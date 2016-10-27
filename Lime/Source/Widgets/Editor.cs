@@ -370,6 +370,8 @@ namespace Lime
 
 			public static Key Submit = Key.MapShortcut(Key.Enter);
 			public static Key Cancel = Key.MapShortcut(Key.Escape);
+
+			public static Key ContextMenu = Key.MapShortcut(Key.Menu);
 		}
 
 		bool IsTextReadable => !EditorParams.UseSecureString && !EditorParams.PasswordChar.HasValue;
@@ -474,7 +476,7 @@ namespace Lime
 					Cmds.SelectLineStart, Cmds.SelectLineEnd,
 					Cmds.SelectAll,
 					Cmds.DeleteWordPrev, Cmds.DeleteWordNext,
-					Cmds.Submit, Cmds.Cancel,
+					Cmds.Submit, Cmds.Cancel, Cmds.ContextMenu,
 					Key.Commands.Cut, Key.Commands.Copy, Key.Commands.Paste, Key.Commands.Delete,
 					Key.Commands.Undo, Key.Commands.Redo,
 				}
@@ -703,6 +705,9 @@ namespace Lime
 					input.ConsumeKey(Cmds.Cancel);
 					InputWidget.RevokeFocus();
 				}
+
+				if (WasKeyRepeated(Cmds.ContextMenu))
+					ShowContextMenu(atCaret: true);
 				if (input.WasKeyPressed(Key.Commands.Copy) && HasSelection() && IsTextReadable) {
 					var r = GetSelectionRange();
 					Clipboard.Text = Text.Text.Substring(r.Start, r.Length);
@@ -813,7 +818,7 @@ namespace Lime
 						input.ReleaseMouse();
 					}
 					if (input.WasMouseReleased(1))
-						ShowContextMenu();
+						ShowContextMenu(atCaret: false);
 					Text.SyncCaretPosition();
 				}
 				AdjustSizeAndScrollToCaret();
@@ -830,11 +835,11 @@ namespace Lime
 			}
 		}
 
-		private void ShowContextMenu()
+		private void ShowContextMenu(bool atCaret)
 		{
 #if MAC || WIN
 			var i = Window.Current.Input;
-			(new Menu {
+			var m = new Menu {
 				new LocalKeySendingCommand(i, "Undo", Key.Commands.Undo),
 				Command.MenuSeparator,
 				new LocalKeySendingCommand(i, "Cut", Key.Commands.Cut),
@@ -843,7 +848,12 @@ namespace Lime
 				new LocalKeySendingCommand(i, "Delete", Key.Commands.Delete),
 				Command.MenuSeparator,
 				new LocalKeySendingCommand(i, "Select all", Key.Commands.SelectAll),
-			}).Popup();
+			};
+			if (atCaret) {
+				var p = DisplayWidget.LocalToWorldTransform.TransformVector(CaretPos.WorldPos);
+				m.Popup(Window.Current, p, 0, null);
+			} else
+				m.Popup();
 #endif
 		}
 	}
