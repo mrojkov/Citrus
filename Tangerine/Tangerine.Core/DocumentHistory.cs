@@ -1,33 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Tangerine.Core
 {
-	public interface ISaveOperation : IOperation { }
-
 	public class DocumentHistory
 	{
-		private int transactionCounter;
-		private DateTime transactionTimestamp;
-		private int undoPosition;
-		private List<IOperation> operations = new List<IOperation>();
-
 		public static readonly List<Func<IOperationProcessor>> ProcessorBuilders = new List<Func<IOperationProcessor>>();
 		readonly List<IOperationProcessor> processors;
 
-		public event Action Changed;
+		int transactionCounter;
+		DateTime transactionTimestamp;
+		readonly List<IOperation> operations = new List<IOperation>();
+		int headPos;
+		int savePos;
 
-		public bool UndoEnabled => undoPosition > 0;
-		public bool RedoEnabled => undoPosition < operations.Count;
+		public bool UndoEnabled => headPos > 0;
+		public bool RedoEnabled => headPos < operations.Count;
 		public bool IsDocumentModified { get; private set; }
 
 		public DocumentHistory()
 		{
 			processors = ProcessorBuilders.Select(i => i()).ToList();
-			Changed += RefreshModifiedStatus;
 		}
 
 		public void BeginTransaction()
@@ -44,13 +38,16 @@ namespace Tangerine.Core
 		public void Perform(IOperation operation)
 		{
 			operation.Timestamp = (transactionCounter > 0) ? transactionTimestamp : DateTime.UtcNow;
-			operations.RemoveRange(undoPosition, operations.Count - undoPosition);
+			if (savePos > headPos) {
+				savePos = -1;
+			}
+			operations.RemoveRange(headPos, operations.Count - headPos);
 			operations.Add(operation);
-			undoPosition = operations.Count;
+			headPos = operations.Count;
 			foreach (var p in processors) {
 				p.Do(operation);
 			}
-			Changed?.Invoke();
+			OnChange();
 		}
 
 		public void Undo()
@@ -59,8 +56,8 @@ namespace Tangerine.Core
 				return;
 			}
 			DateTime? timestamp = null;
-			for (; undoPosition > 0; undoPosition--) {
-				var o = operations[undoPosition - 1];
+			for (; headPos > 0; headPos--) {
+				var o = operations[headPos - 1];
 				if (o.IsChangingDocument && !timestamp.HasValue) {
 					timestamp = o.Timestamp;
 				}
@@ -71,7 +68,7 @@ namespace Tangerine.Core
 					p.Undo(o);
 				}
 			}
-			Changed?.Invoke();
+			OnChange();
 		}
 		
 		public void Redo()
@@ -80,8 +77,8 @@ namespace Tangerine.Core
 				return;
 			}
 			DateTime? timestamp = null;
-			for (; undoPosition < operations.Count; undoPosition++) {
-				var o = operations[undoPosition];
+			for (; headPos < operations.Count; headPos++) {
+				var o = operations[headPos];
 				if (o.IsChangingDocument && !timestamp.HasValue) {
 					timestamp = o.Timestamp;
 				}
@@ -92,19 +89,31 @@ namespace Tangerine.Core
 					p.Do(o);
 				}
 			}
-			Changed?.Invoke();
+			OnChange();
 		}
 
-		private void RefreshModifiedStatus()
+		void RefreshModifiedStatus()
 		{
-			IsDocumentModified = false;
-			for (var i = undoPosition; i > 0; i--) {
-				var o = operations[i - 1];
-				if (o is ISaveOperation) {
-					break;
-				}
-				IsDocumentModified |= o.IsChangingDocument;
+			if (savePos < 0) {
+				IsDocumentModified = true;
+				return;
 			}
+			var range = savePos <= headPos ?
+				operations.GetRange(savePos, headPos - savePos) :
+				operations.GetRange(headPos, savePos - headPos);
+			IsDocumentModified = range.Any(i => i.IsChangingDocument);
+		}
+
+		public void AddSavePoint()
+		{
+			savePos = headPos;
+			RefreshModifiedStatus();
+		}
+
+		void OnChange()
+		{
+			RefreshModifiedStatus();
+			Lime.Application.InvalidateWindows();
 		}
 	}
 }
