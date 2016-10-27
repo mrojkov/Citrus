@@ -42,7 +42,7 @@ namespace Lime
 		public Matrix32 ScreenToWorldTransform = Matrix32.Identity;
 
 		/// <summary>
-		/// The current mouse position in virtual coordinates coordinates. (read only)
+		/// The current mouse position in virtual coordinates. (read only)
 		/// </summary>
 		public Vector2 MousePosition { get; internal set; }
 
