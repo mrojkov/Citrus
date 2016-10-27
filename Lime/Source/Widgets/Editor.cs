@@ -321,10 +321,7 @@ namespace Lime
 			Text.Caret = mc;
 
 			if (EditorParams.PasswordChar.HasValue) {
-				if (EditorParams.UseSecureString)
-					Text.TextProcessor += ProcessSecurePassword;
-				else
-					Text.TextProcessor += ProcessPlainPassword;
+				Text.TextProcessor += ProcessHiddenPassword;
 				if (EditorParams.PasswordLastCharShowTime > 0)
 					container.Tasks.Add(TrackLastCharInput, this);
 			}
@@ -378,19 +375,16 @@ namespace Lime
 		bool IsTextReadable => !EditorParams.UseSecureString && !EditorParams.PasswordChar.HasValue;
 		private int TextLength => EditorParams.UseSecureString ? Password.Length : Text.Text.Length;
 
-		private string PasswordChars(int length) => new string(EditorParams.PasswordChar.Value, length);
-
-		private static char LastChar(SecureString s)
+		private struct LastChar
 		{
-			if (s.Length == 0)
-				return '\0';
-			var bstr = Marshal.SecureStringToBSTR(s);
-			try {
-				return (char)Marshal.ReadInt16(bstr, s.Length - 2);
-			} finally {
-				Marshal.ZeroFreeBSTR(bstr);
-			}
+			public float ShowTimeLeft;
+			public char Value;
+			public int Pos;
+			public bool Visible => ShowTimeLeft > 0;
 		}
+		private LastChar lastChar;
+
+		private string PasswordChars(int length) => new string(EditorParams.PasswordChar.Value, length);
 
 		// This totally defeats the point of using SecureString.
 		private static string Unsecure(SecureString s)
@@ -405,19 +399,14 @@ namespace Lime
 			}
 		}
 
-		private void ProcessSecurePassword(ref string text)
+		private void ProcessHiddenPassword(ref string text)
 		{
-			text = isLastCharVisible ?
-				PasswordChars(Password.Length - 1) + LastChar(Password) : PasswordChars(Password.Length);
+			text = lastChar.Visible ?
+				PasswordChars(lastChar.Pos) + lastChar.Value + PasswordChars(TextLength - lastChar.Pos - 1) :
+				PasswordChars(TextLength);
 		}
 
 		private void ProcessUnsecuredPassword(ref string text) { text = Unsecure(Password); }
-
-		private void ProcessPlainPassword(ref string text)
-		{
-			if (text != "")
-				text = isLastCharVisible ? PasswordChars(text.Length - 1) + text.Last() : PasswordChars(text.Length);
-		}
 
 		public void Unlink()
 		{
@@ -433,6 +422,7 @@ namespace Lime
 
 		private void ApplyUndoItem(UndoItem i)
 		{
+			lastChar.ShowTimeLeft = 0;
 			Text.Text = i.Value;
 			CaretPos.TextPos = i.TextPos;
 			CaretPos.InvalidatePreservingTextPos();
@@ -442,23 +432,26 @@ namespace Lime
 
 		private bool WasKeyRepeated(Key key) => input.WasKeyRepeated(key);
 
-		private void InsertChar(char ch)
+		private bool InsertChar(char ch)
 		{
 			if (HasSelection())
 				DeleteSelection();
-			if (CaretPos.TextPos < 0 || CaretPos.TextPos > TextLength) return;
-			if (!EditorParams.IsAcceptableLength(TextLength + 1)) return;
-			if (ch != '\n' && !EditorParams.AllowNonDisplayableChars && !Text.CanDisplay(ch)) return;
+			if (CaretPos.TextPos < 0 || CaretPos.TextPos > TextLength) return false;
+			if (!EditorParams.IsAcceptableLength(TextLength + 1)) return false;
 			if (EditorParams.UseSecureString) {
-				if (ch == '\n') return;
+				if (ch == '\n') return false;
 				Password.InsertAt(CaretPos.TextPos, ch);
 			} else {
+				if (ch != '\n' && !EditorParams.AllowNonDisplayableChars && !Text.CanDisplay(ch)) return false;
 				var newText = Text.Text.Insert(CaretPos.TextPos, ch.ToString());
-				if (EditorParams.AcceptText != null && !EditorParams.AcceptText(newText)) return;
-				if (EditorParams.MaxHeight > 0 && !EditorParams.IsAcceptableHeight(CalcTextHeight(newText))) return;
+				if (EditorParams.AcceptText != null && !EditorParams.AcceptText(newText)) return false;
+				if (EditorParams.MaxHeight > 0 && !EditorParams.IsAcceptableHeight(CalcTextHeight(newText))) return false;
 				Text.Text = newText;
 			}
-			CaretPos.TextPos++;
+			lastChar.ShowTimeLeft = EditorParams.PasswordLastCharShowTime;
+			lastChar.Value = ch;
+			lastChar.Pos = CaretPos.TextPos++;
+			return true;
 		}
 
 		private float CalcTextHeight(string s)
@@ -579,6 +572,8 @@ namespace Lime
 				HideSelection();
 				Text.Text = Text.Text.Remove(start, length);
 			}
+			if (start <= lastChar.Pos && lastChar.Pos < start + length)
+				lastChar.ShowTimeLeft = 0;
 			if (newTextPos >= 0)
 				CaretPos.TextPos = newTextPos;
 			CaretPos.InvalidatePreservingTextPos();
@@ -587,14 +582,11 @@ namespace Lime
 		private void InsertText(string text)
 		{
 			if (EditorParams.UseSecureString) {
-				foreach (var ch in text)
-					InsertChar(ch);
-				Text.Invalidate();
+				if (text.Count(InsertChar) > 0)
+					Text.Invalidate();
 			} else {
 				var u = MakeUndoItem();
-				foreach (var ch in text)
-					InsertChar(ch);
-				if (Text.Text != u.Value)
+				if (text.Count(InsertChar) > 0)
 					History.Add(u);
 			}
 		}
@@ -740,9 +732,6 @@ namespace Lime
 			}
 		}
 
-		private float lastCharShowTimeLeft;
-		private bool isLastCharVisible;
-
 		private void HandleTextInput()
 		{
 			if (input.TextInput == null)
@@ -753,28 +742,21 @@ namespace Lime
 				if (ch == '\b') {
 					if (HasSelection())
 						DeleteSelection();
-					else if (CaretPos.TextPos > 0 && CaretPos.TextPos <= TextLength) {
+					else if (CaretPos.TextPos > 0 && CaretPos.TextPos <= TextLength)
 						RemoveText(CaretPos.TextPos - 1, 1, CaretPos.TextPos - 1);
-						lastCharShowTimeLeft = 0f;
-					}
 				}
-				else if (ch >= ' ' && ch != '\u007f') { // Ignore control and 'delete' characters.
+				else if (ch >= ' ' && ch != '\u007f') // Ignore control and 'delete' characters.
 					InsertText(ch.ToString());
-					lastCharShowTimeLeft = EditorParams.PasswordLastCharShowTime;
-				}
 			}
 		}
 
 		private IEnumerator<object> TrackLastCharInput()
 		{
 			while (true) {
-				if (TextLength > 0) {
-					lastCharShowTimeLeft -= Task.Current.Delta;
-					var shouldShowLastChar = lastCharShowTimeLeft > 0;
-					if (shouldShowLastChar != isLastCharVisible) {
-						isLastCharVisible = shouldShowLastChar;
+				if (lastChar.Visible) {
+					lastChar.ShowTimeLeft -= Task.Current.Delta;
+					if (!lastChar.Visible)
 						Text.Invalidate();
-					}
 				}
 				yield return null;
 			}
