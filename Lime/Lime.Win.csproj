@@ -95,6 +95,11 @@
     <Compile Include="Source\Application\Clipboard\Clipboard.Mac.cs" />
     <Compile Include="Source\Application\Clipboard\Clipboard.Win.cs" />
     <Compile Include="Source\Application\CommonWindow.cs" />
+    <Compile Include="Source\Application\Display\Display.Android.cs" />
+    <Compile Include="Source\Application\Display\Display.iOS.cs" />
+    <Compile Include="Source\Application\Display\Display.Mac.cs" />
+    <Compile Include="Source\Application\Display\Display.Win.cs" />
+    <Compile Include="Source\Application\Display\IDisplay.cs" />
     <Compile Include="Source\Application\DummyWindow.cs" />
     <Compile Include="Source\Application\Menu\Menu.Win.cs" />
     <Compile Include="Source\Application\MouseCursor\MouseCursor.cs" />
