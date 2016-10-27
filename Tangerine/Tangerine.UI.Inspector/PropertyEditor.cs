@@ -136,9 +136,13 @@ namespace Tangerine.UI.Inspector
 
 	class StringPropertyEditor : CommonPropertyEditor
 	{
-		public StringPropertyEditor(PropertyEditorContext context) : base(context)
+		const int maxLines = 5;
+
+		public StringPropertyEditor(PropertyEditorContext context, bool multiline = false) : base(context)
 		{
 			var editor = new EditBox { LayoutCell = new LayoutCell(Alignment.Center) };
+			editor.Editor.EditorParams.MaxLines = multiline ? maxLines : 1;
+			editor.MinHeight += multiline ? editor.TextWidget.FontHeight * (maxLines - 1) : 0;
 			containerWidget.AddNode(editor);
 			OnKeyframeToggle += editor.SetFocus;
 			editor.Submitted += text => {

@@ -61,6 +61,7 @@ namespace Tangerine.UI.Inspector
 		{
 			AddEditor(c => c.PropertyName == "ContentsPath", c => new ContentsPathPropertyEditor(c));
 			AddEditor(typeof(Vector2), c => new Vector2PropertyEditor(c));
+			AddEditor(c => c.PropertyName == "Text", c => new StringPropertyEditor(c, multiline: true));
 			AddEditor(typeof(string), c => new StringPropertyEditor(c));
 			AddEditor(typeof(float), c => new FloatPropertyEditor(c));
 			AddEditor(typeof(bool), c => new BooleanPropertyEditor(c));
