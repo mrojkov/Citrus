@@ -6,8 +6,7 @@ namespace Tangerine.Core
 {
 	public class DocumentHistory
 	{
-		public static readonly List<Func<IOperationProcessor>> ProcessorBuilders = new List<Func<IOperationProcessor>>();
-		readonly List<IOperationProcessor> processors;
+		public static readonly List<IOperationProcessor> Processors = new List<IOperationProcessor>();
 
 		int transactionCounter;
 		DateTime transactionTimestamp;
@@ -20,11 +19,6 @@ namespace Tangerine.Core
 		public bool IsDocumentModified { get; private set; }
 
 		readonly TimeSpan maxUndoTimespan = TimeSpan.FromSeconds(0.1f);
-
-		public DocumentHistory()
-		{
-			processors = ProcessorBuilders.Select(i => i()).ToList();
-		}
 
 		public void BeginTransaction()
 		{
@@ -46,7 +40,7 @@ namespace Tangerine.Core
 			operations.RemoveRange(headPos, operations.Count - headPos);
 			operations.Add(operation);
 			headPos = operations.Count;
-			foreach (var p in processors) {
+			foreach (var p in Processors) {
 				p.Do(operation);
 			}
 			OnChange();
@@ -66,7 +60,7 @@ namespace Tangerine.Core
 				if (timestamp.HasValue && (timestamp.Value - o.Timestamp) > maxUndoTimespan) {
 					break;
 				}
-				foreach (var p in processors) {
+				foreach (var p in Processors) {
 					p.Undo(o);
 				}
 			}
@@ -87,7 +81,7 @@ namespace Tangerine.Core
 				if (timestamp.HasValue && (o.Timestamp - timestamp.Value) > maxUndoTimespan) {
 					break;
 				}
-				foreach (var p in processors) {
+				foreach (var p in Processors) {
 					p.Do(o);
 				}
 			}

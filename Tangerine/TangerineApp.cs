@@ -64,24 +64,24 @@ namespace Tangerine
 				}
 			};
 
-			DocumentHistory.ProcessorBuilders.AddRange(new Func<IOperationProcessor>[] {
-				() => new Core.Operations.SelectRow.Processor(),
-				() => new Core.Operations.SetProperty.Processor(),
-				() => new Core.Operations.SetGenericProperty<NodeVisibility>.Processor(),
-				() => new Core.Operations.SetGenericProperty<bool>.Processor(),
-				() => new Core.Operations.SetGenericProperty<Node>.Processor(),
-				() => new Core.Operations.RemoveKeyframe.Processor(),
-				() => new Core.Operations.SetKeyframe.Processor(),
-				() => new Core.Operations.InsertNode.Processor(),
-				() => new Core.Operations.UnlinkNode.Processor(),
-				() => new Core.Operations.SetMarker.Processor(),
-				() => new UI.Timeline.Operations.SelectGridSpan.Processor(),
-				() => new UI.Timeline.Operations.ClearGridSelection.Processor(),
-				() => new UI.Timeline.Operations.ShiftGridSelection.Processor(),
-				() => new UI.Timeline.Operations.SetCurrentColumn.Processor(),
-				() => new RowsSynchronizer()
+			DocumentHistory.Processors.AddRange(new IOperationProcessor[] {
+				new Core.Operations.SelectRow.Processor(),
+				new Core.Operations.SetProperty.Processor(),
+				new Core.Operations.SetGenericProperty<NodeVisibility>.Processor(),
+				new Core.Operations.SetGenericProperty<bool>.Processor(),
+				new Core.Operations.SetGenericProperty<Node>.Processor(),
+				new Core.Operations.RemoveKeyframe.Processor(),
+				new Core.Operations.SetKeyframe.Processor(),
+				new Core.Operations.InsertNode.Processor(),
+				new Core.Operations.UnlinkNode.Processor(),
+				new Core.Operations.SetMarker.Processor(),
+				new UI.Timeline.Operations.SelectGridSpan.Processor(),
+				new UI.Timeline.Operations.ClearGridSelection.Processor(),
+				new UI.Timeline.Operations.ShiftGridSelection.Processor(),
+				new UI.Timeline.Operations.SetCurrentColumn.Processor(),
+				new RowsSynchronizer()
 			});
-			DocumentHistory.ProcessorBuilders.AddRange(UI.Timeline.Timeline.GetOperationProcessorBuilders());
+			DocumentHistory.Processors.AddRange(UI.Timeline.Timeline.GetOperationProcessorBuilders());
 
 			Toolbars.Add("Create", new Toolbar(dockManager.ToolbarArea));
 			Toolbars.Add("Tools", new Toolbar(dockManager.ToolbarArea));

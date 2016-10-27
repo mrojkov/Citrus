@@ -45,14 +45,14 @@ namespace Tangerine.UI.Timeline
 		public int ColumnCount { get; set; }
 		public readonly Entity Globals = new Entity();
 
-		public static IEnumerable<Func<IOperationProcessor>> GetOperationProcessorBuilders()
+		public static IEnumerable<IOperationProcessor> GetOperationProcessorBuilders()
 		{
-			return new Func<IOperationProcessor>[] { 
-				() => new ColumnCountUpdater(),
-				() => new RowViewsUpdater(),
-				() => new RollWidgetsUpdater(),
-				() => new GridWidgetsUpdater(),
-				() => new OverviewWidgetsUpdater()
+			return new IOperationProcessor[] { 
+				new ColumnCountUpdater(),
+				new RowViewsUpdater(),
+				new RollWidgetsUpdater(),
+				new GridWidgetsUpdater(),
+				new OverviewWidgetsUpdater()
 			};
 		}
 
