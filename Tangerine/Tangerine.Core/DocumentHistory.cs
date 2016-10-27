@@ -19,6 +19,8 @@ namespace Tangerine.Core
 		public bool RedoEnabled => headPos < operations.Count;
 		public bool IsDocumentModified { get; private set; }
 
+		readonly TimeSpan maxUndoTimespan = TimeSpan.FromSeconds(0.1f);
+
 		public DocumentHistory()
 		{
 			processors = ProcessorBuilders.Select(i => i()).ToList();
@@ -61,7 +63,7 @@ namespace Tangerine.Core
 				if (o.IsChangingDocument && !timestamp.HasValue) {
 					timestamp = o.Timestamp;
 				}
-				if (timestamp.HasValue && (timestamp.Value - o.Timestamp) > TimeSpan.FromSeconds(0.1f)) {
+				if (timestamp.HasValue && (timestamp.Value - o.Timestamp) > maxUndoTimespan) {
 					break;
 				}
 				foreach (var p in processors) {
@@ -82,7 +84,7 @@ namespace Tangerine.Core
 				if (o.IsChangingDocument && !timestamp.HasValue) {
 					timestamp = o.Timestamp;
 				}
-				if (timestamp.HasValue && (o.Timestamp - timestamp.Value) > TimeSpan.FromSeconds(0.1f)) {
+				if (timestamp.HasValue && (o.Timestamp - timestamp.Value) > maxUndoTimespan) {
 					break;
 				}
 				foreach (var p in processors) {
