@@ -20,9 +20,9 @@ namespace Tangerine.UI.Timeline.Components
 		{
 			this.row = row;
 			nodeData = row.Components.Get<NodeRow>();
-			label = new SimpleText { HitTestTarget = true };
+			label = new SimpleText();
 			editBox = new EditBox { LayoutCell = new LayoutCell(Alignment.Center, stretchX: float.MaxValue) };
-			nodeIcon = new Image(NodeIconPool.GetTexture(nodeData.Node.GetType()));
+			nodeIcon = new Image(NodeIconPool.GetTexture(nodeData.Node.GetType())) { HitTestTarget = true };
 			nodeIcon.MinMaxSize = (Vector2)nodeIcon.Texture.ImageSize;
 			var expandButtonContainer = new Widget {
 				Layout = new StackLayout { IgnoreHidden = false },
@@ -121,7 +121,7 @@ namespace Tangerine.UI.Timeline.Components
 		IEnumerator<object> HandleDobleClickTask()
 		{
 			while (true) {
-				if (label.Input.WasKeyPressed(Key.Mouse0DoubleClick)) {
+				if (nodeIcon.Input.WasKeyPressed(Key.Mouse0DoubleClick)) {
 					Core.Operations.ClearRowSelection.Perform();
 					Core.Operations.SelectRow.Perform(row);
 					label.Visible = false;
@@ -136,19 +136,12 @@ namespace Tangerine.UI.Timeline.Components
 			}
 		}
 
-		static List<Key> keysToConsume = new List<Key> {
-			Key.Down, Key.Up
-		}.Select(i => Key.MapShortcut(i)).ToList();
-
 		IEnumerator<object> EditNodeIdTask()
 		{
-			editBox.Input.CaptureMouse();
 			var initialText = editBox.Text;
 			while (editBox.IsFocused()) {
-				editBox.Input.ConsumeKeys(keysToConsume);
 				yield return null;
 			}
-			editBox.Input.ReleaseMouse();
 			editBox.Visible = false;
 			label.Visible = true;
 			if (editBox.Text != initialText) {
