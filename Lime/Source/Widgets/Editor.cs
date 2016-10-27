@@ -371,6 +371,8 @@ namespace Lime
 			public static Key Submit = Key.MapShortcut(Key.Enter);
 			public static Key Cancel = Key.MapShortcut(Key.Escape);
 
+			public static Key BackSpace = Key.MapShortcut(Key.BackSpace);
+
 			public static Key ContextMenu = Key.MapShortcut(Key.Menu);
 		}
 
@@ -477,6 +479,7 @@ namespace Lime
 					Cmds.SelectAll,
 					Cmds.DeleteWordPrev, Cmds.DeleteWordNext,
 					Cmds.Submit, Cmds.Cancel, Cmds.ContextMenu,
+					Cmds.BackSpace,
 					Key.Commands.Cut, Key.Commands.Copy, Key.Commands.Paste, Key.Commands.Delete,
 					Key.Commands.Undo, Key.Commands.Redo,
 				}
