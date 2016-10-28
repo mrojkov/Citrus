@@ -23,5 +23,18 @@ namespace Tangerine.Core
 			taskList.Add(task.Task());
 		}
 	}
+
+	public static class TaskProviderExtensions
+	{
+		public static void AddTo(this ITaskProvider task, TaskList tasks)
+		{
+			tasks.Add(task);
+		}
+
+		public static void AddTo(this ITaskProvider task, Widget widget)
+		{
+			widget.Tasks.Add(task);
+		}
+	}
 }
 

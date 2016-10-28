@@ -94,9 +94,7 @@ namespace Tangerine.UI.Inspector
 		ITaskProvider RebuildInspectorWhenSelectedRowsChanged()
 		{
 			var builder = new InspectorBuilder();
-			return new Property<int>(() => Document.Current.SelectedRows.Version).DistinctUntilChanged().Consume(_ => {
-				builder.Build(Document.Current.SelectedNodes());
-			});
+			return new Property<int>(() => Document.Current.SelectedRows.Version).WhenChanged(_ => builder.Build(Document.Current.SelectedNodes()));
 		}
 
 		public class PropertyEditorRegistryItem

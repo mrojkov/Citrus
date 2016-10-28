@@ -41,7 +41,7 @@ namespace Tangerine.UI
 				}
 			};
 			resultPane = scrollView.Content;
-			RootWidget.Tasks.Add(new Property<string>(() => searchStringEditor.Text).DistinctUntilChanged().Consume(RefreshResultPane));
+			RootWidget.AddChangeWatcher(() => searchStringEditor.Text, RefreshResultPane);
 			scrollView.TabTravesable = new TabTraversable();
 			resultPane.CompoundPresenter.Insert(0, new DelegatePresenter<Widget>(w => {
 				w.PrepareRendererState();

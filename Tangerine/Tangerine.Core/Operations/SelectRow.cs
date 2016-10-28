@@ -59,6 +59,9 @@ namespace Tangerine.Core.Operations
 	{
 		public static void Perform(Node node, bool select = true)
 		{
+			if (node.Parent != Document.Current.Container) {
+				throw new InvalidOperationException();
+			}
 			var row = Document.Current.GetRowById(node.EditorState().Uid);
 			SelectRow.Perform(row, select);
 		}

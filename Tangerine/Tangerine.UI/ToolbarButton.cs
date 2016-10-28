@@ -97,7 +97,7 @@ namespace Tangerine.UI
 		{
 			base.Awake();
 			Tasks.Add(ShowTipTask());
-			Tasks.Add(new Property<bool>(() => Enabled).DistinctUntilChanged().Consume(_ => Window.Current.Invalidate()));
+			this.AddChangeWatcher(() => Enabled, _ => Window.Current.Invalidate());
 		}
 
 		private IEnumerator<object> ShowTipTask()

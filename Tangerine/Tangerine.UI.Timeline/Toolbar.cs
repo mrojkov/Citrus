@@ -39,7 +39,7 @@ namespace Tangerine.UI.Timeline
 		ToolbarButton CreateAnimationModeButton()
 		{
 			var button = new ToolbarButton(IconPool.GetTexture("Timeline.AnimationMode")) { Tip = "Animation mode" };
-			button.Tasks.Add(new Property<bool>(() => UserPreferences.Instance.AnimationMode).DistinctUntilChanged().Consume(i => button.Checked = i));
+			button.AddChangeWatcher(() => UserPreferences.Instance.AnimationMode, i => button.Checked = i);
 			button.Clicked += () => {
 				UserPreferences.Instance.AnimationMode = !UserPreferences.Instance.AnimationMode;
 			};
@@ -52,15 +52,15 @@ namespace Tangerine.UI.Timeline
 			Action f = () => {
 				t.Text = $"{Document.Current.Container.AnimationFrame} : {Timeline.Instance.Ruler.MeasuredFrameDistance:+#;-#;0}";
 			};
-			t.Tasks.Add(new Property<int>(() => Document.Current.Container.AnimationFrame).DistinctUntilChanged().Consume(_ => f()));
-			t.Tasks.Add(new Property<int>(() => Timeline.Instance.Ruler.MeasuredFrameDistance).DistinctUntilChanged().Consume(_ => f()));
+			t.AddChangeWatcher(() => Document.Current.Container.AnimationFrame, _ => f());
+			t.AddChangeWatcher(() => Timeline.Instance.Ruler.MeasuredFrameDistance, _ => f());
 			return t;
 		}
 
 		ToolbarButton CreateAutoKeyframesButton()
 		{
 			var button = new ToolbarButton(IconPool.GetTexture("Timeline.Key")) { Tip = "Automatic keyframes" };
-			button.Tasks.Add(new Property<bool>(() => UserPreferences.Instance.AutoKeyframes).DistinctUntilChanged().Consume(i => button.Checked = i));
+			button.AddChangeWatcher(() => UserPreferences.Instance.AutoKeyframes, i => button.Checked = i);
 			button.Clicked += () => {
 				UserPreferences.Instance.AutoKeyframes = !UserPreferences.Instance.AutoKeyframes;
 			};

@@ -81,7 +81,7 @@ namespace Tangerine
 				new UI.Timeline.Operations.SetCurrentColumn.Processor(),
 				new RowsSynchronizer()
 			});
-			DocumentHistory.Processors.AddRange(UI.Timeline.Timeline.GetOperationProcessorBuilders());
+			DocumentHistory.Processors.AddRange(UI.Timeline.Timeline.GetOperationProcessors());
 
 			Toolbars.Add("Create", new Toolbar(dockManager.ToolbarArea));
 			Toolbars.Add("Tools", new Toolbar(dockManager.ToolbarArea));
@@ -189,12 +189,8 @@ namespace Tangerine
 			public DocumentTabsProcessor(TabBar tabBar)
 			{
 				RebuildTabs(tabBar);
-				var documentsCollectionChanged = new Property<int>(() => Project.Current.Documents.Version).DistinctUntilChanged();
-				var currentProjectChanged = new Property<Project>(() => Project.Current).DistinctUntilChanged();
-				tabBar.Tasks.Add(
-					documentsCollectionChanged.Consume(_ => RebuildTabs(tabBar)),
-					currentProjectChanged.Consume(_ => RebuildTabs(tabBar))
-				);
+				tabBar.AddChangeWatcher(() => Project.Current.Documents.Version, _ => RebuildTabs(tabBar));
+				tabBar.AddChangeWatcher(() => Project.Current, _ => RebuildTabs(tabBar));
 			}
 
 			private void RebuildTabs(TabBar tabBar)
@@ -203,11 +199,8 @@ namespace Tangerine
 				foreach (var doc in Project.Current.Documents) {
 					var tab = new Tab { Closable = true };
 					var currentDocumentChanged = new Property<bool>(() => Document.Current == doc).DistinctUntilChanged().Where(i => i);
-					var documentModified = new Property<bool>(() => doc.IsModified).DistinctUntilChanged();
-					tab.Tasks.Add(
-						currentDocumentChanged.Consume(_ => tabBar.ActivateTab(tab)),
-						documentModified.Consume(_ => RefreshTabText(doc, tab))
-					);
+					tab.Tasks.Add(currentDocumentChanged.Consume(_ => tabBar.ActivateTab(tab)));
+					tab.AddChangeWatcher(() => doc.IsModified, _ => RefreshTabText(doc, tab));
 					tab.Clicked += doc.MakeCurrent;
 					tab.Closing += () => Project.Current.CloseDocument(doc);
 					tabBar.AddNode(tab);

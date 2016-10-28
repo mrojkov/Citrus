@@ -115,8 +115,8 @@ namespace Tangerine.UI.Inspector
 			editorY.TextWidget.HAlignment = HAlignment.Right;
 			editorX.Submitted += text => SetComponent(context, 0, editorX, currentX.GetValue());
 			editorY.Submitted += text => SetComponent(context, 1, editorY, currentY.GetValue());
-			editorX.Tasks.Add(currentX.DistinctUntilChanged().Consume(v => editorX.Text = v.ToString()));
-			editorY.Tasks.Add(currentY.DistinctUntilChanged().Consume(v => editorY.Text = v.ToString()));
+			editorX.AddChangeWatcher(currentX, v => editorX.Text = v.ToString());
+			editorY.AddChangeWatcher(currentY, v => editorY.Text = v.ToString());
 		}
 
 		void SetComponent(PropertyEditorContext context, int component, EditBox editor, float currentValue)
@@ -148,7 +148,7 @@ namespace Tangerine.UI.Inspector
 			editor.Submitted += text => {
 				Core.Operations.SetAnimableProperty.Perform(context.Objects, context.PropertyName, text);
 			};
-			editor.Tasks.Add(CoalescedPropertyValue<string>(context).DistinctUntilChanged().Consume(v => editor.Text = v));
+			editor.AddChangeWatcher(CoalescedPropertyValue<string>(context), v => editor.Text = v);
 		}
 	}
 
@@ -166,7 +166,7 @@ namespace Tangerine.UI.Inspector
 			selector.Changed += index => {
 				Core.Operations.SetAnimableProperty.Perform(context.Objects, context.PropertyName, (T)selector.Items[index].Value);
 			};
-			selector.Tasks.Add(CoalescedPropertyValue<T>(context).DistinctUntilChanged().Consume(v => selector.Value = v));
+			selector.AddChangeWatcher(CoalescedPropertyValue<T>(context), v => selector.Value = v);
 		}
 	}
 
@@ -180,7 +180,7 @@ namespace Tangerine.UI.Inspector
 			checkBox.Changed += value => {
 				Core.Operations.SetAnimableProperty.Perform(context.Objects, context.PropertyName, value);
 			};
-			checkBox.Tasks.Add(CoalescedPropertyValue<bool>(context).DistinctUntilChanged().Consume(v => checkBox.Checked = v));
+			checkBox.AddChangeWatcher(CoalescedPropertyValue<bool>(context), v => checkBox.Checked = v);
 		}
 	}
 
@@ -201,7 +201,7 @@ namespace Tangerine.UI.Inspector
 					editor.Text = current.GetValue().ToString();
 				}
 			};
-			editor.Tasks.Add(current.DistinctUntilChanged().Consume(v => editor.Text = v.ToString()));
+			editor.AddChangeWatcher(current, v => editor.Text = v.ToString());
 		}
 	}
 
@@ -307,7 +307,7 @@ namespace Tangerine.UI.Inspector
 			editor.Submitted += text => {
 				Core.Operations.SetAnimableProperty.Perform(context.Objects, context.PropertyName, new SerializableTexture(text));
 			};
-			editor.Tasks.Add(CoalescedPropertyValue<ITexture>(context).DistinctUntilChanged().Select(i => i != null ? i.SerializationPath : "").Consume(v => editor.Text = v));
+			editor.AddChangeWatcher(CoalescedPropertyValue<ITexture>(context), v => editor.Text = v?.SerializationPath ?? "");
 		}
 
 		protected override void SetFilePath(string path)
@@ -325,7 +325,7 @@ namespace Tangerine.UI.Inspector
 			editor.Submitted += text => {
 				Core.Operations.SetAnimableProperty.Perform(context.Objects, context.PropertyName, new SerializableSample(text));
 			};
-			editor.Tasks.Add(CoalescedPropertyValue<SerializableSample>(context).DistinctUntilChanged().Select(i => i != null ? i.SerializationPath : "").Consume(v => editor.Text = v));
+			editor.AddChangeWatcher(CoalescedPropertyValue<SerializableSample>(context), v => editor.Text = v?.SerializationPath ?? "");
 		}
 
 		protected override void SetFilePath(string path)
@@ -343,7 +343,7 @@ namespace Tangerine.UI.Inspector
 			editor.Submitted += text => {
 				Core.Operations.SetAnimableProperty.Perform(context.Objects, context.PropertyName, text);
 			};
-			editor.Tasks.Add(CoalescedPropertyValue<string>(context).DistinctUntilChanged().Consume(v => editor.Text = v));
+			editor.AddChangeWatcher(CoalescedPropertyValue<string>(context), v => editor.Text = v);
 		}
 
 		protected override void SetFilePath(string path)

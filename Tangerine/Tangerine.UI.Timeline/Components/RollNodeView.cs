@@ -47,8 +47,8 @@ namespace Tangerine.UI.Timeline.Components
 					CreateLockButton(),
 				},
 			};
-			label.Tasks.Add(new Property<string>(() => nodeData.Node.Id).DistinctUntilChanged().Consume(s => RefreshLabel()));
-			label.Tasks.Add(new Property<string>(() => nodeData.Node.ContentsPath).DistinctUntilChanged().Consume(s => RefreshLabel()));
+			label.AddChangeWatcher(() => nodeData.Node.Id, s => RefreshLabel());
+			label.AddChangeWatcher(() => nodeData.Node.ContentsPath, s => RefreshLabel());
 			widget.CompoundPresenter.Push(new DelegatePresenter<Widget>(RenderBackground));
 			editBox.Visible = false;
 			widget.Tasks.Add(HandleDobleClickTask());
@@ -67,7 +67,7 @@ namespace Tangerine.UI.Timeline.Components
 		ToolbarButton CreateEyeButton()
 		{
 			var button = new ToolbarButton { Highlightable = false };
-			button.Tasks.Add(new Property<NodeVisibility>(() => nodeData.Visibility).DistinctUntilChanged().Consume(i => {
+			button.AddChangeWatcher(() => nodeData.Visibility, i => {
 				var texture = "Timeline.Dot";
 				if (i == NodeVisibility.Shown) {
 					texture = "Timeline.Eye";
@@ -75,7 +75,7 @@ namespace Tangerine.UI.Timeline.Components
 					texture = "Timeline.Cross";
 				}
 				button.Texture = IconPool.GetTexture(texture);
-			}));
+			});
 			button.Clicked += () => {
 				Core.Operations.SetGenericProperty<NodeVisibility>.Perform(
 					() => nodeData.Visibility, value => nodeData.Visibility = value,
@@ -88,24 +88,22 @@ namespace Tangerine.UI.Timeline.Components
 		ToolbarButton CreateLockButton()
 		{
 			var button = new ToolbarButton { Highlightable = false };
-			button.Tasks.Add(new Property<bool>(() => nodeData.Locked).DistinctUntilChanged().Consume(i => {
-				button.Texture = IconPool.GetTexture(i ? "Timeline.Lock" : "Timeline.Dot");
-			}));
-			button.Clicked += () => {
-				Core.Operations.SetGenericProperty<bool>.Perform(() => nodeData.Locked, value => nodeData.Locked = value, !nodeData.Locked);
-			};
+			button.AddChangeWatcher(
+				() => nodeData.Locked, 
+				i => button.Texture = IconPool.GetTexture(i ? "Timeline.Lock" : "Timeline.Dot")
+			);
+			button.Clicked += () => Core.Operations.SetProperty.Perform(nodeData, nameof(NodeRow.Locked), !nodeData.Locked);
 			return button;
 		}
 
 		ToolbarButton CreateExpandButton()
 		{
 			var button = new ToolbarButton { Highlightable = false };
-			button.Tasks.Add(new Property<bool>(() => nodeData.Expanded).DistinctUntilChanged().Consume(i => {
-				button.Texture = IconPool.GetTexture(i ? "Timeline.Expanded" : "Timeline.Collapsed");
-			}));
-			button.Clicked += () => {
-				Core.Operations.SetGenericProperty<bool>.Perform(() => nodeData.Expanded, value => nodeData.Expanded = value, !nodeData.Expanded);
-			};
+			button.AddChangeWatcher(
+				() => nodeData.Expanded,
+				i => button.Texture = IconPool.GetTexture(i ? "Timeline.Expanded" : "Timeline.Collapsed")
+			);
+			button.Clicked += () => Core.Operations.SetProperty.Perform(nodeData, nameof(NodeRow.Expanded), !nodeData.Expanded);
 			button.Updated += delta => button.Visible = nodeData.Node.Animators.Count > 0;
 			return button;
 		}

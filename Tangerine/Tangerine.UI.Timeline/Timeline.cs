@@ -45,7 +45,7 @@ namespace Tangerine.UI.Timeline
 		public int ColumnCount { get; set; }
 		public readonly Entity Globals = new Entity();
 
-		public static IEnumerable<IOperationProcessor> GetOperationProcessorBuilders()
+		public static IEnumerable<IOperationProcessor> GetOperationProcessors()
 		{
 			return new IOperationProcessor[] { 
 				new ColumnCountUpdater(),
@@ -142,12 +142,12 @@ namespace Tangerine.UI.Timeline
 		ITaskProvider EnsureCurrentColumnVisibleOnContainerChange()
 		{
 			return new Property<Node>(() => Document.Current.Container).
-				DistinctUntilChanged().Consume(_ => EnsureColumnVisible(Document.Current.AnimationFrame));
+				WhenChanged(_ => EnsureColumnVisible(Document.Current.AnimationFrame));
 		}
 
 		ITaskProvider PanelTitleUpdater()
 		{
-			return new Property<Node>(() => Document.Current.Container).DistinctUntilChanged().Consume(_ => {
+			return new Property<Node>(() => Document.Current.Container).WhenChanged(_ => {
 				Panel.Title = "Timeline";
 				var t = "";
 				for (var n = Document.Current.Container; n != Document.Current.RootNode; n = n.Parent) {

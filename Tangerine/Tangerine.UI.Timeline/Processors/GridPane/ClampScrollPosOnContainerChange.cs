@@ -9,7 +9,7 @@ namespace Tangerine.UI.Timeline
 	{
 		public ITaskProvider GetProcessor()
 		{
-			return new Property<Node>(() => Document.Current.Container).DistinctUntilChanged().Consume(_ => {
+			return new Property<Node>(() => Document.Current.Container).WhenChanged(_ => {
 				var rows = Document.Current.SelectedRows;
 				if (rows.Count > 0) {
 					Timeline.Instance.EnsureRowVisible(rows[0]);

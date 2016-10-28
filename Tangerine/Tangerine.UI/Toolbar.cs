@@ -16,7 +16,7 @@ namespace Tangerine
 			widget = new Widget();
 			container.Nodes.Add(widget);
 			DecorateToolbar(widget);
-			container.Tasks.Add(new Property<int>(() => Version).DistinctUntilChanged().Consume(_ => Rebuild()));
+			container.AddChangeWatcher(() => Version, _ => Rebuild());
 		}
 
 		void Rebuild()

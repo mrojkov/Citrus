@@ -44,12 +44,10 @@ namespace Tangerine.UI.Timeline.Components
 		{
 			var button = new ToolbarButton { LayoutCell = new LayoutCell(Alignment.Center) };
 			var s = propRow.Animator.EditorState();
-			button.Tasks.Add(new Property<bool>(() => s.CurvesShown).DistinctUntilChanged().Consume(i => {
-				button.Texture = IconPool.GetTexture(i ? "Timeline.Expanded" : "Timeline.Collapsed");
-			}));
-			button.Clicked += () => {
-				Core.Operations.SetGenericProperty<bool>.Perform(() => s.CurvesShown, value => s.CurvesShown = value, !s.CurvesShown);
-			};
+			button.AddChangeWatcher(() => s.CurvesShown, 
+				i => button.Texture = IconPool.GetTexture(i ? "Timeline.Expanded" : "Timeline.Collapsed"));
+			button.Clicked += 
+				() => Core.Operations.SetGenericProperty<bool>.Perform(() => s.CurvesShown, value => s.CurvesShown = value, !s.CurvesShown);
 			return button;
 		}
 

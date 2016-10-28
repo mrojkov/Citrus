@@ -217,6 +217,11 @@ namespace Tangerine.Core
 			return new DataflowProvider<T>(() => new DistinctUntilChangedProvider<T>(arg.GetDataflow()));
 		}
 
+		public static Consumer<T> WhenChanged<T>(this IDataflowProvider<T> arg, Action<T> action)
+		{
+			return DistinctUntilChanged(arg).Consume(action);
+		}
+
 		public static IDataflowProvider<T> SameOrDefault<T>(this IDataflowProvider<T> arg1, IDataflowProvider<T> arg2, T defaultValue = default(T))
 		{
 			return new DataflowProvider<T>(() => new SameOrDefaultProvider<T>(arg1.GetDataflow(), arg2.GetDataflow(), defaultValue));
