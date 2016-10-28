@@ -93,13 +93,13 @@ namespace Tangerine.UI.SceneView
 			var newPivot = ((transform * pivot) / widget.Size).Snap(widget.Pivot);
 			var deltaPos = Vector2.RotateDeg((newPivot - widget.Pivot) * (widget.Scale * widget.Size), widget.Rotation);
 			var newPos = widget.Position + deltaPos.Snap(Vector2.Zero);
-			Core.Operations.SetAnimableProperty.Perform(widget, "Position", newPos);
-			Core.Operations.SetAnimableProperty.Perform(widget, "Pivot", newPivot);
+			Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), newPos);
+			Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Pivot), newPivot);
 		}
 
 		void SetWidgetRotation(Widget widget, float rotation)
 		{
-			Core.Operations.SetAnimableProperty.Perform(widget, "Rotation", rotation);
+			Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Rotation), rotation);
 		}
 	}
 }

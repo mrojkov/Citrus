@@ -77,10 +77,7 @@ namespace Tangerine.UI.Timeline.Components
 				button.Texture = IconPool.GetTexture(texture);
 			});
 			button.Clicked += () => {
-				Core.Operations.SetGenericProperty<NodeVisibility>.Perform(
-					() => nodeData.Visibility, value => nodeData.Visibility = value,
-					(NodeVisibility)(((int)nodeData.Visibility + 1) % 3)
-				);
+				Core.Operations.SetProperty.Perform(nodeData, nameof(NodeRow.Visibility), (NodeVisibility)(((int)nodeData.Visibility + 1) % 3));
 			};
 			return button;
 		}

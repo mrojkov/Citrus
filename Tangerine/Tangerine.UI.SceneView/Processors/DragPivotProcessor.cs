@@ -72,8 +72,8 @@ namespace Tangerine.UI.SceneView
 						var deltaPos = Vector2.RotateDeg(dragDelta * widget.Scale, widget.Rotation);
 						deltaPivot = deltaPivot.Snap(Vector2.Zero);
 						if (deltaPivot != Vector2.Zero) {
-							Core.Operations.SetAnimableProperty.Perform(widget, "Pivot", pivots[i] + deltaPivot);
-							Core.Operations.SetAnimableProperty.Perform(widget, "Position", positions[i] + deltaPos.Snap(Vector2.Zero));
+							Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Pivot), pivots[i] + deltaPivot);
+							Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), positions[i] + deltaPos.Snap(Vector2.Zero));
 						}
 					}
 					yield return null;

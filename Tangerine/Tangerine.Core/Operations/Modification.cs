@@ -44,43 +44,6 @@ namespace Tangerine.Core.Operations
 		}
 	}
 
-	public class SetGenericProperty<T> : Operation
-	{
-		public Func<T> Getter;
-		public Action<T> Setter;
-		public T Value;
-
-		public override bool IsChangingDocument => true;
-
-		public static void Perform(Func<T> getter, Action<T> setter, T value)
-		{
-			Document.Current.History.Perform(new SetGenericProperty<T>(getter, setter, value));
-		}
-
-		private SetGenericProperty(Func<T> getter, Action<T> setter, T value)
-		{
-			Value = value;
-			Getter = getter;
-			Setter = setter;
-		}
-
-		public class Processor : OperationProcessor<SetGenericProperty<T>>
-		{
-			class Backup { public T Value; }
-
-			protected override void InternalDo(SetGenericProperty<T> op)
-			{
-				op.Save(new Backup { Value = op.Getter() });
-				op.Setter(op.Value);
-			}
-
-			protected override void InternalUndo(SetGenericProperty<T> op)
-			{
-				op.Setter(op.Restore<Backup>().Value);
-			}
-		}
-	}
-
 	public class SetAnimableProperty
 	{
 		public static void Perform(IEnumerable<object> objects, string propertyName, object value)

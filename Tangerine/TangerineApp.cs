@@ -67,9 +67,6 @@ namespace Tangerine
 			DocumentHistory.Processors.AddRange(new IOperationProcessor[] {
 				new Core.Operations.SelectRow.Processor(),
 				new Core.Operations.SetProperty.Processor(),
-				new Core.Operations.SetGenericProperty<NodeVisibility>.Processor(),
-				new Core.Operations.SetGenericProperty<bool>.Processor(),
-				new Core.Operations.SetGenericProperty<Node>.Processor(),
 				new Core.Operations.RemoveKeyframe.Processor(),
 				new Core.Operations.SetKeyframe.Processor(),
 				new Core.Operations.InsertNode.Processor(),

@@ -60,7 +60,7 @@ namespace Tangerine.UI.SceneView
 					dragDelta = dragDelta.Snap(Vector2.Zero);
 					if (dragDelta != Vector2.Zero) {
 						for (int i = 0; i < widgets.Count; i++) {
-							Core.Operations.SetAnimableProperty.Perform(widgets[i], "Position", positions[i] + dragDelta);
+							Core.Operations.SetAnimableProperty.Perform(widgets[i], nameof(Widget.Position), positions[i] + dragDelta);
 						}
 					}
 					yield return null;

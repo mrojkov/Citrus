@@ -86,10 +86,7 @@ namespace Tangerine.UI.Timeline
 					visibility = NodeVisibility.Default;
 				}
 				foreach (var node in Document.Current.Container.Nodes) {
-					Core.Operations.SetGenericProperty<NodeVisibility>.Perform(
-						() => node.EditorState().Visibility, value => node.EditorState().Visibility = value,
-						visibility
-					);
+					Core.Operations.SetProperty.Perform(node.EditorState(), nameof(NodeEditorState.Visibility), visibility);
 				}
 			};
 			return button;
@@ -101,10 +98,7 @@ namespace Tangerine.UI.Timeline
 			button.Clicked += () => {
 				var locked = Document.Current.Container.Nodes.All(i => !i.EditorState().Locked);
 				foreach (var node in Document.Current.Container.Nodes) {
-					Core.Operations.SetGenericProperty<bool>.Perform(
-						() => node.EditorState().Locked, value => node.EditorState().Locked = value,
-						locked
-					);
+					Core.Operations.SetProperty.Perform(node.EditorState(), nameof(NodeEditorState.Locked), locked);
 				}
 			};
 			return button;

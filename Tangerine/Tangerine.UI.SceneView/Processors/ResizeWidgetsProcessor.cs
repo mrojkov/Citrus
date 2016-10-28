@@ -113,8 +113,8 @@ namespace Tangerine.UI.SceneView
 			}
 			var size = widget.Size + (deltaSize / widget.Scale).Snap(Vector2.Zero);
 			var position = widget.Position + Vector2.RotateDeg(deltaPosition + widget.Pivot * deltaSize, widget.Rotation).Snap(Vector2.Zero);
-			Core.Operations.SetAnimableProperty.Perform(widget, "Position", position);
-			Core.Operations.SetAnimableProperty.Perform(widget, "Size", size);
+			Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), position);
+			Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Size), size);
 		}
 
 		void RescaleWidget(Widget widget, int controlPointIndex, Vector2 curMousePos, Vector2 prevMousePos, Vector2 masterPivot, bool proportional)
@@ -142,9 +142,9 @@ namespace Tangerine.UI.SceneView
 			var deltaPos = Vector2.RotateDeg((newPivot - widget.Pivot) * scaledSize, widget.Rotation);
 			var newPos = widget.Position + deltaPos;
 			var newScale = widget.Scale * scale;
-			Core.Operations.SetAnimableProperty.Perform(widget, "Scale", newScale);
-			Core.Operations.SetAnimableProperty.Perform(widget, "Pivot", newPivot);
-			Core.Operations.SetAnimableProperty.Perform(widget, "Position", newPos);
+			Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Scale), newScale);
+			Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Pivot), newPivot);
+			Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), newPos);
 		}
 	}
 }
