@@ -88,7 +88,6 @@
     <Compile Include="Components\RollCurveView.cs" />
     <Compile Include="Components\RollNodeView.cs" />
     <Compile Include="Components\RollPropertyView.cs" />
-    <Compile Include="Processors\GridPane\ClampScrollPosOnContainerChange.cs" />
     <Compile Include="Components\GridSpanList.cs" />
     <Compile Include="Operations\SelectGridSpan.cs" />
     <Compile Include="Operations\ColumnCountUpdater.cs" />
@@ -96,6 +95,7 @@
     <Compile Include="Operations\OverviewWidgetsUpdater.cs" />
     <Compile Include="Operations\RollWidgetsUpdater.cs" />
     <Compile Include="Operations\RowViewsUpdater.cs" />
+    <Compile Include="Operations\ContainerChangeHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tangerine.Core\Tangerine.Core.csproj">

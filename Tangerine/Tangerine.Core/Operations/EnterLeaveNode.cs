@@ -6,8 +6,15 @@ using Tangerine.Core;
 
 namespace Tangerine.Core.Operations
 {
+	public interface ISetContainer : IOperation { }
+
 	public static class EnterNode
 	{
+		class SetContainer : SetProperty, ISetContainer
+		{
+			public SetContainer(Node value) : base(Document.Current, nameof(Document.Container), value) { }
+		}
+
 		public static void Perform(Node container, bool selectFirstNode = true)
 		{
 			if (container.ContentsPath != null) {
@@ -29,15 +36,10 @@ namespace Tangerine.Core.Operations
 		{
 			ClearRowSelection.Perform();
 			var prevContainer = Document.Current.Container;
-			SetProperty.Perform(Document.Current, nameof(Document.Container), container);
+			Document.Current.History.Perform(new SetContainer(container));
 			if (selectFirstNode && container.Nodes.Count > 0) {
 				SelectNode.Perform(container.Nodes[0]);
 			}
-		}
-
-		static void SetContainer(Node container)
-		{
-			Document.Current.Container = container;
 		}
 	}
 

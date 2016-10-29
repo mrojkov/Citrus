@@ -19,7 +19,7 @@ namespace Tangerine.Core.Operations
 			Document.Current.History.Perform(new SetProperty(obj, propertyName, value));
 		}
 
-		private SetProperty(object obj, string propertyName, object value)
+		protected SetProperty(object obj, string propertyName, object value)
 		{
 			Obj = obj;
 			Value = value;

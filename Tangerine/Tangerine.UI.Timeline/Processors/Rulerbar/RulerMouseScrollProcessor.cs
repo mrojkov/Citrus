@@ -7,7 +7,7 @@ namespace Tangerine.UI.Timeline
 {
 	public class RulerMouseScrollProcessor : ITaskProvider
 	{
-		Timeline timeline => Timeline.Instance;
+		static Timeline timeline => Timeline.Instance;
 
 		public IEnumerator<object> Task()
 		{
@@ -40,7 +40,7 @@ namespace Tangerine.UI.Timeline
 			}
 		}
 
-		int CalcColumn(float mouseX)
+		public static int CalcColumn(float mouseX)
 		{
 			return ((mouseX + timeline.ScrollPos.X) / TimelineMetrics.ColWidth).Floor().Max(0);
 		}

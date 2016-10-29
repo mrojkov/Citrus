@@ -47,7 +47,8 @@ namespace Tangerine.UI.Timeline
 
 		public static IEnumerable<IOperationProcessor> GetOperationProcessors()
 		{
-			return new IOperationProcessor[] { 
+			return new IOperationProcessor[] {
+				new ContainerChangeHandler(),
 				new ColumnCountUpdater(),
 				new RowViewsUpdater(),
 				new RollWidgetsUpdater(),
@@ -112,18 +113,16 @@ namespace Tangerine.UI.Timeline
 				new OverviewScrollProcessor(),
 				new MouseWheelProcessor(),
 				new ResizeGridCurveViewProcessor(),
-				new GridMouseScrollProcessor(),
 				new RollMouseScrollProcessor(),
 				new SelectAndDragKeyframesProcessor(),
 				new HasKeyframeRespondentProcessor(),
 				new DragKeyframesRespondentProcessor(),
+				new GridMouseScrollProcessor(),
 				new SelectAndDragRowsProcessor(),
 				new RulerMouseScrollProcessor(),
 				new ClampScrollPosProcessor(),
-				new ClampScrollPosOnContainerChange().GetProcessor(),
 				new EditMarkerProcessor(),
 				new SelectFirstNodeOnDocumentOpeningProcessor(),
-				EnsureCurrentColumnVisibleOnContainerChange(),
 				PanelTitleUpdater(),
 			});
 		}
@@ -137,12 +136,6 @@ namespace Tangerine.UI.Timeline
 				}
 				yield return null;
 			}
-		}
-
-		ITaskProvider EnsureCurrentColumnVisibleOnContainerChange()
-		{
-			return new Property<Node>(() => Document.Current.Container).
-				WhenChanged(_ => EnsureColumnVisible(Document.Current.AnimationFrame));
 		}
 
 		ITaskProvider PanelTitleUpdater()

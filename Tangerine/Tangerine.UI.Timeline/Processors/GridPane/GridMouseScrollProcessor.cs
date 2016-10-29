@@ -14,16 +14,19 @@ namespace Tangerine.UI.Timeline
 			var widget = timeline.Grid.RootWidget;
 			while (true) {
 				if (widget.Input.IsMouseOwner()) {
-					var s = new Vector2(TimelineMetrics.ColWidth, TimelineMetrics.DefaultRowHeight);
+					var cw = TimelineMetrics.ColWidth;
 					var p = widget.Input.LocalMousePosition;
-					if (p.X > widget.Width - s.X / 2) {
-						timeline.ScrollPos.X += s.X;
-					} else if (p.X < s.X / 2) {
-						timeline.ScrollPos.X -= s.X;
-					} else if (p.Y > widget.Height - s.Y / 2) {
-						timeline.ScrollPos.Y += s.Y;
-					} else if (p.Y < s.Y / 2) {
-						timeline.ScrollPos.Y -= s.Y;
+					if (p.X > widget.Width - cw / 2) {
+						timeline.ScrollPos.X += cw;
+					} else if (p.X < cw / 2) {
+						timeline.ScrollPos.X -= cw;
+					}
+					Operations.SetCurrentColumn.Perform(RulerMouseScrollProcessor.CalcColumn(p.X));
+					var rh = TimelineMetrics.DefaultRowHeight;
+					if (p.Y > widget.Height - rh / 2) {
+						timeline.ScrollPos.Y += rh;
+					} else if (p.Y < rh / 2) {
+						timeline.ScrollPos.Y -= rh;
 					}
 					Window.Current.Invalidate();
 				}
