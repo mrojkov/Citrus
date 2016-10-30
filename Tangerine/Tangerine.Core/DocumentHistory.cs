@@ -14,8 +14,8 @@ namespace Tangerine.Core
 		int headPos;
 		int savePos;
 
-		public bool UndoEnabled => headPos > 0;
-		public bool RedoEnabled => headPos < operations.Count;
+		public bool CanUndo => headPos > 0;
+		public bool CanRedo => headPos < operations.Count;
 		public bool IsDocumentModified { get; private set; }
 
 		public void BeginTransaction()
@@ -46,7 +46,7 @@ namespace Tangerine.Core
 
 		public void Undo()
 		{
-			if (!UndoEnabled) {
+			if (!CanUndo) {
 				return;
 			}
 			long batchId = 0;
@@ -67,7 +67,7 @@ namespace Tangerine.Core
 		
 		public void Redo()
 		{
-			if (!RedoEnabled) {
+			if (!CanRedo) {
 				return;
 			}
 			long batchId = 0;
