@@ -1,8 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
+using System.Text;
 
 namespace Lime
 {
@@ -10,7 +9,7 @@ namespace Lime
 	{
 		public const int MaxCount = 512;
 
-		public static int Count = 1;
+		public static int Count { get; private set; } = 1;
 		public static Key New() { return Count++; }
 
 		public static readonly Key Unknown = 0;
@@ -20,81 +19,34 @@ namespace Lime
 
 		public Key(int code) { Code = code; }
 
-		public bool IsMouseKey()
-		{
-			return this >= Mouse0 && this <= Touch3;
-		}
+		public bool IsMouseKey() => this >= Mouse0 && this <= Touch3;
 
-		public bool IsModifier()
-		{
-			return this >= Shift && this <= Win;
-		}
+		public bool IsModifier() => this >= Shift && this <= Win;
 
-		public bool IsAlphanumeric()
-		{
-			return IsLetter() || IsDigit();
-		}
+		public bool IsAlphanumeric() => IsLetter() || IsDigit();
 
-		public bool IsDigit()
-		{
-			return this >= Number0 && this <= Number9;
-		}
+		public bool IsDigit() => this >= Number0 && this <= Number9;
 
-		public bool IsLetter()
-		{
-			return this >= A && this <= Z;
-		}
+		public bool IsLetter() => this >= A && this <= Z;
 
-		public bool IsTextNavigation()
-		{
-			return this == PageUp || this == PageDown || this == Home || this == End
-				|| this == Left || this == Right || this == Up || this == Down;
-		}
+		public bool IsTextNavigation() =>
+			this == PageUp || this == PageDown || this == Home || this == End ||
+			this == Left || this == Right || this == Up || this == Down;
 
-		public bool IsPrintable()
-		{
-			return IsAlphanumeric() || (this >= Tilde && this <= BackSlash) || this == Space;
-		}
+		public bool IsPrintable() =>
+			IsAlphanumeric() || (this >= Tilde && this <= BackSlash) || this == Space;
 
-		public bool IsTextEditing()
-		{
-			return this == Delete || this == BackSpace || this == Insert || this == Enter;
-		}
+		public bool IsTextEditing() =>
+			this == Delete || this == BackSpace || this == Insert || this == Enter;
 
-		public bool IsFunctional()
-		{
-			return this >= F1 && this <= F12;
-		}
+		public bool IsFunctional() =>this >= F1 && this <= F12;
 
-		public static bool operator == (Key lhs, Key rhs)
-		{
-			return lhs.Code == rhs.Code;
-		}
-
-		public static bool operator != (Key lhs, Key rhs)
-		{
-			return lhs.Code != rhs.Code;
-		}
-
-		public static bool operator > (Key lhs, Key rhs)
-		{
-			return lhs.Code > rhs.Code;
-		}
-
-		public static bool operator < (Key lhs, Key rhs)
-		{
-			return lhs.Code < rhs.Code;
-		}
-
-		public static bool operator >= (Key lhs, Key rhs)
-		{
-			return lhs.Code >= rhs.Code;
-		}
-
-		public static bool operator <= (Key lhs, Key rhs)
-		{
-			return lhs.Code <= rhs.Code;
-		}
+		public static bool operator == (Key lhs, Key rhs) => lhs.Code == rhs.Code;
+		public static bool operator != (Key lhs, Key rhs) => lhs.Code != rhs.Code;
+		public static bool operator >  (Key lhs, Key rhs) => lhs.Code >  rhs.Code;
+		public static bool operator <  (Key lhs, Key rhs) => lhs.Code <  rhs.Code;
+		public static bool operator >= (Key lhs, Key rhs) => lhs.Code >= rhs.Code;
+		public static bool operator <= (Key lhs, Key rhs) => lhs.Code <= rhs.Code;
 
 		public static IEnumerable<Key> Enumerate()
 		{
@@ -103,20 +55,11 @@ namespace Lime
 			}
 		}
 
-		public override int GetHashCode()
-		{
-			return Code;
-		}
+		public override int GetHashCode() => Code;
+		public override bool Equals(object obj) => (Key)obj == this;
 
-		public override bool Equals(object obj)
-		{
-			return (Key)obj == this;
-		}
-
-		public static Key GetByName(string name)
-		{
-			return keyToNameCache.FirstOrDefault(p => p.Value == name).Key;
-		}
+		public static Key GetByName(string name) =>
+			keyToNameCache.FirstOrDefault(p => p.Value == name).Key;
 
 		public override string ToString()
 		{
@@ -142,18 +85,14 @@ namespace Lime
 				.ToDictionary(i => (Key)i.GetValue(null), i => i.Name);
 		}
 
-		public static implicit operator Key (int code) { return new Key(code); }
-		public static implicit operator int (Key key) { return key.Code; }
+		public static implicit operator Key (int code) => new Key(code);
+		public static implicit operator int (Key key) => key.Code;
 
-		public static Key MapShortcut(Key main)
-		{
-			return MapShortcut(new Shortcut(Modifiers.None, main));
-		}
+		public static Key MapShortcut(Key main) =>
+			MapShortcut(new Shortcut(Modifiers.None, main));
 
-		public static Key MapShortcut(Modifiers modifiers, Key main)
-		{
-			return MapShortcut(new Shortcut(modifiers, main));
-		}
+		public static Key MapShortcut(Modifiers modifiers, Key main) =>
+			MapShortcut(new Shortcut(modifiers, main));
 
 		public static Key MapShortcut(Shortcut shortcut)
 		{
@@ -168,10 +107,8 @@ namespace Lime
 			return key;
 		}
 
-		public void AddAlias(Modifiers modifiers, Key main)
-		{
+		public void AddAlias(Modifiers modifiers, Key main) =>
 			AddAlias(new Shortcut(modifiers, main));
-		}
 
 		public void AddAlias(Shortcut shortcut)
 		{
@@ -185,7 +122,7 @@ namespace Lime
 				throw new InvalidOperationException();
 		}
 
-		#region Keyboard
+#region Keyboard
 		public static readonly Key Shift = New();
 		public static readonly Key Control = New();
 		public static readonly Key Alt = New();
