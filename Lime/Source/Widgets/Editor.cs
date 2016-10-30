@@ -296,17 +296,11 @@ namespace Lime
 
 		private void SelectWord()
 		{
-			var t = Text.Text;
-			if (t == "") return;
+			if (Text.Text == "") return;
 			EnsureSelection();
-			SelectionStart.TextPos = SelectionEnd.TextPos = CaretPos.TextPos;
-			var cc = GetCharClassAt(t, CaretPos.TextPos);
-			if (cc == CharClass.Space || cc == CharClass.End)
-				cc = GetCharClassAt(t, CaretPos.TextPos - 1);
-			while (GetCharClassAt(t, SelectionStart.TextPos - 1) == cc)
-				--SelectionStart.TextPos;
-			while (GetCharClassAt(t, SelectionEnd.TextPos) == cc)
-				++SelectionEnd.TextPos;
+			var w = WordAt(Text.Text, CaretPos.TextPos);
+			SelectionStart.TextPos = w.Left;
+			SelectionEnd.TextPos = w.Right;
 		}
 
 		public void SelectAll()

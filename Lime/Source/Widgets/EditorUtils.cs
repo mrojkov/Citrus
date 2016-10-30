@@ -280,7 +280,7 @@ namespace Lime
 
 	public static class WordUtils
 	{
-		public enum CharClass
+		private enum CharClass
 		{
 			Begin,
 			Space,
@@ -290,7 +290,7 @@ namespace Lime
 			End,
 		}
 
-		public static CharClass GetCharClassAt(string text, int pos)
+		private static CharClass GetCharClassAt(string text, int pos)
 		{
 			if (pos < 0) return CharClass.Begin;
 			if (pos >= text.Length) return CharClass.End;
@@ -330,5 +330,21 @@ namespace Lime
 			}
 			return pos;
 		}
+
+		public struct IntRange { public int Left, Right; }
+
+		public static IntRange WordAt(string text, int pos)
+		{
+			var r = new IntRange { Left = pos, Right = pos };
+			var cc = GetCharClassAt(text, pos);
+			if (cc == CharClass.Space || cc == CharClass.End)
+				cc = GetCharClassAt(text, pos - 1);
+			while (GetCharClassAt(text, r.Left - 1) == cc)
+				--r.Left;
+			while (GetCharClassAt(text, r.Right) == cc)
+				++r.Right;
+			return r;
+		}
+
 	}
 }
