@@ -40,6 +40,11 @@ namespace Lime
 		public FileDialogMode Mode { get; set; }
 
 		/// <summary>
+		/// Gets or sets the dialog's initial directory. 
+		/// </summary>
+		public string InitialDirectory { get; set; }
+
+		/// <summary>
 		/// Shows dialog.
 		/// </summary>
 		/// <returns>return true if user clicks OK in the dialog.</returns>
@@ -76,6 +81,9 @@ namespace Lime
 
 		private bool ShowFileDialog(WinForms.FileDialog dialog)
 		{
+			if (InitialDirectory != null) {
+				dialog.InitialDirectory = InitialDirectory;
+			}
 			if (dialog.ShowDialog() == WinForms.DialogResult.OK) {
 				FileName = dialog.FileName;
 				FileNames = dialog.FileNames;

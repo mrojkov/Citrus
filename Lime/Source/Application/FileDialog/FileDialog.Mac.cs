@@ -7,7 +7,6 @@ using AppKit;
 using MonoMac.AppKit;
 #endif
 
-
 namespace Lime
 {
 	public class FileDialog : IFileDialog
@@ -18,8 +17,7 @@ namespace Lime
 		public string FileName { get; private set; }
 		public string[] FileNames { get; private set; }
 		public string[] AllowedFileTypes { get; set; }
-
-		public FileDialog() { }
+		public string InitialDirectory { get; set; }
 
 		public bool RunModal()
 		{
@@ -27,6 +25,9 @@ namespace Lime
 			FileNames = null;
 			if (Mode == FileDialogMode.Save) {
 				using (var nsPanel = new NSSavePanel()) {
+					if (InitialDirectory != null) {
+						nsPanel.Directory = InitialDirectory;
+					}
 					if (AllowedFileTypes != null) {
 						nsPanel.AllowedFileTypes = AllowedFileTypes;
 					}
@@ -39,6 +40,9 @@ namespace Lime
 				}
 			} else {
 				using (var nsPanel = new NSOpenPanel()) {
+					if (InitialDirectory != null) {
+						nsPanel.Directory = InitialDirectory;
+					}
 					if (AllowedFileTypes != null) {
 						nsPanel.AllowedFileTypes = AllowedFileTypes;
 					}

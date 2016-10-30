@@ -59,6 +59,11 @@ namespace Lime
 		FileDialogMode Mode { get; set; }
 
 		/// <summary>
+		/// Gets or sets the dialog's initial directory. 
+		/// </summary>
+		string InitialDirectory { get; set; }
+
+		/// <summary>
 		/// Shows dialog.
 		/// </summary>
 		/// <returns>return true if user clicks OK in the dialog.</returns>
