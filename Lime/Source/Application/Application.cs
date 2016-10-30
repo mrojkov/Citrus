@@ -105,6 +105,8 @@ namespace Lime
 		public static readonly ObservableCollection<IWindow> Windows = new ObservableCollection<IWindow>();
 		public static bool IsTangerine;
 
+		public static long UpdateCounter { get; internal set; } 
+
 		private static IWindow mainWindow;
 		public static IWindow MainWindow
 		{

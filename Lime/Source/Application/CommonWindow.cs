@@ -64,6 +64,7 @@ namespace Lime
 
 		protected void RaiseUpdating(float delta)
 		{
+			Application.UpdateCounter++;
 			using (Context.Activate().Scoped()) {
 				if (Updating != null) {
 					Updating(delta);
