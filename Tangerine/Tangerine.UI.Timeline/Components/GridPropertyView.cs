@@ -46,7 +46,6 @@ namespace Tangerine.UI.Timeline.Components
 					baseTransform;
 				var v = TimelineMetrics.ColWidth / 3 * Vector2.One;
 				Renderer.DrawRect(-v, v, color);
-				Renderer.DrawRectOutline(-v, v, TimelineGridColors.Lines);
 			}
 		}
 	}
