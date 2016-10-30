@@ -9,7 +9,7 @@ namespace Tangerine.Core
 		public static readonly List<IOperationProcessor> Processors = new List<IOperationProcessor>();
 
 		int transactionCounter;
-		DateTime transactionTimestamp;
+		long transactionBatchId;
 		readonly List<IOperation> operations = new List<IOperation>();
 		int headPos;
 		int savePos;
@@ -18,12 +18,10 @@ namespace Tangerine.Core
 		public bool RedoEnabled => headPos < operations.Count;
 		public bool IsDocumentModified { get; private set; }
 
-		readonly TimeSpan maxUndoTimespan = TimeSpan.FromSeconds(0.1f);
-
 		public void BeginTransaction()
 		{
 			transactionCounter++;
-			transactionTimestamp = DateTime.UtcNow;
+			transactionBatchId = Lime.Application.UpdateCounter;
 		}
 
 		public void EndTransaction()
@@ -33,7 +31,7 @@ namespace Tangerine.Core
 
 		public void Perform(IOperation operation)
 		{
-			operation.Timestamp = (transactionCounter > 0) ? transactionTimestamp : DateTime.UtcNow;
+			operation.BatchId = (transactionCounter > 0) ? transactionBatchId : Lime.Application.UpdateCounter;
 			if (savePos > headPos) {
 				savePos = -1;
 			}
@@ -51,13 +49,13 @@ namespace Tangerine.Core
 			if (!UndoEnabled) {
 				return;
 			}
-			DateTime? timestamp = null;
+			long batchId = 0;
 			for (; headPos > 0; headPos--) {
 				var o = operations[headPos - 1];
-				if (o.IsChangingDocument && !timestamp.HasValue) {
-					timestamp = o.Timestamp;
+				if (o.IsChangingDocument && batchId == 0) {
+					batchId = o.BatchId;
 				}
-				if (timestamp.HasValue && (timestamp.Value - o.Timestamp) > maxUndoTimespan) {
+				if (batchId > 0 && batchId != o.BatchId) {
 					break;
 				}
 				foreach (var p in Processors) {
@@ -72,13 +70,13 @@ namespace Tangerine.Core
 			if (!RedoEnabled) {
 				return;
 			}
-			DateTime? timestamp = null;
+			long batchId = 0;
 			for (; headPos < operations.Count; headPos++) {
 				var o = operations[headPos];
-				if (o.IsChangingDocument && !timestamp.HasValue) {
-					timestamp = o.Timestamp;
+				if (o.IsChangingDocument && batchId == 0) {
+					batchId = o.BatchId;
 				}
-				if (timestamp.HasValue && (o.Timestamp - timestamp.Value) > maxUndoTimespan) {
+				if (batchId > 0 && batchId != o.BatchId) {
 					break;
 				}
 				foreach (var p in Processors) {

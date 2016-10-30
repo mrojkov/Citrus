@@ -7,13 +7,13 @@ namespace Tangerine.Core
 {
 	public interface IOperation
 	{
-		DateTime Timestamp { get; set; }
+		long BatchId { get; set; }
 		bool IsChangingDocument { get; }
 	}
 
 	public abstract class Operation : IOperation
 	{
-		public DateTime Timestamp { get; set; }
+		public long BatchId { get; set; }
 		public abstract bool IsChangingDocument { get; }
 
 		readonly Dictionary<Type, object> backup = new Dictionary<Type, object>();
