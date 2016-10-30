@@ -53,7 +53,6 @@ namespace Tangerine.UI.Timeline
 			var r = GetRectangle(marker.Frame);
 			r.A.Y = r.B.Y - 4;
 			Renderer.DrawRect(r.A, r.B, GetMarkerColor(marker));
-			Renderer.DrawRectOutline(r.A, r.B, TimelineRulerColors.Notchings);
 			if (!string.IsNullOrWhiteSpace(marker.Id)) {
 				var h = DesktopTheme.Metrics.TextHeight;
 				var extent = Renderer.MeasureTextLine(FontPool.Instance.DefaultFont, marker.Id, h) + Vector2.One;
