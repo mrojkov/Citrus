@@ -103,9 +103,9 @@ namespace Lime
 		public void Popup()
 		{
 			Refresh();
-			var w = Window.Current;
+			var w = Window.Current as Window;
 			w.Input.ClearKeyState();
-			NativeContextMenu.Show(w.Form, LimeToSD.ConvertToPoint(w.Input.MousePosition, w.PixelScale));
+			NativeContextMenu.Show(w.Form, w.WorldToWindow(w.Input.MousePosition));
 		}
 
 		public void Popup(IWindow window, Vector2 position, float minimumWidth, ICommand command)
@@ -121,7 +121,7 @@ namespace Lime
 					ni.Select();
 				}
 			}
-			NativeContextMenu.Show(window.Form, LimeToSD.ConvertToPoint(position, window.PixelScale));
+			NativeContextMenu.Show(window.Form, (window as Window).WorldToWindow(position));
 		}
 	}
 
