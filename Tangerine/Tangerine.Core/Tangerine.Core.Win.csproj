@@ -39,6 +39,7 @@
     <Folder Include="Resources\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClassAttributes.cs" />
     <Compile Include="Components\CurveRow.cs" />
     <Compile Include="Components\NodeRow.cs" />
     <Compile Include="Components\PropertyRow.cs" />
@@ -63,11 +64,13 @@
     <Compile Include="Operations\Modification.cs" />
     <Compile Include="NodeEditorState.cs" />
     <Compile Include="AnimatorEditorState.cs" />
+    <Compile Include="PropertyAttributes.cs" />
     <Compile Include="Row.cs" />
     <Compile Include="RowsSynchronizer.cs" />
     <Compile Include="Uid.cs" />
     <Compile Include="Operation.cs" />
     <Compile Include="VersionedCollection.cs" />
+    <Compile Include="WidgetExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Win.csproj">
