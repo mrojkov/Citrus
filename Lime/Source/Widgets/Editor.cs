@@ -695,7 +695,6 @@ namespace Lime
 						input.ConsumeKey(Cmds.Submit);
 					} else {
 						HideSelection();
-						History.Clear();
 						input.ConsumeKey(Cmds.Submit);
 						InputWidget.RevokeFocus();
 					}
