@@ -251,7 +251,7 @@ namespace Lime
 
 		private Key FindMainKey()
 		{
-			for (var i = Key.Unknown; i < Key.Count; i++)
+			for (var i = Key.Unknown; i < Key.LastNormal; i++)
 				if (keys[i].CurrentState && Shortcut.ValidateMainKey(i))
 					return i;
 			return Key.Unknown;
