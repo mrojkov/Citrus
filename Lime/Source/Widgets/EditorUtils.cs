@@ -277,4 +277,58 @@ namespace Lime
 		}
 	}
 
+
+	public static class WordUtils
+	{
+		public enum CharClass
+		{
+			Begin,
+			Space,
+			Punctuation,
+			Word,
+			Other,
+			End,
+		}
+
+		public static CharClass GetCharClassAt(string text, int pos)
+		{
+			if (pos < 0) return CharClass.Begin;
+			if (pos >= text.Length) return CharClass.End;
+			var ch = text[pos];
+			if (Char.IsWhiteSpace(ch)) return CharClass.Space;
+			if (Char.IsPunctuation(ch) || Char.IsSeparator(ch) || Char.IsSymbol(ch))
+				return CharClass.Punctuation;
+			if (Char.IsLetterOrDigit(ch))
+				return CharClass.Word;
+			return CharClass.Other;
+		}
+
+		public static int PreviousWord(string text, int pos)
+		{
+			if (pos <= 0)
+				return 0;
+			--pos;
+			for (var ccRight = GetCharClassAt(text, pos); pos > 0; --pos) {
+				var ccLeft = GetCharClassAt(text, pos - 1);
+				if (ccLeft != ccRight && ccRight != CharClass.Space)
+					break;
+				ccRight = ccLeft;
+			}
+			return pos;
+		}
+
+		public static int NextWord(string text, int pos)
+		{
+			if (pos >= text.Length)
+				return text.Length;
+			++pos;
+			for (var ccLeft = GetCharClassAt(text, pos - 1); pos < text.Length; ++pos) {
+				var ccRight = GetCharClassAt(text, pos);
+				if (ccRight != ccLeft && ccRight != CharClass.Space)
+					break;
+				ccLeft = ccRight;
+			}
+			return pos;
+		}
+	}
 }

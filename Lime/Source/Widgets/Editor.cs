@@ -4,6 +4,8 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security;
 
+using static Lime.WordUtils;
+
 namespace Lime
 {
 	/// <summary>
@@ -213,57 +215,6 @@ namespace Lime
 					Key.Commands.Undo, Key.Commands.Redo,
 				}
 			).ToList();
-
-		private enum CharClass
-		{
-			Begin,
-			Space,
-			Punctuation,
-			Word,
-			Other,
-			End,
-		}
-
-		private static CharClass GetCharClassAt(string text, int pos)
-		{
-			if (pos < 0) return CharClass.Begin;
-			if (pos >= text.Length) return CharClass.End;
-			var ch = text[pos];
-			if (Char.IsWhiteSpace(ch)) return CharClass.Space;
-			if (Char.IsPunctuation(ch) || Char.IsSeparator(ch) || Char.IsSymbol(ch))
-				return CharClass.Punctuation;
-			if (Char.IsLetterOrDigit(ch))
-				return CharClass.Word;
-			return CharClass.Other;
-		}
-
-		private static int PreviousWord(string text, int pos)
-		{
-			if (pos <= 0)
-				return 0;
-			--pos;
-			for (var ccRight = GetCharClassAt(text, pos); pos > 0; --pos) {
-				var ccLeft = GetCharClassAt(text, pos - 1);
-				if (ccLeft != ccRight && ccRight != CharClass.Space)
-					break;
-				ccRight = ccLeft;
-			}
-			return pos;
-		}
-
-		private static int NextWord(string text, int pos)
-		{
-			if (pos >= text.Length)
-				return text.Length;
-			++pos;
-			for (var ccLeft = GetCharClassAt(text, pos - 1); pos < text.Length; ++pos) {
-				var ccRight = GetCharClassAt(text, pos);
-				if (ccRight != ccLeft && ccRight != CharClass.Space)
-					break;
-				ccLeft = ccRight;
-			}
-			return pos;
-		}
 
 		private bool IsMultiline() => EditorParams.IsAcceptableLines(2);
 
