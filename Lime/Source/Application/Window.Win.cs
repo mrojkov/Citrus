@@ -1,6 +1,7 @@
 ﻿ #if WIN
 using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.Windows.Forms;
 using OpenTK.Graphics;
 
@@ -22,7 +23,7 @@ namespace Lime
 		private Stopwatch stopwatch;
 		private bool active;
 		private RenderingState renderingState = RenderingState.Rendered;
-		private System.Drawing.Point lastMousePosition;
+		private Point lastMousePosition;
 
 		public Input Input { get; private set; }
 		public bool Active => active;
@@ -86,7 +87,7 @@ namespace Lime
 
 		public Vector2 ClientPosition
 		{
-			get { return SDToLime.Convert(glControl.PointToScreen(new System.Drawing.Point(0, 0)), PixelScale); }
+			get { return SDToLime.Convert(glControl.PointToScreen(new Point(0, 0)), PixelScale); }
 			set { DecoratedPosition = value + DecoratedPosition - ClientPosition; }
 		}
 
@@ -118,6 +119,12 @@ namespace Lime
 		{
 			get { return SDToLime.Convert(form.MaximumSize, PixelScale); }
 			set { form.MaximumSize = LimeToSD.ConvertToSize(value, PixelScale); }
+		}
+
+		public Point WorldToWindow(Vector2 wp)
+		{
+			var sp = LimeToSD.ConvertToPoint(wp, PixelScale);
+			return new Point(sp.X + glControl.Left, sp.Y + glControl.Top);
 		}
 
 		FPSCounter fpsCounter = new FPSCounter();
@@ -251,7 +258,7 @@ namespace Lime
 			timer.Tick += OnTick;
 			timer.Start();
 			if (options.Icon != null) {
-				form.Icon = (System.Drawing.Icon)options.Icon;
+				form.Icon = (Icon)options.Icon;
 			}
 			Cursor = MouseCursor.Default;
 			Title = options.Title;
@@ -634,7 +641,7 @@ namespace Lime
 
 	static class SDToLime
 	{
-		public static Vector2 Convert(System.Drawing.Point p, float pixelScale)
+		public static Vector2 Convert(Point p, float pixelScale)
 		{
 			return new Vector2(p.X, p.Y) / pixelScale;
 		}
@@ -646,9 +653,9 @@ namespace Lime
 
 	static class LimeToSD
 	{
-		public static System.Drawing.Point ConvertToPoint(Vector2 p, float pixelScale)
+		public static Point ConvertToPoint(Vector2 p, float pixelScale)
 		{
-			return (System.Drawing.Point)ConvertToSize(p, pixelScale);
+			return (Point)ConvertToSize(p, pixelScale);
 		}
 		public static System.Drawing.Size ConvertToSize(Vector2 p, float pixelScale)
 		{
