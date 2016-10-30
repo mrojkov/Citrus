@@ -81,9 +81,9 @@ namespace Tangerine.UI.Timeline
 
 		static bool ArePropertiesCompatible(object object1, object object2, string property)
 		{
-			var m1 = object1.GetType().GetProperty(property)?.GetSetMethod();
-			var m2 = object2.GetType().GetProperty(property)?.GetSetMethod();
-			return m1 != null && m1 == m2;
+			var t1 = object1.GetType().GetProperty(property)?.PropertyType;
+			var t2 = object2.GetType().GetProperty(property)?.PropertyType;
+			return t1 != null && t1 == t2;
 		}
 	}
 }
