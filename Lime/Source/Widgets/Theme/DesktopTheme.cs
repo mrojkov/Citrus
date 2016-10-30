@@ -157,8 +157,12 @@ namespace Lime
 				OffsetContextMenu = p => p + new Vector2(1f, tw.FontHeight + 1f),
 			};
 			eb.Editor = new Editor(tw, editorParams, eb);
+			var vc = new VerticalLineCaret();
+			eb.Updated += delta =>
+				vc.Width = eb.Editor.OverwriteMode && !eb.Editor.HasSelection() ?
+					tw.Font.Chars.Get(eb.Editor.CurrentChar(), tw.FontHeight)?.Width ?? 5f : 0f;
 			new CaretDisplay(
-				tw, eb.Editor.CaretPos, new CaretParams { CaretPresenter = new VerticalLineCaret() });
+				tw, eb.Editor.CaretPos, new CaretParams { CaretPresenter = vc });
 			new SelectionPresenter(
 				tw, eb.Editor.SelectionStart, eb.Editor.SelectionEnd,
 				new SelectionParams { Padding = Thickness.Zero });

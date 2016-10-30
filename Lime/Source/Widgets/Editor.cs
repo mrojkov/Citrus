@@ -18,6 +18,7 @@ namespace Lime
 		public readonly IText Text;
 		public readonly IEditorParams EditorParams;
 		public SecureString Password;
+		public bool OverwriteMode { get; private set; }
 
 		public ICaretPosition CaretPos { get; } = new CaretPosition();
 		public ICaretPosition SelectionStart { get; } = new CaretPosition();
@@ -104,6 +105,7 @@ namespace Lime
 			public static Key Cancel = Key.MapShortcut(Key.Escape);
 
 			public static Key BackSpace = Key.MapShortcut(Key.BackSpace);
+			public static Key ToggleOverwrite = Key.MapShortcut(Key.Insert);
 
 			public static Key ContextMenu = Key.MapShortcut(Key.Menu);
 		}
@@ -153,6 +155,9 @@ namespace Lime
 			DisplayWidget.Tasks.StopByTag(this);
 		}
 
+		public char CurrentChar() =>
+			CaretPos.TextPos >= 0 && CaretPos.TextPos < TextLength ? Text.DisplayText[CaretPos.TextPos] : '\0';
+
 		private UndoItem MakeUndoItem() =>
 			new UndoItem { TextPos = CaretPos.TextPos, Value = Text.Text };
 
@@ -186,10 +191,11 @@ namespace Lime
 					Cmds.SelectCharPrev, Cmds.SelectCharNext,
 					Cmds.SelectWordPrev, Cmds.SelectWordNext,
 					Cmds.SelectLineStart, Cmds.SelectLineEnd,
-					Cmds.SelectAll,
+					Cmds.SelectAll, Cmds.SelectCurrentWord,
 					Cmds.DeleteWordPrev, Cmds.DeleteWordNext,
-					Cmds.Submit, Cmds.Cancel, Cmds.ContextMenu,
-					Cmds.BackSpace,
+					Cmds.Submit, Cmds.Cancel,
+					Cmds.BackSpace, Cmds.ToggleOverwrite,
+					Cmds.ContextMenu,
 					Key.Commands.Cut, Key.Commands.Copy, Key.Commands.Paste, Key.Commands.Delete,
 					Key.Commands.Undo, Key.Commands.Redo,
 				}
@@ -197,7 +203,7 @@ namespace Lime
 
 		private bool IsMultiline() => EditorParams.IsAcceptableLines(2);
 
-		private bool HasSelection() =>
+		public bool HasSelection() =>
 			SelectionStart.IsVisible && SelectionStart.IsValid && SelectionEnd.IsValid &&
 			SelectionStart.TextPos != SelectionEnd.TextPos;
 
@@ -311,6 +317,14 @@ namespace Lime
 			SelectionEnd.TextPos = int.MaxValue;
 		}
 
+		public void DeleteChar()
+		{
+			if (HasSelection())
+				DeleteSelection();
+			else if (CaretPos.TextPos >= 0 && CaretPos.TextPos < TextLength)
+				RemoveText(CaretPos.TextPos, 1, CaretPos.TextPos);
+		}
+
 		private void HandleKeys()
 		{
 			try {
@@ -348,12 +362,10 @@ namespace Lime
 				if (input.WasKeyPressed(Cmds.SelectCurrentWord) && IsTextReadable)
 					SelectWord();
 
-				if (WasKeyRepeated(Key.Commands.Delete)) {
-					if (HasSelection())
-						DeleteSelection();
-					else if (CaretPos.TextPos >= 0 && CaretPos.TextPos < Text.Text.Length)
-						RemoveText(CaretPos.TextPos, 1, CaretPos.TextPos);
-				}
+				if (WasKeyRepeated(Cmds.ToggleOverwrite))
+					OverwriteMode = !OverwriteMode;
+				if (WasKeyRepeated(Key.Commands.Delete))
+					DeleteChar();
 				if (WasKeyRepeated(Cmds.DeleteWordPrev) && IsTextReadable) {
 					var p = PreviousWord(Text.Text, CaretPos.TextPos);
 					if (p < CaretPos.TextPos)
@@ -428,9 +440,11 @@ namespace Lime
 						DeleteSelection();
 					else if (CaretPos.TextPos > 0 && CaretPos.TextPos <= TextLength)
 						RemoveText(CaretPos.TextPos - 1, 1, CaretPos.TextPos - 1);
-				}
-				else if (ch >= ' ' && ch != '\u007f') // Ignore control and 'delete' characters.
+				} else if (ch >= ' ' && ch != '\u007f') { // Ignore control and 'delete' characters.
+					if (OverwriteMode)
+						DeleteChar();
 					InsertText(ch.ToString());
+				}
 			}
 		}
 
