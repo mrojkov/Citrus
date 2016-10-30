@@ -583,6 +583,8 @@ namespace Lime
 					return Key.Enter;
 				case Keys.Delete:
 					return Key.Delete;
+				case Keys.Insert:
+					return Key.Insert;
 				case Keys.Back:
 					return Key.BackSpace;
 				case Keys.PageUp:
