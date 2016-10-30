@@ -12,7 +12,6 @@ namespace Lime
 		Vector2 Position { get; set; }
 		Color4 Color { get; set; }
 		bool Visible { get; set; }
-		float Thickness { get; set; }
 	}
 
 	public interface ICaretParams
@@ -237,6 +236,7 @@ namespace Lime
 		ScrollView Scroll { get; set; }
 		bool AllowNonDisplayableChars { get; set; }
 		float MouseSelectionThreshold { get; set; }
+		Func<Vector2, Vector2> OffsetContextMenu { get; set; }
 
 		bool IsAcceptableLength(int length);
 		bool IsAcceptableLines(int lines);
@@ -261,6 +261,7 @@ namespace Lime
 		public ScrollView Scroll { get; set; }
 		public bool AllowNonDisplayableChars { get; set; }
 		public float MouseSelectionThreshold { get; set; } = 3.0f;
+		public Func<Vector2, Vector2> OffsetContextMenu { get; set; }
 
 		public bool IsAcceptableLength(int length) => MaxLength <= 0 || length <= MaxLength;
 		public bool IsAcceptableLines(int lines) => MaxLines <= 0 || lines <= MaxLines;
@@ -853,6 +854,8 @@ namespace Lime
 			};
 			if (atCaret) {
 				var p = DisplayWidget.LocalToWorldTransform.TransformVector(CaretPos.WorldPos);
+				if (EditorParams.OffsetContextMenu != null)
+					p = EditorParams.OffsetContextMenu(p);
 				m.Popup(Window.Current, p, 0, null);
 			} else
 				m.Popup();
