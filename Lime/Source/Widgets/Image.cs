@@ -16,9 +16,7 @@ namespace Lime
 			{
 				if (texture != value) {
 					texture = value;
-					if (Window.Current != null) {
-						Window.Current.Invalidate();
-					}
+					Window.Current?.Invalidate();
 				}
 			}
 		}

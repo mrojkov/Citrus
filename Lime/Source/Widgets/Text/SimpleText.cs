@@ -423,9 +423,7 @@ namespace Lime
 			spriteList = null;
 			minSizeValid = false;
 			InvalidateParentConstraintsAndArrangement();
-			if (Window.Current != null) {
-				Window.Current.Invalidate();
-			}
+			Window.Current?.Invalidate();
 		}
 
 		public override Node Clone()

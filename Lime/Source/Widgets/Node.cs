@@ -310,9 +310,7 @@ namespace Lime
 		{
 			if ((DirtyMask & mask) == mask)
 				return;
-			if (Window.Current != null) {
-				Window.Current.Invalidate();
-			}
+			Window.Current?.Invalidate();
 			DirtyMask |= mask;
 			for (var n = Nodes.FirstOrNull(); n != null; n = n.NextSibling) {
 				if ((n.DirtyMask & mask) != mask) {

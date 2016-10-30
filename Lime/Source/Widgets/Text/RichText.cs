@@ -212,9 +212,7 @@ namespace Lime
 			parser = null;
 			renderer = null;
 			InvalidateParentConstraintsAndArrangement();
-			if (Window.Current != null) {
-				Window.Current.Invalidate();
-			}
+			Window.Current?.Invalidate();
 		}
 
 		/// Call on user-supplied parts of text.
