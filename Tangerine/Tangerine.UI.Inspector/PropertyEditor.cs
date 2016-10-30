@@ -14,7 +14,7 @@ namespace Tangerine.UI.Inspector
 		public readonly List<object> Objects;
 		public readonly Type Type;
 		public readonly string PropertyName;
-		public readonly TangerineAttribute TangerineAttribute;
+		public readonly TangerinePropertyAttribute TangerineAttribute;
 		public readonly System.Reflection.PropertyInfo PropertyInfo;
 
 		public PropertyEditorContext(Widget inspectorPane, List<object> objects, Type type, string propertyName)
@@ -23,7 +23,7 @@ namespace Tangerine.UI.Inspector
 			Objects = objects;
 			Type = type;
 			PropertyName = propertyName;
-			TangerineAttribute = PropertyAttributes<TangerineAttribute>.Get(Type, PropertyName) ?? new TangerineAttribute(0);
+			TangerineAttribute = PropertyAttributes<TangerinePropertyAttribute>.Get(Type, PropertyName) ?? new TangerinePropertyAttribute(0);
 			PropertyInfo = Type.GetProperty(PropertyName);
 		}
 	}

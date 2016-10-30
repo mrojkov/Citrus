@@ -5,6 +5,7 @@ namespace Lime
 	/// <summary>
 	/// Плоскость с точками, которые можно анимировать, вызывая эффект искажения поверхности
 	/// </summary>
+	[TangerineClass(allowChildren: true)]
 	public class DistortionMesh : Widget
 	{
 		/// <summary>

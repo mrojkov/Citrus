@@ -16,17 +16,27 @@ namespace Lime
 		void OnTrigger(string property);
 	}
 
-	public class TangerineAttribute : Attribute
+	public class TangerinePropertyAttribute : Attribute
 	{
 		public int ColorIndex;
 
-		public TangerineAttribute(int colorIndex)
+		public TangerinePropertyAttribute(int colorIndex)
 		{
 			ColorIndex = colorIndex;
 		}
 	}
 
-	public class TangerineIgnoreAttribute : Attribute { }
+	public class TangerineClassAttribute : Attribute
+	{
+		public bool AllowChildren { get; private set; }
+
+		public TangerineClassAttribute(bool allowChildren)
+		{
+			AllowChildren = allowChildren;
+		}
+	}
+
+	public class TangerineIgnorePropertyAttribute : Attribute { }
 
 	[Flags]
 	public enum TangerineFlags
@@ -77,7 +87,7 @@ namespace Lime
 		/// May be non-unique.
 		/// </summary>
 		[YuzuMember]
-		[Tangerine(0)]
+		[TangerineProperty(0)]
 		public string Id { get; set; }
 
 		private string contentsPath;
@@ -86,7 +96,7 @@ namespace Lime
 		/// the node children are replaced by the external scene nodes.
 		/// </summary>
 		[YuzuMember]
-		[Tangerine(0)]
+		[TangerineProperty(0)]
 		public string ContentsPath
 		{
 			get { return Serialization.ShrinkPath(contentsPath); }
@@ -98,7 +108,7 @@ namespace Lime
 		/// it automatically runs the child animation from the given marker id.
 		/// </summary>
 		[Trigger]
-		[Tangerine(1)]
+		[TangerineProperty(1)]
 		public string Trigger { get; set; }
 
 		private Node parent;

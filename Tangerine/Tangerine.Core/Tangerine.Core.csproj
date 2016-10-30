@@ -88,6 +88,8 @@
     <Compile Include="RowsSynchronizer.cs" />
     <Compile Include="HotStudioExport\HotSceneExporter.cs" />
     <Compile Include="WidgetExtensions.cs" />
+    <Compile Include="ClassAttributes.cs" />
+    <Compile Include="PropertyAttributes.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

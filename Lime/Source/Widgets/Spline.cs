@@ -5,6 +5,7 @@ namespace Lime
 	/// <summary>
 	/// Сплайн. Вспомогательная кривая линия, построенная по алгоритму Catmull-Rom, задающая траекторию для чего-либо
 	/// </summary>
+	[TangerineClass(allowChildren: true)]
 	public class Spline : Widget
 	{
 		/// <summary>

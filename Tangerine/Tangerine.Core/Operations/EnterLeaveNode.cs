@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Lime;
-using Tangerine.Core;
 
 namespace Tangerine.Core.Operations
 {
@@ -15,13 +14,17 @@ namespace Tangerine.Core.Operations
 			public SetContainer(Node value) : base(Document.Current, nameof(Document.Container), value) { }
 		}
 
-		public static void Perform(Node container, bool selectFirstNode = true)
+		public static bool Perform(Node container, bool selectFirstNode = true)
 		{
+			if (!ClassAttributes<TangerineClassAttribute>.Get(container.GetType())?.AllowChildren ?? true) {
+				return false;
+			}
 			if (container.ContentsPath != null) {
 				OpenExternalScene(container.ContentsPath);
 			} else {
 				ChangeContainer(container, selectFirstNode);
 			}
+			return true;
 		}
 
 		static void OpenExternalScene(string path)

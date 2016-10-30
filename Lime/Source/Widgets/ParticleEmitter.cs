@@ -65,6 +65,7 @@ namespace Lime
 		}
 	}
 
+	[TangerineClass(allowChildren: true)]
 	public partial class ParticleEmitter : Widget
 	{
 		internal static System.Random Rng = new System.Random();

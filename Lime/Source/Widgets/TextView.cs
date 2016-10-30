@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace Lime
 {
+	[TangerineClass(allowChildren: true)]
 	public class TextView : Frame
 	{
 		private SimpleText text;

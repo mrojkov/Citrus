@@ -11,6 +11,7 @@ namespace Lime
 	/// <summary>
 	/// Виджет с поведением кнопки
 	/// </summary>
+	[TangerineClass(allowChildren: true)]
 	public class Button : Widget
 	{
 		public BitSet32 EnableMask = BitSet32.Full;

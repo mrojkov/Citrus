@@ -223,7 +223,7 @@ namespace Lime
 		/// Parent-relative position.
 		/// </summary>
 		[YuzuMember]
-		[Tangerine(4)]
+		[TangerineProperty(4)]
 		public Vector2 Position
 		{
 			get { return position; }
@@ -270,7 +270,7 @@ namespace Lime
 			}
 		}
 
-		[Tangerine(7)]
+		[TangerineProperty(7)]
 		public Vector2 Size
 		{
 			get { return size; }
@@ -292,7 +292,7 @@ namespace Lime
 		/// while deserializing with Yuzu.
 		/// </summary>
 		[YuzuMember("Size")]
-		[TangerineIgnore]
+		[TangerineIgnoreProperty]
 		public Vector2 SilentSize { get { return size; } set { size = value; } }
 
 		/// <summary>
@@ -369,7 +369,7 @@ namespace Lime
 		/// (0, 0) is top-left corner, (1, 1) is bottom-right corner.
 		/// </summary>
 		[YuzuMember]
-		[Tangerine(6)]
+		[TangerineProperty(6)]
 		public Vector2 Pivot
 		{
 			get { return pivot; }
@@ -385,7 +385,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		[Tangerine(5)]
+		[TangerineProperty(5)]
 		public Vector2 Scale
 		{
 			get { return scale; }
@@ -404,7 +404,7 @@ namespace Lime
 		/// Counter-clockwise rotation of this widget.
 		/// </summary>
 		[YuzuMember]
-		[Tangerine(3)]
+		[TangerineProperty(3)]
 		public float Rotation {
 			get { return rotation; }
 			set
@@ -422,7 +422,7 @@ namespace Lime
 		/// Hue of this widget. Contents color will be multiplied by it on render.
 		/// </summary>
 		[YuzuMember]
-		[Tangerine(9)]
+		[TangerineProperty(9)]
 		public Color4 Color
 		{
 			get { return color; }
@@ -454,7 +454,7 @@ namespace Lime
 		public Anchors Anchors { get; set; }
 
 		[YuzuMember]
-		[Tangerine(10)]
+		[TangerineProperty(10)]
 		public Blending Blending
 		{
 			get { return blending; }
@@ -481,7 +481,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		[Tangerine(2)]
+		[TangerineProperty(2)]
 		public bool Visible
 		{
 			get { return visible; }

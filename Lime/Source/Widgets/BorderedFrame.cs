@@ -2,6 +2,7 @@
 
 namespace Lime
 {
+	[TangerineClass(allowChildren: true)]
 	public class BorderedFrame : Frame
 	{
 		public BorderedFrame()

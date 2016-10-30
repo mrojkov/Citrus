@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace Lime
 {
+	[TangerineClass(allowChildren: true)]
 	public class Splitter : Widget
 	{
 		public float SeparatorActiveAreaWidth;

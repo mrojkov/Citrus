@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace Lime
 {
+	[TangerineClass(allowChildren: true)]
 	public class Tab : Widget
 	{
 		private bool active;

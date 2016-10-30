@@ -27,7 +27,7 @@ namespace Lime
 		public bool Looped { get; set; }
 
 		[Trigger]
-		[Tangerine(1)]
+		[TangerineProperty(1)]
 		public MovieAction Action { get; set; }
 
 		public Movie()

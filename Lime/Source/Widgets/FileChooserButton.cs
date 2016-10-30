@@ -3,6 +3,7 @@ using System;
 
 namespace Lime
 {
+	[TangerineClass(allowChildren: true)]
 	public class FileChooserButton : Widget
 	{
 		private Widget label;

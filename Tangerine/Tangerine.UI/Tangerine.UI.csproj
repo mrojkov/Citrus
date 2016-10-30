@@ -61,7 +61,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EmbeddedResource.cs" />
     <Compile Include="IconPool.cs" />
-    <Compile Include="Utils\PropertyAttributes.cs" />
     <Compile Include="Utils\KeyframePalette.cs" />
     <Compile Include="Utils\HSpacer.cs" />
     <Compile Include="Utils\Colors.cs" />

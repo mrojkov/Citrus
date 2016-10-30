@@ -76,7 +76,7 @@ namespace Lime
 		}
 
 		[Trigger]
-		[Tangerine(1)]
+		[TangerineProperty(1)]
 		public AudioAction Action { get; set; }
 
 		/// <summary>

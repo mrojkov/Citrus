@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 
 namespace Lime
 {
+	[TangerineClass(allowChildren: true)]
 	public class DropDownList : Widget
 	{
 		private int index = -1;

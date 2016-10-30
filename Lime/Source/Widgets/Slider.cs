@@ -3,6 +3,7 @@ using Yuzu;
 
 namespace Lime
 {
+	[TangerineClass(allowChildren: true)]
 	public class Slider : Widget
 	{
 		[YuzuMember]
