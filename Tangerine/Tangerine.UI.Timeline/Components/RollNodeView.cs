@@ -22,8 +22,10 @@ namespace Tangerine.UI.Timeline.Components
 			nodeData = row.Components.Get<NodeRow>();
 			label = new SimpleText();
 			editBox = new EditBox { LayoutCell = new LayoutCell(Alignment.Center, stretchX: float.MaxValue) };
-			nodeIcon = new Image(NodeIconPool.GetTexture(nodeData.Node.GetType())) { HitTestTarget = true };
-			nodeIcon.MinMaxSize = (Vector2)nodeIcon.Texture.ImageSize;
+			nodeIcon = new Image(NodeIconPool.GetTexture(nodeData.Node.GetType())) {
+				HitTestTarget = true,
+				MinMaxSize = new Vector2(16, 16)
+			};
 			var expandButtonContainer = new Widget {
 				Layout = new StackLayout { IgnoreHidden = false },
 				LayoutCell = new LayoutCell(Alignment.Center),
@@ -32,7 +34,7 @@ namespace Tangerine.UI.Timeline.Components
 			widget = new Widget {
 				Padding = new Thickness { Left = 4, Right = 2 },
 				MinHeight = TimelineMetrics.DefaultRowHeight,
-				Layout = new HBoxLayout { CellDefaults = new LayoutCell { Alignment = Alignment.Center } },
+				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center) },
 				HitTestTarget = true,
 				Nodes = {
 					new HSpacer(indentation * TimelineMetrics.RollIndentation),
