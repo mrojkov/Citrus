@@ -1,6 +1,7 @@
 ﻿using System;
-using Lime;
+using System.IO;
 using System.Linq;
+using Lime;
 using Tangerine.Core;
 using System.Collections.Generic;
 
@@ -284,13 +285,18 @@ namespace Tangerine.UI.Inspector
 			});
 			OnKeyframeToggle += editor.SetFocus;
 			button.Clicked += () => {
-				var dlg = new FileDialog { AllowedFileTypes = allowedFileTypes, Mode = FileDialogMode.Open };
+				var dlg = new FileDialog {
+					AllowedFileTypes = allowedFileTypes,
+					Mode = FileDialogMode.Open,
+					InitialDirectory = Path.GetDirectoryName(Document.Current.GetAbsolutePath()),
+				};
 				if (dlg.RunModal()) {
 					if (!dlg.FileName.StartsWith(Project.Current.AssetsDirectory)) {
 						var alert = new AlertDialog("Tangerine", "Can't open an assset outside the project assets directory", "Ok");
 						alert.Show();
 					} else {
-						var path = System.IO.Path.ChangeExtension(dlg.FileName.Substring(Project.Current.AssetsDirectory.Length + 1), null);
+						var assetPath = dlg.FileName.Substring(Project.Current.AssetsDirectory.Length + 1);
+						var path = Path.ChangeExtension(assetPath, null);
 						SetFilePath(path);
 					}
 				}
