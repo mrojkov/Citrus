@@ -23,16 +23,14 @@ namespace Lime
 		private bool active;
 		private RenderingState renderingState = RenderingState.Rendered;
 		private System.Drawing.Point lastMousePosition;
-		private Display display;
 
 		public Input Input { get; private set; }
-		public bool Active { get { return active; } }
-		public Form Form { get { return form; } }
+		public bool Active => active;
+		public Form Form => form;
 
 		public string Title
 		{
 			get { return form.Text; }
-
 			set { form.Text = value; }
 		}
 
