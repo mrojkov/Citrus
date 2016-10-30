@@ -95,6 +95,7 @@ namespace Lime
 			public static Key SelectLineEnd = Key.MapShortcut(SelectModifier, Key.End);
 
 			public static Key SelectAll = Key.MapShortcut(Modifiers.Command, Key.A);
+			public static Key SelectCurrentWord = Key.MapShortcut(Modifiers.Command | Modifiers.Shift, Key.W);
 
 			public static Key DeleteWordPrev = Key.MapShortcut(Modifiers.Control, Key.BackSpace);
 			public static Key DeleteWordNext = Key.MapShortcut(Modifiers.Control, Key.Delete);
@@ -342,8 +343,10 @@ namespace Lime
 					MoveCaretSelection(() => CaretPos.Col = 0);
 				if (WasKeyRepeated(Cmds.SelectLineEnd))
 					MoveCaretSelection(() => CaretPos.Col = int.MaxValue);
-				if (WasKeyRepeated(Cmds.SelectAll))
+				if (input.WasKeyPressed(Cmds.SelectAll))
 					SelectAll();
+				if (input.WasKeyPressed(Cmds.SelectCurrentWord) && IsTextReadable)
+					SelectWord();
 
 				if (WasKeyRepeated(Key.Commands.Delete)) {
 					if (HasSelection())
