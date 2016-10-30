@@ -32,6 +32,7 @@ namespace Tangerine.UI.Timeline.Components
 				Nodes = {
 					new HSpacer(identation * TimelineMetrics.RollIndentation),
 					// CreateExpandButton(),
+					new HSpacer(6),
 					propIcon,
 					new HSpacer(3),
 					label,
