@@ -124,12 +124,13 @@ namespace Lime
 			if (keyToNameCache.TryGetValue(this, out value)) {
 				return value;
 			}
+
+			var sb = new StringBuilder(10);
 			foreach (var kv in ShortcutMap) {
-				if (kv.Value == this) {
-					return "[" + kv.Key.ToString() + "]";
-				}
+				if (kv.Value == this)
+					sb.Append($"[{kv.Key.ToString()}]");
 			}
-			return Code.ToString();
+			return sb.Length > 0 ? sb.ToString() : Code.ToString();
 		}
 
 		private static Dictionary<Key, string> keyToNameCache;
@@ -137,7 +138,7 @@ namespace Lime
 		static Key()
 		{
 			keyToNameCache = typeof(Key).GetFields()
-				.Where(i => i.FieldType == typeof(Key) && i.Name != "LastNormal")
+				.Where(i => i.FieldType == typeof(Key) && i.Name != nameof(Key.LastNormal))
 				.ToDictionary(i => (Key)i.GetValue(null), i => i.Name);
 		}
 
@@ -167,7 +168,24 @@ namespace Lime
 			return key;
 		}
 
-#region Keyboard
+		public void AddAlias(Modifiers modifiers, Key main)
+		{
+			AddAlias(new Shortcut(modifiers, main));
+		}
+
+		public void AddAlias(Shortcut shortcut)
+		{
+			if (!Shortcut.ValidateMainKey(shortcut.Main)) {
+				throw new ArgumentException();
+			}
+			Key key;
+			if (!ShortcutMap.TryGetValue(shortcut, out key))
+				ShortcutMap.Add(shortcut, this);
+			else if (key != this)
+				throw new InvalidOperationException();
+		}
+
+		#region Keyboard
 		public static readonly Key Shift = New();
 		public static readonly Key Control = New();
 		public static readonly Key Alt = New();
@@ -300,6 +318,13 @@ namespace Lime
 			public static readonly Key Copy = MapShortcut(Modifiers.Command, Key.C);
 			public static readonly Key Paste = MapShortcut(Modifiers.Command, Key.V);
 			public static readonly Key Delete = MapShortcut(Key.Delete);
+
+			static Commands()
+			{
+				Copy.AddAlias(Modifiers.Command, Insert);
+				Cut.AddAlias(Modifiers.Shift, Key.Delete);
+				Paste.AddAlias(Modifiers.Shift, Insert);
+			}
 		}
 	}
 }
