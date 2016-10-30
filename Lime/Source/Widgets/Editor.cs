@@ -167,28 +167,6 @@ namespace Lime
 
 		private bool WasKeyRepeated(Key key) => input.WasKeyRepeated(key);
 
-		private bool InsertChar(char ch)
-		{
-			if (HasSelection())
-				DeleteSelection();
-			if (CaretPos.TextPos < 0 || CaretPos.TextPos > TextLength) return false;
-			if (!EditorParams.IsAcceptableLength(TextLength + 1)) return false;
-			if (EditorParams.UseSecureString) {
-				if (ch == '\n') return false;
-				Password.InsertAt(CaretPos.TextPos, ch);
-			} else {
-				if (ch != '\n' && !EditorParams.AllowNonDisplayableChars && !Text.CanDisplay(ch)) return false;
-				var newText = Text.Text.Insert(CaretPos.TextPos, ch.ToString());
-				if (EditorParams.AcceptText != null && !EditorParams.AcceptText(newText)) return false;
-				if (EditorParams.MaxHeight > 0 && !EditorParams.IsAcceptableHeight(CalcTextHeight(newText))) return false;
-				Text.Text = newText;
-			}
-			lastChar.ShowTimeLeft = EditorParams.PasswordLastCharShowTime;
-			lastChar.Value = ch;
-			lastChar.Pos = CaretPos.TextPos++;
-			return true;
-		}
-
 		private float CalcTextHeight(string s)
 		{
 			var text = Text.Text;
@@ -264,8 +242,30 @@ namespace Lime
 			CaretPos.InvalidatePreservingTextPos();
 		}
 
+		private bool InsertChar(char ch)
+		{
+			if (CaretPos.TextPos < 0 || CaretPos.TextPos > TextLength) return false;
+			if (!EditorParams.IsAcceptableLength(TextLength + 1)) return false;
+			if (EditorParams.UseSecureString) {
+				if (ch == '\n') return false;
+				Password.InsertAt(CaretPos.TextPos, ch);
+			} else {
+				if (ch != '\n' && !EditorParams.AllowNonDisplayableChars && !Text.CanDisplay(ch)) return false;
+				var newText = Text.Text.Insert(CaretPos.TextPos, ch.ToString());
+				if (EditorParams.AcceptText != null && !EditorParams.AcceptText(newText)) return false;
+				if (EditorParams.MaxHeight > 0 && !EditorParams.IsAcceptableHeight(CalcTextHeight(newText))) return false;
+				Text.Text = newText;
+			}
+			lastChar.ShowTimeLeft = EditorParams.PasswordLastCharShowTime;
+			lastChar.Value = ch;
+			lastChar.Pos = CaretPos.TextPos++;
+			return true;
+		}
+
 		private void InsertText(string text)
 		{
+			if (HasSelection())
+				DeleteSelection();
 			if (EditorParams.UseSecureString) {
 				if (text.Count(InsertChar) > 0)
 					Text.Invalidate();
