@@ -2,18 +2,12 @@ using Yuzu;
 
 namespace Lime
 {
-	/// <summary>
-	/// Виджет, содержащий в себе изображение
-	/// </summary>
 	public class Image : Widget, IImageCombinerArg
 	{
 		bool skipRender;
 		bool requestSkipRender;
 		private ITexture texture;
 
-		/// <summary>
-		/// Изображение, отображаемое этим виджетом
-		/// </summary>
 		[YuzuMember]
 		public override sealed ITexture Texture
 		{
@@ -29,15 +23,9 @@ namespace Lime
 			}
 		}
 
-		/// <summary>
-		/// Текстурная координата левого верхнего угла текстуры
-		/// </summary>
 		[YuzuMember]
 		public Vector2 UV0 { get; set; }
 
-		/// <summary>
-		/// Текстурная координата правого нижнего угла текстуры
-		/// </summary>
 		[YuzuMember]
 		public Vector2 UV1 { get; set; }
 
@@ -61,17 +49,11 @@ namespace Lime
 		{
 		}
 
-		/// <summary>
-		/// Возвращает размер текстуры
-		/// </summary>
 		public override Vector2 CalcContentSize()
 		{
 			return (Vector2)Texture.ImageSize;
 		}
 
-		/// <summary>
-		/// Добавляет виджет и все его дочерние виджеты в очередь отрисовки
-		/// </summary>
 		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (GloballyVisible && !skipRender) {
