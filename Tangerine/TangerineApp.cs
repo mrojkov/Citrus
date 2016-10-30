@@ -225,10 +225,11 @@ namespace Tangerine
 				},
 #endif
 				new Submenu("File") {
-					new OpenFileCommand(),
+					new OpenCommand(),
 					new OpenProjectCommand(),
 					Command.MenuSeparator,
-					new SaveFileCommand(),
+					new SaveCommand(),
+					new SaveAsCommand(),
 					Command.MenuSeparator,
 #if !MAC
 					new PreferencesCommand(),

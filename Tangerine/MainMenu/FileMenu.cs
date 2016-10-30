@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Lime;
 using Tangerine.Core;
 using Tangerine.UI;
@@ -25,15 +26,21 @@ namespace Tangerine
 		}
 	}
 
-	public class OpenFileCommand : Command
+	public class OpenCommand : Command
 	{
-		public override string Text => "Open File...";
-		public override Shortcut Shortcut => KeyBindings.GenericKeys.OpenFile;
+		public override string Text => "Open ...";
+		public override Shortcut Shortcut => KeyBindings.GenericKeys.Open;
 		public override bool Enabled => Project.Current != null;
 
 		public override void Execute()
 		{
-			var dlg = new FileDialog { AllowedFileTypes = new string[] { Document.SceneFileExtension }, Mode = FileDialogMode.Open };
+			var dlg = new FileDialog {
+				AllowedFileTypes = new string[] { Document.SceneFileExtension },
+				Mode = FileDialogMode.Open,
+			};
+			if (Document.Current != null) {
+				dlg.InitialDirectory = Path.GetDirectoryName(Document.Current.GetAbsolutePath());
+			}
 			if (dlg.RunModal()) {
 				if (!dlg.FileName.StartsWith(Project.Current.AssetsDirectory)) {
 					var alert = new AlertDialog("Tangerine", "Can't open document outside the project assets directory", "Ok");
@@ -46,15 +53,34 @@ namespace Tangerine
 		}
 	}
 
-	public class SaveFileCommand : Command
+	public class SaveCommand : Command
 	{
-		public override string Text => "Save File";
-		public override Shortcut Shortcut => KeyBindings.GenericKeys.SaveFile;
+		public override string Text => "Save";
+		public override Shortcut Shortcut => KeyBindings.GenericKeys.Save;
 		public override bool Enabled => Document.Current != null;
 
 		public override void Execute()
 		{
 			Document.Current.Save();
+		}
+	}
+
+	public class SaveAsCommand : Command
+	{
+		public override string Text => "Save As...";
+		public override Shortcut Shortcut => KeyBindings.GenericKeys.SaveAs;
+		public override bool Enabled => Document.Current != null;
+
+		public override void Execute()
+		{
+			var dlg = new FileDialog {
+				AllowedFileTypes = new string[] { Document.SceneFileExtension },
+				Mode = FileDialogMode.Save,
+				InitialDirectory = Path.GetDirectoryName(Document.Current.GetAbsolutePath())
+			};
+			if (dlg.RunModal()) {
+				Document.Current.SaveAs(dlg.FileName);
+			}
 		}
 	}
 

@@ -23,8 +23,9 @@ namespace Tangerine.UI
 
 		public static class GenericKeys
 		{
-			public static readonly Shortcut OpenFile = new Shortcut(Modifiers.Command, Key.O);
-			public static readonly Shortcut SaveFile = new Shortcut(Modifiers.Command, Key.S);
+			public static readonly Shortcut Open = new Shortcut(Modifiers.Command, Key.O);
+			public static readonly Shortcut Save = new Shortcut(Modifiers.Command, Key.S);
+			public static readonly Shortcut SaveAs = new Shortcut(Modifiers.Command | Modifiers.Shift, Key.S);
 			public static readonly Shortcut OpenProject = new Shortcut(Modifiers.Command | Modifiers.Shift, Key.O);
 			public static readonly Shortcut PreferencesDialog = new Shortcut(Modifiers.Command, Key.P);
 			public static readonly Shortcut CloseDocument = new Shortcut(Modifiers.Command, Key.W);

@@ -38,6 +38,8 @@ namespace Tangerine.Core
 		/// Gets the root node for the current document.
 		/// </summary>
 		public Node RootNode { get; private set; }
+
+
 		/// <summary>
 		/// Gets or sets the current container widget.
 		/// </summary>
@@ -84,6 +86,12 @@ namespace Tangerine.Core
 		public void MakeCurrent()
 		{
 			SetCurrent(this);
+		}
+
+		public string GetAbsolutePath()
+		{
+			var bd = ((UnpackedAssetsBundle)AssetsBundle.Instance).BaseDirectory;
+			return System.IO.Path.Combine(bd, Path);
 		}
 
 		public static void SetCurrent(Document doc)
@@ -133,10 +141,15 @@ namespace Tangerine.Core
 
 		public void Save()
 		{
-			History.AddSavePoint();
 			var bd = ((UnpackedAssetsBundle)AssetsBundle.Instance).BaseDirectory;
-			var absPath = System.IO.Path.ChangeExtension(System.IO.Path.Combine(bd, Path), ".scene");
-			using (var stream = new FileStream(absPath, FileMode.Create)) {
+			var path = System.IO.Path.ChangeExtension(System.IO.Path.Combine(bd, Path), ".scene");
+			SaveAs(path);
+		}
+
+		public void SaveAs(string path)
+		{
+			History.AddSavePoint();
+			using (var stream = new FileStream(path, FileMode.Create)) {
 				var serializer = new Orange.HotSceneExporter.Serializer();
 				// Dispose cloned object to preserve keyframes identity in the original node. See Animator.Dispose().
 				using (var node = RootNode.Clone()) {
