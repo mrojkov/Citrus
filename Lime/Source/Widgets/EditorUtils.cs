@@ -33,13 +33,19 @@ namespace Lime
 		public Color4 Color { get; set; } = Color4.Black;
 		public bool Visible { get; set; }
 		public float Thickness { get; set; } = 1.0f;
+		public float Width { get; set; } = 0;
 
 		public override void Render(Node node)
 		{
 			if (Visible) {
 				var text = (SimpleText)node;
 				text.PrepareRendererState();
-				Renderer.DrawLine(Position, Position + Vector2.Down * text.FontHeight, Color, Thickness);
+				var b = Position + new Vector2(Width, text.FontHeight);
+				// Zero-width outline is still twice as wide.
+				if (Width <= 0)
+					Renderer.DrawLine(Position, b, Color, Thickness);
+				else
+					Renderer.DrawRectOutline(Position, b, Color, Thickness);
 			}
 		}
 	}
