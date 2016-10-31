@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.IO;
 using Lime;
 
@@ -88,11 +87,7 @@ namespace Tangerine.Core
 			SetCurrent(this);
 		}
 
-		public string GetAbsolutePath()
-		{
-			var bd = ((UnpackedAssetsBundle)AssetsBundle.Instance).BaseDirectory;
-			return System.IO.Path.Combine(bd, Path);
-		}
+		public string GetAbsolutePath() => Project.Current.AssetToAbsolutePath(Path);
 
 		public static void SetCurrent(Document doc)
 		{
@@ -139,17 +134,13 @@ namespace Tangerine.Core
 			return true;
 		}
 
-		public void Save()
-		{
-			var bd = ((UnpackedAssetsBundle)AssetsBundle.Instance).BaseDirectory;
-			var path = System.IO.Path.ChangeExtension(System.IO.Path.Combine(bd, Path), ".scene");
-			SaveAs(path);
-		}
+		public void Save() => SaveAs(GetAbsolutePath());
 
 		public void SaveAs(string path)
 		{
 			History.AddSavePoint();
-			using (var stream = new FileStream(path, FileMode.Create)) {
+			Path = path;
+			using (var stream = new FileStream(GetAbsolutePath(), FileMode.Create)) {
 				var serializer = new Orange.HotSceneExporter.Serializer();
 				// Dispose cloned object to preserve keyframes identity in the original node. See Animator.Dispose().
 				using (var node = RootNode.Clone()) {
@@ -160,7 +151,7 @@ namespace Tangerine.Core
 						n.Nodes.Clear();
 						n.Markers.Clear();
 					}
-					Serialization.WriteObject(Path, stream, node, serializer);
+					Serialization.WriteObject(path, stream, node, serializer);
 				}
 			}
 		}

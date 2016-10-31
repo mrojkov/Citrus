@@ -197,6 +197,7 @@ namespace Tangerine
 					var tab = new Tab { Closable = true };
 					var currentDocumentChanged = new Property<bool>(() => Document.Current == doc).DistinctUntilChanged().Where(i => i);
 					tab.Tasks.Add(currentDocumentChanged.Consume(_ => tabBar.ActivateTab(tab)));
+					tab.AddChangeWatcher(() => doc.Path, _ => RefreshTabText(doc, tab));
 					tab.AddChangeWatcher(() => doc.IsModified, _ => RefreshTabText(doc, tab));
 					tab.Clicked += doc.MakeCurrent;
 					tab.Closing += () => Project.Current.CloseDocument(doc);

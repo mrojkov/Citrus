@@ -79,6 +79,18 @@ namespace Tangerine.Core
 			return true;
 		}
 
+		public bool AbsoluteToAssetPath(string absolutePath, out string assetPath)
+		{
+			assetPath = null;
+			if (absolutePath.StartsWith(AssetsDirectory)) {
+				assetPath = absolutePath.Substring(AssetsDirectory.Length + 1);
+				return true;
+			}
+			return false;
+		}
+
+		public string AssetToAbsolutePath(string assetPath) => Path.Combine(AssetsDirectory, assetPath);
+
 		public Document OpenDocument(string path, bool selectFirstNode = true)
 		{
 			var doc = Documents.FirstOrDefault(i => i.Path == path);

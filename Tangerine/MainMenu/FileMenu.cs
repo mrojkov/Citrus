@@ -42,12 +42,12 @@ namespace Tangerine
 				dlg.InitialDirectory = Path.GetDirectoryName(Document.Current.GetAbsolutePath());
 			}
 			if (dlg.RunModal()) {
-				if (!dlg.FileName.StartsWith(Project.Current.AssetsDirectory)) {
-					var alert = new AlertDialog("Tangerine", "Can't open document outside the project assets directory", "Ok");
+				string localPath;
+				if (!Project.Current.AbsoluteToAssetPath(dlg.FileName, out localPath)) {
+					var alert = new AlertDialog("Tangerine", "Can't open a document outside the project directory", "Ok");
 					alert.Show();
 				} else {
-					var path = dlg.FileName.Substring(Project.Current.AssetsDirectory.Length + 1);
-					Project.Current.OpenDocument(path);
+					Project.Current.OpenDocument(localPath);
 				}
 			}
 		}
@@ -79,7 +79,13 @@ namespace Tangerine
 				InitialDirectory = Path.GetDirectoryName(Document.Current.GetAbsolutePath())
 			};
 			if (dlg.RunModal()) {
-				Document.Current.SaveAs(dlg.FileName);
+				string localPath;
+				if (!Project.Current.AbsoluteToAssetPath(dlg.FileName, out localPath)) {
+					var alert = new AlertDialog("Tangerine", "Can't save the document outside the project directory", "Ok");
+					alert.Show();
+				} else {
+					Document.Current.SaveAs(localPath);
+				}
 			}
 		}
 	}
