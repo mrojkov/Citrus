@@ -136,6 +136,48 @@ namespace Tangerine.UI.Inspector
 		}
 	}
 
+	class NumericRangePropertyEditor : CommonPropertyEditor
+	{
+		public NumericRangePropertyEditor(PropertyEditorContext context) : base(context)
+		{
+			EditBox medEditor, dispEditor;
+			containerWidget.AddNode(new Widget {
+				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center), Spacing = 4 },
+				Nodes = {
+					(medEditor = new EditBox()),
+					(dispEditor = new EditBox()),
+				}
+			});
+			OnKeyframeToggle += medEditor.SetFocus;
+			var currentMed = CoalescedPropertyValue<NumericRange, float>(context, v => v.Median);
+			var currentDisp = CoalescedPropertyValue<NumericRange, float>(context, v => v.Dispersion);
+			medEditor.TextWidget.HAlignment = HAlignment.Right;
+			dispEditor.TextWidget.HAlignment = HAlignment.Right;
+			medEditor.Submitted += text => SetComponent(context, 0, medEditor, currentMed.GetValue());
+			dispEditor.Submitted += text => SetComponent(context, 1, dispEditor, currentDisp.GetValue());
+			medEditor.AddChangeWatcher(currentMed, v => medEditor.Text = v.ToString());
+			dispEditor.AddChangeWatcher(currentDisp, v => dispEditor.Text = v.ToString());
+		}
+
+		void SetComponent(PropertyEditorContext context, int component, EditBox editor, float currentValue)
+		{
+			float newValue;
+			if (float.TryParse(editor.Text, out newValue)) {
+				foreach (var obj in context.Objects) {
+					var current = new Property<NumericRange>(obj, context.PropertyName).Value;
+					if (component == 0) {
+						current.Median = newValue;
+					} else {
+						current.Dispersion = newValue;
+					}
+					Core.Operations.SetAnimableProperty.Perform(obj, context.PropertyName, current);
+				}
+			} else {
+				editor.Text = currentValue.ToString();
+			}
+		}
+	}
+
 	class StringPropertyEditor : CommonPropertyEditor
 	{
 		const int maxLines = 5;
