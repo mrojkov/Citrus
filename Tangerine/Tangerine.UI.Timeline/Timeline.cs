@@ -122,20 +122,8 @@ namespace Tangerine.UI.Timeline
 				new RulerMouseScrollProcessor(),
 				new ClampScrollPosProcessor(),
 				new EditMarkerProcessor(),
-				new SelectFirstNodeOnDocumentOpeningProcessor(),
 				PanelTitleUpdater(),
 			});
-		}
-
-		class SelectFirstNodeOnDocumentOpeningProcessor : ITaskProvider
-		{
-			public IEnumerator<object> Task()
-			{
-				if (Document.Current.Container.Nodes.Count > 0) {
-					Core.Operations.SelectNode.Perform(Document.Current.Container.Nodes[0]);
-				}
-				yield return null;
-			}
 		}
 
 		ITaskProvider PanelTitleUpdater()

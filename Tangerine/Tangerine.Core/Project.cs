@@ -79,7 +79,7 @@ namespace Tangerine.Core
 			return true;
 		}
 
-		public Document OpenDocument(string path)
+		public Document OpenDocument(string path, bool selectFirstNode = true)
 		{
 			var doc = Documents.FirstOrDefault(i => i.Path == path);
 			if (doc == null) {
@@ -87,6 +87,12 @@ namespace Tangerine.Core
 				documents.Add(doc);
 			}
 			doc.MakeCurrent();
+			if (selectFirstNode) {
+				Operations.Dummy.Perform();
+				if (doc.Rows.Count > 0) {
+					Operations.SelectRow.Perform(doc.Rows[0]);
+				}
+			}
 			return doc;
 		}
 
