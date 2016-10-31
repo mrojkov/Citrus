@@ -12,6 +12,7 @@ namespace Tangerine.Core.Operations
 		class SetContainer : SetProperty, ISetContainer
 		{
 			public SetContainer(Node value) : base(Document.Current, nameof(Document.Container), value) { }
+			public override bool IsChangingDocument => false;
 		}
 
 		public static bool Perform(Node container, bool selectFirstNode = true)
