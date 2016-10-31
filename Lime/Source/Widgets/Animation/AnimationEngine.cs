@@ -76,7 +76,7 @@ namespace Lime
 				animation.TimeInternal += delta;
 				if (prevFrame != currFrame && animation.Markers.Count > 0) {
 					var marker = animation.Markers.GetByFrame(currFrame);
-					if (marker != null) {
+					if (marker != null && (animation.Owner.TangerineFlags & TangerineFlags.IgnoreMarkers) == 0) {
 						ProcessMarker(animation, marker, ref prevFrame, ref currFrame);
 					}
 				}
