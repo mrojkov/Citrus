@@ -93,7 +93,7 @@ namespace Lime
 			switch (marker.Action) {
 				case MarkerAction.Jump:
 					var gotoMarker = animation.Markers.TryFind(marker.JumpTo);
-					if (gotoMarker != null) {
+					if (gotoMarker != null && gotoMarker != marker) {
 						var hopFrames = gotoMarker.Frame - animation.Frame;
 						animation.TimeInternal += AnimationUtils.FramesToMsecs(hopFrames);
 						prevFrame += hopFrames;
