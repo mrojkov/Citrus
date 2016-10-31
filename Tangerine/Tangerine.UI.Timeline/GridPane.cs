@@ -17,11 +17,6 @@ namespace Tangerine.UI.Timeline
 		public Vector2 Size => RootWidget.Size;
 		public Vector2 ContentSize => ContentWidget.Size;
 
-		class FooOperation : Operation
-		{
-			public override bool IsChangingDocument => false;
-		}
-
 		public GridPane()
 		{
 			RootWidget = new Frame {
@@ -42,8 +37,8 @@ namespace Tangerine.UI.Timeline
 				ContentWidget.Position = -timeline.ScrollPos;
 			};
 			RootWidget.AddChangeWatcher(() => RootWidget.Size, 
-				// Some document updaters (e.g. ColumnCountUpdater) require up-to-date timeline dimensions.
-				_ => Document.Current.History.Perform(new FooOperation()));
+				// Some document operation processors (e.g. ColumnCountUpdater) require up-to-date timeline dimensions.
+				_ => Core.Operations.Dummy.Perform());
 			OnPostRender += RenderGrid;
 			OnPostRender += RenderSelection;
 		}
