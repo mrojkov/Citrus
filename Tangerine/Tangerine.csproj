@@ -142,15 +142,12 @@
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.EditBox.png" />
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.EmitterShapePoint.png" />
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Frame.png" />
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Gear.png" />
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Image.png" />
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.MaskedEffect.png" />
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.ModelView.png" />
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Movie.png" />
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.NineGrid.png" />
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.ParticleEmitter.png" />
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.ParticlesMagnet.png" />
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.ParticleTemplate.png" />
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.RadioButton.png" />
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.RichText.png" />
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.SimpleText.png" />
@@ -203,6 +200,9 @@
     <EmbeddedResource Include="Resources\Icons\Timeline\Key.png" />
     <EmbeddedResource Include="Resources\Icons\Timeline\AnimationMode.png" />
     <EmbeddedResource Include="Resources\Icons\Tools\Root.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.ParticleModifier.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.SplineGear.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.ImageCombiner.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PreferencesDialog\" />
