@@ -66,7 +66,8 @@ namespace Tangerine.UI.SceneView
 				blackBackgroundPresenter = new WidgetFlatFillPresenter(Color4.Transparent);
 				canvas = CreateCanvas(container);
 				var cellSize = CalcCellSize(container.Size, GetWidgets().Count());
-				items = GetWidgets().Select((w, i) => new Item(w, CreateItemFrame(i, canvas, cellSize), input)).ToList();
+				int itemCount = GetWidgets().Count();
+				items = GetWidgets().Select((w, i) => new Item(w, CreateItemFrame(i, canvas, cellSize), input, showLabel: itemCount <= 50)).ToList();
 			}
 
 			static Frame CreateItemFrame(int index, Widget canvas, Vector2 cellSize)
@@ -156,9 +157,10 @@ namespace Tangerine.UI.SceneView
 				readonly Transform2 exposedTransform;
 				readonly WidgetBoundsPresenter borderPresenter;
 				readonly Frame frame;
+				readonly SimpleText label;
 				public bool Closed { get; private set; }
 
-				public Item(Widget widget, Frame frame, WidgetInput input)
+				public Item(Widget widget, Frame frame, WidgetInput input, bool showLabel)
 				{
 					this.frame = frame;
 					originalWidget = widget;
@@ -167,37 +169,42 @@ namespace Tangerine.UI.SceneView
 					originalTransform = widget.CalcTransitionToSpaceOf(frame).ToTransform2();
 					exposedTransform = CalcExposedTransform(widget, frame);
 					originalWidget.SetTangerineFlag(TangerineFlags.HiddenOnExposition, true);
-					var label = new SimpleText { 
-						Position = new Vector2(10, 10),
+					frame.HitTestTarget = true;
+					var clickArea = new Widget { Size = frame.Size, Anchors = Anchors.LeftRightTopBottom, HitTestTarget = true };
+					frame.AddNode(clickArea);
+					label = new SimpleText { 
+						Visible = showLabel,
+						Position = new Vector2(3, 2),
 						Color = SceneViewColors.Label,
 						Text = (exposedWidget.Id ?? ""),
 						OverflowMode = TextOverflowMode.Ignore
 					};
-					frame.HitTestTarget = true;
-					var clickArea = new Widget { Size = frame.Size, Anchors = Anchors.LeftRightTopBottom, HitTestTarget = true };
-					frame.AddNode(clickArea);
+					label.FontHeight *= 0.75f;
 					frame.AddNode(label);
 					frame.AddNode(exposedWidget);
 					borderPresenter = new WidgetBoundsPresenter(SceneViewColors.ExposedItemInactiveBorder, 1);
 					frame.CompoundPresenter.Push(borderPresenter);
 					frame.Tasks.AddLoop(() => {
-                        borderPresenter.Color = Document.Current.SelectedNodes().Contains(widget) ?
-                            SceneViewColors.ExposedItemSelectedBorder :
-                            SceneViewColors.ExposedItemInactiveBorder;
+						borderPresenter.Color = Document.Current.SelectedNodes().Contains(widget) ?
+							SceneViewColors.ExposedItemSelectedBorder :
+							SceneViewColors.ExposedItemInactiveBorder;
 						if (clickArea.IsMouseOver()) {
 							if (Lime.Task.Current.LifeTime % 0.5f < 0.25f) {
-                                borderPresenter.Color = SceneViewColors.ExposedItemActiveBorder;
+								borderPresenter.Color = SceneViewColors.ExposedItemActiveBorder;
 							}
+							label.Visible = true;
 							if (clickArea.Input.WasMousePressed()) {
 								if (!input.IsKeyPressed(MultiSelectKey)) {
-                                    Core.Operations.ClearRowSelection.Perform();
-                                    Core.Operations.SelectNode.Perform(widget);
-                                    Closed = true;
+									Core.Operations.ClearRowSelection.Perform();
+									Core.Operations.SelectNode.Perform(widget);
+									Closed = true;
 								} else {
 									var isSelected = Document.Current.SelectedNodes().Contains(widget);
-                                    Core.Operations.SelectNode.Perform(widget, !isSelected);
+									Core.Operations.SelectNode.Perform(widget, !isSelected);
 								}
 							}
+						} else {
+							label.Visible = showLabel;
 						}
 					});
 				}
