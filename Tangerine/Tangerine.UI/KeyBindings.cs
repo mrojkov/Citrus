@@ -23,6 +23,7 @@ namespace Tangerine.UI
 
 		public static class GenericKeys
 		{
+			public static readonly Shortcut New = new Shortcut(Modifiers.Command, Key.N);
 			public static readonly Shortcut Open = new Shortcut(Modifiers.Command, Key.O);
 			public static readonly Shortcut Save = new Shortcut(Modifiers.Command, Key.S);
 			public static readonly Shortcut SaveAs = new Shortcut(Modifiers.Command | Modifiers.Shift, Key.S);

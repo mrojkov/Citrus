@@ -226,6 +226,8 @@ namespace Tangerine
 				},
 #endif
 				new Submenu("File") {
+					new NewCommand(),
+					Command.MenuSeparator,
 					new OpenCommand(),
 					new OpenProjectCommand(),
 					Command.MenuSeparator,
@@ -271,7 +273,7 @@ namespace Tangerine
 					typeof(Bone),
 					typeof(SplineGear),
 					typeof(ParticleEmitter),
-					typeof(ParticlesMagnet),
+					typeof(ParticleModifier),
 					typeof(EmitterShapePoint),
 					typeof(ParticlesMagnet),
 					typeof(ParticleModifier),

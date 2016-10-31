@@ -91,6 +91,14 @@ namespace Tangerine.Core
 
 		public string AssetToAbsolutePath(string assetPath) => Path.Combine(AssetsDirectory, assetPath);
 
+		public Document NewDocument()
+		{
+			var doc = new Document();
+			documents.Add(doc);
+			doc.MakeCurrent();
+			return doc;
+		}
+			
 		public Document OpenDocument(string path, bool selectFirstNode = true)
 		{
 			var doc = Documents.FirstOrDefault(i => i.Path == path);

@@ -31,13 +31,12 @@ namespace Tangerine.Core
 		public static Document Current { get; private set; }
 
 		public string Path { get; private set; }
-		public readonly DocumentHistory History;
+		public readonly DocumentHistory History = new DocumentHistory();
 		public bool IsModified => History.IsDocumentModified;
 		/// <summary>
 		/// Gets the root node for the current document.
 		/// </summary>
 		public Node RootNode { get; private set; }
-
 
 		/// <summary>
 		/// Gets or sets the current container widget.
@@ -68,12 +67,15 @@ namespace Tangerine.Core
 
 		public string AnimationId { get; set; }
 
+		public const string DefaultPath = "Untitled.scene";
+
 		public Document()
 		{
-			History = new DocumentHistory();
+			Path = DefaultPath;
+			Container = RootNode = new Frame { Size = new Vector2(1024, 768) };
 		}
 
-		public Document(string path) : this()
+		public Document(string path)
 		{
 			Path = path;
 			using (Theme.Push(DefaultTheme.Instance)) {

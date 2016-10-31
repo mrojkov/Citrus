@@ -26,6 +26,18 @@ namespace Tangerine
 		}
 	}
 
+	public class NewCommand : Command
+	{
+		public override string Text => "New";
+		public override Shortcut Shortcut => KeyBindings.GenericKeys.New;
+		public override bool Enabled => Project.Current != null;
+
+		public override void Execute()
+		{
+			Project.Current.NewDocument();
+		}
+	}
+
 	public class OpenCommand : Command
 	{
 		public override string Text => "Open ...";
@@ -61,7 +73,11 @@ namespace Tangerine
 
 		public override void Execute()
 		{
-			Document.Current.Save();
+			if (Document.Current.Path == Document.DefaultPath) {
+				SaveAsCommand.SaveAs();
+			} else {
+				Document.Current.Save();
+			}
 		}
 	}
 
@@ -72,6 +88,11 @@ namespace Tangerine
 		public override bool Enabled => Document.Current != null;
 
 		public override void Execute()
+		{
+			SaveAs();
+		}
+
+		public static void SaveAs()
 		{
 			var dlg = new FileDialog {
 				AllowedFileTypes = new string[] { Document.SceneFileExtension },
