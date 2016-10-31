@@ -15,7 +15,7 @@ namespace Tangerine.UI.SceneView
 		public readonly Widget InputArea;
 		public WidgetInput Input => InputArea.Input;
 		// Container for the document root node.
-		public readonly Widget Scene;
+		public readonly SceneWidget Scene;
 		/// <summary>
 		/// Gets the mouse position in the scene coordinates.
 		/// </summary>
@@ -28,7 +28,7 @@ namespace Tangerine.UI.SceneView
 			this.Panel = panelWidget;
 			InputArea = new Widget { HitTestTarget = true, Anchors = Anchors.LeftRightTopBottom };
 			InputArea.FocusScope = new KeyboardFocusScope(InputArea);
-			Scene = new Widget {
+			Scene = new SceneWidget {
 				Nodes = { Document.Current.RootNode }
 			};
 			Frame = new Widget {
@@ -78,6 +78,16 @@ namespace Tangerine.UI.SceneView
 		public void CreateNode(Type nodeType)
 		{
 			Components.Add(new CreateNodeRequestComponent { NodeType = nodeType });
+		}
+
+		public class SceneWidget : Widget
+		{
+			public override void Update(float delta)
+			{
+				if (Document.Current.PreviewAnimation) {
+					base.Update(delta);
+				}
+			}
 		}
 	}
 

@@ -288,6 +288,11 @@ namespace Lime
 			return clone;
 		}
 
+		public void ClearParticles()
+		{
+			particles.Clear();
+		}
+
 		private Widget GetBasicWidget()
 		{
 			switch (ParticlesLinkage) {

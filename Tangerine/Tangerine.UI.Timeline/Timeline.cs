@@ -25,23 +25,7 @@ namespace Tangerine.UI.Timeline
 		public readonly Widget RootWidget = new Widget();
 
 		public Vector2 ScrollPos;
-		public Node Container
-		{
-			get { return Document.Current.Container; }
-			set { Document.Current.Container = value; }
-		}
-		public int CurrentColumn
-		{
-			get { return Document.Current.AnimationFrame; }
-			set
-			{
-				if (UserPreferences.Instance.AnimationMode && Document.Current.AnimationFrame != value) {
-					SetCurrentFrameRecursive(Document.Current.Container, value);
-				} else {
-					Document.Current.AnimationFrame = value; 
-				}
-			}
-		}
+		public int CurrentColumn => Document.Current.AnimationFrame;
 		public int ColumnCount { get; set; }
 		public readonly Entity Globals = new Entity();
 
@@ -139,14 +123,6 @@ namespace Tangerine.UI.Timeline
 					Panel.Title += " - '" + t + "'";
 				}
 			});
-		}
-
-		void SetCurrentFrameRecursive(Node node, int frame)
-		{
-			node.AnimationFrame = frame;
-			foreach (var child in node.Nodes) {
-				SetCurrentFrameRecursive(child, frame);
-			}
 		}
 
 		public void EnsureColumnVisible(int column)

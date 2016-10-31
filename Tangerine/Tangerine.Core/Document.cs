@@ -65,6 +65,8 @@ namespace Tangerine.Core
 			set { Container.AnimationFrame = value; }
 		}
 
+		public bool PreviewAnimation { get; set; }
+
 		public string AnimationId { get; set; }
 
 		public const string DefaultPath = "Untitled.scene";

@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Lime;
 using Tangerine.Core;
 
@@ -29,15 +26,74 @@ namespace Tangerine.UI.Timeline.Operations
 			protected override void InternalDo(SetCurrentColumn op)
 			{
 				op.Save(new Backup { Column = Timeline.Instance.CurrentColumn });
-				Timeline.Instance.CurrentColumn = op.Column;
-				Timeline.Instance.EnsureColumnVisible(op.Column);
+				SetColumn(op.Column);
 			}
 
 			protected override void InternalUndo(SetCurrentColumn op)
 			{
-				var col = op.Restore<Backup>().Column;
-				Timeline.Instance.CurrentColumn = col;
-				Timeline.Instance.EnsureColumnVisible(col);
+				SetColumn(op.Restore<Backup>().Column);
+			}
+		
+			void SetColumn(int value)
+			{
+				var doc = Document.Current;
+				if (UserPreferences.Instance.AnimationMode && doc.AnimationFrame != value) {
+					doc.Container.SetTangerineFlag(TangerineFlags.IgnoreMarkers, true);
+					if (doc.AnimationFrame < value) {
+						doc.Container.IsRunning = true;
+						UpdateNodeIncremental(doc.Container, value - doc.AnimationFrame);
+						StopAnimationRecursive(doc.Container);
+					} else {
+						SetCurrentFrameRecursive(doc.Container, 0);
+						ClearParticlesRecursive(doc.RootNode);
+						doc.Container.IsRunning = true;
+						UpdateNodeIncremental(doc.Container, value);
+						StopAnimationRecursive(doc.Container);
+					}
+					doc.Container.SetTangerineFlag(TangerineFlags.IgnoreMarkers, false);
+				} else {
+					doc.AnimationFrame = value;
+					ClearParticlesRecursive(doc.RootNode);
+				}
+				Timeline.Instance.EnsureColumnVisible(value);
+			}
+
+			static void UpdateNodeIncremental(Node node, int deltaFrames)
+			{
+				var delta = AnimationUtils.FramesToMsecs(deltaFrames) / 1000f;
+				const float maxDelta = AnimationUtils.MsecsPerFrame / 1000f;
+				while (delta > maxDelta) {
+					node.Update(maxDelta);
+					delta -= maxDelta;
+				}
+				node.Update(delta);
+			}
+
+			static void SetCurrentFrameRecursive(Node node, int frame)
+			{
+				node.AnimationFrame = frame;
+				foreach (var child in node.Nodes) {
+					SetCurrentFrameRecursive(child, frame);
+				}
+			}
+
+			static void StopAnimationRecursive(Node node)
+			{
+				node.IsRunning = false;
+				foreach (var child in node.Nodes) {
+					StopAnimationRecursive(child);
+				}
+			}
+
+			static void ClearParticlesRecursive(Node node)
+			{
+				if (node is ParticleEmitter) {
+					var e = (ParticleEmitter)node;
+					e.ClearParticles();
+				}
+				foreach (var child in node.Nodes) {
+					ClearParticlesRecursive(child);
+				}
 			}
 		}
 	}

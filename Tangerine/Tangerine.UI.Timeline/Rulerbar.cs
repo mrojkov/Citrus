@@ -37,7 +37,7 @@ namespace Tangerine.UI.Timeline
 					Renderer.DrawLine(x, 0, x, RootWidget.Height, TimelineRulerColors.Notchings);
 				}
 			}
-			foreach (var m in Timeline.Instance.Container.Markers) {
+			foreach (var m in Document.Current.Container.Markers) {
 				RenderMarker(m);
 			}
 		}

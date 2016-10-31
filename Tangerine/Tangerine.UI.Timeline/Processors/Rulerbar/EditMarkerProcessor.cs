@@ -15,7 +15,8 @@ namespace Tangerine.UI.Timeline
 			var input = timeline.Ruler.RootWidget.Input;
 			while (true) {
 				if (input.WasKeyReleased(Key.Mouse0DoubleClick)) {
-					var marker = timeline.Container.Markers.FirstOrDefault(i => i.Frame == timeline.CurrentColumn) ?? new Marker { Frame = timeline.CurrentColumn };
+					var marker = Document.Current.Container.Markers.FirstOrDefault(
+						i => i.Frame == timeline.CurrentColumn) ?? new Marker { Frame = timeline.CurrentColumn };
 					var dlg = new MarkerPropertiesDialog(marker);
 					var result = dlg.Show();
 					if (result != null) {
@@ -28,7 +29,7 @@ namespace Tangerine.UI.Timeline
 
 		void SetMarker(Marker marker)
 		{
-			Core.Operations.SetMarker.Perform(timeline.Container.DefaultAnimation.Markers, marker);
+			Core.Operations.SetMarker.Perform(Document.Current.Container.DefaultAnimation.Markers, marker);
 		}
 	}
 }
