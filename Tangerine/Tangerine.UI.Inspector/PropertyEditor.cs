@@ -50,6 +50,7 @@ namespace Tangerine.UI.Inspector
 			context.InspectorPane.AddNode(containerWidget);
 			containerWidget.AddNode(new SimpleText {
 				Text = context.PropertyName,
+				VAlignment = VAlignment.Center,
 				LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0.5f),
 				AutoSizeConstraints = false,
 			});

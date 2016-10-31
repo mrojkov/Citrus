@@ -67,6 +67,7 @@ namespace Tangerine.UI.Inspector
 							new SimpleText {
 								Text = type.Name,
 								Padding = new Thickness(4, 0),
+								VAlignment = VAlignment.Center,
 								AutoSizeConstraints = false,
 							}
 						}

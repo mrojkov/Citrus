@@ -31,7 +31,12 @@ namespace Tangerine.UI
 			TitleWidget = new Widget {
 				Layout = new HBoxLayout(),
 				Nodes = {
-					(TitleLabel = new SimpleText { Padding = new Thickness(4, 0), AutoSizeConstraints = false, MinMaxHeight = DesktopTheme.Metrics.MinTabSize.Y }),
+					(TitleLabel = new SimpleText {
+						Padding = new Thickness(4, 0),
+						AutoSizeConstraints = false,
+						MinMaxHeight = DesktopTheme.Metrics.MinTabSize.Y,
+						VAlignment = VAlignment.Center
+					}),
 					(CloseButton = new DesktopTheme.TabCloseButton { LayoutCell = new LayoutCell(Alignment.Center) })
 				},
 				HitTestTarget = true
