@@ -13,7 +13,7 @@ namespace Tangerine
 		public override void Execute()
 		{
 			foreach (var widget in Core.Document.Current.SelectedNodes().Editable().OfType<Widget>()) {
-				Core.Operations.SetProperty.Perform(widget, "Scale", Vector2.One);
+				Core.Operations.SetProperty.Perform(widget, nameof(Widget.Scale), Vector2.One);
 			}
 		}
 	}
@@ -26,7 +26,7 @@ namespace Tangerine
 		public override void Execute()
 		{
 			foreach (var widget in Core.Document.Current.SelectedNodes().Editable().OfType<Widget>()) {
-				Core.Operations.SetProperty.Perform(widget, "Rotation", 0);
+				Core.Operations.SetProperty.Perform(widget, nameof(Widget.Rotation), 0);
 			}
 		}
 	}
@@ -41,7 +41,7 @@ namespace Tangerine
 			foreach (var widget in Core.Document.Current.SelectedNodes().Editable().OfType<Widget>()) {
 				var s = widget.Scale;
 				s.X = -s.X;
-				Core.Operations.SetProperty.Perform(widget, "Scale", s);
+				Core.Operations.SetProperty.Perform(widget, nameof(Widget.Scale), s);
 			}
 		}
 	}
@@ -56,7 +56,7 @@ namespace Tangerine
 			foreach (var widget in Core.Document.Current.SelectedNodes().Editable().OfType<Widget>()) {
 				var s = widget.Scale;
 				s.Y = -s.Y;
-				Core.Operations.SetProperty.Perform(widget, "Scale", s);
+				Core.Operations.SetProperty.Perform(widget, nameof(Widget.Scale), s);
 			}
 		}
 	}
@@ -70,11 +70,11 @@ namespace Tangerine
 		{
 			var container = (Widget)Core.Document.Current.Container;
 			foreach (var widget in Core.Document.Current.SelectedNodes().Editable().OfType<Widget>()) {
-				Core.Operations.SetProperty.Perform(widget, "Size", container.Size);
-				Core.Operations.SetProperty.Perform(widget, "Rotation", 0);
-				Core.Operations.SetProperty.Perform(widget, "Position", widget.Pivot * container.Size);
-				Core.Operations.SetProperty.Perform(widget, "Scale", Vector2.One);
-				Core.Operations.SetProperty.Perform(widget, "Anchors", Anchors.LeftRightTopBottom);
+				Core.Operations.SetProperty.Perform(widget, nameof(Widget.Size), container.Size);
+				Core.Operations.SetProperty.Perform(widget, nameof(Widget.Rotation), 0);
+				Core.Operations.SetProperty.Perform(widget, nameof(Widget.Position), widget.Pivot * container.Size);
+				Core.Operations.SetProperty.Perform(widget, nameof(Widget.Scale), Vector2.One);
+				Core.Operations.SetProperty.Perform(widget, nameof(Widget.Anchors), Anchors.LeftRightTopBottom);
 			}
 		}
 	}
@@ -92,15 +92,15 @@ namespace Tangerine
 				Rectangle aabb;
 				if (Utils.CalcAABB(widget.Nodes, widget, out aabb)) {
 					foreach (var w in widget.Nodes.OfType<Widget>()) {
-						Core.Operations.SetProperty.Perform(w, "Position", w.Position - aabb.A);
+						Core.Operations.SetProperty.Perform(w, nameof(Widget.Position), w.Position - aabb.A);
 					}
 					foreach (var po in widget.Nodes.OfType<PointObject>()) {
-						Core.Operations.SetProperty.Perform(po, "Position", po.Position - aabb.A);
+						Core.Operations.SetProperty.Perform(po, nameof(Widget.Position), po.Position - aabb.A);
 					}
 					var p0 = widget.CalcTransitionToSpaceOf(container) * aabb.A;
-					Core.Operations.SetProperty.Perform(widget, "Size", aabb.Size);
+					Core.Operations.SetProperty.Perform(widget, nameof(Widget.Size), aabb.Size);
 					var p1 = widget.CalcTransitionToSpaceOf(container) * Vector2.Zero;
-					Core.Operations.SetProperty.Perform(widget, "Position", widget.Position + p0 - p1);
+					Core.Operations.SetProperty.Perform(widget, nameof(Widget.Position), widget.Position + p0 - p1);
 				}
 			}
 		}
