@@ -22,20 +22,20 @@ namespace Tangerine.UI.SceneView
 					});
 					sv.Frame.CompoundPostPresenter.Add(presenter);
 					input.CaptureMouse();
-					var cliked = true;
+					var clicked = true;
 					var selectedNodes = Document.Current.SelectedNodes().Editable().ToList();
 					Document.Current.History.BeginTransaction();
 					while (input.IsMousePressed()) {
 						rect.B = sv.MousePosition;
-						cliked &= (rect.B - rect.A).Length <= 5;
-						if (!cliked) {
+						clicked &= (rect.B - rect.A).Length <= 5;
+						if (!clicked) {
 							RefreshSelectedNodes(rect, selectedNodes);
 							CommonWindow.Current.Invalidate();
 						}
 						yield return null;
 					}
 					input.ReleaseMouse();
-					if (cliked) {
+					if (clicked) {
 						SelectByClick(rect.A);
 					}
 					sv.Frame.CompoundPostPresenter.Remove(presenter);
@@ -79,19 +79,22 @@ namespace Tangerine.UI.SceneView
 
 		bool TestNode(Rectangle rect, Node node)
 		{
+			var nrect = rect.Normalized;
 			var canvas = SceneView.Instance.Scene;
 			if (node is Widget) {
 				var widget = (Widget)node;
 				var hull = widget.CalcHullInSpaceOf(canvas);
 				for (int i = 0; i < 4; i++) {
-					if (rect.Normalized.Contains(hull[i])) {
+					if (nrect.Contains(hull[i])) {
 						return true;
 					}
 				}
 				var pivot = widget.CalcPositionInSpaceOf(canvas);
-				return rect.Normalized.Contains(pivot);
+				return nrect.Contains(pivot);
 			} else if (node is PointObject) {
-				throw new NotImplementedException();
+				var p = ((PointObject)node).TransformedPosition;
+				var t = node.Parent.AsWidget.CalcTransitionToSpaceOf(canvas);
+				return nrect.Contains(t * p);
 			}
 			return false;
 		}
