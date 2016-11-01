@@ -46,24 +46,7 @@ namespace Lime
 		Other
 	}
 
-	public class EmitterShapePoint : PointObject
-	{
-		public Vector2 TransformedPosition {
-			get {
-				Vector2 result = Vector2.Zero;
-				if (Parent != null && Parent.AsWidget != null) {
-					result = Parent.AsWidget.Size * Position;
-				}
-				if (SkinningWeights != null && Parent != null && Parent.Parent != null) {
-					BoneArray a = Parent.Parent.AsWidget.BoneArray;
-					Matrix32 m1 = Parent.AsWidget.CalcLocalToParentTransform();
-					Matrix32 m2 = m1.CalcInversed();
-					result = m2.TransformVector(a.ApplySkinningToVector(m1.TransformVector(result), SkinningWeights));
-				}
-				return result;
-			}
-		}
-	}
+	public class EmitterShapePoint : PointObject { }
 
 	[TangerineClass(allowChildren: true)]
 	public partial class ParticleEmitter : Widget
