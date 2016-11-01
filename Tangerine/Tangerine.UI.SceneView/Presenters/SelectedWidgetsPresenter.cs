@@ -52,14 +52,12 @@ namespace Tangerine.UI.SceneView
 
 		void DrawStretchMark(Vector2 position)
 		{
-			var sz = new Vector2(3, 3);
-			Renderer.DrawRect(position - sz, position + sz, SceneViewColors.SelectedWidgetBorder);
+			Renderer.DrawRect(position - Vector2.One * 3, position + Vector2.One * 3, SceneViewColors.SelectedWidgetBorder);
 		}
 
 		void DrawMultiPivotMark(Vector2 position)
 		{
-			var sz = new Vector2(5, 5);
-			Renderer.DrawRect(position - sz, position + sz, SceneViewColors.SelectedWidgetBorder);
+			Renderer.DrawRect(position - Vector2.One * 5, position + Vector2.One * 5, SceneViewColors.SelectedWidgetBorder);
 		}
 	}
 }
