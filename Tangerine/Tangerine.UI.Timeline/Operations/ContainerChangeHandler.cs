@@ -7,7 +7,7 @@ namespace Tangerine.UI.Timeline
 {
 	public class ContainerChangeHandler : SymmetricOperationProcessor
 	{
-		public override void Do(IOperation op)
+		public override void Process(IOperation op)
 		{
 			if (op is Core.Operations.ISetContainer) {
 				var timeline = Timeline.Instance;

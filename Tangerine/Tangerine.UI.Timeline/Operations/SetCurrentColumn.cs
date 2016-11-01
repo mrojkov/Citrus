@@ -23,7 +23,7 @@ namespace Tangerine.UI.Timeline.Operations
 		{
 			class Backup { public int Column; }
 
-			protected override void InternalDo(SetCurrentColumn op)
+			protected override void InternalRedo(SetCurrentColumn op)
 			{
 				op.Save(new Backup { Column = Timeline.Instance.CurrentColumn });
 				SetColumn(op.Column);

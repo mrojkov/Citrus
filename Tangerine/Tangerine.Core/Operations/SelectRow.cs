@@ -28,7 +28,7 @@ namespace Tangerine.Core.Operations
 		{
 			class Backup { public int LastIndex; }
 
-			protected override void InternalDo(SelectRow op)
+			protected override void InternalRedo(SelectRow op)
 			{
 				var sr = Document.Current.SelectedRows;
 				var b = new Backup { LastIndex = sr.IndexOf(op.Row) };

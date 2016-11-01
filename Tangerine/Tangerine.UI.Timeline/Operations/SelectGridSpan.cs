@@ -26,7 +26,7 @@ namespace Tangerine.UI.Timeline.Operations
 
 		public class Processor : OperationProcessor<SelectGridSpan>
 		{
-			protected override void InternalDo(SelectGridSpan op)
+			protected override void InternalRedo(SelectGridSpan op)
 			{
 				Document.Current.Rows[op.Row].Components.GetOrAdd<GridSpanList>().Add(op.Span);
 			}

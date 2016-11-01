@@ -8,7 +8,7 @@ namespace Tangerine.UI.Timeline
 	{
 		Timeline timeline => Timeline.Instance;
 
-		public override void Do(IOperation op)
+		public override void Process(IOperation op)
 		{
 			if (!AreWidgetsValid()) {
 				ResetWidgets();

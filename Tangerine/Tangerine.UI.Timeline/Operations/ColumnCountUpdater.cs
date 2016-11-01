@@ -7,7 +7,7 @@ namespace Tangerine.UI.Timeline
 {
 	public class ColumnCountUpdater : SymmetricOperationProcessor
 	{
-		public override void Do(IOperation op)
+		public override void Process(IOperation op)
 		{
 			var timeline = Timeline.Instance;
 			var rows = Document.Current.Rows;

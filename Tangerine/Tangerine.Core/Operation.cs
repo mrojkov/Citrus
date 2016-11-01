@@ -31,12 +31,21 @@ namespace Tangerine.Core
 		}
 	}
 
+	public interface IOperationProcessor
+	{
+		void Do(IOperation operation);
+		void Undo(IOperation operation);
+		void Redo(IOperation operation);
+	}
+
 	public abstract class OperationProcessor<T> : IOperationProcessor where T: IOperation
 	{
-		public void Do(IOperation op)
+		public void Do(IOperation op) => Redo(op);
+
+		public void Redo(IOperation op)
 		{
 			if (op is T) {
-				InternalDo((T)op);
+				InternalRedo((T)op);
 			}
 		}
 
@@ -47,19 +56,15 @@ namespace Tangerine.Core
 			}
 		}
 
-		protected abstract void InternalDo(T op);
+		protected abstract void InternalRedo(T op);
 		protected abstract void InternalUndo(T op);
-	}
-
-	public interface IOperationProcessor
-	{
-		void Do(IOperation operation);
-		void Undo(IOperation operation);
 	}
 
 	public abstract class SymmetricOperationProcessor : IOperationProcessor
 	{
-		public abstract void Do(IOperation op);
-		public void Undo(IOperation op) { Do(op); }
+		public void Do(IOperation op) => Process(op);
+		public void Undo(IOperation op) => Process(op);
+		public void Redo(IOperation op) => Process(op);
+		public abstract void Process(IOperation op);
 	}
 }

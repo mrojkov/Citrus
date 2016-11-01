@@ -27,7 +27,7 @@ namespace Tangerine.UI.Timeline.Operations
 		{
 			class Backup { public List<GridSpanList> Spans; }
 
-			protected override void InternalDo(ShiftGridSelection op)
+			protected override void InternalRedo(ShiftGridSelection op)
 			{
 				ShiftX(op.Offset.X);
 				ShiftY(op);

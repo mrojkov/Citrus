@@ -80,7 +80,7 @@ namespace Tangerine.Core
 					break;
 				}
 				foreach (var p in Processors) {
-					p.Do(o);
+					p.Redo(o);
 				}
 			}
 			OnChange();

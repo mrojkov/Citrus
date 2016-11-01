@@ -30,7 +30,7 @@ namespace Tangerine.Core.Operations
 		{
 			class Backup { public object Value; }
 
-			protected override void InternalDo(SetProperty op)
+			protected override void InternalRedo(SetProperty op)
 			{
 				op.Save(new Backup { Value = op.Property.GetValue(op.Obj, null) });
 				op.Property.SetValue(op.Obj, op.Value, null);
@@ -92,7 +92,7 @@ namespace Tangerine.Core.Operations
 		{
 			class Backup { public IKeyframe Keyframe; }
 
-			protected override void InternalDo(RemoveKeyframe op)
+			protected override void InternalRedo(RemoveKeyframe op)
 			{
 				var kf = op.Animator.Keys.FirstOrDefault(k => k.Frame == op.Frame);
 				op.Save(new Backup { Keyframe = kf });
@@ -137,7 +137,7 @@ namespace Tangerine.Core.Operations
 				public IAnimator Animator;
 			}
 
-			protected override void InternalDo(SetKeyframe op)
+			protected override void InternalRedo(SetKeyframe op)
 			{
 				var animator = op.Animable.Animators[op.PropertyName, op.AnimationId];
 				op.Save(new Backup {
@@ -186,7 +186,7 @@ namespace Tangerine.Core.Operations
 
 		public class Processor : OperationProcessor<InsertNode>
 		{
-			protected override void InternalDo(InsertNode op)
+			protected override void InternalRedo(InsertNode op)
 			{
 				op.Container.Nodes.Insert(op.Index, op.Node);
 			}
@@ -253,7 +253,7 @@ namespace Tangerine.Core.Operations
 				public int Index;
 			}
 
-			protected override void InternalDo(UnlinkNode op)
+			protected override void InternalRedo(UnlinkNode op)
 			{
 				op.Save(new Backup { Container = op.Node.Parent, Index = op.Node.Parent.Nodes.IndexOf(op.Node) });
 				op.Node.Unlink();
@@ -289,7 +289,7 @@ namespace Tangerine.Core.Operations
 		{
 			class Backup { public Marker Marker; }
 
-			protected override void InternalDo(SetMarker op)
+			protected override void InternalRedo(SetMarker op)
 			{
 				op.Save(new Backup { Marker = op.Collection.FirstOrDefault(i => i.Frame == op.Marker.Frame) });
 				op.Collection.AddOrdered(op.Marker);

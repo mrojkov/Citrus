@@ -22,7 +22,7 @@ namespace Tangerine.UI.Timeline.Operations
 		{
 			class Backup { public List<GridSpanList> Spans; }
 				
-			protected override void InternalDo(ClearGridSelection op)
+			protected override void InternalRedo(ClearGridSelection op)
 			{
 				op.Save(new Backup { Spans = Document.Current.Rows.Select(r => r.Components.GetOrAdd<GridSpanList>()).ToList() });
 				foreach (var row in Document.Current.Rows) {

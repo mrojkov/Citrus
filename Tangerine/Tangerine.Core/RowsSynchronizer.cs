@@ -1,13 +1,12 @@
 using System;
 using System.Linq;
 using Lime;
-using System.Collections.Generic;
 
 namespace Tangerine.Core
 {
 	public class RowsSynchronizer : SymmetricOperationProcessor
 	{
-		public override void Do(IOperation operation)
+		public override void Process(IOperation op)
 		{
 			if (!ValidateRows()) {
 				RebuildRows();

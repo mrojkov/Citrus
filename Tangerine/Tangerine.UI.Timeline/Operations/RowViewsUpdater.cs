@@ -9,7 +9,7 @@ namespace Tangerine.UI.Timeline
 {
 	public class RowViewsUpdater : SymmetricOperationProcessor
 	{
-		public override void Do(IOperation op)
+		public override void Process(IOperation op)
 		{
 			foreach (var row in Document.Current.Rows) {
 				TryCreateGridNodeView(row);
