@@ -4,14 +4,12 @@ using Lime;
 
 namespace Tangerine.UI.SceneView
 {
-	public class SceneViewDecorator : Core.ITaskProvider
+	public class ContainerAreaPresenter 
 	{
-		SceneView sv => SceneView.Instance;
-
-		public IEnumerator<object> Task()
+		public ContainerAreaPresenter(SceneView sceneView)
 		{
 			const float inf = 1000000f;
-			sv.Scene.CompoundPresenter.Push(new DelegatePresenter<Widget>(w => {
+			sceneView.Scene.CompoundPresenter.Push(new DelegatePresenter<Widget>(w => {
 				var ctr = Core.Document.Current.Container as Widget;
 				if (ctr != null) {
 					ctr.PrepareRendererState();
@@ -23,7 +21,7 @@ namespace Tangerine.UI.SceneView
 					Renderer.DrawRect(Vector2.Zero, ctr.Size, SceneViewColors.ContainerInnerSpace);
 				}
 			}));
-			sv.Scene.CompoundPostPresenter.Push(new DelegatePresenter<Widget>(w => {
+			sceneView.Scene.CompoundPostPresenter.Push(new DelegatePresenter<Widget>(w => {
 				var ctr = Core.Document.Current.Container as Widget;
 				if (ctr != null) {
 					ctr.PrepareRendererState();
@@ -38,7 +36,6 @@ namespace Tangerine.UI.SceneView
 					Renderer.DrawLine(new Vector2(-inf, ctr.Height), new Vector2(inf, ctr.Height), c, t2);
 				}
 			}));
-			yield return null;
 		}
 	}
 }

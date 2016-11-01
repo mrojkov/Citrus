@@ -5,14 +5,11 @@ using Lime;
 
 namespace Tangerine.UI.SceneView
 {
-	class SelectedWidgetsPresenter : Core.ITaskProvider
+	class SelectedWidgetsPresenter
 	{
-		public IEnumerator<object> Task()
+		public SelectedWidgetsPresenter(SceneView sceneView)
 		{
-			SceneView.Instance.Frame.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(RenderSelection));
-			while (true) {
-				yield return null;
-			}
+			sceneView.Frame.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(RenderSelection));
 		}
 
 		private void RenderSelection(Widget canvas)

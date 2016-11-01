@@ -37,6 +37,7 @@ namespace Tangerine.UI.SceneView
 			};
 			CreateComponents();
 			CreateProcessors();
+			CreatePresenters();
 		}
 
 		public void Attach()
@@ -59,12 +60,10 @@ namespace Tangerine.UI.SceneView
 		void CreateProcessors()
 		{
 			Frame.Tasks.Add(
-				new SceneViewDecorator(),
 				new CreateWidgetProcessor(),
 				new CreateNodeProcessor(),
 				new ExpositionProcessor(),
 				new MouseScrollProcessor(),
-				new SelectedWidgetsPresenter(),
 				new DragPivotProcessor(),
 				new DragWidgetsProcessor(),
 				new ResizeWidgetsProcessor(),
@@ -73,6 +72,12 @@ namespace Tangerine.UI.SceneView
 				new ShiftClickProcessor(),
 				new WASDProcessor()
 			);
+		}
+
+		void CreatePresenters()
+		{
+			new ContainerAreaPresenter(this);
+			new SelectedWidgetsPresenter(this);
 		}
 
 		public void CreateNode(Type nodeType)

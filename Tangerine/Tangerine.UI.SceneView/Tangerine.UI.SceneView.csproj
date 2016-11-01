@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -56,7 +55,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Processors\MouseScrollProcessor.cs" />
     <Compile Include="Processors\ExpositionProcessor.cs" />
-    <Compile Include="Processors\SelectedWidgetPresenter.cs" />
     <Compile Include="Processors\PreviewAnimationProcessor.cs" />
     <Compile Include="Processors\MouseSelectionProcessor.cs" />
     <Compile Include="Processors\ResizeWidgetsProcessor.cs" />
@@ -66,8 +64,9 @@
     <Compile Include="Processors\DragPivotProcessor.cs" />
     <Compile Include="Processors\CreateNodeProcessor.cs" />
     <Compile Include="Processors\CreateWidgetProcessor.cs" />
-    <Compile Include="Processors\SceneViewDecorator.cs" />
     <Compile Include="Processors\ShiftClickProcessor.cs" />
+    <Compile Include="Presenters\SelectedWidgetsPresenter.cs" />
+    <Compile Include="Presenters\ContainerAreaPresenter.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Mac.csproj">
@@ -85,6 +84,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Processors\" />
+    <Folder Include="Presenters\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
 </Project>
