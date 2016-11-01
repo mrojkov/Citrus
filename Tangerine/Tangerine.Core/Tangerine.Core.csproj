@@ -91,6 +91,7 @@
     <Compile Include="ClassAttributes.cs" />
     <Compile Include="PropertyAttributes.cs" />
     <Compile Include="Operations\DummyOperation.cs" />
+    <Compile Include="Operations\DistortionMeshProcessor.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>
