@@ -130,7 +130,10 @@ namespace Lime
 
 	public class KeyframeCollection<T> : List<Keyframe<T>>
 	{
-		internal bool Shared;
+		internal int RefCount { get; private set; }
+
+		internal void AddRef() => RefCount++;
+		internal void Release() => RefCount--;
 
 		public KeyframeCollection<T> Clone()
 		{
