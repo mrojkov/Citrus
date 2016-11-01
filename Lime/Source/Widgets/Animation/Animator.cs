@@ -3,7 +3,7 @@ using Yuzu;
 
 namespace Lime
 {
-	public interface IAnimator : IDisposable
+	public interface IAnimator
 	{
 		IAnimable Owner { get; }
 
@@ -46,31 +46,18 @@ namespace Lime
 		public Type GetValueType() { return typeof(T); }
 
 		[YuzuMember]
-		public KeyframeCollection<T> ReadonlyKeys;
+		public KeyframeCollection<T> ReadonlyKeys = new KeyframeCollection<T>();
 
 		[YuzuMember]
 		public string AnimationId { get; set; }
 
 		public object UserData { get; set; }
 
-		public Animator()
-		{
-			ReadonlyKeys = new KeyframeCollection<T>();
-			ReadonlyKeys.AddRef();
-		}
-
-		public void Dispose()
-		{
-			ReadonlyKeys.Release();
-		}
-
 		public KeyframeCollection<T> Keys
 		{
 			get {
-				if (ReadonlyKeys.RefCount > 1) {
-					ReadonlyKeys.Release();
+				if (ReadonlyKeys.Shared) {
 					ReadonlyKeys = ReadonlyKeys.Clone();
-					ReadonlyKeys.AddRef();
 				}
 				return ReadonlyKeys;
 			}
@@ -79,7 +66,7 @@ namespace Lime
 		IKeyframeCollection proxyKeys;
 		IKeyframeCollection IAnimator.Keys {
 			get {
-				if (ReadonlyKeys.RefCount > 1) {
+				if (ReadonlyKeys.Shared) {
 					proxyKeys = null;
 				}
 				if (proxyKeys == null) {
@@ -103,7 +90,7 @@ namespace Lime
 			var clone = (Animator<T>)MemberwiseClone();
 			clone.proxyKeys = null;
 			proxyKeys = null;
-			ReadonlyKeys.AddRef();
+			ReadonlyKeys.Shared = true;
 			return clone;
 		}
 
