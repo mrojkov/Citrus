@@ -2,33 +2,18 @@ using Yuzu;
 
 namespace Lime
 {
-	/// <summary>
-	/// Плоскость с точками, которые можно анимировать, вызывая эффект искажения поверхности
-	/// </summary>
 	[TangerineClass(allowChildren: true)]
 	public class DistortionMesh : Widget
 	{
-		/// <summary>
-		/// Количество колонок
-		/// </summary>
 		[YuzuMember]
 		public int NumCols { get; set; }
 
-		/// <summary>
-		/// Количество горизонтальных рядов
-		/// </summary>
 		[YuzuMember]
 		public int NumRows { get; set; }
 
-		/// <summary>
-		/// Текстура
-		/// </summary>
 		[YuzuMember]
 		public override ITexture Texture { get; set; }
 
-		/// <summary>
-		/// Создает DistortionMesh с 2 колонками, 2 рядами и пустой текстурой
-		/// </summary>
 		public DistortionMesh()
 		{
 			NumCols = 2;
@@ -36,36 +21,12 @@ namespace Lime
 			Texture = new SerializableTexture();
 		}
 
-		/// <summary>
-		/// Возвращает точку в указанном ряде и колонке. Точку можно анимировать, вызывая искажения поверхности
-		/// </summary>
-		/// <param name="row">Номер ряда (x)</param>
-		/// <param name="col">Номер колонки (y)</param>
 		public DistortionMeshPoint GetPoint(int row, int col)
 		{
 			if (row < 0 || col < 0 || row > NumRows || col > NumCols)
 				return null;
 			int i = row * (NumCols + 1) + col;
 			return Nodes[i] as DistortionMeshPoint;
-		}
-
-		/// <summary>
-		/// Возвращает все точки в начальное состояние
-		/// </summary>
-		public void ResetPoints()
-		{
-			Nodes.Clear();
-			for (int i = 0; i <= NumRows; i++) {
-				for (int j = 0; j <= NumCols; j++) {
-					var p = new Vector2((float)j / NumCols, (float)i / NumRows);
-					var point = new DistortionMeshPoint() {
-						Color = Color4.White,
-						UV = p,
-						Position = p
-					};
-					Nodes.Add(point);
-				}
-			}
 		}
 
 		protected static Vertex[] polygon = new Vertex[6];
