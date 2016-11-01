@@ -36,7 +36,7 @@ namespace Tangerine.UI.SceneView
 			Utils.CalcHullAndPivot(widgets, canvas, out hull, out pivot);
 			// Render rectangles.
 			var locked = widgets.Any(w => w.GetTangerineFlag(TangerineFlags.Locked));
-			var color = locked ? SceneViewColors.LockedWidgetBorder : SceneViewColors.SelectedWidgetBorder;
+			var color = locked ? SceneViewColors.LockedWidgetBorder : SceneViewColors.Selection;
 			for (int i = 0; i < 4; i++) {
 				var a = hull[i];
 				var b = hull[(i + 1) % 4];
@@ -52,12 +52,12 @@ namespace Tangerine.UI.SceneView
 
 		void DrawStretchMark(Vector2 position)
 		{
-			Renderer.DrawRect(position - Vector2.One * 3, position + Vector2.One * 3, SceneViewColors.SelectedWidgetBorder);
+			Renderer.DrawRect(position - Vector2.One * 3, position + Vector2.One * 3, SceneViewColors.Selection);
 		}
 
 		void DrawMultiPivotMark(Vector2 position)
 		{
-			Renderer.DrawRect(position - Vector2.One * 5, position + Vector2.One * 5, SceneViewColors.SelectedWidgetBorder);
+			Renderer.DrawRect(position - Vector2.One * 5, position + Vector2.One * 5, SceneViewColors.Selection);
 		}
 	}
 }
