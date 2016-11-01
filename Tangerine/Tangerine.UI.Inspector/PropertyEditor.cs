@@ -249,6 +249,27 @@ namespace Tangerine.UI.Inspector
 		}
 	}
 
+	class IntPropertyEditor : CommonPropertyEditor
+	{
+		public IntPropertyEditor(PropertyEditorContext context) : base(context)
+		{
+			var editor = new EditBox { LayoutCell = new LayoutCell(Alignment.Center) };
+			editor.TextWidget.HAlignment = HAlignment.Right;
+			containerWidget.AddNode(editor);
+			OnKeyframeToggle += editor.SetFocus;
+			var current = CoalescedPropertyValue<int>(context);
+			editor.Submitted += text => {
+				int newValue;
+				if (int.TryParse(text, out newValue)) {
+					Core.Operations.SetAnimableProperty.Perform(context.Objects, context.PropertyName, newValue);
+				} else {
+					editor.Text = current.GetValue().ToString();
+				}
+			};
+			editor.AddChangeWatcher(current, v => editor.Text = v.ToString());
+		}
+	}
+
 	class Color4PropertyEditor : CommonPropertyEditor
 	{
 		public Color4PropertyEditor(PropertyEditorContext context) : base(context)
