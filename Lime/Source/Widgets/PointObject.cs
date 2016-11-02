@@ -24,15 +24,21 @@ namespace Lime
 		[YuzuMember]
 		public Vector2 Offset { get; set; }
 
+		public Vector2 CalcPositionInSpaceOf(Widget container)
+		{
+			var matrix = Parent.AsWidget.CalcTransitionToSpaceOf(container);
+			return matrix.TransformVector(TransformedPosition);
+		}
+
 		public Vector2 TransformedPosition
 		{
 			get
 			{
 				Vector2 result = Offset;
-				if (Parent != null && Parent.AsWidget != null) {
+				if (Parent?.AsWidget != null) {
 					result = Parent.AsWidget.Size * Position + Offset;
 				}
-				if (SkinningWeights != null && Parent != null && Parent.Parent != null) {
+				if (SkinningWeights != null && Parent?.Parent != null) {
 					BoneArray a = Parent.Parent.AsWidget.BoneArray;
 					Matrix32 m1 = Parent.AsWidget.CalcLocalToParentTransform();
 					Matrix32 m2 = m1.CalcInversed();
