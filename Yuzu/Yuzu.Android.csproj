@@ -59,6 +59,12 @@
     <Compile Include="Meta.cs" />
     <Compile Include="ReaderDeserializer.cs" />
     <Compile Include="UnsafeReader.cs" />
+    <Compile Include="JsonHelpers.cs" />
+    <Compile Include="BinaryCommon.cs" />
+    <Compile Include="Grisu\DiyFp.cs" />
+    <Compile Include="Grisu\Grisu.cs" />
+    <Compile Include="Grisu\GrisuDouble.cs" />
+    <Compile Include="Grisu\PowersOfTenCache.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <ItemGroup>
@@ -67,5 +73,8 @@
     <Compile Include="ProtoBuf.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="Yuzu.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Grisu\LICENSE" />
   </ItemGroup>
 </Project>

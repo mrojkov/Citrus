@@ -322,6 +322,10 @@
     <Compile Include="Source\Widgets\CheckBox.cs" />
     <Compile Include="Source\Widgets\DropDownList.cs" />
     <Compile Include="Source\Widgets\TabBar.cs" />
+    <Compile Include="Source\Types\Quadrangle.cs" />
+    <Compile Include="Source\Types\Transform2.cs" />
+    <Compile Include="Source\Widgets\Folder.cs" />
+    <Compile Include="Source\Widgets\ListView\ScrollViewWidget.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Android.csproj">
