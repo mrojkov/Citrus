@@ -27,6 +27,7 @@ namespace Lime
 			foreach (var a in this) {
 				a.Dispose();
 			}
+			Clear();
 		}
 
 		public AnimatorCollection(Node owner, int capacity)

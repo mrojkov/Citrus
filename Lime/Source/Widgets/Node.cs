@@ -311,7 +311,6 @@ namespace Lime
 			}
 			Nodes.Clear();
 			Animators.Dispose();
-			Animators.Clear();
 		}
 
 		/// <summary>

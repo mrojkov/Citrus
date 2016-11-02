@@ -46,7 +46,7 @@ namespace Lime
 		public Type GetValueType() { return typeof(T); }
 
 		[YuzuMember]
-		public KeyframeCollection<T> ReadonlyKeys;
+		public KeyframeCollection<T> ReadonlyKeys { get; private set; }
 
 		[YuzuMember]
 		public string AnimationId { get; set; }
@@ -136,7 +136,7 @@ namespace Lime
 		public void Clear()
 		{
 			currentKey = 0;
-			ReadonlyKeys.Clear();
+			Keys.Clear();
 		}
 
 		public void InvokeTrigger(int frame)

@@ -1390,10 +1390,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.ReadonlyKeys = (global::Lime.KeyframeCollection<global::System.String>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
-					result.ReadonlyKeys = new global::Lime.KeyframeCollection<global::System.String>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::System.String>)dg.ReadObject<global::Lime.Keyframe<global::System.String>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -1428,10 +1426,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.ReadonlyKeys = (global::Lime.KeyframeCollection<global::System.Int32>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
-					result.ReadonlyKeys = new global::Lime.KeyframeCollection<global::System.Int32>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::System.Int32>)dg.ReadObject<global::Lime.Keyframe<global::System.Int32>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -1466,10 +1462,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.ReadonlyKeys = (global::Lime.KeyframeCollection<global::System.Boolean>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
-					result.ReadonlyKeys = new global::Lime.KeyframeCollection<global::System.Boolean>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::System.Boolean>)dg.ReadObject<global::Lime.Keyframe<global::System.Boolean>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -1504,10 +1498,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.ReadonlyKeys = (global::Lime.KeyframeCollection<global::Lime.Blending>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
-					result.ReadonlyKeys = new global::Lime.KeyframeCollection<global::Lime.Blending>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.Blending>)dg.ReadObject<global::Lime.Keyframe<global::Lime.Blending>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -1542,10 +1534,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.ReadonlyKeys = (global::Lime.KeyframeCollection<global::Lime.ITexture>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
-					result.ReadonlyKeys = new global::Lime.KeyframeCollection<global::Lime.ITexture>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.ITexture>)dg.ReadObject<global::Lime.Keyframe<global::Lime.ITexture>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -1580,10 +1570,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.ReadonlyKeys = (global::Lime.KeyframeCollection<global::Lime.NumericRange>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
-					result.ReadonlyKeys = new global::Lime.KeyframeCollection<global::Lime.NumericRange>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.NumericRange>)dg.ReadObject<global::Lime.Keyframe<global::Lime.NumericRange>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -1618,10 +1606,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.ReadonlyKeys = (global::Lime.KeyframeCollection<global::Lime.Vector2>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
-					result.ReadonlyKeys = new global::Lime.KeyframeCollection<global::Lime.Vector2>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.Vector2>)dg.ReadObject<global::Lime.Keyframe<global::Lime.Vector2>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -1656,10 +1642,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.ReadonlyKeys = (global::Lime.KeyframeCollection<global::Lime.Color4>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
-					result.ReadonlyKeys = new global::Lime.KeyframeCollection<global::Lime.Color4>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.Color4>)dg.ReadObject<global::Lime.Keyframe<global::Lime.Color4>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -1694,10 +1678,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.ReadonlyKeys = (global::Lime.KeyframeCollection<global::System.Single>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
-					result.ReadonlyKeys = new global::Lime.KeyframeCollection<global::System.Single>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::System.Single>)dg.ReadObject<global::Lime.Keyframe<global::System.Single>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -1732,10 +1714,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.ReadonlyKeys = (global::Lime.KeyframeCollection<global::Lime.EmitterShape>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
-					result.ReadonlyKeys = new global::Lime.KeyframeCollection<global::Lime.EmitterShape>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.EmitterShape>)dg.ReadObject<global::Lime.Keyframe<global::Lime.EmitterShape>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -1770,10 +1750,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.ReadonlyKeys = (global::Lime.KeyframeCollection<global::Lime.AudioAction>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
-					result.ReadonlyKeys = new global::Lime.KeyframeCollection<global::Lime.AudioAction>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.AudioAction>)dg.ReadObject<global::Lime.Keyframe<global::Lime.AudioAction>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -1808,10 +1786,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.ReadonlyKeys = (global::Lime.KeyframeCollection<global::Lime.SerializableSample>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
-					result.ReadonlyKeys = new global::Lime.KeyframeCollection<global::Lime.SerializableSample>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.SerializableSample>)dg.ReadObject<global::Lime.Keyframe<global::Lime.SerializableSample>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -1846,10 +1822,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.ReadonlyKeys = (global::Lime.KeyframeCollection<global::Lime.HAlignment>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
-					result.ReadonlyKeys = new global::Lime.KeyframeCollection<global::Lime.HAlignment>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.HAlignment>)dg.ReadObject<global::Lime.Keyframe<global::Lime.HAlignment>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -1884,10 +1858,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.ReadonlyKeys = (global::Lime.KeyframeCollection<global::Lime.VAlignment>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
-					result.ReadonlyKeys = new global::Lime.KeyframeCollection<global::Lime.VAlignment>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.VAlignment>)dg.ReadObject<global::Lime.Keyframe<global::Lime.VAlignment>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -1922,10 +1894,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.ReadonlyKeys = (global::Lime.KeyframeCollection<global::Lime.MovieAction>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
-					result.ReadonlyKeys = new global::Lime.KeyframeCollection<global::Lime.MovieAction>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.MovieAction>)dg.ReadObject<global::Lime.Keyframe<global::Lime.MovieAction>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -1960,10 +1930,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.ReadonlyKeys = (global::Lime.KeyframeCollection<global::Lime.ShaderId>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
-					result.ReadonlyKeys = new global::Lime.KeyframeCollection<global::Lime.ShaderId>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.ShaderId>)dg.ReadObject<global::Lime.Keyframe<global::Lime.ShaderId>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -1998,10 +1966,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.ReadonlyKeys = (global::Lime.KeyframeCollection<global::Lime.Vector3>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
-					result.ReadonlyKeys = new global::Lime.KeyframeCollection<global::Lime.Vector3>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.Vector3>)dg.ReadObject<global::Lime.Keyframe<global::Lime.Vector3>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -2036,10 +2002,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.ReadonlyKeys = (global::Lime.KeyframeCollection<global::Lime.Quaternion>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
-					result.ReadonlyKeys = new global::Lime.KeyframeCollection<global::Lime.Quaternion>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.Quaternion>)dg.ReadObject<global::Lime.Keyframe<global::Lime.Quaternion>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -2074,10 +2038,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.ReadonlyKeys = (global::Lime.KeyframeCollection<global::Lime.EmissionType>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
-					result.ReadonlyKeys = new global::Lime.KeyframeCollection<global::Lime.EmissionType>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.EmissionType>)dg.ReadObject<global::Lime.Keyframe<global::Lime.EmissionType>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -2112,10 +2074,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.ReadonlyKeys = (global::Lime.KeyframeCollection<global::System.Single>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
-					result.ReadonlyKeys = new global::Lime.KeyframeCollection<global::System.Single>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::System.Single>)dg.ReadObject<global::Lime.Keyframe<global::System.Single>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -2150,10 +2110,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.ReadonlyKeys = (global::Lime.KeyframeCollection<global::Lime.Vector2>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
-					result.ReadonlyKeys = new global::Lime.KeyframeCollection<global::Lime.Vector2>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.Vector2>)dg.ReadObject<global::Lime.Keyframe<global::Lime.Vector2>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -2188,10 +2146,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.ReadonlyKeys = (global::Lime.KeyframeCollection<global::Lime.Color4>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
-					result.ReadonlyKeys = new global::Lime.KeyframeCollection<global::Lime.Color4>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.Color4>)dg.ReadObject<global::Lime.Keyframe<global::Lime.Color4>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -2226,10 +2182,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.ReadonlyKeys = (global::Lime.KeyframeCollection<global::Lime.Quaternion>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
-					result.ReadonlyKeys = new global::Lime.KeyframeCollection<global::Lime.Quaternion>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.Quaternion>)dg.ReadObject<global::Lime.Keyframe<global::Lime.Quaternion>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -2264,10 +2218,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.ReadonlyKeys = (global::Lime.KeyframeCollection<global::Lime.Vector3>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
-					result.ReadonlyKeys = new global::Lime.KeyframeCollection<global::Lime.Vector3>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.Vector3>)dg.ReadObject<global::Lime.Keyframe<global::Lime.Vector3>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -2302,10 +2254,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.ReadonlyKeys = (global::Lime.KeyframeCollection<global::Lime.Matrix44>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
-					result.ReadonlyKeys = new global::Lime.KeyframeCollection<global::Lime.Matrix44>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.Matrix44>)dg.ReadObject<global::Lime.Keyframe<global::Lime.Matrix44>>();
 						result.ReadonlyKeys.Add(tmp2);
