@@ -179,19 +179,18 @@ namespace Lime
 			(PostPresenter as CompoundPresenter) ?? (CompoundPresenter)(PostPresenter = new CompoundPresenter(PostPresenter));
 
 		/// <summary>
-		/// Shortcut to the next element of nodes of this parent.
+		/// Gets or sets cached reference to the next node in the NodeList. Used for fast tree traverse within Update() method.
 		/// </summary>
-		public Node NextSibling;
+		public Node NextSibling { get; internal set; }
 
 		/// <summary>
-		/// TODO: Translate
-		/// Позволяет вручную задать Z-order (порядок отрисовки). 0 - по умолчанию, 1 - самый нижний слой, 99 - самый верхний слой
+		/// Gets or sets Z-order (the rendering order).
+		/// 0 - inherit Z-order from the parent node. 1 - the lowest, (RenderChain.LayerCount - 1) - the topmost.
 		/// </summary>
 		public int Layer { get; set; }
 
 		/// <summary>
-		/// TODO: Translate
-		/// Аниматоры, изменяющие анимированные параметры объекта в время обновления
+		/// Collections of Animators.
 		/// </summary>
 		[YuzuMember]
 		public AnimatorCollection Animators { get; private set; }
@@ -400,8 +399,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO: Translate
-		/// Текущий кадр анимации
+		/// Get or sets the current animation frame.
 		/// </summary>
 		public int AnimationFrame {
 			get { return AnimationUtils.MsecsToFrames(AnimationTime); }
@@ -409,10 +407,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO: Translate
-		/// Используйте для быстрого клонирования с сохранением иерархии для неанимированных объектов.
-		/// Функция основана на MemberwiseClone().
-		/// Свойства Animators, Markers, SkinningWeights будут общими у клона и оригинала
+		/// Returns a clone of the node hierarchy.
 		/// </summary>
 		public virtual Node Clone()
 		{
@@ -436,10 +431,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO: Translate
-		/// Используйте для быстрого клонирования с сохранением иерархии для неанимированных объектов.
-		/// Функция основана на MemberwiseClone().
-		/// Свойства Animators, Markers, SkinningWeights будут общими у клона и оригинала
+		/// Returns a clone of the node hierarchy.
 		/// </summary>
 		public T Clone<T>() where T : Node
 		{
