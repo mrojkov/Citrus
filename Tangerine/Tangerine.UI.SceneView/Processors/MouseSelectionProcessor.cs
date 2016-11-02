@@ -61,6 +61,13 @@ namespace Tangerine.UI.SceneView
 					break;
 				}
 			}
+			foreach (var pobject in Document.Current.Container.Nodes.Editable().OfType<PointObject>()) {
+				var pos = pobject.CalcPositionInSpaceOf(sv.Scene);
+				if ((pos - point).Length <= 5) {
+					Core.Operations.SelectNode.Perform(pobject, !ctrlPressed || !Document.Current.SelectedNodes().Contains(pobject));
+					break;
+				}
+			}
 		}
 
 		void RefreshSelectedNodes(Rectangle rect, IEnumerable<Node> originalSelection)
