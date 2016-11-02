@@ -179,8 +179,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO: Translate
-		/// Используется только для виджетов, умеющих отображать текст. Если виджет не умеет отображать текст, возвращает null
+		/// Get or sets a label upon the widget. For widgets which can not have a label returns null.
 		/// </summary>
 		public virtual string Text
 		{
@@ -189,8 +188,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO: Translate
-		/// Используется только для виджетов, умеющих отображать текстуры. Если виджет не умеет отображать текстуры, возвращает null
+		/// Get or sets a texture upon the widget. For widgets which can not have a texture returns null.
 		/// </summary>
 		public virtual ITexture Texture
 		{
@@ -1167,18 +1165,12 @@ namespace Lime
 			};
 		}
 
-		/// <summary>
-		/// Âîçâðàùàåò ïîçèöèþ ýòîãî âèäæåòà, åñëè áû îí íàõîäèëñÿ â ýòîé æå ýêðàííîé êîîðäèíàòå, íî â äðóãîì êîíòåéíåðå
-		/// </summary>
 		public Vector2 CalcPositionInSpaceOf(Widget container)
 		{
 			Matrix32 matrix = CalcTransitionToSpaceOf(container);
 			return matrix.TransformVector(Pivot * Size);
 		}
 
-		/// <summary>
-		/// Îòëàäî÷íûé ìåòîä, ïîçâîëÿþùèé óçíàòü ïðè÷èíû, ïî êîòîðûì âèäæåò íå îòðèñîâûâàåòñÿ
-		/// </summary>
 		public virtual IEnumerable<string> GetVisibilityIssues()
 		{
 			if (!DescendantOrThis(WidgetContext.Current.Root)) {
