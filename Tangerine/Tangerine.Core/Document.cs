@@ -83,6 +83,7 @@ namespace Tangerine.Core
 			using (Theme.Push(DefaultTheme.Instance)) {
 				RootNode = new Frame(path);
 			}
+			RootNode.Update(0);
 			Container = RootNode;
 		}
 
