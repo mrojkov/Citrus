@@ -21,8 +21,7 @@ namespace Lime
 		[YuzuMember]
 		public SkinningWeights SkinningWeights { get; set; }
 
-		[YuzuMember]
-		public Vector2 Offset { get; set; }
+		public virtual Vector2 Offset { get; set; }
 
 		public Vector2 CalcPositionInSpaceOf(Widget container)
 		{

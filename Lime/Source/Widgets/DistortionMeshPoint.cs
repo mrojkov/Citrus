@@ -10,6 +10,9 @@ namespace Lime
 		[YuzuMember]
 		public Vector2 UV { get; set; }
 
+		[YuzuMember]
+		public override Vector2 Offset { get; set; }
+
 		public DistortionMeshPoint()
 		{
 			Color = Color4.White;
