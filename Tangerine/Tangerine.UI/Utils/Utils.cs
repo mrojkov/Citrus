@@ -62,6 +62,21 @@ namespace Tangerine.UI
 			return true;
 		}
 
+		public static bool CalcAABB(IEnumerable<PointObject> pointObjects, Widget canvas, out Rectangle aabb, float padding = 10)
+		{
+			var result = false;
+			aabb = Rectangle.Empty;
+			foreach (var po in pointObjects) {
+				var p = po.CalcPositionInSpaceOf(canvas);
+				aabb = !result ? new Rectangle(p, p) : aabb.IncludingPoint(p);
+				result = true;
+			}
+			if (result) {
+				aabb = aabb.ExpandedBy(new Thickness(padding));
+			}
+			return result;
+		}
+
 		public static bool CalcAABB(IEnumerable<Node> nodes, Widget basisWidget, out Rectangle aabb)
 		{
 			var empty = true;

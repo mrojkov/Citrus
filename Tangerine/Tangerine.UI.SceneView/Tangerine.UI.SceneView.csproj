@@ -68,6 +68,7 @@
     <Compile Include="Presenters\SelectedWidgetsPresenter.cs" />
     <Compile Include="Presenters\ContainerAreaPresenter.cs" />
     <Compile Include="Presenters\PointObjectsPresenter.cs" />
+    <Compile Include="Processors\DragPointObjectsProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Mac.csproj">
