@@ -48,7 +48,8 @@ namespace Tangerine.Core.Operations
 				if (op.Select) {
 					System.Diagnostics.Debug.Assert(sr[0] == op.Row);
 					sr.RemoveAt(0);
-				} else if (b.LastIndex >= 0) {
+				}
+				if (b.LastIndex >= 0) {
 					sr.Insert(b.LastIndex, op.Row);
 				}
 			}
