@@ -40,7 +40,12 @@ namespace Tangerine.Core
 
 	public abstract class OperationProcessor<T> : IOperationProcessor where T: IOperation
 	{
-		public void Do(IOperation op) => Redo(op);
+		public void Do(IOperation op)
+		{
+			if (op is T) {
+				InternalDo((T)op);
+			}
+		}
 
 		public void Redo(IOperation op)
 		{
@@ -56,6 +61,7 @@ namespace Tangerine.Core
 			}
 		}
 
+		protected virtual void InternalDo(T op) => InternalRedo(op);
 		protected abstract void InternalRedo(T op);
 		protected abstract void InternalUndo(T op);
 	}

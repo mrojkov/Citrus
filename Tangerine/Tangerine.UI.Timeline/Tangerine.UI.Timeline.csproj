@@ -95,7 +95,8 @@
     <Compile Include="Operations\OverviewWidgetsUpdater.cs" />
     <Compile Include="Operations\RollWidgetsUpdater.cs" />
     <Compile Include="Operations\RowViewsUpdater.cs" />
-    <Compile Include="Operations\ContainerChangeHandler.cs" />
+    <Compile Include="Operations\EnsureRowVisibleIfSelected.cs" />
+    <Compile Include="Operations\EnsureCurrentColumnVisibleIfContainerChanged.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tangerine.Core\Tangerine.Core.csproj">

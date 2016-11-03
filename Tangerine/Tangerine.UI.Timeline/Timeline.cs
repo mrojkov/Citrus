@@ -32,12 +32,13 @@ namespace Tangerine.UI.Timeline
 		public static IEnumerable<IOperationProcessor> GetOperationProcessors()
 		{
 			return new IOperationProcessor[] {
-				new ContainerChangeHandler(),
+				new EnsureRowVisibleIfSelected(),
+				new EnsureCurrentColumnVisibleIfContainerChanged(),
 				new ColumnCountUpdater(),
 				new RowViewsUpdater(),
 				new RollWidgetsUpdater(),
-				new GridWidgetsUpdater(),
-				new OverviewWidgetsUpdater()
+				new OverviewWidgetsUpdater(),
+				new GridWidgetsUpdater()
 			};
 		}
 

@@ -31,6 +31,8 @@ namespace Tangerine.UI.Timeline
 			foreach (var row in Document.Current.Rows) {
 				content.AddNode(row.Components.Get<Components.IGridWidget>().Widget);
 			}
+			// Layout widgets in order to have valid row positions and sizes, which are used for rows visibility determination.
+			Lime.LayoutManager.Instance.Layout();
 		}
 
 		bool AreWidgetsValid()

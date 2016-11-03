@@ -105,7 +105,6 @@ namespace Tangerine.UI.Timeline
 					Core.Operations.SelectRow.Perform(lastSelectedRow, false);
 				}
 				Core.Operations.SelectRow.Perform(nextRow);
-				timeline.EnsureRowVisible(nextRow);
 			}
 		}
 
