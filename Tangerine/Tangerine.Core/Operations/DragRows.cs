@@ -21,6 +21,7 @@ namespace Tangerine.Core.Operations
 			var insertionIndex = nodeInsertBefore == null ? container.Nodes.Count : container.Nodes.IndexOf(nodeInsertBefore);
 			foreach (var node in nodesToDrag) {
 				InsertNode.Perform(container, insertionIndex++, node);
+				SelectNode.Perform(node);
 			}
 		}
 	}
