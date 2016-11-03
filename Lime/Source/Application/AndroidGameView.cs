@@ -15,9 +15,6 @@ namespace Lime
 {
 	public sealed class GameView : AndroidGameView
 	{
-		// TODO: resolve keyboard flickering bug and remove this field;
-		public static bool AllowOnscreenKeyboard;
-
 		private class KeyboardHandler : Java.Lang.Object, IOnKeyListener
 		{
 			private string textInput;
@@ -131,20 +128,18 @@ namespace Lime
 		protected override void OnLayout(bool changed, int left, int top, int right, int bottom)
 		{
 			base.OnLayout(changed, left, top, right, bottom);
-			if (AllowOnscreenKeyboard) {
-				if (Window.Current == null) {
-					// Do not calc keyboard height before window init, because we need to know pixel scale.
-					return;
-				}
-				var r = new Android.Graphics.Rect();
-				this.GetWindowVisibleDisplayFrame(r);
-				var totalHeight = bottom - top;
-				var visibleHeight = r.Bottom - r.Top;
-				if (visibleHeight == totalHeight) {
-					androidSoftKeyboard.Height = 0;
-				} else {
-					androidSoftKeyboard.Height = totalHeight - visibleHeight;
-				}
+			if (Window.Current == null) {
+				// Do not calc keyboard height before window init, because we need to know pixel scale.
+				return;
+			}
+			var r = new Android.Graphics.Rect();
+			this.GetWindowVisibleDisplayFrame(r);
+			var totalHeight = bottom - top;
+			var visibleHeight = r.Bottom - r.Top;
+			if (visibleHeight == totalHeight) {
+				androidSoftKeyboard.Height = 0;
+			} else {
+				androidSoftKeyboard.Height = totalHeight - visibleHeight;
 			}
 		}
 

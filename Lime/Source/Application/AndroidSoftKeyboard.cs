@@ -1,7 +1,5 @@
 ﻿#if ANDROID
 using System;
-
-using Android.Content;
 using Android.Views.InputMethods;
 
 namespace Lime
@@ -44,17 +42,15 @@ namespace Lime
 
 		public void Show(bool show, string text)
 		{
-			if (GameView.AllowOnscreenKeyboard) {
-				if (show) {
-					gameView.Focusable = true;
-					gameView.FocusableInTouchMode = true;
-					gameView.RequestFocus();
-					imm.ShowSoftInput(gameView, ShowFlags.Forced);
-				} else {
-					gameView.Focusable = false;
-					gameView.FocusableInTouchMode = false;
-					imm.HideSoftInputFromWindow(gameView.WindowToken, 0);
-				}
+			if (show) {
+				gameView.Focusable = true;
+				gameView.FocusableInTouchMode = true;
+				gameView.RequestFocus();
+				imm.ShowSoftInput(gameView, ShowFlags.Forced);
+			} else {
+				gameView.Focusable = false;
+				gameView.FocusableInTouchMode = false;
+				imm.HideSoftInputFromWindow(gameView.WindowToken, 0);
 			}
 		}
 
