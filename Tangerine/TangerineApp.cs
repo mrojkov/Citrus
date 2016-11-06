@@ -256,6 +256,7 @@ namespace Tangerine
 					new KeySendingCommand("Select All", new Shortcut(Modifiers.Command, Key.A), Key.Commands.SelectAll),
 					Command.MenuSeparator,
 					new GroupCommand(),
+					new UngroupCommand(),
 				},
 				new Submenu("Create") {
 				},

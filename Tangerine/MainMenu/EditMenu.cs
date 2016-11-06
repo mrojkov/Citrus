@@ -52,6 +52,42 @@ namespace Tangerine
 
 		public override bool Enabled => Core.Document.Current?.SelectedNodes().Editable().Any(IsValidNode) ?? false;
 
-		bool IsValidNode(Node node) => (node is Widget) || (node is PointObject) || (node is Bone) || (node is Audio) || (node is ImageCombiner);
+		public static bool IsValidNode(Node node) => (node is Widget) || (node is Bone) || (node is Audio) || (node is ImageCombiner);
+	}
+
+	public class UngroupCommand : Command
+	{
+		public override string Text => "Ungroup";
+		public override Shortcut Shortcut => new Shortcut(Modifiers.Command | Modifiers.Shift, Key.G);
+
+		public override void Execute()
+		{
+			var groups = Core.Document.Current?.SelectedNodes().Editable().Where(n => n is Frame).ToList();
+			if (groups.Count == 0) {
+				return;
+			}
+			var container = (Widget)Core.Document.Current.Container;
+			var i = container.Nodes.IndexOf(groups[0]);
+			Core.Operations.ClearRowSelection.Perform();
+			foreach (var group in groups) {
+				Core.Operations.UnlinkNode.Perform(group);
+			}
+			foreach (var group in groups) {
+				foreach (var node in group.Nodes.ToList().Where(GroupCommand.IsValidNode)) {
+					Core.Operations.UnlinkNode.Perform(node);
+					Core.Operations.InsertNode.Perform(container, i++, node);
+					Core.Operations.SelectNode.Perform(node);
+					var widget = node as Widget;
+					if (widget != null) {
+						GroupCommand.TransformPropertyAndKeyframes<Vector2>(node, nameof(Widget.Position), v => container.CalcLocalToParentTransform() * v);
+						GroupCommand.TransformPropertyAndKeyframes<Vector2>(node, nameof(Widget.Scale), v => container.Scale * v);
+						GroupCommand.TransformPropertyAndKeyframes<float>(node, nameof(Widget.Rotation), v => container.Rotation + v);
+						GroupCommand.TransformPropertyAndKeyframes<Color4>(node, nameof(Widget.Color), v => container.Color * v);
+					}
+				}
+			}
+		}
+
+		public override bool Enabled => Core.Document.Current?.SelectedNodes().Editable().Any(i => i is Frame) ?? false;
 	}
 }
