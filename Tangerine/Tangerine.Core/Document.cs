@@ -161,9 +161,20 @@ namespace Tangerine.Core
 			}
 		}
 
+		int selectedNodesVersion;
+		List<Node> selectedNodes;
+
 		public IEnumerable<Node> SelectedNodes()
 		{
-			return SelectedRows.Select(i => i.Components.Get<Components.NodeRow>()?.Node).Where(n => n != null);
+			if (selectedNodesVersion != SelectedRows.Version) {
+				selectedNodesVersion = SelectedRows.Version;
+				selectedNodes = SelectedRows.
+					OrderBy(i => i.Index).
+					Select(i => i.Components.Get<Components.NodeRow>()?.Node).
+					Where(n => n != null).
+					ToList();
+			}
+			return selectedNodes;
 		}
 
 		public Row GetRowById(Uid uid)
