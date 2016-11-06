@@ -62,48 +62,29 @@ namespace Tangerine.UI
 			return true;
 		}
 
-		public static bool CalcAABB(IEnumerable<PointObject> pointObjects, Widget canvas, out Rectangle aabb, float padding = 10)
+		public static bool CalcAABB(IEnumerable<Node> nodes, Widget canvas, out Rectangle aabb)
 		{
 			var result = false;
 			aabb = Rectangle.Empty;
-			foreach (var po in pointObjects) {
-				var p = po.CalcPositionInSpaceOf(canvas);
-				aabb = !result ? new Rectangle(p, p) : aabb.IncludingPoint(p);
-				result = true;
-			}
-			if (result) {
-				aabb = aabb.ExpandedBy(new Thickness(padding));
+			foreach (var node in nodes) {
+				var widget = node as Widget;
+				if (widget != null) {
+					var t = widget.CalcAABBInSpaceOf(canvas);
+					aabb = !result ? t : aabb.
+						IncludingPoint(t.A).
+						IncludingPoint(new Vector2(t.Right, t.Top)).
+						IncludingPoint(t.B).
+						IncludingPoint(new Vector2(t.Left, t.Bottom));
+					result = true;
+				}
+				var po = node as PointObject;
+				if (po != null) {
+					var p = po.CalcPositionInSpaceOf(canvas);
+					aabb = result ? aabb.IncludingPoint(p) : new Rectangle(p, p);
+					result = true;
+				}
 			}
 			return result;
-		}
-
-		public static bool CalcAABB(IEnumerable<Node> nodes, Widget basisWidget, out Rectangle aabb)
-		{
-			var empty = true;
-			aabb = Rectangle.Empty;
-			foreach (var widget in nodes.OfType<Widget>()) {
-				if (empty) {
-					aabb = widget.CalcAABBInSpaceOf(basisWidget);
-					empty = false;
-				} else {
-					var t = widget.CalcAABBInSpaceOf(basisWidget);
-					aabb = aabb
-						.IncludingPoint(t.A)
-						.IncludingPoint(new Vector2(t.Right, t.Top))
-						.IncludingPoint(t.B)
-						.IncludingPoint(new Vector2(t.Left, t.Bottom));
-				}
-			}
-			foreach (var po in nodes.OfType<PointObject>()) {
-				var p = ((Widget)po.Parent).CalcTransitionToSpaceOf(basisWidget) * po.Position;
-				if (empty) {
-					aabb = new Rectangle(p, p);
-					empty = false;
-				} else {
-					aabb = aabb.IncludingPoint(p);
-				}
-			}
-			return !empty;
 		}
 	}
 }

@@ -30,6 +30,7 @@ namespace Tangerine.UI.SceneView
 			}
 			Rectangle aabb;
 			if (Utils.CalcAABB(selectedPointObjects, canvas, out aabb)) {
+				aabb = aabb.ExpandedBy(new Thickness(10));
 				Renderer.DrawRectOutline(aabb.A, aabb.B, SceneViewColors.Selection);
 			}
 			DrawPivot(aabb.Center);
