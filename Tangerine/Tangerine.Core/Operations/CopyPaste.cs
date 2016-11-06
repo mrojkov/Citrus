@@ -54,8 +54,18 @@ namespace Tangerine.Core.Operations
 	{
 		public static void Perform()
 		{
-			foreach (var i in Document.Current.SelectedNodes().ToList()) {
+			var nodes = Document.Current.SelectedNodes().ToList();
+			if (nodes.Count == 0) {
+				return;
+			}
+			var container = Document.Current.Container;
+			var t = container.Nodes.IndexOf(nodes[0]);
+			foreach (var i in nodes) {
 				UnlinkNode.Perform(i);
+			}
+			t = t.Clamp(0, container.Nodes.Count - 1);
+			if (t >= 0) {
+				SelectNode.Perform(container.Nodes[t]);
 			}
 		}
 	}
