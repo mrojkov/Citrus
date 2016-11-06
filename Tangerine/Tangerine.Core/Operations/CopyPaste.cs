@@ -19,6 +19,9 @@ namespace Tangerine.Core.Operations
 			Clipboard.Nodes.AddRange(Document.Current.SelectedNodes().Select(i => {
 				var clone = i.Clone();
 				clone.UserData = null;
+				foreach (var n in clone.Descendants) {
+					n.UserData = null;
+				}
 				return clone;
 			}));
 		}
