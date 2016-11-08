@@ -21,12 +21,17 @@ namespace Tangerine.Core
 			DiscardChanges
 		}
 
+		public const string DefaultExtension = "scene";
+		readonly string defaultPath = "Untitled.scene";
+		readonly Vector2 defaultSceneSize = new Vector2(1024, 768);
+
+		public delegate bool PathSelectorDelegate(out string path);
+
 		private readonly Dictionary<Uid, Row> RowCache = new Dictionary<Uid, Row>();
 
 		public static event Action<Document> AttachingViews;
-		public static event Func<Document, CloseAction> Closing;
-
-		public const string SceneFileExtension = "scene";
+		public static Func<Document, CloseAction> Closing;
+		public static PathSelectorDelegate PathSelector;
 
 		public static Document Current { get; private set; }
 
@@ -69,12 +74,10 @@ namespace Tangerine.Core
 
 		public string AnimationId { get; set; }
 
-		public const string DefaultPath = "Untitled.scene";
-
 		public Document()
 		{
-			Path = DefaultPath;
-			Container = RootNode = new Frame { Size = new Vector2(1024, 768) };
+			Path = defaultPath;
+			Container = RootNode = new Frame { Size = defaultSceneSize };
 		}
 
 		public Document(string path)
@@ -91,8 +94,6 @@ namespace Tangerine.Core
 		{
 			SetCurrent(this);
 		}
-
-		public string GetAbsolutePath() => Project.Current.AssetToAbsolutePath(Path);
 
 		public static void SetCurrent(Document doc)
 		{
@@ -139,29 +140,45 @@ namespace Tangerine.Core
 			return true;
 		}
 
-		public void Save() => SaveAs(GetAbsolutePath());
+		public void Save()
+		{
+			if (Path == defaultPath) {
+				string path;
+				if (PathSelector(out path)) {
+					SaveAs(path);
+				}
+			} else {
+				SaveAs(Path);
+			}
+		}
 
 		public void SaveAs(string path)
 		{
 			History.AddSavePoint();
 			Path = path;
-			using (var stream = new FileStream(GetAbsolutePath(), FileMode.Create)) {
+			using (var stream = new FileStream(Project.Current.GetSystemPath(path), FileMode.Create)) {
 				var serializer = new Orange.HotSceneExporter.Serializer();
 				// Dispose cloned object to preserve keyframes identity in the original node. See Animator.Dispose().
-				using (var node = RootNode.Clone()) {
-					foreach (var n in node.Descendants) {
-						n.AnimationFrame = 0;
-					}
-					foreach (var n in node.Descendants.Where(i => i.ContentsPath != null)) {
-						n.Nodes.Clear();
-						n.Markers.Clear();
-					}
+				using (var node = CreateCloneForSerialization(RootNode)) {
 					Serialization.WriteObject(path, stream, node, serializer);
 				}
 			}
 		}
 
-		int selectedNodesVersion;
+		public static Node CreateCloneForSerialization(Node node)
+		{
+			var clone = node.Clone();
+			foreach (var n in clone.Descendants) {
+				n.AnimationFrame = 0;
+			}
+			foreach (var n in clone.Descendants.Where(i => i.ContentsPath != null)) {
+				n.Nodes.Clear();
+				n.Markers.Clear();
+			}
+			return clone;
+		}
+
+		int selectedNodesVersion = -1;
 		List<Node> selectedNodes;
 
 		public IEnumerable<Node> SelectedNodes()

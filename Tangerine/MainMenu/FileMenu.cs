@@ -47,15 +47,15 @@ namespace Tangerine
 		public override void Execute()
 		{
 			var dlg = new FileDialog {
-				AllowedFileTypes = new string[] { Document.SceneFileExtension },
+				AllowedFileTypes = new string[] { Document.DefaultExtension },
 				Mode = FileDialogMode.Open,
 			};
 			if (Document.Current != null) {
-				dlg.InitialDirectory = Path.GetDirectoryName(Document.Current.GetAbsolutePath());
+				dlg.InitialDirectory = Path.GetDirectoryName(Project.Current.GetSystemPath(Document.Current.Path));
 			}
 			if (dlg.RunModal()) {
 				string localPath;
-				if (!Project.Current.AbsoluteToAssetPath(dlg.FileName, out localPath)) {
+				if (!Project.Current.TryGetAssetPath(dlg.FileName, out localPath)) {
 					var alert = new AlertDialog("Tangerine", "Can't open a document outside the project directory", "Ok");
 					alert.Show();
 				} else {
@@ -71,13 +71,33 @@ namespace Tangerine
 		public override Shortcut Shortcut => KeyBindings.GenericKeys.Save;
 		public override bool Enabled => Document.Current != null;
 
+		static SaveCommand()
+		{
+			Document.PathSelector += SelectPath;
+		}
+
 		public override void Execute()
 		{
-			if (Document.Current.Path == Document.DefaultPath) {
-				SaveAsCommand.SaveAs();
-			} else {
-				Document.Current.Save();
+			Document.Current.Save();
+		}
+
+		public static bool SelectPath(out string path)
+		{
+			var dlg = new FileDialog {
+				AllowedFileTypes = new string[] { Document.DefaultExtension },
+				Mode = FileDialogMode.Save,
+				InitialDirectory = Path.GetDirectoryName(Project.Current.GetSystemPath(Document.Current.Path))
+			};
+			path = null;
+			if (!dlg.RunModal()) {
+				return false;
 			}
+			if (!Project.Current.TryGetAssetPath(dlg.FileName, out path)) {
+				var alert = new AlertDialog("Tangerine", "Can't save the document outside the project directory", "Ok");
+				alert.Show();
+				return false;
+			}
+			return true;
 		}
 	}
 
@@ -94,14 +114,16 @@ namespace Tangerine
 
 		public static void SaveAs()
 		{
+			string path;
+
 			var dlg = new FileDialog {
-				AllowedFileTypes = new string[] { Document.SceneFileExtension },
+				AllowedFileTypes = new string[] { Document.DefaultExtension },
 				Mode = FileDialogMode.Save,
-				InitialDirectory = Path.GetDirectoryName(Document.Current.GetAbsolutePath())
+				InitialDirectory = Path.GetDirectoryName(Project.Current.GetSystemPath(Document.Current.Path))
 			};
 			if (dlg.RunModal()) {
 				string localPath;
-				if (!Project.Current.AbsoluteToAssetPath(dlg.FileName, out localPath)) {
+				if (!Project.Current.TryGetAssetPath(dlg.FileName, out localPath)) {
 					var alert = new AlertDialog("Tangerine", "Can't save the document outside the project directory", "Ok");
 					alert.Show();
 				} else {

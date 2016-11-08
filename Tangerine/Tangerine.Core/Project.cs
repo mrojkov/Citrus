@@ -79,17 +79,17 @@ namespace Tangerine.Core
 			return true;
 		}
 
-		public bool AbsoluteToAssetPath(string absolutePath, out string assetPath)
+		public bool TryGetAssetPath(string systemPath, out string assetPath)
 		{
 			assetPath = null;
-			if (absolutePath.StartsWith(AssetsDirectory)) {
-				assetPath = absolutePath.Substring(AssetsDirectory.Length + 1);
+			if (systemPath.StartsWith(AssetsDirectory)) {
+				assetPath = systemPath.Substring(AssetsDirectory.Length + 1);
 				return true;
 			}
 			return false;
 		}
 
-		public string AssetToAbsolutePath(string assetPath) => Path.Combine(AssetsDirectory, assetPath);
+		public string GetSystemPath(string assetPath) => Path.Combine(AssetsDirectory, assetPath);
 
 		public Document NewDocument()
 		{
