@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainMenu\CreateMenu.cs" />
+    <Compile Include="MainMenu\EditMenu.cs" />
     <Compile Include="MainMenu\FileMenu.cs" />
     <Compile Include="MainMenu\Preferences.cs" />
     <Compile Include="MainMenu\ViewMenu.cs" />
