@@ -14,7 +14,7 @@ namespace Lime
 			this.screen = screen;
 		}
 
-		public Vector2 Size => new Size(screen.Bounds.Width, screen.Bounds.Height);
+		public Vector2 Size => new Vector2((float)screen.Bounds.Width, (float)screen.Bounds.Height);
 	}
 }
 #endif
