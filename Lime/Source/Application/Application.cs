@@ -231,8 +231,8 @@ namespace Lime
 		public static event Func<bool> Exiting;
 		public static event Action Exited;
 
-		public static bool DoExiting() { return Exiting == null || Exiting(); }
-		public static void DoExited() { Exited?.Invoke(); }
+		public static bool DoExiting() => Exiting?.Invoke() ?? true;
+		public static void DoExited() => Exited?.Invoke();
 
 		public static void Initialize(ApplicationOptions options = null)
 		{
