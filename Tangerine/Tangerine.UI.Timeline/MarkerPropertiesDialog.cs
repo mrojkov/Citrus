@@ -7,21 +7,25 @@ namespace Tangerine.UI.Timeline
 {
 	public class MarkerPropertiesDialog
 	{
-		bool result;
-		readonly Marker marker;
-		readonly Window window;
-		readonly WindowWidget rootWidget;
-		readonly Button okButton;
-		readonly Button cancelButton;
-		readonly DropDownList actionSelector;
-		readonly EditBox markerIdEditor;
-		readonly EditBox jumpToEditor;
-
-		public MarkerPropertiesDialog(Marker marker)
+		public enum Result
 		{
-			this.marker = marker.Clone();
-			window = new Window(new WindowOptions { FixedSize = true, Title = "Marker properties", Visible = false, Style = WindowStyle.Dialog });
-			rootWidget = new InvalidableWindowWidget(window) {
+			Ok,
+			Cancel,
+			Delete
+		}
+
+		public Result Show(Marker marker, bool canDelete)
+		{
+			Widget buttonsPanel;
+			Button deleteButton;
+			Button okButton;
+			Button cancelButton;
+			DropDownList actionSelector;
+			EditBox markerIdEditor;
+			EditBox jumpToEditor;
+			Result result;
+			var window = new Window(new WindowOptions { FixedSize = true, Title = "Marker properties", Visible = false, Style = WindowStyle.Dialog });
+			var rootWidget = new InvalidableWindowWidget(window) {
 				LayoutBasedWindowSize = true,
 				Padding = new Thickness(8),
 				Layout = new VBoxLayout { Spacing = 16 },
@@ -53,16 +57,24 @@ namespace Tangerine.UI.Timeline
 							(jumpToEditor = new EditBox { Text = marker.JumpTo }),
 						}
 					},
-					new Widget {
+					(buttonsPanel = new Widget {
 						Layout = new HBoxLayout { Spacing = 8 },
 						LayoutCell = new LayoutCell(Alignment.RightCenter),
 						Nodes = {
 							(okButton = new Button("Ok")),
 							(cancelButton = new Button("Cancel")),
 						}
-					}
+					})
 				}
 			};
+			if (canDelete) {
+				deleteButton = new Button("Delete");
+				buttonsPanel.AddNode(deleteButton);
+				deleteButton.Clicked += () => {
+					result = Result.Delete;
+					window.Close();
+				};
+			}
 			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
 			rootWidget.Input.KeyPressed += (input, key) => {
 				if (key == KeyBindings.CloseDialog) {
@@ -71,21 +83,19 @@ namespace Tangerine.UI.Timeline
 				}
 			};
 			okButton.Clicked += () => {
-				result = true;
-				this.marker.Id = markerIdEditor.Text;
-				this.marker.Action = (MarkerAction)actionSelector.Value;
-				this.marker.JumpTo = jumpToEditor.Text;
+				result = Result.Ok;
 				window.Close();
 			};
 			cancelButton.Clicked += window.Close;
 			okButton.SetFocus();
-		}
-
-		public Marker Show()
-		{
-			result = false;
+			result = Result.Cancel;
 			window.ShowModal();
-			return result ? marker : null;
+			if (result == Result.Ok) {
+				marker.Id = markerIdEditor.Text;
+				marker.Action = (MarkerAction)actionSelector.Value;
+				marker.JumpTo = jumpToEditor.Text;
+			}
+			return result;
 		}
 	}
 }

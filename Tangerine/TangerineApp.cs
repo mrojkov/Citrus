@@ -72,6 +72,7 @@ namespace Tangerine
 				new Core.Operations.InsertNode.Processor(),
 				new Core.Operations.UnlinkNode.Processor(),
 				new Core.Operations.SetMarker.Processor(),
+				new Core.Operations.DeleteMarker.Processor(),
 				new Core.Operations.DistortionMeshProcessor(),
 				new UI.Timeline.Operations.SelectGridSpan.Processor(),
 				new UI.Timeline.Operations.ClearGridSelection.Processor(),

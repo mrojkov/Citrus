@@ -16,20 +16,17 @@ namespace Tangerine.UI.Timeline
 			while (true) {
 				if (input.WasKeyReleased(Key.Mouse0DoubleClick)) {
 					var marker = Document.Current.Container.Markers.FirstOrDefault(
-						i => i.Frame == timeline.CurrentColumn) ?? new Marker { Frame = timeline.CurrentColumn };
-					var dlg = new MarkerPropertiesDialog(marker);
-					var result = dlg.Show();
-					if (result != null) {
-						SetMarker(result);
+						i => i.Frame == timeline.CurrentColumn);
+					var newMarker = marker?.Clone() ?? new Marker { Frame = timeline.CurrentColumn };
+					var r = new MarkerPropertiesDialog().Show(newMarker, canDelete: marker != null);
+					if (r == MarkerPropertiesDialog.Result.Ok) {
+						Core.Operations.SetMarker.Perform(Document.Current.Container.DefaultAnimation.Markers, newMarker);
+					} else if (r == MarkerPropertiesDialog.Result.Delete) {
+						Core.Operations.DeleteMarker.Perform(Document.Current.Container.DefaultAnimation.Markers, marker);
 					}
 				}
 				yield return null;
 			}
-		}
-
-		void SetMarker(Marker marker)
-		{
-			Core.Operations.SetMarker.Perform(Document.Current.Container.DefaultAnimation.Markers, marker);
 		}
 	}
 }

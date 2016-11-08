@@ -305,4 +305,36 @@ namespace Tangerine.Core.Operations
 			}
 		}
 	}
+
+	public class DeleteMarker : Operation
+	{
+		public readonly MarkerCollection Collection;
+		public readonly Marker Marker;
+
+		public override bool IsChangingDocument => true;
+
+		public static void Perform(MarkerCollection collection, Marker marker)
+		{
+			Document.Current.History.Perform(new DeleteMarker(collection, marker));
+		}
+
+		private DeleteMarker(MarkerCollection collection, Marker marker)
+		{
+			Collection = collection;
+			Marker = marker;
+		}
+
+		public class Processor : OperationProcessor<DeleteMarker>
+		{
+			protected override void InternalRedo(DeleteMarker op)
+			{
+				op.Collection.Remove(op.Marker);
+			}
+
+			protected override void InternalUndo(DeleteMarker op)
+			{
+				op.Collection.AddOrdered(op.Marker);
+			}
+		}
+	}
 }
