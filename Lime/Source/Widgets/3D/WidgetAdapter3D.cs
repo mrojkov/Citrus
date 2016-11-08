@@ -29,6 +29,9 @@ namespace Lime
 
 		public override float CalcDistanceToCamera(Camera3D camera)
 		{
+			if (Widget == null) {
+				return 0f;
+			}
 			var p = GlobalTransform.TransformVector((Vector3)(Widget.Position * new Vector2(1, -1)));
 			return camera.View.TransformVector(p).Z;
 		}
@@ -40,13 +43,16 @@ namespace Lime
 
 		public override void AddToRenderChain(RenderChain chain)
 		{
-			if (GloballyVisible && Widget != null) {
+			if (GloballyVisible) {
 				AddSelfToRenderChain(chain);
 			}
 		}
 
 		public override void Render()
 		{
+			if (Widget == null) {
+				return;
+			}
 			Widget.AddToRenderChain(renderChain);
 			var oldZTestEnabled = Renderer.ZTestEnabled;
 			var oldCullMode = Renderer.CullMode;
@@ -63,6 +69,9 @@ namespace Lime
 
 		internal protected override bool PartialHitTest(ref HitTestArgs args)
 		{
+			if (Widget == null) {
+				return false;
+			}
 			var plane = GetPlane();
 			var ray = args.Ray;
 			var distance = ray.Intersects(plane);

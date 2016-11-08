@@ -137,6 +137,7 @@ namespace Lime
 			Renderer.Flush();
 			Renderer.View = Camera.View;
 			Renderer.Projection = TransformProjection(Renderer.Projection);
+			Renderer.ZTestEnabled = true;
 			if (ZSortEnabled) {
 				for (var i = 0; i < RenderChain.LayerCount; i++) {
 					var layer = renderChain.Layers[i];
@@ -148,15 +149,14 @@ namespace Lime
 						var list = node.Opaque ? opaqueNodes : transparentNodes;
 						list.Add(node);
 					}
-					Renderer.ZTestEnabled = true;
-					Renderer.ZWriteEnabled = false;
-					SortAndRender(opaqueNodes, frontToBackComparer);
-					Renderer.ZTestEnabled = false;
 					Renderer.ZWriteEnabled = true;
+					SortAndRender(opaqueNodes, frontToBackComparer);
+					Renderer.ZWriteEnabled = false;
 					SortAndRender(transparentNodes, backToFrontComparer);
 					opaqueNodes.Clear();
 					transparentNodes.Clear();
 				}
+				renderChain.Clear();
 			} else {
 				renderChain.RenderAndClear();
 			}

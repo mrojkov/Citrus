@@ -256,7 +256,7 @@ namespace Lime
 				jd.Generate<Vector3>();
 				jd.Generate<Vector4>();
 				jd.Generate<Camera3D>();
-				jd.Generate<Material>();
+				jd.Generate<CommonMaterial>();
 				jd.Generate<Mesh3D>();
 				jd.Generate<Submesh3D>();
 				jd.Generate<Node3D>();

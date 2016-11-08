@@ -15,15 +15,11 @@ namespace Lime
 		public BoundingSphere BoundingSphere { get; set; }
 
 		public CullMode CullMode { get; set; }
-		public bool ZTestEnabled { get; set; }
-		public bool ZWriteEnabled { get; set; }
 		public bool SkipRender { get; set; }
 
 		public Mesh3D()
 		{
 			Submeshes = new Submesh3DCollection(this);
-			ZTestEnabled = true;
-			ZWriteEnabled = true;
 			CullMode = CullMode.CullClockwise;
 		}
 
@@ -32,29 +28,24 @@ namespace Lime
 			if (SkipRender) {
 				return;
 			}
-			var world = GlobalTransform;
-			var worldInverse = world.CalcInverted();
-			var materialExternals = new MaterialExternals {
-				WorldView = GlobalTransform * Renderer.View,
-				WorldViewProj = Renderer.FixupWVP(world * Renderer.ViewProjection),
-				ColorFactor = GlobalColor
-			};
-			Renderer.ZTestEnabled = ZTestEnabled;
-			Renderer.ZWriteEnabled = ZWriteEnabled;
+			Renderer.World = GlobalTransform;
 			Renderer.CullMode = CullMode;
+			var invWorld = GlobalTransform.CalcInverted();
 			foreach (var sm in Submeshes) {
-				if (sm.Bones.Count > 0) {
-					if (sharedBoneTransforms.Length < sm.Bones.Count) {
-						sharedBoneTransforms = new Matrix44[sm.Bones.Count];
+				var skin = sm.Material as IMaterialSkin;
+				if (skin != null && sm.Bones.Count > 0) {
+					skin.SkinEnabled = sm.Bones.Count > 0;
+					if (skin.SkinEnabled) {
+						if (sharedBoneTransforms.Length < sm.Bones.Count) {
+							sharedBoneTransforms = new Matrix44[sm.Bones.Count];
+						}
+						for (var i = 0; i < sm.Bones.Count; i++) {
+							sharedBoneTransforms[i] = sm.BoneBindPoses[i] * sm.Bones[i].GlobalTransform * invWorld;
+						}
+						skin.SetBones(sharedBoneTransforms, sm.Bones.Count);
 					}
-					for (var i = 0; i < sm.Bones.Count; i++) {
-						sharedBoneTransforms[i] = sm.BoneBindPoses[i] * sm.Bones[i].GlobalTransform * worldInverse;
-					}
-					materialExternals.Caps |= MaterialCap.Skin;
-					materialExternals.Bones = sharedBoneTransforms;
-					materialExternals.BoneCount = sm.Bones.Count;
 				}
-				sm.Material.Apply(ref materialExternals);
+				sm.Material.Apply();
 				sm.ReadOnlyGeometry.Render(0, sm.ReadOnlyGeometry.Indices.Length);
 			}
 		}
@@ -110,6 +101,9 @@ namespace Lime
 		{
 			var clone = base.Clone() as Mesh3D;
 			clone.Submeshes = Submeshes.Clone(clone);
+			clone.BoundingSphere = BoundingSphere;
+			clone.CullMode = CullMode;
+			clone.SkipRender = SkipRender;
 			return clone;
 		}
 	}
@@ -120,7 +114,7 @@ namespace Lime
 		public GeometryBuffer ReadOnlyGeometry { get { return GeometryReference.Target; } }
 
 		[YuzuMember]
-		public Material Material { get; set; }
+		public IMaterial Material = new CommonMaterial();
 
 		[YuzuMember]
 		public GeometryBuffer Geometry
@@ -272,8 +266,5 @@ namespace Lime
 			Target = target;
 			Counter = 1;
 		}
-
-
 	}
-
 }

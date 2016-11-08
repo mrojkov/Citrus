@@ -110,36 +110,6 @@ namespace Orange
 			}
 		}
 
-		private class MaterialImportData
-		{
-			public Dictionary<string, TextureReference> Textures { get; private set; }
-
-			public Material CreateMaterial()
-			{
-				return new Material {
-					DiffuseTexture = TryGetSerializableTexture("Diffuse"),
-					OpacityTexture = TryGetSerializableTexture("Opacity"),
-				};
-			}
-
-			private SerializableTexture TryGetSerializableTexture(string name)
-			{
-				TextureReference reference;
-				return Textures.TryGetValue(name, out reference) ? reference.ToSerializableTexture() : null;
-			}
-		}
-
-		private struct TextureReference
-		{
-			public string Path { get; set; }
-			public int UVChannel { get; set; }
-
-			public SerializableTexture ToSerializableTexture()
-			{
-				return new SerializableTexture(Path);
-			}
-		}
-
 		private string path;
 		private Assimp.Scene aiScene;
 		private TargetPlatform platform;
@@ -357,21 +327,15 @@ namespace Orange
 			return res;
 		}
 
-		private Material ImportMaterial(Assimp.Material material)
+		private IMaterial ImportMaterial(Assimp.Material material)
 		{
-			var res = new Material();
+			var res = new CommonMaterial();
 			res.Name = material.Name;
 			if (material.HasTextureDiffuse) {
 				res.DiffuseTexture = CreateSerializableTexture(material.TextureDiffuse);
 			}
 			if (material.HasColorDiffuse) {
 				res.DiffuseColor = material.ColorDiffuse.ToLime();
-			}
-			if (material.HasColorEmissive) {
-				res.EmissiveColor = material.ColorEmissive.ToLime();
-			}
-			if (material.HasColorSpecular) {
-				res.SpecularColor = material.ColorSpecular.ToLime();
 			}
 			return res;
 		}
