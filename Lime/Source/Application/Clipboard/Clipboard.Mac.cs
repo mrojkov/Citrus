@@ -1,5 +1,4 @@
 ﻿#if MAC
-// TODO: Add MonoMac support.
 using System;
 using System.Runtime.InteropServices;
 using AppKit;
