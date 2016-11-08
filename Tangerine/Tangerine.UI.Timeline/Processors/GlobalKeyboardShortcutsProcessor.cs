@@ -38,7 +38,7 @@ namespace Tangerine.UI.Timeline
 			input.SetKeyEnabled(Key.Commands.SelectAll, hasSelection);
 			input.SetKeyEnabled(Key.Commands.Cut, hasSelection);
 			input.SetKeyEnabled(Key.Commands.Copy, hasSelection);
-			input.SetKeyEnabled(Key.Commands.Paste, Core.Operations.Clipboard.Nodes.Count > 0);
+			input.SetKeyEnabled(Key.Commands.Paste, true);
 			input.SetKeyEnabled(Key.Commands.Delete, hasSelection);
 			if (input.ConsumeKeyRepeat(Key.Commands.Redo)) {
 				Document.Current.History.Redo();

@@ -6,24 +6,20 @@ using Tangerine.Core;
 
 namespace Tangerine.Core.Operations
 {
-	public static class Clipboard
-	{
-		public static List<Node> Nodes = new List<Node>();
-	}
-
 	public static class Copy
 	{
 		public static void Perform()
 		{
-			Clipboard.Nodes.Clear();
-			Clipboard.Nodes.AddRange(Document.Current.SelectedNodes().Select(i => {
-				var clone = i.Clone();
-				clone.UserData = null;
-				foreach (var n in clone.Descendants) {
-					n.UserData = null;
+			using (var frame = new Frame()) {
+				foreach (var node in Document.Current.SelectedNodes()) {
+					var clone = Document.CreateCloneForSerialization(node);
+					frame.AddNode(clone);
 				}
-				return clone;
-			}));
+				var stream = new System.IO.MemoryStream();
+				Serialization.WriteObject(Document.Current.Path, stream, frame, Serialization.Format.JSON);
+				var text = System.Text.Encoding.UTF8.GetString(stream.ToArray());
+				Clipboard.Text = text;
+			}
 		}
 	}
 
@@ -40,16 +36,22 @@ namespace Tangerine.Core.Operations
 	{
 		public static void Perform()
 		{
-			var nodeInsertBefore = Document.Current.SelectedNodes().FirstOrDefault();
-			var insertionIndex = nodeInsertBefore != null ? Document.Current.Container.Nodes.IndexOf(nodeInsertBefore) : 0;
-			if (Clipboard.Nodes.Count > 0) {
-				ClearRowSelection.Perform();
-				foreach (var node in Clipboard.Nodes) {
-					var clone = node.Clone();
-					InsertNode.Perform(Document.Current.Container, insertionIndex++, clone);
-					SelectNode.Perform(clone);
-				}
+			var text = Clipboard.Text;
+			if (string.IsNullOrEmpty(text)) {
+				return;
 			}
+			try {
+				var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(text));
+				var frame = Serialization.ReadObject<Frame>(Document.Current.Path, stream);
+				var nodeInsertBefore = Document.Current.SelectedNodes().FirstOrDefault();
+				var insertionIndex = nodeInsertBefore != null ? Document.Current.Container.Nodes.IndexOf(nodeInsertBefore) : 0;
+				ClearRowSelection.Perform();
+				foreach (var node in frame.Nodes.ToList()) {
+					node.Unlink();
+					InsertNode.Perform(Document.Current.Container, insertionIndex++, node);
+					SelectNode.Perform(node);
+				}
+			} catch (System.Exception) { }
 		}
 	}
 
