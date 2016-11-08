@@ -20,21 +20,23 @@ namespace Tangerine.UI.Timeline
 			while (true) {
 				if (input.WasMousePressed()) {
 					var initialCell = MousePositionToCell(input.MousePosition);
-					input.CaptureMouse();
-					if (IsCellSelected(initialCell)) {
-						yield return DragSelectionTask(initialCell);
-					} else {
-						var r = new HasKeyframeRequest(initialCell);
-						timeline.Globals.Components.Add(r);
-						yield return null;
-						timeline.Globals.Components.Remove<HasKeyframeRequest>();
-						if (r.Result) {
-							yield return DragKeyframeTask(initialCell);
+					if (initialCell.Y < Document.Current.Rows.Count) {
+						input.CaptureMouse();
+						if (IsCellSelected(initialCell)) {
+							yield return DragSelectionTask(initialCell);
 						} else {
-							yield return SelectTask(initialCell);
+							var r = new HasKeyframeRequest(initialCell);
+							timeline.Globals.Components.Add(r);
+							yield return null;
+							timeline.Globals.Components.Remove<HasKeyframeRequest>();
+							if (r.Result) {
+								yield return DragKeyframeTask(initialCell);
+							} else {
+								yield return SelectTask(initialCell);
+							}
 						}
+						input.ReleaseMouse();
 					}
-					input.ReleaseMouse();
 				}
 				yield return null;
 			}
