@@ -150,11 +150,9 @@ namespace Lime
 						list.Add(node);
 					}
 					Renderer.ZWriteEnabled = true;
-					SortAndRender(opaqueNodes, frontToBackComparer);
+					SortAndFlushList(opaqueNodes, frontToBackComparer);
 					Renderer.ZWriteEnabled = false;
-					SortAndRender(transparentNodes, backToFrontComparer);
-					opaqueNodes.Clear();
-					transparentNodes.Clear();
+					SortAndFlushList(transparentNodes, backToFrontComparer);
 				}
 				renderChain.Clear();
 			} else {
@@ -169,12 +167,13 @@ namespace Lime
 			Renderer.CullMode = oldCullMode;
 		}
 
-		private void SortAndRender(List<Node3D> nodes, IComparer<Node3D> comparer)
+		private void SortAndFlushList(List<Node3D> nodes, IComparer<Node3D> comparer)
 		{
 			nodes.Sort(comparer);
 			for (var i = 0; i < nodes.Count; i++) {
 				nodes[i].Presenter.Render(nodes[i]);
 			}
+			nodes.Clear();
 		}
 
 		private Matrix44 TransformProjection(Matrix44 orthoProjection)

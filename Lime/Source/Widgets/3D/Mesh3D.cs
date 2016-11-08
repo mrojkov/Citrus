@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Yuzu;
 
 namespace Lime
@@ -14,8 +16,18 @@ namespace Lime
 		[YuzuMember]
 		public BoundingSphere BoundingSphere { get; set; }
 
+		[YuzuMember]
 		public CullMode CullMode { get; set; }
+
+		[YuzuMember]
+		public Vector3 Center { get; set; }
+
 		public bool SkipRender { get; set; }
+
+		public Vector3 GlobalCenter
+		{
+			get { return GlobalTransform.TransformVector(Center); }
+		}
 
 		public Mesh3D()
 		{
@@ -97,21 +109,58 @@ namespace Lime
 			return hit;
 		}
 
+		public override float CalcDistanceToCamera(Camera3D camera)
+		{
+			return camera.View.TransformVector(GlobalCenter).Z;
+		}
+
+		public void RecalcBounds()
+		{
+			BoundingSphere = BoundingSphere.CreateFromPoints(GetVertices());
+		}
+
+		public void RecalcCenter()
+		{
+			Center = Vector3.Zero;
+			var n = 0;
+			foreach (var v in GetVertices()) {
+				Center += v;
+				n++;
+			}
+			Center /= n;
+		}
+
+		private IEnumerable<Vector3> GetVertices()
+		{
+			return Submeshes
+				.Select(sm => sm.ReadOnlyGeometry)
+				.SelectMany(g => g.Vertices);
+		}
+
 		public override Node Clone()
 		{
 			var clone = base.Clone() as Mesh3D;
 			clone.Submeshes = Submeshes.Clone(clone);
 			clone.BoundingSphere = BoundingSphere;
+			clone.Center = Center;
 			clone.CullMode = CullMode;
 			clone.SkipRender = SkipRender;
 			return clone;
 		}
+
+		public override void Dispose()
+		{
+			foreach (var sm in Submeshes) {
+				sm.Dispose();
+			}
+			Submeshes.Clear();
+			base.Dispose();
+		}
 	}
 
-	public class Submesh3D
+	public class Submesh3D : IDisposable
 	{
-		public GeometryBufferReference GeometryReference = new GeometryBufferReference(new GeometryBuffer());
-		public GeometryBuffer ReadOnlyGeometry { get { return GeometryReference.Target; } }
+		private GeometryBufferProxy geometryProxy;
 
 		[YuzuMember]
 		public IMaterial Material = new CommonMaterial();
@@ -121,13 +170,19 @@ namespace Lime
 		{
 			get
 			{
-				if (GeometryReference.Counter > 1) {
-					GeometryReference.Counter--;
-					GeometryReference = new GeometryBufferReference(GeometryReference.Target.Clone());
+				if (geometryProxy == null) {
+					geometryProxy = new GeometryBufferProxy(new GeometryBuffer());
+					geometryProxy.AddRef();
+				} else if (geometryProxy.RefCount > 1) {
+					geometryProxy.ReleaseRef();
+					geometryProxy = new GeometryBufferProxy(geometryProxy.Target.Clone());
+					geometryProxy.AddRef();
 				}
-				return GeometryReference.Target;
+				return geometryProxy.Target;
 			}
 		}
+
+		public GeometryBuffer ReadOnlyGeometry => geometryProxy.Target;
 
 		[YuzuMember]
 		public List<Matrix44> BoneBindPoses { get; private set; }
@@ -136,7 +191,7 @@ namespace Lime
 		public List<string> BoneNames { get; private set; }
 		public List<Node3D> Bones { get; private set; }
 
-		public Mesh3D Owner;
+		public Mesh3D Owner { get; internal set; }
 
 		public Submesh3D()
 		{
@@ -145,9 +200,9 @@ namespace Lime
 			Bones = new List<Node3D>();
 		}
 
-		~Submesh3D()
+		public void Dispose()
 		{
-			GeometryReference.Counter--;
+			geometryProxy.ReleaseRef();
 		}
 
 		public void RebuildSkeleton()
@@ -165,9 +220,9 @@ namespace Lime
 
 		public Submesh3D Clone()
 		{
-			GeometryReference.Counter++;
+			geometryProxy.AddRef();
 			var clone = new Submesh3D();
-			clone.GeometryReference = GeometryReference;
+			clone.geometryProxy = geometryProxy;
 			clone.BoneNames = new List<string>(BoneNames);
 			clone.BoneBindPoses = new List<Matrix44>(BoneBindPoses);
 			clone.Material = Material.Clone();
@@ -256,15 +311,17 @@ namespace Lime
 		}
 	}
 
-	public class GeometryBufferReference
+	internal class GeometryBufferProxy
 	{
-		public int Counter;
-		public GeometryBuffer Target;
+		public int RefCount { get; private set; }
+		public GeometryBuffer Target { get; private set; }
 
-		public GeometryBufferReference(GeometryBuffer target)
+		public void AddRef() => RefCount++;
+		public void ReleaseRef() => RefCount--;
+
+		public GeometryBufferProxy(GeometryBuffer target)
 		{
 			Target = target;
-			Counter = 1;
 		}
 	}
 }

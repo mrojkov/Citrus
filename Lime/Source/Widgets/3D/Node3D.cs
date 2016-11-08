@@ -72,11 +72,12 @@ namespace Lime
 			}
 		}
 
+		[YuzuMember]
+		public bool Opaque { get; set; }
+
 		public Matrix44 GlobalTransform { get { RecalcDirtyGlobals(); return globalTransform; } }
 		public bool GloballyVisible { get { RecalcDirtyGlobals(); return globallyVisible; } }
 		public Color4 GlobalColor { get { RecalcDirtyGlobals(); return globalColor; } }
-
-		public bool Opaque = true;
 
 		public bool IsMouseOver()
 		{
@@ -86,6 +87,7 @@ namespace Lime
 		public Node3D()
 		{
 			AsNode3D = this;
+			Opaque = true;
 			scale = Vector3.One;
 			rotation = Quaternion.Identity;
 			visible = true;
@@ -184,6 +186,7 @@ namespace Lime
 		{
 			var clone = base.Clone() as Node3D;
 			clone.AsNode3D = clone;
+			clone.Opaque = Opaque;
 			return clone;
 		}
 

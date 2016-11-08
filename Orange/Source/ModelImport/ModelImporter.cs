@@ -134,32 +134,7 @@ namespace Orange
 				Model = new Model3D();
 				FindCameras();
 				ImportNodes();
-				ImportSkeleton();
 				ImportAnimations();
-			}
-		}
-
-		private void ImportSkeleton()
-		{
-			ImportSkeleton(aiScene.RootNode);
-		}
-
-		private void ImportSkeleton(Assimp.Node aiNode)
-		{
-			if (aiNode.HasMeshes) {
-				var mesh = Model.Find<Mesh3D>(aiNode.Name);
-				for (var i = 0; i < aiNode.MeshCount; i++) {
-					var aiMesh = aiScene.Meshes[aiNode.MeshIndices[i]];
-					if (aiMesh.HasBones) {
-						foreach (var bone in aiMesh.Bones) {
-							mesh.Submeshes[i].BoneNames.Add(bone.Name);
-							mesh.Submeshes[i].BoneBindPoses.Add(bone.OffsetMatrix.ToLime());
-						}
-					}
-				}
-			}
-			foreach (var aiChild in aiNode.Children) {
-				ImportSkeleton(aiChild);
 			}
 		}
 
@@ -178,14 +153,15 @@ namespace Orange
 			Node3D node = null;
 			if (aiNode.HasMeshes) {
 				var mesh = new Mesh3D { Id = aiNode.Name };
-				mesh.SetLocalTransform(CalcRelativeTransform(aiNode, aiParent));
 				foreach (var aiMeshIndex in aiNode.MeshIndices) {
 					var aiMesh = aiScene.Meshes[aiMeshIndex];
 					if (aiMesh.HasVertices) {
 						mesh.Submeshes.Add(ImportSubmesh(aiMesh));
 					}
 				}
-				mesh.BoundingSphere = BoundingSphere.CreateFromPoints(mesh.Submeshes.SelectMany(submesh => submesh.Geometry.Vertices));
+				mesh.SetLocalTransform(CalcRelativeTransform(aiNode, aiParent));
+				mesh.RecalcBounds();
+				mesh.RecalcCenter();
 				node = mesh;
 			} else if (aiNode.Name.Contains("_$AssimpFbx$")) {
 				var ownerNodeName = GetNodeName(aiNode.Name);
@@ -263,32 +239,36 @@ namespace Orange
 
 		private Submesh3D ImportSubmesh(Assimp.Mesh mesh)
 		{
-			return new Submesh3D {
-				// TODO: Materials
-				Material = ImportMaterial(aiScene.Materials[mesh.MaterialIndex]),
-				GeometryReference = new GeometryBufferReference(ImportGeometry(mesh))
-			};
+			var sm = new Submesh3D();
+			sm.Material = ImportMaterial(aiScene.Materials[mesh.MaterialIndex]);
+			ImportGeometry(mesh, sm.Geometry);
+			if (mesh.HasBones) {
+				foreach (var bone in mesh.Bones) {
+					sm.BoneNames.Add(GetNodeName(bone.Name));
+					sm.BoneBindPoses.Add(bone.OffsetMatrix.ToLime());
+				}
+			}
+			return sm;
 		}
 
-		private GeometryBuffer ImportGeometry(Assimp.Mesh mesh)
+		private GeometryBuffer ImportGeometry(Assimp.Mesh mesh, GeometryBuffer g)
 		{
-			var res = new GeometryBuffer();
-			res.Vertices = mesh.Vertices.Select(AssimpExtensions.ToLime).ToArray();
-			res.Indices = mesh.GetIndices().Select(index => checked((ushort)index)).ToArray();
+			g.Vertices = mesh.Vertices.Select(AssimpExtensions.ToLime).ToArray();
+			g.Indices = mesh.GetIndices().Select(index => checked((ushort)index)).ToArray();
 			if (mesh.HasTextureCoords(0)) {
-				res.UV1 = mesh.TextureCoordinateChannels[0].Select(uv => new Vector2(uv.X, uv.Y)).ToArray();
+				g.UV1 = mesh.TextureCoordinateChannels[0].Select(uv => new Vector2(uv.X, uv.Y)).ToArray();
 			}
 			if (mesh.HasVertexColors(0)) {
-				res.Colors = mesh.VertexColorChannels[0].Select(AssimpExtensions.ToLime).ToArray();
+				g.Colors = mesh.VertexColorChannels[0].Select(AssimpExtensions.ToLime).ToArray();
 			} else {
-				res.Colors = Enumerable.Repeat(Color4.White, mesh.VertexCount).ToArray();
+				g.Colors = Enumerable.Repeat(Color4.White, mesh.VertexCount).ToArray();
 			}
 			if (mesh.HasBones) {
 				var indices = new byte[4];
 				var weights = new float[4];
-				res.BlendIndices = new BlendIndices[res.Vertices.Length];
-				res.BlendWeights = new BlendWeights[res.Vertices.Length];
-				for (var i = 0; i < res.Vertices.Length; i++) {
+				g.BlendIndices = new BlendIndices[g.Vertices.Length];
+				g.BlendWeights = new BlendWeights[g.Vertices.Length];
+				for (var i = 0; i < g.Vertices.Length; i++) {
 					var count = 0;
 					for (var j = 0; j < mesh.BoneCount; j++) {
 						var b = mesh.Bones[j];
@@ -306,25 +286,25 @@ namespace Orange
 						Console.WriteLine("Warning");
 					} else {
 						if (count > 0) {
-							res.BlendIndices[i].Index0 = indices[0];
-							res.BlendWeights[i].Weight0 = weights[0];
+							g.BlendIndices[i].Index0 = indices[0];
+							g.BlendWeights[i].Weight0 = weights[0];
 						}
 						if (count > 1) {
-							res.BlendIndices[i].Index1 = indices[1];
-							res.BlendWeights[i].Weight1 = weights[1];
+							g.BlendIndices[i].Index1 = indices[1];
+							g.BlendWeights[i].Weight1 = weights[1];
 						}
 						if (count > 2) {
-							res.BlendIndices[i].Index2 = indices[2];
-							res.BlendWeights[i].Weight2 = weights[2];
+							g.BlendIndices[i].Index2 = indices[2];
+							g.BlendWeights[i].Weight2 = weights[2];
 						}
 						if (count > 3) {
-							res.BlendIndices[i].Index3 = indices[3];
-							res.BlendWeights[i].Weight3 = weights[3];
+							g.BlendIndices[i].Index3 = indices[3];
+							g.BlendWeights[i].Weight3 = weights[3];
 						}
 					}
 				}
 			}
-			return res;
+			return g;
 		}
 
 		private IMaterial ImportMaterial(Assimp.Material material)
