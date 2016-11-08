@@ -144,8 +144,7 @@ namespace Tangerine
 		private static void RefreshExternalContent(Node node)
 		{
 			if (node.ContentsPath != null) {
-				var path = System.IO.Path.ChangeExtension(node.ContentsPath, Document.DefaultExtension);
-				var doc = Project.Current.Documents.FirstOrDefault(i => i.Path == path);
+				var doc = Project.Current.Documents.FirstOrDefault(i => i.Path == node.ContentsPath);
 				if (doc != null && doc.IsModified) {
 					node.Nodes.Clear();
 					node.Markers.Clear();

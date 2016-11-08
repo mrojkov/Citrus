@@ -352,7 +352,7 @@ namespace Tangerine.UI.Inspector
 				var dlg = new FileDialog {
 					AllowedFileTypes = allowedFileTypes,
 					Mode = FileDialogMode.Open,
-					InitialDirectory = Path.GetDirectoryName(Document.Current.GetAbsolutePath()),
+					InitialDirectory = Project.Current.GetSystemDirectory(Document.Current.Path),
 				};
 				if (dlg.RunModal()) {
 					if (!dlg.FileName.StartsWith(Project.Current.AssetsDirectory)) {
@@ -408,7 +408,7 @@ namespace Tangerine.UI.Inspector
 
 	class ContentsPathPropertyEditor : FilePropertyEditor
 	{
-		public ContentsPathPropertyEditor(PropertyEditorContext context) : base(context, new string[] { Document.SceneFileExtension })
+		public ContentsPathPropertyEditor(PropertyEditorContext context) : base(context, Document.GetSupportedFileTypes())
 		{
 			editor.Submitted += text => {
 				Core.Operations.SetAnimableProperty.Perform(context.Objects, context.PropertyName, text);

@@ -21,8 +21,7 @@ namespace Tangerine.Core
 			DiscardChanges
 		}
 
-		public const string DefaultExtension = "scene";
-		readonly string defaultPath = "Untitled.scene";
+		readonly string defaultPath = "Untitled";
 		readonly Vector2 defaultSceneSize = new Vector2(1024, 768);
 
 		public delegate bool PathSelectorDelegate(out string path);
@@ -35,9 +34,16 @@ namespace Tangerine.Core
 
 		public static Document Current { get; private set; }
 
-		public string Path { get; private set; }
 		public readonly DocumentHistory History = new DocumentHistory();
 		public bool IsModified => History.IsDocumentModified;
+
+		public static string[] GetSupportedFileTypes() => new string[] { "scene", "tan" };
+
+		/// <summary>
+		/// Gets the path to the document relative to the project directory.
+		/// </summary>
+		public string Path { get; private set; }
+
 		/// <summary>
 		/// Gets the root node for the current document.
 		/// </summary>
@@ -47,18 +53,22 @@ namespace Tangerine.Core
 		/// Gets or sets the current container widget.
 		/// </summary>
 		public Node Container { get; set; }
+
 		/// <summary>
 		/// Gets or sets the scene we are navigated from. Need for getting back into the main scene from the external one.
 		/// </summary>
 		public string SceneNavigatedFrom { get; set; }
+
 		/// <summary>
 		/// The list of rows, currently displayed on the timeline.
 		/// </summary>
 		public readonly List<Row> Rows = new List<Row>();
+
 		/// <summary>
 		/// The list of selected rows, currently displayed on the timeline.
 		/// </summary>
 		public readonly VersionedCollection<Row> SelectedRows = new VersionedCollection<Row>();
+
 		/// <summary>
 		/// The list of views (timeline, inspector, ...)
 		/// </summary>
@@ -156,7 +166,7 @@ namespace Tangerine.Core
 		{
 			History.AddSavePoint();
 			Path = path;
-			using (var stream = new FileStream(Project.Current.GetSystemPath(path), FileMode.Create)) {
+			using (var stream = new FileStream(Project.Current.GetSystemPath(path, "scene"), FileMode.Create)) {
 				var serializer = new Orange.HotSceneExporter.Serializer();
 				// Dispose cloned object to preserve keyframes identity in the original node. See Animator.Dispose().
 				using (var node = CreateCloneForSerialization(RootNode)) {

@@ -47,11 +47,11 @@ namespace Tangerine
 		public override void Execute()
 		{
 			var dlg = new FileDialog {
-				AllowedFileTypes = new string[] { Document.DefaultExtension },
+				AllowedFileTypes = Document.GetSupportedFileTypes(),
 				Mode = FileDialogMode.Open,
 			};
 			if (Document.Current != null) {
-				dlg.InitialDirectory = Path.GetDirectoryName(Project.Current.GetSystemPath(Document.Current.Path));
+				dlg.InitialDirectory = Project.Current.GetSystemDirectory(Document.Current.Path);
 			}
 			if (dlg.RunModal()) {
 				string localPath;
@@ -84,9 +84,9 @@ namespace Tangerine
 		public static bool SelectPath(out string path)
 		{
 			var dlg = new FileDialog {
-				AllowedFileTypes = new string[] { Document.DefaultExtension },
+				AllowedFileTypes = Document.GetSupportedFileTypes(),
 				Mode = FileDialogMode.Save,
-				InitialDirectory = Path.GetDirectoryName(Project.Current.GetSystemPath(Document.Current.Path))
+				InitialDirectory = Project.Current.GetSystemDirectory(Document.Current.Path)
 			};
 			path = null;
 			if (!dlg.RunModal()) {
@@ -114,20 +114,18 @@ namespace Tangerine
 
 		public static void SaveAs()
 		{
-			string path;
-
 			var dlg = new FileDialog {
-				AllowedFileTypes = new string[] { Document.DefaultExtension },
+				AllowedFileTypes = Document.GetSupportedFileTypes(),
 				Mode = FileDialogMode.Save,
-				InitialDirectory = Path.GetDirectoryName(Project.Current.GetSystemPath(Document.Current.Path))
+				InitialDirectory = Project.Current.GetSystemDirectory(Document.Current.Path)
 			};
 			if (dlg.RunModal()) {
-				string localPath;
-				if (!Project.Current.TryGetAssetPath(dlg.FileName, out localPath)) {
+				string assetPath;
+				if (!Project.Current.TryGetAssetPath(dlg.FileName, out assetPath)) {
 					var alert = new AlertDialog("Tangerine", "Can't save the document outside the project directory", "Ok");
 					alert.Show();
 				} else {
-					Document.Current.SaveAs(localPath);
+					Document.Current.SaveAs(assetPath);
 				}
 			}
 		}

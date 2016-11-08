@@ -39,12 +39,10 @@ namespace Tangerine.Core
 				try {
 					var userprefs = Serialization.ReadObjectFromFile<Userprefs>(UserprefsPath);
 					foreach (var path in userprefs.Documents) {
-						if (AssetsBundle.Instance.FileExists(path)) {
-							try {
-								OpenDocument(path);
-							} catch (System.Exception e) {
-								Debug.Write($"Failed to open document '{path}': {e.Message}");
-							}
+						try {
+							OpenDocument(path);
+						} catch (System.Exception e) {
+							Debug.Write($"Failed to open document '{path}': {e.Message}");
 						}
 					}
 					var currentDoc = documents.FirstOrDefault(d => d.Path == userprefs.CurrentDocument) ?? documents.FirstOrDefault();
@@ -82,14 +80,23 @@ namespace Tangerine.Core
 		public bool TryGetAssetPath(string systemPath, out string assetPath)
 		{
 			assetPath = null;
-			if (systemPath.StartsWith(AssetsDirectory)) {
-				assetPath = systemPath.Substring(AssetsDirectory.Length + 1);
+			var p = Path.ChangeExtension(systemPath, null);
+			if (p.StartsWith(AssetsDirectory)) {
+				assetPath = p.Substring(AssetsDirectory.Length + 1);
 				return true;
 			}
 			return false;
 		}
 
-		public string GetSystemPath(string assetPath) => Path.Combine(AssetsDirectory, assetPath);
+		public string GetSystemPath(string assetPath, string extension)
+		{
+			return Path.ChangeExtension(Path.Combine(AssetsDirectory, assetPath), extension);
+		}
+
+		public string GetSystemDirectory(string assetPath)
+		{
+			return Path.GetDirectoryName(GetSystemPath(assetPath, null));
+		}
 
 		public Document NewDocument()
 		{

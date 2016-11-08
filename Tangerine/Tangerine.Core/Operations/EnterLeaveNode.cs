@@ -30,7 +30,6 @@ namespace Tangerine.Core.Operations
 
 		static void OpenExternalScene(string path)
 		{
-			path = System.IO.Path.ChangeExtension(path, Document.DefaultExtension);
 			var sceneNavigatedFrom = Document.Current.Path;
 			var doc = Project.Current.OpenDocument(path);
 			doc.SceneNavigatedFrom = sceneNavigatedFrom;
@@ -55,7 +54,6 @@ namespace Tangerine.Core.Operations
 			if (doc.Container == doc.RootNode) {
 				var path = doc.SceneNavigatedFrom;
 				if (path != null) {
-					path = System.IO.Path.ChangeExtension(path, Document.DefaultExtension);
 					Project.Current.Documents.FirstOrDefault(i => i.Path == path)?.MakeCurrent();
 				}
 			} else {
