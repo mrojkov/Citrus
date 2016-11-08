@@ -176,7 +176,9 @@ namespace Lime
 					Serialization.ReadObject<Frame>(path, stream, this);
 				}
 				LoadContent();
-				Tag = path;
+				if (!Application.IsTangerine) {
+					Tag = path;
+				}
 			} finally {
 				cyclicDependencyTracker.Remove(path);
 			}
@@ -186,7 +188,9 @@ namespace Lime
 		{
 			var frame = (Frame)(new Frame(path).Nodes[0]);
 			frame.Unlink();
-			frame.Tag = path;
+			if (!Application.IsTangerine) {
+				frame.Tag = path;
+			}
 			return frame;
 		}
 

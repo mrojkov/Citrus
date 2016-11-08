@@ -10,6 +10,7 @@ namespace Tangerine.UI.Inspector
 
 	public class Inspector : IDocumentView
 	{
+		InspectorBuilder builder;
 		public static Inspector Instance { get; private set; }
 
 		public readonly Widget PanelWidget;
@@ -35,6 +36,7 @@ namespace Tangerine.UI.Inspector
 
 		public Inspector(Widget panelWidget)
 		{
+			builder = new InspectorBuilder();
 			PanelWidget = panelWidget;
 			RootWidget = new ScrollViewWidget();
 			var toolbarArea = new Widget { Layout = new StackLayout(), Padding = new Thickness(4, 0) };
@@ -48,7 +50,7 @@ namespace Tangerine.UI.Inspector
 			PropertyEditorRegistry = new List<PropertyEditorRegistryItem>();
 			Editors = new List<IPropertyEditor>();
 			RegisterEditors();
-			RootWidget.Tasks.Add(RebuildInspectorWhenSelectedRowsChanged());
+			CreateWatchersToRebuild();
 			SetupToolbar();
 		}
 
@@ -57,7 +59,7 @@ namespace Tangerine.UI.Inspector
 			Toolbar.Add(new InspectRootNodeCommand());
 		}
 
-		private void RegisterEditors()
+		void RegisterEditors()
 		{
 			AddEditor(c => c.PropertyName == "ContentsPath", c => new ContentsPathPropertyEditor(c));
 			AddEditor(typeof(Vector2), c => new Vector2PropertyEditor(c));
@@ -83,20 +85,25 @@ namespace Tangerine.UI.Inspector
 			AddEditor(typeof(TextOverflowMode), c => new EnumPropertyEditor<TextOverflowMode>(c));
 		}
 
-		private void AddEditor(Type type, PropertyEditorBuilder builder)
+		void AddEditor(Type type, PropertyEditorBuilder builder)
 		{
 			PropertyEditorRegistry.Add(new PropertyEditorRegistryItem(c => c.PropertyInfo.PropertyType == type, builder));
 		}
 
-		private void AddEditor(Func<PropertyEditorContext, bool> condition, PropertyEditorBuilder builder)
+		void AddEditor(Func<PropertyEditorContext, bool> condition, PropertyEditorBuilder builder)
 		{
 			PropertyEditorRegistry.Add(new PropertyEditorRegistryItem(condition, builder));
 		}
 
-		ITaskProvider RebuildInspectorWhenSelectedRowsChanged()
+		void CreateWatchersToRebuild()
 		{
-			var builder = new InspectorBuilder();
-			return new Property<int>(() => Document.Current.SelectedRows.Version).WhenChanged(_ => builder.Build(Document.Current.SelectedNodes()));
+			RootWidget.AddChangeWatcher(() => Document.Current.SelectedRows.Version, _ => Rebuild());
+			RootWidget.AddChangeWatcher(() => InspectRootNode, _ => Rebuild());
+		}
+
+		void Rebuild()
+		{
+			builder.Build(InspectRootNode ? new Node[] { Document.Current.RootNode } : Document.Current.SelectedNodes());
 		}
 
 		public class PropertyEditorRegistryItem
@@ -114,7 +121,7 @@ namespace Tangerine.UI.Inspector
 
 	public class InspectRootNodeCommand : Command
 	{
-		public override string Text => "Root node properties";
+		public override string Text => "Inspect root node";
 		public override ITexture Icon => IconPool.GetTexture("Tools.Root");
 
 		public override void Execute()
