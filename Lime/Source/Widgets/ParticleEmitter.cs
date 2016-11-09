@@ -224,12 +224,12 @@ namespace Lime
 		private float particlesToSpawn;
 		public List<Particle> particles = new List<Particle>();
 		private static readonly List<Particle> particlePool = new List<Particle>();
-		private readonly List<ParticleModifier> modifiers = new List<ParticleModifier>();
-		private readonly List<EmitterShapePoint> emitterShapePoints = new List<EmitterShapePoint>();
-		private readonly List<Vector2> cachedShapePoints = new List<Vector2>();
+		private List<ParticleModifier> modifiers = new List<ParticleModifier>();
+		private List<EmitterShapePoint> emitterShapePoints = new List<EmitterShapePoint>();
+		private List<Vector2> cachedShapePoints = new List<Vector2>();
 		// indexed triangle list (3 values per triangle)
-		private readonly List<int> cachedShapeTriangles = new List<int>();
-		private readonly List<float> cachedShapeTriangleSizes = new List<float>();
+		private List<int> cachedShapeTriangles = new List<int>();
+		private List<float> cachedShapeTriangleSizes = new List<float>();
 		public static bool GloballyEnabled = true;
 
 		public ParticleEmitter()
@@ -263,11 +263,13 @@ namespace Lime
 
 		public override Node Clone()
 		{
-			// Do not clone particle instances
-			var savedParticles = particles;
-			particles = new List<Particle>();
 			var clone = base.Clone() as ParticleEmitter;
-			particles = savedParticles;
+			clone.particles = new List<Particle>();
+			clone.modifiers = new List<ParticleModifier>();
+			clone.emitterShapePoints = new List<EmitterShapePoint>();
+			clone.cachedShapePoints = new List<Vector2>();
+			clone.cachedShapeTriangles = new List<int>();
+			clone.cachedShapeTriangleSizes = new List<float>();
 			return clone;
 		}
 
