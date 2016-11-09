@@ -9,7 +9,7 @@ namespace Orange
 		[MenuItem("Run Tangerine", 2)]
 		public static void RunTangerine()
 		{
-			var path = (new Uri(Assembly.GetExecutingAssembly().CodeBase)).AbsolutePath;
+			var path = (new Uri(Assembly.GetExecutingAssembly().CodeBase)).AbsolutePath.Replace("%20", " ");
 			while (Path.GetFileName(path) != "Citrus") {
 				path = Path.GetDirectoryName(path);
 			}
@@ -27,13 +27,15 @@ namespace Orange
 #if MAC
 				var app = Path.Combine(path, "bin/Debug/Tangerine.app/Contents/MacOS/Tangerine");
 #elif WIN
-				var app = Path.Combine(projectDirectory, "bin/Release/Tangerine.exe");
+				var app = Path.Combine(path, "bin/Release/Tangerine.exe");
 #endif
 				var p = new System.Diagnostics.Process();
 				p.StartInfo.FileName = app;
+#if MAC
 				p.StartInfo.UseShellExecute = false;
 				p.StartInfo.EnvironmentVariables.Clear();
 				p.StartInfo.EnvironmentVariables.Add("PATH", "/usr/bin");
+#endif
 				p.Start();
 			}
 		}

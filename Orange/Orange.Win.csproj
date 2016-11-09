@@ -95,10 +95,10 @@
     <Compile Include="Source\Actions\GenerateAppDeserializers.cs" />
     <Compile Include="Source\Actions\RevealCookedAssets.cs" />
     <Compile Include="Source\Actions\BuildGameAndRun.cs" />
+    <Compile Include="Source\Actions\RunTangerine.cs" />
     <Compile Include="Source\Actions\UpdateDictionaryTxtOldFormat.cs" />
     <Compile Include="Source\Actions\UpdateDictionaryTxt.cs" />
     <Compile Include="Source\Actions\UpdateXCodeProject.cs" />
-    <Compile Include="Source\Actions\UpgradeOrange.cs" />
     <Compile Include="Source\AssetCooker\OpacityMaskCreator.cs" />
     <Compile Include="Source\Builder\BuildSystem.cs" />
     <Compile Include="Source\Builder\MSBuild.cs" />
