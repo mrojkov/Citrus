@@ -271,6 +271,13 @@
     <Compile Include="Source\Types\Quadrangle.cs" />
     <Compile Include="Source\Types\Transform2.cs" />
     <Compile Include="Source\Widgets\ListView\ScrollViewWidget.cs" />
+    <Compile Include="Source\Widgets\Folder.cs" />
+    <Compile Include="Source\Widgets\EditorUtils.cs" />
+    <Compile Include="Source\Application\Display\Display.Android.cs" />
+    <Compile Include="Source\Application\Display\Display.iOS.cs" />
+    <Compile Include="Source\Application\Display\Display.Mac.cs" />
+    <Compile Include="Source\Application\Display\Display.Win.cs" />
+    <Compile Include="Source\Application\Display\IDisplay.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

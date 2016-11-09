@@ -115,7 +115,6 @@
     <Compile Include="Source\UI\MainWindow.cs" />
     <Compile Include="Source\UI\MainWindow.UI.cs" />
     <Compile Include="Source\UI\UserInterface.cs" />
-    <Compile Include="Source\Actions\UpgradeOrange.cs" />
     <Compile Include="Source\Toolbox\DirectoryChanger.cs" />
     <Compile Include="Source\Toolbox\FileEnumerator.cs" />
     <Compile Include="Source\Toolbox\Json.cs" />
