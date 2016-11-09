@@ -15,7 +15,7 @@
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>BuildMachineOSBuild</key>
-	<string>15G1004</string>
+	<string>16B2555</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>MonoBundleExecutable</key>
@@ -37,7 +37,7 @@
 	<key>DTPlatformVersion</key>
 	<string>GM</string>
 	<key>DTSDKBuild</key>
-	<string>15G1004</string>
+	<string>16B2555</string>
 	<key>DTSDKName</key>
 	<string>macosx10.12</string>
 	<key>DTXcode</key>
@@ -45,6 +45,6 @@
 	<key>DTXcodeBuild</key>
 	<string>8A218a</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © gameforest</string>
+	<string>Copyright © mike</string>
 </dict>
 </plist>

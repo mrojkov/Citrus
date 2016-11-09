@@ -156,7 +156,7 @@ namespace Orange
 						var builder = new SolutionBuilder(The.Workspace.ActivePlatform, The.Workspace.CustomSolution);
 						builder.SvnUpdate();
 					}
-					The.Workspace.AssetFiles.Rescan();
+					The.Workspace?.AssetFiles?.Rescan();
 					action();
 				}
 				catch (Exception exc) {

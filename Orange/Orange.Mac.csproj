@@ -143,6 +143,7 @@
     <Compile Include="Source\Actions\GenerateAppDeserializers.cs" />
     <Compile Include="Source\Actions\GenerateLimeDeserializers.cs" />
     <Compile Include="Source\Actions\AnalyzeResources.cs" />
+    <Compile Include="Source\Actions\RunTangerine.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Info.plist" />
