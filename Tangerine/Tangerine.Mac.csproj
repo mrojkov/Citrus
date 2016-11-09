@@ -108,23 +108,23 @@
       <Project>{DC16EEBF-404D-4610-B87A-15B57464D707}</Project>
       <Name>Lime.Mac</Name>
     </ProjectReference>
-    <ProjectReference Include="Tangerine.Core\Tangerine.Core.csproj">
+    <ProjectReference Include="Tangerine.Core\Tangerine.Core.Mac.csproj">
       <Project>{05FB6476-C29B-49A7-918C-A52CAF73FCA7}</Project>
       <Name>Tangerine.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="Tangerine.UI\Tangerine.UI.csproj">
+    <ProjectReference Include="Tangerine.UI\Tangerine.UI.Mac.csproj">
       <Project>{E62BA18F-4E1A-466A-8299-67AD567F17E5}</Project>
       <Name>Tangerine.UI</Name>
     </ProjectReference>
-    <ProjectReference Include="Tangerine.UI.Timeline\Tangerine.UI.Timeline.csproj">
+    <ProjectReference Include="Tangerine.UI.Timeline\Tangerine.UI.Timeline.Mac.csproj">
       <Project>{FB325FE1-F328-4755-885F-E713BD7E7DAD}</Project>
       <Name>Tangerine.UI.Timeline</Name>
     </ProjectReference>
-    <ProjectReference Include="Tangerine.UI.Inspector\Tangerine.UI.Inspector.csproj">
+    <ProjectReference Include="Tangerine.UI.Inspector\Tangerine.UI.Inspector.Mac.csproj">
       <Project>{D6B543CB-0223-4210-BB0F-7D8250760895}</Project>
       <Name>Tangerine.UI.Inspector</Name>
     </ProjectReference>
-    <ProjectReference Include="Tangerine.UI.SceneView\Tangerine.UI.SceneView.csproj">
+    <ProjectReference Include="Tangerine.UI.SceneView\Tangerine.UI.SceneView.Mac.csproj">
       <Project>{80486551-A659-42B0-AADA-165C54E9B0AF}</Project>
       <Name>Tangerine.UI.SceneView</Name>
     </ProjectReference>

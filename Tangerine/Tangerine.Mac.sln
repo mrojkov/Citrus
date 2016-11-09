@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangerine", "Tangerine.csproj", "{836E69F0-39A3-47CA-94C5-FB9F605D49EB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangerine.Mac", "Tangerine.Mac.csproj", "{836E69F0-39A3-47CA-94C5-FB9F605D49EB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lime.Mac", "..\Lime\Lime.Mac.csproj", "{DC16EEBF-404D-4610-B87A-15B57464D707}"
 EndProject
@@ -9,15 +9,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lemon.Mac", "..\Lemon\Lemon
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicFont.Mac", "..\Lime\Extensions\DynamicFont\DynamicFont.Mac.csproj", "{B5F74505-80BB-4373-B194-219D743C1FA0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangerine.Core", "Tangerine.Core\Tangerine.Core.csproj", "{05FB6476-C29B-49A7-918C-A52CAF73FCA7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangerine.Core.Mac", "Tangerine.Core\Tangerine.Core.Mac.csproj", "{05FB6476-C29B-49A7-918C-A52CAF73FCA7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangerine.UI", "Tangerine.UI\Tangerine.UI.csproj", "{E62BA18F-4E1A-466A-8299-67AD567F17E5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangerine.UI.Mac", "Tangerine.UI\Tangerine.UI.Mac.csproj", "{E62BA18F-4E1A-466A-8299-67AD567F17E5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangerine.UI.Timeline", "Tangerine.UI.Timeline\Tangerine.UI.Timeline.csproj", "{FB325FE1-F328-4755-885F-E713BD7E7DAD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangerine.UI.Timeline.Mac", "Tangerine.UI.Timeline\Tangerine.UI.Timeline.Mac.csproj", "{FB325FE1-F328-4755-885F-E713BD7E7DAD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangerine.UI.Inspector", "Tangerine.UI.Inspector\Tangerine.UI.Inspector.csproj", "{D6B543CB-0223-4210-BB0F-7D8250760895}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangerine.UI.Inspector.Mac", "Tangerine.UI.Inspector\Tangerine.UI.Inspector.Mac.csproj", "{D6B543CB-0223-4210-BB0F-7D8250760895}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangerine.UI.SceneView", "Tangerine.UI.SceneView\Tangerine.UI.SceneView.csproj", "{80486551-A659-42B0-AADA-165C54E9B0AF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangerine.UI.SceneView.Mac", "Tangerine.UI.SceneView\Tangerine.UI.SceneView.Mac.csproj", "{80486551-A659-42B0-AADA-165C54E9B0AF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yuzu.Mac", "..\Yuzu\Yuzu.Mac.csproj", "{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}"
 EndProject

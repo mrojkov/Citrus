@@ -80,7 +80,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\Tangerine.Core\Tangerine.Core.csproj">
+    <ProjectReference Include="..\Tangerine.Core\Tangerine.Core.Mac.csproj">
       <Project>{05FB6476-C29B-49A7-918C-A52CAF73FCA7}</Project>
       <Name>Tangerine.Core</Name>
     </ProjectReference>
