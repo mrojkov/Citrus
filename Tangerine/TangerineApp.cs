@@ -42,14 +42,12 @@ namespace Tangerine
 			};
 			var timelinePanel = new DockPanel("Timeline");
 			var inspectorPanel = new DockPanel("Inspector");
-			var consolePanel = new DockPanel("Console");
 			var searchPanel = new DockPanel("Search");
 
 			var dockManager = DockManager.Instance;
 			dockManager.AddPanel(timelinePanel, DockSite.Top, new Vector2(800, 300));
 			dockManager.AddPanel(inspectorPanel, DockSite.Left, new Vector2(300, 700));
 			dockManager.AddPanel(searchPanel, DockSite.Right, new Vector2(300, 700));
-			dockManager.AddPanel(consolePanel, DockSite.Right, new Vector2(300, 700));
 			DockManagerInitialState = dockManager.ExportState();
 			var documentViewContainer = InitializeDocumentArea(dockManager);
 
@@ -94,7 +92,6 @@ namespace Tangerine
 						new UI.Inspector.Inspector(inspectorPanel.ContentWidget),
 						new UI.Timeline.Timeline(timelinePanel),
 						new UI.SceneView.SceneView(documentViewContainer),
-						new UI.Console(consolePanel.ContentWidget),
 						new UI.SearchPanel(searchPanel.ContentWidget),
 					});
 				}
