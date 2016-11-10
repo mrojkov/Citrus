@@ -9,7 +9,7 @@ namespace Orange
 		[MenuItem("Run Tangerine", 2)]
 		public static void RunTangerine()
 		{
-			var path = (new Uri(Assembly.GetExecutingAssembly().CodeBase)).AbsolutePath.Replace("%20", " ");
+			var path = Uri.UnescapeDataString((new Uri(Assembly.GetExecutingAssembly().CodeBase)).AbsolutePath);
 			while (Path.GetFileName(path) != "Citrus") {
 				path = Path.GetDirectoryName(path);
 			}
