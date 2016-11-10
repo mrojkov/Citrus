@@ -6,9 +6,11 @@ namespace Lime
 	public class DistortionMesh : Widget
 	{
 		[YuzuMember]
+		[TangerineStaticProperty]
 		public int NumCols { get; set; }
 
 		[YuzuMember]
+		[TangerineStaticProperty]
 		public int NumRows { get; set; }
 
 		[YuzuMember]

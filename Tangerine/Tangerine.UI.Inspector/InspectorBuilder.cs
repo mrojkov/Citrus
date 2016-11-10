@@ -53,7 +53,7 @@ namespace Tangerine.UI.Inspector
 					continue;
 				}
 				var yuzuField = PropertyAttributes<YuzuField>.Get(type, property.Name);
-				var tang = PropertyAttributes<TangerinePropertyAttribute>.Get(type, property.Name);
+				var tang = PropertyAttributes<TangerineKeyframeColorAttribute>.Get(type, property.Name);
 				var tangIgnore = PropertyAttributes<TangerineIgnorePropertyAttribute>.Get(type, property.Name);
 				if (yuzuField == null && tang == null || tangIgnore != null)
 					continue;

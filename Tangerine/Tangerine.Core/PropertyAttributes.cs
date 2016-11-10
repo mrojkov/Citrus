@@ -8,6 +8,11 @@ namespace Tangerine.Core
 	{
 		static readonly Dictionary<Type, Dictionary<string, T>> map = new Dictionary<Type, Dictionary<string, T>>();
 
+		public static T Get(System.Reflection.PropertyInfo property)
+		{
+			return Get(property.DeclaringType, property.Name);
+		}
+
 		public static T Get(Type type, string property)
 		{
 			Dictionary<string, T> propMap;

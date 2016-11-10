@@ -15,23 +15,14 @@ namespace Lime
 		[YuzuMember]
 		public SerializableSample Sample { get; set; }
 
-		/// <summary>
-		/// Зацикленное проигрывание
-		/// </summary>
 		[YuzuMember]
 		public bool Looping { get; set; }
 
-		/// <summary>
-		/// Время затухания в секундах
-		/// </summary>
 		[YuzuMember]
 		public float FadeTime { get; set; }
 
 		private float volume = 0.5f;
 
-		/// <summary>
-		/// Громкость (0 - 1)
-		/// </summary>
 		[YuzuMember]
 		public float Volume
 		{
@@ -45,9 +36,6 @@ namespace Lime
 
 		private float pan = 0;
 
-		/// <summary>
-		/// Сдвиг влево/вправо (-1 - влево, 1 - вправо, 0 - посередине)
-		/// </summary>
 		[YuzuMember]
 		public float Pan
 		{
@@ -61,9 +49,6 @@ namespace Lime
 
 		private float pitch = 1;
 
-		/// <summary>
-		/// Высота звука
-		/// </summary>
 		[YuzuMember]
 		public float Pitch
 		{
@@ -76,12 +61,9 @@ namespace Lime
 		}
 
 		[Trigger]
-		[TangerineProperty(1)]
+		[TangerineKeyframeColor(1)]
 		public AudioAction Action { get; set; }
 
-		/// <summary>
-		/// Группа звуков. Например голос, фоновый звук, эффект. Группа позволяет задавать общие параметры для всех членов группы
-		/// </summary>
 		[YuzuMember]
 		public AudioChannelGroup Group { get; set; }
 

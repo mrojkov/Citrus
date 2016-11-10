@@ -27,7 +27,7 @@ namespace Lime
 		public bool Looped { get; set; }
 
 		[Trigger]
-		[TangerineProperty(1)]
+		[TangerineKeyframeColor(1)]
 		public MovieAction Action { get; set; }
 
 		public Movie()

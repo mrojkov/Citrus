@@ -15,7 +15,7 @@ namespace Tangerine.UI.Inspector
 		public readonly List<object> Objects;
 		public readonly Type Type;
 		public readonly string PropertyName;
-		public readonly TangerinePropertyAttribute TangerineAttribute;
+		public readonly TangerineKeyframeColorAttribute TangerineAttribute;
 		public readonly System.Reflection.PropertyInfo PropertyInfo;
 
 		public PropertyEditorContext(Widget inspectorPane, List<object> objects, Type type, string propertyName)
@@ -24,7 +24,7 @@ namespace Tangerine.UI.Inspector
 			Objects = objects;
 			Type = type;
 			PropertyName = propertyName;
-			TangerineAttribute = PropertyAttributes<TangerinePropertyAttribute>.Get(Type, PropertyName) ?? new TangerinePropertyAttribute(0);
+			TangerineAttribute = PropertyAttributes<TangerineKeyframeColorAttribute>.Get(Type, PropertyName) ?? new TangerineKeyframeColorAttribute(0);
 			PropertyInfo = Type.GetProperty(PropertyName);
 		}
 	}
@@ -54,22 +54,26 @@ namespace Tangerine.UI.Inspector
 				LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0.5f),
 				AutoSizeConstraints = false,
 			});
-			keyFunctionButton = new KeyFunctionButton {
-				LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0),
-			};
-			keyframeButton = new KeyframeButton {
-				LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0),
-				KeyColor = KeyframePalette.Colors[context.TangerineAttribute.ColorIndex],
-			};
-			keyFunctionButton.Clicked += RaiseOnKeyframeToggle;
-			keyframeButton.Clicked += RaiseOnKeyframeToggle;
-			containerWidget.Nodes.AddRange(
-				keyFunctionButton,
-				keyframeButton,
-				new HSpacer(4)
-			);
-			containerWidget.Tasks.Add(new KeyframeButtonBinding(context, keyframeButton));
-			containerWidget.Tasks.Add(new KeyFunctionButtonBinding(context, keyFunctionButton));
+			if (PropertyAttributes<TangerineStaticPropertyAttribute>.Get(context.PropertyInfo) == null) {
+				keyFunctionButton = new KeyFunctionButton {
+					LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0),
+				};
+				keyframeButton = new KeyframeButton {
+					LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0),
+					KeyColor = KeyframePalette.Colors[context.TangerineAttribute.ColorIndex],
+				};
+				keyFunctionButton.Clicked += RaiseOnKeyframeToggle;
+				keyframeButton.Clicked += RaiseOnKeyframeToggle;
+				containerWidget.Nodes.AddRange(
+					keyFunctionButton,
+					keyframeButton,
+					new HSpacer(4)
+				);
+				containerWidget.Tasks.Add(new KeyframeButtonBinding(context, keyframeButton));
+				containerWidget.Tasks.Add(new KeyFunctionButtonBinding(context, keyFunctionButton));
+			} else {
+				containerWidget.Nodes.Add(new HSpacer(41));
+			}
 		}
 
 		void RaiseOnKeyframeToggle()

@@ -16,11 +16,16 @@ namespace Lime
 		void OnTrigger(string property);
 	}
 
-	public class TangerinePropertyAttribute : Attribute
+	/// <summary>
+	/// Denotes a property which can not be animated within Tangerine.
+	/// </summary>
+	public class TangerineStaticPropertyAttribute : Attribute { }
+
+	public class TangerineKeyframeColorAttribute : Attribute
 	{
 		public int ColorIndex;
 
-		public TangerinePropertyAttribute(int colorIndex)
+		public TangerineKeyframeColorAttribute(int colorIndex)
 		{
 			ColorIndex = colorIndex;
 		}
@@ -88,7 +93,7 @@ namespace Lime
 		/// May be non-unique.
 		/// </summary>
 		[YuzuMember]
-		[TangerineProperty(0)]
+		[TangerineStaticProperty]
 		public string Id { get; set; }
 
 		private string contentsPath;
@@ -97,7 +102,7 @@ namespace Lime
 		/// the node children are replaced by the external scene nodes.
 		/// </summary>
 		[YuzuMember]
-		[TangerineProperty(0)]
+		[TangerineStaticProperty]
 		public string ContentsPath
 		{
 			get { return Serialization.ShrinkPath(contentsPath); }
@@ -109,7 +114,7 @@ namespace Lime
 		/// it automatically runs the child animation from the given marker id.
 		/// </summary>
 		[Trigger]
-		[TangerineProperty(1)]
+		[TangerineKeyframeColor(1)]
 		public string Trigger { get; set; }
 
 		private Node parent;
@@ -249,7 +254,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Custom data. Can be set via HotStudio (this way it will contain path to external scene).
+		/// Custom data. Can be set via Tangerine (this way it will contain path to external scene).
 		/// </summary>
 		[YuzuMember]
 		public string Tag { get; set; }
@@ -461,9 +466,7 @@ namespace Lime
 		/// </summary>
 		public void Unlink()
 		{
-			if (Parent != null) {
-				Parent.Nodes.Remove(this);
-			}
+			Parent?.Nodes.Remove(this);
 		}
 
 		public void UnlinkAndDispose()

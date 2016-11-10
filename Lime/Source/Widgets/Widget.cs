@@ -221,7 +221,7 @@ namespace Lime
 		/// Parent-relative position.
 		/// </summary>
 		[YuzuMember]
-		[TangerineProperty(4)]
+		[TangerineKeyframeColor(4)]
 		public Vector2 Position
 		{
 			get { return position; }
@@ -268,7 +268,7 @@ namespace Lime
 			}
 		}
 
-		[TangerineProperty(7)]
+		[TangerineKeyframeColor(7)]
 		public Vector2 Size
 		{
 			get { return size; }
@@ -367,7 +367,7 @@ namespace Lime
 		/// (0, 0) is top-left corner, (1, 1) is bottom-right corner.
 		/// </summary>
 		[YuzuMember]
-		[TangerineProperty(6)]
+		[TangerineKeyframeColor(6)]
 		public Vector2 Pivot
 		{
 			get { return pivot; }
@@ -383,7 +383,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		[TangerineProperty(5)]
+		[TangerineKeyframeColor(5)]
 		public Vector2 Scale
 		{
 			get { return scale; }
@@ -402,7 +402,7 @@ namespace Lime
 		/// Counter-clockwise rotation of this widget.
 		/// </summary>
 		[YuzuMember]
-		[TangerineProperty(3)]
+		[TangerineKeyframeColor(3)]
 		public float Rotation {
 			get { return rotation; }
 			set
@@ -420,7 +420,7 @@ namespace Lime
 		/// Hue of this widget. Contents color will be multiplied by it on render.
 		/// </summary>
 		[YuzuMember]
-		[TangerineProperty(9)]
+		[TangerineKeyframeColor(9)]
 		public Color4 Color
 		{
 			get { return color; }
@@ -452,7 +452,7 @@ namespace Lime
 		public Anchors Anchors { get; set; }
 
 		[YuzuMember]
-		[TangerineProperty(10)]
+		[TangerineKeyframeColor(10)]
 		public Blending Blending
 		{
 			get { return blending; }
@@ -479,7 +479,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		[TangerineProperty(2)]
+		[TangerineKeyframeColor(2)]
 		public bool Visible
 		{
 			get { return visible; }
