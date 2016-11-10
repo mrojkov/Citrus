@@ -51,8 +51,11 @@ namespace Orange
 			needToUpdateFilesTXT = true;
 		}
 
-		public override IEnumerable<string> EnumerateFiles()
+		public override IEnumerable<string> EnumerateFiles(string path = null)
 		{
+			if (path != null) {
+				throw new NotImplementedException();
+			}
 			foreach (var i in base.EnumerateFiles()) {
 				string ext = Path.GetExtension(i);
 				if (ext == ".meta") {

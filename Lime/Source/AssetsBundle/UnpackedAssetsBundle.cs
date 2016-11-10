@@ -6,17 +6,10 @@ using System.IO;
 
 namespace Lime
 {
-	/// <summary>
-	/// Распакованный бандл. Представляет собой папку с файлами бандла. Используется в целях отладки
-	/// </summary>
 	public class UnpackedAssetsBundle : AssetsBundle
 	{
 		public readonly string BaseDirectory;
 
-		/// <summary>
-		/// Конструктор
-		/// </summary>
-		/// <param name="baseDirectory">Папка, в которой хранятся файлы бандла</param>
 		public UnpackedAssetsBundle(string baseDirectory)
 		{
 			this.BaseDirectory = baseDirectory;
@@ -27,10 +20,6 @@ namespace Lime
 			return new FileStream(Path.Combine(BaseDirectory, path), FileMode.Open);
 		}
 
-		/// <summary>
-		/// Возвращает время записи файла (время, когда файл был изменен)
-		/// </summary>
-		/// <param name="path">Путь к проверяемому файлу в бандле</param>
 		public override DateTime GetFileLastWriteTime(string path)
 		{
 #if UNITY
@@ -40,9 +29,6 @@ namespace Lime
 #endif
 		}
 
-		/// <summary>
-		/// Удаляет файл из бандла
-		/// </summary>
 		public override void DeleteFile(string path)
 		{
 			File.Delete(Path.Combine(BaseDirectory, path));
@@ -53,13 +39,6 @@ namespace Lime
 			return File.Exists(Path.Combine(BaseDirectory, path));
 		}
 
-		/// <summary>
-		/// Копирует файл в папку бандла
-		/// </summary>
-		/// <param name="path">Путь, куда будет скопирван импортируемый файл (относительно папки бандла)</param>
-		/// <param name="stream">Поток файла</param>
-		/// <param name="reserve">Не используется</param>
-		/// <param name="attributes">Не используется</param>
 		public override void ImportFile(string path, Stream stream, int reserve, string sourceExtension, AssetAttributes attributes)
 		{
 #if UNITY
@@ -74,17 +53,19 @@ namespace Lime
 #endif
 		}
 
-		/// <summary>
-		/// Перечисляет все файлы бандла
-		/// </summary>
-		public override IEnumerable<string> EnumerateFiles()
+		public override IEnumerable<string> EnumerateFiles(string path = null)
 		{
 #if UNITY
 			throw new NotImplementedException();
 #else
-			var baseDir = new Uri(BaseDirectory + "/");
-			foreach (var i in Directory.EnumerateFiles(BaseDirectory, "*.*", SearchOption.AllDirectories)) {
-				var relativePath = baseDir.MakeRelativeUri(new Uri(i)).ToString();
+			var baseDirectory = BaseDirectory;
+			if (path != null) {
+				baseDirectory = Path.Combine(baseDirectory, path);
+			}
+			baseDirectory += '/';
+			var baseUri = new Uri(baseDirectory);
+			foreach (var i in Directory.EnumerateFiles(baseDirectory, "*.*", SearchOption.AllDirectories)) {
+				var relativePath = baseUri.MakeRelativeUri(new Uri(i)).ToString();
 				relativePath = Uri.UnescapeDataString(relativePath);
 				yield return relativePath;
 			}

@@ -64,12 +64,12 @@ namespace Orange
 				throw new Lime.Exception("ImportFile is not supported for BundleSwitcher (file '{0}')", path);
 			}
 
-			public override IEnumerable<string> EnumerateFiles()
+			public override IEnumerable<string> EnumerateFiles(string path = null)
 			{
-				foreach (var s in mainBundle.EnumerateFiles()) {
+				foreach (var s in mainBundle.EnumerateFiles(path)) {
 					yield return s;
 				}
-				foreach (var s in secondaryBundle.EnumerateFiles()) {
+				foreach (var s in secondaryBundle.EnumerateFiles(path)) {
 					yield return s;
 				}
 			}

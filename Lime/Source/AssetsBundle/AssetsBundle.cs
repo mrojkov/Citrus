@@ -7,31 +7,17 @@ namespace Lime
 	[Flags]
 	public enum AssetAttributes
 	{
-		None = 0,
-
-		/// <summary>
-		/// Бандл заархивирован
-		/// </summary>
-		ZippedDeflate = 1 << 0,
-
-		/// <summary>
-		/// Бандл содержит текстуры, не равные степени 2
-		/// </summary>
-		NonPowerOf2Texture = 1 << 1,
-		ZippedLZMA = 1 << 2,
-		Zipped = ZippedDeflate | ZippedLZMA
+		None				= 0,
+		ZippedDeflate		= 1 << 0,
+		NonPowerOf2Texture	= 1 << 1,
+		ZippedLZMA			= 1 << 2,
+		Zipped				= ZippedDeflate | ZippedLZMA
 	}
 
-	/// <summary>
-	/// Бандл. Архив, с игровыми ресурсами
-	/// </summary>
 	public abstract class AssetsBundle : IDisposable
 	{
 		private static AssetsBundle instance;
 
-		/// <summary>
-		/// Ссылка на текущий бандл
-		/// </summary>
 		public static AssetsBundle Instance
 		{
 			get
@@ -50,9 +36,6 @@ namespace Lime
 			}
 		}
 
-		/// <summary>
-		/// Возвращает true, если Instance не null
-		/// </summary>
 		public static bool Initialized { get { return instance != null; } }
 
 		public virtual void Dispose()
@@ -62,9 +45,6 @@ namespace Lime
 			}
 		}
 
-		/// <summary>
-		/// Текущий язык (например RU, EN)
-		/// </summary>
 		public static string CurrentLanguage;
 
 		public abstract Stream OpenFile(string path);
@@ -79,36 +59,15 @@ namespace Lime
 			}
 		}
 
-		/// <summary>
-		/// Возвращает время записи файла (время, когда файл был изменен)
-		/// </summary>
-		/// <param name="path">Путь к проверяемому файлу в бандле</param>
 		public abstract DateTime GetFileLastWriteTime(string path);
 
 		public abstract void DeleteFile(string path);
 		public abstract bool FileExists(string path);
 
-		/// <summary>
-		/// Импортирует файл в бандл
-		/// </summary>
-		/// <param name="path">По какому пути разместить файл в бандле. Если такой файл уже есть, он будет удален</param>
-		/// <param name="stream">поток импортируемого файла</param>
-		/// <param name="reserve">Сколько байт зарезервировать (будет фактически записано 'Длина_Файла + reserve' байт)</param>
-		/// <param name="attributes">Атрибуты импортируемого файла</param>
 		public abstract void ImportFile(string path, Stream stream, int reserve, string sourceExtension, AssetAttributes attributes = AssetAttributes.None);
 
-		/// <summary>
-		/// Перечисляет все файлы, входящие в бандл
-		/// </summary>
-		public abstract IEnumerable<string> EnumerateFiles();
+		public abstract IEnumerable<string> EnumerateFiles(string path = null);
 
-		/// <summary>
-		/// Импортирует файл в бандл
-		/// </summary>
-		/// <param name="dstPath">По какому пути разместить файл в бандле. Если такой файл уже есть, он будет удален</param>
-		/// <param name="srcPath">Импортируемый файл</param>
-		/// <param name="reserve">Сколько байт зарезервировать (будет фактически записано 'Длина_Файла + reserve' байт)</param>
-		/// <param name="attributes">Атрибуты импортируемого файла</param>
 		public void ImportFile(string srcPath, string dstPath, int reserve, string sourceExtension, AssetAttributes attributes = AssetAttributes.None)
 		{
 			using (var stream = new FileStream(srcPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
@@ -116,19 +75,12 @@ namespace Lime
 			}
 		}
 
-		/// <summary>
-		/// Открывает файл, используя локализованный путь (см описание к методу GetLocalizedPath)
-		/// </summary>
 		public Stream OpenFileLocalized(string path)
 		{
 			var stream = OpenFile(GetLocalizedPath(path));
 			return stream;
 		}
 
-		/// <summary>
-		/// Возвращает путь с учетом текущего языка (свойство CurrentLanguage). Например при path == "dictionary.txt" вернет dictionary.ru.txt
-		/// (при условии, что CurrentLanguage == "ru")
-		/// </summary>
 		public string GetLocalizedPath(string path)
 		{
 			if (string.IsNullOrEmpty(CurrentLanguage))
