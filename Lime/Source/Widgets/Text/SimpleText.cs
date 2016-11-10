@@ -17,23 +17,30 @@ namespace Lime
 		private Color4 textColor;
 		private bool minSizeValid;
 		private string displayText;
-
+		private TextOverflowMode overflowMode;
+		private bool wordSplitAllowed;
 		private TextProcessorDelegate textProcessor;
-		public event TextProcessorDelegate TextProcessor {
-			add {
+
+		public event TextProcessorDelegate TextProcessor
+		{
+			add
+			{
 				textProcessor += value;
 				Invalidate();
 			}
-			remove {
+			remove
+			{
 				textProcessor -= value;
 				Invalidate();
 			}
 		}
 
 		[YuzuMember]
-		public SerializableFont Font {
+		public SerializableFont Font
+		{
 			get { return font; }
-			set {
+			set
+			{
 				if (value != font) {
 					font = value;
 					Invalidate();
@@ -42,9 +49,11 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		public override string Text {
+		public override string Text
+		{
 			get { return text ?? ""; }
-			set {
+			set
+			{
 				if (value != text) {
 					text = value;
 					Invalidate();
@@ -52,7 +61,8 @@ namespace Lime
 			}
 		}
 
-		public string DisplayText {
+		public string DisplayText 
+		{
 			get
 			{
 				if (displayText != null) return displayText;
@@ -64,9 +74,11 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		public float FontHeight {
+		public float FontHeight
+		{
 			get { return fontHeight; }
-			set {
+			set
+			{
 				if (value != fontHeight) {
 					fontHeight = value;
 					Invalidate();
@@ -75,9 +87,11 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		public float Spacing {
+		public float Spacing
+		{
 			get { return spacing; }
-			set {
+			set
+			{
 				if (value != spacing) {
 					spacing = value;
 					Invalidate();
@@ -86,9 +100,11 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		public HAlignment HAlignment {
+		public HAlignment HAlignment
+		{
 			get { return hAlignment; }
-			set {
+			set
+			{
 				if (value != hAlignment) {
 					hAlignment = value;
 					Invalidate();
@@ -97,9 +113,11 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		public VAlignment VAlignment {
+		public VAlignment VAlignment
+		{
 			get { return vAlignment; }
-			set {
+			set
+			{
 				if (value != vAlignment) {
 					vAlignment = value;
 					Invalidate();
@@ -108,10 +126,30 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		public TextOverflowMode OverflowMode { get; set; }
+		public TextOverflowMode OverflowMode
+		{
+			get { return overflowMode; }
+			set
+			{
+				if (overflowMode != value) {
+					overflowMode = value;
+					Invalidate();
+				}
+			}
+		}
 
 		[YuzuMember]
-		public bool WordSplitAllowed { get; set; }
+		public bool WordSplitAllowed
+		{
+			get { return wordSplitAllowed; }
+			set
+			{
+				if (wordSplitAllowed != value) {
+					wordSplitAllowed = value;
+					Invalidate();
+				}
+			}
+		}
 
 		[YuzuMember]
 		public Color4 TextColor
