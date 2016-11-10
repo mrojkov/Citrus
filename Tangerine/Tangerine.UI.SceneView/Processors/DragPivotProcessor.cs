@@ -12,10 +12,10 @@ namespace Tangerine.UI.SceneView
 
 		public IEnumerator<object> Task()
 		{
-			var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>();
 			while (true) {
 				Quadrangle hull;
 				Vector2 pivot;
+				var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>();
 				if (
 					sv.Input.IsKeyPressed(Key.Control) &&
 					Utils.CalcHullAndPivot(widgets, sv.Scene, out hull, out pivot) &&

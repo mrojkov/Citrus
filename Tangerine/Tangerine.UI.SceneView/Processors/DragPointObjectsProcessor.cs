@@ -12,9 +12,9 @@ namespace Tangerine.UI.SceneView
 
 		public IEnumerator<object> Task()
 		{
-			var pobjects = Document.Current.SelectedNodes().Editable().OfType<PointObject>();
 			while (true) {
 				Rectangle aabb;
+				var pobjects = Document.Current.SelectedNodes().Editable().OfType<PointObject>();
 				if (
 					Utils.CalcAABB(pobjects, sv.Scene, out aabb) && 
 					(aabb.Center - sv.MousePosition).Length < 10 / sv.Scene.Scale.X)

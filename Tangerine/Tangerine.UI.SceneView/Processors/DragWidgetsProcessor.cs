@@ -12,10 +12,10 @@ namespace Tangerine.UI.SceneView
 
 		public IEnumerator<object> Task()
 		{
-			var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>();
 			while (true) {
 				Quadrangle hull;
 				Vector2 pivot;
+				var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>();
 				if (Utils.CalcHullAndPivot(widgets, sv.Scene, out hull, out pivot) && (pivot - sv.MousePosition).Length < 10 / sv.Scene.Scale.X) {
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {
