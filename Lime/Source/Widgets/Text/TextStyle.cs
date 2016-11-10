@@ -4,6 +4,18 @@ namespace Lime
 {
 	public class TextStyle : Node
 	{
+		private ITexture imageTexture;
+		private Vector2 imageSize;
+		private ImageUsageEnum imageUsage;
+		private SerializableFont font;
+		private float size;
+		private float spaceAfter;
+		private bool bold;
+		private bool castShadow;
+		private Vector2 shadowOffset;
+		private Color4 textColor;
+		private Color4 shadowColor;
+
 		public static TextStyle Default = new TextStyle();
 
 		public enum ImageUsageEnum
@@ -13,40 +25,148 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		public ITexture ImageTexture { get; set; }
+		public ITexture ImageTexture {
+			get { return imageTexture; }
+			set 
+			{
+				if (imageTexture != value) {
+					imageTexture = value;
+					InvalidateRichText();
+				}
+			}
+		}
 
 		[YuzuMember]
-		public Vector2 ImageSize { get; set; }
+		public Vector2 ImageSize
+		{
+			get { return imageSize; }
+			set
+			{
+				if (imageSize != value) {
+					imageSize = value;
+					InvalidateRichText();
+				}
+			}
+		}
 
 		[YuzuMember]
-		public ImageUsageEnum ImageUsage { get; set; }
+		public ImageUsageEnum ImageUsage
+		{
+			get { return imageUsage; }
+			set
+			{
+				if (imageUsage != value) {
+					imageUsage = value;
+					InvalidateRichText();
+				}
+			}
+		}
 
 		[YuzuMember]
-		public SerializableFont Font { get; set; }
+		public SerializableFont Font
+		{
+			get { return font; }
+			set
+			{
+				if (font != value) {
+					font = value;
+					InvalidateRichText();
+				}
+			}
+		}
 
 		[YuzuMember]
-		public float Size { get; set; }
+		public float Size
+		{
+			get { return size; }
+			set
+			{
+				if (size != value) {
+					size = value;
+					InvalidateRichText();
+				}
+			}
+		}
 
 		[YuzuMember]
-		public float SpaceAfter { get; set; }
+		public float SpaceAfter
+		{
+			get { return spaceAfter; }
+			set
+			{
+				if (spaceAfter != value) {
+					spaceAfter = value;
+					InvalidateRichText();
+				}
+			}
+		}
 
 		[YuzuMember]
-		public bool Bold { get; set; }
+		public bool Bold
+		{
+			get { return bold; }
+			set
+			{
+				if (bold != value) {
+					bold = value;
+					InvalidateRichText();
+				}
+			}
+		}
 
 		[YuzuMember]
-		public bool CastShadow { get; set; }
+		public bool CastShadow
+		{
+			get { return castShadow; }
+			set
+			{
+				if (castShadow != value) {
+					castShadow = value;
+					InvalidateRichText();
+				}
+			}
+		}
 
 		[YuzuMember]
-		public Vector2 ShadowOffset { get; set; }
+		public Vector2 ShadowOffset
+		{
+			get { return shadowOffset; }
+			set
+			{
+				if (shadowOffset != value) {
+					shadowOffset = value;
+					InvalidateRichText();
+				}
+			}
+		}
 
 		[YuzuMember]
-		public Color4 TextColor { get; set; }
+		public Color4 TextColor
+		{
+			get { return textColor; }
+			set
+			{
+				if (textColor != value) {
+					textColor = value;
+					InvalidateRichText();
+				}
+			}
+		}
 
 		[YuzuMember]
-		public Color4 ShadowColor { get; set; }
+		public Color4 ShadowColor
+		{
+			get { return shadowColor; }
+			set
+			{
+				if (shadowColor != value) {
+					shadowColor = value;
+					InvalidateRichText();
+				}
+			}
+		}
 
 		public TextStyle()
-
 		{
 			Size = 15;
 			TextColor = Color4.White;
@@ -54,5 +174,7 @@ namespace Lime
 			ShadowOffset = Vector2.One;
 			Font = new SerializableFont();
 		}
+
+		void InvalidateRichText() => (Parent as RichText)?.Invalidate();
 	}
 }

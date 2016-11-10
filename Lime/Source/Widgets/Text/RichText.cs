@@ -11,6 +11,7 @@ namespace Lime
 		private string text;
 		private HAlignment hAlignment;
 		private VAlignment vAlignment;
+		private TextOverflowMode overflowMode;
 		private SpriteList spriteList;
 		private TextRenderer renderer;
 
@@ -18,7 +19,13 @@ namespace Lime
 		public override string Text
 		{
 			get { return text; }
-			set { SetText(value); }
+			set
+			{
+				if (text != value) {
+					text = value;
+					Invalidate();
+				}
+			}
 		}
 
 		// TODO
@@ -29,18 +36,40 @@ namespace Lime
 		public HAlignment HAlignment
 		{
 			get { return hAlignment; }
-			set { SetHAlignment(value); }
+			set
+			{
+				if (hAlignment != value) {
+					hAlignment = value;
+					Invalidate();
+				}
+			}
 		}
 
 		[YuzuMember]
 		public VAlignment VAlignment
 		{
 			get { return vAlignment; }
-			set { SetVAlignment(value); }
+			set
+			{
+				if (vAlignment != value) {
+					vAlignment = value;
+					Invalidate();
+				}
+			}
 		}
 
 		[YuzuMember]
-		public TextOverflowMode OverflowMode { get; set; }
+		public TextOverflowMode OverflowMode
+		{
+			get { return overflowMode; }
+			set
+			{
+				if (overflowMode != value) {
+					overflowMode = value;
+					Invalidate();
+				}
+			}
+		}
 
 		[YuzuMember]
 		public bool WordSplitAllowed { get; set; }
@@ -52,7 +81,6 @@ namespace Lime
 
 		public RichText()
 		{
-			// CachedRendering = true;
 			Localizable = true;
 		}
 
@@ -162,33 +190,6 @@ namespace Lime
 				else
 					++i;
 			}
-		}
-
-		private void SetHAlignment(Lime.HAlignment value)
-		{
-			if (value == hAlignment) {
-				return;
-			}
-			hAlignment = value;
-			Invalidate();
-		}
-
-		private void SetVAlignment(Lime.VAlignment value)
-		{
-			if (value == vAlignment) {
-				return;
-			}
-			vAlignment = value;
-			Invalidate();
-		}
-
-		private void SetText(string value)
-		{
-			if (value == text) {
-				return;
-			}
-			Invalidate();
-			text = value;
 		}
 
 		private void ParseText()
