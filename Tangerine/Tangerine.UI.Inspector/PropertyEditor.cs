@@ -423,4 +423,28 @@ namespace Tangerine.UI.Inspector
 			}
 		}
 	}
+
+	class FontPropertyEditor : CommonPropertyEditor
+	{
+		public FontPropertyEditor(PropertyEditorContext context) : base(context)
+		{
+			var selector = new DropDownList { LayoutCell = new LayoutCell(Alignment.Center) };
+			containerWidget.AddNode(selector);
+			OnKeyframeToggle += selector.SetFocus;
+			var propType = context.PropertyInfo.PropertyType;
+			var items = AssetsBundle.Instance.EnumerateFiles("Fonts").
+				Where(i => i.EndsWith(".fnt") || i.EndsWith(".tft")).
+				Select(i => new DropDownList.Item(Path.ChangeExtension(Path.GetFileName(i), null)));
+			foreach (var i in items) {
+				selector.Items.Add(i);
+			}
+			selector.Changed += index => {
+				var font = new SerializableFont(selector.Items[index].Text);
+				Core.Operations.SetAnimableProperty.Perform(context.Objects, context.PropertyName, font);
+			};
+			selector.AddChangeWatcher(CoalescedPropertyValue<SerializableFont>(context), i => {
+				selector.Text = string.IsNullOrEmpty(i.Name) ? "Default" : i.Name;
+			});
+		}
+	}
 }

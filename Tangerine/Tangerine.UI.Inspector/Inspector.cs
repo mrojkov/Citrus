@@ -76,6 +76,7 @@ namespace Tangerine.UI.Inspector
 			AddEditor(typeof(RenderTarget), c => new EnumPropertyEditor<RenderTarget>(c));
 			AddEditor(typeof(ITexture), c => new TexturePropertyEditor(c));
 			AddEditor(typeof(SerializableSample), c => new AudioSamplePropertyEditor(c));
+			AddEditor(typeof(SerializableFont), c => new FontPropertyEditor(c));
 			AddEditor(typeof(HAlignment), c => new EnumPropertyEditor<HAlignment>(c));
 			AddEditor(typeof(VAlignment), c => new EnumPropertyEditor<VAlignment>(c));
 			AddEditor(typeof(AudioAction), c => new EnumPropertyEditor<AudioAction>(c));
