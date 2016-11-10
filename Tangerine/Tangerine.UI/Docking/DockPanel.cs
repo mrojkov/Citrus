@@ -193,7 +193,14 @@ namespace Tangerine.UI
 					PostPresenter = new WidgetBoundsPresenter(Color4.Black, 1),
 					Layout = new StackLayout(),
 					Nodes = {
-						new SimpleText { Text = title, LayoutCell = new LayoutCell(Alignment.Center) }
+						new SimpleText {
+							Text = title,
+							AutoSizeConstraints = false, 
+							LayoutCell = new LayoutCell(Alignment.Center),
+							OverflowMode = TextOverflowMode.Ellipsis,
+							HAlignment = HAlignment.Center,
+							VAlignment = VAlignment.Center
+						}
 					}
 				};
 				rootWidget.Updated += delta => StickToMouseCursor();
