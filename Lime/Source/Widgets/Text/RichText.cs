@@ -4,9 +4,7 @@ using Yuzu;
 
 namespace Lime
 {
-	/// <summary>
-	/// Виджет, отображающий текст и использующий продвинутое форматирование
-	/// </summary>
+	[TangerineClass(allowChildren: true)]
 	public class RichText : Widget, IText
 	{
 		private TextParser parser = new TextParser();
