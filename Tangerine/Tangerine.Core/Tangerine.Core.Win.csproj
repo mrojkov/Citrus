@@ -58,6 +58,7 @@
     <Compile Include="Operations\EnterLeaveNode.cs" />
     <Compile Include="Operations\SelectRow.cs" />
     <Compile Include="Operations\SelectRowRange.cs" />
+    <Compile Include="Operations\TimelineHorizontalShift.cs" />
     <Compile Include="Project.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DocumentHistory.cs" />

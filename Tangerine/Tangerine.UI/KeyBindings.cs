@@ -30,6 +30,10 @@ namespace Tangerine.UI
 			public static readonly Shortcut OpenProject = new Shortcut(Modifiers.Command | Modifiers.Shift, Key.O);
 			public static readonly Shortcut PreferencesDialog = new Shortcut(Modifiers.Command, Key.P);
 			public static readonly Shortcut CloseDocument = new Shortcut(Modifiers.Command, Key.W);
+			public static readonly Shortcut Group = new Shortcut(Modifiers.Command, Key.G);
+			public static readonly Shortcut Ungroup = new Shortcut(Modifiers.Command | Modifiers.Shift, Key.G);
+			public static readonly Shortcut InsertTimelineColumn = new Shortcut(Modifiers.Command, Key.E);
+			public static readonly Shortcut RemoveTimelineColumn = new Shortcut(Modifiers.Command | Modifiers.Shift, Key.E);
 
 			public static readonly Shortcut NextDocument = new Shortcut(Modifiers.Control, Key.Tab);
 			public static readonly Shortcut PreviousDocument = new Shortcut(Modifiers.Control | Modifiers.Shift, Key.Tab);

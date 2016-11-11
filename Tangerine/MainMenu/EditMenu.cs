@@ -8,7 +8,7 @@ namespace Tangerine
 	public class GroupCommand : Command
 	{
 		public override string Text => "Group";
-		public override Shortcut Shortcut => new Shortcut(Modifiers.Command, Key.G);
+		public override Shortcut Shortcut => KeyBindings.GenericKeys.Group;
 
 		public override void Execute()
 		{
@@ -58,7 +58,7 @@ namespace Tangerine
 	public class UngroupCommand : Command
 	{
 		public override string Text => "Ungroup";
-		public override Shortcut Shortcut => new Shortcut(Modifiers.Command | Modifiers.Shift, Key.G);
+		public override Shortcut Shortcut => KeyBindings.GenericKeys.Ungroup;
 
 		public override void Execute()
 		{
@@ -94,7 +94,7 @@ namespace Tangerine
 	public class InsertTimelineColumn : Command
 	{
 		public override string Text => "Insert Column On Timeline";
-		public override Shortcut Shortcut => new Shortcut(Modifiers.Control, Key.Q);
+		public override Shortcut Shortcut => KeyBindings.GenericKeys.InsertTimelineColumn;
 		public override bool Enabled => true;
 
 		public override void Execute()
@@ -106,7 +106,7 @@ namespace Tangerine
 	public class RemoveTimelineColumn : Command
 	{
 		public override string Text => "Remove Column On Timeline";
-		public override Shortcut Shortcut => new Shortcut(Modifiers.Control, Key.W);
+		public override Shortcut Shortcut => KeyBindings.GenericKeys.RemoveTimelineColumn;
 		public override bool Enabled => true;
 
 		public override void Execute()
