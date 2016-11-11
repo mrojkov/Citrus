@@ -120,6 +120,11 @@ namespace Tangerine.Core.Operations
 			Document.Current.History.Perform(new SetKeyframe(animable, propertyName, animationId, keyframe));
 		}
 
+		public static void Perform(IAnimator animator, IKeyframe keyframe)
+		{
+			Perform(animator.Owner, animator.TargetProperty, animator.AnimationId, keyframe);
+		}
+
 		private SetKeyframe(IAnimable animable, string propertyName, string animationId, IKeyframe keyframe)
 		{
 			Animable = animable;

@@ -72,6 +72,7 @@ namespace Tangerine
 				new Core.Operations.SetMarker.Processor(),
 				new Core.Operations.DeleteMarker.Processor(),
 				new Core.Operations.DistortionMeshProcessor(),
+				new Core.Operations.TimelineHorizontalShift.Processor(),
 				new UI.Timeline.Operations.SelectGridSpan.Processor(),
 				new UI.Timeline.Operations.ClearGridSelection.Processor(),
 				new UI.Timeline.Operations.ShiftGridSelection.Processor(),
@@ -254,6 +255,8 @@ namespace Tangerine
 					Command.MenuSeparator,
 					new GroupCommand(),
 					new UngroupCommand(),
+					new InsertTimelineColumn(),
+					new RemoveTimelineColumn(),
 				},
 				new Submenu("Create") {
 				},

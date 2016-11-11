@@ -90,4 +90,28 @@ namespace Tangerine
 
 		public override bool Enabled => Core.Document.Current?.SelectedNodes().Editable().Any(i => i is Frame) ?? false;
 	}
+
+	public class InsertTimelineColumn : Command
+	{
+		public override string Text => "Insert Column On Timeline";
+		public override Shortcut Shortcut => new Shortcut(Modifiers.Control, Key.Q);
+		public override bool Enabled => true;
+
+		public override void Execute()
+		{
+			Core.Operations.TimelineHorizontalShift.Perform(Tangerine.UI.Timeline.Timeline.Instance.CurrentColumn, 1);
+		}
+	}
+
+	public class RemoveTimelineColumn : Command
+	{
+		public override string Text => "Remove Column On Timeline";
+		public override Shortcut Shortcut => new Shortcut(Modifiers.Control, Key.W);
+		public override bool Enabled => true;
+
+		public override void Execute()
+		{
+			Core.Operations.TimelineHorizontalShift.Perform(Tangerine.UI.Timeline.Timeline.Instance.CurrentColumn, -1);
+		}
+	}
 }
