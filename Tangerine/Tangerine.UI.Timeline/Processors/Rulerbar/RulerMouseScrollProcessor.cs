@@ -26,6 +26,9 @@ namespace Tangerine.UI.Timeline
 							} else if (mp < cw / 2) {
 								timeline.ScrollPos.X -= cw;
 							}
+							if (input.IsKeyPressed(Key.Control)) {
+								ShiftTimeline(CalcColumn(mp));
+							}
 							Operations.SetCurrentColumn.Perform(CalcColumn(mp));
 							timeline.Ruler.MeasuredFrameDistance = timeline.CurrentColumn - initialCol;
 							Window.Current.Invalidate();
@@ -37,6 +40,18 @@ namespace Tangerine.UI.Timeline
 					}
 				}
 				yield return null;
+			}
+		}
+
+		void ShiftTimeline(int destColumn)
+		{
+			var delta = destColumn - timeline.CurrentColumn;
+			for (int i = 0; i < delta.Abs(); i++) {
+				if (delta > 0) {
+					Core.Operations.TimelineHorizontalShift.Perform(timeline.CurrentColumn, 1);
+				} else {
+					Core.Operations.TimelineHorizontalShift.Perform(destColumn, -1);
+				}
 			}
 		}
 
