@@ -141,6 +141,7 @@ namespace Lime
 		public IMaterial Clone()
 		{
 			return new CommonMaterial {
+				Name = Name,
 				DiffuseColor = DiffuseColor,
 				ColorFactor = ColorFactor,
 				FogMode = FogMode,
