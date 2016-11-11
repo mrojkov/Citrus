@@ -26,7 +26,7 @@ namespace Tangerine.UI.Timeline
 							} else if (mp < cw / 2) {
 								timeline.ScrollPos.X -= cw;
 							}
-							if (input.IsKeyPressed(Key.Control)) {
+							if (input.IsKeyPressed(Key.Control) && !input.WasMousePressed()) {
 								ShiftTimeline(CalcColumn(mp));
 							}
 							Operations.SetCurrentColumn.Perform(CalcColumn(mp));
