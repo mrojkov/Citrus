@@ -154,6 +154,9 @@ namespace Lime
 			int count = ReadonlyKeys.Count;
 			if (count == 0)
 				return;
+			if (currentKey >= count) {
+				currentKey = count - 1;
+			}
 			int frame = AnimationUtils.MsecsToFrames(time);
 			while (currentKey < count - 1 && frame > ReadonlyKeys[currentKey].Frame)
 				currentKey++;
