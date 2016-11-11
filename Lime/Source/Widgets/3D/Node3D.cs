@@ -72,6 +72,9 @@ namespace Lime
 			}
 		}
 
+		[YuzuMember]
+		public bool Opaque { get; set; }
+
 		public Matrix44 GlobalTransform { get { RecalcDirtyGlobals(); return globalTransform; } }
 		public bool GloballyVisible { get { RecalcDirtyGlobals(); return globallyVisible; } }
 		public Color4 GlobalColor { get { RecalcDirtyGlobals(); return globalColor; } }
@@ -84,10 +87,16 @@ namespace Lime
 		public Node3D()
 		{
 			AsNode3D = this;
+			Opaque = true;
 			scale = Vector3.One;
 			rotation = Quaternion.Identity;
 			visible = true;
 			color = Color4.White;
+		}
+
+		public virtual float CalcDistanceToCamera(Camera3D camera)
+		{
+			return camera.View.TransformVector(GlobalTransform.Translation).Z;
 		}
 
 		protected override void RecalcDirtyGlobalsUsingParents()
@@ -151,10 +160,33 @@ namespace Lime
 			return p as Viewport3D;
 		}
 
+		public Model3D FindModel()
+		{
+			var model = TryFindModel();
+			if (model == null) {
+				throw new Lime.Exception("Model for node '{0}' is not found", this);
+			}
+			return model;
+		}
+
+		public Model3D TryFindModel()
+		{
+			Node n = this;
+			do {
+				var model = n as Model3D;
+				if (model != null) {
+					return model;
+				}
+				n = n.Parent;
+			} while (n != null);
+			return null;
+		}
+
 		public override Node Clone()
 		{
 			var clone = base.Clone() as Node3D;
 			clone.AsNode3D = clone;
+			clone.Opaque = Opaque;
 			return clone;
 		}
 

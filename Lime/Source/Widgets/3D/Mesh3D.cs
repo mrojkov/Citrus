@@ -1,15 +1,14 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Yuzu;
 
 namespace Lime
 {
 	public class Mesh3D : Node3D
 	{
-		internal Matrix44 WorldView;
-		internal Matrix44 WorldViewProj;
-		internal Matrix44[] SharedBoneTransforms = new Matrix44[] { };
-		private bool invalidBones;
+		private static Matrix44[] sharedBoneTransforms = new Matrix44[0];
 
 		[YuzuMember]
 		public Submesh3DCollection Submeshes { get; private set; }
@@ -18,45 +17,22 @@ namespace Lime
 		public BoundingSphere BoundingSphere { get; set; }
 
 		[YuzuMember]
-		public List<Node3D> Bones { get; private set; }
+		public CullMode CullMode { get; set; }
 
 		[YuzuMember]
-		public List<Matrix44> BoneBindPoseInverses { get; private set; }
+		public Vector3 Center { get; set; }
 
-		public CullMode CullMode { get; set; }
-		public bool ZTestEnabled { get; set; }
-		public bool ZWriteEnabled { get; set; }
 		public bool SkipRender { get; set; }
+
+		public Vector3 GlobalCenter
+		{
+			get { return GlobalTransform.TransformVector(Center); }
+		}
 
 		public Mesh3D()
 		{
 			Submeshes = new Submesh3DCollection(this);
-			Bones = new List<Node3D>();
-			BoneBindPoseInverses = new List<Matrix44>();
-			ZTestEnabled = true;
-			ZWriteEnabled = true;
 			CullMode = CullMode.CullClockwise;
-		}
-
-		[YuzuAfterDeserialization]
-		public void AfterDeserialization()
-		{
-			invalidBones = true;
-		}
-
-		internal void PrepareToRender()
-		{
-			ValidateBones();
-			var world = GlobalTransform;
-			var worldInverse = world.CalcInverted();
-			if (SharedBoneTransforms.Length < Bones.Count) {
-				SharedBoneTransforms = new Matrix44[Bones.Count];
-			}
-			for (var i = 0; i < Bones.Count; i++) {
-				SharedBoneTransforms[i] = BoneBindPoseInverses[i] * Bones[i].GlobalTransform * worldInverse;
-			}
-			WorldView = world * WidgetContext.Current.CurrentCamera.View;
-			WorldViewProj = Renderer.FixupWVP(world * Renderer.Projection);
 		}
 
 		public override void Render()
@@ -64,37 +40,26 @@ namespace Lime
 			if (SkipRender) {
 				return;
 			}
-			PrepareToRender();
+			Renderer.World = GlobalTransform;
+			Renderer.CullMode = CullMode;
+			var invWorld = GlobalTransform.CalcInverted();
 			foreach (var sm in Submeshes) {
-				sm.Render();
-			}
-		}
-
-		private void ValidateBones()
-		{
-			if (invalidBones) {
-				var success = false;
-				Node skeletonRoot = this;
-				while (skeletonRoot != null && skeletonRoot.AsNode3D != null) {
-					var i = 0;
-					while (i < Bones.Count) {
-						var validBone = skeletonRoot.TryFind<Node3D>(Bones[i].Id);
-						if (validBone == null) {
-							break;
+				var skin = sm.Material as IMaterialSkin;
+				if (skin != null && sm.Bones.Count > 0) {
+					skin.SkinEnabled = sm.Bones.Count > 0;
+					if (skin.SkinEnabled) {
+						if (sharedBoneTransforms.Length < sm.Bones.Count) {
+							sharedBoneTransforms = new Matrix44[sm.Bones.Count];
 						}
-						Bones[i] = validBone;
-						i++;
+						for (var i = 0; i < sm.Bones.Count; i++) {
+							sharedBoneTransforms[i] = sm.BoneBindPoses[i] * sm.Bones[i].GlobalTransform * invWorld;
+						}
+						skin.SetBones(sharedBoneTransforms, sm.Bones.Count);
 					}
-					success = i == Bones.Count;
-					if (success) {
-						break;
-					}
-					skeletonRoot = skeletonRoot.Parent;
 				}
-				if (!success) {
-					throw new Lime.Exception("Skeleton for `{0}` is not found", ToString());
-				}
-				invalidBones = false;
+				sm.Material.ColorFactor = GlobalColor;
+				sm.Material.Apply();
+				sm.ReadOnlyGeometry.Render(0, sm.ReadOnlyGeometry.Indices.Length);
 			}
 		}
 
@@ -145,107 +110,124 @@ namespace Lime
 			return hit;
 		}
 
+		public override float CalcDistanceToCamera(Camera3D camera)
+		{
+			return camera.View.TransformVector(GlobalCenter).Z;
+		}
+
+		public void RecalcBounds()
+		{
+			BoundingSphere = BoundingSphere.CreateFromPoints(GetVertices());
+		}
+
+		public void RecalcCenter()
+		{
+			Center = Vector3.Zero;
+			var n = 0;
+			foreach (var v in GetVertices()) {
+				Center += v;
+				n++;
+			}
+			Center /= n;
+		}
+
+		private IEnumerable<Vector3> GetVertices()
+		{
+			return Submeshes
+				.Select(sm => sm.ReadOnlyGeometry)
+				.SelectMany(g => g.Vertices);
+		}
+
 		public override Node Clone()
 		{
 			var clone = base.Clone() as Mesh3D;
 			clone.Submeshes = Submeshes.Clone(clone);
-			clone.Bones = Toolbox.Clone(Bones);
-			clone.BoneBindPoseInverses = Toolbox.Clone(BoneBindPoseInverses);
-			clone.SharedBoneTransforms = new Matrix44[] { };
-			clone.invalidBones = true;
+			clone.BoundingSphere = BoundingSphere;
+			clone.Center = Center;
+			clone.CullMode = CullMode;
+			clone.SkipRender = SkipRender;
 			return clone;
+		}
+
+		public override void Dispose()
+		{
+			foreach (var sm in Submeshes) {
+				sm.Dispose();
+			}
+			Submeshes.Clear();
+			base.Dispose();
 		}
 	}
 
-	public class Submesh3D : IRenderObject3D
+	public class Submesh3D : IDisposable
 	{
-		private static Matrix44[] sharedBoneTransforms = new Matrix44[] { };
-
-		public GeometryBufferReference GeometryReference = new GeometryBufferReference(new GeometryBuffer());
-		public GeometryBuffer ReadOnlyGeometry { get { return GeometryReference.Target; } }
+		private GeometryBufferProxy geometryProxy;
 
 		[YuzuMember]
-		public Material Material { get; set; }
+		public IMaterial Material = new CommonMaterial();
 
 		[YuzuMember]
 		public GeometryBuffer Geometry
 		{
 			get
 			{
-				if (GeometryReference.Counter > 1) {
-					GeometryReference.Counter--;
-					GeometryReference = new GeometryBufferReference(GeometryReference.Target.Clone());
+				if (geometryProxy == null) {
+					geometryProxy = new GeometryBufferProxy(new GeometryBuffer());
+					geometryProxy.AddRef();
+				} else if (geometryProxy.RefCount > 1) {
+					geometryProxy.ReleaseRef();
+					geometryProxy = new GeometryBufferProxy(geometryProxy.Target.Clone());
+					geometryProxy.AddRef();
 				}
-				return GeometryReference.Target;
+				return geometryProxy.Target;
 			}
 		}
+
+		public GeometryBuffer ReadOnlyGeometry => geometryProxy.Target;
 
 		[YuzuMember]
-		public List<int> BoneIndices { get; private set; }
+		public List<Matrix44> BoneBindPoses { get; private set; }
 
-		public Mesh3D ModelMesh;
+		[YuzuMember]
+		public List<string> BoneNames { get; private set; }
+		public List<Node3D> Bones { get; private set; }
 
-		private Vector3? center;
-
-		public Vector3 Center
-		{
-			get
-			{
-				if (center == null) {
-					center = Vector3.Zero;
-					int n = ReadOnlyGeometry.Vertices.Length;
-					for (int i = 0; i < n; i++) {
-						center += ReadOnlyGeometry.Vertices[i];
-					}
-					center /= n;
-				}
-				return center.Value * ModelMesh.GlobalTransform;
-			}
-		}
+		public Mesh3D Owner { get; internal set; }
 
 		public Submesh3D()
 		{
-			BoneIndices = new List<int>();
+			BoneBindPoses = new List<Matrix44>();
+			BoneNames = new List<string>();
+			Bones = new List<Node3D>();
 		}
 
-		~Submesh3D()
+		public void Dispose()
 		{
-			GeometryReference.Counter--;
+			geometryProxy.ReleaseRef();
 		}
 
-		public void Render()
+		public void RebuildSkeleton()
 		{
-			Renderer.ZTestEnabled = ModelMesh.ZTestEnabled;
-			Renderer.ZWriteEnabled = ModelMesh.ZWriteEnabled;
-			Renderer.CullMode = ModelMesh.CullMode;
-			var materialExternals = new MaterialExternals {
-				WorldView = ModelMesh.WorldView,
-				WorldViewProj = ModelMesh.WorldViewProj,
-				ColorFactor = ModelMesh.GlobalColor
-			};
-			if (BoneIndices.Count > 0) {
-				if (sharedBoneTransforms.Length < BoneIndices.Count) {
-					sharedBoneTransforms = new Matrix44[BoneIndices.Count];
-				}
-				for (var i = 0; i < BoneIndices.Count; i++) {
-					sharedBoneTransforms[i] = ModelMesh.SharedBoneTransforms[BoneIndices[i]];
-				}
-				materialExternals.Caps |= MaterialCap.Skin;
-				materialExternals.Bones = sharedBoneTransforms;
-				materialExternals.BoneCount = BoneIndices.Count;
+			RebuildSkeleton(Owner.FindModel());
+		}
+
+		internal void RebuildSkeleton(Model3D model)
+		{
+			Bones.Clear();
+			foreach (var boneName in BoneNames) {
+				Bones.Add(model.Find<Node3D>(boneName));
 			}
-			Material.Apply(ref materialExternals);
-			ReadOnlyGeometry.Render(0, ReadOnlyGeometry.Indices.Length);
 		}
 
 		public Submesh3D Clone()
 		{
-			GeometryReference.Counter++;
-			var clone = MemberwiseClone() as Submesh3D;
-			clone.GeometryReference = GeometryReference;
-			clone.BoneIndices = Toolbox.Clone(BoneIndices);
+			geometryProxy.AddRef();
+			var clone = new Submesh3D();
+			clone.geometryProxy = geometryProxy;
+			clone.BoneNames = new List<string>(BoneNames);
+			clone.BoneBindPoses = new List<Matrix44>(BoneBindPoses);
 			clone.Material = Material.Clone();
-			clone.ModelMesh = null;
+			clone.Owner = null;
 			return clone;
 		}
 	}
@@ -273,7 +255,7 @@ namespace Lime
 
 		public void Add(Submesh3D item)
 		{
-			item.ModelMesh = owner;
+			item.Owner = owner;
 			list.Add(item);
 		}
 
@@ -330,18 +312,17 @@ namespace Lime
 		}
 	}
 
-	public class GeometryBufferReference
+	internal class GeometryBufferProxy
 	{
-		public int Counter;
-		public GeometryBuffer Target;
+		public int RefCount { get; private set; }
+		public GeometryBuffer Target { get; private set; }
 
-		public GeometryBufferReference(GeometryBuffer target)
+		public void AddRef() => RefCount++;
+		public void ReleaseRef() => RefCount--;
+
+		public GeometryBufferProxy(GeometryBuffer target)
 		{
 			Target = target;
-			Counter = 1;
 		}
-
-
 	}
-
 }

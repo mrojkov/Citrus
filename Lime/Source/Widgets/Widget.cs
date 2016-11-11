@@ -1049,11 +1049,14 @@ namespace Lime
 				}
 				texture.SetAsRenderTarget();
 				var savedViewport = Renderer.Viewport;
+				var savedWorld = Renderer.World;
+				var savedView = Renderer.View;
+				var savedProj = Renderer.Projection;
 				Renderer.Viewport = new WindowRect { X = 0, Y = 0, Width = texture.ImageSize.Width, Height = texture.ImageSize.Height };
 				if (clearRenderTarget) {
 					Renderer.Clear(0, 0, 0, 0);
 				}
-				Renderer.PushProjectionMatrix();
+				Renderer.World = Renderer.View = Matrix44.Identity;
 				Renderer.SetOrthogonalProjection(0, 0, Width, Height);
 				for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
 					node.AddToRenderChain(renderChain);
@@ -1061,7 +1064,9 @@ namespace Lime
 				renderChain.RenderAndClear();
 				texture.RestoreRenderTarget();
 				Renderer.Viewport = savedViewport;
-				Renderer.PopProjectionMatrix();
+				Renderer.World = savedWorld;
+				Renderer.View = savedView;
+				Renderer.Projection = savedProj;
 				if (scissorTest) {
 					Renderer.ScissorTestEnabled = true;
 				}

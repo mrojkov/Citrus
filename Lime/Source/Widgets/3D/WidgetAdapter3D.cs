@@ -1,7 +1,7 @@
 ﻿
 namespace Lime
 {
-	public class WidgetAdapter3D : Node3D, IRenderObject3D
+	public class WidgetAdapter3D : Node3D
 	{
 		private RenderChain renderChain = new RenderChain();
 
@@ -22,9 +22,18 @@ namespace Lime
 			}
 		}
 
-		public Vector3 Center
+		public WidgetAdapter3D()
 		{
-			get { return GlobalTransform.TransformVector((Vector3)(Widget.Position * new Vector2(1, -1))); }
+			Opaque = false;
+		}
+
+		public override float CalcDistanceToCamera(Camera3D camera)
+		{
+			if (Widget == null) {
+				return 0f;
+			}
+			var p = GlobalTransform.TransformVector((Vector3)(Widget.Position * new Vector2(1, -1)));
+			return camera.View.TransformVector(p).Z;
 		}
 
 		public Plane GetPlane()
@@ -34,29 +43,35 @@ namespace Lime
 
 		public override void AddToRenderChain(RenderChain chain)
 		{
-			if (GloballyVisible && Widget != null) {
+			if (GloballyVisible) {
 				AddSelfToRenderChain(chain);
 			}
 		}
 
 		public override void Render()
 		{
+			if (Widget == null) {
+				return;
+			}
 			Widget.AddToRenderChain(renderChain);
 			var oldZTestEnabled = Renderer.ZTestEnabled;
 			var oldCullMode = Renderer.CullMode;
-			var oldProj = Renderer.Projection;
+			var oldWorld = Renderer.World;
 			Renderer.ZTestEnabled = false;
 			Renderer.CullMode = CullMode.None;
-			Renderer.Projection = Matrix44.CreateScale(new Vector3(1, -1, 1)) * GlobalTransform * oldProj;
+			Renderer.World = Matrix44.CreateScale(new Vector3(1, -1, 1)) * GlobalTransform;
 			renderChain.RenderAndClear();
 			Renderer.Flush();
-			Renderer.Projection = oldProj;
+			Renderer.World = oldWorld;
 			Renderer.CullMode = oldCullMode;
 			Renderer.ZTestEnabled = oldZTestEnabled;
 		}
 
 		internal protected override bool PartialHitTest(ref HitTestArgs args)
 		{
+			if (Widget == null) {
+				return false;
+			}
 			var plane = GetPlane();
 			var ray = args.Ray;
 			var distance = ray.Intersects(plane);
