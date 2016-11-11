@@ -92,10 +92,18 @@ namespace Tangerine.Core
 				IsDocumentModified = true;
 				return;
 			}
-			var range = savePos <= headPos ?
-				operations.GetRange(savePos, headPos - savePos) :
-				operations.GetRange(headPos, savePos - headPos);
-			IsDocumentModified = range.Any(i => i.IsChangingDocument);
+			IsDocumentModified = savePos <= headPos ?
+				IsChangingOperationWithinRange(savePos, headPos) :
+				IsChangingOperationWithinRange(headPos, savePos);
+		}
+
+		private bool IsChangingOperationWithinRange(int start, int end)
+		{
+			for (int i = start; i < end; i++) {
+				if (operations[i].IsChangingDocument)
+					return true;
+			}
+			return false;
 		}
 
 		public void AddSavePoint()
