@@ -57,6 +57,7 @@ namespace Lime
 						skin.SetBones(sharedBoneTransforms, sm.Bones.Count);
 					}
 				}
+				sm.Material.ColorFactor = GlobalColor;
 				sm.Material.Apply();
 				sm.ReadOnlyGeometry.Render(0, sm.ReadOnlyGeometry.Indices.Length);
 			}
