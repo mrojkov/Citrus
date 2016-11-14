@@ -235,9 +235,7 @@
     <Compile Include="Source\Graphics\GeometryBuffer.cs" />
     <Compile Include="Source\Graphics\OpenGL\PlatformGeometryBuffer.cs" />
     <Compile Include="Source\Widgets\3D\Camera3D.cs" />
-    <Compile Include="Source\Widgets\3D\IRenderObject3D.cs" />
     <Compile Include="Source\Widgets\3D\Material.cs" />
-    <Compile Include="Source\Widgets\3D\MaterialTechnique.cs" />
     <Compile Include="Source\Widgets\3D\Mesh3D.cs" />
     <Compile Include="Source\Widgets\3D\Node3D.cs" />
     <Compile Include="Source\Widgets\3D\Viewport3D.cs" />
@@ -278,6 +276,9 @@
     <Compile Include="Source\Application\Display\Display.Mac.cs" />
     <Compile Include="Source\Application\Display\Display.Win.cs" />
     <Compile Include="Source\Application\Display\IDisplay.cs" />
+    <Compile Include="Source\Widgets\3D\CommonMaterial.cs" />
+    <Compile Include="Source\Widgets\3D\CommonMaterialProgram.cs" />
+    <Compile Include="Source\Widgets\3D\Model3D.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
