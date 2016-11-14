@@ -13,7 +13,7 @@ using System.Runtime.InteropServices;
 
 namespace Lime
 {
-	unsafe static class PlatformRenderer
+	public unsafe static class PlatformRenderer
 	{
 		public static uint CurrentFramebuffer { get; private set; }
 		public static uint DefaultFramebuffer { get; private set; }
