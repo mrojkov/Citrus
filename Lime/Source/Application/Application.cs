@@ -102,7 +102,7 @@ namespace Lime
 	public static class Application
 	{
 		public static event Action<DeviceOrientation> SupportedDeviceOrientationsChanged;
-		public static readonly ObservableCollection<IWindow> Windows = new ObservableCollection<IWindow>();
+		public static readonly List<IWindow> Windows = new List<IWindow>();
 		public static bool IsTangerine;
 
 		public static long UpdateCounter { get; internal set; } 
