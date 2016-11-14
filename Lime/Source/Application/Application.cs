@@ -1,5 +1,5 @@
 using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.Threading;
 
 #if iOS
@@ -16,65 +16,25 @@ using System.Windows.Forms;
 
 namespace Lime
 {
-	/// <summary>
-	/// Варианты ориентации телефона или планшета
-	/// </summary>
 	[Flags]
 	public enum DeviceOrientation
 	{
-		/// <summary>
-		/// Портретная. Высота экрана больше ширины, аппаратные кнопки внизу
-		/// </summary>
 		Portrait = 1,
-
-		/// <summary>
-		/// Портретная перевернутая. Высота экрана больше ширины, аппаратные кнопки вверху
-		/// </summary>
 		PortraitUpsideDown = 2,
-
-		/// <summary>
-		/// Альбомная. Ширина экрана больше высоты, аппаратные кнопки слева
-		/// </summary>
 		LandscapeLeft = 4,
-
-		/// <summary>
-		/// Альбомная. Ширина экрана больше высоты, аппаратные кнопки справа
-		/// </summary>
 		LandscapeRight = 8,
-
-		/// <summary>
-		/// Портретные ориентации. Высота экрана больше ширины
-		/// </summary>
 		AllPortraits = Portrait | PortraitUpsideDown,
-
-		/// <summary>
-		/// Альбомные ориентации. Ширина экрана больше высоты
-		/// </summary>
 		AllLandscapes = LandscapeLeft | LandscapeRight,
-
-		/// <summary>
-		/// Все ориентации устройства
-		/// </summary>
 		All = 15,
 	}
 
 	public static class DeviceOrientationExtensions
 	{
-		/// <summary>
-		/// Портретная ориентация. Высота экрана больше ширины
-		/// </summary>
-		public static bool IsPortrait(this DeviceOrientation value)
-		{
-			return (value == DeviceOrientation.Portrait) || (value == DeviceOrientation.PortraitUpsideDown);
-		}
+		public static bool IsPortrait(this DeviceOrientation value) => 
+			(value == DeviceOrientation.Portrait) ||
+			(value == DeviceOrientation.PortraitUpsideDown);
 
-		/// <summary>
-		/// Альбомная ориентация. Ширина экрана больше высоты
-		/// </summary>
-		public static bool IsLandscape(this DeviceOrientation value)
-		{
-			return !value.IsPortrait();
-		}
+		public static bool IsLandscape(this DeviceOrientation value) => !value.IsPortrait();
 	}
 
 	public enum PlatformId
@@ -105,7 +65,10 @@ namespace Lime
 		public static readonly List<IWindow> Windows = new List<IWindow>();
 		public static bool IsTangerine;
 
-		public static long UpdateCounter { get; internal set; } 
+		/// <summary>
+		/// Gets the global update counter. The counter is incremented every time the active window got updated.
+		/// </summary>
+		public static long UpdateCounter { get; internal set; } = 1;
 
 		private static IWindow mainWindow;
 		public static IWindow MainWindow
@@ -418,44 +381,32 @@ namespace Lime
 		}
 
 #if iOS
-		private static float pixelsPerPoints = 0f;
+		private static float pixelsPerPoints;
+#endif
 
 		/// <summary>
-		/// Возвращает количество пикселей в дюйме по горизонтали и вертикали
+		/// Returns the main display's pixel density. 
 		/// </summary>
 		public static Vector2 ScreenDPI
 		{
-			get {
+#if WIN || MAC || MONOMAC
+			get { return Window.Current.PixelScale * 96 * Vector2.One; }
+#elif iOS
+			get
+			{
 				// Class-level initialization fails on iOS simulator in debug mode,
 				// because it is called before main UI thread.
 				if (pixelsPerPoints == 0)
 					pixelsPerPoints = (float)UIScreen.MainScreen.Scale;
 				return 160 * pixelsPerPoints * Vector2.One;
 			}
-		}
-
-#elif WIN || MAC || MONOMAC
-
-		/// <summary>
-		/// Возвращает количество пикселей в дюйме по горизонтали и вертикали.
-		/// </summary>
-		public static Vector2 ScreenDPI
-		{
-			get { return Window.Current.PixelScale * 96 * Vector2.One; }
-		}
-
 #elif ANDROID
-		/// <summary>
-		/// Возвращает количество пикселей в дюйме по горизонтали и вертикали
-		/// </summary>
-		public static Vector2 ScreenDPI
-		{
 			get
 			{
 				var dm = Android.Content.Res.Resources.System.DisplayMetrics;
 				return new Vector2(dm.Xdpi, dm.Ydpi);
 			}
-		}
 #endif
+		}
 	}
 }
