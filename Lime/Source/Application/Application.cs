@@ -70,6 +70,8 @@ namespace Lime
 		/// </summary>
 		public static long UpdateCounter { get; internal set; } = 1;
 
+		public static event Action<IWindow> ActiveWindowUpdated;
+
 		private static IWindow mainWindow;
 		public static IWindow MainWindow
 		{
@@ -111,6 +113,11 @@ namespace Lime
 					SupportedDeviceOrientationsChanged?.Invoke(value);
 				}
 			}
+		}
+
+		internal static void RaiseActiveWindowUpdated(IWindow window)
+		{
+			ActiveWindowUpdated?.Invoke(window);
 		}
 
 		/// <summary>
