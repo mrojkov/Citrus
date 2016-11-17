@@ -77,7 +77,7 @@ namespace Tangerine.UI.Timeline
 			}
 			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
 			rootWidget.Input.KeyPressed += (input, key) => {
-				if (key == KeyBindings.CloseDialog) {
+				if (key == Key.Escape) {
 					input.ConsumeKey(key);
 					window.Close();
 				}

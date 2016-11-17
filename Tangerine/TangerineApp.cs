@@ -10,7 +10,7 @@ namespace Tangerine
 	public class TangerineApp
 	{
 		public static TangerineApp Instance { get; private set; }
-		public readonly Menu PadsMenu;
+		public readonly IMenu PadsMenu;
 		public readonly Dictionary<string, Toolbar> Toolbars = new Dictionary<string, Toolbar>();
 		public readonly DockManager.State DockManagerInitialState;
 
@@ -29,10 +29,8 @@ namespace Tangerine
 			Theme.Current = new DesktopTheme();
 			LoadFont();
 
-			PadsMenu = new Submenu("Pads");
+			PadsMenu = new Menu();
 			DockManager.Initialize(new Vector2(1024, 768), PadsMenu);
-			DockManager.Instance.DockPanelAdded += panel => AddGlobalProcessors(panel.RootWidget);
-			AddGlobalProcessors(DockManager.Instance.DocumentArea);
 			CreateMainMenu();
 
 			Application.Exiting += () => Project.Current.Close();
@@ -83,7 +81,7 @@ namespace Tangerine
 
 			Toolbars.Add("Create", new Toolbar(dockManager.ToolbarArea));
 			Toolbars.Add("Tools", new Toolbar(dockManager.ToolbarArea));
-			foreach (var c in Application.MainMenu.FindCommand("Create").Submenu) {
+			foreach (var c in Application.MainMenu.FindCommand("Create").Menu) {
 				Toolbars["Create"].Add(c);
 			}
 			CreateToolsToolbar();
@@ -102,26 +100,26 @@ namespace Tangerine
 			if (proj != null) {
 				new Project(proj).Open();
 			}
+			ConnectCommandsToHandlers();
 		}
 
 		void CreateToolsToolbar()
 		{
 			var tb = Toolbars["Tools"];
-			tb.Add(new AlignLeft());
-			tb.Add(new AlignTop());
-			tb.Add(new AlignRight());
-			tb.Add(new AlignBottom());
-			tb.Add(new AlignCentersHorizontally());
-			tb.Add(new AlignCentersVertically());
-			tb.Add(new CenterHorizontally());
-			tb.Add(new CenterVertically());
-
-			tb.Add(new ResetScale());
-			tb.Add(new ResetRotation());
-			tb.Add(new FitToContainer());
-			tb.Add(new FitToContent());
-			tb.Add(new FlipX());
-			tb.Add(new FlipY());
+			tb.Add(Tools.AlignLeft);
+			tb.Add(Tools.AlignTop);
+			tb.Add(Tools.AlignRight);
+			tb.Add(Tools.AlignBottom);
+			tb.Add(Tools.AlignCentersHorizontally);
+			tb.Add(Tools.AlignCentersVertically);
+			tb.Add(Tools.CenterHorizontally);
+			tb.Add(Tools.CenterVertically);
+			tb.Add(Tools.ResetScale);
+			tb.Add(Tools.ResetRotation);
+			tb.Add(Tools.FitToContainer);
+			tb.Add(Tools.FitToContent);
+			tb.Add(Tools.FlipX);
+			tb.Add(Tools.FlipY);
 		}
 
 		Yuzu.AbstractDeserializer DeserializeHotStudioAssets(string path, System.IO.Stream stream)
@@ -132,12 +130,6 @@ namespace Tangerine
 				return new Orange.HotFontDeserializer(stream);
 			}
 			return null;
-		}
-
-		private void AddGlobalProcessors(Widget panel)
-		{
-			panel.LateTasks.Add(new UI.Timeline.GlobalKeyboardShortcutsProcessor(panel.Input));
-			panel.LateTasks.Add(new UI.SceneView.PreviewAnimationProcessor(panel.Input));
 		}
 
 		private static void RefreshExternalContent(Node node)
@@ -164,7 +156,7 @@ namespace Tangerine
 			}
 		}
 
-		static Frame InitializeDocumentArea(UI.DockManager dockManager)
+		static Frame InitializeDocumentArea(DockManager dockManager)
 		{
 			var tabBar = new TabBar { LayoutCell = new LayoutCell { StretchY = 0 } };
 			var documentViewContainer = new Frame {
@@ -218,83 +210,131 @@ namespace Tangerine
 		{
 			Application.MainMenu = new Menu {
 #if MAC
-				new Submenu("Application") {
-					new PreferencesCommand(),
+				new Command("Application", new Menu {
+					GenericCommands.PreferencesDialog,
 					Command.MenuSeparator,
-					new DelegateCommand("Quit", new Shortcut(Modifiers.Command, Key.Q), Application.Exit),
-				},
+					GenericCommands.Quit,
+				}),
 #endif
-				new Submenu("File") {
-					new NewCommand(),
+				new Command("File", new Menu {
+					GenericCommands.New,
 					Command.MenuSeparator,
-					new OpenCommand(),
-					new OpenProjectCommand(),
+					GenericCommands.Open,
+					GenericCommands.OpenProject,
 					Command.MenuSeparator,
-					new SaveCommand(),
-					new SaveAsCommand(),
+					GenericCommands.Save,
+					GenericCommands.SaveAs,
 					Command.MenuSeparator,
 #if !MAC
-					new PreferencesCommand(),
+					GenericCommands.PreferencesDialog,
 					Command.MenuSeparator,
 #endif
-					new CloseDocumentCommand(),
+					GenericCommands.CloseDocument,
 #if !MAC
-					new DelegateCommand("Quit", new Shortcut(Modifiers.Alt, Key.F4), Application.Exit),
+					GenericCommands.Quit,
 #endif
-				},
-				new Submenu("Edit") {
-					new KeySendingCommand("Undo", new Shortcut(Modifiers.Command, Key.Z), Key.Commands.Undo),
-					new KeySendingCommand("Redo", new Shortcut(Modifiers.Command | Modifiers.Shift, Key.Z), Key.Commands.Redo),
+				}),
+				new Command("Edit", new Menu {
+					Command.Undo,
+					Command.Redo,
 					Command.MenuSeparator,
-					new KeySendingCommand("Cut", new Shortcut(Modifiers.Command, Key.X), Key.Commands.Cut),
-					new KeySendingCommand("Copy", new Shortcut(Modifiers.Command, Key.C), Key.Commands.Copy),
-					new KeySendingCommand("Paste", new Shortcut(Modifiers.Command, Key.V), Key.Commands.Paste),
-					new KeySendingCommand("Delete", Key.Delete, Key.Commands.Delete),
+					Command.Cut,
+					Command.Copy,
+					Command.Paste,
+					Command.Delete,
 					Command.MenuSeparator,
-					new KeySendingCommand("Select All", new Shortcut(Modifiers.Command, Key.A), Key.Commands.SelectAll),
+					Command.SelectAll,
 					Command.MenuSeparator,
-					new GroupCommand(),
-					new UngroupCommand(),
-					new InsertTimelineColumn(),
-					new RemoveTimelineColumn(),
-				},
-				new Submenu("Create") {
-				},
-				new Submenu("View") {
-					new DefaultLayoutCommand(),
-					(Submenu)PadsMenu
-				},
-				new Submenu("Window") {
-					new NextDocumentCommand(),
-					new PreviousDocumentCommand(),
-				},
+					GenericCommands.Group,
+					GenericCommands.Ungroup,
+					GenericCommands.InsertTimelineColumn,
+					GenericCommands.RemoveTimelineColumn
+				}),
+				new Command("Create", new Menu()),
+				new Command("View", new Menu {
+					GenericCommands.DefaultLayout,
+					new Command("Pads", PadsMenu),
+				}),
+				new Command("Window", new Menu {
+					GenericCommands.NextDocument,
+					GenericCommands.PreviousDocument
+				}),
 			};
-			Application.MainMenu.FindCommand("Create").Submenu.AddRange(
-				new List<Type> {
-					typeof(Frame),
-					typeof(Image),
-					typeof(Movie),
-					typeof(Bone),
-					typeof(SplineGear),
-					typeof(ParticleEmitter),
-					typeof(ParticleModifier),
-					typeof(EmitterShapePoint),
-					typeof(ParticlesMagnet),
-					typeof(ParticleModifier),
-					typeof(SimpleText),
-					typeof(RichText),
-					typeof(TextStyle),
-					typeof(NineGrid),
-					typeof(DistortionMesh),
-					typeof(Spline),
-					typeof(SplinePoint),
-					typeof(ImageCombiner)
-				}.Select(i => new CreateNodeCommand(i)));
+			var nodeTypes = new[] {
+				typeof(Frame),
+				typeof(Image),
+				typeof(Movie),
+				typeof(Bone),
+				typeof(SplineGear),
+				typeof(ParticleEmitter),
+				typeof(ParticleModifier),
+				typeof(EmitterShapePoint),
+				typeof(ParticlesMagnet),
+				typeof(ParticleModifier),
+				typeof(SimpleText),
+				typeof(RichText),
+				typeof(TextStyle),
+				typeof(NineGrid),
+				typeof(DistortionMesh),
+				typeof(Spline),
+				typeof(SplinePoint),
+				typeof(ImageCombiner)
+			};
+			foreach (var t in nodeTypes) {
+				var cmd = new Command(t.Name) { Icon = NodeIconPool.GetTexture(t) };
+				CommandHandlerList.Global.Connect(cmd, new CreateNode(t));
+				Application.MainMenu.FindCommand("Create").Menu.Add(cmd);
+			}
+		}
+
+		void ConnectCommandsToHandlers()
+		{
+			var h = CommandHandlerList.Global;
+			h.Connect(GenericCommands.New, new FileNew());
+			h.Connect(GenericCommands.Open, new FileOpen());
+			h.Connect(GenericCommands.OpenProject, new FileOpenProject());
+			h.Connect(GenericCommands.Save, new FileSave());
+			h.Connect(GenericCommands.SaveAs, new FileSaveAs());
+			h.Connect(GenericCommands.CloseDocument, new FileClose());
+			h.Connect(GenericCommands.Quit, Application.Exit);
+			h.Connect(GenericCommands.PreferencesDialog, () => new PreferencesDialog());
+			h.Connect(GenericCommands.Group, new GroupNodes());
+			h.Connect(GenericCommands.Ungroup, new UngroupNodes());
+			h.Connect(GenericCommands.InsertTimelineColumn, new InsertTimelineColumn());
+			h.Connect(GenericCommands.RemoveTimelineColumn, new RemoveTimelineColumn());
+			h.Connect(GenericCommands.NextDocument, new SetNextDocument());
+			h.Connect(GenericCommands.PreviousDocument, new SetPreviousDocument());
+			h.Connect(GenericCommands.DefaultLayout, new ViewDefaultLayout());
+			h.Connect(Tools.AlignLeft, new AlignLeft());
+			h.Connect(Tools.AlignRight, new AlignRight());
+			h.Connect(Tools.AlignTop, new AlignTop());
+			h.Connect(Tools.AlignBottom, new AlignBottom());
+			h.Connect(Tools.CenterHorizontally, new CenterHorizontally());
+			h.Connect(Tools.CenterVertically, new CenterVertically());
+			h.Connect(Tools.AlignCentersHorizontally, new AlignCentersHorizontally());
+			h.Connect(Tools.AlignCentersVertically, new AlignCentersVertically());
+			h.Connect(Tools.ResetScale, new ResetScale());
+			h.Connect(Tools.ResetRotation, new ResetRotation());
+			h.Connect(Tools.FitToContainer, new FitToContainer());
+			h.Connect(Tools.FitToContent, new FitToContent());
+			h.Connect(Tools.FlipX, new FlipX());		
+			h.Connect(Tools.FlipY, new FlipY());
+			h.Connect(Command.Copy, Core.Operations.Copy.Perform, () => Document.Current?.SelectedRows.Count > 0);
+			h.Connect(Command.Cut, Core.Operations.Cut.Perform, () => Document.Current?.SelectedRows.Count > 0);
+			h.Connect(Command.Paste, Core.Operations.Paste.Perform, Document.HasCurrent);
+			h.Connect(Command.Delete, Core.Operations.Delete.Perform, () => Document.Current?.SelectedRows.Count > 0);
+			h.Connect(Command.SelectAll, () => {
+				foreach (var row in Document.Current.Rows) {
+					Core.Operations.SelectRow.Perform(row, true);
+				}
+			}, () => Document.Current?.Rows.Count > 0);
+			h.Connect(Command.Undo, () => Document.Current.History.Undo(), () => Document.Current?.History.CanUndo() ?? false);
+			h.Connect(Command.Redo, () => Document.Current.History.Redo(), () => Document.Current?.History.CanRedo() ?? false);
 		}
 
 		static void LoadFont()
 		{
-			var fontData = new Tangerine.UI.EmbeddedResource("Tangerine.Resources.SegoeUIRegular.ttf", "Tangerine").GetResourceBytes();
+			var fontData = new EmbeddedResource("Tangerine.Resources.SegoeUIRegular.ttf", "Tangerine").GetResourceBytes();
 			var font = new DynamicFont(fontData);
 			FontPool.Instance.AddFont("Default", font);
 		}

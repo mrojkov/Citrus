@@ -5,11 +5,8 @@ using Tangerine.UI;
 
 namespace Tangerine
 {
-	public class GroupCommand : Command
+	public class GroupNodes : DocumentCommandHandler
 	{
-		public override string Text => "Group";
-		public override Shortcut Shortcut => KeyBindings.GenericKeys.Group;
-
 		public override void Execute()
 		{
 			var nodes = Core.Document.Current?.SelectedNodes().Editable().Where(IsValidNode).ToList();
@@ -50,16 +47,13 @@ namespace Tangerine
 			}
 		}
 
-		public override bool Enabled => Core.Document.Current?.SelectedNodes().Editable().Any(IsValidNode) ?? false;
+		public override bool GetEnabled() => Core.Document.Current.SelectedNodes().Editable().Any(IsValidNode);
 
 		public static bool IsValidNode(Node node) => (node is Widget) || (node is Bone) || (node is Audio) || (node is ImageCombiner);
 	}
 
-	public class UngroupCommand : Command
+	public class UngroupNodes : DocumentCommandHandler
 	{
-		public override string Text => "Ungroup";
-		public override Shortcut Shortcut => KeyBindings.GenericKeys.Ungroup;
-
 		public override void Execute()
 		{
 			var groups = Core.Document.Current?.SelectedNodes().Editable().Where(n => n is Frame).ToList();
@@ -73,42 +67,34 @@ namespace Tangerine
 				Core.Operations.UnlinkNode.Perform(group);
 			}
 			foreach (var group in groups) {
-				foreach (var node in group.Nodes.ToList().Where(GroupCommand.IsValidNode)) {
+				foreach (var node in group.Nodes.ToList().Where(GroupNodes.IsValidNode)) {
 					Core.Operations.UnlinkNode.Perform(node);
 					Core.Operations.InsertNode.Perform(container, i++, node);
 					Core.Operations.SelectNode.Perform(node);
 					var widget = node as Widget;
 					if (widget != null) {
-						GroupCommand.TransformPropertyAndKeyframes<Vector2>(node, nameof(Widget.Position), v => container.CalcLocalToParentTransform() * v);
-						GroupCommand.TransformPropertyAndKeyframes<Vector2>(node, nameof(Widget.Scale), v => container.Scale * v);
-						GroupCommand.TransformPropertyAndKeyframes<float>(node, nameof(Widget.Rotation), v => container.Rotation + v);
-						GroupCommand.TransformPropertyAndKeyframes<Color4>(node, nameof(Widget.Color), v => container.Color * v);
+						GroupNodes.TransformPropertyAndKeyframes<Vector2>(node, nameof(Widget.Position), v => container.CalcLocalToParentTransform() * v);
+						GroupNodes.TransformPropertyAndKeyframes<Vector2>(node, nameof(Widget.Scale), v => container.Scale * v);
+						GroupNodes.TransformPropertyAndKeyframes<float>(node, nameof(Widget.Rotation), v => container.Rotation + v);
+						GroupNodes.TransformPropertyAndKeyframes<Color4>(node, nameof(Widget.Color), v => container.Color * v);
 					}
 				}
 			}
 		}
 
-		public override bool Enabled => Core.Document.Current?.SelectedNodes().Editable().Any(i => i is Frame) ?? false;
+		public override bool GetEnabled() => Core.Document.Current.SelectedNodes().Editable().Any(i => i is Frame);
 	}
 
-	public class InsertTimelineColumn : Command
+	public class InsertTimelineColumn : DocumentCommandHandler
 	{
-		public override string Text => "Insert Column On Timeline";
-		public override Shortcut Shortcut => KeyBindings.GenericKeys.InsertTimelineColumn;
-		public override bool Enabled => true;
-
 		public override void Execute()
 		{
 			Core.Operations.TimelineHorizontalShift.Perform(Tangerine.UI.Timeline.Timeline.Instance.CurrentColumn, 1);
 		}
 	}
 
-	public class RemoveTimelineColumn : Command
+	public class RemoveTimelineColumn : DocumentCommandHandler
 	{
-		public override string Text => "Remove Column On Timeline";
-		public override Shortcut Shortcut => KeyBindings.GenericKeys.RemoveTimelineColumn;
-		public override bool Enabled => true;
-
 		public override void Execute()
 		{
 			Core.Operations.TimelineHorizontalShift.Perform(Tangerine.UI.Timeline.Timeline.Instance.CurrentColumn, -1);

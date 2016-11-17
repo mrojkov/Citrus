@@ -19,14 +19,14 @@ namespace Tangerine.UI
 	public class DockManager
 	{
 		readonly List<DockPanel> panels = new List<DockPanel>();
-		readonly Menu padsMenu;
+		readonly IMenu padsMenu;
 		public readonly Widget ToolbarArea;
 		public readonly Widget DocumentArea;
 		public readonly WindowWidget MainWindowWidget;
 		public event Action<DockPanel> DockPanelAdded;
 		public static DockManager Instance { get; private set; }
 
-		public static void Initialize(Vector2 windowSize, Menu padsMenu)
+		public static void Initialize(Vector2 windowSize, IMenu padsMenu)
 		{
 			if (Instance != null) {
 				throw new InvalidOperationException();
@@ -34,7 +34,7 @@ namespace Tangerine.UI
 			Instance = new DockManager(windowSize, padsMenu);
 		}
 
-		private DockManager(Vector2 windowSize, Menu padsMenu)
+		private DockManager(Vector2 windowSize, IMenu padsMenu)
 		{
 			this.padsMenu = padsMenu;
 			var window = new Window(new WindowOptions { ClientSize = windowSize, FixedSize = false, Title = "Tangerine" });
@@ -58,7 +58,7 @@ namespace Tangerine.UI
 
 		public void AddPanel(DockPanel panel, DockSite site, Vector2 size)
 		{
-			padsMenu.Add(new DelegateCommand(panel.Title, () => ShowPanel(panel)));
+			padsMenu.Add(new Command(panel.Title, () => ShowPanel(panel)));
 			padsMenu.Refresh();
 			var dockedSize = CalcDockedSize(site, size);
 			panel.Placement = new DockPanel.PanelPlacement { Title = panel.Id, Site = site, DockedSize = dockedSize, Docked = true, UndockedSize = size };

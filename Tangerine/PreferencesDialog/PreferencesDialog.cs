@@ -54,7 +54,7 @@ namespace Tangerine
 			cancelButton.Clicked += window.Close;
 			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
 			rootWidget.LateTasks.AddLoop(() => {
-				if (rootWidget.Input.ConsumeKeyPress(KeyBindings.CloseDialog)) {
+				if (rootWidget.Input.ConsumeKeyPress(Key.Escape)) {
 					window.Close();
 				}
 			});

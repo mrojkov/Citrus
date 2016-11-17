@@ -10,7 +10,7 @@ namespace Tangerine.UI.Timeline.Components
 	{
 		// readonly Node node;
 		// readonly IAnimator animator;
-		readonly CurveEditorState curve;
+		// readonly CurveEditorState curve;
 		readonly Widget gridWidget;
 		readonly Widget overviewWidget;
 
@@ -18,7 +18,7 @@ namespace Tangerine.UI.Timeline.Components
 		{
 			// this.node = node;
 			// this.animator = animator;
-			this.curve = curve;
+			// this.curve = curve;
 			gridWidget = new Widget { LayoutCell = new LayoutCell { StretchY = 0 }, MinHeight = curve.RowHeight };
 			overviewWidget = new Widget { LayoutCell = new LayoutCell { StretchY = 0 }, MinHeight = curve.RowHeight };
 			gridWidget.Presenter = new DelegatePresenter<Widget>(Render);

@@ -81,6 +81,7 @@ namespace Tangerine.Core
 		}
 
 		public bool PreviewAnimation { get; set; }
+		public int PreviewAnimationBegin { get; set; }
 
 		public string AnimationId { get; set; }
 
@@ -213,5 +214,7 @@ namespace Tangerine.Core
 			}
 			return row;
 		}
+
+		public static bool HasCurrent() => Current != null;
 	}
 }

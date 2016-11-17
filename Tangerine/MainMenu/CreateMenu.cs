@@ -5,20 +5,13 @@ using Tangerine.UI;
 
 namespace Tangerine
 {
-	public class CreateNodeCommand : Command
+	public class CreateNode : DocumentCommandHandler
 	{
 		readonly Type type;
-		readonly string text;
-		readonly ITexture icon;
 
-		public override string Text => text;
-		public override ITexture Icon => icon;
-
-		public CreateNodeCommand(Type type)
+		public CreateNode(Type type)
 		{
 			this.type = type;
-			this.text = type.Name;
-			this.icon = NodeIconPool.GetTexture(type);
 		}
 
 		public override void Execute()

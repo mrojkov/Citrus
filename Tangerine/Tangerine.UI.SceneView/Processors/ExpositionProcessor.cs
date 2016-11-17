@@ -13,20 +13,20 @@ namespace Tangerine.UI.SceneView
 
 	public class ExpositionProcessor : Core.ITaskProvider
 	{
-		public static readonly Key Key = KeyBindings.SceneViewKeys.SceneExposition;
-		public static readonly Key MultiSelectKey = KeyBindings.SceneViewKeys.SceneExpositionMultiSelect;
+		public static readonly Key MainKey = Key.MapShortcut(Key.Tab);
+		public static readonly Key MultiSelectKey = Key.MapShortcut(Modifiers.Shift, Key.Tab);
 
 		public IEnumerator<object> Task()
 		{
 			const float animationLength = 0.75f;
 			while (true) {
 				var sv = SceneView.Instance;
-				if (sv.Input.ConsumeKeyPress(Key) || sv.Input.ConsumeKeyPress(MultiSelectKey)) {
+				if (sv.Input.ConsumeKeyPress(MainKey) || sv.Input.ConsumeKeyPress(MultiSelectKey)) {
 					sv.Components.Get<ExpositionComponent>().InProgress = true;
 					using (var exposition = new Exposition(sv.Frame, sv.Input)) {
 						float t = 0; 
 						while (true) {
-							if ((sv.Input.IsKeyPressed(Key) || sv.Input.IsKeyPressed(MultiSelectKey)) && !exposition.Closed()) {
+							if ((sv.Input.IsKeyPressed(MainKey) || sv.Input.IsKeyPressed(MultiSelectKey)) && !exposition.Closed()) {
 								if (t < animationLength) {
 									t += Lime.Task.Current.Delta;
 									if (t >= animationLength) {

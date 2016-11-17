@@ -16,18 +16,22 @@ namespace Tangerine.Core
 		public long BatchId { get; set; }
 		public abstract bool IsChangingDocument { get; }
 
-		readonly Dictionary<Type, object> backup = new Dictionary<Type, object>();
+		readonly List<object> backup = new List<object>();
 
 		public void Save<T>(T data)
 		{
-			backup.Add(typeof(T), data);
+			backup.Add(data);
 		}
 
 		public T Restore<T>()
 		{
-			var r = backup[typeof(T)];
-			backup.Remove(typeof(T));
-			return (T)r;
+			foreach (var i in backup) {
+				if (i is T) {
+					backup.Remove(i);
+					return (T)i;
+				}
+			}
+			throw new InvalidOperationException();
 		}
 	}
 

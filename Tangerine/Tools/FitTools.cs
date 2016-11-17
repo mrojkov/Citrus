@@ -5,11 +5,8 @@ using Tangerine.UI;
 
 namespace Tangerine
 {
-	public class ResetScale : Command
+	public class ResetScale : DocumentCommandHandler
 	{
-		public override string Text => "Reset scale";
-		public override ITexture Icon => UI.IconPool.GetTexture("Tools.SetUnitScale");
-
 		public override void Execute()
 		{
 			foreach (var widget in Core.Document.Current.SelectedNodes().Editable().OfType<Widget>()) {
@@ -18,11 +15,8 @@ namespace Tangerine
 		}
 	}
 
-	public class ResetRotation : Command
+	public class ResetRotation : DocumentCommandHandler
 	{
-		public override string Text => "Reset rotation";
-		public override ITexture Icon => UI.IconPool.GetTexture("Tools.SetZeroRotation");
-
 		public override void Execute()
 		{
 			foreach (var widget in Core.Document.Current.SelectedNodes().Editable().OfType<Widget>()) {
@@ -31,11 +25,8 @@ namespace Tangerine
 		}
 	}
 
-	public class FlipX : Command
+	public class FlipX : DocumentCommandHandler
 	{
-		public override string Text => "Flip horizontally";
-		public override ITexture Icon => UI.IconPool.GetTexture("Tools.FlipH");
-
 		public override void Execute()
 		{
 			foreach (var widget in Core.Document.Current.SelectedNodes().Editable().OfType<Widget>()) {
@@ -46,11 +37,8 @@ namespace Tangerine
 		}
 	}
 
-	public class FlipY : Command
+	public class FlipY : DocumentCommandHandler
 	{
-		public override string Text => "Flip vertically";
-		public override ITexture Icon => UI.IconPool.GetTexture("Tools.FlipV");
-
 		public override void Execute()
 		{
 			foreach (var widget in Core.Document.Current.SelectedNodes().Editable().OfType<Widget>()) {
@@ -61,11 +49,8 @@ namespace Tangerine
 		}
 	}
 
-	public class FitToContainer : Command
+	public class FitToContainer : DocumentCommandHandler
 	{
-		public override string Text => "Fit to container";
-		public override ITexture Icon => UI.IconPool.GetTexture("Tools.FitToContainer");
-
 		public override void Execute()
 		{
 			var container = (Widget)Core.Document.Current.Container;
@@ -79,11 +64,8 @@ namespace Tangerine
 		}
 	}
 
-	public class FitToContent : Command
+	public class FitToContent : DocumentCommandHandler
 	{
-		public override string Text => "Fit to content";
-		public override ITexture Icon => UI.IconPool.GetTexture("Tools.FitToContent");
-
 		public override void Execute()
 		{
 			var container = (Widget)Core.Document.Current.Container;

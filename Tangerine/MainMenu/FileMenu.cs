@@ -6,11 +6,8 @@ using Tangerine.UI;
 
 namespace Tangerine
 {
-	public class OpenProjectCommand : Command
+	public class FileOpenProject : CommandHandler
 	{
-		public override string Text => "Open Project...";
-		public override Shortcut Shortcut => KeyBindings.GenericKeys.OpenProject;
-
 		public override void Execute()
 		{
 			var dlg = new FileDialog { AllowedFileTypes = new string[] { "citproj" }, Mode = FileDialogMode.Open };
@@ -26,11 +23,12 @@ namespace Tangerine
 		}
 	}
 
-	public class NewCommand : Command
+	public class FileNew : CommandHandler
 	{
-		public override string Text => "New";
-		public override Shortcut Shortcut => KeyBindings.GenericKeys.New;
-		public override bool Enabled => Project.Current != null;
+		public override void RefreshCommand(ICommand command)
+		{
+			command.Enabled = Project.Current != null;
+		}
 
 		public override void Execute()
 		{
@@ -38,11 +36,12 @@ namespace Tangerine
 		}
 	}
 
-	public class OpenCommand : Command
+	public class FileOpen : CommandHandler
 	{
-		public override string Text => "Open ...";
-		public override Shortcut Shortcut => KeyBindings.GenericKeys.Open;
-		public override bool Enabled => Project.Current != null;
+		public override void RefreshCommand(ICommand command)
+		{
+			command.Enabled = Project.Current != null;
+		}
 
 		public override void Execute()
 		{
@@ -65,13 +64,9 @@ namespace Tangerine
 		}
 	}
 
-	public class SaveCommand : Command
+	public class FileSave : DocumentCommandHandler
 	{
-		public override string Text => "Save";
-		public override Shortcut Shortcut => KeyBindings.GenericKeys.Save;
-		public override bool Enabled => Document.Current != null;
-
-		static SaveCommand()
+		static FileSave()
 		{
 			Document.PathSelector += SelectPath;
 		}
@@ -101,12 +96,8 @@ namespace Tangerine
 		}
 	}
 
-	public class SaveAsCommand : Command
+	public class FileSaveAs : DocumentCommandHandler
 	{
-		public override string Text => "Save As...";
-		public override Shortcut Shortcut => KeyBindings.GenericKeys.SaveAs;
-		public override bool Enabled => Document.Current != null;
-
 		public override void Execute()
 		{
 			SaveAs();
@@ -131,11 +122,8 @@ namespace Tangerine
 		}
 	}
 
-	public class CloseDocumentCommand : Command
+	public class FileClose : DocumentCommandHandler
 	{
-		public override string Text => "Close Document...";
-		public override Shortcut Shortcut => KeyBindings.GenericKeys.CloseDocument;
-
 		public override void Execute()
 		{
 			if (Document.Current != null) {

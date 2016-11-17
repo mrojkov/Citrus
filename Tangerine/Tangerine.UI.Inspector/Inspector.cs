@@ -22,6 +22,11 @@ namespace Tangerine.UI.Inspector
 		public readonly List<IPropertyEditor> Editors;
 		public bool InspectRootNode { get; set; }
 
+		static Inspector()
+		{
+			CommandHandlerList.Global.Connect(InspectorCommands.InspectRootNodeCommand, () => Instance.InspectRootNode = !Instance.InspectRootNode);
+		}
+
 		public void Attach()
 		{
 			Instance = this;
@@ -56,7 +61,7 @@ namespace Tangerine.UI.Inspector
 
 		void SetupToolbar()
 		{
-			Toolbar.Add(new InspectRootNodeCommand());
+			Toolbar.Add(InspectorCommands.InspectRootNodeCommand);
 		}
 
 		void RegisterEditors()
@@ -117,17 +122,6 @@ namespace Tangerine.UI.Inspector
 				Condition = condition;
 				Builder = builder;
 			}
-		}
-	}
-
-	public class InspectRootNodeCommand : Command
-	{
-		public override string Text => "Inspect root node";
-		public override ITexture Icon => IconPool.GetTexture("Tools.Root");
-
-		public override void Execute()
-		{
-			Inspector.Instance.InspectRootNode = !Inspector.Instance.InspectRootNode;
 		}
 	}
 }

@@ -37,7 +37,7 @@ namespace Tangerine.UI
 			var cancelIndex = buttons.ToList().IndexOf("Cancel");
 			if (cancelIndex >= 0) {
 				rootWidget.LateTasks.AddLoop(() => {
-					if (rootWidget.Input.ConsumeKeyPress(KeyBindings.CloseDialog)) {
+					if (rootWidget.Input.ConsumeKeyPress(Key.Escape)) {
 						Close(cancelIndex);
 					}
 				});

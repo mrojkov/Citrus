@@ -41,6 +41,8 @@
     <Folder Include="Resources\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommandHandler.cs" />
+    <Compile Include="Commands.cs" />
     <Compile Include="Console.cs" />
     <Compile Include="Dialogs\AlertDialog.cs" />
     <Compile Include="Dialogs\ColorPickerDialog.cs" />
@@ -57,7 +59,6 @@
     <Compile Include="Utils\Colors.cs" />
     <Compile Include="Docking\DockManager.cs" />
     <Compile Include="Docking\DockPanel.cs" />
-    <Compile Include="KeyBindings.cs" />
     <Compile Include="Utils\TimelineMetrics.cs" />
     <Compile Include="Utils\Utils.cs" />
   </ItemGroup>

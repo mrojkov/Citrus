@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
 using Lime;
 using Tangerine.Core;
 
@@ -22,6 +22,29 @@ namespace Tangerine.UI.SceneView
 		public Vector2 MousePosition => Scene.Input.LocalMousePosition;
 
 		public static SceneView Instance { get; private set; }
+
+		static SceneView()
+		{
+			var h = CommandHandlerList.Global;
+			h.Connect(SceneViewCommands.PreviewAnimation, new PreviewAnimationHandler());
+			h.Connect(SceneViewCommands.DragUp, () => DragWidgets(new Vector2(0, -1)));
+			h.Connect(SceneViewCommands.DragDown, () => DragWidgets(new Vector2(0, 1)));
+			h.Connect(SceneViewCommands.DragLeft, () => DragWidgets(new Vector2(-1, 0)));
+			h.Connect(SceneViewCommands.DragRight, () => DragWidgets(new Vector2(1, 0)));
+			h.Connect(SceneViewCommands.DragUpFast, () => DragWidgets(new Vector2(0, -5)));
+			h.Connect(SceneViewCommands.DragDownFast, () => DragWidgets(new Vector2(0, 5)));
+			h.Connect(SceneViewCommands.DragLeftFast, () => DragWidgets(new Vector2(-5, 0)));
+			h.Connect(SceneViewCommands.DragRightFast, () => DragWidgets(new Vector2(5, 0)));
+		}
+
+		static void DragWidgets(Vector2 delta)
+		{
+			var transform = Document.Current.Container.AsWidget.CalcTransitionToSpaceOf(SceneView.Instance.Scene).CalcInversed();
+			var dragDelta = transform * delta - transform * Vector2.Zero;
+			foreach (var widget in Document.Current.SelectedNodes().Editable().OfType<Widget>()) {
+				Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), widget.Position + dragDelta);
+			}
+		}
 
 		public SceneView(Widget panelWidget)
 		{
@@ -71,7 +94,7 @@ namespace Tangerine.UI.SceneView
 				new RotateWidgetsProcessor(),
 				new MouseSelectionProcessor(),
 				new ShiftClickProcessor(),
-				new WASDProcessor()
+				new PreviewAnimationProcessor()
 			);
 		}
 

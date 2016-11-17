@@ -55,11 +55,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Processors\MouseScrollProcessor.cs" />
     <Compile Include="Processors\ExpositionProcessor.cs" />
-    <Compile Include="Processors\PreviewAnimationProcessor.cs" />
     <Compile Include="Processors\MouseSelectionProcessor.cs" />
     <Compile Include="Processors\ResizeWidgetsProcessor.cs" />
     <Compile Include="Processors\DragWidgetsProcessor.cs" />
-    <Compile Include="Processors\WASDProcessor.cs" />
     <Compile Include="Processors\RotateWidgetsProcessor.cs" />
     <Compile Include="Processors\DragPivotProcessor.cs" />
     <Compile Include="Processors\CreateNodeProcessor.cs" />
@@ -69,6 +67,8 @@
     <Compile Include="Presenters\ContainerAreaPresenter.cs" />
     <Compile Include="Presenters\PointObjectsPresenter.cs" />
     <Compile Include="Processors\DragPointObjectsProcessor.cs" />
+    <Compile Include="PreviewAnimationHandler.cs" />
+    <Compile Include="Processors\PreviewAnimationProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Mac.csproj">
@@ -77,11 +77,11 @@
     </ProjectReference>
     <ProjectReference Include="..\Tangerine.Core\Tangerine.Core.Mac.csproj">
       <Project>{05FB6476-C29B-49A7-918C-A52CAF73FCA7}</Project>
-      <Name>Tangerine.Core</Name>
+      <Name>Tangerine.Core.Mac</Name>
     </ProjectReference>
     <ProjectReference Include="..\Tangerine.UI\Tangerine.UI.Mac.csproj">
       <Project>{E62BA18F-4E1A-466A-8299-67AD567F17E5}</Project>
-      <Name>Tangerine.UI</Name>
+      <Name>Tangerine.UI.Mac</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

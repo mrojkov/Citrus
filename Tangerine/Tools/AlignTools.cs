@@ -6,11 +6,8 @@ using Tangerine.UI;
 
 namespace Tangerine
 {
-	public class CenterHorizontally : Command
+	public class CenterHorizontally : DocumentCommandHandler
 	{
-		public override string Text => "Center horizontally";
-		public override ITexture Icon => UI.IconPool.GetTexture("Tools.CenterH");
-
 		public override void Execute()
 		{
 			Rectangle aabb;
@@ -31,11 +28,8 @@ namespace Tangerine
 		}
 	}
 
-	public class CenterVertically : Command
+	public class CenterVertically : DocumentCommandHandler
 	{
-		public override string Text => "Center vertically";
-		public override ITexture Icon => UI.IconPool.GetTexture("Tools.CenterV");
-
 		public override void Execute()
 		{
 			Rectangle aabb;
@@ -56,11 +50,8 @@ namespace Tangerine
 		}
 	}
 
-	public class AlignCentersHorizontally : Command
+	public class AlignCentersHorizontally : DocumentCommandHandler
 	{
-		public override string Text => "Align centers horizontally";
-		public override ITexture Icon => UI.IconPool.GetTexture("Tools.AlignCentersHorizontally");
-
 		public override void Execute()
 		{
 			Rectangle aabb;
@@ -81,11 +72,8 @@ namespace Tangerine
 		}
 	}
 
-	public class AlignCentersVertically : Command
+	public class AlignCentersVertically : DocumentCommandHandler
 	{
-		public override string Text => "Align centers vertically";
-		public override ITexture Icon => UI.IconPool.GetTexture("Tools.AlignCentersVertically");
-
 		public override void Execute()
 		{
 			Rectangle aabb;
@@ -106,11 +94,8 @@ namespace Tangerine
 		}
 	}
 
-	public class AlignTop : Command
+	public class AlignTop : DocumentCommandHandler
 	{
-		public override string Text => "Align top";
-		public override ITexture Icon => UI.IconPool.GetTexture("Tools.AlignTop");
-
 		public override void Execute()
 		{
 			Rectangle aabb;
@@ -131,11 +116,8 @@ namespace Tangerine
 		}
 	}
 
-	public class AlignBottom : Command
+	public class AlignBottom : DocumentCommandHandler
 	{
-		public override string Text => "Align bottom";
-		public override ITexture Icon => UI.IconPool.GetTexture("Tools.AlignBottom");
-
 		public override void Execute()
 		{
 			Rectangle aabb;
@@ -156,11 +138,8 @@ namespace Tangerine
 		}
 	}
 
-	public class AlignLeft : Command
+	public class AlignLeft : DocumentCommandHandler
 	{
-		public override string Text => "Align left";
-		public override ITexture Icon => UI.IconPool.GetTexture("Tools.AlignLeft");
-
 		public override void Execute()
 		{
 			Rectangle aabb;
@@ -181,11 +160,8 @@ namespace Tangerine
 		}
 	}
 
-	public class AlignRight : Command
+	public class AlignRight : DocumentCommandHandler
 	{
-		public override string Text => "Align right";
-		public override ITexture Icon => UI.IconPool.GetTexture("Tools.AlignRight");
-
 		public override void Execute()
 		{
 			Rectangle aabb;

@@ -158,5 +158,53 @@ namespace Tangerine.UI.Timeline
 			var pos = Document.Current.Rows[row].GetGridWidget().Top - ScrollPos.Y;
 			return pos >= 0 && pos < Grid.Size.Y;
 		}
+
+		static Timeline()
+		{
+			var h = CommandHandlerList.Global;
+			h.Connect(TimelineCommands.EnterNode, () => {
+				var node = Document.Current.SelectedNodes().FirstOrDefault();
+				if (node != null) {
+					Core.Operations.EnterNode.Perform(node);
+				}
+			}, Document.HasCurrent);
+			h.Connect(TimelineCommands.ExitNode, Core.Operations.LeaveNode.Perform, Document.HasCurrent);
+			h.Connect(TimelineCommands.ScrollUp, () => SelectRow(-1, false), Document.HasCurrent);
+			h.Connect(TimelineCommands.ScrollDown, () => SelectRow(1, false), Document.HasCurrent);
+			h.Connect(TimelineCommands.SelectUp, () => SelectRow(-1, true), Document.HasCurrent);
+			h.Connect(TimelineCommands.SelectDown, () => SelectRow(1, true), Document.HasCurrent);
+			h.Connect(TimelineCommands.ScrollLeft, () => AdvanceCurrentColumn(-1), Document.HasCurrent);
+			h.Connect(TimelineCommands.ScrollRight, () => AdvanceCurrentColumn(1), Document.HasCurrent);
+			h.Connect(TimelineCommands.FastScrollLeft, () => AdvanceCurrentColumn(-10), Document.HasCurrent);
+			h.Connect(TimelineCommands.FastScrollRight, () => AdvanceCurrentColumn(10), Document.HasCurrent);
+		}
+
+		static void SelectRow(int advance, bool multiselection)
+		{
+			var doc = Document.Current;
+			if (doc.Rows.Count == 0) {
+				return;
+			}
+			if (doc.SelectedRows.Count == 0) {
+				Core.Operations.SelectRow.Perform(doc.Rows[0]);
+				return;
+			}
+			var lastSelectedRow = doc.SelectedRows[0];
+			var nextRow = doc.Rows[Mathf.Clamp(lastSelectedRow.Index + advance, 0, doc.Rows.Count - 1)];
+			if (nextRow != lastSelectedRow) {
+				if (!multiselection) {
+					Core.Operations.ClearRowSelection.Perform();
+				}
+				if (doc.SelectedRows.Contains(nextRow)) {
+					Core.Operations.SelectRow.Perform(lastSelectedRow, false);
+				}
+				Core.Operations.SelectRow.Perform(nextRow);
+			}
+		}
+
+		static void AdvanceCurrentColumn(int stride)
+		{
+			Operations.SetCurrentColumn.Perform(Math.Max(0, Instance.CurrentColumn + stride));
+		}
 	}
 }

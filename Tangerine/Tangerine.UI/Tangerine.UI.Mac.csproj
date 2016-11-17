@@ -16,7 +16,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;</DefineConstants>
+    <DefineConstants>__UNIFIED__;DEBUG;MAC</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -30,9 +30,10 @@
     <HttpClientHandler>HttpClientHandler</HttpClientHandler>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>full</DebugType>
+    <DebugType></DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
+    <DefineConstants>__UNIFIED__;MAC</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -66,7 +67,7 @@
     <Compile Include="Utils\Colors.cs" />
     <Compile Include="Docking\DockManager.cs" />
     <Compile Include="Docking\DockPanel.cs" />
-    <Compile Include="KeyBindings.cs" />
+    <Compile Include="Commands.cs" />
     <Compile Include="Console.cs" />
     <Compile Include="ToolbarButton.cs" />
     <Compile Include="Dialogs\AlertDialog.cs" />
@@ -77,12 +78,13 @@
     <Compile Include="Toolbar.cs" />
     <Compile Include="Utils\Utils.cs" />
     <Compile Include="Utils\TimelineMetrics.cs" />
+    <Compile Include="CommandHandler.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>
     <ProjectReference Include="..\Tangerine.Core\Tangerine.Core.Mac.csproj">
       <Project>{05FB6476-C29B-49A7-918C-A52CAF73FCA7}</Project>
-      <Name>Tangerine.Core</Name>
+      <Name>Tangerine.Core.Mac</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Lime\Lime.Mac.csproj">
       <Project>{DC16EEBF-404D-4610-B87A-15B57464D707}</Project>

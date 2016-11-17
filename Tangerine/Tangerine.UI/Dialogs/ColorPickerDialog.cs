@@ -62,7 +62,7 @@ namespace Tangerine.UI
 			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
 			okButton.SetFocus();
 			rootWidget.Input.KeyPressed += (input, key) => {
-				if (key == KeyBindings.CloseDialog) {
+				if (key == Key.Escape) {
 					input.ConsumeKey(key);
 					Close(false);
 				}
