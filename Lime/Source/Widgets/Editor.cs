@@ -74,40 +74,39 @@ namespace Lime
 #endif
 			private const Modifiers SelectModifier = Modifiers.Shift;
 
-			public static Key MoveCharPrev = Key.MapShortcut(Key.Left);
-			public static Key MoveCharNext = Key.MapShortcut(Key.Right);
+			public static ICommand MoveCharPrev = new Command(Key.Left);
+			public static ICommand MoveCharNext = new Command(Key.Right);
 
-			public static Key MoveWordPrev = Key.MapShortcut(WordModifier, Key.Left);
-			public static Key MoveWordNext = Key.MapShortcut(WordModifier, Key.Right);
+			public static ICommand MoveWordPrev = new Command(WordModifier, Key.Left);
+			public static ICommand MoveWordNext = new Command(WordModifier, Key.Right);
 
-			public static Key MoveLinePrev = Key.MapShortcut(Key.Up);
-			public static Key MoveLineNext = Key.MapShortcut(Key.Down);
+			public static ICommand MoveLinePrev = new Command(Key.Up);
+			public static ICommand MoveLineNext = new Command(Key.Down);
 
-			public static Key MoveLineStart = Key.MapShortcut(Key.Home);
-			public static Key MoveLineEnd = Key.MapShortcut(Key.End);
+			public static ICommand MoveLineStart = new Command(Key.Home);
+			public static ICommand MoveLineEnd = new Command(Key.End);
 
-			public static Key SelectCharPrev = Key.MapShortcut(SelectModifier, Key.Left);
-			public static Key SelectCharNext = Key.MapShortcut(SelectModifier, Key.Right);
+			public static ICommand SelectCharPrev = new Command(SelectModifier, Key.Left);
+			public static ICommand SelectCharNext = new Command(SelectModifier, Key.Right);
 
-			public static Key SelectWordPrev = Key.MapShortcut(SelectModifier | WordModifier, Key.Left);
-			public static Key SelectWordNext = Key.MapShortcut(SelectModifier | WordModifier, Key.Right);
+			public static ICommand SelectWordPrev = new Command(SelectModifier | WordModifier, Key.Left);
+			public static ICommand SelectWordNext = new Command(SelectModifier | WordModifier, Key.Right);
 
-			public static Key SelectLineStart = Key.MapShortcut(SelectModifier, Key.Home);
-			public static Key SelectLineEnd = Key.MapShortcut(SelectModifier, Key.End);
+			public static ICommand SelectLineStart = new Command(SelectModifier, Key.Home);
+			public static ICommand SelectLineEnd = new Command(SelectModifier, Key.End);
 
-			public static Key SelectAll = Key.MapShortcut(Modifiers.Command, Key.A);
-			public static Key SelectCurrentWord = Key.MapShortcut(Modifiers.Command | Modifiers.Shift, Key.W);
+			public static ICommand SelectCurrentWord = new Command(Modifiers.Command | Modifiers.Shift, Key.W);
 
-			public static Key DeleteWordPrev = Key.MapShortcut(Modifiers.Control, Key.BackSpace);
-			public static Key DeleteWordNext = Key.MapShortcut(Modifiers.Control, Key.Delete);
+			public static ICommand DeleteWordPrev = new Command(Modifiers.Control, Key.BackSpace);
+			public static ICommand DeleteWordNext = new Command(Modifiers.Control, Key.Delete);
 
-			public static Key Submit = Key.MapShortcut(Key.Enter);
-			public static Key Cancel = Key.MapShortcut(Key.Escape);
+			public static ICommand Submit = new Command(Key.Enter);
+			public static ICommand Cancel = new Command(Key.Escape);
 
-			public static Key BackSpace = Key.MapShortcut(Key.BackSpace);
-			public static Key ToggleOverwrite = Key.MapShortcut(Key.Insert);
+			public static ICommand BackSpace = new Command(Key.BackSpace);
+			public static ICommand ToggleOverwrite = new Command(Key.Insert);
 
-			public static Key ContextMenu = Key.MapShortcut(Key.Menu);
+			public static ICommand ContextMenu = new Command(Key.Menu);
 		}
 
 		bool IsTextReadable => !EditorParams.UseSecureString && !EditorParams.PasswordChar.HasValue;
@@ -171,8 +170,6 @@ namespace Lime
 
 		private WidgetInput input => InputWidget.Input;
 
-		private bool WasKeyRepeated(Key key) => input.WasKeyRepeated(key);
-
 		private float CalcTextHeight(string s)
 		{
 			var text = Text.Text;
@@ -182,24 +179,23 @@ namespace Lime
 			return height;
 		}
 
-		static readonly List<Key> consumingKeys = Key.Enumerate().Where(
-			k => k.IsPrintable() || k.IsTextEditing()).Concat(
-				new[] {
-					Cmds.MoveCharPrev, Cmds.MoveCharNext,
-					Cmds.MoveWordPrev, Cmds.MoveWordNext,
-					Cmds.MoveLineStart, Cmds.MoveLineEnd,
-					Cmds.SelectCharPrev, Cmds.SelectCharNext,
-					Cmds.SelectWordPrev, Cmds.SelectWordNext,
-					Cmds.SelectLineStart, Cmds.SelectLineEnd,
-					Cmds.SelectAll, Cmds.SelectCurrentWord,
-					Cmds.DeleteWordPrev, Cmds.DeleteWordNext,
-					Cmds.Submit, Cmds.Cancel,
-					Cmds.BackSpace, Cmds.ToggleOverwrite,
-					Cmds.ContextMenu,
-					Key.Commands.Cut, Key.Commands.Copy, Key.Commands.Paste, Key.Commands.Delete,
-					Key.Commands.Undo, Key.Commands.Redo,
-				}
-			).ToList();
+		static readonly List<ICommand> consumingCommands =
+			Command.Editing.Union(
+			Key.Enumerate().Where(k => k.IsPrintable() || k.IsTextEditing()).Select(i => new Command(i)).Union(
+			Key.Enumerate().Where(k => k.IsPrintable()).Select(i => new Command(new Shortcut(Modifiers.Shift, i)))).Union(
+			new [] {
+				Cmds.MoveCharPrev, Cmds.MoveCharNext,
+				Cmds.MoveWordPrev, Cmds.MoveWordNext,
+				Cmds.MoveLineStart, Cmds.MoveLineEnd,
+				Cmds.SelectCharPrev, Cmds.SelectCharNext,
+				Cmds.SelectWordPrev, Cmds.SelectWordNext,
+				Cmds.SelectLineStart, Cmds.SelectLineEnd,
+				Cmds.SelectCurrentWord,
+				Cmds.DeleteWordPrev, Cmds.DeleteWordNext,
+				Cmds.Submit, Cmds.Cancel,
+				Cmds.BackSpace, Cmds.ToggleOverwrite,
+				Cmds.ContextMenu,
+		})).ToList();
 
 		private bool IsMultiline() => EditorParams.IsAcceptableLines(2);
 
@@ -328,103 +324,105 @@ namespace Lime
 		private void HandleKeys()
 		{
 			try {
-				if (WasKeyRepeated(Cmds.MoveCharPrev))
+				if (Cmds.ContextMenu.WasIssued()) {
+					ShowContextMenu(atCaret: true);
+				}
+				if (Cmds.MoveCharPrev.WasIssued())
 					MoveCaret(() => CaretPos.TextPos--);
-				if (WasKeyRepeated(Cmds.MoveCharNext))
+				if (Cmds.MoveCharNext.WasIssued())
 					MoveCaret(() => CaretPos.TextPos++);
-				if (WasKeyRepeated(Cmds.MoveWordPrev) && IsTextReadable)
+				if (Cmds.MoveWordPrev.WasIssued() && IsTextReadable)
 					MoveCaret(() => CaretPos.TextPos = PreviousWord(Text.Text, CaretPos.TextPos));
-				if (WasKeyRepeated(Cmds.MoveWordNext) && IsTextReadable)
+				if (Cmds.MoveWordNext.WasIssued() && IsTextReadable)
 					MoveCaret(() => CaretPos.TextPos = NextWord(Text.Text, CaretPos.TextPos));
-				if (IsMultiline() && WasKeyRepeated(Cmds.MoveLinePrev) && IsTextReadable)
+				if (IsMultiline() && Cmds.MoveLinePrev.WasIssued() && IsTextReadable)
 					MoveCaret(() => CaretPos.Line--);
-				if (IsMultiline() && WasKeyRepeated(Cmds.MoveLineNext) && IsTextReadable)
+				if (IsMultiline() && Cmds.MoveLineNext.WasIssued() && IsTextReadable)
 					MoveCaret(() => CaretPos.Line++);
-				if (WasKeyRepeated(Cmds.MoveLineStart))
+				if (Cmds.MoveLineStart.WasIssued())
 					MoveCaret(() => CaretPos.Col = 0);
-				if (WasKeyRepeated(Cmds.MoveLineEnd))
+				if (Cmds.MoveLineEnd.WasIssued())
 					MoveCaret(() => CaretPos.Col = int.MaxValue);
 
-				if (WasKeyRepeated(Cmds.SelectCharPrev))
+				if (Cmds.SelectCharPrev.WasIssued())
 					MoveCaretSelection(() => CaretPos.TextPos--);
-				if (WasKeyRepeated(Cmds.SelectCharNext))
+				if (Cmds.SelectCharNext.WasIssued())
 					MoveCaretSelection(() => CaretPos.TextPos++);
-				if (WasKeyRepeated(Cmds.SelectWordPrev) && IsTextReadable)
+				if (Cmds.SelectWordPrev.WasIssued() && IsTextReadable)
 					MoveCaretSelection(() => CaretPos.TextPos = PreviousWord(Text.Text, CaretPos.TextPos));
-				if (WasKeyRepeated(Cmds.SelectWordNext) && IsTextReadable)
+				if (Cmds.SelectWordNext.WasIssued() && IsTextReadable)
 					MoveCaretSelection(() => CaretPos.TextPos = NextWord(Text.Text, CaretPos.TextPos));
-				if (WasKeyRepeated(Cmds.SelectLineStart))
+				if (Cmds.SelectLineStart.WasIssued())
 					MoveCaretSelection(() => CaretPos.Col = 0);
-				if (WasKeyRepeated(Cmds.SelectLineEnd))
+				if (Cmds.SelectLineEnd.WasIssued())
 					MoveCaretSelection(() => CaretPos.Col = int.MaxValue);
-				if (input.WasKeyPressed(Cmds.SelectAll))
+				if (Command.SelectAll.WasIssued())
 					SelectAll();
-				if (input.WasKeyPressed(Cmds.SelectCurrentWord) && IsTextReadable)
+				if (Cmds.SelectCurrentWord.WasIssued() && IsTextReadable)
 					SelectWord();
 
-				if (WasKeyRepeated(Cmds.ToggleOverwrite))
+				if (Cmds.ToggleOverwrite.WasIssued())
 					OverwriteMode = !OverwriteMode;
-				if (WasKeyRepeated(Key.Commands.Delete))
+				if (Command.Delete.WasIssued())
 					DeleteChar();
-				if (WasKeyRepeated(Cmds.DeleteWordPrev) && IsTextReadable) {
+				if (Cmds.DeleteWordPrev.WasIssued() && IsTextReadable) {
 					var p = PreviousWord(Text.Text, CaretPos.TextPos);
 					if (p < CaretPos.TextPos)
 						RemoveText(p, CaretPos.TextPos - p, p);
 				}
-				if (WasKeyRepeated(Cmds.DeleteWordNext) && IsTextReadable) {
+				if (Cmds.DeleteWordNext.WasIssued() && IsTextReadable) {
 					var p = NextWord(Text.Text, CaretPos.TextPos);
 					if (p > CaretPos.TextPos)
 						RemoveText(CaretPos.TextPos, p - CaretPos.TextPos);
 				}
 
-				if (WasKeyRepeated(Cmds.Submit)) {
+				if (Cmds.Submit.WasIssued()) {
 					if (IsMultiline()) {
 						if (EditorParams.IsAcceptableLines(Text.Text.Count(ch => ch == '\n') + 2))
 							InsertText("\n");
-						input.ConsumeKey(Cmds.Submit);
+						Cmds.Submit.Consume();
 					} else {
 						HideSelection();
-						input.ConsumeKey(Cmds.Submit);
+						Cmds.Submit.Consume();
 						InputWidget.RevokeFocus();
 					}
 				}
-				if (WasKeyRepeated(Cmds.Cancel) && IsTextReadable) {
+				if (Cmds.Cancel.WasIssued() && IsTextReadable) {
 					if (History.CanUndo())
 						ApplyUndoItem(History.ClearAndRestore());
 					HideSelection();
 					History.Clear();
-					input.ConsumeKey(Cmds.Cancel);
+					Cmds.Cancel.Consume();
 					InputWidget.RevokeFocus();
 				}
 
-				if (WasKeyRepeated(Cmds.ContextMenu))
-					ShowContextMenu(atCaret: true);
-				if (input.WasKeyPressed(Key.Commands.Copy) && HasSelection() && IsTextReadable) {
+				if (Command.Copy.WasIssued() && HasSelection() && IsTextReadable) {
 					var r = GetSelectionRange();
 					Clipboard.Text = Text.Text.Substring(r.Start, r.Length);
 				}
-				if (input.WasKeyPressed(Key.Commands.Cut) && HasSelection() && IsTextReadable) {
+				if (Command.Cut.WasIssued() && HasSelection() && IsTextReadable) {
 					var r = GetSelectionRange();
 					Clipboard.Text = Text.Text.Substring(r.Start, r.Length);
 					DeleteSelection();
 				}
-				if (WasKeyRepeated(Key.Commands.Paste))
+				if (Command.Paste.WasIssued())
 					InsertText(Clipboard.Text);
-				if (WasKeyRepeated(Key.Commands.Undo) && History.CanUndo())
+				if (Command.Undo.WasIssued() && History.CanUndo())
 					ApplyUndoItem(History.Undo(MakeUndoItem()));
-				if (WasKeyRepeated(Key.Commands.Redo) && History.CanRedo())
+				if (Command.Redo.WasIssued() && History.CanRedo())
 					ApplyUndoItem(History.Redo());
 			} finally {
 				var hs = HasSelection();
-				input.SetKeyEnabled(Key.Commands.Cut, hs && IsTextReadable);
-				input.SetKeyEnabled(Key.Commands.Copy, hs && IsTextReadable);
-				input.SetKeyEnabled(Key.Commands.Delete, hs);
-				input.SetKeyEnabled(Key.Commands.Paste, !string.IsNullOrEmpty(Clipboard.Text));
-				input.SetKeyEnabled(Key.Commands.Undo, History.CanUndo());
-
-				input.ConsumeKeys(consumingKeys);
-				if (IsMultiline())
-					input.ConsumeKeys(new[] { Cmds.MoveLinePrev, Cmds.MoveLineNext, });
+				Command.Cut.Enabled = hs && IsTextReadable;
+				Command.Copy.Enabled = hs && IsTextReadable;
+				Command.Delete.Enabled = hs;
+				Command.Paste.Enabled = !string.IsNullOrEmpty(Clipboard.Text);
+				Command.Undo.Enabled = History.CanUndo();
+				Command.ConsumeRange(consumingCommands);
+				if (IsMultiline()) {
+					Cmds.MoveLinePrev.Consume();
+					Cmds.MoveLineNext.Consume();
+				}
 			}
 		}
 
@@ -488,6 +486,8 @@ namespace Lime
 					InputWidget.SetFocus();
 				}
 				if (InputWidget.IsFocused()) {
+					if (input.WasMouseReleased(1))
+						ShowContextMenu(atCaret: false);
 					HandleKeys();
 					HandleTextInput();
 					var p = input.MousePosition;
@@ -510,8 +510,6 @@ namespace Lime
 					else {
 						input.ReleaseMouse();
 					}
-					if (input.WasMouseReleased(1))
-						ShowContextMenu(atCaret: false);
 					Text.SyncCaretPosition();
 				}
 				AdjustSizeAndScrollToCaret();
@@ -533,14 +531,14 @@ namespace Lime
 #if MAC || WIN
 			var i = Window.Current.Input;
 			var m = new Menu {
-				new LocalKeySendingCommand(i, "Undo", Key.Commands.Undo),
+				Command.Undo,
 				Command.MenuSeparator,
-				new LocalKeySendingCommand(i, "Cut", Key.Commands.Cut),
-				new LocalKeySendingCommand(i, "Copy", Key.Commands.Copy),
-				new LocalKeySendingCommand(i, "Paste", Key.Commands.Paste),
-				new LocalKeySendingCommand(i, "Delete", Key.Commands.Delete),
+				Command.Cut,
+				Command.Copy,
+				Command.Paste,
+				Command.Delete,
 				Command.MenuSeparator,
-				new LocalKeySendingCommand(i, "Select all", Key.Commands.SelectAll),
+				Command.SelectAll,
 			};
 			if (atCaret) {
 				var p = DisplayWidget.LocalToWorldTransform.TransformVector(CaretPos.WorldPos);

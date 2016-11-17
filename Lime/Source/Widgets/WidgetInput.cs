@@ -172,18 +172,6 @@ namespace Lime
 			return false;
 		}
 
-		public bool IsKeyEnabled(Key key)
-		{
-			return windowInput.IsKeyEnabled(key);
-		}
-
-		public void SetKeyEnabled(Key key, bool enable = true)
-		{
-			if (IsAcceptingKey(key)) {
-				windowInput.SetKeyEnabled(key, enable);
-			}
-		}
-
 		public void ConsumeKey(Key key)
 		{
 			if (IsAcceptingKey(key)) {

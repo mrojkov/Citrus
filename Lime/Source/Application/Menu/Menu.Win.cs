@@ -41,16 +41,12 @@ namespace Lime
 
 		private IEnumerable<ICommand> AllCommands()
 		{
-			foreach (var i in this)
-			{
+			foreach (var i in this) {
 				yield return i;
 			}
-			foreach (var i in this)
-			{
-				if (i.Submenu != null)
-				{
-					foreach (var j in i.Submenu.AllCommands())
-					{
+			foreach (var i in this) {
+				if (i.Menu != null) {
+					foreach (var j in ((Menu)i.Menu).AllCommands()) {
 						yield return j;
 					}
 				}
@@ -127,6 +123,7 @@ namespace Lime
 
 	class MenuItem
 	{
+		private int commandVersion;
 		public readonly ICommand Command;
 		public readonly ToolStripItem NativeItem;
 
@@ -137,13 +134,20 @@ namespace Lime
 				NativeItem = new ToolStripSeparator();
 			} else {
 				NativeItem = new ToolStripMenuItem();
-				NativeItem.Click += (s, e) => command.Execute();
+				NativeItem.Click += (s, e) => ((Command)command).Issue();
 			}
 			Refresh();
 		}
 
 		public void Refresh()
 		{
+			if (Command.Menu != null) {
+				Command.Menu.Refresh();
+			}
+			if (Command.Version == commandVersion) {
+				return;
+			}
+			commandVersion = Command.Version;
 			NativeItem.Visible = Command.Visible;
 			NativeItem.Enabled = Command.Enabled;
 			NativeItem.Text = Command.Text;
@@ -151,9 +155,8 @@ namespace Lime
 			if (mi == null)
 				return;
 			mi.ShortcutKeys = ToNativeKeys(Command.Shortcut);
-			if (Command.Submenu != null) {
-				Command.Submenu.Refresh();
-				mi.DropDown = Command.Submenu.NativeContextMenu;
+			if (Command.Menu != null) {
+				mi.DropDown = ((Menu)Command.Menu).NativeContextMenu;
 			} else {
 				mi.DropDown = null;
 			}

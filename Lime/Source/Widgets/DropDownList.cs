@@ -89,12 +89,12 @@ namespace Lime
 			int j = 0;
 			ICommand selectedCommand = null;
 			foreach (var i in Items) {
-				var command = new DelegateCommand(i.Text);
+				var command = new Command(i.Text);
 				if (j == Index) {
 					selectedCommand = command;
 				}
 				var t = j;
-				command.Executing += () => {
+				command.Issued += () => {
 					Index = t; 
 					if (Changed != null) {
 						Changed(Index);

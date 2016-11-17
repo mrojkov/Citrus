@@ -245,24 +245,6 @@ namespace Lime
 #endregion
 
 		public static readonly Key LastNormal = Count - 1;
-
-		public static class Commands
-		{
-			public static readonly Key Undo = MapShortcut(Modifiers.Command, Key.Z);
-			public static readonly Key Redo = MapShortcut(Modifiers.Command | Modifiers.Shift, Key.Z);
-			public static readonly Key SelectAll = MapShortcut(Modifiers.Command, Key.A);
-			public static readonly Key Cut = MapShortcut(Modifiers.Command, Key.X);
-			public static readonly Key Copy = MapShortcut(Modifiers.Command, Key.C);
-			public static readonly Key Paste = MapShortcut(Modifiers.Command, Key.V);
-			public static readonly Key Delete = MapShortcut(Key.Delete);
-
-			static Commands()
-			{
-				Copy.AddAlias(Modifiers.Command, Insert);
-				Cut.AddAlias(Modifiers.Shift, Key.Delete);
-				Paste.AddAlias(Modifiers.Shift, Insert);
-			}
-		}
 	}
 }
 

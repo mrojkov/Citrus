@@ -40,8 +40,8 @@ namespace Lime
 				yield return i;
 			}
 			foreach (var i in this) {
-				if (i.Submenu != null) {
-					foreach (var j in i.Submenu.AllCommands()) {
+				if (i.Menu != null) {
+					foreach (var j in ((Menu)i.Menu).AllCommands()) {
 						yield return j;
 					}
 				}
@@ -89,7 +89,7 @@ namespace Lime
 		class MenuItem
 		{
 			private bool separator;
-			private CommandState state;
+			private int commandVersion;
 			public readonly ICommand Command;
 			public readonly NSMenuItem NativeMenuItem;
 
@@ -102,7 +102,7 @@ namespace Lime
 				} else {
 					NativeMenuItem = new NSMenuItem();
 					NativeMenuItem.Activated += (s, e) => {
-						Command.Execute();
+						((Command)Command).Issue();
 					};
 					Refresh();
 				}
@@ -113,13 +113,13 @@ namespace Lime
 				if (separator) {
 					return;
 				}
-				if (Command.Submenu != null) {
-					Command.Submenu.Refresh();
+				if (Command.Menu != null) {
+					Command.Menu.Refresh();
 				}
-				if (state != null && state.Equals(Command)) {
+				if (commandVersion == Command.Version) {
 					return;
 				}
-				state = new CommandState(Command);
+				commandVersion = Command.Version;
 				NativeMenuItem.Hidden = !Command.Visible;
 				NativeMenuItem.Enabled = Command.Enabled;
 				NativeMenuItem.Title = Command.Text;
@@ -130,8 +130,8 @@ namespace Lime
 					NativeMenuItem.KeyEquivalent = "";
 					NativeMenuItem.KeyEquivalentModifierMask = 0;
 				}
-				if (Command.Submenu != null) {
-					var nativeSubmenu = Command.Submenu.NativeMenu;
+				if (Command.Menu != null) {
+					var nativeSubmenu = ((Menu)Command.Menu).NativeMenu;
 					nativeSubmenu.Title = Command.Text;
 					NativeMenuItem.Submenu = nativeSubmenu;
 				} else {
@@ -175,34 +175,6 @@ namespace Lime
 					result |= NSEventModifierMask.CommandKeyMask;
 				}
 				return result;
-			}
-
-			class CommandState
-			{
-				readonly string Text;
-				readonly Shortcut Shortcut;
-				readonly Menu Submenu;
-				readonly bool Enabled;
-				readonly bool Visible;
-
-				public CommandState(ICommand command)
-				{
-					Text = command.Text;
-					Shortcut = command.Shortcut;
-					Submenu = command.Submenu;
-					Enabled = command.Enabled;
-					Visible = command.Visible;
-				}
-
-				public bool Equals(ICommand command)
-				{
-					return
-						Text == command.Text &&
-						Shortcut == command.Shortcut &&
-						Submenu == command.Submenu &&
-						Enabled == command.Enabled &&
-						Visible == command.Visible;
-				}
 			}
 		}
 	}

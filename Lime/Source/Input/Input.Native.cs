@@ -31,7 +31,6 @@ namespace Lime
 			public bool CurrentState;
 			public float RepeatDelay;
 			public bool Repeated;
-			public bool Disabled;
 		}
 
 		private readonly KeyState[] keys = new KeyState[Key.MaxCount];
@@ -199,16 +198,6 @@ namespace Lime
 				Changed |= value != null;
 				textInput = value;
 			}
-		}
-
-		public bool IsKeyEnabled(Key key)
-		{
-			return !keys[key].Disabled;
-		}
-		
-		public void SetKeyEnabled(Key key, bool enable)
-		{
-			keys[key].Disabled = !enable;
 		}
 
 		private Key currentShortcut = Key.Unknown;
