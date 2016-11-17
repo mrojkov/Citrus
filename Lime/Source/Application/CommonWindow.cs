@@ -69,7 +69,7 @@ namespace Lime
 					Updating(delta);
 				}
 				if (Current.Active) {
-					Application.MainMenu.Refresh();
+					Application.MainMenu?.Refresh();
 					Application.RaiseActiveWindowUpdated(Current);
 					Application.UpdateCounter++;
 				}
