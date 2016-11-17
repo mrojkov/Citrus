@@ -356,6 +356,8 @@ namespace Lime
 				window.MakeKeyAndOrderFront(window);
 			}
 			if (dialogMode) {
+				// Showing a new modal window should consume issued commands or we may fall into infinite loop otherwise.
+				Application.UpdateCounter++;
 				NSApplication.SharedApplication.RunModalForWindow(window);
 			}
 		}
