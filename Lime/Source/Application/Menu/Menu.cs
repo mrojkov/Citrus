@@ -1,5 +1,4 @@
-﻿#if WIN || MAC
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Lime
@@ -29,4 +28,3 @@ namespace Lime
 		ICommand FindCommand(string text);
 	}
 }
-#endif
