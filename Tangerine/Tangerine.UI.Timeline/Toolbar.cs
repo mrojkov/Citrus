@@ -21,6 +21,7 @@ namespace Tangerine.UI.Timeline
 				Nodes = {
 					CreateAnimationModeButton(),
 					CreateAutoKeyframesButton(),
+					CreateNewFolderButton(),
 					CreateAnimationIndicator(),
 					new Widget(),
 					CreateExitButton(),
@@ -63,6 +64,19 @@ namespace Tangerine.UI.Timeline
 			button.AddChangeWatcher(() => UserPreferences.Instance.AutoKeyframes, i => button.Checked = i);
 			button.Clicked += () => {
 				UserPreferences.Instance.AutoKeyframes = !UserPreferences.Instance.AutoKeyframes;
+			};
+			return button;
+		}
+
+		ToolbarButton CreateNewFolderButton()
+		{
+			var button = new ToolbarButton(IconPool.GetTexture("Tools.NewFolder")) { Tip = "Create folder" };
+			button.Clicked += () => {
+				var doc = Document.Current;
+				var n = doc.SelectedNodes().FirstOrDefault() ?? doc.Container.Nodes.FirstOrDefault();
+				int i = n != null ? doc.Container.Nodes.IndexOf(n) : 0;
+				Core.Operations.InsertNode.Perform(doc.Container, i, new FolderBegin());
+				Core.Operations.InsertNode.Perform(doc.Container, i, new FolderEnd());
 			};
 			return button;
 		}
