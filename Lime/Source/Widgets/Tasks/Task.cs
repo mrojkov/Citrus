@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Lime
 {
@@ -187,6 +188,14 @@ namespace Lime
 					Current.Dispose();
 				}
 			};
+		}
+
+		/// <summary>
+		/// Creates a new Task executing all provided enumerators in sequential order
+		/// </summary>
+		public static Task Sequence(params IEnumerator<object>[] args)
+		{
+			return new Task(args.Cast<object>().GetEnumerator());
 		}
 
 		/// <summary>
