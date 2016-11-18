@@ -54,7 +54,6 @@
   <ItemGroup>
     <Folder Include="Resources\" />
     <Folder Include="Operations\" />
-    <Folder Include="Components\" />
     <Folder Include="HotStudioExport\" />
   </ItemGroup>
   <ItemGroup>
@@ -76,9 +75,6 @@
     <Compile Include="IDataflow.cs" />
     <Compile Include="VersionedCollection.cs" />
     <Compile Include="Row.cs" />
-    <Compile Include="Components\CurveRow.cs" />
-    <Compile Include="Components\NodeRow.cs" />
-    <Compile Include="Components\PropertyRow.cs" />
     <Compile Include="Operations\CopyPaste.cs" />
     <Compile Include="Operations\ClearRowSelection.cs" />
     <Compile Include="Operations\SelectRow.cs" />
@@ -93,6 +89,7 @@
     <Compile Include="Operations\DummyOperation.cs" />
     <Compile Include="Operations\DistortionMeshProcessor.cs" />
     <Compile Include="Operations\TimelineHorizontalShift.cs" />
+    <Compile Include="Components.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>
