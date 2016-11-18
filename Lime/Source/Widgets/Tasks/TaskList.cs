@@ -84,6 +84,18 @@ namespace Lime
 			}
 		}
 
+		public static IEnumerator<object> SequenceEnumerator(params IEnumerator<object>[] args)
+		{
+			return args.Cast<object>().GetEnumerator();
+		}
+
+		public Task AddSequence(params IEnumerator<object>[] args)
+		{
+			var task = new Task(SequenceEnumerator(args), null);
+			Add(task);
+			return task;
+		}
+
 		/// <summary>
 		/// Adds task to the end of this list.
 		/// </summary>
