@@ -13,9 +13,11 @@ namespace Tangerine.UI.Timeline
 		{
 			foreach (var row in Document.Current.Rows) {
 				TryCreateGridNodeView(row);
+				TryCreateGridFolderView(row);
 				TryCreateGridPropertyView(row);
 				TryCreateGridCurveView(row);
 				TryCreateRollNodeView(row);
+				TryCreateRollFolderView(row);
 				TryCreateRollPropertyView(row);
 				TryCreateRollCurveView(row);
 			}
@@ -27,6 +29,16 @@ namespace Tangerine.UI.Timeline
 			var view = row.Components.Get<IRollWidget>();
 			if (view == null && nodeRow != null) {
 				view = new RollNodeView(row, 0);
+				row.Components.Add<IRollWidget>(view);
+			}
+		}
+
+		static void TryCreateRollFolderView(Row row)
+		{
+			var folderRow = row.Components.Get<Core.Components.FolderRow>();
+			var view = row.Components.Get<IRollWidget>();
+			if (view == null && folderRow != null) {
+				view = new RollFolderView(row, 0);
 				row.Components.Add<IRollWidget>(view);
 			}
 		}
@@ -56,6 +68,16 @@ namespace Tangerine.UI.Timeline
 			var nodeRow = row.Components.Get<Core.Components.NodeRow>();
 			if (nodeRow != null && !row.Components.Has<IGridWidget>()) {
 				var c = new GridNodeView(nodeRow.Node);
+				row.Components.Add<IGridWidget>(c);
+				row.Components.Add<IOverviewWidget>(c);
+			}
+		}
+
+		static void TryCreateGridFolderView(Row row)
+		{
+			var folderRow = row.Components.Get<Core.Components.FolderRow>();
+			if (folderRow != null && !row.Components.Has<IGridWidget>()) {
+				var c = new GridNodeView(folderRow.Node);
 				row.Components.Add<IGridWidget>(c);
 				row.Components.Add<IOverviewWidget>(c);
 			}

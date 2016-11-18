@@ -17,17 +17,28 @@ namespace Tangerine.Core.Components
 		}
 	}
 
-	public class NodeRow : IComponent
+	public class CommonNodeRow : IComponent
 	{
 		public Node Node { get; private set; }
 		public NodeVisibility Visibility { get { return Node.EditorState().Visibility; } set { Node.EditorState().Visibility = value; } }
 		public bool Locked { get { return Node.EditorState().Locked; } set { Node.EditorState().Locked = value; } }
 		public bool Expanded { get { return Node.EditorState().Expanded; } set { Node.EditorState().Expanded = value; } }
 
-		public NodeRow(Node node)
+		public CommonNodeRow(Node node)
 		{
 			Node = node;
 		}
+	}
+
+	public class NodeRow : CommonNodeRow
+	{
+		public NodeRow(Node node) : base(node) { }
+	}
+
+	public class FolderRow : CommonNodeRow
+	{
+		public Node FolderEnd { get; set; }
+		public FolderRow(Node node) : base(node) { }
 	}
 
 	public class PropertyRow : IComponent

@@ -7,30 +7,36 @@ using Tangerine.Core.Components;
 
 namespace Tangerine.UI.Timeline.Components
 {
-	public class RollNodeView : IRollWidget
+	public abstract class CommonRollNodeView : IRollWidget
 	{
-		readonly Row row;
-		readonly NodeRow nodeData;
-		readonly SimpleText label;
-		readonly EditBox editBox;
-		readonly Image nodeIcon;
-		readonly Widget widget;
+		protected readonly Row row;
+		protected readonly CommonNodeRow nodeData;
+		protected readonly SimpleText label;
+		protected readonly EditBox editBox;
+		protected readonly Image nodeIcon;
+		protected readonly Widget widget;
+		protected readonly ToolbarButton expandButton;
+		protected readonly ToolbarButton eyeButton;
+		protected readonly ToolbarButton lockButton;
 
-		public RollNodeView(Row row, int indentation)
+		public CommonRollNodeView(Row row, CommonNodeRow nodeRow, int indentation)
 		{
 			this.row = row;
-			nodeData = row.Components.Get<NodeRow>();
+			nodeData = nodeRow;
 			label = new SimpleText();
 			editBox = new EditBox { LayoutCell = new LayoutCell(Alignment.Center, stretchX: float.MaxValue) };
 			nodeIcon = new Image(NodeIconPool.GetTexture(nodeData.Node.GetType())) {
 				HitTestTarget = true,
 				MinMaxSize = new Vector2(16, 16)
 			};
+			expandButton = CreateExpandButton();
 			var expandButtonContainer = new Widget {
 				Layout = new StackLayout { IgnoreHidden = false },
 				LayoutCell = new LayoutCell(Alignment.Center),
-				Nodes = { CreateExpandButton() }
+				Nodes = { expandButton }
 			};
+			eyeButton = CreateEyeButton();
+			lockButton = CreateLockButton();
 			widget = new Widget {
 				Padding = new Thickness { Left = 4, Right = 2 },
 				MinHeight = TimelineMetrics.DefaultRowHeight,
@@ -44,8 +50,8 @@ namespace Tangerine.UI.Timeline.Components
 					label,
 					editBox,
 					new Widget(),
-					CreateEyeButton(),
-					CreateLockButton(),
+					eyeButton,
+					lockButton,
 				},
 			};
 			label.AddChangeWatcher(() => nodeData.Node.Id, s => RefreshLabel());
@@ -102,7 +108,6 @@ namespace Tangerine.UI.Timeline.Components
 				i => button.Texture = IconPool.GetTexture(i ? "Timeline.Expanded" : "Timeline.Collapsed")
 			);
 			button.Clicked += () => Core.Operations.SetProperty.Perform(nodeData, nameof(NodeRow.Expanded), !nodeData.Expanded);
-			button.Updated += delta => button.Visible = nodeData.Node.Animators.Count > 0;
 			return button;
 		}
 
@@ -143,6 +148,38 @@ namespace Tangerine.UI.Timeline.Components
 			if (editBox.Text != initialText) {
 				Core.Operations.SetProperty.Perform(nodeData.Node, "Id", editBox.Text);
 			}
+		}
+	}
+
+	public class RollNodeView : CommonRollNodeView
+	{
+		public RollNodeView(Row row, int indentation) : base(row, row.Components.Get<NodeRow>(), indentation)
+		{
+			expandButton.Visible = nodeData.Node.Animators.Count > 0;
+		}
+	}
+
+	public class RollFolderView : CommonRollNodeView
+	{
+		readonly List<Node> innerNodes = new List<Node>();
+
+		public RollFolderView(Row row, int indentation) : base(row, row.Components.Get<FolderRow>(), indentation)
+		{
+			var nodes = Document.Current.Container.Nodes;
+			for (var i = nodes.IndexOf(nodeData.Node) + 1; i < nodes.IndexOf((nodeData as FolderRow).FolderEnd); i++) {
+				innerNodes.Add(nodes[i]);
+			}
+			expandButton.Visible = innerNodes.Count > 0;
+			eyeButton.Clicked += () => {
+				foreach (var node in innerNodes) {
+					Core.Operations.SetProperty.Perform(node.EditorState(), nameof(NodeEditorState.Visibility), nodeData.Visibility);
+				}
+			};
+			lockButton.Clicked += () => {
+				foreach (var node in innerNodes) {
+					Core.Operations.SetProperty.Perform(node.EditorState(), nameof(NodeEditorState.Locked), nodeData.Locked);
+				}
+			};
 		}
 	}
 }

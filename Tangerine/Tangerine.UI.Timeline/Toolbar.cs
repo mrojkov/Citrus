@@ -75,8 +75,8 @@ namespace Tangerine.UI.Timeline
 				var doc = Document.Current;
 				var n = doc.SelectedNodes().FirstOrDefault() ?? doc.Container.Nodes.FirstOrDefault();
 				int i = n != null ? doc.Container.Nodes.IndexOf(n) : 0;
-				Core.Operations.InsertNode.Perform(doc.Container, i, new FolderBegin());
-				Core.Operations.InsertNode.Perform(doc.Container, i, new FolderEnd());
+				Core.Operations.InsertNode.Perform(doc.Container, i, new FolderBegin { Id = "Folder" });
+				Core.Operations.InsertNode.Perform(doc.Container, i + 1, new FolderEnd());
 			};
 			return button;
 		}

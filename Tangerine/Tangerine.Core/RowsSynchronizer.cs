@@ -7,6 +7,7 @@ namespace Tangerine.Core
 {
 	public class RowsSynchronizer : SymmetricOperationProcessor
 	{
+		readonly Stack<Row> folderStack = new Stack<Row>();
 		readonly List<Row> rows = new List<Row>();
 
 		public override void Process(IOperation op)
@@ -20,8 +21,28 @@ namespace Tangerine.Core
 
 		void BuildRows()
 		{
+			folderStack.Clear();
 			rows.Clear();
+			Row collapsedFolderRow = null;
 			foreach (var node in Document.Current.Container.Nodes) {
+				if (node is FolderEnd) {
+					var row = folderStack.Pop();
+					row.Components.Get<Components.FolderRow>().FolderEnd = node;
+					if (row == collapsedFolderRow)
+						collapsedFolderRow = null;
+					continue;
+				}
+				if (node is FolderBegin) {
+					var row = AddFolderRow(node);
+					if (collapsedFolderRow == null && !node.EditorState().Expanded) {
+						collapsedFolderRow = row;
+					}
+					folderStack.Push(row);
+					continue;
+				}
+				if (collapsedFolderRow != null) {
+					continue;
+				}
 				AddNodeRow(node);
 				if (node.EditorState().Expanded) {
 					foreach (var animator in node.Animators) {
@@ -61,6 +82,16 @@ namespace Tangerine.Core
 				row.Components.Add(new Components.NodeRow(node));
 			}
 			AddRow(row);
+		}
+
+		Row AddFolderRow(Node node)
+		{
+			var row = Document.Current.GetRowById(node.EditorState().Uid);
+			if (!row.Components.Has<Components.FolderRow>()) {
+				row.Components.Add(new Components.FolderRow(node));
+			}
+			AddRow(row);
+			return row;
 		}
 
 		void AddRow(Row row)
