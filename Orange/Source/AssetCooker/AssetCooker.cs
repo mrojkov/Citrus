@@ -743,9 +743,10 @@ namespace Orange
 		{
 			var rootNode = new Lime.Frame();
 			rootNode.AddNode(new ModelImporter(srcPath, The.Workspace.ActivePlatform).Model);
-			Serialization.WriteObjectToBundle(assetsBundle, dstPath, rootNode, Serialization.Format.Binary, Path.GetExtension(srcPath), AssetAttributes.ZippedDeflate);
+
+			var rules = cookingRulesMap[srcPath];
+			Serialization.WriteObjectToBundle(assetsBundle, dstPath, rootNode, Serialization.Format.Binary, Path.GetExtension(srcPath), rules.ModelCompressing);
 			return true;
 		}
 	}
 }
-

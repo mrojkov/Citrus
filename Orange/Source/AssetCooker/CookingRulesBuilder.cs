@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using Lime;
 
 namespace Orange
 {
@@ -44,6 +45,7 @@ namespace Orange
 		public bool Ignore;
 		public int ADPCMLimit; // Kb
 		public AtlasOptimization AtlasOptimization;
+		public AssetAttributes ModelCompressing;
 
 		public static CookingRules GetDefault(TargetPlatform platform)
 		{
@@ -58,7 +60,8 @@ namespace Orange
 				Bundles = new[] { MainBundleName },
 				Ignore = false,
 				ADPCMLimit = 100,
-				AtlasOptimization = AtlasOptimization.Memory
+				AtlasOptimization = AtlasOptimization.Memory,
+				ModelCompressing = AssetAttributes.ZippedDeflate
 			};
 		}
 	}
@@ -168,6 +171,19 @@ namespace Orange
 			}
 		}
 
+		static AssetAttributes ParseModelCompressing(string value)
+		{
+			switch (value) {
+				case "":
+				case "Deflate":
+					return AssetAttributes.ZippedDeflate;
+				case "LZMA":
+					return AssetAttributes.ZippedLZMA;
+				default:
+					throw new Lime.Exception("Error parsing ModelCompressing. Must be one of: Deflate, LZMA");
+			}
+		}
+
 		static CookingRules ParseCookingRules(CookingRules basicRules, string path, TargetPlatform platform, string target)
 		{
 			var rules = basicRules;
@@ -252,6 +268,9 @@ namespace Orange
 								break;
 							case "AtlasOptimization":
 								rules.AtlasOptimization = ParseAtlasOptimization(words[1]);
+								break;
+							case "ModelCompressing":
+								rules.ModelCompressing = ParseModelCompressing(words[1]);
 								break;
 							default:
 								throw new Lime.Exception("Unknown attribute {0}", words[0]);
