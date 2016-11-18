@@ -1,21 +1,26 @@
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using Lime;
 
 namespace Tangerine.Core
 {
 	public class RowsSynchronizer : SymmetricOperationProcessor
 	{
+		readonly List<Row> rows = new List<Row>();
+
 		public override void Process(IOperation op)
 		{
-			if (!ValidateRows()) {
-				RebuildRows();
+			BuildRows();
+			if (!rows.SequenceEqual(Document.Current.Rows)) {
+				Document.Current.Rows.Clear();
+				Document.Current.Rows.AddRange(rows);
 			}
 		}
 
-		void RebuildRows()
+		void BuildRows()
 		{
-			Document.Current.Rows.Clear();
+			rows.Clear();
 			foreach (var node in Document.Current.Container.Nodes) {
 				AddNodeRow(node);
 				if (node.EditorState().Expanded) {
@@ -58,60 +63,10 @@ namespace Tangerine.Core
 			AddRow(row);
 		}
 
-		public void AddRow(Row row)
+		void AddRow(Row row)
 		{
-			row.Index = Document.Current.Rows.Count;
-			Document.Current.Rows.Add(row);
-		}
-
-		bool ValidateRows()
-		{
-			var doc = Document.Current;
-			if (doc == null) {
-				return true;
-			}
-			int i = 0;
-			foreach (var node in Document.Current.Container.Nodes) {
-				if (!ValidateNodeRow(i++, node)) {
-					return false;
-				}
-				if (node.EditorState().Expanded) {
-					foreach (var animator in node.Animators) {
-						if (!ValidatePropertyRow(i++, animator)) {
-							return false;
-						}
-						if (animator.EditorState().CurvesShown) {
-							foreach (var curve in animator.EditorState().Curves) {
-								if (!ValidateCurveRow(i++, animator, curve))
-									return false;
-							}
-						}
-					}
-				}
-			}
-			return i == Document.Current.Rows.Count;
-		}
-
-		bool ValidateNodeRow(int row, Node node)
-		{
-			var rows = Document.Current.Rows;
-			return row < rows.Count && rows[row].Components.Get<Components.NodeRow>()?.Node == node;
-		}
-
-		bool ValidatePropertyRow(int row, IAnimator animator)
-		{
-			var rows = Document.Current.Rows;
-			return row < rows.Count && rows[row].Components.Get<Components.PropertyRow>()?.Animator == animator;
-		}
-
-		bool ValidateCurveRow(int row, IAnimator animator, CurveEditorState curveState)
-		{
-			var rows = Document.Current.Rows;
-			if (row >= rows.Count) {
-				return false;
-			}
-			var cr = rows[row].Components.Get<Components.CurveRow>();
-			return cr?.Animator == animator && cr?.State == curveState;
+			row.Index = rows.Count;
+			rows.Add(row);
 		}
 	}
 }
