@@ -18,13 +18,13 @@ namespace Lime
 		/// Invoked on every Task update. Useful for disposing of the Task on some condition.
 		/// </summary>
 		public Action Updating;
-		
+
 		public Task(IEnumerator<object> e, object tag = null)
 		{
 			Tag = tag;
 			stack.Push(e);
 		}
-		
+
 		/// <summary>
 		/// Time delta since last Update.
 		/// </summary>
@@ -176,7 +176,7 @@ namespace Lime
 			}
 #endif
 		}
-		
+
 		/// <summary>
 		/// Sets stopping condition for current task.
 		/// </summary>

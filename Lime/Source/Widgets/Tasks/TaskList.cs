@@ -15,7 +15,7 @@ namespace Lime
 		public T1 Value1;
 		public T2 Value2;
 	}
-	
+
 	public class TaskList : List<Task>
 	{
 		[ThreadStatic]
@@ -24,9 +24,9 @@ namespace Lime
 		/// <summary>
 		/// Currently processing TaskList.
 		/// </summary>
-		public static TaskList Current { 
-			get { return current; } 
-			private set { current = value; } 
+		public static TaskList Current {
+			get { return current; }
+			private set { current = value; }
 		}
 
 		/// <summary>
