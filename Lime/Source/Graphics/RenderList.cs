@@ -6,13 +6,12 @@ namespace Lime
 	{
 		private readonly List<RenderBatch> Batches = new List<RenderBatch>();
 		private RenderBatch lastBatch;
-		public bool Empty => lastBatch == null;
-		public int LastFrameBatchCount { get; private set; }
-		private bool wasEndFrame;
+
+		public bool Empty { get { return lastBatch == null; } }
 
 		public RenderBatch GetBatch(ITexture texture1, ITexture texture2, Blending blending, ShaderId shader, ShaderProgram customShaderProgram, int vertexCount, int indexCount)
 		{
-			bool needMesh = lastBatch == null ||
+			bool needMesh = lastBatch == null || 
 				lastBatch.LastVertex + vertexCount > lastBatch.Geometry.Vertices.Length ||
 				lastBatch.LastIndex + indexCount > lastBatch.Geometry.Indices.Length;
 			if (!needMesh &&
@@ -45,7 +44,7 @@ namespace Lime
 
 		private static uint GetTextureHandle(ITexture texture)
 		{
-			return texture?.GetHandle() ?? 0;
+			return texture == null ? 0 : texture.GetHandle();
 		}
 
 		public void Render()
@@ -55,7 +54,7 @@ namespace Lime
 			}
 		}
 
-		private void Clear()
+		public void Clear()
 		{
 			if (lastBatch == null) {
 				return;
@@ -71,18 +70,8 @@ namespace Lime
 		{
 			if (lastBatch != null) {
 				Render();
-				if (wasEndFrame) {
-					LastFrameBatchCount = 0;
-					wasEndFrame = false;
-				}
-				LastFrameBatchCount += Batches.Count;
 				Clear();
 			}
-		}
-
-		public void EndFrame()
-		{
-			wasEndFrame = true;
 		}
 	}
 }
