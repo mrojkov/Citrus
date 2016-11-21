@@ -205,7 +205,7 @@ namespace Lime
 		public static WindowRect ScissorRectangle
 		{
 			get { return scissorRectangle; }
-			set 
+			set
 			{
 				MainRenderList.Flush();
 				scissorRectangle = value;
@@ -216,7 +216,7 @@ namespace Lime
 		public static bool ScissorTestEnabled
 		{
 			get { return scissorTestEnabled; }
-			set 
+			set
 			{
 				MainRenderList.Flush();
 				scissorTestEnabled = value;
@@ -301,6 +301,7 @@ namespace Lime
 		public static void EndFrame()
 		{
 			Flush();
+			MainRenderList.EndFrame();
 		}
 
 		public static void Flush()
@@ -609,7 +610,7 @@ namespace Lime
 				var s = (i == spriteList.Count) ? sentinelSprite : spriteList[i];
 				if (scissorTestEnabled && s != sentinelSprite) {
 					if (s.Position.X + s.Size.X < clipRect.A.X ||
-						s.Position.X > clipRect.B.X || 
+						s.Position.X > clipRect.B.X ||
 						s.Position.Y + s.Size.Y < clipRect.A.Y ||
 						s.Position.Y > clipRect.B.Y)
 					{
@@ -721,7 +722,7 @@ namespace Lime
 		{
 			DrawLine(new Vector2(x0, y0), new Vector2(x1, y1), color, thickness, cap);
 		}
-		
+
 		static Vertex[] v = new Vertex[4];
 
 		public static void DrawLine(Vector2 a, Vector2 b, Color4 color, float thickness = 1, LineCap cap = LineCap.Butt)
