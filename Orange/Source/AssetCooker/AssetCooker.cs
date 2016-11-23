@@ -174,6 +174,7 @@ namespace Orange
 			AddStage(() => SyncRawAssets(".xml"));
 			AddStage(() => SyncRawAssets(".raw"));
 			AddStage(WarnAboutNPOTTextures);
+			AddStage(() => SyncRawAssets(".bin"));
 		}
 
 		private static void WarnAboutNPOTTextures()
