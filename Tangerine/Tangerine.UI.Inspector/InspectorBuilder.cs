@@ -59,13 +59,17 @@ namespace Tangerine.UI.Inspector
 					continue;
 				if (!categoryLabelAdded) {
 					categoryLabelAdded = true;
+					var text = type.Name;
+					if (text == "Node" && objects.Count == 1) {
+						text += $" of type '{objects[0].GetType().Name}'";
+					}
 					var label = new Widget {
 						LayoutCell = new LayoutCell { StretchY = 0 },
 						Layout = new StackLayout(),
 						MinHeight = DesktopTheme.Metrics.DefaultButtonSize.Y,
 						Nodes = {
 							new SimpleText {
-								Text = type.Name,
+								Text = text,
 								Padding = new Thickness(4, 0),
 								VAlignment = VAlignment.Center,
 								AutoSizeConstraints = false,
