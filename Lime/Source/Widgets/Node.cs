@@ -134,6 +134,7 @@ namespace Lime
 
 		private TangerineFlags tangerineFlags;
 
+		[YuzuMember]
 		public TangerineFlags TangerineFlags
 		{
 			get { return tangerineFlags; }
