@@ -145,9 +145,6 @@ namespace Tangerine.UI
 				if (!p.Placement.Hidden) {
 					if (p.WindowWidget == null) {
 						var window = new Window(new WindowOptions { Title = p.Title, FixedSize = false });
-#if WIN
-						window.Form.Owner = MainWindowWidget.Window.Form;
-#endif
 						window.Closing += () => {
 							if (!p.Placement.Docked) {
 								p.Placement.Hidden = true;
