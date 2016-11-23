@@ -57,7 +57,7 @@ namespace Lime
 			var oldZTestEnabled = Renderer.ZTestEnabled;
 			var oldCullMode = Renderer.CullMode;
 			var oldWorld = Renderer.World;
-			Renderer.ZTestEnabled = false;
+			Renderer.ZTestEnabled = true;
 			Renderer.CullMode = CullMode.None;
 			Renderer.World = Matrix44.CreateScale(new Vector3(1, -1, 1)) * GlobalTransform;
 			renderChain.RenderAndClear();
