@@ -13,8 +13,9 @@ namespace Tangerine.UI.Timeline.Components
 		readonly Image propIcon;
 		readonly Widget widget;
 		readonly PropertyRow propRow;
+		readonly Widget spacer;
 
-		public RollPropertyView(Row row, int identation)
+		public RollPropertyView(Row row)
 		{
 			this.row = row;
 			propRow = row.Components.Get<PropertyRow>();
@@ -24,13 +25,14 @@ namespace Tangerine.UI.Timeline.Components
 				Texture = IconPool.GetTexture("Nodes.Unknown"),
 				MinMaxSize = new Vector2(16, 16)
 			};
+			spacer = new Widget();
 			widget = new Widget {
 				Padding = new Thickness { Left = 4, Right = 2 },
 				MinHeight = TimelineMetrics.DefaultRowHeight,
 				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center) },
 				HitTestTarget = true,
 				Nodes = {
-					new HSpacer(identation * TimelineMetrics.RollIndentation),
+					spacer,
 					// CreateExpandButton(),
 					new HSpacer(6),
 					propIcon,
@@ -39,6 +41,7 @@ namespace Tangerine.UI.Timeline.Components
 					new Widget(),
 				},
 			};
+			spacer.Updating += delta => spacer.MinMaxWidth = row.CalcIndentation() * TimelineMetrics.RollIndentation;
 			widget.CompoundPresenter.Push(new DelegatePresenter<Widget>(RenderBackground));
 		}
 

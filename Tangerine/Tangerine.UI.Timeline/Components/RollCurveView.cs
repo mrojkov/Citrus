@@ -11,7 +11,7 @@ namespace Tangerine.UI.Timeline.Components
 		readonly SimpleText label;
 		readonly Widget widget;
 
-		public RollCurveView(Row row, int identation)
+		public RollCurveView(Row row)
 		{
 			this.row = row;
 			var c = row.Components.Get<Core.Components.CurveRow>();
@@ -22,7 +22,7 @@ namespace Tangerine.UI.Timeline.Components
 				Layout = new HBoxLayout(),
 				HitTestTarget = true,
 				Nodes = {
-					new HSpacer(identation * TimelineMetrics.RollIndentation),
+					new HSpacer(row.CalcIndentation() * TimelineMetrics.RollIndentation),
 					label,
 				},
 			};

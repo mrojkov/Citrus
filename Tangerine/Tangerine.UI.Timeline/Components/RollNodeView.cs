@@ -7,7 +7,7 @@ using Tangerine.Core.Components;
 
 namespace Tangerine.UI.Timeline.Components
 {
-	public abstract class CommonRollNodeView : IRollWidget
+	public abstract class CommonRollNodeView
 	{
 		protected readonly Row row;
 		protected readonly CommonNodeRow nodeData;
@@ -18,8 +18,9 @@ namespace Tangerine.UI.Timeline.Components
 		protected readonly ToolbarButton expandButton;
 		protected readonly ToolbarButton eyeButton;
 		protected readonly ToolbarButton lockButton;
+		readonly Widget spacer;
 
-		public CommonRollNodeView(Row row, CommonNodeRow nodeRow, int indentation)
+		protected CommonRollNodeView(Row row, CommonNodeRow nodeRow)
 		{
 			this.row = row;
 			nodeData = nodeRow;
@@ -37,13 +38,14 @@ namespace Tangerine.UI.Timeline.Components
 			};
 			eyeButton = CreateEyeButton();
 			lockButton = CreateLockButton();
+			spacer = new Widget();
 			widget = new Widget {
 				Padding = new Thickness { Left = 4, Right = 2 },
 				MinHeight = TimelineMetrics.DefaultRowHeight,
 				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center) },
 				HitTestTarget = true,
 				Nodes = {
-					new HSpacer(indentation * TimelineMetrics.RollIndentation),
+					spacer,
 					expandButtonContainer,
 					nodeIcon,
 					new HSpacer(3),
@@ -54,6 +56,7 @@ namespace Tangerine.UI.Timeline.Components
 					lockButton,
 				},
 			};
+			spacer.Updating += delta => spacer.MinMaxWidth = row.CalcIndentation() * TimelineMetrics.RollIndentation;
 			label.AddChangeWatcher(() => nodeData.Node.Id, s => RefreshLabel());
 			label.AddChangeWatcher(() => nodeData.Node.ContentsPath, s => RefreshLabel());
 			widget.CompoundPresenter.Push(new DelegatePresenter<Widget>(RenderBackground));
@@ -117,8 +120,6 @@ namespace Tangerine.UI.Timeline.Components
 			Renderer.DrawRect(Vector2.Zero, widget.Size, Document.Current.SelectedRows.Contains(row) ? Colors.SelectedBackground : Colors.WhiteBackground);
 		}
 
-		Widget IRollWidget.Widget => widget;
-
 		IEnumerator<object> HandleDobleClickTask()
 		{
 			while (true) {
@@ -131,7 +132,7 @@ namespace Tangerine.UI.Timeline.Components
 					editBox.SetFocus();
 					editBox.Tasks.Add(EditNodeIdTask());
 				} else if (widget.Input.WasKeyPressed(Key.Mouse0DoubleClick)) {
-					Core.Operations.EnterNode.Perform(row.Components.Get<NodeRow>().Node);
+					Core.Operations.EnterNode.Perform(nodeData.Node);
 				}
 				yield return null;
 			}
@@ -151,35 +152,34 @@ namespace Tangerine.UI.Timeline.Components
 		}
 	}
 
-	public class RollNodeView : CommonRollNodeView
+	public sealed class RollNodeView : CommonRollNodeView, IRollWidget
 	{
-		public RollNodeView(Row row, int indentation) : base(row, row.Components.Get<NodeRow>(), indentation)
+		public RollNodeView(Row row) : base(row, row.Components.Get<NodeRow>())
 		{
 			expandButton.Visible = nodeData.Node.Animators.Count > 0;
 		}
+
+		Widget IRollWidget.Widget => widget;
 	}
 
-	public class RollFolderView : CommonRollNodeView
+	public sealed class RollFolderView : CommonRollNodeView, IRollWidget
 	{
-		readonly List<Node> innerNodes = new List<Node>();
-
-		public RollFolderView(Row row, int indentation) : base(row, row.Components.Get<FolderRow>(), indentation)
+		public RollFolderView(Row row) : base(row, row.Components.Get<FolderRow>())
 		{
 			var nodes = Document.Current.Container.Nodes;
-			for (var i = nodes.IndexOf(nodeData.Node) + 1; i < nodes.IndexOf((nodeData as FolderRow).FolderEnd); i++) {
-				innerNodes.Add(nodes[i]);
-			}
-			expandButton.Visible = innerNodes.Count > 0;
 			eyeButton.Clicked += () => {
-				foreach (var node in innerNodes) {
+				foreach (var node in (nodeData as FolderRow).GetNodes()) {
 					Core.Operations.SetProperty.Perform(node.EditorState(), nameof(NodeEditorState.Visibility), nodeData.Visibility);
 				}
 			};
 			lockButton.Clicked += () => {
-				foreach (var node in innerNodes) {
+				foreach (var node in (nodeData as FolderRow).GetNodes()) {
 					Core.Operations.SetProperty.Perform(node.EditorState(), nameof(NodeEditorState.Locked), nodeData.Locked);
 				}
 			};
+			nodeIcon.Texture = IconPool.GetTexture("Tools.NewFolder");
 		}
+
+		Widget IRollWidget.Widget => widget;
 	}
 }

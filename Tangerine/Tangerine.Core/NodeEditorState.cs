@@ -55,5 +55,10 @@ namespace Tangerine
 			}
 			return (NodeEditorState)node.UserData;
 		}
+
+		public static int CollectionIndex(this Node node)
+		{
+			return node.Parent.Nodes.IndexOf(node);
+		}
 	}
 }

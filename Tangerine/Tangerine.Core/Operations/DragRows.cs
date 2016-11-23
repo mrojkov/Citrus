@@ -12,8 +12,8 @@ namespace Tangerine.Core.Operations
 		{
 			var nodesToDrag = Document.Current.SelectedNodes().ToList();
 			var rowInsertBefore = Document.Current.Rows.FirstOrDefault(
-				row => !Document.Current.SelectedRows.Contains(row) && row.Index >= destination && row.Components.Has<Core.Components.NodeRow>());
-			var nodeInsertBefore = rowInsertBefore?.Components.Get<Core.Components.NodeRow>().Node;
+				row => !Document.Current.SelectedRows.Contains(row) && row.Index >= destination && row.Components.Has<Components.NodeRow>());
+			var nodeInsertBefore = rowInsertBefore?.Components.Get<Components.NodeRow>().Node;
 			foreach (var node in nodesToDrag) {
 				UnlinkNode.Perform(node);
 			}

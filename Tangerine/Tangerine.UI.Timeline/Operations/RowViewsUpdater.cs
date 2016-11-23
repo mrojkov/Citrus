@@ -28,8 +28,8 @@ namespace Tangerine.UI.Timeline
 			var nodeRow = row.Components.Get<Core.Components.NodeRow>();
 			var view = row.Components.Get<IRollWidget>();
 			if (view == null && nodeRow != null) {
-				view = new RollNodeView(row, 0);
-				row.Components.Add<IRollWidget>(view);
+				view = new RollNodeView(row);
+				row.Components.Add(view);
 			}
 		}
 
@@ -38,8 +38,8 @@ namespace Tangerine.UI.Timeline
 			var folderRow = row.Components.Get<Core.Components.FolderRow>();
 			var view = row.Components.Get<IRollWidget>();
 			if (view == null && folderRow != null) {
-				view = new RollFolderView(row, 0);
-				row.Components.Add<IRollWidget>(view);
+				view = new RollFolderView(row);
+				row.Components.Add(view);
 			}
 		}
 
@@ -48,8 +48,8 @@ namespace Tangerine.UI.Timeline
 			var propRow = row.Components.Get<Core.Components.PropertyRow>();
 			var view = row.Components.Get<IRollWidget>();
 			if (view == null && propRow != null) {
-				view = new RollPropertyView(row, 1);
-				row.Components.Add<IRollWidget>(view);
+				view = new RollPropertyView(row);
+				row.Components.Add(view);
 			}
 		}
 
@@ -58,8 +58,8 @@ namespace Tangerine.UI.Timeline
 			var curveRow = row.Components.Get<Core.Components.CurveRow>();
 			var view = row.Components.Get<IRollWidget>();
 			if (view == null && curveRow != null) {
-				view = new RollCurveView(row, 2);
-				row.Components.Add<IRollWidget>(view);
+				view = new RollCurveView(row);
+				row.Components.Add(view);
 			}
 		}
 

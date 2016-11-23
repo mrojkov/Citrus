@@ -71,6 +71,7 @@ namespace Tangerine
 				new Core.Operations.DeleteMarker.Processor(),
 				new Core.Operations.DistortionMeshProcessor(),
 				new Core.Operations.TimelineHorizontalShift.Processor(),
+				new Core.Operations.DeleteRow.Processor(),
 				new UI.Timeline.Operations.SelectGridSpan.Processor(),
 				new UI.Timeline.Operations.ClearGridSelection.Processor(),
 				new UI.Timeline.Operations.ShiftGridSelection.Processor(),

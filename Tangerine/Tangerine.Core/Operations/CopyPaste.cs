@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Lime;
 using Tangerine.Core;
+using Tangerine.Core.Components;
 
 namespace Tangerine.Core.Operations
 {
@@ -11,9 +12,18 @@ namespace Tangerine.Core.Operations
 		public static void Perform()
 		{
 			using (var frame = new Frame()) {
-				foreach (var node in Document.Current.SelectedNodes()) {
-					var clone = Document.CreateCloneForSerialization(node);
-					frame.AddNode(clone);
+				foreach (var row in Document.Current.TopLevelSelectedRows()) {
+					var nr = row.Components.Get<NodeRow>();
+					var fr = row.Components.Get<FolderRow>();
+					// TODO: Handle PropertyRow
+					if (nr != null) {
+						frame.AddNode(Document.CreateCloneForSerialization(nr.Node));
+					}
+					if (fr != null) {
+						foreach (var n in fr.GetNodes().ToList()) {
+							frame.AddNode(Document.CreateCloneForSerialization(n));
+						}
+					}
 				}
 				var stream = new System.IO.MemoryStream();
 				Serialization.WriteObject(Document.Current.Path, stream, frame, Serialization.Format.JSON);
@@ -40,18 +50,27 @@ namespace Tangerine.Core.Operations
 			if (string.IsNullOrEmpty(text)) {
 				return;
 			}
+			Frame frame = null;
 			try {
 				var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(text));
-				var frame = Serialization.ReadObject<Frame>(Document.Current.Path, stream);
-				var nodeInsertBefore = Document.Current.SelectedNodes().FirstOrDefault();
-				var insertionIndex = nodeInsertBefore != null ? Document.Current.Container.Nodes.IndexOf(nodeInsertBefore) : 0;
-				ClearRowSelection.Perform();
-				foreach (var node in frame.Nodes.ToList()) {
-					node.Unlink();
-					InsertNode.Perform(Document.Current.Container, insertionIndex++, node);
-					SelectNode.Perform(node);
-				}
-			} catch (System.Exception) { }
+				frame = Serialization.ReadObject<Frame>(Document.Current.Path, stream);
+			} catch (System.Exception e) {
+				Debug.Write(e);
+				return;
+			}
+			var nodeInsertBefore = Document.Current.TopLevelSelectedRows().
+				Select(i => i.Components.Get<NodeRow>()?.Node ?? i.Components.Get<FolderRow>()?.Node).
+				Where(i => i != null)?.FirstOrDefault();
+			var insertionIndex = nodeInsertBefore != null ? nodeInsertBefore.CollectionIndex() : 0;
+			ClearRowSelection.Perform();
+			var nodes = frame.Nodes.ToList();
+			FreezeRows.Perform();
+			foreach (var node in nodes) {
+				node.Unlink();
+				InsertNode.Perform(Document.Current.Container, insertionIndex++, node);
+			}
+			UnfreezeRows.Perform();
+			SelectNode.Perform(nodes.FirstOrDefault());
 		}
 	}
 
@@ -59,19 +78,54 @@ namespace Tangerine.Core.Operations
 	{
 		public static void Perform()
 		{
-			var nodes = Document.Current.SelectedNodes().ToList();
-			if (nodes.Count == 0) {
-				return;
+			var t = Document.Current.SelectedRows[0].Index;
+			foreach (var row in Document.Current.TopLevelSelectedRows()) {
+				DeleteRow.Perform(row);
 			}
-			var container = Document.Current.Container;
-			var t = container.Nodes.IndexOf(nodes[0]);
-			foreach (var i in nodes) {
-				UnlinkNode.Perform(i);
-			}
-			t = t.Clamp(0, container.Nodes.Count - 1);
+			t = t.Clamp(0, Document.Current.Rows.Count - 1);
 			if (t >= 0) {
-				SelectNode.Perform(container.Nodes[t]);
+				SelectRow.Perform(Document.Current.Rows[t]);
 			}
+		}
+	}
+
+	public class DeleteRow : Operation
+	{
+		public readonly Row Row;
+
+		public override bool IsChangingDocument => true;
+
+		public static void Perform(Row row)
+		{
+			Document.Current.History.Perform(new DeleteRow(row));
+		}
+
+		private DeleteRow(Row row)
+		{
+			Row = row;
+		}
+
+		public class Processor : OperationProcessor<DeleteRow>
+		{
+			protected override void InternalDo(DeleteRow op)
+			{
+				var nr = op.Row.Components.Get<NodeRow>();
+				var fr = op.Row.Components.Get<FolderRow>();
+				if (nr != null) {
+					UnlinkNode.Perform(nr.Node);
+				}
+				if (fr != null) {
+					FreezeRows.Perform();
+					foreach (var n in fr.GetNodes().ToList()) {
+						UnlinkNode.Perform(n);
+					}
+					UnfreezeRows.Perform();
+				}
+				// TODO: Handle PropertyRow
+			}
+
+			protected override void InternalRedo(DeleteRow op) { }
+			protected override void InternalUndo(DeleteRow op) { }
 		}
 	}
 }

@@ -12,10 +12,20 @@ namespace Tangerine.Core
 	{
 		public Uid Uid { get; private set; }
 		public int Index { get; set; }
+		public Row Parent { get; set; }
 
 		public Row(Uid uid)
 		{
 			Uid = uid;
+		}
+
+		public int CalcIndentation()
+		{
+			int i = 0;
+			for (var r = Parent; r != null; r = r.Parent) {
+				i++;
+			}
+			return i;
 		}
 	}
 }

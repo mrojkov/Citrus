@@ -205,6 +205,22 @@ namespace Tangerine.Core
 			return selectedNodes;
 		}
 
+		public List<Row> TopLevelSelectedRows()
+		{
+			var topLevelSelectedRows = new List<Row>();
+			foreach (var row in SelectedRows) {
+				var discardRow = false;
+				for (var p = row.Parent; p != null; p = p.Parent) {
+					discardRow |= SelectedRows.Contains(p);
+				}
+				if (!discardRow) {
+					topLevelSelectedRows.Add(row);
+				}
+			}
+			topLevelSelectedRows.Sort((a, b) => a.Index.CompareTo(b.Index));
+			return topLevelSelectedRows;
+		}
+
 		public Row GetRowById(Uid uid)
 		{
 			Row row;
