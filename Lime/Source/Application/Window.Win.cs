@@ -273,6 +273,8 @@ namespace Lime
 				Application.MainWindow = this;
 				Closing += Application.DoExiting;
 				Closed += Application.DoExited;
+			} else {
+				Form.Owner = Application.MainWindow.Form;
 			}
 			Application.Windows.Add(this);
 		}
