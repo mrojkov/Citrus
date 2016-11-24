@@ -10,16 +10,10 @@ namespace Tangerine.Core
 {
 	public class Row : Entity
 	{
-		public Uid Uid { get; private set; }
 		public int Index { get; set; }
 		public Row Parent { get; set; }
 		public bool Selected => SelectedAtUpdate > 0;
 		public long SelectedAtUpdate { get; set; }
-
-		public Row(Uid uid)
-		{
-			Uid = uid;
-		}
 
 		public int CalcIndentation()
 		{

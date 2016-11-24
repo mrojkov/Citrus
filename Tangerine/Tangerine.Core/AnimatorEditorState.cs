@@ -12,8 +12,6 @@ namespace Tangerine.Core
 		public readonly IAnimator Animator;
 		public bool CurvesShown { get; set; }
 
-		public Uid Uid { get; private set; } = Uid.Generate();
-
 		public AnimatorEditorState(IAnimator animator)
 		{
 			Animator = animator;
@@ -33,7 +31,6 @@ namespace Tangerine.Core
 	{
 		public readonly string Component;
 
-		public Uid Uid { get; private set; } = Uid.Generate();
 		public float RowHeight { get; set; } = 30;
 
 		public CurveEditorState(string component)

@@ -52,7 +52,7 @@ namespace Tangerine.Core.Operations
 			}
 			if (node is FolderEnd)
 				return;
-			var row = Document.Current.GetRowById(node.EditorState().Uid);
+			var row = Document.Current.GetRowForObject(node);
 			SelectRow.Perform(row, select);
 		}
 	}

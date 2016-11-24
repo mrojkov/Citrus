@@ -74,18 +74,9 @@ namespace Tangerine.Core
 
 		Row ParentFolderRow() => folderStack.Count > 0 ? folderStack.Peek() : null;
 
-		void AddCurveRow(Node node, IAnimator animator, CurveEditorState curve, Row parent)
-		{
-			var row = Document.Current.GetRowById(curve.Uid);
-			if (!row.Components.Has<CurveRow>()) {
-				row.Components.Add(new CurveRow(node, animator, curve));
-			}
-			AddRow(row, parent);
-		}
-
 		Row AddAnimatorRow(Node node, IAnimator animator, Row parent)
 		{
-			var row = Document.Current.GetRowById(animator.EditorState().Uid);
+			var row = Document.Current.GetRowForObject(animator);
 			if (!row.Components.Has<PropertyRow>()) {
 				row.Components.Add(new PropertyRow(node, animator));
 			}
@@ -95,7 +86,7 @@ namespace Tangerine.Core
 
 		Row AddNodeRow(Node node, Row parent)
 		{
-			var row = Document.Current.GetRowById(node.EditorState().Uid);
+			var row = Document.Current.GetRowForObject(node);
 			if (!row.Components.Has<NodeRow>()) {
 				row.Components.Add(new NodeRow(node));
 			}
@@ -105,7 +96,7 @@ namespace Tangerine.Core
 
 		Row AddFolderRow(FolderBegin node, Row parent)
 		{
-			var row = Document.Current.GetRowById(node.EditorState().Uid);
+			var row = Document.Current.GetRowForObject(node);
 			if (!row.Components.Has<FolderRow>()) {
 				row.Components.Add(new FolderRow(node));
 			}

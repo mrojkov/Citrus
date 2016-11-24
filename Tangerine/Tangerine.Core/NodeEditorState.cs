@@ -17,7 +17,6 @@ namespace Tangerine.Core
 	public class NodeEditorState
 	{
 		readonly Node node;
-		public Uid Uid { get; private set; } = Uid.Generate();
 		public string ThumbnailData { get; set; }
 		public NodeVisibility Visibility
 		{

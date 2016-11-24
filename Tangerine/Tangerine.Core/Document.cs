@@ -27,7 +27,7 @@ namespace Tangerine.Core
 
 		public delegate bool PathSelectorDelegate(out string path);
 
-		private readonly Dictionary<Uid, Row> RowCache = new Dictionary<Uid, Row>();
+		private readonly Dictionary<object, Row> RowCache = new Dictionary<object, Row>();
 
 		public static event Action<Document> AttachingViews;
 		public static Func<Document, CloseAction> Closing;
@@ -221,12 +221,12 @@ namespace Tangerine.Core
 			}
 		}
 
-		public Row GetRowById(Uid uid)
+		public Row GetRowForObject(object obj)
 		{
 			Row row;
-			if (!RowCache.TryGetValue(uid, out row)) {
-				row = new Row(uid);
-				RowCache.Add(uid, row);
+			if (!RowCache.TryGetValue(obj, out row)) {
+				row = new Row();
+				RowCache.Add(obj, row);
 			}
 			return row;
 		}
