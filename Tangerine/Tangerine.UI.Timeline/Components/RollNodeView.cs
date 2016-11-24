@@ -117,7 +117,7 @@ namespace Tangerine.UI.Timeline.Components
 		void RenderBackground(Widget widget)
 		{
 			widget.PrepareRendererState();
-			Renderer.DrawRect(Vector2.Zero, widget.Size, Document.Current.SelectedRows.Contains(row) ? Colors.SelectedBackground : Colors.WhiteBackground);
+			Renderer.DrawRect(Vector2.Zero, widget.Size, row.Selected ? Colors.SelectedBackground : Colors.WhiteBackground);
 		}
 
 		IEnumerator<object> HandleDobleClickTask()

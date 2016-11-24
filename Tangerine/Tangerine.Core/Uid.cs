@@ -1,4 +1,4 @@
-namespace Tangerine
+namespace Tangerine.Core
 {
 	public struct Uid
 	{

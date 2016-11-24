@@ -2,7 +2,7 @@ using System.IO;
 using System;
 using Lime;
 using System.Collections.Generic;
-using Tangerine;
+using Tangerine.Core;
 using Exception = Lime.Exception;
 
 namespace Orange

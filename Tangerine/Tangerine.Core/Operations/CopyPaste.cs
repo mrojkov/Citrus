@@ -78,8 +78,8 @@ namespace Tangerine.Core.Operations
 	{
 		public static void Perform()
 		{
-			var t = Document.Current.SelectedRows[0].Index;
-			foreach (var row in Document.Current.TopLevelSelectedRows()) {
+			var t = Document.Current.SelectedRows().First().Index;
+			foreach (var row in Document.Current.TopLevelSelectedRows().ToList()) {
 				DeleteRow.Perform(row);
 			}
 			t = t.Clamp(0, Document.Current.Rows.Count - 1);

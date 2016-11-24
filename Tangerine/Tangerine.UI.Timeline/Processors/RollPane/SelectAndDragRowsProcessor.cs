@@ -26,8 +26,8 @@ namespace Tangerine.UI.Timeline
 				var initialMousePosition = input.MousePosition;
 				var row = MousePositionToRow(initialMousePosition);
 				if (input.IsKeyPressed(Key.Shift)) {
-					if (Document.Current.SelectedRows.Count > 0) {
-						var firstRow = Document.Current.SelectedRows[0];
+					if (Document.Current.SelectedRows().Any()) {
+						var firstRow = Document.Current.SelectedRows().FirstOrDefault();
 						Core.Operations.ClearRowSelection.Perform();
 						Core.Operations.SelectRowRange.Perform(firstRow, row);
 					} else {
@@ -36,7 +36,7 @@ namespace Tangerine.UI.Timeline
 					}
 				} else {
 					input.CaptureMouse();
-					if (!Document.Current.SelectedRows.Contains(row)) {
+					if (!row.Selected) {
 						Core.Operations.ClearRowSelection.Perform();
 						Core.Operations.SelectRow.Perform(row);
 					}

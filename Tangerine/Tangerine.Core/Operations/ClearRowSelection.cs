@@ -10,8 +10,10 @@ namespace Tangerine.Core.Operations
 	{
 		public static void Perform()
 		{
-			foreach (var i in Document.Current.SelectedRows.ToList()) {
-				SelectRow.Perform(i, false);
+			foreach (var row in Document.Current.Rows) {
+				if (row.Selected) {
+					SelectRow.Perform(row, false);
+				}
 			}
 		}
 	}

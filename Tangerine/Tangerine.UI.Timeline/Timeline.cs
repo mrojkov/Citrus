@@ -6,11 +6,6 @@ using System.Collections.Generic;
 
 namespace Tangerine.UI.Timeline
 {
-	public static class RowExtensions
-	{
-		public static Components.IGridWidget GetGridWidget(this Row row) => row.Components.Get<Components.IGridWidget>();
-	}
-
 	public class Timeline : IDocumentView
 	{
 		public static Timeline Instance { get; private set; }
@@ -185,17 +180,17 @@ namespace Tangerine.UI.Timeline
 			if (doc.Rows.Count == 0) {
 				return;
 			}
-			if (doc.SelectedRows.Count == 0) {
+			if (!doc.SelectedRows().Any()) {
 				Core.Operations.SelectRow.Perform(doc.Rows[0]);
 				return;
 			}
-			var lastSelectedRow = doc.SelectedRows[0];
+			var lastSelectedRow = doc.SelectedRows().OrderByDescending(i => i.SelectedAtUpdate).First();
 			var nextRow = doc.Rows[Mathf.Clamp(lastSelectedRow.Index + advance, 0, doc.Rows.Count - 1)];
 			if (nextRow != lastSelectedRow) {
 				if (!multiselection) {
 					Core.Operations.ClearRowSelection.Perform();
 				}
-				if (doc.SelectedRows.Contains(nextRow)) {
+				if (nextRow.Selected) {
 					Core.Operations.SelectRow.Perform(lastSelectedRow, false);
 				}
 				Core.Operations.SelectRow.Perform(nextRow);
@@ -206,5 +201,10 @@ namespace Tangerine.UI.Timeline
 		{
 			Operations.SetCurrentColumn.Perform(Math.Max(0, Instance.CurrentColumn + stride));
 		}
+	}
+
+	public static class RowExtensions
+	{
+		public static Components.IGridWidget GetGridWidget(this Row row) => row.Components.Get<Components.IGridWidget>();
 	}
 }

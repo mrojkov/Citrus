@@ -5,13 +5,13 @@ using System.Text;
 using System.IO;
 using Lime;
 
-namespace Tangerine
+namespace Tangerine.Core
 {
 	public class AnimatorEditorState
 	{
 		public readonly IAnimator Animator;
 		public bool CurvesShown { get; set; }
-		public bool Selected { get; set; }
+
 		public Uid Uid { get; private set; } = Uid.Generate();
 
 		public AnimatorEditorState(IAnimator animator)
@@ -35,7 +35,6 @@ namespace Tangerine
 
 		public Uid Uid { get; private set; } = Uid.Generate();
 		public float RowHeight { get; set; } = 30;
-		public bool Selected { get; set; }
 
 		public CurveEditorState(string component)
 		{

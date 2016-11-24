@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using Lime;
+using Tangerine.Core.Components;
 
 namespace Tangerine.Core
 {
@@ -63,11 +64,6 @@ namespace Tangerine.Core
 		/// The list of rows, currently displayed on the timeline.
 		/// </summary>
 		public readonly List<Row> Rows = new List<Row>();
-
-		/// <summary>
-		/// The list of selected rows, currently displayed on the timeline.
-		/// </summary>
-		public readonly VersionedCollection<Row> SelectedRows = new VersionedCollection<Row>();
 
 		/// <summary>
 		/// The list of views (timeline, inspector, ...)
@@ -189,36 +185,40 @@ namespace Tangerine.Core
 			return clone;
 		}
 
-		int selectedNodesVersion = -1;
-		List<Node> selectedNodes;
+		public IEnumerable<Row> SelectedRows()
+		{
+			foreach (var row in Rows) {
+				if (row.Selected) {
+					yield return row;
+				}
+			}
+		}
 
 		public IEnumerable<Node> SelectedNodes()
 		{
-			if (selectedNodesVersion != SelectedRows.Version) {
-				selectedNodesVersion = SelectedRows.Version;
-				selectedNodes = SelectedRows.
-					OrderBy(i => i.Index).
-					Select(i => i.Components.Get<Components.NodeRow>()?.Node).
-					Where(n => n != null).
-					ToList();
+			foreach (var row in Rows) {
+				if (row.Selected) {
+					var nr = row.Components.Get<NodeRow>();
+					if (nr != null) {
+						yield return nr.Node;
+					}
+				}
 			}
-			return selectedNodes;
 		}
 
-		public List<Row> TopLevelSelectedRows()
+		public IEnumerable<Row> TopLevelSelectedRows()
 		{
-			var topLevelSelectedRows = new List<Row>();
-			foreach (var row in SelectedRows) {
-				var discardRow = false;
-				for (var p = row.Parent; p != null; p = p.Parent) {
-					discardRow |= SelectedRows.Contains(p);
-				}
-				if (!discardRow) {
-					topLevelSelectedRows.Add(row);
+			foreach (var row in Rows) {
+				if (row.Selected) {
+					var discardRow = false;
+					for (var p = row.Parent; p != null; p = p.Parent) {
+						discardRow |= p.Selected;
+					}
+					if (!discardRow) {
+						yield return row;
+					}
 				}
 			}
-			topLevelSelectedRows.Sort((a, b) => a.Index.CompareTo(b.Index));
-			return topLevelSelectedRows;
 		}
 
 		public Row GetRowById(Uid uid)

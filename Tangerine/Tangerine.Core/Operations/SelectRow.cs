@@ -26,32 +26,19 @@ namespace Tangerine.Core.Operations
 
 		public class Processor : OperationProcessor<SelectRow>
 		{
-			class Backup { public int LastIndex; }
+			class Backup { public long selectedAtUpdate; }
 
 			protected override void InternalRedo(SelectRow op)
 			{
-				var sr = Document.Current.SelectedRows;
-				var b = new Backup { LastIndex = sr.IndexOf(op.Row) };
-				op.Save(b);
-				if (b.LastIndex >= 0) {
-					sr.RemoveAt(b.LastIndex);
-				}
-				if (op.Select) {
-					sr.Insert(0, op.Row);
+				if (op.Select ^ op.Row.Selected) {
+					op.Save(new Backup { selectedAtUpdate = op.Row.SelectedAtUpdate });
+					op.Row.SelectedAtUpdate = op.Select ? Application.UpdateCounter : 0;
 				}
 			}
 
 			protected override void InternalUndo(SelectRow op)
 			{
-				var b = op.Restore<Backup>();
-				var sr = Document.Current.SelectedRows;
-				if (op.Select) {
-					System.Diagnostics.Debug.Assert(sr[0] == op.Row);
-					sr.RemoveAt(0);
-				}
-				if (b.LastIndex >= 0) {
-					sr.Insert(b.LastIndex, op.Row);
-				}
+				op.Row.SelectedAtUpdate = op.Restore<Backup>().selectedAtUpdate;
 			}
 		}
 	}

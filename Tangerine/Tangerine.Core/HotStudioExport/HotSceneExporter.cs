@@ -3,7 +3,7 @@ using System.Linq;
 using System.IO;
 using System.Collections.Generic;
 using Lime;
-using Tangerine;
+using Tangerine.Core;
 
 namespace Orange
 {

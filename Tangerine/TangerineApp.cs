@@ -320,10 +320,10 @@ namespace Tangerine
 			h.Connect(Tools.FitToContent, new FitToContent());
 			h.Connect(Tools.FlipX, new FlipX());		
 			h.Connect(Tools.FlipY, new FlipY());
-			h.Connect(Command.Copy, Core.Operations.Copy.Perform, () => Document.Current?.SelectedRows.Count > 0);
-			h.Connect(Command.Cut, Core.Operations.Cut.Perform, () => Document.Current?.SelectedRows.Count > 0);
+			h.Connect(Command.Copy, Core.Operations.Copy.Perform, () => Document.Current?.SelectedRows().Any() ?? false);
+			h.Connect(Command.Cut, Core.Operations.Cut.Perform, () => Document.Current?.SelectedRows().Any() ?? false);
 			h.Connect(Command.Paste, Core.Operations.Paste.Perform, Document.HasCurrent);
-			h.Connect(Command.Delete, Core.Operations.Delete.Perform, () => Document.Current?.SelectedRows.Count > 0);
+			h.Connect(Command.Delete, Core.Operations.Delete.Perform, () => Document.Current?.SelectedRows().Any() ?? false);
 			h.Connect(Command.SelectAll, () => {
 				foreach (var row in Document.Current.Rows) {
 					Core.Operations.SelectRow.Perform(row, true);

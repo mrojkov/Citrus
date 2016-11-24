@@ -103,8 +103,18 @@ namespace Tangerine.UI.Inspector
 
 		void CreateWatchersToRebuild()
 		{
-			RootWidget.AddChangeWatcher(() => Document.Current.SelectedRows.Version, _ => Rebuild());
+			RootWidget.AddChangeWatcher(() => CalcSelectedRowsHashcode(), _ => Rebuild());
 			RootWidget.AddChangeWatcher(() => InspectRootNode, _ => Rebuild());
+		}
+
+		int CalcSelectedRowsHashcode()
+		{
+			int r = 0;
+			foreach (var row in Document.Current.Rows) {
+				if (row.Selected)
+					r ^= row.GetHashCode();
+			}
+			return r;
 		}
 
 		void Rebuild()
