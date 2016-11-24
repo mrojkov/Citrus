@@ -1,8 +1,5 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using Lime;
-using Tangerine.Core;
 
 namespace Tangerine.Core.Operations
 {
@@ -30,10 +27,8 @@ namespace Tangerine.Core.Operations
 
 			protected override void InternalRedo(SelectRow op)
 			{
-				if (op.Select ^ op.Row.Selected) {
-					op.Save(new Backup { selectedAtUpdate = op.Row.SelectedAtUpdate });
-					op.Row.SelectedAtUpdate = op.Select ? Application.UpdateCounter : 0;
-				}
+				op.Save(new Backup { selectedAtUpdate = op.Row.SelectedAtUpdate });
+				op.Row.SelectedAtUpdate = op.Select ? Application.UpdateCounter : 0;
 			}
 
 			protected override void InternalUndo(SelectRow op)
