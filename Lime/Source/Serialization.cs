@@ -55,6 +55,7 @@ namespace Lime
 			FieldSeparator = "\n",
 			SaveRootClass = true,
 			Unordered = true,
+			MaxOnelineFields = 8,
 		};
 
 		public enum Format
