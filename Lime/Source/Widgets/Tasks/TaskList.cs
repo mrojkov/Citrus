@@ -91,6 +91,11 @@ namespace Lime
 			return task;
 		}
 
+		public List<Task> AddConcurrent(params IEnumerator<object>[] args)
+		{
+			return args.Select(e => Add(e)).ToList();
+		}
+
 		/// <summary>
 		/// Adds task to the end of this list.
 		/// </summary>
