@@ -158,6 +158,12 @@ namespace Orange
 			AddStage(() => SyncRawAssets(".json", AssetAttributes.ZippedDeflate));
 			AddStage(() => SyncRawAssets(".txt", AssetAttributes.ZippedDeflate));
 			AddStage(() => SyncRawAssets(".csv", AssetAttributes.ZippedDeflate));
+			string rawAssetExtensions = The.Workspace.ProjectJson["RawAssetExtensions"] as string;
+			if (rawAssetExtensions != null) {
+				foreach (var extension in rawAssetExtensions.Split(' ')) {
+					AddStage(() => SyncRawAssets(extension, AssetAttributes.ZippedDeflate));
+				}
+			}
 			AddStage(SyncTextures);
 			AddStage(DeleteOrphanedMasks);
 			AddStage(DeleteOrphanedAlphaTextures);
