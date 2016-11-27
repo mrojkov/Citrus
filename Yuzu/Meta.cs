@@ -336,6 +336,23 @@ namespace Yuzu.Metadata
 			}
 			return result;
 		}
+
+		public const int FoundNonPrimitive = -1;
+		public int CountPrimitiveChildren(CommonOptions options)
+		{
+			int result = 0;
+			foreach (var yi in Items) {
+				if (yi.Type.IsPrimitive || yi.Type.IsEnum || yi.Type == typeof(string)) {
+					result += 1;
+				} else if (yi.IsCompact) {
+					var c = Get(yi.Type, options).CountPrimitiveChildren(options);
+					if (c == FoundNonPrimitive) return FoundNonPrimitive;
+					result += c;
+				} else
+					return FoundNonPrimitive;
+			}
+			return result;
+		}
 	}
 
 }

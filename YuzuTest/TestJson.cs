@@ -1421,6 +1421,30 @@ namespace YuzuTest.Json
 		}
 
 		[TestMethod]
+		public void TestOnelineNested()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.MaxOnelineFields = 2;
+			js.JsonOptions.Indent = "";
+			js.JsonOptions.FieldSeparator = " ";
+			var v1 = new SampleOneline {
+				Name = "Foo",
+				Point0 = new SamplePoint() { X = 2, Y = 5 },
+				Point1 = new SamplePoint() { X = 666, Y = 999 },
+				Rect = new SampleOnelineRect() {
+					A = new SamplePoint() { X = 10, Y = 12 },
+					B = new SamplePoint() { X = 15, Y = 75 },
+				},
+				Type = SampleEnum.E2
+			};
+			Assert.AreEqual("[ \"Foo\", [2,5], [666,999], [ [10,12], [15,75] ], 1 ]", js.ToString(v1));
+			js.JsonOptions.MaxOnelineFields = 10;
+			Assert.AreEqual("[\"Foo\",[2,5],[666,999],[[10,12],[15,75]],1]", js.ToString(v1));
+			js.JsonOptions.MaxOnelineFields = 4;
+			Assert.AreEqual("[ \"Foo\", [2,5], [666,999], [[10,12],[15,75]], 1 ]", js.ToString(v1));
+		}
+
+		[TestMethod]
 		public void TestErrors()
 		{
 			var js = new JsonSerializer();

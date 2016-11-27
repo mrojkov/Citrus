@@ -224,6 +224,30 @@ namespace YuzuTest
 		public override int GetHashCode() { return X ^ Y; }
 	}
 
+	[YuzuCompact]
+	public class SampleOnelineRect
+	{
+		[YuzuRequired]
+		public SamplePoint A;
+		[YuzuRequired]
+		public SamplePoint B;
+	}
+
+	[YuzuCompact]
+	public class SampleOneline
+	{
+		[YuzuRequired]
+		public SamplePoint Point0;
+		[YuzuRequired]
+		public SampleOnelineRect Rect;
+		[YuzuRequired]
+		public string Name;
+		[YuzuRequired]
+		public SampleEnum Type;
+		[YuzuRequired]
+		public SamplePoint Point1;
+	}
+
 	public class SampleRect
 	{
 		[YuzuRequired]

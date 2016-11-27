@@ -417,12 +417,8 @@ namespace Yuzu.Json
 
 		private bool IsOneline(Meta meta)
 		{
-			if (meta.Items.Count > JsonOptions.MaxOnelineFields)
-				return false;
-			foreach (var yi in meta.Items)
-				if (!yi.Type.IsPrimitive && !yi.Type.IsEnum && yi.Type != typeof(string))
-					return false;
-			return true;
+			var r = meta.CountPrimitiveChildren(Options);
+			return r != Meta.FoundNonPrimitive && r <= JsonOptions.MaxOnelineFields;
 		}
 
 		public Action<object> MakeDelegate(MethodInfo m)
