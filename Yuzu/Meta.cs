@@ -62,6 +62,7 @@ namespace Yuzu.Metadata
 		public readonly List<Item> Items = new List<Item>();
 		public readonly bool IsCompact;
 		public object Default { get; private set; }
+
 		public Dictionary<string, Item> TagToItem = new Dictionary<string, Item>();
 		public Func<object, YuzuUnknownStorage> GetUnknownStorage;
 
@@ -137,9 +138,7 @@ namespace Yuzu.Metadata
 			var item = new Item {
 				Alias = Options.GetAlias(ia.Any()) ?? m.Name,
 				IsOptional = ia.Required == null,
-				IsCompact =
-					m.IsDefined(Options.CompactAttribute, false) ||
-					m.GetType().IsDefined(Options.CompactAttribute, false),
+				IsCompact = m.IsDefined(Options.CompactAttribute, false),
 				SerializeIf = serializeIf != null ? Options.GetSerializeCondition(serializeIf) : null,
 				Name = m.Name,
 			};
@@ -181,6 +180,8 @@ namespace Yuzu.Metadata
 				if (!item.Type.IsClass && !item.Type.IsInterface || item.Type == typeof(object))
 					throw Error("Unable to either set or merge item {0}", item.Name);
 			}
+			if (item.Type.IsDefined(Options.CompactAttribute, false))
+				item.IsCompact = true;
 			if (ia.Member != null && item.SerializeIf == null && !Type.IsAbstract && !Type.IsInterface) {
 				if (Default == null)
 					Default = Activator.CreateInstance(Type);
