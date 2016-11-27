@@ -35,7 +35,8 @@ namespace Yuzu.Json
 
 			escapeChars['"'] = '"';
 			escapeChars['\\'] = '\\';
-			escapeChars['/'] = '/';
+			// Do not escape forward slash, see http://stackoverflow.com/questions/1580647/json-why-are-forward-slashes-escaped
+			// escapeChars['/'] = '/';
 			escapeChars['\b'] = 'b';
 			escapeChars['\f'] = 'f';
 			escapeChars['\n'] = 'n';
