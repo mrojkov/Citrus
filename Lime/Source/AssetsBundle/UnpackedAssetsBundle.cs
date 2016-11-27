@@ -17,7 +17,7 @@ namespace Lime
 
 		public override Stream OpenFile(string path)
 		{
-			return new FileStream(Path.Combine(BaseDirectory, path), FileMode.Open);
+			return new FileStream(Path.Combine(BaseDirectory, path), FileMode.Open, FileAccess.Read);
 		}
 
 		public override DateTime GetFileLastWriteTime(string path)
