@@ -221,6 +221,7 @@ namespace Lime
 			var toOrientation = ConvertInterfaceOrientation(this.InterfaceOrientation);
 			var deviceRotated = toOrientation != Application.CurrentDeviceOrientation;
 			Application.CurrentDeviceOrientation = toOrientation;
+			PlatformRenderer.RebindTextures();
 			if (OnResize != null) {
 				OnResize(this, new ResizeEventArgs { DeviceRotated = deviceRotated });
 			}

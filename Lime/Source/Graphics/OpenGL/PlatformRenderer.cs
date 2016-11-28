@@ -138,9 +138,9 @@ namespace Lime
 #endif
 		}
 
-		internal static void SetTexture(uint glTexNum, int stage)
+		internal static void SetTexture(uint glTexNum, int stage, bool force = false)
 		{
-			if (glTexNum == textures[stage])
+			if (glTexNum == textures[stage] && !force)
 				return;
 			if (stage > 0) {
 				GL.ActiveTexture(TextureUnit.Texture0 + stage);
@@ -181,6 +181,13 @@ namespace Lime
 				if (textures[i] == handle) {
 					textures[i] = 0;
 				}
+			}
+		}
+
+		public static void RebindTextures()
+		{
+			for (int i = 0; i < textures.Length; i++) {
+				SetTexture(textures[i], i, force: true);
 			}
 		}
 
