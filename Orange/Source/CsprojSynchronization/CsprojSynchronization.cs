@@ -12,7 +12,10 @@ namespace Orange
 		{
 			var limeProj = The.Workspace.GetLimeCsprojFilePath();
 			SynchronizeProject(limeProj);
-
+			var dontSynchronizeProject = The.Workspace.ProjectJson["DontSynchronizeProject"] as bool?;
+			if (dontSynchronizeProject != null && dontSynchronizeProject.Value) {
+				return;
+			}
 			foreach (var gameProj in The.Workspace.EnumerateGameCsprojFilePaths()) {
 				SynchronizeProject(gameProj);
 			}
