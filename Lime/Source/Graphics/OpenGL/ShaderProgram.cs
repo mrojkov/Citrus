@@ -192,6 +192,36 @@ namespace Lime
 			GL.Uniform2(uniformId, vector.X, vector.Y);
 		}
 
+		public void LoadVector2Array(int uniformId, Vector2[] vectors)
+		{
+			unsafe
+			{
+				fixed (Vector2* p = vectors) {
+					GL.Uniform2(uniformId, vectors.Length, (float*)p);
+				}
+			}
+		}
+
+		public void LoadVector2Array(int uniformId, Vector2[] vectors, int length)
+		{
+			unsafe
+			{
+				fixed (Vector2* p = vectors) {
+					GL.Uniform2(uniformId, length, (float*)p);
+				}
+			}
+		}
+
+		public void LoadFloatArray(int uniformId, float[] value)
+		{
+			GL.Uniform1(uniformId, value.Length, value);
+		}
+
+		public void LoadFloatArray(int uniformId, float[] value, int length)
+		{
+			GL.Uniform1(uniformId, length, value);
+		}
+
 		public void LoadVector4(int uniformId, Vector4 vector)
 		{
 			GL.Uniform4(uniformId, vector.X, vector.Y, vector.Z, vector.W);
