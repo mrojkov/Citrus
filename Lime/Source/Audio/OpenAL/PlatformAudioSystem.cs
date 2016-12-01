@@ -72,6 +72,7 @@ namespace Lime
 		static volatile bool shouldTerminateThread;
 #if iOS
 		static NSObject interruptionNotification;
+		static bool audioSessionInterruptionEnded;
 #endif
 
 		public delegate void AudioMissingDelegate(string path);
@@ -81,23 +82,13 @@ namespace Lime
 		{
 #if iOS
 			AVAudioSession.SharedInstance().Init();
-			AVAudioSession.SharedInstance().SetCategory(AVAudioSessionCategory.Ambient);
-
 			interruptionNotification = AVAudioSession.Notifications.ObserveInterruption((sender, args) => {
 				if (args.InterruptionType == AVAudioSessionInterruptionType.Began) {
-					Active = false;
 					AVAudioSession.SharedInstance().SetActive(false);
+					Active = false;
 				} else if (args.InterruptionType == AVAudioSessionInterruptionType.Ended) {
-
-					// Grisha: Workaround on "AUIOClient_StartIO failed" issue.
-					// On iOS sound not restores after incoming call.
-					// Making everything like in tutorial doesn't help much.
-					// So, we wait a bit before restoring - and it works.
-					Thread.Sleep(500);
-
-					AVAudioSession.SharedInstance().SetCategory(AVAudioSessionCategory.Ambient);
-					AVAudioSession.SharedInstance().SetActive(true);
-					Active = true;
+					// Do not restore the audio session here, because incoming call screen is still visible. Defer it until the first update.
+					audioSessionInterruptionEnded = true;
 				}
 			});
 			context = new AudioContext();
@@ -169,10 +160,10 @@ namespace Lime
 					}
 				}
 			} else {
+				Alc.MakeContextCurrent(ContextHandle.Zero);
 				if (context != null) {
 					context.Suspend();
 				}
-				Alc.MakeContextCurrent(ContextHandle.Zero);
 			}
 		}
 #else
@@ -241,6 +232,13 @@ namespace Lime
 
 		public static void Update()
 		{
+#if iOS
+			if (audioSessionInterruptionEnded) {
+				audioSessionInterruptionEnded = false;
+				AVAudioSession.SharedInstance().SetActive(true);
+				Active = true;
+			}
+#endif
 			if (streamingThread == null) {
 				UpdateChannels();
 			}
