@@ -113,6 +113,16 @@ namespace Lime
 			return new IntVector2(lhs.X / rhs, lhs.Y / rhs);
 		}
 
+		public static IntVector2 operator *(IntVector2 lhs, IntVector2 rhs)
+		{
+			return new IntVector2(lhs.X * rhs.X, lhs.Y * rhs.Y);
+		}
+
+		public static IntVector2 operator /(IntVector2 lhs, IntVector2 rhs)
+		{
+			return new IntVector2(lhs.X / rhs.X, lhs.Y / rhs.Y);
+		}
+
 		public static IntVector2 operator *(int lhs, IntVector2 rhs)
 		{
 			return new IntVector2(lhs * rhs.X, lhs * rhs.Y);
