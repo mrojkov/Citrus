@@ -9,6 +9,7 @@ using OpenTK.Graphics.OpenGL;
 #elif MONOMAC
 using MonoMac.OpenGL;
 #endif
+
 #endif
 
 namespace Lime
@@ -21,8 +22,6 @@ namespace Lime
 		private List<RenderItem> transparentList;
 		private bool zSortEnabled;
 		private RenderChain renderChain = new RenderChain();
-		private DistanceComparer backToFrontComparer = new BackToFrontComparer();
-		private DistanceComparer frontToBackComparer = new FrontToBackComparer();
 
 		public bool ZSortEnabled
 		{
@@ -49,7 +48,6 @@ namespace Lime
 			set
 			{
 				camera = value;
-				backToFrontComparer.Camera = frontToBackComparer.Camera = Camera;
 				AdjustCameraAspectRatio();
 			}
 		}
@@ -153,9 +151,9 @@ namespace Lime
 						});
 					}
 					Renderer.ZWriteEnabled = true;
-					SortAndFlushList(opaqueList, frontToBackComparer);
+					SortAndFlushList(opaqueList, RenderOrderComparers.FrontToBack);
 					Renderer.ZWriteEnabled = false;
-					SortAndFlushList(transparentList, backToFrontComparer);
+					SortAndFlushList(transparentList, RenderOrderComparers.BackToFront);
 				}
 				renderChain.Clear();
 			} else {
@@ -174,7 +172,8 @@ namespace Lime
 		{
 			items.Sort(comparer);
 			for (var i = 0; i < items.Count; i++) {
-				items[i].Node.Presenter.Render(items[i].Node);
+				var node = items[i].Node;
+				node.Presenter.Render(node);
 			}
 			items.Clear();
 		}
@@ -254,12 +253,13 @@ namespace Lime
 			return new Vector3(xy, z) * new Vector3(1, -1, 1);
 		}
 
-		private abstract class DistanceComparer : Comparer<RenderItem>
+		private static class RenderOrderComparers
 		{
-			public Camera3D Camera { get; set; }
+			public static readonly BackToFrontComparer BackToFront = new BackToFrontComparer();
+			public static readonly FrontToBackComparer FrontToBack = new FrontToBackComparer();
 		}
 
-		private class BackToFrontComparer : DistanceComparer
+		private class BackToFrontComparer : Comparer<RenderItem>
 		{
 			public override int Compare(RenderItem x, RenderItem y)
 			{
@@ -267,7 +267,7 @@ namespace Lime
 			}
 		}
 
-		private class FrontToBackComparer : DistanceComparer
+		private class FrontToBackComparer : Comparer<RenderItem>
 		{
 			public override int Compare(RenderItem x, RenderItem y)
 			{
