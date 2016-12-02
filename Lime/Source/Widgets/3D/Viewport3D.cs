@@ -17,8 +17,8 @@ namespace Lime
 	{
 		private Camera3D camera;
 		private float frame;
-		private List<Node3D> opaqueNodes;
-		private List<Node3D> transparentNodes;
+		private List<RenderItem> opaqueList;
+		private List<RenderItem> transparentList;
 		private bool zSortEnabled;
 		private RenderChain renderChain = new RenderChain();
 		private DistanceComparer backToFrontComparer = new BackToFrontComparer();
@@ -33,11 +33,11 @@ namespace Lime
 					return;
 				}
 				if (value) {
-					opaqueNodes = new List<Node3D>();
-					transparentNodes = new List<Node3D>();
+					opaqueList = new List<RenderItem>();
+					transparentList = new List<RenderItem>();
 				} else {
-					opaqueNodes = null;
-					transparentNodes = null;
+					opaqueList = null;
+					transparentList = null;
 				}
 				zSortEnabled = value;
 			}
@@ -146,13 +146,16 @@ namespace Lime
 					}
 					for (var j = 0; j < layer.Count; j++) {
 						var node = layer[j].Node.AsNode3D;
-						var list = node.Opaque ? opaqueNodes : transparentNodes;
-						list.Add(node);
+						var list = node.Opaque ? opaqueList : transparentList;
+						list.Add(new RenderItem {
+							Node = node,
+							Distance = node.CalcDistanceToCamera(camera)
+						});
 					}
 					Renderer.ZWriteEnabled = true;
-					SortAndFlushList(opaqueNodes, frontToBackComparer);
+					SortAndFlushList(opaqueList, frontToBackComparer);
 					Renderer.ZWriteEnabled = false;
-					SortAndFlushList(transparentNodes, backToFrontComparer);
+					SortAndFlushList(transparentList, backToFrontComparer);
 				}
 				renderChain.Clear();
 			} else {
@@ -167,13 +170,13 @@ namespace Lime
 			Renderer.CullMode = oldCullMode;
 		}
 
-		private void SortAndFlushList(List<Node3D> nodes, IComparer<Node3D> comparer)
+		private void SortAndFlushList(List<RenderItem> items, IComparer<RenderItem> comparer)
 		{
-			nodes.Sort(comparer);
-			for (var i = 0; i < nodes.Count; i++) {
-				nodes[i].Presenter.Render(nodes[i]);
+			items.Sort(comparer);
+			for (var i = 0; i < items.Count; i++) {
+				items[i].Node.Presenter.Render(items[i].Node);
 			}
-			nodes.Clear();
+			items.Clear();
 		}
 
 		private Matrix44 TransformProjection(Matrix44 orthoProjection)
@@ -251,29 +254,31 @@ namespace Lime
 			return new Vector3(xy, z) * new Vector3(1, -1, 1);
 		}
 
-		private abstract class DistanceComparer : Comparer<Node3D>
+		private abstract class DistanceComparer : Comparer<RenderItem>
 		{
 			public Camera3D Camera { get; set; }
 		}
 
 		private class BackToFrontComparer : DistanceComparer
 		{
-			public override int Compare(Node3D x, Node3D y)
+			public override int Compare(RenderItem x, RenderItem y)
 			{
-				var xDistance = x.CalcDistanceToCamera(Camera);
-				var yDistance = y.CalcDistanceToCamera(Camera);
-				return xDistance.CompareTo(yDistance);
+				return x.Distance.CompareTo(y.Distance);
 			}
 		}
 
 		private class FrontToBackComparer : DistanceComparer
 		{
-			public override int Compare(Node3D x, Node3D y)
+			public override int Compare(RenderItem x, RenderItem y)
 			{
-				var xDistance = x.CalcDistanceToCamera(Camera);
-				var yDistance = y.CalcDistanceToCamera(Camera);
-				return yDistance.CompareTo(xDistance);
+				return y.Distance.CompareTo(x.Distance);
 			}
+		}
+
+		private struct RenderItem
+		{
+			public Node3D Node;
+			public float Distance;
 		}
 	}
 }
