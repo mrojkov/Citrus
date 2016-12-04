@@ -22,7 +22,7 @@ namespace Tangerine.UI.Inspector
 		public readonly List<IPropertyEditor> Editors;
 		public bool InspectRootNode { get; set; }
 
-		static Inspector()
+		public static void RegisterGlobalCommands()
 		{
 			CommandHandlerList.Global.Connect(InspectorCommands.InspectRootNodeCommand, () => Instance.InspectRootNode = !Instance.InspectRootNode);
 		}

@@ -154,7 +154,7 @@ namespace Tangerine.UI.Timeline
 			return pos >= 0 && pos < Grid.Size.Y;
 		}
 
-		static Timeline()
+		public static void RegisterGlobalCommands()
 		{
 			var h = CommandHandlerList.Global;
 			h.Connect(TimelineCommands.EnterNode, () => {

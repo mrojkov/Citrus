@@ -101,7 +101,7 @@ namespace Tangerine
 			if (proj != null) {
 				new Project(proj).Open();
 			}
-			ConnectCommandsToHandlers();
+			RegisterGlobalCommands();
 		}
 
 		void CreateToolsToolbar()
@@ -288,8 +288,12 @@ namespace Tangerine
 			}
 		}
 
-		void ConnectCommandsToHandlers()
+		void RegisterGlobalCommands()
 		{
+			UI.Inspector.Inspector.RegisterGlobalCommands();
+			UI.Timeline.Timeline.RegisterGlobalCommands();
+			UI.SceneView.SceneView.RegisterGlobalCommands();
+
 			var h = CommandHandlerList.Global;
 			h.Connect(GenericCommands.New, new FileNew());
 			h.Connect(GenericCommands.Open, new FileOpen());

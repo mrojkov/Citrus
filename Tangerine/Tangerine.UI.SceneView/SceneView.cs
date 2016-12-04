@@ -23,7 +23,7 @@ namespace Tangerine.UI.SceneView
 
 		public static SceneView Instance { get; private set; }
 
-		static SceneView()
+		public static void RegisterGlobalCommands()
 		{
 			var h = CommandHandlerList.Global;
 			h.Connect(SceneViewCommands.PreviewAnimation, new PreviewAnimationHandler());
