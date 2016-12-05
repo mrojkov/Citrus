@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -61,7 +61,7 @@ namespace Lime
 	/// Scene tree element.
 	/// </summary>
 	[DebuggerTypeProxy(typeof(NodeDebugView))]
-	public class Node : IDisposable, IAnimable
+	public class Node : IDisposable, IAnimable, IFolderItem, IFolderContext
 	{
 		[Flags]
 		protected internal enum DirtyFlags
@@ -262,6 +262,9 @@ namespace Lime
 
 		[YuzuMember]
 		public AnimationList Animations { get; private set; }
+
+		[YuzuMember]
+		public List<Folder.Descriptor> Folders { get; set; }
 
 		/// <summary>
 		/// Name of last started marker of default animation. Is set to null by default.
