@@ -18,7 +18,7 @@ namespace Tangerine.Core.Components
 		}
 	}
 
-	public class CommonNodeRow
+	public class NodeRow : IComponent
 	{
 		public Node Node { get; private set; }
 
@@ -40,39 +40,19 @@ namespace Tangerine.Core.Components
 			set { Node.EditorState().Expanded = value; }
 		}
 
-		public CommonNodeRow(Node node)
+		public NodeRow(Node node)
 		{
 			Node = node;
 		}
 	}
 
-	public sealed class NodeRow : CommonNodeRow, IComponent
+	public sealed class FolderRow : IComponent
 	{
-		public NodeRow(Node node) : base(node) { }
-	}
+		public Folder Folder { get; private set; }
 
-	public sealed class FolderRow : CommonNodeRow, IComponent	
-	{
-		public FolderEnd FolderEnd { get; set; }
-		public FolderBegin FolderBegin { get; private set; }
-
-		public FolderRow(FolderBegin folderBegin) : base(folderBegin)
+		public FolderRow(Folder folder)
 		{
-			FolderBegin = folderBegin;
-		}
-
-		public IEnumerable<Node> GetNodes(bool nestedOnly = false)
-		{
-			var n = Node.Parent.Nodes;
-			int a = n.IndexOf(FolderBegin);
-			int b = n.IndexOf(FolderEnd);
-			if (a < 0 || b < 0) {
-				throw new InvalidOperationException();
-			}
-			var t = nestedOnly ? 1 : 0;
-			for (int i = a + t; i <= b - t; i++) {
-				yield return n[i];
-			}
+			Folder = folder;
 		}
 	}
 

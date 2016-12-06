@@ -169,51 +169,70 @@ namespace Tangerine.Core.Operations
 		}
 	}
 
-	public class InsertNode : Operation
+	public class InsertFolderItem : Operation
 	{
 		public readonly Node Container;
-		public readonly int Index;
-		public readonly Node Node;
+		public readonly FolderItemLocation Location;
+		public readonly IFolderItem Item;
 
 		public override bool IsChangingDocument => true;
 
-		public static void Perform(Node container, int index, Node node)
+		public static void Perform(IFolderItem item)
 		{
-			Document.Current.History.Perform(new InsertNode(container, index, node));
+			Document.Current.History.Perform(new InsertFolderItem(Document.Current.Container, GetNewFolderItemLocation(), item));
 		}
 
-		private InsertNode(Node container, int index, Node node)
+		public static void Perform(Node container, FolderItemLocation location, IFolderItem item)
+		{
+			Document.Current.History.Perform(new InsertFolderItem(container, location, item));
+		}
+
+		internal static FolderItemLocation GetNewFolderItemLocation()
+		{
+			var doc = Document.Current;
+			var fi = doc.SelectedFolderItems().FirstOrDefault();
+			return fi != null ? doc.Container.RootFolder().Find(fi) : new FolderItemLocation(doc.Container.RootFolder(), 0);
+		}
+
+		private InsertFolderItem(Node container, FolderItemLocation location, IFolderItem item)
 		{
 			Container = container;
-			Index = index;
-			Node = node;
+			Location = location;
+			Item = item;
 		}
 
-		public class Processor : OperationProcessor<InsertNode>
+		public class Processor : OperationProcessor<InsertFolderItem>
 		{
-			protected override void InternalRedo(InsertNode op)
+			protected override void InternalRedo(InsertFolderItem op)
 			{
-				op.Container.Nodes.Insert(op.Index, op.Node);
+				op.Location.Folder.Items.Insert(op.Location.Index, op.Item);
+				op.Container.SyncFolderDescriptorsAndNodes();
 			}
 
-			protected override void InternalUndo(InsertNode op)
+			protected override void InternalUndo(InsertFolderItem op)
 			{
-				op.Node.Unlink();
+				op.Location.Folder.Items.Remove(op.Item);
+				op.Container.SyncFolderDescriptorsAndNodes();
 			}
 		}
 	}
 
 	public static class CreateNode
 	{
-		public static Node Perform(Node container, int index, Type nodeType)
+		public static Node Perform(Type nodeType)
+		{
+			return Perform(Document.Current.Container, InsertFolderItem.GetNewFolderItemLocation(), nodeType);
+		}
+
+		public static Node Perform(Node container, FolderItemLocation location, Type nodeType)
 		{
 			if (!nodeType.IsSubclassOf(typeof(Node))) {
 				throw new InvalidOperationException();
 			}
-			var ctr = nodeType.GetConstructor(System.Type.EmptyTypes);
+			var ctr = nodeType.GetConstructor(Type.EmptyTypes);
 			var node = (Node)ctr.Invoke(new object[] {});
 			node.Id = GenerateNodeId(container, nodeType);
-			InsertNode.Perform(container, index, node);
+			InsertFolderItem.Perform(container, location, node);
 			ClearRowSelection.Perform();
 			SelectNode.Perform(node);
 			return node;
@@ -231,43 +250,45 @@ namespace Tangerine.Core.Operations
 		}
 	}
 
-	public class UnlinkNode : Operation
+	public class UnlinkFolderItem : Operation
 	{
-		public readonly Node Node;
+		public readonly Node Container;
+		public readonly IFolderItem Item;
 
 		public override bool IsChangingDocument => true;
 
-		public static void Perform(Node node)
+		public static void Perform(Node container, IFolderItem item)
 		{
-			if (Document.Current.SelectedNodes().Contains(node)) {
-				SelectNode.Perform(node, select: false);
-			}
-			Document.Current.History.Perform(new UnlinkNode(node));
+			Document.Current.History.Perform(new UnlinkFolderItem(container, item));
 		}
 
-		private UnlinkNode(Node node)
+		private UnlinkFolderItem(Node container, IFolderItem item)
 		{
-			Node = node;
+			Container = container;
+			Item = item;
 		}
 
-		public class Processor : OperationProcessor<UnlinkNode>
+		public class Processor : OperationProcessor<UnlinkFolderItem>
 		{
 			class Backup
 			{
 				public Node Container;
-				public int Index;
+				public FolderItemLocation Location;
 			}
 
-			protected override void InternalRedo(UnlinkNode op)
+			protected override void InternalRedo(UnlinkFolderItem op)
 			{
-				op.Save(new Backup { Container = op.Node.Parent, Index = op.Node.Parent.Nodes.IndexOf(op.Node) });
-				op.Node.Unlink();
+				var loc = op.Container.RootFolder().Find(op.Item);
+				op.Save(new Backup { Container = op.Container, Location = loc });
+				loc.Folder.Items.Remove(op.Item);
+				op.Container.SyncFolderDescriptorsAndNodes();
 			}
 
-			protected override void InternalUndo(UnlinkNode op)
+			protected override void InternalUndo(UnlinkFolderItem op)
 			{
 				var b = op.Restore<Backup>();
-				b.Container.Nodes.Insert(b.Index, op.Node);
+				b.Location.Folder.Items.Insert(b.Location.Index, op.Item);
+				b.Container.SyncFolderDescriptorsAndNodes();
 			}
 		}
 	}

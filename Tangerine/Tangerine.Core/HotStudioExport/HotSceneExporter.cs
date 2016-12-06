@@ -7,6 +7,20 @@ using Tangerine.Core;
 
 namespace Orange
 {
+	public class FolderBegin : Node
+	{
+		public bool Expanded { get; set; }
+
+		public FolderBegin()
+		{
+			Expanded = true;
+		}
+	}
+
+	public class FolderEnd : Node
+	{
+	}
+
 	public class HotSceneExporter
 	{
 		public class Serializer : Yuzu.AbstractSerializer

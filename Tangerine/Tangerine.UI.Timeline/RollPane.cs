@@ -25,7 +25,7 @@ namespace Tangerine.UI.Timeline
 				Width = RootWidget.Width,
 				Height = 0,
 				Anchors = Anchors.LeftRight,
-				Layout = new VBoxLayout { Spacing = 1 },
+				Layout = new VBoxLayout { Spacing = TimelineMetrics.RowSpacing },
 				Presenter = new DelegatePresenter<Node>(RenderBackground)
 			};
 			OverlayWidget = new Widget { Presenter = new DelegatePresenter<Widget>(w => OnRenderOverlay?.Invoke(w)) };

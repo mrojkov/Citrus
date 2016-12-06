@@ -9,7 +9,7 @@ namespace Tangerine.Core.Operations
 		public void Do(IOperation op)
 		{
 			var mesh = 
-				(op as InsertNode)?.Node as DistortionMesh ??
+				(op as InsertFolderItem)?.Item as DistortionMesh ??
 				(op as SetProperty)?.Obj as DistortionMesh;
 			if (mesh != null)
 				RestorePointsIfNeeded(mesh);
@@ -22,8 +22,9 @@ namespace Tangerine.Core.Operations
 		{
 			if (ValidateMeshPoints(mesh))
 				return;
-			foreach (var point in mesh.Nodes.ToList()) {
-				UnlinkNode.Perform(point);
+			var rootFolder = mesh.RootFolder();
+			foreach (var item in rootFolder.Items.ToList()) {
+				UnlinkFolderItem.Perform(mesh, item);
 			}
 			for (int i = 0; i <= mesh.NumRows; i++) {
 				for (int j = 0; j <= mesh.NumCols; j++) {
@@ -34,7 +35,7 @@ namespace Tangerine.Core.Operations
 						UV = pos,
 						Position = pos
 					};
-					InsertNode.Perform(mesh, mesh.Nodes.Count, point);
+					InsertFolderItem.Perform(mesh, new FolderItemLocation(rootFolder, rootFolder.Items.Count), point);
 				}
 			}
 		}

@@ -39,6 +39,9 @@ namespace Tangerine.Core
 		public bool Locked { get { return node.GetTangerineFlag(TangerineFlags.Locked); } set { node.SetTangerineFlag(TangerineFlags.Locked, value); } }
 		public bool Expanded { get { return node.GetTangerineFlag(TangerineFlags.Expanded); } set { node.SetTangerineFlag(TangerineFlags.Expanded, value); } }
 
+		Folder rootFolder;
+		public Folder RootFolder => rootFolder ?? (rootFolder = Folder.BuildTree(node));
+
 		public NodeEditorState(Node node)
 		{
 			this.node = node;
@@ -58,6 +61,16 @@ namespace Tangerine.Core
 		public static int CollectionIndex(this Node node)
 		{
 			return node.Parent.Nodes.IndexOf(node);
+		}
+
+		public static Folder RootFolder(this Node node)
+		{
+			return EditorState(node).RootFolder;
+		}
+
+		public static void SyncFolderDescriptorsAndNodes(this Node node)
+		{
+			EditorState(node).RootFolder.SyncDescriptorsAndNodes(node);
 		}
 	}
 }

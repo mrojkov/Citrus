@@ -77,7 +77,7 @@ namespace Tangerine.UI.Timeline
 		{
 			var folderRow = row.Components.Get<Core.Components.FolderRow>();
 			if (folderRow != null && !row.Components.Has<IGridWidget>()) {
-				var c = new GridNodeView(folderRow.Node);
+				var c = new GridFolderView();
 				row.Components.Add<IGridWidget>(c);
 				row.Components.Add<IOverviewWidget>(c);
 			}

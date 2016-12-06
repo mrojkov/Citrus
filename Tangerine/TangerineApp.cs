@@ -65,13 +65,12 @@ namespace Tangerine
 				new Core.Operations.SetProperty.Processor(),
 				new Core.Operations.RemoveKeyframe.Processor(),
 				new Core.Operations.SetKeyframe.Processor(),
-				new Core.Operations.InsertNode.Processor(),
-				new Core.Operations.UnlinkNode.Processor(),
+				new Core.Operations.InsertFolderItem.Processor(),
+				new Core.Operations.UnlinkFolderItem.Processor(),
 				new Core.Operations.SetMarker.Processor(),
 				new Core.Operations.DeleteMarker.Processor(),
 				new Core.Operations.DistortionMeshProcessor(),
 				new Core.Operations.TimelineHorizontalShift.Processor(),
-				new Core.Operations.DeleteRow.Processor(),
 				new UI.Timeline.Operations.SelectGridSpan.Processor(),
 				new UI.Timeline.Operations.ClearGridSelection.Processor(),
 				new UI.Timeline.Operations.ShiftGridSelection.Processor(),
@@ -324,7 +323,7 @@ namespace Tangerine
 			h.Connect(Tools.FitToContent, new FitToContent());
 			h.Connect(Tools.FlipX, new FlipX());		
 			h.Connect(Tools.FlipY, new FlipY());
-			h.Connect(Command.Copy, Core.Operations.Copy.Perform, () => Document.Current?.SelectedRows().Any() ?? false);
+			h.Connect(Command.Copy, Core.Operations.Copy.CopyToClipboard, () => Document.Current?.SelectedRows().Any() ?? false);
 			h.Connect(Command.Cut, Core.Operations.Cut.Perform, () => Document.Current?.SelectedRows().Any() ?? false);
 			h.Connect(Command.Paste, Core.Operations.Paste.Perform, Document.HasCurrent);
 			h.Connect(Command.Delete, Core.Operations.Delete.Perform, () => Document.Current?.SelectedRows().Any() ?? false);

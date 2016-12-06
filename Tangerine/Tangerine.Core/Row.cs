@@ -1,19 +1,29 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
 using Lime;
-using Tangerine.Core;
 
 namespace Tangerine.Core
 {
+	public struct RowLocation
+	{
+		public Row ParentRow;
+		public int Index;
+
+		public RowLocation(Row parentRow, int index)
+		{
+			ParentRow = parentRow;
+			Index = index;
+		}
+	}
+
 	public class Row : Entity
 	{
 		public int Index { get; set; }
-		public Row Parent { get; set; }
 		public bool Selected => SelectedAtUpdate > 0;
 		public long SelectedAtUpdate { get; set; }
+		public bool CanHaveChildren { get; set; }
+		public Row Parent { get; set; }
+		public readonly List<Row> Rows = new List<Row>();
 
 		public int CalcIndentation()
 		{
@@ -21,7 +31,7 @@ namespace Tangerine.Core
 			for (var r = Parent; r != null; r = r.Parent) {
 				i++;
 			}
-			return i;
+			return i - 1;
 		}
 	}
 }

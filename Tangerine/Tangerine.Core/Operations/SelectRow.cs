@@ -45,8 +45,6 @@ namespace Tangerine.Core.Operations
 			if (node.Parent != Document.Current.Container) {
 				throw new InvalidOperationException();
 			}
-			if (node is FolderEnd)
-				return;
 			var row = Document.Current.GetRowForObject(node);
 			SelectRow.Perform(row, select);
 		}

@@ -7,10 +7,10 @@ using Tangerine.Core.Components;
 
 namespace Tangerine.UI.Timeline.Components
 {
-	public abstract class CommonRollNodeView
+	public class RollNodeView : IRollWidget
 	{
 		protected readonly Row row;
-		protected readonly CommonNodeRow nodeData;
+		protected readonly NodeRow nodeData;
 		protected readonly SimpleText label;
 		protected readonly EditBox editBox;
 		protected readonly Image nodeIcon;
@@ -20,10 +20,10 @@ namespace Tangerine.UI.Timeline.Components
 		protected readonly ToolbarButton lockButton;
 		readonly Widget spacer;
 
-		protected CommonRollNodeView(Row row, CommonNodeRow nodeRow)
+		public RollNodeView(Row row)
 		{
 			this.row = row;
-			nodeData = nodeRow;
+			nodeData = row.Components.Get<NodeRow>();
 			label = new SimpleText();
 			editBox = new EditBox { LayoutCell = new LayoutCell(Alignment.Center, stretchX: float.MaxValue) };
 			nodeIcon = new Image(NodeIconPool.GetTexture(nodeData.Node.GetType())) {
@@ -34,6 +34,7 @@ namespace Tangerine.UI.Timeline.Components
 			var expandButtonContainer = new Widget {
 				Layout = new StackLayout { IgnoreHidden = false },
 				LayoutCell = new LayoutCell(Alignment.Center),
+				Visible = nodeData.Node.Animators.Count > 0,
 				Nodes = { expandButton }
 			};
 			eyeButton = CreateEyeButton();
@@ -63,6 +64,8 @@ namespace Tangerine.UI.Timeline.Components
 			editBox.Visible = false;
 			widget.Tasks.Add(HandleDobleClickTask());
 		}
+
+		Widget IRollWidget.Widget => widget;
 
 		void RefreshLabel()
 		{
@@ -150,36 +153,5 @@ namespace Tangerine.UI.Timeline.Components
 				Core.Operations.SetProperty.Perform(nodeData.Node, "Id", editBox.Text);
 			}
 		}
-	}
-
-	public sealed class RollNodeView : CommonRollNodeView, IRollWidget
-	{
-		public RollNodeView(Row row) : base(row, row.Components.Get<NodeRow>())
-		{
-			expandButton.Visible = nodeData.Node.Animators.Count > 0;
-		}
-
-		Widget IRollWidget.Widget => widget;
-	}
-
-	public sealed class RollFolderView : CommonRollNodeView, IRollWidget
-	{
-		public RollFolderView(Row row) : base(row, row.Components.Get<FolderRow>())
-		{
-			var nodes = Document.Current.Container.Nodes;
-			eyeButton.Clicked += () => {
-				foreach (var node in (nodeData as FolderRow).GetNodes()) {
-					Core.Operations.SetProperty.Perform(node.EditorState(), nameof(NodeEditorState.Visibility), nodeData.Visibility);
-				}
-			};
-			lockButton.Clicked += () => {
-				foreach (var node in (nodeData as FolderRow).GetNodes()) {
-					Core.Operations.SetProperty.Perform(node.EditorState(), nameof(NodeEditorState.Locked), nodeData.Locked);
-				}
-			};
-			nodeIcon.Texture = IconPool.GetTexture("Tools.NewFolder");
-		}
-
-		Widget IRollWidget.Widget => widget;
 	}
 }

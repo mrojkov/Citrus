@@ -66,6 +66,11 @@ namespace Tangerine.Core
 		public readonly List<Row> Rows = new List<Row>();
 
 		/// <summary>
+		/// The root of the current row hierarchy.
+		/// </summary>
+		public Row RowTree { get; set; }
+
+		/// <summary>
 		/// The list of views (timeline, inspector, ...)
 		/// </summary>
 		public readonly List<IDocumentView> Views = new List<IDocumentView>();
@@ -201,6 +206,22 @@ namespace Tangerine.Core
 					var nr = row.Components.Get<NodeRow>();
 					if (nr != null) {
 						yield return nr.Node;
+					}
+				}
+			}
+		}
+
+		public IEnumerable<IFolderItem> SelectedFolderItems()
+		{
+			foreach (var row in Rows) {
+				if (row.Selected) {
+					var nr = row.Components.Get<NodeRow>();
+					if (nr != null) {
+						yield return nr.Node;
+					}
+					var fr = row.Components.Get<FolderRow>();
+					if (fr != null) {
+						yield return fr.Folder;
 					}
 				}
 			}

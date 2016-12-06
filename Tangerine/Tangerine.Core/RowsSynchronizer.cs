@@ -8,130 +8,89 @@ namespace Tangerine.Core
 {
 	public class RowsSynchronizer : SymmetricOperationProcessor
 	{
-		readonly Stack<Row> folderStack = new Stack<Row>();
 		readonly List<Row> rows = new List<Row>();
-		int freezeCounter;
 
 		public override void Process(IOperation op)
 		{
-			if (CanSyncRows(op)) {
-				BuildRows();
-				if (!rows.SequenceEqual(Document.Current.Rows)) {
-					Document.Current.Rows.Clear();
-					Document.Current.Rows.AddRange(rows);
-				}
-			}
-		}
-
-		bool CanSyncRows(IOperation op)
-		{
-			if (op is Operations.FreezeRows) {
-				freezeCounter++;
-				return true;
-			}
-			if (op is Operations.UnfreezeRows) {
-				freezeCounter--;
-				return true;
-			}
-			return freezeCounter == 0;
-		}
-
-		void BuildRows()
-		{
-			folderStack.Clear();
+			var doc = Document.Current;
 			rows.Clear();
-			int skipFolderCounter = 0;
-			foreach (var node in Document.Current.Container.Nodes) {
-				if (skipFolderCounter > 0) {
-					if (node is FolderBegin)
-						skipFolderCounter++;
-					if (node is FolderEnd)
-						skipFolderCounter--;
-				}
-				if (skipFolderCounter > 0)
-					continue;
-				if (node is FolderBegin) {
-					var row = AddFolderRow((FolderBegin)node, ParentFolderRow());
-					folderStack.Push(row);
-					if (!node.EditorState().Expanded)
-						skipFolderCounter = 1;
-				} else if (node is FolderEnd) {
-					var row = folderStack.Pop();
-					row.Components.Get<FolderRow>().FolderEnd = (FolderEnd)node;
-				} else {
-					var nodeRow = AddNodeRow(node, ParentFolderRow());
+			doc.RowTree = GetFolderRow(doc.Container.RootFolder());
+			doc.RowTree.Rows.Clear();
+			AddFolderContent(doc.RowTree);
+			// Use temporal row list to avoid 'Collection was modified' exception during row batch processing.
+			if (!rows.SequenceEqual(Document.Current.Rows)) {
+				doc.Rows.Clear();
+				doc.Rows.AddRange(rows);
+			}
+		}
+
+		void AddFolderContent(Row parentRow)
+		{
+			var parentFolder = parentRow.Components.Get<FolderRow>().Folder;
+			foreach (var i in parentFolder.Items) {
+				var node = i as Node;
+				var folder = i as Folder;
+				if (node != null) {
+					var nodeRow = AddNodeRow(parentRow, node);
 					if (node.EditorState().Expanded) {
 						foreach (var animator in node.Animators) {
-							AddAnimatorRow(node, animator, nodeRow);
+							AddAnimatorRow(nodeRow, node, animator);
 						}
+					}
+				} else if (folder != null) {
+					var folderRow = AddFolderRow(parentRow, folder);
+					if (folder.Expanded) {
+						AddFolderContent(folderRow);
 					}
 				}
 			}
-			if (folderStack.Count > 0) {
-				throw new InvalidOperationException("Missing FolderEnd node");
-			}
 		}
 
-		Row ParentFolderRow() => folderStack.Count > 0 ? folderStack.Peek() : null;
-
-		Row AddAnimatorRow(Node node, IAnimator animator, Row parent)
+		Row AddAnimatorRow(Row parent, Node node, IAnimator animator)
 		{
 			var row = Document.Current.GetRowForObject(animator);
 			if (!row.Components.Has<PropertyRow>()) {
 				row.Components.Add(new PropertyRow(node, animator));
 			}
-			AddRow(row, parent);
+			AddRow(parent, row);
 			return row;
 		}
 
-		Row AddNodeRow(Node node, Row parent)
+		Row AddNodeRow(Row parent, Node node)
 		{
 			var row = Document.Current.GetRowForObject(node);
 			if (!row.Components.Has<NodeRow>()) {
 				row.Components.Add(new NodeRow(node));
+				row.CanHaveChildren = true;
 			}
-			AddRow(row, parent);
+			AddRow(parent, row);
 			return row;
 		}
 
-		Row AddFolderRow(FolderBegin node, Row parent)
+		Row AddFolderRow(Row parent, Folder folder)
 		{
-			var row = Document.Current.GetRowForObject(node);
-			if (!row.Components.Has<FolderRow>()) {
-				row.Components.Add(new FolderRow(node));
-			}
-			AddRow(row, parent);
+			var row = GetFolderRow(folder);
+			AddRow(parent, row);
 			return row;
 		}
 
-		void AddRow(Row row, Row parent)
+		Row GetFolderRow(Folder folder)
+		{
+			var row = Document.Current.GetRowForObject(folder);
+			if (!row.Components.Has<FolderRow>()) {
+				row.Components.Add(new FolderRow(folder));
+				row.CanHaveChildren = true;
+			}
+			return row;
+		}
+
+		void AddRow(Row parent, Row row)
 		{
 			row.Index = rows.Count;
 			row.Parent = parent;
+			row.Rows.Clear();
 			rows.Add(row);
-		}
-	}
-
-	namespace Operations
-	{
-		public class FreezeRows : Operation
-		{
-			public override bool IsChangingDocument => false;
-
-			public static void Perform()
-			{
-				Document.Current.History.Perform(new FreezeRows());
-			}
-		}
-
-		public class UnfreezeRows : Operation
-		{
-			public override bool IsChangingDocument => false;
-
-			public static void Perform()
-			{
-				Document.Current.History.Perform(new UnfreezeRows());
-			}
+			parent.Rows.Add(row);
 		}
 	}
 }

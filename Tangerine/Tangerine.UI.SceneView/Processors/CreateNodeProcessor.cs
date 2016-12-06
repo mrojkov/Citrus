@@ -15,7 +15,7 @@ namespace Tangerine.UI.SceneView
 				var c = sv.Components.Get<CreateNodeRequestComponent>();
 				if (c != null) {
 					sv.Components.Remove<CreateNodeRequestComponent>();
-					Core.Operations.CreateNode.Perform(Document.Current.Container, 0, c.NodeType);
+					Core.Operations.CreateNode.Perform(c.NodeType);
 				}
 				yield return null;
 			}
