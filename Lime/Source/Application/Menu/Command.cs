@@ -9,7 +9,7 @@ namespace Lime
 	public interface ICommand
 	{
 		/// <summary>
-		/// Gets or sets the command's descriptive text. 
+		/// Gets or sets the command's descriptive text.
 		/// If the command is added to a menu, the menu option will consist of the text and the shortcut (if there is one).
 		/// </summary>
 		string Text { get; set; }
@@ -20,7 +20,7 @@ namespace Lime
 		Shortcut Shortcut { get; set; }
 
 		/// <summary>
-		/// Gets or sets the menu contained by this command. 
+		/// Gets or sets the menu contained by this command.
 		/// Commands that contain menus can be used to create menu items with submenus,
 		/// or inserted into toolbars to create buttons with popup menus.
 		/// </summary>
@@ -37,7 +37,7 @@ namespace Lime
 		bool Visible { get; set; }
 
 		/// <summary>
-		/// Gets or sets a value indicating whether the command will auto repeat when the keyboard shortcut combination is held down. 
+		/// Gets or sets a value indicating whether the command will auto repeat when the keyboard shortcut combination is held down.
 		/// Commands used in the main menu are always repeatable. The default value is true.
 		/// </summary>
 		bool Repeatable { get; set; }
@@ -99,7 +99,7 @@ namespace Lime
 
 		public int Version { get; private set; } = 1;
 
-		public string Text 
+		public string Text
 		{
 			get { return text; }
 			set
@@ -173,6 +173,8 @@ namespace Lime
 		}
 
 		public bool Repeatable { get; set; } = true;
+
+		public bool Pressed { get; set; }
 
 		public event Action Issued;
 		public static readonly ICommand MenuSeparator = new Command();
