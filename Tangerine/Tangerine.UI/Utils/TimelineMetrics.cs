@@ -9,7 +9,7 @@ namespace Tangerine.UI
 
 	public static class TimelineMetrics
 	{
-		public const float RollIndentation = 16;
+		public const float RollIndentation = 25;
 		public static float ColWidth = 15;
 		public const float DefaultRowHeight = 30;
 		public const float RowSpacing = 1;
