@@ -102,8 +102,17 @@ namespace Tangerine.UI.Timeline
 			}
 			Timeline.Instance.Roll.ContentWidget.PrepareRendererState();
 			Renderer.DrawRect(
-				new Vector2(TimelineMetrics.RollIndentation * (pr.CalcIndentation() + 1), y - 1), 
+				new Vector2(TimelineMetrics.RollIndentation * CalcIndentation(pr), y - 1), 
 				new Vector2(Timeline.Instance.Roll.ContentWidget.Width, y + 1), Colors.DragCursor);
+		}
+
+		static int CalcIndentation(Row row)
+		{
+			int i = 0;
+			for (var r = row.Parent; r != null; r = r.Parent) {
+				i++;
+			}
+			return i;
 		}
 
 		static float CalcSubtreeHeight(Row row)

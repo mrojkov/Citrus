@@ -25,15 +25,13 @@ namespace Tangerine.UI.Timeline.Components
 				Texture = IconPool.GetTexture("Nodes.Unknown"),
 				MinMaxSize = new Vector2(16, 16)
 			};
-			spacer = new Widget();
 			widget = new Widget {
 				Padding = new Thickness { Left = 4, Right = 2 },
 				MinHeight = TimelineMetrics.DefaultRowHeight,
 				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center) },
 				HitTestTarget = true,
 				Nodes = {
-					spacer,
-					// CreateExpandButton(),
+					(spacer = new Widget()),
 					new HSpacer(6),
 					propIcon,
 					new HSpacer(3),
@@ -41,7 +39,6 @@ namespace Tangerine.UI.Timeline.Components
 					new Widget(),
 				},
 			};
-			spacer.Updating += delta => spacer.MinMaxWidth = row.CalcIndentation() * TimelineMetrics.RollIndentation;
 			widget.CompoundPresenter.Push(new DelegatePresenter<Widget>(RenderBackground));
 		}
 
@@ -62,5 +59,6 @@ namespace Tangerine.UI.Timeline.Components
 		}
 
 		Widget IRollWidget.Widget => widget;
+		float IRollWidget.Indentation { set { spacer.MinMaxWidth = value; } }
 	}	
 }

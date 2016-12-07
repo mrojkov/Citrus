@@ -13,6 +13,23 @@ namespace Tangerine.UI.Timeline
 			if (!AreWidgetsValid()) {
 				ResetWidgets();
 			}
+			UpdateIndentation();
+		}
+
+		void UpdateIndentation()
+		{
+			foreach (var row in Document.Current.Rows) {
+				row.Components.Get<Components.IRollWidget>().Indentation = CalcIndentation(row) * TimelineMetrics.RollIndentation;
+			}
+		}
+
+		int CalcIndentation(Row row)
+		{
+			int i = 0;
+			for (var r = row.Parent; r != null; r = r.Parent) {
+				i++;
+			}
+			return i - 1;
 		}
 
 		void ResetWidgets()

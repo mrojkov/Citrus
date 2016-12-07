@@ -10,6 +10,7 @@ namespace Tangerine.UI.Timeline.Components
 		readonly Row row;
 		readonly SimpleText label;
 		readonly Widget widget;
+		readonly Widget spacer;
 
 		public RollCurveView(Row row)
 		{
@@ -22,7 +23,7 @@ namespace Tangerine.UI.Timeline.Components
 				Layout = new HBoxLayout(),
 				HitTestTarget = true,
 				Nodes = {
-					new HSpacer(row.CalcIndentation() * TimelineMetrics.RollIndentation),
+					(spacer = new Widget()),
 					label,
 				},
 			};
@@ -31,6 +32,7 @@ namespace Tangerine.UI.Timeline.Components
 		}
 
 		Widget IRollWidget.Widget => widget;
+		float IRollWidget.Indentation { set { spacer.MinMaxWidth = value; } }
 
 		void RenderBackground(Widget widget)
 		{

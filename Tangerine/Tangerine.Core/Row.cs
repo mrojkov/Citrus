@@ -24,14 +24,5 @@ namespace Tangerine.Core
 		public bool CanHaveChildren { get; set; }
 		public Row Parent { get; set; }
 		public readonly List<Row> Rows = new List<Row>();
-
-		public int CalcIndentation()
-		{
-			int i = 0;
-			for (var r = Parent; r != null; r = r.Parent) {
-				i++;
-			}
-			return i - 1;
-		}
 	}
 }

@@ -39,14 +39,13 @@ namespace Tangerine.UI.Timeline.Components
 			};
 			eyeButton = CreateEyeButton();
 			lockButton = CreateLockButton();
-			spacer = new Widget();
 			widget = new Widget {
 				Padding = new Thickness { Left = 4, Right = 2 },
 				MinHeight = TimelineMetrics.DefaultRowHeight,
 				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center) },
 				HitTestTarget = true,
 				Nodes = {
-					spacer,
+					(spacer = new Widget()),
 					expandButtonContainer,
 					nodeIcon,
 					new HSpacer(3),
@@ -57,7 +56,6 @@ namespace Tangerine.UI.Timeline.Components
 					lockButton,
 				},
 			};
-			spacer.Updating += delta => spacer.MinMaxWidth = row.CalcIndentation() * TimelineMetrics.RollIndentation;
 			label.AddChangeWatcher(() => folder.Id, s => label.Text = folder.Id);
 			widget.CompoundPresenter.Push(new DelegatePresenter<Widget>(RenderBackground));
 			editBox.Visible = false;
@@ -65,6 +63,7 @@ namespace Tangerine.UI.Timeline.Components
 		}
 
 		Widget IRollWidget.Widget => widget;
+		float IRollWidget.Indentation { set { spacer.MinMaxWidth = value; } }
 
 		ToolbarButton CreateEyeButton()
 		{
