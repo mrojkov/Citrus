@@ -24,7 +24,7 @@ namespace Tangerine
 			WindowOptions.DefaultRefreshRate = 60;
 			WidgetInput.AcceptMouseBeyondWidgetByDefault = false;
 			Application.IsTangerine = true;
-			Lime.Serialization.DeserializerBuilders.Insert(0, DeserializeHotStudioAssets);
+			Serialization.DeserializerBuilders.Insert(0, DeserializeHotStudioAssets);
 			Widget.DefaultWidgetSize = Vector2.Zero;
 			Theme.Current = new DesktopTheme();
 			LoadFont();
@@ -70,6 +70,7 @@ namespace Tangerine
 				new Core.Operations.SetMarker.Processor(),
 				new Core.Operations.DeleteMarker.Processor(),
 				new Core.Operations.DistortionMeshProcessor(),
+				new Core.Operations.SyncFolderDescriptorsProcessor(),
 				new Core.Operations.TimelineHorizontalShift.Processor(),
 				new UI.Timeline.Operations.SelectGridSpan.Processor(),
 				new UI.Timeline.Operations.ClearGridSelection.Processor(),
