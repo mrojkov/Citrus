@@ -40,9 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClassAttributes.cs" />
-    <Compile Include="Components\CurveRow.cs" />
-    <Compile Include="Components\NodeRow.cs" />
-    <Compile Include="Components\PropertyRow.cs" />
+    <Compile Include="Components.cs" />
     <Compile Include="HotStudioExport\HotSceneExporter.cs" />
     <Compile Include="HotStudioImport\HotAnimators.cs" />
     <Compile Include="HotStudioImport\HotFontImporter.cs" />
@@ -53,11 +51,11 @@
     <Compile Include="Operations\ClearRowSelection.cs" />
     <Compile Include="Operations\CopyPaste.cs" />
     <Compile Include="Operations\DistortionMeshProcessor.cs" />
-    <Compile Include="Operations\DragRows.cs" />
     <Compile Include="Operations\DummyOperation.cs" />
     <Compile Include="Operations\EnterLeaveNode.cs" />
     <Compile Include="Operations\SelectRow.cs" />
     <Compile Include="Operations\SelectRowRange.cs" />
+    <Compile Include="Operations\SyncFolderDescriptorsProcessor.cs" />
     <Compile Include="Operations\TimelineHorizontalShift.cs" />
     <Compile Include="Project.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -70,7 +68,6 @@
     <Compile Include="PropertyAttributes.cs" />
     <Compile Include="Row.cs" />
     <Compile Include="RowsSynchronizer.cs" />
-    <Compile Include="Uid.cs" />
     <Compile Include="Operation.cs" />
     <Compile Include="VersionedCollection.cs" />
     <Compile Include="WidgetExtensions.cs" />
