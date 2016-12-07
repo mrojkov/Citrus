@@ -1,5 +1,6 @@
 using System.IO;
 using System;
+using System.Linq;
 using Lime;
 using System.Collections.Generic;
 using Tangerine.Core;
@@ -64,7 +65,38 @@ namespace Orange
 				}
 				lexer.ReadLine();
 				node.EditorState().ThumbnailData = ReadThumbnail(lexer);
+				ConvertFolderBeginEndToDescriptors(node);
 				return node;
+			}
+		}
+
+		void ConvertFolderBeginEndToDescriptors(Node node)
+		{
+			var stack = new Stack<Folder.Descriptor>();
+			int j = 0;
+			foreach (var n in node.Nodes.ToList()) {
+				if (n is FolderBegin) {
+					var fb = (FolderBegin)n;
+					node.Nodes.RemoveAt(j);
+					var fd = new Folder.Descriptor { Id = fb.Id, Expanded = fb.Expanded, Index = j };
+					stack.Push(fd);
+					if (node.Folders == null) {
+						node.Folders = new List<Folder.Descriptor>();
+					}
+					node.Folders.Add(fd);
+				} else if (n is FolderEnd) {
+					node.Nodes.RemoveAt(j);
+					stack.Pop();
+					if (stack.Count > 0) {
+						stack.Peek().ItemCount++;
+					}
+				} else {
+					ConvertFolderBeginEndToDescriptors(n);
+					if (stack.Count > 0) {
+						stack.Peek().ItemCount++;
+					}
+					j++;
+				}
 			}
 		}
 
@@ -1023,8 +1055,8 @@ namespace Orange
 				new KnownActorType {ActorClass = "Hot::SplinePoint", NodeClass = "Lime.SplinePoint, Lime", PropReader = ParseSplinePointProperty},
 				new KnownActorType {ActorClass = "Hot::Gear", NodeClass = "Lime.SplineGear, Lime", PropReader = ParseGearProperty},
 				new KnownActorType {ActorClass = "Hot::Button", NodeClass = "Lime.Button, Lime", PropReader = ParseButtonProperty},
-				new KnownActorType {ActorClass = "Hot::FolderBegin", NodeClass = "Lime.FolderBegin, Lime", PropReader = ParseFolderBeginProperty},
-				new KnownActorType {ActorClass = "Hot::FolderEnd", NodeClass = "Lime.FolderEnd, Lime", PropReader = ParseFolderEndProperty},
+				new KnownActorType {ActorClass = "Hot::FolderBegin", NodeClass = "Orange.FolderBegin, Tangerine.Core", PropReader = ParseFolderBeginProperty},
+				new KnownActorType {ActorClass = "Hot::FolderEnd", NodeClass = "Orange.FolderEnd, Tangerine.Core", PropReader = ParseFolderEndProperty},
 				new KnownActorType {ActorClass = "Hot::NineGrid", NodeClass = "Lime.NineGrid, Lime", PropReader = ParseNineGridProperty},
 				new KnownActorType {ActorClass = "Hot::Slider", NodeClass = "Lime.Slider, Lime", PropReader = ParseSliderProperty},
 				new KnownActorType {ActorClass = "Hot::RichText", NodeClass = "Lime.RichText, Lime", PropReader = ParseRichTextProperty},

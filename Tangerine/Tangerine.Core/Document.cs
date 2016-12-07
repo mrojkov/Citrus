@@ -182,6 +182,9 @@ namespace Tangerine.Core
 			var clone = node.Clone();
 			foreach (var n in clone.Descendants) {
 				n.AnimationFrame = 0;
+				if (n.Folders != null && n.Folders.Count == 0) {
+					n.Folders = null;
+				}
 			}
 			foreach (var n in clone.Descendants.Where(i => i.ContentsPath != null)) {
 				n.Nodes.Clear();

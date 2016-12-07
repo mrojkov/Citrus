@@ -17,9 +17,7 @@ namespace Orange
 		}
 	}
 
-	public class FolderEnd : Node
-	{
-	}
+	public class FolderEnd : Node { }
 
 	public class HotSceneExporter
 	{
@@ -202,18 +200,74 @@ namespace Orange
 			};
 		}
 
-
 		public void Export(Stream stream, Node node)
 		{
-			using (var tw = new StreamWriter(stream)) {
-				writer = new Writer(tw);
-				Write(node);
-				var thumbnail = node.EditorState().ThumbnailData;
-				if (thumbnail != null) {
-					tw.NewLine = "\r\n";
-					tw.WriteLine(HotSceneImporter.ThumbnailMarker);
-					tw.Write(thumbnail);
+			CreateFolderBeginEndNodes(node);
+			try {
+				using (var tw = new StreamWriter(stream)) {
+					writer = new Writer(tw);
+					Write(node);
+					var thumbnail = node.EditorState().ThumbnailData;
+					if (thumbnail != null) {
+						tw.NewLine = "\r\n";
+						tw.WriteLine(HotSceneImporter.ThumbnailMarker);
+						tw.Write(thumbnail);
+					}
 				}
+			} finally {
+				RemoveFolderBeginEndNodes(node);
+			}
+		}
+
+		void CreateFolderBeginEndNodes(Node node)
+		{
+			foreach (var n in node.Nodes) {
+				CreateFolderBeginEndNodes(n);
+			}
+			if (node.Folders == null) {
+				return;
+			}
+			var stack = new Stack<int>();
+			var nodes = node.Nodes.ToList();
+			node.Nodes.Clear();
+			int folderIndex = 0;
+			int nodeIndex = 0;
+			while (true) {
+				if (folderIndex < node.Folders.Count && node.Folders[folderIndex].Index <= nodeIndex) {
+					var folder = node.Folders[folderIndex];
+					node.Nodes.Add(new FolderBegin { Id = folder.Id, Expanded = folder.Expanded });
+					stack.Push(folder.ItemCount);
+					folderIndex++;
+				} else if (nodeIndex < nodes.Count) {
+					node.Nodes.Add(nodes[nodeIndex++]);
+				} else {
+					break;
+				}
+				while (stack.Count > 0) {
+					var c = stack.Pop();
+					if (c > 0) {
+						stack.Push(c - 1);
+						break;
+					}
+					node.Nodes.Add(new FolderEnd());
+				}
+			}
+			while (stack.Count > 0) {
+				stack.Pop();
+				nodes.Add(new FolderEnd());
+			}
+		}
+
+		void RemoveFolderBeginEndNodes(Node node)
+		{
+			foreach (var n in node.Nodes) {
+				RemoveFolderBeginEndNodes(n);
+			}
+			if (node.Folders == null) {
+				return;
+			}
+			foreach (var n in node.Nodes.Where(i => i is FolderBegin || i is FolderEnd).ToList()) {
+				n.Unlink();
 			}
 		}
 
