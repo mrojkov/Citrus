@@ -43,6 +43,11 @@ namespace Lime
 		bool Repeatable { get; set; }
 
 		/// <summary>
+		/// Gets or sets a value indicating whether the menu item or tool button is checked.
+		/// </summary>
+		bool Checked { get; set; }
+
+		/// <summary>
 		/// Gets or sets the icon. The icon is used as the tool button icon.
 		/// </summary>
 		ITexture Icon { get; set; }
@@ -174,7 +179,7 @@ namespace Lime
 
 		public bool Repeatable { get; set; } = true;
 
-		public bool Pressed { get; set; }
+		public bool Checked { get; set; }
 
 		public event Action Issued;
 		public static readonly ICommand MenuSeparator = new Command();
