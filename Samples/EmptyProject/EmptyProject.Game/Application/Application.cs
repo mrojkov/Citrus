@@ -26,15 +26,6 @@ namespace EmptyProject.Application
 			AssetsBundle.Instance = CreateAssetsBundle();
 			Profile.Instance = new Profile();
 
-			Key.ShortcutMap.Add(new Shortcut(Modifiers.Control, Key.C), Key.Commands.Copy);
-			Key.ShortcutMap.Add(new Shortcut(Modifiers.Control, Key.X), Key.Commands.Cut);
-			Key.ShortcutMap.Add(new Shortcut(Modifiers.Control, Key.V), Key.Commands.Paste);
-
-			Key.ShortcutMap.Add(new Shortcut(Modifiers.Control, Key.Left), Editor.Keys.PreviousWord);
-			Key.ShortcutMap.Add(new Shortcut(Modifiers.Control, Key.Right), Editor.Keys.NextWord);
-			Key.ShortcutMap.Add(new Shortcut(Modifiers.Control, Key.BackSpace), Editor.Keys.DeletePreviousWord);
-			Key.ShortcutMap.Add(new Shortcut(Modifiers.Control, Key.Delete), Editor.Keys.DeleteNextWord);
-
 			LoadFonts();
 			LoadDictionary();
 			SetWindowSize();

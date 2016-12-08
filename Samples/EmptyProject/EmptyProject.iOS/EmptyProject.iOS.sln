@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmptyProject.iOS", "EmptyProject.iOS.csproj", "{304BC36A-88DE-41EA-B596-E07505A14FD2}"
@@ -9,9 +9,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lime.iOS", "..\..\Citrus\Li
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lemon.iOS", "..\..\Citrus\Lemon\Lemon.iOS.csproj", "{C4795CBE-B192-4E53-8140-7310FBD206DD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yuzu.iOS", "..\..\..\Citrus\Yuzu\Yuzu.iOS.csproj", "{DF52C768-5E17-4A26-AD77-4BDD31A2224C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yuzu.iOS", "..\..\Citrus\Yuzu\Yuzu.iOS.csproj", "{DF52C768-5E17-4A26-AD77-4BDD31A2224C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicFont.iOS", "..\..\..\Citrus\Lime\Extensions\DynamicFont\DynamicFont.iOS.csproj", "{B956A746-3D0C-4378-926B-8A776846FFFA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicFont.iOS", "..\..\Citrus\Lime\Extensions\DynamicFont\DynamicFont.iOS.csproj", "{B956A746-3D0C-4378-926B-8A776846FFFA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
