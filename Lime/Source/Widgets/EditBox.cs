@@ -20,6 +20,7 @@ namespace Lime
 			Scroll = new ScrollView(this, ScrollDirection.Horizontal);
 			Scroll.CanScroll = false;
 			TextWidget = new SimpleText();
+			TextWidget.Height = Height;
 			Scroll.Content.AddNode(TextWidget);
 			Theme.Current.Apply(this);
 		}
@@ -33,8 +34,10 @@ namespace Lime
 		protected override void OnSizeChanged(Vector2 sizeDelta)
 		{
 			base.OnSizeChanged(sizeDelta);
-			TextWidget.Height = Height;
-			Editor.AdjustSizeAndScrollToCaret();
+			if (TextWidget != null) { // Size is assigned in Widget constructor.
+				TextWidget.Height = Height;
+				Editor?.AdjustSizeAndScrollToCaret();
+			}
 		}
 	}
 }
