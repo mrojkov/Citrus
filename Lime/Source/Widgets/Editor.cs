@@ -415,7 +415,7 @@ namespace Lime
 				var hs = HasSelection();
 				Command.Cut.Enabled = hs && IsTextReadable;
 				Command.Copy.Enabled = hs && IsTextReadable;
-				Command.Delete.Enabled = hs;
+				Command.Delete.Enabled = hs || CaretPos.TextPos < TextLength;
 				Command.Paste.Enabled = !string.IsNullOrEmpty(Clipboard.Text);
 				Command.Undo.Enabled = History.CanUndo();
 				Command.ConsumeRange(consumingCommands);
@@ -462,7 +462,7 @@ namespace Lime
 		{
 			var s = EditorParams.Scroll;
 			if (s == null) return;
-			// Layout has not been not done yet.
+			// Layout has not been done yet.
 			if (s.Frame.Size == Vector2.Zero) return;
 			// ScrollView limits scrolling by Content.Size.
 			// Container.Size must be large enough to satistfy scissor test,
