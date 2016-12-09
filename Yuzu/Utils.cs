@@ -240,4 +240,26 @@ namespace Yuzu.Util
 		public int Value = 0;
 	}
 
+	public class ActionList
+	{
+		public struct MethodAction
+		{
+			public MethodInfo Info;
+			public Action<object> Run;
+		}
+
+		public List<MethodAction> Actions = new List<MethodAction>();
+
+		public void MaybeAdd(MethodInfo m, Type attr)
+		{
+			if (m.IsDefined(attr, false))
+				Actions.Add(new MethodAction { Info = m, Run = obj => m.Invoke(obj, null) });
+		}
+		public void Run(object obj)
+		{
+			foreach (var a in Actions)
+				a.Run(obj);
+		}
+	}
+
 }

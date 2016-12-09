@@ -70,14 +70,8 @@ namespace Yuzu.Metadata
 		public Dictionary<string, Item> TagToItem = new Dictionary<string, Item>();
 		public Func<object, YuzuUnknownStorage> GetUnknownStorage;
 
-		public struct MethodAction
-		{
-			public MethodInfo Info;
-			public Action<object> Run;
-		}
-
-		public List<MethodAction> BeforeSerialization = new List<MethodAction>();
-		public List<MethodAction> AfterDeserialization = new List<MethodAction>();
+		public ActionList BeforeSerialization = new ActionList();
+		public ActionList AfterDeserialization = new ActionList();
 
 #if !iOS // Apple forbids code generation.
 		private static Action<object, object> SetterGenericHelper<TTarget, TParam>(MethodInfo m)
@@ -219,22 +213,8 @@ namespace Yuzu.Metadata
 
 		private void AddMethod(MethodInfo m)
 		{
-			if (m.IsDefined(Options.BeforeSerializationAttribute, false))
-				BeforeSerialization.Add(new MethodAction { Info = m, Run = obj => m.Invoke(obj, null) });
-			if (m.IsDefined(Options.AfterDeserializationAttribute, false))
-				AfterDeserialization.Add(new MethodAction { Info = m, Run = obj => m.Invoke(obj, null) });
-		}
-
-		public void RunBeforeSerialization(object obj)
-		{
-			foreach (var a in BeforeSerialization)
-				a.Run(obj);
-		}
-
-		public void RunAfterDeserialization(object obj)
-		{
-			foreach (var a in AfterDeserialization)
-				a.Run(obj);
+			BeforeSerialization.MaybeAdd(m, Options.BeforeSerializationAttribute);
+			AfterDeserialization.MaybeAdd(m, Options.AfterDeserializationAttribute);
 		}
 
 		private void ExploreType(Type t)

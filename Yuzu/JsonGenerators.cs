@@ -346,7 +346,7 @@ namespace Yuzu.Json
 
 		private void GenerateAfterDeserialization(Meta meta)
 		{
-			foreach (var a in meta.AfterDeserialization)
+			foreach (var a in meta.AfterDeserialization.Actions)
 				cw.Put("result.{0}();\n", a.Info.Name);
 		}
 

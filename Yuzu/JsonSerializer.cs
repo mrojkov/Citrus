@@ -551,7 +551,7 @@ namespace Yuzu.Json
 			var actualType = obj.GetType();
 			if (typeof(T) != actualType)
 				meta = Meta.Get(actualType, Options);
-			meta.RunBeforeSerialization(obj);
+			meta.BeforeSerialization.Run(obj);
 			writer.Write((byte)'{');
 			WriteFieldSeparator();
 			objStack.Push(obj);
@@ -615,7 +615,7 @@ namespace Yuzu.Json
 				writer.Write(nullBytes);
 				return;
 			}
-			meta.RunBeforeSerialization(obj);
+			meta.BeforeSerialization.Run(obj);
 			writer.Write((byte)'[');
 			WriteFieldSeparator();
 			var isFirst = true;
@@ -648,7 +648,7 @@ namespace Yuzu.Json
 				writer.Write(nullBytes);
 				return;
 			}
-			meta.RunBeforeSerialization(obj);
+			meta.BeforeSerialization.Run(obj);
 			writer.Write((byte)'[');
 			var isFirst = true;
 			var actualType = obj.GetType();

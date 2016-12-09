@@ -347,7 +347,7 @@ namespace Yuzu.Binary
 			finally {
 				d.objStack.Pop();
 			}
-			def.Meta.RunAfterDeserialization(obj);
+			def.Meta.AfterDeserialization.Run(obj);
 		}
 
 		protected void ReadIntoObject<T>(object obj)
