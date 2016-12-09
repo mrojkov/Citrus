@@ -112,5 +112,28 @@ namespace YuzuTest.Metadata
 			Assert.IsFalse(m2.Items[0].IsOptional);
 			Assert.IsTrue(m2.Items[1].IsOptional);
 		}
+
+		[YuzuAll]
+		internal class Exclude
+		{
+			public int F1 = 0;
+			public int P1 { get; set; }
+			[YuzuExclude]
+			public int F2 = 0;
+			[YuzuExclude]
+			public int P2 { get; set; }
+			[YuzuRequired, YuzuExclude]
+			public int R = 0;
+		}
+
+		[TestMethod]
+		public void TestExclude()
+		{
+			var opt1 = new CommonOptions();
+			var m1 = Meta.Get(typeof(Exclude), opt1);
+			Assert.AreEqual(2, m1.Items.Count);
+			Assert.AreEqual("F1", m1.Items[0].Tag(opt1));
+			Assert.AreEqual("P1", m1.Items[1].Tag(opt1));
+		}
 	}
 }

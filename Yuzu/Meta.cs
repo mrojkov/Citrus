@@ -233,6 +233,8 @@ namespace Yuzu.Metadata
 			const BindingFlags bindingFlags =
 				BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy;
 			foreach (var m in t.GetMembers(bindingFlags)) {
+				if (Options.ExcludeAttribute != null && m.IsDefined(Options.ExcludeAttribute, false))
+					continue;
 				switch (m.MemberType) {
 					case MemberTypes.Field:
 						var f = m as FieldInfo;
@@ -354,7 +356,10 @@ namespace Yuzu.Metadata
 					k = options.GetItemOptionalityAndKind(all).Item2;
 			}
 			foreach (var m in t.GetMembers(bindingFlags)) {
-				if (m.MemberType != MemberTypes.Field && m.MemberType != MemberTypes.Property)
+				if (
+					m.MemberType != MemberTypes.Field && m.MemberType != MemberTypes.Property ||
+					options.ExcludeAttribute != null && m.IsDefined(options.ExcludeAttribute, false)
+				)
 					continue;
 				if (
 					k.HasFlag(YuzuItemKind.Field) && m.MemberType == MemberTypes.Field ||

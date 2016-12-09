@@ -111,6 +111,8 @@ namespace Yuzu
 		public YuzuAll(YuzuItemKind kind = YuzuItemKind.Any) { Kind = kind; }
 	}
 
+	public class YuzuExclude : Attribute { }
+
 	public enum TagMode
 	{
 		Aliases = 0,
@@ -163,6 +165,7 @@ namespace Yuzu
 		public Type MergeAttribute = typeof(YuzuMerge);
 		public Type MustAttribute = typeof(YuzuMust);
 		public Type AllAttribute = typeof(YuzuAll);
+		public Type ExcludeAttribute = typeof(YuzuExclude);
 
 		public Func<Attribute, string> GetAlias = attr => (attr as YuzuField).Alias;
 		public Func<Attribute, Func<object, object, bool>> GetSerializeCondition =
