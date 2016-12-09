@@ -1143,6 +1143,20 @@ namespace YuzuTest.Json
 		}
 
 		[TestMethod]
+		public void TestBeforeSerialization()
+		{
+			var js = new JsonSerializer();
+			var v0 = new SampleBefore { X = "m" };
+			var result0 = js.ToString(v0);
+			Assert.AreEqual("{\n\t\"X\":\"m1\"\n}", result0);
+
+			var v1 = new SampleBefore2 { X = "m" };
+			var result1 = js.ToString(v1);
+			Assert.AreEqual("{\n\t\"X\":\"m231\"\n}", result1);
+
+		}
+
+		[TestMethod]
 		public void TestAfterDeserialization()
 		{
 			var js = new JsonSerializer();

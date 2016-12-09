@@ -1169,6 +1169,23 @@ namespace YuzuTest.Binary
 		}
 
 		[TestMethod]
+		public void TestBeforeSerialization()
+		{
+			var bs = new BinarySerializer();
+			var v0 = new SampleBefore { X = "m" };
+			var result0 = bs.ToBytes(v0);
+			Assert.AreEqual(
+				"20 01 00 " + XS(typeof(SampleBefore)) + " 01 00 " + XS("X", RoughType.String) +
+				" 01 00 " + XS("m1") + " 00 00",
+				XS(result0));
+			var result1 = bs.ToBytes(new SampleBefore2 { X = "m" });
+			Assert.AreEqual(
+				"20 02 00 " + XS(typeof(SampleBefore2)) + " 01 00 " + XS("X", RoughType.String) +
+				" 01 00 " + XS("m231") + " 00 00",
+				XS(result1));
+		}
+
+		[TestMethod]
 		public void TestAfterDeserialization()
 		{
 			var bs = new BinarySerializer();

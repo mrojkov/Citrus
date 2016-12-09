@@ -76,6 +76,7 @@ namespace Yuzu.Metadata
 			public Action<object> Run;
 		}
 
+		public List<MethodAction> BeforeSerialization = new List<MethodAction>();
 		public List<MethodAction> AfterDeserialization = new List<MethodAction>();
 
 #if !iOS // Apple forbids code generation.
@@ -218,8 +219,16 @@ namespace Yuzu.Metadata
 
 		private void AddMethod(MethodInfo m)
 		{
+			if (m.IsDefined(Options.BeforeSerializationAttribute, false))
+				BeforeSerialization.Add(new MethodAction { Info = m, Run = obj => m.Invoke(obj, null) });
 			if (m.IsDefined(Options.AfterDeserializationAttribute, false))
 				AfterDeserialization.Add(new MethodAction { Info = m, Run = obj => m.Invoke(obj, null) });
+		}
+
+		public void RunBeforeSerialization(object obj)
+		{
+			foreach (var a in BeforeSerialization)
+				a.Run(obj);
 		}
 
 		public void RunAfterDeserialization(object obj)

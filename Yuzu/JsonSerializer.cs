@@ -357,7 +357,7 @@ namespace Yuzu.Json
 				throw new YuzuException("WriteAny");
 			if (t.IsClass || Utils.IsStruct(t))
 				// Ignore compact since class name is always required.
-				// Do not pass Meta since it will always be overritten.
+				// Do not pass Meta since it will always be overwritten.
 				WriteObject<object>(obj, null);
 			else
 				GetWriteFunc(t)(obj);
@@ -548,19 +548,20 @@ namespace Yuzu.Json
 				writer.Write(nullBytes);
 				return;
 			}
+			var actualType = obj.GetType();
+			if (typeof(T) != actualType)
+				meta = Meta.Get(actualType, Options);
+			meta.RunBeforeSerialization(obj);
 			writer.Write((byte)'{');
 			WriteFieldSeparator();
 			objStack.Push(obj);
 			try {
 				depth += 1;
 				var isFirst = true;
-				var actualType = obj.GetType();
 				if (typeof(T) != actualType || objStack.Count == 1 && JsonOptions.SaveRootClass) {
 					WriteName(JsonOptions.ClassTag, ref isFirst);
 					WriteUnescapedString(TypeSerializer.Serialize(actualType));
 				}
-				if (typeof(T) != actualType)
-					meta = Meta.Get(actualType, Options);
 				var storage = meta.GetUnknownStorage == null ? null : meta.GetUnknownStorage(obj);
 				// Duplicate code to optimize fast-path without unknown storage.
 				if (storage == null || storage.Fields.Count == 0 || JsonOptions.Unordered) {
@@ -614,6 +615,7 @@ namespace Yuzu.Json
 				writer.Write(nullBytes);
 				return;
 			}
+			meta.RunBeforeSerialization(obj);
 			writer.Write((byte)'[');
 			WriteFieldSeparator();
 			var isFirst = true;
@@ -646,6 +648,7 @@ namespace Yuzu.Json
 				writer.Write(nullBytes);
 				return;
 			}
+			meta.RunBeforeSerialization(obj);
 			writer.Write((byte)'[');
 			var isFirst = true;
 			var actualType = obj.GetType();

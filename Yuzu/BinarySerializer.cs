@@ -304,6 +304,7 @@ namespace Yuzu.Binary
 
 		private void WriteFields(ClassDef def, object obj)
 		{
+			def.Meta.RunBeforeSerialization(obj);
 			objStack.Push(obj);
 			try {
 				foreach (var d in def.Fields)
@@ -463,6 +464,7 @@ namespace Yuzu.Binary
 				return;
 			}
 			var def = WriteClassId(obj);
+			def.Meta.RunBeforeSerialization(obj);
 			objStack.Push(obj);
 			try {
 				foreach (var d in def.Fields)

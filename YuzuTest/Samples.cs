@@ -486,6 +486,22 @@ namespace YuzuTest
 		public SampleCollection<int> B = new SampleCollection<int>();
 	}
 
+	public class SampleBefore
+	{
+		[YuzuRequired]
+		public string X;
+		[YuzuBeforeSerialization]
+		public void After() { X += "1"; }
+	}
+
+	public class SampleBefore2 : SampleBefore
+	{
+		[YuzuBeforeSerialization]
+		public void After2() { X += "2"; }
+		[YuzuBeforeSerialization]
+		public void After3() { X += "3"; }
+	}
+
 	public class SampleAfter
 	{
 		[YuzuRequired]
