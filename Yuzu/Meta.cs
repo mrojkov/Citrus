@@ -66,6 +66,7 @@ namespace Yuzu.Metadata
 		public YuzuItemKind Must = YuzuItemKind.None;
 		public YuzuItemKind AllKind = YuzuItemKind.None;
 		public YuzuItemOptionality AllOptionality = YuzuItemOptionality.None;
+		public bool AllowReadingFromAncestor;
 
 		public Dictionary<string, Item> TagToItem = new Dictionary<string, Item>();
 		public Func<object, YuzuUnknownStorage> GetUnknownStorage;
@@ -314,6 +315,15 @@ namespace Yuzu.Metadata
 					throw Error("Duplicate tag '{0}' for field '{1}'", tag, i.Name);
 				prevTag = tag;
 				TagToItem.Add(tag, i);
+			}
+
+			AllowReadingFromAncestor = t.IsDefined(Options.AllowReadingFromAncestorAttribute, false);
+			if (AllowReadingFromAncestor) {
+				var ancestorMeta = Get(t.BaseType, options);
+				if (ancestorMeta.Items.Count != Items.Count)
+					throw Error(
+						"Allows reading from ancestor {0}, but has {1} items instead of {2}",
+						t.BaseType.Name, Items.Count, ancestorMeta.Items.Count);
 			}
 		}
 

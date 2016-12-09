@@ -61,6 +61,12 @@ namespace YuzuTest
 		}
 	}
 
+	[YuzuAllowReadingFromAncestor]
+	public class Sample2Allow : Sample2
+	{
+		public int Extra = 0;
+	}
+
 	public class Sample3
 	{
 		[YuzuRequired]

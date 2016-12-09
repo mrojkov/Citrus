@@ -1363,6 +1363,22 @@ namespace YuzuTest.Json
 		}
 
 		[TestMethod]
+		public void TestAllowReadingFromAncestor()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			js.JsonOptions.SaveRootClass = true;
+			var v1 = new Sample2 { X = 83, Y = "83" };
+			var result1 = js.ToString(v1);
+			Assert.AreEqual("{\n\"class\":\"YuzuTest.Sample2, YuzuTest\",\n\"X\":83\n}", result1);
+
+			var w1 = new Sample2Allow();
+			var jd = new JsonDeserializer();
+			jd.FromString(w1, result1);
+			Assert.AreEqual(v1.X, w1.X);
+		}
+
+		[TestMethod]
 		public void TestIndentation()
 		{
 			var js = new JsonSerializer();
@@ -1482,6 +1498,8 @@ namespace YuzuTest.Json
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "[]"), "'Sample1'");
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"class\": \"Q\" }"), "'Q'");
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"class\": \"YuzuTest.Sample2, YuzuTest\" }"), ".Sample2");
+			XAssert.Throws<YuzuException>(() => jd.FromString(
+				new Sample2Allow(), "{ \"class\": \"YuzuTest.Sample1, YuzuTest\" }"), ".Sample1");
 			XAssert.Throws<YuzuException>(() => jd.FromString(new SamplePoint(), "[ \"QQ\" ]"), "");
 			XAssert.Throws<YuzuException>(() => jd.FromString(new object(), "{}"), "object");
 			XAssert.Throws<EndOfStreamException>(() => jd.FromString(""), "");

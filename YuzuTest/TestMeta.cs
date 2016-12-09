@@ -135,5 +135,18 @@ namespace YuzuTest.Metadata
 			Assert.AreEqual("F1", m1.Items[0].Tag(opt1));
 			Assert.AreEqual("P1", m1.Items[1].Tag(opt1));
 		}
+
+		[YuzuAllowReadingFromAncestor]
+		internal class Sample1Bad: Sample1
+		{
+			[YuzuMember]
+			public int F1 = 0;
+		}
+
+		[TestMethod]
+		public void TestAllowReadingFromAncestorBad()
+		{
+			XAssert.Throws<YuzuException>(() => Meta.Get(typeof(Sample1Bad), new CommonOptions()), "3");
+		}
 	}
 }

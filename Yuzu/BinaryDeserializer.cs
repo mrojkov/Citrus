@@ -356,8 +356,12 @@ namespace Yuzu.Binary
 			if (classId == 0)
 				throw Error("Unable to read null into object");
 			var def = GetClassDef(classId);
-			if (obj.GetType() != def.Meta.Type)
-				throw Error("Unable to read type {0} into {1}", def.Meta.Type, obj.GetType());
+			var expectedType = obj.GetType();
+			if (
+				expectedType != def.Meta.Type &&
+				(!Meta.Get(expectedType, Options).AllowReadingFromAncestor || expectedType.BaseType != def.Meta.Type)
+			)
+				throw Error("Unable to read type {0} into {1}", def.Meta.Type, expectedType);
 			def.ReadFields(this, def, obj);
 		}
 

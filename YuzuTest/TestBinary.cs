@@ -1394,6 +1394,22 @@ namespace YuzuTest.Binary
 		}
 
 		[TestMethod]
+		public void TestAllowReadingFromAncestor()
+		{
+			var bs = new BinarySerializer();
+			var v1 = new Sample2 { X = 83, Y = "83" };
+			var result1 = bs.ToBytes(v1);
+			Assert.AreEqual(
+				"20 01 00 " + XS(typeof(Sample2)) + " 02 00 " + XS("X", RoughType.Int, "Y", RoughType.String) +
+				" 01 00 53 00 00 00 00 00", XS(result1));
+
+			var w1 = new Sample2Allow();
+			var bd = new BinaryDeserializer();
+			bd.FromBytes(w1, result1);
+			Assert.AreEqual(v1.X, w1.X);
+		}
+
+		[TestMethod]
 		public void TestSignature()
 		{
 			var bs = new BinarySerializer();
@@ -1436,21 +1452,26 @@ namespace YuzuTest.Binary
 
 			var w = new Sample1();
 			XAssert.Throws<YuzuException>(() => bd.FromBytes(w, SX(
-				"20 01 00 " + XS(typeof(Empty)) + " 00 00 00 00"
+				"20 02 00 " + XS(typeof(Empty)) + " 00 00 00 00"
 			)), "Sample1");
+
+			var w2 = new Sample2Allow();
+			XAssert.Throws<YuzuException>(() => bd.FromBytes(w2, SX(
+				"20 02 00 00 00"
+			)), "Sample2Allow");
 
 			XAssert.Throws<YuzuException>(() => bd.FromBytes(w, SX("20 05 00")), "5");
 
 			XAssert.Throws<YuzuException>(() => bd.FromBytes(w, SX(
-				"20 02 00 " + XS(typeof(Sample1)) + " 00 00 00 00"
+				"20 03 00 " + XS(typeof(Sample1)) + " 00 00 00 00"
 			)), " X ");
 
 			XAssert.Throws<YuzuException>(() => bd.FromBytes(w, SX(
-				"20 02 00 " + XS(typeof(Empty)) + " 00 01 " + XS("New", RoughType.Int) + " 00 00"
+				"20 03 00 " + XS(typeof(Empty)) + " 00 01 " + XS("New", RoughType.Int) + " 00 00"
 			)), "New");
 
 			XAssert.Throws<YuzuException>(() => bd.FromBytes(w, SX(
-				"20 02 00 " + XS(typeof(Sample1)) + " 00 01 " + XS("X", RoughType.String) + " 00 00"
+				"20 03 00 " + XS(typeof(Sample1)) + " 00 01 " + XS("X", RoughType.String) + " 00 00"
 			)), "Int32");
 		}
 	}
