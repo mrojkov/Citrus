@@ -273,18 +273,14 @@ namespace Yuzu.Metadata
 			Type = t;
 			Options = options.Meta ?? MetaOptions.Default;
 			IsCompact = t.IsDefined(Options.CompactAttribute, false);
-			if (Options.MustAttribute != null) {
-				var must = t.GetCustomAttribute_Compat(Options.MustAttribute, false);
-				if (must != null)
-					Must = Options.GetItemKind(must);
-			}
-			if (Options.AllAttribute != null) {
-				var all = t.GetCustomAttribute_Compat(Options.AllAttribute, false);
-				if (all != null) {
-					var ok = Options.GetItemOptionalityAndKind(all);
-					AllOptionality = ok.Item1;
-					AllKind = ok.Item2;
-				}
+			var must = t.GetCustomAttribute_Compat(Options.MustAttribute, false);
+			if (must != null)
+				Must = Options.GetItemKind(must);
+			var all = t.GetCustomAttribute_Compat(Options.AllAttribute, false);
+			if (all != null) {
+				var ok = Options.GetItemOptionalityAndKind(all);
+				AllOptionality = ok.Item1;
+				AllKind = ok.Item2;
 			}
 
 			foreach (var i in t.GetInterfaces())
@@ -348,12 +344,8 @@ namespace Yuzu.Metadata
 		{
 			const BindingFlags bindingFlags =
 				BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy;
-			var k = YuzuItemKind.None;
-			if (options.AllAttribute != null) {
-				var all = t.GetCustomAttribute_Compat(options.AllAttribute, false);
-				if (all != null)
-					k = options.GetItemOptionalityAndKind(all).Item2;
-			}
+			var all = t.GetCustomAttribute_Compat(options.AllAttribute, false);
+			var k = all != null ? options.GetItemOptionalityAndKind(all).Item2 : YuzuItemKind.None;
 			foreach (var m in t.GetMembers(bindingFlags)) {
 				if (
 					m.MemberType != MemberTypes.Field && m.MemberType != MemberTypes.Property ||
