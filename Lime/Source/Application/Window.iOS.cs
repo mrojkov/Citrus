@@ -71,6 +71,7 @@ namespace Lime
 				Active = true;
 				AudioSystem.Active = true;
 				RaiseActivated();
+				UIKit.UIViewController.AttemptRotationToDeviceOrientation();
 			};
 			AppDelegate.Instance.Deactivated += () => {
 				UIViewController.LockDeviceOrientation = true;
