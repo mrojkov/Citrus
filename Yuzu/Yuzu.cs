@@ -12,19 +12,24 @@ namespace Yuzu
 		public YuzuField(string alias) { Alias = alias; }
 	}
 
+	// YuzuField attributes must have default constructors for YuzuAll to work.
+
 	public class YuzuRequired : YuzuField
 	{
-		public YuzuRequired(string alias = null) : base(alias) { }
+		public YuzuRequired() : base(null) { }
+		public YuzuRequired(string alias) : base(alias) { }
 	}
 
 	public class YuzuOptional : YuzuField
 	{
-		public YuzuOptional(string alias = null) : base(alias) { }
+		public YuzuOptional() : base(null) { }
+		public YuzuOptional(string alias) : base(alias) { }
 	}
 
 	public class YuzuMember : YuzuField
 	{
-		public YuzuMember(string alias = null) : base(alias) { }
+		public YuzuMember() : base(null) { }
+		public YuzuMember(string alias) : base(alias) { }
 	}
 
 	public abstract class YuzuSerializeCondition : Attribute
@@ -80,10 +85,30 @@ namespace Yuzu
 		Any = 3,
 	}
 
+	public enum YuzuItemOptionality
+	{
+		None = 0,
+		Optional = 1,
+		Required = 2,
+		Member = 3,
+	}
+
 	public class YuzuMust : Attribute
 	{
 		public readonly YuzuItemKind Kind;
 		public YuzuMust(YuzuItemKind kind = YuzuItemKind.Any) { Kind = kind; }
+	}
+
+	public class YuzuAll : Attribute
+	{
+		public readonly YuzuItemOptionality Optionality = YuzuItemOptionality.Member;
+		public readonly YuzuItemKind Kind;
+		public YuzuAll(YuzuItemOptionality optionality, YuzuItemKind kind = YuzuItemKind.Any)
+		{
+			Optionality = optionality;
+			Kind = kind;
+		}
+		public YuzuAll(YuzuItemKind kind = YuzuItemKind.Any) { Kind = kind; }
 	}
 
 	public enum TagMode
@@ -137,11 +162,14 @@ namespace Yuzu
 		public Type AfterDeserializationAttribute = typeof(YuzuAfterDeserialization);
 		public Type MergeAttribute = typeof(YuzuMerge);
 		public Type MustAttribute = typeof(YuzuMust);
+		public Type AllAttribute = typeof(YuzuAll);
 
 		public Func<Attribute, string> GetAlias = attr => (attr as YuzuField).Alias;
 		public Func<Attribute, Func<object, object, bool>> GetSerializeCondition =
 			attr => (attr as YuzuSerializeCondition).Check;
 		public Func<Attribute, YuzuItemKind> GetItemKind = attr => (attr as YuzuMust).Kind;
+		public Func<Attribute, Tuple<YuzuItemOptionality, YuzuItemKind>> GetItemOptionalityAndKind =
+			attr => Tuple.Create((attr as YuzuAll).Optionality, (attr as YuzuAll).Kind);
 	}
 
 	public struct CommonOptions

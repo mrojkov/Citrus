@@ -234,18 +234,13 @@ namespace YuzuTest
 		public SamplePoint B;
 	}
 
-	[YuzuCompact]
+	[YuzuCompact, YuzuAll(YuzuItemOptionality.Required)]
 	public class SampleOneline
 	{
-		[YuzuRequired]
 		public SamplePoint Point0;
-		[YuzuRequired]
 		public SampleOnelineRect Rect;
-		[YuzuRequired]
 		public string Name;
-		[YuzuRequired]
 		public SampleEnum Type;
-		[YuzuRequired]
 		public SamplePoint Point1;
 	}
 
@@ -257,21 +252,14 @@ namespace YuzuTest
 		public SamplePoint B;
 	}
 
+	[YuzuAll]
 	public class SampleDefault
 	{
-		[YuzuMember]
 		public int A = 3;
-
-		[YuzuMember]
 		public string B = "default";
-
-		[YuzuMember]
 		public SamplePoint P;
 
-		public SampleDefault()
-		{
-			P = new SamplePoint { X = 7, Y = 2 };
-		}
+		public SampleDefault() { P = new SamplePoint { X = 7, Y = 2 }; }
 	}
 
 	public class SampleObj

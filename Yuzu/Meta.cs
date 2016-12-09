@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 using Yuzu.Util;
@@ -63,6 +64,8 @@ namespace Yuzu.Metadata
 		public readonly bool IsCompact;
 		public object Default { get; private set; }
 		public YuzuItemKind Must = YuzuItemKind.None;
+		public YuzuItemKind AllKind = YuzuItemKind.None;
+		public YuzuItemOptionality AllOptionality = YuzuItemOptionality.None;
 
 		public Dictionary<string, Item> TagToItem = new Dictionary<string, Item>();
 		public Func<object, YuzuUnknownStorage> GetUnknownStorage;
@@ -109,17 +112,26 @@ namespace Yuzu.Metadata
 
 		private struct ItemAttrs
 		{
-			public Attribute Optional;
-			public Attribute Required;
-			public Attribute Member;
+			private Attribute[] attrs;
+			public Attribute Optional { get { return attrs[0]; } }
+			public Attribute Required { get { return attrs[1]; } }
+			public Attribute Member { get { return attrs[2]; } }
 			public int Count;
 			public Attribute Any() { return Optional ?? Required ?? Member; }
-			public ItemAttrs(MemberInfo m, MetaOptions options)
+
+			public ItemAttrs(MemberInfo m, MetaOptions options, YuzuItemOptionality opt)
 			{
-				Optional = m.GetCustomAttribute_Compat(options.OptionalAttribute, false);
-				Required = m.GetCustomAttribute_Compat(options.RequiredAttribute, false);
-				Member = m.GetCustomAttribute_Compat(options.MemberAttribute, false);
-				Count = (Optional != null ? 1 : 0) + (Required != null ? 1 : 0) + (Member != null ? 1 : 0);
+				var attrTypes = new Type[] {
+					options.OptionalAttribute,
+					options.RequiredAttribute,
+					options.MemberAttribute,
+				};
+				attrs = attrTypes.Select(t => m.GetCustomAttribute_Compat(t, false)).ToArray();
+				Count = attrs.Count(a => a != null);
+				if (Count == 0 && opt > 0 && attrTypes[(int)opt - 1] != null) {
+					attrs[(int)opt - 1] = Activator.CreateInstance(attrTypes[(int)opt - 1]) as Attribute;
+					Count = 1;
+				}
 			}
 		}
 
@@ -128,9 +140,9 @@ namespace Yuzu.Metadata
 			return value == null || ((ICollection<T>)value).Count > 0;
 		}
 
-		private void AddItem(MemberInfo m, bool must)
+		private void AddItem(MemberInfo m, bool must, bool all)
 		{
-			var ia = new ItemAttrs(m, Options);
+			var ia = new ItemAttrs(m, Options, all ? AllOptionality : YuzuItemOptionality.None);
 			if (ia.Count == 0) {
 				if (must)
 					throw Error("Item {0} must be serialized", m.Name);
@@ -230,7 +242,9 @@ namespace Yuzu.Metadata
 							GetUnknownStorage = obj => (YuzuUnknownStorage)f.GetValue(obj);
 						}
 						else
-							AddItem(m, Must.HasFlag(YuzuItemKind.Field) && f.IsPublic);
+							AddItem(m,
+								Must.HasFlag(YuzuItemKind.Field) && f.IsPublic,
+								AllKind.HasFlag(YuzuItemKind.Field) && f.IsPublic);
 						break;
 					case MemberTypes.Property:
 						var p = m as PropertyInfo;
@@ -245,7 +259,9 @@ namespace Yuzu.Metadata
 #endif
 						}
 						else
-							AddItem(m, Must.HasFlag(YuzuItemKind.Property) && p.GetGetMethod() != null);
+							AddItem(m,
+								Must.HasFlag(YuzuItemKind.Property) && p.GetGetMethod() != null,
+								AllKind.HasFlag(YuzuItemKind.Property) && p.GetGetMethod() != null);
 						break;
 					case MemberTypes.Method:
 						AddMethod(m as MethodInfo);
@@ -269,6 +285,14 @@ namespace Yuzu.Metadata
 				var must = t.GetCustomAttribute_Compat(Options.MustAttribute, false);
 				if (must != null)
 					Must = Options.GetItemKind(must);
+			}
+			if (Options.AllAttribute != null) {
+				var all = t.GetCustomAttribute_Compat(Options.AllAttribute, false);
+				if (all != null) {
+					var ok = Options.GetItemOptionalityAndKind(all);
+					AllOptionality = ok.Item1;
+					AllKind = ok.Item2;
+				}
 			}
 
 			foreach (var i in t.GetInterfaces())
@@ -323,10 +347,20 @@ namespace Yuzu.Metadata
 		{
 			const BindingFlags bindingFlags =
 				BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy;
+			var k = YuzuItemKind.None;
+			if (options.AllAttribute != null) {
+				var all = t.GetCustomAttribute_Compat(options.AllAttribute, false);
+				if (all != null)
+					k = options.GetItemOptionalityAndKind(all).Item2;
+			}
 			foreach (var m in t.GetMembers(bindingFlags)) {
 				if (m.MemberType != MemberTypes.Field && m.MemberType != MemberTypes.Property)
 					continue;
-				if (new ItemAttrs(m, options).Any() != null)
+				if (
+					k.HasFlag(YuzuItemKind.Field) && m.MemberType == MemberTypes.Field ||
+					k.HasFlag(YuzuItemKind.Property) && m.MemberType == MemberTypes.Property ||
+					new ItemAttrs(m, options, YuzuItemOptionality.None).Any() != null
+				)
 					return true;
 			}
 			return false;

@@ -61,6 +61,7 @@ namespace YuzuTest
 			var t = Meta.Collect(GetType().Assembly, MetaOptions.Default);
 			Assert.IsTrue(t.Contains(typeof(Sample1)));
 			Assert.IsFalse(t.Contains(typeof(SampleInterfacedGeneric<>)));
+			Assert.IsTrue(t.Contains(typeof(Metadata.TestMeta.AllDefault)));
 		}
 	}
 

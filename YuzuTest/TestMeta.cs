@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using ProtoBuf;
 
@@ -12,35 +7,6 @@ using Yuzu.Metadata;
 
 namespace YuzuTest.Metadata
 {
-	[YuzuMust(YuzuItemKind.Field)]
-	internal class MustField
-	{
-		[YuzuOptional]
-		public int F1 = 0;
-		public int P1 { get; set; }
-		public int F2 = 0;
-	}
-
-	[YuzuMust(YuzuItemKind.Property)]
-	internal class MustProperty
-	{
-		public int F1 = 0;
-		[YuzuOptional]
-		public int P1 { get; set; }
-		public int P2 { get; set; }
-	}
-
-	[YuzuMust]
-	internal class MustPrivate
-	{
-		[YuzuRequired]
-		public int F1 = 0;
-		[YuzuRequired]
-		public int P1 { get; set; }
-		private int F2;
-		private int P2 { get; set; }
-	}
-
 	[TestClass]
 	public class TestMeta
 	{
@@ -71,6 +37,35 @@ namespace YuzuTest.Metadata
 			Assert.AreEqual("2", m2.Items[1].Tag(opt2));
 		}
 
+		[YuzuMust(YuzuItemKind.Field)]
+		internal class MustField
+		{
+			[YuzuOptional]
+			public int F1 = 0;
+			public int P1 { get; set; }
+			public int F2 = 0;
+		}
+
+		[YuzuMust(YuzuItemKind.Property)]
+		internal class MustProperty
+		{
+			public int F1 = 0;
+			[YuzuOptional]
+			public int P1 { get; set; }
+			public int P2 { get; set; }
+		}
+
+		[YuzuMust]
+		internal class MustPrivate
+		{
+			[YuzuRequired]
+			public int F1 = 0;
+			[YuzuRequired]
+			public int P1 { get; set; }
+			private int F2 = 0;
+			private int P2 { get; set; }
+		}
+
 		[TestMethod]
 		public void TestMust()
 		{
@@ -78,6 +73,44 @@ namespace YuzuTest.Metadata
 			XAssert.Throws<YuzuException>(() => Meta.Get(typeof(MustField), opt1), "F2");
 			XAssert.Throws<YuzuException>(() => Meta.Get(typeof(MustProperty), opt1), "P2");
 			Assert.AreEqual(2, Meta.Get(typeof(MustPrivate), opt1).Items.Count);
+		}
+
+		[YuzuAll]
+		internal class AllDefault
+		{
+			public int F1 = 0;
+			public int P1 { get; set; }
+			private int F2 = 0;
+			private int P2 { get; set; }
+			[YuzuRequired]
+			public int R = 0;
+		}
+
+		[YuzuAll(YuzuItemOptionality.Required, YuzuItemKind.Field)]
+		internal class AllRequiredFields
+		{
+			public int F1 = 0;
+			public int P1 { get; set; }
+			private int F2 = 0;
+			private int P2 { get; set; }
+			[YuzuMember]
+			public int M = 0;
+		}
+
+		[TestMethod]
+		public void TestAll()
+		{
+			var opt1 = new CommonOptions();
+			var m1 = Meta.Get(typeof(AllDefault), opt1);
+			Assert.AreEqual(3, m1.Items.Count);
+			Assert.IsTrue(m1.Items[0].IsOptional);
+			Assert.IsTrue(m1.Items[1].IsOptional);
+			Assert.IsFalse(m1.Items[2].IsOptional);
+
+			var m2 = Meta.Get(typeof(AllRequiredFields), opt1);
+			Assert.AreEqual(2, m2.Items.Count);
+			Assert.IsFalse(m2.Items[0].IsOptional);
+			Assert.IsTrue(m2.Items[1].IsOptional);
 		}
 	}
 }
