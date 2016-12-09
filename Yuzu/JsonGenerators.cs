@@ -344,12 +344,6 @@ namespace Yuzu.Json
 			}
 		}
 
-		private void GenerateAfterDeserialization(Meta meta)
-		{
-			foreach (var a in meta.AfterDeserialization.Actions)
-				cw.Put("result.{0}();\n", a.Info.Name);
-		}
-
 		public void Generate<T>() { Generate(typeof(T)); }
 
 		public void Generate(Type t)
@@ -436,7 +430,7 @@ namespace Yuzu.Json
 					if (yi.IsOptional)
 						cw.Put("}\n");
 				}
-				GenerateAfterDeserialization(meta);
+				cw.GenerateActionList(meta.AfterDeserialization);
 			}
 			cw.Put("return result;\n");
 			cw.Put("}\n");
@@ -460,7 +454,7 @@ namespace Yuzu.Json
 						GenerateMerge(yi.Type, "result." + yi.Name);
 				}
 				cw.Put("Require(']');\n");
-				GenerateAfterDeserialization(meta);
+				cw.GenerateActionList(meta.AfterDeserialization);
 				cw.Put("return result;\n");
 				cw.Put("}\n");
 			}

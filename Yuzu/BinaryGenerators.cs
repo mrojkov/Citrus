@@ -82,12 +82,6 @@ namespace Yuzu.Binary
 			cw.Put("}\n"); // Close namespace.
 		}
 
-		private void GenerateAfterDeserialization(Meta meta)
-		{
-			foreach (var a in meta.AfterDeserialization.Actions)
-				cw.Put("result.{0}();\n", a.Info.Name);
-		}
-
 		private static Dictionary<Type, string> simpleValueReader = new Dictionary<Type, string>();
 
 		private static void InitSimpleValueReader()
@@ -282,7 +276,7 @@ namespace Yuzu.Binary
 				if (SafetyChecks)
 					cw.Put("if (fd.OurIndex != {0}.EOF) throw dg.Error(\"Unfinished object\");\n", classDefName);
 			}
-			GenerateAfterDeserialization(meta);
+			cw.GenerateActionList(meta.AfterDeserialization);
 		}
 
 		private string GetMangledTypeNameNS(Type t)

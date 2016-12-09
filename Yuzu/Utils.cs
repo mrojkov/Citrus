@@ -227,6 +227,13 @@ namespace Yuzu.Util
 			tempCount += 1;
 			return "tmp" + tempCount.ToString();
 		}
+
+		public void GenerateActionList(ActionList actions)
+		{
+			foreach (var a in actions.Actions)
+				Put("result.{0}();\n", a.Info.Name);
+		}
+
 	}
 
 	internal class NullYuzuUnknownStorage : YuzuUnknownStorage
@@ -242,19 +249,20 @@ namespace Yuzu.Util
 
 	public class ActionList
 	{
-		public struct MethodAction
+		internal struct MethodAction
 		{
 			public MethodInfo Info;
 			public Action<object> Run;
 		}
 
-		public List<MethodAction> Actions = new List<MethodAction>();
+		internal List<MethodAction> Actions = new List<MethodAction>();
 
 		public void MaybeAdd(MethodInfo m, Type attr)
 		{
 			if (m.IsDefined(attr, false))
 				Actions.Add(new MethodAction { Info = m, Run = obj => m.Invoke(obj, null) });
 		}
+
 		public void Run(object obj)
 		{
 			foreach (var a in Actions)
