@@ -76,9 +76,6 @@ namespace Lime
 				UIViewController.LockDeviceOrientation = true;
 				AudioSystem.Active = false;
 				RaiseDeactivated();
-				UIView.DoRenderFrame();
-				OpenTK.Graphics.ES11.GL.Finish();
-				TexturePool.Instance.DiscardTexturesUnderPressure();
 				Active = false;
 			};
 			AppDelegate.Instance.WillTerminateEvent += () => {
