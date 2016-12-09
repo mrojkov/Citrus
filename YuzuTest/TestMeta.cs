@@ -12,6 +12,35 @@ using Yuzu.Metadata;
 
 namespace YuzuTest.Metadata
 {
+	[YuzuMust(YuzuItemKind.Field)]
+	internal class MustField
+	{
+		[YuzuOptional]
+		public int F1 = 0;
+		public int P1 { get; set; }
+		public int F2 = 0;
+	}
+
+	[YuzuMust(YuzuItemKind.Property)]
+	internal class MustProperty
+	{
+		public int F1 = 0;
+		[YuzuOptional]
+		public int P1 { get; set; }
+		public int P2 { get; set; }
+	}
+
+	[YuzuMust]
+	internal class MustPrivate
+	{
+		[YuzuRequired]
+		public int F1 = 0;
+		[YuzuRequired]
+		public int P1 { get; set; }
+		private int F2;
+		private int P2 { get; set; }
+	}
+
 	[TestClass]
 	public class TestMeta
 	{
@@ -40,6 +69,15 @@ namespace YuzuTest.Metadata
 			Assert.AreEqual(2, m2.Items.Count);
 			Assert.AreEqual("1", m2.Items[0].Tag(opt2));
 			Assert.AreEqual("2", m2.Items[1].Tag(opt2));
+		}
+
+		[TestMethod]
+		public void TestMust()
+		{
+			var opt1 = new CommonOptions();
+			XAssert.Throws<YuzuException>(() => Meta.Get(typeof(MustField), opt1), "F2");
+			XAssert.Throws<YuzuException>(() => Meta.Get(typeof(MustProperty), opt1), "P2");
+			Assert.AreEqual(2, Meta.Get(typeof(MustPrivate), opt1).Items.Count);
 		}
 	}
 }

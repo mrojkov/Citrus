@@ -71,6 +71,21 @@ namespace Yuzu
 
 	public class YuzuMerge : Attribute { }
 
+	[Flags]
+	public enum YuzuItemKind
+	{
+		None = 0,
+		Field = 1,
+		Property = 2,
+		Any = 3,
+	}
+
+	public class YuzuMust : Attribute
+	{
+		public readonly YuzuItemKind Kind;
+		public YuzuMust(YuzuItemKind kind = YuzuItemKind.Any) { Kind = kind; }
+	}
+
 	public enum TagMode
 	{
 		Aliases = 0,
@@ -121,10 +136,12 @@ namespace Yuzu
 		public Type SerializeIfAttribute = typeof(YuzuSerializeCondition);
 		public Type AfterDeserializationAttribute = typeof(YuzuAfterDeserialization);
 		public Type MergeAttribute = typeof(YuzuMerge);
+		public Type MustAttribute = typeof(YuzuMust);
 
 		public Func<Attribute, string> GetAlias = attr => (attr as YuzuField).Alias;
 		public Func<Attribute, Func<object, object, bool>> GetSerializeCondition =
 			attr => (attr as YuzuSerializeCondition).Check;
+		public Func<Attribute, YuzuItemKind> GetItemKind = attr => (attr as YuzuMust).Kind;
 	}
 
 	public struct CommonOptions

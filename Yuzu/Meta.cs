@@ -62,6 +62,7 @@ namespace Yuzu.Metadata
 		public readonly List<Item> Items = new List<Item>();
 		public readonly bool IsCompact;
 		public object Default { get; private set; }
+		public YuzuItemKind Must = YuzuItemKind.None;
 
 		public Dictionary<string, Item> TagToItem = new Dictionary<string, Item>();
 		public Func<object, YuzuUnknownStorage> GetUnknownStorage;
@@ -127,11 +128,14 @@ namespace Yuzu.Metadata
 			return value == null || ((ICollection<T>)value).Count > 0;
 		}
 
-		private void AddItem(MemberInfo m)
+		private void AddItem(MemberInfo m, bool must)
 		{
 			var ia = new ItemAttrs(m, Options);
-			if (ia.Count == 0)
+			if (ia.Count == 0) {
+				if (must)
+					throw Error("Item {0} must be serialized", m.Name);
 				return;
+			}
 			if (ia.Count != 1)
 				throw Error("More than one of optional, required and member attributes for field '{0}'", m.Name);
 			var serializeIf = m.GetCustomAttribute_Compat(Options.SerializeIfAttribute, true);
@@ -226,7 +230,7 @@ namespace Yuzu.Metadata
 							GetUnknownStorage = obj => (YuzuUnknownStorage)f.GetValue(obj);
 						}
 						else
-							AddItem(m);
+							AddItem(m, Must.HasFlag(YuzuItemKind.Field) && f.IsPublic);
 						break;
 					case MemberTypes.Property:
 						var p = m as PropertyInfo;
@@ -241,7 +245,7 @@ namespace Yuzu.Metadata
 #endif
 						}
 						else
-							AddItem(m);
+							AddItem(m, Must.HasFlag(YuzuItemKind.Property) && p.GetGetMethod() != null);
 						break;
 					case MemberTypes.Method:
 						AddMethod(m as MethodInfo);
@@ -261,6 +265,11 @@ namespace Yuzu.Metadata
 			Type = t;
 			Options = options.Meta ?? MetaOptions.Default;
 			IsCompact = t.IsDefined(Options.CompactAttribute, false);
+			if (Options.MustAttribute != null) {
+				var must = t.GetCustomAttribute_Compat(Options.MustAttribute, false);
+				if (must != null)
+					Must = Options.GetItemKind(must);
+			}
 
 			foreach (var i in t.GetInterfaces())
 				ExploreType(i);

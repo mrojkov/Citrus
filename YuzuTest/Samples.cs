@@ -93,6 +93,7 @@ namespace YuzuTest
 		public bool B;
 	}
 
+	[YuzuMust]
 	public class SampleSmallTypes
 	{
 		[YuzuRequired]
