@@ -157,6 +157,7 @@ namespace YuzuTest
 				bd.Generate<SampleMatrix>();
 				bd.Generate<SamplePoint>();
 				bd.Generate<SampleRect>();
+				bd.Generate<SampleDefault>();
 				bd.Generate<Color>();
 				bd.Generate<SampleClassList>();
 				bd.Generate<SampleSmallTypes>();

@@ -901,6 +901,19 @@ namespace YuzuTest.Binary
 			Assert.AreEqual(3, w3.A);
 			Assert.AreEqual("z", w3.B);
 			Assert.AreEqual(new SamplePoint { X = 7, Y = 2 }, w3.P);
+
+			var result4 = SX(
+				"20 01 00 " + XS(typeof(SampleDefault)) + " 02 00 " +
+				XS("A", RoughType.Int, "P", RoughType.Record) + " 01 00 05 00 00 00 " +
+				"02 00 02 00 " + XS(typeof(SamplePoint)) + " 02 00 " +
+				XS("X", RoughType.Int, "Y", RoughType.Int) + " 04 00 00 00 06 00 00 00 " +
+				"00 00"
+			);
+			bdg.ClearClassIds();
+			var w4 = bdg.FromBytes<SampleDefault>(result4);
+			Assert.AreEqual(5, w4.A);
+			Assert.AreEqual("default", w4.B);
+			Assert.AreEqual(new SamplePoint { X = 4, Y = 6 }, w4.P);
 		}
 
 		[TestMethod]
