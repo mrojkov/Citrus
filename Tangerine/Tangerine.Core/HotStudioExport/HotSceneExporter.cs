@@ -84,7 +84,7 @@ namespace Orange
 			if (value is SkinningWeights) {
 				var v = (SkinningWeights)value;
 				return
-					$"{v.Bone0.Index} {FloatToString(v.Bone0.Weight)} " +
+					$"[ {v.Bone0.Index} {FloatToString(v.Bone0.Weight)} " +
 					$"{v.Bone1.Index} {FloatToString(v.Bone1.Weight)} " +
 					$"{v.Bone2.Index} {FloatToString(v.Bone2.Weight)} " +
 					$"{v.Bone3.Index} {FloatToString(v.Bone3.Weight)} ]";
