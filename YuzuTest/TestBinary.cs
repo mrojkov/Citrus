@@ -901,6 +901,19 @@ namespace YuzuTest.Binary
 			Assert.AreEqual(3, w3.A);
 			Assert.AreEqual("z", w3.B);
 			Assert.AreEqual(new SamplePoint { X = 7, Y = 2 }, w3.P);
+
+			var result4 = SX(
+				"20 01 00 " + XS(typeof(SampleDefault)) + " 02 00 " +
+				XS("A", RoughType.Int, "P", RoughType.Record) + " 01 00 05 00 00 00 " +
+				"02 00 02 00 " + XS(typeof(SamplePoint)) + " 02 00 " +
+				XS("X", RoughType.Int, "Y", RoughType.Int) + " 04 00 00 00 06 00 00 00 " +
+				"00 00"
+			);
+			bdg.ClearClassIds();
+			var w4 = bdg.FromBytes<SampleDefault>(result4);
+			Assert.AreEqual(5, w4.A);
+			Assert.AreEqual("default", w4.B);
+			Assert.AreEqual(new SamplePoint { X = 4, Y = 6 }, w4.P);
 		}
 
 		[TestMethod]
@@ -1156,6 +1169,23 @@ namespace YuzuTest.Binary
 		}
 
 		[TestMethod]
+		public void TestBeforeSerialization()
+		{
+			var bs = new BinarySerializer();
+			var v0 = new SampleBefore { X = "m" };
+			var result0 = bs.ToBytes(v0);
+			Assert.AreEqual(
+				"20 01 00 " + XS(typeof(SampleBefore)) + " 01 00 " + XS("X", RoughType.String) +
+				" 01 00 " + XS("m1") + " 00 00",
+				XS(result0));
+			var result1 = bs.ToBytes(new SampleBefore2 { X = "m" });
+			Assert.AreEqual(
+				"20 02 00 " + XS(typeof(SampleBefore2)) + " 01 00 " + XS("X", RoughType.String) +
+				" 01 00 " + XS("m231") + " 00 00",
+				XS(result1));
+		}
+
+		[TestMethod]
 		public void TestAfterDeserialization()
 		{
 			var bs = new BinarySerializer();
@@ -1364,6 +1394,22 @@ namespace YuzuTest.Binary
 		}
 
 		[TestMethod]
+		public void TestAllowReadingFromAncestor()
+		{
+			var bs = new BinarySerializer();
+			var v1 = new Sample2 { X = 83, Y = "83" };
+			var result1 = bs.ToBytes(v1);
+			Assert.AreEqual(
+				"20 01 00 " + XS(typeof(Sample2)) + " 02 00 " + XS("X", RoughType.Int, "Y", RoughType.String) +
+				" 01 00 53 00 00 00 00 00", XS(result1));
+
+			var w1 = new Sample2Allow();
+			var bd = new BinaryDeserializer();
+			bd.FromBytes(w1, result1);
+			Assert.AreEqual(v1.X, w1.X);
+		}
+
+		[TestMethod]
 		public void TestSignature()
 		{
 			var bs = new BinarySerializer();
@@ -1406,21 +1452,26 @@ namespace YuzuTest.Binary
 
 			var w = new Sample1();
 			XAssert.Throws<YuzuException>(() => bd.FromBytes(w, SX(
-				"20 01 00 " + XS(typeof(Empty)) + " 00 00 00 00"
+				"20 02 00 " + XS(typeof(Empty)) + " 00 00 00 00"
 			)), "Sample1");
+
+			var w2 = new Sample2Allow();
+			XAssert.Throws<YuzuException>(() => bd.FromBytes(w2, SX(
+				"20 02 00 00 00"
+			)), "Sample2Allow");
 
 			XAssert.Throws<YuzuException>(() => bd.FromBytes(w, SX("20 05 00")), "5");
 
 			XAssert.Throws<YuzuException>(() => bd.FromBytes(w, SX(
-				"20 02 00 " + XS(typeof(Sample1)) + " 00 00 00 00"
+				"20 03 00 " + XS(typeof(Sample1)) + " 00 00 00 00"
 			)), " X ");
 
 			XAssert.Throws<YuzuException>(() => bd.FromBytes(w, SX(
-				"20 02 00 " + XS(typeof(Empty)) + " 00 01 " + XS("New", RoughType.Int) + " 00 00"
+				"20 03 00 " + XS(typeof(Empty)) + " 00 01 " + XS("New", RoughType.Int) + " 00 00"
 			)), "New");
 
 			XAssert.Throws<YuzuException>(() => bd.FromBytes(w, SX(
-				"20 02 00 " + XS(typeof(Sample1)) + " 00 01 " + XS("X", RoughType.String) + " 00 00"
+				"20 03 00 " + XS(typeof(Sample1)) + " 00 01 " + XS("X", RoughType.String) + " 00 00"
 			)), "Int32");
 		}
 	}

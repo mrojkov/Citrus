@@ -61,6 +61,7 @@ namespace YuzuTest
 			var t = Meta.Collect(GetType().Assembly, MetaOptions.Default);
 			Assert.IsTrue(t.Contains(typeof(Sample1)));
 			Assert.IsFalse(t.Contains(typeof(SampleInterfacedGeneric<>)));
+			Assert.IsTrue(t.Contains(typeof(Metadata.TestMeta.AllDefault)));
 		}
 	}
 
@@ -157,6 +158,7 @@ namespace YuzuTest
 				bd.Generate<SampleMatrix>();
 				bd.Generate<SamplePoint>();
 				bd.Generate<SampleRect>();
+				bd.Generate<SampleDefault>();
 				bd.Generate<Color>();
 				bd.Generate<SampleClassList>();
 				bd.Generate<SampleSmallTypes>();

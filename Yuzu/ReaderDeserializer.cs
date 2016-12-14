@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 
 using Yuzu.Util;
+using Yuzu.Metadata;
 
 namespace Yuzu.Deserializer
 {
@@ -100,7 +101,11 @@ namespace Yuzu.Deserializer
 
 		protected void CheckExpectedType(string typeName, Type expectedType)
 		{
-			if (FindType(typeName) != expectedType)
+			var actualType = FindType(typeName);
+			if (
+				actualType != expectedType &&
+				(!Meta.Get(expectedType, Options).AllowReadingFromAncestor || expectedType.BaseType != actualType)
+			)
 				throw Error("Expected type '{0}', but got '{1}'", expectedType.Name, typeName);
 		}
 

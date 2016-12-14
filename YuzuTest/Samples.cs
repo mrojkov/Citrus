@@ -61,6 +61,12 @@ namespace YuzuTest
 		}
 	}
 
+	[YuzuAllowReadingFromAncestor]
+	public class Sample2Allow : Sample2
+	{
+		public int Extra = 0;
+	}
+
 	public class Sample3
 	{
 		[YuzuRequired]
@@ -93,6 +99,7 @@ namespace YuzuTest
 		public bool B;
 	}
 
+	[YuzuMust]
 	public class SampleSmallTypes
 	{
 		[YuzuRequired]
@@ -233,18 +240,13 @@ namespace YuzuTest
 		public SamplePoint B;
 	}
 
-	[YuzuCompact]
+	[YuzuCompact, YuzuAll(YuzuItemOptionality.Required)]
 	public class SampleOneline
 	{
-		[YuzuRequired]
 		public SamplePoint Point0;
-		[YuzuRequired]
 		public SampleOnelineRect Rect;
-		[YuzuRequired]
 		public string Name;
-		[YuzuRequired]
 		public SampleEnum Type;
-		[YuzuRequired]
 		public SamplePoint Point1;
 	}
 
@@ -256,21 +258,14 @@ namespace YuzuTest
 		public SamplePoint B;
 	}
 
+	[YuzuAll]
 	public class SampleDefault
 	{
-		[YuzuMember]
 		public int A = 3;
-
-		[YuzuMember]
 		public string B = "default";
-
-		[YuzuMember]
 		public SamplePoint P;
 
-		public SampleDefault()
-		{
-			P = new SamplePoint { X = 7, Y = 2 };
-		}
+		public SampleDefault() { P = new SamplePoint { X = 7, Y = 2 }; }
 	}
 
 	public class SampleObj
@@ -495,6 +490,22 @@ namespace YuzuTest
 		public SampleCollection<ISample> A = new SampleCollection<ISample>();
 		[YuzuRequired]
 		public SampleCollection<int> B = new SampleCollection<int>();
+	}
+
+	public class SampleBefore
+	{
+		[YuzuRequired]
+		public string X;
+		[YuzuBeforeSerialization]
+		public void After() { X += "1"; }
+	}
+
+	public class SampleBefore2 : SampleBefore
+	{
+		[YuzuBeforeSerialization]
+		public void After2() { X += "2"; }
+		[YuzuBeforeSerialization]
+		public void After3() { X += "3"; }
 	}
 
 	public class SampleAfter

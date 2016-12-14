@@ -421,6 +421,35 @@ namespace YuzuGenBin
 			return result;
 		}
 
+		private static void Read_YuzuTest__SampleDefault(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::YuzuTest.SampleDefault)obj;
+			var dg = (BinaryDeserializerGen)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				result.A = d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (2 == fd.OurIndex) {
+				result.B = d.Reader.ReadString();
+				if (result.B == "" && d.Reader.ReadBoolean()) result.B = null;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (3 == fd.OurIndex) {
+				result.P = (global::YuzuTest.SamplePoint)dg.ReadStruct<global::YuzuTest.SamplePoint>();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_YuzuTest__SampleDefault(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::YuzuTest.SampleDefault();
+			Read_YuzuTest__SampleDefault(d, def, result);
+			return result;
+		}
+
 		private static void Read_YuzuTest__Color(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::YuzuTest.Color)obj;
@@ -866,6 +895,7 @@ namespace YuzuGenBin
 			readCache[typeof(global::YuzuTest.SampleDerivedB)] = Read_YuzuTest__SampleDerivedB;
 			readCache[typeof(global::YuzuTest.SampleMatrix)] = Read_YuzuTest__SampleMatrix;
 			readCache[typeof(global::YuzuTest.SampleRect)] = Read_YuzuTest__SampleRect;
+			readCache[typeof(global::YuzuTest.SampleDefault)] = Read_YuzuTest__SampleDefault;
 			readCache[typeof(global::YuzuTest.Color)] = Read_YuzuTest__Color;
 			readCache[typeof(global::YuzuTest.SampleClassList)] = Read_YuzuTest__SampleClassList;
 			readCache[typeof(global::YuzuTest.SampleSmallTypes)] = Read_YuzuTest__SampleSmallTypes;
@@ -900,6 +930,7 @@ namespace YuzuGenBin
 			makeCache[typeof(global::YuzuTest.SampleMatrix)] = Make_YuzuTest__SampleMatrix;
 			makeCache[typeof(global::YuzuTest.SamplePoint)] = Make_YuzuTest__SamplePoint;
 			makeCache[typeof(global::YuzuTest.SampleRect)] = Make_YuzuTest__SampleRect;
+			makeCache[typeof(global::YuzuTest.SampleDefault)] = Make_YuzuTest__SampleDefault;
 			makeCache[typeof(global::YuzuTest.Color)] = Make_YuzuTest__Color;
 			makeCache[typeof(global::YuzuTest.SampleClassList)] = Make_YuzuTest__SampleClassList;
 			makeCache[typeof(global::YuzuTest.SampleSmallTypes)] = Make_YuzuTest__SampleSmallTypes;

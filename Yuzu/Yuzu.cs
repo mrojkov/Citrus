@@ -12,19 +12,24 @@ namespace Yuzu
 		public YuzuField(string alias) { Alias = alias; }
 	}
 
+	// YuzuField attributes must have default constructors for YuzuAll to work.
+
 	public class YuzuRequired : YuzuField
 	{
-		public YuzuRequired(string alias = null) : base(alias) { }
+		public YuzuRequired() : base(null) { }
+		public YuzuRequired(string alias) : base(alias) { }
 	}
 
 	public class YuzuOptional : YuzuField
 	{
-		public YuzuOptional(string alias = null) : base(alias) { }
+		public YuzuOptional() : base(null) { }
+		public YuzuOptional(string alias) : base(alias) { }
 	}
 
 	public class YuzuMember : YuzuField
 	{
-		public YuzuMember(string alias = null) : base(alias) { }
+		public YuzuMember() : base(null) { }
+		public YuzuMember(string alias) : base(alias) { }
 	}
 
 	public abstract class YuzuSerializeCondition : Attribute
@@ -67,9 +72,49 @@ namespace Yuzu
 
 	public class YuzuCompact : Attribute { }
 
+	public class YuzuBeforeSerialization : Attribute { }
 	public class YuzuAfterDeserialization : Attribute { }
 
 	public class YuzuMerge : Attribute { }
+
+	[Flags]
+	public enum YuzuItemKind
+	{
+		None = 0,
+		Field = 1,
+		Property = 2,
+		Any = 3,
+	}
+
+	public enum YuzuItemOptionality
+	{
+		None = 0,
+		Optional = 1,
+		Required = 2,
+		Member = 3,
+	}
+
+	public class YuzuMust : Attribute
+	{
+		public readonly YuzuItemKind Kind;
+		public YuzuMust(YuzuItemKind kind = YuzuItemKind.Any) { Kind = kind; }
+	}
+
+	public class YuzuAll : Attribute
+	{
+		public readonly YuzuItemOptionality Optionality = YuzuItemOptionality.Member;
+		public readonly YuzuItemKind Kind;
+		public YuzuAll(YuzuItemOptionality optionality, YuzuItemKind kind = YuzuItemKind.Any)
+		{
+			Optionality = optionality;
+			Kind = kind;
+		}
+		public YuzuAll(YuzuItemKind kind = YuzuItemKind.Any) { Kind = kind; }
+	}
+
+	public class YuzuExclude : Attribute { }
+
+	public class YuzuAllowReadingFromAncestor : Attribute { }
 
 	public enum TagMode
 	{
@@ -114,17 +159,25 @@ namespace Yuzu
 	{
 		public static MetaOptions Default = new MetaOptions();
 
-		public readonly Type RequiredAttribute = typeof(YuzuRequired);
-		public readonly Type OptionalAttribute = typeof(YuzuOptional);
-		public readonly Type MemberAttribute = typeof(YuzuMember);
-		public readonly Type CompactAttribute = typeof(YuzuCompact);
-		public readonly Type SerializeIfAttribute = typeof(YuzuSerializeCondition);
-		public readonly Type AfterDeserializationAttribute = typeof(YuzuAfterDeserialization);
-		public readonly Type MergeAttribute = typeof(YuzuMerge);
+		public Type RequiredAttribute = typeof(YuzuRequired);
+		public Type OptionalAttribute = typeof(YuzuOptional);
+		public Type MemberAttribute = typeof(YuzuMember);
+		public Type CompactAttribute = typeof(YuzuCompact);
+		public Type SerializeIfAttribute = typeof(YuzuSerializeCondition);
+		public Type BeforeSerializationAttribute = typeof(YuzuBeforeSerialization);
+		public Type AfterDeserializationAttribute = typeof(YuzuAfterDeserialization);
+		public Type MergeAttribute = typeof(YuzuMerge);
+		public Type MustAttribute = typeof(YuzuMust);
+		public Type AllAttribute = typeof(YuzuAll);
+		public Type ExcludeAttribute = typeof(YuzuExclude);
+		public Type AllowReadingFromAncestorAttribute = typeof(YuzuAllowReadingFromAncestor);
 
-		public readonly Func<Attribute, string> GetAlias = attr => (attr as YuzuField).Alias;
-		public readonly Func<Attribute, Func<object, object, bool>> GetSerializeCondition =
+		public Func<Attribute, string> GetAlias = attr => (attr as YuzuField).Alias;
+		public Func<Attribute, Func<object, object, bool>> GetSerializeCondition =
 			attr => (attr as YuzuSerializeCondition).Check;
+		public Func<Attribute, YuzuItemKind> GetItemKind = attr => (attr as YuzuMust).Kind;
+		public Func<Attribute, Tuple<YuzuItemOptionality, YuzuItemKind>> GetItemOptionalityAndKind =
+			attr => Tuple.Create((attr as YuzuAll).Optionality, (attr as YuzuAll).Kind);
 	}
 
 	public struct CommonOptions

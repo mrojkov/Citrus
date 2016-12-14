@@ -733,7 +733,7 @@ namespace Yuzu.Json
 			finally {
 				objStack.Pop();
 			}
-			meta.RunAfterDeserialization(obj);
+			meta.AfterDeserialization.Run(obj);
 			return obj;
 		}
 
@@ -756,7 +756,7 @@ namespace Yuzu.Json
 				objStack.Pop();
 			}
 			Require(']');
-			meta.RunAfterDeserialization(obj);
+			meta.AfterDeserialization.Run(obj);
 			return obj;
 		}
 
