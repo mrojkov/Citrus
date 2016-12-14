@@ -157,6 +157,7 @@ namespace Lime
 				}
 				renderChain.Clear();
 			} else {
+				Renderer.ZWriteEnabled = true;
 				renderChain.RenderAndClear();
 			}
 			Renderer.Clear(ClearTarget.DepthBuffer);
