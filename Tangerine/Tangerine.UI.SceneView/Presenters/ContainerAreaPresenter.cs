@@ -13,17 +13,21 @@ namespace Tangerine.UI.SceneView
 				var ctr = Core.Document.Current.Container as Widget;
 				if (ctr != null) {
 					ctr.PrepareRendererState();
-					var c = SceneViewColors.ContainerOuterSpace;
-					Renderer.DrawRect(new Vector2(-inf, -inf), new Vector2(inf, 0), c);
-					Renderer.DrawRect(new Vector2(-inf, ctr.Height), new Vector2(inf, inf), c);
-					Renderer.DrawRect(new Vector2(-inf, 0), new Vector2(0, ctr.Height), c);
-					Renderer.DrawRect(new Vector2(ctr.Width, 0), new Vector2(inf, ctr.Height), c);
-					Renderer.DrawRect(Vector2.Zero, ctr.Size, SceneViewColors.ContainerInnerSpace);
+					if (Core.Document.Current.PreviewAnimation) {
+						Renderer.DrawRect(new Vector2(-inf, -inf), new Vector2(inf, inf), Color4.Black);
+					} else {
+						var c = SceneViewColors.ContainerOuterSpace;
+						Renderer.DrawRect(new Vector2(-inf, -inf), new Vector2(inf, 0), c);
+						Renderer.DrawRect(new Vector2(-inf, ctr.Height), new Vector2(inf, inf), c);
+						Renderer.DrawRect(new Vector2(-inf, 0), new Vector2(0, ctr.Height), c);
+						Renderer.DrawRect(new Vector2(ctr.Width, 0), new Vector2(inf, ctr.Height), c);
+						Renderer.DrawRect(Vector2.Zero, ctr.Size, SceneViewColors.ContainerInnerSpace);
+					}
 				}
 			}));
 			sceneView.Scene.CompoundPostPresenter.Push(new DelegatePresenter<Widget>(w => {
 				var ctr = Core.Document.Current.Container as Widget;
-				if (ctr != null) {
+				if (ctr != null && !Core.Document.Current.PreviewAnimation) {
 					ctr.PrepareRendererState();
 					var c = SceneViewColors.ContainerBorder;
 					var mtx = ctr.LocalToWorldTransform;
