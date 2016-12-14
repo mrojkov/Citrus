@@ -148,6 +148,9 @@ namespace Tangerine.UI.Timeline.Components
 			var initialText = editBox.Text;
 			while (editBox.IsFocused()) {
 				yield return null;
+				if (!row.Selected) {
+					editBox.RevokeFocus();
+				}
 			}
 			editBox.Visible = false;
 			label.Visible = true;
