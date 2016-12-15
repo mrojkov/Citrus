@@ -107,6 +107,7 @@
     <Compile Include="Source\DictionaryOldFormatExtractor.cs" />
     <Compile Include="Source\ModelImport\KeyframeReducer.cs" />
     <Compile Include="Source\ModelImport\ModelImporter.cs" />
+    <Compile Include="Source\Nuget\Nuget.cs" />
     <Compile Include="Source\PluginAttributes\PluginFileIgoranceAttribute.cs" />
     <Compile Include="Source\PluginAttributes\PluginAssetsCookedAttribute.cs" />
     <Compile Include="Source\PluginAttributes\PluginCommandLineArgumentsAttribute.cs" />
@@ -168,6 +169,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Toolchain.Win\libtiff3.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Toolchain.Win\nuget.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Toolchain.Win\nvcompress.exe">
