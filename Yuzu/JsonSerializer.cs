@@ -507,6 +507,12 @@ namespace Yuzu.Json
 				return WriteUnknown;
 			if (Utils.IsStruct(t) || t.IsClass || t.IsInterface) {
 				var meta = Meta.Get(t, Options);
+				var sg = meta.Surrogate;
+				if (sg.FuncTo != null && sg.FuncIf == null) {
+					var surrogateWriter = GetWriteFunc(sg.SurrogateType);
+					return obj => surrogateWriter(sg.FuncTo(obj));
+				}
+
 				var name =
 					!meta.IsCompact || JsonOptions.IgnoreCompact ? "WriteObject" :
 					IsOneline(meta) ? "WriteObjectCompactOneline" :
@@ -514,7 +520,19 @@ namespace Yuzu.Json
 
 				var m = Utils.GetPrivateGeneric(GetType(), name, t);
 				var d = (Action<object, Meta>)Delegate.CreateDelegate(typeof(Action<object, Meta>), this, m);
-				return obj => d(obj, meta);
+				Action<object> writeFunc = obj => d(obj, meta);
+
+				if(sg.FuncTo != null && sg.FuncIf != null) {
+					var surrogateWriter = GetWriteFunc(sg.SurrogateType);
+					writeFunc = obj => {
+						if (sg.FuncIf.Invoke(obj))
+							surrogateWriter(sg.FuncTo(obj));
+						else
+							d(obj, meta);
+					};
+				}
+
+				return writeFunc;
 			}
 			throw new NotImplementedException(t.Name);
 		}
@@ -549,8 +567,15 @@ namespace Yuzu.Json
 				return;
 			}
 			var actualType = obj.GetType();
-			if (typeof(T) != actualType)
+			if (typeof(T) != actualType) {
 				meta = Meta.Get(actualType, Options);
+				var sg = meta.Surrogate;
+				if (sg.FuncTo != null && (sg.FuncIf == null || sg.FuncIf(obj))) {
+					var result = sg.FuncTo(obj);
+					GetWriteFunc(result.GetType())(obj);
+					return;
+				}
+			}
 			meta.BeforeSerialization.Run(obj);
 			writer.Write((byte)'{');
 			WriteFieldSeparator();

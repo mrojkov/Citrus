@@ -1379,6 +1379,32 @@ namespace YuzuTest.Json
 		}
 
 		[TestMethod]
+		public void TestSurrogate()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			var jd = new JsonDeserializer();
+
+			var v1 = new SampleSurrogateColor { R = 255, G = 0, B = 161 };
+			var result1 = js.ToString(v1);
+			Assert.AreEqual("\"#FF00A1\"", result1);
+			var w1 = jd.FromString<SampleSurrogateColor>(result1);
+			Assert.AreEqual(v1.R, w1.R);
+			Assert.AreEqual(v1.G, w1.G);
+			Assert.AreEqual(v1.B, w1.B);
+
+			var v2 = new SampleSurrogateColorIf { R = 77, G = 88, B = 99 };
+			Assert.AreEqual("[\n99,\n88,\n77\n]", js.ToString(v2));
+
+			var v3 = new SampleSurrogateColorIfDerived { R = 55, G = 66, B = 77 };
+			Assert.AreEqual("556677", js.ToString(v3));
+
+			SampleSurrogateColorIf.S = true;
+			Assert.AreEqual("778899", js.ToString(v2));
+
+		}
+
+		[TestMethod]
 		public void TestIndentation()
 		{
 			var js = new JsonSerializer();
