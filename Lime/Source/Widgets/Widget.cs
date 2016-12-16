@@ -502,11 +502,11 @@ namespace Lime
 		[YuzuMember]
 		public BoneArray BoneArray;
 
-		private Matrix32 localToWorldTransform;
-		private Color4 globalColor;
-		private Blending globalBlending;
-		private ShaderId globalShader;
-		private bool globallyVisible;
+		protected Matrix32 localToWorldTransform;
+		protected Color4 globalColor;
+		protected Blending globalBlending;
+		protected ShaderId globalShader;
+		protected bool globallyVisible;
 
 		/// <summary>
 		/// TODO: Add summary
