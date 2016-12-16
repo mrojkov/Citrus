@@ -67,6 +67,7 @@ namespace Yuzu.Metadata
 		public YuzuItemKind AllKind = YuzuItemKind.None;
 		public YuzuItemOptionality AllOptionality = YuzuItemOptionality.None;
 		public bool AllowReadingFromAncestor;
+		public Surrogate Surrogate;
 
 		public Dictionary<string, Item> TagToItem = new Dictionary<string, Item>();
 		public Func<object, YuzuUnknownStorage> GetUnknownStorage;
@@ -216,12 +217,15 @@ namespace Yuzu.Metadata
 		{
 			BeforeSerialization.MaybeAdd(m, Options.BeforeSerializationAttribute);
 			AfterDeserialization.MaybeAdd(m, Options.AfterDeserializationAttribute);
+			Surrogate.ProcessMethod(m);
 		}
 
 		private void ExploreType(Type t)
 		{
 			const BindingFlags bindingFlags =
-				BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy;
+				BindingFlags.Static | BindingFlags.Instance |
+				BindingFlags.Public | BindingFlags.NonPublic |
+				BindingFlags.FlattenHierarchy;
 			foreach (var m in t.GetMembers(bindingFlags)) {
 				if (Options.ExcludeAttribute != null && m.IsDefined(Options.ExcludeAttribute, false))
 					continue;
@@ -240,20 +244,21 @@ namespace Yuzu.Metadata
 						break;
 					case MemberTypes.Property:
 						var p = m as PropertyInfo;
+						var g = p.GetGetMethod();
 						if (p.PropertyType == typeof(YuzuUnknownStorage)) {
 							if (GetUnknownStorage != null)
 								throw Error("Duplicated unknown storage in field {0}", m.Name);
 #if iOS // Apple forbids code generation.
 							GetUnknownStorage = obj => (YuzuUnknownStorage)p.GetValue(obj, Utils.ZeroObjects);
 #else
-							var getter = BuildGetter(p.GetGetMethod());
+							var getter = BuildGetter(g);
 							GetUnknownStorage = obj => (YuzuUnknownStorage)getter(obj);
 #endif
 						}
 						else
 							AddItem(m,
-								Must.HasFlag(YuzuItemKind.Property) && p.GetGetMethod() != null,
-								AllKind.HasFlag(YuzuItemKind.Property) && p.GetGetMethod() != null);
+								Must.HasFlag(YuzuItemKind.Property) && g != null,
+								AllKind.HasFlag(YuzuItemKind.Property) && g != null);
 						break;
 					case MemberTypes.Method:
 						AddMethod(m as MethodInfo);
@@ -283,14 +288,20 @@ namespace Yuzu.Metadata
 				AllKind = ok.Item2;
 			}
 
+			Surrogate = new Surrogate(Type, Options);
 			foreach (var i in t.GetInterfaces())
 				ExploreType(i);
 			ExploreType(t);
+			Surrogate.Complete();
+
 			if (Utils.GetICollection(t) != null) {
 				if (Items.Count > 0)
 					throw Error("Serializable fields in collection are not supported");
 			}
-			else if (!options.AllowEmptyTypes && Items.Count == 0 && !(t.IsInterface || t.IsAbstract))
+			else if (
+				!options.AllowEmptyTypes && Items.Count == 0 && !(t.IsInterface || t.IsAbstract) &&
+				Surrogate.SurrogateType == null
+			)
 				throw Error("No serializable fields");
 			Items.Sort();
 			Item prev = null;
@@ -321,6 +332,7 @@ namespace Yuzu.Metadata
 						"Allows reading from ancestor {0}, but has {1} items instead of {2}",
 						t.BaseType.Name, Items.Count, ancestorMeta.Items.Count);
 			}
+
 		}
 
 		public static Meta Get(Type t, CommonOptions options)

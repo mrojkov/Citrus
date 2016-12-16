@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -563,6 +564,44 @@ namespace YuzuTest
 		[YuzuMember]
 		public int X;
 		public YuzuUnknownStorage Storage = new YuzuUnknownStorage();
+	}
+
+	public class SampleSurrogateColor
+	{
+		public int R, G, B;
+		[YuzuToSurrogate]
+		public string ToSurrogate() { return String.Format("#{0:X2}{1:X2}{2:X2}", R, G, B); }
+		[YuzuFromSurrogate]
+		public static SampleSurrogateColor FromSurrogate(string s) {
+			if (s[0] != '#')
+				throw new Exception("Bad color: " + s);
+			return new SampleSurrogateColor {
+				R = int.Parse(s.Substring(1, 2), NumberStyles.AllowHexSpecifier),
+				G = int.Parse(s.Substring(3, 2), NumberStyles.AllowHexSpecifier),
+				B = int.Parse(s.Substring(5, 2), NumberStyles.AllowHexSpecifier),
+			};
+		}
+	}
+
+	[YuzuCompact]
+	public class SampleSurrogateColorIf
+	{
+		[YuzuRequired]
+		public int R, G, B;
+		public static bool S;
+		[YuzuSurrogateIf]
+		public virtual bool SurrogateIf() { return S; }
+		[YuzuToSurrogate]
+		public static int ToSurrogate(SampleSurrogateColorIf c)
+		{
+			return c.R * 10000 + c.G * 100 + c.B;
+		}
+	}
+
+	[YuzuCompact]
+	public class SampleSurrogateColorIfDerived: SampleSurrogateColorIf
+	{
+		public override bool SurrogateIf() { return true; }
 	}
 
 	public class Bad1

@@ -116,6 +116,10 @@ namespace Yuzu
 
 	public class YuzuAllowReadingFromAncestor : Attribute { }
 
+	public class YuzuSurrogateIf : Attribute { }
+	public class YuzuToSurrogate : Attribute { }
+	public class YuzuFromSurrogate : Attribute { }
+
 	public enum TagMode
 	{
 		Aliases = 0,
@@ -171,6 +175,10 @@ namespace Yuzu
 		public Type AllAttribute = typeof(YuzuAll);
 		public Type ExcludeAttribute = typeof(YuzuExclude);
 		public Type AllowReadingFromAncestorAttribute = typeof(YuzuAllowReadingFromAncestor);
+
+		public Type SurrogateIfAttribute = typeof(YuzuSurrogateIf);
+		public Type ToSurrogateAttribute = typeof(YuzuToSurrogate);
+		public Type FromSurrogateAttribute = typeof(YuzuFromSurrogate);
 
 		public Func<Attribute, string> GetAlias = attr => (attr as YuzuField).Alias;
 		public Func<Attribute, Func<object, object, bool>> GetSerializeCondition =
