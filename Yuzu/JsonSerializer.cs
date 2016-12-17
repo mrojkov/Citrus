@@ -358,7 +358,7 @@ namespace Yuzu.Json
 			if (t.IsClass || Utils.IsStruct(t))
 				// Ignore compact since class name is always required.
 				// Do not pass Meta since it will always be overwritten.
-				WriteObject<object>(obj, null);
+				WriteObject(obj, null);
 			else
 				GetWriteFunc(t)(obj);
 		}
@@ -508,29 +508,25 @@ namespace Yuzu.Json
 			if (Utils.IsStruct(t) || t.IsClass || t.IsInterface) {
 				var meta = Meta.Get(t, Options);
 				var sg = meta.Surrogate;
-				if (sg.FuncTo != null && sg.FuncIf == null) {
-					var surrogateWriter = GetWriteFunc(sg.SurrogateType);
+				var surrogateWriter = sg.FuncTo != null ? GetWriteFunc(sg.SurrogateType) : null;
+				if (sg.FuncTo != null && sg.FuncIf == null)
 					return obj => surrogateWriter(sg.FuncTo(obj));
-				}
 
-				var name =
-					!meta.IsCompact || JsonOptions.IgnoreCompact ? "WriteObject" :
-					IsOneline(meta) ? "WriteObjectCompactOneline" :
-					"WriteObjectCompact";
+				Action<object> writeFunc;
+				if (!meta.IsCompact || JsonOptions.IgnoreCompact)
+					writeFunc = obj => WriteObject(obj, meta);
+				else if (IsOneline(meta))
+					writeFunc = obj => WriteObjectCompactOneline(obj, meta);
+				else
+					writeFunc = obj => WriteObjectCompact(obj, meta);
 
-				var m = Utils.GetPrivateGeneric(GetType(), name, t);
-				var d = (Action<object, Meta>)Delegate.CreateDelegate(typeof(Action<object, Meta>), this, m);
-				Action<object> writeFunc = obj => d(obj, meta);
-
-				if(sg.FuncTo != null && sg.FuncIf != null) {
-					var surrogateWriter = GetWriteFunc(sg.SurrogateType);
-					writeFunc = obj => {
-						if (sg.FuncIf.Invoke(obj))
+				if (sg.FuncTo != null && sg.FuncIf != null)
+					return obj => {
+						if (sg.FuncIf(obj))
 							surrogateWriter(sg.FuncTo(obj));
 						else
-							d(obj, meta);
+							writeFunc(obj);
 					};
-				}
 
 				return writeFunc;
 			}
@@ -560,22 +556,16 @@ namespace Yuzu.Json
 			GetWriteFunc(item.Value.GetType())(item.Value);
 		}
 
-		private void WriteObject<T>(object obj, Meta meta)
+		private void WriteObject(object obj, Meta meta)
 		{
 			if (obj == null) {
 				writer.Write(nullBytes);
 				return;
 			}
+			var expectedType = meta == null ? null : meta.Type;
 			var actualType = obj.GetType();
-			if (typeof(T) != actualType) {
+			if (meta == null || meta.Type != actualType)
 				meta = Meta.Get(actualType, Options);
-				var sg = meta.Surrogate;
-				if (sg.FuncTo != null && (sg.FuncIf == null || sg.FuncIf(obj))) {
-					var result = sg.FuncTo(obj);
-					GetWriteFunc(result.GetType())(obj);
-					return;
-				}
-			}
 			meta.BeforeSerialization.Run(obj);
 			writer.Write((byte)'{');
 			WriteFieldSeparator();
@@ -583,7 +573,7 @@ namespace Yuzu.Json
 			try {
 				depth += 1;
 				var isFirst = true;
-				if (typeof(T) != actualType || objStack.Count == 1 && JsonOptions.SaveRootClass) {
+				if (expectedType != actualType || objStack.Count == 1 && JsonOptions.SaveRootClass) {
 					WriteName(JsonOptions.ClassTag, ref isFirst);
 					WriteUnescapedString(TypeSerializer.Serialize(actualType));
 				}
@@ -634,20 +624,20 @@ namespace Yuzu.Json
 			writer.Write((byte)'}');
 		}
 
-		private void WriteObjectCompact<T>(object obj, Meta meta)
+		private void WriteObjectCompact(object obj, Meta meta)
 		{
 			if (obj == null) {
 				writer.Write(nullBytes);
 				return;
 			}
+			var actualType = obj.GetType();
+			if (meta.Type != actualType)
+				throw new YuzuException(String.Format(
+					"Attempt to write compact type {0} instead of {1}", actualType.Name, meta.Type.Name));
 			meta.BeforeSerialization.Run(obj);
 			writer.Write((byte)'[');
 			WriteFieldSeparator();
 			var isFirst = true;
-			var actualType = obj.GetType();
-			if (typeof(T) != actualType)
-				throw new YuzuException(String.Format(
-					"Attempt to write compact type {0} instead of {1}", actualType.Name, typeof(T).Name));
 			objStack.Push(obj);
 			try {
 				depth += 1;
@@ -667,19 +657,19 @@ namespace Yuzu.Json
 			writer.Write((byte)']');
 		}
 
-		private void WriteObjectCompactOneline<T>(object obj, Meta meta)
+		private void WriteObjectCompactOneline(object obj, Meta meta)
 		{
 			if (obj == null) {
 				writer.Write(nullBytes);
 				return;
 			}
+			var actualType = obj.GetType();
+			if (meta.Type != actualType)
+				throw new YuzuException(String.Format(
+					"Attempt to write compact type {0} instead of {1}", actualType.Name, meta.Type.Name));
 			meta.BeforeSerialization.Run(obj);
 			writer.Write((byte)'[');
 			var isFirst = true;
-			var actualType = obj.GetType();
-			if (typeof(T) != actualType)
-				throw new YuzuException(String.Format(
-					"Attempt to write compact type {0} instead of {1}", actualType.Name, typeof(T).Name));
 			objStack.Push(obj);
 			try {
 				foreach (var yi in meta.Items) {
