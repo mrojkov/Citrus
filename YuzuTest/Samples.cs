@@ -604,6 +604,18 @@ namespace YuzuTest
 		public override bool SurrogateIf() { return true; }
 	}
 
+	public class SampleSurrogateClass
+	{
+		public bool FB;
+		[YuzuToSurrogate]
+		public static SampleBool ToSurrogate(SampleSurrogateClass obj) { return new SampleBool { B = obj.FB }; }
+		[YuzuFromSurrogate]
+		public static SampleSurrogateClass FromSurrogate(SampleBool obj)
+		{
+			return new SampleSurrogateClass { FB = obj.B };
+		}
+	}
+
 	public class Bad1
 	{
 		[YuzuRequired]

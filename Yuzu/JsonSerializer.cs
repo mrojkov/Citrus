@@ -355,11 +355,16 @@ namespace Yuzu.Json
 			var t = obj.GetType();
 			if (t == typeof(object))
 				throw new YuzuException("WriteAny");
-			if (t.IsClass || Utils.IsStruct(t))
-				// Ignore compact since class name is always required.
-				// Do not pass Meta since it will always be overwritten.
-				WriteObject(obj, null);
-			else
+			if (IsUserObject(t)) {
+				var meta = Meta.Get(t, Options);
+				var sg = meta.Surrogate;
+				Action<object> surrogateWriter = GetSurrogateWriter(meta);
+				if (sg.FuncTo == null || (sg.FuncIf != null && !sg.FuncIf(obj)))
+					// Ignore compact since class name is always required.
+					WriteObject(obj, null);
+				else
+					surrogateWriter(sg.FuncTo(obj));
+			} else
 				GetWriteFunc(t)(obj);
 		}
 
@@ -476,6 +481,40 @@ namespace Yuzu.Json
 			return result;
 		}
 
+		// This condition must be equivalent to MakeWriteFunc returning WriteObject*.
+		private bool IsUserObject(Type t)
+		{
+			if (t == typeof(string)) return false;
+			if (Utils.IsStruct(t)) return true;
+			if (!t.IsClass && !t.IsInterface) return false;
+			if (t.IsGenericType) {
+				var g = t.GetGenericTypeDefinition();
+				if (g == typeof(Dictionary<,>) || g == typeof(Action<>) || g == typeof(Nullable<>))
+					return false;
+			}
+			if (Utils.GetICollection(t) != null)
+				return false;
+			return true;
+		}
+
+		private Action<object> GetSurrogateWriter(Meta meta)
+		{
+			var sg = meta.Surrogate;
+			if (sg.FuncTo == null)
+				return null;
+			var st = sg.SurrogateType;
+			if (!IsUserObject(st))
+				return GetWriteFunc(st);
+			var sgMeta = Meta.Get(st, Options);
+			// Unpack conditional compact surrogate for compact field to allow detection.
+			if (!sgMeta.IsCompact || JsonOptions.IgnoreCompact || meta.IsCompact && sg.FuncIf != null)
+				return obj => WriteObject(obj, meta);
+			if (IsOneline(sgMeta))
+				return obj => WriteObjectCompactOneline(obj, meta);
+			else
+				return obj => WriteObjectCompact(obj, meta);
+		}
+
 		private Action<object> MakeWriteFunc(Type t)
 		{
 			if (t.IsEnum) {
@@ -508,7 +547,7 @@ namespace Yuzu.Json
 			if (Utils.IsStruct(t) || t.IsClass || t.IsInterface) {
 				var meta = Meta.Get(t, Options);
 				var sg = meta.Surrogate;
-				var surrogateWriter = sg.FuncTo != null ? GetWriteFunc(sg.SurrogateType) : null;
+				Action<object> surrogateWriter = GetSurrogateWriter(meta);
 				if (sg.FuncTo != null && sg.FuncIf == null)
 					return obj => surrogateWriter(sg.FuncTo(obj));
 

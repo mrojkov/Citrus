@@ -953,6 +953,11 @@ namespace YuzuTest.Json
 			var f = ((Dictionary<string, object>)d)["F"];
 			Assert.IsInstanceOfType(f, typeof(SampleObj));
 			Assert.AreEqual(null, ((SampleObj)f).F);
+
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			js.JsonOptions.FieldSeparator = "";
+			Assert.AreEqual("[\"q\",[1]]", js.ToString(new List<object> { "q", new List<int> { 1 } }));
 		}
 
 		[TestMethod]
@@ -1379,7 +1384,7 @@ namespace YuzuTest.Json
 		}
 
 		[TestMethod]
-		public void TestSurrogate()
+		public void TestSurrogateStr()
 		{
 			var js = new JsonSerializer();
 			js.JsonOptions.Indent = "";
@@ -1401,7 +1406,22 @@ namespace YuzuTest.Json
 
 			SampleSurrogateColorIf.S = true;
 			Assert.AreEqual("778899", js.ToString(v2));
+		}
 
+		[TestMethod]
+		public void TestSurrogateClass()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			js.JsonOptions.FieldSeparator = "";
+			var jd = new JsonDeserializer();
+
+			var v1 = new SampleSurrogateClass { FB = true };
+			var result1 = js.ToString(v1);
+			Assert.AreEqual("{\"class\":\"YuzuTest.SampleBool, YuzuTest\",\"B\":true}", result1);
+			Assert.AreEqual("[" + result1 + "]", js.ToString(new List<object> { v1 }));
+			var w1 = jd.FromString<SampleSurrogateClass>(result1);
+			Assert.IsTrue(w1.FB);
 		}
 
 		[TestMethod]

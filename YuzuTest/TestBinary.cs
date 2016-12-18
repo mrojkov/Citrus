@@ -947,6 +947,11 @@ namespace YuzuTest.Binary
 				new object[] { (sbyte)5, "abc" });
 
 			Assert.AreEqual((short)266, bd.FromBytes<object>(SX("03 0A 01")));
+
+			var bs = new BinarySerializer();
+			Assert.AreEqual(
+				"21 11 02 00 00 00 10 " + XS("q") + " 21 05 01 00 00 00 01 00 00 00",
+				XS(bs.ToBytes(new List<object> { "q", new List<int> { 1 } })));
 		}
 
 		[TestMethod]
