@@ -20,7 +20,7 @@ namespace Lime
 
 		public static Folder BuildTree(IFolderContext context)
 		{
-			var root = new Folder();
+			var root = new Folder { Expanded = true };
 			if (context.Folders == null || context.Folders.Count == 0) {
 				root.Items.AddRange(context.Nodes);
 			} else {
