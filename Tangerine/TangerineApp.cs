@@ -60,6 +60,12 @@ namespace Tangerine
 				}
 			};
 
+			Document.NodeDecorators.Add(n => {
+				if (n is Spline) {
+					n.CompoundPresenter.Add(new UI.SceneView.SplinePresenter());
+				}
+			});
+
 			DocumentHistory.Processors.AddRange(new IOperationProcessor[] {
 				new Core.Operations.SelectRow.Processor(),
 				new Core.Operations.SetProperty.Processor(),

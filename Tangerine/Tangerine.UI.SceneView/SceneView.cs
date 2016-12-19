@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Lime;
 using Tangerine.Core;
@@ -84,6 +85,7 @@ namespace Tangerine.UI.SceneView
 		{
 			Frame.Tasks.Add(
 				new CreateWidgetProcessor(),
+				new CreatePointObjectProcessor(),
 				new CreateNodeProcessor(),
 				new ExpositionProcessor(),
 				new MouseScrollProcessor(),
