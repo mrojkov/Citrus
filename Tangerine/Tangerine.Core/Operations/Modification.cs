@@ -231,6 +231,9 @@ namespace Tangerine.Core.Operations
 			}
 			var ctr = nodeType.GetConstructor(Type.EmptyTypes);
 			var node = (Node)ctr.Invoke(new object[] {});
+			foreach (var d in Document.NodeDecorators) {
+				d(node);
+			}
 			node.Id = GenerateNodeId(container, nodeType);
 			InsertFolderItem.Perform(container, location, node);
 			ClearRowSelection.Perform();

@@ -41,6 +41,11 @@ namespace Tangerine.Core
 		public static string[] GetSupportedFileTypes() => new string[] { "scene", "tan" };
 
 		/// <summary>
+		/// The list of Tangerine node decorators.
+		/// </summary>
+		public static readonly List<Action<Node>> NodeDecorators = new List<Action<Node>>();
+
+		/// <summary>
 		/// Gets the path to the document relative to the project directory.
 		/// </summary>
 		public string Path { get; private set; }
@@ -97,6 +102,11 @@ namespace Tangerine.Core
 			Path = path;
 			using (Theme.Push(DefaultTheme.Instance)) {
 				RootNode = new Frame(path);
+			}
+			foreach (var n in RootNode.Descendants) {
+				foreach (var d in NodeDecorators) {
+					d(n);
+				}
 			}
 			RootNode.Update(0);
 			Container = RootNode;
