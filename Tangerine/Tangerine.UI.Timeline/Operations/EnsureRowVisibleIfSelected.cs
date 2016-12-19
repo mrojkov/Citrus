@@ -11,7 +11,7 @@ namespace Tangerine.UI.Timeline
 		{
 			if (op.Select) {
 				var timeline = Timeline.Instance;
-				timeline.EnsureRowVisible((op as Core.Operations.SelectRow).Row);
+				timeline.EnsureRowVisible(op.Row);
 			}
 		}
 
