@@ -45,6 +45,16 @@ namespace Tangerine.Core.Operations
 			if (node.Parent != Document.Current.Container) {
 				throw new InvalidOperationException();
 			}
+			if (select) {
+				var rootFolder = Document.Current.Container.EditorState().RootFolder;
+				var folder = rootFolder.Find(node).Folder;
+				while (folder != null) {
+					if (!folder.Expanded) {
+						SetProperty.Perform(folder, nameof(Folder.Expanded), true);
+					}
+					folder = rootFolder.Find(folder).Folder;
+				}
+			}
 			var row = Document.Current.GetRowForObject(node);
 			SelectRow.Perform(row, select);
 		}
