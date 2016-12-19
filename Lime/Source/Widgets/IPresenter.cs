@@ -80,6 +80,17 @@ namespace Lime
 		public virtual IPresenter Clone() { return (CustomPresenter)MemberwiseClone(); }
 	}
 
+	public class CustomPresenter<T> : IPresenter where T: Node
+	{
+		public void Render(Node node) => InternalRender((T)node);
+		public bool PartialHitTest(Node node, ref HitTestArgs args) => InternalPartialHitTest((T)node, ref args);
+
+		protected virtual void InternalRender(T node) { }
+		protected virtual bool InternalPartialHitTest(T node, ref HitTestArgs args) => false;
+
+		public virtual IPresenter Clone() { return (CustomPresenter<T>)MemberwiseClone(); }
+	}
+
 	public class DelegatePresenter<T> : CustomPresenter where T: Node
 	{
 		public delegate bool HitTestDelegate(T node, ref HitTestArgs args);
@@ -105,13 +116,13 @@ namespace Lime
 				render((T)node);
 		}
 
-		public override bool PartialHitTest (Node node, ref HitTestArgs args)
+		public override bool PartialHitTest(Node node, ref HitTestArgs args)
 		{
-			return hitTest != null && hitTest ((T)node, ref args);
+			return hitTest != null && hitTest((T)node, ref args);
 		}
 	}
 
-	public class WidgetBoundsPresenter : CustomPresenter
+	public class WidgetBoundsPresenter : CustomPresenter<Widget>
 	{
 		public Color4 Color { get; set; }
 		public float Thickness { get; set; }
@@ -122,15 +133,14 @@ namespace Lime
 			Thickness = thickness;
 		}
 
-		public override void Render(Node node)
+		protected override void InternalRender(Widget widget)
 		{
-			var widget = node.AsWidget;
 			widget.PrepareRendererState();
 			Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Color * widget.GlobalColor, Thickness);
 		}
 	}
 
-	public class WidgetFlatFillPresenter : CustomPresenter
+	public class WidgetFlatFillPresenter : CustomPresenter<Widget>
 	{
 		public Color4 Color { get; set; }
 
@@ -139,9 +149,8 @@ namespace Lime
 			Color = color;
 		}
 
-		public override void Render(Node node)
+		protected override void InternalRender(Widget widget)
 		{
-			var widget = node.AsWidget;
 			widget.PrepareRendererState();
 			Renderer.DrawRect(widget.ContentPosition, widget.ContentSize, Color * widget.GlobalColor);
 		}
