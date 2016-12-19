@@ -12,5 +12,10 @@ namespace Lime
 
 		[YuzuMember]
 		public float TangentWeight { get; set; }
+
+		public SplinePoint()
+		{
+			TangentWeight = 1.0f;
+		}
 	}
 }
