@@ -2,15 +2,9 @@ using System.Collections.Generic;
 
 namespace Lime
 {
-	/// <summary>
-	/// —плайн. ¬спомогательна€ крива€ лини€, построенна€ по алгоритму Catmull-Rom, задающа€ траекторию дл€ чего-либо
-	/// </summary>
 	[TangerineClass(allowChildren: true)]
 	public class Spline : Widget
 	{
-		/// <summary>
-		/// ¬озвращает длину сплайна в пиксел€х (быстро, но грубо)
-		/// </summary>
 		public float CalcLengthRough()
 		{
 			float length = 0;
@@ -27,10 +21,6 @@ namespace Lime
 			return length;
 		}
 
-		/// <summary>
-		/// –аспредел€ет точки равномерно по сплайну. ¬озвращает список координат точек
-		/// </summary>
-		/// <param name="approximateCount"> оличество точек, которые нужно распределить</param>
 		public List<Vector2> ApproximateByPolyline(int approximateCount)
 		{
 			var result = new List<Vector2>();
@@ -61,11 +51,6 @@ namespace Lime
 			return length;
 		}
 
-		/// <summary>
-		/// ¬озвращает длину сплайна в пиксел€х (точно, но медленно).
-		/// —плайн разбиваетс€ на много мелких отрезков, после чего возвращаетс€ сумма их длинн
-		/// </summary>
-		/// <param name="approximateCount"> оличество точек аппроксимации. „ем больше точек, тем больше отрезков будет построено и тем точнее будет результат</param>
 		public float CalcLengthAccurate(int approximateCount)
 		{
 			float length = 0;
@@ -79,10 +64,6 @@ namespace Lime
 			return length;
 		}
 
-		/// <summary>
-		/// ¬озвращает точку на сплайне
-		/// </summary>
-		/// <param name="lengthFromBeginning">ѕозици€ на сплайне. 0 - начало, 1 - конец</param>
 		public Vector2 CalcPoint(float lengthFromBeginning)
 		{
 			float length = 0.0f;
