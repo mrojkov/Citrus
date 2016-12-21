@@ -741,7 +741,7 @@ namespace Lime
 				v[2].Pos += d;
 				v[3].Pos -= d;
 			}
-			Renderer.DrawTriangleFan(null, null, v, v.Length);
+			Renderer.DrawTriangleFan(null, null, v, 4);
 		}
 
 		static Vector2 GetVectorNormal(Vector2 v)
@@ -755,7 +755,7 @@ namespace Lime
 			v[1] = new Vertex { Pos = new Vector2(b.X, a.Y), Color = color };
 			v[2] = new Vertex { Pos = b, Color = color };
 			v[3] = new Vertex { Pos = new Vector2(a.X, b.Y), Color = color };
-			Renderer.DrawTriangleFan(null, null, v, v.Length);
+			Renderer.DrawTriangleFan(null, null, v, 4);
 		}
 
 		public static void DrawRect(float x0, float y0, float x1, float y1, Color4 color)
@@ -802,7 +802,7 @@ namespace Lime
 			v[1] = new Vertex { Pos = new Vector2(b.X, a.Y), Color = gradient.A };
 			v[2] = new Vertex { Pos = b, Color = gradient.B };
 			v[3] = new Vertex { Pos = new Vector2(a.X, b.Y), Color = gradient.B };
-			Renderer.DrawTriangleFan(null, null, v, v.Length);
+			Renderer.DrawTriangleFan(null, null, v, 4);
 		}
 
 		public static void DrawVerticalGradientRect(float x0, float y0, float x1, float y1, ColorGradient gradient)
@@ -821,7 +821,7 @@ namespace Lime
 			v[1] = new Vertex { Pos = new Vector2(b.X, a.Y), Color = gradient.B };
 			v[2] = new Vertex { Pos = b, Color = gradient.B };
 			v[3] = new Vertex { Pos = new Vector2(a.X, b.Y), Color = gradient.A };
-			Renderer.DrawTriangleFan(null, null, v, v.Length);
+			Renderer.DrawTriangleFan(null, null, v, 4);
 		}
 
 		public static void DrawHorizontalGradientRect(float x0, float y0, float x1, float y1, ColorGradient gradient)
@@ -842,6 +842,24 @@ namespace Lime
 		public static void DrawVerticalGradientRect(float x0, float y0, float x1, float y1, Color4 topColor, Color4 bottomColor)
 		{
 			DrawVerticalGradientRect(new Vector2(x0, y0), new Vector2(x1, y1), topColor, bottomColor);
+		}
+
+		public static void DrawRound(Vector2 center, float radius, int numSegments, Color4 innerColor, Color4 outerColor)
+		{
+			if (v.Length < numSegments + 1) {
+				v = new Vertex[numSegments + 1];
+			}
+			v[0] = new Vertex { Pos = center, Color = innerColor };
+			for (int i = 0; i < numSegments; i++) {
+				v[i + 1].Pos = Vector2.CosSin(i * Mathf.TwoPi / (numSegments - 1)) * radius + center;
+				v[i + 1].Color = outerColor;
+			}
+			DrawTriangleFan(null, v, numSegments + 1);
+		}
+
+		public static void DrawRound(Vector2 center, float radius, int numSegments, Color4 color)
+		{
+			DrawRound(center, radius, numSegments, color, color);
 		}
 	}
 }
