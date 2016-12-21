@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Lime;
 using Tangerine.Core;
 
@@ -12,8 +13,13 @@ namespace Tangerine.UI.SceneView
 				return;
 			}
 			SceneView.Instance.Frame.PrepareRendererState();
+			DrawSpline(spline);
+		}
+
+		void DrawSpline(Spline spline)
+		{
 			var l = spline.CalcLengthAccurate(100);
-			const float step = 5.0f;
+			float step = 7.0f / SceneView.Instance.Scene.Scale.X;
 			var xform = spline.CalcTransitionToSpaceOf(SceneView.Instance.Frame);
 			var p = spline.CalcPoint(0) * xform;
 			for (float t = 0; t <= l + step; t += step) {

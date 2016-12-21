@@ -1,18 +1,18 @@
-﻿using System;
+using System;
 using System.Linq;
 using Lime;
 using Tangerine.Core;
 
 namespace Tangerine.UI.SceneView
 {
-	class PointObjectsPresenter
+	class PointObjectsSelectionPresenter
 	{
-		public PointObjectsPresenter(SceneView sceneView)
+		public PointObjectsSelectionPresenter(SceneView sceneView)
 		{
 			sceneView.Frame.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(Render));
 		}
 
-		private void Render(Widget canvas)
+		void Render(Widget canvas)
 		{
 			if (
 				SceneView.Instance.Components.Get<ExpositionComponent>().InProgress ||
@@ -22,11 +22,10 @@ namespace Tangerine.UI.SceneView
 				return;
 			}
 			canvas.PrepareRendererState();
-			var pointObjects = Document.Current.Container.Nodes.OfType<PointObject>().ToList();
 			var t = Document.Current.Container.AsWidget.CalcTransitionToSpaceOf(canvas);
 			var selectedPointObjects = Document.Current.SelectedNodes().OfType<PointObject>().Editable().ToList();
-			foreach (var po in pointObjects) {
-				DrawPointObject(t * po.TransformedPosition, selected: selectedPointObjects.Contains(po));
+			foreach (var po in selectedPointObjects) {
+				DrawPointObject(t * po.TransformedPosition);
 			}
 			Rectangle aabb;
 			if (Utils.CalcAABB(selectedPointObjects, canvas, out aabb)) {
@@ -36,16 +35,14 @@ namespace Tangerine.UI.SceneView
 			DrawPivot(aabb.Center);
 		}
 
-		void DrawPointObject(Vector2 position, bool selected)
+		void DrawPointObject(Vector2 position)
 		{
-			Renderer.DrawRect(
-				position - Vector2.One * 3, position + Vector2.One * 3,
-				selected ? SceneViewColors.Selection : SceneViewColors.PointObject);
+			Renderer.DrawRound(position, 3, 10, SceneViewColors.Selection);
 		}
 
 		void DrawPivot(Vector2 position)
 		{
-			Renderer.DrawRect(position - Vector2.One * 5, position + Vector2.One * 5, SceneViewColors.Selection);
+			Renderer.DrawRound(position, 3, 10, SceneViewColors.Selection);
 		}
 	}
 }

@@ -92,6 +92,7 @@ namespace Tangerine.UI.SceneView
 				new DragPivotProcessor(),
 				new DragWidgetsProcessor(),
 				new DragPointObjectsProcessor(),
+				new DragSplineTangentsProcessor(),
 				new ResizeWidgetsProcessor(),
 				new RotateWidgetsProcessor(),
 				new MouseSelectionProcessor(),
@@ -104,7 +105,7 @@ namespace Tangerine.UI.SceneView
 		{
 			new ContainerAreaPresenter(this);
 			new SelectedWidgetsPresenter(this);
-			new PointObjectsPresenter(this);
+			new PointObjectsSelectionPresenter(this);
 		}
 
 		public void CreateNode(Type nodeType)

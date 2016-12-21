@@ -60,11 +60,9 @@ namespace Tangerine
 				}
 			};
 
-			Document.NodeDecorators.Add(n => {
-				if (n is Spline) {
-					n.CompoundPresenter.Add(new UI.SceneView.SplinePresenter());
-				}
-			});
+			Document.NodeDecorators.AddFor<Spline>(n => n.CompoundPresenter.Add(new UI.SceneView.SplinePresenter()));
+			Document.NodeDecorators.AddFor<PointObject>(n => n.CompoundPresenter.Add(new UI.SceneView.PointObjectPresenter()));
+			Document.NodeDecorators.AddFor<SplinePoint>(n => n.CompoundPresenter.Add(new UI.SceneView.SplinePointPresenter()));
 
 			DocumentHistory.Processors.AddRange(new IOperationProcessor[] {
 				new Core.Operations.SelectRow.Processor(),

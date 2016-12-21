@@ -43,7 +43,7 @@ namespace Tangerine.Core
 		/// <summary>
 		/// The list of Tangerine node decorators.
 		/// </summary>
-		public static readonly List<Action<Node>> NodeDecorators = new List<Action<Node>>();
+		public static readonly NodeDecoratorList NodeDecorators = new NodeDecoratorList();
 
 		/// <summary>
 		/// Gets the path to the document relative to the project directory.
@@ -266,5 +266,17 @@ namespace Tangerine.Core
 		}
 
 		public static bool HasCurrent() => Current != null;
+
+		public class NodeDecoratorList : List<Action<Node>>
+		{
+			public void AddFor<T>(Action<Node> action) where T: Node
+			{
+				Add(node => {
+					if (node is T) {
+						action(node);
+					}
+				});
+			}
+		}
 	}
 }
