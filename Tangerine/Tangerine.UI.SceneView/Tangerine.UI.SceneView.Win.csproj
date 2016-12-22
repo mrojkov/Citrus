@@ -62,13 +62,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Presenters\ContainerAreaPresenter.cs" />
-    <Compile Include="Presenters\PointObjectsPresenter.cs" />
+    <Compile Include="Presenters\PointObjectPresenter.cs" />
+    <Compile Include="Presenters\PointObjectsSelectionPresenter.cs" />
     <Compile Include="Presenters\SelectedWidgetsPresenter.cs" />
+    <Compile Include="Presenters\SplinePointPresenter.cs" />
+    <Compile Include="Presenters\SplinePresenter.cs" />
     <Compile Include="PreviewAnimationHandler.cs" />
     <Compile Include="Processors\CreateNodeProcessor.cs" />
+    <Compile Include="Processors\CreatePointObjectProcessor.cs" />
     <Compile Include="Processors\CreateWidgetProcessor.cs" />
     <Compile Include="Processors\DragPivotProcessor.cs" />
     <Compile Include="Processors\DragPointObjectsProcessor.cs" />
+    <Compile Include="Processors\DragSplineTangentsProcessor.cs" />
     <Compile Include="Processors\ShiftClickProcessor.cs" />
     <Compile Include="SceneView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
