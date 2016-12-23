@@ -9,6 +9,7 @@ namespace Lime
 		public MouseCursor IBeam { get { return null; } }
 		public MouseCursor SizeNS { get { return null; } }
 		public MouseCursor SizeWE { get { return null; } }
+		public MouseCursor SizeAll { get { return null; } }
 	}
 }
 #endif

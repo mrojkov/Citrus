@@ -17,6 +17,7 @@ namespace Lime
 		public MouseCursor IBeam { get; private set; }
 		public MouseCursor SizeNS { get; private set; }
 		public MouseCursor SizeWE { get; private set; }
+		public MouseCursor SizeAll { get; private set; }
 
 		private static MouseCursor FromNSCursor(NSCursor cursor)
 		{
