@@ -8,5 +8,6 @@
 		MouseCursor IBeam { get; }
 		MouseCursor SizeNS { get; }
 		MouseCursor SizeWE { get; }
+		MouseCursor SizeAll { get; }
 	}
 }

@@ -13,6 +13,7 @@ namespace Lime
 			Default = FromWinFormsCursor(Cursors.Default);
 			SizeNS = FromWinFormsCursor(Cursors.SizeNS);
 			SizeWE = FromWinFormsCursor(Cursors.SizeWE);
+			SizeAll = FromWinFormsCursor(Cursors.SizeAll);
 		}
 
 		private static MouseCursor FromWinFormsCursor(Cursor cursor)
@@ -27,6 +28,7 @@ namespace Lime
 		public MouseCursor IBeam { get; private set; }
 		public MouseCursor SizeNS { get; private set; }
 		public MouseCursor SizeWE { get; private set; }
+		public MouseCursor SizeAll { get; private set; }
 	}
 }
 #endif

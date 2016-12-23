@@ -44,5 +44,7 @@ namespace Lime
 		/// Gets the two-headed horizontal(west/east) sizing cursor.
 		/// </summary>
 		public static MouseCursor SizeWE { get { return cursors.SizeWE; } }
+
+		public static MouseCursor SizeAll { get { return cursors.SizeAll; } }
 	}
 }
