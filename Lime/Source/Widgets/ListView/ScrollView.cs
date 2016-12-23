@@ -25,6 +25,8 @@ namespace Lime
 		public Vector2? SwipeSensitivity { get; set; }
 		public float BounceZoneThickness = 100;
 		public float ScrollToItemVelocity = 800;
+		public float InertialScrollingStopVelocity = 40;
+		public float InertialScrollingDamping = 2;
 		public ScrollDirection ScrollDirection { get; private set; }
 		private WheelScrollState wheelScrollState;
 		public bool ScrollWhenContentFits = true;
@@ -351,9 +353,9 @@ namespace Lime
 		{
 			while (true) {
 				var delta = Task.Current.Delta;
-				float damping = ScrollPosition.InRange(MinScrollPosition, MaxScrollPosition) ? 2.0f : 20.0f;
+				float damping = InertialScrollingDamping * (ScrollPosition.InRange(MinScrollPosition, MaxScrollPosition) ? 1 : 10);
 				velocity -= velocity * damping * delta;
-				if (velocity.Abs() < 40.0f) {
+				if (velocity.Abs() < InertialScrollingStopVelocity) {
 					break;
 				}
 				// Round scrolling position to prevent blurring
