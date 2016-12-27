@@ -79,7 +79,7 @@ namespace Orange
 			CsprojSynchronization.SynchronizeAll();
 			var nugetResult = Nuget.Restore(projectDirectory);
 			if (nugetResult != 0) {
-				Console.WriteLine("NuGet failed to restore packages");
+				Console.WriteLine("NuGet exited with code: {0}", nugetResult);
 			}
 			var buildSystem = GetBuildSystem();
 			buildSystem.PrepareForBuild();

@@ -144,6 +144,7 @@
     <Compile Include="Source\Actions\GenerateLimeDeserializers.cs" />
     <Compile Include="Source\Actions\AnalyzeResources.cs" />
     <Compile Include="Source\Actions\RunTangerine.cs" />
+    <Compile Include="Source\Nuget\Nuget.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Info.plist" />
@@ -151,6 +152,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Toolchain.Mac\nvcompress">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Toolchain.Win\nuget.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
