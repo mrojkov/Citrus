@@ -55,6 +55,7 @@ namespace Orange
 
 		private static void ResetCurrentPlugin()
 		{
+			RunCurrentPluginStaticMethodWithAttribute<PluginFinalizationAttribute>();
 			CurrentPlugin = null;
 			The.UI.RefreshMenu();
 		}
