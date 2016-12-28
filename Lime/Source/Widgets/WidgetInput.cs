@@ -19,6 +19,9 @@ namespace Lime
 		public static readonly WidgetStack MouseCaptureStack = new WidgetStack();
 		public static readonly WidgetStack InputScopeStack = new WidgetStack();
 
+		public delegate bool FilterFunc(Widget widget, Key key);
+		public static FilterFunc Filter;
+
 		public event KeyEventHandler KeyPressed;
 		public event KeyEventHandler KeyReleased;
 		public event KeyEventHandler KeyRepeated;
@@ -78,6 +81,9 @@ namespace Lime
 
 		public bool IsAcceptingKey(Key key)
 		{
+			if (Filter != null && !Filter(widget, key)) {
+				return false;
+			}
 			if (InputScopeStack.Top != null && !widget.DescendantOrThis(InputScopeStack.Top)) {
 				return false;
 			}
