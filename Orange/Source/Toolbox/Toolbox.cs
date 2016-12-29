@@ -8,6 +8,8 @@ namespace Orange
 {
 	public static class Toolbox
 	{
+		private static string monoPath;
+
 		public static string ToWindowsSlashes(string path)
 		{
 			return path.Replace('/', '\\');
@@ -50,6 +52,26 @@ namespace Orange
 #endif
 			var dir = System.IO.Path.GetDirectoryName(assemblyPath);
 			return dir;
+		}
+
+		public static string GetMonoPath()
+		{
+			if (monoPath == null) {
+				// Get path to mscorlib assembly and remove four last segments of path.
+				var up = 4;
+				var path = typeof(int).Assembly.Location;
+				for (int i = path.Length - 1; i >= 0; i--) {
+					if (path[i] == Path.DirectorySeparatorChar) {
+						up--;
+						if (up == 0) {
+							path = path.Substring(0, i);
+							break;
+						}
+					}
+				}
+				monoPath = Path.Combine(path, "bin", "mono");
+			}
+			return monoPath;
 		}
 
 		public static string GetTargetPlatformString(TargetPlatform platform)
