@@ -333,6 +333,11 @@ namespace Lime
 			MemoryUsed += length;
 			return reader.ReadBytes(length);
 		}
+
+		public Color4[] GetPixels()
+		{
+			throw new NotSupportedException();
+		}
 	}
 }
 #endif

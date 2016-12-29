@@ -95,6 +95,11 @@ namespace Lime
 
 		public void Discard() { }
 
+		public Color4[] GetPixels()
+		{
+			throw new NotSupportedException();
+		}
+
 		public bool IsStubTexture
 		{
 			get { return atlasTexture.IsStubTexture; }

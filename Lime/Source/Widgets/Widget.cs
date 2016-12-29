@@ -1073,6 +1073,37 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// Renders the widget with all descendants into new instance of <see cref="Bitmap">
+		/// </summary>
+		/// <returns></returns>
+		public Bitmap ToBitmap()
+		{
+			var pixelScale = Window.Current.PixelScale;
+			var scaledWidth = (int)(Width * pixelScale);
+			var scaledHeight = (int)(Height * pixelScale);
+			var savedScale = Scale;
+			var savedPosition = Position;
+			var savedPivot = Pivot;
+
+			try {
+				Scale = Vector2.One;
+				Position = Vector2.Zero;
+				Pivot = Vector2.Zero;
+
+				using (var texture = new RenderTexture(scaledWidth, scaledHeight)) {
+					var renderChain = new RenderChain();
+					this.AddToRenderChain(renderChain);
+					this.RenderToTexture(texture, renderChain);
+					return new Bitmap(texture.GetPixels(), scaledWidth, scaledHeight);
+				}
+			} finally {
+				Scale = savedScale;
+				Position = savedPosition;
+				Pivot = savedPivot;
+			}
+		}
+
 		public void CenterOnParent()
 		{
 			if (Parent == null) {
