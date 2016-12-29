@@ -160,5 +160,13 @@ namespace Lime
 		{
 			return TexturePool.Instance.GetTexture(path);
 		}
+
+		public Color4[] GetPixels()
+		{
+			if (texture == null) {
+				texture = LoadTexture();
+			}
+			return texture.GetPixels();
+		}
 	}
 }

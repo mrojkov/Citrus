@@ -194,6 +194,22 @@ namespace Lime
 		{
 			return false;
 		}
+
+		/// <summary>
+		/// Copies all pixels from texture.
+		/// </summary>
+		/// <returns></returns>
+		public Color4[] GetPixels()
+		{
+			SetAsRenderTarget();
+			try {
+				var pixels = new Color4[size.Width * size.Height];
+				GL.ReadPixels(0, 0, size.Width, size.Height, PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
+				return pixels;
+			} finally {
+				RestoreRenderTarget();
+			}
+		}
 	}
 }
 #endif

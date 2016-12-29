@@ -32,6 +32,7 @@ namespace Lime
 		/// </summary>
 		void Discard();
 		void MaybeDiscardUnderPressure();
+		Color4[] GetPixels();
 	}
 
 	public class CommonTexture : IDisposable
