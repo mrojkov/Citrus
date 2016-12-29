@@ -215,6 +215,19 @@ namespace Lime
 		}
 
 		/// <summary>
+		/// Saves this image to file with specified path in specified compression format (default compression is PNG).
+		/// </summary>
+		/// <param name="path">The path to a file.</param>
+		/// <param name="compression">Jpeg or Png.</param>
+		public void SaveTo(string path, CompressionFormat compression = CompressionFormat.Png)
+		{
+			CheckValidity();
+			using (var stream = File.Create(path)) {
+				SaveTo(stream, compression);
+			}
+		}
+
+		/// <summary>
 		/// Releases all resources used by this bitmap.
 		/// </summary>
 		public void Dispose()
