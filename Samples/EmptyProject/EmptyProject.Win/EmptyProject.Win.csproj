@@ -84,6 +84,10 @@
       <Project>{538e41e4-725c-4521-bcf3-a5591a1a3afd}</Project>
       <Name>Lemon.Win</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Citrus\Lime\Extensions\DynamicFont\DynamicFont.Win.csproj">
+      <Project>{fe8512bc-7a55-425c-8bc1-ad4d9785cf12}</Project>
+      <Name>DynamicFont.Win</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Citrus\Lime\Lime.Win.csproj">
       <Project>{fc2de6c9-641a-4230-8d29-ea4035cd8708}</Project>
       <Name>Lime.Win</Name>
