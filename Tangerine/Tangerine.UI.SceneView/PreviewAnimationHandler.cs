@@ -9,13 +9,26 @@ namespace Tangerine.UI.SceneView
 		public override void Execute()
 		{
 			var doc = Core.Document.Current;
-			if (doc.Container.IsRunning) {
-				doc.Container.AnimationFrame = doc.PreviewAnimationBegin;
+			if (doc.PreviewAnimation) {
+				doc.PreviewAnimation = false;
+				StopAnimationRecursive(doc.PreviewAnimationContainer);
+				doc.PreviewAnimationContainer.AnimationFrame = doc.PreviewAnimationBegin;
 			} else {
+				doc.PreviewAnimation = true;
+				doc.Container.IsRunning = doc.PreviewAnimation;
 				doc.PreviewAnimationBegin = doc.Container.AnimationFrame;
+				doc.PreviewAnimationContainer = doc.Container;
 			}
-			doc.PreviewAnimation = !doc.PreviewAnimation;
 			Application.InvalidateWindows();
+		}
+
+		void StopAnimationRecursive(Node node)
+		{
+			node.IsRunning = false;
+			node.AnimationFrame = 0;
+			foreach (var child in node.Nodes) {
+				StopAnimationRecursive(child);
+			}
 		}
 	}
 }

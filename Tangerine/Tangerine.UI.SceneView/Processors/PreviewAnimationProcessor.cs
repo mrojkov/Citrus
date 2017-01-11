@@ -10,7 +10,6 @@ namespace Tangerine.UI.SceneView
 		{
 			var doc = Core.Document.Current;
 			while (true) {
-				doc.Container.IsRunning = doc.PreviewAnimation;
 				if (doc.PreviewAnimation) {
 					Application.InvalidateWindows();
 				}

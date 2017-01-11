@@ -88,6 +88,7 @@ namespace Tangerine.Core
 
 		public bool PreviewAnimation { get; set; }
 		public int PreviewAnimationBegin { get; set; }
+		public Node PreviewAnimationContainer { get; set; }
 
 		public string AnimationId { get; set; }
 
