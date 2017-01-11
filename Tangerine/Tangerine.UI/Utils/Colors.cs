@@ -47,6 +47,7 @@ namespace Tangerine.UI
 		public static readonly Color4 Cursor = Color4.Red.Lighten(0.4f);
 		public static readonly Color4 RunningCursor = Color4.Green.Lighten(0.4f);
 	}
+
 	public static class TimelineRulerColors
 	{
 		public static readonly Color4 Notchings = TimelineGridColors.Lines;
@@ -57,14 +58,17 @@ namespace Tangerine.UI
 		public static readonly Color4 Cursor = TimelineGridColors.Cursor;
 		public static readonly Color4 RunningCursor = TimelineGridColors.RunningCursor;
 	}
+
 	public static class TimelineOverviewColors
 	{
 		public static readonly Color4 Veil = Color4.White.Darken(0.2f).Transparentify(0.3f);
 		public static readonly Color4 Border = Color4.White.Darken(0.2f);
 	}
+
 	public static class TimelineRollColors
 	{
 		public static readonly Color4 Lines = TimelineGridColors.Lines;
+		public static readonly Color4 GrayedLabel = DesktopTheme.Colors.BlackText.Lighten(0.5f);
 	}
 
 	public static class DockingColors

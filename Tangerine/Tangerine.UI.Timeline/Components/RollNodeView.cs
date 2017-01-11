@@ -57,6 +57,7 @@ namespace Tangerine.UI.Timeline.Components
 				},
 			};
 			label.AddChangeWatcher(() => nodeData.Node.Id, s => RefreshLabel());
+			label.AddChangeWatcher(() => IsGrayedLabel(nodeData.Node), s => RefreshLabel());
 			label.AddChangeWatcher(() => nodeData.Node.ContentsPath, s => RefreshLabel());
 			widget.CompoundPresenter.Push(new DelegatePresenter<Widget>(RenderBackground));
 			editBox.Visible = false;
@@ -66,6 +67,8 @@ namespace Tangerine.UI.Timeline.Components
 		Widget IRollWidget.Widget => widget;
 		float IRollWidget.Indentation { set { spacer.MinMaxWidth = value; } }
 
+		bool IsGrayedLabel(Node node) => node.AsWidget?.Visible ?? true;
+
 		void RefreshLabel()
 		{
 			var node = nodeData.Node;
@@ -74,6 +77,7 @@ namespace Tangerine.UI.Timeline.Components
 			} else {
 				label.Text = node.Id;
 			}
+			label.Color = IsGrayedLabel(node) ? DesktopTheme.Colors.BlackText : TimelineRollColors.GrayedLabel;
 		}
 
 		ToolbarButton CreateEyeButton()
