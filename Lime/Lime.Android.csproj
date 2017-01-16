@@ -334,15 +334,6 @@
     <Compile Include="Source\Types\Transform2.cs" />
     <Compile Include="Source\Widgets\Folder.cs" />
     <Compile Include="Source\Widgets\ListView\ScrollViewWidget.cs" />
-    <Compile Include="Source\Widgets\EditorUtils.cs" />
-    <Compile Include="Source\Application\Display\Display.Android.cs" />
-    <Compile Include="Source\Application\Display\Display.iOS.cs" />
-    <Compile Include="Source\Application\Display\Display.Mac.cs" />
-    <Compile Include="Source\Application\Display\Display.Win.cs" />
-    <Compile Include="Source\Application\Display\IDisplay.cs" />
-    <Compile Include="Source\Widgets\3D\CommonMaterial.cs" />
-    <Compile Include="Source\Widgets\3D\CommonMaterialProgram.cs" />
-    <Compile Include="Source\Widgets\3D\Model3D.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Android.csproj">
