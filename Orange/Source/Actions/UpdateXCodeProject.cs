@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.Composition;
 using System.IO;
 using Orange;
 using System.Text;
@@ -7,7 +8,8 @@ namespace Kill3.OrangePlugin
 {
 	public static class UpdateXCodeProject
 	{
-		[MenuItem("Update XCode Project")]
+		[Export(nameof(Orange.OrangePlugin.MenuItems))]
+		[ExportMetadata("Label", "Update XCode Project")]
 		public static void UpdateXCodeProjectAction()
 		{
 			if (The.Workspace.ProjectJson.GetValue<bool>("XCodeProject/DoSvnUpdate")) {
@@ -45,7 +47,7 @@ namespace Kill3.OrangePlugin
 			var dsymDstPath = Path.Combine(dstDirectory, Path.GetFileName(dsymPath));
 			CopyDirectoryRecursive(dsymPath, dsymDstPath);
 		}
-		
+
 		private static void CopyContent(string appPath, string dstPath)
 		{
 			string resourceMasks = The.Workspace.ProjectJson["XCodeProject/Resources"] as string;
@@ -95,7 +97,7 @@ namespace Kill3.OrangePlugin
 			p = Path.Combine(p, The.Workspace.ProjectJson["XCodeProject/DataFolder"] as string);
 			return p;
 		}
-		
+
 		private static string GetGeneratedAppPath(string mtouch)
 		{
 			string[] args = mtouch.Trim().Split(' ');

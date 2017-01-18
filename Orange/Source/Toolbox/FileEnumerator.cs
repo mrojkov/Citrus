@@ -39,7 +39,6 @@ namespace Orange
 				file = Lime.AssetPath.CorrectSlashes(file);
 				files.Add(new FileInfo { Path = file, LastWriteTime = fileInfo.LastWriteTime });
 			}
-			PluginLoader.FilterFiles(files);
 		}
 
 		public List<FileInfo> Enumerate(string extension = null)

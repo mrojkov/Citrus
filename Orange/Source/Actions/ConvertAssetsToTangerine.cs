@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,9 @@ namespace Orange
 {
 	static partial class ConvertAssets
 	{
-		[MenuItem("Convert Assets to Tangerine Format", 50)]
+		[Export(nameof(OrangePlugin.MenuItems))]
+		[ExportMetadata("Label", "Convert Assets to Tangerine Format")]
+		[ExportMetadata("Priority", 50)]
 		public static void ConvertAssetsAction()
 		{
 			var fileEnumerator = The.Workspace.AssetFiles;

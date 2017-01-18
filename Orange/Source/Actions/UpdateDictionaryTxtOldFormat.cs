@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.ComponentModel.Composition;
 
 namespace Orange
 {
 	static partial class Actions
 	{
-		[MenuItem("Update Localization Dictionary (old format)")]
+		[Export(nameof(OrangePlugin.MenuItems))]
+		[ExportMetadata("Label", "Update Localization Dictionary (old format)")]
 		public static void UpdateLocalizationDictionaryOldFormat()
 		{
 			var extractor = new DictionaryOldFormatExtractor();

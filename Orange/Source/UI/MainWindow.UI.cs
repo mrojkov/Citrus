@@ -43,7 +43,7 @@ namespace Orange
 		private static void CreateMenuItems()
 		{
 			var assembly = System.Reflection.Assembly.GetExecutingAssembly();
-			The.MenuController.CreateAssemblyMenuItems(assembly);
+			The.MenuController.CreateAssemblyMenuItems();
 		}
 
 		private void Create()

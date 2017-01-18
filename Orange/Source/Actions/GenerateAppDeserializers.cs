@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 
@@ -7,7 +8,8 @@ namespace Orange
 {
 	static partial class Actions
 	{
-		[MenuItem("Generate Yuzu Deserializers For Application Types")]
+		[Export(nameof(OrangePlugin.MenuItems))]
+		[ExportMetadata("Label", "Generate Yuzu Deserializers For Application Types")]
 		public static void GenerateYuzuDeserializersForApp()
 		{
 			AssetCooker.CookForActivePlatform();

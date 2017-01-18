@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -10,7 +11,8 @@ namespace Orange.Source.Actions
 {
 	static partial class Actions
 	{
-		[MenuItem("Convert Dictionary.txt to the New Format")]
+		[Export(nameof(OrangePlugin.MenuItems))]
+		[ExportMetadata("Label", "Convert Dictionary.txt to the New Format")]
 		public static void ConvertDictionaryTxt()
 		{
 			LoadDictionary("Dictionary.txt");
@@ -79,7 +81,7 @@ namespace Orange.Source.Actions
 			LocalizationEntry value;
 			if (Localization.Dictionary.TryGetValue(key, out value)) {
 				Localization.Dictionary.Remove(key);
-				Localization.Dictionary.Add(text, value);				
+				Localization.Dictionary.Add(text, value);
 			}
 		}
 	}

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.IO;
 using System.Text.RegularExpressions;
 using Lime;
@@ -75,7 +76,8 @@ namespace Orange
 			}
 		}
 
-		[MenuItem("Analyze Resources")]
+		[Export(nameof(OrangePlugin.MenuItems))]
+		[ExportMetadata("Label", "Analyze Resources")]
 		public static void AnalyzeResourcesAction()
 		{
 			requestedPaths = new List<PathRequestRecord>();

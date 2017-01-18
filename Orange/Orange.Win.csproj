@@ -101,6 +101,7 @@
     <Reference Include="glade-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <Reference Include="pango-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <Reference Include="atk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
     <Reference Include="OpenTK">
@@ -134,11 +135,6 @@
     <Compile Include="Source\ModelImport\KeyframeReducer.cs" />
     <Compile Include="Source\ModelImport\ModelImporter.cs" />
     <Compile Include="Source\Nuget\Nuget.cs" />
-    <Compile Include="Source\PluginAttributes\PluginFileIgoranceAttribute.cs" />
-    <Compile Include="Source\PluginAttributes\PluginAssetsCookedAttribute.cs" />
-    <Compile Include="Source\PluginAttributes\PluginCommandLineArgumentsAttribute.cs" />
-    <Compile Include="Source\PluginAttributes\PluginFinalizationAttribute.cs" />
-    <Compile Include="Source\PluginAttributes\PluginInitializationAttribute.cs" />
     <Compile Include="Source\CsprojSynchronization\CsprojSynchronization.cs" />
     <Compile Include="Source\SubTarget.cs" />
     <Compile Include="Source\Toolbox\Json.cs" />
@@ -166,7 +162,6 @@
     <Compile Include="Source\HotStudioImport\HotSceneImporter.cs" />
     <Compile Include="Source\Main.cs" />
     <Compile Include="Source\MenuController.cs" />
-    <Compile Include="Source\MenuItemAttribute.cs" />
     <Compile Include="Source\PluginLoader.cs" />
     <Compile Include="Source\Builder\SolutionBuilder.cs" />
     <Compile Include="Source\TargetPlatform.cs" />

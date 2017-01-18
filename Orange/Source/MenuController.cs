@@ -11,7 +11,6 @@ namespace Orange
 		public string Label;
 		public Action Action;
 		public int Priority;
-		public Assembly Assembly;
 	}
 
 	public class MenuController
@@ -22,49 +21,26 @@ namespace Orange
 
 		public List<MenuItem> GetVisibleAndSortedItems()
 		{
-			var items = Items.FindAll(IsVisibleMenuItem);
+			var items = Items.ToList();
 			items.Sort((a, b) => a.Priority.CompareTo(b.Priority));
 			return items;
 		}
 
-		private bool IsVisibleMenuItem(MenuItem item)
+		public void CreateAssemblyMenuItems()
 		{
-			if (item.Assembly == System.Reflection.Assembly.GetExecutingAssembly()) {
-				return true;
+			Items.Clear();
+			if (PluginLoader.CurrentPlugin == null) {
+				return;
 			}
-			if (item.Assembly == PluginLoader.CurrentPlugin) {
-				return true;
+			foreach (var i in PluginLoader.CurrentPlugin.MenuItems) {
+				Items.Add(new MenuItem() {
+					Action = i.Value,
+					Label = i.Metadata.Label,
+					Priority = i.Metadata.Priority,
+				});
 			}
-			return false;
-		}
-
-		public void CreateAssemblyMenuItems(System.Reflection.Assembly assembly)
-		{
-			var items = new List<MenuItem>(ScanForMenuItems(assembly));
-			Items.AddRange(items);
 			The.UI.RefreshMenu();
 		}
 
-		private static IEnumerable<MenuItem> ScanForMenuItems(System.Reflection.Assembly assembly)
-		{
-			foreach (var method in assembly.GetAllMethodsWithAttribute(typeof(MenuItemAttribute))) {
-				if (!method.IsStatic || method.GetParameters().Length > 0) {
-					throw new Lime.Exception("MenuItemAttribute is valid only for static parameterless methods");
-				}
-				var attrs = method.GetCustomAttributes(typeof(MenuItemAttribute), false);
-				var attr = attrs[0] as MenuItemAttribute;
-				yield return CreateMenuItem(method, assembly, attr);
-			}
-		}
-
-		private static MenuItem CreateMenuItem(MethodInfo method, Assembly assembly, MenuItemAttribute attr)
-		{
-			return new MenuItem() {
-				Action = () => method.Invoke(null, null),
-				Label = attr.Label,
-				Priority = attr.Priority,
-				Assembly = assembly
-			};
-		}
 	}
 }

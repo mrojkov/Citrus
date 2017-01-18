@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.Composition;
 using System.IO;
 using System.Reflection;
 
@@ -6,7 +7,9 @@ namespace Orange
 {
 	public static class RunTangerineAction
 	{
-		[MenuItem("Run Tangerine", 2)]
+		[Export(nameof(OrangePlugin.MenuItems))]
+		[ExportMetadata("Label", "Run Tangerine")]
+		[ExportMetadata("Priority", 2)]
 		public static void RunTangerine()
 		{
 			var path = Uri.UnescapeDataString((new Uri(Assembly.GetExecutingAssembly().CodeBase)).AbsolutePath);

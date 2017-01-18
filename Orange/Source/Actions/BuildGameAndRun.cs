@@ -1,11 +1,14 @@
 using System;
+using System.ComponentModel.Composition;
 using System.IO;
 
 namespace Orange
 {
 	public static partial class Actions
 	{
-		[MenuItem("Build & Run", 0)]
+		[Export(nameof(OrangePlugin.MenuItems))]
+		[ExportMetadata("Label", "Build & Run")]
+		[ExportMetadata("Priority", 0)]
 		public static void BuildAndRunAction()
 		{
 			AssetCooker.CookForActivePlatform();

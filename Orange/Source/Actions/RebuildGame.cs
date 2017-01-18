@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using System.IO;
@@ -8,7 +9,9 @@ namespace Orange
 {
 	static partial class Actions
 	{
-		[MenuItem("Rebuild Game", 2)]
+		[Export(nameof(OrangePlugin.MenuItems))]
+		[ExportMetadata("Label", "Rebuild Game")]
+		[ExportMetadata("Priority", 2)]
 		public static void RebuildGameAction()
 		{
 			if (The.UI.AskConfirmation("Are you sure you want to rebuild the game?")) {

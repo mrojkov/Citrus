@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.ComponentModel.Composition;
 
 namespace Orange
 {
 	static partial class Actions
 	{
-		[MenuItem("Update Localization Dictionary")]
+		[Export(nameof(OrangePlugin.MenuItems))]
+		[ExportMetadata("Label", "Update Localization Dictionary")]
 		public static void UpdateLocalizationDictionary()
 		{
 			if (!The.UI.AskConfirmation("Are you sure you want to update the dictionary?")) {
