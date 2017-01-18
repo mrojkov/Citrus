@@ -18,7 +18,7 @@ namespace Orange
 			totalSquare = size.Width * size.Height;
 			rects.Add(new IntRectangle(0, 0, size.Width, size.Height));
 		}
-		
+
 		public bool Allocate(Size size, out IntRectangle rect)
 		{
 			int j = -1;

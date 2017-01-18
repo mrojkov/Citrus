@@ -46,6 +46,7 @@ namespace Orange
 		public int ADPCMLimit; // Kb
 		public AtlasOptimization AtlasOptimization;
 		public AssetAttributes ModelCompressing;
+		public string AtlasPacker;
 
 		public static CookingRules GetDefault(TargetPlatform platform)
 		{
@@ -268,6 +269,9 @@ namespace Orange
 								break;
 							case "AtlasOptimization":
 								rules.AtlasOptimization = ParseAtlasOptimization(words[1]);
+								break;
+							case "AtlasPacker":
+								rules.AtlasPacker = words[1];
 								break;
 							case "ModelCompressing":
 								rules.ModelCompressing = ParseModelCompressing(words[1]);
