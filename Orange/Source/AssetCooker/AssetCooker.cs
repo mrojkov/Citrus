@@ -433,7 +433,7 @@ namespace Orange
 						SourceExtension = Path.GetExtension(fileInfo.Path)
 					};
 					var k = cookingRules.AtlasPacker;
-					if (!string.IsNullOrEmpty(k)) {
+					if (!string.IsNullOrEmpty(k) && k != "Default") {
 						List<AtlasItem> l;
 						if (!pluginItems.TryGetValue(k, out l)) {
 							pluginItems.Add(k, l = new List<AtlasItem>());
