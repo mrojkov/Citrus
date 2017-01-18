@@ -31,12 +31,11 @@ namespace Orange
 
 		public static int Restore(string projectDirectory)
 		{
-			return Start($"restore {projectDirectory}");
+			return Start($"restore \"{projectDirectory}\"");
 		}
 
 		public static int Start(string args)
 		{
-			var fileName = typeof(int).Assembly.Location;
 #if WIN
 			return Process.Start(nugetPath, args);
 #elif MAC
