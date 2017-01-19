@@ -78,6 +78,7 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\3rdParty\Newtonsoft.Json\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="System.ComponentModel.Composition" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Mono\MonoMac\v0.0\Mono.MonoMac.targets" />
@@ -99,7 +100,6 @@
     <Compile Include="Source\AssetCooker\TextureConverterUtils.cs" />
     <Compile Include="Source\AssetCooker\UnityAssetBundle.cs" />
     <Compile Include="Source\MenuController.cs" />
-    <Compile Include="Source\MenuItemAttribute.cs" />
     <Compile Include="Source\PluginLoader.cs" />
     <Compile Include="Source\The.cs" />
     <Compile Include="Source\Workspace.cs" />
@@ -124,14 +124,9 @@
     <Compile Include="Source\Actions\UpdateXCodeProject.cs" />
     <Compile Include="Source\AssetCooker\TextureConverter.cs" />
     <Compile Include="Source\AssetCooker\OpacityMaskCreator.cs" />
-    <Compile Include="Source\PluginAttributes\PluginAssetsCookedAttribute.cs" />
-    <Compile Include="Source\PluginAttributes\PluginCommandLineArgumentsAttribute.cs" />
-    <Compile Include="Source\PluginAttributes\PluginFinalizationAttribute.cs" />
-    <Compile Include="Source\PluginAttributes\PluginInitializationAttribute.cs" />
     <Compile Include="Source\DictionaryOldFormatExtractor.cs" />
     <Compile Include="Source\Actions\ConvertDictionaryToNewFormat.cs" />
     <Compile Include="Source\Actions\UpdateDictionaryTxtOldFormat.cs" />
-    <Compile Include="Source\PluginAttributes\PluginFileIgoranceAttribute.cs" />
     <Compile Include="Source\Builder\BuildSystem.cs" />
     <Compile Include="Source\Builder\MSBuild.cs" />
     <Compile Include="Source\Builder\MDTool.cs" />
@@ -180,6 +175,7 @@
   <ItemGroup>
     <Folder Include="Source\AssetCooker\" />
     <Folder Include="bin\Mac\Debug\Orange.app\Contents\MonoBundle\" />
+    <Folder Include="Source\PluginAttributes\" />
   </ItemGroup>
   <ItemGroup>
     <NativeReference Include="..\3rdParty\AssimpNet\libassimp.dylib">
