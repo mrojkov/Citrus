@@ -1,13 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
-using System.Linq;
-using System.Text;
 using System.IO;
+using System.Linq;
 using System.Reflection;
-using Gtk;
 using Action = System.Action;
 
 namespace Orange
@@ -21,6 +20,7 @@ namespace Orange
 	{
 		[DefaultValue("Unspecified label")]
 		string Label { get; }
+
 		[DefaultValue(int.MaxValue)]
 		int Priority { get; }
 	}
@@ -29,14 +29,19 @@ namespace Orange
 	{
 		[Import(nameof(OrangePlugin.Initialize), AllowRecomposition = true, AllowDefault = true)]
 		public Action Initialize;
+
 		[Import(nameof(OrangePlugin.Finalize), AllowRecomposition = true, AllowDefault = true)]
 		public Action Finalize;
+
 		[ImportMany(nameof(AtlasPackers), AllowRecomposition = true)]
 		public IEnumerable<Lazy<Func<string, List<AssetCooker.AtlasItem>, int, int>, IAtlasPackerMetadata>> AtlasPackers { get; set; }
+
 		[ImportMany(nameof(AfterAssetsCooked), AllowRecomposition = true)]
 		public IEnumerable<Action<string>> AfterAssetsCooked { get; set; }
+
 		[ImportMany(nameof(CommandLineArguments), AllowRecomposition = true)]
 		public IEnumerable<Func<string>> CommandLineArguments { get; set; }
+
 		[ImportMany(nameof(MenuItems), AllowRecomposition = true)]
 		public IEnumerable<Lazy<Action, IMenuItemMetadata>> MenuItems { get; set; }
 	}
@@ -80,6 +85,7 @@ namespace Orange
 			ResetPlugins();
 			try {
 				catalog.Catalogs.Add(new DirectoryCatalog(CurrentPluginDirectory));
+				ValidateComposition();
 			} catch (BadImageFormatException e) {
 				Console.WriteLine(e.Message);
 			} catch (System.Exception e) {
@@ -108,6 +114,44 @@ namespace Orange
 		private static string GetPluginCommandLineArgumets()
 		{
 			return CurrentPlugin.CommandLineArguments.Aggregate("", (current, i) => current + i());
+		}
+
+		private static void ValidateComposition()
+		{
+			var exportedCount = catalog.Parts.SelectMany(p => p.ExportDefinitions).Count();
+			var importedCount = 0;
+
+			Func<MemberInfo, bool> isImportMember = (m) =>
+				Attribute.IsDefined(m, typeof(ImportAttribute)) ||
+				Attribute.IsDefined(m, typeof(ImportManyAttribute));
+
+			foreach (
+				var member in typeof(OrangePlugin).GetMembers()
+					.Where(m => m is PropertyInfo || m is FieldInfo)
+					.Where(m => isImportMember(m))
+				) {
+				if (member is PropertyInfo) {
+					var property = member as PropertyInfo;
+					if (property.PropertyType.GetInterfaces().Contains(typeof(IEnumerable))) {
+						importedCount += ((ICollection)property.GetValue(CurrentPlugin)).Count;
+					} else {
+						importedCount++;
+					}
+				} else if (member is FieldInfo) {
+					var field = member as FieldInfo;
+					if (field.FieldType.GetInterfaces().Contains(typeof(IEnumerable))) {
+						importedCount += ((ICollection)field.GetValue(CurrentPlugin)).Count;
+					} else {
+						importedCount++;
+					}
+				}
+			}
+
+			if (exportedCount != importedCount) {
+				throw new Exception(
+					$"WARNING: Plugin composition missmatch found.\nThe given assemblies defines [{exportedCount}] " +
+					$"exports, but only [{importedCount}] has been imported.\nPlease check export contracts.\n");
+			}
 		}
 	}
 }
