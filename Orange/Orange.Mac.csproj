@@ -100,7 +100,6 @@
     <Compile Include="Source\AssetCooker\TextureConverterUtils.cs" />
     <Compile Include="Source\AssetCooker\UnityAssetBundle.cs" />
     <Compile Include="Source\MenuController.cs" />
-    <Compile Include="Source\PluginLoader.cs" />
     <Compile Include="Source\The.cs" />
     <Compile Include="Source\Workspace.cs" />
     <Compile Include="Source\WorkspaceConfig.cs" />
@@ -140,6 +139,10 @@
     <Compile Include="Source\Actions\AnalyzeResources.cs" />
     <Compile Include="Source\Actions\RunTangerine.cs" />
     <Compile Include="Source\Nuget\Nuget.cs" />
+    <Compile Include="Source\Plugins\IPluginUIBuilder.cs" />
+    <Compile Include="Source\Plugins\PluginLoader.cs" />
+    <Compile Include="Source\UI\MainWindow.PluginUI.cs" />
+    <Compile Include="Source\UI\PluginUIBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Info.plist" />
@@ -175,7 +178,6 @@
   <ItemGroup>
     <Folder Include="Source\AssetCooker\" />
     <Folder Include="bin\Mac\Debug\Orange.app\Contents\MonoBundle\" />
-    <Folder Include="Source\PluginAttributes\" />
   </ItemGroup>
   <ItemGroup>
     <NativeReference Include="..\3rdParty\AssimpNet\libassimp.dylib">

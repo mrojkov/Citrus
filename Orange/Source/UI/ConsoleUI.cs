@@ -180,5 +180,42 @@ namespace Orange
 		public override void ClearLog()
 		{
 		}
+
+		public override IPluginUIBuilder GetPluginUIBuilder()
+		{
+			return new PluginUIBuilder();
+		}
+
+		public override void CreatePluginUI(IPluginUIBuilder builder)
+		{
+		}
+
+		public override void DestroyPluginUI()
+		{
+		}
+
+		private class PluginUIBuilder : IPluginUIBuilder
+		{
+			public IPluginPanel SidePanel { get; } = new PluginPanel();
+		}
+
+		private class PluginPanel : IPluginPanel
+		{
+			public bool Enabled { get; set; }
+
+			public string Title { get; set; }
+
+			public ICheckBox AddCheckBox(string label)
+			{
+				return new CheckBox();
+			}
+		}
+
+		private class CheckBox : ICheckBox
+		{
+			public event EventHandler Toggled;
+
+			public bool Active { get; set; }
+		}
 	}
 }

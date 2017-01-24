@@ -136,12 +136,15 @@
     <Compile Include="Source\ModelImport\ModelImporter.cs" />
     <Compile Include="Source\Nuget\Nuget.cs" />
     <Compile Include="Source\CsprojSynchronization\CsprojSynchronization.cs" />
+    <Compile Include="Source\Plugins\IPluginUIBuilder.cs" />
     <Compile Include="Source\SubTarget.cs" />
     <Compile Include="Source\Toolbox\Json.cs" />
     <Compile Include="Source\Toolbox\Process.cs" />
     <Compile Include="Source\Toolbox\Subversion.cs" />
     <Compile Include="Source\Toolbox\Toolbox.cs" />
     <Compile Include="Source\UI\ConsoleUI.cs" />
+    <Compile Include="Source\UI\MainWindow.PluginUI.cs" />
+    <Compile Include="Source\UI\PluginUIBuilder.cs" />
     <Compile Include="Source\UI\UserInterface.cs" />
     <Compile Include="Source\WorkspaceConfig.cs" />
     <Compile Include="Source\AssemblyInfo.cs" />
@@ -162,7 +165,7 @@
     <Compile Include="Source\HotStudioImport\HotSceneImporter.cs" />
     <Compile Include="Source\Main.cs" />
     <Compile Include="Source\MenuController.cs" />
-    <Compile Include="Source\PluginLoader.cs" />
+    <Compile Include="Source\Plugins\PluginLoader.cs" />
     <Compile Include="Source\Builder\SolutionBuilder.cs" />
     <Compile Include="Source\TargetPlatform.cs" />
     <Compile Include="Source\UI\MainWindow.UI.cs" />

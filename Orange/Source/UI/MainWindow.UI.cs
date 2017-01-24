@@ -13,6 +13,7 @@ namespace Orange
 		public ComboBox ActionPicker;
 		public CheckButton UpdateBeforeBuildCheckbox;
 		public Button GoButton;
+		private HBox mainHBox;
 
 		public override void Initialize()
 		{
@@ -53,7 +54,7 @@ namespace Orange
 				WindowPosition = WindowPosition.Center,
 				DefaultSize = new Gdk.Size(500, 400)
 			};
-			var mainHBox = new HBox {
+			mainHBox = new HBox {
 				Name = "MainHBox"
 			};
 			var mainVBox = new VBox {
