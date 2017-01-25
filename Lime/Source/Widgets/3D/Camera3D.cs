@@ -4,7 +4,9 @@ namespace Lime
 {
 	public class Camera3D : Node3D
 	{
+		private CameraProjectionMode projectionMode = CameraProjectionMode.Perspective;
 		private float fieldOfView;
+		private float orthographicSize;
 		private float aspectRatio;
 		private float nearClipPlane;
 		private float farClipPlane;
@@ -64,6 +66,32 @@ namespace Lime
 			}
 		}
 
+		[YuzuMember]
+		public float OrthographicSize
+		{
+			get { return orthographicSize; }
+			set
+			{
+				if (orthographicSize != value) {
+					orthographicSize = value;
+					projectionDirty = true;
+				}
+			}
+		}
+
+		[YuzuMember]
+		public CameraProjectionMode ProjectionMode
+		{
+			get { return projectionMode; }
+			set
+			{
+				if (projectionMode != value) {
+					projectionMode = value;
+					projectionDirty = true;
+				}
+			}
+		}
+
 		public Matrix44 ViewProjection
 		{
 			get { return View * Projection; }
@@ -80,12 +108,21 @@ namespace Lime
 			{
 				if (projectionDirty) {
 					projectionDirty = false;
-					projection = Matrix44.CreatePerspectiveFieldOfView(
-						fieldOfView / aspectRatio,
-						aspectRatio,
-						nearClipPlane,
-						farClipPlane
-					);
+					if (projectionMode == CameraProjectionMode.Perspective) {
+						projection = Matrix44.CreatePerspectiveFieldOfView(
+							fieldOfView / aspectRatio,
+							aspectRatio,
+							nearClipPlane,
+							farClipPlane
+						);
+					} else {
+						projection = Matrix44.CreateOrthographic(
+							orthographicSize * aspectRatio,
+							orthographicSize,
+							nearClipPlane,
+							farClipPlane
+						);
+					}
 				}
 				return projection;
 			}
@@ -98,5 +135,11 @@ namespace Lime
 				view = globalTransform.CalcInverted();
 			}
 		}
+	}
+
+	public enum CameraProjectionMode
+	{
+		Orthographic,
+		Perspective,
 	}
 }
