@@ -200,9 +200,7 @@ namespace Lime
 		{
 			pt = Camera.ViewProjection.ProjectVector(pt) * new Vector3(1, -1, 1);
 			var xy = ((Vector2)pt + Vector2.One) * Size * Vector2.Half;
-			var zNear = Camera.NearClipPlane;
-			var zFar = Camera.FarClipPlane;
-			var z = 2f * (zNear * zFar) / ((zFar - zNear) * pt.Z - zNear - zFar);
+			var z = Camera.Projection.CalcInverted().ProjectVector(pt).Z;
 			return new Vector3(xy, z);
 		}
 
@@ -248,9 +246,7 @@ namespace Lime
 		private Vector3 ViewportToNDCPoint(Vector3 pt)
 		{
 			var xy = (Vector2)pt / Size * 2f - Vector2.One;
-			var zNear = Camera.NearClipPlane;
-			var zFar = Camera.FarClipPlane;
-			var z = (pt.Z * (zFar + zNear) + 2f * zFar * zNear) / (pt.Z * (zFar - zNear));
+			var z = Camera.Projection.ProjectVector(pt).Z;
 			return new Vector3(xy, z) * new Vector3(1, -1, 1);
 		}
 
