@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Lime
 {
@@ -147,11 +146,26 @@ namespace Lime
 			return value1 + (value2 - value1) * amount;
 		}
 
+		/// <summary>
+		/// Returns a random floating-point number that is within a specified range and produced by specified generator.
+		/// </summary>
+		/// <param name="rng">The instance of a random generator.</param>
+		/// <param name="min">The inclusive lower bound of the random number returned.</param>
+		/// <param name="max">The exclusive upper bound of the random number returned.</param>
+		/// <returns>A single-precision floating point number that is greater than or equal to min,
+		/// and less than max.</returns>
 		public static float RandomFloat(this System.Random rng, float min, float max)
 		{
 			return rng.RandomFloat() * (max - min) + min;
 		}
 
+		/// <summary>
+		/// Returns a random floating-point number that is within a specified range.
+		/// </summary>
+		/// <param name="min">The inclusive lower bound of the random number returned.</param>
+		/// <param name="max">The exclusive upper bound of the random number returned.</param>
+		/// <returns>A single-precision floating point number that is greater than or equal to min,
+		/// and less than max.</returns>
 		public static float RandomFloat(float min, float max)
 		{
 			return RandomGenerator.RandomFloat(min, max);
@@ -167,11 +181,30 @@ namespace Lime
 			return RandomGenerator.RandomBool();
 		}
 
+		/// <summary>
+		/// Returns a random integer that is within a specified range and produced by specified generator.
+		/// </summary>
+		/// <param name="rng">The instance of a random generator.</param>
+		/// <param name="min">The inclusive lower bound of the random number returned.</param>
+		/// <param name="max">The inclusive upper bound of the random number returned.
+		/// max must be greater than or equal to (min - 1).</param>
+		/// <returns>A 32-bit signed integer greater than or equal to min and not greater than max;
+		/// that is, the range of return values includes both min and max.
+		/// If max equals min or (min - 1), min is returned.</returns>
 		public static int RandomInt(this System.Random rng, int min, int max)
 		{
 			return rng.RandomInt(max - min + 1) + min;
 		}
 
+		/// <summary>
+		/// Returns a random integer that is within a specified range.
+		/// </summary>
+		/// <param name="min">The inclusive lower bound of the random number returned.</param>
+		/// <param name="max">The inclusive upper bound of the random number returned.
+		/// max must be greater than or equal to (min - 1).</param>
+		/// <returns>A 32-bit signed integer greater than or equal to min and not greater than max;
+		/// that is, the range of return values includes both min and max.
+		/// If max equals min or (min - 1), min is returned.</returns>
 		public static int RandomInt(int min, int max)
 		{
 			return RandomGenerator.RandomInt(min, max);
@@ -202,21 +235,55 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// Returns a non-negative random integer that is less than the specified maximum and
+		/// produced by specified generator.
+		/// </summary>
+		/// <param name="rng">The instance of a random generator.</param>
+		/// <param name="maxValue">The exclusive upper bound of the random number to be generated.
+		/// maxValue must be greater than or equal to 0.</param>
+		/// <returns>A 32-bit signed integer that is greater than or equal to 0, and less than maxValue;
+		/// that is, the range of return values ordinarily includes 0 but not maxValue.
+		/// However, if maxValue equals 0, maxValue is returned.</returns>
 		public static int RandomInt(this System.Random rng, int maxValue)
 		{
 			return rng.Next(maxValue);
 		}
 
+		/// <summary>
+		/// Returns a non-negative random integer that is less than the specified maximum.
+		/// </summary>
+		/// <param name="maxValue">The exclusive upper bound of the random number to be generated.
+		/// maxValue must be greater than or equal to 0.</param>
+		/// <returns>A 32-bit signed integer that is greater than or equal to 0, and less than maxValue;
+		/// that is, the range of return values ordinarily includes 0 but not maxValue.
+		/// However, if maxValue equals 0, maxValue is returned.</returns>
 		public static int RandomInt(int maxValue)
 		{
 			return RandomGenerator.RandomInt(maxValue);
 		}
 
+		/// <summary>
+		/// Returns a random floating-point number that is greater than or equal to 0.0, and less than 1.0 and
+		/// produced by specified generator.
+		/// </summary>
+		/// <param name="rng">The instance of a random generator.</param>
+		/// <returns>A single-precision floating point number that is greater than or equal to 0.0,
+		/// and less than 1.0.</returns>
+		/// <remarks>The actual upper bound of the random number returned by this method is 0.99999999999999978.
+		/// </remarks>
 		public static float RandomFloat(this System.Random rng)
 		{
 			return (float)rng.NextDouble();
 		}
 
+		/// <summary>
+		/// Returns a random floating-point number that is greater than or equal to 0.0, and less than 1.0.
+		/// </summary>
+		/// <returns>A single-precision floating point number that is greater than or equal to 0.0,
+		/// and less than 1.0.</returns>
+		/// <remarks>The actual upper bound of the random number returned by this method is 0.99999999999999978.
+		/// </remarks>
 		public static float RandomFloat()
 		{
 			return RandomGenerator.RandomFloat();
