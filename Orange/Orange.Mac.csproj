@@ -6,8 +6,8 @@
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{4B2BDD5A-2AAE-46AE-AA1A-8C9308BAA50D}</ProjectGuid>
-    <ProjectTypeGuids>{948B3504-5B70-4649-8FE4-BDE1FB46EC69};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <OutputType>Exe</OutputType>
+    <ProjectTypeGuids>{A3F8F2AB-B479-4A4A-A458-A89E7DC349F1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
     <RootNamespace>Orange</RootNamespace>
     <AssemblyName>Orange</AssemblyName>
     <newfilesearch>OnLoad</newfilesearch>
@@ -66,25 +66,21 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Drawing" />
     <Reference Include="MonoMac" />
-    <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
-    <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <Reference Include="Mono.Posix" />
-    <Reference Include="atk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <Reference Include="Microsoft.Build.Engine" />
     <Reference Include="AssimpNet">
       <HintPath>..\3rdParty\AssimpNet\AssimpNet.dll</HintPath>
     </Reference>
-    <Reference Include="pango-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\3rdParty\Newtonsoft.Json\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="glib-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(MSBuildExtensionsPath)\Mono\MonoMac\v0.0\Mono.MonoMac.targets" />
   <ItemGroup>
     <Compile Include="Source\AssemblyInfo.cs" />
-    <Compile Include="Source\Main.cs" />
     <Compile Include="Source\TargetPlatform.cs" />
     <Compile Include="Source\HotStudioImport\HotLexer.cs" />
     <Compile Include="Source\HotStudioImport\HotAnimators.cs" />
@@ -110,9 +106,6 @@
     <Compile Include="Source\Actions\UpdateDictionaryTxt.cs" />
     <Compile Include="Source\Actions\CookGameAssets.cs" />
     <Compile Include="Source\CsprojSynchronization\CsprojSynchronization.cs" />
-    <Compile Include="Source\UI\ConsoleUI.cs" />
-    <Compile Include="Source\UI\MainWindow.cs" />
-    <Compile Include="Source\UI\MainWindow.UI.cs" />
     <Compile Include="Source\UI\UserInterface.cs" />
     <Compile Include="Source\Toolbox\DirectoryChanger.cs" />
     <Compile Include="Source\Toolbox\FileEnumerator.cs" />
@@ -123,13 +116,10 @@
     <Compile Include="Source\Actions\UpdateXCodeProject.cs" />
     <Compile Include="Source\AssetCooker\TextureConverter.cs" />
     <Compile Include="Source\AssetCooker\OpacityMaskCreator.cs" />
-    <Compile Include="Source\DictionaryOldFormatExtractor.cs" />
     <Compile Include="Source\Actions\ConvertDictionaryToNewFormat.cs" />
-    <Compile Include="Source\Actions\UpdateDictionaryTxtOldFormat.cs" />
     <Compile Include="Source\Builder\BuildSystem.cs" />
     <Compile Include="Source\Builder\MSBuild.cs" />
     <Compile Include="Source\Builder\MDTool.cs" />
-    <Compile Include="Source\DictionaryExtractorWindow.cs" />
     <Compile Include="Source\ModelImport\ModelImporter.cs" />
     <Compile Include="Source\SubTarget.cs" />
     <Compile Include="Source\ModelImport\KeyframeReducer.cs" />
@@ -141,11 +131,8 @@
     <Compile Include="Source\Nuget\Nuget.cs" />
     <Compile Include="Source\Plugins\IPluginUIBuilder.cs" />
     <Compile Include="Source\Plugins\PluginLoader.cs" />
-    <Compile Include="Source\UI\MainWindow.PluginUI.cs" />
-    <Compile Include="Source\UI\PluginUIBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Info.plist" />
     <Content Include="Toolchain.Mac\PVRTexTool">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -156,28 +143,16 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ProjectExtensions>
-    <MonoDevelop>
-      <Properties>
-        <GtkDesignInfo generateGettext="False" />
-      </Properties>
-    </MonoDevelop>
-  </ProjectExtensions>
   <ItemGroup>
     <None Include="Orange.Mac.userprefs">
       <Visible>False</Visible>
     </None>
-    <None Include="Orange.ico" />
     <None Include="Orange.Win.v11.suo">
       <Visible>False</Visible>
     </None>
     <None Include="Orange.Win.v12.suo">
       <Visible>False</Visible>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Source\AssetCooker\" />
-    <Folder Include="bin\Mac\Debug\Orange.app\Contents\MonoBundle\" />
   </ItemGroup>
   <ItemGroup>
     <NativeReference Include="..\3rdParty\AssimpNet\libassimp.dylib">

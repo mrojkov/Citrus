@@ -9,18 +9,6 @@ namespace Orange
 	{
 		public static UserInterface Instance;
 
-		public static void CreateGUI()
-		{
-			Instance = new MainWindow();
-			Instance.Initialize();
-		}
-
-		public static void CreateConsole()
-		{
-			Instance = new ConsoleUI();
-			Instance.Initialize();
-		}
-
 		public virtual void Initialize()
 		{
 			var w = new Lime.DummyWindow();
@@ -41,6 +29,8 @@ namespace Orange
 		public abstract TargetPlatform GetActivePlatform();
 
 		public abstract SubTarget GetActiveSubTarget();
+
+		public virtual void ExitWithErrorIfPossible() { }
 
 		public virtual void ProcessPendingEvents() { }
 

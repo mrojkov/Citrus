@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace Orange
@@ -20,24 +19,23 @@ namespace Orange
 		public override void Initialize()
 		{
 			base.Initialize();
-			Gtk.Application.Init();
 #if MAC
 			AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 #else
 			AppDomain.CurrentDomain.FirstChanceException += CurrentDomain_FirstChanceException;
 #endif
 			var args = System.Environment.GetCommandLineArgs();
+			CreateMenuItems();
 			if (args.Length < 3) {
 				WriteHelpAndExit();
 			}
-			CreateMenuItems();
 			OpenWorkspace(args);
 			RunCommand(Toolbox.GetCommandLineArg("--command"));
 		}
 
 		private static void OpenWorkspace(string[] args)
 		{
-			var projectFile = args[2];
+			var projectFile = args[1];
 			if (!System.IO.File.Exists(projectFile)) {
 				throw new Lime.Exception("Project file '{0}' does not exist", projectFile);
 			}
@@ -81,7 +79,7 @@ namespace Orange
 
 		private static void WriteHelpAndExit()
 		{
-			Console.WriteLine("Orange --console citrus_project --platform:[desktop|ios|android|uc] --command:command [--autoupdate]");
+			Console.WriteLine("Orange.CLI citrus_project --platform:[desktop|ios|android|uc] --command:command [--autoupdate]");
 			var commands = The.MenuController.GetVisibleAndSortedItems();
 			if (commands.Count > 0) {
 				Console.WriteLine("Available commands are:");
@@ -179,6 +177,11 @@ namespace Orange
 
 		public override void ClearLog()
 		{
+		}
+
+		public override void ExitWithErrorIfPossible()
+		{
+			Environment.Exit(1);
 		}
 
 		public override IPluginUIBuilder GetPluginUIBuilder()

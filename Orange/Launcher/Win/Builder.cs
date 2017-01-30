@@ -29,7 +29,7 @@ namespace Launcher
 
 		protected override string DefaultSolutionPath => Path.Combine(Environment.CurrentDirectory, "Orange.Win.sln");
 
-		protected override string DefaultExecutablePath => Path.Combine(Environment.CurrentDirectory, @"bin\Win\Release\Orange.exe");
+		protected override string DefaultExecutablePath => Path.Combine(Environment.CurrentDirectory, @"bin\Win\Release\Orange.GUI.exe");
 
 		protected override string BuilderPath => @"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe";
 	}
