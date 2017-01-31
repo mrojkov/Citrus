@@ -18,6 +18,16 @@ namespace Lime
 		[YuzuMember("3")]
 		public float W;
 
+		/// <summary>
+		/// Returns a vector with components 0, 0, 0, 0.
+		/// </summary>
+		public static readonly Vector4 Zero = new Vector4(0, 0, 0, 0);
+
+		/// <summary>
+		/// Returns a vector with components 1, 1, 1, 1.
+		/// </summary>
+		public static readonly Vector4 One = new Vector4(1, 1, 1, 1);
+
 		public float Length
 		{
 			get { return Mathf.Sqrt(SqrLength); }
