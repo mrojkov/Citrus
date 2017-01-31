@@ -19,8 +19,9 @@ namespace Lime
 				ReorderBones(container);
 			}
 			int numBones = container.Nodes.Count;
+			int skipConvertionCounter = 0;
 			foreach (var child in originalNodes) {
-				if (CanConvertNodeToMesh(child)) {
+				if (skipConvertionCounter == 0 && CanConvertNodeToMesh(child)) {
 					container.AddNode(child);
 				} else {
 					if (container.Nodes.Count > numBones) {
@@ -28,7 +29,13 @@ namespace Lime
 						ClearContentsExceptBones(container);
 						node.AddNode(mesh);
 					}
-					if (child is Bone) {
+					if (skipConvertionCounter > 0) {
+						skipConvertionCounter--;
+					}
+					if (child is ImageCombiner) {
+						skipConvertionCounter = 2;
+						node.AddNode(child);
+					} else if (child is Bone) {
 						// Bones already have affected mesh animations. No need to add them to the container. 
 					} else if (child is DiscreteMorphableMesh) {
 						node.AddNode(child);
@@ -225,6 +232,7 @@ namespace Lime
 		{
 			if (
 				node is DiscreteMorphableMesh ||
+				node is ImageCombiner ||
 				node is ParticleEmitter ||
 				node is ParticleModifier ||
 				node is ParticlesMagnet ||
