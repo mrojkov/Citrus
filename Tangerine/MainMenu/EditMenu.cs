@@ -49,7 +49,7 @@ namespace Tangerine
 			}
 		}
 
-		public override bool GetEnabled() => Core.Document.Current.SelectedNodes().Editable().Any(IsValidNode);
+		public override bool GetEnabled() => Document.Current.SelectedNodes().Editable().Any(IsValidNode);
 
 		public static bool IsValidNode(Node node) => (node is Widget) || (node is Bone) || (node is Audio) || (node is ImageCombiner);
 	}
@@ -92,7 +92,7 @@ namespace Tangerine
 	{
 		public override void Execute()
 		{
-			Core.Operations.TimelineHorizontalShift.Perform(Tangerine.UI.Timeline.Timeline.Instance.CurrentColumn, 1);
+			Core.Operations.TimelineHorizontalShift.Perform(UI.Timeline.Timeline.Instance.CurrentColumn, 1);
 		}
 	}
 
@@ -100,7 +100,25 @@ namespace Tangerine
 	{
 		public override void Execute()
 		{
-			Core.Operations.TimelineHorizontalShift.Perform(Tangerine.UI.Timeline.Timeline.Instance.CurrentColumn, -1);
+			Core.Operations.TimelineHorizontalShift.Perform(UI.Timeline.Timeline.Instance.CurrentColumn, -1);
+		}
+	}
+
+	public class GroupContentsToMorphableMeshes : DocumentCommandHandler
+	{
+		public override void Execute()
+		{
+			var nodes = Document.Current?.SelectedNodes().Editable().ToList();
+			var container = Document.Current.Container;
+			Core.Operations.ClearRowSelection.Perform();
+			foreach (var node in nodes) {
+				var clone = node.Clone();
+				var loc = container.RootFolder().Find(node);
+				Core.Operations.UnlinkFolderItem.Perform(container, node);
+				Core.Operations.InsertFolderItem.Perform(container, loc, clone);
+				new MorphableMeshBuilder().BuildNodeContents(clone);
+				Core.Operations.SelectNode.Perform(clone);
+			}
 		}
 	}
 }

@@ -253,7 +253,9 @@ namespace Tangerine
 					GenericCommands.Group,
 					GenericCommands.Ungroup,
 					GenericCommands.InsertTimelineColumn,
-					GenericCommands.RemoveTimelineColumn
+					GenericCommands.RemoveTimelineColumn,
+					Command.MenuSeparator,
+					GenericCommands.GroupContentsToMorphableMeshes,
 				}),
 				new Command("Create", new Menu()),
 				new Command("View", new Menu {
@@ -314,6 +316,7 @@ namespace Tangerine
 			h.Connect(GenericCommands.NextDocument, new SetNextDocument());
 			h.Connect(GenericCommands.PreviousDocument, new SetPreviousDocument());
 			h.Connect(GenericCommands.DefaultLayout, new ViewDefaultLayout());
+			h.Connect(GenericCommands.GroupContentsToMorphableMeshes, new GroupContentsToMorphableMeshes());
 			h.Connect(Tools.AlignLeft, new AlignLeft());
 			h.Connect(Tools.AlignRight, new AlignRight());
 			h.Connect(Tools.AlignTop, new AlignTop());
