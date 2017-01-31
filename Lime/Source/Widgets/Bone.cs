@@ -2,29 +2,16 @@ using Yuzu;
 
 namespace Lime
 {
-	/// <summary>
-	/// Хранит номер кости и силу влияния
-	/// </summary>
 	[YuzuCompact]
 	public struct BoneWeight
 	{
-		/// <summary>
-		/// Номер кости
-		/// </summary>
 		[YuzuMember("0")]
 		public int Index;
 
-		/// <summary>
-		/// Сила влияния кости
-		/// </summary>
 		[YuzuMember("1")]
 		public float Weight;
 	}
 
-	/// <summary>
-	/// Содержит информацию о степени влияния костей на точку DistortionMesh
-	/// Поддерживается влияние 4 костей одновременно
-	/// </summary>
 	[YuzuCompact]
 	public class SkinningWeights
 	{
@@ -41,57 +28,29 @@ namespace Lime
 		public BoneWeight Bone3;
 	}
 
-	/// <summary>
-	/// Кость. Управляет движением точек DistortionMesh
-	/// </summary>
 	public class Bone : Node
 	{
-		/// <summary>
-		/// Позиция в сцене
-		/// </summary>
 		[YuzuMember]
 		public Vector2 Position { get; set; }
 
-		/// <summary>
-		/// Угол поворота кости в градусах по часовой стрелке
-		/// </summary>
 		[YuzuMember]
 		public float Rotation { get; set; }
 
-		/// <summary>
-		/// Длина кости
-		/// </summary>
 		[YuzuMember]
 		public float Length { get; set; }
 
-		/// <summary>
-		/// Ограничитель обратной кинематики.
-		/// Обратная кинематика не будет распространяться на кость-родитель и далее
-		/// </summary>
 		[YuzuMember]
 		public bool IKStopper { get; set; }
 
-		/// <summary>
-		/// Порядковый номер кости в сцене
-		/// </summary>
 		[YuzuMember]
 		public int Index { get; set; }
 
-		/// <summary>
-		/// Номер родительской кости
-		/// </summary>
 		[YuzuMember]
 		public int BaseIndex { get; set; }
 
-		/// <summary>
-		/// Область влияния, в которой кость оказывает максимальный эффект
-		/// </summary>
 		[YuzuMember]
 		public float EffectiveRadius { get; set; }
 
-		/// <summary>
-		/// Область влияния, в которой кость оказывает минимальный эффект
-		/// </summary>
 		[YuzuMember]
 		public float FadeoutZone { get; set; }
 

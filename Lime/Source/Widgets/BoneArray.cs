@@ -7,27 +7,15 @@ namespace Lime
 	{
 		public struct Entry
 		{
-			/// <summary>
-			/// Текущий абсолютный поворот кости
-			/// </summary>
 			[YuzuMember]
 			public float Rotation;
 
-			/// <summary>
-			/// Текущая длина кости
-			/// </summary>
 			[YuzuMember]
 			public float Length;
 
-			/// <summary>
-			/// Текущая абсолютная позиция начала кости
-			/// </summary>
 			[YuzuMember]
 			public Vector2 Joint;
 
-			/// <summary>
-			/// Текущая абсолютная позиция конца кости
-			/// </summary>
 			[YuzuMember]
 			public Vector2 Tip;
 
