@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{B41A4095-699B-457F-90EA-0EBC7D8B8CB4}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Orange.Mac.CLI</RootNamespace>
+    <AssemblyName>Orange.CLI</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <ApplicationIcon>Orange.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Mac\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ExternalConsole>true</ExternalConsole>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Mac\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ExternalConsole>true</ExternalConsole>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Source\Main.CLI.cs" />
+    <Compile Include="Source\Actions\BuildGame.cs" />
+    <Compile Include="Source\UI\ConsoleUI.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Lemon\Lemon.MonoMac.csproj">
+      <Project>{4604AA2E-129F-4814-AD0D-8BA35346ECC4}</Project>
+      <Name>Lemon.MonoMac</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Lime\Lime.MonoMac.csproj">
+      <Project>{DC16EEBF-404D-4610-B87A-15B57464D707}</Project>
+      <Name>Lime.MonoMac</Name>
+    </ProjectReference>
+    <ProjectReference Include="Orange.Mac.csproj">
+      <Project>{4B2BDD5A-2AAE-46AE-AA1A-8C9308BAA50D}</Project>
+      <Name>Orange.Mac</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Yuzu\Yuzu.csproj">
+      <Project>{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}</Project>
+      <Name>Yuzu</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>

@@ -32,9 +32,7 @@ namespace Orange
 
 			if (!builder.Build()) {
 				Console.WriteLine("BUILD FAILED");
-				if (UserInterface.Instance is ConsoleUI) {
-					Environment.Exit(1);
-				}
+				UserInterface.Instance.ExitWithErrorIfPossible();
 				return false;
 			}
 			return true;

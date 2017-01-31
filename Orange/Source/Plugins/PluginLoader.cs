@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
+using System.ComponentModel.Composition.Primitives;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -49,28 +50,39 @@ namespace Orange
 		public IEnumerable<Lazy<Action, IMenuItemMetadata>> MenuItems { get; set; }
 	}
 
-	static class PluginLoader
+	public static class PluginLoader
 	{
 		public static string CurrentPluginDirectory;
 		public static OrangePlugin CurrentPlugin = new OrangePlugin();
 		private static CompositionContainer compositionContainer;
 		private static readonly AggregateCatalog catalog;
+		private static readonly List<ComposablePartCatalog> registeredCatalogs = new List<ComposablePartCatalog>();
 
 		static PluginLoader()
 		{
 			catalog = new AggregateCatalog();
+			RegisterAssembly(typeof(PluginLoader).Assembly);
 			ResetPlugins();
 		}
 
 		private static void ResetPlugins()
 		{
-			catalog.Catalogs.Add(new AssemblyCatalog(typeof(PluginLoader).Assembly));
+			catalog.Catalogs.Clear();
+			foreach (var additionalCatalog in registeredCatalogs) {
+				catalog.Catalogs.Add(additionalCatalog);
+			}
 			compositionContainer = new CompositionContainer(catalog);
 			try {
 				compositionContainer.ComposeParts(CurrentPlugin);
 			} catch (CompositionException compositionException) {
 				Console.WriteLine(compositionException.ToString());
 			}
+		}
+
+		public static void RegisterAssembly(Assembly assembly)
+		{
+			registeredCatalogs.Add(new AssemblyCatalog(assembly));
+			ResetPlugins();
 		}
 
 		public static void ScanForPlugins(string citrusProjectFile)
@@ -85,7 +97,6 @@ namespace Orange
 			CurrentPlugin?.Finalize?.Invoke();
 			The.UI.DestroyPluginUI();
 			CurrentPlugin = new OrangePlugin();
-			catalog.Catalogs.Clear();
 			ResetPlugins();
 			try {
 				catalog.Catalogs.Add(new DirectoryCatalog(CurrentPluginDirectory));
