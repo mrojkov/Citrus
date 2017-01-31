@@ -77,6 +77,8 @@ namespace Lime
 
 		public static Vector2 DefaultWidgetSize = new Vector2(100, 100);
 
+		public static bool RenderTransparentWidgets;
+
 		public Widget ParentWidget { get { return Parent != null ? Parent.AsWidget : null; } }
 
 		public TabTraversable TabTravesable { get; set; }
@@ -799,13 +801,13 @@ namespace Lime
 				globalColor = color;
 				globalBlending = Blending.Inherited;
 				globalShader = ShaderId.Inherited;
-				globallyVisible = Visible && color.A != 0;
+				globallyVisible = Visible && (color.A != 0 || RenderTransparentWidgets);
 				return;
 			}
 			globalColor = Color;
 			globalBlending = Blending;
 			globalShader = Shader;
-			globallyVisible = Visible && color.A != 0;
+			globallyVisible = Visible && (color.A != 0 || RenderTransparentWidgets);
 			if (Application.IsTangerine) {
 				globallyVisible |= GetTangerineFlag(TangerineFlags.Shown);
 				globallyVisible &= !GetTangerineFlag(TangerineFlags.Hidden | TangerineFlags.HiddenOnExposition);
