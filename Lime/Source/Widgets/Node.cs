@@ -436,6 +436,7 @@ namespace Lime
 				clone.PostPresenter = PostPresenter.Clone();
 			}
 			clone.DirtyMask = DirtyFlags.All;
+			clone.UserData = null;
 			return clone;
 		}
 
