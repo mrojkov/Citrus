@@ -88,6 +88,12 @@
   <ItemGroup>
   </ItemGroup>
   <ItemGroup>
+    <NativeReference Include="..\3rdParty\AssimpNet\libassimp.dylib">
+      <IsCxx>False</IsCxx>
+      <Kind>Dynamic</Kind>
+    </NativeReference>
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Lime\Lime.MonoMac.csproj">
       <Project>{DC16EEBF-404D-4610-B87A-15B57464D707}</Project>
       <Name>Lime.MonoMac</Name>
