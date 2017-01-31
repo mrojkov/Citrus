@@ -12,9 +12,10 @@ Lime/Extensions/*/bin/*
 3rdParty/*/bin/*
 !3rdParty/ProtoBuf-Net/*/*
 Orange/packages
-!/Orange/bin/Mac/Release/Orange.app
-!/Orange/bin/Win/Release/Orange.exe
 *.mdb
 Yuzu/bin
 [Bb]in/
 *.suo
+/Orange/bin/**/*
+!/Orange/bin/Mac/Release/Orange.app
+!Orange/bin/Win/Release/Orange.exe
