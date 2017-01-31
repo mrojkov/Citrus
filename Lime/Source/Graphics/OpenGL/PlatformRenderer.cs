@@ -54,10 +54,9 @@ namespace Lime
 			shaderProgram = null;
 		}
 
-		public static void SetShader(ShaderId value, ShaderProgram customShaderProgram)
+		public static ShaderProgram SetShader(ShaderId value, ShaderProgram customShaderProgram, ShaderFlags flags = ShaderFlags.None)
 		{
 			int numTextures = textures[1] != 0 ? 2 : (textures[0] != 0 ? 1 : 0);
-			var flags = ShaderFlags.None;
 #if ANDROID
 			if (textures[2] != 0) {
 				flags |= ShaderFlags.UseAlphaTexture1;
@@ -75,6 +74,7 @@ namespace Lime
 				shaderProgram.Use();
 				shaderProgram.LoadMatrix(program.ProjectionMatrixUniformId, FixupWVP(Renderer.WorldViewProjection));
 			}
+			return program;
 		}
 
 		static PlatformRenderer()

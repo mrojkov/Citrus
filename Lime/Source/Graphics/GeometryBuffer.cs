@@ -6,7 +6,9 @@ namespace Lime
 {
 	interface IPlatformGeometryBuffer : IDisposable
 	{
-		void Render(int startIndex, int indexCount);
+		void UploadVertices(int index);
+		void UploadIndices();
+		void Render(int startIndex, int indexCount, bool uploadVertices);
 	}
 
 	[YuzuCompact]
@@ -100,12 +102,28 @@ namespace Lime
 			DirtyAttributes = Attributes.All;
 		}
 
-		public void Render(int startIndex, int indexCount)
+		public void UploadVertices(int index)
 		{
 			if (platformBuffer == null) {
 				platformBuffer = new PlatformGeometryBuffer(this);
 			}
-			platformBuffer.Render(startIndex, indexCount);
+			platformBuffer.UploadVertices(index);
+		}
+
+		public void UploadIndices()
+		{
+			if (platformBuffer == null) {
+				platformBuffer = new PlatformGeometryBuffer(this);
+			}
+			platformBuffer.UploadIndices();
+		}
+
+		public void Render(int startIndex, int indexCount, bool uploadVertices = true)
+		{
+			if (platformBuffer == null) {
+				platformBuffer = new PlatformGeometryBuffer(this);
+			}
+			platformBuffer.Render(startIndex, indexCount, uploadVertices);
 		}
 
 		public void Allocate(int vertexCount, int indexCount, Attributes attrs)

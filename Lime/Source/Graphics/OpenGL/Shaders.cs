@@ -13,7 +13,8 @@ namespace Lime
 		UseAlphaTexture1 = 1,
 		UseAlphaTexture2 = 2,
 		PremultiplyAlpha = 4,
-		Count = 3
+		VertexAnimation = 8,
+		Count = 4
 	}
 
 	public class ShaderPrograms
@@ -30,7 +31,7 @@ namespace Lime
 					if ((i & (int)mask) == i) {
 						programs[i] = new ShaderProgram(
 							new Shader[] { 
-								new VertexShader(vertexShader), 
+								new VertexShader(AddHeaderWithDefines((ShaderFlags)i, vertexShader)), 
 								new FragmentShader(AddHeaderWithDefines((ShaderFlags)i, fragmentShader))
 							},
 							attribLocations, samplers);
@@ -60,15 +61,16 @@ namespace Lime
 
 		private ShaderPrograms()
 		{
-			colorOnlyBlendingProgram = CreateShaderProgram(oneTextureVertexShader, colorOnlyFragmentShader, ShaderFlags.None);
+			var flags = ShaderFlags.VertexAnimation;
+			colorOnlyBlendingProgram = CreateShaderProgram(oneTextureVertexShader, colorOnlyFragmentShader, flags);
 			oneTextureBlengingProgram = CreateShaderProgram(oneTextureVertexShader, oneTextureFragmentShader,
-				ShaderFlags.UseAlphaTexture1 | ShaderFlags.PremultiplyAlpha);
+				ShaderFlags.UseAlphaTexture1 | ShaderFlags.PremultiplyAlpha | flags);
 			twoTexturesBlengingProgram = CreateShaderProgram(twoTexturesVertexShader, twoTexturesFragmentShader,
-				ShaderFlags.UseAlphaTexture1 | ShaderFlags.UseAlphaTexture2 | ShaderFlags.PremultiplyAlpha);
+				ShaderFlags.UseAlphaTexture1 | ShaderFlags.UseAlphaTexture2 | ShaderFlags.PremultiplyAlpha | flags);
 			silhuetteBlendingProgram = CreateShaderProgram(oneTextureVertexShader, silhouetteFragmentShader,
-				ShaderFlags.UseAlphaTexture1);
-			twoTexturesSilhuetteBlendingProgram = CreateShaderProgram(twoTexturesVertexShader, twoTexturesSilhouetteFragmentShader, ShaderFlags.UseAlphaTexture1 | ShaderFlags.UseAlphaTexture2);
-			inversedSilhuetteBlendingProgram = CreateShaderProgram(oneTextureVertexShader, inversedSilhouetteFragmentShader, ShaderFlags.UseAlphaTexture1);
+				ShaderFlags.UseAlphaTexture1 | flags);
+			twoTexturesSilhuetteBlendingProgram = CreateShaderProgram(twoTexturesVertexShader, twoTexturesSilhouetteFragmentShader, ShaderFlags.UseAlphaTexture1 | ShaderFlags.UseAlphaTexture2 | flags);
+			inversedSilhuetteBlendingProgram = CreateShaderProgram(oneTextureVertexShader, inversedSilhouetteFragmentShader, ShaderFlags.UseAlphaTexture1 | flags);
 		}
 
 		public ShaderProgram GetShaderProgram(ShaderId shader, int numTextures, ShaderFlags flags)
@@ -98,34 +100,52 @@ namespace Lime
 
 		readonly string oneTextureVertexShader = @"
 			attribute vec4 inPos;
+			attribute vec4 inPos2;
 			attribute vec4 inColor;
+			attribute vec4 inColor2;
 			attribute vec2 inTexCoords1;
 			varying lowp vec4 color;
 			varying lowp vec2 texCoords;
 			uniform mat4 matProjection;
+			uniform vec4 globalColor;
+			uniform highp float morphKoeff;
 			void main()
 			{
-				gl_Position = matProjection * inPos;
-				color = inColor;					
+				$ifdef VertexAnimation
+					gl_Position = matProjection * vec4((1.0 - morphKoeff) * inPos + morphKoeff * inPos2);
+					color = ((1.0 - morphKoeff) * inColor + morphKoeff * inColor2) * globalColor;
+				$else
+					gl_Position = matProjection * inPos;
+					color = inColor;					
+				$endif
 				texCoords = inTexCoords1;
 			}";
 
 		readonly string twoTexturesVertexShader = @"
 			attribute vec4 inPos;
+			attribute vec4 inPos2;
 			attribute vec4 inColor;
+			attribute vec4 inColor2;
 			attribute vec2 inTexCoords1;
 			attribute vec2 inTexCoords2;
 			varying lowp vec4 color;
 			varying lowp vec2 texCoords1;
 			varying lowp vec2 texCoords2;
 			uniform mat4 matProjection;
+			uniform vec4 globalColor;
+			uniform highp float morphKoeff;
 			void main()
 			{
-				gl_Position = matProjection * inPos;
-				color = inColor;
+				$ifdef VertexAnimation
+					gl_Position = matProjection * vec4((1.0 - morphKoeff) * inPos + morphKoeff * inPos2);
+					color = ((1.0 - morphKoeff) * inColor + morphKoeff * inColor2) * globalColor;
+				$else
+					gl_Position = matProjection * inPos;
+					color = inColor;					
+				$endif
 				texCoords1 = inTexCoords1;
 				texCoords2 = inTexCoords2;
-			}";
+			}";	
 
 		readonly string colorOnlyFragmentShader = @"
 			varying lowp vec4 color;
@@ -237,6 +257,7 @@ namespace Lime
 		private static MultiShaderProgram CreateShaderProgram(string vertexShader, string fragmentShader, ShaderFlags mask)
 		{
 			// #ifdef - breaks Unity3D compiler
+			vertexShader = vertexShader.Replace('$', '#');
 			fragmentShader = fragmentShader.Replace('$', '#');
 			return new MultiShaderProgram(
 				vertexShader, fragmentShader, PlatformGeometryBuffer.Attributes.GetLocations(), 

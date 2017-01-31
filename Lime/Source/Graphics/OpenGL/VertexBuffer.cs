@@ -16,22 +16,20 @@ namespace Lime
 {
 	public class VertexBuffer : IDisposable, IGLObject
 	{
-		public readonly int Attribute;
 		public readonly VertexAttribPointerType AttribType;
 		public readonly int ComponentCount;
 		public static int TotalVertexBuffers;
 		private uint vboHandle;
-		private int stride;
+		private readonly int stride;
 		private int componentCount;
 		private bool normalized;
 		private bool disposed;
 	
-		public VertexBuffer(int attribute, VertexAttribPointerType attribType, int componentCount, bool normalized = false)
+		public VertexBuffer(VertexAttribPointerType attribType, int componentCount, bool normalized = false)
 		{
-			Attribute = attribute;
 			AttribType = attribType;
-			ComponentCount = componentCount;
 			stride = GetAttributeSize(attribType) * componentCount;
+			ComponentCount = componentCount;
 			this.componentCount = componentCount;
 			this.normalized = normalized;
 			TotalVertexBuffers++;
@@ -62,15 +60,15 @@ namespace Lime
 			vboHandle = (uint)t[0];
 		}
 
-		public void Bind<T>(T[] vertices, bool forceUpload) where T : struct
+		public void Bind<T>(T[] vertices, int attribute, bool forceUpload) where T : struct
 		{
 			if (vboHandle == 0) {
 				forceUpload = true;
 				AllocateVBOHandle();
 			}
 			GL.BindBuffer(BufferTarget.ArrayBuffer, vboHandle);
-			GL.EnableVertexAttribArray(Attribute);
-			GL.VertexAttribPointer(Attribute, componentCount, AttribType, normalized, 0, (IntPtr)0);
+			GL.EnableVertexAttribArray(attribute);
+			GL.VertexAttribPointer(attribute, componentCount, AttribType, normalized, 0, (IntPtr)0);
 			if (forceUpload) {
 				GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(stride * vertices.Length), vertices, BufferUsageHint.DynamicDraw);
 			}

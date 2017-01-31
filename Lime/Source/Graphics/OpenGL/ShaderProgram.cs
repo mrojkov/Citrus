@@ -112,7 +112,7 @@ namespace Lime
 			ProjectionMatrixUniformId = GetUniformId("matProjection");
 		}
 
-		protected int GetUniformId(string name)
+		public int GetUniformId(string name)
 		{
 			int id;
 			if (uniformIds.TryGetValue(name, out id)) {

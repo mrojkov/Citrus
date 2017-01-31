@@ -156,9 +156,9 @@
 		private static AttribLocation[] GetAttribLocations()
 		{
 			return new AttribLocation[] {
-				new AttribLocation { Name = "a_Position", Index = PlatformGeometryBuffer.Attributes.Vertex },
+				new AttribLocation { Name = "a_Position", Index = PlatformGeometryBuffer.Attributes.Vertex1 },
 				new AttribLocation { Name = "a_UV", Index = PlatformGeometryBuffer.Attributes.UV1 },
-				new AttribLocation { Name = "a_Color", Index = PlatformGeometryBuffer.Attributes.Color },
+				new AttribLocation { Name = "a_Color", Index = PlatformGeometryBuffer.Attributes.Color1 },
 				new AttribLocation { Name = "a_BlendIndices", Index = PlatformGeometryBuffer.Attributes.BlendIndices },
 				new AttribLocation { Name = "a_BlendWeights", Index = PlatformGeometryBuffer.Attributes.BlendWeights }
 			};

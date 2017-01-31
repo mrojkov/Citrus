@@ -4,7 +4,7 @@ namespace Lime
 {
 	public class RenderList
 	{
-		private readonly List<RenderBatch> Batches = new List<RenderBatch>();
+		public readonly List<RenderBatch> Batches = new List<RenderBatch>();
 		private RenderBatch lastBatch;
 
 		public bool Empty { get { return lastBatch == null; } }
@@ -19,7 +19,8 @@ namespace Lime
 				(GetTextureHandle(lastBatch.Texture2) == GetTextureHandle(texture2)) &&
 				lastBatch.Blending == blending &&
 				lastBatch.Shader == shader &&
-				lastBatch.CustomShaderProgram == customShaderProgram) {
+				lastBatch.CustomShaderProgram == customShaderProgram)
+			{
 				return lastBatch;
 			}
 			var batch = RenderBatchPool.Acquire();
