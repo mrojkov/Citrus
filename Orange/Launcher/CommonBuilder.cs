@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.IO;
+using System.Linq;
 
 namespace Launcher
 {
@@ -37,9 +38,9 @@ namespace Launcher
 		private void BuildAndRun(bool runExecutable)
 		{
 			var currentDirectory = new DirectoryInfo(Environment.CurrentDirectory);
-			while (currentDirectory.Name != "Citrus") {
+			while (currentDirectory.GetDirectories().All(d => d.Name != "Orange")) {
 				if (currentDirectory.Parent == null) {
-					SetFailedBuildStatus("Cannot find Citrus directory");
+					SetFailedBuildStatus("Cannot find Orange directory");
 				}
 				currentDirectory = currentDirectory.Parent;
 			}
