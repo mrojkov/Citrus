@@ -44,9 +44,12 @@ namespace Launcher
 				}
 				currentDirectory = currentDirectory.Parent;
 			}
-			Environment.CurrentDirectory = Path.Combine(currentDirectory.FullName, "Orange");
+			var citrusDirectory = currentDirectory.FullName;
+			Environment.CurrentDirectory = Path.Combine(citrusDirectory, "Orange");
+			ClearObjFolder(citrusDirectory);
 			OnBuildStatusChange?.Invoke("Building");
 			if (AreRequirementsMet() && Build(SolutionPath ?? DefaultSolutionPath)) {
+				ClearObjFolder(citrusDirectory);
 				if (runExecutable) {
 					RunExecutable();
 				}
@@ -57,6 +60,16 @@ namespace Launcher
 					SetFailedBuildStatus("Send this text to our developers.");
 				OnBuildFail?.Invoke();
 			}
+		}
+
+		private static void ClearObjFolder(string citrusDirectory)
+		{
+			// Mac-specific bug: while building Lime.iOS mdtool reuses obj folder after Lime.MonoMac build,
+			// which results in invalid Lime.iOS assembly (missing classes, etc.).
+			// Solution: remove obj folder after Orange build (and before, just in case).
+			var path = Path.Combine(citrusDirectory, "Lime", "obj");
+			if (Directory.Exists(path))
+				Directory.Delete(path, true);
 		}
 
 		private bool Build(string solutionPath)
