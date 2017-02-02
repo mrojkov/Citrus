@@ -13,6 +13,7 @@ namespace Lime
 	{
 		public static float DefaultRefreshRate = 60;
 
+		public Nullable<int> Screen = null;
 		public bool FullScreen = false;
 		public bool FixedSize = true;
 		public bool Centered = true;

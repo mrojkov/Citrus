@@ -266,6 +266,9 @@ namespace Lime
 			if (options.Visible) {
 				Visible = true;
 			}
+			if (options.Screen != null && options.Screen >= 0 && Screen.AllScreens.Length > options.Screen) {
+				form.Location = GetCenter(Screen.AllScreens[options.Screen.Value].WorkingArea);
+			}
 			if (options.Centered) {
 				Center();
 			}
@@ -291,6 +294,14 @@ namespace Lime
 		/// Gets the display device containing the largest portion of this window.
 		/// </summary>
 		public IDisplay Display => Lime.Display.GetDisplay(Screen.FromControl(form));
+
+		private static Point GetCenter(System.Drawing.Rectangle rect)
+		{
+			return new Point(
+				rect.X + (rect.Width / 2),
+				rect.Y + (rect.Height / 2)
+			);
+		}
 
 		private static float CalcPixelScale(float Dpi)
 		{
