@@ -76,12 +76,11 @@
 			{
 				vec4 color = v_Color * u_DiffuseColor;
 			#ifdef DIFFUSE_TEXTURE_ENABLED
-				color.rgb *= texture2D(u_DiffuseTexture, v_UV).rgb;
+				color.rgba *= texture2D(u_DiffuseTexture, v_UV).rgba;
 			#endif
 			#ifdef FOG_ENABLED
 				color.rgb = mix(color.rgb, u_FogColor.rgb, v_FogFactor);
 			#endif
-				color.rgb *= color.a;
 				gl_FragColor = color;
 			}
 		";
