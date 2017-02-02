@@ -293,8 +293,10 @@ namespace Lime
 					title = MainWindow.Title;
 					MainWindow.Visible = false;
 				}
-				WinApi.MessageBox((IntPtr)null, e.ToString(),
-					string.Format("{0} has terminated with an error", title), 0);
+
+				using (var messageBox = new MessageBoxForm($"{title} has terminated with an error", e.ToString())) {
+					messageBox.ShowDialog();
+				}
 #else
 				Console.WriteLine(e.ToString());
 #endif

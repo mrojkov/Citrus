@@ -104,6 +104,7 @@
     <Compile Include="Source\Application\Display\IDisplay.cs" />
     <Compile Include="Source\Application\DummyWindow.cs" />
     <Compile Include="Source\Application\Menu\Menu.Win.cs" />
+    <Compile Include="Source\Application\MessageBox.cs" />
     <Compile Include="Source\Application\MouseCursor\MouseCursor.cs" />
     <Compile Include="Source\Application\FileDialog\FileDialog.cs" />
     <Compile Include="Source\Application\FileDialog\FileDialog.Mac.cs" />
@@ -315,7 +316,6 @@
     <Compile Include="Source\Application\iOSGameController.cs" />
     <Compile Include="Source\Application\iOSGameView.cs" />
     <Compile Include="Source\Application\Sdl2.cs" />
-    <Compile Include="Source\Application\WinApi.cs" />
     <Compile Include="Source\Application\OpenTK.Xamarin.iOS\Factory.iPhone.cs" />
     <Compile Include="Source\Application\OpenTK.Xamarin.iOS\GraphicsContext.cs" />
     <Compile Include="Source\Application\OpenTK.Xamarin.iOS\iPhoneOSGameView.cs" />
