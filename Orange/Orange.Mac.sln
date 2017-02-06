@@ -7,9 +7,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lime.MonoMac", "..\Lime\Lim
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yuzu", "..\Yuzu\Yuzu.csproj", "{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orange.Mac.CLI", "Orange.Mac.CLI.csproj", "{B41A4095-699B-457F-90EA-0EBC7D8B8CB4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orange.Mac.CLI", "Orange.CLI\Orange.Mac.CLI.csproj", "{B41A4095-699B-457F-90EA-0EBC7D8B8CB4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orange.Mac.GUI", "Orange.Mac.GUI.csproj", "{4B2BDD5B-2AAE-46AE-AA1A-8C9308BAA50D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orange.Mac.GUI", "Orange.GUI\Orange.Mac.GUI.csproj", "{4B2BDD5B-2AAE-46AE-AA1A-8C9308BAA50D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orange.Mac", "Orange.Mac.csproj", "{4B2BDD5A-2AAE-46AE-AA1A-8C9308BAA50D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,6 +39,10 @@ Global
 		{4B2BDD5B-2AAE-46AE-AA1A-8C9308BAA50D}.Debug|x86.Build.0 = Debug|x86
 		{4B2BDD5B-2AAE-46AE-AA1A-8C9308BAA50D}.Release|x86.ActiveCfg = Release|x86
 		{4B2BDD5B-2AAE-46AE-AA1A-8C9308BAA50D}.Release|x86.Build.0 = Release|x86
+		{4B2BDD5A-2AAE-46AE-AA1A-8C9308BAA50D}.Debug|x86.ActiveCfg = Debug|x86
+		{4B2BDD5A-2AAE-46AE-AA1A-8C9308BAA50D}.Debug|x86.Build.0 = Debug|x86
+		{4B2BDD5A-2AAE-46AE-AA1A-8C9308BAA50D}.Release|x86.ActiveCfg = Release|x86
+		{4B2BDD5A-2AAE-46AE-AA1A-8C9308BAA50D}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0

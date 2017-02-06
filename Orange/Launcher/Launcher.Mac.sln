@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Launcher.Mac", "Launcher\Launcher.Mac.csproj", "{6B5204B6-00C2-481C-92DB-D58648552F86}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Launcher.Mac", "Launcher.Mac.csproj", "{6B5204B6-00C2-481C-92DB-D58648552F86}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,6 +11,8 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{6B5204B6-00C2-481C-92DB-D58648552F86}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{6B5204B6-00C2-481C-92DB-D58648552F86}.Release|x86.ActiveCfg = Release|Any CPU
+		{6B5204B6-00C2-481C-92DB-D58648552F86}.Debug|x86.Build.0 = Debug|Any CPU
+		{6B5204B6-00C2-481C-92DB-D58648552F86}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0

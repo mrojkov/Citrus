@@ -19,7 +19,7 @@
     <DebugSymbols>True</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
-    <OutputPath>bin\Mac\Debug</OutputPath>
+    <OutputPath>..\bin\Mac\Debug</OutputPath>
     <DefineConstants>DEBUG;MAC;ORANGE_GUI</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -40,7 +40,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>full</DebugType>
     <Optimize>True</Optimize>
-    <OutputPath>bin\Mac\Release</OutputPath>
+    <OutputPath>..\bin\Mac\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
@@ -68,12 +68,6 @@
     <Reference Include="MonoMac" />
     <Reference Include="Mono.Posix" />
     <Reference Include="Microsoft.Build.Engine" />
-    <Reference Include="AssimpNet">
-      <HintPath>..\3rdParty\AssimpNet\AssimpNet.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\3rdParty\Newtonsoft.Json\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="gdk-sharp, " />
     <Reference Include="glib-sharp, " />
@@ -96,25 +90,25 @@
     <Compile Include="UI\PluginUIBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
-    <NativeReference Include="..\3rdParty\AssimpNet\libassimp.dylib">
+    <NativeReference Include="..\..\3rdParty\AssimpNet\libassimp.dylib">
       <IsCxx>False</IsCxx>
       <Kind>Dynamic</Kind>
     </NativeReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Lime\Lime.MonoMac.csproj">
+    <ProjectReference Include="..\..\Lime\Lime.MonoMac.csproj">
       <Project>{DC16EEBF-404D-4610-B87A-15B57464D707}</Project>
       <Name>Lime.MonoMac</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Lemon\Lemon.MonoMac.csproj">
+    <ProjectReference Include="..\..\Lemon\Lemon.MonoMac.csproj">
       <Project>{4604AA2E-129F-4814-AD0D-8BA35346ECC4}</Project>
       <Name>Lemon.MonoMac</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Yuzu\Yuzu.csproj">
+    <ProjectReference Include="..\..\Yuzu\Yuzu.csproj">
       <Project>{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}</Project>
       <Name>Yuzu</Name>
     </ProjectReference>
-    <ProjectReference Include="Orange.Mac.csproj">
+    <ProjectReference Include="..\Orange.Mac.csproj">
       <Project>{4B2BDD5A-2AAE-46AE-AA1A-8C9308BAA50D}</Project>
       <Name>Orange.Mac</Name>
     </ProjectReference>
@@ -122,6 +116,6 @@
   <ItemGroup>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Info.plist" />
+    <None Include="..\Info.plist" />
   </ItemGroup>
 </Project>
