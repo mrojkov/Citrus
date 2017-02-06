@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Launcher
 {
-	internal class LogWriter : TextWriter
+	public class LogWriter : TextWriter
 	{
 		private Action<string> logginAction;
 
@@ -22,9 +22,6 @@ namespace Launcher
 			logginAction(value);
 		}
 
-		public override System.Text.Encoding Encoding
-		{
-			get { throw new NotImplementedException(); }
-		}
+		public override System.Text.Encoding Encoding { get { return System.Text.Encoding.UTF8; } }
 	}
 }

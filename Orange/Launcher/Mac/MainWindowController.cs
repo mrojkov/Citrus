@@ -8,6 +8,8 @@ namespace Launcher
 	{
 		private LoggingWindowController loggingWindowConroller;
 
+		public LogWriter LogWriter;
+
 		public MainWindowController(IntPtr handle) : base(handle)
 		{
 		}
@@ -21,11 +23,7 @@ namespace Launcher
 		{
 			loggingWindowConroller = new LoggingWindowController();
 			loggingWindowConroller.Window.OrderOut(this);
-		}
-
-		public void Log(string line)
-		{
-			loggingWindowConroller.Log(line);
+			LogWriter = new LogWriter (loggingWindowConroller.Log);
 		}
 
 		public void SetBuildStatus(string status)
