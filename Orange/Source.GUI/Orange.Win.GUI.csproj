@@ -38,11 +38,11 @@
     <StartupObject />
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Orange.ico</ApplicationIcon>
+    <ApplicationIcon>..\Orange.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Win\Debug\</OutputPath>
+    <OutputPath>..\bin\Win\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;WIN;ORANGE_GUI</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
@@ -52,7 +52,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>bin\Win\Release\</OutputPath>
+    <OutputPath>..\bin\Win\Release\</OutputPath>
     <DefineConstants>TRACE;WIN;ORANGE_GUI</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
@@ -93,36 +93,34 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="..\App.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Content Include="..\Orange.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Properties\" />
+    <Compile Include="Actions\UpdateDictionaryTxtOldFormat.cs" />
+    <Compile Include="DictionaryExtractorWindow.cs" />
+    <Compile Include="DictionaryOldFormatExtractor.cs" />
+    <Compile Include="Main.GUI.cs" />
+    <Compile Include="UI\MainWindow.cs" />
+    <Compile Include="UI\MainWindow.PluginUI.cs" />
+    <Compile Include="UI\MainWindow.UI.cs" />
+    <Compile Include="UI\PluginUIBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Orange.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Source.GUI\Actions\UpdateDictionaryTxtOldFormat.cs" />
-    <Compile Include="Source.GUI\DictionaryExtractorWindow.cs" />
-    <Compile Include="Source.GUI\DictionaryOldFormatExtractor.cs" />
-    <Compile Include="Source.GUI\Main.GUI.cs" />
-    <Compile Include="Source.GUI\UI\MainWindow.cs" />
-    <Compile Include="Source.GUI\UI\MainWindow.PluginUI.cs" />
-    <Compile Include="Source.GUI\UI\MainWindow.UI.cs" />
-    <Compile Include="Source.GUI\UI\PluginUIBuilder.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Lime\Lime.Win.csproj">
+    <ProjectReference Include="..\..\Lime\Lime.Win.csproj">
       <Project>{fc2de6c9-641a-4230-8d29-ea4035cd8708}</Project>
       <Name>Lime.Win</Name>
     </ProjectReference>
-    <ProjectReference Include="Orange.Win.csproj">
+    <ProjectReference Include="..\Orange.Win.csproj">
       <Project>{6f0c1a51-492a-4e6e-b302-e212d441ebf3}</Project>
       <Name>Orange.Win</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
