@@ -14,7 +14,7 @@
     <AndroidResgenFile>Resources\Resource.Designer.cs</AndroidResgenFile>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
     <AndroidUseLatestPlatformSdk>True</AndroidUseLatestPlatformSdk>
-    <TargetFrameworkVersion>v6.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v7.0</TargetFrameworkVersion>
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -22,7 +22,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;ANDROID</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AndroidLinkMode>None</AndroidLinkMode>
@@ -40,7 +40,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;ANDROID</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AndroidUseSharedRuntime>False</AndroidUseSharedRuntime>
@@ -97,13 +97,17 @@
       <Project>{B4435A5F-51DA-42BA-9315-61691A5F58AC}</Project>
       <Name>Lemon.Android</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Citrus\Lime\Extensions\DynamicFont\DynamicFont.Android.csproj">
+      <Project>{b305434e-2233-4f9e-9815-577df6f9a737}</Project>
+      <Name>DynamicFont.Android</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Citrus\Lime\Lime.Android.csproj">
       <Project>{72E2DDBB-C320-4356-89EC-BDED6036D29B}</Project>
       <Name>Lime.Android</Name>
     </ProjectReference>
-    <ProjectReference Include="..\EmptyProject.Game\EmptyProject.Game.Android.csproj">
-      <Project>{035093F5-12B2-402C-8B46-3E75C531DB68}</Project>
-      <Name>EmptyProject.Game.Android</Name>
+    <ProjectReference Include="..\..\Citrus\Yuzu\Yuzu.Android.csproj">
+      <Project>{cf150772-5f4a-453c-91bd-d52901174b4e}</Project>
+      <Name>Yuzu.Android</Name>
     </ProjectReference>
     <ProjectReference Include="Assets\Assets.Android.csproj">
       <Project>{1C601E58-2EF5-462E-86CB-B7443A410FC5}</Project>
@@ -118,6 +122,7 @@
     <AndroidResource Include="Resources\drawable-xxxhdpi\Icon.png" />
     <AndroidResource Include="Resources\values\Strings.xml" />
   </ItemGroup>
+  <Import Project="..\EmptyProject.Game\EmptyProject.Game.projitems" Label="Shared" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
      Other similar extension points exist, see Microsoft.Common.targets.

@@ -8,17 +8,18 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lemon.Win", "..\..\Citrus\Lemon\Lemon.Win.csproj", "{538E41E4-725C-4521-BCF3-A5591A1A3AFD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmptyProject.Win", "EmptyProject.Win.csproj", "{87884330-1A04-4008-9D2F-05585F4C7E05}"
-	ProjectSection(ProjectDependencies) = postProject
-		{8DF7F0F3-8C68-4A0E-9573-CC4CA0882A3E} = {8DF7F0F3-8C68-4A0E-9573-CC4CA0882A3E}
-	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmptyProject.Game.Win", "..\EmptyProject.Game\EmptyProject.Game.Win.csproj", "{8DF7F0F3-8C68-4A0E-9573-CC4CA0882A3E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yuzu", "..\..\Citrus\Yuzu\Yuzu.csproj", "{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicFont.Win", "..\..\Citrus\Lime\Extensions\DynamicFont\DynamicFont.Win.csproj", "{FE8512BC-7A55-425C-8BC1-AD4D9785CF12}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "EmptyProject.Game", "..\EmptyProject.Game\EmptyProject.Game.shproj", "{E72754D5-6DF7-42F1-9E14-0EF4D1491621}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		..\EmptyProject.Game\EmptyProject.Game.projitems*{87884330-1a04-4008-9d2f-05585f4c7e05}*SharedItemsImports = 4
+		..\EmptyProject.Game\EmptyProject.Game.projitems*{e72754d5-6df7-42f1-9e14-0ef4d1491621}*SharedItemsImports = 13
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x86 = Debug|x86
@@ -50,14 +51,6 @@ Global
 		{87884330-1A04-4008-9D2F-05585F4C7E05}.Release|Any CPU.Build.0 = Release|Any CPU
 		{87884330-1A04-4008-9D2F-05585F4C7E05}.Release|x86.ActiveCfg = Release|x86
 		{87884330-1A04-4008-9D2F-05585F4C7E05}.Release|x86.Build.0 = Release|x86
-		{8DF7F0F3-8C68-4A0E-9573-CC4CA0882A3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8DF7F0F3-8C68-4A0E-9573-CC4CA0882A3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8DF7F0F3-8C68-4A0E-9573-CC4CA0882A3E}.Debug|x86.ActiveCfg = Debug|x86
-		{8DF7F0F3-8C68-4A0E-9573-CC4CA0882A3E}.Debug|x86.Build.0 = Debug|x86
-		{8DF7F0F3-8C68-4A0E-9573-CC4CA0882A3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8DF7F0F3-8C68-4A0E-9573-CC4CA0882A3E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8DF7F0F3-8C68-4A0E-9573-CC4CA0882A3E}.Release|x86.ActiveCfg = Release|x86
-		{8DF7F0F3-8C68-4A0E-9573-CC4CA0882A3E}.Release|x86.Build.0 = Release|x86
 		{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}.Debug|x86.ActiveCfg = Debug|Any CPU
