@@ -5,11 +5,11 @@ namespace Launcher
 {
 	internal class LogWriter : TextWriter
 	{
-		private LoggingForm loggingForm;
+		private Action<string> logginAction;
 
-		public LogWriter(LoggingForm loggingForm)
+		public LogWriter(Action<string> logginAction)
 		{
-			this.loggingForm = loggingForm;
+			this.logginAction = logginAction;
 		}
 
 		public override void WriteLine(string value)
@@ -19,7 +19,7 @@ namespace Launcher
 
 		public override void Write(string value)
 		{
-			loggingForm.Log(value);
+			logginAction(value);
 		}
 
 		public override System.Text.Encoding Encoding

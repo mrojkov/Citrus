@@ -10,7 +10,7 @@ namespace Launcher
 
 		public MainForm()
 		{
-			LogWriter = new LogWriter(loggingForm);
+			LogWriter = new LogWriter(loggingForm.Log);
 			InitializeComponent();
 		}
 
