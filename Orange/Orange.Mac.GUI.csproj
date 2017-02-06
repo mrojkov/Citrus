@@ -20,7 +20,7 @@
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
     <OutputPath>bin\Mac\Debug</OutputPath>
-    <DefineConstants>DEBUG;MAC</DefineConstants>
+    <DefineConstants>DEBUG;MAC;ORANGE_GUI</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
@@ -47,7 +47,7 @@
     <ConsolePause>False</ConsolePause>
     <DebugSymbols>True</DebugSymbols>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <DefineConstants>MAC</DefineConstants>
+    <DefineConstants>MAC;ORANGE_GUI</DefineConstants>
     <EnableCodeSigning>False</EnableCodeSigning>
     <CreatePackage>False</CreatePackage>
     <EnablePackageSigning>False</EnablePackageSigning>

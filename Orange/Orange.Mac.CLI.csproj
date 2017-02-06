@@ -17,23 +17,36 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Mac\Debug</OutputPath>
-    <DefineConstants>DEBUG;</DefineConstants>
+    <DefineConstants>DEBUG;MAC;ORANGE_CLI</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ExternalConsole>true</ExternalConsole>
     <PlatformTarget>x86</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <Optimize>true</Optimize>
     <OutputPath>bin\Mac\Release</OutputPath>
+    <DefineConstants>MAC;ORANGE_CLI</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ExternalConsole>true</ExternalConsole>
     <PlatformTarget>x86</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\3rdParty\Newtonsoft.Json\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="System.Xml" />
+    <Reference Include="glib-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="AssimpNet">
+      <HintPath>..\3rdParty\AssimpNet\AssimpNet.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Posix" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Main.CLI.cs" />
@@ -109,10 +122,6 @@
     <ProjectReference Include="..\Lime\Lime.MonoMac.csproj">
       <Project>{DC16EEBF-404D-4610-B87A-15B57464D707}</Project>
       <Name>Lime.MonoMac</Name>
-    </ProjectReference>
-    <ProjectReference Include="Orange.Mac.csproj">
-      <Project>{4B2BDD5A-2AAE-46AE-AA1A-8C9308BAA50D}</Project>
-      <Name>Orange.Mac</Name>
     </ProjectReference>
     <ProjectReference Include="..\Yuzu\Yuzu.csproj">
       <Project>{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}</Project>
