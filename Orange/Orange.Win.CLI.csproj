@@ -19,18 +19,20 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Win\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;ORANGE_CLI;WIN</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Win\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;ORANGE_CLI;WIN</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>Orange.ico</ApplicationIcon>
@@ -38,30 +40,147 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Win\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;WIN;ORANGE_CLI</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>bin\Win\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;WIN;ORANGE_CLI</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AssimpNet">
+      <HintPath>..\3rdParty\AssimpNet\AssimpNet.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\3rdParty\Newtonsoft.Json\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
+    <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files\GtkSharp\2.12\lib\gtk-sharp-2.0\gdk-sharp.dll</HintPath>
+    </Reference>
+    <Reference Include="glib-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files\GtkSharp\2.12\lib\gtk-sharp-2.0\glib-sharp.dll</HintPath>
+    </Reference>
+    <Reference Include="System.XML" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\3rdParty\AssimpNet\Assimp32.dll">
+      <Link>Assimp32.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\3rdParty\AssimpNet\Assimp64.dll">
+      <Link>Assimp64.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <Content Include="Orange.ico" />
+    <Content Include="Toolchain.Win\cudart32_30_14.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Toolchain.Win\jpeg62.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Toolchain.Win\libpng12.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Toolchain.Win\libtiff3.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Toolchain.Win\nuget.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Toolchain.Win\nvcompress.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Toolchain.Win\nvtt.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Toolchain.Win\pngcrush_1_7_83_w32.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Toolchain.Win\PVRTexToolCLI.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <Compile Include="Source\AssemblyInfo.cs" />
+    <Compile Include="Source\DictionaryExtractor.cs" />
+    <Compile Include="Source\DictionaryExtractorWindow.cs" />
+    <Compile Include="Source\DictionaryOldFormatExtractor.cs" />
+    <Compile Include="Source\Main.GUI.cs" />
+    <Compile Include="Source\MenuController.cs" />
+    <Compile Include="Source\SubTarget.cs" />
+    <Compile Include="Source\TargetPlatform.cs" />
+    <Compile Include="Source\The.cs" />
+    <Compile Include="Source\Workspace.cs" />
+    <Compile Include="Source\WorkspaceConfig.cs" />
+    <Compile Include="Source\Actions\AnalyzeResources.cs" />
+    <Compile Include="Source\Actions\BuildGameAndRun.cs" />
+    <Compile Include="Source\Actions\ConvertAssetsToTangerine.cs" />
+    <Compile Include="Source\Actions\ConvertDictionaryToNewFormat.cs" />
+    <Compile Include="Source\Actions\CookGameAssets.cs" />
+    <Compile Include="Source\Actions\ExtractTangerineScenes.cs" />
+    <Compile Include="Source\Actions\GenerateAppDeserializers.cs" />
+    <Compile Include="Source\Actions\GenerateLimeDeserializers.cs" />
+    <Compile Include="Source\Actions\RebuildGame.cs" />
+    <Compile Include="Source\Actions\RevealCookedAssets.cs" />
+    <Compile Include="Source\Actions\RunTangerine.cs" />
+    <Compile Include="Source\Actions\UpdateDictionaryTxt.cs" />
+    <Compile Include="Source\Actions\UpdateDictionaryTxtOldFormat.cs" />
+    <Compile Include="Source\Actions\UpdateXCodeProject.cs" />
+    <Compile Include="Source\AssetCooker\AssetCooker.cs" />
+    <Compile Include="Source\AssetCooker\AssetsUnpacker.cs" />
+    <Compile Include="Source\AssetCooker\CookingRulesBuilder.cs" />
+    <Compile Include="Source\AssetCooker\OpacityMaskCreator.cs" />
+    <Compile Include="Source\AssetCooker\RectAllocator.cs" />
+    <Compile Include="Source\AssetCooker\TextureConverter.cs" />
+    <Compile Include="Source\AssetCooker\TextureConverterUtils.cs" />
+    <Compile Include="Source\AssetCooker\UnityAssetBundle.cs" />
+    <Compile Include="Source\AssetCooker\WaveIMA4Converter.cs" />
+    <Compile Include="Source\Builder\BuildSystem.cs" />
+    <Compile Include="Source\Builder\MDTool.cs" />
+    <Compile Include="Source\Builder\MSBuild.cs" />
+    <Compile Include="Source\Builder\SolutionBuilder.cs" />
+    <Compile Include="Source\CsprojSynchronization\CsprojSynchronization.cs" />
+    <Compile Include="Source\HotStudioImport\HotAnimators.cs" />
+    <Compile Include="Source\HotStudioImport\HotFontImporter.cs" />
+    <Compile Include="Source\HotStudioImport\HotLexer.cs" />
+    <Compile Include="Source\HotStudioImport\HotSceneImporter.cs" />
+    <Compile Include="Source\ModelImport\KeyframeReducer.cs" />
+    <Compile Include="Source\ModelImport\ModelImporter.cs" />
+    <Compile Include="Source\Nuget\Nuget.cs" />
+    <Compile Include="Source\Plugins\IPluginUIBuilder.cs" />
+    <Compile Include="Source\Plugins\PluginLoader.cs" />
+    <Compile Include="Source\Toolbox\DirectoryChanger.cs" />
+    <Compile Include="Source\Toolbox\EmbeddedResource.cs" />
+    <Compile Include="Source\Toolbox\FileEnumerator.cs" />
+    <Compile Include="Source\Toolbox\FontBuilder.cs" />
+    <Compile Include="Source\Toolbox\Json.cs" />
+    <Compile Include="Source\Toolbox\Process.cs" />
+    <Compile Include="Source\Toolbox\Subversion.cs" />
+    <Compile Include="Source\Toolbox\Toolbox.cs" />
+    <Compile Include="Source\UI\MainWindow.cs" />
+    <Compile Include="Source\UI\MainWindow.PluginUI.cs" />
+    <Compile Include="Source\UI\MainWindow.UI.cs" />
+    <Compile Include="Source\UI\PluginUIBuilder.cs" />
+    <Compile Include="Source\UI\UserInterface.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
@@ -79,10 +198,6 @@
       <Project>{ddd2dfe9-ced2-4cea-adf0-5a6865865a46}</Project>
       <Name>Yuzu</Name>
     </ProjectReference>
-    <ProjectReference Include="Orange.Win.csproj">
-      <Project>{6f0c1a51-492a-4e6e-b302-e212d441ebf3}</Project>
-      <Name>Orange.Win</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Actions\BuildGame.cs" />
@@ -93,7 +208,7 @@
     <Content Include="Orange.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>

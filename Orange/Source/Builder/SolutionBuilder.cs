@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using Orange.Source;
 using System.Linq;
+using Exception = Lime.Exception;
 
 namespace Orange
 {
@@ -73,10 +74,23 @@ namespace Orange
 			File.Copy(srcFile, dstFile, true);
 		}
 
+		private static void SynchronizeAll()
+		{
+			var limeProj = The.Workspace.GetLimeCsprojFilePath();
+			CsprojSynchronization.SynchronizeProject(limeProj);
+			var dontSynchronizeProject = The.Workspace.ProjectJson["DontSynchronizeProject"] as bool?;
+			if (dontSynchronizeProject != null && dontSynchronizeProject.Value) {
+				return;
+			}
+			foreach (var gameProj in The.Workspace.EnumerateGameCsprojFilePaths()) {
+				CsprojSynchronization.SynchronizeProject(gameProj);
+			}
+		}
+
 		public bool Build(StringBuilder output = null)
 		{
 			Console.WriteLine("------------- Building Application -------------");
-			CsprojSynchronization.SynchronizeAll();
+			SynchronizeAll();
 			var nugetResult = Nuget.Restore(projectDirectory);
 			if (nugetResult != 0) {
 				Console.WriteLine("NuGet exited with code: {0}", nugetResult);
@@ -119,7 +133,7 @@ namespace Orange
 				throw new NotImplementedException();
 			}
 #elif WIN
-			app = Path.Combine(projectDirectory, string.Format("bin/{0}", ConfigurationName), projectName + ".exe");
+			app = Path.Combine(projectDirectory, String.Format("bin/{0}", ConfigurationName), projectName + ".exe");
 #endif
 			return app;
 		}
@@ -168,8 +182,8 @@ namespace Orange
 		{
 			var directory = Path.Combine(projectDirectory, "bin", "iPhone", ConfigurationName);
 			// var directory = Path.Combine(Path.GetDirectoryName(The.Workspace.GetSolutionFilePath()), "bin", "iPhone", "Release");
-			var dirInfo = new System.IO.DirectoryInfo(directory);
-			var all = new List<System.IO.DirectoryInfo>(dirInfo.EnumerateDirectories("*.app"));
+			var dirInfo = new DirectoryInfo(directory);
+			var all = new List<DirectoryInfo>(dirInfo.EnumerateDirectories("*.app"));
 			all.Sort((a, b) => b.CreationTime.CompareTo(a.CreationTime));
 			if (all.Count > 0) {
 				var path = Path.Combine(directory, all[0].FullName);
@@ -190,17 +204,17 @@ namespace Orange
 			Console.WriteLine("------------------ Deploying ------------------");
 			Console.WriteLine("Uninstalling previous apk ({0})", packageName);
 
-			if (Process.Start(adb, string.Format("shell pm uninstall {0}", packageName)) == 0) {
+			if (Process.Start(adb, String.Format("shell pm uninstall {0}", packageName)) == 0) {
 				Console.WriteLine("Uninstalled!");
 			} else {
 				Console.WriteLine("Error during uninstalling. Probably application wasn't installed.");
 			}
 
 			Console.WriteLine("Installing apk {0}", apkPath);
-			if (Process.Start(adb, string.Format("install {0}", apkPath)) == 0) {
+			if (Process.Start(adb, String.Format("install {0}", apkPath)) == 0) {
 				Console.WriteLine("App installed.");
 				Console.WriteLine("Starting application.");
-				Process.Start(adb, string.Format("shell monkey -p {0} -c android.intent.category.LAUNCHER 1", packageName));
+				Process.Start(adb, String.Format("shell monkey -p {0} -c android.intent.category.LAUNCHER 1", packageName));
 			} else {
 				Console.WriteLine("Error during installing.");
 			}
@@ -213,7 +227,7 @@ namespace Orange
 
 			if (androidSdk == null) {
 #if WIN
-				var appData = System.Environment.ExpandEnvironmentVariables("%LOCALAPPDATA%");
+				var appData = Environment.ExpandEnvironmentVariables("%LOCALAPPDATA%");
 				androidSdk = Path.Combine(appData, "Android", "android-sdk");
 				executable = Path.Combine(androidSdk, "platform-tools", "adb.exe");
 #elif MAC
@@ -222,7 +236,7 @@ namespace Orange
 			}
 
 			if (!File.Exists(executable))
-				throw new Lime.Exception("ADB not found. You can specify sdk location with" +
+				throw new Exception("ADB not found. You can specify sdk location with" +
 										 "--android-sdk argument. Used sdk path: {0}. ", androidSdk);
 			return executable;
 		}

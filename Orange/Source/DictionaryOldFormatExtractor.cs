@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if ORANGE_GUI
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -202,7 +203,7 @@ namespace Orange
 		{
 			currentSource = file;
 			var originalCode = File.ReadAllText(file, Encoding.Default);
-			var processedCode = Regex.Replace(originalCode, @"^(\s*Text)\s""([^""\\]*(?:\\.[^""\\]*)*)""$", 
+			var processedCode = Regex.Replace(originalCode, @"^(\s*Text)\s""([^""\\]*(?:\\.[^""\\]*)*)""$",
 				(match) => {
 					string prefix = match.Groups[1].Value;
 					string text = match.Groups[2].Value;
@@ -250,7 +251,7 @@ namespace Orange
 				}
 			} else if (processStringsWithoutBrackets) {
 				if (HasAlphabeticCharacters(text)) {
-					// The line has no [] prefix, but still should be localized. 
+					// The line has no [] prefix, but still should be localized.
 					// E.g. most of texts in scene files.
 					var key = GenerateTagForText(Unescape(text));
 					if (AddTextToDictionary(key, Unescape(text))) {
@@ -302,7 +303,7 @@ namespace Orange
 			return text.Replace("\\n", "\n").Replace("\\\"", "\"").Replace("\\'", "'");
 		}
 
-		// Try to look up the value in the dictionary, and if success return an existing key, 
+		// Try to look up the value in the dictionary, and if success return an existing key,
 		// else generate a new one
 		private static string GenerateTagForText(string text)
 		{
@@ -324,3 +325,4 @@ namespace Orange
 		}
 	}
 }
+#endif // ORANGE_GUI

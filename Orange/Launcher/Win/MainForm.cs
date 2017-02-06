@@ -6,9 +6,11 @@ namespace Launcher
 	internal partial class MainForm : Form
 	{
 		private readonly LoggingForm loggingForm = new LoggingForm();
+		public readonly LogWriter LogWriter;
 
 		public MainForm()
 		{
+			LogWriter = new LogWriter(loggingForm);
 			InitializeComponent();
 		}
 

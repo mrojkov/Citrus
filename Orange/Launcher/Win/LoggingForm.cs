@@ -19,11 +19,11 @@ namespace Launcher
 		public void SetBuildStatus(string status)
 		{
 			InvokeIfRequired(arg => Status.Text = arg, status);
-		} 
+		}
 
 		public void Log(string line)
 		{
-			InvokeIfRequired(arg => TextBox.Text += arg + Environment.NewLine, line);
+			InvokeIfRequired(arg => TextBox.Text += arg, line);
 		}
 
 		private void InvokeIfRequired(Action<string> action, string arg)

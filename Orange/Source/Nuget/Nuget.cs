@@ -9,7 +9,9 @@ namespace Orange
 	internal static class Nuget
 	{
 		private static readonly string nugetPath;
+#if MAC
 		private static readonly string monoPath;
+#endif
 
 		static Nuget()
 		{

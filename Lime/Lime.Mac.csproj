@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -277,6 +277,7 @@
     <Compile Include="Source\Widgets\3D\Model3D.cs" />
     <Compile Include="Source\Widgets\3D\CommonMaterial.cs" />
     <Compile Include="Source\Widgets\3D\CommonMaterialProgram.cs" />
+    <Compile Include="Source\Application\MessageBox.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
@@ -326,7 +327,6 @@
     <Compile Include="Source\Widgets\Polyline.cs" />
     <Compile Include="Source\StringExtensions.cs" />
     <Compile Include="Source\Application\Logger.cs" />
-    <Compile Include="Source\Application\WinApi.cs" />
     <Compile Include="Source\AssetsBundle\AssetsBundle.cs" />
     <Compile Include="Source\AssetsBundle\PackedAssetsBundle.cs" />
     <Compile Include="Source\AssetsBundle\UnpackedAssetsBundle.cs" />

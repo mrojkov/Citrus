@@ -1,3 +1,4 @@
+#if ORANGE_GUI
 namespace Orange
 {
 	public partial class MainWindow
@@ -28,3 +29,4 @@ namespace Orange
 		}
 	}
 }
+#endif // ORANGE_GUI

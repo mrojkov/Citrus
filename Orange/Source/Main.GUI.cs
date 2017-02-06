@@ -1,3 +1,4 @@
+#if ORANGE_GUI
 using System;
 
 namespace Orange
@@ -15,3 +16,4 @@ namespace Orange
 		}
 	}
 }
+#endif // ORANGE_GUI

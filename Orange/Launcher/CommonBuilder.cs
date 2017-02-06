@@ -12,12 +12,11 @@ namespace Launcher
 
 		public string SolutionPath;
 		public string ExecutablePath;
-		public Action<string> LoggingAction;
-		
+
 		public event Action<string> OnBuildStatusChange;
 		public event Action OnBuildFail;
 		public event Action OnBuildSuccess;
-		
+
 		private void RunExecutable()
 		{
 			var process = new Process {
@@ -28,14 +27,36 @@ namespace Launcher
 			process.Start();
 		}
 
+		private void SynchronizeAllProjects()
+		{
+			var citrus = CalcCitrusDirectory();
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrus}/Yuzu/Yuzu.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrus}/Yuzu/Yuzu.Mac.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrus}/Lime/Lime.Win.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrus}/Lime/Lime.Mac.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrus}/Lime/Lime.MonoMac.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrus}/Orange/Orange.Win.CLI.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrus}/Orange/Orange.Mac.CLI.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrus}/Orange/Orange.Win.GUI.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrus}/Orange/Orange.Mac.GUI.csproj");
+		}
+
 		public Task Start(bool runExecutable)
 		{
-			var task = new Task(() => BuildAndRun(runExecutable));
+			var task = new Task(() => {
+				try {
+					SynchronizeAllProjects();
+					BuildAndRun(runExecutable);
+				} catch (Exception e) {
+					Console.WriteLine(e.Message);
+					OnBuildFail?.Invoke();
+				}
+			});
 			task.Start();
 			return task;
 		}
 
-		private void BuildAndRun(bool runExecutable)
+		private string CalcCitrusDirectory()
 		{
 			var currentDirectory = new DirectoryInfo(Environment.CurrentDirectory);
 			while (currentDirectory.GetDirectories().All(d => d.Name != "Orange")) {
@@ -44,7 +65,12 @@ namespace Launcher
 				}
 				currentDirectory = currentDirectory.Parent;
 			}
-			var citrusDirectory = currentDirectory.FullName;
+			return currentDirectory.FullName;
+		}
+
+		private void BuildAndRun(bool runExecutable)
+		{
+			var citrusDirectory = CalcCitrusDirectory();
 			Environment.CurrentDirectory = Path.Combine(citrusDirectory, "Orange");
 			ClearObjFolder(citrusDirectory);
 			OnBuildStatusChange?.Invoke("Building");
@@ -56,8 +82,9 @@ namespace Launcher
 				OnBuildSuccess?.Invoke();
 			}
 			else {
-				if (!areFailedDetailsSet)
+				if (!areFailedDetailsSet) {
 					SetFailedBuildStatus("Send this text to our developers.");
+				}
 				OnBuildFail?.Invoke();
 			}
 		}
@@ -99,7 +126,7 @@ namespace Launcher
 		{
 			lock (this) {
 				if (args.Data != null) {
-					LoggingAction(args.Data);
+					Console.WriteLine(args.Data);
 				}
 			}
 		}
@@ -113,7 +140,7 @@ namespace Launcher
 			OnBuildStatusChange?.Invoke($"Build failed. {details}");
 			areFailedDetailsSet = true;
 		}
-		
+
 		protected abstract string DefaultSolutionPath { get; }
 		protected abstract string DefaultExecutablePath { get; }
 		protected abstract string BuilderPath { get; }

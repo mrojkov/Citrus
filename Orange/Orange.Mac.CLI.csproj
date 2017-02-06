@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -39,6 +39,67 @@
     <Compile Include="Source\Main.CLI.cs" />
     <Compile Include="Source\Actions\BuildGame.cs" />
     <Compile Include="Source\UI\ConsoleUI.cs" />
+    <Compile Include="Source\AssemblyInfo.cs" />
+    <Compile Include="Source\DictionaryExtractor.cs" />
+    <Compile Include="Source\DictionaryExtractorWindow.cs" />
+    <Compile Include="Source\DictionaryOldFormatExtractor.cs" />
+    <Compile Include="Source\Main.GUI.cs" />
+    <Compile Include="Source\MenuController.cs" />
+    <Compile Include="Source\SubTarget.cs" />
+    <Compile Include="Source\TargetPlatform.cs" />
+    <Compile Include="Source\The.cs" />
+    <Compile Include="Source\Workspace.cs" />
+    <Compile Include="Source\WorkspaceConfig.cs" />
+    <Compile Include="Source\Actions\AnalyzeResources.cs" />
+    <Compile Include="Source\Actions\BuildGameAndRun.cs" />
+    <Compile Include="Source\Actions\ConvertAssetsToTangerine.cs" />
+    <Compile Include="Source\Actions\ConvertDictionaryToNewFormat.cs" />
+    <Compile Include="Source\Actions\CookGameAssets.cs" />
+    <Compile Include="Source\Actions\ExtractTangerineScenes.cs" />
+    <Compile Include="Source\Actions\GenerateAppDeserializers.cs" />
+    <Compile Include="Source\Actions\GenerateLimeDeserializers.cs" />
+    <Compile Include="Source\Actions\RebuildGame.cs" />
+    <Compile Include="Source\Actions\RevealCookedAssets.cs" />
+    <Compile Include="Source\Actions\RunTangerine.cs" />
+    <Compile Include="Source\Actions\UpdateDictionaryTxt.cs" />
+    <Compile Include="Source\Actions\UpdateDictionaryTxtOldFormat.cs" />
+    <Compile Include="Source\Actions\UpdateXCodeProject.cs" />
+    <Compile Include="Source\AssetCooker\AssetCooker.cs" />
+    <Compile Include="Source\AssetCooker\AssetsUnpacker.cs" />
+    <Compile Include="Source\AssetCooker\CookingRulesBuilder.cs" />
+    <Compile Include="Source\AssetCooker\OpacityMaskCreator.cs" />
+    <Compile Include="Source\AssetCooker\RectAllocator.cs" />
+    <Compile Include="Source\AssetCooker\TextureConverter.cs" />
+    <Compile Include="Source\AssetCooker\TextureConverterUtils.cs" />
+    <Compile Include="Source\AssetCooker\UnityAssetBundle.cs" />
+    <Compile Include="Source\AssetCooker\WaveIMA4Converter.cs" />
+    <Compile Include="Source\Builder\BuildSystem.cs" />
+    <Compile Include="Source\Builder\MDTool.cs" />
+    <Compile Include="Source\Builder\MSBuild.cs" />
+    <Compile Include="Source\Builder\SolutionBuilder.cs" />
+    <Compile Include="Source\CsprojSynchronization\CsprojSynchronization.cs" />
+    <Compile Include="Source\HotStudioImport\HotAnimators.cs" />
+    <Compile Include="Source\HotStudioImport\HotFontImporter.cs" />
+    <Compile Include="Source\HotStudioImport\HotLexer.cs" />
+    <Compile Include="Source\HotStudioImport\HotSceneImporter.cs" />
+    <Compile Include="Source\ModelImport\KeyframeReducer.cs" />
+    <Compile Include="Source\ModelImport\ModelImporter.cs" />
+    <Compile Include="Source\Nuget\Nuget.cs" />
+    <Compile Include="Source\Plugins\IPluginUIBuilder.cs" />
+    <Compile Include="Source\Plugins\PluginLoader.cs" />
+    <Compile Include="Source\Toolbox\DirectoryChanger.cs" />
+    <Compile Include="Source\Toolbox\EmbeddedResource.cs" />
+    <Compile Include="Source\Toolbox\FileEnumerator.cs" />
+    <Compile Include="Source\Toolbox\FontBuilder.cs" />
+    <Compile Include="Source\Toolbox\Json.cs" />
+    <Compile Include="Source\Toolbox\Process.cs" />
+    <Compile Include="Source\Toolbox\Subversion.cs" />
+    <Compile Include="Source\Toolbox\Toolbox.cs" />
+    <Compile Include="Source\UI\MainWindow.cs" />
+    <Compile Include="Source\UI\MainWindow.PluginUI.cs" />
+    <Compile Include="Source\UI\MainWindow.UI.cs" />
+    <Compile Include="Source\UI\PluginUIBuilder.cs" />
+    <Compile Include="Source\UI\UserInterface.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.MonoMac.csproj">

@@ -60,7 +60,35 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Launcher.Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Launcher.Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;WIN</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Launcher.Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Launcher.Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;WIN</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <LangVersion>6</LangVersion>
+  </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\Source\CsprojSynchronization\CsprojSynchronization.cs">
+      <Link>CsprojSynchronization.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Toolbox\DirectoryChanger.cs">
+      <Link>DirectoryChanger.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Toolbox\FileEnumerator.cs">
+      <Link>FileEnumerator.cs</Link>
+    </Compile>
     <Compile Include="CommandLineArguments.cs" />
     <Compile Include="Win\Builder.cs" />
     <Compile Include="CommonBuilder.cs" />
@@ -71,6 +99,7 @@
       <DependentUpon>LoggingForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Main.cs" />
+    <Compile Include="Win\LogWriter.cs" />
     <Compile Include="Win\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -87,6 +116,7 @@
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Win\LoggingForm.resx">

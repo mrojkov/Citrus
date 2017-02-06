@@ -36,7 +36,7 @@ namespace Orange
 				if (file.Contains(".svn"))
 					continue;
 				file = file.Remove(0, dirInfo.FullName.Length + 1);
-				file = Lime.AssetPath.CorrectSlashes(file);
+				file = CsprojSynchronization.ToUnixSlashes(file);
 				files.Add(new FileInfo { Path = file, LastWriteTime = fileInfo.LastWriteTime });
 			}
 		}

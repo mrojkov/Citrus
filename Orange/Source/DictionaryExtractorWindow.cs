@@ -1,3 +1,4 @@
+#if ORANGE_GUI
 using System;
 using System.IO;
 using Gtk;
@@ -129,7 +130,7 @@ namespace Orange
 		Widget CreateFooterSection()
 		{
 			var hbox = new HBox();
-			
+
 			// GoButton section
 			GoButton = new Button() { WidthRequest = 80, Label = "Go" };
 			hbox.PackEnd(GoButton, expand: false, fill: true, padding: 0);
@@ -137,3 +138,4 @@ namespace Orange
 		}
 	}
 }
+#endif // ORANGE_GUI

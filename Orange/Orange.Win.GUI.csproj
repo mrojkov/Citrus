@@ -19,18 +19,20 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Win\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;ORANGE_GUI</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Win\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;ORANGE_GUI</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
@@ -41,6 +43,38 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Win\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;WIN;ORANGE_GUI</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\Win\Release\</OutputPath>
+    <DefineConstants>TRACE;WIN;ORANGE_GUI</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Launcher.Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Launcher.Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Launcher.Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Launcher.Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
@@ -48,28 +82,81 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>bin\Win\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>true</Prefer32Bit>
-  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AssimpNet">
+      <HintPath>..\3rdParty\AssimpNet\AssimpNet.dll</HintPath>
+    </Reference>
     <Reference Include="atk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f, processorArchitecture=MSIL" />
     <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f, processorArchitecture=MSIL" />
     <Reference Include="glib-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f, processorArchitecture=MSIL" />
     <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f, processorArchitecture=MSIL" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\3rdParty\Newtonsoft.Json\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="pango-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
+    <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <Compile Include="Source\AssemblyInfo.cs" />
+    <Compile Include="Source\DictionaryExtractor.cs" />
+    <Compile Include="Source\Main.CLI.cs" />
+    <Compile Include="Source\MenuController.cs" />
+    <Compile Include="Source\SubTarget.cs" />
+    <Compile Include="Source\TargetPlatform.cs" />
+    <Compile Include="Source\The.cs" />
+    <Compile Include="Source\Workspace.cs" />
+    <Compile Include="Source\WorkspaceConfig.cs" />
+    <Compile Include="Source\Actions\AnalyzeResources.cs" />
+    <Compile Include="Source\Actions\BuildGame.cs" />
+    <Compile Include="Source\Actions\BuildGameAndRun.cs" />
+    <Compile Include="Source\Actions\ConvertAssetsToTangerine.cs" />
+    <Compile Include="Source\Actions\ConvertDictionaryToNewFormat.cs" />
+    <Compile Include="Source\Actions\CookGameAssets.cs" />
+    <Compile Include="Source\Actions\ExtractTangerineScenes.cs" />
+    <Compile Include="Source\Actions\GenerateAppDeserializers.cs" />
+    <Compile Include="Source\Actions\GenerateLimeDeserializers.cs" />
+    <Compile Include="Source\Actions\RebuildGame.cs" />
+    <Compile Include="Source\Actions\RevealCookedAssets.cs" />
+    <Compile Include="Source\Actions\RunTangerine.cs" />
+    <Compile Include="Source\Actions\UpdateDictionaryTxt.cs" />
+    <Compile Include="Source\Actions\UpdateXCodeProject.cs" />
+    <Compile Include="Source\AssetCooker\AssetCooker.cs" />
+    <Compile Include="Source\AssetCooker\AssetsUnpacker.cs" />
+    <Compile Include="Source\AssetCooker\CookingRulesBuilder.cs" />
+    <Compile Include="Source\AssetCooker\OpacityMaskCreator.cs" />
+    <Compile Include="Source\AssetCooker\RectAllocator.cs" />
+    <Compile Include="Source\AssetCooker\TextureConverter.cs" />
+    <Compile Include="Source\AssetCooker\TextureConverterUtils.cs" />
+    <Compile Include="Source\AssetCooker\UnityAssetBundle.cs" />
+    <Compile Include="Source\AssetCooker\WaveIMA4Converter.cs" />
+    <Compile Include="Source\Builder\BuildSystem.cs" />
+    <Compile Include="Source\Builder\MDTool.cs" />
+    <Compile Include="Source\Builder\MSBuild.cs" />
+    <Compile Include="Source\Builder\SolutionBuilder.cs" />
+    <Compile Include="Source\CsprojSynchronization\CsprojSynchronization.cs" />
+    <Compile Include="Source\HotStudioImport\HotAnimators.cs" />
+    <Compile Include="Source\HotStudioImport\HotFontImporter.cs" />
+    <Compile Include="Source\HotStudioImport\HotLexer.cs" />
+    <Compile Include="Source\HotStudioImport\HotSceneImporter.cs" />
+    <Compile Include="Source\ModelImport\KeyframeReducer.cs" />
+    <Compile Include="Source\ModelImport\ModelImporter.cs" />
+    <Compile Include="Source\Nuget\Nuget.cs" />
+    <Compile Include="Source\Plugins\IPluginUIBuilder.cs" />
+    <Compile Include="Source\Plugins\PluginLoader.cs" />
+    <Compile Include="Source\Toolbox\DirectoryChanger.cs" />
+    <Compile Include="Source\Toolbox\EmbeddedResource.cs" />
+    <Compile Include="Source\Toolbox\FileEnumerator.cs" />
+    <Compile Include="Source\Toolbox\FontBuilder.cs" />
+    <Compile Include="Source\Toolbox\Json.cs" />
+    <Compile Include="Source\Toolbox\Process.cs" />
+    <Compile Include="Source\Toolbox\Subversion.cs" />
+    <Compile Include="Source\Toolbox\Toolbox.cs" />
+    <Compile Include="Source\UI\ConsoleUI.cs" />
+    <Compile Include="Source\UI\UserInterface.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
@@ -86,10 +173,6 @@
     <ProjectReference Include="..\Yuzu\Yuzu.csproj">
       <Project>{ddd2dfe9-ced2-4cea-adf0-5a6865865a46}</Project>
       <Name>Yuzu</Name>
-    </ProjectReference>
-    <ProjectReference Include="Orange.Win.csproj">
-      <Project>{6f0c1a51-492a-4e6e-b302-e212d441ebf3}</Project>
-      <Name>Orange.Win</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

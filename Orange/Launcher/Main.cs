@@ -1,4 +1,6 @@
 using System;
+using System.IO;
+using System.Threading.Tasks;
 #if WIN
 using System.Windows.Forms;
 #elif MAC
@@ -54,14 +56,14 @@ namespace Launcher
 		private static void StartUIMode(string[] args)
 		{
 			var mainForm = new MainForm();
-			builder.LoggingAction = mainForm.Log;
 			builder.OnBuildStatusChange += mainForm.SetBuildStatus;
 			builder.OnBuildFail += mainForm.ShowLog;
 			builder.OnBuildSuccess += Application.Exit;
-			mainForm.Show();
+			Console.SetOut(mainForm.LogWriter);
+			Console.SetError(mainForm.LogWriter);
 			builder.Start(RunExecutable);
+			mainForm.Show();
 			Application.Run();
-
 		}
 #elif MAC
 		private static void StartUIMode(string[] args)
@@ -75,11 +77,9 @@ namespace Launcher
 
 		private static void StartConsoleMode()
 		{
-			builder.LoggingAction = Console.WriteLine;
 			builder.OnBuildStatusChange += Console.WriteLine;
 			builder.OnBuildFail += () => Environment.Exit(1);
-			var task = builder.Start(RunExecutable);
-			task.Wait();
+			builder.Start(RunExecutable);
 		}
 	}
 }

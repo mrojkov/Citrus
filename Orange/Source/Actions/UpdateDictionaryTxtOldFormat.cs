@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.Composition;
+﻿#if ORANGE_GUI
+using System.ComponentModel.Composition;
 
 namespace Orange
 {
@@ -13,3 +14,4 @@ namespace Orange
 		}
 	}
 }
+#endif // ORANGE_GUI

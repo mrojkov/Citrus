@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if false
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -83,7 +84,7 @@ namespace Orange
 					Height = Height,
 					TextureIndex = font.Textures.Count,
 					ACWidths = new Vector2(
-						bearingX.Round(), 
+						bearingX.Round(),
 						((float)face.Glyph.Metrics.HorizontalAdvance - (float)face.Glyph.Metrics.Width - bearingX).Round()
 					),
 					UV0 = uv0,
@@ -141,3 +142,4 @@ namespace Orange
 	}
 
 }
+#endif
