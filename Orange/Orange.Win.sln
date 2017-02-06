@@ -11,9 +11,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yuzu", "..\Yuzu\Yuzu.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orange.Win", "Orange.Win.csproj", "{6F0C1A51-492A-4E6E-B302-E212D441EBF3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orange.Win.CLI", "Source.CLI\Orange.Win.CLI.csproj", "{459FF536-CCBA-4A0A-AA24-09D41E2FAF54}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orange.Win.CLI", "Orange.CLI\Orange.Win.CLI.csproj", "{459FF536-CCBA-4A0A-AA24-09D41E2FAF54}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orange.Win.GUI", "Source.GUI\Orange.Win.GUI.csproj", "{D95BDCE1-EA8F-4544-AFCE-E72C01A1D3A0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orange.Win.GUI", "Orange.GUI\Orange.Win.GUI.csproj", "{D95BDCE1-EA8F-4544-AFCE-E72C01A1D3A0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

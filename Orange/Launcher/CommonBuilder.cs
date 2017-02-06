@@ -35,10 +35,10 @@ namespace Launcher
 			Orange.CsprojSynchronization.SynchronizeProject($"{citrus}/Lime/Lime.Win.csproj");
 			Orange.CsprojSynchronization.SynchronizeProject($"{citrus}/Lime/Lime.Mac.csproj");
 			Orange.CsprojSynchronization.SynchronizeProject($"{citrus}/Lime/Lime.MonoMac.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrus}/Orange/Orange.Win.CLI.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrus}/Orange/Orange.Mac.CLI.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrus}/Orange/Orange.Win.GUI.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrus}/Orange/Orange.Mac.GUI.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrus}/Orange/Orange.CLI/Orange.Win.CLI.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrus}/Orange/Orange.CLI/Orange.Mac.CLI.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrus}/Orange/Orange.GUI/Orange.Win.GUI.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrus}/Orange/Orange.GUI/Orange.Mac.GUI.csproj");
 		}
 
 		public Task Start(bool runExecutable)
