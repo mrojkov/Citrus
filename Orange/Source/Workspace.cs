@@ -19,6 +19,7 @@ namespace Orange
 		public List<SubTarget> SubTargets { get; private set; }
 
 		private string dataFolderName;
+		private string pluginName;
 
 		public string GetPlatformSuffix()
 		{
@@ -136,7 +137,11 @@ namespace Orange
 				if (!Directory.Exists(AssetsDirectory)) {
 					throw new Lime.Exception("Assets folder '{0}' doesn't exist", AssetsDirectory);
 				}
-				PluginLoader.ScanForPlugins(file);
+				if (!string.IsNullOrWhiteSpace(pluginName)) {
+					PluginLoader.ScanForPlugins(Path.Combine(Path.GetDirectoryName(file), pluginName));
+				} else {
+					PluginLoader.ScanForPlugins(file);
+				}
 				AssetFiles = new FileEnumerator(AssetsDirectory);
 				The.UI.OnWorkspaceOpened();
 			}
@@ -153,14 +158,15 @@ namespace Orange
 			Target = ProjectJson.GetValue("Target", "");
 			SubTargets = new List<SubTarget>();
 			dataFolderName = ProjectJson.GetValue("DataFolderName", "Data");
-			
+			pluginName = ProjectJson.GetValue("Plugin", "");
+
 			foreach (var target in ProjectJson.GetArray("SubTargets", new Dictionary<string, object>[0])) {
 				var cleanBeforeBuild = false;
 				if (target.ContainsKey("CleanBeforeBuild")) {
 					cleanBeforeBuild = (bool)target["CleanBeforeBuild"];
 				}
 
-				SubTargets.Add(new SubTarget(target["Name"] as string, target["Project"] as string, 
+				SubTargets.Add(new SubTarget(target["Name"] as string, target["Project"] as string,
 											 cleanBeforeBuild, GetPlaformByName(target["Platform"] as string)));
 			}
 		}
