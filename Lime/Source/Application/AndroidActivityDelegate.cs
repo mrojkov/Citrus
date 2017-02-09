@@ -79,10 +79,6 @@ namespace Lime
 			if (Created != null) {
 				Created(Activity, bundle);
 			}
-
-			Activity.Window.Attributes.Flags |=
-				Android.Views.WindowManagerFlags.LayoutInScreen |
-				Android.Views.WindowManagerFlags.LayoutNoLimits;
 		}
 
 		private void RemoveGameViewFromParent()
