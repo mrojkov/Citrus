@@ -33,7 +33,7 @@ namespace Lime
 
 		public bool Equals(Matrix32 rhs)
 		{
-			return U.Equals(rhs.U) && V.Equals(rhs.V) && T.Equals(rhs.T);
+			return U.X == rhs.U.X && U.Y == rhs.U.Y && V.X == rhs.V.X && V.Y == rhs.V.Y && T.X == rhs.T.X && T.Y == rhs.T.Y;
 		}
 
 		public float CalcDeterminant()
