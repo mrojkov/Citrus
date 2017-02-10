@@ -23,6 +23,7 @@ namespace Lime
 
 		public void Add(IGLObject item)
 		{
+#if Android			
 			lock (items) {
 				foreach (var i in items) {
 					if (!i.IsAlive) {
@@ -32,6 +33,7 @@ namespace Lime
 				}
 				items.Add(new WeakReference(item));
 			}
+#endif
 		}
 
 		public void DiscardObjects()
