@@ -239,6 +239,9 @@ namespace Lime
 			set { DefaultAnimation.Time = value; }
 		}
 
+
+		private Animation defaultAnimation;
+
 		/// <summary>
 		/// Returns first animation in animation list
 		/// (or creates an empty animation if list is empty).
@@ -247,10 +250,13 @@ namespace Lime
 		{
 			get
 			{
-				if (Animations.Count == 0) {
-					Animations.Add(new Animation());
+				if (defaultAnimation == null) {
+					if (Animations.Count == 0) {
+						Animations.Add(new Animation());
+					}
+					defaultAnimation = Animations[0];
 				}
-				return Animations[0];
+				return defaultAnimation;
 			}
 		}
 
@@ -425,6 +431,7 @@ namespace Lime
 			clone.Parent = null;
 			clone.NextSibling = null;
 			clone.AsWidget = clone as Widget;
+			clone.defaultAnimation = null;
 			clone.Animations = Animations.Clone(clone);
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
 			clone.Nodes = Nodes.Clone(clone);
