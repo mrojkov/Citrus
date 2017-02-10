@@ -29,7 +29,7 @@
     <CodeSigningKey>Mac Developer</CodeSigningKey>
     <EnableCodeSigning>false</EnableCodeSigning>
     <EnablePackageSigning>false</EnablePackageSigning>
-    <XamMacArch>x86_64</XamMacArch>
+    <XamMacArch>i386</XamMacArch>
     <HttpClientHandler>NSUrlSessionHandler</HttpClientHandler>
     <LinkMode>SdkOnly</LinkMode>
     <TlsProvider>Default</TlsProvider>

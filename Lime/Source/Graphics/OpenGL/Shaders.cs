@@ -7,53 +7,95 @@ using System.Text;
 namespace Lime
 {
 	[Flags]
-	public enum ShaderFlags
+	public enum ShaderOptions
 	{
 		None = 0,
 		UseAlphaTexture1 = 1,
 		UseAlphaTexture2 = 2,
 		PremultiplyAlpha = 4,
 		VertexAnimation = 8,
-		Count = 4
+		Count = 4,
 	}
-
+	
 	public class ShaderPrograms
 	{
-		class MultiShaderProgram
+		public static class Attributes
+		{
+			public const int Pos1 = 0;
+			public const int Color1 = 1;
+
+			public const int UV1 = 2;
+			public const int UV2 = 3;
+			public const int UV3 = 4;
+			public const int UV4 = 5;
+			public const int BlendIndices = 6;
+			public const int BlendWeights = 7;
+
+			public const int Pos2 = 8;
+			public const int Color2 = 9;
+
+			public static IEnumerable<ShaderProgram.AttribLocation> GetLocations()
+			{
+				return new ShaderProgram.AttribLocation[] {
+					new ShaderProgram.AttribLocation { Index = Pos1, Name = "inPos" },
+					new ShaderProgram.AttribLocation { Index = Color1, Name = "inColor" },
+					new ShaderProgram.AttribLocation { Index = UV1, Name = "inTexCoords1" },
+					new ShaderProgram.AttribLocation { Index = UV2, Name = "inTexCoords2" },
+					new ShaderProgram.AttribLocation { Index = UV3, Name = "inTexCoords3" },
+					new ShaderProgram.AttribLocation { Index = UV4, Name = "inTexCoords4" },
+					new ShaderProgram.AttribLocation { Index = BlendIndices, Name = "inBlendIndices" },
+					new ShaderProgram.AttribLocation { Index = BlendWeights, Name = "inBlendWeights" },
+					new ShaderProgram.AttribLocation { Index = Pos2, Name = "inPos2" },
+					new ShaderProgram.AttribLocation { Index = Color2, Name = "inColor2" },
+				};
+			}
+		}
+
+		class CustomShaderProgram
 		{
 			private ShaderProgram[] programs;
+			private string vertexShader;
+			private string fragmentShader;
+			private IEnumerable<ShaderProgram.AttribLocation> attribLocations;
+			private IEnumerable<ShaderProgram.Sampler> samplers;
 
-			public MultiShaderProgram(string vertexShader, string fragmentShader, IEnumerable<ShaderProgram.AttribLocation> attribLocations, IEnumerable<ShaderProgram.Sampler> samplers, ShaderFlags mask)
+			public CustomShaderProgram(string vertexShader, string fragmentShader, IEnumerable<ShaderProgram.AttribLocation> attribLocations, IEnumerable<ShaderProgram.Sampler> samplers)
 			{
-				var maxEntries = 1 << (int)ShaderFlags.Count;
-				programs = new ShaderProgram[maxEntries];
-				for (int i = 0; i < maxEntries; i++) {
-					if ((i & (int)mask) == i) {
-						programs[i] = new ShaderProgram(
-							new Shader[] { 
-								new VertexShader(AddHeaderWithDefines((ShaderFlags)i, vertexShader)), 
-								new FragmentShader(AddHeaderWithDefines((ShaderFlags)i, fragmentShader))
-							},
-							attribLocations, samplers);
-					}
-				}
+				this.vertexShader = vertexShader;
+				this.fragmentShader = fragmentShader;
+				this.attribLocations = attribLocations;
+				this.samplers = samplers;
+				this.programs = new ShaderProgram[1 << (int)ShaderOptions.Count];
 			}
 
-			private string AddHeaderWithDefines(ShaderFlags shaderFlags, string shader)
+			public ShaderProgram GetProgram(ShaderOptions options)
 			{
-				for (int i = 0; i < (int)ShaderFlags.Count; i++) {
-					int bit = 1 << i;
-					if (((int)shaderFlags & bit) != 0) {
-						var name = Enum.GetName(typeof(ShaderFlags), (ShaderFlags)bit);
-						shader = "#define " + name + "\n" + shader;
-					}
+				var program = programs[(int)options];
+				if (program == null) {
+					var preamble = CreateShaderPreamble(options);
+					programs[(int)options] = program = new ShaderProgram(
+						new Shader[] { 
+							new VertexShader(preamble + vertexShader), 
+							new FragmentShader(preamble + fragmentShader)
+						},
+						attribLocations, samplers);
 				}
-				return shader;
+				return program;
 			}
-
-			public ShaderProgram GetProgram(ShaderFlags flags)
+			
+			private string CreateShaderPreamble(ShaderOptions options)
 			{
-				return programs[(int)flags];
+				string result = "";
+				int bit = 1;
+				while (options != ShaderOptions.None) {
+					if (((int)options & 1) == 1) {
+						var name = Enum.GetName(typeof(ShaderOptions), (ShaderOptions)bit);
+						result += "#define " + name + "\n";
+					}
+					bit <<= 1;
+					options = (ShaderOptions)((int)options >> 1);
+				}
+				return result;
 			}
 		}
 
@@ -61,24 +103,20 @@ namespace Lime
 
 		private ShaderPrograms()
 		{
-			var flags = ShaderFlags.VertexAnimation;
-			colorOnlyBlendingProgram = CreateShaderProgram(oneTextureVertexShader, colorOnlyFragmentShader, flags);
-			oneTextureBlengingProgram = CreateShaderProgram(oneTextureVertexShader, oneTextureFragmentShader,
-				ShaderFlags.UseAlphaTexture1 | ShaderFlags.PremultiplyAlpha | flags);
-			twoTexturesBlengingProgram = CreateShaderProgram(twoTexturesVertexShader, twoTexturesFragmentShader,
-				ShaderFlags.UseAlphaTexture1 | ShaderFlags.UseAlphaTexture2 | ShaderFlags.PremultiplyAlpha | flags);
-			silhuetteBlendingProgram = CreateShaderProgram(oneTextureVertexShader, silhouetteFragmentShader,
-				ShaderFlags.UseAlphaTexture1 | flags);
-			twoTexturesSilhuetteBlendingProgram = CreateShaderProgram(twoTexturesVertexShader, twoTexturesSilhouetteFragmentShader, ShaderFlags.UseAlphaTexture1 | ShaderFlags.UseAlphaTexture2 | flags);
-			inversedSilhuetteBlendingProgram = CreateShaderProgram(oneTextureVertexShader, inversedSilhouetteFragmentShader, ShaderFlags.UseAlphaTexture1 | flags);
+			colorOnlyBlendingProgram = CreateShaderProgram(oneTextureVertexShader, colorOnlyFragmentShader);
+			oneTextureBlengingProgram = CreateShaderProgram(oneTextureVertexShader, oneTextureFragmentShader);
+			twoTexturesBlengingProgram = CreateShaderProgram(twoTexturesVertexShader, twoTexturesFragmentShader);
+			silhuetteBlendingProgram = CreateShaderProgram(oneTextureVertexShader, silhouetteFragmentShader);
+			twoTexturesSilhuetteBlendingProgram = CreateShaderProgram(twoTexturesVertexShader, twoTexturesSilhouetteFragmentShader);
+			inversedSilhuetteBlendingProgram = CreateShaderProgram(oneTextureVertexShader, inversedSilhouetteFragmentShader);
 		}
 
-		public ShaderProgram GetShaderProgram(ShaderId shader, int numTextures, ShaderFlags flags)
+		public ShaderProgram GetShaderProgram(ShaderId shader, int numTextures, ShaderOptions options)
 		{
-			return GetShaderProgram(shader, numTextures).GetProgram(flags);
+			return GetShaderProgram(shader, numTextures).GetProgram(options);
 		}
 
-		private MultiShaderProgram GetShaderProgram(ShaderId shader, int numTextures)
+		private CustomShaderProgram GetShaderProgram(ShaderId shader, int numTextures)
 		{
 			if (shader == ShaderId.Diffuse || shader == ShaderId.Inherited) {
 				if (numTextures == 1) {
@@ -107,12 +145,13 @@ namespace Lime
 			varying lowp vec4 color;
 			varying lowp vec2 texCoords;
 			uniform mat4 matProjection;
+			uniform mat4 globalTransform;
 			uniform vec4 globalColor;
 			uniform highp float morphKoeff;
 			void main()
 			{
 				$ifdef VertexAnimation
-					gl_Position = matProjection * vec4((1.0 - morphKoeff) * inPos + morphKoeff * inPos2);
+					gl_Position = matProjection * (globalTransform * vec4((1.0 - morphKoeff) * inPos + morphKoeff * inPos2));
 					color = ((1.0 - morphKoeff) * inColor + morphKoeff * inColor2) * globalColor;
 				$else
 					gl_Position = matProjection * inPos;
@@ -132,12 +171,13 @@ namespace Lime
 			varying lowp vec2 texCoords1;
 			varying lowp vec2 texCoords2;
 			uniform mat4 matProjection;
+			uniform mat4 globalTransform;
 			uniform vec4 globalColor;
 			uniform highp float morphKoeff;
 			void main()
 			{
 				$ifdef VertexAnimation
-					gl_Position = matProjection * vec4((1.0 - morphKoeff) * inPos + morphKoeff * inPos2);
+					gl_Position = matProjection * (globalTransform * vec4((1.0 - morphKoeff) * inPos + morphKoeff * inPos2));
 					color = ((1.0 - morphKoeff) * inColor + morphKoeff * inColor2) * globalColor;
 				$else
 					gl_Position = matProjection * inPos;
@@ -247,21 +287,19 @@ namespace Lime
 				gl_FragColor = color * vec4(1.0, 1.0, 1.0, a);
 			}";
 
-		private readonly MultiShaderProgram colorOnlyBlendingProgram;
-		private readonly MultiShaderProgram oneTextureBlengingProgram;
-		private readonly MultiShaderProgram twoTexturesBlengingProgram;
-		private readonly MultiShaderProgram silhuetteBlendingProgram;
-		private readonly MultiShaderProgram twoTexturesSilhuetteBlendingProgram;
-		private readonly MultiShaderProgram inversedSilhuetteBlendingProgram;
+		private readonly CustomShaderProgram colorOnlyBlendingProgram;
+		private readonly CustomShaderProgram oneTextureBlengingProgram;
+		private readonly CustomShaderProgram twoTexturesBlengingProgram;
+		private readonly CustomShaderProgram silhuetteBlendingProgram;
+		private readonly CustomShaderProgram twoTexturesSilhuetteBlendingProgram;
+		private readonly CustomShaderProgram inversedSilhuetteBlendingProgram;
 
-		private static MultiShaderProgram CreateShaderProgram(string vertexShader, string fragmentShader, ShaderFlags mask)
+		private static CustomShaderProgram CreateShaderProgram(string vertexShader, string fragmentShader)
 		{
 			// #ifdef - breaks Unity3D compiler
 			vertexShader = vertexShader.Replace('$', '#');
 			fragmentShader = fragmentShader.Replace('$', '#');
-			return new MultiShaderProgram(
-				vertexShader, fragmentShader, PlatformGeometryBuffer.Attributes.GetLocations(), 
-				GetSamplers(), mask);
+			return new CustomShaderProgram(vertexShader, fragmentShader, Attributes.GetLocations(), GetSamplers());
 		}
 
 		public static IEnumerable<ShaderProgram.Sampler> GetSamplers()

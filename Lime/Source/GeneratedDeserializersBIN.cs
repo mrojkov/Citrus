@@ -169,9 +169,9 @@ namespace GeneratedDeserializersBIN
 			return result;
 		}
 
-		private static object Make_Lime__BlendIndices(BinaryDeserializer d, ReaderClassDef def)
+		private static object Make_Lime__Mesh3D__BlendIndices(BinaryDeserializer d, ReaderClassDef def)
 		{
-			var result = new global::Lime.BlendIndices();
+			var result = new global::Lime.Mesh3D.BlendIndices();
 			result.Index0 = d.Reader.ReadByte();
 			result.Index1 = d.Reader.ReadByte();
 			result.Index2 = d.Reader.ReadByte();
@@ -179,9 +179,9 @@ namespace GeneratedDeserializersBIN
 			return result;
 		}
 
-		private static object Make_Lime__BlendWeights(BinaryDeserializer d, ReaderClassDef def)
+		private static object Make_Lime__Mesh3D__BlendWeights(BinaryDeserializer d, ReaderClassDef def)
 		{
-			var result = new global::Lime.BlendWeights();
+			var result = new global::Lime.Mesh3D.BlendWeights();
 			result.Weight0 = d.Reader.ReadSingle();
 			result.Weight1 = d.Reader.ReadSingle();
 			result.Weight2 = d.Reader.ReadSingle();
@@ -189,128 +189,129 @@ namespace GeneratedDeserializersBIN
 			return result;
 		}
 
-		private static void Read_Lime__GeometryBuffer(BinaryDeserializer d, ReaderClassDef def, object obj)
+		private static object Make_Lime__Mesh3D__Vertex(BinaryDeserializer d, ReaderClassDef def)
 		{
-			var result = (global::Lime.GeometryBuffer)obj;
+			var result = new global::Lime.Mesh3D.Vertex();
 			var dg = (BinaryDeserializerGen)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
-				result.BlendIndices = (global::Lime.BlendIndices[])null;
-				var tmp1 = d.Reader.ReadInt32();
-				if (tmp1 >= 0) {
-					var tmp2 = new global::Lime.BlendIndices[tmp1];
-					for(tmp1 = 0; tmp1 < tmp2.Length; ++tmp1) {
-						tmp2[tmp1] = (global::Lime.BlendIndices)dg.ReadStruct<global::Lime.BlendIndices>();
-					}
-					result.BlendIndices = tmp2;
-				}
+				result.Pos = (global::Lime.Vector3)dg.ReadStruct<global::Lime.Vector3>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.BlendWeights = (global::Lime.BlendWeights[])null;
-				var tmp3 = d.Reader.ReadInt32();
-				if (tmp3 >= 0) {
-					var tmp4 = new global::Lime.BlendWeights[tmp3];
-					for(tmp3 = 0; tmp3 < tmp4.Length; ++tmp3) {
-						tmp4[tmp3] = (global::Lime.BlendWeights)dg.ReadStruct<global::Lime.BlendWeights>();
-					}
-					result.BlendWeights = tmp4;
-				}
+				result.Color = (global::Lime.Color4)dg.ReadStruct<global::Lime.Color4>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
-				result.Colors = (global::Lime.Color4[])null;
-				var tmp5 = d.Reader.ReadInt32();
-				if (tmp5 >= 0) {
-					var tmp6 = new global::Lime.Color4[tmp5];
-					for(tmp5 = 0; tmp5 < tmp6.Length; ++tmp5) {
-						tmp6[tmp5] = (global::Lime.Color4)dg.ReadStruct<global::Lime.Color4>();
-					}
-					result.Colors = tmp6;
-				}
+				result.UV1 = (global::Lime.Vector2)dg.ReadStruct<global::Lime.Vector2>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (4 == fd.OurIndex) {
-				result.Indices = (global::System.UInt16[])null;
-				var tmp7 = d.Reader.ReadInt32();
-				if (tmp7 >= 0) {
-					var tmp8 = new global::System.UInt16[tmp7];
-					for(tmp7 = 0; tmp7 < tmp8.Length; ++tmp7) {
-						tmp8[tmp7] = d.Reader.ReadUInt16();
-					}
-					result.Indices = tmp8;
-				}
+				result.BlendIndices = (global::Lime.Mesh3D.BlendIndices)dg.ReadStruct<global::Lime.Mesh3D.BlendIndices>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (5 == fd.OurIndex) {
-				result.UV1 = (global::Lime.Vector2[])null;
-				var tmp9 = d.Reader.ReadInt32();
-				if (tmp9 >= 0) {
-					var tmp10 = new global::Lime.Vector2[tmp9];
-					for(tmp9 = 0; tmp9 < tmp10.Length; ++tmp9) {
-						tmp10[tmp9] = (global::Lime.Vector2)dg.ReadStruct<global::Lime.Vector2>();
-					}
-					result.UV1 = tmp10;
-				}
+				result.BlendWeights = (global::Lime.Mesh3D.BlendWeights)dg.ReadStruct<global::Lime.Mesh3D.BlendWeights>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (6 == fd.OurIndex) {
-				result.UV2 = (global::Lime.Vector2[])null;
-				var tmp11 = d.Reader.ReadInt32();
-				if (tmp11 >= 0) {
-					var tmp12 = new global::Lime.Vector2[tmp11];
-					for(tmp11 = 0; tmp11 < tmp12.Length; ++tmp11) {
-						tmp12[tmp11] = (global::Lime.Vector2)dg.ReadStruct<global::Lime.Vector2>();
-					}
-					result.UV2 = tmp12;
-				}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+			return result;
+		}
+
+		private static void Read_Lime__Mesh(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.Mesh)obj;
+			var dg = (BinaryDeserializerGen)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				result.IndexBuffer = (global::Lime.IIndexBuffer)dg.ReadObject<global::Lime.IIndexBuffer>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (7 == fd.OurIndex) {
-				result.UV3 = (global::Lime.Vector2[])null;
-				var tmp13 = d.Reader.ReadInt32();
-				if (tmp13 >= 0) {
-					var tmp14 = new global::Lime.Vector2[tmp13];
-					for(tmp13 = 0; tmp13 < tmp14.Length; ++tmp13) {
-						tmp14[tmp13] = (global::Lime.Vector2)dg.ReadStruct<global::Lime.Vector2>();
+			if (2 == fd.OurIndex) {
+				result.VertexBuffers = (global::Lime.IVertexBuffer[])null;
+				var tmp1 = d.Reader.ReadInt32();
+				if (tmp1 >= 0) {
+					var tmp2 = new global::Lime.IVertexBuffer[tmp1];
+					for(tmp1 = 0; tmp1 < tmp2.Length; ++tmp1) {
+						tmp2[tmp1] = (global::Lime.IVertexBuffer)dg.ReadObject<global::Lime.IVertexBuffer>();
 					}
-					result.UV3 = tmp14;
-				}
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (8 == fd.OurIndex) {
-				result.UV4 = (global::Lime.Vector2[])null;
-				var tmp15 = d.Reader.ReadInt32();
-				if (tmp15 >= 0) {
-					var tmp16 = new global::Lime.Vector2[tmp15];
-					for(tmp15 = 0; tmp15 < tmp16.Length; ++tmp15) {
-						tmp16[tmp15] = (global::Lime.Vector2)dg.ReadStruct<global::Lime.Vector2>();
-					}
-					result.UV4 = tmp16;
-				}
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (9 == fd.OurIndex) {
-				result.Vertices = (global::Lime.Vector3[])null;
-				var tmp17 = d.Reader.ReadInt32();
-				if (tmp17 >= 0) {
-					var tmp18 = new global::Lime.Vector3[tmp17];
-					for(tmp17 = 0; tmp17 < tmp18.Length; ++tmp17) {
-						tmp18[tmp17] = (global::Lime.Vector3)dg.ReadStruct<global::Lime.Vector3>();
-					}
-					result.Vertices = tmp18;
+					result.VertexBuffers = tmp2;
 				}
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
-			result.AfterDeserialization();
 		}
 
-		private static object Make_Lime__GeometryBuffer(BinaryDeserializer d, ReaderClassDef def)
+		private static object Make_Lime__Mesh(BinaryDeserializer d, ReaderClassDef def)
 		{
-			var result = new global::Lime.GeometryBuffer();
-			Read_Lime__GeometryBuffer(d, def, result);
+			var result = new global::Lime.Mesh();
+			Read_Lime__Mesh(d, def, result);
+			return result;
+		}
+
+		private static void Read_Lime__VertexBuffer_Mesh3D__Vertex(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.VertexBuffer<global::Lime.Mesh3D.Vertex>)obj;
+			var dg = (BinaryDeserializerGen)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				result.Data = (global::Lime.Mesh3D.Vertex[])null;
+				var tmp1 = d.Reader.ReadInt32();
+				if (tmp1 >= 0) {
+					var tmp2 = new global::Lime.Mesh3D.Vertex[tmp1];
+					for(tmp1 = 0; tmp1 < tmp2.Length; ++tmp1) {
+						tmp2[tmp1] = (global::Lime.Mesh3D.Vertex)dg.ReadStruct<global::Lime.Mesh3D.Vertex>();
+					}
+					result.Data = tmp2;
+				}
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (2 == fd.OurIndex) {
+				result.Dynamic = d.Reader.ReadBoolean();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_Lime__VertexBuffer_Mesh3D__Vertex(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.VertexBuffer<global::Lime.Mesh3D.Vertex>();
+			Read_Lime__VertexBuffer_Mesh3D__Vertex(d, def, result);
+			return result;
+		}
+
+		private static void Read_Lime__IndexBuffer(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.IndexBuffer)obj;
+			var dg = (BinaryDeserializerGen)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				result.Data = (global::System.UInt16[])null;
+				var tmp1 = d.Reader.ReadInt32();
+				if (tmp1 >= 0) {
+					var tmp2 = new global::System.UInt16[tmp1];
+					for(tmp1 = 0; tmp1 < tmp2.Length; ++tmp1) {
+						tmp2[tmp1] = d.Reader.ReadUInt16();
+					}
+					result.Data = tmp2;
+				}
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (2 == fd.OurIndex) {
+				result.Dynamic = d.Reader.ReadBoolean();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_Lime__IndexBuffer(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.IndexBuffer();
+			Read_Lime__IndexBuffer(d, def, result);
 			return result;
 		}
 
@@ -859,14 +860,15 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
-				dg.ReadIntoObject<global::Lime.GeometryBuffer>(result.Geometry);
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (4 == fd.OurIndex) {
 				result.Material = (global::Lime.IMaterial)dg.ReadObject<global::Lime.IMaterial>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
+			if (4 == fd.OurIndex) {
+				result.Mesh = (global::Lime.IMesh)dg.ReadObject<global::Lime.IMesh>();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+			result.AfterDeserialization();
 		}
 
 		private static object Make_Lime__Submesh3D(BinaryDeserializer d, ReaderClassDef def)
@@ -5936,7 +5938,9 @@ namespace GeneratedDeserializersBIN
 			readCache[typeof(global::Lime.SerializableSample)] = Read_Lime__SerializableSample;
 			readCache[typeof(global::Lime.FontChar)] = Read_Lime__FontChar;
 			readCache[typeof(global::Lime.SerializableFont)] = Read_Lime__SerializableFont;
-			readCache[typeof(global::Lime.GeometryBuffer)] = Read_Lime__GeometryBuffer;
+			readCache[typeof(global::Lime.Mesh)] = Read_Lime__Mesh;
+			readCache[typeof(global::Lime.VertexBuffer<global::Lime.Mesh3D.Vertex>)] = Read_Lime__VertexBuffer_Mesh3D__Vertex;
+			readCache[typeof(global::Lime.IndexBuffer)] = Read_Lime__IndexBuffer;
 			readCache[typeof(global::Lime.Camera3D)] = Read_Lime__Camera3D;
 			readCache[typeof(global::Lime.CommonMaterial)] = Read_Lime__CommonMaterial;
 			readCache[typeof(global::Lime.Mesh3D)] = Read_Lime__Mesh3D;
@@ -6023,9 +6027,12 @@ namespace GeneratedDeserializersBIN
 			makeCache[typeof(global::Lime.KerningPair)] = Make_Lime__KerningPair;
 			makeCache[typeof(global::Lime.FontChar)] = Make_Lime__FontChar;
 			makeCache[typeof(global::Lime.SerializableFont)] = Make_Lime__SerializableFont;
-			makeCache[typeof(global::Lime.BlendIndices)] = Make_Lime__BlendIndices;
-			makeCache[typeof(global::Lime.BlendWeights)] = Make_Lime__BlendWeights;
-			makeCache[typeof(global::Lime.GeometryBuffer)] = Make_Lime__GeometryBuffer;
+			makeCache[typeof(global::Lime.Mesh3D.BlendIndices)] = Make_Lime__Mesh3D__BlendIndices;
+			makeCache[typeof(global::Lime.Mesh3D.BlendWeights)] = Make_Lime__Mesh3D__BlendWeights;
+			makeCache[typeof(global::Lime.Mesh3D.Vertex)] = Make_Lime__Mesh3D__Vertex;
+			makeCache[typeof(global::Lime.Mesh)] = Make_Lime__Mesh;
+			makeCache[typeof(global::Lime.VertexBuffer<global::Lime.Mesh3D.Vertex>)] = Make_Lime__VertexBuffer_Mesh3D__Vertex;
+			makeCache[typeof(global::Lime.IndexBuffer)] = Make_Lime__IndexBuffer;
 			makeCache[typeof(global::Lime.TextureAtlasElement.Params)] = Make_Lime__TextureAtlasElement__Params;
 			makeCache[typeof(global::Lime.BitSet32)] = Make_Lime__BitSet32;
 			makeCache[typeof(global::Lime.BoundingSphere)] = Make_Lime__BoundingSphere;

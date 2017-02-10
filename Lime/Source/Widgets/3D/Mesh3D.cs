@@ -2,12 +2,66 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Yuzu;
 
 namespace Lime
 {
 	public class Mesh3D : Node3D
 	{
+		[YuzuCompact]
+		[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 4)]
+		public struct BlendIndices
+		{
+			[YuzuMember("0")]
+			public byte Index0;
+	
+			[YuzuMember("1")]
+			public byte Index1;
+	
+			[YuzuMember("2")]
+			public byte Index2;
+	
+			[YuzuMember("3")]
+			public byte Index3;
+		}
+	
+		[YuzuCompact]
+		[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 16)]
+		public struct BlendWeights
+		{
+			[YuzuMember("0")]
+			public float Weight0;
+	
+			[YuzuMember("1")]
+			public float Weight1;
+	
+			[YuzuMember("2")]
+			public float Weight2;
+	
+			[YuzuMember("3")]
+			public float Weight3;
+		}
+
+		[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 48)]
+		public struct Vertex
+		{
+			[YuzuMember("0")]
+			public Vector3 Pos;
+			
+			[YuzuMember("1")]
+			public Color4 Color;
+	
+			[YuzuMember("2")]
+			public Vector2 UV1;
+	
+			[YuzuMember("3")]
+			public BlendIndices BlendIndices;
+			
+			[YuzuMember("4")]
+			public BlendWeights BlendWeights;
+		}
+		
 		private static Matrix44[] sharedBoneTransforms = new Matrix44[0];
 
 		[YuzuMember]
@@ -59,7 +113,7 @@ namespace Lime
 				}
 				sm.Material.ColorFactor = GlobalColor;
 				sm.Material.Apply();
-				sm.ReadOnlyGeometry.Render(0, sm.ReadOnlyGeometry.Indices.Length);
+				PlatformRenderer.DrawTriangles(sm.Mesh, 0, sm.Mesh.IndexBuffer.Data.Length);
 			}
 		}
 
@@ -98,9 +152,9 @@ namespace Lime
 			distance = float.MaxValue;
 			ray = ray.Transform(GlobalTransform.CalcInverted());
 			foreach (var submesh in Submeshes) {
-				var vertices = submesh.ReadOnlyGeometry.Vertices;
+				var vertices = ((IVertexBuffer<Vertex>)submesh.Mesh.VertexBuffers[0]).Data;
 				for (int i = 0; i <= vertices.Length - 3; i += 3) {
-					var d = ray.IntersectsTriangle(vertices[i], vertices[i + 1], vertices[i + 2]);
+					var d = ray.IntersectsTriangle(vertices[i].Pos, vertices[i + 1].Pos, vertices[i + 2].Pos);
 					if (d != null && d.Value < distance) {
 						distance = d.Value;
 						hit = true;
@@ -117,25 +171,28 @@ namespace Lime
 
 		public void RecalcBounds()
 		{
-			BoundingSphere = BoundingSphere.CreateFromPoints(GetVertices());
+			BoundingSphere = BoundingSphere.CreateFromPoints(GetVertexPositions());
 		}
 
 		public void RecalcCenter()
 		{
 			Center = Vector3.Zero;
 			var n = 0;
-			foreach (var v in GetVertices()) {
-				Center += v;
+			foreach (var vp in GetVertexPositions()) {
+				Center += vp;
 				n++;
 			}
 			Center /= n;
 		}
-
-		private IEnumerable<Vector3> GetVertices()
+		
+		private IEnumerable<Vector3> GetVertexPositions()
 		{
-			return Submeshes
-				.Select(sm => sm.ReadOnlyGeometry)
-				.SelectMany(g => g.Vertices);
+			foreach (var sm in Submeshes) {
+				var vertices = ((IVertexBuffer<Vertex>)sm.Mesh.VertexBuffers[0]).Data;
+				foreach (var v in vertices) {
+					yield return v.Pos;
+				}
+			}
 		}
 
 		public override Node Clone()
@@ -151,39 +208,18 @@ namespace Lime
 
 		public override void Dispose()
 		{
-			foreach (var sm in Submeshes) {
-				sm.Dispose();
-			}
 			Submeshes.Clear();
 			base.Dispose();
 		}
 	}
 
-	public class Submesh3D : IDisposable
+	public class Submesh3D
 	{
-		private GeometryBufferProxy geometryProxy;
-
 		[YuzuMember]
 		public IMaterial Material = new CommonMaterial();
 
 		[YuzuMember]
-		public GeometryBuffer Geometry
-		{
-			get
-			{
-				if (geometryProxy == null) {
-					geometryProxy = new GeometryBufferProxy(new GeometryBuffer());
-					geometryProxy.AddRef();
-				} else if (geometryProxy.RefCount > 1) {
-					geometryProxy.ReleaseRef();
-					geometryProxy = new GeometryBufferProxy(geometryProxy.Target.Clone());
-					geometryProxy.AddRef();
-				}
-				return geometryProxy.Target;
-			}
-		}
-
-		public GeometryBuffer ReadOnlyGeometry => geometryProxy.Target;
+		public IMesh Mesh { get; set; }
 
 		[YuzuMember]
 		public List<Matrix44> BoneBindPoses { get; private set; }
@@ -200,10 +236,17 @@ namespace Lime
 			BoneNames = new List<string>();
 			Bones = new List<Node3D>();
 		}
-
-		public void Dispose()
+		
+		[YuzuAfterDeserialization]
+		public void AfterDeserialization()
 		{
-			geometryProxy.ReleaseRef();
+			Mesh.Attributes = new[] { new[] {
+				ShaderPrograms.Attributes.Pos1,
+				ShaderPrograms.Attributes.Color1,
+				ShaderPrograms.Attributes.UV1,
+				ShaderPrograms.Attributes.BlendIndices,
+				ShaderPrograms.Attributes.BlendWeights
+			} };
 		}
 
 		public void RebuildSkeleton()
@@ -221,9 +264,8 @@ namespace Lime
 
 		public Submesh3D Clone()
 		{
-			geometryProxy.AddRef();
 			var clone = new Submesh3D();
-			clone.geometryProxy = geometryProxy;
+			clone.Mesh = Mesh.ShallowClone();
 			clone.BoneNames = new List<string>(BoneNames);
 			clone.BoneBindPoses = new List<Matrix44>(BoneBindPoses);
 			clone.Material = Material.Clone();
@@ -309,20 +351,6 @@ namespace Lime
 				clone.Add(this[i].Clone());
 			}
 			return clone;
-		}
-	}
-
-	internal class GeometryBufferProxy
-	{
-		public int RefCount { get; private set; }
-		public GeometryBuffer Target { get; private set; }
-
-		public void AddRef() => RefCount++;
-		public void ReleaseRef() => RefCount--;
-
-		public GeometryBufferProxy(GeometryBuffer target)
-		{
-			Target = target;
 		}
 	}
 }

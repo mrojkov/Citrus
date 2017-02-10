@@ -241,7 +241,7 @@ namespace Orange
 		{
 			var sm = new Submesh3D();
 			sm.Material = ImportMaterial(aiScene.Materials[mesh.MaterialIndex]);
-			ImportGeometry(mesh, sm.Geometry);
+			sm.Mesh = ImportMesh(mesh);
 			if (mesh.HasBones) {
 				foreach (var bone in mesh.Bones) {
 					sm.BoneNames.Add(GetNodeName(bone.Name));
@@ -251,24 +251,30 @@ namespace Orange
 			return sm;
 		}
 
-		private GeometryBuffer ImportGeometry(Assimp.Mesh mesh, GeometryBuffer g)
+		private IMesh ImportMesh(Assimp.Mesh mesh)
 		{
-			g.Vertices = mesh.Vertices.Select(AssimpExtensions.ToLime).ToArray();
-			g.Indices = mesh.GetIndices().Select(index => checked((ushort)index)).ToArray();
+			var vb = new VertexBuffer<Mesh3D.Vertex> {
+				Data = mesh.Vertices.Select(v => new Mesh3D.Vertex { Pos = v.ToLime() }).ToArray()
+			};
 			if (mesh.HasTextureCoords(0)) {
-				g.UV1 = mesh.TextureCoordinateChannels[0].Select(uv => new Vector2(uv.X, uv.Y)).ToArray();
+				for (int i = 0; i < vb.Data.Length; i++) {
+					var uv = mesh.TextureCoordinateChannels[0][i];
+					vb.Data[i].UV1 = new Vector2(uv.X, uv.Y);
+				}
 			}
 			if (mesh.HasVertexColors(0)) {
-				g.Colors = mesh.VertexColorChannels[0].Select(AssimpExtensions.ToLime).ToArray();
+				for (int i = 0; i < vb.Data.Length; i++) {
+					vb.Data[i].Color = mesh.VertexColorChannels[0][i].ToLime();
+				}
 			} else {
-				g.Colors = Enumerable.Repeat(Color4.White, mesh.VertexCount).ToArray();
+				for (int i = 0; i < vb.Data.Length; i++) {
+					vb.Data[i].Color = Color4.White;
+				}
 			}
 			if (mesh.HasBones) {
 				var indices = new byte[4];
 				var weights = new float[4];
-				g.BlendIndices = new BlendIndices[g.Vertices.Length];
-				g.BlendWeights = new BlendWeights[g.Vertices.Length];
-				for (var i = 0; i < g.Vertices.Length; i++) {
+				for (var i = 0; i < vb.Data.Length; i++) {
 					var count = 0;
 					for (var j = 0; j < mesh.BoneCount; j++) {
 						var b = mesh.Bones[j];
@@ -286,25 +292,35 @@ namespace Orange
 						Console.WriteLine("Warning");
 					} else {
 						if (count > 0) {
-							g.BlendIndices[i].Index0 = indices[0];
-							g.BlendWeights[i].Weight0 = weights[0];
+							vb.Data[i].BlendIndices.Index0 = indices[0];
+							vb.Data[i].BlendWeights.Weight0 = weights[0];
 						}
 						if (count > 1) {
-							g.BlendIndices[i].Index1 = indices[1];
-							g.BlendWeights[i].Weight1 = weights[1];
+							vb.Data[i].BlendIndices.Index1 = indices[1];
+							vb.Data[i].BlendWeights.Weight1 = weights[1];
 						}
 						if (count > 2) {
-							g.BlendIndices[i].Index2 = indices[2];
-							g.BlendWeights[i].Weight2 = weights[2];
+							vb.Data[i].BlendIndices.Index2 = indices[2];
+							vb.Data[i].BlendWeights.Weight2 = weights[2];
 						}
 						if (count > 3) {
-							g.BlendIndices[i].Index3 = indices[3];
-							g.BlendWeights[i].Weight3 = weights[3];
+							vb.Data[i].BlendIndices.Index3 = indices[3];
+							vb.Data[i].BlendWeights.Weight3 = weights[3];
 						}
 					}
 				}
 			}
-			return g;
+			var ib = new IndexBuffer { Data = mesh.GetIndices().Select(index => checked((ushort)index)).ToArray() };
+			return new Mesh {
+				VertexBuffers = new[] { vb },
+				IndexBuffer = ib,
+				Attributes = new[] { new[] {
+					ShaderPrograms.Attributes.Pos1,
+					ShaderPrograms.Attributes.Color1,
+					ShaderPrograms.Attributes.UV1,
+					ShaderPrograms.Attributes.BlendIndices,
+					ShaderPrograms.Attributes.BlendWeights
+				} } };
 		}
 
 		private IMaterial ImportMaterial(Assimp.Material material)

@@ -232,7 +232,7 @@ namespace Lime
 #if !MAC && !MONOMAC
 			GL.Uniform4(uniformId, new OpenTK.Graphics.Color4(color.R, color.G, color.B, color.A));
 #elif MAC
-			GL.Uniform4(uniformId, new OpenTK.Vector4(color.R, color.G, color.B, color.A));
+			GL.Uniform4(uniformId, color.R / 255f, color.G / 255f, color.B / 255f, color.A / 255f);
 #elif MONOMAC
 			GL.Uniform4(uniformId, new MonoMac.OpenGL.Vector4(color.R, color.G, color.B, color.A));
 #endif

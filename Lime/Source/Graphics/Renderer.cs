@@ -81,6 +81,7 @@ namespace Lime
 		}
 	}
 
+	[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 32)]
 	public struct Vertex
 	{
 		public Vector2 Pos;
@@ -154,7 +155,7 @@ namespace Lime
 				viewProjDirty = worldViewProjDirty = true;
 				PlatformRenderer.InvalidateShaderProgram();
 			}
-		}
+			}
 
 		public static Matrix44 WorldView
 		{
@@ -434,14 +435,14 @@ namespace Lime
 			var batch = DrawTrianglesHelper(texture1, texture2, vertices, numVertices);
 			var baseVertex = batch.LastVertex;
 			int j = batch.LastIndex;
-			var indices = batch.Geometry.Indices;
+			var indices = batch.IndexBuffer.Data;
 			for (int i = 1; i <= numVertices - 2; i++) {
 				indices[j++] = (ushort)(baseVertex);
 				indices[j++] = (ushort)(baseVertex + i);
 				indices[j++] = (ushort)(baseVertex + i + 1);
 				batch.LastIndex += 3;
 			}
-			batch.Geometry.IndicesDirty = true;
+			batch.IndexBuffer.Dirty = true;
 			batch.LastVertex += numVertices;
 		}
 
@@ -460,7 +461,7 @@ namespace Lime
 			var batch = DrawTrianglesHelper(texture1, texture2, vertices, numVertices);
 			var vertex = batch.LastVertex;
 			int j = batch.LastIndex;
-			var indices = batch.Geometry.Indices;
+			var indices = batch.IndexBuffer.Data;
 			for (int i = 0; i < numVertices - 2; i++) {
 				indices[j++] = (ushort)vertex;
 				indices[j++] = (ushort)(vertex + 1);
@@ -468,7 +469,7 @@ namespace Lime
 				vertex++;
 				batch.LastIndex += 3;
 			}
-			batch.Geometry.IndicesDirty = true;
+			batch.IndexBuffer.Dirty = true;
 			batch.LastVertex += numVertices;
 		}
 
@@ -476,23 +477,25 @@ namespace Lime
 		{
 			var batch = CurrentRenderList.GetBatch(texture1, texture2, Blending, Shader, CustomShaderProgram, numVertices, (numVertices - 2) * 3);
 			var transform = GetEffectiveTransform();
-			var mesh = batch.Geometry;
-			mesh.DirtyAttributes |= GeometryBuffer.Attributes.VertexColorUV12 | (texture2 != null ? GeometryBuffer.Attributes.UV2 : GeometryBuffer.Attributes.None);
+			var vd = batch.VertexBuffer.Data;
+			batch.VertexBuffer.Dirty = true;
 			int j = batch.LastVertex;
 			for (int i = 0; i < numVertices; i++) {
 				var v = vertices[i];
 				if (PremultipliedAlphaMode && v.Color.A != 255) {
 					v.Color = Color4.PremulAlpha(v.Color);
 				}
-				mesh.Colors[j] = v.Color;
-				mesh.Vertices[j] = (Vector3)(transform * v.Pos);
+				vd[j].Color = v.Color;
+				vd[j].Pos = transform * v.Pos;
 				if (texture1 != null) {
-					mesh.UV1[j] = v.UV1;
-					texture1.TransformUVCoordinatesToAtlasSpace(ref mesh.UV1[j]);
+					var uv1 = v.UV1;
+					texture1.TransformUVCoordinatesToAtlasSpace(ref uv1);
+					vd[j].UV1 = uv1;
 				}
 				if (texture2 != null) {
-					mesh.UV2[j] = v.UV2;
-					texture2.TransformUVCoordinatesToAtlasSpace(ref mesh.UV2[j]);
+					var uv2 = v.UV2;
+					texture2.TransformUVCoordinatesToAtlasSpace(ref uv2);
+					vd[j].UV2 = uv2;
 				}
 				j++;
 			}
@@ -512,27 +515,26 @@ namespace Lime
 				Blending = Blending.Darken;
 			}
 			var batch = CurrentRenderList.GetBatch(texture, null, Blending, Shader, CustomShaderProgram, 4, 6);
-			if (Renderer.PremultipliedAlphaMode && color.A != 255) {
+			if (PremultipliedAlphaMode && color.A != 255) {
 				color = Color4.PremulAlpha(color);
 			}
 			if (texture != null) {
 				texture.TransformUVCoordinatesToAtlasSpace(ref uv0);
 				texture.TransformUVCoordinatesToAtlasSpace(ref uv1);
 			}
-			var mesh = batch.Geometry;
-			mesh.DirtyAttributes |= GeometryBuffer.Attributes.VertexColorUV12;
-			mesh.IndicesDirty = true;
-			int bv = batch.LastVertex;
-			int bi = batch.LastIndex;
+			batch.VertexBuffer.Dirty = true;
+			batch.IndexBuffer.Dirty = true;
+			int v = batch.LastVertex;
+			int i = batch.LastIndex;
 			batch.LastIndex += 6;
 			batch.LastVertex += 4;
-			var indices = mesh.Indices;
-			indices[bi++] = (ushort)(bv + 1);
-			indices[bi++] = (ushort)bv;
-			indices[bi++] = (ushort)(bv + 2);
-			indices[bi++] = (ushort)(bv + 2);
-			indices[bi++] = (ushort)(bv + 3);
-			indices[bi++] = (ushort)(bv + 1);
+			var indices = batch.IndexBuffer.Data;
+			indices[i++] = (ushort)(v + 1);
+			indices[i++] = (ushort)v;
+			indices[i++] = (ushort)(v + 2);
+			indices[i++] = (ushort)(v + 2);
+			indices[i++] = (ushort)(v + 3);
+			indices[i++] = (ushort)(v + 1);
 			float x0 = position.X;
 			float y0 = position.Y;
 			float x1 = position.X + size.X;
@@ -546,21 +548,19 @@ namespace Lime
 			float x1uy = x1 * matrix.U.Y;
 			float y1vx = y1 * matrix.V.X;
 			float y1vy = y1 * matrix.V.Y;
-			var v = mesh.Vertices;
-			v[bv + 0] = new Vector3() { X = x0ux + y0vx + matrix.T.X, Y = x0uy + y0vy + matrix.T.Y };
-			v[bv + 1] = new Vector3() { X = x1ux + y0vx + matrix.T.X, Y = x1uy + y0vy + matrix.T.Y };
-			v[bv + 2] = new Vector3() { X = x0ux + y1vx + matrix.T.X, Y = x0uy + y1vy + matrix.T.Y };
-			v[bv + 3] = new Vector3() { X = x1ux + y1vx + matrix.T.X, Y = x1uy + y1vy + matrix.T.Y };
-			var c = mesh.Colors;
-			c[bv + 0] = color;
-			c[bv + 1] = color;
-			c[bv + 2] = color;
-			c[bv + 3] = color;
-			var uv = mesh.UV1;
-			uv[bv + 0] = uv0;
-			uv[bv + 1] = new Vector2() { X = uv1.X, Y = uv0.Y };
-			uv[bv + 2] = new Vector2() { X = uv0.X, Y = uv1.Y };
-			uv[bv + 3] = uv1;
+			var vertices = batch.VertexBuffer.Data;
+			vertices[v].Pos = new Vector2 { X = x0ux + y0vx + matrix.T.X, Y = x0uy + y0vy + matrix.T.Y };
+			vertices[v].Color = color;
+			vertices[v++].UV1 = uv0;
+			vertices[v].Pos = new Vector2 { X = x1ux + y0vx + matrix.T.X, Y = x1uy + y0vy + matrix.T.Y };
+			vertices[v].Color = color;
+			vertices[v++].UV1 = new Vector2 { X = uv1.X, Y = uv0.Y };
+			vertices[v].Pos = new Vector2 { X = x0ux + y1vx + matrix.T.X, Y = x0uy + y1vy + matrix.T.Y };
+			vertices[v].Color = color;
+			vertices[v++].UV1 = new Vector2 { X = uv0.X, Y = uv1.Y };
+			vertices[v].Pos = new Vector2 { X = x1ux + y1vx + matrix.T.X, Y = x1uy + y1vy + matrix.T.Y };
+			vertices[v].Color = color;
+			vertices[v].UV1 = uv1;
 		}
 
 		private static Matrix32 GetEffectiveTransform()
@@ -605,8 +605,8 @@ namespace Lime
 			var matrix = GetEffectiveTransform();
 			int batchLength = 0;
 			var clipRect = scissorTestEnabled ? CalcLocalScissorAABB(matrix) : new Rectangle();
-			for (int i = 0; i <= spriteList.Count; i++) {
-				var s = (i == spriteList.Count) ? sentinelSprite : spriteList[i];
+			for (int t = 0; t <= spriteList.Count; t++) {
+				var s = (t == spriteList.Count) ? sentinelSprite : spriteList[t];
 				if (scissorTestEnabled && s != sentinelSprite) {
 					if (s.Position.X + s.Size.X < clipRect.A.X ||
 						s.Position.X > clipRect.B.X ||
@@ -622,15 +622,12 @@ namespace Lime
 				}
 				var batch = CurrentRenderList.GetBatch(
 					batchedSprites[0].Texture, null, Blending, Shader, CustomShaderProgram, 4 * batchLength, 6 * batchLength);
-				int bv = batch.LastVertex;
-				int bi = batch.LastIndex;
-				var mesh = batch.Geometry;
-				mesh.DirtyAttributes |= GeometryBuffer.Attributes.VertexColorUV12;
-				mesh.IndicesDirty = true;
-				var indices = mesh.Indices;
-				var v = mesh.Vertices;
-				var c = mesh.Colors;
-				var uv = mesh.UV1;
+				int v = batch.LastVertex;
+				int i = batch.LastIndex;
+				batch.VertexBuffer.Dirty = true;
+				batch.IndexBuffer.Dirty = true;
+				var indices = batch.IndexBuffer.Data;
+				var vertices = batch.VertexBuffer.Data;
 				var uvRect = batchedSprites[0].Texture.AtlasUVRect;
 				for (int j = 0; j < batchLength; j++) {
 					var sprite = batchedSprites[j];
@@ -638,18 +635,18 @@ namespace Lime
 					if (Renderer.PremultipliedAlphaMode && color.A != 255) {
 						effectiveColor = Color4.PremulAlpha(effectiveColor);
 					}
+					indices[i++] = (ushort)(v + 1);
+					indices[i++] = (ushort)v;
+					indices[i++] = (ushort)(v + 2);
+					indices[i++] = (ushort)(v + 2);
+					indices[i++] = (ushort)(v + 3);
+					indices[i++] = (ushort)(v + 1);
 					var uv0 = sprite.UV0;
 					var uv1 = sprite.UV1;
 					uv0.X = uvRect.A.X + (uvRect.B.X - uvRect.A.X) * uv0.X;
 					uv0.Y = uvRect.A.Y + (uvRect.B.Y - uvRect.A.Y) * uv0.Y;
 					uv1.X = uvRect.A.X + (uvRect.B.X - uvRect.A.X) * uv1.X;
 					uv1.Y = uvRect.A.Y + (uvRect.B.Y - uvRect.A.Y) * uv1.Y;
-					indices[bi++] = (ushort)(bv + 1);
-					indices[bi++] = (ushort)bv;
-					indices[bi++] = (ushort)(bv + 2);
-					indices[bi++] = (ushort)(bv + 2);
-					indices[bi++] = (ushort)(bv + 3);
-					indices[bi++] = (ushort)(bv + 1);
 					float x0 = sprite.Position.X;
 					float y0 = sprite.Position.Y;
 					float x1 = sprite.Position.X + sprite.Size.X;
@@ -662,22 +659,21 @@ namespace Lime
 					float x1uy = x1 * matrix.U.Y;
 					float y1vx = y1 * matrix.V.X;
 					float y1vy = y1 * matrix.V.Y;
-					v[bv + 0] = new Vector3 { X = x0ux + y0vx + matrix.T.X, Y = x0uy + y0vy + matrix.T.Y };
-					v[bv + 1] = new Vector3 { X = x1ux + y0vx + matrix.T.X, Y = x1uy + y0vy + matrix.T.Y };
-					v[bv + 2] = new Vector3 { X = x0ux + y1vx + matrix.T.X, Y = x0uy + y1vy + matrix.T.Y };
-					v[bv + 3] = new Vector3 { X = x1ux + y1vx + matrix.T.X, Y = x1uy + y1vy + matrix.T.Y };
-					c[bv + 0] = effectiveColor;
-					c[bv + 1] = effectiveColor;
-					c[bv + 2] = effectiveColor;
-					c[bv + 3] = effectiveColor;
-					uv[bv + 0] = uv0;
-					uv[bv + 1] = new Vector2 { X = uv1.X, Y = uv0.Y };
-					uv[bv + 2] = new Vector2 { X = uv0.X, Y = uv1.Y };
-					uv[bv + 3] = uv1;
-					bv += 4;
+					vertices[v].Pos = new Vector2 { X = x0ux + y0vx + matrix.T.X, Y = x0uy + y0vy + matrix.T.Y };
+					vertices[v].Color = effectiveColor;
+					vertices[v++].UV1 = uv0;
+					vertices[v].Pos = new Vector2 { X = x1ux + y0vx + matrix.T.X, Y = x1uy + y0vy + matrix.T.Y };
+					vertices[v].Color = effectiveColor;
+					vertices[v++].UV1 = new Vector2 { X = uv1.X, Y = uv0.Y };
+					vertices[v].Pos = new Vector2 { X = x0ux + y1vx + matrix.T.X, Y = x0uy + y1vy + matrix.T.Y };
+					vertices[v].Color = effectiveColor;
+					vertices[v++].UV1 = new Vector2 { X = uv0.X, Y = uv1.Y };
+					vertices[v].Pos = new Vector2 { X = x1ux + y1vx + matrix.T.X, Y = x1uy + y1vy + matrix.T.Y };
+					vertices[v].Color = effectiveColor;
+					vertices[v++].UV1 = uv1;
 				}
-				batch.LastIndex = bi;
-				batch.LastVertex = bv;
+				batch.LastIndex = i;
+				batch.LastVertex = v;
 				batchLength = 1;
 				batchedSprites[0] = s;
 			}

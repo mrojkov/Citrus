@@ -247,10 +247,8 @@
     <Compile Include="Source\GeometryUtils.cs" />
     <Compile Include="Source\Widgets\Layout\FlowLayout.cs" />
     <Compile Include="Source\Application\DummyWindow.cs" />
-    <Compile Include="Source\Graphics\OpenGL\PlatformGeometryBuffer.cs" />
     <Compile Include="Source\Graphics\Unity\MovieTexture.cs" />
     <Compile Include="Source\Graphics\Unity\PlatformGeometryBuffer.cs" />
-    <Compile Include="Source\Graphics\GeometryBuffer.cs" />
     <Compile Include="Source\Types\Plane.cs" />
     <Compile Include="Source\Types\Vector4.cs" />
     <Compile Include="Source\Types\MonoMac\CG.cs" />
@@ -280,6 +278,8 @@
     <Compile Include="Source\Application\MessageBox.cs" />
     <Compile Include="Source\Widgets\MorphableMesh.cs" />
     <Compile Include="Source\Widgets\MorphableMeshBuilder.cs" />
+    <Compile Include="Source\Graphics\OpenGL\Mesh.cs" />
+    <Compile Include="Source\Graphics\IMesh.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

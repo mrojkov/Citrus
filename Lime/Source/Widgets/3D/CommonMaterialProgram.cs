@@ -156,11 +156,11 @@
 		private static AttribLocation[] GetAttribLocations()
 		{
 			return new AttribLocation[] {
-				new AttribLocation { Name = "a_Position", Index = PlatformGeometryBuffer.Attributes.Vertex1 },
-				new AttribLocation { Name = "a_UV", Index = PlatformGeometryBuffer.Attributes.UV1 },
-				new AttribLocation { Name = "a_Color", Index = PlatformGeometryBuffer.Attributes.Color1 },
-				new AttribLocation { Name = "a_BlendIndices", Index = PlatformGeometryBuffer.Attributes.BlendIndices },
-				new AttribLocation { Name = "a_BlendWeights", Index = PlatformGeometryBuffer.Attributes.BlendWeights }
+				new AttribLocation { Name = "a_Position", Index = ShaderPrograms.Attributes.Pos1 },
+				new AttribLocation { Name = "a_UV", Index = ShaderPrograms.Attributes.UV1 },
+				new AttribLocation { Name = "a_Color", Index = ShaderPrograms.Attributes.Color1 },
+				new AttribLocation { Name = "a_BlendIndices", Index = ShaderPrograms.Attributes.BlendIndices },
+				new AttribLocation { Name = "a_BlendWeights", Index = ShaderPrograms.Attributes.BlendWeights }
 			};
 		}
 	}

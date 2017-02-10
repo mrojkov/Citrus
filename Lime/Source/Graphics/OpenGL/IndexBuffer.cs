@@ -1,8 +1,5 @@
 #if OPENGL
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 #if iOS || ANDROID || WIN
 using OpenTK.Graphics.ES20;
 #elif MAC
@@ -10,21 +7,34 @@ using OpenTK.Graphics.OpenGL;
 #elif MONOMAC
 using MonoMac.OpenGL;
 #endif
-using System.Runtime.InteropServices;
+using Yuzu;
 
 namespace Lime
 {
-	public unsafe class IndexBuffer : IDisposable, IGLObject
+	internal interface IGLIndexBuffer
 	{
-		public const int DefaultCapacity = 400;
-		public static int TotalIndexBuffers;
+		void BufferData();
+	}
+
+	public class IndexBuffer : IIndexBuffer, IGLIndexBuffer, IGLObject
+	{
 		private uint iboHandle;
+		private static uint boundIboHandle;
 		private bool disposed;
+
+		public ushort[] Data { get; set; }
+		public bool Dynamic { get; set; }
+		public bool Dirty { get; set; }
 
 		public IndexBuffer()
 		{
-			TotalIndexBuffers++;
+			Dirty = true;
 			GLObjectRegistry.Instance.Add(this);
+		}
+
+		public IndexBuffer(bool dynamic) : this()
+		{
+			Dynamic = dynamic;
 		}
 
 		~IndexBuffer()
@@ -32,29 +42,33 @@ namespace Lime
 			Dispose();
 		}
 
-		private void AllocateIBOHandle()
+		private void AllocateHandle()
 		{
 			var t = new int[1];
 			GL.GenBuffers(1, t);
 			iboHandle = (uint)t[0];
+			boundIboHandle = 0;
 		}
 
-		public void Bind(ushort[] indices, bool forceUpload)
+		void IGLIndexBuffer.BufferData()
 		{
 			if (iboHandle == 0) {
-				forceUpload = true;
-				AllocateIBOHandle();
+				AllocateHandle();
 			}
-			GL.BindBuffer(BufferTarget.ElementArrayBuffer, iboHandle);
-			if (forceUpload) {
-				GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(sizeof(short) * indices.Length), indices, BufferUsageHint.DynamicDraw);
+			if (boundIboHandle != iboHandle) {
+				boundIboHandle = iboHandle;
+				GL.BindBuffer(BufferTarget.ElementArrayBuffer, iboHandle);
+			}
+			if (Dirty) {
+				Dirty = false;
+				var usageHint = Dynamic ? BufferUsageHint.DynamicDraw : BufferUsageHint.StaticDraw;
+				GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(sizeof(ushort) * Data.Length), Data, usageHint);
 			}
 		}
 
 		public void Dispose()
 		{
 			if (!disposed) {
-				TotalIndexBuffers--;
 				Discard();
 				disposed = true;
 			}

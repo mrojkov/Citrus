@@ -236,9 +236,12 @@ namespace Lime
 				jd.Generate<KerningPair>();
 				jd.Generate<FontChar>();
 				jd.Generate<SerializableFont>();
-				jd.Generate<BlendIndices>();
-				jd.Generate<BlendWeights>();
-				jd.Generate<GeometryBuffer>();
+				jd.Generate<Mesh3D.BlendIndices>();
+				jd.Generate<Mesh3D.BlendWeights>();
+				jd.Generate<Mesh3D.Vertex>();
+				jd.Generate<Mesh>();
+				jd.Generate<VertexBuffer<Mesh3D.Vertex>>();
+				jd.Generate<IndexBuffer>();
 				jd.Generate<TextureAtlasElement.Params>();
 				jd.Generate<BitSet32>();
 				jd.Generate<BoundingSphere>();

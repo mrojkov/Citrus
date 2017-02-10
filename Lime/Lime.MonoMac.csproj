@@ -232,8 +232,6 @@
     <Compile Include="Source\Application\DummyWindow.cs" />
     <Compile Include="Source\Graphics\Bitmap.Cocoa.cs" />
     <Compile Include="Source\EnumExtensions.cs" />
-    <Compile Include="Source\Graphics\GeometryBuffer.cs" />
-    <Compile Include="Source\Graphics\OpenGL\PlatformGeometryBuffer.cs" />
     <Compile Include="Source\Widgets\3D\Camera3D.cs" />
     <Compile Include="Source\Widgets\3D\Material.cs" />
     <Compile Include="Source\Widgets\3D\Mesh3D.cs" />
@@ -280,6 +278,8 @@
     <Compile Include="Source\Widgets\3D\CommonMaterialProgram.cs" />
     <Compile Include="Source\Widgets\3D\Model3D.cs" />
     <Compile Include="Source\Application\MessageBox.cs" />
+    <Compile Include="Source\Graphics\OpenGL\Mesh.cs" />
+    <Compile Include="Source\Graphics\IMesh.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

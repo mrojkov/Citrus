@@ -117,7 +117,7 @@ namespace Lime
 				}
 			}
 			if (diffuseTexture != null) {
-				PlatformRenderer.SetTexture(DiffuseTexture, CommonMaterialProgram.DiffuseTextureStage);
+				PlatformRenderer.SetTexture(diffuseTexture, CommonMaterialProgram.DiffuseTextureStage);
 			}
 		}
 

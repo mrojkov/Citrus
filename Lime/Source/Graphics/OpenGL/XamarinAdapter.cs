@@ -19,6 +19,7 @@ namespace Lime
 	static class BufferUsageHint
 	{
 		public const BufferUsage DynamicDraw = BufferUsage.DynamicDraw;
+		public const BufferUsage StaticDraw = BufferUsage.StaticDraw;
 	}
 
 	static class PrimitiveType
@@ -53,6 +54,7 @@ namespace Lime
 	static class BufferUsageHint
 	{
 		public const BufferUsage DynamicDraw = BufferUsage.DynamicDraw;
+		public const BufferUsage StaticDraw = BufferUsage.StaticDraw;
 	}
 
 	static class PrimitiveType

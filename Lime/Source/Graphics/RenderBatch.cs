@@ -8,6 +8,11 @@ namespace Lime
 		public const int VertexBufferCapacity = 400;
 		public const int IndexBufferCapacity = 600;
 
+		private static Stack<RenderBatch> batchPool = new Stack<RenderBatch>();
+		private static Stack<IMesh> meshPool = new Stack<IMesh>();
+		private IMesh mesh;
+		private bool ownsMesh;
+
 		public Blending Blending;
 		public ShaderId Shader;
 		public ShaderProgram CustomShaderProgram;
@@ -16,28 +21,24 @@ namespace Lime
 		public int LastVertex;
 		public int StartIndex;
 		public int LastIndex;
-		public GeometryBuffer Geometry;
-		public bool OwnsMesh;
 
-		public RenderBatch()
-		{
-			Clear();
-		}
+		public IVertexBuffer<Vertex> VertexBuffer { get; private set; }
+		public IIndexBuffer IndexBuffer { get; private set; }
 
-		public void Clear()
+		private void Clear()
 		{
 			Texture1 = Texture2 = null;
-			Blending = Lime.Blending.None;
+			Blending = Blending.None;
 			Shader = ShaderId.None;
 			CustomShaderProgram = null;
 			StartIndex = LastIndex = LastVertex = 0;
-			if (Geometry != null) {
-				if (OwnsMesh) {
-					GeometryBufferPool.Release(Geometry);
+			if (mesh != null) {
+				if (ownsMesh) {
+					ReleaseMesh(mesh);
 				}
-				Geometry = null;
+				mesh = null;
 			}
-			OwnsMesh = false;
+			ownsMesh = false;
 		}
 
 		public void Render()
@@ -46,48 +47,57 @@ namespace Lime
 			PlatformRenderer.SetTexture(Texture2, 1);
 			PlatformRenderer.SetBlending(Blending);
 			PlatformRenderer.SetShader(Shader, CustomShaderProgram);
-			Geometry.Render(StartIndex, LastIndex - StartIndex);
-			Renderer.DrawCalls++;
+			PlatformRenderer.DrawTriangles(mesh, StartIndex, LastIndex - StartIndex);
 		}
-	}
 
-	static class RenderBatchPool
-	{
-		private static Stack<RenderBatch> items = new Stack<RenderBatch>();
-
-		public static RenderBatch Acquire()
+		public static RenderBatch Acquire(RenderBatch origin)
 		{
-			if (items.Count == 0) {
-				return new RenderBatch();
+			var batch = batchPool.Count == 0 ? new RenderBatch() : batchPool.Pop();
+			if (origin != null) {
+				batch.mesh = origin.mesh;
+				batch.StartIndex = origin.LastIndex;
+				batch.LastVertex = origin.LastVertex;
+				batch.LastIndex = origin.LastIndex;
+			} else {
+				batch.ownsMesh = true;
+				batch.mesh = AcquireMesh();
 			}
-			return items.Pop();
+			batch.VertexBuffer = (IVertexBuffer<Vertex>)batch.mesh.VertexBuffers[0];
+			batch.IndexBuffer = batch.mesh.IndexBuffer;
+			return batch;
 		}
 
-		public static void Release(RenderBatch item)
+		public void Release()
 		{
-			item.Clear();
-			items.Push(item);
+			Clear();
+			batchPool.Push(this);
 		}
-	}
 
-	static class GeometryBufferPool
-	{
-		private static Stack<GeometryBuffer> items = new Stack<GeometryBuffer>();
-
-		public static GeometryBuffer Acquire()
+		private static IMesh AcquireMesh()
 		{
-			if (items.Count == 0) {
-				var mesh = new GeometryBuffer();
-				mesh.Allocate(RenderBatch.VertexBufferCapacity, RenderBatch.IndexBufferCapacity, GeometryBuffer.Attributes.VertexColorUV12);
-				return mesh;
+			if (meshPool.Count == 0) {
+				var vao = new Mesh {
+					IndexBuffer = new IndexBuffer { Data = new ushort[IndexBufferCapacity], Dynamic = true },
+					VertexBuffers = new[] {
+						new VertexBuffer<Vertex> { Data = new Vertex[VertexBufferCapacity], Dynamic = true }
+					},
+					Attributes = new[] { 
+						new int[] {
+							ShaderPrograms.Attributes.Pos1,
+							ShaderPrograms.Attributes.Color1,
+							ShaderPrograms.Attributes.UV1,
+							ShaderPrograms.Attributes.UV2
+						}
+					}
+				};
+				return vao;
 			}
-			return items.Pop();
+			return meshPool.Pop();
 		}
 
-		public static void Release(GeometryBuffer item)
+		private static void ReleaseMesh(IMesh item)
 		{
-			items.Push(item);
+			meshPool.Push(item);
 		}
 	}
-
 }

@@ -54,27 +54,37 @@ namespace Lime
 			shaderProgram = null;
 		}
 
-		public static ShaderProgram SetShader(ShaderId value, ShaderProgram customShaderProgram, ShaderFlags flags = ShaderFlags.None)
+		public static ShaderProgram GetShaderProgram(ShaderId value, ShaderProgram customShaderProgram, ShaderOptions options = ShaderOptions.None)
 		{
 			int numTextures = textures[1] != 0 ? 2 : (textures[0] != 0 ? 1 : 0);
-#if ANDROID
+		#if ANDROID
 			if (textures[2] != 0) {
-				flags |= ShaderFlags.UseAlphaTexture1;
+				options |= ShaderOptions.UseAlphaTexture1;
 			}
 			if (textures[3] != 0) {
-				flags |= ShaderFlags.UseAlphaTexture2;
+				options |= ShaderOptions.UseAlphaTexture2;
 			}
-#endif
+		#endif
 			if (!premultipliedAlphaMode && (blending == Blending.Burn || blending == Blending.Darken)) {
-				flags |= ShaderFlags.PremultiplyAlpha;
+				options |= ShaderOptions.PremultiplyAlpha;
 			}
-			var program = value == ShaderId.Custom ? customShaderProgram : ShaderPrograms.Instance.GetShaderProgram(value, numTextures, flags);
+			return value == ShaderId.Custom ? customShaderProgram : ShaderPrograms.Instance.GetShaderProgram(value, numTextures, options);
+		}
+
+		public static ShaderProgram SetShader(ShaderId value, ShaderProgram customShaderProgram, ShaderOptions options = ShaderOptions.None)
+		{
+			var program = GetShaderProgram(value, customShaderProgram, options);
+			SetShaderProgram(program);
+			return program;
+		}
+
+		public static void SetShaderProgram(ShaderProgram program)
+		{
 			if (shaderProgram != program) {
 				shaderProgram = program;
 				shaderProgram.Use();
 				shaderProgram.LoadMatrix(program.ProjectionMatrixUniformId, FixupWVP(Renderer.WorldViewProjection));
 			}
-			return program;
 		}
 
 		static PlatformRenderer()
@@ -120,7 +130,7 @@ namespace Lime
 			}
 			GL.Clear(clearBufferMask);
 		}
-
+		
 		public static void SetTexture(ITexture texture, int stage)
 		{
 			var handle = texture != null ? texture.GetHandle() : 0;
@@ -280,7 +290,7 @@ namespace Lime
 			} else {
 				GL.FrontFace(IsOffscreen() ? FrontFaceDirection.Ccw : FrontFaceDirection.Cw);
 			}
-			PlatformRenderer.CheckErrors();
+			CheckErrors();
 		}
 
 		private static bool IsOffscreen()
@@ -295,6 +305,19 @@ namespace Lime
 				projection *= Matrix44.CreateScale(new Vector3(1, -1, 1));
 			}
 			return projection;
+		}
+
+		public static void DrawTriangles(IMesh mesh, int startIndex, int count)
+		{
+			(mesh as Mesh).Bind();
+			int offset = startIndex * sizeof(short);
+#if MAC || MONOMAC
+			GL.DrawElements(BeginMode.Triangles, count, DrawElementsType.UnsignedShort, (IntPtr)offset);
+#else
+			GL.DrawElements(PrimitiveType.Triangles, count, DrawElementsType.UnsignedShort, (IntPtr)offset);
+#endif
+			CheckErrors();
+			Renderer.DrawCalls++;
 		}
 	}
 }

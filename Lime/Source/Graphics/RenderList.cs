@@ -12,8 +12,8 @@ namespace Lime
 		public RenderBatch GetBatch(ITexture texture1, ITexture texture2, Blending blending, ShaderId shader, ShaderProgram customShaderProgram, int vertexCount, int indexCount)
 		{
 			bool needMesh = lastBatch == null || 
-				lastBatch.LastVertex + vertexCount > lastBatch.Geometry.Vertices.Length ||
-				lastBatch.LastIndex + indexCount > lastBatch.Geometry.Indices.Length;
+				lastBatch.LastVertex + vertexCount > RenderBatch.VertexBufferCapacity ||
+				lastBatch.LastIndex + indexCount > RenderBatch.IndexBufferCapacity;
 			if (!needMesh &&
 				(GetTextureHandle(lastBatch.Texture1) == GetTextureHandle(texture1)) &&
 				(GetTextureHandle(lastBatch.Texture2) == GetTextureHandle(texture2)) &&
@@ -23,16 +23,7 @@ namespace Lime
 			{
 				return lastBatch;
 			}
-			var batch = RenderBatchPool.Acquire();
-			if (needMesh) {
-				batch.Geometry = GeometryBufferPool.Acquire();
-				batch.OwnsMesh = true;
-				lastBatch = batch;
-			}
-			batch.StartIndex = lastBatch.LastIndex;
-			batch.LastVertex = lastBatch.LastVertex;
-			batch.LastIndex = lastBatch.LastIndex;
-			batch.Geometry = lastBatch.Geometry;
+			var batch = RenderBatch.Acquire(needMesh ? null : lastBatch);
 			batch.Texture1 = texture1;
 			batch.Texture2 = texture2;
 			batch.Blending = blending;
@@ -61,7 +52,7 @@ namespace Lime
 				return;
 			}
 			foreach (var i in Batches) {
-				RenderBatchPool.Release(i);
+				i.Release();
 			}
 			Batches.Clear();
 			lastBatch = null;

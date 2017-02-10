@@ -6,7 +6,14 @@ namespace Lime
 {
 	public class MorphableMeshBuilder
 	{
-		public void BuildNodeContents(Node node)
+		[Flags]
+		public enum Options
+		{
+			None = 0,
+			NoParticles = 1
+		}
+
+		public void BuildNodeContents(Node node, Options options)
 		{
 			var originalNodes = node.Nodes.ToList();
 			node.Nodes.Clear();
@@ -21,6 +28,9 @@ namespace Lime
 			int numBones = container.Nodes.Count;
 			int skipConvertionCounter = 0;
 			foreach (var child in originalNodes) {
+				if ((options & Options.NoParticles) != 0 && (child is ParticleEmitter)) {
+					continue;
+				}
 				if (skipConvertionCounter == 0 && CanConvertNodeToMesh(child)) {
 					container.AddNode(child);
 				} else {
@@ -44,7 +54,7 @@ namespace Lime
 						node.AddNode(mesh);
 					} else {
 						node.AddNode(child);
-						BuildNodeContents(child);
+						BuildNodeContents(child, options);
 					}
 				}
 			}
@@ -95,6 +105,7 @@ namespace Lime
 				var mesh = NodeContentsToMorphableMesh(node, interval);
 				discreteMesh.Meshes.Add(mesh);
 			}
+			discreteMesh.RefreshMeshBounds();
 			return discreteMesh;
 		}
 
@@ -130,35 +141,29 @@ namespace Lime
 						}
 					}
 					if (isFirstTimeStamp) {
-						mesh.Geometry = new GeometryBuffer {
-							UV1 = new Vector2[vertexCount],
-							Indices = new ushort[indexCount],
-						};
+						mesh.UVBuffer = new VertexBuffer<Vector2> { Data = new Vector2[vertexCount] };
+						mesh.IndexBuffer = new IndexBuffer { Data = new ushort[indexCount] };
 					}
 					var morphTarget = new MorphableMesh.MorphTarget {
 						Timestamp = time,
-						Geometry = new GeometryBuffer {
-							Vertices = new Vector3[vertexCount],
-							Colors = new Color4[vertexCount]
-						}
+						PosColorBuffer = new VertexBuffer<MorphableMesh.PosColor> { Data = new MorphableMesh.PosColor[vertexCount] }
 					};
 					mesh.MorphTargets.Add(morphTarget);
 					int currentVertex = 0;
 					int currentIndex = 0;
 					foreach (var batch in renderList.Batches) {
-						CopyAnimableVertices(batch.Geometry, morphTarget.Geometry, currentVertex, batch.LastVertex);
+						CopyPosColorData(batch.VertexBuffer.Data, morphTarget.PosColorBuffer.Data, currentVertex, batch.LastVertex);
 						if (isFirstTimeStamp) {
 							var mbatch = new MorphableMesh.RenderBatch {
-								Texture1 = batch.Texture1,
-								Texture2 = batch.Texture2,
+								Texture = batch.Texture1,
 								Blending = batch.Blending,
 								Shader = batch.Shader,
 								StartIndex = batch.StartIndex + currentIndex,
 								IndexCount = batch.LastIndex - batch.StartIndex,
 							};
 							mesh.Batches.Add(mbatch);
-							CopyStaticVertices(batch.Geometry, mesh.Geometry, currentVertex, batch.LastVertex);
-							CopyIndices(batch.Geometry, mesh.Geometry, currentIndex, batch.LastIndex, (ushort)currentVertex);
+							CopyUV1Data(batch.VertexBuffer.Data, mesh.UVBuffer.Data, currentVertex, batch.LastVertex);
+							CopyIndices(batch.IndexBuffer.Data, mesh.IndexBuffer.Data, currentIndex, batch.LastIndex, (ushort)currentVertex);
 						}
 						currentVertex += batch.LastVertex;
 						currentIndex += batch.LastIndex;
@@ -241,6 +246,11 @@ namespace Lime
 			{
 				return false;
 			}
+			var id = node.Id;
+			if (id.Length > 0 && (id[0] == '>' || id[0] == '@')) {
+				// Make kumquat pleased.
+				return false;
+			}
 			IAnimator triggers;
 			if (node.Animators.TryFind("Trigger", out triggers) && triggers.ReadonlyKeys.Count > 0) {
 				return false;
@@ -253,22 +263,25 @@ namespace Lime
 			return true;
 		}
 
-		private void CopyStaticVertices(GeometryBuffer source, GeometryBuffer destination, int destinationIndex, int length)
+		private void CopyUV1Data(Vertex[] vertices, Vector2[] destination, int destinationIndex, int length)
 		{
-			Array.Copy(source.UV1, 0, destination.UV1, destinationIndex, length);
+			for (int i = 0; i < length; i++, destinationIndex++) {
+				destination[destinationIndex] = vertices[i].UV1;
+			}
 		}
 
-		private void CopyAnimableVertices(GeometryBuffer source, GeometryBuffer destination, int destinationIndex, int length)
+		private void CopyPosColorData(Vertex[] vertices, MorphableMesh.PosColor[] destination, int destinationIndex, int length)
 		{
-			Array.Copy(source.Vertices, 0, destination.Vertices, destinationIndex, length);
-			Array.Copy(source.Colors, 0, destination.Colors, destinationIndex, length);
+			for (int i = 0; i < length; i++, destinationIndex++) {
+				destination[destinationIndex].Position = vertices[i].Pos;
+				destination[destinationIndex].Color = vertices[i].Color;
+			}
 		}
 
-		private void CopyIndices(GeometryBuffer source, GeometryBuffer destination, int destinationIndex, int length, ushort offset)
+		private void CopyIndices(ushort[] source, ushort[] destination, int destinationIndex, int length, ushort offset)
 		{
-			Array.Copy(source.Indices, 0, destination.Indices, destinationIndex, length);
-			for (int i = 0; i < length; i++) {
-				destination.Indices[i + destinationIndex] += offset;
+			for (int i = 0; i < length; i++, destinationIndex++) {
+				destination[destinationIndex] = (ushort)(source[i] + offset);
 			}
 		}
 
