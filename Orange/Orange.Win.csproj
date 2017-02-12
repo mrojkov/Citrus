@@ -114,7 +114,6 @@
     <Compile Include="Source\Actions\RunTangerine.cs" />
     <Compile Include="Source\Actions\UpdateDictionaryTxt.cs" />
     <Compile Include="Source\Actions\UpdateXCodeProject.cs" />
-    <Compile Include="Source\AssetCooker\CodeCooker.cs" />
     <Compile Include="Source\AssetCooker\OpacityMaskCreator.cs" />
     <Compile Include="Source\Builder\BuildSystem.cs" />
     <Compile Include="Source\Builder\MSBuild.cs" />
@@ -194,10 +193,6 @@
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Kumquat\Kumquat.Win.csproj">
-      <Project>{b1a51655-d2ad-4d03-b3f2-619f27fecbc4}</Project>
-      <Name>Kumquat.Win</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Lemon\Lemon.Win.csproj">
       <Project>{538E41E4-725C-4521-BCF3-A5591A1A3AFD}</Project>
       <Name>Lemon.Win</Name>
