@@ -95,10 +95,15 @@ namespace Yuzu.Util
 				DeclaringTypes(t.DeclaringType, separator) + t.DeclaringType.Name + separator;
 		}
 
-		public static string GetTypeSpec(Type t)
+		public static string GetTypeSpec(Type t, string arraySize = "")
 		{
-			if (t.IsArray)
-				return GetTypeSpec(t.GetElementType()) + "[]";
+			if (t.IsArray) {
+				var suffix = String.Format("[{0}]", arraySize);
+				t = t.GetElementType();
+				for (; t.IsArray; suffix += "[]")
+					t = t.GetElementType();
+				return GetTypeSpec(t) + suffix;
+			}
 			var p = "global::" + t.Namespace + ".";
 			var n = DeclaringTypes(t, ".") + t.Name;
 			if (!t.IsGenericType)

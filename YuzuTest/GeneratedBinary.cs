@@ -293,6 +293,41 @@ namespace YuzuGenBin
 			return result;
 		}
 
+		private static void Read_YuzuTest__SampleArray2D(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::YuzuTest.SampleArray2D)obj;
+			var dg = (BinaryDeserializerGen)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 != fd.OurIndex) throw dg.Error("1!=" + fd.OurIndex);
+			result.A = (global::System.Int32[][])null;
+			var tmp1 = d.Reader.ReadInt32();
+			if (tmp1 >= 0) {
+				var tmp2 = new global::System.Int32[tmp1][];
+				for(tmp1 = 0; tmp1 < tmp2.Length; ++tmp1) {
+					tmp2[tmp1] = (global::System.Int32[])null;
+					var tmp3 = d.Reader.ReadInt32();
+					if (tmp3 >= 0) {
+						var tmp4 = new global::System.Int32[tmp3];
+						for(tmp3 = 0; tmp3 < tmp4.Length; ++tmp3) {
+							tmp4[tmp3] = d.Reader.ReadInt32();
+						}
+						tmp2[tmp1] = tmp4;
+					}
+				}
+				result.A = tmp2;
+			}
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_YuzuTest__SampleArray2D(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::YuzuTest.SampleArray2D();
+			Read_YuzuTest__SampleArray2D(d, def, result);
+			return result;
+		}
+
 		private static void Read_YuzuTest__SampleBase(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::YuzuTest.SampleBase)obj;
@@ -890,6 +925,7 @@ namespace YuzuGenBin
 			readCache[typeof(global::YuzuTest.SampleDictKeys)] = Read_YuzuTest__SampleDictKeys;
 			readCache[typeof(global::YuzuTest.SampleMemberI)] = Read_YuzuTest__SampleMemberI;
 			readCache[typeof(global::YuzuTest.SampleArray)] = Read_YuzuTest__SampleArray;
+			readCache[typeof(global::YuzuTest.SampleArray2D)] = Read_YuzuTest__SampleArray2D;
 			readCache[typeof(global::YuzuTest.SampleBase)] = Read_YuzuTest__SampleBase;
 			readCache[typeof(global::YuzuTest.SampleDerivedA)] = Read_YuzuTest__SampleDerivedA;
 			readCache[typeof(global::YuzuTest.SampleDerivedB)] = Read_YuzuTest__SampleDerivedB;
@@ -924,6 +960,7 @@ namespace YuzuGenBin
 			makeCache[typeof(global::YuzuTest.SampleDictKeys)] = Make_YuzuTest__SampleDictKeys;
 			makeCache[typeof(global::YuzuTest.SampleMemberI)] = Make_YuzuTest__SampleMemberI;
 			makeCache[typeof(global::YuzuTest.SampleArray)] = Make_YuzuTest__SampleArray;
+			makeCache[typeof(global::YuzuTest.SampleArray2D)] = Make_YuzuTest__SampleArray2D;
 			makeCache[typeof(global::YuzuTest.SampleBase)] = Make_YuzuTest__SampleBase;
 			makeCache[typeof(global::YuzuTest.SampleDerivedA)] = Make_YuzuTest__SampleDerivedA;
 			makeCache[typeof(global::YuzuTest.SampleDerivedB)] = Make_YuzuTest__SampleDerivedB;

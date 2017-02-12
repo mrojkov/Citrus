@@ -133,6 +133,7 @@ namespace Yuzu.Json
 			if (Options.AllowUnknownFields || JsonOptions.Unordered)
 				throw new NotImplementedException();
 			cw.Put("using System;\n");
+			cw.Put("using System.Collections.Generic;\n");
 			cw.Put("\n");
 			cw.Put("using Yuzu;\n");
 			cw.Put("using Yuzu.Json;\n");
@@ -151,7 +152,7 @@ namespace Yuzu.Json
 
 		private void PutRequireOrNullArray(char ch, Type t, string name)
 		{
-			cw.PutPart("RequireOrNull('{0}') ? null : new {1}[0];\n", ch, Utils.GetTypeSpec(t.GetElementType()));
+			cw.PutPart("RequireOrNull('{0}') ? null : new {1};\n", ch, Utils.GetTypeSpec(t, arraySize: "0"));
 			cw.Put("if ({0} != null) {{\n", name);
 		}
 
@@ -294,7 +295,7 @@ namespace Yuzu.Json
 				PutRequireOrNullArray('[', t, name);
 				cw.Put("if (SkipSpacesCarefully() != ']') {\n");
 				var tempArrayName = cw.GetTempName();
-				cw.Put("var {0} = new {1}[RequireUInt()];\n", tempArrayName, Utils.GetTypeSpec(t.GetElementType()));
+				cw.Put("var {0} = new {1};\n", tempArrayName, Utils.GetTypeSpec(t, arraySize: "RequireUInt()"));
 				var tempIndexName = cw.GetTempName();
 				cw.Put("for(int {0} = 0; {0} < {1}.Length; ++{0}) {{\n", tempIndexName, tempArrayName);
 				cw.Put("Require(',');\n");

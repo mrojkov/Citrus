@@ -169,6 +169,12 @@ namespace YuzuTest
 		public string[] A;
 	}
 
+	public class SampleArray2D
+	{
+		[YuzuRequired]
+		public int[][] A;
+	}
+
 	public class SampleTree
 	{
 		[YuzuRequired("a")]
