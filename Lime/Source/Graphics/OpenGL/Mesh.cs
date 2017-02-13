@@ -57,7 +57,12 @@ namespace Lime
 
 		public Mesh()
 		{
-			if (!vaoChecked && !(CommonWindow.Current != null && CommonWindow.Current is DummyWindow)) {
+#if WIN || MAC || MONOMAC
+			var requiredVaoCheck = !vaoChecked && !(CommonWindow.Current != null && CommonWindow.Current is DummyWindow);
+#else
+			var requiredVaoCheck = !vaoChecked;
+#endif
+			if (requiredVaoCheck) {
 				vaoChecked = true;
 				var ext = GL.GetString(StringName.Extensions);
 				vaoSupported = ext?.Contains("OES_vertex_array_object") ?? false;
