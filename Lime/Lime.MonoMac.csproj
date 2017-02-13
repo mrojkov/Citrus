@@ -280,6 +280,8 @@
     <Compile Include="Source\Application\MessageBox.cs" />
     <Compile Include="Source\Graphics\OpenGL\Mesh.cs" />
     <Compile Include="Source\Graphics\IMesh.cs" />
+    <Compile Include="Source\Widgets\MorphableMesh.cs" />
+    <Compile Include="Source\Widgets\MorphableMeshBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
