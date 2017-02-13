@@ -45,7 +45,7 @@ namespace Kumquat
 
 		private string GenerateCommonBase()
 		{
-			return !BaseClassName.IsNullOrWhiteSpace() ? $"\npublic Commons.{BaseClassName} {BaseClassName};" : "";
+			return !BaseClassName.IsNullOrWhiteSpace() ? $"\npublic Common.{BaseClassName} {BaseClassName};" : "";
 		}
 
 		private string GenerateInnerClasses(ScenesCodeCooker scenesCodeCooker)
@@ -64,7 +64,7 @@ namespace Kumquat
 		{
 			var result = "";
 			if (!BaseClassName.IsNullOrWhiteSpace()) {
-				result += $"{BaseClassName} = new Commons.{BaseClassName}(Widget);\n";
+				result += $"{BaseClassName} = new Common.{BaseClassName}(Widget);\n";
 			}
 			foreach (var node in ParsedNodes) {
 				result += string.Format(

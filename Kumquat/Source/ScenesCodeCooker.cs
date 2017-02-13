@@ -157,7 +157,7 @@ namespace Kumquat
 					}
 				}
 			};
-			var code = $"using Lime;\n namespace {(GetBundleNamespace(mainBundleName))}.Commons\n{{\n" +
+			var code = $"using Lime;\n namespace {(GetBundleNamespace(mainBundleName))}.Common\n{{\n" +
 			           $"<%GEN%>\n" +
 			           $"}}\n";
 
@@ -223,7 +223,7 @@ namespace Kumquat
 			}
 			code = code.Replace("<%GEN%>", "");
 			code = new CodeFormatter(code).FormattedCode;
-			File.WriteAllText($"{scenesPath}/{(mainBundleName)}/Commons.cs", code);
+			File.WriteAllText($"{scenesPath}/{(mainBundleName)}/Common.cs", code);
 		}
 
 		public string GetFullTypeOf(ParsedFramesTree parsedFramesTree)
