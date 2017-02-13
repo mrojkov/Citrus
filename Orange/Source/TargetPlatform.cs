@@ -3,7 +3,8 @@ namespace Orange
 {
 	public enum TargetPlatform
 	{
-		Desktop,
+		Win,
+		Mac,
 		iOS,
 		Android,
 		Unity,

@@ -21,6 +21,10 @@ namespace Orange
 
 		public static void SynchronizeProject(string projectFileName)
 		{
+			if (!File.Exists(projectFileName)) {
+				Console.WriteLine($"Warning: project file doesn't exist: {projectFileName}");
+				return;
+			}
 			bool changed = false;
 			var doc = new XmlDocument();
 			doc.Load(projectFileName);
@@ -36,7 +40,7 @@ namespace Orange
 					doc.Save(writer);
 				}
 			}
-			Console.WriteLine(string.Format("Synchronized project: {0}", projectFileName));
+			Console.WriteLine($"Synchronized project: {projectFileName}");
 		}
 
 		private static void IncludeNewItems(XmlDocument doc, ref bool changed)

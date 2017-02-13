@@ -78,8 +78,10 @@ namespace Orange
 		{
 			switch(platform)
 			{
-			case TargetPlatform.Desktop:
-				return "Desktop";
+			case TargetPlatform.Win:
+				return "Win";
+			case TargetPlatform.Mac:
+				return "Mac";
 			case TargetPlatform.iOS:
 				return "iOS";
 			case TargetPlatform.Android:

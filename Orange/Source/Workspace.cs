@@ -21,26 +21,12 @@ namespace Orange
 		private string dataFolderName;
 		private string pluginName;
 
-		public string GetPlatformSuffix()
+		public string GetPlatformSuffix(TargetPlatform? platform = null)
 		{
-			switch (ActivePlatform) {
-				case TargetPlatform.Android:
-					return ".Android";
-				case TargetPlatform.Desktop:
-#if WIN
-					return ".Win";
-#elif MAC || MONOMAC
-					return ".Mac";
-#endif
-				case TargetPlatform.iOS:
-#if WIN
-					throw new NotSupportedException();
-#elif MAC || MONOMAC
-					return ".iOS";
-#endif
-				default:
-					throw new NotSupportedException();
+			if (platform == null) {
+				platform = ActivePlatform;
 			}
+			return "." + Toolbox.GetTargetPlatformString(platform.Value);
 		}
 
 		/// <summary>
@@ -48,7 +34,8 @@ namespace Orange
 		/// </summary>
 		public string GetSolutionFilePath()
 		{
-			var path = Path.Combine(The.Workspace.ProjectDirectory, The.Workspace.Title + GetPlatformSuffix(), The.Workspace.Title + GetPlatformSuffix() + ".sln");
+			var path = Path.Combine(The.Workspace.ProjectDirectory, The.Workspace.Title + GetPlatformSuffix(),
+				The.Workspace.Title + GetPlatformSuffix() + ".sln");
 			return path;
 		}
 
@@ -63,16 +50,19 @@ namespace Orange
 		/// <summary>
 		/// Enumerate all game projects. E.g: Zx3.Game/Zx3.Game.Win.csproj
 		/// </summary>
-		public IEnumerable<string> EnumerateGameCsprojFilePaths()
+		public IEnumerable<string> EnumerateGameCsprojFilePaths(TargetPlatform? platform = null)
 		{
+			if (platform == null) {
+				platform = The.Workspace.ActivePlatform;
+			}
 			var dirInfo = new System.IO.DirectoryInfo(ProjectDirectory);
-			foreach (var fileInfo in dirInfo.GetFiles("*" + GetPlatformSuffix() + ".csproj", SearchOption.AllDirectories)) {
+			foreach (var fileInfo in dirInfo.GetFiles("*" + GetPlatformSuffix(platform) + ".csproj", SearchOption.AllDirectories)) {
 				var file = fileInfo.FullName;
 				yield return file;
 			}
 
-			var subTarget = The.UI.GetActiveSubTarget();
-			if (subTarget != null) {
+			var subtargets = The.Workspace.SubTargets.Where(i => i.Platform == platform);
+			foreach (var subTarget in subtargets) {
 				foreach (var subTargetCsprojFile in dirInfo.GetFiles(Path.GetFileName(subTarget.ProjectPath), SearchOption.AllDirectories)) {
 					yield return subTargetCsprojFile.FullName;
 				}
@@ -82,9 +72,12 @@ namespace Orange
 		/// <summary>
 		/// Returns Citrus/Lime project path. It is supposed that Citrus lies beside the game.
 		/// </summary>
-		public string GetLimeCsprojFilePath()
+		public string GetLimeCsprojFilePath(TargetPlatform? platform = null)
 		{
-			return Path.Combine(Path.GetDirectoryName(ProjectDirectory), "Citrus", "Lime", "Lime" + GetPlatformSuffix() + ".csproj");
+			if (platform == null) {
+				platform = The.Workspace.ActivePlatform;
+			}
+			return Path.Combine(Path.GetDirectoryName(ProjectDirectory), "Citrus", "Lime", "Lime" + GetPlatformSuffix(platform) + ".csproj");
 		}
 
 		public static readonly Workspace Instance = new Workspace();
@@ -137,16 +130,14 @@ namespace Orange
 				if (!Directory.Exists(AssetsDirectory)) {
 					throw new Lime.Exception("Assets folder '{0}' doesn't exist", AssetsDirectory);
 				}
-				if (!string.IsNullOrWhiteSpace(pluginName)) {
-					PluginLoader.ScanForPlugins(Path.Combine(Path.GetDirectoryName(file), pluginName));
-				} else {
-					PluginLoader.ScanForPlugins(file);
-				}
+				PluginLoader.ScanForPlugins(!string.IsNullOrWhiteSpace(pluginName)
+					? Path.Combine(Path.GetDirectoryName(file), pluginName)
+					: file);
 				AssetFiles = new FileEnumerator(AssetsDirectory);
 				The.UI.OnWorkspaceOpened();
 			}
 			catch (System.Exception e) {
-				Console.WriteLine(string.Format("Can't open {0}:\n{1}", file, e.Message));
+				Console.WriteLine($"Can't open {file}:\n{e.Message}");
 			}
 		}
 
@@ -169,11 +160,6 @@ namespace Orange
 				SubTargets.Add(new SubTarget(target["Name"] as string, target["Project"] as string,
 											 cleanBeforeBuild, GetPlaformByName(target["Platform"] as string)));
 			}
-		}
-
-		public string GetActivePlatformString()
-		{
-			return Toolbox.GetTargetPlatformString(ActivePlatform);
 		}
 
 		public string GetMainBundlePath()
@@ -205,7 +191,7 @@ namespace Orange
 			return Path.Combine(ProjectDirectory, Title + ".Unity");
 		}
 
-		private TargetPlatform GetPlaformByName(string name)
+		private static TargetPlatform GetPlaformByName(string name)
 		{
 			try {
 				return (TargetPlatform)Enum.Parse(typeof(TargetPlatform), name, true);

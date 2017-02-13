@@ -14,16 +14,6 @@ namespace Orange.Source
 		protected TargetPlatform Platform;
 		public string Configuration;
 
-		private Dictionary<TargetPlatform, string> fileEndings = new Dictionary<TargetPlatform, string> {
-#if WIN
-			{TargetPlatform.Desktop, ".Win.sln"},
-#elif MAC
-			{TargetPlatform.Desktop, ".Mac.sln"},
-#endif
-			{TargetPlatform.Android, ".Android.csproj"},
-			{TargetPlatform.iOS, ".iOS.sln"}
-		};
-
 		public BuildSystem(string projectDirectory, string projectName, TargetPlatform platform, string customSolution)
 		{
 			Platform = platform;
@@ -31,7 +21,7 @@ namespace Orange.Source
 			if (customSolution != null)
 				SlnPath = Path.Combine(projectDirectory, customSolution);
 			else
-				SlnPath = Path.Combine(projectDirectory, projectName + fileEndings[platform]);
+				SlnPath = Path.Combine(projectDirectory, projectName + "." + Toolbox.GetTargetPlatformString(platform) + ".sln");
 		}
 
 		public string ReleaseBinariesDirectory

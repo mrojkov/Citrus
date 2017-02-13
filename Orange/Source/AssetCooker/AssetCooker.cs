@@ -569,7 +569,8 @@ namespace Orange
 				case TargetPlatform.Android:
 				case TargetPlatform.iOS:
 					return item1.PVRFormat == item2.PVRFormat && item1.Pixbuf.HasAlpha == item2.Pixbuf.HasAlpha;
-				case TargetPlatform.Desktop:
+				case TargetPlatform.Win:
+				case TargetPlatform.Mac:
 					return item1.DDSFormat == item2.DDSFormat;
 				case TargetPlatform.Unity:
 					return true;
@@ -641,7 +642,8 @@ namespace Orange
 				case TargetPlatform.iOS:
 					ConvertTexture(path, attributes, file => TextureConverter.ToPVR(texture, file, rules.MipMaps, rules.HighQualityCompression, rules.PVRFormat));
 					break;
-				case TargetPlatform.Desktop:
+				case TargetPlatform.Win:
+				case TargetPlatform.Mac:
 					ConvertTexture(path, attributes, file => TextureConverter.ToDDS(texture, file, rules.DDSFormat, rules.MipMaps));
 					break;
 				default:

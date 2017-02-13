@@ -9,7 +9,7 @@ namespace Orange
 	{
 		public Window NativeWindow;
 		public FileChooserButton CitrusProjectChooser;
-		public ComboBox PlatformPicker;
+		private ComboBox platformPicker;
 		public TextView OutputPane;
 		public ComboBox ActionPicker;
 		public CheckButton UpdateBeforeBuildCheckbox;
@@ -121,9 +121,9 @@ namespace Orange
 			table.Attach(label1, 0, 1, 0, 1, xoptions: AttachOptions.Fill, yoptions: 0,
 				xpadding: 0, ypadding: 0);
 
-			PlatformPicker = ComboBox.NewText();
+			platformPicker = ComboBox.NewText();
 			UpdatePlatformPicker();
-			table.Attach(PlatformPicker, 1, 2, 0, 1);
+			table.Attach(platformPicker, 1, 2, 0, 1);
 
 			// Citrus project section
 			var label2 = new Label() { Xalign = 1, LabelProp = "Citrus Project" };
@@ -144,19 +144,19 @@ namespace Orange
 
 		private void UpdatePlatformPicker()
 		{
-			(PlatformPicker.Model as ListStore).Clear();
+			(platformPicker.Model as ListStore).Clear();
 
-			PlatformPicker.AppendText("Desktop (PC, Mac, Linux)");
-			PlatformPicker.AppendText("iPhone/iPad");
-			PlatformPicker.AppendText("Android");
-			PlatformPicker.AppendText("Unity");
+			platformPicker.AppendText("Desktop (PC, Mac, Linux)");
+			platformPicker.AppendText("iPhone/iPad");
+			platformPicker.AppendText("Android");
+			platformPicker.AppendText("Unity");
 
 			if (The.Workspace.SubTargets != null) {
 				foreach (var target in The.Workspace.SubTargets)
-					PlatformPicker.AppendText(target.Name);
+					platformPicker.AppendText(target.Name);
 			}
 
-			PlatformPicker.Active = 0;
+			platformPicker.Active = 0;
 		}
 	}
 }

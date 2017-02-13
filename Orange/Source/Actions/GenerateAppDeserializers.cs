@@ -13,10 +13,18 @@ namespace Orange
 		public static void GenerateYuzuDeserializersForApp()
 		{
 			AssetCooker.CookForActivePlatform();
-			if (!BuildGame(Orange.TargetPlatform.Desktop)) {
+#if WIN
+			if (!BuildGame(Orange.TargetPlatform.Win)) {
+#elif MAC
+			if (!BuildGame(Orange.TargetPlatform.Mac)) {
+#endif
 				return;
 			}
-			var builder = new SolutionBuilder(TargetPlatform.Desktop);
+#if WIN
+			var builder = new SolutionBuilder(TargetPlatform.Win);
+#elif MAC
+			var builder = new SolutionBuilder(TargetPlatform.Mac);
+#endif
 			int exitCode = builder.Run("--GenerateYuzuDeserializers");
 			if (exitCode != 0) {
 				Console.WriteLine("Application terminated with exit code {0}", exitCode);

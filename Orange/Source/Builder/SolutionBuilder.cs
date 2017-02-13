@@ -13,10 +13,10 @@ namespace Orange
 		public readonly string ReleaseBinariesDirectory;
 		public readonly string DebugBinariesDirectory;
 
-		string projectDirectory;
-		string projectName;
-		string customSolution;
-		TargetPlatform platform;
+		readonly string projectDirectory;
+		readonly string projectName;
+		readonly string customSolution;
+		readonly TargetPlatform platform;
 
 		public static string ConfigurationName = "Release";
 
@@ -24,30 +24,8 @@ namespace Orange
 		{
 			this.platform = platform;
 			projectName = The.Workspace.Title;
-			projectDirectory = Path.Combine(The.Workspace.ProjectDirectory, projectName);
+			projectDirectory = Path.Combine(The.Workspace.ProjectDirectory, projectName + "." + Toolbox.GetTargetPlatformString(platform));
 			this.customSolution = customSolution;
-			switch (platform) {
-				case TargetPlatform.Android:
-					projectDirectory += ".Android";
-					break;
-				case TargetPlatform.Desktop:
-#if WIN
-					projectDirectory += ".Win";
-#elif MAC || MONOMAC
-					projectDirectory += ".Mac";
-#endif
-					break;
-				case TargetPlatform.iOS:
-#if WIN
-					throw new NotSupportedException();
-#elif MAC || MONOMAC
-					projectDirectory += ".iOS";
-					break;
-#endif
-				default:
-					throw new NotSupportedException();
-			}
-
 			var builder = GetBuildSystem();
 			ReleaseBinariesDirectory = builder.ReleaseBinariesDirectory;
 			DebugBinariesDirectory = builder.DebugBinariesDirectory;
@@ -76,14 +54,16 @@ namespace Orange
 
 		private static void SynchronizeAll()
 		{
-			var limeProj = The.Workspace.GetLimeCsprojFilePath();
-			CsprojSynchronization.SynchronizeProject(limeProj);
-			var dontSynchronizeProject = The.Workspace.ProjectJson["DontSynchronizeProject"] as bool?;
-			if (dontSynchronizeProject != null && dontSynchronizeProject.Value) {
-				return;
-			}
-			foreach (var gameProj in The.Workspace.EnumerateGameCsprojFilePaths()) {
-				CsprojSynchronization.SynchronizeProject(gameProj);
+			foreach (var platform in (TargetPlatform[])Enum.GetValues(typeof(TargetPlatform))) {
+				var limeProj = The.Workspace.GetLimeCsprojFilePath(platform);
+				CsprojSynchronization.SynchronizeProject(limeProj);
+				var dontSynchronizeProject = The.Workspace.ProjectJson["DontSynchronizeProject"] as bool?;
+				if (dontSynchronizeProject != null && dontSynchronizeProject.Value) {
+					return;
+				}
+				foreach (var gameProj in The.Workspace.EnumerateGameCsprojFilePaths(platform)) {
+					CsprojSynchronization.SynchronizeProject(gameProj);
+				}
 			}
 		}
 
@@ -127,13 +107,13 @@ namespace Orange
 		{
 			string app;
 #if MAC
-			if (platform == TargetPlatform.Desktop) {
+			if (platform == TargetPlatform.Mac) {
 				app = Path.Combine(projectDirectory, string.Format("bin/{0}", ConfigurationName), projectName + ".app", "Contents/MacOS", projectName);
 			} else {
 				throw new NotImplementedException();
 			}
 #elif WIN
-			app = Path.Combine(projectDirectory, String.Format("bin/{0}", ConfigurationName), projectName + ".exe");
+			app = Path.Combine(projectDirectory, $"bin/{ConfigurationName}", projectName + ".exe");
 #endif
 			return app;
 		}
@@ -204,17 +184,17 @@ namespace Orange
 			Console.WriteLine("------------------ Deploying ------------------");
 			Console.WriteLine("Uninstalling previous apk ({0})", packageName);
 
-			if (Process.Start(adb, String.Format("shell pm uninstall {0}", packageName)) == 0) {
+			if (Process.Start(adb, $"shell pm uninstall {packageName}") == 0) {
 				Console.WriteLine("Uninstalled!");
 			} else {
 				Console.WriteLine("Error during uninstalling. Probably application wasn't installed.");
 			}
 
 			Console.WriteLine("Installing apk {0}", apkPath);
-			if (Process.Start(adb, String.Format("install {0}", apkPath)) == 0) {
+			if (Process.Start(adb, $"install {apkPath}") == 0) {
 				Console.WriteLine("App installed.");
 				Console.WriteLine("Starting application.");
-				Process.Start(adb, String.Format("shell monkey -p {0} -c android.intent.category.LAUNCHER 1", packageName));
+				Process.Start(adb, $"shell monkey -p {packageName} -c android.intent.category.LAUNCHER 1");
 			} else {
 				Console.WriteLine("Error during installing.");
 			}

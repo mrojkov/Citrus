@@ -19,10 +19,10 @@ namespace Orange
 			path = Path.Combine(path, "Tangerine");
 
 #if WIN
-			var buildSystem = new Source.MSBuild(path, "Tangerine", TargetPlatform.Desktop);
+			var buildSystem = new Source.MSBuild(path, "Tangerine", TargetPlatform.Win);
 			buildSystem.Configuration = "Release";
 #elif MAC
-			var buildSystem = new Source.MDTool(path, "Tangerine", TargetPlatform.Desktop);
+			var buildSystem = new Source.MDTool(path, "Tangerine", TargetPlatform.Mac);
 			buildSystem.Configuration = "Debug"; // Release requires code signing, use debug for a while.
 #endif
 			buildSystem.PrepareForBuild();

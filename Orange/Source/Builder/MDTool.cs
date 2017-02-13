@@ -38,7 +38,8 @@ namespace Orange.Source
 					platformSpecification = "|iPhone";
 					break;
 				}
-				case TargetPlatform.Desktop: {
+				case TargetPlatform.Win:
+				case TargetPlatform.Mac: {
 					// Need to research strange behaviour due to this string
 					//platformSpecification = "|x86";
 					platformSpecification = "";

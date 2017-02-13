@@ -18,15 +18,32 @@ namespace Orange
 			if (subTarget != null)
 				return subTarget.Platform;
 
-			return (TargetPlatform)PlatformPicker.Active;
+			switch (platformPicker.Active) {
+				case 0:
+#if WIN
+					return TargetPlatform.Win;
+#elif MAC
+					return TargetPlatform.Mac;
+#else
+					throw new NotImplementedException();
+#endif
+				case 1:
+					return TargetPlatform.iOS;
+				case 2:
+					return TargetPlatform.Android;
+				case 3:
+					return TargetPlatform.Unity;
+				default:
+					throw new NotSupportedException();
+			};
 		}
 
 		public override SubTarget GetActiveSubTarget()
 		{
 			var platformsCount = Enum.GetValues(typeof(TargetPlatform)).Length;
 
-			if (PlatformPicker.Active > (platformsCount - 1))
-				return The.Workspace.SubTargets[PlatformPicker.Active - platformsCount];
+			if (platformPicker.Active > (platformsCount - 1))
+				return The.Workspace.SubTargets[platformPicker.Active - platformsCount];
 
 			return null;
 		}
@@ -149,7 +166,7 @@ namespace Orange
 			var startTime = DateTime.Now;
 			The.Workspace.Save();
 			EnableControls(false);
-			var platform = (TargetPlatform)PlatformPicker.Active;
+			var platform = (TargetPlatform)platformPicker.Active;
 			try {
 				try {
 					ClearLog();
@@ -180,7 +197,7 @@ namespace Orange
 		{
 			GoButton.Sensitive = value;
 			ActionPicker.Sensitive = value;
-			PlatformPicker.Sensitive = value;
+			platformPicker.Sensitive = value;
 			CitrusProjectChooser.Sensitive = value;
 			UpdateBeforeBuildCheckbox.Sensitive = value;
 		}
@@ -225,7 +242,7 @@ namespace Orange
 
 		private bool CheckTargetAvailability()
 		{
-			var platform = (TargetPlatform)PlatformPicker.Active;
+			var platform = (TargetPlatform)platformPicker.Active;
 #if WIN
 			if (platform == TargetPlatform.iOS) {
 				ShowError("iOS target is not supported on Windows platform");

@@ -147,9 +147,17 @@ namespace Orange
 					return TargetPlatform.Android;
 				case "desktop":
 				case null:
-					return TargetPlatform.Desktop;
+#if WIN
+					return TargetPlatform.Win;
+#elif MAC
+					return TargetPlatform.Mac;
+#endif
+				case "win":
+					return TargetPlatform.Win;
+				case "mac":
+					return TargetPlatform.Mac;
 				default:
-					Console.WriteLine("Target platform must be either ios, android or desktop");
+					Console.WriteLine("Target platform must be either ios, android, desktop, win, mac");
 					throw new TerminateException(1);
 			}
 		}
