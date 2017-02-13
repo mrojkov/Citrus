@@ -12,31 +12,29 @@ namespace Kumquat
 	{
 		private readonly string directory;
 		private readonly string projectName;
-		private readonly string bundleName;
 		private readonly Dictionary<string, string> sceneToBundleMap;
 		private readonly Dictionary<string, Frame> scenes;
-
 		public readonly string SceneCodeTemplate;
 		public readonly string FrameCodeTemplate;
 		public readonly string NodeCodeTemplate;
-
 		private string currentCookingScene;
-		private string BundleNamespace { get { return GetBundleNamespace(projectName, bundleName); } }
-
 		private readonly Dictionary<string, List<ParsedFramesTree>> commonParts = new Dictionary<string, List<ParsedFramesTree>>();
+		private readonly Dictionary<string, List<string>> referringScenes = new Dictionary<string, List<string>>();
+		private readonly string mainBundleName;
 
 		public ScenesCodeCooker(
 			string directory,
 			string projectName,
+			string mainBundleName,
 			Dictionary<string, string> sceneToBundleMap,
 			Dictionary<string, Frame> scenes
 		)
 		{
 			this.directory = directory;
 			this.projectName = projectName;
+			this.mainBundleName = mainBundleName;
 			this.sceneToBundleMap = sceneToBundleMap;
 			this.scenes = scenes;
-			bundleName = sceneToBundleMap[scenes.Keys.First()];
 			SceneCodeTemplate = GetEmbeddedResource("SceneFile.txt");
 			FrameCodeTemplate = GetEmbeddedResource("ParsedFrame.txt");
 			NodeCodeTemplate = GetEmbeddedResource("ParsedNode.txt");
@@ -45,25 +43,41 @@ namespace Kumquat
 		public void Start()
 		{
 			Console.WriteLine("Generating scenes code for {0} scenes...", scenes.Count);
-			var generatedScenesPath = $@"{directory}/{projectName}.GeneratedScenes";
+			var generatedScenesPath = $"{directory}/{projectName}.GeneratedScenes";
 			if (!Directory.Exists(generatedScenesPath)) {
 				GenerateProjectFiles(generatedScenesPath);
 			}
-			var bundleSourcePath = $@"{directory}/{projectName}.GeneratedScenes/Scenes/{bundleName}";
-			if (Directory.Exists(bundleSourcePath)) {
-				Directory.Delete(bundleSourcePath, true);
+			var scenesPath = $@"{directory}/{projectName}.GeneratedScenes/Scenes";
+			if (Directory.Exists(scenesPath)) {
+				Directory.Delete(scenesPath, true);
 			}
-			Directory.CreateDirectory(bundleSourcePath);
+			var sceneToFrameTree = new List<Tuple<string, ParsedFramesTree>>();
 			foreach (var scene in scenes) {
+				var bundleName = sceneToBundleMap[scene.Key];
+				var bundleSourcePath = $"{scenesPath}/{bundleName}";
+				Directory.CreateDirectory(bundleSourcePath);
 				currentCookingScene = scene.Key;
 				var parsedFramesTree = GenerateParsedFramesTree(scene.Key, scene.Value);
+				sceneToFrameTree.Add(new Tuple<string, ParsedFramesTree>(scene.Key, parsedFramesTree));
+			}
+			foreach (var kv in sceneToFrameTree) {
+				var parsedFramesTree = kv.Item2;
+				currentCookingScene = kv.Item1;
+				var k = Path.ChangeExtension(kv.Item1, null);
+				k = AssetPath.CorrectSlashes(k);
+				bool useful = parsedFramesTree.ParsedNodes.Count > 0 || parsedFramesTree.InnerClasses.Count > 0;
+				if (!useful && !referringScenes.ContainsKey(k)) {
+					continue;
+				}
+				var bundleName = sceneToBundleMap[kv.Item1];
+				var bundleSourcePath = $"{scenesPath}/{bundleName}";
 				var code = parsedFramesTree.GenerateCode(this);
 				code = code.Replace("<%PROJECT_NAME%>", projectName);
-				code = code.Replace("<%NAMESPACE%>", BundleNamespace);
+				code = code.Replace("<%NAMESPACE%>", GetBundleNamespace(bundleName));
 				code = new CodeFormatter(code).FormattedCode;
 				File.WriteAllText(bundleSourcePath + "/" + parsedFramesTree.ClassName + ".cs", code);
 			}
-			GenerateCommonParts(bundleSourcePath);
+			GenerateCommonParts(scenesPath);
 		}
 
 		private void GenerateProjectFiles(string generatedScenesPath)
@@ -121,7 +135,7 @@ namespace Kumquat
 			return tested;
 		}
 
-		private void GenerateCommonParts(string bundleSourcePath)
+		private void GenerateCommonParts(string scenesPath)
 		{
 			if (commonParts.Count <= 0) {
 				return;
@@ -143,7 +157,7 @@ namespace Kumquat
 					}
 				}
 			};
-			var code = $"using Lime;\n namespace {BundleNamespace}.Commons\n{{\n" +
+			var code = $"using Lime;\n namespace {(GetBundleNamespace(mainBundleName))}.Commons\n{{\n" +
 			           $"<%GEN%>\n" +
 			           $"}}\n";
 
@@ -161,8 +175,8 @@ namespace Kumquat
 				while (queue.Count != 0) {
 					var s = queue.Dequeue();
 					var nextRoot = sync.Dequeue();
-					Dictionary<string, List<ParsedFramesTree>> treeUnion = new Dictionary<string, List<ParsedFramesTree>>();
-					Dictionary<string, List<ParsedNode>> leafUnion = new Dictionary<string, List<ParsedNode>>();
+					var treeUnion = new Dictionary<string, List<ParsedFramesTree>>();
+					var leafUnion = new Dictionary<string, List<ParsedNode>>();
 					foreach (var ft in s) {
 						foreach (var leafNode in ft.ParsedNodes) {
 							var k = leafNode.Name + GetFullTypeOf(leafNode);
@@ -181,16 +195,18 @@ namespace Kumquat
 					}
 					foreach (var i in leafUnion) {
 						if (i.Value.Count == s.Count) {
-							var leafClone = new ParsedNode(i.Value.First());
-							leafClone.Type = GetCommonBaseClass(i.Value.Select(j => j.Type).ToList()).Name;
+							var leafClone = new ParsedNode(i.Value.First()) {
+								Type = GetCommonBaseClass(i.Value.Select(j => j.Type).ToList()).Name
+							};
 							UniteMarkers(leafClone, i.Value);
 							nextRoot.ParsedNodes.Add(leafClone);
 						}
 					}
 					foreach (var i in treeUnion) {
 						if (i.Value.Count == s.Count) {
-							var subtreeClone = new ParsedFramesTree(i.Value.First());
-							subtreeClone.ParsedNode.Type = GetCommonBaseClass(i.Value.Select(j => j.ParsedNode.Type).ToList()).Name;
+							var subtreeClone = new ParsedFramesTree(i.Value.First()) {
+								ParsedNode = { Type = GetCommonBaseClass(i.Value.Select(j => j.ParsedNode.Type).ToList()).Name }
+							};
 							UniteMarkers(subtreeClone.ParsedNode, i.Value.Select(j => j.ParsedNode).ToList());
 							nextRoot.InnerClasses.Add(subtreeClone);
 							queue.Enqueue(i.Value);
@@ -207,7 +223,7 @@ namespace Kumquat
 			}
 			code = code.Replace("<%GEN%>", "");
 			code = new CodeFormatter(code).FormattedCode;
-			File.WriteAllText(bundleSourcePath + "/Commons.cs", code);
+			File.WriteAllText($"{scenesPath}/{(mainBundleName)}/Commons.cs", code);
 		}
 
 		public string GetFullTypeOf(ParsedFramesTree parsedFramesTree)
@@ -216,7 +232,7 @@ namespace Kumquat
 				return parsedFramesTree.ClassName;
 			}
 
-			var pftType = string.Format("{0}<{1}>", parsedFramesTree.ClassName, parsedFramesTree.ParsedNode.Type);
+			var pftType = $"{parsedFramesTree.ClassName}<{parsedFramesTree.ParsedNode.Type}>";
 
 			var scenePath = parsedFramesTree.ParsedNode.ContentsPath + ".scene";
 			string bundleName;
@@ -224,9 +240,8 @@ namespace Kumquat
 				Console.WriteLine("Warning! Can not find external scene \'{0}\' in \'{1}!\'", scenePath, currentCookingScene);
 				return pftType;
 			}
-			var pftBundleNamespace = GetBundleNamespace(projectName, bundleName);
-
-			return BundleNamespace == pftBundleNamespace ? pftType : pftBundleNamespace + '.' + pftType;
+			var pftBundleNamespace = GetBundleNamespace(bundleName);
+			return GetBundleNamespace(sceneToBundleMap[currentCookingScene]) == pftBundleNamespace ? pftType : pftBundleNamespace + '.' + pftType;
 		}
 
 		public string GetFullTypeOf(ParsedNode node)
@@ -235,7 +250,7 @@ namespace Kumquat
 				return node.ClassName;
 			}
 
-			var nodeType = string.Format("{0}<{1}>", node.ClassName, node.Type);
+			var nodeType = $"{node.ClassName}<{node.Type}>";
 
 			var scenePath = node.ContentsPath + ".scene";
 			string bundleName;
@@ -243,9 +258,8 @@ namespace Kumquat
 				Console.WriteLine("Warning! Can not find external scene \'{0}\' in \'{1}!\'", scenePath, currentCookingScene);
 				return nodeType;
 			}
-			var nodeBundleNamespace = GetBundleNamespace(projectName, bundleName);
-
-			return BundleNamespace == nodeBundleNamespace ? nodeType : nodeBundleNamespace + '.' + nodeType;
+			var nodeBundleNamespace = GetBundleNamespace(bundleName);
+			return GetBundleNamespace(sceneToBundleMap[currentCookingScene]) == nodeBundleNamespace ? nodeType : nodeBundleNamespace + '.' + nodeType;
 		}
 
 		public static bool ParseCommonName(string source, out string name, out string commonName)
@@ -272,6 +286,15 @@ namespace Kumquat
 			return parsedFramesTree;
 		}
 
+		private void AddReferringSceneSafe(string externalScene, string referringScene)
+		{
+			if (!referringScenes.ContainsKey(externalScene)) {
+				var l = new List<string>();
+				referringScenes.Add(externalScene, l);
+			}
+			referringScenes[externalScene].Add(referringScene);
+		}
+
 		private ParsedFramesTree GenerateParsedFramesTreeHelper(Node node, string name, string baseName)
 		{
 			var parsedFramesTree = new ParsedFramesTree {
@@ -282,11 +305,13 @@ namespace Kumquat
 				BaseClassName = baseName,
 			};
 			if (parsedFramesTree.ParsedNode.IsExternalScene) {
+				AddReferringSceneSafe(parsedFramesTree.ParsedNode.ContentsPath, currentCookingScene);
 				string externalName;
 				string externalBaseName;
 				ParseCommonName(Path.GetFileNameWithoutExtension(parsedFramesTree.ParsedNode.ContentsPath), out externalName, out externalBaseName);
 				parsedFramesTree.ClassName = externalName;
 				parsedFramesTree.BaseClassName = externalBaseName;
+
 			}
 			if (!baseName.IsNullOrWhiteSpace()) {
 				if (!commonParts.ContainsKey(baseName)) {
@@ -321,7 +346,9 @@ namespace Kumquat
 							parsedNode = new ParsedNode(n, n.Id.Substring(1));
 							parsedFramesTree.ParsedNodes.Add(parsedNode);
 						}
-
+						if (parsedNode != null && parsedNode.IsExternalScene) {
+							AddReferringSceneSafe(parsedNode.ContentsPath, currentCookingScene);
+						}
 						if (n.Nodes.Count > 0 && (parsedNode == null || !parsedNode.IsExternalScene)) {
 							nodesToParse.Add(n);
 						}
@@ -331,13 +358,10 @@ namespace Kumquat
 			return parsedFramesTree;
 		}
 
-		private static string GetBundleNamespace(string projectName, string bundleName)
+		private string GetBundleNamespace(string bundleName)
 		{
-			return string.Format(
-				"{0}.Scenes{1}",
-				projectName,
-				bundleName == "Main" ? "" : "." + bundleName.Substring(bundleName.LastIndexOf('/') + 1)
-			);
+			string bundlePart = bundleName == mainBundleName ? "" : "." + Path.GetFileName(bundleName);
+			return $"{projectName}.Scenes{bundlePart}";
 		}
 
 		#region GetCodeTemplate
