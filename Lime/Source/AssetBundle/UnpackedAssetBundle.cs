@@ -6,11 +6,11 @@ using System.IO;
 
 namespace Lime
 {
-	public class UnpackedAssetsBundle : AssetsBundle
+	public class UnpackedAssetBundle : AssetBundle
 	{
 		public readonly string BaseDirectory;
 
-		public UnpackedAssetsBundle(string baseDirectory)
+		public UnpackedAssetBundle(string baseDirectory)
 		{
 			this.BaseDirectory = baseDirectory;
 		}

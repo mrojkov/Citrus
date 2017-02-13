@@ -172,7 +172,7 @@ namespace Lime
 			}
 			cyclicDependencyTracker.Add(path);
 			try {
-				using (Stream stream = AssetsBundle.Instance.OpenFileLocalized(path)) {
+				using (Stream stream = AssetBundle.Instance.OpenFileLocalized(path)) {
 					Serialization.ReadObject<Frame>(path, stream, this);
 				}
 				LoadContent();

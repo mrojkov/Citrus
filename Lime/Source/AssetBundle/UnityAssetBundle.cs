@@ -7,11 +7,11 @@ using System.IO;
 
 namespace Lime
 {
-	public sealed class UnityAssetsBundle : AssetsBundle
+	public sealed class UnityAssetBundle : AssetBundle
 	{
 		List<string> fileList;
 
-		public UnityAssetsBundle()
+		public UnityAssetBundle()
 		{
 			ReadFileList();
 		}
@@ -70,7 +70,7 @@ namespace Lime
 		{
 			throw new NotImplementedException();
 		}
-		
+
 		public override IEnumerable<string> EnumerateFiles()
 		{
 			return fileList.ToArray();

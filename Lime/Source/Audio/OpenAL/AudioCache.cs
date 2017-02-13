@@ -35,11 +35,11 @@ namespace Lime
 			if (stream != null) {
 				return stream;
 			}
-			if (!AssetsBundle.Instance.FileExists(path)) {
+			if (!AssetBundle.Instance.FileExists(path)) {
 				Logger.Write("Missing audio file '{0}'", path);
 				return null;
 			}
-			stream = PackedAssetsBundle.Instance.OpenFileLocalized(path);
+			stream = PackedAssetBundle.Instance.OpenFileLocalized(path);
 			if (stream.Length < MaxCachedSampleSize) {
 				CacheSoundAsync(path);
 			}
@@ -50,7 +50,7 @@ namespace Lime
 		{
 			var bw = new BackgroundWorker();
 			bw.DoWork += (s, e) => {
-				using (var stream = PackedAssetsBundle.Instance.OpenFileLocalized(path)) {
+				using (var stream = PackedAssetBundle.Instance.OpenFileLocalized(path)) {
 					var memStream = new MemoryStream((int)stream.Length);
 					stream.CopyTo(memStream);
 					memStream.Position = 0;

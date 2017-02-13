@@ -7,7 +7,7 @@ using System.IO;
 
 namespace Lime
 {
-	public sealed class UnityDownloadableBundle : AssetsBundle
+	public sealed class UnityDownloadableBundle : AssetBundle
 	{
 		private List<string> fileList;
 		private UnityEngine.AssetBundle bundle;

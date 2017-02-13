@@ -6,7 +6,7 @@ using System.IO;
 
 namespace Orange
 {
-	public class UnityAssetBundle : Lime.UnpackedAssetsBundle
+	public class UnityAssetBundle : Lime.UnpackedAssetBundle
 	{
 		private bool needToUpdateFilesTXT = false;
 

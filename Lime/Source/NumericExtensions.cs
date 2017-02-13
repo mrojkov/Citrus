@@ -130,14 +130,14 @@ namespace Lime
 		{
 			string result = value.ToString("N0");
 			if (
-				string.IsNullOrEmpty(AssetsBundle.CurrentLanguage) 
-				|| AssetsBundle.CurrentLanguage == "EN"
-				|| AssetsBundle.CurrentLanguage == "JP"
-				|| AssetsBundle.CurrentLanguage == "KR"
-				|| AssetsBundle.CurrentLanguage == "CN"
+				string.IsNullOrEmpty(AssetBundle.CurrentLanguage)
+				|| AssetBundle.CurrentLanguage == "EN"
+				|| AssetBundle.CurrentLanguage == "JP"
+				|| AssetBundle.CurrentLanguage == "KR"
+				|| AssetBundle.CurrentLanguage == "CN"
 			) {
 				return result;
-			} else if (AssetsBundle.CurrentLanguage == "BR") {
+			} else if (AssetBundle.CurrentLanguage == "BR") {
 				return result.Replace(',', '.'); // заменяем запятые на точки
 			} else {
 				return result.Replace(',', (char)160); // заменяем запятые на неразрывные пробелы

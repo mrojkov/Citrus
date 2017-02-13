@@ -105,19 +105,19 @@ namespace Lime
 
 		public void LoadImage(string path)
 		{
-			using (var stream = AssetsBundle.Instance.OpenFileLocalized(path)) {
+			using (var stream = AssetBundle.Instance.OpenFileLocalized(path)) {
 				LoadImageHelper(stream, createReloader: false);
 			}
 			reloader = new TextureBundleReloader(path);
 			var alphaTexturePath = Path.ChangeExtension(path, ".alpha.pvr");
-			if (AssetsBundle.Instance.FileExists(alphaTexturePath)) {
+			if (AssetBundle.Instance.FileExists(alphaTexturePath)) {
 				if (AlphaTexture == null) {
 					AlphaTexture = new Texture2D();
 				}
 				((Texture2D)AlphaTexture).LoadImage(alphaTexturePath);
 			}
 			var maskPath = Path.ChangeExtension(path, ".mask");
-			if (AssetsBundle.Instance.FileExists(maskPath)) {
+			if (AssetBundle.Instance.FileExists(maskPath)) {
 				OpacityMask = new OpacityMask(maskPath);
 			}
 		}

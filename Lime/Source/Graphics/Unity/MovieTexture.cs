@@ -41,13 +41,13 @@ namespace Lime
 				throw new ArgumentException();
 			}
 			Stop();
-			movieTexture = AssetsBundle.Instance.LoadUnityAsset<UnityEngine.MovieTexture>(Path + ".ogv");
+			movieTexture = AssetBundle.Instance.LoadUnityAsset<UnityEngine.MovieTexture>(Path + ".ogv");
 			movieTexture.loop = false;
 			movieTexture.wrapMode = UnityEngine.TextureWrapMode.Clamp;
 			movieTexture.filterMode = UnityEngine.FilterMode.Bilinear;
 			foreach (var i in new string[] { "_alpha.ogv", "_Alpha.ogv" }) {
-				if (AssetsBundle.Instance.FileExists(Path + i)) {
-					alphaMovieTexture = AssetsBundle.Instance.LoadUnityAsset<UnityEngine.MovieTexture>(Path + i);
+				if (AssetBundle.Instance.FileExists(Path + i)) {
+					alphaMovieTexture = AssetBundle.Instance.LoadUnityAsset<UnityEngine.MovieTexture>(Path + i);
 					alphaMovieTexture.loop = false;
 					alphaMovieTexture.wrapMode = UnityEngine.TextureWrapMode.Clamp;
 					alphaMovieTexture.filterMode = UnityEngine.FilterMode.Bilinear;

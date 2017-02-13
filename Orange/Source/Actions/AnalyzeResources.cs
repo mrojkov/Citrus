@@ -17,12 +17,12 @@ namespace Orange
 		}
 
 		internal static List<PathRequestRecord> requestedPaths;
-		public class BundleSwitcher : AssetsBundle
+		public class BundleSwitcher : AssetBundle
 		{
-			AssetsBundle mainBundle;
-			AssetsBundle secondaryBundle;
+			AssetBundle mainBundle;
+			AssetBundle secondaryBundle;
 
-			public BundleSwitcher(AssetsBundle mainBundle, AssetsBundle secondaryBundle)
+			public BundleSwitcher(AssetBundle mainBundle, AssetBundle secondaryBundle)
 			{
 				this.mainBundle = mainBundle;
 				this.secondaryBundle = secondaryBundle;
@@ -33,7 +33,7 @@ namespace Orange
 				if (mainBundle.FileExists(path)) {
 					requestedPaths.Add(new PathRequestRecord() {
 						path = path,
-						bundle = (mainBundle as PackedAssetsBundle).Path,
+						bundle = (mainBundle as PackedAssetBundle).Path,
 					});
 					return mainBundle.OpenFile(path);
 				} else {
@@ -87,7 +87,7 @@ namespace Orange
 			var bundles = new HashSet<string>();
 			var cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles,
 				The.Workspace.ActivePlatform, The.Workspace.Target);
-			AssetsBundle.Instance = new PackedAssetsBundle(
+			AssetBundle.Instance = new PackedAssetBundle(
 				The.Workspace.GetBundlePath(CookingRules.MainBundleName));
 			foreach (var i in cookingRulesMap) {
 				if (i.Key.EndsWith(".png")) {
@@ -115,8 +115,8 @@ namespace Orange
 				}
 			}
 			foreach (var i in bundles) {
-				AssetsBundle.Instance = new BundleSwitcher(new PackedAssetsBundle(The.Workspace.GetBundlePath(i)),
-					AssetsBundle.Instance);
+				AssetBundle.Instance = new BundleSwitcher(new PackedAssetBundle(The.Workspace.GetBundlePath(i)),
+					AssetBundle.Instance);
 			}
 			The.Workspace.AssetFiles.EnumerationFilter = (info) => {
 				CookingRules rules;
@@ -163,8 +163,8 @@ namespace Orange
 								texPath + ".png",
 							};
 							foreach (var tpp in possiblePaths) {
-								if (Lime.AssetsBundle.Instance.FileExists(tpp)) {
-									Lime.AssetsBundle.Instance.OpenFile(tpp);
+								if (Lime.AssetBundle.Instance.FileExists(tpp)) {
+									Lime.AssetBundle.Instance.OpenFile(tpp);
 									return;
 								}
 							}
@@ -190,11 +190,11 @@ namespace Orange
 						} else if (j is Lime.Audio) {
 							var au = j as Lime.Audio;
 							var path = au.Sample.SerializationPath + ".sound";
-							if (!Lime.AssetsBundle.Instance.FileExists(path)) {
+							if (!Lime.AssetBundle.Instance.FileExists(path)) {
 								missingResourcesReport.Add(string.Format("audio missing:\n\taudio path: {0}\n\tscene path: {1}\n",
 									path, j.ToString()));
 							} else {
-								using (var tempStream = Lime.AssetsBundle.Instance.OpenFile(path)) {
+								using (var tempStream = Lime.AssetBundle.Instance.OpenFile(path)) {
 
 								}
 							}

@@ -121,7 +121,8 @@
     <Compile Include="Source\Application\Window.Mac.cs" />
     <Compile Include="Source\Application\Window.Win.cs" />
     <Compile Include="Source\Application\WindowOptions.cs" />
-    <Compile Include="Source\AssetsBundle\UnityAssetsBundle.cs" />
+    <Compile Include="Source\AssetBundle\AggregateAssetBundle.cs" />
+    <Compile Include="Source\AssetBundle\UnityAssetBundle.cs" />
     <Compile Include="Source\Audio\IAudioChannel.cs" />
     <Compile Include="Source\Audio\OpenAL\AudioCache.cs" />
     <Compile Include="Source\Audio\OpenAL\AudioChannel.cs" />
@@ -223,7 +224,7 @@
     <Compile Include="Source\NumericExtensions.cs" />
     <Compile Include="Source\Application\Application.cs" />
     <Compile Include="Source\Application\Logger.cs" />
-    <Compile Include="Source\AssetsBundle\AssetsBundle.cs" />
+    <Compile Include="Source\AssetBundle\AssetBundle.cs" />
     <Compile Include="Source\Audio\SerializableSample.cs" />
     <Compile Include="Source\Audio\Sound.cs" />
     <Compile Include="Source\Widgets\PopupMenu\ImageBox.cs" />
@@ -234,7 +235,7 @@
     <Compile Include="Source\Environment.cs" />
     <Compile Include="Source\Widgets\PopupMenu\RoundedRectangle.cs" />
     <Compile Include="Source\GeometryUtils.cs" />
-    <Compile Include="Source\AssetsBundle\PackedAssetsBundle.cs" />
+    <Compile Include="Source\AssetBundle\PackedAssetBundle.cs" />
     <Compile Include="Source\Audio\AudioSystem.cs" />
     <Compile Include="Source\Exception.cs" />
     <Compile Include="Source\Graphics\SerializableTexture.cs" />
@@ -258,7 +259,7 @@
     <Compile Include="Source\Types\Size.cs" />
     <Compile Include="Source\Types\Vector2.cs" />
     <Compile Include="Source\Types\Vector3.cs" />
-    <Compile Include="Source\AssetsBundle\UnpackedAssetsBundle.cs" />
+    <Compile Include="Source\AssetBundle\UnpackedAssetBundle.cs" />
     <Compile Include="Source\Widgets\Tasks\TaskList.cs" />
     <Compile Include="Source\Widgets\Tasks\Task.cs" />
     <Compile Include="Source\Widgets\Animation\AnimationUtils.cs" />
@@ -310,7 +311,7 @@
     <Compile Include="Source\Graphics\Unity\PlatformGeometryBuffer.cs" />
     <Compile Include="Source\Graphics\Unity\PlatformRenderer.cs" />
     <Compile Include="Source\Audio\Unity\PlatformAudioSystem.cs" />
-    <Compile Include="Source\AssetsBundle\UnityDownloadableBundle.cs" />
+    <Compile Include="Source\AssetBundle\UnityDownloadableBundle.cs" />
     <Compile Include="Source\Types\BitSet32.cs" />
     <Compile Include="Source\Application\AndroidActivityDelegate.cs" />
     <Compile Include="Source\Application\AndroidGameView.cs" />

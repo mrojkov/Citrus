@@ -892,7 +892,7 @@ namespace Lime
 		/// </summary>
 		internal static string ResolveScenePath(string path)
 		{
-			var candidates = sceneExtensions.Select(ext => Path.ChangeExtension(path, ext)).Where(AssetsBundle.Instance.FileExists);
+			var candidates = sceneExtensions.Select(ext => Path.ChangeExtension(path, ext)).Where(AssetBundle.Instance.FileExists);
 			if (candidates.Count() > 1) {
 				throw new Lime.Exception("Ambiguity between: {0}", string.Join("; ", candidates.ToArray()));
 			}

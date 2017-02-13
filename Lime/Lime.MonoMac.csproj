@@ -136,7 +136,6 @@
     <Compile Include="Source\Audio\IAudioChannel.cs" />
     <Compile Include="Source\Types\BitSet32.cs" />
     <Compile Include="Source\Input\SoftKeyboard.cs" />
-    <Compile Include="Source\AssetsBundle\UnityDownloadableBundle.cs" />
     <Compile Include="Source\Audio\Unity\AudioChannel.cs" />
     <Compile Include="Source\Audio\Unity\PlatformAudioSystem.cs" />
     <Compile Include="Source\Graphics\Bitmap.Unity.cs" />
@@ -282,6 +281,11 @@
     <Compile Include="Source\Graphics\IMesh.cs" />
     <Compile Include="Source\Widgets\MorphableMesh.cs" />
     <Compile Include="Source\Widgets\MorphableMeshBuilder.cs" />
+    <Compile Include="Source\AssetBundle\AssetBundle.cs" />
+    <Compile Include="Source\AssetBundle\PackedAssetBundle.cs" />
+    <Compile Include="Source\AssetBundle\UnityAssetBundle.cs" />
+    <Compile Include="Source\AssetBundle\UnityDownloadableBundle.cs" />
+    <Compile Include="Source\AssetBundle\UnpackedAssetBundle.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
@@ -331,15 +335,11 @@
     <Compile Include="Source\Widgets\Polyline.cs" />
     <Compile Include="Source\StringExtensions.cs" />
     <Compile Include="Source\Application\Logger.cs" />
-    <Compile Include="Source\AssetsBundle\AssetsBundle.cs" />
-    <Compile Include="Source\AssetsBundle\PackedAssetsBundle.cs" />
-    <Compile Include="Source\AssetsBundle\UnpackedAssetsBundle.cs" />
     <Compile Include="Source\Widgets\NodeDebugView.cs" />
     <Compile Include="Source\NumericExtensions.cs" />
     <Compile Include="Source\Toolbox.cs" />
     <Compile Include="Source\RewindableStream.cs" />
     <Compile Include="Source\Graphics\ITexture.cs" />
-    <Compile Include="Source\AssetsBundle\UnityAssetsBundle.cs" />
     <Compile Include="Source\Graphics\OpenGL\RenderTexture.cs" />
     <Compile Include="Source\Graphics\OpenGL\Texture2D.DDS.cs" />
     <Compile Include="Source\Graphics\OpenGL\Texture2D.Pvr.cs" />

@@ -21,15 +21,15 @@ namespace Orange
 		private static void UnpackBundle(string bundlePath)
 		{
 			string outputDirectory = bundlePath + ".Unpacked";
-			using (AssetsBundle.Instance = new PackedAssetsBundle(bundlePath, AssetBundleFlags.None)) {
+			using (AssetBundle.Instance = new PackedAssetBundle(bundlePath, AssetBundleFlags.None)) {
 				Console.WriteLine("Extracting game content into \"{0}\"", outputDirectory);
 				if (Directory.Exists(outputDirectory)) {
 					Directory.Delete(outputDirectory, true);
 				}
 				Directory.CreateDirectory(outputDirectory);
 				using (new DirectoryChanger(outputDirectory)) {
-					foreach (string asset in AssetsBundle.Instance.EnumerateFiles()) {
-						using (var stream = AssetsBundle.Instance.OpenFile(asset)) {
+					foreach (string asset in AssetBundle.Instance.EnumerateFiles()) {
+						using (var stream = AssetBundle.Instance.OpenFile(asset)) {
 							Console.WriteLine("> " + asset);
 							string assetDirectory = Path.GetDirectoryName(asset);
 							if (assetDirectory != "") {
@@ -48,12 +48,12 @@ namespace Orange
 		{
 			string bundlePath = The.Workspace.GetMainBundlePath();
 			string outputDirectory = The.Workspace.AssetsDirectory;
-			using (AssetsBundle.Instance = new PackedAssetsBundle(bundlePath, AssetBundleFlags.None)) {
+			using (AssetBundle.Instance = new PackedAssetBundle(bundlePath, AssetBundleFlags.None)) {
 				Console.WriteLine("Extracting tangerine scenes into \"{0}\"", outputDirectory);
 				using (new DirectoryChanger(outputDirectory)) {
-					foreach (string asset in AssetsBundle.Instance.EnumerateFiles()) {
+					foreach (string asset in AssetBundle.Instance.EnumerateFiles()) {
 						if (Path.GetExtension(asset) == ".scene") {
-							using (var stream = AssetsBundle.Instance.OpenFile(asset)) {
+							using (var stream = AssetBundle.Instance.OpenFile(asset)) {
 								var	outputPath = Path.ChangeExtension(asset, ".tan");
 								Console.WriteLine("> " + outputPath);
 								var buffer = new byte[stream.Length];
@@ -63,7 +63,7 @@ namespace Orange
 						}
 					}
 				}
-			}		
+			}
 		}
 	}
 }

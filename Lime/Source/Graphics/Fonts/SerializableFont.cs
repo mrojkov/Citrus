@@ -99,7 +99,7 @@ namespace Lime
 				string[] fontExtensions = { ".tft", ".fnt" };
 				foreach (var e in fontExtensions) {
 					string path = "Fonts/" + name + e;
-					if (!AssetsBundle.Initialized || !AssetsBundle.Instance.FileExists(path))
+					if (!AssetBundle.Initialized || !AssetBundle.Instance.FileExists(path))
 						continue;
 					font = Serialization.ReadObject<Font>(path);
 					fonts[name] = font;
