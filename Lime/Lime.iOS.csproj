@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -101,16 +101,12 @@
     <Compile Include="Source\StringExtensions.cs" />
     <Compile Include="Source\Application\Logger.cs" />
     <Compile Include="Source\Application\Application.cs" />
-    <Compile Include="Source\AssetsBundle\AssetsBundle.cs" />
-    <Compile Include="Source\AssetsBundle\PackedAssetsBundle.cs" />
-    <Compile Include="Source\AssetsBundle\UnpackedAssetsBundle.cs" />
     <Compile Include="Source\Graphics\OgvDecoder.cs" />
     <Compile Include="Source\Widgets\NodeDebugView.cs" />
     <Compile Include="Source\NumericExtensions.cs" />
     <Compile Include="Source\Toolbox.cs" />
     <Compile Include="Source\RewindableStream.cs" />
     <Compile Include="Source\Graphics\ITexture.cs" />
-    <Compile Include="Source\AssetsBundle\UnityAssetsBundle.cs" />
     <Compile Include="Source\Graphics\OpenGL\RenderTexture.cs" />
     <Compile Include="Source\Graphics\OpenGL\Texture2D.DDS.cs" />
     <Compile Include="Source\Graphics\OpenGL\Texture2D.Pvr.cs" />
@@ -196,7 +192,6 @@
     <Compile Include="Source\Audio\OpenAL\WaveIMA4Decoder.cs" />
     <Compile Include="Source\Audio\Unity\AudioChannel.cs" />
     <Compile Include="Source\Audio\Unity\PlatformAudioSystem.cs" />
-    <Compile Include="Source\AssetsBundle\UnityDownloadableBundle.cs" />
     <Compile Include="Source\Types\BitSet32.cs" />
     <Compile Include="Source\Input\SoftKeyboard.cs" />
     <Compile Include="Source\Widgets\Animation\AnimationEngine.cs" />
@@ -341,6 +336,13 @@
     <Compile Include="Source\Widgets\MorphableMeshBuilder.cs" />
     <Compile Include="Source\Graphics\OpenGL\Mesh.cs" />
     <Compile Include="Source\Graphics\IMesh.cs" />
+    <Compile Include="Source\Application\MessageBox.cs" />
+    <Compile Include="Source\AssetBundle\AggregateAssetBundle.cs" />
+    <Compile Include="Source\AssetBundle\AssetBundle.cs" />
+    <Compile Include="Source\AssetBundle\PackedAssetBundle.cs" />
+    <Compile Include="Source\AssetBundle\UnityAssetBundle.cs" />
+    <Compile Include="Source\AssetBundle\UnityDownloadableBundle.cs" />
+    <Compile Include="Source\AssetBundle\UnpackedAssetBundle.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

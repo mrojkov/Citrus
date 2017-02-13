@@ -286,6 +286,7 @@
     <Compile Include="Source\AssetBundle\UnityAssetBundle.cs" />
     <Compile Include="Source\AssetBundle\UnityDownloadableBundle.cs" />
     <Compile Include="Source\AssetBundle\UnpackedAssetBundle.cs" />
+    <Compile Include="Source\AssetBundle\AggregateAssetBundle.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
