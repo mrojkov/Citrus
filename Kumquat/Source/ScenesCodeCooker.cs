@@ -65,7 +65,10 @@ namespace Kumquat
 				currentCookingScene = kv.Item1;
 				var k = Path.ChangeExtension(kv.Item1, null);
 				k = AssetPath.CorrectSlashes(k);
-				bool useful = parsedFramesTree.ParsedNodes.Count > 0 || parsedFramesTree.InnerClasses.Count > 0;
+				var id = scenes[kv.Item1].Id;
+				bool useful = parsedFramesTree.ParsedNodes.Count > 0 ||
+					parsedFramesTree.InnerClasses.Count > 0 ||
+					(id != null && id.StartsWith("@"));
 				if (!useful && !referringScenes.ContainsKey(k)) {
 					continue;
 				}
