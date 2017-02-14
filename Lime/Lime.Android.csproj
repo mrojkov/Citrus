@@ -69,10 +69,6 @@
     <Compile Include="Source\Application\iOSGameView.cs" />
     <Compile Include="Source\Application\Logger.cs" />
     <Compile Include="Source\Application\Sdl2.cs" />
-    <Compile Include="Source\AssetsBundle\AssetsBundle.cs" />
-    <Compile Include="Source\AssetsBundle\PackedAssetsBundle.cs" />
-    <Compile Include="Source\AssetsBundle\UnityAssetsBundle.cs" />
-    <Compile Include="Source\AssetsBundle\UnpackedAssetsBundle.cs" />
     <Compile Include="Source\Audio\AudioSystem.cs" />
     <Compile Include="Source\Audio\SerializableSample.cs" />
     <Compile Include="Source\Audio\Sound.cs" />
@@ -336,15 +332,12 @@
     <Compile Include="Source\Widgets\MorphableMeshBuilder.cs" />
     <Compile Include="Source\Widgets\MorphableMesh.cs" />
     <Compile Include="Source\Application\MessageBox.cs" />
-<<<<<<< HEAD
-=======
     <Compile Include="Source\AssetBundle\AggregateAssetBundle.cs" />
     <Compile Include="Source\AssetBundle\AssetBundle.cs" />
     <Compile Include="Source\AssetBundle\PackedAssetBundle.cs" />
     <Compile Include="Source\AssetBundle\UnityAssetBundle.cs" />
     <Compile Include="Source\AssetBundle\UnityDownloadableBundle.cs" />
     <Compile Include="Source\AssetBundle\UnpackedAssetBundle.cs" />
->>>>>>> update project files
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Android.csproj">
