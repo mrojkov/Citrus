@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Threading;
 using Lime;
 
 namespace Kumquat
@@ -40,6 +41,34 @@ namespace Kumquat
 			NodeCodeTemplate = GetEmbeddedResource("ParsedNode.txt");
 		}
 
+		private static void RetryUntilSuccessDeleteDirectory(string path)
+		{
+			while (true) {
+				try {
+					Directory.Delete(path, true);
+					Console.WriteLine($"Deleted directory {path}");
+					break;
+				} catch (System.Exception) {
+					Console.WriteLine($"Failed to delete {path}");
+				}
+				System.Threading.Thread.Sleep(100);
+			}
+		}
+
+		private static void RetryUntilSuccessCreateDirectory(string path)
+		{
+			while (true) {
+				try {
+					Directory.CreateDirectory(path);
+					Console.WriteLine($"Created directory {path}");
+					break;
+				} catch (System.Exception) {
+					Console.WriteLine($"Failed to create {path}");
+				}
+				System.Threading.Thread.Sleep(100);
+			}
+		}
+
 		public void Start()
 		{
 			Console.WriteLine("Generating scenes code for {0} scenes...", scenes.Count);
@@ -49,13 +78,15 @@ namespace Kumquat
 			}
 			var scenesPath = $@"{directory}/{projectName}.GeneratedScenes/Scenes";
 			if (Directory.Exists(scenesPath)) {
-				Directory.Delete(scenesPath, true);
+				RetryUntilSuccessDeleteDirectory(scenesPath);
 			}
 			var sceneToFrameTree = new List<Tuple<string, ParsedFramesTree>>();
 			foreach (var scene in scenes) {
 				var bundleName = sceneToBundleMap[scene.Key];
 				var bundleSourcePath = $"{scenesPath}/{bundleName}";
-				Directory.CreateDirectory(bundleSourcePath);
+				if (!Directory.Exists(bundleSourcePath)) {
+					RetryUntilSuccessCreateDirectory(bundleSourcePath);
+				}
 				currentCookingScene = scene.Key;
 				var parsedFramesTree = GenerateParsedFramesTree(scene.Key, scene.Value);
 				sceneToFrameTree.Add(new Tuple<string, ParsedFramesTree>(scene.Key, parsedFramesTree));
