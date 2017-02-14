@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -131,6 +131,17 @@
     <Compile Include="Source\Nuget\Nuget.cs" />
     <Compile Include="Source\Plugins\IPluginUIBuilder.cs" />
     <Compile Include="Source\Plugins\PluginLoader.cs" />
+    <Compile Include="Source\DictionaryExtractorWindow.cs" />
+    <Compile Include="Source\DictionaryOldFormatExtractor.cs" />
+    <Compile Include="Source\Main.GUI.cs" />
+    <Compile Include="Source\Actions\UpdateDictionaryTxtOldFormat.cs" />
+    <Compile Include="Source\AssetCooker\CodeCooker.cs" />
+    <Compile Include="Source\Toolbox\EmbeddedResource.cs" />
+    <Compile Include="Source\Toolbox\FontBuilder.cs" />
+    <Compile Include="Source\UI\MainWindow.PluginUI.cs" />
+    <Compile Include="Source\UI\MainWindow.UI.cs" />
+    <Compile Include="Source\UI\MainWindow.cs" />
+    <Compile Include="Source\UI\PluginUIBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Toolchain.Mac\PVRTexTool">
@@ -172,6 +183,10 @@
     <ProjectReference Include="..\Yuzu\Yuzu.csproj">
       <Project>{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}</Project>
       <Name>Yuzu</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Kumquat\Kumquat.Mac.csproj">
+      <Project>{B1A51655-D2AD-4D03-B3F2-619F27FECBC4}</Project>
+      <Name>Kumquat.Mac</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

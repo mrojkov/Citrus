@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{4B2BDD5A-2AAE-46AE-AA1A-8C9308BAA50D}</ProjectGuid>
+    <ProjectGuid>{B1A51655-D2AD-4D03-B3F2-619F27FECBC4}</ProjectGuid>
     <ProjectTypeGuids>{A3F8F2AB-B479-4A4A-A458-A89E7DC349F1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
-    <RootNamespace>Orange</RootNamespace>
-    <AssemblyName>Orange</AssemblyName>
+    <RootNamespace>Kumquat</RootNamespace>
+    <AssemblyName>Kumquat</AssemblyName>
     <newfilesearch>OnLoad</newfilesearch>
     <SuppressXamMacUpsell>True</SuppressXamMacUpsell>
     <SuppressXamMacMigration>True</SuppressXamMacMigration>
@@ -61,22 +61,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="MonoMac" />
-    <Reference Include="Mono.Posix" />
-    <Reference Include="Microsoft.Build.Engine" />
-    <Reference Include="AssimpNet">
-      <HintPath>..\3rdParty\AssimpNet\AssimpNet.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\3rdParty\Newtonsoft.Json\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="glib-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
-    <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -86,45 +72,18 @@
     <Compile Include="Source\ScenesCodeCooker.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Toolchain.Mac\PVRTexTool">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Toolchain.Mac\nvcompress">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Toolchain.Win\nuget.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Orange.Mac.userprefs">
-      <Visible>False</Visible>
-    </None>
-    <None Include="Orange.Win.v11.suo">
-      <Visible>False</Visible>
-    </None>
-    <None Include="Orange.Win.v12.suo">
-      <Visible>False</Visible>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <NativeReference Include="..\3rdParty\AssimpNet\libassimp.dylib">
-      <IsCxx>False</IsCxx>
-      <Kind>Dynamic</Kind>
-    </NativeReference>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Lime\Lime.MonoMac.csproj">
       <Project>{DC16EEBF-404D-4610-B87A-15B57464D707}</Project>
       <Name>Lime.MonoMac</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Lemon\Lemon.MonoMac.csproj">
-      <Project>{4604AA2E-129F-4814-AD0D-8BA35346ECC4}</Project>
-      <Name>Lemon.MonoMac</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Yuzu\Yuzu.csproj">
-      <Project>{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}</Project>
-      <Name>Yuzu</Name>
-    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Source\CodeTemplates\ParsedFrame.txt" />
+    <EmbeddedResource Include="Source\CodeTemplates\ParsedNode.txt" />
+    <EmbeddedResource Include="Source\CodeTemplates\SceneFile.txt" />
+    <EmbeddedResource Include="Templates\GeneratedScenes.Android.csproj" />
+    <EmbeddedResource Include="Templates\GeneratedScenes.iOS.csproj" />
+    <EmbeddedResource Include="Templates\GeneratedScenes.Win.csproj" />
+    <EmbeddedResource Include="Templates\ParsedWidget.cs" />
   </ItemGroup>
 </Project>
