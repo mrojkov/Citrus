@@ -181,6 +181,7 @@ namespace Orange
 			AddStage(() => SyncRawAssets(".raw"));
 			AddStage(WarnAboutNPOTTextures);
 			AddStage(() => SyncRawAssets(".bin"));
+			AddStage(CodeCooker.Cook);
 		}
 
 		private static void WarnAboutNPOTTextures()

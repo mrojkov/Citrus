@@ -1,0 +1,21 @@
+﻿public class <%CLASS_NAME%> : ParsedWidget
+{
+	<%IT%>
+	<%COMMON_BASE%>
+
+	<%INNER_CLASSES%>
+	<%FIELDS%>
+
+	public <%CLASS_NAME%>(Widget widget)
+	{
+		Widget = widget;
+		<%INIT_FIELDS%>
+	}
+
+	public <%CLASS_NAME%> Clone()
+	{
+		return new <%CLASS_NAME%>(It.Clone<Widget>());
+	}
+
+	<%ANIMATIONS%>
+}
