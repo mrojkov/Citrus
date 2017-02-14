@@ -60,7 +60,9 @@ namespace Lime
 #if WIN || MAC || MONOMAC
 			var requiredVaoCheck = !vaoChecked && !(CommonWindow.Current != null && CommonWindow.Current is DummyWindow);
 #else
-			var requiredVaoCheck = !vaoChecked;
+			// Vao check was temporary disabled because of crush on iOS devices
+			//var requiredVaoCheck = !vaoChecked;
+			var requiredVaoCheck = false;
 #endif
 			if (requiredVaoCheck) {
 				vaoChecked = true;
