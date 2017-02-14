@@ -26,7 +26,7 @@ namespace Lime
 		/// </summary>
 		/// <param name="fontName">Font file name.</param>
 		public DynamicFont(string fontName)
-			: this(AssetsBundle.Instance.ReadFile("Fonts/" + fontName))
+			: this(AssetBundle.Instance.ReadFile("Fonts/" + fontName))
 		{
 		}
 
