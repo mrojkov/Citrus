@@ -101,11 +101,11 @@ Rules can be optionally marked with platform identifier to specify to which plat
 |                          | `LZMA`              | |
 | `TextureAtlas`           | `None`              | |
 |                          | `${DirectoryName}`  | |
-|                          | `<custom_name>`     | |
+|                          | custom value        | |
 | `MipMaps`                | `Yes` or `No`       | doesn't seem to work at all |
 | `HighQualityCompression` | `Yes` or `No`       | |
 | `Bundle`                 | `<default>`, `data` | main bundle |
-|                          | <user_defined>      | |
+|                          | custom value        | |
 | `Ignore`                 | `Yes`, `No`         | if set to `Yes` applicable assets won't make it to bundle |
 | `ADPCMLimit`             | int                 | |
 | `TextureScaleFactor`     | float               | designed to be texture size multiplier. however if it's not 1.0f texture size multiplied by 0.75 with a mix of some logic. see code for detail. |
