@@ -163,24 +163,24 @@ namespace Lime
 			if (cyclicDependencyTracker == null) {
 				cyclicDependencyTracker = new HashSet<string>();
 			}
-			path = ResolveScenePath(path);
-			if (path == null) {
-				return;
+			var fullPath = ResolveScenePath(path);
+			if (fullPath == null) {
+				throw new Lime.Exception($"Scene '{path}' not found in current asset bundle");
 			}
-			if (cyclicDependencyTracker.Contains(path)) {
-				throw new Lime.Exception("Cyclic dependency of scenes was detected: {0}", path);
+			if (cyclicDependencyTracker.Contains(fullPath)) {
+				throw new Lime.Exception("Cyclic dependency of scenes was detected: {0}", fullPath);
 			}
-			cyclicDependencyTracker.Add(path);
+			cyclicDependencyTracker.Add(fullPath);
 			try {
-				using (Stream stream = AssetBundle.Instance.OpenFileLocalized(path)) {
-					Serialization.ReadObject<Frame>(path, stream, this);
+				using (Stream stream = AssetBundle.Instance.OpenFileLocalized(fullPath)) {
+					Serialization.ReadObject<Frame>(fullPath, stream, this);
 				}
 				LoadContent();
 				if (!Application.IsTangerine) {
-					Tag = path;
+					Tag = fullPath;
 				}
 			} finally {
-				cyclicDependencyTracker.Remove(path);
+				cyclicDependencyTracker.Remove(fullPath);
 			}
 		}
 
