@@ -16,7 +16,6 @@ namespace Lime
 	{
 		private bool disposed;
 		private uint vaoHandle;
-		private static uint boundVaoHandle;
 		private static bool vaoSupported;
 		private static bool vaoChecked;
 		private static int currentContext;
@@ -60,9 +59,7 @@ namespace Lime
 #if WIN || MAC || MONOMAC
 			var requiredVaoCheck = !vaoChecked && !(CommonWindow.Current != null && CommonWindow.Current is DummyWindow);
 #else
-			// Vao check was temporary disabled because of crush on iOS devices
-			//var requiredVaoCheck = !vaoChecked;
-			var requiredVaoCheck = false;
+			var requiredVaoCheck = !vaoChecked;
 #endif
 			if (requiredVaoCheck) {
 				vaoChecked = true;
@@ -80,7 +77,6 @@ namespace Lime
 
 		private unsafe void AllocateVAOHandle()
 		{
-			boundVaoHandle = 0;
 			fixed (uint* p = &vaoHandle) {
 				glGenVertexArrays(1, p);
 			}
@@ -110,10 +106,7 @@ namespace Lime
 						vb.SetAttribPointers(Attributes[i++]);
 					}
 				}
-				if (vaoHandle != boundVaoHandle) {
-					boundVaoHandle = vaoHandle;
-					glBindVertexArray(vaoHandle);
-				}
+				glBindVertexArray(vaoHandle);
 				foreach (var vb in glVertexBuffers) {
 					vb.BufferData();
 				}

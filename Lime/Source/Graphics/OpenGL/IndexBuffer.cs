@@ -19,7 +19,6 @@ namespace Lime
 	public class IndexBuffer : IIndexBuffer, IGLIndexBuffer, IGLObject
 	{
 		private uint iboHandle;
-		private static uint boundIboHandle;
 		private bool disposed;
 
 		public ushort[] Data { get; set; }
@@ -47,7 +46,6 @@ namespace Lime
 			var t = new int[1];
 			GL.GenBuffers(1, t);
 			iboHandle = (uint)t[0];
-			boundIboHandle = 0;
 		}
 
 		void IGLIndexBuffer.BufferData()
@@ -55,10 +53,7 @@ namespace Lime
 			if (iboHandle == 0) {
 				AllocateHandle();
 			}
-			if (boundIboHandle != iboHandle) {
-				boundIboHandle = iboHandle;
-				GL.BindBuffer(BufferTarget.ElementArrayBuffer, iboHandle);
-			}
+			GL.BindBuffer(BufferTarget.ElementArrayBuffer, iboHandle);
 			if (Dirty) {
 				Dirty = false;
 				var usageHint = Dynamic ? BufferUsageHint.DynamicDraw : BufferUsageHint.StaticDraw;
