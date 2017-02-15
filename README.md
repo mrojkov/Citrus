@@ -84,34 +84,31 @@ Rules can be optionally marked with platform identifier to specify to which plat
 'AtlasPacker'
 'ModelCompressing'
 
-| rule                | values           | description  |
-| -----------         | ---------------- | ------------ |
-| `DDSFormat`         | `DXTi`           | DXTi         |
-|                     | `ARGB8`, `RGBA8` | Uncompressed |
-| `PVRFormat`         | `PVRTC4`         | Fallbacks to PVRTC2 if image has no alpha |
-|                     | `PVRTC4_Forced`  | |
-|                     | `PVRTC2`         | |
-|                     | `RGBA4`          | |
-|                     | `RGB565`         | |
-|                     | `ARGB8`          | |
-|                     | `RGBA8`          | |
-| `AtlasOptimization` | `Memory` | Default |
-|                     | `DrawCalls` | |
-| `ModelCompressing`  | `Deflate` | |
-|                     | `LZMA` | |
-| `TextureAtlas`      | `None` | |
-|                     | `${DirectoryName}` | |
-|                     | `<custom_name>` | |
-
-`MipMaps` : `Yes` or `No`
-`HighQualityCompression` : `Yes`, `No`
-`PVRFormat` : ...
-`DDSFormat` : ...
-`Bundle` : `<default>`, `data` (CookingRules.MainBundleName), `anyotherbundlename`
-`Ignore` : `Yes`, `No`
-`ADPCMLimit` : int
-`TextureScaleFactor` : float
-`AtlasPacker` : `string` custom packer
-`ModelCompressing` : ...
+| rule                     | values              | description  |
+| ------------------------ | ------------------- | ------------ |
+| `DDSFormat`              | `DXTi`              | DXTi         |
+|                          | `ARGB8`, `RGBA8`    | Uncompressed |
+| `PVRFormat`              | `PVRTC4`            | Falls back to PVRTC2 if image has no alpha |
+|                          | `PVRTC4_Forced`     | |
+|                          | `PVRTC2`            | |
+|                          | `RGBA4`             | |
+|                          | `RGB565`            | |
+|                          | `ARGB8`             | |
+|                          | `RGBA8`             | |
+| `AtlasOptimization`      | `Memory`            | Default; best pack rate heuristics |
+|                          | `DrawCalls`         | try to fit as many items to atlas as possible |
+| `ModelCompressing`       | `Deflate`           | |
+|                          | `LZMA`              | |
+| `TextureAtlas`           | `None`              | |
+|                          | `${DirectoryName}`  | |
+|                          | `<custom_name>`     | |
+| `MipMaps`                | `Yes` or `No`       | doesn't seem to work at all |
+| `HighQualityCompression` | `Yes` or `No`       | |
+| `Bundle`                 | `<default>`, `data` | main bundle |
+|                          | <user_defined>      | |
+| `Ignore`                 | `Yes`, `No`         | if set to `Yes` applicable assets won't make it to bundle |
+| `ADPCMLimit`             | int                 | |
+| `TextureScaleFactor`     | float               | designed to be texture size multiplier. however if it's not 1.0f texture size multiplied by 0.75 with a mix of some logic. see code for detail. |
+| `AtlasPacker`            | string              | custom packer defined via plugin |
 
 
