@@ -1,5 +1,5 @@
 # Citrus
-![](Orange/Orange.png)
+![](Orange/Logo.png)
 
 ## Cooking Rules
 
