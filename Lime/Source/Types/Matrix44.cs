@@ -760,15 +760,11 @@ namespace Lime
 		/// <remarks>
 		/// This method is designed to decompose an SRT transformation matrix only.
 		/// </remarks>
-		public bool Decompose(out Vector3 scale, out Quaternion rotation, out Vector3 translation)
+		public void Decompose(out Vector3 scale, out Quaternion rotation, out Vector3 translation)
 		{
 			Matrix44 rotationMatrix;
-			if (Decompose(out scale, out rotationMatrix, out translation)) {
-				Quaternion.CreateFromRotationMatrix(ref rotationMatrix, out rotation);
-				return true;
-			}
-			rotation = default(Quaternion);
-			return false;
+			Decompose(out scale, out rotationMatrix, out translation);
+			Quaternion.CreateFromRotationMatrix(ref rotationMatrix, out rotation);
 		}
 
 		/// <summary>
@@ -780,7 +776,7 @@ namespace Lime
 		/// <remarks>
 		/// This method is designed to decompose an SRT transformation matrix only.
 		/// </remarks>
-		public bool Decompose(out Vector3 scale, out Matrix44 rotation, out Vector3 translation)
+		public void Decompose(out Vector3 scale, out Matrix44 rotation, out Vector3 translation)
 		{
 			//Source: Unknown
 			//References: http://www.gamedev.net/community/forums/topic.asp?topic_id=441695
@@ -796,11 +792,13 @@ namespace Lime
 			scale.Z = (float)Math.Sqrt((M31 * M31) + (M32 * M32) + (M33 * M33));
 
 			//If any of the scaling factors are zero, than the rotation matrix can not exist.
-			if (Math.Abs(scale.X) < Mathf.ZeroTolerance ||
+			if (
+				Math.Abs(scale.X) < Mathf.ZeroTolerance ||
 				Math.Abs(scale.Y) < Mathf.ZeroTolerance ||
-				Math.Abs(scale.Z) < Mathf.ZeroTolerance) {
-				rotation = Matrix44.Identity;
-				return false;
+				Math.Abs(scale.Z) < Mathf.ZeroTolerance
+			) {
+				rotation = Identity;
+				return;
 			}
 
 			// Calculate an perfect orthonormal matrix (no reflections)
@@ -817,8 +815,6 @@ namespace Lime
 			scale.X = Vector3.DotProduct(right, Right) > 0.0f ? scale.X : -scale.X;
 			scale.Y = Vector3.DotProduct(up, Up) > 0.0f ? scale.Y : -scale.Y;
 			scale.Z = Vector3.DotProduct(at, Backward) > 0.0f ? scale.Z : -scale.Z;
-
-			return true;
 		}
 
 		public static bool operator ==(Matrix44 matrix1, Matrix44 matrix2)

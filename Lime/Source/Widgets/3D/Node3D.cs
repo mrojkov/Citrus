@@ -127,15 +127,6 @@ namespace Lime
 			return Matrix44.CreateScale(scale) * Matrix44.CreateRotation(rotation) * Matrix44.CreateTranslation(position);
 		}
 
-		public bool TrySetLocalTransform(Matrix44 transform)
-		{
-			if (transform.Decompose(out scale, out rotation, out position)) {
-				PropagateDirtyFlags(DirtyFlags.Transform);
-				return true;
-			}
-			return false;
-		}
-
 		public void SetGlobalTransform(Matrix44 transform)
 		{
 			if (Parent != null && Parent.AsNode3D != null) {
@@ -146,9 +137,8 @@ namespace Lime
 
 		public void SetLocalTransform(Matrix44 transform)
 		{
-			if (!TrySetLocalTransform(transform)) {
-				throw new ArgumentException();
-			}
+			transform.Decompose(out scale, out rotation, out position);
+			PropagateDirtyFlags(DirtyFlags.Transform);
 		}
 
 		public Viewport3D GetViewport()
