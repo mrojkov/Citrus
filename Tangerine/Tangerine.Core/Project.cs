@@ -34,7 +34,7 @@ namespace Tangerine.Core
 				throw new InvalidOperationException();
 			}
 			Current = this;
-			AssetsBundle.Instance = new UnpackedAssetsBundle(AssetsDirectory);
+			AssetBundle.Instance = new UnpackedAssetBundle(AssetsDirectory);
 			if (File.Exists(UserprefsPath)) {
 				try {
 					var userprefs = Serialization.ReadObjectFromFile<Userprefs>(UserprefsPath);
@@ -72,7 +72,7 @@ namespace Tangerine.Core
 				userprefs.Documents.Add(doc.Path);
 			}
 			Serialization.WriteObjectToFile(UserprefsPath, userprefs, Serialization.Format.JSON);
-			AssetsBundle.Instance = null;
+			AssetBundle.Instance = null;
 			Current = Null;
 			return true;
 		}

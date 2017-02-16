@@ -436,7 +436,7 @@ namespace Tangerine.UI.Inspector
 			containerWidget.AddNode(selector);
 			OnKeyframeToggle += selector.SetFocus;
 			var propType = context.PropertyInfo.PropertyType;
-			var items = AssetsBundle.Instance.EnumerateFiles("Fonts").
+			var items = AssetBundle.Instance.EnumerateFiles("Fonts").
 				Where(i => i.EndsWith(".fnt") || i.EndsWith(".tft")).
 				Select(i => new DropDownList.Item(Path.ChangeExtension(Path.GetFileName(i), null)));
 			foreach (var i in items) {

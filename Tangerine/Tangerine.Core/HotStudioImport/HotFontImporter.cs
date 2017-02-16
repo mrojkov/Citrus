@@ -170,7 +170,7 @@ namespace Orange
 				var texturePath = Path.ChangeExtension(Path.GetFileName(path), null);
 				var index = (i == 0) ? "" : i.ToString("00");
 				var texturePng = Path.ChangeExtension(path, null) + index + ".png";
-				if (!AssetsBundle.Instance.FileExists(texturePng)) {
+				if (!AssetBundle.Instance.FileExists(texturePng)) {
 					break;
 				}
 				font.Textures.Add(new SerializableTexture(texturePath + index));
@@ -192,7 +192,7 @@ namespace Orange
 		{
 			width = height = 0;
 			hasAlpha = false;
-			using(var stream = AssetsBundle.Instance.OpenFile(path)) {
+			using(var stream = AssetBundle.Instance.OpenFile(path)) {
 				using(var reader = new BinaryReader(stream)) {
 					byte[] sign = reader.ReadBytes(8); // PNG signature
 					if (sign[1] != 'P' || sign[2] != 'N' || sign[3] != 'G')
