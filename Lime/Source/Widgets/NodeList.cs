@@ -206,6 +206,21 @@ namespace Lime
 			return false;
 		}
 
+		public void RemoveAll(Predicate<Node> predicate)
+		{
+			if (list == null) {
+				return;
+			}
+			int index = list.Count - 1;
+			while (index >= 0) {
+				var node = list[index];
+				if (predicate(node)) {
+					RemoveAt(index);
+				}
+				index--;
+			}
+		}
+
 		public void Clear()
 		{
 			if (list == null) {
