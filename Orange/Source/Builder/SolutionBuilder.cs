@@ -146,27 +146,48 @@ namespace Orange
 				return 1;
 			}
 #else
-			var args = "--installdev=" + GetIOSAppName();
-			int exitCode = Process.Start("/Developer/MonoTouch/usr/bin/mtouch", args);
-			if (exitCode != 0) {
+			if (platform == TargetPlatform.Mac) {
+				int exitCode = Process.Start(GetMacAppName(), "");
+				return exitCode;
+			} else {
+				var args = "--installdev=" + GetIOSAppName();
+				int exitCode = Process.Start("/Developer/MonoTouch/usr/bin/mtouch", args);
+				if (exitCode != 0) {
+					return exitCode;
+				}
+				Console.WriteLine("Please start app manually :)");
 				return exitCode;
 			}
-			Console.WriteLine("Please start app manually :)");
-			//args = "--launchdev=" + GetBundleId();
-			//exitCode = Toolbox.StartProcess("/Developer/MonoTouch/usr/bin/mtouch", args);
-			return exitCode;
 #endif
 		}
 
 		private string GetIOSAppName()
 		{
 			var directory = Path.Combine(projectDirectory, "bin", "iPhone", ConfigurationName);
-			// var directory = Path.Combine(Path.GetDirectoryName(The.Workspace.GetSolutionFilePath()), "bin", "iPhone", "Release");
 			var dirInfo = new DirectoryInfo(directory);
 			var all = new List<DirectoryInfo>(dirInfo.EnumerateDirectories("*.app"));
 			all.Sort((a, b) => b.CreationTime.CompareTo(a.CreationTime));
 			if (all.Count > 0) {
 				var path = Path.Combine(directory, all[0].FullName);
+				return path;
+			}
+			return null;
+		}
+
+		private string GetMacAppName()
+		{
+			var directory = Path.Combine(projectDirectory, "bin", ConfigurationName);
+			var dirInfo = new DirectoryInfo(directory);
+			var all = new List<DirectoryInfo> (dirInfo.EnumerateDirectories("*.app"));
+			all.Sort ((a, b) => b.CreationTime.CompareTo (a.CreationTime));
+			if (all.Count > 0) {
+				var path = Path.Combine(
+					directory, 
+					all[0].FullName, 
+					"Contents", 
+					"MacOS", 
+					Path.GetFileNameWithoutExtension(all[0].FullName)
+				);
 				return path;
 			}
 			return null;
