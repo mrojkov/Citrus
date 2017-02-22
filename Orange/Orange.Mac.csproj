@@ -131,17 +131,9 @@
     <Compile Include="Source\Nuget\Nuget.cs" />
     <Compile Include="Source\Plugins\IPluginUIBuilder.cs" />
     <Compile Include="Source\Plugins\PluginLoader.cs" />
-    <Compile Include="Source\DictionaryExtractorWindow.cs" />
-    <Compile Include="Source\DictionaryOldFormatExtractor.cs" />
-    <Compile Include="Source\Main.GUI.cs" />
-    <Compile Include="Source\Actions\UpdateDictionaryTxtOldFormat.cs" />
     <Compile Include="Source\AssetCooker\CodeCooker.cs" />
     <Compile Include="Source\Toolbox\EmbeddedResource.cs" />
     <Compile Include="Source\Toolbox\FontBuilder.cs" />
-    <Compile Include="Source\UI\MainWindow.PluginUI.cs" />
-    <Compile Include="Source\UI\MainWindow.UI.cs" />
-    <Compile Include="Source\UI\MainWindow.cs" />
-    <Compile Include="Source\UI\PluginUIBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Toolchain.Mac\PVRTexTool">

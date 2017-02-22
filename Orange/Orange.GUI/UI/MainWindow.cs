@@ -166,7 +166,6 @@ namespace Orange
 			var startTime = DateTime.Now;
 			The.Workspace.Save();
 			EnableControls(false);
-			var platform = (TargetPlatform)platformPicker.Active;
 			try {
 				try {
 					ClearLog();
@@ -242,9 +241,8 @@ namespace Orange
 
 		private bool CheckTargetAvailability()
 		{
-			var platform = (TargetPlatform)platformPicker.Active;
 #if WIN
-			if (platform == TargetPlatform.iOS) {
+			if (GetActivePlatform() == TargetPlatform.iOS) {
 				ShowError("iOS target is not supported on Windows platform");
 				return false;
 			}

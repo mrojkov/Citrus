@@ -153,16 +153,8 @@
     <Compile Include="Source\TargetPlatform.cs" />
     <Compile Include="Source\The.cs" />
     <Compile Include="Source\Workspace.cs" />
-    <Compile Include="Source\DictionaryExtractorWindow.cs" />
-    <Compile Include="Source\DictionaryOldFormatExtractor.cs" />
-    <Compile Include="Source\Main.GUI.cs" />
-    <Compile Include="Source\Actions\UpdateDictionaryTxtOldFormat.cs" />
     <Compile Include="Source\Toolbox\EmbeddedResource.cs" />
     <Compile Include="Source\Toolbox\FontBuilder.cs" />
-    <Compile Include="Source\UI\MainWindow.PluginUI.cs" />
-    <Compile Include="Source\UI\MainWindow.UI.cs" />
-    <Compile Include="Source\UI\MainWindow.cs" />
-    <Compile Include="Source\UI\PluginUIBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\3rdParty\AssimpNet\Assimp32.dll">
