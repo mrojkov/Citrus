@@ -140,6 +140,97 @@ namespace Tangerine.UI.Inspector
 		}
 	}
 
+	class Vector3PropertyEditor : CommonPropertyEditor
+	{
+		public Vector3PropertyEditor(PropertyEditorContext context) : base(context)
+		{
+			EditBox editorX, editorY, editorZ;
+			containerWidget.AddNode(new Widget {
+				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center), Spacing = 4 },
+				Nodes = {
+					(editorX = new EditBox()),
+					(editorY = new EditBox()),
+					(editorZ = new EditBox())
+				}
+			});
+			OnKeyframeToggle += editorX.SetFocus;
+			var currentX = CoalescedPropertyValue<Vector3, float>(context, v => v.X);
+			var currentY = CoalescedPropertyValue<Vector3, float>(context, v => v.Y);
+			var currentZ = CoalescedPropertyValue<Vector3, float>(context, v => v.Z);
+			editorX.TextWidget.HAlignment = HAlignment.Right;
+			editorY.TextWidget.HAlignment = HAlignment.Right;
+			editorZ.TextWidget.HAlignment = HAlignment.Right;
+			editorX.Submitted += text => SetComponent(context, 0, editorX, currentX.GetValue());
+			editorY.Submitted += text => SetComponent(context, 1, editorY, currentY.GetValue());
+			editorZ.Submitted += text => SetComponent(context, 2, editorZ, currentZ.GetValue());
+			editorX.AddChangeWatcher(currentX, v => editorX.Text = v.ToString());
+			editorY.AddChangeWatcher(currentY, v => editorY.Text = v.ToString());
+			editorZ.AddChangeWatcher(currentZ, v => editorZ.Text = v.ToString());
+		}
+
+		void SetComponent(PropertyEditorContext context, int component, EditBox editor, float currentValue)
+		{
+			float newValue;
+			if (float.TryParse(editor.Text, out newValue)) {
+				foreach (var obj in context.Objects) {
+					var current = new Property<Vector3>(obj, context.PropertyName).Value;
+					current[component] = newValue;
+					Core.Operations.SetAnimableProperty.Perform(obj, context.PropertyName, current);
+				}
+			} else {
+				editor.Text = currentValue.ToString();
+			}
+		}
+	}
+
+	class QuaternionPropertyEditor : CommonPropertyEditor
+	{
+		public QuaternionPropertyEditor(PropertyEditorContext context) : base(context)
+		{
+			EditBox editorX, editorY, editorZ;
+			containerWidget.AddNode(new Widget {
+				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center), Spacing = 4 },
+				Nodes = {
+					(editorX = new EditBox()),
+					(editorY = new EditBox()),
+					(editorZ = new EditBox())
+				}
+			});
+
+			OnKeyframeToggle += editorX.SetFocus;
+			var current = CoalescedPropertyValue<Quaternion>(context);
+			editorX.TextWidget.HAlignment = HAlignment.Right;
+			editorY.TextWidget.HAlignment = HAlignment.Right;
+			editorZ.TextWidget.HAlignment = HAlignment.Right;
+			editorX.Submitted += text => SetComponent(context, 0, editorX, current.GetValue());
+			editorY.Submitted += text => SetComponent(context, 1, editorY, current.GetValue());
+			editorZ.Submitted += text => SetComponent(context, 2, editorZ, current.GetValue());
+			editorX.AddChangeWatcher(current, v => {
+				var ea = v.ToEulerAngles() * Mathf.RadToDeg;
+				editorX.Text = RoundAngle(ea.X).ToString();
+				editorY.Text = RoundAngle(ea.Y).ToString();
+				editorZ.Text = RoundAngle(ea.Z).ToString();
+			});
+		}
+
+		float RoundAngle(float value) => (value * 1000f).Round() / 1000f;
+
+		void SetComponent(PropertyEditorContext context, int component, EditBox editor, Quaternion currentValue)
+		{
+			float newValue;
+			if (float.TryParse(editor.Text, out newValue)) {
+				foreach (var obj in context.Objects) {
+					var current = new Property<Quaternion>(obj, context.PropertyName).Value.ToEulerAngles();
+					current[component] = newValue * Mathf.DegToRad;
+					Core.Operations.SetAnimableProperty.Perform(obj, context.PropertyName,
+						Quaternion.CreateFromEulerAngles(current));
+				}
+			} else {
+				editor.Text = RoundAngle(currentValue.ToEulerAngles()[component] * Mathf.RadToDeg).ToString();
+			}
+		}
+	}
+
 	class NumericRangePropertyEditor : CommonPropertyEditor
 	{
 		public NumericRangePropertyEditor(PropertyEditorContext context) : base(context)
