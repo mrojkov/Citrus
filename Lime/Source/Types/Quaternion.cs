@@ -396,47 +396,66 @@ namespace Lime
 		/// <returns>A new quaternion from the concatenated yaw, pitch, and roll angles.</returns>
 		public static Quaternion CreateFromYawPitchRoll(float yaw, float pitch, float roll)
 		{
-			float halfRoll = roll * 0.5f;
-			float halfPitch = pitch * 0.5f;
-			float halfYaw = yaw * 0.5f;
+			double halfRoll = roll * 0.5;
+			double halfPitch = pitch * 0.5;
+			double halfYaw = yaw * 0.5;
 
-			float sinRoll = (float)Math.Sin(halfRoll);
-			float cosRoll = (float)Math.Cos(halfRoll);
-			float sinPitch = (float)Math.Sin(halfPitch);
-			float cosPitch = (float)Math.Cos(halfPitch);
-			float sinYaw = (float)Math.Sin(halfYaw);
-			float cosYaw = (float)Math.Cos(halfYaw);
+			double sinRoll = Math.Sin(halfRoll);
+			double cosRoll = Math.Cos(halfRoll);
+			double sinPitch = Math.Sin(halfPitch);
+			double cosPitch = Math.Cos(halfPitch);
+			double sinYaw = Math.Sin(halfYaw);
+			double cosYaw = Math.Cos(halfYaw);
 
-			return new Quaternion((cosYaw * sinPitch * cosRoll) + (sinYaw * cosPitch * sinRoll),
-				(sinYaw * cosPitch * cosRoll) - (cosYaw * sinPitch * sinRoll),
-				(cosYaw * cosPitch * sinRoll) - (sinYaw * sinPitch * cosRoll),
-				(cosYaw * cosPitch * cosRoll) + (sinYaw * sinPitch * sinRoll));
+			return new Quaternion(
+				(float)(cosYaw * sinPitch * cosRoll + sinYaw * cosPitch * sinRoll),
+				(float)(sinYaw * cosPitch * cosRoll - cosYaw * sinPitch * sinRoll),
+				(float)(cosYaw * cosPitch * sinRoll - sinYaw * sinPitch * cosRoll),
+				(float)(cosYaw * cosPitch * cosRoll + sinYaw * sinPitch * sinRoll));
 		}
 
 		/// <summary>
-		/// Creates a new <see cref="Quaternion"/> from the specified yaw, pitch and roll angles.
+		/// Returns a rotation that rotates z degrees around the z axis, x degrees around the x axis, and y degrees around the y axis (in that order).
 		/// </summary>
-		/// <param name="yaw">Yaw around the y axis in radians.</param>
-		/// <param name="pitch">Pitch around the x axis in radians.</param>
-		/// <param name="roll">Roll around the z axis in radians.</param>
-		/// <param name="result">A new quaternion from the concatenated yaw, pitch, and roll angles as an output parameter.</param>
-		public static void CreateFromYawPitchRoll(float yaw, float pitch, float roll, out Quaternion result)
+		public static Quaternion CreateFromEulerAngles(Vector3 angles)
 		{
-			float halfRoll = roll * 0.5f;
-			float halfPitch = pitch * 0.5f;
-			float halfYaw = yaw * 0.5f;
+			return CreateFromYawPitchRoll(angles.Y, angles.X, angles.Z);
+		}
 
-			float sinRoll = (float)Math.Sin(halfRoll);
-			float cosRoll = (float)Math.Cos(halfRoll);
-			float sinPitch = (float)Math.Sin(halfPitch);
-			float cosPitch = (float)Math.Cos(halfPitch);
-			float sinYaw = (float)Math.Sin(halfYaw);
-			float cosYaw = (float)Math.Cos(halfYaw);
-
-			result.X = (cosYaw * sinPitch * cosRoll) + (sinYaw * cosPitch * sinRoll);
-			result.Y = (sinYaw * cosPitch * cosRoll) - (cosYaw * sinPitch * sinRoll);
-			result.Z = (cosYaw * cosPitch * sinRoll) - (sinYaw * sinPitch * cosRoll);
-			result.W = (cosYaw * cosPitch * cosRoll) + (sinYaw * sinPitch * sinRoll);
+		/// <summary>
+		/// Returns the x, y, and z angles represent a rotation z degrees around the z axis, x degrees around the x axis, and y degrees around the y axis (in that order).
+		/// Original code taken from: https://raw.githubusercontent.com/dfelinto/blender/0a446d7276e74e3c8472453948204ca6463d158e/source/blender/blenlib/intern/math_rotation.c
+		/// </summary>
+		public Vector3 ToEulerAngles()
+		{
+			var qxx = X * X;
+			var qyy = Y * Y;
+			var qzz = Z * Z;
+			var qxy = X * Y;
+			var qzw = Z * W;
+			var qzx = Z * X;
+			var qyw = Y * W;
+			var qyz = Y * Z;
+			var qxw = X * W;
+			var m11 = 1f - (2f * (qyy + qzz));
+			var m22 = 1f - (2f * (qzz + qxx));
+			var m33 = 1f - (2f * (qyy + qxx));
+			var m12 = 2f * (qxy + qzw);
+			var m21 = 2f * (qxy - qzw);
+			var m31 = 2f * (qzx + qyw);
+			var m32 = 2f * (qyz - qxw);
+			var cy = Mathf.Sqrt(m33 * m33 + m31 * m31);
+			var result = new Vector3();
+			if (cy > 16.0f * 1.0e-5f) {
+				result.X = (float)Math.Atan2(-m32, cy);
+				result.Y = (float)Math.Atan2(m31, m33);
+				result.Z = (float)Math.Atan2(m12, m22);
+			} else {
+				result.X = (float)Math.Atan2(-m32, cy);
+				result.Y = 0;
+				result.Z = (float)Math.Atan2(-m21, m11);
+			}
+			return result;
 		}
 
 		/// <summary>
