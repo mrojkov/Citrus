@@ -859,14 +859,41 @@ namespace Lime
 			}
 		}
 
-		/// <summary>
-		/// TODO: Add summary
-		/// </summary>
-		protected void LoadContent()
+		[ThreadStatic]
+		private static HashSet<string> loadingScenes;
+
+		public static Node CreateFromAssetBundle(string path, Node instance = null)
+		{
+			if (loadingScenes == null) {
+				loadingScenes = new HashSet<string>();
+			}
+			var fullPath = ResolveScenePath(path);
+			if (fullPath == null) {
+				throw new Exception($"Scene '{path}' not found in current asset bundle");
+			}
+			if (loadingScenes.Contains(fullPath)) {
+				throw new Exception($"Cyclic scenes dependency was detected: {fullPath}");
+			}
+			loadingScenes.Add(fullPath);
+			try {
+				using (Stream stream = AssetBundle.Instance.OpenFileLocalized(fullPath)) {
+					instance = Serialization.ReadObject<Node>(fullPath, stream, instance);
+				}
+				instance.LoadExternalScenes();
+				if (!Application.IsTangerine) {
+					instance.Tag = fullPath;
+				}
+			} finally {
+				loadingScenes.Remove(fullPath);
+			}
+			return instance;
+		}
+
+		private void LoadExternalScenes()
 		{
 			if (string.IsNullOrEmpty(ContentsPath)) {
 				for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
-					node.LoadContent();
+					node.LoadExternalScenes();
 				}
 				return;
 			}
@@ -876,7 +903,7 @@ namespace Lime
 			if (contentsPath == null) {
 				return;
 			}
-			var content = new Frame(ContentsPath);
+			var content = CreateFromAssetBundle(ContentsPath, null);
 			if (content.AsWidget != null && AsWidget != null) {
 				content.AsWidget.Size = AsWidget.Size;
 			}
@@ -886,17 +913,17 @@ namespace Lime
 			Nodes.AddRange(nodes);
 		}
 
-		private static readonly string[] sceneExtensions = new[] { ".scene", ".daeModel", ".fbxModel", ".tan" };
+		private static readonly string[] sceneExtensions = new[] { ".scene", ".model", ".tan" };
 
 		/// <summary>
 		/// Returns path to scene if it exists in bundle. Returns null otherwise.
 		/// Throws exception if there is more than one scene file with such path.
 		/// </summary>
-		internal static string ResolveScenePath(string path)
+		private static string ResolveScenePath(string path)
 		{
 			var candidates = sceneExtensions.Select(ext => Path.ChangeExtension(path, ext)).Where(AssetBundle.Instance.FileExists);
 			if (candidates.Count() > 1) {
-				throw new Lime.Exception("Ambiguity between: {0}", string.Join("; ", candidates.ToArray()));
+				throw new Exception("Ambiguity between: {0}", string.Join("; ", candidates.ToArray()));
 			}
 			return candidates.FirstOrDefault();
 		}

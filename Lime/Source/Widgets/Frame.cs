@@ -50,7 +50,7 @@ namespace Lime
 
 		public Frame(string path) : this()
 		{
-			LoadFromBundle(path);
+			CreateFromAssetBundle(path, this);
 		}
 
 		private void SetRenderTarget(RenderTarget value)
@@ -152,35 +152,6 @@ namespace Lime
 				AddSelfToRenderChain(chain);
 			} else {
 				base.AddToRenderChain(chain);
-			}
-		}
-
-		[ThreadStatic]
-		private static HashSet<string> cyclicDependencyTracker;
-
-		private void LoadFromBundle(string path)
-		{
-			if (cyclicDependencyTracker == null) {
-				cyclicDependencyTracker = new HashSet<string>();
-			}
-			var fullPath = ResolveScenePath(path);
-			if (fullPath == null) {
-				throw new Lime.Exception($"Scene '{path}' not found in current asset bundle");
-			}
-			if (cyclicDependencyTracker.Contains(fullPath)) {
-				throw new Lime.Exception("Cyclic dependency of scenes was detected: {0}", fullPath);
-			}
-			cyclicDependencyTracker.Add(fullPath);
-			try {
-				using (Stream stream = AssetBundle.Instance.OpenFileLocalized(fullPath)) {
-					Serialization.ReadObject<Frame>(fullPath, stream, this);
-				}
-				LoadContent();
-				if (!Application.IsTangerine) {
-					Tag = fullPath;
-				}
-			} finally {
-				cyclicDependencyTracker.Remove(fullPath);
 			}
 		}
 
