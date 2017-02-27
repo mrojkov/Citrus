@@ -83,6 +83,21 @@ namespace Lime
 			return (float)Math.Atan2(v.Y, v.X);
 		}
 
+		public static float Atan2(float y, float x)
+		{
+			return (float)Math.Atan2(y, x);
+		}
+
+		public static float Asin(float v)
+		{
+			return (float)Math.Asin(v);
+		}
+
+		public static float Acos(float v)
+		{
+			return (float)Math.Acos(v);
+		}
+
 		public static int Wrap(int x, int lowerBound, int upperBound)
 		{
 			int range = upperBound - lowerBound + 1;
