@@ -17,7 +17,13 @@ namespace EmptyProject.Dialogs
 
 		public void Open<T>(T dialog) where T : Dialog
 		{
+			dialog.Attach(The.World);
 			ActiveDialogs.Add(dialog);
+		}
+
+		public void Remove<T>(T dialog) where T : Dialog
+		{
+			ActiveDialogs.Remove(dialog);
 		}
 	}
 }

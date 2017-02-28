@@ -6,95 +6,62 @@ using EmptyProject.Scenes;
 
 namespace EmptyProject.Dialogs
 {
-	public enum DialogState
-	{
-		Showing,
-		Shown,
-		Closing,
-		Closed
-	}
-
-	public class Dialog<T> : Dialog where T: ParsedWidget, new()
-	{
-		protected Dialog(): base(new T()) { }
-
-		protected new T Scene => (T) base.Scene;
-	}
-
 	public class Dialog : IDisposable
 	{
 		private const string DialogTag = "Dialog";
-		protected TaskList Tasks { get; } = new TaskList();
+
 		protected ParsedWidget Scene { get; }
 		protected Widget Root => Scene.Widget;
+		protected TaskList Tasks { get; } = new TaskList();
 		public DialogState State { get; protected set; }
 
-		protected Dialog(ParsedWidget scene, string animation = "Show", int layer = Layers.Interface)
+		protected Dialog(ParsedWidget scene)
 		{
 			Scene = scene;
-			Initialize(animation, layer);
-		}
-
-		private void Initialize(string animation, int layer)
-		{
-			Root.Layer = layer;
 			Root.Tag = DialogTag;
-			Root.PushToNode(World);
-			Root.ExpandToContainer();
 			Root.Updating += Tasks.Update;
 			Root.Updating += Update;
-			Lime.Application.InvokeOnMainThread(() => {
-				Root.Input.RestrictScope();
-			});
+			ApplyLocalization();
+		}
+
+		public void Attach(Widget widget)
+		{
+			Root.Layer = Layer;
+			Root.PushToNode(widget);
+			Root.ExpandToContainer();
+			Lime.Application.InvokeOnMainThread(Root.Input.RestrictScope);
 
 			DisplayInfo.BeforeOrientationOrResolutionChanged += OnBeforeOrientationOrResolutionChanged;
 			DisplayInfo.OrientationOrResolutionChanged += OnOrientationOrResolutionChanged;
 
-			ApplyLocalization();
-
-			Tasks.Add(ShowTask(animation));
+			Show(ShowAnimationName);
 			Root.Update(0);
 		}
+
+		protected virtual int Layer => Layers.Interface;
+
+		protected virtual string ShowAnimationName => "Show";
 
 		protected virtual string HideAnimationName => "Hide";
 
 		protected virtual string CustomRotationAnimation => null;
 
-		public bool IsClosed => Root.Parent == null;
-
-		public bool IsTopDialog => DialogManager.Top == this;
-
 		protected virtual void Update(float delta) { }
 
 		private void Show(string animation)
 		{
-			State = DialogState.Showing;
-			Tasks.Add(ShowTask(animation, () => {
-				State = DialogState.Shown;
-			}));
+			Tasks.Add(ShowTask(animation));
 		}
 
-		private IEnumerator<object> ShowTask(string animation, Action whenDone = null)
+		private IEnumerator<object> ShowTask(string animation)
 		{
+			State = DialogState.Showing;
 			Orientate();
 			if (animation != null && Root.TryRunAnimation(animation)) {
 				yield return Root;
 			}
-
-			whenDone?.Invoke();
+			State = DialogState.Shown;
 		}
-
-		private IEnumerator<object> HideTask(string animation, Action whenDone = null)
-		{
-			if (animation != null && Root.TryRunAnimation(animation)) {
-				yield return Root;
-			}
-
-			UnlinkAndDispose();
-			whenDone?.Invoke();
-		}
-
-		protected virtual void Closing() { }
 
 		protected virtual void OnBeforeOrientationOrResolutionChanged()
 		{
@@ -106,8 +73,8 @@ namespace EmptyProject.Dialogs
 
 		protected virtual void Orientate()
 		{
-			string animationName = DisplayInfo.IsLandscapeOrientation() ? "@Landscape" : "@Portrait";
-			string preferredAnimationNameCustom = CustomRotationAnimation;
+			var animationName = DisplayInfo.IsLandscapeOrientation() ? "@Landscape" : "@Portrait";
+			var preferredAnimationNameCustom = CustomRotationAnimation;
 			foreach (var node in Root.Descendants) {
 				if (preferredAnimationNameCustom == null || !node.TryRunAnimation(preferredAnimationNameCustom)) {
 					node.TryRunAnimation(animationName);
@@ -132,7 +99,7 @@ namespace EmptyProject.Dialogs
 
 		protected void CrossfadeInto<T>(bool fadeIn, bool fadeOut) where T : Dialog, new()
 		{
-			Tasks.Add(CrossfadeIntoTask<T>(fadeIn, fadeOut));
+			World.Tasks.Add(CrossfadeIntoTask<T>(fadeIn, fadeOut));
 		}
 
 		private IEnumerator<object> CrossfadeIntoTask<T>(bool fadeIn, bool fadeOut) where T : Dialog, new()
@@ -142,6 +109,7 @@ namespace EmptyProject.Dialogs
 			crossfade.CaptureInput();
 			if (fadeIn)
 				yield return crossfade.FadeInTask();
+			CloseImmediately();
 			Open<T>();
 			crossfade.ReleaseInput();
 			if (fadeOut)
@@ -162,32 +130,41 @@ namespace EmptyProject.Dialogs
 
 		private void UnlinkAndDispose()
 		{
+			Root.UnlinkAndDispose();
 			DisplayInfo.BeforeOrientationOrResolutionChanged -= OnBeforeOrientationOrResolutionChanged;
 			DisplayInfo.OrientationOrResolutionChanged -= OnOrientationOrResolutionChanged;
-			Root.UnlinkAndDispose();
 		}
 
 		public void Close()
 		{
-			State = DialogState.Closing;
-
-			Closing();
-
-			DialogManager.ActiveDialogs.Remove(this);
-			Tasks.Add(HideTask(HideAnimationName, () => {
-				State = DialogState.Closed;
-			}));
+			BeginClose();
+			Tasks.Add(CloseTask(HideAnimationName));
 		}
 
 		public void CloseImmediately()
 		{
-			State = DialogState.Closing;
-
-			Closing();
-
-			DialogManager.ActiveDialogs.Remove(this);
+			BeginClose();
 			UnlinkAndDispose();
+			State = DialogState.Closed;
+		}
 
+		private void BeginClose()
+		{
+			State = DialogState.Closing;
+			Closing();
+			DialogManager.Remove(this);
+		}
+
+		protected virtual void Closing() { }
+
+		private IEnumerator<object> CloseTask(string animation)
+		{
+			State = DialogState.Closing;
+			if (animation != null && Root.TryRunAnimation(animation))
+			{
+				yield return Root;
+			}
+			UnlinkAndDispose();
 			State = DialogState.Closed;
 		}
 
@@ -206,12 +183,16 @@ namespace EmptyProject.Dialogs
 			return true;
 		}
 
-		public virtual void FillDebugMenuItems(RainbowDash.Menu menu) { }
-
 		public void Dispose()
 		{
 			CloseImmediately();
 		}
+
+		public bool IsClosed => State == DialogState.Closed;
+
+		public bool IsTopDialog => DialogManager.Top == this;
+
+		public virtual void FillDebugMenuItems(RainbowDash.Menu menu) { }
 
 		protected Application.Application App => The.App;
 		protected WindowWidget World => The.World;
@@ -221,5 +202,20 @@ namespace EmptyProject.Dialogs
 		protected Profile Profile => The.Profile;
 		protected DialogManager DialogManager => The.DialogManager;
 		protected Logger Log => The.Log;
+	}
+
+	public class Dialog<T> : Dialog where T: ParsedWidget, new()
+	{
+		protected Dialog(): base(new T()) { }
+
+		protected new T Scene => (T) base.Scene;
+	}
+
+	public enum DialogState
+	{
+		Showing,
+		Shown,
+		Closing,
+		Closed
 	}
 }
