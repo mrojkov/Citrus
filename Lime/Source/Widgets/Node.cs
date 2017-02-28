@@ -903,7 +903,7 @@ namespace Lime
 					instance.Tag = fullPath;
 				}
 			} finally {
-				loadingScenes.Remove(fullPath);
+				scenesBeingLoaded.Remove(fullPath);
 			}
 			return instance;
 		}
