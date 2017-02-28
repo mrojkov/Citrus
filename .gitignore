@@ -127,13 +127,18 @@ UpgradeLog*.htm
 *.Android
 *.Win
 
+# HotStudio
+HotStudioProject.ini
+
 # Scene backups
 *.scene_Autoback0
 *.scene_Autoback1
 *.scene_Autoback2
-HotStudioProject.ini
 
 # Project-specific
 !EmptyProject.Game/Debug
 !EmptyProject.Android
 !EmptyProject.iOS
+
+# Generated scenes
+EmptyProject.GeneratedScenes/Scenes
