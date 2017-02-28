@@ -2,16 +2,14 @@
 
 namespace EmptyProject.Dialogs
 {
-	public class AlertDialog : Dialog
+	public class AlertDialog : Dialog<Scenes.AlertDialog>
 	{
-		public AlertDialog(string text) 
-			: base("Shell/Alert")
+		public AlertDialog(string text)
 		{
-			var label = Root.Find<RichText>("Title");
+			var label = Scene._Title.It;
 			label.OverflowMode = TextOverflowMode.Minify;
 			label.Text = text;
-
-			Root["BtnOk"].Clicked = Close;
+			Scene._BtnOk.It.Clicked = Close;
 		}
 	}
 }

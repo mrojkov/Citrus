@@ -2,16 +2,15 @@ using Lime;
 
 namespace EmptyProject.Dialogs
 {
-	public class GameScreen : Dialog
+	public class GameScreen : Dialog<Scenes.GameScreen>
 	{
-		public GameScreen() : base("Shell/GameScreen")
+		public GameScreen()
 		{
 			The.SoundManager.PlayMusic("Ingame");
-			Root["BtnExit"].Clicked = BackToMenu;
-			Root.Updating += Update;
+			Scene._BtnExit.It.Clicked = BackToMenu;
 		}
 
-		private void Update(float delta)
+		protected override void Update(float delta)
 		{
 			if (Root.Input.WasKeyPressed(Key.Escape)) {
 				BackToMenu();

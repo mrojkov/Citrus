@@ -26,7 +26,7 @@
 			]
 			Actors [
 				"Hot::Button" {
-					Name "BtnOk"
+					Name "@BtnOk"
 					Source "Buttons\\BtnOk.scene"
 					Position [ 555.00000 531.00000 ]
 					Scale [ 0.50000 0.50000 ]
@@ -65,13 +65,13 @@
 					TexturePath "Windows\\BarSm.png"
 				}
 				"Hot::Scene" {
-					Name "NoMusicCheckGroup"
+					Name ">[CheckGroup]MusicGroup"
 					Position [ 250.00000 251.00000 ]
 					Pivot [ 0.50000 0.50000 ]
 					Size [ 58.43292 58.43292 ]
 					Actors [
 						"Hot::Scene" {
-							Name "Check"
+							Name "@Check"
 							Position [ 29.21643 32.21643 ]
 							Scale [ 0.88060 0.88060 ]
 							Pivot [ 0.50000 0.50000 ]
@@ -130,12 +130,12 @@
 							FontName "Default"
 							FontSize 41.00000
 							LineIndent -14.00000
-							Text "No Music"
+							Text "Music"
 							TextColor 0xFFFFFFFF
 							VAlign 1
 						}
 						"Hot::Button" {
-							Name "BtnCheck"
+							Name "@BtnCheck"
 							Trigger "Init"
 							Position [ 114.00000 29.00000 ]
 							Pivot [ 0.50000 0.50000 ]
@@ -211,13 +211,13 @@
 					]
 				}
 				"Hot::Scene" {
-					Name "NoSoundCheckGroup"
+					Name ">[CheckGroup]SoundGroup"
 					Position [ 250.00000 320.00000 ]
 					Pivot [ 0.50000 0.50000 ]
 					Size [ 58.43292 58.43292 ]
 					Actors [
 						"Hot::Scene" {
-							Name "Check"
+							Name "@Check"
 							Position [ 29.21643 32.21643 ]
 							Scale [ 0.88060 0.88060 ]
 							Pivot [ 0.50000 0.50000 ]
@@ -276,12 +276,12 @@
 							FontName "Default"
 							FontSize 41.00000
 							LineIndent -14.00000
-							Text "No Sound"
+							Text "Sound"
 							TextColor 0xFFFFFFFF
 							VAlign 1
 						}
 						"Hot::Button" {
-							Name "BtnCheck"
+							Name "@BtnCheck"
 							Trigger "Init"
 							Position [ 114.00000 29.00000 ]
 							Pivot [ 0.50000 0.50000 ]
@@ -357,13 +357,13 @@
 					]
 				}
 				"Hot::Scene" {
-					Name "NoVoiceCheckGroup"
+					Name ">[CheckGroup]VoiceGroup"
 					Position [ 250.00000 389.00000 ]
 					Pivot [ 0.50000 0.50000 ]
 					Size [ 58.43292 58.43292 ]
 					Actors [
 						"Hot::Scene" {
-							Name "Check"
+							Name "@Check"
 							Position [ 29.21643 32.21643 ]
 							Scale [ 0.88060 0.88060 ]
 							Pivot [ 0.50000 0.50000 ]
@@ -422,12 +422,12 @@
 							FontName "Default"
 							FontSize 41.00000
 							LineIndent -14.00000
-							Text "No Voice"
+							Text "Voice"
 							TextColor 0xFFFFFFFF
 							VAlign 1
 						}
 						"Hot::Button" {
-							Name "BtnCheck"
+							Name "@BtnCheck"
 							Trigger "Init"
 							Position [ 114.00000 29.00000 ]
 							Pivot [ 0.50000 0.50000 ]
@@ -503,13 +503,13 @@
 					]
 				}
 				"Hot::Scene" {
-					Name "FullScreenCheckGroup"
+					Name ">[CheckGroup]FullScreenGroup"
 					Position [ 250.00000 458.00000 ]
 					Pivot [ 0.50000 0.50000 ]
 					Size [ 58.43292 58.43292 ]
 					Actors [
 						"Hot::Scene" {
-							Name "Check"
+							Name "@Check"
 							Position [ 29.21643 32.21643 ]
 							Scale [ 0.88060 0.88060 ]
 							Pivot [ 0.50000 0.50000 ]
@@ -573,7 +573,7 @@
 							VAlign 1
 						}
 						"Hot::Button" {
-							Name "BtnCheck"
+							Name "@BtnCheck"
 							Trigger "Init"
 							Position [ 114.00000 29.00000 ]
 							Pivot [ 0.50000 0.50000 ]

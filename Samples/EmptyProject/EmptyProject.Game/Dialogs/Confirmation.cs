@@ -3,21 +3,28 @@ using Lime;
 
 namespace EmptyProject.Dialogs
 {
-	public class Confirmation : Dialog
+	public class Confirmation : Dialog<Scenes.Confirmation>
 	{
-		public Confirmation(string text, Action onOk, bool cancelButtonVisible = true)
-			: base("Shell/Confirmation")
+		public event Action OkClicked;
+
+		public Confirmation(string text, bool cancelButtonVisible = true)
 		{
-			var label = Root.Find<RichText>("Title");
+			var label = Scene._Title.It;
 			label.OverflowMode = TextOverflowMode.Minify;
 			label.Text = text;
 
-			Root["BtnCancel"].Visible = cancelButtonVisible;
-			Root["BtnCancel"].Clicked = Close;
-			Root["BtnOk"].Clicked = () => {
+			var cancel = Scene._BtnCancel.It;
+			cancel.Visible = cancelButtonVisible;
+			cancel.Clicked = Close;
+			Scene._BtnOk.It.Clicked = () => {
 				Close();
-				onOk.SafeInvoke();
+				OkClicked?.Invoke();
 			};
+		}
+
+		protected override void Closing()
+		{
+			OkClicked = null;
 		}
 	}
 }

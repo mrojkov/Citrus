@@ -4,6 +4,7 @@ using System.Linq;
 using EmptyProject.Application;
 using Lime;
 using EmptyProject.Debug;
+using EmptyProject.Scenes;
 
 namespace EmptyProject.Dialogs
 {
@@ -13,6 +14,13 @@ namespace EmptyProject.Dialogs
 		Shown,
 		Closing,
 		Closed
+	}
+
+	public class Dialog<T> : Dialog where T: ParsedWidget, new()
+	{
+		public Dialog(): base(new T()) { }
+
+		protected new T Scene => (T) base.Scene;
 	}
 
 	public class Dialog : IDisposable
@@ -25,21 +33,17 @@ namespace EmptyProject.Dialogs
 		protected readonly TaskList Tasks = new TaskList();
 		protected virtual string HideAnimationName { get { return "Hide"; } }
 		protected virtual string CustomRotationAnimation { get { return null; } }
+		protected ParsedWidget Scene { get; }
 		protected Widget Root;
 
 		public bool IsClosed { get { return Root.Parent == null; } }
 		public bool IsTopDialog { get { return Top == this; } }
 		public DialogState State { get; protected set; }
 
-		public Dialog(Widget windowProto, string animation = "Show", int layer = Layers.Interface)
+		public Dialog(ParsedWidget scene, string animation = "Show", int layer = Layers.Interface)
 		{
-			Root = windowProto.Clone<Widget>();
-			Initialize(animation, layer);
-		}
-
-		public Dialog(string scenePath, string animation = "Show", int layer = Layers.Interface)
-		{
-			Root = new Frame(scenePath);
+			Scene = scene;
+			Root = scene.Widget;
 			Initialize(animation, layer);
 		}
 
@@ -53,6 +57,7 @@ namespace EmptyProject.Dialogs
 			Root.ExpandToContainer();
 			Root.Update(0);
 			Root.Updating += Tasks.Update;
+			Root.Updating += Update;
 			Lime.Application.InvokeOnMainThread(() => {
 				Root.Input.RestrictScope();
 			});
@@ -64,6 +69,8 @@ namespace EmptyProject.Dialogs
 
 			Tasks.Add(ShowTask(animation));
 		}
+
+		protected virtual void Update(float delta) { }
 
 		private void Show(string animation)
 		{

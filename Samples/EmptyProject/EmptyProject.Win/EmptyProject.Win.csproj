@@ -96,6 +96,10 @@
       <Project>{ddd2dfe9-ced2-4cea-adf0-5a6865865a46}</Project>
       <Name>Yuzu</Name>
     </ProjectReference>
+    <ProjectReference Include="..\EmptyProject.GeneratedScenes\EmptyProject.GeneratedScenes.Win.csproj">
+      <Project>{6270D842-8DB1-47E0-8168-FB8D03D405FF}</Project>
+      <Name>EmptyProject.GeneratedScenes.Win</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

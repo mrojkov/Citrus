@@ -2,17 +2,13 @@
 
 namespace EmptyProject.Dialogs
 {
-	public class MainMenu : Dialog
+	public class MainMenu : Dialog<Scenes.MainMenu>
 	{
 		public MainMenu()
-			: base("Shell/MainMenu")
 		{
 			The.SoundManager.PlayMusic("Theme");
-
-			Root["BtnPlay"].Clicked = BtnPlayClick;
-			Root["BtnOptions"].Clicked = () => new Options();
-
-			Root.Updating += Update;
+			Scene._BtnPlay.It.Clicked = BtnPlayClick;
+			Scene._BtnOptions.It.Clicked = () => new Options();
 		}
 
 		protected override bool HandleAndroidBackButton()
@@ -20,7 +16,7 @@ namespace EmptyProject.Dialogs
 			return false;
 		}
 
-		private void Update(float delta)
+		protected override void Update(float delta)
 		{
 			if (Root.Input.WasKeyPressed(Key.Escape)) {
 				Lime.Application.Exit();
