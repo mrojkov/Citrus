@@ -889,28 +889,28 @@ namespace Lime
 			return instance;
 		}
 
-		private void LoadExternalScenes()
+		public void LoadExternalScenes()
 		{
 			if (string.IsNullOrEmpty(ContentsPath)) {
 				for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
 					node.LoadExternalScenes();
 				}
-				return;
+			} else {
+				Nodes.Clear();
+				Markers.Clear();
+				var contentsPath = ResolveScenePath(ContentsPath);
+				if (contentsPath == null) {
+					return;
+				}
+				var content = CreateFromAssetBundle(ContentsPath, null);
+				if (content.AsWidget != null && AsWidget != null) {
+					content.AsWidget.Size = AsWidget.Size;
+				}
+				Markers.AddRange(content.Markers);
+				var nodes = content.Nodes.ToList();
+				content.Nodes.Clear();
+				Nodes.AddRange(nodes);
 			}
-			Nodes.Clear();
-			Markers.Clear();
-			var contentsPath = ResolveScenePath(ContentsPath);
-			if (contentsPath == null) {
-				return;
-			}
-			var content = CreateFromAssetBundle(ContentsPath, null);
-			if (content.AsWidget != null && AsWidget != null) {
-				content.AsWidget.Size = AsWidget.Size;
-			}
-			Markers.AddRange(content.Markers);
-			var nodes = content.Nodes.ToList();
-			content.Nodes.Clear();
-			Nodes.AddRange(nodes);
 		}
 
 		private static readonly string[] sceneExtensions = new[] { ".scene", ".model", ".tan" };
