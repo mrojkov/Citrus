@@ -5,26 +5,42 @@ namespace Lime
 	public class SplineGear : Node
 	{
 		[YuzuMember]
-		public string WidgetId { get; set; }
+		public NodeReference<Widget> WidgetRef;
 
 		[YuzuMember]
-		public string SplineId { get; set; }
+		public NodeReference<Spline> SplineRef;
+
+		public Widget Widget
+		{
+			get { return WidgetRef.Node; }
+			set { WidgetRef.Node = value; }
+		}
+
+		public Spline Spline
+		{
+			get { return SplineRef.Node; }
+			set { SplineRef.Node = value; }
+		}
 
 		[YuzuMember]
 		public float SplineOffset { get; set; }
+
+		protected override void LookupReferences()
+		{
+			WidgetRef.LookupNode(Parent);
+			SplineRef.LookupNode(Parent);
+		}
 
 		protected override void SelfLateUpdate(float delta)
 		{
 			if (Parent == null) {
 				return;
 			}
-			var spline = Parent.Nodes.TryFind(SplineId) as Spline;
-			var widget = Parent.Nodes.TryFind(WidgetId) as Widget;
-			if (spline != null && widget != null) {
-				float length = spline.CalcLengthRough();
-				Vector2 point = spline.CalcPoint(SplineOffset * length);
-				widget.Position = spline.CalcLocalToParentTransform().TransformVector(point);
-				widget.Update(0);
+			if (Spline != null && Widget != null) {
+				float length = Spline.CalcLengthRough();
+				Vector2 point = Spline.CalcPoint(SplineOffset * length);
+				Widget.Position = Spline.CalcLocalToParentTransform().TransformVector(point);
+				Widget.Update(0);
 			}
 		}
 	}

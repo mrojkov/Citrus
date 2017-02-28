@@ -719,10 +719,10 @@ namespace Orange
 			SplineGear gear = (SplineGear)node;
 			switch (name) {
 			case "WidgetName":
-				gear.WidgetId = lexer.ParseQuotedString();
+				gear.WidgetRef = new NodeReference<Widget>(lexer.ParseQuotedString());
 				break;
 			case "SplineName":
-				gear.SplineId = lexer.ParseQuotedString();
+				gear.SplineRef = new NodeReference<Spline>(lexer.ParseQuotedString());
 				break;
 			case "SplineOffset":
 				gear.SplineOffset = lexer.ParseFloat();

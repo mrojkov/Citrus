@@ -514,7 +514,26 @@ namespace Lime
 		/// <summary>
 		/// Awake is called on the first node update, before changing node state.
 		/// </summary>
-		protected virtual void Awake() { }
+		protected virtual void Awake()
+		{
+			LookupReferences();
+		}
+
+		/// <summary>
+		/// Lookups the node references.
+		/// </summary>
+		protected virtual void LookupReferences() { }
+
+		/// <summary>
+		/// Lookups all the node references through the nodes hierarchy.
+		/// </summary>
+		public void LookupReferencesDeep()
+		{
+			LookupReferences();
+			foreach (var n in Nodes) {
+				n.LookupReferences();
+			}
+		}
 
 		/// <summary>
 		/// Called before updating child nodes.
