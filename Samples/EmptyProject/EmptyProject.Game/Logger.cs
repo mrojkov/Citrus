@@ -17,11 +17,11 @@ namespace EmptyProject
 			Fatal   = 5
 		}
 
-		public static Logger StaticLogger;
+		public static Logger Instance;
 
 		static Logger()
 		{
-			StaticLogger = new Logger("unnamed-logger");
+			Instance = new Logger("unnamed-logger");
 		}
 
 		public readonly string Name;

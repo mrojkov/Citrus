@@ -21,6 +21,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Dialogs\AlertDialog.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dialogs\Confirmation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dialogs\Dialog.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dialogs\DialogContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dialogs\GameScreen.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dialogs\MainMenu.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dialogs\Options.cs" />

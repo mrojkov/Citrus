@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using EmptyProject.Application;
 using Lime;
 using EmptyProject.Debug;
@@ -27,9 +26,6 @@ namespace EmptyProject.Dialogs
 	{
 		private const string DialogTag = "Dialog";
 
-		public static List<Dialog> ActiveDialogs = new List<Dialog>();
-		public static Dialog Top { get { return ActiveDialogs.FirstOrDefault(); } }
-
 		protected readonly TaskList Tasks = new TaskList();
 		protected virtual string HideAnimationName { get { return "Hide"; } }
 		protected virtual string CustomRotationAnimation { get { return null; } }
@@ -37,7 +33,7 @@ namespace EmptyProject.Dialogs
 		protected Widget Root;
 
 		public bool IsClosed { get { return Root.Parent == null; } }
-		public bool IsTopDialog { get { return Top == this; } }
+		public bool IsTopDialog { get { return DialogContext.Top == this; } }
 		public DialogState State { get; protected set; }
 
 		public Dialog(ParsedWidget scene, string animation = "Show", int layer = Layers.Interface)
@@ -49,11 +45,9 @@ namespace EmptyProject.Dialogs
 
 		private void Initialize(string animation, int layer)
 		{
-			ActiveDialogs.Add(this);
-
 			Root.Layer = layer;
 			Root.Tag = DialogTag;
-			Root.PushToNode(The.World);
+			Root.PushToNode(World);
 			Root.ExpandToContainer();
 			Root.Update(0);
 			Root.Updating += Tasks.Update;
@@ -100,8 +94,7 @@ namespace EmptyProject.Dialogs
 			whenDone.SafeInvoke();
 		}
 
-		protected virtual void Closing()
-		{ }
+		protected virtual void Closing() { }
 
 		protected virtual void OnBeforeOrientationOrResolutionChanged()
 		{
@@ -109,8 +102,7 @@ namespace EmptyProject.Dialogs
 			Orientate();
 		}
 
-		protected virtual void OnOrientationOrResolutionChanged()
-		{ }
+		protected virtual void OnOrientationOrResolutionChanged() { }
 
 		protected virtual void Orientate()
 		{
@@ -146,7 +138,7 @@ namespace EmptyProject.Dialogs
 
 			Closing();
 
-			ActiveDialogs.Remove(this);
+			DialogContext.ActiveDialogs.Remove(this);
 			Tasks.Add(HideTask(HideAnimationName, () => {
 				State = DialogState.Closed;
 			}));
@@ -158,7 +150,7 @@ namespace EmptyProject.Dialogs
 
 			Closing();
 
-			ActiveDialogs.Remove(this);
+			DialogContext.ActiveDialogs.Remove(this);
 			UnlinkAndDispose();
 
 			State = DialogState.Closed;
@@ -179,12 +171,20 @@ namespace EmptyProject.Dialogs
 			return true;
 		}
 
-		public virtual void FillDebugMenuItems(RainbowDash.Menu menu)
-		{ }
+		public virtual void FillDebugMenuItems(RainbowDash.Menu menu) { }
 
 		public void Dispose()
 		{
 			CloseImmediately();
 		}
+
+		protected Application.Application App => Application.Application.Instance;
+		protected WindowWidget World => App.World;
+		protected IWindow Window => World.Window;
+		protected SoundManager SoundManager => SoundManager.Instance;
+		protected AppData AppData => AppData.Instance;
+		protected Profile Profile => Profile.Instance;
+		protected DialogContext DialogContext => DialogContext.Instance;
+		protected Logger Log => Logger.Instance;
 	}
 }

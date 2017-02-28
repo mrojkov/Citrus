@@ -52,32 +52,31 @@ namespace EmptyProject.Dialogs
 		protected override void Closing()
 		{
 			base.Closing();
-
-			The.AppData.Save();
+			AppData.Save();
 		}
 
-		private static bool MusicEnabled
+		private bool MusicEnabled
 		{
-			get { return The.SoundManager.MusicVolume > 0; }
-			set { The.SoundManager.MusicVolume = value ? 1.0f : 0; }
+			get { return SoundManager.MusicVolume > 0; }
+			set { SoundManager.MusicVolume = value ? 1.0f : 0; }
 		}
 
-		private static bool SoundEnabled
+		private bool SoundEnabled
 		{
-			get { return The.SoundManager.SfxVolume > 0; }
-			set { The.SoundManager.SfxVolume = value ? 1.0f : 0; }
+			get { return SoundManager.SfxVolume > 0; }
+			set { SoundManager.SfxVolume = value ? 1.0f : 0; }
 		}
 
-		private static bool VoiceEnabled
+		private bool VoiceEnabled
 		{
-			get { return The.SoundManager.VoiceVolume > 0; }
-			set { The.SoundManager.VoiceVolume = value ? 1.0f : 0; }
+			get { return SoundManager.VoiceVolume > 0; }
+			set { SoundManager.VoiceVolume = value ? 1.0f : 0; }
 		}
 
-		private static bool Fullscreen
+		private bool Fullscreen
 		{
-			get { return The.Window.Fullscreen; }
-			set { The.Window.Fullscreen = value; }
+			get { return Window.Fullscreen; }
+			set { Window.Fullscreen = value; }
 		}
 	}
 }

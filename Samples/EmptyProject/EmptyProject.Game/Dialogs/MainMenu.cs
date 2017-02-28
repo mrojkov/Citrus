@@ -6,7 +6,7 @@ namespace EmptyProject.Dialogs
 	{
 		public MainMenu()
 		{
-			The.SoundManager.PlayMusic("Theme");
+			SoundManager.PlayMusic("Theme");
 			Scene._BtnPlay.It.Clicked = BtnPlayClick;
 			Scene._BtnOptions.It.Clicked = () => new Options();
 		}

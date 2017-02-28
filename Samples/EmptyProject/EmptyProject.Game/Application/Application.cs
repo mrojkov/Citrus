@@ -10,17 +10,17 @@ namespace EmptyProject.Application
 {
 	public class Application
 	{
-        public static Application Instance;
+		public static Application Instance;
 
-        public const string ApplicationName = "EmptyProject";
-        public static readonly Vector2 DefaultWorldSize = new Vector2(1024, 768);
+		public const string ApplicationName = "EmptyProject";
+		public static readonly Vector2 DefaultWorldSize = new Vector2(1024, 768);
 
 		private readonly object uiSync = new object();
 		private static List<string> debugInfoStrings = new List<string>();
 
 		public Application()
 		{
-			CreateWindow();
+			World = CreateWorld();
 
 			AppData.Load();
 			AssetBundle.Instance = CreateAssetBundle();
@@ -40,7 +40,7 @@ namespace EmptyProject.Application
 			Instance = this;
 		}
 
-		public static WindowWidget World { get; private set; }
+		public WindowWidget World { get; }
 
 		private AssetBundle CreateAssetBundle()
 		{
@@ -85,13 +85,14 @@ namespace EmptyProject.Application
 			}
 		}
 
-		private void CreateWindow()
+		private WindowWidget CreateWorld()
 		{
 			var options = new WindowOptions { Title = ApplicationName };
-			World = new WindowWidget(new Window(options)) { Layer = RenderChain.LayerCount - 1 };
-			World.Window.Updating += OnUpdateFrame;
-			World.Window.Rendering += OnRenderFrame;
-			World.Window.Resized += OnResize;
+			var world = new WindowWidget(new Window(options)) { Layer = RenderChain.LayerCount - 1 };
+			world.Window.Updating += OnUpdateFrame;
+			world.Window.Rendering += OnRenderFrame;
+			world.Window.Resized += OnResize;
+			return world;
 		}
 
 		private static void SetWindowSize()

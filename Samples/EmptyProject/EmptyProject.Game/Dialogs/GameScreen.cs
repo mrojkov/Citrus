@@ -6,7 +6,7 @@ namespace EmptyProject.Dialogs
 	{
 		public GameScreen()
 		{
-			The.SoundManager.PlayMusic("Ingame");
+			SoundManager.PlayMusic("Ingame");
 			Scene._BtnExit.It.Clicked = BackToMenu;
 		}
 
