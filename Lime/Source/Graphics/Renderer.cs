@@ -358,7 +358,7 @@ namespace Lime
 
 		public static void DrawTextLine(
 			IFont font, Vector2 position, string text, Color4 color, float fontHeight, int start, int length, SpriteList list = null,
-			Action<int, Vector2, Vector2> onDrawChar = null, int tag = -1)
+			Action<int, Vector2, Vector2> onDrawChar = null, int tag = -1, ITexture texture = null)
 		{
 			int j = 0;
 			if (list != null) {
@@ -412,7 +412,7 @@ namespace Lime
 				prevChar = fontChar;
 			}
 			if (list != null)
-				list.Add(font, color, fontHeight, chars, tag);
+				list.Add(font, color, fontHeight, chars, tag, texture);
 		}
 
 		public static void DrawTriangleFan(ITexture texture, Vertex[] vertices, int numVertices)
@@ -616,19 +616,24 @@ namespace Lime
 						continue;
 					}
 				}
-				if (batchLength == 0 || batchLength < batchedSprites.Length && s.Texture == batchedSprites[0].Texture) {
+				if (
+					batchLength == 0 ||
+					batchLength < batchedSprites.Length &&
+					s.Texture1 == batchedSprites[0].Texture1 &&
+					s.Texture2 == batchedSprites[0].Texture2
+				) {
 					batchedSprites[batchLength++] = s;
 					continue;
 				}
 				var batch = CurrentRenderList.GetBatch(
-					batchedSprites[0].Texture, null, Blending, Shader, CustomShaderProgram, 4 * batchLength, 6 * batchLength);
+					batchedSprites[0].Texture1, batchedSprites[0].Texture2, Blending, Shader, CustomShaderProgram, 4 * batchLength, 6 * batchLength);
 				int v = batch.LastVertex;
 				int i = batch.LastIndex;
 				batch.VertexBuffer.Dirty = true;
 				batch.IndexBuffer.Dirty = true;
 				var indices = batch.IndexBuffer.Data;
 				var vertices = batch.VertexBuffer.Data;
-				var uvRect = batchedSprites[0].Texture.AtlasUVRect;
+				var uvRect = batchedSprites[0].Texture1.AtlasUVRect;
 				for (int j = 0; j < batchLength; j++) {
 					var sprite = batchedSprites[j];
 					var effectiveColor = color * sprite.Color;

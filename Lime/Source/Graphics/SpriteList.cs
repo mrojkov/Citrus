@@ -8,7 +8,8 @@ namespace Lime
 	public class Sprite
 	{
 		public int Tag;
-		public ITexture Texture;
+		public ITexture Texture1;
+		public ITexture Texture2;
 		public Color4 Color;
 		public Vector2 UV0;
 		public Vector2 UV1;
@@ -60,6 +61,7 @@ namespace Lime
 			public CharDef[] CharDefs;
 			private static Sprite[] buffer = new Sprite[50];
 			public static int Index = 0;
+			public ITexture Texture;
 
 			public void AddToList(List<Sprite> sprites)
 			{
@@ -73,7 +75,8 @@ namespace Lime
 					var s = buffer[Index];
 					Index++;
 					s.Tag = Tag;
-					s.Texture = ch.Texture;
+					s.Texture1 = ch.Texture;
+					s.Texture2 = Texture;
 					s.Color = Color;
 					s.Position = cd.Position;
 					s.Size = cd.Size(FontHeight);
@@ -104,7 +107,7 @@ namespace Lime
 			ITexture texture, Color4 color, Vector2 position, Vector2 size, Vector2 UV0, Vector2 UV1, int tag)
 		{
 			items.Add(new NormalSprite() {
-				Texture = texture,
+				Texture1 = texture,
 				Color = color,
 				Position = position,
 				Size = size,
@@ -114,7 +117,7 @@ namespace Lime
 			});
 		}
 
-		public void Add(IFont font, Color4 color, float fontHeight, CharDef[] charDefs, int tag)
+		public void Add(IFont font, Color4 color, float fontHeight, CharDef[] charDefs, int tag, ITexture texture)
 		{
 			items.Add(new TextSprite {
 				Font = font,
@@ -122,6 +125,7 @@ namespace Lime
 				FontHeight = fontHeight,
 				CharDefs = charDefs,
 				Tag = tag,
+				Texture = texture,
 			});
 		}
 

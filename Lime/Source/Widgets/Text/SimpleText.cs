@@ -20,6 +20,20 @@ namespace Lime
 		private TextOverflowMode overflowMode;
 		private bool wordSplitAllowed;
 		private TextProcessorDelegate textProcessor;
+		private ITexture texture;
+
+		[YuzuMember]
+		public override sealed ITexture Texture
+		{
+			get { return texture; }
+			set
+			{
+				if (texture != value) {
+					texture = value;
+					Window.Current?.Invalidate();
+				}
+			}
+		}
 
 		public event TextProcessorDelegate TextProcessor
 		{
@@ -61,7 +75,7 @@ namespace Lime
 			}
 		}
 
-		public string DisplayText 
+		public string DisplayText
 		{
 			get
 			{
@@ -344,7 +358,7 @@ namespace Lime
 				pos.X = CalcXByAlignment(lineWidth);
 				if (spriteList != null) {
 					Renderer.DrawTextLine(
-						Font, pos, line, Color4.White, FontHeight, 0, line.Length, spriteList, caret.Sync);
+						Font, pos, line, Color4.White, FontHeight, 0, line.Length, spriteList, caret.Sync, -1, Texture);
 				}
 				Rectangle lineRect = new Rectangle(pos.X, pos.Y, pos.X + lineWidth, pos.Y + FontHeight);
 				if (lastLine) {
