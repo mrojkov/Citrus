@@ -879,21 +879,21 @@ namespace Lime
 		}
 
 		[ThreadStatic]
-		private static HashSet<string> loadingScenes;
+		private static HashSet<string> scenesBeingLoaded;
 
 		public static Node CreateFromAssetBundle(string path, Node instance = null)
 		{
-			if (loadingScenes == null) {
-				loadingScenes = new HashSet<string>();
+			if (scenesBeingLoaded == null) {
+				scenesBeingLoaded = new HashSet<string>();
 			}
 			var fullPath = ResolveScenePath(path);
 			if (fullPath == null) {
 				throw new Exception($"Scene '{path}' not found in current asset bundle");
 			}
-			if (loadingScenes.Contains(fullPath)) {
+			if (scenesBeingLoaded.Contains(fullPath)) {
 				throw new Exception($"Cyclic scenes dependency was detected: {fullPath}");
 			}
-			loadingScenes.Add(fullPath);
+			scenesBeingLoaded.Add(fullPath);
 			try {
 				using (Stream stream = AssetBundle.Instance.OpenFileLocalized(fullPath)) {
 					instance = Serialization.ReadObject<Node>(fullPath, stream, instance);
