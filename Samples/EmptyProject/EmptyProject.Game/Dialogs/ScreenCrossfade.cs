@@ -4,74 +4,68 @@ using Lime;
 
 namespace EmptyProject.Dialogs
 {
-	public class ScreenCrossfade
+	public class ScreenCrossfade: IDisposable
 	{
 		private const float FadeTime = 0.3f;
 		private readonly Image image;
-		private readonly Frame frame;
-		private readonly Action action;
 
-		public ScreenCrossfade(Action action, bool doFadeIn = true, bool doFadeOut = true)
+		public ScreenCrossfade()
 		{
-			this.action = action;
-			image = new Image() {
-				Size = The.World.Size,
+			image = new Image {
 				Layer = Layers.AboveAllElse,
 				Shader = ShaderId.Silhuette,
 				Color = Color4.Black
 			};
-			if (doFadeIn) {
-				image.Opacity = 0;
-			}
-			frame = new Frame();
-			frame.PushToNode(The.World);
-			frame.Input.RestrictScope();
-			image.PushToNode(frame);
-			var tasks = new TaskList { MainTask(doFadeIn, doFadeOut) };
-			image.Updating += tasks.Update;
 		}
 
-		private IEnumerator<object> MainTask(bool doFadeIn, bool doFadeOut)
+		public IEnumerator<object> FadeInTask()
 		{
-			if (doFadeIn) {
-				for (float t = 0; t < FadeTime; t += Task.Current.Delta) {
-					image.Opacity = t / FadeTime;
-					yield return 0;
-				}
+			yield return ChangeOpacity(0, 1);
+		}
+
+		public IEnumerator<object> FadeOutTask()
+		{
+			yield return ChangeOpacity(1, 0);
+		}
+
+		private IEnumerator<object> ChangeOpacity(float from, float to)
+		{
+			foreach (var t in Task.LinearMotion(FadeTime, from, to)) {
+				image.Opacity = t;
+				yield return null;
 			}
-			frame.Input.DerestrictScope();
-			action.SafeInvoke();
-			if (doFadeOut) {
-				for (float t = 0; t < FadeTime; t += Task.Current.Delta) {
-					image.Opacity = 1 - t / FadeTime;
-					yield return 0;
-				}
-			}
-			frame.Unlink();
+		}
+
+		public void Attach()
+		{
+			Attach(The.World);
+		}
+
+		public void Attach(Widget widget)
+		{
+			image.PushToNode(widget);
+			image.ExpandToContainer();
+		}
+
+		public void CaptureInput()
+		{
+			image.Input.RestrictScope();
+		}
+
+		public void ReleaseInput()
+		{
+			image.Input.DerestrictScope();
+		}
+
+		public void Detach()
+		{
+			image.Unlink();
+		}
+
+		public void Dispose()
+		{
+			image.Dispose();
 			GC.Collect();
-		}
-	}
-
-	internal class ScreenCrossfadeScene
-	{
-		public ScreenCrossfadeScene(string path, Action action)
-		{
-			var frame = new Frame(path) {
-				Layer = Layers.AboveAllElse,
-				Size = The.World.Size
-			};
-			frame.PushToNode(The.World);
-			frame.Input.RestrictScope();
-			frame.RunAnimation("Show");
-			frame.AnimationStopped += () => {
-				frame.Input.DerestrictScope();
-				action.SafeInvoke();
-				frame.RunAnimation("Hide");
-				frame.AnimationStopped += () => {
-					frame.Unlink();
-					GC.Collect();
-				};
-			};
 		}
 	}
 }

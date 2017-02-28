@@ -115,6 +115,41 @@ namespace EmptyProject.Dialogs
 			}
 		}
 
+		protected void Open<T>() where T : Dialog, new()
+		{
+			DialogContext.Open<T>();
+		}
+
+		protected void Open<T>(T dialog) where T : Dialog, new()
+		{
+			DialogContext.Open(dialog);
+		}
+
+		protected void CrossfadeInto<T>() where T : Dialog, new()
+		{
+			CrossfadeInto<T>(true, true);
+		}
+
+		protected void CrossfadeInto<T>(bool fadeIn, bool fadeOut) where T : Dialog, new()
+		{
+			Tasks.Add(CrossfadeIntoTask<T>(fadeIn, fadeOut));
+		}
+
+		private IEnumerator<object> CrossfadeIntoTask<T>(bool fadeIn, bool fadeOut) where T : Dialog, new()
+		{
+			var crossfade = new ScreenCrossfade();
+			crossfade.Attach();
+			crossfade.CaptureInput();
+			if (fadeIn)
+				yield return crossfade.FadeInTask();
+			Open<T>();
+			crossfade.ReleaseInput();
+			if (fadeOut)
+				yield return crossfade.FadeOutTask();
+			crossfade.Detach();
+			crossfade.Dispose();
+		}
+
 		private void ApplyLocalization()
 		{
 			var animationName = string.IsNullOrEmpty(AssetBundle.CurrentLanguage) ? "@EN" : ("@" + AssetBundle.CurrentLanguage);

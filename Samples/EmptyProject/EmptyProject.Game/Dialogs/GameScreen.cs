@@ -7,28 +7,25 @@ namespace EmptyProject.Dialogs
 		public GameScreen()
 		{
 			SoundManager.PlayMusic("Ingame");
-			Scene._BtnExit.It.Clicked = BackToMenu;
+			Scene._BtnExit.It.Clicked = ReturnToMenu;
 		}
 
 		protected override void Update(float delta)
 		{
 			if (Root.Input.WasKeyPressed(Key.Escape)) {
-				BackToMenu();
+				ReturnToMenu();
 			}
-		}
-
-		private void BackToMenu()
-		{
-			new ScreenCrossfade(() => {
-				CloseImmediately();
-				new MainMenu();
-			});
 		}
 
 		protected override bool HandleAndroidBackButton()
 		{
-			BackToMenu();
+			ReturnToMenu();
 			return true;
+		}
+
+		private void ReturnToMenu()
+		{
+			CrossfadeInto<MainMenu>();
 		}
 	}
 }

@@ -4,15 +4,10 @@ namespace EmptyProject.Dialogs
 {
 	public class SplashScreen : Dialog<Scenes.Splash>
 	{
-		public SplashScreen(Action onClosed = null)
+		public SplashScreen()
 		{
 			Scene.RunAnimationStart();
-			Root.AnimationStopped += () => {
-				new ScreenCrossfade(() => {
-					CloseImmediately();
-					onClosed.SafeInvoke();
-				});
-			};
+			Root.AnimationStopped += CrossfadeInto<MainMenu>;
 		}
 	}
 }

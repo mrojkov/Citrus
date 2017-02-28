@@ -7,8 +7,8 @@ namespace EmptyProject.Dialogs
 		public MainMenu()
 		{
 			SoundManager.PlayMusic("Theme");
-			Scene._BtnPlay.It.Clicked = BtnPlayClick;
-			Scene._BtnOptions.It.Clicked = () => new Options();
+			Scene._BtnPlay.It.Clicked = CrossfadeInto<GameScreen>;
+			Scene._BtnOptions.It.Clicked = Open<Options>;
 		}
 
 		protected override bool HandleAndroidBackButton()
@@ -21,14 +21,6 @@ namespace EmptyProject.Dialogs
 			if (Root.Input.WasKeyPressed(Key.Escape)) {
 				Lime.Application.Exit();
 			}
-		}
-
-		private void BtnPlayClick()
-		{
-			new ScreenCrossfade(() => {
-				CloseImmediately();
-				new GameScreen();
-			});
 		}
 	}
 }

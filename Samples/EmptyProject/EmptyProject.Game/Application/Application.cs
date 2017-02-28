@@ -31,10 +31,10 @@ namespace EmptyProject.Application
 			SetWindowSize();
 
 			if (AppData.Instance.EnableSplashScreen) {
-				new SplashScreen(() => new MainMenu());
+				The.DialogContext.Open<SplashScreen>();
 			}
 			else {
-				new MainMenu();
+				The.DialogContext.Open<MainMenu>();
 			}
 
 			Instance = this;
