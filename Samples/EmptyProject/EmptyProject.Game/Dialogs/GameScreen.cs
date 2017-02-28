@@ -25,7 +25,9 @@ namespace EmptyProject.Dialogs
 
 		private void ReturnToMenu()
 		{
-			CrossfadeInto<MainMenu>();
+			var confirmation = new Confirmation("Are you sure?");
+			confirmation.OkClicked += CrossfadeInto<MainMenu>;
+			Open(confirmation);
 		}
 	}
 }

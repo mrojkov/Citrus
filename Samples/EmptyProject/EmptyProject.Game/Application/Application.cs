@@ -1,10 +1,7 @@
 ﻿using EmptyProject.Debug;
 using EmptyProject.Dialogs;
 using Lime;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace EmptyProject.Application
 {
@@ -16,10 +13,10 @@ namespace EmptyProject.Application
 		public static readonly Vector2 DefaultWorldSize = new Vector2(1024, 768);
 
 		private readonly object uiSync = new object();
-		private static List<string> debugInfoStrings = new List<string>();
 
 		public Application()
 		{
+			Instance = this;
 			World = CreateWorld();
 
 			AppData.Load();
@@ -36,8 +33,6 @@ namespace EmptyProject.Application
 			else {
 				The.DialogContext.Open<MainMenu>();
 			}
-
-			Instance = this;
 		}
 
 		public WindowWidget World { get; }
@@ -53,7 +48,7 @@ namespace EmptyProject.Application
 #endif
 		}
 
-		private void LoadFonts()
+		private static void LoadFonts()
 		{
 			FontPool.Instance.AddFont("regular", new DynamicFont("Dynamic/Roboto-Regular.ttf"));
 			FontPool.Instance.AddFont("bold", new DynamicFont("Dynamic/Roboto-Bold.ttf"));
@@ -134,7 +129,7 @@ namespace EmptyProject.Application
 				Renderer.BeginFrame();
 				SetupViewportAndProjectionMatrix();
 				World.RenderAll();
-				RenderInfo();
+				Cheats.RenderDebugInfo();
 				Renderer.EndFrame();
 			}
 		}
@@ -145,40 +140,6 @@ namespace EmptyProject.Application
 			var windowSize = The.Window.ClientSize;
 			The.Window.Input.ScreenToWorldTransform = Matrix32.Scaling(The.World.Width / windowSize.X,
 				The.World.Height / windowSize.Y);
-		}
-
-		public static void RenderDebugInfo(string info)
-		{
-			debugInfoStrings.Add(info);
-		}
-
-		protected void RenderInfo()
-		{
-			if (!Cheats.IsDebugInfoVisible) {
-				return;
-			}
-
-			Renderer.Transform1 = Matrix32.Identity;
-			Renderer.Blending = Blending.Alpha;
-			Renderer.Shader = ShaderId.Diffuse;
-			IFont font = FontPool.Instance[null];
-			float height = 25.0f * World.Scale.X;
-
-			float x = 5;
-			float y = 0;
-
-			var fields = new string[] {
-				String.Format("FPS: {0}", The.Window.FPS),
-				String.Format("Window Size: {0}", The.Window.ClientSize),
-				String.Format("World Size: {0}", The.World.Size)
-			};
-
-			var text = String.Join("\n", fields.Concat(debugInfoStrings));
-
-			Renderer.DrawTextLine(font, new Vector2(x + 1, y + 1), text, height, new Color4(0, 0, 0, 255)); // shadow
-			Renderer.DrawTextLine(font, new Vector2(x, y), text, height, new Color4(255, 255, 255, 255));
-
-			debugInfoStrings.Clear();
 		}
 	}
 }

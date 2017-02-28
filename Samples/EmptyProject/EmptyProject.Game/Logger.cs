@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace EmptyProject
 {
 	public class Logger
 	{
-		public enum Level : int
+		public enum Level
 		{
 			Trace   = 0,
 			Debug   = 1,
@@ -17,19 +14,19 @@ namespace EmptyProject
 			Fatal   = 5
 		}
 
-		public static Logger Instance;
+		public static readonly Logger Instance;
 
 		static Logger()
 		{
 			Instance = new Logger("unnamed-logger");
 		}
 
-		public readonly string Name;
+		public string Name { get; }
 
 		public Logger(string name)
 		{
 			if (name == null) {
-				throw new ArgumentNullException("name");
+				throw new ArgumentNullException(nameof(name));
 			}
 
 			Name = name;
@@ -37,48 +34,48 @@ namespace EmptyProject
 
 		#region Shortcuts
 
-		public void Debug(string message, params string[] param)
+		public void Debug(string message, params object[] param)
 		{
 			Write(Level.Debug, message, param);
 		}
 
-		public void Info(string message, params string[] param)
+		public void Info(string message, params object[] param)
 		{
 			Write(Level.Info, message, param);
 		}
 
-		public void Warn(string message, params string[] param)
+		public void Warn(string message, params object[] param)
 		{
 			Write(Level.Warning, message, param);
 		}
 
-		public void Error(string message, params string[] param)
+		public void Error(string message, params object[] param)
 		{
 			Write(Level.Error, message, param);
 		}
 
 		public void Error(string message, Exception exception)
 		{
-			var exp = exception == null ? "null exception" : exception.Message;
+			var exp = exception?.Message ?? "null exception";
 			Write(Level.Error, "{0} :: {1}", message, exp);
 		}
 
-		public void Fatal(string message, params string[] param)
+		public void Fatal(string message, params object[] param)
 		{
 			Write(Level.Fatal, message, param);
 		}
 
 		public void Fatal(string message, Exception exception)
 		{
-			var exp = exception == null ? "null exception" : exception.Message;
+			var exp = exception?.Message ?? "null exception";
 			Write(Level.Fatal, "{0} :: {1}", message, exp);
 		}
 
 		#endregion
 
-		public void Write(Level level, string message, params string[] param)
+		public void Write(Level level, string message, params object[] param)
 		{
-			Write(level, String.Format(message, param));
+			Write(level, string.Format(message, param));
 		}
 
 		public void Write(Level level, string message)

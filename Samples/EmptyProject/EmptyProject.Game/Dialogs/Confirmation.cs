@@ -17,8 +17,8 @@ namespace EmptyProject.Dialogs
 			cancel.Visible = cancelButtonVisible;
 			cancel.Clicked = Close;
 			Scene._BtnOk.It.Clicked = () => {
-				Close();
 				OkClicked?.Invoke();
+				Close();
 			};
 		}
 

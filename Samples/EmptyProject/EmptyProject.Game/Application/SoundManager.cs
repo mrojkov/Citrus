@@ -6,12 +6,11 @@ namespace EmptyProject.Application
 {
 	public class SoundManager
 	{
-		public static SoundManager Instance = new SoundManager();
+		public static readonly SoundManager Instance = new SoundManager();
 
-		public SoundManager()
+		private SoundManager()
 		{
 			The.World.Updated += Update;
-
 			SfxVolume = AppData.Instance.EffectsVolume;
 			MusicVolume = AppData.Instance.MusicVolume;
 		}
@@ -34,19 +33,19 @@ namespace EmptyProject.Application
 			set { AudioSystem.SetGroupVolume(AudioChannelGroup.Voice, value); }
 		}
 
-		Dictionary<string, DateTime> effectTimestamps = new Dictionary<string, DateTime>();
+		private readonly Dictionary<string, DateTime> effectTimestamps = new Dictionary<string, DateTime>();
 
 		public Sound PlaySound(string soundFile, string polyphonicGroup = null, float pan = 0, int polyphonicMinInterval = 50, float pitch = 1, float priority = 0.5f, float volume = 1.0f, bool looped = false)
 		{
 			if (polyphonicGroup != null) {
 				DateTime value;
-				DateTime now = DateTime.Now;
+				var now = DateTime.Now;
 				if (effectTimestamps.TryGetValue(polyphonicGroup, out value) && (now - value).Milliseconds < polyphonicMinInterval) {
 					return new Sound();
 				}
 				effectTimestamps[polyphonicGroup] = now;
 			}
-			string path = soundFile;
+			var path = soundFile;
 			var sound = AudioSystem.Play("Audio/Sounds/" + path, AudioChannelGroup.Effects, looped, priority, 0, false, volume, pan);
 			if (pitch != 1) {
 				sound.Pitch = pitch;
@@ -58,13 +57,9 @@ namespace EmptyProject.Application
 
 		public void PlayJingle(string soundFile)
 		{
-			if (musicInstance != null) {
-				musicInstance.Stop(0.5f);
-			}
-			if (jingleInstance != null) {
-				jingleInstance.Stop(0.5f);
-			}
-			jingleInstance = Lime.AudioSystem.PlayMusic("Audio/Music/" + soundFile, false, 100, 0.5f);
+			musicInstance?.Stop(0.5f);
+			jingleInstance?.Stop(0.5f);
+			jingleInstance = AudioSystem.PlayMusic("Audio/Music/" + soundFile, false);
 		}
 
 		public void StopJingle()
@@ -98,12 +93,12 @@ namespace EmptyProject.Application
 
 		private void RestartMusic()
 		{
-			string music = Music;
+			var music = Music;
 			Music = null;
 			PlayMusic(music);
 		}
 
-		private Stack<string> musicStack = new Stack<string>();
+		private readonly Stack<string> musicStack = new Stack<string>();
 
 		public void PushMusic()
 		{
@@ -120,11 +115,11 @@ namespace EmptyProject.Application
 
 		private sealed class MusicChangedEvent
 		{
-			public Sound OldMusic;
-			public float Duration;
+			public readonly Sound OldMusic;
+			public readonly float Duration;
 			public float TimePassed;
 
-			public bool TimeToOccur { get { return TimePassed >= Duration; } }
+			public bool TimeToOccur => TimePassed >= Duration;
 
 			public MusicChangedEvent(Sound oldMusic, float duration)
 			{
@@ -141,60 +136,45 @@ namespace EmptyProject.Application
 
 		public string PlayAmbient(string ambientName)
 		{
-			if (Ambient != ambientName) {
-				string oldAmbient = Ambient;
-				if (ambientInstance != null) {
-					ambientInstance.Stop(0.5f);
-				}
-				Ambient = ambientName;
-				if (ambientName != null) {
-					ambientInstance = Lime.AudioSystem.PlayEffect("Audio/Ambient/" + ambientName, true, 100, 0.5f);
-				}
-				else {
-					ambientInstance = null;
-				}
-				return oldAmbient;
-			}
-			return Ambient;
+			if (Ambient == ambientName)
+				return Ambient;
+			var oldAmbient = Ambient;
+			ambientInstance?.Stop(0.5f);
+			Ambient = ambientName;
+			ambientInstance = ambientName == null ? null :
+				AudioSystem.PlayEffect("Audio/Ambient/" + ambientName, true, 100, 0.5f);
+			return oldAmbient;
 		}
 
 		public string PlayMusic(string musicName, bool looped = true, float volume = 1.0f)
 		{
 			const float fadeoutDuration = 0.5f;
 
-			if (Music != musicName) {
-				string oldMusic = Music;
-				Music = musicName;
-				if (jingleInstance == null) {
-					if (musicInstance != null) {
-						musicChanged = new MusicChangedEvent(musicInstance, fadeoutDuration);
-					}
-					if (musicName != null) {
-						musicInstance = Lime.AudioSystem.PlayMusic("Audio/Music/" + musicName, looped, 100, fadeoutDuration, false, volume);
-					}
-					else {
-						musicInstance = null;
-					}
-				}
+			if (Music == musicName)
+				return Music;
+			var oldMusic = Music;
+			Music = musicName;
+			if (jingleInstance != null)
 				return oldMusic;
+			if (musicInstance != null) {
+				musicChanged = new MusicChangedEvent(musicInstance, fadeoutDuration);
 			}
-			return Music;
+			musicInstance = musicName == null ? null :
+				AudioSystem.PlayMusic("Audio/Music/" + musicName, looped, 100, fadeoutDuration, false, volume);
+			return oldMusic;
 		}
 
 		public string StopMusic(float fadeoutTime = 0)
 		{
-			if (Music != null) {
-				string oldMusic = Music;
-				Music = null;
-				if (jingleInstance == null) {
-					if (musicInstance != null) {
-						musicInstance.Stop(fadeoutTime);
-					}
-					musicInstance = null;
-				}
+			if (Music == null)
+				return Music;
+			var oldMusic = Music;
+			Music = null;
+			if (jingleInstance != null)
 				return oldMusic;
-			}
-			return Music;
+			musicInstance?.Stop(fadeoutTime);
+			musicInstance = null;
+			return oldMusic;
 		}
 	}
 }

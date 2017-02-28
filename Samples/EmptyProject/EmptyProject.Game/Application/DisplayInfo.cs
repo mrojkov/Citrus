@@ -12,7 +12,7 @@ namespace EmptyProject.Application
 
 	public static partial class DisplayInfo
 	{
-		public const float ReferenceDPI = 330f;
+		private const float ReferenceDpi = 330f;
 
 		public static readonly List<Display> Displays = new List<Display>() {
 			new Display("iPhone 4", 960, 640, 326),
@@ -27,11 +27,11 @@ namespace EmptyProject.Application
 		public static event Action BeforeOrientationOrResolutionChanged;
 		public static event Action OrientationOrResolutionChanged;
 
-		public static Orientation Orientation { get { return IsLandscapeOrientation() ? Orientation.Landscape : Orientation.Portrait; } }
+		public static Orientation Orientation => IsLandscapeOrientation() ? Orientation.Landscape : Orientation.Portrait;
 
 		public static float GetInterfaceScale()
 		{
-			var d = Display.DPI / ReferenceDPI;
+			var d = Display.DPI / ReferenceDpi;
 			d = (d * 4.0f).Round() * 0.25f;
 			if (IsTabletDisplay()) {
 				d *= 2;
@@ -108,12 +108,12 @@ namespace EmptyProject.Application
 
 		public static void HandleOrientationOrResolutionChange()
 		{
-			BeforeOrientationOrResolutionChanged.SafeInvoke();
+			BeforeOrientationOrResolutionChanged?.Invoke();
 			The.World.Size = CalcWorldSize();
 #if !iOS && !ANDROID
 			The.Window.ClientSize = GetResolution();
 #endif
-			OrientationOrResolutionChanged.SafeInvoke();
+			OrientationOrResolutionChanged?.Invoke();
 
 #if WIN
 			The.Window.Center();

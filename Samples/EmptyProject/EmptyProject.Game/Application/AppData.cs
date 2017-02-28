@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using Lime;
 using Yuzu;
 
@@ -37,7 +36,7 @@ namespace EmptyProject.Application
 
 		public static string GetDataDirectory()
 		{
-			return Lime.Environment.GetDataDirectory("Game Forest", Application.ApplicationName, Version);
+			return Environment.GetDataDirectory("Game Forest", Application.ApplicationName, Version);
 		}
 
 		public static void Load()
@@ -46,7 +45,7 @@ namespace EmptyProject.Application
 			Instance = null;
 			if (File.Exists(path)) {
 				try {
-					Instance = Lime.Serialization.ReadObjectFromFile<AppData>(path);
+					Instance = Serialization.ReadObjectFromFile<AppData>(path);
 				}
 				catch (System.Exception e) {
 					The.Log.Warn("Failed to load the application profile: {0}", e.Message);

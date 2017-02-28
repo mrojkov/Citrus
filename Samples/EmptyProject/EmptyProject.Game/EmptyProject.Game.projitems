@@ -32,6 +32,5 @@
     <Compile Include="$(MSBuildThisFileDirectory)Logger.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Profile.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)The.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Utils.cs" />
   </ItemGroup>
 </Project>

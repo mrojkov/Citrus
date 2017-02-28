@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using EmptyProject.Application;
 using Lime;
-using EmptyProject.Debug;
 using EmptyProject.Scenes;
 
 namespace EmptyProject.Dialogs
@@ -17,7 +16,7 @@ namespace EmptyProject.Dialogs
 
 	public class Dialog<T> : Dialog where T: ParsedWidget, new()
 	{
-		public Dialog(): base(new T()) { }
+		protected Dialog(): base(new T()) { }
 
 		protected new T Scene => (T) base.Scene;
 	}
@@ -25,21 +24,14 @@ namespace EmptyProject.Dialogs
 	public class Dialog : IDisposable
 	{
 		private const string DialogTag = "Dialog";
-
-		protected readonly TaskList Tasks = new TaskList();
-		protected virtual string HideAnimationName { get { return "Hide"; } }
-		protected virtual string CustomRotationAnimation { get { return null; } }
+		protected TaskList Tasks { get; } = new TaskList();
 		protected ParsedWidget Scene { get; }
-		protected Widget Root;
-
-		public bool IsClosed { get { return Root.Parent == null; } }
-		public bool IsTopDialog { get { return DialogContext.Top == this; } }
+		protected Widget Root => Scene.Widget;
 		public DialogState State { get; protected set; }
 
-		public Dialog(ParsedWidget scene, string animation = "Show", int layer = Layers.Interface)
+		protected Dialog(ParsedWidget scene, string animation = "Show", int layer = Layers.Interface)
 		{
 			Scene = scene;
-			Root = scene.Widget;
 			Initialize(animation, layer);
 		}
 
@@ -49,7 +41,6 @@ namespace EmptyProject.Dialogs
 			Root.Tag = DialogTag;
 			Root.PushToNode(World);
 			Root.ExpandToContainer();
-			Root.Update(0);
 			Root.Updating += Tasks.Update;
 			Root.Updating += Update;
 			Lime.Application.InvokeOnMainThread(() => {
@@ -62,7 +53,16 @@ namespace EmptyProject.Dialogs
 			ApplyLocalization();
 
 			Tasks.Add(ShowTask(animation));
+			Root.Update(0);
 		}
+
+		protected virtual string HideAnimationName => "Hide";
+
+		protected virtual string CustomRotationAnimation => null;
+
+		public bool IsClosed => Root.Parent == null;
+
+		public bool IsTopDialog => DialogContext.Top == this;
 
 		protected virtual void Update(float delta) { }
 
@@ -81,7 +81,7 @@ namespace EmptyProject.Dialogs
 				yield return Root;
 			}
 
-			whenDone.SafeInvoke();
+			whenDone?.Invoke();
 		}
 
 		private IEnumerator<object> HideTask(string animation, Action whenDone = null)
@@ -91,7 +91,7 @@ namespace EmptyProject.Dialogs
 			}
 
 			UnlinkAndDispose();
-			whenDone.SafeInvoke();
+			whenDone?.Invoke();
 		}
 
 		protected virtual void Closing() { }
@@ -120,7 +120,7 @@ namespace EmptyProject.Dialogs
 			DialogContext.Open<T>();
 		}
 
-		protected void Open<T>(T dialog) where T : Dialog, new()
+		protected void Open<T>(T dialog) where T : Dialog
 		{
 			DialogContext.Open(dialog);
 		}

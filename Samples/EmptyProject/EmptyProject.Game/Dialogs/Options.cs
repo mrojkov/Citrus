@@ -18,7 +18,7 @@ namespace EmptyProject.Dialogs
 
 		private void CreateCheckBox(CheckGroup checkGroup, string propertyName, bool autoUpdate = false)
 		{
-			var property = GetType().GetProperty(propertyName, BindingFlags.NonPublic | BindingFlags.Static);
+			var property = GetType().GetProperty(propertyName, BindingFlags.NonPublic | BindingFlags.Instance);
 			var getValue = new Func<bool>(() => (bool) property.GetValue(this));
 			var toggle = new Action(() => property.SetValue(this, !getValue()));
 			CreateCheckBox(checkGroup, getValue, toggle, autoUpdate);
@@ -30,7 +30,7 @@ namespace EmptyProject.Dialogs
 			var check = checkGroup._Check;
 			RunConditionalAnimation(getValue, check.RunAnimationChecked, check.RunAnimationUnchecked);
 			checkGroup._BtnCheck.It.Clicked = () => {
-				toggleValue.SafeInvoke();
+				toggleValue?.Invoke();
 				RunConditionalAnimation(getValue, check.RunAnimationCheck, check.RunAnimationUncheck);
 			};
 			if (autoUpdate) {

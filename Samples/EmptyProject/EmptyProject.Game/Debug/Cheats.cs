@@ -1,20 +1,23 @@
-﻿using EmptyProject.Application;
-using EmptyProject.Dialogs;
+﻿using System.Collections.Generic;
+using System.Linq;
+using EmptyProject.Application;
 using Lime;
 
 namespace EmptyProject.Debug
 {
 	public static class Cheats
 	{
-		public static bool Enabled { get { return true; } }
+		private static readonly List<string> debugInfoStrings = new List<string>();
+		public static bool Enabled { get; set; }
 		public static bool IsDebugInfoVisible { get; set; }
 
-		private static Input Input { get { return The.Window.Input; } }
+		private static Input Input => The.Window.Input;
 		private static RainbowDash.Menu currentMenu;
 
 		static Cheats()
 		{
 #if DEBUG
+			Enabled = true;
 			IsDebugInfoVisible = true;
 #endif
 		}
@@ -96,6 +99,41 @@ namespace EmptyProject.Debug
 				The.AppData.EnableSplashScreen = false;
 				The.AppData.Save();
 			}, () => The.AppData.EnableSplashScreen);
+		}
+
+		public static void AddDebugInfo(string info)
+		{
+			debugInfoStrings.Add(info);
+		}
+
+		public static void RenderDebugInfo()
+		{
+			if (!IsDebugInfoVisible)
+			{
+				return;
+			}
+
+			Renderer.Transform1 = Matrix32.Identity;
+			Renderer.Blending = Blending.Alpha;
+			Renderer.Shader = ShaderId.Diffuse;
+			IFont font = FontPool.Instance[null];
+			float height = 25.0f * The.World.Scale.X;
+
+			float x = 5;
+			float y = 0;
+
+			var fields = new[] {
+				$"FPS: {The.Window.FPS}",
+				$"Window Size: {The.Window.ClientSize}",
+				$"World Size: {The.World.Size}"
+			};
+
+			var text = string.Join("\n", fields.Concat(debugInfoStrings));
+
+			Renderer.DrawTextLine(font, new Vector2(x + 1, y + 1), text, height, new Color4(0, 0, 0)); // shadow
+			Renderer.DrawTextLine(font, new Vector2(x, y), text, height, new Color4(255, 255, 255));
+
+			debugInfoStrings.Clear();
 		}
 	}
 }

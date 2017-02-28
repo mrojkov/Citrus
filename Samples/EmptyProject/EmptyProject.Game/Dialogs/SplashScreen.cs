@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace EmptyProject.Dialogs
+﻿namespace EmptyProject.Dialogs
 {
 	public class SplashScreen : Dialog<Scenes.Splash>
 	{

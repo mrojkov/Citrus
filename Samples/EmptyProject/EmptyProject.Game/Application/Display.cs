@@ -27,10 +27,8 @@ namespace EmptyProject.Application
 		{
 			return other.Name == Name;
 		}
-		public Vector2 PhysicalSize
-		{
-			get { return (Vector2)Resolution / DPI; }
-		}
+
+		private Vector2 PhysicalSize => (Vector2)Resolution / DPI;
 
 		public bool IsTablet
 		{
