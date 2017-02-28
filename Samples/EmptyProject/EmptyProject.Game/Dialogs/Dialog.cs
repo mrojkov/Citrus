@@ -118,7 +118,7 @@ namespace EmptyProject.Dialogs
 
 		private void ApplyLocalization()
 		{
-			var animationName = string.IsNullOrEmpty(AssetsBundle.CurrentLanguage) ? "@EN" : ("@" + AssetsBundle.CurrentLanguage);
+			var animationName = string.IsNullOrEmpty(AssetBundle.CurrentLanguage) ? "@EN" : ("@" + AssetBundle.CurrentLanguage);
 			foreach (var node in Root.Descendants) {
 				if (!node.TryRunAnimation(animationName)) {
 					node.TryRunAnimation("@other");

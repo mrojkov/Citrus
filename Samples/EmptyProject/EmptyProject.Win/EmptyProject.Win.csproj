@@ -71,8 +71,8 @@
     <Compile Include="Application.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Data.Desktop">
-      <Link>Data.Desktop</Link>
+    <None Include="..\Data.Win">
+      <Link>Data.Win</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="app.config">

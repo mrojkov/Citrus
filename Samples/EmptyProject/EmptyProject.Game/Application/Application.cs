@@ -23,7 +23,7 @@ namespace EmptyProject.Application
 			CreateWindow();
 
 			AppData.Load();
-			AssetsBundle.Instance = CreateAssetsBundle();
+			AssetBundle.Instance = CreateAssetBundle();
 			Profile.Instance = new Profile();
 
 			LoadFonts();
@@ -42,14 +42,14 @@ namespace EmptyProject.Application
 
 		public static WindowWidget World { get; private set; }
 
-		private AssetsBundle CreateAssetsBundle()
+		private AssetBundle CreateAssetBundle()
 		{
 #if ANDROID
-			return new PackedAssetsBundle("Assets.Android.Data.Android", "Assets.Android");
+			return new PackedAssetBundle("Assets.Android.Data.Android", "Assets.Android");
 #elif iOS
-			return new PackedAssetsBundle("Data.iOS");
+			return new PackedAssetBundle("Data.iOS");
 #else
-			return new PackedAssetsBundle("Data.Desktop");
+			return new PackedAssetBundle("Data.Win");
 #endif
 		}
 
@@ -75,12 +75,12 @@ namespace EmptyProject.Application
 			}
 #endif
 
-			if (!AssetsBundle.Instance.FileExists(fileName)) {
+			if (!AssetBundle.Instance.FileExists(fileName)) {
 				return;
 			}
 
 			Localization.Dictionary.Clear();
-			using (var stream = AssetsBundle.Instance.OpenFile(fileName)) {
+			using (var stream = AssetBundle.Instance.OpenFile(fileName)) {
 				Localization.Dictionary.ReadFromStream(new LocalizationDictionaryTextSerializer(), stream);
 			}
 		}
