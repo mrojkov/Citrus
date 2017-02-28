@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicFont.Android", "..\.
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "EmptyProject.Game", "..\EmptyProject.Game\EmptyProject.Game.shproj", "{E72754D5-6DF7-42F1-9E14-0EF4D1491621}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmptyProject.GeneratedScenes.Android", "..\EmptyProject.GeneratedScenes\EmptyProject.GeneratedScenes.Android.csproj", "{CF150772-5F4A-453C-91BD-D52911174B4E}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\EmptyProject.Game\EmptyProject.Game.projitems*{46b5ff2e-5ed1-42fe-a557-2cdb3c485291}*SharedItemsImports = 4
@@ -53,6 +55,10 @@ Global
 		{B305434E-2233-4F9E-9815-577DF6F9A737}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B305434E-2233-4F9E-9815-577DF6F9A737}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B305434E-2233-4F9E-9815-577DF6F9A737}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF150772-5F4A-453C-91BD-D52911174B4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF150772-5F4A-453C-91BD-D52911174B4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF150772-5F4A-453C-91BD-D52911174B4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF150772-5F4A-453C-91BD-D52911174B4E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

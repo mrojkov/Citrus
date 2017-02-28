@@ -18,14 +18,13 @@ namespace EmptyProject.Android
 			System.Threading.ThreadPool.SetMinThreads(4, 8);
 			new Lime.ActivityDelegate(() => {
 				Lime.Application.Initialize(
-				new Lime.ApplicationOptions
-				{
-					DecodeAudioInSeparateThread = false,
-					UsingDeferredHitTest = true
-				}
-			);
-
-				new Application.Application();
+					new Lime.ApplicationOptions
+					{
+						DecodeAudioInSeparateThread = false,
+						UsingDeferredHitTest = true
+					}
+				);
+				EmptyProject.Application.Application.Initialize();
 			});
 		}
 

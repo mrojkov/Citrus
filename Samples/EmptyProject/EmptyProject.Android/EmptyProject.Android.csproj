@@ -109,6 +109,10 @@
       <Project>{cf150772-5f4a-453c-91bd-d52901174b4e}</Project>
       <Name>Yuzu.Android</Name>
     </ProjectReference>
+    <ProjectReference Include="..\EmptyProject.GeneratedScenes\EmptyProject.GeneratedScenes.Android.csproj">
+      <Project>{cf150772-5f4a-453c-91bd-d52911174b4e}</Project>
+      <Name>EmptyProject.GeneratedScenes.Android</Name>
+    </ProjectReference>
     <ProjectReference Include="Assets\Assets.Android.csproj">
       <Project>{1C601E58-2EF5-462E-86CB-B7443A410FC5}</Project>
       <Name>Assets.Android</Name>
