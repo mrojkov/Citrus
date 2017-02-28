@@ -14,9 +14,13 @@ namespace EmptyProject.Application
 
 		private readonly object uiSync = new object();
 
-		public Application()
+		public static void Initialize()
 		{
-			Instance = this;
+			Instance = new Application();
+		}
+
+		private Application()
+		{
 			World = CreateWorld();
 
 			AppData.Load();
