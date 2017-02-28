@@ -125,6 +125,7 @@ UpgradeLog*.htm
 *.Desktop
 *.iOS
 *.Android
+*.Win
 
 # Scene backups
 *.scene_Autoback0
