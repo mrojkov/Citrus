@@ -346,6 +346,11 @@ namespace Lime
 				jd.Generate<TextStyle>();
 				jd.Generate<Widget>();
 				jd.Generate<SerializableTexture>();
+
+				jd.Generate<NodeReference<Widget>>();
+				jd.Generate<NodeReference<Spline>>();
+				jd.Generate<NodeReference<Camera3D>>();
+
 				jd.GenerateFooter();
 				sw.Flush();
 				var executablePath = System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
