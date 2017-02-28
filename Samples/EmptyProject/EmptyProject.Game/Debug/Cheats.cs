@@ -73,7 +73,7 @@ namespace EmptyProject.Debug
 			var section = menu.Section();
 
 			InitialFill(menu);
-			The.DialogContext.Top.FillDebugMenuItems(menu);
+			The.DialogManager.Top.FillDebugMenuItems(menu);
 
 			menu.Show();
 			currentMenu = menu;

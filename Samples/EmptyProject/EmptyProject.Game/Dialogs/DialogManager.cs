@@ -3,9 +3,9 @@ using System.Linq;
 
 namespace EmptyProject.Dialogs
 {
-	public class DialogContext
+	public class DialogManager
 	{
-		public static DialogContext Instance { get; } = new DialogContext();
+		public static DialogManager Instance { get; } = new DialogManager();
 
 		public List<Dialog> ActiveDialogs { get; } = new List<Dialog>();
 		public Dialog Top => ActiveDialogs.FirstOrDefault();

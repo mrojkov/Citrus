@@ -62,7 +62,7 @@ namespace EmptyProject.Dialogs
 
 		public bool IsClosed => Root.Parent == null;
 
-		public bool IsTopDialog => DialogContext.Top == this;
+		public bool IsTopDialog => DialogManager.Top == this;
 
 		protected virtual void Update(float delta) { }
 
@@ -117,12 +117,12 @@ namespace EmptyProject.Dialogs
 
 		protected void Open<T>() where T : Dialog, new()
 		{
-			DialogContext.Open<T>();
+			DialogManager.Open<T>();
 		}
 
 		protected void Open<T>(T dialog) where T : Dialog
 		{
-			DialogContext.Open(dialog);
+			DialogManager.Open(dialog);
 		}
 
 		protected void CrossfadeInto<T>() where T : Dialog, new()
@@ -173,7 +173,7 @@ namespace EmptyProject.Dialogs
 
 			Closing();
 
-			DialogContext.ActiveDialogs.Remove(this);
+			DialogManager.ActiveDialogs.Remove(this);
 			Tasks.Add(HideTask(HideAnimationName, () => {
 				State = DialogState.Closed;
 			}));
@@ -185,7 +185,7 @@ namespace EmptyProject.Dialogs
 
 			Closing();
 
-			DialogContext.ActiveDialogs.Remove(this);
+			DialogManager.ActiveDialogs.Remove(this);
 			UnlinkAndDispose();
 
 			State = DialogState.Closed;
@@ -213,13 +213,13 @@ namespace EmptyProject.Dialogs
 			CloseImmediately();
 		}
 
-		protected Application.Application App => Application.Application.Instance;
-		protected WindowWidget World => App.World;
-		protected IWindow Window => World.Window;
-		protected SoundManager SoundManager => SoundManager.Instance;
-		protected AppData AppData => AppData.Instance;
-		protected Profile Profile => Profile.Instance;
-		protected DialogContext DialogContext => DialogContext.Instance;
-		protected Logger Log => Logger.Instance;
+		protected Application.Application App => The.App;
+		protected WindowWidget World => The.World;
+		protected IWindow Window => The.Window;
+		protected SoundManager SoundManager => The.SoundManager;
+		protected AppData AppData => The.AppData;
+		protected Profile Profile => The.Profile;
+		protected DialogManager DialogManager => The.DialogManager;
+		protected Logger Log => The.Log;
 	}
 }

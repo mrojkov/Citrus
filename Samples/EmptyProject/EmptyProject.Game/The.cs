@@ -12,7 +12,7 @@ namespace EmptyProject
 		public static SoundManager SoundManager => SoundManager.Instance;
 		public static AppData AppData => AppData.Instance;
 		public static Profile Profile => Profile.Instance;
-		public static DialogContext DialogContext => DialogContext.Instance;
+		public static DialogManager DialogManager => DialogManager.Instance;
 		public static Logger Log => Logger.Instance;
 	}
 }
