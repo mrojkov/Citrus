@@ -17,9 +17,10 @@ namespace EmptyProject.Application
 		public static void Initialize()
 		{
 			Instance = new Application();
+			Instance.Load();
 		}
 
-		private Application()
+		private void Load()
 		{
 			World = CreateWorld();
 
@@ -39,7 +40,7 @@ namespace EmptyProject.Application
 			}
 		}
 
-		public WindowWidget World { get; }
+		public WindowWidget World { get; private set; }
 
 		private AssetBundle CreateAssetBundle()
 		{
@@ -87,10 +88,11 @@ namespace EmptyProject.Application
 		private WindowWidget CreateWorld()
 		{
 			var options = new WindowOptions { Title = ApplicationName };
-			var world = new WindowWidget(new Window(options)) { Layer = RenderChain.LayerCount - 1 };
-			world.Window.Updating += OnUpdateFrame;
-			world.Window.Rendering += OnRenderFrame;
-			world.Window.Resized += OnResize;
+			var window = new Window(options);
+			window.Updating += OnUpdateFrame;
+			window.Rendering += OnRenderFrame;
+			window.Resized += OnResize;
+			var world = new WindowWidget(window) { Layer = RenderChain.LayerCount - 1 };
 			return world;
 		}
 
