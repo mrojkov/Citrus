@@ -15,7 +15,7 @@ namespace EmptyProject.iOS
 				UsingDeferredHitTest = true
 			});
 
-			new EmptyProject.Application.Application();
+			EmptyProject.Application.Application.Initialize();
 			return true;
 		}
 

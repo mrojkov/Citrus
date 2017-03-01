@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmptyProject.iOS", "EmptyProject.iOS.csproj", "{304BC36A-88DE-41EA-B596-E07505A14FD2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmptyProject.Game.iOS", "..\EmptyProject.Game\EmptyProject.Game.iOS.csproj", "{05049BBD-01C5-41E6-A2BE-DF2DBFCB049F}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lime.iOS", "..\..\Citrus\Lime\Lime.iOS.csproj", "{9CFD3A2F-7DA5-420E-B475-44749DC61485}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lemon.iOS", "..\..\Citrus\Lemon\Lemon.iOS.csproj", "{C4795CBE-B192-4E53-8140-7310FBD206DD}"
@@ -12,6 +10,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yuzu.iOS", "..\..\Citrus\Yuzu\Yuzu.iOS.csproj", "{DF52C768-5E17-4A26-AD77-4BDD31A2224C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicFont.iOS", "..\..\Citrus\Lime\Extensions\DynamicFont\DynamicFont.iOS.csproj", "{B956A746-3D0C-4378-926B-8A776846FFFA}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "EmptyProject.Game", "..\EmptyProject.Game\EmptyProject.Game.shproj", "{E72754D5-6DF7-42F1-9E14-0EF4D1491621}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmptyProject.GeneratedScenes.iOS", "..\EmptyProject.GeneratedScenes\EmptyProject.GeneratedScenes.iOS.csproj", "{DF52C768-5E17-4A26-AD77-4BDD41A2224C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,18 +25,6 @@ Global
 		AppStore|iPhone = AppStore|iPhone
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{05049BBD-01C5-41E6-A2BE-DF2DBFCB049F}.Debug|iPhone.ActiveCfg = Debug|Any CPU
-		{05049BBD-01C5-41E6-A2BE-DF2DBFCB049F}.Debug|iPhone.Build.0 = Debug|Any CPU
-		{05049BBD-01C5-41E6-A2BE-DF2DBFCB049F}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
-		{05049BBD-01C5-41E6-A2BE-DF2DBFCB049F}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
-		{05049BBD-01C5-41E6-A2BE-DF2DBFCB049F}.Release|iPhone.ActiveCfg = Release|Any CPU
-		{05049BBD-01C5-41E6-A2BE-DF2DBFCB049F}.Release|iPhone.Build.0 = Release|Any CPU
-		{05049BBD-01C5-41E6-A2BE-DF2DBFCB049F}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
-		{05049BBD-01C5-41E6-A2BE-DF2DBFCB049F}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
-		{05049BBD-01C5-41E6-A2BE-DF2DBFCB049F}.Ad-Hoc|iPhone.ActiveCfg = Debug|Any CPU
-		{05049BBD-01C5-41E6-A2BE-DF2DBFCB049F}.Ad-Hoc|iPhone.Build.0 = Debug|Any CPU
-		{05049BBD-01C5-41E6-A2BE-DF2DBFCB049F}.AppStore|iPhone.ActiveCfg = Debug|Any CPU
-		{05049BBD-01C5-41E6-A2BE-DF2DBFCB049F}.AppStore|iPhone.Build.0 = Debug|Any CPU
 		{304BC36A-88DE-41EA-B596-E07505A14FD2}.Debug|iPhone.ActiveCfg = Debug|iPhone
 		{304BC36A-88DE-41EA-B596-E07505A14FD2}.Debug|iPhone.Build.0 = Debug|iPhone
 		{304BC36A-88DE-41EA-B596-E07505A14FD2}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
@@ -95,6 +85,18 @@ Global
 		{B956A746-3D0C-4378-926B-8A776846FFFA}.Ad-Hoc|iPhone.Build.0 = Release|Any CPU
 		{B956A746-3D0C-4378-926B-8A776846FFFA}.AppStore|iPhone.ActiveCfg = Release|Any CPU
 		{B956A746-3D0C-4378-926B-8A776846FFFA}.AppStore|iPhone.Build.0 = Release|Any CPU
+		{DF52C768-5E17-4A26-AD77-4BDD41A2224C}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhone
+		{DF52C768-5E17-4A26-AD77-4BDD41A2224C}.Debug|iPhoneSimulator.Build.0 = Debug|iPhone
+		{DF52C768-5E17-4A26-AD77-4BDD41A2224C}.Release|iPhone.ActiveCfg = Release|iPhone
+		{DF52C768-5E17-4A26-AD77-4BDD41A2224C}.Release|iPhone.Build.0 = Release|iPhone
+		{DF52C768-5E17-4A26-AD77-4BDD41A2224C}.Release|iPhoneSimulator.ActiveCfg = Release|iPhone
+		{DF52C768-5E17-4A26-AD77-4BDD41A2224C}.Release|iPhoneSimulator.Build.0 = Release|iPhone
+		{DF52C768-5E17-4A26-AD77-4BDD41A2224C}.Debug|iPhone.ActiveCfg = Debug|iPhone
+		{DF52C768-5E17-4A26-AD77-4BDD41A2224C}.Debug|iPhone.Build.0 = Debug|iPhone
+		{DF52C768-5E17-4A26-AD77-4BDD41A2224C}.Ad-Hoc|iPhone.ActiveCfg = Release|iPhone
+		{DF52C768-5E17-4A26-AD77-4BDD41A2224C}.Ad-Hoc|iPhone.Build.0 = Release|iPhone
+		{DF52C768-5E17-4A26-AD77-4BDD41A2224C}.AppStore|iPhone.ActiveCfg = Release|iPhone
+		{DF52C768-5E17-4A26-AD77-4BDD41A2224C}.AppStore|iPhone.Build.0 = Release|iPhone
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
