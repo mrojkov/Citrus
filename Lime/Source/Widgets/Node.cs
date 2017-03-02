@@ -516,22 +516,22 @@ namespace Lime
 		/// </summary>
 		protected virtual void Awake()
 		{
-			LookupReferences();
+			RefreshReferences();
 		}
 
 		/// <summary>
-		/// Lookups the node references.
+		/// Refreshes the node references.
 		/// </summary>
-		protected virtual void LookupReferences() { }
+		protected virtual void RefreshReferences() { }
 
 		/// <summary>
-		/// Lookups all the node references through the nodes hierarchy.
+		/// Refreshes all the node references through the nodes hierarchy.
 		/// </summary>
-		public void LookupReferencesDeep()
+		public void RefreshReferencesDeep()
 		{
-			LookupReferences();
+			RefreshReferences();
 			foreach (var n in Nodes) {
-				n.LookupReferences();
+				n.RefreshReferences();
 			}
 		}
 

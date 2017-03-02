@@ -4,37 +4,37 @@ using Yuzu;
 namespace Lime
 {
 	/// <summary>
-	/// A node reference. Used for serialization, cloning and picking a node within Tangerine.
+	/// A node reference is used for referencing to a node within a serialized scene by the node Id.
 	/// </summary>
 	public struct NodeReference<T> where T: Node
 	{
-		private T node;
-
 		[YuzuMember]
+		// Public field only because of Yuzu serialization.
 		public string Id;
+
+		public T Node { get; private set; }
 
 		public NodeReference(string id)
 		{
 			Id = id;
-			node = null;
+			Node = null;
+		}
+
+		public NodeReference(T node)
+		{
+			Id = node?.Id;
+			Node = node;
 		}
 
 		/// <summary>
-		/// Lookups the node by its id. This method should be called from Node.LookupReferences().
+		/// Create a copy with the resolved Node reference. This method should be called from Node.LookupReferences().
 		/// </summary>
-		public void LookupNode(Node container)
+		public NodeReference<T> Resolve(Node context)
 		{
-			Node = Id != null ? container.TryFind<T>(Id) : null;
-		}
-
-		public T Node
-		{
-			get { return node; }
-			set
-			{
-				node = value;
-				Id = node?.Id;
-			}
+			return new NodeReference<T> {
+				Id = Id,
+				Node = Id != null ? context.TryFind<T>(Id) : null
+			};
 		}
 	}
 }

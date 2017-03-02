@@ -562,8 +562,8 @@ namespace Orange
 		void WriteSplineGearProperties(SplineGear node)
 		{
 			WriteNodeProperties(node);
-			WriteProperty("WidgetName", node.WidgetId, null);
-			WriteProperty("SplineName", node.SplineId, null);
+			WriteProperty("WidgetName", node.Widget?.Id, null);
+			WriteProperty("SplineName", node.Spline?.Id, null);
 			WriteProperty("SplineOffset", node.SplineOffset, 0f);
 		}
 

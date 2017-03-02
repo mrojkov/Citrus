@@ -36,6 +36,10 @@ namespace Orange
 				return () => lexer.ParseBool();
 			case "Hot::TypedAnimator<std::basic_string<char,std::char_traits<char>,std::allocator<char>>>":
 				switch(propertyName + "@" + className) {
+				case "WidgetId@Hot::Gear":
+					return () => new NodeReference<Widget>(lexer.ParseQuotedString());
+				case "SplineId@Hot::Gear":
+					return () => new NodeReference<Spline>(lexer.ParseQuotedString());
 				case "Sample@Hot::Audio":
 					return () => new SerializableSample(lexer.ParsePath());
 				case "Texture@Hot::Image":
@@ -145,6 +149,12 @@ namespace Orange
 						break;
 					case "AlongTrackOrientation@Hot::ParticleEmitter":
 						animator = new Animator<bool>();
+						break;
+					case "WidgetId@Hot::Gear":
+						animator = new Animator<NodeReference<Widget>>();
+						break;
+					case "SplineId@Hot::Gear":
+						animator = new Animator<NodeReference<Spline>>();
 						break;
 					default:
 						animator = node.Animators[propertyName]; 
