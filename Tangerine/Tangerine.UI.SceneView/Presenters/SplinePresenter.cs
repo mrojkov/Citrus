@@ -18,13 +18,13 @@ namespace Tangerine.UI.SceneView
 
 		void DrawSpline(Spline spline)
 		{
-			var l = spline.CalcLengthAccurate(100);
 			float step = 7.0f / SceneView.Instance.Scene.Scale.X;
 			var xform = spline.CalcTransitionToSpaceOf(SceneView.Instance.Frame);
-			var p = spline.CalcPoint(0) * xform;
-			for (float t = 0; t <= l + step; t += step) {
-				var v = spline.CalcPoint(Math.Min(t, l)) * xform;
-				DrawLine(p, v);
+			Vector2? p = null;
+			foreach (var v in spline.CalcPoints(step)) {
+				if (p.HasValue) {
+					DrawLine(p.Value * xform, v * xform);
+				}
 				p = v;
 			}
 		}
