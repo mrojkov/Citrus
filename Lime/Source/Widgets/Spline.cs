@@ -63,30 +63,52 @@ namespace Lime
 			}
 			return length;
 		}
-
-		public Vector2 CalcPoint(float lengthFromBeginning)
+		
+		public Vector2 CalcPoint(float lengthFromBeginnning)
 		{
-			float length = 0.0f;
-			SplinePoint p = null;
-			foreach (Node node in Nodes) {
-				SplinePoint v = node as SplinePoint;
-				if (v == null)
+			SplinePoint pre = null;
+			float segStart = 0;
+			foreach (var node in Nodes) {
+				var cur = node as SplinePoint;
+				if (cur == null)
 					continue;
-				if (lengthFromBeginning < 0.0f)
-					return v.Position * Size;
-				if (p != null) {
-					float segmentLength = ((v.Position - p.Position) * Size).Length;
-					if (length <= lengthFromBeginning && lengthFromBeginning < length + segmentLength) {
-						return Interpolate(p, v, (lengthFromBeginning - length) / segmentLength);
+				if (lengthFromBeginnning < 0)
+					return cur.Position * Size;
+				if (pre != null) {
+					float segLength = ((cur.Position - pre.Position) * Size).Length;
+					if (segStart <= lengthFromBeginnning && lengthFromBeginnning < segStart + segLength) {
+						return Interpolate(pre, cur, (lengthFromBeginnning - segStart) / segLength);
 					}
-					length += segmentLength;
+					segStart += segLength;
 				}
-				p = v;
+				pre = cur;
 			}
-			if (p != null)
-				return p.Position * Size;
-			else
-				return Vector2.Zero;
+			return pre != null ? pre.Position * Size : Vector2.Zero;
+		}
+		
+		public IEnumerable<Vector2> CalcPoints(float step)
+		{
+			SplinePoint pre = null;
+			float segStart = 0;
+			float totalLength = 0;
+			foreach (var node in Nodes) {
+				var cur = node as SplinePoint;
+				if (cur == null)
+					continue;
+				if (pre != null) {
+					var segLength = ((cur.Position - pre.Position) * Size).Length;
+					while (totalLength < segStart + segLength) {
+						var t = (totalLength - segStart) / segLength;
+						yield return Interpolate(pre, cur, t);
+						totalLength += step;
+					}
+					segStart += segLength;
+				}
+				pre = cur;
+			}
+			if (pre != null) {
+				yield return pre.Position * Size;
+			}
 		}
 
 		private Vector2 Interpolate(SplinePoint v1, SplinePoint v2, float t)
