@@ -306,7 +306,8 @@ namespace Lime
 		public static int CreatedCount = 0;
 		public static int FinalizedCount = 0;
 
-		protected bool Awoken;
+		protected bool IsAwoken;
+		public Action<Node> Awoken;
 
 		public Node()
 		{
@@ -435,7 +436,7 @@ namespace Lime
 			clone.Animations = Animations.Clone(clone);
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
 			clone.Nodes = Nodes.Clone(clone);
-			clone.Awoken = false;
+			clone.IsAwoken = false;
 			if (Presenter != null) {
 				clone.Presenter = Presenter.Clone();
 			}
@@ -495,9 +496,10 @@ namespace Lime
 		public virtual void Update(float delta)
 		{
 			delta *= AnimationSpeed;
-			if (!Awoken) {
+			if (!IsAwoken) {
+				Awoken?.Invoke(this);
 				Awake();
-				Awoken = true;
+				IsAwoken = true;
 			}
 			AdvanceAnimation(delta);
 			SelfUpdate(delta);
