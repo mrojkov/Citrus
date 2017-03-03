@@ -204,7 +204,6 @@ namespace Lime
 		private IEnumerator<int> PressedState()
 		{
 			Input.CaptureMouse();
-			var mouse = Input.MousePosition;
 			TryRunAnimation("Press");
 			bool wasPressed = true;
 			while (true) {
