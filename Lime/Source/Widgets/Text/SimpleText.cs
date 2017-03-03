@@ -249,6 +249,9 @@ namespace Lime
 
 		public override void Render()
 		{
+			if (!IsAwoken) {
+				return;
+			}
 			PrepareSpriteListAndSyncCaret();
 			Renderer.Transform1 = LocalToWorldTransform;
 			Renderer.Blending = GlobalBlending;
