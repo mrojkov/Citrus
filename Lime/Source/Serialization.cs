@@ -120,28 +120,28 @@ namespace Lime
 			stream = ms;
 			SerializationPathStack.Push(path);
 			try {
-				AbstractDeserializer yd = null;
+				AbstractDeserializer d = null;
 				if (CheckYuzuBinarySignature(stream)) {
-					yd = new GeneratedDeserializersBIN.BinaryDeserializerGen { Options = defaultYuzuCommonOptions };
+					d = new GeneratedDeserializersBIN.BinaryDeserializerGen { Options = defaultYuzuCommonOptions };
 				} else {
-					foreach (var d in DeserializerBuilders) {
-						yd = d(path, stream);
-						if (yd != null)
+					foreach (var db in DeserializerBuilders) {
+						d = db(path, stream);
+						if (d != null)
 							break;
 					}
 				}
-				var bd = yd as BinaryDeserializer;
+				var bd = d as BinaryDeserializer;
 				if (obj == null) {
 					if (bd != null) {
 						return bd.FromReader<T>(new BinaryReader(stream));
 					} else {
-						return (T)yd.FromStream(stream);
+						return d.FromStream<T>(stream);
 					}
 				} else {
 					if (bd != null) {
 						return (T)bd.FromReader(obj, new BinaryReader(stream));
 					} else {
-						return (T)yd.FromStream(obj, stream);
+						return (T)d.FromStream(obj, stream);
 					}
 				}
 			} finally {
