@@ -83,7 +83,9 @@ namespace Tangerine.UI.Inspector
 				foreach (var i in Inspector.PropertyEditorRegistry) {
 					if (i.Condition(context)) {
 						var propertyEditor = i.Builder(context);
-						Inspector.Editors.Add(propertyEditor);
+						if (propertyEditor != null) {
+							Inspector.Editors.Add(propertyEditor);
+						}
 						break;
 					}
 				}

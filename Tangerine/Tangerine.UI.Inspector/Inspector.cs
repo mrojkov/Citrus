@@ -66,7 +66,8 @@ namespace Tangerine.UI.Inspector
 
 		void RegisterEditors()
 		{
-			AddEditor(c => c.PropertyName == "ContentsPath", c => new ContentsPathPropertyEditor(c));
+			AddEditor(c => c.PropertyName == "ContentsPath", c => AllowChildren(c) ? new ContentsPathPropertyEditor(c) : null);
+			AddEditor(c => c.PropertyName == "Trigger", c => AllowChildren(c) ? new StringPropertyEditor(c) : null);
 			AddEditor(typeof(Vector2), c => new Vector2PropertyEditor(c));
 			AddEditor(typeof(Vector3), c => new Vector3PropertyEditor(c));
 			AddEditor(typeof(Quaternion), c => new QuaternionPropertyEditor(c));
@@ -91,6 +92,15 @@ namespace Tangerine.UI.Inspector
 			AddEditor(typeof(EmitterShape), c => new EnumPropertyEditor<EmitterShape>(c));
 			AddEditor(typeof(EmissionType), c => new EnumPropertyEditor<EmissionType>(c));
 			AddEditor(typeof(TextOverflowMode), c => new EnumPropertyEditor<TextOverflowMode>(c));
+			AddEditor(typeof(NodeReference<Camera3D>), c => new NodeReferencePropertyEditor<Camera3D>(c));
+			AddEditor(typeof(NodeReference<Spline>), c => new NodeReferencePropertyEditor<Spline>(c));
+			AddEditor(typeof(NodeReference<Widget>), c => new NodeReferencePropertyEditor<Widget>(c));
+		}
+		
+		static bool AllowChildren(PropertyEditorContext context)
+		{
+			return context.Objects.Any(o =>
+				ClassAttributes<TangerineClassAttribute>.Get(o.GetType())?.AllowChildren ?? false);
 		}
 
 		void AddEditor(Type type, PropertyEditorBuilder builder)

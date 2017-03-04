@@ -36,6 +36,7 @@ namespace Tangerine.UI.Inspector
 
 		protected readonly PropertyEditorContext context;
 		protected readonly Widget containerWidget;
+		protected readonly SimpleText propertyNameLabel;
 
 		public event Action OnKeyframeToggle;
 
@@ -48,12 +49,13 @@ namespace Tangerine.UI.Inspector
 				LayoutCell = new LayoutCell { StretchY = 0 },
 			};
 			context.InspectorPane.AddNode(containerWidget);
-			containerWidget.AddNode(new SimpleText {
+			propertyNameLabel = new SimpleText {
 				Text = context.PropertyName,
 				VAlignment = VAlignment.Center,
 				LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0.5f),
 				AutoSizeConstraints = false,
-			});
+			};
+			containerWidget.AddNode(propertyNameLabel);
 			if (PropertyAttributes<TangerineStaticPropertyAttribute>.Get(context.PropertyInfo) == null) {
 				keyFunctionButton = new KeyFunctionButton {
 					LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0),
@@ -270,6 +272,25 @@ namespace Tangerine.UI.Inspector
 			} else {
 				editor.Text = currentValue.ToString();
 			}
+		}
+	}
+
+	class NodeReferencePropertyEditor<T> : CommonPropertyEditor where T : Node
+	{
+		public NodeReferencePropertyEditor(PropertyEditorContext context) : base(context)
+		{
+			var propName = context.PropertyName;
+			if (propName.EndsWith("Ref")) {
+				propertyNameLabel.Text = propName.Substring(0, propName.Length - 3);
+			}
+			var editor = new EditBox { LayoutCell = new LayoutCell(Alignment.Center) };
+			containerWidget.AddNode(editor);
+			OnKeyframeToggle += editor.SetFocus;
+			editor.Submitted += text => {
+				var value = new NodeReference<T>(text);
+				Core.Operations.SetAnimableProperty.Perform(context.Objects, context.PropertyName, value);
+			};
+			editor.AddChangeWatcher(CoalescedPropertyValue<NodeReference<T>>(context), v => editor.Text = v.Id);
 		}
 	}
 
@@ -503,7 +524,7 @@ namespace Tangerine.UI.Inspector
 
 	class ContentsPathPropertyEditor : FilePropertyEditor
 	{
-		public ContentsPathPropertyEditor(PropertyEditorContext context) : base(context, Document.GetSupportedFileTypes())
+		public ContentsPathPropertyEditor(PropertyEditorContext context) : base(context, Document.AllowedFileTypes)
 		{
 			editor.Submitted += text => {
 				Core.Operations.SetAnimableProperty.Perform(context.Objects, context.PropertyName, text);
@@ -516,6 +537,7 @@ namespace Tangerine.UI.Inspector
 			foreach (var obj in context.Objects) {
 				Core.Operations.SetAnimableProperty.Perform(obj, context.PropertyName, path);
 			}
+			Document.Current.Container.LoadExternalScenes();
 		}
 	}
 

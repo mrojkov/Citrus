@@ -234,6 +234,11 @@ namespace Tangerine.Core.Operations
 			foreach (var d in Document.NodeDecorators) {
 				d(node);
 			}
+			var attrs = ClassAttributes<TangerineClassAttribute>.Get(nodeType);
+			if (attrs?.BuilderMethodName != null) {
+				var builder = nodeType.GetMethod(attrs.BuilderMethodName, BindingFlags.NonPublic | BindingFlags.Instance);
+				builder.Invoke(node, new object[] {});
+			}
 			node.Id = GenerateNodeId(container, nodeType);
 			InsertFolderItem.Perform(container, location, node);
 			ClearRowSelection.Perform();
