@@ -20,7 +20,7 @@ namespace Tangerine.Core.Operations
 			if (!ClassAttributes<TangerineClassAttribute>.Get(container.GetType())?.AllowChildren ?? true) {
 				return false;
 			}
-			if (container.ContentsPath != null) {
+			if (!string.IsNullOrEmpty(container.ContentsPath)) {
 				OpenExternalScene(container.ContentsPath);
 			} else {
 				ChangeContainer(container, selectFirstNode);
