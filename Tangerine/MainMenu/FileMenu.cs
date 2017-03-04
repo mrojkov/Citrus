@@ -46,7 +46,7 @@ namespace Tangerine
 		public override void Execute()
 		{
 			var dlg = new FileDialog {
-				AllowedFileTypes = Document.GetSupportedFileTypes(),
+				AllowedFileTypes = Document.AllowedFileTypes,
 				Mode = FileDialogMode.Open,
 			};
 			if (Document.Current != null) {
@@ -73,13 +73,23 @@ namespace Tangerine
 
 		public override void Execute()
 		{
-			Document.Current.Save();
+			try {
+				Document.Current.Save();
+			} catch (System.Exception e) {
+				ShowErrorMessageBox(e);
+			}				
+		}
+		
+		public static void ShowErrorMessageBox(System.Exception e)
+		{
+			var dlg = new AlertDialog("Tangerine", $"Save document error: '{e.Message}'.\nYou may have to upgrade the document format.", "Ok");
+			dlg.Show();
 		}
 
 		public static bool SelectPath(out string path)
 		{
 			var dlg = new FileDialog {
-				AllowedFileTypes = Document.GetSupportedFileTypes(),
+				AllowedFileTypes = new string[] { Document.Current.GetFileExtension() },
 				Mode = FileDialogMode.Save,
 				InitialDirectory = Project.Current.GetSystemDirectory(Document.Current.Path)
 			};
@@ -106,7 +116,7 @@ namespace Tangerine
 		public static void SaveAs()
 		{
 			var dlg = new FileDialog {
-				AllowedFileTypes = Document.GetSupportedFileTypes(),
+				AllowedFileTypes = new string[] { Document.Current.GetFileExtension() },
 				Mode = FileDialogMode.Save,
 				InitialDirectory = Project.Current.GetSystemDirectory(Document.Current.Path)
 			};
@@ -116,7 +126,11 @@ namespace Tangerine
 					var alert = new AlertDialog("Tangerine", "Can't save the document outside the project directory", "Ok");
 					alert.Show();
 				} else {
-					Document.Current.SaveAs(assetPath);
+					try {
+						Document.Current.SaveAs(assetPath);
+					} catch (System.Exception e) {
+						FileSave.ShowErrorMessageBox(e);
+					}
 				}
 			}
 		}
@@ -129,6 +143,26 @@ namespace Tangerine
 			if (Document.Current != null) {
 				Project.Current.CloseDocument(Document.Current);
 			}
+		}
+	}
+	
+	public class UpgradeDocumentFormat : DocumentCommandHandler
+	{
+		public override bool GetEnabled()
+		{
+			return Document.Current.Format == DocumentFormat.Scene;
+		}
+
+		public override void Execute()
+		{
+			try {
+				AssetBundle.Instance.DeleteFile(Path.ChangeExtension(Document.Current.Path, "scene"));
+				Document.Current.Format = DocumentFormat.Tan;
+				Document.Current.Save();
+			} catch (System.Exception e) {
+				var dlg = new AlertDialog("Tangerine", $"Upgrade document format error: '{e.Message}'", "Ok");
+				dlg.Show();
+			}				
 		}
 	}
 }

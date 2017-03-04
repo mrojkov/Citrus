@@ -13,6 +13,13 @@ namespace Tangerine.Core
 		void Attach();
 	}
 
+	public enum DocumentFormat
+	{
+		Scene,
+		Tan,
+		Model
+	}
+
 	public sealed class Document
 	{
 		public enum CloseAction
@@ -21,6 +28,8 @@ namespace Tangerine.Core
 			SaveChanges,
 			DiscardChanges
 		}
+
+		public static readonly string[] AllowedFileTypes = new string[] { "scene", "tan", "model" };
 
 		readonly string defaultPath = "Untitled";
 		readonly Vector2 defaultSceneSize = new Vector2(1024, 768);
@@ -38,8 +47,6 @@ namespace Tangerine.Core
 		public readonly DocumentHistory History = new DocumentHistory();
 		public bool IsModified => History.IsDocumentModified;
 
-		public static string[] GetSupportedFileTypes() => new string[] { "scene", "tan" };
-
 		/// <summary>
 		/// The list of Tangerine node decorators.
 		/// </summary>
@@ -49,6 +56,11 @@ namespace Tangerine.Core
 		/// Gets the path to the document relative to the project directory.
 		/// </summary>
 		public string Path { get; private set; }
+
+		/// <summary>
+		/// Gets or sets the file format the document should be saved to.
+		/// </summary>
+		public DocumentFormat Format { get; set; }
 
 		/// <summary>
 		/// Gets the root node for the current document.
@@ -94,6 +106,7 @@ namespace Tangerine.Core
 
 		public Document()
 		{
+			Format = DocumentFormat.Scene;
 			Path = defaultPath;
 			Container = RootNode = new Frame { Size = defaultSceneSize };
 		}
@@ -101,8 +114,23 @@ namespace Tangerine.Core
 		public Document(string path)
 		{
 			Path = path;
+			Format = ResolveFormat(path);
 			using (Theme.Push(DefaultTheme.Instance)) {
-				RootNode = new Frame(path);
+				RootNode = Node.CreateFromAssetBundle(path);
+				if (RootNode is Node3D) {
+					var vp = new Viewport3D { Width = 1024, Height = 768, ZSortEnabled = true };
+					vp.AddNode(RootNode);
+					vp.Camera = new Camera3D {
+						Id = "DefaultCamera",
+						Position = new Vector3(0, 0, 10),
+						FarClipPlane = 100000,
+						NearClipPlane = 0.001f,
+						FieldOfView = 1.0f,
+						AspectRatio = 1.3f
+					};
+					vp.AddNode(vp.Camera);
+					RootNode = vp;
+				}
 			}
 			foreach (var n in RootNode.Descendants) {
 				foreach (var d in NodeDecorators) {
@@ -111,7 +139,36 @@ namespace Tangerine.Core
 			}
 			RootNode.Update(0);
 			Container = RootNode;
+			// Hide all hitboxes
+			foreach (var n in RootNode.Descendants.Where(n => n.Id == "HitBox")) {
+				(n as Node3D).Visible = false;
+			}
 		}
+		
+		static DocumentFormat ResolveFormat(string path)
+		{
+			if (AssetExists(path, "scene")) {
+				return DocumentFormat.Scene;
+			} else if (AssetExists(path, "tan")) {
+				return DocumentFormat.Tan;
+			} else if (AssetExists(path, "model")) {
+				return DocumentFormat.Model;
+			} else {
+				throw new FileNotFoundException(path);
+			}
+		}
+		
+		public string GetFileExtension()
+		{
+			switch (Format) {
+				case DocumentFormat.Model: return "model";
+				case DocumentFormat.Scene: return "scene";
+				case DocumentFormat.Tan: return "tan";
+				default: throw new InvalidOperationException();
+			}
+		}
+		
+		static bool AssetExists(string path, string ext) => AssetBundle.Instance.FileExists(System.IO.Path.ChangeExtension(path, ext));
 
 		public void MakeCurrent()
 		{
@@ -131,6 +188,7 @@ namespace Tangerine.Core
 
 		void AttachViews()
 		{
+			RefreshExternalScenes(RootNode);
 			AttachingViews?.Invoke(this);
 			foreach (var i in Current.Views) {
 				i.Attach();
@@ -141,6 +199,30 @@ namespace Tangerine.Core
 		{
 			foreach (var i in Current.Views) {
 				i.Detach();
+			}
+		}
+
+		private void RefreshExternalScenes(Node node)
+		{
+			if (node.ContentsPath != null) {
+				var doc = Project.Current.Documents.FirstOrDefault(i => i.Path == node.ContentsPath);
+				if (doc != null && doc.IsModified) {
+					node.Nodes.Clear();
+					node.Markers.Clear();
+					var content = doc.RootNode.Clone();
+					RefreshExternalScenes(content);
+					if (content.AsWidget != null && node.AsWidget != null) {
+						content.AsWidget.Size = node.AsWidget.Size;
+					}
+					node.Markers.AddRange(content.Markers);
+					var nodes = content.Nodes.ToList();
+					content.Nodes.Clear();
+					node.Nodes.AddRange(nodes);
+				}
+			} else {
+				foreach (var child in node.Nodes) {
+					RefreshExternalScenes(child);
+				}
 			}
 		}
 
@@ -174,17 +256,26 @@ namespace Tangerine.Core
 				SaveAs(Path);
 			}
 		}
-
+		
 		public void SaveAs(string path)
 		{
 			History.AddSavePoint();
 			Path = path;
-			using (var stream = new FileStream(Project.Current.GetSystemPath(path, "scene"), FileMode.Create)) {
-				var serializer = new Orange.HotSceneExporter.Serializer();
-				// Dispose cloned object to preserve keyframes identity in the original node. See Animator.Dispose().
-				using (var node = CreateCloneForSerialization(RootNode)) {
-					Serialization.WriteObject(path, stream, node, serializer);
+			// Save the document into memory at first to avoid a torn file in the case of a serialization error.
+			var ms = new MemoryStream();
+			// Dispose cloned object to preserve keyframes identity in the original node. See Animator.Dispose().
+			using (var node = CreateCloneForSerialization(RootNode)) {
+				if (Format == DocumentFormat.Scene) {
+					var serializer = new Orange.HotSceneExporter.Serializer();
+					Serialization.WriteObject(path, ms, node, serializer);
+				} else {
+					Serialization.WriteObject(path, ms, node, Serialization.Format.JSON);
 				}
+			}
+			var fullPath = Project.Current.GetSystemPath(path, GetFileExtension());
+			using (var fs = new FileStream(fullPath, FileMode.Create)) {
+				var a = ms.ToArray();
+				fs.Write(a, 0, a.Length);
 			}
 		}
 
