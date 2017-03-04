@@ -95,7 +95,7 @@ namespace Lime
 				return;
 			}
 			Renderer.World = GlobalTransform;
-			Renderer.CullMode = CullMode;
+			Renderer.CullMode = Application.IsTangerine ? CullMode.None : CullMode;
 			var invWorld = GlobalTransform.CalcInverted();
 			foreach (var sm in Submeshes) {
 				var skin = sm.Material as IMaterialSkin;
