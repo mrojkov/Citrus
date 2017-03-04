@@ -80,7 +80,8 @@ namespace Tangerine
 				new UI.Timeline.Operations.ClearGridSelection.Processor(),
 				new UI.Timeline.Operations.ShiftGridSelection.Processor(),
 				new UI.Timeline.Operations.SetCurrentColumn.Processor(),
-				new RowsSynchronizer()
+				new RowsSynchronizer(),
+				new RefreshNodeReferencesProcessor(),
 			});
 			DocumentHistory.Processors.AddRange(UI.Timeline.Timeline.GetOperationProcessors());
 
@@ -99,13 +100,20 @@ namespace Tangerine
 						new UI.SearchPanel(searchPanel.ContentWidget),
 					});
 				}
-				RefreshExternalContent(doc.RootNode);
 			};
 			var proj = UserPreferences.Instance.RecentProjects.FirstOrDefault();
 			if (proj != null) {
 				new Project(proj).Open();
 			}
 			RegisterGlobalCommands();
+		}
+
+		class RefreshNodeReferencesProcessor : SymmetricOperationProcessor
+		{
+			public override void Process(IOperation op)
+			{
+				Document.Current.RootNode.RefreshReferencesDeep();
+			}
 		}
 
 		void CreateToolsToolbar()
@@ -135,30 +143,6 @@ namespace Tangerine
 				return new Orange.HotFontDeserializer(stream);
 			}
 			return null;
-		}
-
-		private static void RefreshExternalContent(Node node)
-		{
-			if (node.ContentsPath != null) {
-				var doc = Project.Current.Documents.FirstOrDefault(i => i.Path == node.ContentsPath);
-				if (doc != null && doc.IsModified) {
-					node.Nodes.Clear();
-					node.Markers.Clear();
-					var content = doc.RootNode.Clone();
-					RefreshExternalContent(content);
-					if (content.AsWidget != null && node.AsWidget != null) {
-						content.AsWidget.Size = node.AsWidget.Size;
-					}
-					node.Markers.AddRange(content.Markers);
-					var nodes = content.Nodes.ToList();
-					content.Nodes.Clear();
-					node.Nodes.AddRange(nodes);
-				}
-			} else {
-				foreach (var child in node.Nodes) {
-					RefreshExternalContent(child);
-				}
-			}
 		}
 
 		static Frame InitializeDocumentArea(DockManager dockManager)
@@ -229,6 +213,7 @@ namespace Tangerine
 					Command.MenuSeparator,
 					GenericCommands.Save,
 					GenericCommands.SaveAs,
+					GenericCommands.UpgradeDocumentFormat,
 					Command.MenuSeparator,
 #if !MAC
 					GenericCommands.PreferencesDialog,
@@ -285,7 +270,10 @@ namespace Tangerine
 				typeof(DistortionMesh),
 				typeof(Spline),
 				typeof(SplinePoint),
-				typeof(ImageCombiner)
+				typeof(ImageCombiner),
+				typeof(Viewport3D),
+				typeof(Camera3D),
+				typeof(Model3D),
 			};
 			foreach (var t in nodeTypes) {
 				var cmd = new Command(t.Name) { Icon = NodeIconPool.GetTexture(t) };
