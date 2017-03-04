@@ -15,7 +15,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
+    <Optimize>true</Optimize>
     <OutputPath>bin\Debug</OutputPath>
     <DefineConstants>__UNIFIED__;DEBUG;MAC</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -31,7 +31,7 @@
     <EnablePackageSigning>false</EnablePackageSigning>
     <XamMacArch>i386</XamMacArch>
     <HttpClientHandler>NSUrlSessionHandler</HttpClientHandler>
-    <LinkMode>SdkOnly</LinkMode>
+    <LinkMode>None</LinkMode>
     <TlsProvider>Default</TlsProvider>
     <PackageSigningKey>Developer ID Installer</PackageSigningKey>
     <CodeSignEntitlements></CodeSignEntitlements>
@@ -203,6 +203,9 @@
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.ParticleModifier.png" />
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.SplineGear.png" />
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.ImageCombiner.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Viewport3D.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Camera3D.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Model3D.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PreferencesDialog\" />

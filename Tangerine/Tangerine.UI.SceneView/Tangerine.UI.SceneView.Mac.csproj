@@ -74,6 +74,7 @@
     <Compile Include="Presenters\PointObjectsSelectionPresenter.cs" />
     <Compile Include="Presenters\SplinePointPresenter.cs" />
     <Compile Include="Processors\DragSplineTangentsProcessor.cs" />
+    <Compile Include="Processors\3D\RotateNode3DProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Mac.csproj">
@@ -92,6 +93,7 @@
   <ItemGroup>
     <Folder Include="Processors\" />
     <Folder Include="Presenters\" />
+    <Folder Include="Processors\3D\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
 </Project>
