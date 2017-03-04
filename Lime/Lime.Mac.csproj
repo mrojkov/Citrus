@@ -285,6 +285,8 @@
     <Compile Include="Source\AssetBundle\UnityDownloadableBundle.cs" />
     <Compile Include="Source\AssetBundle\UnpackedAssetBundle.cs" />
     <Compile Include="Source\AssetBundle\AggregateAssetBundle.cs" />
+    <Compile Include="Source\Widgets\NodeReference.cs" />
+    <Compile Include="Source\Widgets\3D\Model3DAttachment.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

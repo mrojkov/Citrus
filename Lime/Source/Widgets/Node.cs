@@ -905,6 +905,10 @@ namespace Lime
 			} finally {
 				scenesBeingLoaded.Remove(fullPath);
 			}
+			if (instance is Model3D) {
+				var attachment = new Model3DAttachmentParser().Parse(path);
+				attachment.Apply((Model3D)instance);
+			}
 			return instance;
 		}
 
