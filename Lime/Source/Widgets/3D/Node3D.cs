@@ -3,6 +3,7 @@ using Yuzu;
 
 namespace Lime
 {
+	[TangerineClassAttribute(allowChildren: true)]
 	public class Node3D : Node
 	{
 		private Vector3 scale;
@@ -16,6 +17,7 @@ namespace Lime
 		protected Color4 globalColor;
 
 		[YuzuMember]
+		[TangerineKeyframeColor(2)]
 		public bool Visible
 		{
 			get { return visible; }
@@ -29,6 +31,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(5)]
 		public Vector3 Scale
 		{
 			get { return scale; }
@@ -40,6 +43,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(3)]
 		public Quaternion Rotation
 		{
 			get { return rotation; }
@@ -51,6 +55,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(4)]
 		public Vector3 Position
 		{
 			get { return position; }
@@ -62,6 +67,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(9)]
 		public Color4 Color
 		{
 			get { return color; }

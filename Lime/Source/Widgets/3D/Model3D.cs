@@ -3,6 +3,7 @@ using Yuzu;
 
 namespace Lime
 {
+	[TangerineClass(allowChildren: true)]
 	public class Model3D : Node3D
 	{
 		[YuzuAfterDeserialization]
