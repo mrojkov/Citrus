@@ -155,6 +155,7 @@ namespace Orange
 
 		static AssetCooker()
 		{
+			AddStage(ConvertFbxToModels);
 			AddStage(SyncAtlases);
 			AddStage(SyncDeleted);
 			AddStage(() => SyncRawAssets(".json", AssetAttributes.ZippedDeflate));
@@ -272,6 +273,16 @@ namespace Orange
 			});
 		}
 
+		private static void SyncModels()
+		{
+			SyncUpdated(".model", ".model", (srcPath, dstPath) => {
+				var node = Serialization.ReadObjectFromFile<Node>(srcPath);
+				var compression = cookingRulesMap[srcPath].ModelCompressing;
+				Serialization.WriteObjectToBundle(AssetBundle, dstPath, node, Serialization.Format.Binary, ".model", compression);
+				return true;
+			});
+		}
+
 		private static void SyncFonts()
 		{
 			SyncUpdated(".tft", ".tft", (srcPath, dstPath) => {
@@ -355,11 +366,16 @@ namespace Orange
 
 		static void SyncUpdated(string fileExtension, string bundleAssetExtension, Converter converter)
 		{
+			SyncUpdated(fileExtension, bundleAssetExtension, AssetBundle.Instance, converter);
+		}
+
+		static void SyncUpdated(string fileExtension, string bundleAssetExtension, AssetBundle bundle, Converter converter)
+		{
 			foreach (var srcFileInfo in The.Workspace.AssetFiles.Enumerate(fileExtension)) {
 				var srcPath = srcFileInfo.Path;
 				var dstPath = Path.ChangeExtension(srcPath, bundleAssetExtension);
-				var bundled = AssetBundle.FileExists(dstPath);
-				var needUpdate =  !bundled || srcFileInfo.LastWriteTime > AssetBundle.GetFileLastWriteTime(dstPath);
+				var bundled = bundle.FileExists(dstPath);
+				var needUpdate =  !bundled || srcFileInfo.LastWriteTime > bundle.GetFileLastWriteTime(dstPath);
 				if (needUpdate) {
 					if (converter != null) {
 						try {
@@ -374,7 +390,7 @@ namespace Orange
 					} else {
 						Console.WriteLine((bundled ? "* " : "+ ") + dstPath);
 						using (Stream stream = new FileStream(srcPath, FileMode.Open, FileAccess.Read)) {
-							AssetBundle.ImportFile(dstPath, stream, 0, fileExtension);
+							bundle.ImportFile(dstPath, stream, 0, fileExtension);
 						}
 					}
 				}
@@ -726,7 +742,7 @@ namespace Orange
 			foreach (var atlasPartPath in AssetBundle.EnumerateFiles()) {
 				if (Path.GetExtension(atlasPartPath) != ".atlasPart")
 					continue;
-
+			
 				// If atlas part has been outdated we should rebuild full atlas chain
 				var srcTexturePath = Path.ChangeExtension(atlasPartPath, ".png");
 				if (!textures.ContainsKey(srcTexturePath) || AssetBundle.GetFileLastWriteTime(atlasPartPath) < textures[srcTexturePath]) {
@@ -761,20 +777,14 @@ namespace Orange
 			}
 		}
 
-		private static void SyncModels()
+		private static void ConvertFbxToModels()
 		{
-			SyncUpdated(".fbx", ".fbxModel", ConvertModel);
-			SyncUpdated(".dae", ".daeModel", ConvertModel);
-		}
-
-		private static bool ConvertModel(string srcPath, string dstPath)
-		{
-			var rootNode = new Lime.Frame();
-			rootNode.AddNode(new ModelImporter(srcPath, The.Workspace.ActivePlatform).Model);
-
-			var rules = cookingRulesMap[srcPath];
-			Serialization.WriteObjectToBundle(AssetBundle, dstPath, rootNode, Serialization.Format.Binary, Path.GetExtension(srcPath), rules.ModelCompressing);
-			return true;
+			var bundle = new UnpackedAssetBundle(The.Workspace.AssetsDirectory);
+			SyncUpdated(".fbx", ".model", bundle, (srcPath, dstPath) => {
+				var model = new ModelImporter(srcPath, The.Workspace.ActivePlatform).Model;
+				Serialization.WriteObjectToBundle(bundle, dstPath, model, Serialization.Format.JSON, Path.GetExtension(srcPath));
+				return true;
+			});
 		}
 	}
 }

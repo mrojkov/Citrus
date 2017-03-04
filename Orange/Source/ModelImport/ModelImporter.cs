@@ -112,7 +112,6 @@ namespace Orange
 
 		private string path;
 		private Assimp.Scene aiScene;
-		private TargetPlatform platform;
 		private Dictionary<string, Assimp.Camera> aiCameras = new Dictionary<string, Assimp.Camera>();
 		private Dictionary<string, Pivot> pivots = new Dictionary<string, Pivot>();
 
@@ -121,7 +120,6 @@ namespace Orange
 		public ModelImporter(string path, TargetPlatform platform)
 		{
 			this.path = path;
-			this.platform = platform;
 			using (var aiContext = new Assimp.AssimpContext()) {
 				aiContext.SetConfig(new Assimp.Configs.RemoveDegeneratePrimitivesConfig(true));
 				var postProcess = Assimp.PostProcessSteps.Triangulate;
