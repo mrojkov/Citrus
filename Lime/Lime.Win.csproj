@@ -152,6 +152,7 @@
     <Compile Include="Source\Widgets\3D\CommonMaterial.cs" />
     <Compile Include="Source\Widgets\3D\CommonMaterialProgram.cs" />
     <Compile Include="Source\Widgets\3D\Model3D.cs" />
+    <Compile Include="Source\Widgets\3D\Model3DAttachment.cs" />
     <Compile Include="Source\Widgets\3D\Spline3D.cs" />
     <Compile Include="Source\Widgets\Animation\Animation.cs" />
     <Compile Include="Source\Widgets\Animation\AnimationList.cs" />
@@ -193,6 +194,7 @@
     <Compile Include="Source\Widgets\ListView\ScrollViewWidget.cs" />
     <Compile Include="Source\Widgets\MorphableMesh.cs" />
     <Compile Include="Source\Widgets\MorphableMeshBuilder.cs" />
+    <Compile Include="Source\Widgets\NodeReference.cs" />
     <Compile Include="Source\Widgets\Text\IText.cs" />
     <Compile Include="Source\Widgets\ListView\ExpandableListItem.cs" />
     <Compile Include="Source\Widgets\ListView\ListView.cs" />

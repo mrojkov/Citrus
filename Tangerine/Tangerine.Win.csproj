@@ -190,4 +190,13 @@
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.ParticleModifier.png" />
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.SplineGear.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Model3D.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Camera3D.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Viewport3D.png" />
+  </ItemGroup>
 </Project>
