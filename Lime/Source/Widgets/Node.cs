@@ -34,10 +34,12 @@ namespace Lime
 	public class TangerineClassAttribute : Attribute
 	{
 		public bool AllowChildren { get; private set; }
+		public string BuilderMethodName { get; private set; }
 
-		public TangerineClassAttribute(bool allowChildren)
+		public TangerineClassAttribute(bool allowChildren, string builderMethodName = null)
 		{
 			AllowChildren = allowChildren;
+			BuilderMethodName = builderMethodName;
 		}
 	}
 

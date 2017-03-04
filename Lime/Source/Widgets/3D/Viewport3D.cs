@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Yuzu;
 using System;
 #if OPENGL
@@ -14,9 +14,9 @@ using MonoMac.OpenGL;
 
 namespace Lime
 {
+	[TangerineClass(allowChildren: true, builderMethodName: "BuildForTangerine")]
 	public class Viewport3D : Widget
 	{
-		private Camera3D camera;
 		private float frame;
 		private List<RenderItem> opaqueList;
 		private List<RenderItem> transparentList;
@@ -42,14 +42,13 @@ namespace Lime
 			}
 		}
 
+		[YuzuMember]
+		public NodeReference<Camera3D> CameraRef { get; set; }
+
 		public Camera3D Camera
 		{
-			get { return camera; }
-			set
-			{
-				camera = value;
-				AdjustCameraAspectRatio();
-			}
+			get { return CameraRef.Node; }
+			set { CameraRef = new NodeReference<Camera3D>(value); }
 		}
 
 		[YuzuMember]
@@ -63,6 +62,26 @@ namespace Lime
 			}
 		}
 
+		private void BuildForTangerine()
+		{
+			var camera = new Camera3D {
+				Id = "DefaultCamera",
+				Position = new Vector3(0, 0, 10),
+				FarClipPlane = 100000,
+				NearClipPlane = 0.001f,
+				FieldOfView = 1.0f,
+				AspectRatio = 1.3f
+			};
+			ZSortEnabled = true;
+			Nodes.Add(camera);
+			Camera = camera;
+		}
+
+		protected override void RefreshReferences()
+		{
+			CameraRef = CameraRef.Resolve(this);
+		}
+
 		protected override void OnSizeChanged(Vector2 sizeDelta)
 		{
 			base.OnSizeChanged(sizeDelta);
@@ -71,8 +90,8 @@ namespace Lime
 
 		private void AdjustCameraAspectRatio()
 		{
-			if (camera != null) {
-				camera.AspectRatio = Width / Height;
+			if (Camera != null) {
+				Camera.AspectRatio = Width / Height;
 			}
 		}
 
@@ -95,6 +114,9 @@ namespace Lime
 		internal protected override bool PartialHitTest(ref HitTestArgs args)
 		{
 			try {
+				if (Camera == null) {
+					return false;
+				}	
 				args.Ray = ScreenPointToRay(args.Point);
 				args.Distance = float.MaxValue;
 				foreach (var node in Nodes) {
@@ -123,6 +145,10 @@ namespace Lime
 
 		public override void Render()
 		{
+			if (Camera == null) {
+				return;
+			}
+			AdjustCameraAspectRatio();
 			foreach (var node in Nodes) {
 				node.AddToRenderChain(renderChain);
 			}
@@ -144,10 +170,13 @@ namespace Lime
 					}
 					for (var j = 0; j < layer.Count; j++) {
 						var node = layer[j].Node.AsNode3D;
+						if (node == null) {
+							continue;	
+						}
 						var list = node.Opaque ? opaqueList : transparentList;
 						list.Add(new RenderItem {
 							Node = node,
-							Distance = node.CalcDistanceToCamera(camera)
+							Distance = node.CalcDistanceToCamera(Camera)
 						});
 					}
 					Renderer.ZWriteEnabled = true;
@@ -183,11 +212,16 @@ namespace Lime
 		{
 			orthoProjection.M33 = 1; // Discard Z normalization, since it comes from the camera projection matrix
 			orthoProjection.M43 = 0;
-			return Camera.Projection *
+			var p = 
 				// Transform from <-1, 1> normalized coordinates to the widget space
 				Matrix44.CreateScale(new Vector3(Width / 2, -Height / 2, 1)) *
 				Matrix44.CreateTranslation(new Vector3(Width / 2, Height / 2, 0)) *
 				(Matrix44)LocalToWorldTransform * orthoProjection;
+			if (Camera != null) {
+				return Camera.Projection * p;
+			} else {
+				return p;
+			}
 		}
 
 		public Vector3 WorldToScreenPoint(Vector3 pt)
