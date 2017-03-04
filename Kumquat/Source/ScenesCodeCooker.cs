@@ -14,7 +14,7 @@ namespace Kumquat
 		private readonly string directory;
 		private readonly string projectName;
 		private readonly Dictionary<string, string> sceneToBundleMap;
-		private readonly Dictionary<string, Frame> scenes;
+		private readonly Dictionary<string, Node> scenes;
 		public readonly string SceneCodeTemplate;
 		public readonly string FrameCodeTemplate;
 		public readonly string NodeCodeTemplate;
@@ -28,7 +28,7 @@ namespace Kumquat
 			string projectName,
 			string mainBundleName,
 			Dictionary<string, string> sceneToBundleMap,
-			Dictionary<string, Frame> scenes
+			Dictionary<string, Node> scenes
 		)
 		{
 			this.directory = directory;

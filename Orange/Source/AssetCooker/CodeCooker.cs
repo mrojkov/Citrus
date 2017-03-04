@@ -19,7 +19,7 @@ namespace Orange
 				.Enumerate(".scene")
 				.Select(srcFileInfo => srcFileInfo.Path)
 				.Where(path => AssetBundle.Instance.FileExists(path))
-				.ToDictionary(path => path, path => new Frame(path));
+				.ToDictionary(path => path, path => Node.CreateFromAssetBundle(path));
 			if (scenes.Count == 0) {
 				return;
 			}
