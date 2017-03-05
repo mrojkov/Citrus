@@ -124,6 +124,13 @@ namespace Lime
 			list.Add(item);
 			item.Owner = owner;
 		}
+		
+		public void AddRange(IEnumerable<Animation> collection)
+		{
+			foreach (var animation in collection) {
+				Add(animation);
+			}
+		}
 
 		public void Clear()
 		{

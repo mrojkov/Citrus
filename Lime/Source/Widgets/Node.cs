@@ -930,8 +930,6 @@ namespace Lime
 					node.LoadExternalScenes();
 				}
 			} else {
-				Nodes.Clear();
-				Markers.Clear();
 				var contentsPath = ResolveScenePath(ContentsPath);
 				if (contentsPath == null) {
 					return;
@@ -940,9 +938,11 @@ namespace Lime
 				if (content.AsWidget != null && AsWidget != null) {
 					content.AsWidget.Size = AsWidget.Size;
 				}
-				Markers.AddRange(content.Markers);
+				Animations.Clear();
+				Animations.AddRange(content.Animations);
 				var nodes = content.Nodes.ToList();
 				content.Nodes.Clear();
+				Nodes.Clear();
 				Nodes.AddRange(nodes);
 			}
 		}
