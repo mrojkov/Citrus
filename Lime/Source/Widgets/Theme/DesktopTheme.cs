@@ -50,6 +50,7 @@ namespace Lime
 			Decorators[typeof(WindowWidget)] = DecorateWindowWidget;
 			Decorators[typeof(TextView)] = DecorateTextView;
 			Decorators[typeof(DropDownList)] = DecorateDropDownList;
+			Decorators[typeof(ComboBox)] = DecorateComboBox;
 			Decorators[typeof(FileChooserButton)] = DecorateFileChooserButton;
 			Decorators[typeof(HSplitter)] = DecorateSplitter;
 			Decorators[typeof(VSplitter)] = DecorateSplitter;
@@ -200,9 +201,20 @@ namespace Lime
 			text.CompoundPresenter.Add(new DropDownListPresenter());
 			dropDownList.PostPresenter = new KeyboardFocusBorderPresenter();
 			text.Padding = Metrics.ControlsPadding;
-			text.Padding.Right = DropDownListPresenter.IconWidth;
 			dropDownList.AddNode(text);
 			ExpandToContainer(text);
+		}
+
+		private void DecorateComboBox(Widget widget)
+		{
+			var comboBox = (ComboBox)widget;
+			comboBox.MinSize = Metrics.DefaultButtonSize;
+			comboBox.MaxHeight = Metrics.DefaultButtonSize.Y;
+			var text = new EditBox { Id = "Label" };
+			comboBox.CompoundPresenter.Add(new DropDownListPresenter());
+			comboBox.AddNode(text);
+			ExpandToContainer(text);
+			text.Width -= DropDownListPresenter.IconWidth;
 		}
 
 		private void DecorateTabBar(Widget widget)

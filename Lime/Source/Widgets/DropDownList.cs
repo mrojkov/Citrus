@@ -10,7 +10,14 @@ namespace Lime
 	{
 		private int index = -1;
 		public event Action<int> Changed;
-		public readonly ObservableCollection<Item> Items;
+		public readonly ObservableCollection<Item> Items = new ObservableCollection<Item>();
+		public NodeReference<Widget> LabelRef { get; set; } = new NodeReference<Widget>("Label");
+		
+		public Widget Label
+		{
+			get { return LabelRef.Node; }
+			set { LabelRef = new NodeReference<Widget>(value); }
+		}
 
 		public int Index
 		{
@@ -45,7 +52,6 @@ namespace Lime
 		public DropDownList()
 		{
 			Input.AcceptMouseBeyondWidget = false;
-			Items = new ObservableCollection<Item>();
 			Items.CollectionChanged += (sender, e) => RefreshLabel();
 			HitTestTarget = true;
 			Theme.Current.Apply(this);
@@ -53,7 +59,13 @@ namespace Lime
 
 		protected override void Awake()
 		{
+			base.Awake();
 			Tasks.Add(Loop());
+		}
+
+		protected override void RefreshReferences()
+		{
+			LabelRef = LabelRef.Resolve(Parent);
 		}
 
 		IEnumerator<object> Loop()
@@ -67,7 +79,11 @@ namespace Lime
 #endif
 					yield return ShowDropDownListTask();
 				}
-				if (Input.ConsumeKeyPress(Key.Space) || Input.ConsumeKeyPress(Key.Up) || Input.ConsumeKeyPress(Key.Down)) {
+				if (
+					HandleSpaceKey() && Input.ConsumeKeyPress(Key.Space) ||
+					Input.ConsumeKeyPress(Key.Up) ||
+					Input.ConsumeKeyPress(Key.Down))
+				{
 					ShowDropDownList();
 				} else if (Input.ConsumeKeyPress(Key.Escape) || Input.ConsumeKeyPress(Key.Enter)) {
 					RevokeFocus();
@@ -75,6 +91,8 @@ namespace Lime
 				yield return Task.WaitForInput();
 			}
 		}
+		
+		protected virtual bool HandleSpaceKey() => true;
 
 		IEnumerator<object> ShowDropDownListTask()
 		{
@@ -112,9 +130,8 @@ namespace Lime
 
 		private void RefreshLabel()
 		{
-			var label = TryFind<SimpleText>("Label");
-			if (label != null) {
-				label.Text = Text;
+			if (Label != null) {
+				Label.Text = Text;
 			}
 		}
 
@@ -135,5 +152,16 @@ namespace Lime
 				Value = value;
 			}
 		}
+	}
+
+	[TangerineClass(allowChildren: true)]	
+	public class ComboBox : DropDownList
+	{
+		public ComboBox()
+		{
+			Theme.Current.Apply(this);
+		}
+		
+		protected override bool HandleSpaceKey() => false;
 	}
 }
