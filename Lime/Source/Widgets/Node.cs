@@ -597,7 +597,16 @@ namespace Lime
 				AnimationTime = 0;
 				IsRunning = true;
 			} else {
-				TryRunAnimation(Trigger);
+				if (Trigger.Contains('@')) {
+					var s = Trigger.Split('@');
+					if (s.Length == 2) {
+						var markerId = s[0];
+						var animationId = s[1];
+						TryRunAnimation(markerId, animationId);
+					}
+				} else {
+					TryRunAnimation(Trigger);
+				}
 			}
 		}
 
