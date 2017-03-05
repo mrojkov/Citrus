@@ -67,7 +67,7 @@ namespace Tangerine.UI.Inspector
 		void RegisterEditors()
 		{
 			AddEditor(c => c.PropertyName == "ContentsPath", c => AllowChildren(c) ? new ContentsPathPropertyEditor(c) : null);
-			AddEditor(c => c.PropertyName == "Trigger", c => AllowChildren(c) ? new StringPropertyEditor(c) : null);
+			AddEditor(c => c.PropertyName == "Trigger", c => AllowChildren(c) ? new TriggerPropertyEditor(c) : null);
 			AddEditor(typeof(Vector2), c => new Vector2PropertyEditor(c));
 			AddEditor(typeof(Vector3), c => new Vector3PropertyEditor(c));
 			AddEditor(typeof(Quaternion), c => new QuaternionPropertyEditor(c));

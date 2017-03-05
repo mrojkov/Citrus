@@ -564,4 +564,27 @@ namespace Tangerine.UI.Inspector
 			});
 		}
 	}
+	
+	class TriggerPropertyEditor : CommonPropertyEditor
+	{
+		public TriggerPropertyEditor(PropertyEditorContext context, bool multiline = false) : base(context)
+		{
+			var cb = new ComboBox { LayoutCell = new LayoutCell(Alignment.Center) };
+			containerWidget.AddNode(cb);
+			OnKeyframeToggle += cb.SetFocus;
+			cb.Changed += index => {
+				Core.Operations.SetAnimableProperty.Perform(context.Objects, context.PropertyName, cb.Items[index].Text);
+			};
+			if (context.Objects.Count == 1) {
+				var node = (Node)context.Objects[0];
+				foreach (var a in node.Animations) {
+					foreach (var m in a.Markers.Where(i => i.Action != MarkerAction.Jump)) {
+						var id = a.Id != null ? m.Id + '@' + a.Id : m.Id;
+						cb.Items.Add(new DropDownList.Item(id));
+					}
+				}
+			}
+			cb.AddChangeWatcher(CoalescedPropertyValue<string>(context), v => cb.Text = v);
+		}
+	}
 }
