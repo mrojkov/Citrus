@@ -15,6 +15,7 @@ namespace Tangerine.UI.Timeline.Components
 		protected readonly EditBox editBox;
 		protected readonly Image nodeIcon;
 		protected readonly Widget widget;
+		protected readonly ToolbarButton enterButton;
 		protected readonly ToolbarButton expandButton;
 		protected readonly ToolbarButton eyeButton;
 		protected readonly ToolbarButton lockButton;
@@ -37,6 +38,8 @@ namespace Tangerine.UI.Timeline.Components
 				Visible = nodeData.Node.Animators.Count > 0,
 				Nodes = { expandButton }
 			};
+			enterButton = (ClassAttributes<TangerineClassAttribute>.Get(nodeData.Node.GetType())?.
+				AllowChildren ?? false) ? CreateEnterButton() : null;
 			eyeButton = CreateEyeButton();
 			lockButton = CreateLockButton();
 			widget = new Widget {
@@ -52,6 +55,7 @@ namespace Tangerine.UI.Timeline.Components
 					label,
 					editBox,
 					new Widget(),
+					(Widget)enterButton ?? (Widget)new HSpacer(DesktopTheme.Metrics.DefaultButtonSize.Y),
 					eyeButton,
 					lockButton,
 				},
@@ -78,6 +82,16 @@ namespace Tangerine.UI.Timeline.Components
 				label.Text = node.Id;
 			}
 			label.Color = IsGrayedLabel(node) ? DesktopTheme.Colors.BlackText : TimelineRollColors.GrayedLabel;
+		}
+		
+		ToolbarButton CreateEnterButton()
+		{
+			var button = new ToolbarButton {
+				Texture = IconPool.GetTexture("Timeline.EnterContainer"),
+				Highlightable = false
+			};
+			button.Clicked += () => Core.Operations.EnterNode.Perform(nodeData.Node);
+			return button;
 		}
 
 		ToolbarButton CreateEyeButton()
