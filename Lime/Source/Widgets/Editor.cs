@@ -478,11 +478,17 @@ namespace Lime
 
 		private IEnumerator<object> HandleInputTask()
 		{
+			bool focusedByClick = false;
 			bool wasFocused = false;
 			Vector2 lastClickPos = Vector2.Zero;
 
 			while (true) {
+				if (EditorParams.SelectAllOnFocus && !wasFocused && InputWidget.IsFocused()) {
+					SelectAll();
+					CaretPos.TextPos = TextLength;
+				}
 				if (DisplayWidget.Input.WasMousePressed()) {
+					focusedByClick = !InputWidget.IsFocused();
 					InputWidget.SetFocus();
 				}
 				if (InputWidget.IsFocused()) {
@@ -506,9 +512,15 @@ namespace Lime
 							EnsureSelection();
 							SelectionEnd.AssignFrom(CaretPos);
 						}
-					}
-					else {
+					} else if (input.WasMouseReleased()) {
 						input.ReleaseMouse();
+						if (EditorParams.SelectAllOnFocus && focusedByClick) {
+							if ((p - lastClickPos).SqrLength < EditorParams.MouseSelectionThreshold) {
+								SelectAll();
+								CaretPos.TextPos = TextLength;
+								Window.Current.Invalidate();
+							}
+						}
 					}
 					Text.SyncCaretPosition();
 				}

@@ -156,6 +156,7 @@ namespace Lime
 			var editorParams = new EditorParams {
 				MaxLines = 1, Scroll = eb.Scroll,
 				OffsetContextMenu = p => p + new Vector2(1f, tw.FontHeight + 1f),
+				SelectAllOnFocus = true
 			};
 			eb.Editor = new Editor(tw, editorParams, eb);
 			var vc = new VerticalLineCaret();

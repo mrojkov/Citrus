@@ -230,6 +230,7 @@ namespace Lime
 
 	public interface IEditorParams
 	{
+		bool SelectAllOnFocus { get; set; }
 		int MaxLength { get; set; }
 		int MaxLines { get; set; }
 		float MaxHeight { get; set; }
@@ -250,6 +251,7 @@ namespace Lime
 
 	public class EditorParams : IEditorParams
 	{
+		public bool SelectAllOnFocus { get; set; }
 		public int MaxLength { get; set; }
 		public int MaxLines { get; set; }
 		public float MaxHeight { get; set; }
