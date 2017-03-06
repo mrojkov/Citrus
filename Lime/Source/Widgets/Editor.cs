@@ -504,6 +504,7 @@ namespace Lime
 								SelectWord();
 							else
 								SelectAll();
+							Window.Current.Invalidate();
 						} else if (input.WasMousePressed()) {
 							lastClickPos = p;
 							HideSelection();
@@ -517,7 +518,6 @@ namespace Lime
 						if (EditorParams.SelectAllOnFocus && focusedByClick) {
 							if ((p - lastClickPos).SqrLength < EditorParams.MouseSelectionThreshold) {
 								SelectAll();
-								CaretPos.TextPos = TextLength;
 								Window.Current.Invalidate();
 							}
 						}
