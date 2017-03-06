@@ -5,8 +5,7 @@ using System.Collections.ObjectModel;
 
 namespace Lime
 {
-	[TangerineClass(allowChildren: true)]
-	public class DropDownList : Widget
+	public abstract class CommonDropDownList : Widget
 	{
 		private int index = -1;
 		public event Action<int> Changed;
@@ -49,12 +48,11 @@ namespace Lime
 			}
 		}
 
-		public DropDownList()
+		public CommonDropDownList()
 		{
 			Input.AcceptMouseBeyondWidget = false;
 			Items.CollectionChanged += (sender, e) => RefreshLabel();
 			HitTestTarget = true;
-			Theme.Current.Apply(this);
 		}
 
 		protected override void Awake()
@@ -92,7 +90,7 @@ namespace Lime
 			}
 		}
 		
-		protected virtual bool DoesHandleSpacebar() => true;
+		protected abstract bool DoesHandleSpacebar();
 
 		IEnumerator<object> ShowDropDownListTask()
 		{
@@ -155,7 +153,18 @@ namespace Lime
 	}
 
 	[TangerineClass(allowChildren: true)]	
-	public class ComboBox : DropDownList
+	public class DropDownList : CommonDropDownList
+	{
+		public DropDownList()
+		{
+			Theme.Current.Apply(this);
+		}
+
+		protected override bool DoesHandleSpacebar() => true;
+	}
+
+	[TangerineClass(allowChildren: true)]	
+	public class ComboBox : CommonDropDownList
 	{
 		public ComboBox()
 		{
