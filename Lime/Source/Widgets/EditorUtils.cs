@@ -110,7 +110,6 @@ namespace Lime
 
 	public class SelectionPresenter : CustomPresenter, IPresenter
 	{
-		private Widget container;
 		private ICaretPosition selectionStart;
 		private ICaretPosition selectionEnd;
 		private SelectionParams selectionParams;
@@ -119,7 +118,6 @@ namespace Lime
 			Widget container, ICaretPosition selectionStart, ICaretPosition selectionEnd,
 			SelectionParams selectionParams)
 		{
-			this.container = container;
 			this.selectionStart = selectionStart;
 			this.selectionEnd = selectionEnd;
 			this.selectionParams = selectionParams;
