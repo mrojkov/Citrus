@@ -48,8 +48,10 @@ namespace EmptyProject.Application
 			return new PackedAssetBundle("Assets.Android.Data.Android", "Assets.Android");
 #elif iOS
 			return new PackedAssetBundle("Data.iOS");
-#else
+#elif WIN
 			return new PackedAssetBundle("Data.Win");
+#elif MAC
+			return new PackedAssetBundle("Data.Mac");
 #endif
 		}
 

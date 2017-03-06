@@ -17,7 +17,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;</DefineConstants>
+    <DefineConstants>__UNIFIED__;DEBUG;MAC</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -33,6 +33,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
+    <DefineConstants>__UNIFIED__;MAC</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -57,16 +58,12 @@
   <ItemGroup>
     <None Include="Info.plist" />
   </ItemGroup>
+  <Import Project="..\EmptyProject.Game\EmptyProject.Game.projitems" Label="Shared" Condition="Exists('..\EmptyProject.Game\EmptyProject.Game.projitems')" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>
-    <Compile Include="AppDelegate.cs" />
     <Compile Include="Application.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\EmptyProject.Game\EmptyProject.Game.Mac.csproj">
-      <Project>{FB693455-C730-47B9-88A6-E16C3FD0B7D7}</Project>
-      <Name>EmptyProject.Game.Mac</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Citrus\Lime\Lime.Mac.csproj">
       <Project>{DC16EEBF-404D-4610-B87A-15B57464D707}</Project>
       <Name>Lime.Mac</Name>
@@ -75,10 +72,22 @@
       <Project>{BB697671-700C-455D-B8EE-66A6B122B949}</Project>
       <Name>Lemon.Mac</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Citrus\Yuzu\Yuzu.Mac.csproj">
+      <Project>{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}</Project>
+      <Name>Yuzu.Mac</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\EmptyProject.GeneratedScenes\EmptyProject.GeneratedScenes.Mac.csproj">
+      <Project>{1EE9C6F3-E8D7-4FF8-9420-2B4C9CF9B66D}</Project>
+      <Name>EmptyProject.GeneratedScenes.Mac</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Citrus\Lime\Extensions\DynamicFont\DynamicFont.Mac.csproj">
+      <Project>{B5F74505-80BB-4373-B194-219D743C1FA0}</Project>
+      <Name>DynamicFont.Mac</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <BundleResource Include="..\Data.Desktop">
-      <Link>Data.Desktop</Link>
+    <BundleResource Include="..\Data.Mac">
+      <Link>Data.Mac</Link>
     </BundleResource>
   </ItemGroup>
 </Project>
