@@ -33,6 +33,7 @@ namespace Lime
 			public static readonly Color4 TabActive = GrayBackground.Darken(0.05f);
 			public static readonly Color4 SeparatorColor = GrayBackground.Darken(0.3f);
 			public static readonly Color4 KeyboardFocusBorder = new Color4(150, 200, 255);
+			public static readonly Color4 TextSelection = new Color4(200, 230, 255);
 			public static readonly Color4 CloseButtonNormal = GrayBackground.Darken(0.6f);
 			public static readonly Color4 CloseButtonHovered = GrayBackground.Darken(0.8f);
 			public static readonly Color4 CloseButtonPressed = GrayBackground.Darken(1);
@@ -167,7 +168,11 @@ namespace Lime
 				tw, eb.Editor.CaretPos, new CaretParams { CaretPresenter = vc });
 			new SelectionPresenter(
 				tw, eb.Editor.SelectionStart, eb.Editor.SelectionEnd,
-				new SelectionParams { Padding = Thickness.Zero });
+				new SelectionParams {
+					Padding = Thickness.Zero,
+					OutlineColor = Colors.TextSelection,
+					Color = Colors.TextSelection
+				});
 
 			eb.TabTravesable = new TabTraversable();
 			eb.CompoundPresenter.Add(new BorderedFramePresenter(Colors.WhiteBackground, Colors.ControlBorder));
