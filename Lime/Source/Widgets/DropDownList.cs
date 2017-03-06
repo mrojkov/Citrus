@@ -80,7 +80,7 @@ namespace Lime
 					yield return ShowDropDownListTask();
 				}
 				if (
-					HandleSpaceKey() && Input.ConsumeKeyPress(Key.Space) ||
+					DoesHandleSpacebar() && Input.ConsumeKeyPress(Key.Space) ||
 					Input.ConsumeKeyPress(Key.Up) ||
 					Input.ConsumeKeyPress(Key.Down))
 				{
@@ -92,7 +92,7 @@ namespace Lime
 			}
 		}
 		
-		protected virtual bool HandleSpaceKey() => true;
+		protected virtual bool DoesHandleSpacebar() => true;
 
 		IEnumerator<object> ShowDropDownListTask()
 		{
@@ -162,6 +162,6 @@ namespace Lime
 			Theme.Current.Apply(this);
 		}
 		
-		protected override bool HandleSpaceKey() => false;
+		protected override bool DoesHandleSpacebar() => false;
 	}
 }
