@@ -4,13 +4,14 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using System.Threading;
 using Lime;
 
 namespace Kumquat
 {
 	public class ScenesCodeCooker
 	{
+		private static readonly string[] scenesExtensions = { ".scene", ".tan" };
+
 		private readonly string directory;
 		private readonly string projectName;
 		private readonly Dictionary<string, string> sceneToBundleMap;
@@ -97,7 +98,8 @@ namespace Kumquat
 				var k = Path.ChangeExtension(kv.Item1, null);
 				k = AssetPath.CorrectSlashes(k);
 				var id = scenes[kv.Item1].Id;
-				bool useful = parsedFramesTree.ParsedNodes.Count > 0 ||
+				var useful =
+					parsedFramesTree.ParsedNodes.Count > 0 ||
 					parsedFramesTree.InnerClasses.Count > 0 ||
 					(id != null && id.StartsWith("@"));
 				if (!useful && !referringScenes.ContainsKey(k)) {
@@ -133,15 +135,15 @@ namespace Kumquat
 			var limeAssembly = typeof(Lime.Node).Assembly;
 			var types = typeNames.Select(i => limeAssembly.GetType("Lime." + i)).ToList();
 			var temp = new Type[typeNames.Count];
-			for (int i = 0; i < typeNames.Count; i++) {
+			for (var i = 0; i < typeNames.Count; i++) {
 				temp[i] = types[i];
 			}
-			bool checkPass = false;
+			var checkPass = false;
 			Type tested = null;
 			while (!checkPass) {
 				tested = temp[0];
 				checkPass = true;
-				for (int i = 1; i < temp.Length; i++) {
+				for (var i = 1; i < temp.Length; i++) {
 					if (tested == temp[i])
 						continue;
 					else {
@@ -150,14 +152,14 @@ namespace Kumquat
 							continue;
 						}
 						else if (tested.BaseType != null && tested.BaseType == temp[i]) {
-							for (int j = 0; j <= i - 1; j++) {
+							for (var j = 0; j <= i - 1; j++) {
 								temp[j] = temp[j].BaseType;
 							}
 							checkPass = false;
 							break;
 						}
 						else {
-							for (int j = 0; j <= i; j++) {
+							for (var j = 0; j <= i; j++) {
 								temp[j] = temp[j].BaseType;
 							}
 							checkPass = false;
@@ -267,13 +269,11 @@ namespace Kumquat
 			}
 
 			var pftType = $"{parsedFramesTree.ClassName}<{parsedFramesTree.ParsedNode.Type}>";
-
-			var scenePath = parsedFramesTree.ParsedNode.ContentsPath + ".scene";
-			string bundleName;
-			if (!sceneToBundleMap.TryGetValue(scenePath, out bundleName)) {
-				Console.WriteLine("Warning! Can not find external scene \'{0}\' in \'{1}!\'", scenePath, currentCookingScene);
+			var bundleName = GetBundleNameOfExternalScene(parsedFramesTree.ParsedNode);
+			if (string.IsNullOrEmpty(bundleName)) {
 				return pftType;
 			}
+
 			var pftBundleNamespace = GetBundleNamespace(bundleName);
 			return GetBundleNamespace(sceneToBundleMap[currentCookingScene]) == pftBundleNamespace ? pftType : pftBundleNamespace + '.' + pftType;
 		}
@@ -285,15 +285,32 @@ namespace Kumquat
 			}
 
 			var nodeType = $"{node.ClassName}<{node.Type}>";
-
-			var scenePath = node.ContentsPath + ".scene";
-			string bundleName;
-			if (!sceneToBundleMap.TryGetValue(scenePath, out bundleName)) {
-				Console.WriteLine("Warning! Can not find external scene \'{0}\' in \'{1}!\'", scenePath, currentCookingScene);
+			var bundleName = GetBundleNameOfExternalScene(node);
+			if (string.IsNullOrEmpty(bundleName)) {
 				return nodeType;
 			}
+
 			var nodeBundleNamespace = GetBundleNamespace(bundleName);
 			return GetBundleNamespace(sceneToBundleMap[currentCookingScene]) == nodeBundleNamespace ? nodeType : nodeBundleNamespace + '.' + nodeType;
+		}
+
+		private string GetBundleNameOfExternalScene(ParsedNode node)
+		{
+			var bundleName = string.Empty;
+			var scenePath = AssetPath.CorrectSlashes(node.ContentsPath);
+			foreach (var sceneExtension in scenesExtensions) {
+				string sceneBundle;
+				if (!sceneToBundleMap.TryGetValue(scenePath + sceneExtension, out sceneBundle)) {
+					continue;
+				}
+
+				bundleName = sceneBundle;
+				break;
+			}
+			if (string.IsNullOrEmpty(bundleName)) {
+				Console.WriteLine("Warning! Can not find external scene \'{0}\' in \'{1}!\'", scenePath, currentCookingScene);
+			}
+			return bundleName;
 		}
 
 		public static bool ParseCommonName(string source, out string name, out string commonName)
@@ -322,6 +339,9 @@ namespace Kumquat
 
 		private void AddReferringSceneSafe(string externalScene, string referringScene)
 		{
+			externalScene = AssetPath.CorrectSlashes(externalScene);
+			referringScene = AssetPath.CorrectSlashes(referringScene);
+
 			if (!referringScenes.ContainsKey(externalScene)) {
 				var l = new List<string>();
 				referringScenes.Add(externalScene, l);
@@ -394,7 +414,7 @@ namespace Kumquat
 
 		private string GetBundleNamespace(string bundleName)
 		{
-			string bundlePart = bundleName == mainBundleName ? "" : "." + Path.GetFileName(bundleName);
+			var bundlePart = bundleName == mainBundleName ? "" : "." + Path.GetFileName(bundleName);
 			return $"{projectName}.Scenes{bundlePart}";
 		}
 
