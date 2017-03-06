@@ -452,19 +452,11 @@ namespace Lime
 			}
 			// Refresh mouse position of every frame to make HitTest work properly if mouse is outside of the screen.
 			RefreshMousePosition();
-			if (Application.UsingDeferredHitTest) {
-				RaiseUpdating(delta);
-				AudioSystem.Update();
-				Input.CopyKeysState();
-				Input.ProcessPendingKeyEvents(delta);
-				Input.TextInput = null;
-			} else {
-				Input.ProcessPendingKeyEvents(delta);
-				RaiseUpdating(delta);
-				AudioSystem.Update();
-				Input.TextInput = null;
-				Input.CopyKeysState();
-			}
+			RaiseUpdating(delta);
+			AudioSystem.Update();
+			Input.CopyKeysState();
+			Input.ProcessPendingKeyEvents(delta);
+			Input.TextInput = null;
 			if (renderingState == RenderingState.RenderDeferred) {
 				Invalidate();
 			}

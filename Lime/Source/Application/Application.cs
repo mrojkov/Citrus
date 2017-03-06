@@ -56,7 +56,6 @@ namespace Lime
 #else
 		public RenderingBackend RenderingBackend = RenderingBackend.ES20;
 #endif
-		public bool UsingDeferredHitTest = false;
 	}
 
 	public static class Application
@@ -190,7 +189,6 @@ namespace Lime
 		}
 
 		public static RenderingBackend RenderingBackend { get; private set; }
-		public static bool UsingDeferredHitTest { get; private set; }
 #if WIN
 		[System.Runtime.InteropServices.DllImport("user32.dll")]
 		private static extern bool SetProcessDPIAware();
@@ -213,7 +211,6 @@ namespace Lime
 #endif
 			options = options ?? new ApplicationOptions();
 			RenderingBackend = options.RenderingBackend;
-			UsingDeferredHitTest = options.UsingDeferredHitTest;
 			MainThread = Thread.CurrentThread;
 			// Use '.' as decimal separator.
 			var culture = System.Globalization.CultureInfo.InvariantCulture;

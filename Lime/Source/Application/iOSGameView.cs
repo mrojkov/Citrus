@@ -218,9 +218,6 @@ namespace Lime
 		protected override void OnUpdateFrame(Xamarin.FrameEventArgs e)
 		{
 			base.OnUpdateFrame(e);
-			if (!Application.UsingDeferredHitTest) {
-				input.CopyKeysState();
-			}
 			ProcessTextInput();
 		}
 
