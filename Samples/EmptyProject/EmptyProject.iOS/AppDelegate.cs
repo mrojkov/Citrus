@@ -12,7 +12,6 @@ namespace EmptyProject.iOS
 			AVAudioSession.SharedInstance().SetCategory(AVAudioSessionCategory.Ambient);
 			Lime.Application.Initialize(new Lime.ApplicationOptions {
 				DecodeAudioInSeparateThread = false,
-				UsingDeferredHitTest = true
 			});
 
 			EmptyProject.Application.Application.Initialize();
