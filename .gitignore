@@ -122,23 +122,16 @@ UpgradeLog*.htm
 ## Citrus
 
 # Bundles
-*.Desktop
-*.iOS
-*.Android
-*.Win
+Data.Win
+Data.Mac
+Data.iOS
+Data.Android
 
 # HotStudio
 HotStudioProject.ini
 
-# Scene backups
-*.scene_Autoback0
-*.scene_Autoback1
-*.scene_Autoback2
-
 # Project-specific
 !EmptyProject.Game/Debug
-!EmptyProject.Android
-!EmptyProject.iOS
 
 # Generated scenes
 EmptyProject.GeneratedScenes/Scenes
