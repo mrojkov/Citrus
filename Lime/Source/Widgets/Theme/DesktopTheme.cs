@@ -205,34 +205,46 @@ namespace Lime
 						eb.RaiseBeginSpin();
 						eb.Input.CaptureMouse();
 						eb.Input.ConsumeKey(Key.Mouse0);
-						var initialMousePos = Application.DesktopMousePosition;
-						var initialValue = eb.Value;
+						var prevMousePos = Application.DesktopMousePosition;
 						var dragged = false;
 						var disp = Window.Current.Display;
 						// TODO: Remove focus revoke and block editor input while dragging.
 						eb.SetFocus();
 						eb.RevokeFocus();
 						while (eb.Input.IsMousePressed()) {
-							dragged |= Application.DesktopMousePosition != initialMousePos;
+							dragged |= Application.DesktopMousePosition != prevMousePos;
 							var wrapped = false;
 							if (Application.DesktopMousePosition.X > disp.Position.X + disp.Size.X - 5) {
-								initialMousePos.X = disp.Position.X + 5;
+								prevMousePos.X = disp.Position.X + 5;
 								wrapped = true;
 							}
 							if (Application.DesktopMousePosition.X < disp.Position.X + 5) {
-								initialMousePos.X = disp.Position.X + disp.Size.X - 5;
+								prevMousePos.X = disp.Position.X + disp.Size.X - 5;
 								wrapped = true;
 							}
 							if (wrapped) {
-								Application.DesktopMousePosition = new Vector2(initialMousePos.X, Application.DesktopMousePosition.Y);
-								initialValue = eb.Value;
+								Application.DesktopMousePosition = new Vector2(prevMousePos.X, Application.DesktopMousePosition.Y);
 							}
-							eb.Value = initialValue + (Application.DesktopMousePosition.X - initialMousePos.X) * eb.Step;
+							var delta = (Application.DesktopMousePosition.X - prevMousePos.X).Round() * eb.Step;
+							if (eb.Input.IsKeyPressed(Key.Shift)) {
+								delta *= 10f;
+							} else if (eb.Input.IsKeyPressed(Key.Control)) {
+								delta *= 0.1f;
+							}
+							eb.Value += delta;
+							prevMousePos = Application.DesktopMousePosition;
 							yield return null;
 						}
 						if (!dragged) {
-							eb.Value += (leftToRight ? 1 : -1) * eb.Step;
+							var delta = (leftToRight ? 1 : -1) * eb.Step;
+							if (eb.Input.IsKeyPressed(Key.Shift)) {
+								delta *= 10f;
+							} else if (eb.Input.IsKeyPressed(Key.Control)) {
+								delta *= 0.1f;
+							}
+							eb.Value += delta;
 						}
+						eb.Input.ConsumeKey(Key.Mouse0);
 						eb.Input.ReleaseMouse();
 						eb.RaiseEndSpin();
 					}
