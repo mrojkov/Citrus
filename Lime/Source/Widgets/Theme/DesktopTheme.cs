@@ -215,12 +215,12 @@ namespace Lime
 						while (eb.Input.IsMousePressed()) {
 							dragged |= Application.DesktopMousePosition != initialMousePos;
 							var wrapped = false;
-							if (Application.DesktopMousePosition.X > disp.Position.X + disp.Size.X - 1) {
-								initialMousePos.X = disp.Position.X + 1;
+							if (Application.DesktopMousePosition.X > disp.Position.X + disp.Size.X - 5) {
+								initialMousePos.X = disp.Position.X + 5;
 								wrapped = true;
 							}
-							if (Application.DesktopMousePosition.X < disp.Position.X + 1) {
-								initialMousePos.X = disp.Position.X + disp.Size.X - 1;
+							if (Application.DesktopMousePosition.X < disp.Position.X + 5) {
+								initialMousePos.X = disp.Position.X + disp.Size.X - 5;
 								wrapped = true;
 							}
 							if (wrapped) {
