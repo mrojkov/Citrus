@@ -1,5 +1,6 @@
 ﻿#if WIN
 using System.Text;
+using System.Linq;
 using WinForms = System.Windows.Forms;
 
 namespace Lime
@@ -66,16 +67,8 @@ namespace Lime
 		private void SetFilter(WinForms.FileDialog dialog)
 		{
 			if (AllowedFileTypes != null) {
-				var result = new StringBuilder();
-				var i = 0;
-				foreach (var type in AllowedFileTypes) {
-					i++;
-					result.Append(type.ToUpper()).Append("|*.").Append(type);
-					if (i < AllowedFileTypes.Length) {
-						result.Append("|");
-					}
-				}
-				dialog.Filter = result.ToString();
+				var f = string.Join("; ", AllowedFileTypes.Select(s => "*." + s));
+				dialog.Filter = f + '|' + f;
 			}
 		}
 
