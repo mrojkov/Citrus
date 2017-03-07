@@ -8,6 +8,8 @@ namespace Tangerine.UI
 {
 	public class ToolbarButton : Button
 	{
+		public static readonly Vector2 DefaultSize = new Vector2(DesktopTheme.Metrics.DefaultButtonSize.Y);
+
 		enum State
 		{
 			Default,
@@ -63,7 +65,7 @@ namespace Tangerine.UI
 			highlightable = true;
 			Nodes.Clear();
 			Padding = new Thickness(3);
-			Size = MinMaxSize = DesktopTheme.Metrics.DefaultButtonSize.Y * Vector2.One;
+			Size = MinMaxSize = DefaultSize;
 			DefaultAnimation.AnimationEngine = new AnimationEngineDelegate {
 				OnRunAnimation = (animation, markerId) => {
 					if (markerId == "Focus") {

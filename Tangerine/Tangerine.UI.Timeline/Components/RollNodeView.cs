@@ -29,7 +29,7 @@ namespace Tangerine.UI.Timeline.Components
 			editBox = new EditBox { LayoutCell = new LayoutCell(Alignment.Center, stretchX: float.MaxValue) };
 			nodeIcon = new Image(NodeIconPool.GetTexture(nodeData.Node.GetType())) {
 				HitTestTarget = true,
-				MinMaxSize = new Vector2(16, 16)
+				MinMaxSize = new Vector2(16)
 			};
 			expandButton = CreateExpandButton();
 			var expandButtonContainer = new Widget {
@@ -56,7 +56,7 @@ namespace Tangerine.UI.Timeline.Components
 					label,
 					editBox,
 					new Widget(),
-					(Widget)enterButton ?? (Widget)new HSpacer(DesktopTheme.Metrics.DefaultButtonSize.Y),
+					(Widget)enterButton ?? (Widget)new HSpacer(ToolbarButton.DefaultSize.X),
 					eyeButton,
 					lockButton,
 				},
