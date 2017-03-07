@@ -47,6 +47,7 @@ namespace Lime
 			Decorators[typeof(Button)] = DecorateButton;
 			Decorators[typeof(TabCloseButton)] = DecorateTabCloseButton;
 			Decorators[typeof(EditBox)] = DecorateEditBox;
+			Decorators[typeof(NumericEditBox)] = DecorateEditBoxWithSpinner;
 			Decorators[typeof(CheckBox)] = DecorateCheckBox;
 			Decorators[typeof(WindowWidget)] = DecorateWindowWidget;
 			Decorators[typeof(TextView)] = DecorateTextView;
@@ -143,7 +144,7 @@ namespace Lime
 		
 		private void DecorateEditBox(Widget widget)
 		{
-			var eb = (EditBox)widget;
+			var eb = (CommonEditBox)widget;
 			var tw = eb.TextWidget;
 			DecorateSimpleText(tw);
 			tw.AutoSizeConstraints = false;
@@ -177,6 +178,104 @@ namespace Lime
 			eb.TabTravesable = new TabTraversable();
 			eb.CompoundPresenter.Add(new BorderedFramePresenter(Colors.WhiteBackground, Colors.ControlBorder));
 			eb.CompoundPostPresenter.Add(new KeyboardFocusBorderPresenter());
+		}
+
+		private void DecorateEditBoxWithSpinner(Widget widget)
+		{
+			DecorateEditBox(widget);
+			var eb = (NumericEditBox)widget;
+			eb.TextWidget.Padding = new Thickness(SpinButtonPresenter.ButtonWidth + 2, 2);
+			eb.CompoundPostPresenter.Add(new SpinButtonPresenter(true));
+			eb.CompoundPostPresenter.Add(new SpinButtonPresenter(false));
+			eb.Awoken += n => {
+				var e = (NumericEditBox)n;
+				e.Tasks.Add(HandleSpinButtonTask(e, true));
+				e.Tasks.Add(HandleSpinButtonTask(e, false));
+			};
+		}
+
+		private IEnumerator<object> HandleSpinButtonTask(NumericEditBox eb, bool leftToRight)
+		{
+			while (true) {
+				if (eb.Input.WasMousePressed()) {
+					if (
+						leftToRight && eb.Input.LocalMousePosition.X > eb.Width - SpinButtonPresenter.ButtonWidth ||
+						!leftToRight && eb.Input.LocalMousePosition.X < SpinButtonPresenter.ButtonWidth
+					) {
+						eb.RaiseBeginSpin();
+						eb.Input.CaptureMouse();
+						eb.Input.ConsumeKey(Key.Mouse0);
+						var initialMousePos = Application.DesktopMousePosition;
+						var initialValue = eb.Value;
+						var dragged = false;
+						var disp = Window.Current.Display;
+						// TODO: Remove focus revoke and block editor input while dragging.
+						eb.SetFocus();
+						eb.RevokeFocus();
+						while (eb.Input.IsMousePressed()) {
+							dragged |= Application.DesktopMousePosition != initialMousePos;
+							var wrapped = false;
+							if (Application.DesktopMousePosition.X > disp.Position.X + disp.Size.X - 1) {
+								initialMousePos.X = disp.Position.X + 1;
+								wrapped = true;
+							}
+							if (Application.DesktopMousePosition.X < disp.Position.X + 1) {
+								initialMousePos.X = disp.Position.X + disp.Size.X - 1;
+								wrapped = true;
+							}
+							if (wrapped) {
+								Application.DesktopMousePosition = new Vector2(initialMousePos.X, Application.DesktopMousePosition.Y);
+								initialValue = eb.Value;
+							}
+							eb.Value = initialValue + (Application.DesktopMousePosition.X - initialMousePos.X) * eb.Step;
+							yield return null;
+						}
+						if (!dragged) {
+							eb.Value += (leftToRight ? 1 : -1) * eb.Step;
+						}
+						eb.Input.ReleaseMouse();
+						eb.RaiseEndSpin();
+					}
+				}
+				yield return null;
+			}
+		}
+
+		class SpinButtonPresenter : CustomPresenter
+		{
+			public const float ButtonWidth = 10;
+
+			static Color4 color = Color4.Lerp(0.25f, Colors.ControlBorder, Colors.BlackText);
+
+			private readonly VectorShape buttonShape = new VectorShape {
+				new VectorShape.TriangleFan(new float[] { 0, 0, 1, 0, 1, 1, 0, 1 }, Colors.WhiteBackground),
+				new VectorShape.TriangleFan(new float[] { 0.3f, 0.3f, 0.7f, 0.5f, 0.3f, 0.7f }, color)
+			};
+
+			private bool leftToRight;
+
+			public SpinButtonPresenter(bool leftToRight)
+			{
+				this.leftToRight = leftToRight;
+			}
+
+			public override bool PartialHitTest(Node node, ref HitTestArgs args)
+			{
+				return base.PartialHitTest(node, ref args);
+			}
+
+			public override void Render(Node node)
+			{
+				var widget = node.AsWidget;
+				widget.PrepareRendererState();
+				Matrix32 transform;
+				if (leftToRight) {
+					transform = Matrix32.Scaling(ButtonWidth, widget.Height - 2) * Matrix32.Translation(widget.Width - ButtonWidth - 1, 1);
+				} else {
+					transform = Matrix32.Scaling(-ButtonWidth, widget.Height - 2) * Matrix32.Translation(ButtonWidth + 1, 1);
+				}
+				buttonShape.Draw(transform);
+			}
 		}
 
 		private void DecorateCheckBox(Widget widget)

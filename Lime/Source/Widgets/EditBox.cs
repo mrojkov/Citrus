@@ -2,7 +2,7 @@
 
 namespace Lime
 {
-	public class EditBox : Frame
+	public abstract class CommonEditBox : Frame
 	{
 		public SimpleText TextWidget { get; private set; }
 		public Editor Editor { get; set; }
@@ -15,14 +15,13 @@ namespace Lime
 			set { TextWidget.Text = value; }
 		}
 
-		public EditBox()
+		public CommonEditBox()
 		{
 			Scroll = new ScrollView(this, ScrollDirection.Horizontal);
 			Scroll.CanScroll = false;
 			TextWidget = new SimpleText();
 			TextWidget.Height = Height;
 			Scroll.Content.AddNode(TextWidget);
-			Theme.Current.Apply(this);
 		}
 
 		protected override void Awake()
@@ -39,6 +38,46 @@ namespace Lime
 				Editor?.AdjustSizeAndScrollToCaret();
 			}
 		}
+
+		protected void OnSubmit() => Submitted?.Invoke(Text);
+	}
+
+	public class EditBox : CommonEditBox
+	{
+		public EditBox()
+		{
+			Theme.Current.Apply(this);
+		}
+	}
+
+	public class NumericEditBox : CommonEditBox
+	{
+		public float Step = 0.1f;
+
+		public event Action BeginSpin;
+		public event Action EndSpin;
+
+		public float Value
+		{
+			get
+			{
+				float v;
+				return float.TryParse(Text, out v) ? v : 0;
+			}
+			set
+			{
+				Text = value.ToString();
+				OnSubmit();
+			}
+		}
+
+		public NumericEditBox()
+		{
+			Theme.Current.Apply(this);
+		}
+
+		public void RaiseBeginSpin() => BeginSpin?.Invoke();
+		public void RaiseEndSpin() => EndSpin?.Invoke();
 	}
 }
 

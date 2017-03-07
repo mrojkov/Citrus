@@ -31,6 +31,29 @@ namespace Lime
 			Renderer.Transform1 = t;
 		}
 
+		public class TriangleFan : IVectorShapeElement
+		{
+			private Vertex[] vertices;
+			private Color4 color;
+
+			public TriangleFan(float[] vertices, Color4 color)
+			{
+				this.color = color;
+				this.vertices = new Vertex[vertices.Length / 2];
+				for (int i = 0; i < this.vertices.Length; i++) {
+					this.vertices[i] = new Vertex { Pos = new Vector2(vertices[i * 2], vertices[i * 2 + 1]) };
+				}
+			}
+
+			public void Draw(Color4 tint)
+			{
+				for (int i = 0; i < vertices.Length; i++) {
+					vertices[i].Color = color * tint;
+				}
+				Renderer.DrawTriangleFan(null, vertices, vertices.Length);
+			}
+		}
+
 		public class Line : IVectorShapeElement
 		{
 			public Vector2 A;

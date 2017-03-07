@@ -9,6 +9,16 @@ namespace Tangerine.UI.Inspector
 {
 	public interface IPropertyEditor { }
 
+	class TransactionalNumericEditBox : NumericEditBox
+	{
+		public TransactionalNumericEditBox()
+		{
+			Theme.Current.Apply(this, typeof(NumericEditBox));
+			BeginSpin += () => Document.Current.History.BeginTransaction();
+			EndSpin += () => Document.Current.History.EndTransaction();
+		}
+	}
+
 	public class PropertyEditorContext
 	{
 		public readonly Widget InspectorPane;
@@ -108,12 +118,12 @@ namespace Tangerine.UI.Inspector
 	{
 		public Vector2PropertyEditor(PropertyEditorContext context) : base(context)
 		{
-			EditBox editorX, editorY;
+			TransactionalNumericEditBox editorX, editorY;
 			containerWidget.AddNode(new Widget {
 				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center), Spacing = 4 },
 				Nodes = {
-					(editorX = new EditBox()),
-					(editorY = new EditBox()),
+					(editorX = new TransactionalNumericEditBox()),
+					(editorY = new TransactionalNumericEditBox()),
 				}
 			});
 			OnKeyframeToggle += editorX.SetFocus;
@@ -127,7 +137,7 @@ namespace Tangerine.UI.Inspector
 			editorY.AddChangeWatcher(currentY, v => editorY.Text = v.ToString());
 		}
 
-		void SetComponent(PropertyEditorContext context, int component, EditBox editor, float currentValue)
+		void SetComponent(PropertyEditorContext context, int component, TransactionalNumericEditBox editor, float currentValue)
 		{
 			float newValue;
 			if (float.TryParse(editor.Text, out newValue)) {
@@ -146,13 +156,13 @@ namespace Tangerine.UI.Inspector
 	{
 		public Vector3PropertyEditor(PropertyEditorContext context) : base(context)
 		{
-			EditBox editorX, editorY, editorZ;
+			TransactionalNumericEditBox editorX, editorY, editorZ;
 			containerWidget.AddNode(new Widget {
 				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center), Spacing = 4 },
 				Nodes = {
-					(editorX = new EditBox()),
-					(editorY = new EditBox()),
-					(editorZ = new EditBox())
+					(editorX = new TransactionalNumericEditBox()),
+					(editorY = new TransactionalNumericEditBox()),
+					(editorZ = new TransactionalNumericEditBox())
 				}
 			});
 			OnKeyframeToggle += editorX.SetFocus;
@@ -170,7 +180,7 @@ namespace Tangerine.UI.Inspector
 			editorZ.AddChangeWatcher(currentZ, v => editorZ.Text = v.ToString());
 		}
 
-		void SetComponent(PropertyEditorContext context, int component, EditBox editor, float currentValue)
+		void SetComponent(PropertyEditorContext context, int component, TransactionalNumericEditBox editor, float currentValue)
 		{
 			float newValue;
 			if (float.TryParse(editor.Text, out newValue)) {
@@ -189,13 +199,13 @@ namespace Tangerine.UI.Inspector
 	{
 		public QuaternionPropertyEditor(PropertyEditorContext context) : base(context)
 		{
-			EditBox editorX, editorY, editorZ;
+			TransactionalNumericEditBox editorX, editorY, editorZ;
 			containerWidget.AddNode(new Widget {
 				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center), Spacing = 4 },
 				Nodes = {
-					(editorX = new EditBox()),
-					(editorY = new EditBox()),
-					(editorZ = new EditBox())
+					(editorX = new TransactionalNumericEditBox()),
+					(editorY = new TransactionalNumericEditBox()),
+					(editorZ = new TransactionalNumericEditBox())
 				}
 			});
 
@@ -217,7 +227,7 @@ namespace Tangerine.UI.Inspector
 
 		float RoundAngle(float value) => (value * 1000f).Round() / 1000f;
 
-		void SetComponent(PropertyEditorContext context, int component, EditBox editor, Quaternion currentValue)
+		void SetComponent(PropertyEditorContext context, int component, TransactionalNumericEditBox editor, Quaternion currentValue)
 		{
 			float newValue;
 			if (float.TryParse(editor.Text, out newValue)) {
@@ -348,7 +358,7 @@ namespace Tangerine.UI.Inspector
 	{
 		public FloatPropertyEditor(PropertyEditorContext context) : base(context)
 		{
-			var editor = new EditBox { LayoutCell = new LayoutCell(Alignment.Center) };
+			var editor = new TransactionalNumericEditBox { LayoutCell = new LayoutCell(Alignment.Center) };
 			editor.TextWidget.HAlignment = HAlignment.Right;
 			containerWidget.AddNode(editor);
 			OnKeyframeToggle += editor.SetFocus;
