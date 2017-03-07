@@ -35,9 +35,10 @@ namespace Tangerine.UI.Timeline.Components
 			var expandButtonContainer = new Widget {
 				Layout = new StackLayout { IgnoreHidden = false },
 				LayoutCell = new LayoutCell(Alignment.Center),
-				Visible = nodeData.Node.Animators.Count > 0,
 				Nodes = { expandButton }
 			};
+			expandButtonContainer.Updating += delta => 
+				expandButtonContainer.Visible = nodeData.Node.Animators.Count > 0;
 			enterButton = (ClassAttributes<TangerineClassAttribute>.Get(nodeData.Node.GetType())?.
 				AllowChildren ?? false) ? CreateEnterButton() : null;
 			eyeButton = CreateEyeButton();
