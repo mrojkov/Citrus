@@ -247,12 +247,12 @@ namespace Tangerine.UI.Inspector
 	{
 		public NumericRangePropertyEditor(PropertyEditorContext context) : base(context)
 		{
-			EditBox medEditor, dispEditor;
+			TransactionalNumericEditBox medEditor, dispEditor;
 			containerWidget.AddNode(new Widget {
 				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center), Spacing = 4 },
 				Nodes = {
-					(medEditor = new EditBox()),
-					(dispEditor = new EditBox()),
+					(medEditor = new TransactionalNumericEditBox()),
+					(dispEditor = new TransactionalNumericEditBox()),
 				}
 			});
 			OnKeyframeToggle += medEditor.SetFocus;
@@ -266,7 +266,7 @@ namespace Tangerine.UI.Inspector
 			dispEditor.AddChangeWatcher(currentDisp, v => dispEditor.Text = v.ToString());
 		}
 
-		void SetComponent(PropertyEditorContext context, int component, EditBox editor, float currentValue)
+		void SetComponent(PropertyEditorContext context, int component, TransactionalNumericEditBox editor, float currentValue)
 		{
 			float newValue;
 			if (float.TryParse(editor.Text, out newValue)) {
