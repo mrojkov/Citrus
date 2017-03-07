@@ -17,6 +17,7 @@ namespace Lime
 			this.NativeScreen = nativeScreen;
 		}
 
+		public Vector2 Position => new Vector2((float)NativeScreen.Frame.Left, (float)NativeScreen.Frame.Top);
 		public Vector2 Size => new Vector2((float)NativeScreen.Frame.Width, (float)NativeScreen.Frame.Height);
 	}
 }

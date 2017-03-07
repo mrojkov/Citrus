@@ -13,6 +13,8 @@ namespace Lime
 			this.nativeDisplay = nativeDisplay;
 		}
 
+		public Vector2 Position => Vector2.Zero;
+
 		public Vector2 Size
 		{
 			get

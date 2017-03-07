@@ -19,6 +19,10 @@ namespace Lime
 			return nd;
 		}
 
+		public Vector2 Position => new Vector2(
+			Screen.Bounds.Left / Window.Current.PixelScale,
+			Screen.Bounds.Top / Window.Current.PixelScale);
+
 		public Vector2 Size => new Vector2(
 			Screen.Bounds.Width / Window.Current.PixelScale,
 			Screen.Bounds.Height / Window.Current.PixelScale);
