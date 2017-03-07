@@ -70,7 +70,8 @@ namespace Lime
 				FarClipPlane = 100000,
 				NearClipPlane = 0.001f,
 				FieldOfView = 1.0f,
-				AspectRatio = 1.3f
+				AspectRatio = 1.3f,
+				OrthographicSize = 1.0f
 			};
 			ZSortEnabled = true;
 			Nodes.Add(camera);
