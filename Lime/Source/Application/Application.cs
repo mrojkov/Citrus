@@ -129,12 +129,26 @@ namespace Lime
 #endif
 
 #if MAC
+		[System.Runtime.InteropServices.DllImport(ObjCRuntime.Constants.CoreGraphicsLibrary)]
+		extern static void CGWarpMouseCursorPosition(nfloat X, nfloat Y);
+
 		public static Vector2 DesktopMousePosition
 		{
 			get { return new Vector2((float)AppKit.NSEvent.CurrentMouseLocation.X, (float)AppKit.NSEvent.CurrentMouseLocation.Y); }
+			set { CGWarpMouseCursorPosition(value.X, value.Y); }
 		}
 #elif WIN
-		public static Vector2 DesktopMousePosition => SDToLime.Convert(Cursor.Position, 1f);
+		public static Vector2 DesktopMousePosition
+		{
+			get { return SDToLime.Convert(Cursor.Position, Window.Current.PixelScale); }
+			set {  Cursor.Position = LimeToSD.ConvertToPoint(value, Window.Current.PixelScale); }
+		}
+#else
+		public static Vector2 DesktopMousePosition
+		{
+			get { return Window.Current.Input.MousePosition; }
+			set { }
+		}
 #endif
 
 		// Specifies the lowest possible 1/(time delta) passed to Window.Updating.
