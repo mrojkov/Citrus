@@ -70,7 +70,7 @@ namespace Lime
 			public static readonly Color4 TabNormal = GrayBackground.Lighten(0.1f);
 			public static readonly Color4 TabActive = GrayBackground.Lighten(0.05f);
 			public static readonly Color4 SeparatorColor = GrayBackground.Lighten(0.3f);
-			public static readonly Color4 KeyboardFocusBorder = new Color4(100, 70, 200);
+			public static readonly Color4 KeyboardFocusBorder = new Color4(100, 150, 200);
 			public static readonly Color4 TextSelection = new Color4(133, 133, 133);
 			public static readonly Color4 CloseButtonNormal = GrayBackground.Lighten(0.6f);
 			public static readonly Color4 CloseButtonHovered = GrayBackground.Lighten(0.8f);
@@ -513,7 +513,7 @@ namespace Lime
 				if (Widget.Focused == node) {
 					var widget = node.AsWidget;
 					widget.PrepareRendererState();
-					Renderer.DrawRectOutline(-Vector2.One, widget.Size + Vector2.One, Colors.KeyboardFocusBorder, 2);
+					Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Colors.KeyboardFocusBorder, 1);
 				}
 			}
 		}
