@@ -70,7 +70,7 @@ namespace Lime
 			public static readonly Color4 TabNormal = GrayBackground.Lighten(0.1f);
 			public static readonly Color4 TabActive = GrayBackground.Lighten(0.05f);
 			public static readonly Color4 SeparatorColor = GrayBackground.Lighten(0.3f);
-			public static readonly Color4 KeyboardFocusBorder = new Color4(51, 51, 51);
+			public static readonly Color4 KeyboardFocusBorder = new Color4(100, 70, 200);
 			public static readonly Color4 TextSelection = new Color4(133, 133, 133);
 			public static readonly Color4 CloseButtonNormal = GrayBackground.Lighten(0.6f);
 			public static readonly Color4 CloseButtonHovered = GrayBackground.Lighten(0.8f);
