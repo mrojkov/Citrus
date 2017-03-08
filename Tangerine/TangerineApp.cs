@@ -255,6 +255,7 @@ namespace Tangerine
 			var nodeTypes = new[] {
 				typeof(Frame),
 				typeof(Image),
+				typeof(Audio),
 				typeof(Movie),
 				typeof(Bone),
 				typeof(SplineGear),
