@@ -29,7 +29,7 @@
     <CodeSigningKey>Mac Developer</CodeSigningKey>
     <EnableCodeSigning>false</EnableCodeSigning>
     <EnablePackageSigning>false</EnablePackageSigning>
-    <XamMacArch>i386</XamMacArch>
+    <XamMacArch>x86_64</XamMacArch>
     <HttpClientHandler>NSUrlSessionHandler</HttpClientHandler>
     <LinkMode>None</LinkMode>
     <TlsProvider>Default</TlsProvider>
@@ -211,5 +211,15 @@
     <Folder Include="PreferencesDialog\" />
     <Folder Include="MainMenu\" />
     <Folder Include="Tools\" />
+  </ItemGroup>
+  <ItemGroup>
+    <NativeReference Include="..\3rdParty\FreeType\libfreetype6.dylib">
+      <Kind>Dynamic</Kind>
+      <SmartLink>False</SmartLink>
+    </NativeReference>
+    <NativeReference Include="..\Lemon\Library\bin\Mac\Release\libLemon.dylib">
+      <Kind>Dynamic</Kind>
+      <SmartLink>False</SmartLink>
+    </NativeReference>
   </ItemGroup>
 </Project>
