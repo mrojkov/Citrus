@@ -40,6 +40,7 @@ namespace Lime
 			public static readonly Color4 CloseButtonPressed = GrayBackground.Darken(1);
 			public static readonly Color4 ScrollbarBackground = new Color4(210, 210, 210);
 			public static readonly Color4 ScrollbarThumb = new Color4(120, 120, 120);
+			public static readonly Color4 TextCaret = new Color4(0, 0, 0);
 		}
 		*/
 
@@ -76,6 +77,7 @@ namespace Lime
 			public static readonly Color4 CloseButtonPressed = GrayBackground.Lighten(1);
 			public static readonly Color4 ScrollbarBackground = new Color4(51, 51, 51);
 			public static readonly Color4 ScrollbarThumb = new Color4(107, 107, 107);
+			public static readonly Color4 TextCaret = new Color4(204, 204, 204);
 		}
 
 		public DesktopTheme()
@@ -198,7 +200,7 @@ namespace Lime
 				SelectAllOnFocus = true
 			};
 			eb.Editor = new Editor(tw, editorParams, eb);
-			var vc = new VerticalLineCaret();
+			var vc = new VerticalLineCaret { Color = Colors.TextCaret };
 			eb.Updated += delta =>
 				vc.Width = eb.Editor.OverwriteMode && !eb.Editor.HasSelection() ?
 					tw.Font.Chars.Get(eb.Editor.CurrentChar(), tw.FontHeight)?.Width ?? 5f : 0f;

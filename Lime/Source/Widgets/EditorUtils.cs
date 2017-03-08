@@ -5,7 +5,6 @@ using System.Linq;
 
 namespace Lime
 {
-
 	public interface ICaretPresenter : IPresenter
 	{
 		Vector2 Position { get; set; }
