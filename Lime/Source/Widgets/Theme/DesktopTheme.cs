@@ -6,6 +6,7 @@ namespace Lime
 {
 	public class DesktopTheme : Theme
 	{
+		/* Light theme
 		public static class Metrics
 		{
 			public static readonly int TextHeight = 18;
@@ -39,6 +40,44 @@ namespace Lime
 			public static readonly Color4 CloseButtonPressed = GrayBackground.Darken(1);
 			public static readonly Color4 ScrollbarBackground = new Color4(210, 210, 210);
 			public static readonly Color4 ScrollbarThumb = new Color4(120, 120, 120);
+			public static readonly Color4 TextCaret = new Color4(0, 0, 0);
+		}
+		*/
+
+		public static class Metrics
+		{
+			public static readonly int TextHeight = 18;
+			public static readonly Vector2 CheckBoxSize = new Vector2(16, 16);
+			public static readonly Vector2 DefaultButtonSize = new Vector2(75, 22);
+			public static readonly Vector2 DefaultEditBoxSize = new Vector2(75, 22);
+			public static readonly Vector2 MaxTabSize = new Vector2(250, 24);
+			public static readonly Vector2 MinTabSize = new Vector2(25, 24);
+			public static readonly Vector2 CloseButtonSize = new Vector2(16, 16);
+			public static readonly Thickness ControlsPadding = new Thickness(2);
+		}
+
+		public static class Colors
+		{
+			public static readonly Color4 BlackText = new Color4(204, 204, 204);
+			public static readonly Color4 WhiteBackground = Color4.Black.Lighten(0.25f);
+			public static readonly Color4 GrayBackground = new Color4(45, 45, 48);
+			public static readonly Color4 SelectedBackground = new Color4(86, 86, 86);
+			public static readonly Color4 ControlBorder = new Color4(39, 39, 39);
+			public static readonly ColorGradient ButtonDefault = new ColorGradient(new Color4(107, 107, 107), new Color4(107, 107, 107));
+			public static readonly ColorGradient ButtonHover = new ColorGradient(new Color4(133, 133, 133), new Color4(133, 133, 133));
+			public static readonly ColorGradient ButtonPress = new ColorGradient(new Color4(141, 167, 204), new Color4(141, 167, 204));
+			public static readonly ColorGradient ButtonDisable = new ColorGradient(new Color4(64, 64, 64), new Color4(64, 64, 64));
+			public static readonly Color4 TabNormal = GrayBackground.Lighten(0.1f);
+			public static readonly Color4 TabActive = GrayBackground.Lighten(0.05f);
+			public static readonly Color4 SeparatorColor = GrayBackground.Lighten(0.3f);
+			public static readonly Color4 KeyboardFocusBorder = new Color4(51, 51, 51);
+			public static readonly Color4 TextSelection = new Color4(133, 133, 133);
+			public static readonly Color4 CloseButtonNormal = GrayBackground.Lighten(0.6f);
+			public static readonly Color4 CloseButtonHovered = GrayBackground.Lighten(0.8f);
+			public static readonly Color4 CloseButtonPressed = GrayBackground.Lighten(1);
+			public static readonly Color4 ScrollbarBackground = new Color4(51, 51, 51);
+			public static readonly Color4 ScrollbarThumb = new Color4(107, 107, 107);
+			public static readonly Color4 TextCaret = new Color4(204, 204, 204);
 		}
 
 		public DesktopTheme()
@@ -120,7 +159,7 @@ namespace Lime
 			fc.AddNode(label);
 			fc.AddNode(button);
 		}
-		
+
 		private void DecorateSimpleText(Widget widget)
 		{
 			var text = (SimpleText)widget;
@@ -136,12 +175,12 @@ namespace Lime
 			text.TrimWhitespaces = true;
 			text.Size = text.MinSize;
 		}
-				
+
 		private void DecorateWindowWidget(Widget widget)
 		{
 			widget.CompoundPresenter.Push(new WindowWidgetPresenter());
 		}
-		
+
 		private void DecorateEditBox(Widget widget)
 		{
 			var eb = (CommonEditBox)widget;
@@ -161,7 +200,7 @@ namespace Lime
 				SelectAllOnFocus = true
 			};
 			eb.Editor = new Editor(tw, editorParams, eb);
-			var vc = new VerticalLineCaret();
+			var vc = new VerticalLineCaret { Color = Colors.TextCaret };
 			eb.Updated += delta =>
 				vc.Width = eb.Editor.OverwriteMode && !eb.Editor.HasSelection() ?
 					tw.Font.Chars.Get(eb.Editor.CurrentChar(), tw.FontHeight)?.Width ?? 5f : 0f;
