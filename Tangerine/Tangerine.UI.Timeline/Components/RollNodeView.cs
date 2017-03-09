@@ -66,7 +66,7 @@ namespace Tangerine.UI.Timeline.Components
 			label.AddChangeWatcher(() => nodeData.Node.ContentsPath, s => RefreshLabel());
 			widget.CompoundPresenter.Push(new DelegatePresenter<Widget>(RenderBackground));
 			editBox.Visible = false;
-			widget.Tasks.Add(HandleDobleClickTask());
+			widget.Tasks.Add(HandleDoubleClickTask());
 		}
 
 		Widget IRollWidget.Widget => widget;
@@ -141,7 +141,7 @@ namespace Tangerine.UI.Timeline.Components
 			Renderer.DrawRect(Vector2.Zero, widget.Size, row.Selected ? Colors.SelectedBackground : Colors.WhiteBackground);
 		}
 
-		IEnumerator<object> HandleDobleClickTask()
+		IEnumerator<object> HandleDoubleClickTask()
 		{
 			while (true) {
 				if (nodeIcon.Input.WasKeyPressed(Key.Mouse0DoubleClick)) {
