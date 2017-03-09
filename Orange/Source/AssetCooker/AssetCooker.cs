@@ -782,7 +782,7 @@ namespace Orange
 			var bundle = new UnpackedAssetBundle(The.Workspace.AssetsDirectory);
 			SyncUpdated(".fbx", ".model", bundle, (srcPath, dstPath) => {
 				var model = new ModelImporter(srcPath, The.Workspace.ActivePlatform).Model;
-				Serialization.WriteObjectToBundle(bundle, dstPath, model, Serialization.Format.JSON, Path.GetExtension(srcPath));
+				Serialization.WriteObjectToBundle(bundle, dstPath, model, Serialization.Format.Binary, Path.GetExtension(srcPath));
 				return true;
 			});
 		}
