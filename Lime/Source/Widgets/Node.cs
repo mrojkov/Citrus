@@ -308,7 +308,7 @@ namespace Lime
 		public static int CreatedCount = 0;
 		public static int FinalizedCount = 0;
 
-		protected bool IsAwoken;
+		public bool IsAwoken;
 		public Action<Node> Awoken;
 
 		public Node()
