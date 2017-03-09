@@ -18,7 +18,7 @@ namespace EmptyProject.Dialogs
 
 		protected override void Update(float delta)
 		{
-			if (Root.Input.WasKeyPressed(Key.Escape)) {
+			if (Input.WasKeyPressed(Key.Escape)) {
 				Lime.Application.Exit();
 			}
 		}
