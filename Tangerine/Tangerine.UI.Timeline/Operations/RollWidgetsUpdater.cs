@@ -37,7 +37,11 @@ namespace Tangerine.UI.Timeline
 			var content = timeline.Roll.ContentWidget;
 			content.Nodes.Clear();
 			foreach (var row in Document.Current.Rows) {
-				content.AddNode(row.Components.Get<Components.IRollWidget>().Widget);
+				var widget = row.Components.Get<Components.IRollWidget>().Widget;
+				if (!widget.IsAwoken) {
+					widget.Update(0);
+				}
+				content.AddNode(widget);
 			}
 		}
 

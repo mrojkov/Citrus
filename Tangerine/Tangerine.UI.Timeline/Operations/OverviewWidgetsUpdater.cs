@@ -29,7 +29,11 @@ namespace Tangerine.UI.Timeline
 			var content = timeline.Overview.ContentWidget;
 			content.Nodes.Clear();
 			foreach (var row in Document.Current.Rows) {
-				content.AddNode(row.Components.Get<Components.IOverviewWidget>().Widget);
+				var widget = row.Components.Get<Components.IOverviewWidget>().Widget;
+				if (!widget.IsAwoken) {
+					widget.Update(0);
+				}
+				content.AddNode(widget);
 			}
 		}
 

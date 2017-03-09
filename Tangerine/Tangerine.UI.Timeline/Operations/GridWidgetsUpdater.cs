@@ -29,7 +29,11 @@ namespace Tangerine.UI.Timeline
 			var content = timeline.Grid.ContentWidget;
 			content.Nodes.Clear();
 			foreach (var row in Document.Current.Rows) {
-				content.AddNode(row.Components.Get<Components.IGridWidget>().Widget);
+				var widget = row.Components.Get<Components.IGridWidget>().Widget;
+				if (!widget.IsAwoken) {
+					widget.Update(0);
+				}
+				content.AddNode(widget);
 			}
 			// Layout widgets in order to have valid row positions and sizes, which are used for rows visibility determination.
 			Lime.LayoutManager.Instance.Layout();
