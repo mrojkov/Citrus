@@ -41,11 +41,11 @@
     <Folder Include="Resources\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ColorPickerPanel.cs" />
     <Compile Include="CommandHandler.cs" />
     <Compile Include="Commands.cs" />
     <Compile Include="Console.cs" />
     <Compile Include="Dialogs\AlertDialog.cs" />
-    <Compile Include="Dialogs\ColorPickerDialog.cs" />
     <Compile Include="IconPool.cs" />
     <Compile Include="NodeIconPool.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

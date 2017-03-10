@@ -411,12 +411,15 @@ namespace Tangerine.UI.Inspector
 					(colorBox = new ColorBoxButton(currentColor)),
 				}
 			});
-			colorBox.Clicked += () => {
-				var dlg = new ColorPickerDialog(currentColor.GetValue());
-				if (dlg.Show()) {
-					Core.Operations.SetAnimableProperty.Perform(context.Objects, context.PropertyName, dlg.Color);
-				}
-			};
+			var panel = new ColorPickerPanel();
+			context.InspectorPane.AddNode(panel.RootWidget);
+			panel.RootWidget.Visible = false;
+			panel.RootWidget.Padding.Right = 12;
+			panel.RootWidget.Tasks.Add(currentColor.Consume(v => panel.Color = v));
+			panel.Changed += () => Core.Operations.SetAnimableProperty.Perform(context.Objects, context.PropertyName, panel.Color);
+			panel.DragStarted += Document.Current.History.BeginTransaction;
+			panel.DragEnded += Document.Current.History.EndTransaction;
+			colorBox.Clicked += () => panel.RootWidget.Visible = !panel.RootWidget.Visible;
 			var currentColorString = currentColor.Select(i => i.ToString(Color4.StringPresentation.Dec));
 			OnKeyframeToggle += editor.SetFocus;
 			editor.Submitted += text => {
