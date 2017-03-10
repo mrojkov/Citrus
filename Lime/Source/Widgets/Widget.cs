@@ -944,7 +944,7 @@ namespace Lime
 		public int GetEffectiveLayer()
 		{
 			for (Node node = this; node != null; node = node.Parent) {
-				if (node.AsWidget.Layer != 0) {
+				if (node.AsWidget != null && node.AsWidget.Layer != 0) {
 					return node.AsWidget.Layer;
 				}
 			}
