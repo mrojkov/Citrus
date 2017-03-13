@@ -953,7 +953,7 @@ namespace Lime
 		/// Returns path to scene if it exists in bundle. Returns null otherwise.
 		/// Throws exception if there is more than one scene file with such path.
 		/// </summary>
-		private static string ResolveScenePath(string path)
+		public static string ResolveScenePath(string path)
 		{
 			var candidates = sceneExtensions.Select(ext => Path.ChangeExtension(path, ext)).Where(AssetBundle.Instance.FileExists);
 			if (candidates.Count() > 1) {
