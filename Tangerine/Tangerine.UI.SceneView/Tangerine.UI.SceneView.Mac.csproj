@@ -74,7 +74,7 @@
     <Compile Include="Presenters\PointObjectsSelectionPresenter.cs" />
     <Compile Include="Presenters\SplinePointPresenter.cs" />
     <Compile Include="Processors\DragSplineTangentsProcessor.cs" />
-    <Compile Include="Processors\3D\RotateNode3DProcessor.cs" />
+    <Compile Include="Presenters\TranslationGizmoPresenter.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Mac.csproj">

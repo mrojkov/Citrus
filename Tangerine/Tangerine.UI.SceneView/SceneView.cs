@@ -106,6 +106,7 @@ namespace Tangerine.UI.SceneView
 			new ContainerAreaPresenter(this);
 			new SelectedWidgetsPresenter(this);
 			new PointObjectsSelectionPresenter(this);
+			new TranslationGizmoPresenter(this);
 		}
 
 		public void CreateNode(Type nodeType)

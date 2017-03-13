@@ -209,7 +209,7 @@ namespace Lime
 			items.Clear();
 		}
 
-		private Matrix44 TransformProjection(Matrix44 orthoProjection)
+		public Matrix44 TransformProjection(Matrix44 orthoProjection)
 		{
 			orthoProjection.M33 = 1; // Discard Z normalization, since it comes from the camera projection matrix
 			orthoProjection.M43 = 0;
