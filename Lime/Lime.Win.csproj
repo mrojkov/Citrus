@@ -378,6 +378,7 @@
     <Compile Include="Source\Widgets\TabBar.cs" />
     <Compile Include="Source\Types\Quadrangle.cs" />
     <Compile Include="Source\Types\Transform2.cs" />
+    <Compile Include="Source\Graphics\MeshUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\3rdParty\OpenAL\OpenAL32.dll">
