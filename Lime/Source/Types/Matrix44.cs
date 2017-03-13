@@ -526,6 +526,8 @@ namespace Lime
 			result.M44 = 1f;
 		}
 
+		public static Matrix44 CreateScale(float x, float y, float z) => CreateScale(new Vector3(x, y, z));
+
 		public static Matrix44 CreateScale(Vector3 scales)
 		{
 			Matrix44 result;
@@ -547,6 +549,8 @@ namespace Lime
 			result.M44 = 1;
 			return result;
 		}
+
+		public static Matrix44 CreateTranslation(float x, float y, float z) => CreateTranslation(new Vector3(x, y, z));
 
 		public static Matrix44 CreateTranslation(Vector3 position)
 		{
