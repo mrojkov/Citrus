@@ -19,7 +19,7 @@ namespace Tangerine.UI.SceneView
 				return;
 			}
 			var vp = GetCurrentViewport3D();
-			if (vp == null) {
+			if (vp == null || vp.Camera == null) {
 				return;
 			}
 			canvas.PrepareRendererState();
@@ -87,7 +87,8 @@ namespace Tangerine.UI.SceneView
 			const float poleRadius = 0.01f;
 			var tip = Mesh.CreateCone(tipHeight, tipRadius, 20, color);
 			TransformMesh(tip, Matrix44.CreateTranslation(0, 1 - tipHeight, 0));
-			var pole = Mesh.CreateCylinder(1 - tipHeight, poleRadius, 6, color);
+			var pole = Mesh.CreateCylinder(1 - tipHeight - 0.1f, poleRadius, 6, color);
+			TransformMesh(pole, Matrix44.CreateTranslation(0, 0.1f, 0));
 			var arrow = Mesh.Combine<Mesh.PositionColor>(tip, pole);
 			TransformMesh(arrow, matrix);
 			return arrow;
