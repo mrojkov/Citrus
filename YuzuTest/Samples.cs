@@ -605,9 +605,18 @@ namespace YuzuTest
 	}
 
 	[YuzuCompact]
-	public class SampleSurrogateColorIfDerived: SampleSurrogateColorIf
+	public class SampleSurrogateColorIfDerived : SampleSurrogateColorIf
 	{
 		public override bool SurrogateIf() { return true; }
+		[YuzuFromSurrogate]
+		public static SampleSurrogateColorIfDerived FromSurrogate(int x)
+		{
+			return new SampleSurrogateColorIfDerived {
+				R = x / 10000,
+				G = (x % 10000) / 100,
+				B = x % 100,
+			};
+		}
 	}
 
 	public class SampleSurrogateClass

@@ -1429,6 +1429,11 @@ namespace YuzuTest.Json
 
 			SampleSurrogateColorIf.S = true;
 			Assert.AreEqual("778899", js.ToString(v2));
+			// RequireInt fails at EOF, so add trailing space.
+			var w2 = jd.FromString<SampleSurrogateColorIfDerived>("778899 ");
+			Assert.AreEqual(v2.R, w2.R);
+			Assert.AreEqual(v2.G, w2.G);
+			Assert.AreEqual(v2.B, w2.B);
 		}
 
 		[TestMethod]
