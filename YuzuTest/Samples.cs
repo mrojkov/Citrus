@@ -631,6 +631,21 @@ namespace YuzuTest
 		}
 	}
 
+	public class SampleCompactSurrogate
+	{
+		public int X, Y;
+		[YuzuToSurrogate]
+		public static SamplePoint ToSurrogate(SampleCompactSurrogate obj)
+		{
+			return new SamplePoint { X = obj.X, Y = obj.Y };
+		}
+		[YuzuFromSurrogate]
+		public static SampleCompactSurrogate FromSurrogate(SamplePoint obj)
+		{
+			return new SampleCompactSurrogate { X = obj.X, Y = obj.Y };
+		}
+	}
+
 	public class Bad1
 	{
 		[YuzuRequired]

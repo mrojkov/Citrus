@@ -1450,6 +1450,14 @@ namespace YuzuTest.Json
 			Assert.AreEqual("[" + result1 + "]", js.ToString(new List<object> { v1 }));
 			var w1 = jd.FromString<SampleSurrogateClass>(result1);
 			Assert.IsTrue(w1.FB);
+
+			var v2 = new SampleCompactSurrogate { X = 24, Y = 25 };
+			var result2 = js.ToString(v2);
+			Assert.AreEqual("[24,25]", result2);
+			Assert.AreEqual("[" + result2 + "]", js.ToString(new List<object> { v2 }));
+			var w2 = jd.FromString<SampleCompactSurrogate>(result2);
+			Assert.AreEqual(v2.X, w2.X);
+			Assert.AreEqual(v2.Y, w2.Y);
 		}
 
 		[TestMethod]

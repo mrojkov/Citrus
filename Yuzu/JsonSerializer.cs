@@ -510,9 +510,9 @@ namespace Yuzu.Json
 			if (!sgMeta.IsCompact || JsonOptions.IgnoreCompact || meta.IsCompact && sg.FuncIf != null)
 				return obj => WriteObject(obj, meta);
 			if (IsOneline(sgMeta))
-				return obj => WriteObjectCompactOneline(obj, meta);
+				return obj => WriteObjectCompactOneline(obj, sgMeta);
 			else
-				return obj => WriteObjectCompact(obj, meta);
+				return obj => WriteObjectCompact(obj, sgMeta);
 		}
 
 		private Action<object> MakeWriteFunc(Type t)

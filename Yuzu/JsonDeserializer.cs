@@ -740,8 +740,12 @@ namespace Yuzu.Json
 		protected virtual object ReadFieldsCompact(object obj)
 		{
 			var meta = Meta.Get(obj.GetType(), Options);
-			if (!meta.IsCompact)
-				throw Error("Attempt to read non-compact type '{0}' from compact format", obj.GetType().Name);
+			if (!meta.IsCompact) {
+				if (meta.Surrogate.FuncFrom == null)
+					throw Error("Attempt to read non-compact type '{0}' from compact format", obj.GetType().Name);
+				return meta.Surrogate.FuncFrom(
+					ReadFieldsCompact(Activator.CreateInstance(meta.Surrogate.SurrogateType)));
+			}
 			bool isFirst = true;
 			objStack.Push(obj);
 			try {
@@ -770,7 +774,9 @@ namespace Yuzu.Json
 		{
 			var sg = Meta.Get(typeof(T), Options).Surrogate;
 			if (sg.FuncFrom == null)
-				throw Error("Expected type '{0}', but got '{1}'", typeof(T).Name, actualType.Name);
+				throw Error(
+					"Expected type '{0}', but got '{1}'",
+					typeof(T).Name, actualType == null ? "number" : actualType.Name);
 			if (actualType != null && !sg.SurrogateType.IsAssignableFrom(actualType))
 				throw Error(
 					"Expected type '{0}' or '{1}', but got '{2}'",
