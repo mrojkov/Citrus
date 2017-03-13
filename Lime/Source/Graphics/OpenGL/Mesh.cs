@@ -12,7 +12,7 @@ using Yuzu;
 
 namespace Lime
 {
-	public class Mesh : IMesh, IDisposable, IGLObject
+	public partial class Mesh : IMesh, IDisposable, IGLObject
 	{
 		private bool disposed;
 		private uint vaoHandle;
