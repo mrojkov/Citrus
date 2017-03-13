@@ -26,11 +26,11 @@ namespace Tangerine.UI.SceneView
 				if (sv.InputArea.IsMouseOver()) {
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 				}
+				var container = Document.Current.Container as Widget;
 				ConsumeCreateWidgetRequest(ref nodeType);
-				if (sv.Input.WasMousePressed()) {
+				if (sv.Input.WasMousePressed() && container != null) {
 					sv.Input.CaptureMouse();
 					sv.Input.ConsumeKey(Key.Mouse0);
-					var container = (Widget)Document.Current.Container;
 					var t = sv.Scene.CalcTransitionToSpaceOf(container);
 					var rect = new Rectangle(sv.MousePosition * t, sv.MousePosition * t);
 					var presenter = new DelegatePresenter<Widget>(w => {
