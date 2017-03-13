@@ -206,6 +206,8 @@
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Viewport3D.png" />
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Camera3D.png" />
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Model3D.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.WidgetAdapter3D.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Node3D.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PreferencesDialog\" />

@@ -263,7 +263,6 @@ namespace Tangerine
 				typeof(ParticleModifier),
 				typeof(EmitterShapePoint),
 				typeof(ParticlesMagnet),
-				typeof(ParticleModifier),
 				typeof(SimpleText),
 				typeof(RichText),
 				typeof(TextStyle),
@@ -275,6 +274,8 @@ namespace Tangerine
 				typeof(Viewport3D),
 				typeof(Camera3D),
 				typeof(Model3D),
+				typeof(Node3D),
+				typeof(WidgetAdapter3D),
 			};
 			foreach (var t in nodeTypes) {
 				var cmd = new Command(t.Name) { Icon = NodeIconPool.GetTexture(t) };

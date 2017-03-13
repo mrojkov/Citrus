@@ -1,6 +1,7 @@
 ﻿
 namespace Lime
 {
+	[TangerineClass(allowChildren: true, builderMethodName: "BuildForTangerine")]
 	public class WidgetAdapter3D : Node3D
 	{
 		private RenderChain renderChain = new RenderChain();
@@ -25,6 +26,16 @@ namespace Lime
 		public WidgetAdapter3D()
 		{
 			Opaque = false;
+		}
+
+		private void BuildForTangerine()
+		{
+			var root = new Frame {
+				Id = "Root",
+				Pivot = Vector2.Half,
+				Size = new Vector2(400, 300)
+			};
+			Nodes.Add(root);
 		}
 
 		public override float CalcDistanceToCamera(Camera3D camera)
