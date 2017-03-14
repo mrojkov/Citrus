@@ -21,6 +21,9 @@ namespace Tangerine.UI.Timeline
 				}
 				var initialMousePosition = input.MousePosition;
 				var row = RowUnderMouse(initialMousePosition);
+				if (row == null) {
+					continue;
+				}
 				if (input.IsKeyPressed(Key.Shift)) {
 					if (Document.Current.SelectedRows().Any()) {
 						var firstRow = Document.Current.SelectedRows().FirstOrDefault();
@@ -127,6 +130,9 @@ namespace Tangerine.UI.Timeline
 		static Row RowUnderMouse(Vector2 position)
 		{
 			var doc = Document.Current;
+			if (doc.Rows.Count == 0) {
+				return null;
+			}
 			position -= Timeline.Instance.Roll.ContentWidget.GlobalPosition;
 			if (position.Y < 0) {
 				return doc.Rows[0];
