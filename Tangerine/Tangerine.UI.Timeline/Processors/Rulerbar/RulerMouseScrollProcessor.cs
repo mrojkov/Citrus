@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
@@ -18,6 +19,7 @@ namespace Tangerine.UI.Timeline
 					input.CaptureMouse();
 					try {
 						int initialCol = CalcColumn(input.LocalMousePosition.X);
+						var marker = Document.Current.Container.Markers.FirstOrDefault(m => m.Frame == initialCol);
 						while (input.IsMousePressed()) {
 							var cw = TimelineMetrics.ColWidth;
 							var mp = input.LocalMousePosition.X;
@@ -27,7 +29,11 @@ namespace Tangerine.UI.Timeline
 								timeline.ScrollPos.X -= cw;
 							}
 							if (input.IsKeyPressed(Key.Control) && !input.WasMousePressed()) {
-								ShiftTimeline(CalcColumn(mp));
+								if (input.IsKeyPressed(Key.Shift)) {
+									ShiftTimeline(CalcColumn(mp));
+								} else if (marker != null) {
+									DragMarker(marker, CalcColumn(mp));
+								}
 							}
 							Operations.SetCurrentColumn.Perform(CalcColumn(mp));
 							timeline.Ruler.MeasuredFrameDistance = timeline.CurrentColumn - initialCol;
@@ -53,6 +59,18 @@ namespace Tangerine.UI.Timeline
 					Core.Operations.TimelineHorizontalShift.Perform(destColumn, -1);
 				}
 			}
+		}
+
+		void DragMarker(Marker marker, int destColumn)
+		{
+			if (Document.Current.Container.Markers.Any(m => m.Frame == destColumn)) {
+				// The place is taken by another marker.
+				return;
+			}
+			// Delete and add marker again, because we want to maintain the markers order.
+			Core.Operations.DeleteMarker.Perform(Document.Current.Container.Markers, marker);
+			Core.Operations.SetProperty.Perform(marker, "Frame", destColumn);
+			Core.Operations.SetMarker.Perform(Document.Current.Container.Markers, marker);
 		}
 
 		public static int CalcColumn(float mouseX)
