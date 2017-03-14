@@ -224,6 +224,7 @@ namespace Lime
 		private float particlesToSpawn;
 		public List<Particle> particles = new List<Particle>();
 		private static readonly List<Particle> particlePool = new List<Particle>();
+		private static readonly object particlePoolSync = new object();
 		private List<ParticleModifier> modifiers = new List<ParticleModifier>();
 		private List<EmitterShapePoint> emitterShapePoints = new List<EmitterShapePoint>();
 		private List<Vector2> cachedShapePoints = new List<Vector2>();
@@ -301,15 +302,17 @@ namespace Lime
 
 		private Particle AllocParticle()
 		{
-			Particle result;
-			if (particlePool.Count == 0) {
-				result = new Particle();
-			} else {
-				result = particlePool.Last();
-				particlePool.RemoveAt(particlePool.Count - 1);
+			lock (particlePoolSync) {
+				Particle result;
+				if (particlePool.Count == 0) {
+					result = new Particle();
+				} else {
+					result = particlePool.Last();
+					particlePool.RemoveAt(particlePool.Count - 1);
+				}
+				particles.Add(result);
+				return result;
 			}
-			particles.Add(result);
-			return result;
 		}
 
 		/// <summary>
@@ -318,10 +321,12 @@ namespace Lime
 		/// <param name="particleCount"></param>
 		private void FreeLastParticles(int particleCount)
 		{
-			while (particleCount > 0) {
-				particlePool.Add(particles.Last());
-				particles.RemoveAt(particles.Count - 1);
-				particleCount--;
+			lock (particlePoolSync) {
+				while (particleCount > 0) {
+					particlePool.Add(particles.Last());
+					particles.RemoveAt(particles.Count - 1);
+					particleCount--;
+				}
 			}
 		}
 
