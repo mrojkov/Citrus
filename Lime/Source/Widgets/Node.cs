@@ -79,7 +79,11 @@ namespace Lime
 		/// <summary>
 		/// Is invoked after default animation has been stopped (e.g. hit "Stop" marker).
 		/// Note: DefaultAnimation.Stopped will be set to null after invocation.
+		/// Warning: Please refrain from using this function. Invoking RunAnimation sets AnimationStopped
+		/// to null thus making it impossible to add multiple event handlers. So you have to be careful and
+		/// first invoke RunAnimation and add AnimationStopped handler only after.
 		/// </summary>
+		[System.Obsolete("Use tasks")]
 		public event Action AnimationStopped
 		{
 			add { DefaultAnimation.Stopped += value; }
