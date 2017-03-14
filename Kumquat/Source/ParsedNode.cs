@@ -60,7 +60,7 @@ namespace Kumquat
 
 		public string GenerateIt()
 		{
-			var result = string.Format("public Lime.{0} It => (Lime.{0})Widget;", Type);
+			var result = string.Format("public Lime.{0} It => (Lime.{0})Node;", Type);
 			return result;
 		}
 
@@ -74,8 +74,8 @@ namespace Kumquat
 				}
 				result += string.Format("public {1} RunAnimation{0}() \n", safeMarker, customType ?? Type);
 				result += "{ \n";
-				result += string.Format("Widget.RunAnimation(\"{0}\");\n", marker);
-				result += string.Format("return ({0})Widget;\n", customType ?? Type);
+				result += string.Format("Node.RunAnimation(\"{0}\");\n", marker);
+				result += string.Format("return ({0})Node;\n", customType ?? Type);
 				result += "} \n";
 			}
 			return result;

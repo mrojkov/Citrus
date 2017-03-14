@@ -9,35 +9,35 @@ namespace <%NAMESPACE%>
 	{
 		public static readonly Frame FrameCache = new Frame(<%SCENE_PATH%>);
 
-		public <%CLASS_NAME%>() : base(FrameCache.Clone<Widget>()) { }
+		public <%CLASS_NAME%>() : base(FrameCache.Clone<Node>()) { }
 
-		public <%CLASS_NAME%>(Widget widget) : base(widget) { }
+		public <%CLASS_NAME%>(Node node) : base(node) { }
 
 		public new <%CLASS_NAME%> Clone()
 		{
-			return new <%CLASS_NAME%>(It.Clone<Widget>());
+			return new <%CLASS_NAME%>(It.Clone<Node>());
 		}
 	}
 
-	public class <%CLASS_NAME%><T> : ParsedWidget where T : Widget
+	public class <%CLASS_NAME%><T> : ParsedNode where T : Node
 	{
-		public T It => (T)Widget;
+		public T It => (T)Node;
 		<%COMMON_BASE%>
 
 		<%INNER_CLASSES%>
 		<%FIELDS%>
 
-		public <%CLASS_NAME%>() : this(<%CLASS_NAME%>.FrameCache.Clone<Widget>()) { }
+		public <%CLASS_NAME%>() : this(<%CLASS_NAME%>.FrameCache.Clone<Node>()) { }
 
-		public <%CLASS_NAME%>(Widget widget)
+		public <%CLASS_NAME%>(Node node)
 		{
-			Widget = widget;
+			Node = node;
 			<%INIT_FIELDS%>
 		}
 
 		public <%CLASS_NAME%><T> Clone()
 		{
-			return new <%CLASS_NAME%><T>(It.Clone<Widget>());
+			return new <%CLASS_NAME%><T>(It.Clone<Node>());
 		}
 
 		<%ANIMATIONS%>

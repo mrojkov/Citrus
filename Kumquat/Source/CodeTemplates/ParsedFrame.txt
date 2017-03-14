@@ -1,4 +1,4 @@
-﻿public class <%CLASS_NAME%> : ParsedWidget
+﻿public class <%CLASS_NAME%> : ParsedNode
 {
 	<%IT%>
 	<%COMMON_BASE%>
@@ -6,15 +6,15 @@
 	<%INNER_CLASSES%>
 	<%FIELDS%>
 
-	public <%CLASS_NAME%>(Widget widget)
+	public <%CLASS_NAME%>(Node node)
 	{
-		Widget = widget;
+		Node = node;
 		<%INIT_FIELDS%>
 	}
 
 	public <%CLASS_NAME%> Clone()
 	{
-		return new <%CLASS_NAME%>(It.Clone<Widget>());
+		return new <%CLASS_NAME%>(It.Clone<Node>());
 	}
 
 	<%ANIMATIONS%>

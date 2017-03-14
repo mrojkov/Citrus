@@ -64,11 +64,11 @@ namespace Kumquat
 		{
 			var result = "";
 			if (!BaseClassName.IsNullOrWhiteSpace()) {
-				result += $"{BaseClassName} = new Common.{BaseClassName}(Widget);\n";
+				result += $"{BaseClassName} = new Common.{BaseClassName}(Node);\n";
 			}
 			foreach (var node in ParsedNodes) {
 				result += string.Format(
-					"@{2} = new {0}(Widget[\"{1}\"]);",
+					"@{2} = new {0}(Node.Find<Node>(\"{1}\"));",
 					scenesCodeCooker.GetFullTypeOf(node),
 					node.Id,
 					node.FieldName
@@ -77,7 +77,7 @@ namespace Kumquat
 			}
 			foreach (var pft in InnerClasses) {
 				result += string.Format(
-					"@{2} = new {0}(Widget[\"{1}\"]);",
+					"@{2} = new {0}(Node.Find<Node>(\"{1}\"));",
 					scenesCodeCooker.GetFullTypeOf(pft),
 					pft.ParsedNode.Id,
 					pft.FieldName
