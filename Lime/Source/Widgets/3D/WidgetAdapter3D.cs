@@ -33,7 +33,7 @@ namespace Lime
 			var root = new Frame {
 				Id = "Root",
 				Pivot = Vector2.Half,
-				Size = new Vector2(400, 300)
+				Size = Vector2.One
 			};
 			Nodes.Add(root);
 		}
