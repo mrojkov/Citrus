@@ -17,6 +17,7 @@ namespace Tangerine.UI.Timeline
 			while (true) {
 				if (input.WasMousePressed()) {
 					input.CaptureMouse();
+					Document.Current.History.BeginTransaction();
 					try {
 						int initialCol = CalcColumn(input.LocalMousePosition.X);
 						var marker = Document.Current.Container.Markers.FirstOrDefault(m => m.Frame == initialCol);
@@ -43,6 +44,7 @@ namespace Tangerine.UI.Timeline
 					} finally {
 						timeline.Ruler.MeasuredFrameDistance = 0;
 						input.ReleaseMouse();
+						Document.Current.History.EndTransaction();
 					}
 				}
 				yield return null;
