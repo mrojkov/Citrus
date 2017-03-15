@@ -76,7 +76,7 @@ namespace Tangerine.UI.Inspector
 							}
 						}
 					};
-					label.CompoundPresenter.Add(new WidgetFlatFillPresenter(InspectorColors.CategoryLabelBackground));
+					label.CompoundPresenter.Add(new WidgetFlatFillPresenter(ColorTheme.Current.Inspector.CategoryLabelBackground));
 					Inspector.ContentWidget.AddNode(label);
 				}
 				var context = new PropertyEditorContext(Inspector.ContentWidget, objects, type, property.Name);

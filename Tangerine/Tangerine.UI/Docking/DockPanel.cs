@@ -44,8 +44,8 @@ namespace Tangerine.UI
 			Title = title ?? id;
 			TitleWidget.CompoundPresenter.Add(new DelegatePresenter<Widget>(w => {
 				w.PrepareRendererState();
-				Renderer.DrawRect(Vector2.Zero, w.Size, DockingColors.PanelTitleBackground);
-				Renderer.DrawLine(0, w.Height - 0.5f, w.Width, w.Height - 0.5f, DockingColors.PanelTitleSeparator);
+				Renderer.DrawRect(Vector2.Zero, w.Size, ColorTheme.Current.Docking.PanelTitleBackground);
+				Renderer.DrawLine(0, w.Height - 0.5f, w.Width, w.Height - 0.5f, ColorTheme.Current.Docking.PanelTitleSeparator);
 			}));
 			ContentWidget = new Frame { Id = "PanelContent", ClipChildren = ClipMethod.ScissorTest, Layout = new StackLayout() };
 			RootWidget = new Widget {
@@ -126,7 +126,7 @@ namespace Tangerine.UI
 				mainWidget.PostPresenter = new DelegatePresenter<Widget>(widget => {
 					if (dockSite != DockSite.None) {
 						widget.PrepareRendererState();
-						Renderer.DrawRectOutline(dockSiteRect.A + Vector2.One, dockSiteRect.B - Vector2.One, DockingColors.DragRectagleOutline, 2);
+						Renderer.DrawRectOutline(dockSiteRect.A + Vector2.One, dockSiteRect.B - Vector2.One, ColorTheme.Current.Docking.DragRectagleOutline, 2);
 					}
 				});
 				var input = panel.TitleWidget.Input;

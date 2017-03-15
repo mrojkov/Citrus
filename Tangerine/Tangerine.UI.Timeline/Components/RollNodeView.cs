@@ -82,7 +82,7 @@ namespace Tangerine.UI.Timeline.Components
 			} else {
 				label.Text = node.Id;
 			}
-			label.Color = IsGrayedLabel(node) ? DesktopTheme.Colors.BlackText : TimelineRollColors.GrayedLabel;
+			label.Color = IsGrayedLabel(node) ? DesktopTheme.Colors.BlackText : ColorTheme.Current.TimelineRoll.GrayedLabel;
 		}
 		
 		ToolbarButton CreateEnterButton()
@@ -138,7 +138,9 @@ namespace Tangerine.UI.Timeline.Components
 		void RenderBackground(Widget widget)
 		{
 			widget.PrepareRendererState();
-			Renderer.DrawRect(Vector2.Zero, widget.Size, row.Selected ? Colors.SelectedBackground : Colors.WhiteBackground);
+			Renderer.DrawRect(
+				Vector2.Zero, widget.Size,
+				row.Selected ? ColorTheme.Current.Basic.SelectedBackground : ColorTheme.Current.Basic.WhiteBackground);
 		}
 
 		IEnumerator<object> HandleDoubleClickTask()

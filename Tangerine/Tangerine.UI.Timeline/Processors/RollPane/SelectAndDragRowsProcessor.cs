@@ -106,7 +106,7 @@ namespace Tangerine.UI.Timeline
 			Timeline.Instance.Roll.ContentWidget.PrepareRendererState();
 			Renderer.DrawRect(
 				new Vector2(TimelineMetrics.RollIndentation * CalcIndentation(pr), y - 1), 
-				new Vector2(Timeline.Instance.Roll.ContentWidget.Width, y + 1), Colors.DragCursor);
+				new Vector2(Timeline.Instance.Roll.ContentWidget.Width, y + 1), ColorTheme.Current.TimelineRoll.DragCursor);
 		}
 
 		static int CalcIndentation(Row row)

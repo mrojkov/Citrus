@@ -40,7 +40,7 @@ namespace Tangerine.UI.Timeline.Components
 			for (int i = 0; i < maxCol; i++) {
 				keyStrips[i] = BitSet32.Empty;
 			}
-			Renderer.DrawRect(Vector2.Zero, widget.ContentSize, Colors.WhiteBackground);
+			Renderer.DrawRect(Vector2.Zero, widget.ContentSize, ColorTheme.Current.Basic.WhiteBackground);
 			foreach (var a in node.Animators) {
 				for (int j = 0; j < a.ReadonlyKeys.Count; j++) {
 					var key = a.ReadonlyKeys[j];

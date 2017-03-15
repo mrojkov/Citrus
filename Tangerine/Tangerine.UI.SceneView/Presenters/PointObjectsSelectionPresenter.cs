@@ -30,19 +30,19 @@ namespace Tangerine.UI.SceneView
 			Rectangle aabb;
 			if (Utils.CalcAABB(selectedPointObjects, canvas, out aabb)) {
 				aabb = aabb.ExpandedBy(new Thickness(10));
-				Renderer.DrawRectOutline(aabb.A, aabb.B, SceneViewColors.Selection);
+				Renderer.DrawRectOutline(aabb.A, aabb.B, ColorTheme.Current.SceneView.Selection);
 			}
 			DrawPivot(aabb.Center);
 		}
 
 		void DrawPointObject(Vector2 position)
 		{
-			Renderer.DrawRound(position, 3, 10, SceneViewColors.Selection);
+			Renderer.DrawRound(position, 3, 10, ColorTheme.Current.SceneView.Selection);
 		}
 
 		void DrawPivot(Vector2 position)
 		{
-			Renderer.DrawRound(position, 3, 10, SceneViewColors.Selection);
+			Renderer.DrawRound(position, 3, 10, ColorTheme.Current.SceneView.Selection);
 		}
 	}
 }

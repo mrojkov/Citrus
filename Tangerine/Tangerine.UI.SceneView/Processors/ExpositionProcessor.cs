@@ -175,22 +175,22 @@ namespace Tangerine.UI.SceneView
 					label = new SimpleText { 
 						Visible = showLabel,
 						Position = new Vector2(3, 2),
-						Color = SceneViewColors.Label,
+						Color = ColorTheme.Current.SceneView.Label,
 						Text = (exposedWidget.Id ?? ""),
 						OverflowMode = TextOverflowMode.Ignore
 					};
 					label.FontHeight *= 0.75f;
 					frame.AddNode(label);
 					frame.AddNode(exposedWidget);
-					borderPresenter = new WidgetBoundsPresenter(SceneViewColors.ExposedItemInactiveBorder, 1);
+					borderPresenter = new WidgetBoundsPresenter(ColorTheme.Current.SceneView.ExposedItemInactiveBorder, 1);
 					frame.CompoundPresenter.Push(borderPresenter);
 					frame.Tasks.AddLoop(() => {
 						borderPresenter.Color = Document.Current.SelectedNodes().Contains(widget) ?
-							SceneViewColors.ExposedItemSelectedBorder :
-							SceneViewColors.ExposedItemInactiveBorder;
+							ColorTheme.Current.SceneView.ExposedItemSelectedBorder :
+							ColorTheme.Current.SceneView.ExposedItemInactiveBorder;
 						if (clickArea.IsMouseOver()) {
 							if (Lime.Task.Current.LifeTime % 0.5f < 0.25f) {
-								borderPresenter.Color = SceneViewColors.ExposedItemActiveBorder;
+								borderPresenter.Color = ColorTheme.Current.SceneView.ExposedItemActiveBorder;
 							}
 							label.Visible = true;
 							if (clickArea.Input.WasMousePressed()) {

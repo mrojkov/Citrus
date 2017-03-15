@@ -46,7 +46,7 @@ namespace Tangerine.UI.Timeline
 		private void RenderBackground(Node node)
 		{
 			RootWidget.PrepareRendererState();
-			Renderer.DrawRect(Vector2.Zero, RootWidget.Size, TimelineGridColors.Lines);
+			Renderer.DrawRect(Vector2.Zero, RootWidget.Size, ColorTheme.Current.TimelineGrid.Lines);
 		}
 		
 		private void RenderGrid(Widget widget)
@@ -56,12 +56,16 @@ namespace Tangerine.UI.Timeline
 			float x = 0.5f;
 			for (int i = 0; i <= numCols; i++) {
 				if (timeline.IsColumnVisible(i)) {
-					Renderer.DrawLine(x, 0, x, ContentWidget.Height, TimelineGridColors.Lines);
+					Renderer.DrawLine(x, 0, x, ContentWidget.Height, ColorTheme.Current.TimelineGrid.Lines);
 				}
 				x += TimelineMetrics.ColWidth;
 			}
 			x = TimelineMetrics.ColWidth * (timeline.CurrentColumn + 0.5f);
-			Renderer.DrawLine(x, 0, x, ContentWidget.Height, Document.Current.Container.IsRunning ? TimelineRulerColors.RunningCursor : TimelineRulerColors.Cursor);
+			Renderer.DrawLine(
+				x, 0, x, ContentWidget.Height,
+				Document.Current.Container.IsRunning ? 
+					ColorTheme.Current.TimelineRuler.RunningCursor : 
+					ColorTheme.Current.TimelineRuler.Cursor);
 		}
 
 		void RenderSelection(Widget widget)
@@ -77,7 +81,7 @@ namespace Tangerine.UI.Timeline
 				foreach (var i in s.GetNonOverlappedSpans()) {
 					var a = CellToGridCoordinates(new IntVector2(i.A, row.Index) + offset);
 					var b = CellToGridCoordinates(new IntVector2(i.B, row.Index + 1) + offset);
-					Renderer.DrawRect(a, b, TimelineGridColors.Selection);
+					Renderer.DrawRect(a, b, ColorTheme.Current.TimelineGrid.Selection);
 				}
 			}
 		}

@@ -16,9 +16,9 @@ namespace Tangerine.UI.SceneView
 			var a = Vector2.CosSin(point.TangentAngle * Mathf.DegToRad) * 10 * point.TangentWeight;
 			var p1 = t * (point.TransformedPosition + a);
 			var p2 = t * (point.TransformedPosition - a);
-			Renderer.DrawLine(p1, p2, SceneViewColors.PointObject);
-			Renderer.DrawRound(p1, 3, 10, SceneViewColors.PointObject);
-			Renderer.DrawRound(p2, 3, 10, SceneViewColors.PointObject);
+			Renderer.DrawLine(p1, p2, ColorTheme.Current.SceneView.PointObject);
+			Renderer.DrawRound(p1, 3, 10, ColorTheme.Current.SceneView.PointObject);
+			Renderer.DrawRound(p2, 3, 10, ColorTheme.Current.SceneView.PointObject);
 		}
 	}
 }

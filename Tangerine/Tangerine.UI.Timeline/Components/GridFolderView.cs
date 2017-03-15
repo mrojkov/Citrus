@@ -29,7 +29,7 @@ namespace Tangerine.UI.Timeline.Components
 		void Render(Widget widget)
 		{
 			widget.PrepareRendererState();
-			Renderer.DrawRect(Vector2.Zero, widget.ContentSize, Colors.WhiteBackground);
+			Renderer.DrawRect(Vector2.Zero, widget.ContentSize, ColorTheme.Current.Basic.WhiteBackground);
 		}
 	}
 }

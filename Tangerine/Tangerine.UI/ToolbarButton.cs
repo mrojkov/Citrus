@@ -87,7 +87,7 @@ namespace Tangerine.UI
 				if (bgColor != Color4.Transparent) {
 					Renderer.DrawRect(Vector2.Zero, Size, bgColor);
 				}
-				var iconColor = Enabled ? GlobalColor : GlobalColor * ToolbarColors.ButtonDisabledColor;
+				var iconColor = Enabled ? GlobalColor : GlobalColor * ColorTheme.Current.Toolbar.ButtonDisabledColor;
 				Renderer.DrawSprite(Texture, iconColor, ContentPosition, ContentSize, Vector2.Zero, Vector2.One);
 				if (borderColor != Color4.Transparent) {
 					Renderer.DrawRectOutline(Vector2.Zero, Size, borderColor);
@@ -143,14 +143,14 @@ namespace Tangerine.UI
 		private void GetColors(out Color4 bgColor, out Color4 borderColor)
 		{
 			if (Highlightable && state == State.Highlight) {
-				bgColor = ToolbarColors.ButtonHighlightBackground;
-				borderColor = ToolbarColors.ButtonHighlightBorder;
+				bgColor = ColorTheme.Current.Toolbar.ButtonHighlightBackground;
+				borderColor = ColorTheme.Current.Toolbar.ButtonHighlightBorder;
 			} else if (Highlightable && state == State.Press) {
-				bgColor = ToolbarColors.ButtonPressBackground;
-				borderColor = ToolbarColors.ButtonPressBorder;
+				bgColor = ColorTheme.Current.Toolbar.ButtonPressBackground;
+				borderColor = ColorTheme.Current.Toolbar.ButtonPressBorder;
 			} else if (Checked) {
-				bgColor = ToolbarColors.ButtonCheckedBackground;
-				borderColor = ToolbarColors.ButtonCheckedBorder;
+				bgColor = ColorTheme.Current.Toolbar.ButtonCheckedBackground;
+				borderColor = ColorTheme.Current.Toolbar.ButtonCheckedBorder;
 			} else {
 				bgColor = Color4.Transparent;
 				borderColor = Color4.Transparent;

@@ -70,7 +70,7 @@ namespace Tangerine.UI.SceneView
 
 		static void DrawRectOutline(Vector2 a, Vector2 b, Matrix32 t)
 		{
-			var c = SceneViewColors.MouseSelection;
+			var c = ColorTheme.Current.SceneView.MouseSelection;
 			Renderer.DrawLine(a * t, new Vector2(b.X, a.Y) * t, c, 1, LineCap.Square);
 			Renderer.DrawLine(new Vector2(b.X, a.Y) * t, b * t, c, 1, LineCap.Square);
 			Renderer.DrawLine(b * t, new Vector2(a.X, b.Y) * t, c, 1, LineCap.Square);

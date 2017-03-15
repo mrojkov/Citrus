@@ -18,7 +18,7 @@ namespace Tangerine.UI.SceneView
 					var presenter = new DelegatePresenter<Widget>(w => {
 						w.PrepareRendererState();
 						var t = sv.Scene.CalcTransitionToSpaceOf(sv.Frame);
-						Renderer.DrawRectOutline(rect.A * t, rect.B * t, SceneViewColors.MouseSelection, 1);
+						Renderer.DrawRectOutline(rect.A * t, rect.B * t, ColorTheme.Current.SceneView.MouseSelection, 1);
 					});
 					sv.Frame.CompoundPostPresenter.Add(presenter);
 					input.CaptureMouse();

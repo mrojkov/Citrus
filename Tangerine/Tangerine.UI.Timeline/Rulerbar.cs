@@ -22,7 +22,7 @@ namespace Tangerine.UI.Timeline
 		void Render(Widget widget)
 		{
 			widget.PrepareRendererState();
-			Renderer.DrawRect(Vector2.Zero, RootWidget.Size, ToolbarColors.Background);
+			Renderer.DrawRect(Vector2.Zero, RootWidget.Size, ColorTheme.Current.Toolbar.Background);
 			Renderer.Transform1 *= Matrix32.Translation(-Timeline.Instance.ScrollPos.X, 0);
 			RenderCursor();
 			for (int i = 0; i < Timeline.Instance.ColumnCount; i++) {
@@ -34,7 +34,7 @@ namespace Tangerine.UI.Timeline
 						new Vector2(x, y), i.ToString(),
 						DesktopTheme.Metrics.TextHeight, 
 						DesktopTheme.Colors.BlackText);
-					Renderer.DrawLine(x, 0, x, RootWidget.Height, TimelineRulerColors.Notchings);
+					Renderer.DrawLine(x, 0, x, RootWidget.Height, ColorTheme.Current.TimelineRuler.Notchings);
 				}
 			}
 			foreach (var m in Document.Current.Container.Markers) {
@@ -45,7 +45,11 @@ namespace Tangerine.UI.Timeline
 		void RenderCursor()
 		{
 			var r = GetRectangle(Timeline.Instance.CurrentColumn);
-			Renderer.DrawRect(r.A, r.B, Document.Current.PreviewAnimation ? TimelineRulerColors.RunningCursor : TimelineRulerColors.Cursor);
+			Renderer.DrawRect(
+				r.A, r.B,
+				Document.Current.PreviewAnimation ? 
+					ColorTheme.Current.TimelineRuler.RunningCursor :
+					ColorTheme.Current.TimelineRuler.Cursor);
 		}
 
 		void RenderMarker(Marker marker)
@@ -67,13 +71,13 @@ namespace Tangerine.UI.Timeline
 		{
 			switch (marker.Action) {
 				case MarkerAction.Jump:
-					return TimelineRulerColors.JumpMarker;
+					return ColorTheme.Current.TimelineRuler.JumpMarker;
 				case MarkerAction.Play:
-					return TimelineRulerColors.PlayMarker;
+					return ColorTheme.Current.TimelineRuler.PlayMarker;
 				case MarkerAction.Stop:
-					return TimelineRulerColors.StopMarker;
+					return ColorTheme.Current.TimelineRuler.StopMarker;
 				default:
-					return TimelineRulerColors.UnknownMarker;
+					return ColorTheme.Current.TimelineRuler.UnknownMarker;
 			}
 		}
 

@@ -18,7 +18,7 @@ namespace Tangerine.UI.Inspector
 			set
 			{
 				@checked = value;
-				image.Color = value ? KeyColor : Colors.WhiteBackground;
+				image.Color = value ? KeyColor : ColorTheme.Current.Basic.WhiteBackground;
 			}
 		}
 
@@ -28,7 +28,7 @@ namespace Tangerine.UI.Inspector
 			Size = MinMaxSize = new Vector2(16, 16);
 			image = new Image { Size = Size, Shader = ShaderId.Silhuette, Texture = new SerializableTexture() };
 			Nodes.Add(image);
-			image.PostPresenter = new WidgetBoundsPresenter(InspectorColors.BorderAroundKeyframeColorbox);
+			image.PostPresenter = new WidgetBoundsPresenter(ColorTheme.Current.Inspector.BorderAroundKeyframeColorbox);
 		}
 	}	
 

@@ -36,7 +36,7 @@ namespace Tangerine.UI.Timeline.Components
 		{
 			var maxCol = Timeline.Instance.ColumnCount;
 			widget.PrepareRendererState();
-			Renderer.DrawRect(Vector2.Zero, widget.ContentSize, TimelineGridColors.PropertyRowBackground);
+			Renderer.DrawRect(Vector2.Zero, widget.ContentSize, ColorTheme.Current.TimelineGrid.PropertyRowBackground);
 		}
 	}
 }

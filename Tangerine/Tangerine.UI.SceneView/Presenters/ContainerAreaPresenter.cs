@@ -16,12 +16,12 @@ namespace Tangerine.UI.SceneView
 					if (Core.Document.Current.PreviewAnimation) {
 						Renderer.DrawRect(new Vector2(-inf, -inf), new Vector2(inf, inf), Color4.Black);
 					} else {
-						var c = SceneViewColors.ContainerOuterSpace;
+						var c = ColorTheme.Current.SceneView.ContainerOuterSpace;
 						Renderer.DrawRect(new Vector2(-inf, -inf), new Vector2(inf, 0), c);
 						Renderer.DrawRect(new Vector2(-inf, ctr.Height), new Vector2(inf, inf), c);
 						Renderer.DrawRect(new Vector2(-inf, 0), new Vector2(0, ctr.Height), c);
 						Renderer.DrawRect(new Vector2(ctr.Width, 0), new Vector2(inf, ctr.Height), c);
-						Renderer.DrawRect(Vector2.Zero, ctr.Size, SceneViewColors.ContainerInnerSpace);
+						Renderer.DrawRect(Vector2.Zero, ctr.Size, ColorTheme.Current.SceneView.ContainerInnerSpace);
 					}
 				}
 			}));
@@ -29,7 +29,7 @@ namespace Tangerine.UI.SceneView
 				var ctr = Core.Document.Current.Container as Widget;
 				if (ctr != null && !Core.Document.Current.PreviewAnimation) {
 					ctr.PrepareRendererState();
-					var c = SceneViewColors.ContainerBorder;
+					var c = ColorTheme.Current.SceneView.ContainerBorder;
 					var mtx = ctr.LocalToWorldTransform;
 					var t1 = 1 / mtx.U.Length;
 					var t2 = 1 / mtx.V.Length;

@@ -14,7 +14,7 @@ namespace Tangerine.UI.SceneView
 			}
 			SceneView.Instance.Frame.PrepareRendererState();
 			var t = pointObject.Parent.AsWidget.CalcTransitionToSpaceOf(SceneView.Instance.Frame);
-			Renderer.DrawRound(t * pointObject.TransformedPosition, 3, 10, SceneViewColors.PointObject);
+			Renderer.DrawRound(t * pointObject.TransformedPosition, 3, 10, ColorTheme.Current.SceneView.PointObject);
 		}
 	}
 }

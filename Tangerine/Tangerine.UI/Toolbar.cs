@@ -41,8 +41,8 @@ namespace Tangerine
 			widget.CompoundPresenter.Add(new DelegatePresenter<Widget>(w => {
 				if (w.Width > 0) {
 					w.PrepareRendererState();
-					Renderer.DrawRect(Vector2.Zero, w.Size, ToolbarColors.Background);
-					Renderer.DrawRectOutline(Vector2.Zero, w.Size, ToolbarColors.Border);
+					Renderer.DrawRect(Vector2.Zero, w.Size, ColorTheme.Current.Toolbar.Background);
+					Renderer.DrawRectOutline(Vector2.Zero, w.Size, ColorTheme.Current.Toolbar.Border);
 				}
 			}));
 		}

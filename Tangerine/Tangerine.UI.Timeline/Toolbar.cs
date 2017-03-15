@@ -34,7 +34,7 @@ namespace Tangerine.UI.Timeline
 		void Render(Widget widget)
 		{
 			widget.PrepareRendererState();
-			Renderer.DrawRect(Vector2.Zero, widget.Size, ToolbarColors.Background); 
+			Renderer.DrawRect(Vector2.Zero, widget.Size, ColorTheme.Current.Toolbar.Background); 
 		}
 
 		ToolbarButton CreateAnimationModeButton()
