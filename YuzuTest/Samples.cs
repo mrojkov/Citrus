@@ -646,6 +646,53 @@ namespace YuzuTest
 		}
 	}
 
+	[ProtoContract]
+	public class SampleAoS
+	{
+		[ProtoContract]
+		[YuzuCompact]
+		public struct Vertex
+		{
+			[YuzuRequired]
+			[ProtoMember(1)]
+			public float X;
+			[YuzuRequired]
+			[ProtoMember(2)]
+			public float Y;
+			[YuzuRequired]
+			[ProtoMember(3)]
+			public float Z;
+		}
+		[ProtoContract]
+		[YuzuCompact]
+		public struct Color
+		{
+			[YuzuRequired]
+			[ProtoMember(1)]
+			public byte R;
+			[YuzuRequired]
+			[ProtoMember(2)]
+			public byte G;
+			[YuzuRequired]
+			[ProtoMember(3)]
+			public byte B;
+		}
+		[ProtoContract]
+		[YuzuCompact]
+		public class S {
+			[YuzuRequired]
+			[ProtoMember(1)]
+			public Vertex V;
+			[YuzuRequired]
+			[ProtoMember(2)]
+			public Color C;
+		}
+
+		[YuzuRequired]
+		[ProtoMember(1)]
+		public List<S> A = new List<S>();
+	}
+
 	public class Bad1
 	{
 		[YuzuRequired]

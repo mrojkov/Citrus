@@ -182,6 +182,44 @@ namespace YuzuTest
 			var list2 = (new JsonDeserializer()).FromString<List<TimeSpan>>(result1);
 			CollectionAssert.AreEqual(list1, list2);
 		}
+
+		[TestMethod]
+		public void TestProtobufNetAoS()
+		{
+			var list1 = new SampleAoS();
+			for (int i = 0; i < 100000; ++i)
+				list1.A.Add(new SampleAoS.S {
+					V = new SampleAoS.Vertex { X = i, Y = i * 1.1f, Z = i * 0.9f },
+					C = new SampleAoS.Color { R = (byte)(i % 200), G = (byte)(i % 100), B = (byte)(i % 117) },
+				});
+
+			var ms = new MemoryStream();
+			ProtoBuf.Serializer.Serialize(ms, list1);
+			Assert.IsTrue(ms.Length > 0);
+
+			ms.Position = 0;
+			var list2 = ProtoBuf.Serializer.Deserialize<SampleAoS>(ms);
+			Assert.AreEqual(list1.A.Count, list2.A.Count);
+		}
+
+		[TestMethod]
+		public void TestBinaryAoS()
+		{
+			var list1 = new SampleAoS();
+			for (int i = 0; i < 100000; ++i)
+				list1.A.Add(new SampleAoS.S {
+					V = new SampleAoS.Vertex { X = i, Y = i * 1.1f, Z = i * 0.9f },
+					C = new SampleAoS.Color { R = (byte)(i % 200), G = (byte)(i % 100), B = (byte)(i % 117) },
+				});
+
+			var ms = new MemoryStream();
+			(new BinarySerializer()).ToStream(list1, ms);
+			Assert.IsTrue(ms.Length > 0);
+
+			ms.Position = 0;
+			var list2 = (new BinaryDeserializerGen()).FromStream<SampleAoS>(ms);
+			Assert.AreEqual(list1.A.Count, list2.A.Count);
+		}
 	}
 
 	[TestClass]
@@ -327,6 +365,7 @@ namespace YuzuTest
 			SamplePerson p = (SamplePerson)SamplePerson_JsonDeserializer.Instance.FromStream(jsonStream);
 			Assert.AreEqual(person.Name, p.Name);
 		}
+
 	}
 
 }

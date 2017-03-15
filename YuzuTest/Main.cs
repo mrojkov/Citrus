@@ -176,6 +176,10 @@ namespace YuzuTest
 				bd.Generate<SampleAfter2>();
 				bd.Generate<SampleMerge>();
 				bd.Generate<SampleAssemblyDerivedR>();
+				bd.Generate<SampleAoS.Color>();
+				bd.Generate<SampleAoS.Vertex>();
+				bd.Generate<SampleAoS.S>();
+				bd.Generate<SampleAoS>();
 				bd.Generate<YuzuTestAssembly.SampleAssemblyBase>();
 				bd.Generate<YuzuTestAssembly.SampleAssemblyDerivedQ>();
 				bd.Generate<YuzuTest2.SampleNamespace>();
