@@ -450,7 +450,7 @@ namespace Tangerine.UI.Inspector
 						Renderer.DrawRect(checkPos, checkPos + checkSize, Color4.Black);
 					}
 					Renderer.DrawRect(Vector2.Zero, widget.Size, color.Value);
-					Renderer.DrawRectOutline(Vector2.Zero, widget.Size, InspectorColors.BorderAroundKeyframeColorbox);
+					Renderer.DrawRectOutline(Vector2.Zero, widget.Size, ColorTheme.Current.Inspector.BorderAroundKeyframeColorbox);
 				});
 			}
 		}
@@ -490,11 +490,13 @@ namespace Tangerine.UI.Inspector
 					} else {
 						var assetPath = dlg.FileName.Substring(Project.Current.AssetsDirectory.Length + 1);
 						var path = Path.ChangeExtension(assetPath, null);
-						SetFilePath(path);
+						SetFilePath(NormalizeSlashes(path));
 					}
 				}
 			};
 		}
+
+		protected static string NormalizeSlashes(string path) => path.Replace('\\', '/');
 
 		protected abstract void SetFilePath(string path);
 	}
@@ -504,7 +506,7 @@ namespace Tangerine.UI.Inspector
 		public TexturePropertyEditor(PropertyEditorContext context) : base(context, new string[] { "png" })
 		{
 			editor.Submitted += text => {
-				Core.Operations.SetAnimableProperty.Perform(context.Objects, context.PropertyName, new SerializableTexture(text));
+				Core.Operations.SetAnimableProperty.Perform(context.Objects, context.PropertyName, new SerializableTexture(NormalizeSlashes(text)));
 			};
 			editor.AddChangeWatcher(CoalescedPropertyValue<ITexture>(context), v => editor.Text = v?.SerializationPath ?? "");
 		}
@@ -522,7 +524,7 @@ namespace Tangerine.UI.Inspector
 		public AudioSamplePropertyEditor(PropertyEditorContext context) : base(context, new string[] { "ogg" })
 		{
 			editor.Submitted += text => {
-				Core.Operations.SetAnimableProperty.Perform(context.Objects, context.PropertyName, new SerializableSample(text));
+				Core.Operations.SetAnimableProperty.Perform(context.Objects, context.PropertyName, new SerializableSample(NormalizeSlashes(text)));
 			};
 			editor.AddChangeWatcher(CoalescedPropertyValue<SerializableSample>(context), v => editor.Text = v?.SerializationPath ?? "");
 		}
@@ -540,7 +542,7 @@ namespace Tangerine.UI.Inspector
 		public ContentsPathPropertyEditor(PropertyEditorContext context) : base(context, Document.AllowedFileTypes)
 		{
 			editor.Submitted += text => {
-				Core.Operations.SetAnimableProperty.Perform(context.Objects, context.PropertyName, text);
+				Core.Operations.SetAnimableProperty.Perform(context.Objects, context.PropertyName, NormalizeSlashes(text));
 			};
 			editor.AddChangeWatcher(CoalescedPropertyValue<string>(context), v => editor.Text = v);
 		}
