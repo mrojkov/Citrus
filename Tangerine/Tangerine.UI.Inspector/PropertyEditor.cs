@@ -490,13 +490,13 @@ namespace Tangerine.UI.Inspector
 					} else {
 						var assetPath = dlg.FileName.Substring(Project.Current.AssetsDirectory.Length + 1);
 						var path = Path.ChangeExtension(assetPath, null);
-						SetFilePath(NormalizeSlashes(path));
+						SetFilePath(CorrectSlashes(path));
 					}
 				}
 			};
 		}
 
-		protected static string NormalizeSlashes(string path) => path.Replace('\\', '/');
+		protected static string CorrectSlashes(string path) => AssetPath.CorrectSlashes(path);
 
 		protected abstract void SetFilePath(string path);
 	}
@@ -506,7 +506,7 @@ namespace Tangerine.UI.Inspector
 		public TexturePropertyEditor(PropertyEditorContext context) : base(context, new string[] { "png" })
 		{
 			editor.Submitted += text => {
-				Core.Operations.SetAnimableProperty.Perform(context.Objects, context.PropertyName, new SerializableTexture(NormalizeSlashes(text)));
+				Core.Operations.SetAnimableProperty.Perform(context.Objects, context.PropertyName, new SerializableTexture(CorrectSlashes(text)));
 			};
 			editor.AddChangeWatcher(CoalescedPropertyValue<ITexture>(context), v => editor.Text = v?.SerializationPath ?? "");
 		}
@@ -524,7 +524,7 @@ namespace Tangerine.UI.Inspector
 		public AudioSamplePropertyEditor(PropertyEditorContext context) : base(context, new string[] { "ogg" })
 		{
 			editor.Submitted += text => {
-				Core.Operations.SetAnimableProperty.Perform(context.Objects, context.PropertyName, new SerializableSample(NormalizeSlashes(text)));
+				Core.Operations.SetAnimableProperty.Perform(context.Objects, context.PropertyName, new SerializableSample(CorrectSlashes(text)));
 			};
 			editor.AddChangeWatcher(CoalescedPropertyValue<SerializableSample>(context), v => editor.Text = v?.SerializationPath ?? "");
 		}
@@ -542,7 +542,7 @@ namespace Tangerine.UI.Inspector
 		public ContentsPathPropertyEditor(PropertyEditorContext context) : base(context, Document.AllowedFileTypes)
 		{
 			editor.Submitted += text => {
-				Core.Operations.SetAnimableProperty.Perform(context.Objects, context.PropertyName, NormalizeSlashes(text));
+				Core.Operations.SetAnimableProperty.Perform(context.Objects, context.PropertyName, CorrectSlashes(text));
 			};
 			editor.AddChangeWatcher(CoalescedPropertyValue<string>(context), v => editor.Text = v);
 		}
