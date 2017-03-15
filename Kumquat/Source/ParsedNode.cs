@@ -35,7 +35,7 @@ namespace Kumquat
 			Type = node.GetType().Name;
 			ClassName = name;
 			FieldName = "_" + name;
-			ContentsPath = node.ContentsPath;
+			ContentsPath = AssetPath.CorrectSlashes(node.ContentsPath ?? "");
 
 			if (IsExternalScene) {
 				string externalName;
