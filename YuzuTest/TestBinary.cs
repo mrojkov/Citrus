@@ -775,11 +775,11 @@ namespace YuzuTest.Binary
 			Assert.AreEqual(
 				"20 01 00 " + XS(typeof(SampleRect)) + " 02 00 " +
 				XS("A", RoughType.Record, "B", RoughType.Record) + 
-			" 01 00 02 00 " + XS(typeof(SamplePoint)) + " 02 00 " +
-			XS("X", RoughType.Int, "Y", RoughType.Int) +
-			" 21 00 00 00 2C 00 00 00 " +
-			"02 00 02 00 37 00 00 00 42 00 00 00 00 00",
-			XS(result));
+				" 01 00 02 00 " + XS(typeof(SamplePoint)) + " 02 00 " +
+				XS("X", RoughType.Int, "Y", RoughType.Int) +
+				" 21 00 00 00 2C 00 00 00 " +
+				"02 00 02 00 37 00 00 00 42 00 00 00 00 00",
+				XS(result));
 
 			var bd = new BinaryDeserializer();
 			var w = new SampleRect();
@@ -793,6 +793,18 @@ namespace YuzuTest.Binary
 			var p = (SamplePoint)bdg.FromBytes(new SamplePoint(), SX("20 02 00 22 00 00 00 2D 00 00 00"));
 			Assert.AreEqual(34, p.X);
 			Assert.AreEqual(45, p.Y);
+
+			var v2 = new SampleStructWithProps { A = 37, P = new SamplePoint { X = 9, Y = 1 } };
+			var result2 = bs.ToBytes(v2);
+			Assert.AreEqual(
+				"20 03 00 " + XS(typeof(SampleStructWithProps)) + " 02 00 " +
+				XS("A", RoughType.Int, "P", RoughType.Record) +
+				" 25 00 00 00 02 00 09 00 00 00 01 00 00 00",
+				XS(result2));
+			var w2 = bd.FromBytes<SampleStructWithProps>(result2);
+			Assert.AreEqual(v2.A, w2.A);
+			Assert.AreEqual(v2.P.X, w2.P.X);
+			Assert.AreEqual(v2.P.Y, w2.P.Y);
 		}
 
 		[TestMethod]

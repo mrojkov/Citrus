@@ -180,9 +180,15 @@ namespace Yuzu.Metadata
 					if (!merge && setter != null)
 						item.SetValue = (obj, value) => p.SetValue(obj, value, Utils.ZeroObjects);
 #else
-					item.GetValue = BuildGetter(getter);
-					if (!merge && setter != null)
-						item.SetValue = BuildSetter(setter);
+					if (Utils.IsStruct(Type)) {
+						item.GetValue = obj => p.GetValue(obj, Utils.ZeroObjects);
+						if (!merge && setter != null)
+							item.SetValue = (obj, value) => p.SetValue(obj, value, Utils.ZeroObjects);
+					} else {
+						item.GetValue = BuildGetter(getter);
+						if (!merge && setter != null)
+							item.SetValue = BuildSetter(setter);
+					}
 #endif
 					item.PropInfo = p;
 					break;

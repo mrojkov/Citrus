@@ -767,6 +767,15 @@ namespace YuzuTest.Json
 			var p = (SamplePoint)jdg.FromString(new SamplePoint(), "{ \"X\":34, \"Y\":45 }");
 			Assert.AreEqual(34, p.X);
 			Assert.AreEqual(45, p.Y);
+
+			js.JsonOptions.IgnoreCompact = false;
+			var v2 = new SampleStructWithProps { A = 37, P = new SamplePoint { X = 9, Y = 1 } };
+			var result2 = js.ToString(v2);
+			Assert.AreEqual("[ 37, [ 9, 1 ] ]", result2);
+			var w2 = jd.FromString<SampleStructWithProps>(result2);
+			Assert.AreEqual(v2.A, w2.A);
+			Assert.AreEqual(v2.P.X, w2.P.X);
+			Assert.AreEqual(v2.P.Y, w2.P.Y);
 		}
 
 		[TestMethod]

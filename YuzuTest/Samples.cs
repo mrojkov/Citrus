@@ -435,7 +435,7 @@ namespace YuzuTest
 
 	public abstract class SampleAbstract { }
 
-	public class SampleConcrete: SampleAbstract
+	public class SampleConcrete : SampleAbstract
 	{
 		[YuzuRequired]
 		public int XX;
@@ -523,7 +523,7 @@ namespace YuzuTest
 		public void After() { X += "1"; }
 	}
 
-	public class SampleAfter2: SampleAfter
+	public class SampleAfter2 : SampleAfter
 	{
 		[YuzuAfterDeserialization]
 		public void After2() { X += "2"; }
@@ -533,7 +533,7 @@ namespace YuzuTest
 
 	public class SampleMerge
 	{
-		private Dictionary<int, int> di = new Dictionary<int,int>();
+		private Dictionary<int, int> di = new Dictionary<int, int>();
 		private List<int> li = new List<int>();
 		[YuzuRequired]
 		public Dictionary<int, int> DI { get { return di; } }
@@ -644,6 +644,15 @@ namespace YuzuTest
 		{
 			return new SampleCompactSurrogate { X = obj.X, Y = obj.Y };
 		}
+	}
+
+	[YuzuCompact]
+	public struct SampleStructWithProps
+	{
+		[YuzuRequired]
+		public int A { get; set; }
+		[YuzuRequired]
+		public SamplePoint P { get; set; }
 	}
 
 	[ProtoContract]
