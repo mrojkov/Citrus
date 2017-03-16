@@ -205,7 +205,15 @@ namespace Yuzu.Binary
 		private void GenerateSetValue(Type t, string name)
 		{
 			if (!t.IsGenericType && Utils.IsStruct(t) && !simpleValueReader.ContainsKey(t)) {
-				cw.Put("dg.ReadIntoStruct(ref {0});\n", name);
+
+				var meta = Meta.Get(t, options);
+				if (meta.IsCompact && meta.Surrogate.FuncFrom == null) {
+					cw.Put("dg.EnsureClassDef(typeof({0}));\n", Utils.GetTypeSpec(t));
+					foreach (var yi in meta.Items)
+						GenerateSetValue(yi.Type, name + "." + yi.Name);
+				}
+				else
+					cw.Put("dg.ReadIntoStruct(ref {0});\n", name);
 				return;
 			}
 			cw.Put("{0} = ", name);

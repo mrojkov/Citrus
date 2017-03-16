@@ -400,6 +400,13 @@ namespace Yuzu.Binary
 			return result;
 		}
 
+		protected void EnsureClassDef(Type t)
+		{
+			var def = GetClassDef(Reader.ReadInt16());
+			if (def.Meta.Type != t)
+				throw Error("Expected type {0}, but found {1}", def.Meta.Type, t.Name);
+		}
+
 		protected object ReadStruct<T>() where T : struct
 		{
 			var classId = Reader.ReadInt16();
