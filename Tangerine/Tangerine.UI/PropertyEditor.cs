@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using Lime;
@@ -9,26 +9,39 @@ namespace Tangerine.UI
 {
 	public interface IPropertyEditor
 	{
-		PropertyEditorContext Context { get; }
+		IPropertyEditorParams EditorParams { get; }
 		Widget ContainerWidget { get; }
 		void SetFocus();
 	}
 
-	public class PropertyEditorContext
+	public interface IPropertyEditorParams
 	{
-		public delegate void PropertySetterDelegate(object obj, string propertyName, object value);
+		Widget InspectorPane { get; set; }
+		List<object> Objects { get; set; }
+		Type Type { get; set; }
+		string PropertyName { get; set; }
+		string DisplayName { get; set; }
+		TangerineKeyframeColorAttribute TangerineAttribute { get; set; }
+		System.Reflection.PropertyInfo PropertyInfo { get; set; }
+		Func<NumericEditBox> NumericEditBoxFactory { get; set; }
+		PropertySetterDelegate PropertySetter { get; set; }
+	}
 
-		public readonly Widget InspectorPane;
-		public readonly List<object> Objects;
-		public readonly Type Type;
-		public readonly string PropertyName;
-		public string DisplayName;
-		public readonly TangerineKeyframeColorAttribute TangerineAttribute;
-		public readonly System.Reflection.PropertyInfo PropertyInfo;
-		public Func<NumericEditBox> NumericEditBoxFactory = () => new NumericEditBox();
-		public PropertySetterDelegate PropertySetter;
+	public delegate void PropertySetterDelegate(object obj, string propertyName, object value);
 
-		public PropertyEditorContext(Widget inspectorPane, List<object> objects, Type type, string propertyName)
+	public class PropertyEditorParams : IPropertyEditorParams
+	{
+		public Widget InspectorPane { get; set; }
+		public List<object> Objects { get; set; }
+		public Type Type { get; set; }
+		public string PropertyName { get; set; }
+		public string DisplayName { get; set; }
+		public TangerineKeyframeColorAttribute TangerineAttribute { get; set; }
+		public System.Reflection.PropertyInfo PropertyInfo { get; set; }
+		public Func<NumericEditBox> NumericEditBoxFactory { get; set; }
+		public PropertySetterDelegate PropertySetter { get; set; }
+
+		public PropertyEditorParams(Widget inspectorPane, List<object> objects, Type type, string propertyName)
 		{
 			InspectorPane = inspectorPane;
 			Objects = objects;
@@ -37,9 +50,10 @@ namespace Tangerine.UI
 			TangerineAttribute = PropertyAttributes<TangerineKeyframeColorAttribute>.Get(Type, PropertyName) ?? new TangerineKeyframeColorAttribute(0);
 			PropertyInfo = Type.GetProperty(PropertyName);
 			PropertySetter = SetProperty;
+			NumericEditBoxFactory = () => new NumericEditBox();
 		}
 
-		public PropertyEditorContext(Widget inspectorPane, object obj, string propertyName, string displayName = null)
+		public PropertyEditorParams(Widget inspectorPane, object obj, string propertyName, string displayName = null)
 			: this(inspectorPane, new List<object> { obj }, obj.GetType(), propertyName)
 		{
 			DisplayName = displayName;
@@ -50,21 +64,21 @@ namespace Tangerine.UI
 
 	public class CommonPropertyEditor : IPropertyEditor
 	{
-		public PropertyEditorContext Context { get; private set; }
+		public IPropertyEditorParams EditorParams { get; private set; }
 		public Widget ContainerWidget { get; private set; }
 		public SimpleText PropertyNameLabel { get; private set; }
 
-		public CommonPropertyEditor(PropertyEditorContext context)
+		public CommonPropertyEditor(IPropertyEditorParams editorParams)
 		{
-			Context = context;
+			EditorParams = editorParams;
 			ContainerWidget = new Widget {
 				Layout = new HBoxLayout { IgnoreHidden = false },
 				Padding = new Thickness { Left = 4, Right = 12 },
 				LayoutCell = new LayoutCell { StretchY = 0 },
 			};
-			context.InspectorPane.AddNode(ContainerWidget);
+			editorParams.InspectorPane.AddNode(ContainerWidget);
 			PropertyNameLabel = new SimpleText {
-				Text = context.DisplayName ?? context.PropertyName,
+				Text = editorParams.DisplayName ?? editorParams.PropertyName,
 				VAlignment = VAlignment.Center,
 				LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0.5f),
 				AutoSizeConstraints = false,
@@ -74,21 +88,21 @@ namespace Tangerine.UI
 
 		public virtual void SetFocus() { }
 
-		protected static IDataflowProvider<T> CoalescedPropertyValue<T>(PropertyEditorContext context, T defaultValue = default(T))
+		protected static IDataflowProvider<T> CoalescedPropertyValue<T>(IPropertyEditorParams editorParams, T defaultValue = default(T))
 		{
 			IDataflowProvider<T> provider = null;
-			foreach (var o in context.Objects) {
-				var p = new Property<T>(o, context.PropertyName);
+			foreach (var o in editorParams.Objects) {
+				var p = new Property<T>(o, editorParams.PropertyName);
 				provider = (provider == null) ? p : provider.SameOrDefault(p, defaultValue);
 			}
 			return provider;
 		}
 
-		protected static IDataflowProvider<T2> CoalescedPropertyValue<T1, T2>(PropertyEditorContext context, Func<T1, T2> selector, T2 defaultValue = default(T2))
+		protected static IDataflowProvider<T2> CoalescedPropertyValue<T1, T2>(IPropertyEditorParams editorParams, Func<T1, T2> selector, T2 defaultValue = default(T2))
 		{
 			IDataflowProvider<T2> provider = null;
-			foreach (var o in context.Objects) {
-				var p = new Property<T1>(o, context.PropertyName).Select(selector);
+			foreach (var o in editorParams.Objects) {
+				var p = new Property<T1>(o, editorParams.PropertyName).Select(selector);
 				provider = (provider == null) ? p : provider.SameOrDefault(p, defaultValue);
 			}
 			return provider;
@@ -96,8 +110,8 @@ namespace Tangerine.UI
 
 		protected void SetProperty(string name, object value)
 		{
-			foreach (var o in Context.Objects) {
-				Context.PropertySetter(o, name, value);
+			foreach (var o in EditorParams.Objects) {
+				EditorParams.PropertySetter(o, name, value);
 			}
 		}
 	}
@@ -106,35 +120,35 @@ namespace Tangerine.UI
 	{
 		private NumericEditBox editorX, editorY;
 
-		public Vector2PropertyEditor(PropertyEditorContext context) : base(context)
+		public Vector2PropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
 			ContainerWidget.AddNode(new Widget {
 				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center), Spacing = 4 },
 				Nodes = {
-					(editorX = context.NumericEditBoxFactory()),
-					(editorY = context.NumericEditBoxFactory()),
+					(editorX = editorParams.NumericEditBoxFactory()),
+					(editorY = editorParams.NumericEditBoxFactory()),
 				}
 			});
-			var currentX = CoalescedPropertyValue<Vector2, float>(context, v => v.X);
-			var currentY = CoalescedPropertyValue<Vector2, float>(context, v => v.Y);
+			var currentX = CoalescedPropertyValue<Vector2, float>(editorParams, v => v.X);
+			var currentY = CoalescedPropertyValue<Vector2, float>(editorParams, v => v.Y);
 			editorX.TextWidget.HAlignment = HAlignment.Right;
 			editorY.TextWidget.HAlignment = HAlignment.Right;
-			editorX.Submitted += text => SetComponent(context, 0, editorX, currentX.GetValue());
-			editorY.Submitted += text => SetComponent(context, 1, editorY, currentY.GetValue());
+			editorX.Submitted += text => SetComponent(editorParams, 0, editorX, currentX.GetValue());
+			editorY.Submitted += text => SetComponent(editorParams, 1, editorY, currentY.GetValue());
 			editorX.AddChangeWatcher(currentX, v => editorX.Text = v.ToString());
 			editorY.AddChangeWatcher(currentY, v => editorY.Text = v.ToString());
 		}
 
 		public override void SetFocus() => editorX.SetFocus();
 
-		void SetComponent(PropertyEditorContext context, int component, CommonEditBox editor, float currentValue)
+		void SetComponent(IPropertyEditorParams editorParams, int component, CommonEditBox editor, float currentValue)
 		{
 			float newValue;
 			if (float.TryParse(editor.Text, out newValue)) {
-				foreach (var obj in context.Objects) {
-					var current = new Property<Vector2>(obj, context.PropertyName).Value;
+				foreach (var obj in editorParams.Objects) {
+					var current = new Property<Vector2>(obj, editorParams.PropertyName).Value;
 					current[component] = newValue;
-					context.PropertySetter(obj, context.PropertyName, current);
+					editorParams.PropertySetter(obj, editorParams.PropertyName, current);
 				}
 			} else {
 				editor.Text = currentValue.ToString();
@@ -146,25 +160,25 @@ namespace Tangerine.UI
 	{
 		private NumericEditBox editorX, editorY, editorZ;
 
-		public Vector3PropertyEditor(PropertyEditorContext context) : base(context)
+		public Vector3PropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
 			ContainerWidget.AddNode(new Widget {
 				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center), Spacing = 4 },
 				Nodes = {
-					(editorX = context.NumericEditBoxFactory()),
-					(editorY = context.NumericEditBoxFactory()),
-					(editorZ = context.NumericEditBoxFactory())
+					(editorX = editorParams.NumericEditBoxFactory()),
+					(editorY = editorParams.NumericEditBoxFactory()),
+					(editorZ = editorParams.NumericEditBoxFactory())
 				}
 			});
-			var currentX = CoalescedPropertyValue<Vector3, float>(context, v => v.X);
-			var currentY = CoalescedPropertyValue<Vector3, float>(context, v => v.Y);
-			var currentZ = CoalescedPropertyValue<Vector3, float>(context, v => v.Z);
+			var currentX = CoalescedPropertyValue<Vector3, float>(editorParams, v => v.X);
+			var currentY = CoalescedPropertyValue<Vector3, float>(editorParams, v => v.Y);
+			var currentZ = CoalescedPropertyValue<Vector3, float>(editorParams, v => v.Z);
 			editorX.TextWidget.HAlignment = HAlignment.Right;
 			editorY.TextWidget.HAlignment = HAlignment.Right;
 			editorZ.TextWidget.HAlignment = HAlignment.Right;
-			editorX.Submitted += text => SetComponent(context, 0, editorX, currentX.GetValue());
-			editorY.Submitted += text => SetComponent(context, 1, editorY, currentY.GetValue());
-			editorZ.Submitted += text => SetComponent(context, 2, editorZ, currentZ.GetValue());
+			editorX.Submitted += text => SetComponent(editorParams, 0, editorX, currentX.GetValue());
+			editorY.Submitted += text => SetComponent(editorParams, 1, editorY, currentY.GetValue());
+			editorZ.Submitted += text => SetComponent(editorParams, 2, editorZ, currentZ.GetValue());
 			editorX.AddChangeWatcher(currentX, v => editorX.Text = v.ToString());
 			editorY.AddChangeWatcher(currentY, v => editorY.Text = v.ToString());
 			editorZ.AddChangeWatcher(currentZ, v => editorZ.Text = v.ToString());
@@ -172,14 +186,14 @@ namespace Tangerine.UI
 
 		public override void SetFocus() => editorX.SetFocus();
 
-		void SetComponent(PropertyEditorContext context, int component, NumericEditBox editor, float currentValue)
+		void SetComponent(IPropertyEditorParams editorParams, int component, NumericEditBox editor, float currentValue)
 		{
 			float newValue;
 			if (float.TryParse(editor.Text, out newValue)) {
-				foreach (var obj in context.Objects) {
-					var current = new Property<Vector3>(obj, context.PropertyName).Value;
+				foreach (var obj in editorParams.Objects) {
+					var current = new Property<Vector3>(obj, editorParams.PropertyName).Value;
 					current[component] = newValue;
-					context.PropertySetter(obj, context.PropertyName, current);
+					editorParams.PropertySetter(obj, editorParams.PropertyName, current);
 				}
 			} else {
 				editor.Text = currentValue.ToString();
@@ -191,23 +205,23 @@ namespace Tangerine.UI
 	{
 		private NumericEditBox editorX, editorY, editorZ;
 
-		public QuaternionPropertyEditor(PropertyEditorContext context) : base(context)
+		public QuaternionPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
 			ContainerWidget.AddNode(new Widget {
 				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center), Spacing = 4 },
 				Nodes = {
-					(editorX = context.NumericEditBoxFactory()),
-					(editorY = context.NumericEditBoxFactory()),
-					(editorZ = context.NumericEditBoxFactory())
+					(editorX = editorParams.NumericEditBoxFactory()),
+					(editorY = editorParams.NumericEditBoxFactory()),
+					(editorZ = editorParams.NumericEditBoxFactory())
 				}
 			});
-			var current = CoalescedPropertyValue<Quaternion>(context);
+			var current = CoalescedPropertyValue<Quaternion>(editorParams);
 			editorX.TextWidget.HAlignment = HAlignment.Right;
 			editorY.TextWidget.HAlignment = HAlignment.Right;
 			editorZ.TextWidget.HAlignment = HAlignment.Right;
-			editorX.Submitted += text => SetComponent(context, 0, editorX, current.GetValue());
-			editorY.Submitted += text => SetComponent(context, 1, editorY, current.GetValue());
-			editorZ.Submitted += text => SetComponent(context, 2, editorZ, current.GetValue());
+			editorX.Submitted += text => SetComponent(editorParams, 0, editorX, current.GetValue());
+			editorY.Submitted += text => SetComponent(editorParams, 1, editorY, current.GetValue());
+			editorZ.Submitted += text => SetComponent(editorParams, 2, editorZ, current.GetValue());
 			editorX.AddChangeWatcher(current, v => {
 				var ea = v.ToEulerAngles() * Mathf.RadToDeg;
 				editorX.Text = RoundAngle(ea.X).ToString();
@@ -220,14 +234,14 @@ namespace Tangerine.UI
 
 		float RoundAngle(float value) => (value * 1000f).Round() / 1000f;
 
-		void SetComponent(PropertyEditorContext context, int component, NumericEditBox editor, Quaternion currentValue)
+		void SetComponent(IPropertyEditorParams editorParams, int component, NumericEditBox editor, Quaternion currentValue)
 		{
 			float newValue;
 			if (float.TryParse(editor.Text, out newValue)) {
-				foreach (var obj in context.Objects) {
-					var current = new Property<Quaternion>(obj, context.PropertyName).Value.ToEulerAngles();
+				foreach (var obj in editorParams.Objects) {
+					var current = new Property<Quaternion>(obj, editorParams.PropertyName).Value.ToEulerAngles();
 					current[component] = newValue * Mathf.DegToRad;
-					context.PropertySetter(obj, context.PropertyName,
+					editorParams.PropertySetter(obj, editorParams.PropertyName,
 						Quaternion.CreateFromEulerAngles(current));
 				}
 			} else {
@@ -240,39 +254,39 @@ namespace Tangerine.UI
 	{
 		private NumericEditBox medEditor, dispEditor;
 
-		public NumericRangePropertyEditor(PropertyEditorContext context) : base(context)
+		public NumericRangePropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
 			ContainerWidget.AddNode(new Widget {
 				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center), Spacing = 4 },
 				Nodes = {
-					(medEditor = context.NumericEditBoxFactory()),
-					(dispEditor = context.NumericEditBoxFactory()),
+					(medEditor = editorParams.NumericEditBoxFactory()),
+					(dispEditor = editorParams.NumericEditBoxFactory()),
 				}
 			});
-			var currentMed = CoalescedPropertyValue<NumericRange, float>(context, v => v.Median);
-			var currentDisp = CoalescedPropertyValue<NumericRange, float>(context, v => v.Dispersion);
+			var currentMed = CoalescedPropertyValue<NumericRange, float>(editorParams, v => v.Median);
+			var currentDisp = CoalescedPropertyValue<NumericRange, float>(editorParams, v => v.Dispersion);
 			medEditor.TextWidget.HAlignment = HAlignment.Right;
 			dispEditor.TextWidget.HAlignment = HAlignment.Right;
-			medEditor.Submitted += text => SetComponent(context, 0, medEditor, currentMed.GetValue());
-			dispEditor.Submitted += text => SetComponent(context, 1, dispEditor, currentDisp.GetValue());
+			medEditor.Submitted += text => SetComponent(editorParams, 0, medEditor, currentMed.GetValue());
+			dispEditor.Submitted += text => SetComponent(editorParams, 1, dispEditor, currentDisp.GetValue());
 			medEditor.AddChangeWatcher(currentMed, v => medEditor.Text = v.ToString());
 			dispEditor.AddChangeWatcher(currentDisp, v => dispEditor.Text = v.ToString());
 		}
 
 		public override void SetFocus() => medEditor.SetFocus();
 
-		void SetComponent(PropertyEditorContext context, int component, NumericEditBox editor, float currentValue)
+		void SetComponent(IPropertyEditorParams editorParams, int component, NumericEditBox editor, float currentValue)
 		{
 			float newValue;
 			if (float.TryParse(editor.Text, out newValue)) {
-				foreach (var obj in context.Objects) {
-					var current = new Property<NumericRange>(obj, context.PropertyName).Value;
+				foreach (var obj in editorParams.Objects) {
+					var current = new Property<NumericRange>(obj, editorParams.PropertyName).Value;
 					if (component == 0) {
 						current.Median = newValue;
 					} else {
 						current.Dispersion = newValue;
 					}
-					context.PropertySetter(obj, context.PropertyName, current);
+					editorParams.PropertySetter(obj, editorParams.PropertyName, current);
 				}
 			} else {
 				editor.Text = currentValue.ToString();
@@ -284,9 +298,9 @@ namespace Tangerine.UI
 	{
 		private EditBox editor;
 
-		public NodeReferencePropertyEditor(PropertyEditorContext context) : base(context)
+		public NodeReferencePropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
-			var propName = context.PropertyName;
+			var propName = editorParams.PropertyName;
 			if (propName.EndsWith("Ref")) {
 				PropertyNameLabel.Text = propName.Substring(0, propName.Length - 3);
 			}
@@ -294,9 +308,9 @@ namespace Tangerine.UI
 			ContainerWidget.AddNode(editor);
 			editor.Submitted += text => {
 				var value = new NodeReference<T>(text);
-				SetProperty(context.PropertyName, value);
+				SetProperty(editorParams.PropertyName, value);
 			};
-			editor.AddChangeWatcher(CoalescedPropertyValue<NodeReference<T>>(context), v => editor.Text = v.Id);
+			editor.AddChangeWatcher(CoalescedPropertyValue<NodeReference<T>>(editorParams), v => editor.Text = v.Id);
 		}
 
 		public override void SetFocus() => editor.SetFocus();
@@ -307,14 +321,14 @@ namespace Tangerine.UI
 		const int maxLines = 5;
 		private EditBox editor;
 
-		public StringPropertyEditor(PropertyEditorContext context, bool multiline = false) : base(context)
+		public StringPropertyEditor(IPropertyEditorParams editorParams, bool multiline = false) : base(editorParams)
 		{
 			editor = new EditBox { LayoutCell = new LayoutCell(Alignment.Center) };
 			editor.Editor.EditorParams.MaxLines = multiline ? maxLines : 1;
 			editor.MinHeight += multiline ? editor.TextWidget.FontHeight * (maxLines - 1) : 0;
 			ContainerWidget.AddNode(editor);
-			editor.Submitted += text => SetProperty(context.PropertyName, text);
-			editor.AddChangeWatcher(CoalescedPropertyValue<string>(context), v => editor.Text = v);
+			editor.Submitted += text => SetProperty(editorParams.PropertyName, text);
+			editor.AddChangeWatcher(CoalescedPropertyValue<string>(editorParams), v => editor.Text = v);
 		}
 
 		public override void SetFocus() => editor.SetFocus();
@@ -324,16 +338,16 @@ namespace Tangerine.UI
 	{
 		private DropDownList selector;
 
-		public EnumPropertyEditor(PropertyEditorContext context) : base(context)
+		public EnumPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
 			selector = new DropDownList { LayoutCell = new LayoutCell(Alignment.Center) };
 			ContainerWidget.AddNode(selector);
-			var propType = context.PropertyInfo.PropertyType;
+			var propType = editorParams.PropertyInfo.PropertyType;
 			foreach (var i in Enum.GetNames(propType).Zip(Enum.GetValues(propType).Cast<object>(), (a, b) => new DropDownList.Item(a, b))) {
 				selector.Items.Add(i);
 			}
-			selector.Changed += index => SetProperty(context.PropertyName, (T)selector.Items[index].Value);
-			selector.AddChangeWatcher(CoalescedPropertyValue<T>(context), v => selector.Value = v);
+			selector.Changed += index => SetProperty(editorParams.PropertyName, (T)selector.Items[index].Value);
+			selector.AddChangeWatcher(CoalescedPropertyValue<T>(editorParams), v => selector.Value = v);
 		}
 
 		public override void SetFocus() => selector.SetFocus();
@@ -343,12 +357,12 @@ namespace Tangerine.UI
 	{
 		private CheckBox checkBox;
 
-		public BooleanPropertyEditor(PropertyEditorContext context) : base(context)
+		public BooleanPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
 			checkBox = new CheckBox { LayoutCell = new LayoutCell(Alignment.Center) };
 			ContainerWidget.AddNode(checkBox);
-			checkBox.Changed += value => SetProperty(context.PropertyName, value);
-			checkBox.AddChangeWatcher(CoalescedPropertyValue<bool>(context), v => checkBox.Checked = v);
+			checkBox.Changed += value => SetProperty(editorParams.PropertyName, value);
+			checkBox.AddChangeWatcher(CoalescedPropertyValue<bool>(editorParams), v => checkBox.Checked = v);
 		}
 
 		public override void SetFocus() => checkBox.SetFocus();
@@ -358,16 +372,16 @@ namespace Tangerine.UI
 	{
 		private NumericEditBox editor;
 
-		public FloatPropertyEditor(PropertyEditorContext context) : base(context)
+		public FloatPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
 			editor = new NumericEditBox { LayoutCell = new LayoutCell(Alignment.Center) };
 			editor.TextWidget.HAlignment = HAlignment.Right;
 			ContainerWidget.AddNode(editor);
-			var current = CoalescedPropertyValue<float>(context);
+			var current = CoalescedPropertyValue<float>(editorParams);
 			editor.Submitted += text => {
 				float newValue;
 				if (float.TryParse(text, out newValue)) {
-					SetProperty(context.PropertyName, newValue);
+					SetProperty(editorParams.PropertyName, newValue);
 				} else {
 					editor.Text = current.GetValue().ToString();
 				}
@@ -382,16 +396,16 @@ namespace Tangerine.UI
 	{
 		private EditBox editor;
 
-		public IntPropertyEditor(PropertyEditorContext context) : base(context)
+		public IntPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
 			editor = new EditBox { LayoutCell = new LayoutCell(Alignment.Center) };
 			editor.TextWidget.HAlignment = HAlignment.Right;
 			ContainerWidget.AddNode(editor);
-			var current = CoalescedPropertyValue<int>(context);
+			var current = CoalescedPropertyValue<int>(editorParams);
 			editor.Submitted += text => {
 				int newValue;
 				if (int.TryParse(text, out newValue)) {
-					SetProperty(context.PropertyName, newValue);
+					SetProperty(editorParams.PropertyName, newValue);
 				} else {
 					editor.Text = current.GetValue().ToString();
 				}
@@ -406,10 +420,10 @@ namespace Tangerine.UI
 	{
 		private EditBox editor;
 
-		public Color4PropertyEditor(PropertyEditorContext context) : base(context)
+		public Color4PropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
 			ColorBoxButton colorBox;
-			var currentColor = CoalescedPropertyValue(context, Color4.White).DistinctUntilChanged();
+			var currentColor = CoalescedPropertyValue(editorParams, Color4.White).DistinctUntilChanged();
 			ContainerWidget.AddNode(new Widget {
 				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center) },
 				Nodes = {
@@ -419,11 +433,11 @@ namespace Tangerine.UI
 				}
 			});
 			var panel = new ColorPickerPanel();
-			context.InspectorPane.AddNode(panel.RootWidget);
+			editorParams.InspectorPane.AddNode(panel.RootWidget);
 			panel.RootWidget.Visible = false;
 			panel.RootWidget.Padding.Right = 12;
 			panel.RootWidget.Tasks.Add(currentColor.Consume(v => panel.Color = v));
-			panel.Changed += () => SetProperty(context.PropertyName, panel.Color);
+			panel.Changed += () => SetProperty(editorParams.PropertyName, panel.Color);
 			panel.DragStarted += Document.Current.History.BeginTransaction;
 			panel.DragEnded += Document.Current.History.EndTransaction;
 			colorBox.Clicked += () => panel.RootWidget.Visible = !panel.RootWidget.Visible;
@@ -431,7 +445,7 @@ namespace Tangerine.UI
 			editor.Submitted += text => {
 				Color4 newColor;
 				if (Color4.TryParse(text, out newColor)) {
-					SetProperty(context.PropertyName, newColor);
+					SetProperty(editorParams.PropertyName, newColor);
 				} else {
 					editor.Text = currentColorString.GetValue();
 				}
@@ -469,7 +483,7 @@ namespace Tangerine.UI
 		protected readonly EditBox editor;
 		protected readonly Button button;
 
-		protected FilePropertyEditor(PropertyEditorContext context, string[] allowedFileTypes) : base(context)
+		protected FilePropertyEditor(IPropertyEditorParams editorParams, string[] allowedFileTypes) : base(editorParams)
 		{
 			ContainerWidget.AddNode(new Widget {
 				Layout = new HBoxLayout(),
@@ -512,43 +526,43 @@ namespace Tangerine.UI
 
 	public class TexturePropertyEditor : FilePropertyEditor
 	{
-		public TexturePropertyEditor(PropertyEditorContext context) : base(context, new string[] { "png" })
+		public TexturePropertyEditor(IPropertyEditorParams editorParams) : base(editorParams, new string[] { "png" })
 		{
-			editor.Submitted += text => SetProperty(context.PropertyName, new SerializableTexture(CorrectSlashes(text)));
-			editor.AddChangeWatcher(CoalescedPropertyValue<ITexture>(context), v => editor.Text = v?.SerializationPath ?? "");
+			editor.Submitted += text => SetProperty(editorParams.PropertyName, new SerializableTexture(CorrectSlashes(text)));
+			editor.AddChangeWatcher(CoalescedPropertyValue<ITexture>(editorParams), v => editor.Text = v?.SerializationPath ?? "");
 		}
 
 		protected override void SetFilePath(string path)
 		{
-			SetProperty(Context.PropertyName, new SerializableTexture(path));
+			SetProperty(EditorParams.PropertyName, new SerializableTexture(path));
 		}
 	}
 
 	public class AudioSamplePropertyEditor : FilePropertyEditor
 	{
-		public AudioSamplePropertyEditor(PropertyEditorContext context) : base(context, new string[] { "ogg" })
+		public AudioSamplePropertyEditor(IPropertyEditorParams editorParams) : base(editorParams, new string[] { "ogg" })
 		{
-			editor.Submitted += text => SetProperty(context.PropertyName, new SerializableSample(CorrectSlashes(text)));
-			editor.AddChangeWatcher(CoalescedPropertyValue<SerializableSample>(context), v => editor.Text = v?.SerializationPath ?? "");
+			editor.Submitted += text => SetProperty(editorParams.PropertyName, new SerializableSample(CorrectSlashes(text)));
+			editor.AddChangeWatcher(CoalescedPropertyValue<SerializableSample>(editorParams), v => editor.Text = v?.SerializationPath ?? "");
 		}
 
 		protected override void SetFilePath(string path)
 		{
-			SetProperty(Context.PropertyName, new SerializableSample(path));
+			SetProperty(EditorParams.PropertyName, new SerializableSample(path));
 		}
 	}
 
 	public class ContentsPathPropertyEditor : FilePropertyEditor
 	{
-		public ContentsPathPropertyEditor(PropertyEditorContext context) : base(context, Document.AllowedFileTypes)
+		public ContentsPathPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams, Document.AllowedFileTypes)
 		{
-			editor.Submitted += text => SetProperty(context.PropertyName, CorrectSlashes(text));
-			editor.AddChangeWatcher(CoalescedPropertyValue<string>(context), v => editor.Text = v);
+			editor.Submitted += text => SetProperty(editorParams.PropertyName, CorrectSlashes(text));
+			editor.AddChangeWatcher(CoalescedPropertyValue<string>(editorParams), v => editor.Text = v);
 		}
 
 		protected override void SetFilePath(string path)
 		{
-			SetProperty(Context.PropertyName, path);
+			SetProperty(EditorParams.PropertyName, path);
 			Document.Current.Container.LoadExternalScenes();
 		}
 	}
@@ -557,11 +571,11 @@ namespace Tangerine.UI
 	{
 		private DropDownList selector;
 
-		public FontPropertyEditor(PropertyEditorContext context) : base(context)
+		public FontPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
 			selector = new DropDownList { LayoutCell = new LayoutCell(Alignment.Center) };
 			ContainerWidget.AddNode(selector);
-			var propType = context.PropertyInfo.PropertyType;
+			var propType = editorParams.PropertyInfo.PropertyType;
 			var items = AssetBundle.Instance.EnumerateFiles("Fonts").
 				Where(i => i.EndsWith(".fnt") || i.EndsWith(".tft")).
 				Select(i => new DropDownList.Item(Path.ChangeExtension(Path.GetFileName(i), null)));
@@ -570,9 +584,9 @@ namespace Tangerine.UI
 			}
 			selector.Changed += index => {
 				var font = new SerializableFont(selector.Items[index].Text);
-				SetProperty(context.PropertyName, font);
+				SetProperty(editorParams.PropertyName, font);
 			};
-			selector.AddChangeWatcher(CoalescedPropertyValue<SerializableFont>(context), i => {
+			selector.AddChangeWatcher(CoalescedPropertyValue<SerializableFont>(editorParams), i => {
 				selector.Text = string.IsNullOrEmpty(i.Name) ? "Default" : i.Name;
 			});
 		}
@@ -584,13 +598,13 @@ namespace Tangerine.UI
 	{
 		private ComboBox comboBox;
 
-		public TriggerPropertyEditor(PropertyEditorContext context, bool multiline = false) : base(context)
+		public TriggerPropertyEditor(IPropertyEditorParams editorParams, bool multiline = false) : base(editorParams)
 		{
 			comboBox = new ComboBox { LayoutCell = new LayoutCell(Alignment.Center) };
 			ContainerWidget.AddNode(comboBox);
-			comboBox.Changed += index => SetProperty(context.PropertyName, comboBox.Items[index].Text);
-			if (context.Objects.Count == 1) {
-				var node = (Node)context.Objects[0];
+			comboBox.Changed += index => SetProperty(editorParams.PropertyName, comboBox.Items[index].Text);
+			if (editorParams.Objects.Count == 1) {
+				var node = (Node)editorParams.Objects[0];
 				foreach (var a in node.Animations) {
 					foreach (var m in a.Markers.Where(i => i.Action != MarkerAction.Jump)) {
 						var id = a.Id != null ? m.Id + '@' + a.Id : m.Id;
@@ -598,7 +612,7 @@ namespace Tangerine.UI
 					}
 				}
 			}
-			comboBox.AddChangeWatcher(CoalescedPropertyValue<string>(context), v => comboBox.Text = v);
+			comboBox.AddChangeWatcher(CoalescedPropertyValue<string>(editorParams), v => comboBox.Text = v);
 		}
 
 		public override void SetFocus() => comboBox.SetFocus();

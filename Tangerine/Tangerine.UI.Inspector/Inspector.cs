@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Lime;
 using System.Linq;
 using Tangerine.Core;
@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Tangerine.UI.Inspector
 {
-	public delegate IPropertyEditor PropertyEditorBuilder(PropertyEditorContext context);
+	public delegate IPropertyEditor PropertyEditorBuilder(PropertyEditorParams context);
 
 	public class Inspector : IDocumentView
 	{
@@ -98,7 +98,7 @@ namespace Tangerine.UI.Inspector
 			AddEditor(typeof(NodeReference<Widget>), c => new NodeReferencePropertyEditor<Widget>(c));
 		}
 		
-		static bool AllowChildren(PropertyEditorContext context)
+		static bool AllowChildren(PropertyEditorParams context)
 		{
 			return context.Objects.Any(o =>
 				ClassAttributes<TangerineClassAttribute>.Get(o.GetType())?.AllowChildren ?? false);
@@ -109,7 +109,7 @@ namespace Tangerine.UI.Inspector
 			PropertyEditorRegistry.Add(new PropertyEditorRegistryItem(c => c.PropertyInfo.PropertyType == type, builder));
 		}
 
-		void AddEditor(Func<PropertyEditorContext, bool> condition, PropertyEditorBuilder builder)
+		void AddEditor(Func<PropertyEditorParams, bool> condition, PropertyEditorBuilder builder)
 		{
 			PropertyEditorRegistry.Add(new PropertyEditorRegistryItem(condition, builder));
 		}
@@ -137,10 +137,10 @@ namespace Tangerine.UI.Inspector
 
 		public class PropertyEditorRegistryItem
 		{
-			public readonly Func<PropertyEditorContext, bool> Condition;
+			public readonly Func<PropertyEditorParams, bool> Condition;
 			public readonly PropertyEditorBuilder Builder;
 
-			public PropertyEditorRegistryItem(Func<PropertyEditorContext, bool> condition, PropertyEditorBuilder builder)
+			public PropertyEditorRegistryItem(Func<PropertyEditorParams, bool> condition, PropertyEditorBuilder builder)
 			{
 				Condition = condition;
 				Builder = builder;

@@ -28,7 +28,7 @@ namespace Tangerine.UI.Inspector
 
 		public void Dispose() { }
 
-		public static IDataflowProvider<R> GetProvider<R>(PropertyEditorContext context, Func<IKeyframe, R> selector)
+		public static IDataflowProvider<R> GetProvider<R>(IPropertyEditorParams context, Func<IKeyframe, R> selector)
 		{
 			IDataflowProvider<R> provider = null;
 			foreach (var obj in context.Objects) {

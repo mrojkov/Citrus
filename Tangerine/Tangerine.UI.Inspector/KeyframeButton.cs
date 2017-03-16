@@ -34,18 +34,18 @@ namespace Tangerine.UI.Inspector
 
 	class KeyframeButtonBinding : ITaskProvider
 	{
-		readonly PropertyEditorContext context;
+		readonly IPropertyEditorParams editorParams;
 		readonly KeyframeButton button;
 
-		public KeyframeButtonBinding(PropertyEditorContext context, KeyframeButton button)
+		public KeyframeButtonBinding(IPropertyEditorParams editorParams, KeyframeButton button)
 		{
-			this.context = context;
+			this.editorParams = editorParams;
 			this.button = button;
 		}
 
 		public IEnumerator<object> Task()
 		{
-			var provider = KeyframeDataflow.GetProvider(context, i => i != null).DistinctUntilChanged();
+			var provider = KeyframeDataflow.GetProvider(editorParams, i => i != null).DistinctUntilChanged();
 			var hasKeyframe = provider.GetDataflow();
 			while (true) {
 				bool @checked;
@@ -61,20 +61,20 @@ namespace Tangerine.UI.Inspector
 
 		void SetKeyframe(bool value)
 		{
-			foreach (var animable in context.Objects.OfType<IAnimable>()) {
+			foreach (var animable in editorParams.Objects.OfType<IAnimable>()) {
 				IKeyframe keyframe = null;
 				IAnimator animator;
 				var hasKey = false;
-				if (animable.Animators.TryFind(context.PropertyName, out animator, Document.Current.AnimationId)) {
+				if (animable.Animators.TryFind(editorParams.PropertyName, out animator, Document.Current.AnimationId)) {
 					hasKey = animator.ReadonlyKeys.Any(i => i.Frame == Document.Current.AnimationFrame);
 					if (hasKey && !value) {
 						Core.Operations.RemoveKeyframe.Perform(animator, Document.Current.AnimationFrame); 
 					}
 				}
 				if (!hasKey && value) {
-					var propValue = new Property(animable, context.PropertyName).Getter();
-					keyframe = Keyframe.CreateForType(context.PropertyInfo.PropertyType, Document.Current.AnimationFrame, propValue);
-					Core.Operations.SetKeyframe.Perform(animable, context.PropertyName, Document.Current.AnimationId, keyframe);
+					var propValue = new Property(animable, editorParams.PropertyName).Getter();
+					keyframe = Keyframe.CreateForType(editorParams.PropertyInfo.PropertyType, Document.Current.AnimationFrame, propValue);
+					Core.Operations.SetKeyframe.Perform(animable, editorParams.PropertyName, Document.Current.AnimationId, keyframe);
 				}
 			}
 		}

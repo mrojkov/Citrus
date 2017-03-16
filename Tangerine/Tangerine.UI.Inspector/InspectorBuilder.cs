@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -79,7 +79,7 @@ namespace Tangerine.UI.Inspector
 					label.CompoundPresenter.Add(new WidgetFlatFillPresenter(ColorTheme.Current.Inspector.CategoryLabelBackground));
 					Inspector.ContentWidget.AddNode(label);
 				}
-				var context = new PropertyEditorContext(Inspector.ContentWidget, objects, type, property.Name) {
+				var context = new PropertyEditorParams(Inspector.ContentWidget, objects, type, property.Name) {
 					NumericEditBoxFactory = () => new TransactionalNumericEditBox(),
 					PropertySetter = Core.Operations.SetAnimableProperty.Perform
 				};
@@ -99,21 +99,21 @@ namespace Tangerine.UI.Inspector
 		private void DecoratePropertyEditor(IPropertyEditor editor)
 		{
 			var ctr = editor.ContainerWidget;
-			if (PropertyAttributes<TangerineStaticPropertyAttribute>.Get(editor.Context.PropertyInfo) == null) {
+			if (PropertyAttributes<TangerineStaticPropertyAttribute>.Get(editor.EditorParams.PropertyInfo) == null) {
 				var keyFunctionButton = new KeyFunctionButton {
 					LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0),
 				};
 				var keyframeButton = new KeyframeButton {
 					LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0),
-					KeyColor = KeyframePalette.Colors[editor.Context.TangerineAttribute.ColorIndex],
+					KeyColor = KeyframePalette.Colors[editor.EditorParams.TangerineAttribute.ColorIndex],
 				};
 				keyFunctionButton.Clicked += editor.SetFocus;
 				keyframeButton.Clicked += editor.SetFocus;
 				ctr.Nodes.Insert(1, keyFunctionButton);
 				ctr.Nodes.Insert(2, keyframeButton);
 				ctr.Nodes.Insert(3, new HSpacer(4));
-				ctr.Tasks.Add(new KeyframeButtonBinding(editor.Context, keyframeButton));
-				ctr.Tasks.Add(new KeyFunctionButtonBinding(editor.Context, keyFunctionButton));
+				ctr.Tasks.Add(new KeyframeButtonBinding(editor.EditorParams, keyframeButton));
+				ctr.Tasks.Add(new KeyFunctionButtonBinding(editor.EditorParams, keyFunctionButton));
 			} else {
 				ctr.Nodes.Insert(1, new HSpacer(41));
 			}

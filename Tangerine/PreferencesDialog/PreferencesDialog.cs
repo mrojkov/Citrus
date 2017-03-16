@@ -81,13 +81,13 @@ namespace Tangerine
 			var pane = new ScrollViewWidget();
 			pane.Content.Layout = new VBoxLayout { Spacing = 4 };
 			new EnumPropertyEditor<ColorThemeEnum>(
-				new PropertyEditorContext(pane.Content, UserPreferences.Instance, "Theme", "User interface theme"));
+				new PropertyEditorParams(pane.Content, UserPreferences.Instance, "Theme", "User interface theme"));
 			new Vector2PropertyEditor(
-				new PropertyEditorContext(pane.Content, UserPreferences.Instance, "DefaultSceneDimensions", "Default scene dimensions"));
+				new PropertyEditorParams(pane.Content, UserPreferences.Instance, "DefaultSceneDimensions", "Default scene dimensions"));
 			new BooleanPropertyEditor(
-				new PropertyEditorContext(pane.Content, UserPreferences.Instance, "AutoKeyframes", "Automatic keyframes"));
+				new PropertyEditorParams(pane.Content, UserPreferences.Instance, "AutoKeyframes", "Automatic keyframes"));
 			new BooleanPropertyEditor(
-				new PropertyEditorContext(pane.Content, UserPreferences.Instance, "AnimationMode", "Animation mode"));
+				new PropertyEditorParams(pane.Content, UserPreferences.Instance, "AnimationMode", "Animation mode"));
 			return pane;
 		}
 	}

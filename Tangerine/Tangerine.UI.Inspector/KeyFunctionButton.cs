@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using Lime;
@@ -33,18 +33,18 @@ namespace Tangerine.UI.Inspector
 
 	class KeyFunctionButtonBinding : ITaskProvider
 	{
-		readonly PropertyEditorContext context;
+		readonly IPropertyEditorParams editorParams;
 		readonly KeyFunctionButton button;
 
-		public KeyFunctionButtonBinding(PropertyEditorContext context, KeyFunctionButton button)
+		public KeyFunctionButtonBinding(IPropertyEditorParams editorParams, KeyFunctionButton button)
 		{
-			this.context = context;
+			this.editorParams = editorParams;
 			this.button = button;
 		}
 
 		public IEnumerator<object> Task()
 		{
-			var provider = KeyframeDataflow.GetProvider(context, i => i?.Function).DistinctUntilChanged();
+			var provider = KeyframeDataflow.GetProvider(editorParams, i => i?.Function).DistinctUntilChanged();
 			var keyFunction = provider.GetDataflow();
 			while (true) {
 				KeyFunction? v; 
@@ -68,12 +68,12 @@ namespace Tangerine.UI.Inspector
 
 		void SetKeyFunction(KeyFunction value)
 		{
-			foreach (var animable in context.Objects.OfType<IAnimable>()) {
+			foreach (var animable in editorParams.Objects.OfType<IAnimable>()) {
 				IAnimator animator;
-				if (animable.Animators.TryFind(context.PropertyName, out animator, Document.Current.AnimationId)) {
+				if (animable.Animators.TryFind(editorParams.PropertyName, out animator, Document.Current.AnimationId)) {
 					var keyframe = animator.ReadonlyKeys.FirstOrDefault(i => i.Frame == Document.Current.AnimationFrame).Clone();
 					keyframe.Function = value;
-					Core.Operations.SetKeyframe.Perform(animable, context.PropertyName, Document.Current.AnimationId, keyframe); 
+					Core.Operations.SetKeyframe.Perform(animable, editorParams.PropertyName, Document.Current.AnimationId, keyframe); 
 				}
 			}
 		}
