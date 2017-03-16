@@ -805,6 +805,11 @@ namespace YuzuTest.Binary
 			Assert.AreEqual(v2.A, w2.A);
 			Assert.AreEqual(v2.P.X, w2.P.X);
 			Assert.AreEqual(v2.P.Y, w2.P.Y);
+
+			var w2g = bdg.FromBytes<SampleStructWithProps>(result2);
+			Assert.AreEqual(v2.A, w2.A);
+			Assert.AreEqual(v2.P.X, w2.P.X);
+			Assert.AreEqual(v2.P.Y, w2.P.Y);
 		}
 
 		[TestMethod]
