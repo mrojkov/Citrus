@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Lime;
 using Tangerine.UI;
+using Tangerine.Core;
 
 namespace Tangerine
 {
@@ -11,9 +12,11 @@ namespace Tangerine
 		readonly WindowWidget rootWidget;
 		readonly Button okButton;
 		readonly Button cancelButton;
+		readonly ColorThemeEnum theme;
 
 		public PreferencesDialog()
 		{
+			theme = UserPreferences.Instance.Theme;
 			window = new Window(new WindowOptions {
 				ClientSize = new Vector2(600, 400),
 				FixedSize = false,
@@ -33,8 +36,9 @@ namespace Tangerine
 						}
 					},
 					new BorderedFrame {
-						ClipChildren = ClipMethod.ScissorTest,
+						Padding = new Thickness(8),
 						LayoutCell = new LayoutCell { StretchY = float.MaxValue },
+						Layout = new StackLayout(),
 						Nodes = {
 							CreateGenericPane(),
 						}
@@ -50,12 +54,23 @@ namespace Tangerine
 					}
 				}
 			};
-			okButton.Clicked += window.Close;
-			cancelButton.Clicked += window.Close;
+			okButton.Clicked += () => {
+				window.Close();
+				if (theme != UserPreferences.Instance.Theme) {
+					var alert = new AlertDialog("Tangerine", "The color theme change will take effect next time you run Tangerine.", "Ok");
+					alert.Show();
+				}
+				UserPreferences.Instance.Save();
+			};
+			cancelButton.Clicked += () => {
+				window.Close();
+				UserPreferences.Instance.Load();
+			};
 			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
 			rootWidget.LateTasks.AddLoop(() => {
 				if (rootWidget.Input.ConsumeKeyPress(Key.Escape)) {
 					window.Close();
+					UserPreferences.Instance.Load();
 				}
 			});
 			okButton.SetFocus();
@@ -63,31 +78,16 @@ namespace Tangerine
 
 		Widget CreateGenericPane()
 		{
-			var pane = new Widget {
-				Padding = new Thickness(16),
-				Layout = new TableLayout { 
-					ColCount = 2,
-					RowCount = 2,
-					RowSpacing = 8,
-					ColSpacing = 16,
-					ColDefaults = new List<LayoutCell> {
-						new LayoutCell(Alignment.RightCenter),
-						new LayoutCell(Alignment.LeftCenter)
-					}
-				},
-				Nodes = {
-					new SimpleText("Default scene size"),
-					new Widget {
-						Layout = new HBoxLayout { Spacing = 4 },
-						Nodes = {
-							new EditBox { Text = "1024" },
-							new EditBox { Text = "768" }
-						}
-					},
-					new SimpleText("Run on 30fps"),
-					new CheckBox(),
-				}
-			};
+			var pane = new ScrollViewWidget();
+			pane.Content.Layout = new VBoxLayout { Spacing = 4 };
+			new EnumPropertyEditor<ColorThemeEnum>(
+				new PropertyEditorContext(pane.Content, UserPreferences.Instance, "Theme", "User interface theme"));
+			new Vector2PropertyEditor(
+				new PropertyEditorContext(pane.Content, UserPreferences.Instance, "DefaultSceneDimensions", "Default scene dimensions"));
+			new BooleanPropertyEditor(
+				new PropertyEditorContext(pane.Content, UserPreferences.Instance, "AutoKeyframes", "Automatic keyframes"));
+			new BooleanPropertyEditor(
+				new PropertyEditorContext(pane.Content, UserPreferences.Instance, "AnimationMode", "Animation mode"));
 			return pane;
 		}
 	}

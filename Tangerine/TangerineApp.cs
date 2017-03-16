@@ -50,6 +50,7 @@ namespace Tangerine
 			var documentViewContainer = InitializeDocumentArea(dockManager);
 
 			UserPreferences.Initialize();
+			SetColorTheme(UserPreferences.Instance.Theme);
 			dockManager.ImportState(UserPreferences.Instance.DockState);
 			Document.Closing += doc => {
 				var alert = new AlertDialog("Tangerine", $"Save the changes to document '{doc.Path}' before closing?", "Yes", "No", "Cancel");
@@ -106,6 +107,12 @@ namespace Tangerine
 				new Project(proj).Open();
 			}
 			RegisterGlobalCommands();
+		}
+
+		void SetColorTheme(ColorThemeEnum theme)
+		{
+			DesktopTheme.Colors = theme == ColorThemeEnum.Light ? DesktopTheme.ColorTheme.CreateLightTheme() : DesktopTheme.ColorTheme.CreateDarkTheme();
+			ColorTheme.Current = theme == ColorThemeEnum.Light ? ColorTheme.CreateLightTheme() : ColorTheme.CreateDarkTheme();
 		}
 
 		class RefreshNodeReferencesProcessor : SymmetricOperationProcessor

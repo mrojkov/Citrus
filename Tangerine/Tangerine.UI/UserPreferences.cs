@@ -6,6 +6,12 @@ using System.Collections.Generic;
 
 namespace Tangerine.UI
 {
+	public enum ColorThemeEnum
+	{
+		Light,
+		Dark
+	}
+
 	public class UserPreferences
 	{
 		[YuzuMember]
@@ -14,11 +20,17 @@ namespace Tangerine.UI
 		[YuzuMember]
 		public readonly List<string> RecentProjects = new List<string>();
 
-		[YuzuMember]
-		public bool AutoKeyframes;
+		[YuzuRequired]
+		public bool AutoKeyframes { get; set; }
 
-		[YuzuMember]
-		public bool AnimationMode;
+		[YuzuRequired]
+		public bool AnimationMode { get; set; }
+
+		[YuzuRequired]
+		public ColorThemeEnum Theme { get; set; }
+
+		[YuzuRequired]
+		public Vector2 DefaultSceneDimensions { get; set; } = new Vector2(1024, 768);
 
 		public static UserPreferences Instance { get; private set; }
 
