@@ -61,6 +61,7 @@
     <Compile Include="Docking\DockPanel.cs" />
     <Compile Include="Utils\TimelineMetrics.cs" />
     <Compile Include="Utils\Utils.cs" />
+    <Compile Include="PropertyEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Win.csproj">

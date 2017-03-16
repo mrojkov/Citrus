@@ -46,13 +46,6 @@ namespace Tangerine.Core.Operations
 
 	public class SetAnimableProperty
 	{
-		public static void Perform(IEnumerable<object> objects, string propertyName, object value)
-		{
-			foreach (var obj in objects) {
-				Perform(obj, propertyName, value);
-			}
-		}
-
 		public static void Perform(object @object, string propertyName, object value)
 		{
 			SetProperty.Perform(@object, propertyName, value);

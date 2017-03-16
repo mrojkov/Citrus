@@ -79,16 +79,53 @@ namespace Tangerine.UI.Inspector
 					label.CompoundPresenter.Add(new WidgetFlatFillPresenter(ColorTheme.Current.Inspector.CategoryLabelBackground));
 					Inspector.ContentWidget.AddNode(label);
 				}
-				var context = new PropertyEditorContext(Inspector.ContentWidget, objects, type, property.Name);
+				var context = new PropertyEditorContext(Inspector.ContentWidget, objects, type, property.Name) {
+					NumericEditBoxFactory = () => new TransactionalNumericEditBox(),
+					PropertySetter = Core.Operations.SetAnimableProperty.Perform
+				};
 				foreach (var i in Inspector.PropertyEditorRegistry) {
 					if (i.Condition(context)) {
 						var propertyEditor = i.Builder(context);
 						if (propertyEditor != null) {
+							DecoratePropertyEditor(propertyEditor);
 							Inspector.Editors.Add(propertyEditor);
 						}
 						break;
 					}
 				}
+			}
+		}
+
+		private void DecoratePropertyEditor(IPropertyEditor editor)
+		{
+			var ctr = editor.ContainerWidget;
+			if (PropertyAttributes<TangerineStaticPropertyAttribute>.Get(editor.Context.PropertyInfo) == null) {
+				var keyFunctionButton = new KeyFunctionButton {
+					LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0),
+				};
+				var keyframeButton = new KeyframeButton {
+					LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0),
+					KeyColor = KeyframePalette.Colors[editor.Context.TangerineAttribute.ColorIndex],
+				};
+				keyFunctionButton.Clicked += editor.SetFocus;
+				keyframeButton.Clicked += editor.SetFocus;
+				ctr.Nodes.Insert(1, keyFunctionButton);
+				ctr.Nodes.Insert(2, keyframeButton);
+				ctr.Nodes.Insert(3, new HSpacer(4));
+				ctr.Tasks.Add(new KeyframeButtonBinding(editor.Context, keyframeButton));
+				ctr.Tasks.Add(new KeyFunctionButtonBinding(editor.Context, keyFunctionButton));
+			} else {
+				ctr.Nodes.Insert(1, new HSpacer(41));
+			}
+		}
+
+		class TransactionalNumericEditBox : NumericEditBox
+		{
+			public TransactionalNumericEditBox()
+			{
+				Theme.Current.Apply(this, typeof(NumericEditBox));
+				BeginSpin += () => Document.Current.History.BeginTransaction();
+				EndSpin += () => Document.Current.History.EndTransaction();
 			}
 		}
 	}
