@@ -28,9 +28,12 @@ namespace Lime
 			}
 		}
 
-		// TODO
 		public string DisplayText { get { return text; } }
-		public event TextProcessorDelegate TextProcessor;
+
+		public event TextProcessorDelegate TextProcessor {
+			add { throw new NotImplementedException(); }
+			remove { throw new NotImplementedException(); }
+		}
 
 		[YuzuMember]
 		public HAlignment HAlignment
