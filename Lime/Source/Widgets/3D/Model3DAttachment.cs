@@ -21,7 +21,7 @@ namespace Lime
 			public List<string> Nodes = new List<string>();
 			public List<string> IgnoredNodes = new List<string>();
 		}
-		
+
 		public void Apply(Node3D model)
 		{
 			ProcessAnimations(model);
@@ -73,9 +73,9 @@ namespace Lime
 				return model.Descendants.Where(i => !ignoredNodes.Contains(i));
 			}
 			return model.Descendants;
-		}		
+		}
 	}
-	
+
 	class Model3DAttachmentParser
 	{
 		public enum UVAnimationType
@@ -83,7 +83,7 @@ namespace Lime
 			Rotation,
 			Offset
 		}
-	
+
 		public enum UVAnimationOverlayBlending
 		{
 			Multiply,
@@ -94,40 +94,40 @@ namespace Lime
 		public class ModelAttachmentFormat
 		{
 			[YuzuOptional]
-			public Dictionary<string, ModelAnimationFormat> Animations;
+			public Dictionary<string, ModelAnimationFormat> Animations = null;
 
 			[YuzuOptional]
-			public Dictionary<string, ModelMaterialEffectFormat> MaterialEffects;
+			public Dictionary<string, ModelMaterialEffectFormat> MaterialEffects = null;
 
 			[YuzuOptional]
-			public List<UVAnimationFormat> UVAnimations;
+			public List<UVAnimationFormat> UVAnimations = null;
 		}
 
 		public class UVAnimationFormat
 		{
 			[YuzuOptional]
-			public string MeshName;
+			public string MeshName = null;
 
 			[YuzuOptional]
-			public string DiffuseTexture;
+			public string DiffuseTexture = null;
 
 			[YuzuOptional]
-			public string OverlayTexture;
+			public string OverlayTexture = null;
 
 			[YuzuOptional]
-			public string MaskTexture;
+			public string MaskTexture = null;
 
 			[YuzuOptional]
-			public float AnimationSpeed;
+			public float AnimationSpeed = 0;
 
 			[YuzuOptional]
-			public UVAnimationType AnimationType;
+			public UVAnimationType AnimationType = UVAnimationType.Rotation;
 
 			[YuzuOptional]
-			public UVAnimationOverlayBlending BlendingMode;
+			public UVAnimationOverlayBlending BlendingMode = UVAnimationOverlayBlending.Multiply;
 
 			[YuzuOptional]
-			public bool AnimateOverlay;
+			public bool AnimateOverlay = false;
 
 			[YuzuOptional]
 			public float TileX = 1f;
@@ -139,40 +139,40 @@ namespace Lime
 		public class ModelAnimationFormat
 		{
 			[YuzuOptional]
-			public int StartFrame;
+			public int StartFrame = 0;
 
 			[YuzuOptional]
-			public int LastFrame;
+			public int LastFrame = 0;
 
 			[YuzuOptional]
-			public List<string> Nodes;
+			public List<string> Nodes = null;
 
 			[YuzuOptional]
-			public List<string> IgnoredNodes;
+			public List<string> IgnoredNodes = null;
 
 			[YuzuOptional]
-			public Dictionary<string, ModelMarkerFormat> Markers;
+			public Dictionary<string, ModelMarkerFormat> Markers = null;
 		}
 
 		public class ModelMarkerFormat
 		{
 			[YuzuOptional]
-			public int Frame;
+			public int Frame = 0;
 
 			[YuzuOptional]
-			public string Action;
+			public string Action = null;
 
 			[YuzuOptional]
-			public string JumpTarget;
+			public string JumpTarget = null;
 		}
 
 		public class ModelMaterialEffectFormat
 		{
 			[YuzuOptional]
-			public string MaterialName;
+			public string MaterialName = null;
 
 			[YuzuOptional]
-			public string Path;
+			public string Path = null;
 		}
 
 		public Model3DAttachment Parse(string modelPath)
@@ -227,7 +227,7 @@ namespace Lime
 					}
 
 					attachment.Animations.Add(animation);
-				}	
+				}
 				return attachment;
 			} catch (System.Exception e) {
 				throw new System.Exception(modelPath + ": " + e.Message, e);
