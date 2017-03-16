@@ -5,12 +5,12 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yuzu", "Yuzu.csproj", "{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YuzuTest", "..\YuzuTest\YuzuTest.csproj", "{494055CB-A368-4FC2-AD19-8986C23A6D51}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YuzuTest", "YuzuTest\YuzuTest.csproj", "{494055CB-A368-4FC2-AD19-8986C23A6D51}"
 	ProjectSection(ProjectDependencies) = postProject
 		{3DFBE19B-53F5-414B-AC2A-717A0B872E3F} = {3DFBE19B-53F5-414B-AC2A-717A0B872E3F}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyTest", "..\YuzuTest\AssemblyTest\AssemblyTest.csproj", "{3DFBE19B-53F5-414B-AC2A-717A0B872E3F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyTest", "YuzuTest\AssemblyTest\AssemblyTest.csproj", "{3DFBE19B-53F5-414B-AC2A-717A0B872E3F}"
 	ProjectSection(ProjectDependencies) = postProject
 		{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46} = {DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}
 	EndProjectSection
