@@ -415,6 +415,23 @@ namespace Yuzu.Binary
 			return result;
 		}
 
+		protected void ReadIntoStruct<T>(ref T s) where T : struct
+		{
+			var classId = Reader.ReadInt16();
+			if (classId == 0)
+				return;
+			var def = GetClassDef(classId);
+			if (!typeof(T).IsAssignableFrom(def.Meta.Type))
+				throw Error("Unable to assign type {0} to {1}", def.Meta.Type, typeof(T));
+			if (def.Make != null) {
+				s = (T)def.Make(this, def);
+				return;
+			}
+			var result = Activator.CreateInstance(def.Meta.Type);
+			def.ReadFields(this, def, result);
+			s = (T)result;
+		}
+
 		protected object ReadStructUnchecked<T>() where T : struct
 		{
 			var classId = Reader.ReadInt16();

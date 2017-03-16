@@ -204,6 +204,10 @@ namespace Yuzu.Binary
 
 		private void GenerateSetValue(Type t, string name)
 		{
+			if (!t.IsGenericType && Utils.IsStruct(t) && !simpleValueReader.ContainsKey(t)) {
+				cw.Put("dg.ReadIntoStruct(ref {0});\n", name);
+				return;
+			}
 			cw.Put("{0} = ", name);
 			GenerateValue(t, name);
 		}
