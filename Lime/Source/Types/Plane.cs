@@ -3,6 +3,7 @@ using Yuzu;
 
 namespace Lime
 {
+	[YuzuCompact]
 	public struct Plane : IEquatable<Plane>
 	{
 		[YuzuMember]

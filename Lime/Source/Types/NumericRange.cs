@@ -7,6 +7,7 @@ namespace Lime
 	/// Representation of numeric range of numbers around median.
 	/// </summary>
 	[System.Diagnostics.DebuggerStepThrough]
+	[YuzuCompact]
 	public struct NumericRange : IEquatable<NumericRange>
 	{
 		[YuzuMember]

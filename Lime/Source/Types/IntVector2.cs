@@ -6,8 +6,8 @@ namespace Lime
 	/// <summary>
 	/// Representation of integer 2D vectors and points.
 	/// </summary>
-	[YuzuCompact]
 	[System.Diagnostics.DebuggerStepThrough]
+	[YuzuCompact]
 	public struct IntVector2 : IEquatable<IntVector2>
 	{
 		[YuzuMember("0")]
