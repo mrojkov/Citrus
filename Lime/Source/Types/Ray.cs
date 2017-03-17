@@ -6,7 +6,6 @@ namespace Lime
 	/// <summary>
 	/// Representation of endless ray.
 	/// </summary>
-	[YuzuCompact]
 	public struct Ray : IEquatable<Ray>
 	{
 		[YuzuMember]

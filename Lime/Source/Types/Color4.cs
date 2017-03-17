@@ -7,9 +7,9 @@ namespace Lime
 	/// <summary>
 	/// Representation of 4-byte color (RGBA).
 	/// </summary>
+	[YuzuCompact]
 	[System.Diagnostics.DebuggerStepThrough]
 	[StructLayout(LayoutKind.Explicit)]
-	[YuzuCompact]
 	public struct Color4 : IEquatable<Color4>
 	{
 		[FieldOffset(0)]

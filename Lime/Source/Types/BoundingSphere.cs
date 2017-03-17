@@ -7,7 +7,6 @@ namespace Lime
 	/// <summary>
 	/// Representation of solid sphere.
 	/// </summary>
-	[YuzuCompact]
 	public struct BoundingSphere : IEquatable<BoundingSphere>
 	{
 		[YuzuMember]
