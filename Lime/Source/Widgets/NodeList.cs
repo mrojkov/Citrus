@@ -291,5 +291,33 @@ namespace Lime
 				value.PropagateDirtyFlags();
 			}
 		}
+
+		public void Move(int indexFrom, int indexTo)
+		{
+			if (list == null) {
+				throw new IndexOutOfRangeException();
+			}
+			if (indexFrom == indexTo) {
+				return;
+			}
+			if (indexFrom > 0) {
+				list[indexFrom - 1].NextSibling = (indexFrom + 1 < Count) ? list[indexFrom + 1] : null;
+			}
+			var tmp = list[indexFrom];
+			if (indexFrom < indexTo) {
+				for (int i = indexFrom; i < indexTo; i++) {
+					list[i] = list[i + 1];
+				}
+			} else {
+				for (int i = indexFrom; i > indexTo; i--) {
+					list[i] = list[i - 1];
+				}
+			}
+			list[indexTo] = tmp;
+			if (indexTo > 0) {
+				list[indexTo - 1].NextSibling = tmp;
+			}
+			tmp.NextSibling = (indexTo + 1 < Count) ? list[indexTo + 1] : null;
+		}
 	}
 }
