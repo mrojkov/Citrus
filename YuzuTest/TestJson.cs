@@ -649,6 +649,29 @@ namespace YuzuTest.Json
 		}
 
 		[TestMethod]
+		public void TestArray2D()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			js.JsonOptions.FieldSeparator = "";
+			var jd = new JsonDeserializer();
+
+			var v0 = new SampleArray2D { A = new int[][] { new int[] { 1, 2, 3 }, new int[] { 4, 5 } } };
+			var result0 = js.ToString(v0);
+			Assert.AreEqual("{\"A\":[[1,2,3],[4,5]]}", result0);
+			var w0 = new SampleArray2D();
+			jd.FromString(w0, result0);
+			Assert.AreEqual(2, w0.A.Length);
+			CollectionAssert.AreEqual(v0.A[0], w0.A[0]);
+			CollectionAssert.AreEqual(v0.A[1], w0.A[1]);
+
+			var w1 = (SampleArray2D)SampleArray2D_JsonDeserializer.Instance.FromString(result0);
+			Assert.AreEqual(2, w1.A.Length);
+			CollectionAssert.AreEqual(v0.A[0], w1.A[0]);
+			CollectionAssert.AreEqual(v0.A[1], w1.A[1]);
+		}
+
+		[TestMethod]
 		public void TestClassList()
 		{
 			var js = new JsonSerializer();
@@ -953,6 +976,11 @@ namespace YuzuTest.Json
 			var f = ((Dictionary<string, object>)d)["F"];
 			Assert.IsInstanceOfType(f, typeof(SampleObj));
 			Assert.AreEqual(null, ((SampleObj)f).F);
+
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			js.JsonOptions.FieldSeparator = "";
+			Assert.AreEqual("[\"q\",[1]]", js.ToString(new List<object> { "q", new List<int> { 1 } }));
 		}
 
 		[TestMethod]
@@ -1376,6 +1404,60 @@ namespace YuzuTest.Json
 			var jd = new JsonDeserializer();
 			jd.FromString(w1, result1);
 			Assert.AreEqual(v1.X, w1.X);
+		}
+
+		[TestMethod]
+		public void TestSurrogateStr()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			var jd = new JsonDeserializer();
+
+			var v1 = new SampleSurrogateColor { R = 255, G = 0, B = 161 };
+			var result1 = js.ToString(v1);
+			Assert.AreEqual("\"#FF00A1\"", result1);
+			var w1 = jd.FromString<SampleSurrogateColor>(result1);
+			Assert.AreEqual(v1.R, w1.R);
+			Assert.AreEqual(v1.G, w1.G);
+			Assert.AreEqual(v1.B, w1.B);
+
+			var v2 = new SampleSurrogateColorIf { R = 77, G = 88, B = 99 };
+			Assert.AreEqual("[\n99,\n88,\n77\n]", js.ToString(v2));
+
+			var v3 = new SampleSurrogateColorIfDerived { R = 55, G = 66, B = 77 };
+			Assert.AreEqual("556677", js.ToString(v3));
+
+			SampleSurrogateColorIf.S = true;
+			Assert.AreEqual("778899", js.ToString(v2));
+			// RequireInt fails at EOF, so add trailing space.
+			var w2 = jd.FromString<SampleSurrogateColorIfDerived>("778899 ");
+			Assert.AreEqual(v2.R, w2.R);
+			Assert.AreEqual(v2.G, w2.G);
+			Assert.AreEqual(v2.B, w2.B);
+		}
+
+		[TestMethod]
+		public void TestSurrogateClass()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			js.JsonOptions.FieldSeparator = "";
+			var jd = new JsonDeserializer();
+
+			var v1 = new SampleSurrogateClass { FB = true };
+			var result1 = js.ToString(v1);
+			Assert.AreEqual("{\"class\":\"YuzuTest.SampleBool, YuzuTest\",\"B\":true}", result1);
+			Assert.AreEqual("[" + result1 + "]", js.ToString(new List<object> { v1 }));
+			var w1 = jd.FromString<SampleSurrogateClass>(result1);
+			Assert.IsTrue(w1.FB);
+
+			var v2 = new SampleCompactSurrogate { X = 24, Y = 25 };
+			var result2 = js.ToString(v2);
+			Assert.AreEqual("[24,25]", result2);
+			Assert.AreEqual("[" + result2 + "]", js.ToString(new List<object> { v2 }));
+			var w2 = jd.FromString<SampleCompactSurrogate>(result2);
+			Assert.AreEqual(v2.X, w2.X);
+			Assert.AreEqual(v2.Y, w2.Y);
 		}
 
 		[TestMethod]

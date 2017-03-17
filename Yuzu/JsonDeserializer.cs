@@ -740,8 +740,12 @@ namespace Yuzu.Json
 		protected virtual object ReadFieldsCompact(object obj)
 		{
 			var meta = Meta.Get(obj.GetType(), Options);
-			if (!meta.IsCompact)
-				throw Error("Attempt to read non-compact type '{0}' from compact format", obj.GetType().Name);
+			if (!meta.IsCompact) {
+				if (meta.Surrogate.FuncFrom == null)
+					throw Error("Attempt to read non-compact type '{0}' from compact format", obj.GetType().Name);
+				return meta.Surrogate.FuncFrom(
+					ReadFieldsCompact(Activator.CreateInstance(meta.Surrogate.SurrogateType)));
+			}
 			bool isFirst = true;
 			objStack.Push(obj);
 			try {
@@ -766,11 +770,27 @@ namespace Yuzu.Json
 				throw Error("Expected class tag, but found '{0}'", name);
 		}
 
+		private Surrogate GetSurrogate<T>(Type actualType)
+		{
+			var sg = Meta.Get(typeof(T), Options).Surrogate;
+			if (sg.FuncFrom == null)
+				throw Error(
+					"Expected type '{0}', but got '{1}'",
+					typeof(T).Name, actualType == null ? "number" : actualType.Name);
+			if (actualType != null && !sg.SurrogateType.IsAssignableFrom(actualType))
+				throw Error(
+					"Expected type '{0}' or '{1}', but got '{2}'",
+					typeof(T).Name, sg.SurrogateType.Name, actualType.Name);
+			return sg;
+		}
+
 		// T is neither a collection nor a bare object.
 		private T ReadObject<T>() where T: class, new() {
 			KillBuf();
-			switch (RequireBracketOrNull()) {
+			var ch = SkipSpaces();
+			switch (ch) {
 				case 'n':
+					Require("ull");
 					return null;
 				case '{':
 					var name = GetNextName(first: true);
@@ -778,13 +798,23 @@ namespace Yuzu.Json
 						return (T)ReadFields(new T(), name);
 					var typeName = RequireUnescapedString();
 					var t = FindType(typeName);
-					if (!typeof(T).IsAssignableFrom(t))
-						throw Error("Expected type '{0}', but got '{1}'", typeof(T).Name, typeName);
-					return (T)ReadFields(Activator.CreateInstance(t), GetNextName(first: false));
+					if (typeof(T).IsAssignableFrom(t))
+						return (T)ReadFields(Activator.CreateInstance(t), GetNextName(first: false));
+					return (T)GetSurrogate<T>(t).FuncFrom(
+						ReadFields(Activator.CreateInstance(t), GetNextName(first: false)));
 				case '[':
 					return (T)ReadFieldsCompact(new T());
+				case '"':
+					PutBack(ch);
+					return (T)GetSurrogate<T>(typeof(string)).FuncFrom(RequireString());
+				case 't':
+				case 'f':
+					PutBack(ch);
+					return (T)GetSurrogate<T>(typeof(bool)).FuncFrom(RequireBool());
 				default:
-					throw new YuzuAssert();
+					PutBack(ch);
+					var sg = GetSurrogate<T>(null);
+					return (T)sg.FuncFrom(ReadValueFunc(sg.SurrogateType)()); // TODO: Optimize
 			}
 		}
 

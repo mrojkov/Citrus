@@ -82,6 +82,7 @@
     <Compile Include="Grisu\PowersOfTenCache.cs" />
     <Compile Include="JsonHelpers.cs" />
     <Compile Include="ReaderDeserializer.cs" />
+    <Compile Include="Surrogates.cs" />
     <Compile Include="UnsafeReader.cs" />
     <Compile Include="JsonDeserializer.cs" />
     <Compile Include="JsonGenerators.cs" />

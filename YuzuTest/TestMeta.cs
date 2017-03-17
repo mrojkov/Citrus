@@ -148,5 +148,95 @@ namespace YuzuTest.Metadata
 		{
 			XAssert.Throws<YuzuException>(() => Meta.Get(typeof(Sample1Bad), new CommonOptions()), "3");
 		}
+
+		internal class ToSurrogateBadParams
+		{
+			[YuzuToSurrogate]
+			int ToS1(int y) { return 0; }
+		}
+
+		internal class SurrogateIfBadParams
+		{
+			[YuzuSurrogateIf]
+			bool SIf1(int y) { return false; }
+		}
+
+		internal class FromSurrogateBadParams
+		{
+			[YuzuToSurrogate]
+			int ToS1() { return 0; }
+			[YuzuFromSurrogate]
+			static FromSurrogateBadParams FromS1(string s) { return null; }
+		}
+
+		internal class ToSurrogateStaticBadParams
+		{
+			[YuzuToSurrogate]
+			static int ToS2() { return 0; }
+		}
+
+		internal class ToSurrogateStaticBadParamType
+		{
+			[YuzuToSurrogate]
+			static int ToS21(int x) { return 0; }
+		}
+
+		internal class ToSurrogateVoid
+		{
+			[YuzuToSurrogate]
+			void ToS3() { }
+		}
+
+		internal class SurrogateIfInt
+		{
+			[YuzuSurrogateIf]
+			int SIf3() { return 0; }
+		}
+
+		internal class FromSurrogateInt
+		{
+			[YuzuFromSurrogate]
+			static int FromS3() { return 0; }
+		}
+
+		internal class ToSurrogateDup
+		{
+			[YuzuToSurrogate]
+			int ToS41() { return 0; }
+			[YuzuToSurrogate]
+			int ToS42() { return 0; }
+		}
+
+		internal class ToSurrogateChain
+		{
+			[YuzuToSurrogate]
+			SampleSurrogateColor ToS5() { return new SampleSurrogateColor(); }
+		}
+
+		[TestMethod]
+		public void TestSurrogateErrors()
+		{
+			var opt = new CommonOptions();
+
+			XAssert.Throws<YuzuException>(() => Meta.Get(typeof(ToSurrogateBadParams), opt), "ToS1");
+			XAssert.Throws<YuzuException>(() => Meta.Get(typeof(SurrogateIfBadParams), opt), "SIf1");
+			XAssert.Throws<YuzuException>(() => Meta.Get(typeof(FromSurrogateBadParams), opt), "FromS1");
+
+			XAssert.Throws<YuzuException>(() => Meta.Get(typeof(ToSurrogateStaticBadParams), opt), "ToS2");
+			XAssert.Throws<YuzuException>(() => Meta.Get(typeof(ToSurrogateStaticBadParamType), opt), "ToS21");
+
+			XAssert.Throws<YuzuException>(() => Meta.Get(typeof(ToSurrogateVoid), opt), "ToS3");
+			XAssert.Throws<YuzuException>(() => Meta.Get(typeof(SurrogateIfInt), opt), "SIf3");
+			XAssert.Throws<YuzuException>(() => Meta.Get(typeof(FromSurrogateInt), opt), "FromS3");
+
+			XAssert.Throws<YuzuException>(() => Meta.Get(typeof(ToSurrogateDup), opt), "ToS41");
+
+			var opt1 = new CommonOptions { Meta = new MetaOptions() };
+			Meta.Get(typeof(ToSurrogateChain), opt1);
+			XAssert.Throws<YuzuException>(() => Meta.Get(typeof(SampleSurrogateColor), opt1), "chain");
+			var opt2 = new CommonOptions { Meta = new MetaOptions() };
+			Meta.Get(typeof(SampleSurrogateColor), opt2);
+			XAssert.Throws<YuzuException>(() => Meta.Get(typeof(ToSurrogateChain), opt2), "chain");
+		}
 	}
 }

@@ -175,10 +175,9 @@ namespace Yuzu.Binary
 			if (t.IsArray) {
 				var tempIndexName = PutNullOrCount(t);
 				var tempArrayName = cw.GetTempName();
-				cw.Put("var {0} = new {1}[{2}];\n", tempArrayName, Utils.GetTypeSpec(t.GetElementType()), tempIndexName);
+				cw.Put("var {0} = new {1};\n", tempArrayName, Utils.GetTypeSpec(t, arraySize: tempIndexName));
 				cw.Put("for({0} = 0; {0} < {1}.Length; ++{0}) {{\n", tempIndexName, tempArrayName);
-				cw.Put("{0}[{1}] = ", tempArrayName, tempIndexName);
-				GenerateValue(t.GetElementType(), String.Format("{0}[{1}]", tempArrayName, tempIndexName));
+				GenerateSetValue(t.GetElementType(), String.Format("{0}[{1}]", tempArrayName, tempIndexName));
 				cw.Put("}\n");
 				cw.Put("{0} = {1};\n", name, tempArrayName);
 				cw.Put("}\n"); // if >= 0
@@ -201,6 +200,24 @@ namespace Yuzu.Binary
 				return;
 			}
 			throw new NotImplementedException();
+		}
+
+		private void GenerateSetValue(Type t, string name)
+		{
+			if (!t.IsGenericType && Utils.IsStruct(t) && !simpleValueReader.ContainsKey(t)) {
+
+				var meta = Meta.Get(t, options);
+				if (meta.IsCompact && meta.Surrogate.FuncFrom == null) {
+					cw.Put("dg.EnsureClassDef(typeof({0}));\n", Utils.GetTypeSpec(t));
+					foreach (var yi in meta.Items)
+						GenerateSetValue(yi.Type, name + "." + yi.Name);
+				}
+				else
+					cw.Put("dg.ReadIntoStruct(ref {0});\n", name);
+				return;
+			}
+			cw.Put("{0} = ", name);
+			GenerateValue(t, name);
 		}
 
 		private void GenerateMerge(Type t, string name)
@@ -243,10 +260,8 @@ namespace Yuzu.Binary
 			if (IsDeserializerGenRequired(meta))
 				cw.Put("var dg = (BinaryDeserializerGen)d;\n", Utils.GetTypeSpec(meta.Type));
 			if (meta.IsCompact) {
-				foreach (var yi in meta.Items) {
-					cw.Put("result.{0} = ", yi.Name);
-					GenerateValue(yi.Type, "result." + yi.Name);
-				}
+				foreach (var yi in meta.Items)
+					GenerateSetValue(yi.Type, "result." + yi.Name);
 			}
 			else {
 				cw.Put("{0}.FieldDef fd;\n", classDefName);
@@ -254,19 +269,12 @@ namespace Yuzu.Binary
 				cw.Put("fd = def.Fields[d.Reader.ReadInt16()];\n");
 				foreach (var yi in meta.Items) {
 					ourIndex += 1;
-					if (yi.IsOptional) {
+					if (yi.IsOptional)
 						cw.Put("if ({0} == fd.OurIndex) {{\n", ourIndex);
-						if (yi.SetValue != null)
-							cw.Put("result.{0} = ", yi.Name);
-					}
-					else {
-						if (SafetyChecks)
-							cw.Put("if ({0} != fd.OurIndex) throw dg.Error(\"{0}!=\" + fd.OurIndex);\n", ourIndex);
-						if (yi.SetValue != null)
-							cw.Put("result.{0} = ", yi.Name);
-					}
+					else if (SafetyChecks)
+						cw.Put("if ({0} != fd.OurIndex) throw dg.Error(\"{0}!=\" + fd.OurIndex);\n", ourIndex);
 					if (yi.SetValue != null)
-						GenerateValue(yi.Type, "result." + yi.Name);
+						GenerateSetValue(yi.Type, "result." + yi.Name);
 					else
 						GenerateMerge(yi.Type, "result." + yi.Name);
 					cw.Put("fd = def.Fields[d.Reader.ReadInt16()];\n");

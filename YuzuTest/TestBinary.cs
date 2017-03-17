@@ -679,6 +679,35 @@ namespace YuzuTest.Binary
 		}
 
 		[TestMethod]
+		public void TestArray2D()
+		{
+			var bs = new BinarySerializer();
+			var bd = new BinaryDeserializer();
+			var bdg = new BinaryDeserializerGen();
+
+			var v0 = new SampleArray2D { A = new int[][] { new int[] { 1, 2, 3 }, new int[] { 4, 5 } } };
+			var result0 = bs.ToBytes(v0);
+			Assert.AreEqual(
+				"20 01 00 " + XS(typeof(SampleArray2D)) + " 01 00 " + XS("A", RoughType.Sequence) +
+				" 21 05 01 00 02 00 00 00" +
+				" 03 00 00 00 01 00 00 00 02 00 00 00 03 00 00 00" +
+				" 02 00 00 00 04 00 00 00 05 00 00 00" +
+				" 00 00",
+				XS(result0));
+
+			var w0 = new SampleArray2D();
+			bd.FromBytes(w0, result0);
+			Assert.AreEqual(2, w0.A.Length);
+			CollectionAssert.AreEqual(v0.A[0], w0.A[0]);
+			CollectionAssert.AreEqual(v0.A[1], w0.A[1]);
+
+			var w1 = (SampleArray2D)bdg.FromBytes(result0);
+			Assert.AreEqual(2, w1.A.Length);
+			CollectionAssert.AreEqual(v0.A[0], w1.A[0]);
+			CollectionAssert.AreEqual(v0.A[1], w1.A[1]);
+		}
+
+		[TestMethod]
 		public void TestClassList()
 		{
 			var bs = new BinarySerializer();
@@ -947,6 +976,11 @@ namespace YuzuTest.Binary
 				new object[] { (sbyte)5, "abc" });
 
 			Assert.AreEqual((short)266, bd.FromBytes<object>(SX("03 0A 01")));
+
+			var bs = new BinarySerializer();
+			Assert.AreEqual(
+				"21 11 02 00 00 00 10 " + XS("q") + " 21 05 01 00 00 00 01 00 00 00",
+				XS(bs.ToBytes(new List<object> { "q", new List<int> { 1 } })));
 		}
 
 		[TestMethod]

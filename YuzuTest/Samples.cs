@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -166,6 +167,12 @@ namespace YuzuTest
 	{
 		[YuzuRequired]
 		public string[] A;
+	}
+
+	public class SampleArray2D
+	{
+		[YuzuRequired]
+		public int[][] A;
 	}
 
 	public class SampleTree
@@ -563,6 +570,127 @@ namespace YuzuTest
 		[YuzuMember]
 		public int X;
 		public YuzuUnknownStorage Storage = new YuzuUnknownStorage();
+	}
+
+	public class SampleSurrogateColor
+	{
+		public int R, G, B;
+		[YuzuToSurrogate]
+		public string ToSurrogate() { return String.Format("#{0:X2}{1:X2}{2:X2}", R, G, B); }
+		[YuzuFromSurrogate]
+		public static SampleSurrogateColor FromSurrogate(string s) {
+			if (s[0] != '#')
+				throw new Exception("Bad color: " + s);
+			return new SampleSurrogateColor {
+				R = int.Parse(s.Substring(1, 2), NumberStyles.AllowHexSpecifier),
+				G = int.Parse(s.Substring(3, 2), NumberStyles.AllowHexSpecifier),
+				B = int.Parse(s.Substring(5, 2), NumberStyles.AllowHexSpecifier),
+			};
+		}
+	}
+
+	[YuzuCompact]
+	public class SampleSurrogateColorIf
+	{
+		[YuzuRequired]
+		public int R, G, B;
+		public static bool S;
+		[YuzuSurrogateIf]
+		public virtual bool SurrogateIf() { return S; }
+		[YuzuToSurrogate]
+		public static int ToSurrogate(SampleSurrogateColorIf c)
+		{
+			return c.R * 10000 + c.G * 100 + c.B;
+		}
+	}
+
+	[YuzuCompact]
+	public class SampleSurrogateColorIfDerived : SampleSurrogateColorIf
+	{
+		public override bool SurrogateIf() { return true; }
+		[YuzuFromSurrogate]
+		public static SampleSurrogateColorIfDerived FromSurrogate(int x)
+		{
+			return new SampleSurrogateColorIfDerived {
+				R = x / 10000,
+				G = (x % 10000) / 100,
+				B = x % 100,
+			};
+		}
+	}
+
+	public class SampleSurrogateClass
+	{
+		public bool FB;
+		[YuzuToSurrogate]
+		public static SampleBool ToSurrogate(SampleSurrogateClass obj) { return new SampleBool { B = obj.FB }; }
+		[YuzuFromSurrogate]
+		public static SampleSurrogateClass FromSurrogate(SampleBool obj)
+		{
+			return new SampleSurrogateClass { FB = obj.B };
+		}
+	}
+
+	public class SampleCompactSurrogate
+	{
+		public int X, Y;
+		[YuzuToSurrogate]
+		public static SamplePoint ToSurrogate(SampleCompactSurrogate obj)
+		{
+			return new SamplePoint { X = obj.X, Y = obj.Y };
+		}
+		[YuzuFromSurrogate]
+		public static SampleCompactSurrogate FromSurrogate(SamplePoint obj)
+		{
+			return new SampleCompactSurrogate { X = obj.X, Y = obj.Y };
+		}
+	}
+
+	[ProtoContract]
+	public class SampleAoS
+	{
+		[ProtoContract]
+		[YuzuCompact]
+		public struct Vertex
+		{
+			[YuzuRequired]
+			[ProtoMember(1)]
+			public float X;
+			[YuzuRequired]
+			[ProtoMember(2)]
+			public float Y;
+			[YuzuRequired]
+			[ProtoMember(3)]
+			public float Z;
+		}
+		[ProtoContract]
+		[YuzuCompact]
+		public struct Color
+		{
+			[YuzuRequired]
+			[ProtoMember(1)]
+			public byte R;
+			[YuzuRequired]
+			[ProtoMember(2)]
+			public byte G;
+			[YuzuRequired]
+			[ProtoMember(3)]
+			public byte B;
+		}
+		[ProtoContract]
+		[YuzuCompact]
+		public class S {
+			[YuzuRequired]
+			[ProtoMember(1)]
+			public Vertex V;
+			[YuzuRequired]
+			[ProtoMember(2)]
+			public Color C;
+		}
+
+		[YuzuRequired]
+		[ProtoMember(1)]
+		public List<S> A = new List<S>();
 	}
 
 	public class Bad1
