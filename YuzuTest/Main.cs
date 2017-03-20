@@ -180,6 +180,7 @@ namespace YuzuTest
 				bd.Generate<SampleAoS.Vertex>();
 				bd.Generate<SampleAoS.S>();
 				bd.Generate<SampleAoS>();
+				bd.Generate<SampleStructWithProps>();
 				bd.Generate<YuzuTestAssembly.SampleAssemblyBase>();
 				bd.Generate<YuzuTestAssembly.SampleAssemblyDerivedQ>();
 				bd.Generate<YuzuTest2.SampleNamespace>();
