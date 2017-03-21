@@ -139,8 +139,8 @@ namespace Lime
 
 		private WindowRect CalculateScissorRectangle(Widget widget)
 		{
-			var aabb = widget.CalcAABBInViewportSpace();
-			return (WindowRect)(IntRectangle)aabb;
+			var aabb = widget.CalcAABBInViewportSpace(Renderer.Viewport, Renderer.WorldViewProjection);
+			return (WindowRect)aabb;
 		}
 
 		public override void AddToRenderChain(RenderChain chain)

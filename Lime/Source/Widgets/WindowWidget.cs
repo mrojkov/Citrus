@@ -64,18 +64,20 @@ namespace Lime
 
 		public virtual void RenderAll()
 		{
-			SetViewport();
+			Renderer.Viewport = GetViewport();
 			renderChain.Render();
 		}
 
-		public void SetViewport()
+		public WindowRect GetViewport()
 		{
-			Renderer.Viewport = new WindowRect {
+			return new WindowRect {
 				X = 0, Y = 0,
 				Width = (int)(Window.ClientSize.X * Window.PixelScale),
 				Height = (int)(Window.ClientSize.Y * Window.PixelScale)
 			};
 		}
+
+		public Matrix44 GetProjection() => Matrix44.CreateOrthographicOffCenter(0, Width, Height, 0, -50, 50);
 	}
 
 	public class DefaultWindowWidget : WindowWidget
@@ -88,7 +90,7 @@ namespace Lime
 			Theme.Current.Apply(this, typeof(WindowWidget));
 			window.Rendering += () => {
 				Renderer.BeginFrame();
-				Renderer.SetOrthogonalProjection(Vector2.Zero, Size);
+				Renderer.Projection = GetProjection();
 				RenderAll();
 				Renderer.EndFrame();
 			};

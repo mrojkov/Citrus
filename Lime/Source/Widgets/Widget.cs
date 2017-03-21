@@ -1152,26 +1152,20 @@ namespace Lime
 			return aabb;
 		}
 
-		/// <summary>
-		/// Calculates AABB in the viewport space.
-		/// AABB.A specifies the lower left corner of the rectangle.
-		/// AABB.A specifies the upper right corner of the rectangle.
-		/// </summary>
-		public IntRectangle CalcAABBInViewportSpace()
+
+		public IntRectangle CalcAABBInViewportSpace(WindowRect viewport, Matrix44 worldViewProjection)
 		{
 			var aabb = CalcAABBInSpaceOf(WidgetContext.Current.Root);
 			// Get the projected AABB coordinates in the normalized OpenGL space
-			var rc = GetInheritedComponent<RenderingContext>();
-			Matrix44 proj = rc.Projection;
-			aabb.A = proj.TransformVector(aabb.A);
-			aabb.B = proj.TransformVector(aabb.B);
+			var window = WidgetContext.Current.Root;
+			aabb.A = worldViewProjection.TransformVector(aabb.A);
+			aabb.B = worldViewProjection.TransformVector(aabb.B);
 			// Transform to 0,0 - 1,1 coordinate space
 			aabb.Left = (1 + aabb.Left) / 2;
 			aabb.Right = (1 + aabb.Right) / 2;
 			aabb.Top = (1 + aabb.Top) / 2;
 			aabb.Bottom = (1 + aabb.Bottom) / 2;
-			// Transform to vieport coordinates
-			var viewport = rc.Viewport;
+			// Transform to viewport coordinates
 			var min = new Vector2(viewport.X, viewport.Y);
 			var max = new Vector2(viewport.X + viewport.Width, viewport.Y + viewport.Height);
 			return new IntRectangle {
@@ -1186,16 +1180,12 @@ namespace Lime
 			};
 		}
 
-		/// <summary>
-		/// Calculates AABB in the window space.
-		/// AABB.A specifies the upper left corner of the rectangle.
-		/// AABB.A specifies the lower right corner of the rectangle.
-		/// </summary>
 		public Rectangle CalcAABBInWindowSpace()
 		{
-			var aabb = (Rectangle)CalcAABBInViewportSpace();
-			var rc = GetInheritedComponent<RenderingContext>();
-			var vpOrigin = (Vector2)rc.Viewport.Origin;
+			var windowWidget = (WindowWidget)WidgetContext.Current.Root;
+			var viewport = windowWidget.GetViewport();
+			var aabb = (Rectangle)CalcAABBInViewportSpace(viewport, windowWidget.GetProjection());
+			var vpOrigin = (Vector2)viewport.Origin;
 			aabb.A += vpOrigin;
 			aabb.B += vpOrigin;
 			var window = CommonWindow.Current;
