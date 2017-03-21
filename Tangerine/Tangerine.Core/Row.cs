@@ -16,7 +16,7 @@ namespace Tangerine.Core
 		}
 	}
 
-	public class Row : Entity
+	public class Row
 	{
 		public int Index { get; set; }
 		public bool Selected => SelectedAtUpdate > 0;
@@ -24,5 +24,8 @@ namespace Tangerine.Core
 		public bool CanHaveChildren { get; set; }
 		public Row Parent { get; set; }
 		public readonly List<Row> Rows = new List<Row>();
+		public readonly ComponentCollection<IComponent> Components = new ComponentCollection<IComponent>();
 	}
+
+	public interface IComponent { }
 }

@@ -14,7 +14,7 @@ namespace Tangerine.UI.Timeline
 		{
 			var g = Timeline.Instance.Globals;
 			while (true) {
-				var r = g.Components.Get<HasKeyframeRequest>();
+				var r = g.Get<HasKeyframeRequest>();
 				if (r != null) {
 					r.Result = HasKeyframeOnCell(r.cell);
 				}

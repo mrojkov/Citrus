@@ -72,7 +72,8 @@ namespace Lime
 			Visible   = 1 << 0,
 			Color     = 1 << 1,
 			Transform = 1 << 2,
-			TangerineFlags = 1 << 3,
+			InheritedComponentsCache = 1 << 3,
+			TangerineFlags = 1 << 4,
 			All       = ~None
 		}
 
@@ -199,6 +200,13 @@ namespace Lime
 		public int Layer { get; set; }
 
 		/// <summary>
+		/// Collections of Components.
+		/// </summary>
+		public NodeComponentCollection Components { get; private set; }
+
+		private ComponentCollection<NodeComponent> inheritedComponentsCache;
+
+		/// <summary>
 		/// Collections of Animators.
 		/// </summary>
 		[YuzuMember]
@@ -315,6 +323,7 @@ namespace Lime
 		public Node()
 		{
 			AnimationSpeed = 1;
+			Components = new NodeComponentCollection(this);
 			Animators = new AnimatorCollection(this);
 			Animations = new AnimationList(this);
 			Nodes = new NodeList(this);
@@ -365,7 +374,12 @@ namespace Lime
 		/// <summary>
 		/// TODO: Add summary
 		/// </summary>
-		protected virtual void RecalcDirtyGlobalsUsingParents() { }
+		protected virtual void RecalcDirtyGlobalsUsingParents()
+		{
+			if ((DirtyMask & DirtyFlags.InheritedComponentsCache) != 0) {
+				inheritedComponentsCache?.Clear();
+			}
+		}
 
 #if LIME_COUNT_NODES
 		~Node() {
@@ -380,6 +394,25 @@ namespace Lime
 				node = node.Parent;
 			}
 			return node;
+		}
+
+		public T GetInheritedComponent<T>() where T : NodeComponent
+		{
+			if (inheritedComponentsCache != null) {
+				var c = inheritedComponentsCache.Get<T>();
+				if (c != null) {
+					return c;
+				}
+			}
+			for (var node = this; node != null; node = node.Parent) {
+				var c = node.Components.Get<T>();
+				if (c != null) {
+					inheritedComponentsCache = inheritedComponentsCache ?? new ComponentCollection<NodeComponent>();
+					inheritedComponentsCache.Add<T>(c);
+					return c;
+				}
+			}
+			return default(T);
 		}
 
 		/// <summary>
@@ -439,6 +472,8 @@ namespace Lime
 			clone.Animations = Animations.Clone(clone);
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
 			clone.Nodes = Nodes.Clone(clone);
+			clone.Components = Components.Clone(clone);
+			clone.inheritedComponentsCache = null;
 			clone.IsAwoken = false;
 			if (Presenter != null) {
 				clone.Presenter = Presenter.Clone();
@@ -520,6 +555,9 @@ namespace Lime
 		protected virtual void Awake()
 		{
 			RefreshReferences();
+			foreach (var c in Components) {
+				c.Awake();
+			}
 		}
 
 		/// <summary>

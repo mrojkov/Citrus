@@ -796,6 +796,7 @@ namespace Lime
 		/// </summary>
 		protected override void RecalcDirtyGlobalsUsingParents()
 		{
+			base.RecalcDirtyGlobalsUsingParents();
 			// TODO: Optimize using DirtyMask
 			if (IsRenderedToTexture()) {
 				localToWorldTransform = Matrix32.Identity;
@@ -1160,7 +1161,8 @@ namespace Lime
 		{
 			var aabb = CalcAABBInSpaceOf(WidgetContext.Current.Root);
 			// Get the projected AABB coordinates in the normalized OpenGL space
-			Matrix44 proj = Renderer.Projection;
+			var rc = GetInheritedComponent<RenderingContext>();
+			Matrix44 proj = rc.Projection;
 			aabb.A = proj.TransformVector(aabb.A);
 			aabb.B = proj.TransformVector(aabb.B);
 			// Transform to 0,0 - 1,1 coordinate space
@@ -1169,7 +1171,7 @@ namespace Lime
 			aabb.Top = (1 + aabb.Top) / 2;
 			aabb.Bottom = (1 + aabb.Bottom) / 2;
 			// Transform to vieport coordinates
-			var viewport = Renderer.Viewport;
+			var viewport = rc.Viewport;
 			var min = new Vector2(viewport.X, viewport.Y);
 			var max = new Vector2(viewport.X + viewport.Width, viewport.Y + viewport.Height);
 			return new IntRectangle {
@@ -1192,7 +1194,8 @@ namespace Lime
 		public Rectangle CalcAABBInWindowSpace()
 		{
 			var aabb = (Rectangle)CalcAABBInViewportSpace();
-			var vpOrigin = (Vector2)Renderer.Viewport.Origin;
+			var rc = GetInheritedComponent<RenderingContext>();
+			var vpOrigin = (Vector2)rc.Viewport.Origin;
 			aabb.A += vpOrigin;
 			aabb.B += vpOrigin;
 			var window = CommonWindow.Current;

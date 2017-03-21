@@ -14,11 +14,11 @@ namespace Tangerine.UI.Timeline
 		{
 			var g = Timeline.Instance.Globals;
 			while (true) {
-				var r = g.Components.Get<DragKeyframesRequest>();
+				var r = g.Get<DragKeyframesRequest>();
 				if (r != null) {
 					DragKeys(r.Offset);
 					ShiftSelection(r.Offset);
-					g.Components.Remove<DragKeyframesRequest>();
+					g.Remove<DragKeyframesRequest>();
 				}
 				yield return null;
 			}

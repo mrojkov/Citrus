@@ -16,7 +16,7 @@ namespace Tangerine.UI.Timeline
 		{
 			while (true) {
 				foreach (var row in Document.Current.Rows) {
-					if (!row.Components.Has<CurveRow>()) {
+					if (!row.Components.Contains<CurveRow>()) {
 						continue;
 					}
 					var widget = row.Components.Get<IGridWidget>().Widget;

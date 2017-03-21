@@ -22,7 +22,7 @@ namespace Tangerine.UI.Timeline
 		public Vector2 ScrollPos;
 		public int CurrentColumn => Document.Current.AnimationFrame;
 		public int ColumnCount { get; set; }
-		public readonly Entity Globals = new Entity();
+		public readonly ComponentCollection<IComponent> Globals = new ComponentCollection<IComponent>();
 
 		public static IEnumerable<IOperationProcessor> GetOperationProcessors()
 		{

@@ -6,7 +6,7 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.SceneView
 {
-	public class SceneView : Entity, IDocumentView
+	public class SceneView : IDocumentView
 	{
 		// Given panel.
 		public readonly Widget Panel;
@@ -21,6 +21,8 @@ namespace Tangerine.UI.SceneView
 		/// Gets the mouse position in the scene coordinates.
 		/// </summary>
 		public Vector2 MousePosition => Scene.Input.LocalMousePosition;
+
+		public ComponentCollection<IComponent> Components = new ComponentCollection<IComponent>();
 
 		public static SceneView Instance { get; private set; }
 

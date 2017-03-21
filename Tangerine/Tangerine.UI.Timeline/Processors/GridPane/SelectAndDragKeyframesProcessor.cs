@@ -26,9 +26,9 @@ namespace Tangerine.UI.Timeline
 							yield return DragSelectionTask(initialCell);
 						} else {
 							var r = new HasKeyframeRequest(initialCell);
-							timeline.Globals.Components.Add(r);
+							timeline.Globals.Add(r);
 							yield return null;
-							timeline.Globals.Components.Remove<HasKeyframeRequest>();
+							timeline.Globals.Remove<HasKeyframeRequest>();
 							if (r.Result) {
 								yield return DragKeyframeTask(initialCell);
 							} else {
@@ -60,7 +60,7 @@ namespace Tangerine.UI.Timeline
 			}
 			grid.OnPostRender -= r;
 			if (offset != IntVector2.Zero) {
-				timeline.Globals.Components.Add(new DragKeyframesRequest(offset));
+				timeline.Globals.Add(new DragKeyframesRequest(offset));
 			}
 		}
 

@@ -66,7 +66,7 @@ namespace Tangerine.UI.Timeline
 		static void TryCreateGridNodeView(Row row)
 		{
 			var nodeRow = row.Components.Get<Core.Components.NodeRow>();
-			if (nodeRow != null && !row.Components.Has<IGridWidget>()) {
+			if (nodeRow != null && !row.Components.Contains<IGridWidget>()) {
 				var c = new GridNodeView(nodeRow.Node);
 				row.Components.Add<IGridWidget>(c);
 				row.Components.Add<IOverviewWidget>(c);
@@ -76,7 +76,7 @@ namespace Tangerine.UI.Timeline
 		static void TryCreateGridFolderView(Row row)
 		{
 			var folderRow = row.Components.Get<Core.Components.FolderRow>();
-			if (folderRow != null && !row.Components.Has<IGridWidget>()) {
+			if (folderRow != null && !row.Components.Contains<IGridWidget>()) {
 				var c = new GridFolderView();
 				row.Components.Add<IGridWidget>(c);
 				row.Components.Add<IOverviewWidget>(c);
@@ -86,7 +86,7 @@ namespace Tangerine.UI.Timeline
 		static void TryCreateGridPropertyView(Row row)
 		{
 			var propRow = row.Components.Get<Core.Components.PropertyRow>();
-			if (propRow != null && !row.Components.Has<IGridWidget>()) {
+			if (propRow != null && !row.Components.Contains<IGridWidget>()) {
 				var c = new GridPropertyView(propRow.Node, propRow.Animator);
 				row.Components.Add<IGridWidget>(c);
 				row.Components.Add<IOverviewWidget>(c);
@@ -96,7 +96,7 @@ namespace Tangerine.UI.Timeline
 		static void TryCreateGridCurveView(Row row)
 		{
 			var curveRow = row.Components.Get<Core.Components.CurveRow>();
-			if (curveRow != null && !row.Components.Has<IGridWidget>()) {
+			if (curveRow != null && !row.Components.Contains<IGridWidget>()) {
 				var c = new GridCurveView(curveRow.Node, curveRow.Animator, curveRow.State);
 				row.Components.Add<IGridWidget>(c);
 				row.Components.Add<IOverviewWidget>(c);

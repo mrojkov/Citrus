@@ -49,7 +49,7 @@ namespace Tangerine.Core
 		Row AddAnimatorRow(Row parent, Node node, IAnimator animator)
 		{
 			var row = Document.Current.GetRowForObject(animator);
-			if (!row.Components.Has<PropertyRow>()) {
+			if (!row.Components.Contains<PropertyRow>()) {
 				row.Components.Add(new PropertyRow(node, animator));
 			}
 			AddRow(parent, row);
@@ -59,7 +59,7 @@ namespace Tangerine.Core
 		Row AddNodeRow(Row parent, Node node)
 		{
 			var row = Document.Current.GetRowForObject(node);
-			if (!row.Components.Has<NodeRow>()) {
+			if (!row.Components.Contains<NodeRow>()) {
 				row.Components.Add(new NodeRow(node));
 				row.CanHaveChildren = true;
 			}
@@ -77,7 +77,7 @@ namespace Tangerine.Core
 		Row GetFolderRow(Folder folder)
 		{
 			var row = Document.Current.GetRowForObject(folder);
-			if (!row.Components.Has<FolderRow>()) {
+			if (!row.Components.Contains<FolderRow>()) {
 				row.Components.Add(new FolderRow(folder));
 				row.CanHaveChildren = true;
 			}

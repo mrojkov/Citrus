@@ -107,6 +107,7 @@ namespace Lime
 
 		protected override void RecalcDirtyGlobalsUsingParents()
 		{
+			base.RecalcDirtyGlobalsUsingParents();
 			if (IsDirty(DirtyFlags.Transform)) {
 				globalTransform = CalcLocalTransform();
 				if (Parent != null && Parent.AsNode3D != null) {
