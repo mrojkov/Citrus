@@ -344,6 +344,8 @@
     <Compile Include="Source\Widgets\3D\Model3DAttachment.cs" />
     <Compile Include="Source\Widgets\NodeReference.cs" />
     <Compile Include="Source\Graphics\MeshUtils.cs" />
+    <Compile Include="Source\Widgets\NodeComponentCollection.cs" />
+    <Compile Include="Source\ComponentCollection.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

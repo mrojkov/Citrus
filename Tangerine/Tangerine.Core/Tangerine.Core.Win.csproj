@@ -61,7 +61,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DocumentHistory.cs" />
     <Compile Include="Document.cs" />
-    <Compile Include="Entity.cs" />
     <Compile Include="Operations\Modification.cs" />
     <Compile Include="NodeEditorState.cs" />
     <Compile Include="AnimatorEditorState.cs" />

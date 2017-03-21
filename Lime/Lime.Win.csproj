@@ -379,6 +379,8 @@
     <Compile Include="Source\Types\Quadrangle.cs" />
     <Compile Include="Source\Types\Transform2.cs" />
     <Compile Include="Source\Graphics\MeshUtils.cs" />
+    <Compile Include="Source\ComponentCollection.cs" />
+    <Compile Include="Source\Widgets\NodeComponentCollection.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\3rdParty\OpenAL\OpenAL32.dll">
