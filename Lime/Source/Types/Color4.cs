@@ -61,7 +61,9 @@ namespace Lime
 		/// </summary>
 		public Color4 Darken(float amount)
 		{
-			return Lerp(amount, this, Black);
+			var c = Black;
+			c.A = A;
+			return Lerp(amount, this, c);
 		}
 
 		/// <summary>
@@ -71,7 +73,9 @@ namespace Lime
 		/// </summary>
 		public Color4 Lighten(float amount)
 		{
-			return Lerp(amount, this, White);
+			var c = White;
+			c.A = A;
+			return Lerp(amount, this, c);
 		}
 
 		/// <summary>
@@ -81,7 +85,9 @@ namespace Lime
 		/// </summary>
 		public Color4 Transparentify(float amount)
 		{
-			return Lerp(amount, this, Transparent);
+			var c = this;
+			c.A = 0;
+			return Lerp(amount, this, c);
 		}
 
 		/// <summary>
