@@ -606,7 +606,7 @@ namespace Tangerine.UI
 			if (editorParams.Objects.Count == 1) {
 				var node = (Node)editorParams.Objects[0];
 				foreach (var a in node.Animations) {
-					foreach (var m in a.Markers.Where(i => i.Action != MarkerAction.Jump)) {
+					foreach (var m in a.Markers.Where(i => i.Action != MarkerAction.Jump && !string.IsNullOrEmpty(i.Id))) {
 						var id = a.Id != null ? m.Id + '@' + a.Id : m.Id;
 						comboBox.Items.Add(new DropDownList.Item(id));
 					}
