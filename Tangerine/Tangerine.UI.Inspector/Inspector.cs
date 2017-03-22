@@ -78,9 +78,9 @@ namespace Tangerine.UI.Inspector
 			AddEditor(typeof(bool), c => new BooleanPropertyEditor(c));
 			AddEditor(typeof(int), c => new IntPropertyEditor(c));
 			AddEditor(typeof(Color4), c => new Color4PropertyEditor(c));
+			AddEditor(typeof(Anchors), c => new AnchorsPropertyEditor(c));
 			AddEditor(typeof(Blending), c => new EnumPropertyEditor<Blending>(c));
 			AddEditor(typeof(ShaderId), c => new EnumPropertyEditor<ShaderId>(c));
-			AddEditor(typeof(Anchors), c => new EnumPropertyEditor<Anchors>(c));
 			AddEditor(typeof(RenderTarget), c => new EnumPropertyEditor<RenderTarget>(c));
 			AddEditor(typeof(CameraProjectionMode), c => new EnumPropertyEditor<CameraProjectionMode>(c));
 			AddEditor(typeof(ITexture), c => new TexturePropertyEditor(c));

@@ -87,8 +87,10 @@ namespace Tangerine.UI
 				if (bgColor != Color4.Transparent) {
 					Renderer.DrawRect(Vector2.Zero, Size, bgColor);
 				}
-				var iconColor = Enabled ? GlobalColor : GlobalColor * ColorTheme.Current.Toolbar.ButtonDisabledColor;
-				Renderer.DrawSprite(Texture, iconColor, ContentPosition, ContentSize, Vector2.Zero, Vector2.One);
+				if (Texture != null) {
+					var iconColor = Enabled ? GlobalColor : GlobalColor * ColorTheme.Current.Toolbar.ButtonDisabledColor;
+					Renderer.DrawSprite(Texture, iconColor, ContentPosition, ContentSize, Vector2.Zero, Vector2.One);
+				}
 				if (borderColor != Color4.Transparent) {
 					Renderer.DrawRectOutline(Vector2.Zero, Size, borderColor);
 				}

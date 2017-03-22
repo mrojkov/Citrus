@@ -617,4 +617,67 @@ namespace Tangerine.UI
 
 		public override void SetFocus() => comboBox.SetFocus();
 	}
+
+	public class AnchorsPropertyEditor : CommonPropertyEditor
+	{
+		private ToolbarButton firstButton;
+		private Widget group;
+
+		public AnchorsPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
+		{
+			group = new Widget { Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center), Spacing = 4 } };
+			ContainerWidget.AddNode(group);
+			group.AddNode(new Widget());
+			firstButton = AddButton(Anchors.Left);
+			AddButton(Anchors.Right);
+			AddButton(Anchors.Top);
+			AddButton(Anchors.Bottom);
+			AddButton(Anchors.CenterH);
+			AddButton(Anchors.CenterV);
+		}
+
+		ToolbarButton AddButton(Anchors anchor)
+		{
+			var tb = new ToolbarButton { LayoutCell = new LayoutCell(Alignment.Center) };
+			group.AddNode(tb);
+			var current = CoalescedPropertyValue<Anchors>(EditorParams);
+			tb.CompoundPresenter.Add(new DelegatePresenter<Widget>(w => DrawIcon(w, anchor)));
+			tb.Clicked += () => {
+				tb.Checked = !tb.Checked;
+				SetProperty(
+					EditorParams.PropertyName,
+					tb.Checked ? current.GetValue() | anchor : current.GetValue() & ~anchor);
+			};
+			tb.AddChangeWatcher(current, v => tb.Checked = (v & anchor) != 0);
+			return tb;
+		}
+
+		float[] a = { 0, 0, 1, 0, 0, 0, 0, 1, 0, 0.5f, 0.5f, 0 };
+		float[] b = { 0, 1, 1, 1, 1, 0, 1, 1, 1, 0.5f, 0.5f, 1 };
+
+		void DrawIcon(Widget button, Anchors anchor)
+		{
+			button.PrepareRendererState();
+			Renderer.DrawRect(Vector2.Zero, button.Size, ColorTheme.Current.Basic.WhiteBackground);
+			Renderer.DrawRectOutline(Vector2.Zero, button.Size, ColorTheme.Current.Basic.ControlBorder);
+			int t = -1;
+			while (anchor != Anchors.None) {
+				anchor = (Anchors)((int)anchor >> 1);
+				t++;
+			}
+			var w = button.Width;
+			var h = button.Height;
+			Renderer.DrawLine(Scale(a[t * 2], w), Scale(a[t * 2 + 1], h), Scale(b[t * 2], w), Scale(b[t * 2 + 1], h), ColorTheme.Current.Basic.BlackText);
+		}
+
+		float Scale(float x, float s)
+		{
+			x *= s;
+			if (x == 0) x += 2;
+			if (x == s) x -= 2;
+			return x;
+		}
+
+		public override void SetFocus() => firstButton.SetFocus();
+	}
 }
