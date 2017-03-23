@@ -114,9 +114,13 @@ namespace Lime
 					globalTransform *= Parent.AsNode3D.GlobalTransform;
 				}
 			}
-			if (IsDirty(DirtyFlags.Visible | DirtyFlags.Color)) {
+			if (IsDirty(DirtyFlags.Visible | DirtyFlags.Color | DirtyFlags.TangerineFlags)) {
 				globallyVisible = Visible;
 				globalColor = color;
+				if (Application.IsTangerine) {
+					globallyVisible |= GetTangerineFlag(TangerineFlags.Shown);
+					globallyVisible &= !GetTangerineFlag(TangerineFlags.Hidden | TangerineFlags.HiddenOnExposition);
+				}
 				if (Parent != null) {
 					if (Parent.AsWidget != null) {
 						globallyVisible &= Parent.AsWidget.GloballyVisible;
