@@ -136,7 +136,7 @@ namespace Tangerine.UI
 				RunningCursor = timelineGrid.RunningCursor
 			};
 			var timelineOverview = new TimelineOverviewColors {
-				Veil = Color4.White.Darken(0.2f).Transparentify(0.3f),
+				Veil = Color4.White.Darken(0.2f).Transparentify(0.6f),
 				Border = Color4.White.Darken(0.2f)
 			};
 			var timelineRoll = new TimelineRollColors {
