@@ -72,7 +72,7 @@ namespace Lime
 			Visible   = 1 << 0,
 			Color     = 1 << 1,
 			Transform = 1 << 2,
-			InheritedComponentsCache = 1 << 3,
+			Components = 1 << 3,
 			TangerineFlags = 1 << 4,
 			All       = ~None
 		}
@@ -204,7 +204,7 @@ namespace Lime
 		/// </summary>
 		public NodeComponentCollection Components { get; private set; }
 
-		private ComponentCollection<NodeComponent> inheritedComponentsCache;
+		private ComponentCollection<NodeComponent> ancestorComponentsCache;
 
 		/// <summary>
 		/// Collections of Animators.
@@ -278,7 +278,10 @@ namespace Lime
 		public string Tag { get; set; }
 
 		[YuzuMember]
+		[YuzuSerializeIf(nameof(HasNonDefaultAnimation))]
 		public AnimationList Animations { get; private set; }
+
+		public bool HasNonDefaultAnimation() => Animations.Count > 1;
 
 		[YuzuMember]
 		public List<Folder.Descriptor> Folders { get; set; }
@@ -376,8 +379,8 @@ namespace Lime
 		/// </summary>
 		protected virtual void RecalcDirtyGlobalsUsingParents()
 		{
-			if ((DirtyMask & DirtyFlags.InheritedComponentsCache) != 0) {
-				inheritedComponentsCache?.Clear();
+			if ((DirtyMask & DirtyFlags.Components) != 0) {
+				ancestorComponentsCache?.Clear();
 			}
 		}
 
@@ -396,10 +399,10 @@ namespace Lime
 			return node;
 		}
 
-		public T GetInheritedComponent<T>() where T : NodeComponent
+		public T GetAncestorComponent<T>() where T : NodeComponent
 		{
-			if (inheritedComponentsCache != null) {
-				var c = inheritedComponentsCache.Get<T>();
+			if (ancestorComponentsCache != null) {
+				var c = ancestorComponentsCache.Get<T>();
 				if (c != null) {
 					return c;
 				}
@@ -407,12 +410,12 @@ namespace Lime
 			for (var node = this; node != null; node = node.Parent) {
 				var c = node.Components.Get<T>();
 				if (c != null) {
-					inheritedComponentsCache = inheritedComponentsCache ?? new ComponentCollection<NodeComponent>();
-					inheritedComponentsCache.Add<T>(c);
+					ancestorComponentsCache = ancestorComponentsCache ?? new ComponentCollection<NodeComponent>();
+					ancestorComponentsCache.Add<T>(c);
 					return c;
 				}
 			}
-			return default(T);
+			return null;
 		}
 
 		/// <summary>
@@ -473,7 +476,7 @@ namespace Lime
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
 			clone.Nodes = Nodes.Clone(clone);
 			clone.Components = Components.Clone(clone);
-			clone.inheritedComponentsCache = null;
+			clone.ancestorComponentsCache = null;
 			clone.IsAwoken = false;
 			if (Presenter != null) {
 				clone.Presenter = Presenter.Clone();

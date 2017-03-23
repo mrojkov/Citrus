@@ -36,7 +36,7 @@ namespace Lime
 			}
 			base.Add(component);
 			component.Owner = owner;
-			owner.PropagateDirtyFlags(Node.DirtyFlags.InheritedComponentsCache);
+			owner.PropagateDirtyFlags(Node.DirtyFlags.Components);
 		}
 
 		public override bool Remove<T>()
@@ -44,7 +44,7 @@ namespace Lime
 			var c = Get<T>();
 			if (c != null) {
 				base.Remove<T>();
-				owner.PropagateDirtyFlags(Node.DirtyFlags.InheritedComponentsCache);
+				owner.PropagateDirtyFlags(Node.DirtyFlags.Components);
 				c.Owner = null;
 				return true;
 			}
