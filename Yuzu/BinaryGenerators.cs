@@ -209,9 +209,8 @@ namespace Yuzu.Binary
 				item != null && item.PropInfo == null &&
 				!simpleValueReader.ContainsKey(t);
 			if (canInline) {
-
 				var meta = Meta.Get(t, options);
-				if (meta.IsCompact && meta.Surrogate.FuncFrom == null) {
+				if (meta.IsCompact && meta.Surrogate.FuncFrom == null && meta.AfterDeserialization.Actions.Count == 0) {
 					cw.Put("dg.EnsureClassDef(typeof({0}));\n", Utils.GetTypeSpec(t));
 					foreach (var yi in meta.Items)
 						GenerateSetValue(yi.Type, name + "." + yi.Name, yi);
