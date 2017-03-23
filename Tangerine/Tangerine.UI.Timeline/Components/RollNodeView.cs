@@ -25,8 +25,14 @@ namespace Tangerine.UI.Timeline.Components
 		{
 			this.row = row;
 			nodeData = row.Components.Get<NodeRow>();
-			label = new SimpleText();
-			editBox = new EditBox { LayoutCell = new LayoutCell(Alignment.Center, stretchX: float.MaxValue) };
+			label = new SimpleText {
+				AutoSizeConstraints = false,
+				VAlignment = VAlignment.Center,
+				LayoutCell = new LayoutCell(Alignment.LeftCenter, float.MaxValue)
+			};
+			editBox = new EditBox {
+				LayoutCell = new LayoutCell(Alignment.LeftCenter, float.MaxValue)
+			};
 			nodeIcon = new Image(NodeIconPool.GetTexture(nodeData.Node.GetType())) {
 				HitTestTarget = true,
 				MinMaxSize = new Vector2(16)
@@ -59,7 +65,7 @@ namespace Tangerine.UI.Timeline.Components
 					(Widget)enterButton ?? (Widget)new HSpacer(ToolbarButton.DefaultSize.X),
 					eyeButton,
 					lockButton,
-				},
+				}
 			};
 			label.AddChangeWatcher(() => nodeData.Node.Id, s => RefreshLabel());
 			label.AddChangeWatcher(() => IsGrayedLabel(nodeData.Node), s => RefreshLabel());
