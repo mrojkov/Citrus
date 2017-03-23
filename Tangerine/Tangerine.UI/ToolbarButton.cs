@@ -10,7 +10,7 @@ namespace Tangerine.UI
 	{
 		public static readonly Vector2 DefaultSize = new Vector2(DesktopTheme.Metrics.DefaultButtonSize.Y);
 
-		enum State
+		protected enum State
 		{
 			Default,
 			Highlight,
@@ -19,16 +19,16 @@ namespace Tangerine.UI
 
 		private State state;
 		private ITexture texture;
-		private bool @checked;
-		private bool @highlightable;
+		private bool isChecked;
+		private bool highlightable;
 
 		public bool Checked
 		{
-			get { return @checked; }
+			get { return isChecked; }
 			set
 			{
-				if (@checked != value) {
-					@checked = value;
+				if (isChecked != value) {
+					isChecked = value;
 					Window.Current.Invalidate();
 				}
 			}
@@ -36,11 +36,11 @@ namespace Tangerine.UI
 
 		public bool Highlightable
 		{
-			get { return @highlightable; }
+			get { return highlightable; }
 			set
 			{
-				if (@highlightable != value) {
-					@highlightable = value;
+				if (highlightable != value) {
+					highlightable = value;
 					Window.Current.Invalidate();
 				}
 			}
@@ -83,7 +83,7 @@ namespace Tangerine.UI
 				w.PrepareRendererState();
 				Renderer.Shader = Enabled ? ShaderId.Diffuse : ShaderId.Silhuette;
 				Color4 bgColor, borderColor;
-				GetColors(out bgColor, out borderColor);
+				GetColors(state, out bgColor, out borderColor);
 				if (bgColor != Color4.Transparent) {
 					Renderer.DrawRect(Vector2.Zero, Size, bgColor);
 				}
@@ -142,7 +142,7 @@ namespace Tangerine.UI
 			}
 		}
 
-		private void GetColors(out Color4 bgColor, out Color4 borderColor)
+		protected virtual void GetColors(State state, out Color4 bgColor, out Color4 borderColor)
 		{
 			if (Highlightable && state == State.Highlight) {
 				bgColor = ColorTheme.Current.Toolbar.ButtonHighlightBackground;
