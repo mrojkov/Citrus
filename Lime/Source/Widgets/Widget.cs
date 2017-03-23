@@ -709,6 +709,8 @@ namespace Lime
 			clone.input = null;
 			clone.tasks = null;
 			clone.lateTasks = null;
+			clone.Updated = null;
+			clone.Updating = null;
 			return clone;
 		}
 
