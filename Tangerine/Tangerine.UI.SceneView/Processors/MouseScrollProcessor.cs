@@ -12,12 +12,13 @@ namespace Tangerine.UI.SceneView
 		public IEnumerator<object> Task()
 		{
 			while (true) {
-				if (sv.Input.WasMousePressed() && CommonWindow.Current.Input.IsKeyPressed(Key.Space)) {
+				if (sv.Input.WasMousePressed(0) && CommonWindow.Current.Input.IsKeyPressed(Key.Space) || sv.Input.WasMousePressed(2)) {
 					var initialMouse = sv.Input.MousePosition;
 					var initialPosition = sv.Scene.Position;
 					sv.Input.CaptureMouse();
 					sv.Input.ConsumeKey(Key.Mouse0);
-					while (sv.Input.IsMousePressed()) {
+					sv.Input.ConsumeKey(Key.Mouse2);
+					while (sv.Input.IsMousePressed(0) || sv.Input.IsMousePressed(2)) {
 						sv.Scene.Position = (sv.Input.MousePosition - initialMouse) + initialPosition;
 						yield return null;
 					}

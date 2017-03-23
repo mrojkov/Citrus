@@ -87,6 +87,11 @@ namespace Lime.Platform
 			}
 		}
 
+		public override void OtherMouseDown(NSEvent theEvent)
+		{
+			input.SetKeyState(Key.Mouse2, true);
+		}
+
 		public override void RightMouseUp(NSEvent theEvent)
 		{
 			input.SetKeyState(Key.Mouse1, false);
@@ -102,6 +107,11 @@ namespace Lime.Platform
 			if (theEvent.ClickCount == 2) {
 				input.SetKeyState(Key.Mouse0DoubleClick, false);
 			}
+		}
+
+		public override void OtherMouseUp(NSEvent theEvent)
+		{
+			input.SetKeyState(Key.Mouse2, false);
 		}
 
 		public override void ScrollWheel(NSEvent theEvent)
