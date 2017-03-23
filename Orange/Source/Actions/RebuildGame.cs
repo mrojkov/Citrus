@@ -23,18 +23,50 @@ namespace Orange
 
 		public static bool CleanupGame()
 		{
-			string bundlePath = The.Workspace.GetMainBundlePath();
-			var dirInfo = new System.IO.DirectoryInfo(Path.GetDirectoryName(bundlePath));
-			foreach (var fileInfo in dirInfo.GetFiles('*' + Path.GetExtension(bundlePath), SearchOption.TopDirectoryOnly)) {
-				Console.WriteLine("Deleting {0}", fileInfo.Name);
-				File.Delete(fileInfo.FullName);
-			}
+			DeleteAllBundlesInTopDirectory();
+			DeleteAllBundlesReferredInCookingRules();
+
 			var builder = new SolutionBuilder(The.Workspace.ActivePlatform, The.Workspace.CustomSolution);
 			if (!builder.Clean()) {
 				Console.WriteLine("CLEANUP FAILED");
 				return false;
 			}
 			return true;
+		}
+
+		private static void DeleteAllBundlesReferredInCookingRules()
+		{
+			var bundles = GetAllBundles();
+			foreach (var path in bundles.Select(bundle => The.Workspace.GetBundlePath(bundle)).Where(File.Exists)) {
+				try {
+					Console.WriteLine("Deleting {0}", path);
+					File.Delete(path);
+				} catch (System.Exception e) {
+					Console.WriteLine("Can not remove {0}: {1}", path, e.Message);
+				}
+			}
+		}
+
+		private static void DeleteAllBundlesInTopDirectory()
+		{
+			string bundlePath = The.Workspace.GetMainBundlePath();
+			var dirInfo = new System.IO.DirectoryInfo(Path.GetDirectoryName(bundlePath));
+			foreach (var fileInfo in dirInfo.GetFiles('*' + Path.GetExtension(bundlePath), SearchOption.TopDirectoryOnly)) {
+				Console.WriteLine("Deleting {0}", fileInfo.Name);
+				File.Delete(fileInfo.FullName);
+			}
+		}
+
+		private static HashSet<string> GetAllBundles()
+		{
+			var bundles = new HashSet<string>() {
+				CookingRules.MainBundleName
+			};
+			var cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, The.Workspace.ActivePlatform, The.Workspace.Target);
+			foreach (var bundle in cookingRulesMap.SelectMany(i => i.Value.Bundles.Where(bundle => bundle != CookingRules.MainBundleName))) {
+				bundles.Add(bundle);
+			}
+			return bundles;
 		}
 	}
 }
