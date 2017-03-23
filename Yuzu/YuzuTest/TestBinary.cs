@@ -763,6 +763,13 @@ namespace YuzuTest.Binary
 			Assert.AreEqual(expected.B.Y, actual.B.Y);
 		}
 
+		private void AssertEqualSampleStructWithProps(SampleStructWithProps expected, SampleStructWithProps actual)
+		{
+			Assert.AreEqual(expected.A, actual.A);
+			Assert.AreEqual(expected.P.X, actual.P.X);
+			Assert.AreEqual(expected.P.Y, actual.P.Y);
+		}
+
 		[TestMethod]
 		public void TestStruct()
 		{
@@ -802,14 +809,26 @@ namespace YuzuTest.Binary
 				" 25 00 00 00 02 00 09 00 00 00 01 00 00 00",
 				XS(result2));
 			var w2 = bd.FromBytes<SampleStructWithProps>(result2);
-			Assert.AreEqual(v2.A, w2.A);
-			Assert.AreEqual(v2.P.X, w2.P.X);
-			Assert.AreEqual(v2.P.Y, w2.P.Y);
+			AssertEqualSampleStructWithProps(v2, w2);
 
 			var w2g = bdg.FromBytes<SampleStructWithProps>(result2);
-			Assert.AreEqual(v2.A, w2.A);
-			Assert.AreEqual(v2.P.X, w2.P.X);
-			Assert.AreEqual(v2.P.Y, w2.P.Y);
+			AssertEqualSampleStructWithProps(v2, w2g);
+
+			var v3 = new SampleStructWithProps[2] {
+				new SampleStructWithProps { A = 41, P = new SamplePoint { X = 19, Y = 1 } },
+				new SampleStructWithProps { A = 42, P = new SamplePoint { X = 18, Y = 2 } },
+			};
+
+			var result3 = bs.ToBytes(v3);
+			Assert.AreEqual(
+				"21 20 02 00 00 00" +
+				" 03 00 29 00 00 00 02 00 13 00 00 00 01 00 00 00" +
+				" 03 00 2A 00 00 00 02 00 12 00 00 00 02 00 00 00",
+				XS(result3));
+			var w3 = bd.FromBytes<SampleStructWithProps[]> (result3);
+			Assert.AreEqual(v3.Length, w3.Length);
+			AssertEqualSampleStructWithProps(v3[0], w3[0]);
+			AssertEqualSampleStructWithProps(v3[1], w3[1]);
 		}
 
 		[TestMethod]
