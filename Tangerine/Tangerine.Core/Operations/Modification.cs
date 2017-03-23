@@ -223,7 +223,10 @@ namespace Tangerine.Core.Operations
 				throw new InvalidOperationException();
 			}
 			var ctr = nodeType.GetConstructor(Type.EmptyTypes);
-			var node = (Node)ctr.Invoke(new object[] {});
+			Node node;
+			using (Theme.Push(DefaultTheme.Instance)) {
+				node = (Node)ctr.Invoke(new object[] {});
+			}
 			foreach (var d in Document.NodeDecorators) {
 				d(node);
 			}
