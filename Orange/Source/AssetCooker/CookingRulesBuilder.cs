@@ -175,13 +175,15 @@ namespace Orange
 		static AssetAttributes ParseModelCompressing(string value)
 		{
 			switch (value) {
+				case "None":
+					return AssetAttributes.None;
 				case "":
 				case "Deflate":
 					return AssetAttributes.ZippedDeflate;
 				case "LZMA":
 					return AssetAttributes.ZippedLZMA;
 				default:
-					throw new Lime.Exception("Error parsing ModelCompressing. Must be one of: Deflate, LZMA");
+					throw new Lime.Exception("Error parsing ModelCompressing. Must be one of: None, Deflate, LZMA");
 			}
 		}
 
