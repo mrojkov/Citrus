@@ -278,7 +278,6 @@ namespace Lime
 		public string Tag { get; set; }
 
 		[YuzuMember]
-		[YuzuSerializeIf(nameof(HasNonDefaultAnimation))]
 		public AnimationList Animations { get; private set; }
 
 		public bool HasNonDefaultAnimation() => Animations.Count > 1;
