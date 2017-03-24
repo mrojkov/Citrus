@@ -3,6 +3,8 @@ using System.Linq;
 using Lime;
 using Tangerine.Core;
 using System.Collections.Generic;
+using Tangerine.UI.Timeline.Components;
+using Tangerine.Core.Components;
 
 namespace Tangerine.UI.Timeline
 {
@@ -172,6 +174,7 @@ namespace Tangerine.UI.Timeline
 			h.Connect(TimelineCommands.ScrollRight, () => AdvanceCurrentColumn(1), Document.HasCurrent);
 			h.Connect(TimelineCommands.FastScrollLeft, () => AdvanceCurrentColumn(-10), Document.HasCurrent);
 			h.Connect(TimelineCommands.FastScrollRight, () => AdvanceCurrentColumn(10), Document.HasCurrent);
+			h.Connect(TimelineCommands.DeleteKeyframes, RemoveKeyframes, Document.HasCurrent);
 		}
 
 		static void SelectRow(int advance, bool multiselection)
@@ -194,6 +197,28 @@ namespace Tangerine.UI.Timeline
 					Core.Operations.SelectRow.Perform(lastSelectedRow, false);
 				}
 				Core.Operations.SelectRow.Perform(nextRow);
+			}
+		}
+
+		static void RemoveKeyframes()
+		{
+			foreach (var row in Document.Current.Rows) {
+				var spans = row.Components.GetOrAdd<GridSpanList>();
+				foreach (var span in spans.GetNonOverlappedSpans()) {
+					var node = row.Components.Get<NodeRow>()?.Node ?? row.Components.Get<PropertyRow>()?.Node;
+					if (node == null) {
+						continue;
+					}
+					var property = row.Components.Get<PropertyRow>()?.Animator.TargetProperty;
+					foreach (var a in node.Animators) {
+						if (property != null && a.TargetProperty != property) {
+							continue;
+						}
+						foreach (var k in a.Keys.Where(k => k.Frame >= span.A && k.Frame < span.B).ToList()) {
+							Core.Operations.RemoveKeyframe.Perform(a, k.Frame);
+						}
+					}
+				}
 			}
 		}
 

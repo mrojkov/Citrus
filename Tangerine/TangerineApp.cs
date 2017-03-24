@@ -239,6 +239,7 @@ namespace Tangerine
 					Command.Copy,
 					Command.Paste,
 					Command.Delete,
+					TimelineCommands.DeleteKeyframes,
 					Command.MenuSeparator,
 					Command.SelectAll,
 					Command.MenuSeparator,

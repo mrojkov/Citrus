@@ -15,6 +15,7 @@ namespace Tangerine.UI
 		public static readonly ICommand SelectDown = new Command(new Shortcut(Modifiers.Shift, Key.Down));
 		public static readonly ICommand EnterNode = new Command(new Shortcut(Key.Enter));
 		public static readonly ICommand ExitNode = new Command(new Shortcut(Key.BackSpace));
+		public static readonly ICommand DeleteKeyframes = new Command("Delete Selected Keyframes", new Shortcut(Modifiers.Shift, Key.Delete));
 	}
 
 	public static class InspectorCommands
