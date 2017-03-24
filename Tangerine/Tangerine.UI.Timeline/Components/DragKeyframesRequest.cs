@@ -6,11 +6,13 @@ namespace Tangerine.UI.Timeline.Components
 {
 	class DragKeyframesRequest : IComponent
 	{
+		public bool RemoveOriginals { get; private set; }
 		public IntVector2 Offset { get; private set; }
 
-		public DragKeyframesRequest(IntVector2 offset)
+		public DragKeyframesRequest(IntVector2 offset, bool removeOriginals)
 		{
-			this.Offset = offset;
+			Offset = offset;
+			RemoveOriginals = removeOriginals;
 		}
 	}
 }

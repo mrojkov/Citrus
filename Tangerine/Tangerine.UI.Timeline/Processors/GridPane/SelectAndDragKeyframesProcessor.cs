@@ -60,7 +60,7 @@ namespace Tangerine.UI.Timeline
 			}
 			grid.OnPostRender -= r;
 			if (offset != IntVector2.Zero) {
-				timeline.Globals.Add(new DragKeyframesRequest(offset));
+				timeline.Globals.Add(new DragKeyframesRequest(offset, !input.IsKeyPressed(Key.Alt)));
 			}
 		}
 

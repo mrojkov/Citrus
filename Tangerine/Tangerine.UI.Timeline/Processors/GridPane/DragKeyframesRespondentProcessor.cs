@@ -16,7 +16,7 @@ namespace Tangerine.UI.Timeline
 			while (true) {
 				var r = g.Get<DragKeyframesRequest>();
 				if (r != null) {
-					DragKeys(r.Offset);
+					DragKeys(r.Offset, r.RemoveOriginals);
 					ShiftSelection(r.Offset);
 					g.Remove<DragKeyframesRequest>();
 				}
@@ -29,7 +29,7 @@ namespace Tangerine.UI.Timeline
 			Operations.ShiftGridSelection.Perform(offset);
 		}
 
-		static void DragKeys(IntVector2 offset)
+		static void DragKeys(IntVector2 offset, bool removeOriginals)
 		{
 			var processedKeys = new HashSet<IKeyframe>();
 			var operations = new List<Action>();
@@ -50,7 +50,9 @@ namespace Tangerine.UI.Timeline
 								continue;
 							}
 							processedKeys.Add(k);
-							operations.Insert(0, () => Core.Operations.RemoveKeyframe.Perform(a, k.Frame));
+							if (removeOriginals) {
+								operations.Insert(0, () => Core.Operations.RemoveKeyframe.Perform(a, k.Frame));
+							}
 							var destRow = row.Index + offset.Y;
 							if (!CheckRowRange(destRow)) {
 								continue;
