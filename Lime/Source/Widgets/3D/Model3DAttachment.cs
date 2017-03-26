@@ -32,10 +32,7 @@ namespace Lime
 			if (Animations.Count == 0) {
 				return;
 			}
-			if (model.Animations.Count == 0) {
-				throw new Exception("Model attachment requires at least one animation");
-			}
-			var srcAnimation = model.Animations[0];
+			var srcAnimation = model.DefaultAnimation;
 			foreach (var animationData in Animations) {
 				var animation = srcAnimation;
 				if (animationData.Name != Model3DAttachment.DefaultAnimationName) {

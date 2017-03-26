@@ -278,9 +278,11 @@ namespace Lime
 		public string Tag { get; set; }
 
 		[YuzuMember]
+		[YuzuSerializeIf(nameof(NeedSerializeAnimations))]
 		public AnimationList Animations { get; private set; }
 
-		public bool HasNonDefaultAnimation() => Animations.Count > 1;
+		public bool NeedSerializeAnimations() =>
+			Animations.Count > 1 || (Animations.Count == 1 && (Animations[0].Id != null || Animations[0].Markers.Count > 0));
 
 		[YuzuMember]
 		public List<Folder.Descriptor> Folders { get; set; }
