@@ -25,9 +25,9 @@ namespace Tangerine.UI.Timeline
 							var cw = TimelineMetrics.ColWidth;
 							var mp = input.LocalMousePosition.X;
 							if (mp > rulerWidget.Width - cw / 2) {
-								timeline.ScrollPos.X += cw;
+								timeline.OffsetX += cw;
 							} else if (mp < cw / 2) {
-								timeline.ScrollPos.X -= cw;
+								timeline.OffsetX -= cw;
 							}
 							if (input.IsKeyPressed(Key.Control) && !input.WasMousePressed()) {
 								if (input.IsKeyPressed(Key.Shift)) {
@@ -77,7 +77,7 @@ namespace Tangerine.UI.Timeline
 
 		public static int CalcColumn(float mouseX)
 		{
-			return ((mouseX + timeline.ScrollPos.X) / TimelineMetrics.ColWidth).Floor().Max(0);
+			return ((mouseX + timeline.Offset.X) / TimelineMetrics.ColWidth).Floor().Max(0);
 		}
 	}	
 }

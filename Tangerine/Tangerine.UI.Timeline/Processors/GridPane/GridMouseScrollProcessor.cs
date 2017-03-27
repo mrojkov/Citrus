@@ -17,16 +17,16 @@ namespace Tangerine.UI.Timeline
 					var cw = TimelineMetrics.ColWidth;
 					var p = widget.Input.LocalMousePosition;
 					if (p.X > widget.Width - cw / 2) {
-						timeline.ScrollPos.X += cw;
+						timeline.OffsetX += cw;
 					} else if (p.X < cw / 2) {
-						timeline.ScrollPos.X -= cw;
+						timeline.OffsetX -= cw;
 					}
 					Operations.SetCurrentColumn.Perform(RulerMouseScrollProcessor.CalcColumn(p.X));
 					var rh = TimelineMetrics.DefaultRowHeight;
 					if (p.Y > widget.Height - rh / 2) {
-						timeline.ScrollPos.Y += rh;
+						timeline.OffsetY += rh;
 					} else if (p.Y < rh / 2) {
-						timeline.ScrollPos.Y -= rh;
+						timeline.OffsetY -= rh;
 					}
 					Window.Current.Invalidate();
 				}

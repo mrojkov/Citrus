@@ -33,9 +33,6 @@ namespace Tangerine.UI.Timeline
 				PostPresenter = new DelegatePresenter<Widget>(w => OnPostRender(w))
 			};
 			RootWidget.AddNode(ContentWidget);
-			RootWidget.Updating += delta => {
-				ContentWidget.Position = -timeline.ScrollPos;
-			};
 			RootWidget.AddChangeWatcher(() => RootWidget.Size, 
 				// Some document operation processors (e.g. ColumnCountUpdater) require up-to-date timeline dimensions.
 				_ => Core.Operations.Dummy.Perform());
@@ -47,6 +44,11 @@ namespace Tangerine.UI.Timeline
 		{
 			RootWidget.PrepareRendererState();
 			Renderer.DrawRect(Vector2.Zero, RootWidget.Size, ColorTheme.Current.TimelineGrid.Lines);
+		}
+
+		public void SetOffset(Vector2 value)
+		{
+			ContentWidget.Position = -value;
 		}
 		
 		private void RenderGrid(Widget widget)

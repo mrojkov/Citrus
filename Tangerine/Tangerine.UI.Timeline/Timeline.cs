@@ -12,19 +12,36 @@ namespace Tangerine.UI.Timeline
 	{
 		public static Timeline Instance { get; private set; }
 			
-		public readonly Toolbar Toolbar = new Toolbar();
-		public readonly Rulerbar Ruler = new Rulerbar();
-		public readonly OverviewPane Overview = new OverviewPane();
-		public readonly GridPane Grid = new GridPane();
-		public readonly RollPane Roll = new RollPane();
+		public readonly Toolbar Toolbar;
+		public readonly Rulerbar Ruler;
+		public readonly OverviewPane Overview;
+		public readonly GridPane Grid;
+		public readonly RollPane Roll;
 		public readonly Widget PanelWidget;
 		public readonly DockPanel Panel;
-		public readonly Widget RootWidget = new Widget();
+		public readonly Widget RootWidget;
 
-		public Vector2 ScrollPos;
+		private Vector2 offset;
+		public Vector2 Offset
+		{
+			get { return offset; }
+			set
+			{
+				if (value != Offset) {
+					offset = value;
+					OffsetChanged?.Invoke(value);
+				}
+			}
+		}
+
+		public float OffsetX { get { return Offset.X; } set { Offset = new Vector2(value, Offset.Y); } }
+		public float OffsetY { get { return Offset.Y; } set { Offset = new Vector2(Offset.X, value); } }
+
 		public int CurrentColumn => Document.Current.AnimationFrame;
 		public int ColumnCount { get; set; }
 		public readonly ComponentCollection<IComponent> Globals = new ComponentCollection<IComponent>();
+
+		public event Action<Vector2> OffsetChanged;
 
 		public static IEnumerable<IOperationProcessor> GetOperationProcessors()
 		{
@@ -43,6 +60,13 @@ namespace Tangerine.UI.Timeline
 		{
 			Panel = panel;
 			PanelWidget = panel.ContentWidget;
+			Toolbar = new Toolbar();
+			Ruler = new Rulerbar();
+			Overview = new OverviewPane();
+			Grid = new GridPane();
+			Roll = new RollPane();
+			RootWidget = new Widget();
+			OffsetChanged += v => Grid.SetOffset(v);
 			CreateProcessors();
 			InitializeWidgets();
 		}
@@ -125,34 +149,34 @@ namespace Tangerine.UI.Timeline
 
 		public void EnsureColumnVisible(int column)
 		{
-			if ((column + 1) * TimelineMetrics.ColWidth - ScrollPos.X >= Grid.RootWidget.Width) {
-				ScrollPos.X = (column + 1) * TimelineMetrics.ColWidth - Grid.RootWidget.Width;
+			if ((column + 1) * TimelineMetrics.ColWidth - Offset.X >= Grid.RootWidget.Width) {
+				OffsetX = (column + 1) * TimelineMetrics.ColWidth - Grid.RootWidget.Width;
 			}
-			if (column * TimelineMetrics.ColWidth < ScrollPos.X) {
-				ScrollPos.X = Math.Max(0, column * TimelineMetrics.ColWidth);
+			if (column * TimelineMetrics.ColWidth < Offset.X) {
+				OffsetX = Math.Max(0, column * TimelineMetrics.ColWidth);
 			}
 		}
 
 		public void EnsureRowVisible(Row row)
 		{
 			var gw = row.GetGridWidget();
-			if (gw.Bottom > ScrollPos.Y + Grid.Size.Y) {
-				ScrollPos.Y = gw.Bottom - Grid.Size.Y;
+			if (gw.Bottom > Offset.Y + Grid.Size.Y) {
+				OffsetY = gw.Bottom - Grid.Size.Y;
 			}
-			if (gw.Top < ScrollPos.Y) {
-				ScrollPos.Y = Math.Max(0, gw.Top);
+			if (gw.Top < Offset.Y) {
+				OffsetY = Math.Max(0, gw.Top);
 			}
 		}
 
 		public bool IsColumnVisible(int col)
 		{
-			var pos = col * TimelineMetrics.ColWidth - ScrollPos.X;
+			var pos = col * TimelineMetrics.ColWidth - Offset.X;
 			return pos >= 0 && pos < Grid.Size.X;
 		}
 		
 		public bool IsRowVisible(int row)
 		{
-			var pos = Document.Current.Rows[row].GetGridWidget().Top - ScrollPos.Y;
+			var pos = Document.Current.Rows[row].GetGridWidget().Top - Offset.Y;
 			return pos >= 0 && pos < Grid.Size.Y;
 		}
 

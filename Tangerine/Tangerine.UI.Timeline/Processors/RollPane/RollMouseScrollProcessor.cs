@@ -15,9 +15,9 @@ namespace Tangerine.UI.Timeline
 				if (input.IsMouseOwner()) {
 					var s = TimelineMetrics.DefaultRowHeight;
 					if (input.LocalMousePosition.Y > timeline.Roll.RootWidget.Height - s / 2) {
-						timeline.ScrollPos.Y += s;
+						timeline.OffsetY += s;
 					} else if (input.LocalMousePosition.Y < s / 2) {
-						timeline.ScrollPos.Y -= s;
+						timeline.OffsetY -= s;
 					}
 					Window.Current.Invalidate();
 				}

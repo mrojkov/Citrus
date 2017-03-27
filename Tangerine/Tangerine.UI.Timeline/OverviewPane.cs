@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using Lime;
@@ -46,7 +46,7 @@ namespace Tangerine.UI.Timeline
 			widget.PrepareRendererState();
 			var veilColor = ColorTheme.Current.TimelineOverview.Veil;
 			var zoom = ContentWidget.Scale;
-			var a = Vector2.Floor(timeline.ScrollPos * zoom);
+			var a = Vector2.Floor(timeline.Offset * zoom);
 			var b = a + Vector2.Floor(timeline.Grid.Size * zoom);
 			b = Vector2.Min(size, b);
 			Renderer.DrawRect(0, 0, a.X, size.Y, veilColor);

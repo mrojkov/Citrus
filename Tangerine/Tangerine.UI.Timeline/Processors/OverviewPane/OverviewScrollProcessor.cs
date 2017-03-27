@@ -15,12 +15,12 @@ namespace Tangerine.UI.Timeline
 				if (input.WasMousePressed()) {
 					input.CaptureMouse();
 					var originalMousePosition = input.MousePosition;
-					var scrollPos = timeline.ScrollPos;
+					var scrollPos = timeline.Offset;
 					while (input.IsMousePressed()) {
 						var mouseDelta = input.MousePosition - originalMousePosition;
 						var scrollDelta = Vector2.Round(mouseDelta / timeline.Overview.ContentWidget.Scale);
 						var maxScrollPos = Vector2.Max(Vector2.Zero, timeline.Grid.ContentSize - timeline.Grid.Size);
-						timeline.ScrollPos = Vector2.Clamp(scrollPos + scrollDelta, Vector2.Zero, maxScrollPos);
+						timeline.Offset = Vector2.Clamp(scrollPos + scrollDelta, Vector2.Zero, maxScrollPos);
 						yield return null;
 					}
 					input.ReleaseMouse();

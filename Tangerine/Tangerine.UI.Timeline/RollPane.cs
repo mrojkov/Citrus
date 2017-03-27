@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
@@ -31,7 +31,7 @@ namespace Tangerine.UI.Timeline
 			OverlayWidget = new Widget { Presenter = new DelegatePresenter<Widget>(w => OnRenderOverlay?.Invoke(w)) };
 			RootWidget.AddNode(OverlayWidget);
 			RootWidget.AddNode(ContentWidget);
-			ContentWidget.Updating += delta => ContentWidget.Y = -Timeline.Instance.ScrollPos.Y;
+			ContentWidget.Updating += delta => ContentWidget.Y = -Timeline.Instance.Offset.Y;
 		}
 				
 		private void RenderBackground(Node node)
