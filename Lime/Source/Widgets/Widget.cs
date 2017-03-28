@@ -72,19 +72,20 @@ namespace Lime
 		private Vector2 measuredMaxSize = Vector2.PositiveInfinity;
 		private bool visible;
 		private WidgetInput input;
+		private TaskList tasks;
+		private TaskList lateTasks;
+
+		protected Matrix32 localToWorldTransform;
+		protected Color4 globalColor;
+		protected Blending globalBlending;
+		protected ShaderId globalShader;
+		protected bool globallyVisible;
 
 		public static Widget Focused { get; private set; }
-
-		public static Vector2 DefaultWidgetSize = new Vector2(100, 100);
-
+		public static Vector2 DefaultWidgetSize = new Vector2(100);
 		public static bool RenderTransparentWidgets;
 
-		public Widget ParentWidget { get { return Parent != null ? Parent.AsWidget : null; } }
-
-		public TabTraversable TabTravesable { get; set; }
-
-		public KeyboardFocusScope FocusScope { get; set; }
-
+#region Layout properties
 		public ILayout Layout = AnchorLayout.Instance;
 
 		/// <summary>
@@ -180,45 +181,9 @@ namespace Lime
 			set { MinHeight = MaxHeight = value; }
 		}
 
-		/// <summary>
-		/// Get or sets a label upon the widget. For widgets which can not have a label returns null.
-		/// </summary>
-		public virtual string Text
-		{
-			get { return null; }
-			set { }
-		}
+#endregion
 
-		/// <summary>
-		/// Get or sets a texture upon the widget. For widgets which can not have a texture returns null.
-		/// </summary>
-		public virtual ITexture Texture
-		{
-			get { return null; }
-			set { }
-		}
-
-		internal protected virtual bool IsRenderedToTexture()
-		{
-			return false;
-		}
-
-		public virtual Action Clicked {
-			get { return clicked; }
-			set { clicked = value; }
-		}
-
-		public virtual bool WasClicked()
-		{
-			return Input.WasMouseReleased() && IsMouseOver();
-		}
-
-		private bool IsNumber(float x)
-		{
-			return !float.IsNaN(x) &&
-					!float.IsInfinity(x);
-		}
-
+#region Transformation properties
 		/// <summary>
 		/// Parent-relative position.
 		/// </summary>
@@ -270,120 +235,6 @@ namespace Lime
 			}
 		}
 
-		[TangerineKeyframeColor(7)]
-		public Vector2 Size
-		{
-			get { return size; }
-			set
-			{
-				System.Diagnostics.Debug.Assert(IsNumber(value.X));
-				System.Diagnostics.Debug.Assert(IsNumber(value.Y));
-				if (value.X != size.X || value.Y != size.Y) {
-					var sizeDelta = value - size;
-					size = value;
-					OnSizeChanged(sizeDelta);
-					PropagateDirtyFlags(DirtyFlags.Transform);
-				}
-			}
-		}
-
-		/// <summary>
-		/// SilentSize is needed to prevent unwanted propagation of `OnSizeChanged`
-		/// while deserializing with Yuzu.
-		/// </summary>
-		[YuzuMember("Size")]
-		[TangerineIgnoreProperty]
-		public Vector2 SilentSize { get { return size; } set { size = value; } }
-
-		/// <summary>
-		/// Gets or sets the widget padding. Padding defines the white space between the widget content and the widget border.
-		/// The widget presenter and layout should respect the padding.
-		/// </summary>
-		public Thickness Padding;
-
-		public Vector2 ContentPosition
-		{
-			get { return new Vector2(Padding.Left, Padding.Top); }
-		}
-
-		public Vector2 ContentSize
-		{
-			get { return new Vector2(Size.X - Padding.Left - Padding.Right, Size.Y - Padding.Top - Padding.Bottom); }
-		}
-
-		public float ContentWidth
-		{
-			get { return Size.X - Padding.Left - Padding.Right; }
-		}
-
-		public float ContentHeight
-		{
-			get { return Size.Y - Padding.Top - Padding.Bottom; }
-		}
-
-		/// <summary>
-		/// Stops all tasks and calls Dispose of all descendants.
-		/// </summary>
-		public override void Dispose()
-		{
-			if (tasks != null) {
-				tasks.Stop();
-			}
-			if (lateTasks != null) {
-				lateTasks.Stop();
-			}
-			if (input != null) {
-				input.Dispose();
-			}
-			base.Dispose();
-		}
-
-		public void RefreshLayout()
-		{
-			OnSizeChanged(Vector2.Zero);
-		}
-
-		protected virtual void OnSizeChanged(Vector2 sizeDelta)
-		{
-			Layout.OnSizeChanged(this, sizeDelta);
-		}
-
-		public float Width {
-			get { return size.X; }
-			set {
-				if (size.X != value)
-					Size = new Vector2(value, Height);
-			}
-		}
-
-		public float Height {
-			get { return size.Y; }
-			set {
-				if (size.Y != value)
-					Size = new Vector2(Width, value);
-			}
-		}
-
-		/// <summary>
-		/// Center point of rotation and scaling.
-		/// (0, 0) is top-left corner, (1, 1) is bottom-right corner.
-		/// </summary>
-		[YuzuMember]
-		[TangerineKeyframeColor(6)]
-		public Vector2 Pivot
-		{
-			get { return pivot; }
-			set
-			{
-				System.Diagnostics.Debug.Assert(IsNumber(value.X));
-				System.Diagnostics.Debug.Assert(IsNumber(value.Y));
-				if (pivot.X != value.X || pivot.Y != value.Y) {
-					pivot = value;
-					PropagateDirtyFlags(DirtyFlags.Transform);
-				}
-			}
-		}
-
 		[YuzuMember]
 		[TangerineKeyframeColor(5)]
 		public Vector2 Scale
@@ -417,6 +268,106 @@ namespace Lime
 				}
 			}
 		}
+
+		[TangerineKeyframeColor(7)]
+		public Vector2 Size
+		{
+			get { return size; }
+			set
+			{
+				System.Diagnostics.Debug.Assert(IsNumber(value.X));
+				System.Diagnostics.Debug.Assert(IsNumber(value.Y));
+				if (value.X != size.X || value.Y != size.Y) {
+					var sizeDelta = value - size;
+					size = value;
+					OnSizeChanged(sizeDelta);
+					PropagateDirtyFlags(DirtyFlags.Transform);
+				}
+			}
+		}
+
+		/// <summary>
+		/// SilentSize is needed to prevent unwanted propagation of `OnSizeChanged`
+		/// while deserializing with Yuzu.
+		/// </summary>
+		[YuzuMember("Size")]
+		[TangerineIgnoreProperty]
+		public Vector2 SilentSize { get { return size; } set { size = value; } }
+
+		public float Width
+		{
+			get { return size.X; }
+			set
+			{
+				if (size.X != value) {
+					Size = new Vector2(value, Height);
+				}
+			}
+		}
+
+		public float Height
+		{
+			get { return size.Y; }
+			set
+			{
+				if (size.Y != value) {
+					Size = new Vector2(Width, value);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Center point of rotation and scaling.
+		/// (0, 0) is top-left corner, (1, 1) is bottom-right corner.
+		/// </summary>
+		[YuzuMember]
+		[TangerineKeyframeColor(6)]
+		public Vector2 Pivot
+		{
+			get { return pivot; }
+			set
+			{
+				System.Diagnostics.Debug.Assert(IsNumber(value.X));
+				System.Diagnostics.Debug.Assert(IsNumber(value.Y));
+				if (pivot.X != value.X || pivot.Y != value.Y) {
+					pivot = value;
+					PropagateDirtyFlags(DirtyFlags.Transform);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets the widget padding. Padding defines the white space between the widget content and the widget border.
+		/// The widget presenter and layout should respect the padding.
+		/// </summary>
+		public Thickness Padding;
+
+		public Vector2 ContentPosition => new Vector2(Padding.Left, Padding.Top);
+		public Vector2 ContentSize => new Vector2(Size.X - Padding.Left - Padding.Right, Size.Y - Padding.Top - Padding.Bottom);
+
+		public float ContentWidth => Size.X - Padding.Left - Padding.Right;
+		public float ContentHeight => Size.Y - Padding.Top - Padding.Bottom;
+
+		/// <summary>
+		/// Absolute position of this widget.
+		/// </summary>
+		public Vector2 GlobalPosition => LocalToWorldTransform.T;
+
+		/// <summary>
+		/// Absolute position of center of this widget.
+		/// </summary>
+		public Vector2 GlobalCenter => LocalToWorldTransform * (Size / 2);
+
+		/// <summary>
+		/// Parent-relative position of center of this widget.
+		/// </summary>
+		public Vector2 Center => Position + (Vector2.Half - Pivot) * Size;
+#endregion
+
+#region Misc properties
+		public Widget ParentWidget => Parent != null ? Parent.AsWidget : null;
+		public TabTraversable TabTravesable { get; set; }
+		public KeyboardFocusScope FocusScope { get; set; }
 
 		/// <summary>
 		/// Hue of this widget. Contents color will be multiplied by it on render.
@@ -499,16 +450,65 @@ namespace Lime
 		public SkinningWeights SkinningWeights { get; set; }
 
 		[YuzuMember]
-		public HitTestMethod HitTestMethod { get; set; }
-
-		[YuzuMember]
 		public BoneArray BoneArray;
 
-		protected Matrix32 localToWorldTransform;
-		protected Color4 globalColor;
-		protected Blending globalBlending;
-		protected ShaderId globalShader;
-		protected bool globallyVisible;
+		[YuzuMember]
+		public HitTestMethod HitTestMethod { get; set; }
+
+		/// <summary>
+		/// Get or sets a label upon the widget. For widgets which can not have a label returns null.
+		/// </summary>
+		public virtual string Text
+		{
+			get { return null; }
+			set { }
+		}
+
+		/// <summary>
+		/// Get or sets a texture upon the widget. For widgets which can not have a texture returns null.
+		/// </summary>
+		public virtual ITexture Texture
+		{
+			get { return null; }
+			set { }
+		}
+
+		/// <summary>
+		/// Tasks that are called before Update.
+		/// </summary>
+		public TaskList Tasks
+		{
+			get
+			{
+				if (tasks == null) {
+					tasks = new TaskList();
+					Updating += tasks.Update;
+				}
+				return tasks;
+			}
+		}
+
+		/// <summary>
+		/// Tasks that are called after Update.
+		/// </summary>
+		public TaskList LateTasks
+		{
+			get
+			{
+				if (lateTasks == null) {
+					lateTasks = new TaskList();
+					Updated += lateTasks.Update;
+				}
+				return lateTasks;
+			}
+		}
+
+		public WidgetInput Input
+		{
+			get { return input ?? (input = new WidgetInput(this)); }
+		}
+
+		public bool HasInput() => input != null;
 
 		/// <summary>
 		/// TODO: Add summary
@@ -556,62 +556,7 @@ namespace Lime
 				return globallyVisible;
 			}
 		}
-
-		/// <summary>
-		/// Absolute position of this widget.
-		/// </summary>
-		public Vector2 GlobalPosition { get { return LocalToWorldTransform.T; } }
-
-		/// <summary>
-		/// Absolute position of center of this widget.
-		/// </summary>
-		public Vector2 GlobalCenter { get { return LocalToWorldTransform * (Size / 2); } }
-
-		/// <summary>
-		/// Parent-relative position of center of this widget.
-		/// </summary>
-		public Vector2 Center { get { return Position + (Vector2.Half - Pivot) * Size; } }
-
-		private TaskList tasks;
-
-		/// <summary>
-		/// Tasks that are called before Update.
-		/// </summary>
-		public TaskList Tasks
-		{
-			get
-			{
-				if (tasks == null) {
-					tasks = new TaskList();
-					Updating += tasks.Update;
-				}
-				return tasks;
-			}
-		}
-
-		private TaskList lateTasks;
-
-		/// <summary>
-		/// Tasks that are called after Update.
-		/// </summary>
-		public TaskList LateTasks
-		{
-			get
-			{
-				if (lateTasks == null) {
-					lateTasks = new TaskList();
-					Updated += lateTasks.Update;
-				}
-				return lateTasks;
-			}
-		}
-
-		public WidgetInput Input
-		{
-			get { return input ?? (input = new WidgetInput(this)); }
-		}
-
-		public bool HasInput() { return input != null; }
+#endregion
 
 		/// <summary>
 		/// Called before Update.
@@ -634,6 +579,51 @@ namespace Lime
 			Blending = Blending.Inherited;
 			Shader = ShaderId.Inherited;
 			direction = new Vector2(1, 0);
+		}
+
+		/// <summary>
+		/// Stops all tasks and calls Dispose of all descendants.
+		/// </summary>
+		public override void Dispose()
+		{
+			if (tasks != null) {
+				tasks.Stop();
+			}
+			if (lateTasks != null) {
+				lateTasks.Stop();
+			}
+			if (input != null) {
+				input.Dispose();
+			}
+			base.Dispose();
+		}
+
+		internal protected virtual bool IsRenderedToTexture() => false;
+
+		public virtual Action Clicked
+		{
+			get { return clicked; }
+			set { clicked = value; }
+		}
+
+		public virtual bool WasClicked()
+		{
+			return Input.WasMouseReleased() && IsMouseOver();
+		}
+
+		private static bool IsNumber(float x)
+		{
+			return !float.IsNaN(x) && !float.IsInfinity(x);
+		}
+
+		public void RefreshLayout()
+		{
+			OnSizeChanged(Vector2.Zero);
+		}
+
+		protected virtual void OnSizeChanged(Vector2 sizeDelta)
+		{
+			Layout.OnSizeChanged(this, sizeDelta);
 		}
 
 		public bool IsFocused() { return Focused == this; }
@@ -700,8 +690,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO: Translate
-		/// Возвращает клон этого виджета. Используйте Clone() as Widget, т.к. он возвращает Node (базовый объект виджета)
+		/// Returns a copy of the widget's hierarchy. 
 		/// </summary>
 		public override Node Clone()
 		{
@@ -724,11 +713,8 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO: Translate
-		/// Обновляет состояние виджета (обновляет его анимации, генерирует события и. т.д.).
-		/// Вызывает Update для всех дочерних виджетов. В нормальных условиях этот метод должен вызываться 1 раз за кадр.
+		/// TODO: Add summary
 		/// </summary>
-		/// <param name="delta">Количество секунд, прошедшее с момента предыдущего вызова Update</param>
 		public override void Update(float delta)
 		{
 			if (!IsAwoken) {
@@ -1005,7 +991,7 @@ namespace Lime
 			}
 			if (
 				HitTestMethod == HitTestMethod.BoundingRect && BoundingRectHitTest(args.Point) ||
-			    HitTestMethod == HitTestMethod.Contents && PartialHitTestByContents(ref args)
+				HitTestMethod == HitTestMethod.Contents && PartialHitTestByContents(ref args)
 			) {
 				args.Node = targetNode;
 				return true;
@@ -1250,6 +1236,5 @@ namespace Lime
 			Renderer.Blending = GlobalBlending;
 			Renderer.Shader = GlobalShader;
 		}
-
 	}
 }
