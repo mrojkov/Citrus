@@ -158,6 +158,7 @@ namespace Lime
 				currentKey = count - 1;
 			}
 			int frame = AnimationUtils.MsecsToFrames(time);
+			// find rightmost key on the left from given frame
 			while (currentKey < count - 1 && frame > ReadonlyKeys[currentKey].Frame)
 				currentKey++;
 			while (currentKey >= 0 && frame < ReadonlyKeys[currentKey].Frame)
@@ -190,12 +191,12 @@ namespace Lime
 			} else if (function == KeyFunction.Spline) {
 				int count = ReadonlyKeys.Count;
 				var key0 = ReadonlyKeys[i < 1 ? 0 : i - 1];
-				var key3 = ReadonlyKeys[i + 1 >= count - 1 ? count - 1 : i + 1];
+				var key3 = ReadonlyKeys[i + 1 >= count - 1 ? count - 1 : i + 2];
 				InterpolateAndSet(t, key0, key1, key2, key3);
 			} else if (function == KeyFunction.ClosedSpline) {
 				int count = ReadonlyKeys.Count;
-				var key0 = ReadonlyKeys[i < 1 ? count - 1 : i - 1];
-				var key3 = ReadonlyKeys[i + 1 >= count - 1 ? 0 : i + 1];
+				var key0 = ReadonlyKeys[i < 1 ? count - 2 : i - 1];
+				var key3 = ReadonlyKeys[i + 1 >= count - 1 ? 1 : i + 2];
 				InterpolateAndSet(t, key0, key1, key2, key3);
 			}
 		}
