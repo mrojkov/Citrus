@@ -58,7 +58,8 @@
     <Compile Include="KeyFunctionButton.cs" />
     <Compile Include="KeyframeDataflow.cs" />
     <Compile Include="KeyframeButton.cs" />
-    <Compile Include="InspectorBuilder.cs" />
+    <Compile Include="InspectorContent.cs" />
+    <Compile Include="InspectorPropertyRegistry.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tangerine.UI\Tangerine.UI.Mac.csproj">

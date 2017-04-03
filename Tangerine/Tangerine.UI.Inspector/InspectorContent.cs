@@ -8,25 +8,43 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.Inspector
 {
-	class InspectorBuilder
+	class InspectorContent
 	{
-		Inspector Inspector => Inspector.Instance;
+		private List<IPropertyEditor> editors;
+		private Widget widget;
 
-		public void Build(IEnumerable<object> objects)
+		public InspectorContent(Widget widget)
 		{
-			var content = Inspector.ContentWidget;
-			if (Widget.Focused != null && Widget.Focused.DescendantOf(content)) {
-				content.SetFocus();
+			this.widget = widget;
+			editors = new List<IPropertyEditor>();
+		}
+
+		public void BuildForObjects(IEnumerable<object> objects)
+		{
+			if (Widget.Focused != null && Widget.Focused.DescendantOf(widget)) {
+				widget.SetFocus();
 			}
-			content.Nodes.Clear();
-			Inspector.Editors.Clear();
+			Clear();
 			foreach (var t in GetTypes(objects)) {
 				var o = objects.Where(i => t.IsInstanceOfType(i)).ToList();
 				PopulateContentForType(t, o);
 			}
 		}
 
-		IEnumerable<Type> GetTypes(IEnumerable<object> objects)
+		public void Clear()
+		{
+			widget.Nodes.Clear();
+			editors.Clear();
+		}
+
+		public void DropFiles(IEnumerable<string> files)
+		{
+			foreach (var e in editors) {
+				e.DropFiles(files);
+			}
+		}
+
+		private IEnumerable<Type> GetTypes(IEnumerable<object> objects)
 		{
 			var types = new List<Type>();
 			foreach (var o in objects) {
@@ -44,7 +62,7 @@ namespace Tangerine.UI.Inspector
 			return types;
 		}
 
-		void PopulateContentForType(Type type, List<object> objects)
+		private void PopulateContentForType(Type type, List<object> objects)
 		{
 			var categoryLabelAdded = false;
 			foreach (var property in type.GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public)) {
@@ -77,18 +95,18 @@ namespace Tangerine.UI.Inspector
 						}
 					};
 					label.CompoundPresenter.Add(new WidgetFlatFillPresenter(ColorTheme.Current.Inspector.CategoryLabelBackground));
-					Inspector.ContentWidget.AddNode(label);
+					widget.AddNode(label);
 				}
-				var context = new PropertyEditorParams(Inspector.ContentWidget, objects, type, property.Name) {
+				var context = new PropertyEditorParams(widget, objects, type, property.Name) {
 					NumericEditBoxFactory = () => new TransactionalNumericEditBox(),
 					PropertySetter = Core.Operations.SetAnimableProperty.Perform
 				};
-				foreach (var i in Inspector.PropertyEditorRegistry) {
+				foreach (var i in InspectorPropertyRegistry.Instance.Items) {
 					if (i.Condition(context)) {
 						var propertyEditor = i.Builder(context);
 						if (propertyEditor != null) {
 							DecoratePropertyEditor(propertyEditor);
-							Inspector.Editors.Add(propertyEditor);
+							editors.Add(propertyEditor);
 						}
 						break;
 					}
