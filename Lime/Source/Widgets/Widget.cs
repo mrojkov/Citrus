@@ -930,6 +930,12 @@ namespace Lime
 			return (mouseOwner == null || mouseOwner == this) && WidgetContext.Current.NodeUnderMouse == this;
 		}
 
+		public bool IsMouseOverThisOrDescendant()
+		{
+			var mouseOwner = WidgetInput.MouseCaptureStack.Top;
+			return (mouseOwner == null || mouseOwner == this) && (WidgetContext.Current.NodeUnderMouse?.DescendantOrThis(this) ?? false);
+		}
+
 		public int GetEffectiveLayer()
 		{
 			for (Node node = this; node != null; node = node.Parent) {
