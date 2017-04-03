@@ -40,6 +40,10 @@ namespace Lime
 		[Obsolete("Use FPS property instead", true)]
 		public float CalcFPS() { return fpsCounter.FPS; }
 
+		public bool AllowDropFiles { get { return false; } set {} }
+
+		public event Action<IEnumerable<string>> FilesDropped;
+
 		public float PixelScale
 		{
 			get { return (float)UIScreen.MainScreen.Scale; }

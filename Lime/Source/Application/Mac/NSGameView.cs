@@ -16,7 +16,6 @@ using MonoMac.CoreVideo;
 using MonoMac.Foundation;
 using MonoMac.OpenGL;
 #endif
-
 using OpenTK;
 
 namespace Lime.Platform
@@ -32,10 +31,27 @@ namespace Lime.Platform
 		private NSEventModifierMask prevMask;
 		private Lime.Input input;
 		private bool running;
+		private bool allowDropFiles;
 
 		public event Action Update;
 		public event Action RenderFrame;
 		public event Action InputChanged;
+		public event Action<IEnumerable<string>> FilesDropped;
+
+		public bool AllowDropFiles
+		{
+			get { return allowDropFiles; }
+			set
+			{
+				if (value && !allowDropFiles) {
+					RegisterForDraggedTypes(new string[] { NSPasteboard.NSFilenamesType });
+				}
+				if (!value && allowDropFiles) {
+					UnregisterDraggedTypes();
+				}
+				allowDropFiles = value;
+			}
+		}
 
 		public NSGameView(Lime.Input input, CGRect frame, GraphicsMode mode)
 			: base(frame)
@@ -353,6 +369,22 @@ namespace Lime.Platform
 				InputChanged();
 			}
 		}
+
+		public override bool PerformDragOperation(NSDraggingInfo sender)
+		{
+			if (base.PrepareForDragOperation (sender)) {
+				var nsFiles = ((NSArray)sender.DraggingPasteboard.GetPropertyListForType(NSPasteboard.NSFilenamesType));
+				var files = new List<string>();
+				for (uint i = 0; i < nsFiles.Count; i++) {
+					files.Add((nsFiles.GetItem<NSString>(i).ToString()));
+				}
+				FilesDropped?.Invoke(files);
+				return true;
+			}
+			return false;
+		}
+
+		public override NSDragOperation DraggingEntered(NSDraggingInfo sender) => NSDragOperation.Generic;
 	}
 }
 #endif

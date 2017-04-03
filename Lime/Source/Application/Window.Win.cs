@@ -1,5 +1,6 @@
 ﻿ #if WIN
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
@@ -646,6 +647,41 @@ namespace Lime
 				form.MainMenuStrip = menu.NativeMainMenu;
 			}
 		}
+
+		public bool AllowDropFiles
+		{
+			get { return form.AllowDrop; }
+			set
+			{
+				if (form.AllowDrop != value) {
+					form.AllowDrop = value;
+					if (value) {
+						form.DragEnter += Form_DragEnter;
+						form.DragDrop += Form_DragDrop;
+					} else {
+						form.DragEnter -= Form_DragEnter;
+						form.DragDrop -= Form_DragDrop;
+					}
+				}
+			}
+		}
+
+		private void Form_DragEnter(object sender, DragEventArgs e)
+		{
+			if (e.Data.GetDataPresent(DataFormats.FileDrop)) {
+				e.Effect = DragDropEffects.All;
+			}
+		}
+
+		private void Form_DragDrop(object sender, DragEventArgs e)
+		{
+			var files = ((string[])e.Data.GetData(DataFormats.FileDrop, false));
+			using (Context.Activate().Scoped()) {
+				FilesDropped?.Invoke(files);
+			}
+		}
+
+		public event Action<IEnumerable<string>> FilesDropped;
 	}
 
 	static class SDToLime

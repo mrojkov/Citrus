@@ -151,6 +151,14 @@ namespace Lime
 			}
 		}
 
+		public bool AllowDropFiles
+		{
+			get { return View.AllowDropFiles; }
+			set { View.AllowDropFiles = value; }
+		}
+
+		public event Action<IEnumerable<string>> FilesDropped;
+
 		public float FPS { get { return fpsCounter.FPS; } }
 
 		[Obsolete("Use FPS property instead", true)]
@@ -271,6 +279,7 @@ namespace Lime
 			window.ReleasedWhenClosed = true;
 			View.Update += Update;
 			View.RenderFrame += HandleRenderFrame;
+			View.FilesDropped += RaiseFilesDropped;
 		}
 
 		public void Invalidate()
@@ -342,7 +351,7 @@ namespace Lime
 		private void RefreshMousePosition()
 		{
 			var p = window.MouseLocationOutsideOfEventStream;
-			Input.MousePosition = new Vector2((int)p.X, (int)NSGameView.Frame.Height - (int)p.Y) * Input.ScreenToWorldTransform;
+			Input.MousePosition = new Vector2((float)p.X, (float)(NSGameView.Frame.Height - p.Y)) * Input.ScreenToWorldTransform;
 		}
 
 		private void SetVisible(bool value, bool dialogMode)
@@ -359,6 +368,13 @@ namespace Lime
 				// Showing a new modal window should consume issued commands or we may fall into infinite loop otherwise.
 				Application.UpdateCounter++;
 				NSApplication.SharedApplication.RunModalForWindow(window);
+			}
+		}
+
+		private void RaiseFilesDropped(IEnumerable<string> files)
+		{
+			using (Context.Activate().Scoped()) {
+				FilesDropped?.Invoke(files);
 			}
 		}
 	}

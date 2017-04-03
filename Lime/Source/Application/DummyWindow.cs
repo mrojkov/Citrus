@@ -1,5 +1,6 @@
 #if WIN || MAC || MONOMAC
 using System;
+using System.Collections.Generic;
 
 namespace Lime
 {
@@ -41,6 +42,10 @@ namespace Lime
 		public float PixelScale { get; set; }
 
 		public void ShowModal() {}
+
+		public bool AllowDropFiles { get; set; }
+
+		public event Action<IEnumerable<string>> FilesDropped;
 	}
 }
 #endif

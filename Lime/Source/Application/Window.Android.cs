@@ -1,5 +1,6 @@
 ﻿#if ANDROID
 using System;
+using System.Collections.Generic;
 
 using Android.Content.Res;
 using Android.Runtime;
@@ -41,6 +42,10 @@ namespace Lime
 
 		[Obsolete("Use FPS property instead", true)]
 		public float CalcFPS() { return fpsCounter.FPS; }
+
+		public bool AllowDropFiles { get { return false; } set {} }
+
+		public event Action<IEnumerable<string>> FilesDropped;
 
 		public float PixelScale
 		{

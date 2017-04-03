@@ -1,5 +1,5 @@
 ﻿using System;
-
+using System.Collections.Generic;
 
 namespace Lime
 {
@@ -197,5 +197,15 @@ namespace Lime
 		/// The window must be hidden before calling this method.
 		/// </summary>
 		void ShowModal();
+
+		/// <summary>
+		/// Gets or sets a value indicating whether this <see cref="T:Lime.IWindow"/> allow files drop.
+		/// </summary>
+		bool AllowDropFiles { get; set; }
+
+		/// <summary>
+		/// Occurs when files are dropped.
+		/// </summary>
+		event Action<IEnumerable<string>> FilesDropped;
 	}
 }
