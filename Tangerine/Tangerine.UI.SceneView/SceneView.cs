@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Lime;
 using Tangerine.Core;
@@ -42,7 +43,7 @@ namespace Tangerine.UI.SceneView
 
 		static void DragWidgets(Vector2 delta)
 		{
-			var transform = Document.Current.Container.AsWidget.CalcTransitionToSpaceOf(SceneView.Instance.Scene).CalcInversed();
+			var transform = Document.Current.Container.AsWidget.CalcTransitionToSpaceOf(Instance.Scene).CalcInversed();
 			var dragDelta = transform * delta - transform * Vector2.Zero;
 			foreach (var widget in Document.Current.SelectedNodes().Editable().OfType<Widget>()) {
 				Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), widget.Position + dragDelta);
@@ -70,12 +71,50 @@ namespace Tangerine.UI.SceneView
 		{
 			Instance = this;
 			Panel.AddNode(Frame);
+			DockManager.Instance.FilesDropped += DropFiles;
 		}
 
 		public void Detach()
 		{
+			DockManager.Instance.FilesDropped -= DropFiles;
 			Instance = null;
 			Frame.Unlink();
+		}
+
+		void DropFiles(IEnumerable<string> files)
+		{
+			if (!InputArea.IsMouseOverThisOrDescendant()) {
+				return;
+			}
+			var widgetPos = MousePosition * Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
+			Document.Current.History.BeginTransaction();
+			try {
+				foreach (var file in files) {
+					string assetPath, assetType;
+					if (Utils.ExtractAssetPathOrShowAlert(file, out assetPath, out assetType)) {
+						if (assetType == ".png") {
+							var node = Core.Operations.CreateNode.Perform(typeof(Image));
+							var texture = new SerializableTexture(assetPath);
+							Core.Operations.SetProperty.Perform(node, nameof(Image.Texture), texture);
+							Core.Operations.SetProperty.Perform(node, nameof(Widget.Position), widgetPos);
+							Core.Operations.SetProperty.Perform(node, nameof(Widget.Pivot), Vector2.Half);
+							Core.Operations.SetProperty.Perform(node, nameof(Widget.Size), (Vector2)texture.ImageSize);
+						} else if (assetType == ".tan" || assetType == ".model" || assetType == ".scene") {
+							var scene = Node.CreateFromAssetBundle(assetPath);
+							var node = Core.Operations.CreateNode.Perform(scene.GetType());
+							Core.Operations.SetProperty.Perform(node, nameof(Widget.ContentsPath), assetPath);
+							if (scene is Widget) {
+								Core.Operations.SetProperty.Perform(node, nameof(Widget.Position), widgetPos);
+								Core.Operations.SetProperty.Perform(node, nameof(Widget.Pivot), Vector2.Half);
+								Core.Operations.SetProperty.Perform(node, nameof(Widget.Size), ((Widget)scene).Size);
+							}
+							node.LoadExternalScenes();
+						}
+					}
+				}
+			} finally {
+				Document.Current.History.EndTransaction();
+			}
 		}
 
 		void CreateComponents()

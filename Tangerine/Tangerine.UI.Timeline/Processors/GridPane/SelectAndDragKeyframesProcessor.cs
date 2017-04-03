@@ -19,7 +19,7 @@ namespace Tangerine.UI.Timeline
 			var input = grid.RootWidget.Input;
 			while (true) {
 				if (input.WasMousePressed()) {
-					var initialCell = MousePositionToCell(input.MousePosition);
+					var initialCell = grid.CellUnderMouse();
 					if (initialCell.Y < Document.Current.Rows.Count) {
 						input.CaptureMouse();
 						if (IsCellSelected(initialCell)) {
@@ -54,7 +54,7 @@ namespace Tangerine.UI.Timeline
 			Action<Widget> r = widget => timeline.Grid.RenderSelection(widget, offset);
 			grid.OnPostRender += r;
 			while (input.IsMousePressed()) {
-				offset = MousePositionToCell(input.MousePosition) - initialCell;
+				offset = grid.CellUnderMouse() - initialCell;
 				Window.Current.Invalidate();
 				yield return null;
 			}
@@ -78,7 +78,7 @@ namespace Tangerine.UI.Timeline
 			grid.OnPostRender += RenderSelectionRect;
 			while (input.IsMousePressed()) {
 				rect.A = initialCell;
-				rect.B = MousePositionToCell(input.MousePosition);
+				rect.B = grid.CellUnderMouse();
 				if (rect.Width >= 0) {
 					rect.B.X++;
 				} else {
@@ -97,23 +97,6 @@ namespace Tangerine.UI.Timeline
 			for (var r = rect.A.Y; r < rect.B.Y; r++) {
 				Operations.SelectGridSpan.Perform(r, new GridSpan(rect.A.X, rect.B.X));
 			}
-		}
-
-		IntVector2 MousePositionToCell(Vector2 position)
-		{
-			position -= grid.ContentWidget.GlobalPosition;
-			var r = new IntVector2((int)(position.X / TimelineMetrics.ColWidth), 0);
-			if (position.Y >= grid.ContentSize.Y) {
-				r.Y = Math.Max(0, Document.Current.Rows.Count - 1);
-				return r;
-			}
-			foreach (var row in Document.Current.Rows) {
-				if (position.Y >= row.GetGridWidget().Top && position.Y < row.GetGridWidget().Bottom + TimelineMetrics.RowSpacing) {
-					r.Y = row.Index;
-					break;
-				}
-			}
-			return r;
 		}
 
 		void RenderSelectionRect(Widget widget)

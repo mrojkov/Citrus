@@ -12,6 +12,7 @@ namespace Tangerine.UI
 		IPropertyEditorParams EditorParams { get; }
 		Widget ContainerWidget { get; }
 		void SetFocus();
+		void DropFiles(IEnumerable<string> files);
 	}
 
 	public interface IPropertyEditorParams
@@ -85,6 +86,8 @@ namespace Tangerine.UI
 			};
 			ContainerWidget.AddNode(PropertyNameLabel);
 		}
+
+		public virtual void DropFiles(IEnumerable<string> files) { }
 
 		public virtual void SetFocus() { }
 
@@ -505,34 +508,40 @@ namespace Tangerine.UI
 					InitialDirectory = Project.Current.GetSystemDirectory(Document.Current.Path),
 				};
 				if (dlg.RunModal()) {
-					if (!dlg.FileName.StartsWith(Project.Current.AssetsDirectory)) {
-						var alert = new AlertDialog("Tangerine", "Can't open an assset outside the project assets directory", "Ok");
-						alert.Show();
-					} else {
-						var assetPath = dlg.FileName.Substring(Project.Current.AssetsDirectory.Length + 1);
-						var path = Path.ChangeExtension(assetPath, null);
-						SetFilePath(CorrectSlashes(path));
-					}
+					SetFilePath(dlg.FileName);
 				}
 			};
 		}
 
+		private void SetFilePath(string path)
+		{
+			string asset, type;
+			if (Utils.ExtractAssetPathOrShowAlert(path, out asset, out type)) {
+				AssignAsset(AssetPath.CorrectSlashes(asset));
+			}
+		}
+
+		public override void DropFiles(IEnumerable<string> files)
+		{
+			if (editor.IsMouseOverThisOrDescendant() && files.Any()) {
+				SetFilePath(files.First());
+			}
+		}
+
 		public override void SetFocus() => editor.SetFocus();
 
-		protected static string CorrectSlashes(string path) => AssetPath.CorrectSlashes(path);
-
-		protected abstract void SetFilePath(string path);
+		protected abstract void AssignAsset(string path);
 	}
 
 	public class TexturePropertyEditor : FilePropertyEditor
 	{
 		public TexturePropertyEditor(IPropertyEditorParams editorParams) : base(editorParams, new string[] { "png" })
 		{
-			editor.Submitted += text => SetProperty(editorParams.PropertyName, new SerializableTexture(CorrectSlashes(text)));
+			editor.Submitted += text => SetProperty(editorParams.PropertyName, new SerializableTexture(AssetPath.CorrectSlashes(text)));
 			editor.AddChangeWatcher(CoalescedPropertyValue<ITexture>(editorParams), v => editor.Text = v?.SerializationPath ?? "");
 		}
 
-		protected override void SetFilePath(string path)
+		protected override void AssignAsset(string path)
 		{
 			SetProperty(EditorParams.PropertyName, new SerializableTexture(path));
 		}
@@ -542,11 +551,11 @@ namespace Tangerine.UI
 	{
 		public AudioSamplePropertyEditor(IPropertyEditorParams editorParams) : base(editorParams, new string[] { "ogg" })
 		{
-			editor.Submitted += text => SetProperty(editorParams.PropertyName, new SerializableSample(CorrectSlashes(text)));
+			editor.Submitted += text => SetProperty(editorParams.PropertyName, new SerializableSample(AssetPath.CorrectSlashes(text)));
 			editor.AddChangeWatcher(CoalescedPropertyValue<SerializableSample>(editorParams), v => editor.Text = v?.SerializationPath ?? "");
 		}
 
-		protected override void SetFilePath(string path)
+		protected override void AssignAsset(string path)
 		{
 			SetProperty(EditorParams.PropertyName, new SerializableSample(path));
 		}
@@ -556,11 +565,11 @@ namespace Tangerine.UI
 	{
 		public ContentsPathPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams, Document.AllowedFileTypes)
 		{
-			editor.Submitted += text => SetProperty(editorParams.PropertyName, CorrectSlashes(text));
+			editor.Submitted += text => SetProperty(editorParams.PropertyName, AssetPath.CorrectSlashes(text));
 			editor.AddChangeWatcher(CoalescedPropertyValue<string>(editorParams), v => editor.Text = v);
 		}
 
-		protected override void SetFilePath(string path)
+		protected override void AssignAsset(string path)
 		{
 			SetProperty(EditorParams.PropertyName, path);
 			Document.Current.Container.LoadExternalScenes();

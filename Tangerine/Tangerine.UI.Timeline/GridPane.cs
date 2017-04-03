@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using Lime;
@@ -98,6 +98,51 @@ namespace Tangerine.UI.Timeline
 			var rows = Document.Current.Rows;
 			var y = row < rows.Count ? rows[Math.Max(row, 0)].GetGridWidget().Top : rows[rows.Count - 1].GetGridWidget().Bottom;
 			return new Vector2(col * TimelineMetrics.ColWidth, y);
+		}
+
+		public void TryDropFiles(IEnumerable<string> files)
+		{
+			if (!RootWidget.IsMouseOverThisOrDescendant() || Document.Current.Rows.Count == 0) {
+				return;
+			}
+			var cell = CellUnderMouse();
+			var widget = Document.Current.Rows[cell.Y].Components.Get<Core.Components.NodeRow>()?.Node as Widget;
+			if (widget == null) {
+				return;
+			}
+			Document.Current.History.BeginTransaction();
+			try {
+				foreach (var file in files) {
+					string assetPath, assetType;
+					if (Utils.ExtractAssetPathOrShowAlert(file, out assetPath, out assetType) && assetType == ".png") {
+						var key = new Keyframe<ITexture> {
+							Frame = cell.X,
+							Value = new SerializableTexture(assetPath)
+						};
+						Core.Operations.SetKeyframe.Perform(widget, nameof(Widget.Texture), Document.Current.AnimationId, key);
+						cell.X++;
+					}
+				}
+			} finally {
+				Document.Current.History.EndTransaction();
+			}
+		}
+
+		public IntVector2 CellUnderMouse()
+		{
+			var mousePos = RootWidget.Input.MousePosition - ContentWidget.GlobalPosition;
+			var r = new IntVector2((int)(mousePos.X / TimelineMetrics.ColWidth), 0);
+			if (mousePos.Y >= ContentSize.Y) {
+				r.Y = Math.Max(0, Document.Current.Rows.Count - 1);
+				return r;
+			}
+			foreach (var row in Document.Current.Rows) {
+				if (mousePos.Y >= row.GetGridWidget().Top && mousePos.Y < row.GetGridWidget().Bottom + TimelineMetrics.RowSpacing) {
+					r.Y = row.Index;
+					break;
+				}
+			}
+			return r;
 		}
 	}
 }

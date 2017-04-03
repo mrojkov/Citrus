@@ -46,7 +46,8 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="InspectorBuilder.cs" />
+    <Compile Include="InspectorContent.cs" />
+    <Compile Include="InspectorPropertyRegistry.cs" />
     <Compile Include="KeyframeButton.cs" />
     <Compile Include="KeyframeDataflow.cs" />
     <Compile Include="KeyFunctionButton.cs" />

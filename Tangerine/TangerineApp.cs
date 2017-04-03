@@ -31,6 +31,7 @@ namespace Tangerine
 
 			PadsMenu = new Menu();
 			DockManager.Initialize(new Vector2(1024, 768), PadsMenu);
+			DockManager.Instance.MainWindowWidget.Window.AllowDropFiles = true;
 			CreateMainMenu();
 
 			Application.Exiting += () => Project.Current.Close();
@@ -157,7 +158,8 @@ namespace Tangerine
 			var tabBar = new TabBar { LayoutCell = new LayoutCell { StretchY = 0 } };
 			var documentViewContainer = new Frame {
 				ClipChildren = ClipMethod.ScissorTest,
-				Layout = new StackLayout()
+				Layout = new StackLayout(),
+				HitTestTarget = true
 			};
 			new DocumentTabsProcessor(tabBar);
 			var docArea = dockManager.DocumentArea;

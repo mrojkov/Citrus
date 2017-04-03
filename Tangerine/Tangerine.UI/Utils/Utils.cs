@@ -86,5 +86,21 @@ namespace Tangerine.UI
 			}
 			return result;
 		}
+
+		public static bool ExtractAssetPathOrShowAlert(string filePath, out string assetPath, out string assetType)
+		{
+			if (!filePath.StartsWith(Core.Project.Current.AssetsDirectory, StringComparison.CurrentCultureIgnoreCase)) {
+				var alert = new AlertDialog("Tangerine", $"Asset '{filePath}' outside the project directory", "Ok");
+				alert.Show();
+				assetPath = null;
+				assetType = null;
+				return false;
+			} else {
+				var localPath = filePath.Substring(Core.Project.Current.AssetsDirectory.Length + 1);
+				assetPath = System.IO.Path.ChangeExtension(AssetPath.CorrectSlashes(localPath), null);
+				assetType = System.IO.Path.GetExtension(localPath).ToLower();
+				return true;
+			}
+		}
 	}
 }

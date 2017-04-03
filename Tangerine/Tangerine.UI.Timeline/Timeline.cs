@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Lime;
 using Tangerine.Core;
@@ -76,12 +76,21 @@ namespace Tangerine.UI.Timeline
 			Instance = this;
 			PanelWidget.PushNode(RootWidget);
 			RootWidget.SetFocus();
+			DockManager.Instance.FilesDropped += DropFiles;
 		}
 
 		public void Detach()
 		{
+			DockManager.Instance.FilesDropped -= DropFiles;
 			Instance = null;
 			RootWidget.Unlink();
+		}
+
+		void DropFiles(IEnumerable<string> files)
+		{
+			if (RootWidget.IsMouseOverThisOrDescendant()) {
+				Grid.TryDropFiles(files);
+			}
 		}
 
 		void InitializeWidgets()

@@ -26,6 +26,8 @@ namespace Tangerine.UI
 		public event Action<DockPanel> DockPanelAdded;
 		public static DockManager Instance { get; private set; }
 
+		public event Action<IEnumerable<string>> FilesDropped;
+
 		public static void Initialize(Vector2 windowSize, IMenu padsMenu)
 		{
 			if (Instance != null) {
@@ -38,6 +40,7 @@ namespace Tangerine.UI
 		{
 			this.padsMenu = padsMenu;
 			var window = new Window(new WindowOptions { ClientSize = windowSize, FixedSize = false, Title = "Tangerine" });
+			SetDropHandler(window);
 			MainWindowWidget = new InvalidableWindowWidget(window) {
 				Id = "MainWindow",
 				Layout = new VBoxLayout(),
@@ -54,6 +57,12 @@ namespace Tangerine.UI
 				ClipChildren = ClipMethod.ScissorTest,
 			};
 			DocumentArea.CompoundPresenter.Add(new WidgetFlatFillPresenter(Color4.Gray));
+		}
+
+		private void SetDropHandler(IWindow window)
+		{
+			window.AllowDropFiles = true;
+			window.FilesDropped += files => FilesDropped?.Invoke(files);
 		}
 
 		public void AddPanel(DockPanel panel, DockSite site, Vector2 size)
@@ -145,6 +154,7 @@ namespace Tangerine.UI
 				if (!p.Placement.Hidden) {
 					if (p.WindowWidget == null) {
 						var window = new Window(new WindowOptions { Title = p.Title, FixedSize = false });
+						SetDropHandler(window);
 						window.Closing += () => {
 							if (!p.Placement.Docked) {
 								p.Placement.Hidden = true;
