@@ -372,6 +372,7 @@ namespace Lime.Platform
 
 		public override bool PerformDragOperation(NSDraggingInfo sender)
 		{
+#if !MONOMAC
 			if (base.PrepareForDragOperation (sender)) {
 				var nsFiles = ((NSArray)sender.DraggingPasteboard.GetPropertyListForType(NSPasteboard.NSFilenamesType));
 				var files = new List<string>();
@@ -381,6 +382,7 @@ namespace Lime.Platform
 				FilesDropped?.Invoke(files);
 				return true;
 			}
+#endif
 			return false;
 		}
 
