@@ -118,7 +118,7 @@ namespace Tangerine.Core
 			using (Theme.Push(DefaultTheme.Instance)) {
 				RootNode = Node.CreateFromAssetBundle(path);
 				if (RootNode is Node3D) {
-					var vp = new Viewport3D { Width = 1024, Height = 768, ZSortEnabled = true };
+					var vp = new Viewport3D { Width = 1024, Height = 768 };
 					vp.AddNode(RootNode);
 					vp.Camera = new Camera3D {
 						Id = "DefaultCamera",

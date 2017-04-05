@@ -18,29 +18,9 @@ namespace Lime
 	public class Viewport3D : Widget
 	{
 		private float frame;
-		private List<RenderItem> opaqueList;
-		private List<RenderItem> transparentList;
-		private bool zSortEnabled;
+		private List<RenderItem> opaqueList = new List<RenderItem>();
+		private List<RenderItem> transparentList = new List<RenderItem>();
 		private RenderChain renderChain = new RenderChain();
-
-		public bool ZSortEnabled
-		{
-			get { return zSortEnabled; }
-			set
-			{
-				if (value == zSortEnabled) {
-					return;
-				}
-				if (value) {
-					opaqueList = new List<RenderItem>();
-					transparentList = new List<RenderItem>();
-				} else {
-					opaqueList = null;
-					transparentList = null;
-				}
-				zSortEnabled = value;
-			}
-		}
 
 		[YuzuMember]
 		public NodeReference<Camera3D> CameraRef { get; set; }
@@ -73,7 +53,6 @@ namespace Lime
 				AspectRatio = 1.3f,
 				OrthographicSize = 1.0f
 			};
-			ZSortEnabled = true;
 			Nodes.Add(camera);
 			Camera = camera;
 		}
@@ -163,33 +142,28 @@ namespace Lime
 			Renderer.View = Camera.View;
 			Renderer.Projection = TransformProjection(Renderer.Projection);
 			Renderer.ZTestEnabled = true;
-			if (ZSortEnabled) {
-				for (var i = 0; i < RenderChain.LayerCount; i++) {
-					var layer = renderChain.Layers[i];
-					if (layer == null || layer.Count == 0) {
-						continue;
-					}
-					for (var j = 0; j < layer.Count; j++) {
-						var node = layer[j].Node.AsNode3D;
-						if (node == null) {
-							continue;	
-						}
-						var list = node.Opaque ? opaqueList : transparentList;
-						list.Add(new RenderItem {
-							Node = node,
-							Distance = node.CalcDistanceToCamera(Camera)
-						});
-					}
-					Renderer.ZWriteEnabled = true;
-					SortAndFlushList(opaqueList, RenderOrderComparers.FrontToBack);
-					Renderer.ZWriteEnabled = false;
-					SortAndFlushList(transparentList, RenderOrderComparers.BackToFront);
+			for (var i = 0; i < RenderChain.LayerCount; i++) {
+				var layer = renderChain.Layers[i];
+				if (layer == null || layer.Count == 0) {
+					continue;
 				}
-				renderChain.Clear();
-			} else {
+				for (var j = 0; j < layer.Count; j++) {
+					var node = layer[j].Node.AsNode3D;
+					if (node == null) {
+						continue;	
+					}
+					var list = node.Opaque ? opaqueList : transparentList;
+					list.Add(new RenderItem {
+						Node = node,
+						Distance = node.CalcDistanceToCamera(Camera)
+					});
+				}
 				Renderer.ZWriteEnabled = true;
-				renderChain.RenderAndClear();
+				SortAndFlushList(opaqueList, RenderOrderComparers.FrontToBack);
+				Renderer.ZWriteEnabled = false;
+				SortAndFlushList(transparentList, RenderOrderComparers.BackToFront);
 			}
+			renderChain.Clear();
 			Renderer.Clear(ClearTarget.DepthBuffer);
 			Renderer.World = oldWorld;
 			Renderer.View = oldView;
@@ -197,6 +171,14 @@ namespace Lime
 			Renderer.ZTestEnabled = oldZTestEnabled;
 			Renderer.ZWriteEnabled = oldZWriteEnabled;
 			Renderer.CullMode = oldCullMode;
+		}
+
+		public override Node Clone()
+		{
+			var vp = (Viewport3D)base.Clone();
+			vp.opaqueList = new List<RenderItem>();
+			vp.transparentList = new List<RenderItem>();
+			return vp;
 		}
 
 		private void SortAndFlushList(List<RenderItem> items, IComparer<RenderItem> comparer)
