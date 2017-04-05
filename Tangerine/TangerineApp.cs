@@ -264,6 +264,7 @@ namespace Tangerine
 			};
 			var nodeTypes = new[] {
 				typeof(Frame),
+				typeof(Button),
 				typeof(Image),
 				typeof(Audio),
 				typeof(Movie),
