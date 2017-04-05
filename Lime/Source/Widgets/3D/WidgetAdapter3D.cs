@@ -65,17 +65,14 @@ namespace Lime
 				return;
 			}
 			Widget.AddToRenderChain(renderChain);
-			var oldZTestEnabled = Renderer.ZTestEnabled;
 			var oldCullMode = Renderer.CullMode;
 			var oldWorld = Renderer.World;
-			Renderer.ZTestEnabled = true;
 			Renderer.CullMode = CullMode.None;
 			Renderer.World = Matrix44.CreateScale(new Vector3(1, -1, 1)) * GlobalTransform;
 			renderChain.RenderAndClear();
 			Renderer.Flush();
 			Renderer.World = oldWorld;
 			Renderer.CullMode = oldCullMode;
-			Renderer.ZTestEnabled = oldZTestEnabled;
 		}
 
 		internal protected override bool PartialHitTest(ref HitTestArgs args)
