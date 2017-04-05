@@ -227,9 +227,7 @@ namespace Tangerine.Core.Operations
 			using (Theme.Push(DefaultTheme.Instance)) {
 				node = (Node)ctr.Invoke(new object[] {});
 			}
-			foreach (var d in Document.NodeDecorators) {
-				d(node);
-			}
+			Document.Decorate(node);
 			var attrs = ClassAttributes<TangerineClassAttribute>.Get(nodeType);
 			if (attrs?.BuilderMethodName != null) {
 				var builder = nodeType.GetMethod(attrs.BuilderMethodName, BindingFlags.NonPublic | BindingFlags.Instance);

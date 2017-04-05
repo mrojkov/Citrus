@@ -104,6 +104,9 @@ namespace Tangerine.Core.Operations
 				SetProperty.Perform(parentFolder, nameof(Folder.Expanded), true);
 			}
 			var items = frame.RootFolder().Items.ToList();
+			foreach (var n in items.OfType<Node>()) {
+				Document.Decorate(n);
+			}
 			frame.RootFolder().Items.Clear();
 			frame.RootFolder().SyncDescriptorsAndNodes(frame);
 			ClearRowSelection.Perform();

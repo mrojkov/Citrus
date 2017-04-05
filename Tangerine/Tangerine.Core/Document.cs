@@ -133,11 +133,7 @@ namespace Tangerine.Core
 					RootNode = vp;
 				}
 			}
-			foreach (var n in RootNode.Descendants) {
-				foreach (var d in NodeDecorators) {
-					d(n);
-				}
-			}
+			Decorate(RootNode);
 			RootNode.Update(0);
 			Container = RootNode;
 			// Hide all hitboxes
@@ -359,6 +355,16 @@ namespace Tangerine.Core
 		}
 
 		public static bool HasCurrent() => Current != null;
+
+		public static void Decorate(Node node)
+		{
+			foreach (var decorator in NodeDecorators) {
+				decorator(node);
+				foreach (var descendant in node.Descendants) {
+					decorator(descendant);
+				}
+			}
+		}
 
 		public class NodeDecoratorList : List<Action<Node>>
 		{
