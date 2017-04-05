@@ -596,7 +596,7 @@ namespace Tangerine.UI
 				SetProperty(editorParams.PropertyName, font);
 			};
 			selector.AddChangeWatcher(CoalescedPropertyValue<SerializableFont>(editorParams), i => {
-				selector.Text = string.IsNullOrEmpty(i.Name) ? "Default" : i.Name;
+				selector.Text = string.IsNullOrEmpty(i?.Name) ? "Default" : i.Name;
 			});
 		}
 
