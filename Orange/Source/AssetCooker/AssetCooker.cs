@@ -47,9 +47,7 @@ namespace Orange
 				return ".png";
 			case ".sound":
 				return ".ogg";
-			case ".daeModel":
-				return ".dae";
-			case ".fbxModel":
+			case ".model":
 				return ".fbx";
 			default:
 				return Path.GetExtension(path);
@@ -155,7 +153,7 @@ namespace Orange
 
 		static AssetCooker()
 		{
-			AddStage(ConvertFbxToModels);
+			AddStage(SyncModels);
 			AddStage(SyncAtlases);
 			AddStage(SyncDeleted);
 			AddStage(() => SyncRawAssets(".json", AssetAttributes.ZippedDeflate));
@@ -175,7 +173,6 @@ namespace Orange
 			AddStage(() => SyncRawAssets(".ttf"));
 			AddStage(() => SyncRawAssets(".otf"));
 			AddStage(() => SyncRawAssets(".ogv"));
-			AddStage(SyncModels);
 			AddStage(SyncScenes);
 			AddStage(SyncHotScenes);
 			AddStage(SyncSounds);
@@ -269,16 +266,6 @@ namespace Orange
 			SyncUpdated(".tan", ".tan", (srcPath, dstPath) => {
 				var node = Serialization.ReadObjectFromFile<Node>(srcPath);
 				Serialization.WriteObjectToBundle(AssetBundle, dstPath, node, Serialization.Format.Binary, ".tan");
-				return true;
-			});
-		}
-
-		private static void SyncModels()
-		{
-			SyncUpdated(".model", ".model", (srcPath, dstPath) => {
-				var node = Serialization.ReadObjectFromFile<Node>(srcPath);
-				var compression = cookingRulesMap[srcPath].ModelCompressing;
-				Serialization.WriteObjectToBundle(AssetBundle, dstPath, node, Serialization.Format.Binary, ".model", compression);
 				return true;
 			});
 		}
@@ -777,12 +764,15 @@ namespace Orange
 			}
 		}
 
-		private static void ConvertFbxToModels()
+		private static void SyncModels()
 		{
-			var bundle = new UnpackedAssetBundle(The.Workspace.AssetsDirectory);
-			SyncUpdated(".fbx", ".model", bundle, (srcPath, dstPath) => {
+			var sourceAssetBundle = new UnpackedAssetBundle(The.Workspace.AssetsDirectory);
+			SyncUpdated(".fbx", ".model", (srcPath, dstPath) => {
+				var compression = cookingRulesMap[srcPath].ModelCompressing;
 				var model = new ModelImporter(srcPath, The.Workspace.ActivePlatform).Model;
-				Serialization.WriteObjectToBundle(bundle, dstPath, model, Serialization.Format.Binary, Path.GetExtension(srcPath));
+				// Create .model file for tangerine.
+				Serialization.WriteObjectToBundle(sourceAssetBundle, dstPath, model, Serialization.Format.Binary, ".model");
+				AssetBundle.ImportFile(dstPath, dstPath, 0,  ".model", compression);
 				return true;
 			});
 		}
