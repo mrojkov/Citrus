@@ -71,7 +71,9 @@ namespace Tangerine.Core
 				}
 				userprefs.Documents.Add(doc.Path);
 			}
-			Serialization.WriteObjectToFile(UserprefsPath, userprefs, Serialization.Format.JSON);
+			try {
+				Serialization.WriteObjectToFile(UserprefsPath, userprefs, Serialization.Format.JSON);
+			} catch (System.Exception) { }
 			AssetBundle.Instance = null;
 			Current = Null;
 			return true;
