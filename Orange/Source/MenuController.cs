@@ -32,7 +32,7 @@ namespace Orange
 			if (PluginLoader.CurrentPlugin == null) {
 				return;
 			}
-			foreach (var i in PluginLoader.CurrentPlugin.MenuItems) {
+			foreach (var i in PluginLoader.CurrentPlugin?.MenuItems) {
 				Items.Add(new MenuItem() {
 					Action = i.Value,
 					Label = i.Metadata.Label,
