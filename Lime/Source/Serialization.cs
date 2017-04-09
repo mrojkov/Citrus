@@ -265,7 +265,7 @@ namespace Lime
 				jd.Generate<Submesh3D>();
 				jd.Generate<Node3D>();
 				jd.Generate<Spline3D>();
-				jd.Generate<Spline3D.Point>();
+				jd.Generate<SplinePoint3D>();
 				jd.Generate<Viewport3D>();
 				jd.Generate<Animation>();
 				jd.Generate<Spline>();

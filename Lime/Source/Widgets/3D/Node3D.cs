@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using Yuzu;
 
 namespace Lime
 {
 	[TangerineClassAttribute(allowChildren: true)]
-	public class Node3D : Node
+	public class Node3D : Node, Viewport3D.IZSorterParams
 	{
 		private Vector3 scale;
 		private Quaternion rotation;

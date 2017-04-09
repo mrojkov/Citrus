@@ -60,6 +60,8 @@
     <EmbeddedResource Include="Resources\SegoeUIRegular.ttf" />
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Node3D.png" />
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.WidgetAdapter3D.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Spline3D.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.SplinePoint3D.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Win.csproj">

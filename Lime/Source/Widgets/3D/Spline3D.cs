@@ -1,20 +1,19 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Yuzu;
 
 namespace Lime
 {
+	public enum SplineInterpolation
+	{
+		Linear,
+		Bezier
+	}
+
+	[TangerineClass(allowChildren: true)]
 	public class Spline3D : Node3D
 	{
 		[YuzuMember]
-		public List<Point> Points { get; set; }
-
-		[YuzuMember]
 		public bool Closed { get; set; }
-
-		public Spline3D()
-		{
-			Points = new List<Point>();
-		}
 
 		public float CalcLengthRough()
 		{
@@ -37,7 +36,7 @@ namespace Lime
 			return length;
 		}
 
-		private float CalcSegmentLengthAccurate(Point a, Point b, int approximateCount)
+		private float CalcSegmentLengthAccurate(SplinePoint3D a, SplinePoint3D b, int approximateCount)
 		{
 			var length = 0f;
 			var prevPosition = a.Position;
@@ -69,22 +68,22 @@ namespace Lime
 				}
 				length += segmentLength;
 			}
-			if (Points.Count > 1) {
+			if (Nodes.Count > 1) {
 				return Interpolate(1.0f, GetPoint(segmentCount - 1), GetPoint(segmentCount));
 			}
-			if (Points.Count == 1) {
-				return Matrix44.CreateTranslation(Points[0].Position);
+			if (Nodes.Count == 1) {
+				return Matrix44.CreateTranslation(((SplinePoint3D)Nodes[0]).Position);
 			}
 			return Matrix44.Identity;
 		}
 
-		private Matrix44 Interpolate(float amount, Point point1, Point point2)
+		private Matrix44 Interpolate(float amount, SplinePoint3D point1, SplinePoint3D point2)
 		{
 			var transform = GlobalTransform;
 			var position1 = transform.TransformVector(point1.Position);
 			var position2 = transform.TransformVector(point2.Position);
 			Vector3 position, direction;
-			if (point1.InterpolationMode == InterpolationMode.Linear) {
+			if (point1.Interpolation == SplineInterpolation.Linear) {
 				position = Mathf.Lerp(amount, position1, position2);
 				direction = position2 - position1;
 			} else {
@@ -98,15 +97,15 @@ namespace Lime
 
 		public int GetSegmentCount()
 		{
-			if (Points.Count > 1) {
-				return Closed ? Points.Count : Points.Count - 1;
+			if (Nodes.Count > 1) {
+				return Closed ? Nodes.Count : Nodes.Count - 1;
 			}
 			return 0;
 		}
 
-		private Point GetPoint(int index)
+		private SplinePoint3D GetPoint(int index)
 		{
-			return Points[index % Points.Count];
+			return (SplinePoint3D)Nodes[index % Nodes.Count];
 		}
 
 		private static Matrix44 CalcRotationMatrix(Vector3 direction, Vector3 up)
@@ -121,31 +120,42 @@ namespace Lime
 			return matrix;
 		}
 
-		public enum InterpolationMode
+		public override void AddToRenderChain(RenderChain chain)
 		{
-			Linear,
+			base.AddToRenderChain(chain);
+		}
+	}
 
-			Bezier
+	public class SplinePoint3D : Node, Viewport3D.IZSorterParams
+	{
+		[YuzuMember]
+		public SplineInterpolation Interpolation { get; set; }
+
+		[YuzuMember]
+		public Vector3 Position { get; set; }
+
+		[YuzuMember]
+		public Vector3 TangentA { get; set; }
+
+		[YuzuMember]
+		public Vector3 TangentB { get; set; }
+
+		public SplinePoint3D()
+		{
+			Interpolation = SplineInterpolation.Bezier;
 		}
 
-		public class Point
+		public Vector3 CalcTransformedPosition()
 		{
-			[YuzuMember]
-			public InterpolationMode InterpolationMode { get; set; }
+			var transform = (Parent as Spline3D).GlobalTransform;
+			return transform.TransformVector(Position);
+		}
 
-			[YuzuMember]
-			public Vector3 Position { get; set; }
+		bool Viewport3D.IZSorterParams.Opaque => false;
 
-			[YuzuMember]
-			public Vector3 TangentA { get; set; }
-
-			[YuzuMember]
-			public Vector3 TangentB { get; set; }
-
-			public Point()
-			{
-				InterpolationMode = InterpolationMode.Bezier;
-			}
+		float Viewport3D.IZSorterParams.CalcDistanceToCamera(Camera3D camera)
+		{
+			return camera.View.TransformVector(CalcTransformedPosition()).Z;
 		}
 	}
 }

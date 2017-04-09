@@ -17,6 +17,12 @@ namespace Lime
 	[TangerineClass(allowChildren: true, builderMethodName: "BuildForTangerine")]
 	public class Viewport3D : Widget
 	{
+		public interface IZSorterParams
+		{
+			float CalcDistanceToCamera(Camera3D camera);
+			bool Opaque { get; }
+		}
+
 		private float frame;
 		private List<RenderItem> opaqueList = new List<RenderItem>();
 		private List<RenderItem> transparentList = new List<RenderItem>();
@@ -47,7 +53,7 @@ namespace Lime
 			var camera = new Camera3D {
 				Id = "DefaultCamera",
 				Position = new Vector3(0, 0, 10),
-				FarClipPlane = 100000,
+				FarClipPlane = 10000,
 				NearClipPlane = 0.001f,
 				FieldOfView = 1.0f,
 				AspectRatio = 1.3f,
@@ -147,15 +153,16 @@ namespace Lime
 				if (layer == null || layer.Count == 0) {
 					continue;
 				}
-				for (var j = 0; j < layer.Count; j++) {
-					var node = layer[j].Node.AsNode3D;
-					if (node == null) {
+				foreach (var item in layer) {
+					var p = item.Node as IZSorterParams;
+					if (p == null) {
 						continue;	
 					}
-					var list = node.Opaque ? opaqueList : transparentList;
+					var list = p.Opaque ? opaqueList : transparentList;
 					list.Add(new RenderItem {
-						Node = node,
-						Distance = node.CalcDistanceToCamera(Camera)
+						Node = item.Node,
+						Presenter = item.Presenter,
+						Distance = p.CalcDistanceToCamera(Camera)
 					});
 				}
 				Renderer.ZWriteEnabled = true;
@@ -184,9 +191,8 @@ namespace Lime
 		private void SortAndFlushList(List<RenderItem> items, IComparer<RenderItem> comparer)
 		{
 			items.Sort(comparer);
-			for (var i = 0; i < items.Count; i++) {
-				var node = items[i].Node;
-				node.Presenter.Render(node);
+			foreach (var i in items) {
+				i.Presenter.Render(i.Node);
 			}
 			items.Clear();
 		}
@@ -197,8 +203,8 @@ namespace Lime
 			orthoProjection.M43 = 0;
 			var p = 
 				// Transform from <-1, 1> normalized coordinates to the widget space
-				Matrix44.CreateScale(new Vector3(Width / 2, -Height / 2, 1)) *
-				Matrix44.CreateTranslation(new Vector3(Width / 2, Height / 2, 0)) *
+				Matrix44.CreateScale(Width / 2, -Height / 2, 1) *
+				Matrix44.CreateTranslation(Width / 2, Height / 2, 0) *
 				(Matrix44)LocalToWorldTransform * orthoProjection;
 			if (Camera != null) {
 				return Camera.Projection * p;
@@ -291,7 +297,8 @@ namespace Lime
 
 		private struct RenderItem
 		{
-			public Node3D Node;
+			public Node Node;
+			public IPresenter Presenter;
 			public float Distance;
 		}
 	}
