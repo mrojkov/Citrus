@@ -123,7 +123,7 @@ namespace Tangerine.Core
 					vp.Camera = new Camera3D {
 						Id = "DefaultCamera",
 						Position = new Vector3(0, 0, 10),
-						FarClipPlane = 100000,
+						FarClipPlane = 10000,
 						NearClipPlane = 0.001f,
 						FieldOfView = 1.0f,
 						AspectRatio = 1.3f,

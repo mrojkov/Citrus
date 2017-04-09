@@ -63,6 +63,7 @@ namespace Tangerine
 			};
 
 			Document.NodeDecorators.AddFor<Spline>(n => n.CompoundPresenter.Add(new UI.SceneView.SplinePresenter()));
+			Document.NodeDecorators.AddFor<Spline3D>(n => n.CompoundPresenter.Add(new UI.SceneView.Spline3DPresenter()));
 			Document.NodeDecorators.AddFor<PointObject>(n => n.CompoundPresenter.Add(new UI.SceneView.PointObjectPresenter()));
 			Document.NodeDecorators.AddFor<SplinePoint>(n => n.CompoundPresenter.Add(new UI.SceneView.SplinePointPresenter()));
 
@@ -264,7 +265,7 @@ namespace Tangerine
 			};
 			var nodeTypes = new[] {
 				typeof(Frame),
-				typeof(Button),
+				typeof(Button),	
 				typeof(Image),
 				typeof(Audio),
 				typeof(Movie),
@@ -287,6 +288,8 @@ namespace Tangerine
 				typeof(Model3D),
 				typeof(Node3D),
 				typeof(WidgetAdapter3D),
+				typeof(Spline3D),
+				typeof(SplinePoint3D),
 			};
 			foreach (var t in nodeTypes) {
 				var cmd = new Command(t.Name) { Icon = NodeIconPool.GetTexture(t) };

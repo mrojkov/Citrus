@@ -85,6 +85,8 @@
     <Compile Include="Processors\DragWidgetsProcessor.cs" />
     <Compile Include="Processors\RotateWidgetsProcessor.cs" />
     <Compile Include="Presenters\TranslationGizmoPresenter.cs" />
+    <Compile Include="Processors\CreateSplinePoint3DProcessor.cs" />
+    <Compile Include="Presenters\Spline3DPresenter.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

@@ -12,8 +12,8 @@ namespace Tangerine.UI.SceneView
 		public IEnumerator<object> Task()
 		{
 			while (true) {
-				Type nodeType = null;
-				if (ConsumeCreateNodeRequest(ref nodeType)) {
+				Type nodeType;
+				if (CreateNodeRequestComponent.Consume<PointObject>(sv.Components, out nodeType)) {
 					yield return CreatePointObjectTask(nodeType);
 				}
 				yield return null;
@@ -26,7 +26,7 @@ namespace Tangerine.UI.SceneView
 				if (sv.InputArea.IsMouseOver()) {
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 				}
-				ConsumeCreateNodeRequest(ref nodeType);
+				CreateNodeRequestComponent.Consume<Node>(sv.Components);
 				if (sv.Input.WasMousePressed()) {
 					var currentPoint = (SplinePoint)Core.Operations.CreateNode.Perform(nodeType);
 					var container = (Widget)Document.Current.Container;
@@ -42,17 +42,6 @@ namespace Tangerine.UI.SceneView
 				}
 				yield return null;
 			}
-		}
-
-		bool ConsumeCreateNodeRequest(ref Type nodeType)
-		{
-			var c = sv.Components.Get<CreateNodeRequestComponent>();
-			if (c != null && c.NodeType.IsSubclassOf(typeof(PointObject))) {
-				sv.Components.Remove<CreateNodeRequestComponent>();
-				nodeType = c.NodeType;
-				return true;
-			}
-			return false;
 		}
 	}
 }

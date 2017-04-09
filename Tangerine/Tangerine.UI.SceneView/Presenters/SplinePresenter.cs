@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Lime;
 using Tangerine.Core;
@@ -23,20 +23,18 @@ namespace Tangerine.UI.SceneView
 			Vector2? p = null;
 			foreach (var v in spline.CalcPoints(step)) {
 				if (p.HasValue) {
-					DrawLine(p.Value * xform, v * xform);
+					DrawColoredLine(p.Value * xform, v * xform, Color4.White, Color4.Black);
 				}
 				p = v;
 			}
 		}
 
-		Vertex[] v = new Vertex[4];
+		static Vertex[] v = new Vertex[4];
 
-		void DrawLine(Vector2 a, Vector2 b)
+		public static void DrawColoredLine(Vector2 a, Vector2 b, Color4 color1, Color4 color2)
 		{
 			var d = (b - a).Normalized * 0.5f;
 			var n = new Vector2(-d.Y, d.X);
-			var color1 = Color4.White;
-			var color2 = Color4.Black;
 			v[0] = new Vertex { Pos = a - n, Color = color1 };
 			v[1] = new Vertex { Pos = b - n, Color = color2 };
 			v[2] = new Vertex { Pos = b + n, Color = color2 };
