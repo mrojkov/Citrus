@@ -13,7 +13,7 @@ namespace Tangerine.UI.SceneView
 		{
 			while (true) {
 				Type nodeType = null;
-				if (ConsumeCreateWidgetRequest(ref nodeType)) {
+				if (CreateNodeRequestComponent.Consume<Widget>(sv.Components, out nodeType)) {
 					yield return CreateWidgetTask(nodeType);
 				}
 				yield return null;
@@ -27,7 +27,7 @@ namespace Tangerine.UI.SceneView
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 				}
 				var container = Document.Current.Container as Widget;
-				ConsumeCreateWidgetRequest(ref nodeType);
+				CreateNodeRequestComponent.Consume<Node>(sv.Components);
 				if (sv.Input.WasMousePressed() && container != null) {
 					sv.Input.CaptureMouse();
 					sv.Input.ConsumeKey(Key.Mouse0);
@@ -55,17 +55,7 @@ namespace Tangerine.UI.SceneView
 				}
 				yield return null;
 			}
-		}
-
-		bool ConsumeCreateWidgetRequest(ref Type nodeType)
-		{
-			var c = sv.Components.Get<CreateNodeRequestComponent>();
-			if (c != null && c.NodeType.IsSubclassOf(typeof(Widget))) {
-				sv.Components.Remove<CreateNodeRequestComponent>();
-				nodeType = c.NodeType;
-				return true;
-			}
-			return false;
+			Utils.ChangeCursorIfDefault(MouseCursor.Default);
 		}
 
 		static void DrawRectOutline(Vector2 a, Vector2 b, Matrix32 t)

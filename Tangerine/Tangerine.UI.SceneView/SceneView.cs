@@ -127,6 +127,7 @@ namespace Tangerine.UI.SceneView
 			Frame.Tasks.Add(
 				new CreateWidgetProcessor(),
 				new CreatePointObjectProcessor(),
+				new CreateSplinePoint3DProcessor(),
 				new CreateNodeProcessor(),
 				new ExpositionProcessor(),
 				new MouseScrollProcessor(),
@@ -169,5 +170,23 @@ namespace Tangerine.UI.SceneView
 	public class CreateNodeRequestComponent : IComponent
 	{
 		public Type NodeType { get; set; }
+
+		public static bool Consume<T>(ComponentCollection<IComponent> components, out Type nodeType) where T: Node
+		{
+			var c = components.Get<CreateNodeRequestComponent>();
+			if (c != null && (c.NodeType.IsSubclassOf(typeof(T)) || c.NodeType == typeof(T))) {
+				components.Remove<CreateNodeRequestComponent>();
+				nodeType = c.NodeType;
+				return true;
+			}
+			nodeType = null;
+			return false;
+		}
+
+		public static bool Consume<T>(ComponentCollection<IComponent> components) where T: Node
+		{
+			Type type;
+			return Consume<T>(components, out type);
+		}
 	}
 }

@@ -7,15 +7,12 @@ namespace Tangerine.UI.SceneView
 {
 	public class CreateNodeProcessor : ITaskProvider
 	{
-		SceneView sv => SceneView.Instance;
-
 		public IEnumerator<object> Task()
 		{
 			while (true) {
-				var c = sv.Components.Get<CreateNodeRequestComponent>();
-				if (c != null) {
-					sv.Components.Remove<CreateNodeRequestComponent>();
-					Core.Operations.CreateNode.Perform(c.NodeType);
+				Type type;
+				if (CreateNodeRequestComponent.Consume<Node>(SceneView.Instance.Components, out type)) {
+					Core.Operations.CreateNode.Perform(type);
 				}
 				yield return null;
 			}
