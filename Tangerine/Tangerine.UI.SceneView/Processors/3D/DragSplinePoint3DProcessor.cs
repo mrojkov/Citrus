@@ -20,7 +20,8 @@ namespace Tangerine.UI.SceneView
 					if (HitTestControlPoint(spline, point.Position)) {
 						Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 						if (SceneView.Instance.Input.ConsumeKeyPress(Key.Mouse0)) {
-							yield return DragPoint(point);
+							yield return DragPoints(point, points);
+							break;
 						}
 					}
 					for (int i = 0; i < 2; i++) {
@@ -45,18 +46,17 @@ namespace Tangerine.UI.SceneView
 			return SceneView.Instance.HitTestControlPoint(screenPoint);
 		}
 
-		IEnumerator<object> DragPoint(SplinePoint3D point)
+		IEnumerator<object> DragPoints(SplinePoint3D point, IEnumerable<SplinePoint3D> points)
 		{
 			var input = SceneView.Instance.Input;
 			input.CaptureMouse();
 			Document.Current.History.BeginTransaction();
-			Vector3? posCorrection = null;
+			var offsets = new Vector3?[points.Count()];
 			try {
 				var spline = (Spline3D)Document.Current.Container;
 				var viewport = spline.GetViewport();
 				var initialMouse = input.MousePosition;
 				var dragDirection = DragDirection.Any;
-				var plane = CalcPlane(spline, point.CalcGlobalPosition());
 				while (input.IsMousePressed()) {
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					var currentMouse = input.MousePosition;
@@ -76,11 +76,16 @@ namespace Tangerine.UI.SceneView
 								DragDirection.Horizontal : DragDirection.Vertical;
 						}
 					}
-					var distance = ray.Intersects(plane);
-					if (distance.HasValue) {
-						var pos = (ray.Position + ray.Direction * distance.Value) * spline.GlobalTransform.CalcInverted();
-						posCorrection = posCorrection ?? point.Position - pos;
-						Core.Operations.SetAnimableProperty.Perform(point, nameof(SplinePoint3D.Position), pos + posCorrection.Value);
+					int i = 0;
+					foreach (var p in points) {
+						var plane = CalcPlane(spline, p.CalcGlobalPosition());
+						var distance = ray.Intersects(plane);
+						if (distance.HasValue) {
+							var pos = (ray.Position + ray.Direction * distance.Value) * spline.GlobalTransform.CalcInverted();
+							offsets[i] = offsets[i] ?? p.Position - pos;
+							Core.Operations.SetAnimableProperty.Perform(p, nameof(SplinePoint3D.Position), pos + offsets[i].Value);
+							i++;
+						}
 					}
 					yield return null;
 				}
