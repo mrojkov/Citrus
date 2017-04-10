@@ -15,22 +15,37 @@ namespace Tangerine.UI.SceneView
 				var spline = Document.Current.Container as Spline3D;
 				if (spline == null)
 					continue;
-				var viewport = spline.GetViewport();
 				var points = Document.Current.SelectedNodes().Editable().OfType<SplinePoint3D>();
-				var viewportToScene = viewport.CalcTransitionToSpaceOf(SceneView.Instance.Scene);
 				foreach (var point in points) {
-					var p = (Vector2)viewport.WorldToViewportPoint(point.Position * spline.GlobalTransform) * viewportToScene;
-					if (SceneView.Instance.HitTestControlPoint(p)) {
+					if (HitTestControlPoint(spline, point.Position)) {
 						Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 						if (SceneView.Instance.Input.ConsumeKeyPress(Key.Mouse0)) {
-							yield return Drag(point);
+							yield return DragPoint(point);
+						}
+					}
+					for (int i = 0; i < 2; i++) {
+						if (HitTestControlPoint(spline, point.Position + GetTangent(point, i))) {
+							Utils.ChangeCursorIfDefault(MouseCursor.Hand);
+							if (SceneView.Instance.Input.ConsumeKeyPress(Key.Mouse0)) {
+								yield return DragTangent(point, i);
+							}
 						}
 					}
 				}
 			}
 		}
 
-		IEnumerator<object> Drag(SplinePoint3D point)
+		Vector3 GetTangent(SplinePoint3D point, int index) => index == 0 ? point.TangentA : point.TangentB;
+
+		bool HitTestControlPoint(Spline3D spline, Vector3 pointInSplineCoordinates)
+		{
+			var viewport = spline.GetViewport();
+			var viewportToScene = viewport.CalcTransitionToSpaceOf(SceneView.Instance.Scene);
+			var screenPoint = (Vector2)viewport.WorldToViewportPoint(pointInSplineCoordinates * spline.GlobalTransform) * viewportToScene;
+			return SceneView.Instance.HitTestControlPoint(screenPoint);
+		}
+
+		IEnumerator<object> DragPoint(SplinePoint3D point)
 		{
 			var input = SceneView.Instance.Input;
 			input.CaptureMouse();
@@ -41,9 +56,7 @@ namespace Tangerine.UI.SceneView
 				var viewport = spline.GetViewport();
 				var initialMouse = input.MousePosition;
 				var dragDirection = DragDirection.Any;
-				var xyPlane = new Plane(new Vector3(0, 0, 1), 0).Transform(spline.GlobalTransform);
-				// Drag point in the plane parallel to XY plane in the spline coordinate system.
-				xyPlane.D = -xyPlane.DotCoordinate(point.CalcGlobalPosition());
+				var plane = CalcPlane(spline, point.CalcGlobalPosition());
 				while (input.IsMousePressed()) {
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					var currentMouse = input.MousePosition;
@@ -63,7 +76,7 @@ namespace Tangerine.UI.SceneView
 								DragDirection.Horizontal : DragDirection.Vertical;
 						}
 					}
-					var distance = ray.Intersects(xyPlane);
+					var distance = ray.Intersects(plane);
 					if (distance.HasValue) {
 						var pos = (ray.Position + ray.Direction * distance.Value) * spline.GlobalTransform.CalcInverted();
 						posCorrection = posCorrection ?? point.Position - pos;
@@ -75,6 +88,46 @@ namespace Tangerine.UI.SceneView
 				input.ReleaseMouse();
 				Document.Current.History.EndTransaction();
 			}
+		}
+
+		IEnumerator<object> DragTangent(SplinePoint3D point, int tangentIndex)
+		{
+			var input = SceneView.Instance.Input;
+			input.CaptureMouse();
+			Document.Current.History.BeginTransaction();
+			Vector3? posCorrection = null;
+			try {
+				var spline = (Spline3D)Document.Current.Container;
+				var viewport = spline.GetViewport();
+				var plane = CalcPlane(spline, point.CalcGlobalPosition() + GetTangent(point, tangentIndex));
+				while (input.IsMousePressed()) {
+					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
+					var ray = viewport.ScreenPointToRay(input.MousePosition);
+					var distance = ray.Intersects(plane);
+					if (distance.HasValue) {
+						var pos = (ray.Position + ray.Direction * distance.Value) * spline.GlobalTransform.CalcInverted() - point.Position;
+						posCorrection = posCorrection ?? GetTangent(point, tangentIndex) - pos;
+						Core.Operations.SetAnimableProperty.Perform(point, GetTangentPropertyName(tangentIndex), pos + posCorrection.Value);
+						if (!input.IsKeyPressed(Key.Shift)) {
+							Core.Operations.SetAnimableProperty.Perform(point, GetTangentPropertyName(1 - tangentIndex), -pos - posCorrection.Value);
+						}
+					}
+					yield return null;
+				}
+			} finally {
+				input.ReleaseMouse();
+				Document.Current.History.EndTransaction();
+			}
+		}
+
+		static string GetTangentPropertyName(int index) => index == 0 ? nameof(SplinePoint3D.TangentA) : nameof(SplinePoint3D.TangentB); 
+  
+		static Plane CalcPlane(Spline3D spline, Vector3 point)
+		{
+			var xyPlane = new Plane(new Vector3(0, 0, 1), 0).Transform(spline.GlobalTransform);
+			// Drag point in the plane parallel to XY plane in the spline coordinate system.
+			xyPlane.D = -xyPlane.DotCoordinate(point);
+			return xyPlane;
 		}
 
 		enum DragDirection
