@@ -26,7 +26,9 @@ namespace Tangerine.UI.SceneView
 				if (Core.Operations.EnterNode.Perform(node))
 					return;
 			}
-			var ctr = (Widget)Core.Document.Current.Container;
+			var ctr = Core.Document.Current.Container as Widget;
+			if (ctr == null)
+				return;
 			if (ctr.CalcHullInSpaceOf(sv.Scene).Contains(sv.MousePosition)) {
 				foreach (var widget in ctr.Nodes.Editable().OfType<Widget>()) {
 					if (widget.CalcHullInSpaceOf(sv.Scene).Contains(sv.MousePosition)) {
