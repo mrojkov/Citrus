@@ -16,7 +16,7 @@ namespace Tangerine.UI.SceneView
 				Quadrangle hull;
 				Vector2 pivot;
 				var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>();
-				if (Utils.CalcHullAndPivot(widgets, sv.Scene, out hull, out pivot) && (pivot - sv.MousePosition).Length < 10 / sv.Scene.Scale.X) {
+				if (Utils.CalcHullAndPivot(widgets, sv.Scene, out hull, out pivot) && sv.HitTestControlPoint(pivot)) {
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {
 						yield return Drag();

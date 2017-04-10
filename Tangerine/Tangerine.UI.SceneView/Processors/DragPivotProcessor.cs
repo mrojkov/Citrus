@@ -19,7 +19,7 @@ namespace Tangerine.UI.SceneView
 				if (
 					sv.Input.IsKeyPressed(Key.Control) &&
 					Utils.CalcHullAndPivot(widgets, sv.Scene, out hull, out pivot) &&
-					(pivot - sv.MousePosition).Length < 10 / sv.Scene.Scale.X)
+					sv.HitTestControlPoint(pivot))
 				{
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {

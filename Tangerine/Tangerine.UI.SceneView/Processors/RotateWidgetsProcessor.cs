@@ -18,7 +18,7 @@ namespace Tangerine.UI.SceneView
 				var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>();
 				if (Utils.CalcHullAndPivot(widgets, sv.Scene, out hull, out pivot)) {
 					for (int i = 0; i < 4; i++) {
-						if (HitTestControlPoint(hull[i])) {
+						if (sv.HitTestControlPoint(hull[i])) {
 							Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 							if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {
 								yield return Rotate(pivot);
@@ -28,11 +28,6 @@ namespace Tangerine.UI.SceneView
 				}
 				yield return null;
 			}
-		}
-
-		bool HitTestControlPoint(Vector2 controlPoint)
-		{
-			return (controlPoint - sv.MousePosition).Length < 10 / sv.Scene.Scale.X;
 		}
 
 		IEnumerator<object> Rotate(Vector2 pivot)

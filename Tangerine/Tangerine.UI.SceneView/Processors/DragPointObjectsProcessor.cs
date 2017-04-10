@@ -17,7 +17,7 @@ namespace Tangerine.UI.SceneView
 				var pobjects = Document.Current.SelectedNodes().Editable().OfType<PointObject>();
 				if (
 					Utils.CalcAABB(pobjects, sv.Scene, out aabb) && 
-					(aabb.Center - sv.MousePosition).Length < 10 / sv.Scene.Scale.X)
+					sv.HitTestControlPoint(aabb.Center))
 				{
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {

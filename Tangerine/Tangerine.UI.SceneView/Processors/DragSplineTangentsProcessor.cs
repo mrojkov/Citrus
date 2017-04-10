@@ -17,7 +17,7 @@ namespace Tangerine.UI.SceneView
 				foreach (var point in points) {
 					for (int i = 0; i < 2; i++) {
 						var p = CalcTangentKnobPosition(point, i);
-						if ((sv.MousePosition - p).Length < 5 / sv.Scene.Scale.X) {
+						if (sv.HitTestControlPoint(p, 5)) {
 							Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 							if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {
 								yield return Drag(point, i);

@@ -81,6 +81,14 @@ namespace Tangerine.UI.SceneView
 			Frame.Unlink();
 		}
 
+		/// <summary>
+		/// Checks whether the mouse is over a control point within a given radius. 
+		/// </summary>
+		public bool HitTestControlPoint(Vector2 controlPoint, float radius = 10)
+		{
+			return (controlPoint - MousePosition).Length < radius / Scene.Scale.X;
+		}
+
 		void DropFiles(IEnumerable<string> files)
 		{
 			if (!InputArea.IsMouseOverThisOrDescendant()) {
@@ -135,6 +143,7 @@ namespace Tangerine.UI.SceneView
 				new DragWidgetsProcessor(),
 				new DragPointObjectsProcessor(),
 				new DragSplineTangentsProcessor(),
+				new DragSplinePoint3DProcessor(),
 				new ResizeWidgetsProcessor(),
 				new RotateWidgetsProcessor(),
 				new MouseSelectionProcessor(),
