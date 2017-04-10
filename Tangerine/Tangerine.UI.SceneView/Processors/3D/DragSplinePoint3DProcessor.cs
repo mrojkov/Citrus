@@ -100,6 +100,7 @@ namespace Tangerine.UI.SceneView
 				var spline = (Spline3D)Document.Current.Container;
 				var viewport = spline.GetViewport();
 				var plane = CalcPlane(spline, point.CalcGlobalPosition() + GetTangent(point, tangentIndex));
+				var tangentsAreEqual = (point.TangentA + point.TangentB).Length < 0.1f;
 				while (input.IsMousePressed()) {
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					var ray = viewport.ScreenPointToRay(input.MousePosition);
@@ -108,8 +109,8 @@ namespace Tangerine.UI.SceneView
 						var pos = (ray.Position + ray.Direction * distance.Value) * spline.GlobalTransform.CalcInverted() - point.Position;
 						posCorrection = posCorrection ?? GetTangent(point, tangentIndex) - pos;
 						Core.Operations.SetAnimableProperty.Perform(point, GetTangentPropertyName(tangentIndex), pos + posCorrection.Value);
-						if (!input.IsKeyPressed(Key.Shift)) {
-							Core.Operations.SetAnimableProperty.Perform(point, GetTangentPropertyName(1 - tangentIndex), -pos - posCorrection.Value);
+						if (input.IsKeyPressed(Key.Shift) ^ tangentsAreEqual) {
+							Core.Operations.SetAnimableProperty.Perform(point, GetTangentPropertyName(1 - tangentIndex), -(pos + posCorrection.Value));
 						}
 					}
 					yield return null;
