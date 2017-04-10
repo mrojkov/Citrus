@@ -145,7 +145,7 @@ namespace Lime
 			Interpolation = SplineInterpolation.Bezier;
 		}
 
-		public Vector3 CalcTransformedPosition()
+		public Vector3 CalcGlobalPosition()
 		{
 			var transform = (Parent as Spline3D).GlobalTransform;
 			return transform.TransformVector(Position);
@@ -155,7 +155,7 @@ namespace Lime
 
 		float Viewport3D.IZSorterParams.CalcDistanceToCamera(Camera3D camera)
 		{
-			return camera.View.TransformVector(CalcTransformedPosition()).Z;
+			return camera.View.TransformVector(CalcGlobalPosition()).Z;
 		}
 	}
 }
