@@ -20,8 +20,10 @@ namespace Tangerine.UI.SceneView
 			SceneView.Instance.Frame.PrepareRendererState();
 			var cameraProjection = Renderer.Projection;
 			var oldWorldMatrix = Renderer.World;
+			var oldViewMatrix = Renderer.View;
 			var oldCullMode = Renderer.CullMode;
 			Renderer.World = Matrix44.Identity;
+			Renderer.View = Matrix44.Identity;
 			Renderer.CullMode = CullMode.None;
 			Renderer.Projection = ((WindowWidget)spline.GetRoot()).GetProjection();
 			var vp = spline.GetViewport();
@@ -35,6 +37,7 @@ namespace Tangerine.UI.SceneView
 			Renderer.Flush();
 			Renderer.Projection = cameraProjection;
 			Renderer.World = oldWorldMatrix;
+			Renderer.View = oldViewMatrix;
 			Renderer.CullMode = oldCullMode;
 		} 
  
