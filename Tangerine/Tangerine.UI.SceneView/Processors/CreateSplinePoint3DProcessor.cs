@@ -49,6 +49,10 @@ namespace Tangerine.UI.SceneView
 								yield return null;
 							}
 						} finally {
+							if (point.TangentA.Length < 0.01f) {
+								Core.Operations.SetProperty.Perform(point, nameof(SplinePoint3D.TangentA), new Vector3(1, 0, 0));
+								Core.Operations.SetProperty.Perform(point, nameof(SplinePoint3D.TangentB), new Vector3(-1, 0, 0));
+							}
 							input.ReleaseMouse();
 							Document.Current.History.EndTransaction();
 						}
