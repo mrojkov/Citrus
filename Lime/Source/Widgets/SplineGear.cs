@@ -40,7 +40,6 @@ namespace Lime
 				var length = Spline.CalcLengthRough();
 				var point = Spline.CalcPoint(SplineOffset * length);
 				Widget.Position = Spline.CalcLocalToParentTransform().TransformVector(point);
-				Widget.Update(0);
 			}
 		}
 	}
