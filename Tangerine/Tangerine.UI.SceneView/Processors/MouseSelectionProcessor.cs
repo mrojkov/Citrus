@@ -14,6 +14,7 @@ namespace Tangerine.UI.SceneView
 		{
 			SelectionTesters.Add(new WidgetSelectionTester());
 			SelectionTesters.Add(new PointObjectSelectionTester());
+			SelectionTesters.Add(new SplinePoint3DSelectionTester());
 		}
 
 		public IEnumerator<object> Task()
@@ -131,6 +132,27 @@ namespace Tangerine.UI.SceneView
 				var p = pobject.TransformedPosition;
 				var t = ((Widget)pobject.Parent).CalcTransitionToSpaceOf(SceneView.Instance.Scene);
 				return rectangle.Contains(t * p);
+			}
+		}
+
+		public class SplinePoint3DSelectionTester : SelectionTester<SplinePoint3D>
+		{
+			protected override bool ProbeInternal(SplinePoint3D splinePoint, Vector2 point)
+			{
+				return SceneView.Instance.HitTestControlPoint(CalcPositionInSceneViewSpace(splinePoint));
+			}
+
+			protected override bool ProbeInternal(SplinePoint3D splinePoint, Rectangle rectangle)
+			{
+				return rectangle.Contains(CalcPositionInSceneViewSpace(splinePoint));
+			}
+
+			Vector2 CalcPositionInSceneViewSpace(SplinePoint3D splinePoint)
+			{
+				var spline = (Spline3D)splinePoint.Parent;
+				var viewport = spline.GetViewport();
+				var viewportToScene = viewport.CalcTransitionToSpaceOf(SceneView.Instance.Scene);
+				return (Vector2)viewport.WorldToViewportPoint(splinePoint.Position * spline.GlobalTransform) * viewportToScene;
 			}
 		}
 	}
