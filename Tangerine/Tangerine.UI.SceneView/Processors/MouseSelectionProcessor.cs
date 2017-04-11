@@ -8,13 +8,13 @@ namespace Tangerine.UI.SceneView
 {
 	public class MouseSelectionProcessor : ITaskProvider
 	{
-		public static readonly List<ISelectionTester> SelectionTesters = new List<ISelectionTester>();
+		public static readonly List<IProber> Probers = new List<IProber>();
 
 		static MouseSelectionProcessor()
 		{
-			SelectionTesters.Add(new WidgetSelectionTester());
-			SelectionTesters.Add(new PointObjectSelectionTester());
-			SelectionTesters.Add(new SplinePoint3DSelectionTester());
+			Probers.Add(new WidgetProber());
+			Probers.Add(new PointObjectProber());
+			Probers.Add(new SplinePoint3DProber());
 		}
 
 		public IEnumerator<object> Task()
@@ -79,16 +79,16 @@ namespace Tangerine.UI.SceneView
 			}
 		}
 
-		bool Probe(Node node, Vector2 point) => SelectionTesters.Any(i => i.Probe(node, point));
-		bool Probe(Node node, Rectangle rectangle) => SelectionTesters.Any(i => i.Probe(node, rectangle));
+		bool Probe(Node node, Vector2 point) => Probers.Any(i => i.Probe(node, point));
+		bool Probe(Node node, Rectangle rectangle) => Probers.Any(i => i.Probe(node, rectangle));
 
-		public interface ISelectionTester
+		public interface IProber
 		{
 			bool Probe(Node node, Vector2 point);
 			bool Probe(Node node, Rectangle rectangle);
 		}
 
-		public abstract class SelectionTester<T> : ISelectionTester where T: Node
+		public abstract class Prober<T> : IProber where T: Node
 		{
 			public bool Probe(Node node, Vector2 point) => (node is T) && ProbeInternal((T)node, point);
 			public bool Probe(Node node, Rectangle rectangle) => (node is T) && ProbeInternal((T)node, rectangle);
@@ -97,7 +97,7 @@ namespace Tangerine.UI.SceneView
 			protected abstract bool ProbeInternal(T node, Rectangle rectangle);
 		}
 
-		public class WidgetSelectionTester : SelectionTester<Widget>
+		public class WidgetProber : Prober<Widget>
 		{
 			protected override bool ProbeInternal(Widget widget, Vector2 point)
 			{
@@ -119,7 +119,7 @@ namespace Tangerine.UI.SceneView
 			}
 		}
 
-		public class PointObjectSelectionTester : SelectionTester<PointObject>
+		public class PointObjectProber : Prober<PointObject>
 		{
 			protected override bool ProbeInternal(PointObject pobject, Vector2 point)
 			{
@@ -135,7 +135,7 @@ namespace Tangerine.UI.SceneView
 			}
 		}
 
-		public class SplinePoint3DSelectionTester : SelectionTester<SplinePoint3D>
+		public class SplinePoint3DProber : Prober<SplinePoint3D>
 		{
 			protected override bool ProbeInternal(SplinePoint3D splinePoint, Vector2 point)
 			{
