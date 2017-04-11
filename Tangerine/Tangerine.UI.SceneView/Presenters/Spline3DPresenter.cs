@@ -26,9 +26,11 @@ namespace Tangerine.UI.SceneView
 			Renderer.Projection = ((WindowWidget)spline.GetRoot()).GetProjection();
 			var vp = spline.GetViewport();
 			DrawSpline(spline, vp);
-			var selectedPoints = GetSelectedPoints();
-			foreach (var p in spline.Nodes) {
-				DrawSplinePoint((SplinePoint3D)p, vp, spline.GlobalTransform, selectedPoints.Contains(p));
+			if (Document.Current.Container == spline) {
+				var selectedPoints = GetSelectedPoints();
+				foreach (var p in spline.Nodes) {
+					DrawSplinePoint((SplinePoint3D)p, vp, spline.GlobalTransform, selectedPoints.Contains(p));
+				}
 			}
 			Renderer.Flush();
 			Renderer.Projection = cameraProjection;
