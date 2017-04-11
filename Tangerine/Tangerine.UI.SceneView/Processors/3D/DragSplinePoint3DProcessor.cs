@@ -20,7 +20,7 @@ namespace Tangerine.UI.SceneView
 					if (HitTestControlPoint(spline, point.Position)) {
 						Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 						if (SceneView.Instance.Input.ConsumeKeyPress(Key.Mouse0)) {
-							yield return DragPoints(point, points);
+							yield return DragPoints(points);
 							break;
 						}
 					}
@@ -46,7 +46,7 @@ namespace Tangerine.UI.SceneView
 			return SceneView.Instance.HitTestControlPoint(screenPoint);
 		}
 
-		IEnumerator<object> DragPoints(SplinePoint3D point, IEnumerable<SplinePoint3D> points)
+		IEnumerator<object> DragPoints(IEnumerable<SplinePoint3D> points)
 		{
 			var input = SceneView.Instance.Input;
 			input.CaptureMouse();
@@ -78,7 +78,7 @@ namespace Tangerine.UI.SceneView
 					}
 					int i = 0;
 					foreach (var p in points) {
-						var plane = CalcPlane(spline, p.CalcGlobalPosition());
+						var plane = CalcPlane(spline, p.Position);
 						var distance = ray.Intersects(plane);
 						if (distance.HasValue) {
 							var pos = (ray.Position + ray.Direction * distance.Value) * spline.GlobalTransform.CalcInverted();
@@ -104,7 +104,7 @@ namespace Tangerine.UI.SceneView
 			try {
 				var spline = (Spline3D)Document.Current.Container;
 				var viewport = spline.GetViewport();
-				var plane = CalcPlane(spline, point.CalcGlobalPosition() + GetTangent(point, tangentIndex));
+				var plane = CalcPlane(spline, point.Position + GetTangent(point, tangentIndex));
 				var tangentsAreEqual = (point.TangentA + point.TangentB).Length < 0.1f;
 				while (input.IsMousePressed()) {
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
@@ -130,10 +130,10 @@ namespace Tangerine.UI.SceneView
   
 		static Plane CalcPlane(Spline3D spline, Vector3 point)
 		{
-			var xyPlane = new Plane(new Vector3(0, 0, 1), 0).Transform(spline.GlobalTransform);
-			// Drag point in the plane parallel to XY plane in the spline coordinate system.
-			xyPlane.D = -xyPlane.DotCoordinate(point);
-			return xyPlane;
+			var m = spline.GlobalTransform;
+			var normal = m.TransformNormal(new Vector3(0, 0, 1)).Normalized;
+			var d = -Vector3.DotProduct(m.TransformVector(point), normal);
+			return new Plane(normal, d);
 		}
 
 		enum DragDirection
