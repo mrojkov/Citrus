@@ -12,7 +12,6 @@ namespace Lime
 	public sealed class Movie : Widget, IImageCombinerArg
 	{
 		bool skipRender;
-		bool requestSkipRender;
 		bool textureInitialized;
 		MovieTexture movieTexture;
 
@@ -53,7 +52,7 @@ namespace Lime
 
 		void IImageCombinerArg.SkipRender()
 		{
-			requestSkipRender = true;
+			skipRender = true;
 		}
 
 		Matrix32 IImageCombinerArg.UVTransform { get { return Matrix32.Identity; } }
@@ -63,12 +62,11 @@ namespace Lime
 			if (GloballyVisible && !skipRender && textureInitialized) {
 				AddSelfToRenderChain(chain);
 			}
+			skipRender = false;
 		}
 
 		protected override void SelfUpdate(float delta)
 		{
-			skipRender = requestSkipRender;
-			requestSkipRender = false;
 			movieTexture.Looped = Looped;
 			movieTexture.Update(delta);
 		}

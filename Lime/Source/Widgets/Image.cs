@@ -5,7 +5,6 @@ namespace Lime
 	public class Image : Widget, IImageCombinerArg
 	{
 		bool skipRender;
-		bool requestSkipRender;
 		private ITexture texture;
 
 		[YuzuMember]
@@ -57,6 +56,7 @@ namespace Lime
 			if (GloballyVisible && !skipRender) {
 				AddSelfToRenderChain(chain);
 			}
+			skipRender = false;
 		}
 
 		public override void Dispose()
@@ -74,18 +74,12 @@ namespace Lime
 
 		void IImageCombinerArg.SkipRender()
 		{
-			requestSkipRender = true;
+			skipRender = true;
 		}
 
 		Matrix32 IImageCombinerArg.UVTransform
 		{
 			get { return new Matrix32(new Vector2(UV1.X - UV0.X, 0), new Vector2(0, UV1.Y - UV0.Y), UV0); }
-		}
-
-		protected override void SelfUpdate(float delta)
-		{
-			skipRender = requestSkipRender;
-			requestSkipRender = false;
 		}
 
 		internal protected override bool PartialHitTestByContents(ref HitTestArgs args)

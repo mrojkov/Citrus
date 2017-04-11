@@ -72,18 +72,14 @@ namespace Lime
 			return false;
 		}
 
-		protected override void SelfLateUpdate(float delta)
-		{
-			IImageCombinerArg arg1, arg2;
-			if (Enabled && GetArgs(out arg1, out arg2)) {
-				arg1.SkipRender();
-				arg2.SkipRender();
-			}
-		}
-
 		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (Enabled) {
+				IImageCombinerArg arg1, arg2;
+				if (GetArgs(out arg1, out arg2)) {
+					arg1.SkipRender();
+					arg2.SkipRender();
+				}
 				AddSelfToRenderChain(chain);
 			}
 		}
