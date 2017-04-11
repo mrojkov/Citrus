@@ -52,6 +52,8 @@ namespace Tangerine.UI.Inspector
 			AddEditor(typeof(NodeReference<Camera3D>), c => new NodeReferencePropertyEditor<Camera3D>(c));
 			AddEditor(typeof(NodeReference<Spline>), c => new NodeReferencePropertyEditor<Spline>(c));
 			AddEditor(typeof(NodeReference<Widget>), c => new NodeReferencePropertyEditor<Widget>(c));
+			AddEditor(typeof(NodeReference<Node3D>), c => new NodeReferencePropertyEditor<Node3D>(c));
+			AddEditor(typeof(NodeReference<Spline3D>), c => new NodeReferencePropertyEditor<Spline3D>(c));
 		}
 
 		void AddEditor(Type type, PropertyEditorBuilder builder)

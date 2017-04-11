@@ -270,7 +270,6 @@ namespace Tangerine
 				typeof(Audio),
 				typeof(Movie),
 				typeof(Bone),
-				typeof(SplineGear),
 				typeof(ParticleEmitter),
 				typeof(ParticleModifier),
 				typeof(EmitterShapePoint),
@@ -282,6 +281,7 @@ namespace Tangerine
 				typeof(DistortionMesh),
 				typeof(Spline),
 				typeof(SplinePoint),
+				typeof(SplineGear),
 				typeof(ImageCombiner),
 				typeof(Viewport3D),
 				typeof(Camera3D),
@@ -290,6 +290,7 @@ namespace Tangerine
 				typeof(WidgetAdapter3D),
 				typeof(Spline3D),
 				typeof(SplinePoint3D),
+				typeof(SplineGear3D),
 			};
 			foreach (var t in nodeTypes) {
 				var cmd = new Command(t.Name) { Icon = NodeIconPool.GetTexture(t) };
