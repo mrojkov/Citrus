@@ -63,7 +63,7 @@ namespace Tangerine
 			};
 
 			Document.NodeDecorators.AddFor<Spline>(n => n.CompoundPostPresenter.Add(new UI.SceneView.SplinePresenter()));
-			Document.NodeDecorators.AddFor<Spline3D>(n => n.CompoundPostPresenter.Add(new UI.SceneView.Spline3DPresenter()));
+			Document.NodeDecorators.AddFor<Viewport3D>(n => n.CompoundPostPresenter.Add(new UI.SceneView.Spline3DPresenter()));
 			Document.NodeDecorators.AddFor<PointObject>(n => n.CompoundPostPresenter.Add(new UI.SceneView.PointObjectPresenter()));
 			Document.NodeDecorators.AddFor<SplinePoint>(n => n.CompoundPostPresenter.Add(new UI.SceneView.SplinePointPresenter()));
 

@@ -6,40 +6,41 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.SceneView
 {
-	public class Spline3DPresenter : CustomPresenter<Spline3D>
+	public class Spline3DPresenter : CustomPresenter<Viewport3D>
 	{
 		List<SplinePoint3D> emptySelection = new List<SplinePoint3D>();
 		List<Vector3> splineApproximation = new List<Vector3>();
 
-		protected override void InternalRender(Spline3D spline)
+		protected override void InternalRender(Viewport3D viewport)
 		{
 			if (Document.Current.Container.IsRunning) {
 				return;
 			}
-			Renderer.Flush();
-			SceneView.Instance.Frame.PrepareRendererState();
-			var cameraProjection = Renderer.Projection;
-			var oldWorldMatrix = Renderer.World;
-			var oldViewMatrix = Renderer.View;
-			var oldCullMode = Renderer.CullMode;
-			Renderer.World = Matrix44.Identity;
-			Renderer.View = Matrix44.Identity;
-			Renderer.CullMode = CullMode.None;
-			Renderer.Projection = ((WindowWidget)spline.GetRoot()).GetProjection();
-			var vp = spline.GetViewport();
-			DrawSpline(spline, vp);
-			if (Document.Current.Container == spline) {
-				var selectedPoints = GetSelectedPoints();
-				foreach (var p in spline.Nodes) {
-					DrawSplinePoint((SplinePoint3D)p, vp, spline.GlobalTransform, selectedPoints.Contains(p));
+			foreach (var spline in viewport.Descendants.OfType<Spline3D>()) {
+				Renderer.Flush();
+				SceneView.Instance.Frame.PrepareRendererState();
+				var cameraProjection = Renderer.Projection;
+				var oldWorldMatrix = Renderer.World;
+				var oldViewMatrix = Renderer.View;
+				var oldCullMode = Renderer.CullMode;
+				Renderer.World = Matrix44.Identity;
+				Renderer.View = Matrix44.Identity;
+				Renderer.CullMode = CullMode.None;
+				Renderer.Projection = ((WindowWidget)spline.GetRoot()).GetProjection();
+				DrawSpline(spline, viewport);
+				if (Document.Current.Container == spline) {
+					var selectedPoints = GetSelectedPoints();
+					foreach (var p in spline.Nodes) {
+						DrawSplinePoint((SplinePoint3D)p, viewport, spline.GlobalTransform, selectedPoints.Contains(p));
+					}
 				}
+				Renderer.Flush();
+				Renderer.Projection = cameraProjection;
+				Renderer.World = oldWorldMatrix;
+				Renderer.View = oldViewMatrix;
+				Renderer.CullMode = oldCullMode;
 			}
-			Renderer.Flush();
-			Renderer.Projection = cameraProjection;
-			Renderer.World = oldWorldMatrix;
-			Renderer.View = oldViewMatrix;
-			Renderer.CullMode = oldCullMode;
-		} 
+		}
  
 		void DrawSplinePoint(SplinePoint3D point, Viewport3D viewport, Matrix44 splineWorldMatrix, bool selected)
 		{
