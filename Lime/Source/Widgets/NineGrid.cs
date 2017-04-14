@@ -2,36 +2,20 @@ using Yuzu;
 
 namespace Lime
 {
-	/// <summary>
-	/// Виджет, содержащий 3х3 клетки. Клетки по бокам статичны и не изменяют свой размер.
-	/// Средняя клетка растягивается. Используется для создания саморастягивающихся окошек с рамкой
-	/// </summary>
 	public class NineGrid : Widget
 	{
 		[YuzuMember]
 		public override ITexture Texture { get; set; }
 
-		/// <summary>
-		/// Текстурная координата левого столбца (0 - 1)
-		/// </summary>
 		[YuzuMember]
 		public float LeftOffset { get; set; }
 
-		/// <summary>
-		/// Текстурная координата правого столбца (0 - 1)
-		/// </summary>
 		[YuzuMember]
 		public float RightOffset { get; set; }
 
-		/// <summary>
-		/// Текстурная координата верхнего столбца (0 - 1)
-		/// </summary>
 		[YuzuMember]
 		public float TopOffset { get; set; }
 
-		/// <summary>
-		/// Текстурная координата нижнего столбца (0 - 1)
-		/// </summary>
 		[YuzuMember]
 		public float BottomOffset { get; set; }
 
