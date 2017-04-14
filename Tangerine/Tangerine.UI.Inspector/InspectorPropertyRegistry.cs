@@ -16,7 +16,7 @@ namespace Tangerine.UI.Inspector
 
 		static bool AllowChildren(PropertyEditorParams context)
 		{
-			return context.Objects.Any(o => ClassAttributes<TangerineClassAttribute>.Get(o.GetType())?.AllowChildren ?? false);
+			return context.Objects.Any(o => NodeCompositionValidator.CanHaveChildren(o.GetType()));
 		}
 
 		InspectorPropertyRegistry()

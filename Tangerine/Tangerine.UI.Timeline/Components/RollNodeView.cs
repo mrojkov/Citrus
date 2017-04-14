@@ -45,8 +45,7 @@ namespace Tangerine.UI.Timeline.Components
 			};
 			expandButtonContainer.Updating += delta => 
 				expandButtonContainer.Visible = nodeData.Node.Animators.Count > 0;
-			enterButton = (ClassAttributes<TangerineClassAttribute>.Get(nodeData.Node.GetType())?.
-				AllowChildren ?? false) ? CreateEnterButton() : null;
+			enterButton = NodeCompositionValidator.CanHaveChildren(nodeData.Node.GetType()) ? CreateEnterButton() : null;
 			eyeButton = CreateEyeButton();
 			lockButton = CreateLockButton();
 			widget = new Widget {

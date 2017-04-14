@@ -88,6 +88,7 @@
     <Compile Include="Operations\TimelineHorizontalShift.cs" />
     <Compile Include="Components.cs" />
     <Compile Include="Operations\SyncFolderDescriptorsProcessor.cs" />
+    <Compile Include="NodeCompositionValidator.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

@@ -172,11 +172,14 @@ namespace Tangerine.Core.Operations
 
 		public static void Perform(IFolderItem item)
 		{
-			Document.Current.History.Perform(new InsertFolderItem(Document.Current.Container, GetNewFolderItemLocation(), item));
+			Perform(Document.Current.Container, GetNewFolderItemLocation(), item);
 		}
 
 		public static void Perform(Node container, FolderItemLocation location, IFolderItem item)
 		{
+			if (item is Node && !NodeCompositionValidator.Validate(Document.Current.Container.GetType(), item.GetType())) {
+				throw new InvalidOperationException($"Can't put {item.GetType()} into {container.GetType()}");
+			}
 			Document.Current.History.Perform(new InsertFolderItem(container, location, item));
 		}
 
@@ -228,9 +231,9 @@ namespace Tangerine.Core.Operations
 				node = (Node)ctr.Invoke(new object[] {});
 			}
 			Document.Decorate(node);
-			var attrs = ClassAttributes<TangerineClassAttribute>.Get(nodeType);
-			if (attrs?.BuilderMethodName != null) {
-				var builder = nodeType.GetMethod(attrs.BuilderMethodName, BindingFlags.NonPublic | BindingFlags.Instance);
+			var attrs = ClassAttributes<TangerineNodeBuilderAttribute>.Get(nodeType);
+			if (attrs?.MethodName != null) {
+				var builder = nodeType.GetMethod(attrs.MethodName, BindingFlags.NonPublic | BindingFlags.Instance);
 				builder.Invoke(node, new object[] {});
 			}
 			node.Id = GenerateNodeId(container, nodeType);

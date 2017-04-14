@@ -70,6 +70,7 @@
     <Compile Include="Operation.cs" />
     <Compile Include="VersionedCollection.cs" />
     <Compile Include="WidgetExtensions.cs" />
+    <Compile Include="NodeCompositionValidator.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Win.csproj">

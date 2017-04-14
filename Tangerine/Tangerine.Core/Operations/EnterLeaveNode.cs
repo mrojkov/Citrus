@@ -17,7 +17,7 @@ namespace Tangerine.Core.Operations
 
 		public static bool Perform(Node container, bool selectFirstNode = true)
 		{
-			if (!ClassAttributes<TangerineClassAttribute>.Get(container.GetType())?.AllowChildren ?? true) {
+			if (!NodeCompositionValidator.CanHaveChildren(container.GetType())) {
 				return false;
 			}
 			if (!string.IsNullOrEmpty(container.ContentsPath)) {

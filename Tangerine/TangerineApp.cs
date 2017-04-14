@@ -54,7 +54,7 @@ namespace Tangerine
 			SetColorTheme(UserPreferences.Instance.Theme);
 			dockManager.ImportState(UserPreferences.Instance.DockState);
 			Document.Closing += doc => {
-				var alert = new AlertDialog("Tangerine", $"Save the changes to document '{doc.Path}' before closing?", "Yes", "No", "Cancel");
+				var alert = new AlertDialog($"Save the changes to document '{doc.Path}' before closing?", "Yes", "No", "Cancel");
 				switch (alert.Show()) {
 					case 0: return Document.CloseAction.SaveChanges;
 					case 1: return Document.CloseAction.DiscardChanges;
@@ -339,7 +339,7 @@ namespace Tangerine
 			h.Connect(Tools.FlipY, new FlipY());
 			h.Connect(Command.Copy, Core.Operations.Copy.CopyToClipboard, () => Document.Current?.SelectedRows().Any() ?? false);
 			h.Connect(Command.Cut, Core.Operations.Cut.Perform, () => Document.Current?.SelectedRows().Any() ?? false);
-			h.Connect(Command.Paste, Core.Operations.Paste.Perform, Document.HasCurrent);
+			h.Connect(Command.Paste, Paste, Document.HasCurrent);
 			h.Connect(Command.Delete, Core.Operations.Delete.Perform, () => Document.Current?.SelectedRows().Any() ?? false);
 			h.Connect(Command.SelectAll, () => {
 				foreach (var row in Document.Current.Rows) {
@@ -348,6 +348,15 @@ namespace Tangerine
 			}, () => Document.Current?.Rows.Count > 0);
 			h.Connect(Command.Undo, () => Document.Current.History.Undo(), () => Document.Current?.History.CanUndo() ?? false);
 			h.Connect(Command.Redo, () => Document.Current.History.Redo(), () => Document.Current?.History.CanRedo() ?? false);
+		}
+
+		static void Paste()
+		{
+			try {
+				Core.Operations.Paste.Perform();
+			} catch (InvalidOperationException e) {
+				AlertDialog.Show(e.Message);
+			}
 		}
 
 		static void LoadFont()

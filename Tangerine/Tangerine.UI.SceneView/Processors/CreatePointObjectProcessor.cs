@@ -28,14 +28,19 @@ namespace Tangerine.UI.SceneView
 				}
 				CreateNodeRequestComponent.Consume<Node>(sv.Components);
 				if (sv.Input.WasMousePressed()) {
-					var currentPoint = (SplinePoint)Core.Operations.CreateNode.Perform(nodeType);
-					var container = (Widget)Document.Current.Container;
-					var t = sv.Scene.CalcTransitionToSpaceOf(container);
-					var pos = Vector2.Zero;
-					if (container.Width.Abs() > Mathf.ZeroTolerance && container.Height.Abs() > Mathf.ZeroTolerance) {
-						pos = sv.MousePosition * t / container.Size;
+					try {
+						var currentPoint = (PointObject)Core.Operations.CreateNode.Perform(nodeType);
+						var container = (Widget)Document.Current.Container;
+						var t = sv.Scene.CalcTransitionToSpaceOf(container);
+						var pos = Vector2.Zero;
+						if (container.Width.Abs() > Mathf.ZeroTolerance && container.Height.Abs() > Mathf.ZeroTolerance) {
+							pos = sv.MousePosition * t / container.Size;
+						}
+						Core.Operations.SetProperty.Perform(currentPoint, nameof(PointObject.Position), pos);
+					} catch (InvalidOperationException e) {
+						AlertDialog.Show(e.Message);
+						break;
 					}
-					Core.Operations.SetProperty.Perform(currentPoint, nameof(PointObject.Position), pos);
 				}
 				if (sv.Input.WasMousePressed(1)) {
 					break;

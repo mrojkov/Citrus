@@ -82,7 +82,11 @@ namespace Tangerine.UI.Timeline
 			var data = Copy.CopyToString();
 			if (Paste.CanPaste(data, dragLocation)) {
 				Delete.Perform();
-				Paste.Perform(data, dragLocation);
+				try {
+					Paste.Perform(data, dragLocation);
+				} catch (InvalidOperationException e) {
+					AlertDialog.Show(e.Message);
+				}
 			}
 		}
 

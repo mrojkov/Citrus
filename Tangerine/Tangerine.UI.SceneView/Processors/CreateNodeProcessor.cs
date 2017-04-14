@@ -12,7 +12,11 @@ namespace Tangerine.UI.SceneView
 			while (true) {
 				Type type;
 				if (CreateNodeRequestComponent.Consume<Node>(SceneView.Instance.Components, out type)) {
-					Core.Operations.CreateNode.Perform(type);
+					try {
+						Core.Operations.CreateNode.Perform(type);
+					} catch (InvalidOperationException e) {
+						AlertDialog.Show(e.Message);
+					}
 				}
 				yield return null;
 			}

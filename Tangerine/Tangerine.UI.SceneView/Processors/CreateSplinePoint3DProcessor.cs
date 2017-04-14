@@ -26,6 +26,13 @@ namespace Tangerine.UI.SceneView
 				}
 				CreateNodeRequestComponent.Consume<Node>(SceneView.Instance.Components);
 				if (SceneView.Instance.Input.ConsumeKeyPress(Key.Mouse0)) {
+					SplinePoint3D point;
+					try {
+						point = (SplinePoint3D)Core.Operations.CreateNode.Perform(typeof(SplinePoint3D));
+					} catch (InvalidOperationException e) {
+						AlertDialog.Show(e.Message);
+						yield break;
+					}
 					var spline = (Spline3D)Document.Current.Container;
 					var vp = spline.GetViewport();
 					var ray = vp.ScreenPointToRay(SceneView.Instance.Input.MousePosition);
@@ -33,7 +40,6 @@ namespace Tangerine.UI.SceneView
 					var d = ray.Intersects(xyPlane);
 					if (d.HasValue) {
 						var pos = (ray.Position + ray.Direction * d.Value) * spline.GlobalTransform.CalcInverted();
-						var point = (SplinePoint3D)Core.Operations.CreateNode.Perform(typeof(SplinePoint3D));
 						Core.Operations.SetProperty.Perform(point, nameof(SplinePoint3D.Position), pos);
 						input.CaptureMouse();
 						Document.Current.History.BeginTransaction();
