@@ -37,6 +37,8 @@ namespace Lime
 			if (Parent == null) {
 				return;
 			}
+			// TODO: Rework NodeReference, remove this line.
+			RefreshReferences();
 			if (Spline != null && Node != null) {
 				var length = Spline.CalcLengthRough();
 				var transform = Spline.CalcPointTransform(SplineOffset * length);
