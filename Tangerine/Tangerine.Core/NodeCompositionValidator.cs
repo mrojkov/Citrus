@@ -37,8 +37,8 @@ namespace Tangerine.Core
 		{
 			for (var p = type; p != null; p = p.BaseType) {
 				var a = ClassAttributes<AllowedChildrenTypes>.Get(p);
-				if (a != null && a.Types.Length > 0) {
-					return true;
+				if (a != null) {
+					return a.Types.Length > 0;
 				}
 			}
 			return false;
