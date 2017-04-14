@@ -65,6 +65,7 @@
     <Compile Include="Grisu\Grisu.cs" />
     <Compile Include="Grisu\GrisuDouble.cs" />
     <Compile Include="Grisu\PowersOfTenCache.cs" />
+    <Compile Include="Surrogates.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <ItemGroup>
