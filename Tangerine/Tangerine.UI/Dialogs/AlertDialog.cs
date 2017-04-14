@@ -11,11 +11,14 @@ namespace Tangerine.UI
 		readonly Widget buttonsPanel;
 		int result;
 
-		public AlertDialog(string title, string text, params string[] buttons)
+		public AlertDialog(string text, params string[] buttons)
 		{
+			if (buttons.Length == 0) {
+				buttons = new[] { "Ok" };
+			}
 			window = new Window(new WindowOptions {
 				FixedSize = true,
-				Title = title,
+				Title = "Tangerine",
 				Visible = false,
 				Style = WindowStyle.Dialog
 			});
@@ -63,6 +66,12 @@ namespace Tangerine.UI
 		{
 			window.ShowModal();
 			return result;
+		}
+
+		public static int Show(string text, params string[] buttons)
+		{
+			var dialog = new AlertDialog(text, buttons);
+			return dialog.Show();
 		}
 	}
 }

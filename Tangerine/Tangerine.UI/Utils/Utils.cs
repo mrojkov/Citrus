@@ -90,8 +90,7 @@ namespace Tangerine.UI
 		public static bool ExtractAssetPathOrShowAlert(string filePath, out string assetPath, out string assetType)
 		{
 			if (!filePath.StartsWith(Core.Project.Current.AssetsDirectory, StringComparison.CurrentCultureIgnoreCase)) {
-				var alert = new AlertDialog("Tangerine", $"Asset '{filePath}' outside the project directory", "Ok");
-				alert.Show();
+				AlertDialog.Show($"Asset '{filePath}' outside the project directory");
 				assetPath = null;
 				assetType = null;
 				return false;

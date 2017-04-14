@@ -55,8 +55,7 @@ namespace Tangerine
 			if (dlg.RunModal()) {
 				string localPath;
 				if (!Project.Current.TryGetAssetPath(dlg.FileName, out localPath)) {
-					var alert = new AlertDialog("Tangerine", "Can't open a document outside the project directory", "Ok");
-					alert.Show();
+					AlertDialog.Show("Can't open a document outside the project directory");
 				} else {
 					Project.Current.OpenDocument(localPath);
 				}
@@ -82,8 +81,7 @@ namespace Tangerine
 		
 		public static void ShowErrorMessageBox(System.Exception e)
 		{
-			var dlg = new AlertDialog("Tangerine", $"Save document error: '{e.Message}'.\nYou may have to upgrade the document format.", "Ok");
-			dlg.Show();
+			AlertDialog.Show($"Save document error: '{e.Message}'.\nYou may have to upgrade the document format.");
 		}
 
 		public static bool SelectPath(out string path)
@@ -98,8 +96,7 @@ namespace Tangerine
 				return false;
 			}
 			if (!Project.Current.TryGetAssetPath(dlg.FileName, out path)) {
-				var alert = new AlertDialog("Tangerine", "Can't save the document outside the project directory", "Ok");
-				alert.Show();
+				AlertDialog.Show("Can't save the document outside the project directory");
 				return false;
 			}
 			return true;
@@ -123,8 +120,7 @@ namespace Tangerine
 			if (dlg.RunModal()) {
 				string assetPath;
 				if (!Project.Current.TryGetAssetPath(dlg.FileName, out assetPath)) {
-					var alert = new AlertDialog("Tangerine", "Can't save the document outside the project directory", "Ok");
-					alert.Show();
+					AlertDialog.Show("Can't save the document outside the project directory");
 				} else {
 					try {
 						Document.Current.SaveAs(assetPath);
@@ -160,8 +156,7 @@ namespace Tangerine
 				Document.Current.Format = DocumentFormat.Tan;
 				Document.Current.Save();
 			} catch (System.Exception e) {
-				var dlg = new AlertDialog("Tangerine", $"Upgrade document format error: '{e.Message}'", "Ok");
-				dlg.Show();
+				AlertDialog.Show($"Upgrade document format error: '{e.Message}'");
 			}				
 		}
 	}

@@ -57,8 +57,7 @@ namespace Tangerine
 			okButton.Clicked += () => {
 				window.Close();
 				if (theme != UserPreferences.Instance.Theme) {
-					var alert = new AlertDialog("Tangerine", "The color theme change will take effect next time you run Tangerine.", "Ok");
-					alert.Show();
+					AlertDialog.Show("The color theme change will take effect next time you run Tangerine.");
 				}
 				UserPreferences.Instance.Save();
 			};
