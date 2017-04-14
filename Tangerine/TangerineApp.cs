@@ -84,7 +84,7 @@ namespace Tangerine
 				new UI.Timeline.Operations.ShiftGridSelection.Processor(),
 				new UI.Timeline.Operations.SetCurrentColumn.Processor(),
 				new RowsSynchronizer(),
-				new RefreshNodeReferencesProcessor(),
+				new UpdateNodesAndReferencesProcessor(),
 			});
 			DocumentHistory.Processors.AddRange(UI.Timeline.Timeline.GetOperationProcessors());
 
@@ -117,11 +117,12 @@ namespace Tangerine
 			ColorTheme.Current = theme == ColorThemeEnum.Light ? ColorTheme.CreateLightTheme() : ColorTheme.CreateDarkTheme();
 		}
 
-		class RefreshNodeReferencesProcessor : SymmetricOperationProcessor
+		class UpdateNodesAndReferencesProcessor : SymmetricOperationProcessor
 		{
 			public override void Process(IOperation op)
 			{
 				Document.Current.RootNode.RefreshReferencesDeep();
+				Document.Current.RootNode.Update(0);
 			}
 		}
 
