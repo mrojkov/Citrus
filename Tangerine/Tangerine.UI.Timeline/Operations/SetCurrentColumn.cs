@@ -53,6 +53,7 @@ namespace Tangerine.UI.Timeline.Operations
 					doc.Container.SetTangerineFlag(TangerineFlags.IgnoreMarkers, false);
 				} else {
 					doc.AnimationFrame = value;
+					UpdateNodeIncremental(doc.Container, 0);
 					ClearParticlesRecursive(doc.RootNode);
 				}
 				Timeline.Instance.EnsureColumnVisible(value);
