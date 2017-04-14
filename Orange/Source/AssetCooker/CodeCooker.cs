@@ -8,7 +8,7 @@ namespace Orange
 {
 	public static class CodeCooker
 	{
-		private static readonly string[] scenesExtensions = {".scene", ".tan"};
+		private static readonly string[] scenesExtensions = { ".scene", ".tan", ".model" };
 
 		public static void Cook(Dictionary<string, CookingRules> cookingRulesMap, IReadOnlyCollection<string> bundles)
 		{
