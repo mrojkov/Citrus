@@ -15,8 +15,8 @@ namespace Tangerine.Core
 		{
 			for (var p = parentType; p != null; p = p.BaseType) {
 				var a = ClassAttributes<AllowedChildrenTypes>.Get(p);
-				if (a != null && a.Types.Any(t => childType == t || childType.IsSubclassOf(t))) {
-					return true;
+				if (a != null) {
+					return a.Types.Any(t => childType == t || childType.IsSubclassOf(t));
 				}
 			}
 			return false;
