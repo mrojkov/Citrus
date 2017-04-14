@@ -1,7 +1,7 @@
 ﻿
 namespace Lime
 {
-	[TangerineClass(allowChildren: true, builderMethodName: "BuildForTangerine")]
+	[TangerineNodeBuilder("BuildForTangerine")]
 	public class WidgetAdapter3D : Node3D
 	{
 		private RenderChain renderChain = new RenderChain();

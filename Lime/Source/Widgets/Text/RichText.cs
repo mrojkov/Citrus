@@ -4,7 +4,7 @@ using Yuzu;
 
 namespace Lime
 {
-	[TangerineClass(allowChildren: true)]
+	[AllowedChildrenTypes(typeof(TextStyle))]
 	public class RichText : Widget, IText
 	{
 		private TextParser parser = new TextParser();

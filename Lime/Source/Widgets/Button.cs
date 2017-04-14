@@ -8,10 +8,7 @@ namespace Lime
 	using StateFunc = Func<IEnumerator<int>>;
 	using System.Diagnostics;
 
-	/// <summary>
-	/// Виджет с поведением кнопки
-	/// </summary>
-	[TangerineClass(allowChildren: true)]
+	[AllowedChildrenTypes(typeof(Node))]
 	public class Button : Widget
 	{
 		public BitSet32 EnableMask = BitSet32.Full;

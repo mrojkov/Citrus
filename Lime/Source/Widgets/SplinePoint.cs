@@ -2,6 +2,7 @@ using Yuzu;
 
 namespace Lime
 {
+	[AllowedParentTypes(typeof(Spline))]
 	public class SplinePoint : PointObject
 	{
 		[YuzuMember]

@@ -3,7 +3,8 @@ using Yuzu;
 
 namespace Lime
 {
-	[TangerineClassAttribute(allowChildren: true)]
+	[AllowedParentTypes(typeof(Node3D), typeof(Viewport3D))]
+	[AllowedChildrenTypes(typeof(Node))]
 	public class Node3D : Node, Viewport3D.IZSorterParams
 	{
 		private Vector3 scale;

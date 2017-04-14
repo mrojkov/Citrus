@@ -25,7 +25,7 @@ namespace Lime
 		NoRender,
 	}
 
-	[TangerineClass(allowChildren: true)]
+	[AllowedChildrenTypes(typeof(Node))]
 	public class Frame : Widget, IImageCombinerArg
 	{
 		public ClipMethod ClipChildren { get; set; }

@@ -46,9 +46,10 @@ namespace Lime
 		Other
 	}
 
+	[AllowedParentTypes(typeof(ParticleEmitter))]
 	public class EmitterShapePoint : PointObject { }
 
-	[TangerineClass(allowChildren: true)]
+	[AllowedChildrenTypes(typeof(ParticlesMagnet), typeof(ParticleModifier), typeof(EmitterShapePoint))]
 	public partial class ParticleEmitter : Widget
 	{
 		internal static System.Random Rng = new System.Random();

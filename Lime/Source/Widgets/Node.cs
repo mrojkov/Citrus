@@ -31,15 +31,33 @@ namespace Lime
 		}
 	}
 
-	public class TangerineClassAttribute : Attribute
+	public class TangerineNodeBuilderAttribute : Attribute
 	{
-		public bool AllowChildren { get; private set; }
-		public string BuilderMethodName { get; private set; }
+		public string MethodName { get; private set; }
 
-		public TangerineClassAttribute(bool allowChildren, string builderMethodName = null)
+		public TangerineNodeBuilderAttribute(string methodName)
 		{
-			AllowChildren = allowChildren;
-			BuilderMethodName = builderMethodName;
+			MethodName = methodName;
+		}
+	}
+
+	public class AllowedParentTypes : Attribute
+	{
+		public Type[] Types;
+
+		public AllowedParentTypes(params Type[] types)
+		{
+			Types = types;
+		}
+	}
+
+	public class AllowedChildrenTypes : Attribute
+	{
+		public Type[] Types;
+
+		public AllowedChildrenTypes(params Type[] types)
+		{
+			Types = types;
 		}
 	}
 

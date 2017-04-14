@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Lime
 {
-	[TangerineClass(allowChildren: true)]
+	[AllowedChildrenTypes(typeof(Node))]
 	public class Tab : Widget
 	{
 		private bool active;

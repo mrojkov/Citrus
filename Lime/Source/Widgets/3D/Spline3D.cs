@@ -9,7 +9,7 @@ namespace Lime
 		Bezier
 	}
 
-	[TangerineClass(allowChildren: true)]
+	[AllowedChildrenTypes(typeof(SplinePoint3D))]
 	public class Spline3D : Node3D
 	{
 		[YuzuMember]
@@ -126,6 +126,7 @@ namespace Lime
 		}
 	}
 
+	[AllowedParentTypes(typeof(Spline3D))]
 	public class SplinePoint3D : Node, Viewport3D.IZSorterParams
 	{
 		[YuzuMember]

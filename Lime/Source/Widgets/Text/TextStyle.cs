@@ -2,6 +2,7 @@ using Yuzu;
 
 namespace Lime
 {
+	[AllowedParentTypes(typeof(RichText))]
 	public class TextStyle : Node
 	{
 		private ITexture imageTexture;

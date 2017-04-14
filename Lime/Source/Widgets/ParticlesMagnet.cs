@@ -3,9 +3,7 @@ using Yuzu;
 
 namespace Lime
 {
-	/// <summary>
-	/// Магнит создает эффект притяжения частиц
-	/// </summary>
+	[AllowedParentTypes(typeof(ParticleEmitter))]
 	public class ParticlesMagnet : Widget
 	{
 		public ParticlesMagnet()
@@ -15,21 +13,12 @@ namespace Lime
 			Strength = 1000;
 		}
 
-		/// <summary>
-		/// Форма магнита
-		/// </summary>
 		[YuzuMember]
 		public EmitterShape Shape { get; set; }
 
-		/// <summary>
-		/// Задает на сколько будет уменьшаться сила (Strength) в зависимости от расстояния до центра магнита
-		/// </summary>
 		[YuzuMember]
 		public float Attenuation { get; set; }
 
-		/// <summary>
-		/// Сила воздействия
-		/// </summary>
 		[YuzuMember]
 		public float Strength { get; set; }
 	}

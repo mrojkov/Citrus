@@ -2,7 +2,7 @@ using Yuzu;
 
 namespace Lime
 {
-	[TangerineClass(allowChildren: true)]
+	[AllowedChildrenTypes(typeof(DistortionMeshPoint))]
 	public class DistortionMesh : Widget
 	{
 		[YuzuMember]

@@ -6,7 +6,6 @@ using System.Text;
 
 namespace Lime
 {
-	[TangerineClass(allowChildren: true)]
 	public class ScrollViewWidget : Frame
 	{
 		public ScrollView Behaviour { get; set; }

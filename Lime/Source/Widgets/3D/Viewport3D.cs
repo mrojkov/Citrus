@@ -14,7 +14,8 @@ using MonoMac.OpenGL;
 
 namespace Lime
 {
-	[TangerineClass(allowChildren: true, builderMethodName: "BuildForTangerine")]
+	[TangerineNodeBuilder("BuildForTangerine")]
+	[AllowedChildrenTypes(typeof(Node3D), typeof(SplineGear3D))]
 	public class Viewport3D : Widget
 	{
 		public interface IZSorterParams

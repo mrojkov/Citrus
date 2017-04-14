@@ -152,7 +152,6 @@ namespace Lime
 		}
 	}
 
-	[TangerineClass(allowChildren: true)]	
 	public class DropDownList : CommonDropDownList
 	{
 		public DropDownList()
@@ -163,7 +162,6 @@ namespace Lime
 		protected override bool DoesHandleSpacebar() => true;
 	}
 
-	[TangerineClass(allowChildren: true)]	
 	public class ComboBox : CommonDropDownList
 	{
 		public ComboBox()

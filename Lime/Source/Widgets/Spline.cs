@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Lime
 {
-	[TangerineClass(allowChildren: true)]
+	[AllowedChildrenTypes(typeof(SplinePoint))]
 	public class Spline : Widget
 	{
 		public float CalcLengthRough()

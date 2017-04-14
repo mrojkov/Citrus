@@ -4,6 +4,7 @@ using Yuzu;
 
 namespace Lime
 {
+	[AllowedParentTypes(typeof(ParticleEmitter))]
 	public class ParticleModifier : Node
 	{
 		[YuzuMember]
