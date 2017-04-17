@@ -21,6 +21,7 @@ namespace Lime
 		public class ColorTheme
 		{
 			public Color4 BlackText;
+			public Color4 GrayText;
 			public Color4 WhiteBackground;
 			public Color4 GrayBackground;
 			public Color4 SelectedBackground;
@@ -44,8 +45,10 @@ namespace Lime
 			public static ColorTheme CreateDarkTheme()
 			{
 				var grayBackground = new Color4(45, 45, 48);
+				var blackText = new Color4(204, 204, 204);
 				return new ColorTheme {
-					BlackText = new Color4(204, 204, 204),
+					BlackText = blackText,
+					GrayText = blackText.Darken(0.35f),
 					WhiteBackground = Color4.Black.Lighten(0.25f),
 					GrayBackground = new Color4(45, 45, 48),
 					SelectedBackground = new Color4(86, 86, 86),
@@ -73,6 +76,7 @@ namespace Lime
 				var grayBackground = new Color4(240, 240, 240);
 				return new ColorTheme {
 					BlackText = Color4.Black,
+					GrayText = Color4.Black.Lighten(0.35f),
 					WhiteBackground = Color4.White,
 					GrayBackground = grayBackground,
 					SelectedBackground = new Color4(140, 170, 255),
@@ -400,28 +404,27 @@ namespace Lime
 		private void DecorateTab(Widget widget)
 		{
 			var tab = (Tab)widget;
-			var presenter = new TabPresenter();
 			tab.Padding = Metrics.ControlsPadding;
-			tab.Presenter = presenter;
 			tab.MinSize = Metrics.MinTabSize;
 			tab.MaxSize = Metrics.MaxTabSize;
 			tab.Size = tab.MinSize;
-			tab.DefaultAnimation.AnimationEngine = new AnimationEngineDelegate {
-				OnRunAnimation = (animation, markerId) => {
-					presenter.SetState(markerId);
-					return true;
-				}
-			};
 			tab.Layout = new HBoxLayout();
 			var caption = new SimpleText {
 				Id = "TextPresenter",
 				AutoSizeConstraints = false,
-				TextColor = Colors.BlackText,
 				FontHeight = Metrics.TextHeight,
 				HAlignment = HAlignment.Center,
 				VAlignment = VAlignment.Center,
 				OverflowMode = TextOverflowMode.Ellipsis,
 				LayoutCell = new LayoutCell(Alignment.Center)
+			};
+			var presenter = new TabPresenter(caption);
+			tab.Presenter = presenter;
+			tab.DefaultAnimation.AnimationEngine = new AnimationEngineDelegate {
+				OnRunAnimation = (animation, markerId) => {
+					presenter.SetState(markerId);
+					return true;
+				}
 			};
 			var closeButton = new TabCloseButton { Id = "CloseButton" };
 			tab.AddNode(caption);
@@ -625,12 +628,16 @@ namespace Lime
 
 		class TabPresenter : CustomPresenter
 		{
+			private SimpleText label;
 			private bool active;
+
+			public TabPresenter(SimpleText label) { this.label = label; }
 
 			public void SetState(string state)
 			{
 				CommonWindow.Current.Invalidate();
 				active = state == "Active";
+				label.Color = active ? Colors.BlackText : Colors.GrayText;
 			}
 
 			public override void Render(Node node)
