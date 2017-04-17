@@ -31,22 +31,46 @@ namespace Tangerine.UI.SceneView
 		{
 			var h = CommandHandlerList.Global;
 			h.Connect(SceneViewCommands.PreviewAnimation, new PreviewAnimationHandler());
-			h.Connect(SceneViewCommands.DragUp, () => DragWidgets(new Vector2(0, -1)));
-			h.Connect(SceneViewCommands.DragDown, () => DragWidgets(new Vector2(0, 1)));
-			h.Connect(SceneViewCommands.DragLeft, () => DragWidgets(new Vector2(-1, 0)));
-			h.Connect(SceneViewCommands.DragRight, () => DragWidgets(new Vector2(1, 0)));
-			h.Connect(SceneViewCommands.DragUpFast, () => DragWidgets(new Vector2(0, -5)));
-			h.Connect(SceneViewCommands.DragDownFast, () => DragWidgets(new Vector2(0, 5)));
-			h.Connect(SceneViewCommands.DragLeftFast, () => DragWidgets(new Vector2(-5, 0)));
-			h.Connect(SceneViewCommands.DragRightFast, () => DragWidgets(new Vector2(5, 0)));
+			h.Connect(SceneViewCommands.DragUp, () => DragNodes(new Vector2(0, -1)));
+			h.Connect(SceneViewCommands.DragDown, () => DragNodes(new Vector2(0, 1)));
+			h.Connect(SceneViewCommands.DragLeft, () => DragNodes(new Vector2(-1, 0)));
+			h.Connect(SceneViewCommands.DragRight, () => DragNodes(new Vector2(1, 0)));
+			h.Connect(SceneViewCommands.DragUpFast, () => DragNodes(new Vector2(0, -5)));
+			h.Connect(SceneViewCommands.DragDownFast, () => DragNodes(new Vector2(0, 5)));
+			h.Connect(SceneViewCommands.DragLeftFast, () => DragNodes(new Vector2(-5, 0)));
+			h.Connect(SceneViewCommands.DragRightFast, () => DragNodes(new Vector2(5, 0)));
+		}
+
+		static void DragNodes(Vector2 delta)
+		{
+			DragWidgets(delta);
+			DragNodes3D(delta);
+			DragSplinePoints3D(delta);
 		}
 
 		static void DragWidgets(Vector2 delta)
 		{
-			var transform = Document.Current.Container.AsWidget.CalcTransitionToSpaceOf(Instance.Scene).CalcInversed();
-			var dragDelta = transform * delta - transform * Vector2.Zero;
-			foreach (var widget in Document.Current.SelectedNodes().Editable().OfType<Widget>()) {
-				Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), widget.Position + dragDelta);
+			var containerWidget = Document.Current.Container as Widget;
+			if (containerWidget != null) {
+				var transform = containerWidget.CalcTransitionToSpaceOf(Instance.Scene).CalcInversed();
+				var dragDelta = transform * delta - transform * Vector2.Zero;
+				foreach (var widget in Document.Current.SelectedNodes().Editable().OfType<Widget>()) {
+					Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), widget.Position + dragDelta);
+				}
+			}
+		}
+
+		static void DragNodes3D(Vector2 delta)
+		{
+			foreach (var node3D in Document.Current.SelectedNodes().Editable().OfType<Node3D>()) {
+				Core.Operations.SetAnimableProperty.Perform(node3D, nameof(Widget.Position), node3D.Position + (Vector3)delta / 100);
+			}
+		}
+
+		static void DragSplinePoints3D(Vector2 delta)
+		{
+			foreach (var point in Document.Current.SelectedNodes().Editable().OfType<SplinePoint3D>()) {
+				Core.Operations.SetAnimableProperty.Perform(point, nameof(Widget.Position), point.Position + (Vector3)delta / 100);
 			}
 		}
 
