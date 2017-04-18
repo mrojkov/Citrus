@@ -121,4 +121,39 @@ namespace Tangerine
 			}
 		}
 	}
+
+	public class ExportScene : DocumentCommandHandler
+	{
+		public override void Execute()
+		{
+			var nodes = Document.Current?.SelectedNodes().Editable().ToList();
+			var container = Document.Current.Container;
+			if (nodes.Count != 1) {
+				AlertDialog.Show("Please, select a single node");
+				return;
+			}
+			Export(nodes[0]);
+		}
+
+		public static void Export(Node node)
+		{
+			var dlg = new FileDialog {
+				AllowedFileTypes = new string[] { Document.Current.GetFileExtension() },
+				Mode = FileDialogMode.Save,
+				InitialDirectory = Project.Current.GetSystemDirectory(Document.Current.Path),
+			};
+			if (dlg.RunModal()) {
+				string assetPath;
+				if (!Project.Current.TryGetAssetPath(dlg.FileName, out assetPath)) {
+					AlertDialog.Show("Can't save the document outside the project directory");
+				} else {
+					try {
+						Document.WriteNodeToFile(assetPath, DocumentFormat.Tan, node);
+					} catch (System.Exception e) {
+						AlertDialog.Show(e.Message);
+					}
+				}
+			}
+		}
+	}
 }

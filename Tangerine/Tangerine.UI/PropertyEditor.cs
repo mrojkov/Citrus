@@ -501,6 +501,7 @@ namespace Tangerine.UI
 					})
 				}
 			});
+			editor.Submitted += text => AssignAsset(AssetPath.CorrectSlashes(text));
 			button.Clicked += () => {
 				var dlg = new FileDialog {
 					AllowedFileTypes = allowedFileTypes,
@@ -537,7 +538,6 @@ namespace Tangerine.UI
 	{
 		public TexturePropertyEditor(IPropertyEditorParams editorParams) : base(editorParams, new string[] { "png" })
 		{
-			editor.Submitted += text => SetProperty(editorParams.PropertyName, new SerializableTexture(AssetPath.CorrectSlashes(text)));
 			editor.AddChangeWatcher(CoalescedPropertyValue<ITexture>(editorParams), v => editor.Text = v?.SerializationPath ?? "");
 		}
 
@@ -551,7 +551,6 @@ namespace Tangerine.UI
 	{
 		public AudioSamplePropertyEditor(IPropertyEditorParams editorParams) : base(editorParams, new string[] { "ogg" })
 		{
-			editor.Submitted += text => SetProperty(editorParams.PropertyName, new SerializableSample(AssetPath.CorrectSlashes(text)));
 			editor.AddChangeWatcher(CoalescedPropertyValue<SerializableSample>(editorParams), v => editor.Text = v?.SerializationPath ?? "");
 		}
 
@@ -565,14 +564,13 @@ namespace Tangerine.UI
 	{
 		public ContentsPathPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams, Document.AllowedFileTypes)
 		{
-			editor.Submitted += text => SetProperty(editorParams.PropertyName, AssetPath.CorrectSlashes(text));
 			editor.AddChangeWatcher(CoalescedPropertyValue<string>(editorParams), v => editor.Text = v);
 		}
 
 		protected override void AssignAsset(string path)
 		{
 			SetProperty(EditorParams.PropertyName, path);
-			Document.Current.Container.LoadExternalScenes();
+			Document.Current.RefreshExternalScenes();
 		}
 	}
 

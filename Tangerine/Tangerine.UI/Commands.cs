@@ -46,6 +46,7 @@ namespace Tangerine.UI
 #endif
 		public static readonly ICommand DefaultLayout = new Command("Default Layout");
 		public static readonly ICommand GroupContentsToMorphableMeshes = new Command("Group Contents To Morphable Meshes", new Shortcut(Modifiers.Command | Modifiers.Control, Key.M));
+		public static readonly ICommand ExportScene = new Command("Export Scene...");
 	}
 
 	public static class SceneViewCommands
