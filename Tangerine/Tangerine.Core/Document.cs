@@ -155,15 +155,17 @@ namespace Tangerine.Core
 			}
 		}
 		
-		public string GetFileExtension()
+		public static string GetFileExtension(DocumentFormat format)
 		{
-			switch (Format) {
+			switch (format) {
 				case DocumentFormat.Model: return "model";
 				case DocumentFormat.Scene: return "scene";
 				case DocumentFormat.Tan: return "tan";
 				default: throw new InvalidOperationException();
 			}
 		}
+
+		public string GetFileExtension() => GetFileExtension(Format);
 		
 		static bool AssetExists(string path, string ext) => AssetBundle.Instance.FileExists(System.IO.Path.ChangeExtension(path, ext));
 
@@ -185,10 +187,27 @@ namespace Tangerine.Core
 
 		void AttachViews()
 		{
-			RefreshExternalScenes(RootNode);
+			RefreshExternalScenes();
 			AttachingViews?.Invoke(this);
 			foreach (var i in Current.Views) {
 				i.Attach();
+			}
+		}
+
+		public void RefreshExternalScenes() => RefreshExternalScenes(RootNode);
+
+		void RefreshExternalScenes(Node node)
+		{
+			if (!string.IsNullOrEmpty(node.ContentsPath)) {
+				var doc = Project.Current.Documents.FirstOrDefault(i => i.Path == node.ContentsPath);
+				if (doc != null && doc.IsModified) {
+					node.ReplaceContent(doc.RootNode.Clone());
+				} else {
+					node.LoadExternalScenes();
+				}
+			}
+			foreach (var child in node.Nodes) {
+				RefreshExternalScenes(child);
 			}
 		}
 
@@ -196,30 +215,6 @@ namespace Tangerine.Core
 		{
 			foreach (var i in Current.Views) {
 				i.Detach();
-			}
-		}
-
-		private void RefreshExternalScenes(Node node)
-		{
-			if (node.ContentsPath != null) {
-				var doc = Project.Current.Documents.FirstOrDefault(i => i.Path == node.ContentsPath);
-				if (doc != null && doc.IsModified) {
-					node.Nodes.Clear();
-					node.Markers.Clear();
-					var content = doc.RootNode.Clone();
-					RefreshExternalScenes(content);
-					if (content.AsWidget != null && node.AsWidget != null) {
-						content.AsWidget.Size = node.AsWidget.Size;
-					}
-					node.Markers.AddRange(content.Markers);
-					var nodes = content.Nodes.ToList();
-					content.Nodes.Clear();
-					node.Nodes.AddRange(nodes);
-				}
-			} else {
-				foreach (var child in node.Nodes) {
-					RefreshExternalScenes(child);
-				}
 			}
 		}
 
@@ -258,18 +253,23 @@ namespace Tangerine.Core
 		{
 			History.AddSavePoint();
 			Path = path;
+			WriteNodeToFile(path, Format, RootNode);
+		}
+
+		public static void WriteNodeToFile(string path, DocumentFormat format, Node node)
+		{
 			// Save the document into memory at first to avoid a torn file in the case of a serialization error.
 			var ms = new MemoryStream();
 			// Dispose cloned object to preserve keyframes identity in the original node. See Animator.Dispose().
-			using (var node = CreateCloneForSerialization(RootNode)) {
-				if (Format == DocumentFormat.Scene) {
+			using (node = CreateCloneForSerialization(node)) {
+				if (format == DocumentFormat.Scene) {
 					var serializer = new Orange.HotSceneExporter.Serializer();
 					Serialization.WriteObject(path, ms, node, serializer);
 				} else {
 					Serialization.WriteObject(path, ms, node, Serialization.Format.JSON);
 				}
 			}
-			var fullPath = Project.Current.GetSystemPath(path, GetFileExtension());
+			var fullPath = Project.Current.GetSystemPath(path, GetFileExtension(format));
 			using (var fs = new FileStream(fullPath, FileMode.Create)) {
 				var a = ms.ToArray();
 				fs.Write(a, 0, a.Length);
@@ -285,7 +285,7 @@ namespace Tangerine.Core
 					n.Folders = null;
 				}
 			}
-			foreach (var n in clone.Descendants.Where(i => i.ContentsPath != null)) {
+			foreach (var n in clone.Descendants.Where(i => !string.IsNullOrEmpty(i.ContentsPath))) {
 				n.Nodes.Clear();
 				n.Markers.Clear();
 			}
