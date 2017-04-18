@@ -31,7 +31,7 @@ namespace Tangerine.UI.Inspector
 			}
 		}
 
-		public void Clear()
+		private void Clear()
 		{
 			widget.Nodes.Clear();
 			editors.Clear();

@@ -35,9 +35,8 @@ namespace Tangerine.UI.Inspector
 
 		public void Detach()
 		{
-			content.Clear();
-			DockManager.Instance.FilesDropped -= OnFilesDropped;
 			Instance = null;
+			DockManager.Instance.FilesDropped -= OnFilesDropped;
 			RootWidget.Unlink();
 		}
 
