@@ -122,26 +122,30 @@ namespace Tangerine.UI.SceneView
 			Document.Current.History.BeginTransaction();
 			try {
 				foreach (var file in files) {
-					string assetPath, assetType;
-					if (Utils.ExtractAssetPathOrShowAlert(file, out assetPath, out assetType)) {
-						if (assetType == ".png") {
-							var node = Core.Operations.CreateNode.Perform(typeof(Image));
-							var texture = new SerializableTexture(assetPath);
-							Core.Operations.SetProperty.Perform(node, nameof(Image.Texture), texture);
-							Core.Operations.SetProperty.Perform(node, nameof(Widget.Position), widgetPos);
-							Core.Operations.SetProperty.Perform(node, nameof(Widget.Pivot), Vector2.Half);
-							Core.Operations.SetProperty.Perform(node, nameof(Widget.Size), (Vector2)texture.ImageSize);
-						} else if (assetType == ".tan" || assetType == ".model" || assetType == ".scene") {
-							var scene = Node.CreateFromAssetBundle(assetPath);
-							var node = Core.Operations.CreateNode.Perform(scene.GetType());
-							Core.Operations.SetProperty.Perform(node, nameof(Widget.ContentsPath), assetPath);
-							if (scene is Widget) {
+					try {
+						string assetPath, assetType;
+						if (Utils.ExtractAssetPathOrShowAlert(file, out assetPath, out assetType)) {
+							if (assetType == ".png") {
+								var node = Core.Operations.CreateNode.Perform(typeof(Image));
+								var texture = new SerializableTexture(assetPath);
+								Core.Operations.SetProperty.Perform(node, nameof(Image.Texture), texture);
 								Core.Operations.SetProperty.Perform(node, nameof(Widget.Position), widgetPos);
 								Core.Operations.SetProperty.Perform(node, nameof(Widget.Pivot), Vector2.Half);
-								Core.Operations.SetProperty.Perform(node, nameof(Widget.Size), ((Widget)scene).Size);
+								Core.Operations.SetProperty.Perform(node, nameof(Widget.Size), (Vector2)texture.ImageSize);
+							} else if (assetType == ".tan" || assetType == ".model" || assetType == ".scene") {
+								var scene = Node.CreateFromAssetBundle(assetPath);
+								var node = Core.Operations.CreateNode.Perform(scene.GetType());
+								Core.Operations.SetProperty.Perform(node, nameof(Widget.ContentsPath), assetPath);
+								if (scene is Widget) {
+									Core.Operations.SetProperty.Perform(node, nameof(Widget.Position), widgetPos);
+									Core.Operations.SetProperty.Perform(node, nameof(Widget.Pivot), Vector2.Half);
+									Core.Operations.SetProperty.Perform(node, nameof(Widget.Size), ((Widget)scene).Size);
+								}
+								node.LoadExternalScenes();
 							}
-							node.LoadExternalScenes();
 						}
+					} catch (System.Exception e) {
+						AlertDialog.Show(e.Message);
 					}
 				}
 			} finally {
