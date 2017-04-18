@@ -987,28 +987,33 @@ namespace Lime
 		public void LoadExternalScenes()
 		{
 			if (string.IsNullOrEmpty(ContentsPath)) {
-				for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
-					node.LoadExternalScenes();
+				foreach (var child in Nodes) {
+					child.LoadExternalScenes();
 				}
-			} else {
-				var contentsPath = ResolveScenePath(ContentsPath);
-				if (contentsPath == null) {
-					return;
-				}
+			} else if (ResolveScenePath(ContentsPath) != null) {
 				var content = CreateFromAssetBundle(ContentsPath, null);
-				if (content.AsWidget != null && AsWidget != null) {
-					content.AsWidget.Size = AsWidget.Size;
-				}
-				Animations.Clear();
-				Animations.AddRange(content.Animations);
-				var nodes = content.Nodes.ToList();
-				content.Nodes.Clear();
-				Nodes.Clear();
-				Nodes.AddRange(nodes);
+				ReplaceContent(content);
 			}
 		}
 
-		private static readonly string[] sceneExtensions = new[] { ".scene", ".model", ".tan" };
+		public void ReplaceContent(Node content)
+		{
+			if ((content is Widget) && (this is Widget)) {
+				(content as Widget).Size = (this as Widget).Size;
+			}
+			Animations.Clear();
+			Animations.AddRange(content.Animations);
+			if ((content is Viewport3D) && (this is Node3D) && (content.Nodes.Count > 0)) {
+				// Handle a special case: the 3d scene is wrapped up with a Viewport3D.
+				content = content.Nodes[0];
+			}
+			var nodes = content.Nodes.ToList();
+			content.Nodes.Clear();
+			Nodes.Clear();
+			Nodes.AddRange(nodes);
+		}
+
+		private static readonly string[] sceneExtensions = { ".scene", ".model", ".tan" };
 
 		/// <summary>
 		/// Returns path to scene if it exists in bundle. Returns null otherwise.
