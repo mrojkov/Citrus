@@ -176,12 +176,10 @@ namespace Tangerine.Core
 
 		public static void SetCurrent(Document doc)
 		{
-			if (Current != null) {
-				Current.DetachViews();
-			}
-			Current = doc;
-			if (doc != null) {
-				doc.AttachViews();
+			if (Current != doc) {
+				Current?.DetachViews();
+				Current = doc;
+				doc?.AttachViews();
 			}
 		}
 
