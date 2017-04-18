@@ -1,21 +1,48 @@
-.DS_Store
-.vs/
-*.DotSettings
-*.userprefs
-*.csproj.user
-*.vshost.exe
-[Oo]bj/
-Lemon/bin/
-Lemon/Library/Android/libs/
-Lime/bin/
-Lime/Extensions/*/bin/*
-3rdParty/*/bin/*
-!3rdParty/ProtoBuf-Net/*/*
-Orange/packages
-*.mdb
-Yuzu/bin
-[Bb]in/
+# User-specific files
 *.suo
-/Orange/bin/**/*
-!/Orange/bin/Mac/Release/Orange.app
+*.user
+*.userosscache
+*.sln.docstates
+
+# User-specific files (MonoDevelop/Xamarin Studio)
+*.userprefs
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]eleases/
+x64/
+x86/
+bld/
+[Oo]bj/
+[Ll]og/
+
+# Visual Studio 2015 cache/options directory
+.vs/
+
+# ReSharper is a .NET coding add-in
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# The packages folder can be ignored because of Package Restore
+**/packages/*
+# except build/, which is used as an MSBuild target.
+!**/packages/build/
+
+.DS_Store
+
+Lemon/Library/Android/libs/
+
+# HACK
+
+**/[Bb]in/*
+
+!**/[Bb]in/Mac
+**/[Bb]in/Mac/*
+!**/[Bb]in/Mac/Release
+**/[Bb]in/Mac/Release/*
+!**/[Bb]in/Mac/Release/Orange.app
+!**/[Bb]in/Mac/Release/Orange.app/**/*
+
 !Orange/bin/Win/Release/Orange.exe
