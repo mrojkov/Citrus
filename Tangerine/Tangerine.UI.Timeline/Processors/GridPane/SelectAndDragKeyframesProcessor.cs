@@ -74,6 +74,7 @@ namespace Tangerine.UI.Timeline
 		private IEnumerator<object> SelectTask(IntVector2 initialCell)
 		{
 			Operations.ClearGridSelection.Perform();
+			Core.Operations.ClearRowSelection.Perform();
 			var input = grid.RootWidget.Input;
 			grid.OnPostRender += RenderSelectionRect;
 			while (input.IsMousePressed()) {

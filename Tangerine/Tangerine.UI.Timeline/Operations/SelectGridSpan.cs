@@ -16,6 +16,7 @@ namespace Tangerine.UI.Timeline.Operations
 		public static void Perform(int row, GridSpan span)
 		{
 			Document.Current.History.Perform(new SelectGridSpan(row, span));
+			Core.Operations.SelectRow.Perform(Document.Current.Rows[row]);
 		}
 
 		private SelectGridSpan(int row, GridSpan span)
