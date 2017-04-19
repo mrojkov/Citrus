@@ -170,9 +170,9 @@ namespace Tangerine.Core.Operations
 
 		public override bool IsChangingDocument => true;
 
-		public static void Perform(IFolderItem item)
+		public static void Perform(IFolderItem item, bool aboveSelected = true)
 		{
-			Perform(Document.Current.Container, GetNewFolderItemLocation(), item);
+			Perform(Document.Current.Container, GetNewFolderItemLocation(aboveSelected), item);
 		}
 
 		public static void Perform(Node container, FolderItemLocation location, IFolderItem item)
@@ -183,11 +183,17 @@ namespace Tangerine.Core.Operations
 			Document.Current.History.Perform(new InsertFolderItem(container, location, item));
 		}
 
-		internal static FolderItemLocation GetNewFolderItemLocation()
+		internal static FolderItemLocation GetNewFolderItemLocation(bool aboveSelected)
 		{
 			var doc = Document.Current;
-			var fi = doc.SelectedFolderItems().FirstOrDefault();
-			return fi != null ? doc.Container.RootFolder().Find(fi) : new FolderItemLocation(doc.Container.RootFolder(), 0);
+			var rootFolder = doc.Container.RootFolder();
+			if (aboveSelected) {
+				var fi = doc.SelectedFolderItems().FirstOrDefault();
+				return fi != null ? rootFolder.Find(fi) : new FolderItemLocation(rootFolder, 0);
+			} else {
+				var fi = doc.SelectedFolderItems().LastOrDefault();
+				return fi != null ? rootFolder.Find(fi) + 1 : new FolderItemLocation(rootFolder, rootFolder.Items.Count);
+			}
 		}
 
 		private InsertFolderItem(Node container, FolderItemLocation location, IFolderItem item)
@@ -215,9 +221,9 @@ namespace Tangerine.Core.Operations
 
 	public static class CreateNode
 	{
-		public static Node Perform(Type nodeType)
+		public static Node Perform(Type nodeType, bool aboveSelected = true)
 		{
-			return Perform(Document.Current.Container, InsertFolderItem.GetNewFolderItemLocation(), nodeType);
+			return Perform(Document.Current.Container, InsertFolderItem.GetNewFolderItemLocation(aboveSelected), nodeType);
 		}
 
 		public static Node Perform(Node container, FolderItemLocation location, Type nodeType)

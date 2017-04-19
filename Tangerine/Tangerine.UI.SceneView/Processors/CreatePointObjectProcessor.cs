@@ -29,7 +29,7 @@ namespace Tangerine.UI.SceneView
 				CreateNodeRequestComponent.Consume<Node>(sv.Components);
 				if (sv.Input.WasMousePressed()) {
 					try {
-						var currentPoint = (PointObject)Core.Operations.CreateNode.Perform(nodeType);
+						var currentPoint = (PointObject)Core.Operations.CreateNode.Perform(nodeType, aboveSelected: nodeType != typeof(SplinePoint));
 						var container = (Widget)Document.Current.Container;
 						var t = sv.Scene.CalcTransitionToSpaceOf(container);
 						var pos = Vector2.Zero;

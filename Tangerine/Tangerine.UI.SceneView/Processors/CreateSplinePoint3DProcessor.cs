@@ -28,7 +28,7 @@ namespace Tangerine.UI.SceneView
 				if (SceneView.Instance.Input.ConsumeKeyPress(Key.Mouse0)) {
 					SplinePoint3D point;
 					try {
-						point = (SplinePoint3D)Core.Operations.CreateNode.Perform(typeof(SplinePoint3D));
+						point = (SplinePoint3D)Core.Operations.CreateNode.Perform(typeof(SplinePoint3D), aboveSelected: false);
 					} catch (InvalidOperationException e) {
 						AlertDialog.Show(e.Message);
 						yield break;

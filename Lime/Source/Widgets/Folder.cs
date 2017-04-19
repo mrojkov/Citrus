@@ -127,5 +127,11 @@ namespace Lime
 			Folder = parent;
 			Index = index;
 		}
+
+		public static FolderItemLocation operator + (FolderItemLocation location, int indexDelta)
+		{
+			location.Index += indexDelta;
+			return location;
+		}
 	}
 }
