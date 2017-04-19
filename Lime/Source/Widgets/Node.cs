@@ -268,26 +268,11 @@ namespace Lime
 			set { DefaultAnimation.Time = value; }
 		}
 
-
-		private Animation defaultAnimation;
-
 		/// <summary>
 		/// Returns first animation in animation list
 		/// (or creates an empty animation if list is empty).
 		/// </summary>
-		public Animation DefaultAnimation
-		{
-			get
-			{
-				if (defaultAnimation == null) {
-					if (Animations.Count == 0) {
-						Animations.Add(new Animation());
-					}
-					defaultAnimation = Animations[0];
-				}
-				return defaultAnimation;
-			}
-		}
+		public Animation DefaultAnimation => Animations.DefaultAnimation;
 
 		/// <summary>
 		/// Custom data. Can be set via Tangerine (this way it will contain path to external scene).
@@ -490,7 +475,6 @@ namespace Lime
 			clone.Parent = null;
 			clone.NextSibling = null;
 			clone.AsWidget = clone as Widget;
-			clone.defaultAnimation = null;
 			clone.Animations = Animations.Clone(clone);
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
 			clone.Nodes = Nodes.Clone(clone);

@@ -8,6 +8,7 @@ namespace Lime
 	public sealed class AnimationList : IList<Animation>
 	{
 		private Node owner;
+		private Animation defaultAnimation;
 		private List<Animation> list;
 
 		public int Count
@@ -18,6 +19,20 @@ namespace Lime
 		public bool IsReadOnly
 		{
 			get { return false; }
+		}
+
+		public Animation DefaultAnimation
+		{
+			get
+			{
+				if (defaultAnimation == null) {
+					if (Count == 0) {
+						Add(new Animation());
+					}
+					defaultAnimation = list[0];
+				}
+				return defaultAnimation;
+			}
 		}
 
 		public Animation this[int index]
@@ -31,6 +46,7 @@ namespace Lime
 				}
 				list[index] = value;
 				value.Owner = owner;
+				defaultAnimation = null;
 			}
 		}
 
@@ -111,18 +127,21 @@ namespace Lime
 		{
 			item.Owner = owner;
 			list.Insert(index, item);
+			defaultAnimation = null;
 		}
 
 		public void RemoveAt(int index)
 		{
 			list[index].Owner = null;
 			list.RemoveAt(index);
+			defaultAnimation = null;
 		}
 
 		public void Add(Animation item)
 		{
 			list.Add(item);
 			item.Owner = owner;
+			defaultAnimation = null;
 		}
 		
 		public void AddRange(IEnumerable<Animation> collection)
@@ -138,6 +157,7 @@ namespace Lime
 				animation.Owner = null;
 			}
 			list.Clear();
+			defaultAnimation = null;
 		}
 
 		public bool Contains(Animation item)
@@ -154,6 +174,7 @@ namespace Lime
 		{
 			if (list.Remove(item)) {
 				item.Owner = null;
+				defaultAnimation = null;
 				return true;
 			}
 			return false;
