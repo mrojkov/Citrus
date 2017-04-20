@@ -989,12 +989,16 @@ namespace Lime
 			Animations.AddRange(content.Animations);
 			if ((content is Viewport3D) && (this is Node3D) && (content.Nodes.Count > 0)) {
 				// Handle a special case: the 3d scene is wrapped up with a Viewport3D.
-				content = content.Nodes[0];
+				var node = content.Nodes[0];
+				node.Unlink();
+				Nodes.Clear();
+				Nodes.Add(node);
+			} else {
+				var nodes = content.Nodes.ToList();
+				content.Nodes.Clear();
+				Nodes.Clear();
+				Nodes.AddRange(nodes);
 			}
-			var nodes = content.Nodes.ToList();
-			content.Nodes.Clear();
-			Nodes.Clear();
-			Nodes.AddRange(nodes);
 		}
 
 		private static readonly string[] sceneExtensions = { ".scene", ".model", ".tan" };
