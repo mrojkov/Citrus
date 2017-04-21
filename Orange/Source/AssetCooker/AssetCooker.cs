@@ -510,6 +510,11 @@ namespace Orange
 				}
 				PackItemsToAtlas(items, bestSize, out bestPackRate);
 				CopyAllocatedItemsToAtlas(items, atlasChain, atlasId, bestSize);
+				foreach (var x in items) {
+					if (x.Allocated) {
+						x.Pixbuf.Dispose();
+					}
+				}
 				items.RemoveAll(x => x.Allocated);
 				atlasId++;
 			}
@@ -586,30 +591,31 @@ namespace Orange
 		{
 			var atlasPath = GetAtlasPath(atlasChain, atlasId);
 			var hasAlpha = items.Where(i => i.Allocated).Any(i => i.Pixbuf.HasAlpha);
-			var atlas = new Gdk.Pixbuf(Gdk.Colorspace.Rgb, hasAlpha, 8, size.Width, size.Height);
-			atlas.Fill(0);
-			foreach (var item in items.Where(i => i.Allocated)) {
-				var p = item.Pixbuf;
-				p.CopyArea(0, 0, p.Width, p.Height, atlas, item.AtlasRect.A.X, item.AtlasRect.A.Y);
-				var atlasPart = new TextureAtlasElement.Params();
-				atlasPart.AtlasRect = item.AtlasRect;
-				atlasPart.AtlasRect.B -= new IntVector2(2, 2);
-				atlasPart.AtlasPath = Path.ChangeExtension(atlasPath, null);
-				Serialization.WriteObjectToBundle(AssetBundle, item.Path, atlasPart, Serialization.Format.Binary, item.SourceExtension);
-				// Delete non-atlased texture since now its useless
-				var texturePath = Path.ChangeExtension(item.Path, GetPlatformTextureExtension());
-				if (AssetBundle.FileExists(texturePath)) {
-					DeleteFileFromBundle(texturePath);
+			using (var atlas = new Gdk.Pixbuf(Gdk.Colorspace.Rgb, hasAlpha, 8, size.Width, size.Height)) {
+				atlas.Fill(0);
+				foreach (var item in items.Where(i => i.Allocated)) {
+					var p = item.Pixbuf;
+					p.CopyArea(0, 0, p.Width, p.Height, atlas, item.AtlasRect.A.X, item.AtlasRect.A.Y);
+					var atlasPart = new TextureAtlasElement.Params();
+					atlasPart.AtlasRect = item.AtlasRect;
+					atlasPart.AtlasRect.B -= new IntVector2(2, 2);
+					atlasPart.AtlasPath = Path.ChangeExtension(atlasPath, null);
+					Serialization.WriteObjectToBundle(AssetBundle, item.Path, atlasPart, Serialization.Format.Binary, item.SourceExtension);
+					// Delete non-atlased texture since now its useless
+					var texturePath = Path.ChangeExtension(item.Path, GetPlatformTextureExtension());
+					if (AssetBundle.FileExists(texturePath)) {
+						DeleteFileFromBundle(texturePath);
+					}
 				}
+				Console.WriteLine("+ " + atlasPath);
+				var firstItem = items.First(i => i.Allocated);
+				var rules = new CookingRules {
+					MipMaps = firstItem.MipMapped,
+					PVRFormat = firstItem.PVRFormat,
+					DDSFormat = firstItem.DDSFormat
+				};
+				ImportTexture(atlasPath, atlas, rules);
 			}
-			Console.WriteLine("+ " + atlasPath);
-			var firstItem = items.First(i => i.Allocated);
-			var rules = new CookingRules {
-				MipMaps = firstItem.MipMapped,
-				PVRFormat = firstItem.PVRFormat,
-				DDSFormat = firstItem.DDSFormat
-			};
-			ImportTexture(atlasPath, atlas, rules);
 		}
 
 		private static bool ShouldGenerateOpacityMasks()
@@ -729,7 +735,7 @@ namespace Orange
 			foreach (var atlasPartPath in AssetBundle.EnumerateFiles()) {
 				if (Path.GetExtension(atlasPartPath) != ".atlasPart")
 					continue;
-			
+
 				// If atlas part has been outdated we should rebuild full atlas chain
 				var srcTexturePath = Path.ChangeExtension(atlasPartPath, ".png");
 				if (!textures.ContainsKey(srcTexturePath) || AssetBundle.GetFileLastWriteTime(atlasPartPath) < textures[srcTexturePath]) {
