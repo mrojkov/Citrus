@@ -377,7 +377,8 @@ namespace Tangerine.UI
 
 		public FloatPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
-			editor = new NumericEditBox { LayoutCell = new LayoutCell(Alignment.Center) };
+			editor = editorParams.NumericEditBoxFactory();
+			editor.LayoutCell = new LayoutCell(Alignment.Center);
 			editor.TextWidget.HAlignment = HAlignment.Right;
 			ContainerWidget.AddNode(editor);
 			var current = CoalescedPropertyValue<float>(editorParams);
