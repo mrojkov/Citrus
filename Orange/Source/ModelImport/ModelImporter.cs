@@ -480,7 +480,7 @@ namespace Orange
 
 		private static int TimeToFrame(double ticks, double ticksPerSecond)
 		{
-			return AnimationUtils.MsecsToFrames((int)(ticks * 1000 / ticksPerSecond + 0.5));
+			return AnimationUtils.SecondsToFrames(ticks / ticksPerSecond);
 		}
 
 		private static string GetNodeName(string name)

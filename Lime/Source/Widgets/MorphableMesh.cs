@@ -25,7 +25,7 @@ namespace Lime
 		public override void Render()
 		{
 			var parentWidget = Parent.AsWidget;
-			int animationTime = parentWidget.AnimationTime;
+			var animationTime = parentWidget.AnimationTime;
 			MorphableMesh mesh = null;
 			while (true) {
 				mesh = Meshes[currMeshIndex];
@@ -66,10 +66,10 @@ namespace Lime
 		public readonly List<RenderBatch> Batches = new List<RenderBatch>();
 		
 		[YuzuMember]
-		public int LeftBound { get; set; }
+		public double LeftBound { get; set; }
 		
 		[YuzuMember]
-		public int RightBound { get; set; }
+		public double RightBound { get; set; }
 
 		private int currentTarget;
 
@@ -131,7 +131,7 @@ namespace Lime
 			} else if (animationTime >= target1.Timestamp) {
 				t = 1;
 			} else {
-				t = (animationTime - target0.Timestamp) / (float)(target1.Timestamp - target0.Timestamp);
+				t = (float)((animationTime - target0.Timestamp) / (target1.Timestamp - target0.Timestamp));
 			}
 			// Render all of it.
 			if (shaderProgram == null) {
@@ -180,7 +180,7 @@ namespace Lime
 		public class MorphTarget
 		{
 			[YuzuMember]
-			public int Timestamp { get; set; }
+			public double Timestamp { get; set; }
 						
 			[YuzuMember]
 			public IVertexBuffer<PosColor> PosColorBuffer { get; set; }

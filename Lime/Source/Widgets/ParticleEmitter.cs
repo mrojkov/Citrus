@@ -719,7 +719,7 @@ namespace Lime
 			p.Age += delta;
 			var modifier = modifiers[p.ModifierIndex];
 			if (p.AgeToFrame > 0) {
-				modifier.Animators.Apply(AnimationUtils.FramesToMsecs((int)(p.Age * p.AgeToFrame)));
+				modifier.Animators.Apply(AnimationUtils.FramesToSeconds((int)(p.Age * p.AgeToFrame)));
 			}
 			if (ImmortalParticles) {
 				if (p.Lifetime > 0.0f)

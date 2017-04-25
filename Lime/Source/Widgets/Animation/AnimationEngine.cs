@@ -60,55 +60,61 @@ namespace Lime
 
 		public override void AdvanceAnimation(Animation animation, float delta)
 		{
-			var deltaMs = (int)(delta * 1000 + 0.5f);
-			while (deltaMs > AnimationUtils.MsecsPerFrame) {
-				AdvanceAnimationShort(animation, AnimationUtils.MsecsPerFrame);
-				deltaMs -= AnimationUtils.MsecsPerFrame;
+			if (!animation.IsRunning) {
+				return;
 			}
-			AdvanceAnimationShort(animation, deltaMs);
+			double remainedDelta = delta;
+			// Set the delta limit to ensure we process no more than one frame at a time.
+			const double deltaLimit = AnimationUtils.SecondsPerFrame * 0.99;
+			while (remainedDelta > deltaLimit) {
+				AdvanceAnimationHelper(animation, deltaLimit, applyAnimators: false);
+				remainedDelta -= deltaLimit;
+			}
+			AdvanceAnimationHelper(animation, remainedDelta, applyAnimators: true);
 		}
 
-		private void AdvanceAnimationShort(Animation animation, int delta)
+		private void AdvanceAnimationHelper(Animation animation, double delta, bool applyAnimators)
 		{
-			if (animation.IsRunning) {
-				var prevFrame = AnimationUtils.MsecsToFrames(animation.Time - 1);
-				var currFrame = AnimationUtils.MsecsToFrames(animation.Time + delta - 1);
-				animation.TimeInternal += delta;
-				if (prevFrame != currFrame && animation.Markers.Count > 0) {
-					var marker = animation.Markers.GetByFrame(currFrame);
-					if (marker != null && (animation.Owner.TangerineFlags & TangerineFlags.IgnoreMarkers) == 0) {
-						ProcessMarker(animation, marker, ref prevFrame, ref currFrame);
-					}
+			var previousTime = animation.TimeInternal;
+			var currentTime = previousTime + delta;
+			animation.TimeInternal = currentTime;
+			var frameIndex = AnimationUtils.SecondsToFrames(currentTime);
+			var frameTime = AnimationUtils.SecondsPerFrame * frameIndex;
+			var stepOverFrame = previousTime <= frameTime && frameTime < currentTime;
+			if (stepOverFrame && animation.Markers.Count > 0) {
+				var marker = animation.Markers.GetByFrame(frameIndex);
+				if (marker != null) {
+					ProcessMarker(animation, marker);
 				}
-				var invokeTriggers = prevFrame != currFrame;
-				ApplyAnimators(animation, invokeTriggers);
+			}
+			if (applyAnimators || stepOverFrame) {
+				ApplyAnimators(animation, invokeTriggers: stepOverFrame);
 				if (!animation.IsRunning) {
 					animation.OnStopped();
 				}
 			}
 		}
 
-		private void ProcessMarker(Animation animation, Marker marker, ref int prevFrame, ref int currFrame)
+		private void ProcessMarker(Animation animation, Marker marker)
 		{
+			if ((animation.Owner.TangerineFlags & TangerineFlags.IgnoreMarkers) != 0) {
+				return;
+			}
 			switch (marker.Action) {
 				case MarkerAction.Jump:
 					var gotoMarker = animation.Markers.TryFind(marker.JumpTo);
 					if (gotoMarker != null && gotoMarker != marker) {
-						var hopFrames = gotoMarker.Frame - animation.Frame;
-						animation.TimeInternal += AnimationUtils.FramesToMsecs(hopFrames);
-						prevFrame += hopFrames;
-						currFrame += hopFrames;
-						ProcessMarker(animation, gotoMarker, ref prevFrame, ref currFrame);
+						var delta = animation.Time - AnimationUtils.FramesToSeconds(animation.Frame);
+						animation.TimeInternal = gotoMarker.Time;
+						AdvanceAnimationHelper(animation, delta, applyAnimators: true); 
 					}
 					break;
 				case MarkerAction.Stop:
-					animation.TimeInternal = AnimationUtils.FramesToMsecs(marker.Frame);
-					prevFrame = currFrame - 1;
+					animation.TimeInternal = AnimationUtils.FramesToSeconds(marker.Frame);
 					animation.IsRunning = false;
 					break;
 				case MarkerAction.Destroy:
-					animation.TimeInternal = AnimationUtils.FramesToMsecs(marker.Frame);
-					prevFrame = currFrame - 1;
+					animation.TimeInternal = AnimationUtils.FramesToSeconds(marker.Frame);
 					animation.IsRunning = false;
 					animation.Owner.Unlink();
 					break;

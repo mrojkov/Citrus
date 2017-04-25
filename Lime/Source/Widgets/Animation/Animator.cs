@@ -21,7 +21,7 @@ namespace Lime
 
 		void InvokeTrigger(int frame);
 
-		void Apply(int time);
+		void Apply(double time);
 
 		IKeyframeCollection ReadonlyKeys { get; }
 
@@ -149,7 +149,7 @@ namespace Lime
 			}
 		}
 
-		public void Apply(int time)
+		public void Apply(double time)
 		{
 			int count = ReadonlyKeys.Count;
 			if (count == 0)
@@ -157,7 +157,7 @@ namespace Lime
 			if (currentKey >= count) {
 				currentKey = count - 1;
 			}
-			int frame = AnimationUtils.MsecsToFrames(time);
+			int frame = AnimationUtils.SecondsToFrames(time);
 			// find rightmost key on the left from given frame
 			while (currentKey < count - 1 && frame > ReadonlyKeys[currentKey].Frame)
 				currentKey++;
@@ -173,7 +173,7 @@ namespace Lime
 			}
 		}
 
-		private void ApplyHelper(int time)
+		private void ApplyHelper(double time)
 		{
 			int i = currentKey;
 			var key1 = ReadonlyKeys[i];
@@ -183,9 +183,7 @@ namespace Lime
 				return;
 			}
 			var key2 = ReadonlyKeys[i + 1];
-			int t0 = AnimationUtils.FramesToMsecs(key1.Frame);
-			int t1 = AnimationUtils.FramesToMsecs(key2.Frame);
-			float t = (time - t0) / (float)(t1 - t0);
+			var t = (float)(time * AnimationUtils.FramesPerSecond - key1.Frame) / (key2.Frame - key1.Frame);
 			if (function == KeyFunction.Linear) {
 				InterpolateAndSet(t, key1, key2);
 			} else if (function == KeyFunction.Spline) {

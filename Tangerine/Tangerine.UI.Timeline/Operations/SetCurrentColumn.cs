@@ -41,33 +41,28 @@ namespace Tangerine.UI.Timeline.Operations
 					doc.Container.SetTangerineFlag(TangerineFlags.IgnoreMarkers, true);
 					if (doc.AnimationFrame < value) {
 						doc.Container.IsRunning = true;
-						UpdateNodeIncremental(doc.Container, value - doc.AnimationFrame);
-						StopAnimationRecursive(doc.Container);
+						UpdateToFrame(doc.Container, value);
 					} else {
 						SetCurrentFrameRecursive(doc.Container, 0);
 						ClearParticlesRecursive(doc.RootNode);
 						doc.Container.IsRunning = true;
-						UpdateNodeIncremental(doc.Container, value);
-						StopAnimationRecursive(doc.Container);
+						UpdateToFrame(doc.Container, value);
 					}
+					StopAnimationRecursive(doc.Container);
 					doc.Container.SetTangerineFlag(TangerineFlags.IgnoreMarkers, false);
 				} else {
 					doc.AnimationFrame = value;
-					UpdateNodeIncremental(doc.Container, 0);
+					doc.Container.Update(0);
 					ClearParticlesRecursive(doc.RootNode);
 				}
 				Timeline.Instance.EnsureColumnVisible(value);
 			}
 
-			static void UpdateNodeIncremental(Node node, int deltaFrames)
+			static void UpdateToFrame(Node node, int frame)
 			{
-				var delta = AnimationUtils.FramesToMsecs(deltaFrames) / 1000f;
-				const float maxDelta = AnimationUtils.MsecsPerFrame / 1000f;
-				while (delta > maxDelta) {
-					node.Update(maxDelta);
-					delta -= maxDelta;
-				}
-				node.Update(delta);
+				node.Update((float)(AnimationUtils.SecondsPerFrame * (frame - node.AnimationFrame)));
+				// Set animation frame explicitly to avoid inaccuracy, leading to skipped markers, triggers, etc.
+				node.AnimationFrame = frame;
 			}
 
 			static void SetCurrentFrameRecursive(Node node, int frame)

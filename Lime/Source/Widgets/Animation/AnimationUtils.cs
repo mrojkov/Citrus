@@ -8,30 +8,17 @@ namespace Lime
 {
 	public static class AnimationUtils
 	{
-		/// <summary>
-		///  оличнство кадров в одной секунде
-		/// </summary>
-		public const int FramesPerSecond = 16;
+		public const double FramesPerSecond = 30.0;
+		public const double SecondsPerFrame = 1 / FramesPerSecond;
 
-		/// <summary>
-		///  оличество миллисекунд в одном кадре
-		/// </summary>
-		public const int MsecsPerFrame = 1000 / AnimationUtils.FramesPerSecond - 1;
-
-		/// <summary>
-		/// ѕереводит врем€ в миллисекундах во врем€, измер€емое кадрами
-		/// </summary>
-		public static int MsecsToFrames(int msecs)
+		public static int SecondsToFrames(double seconds)
 		{
-			return msecs >> 6;
+			return (int)(seconds * FramesPerSecond + 0.000001);
 		}
 
-		/// <summary>
-		/// ѕереводит врем€, измер€емое кадрами во врем€ в миллисекунды
-		/// </summary>
-		public static int FramesToMsecs(int frames)
+		public static double FramesToSeconds(int frame)
 		{
-			return frames << 6;
+			return frame * SecondsPerFrame;
 		}
 
 		internal struct PropertyData

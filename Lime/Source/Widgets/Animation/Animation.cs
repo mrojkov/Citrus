@@ -5,7 +5,7 @@ namespace Lime
 {
 	public class Animation : ICloneable
 	{
-		internal int TimeInternal;
+		internal double TimeInternal;
 
 		[YuzuMember]
 		public MarkerCollection Markers { get; private set; }
@@ -13,7 +13,7 @@ namespace Lime
 		[YuzuMember]
 		public string Id;
 
-		public int Time
+		public double Time
 		{
 			get { return TimeInternal; }
 			set
@@ -25,8 +25,8 @@ namespace Lime
 
 		public int Frame
 		{
-			get { return AnimationUtils.MsecsToFrames(Time); }
-			set { Time = AnimationUtils.FramesToMsecs(value); }
+			get { return AnimationUtils.SecondsToFrames(Time); }
+			set { Time = AnimationUtils.FramesToSeconds(value); }
 		}
 
 		public bool IsRunning;

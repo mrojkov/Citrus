@@ -231,9 +231,9 @@ namespace Lime
 			}
 		}
 
-		private int FixFrame(int frame, float fps = 16)
+		private int FixFrame(int frame, double fps = 30)
 		{
-			return AnimationUtils.MsecsToFrames((int)(frame * 1000 / fps + 0.5));
+			return AnimationUtils.SecondsToFrames(frame / fps);
 		}
 	}
 }

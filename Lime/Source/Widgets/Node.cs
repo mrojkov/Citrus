@@ -262,7 +262,7 @@ namespace Lime
 		/// <summary>
 		/// Gets or sets time of current frame of default animation (in milliseconds).
 		/// </summary>
-		public int AnimationTime
+		public double AnimationTime
 		{
 			get { return DefaultAnimation.Time; }
 			set { DefaultAnimation.Time = value; }
@@ -460,9 +460,10 @@ namespace Lime
 		/// <summary>
 		/// Get or sets the current animation frame.
 		/// </summary>
-		public int AnimationFrame {
-			get { return AnimationUtils.MsecsToFrames(AnimationTime); }
-			set { AnimationTime = AnimationUtils.FramesToMsecs(value); }
+		public int AnimationFrame
+		{
+			get { return AnimationUtils.SecondsToFrames(AnimationTime); }
+			set { AnimationTime = AnimationUtils.FramesToSeconds(value); }
 		}
 
 		/// <summary>

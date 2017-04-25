@@ -19,7 +19,7 @@ namespace Lime
 		[YuzuMember]
 		public int Frame { get; set; }
 
-		public int Time { get { return AnimationUtils.FramesToMsecs(Frame); } }
+		public double Time { get { return AnimationUtils.FramesToSeconds(Frame); } }
 
 		[YuzuMember]
 		public MarkerAction Action { get; set; }

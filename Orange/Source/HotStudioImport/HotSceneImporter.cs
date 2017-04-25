@@ -609,7 +609,7 @@ namespace Orange
 				marker.Id = lexer.ParseQuotedString();
 				break;
 			case "Frame":
-				marker.Frame = lexer.ParseInt();
+				marker.Frame = lexer.ParseInt() * 2;
 				break;
 			case "EaseInterpolation":
 				lexer.ParseBool();

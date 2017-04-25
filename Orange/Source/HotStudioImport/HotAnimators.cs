@@ -164,7 +164,7 @@ namespace Orange
 				case "Frames":
 					lexer.ParseToken('[');
 					while (lexer.PeekChar() != ']')
-						frames.Add(lexer.ParseInt());
+						frames.Add(lexer.ParseInt() * 2);
 					lexer.ParseToken(']');
 					break;
 				case "Attributes":

@@ -164,7 +164,7 @@ namespace Lime
 			return val;
 		}
 
-		public void Apply(int time, string animationId = null)
+		public void Apply(double time, string animationId = null)
 		{
 			foreach (var animator in AsArray) {
 				if (animator.AnimationId == animationId) {

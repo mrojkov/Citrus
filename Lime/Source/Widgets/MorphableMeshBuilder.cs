@@ -309,7 +309,7 @@ namespace Lime
 			var result = new List<MorphingInterval>();
 			var interval = new MorphingInterval();
 			foreach (var frame in allFrames) {
-				var time = AnimationUtils.FramesToMsecs(frame);
+				var time = AnimationUtils.FramesToSeconds(frame);
 				if (leapFrames.Contains(frame)) {
 					if (interval.Timestamps.Count > 0) {
 						interval.Timestamps.Add(time - 1);
@@ -330,7 +330,7 @@ namespace Lime
 
 		class MorphingInterval
 		{
-			public readonly List<int> Timestamps = new List<int>();
+			public readonly List<double> Timestamps = new List<double>();
 		}
 	}	
 }
