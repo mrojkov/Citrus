@@ -156,4 +156,29 @@ namespace Tangerine
 			}
 		}
 	}
+
+	public class UpsampleAnimationTwice : DocumentCommandHandler
+	{
+		public override void Execute()
+		{
+			UpsampleNodeAnimation(Document.Current.RootNode);
+		}
+
+		private void UpsampleNodeAnimation(Node node)
+		{
+			foreach (var a in node.Animations) {
+				foreach (var m in a.Markers) {
+					Core.Operations.SetProperty.Perform(m, "Frame", m.Frame * 2);
+				}
+			}
+			foreach (var a in node.Animators) {
+				foreach (var k in a.Keys) {
+					Core.Operations.SetProperty.Perform(k, "Frame", k.Frame * 2);
+				}
+			}
+			foreach (var n in node.Nodes) {
+				UpsampleNodeAnimation(n);
+			}
+		}
+	}
 }

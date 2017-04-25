@@ -254,6 +254,7 @@ namespace Tangerine
 					Command.MenuSeparator,
 					GenericCommands.GroupContentsToMorphableMeshes,
 					GenericCommands.ExportScene,
+					GenericCommands.UpsampleAnimationTwice,
 				}),
 				new Command("Create", new Menu()),
 				new Command("View", new Menu {
@@ -326,6 +327,7 @@ namespace Tangerine
 			h.Connect(GenericCommands.DefaultLayout, new ViewDefaultLayout());
 			h.Connect(GenericCommands.GroupContentsToMorphableMeshes, new GroupContentsToMorphableMeshes());
 			h.Connect(GenericCommands.ExportScene, new ExportScene());
+			h.Connect(GenericCommands.UpsampleAnimationTwice, new UpsampleAnimationTwice());
 			h.Connect(Tools.AlignLeft, new AlignLeft());
 			h.Connect(Tools.AlignRight, new AlignRight());
 			h.Connect(Tools.AlignTop, new AlignTop());

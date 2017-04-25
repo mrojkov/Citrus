@@ -109,6 +109,7 @@ namespace Tangerine.Core
 			Format = DocumentFormat.Scene;
 			Path = defaultPath;
 			Container = RootNode = new Frame { Size = defaultSceneSize };
+			RootNode.AnimationSpeed = 0.5f;
 		}
 
 		public Document(string path)
@@ -132,6 +133,9 @@ namespace Tangerine.Core
 					vp.AddNode(vp.Camera);
 					RootNode = vp;
 				}
+			}
+			if (Format == DocumentFormat.Scene) {
+				RootNode.AnimationSpeed = 0.5f;
 			}
 			Decorate(RootNode);
 			RootNode.Update(0);

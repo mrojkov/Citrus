@@ -154,6 +154,8 @@ namespace Tangerine
 			try {
 				AssetBundle.Instance.DeleteFile(Path.ChangeExtension(Document.Current.Path, "scene"));
 				Document.Current.Format = DocumentFormat.Tan;
+				Document.Current.RootNode.AnimationSpeed = 1;
+				new UpsampleAnimationTwice().Execute();
 				Document.Current.Save();
 			} catch (System.Exception e) {
 				AlertDialog.Show($"Upgrade document format error: '{e.Message}'");
