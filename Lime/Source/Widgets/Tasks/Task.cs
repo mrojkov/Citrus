@@ -113,8 +113,10 @@ namespace Lime
 				waitTime = 0;
 			} else if (result is int) {
 				waitTime = (int)result;
-			} else if (result is float || result is double) {
+			} else if (result is float) {
 				waitTime = (float)result;
+			} else if (result is double) {
+				waitTime = (float)((double)result);
 			} else if (result is IEnumerator<object>) {
 				stack.Push((IEnumerator<object>) result);
 				Advance(0);
