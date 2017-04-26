@@ -60,9 +60,6 @@ namespace Lime
 
 		public override void AdvanceAnimation(Animation animation, float delta)
 		{
-			if (!animation.IsRunning) {
-				return;
-			}
 			double remainedDelta = delta;
 			// Set the delta limit to ensure we process no more than one frame at a time.
 			const double deltaLimit = AnimationUtils.SecondsPerFrame * 0.99;
@@ -75,6 +72,9 @@ namespace Lime
 
 		private void AdvanceAnimationHelper(Animation animation, double delta, bool applyAnimators)
 		{
+			if (!animation.IsRunning) {
+				return;
+			}
 			var previousTime = animation.TimeInternal;
 			var currentTime = previousTime + delta;
 			animation.TimeInternal = currentTime;
