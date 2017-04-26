@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Linq;
+using Foundation;
 using Lime.Platform;
 #if MAC
 using AppKit;
@@ -24,6 +26,7 @@ namespace Lime
 		private float refreshRate;
 		private bool dialogMode;
 		private Display display;
+		private bool closed;
 
 		public NSGameView View { get; private set; }
 
@@ -230,19 +233,8 @@ namespace Lime
 				MaximumDecoratedSize = options.MaximumDecoratedSize;
 			}
 			window.Title = options.Title;
-			window.WindowShouldClose += (sender) => {
-				return RaiseClosing();
-			};
-			window.WillClose += (s, e) => {
-				RaiseClosed();
-				View.Stop();
-				Application.Windows.Remove(this);
-				if (Application.MainWindow == this) {
-					NSApplication.SharedApplication.Terminate(View);
-					TexturePool.Instance.DiscardAllTextures();
-					AudioSystem.Terminate();
-				}
-			};
+			window.WindowShouldClose += OnShouldClose;
+			window.WillClose += OnWillClose;
 			window.DidResize += (s, e) => {
 				View.UpdateGLContext();
 				HandleResize(s, e);
@@ -281,6 +273,57 @@ namespace Lime
 			View.RenderFrame += HandleRenderFrame;
 			View.FilesDropped += RaiseFilesDropped;
 		}
+
+		private bool OnShouldClose(NSObject sender)
+		{
+			if (Application.MainWindow != this) {
+				return RaiseClosing();
+			}
+			var cancel = OtherWindows.Any(w => w.RaiseClosing());
+			return RaiseClosing() || cancel;
+		}
+
+		private void OnWillClose(object sender, EventArgs args)
+		{
+			if (Application.MainWindow == this) {
+				CloseMainWindow();
+			}
+			else {
+				CloseWindow();
+			}
+		}
+
+		private void CloseMainWindow()
+		{
+			if (closed) {
+				return;
+			}
+			foreach (var window in OtherWindows) {
+				window.CloseWindow();
+			}
+			CloseWindow();
+			NSApplication.SharedApplication.Terminate(View);
+			TexturePool.Instance.DiscardAllTextures();
+			AudioSystem.Terminate();
+		}
+
+		private void CloseWindow()
+		{
+			if (closed) {
+				return;
+			}
+			RaiseClosed();
+			View.Stop();
+			Application.Windows.Remove(this);
+			closed = true;
+		}
+
+		// Reverse by convention - Window.Win behave like this.
+		private IEnumerable<Window> OtherWindows =>
+			Application.Windows
+				.Where(w => w != this)
+				.Cast<Window>()
+				.Reverse();
 
 		public void Invalidate()
 		{
