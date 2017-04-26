@@ -18,23 +18,24 @@ namespace Tangerine.UI.SceneView
 
 		public IEnumerator<object> Task()
 		{
-			const float animationLength = 0.75f;
+			const float animationLength = 0.5f;
 			while (true) {
 				var sv = SceneView.Instance;
 				if (sv.Input.ConsumeKeyPress(MainKey) || sv.Input.ConsumeKeyPress(MultiSelectKey)) {
 					sv.Components.Get<ExpositionComponent>().InProgress = true;
 					using (var exposition = new Exposition(sv.Frame, sv.Input)) {
-						float t = 0; 
+						float t = 0;
+						float animationSpeed = CalcAnimationSpeed(exposition.ItemCount);
 						while (true) {
 							if ((sv.Input.IsKeyPressed(MainKey) || sv.Input.IsKeyPressed(MultiSelectKey)) && !exposition.Closed()) {
 								if (t < animationLength) {
-									t += Lime.Task.Current.Delta;
+									t += Lime.Task.Current.Delta * animationSpeed;
 									if (t >= animationLength) {
 										exposition.RunItemAnimations();
 									}
 								}
 							} else {
-								t -= Lime.Task.Current.Delta * 3f;
+								t -= Lime.Task.Current.Delta * 3f * animationSpeed;
 								if (t < 0) {
 									break;
 								}
@@ -49,6 +50,16 @@ namespace Tangerine.UI.SceneView
 			}
 		}
 
+		static float CalcAnimationSpeed(int itemCount)
+		{
+			if (itemCount < 5) {
+				return 4;
+			} else if (itemCount < 20) {
+				return 2;
+			}
+			return 1;
+		}
+
 		private static float CalcMorphKoeff(float time, float length)
 		{
 			return Mathf.Sin(time.Clamp(0, length) / length * Mathf.HalfPi);
@@ -60,6 +71,8 @@ namespace Tangerine.UI.SceneView
 			readonly Widget canvas;
 			readonly List<Item> items;
 			readonly WidgetFlatFillPresenter blackBackgroundPresenter;
+
+			public int ItemCount => items.Count;
 
 			public Exposition(Widget container, WidgetInput input)
 			{
