@@ -9,6 +9,7 @@ namespace Lime
 		public DefaultTheme()
 		{
 			Decorators[typeof(SimpleText)] = DecorateSimpleText;
+			Decorators[typeof(RichText)] = DecorateRichText;
 		}
 
 		private void DecorateSimpleText(Widget widget)
@@ -21,6 +22,16 @@ namespace Lime
 			text.Localizable = true;
 			text.TrimWhitespaces = true;
 			text.Text = "";
+			text.SpriteListElementHandler = Lime.ShaderPrograms.ColorfulTextShaderProgram.HandleSimpleTextSprite;
+		}
+
+		private void DecorateRichText(Widget widget)
+		{
+			var text = (RichText)widget;
+			text.Localizable = true;
+			text.TrimWhitespaces = true;
+			text.Text = "";
+			text.SpriteListElementHandler = Lime.ShaderPrograms.ColorfulTextShaderProgram.HandleRichTextSprite;
 		}
 	}
 }

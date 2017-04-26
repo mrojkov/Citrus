@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -163,7 +163,7 @@
     <Compile Include="Source\Graphics\OpenGL\IndexBuffer.cs" />
     <Compile Include="Source\Graphics\OpenGL\VertexBuffer.cs" />
     <Compile Include="Source\Graphics\OpenGL\XamarinAdapter.cs" />
-    <Compile Include="Source\Graphics\OpenGL\Shaders.cs" />
+    <Compile Include="Source\Graphics\OpenGL\ShaderPrograms.cs" />
     <Compile Include="Source\Graphics\OpenGL\PlatformRenderer.cs" />
     <Compile Include="Source\Graphics\OpenGL\RenderTexture.cs" />
     <Compile Include="Source\Graphics\OpenGL\Shader.cs" />

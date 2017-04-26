@@ -358,7 +358,7 @@ namespace Lime
 
 		public static void DrawTextLine(
 			IFont font, Vector2 position, string text, Color4 color, float fontHeight, int start, int length, SpriteList list = null,
-			Action<int, Vector2, Vector2> onDrawChar = null, int tag = -1, ITexture texture = null)
+			Action<int, Vector2, Vector2> onDrawChar = null, int tag = -1)
 		{
 			int j = 0;
 			if (list != null) {
@@ -412,7 +412,7 @@ namespace Lime
 				prevChar = fontChar;
 			}
 			if (list != null)
-				list.Add(font, color, fontHeight, chars, tag, texture);
+				list.Add(font, color, fontHeight, chars, tag);
 		}
 
 		public static void DrawTriangleFan(ITexture texture, Vertex[] vertices, int numVertices)
@@ -620,13 +620,16 @@ namespace Lime
 					batchLength == 0 ||
 					batchLength < batchedSprites.Length &&
 					s.Texture1 == batchedSprites[0].Texture1 &&
-					s.Texture2 == batchedSprites[0].Texture2
+					s.Texture2 == batchedSprites[0].Texture2 &&
+					s.ShaderProgram == batchedSprites[0].ShaderProgram
 				) {
 					batchedSprites[batchLength++] = s;
 					continue;
 				}
+				bool customShader = batchedSprites[0].ShaderProgram != null;
 				var batch = CurrentRenderList.GetBatch(
-					batchedSprites[0].Texture1, batchedSprites[0].Texture2, Blending, Shader, CustomShaderProgram, 4 * batchLength, 6 * batchLength);
+					batchedSprites[0].Texture1, batchedSprites[0].Texture2, Blending, customShader ? ShaderId.Custom : Shader,
+					customShader ? batchedSprites[0].ShaderProgram : CustomShaderProgram, 4 * batchLength, 6 * batchLength);
 				int v = batch.LastVertex;
 				int i = batch.LastIndex;
 				batch.VertexBuffer.Dirty = true;

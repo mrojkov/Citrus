@@ -20,20 +20,8 @@ namespace Lime
 		private TextOverflowMode overflowMode;
 		private bool wordSplitAllowed;
 		private TextProcessorDelegate textProcessor;
-		private ITexture texture;
-
-		[YuzuMember]
-		public override sealed ITexture Texture
-		{
-			get { return texture; }
-			set
-			{
-				if (texture != value) {
-					texture = value;
-					Window.Current?.Invalidate();
-				}
-			}
-		}
+		public Action<SimpleText, Sprite> SpriteListElementHandler;
+		public ShaderProgram ShaderProgram;
 
 		public event TextProcessorDelegate TextProcessor
 		{
@@ -247,13 +235,23 @@ namespace Lime
 			Invalidate();
 		}
 
+		private void InvokeSpriteHandler(Sprite sprite)
+		{
+			SpriteListElementHandler?.Invoke(this, sprite);
+		}
+
+		protected override void OnTagChanged()
+		{
+			ShaderProgram = null;
+		}
+
 		public override void Render()
 		{
 			PrepareSpriteListAndSyncCaret();
 			Renderer.Transform1 = LocalToWorldTransform;
 			Renderer.Blending = GlobalBlending;
 			Renderer.Shader = GlobalShader;
-			spriteList.Render(GlobalColor * textColor);
+			spriteList.Render(GlobalColor * textColor, InvokeSpriteHandler);
 		}
 
 		void IText.SyncCaretPosition()
@@ -358,7 +356,7 @@ namespace Lime
 				pos.X = CalcXByAlignment(lineWidth);
 				if (spriteList != null) {
 					Renderer.DrawTextLine(
-						Font, pos, line, Color4.White, FontHeight, 0, line.Length, spriteList, caret.Sync, -1, Texture);
+						Font, pos, line, Color4.White, FontHeight, 0, line.Length, spriteList, caret.Sync, -1);
 				}
 				Rectangle lineRect = new Rectangle(pos.X, pos.Y, pos.X + lineWidth, pos.Y + FontHeight);
 				if (lastLine) {

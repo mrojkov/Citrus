@@ -129,7 +129,6 @@
     <Compile Include="Source\Application\OpenTK.Xamarin.iOS\Utilities.iPhone.cs" />
     <Compile Include="Source\Graphics\OpenGL\Shader.cs" />
     <Compile Include="Source\Graphics\OpenGL\ShaderProgram.cs" />
-    <Compile Include="Source\Graphics\OpenGL\Shaders.cs" />
     <Compile Include="Source\Graphics\OpenGL\XamarinAdapter.cs" />
     <Compile Include="Source\Widgets\Animation\AnimationUtils.cs" />
     <Compile Include="Source\Widgets\Animation\Animator.cs" />
@@ -347,6 +346,7 @@
     <Compile Include="Source\Widgets\NodeComponentCollection.cs" />
     <Compile Include="Source\ComponentCollection.cs" />
     <Compile Include="Source\Widgets\3D\SplineGear3D.cs" />
+    <Compile Include="Source\Graphics\OpenGL\ShaderPrograms.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

@@ -15,6 +15,7 @@ namespace Lime
 		public Vector2 UV1;
 		public Vector2 Position;
 		public Vector2 Size;
+		public ShaderProgram ShaderProgram;
 	}
 
 	public class SpriteList
@@ -61,7 +62,6 @@ namespace Lime
 			public CharDef[] CharDefs;
 			private static Sprite[] buffer = new Sprite[50];
 			public static int Index = 0;
-			public ITexture Texture;
 
 			public void AddToList(List<Sprite> sprites)
 			{
@@ -76,12 +76,13 @@ namespace Lime
 					Index++;
 					s.Tag = Tag;
 					s.Texture1 = ch.Texture;
-					s.Texture2 = Texture;
+					s.Texture2 = null;
 					s.Color = Color;
 					s.Position = cd.Position;
 					s.Size = cd.Size(FontHeight);
 					s.UV0 = ch.UV0;
 					s.UV1 = ch.UV1;
+					s.ShaderProgram = null;
 					sprites.Add(s);
 				}
 			}
@@ -117,7 +118,7 @@ namespace Lime
 			});
 		}
 
-		public void Add(IFont font, Color4 color, float fontHeight, CharDef[] charDefs, int tag, ITexture texture)
+		public void Add(IFont font, Color4 color, float fontHeight, CharDef[] charDefs, int tag)
 		{
 			items.Add(new TextSprite {
 				Font = font,
@@ -125,7 +126,6 @@ namespace Lime
 				FontHeight = fontHeight,
 				CharDefs = charDefs,
 				Tag = tag,
-				Texture = texture,
 			});
 		}
 
@@ -141,6 +141,19 @@ namespace Lime
 			TextSprite.Index = 0;
 			foreach (var w in items) {
 				w.AddToList(sprites);
+			}
+			Renderer.DrawSpriteList(sprites, color);
+			sprites.Clear();
+		}
+
+		public void Render(Color4 color, Action<Sprite> spritePostProcessor)
+		{
+			TextSprite.Index = 0;
+			foreach (var w in items) {
+				w.AddToList(sprites);
+			}
+			foreach (var s in sprites) {
+				spritePostProcessor(s);
 			}
 			Renderer.DrawSpriteList(sprites, color);
 			sprites.Clear();

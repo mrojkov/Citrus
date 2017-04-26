@@ -12,8 +12,9 @@ namespace Lime
 		private HAlignment hAlignment;
 		private VAlignment vAlignment;
 		private TextOverflowMode overflowMode;
-		private SpriteList spriteList;
-		private TextRenderer renderer;
+		public SpriteList spriteList;
+		internal TextRenderer Renderer;
+		public Action<RichText, Sprite> SpriteListElementHandler = null;
 
 		[YuzuMember]
 		public override string Text
@@ -85,6 +86,7 @@ namespace Lime
 		public RichText()
 		{
 			Localizable = true;
+			Theme.Current.Apply(this);
 		}
 
 		void IText.Submit()
@@ -117,13 +119,18 @@ namespace Lime
 			Invalidate();
 		}
 
+		private void InvokeSpriteHandler(Sprite sprite)
+		{
+			SpriteListElementHandler?.Invoke(this, sprite);
+		}
+
 		public override void Render()
 		{
 			EnsureSpriteList();
-			Renderer.Transform1 = LocalToWorldTransform;
-			Renderer.Blending = GlobalBlending;
-			Renderer.Shader = GlobalShader;
-			spriteList.Render(GlobalColor);
+			Lime.Renderer.Transform1 = LocalToWorldTransform;
+			Lime.Renderer.Blending = GlobalBlending;
+			Lime.Renderer.Shader = GlobalShader;
+			spriteList.Render(GlobalColor, InvokeSpriteHandler);
 		}
 
 		private void EnsureSpriteList()
@@ -160,27 +167,27 @@ namespace Lime
 
 		private TextRenderer PrepareRenderer()
 		{
-			if (renderer != null)
-				return renderer;
+			if (Renderer != null)
+				return Renderer;
 			ParseText();
-			renderer = new TextRenderer(OverflowMode, WordSplitAllowed);
+			Renderer = new TextRenderer(OverflowMode, WordSplitAllowed);
 			// Setup default style(take first one from node list or TextStyle.Default).
 			TextStyle defaultStyle = null;
 			if (Nodes.Count > 0) {
 				defaultStyle = Nodes[0] as TextStyle;
 			}
-			renderer.AddStyle(defaultStyle ?? TextStyle.Default);
+			Renderer.AddStyle(defaultStyle ?? TextStyle.Default);
 			// Fill up style list.
 			foreach (var styleName in parser.Styles) {
 				var style = Nodes.TryFind(styleName) as TextStyle;
-				renderer.AddStyle(style ?? TextStyle.Default);
+				Renderer.AddStyle(style ?? TextStyle.Default);
 			}
 			// Add text fragments.
 			foreach (var frag in parser.Fragments) {
 				// Warning! Using style + 1, because -1 is a default style.
-				renderer.AddFragment(frag.Text, frag.Style + 1, frag.IsNbsp);
+				Renderer.AddFragment(frag.Text, frag.Style + 1, frag.IsNbsp);
 			}
-			return renderer;
+			return Renderer;
 		}
 
 		public void RemoveUnusedStyles()
@@ -188,7 +195,7 @@ namespace Lime
 			PrepareRenderer();
 			for (int i = 1; i < Nodes.Count; ) {
 				var node = Nodes[i];
-				if (node is TextStyle && !renderer.HasStyle(node as TextStyle))
+				if (node is TextStyle && !Renderer.HasStyle(node as TextStyle))
 					Nodes.RemoveAt(i);
 				else
 					++i;
@@ -212,7 +219,7 @@ namespace Lime
 		{
 			spriteList = null;
 			parser = null;
-			renderer = null;
+			Renderer = null;
 			InvalidateParentConstraintsAndArrangement();
 			Window.Current?.Invalidate();
 		}

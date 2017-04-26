@@ -5,12 +5,11 @@ using System.Text;
 
 namespace Lime.Text
 {
-
 	class TextRenderer
 	{
 		private readonly List<Word> words = new List<Word>();
 		private readonly List<Word> fittedWords = new List<Word>();
-		private readonly List<TextStyle> styles = new List<TextStyle>();
+		public readonly List<TextStyle> Styles = new List<TextStyle>();
 		private readonly List<string> texts = new List<string>();
 
 		private float scaleFactor = 1.0f;
@@ -94,22 +93,22 @@ namespace Lime.Text
 
 		public void AddStyle(TextStyle style)
 		{
-			styles.Add(style);
+			Styles.Add(style);
 		}
 
 		public bool HasStyle(TextStyle style)
 		{
-			return styles.Contains(style);
+			return Styles.Contains(style);
 		}
 
 		private bool IsBullet(Word word)
 		{
-			return word.IsTagBegin && styles[word.Style].ImageUsage == TextStyle.ImageUsageEnum.Bullet;
+			return word.IsTagBegin && Styles[word.Style].ImageUsage == TextStyle.ImageUsageEnum.Bullet;
 		}
 
 		float CalcWordWidth(Word word)
 		{
-			var style = styles[word.Style];
+			var style = Styles[word.Style];
 			Vector2 size = Renderer.MeasureTextLine(
 				style.Font, texts[word.TextIndex], ScaleSize(style.Size), word.Start, word.Length);
 			return size.X + (IsBullet(word) ? ScaleSize(style.ImageSize.X) : 0);
@@ -138,7 +137,7 @@ namespace Lime.Text
 				float totalWidth = 0;
 				for (int j = 0; j < count; j++) {
 					var word = fittedWords[b + j];
-					var style = styles[word.Style];
+					var style = Styles[word.Style];
 					maxHeight = Math.Max(maxHeight, ScaleSize(style.Size + style.SpaceAfter));
 					if (word.IsTagBegin) {
 						maxHeight = Math.Max(maxHeight, ScaleSize(style.ImageSize.Y + style.SpaceAfter));
@@ -160,7 +159,7 @@ namespace Lime.Text
 				for (int j = 0; j < count; j++) {
 					var word = fittedWords[b + j];
 					var t = texts[word.TextIndex];
-					TextStyle style = styles[word.Style];
+					TextStyle style = Styles[word.Style];
 					Vector2 position = new Vector2(word.X, y) + offset;
 					if (IsBullet(word) && style.ImageTexture != null) {
 						var sz = style.ImageSize * scaleFactor;
@@ -187,7 +186,7 @@ namespace Lime.Text
 				// Draw overlays
 				for (int j = 0; j < count; j++) {
 					var word = fittedWords[b + j];
-					TextStyle style = styles[word.Style];
+					TextStyle style = Styles[word.Style];
 					if (style.ImageUsage == TextStyle.ImageUsageEnum.Overlay) {
 						int k = j + 1;
 						for (; k < count; k++) {
@@ -250,7 +249,7 @@ namespace Lime.Text
 			float lineHeight = 0;
 			int c = 0;
 			foreach (var word in fittedWords) {
-				var style = styles[word.Style];
+				var style = Styles[word.Style];
 				if (word.LineBreak && c > 0) {
 					if (overflowMode == TextOverflowMode.Ellipsis && totalHeight + lineHeight > maxHeight) {
 						ClipLastLineWithEllipsis(lines, fittedWords, maxWidth);
@@ -288,12 +287,12 @@ namespace Lime.Text
 			int lastWordInLastLine = firstWordInLastLineIndex + lines[lines.Count - 1] - 1;
 			while (true) {
 				var word = fittedWords[lastWordInLastLine];
-				var style = styles[word.Style];
+				var style = Styles[word.Style];
 				var font = style.Font;
 				var t = texts[word.TextIndex];
 				float dotsWidth = Renderer.MeasureTextLine(font, "...", ScaleSize(style.Size)).X;
 				if (
-					lastWordInLastLine > firstWordInLastLineIndex 
+					lastWordInLastLine > firstWordInLastLineIndex
 					&& (
 						word.X + Renderer.MeasureTextLine(
 							font, t.Substring(word.Start, 1), ScaleSize(style.Size)).X + dotsWidth > maxWidth
@@ -376,7 +375,7 @@ namespace Lime.Text
 			int max = word.Length;
 			int mid = 0;
 			bool isLineLonger = false;
-			var style = styles[word.Style];
+			var style = Styles[word.Style];
 			var font = style.Font;
 			var t = texts[word.TextIndex];
 			do {
@@ -396,7 +395,7 @@ namespace Lime.Text
 
 		private void ClipWordWithEllipsis(Word word, float maxWidth)
 		{
-			var style = styles[word.Style];
+			var style = Styles[word.Style];
 			float dotsWidth = Renderer.MeasureTextLine(style.Font, "...", ScaleSize(style.Size)).X;
 			while (word.Length > 1 && word.X + word.Width + dotsWidth > maxWidth) {
 				word.Length--;

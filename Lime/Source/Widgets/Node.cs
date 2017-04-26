@@ -278,7 +278,20 @@ namespace Lime
 		/// Custom data. Can be set via Tangerine (this way it will contain path to external scene).
 		/// </summary>
 		[YuzuMember]
-		public string Tag { get; set; }
+		public string Tag
+		{
+			get { return tag; }
+			set
+			{
+				if (tag == value) {
+					return;
+				}
+				tag = value;
+				OnTagChanged();
+			}
+		}
+		private string tag;
+		protected virtual void OnTagChanged() { }
 
 		[YuzuMember]
 		[YuzuSerializeIf(nameof(NeedSerializeAnimations))]

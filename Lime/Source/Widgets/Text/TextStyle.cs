@@ -16,6 +16,7 @@ namespace Lime
 		private Vector2 shadowOffset;
 		private Color4 textColor;
 		private Color4 shadowColor;
+		public ShaderProgram ShaderProgram;
 
 		public static TextStyle Default = new TextStyle();
 
@@ -28,7 +29,7 @@ namespace Lime
 		[YuzuMember]
 		public ITexture ImageTexture {
 			get { return imageTexture; }
-			set 
+			set
 			{
 				if (imageTexture != value) {
 					imageTexture = value;
@@ -177,5 +178,10 @@ namespace Lime
 		}
 
 		void InvalidateRichText() => (Parent as RichText)?.Invalidate();
+
+		protected override void OnTagChanged()
+		{
+			ShaderProgram = null;
+		}
 	}
 }
