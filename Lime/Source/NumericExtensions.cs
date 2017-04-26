@@ -97,6 +97,11 @@ namespace Lime
 			return Mathf.Clamp(value, min, max);
 		}
 
+		public static double Clamp(this double value, double min, double max)
+		{
+			return Mathf.Clamp(value, min, max);
+		}
+
 		public static int Truncate(this float x)
 		{
 			return (int)Math.Truncate(x);
@@ -105,6 +110,11 @@ namespace Lime
 		public static int Round(this float x)
 		{
 			return (int)(x + ((x > 0) ? 0.5f : -0.5f));
+		}
+
+		public static int Round(this double x)
+		{
+			return (int)(x + ((x > 0) ? 0.5d : -0.5d));
 		}
 
 		public static int Floor(this float x)

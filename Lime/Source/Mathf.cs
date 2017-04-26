@@ -174,6 +174,11 @@ namespace Lime
 			return rng.RandomFloat() * (max - min) + min;
 		}
 
+		public static double RandomDouble(this System.Random rng, double min, double max)
+		{
+			return rng.NextDouble() * (max - min) + min;
+		}
+
 		/// <summary>
 		/// Returns a random floating-point number that is within a specified range.
 		/// </summary>
@@ -184,6 +189,11 @@ namespace Lime
 		public static float RandomFloat(float min, float max)
 		{
 			return RandomGenerator.RandomFloat(min, max);
+		}
+
+		public static double RandomDouble(double min, double max)
+		{
+			return RandomGenerator.RandomDouble(min, max);
 		}
 
 		public static bool RandomBool(this System.Random rng)
@@ -340,6 +350,11 @@ namespace Lime
 		}
 
 		public static int Clamp(int value, int min, int max)
+		{
+			return (value < min) ? min : (value > max ? max : value);
+		}
+
+		public static double Clamp(double value, double min, double max)
 		{
 			return (value < min) ? min : (value > max ? max : value);
 		}
