@@ -77,6 +77,7 @@ namespace Tangerine.UI.Timeline
 			Core.Operations.ClearRowSelection.Perform();
 			var input = grid.RootWidget.Input;
 			grid.OnPostRender += RenderSelectionRect;
+			var showMeasuredFrameDistance = false;
 			while (input.IsMousePressed()) {
 				rect.A = initialCell;
 				rect.B = grid.CellUnderMouse();
@@ -91,9 +92,14 @@ namespace Tangerine.UI.Timeline
 					rect.A.Y++;
 				}
 				rect = rect.Normalized;
+				showMeasuredFrameDistance |= rect.Width != 1;
+				if (showMeasuredFrameDistance) {
+					Timeline.Instance.Ruler.MeasuredFrameDistance = rect.Width;
+				}
 				Window.Current.Invalidate();
 				yield return null;
 			}
+			Timeline.Instance.Ruler.MeasuredFrameDistance = 0;
 			grid.OnPostRender -= RenderSelectionRect;
 			for (var r = rect.A.Y; r < rect.B.Y; r++) {
 				Operations.SelectGridSpan.Perform(r, new GridSpan(rect.A.X, rect.B.X));

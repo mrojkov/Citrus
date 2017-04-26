@@ -51,7 +51,10 @@ namespace Tangerine.UI.Timeline
 		{
 			var t = new SimpleText { Padding = new Thickness(4, 0) };
 			Action f = () => {
-				t.Text = $"{Document.Current.Container.AnimationFrame} : {Timeline.Instance.Ruler.MeasuredFrameDistance:+#;-#;0}";
+				var distance = Timeline.Instance.Ruler.MeasuredFrameDistance;
+				t.Text = (distance == 0) ? 
+					$"Col : {Document.Current.Container.AnimationFrame}" :
+					$"Col : {Document.Current.Container.AnimationFrame} {Timeline.Instance.Ruler.MeasuredFrameDistance:+#;-#;0}";
 			};
 			t.AddChangeWatcher(() => Document.Current.Container.AnimationFrame, _ => f());
 			t.AddChangeWatcher(() => Timeline.Instance.Ruler.MeasuredFrameDistance, _ => f());
