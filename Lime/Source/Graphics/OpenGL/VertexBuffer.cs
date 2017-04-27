@@ -23,7 +23,7 @@ namespace Lime
 	public class VertexBuffer<T> : IVertexBuffer<T>, IGLVertexBuffer, IGLObject where T: struct
 	{
 		static AttributeDescription[] descriptions = GetDescriptions().ToArray();
-#if WIN
+#if WIN || MONOMAC
 		static int stride = Marshal.SizeOf(typeof(T));
 #else
 		static int stride = Marshal.SizeOf<T>();
