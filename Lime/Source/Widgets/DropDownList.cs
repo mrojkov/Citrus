@@ -78,7 +78,7 @@ namespace Lime
 					yield return ShowDropDownListTask();
 				}
 				if (
-					DoesHandleSpacebar() && Input.ConsumeKeyPress(Key.Space) ||
+					ShouldHandleSpacebar() && Input.ConsumeKeyPress(Key.Space) ||
 					Input.ConsumeKeyPress(Key.Up) ||
 					Input.ConsumeKeyPress(Key.Down))
 				{
@@ -90,7 +90,7 @@ namespace Lime
 			}
 		}
 		
-		protected abstract bool DoesHandleSpacebar();
+		protected abstract bool ShouldHandleSpacebar();
 
 		IEnumerator<object> ShowDropDownListTask()
 		{
@@ -159,7 +159,7 @@ namespace Lime
 			Theme.Current.Apply(this);
 		}
 
-		protected override bool DoesHandleSpacebar() => true;
+		protected override bool ShouldHandleSpacebar() => true;
 	}
 
 	public class ComboBox : CommonDropDownList
@@ -169,6 +169,6 @@ namespace Lime
 			Theme.Current.Apply(this);
 		}
 		
-		protected override bool DoesHandleSpacebar() => false;
+		protected override bool ShouldHandleSpacebar() => false;
 	}
 }
