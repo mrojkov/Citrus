@@ -155,7 +155,10 @@ namespace Tangerine.UI
 					if (p.WindowWidget == null) {
 						var window = new Window(new WindowOptions { Title = p.Title, FixedSize = false });
 						SetDropHandler(window);
-						window.Closing += () => {
+						window.Closing += reason => {
+							if (reason == CloseReason.MainWindowClosing) {
+								return true;
+							}
 							if (!p.Placement.Docked) {
 								p.Placement.Hidden = true;
 							}
