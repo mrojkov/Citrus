@@ -26,7 +26,10 @@ namespace Tangerine
 			Application.IsTangerine = true;
 			Serialization.DeserializerBuilders.Insert(0, DeserializeHotStudioAssets);
 			Widget.DefaultWidgetSize = Vector2.Zero;
-			Theme.Current = new DesktopTheme();
+
+			UserPreferences.Initialize();
+			SetColorTheme(UserPreferences.Instance.Theme);
+
 			LoadFont();
 
 			PadsMenu = new Menu();
@@ -39,6 +42,7 @@ namespace Tangerine
 				UserPreferences.Instance.DockState = DockManager.Instance.ExportState();
 				UserPreferences.Instance.Save();
 			};
+
 			var timelinePanel = new DockPanel("Timeline");
 			var inspectorPanel = new DockPanel("Inspector");
 			var searchPanel = new DockPanel("Search");
@@ -50,8 +54,6 @@ namespace Tangerine
 			DockManagerInitialState = dockManager.ExportState();
 			var documentViewContainer = InitializeDocumentArea(dockManager);
 
-			UserPreferences.Initialize();
-			SetColorTheme(UserPreferences.Instance.Theme);
 			dockManager.ImportState(UserPreferences.Instance.DockState);
 			Document.Closing += doc => {
 				var alert = new AlertDialog($"Save the changes to document '{doc.Path}' before closing?", "Yes", "No", "Cancel");
@@ -113,6 +115,7 @@ namespace Tangerine
 
 		void SetColorTheme(ColorThemeEnum theme)
 		{
+			Theme.Current = new DesktopTheme();
 			DesktopTheme.Colors = theme == ColorThemeEnum.Light ? DesktopTheme.ColorTheme.CreateLightTheme() : DesktopTheme.ColorTheme.CreateDarkTheme();
 			ColorTheme.Current = theme == ColorThemeEnum.Light ? ColorTheme.CreateLightTheme() : ColorTheme.CreateDarkTheme();
 		}
