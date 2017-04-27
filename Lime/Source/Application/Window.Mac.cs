@@ -278,10 +278,10 @@ namespace Lime
 		private bool OnShouldClose(NSObject sender)
 		{
 			if (Application.MainWindow != this) {
-				return RaiseClosing();
+				return RaiseClosing(CloseReason.UserClosing);
 			}
-			var cancel = OtherWindows.Any(w => w.RaiseClosing());
-			return RaiseClosing() || cancel;
+			var cancel = OtherWindows.Any(w => w.RaiseClosing(CloseReason.MainWindowClosing));
+			return RaiseClosing(CloseReason.UserClosing) || cancel;
 		}
 
 		private void OnWillClose(object sender, EventArgs args)
