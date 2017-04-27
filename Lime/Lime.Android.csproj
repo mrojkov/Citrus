@@ -344,7 +344,6 @@
     <Compile Include="Source\Widgets\NodeComponentCollection.cs" />
     <Compile Include="Source\Widgets\3D\SplineGear3D.cs" />
     <Compile Include="Source\Graphics\OpenGL\ShaderPrograms.cs" />
-    <Compile Include="Source\Application\CloseReason.cs" /> 
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Android.csproj">

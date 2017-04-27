@@ -52,6 +52,25 @@ namespace Lime
 	}
 
 	/// <summary>
+	/// Defines the reason for the window closing.
+	/// </summary>
+	public enum CloseReason
+	{
+		/// <summary>
+		/// The cause if the closure was not defined or could not be determined.
+		/// </summary>
+		Unknown,
+		/// <summary>
+		/// The user has closed the window from UI.
+		/// </summary>
+		UserClosing,
+		/// <summary>
+		/// A window is closing because main window is closing.
+		/// </summary>
+		MainWindowClosing
+	}
+
+	/// <summary>
 	/// Defines the interface for a window.
 	/// </summary>
 	public interface IWindow
