@@ -280,6 +280,8 @@ namespace Lime
 			if (Application.MainWindow != this) {
 				return RaiseClosing(CloseReason.UserClosing);
 			}
+			// This calling sequence is correct - Window.Win goes to first child
+			// that requests cancelling and then calls Closing of main window itself.
 			var cancel = OtherWindows.Any(w => w.RaiseClosing(CloseReason.MainWindowClosing));
 			return RaiseClosing(CloseReason.UserClosing) || cancel;
 		}
