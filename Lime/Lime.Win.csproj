@@ -96,6 +96,7 @@
     <Compile Include="Source\Application\Clipboard\Clipboard.iOS.cs" />
     <Compile Include="Source\Application\Clipboard\Clipboard.Mac.cs" />
     <Compile Include="Source\Application\Clipboard\Clipboard.Win.cs" />
+    <Compile Include="Source\Application\CloseReason.cs" />
     <Compile Include="Source\Application\CommonWindow.cs" />
     <Compile Include="Source\Application\Display\Display.Android.cs" />
     <Compile Include="Source\Application\Display\Display.iOS.cs" />
