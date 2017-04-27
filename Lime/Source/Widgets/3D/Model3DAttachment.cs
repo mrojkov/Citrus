@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Lime;
 using Yuzu;
 
 namespace Lime
@@ -10,7 +9,8 @@ namespace Lime
 	{
 		public const string DefaultAnimationName = "Default";
 
-		public List<Animation> Animations = new List<Animation>();
+		public readonly List<Animation> Animations = new List<Animation>();
+		public readonly List<MaterialEffect> MaterialEffects = new List<MaterialEffect>();
 
 		public class Animation
 		{
@@ -22,9 +22,17 @@ namespace Lime
 			public List<string> IgnoredNodes = new List<string>();
 		}
 
+		public class MaterialEffect
+		{
+			public string Name;
+			public string MaterialName;
+			public string Path;
+		}
+
 		public void Apply(Node3D model)
 		{
 			ProcessAnimations(model);
+			ProcessMaterialEffects(model);
 		}
 
 		private void ProcessAnimations(Node3D model)
@@ -35,7 +43,7 @@ namespace Lime
 			var srcAnimation = model.DefaultAnimation;
 			foreach (var animationData in Animations) {
 				var animation = srcAnimation;
-				if (animationData.Name != Model3DAttachment.DefaultAnimationName) {
+				if (animationData.Name != DefaultAnimationName) {
 					animation = new Lime.Animation {
 						Id = animationData.Name
 					};
@@ -47,6 +55,23 @@ namespace Lime
 				foreach (var markerData in animationData.Markers) {
 					animation.Markers.AddOrdered(markerData.Clone());
 				}
+			}
+		}
+
+		private void ProcessMaterialEffects(Node3D model)
+		{
+			var fxEngine = new MaterialEffectEngine();
+			foreach (var fxData in MaterialEffects) {
+				fxEngine.Register(fxData.Name, fxData.MaterialName);
+				var fx = new MaterialEffectWidget(fxData.Name, fxData.Path);
+				var fxAdapter = new WidgetAdapter3D {
+					Widget = fx,
+				};
+				model.PushNode(fxAdapter);
+				model.Animations.Add(new Lime.Animation {
+					Id = fxData.Name,
+					AnimationEngine = fxEngine
+				});
 			}
 		}
 
@@ -225,15 +250,127 @@ namespace Lime
 
 					attachment.Animations.Add(animation);
 				}
+
+				if (modelAttachmentFormat.MaterialEffects != null) {
+					foreach (var materialEffectFormat in modelAttachmentFormat.MaterialEffects) {
+						attachment.MaterialEffects.Add(new Model3DAttachment.MaterialEffect() {
+							Name = materialEffectFormat.Key,
+							MaterialName = materialEffectFormat.Value.MaterialName,
+							Path = FixPath(modelPath, materialEffectFormat.Value.Path)
+						});
+					}
+				}
+
 				return attachment;
 			} catch (System.Exception e) {
 				throw new System.Exception(modelPath + ": " + e.Message, e);
 			}
 		}
 
-		private int FixFrame(int frame, double fps = 30)
+		private static string FixPath(string modelPath, string path)
+		{
+			var baseDir = Path.GetDirectoryName(modelPath);
+			return AssetPath.CorrectSlashes(Path.Combine(AssetPath.CorrectSlashes(baseDir), AssetPath.CorrectSlashes(path)));
+		}
+
+		private static int FixFrame(int frame, double fps = 30)
 		{
 			return AnimationUtils.SecondsToFrames(frame / fps);
+		}
+	}
+
+
+	public class MaterialEffectEngine : DefaultAnimationEngine
+	{
+		private readonly Dictionary<string, string> materialNames = new Dictionary<string, string>();
+
+		public void Register(string effectName, string materialName)
+		{
+			materialNames.Add(effectName, materialName);
+		}
+
+		private MaterialEffectWidget FindEffect(Animation animation)
+		{
+			return (MaterialEffectWidget)animation.Owner.FindNode(animation.Id);
+		}
+
+		public override void AdvanceAnimation(Animation animation, float delta)
+		{
+			base.AdvanceAnimation(FindEffect(animation).Animation, delta);
+		}
+
+		public override void ApplyAnimators(Animation animation, bool invokeTriggers)
+		{
+			base.ApplyAnimators(FindEffect(animation).Animation, invokeTriggers);
+		}
+
+		public override bool TryRunAnimation(Animation animation, string markerId)
+		{
+			var fx = FindEffect(animation);
+			if (base.TryRunAnimation(fx.Animation, markerId)) {
+				var snapshot = fx.GetSnapshot();
+				foreach (var material in GetMaterialsForAnimation(animation)) {
+					material.DiffuseTexture = snapshot;
+				}
+				return true;
+			}
+			return false;
+		}
+
+		private IEnumerable<CommonMaterial> GetMaterialsForAnimation(Animation animation)
+		{
+			return GetMaterials(animation.Owner, materialNames[animation.Id]);
+		}
+
+		private IEnumerable<CommonMaterial> GetMaterials(Node model, string name)
+		{
+			return model
+				.Descendants
+				.OfType<Mesh3D>()
+				.SelectMany(i => i.Submeshes)
+				.Select(i => i.Material)
+				.Cast<CommonMaterial>()
+				.Where(i => i.Name == name);
+		}
+	}
+
+	public class MaterialEffectWidget : Widget
+	{
+		private static readonly RenderChain renderChain = new RenderChain();
+		private ITexture snapshot;
+
+		public Widget Scene { get; private set; }
+		public Animation Animation => Scene.DefaultAnimation;
+
+		public MaterialEffectWidget(string id, string path)
+		{
+			Id = id;
+			Scene = new Frame(path);
+		}
+
+		protected override void SelfUpdate(float delta)
+		{
+			Scene.Update(delta);
+		}
+
+		public override void Render()
+		{
+			if (Animation.IsRunning) {
+				Scene.RenderToTexture(GetSnapshot(), renderChain);
+				renderChain.Clear();
+			}
+		}
+
+		public ITexture GetSnapshot()
+		{
+			return snapshot ?? (snapshot = new RenderTexture((int)Scene.Width, (int)Scene.Height));
+		}
+
+		public override Node Clone()
+		{
+			var clone = (MaterialEffectWidget)base.Clone();
+			clone.Scene = Scene.Clone<Widget>();
+			return clone;
 		}
 	}
 }
