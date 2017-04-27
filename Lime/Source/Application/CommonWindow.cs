@@ -6,13 +6,13 @@ namespace Lime
 	{
 		public event Action Activated;
 		public event Action Deactivated;
-		public event Func<bool> Closing;
+		public event ClosingDelegate Closing;
 		public event Action Closed;
 		public event Action Moved;
 		public event ResizeDelegate Resized;
-		public event Action<float> Updating;
+		public event UpdatingDelegate Updating;
 		public event Action Rendering;
-		public event Action<bool> VisibleChanging;
+		public event VisibleChangingDelegate VisibleChanging;
 		public object Tag { get; set; }
 
 		public static IWindow Current { get; private set; }
@@ -76,11 +76,11 @@ namespace Lime
 			}
 		}
 
-		protected bool RaiseClosing()
+		protected bool RaiseClosing(CloseReason reason)
 		{
 			using (Context.Activate().Scoped()) {
 				if (Closing != null) {
-					return Closing();
+					return Closing(reason);
 				}
 			}
 			return true;

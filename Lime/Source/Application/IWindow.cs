@@ -10,6 +10,25 @@ namespace Lime
 	public delegate void ResizeDelegate(bool deviceRotated);
 
 	/// <summary>
+	/// Delegate used by <see cref="IWindow.Closing"/> event.
+	/// </summary>
+	/// <param name="reason">Defines the reason of window closing.</param>
+	/// <returns>Whether to cancel closing or not.</returns>
+	public delegate bool ClosingDelegate(CloseReason reason);
+
+	/// <summary>
+	/// Delegate used by <see cref="IWindow.Updating"/> event.
+	/// </summary>
+	/// <param name="delta">Time delta since last update.</param>
+	public delegate void UpdatingDelegate(float delta);
+
+	/// <summary>
+	/// Delegate used by <see cref="IWindow.VisibleChanging"/> event.
+	/// </summary>
+	/// <param name="value">New value of <see cref="IWindow.Visible"/>.</param>
+	public delegate void VisibleChangingDelegate(bool value);
+
+	/// <summary>
 	/// Enumerates available window states.
 	/// </summary>
 	public enum WindowState
@@ -138,12 +157,12 @@ namespace Lime
 		/// Occurs when the window is about to close.
 		/// Returns false to cancel closing.
 		/// </summary>
-		event Func<bool> Closing;
+		event ClosingDelegate Closing;
 
 		/// <summary>
 		/// Occurs when the window is about to show or hide.
 		/// </summary>
-		event Action<bool> VisibleChanging;
+		event VisibleChangingDelegate VisibleChanging;
 
 		/// <summary>
 		/// Occurs after the window has closed.
@@ -163,7 +182,7 @@ namespace Lime
 		/// <summary>
 		/// Occurs when it is time to update a frame.
 		/// </summary>
-		event Action<float> Updating;
+		event UpdatingDelegate Updating;
 
 		/// <summary>
 		/// Occurs when it is time to render a frame.

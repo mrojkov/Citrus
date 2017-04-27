@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using OpenTK.Graphics;
+using WinFormsCloseReason = System.Windows.Forms.CloseReason;
 
 namespace Lime
 {
@@ -275,7 +276,7 @@ namespace Lime
 			}
 			if (Application.MainWindow == null) {
 				Application.MainWindow = this;
-				Closing += Application.DoExiting;
+				Closing += reason => Application.DoExiting();
 				Closed += Application.DoExited;
 			} else {
 				Form.Owner = Application.MainWindow.Form;
@@ -325,7 +326,25 @@ namespace Lime
 
 		private void OnClosing(object sender, FormClosingEventArgs e)
 		{
-			e.Cancel = !RaiseClosing();
+			CloseReason reason;
+			switch (e.CloseReason) {
+				case WinFormsCloseReason.None:
+					reason = CloseReason.Unknown;
+					break;
+				case WinFormsCloseReason.WindowsShutDown:
+				case WinFormsCloseReason.MdiFormClosing:
+				case WinFormsCloseReason.TaskManagerClosing:
+				case WinFormsCloseReason.FormOwnerClosing:
+				case WinFormsCloseReason.ApplicationExitCall:
+					reason = CloseReason.MainWindowClosing;
+					break;
+				case WinFormsCloseReason.UserClosing:
+					reason = CloseReason.UserClosing;
+					break;
+				default:
+					throw new ArgumentOutOfRangeException();
+			}
+			e.Cancel = !RaiseClosing(reason);
 		}
 
 		private void OnMove(object sender, EventArgs e)
