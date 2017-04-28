@@ -309,14 +309,17 @@ namespace Orange
 				}
 				if (Platform == TargetPlatform.Unity) {
 					AssetBundle.ImportFile(srcPath, dstPath, reserve: 0, sourceExtension: ".png");
-				} else {
-					Gdk.Pixbuf pixbuf = null;
-					try {
-						pixbuf = new Gdk.Pixbuf(srcPath);
-						DownscaleTextureIfNeeded(ref pixbuf, srcPath, rules);
-						ImportTexture(dstPath, pixbuf, rules);
-					} finally {
-						pixbuf.Dispose();
+				}
+				else {
+					using (var stream = File.OpenRead(srcPath)) {
+						var bitmap = new Bitmap(stream);
+						if (ShouldDownscale(bitmap, rules)) {
+							var scaledBitmap = DownscaleTexture(bitmap, srcPath, rules);
+							bitmap.Dispose();
+							bitmap = scaledBitmap;
+						}
+						ImportTexture(dstPath, bitmap, rules);
+						bitmap.Dispose();
 					}
 				}
 				return true;
@@ -387,7 +390,7 @@ namespace Orange
 		public class AtlasItem
 		{
 			public string Path;
-			public Gdk.Pixbuf Pixbuf;
+			public Bitmap Bitmap;
 			public IntRectangle AtlasRect;
 			public bool Allocated;
 			public CookingRules CookingRules;
@@ -423,13 +426,19 @@ namespace Orange
 				var cookingRules = cookingRulesMap[fileInfo.Path];
 				if (cookingRules.TextureAtlas == atlasChain) {
 					var srcTexturePath = AssetPath.Combine(The.Workspace.AssetsDirectory, fileInfo.Path);
-					var pixbuf = new Gdk.Pixbuf(srcTexturePath);
-					DownscaleTextureIfNeeded(ref pixbuf, srcTexturePath, cookingRules);
+					Bitmap bitmap;
+					using (var stream = File.OpenRead(srcTexturePath)) {
+						bitmap = new Bitmap(stream);
+					}
+					if (ShouldDownscale(bitmap, cookingRules)) {
+						bitmap.Dispose();
+						bitmap = DownscaleTexture(bitmap, srcTexturePath, cookingRules);
+					}
 					// Ensure that no image exceeded maxAtlasSize limit
-					DownscaleTextureToFitAtlas(ref pixbuf, srcTexturePath);
+					DownscaleTextureToFitAtlas(ref bitmap, srcTexturePath);
 					var item = new AtlasItem {
 						Path = Path.ChangeExtension(fileInfo.Path, ".atlasPart"),
-						Pixbuf = pixbuf,
+						Bitmap = bitmap,
 						CookingRules = cookingRules,
 						SourceExtension = Path.GetExtension(fileInfo.Path)
 					};
@@ -448,6 +457,9 @@ namespace Orange
 			var initialAtlasId = 0;
 			foreach (var kv in items) {
 				initialAtlasId = PackItemsToAtlasWithBestSize(atlasChain, kv.Value, kv.Key, initialAtlasId);
+				foreach (var item in kv.Value) {
+					item.Bitmap.Dispose();
+				}
 			}
 			var packers = PluginLoader.CurrentPlugin.AtlasPackers.ToDictionary(i => i.Metadata.Id, i => i.Value);
 			foreach (var kv in pluginItems) {
@@ -463,8 +475,8 @@ namespace Orange
 		{
 			// Sort images in descending size order
 			items.Sort((x, y) => {
-				var a = Math.Max(x.Pixbuf.Width, x.Pixbuf.Height);
-				var b = Math.Max(y.Pixbuf.Width, y.Pixbuf.Height);
+				var a = Math.Max(x.Bitmap.Width, x.Bitmap.Height);
+				var b = Math.Max(y.Bitmap.Width, y.Bitmap.Height);
 				return b - a;
 			});
 
@@ -508,7 +520,7 @@ namespace Orange
 				CopyAllocatedItemsToAtlas(items, atlasChain, atlasId, bestSize);
 				foreach (var x in items) {
 					if (x.Allocated) {
-						x.Pixbuf.Dispose();
+						x.Bitmap.Dispose();
 					}
 				}
 				items.RemoveAll(x => x.Allocated);
@@ -550,7 +562,7 @@ namespace Orange
 			var a = new RectAllocator(new Size(size.Width + 2, size.Height + 2));
 			AtlasItem firstAllocatedItem = null;
 			foreach (var item in items) {
-				var sz = new Size(item.Pixbuf.Width + 2, item.Pixbuf.Height + 2);
+				var sz = new Size(item.Bitmap.Width + 2, item.Bitmap.Height + 2);
 				if (firstAllocatedItem == null || AreAtlasItemsCompatible(firstAllocatedItem, item)) {
 					if (a.Allocate(sz, out item.AtlasRect)) {
 						item.Allocated = true;
@@ -572,7 +584,7 @@ namespace Orange
 			switch (Platform) {
 				case TargetPlatform.Android:
 				case TargetPlatform.iOS:
-					return item1.CookingRules.PVRFormat == item2.CookingRules.PVRFormat && item1.Pixbuf.HasAlpha == item2.Pixbuf.HasAlpha;
+					return item1.CookingRules.PVRFormat == item2.CookingRules.PVRFormat && item1.Bitmap.HasAlpha == item2.Bitmap.HasAlpha;
 				case TargetPlatform.Win:
 				case TargetPlatform.Mac:
 					return item1.CookingRules.DDSFormat == item2.CookingRules.DDSFormat;
@@ -586,26 +598,39 @@ namespace Orange
 		private static void CopyAllocatedItemsToAtlas(List<AtlasItem> items, string atlasChain, int atlasId, Size size)
 		{
 			var atlasPath = GetAtlasPath(atlasChain, atlasId);
-			var hasAlpha = items.Where(i => i.Allocated).Any(i => i.Pixbuf.HasAlpha);
-			using (var atlas = new Gdk.Pixbuf(Gdk.Colorspace.Rgb, hasAlpha, 8, size.Width, size.Height)) {
-				atlas.Fill(0);
-				foreach (var item in items.Where(i => i.Allocated)) {
-					var p = item.Pixbuf;
-					p.CopyArea(0, 0, p.Width, p.Height, atlas, item.AtlasRect.A.X, item.AtlasRect.A.Y);
-					var atlasPart = new TextureAtlasElement.Params();
-					atlasPart.AtlasRect = item.AtlasRect;
-					atlasPart.AtlasRect.B -= new IntVector2(2, 2);
-					atlasPart.AtlasPath = Path.ChangeExtension(atlasPath, null);
-					Serialization.WriteObjectToBundle(AssetBundle, item.Path, atlasPart, Serialization.Format.Binary, item.SourceExtension);
-					// Delete non-atlased texture since now its useless
-					var texturePath = Path.ChangeExtension(item.Path, GetPlatformTextureExtension());
-					if (AssetBundle.FileExists(texturePath)) {
-						DeleteFileFromBundle(texturePath);
-					}
+			var atlasPixels = new Color4[size.Width * size.Height];
+			foreach (var item in items.Where(i => i.Allocated)) {
+				CopyPixels(item.Bitmap, atlasPixels, item.AtlasRect.A.X, item.AtlasRect.A.Y, size.Width, size.Height);
+				var atlasPart = new TextureAtlasElement.Params();
+				atlasPart.AtlasRect = item.AtlasRect;
+				atlasPart.AtlasRect.B -= new IntVector2(2, 2);
+				atlasPart.AtlasPath = Path.ChangeExtension(atlasPath, null);
+				Serialization.WriteObjectToBundle(AssetBundle, item.Path, atlasPart, Serialization.Format.Binary, item.SourceExtension);
+				// Delete non-atlased texture since now its useless
+				var texturePath = Path.ChangeExtension(item.Path, GetPlatformTextureExtension());
+				if (AssetBundle.FileExists(texturePath)) {
+					DeleteFileFromBundle(texturePath);
 				}
-				Console.WriteLine("+ " + atlasPath);
-				var firstItem = items.First(i => i.Allocated);
+			}
+			Console.WriteLine("+ " + atlasPath);
+			var firstItem = items.First(i => i.Allocated);
+			using (var atlas = new Bitmap(atlasPixels, size.Width, size.Height)) {
 				ImportTexture(atlasPath, atlas, firstItem.CookingRules);
+			}
+		}
+
+		private static void CopyPixels(
+			Bitmap source, Color4[] dstPixels, int dstX, int dstY, int dstWidth, int dstHeight)
+		{
+			if (source.Width > dstWidth - dstX || source.Height > dstHeight - dstY) {
+				throw new Lime.Exception(
+					"Unable to copy pixels. Source image runs out of the bounds of destination image.");
+			}
+			var srcPixels = source.GetPixels();
+			for (int y = 0; y < source.Height; y++) {
+				int sourceRowsOffset = y * source.Width;
+				int dstRowsOffset = (y + dstY) * dstWidth;
+				Array.Copy(srcPixels, sourceRowsOffset, dstPixels, dstX + dstRowsOffset, source.Width);
 			}
 		}
 
@@ -614,7 +639,7 @@ namespace Orange
 			return !The.Workspace.ProjectJson.GetValue("DontGenerateOpacityMasks", false);
 		}
 
-		public static void ImportTexture(string path, Gdk.Pixbuf texture, CookingRules rules)
+		private static void ImportTexture(string path, Bitmap texture, CookingRules rules)
 		{
 			if (ShouldGenerateOpacityMasks()) {
 				var maskPath = Path.ChangeExtension(path, ".mask");
@@ -627,24 +652,39 @@ namespace Orange
 			var alphaPath = GetAlphaTexturePath(path);
 			switch (Platform) {
 				case TargetPlatform.Unity:
-					ConvertTexture(path, attributes, file => texture.Save(file, "png"));
+					ConvertTexture(path, attributes, file => {
+						using (var stream = File.OpenWrite(file)) {
+							texture.SaveTo(stream);
+						}
+					});
 					break;
 				case TargetPlatform.Android:
-					ConvertTexture(path, attributes, file => TextureConverter.ToPVR(texture, file, rules.MipMaps, rules.HighQualityCompression, rules.PVRFormat));
+					ConvertTexture(
+						path,
+						attributes,
+						file => TextureConverter.ToPVR(texture, file, rules.MipMaps, rules.HighQualityCompression, rules.PVRFormat));
 					// ETC1 textures on Android use separate alpha channel
 					if (texture.HasAlpha && rules.PVRFormat == PVRFormat.ETC1) {
-						using (var alphaTexture = new Gdk.Pixbuf(texture, 0, 0, texture.Width, texture.Height)) {
-							TextureConverterUtils.ConvertBitmapToAlphaMask(alphaTexture);
-							ConvertTexture(alphaPath, AssetAttributes.ZippedDeflate, file => TextureConverter.ToPVR(alphaTexture, file, rules.MipMaps, rules.HighQualityCompression, PVRFormat.ETC1));
+						using (var alphaMask = TextureConverterUtils.ConvertBitmapToAlphaMask(texture)) {
+							ConvertTexture(
+								alphaPath,
+								AssetAttributes.Zipped,
+								file => TextureConverter.ToPVR(alphaMask, file, rules.MipMaps, rules.HighQualityCompression, PVRFormat.ETC1));
 						}
 					}
 					break;
 				case TargetPlatform.iOS:
-					ConvertTexture(path, attributes, file => TextureConverter.ToPVR(texture, file, rules.MipMaps, rules.HighQualityCompression, rules.PVRFormat));
+					ConvertTexture(
+						path,
+						attributes,
+						file => TextureConverter.ToPVR(texture, file, rules.MipMaps, rules.HighQualityCompression, rules.PVRFormat));
 					break;
 				case TargetPlatform.Win:
 				case TargetPlatform.Mac:
-					ConvertTexture(path, attributes, file => TextureConverter.ToDDS(texture, file, rules.DDSFormat, rules.MipMaps));
+					ConvertTexture(
+						path,
+						attributes,
+						file => TextureConverter.ToDDS(texture, file, rules.DDSFormat, rules.MipMaps));
 					break;
 				default:
 					throw new Lime.Exception();
@@ -663,56 +703,51 @@ namespace Orange
 			}
 		}
 
-		private static void DownscaleTextureToFitAtlas (ref Gdk.Pixbuf texture, string path)
+		private static void DownscaleTextureToFitAtlas(ref Bitmap bitmap, string path)
 		{
 			var maxWidth = GetMaxAtlasSize().Width;
 			var maxHeight = GetMaxAtlasSize().Height;
-			if (texture.Width > maxWidth || texture.Height > maxHeight) {
-				float ratio = Mathf.Min (maxWidth / (float)texture.Width, maxHeight / (float)texture.Height);
-				int w = Math.Min ((texture.Width * ratio).Round (), maxWidth);
-				int h = Math.Min ((texture.Height * ratio).Round (), maxHeight);
-				Console.WriteLine ("{0} downscaled to {1}x{2}", path, w, h);
-				texture = texture.ScaleSimple (w, h, Gdk.InterpType.Bilinear);
+			if (bitmap.Width <= maxWidth && bitmap.Height <= maxHeight) {
+				return;
 			}
+			var newWidth = Math.Min(bitmap.Width, maxWidth);
+			var newHeight = Math.Min(bitmap.Height, maxHeight);
+			var scaledBitmap = bitmap.Rescale(newWidth, newHeight);
+			bitmap.Dispose();
+			bitmap = scaledBitmap;
+			Console.WriteLine($"WARNING: '{path}' downscaled to {newWidth}x{newHeight}");
 		}
 
-		private static void DownscaleTextureToFitAtlas(ref Gdk.Pixbuf texture, string path, CookingRules rules)
-		{
-			var maxWidth = GetMaxAtlasSize().Width;
-			var maxHeight = GetMaxAtlasSize().Height;
-			if (texture.Width > maxWidth || texture.Height > maxHeight) {
-				float ratio = Mathf.Min(maxWidth / (float)texture.Width, maxHeight / (float)texture.Height);
-				int w = Math.Min((texture.Width * ratio).Round(), maxWidth);
-				int h = Math.Min((texture.Height * ratio).Round(), maxHeight);
-				Console.WriteLine("{0} downscaled to {1}x{2}", path, w, h);
-				texture = texture.ScaleSimple(w, h, Gdk.InterpType.Bilinear);
-			}
-		}
-
-		private static void DownscaleTextureIfNeeded(ref Gdk.Pixbuf texture, string path, CookingRules rules)
+		private static bool ShouldDownscale(Bitmap texture, CookingRules rules)
 		{
 			if (rules.TextureScaleFactor != 1.0f) {
-				const int maxSize = 1024;
-				const float scaleRatio = 0.75f;
-				int scaleLargerThan = (Platform == TargetPlatform.Android) ? 32 : 256;
-				if (texture.Width > scaleLargerThan || texture.Height > scaleLargerThan) {
-					var ratio = scaleRatio;
-					if (texture.Width > maxSize || texture.Height > maxSize) {
-						var max = Math.Max(texture.Width, texture.Height);
-						ratio *= maxSize / (float)max;
-					}
-					int w = texture.Width;
-					int h = texture.Height;
-					if (texture.Width > scaleLargerThan) {
-						w = Math.Min((texture.Width * ratio).Round(), maxSize);
-					}
-					if (texture.Height > scaleLargerThan) {
-						h = Math.Min((texture.Height * ratio).Round(), maxSize);
-					}
-					Console.WriteLine("{0} downscaled to {1}x{2}", path, w, h);
-					texture = texture.ScaleSimple(w, h, Gdk.InterpType.Bilinear);
+				int scaleThreshold = Platform == TargetPlatform.Android ? 32 : 256;
+				if (texture.Width > scaleThreshold || texture.Height > scaleThreshold) {
+					return true;
 				}
 			}
+			return false;
+		}
+
+		private static Bitmap DownscaleTexture(Bitmap texture, string path, CookingRules rules)
+		{
+			const int MaxSize = 1024;
+			int scaleThreshold = Platform == TargetPlatform.Android ? 32 : 256;
+			var ratio = rules.TextureScaleFactor;
+			if (texture.Width > MaxSize || texture.Height > MaxSize) {
+				var max = (float) Math.Max(texture.Width, texture.Height);
+				ratio *= MaxSize / max;
+			}
+			int newWidth = texture.Width;
+			int newHeight = texture.Height;
+			if (texture.Width > scaleThreshold) {
+				newWidth = Math.Min((texture.Width * ratio).Round(), MaxSize);
+			}
+			if (texture.Height > scaleThreshold) {
+				newHeight = Math.Min((texture.Height * ratio).Round(), MaxSize);
+			}
+			Console.WriteLine("{0} downscaled to {1}x{2}", path, newWidth, newHeight);
+			return texture.Rescale(newWidth, newHeight);
 		}
 
 		static void SyncAtlases()

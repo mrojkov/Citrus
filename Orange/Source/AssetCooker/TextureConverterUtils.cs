@@ -2,169 +2,86 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Runtime.InteropServices;
-using Gdk;
+using Lime;
 
 namespace Orange
 {
 	public static class TextureConverterUtils
 	{
-		struct RGBA
-		{
-			public byte R, G, B, A;
-		}
-
-		struct RGB
-		{
-			public byte R, G, B;
-		}
-
 		/// <summary>
 		/// Fills RGB channels with alpha values.
 		/// </summary>
-		public static void ConvertBitmapToAlphaMask(Pixbuf pixbuf)
+		public static Bitmap ConvertBitmapToAlphaMask(Bitmap bitmap)
 		{
-			int stride = pixbuf.Rowstride;
-			if ((stride & 0x3) != 0 || !pixbuf.HasAlpha) {
-				throw new Lime.Exception("Invalid pixbuf format");
+			Color4[] pixels = bitmap.GetPixels();
+			for (int i = 0; i < pixels.Length; i++)
+			{
+				Color4 color = pixels[i];
+				pixels[i] = new Color4(color.A, color.A, color.A);
 			}
-			unsafe {
-				int width = pixbuf.Width;
-				int height = pixbuf.Height;
-				RGBA* pixels = (RGBA*)pixbuf.Pixels;
-				for (int i = 0; i < height; i++) {
-					for (int j = 0; j < width; j++) {
-						RGBA p = *pixels;
-						p.R = p.G = p.B = p.A;
-						p.A = 255;
-						*pixels++ = p;
-					}
-					pixels += stride / 4 - width;
-				}
-			}
+			return new Bitmap(pixels, bitmap.Width, bitmap.Height);
 		}
 
 		/// <summary>
 		/// Fills RGB channels with Alpha value, Alpha remains untouched
 		/// </summary>
-		public static void ConvertBitmapToGrayscaleAlphaMask(Pixbuf pixbuf)
+		public static Bitmap ConvertBitmapToGrayscaleAlphaMask(Bitmap bitmap)
 		{
-			int stride = pixbuf.Rowstride;
-			if ((stride & 0x3) != 0 || !pixbuf.HasAlpha) {
-				throw new Lime.Exception("Invalid pixbuf format");
+			Color4[] pixels = bitmap.GetPixels();
+			for (int i = 0; i < pixels.Length; i++)
+			{
+				Color4 color = pixels[i];
+				pixels[i] = new Color4(color.A, color.A, color.A, color.A);
 			}
-			unsafe {
-				int width = pixbuf.Width;
-				int height = pixbuf.Height;
-				RGBA* pixels = (RGBA*)pixbuf.Pixels;
-				for (int i = 0; i < height; i++) {
-					for (int j = 0; j < width; j++) {
-						RGBA p = *pixels;
-						p.R = p.G = p.B = p.A;
-						*pixels++ = p;
-					}
-					pixels += stride / 4 - width;
-				}
-			}
+			return new Bitmap(pixels, bitmap.Width, bitmap.Height);
 		}
 
-		public static bool IsWhiteImageWithAlpha(Pixbuf pixbuf)
+		public static bool IsWhiteImageWithAlpha(Bitmap bitmap)
 		{
-			if (pixbuf.NChannels != 4 || !pixbuf.HasAlpha) {
+			if (!bitmap.HasAlpha) {
 				return false;
 			}
-			if ((pixbuf.Rowstride & 0x3) != 0 || pixbuf.BitsPerSample != 8) {
-				throw new Lime.Exception("Invalid pixbuf format");
-			}
-			unsafe {
-				RGBA* pixels = (RGBA*)pixbuf.Pixels;
-				int width = pixbuf.Width;
-				for (int i = 0; i < pixbuf.Height; i++) {
-					for (int j = 0; j < width; j++) {
-						RGBA c = *pixels;
-						if (c.A > 0) {
-							if (c.R != 255 || c.G != 255 || c.B != 255) {
-								return false;
-							}
-						}
-						pixels++;
+			foreach (var pixel in bitmap.GetPixels()) {
+				if (pixel.A > 0) {
+					if (pixel.R != 255 || pixel.G != 255 || pixel.B != 255) {
+						return false;
 					}
-					pixels += pixbuf.Rowstride / 4 - width;
 				}
 			}
 			return true;
 		}
 
-		public static void SwapRGBChannels(Pixbuf pixbuf)
+		public static Bitmap BleedAlpha(Bitmap bitmap)
 		{
-			if (pixbuf.HasAlpha) {
-				unsafe {
-					for (int i = 0; i < pixbuf.Height; i++) {
-						RGBA* pixels = (RGBA*)((byte*)pixbuf.Pixels + pixbuf.Rowstride * i);
-						int width = pixbuf.Width;
-						for (int j = 0; j < width; j++) {
-							RGBA c = *pixels;
-							byte r = c.R;
-							byte b = c.B;
-							c.R = b;
-							c.B = r;
-							*pixels++ = c;
-						}
-					}
-				}
-			} else {
-				unsafe {
-					for (int i = 0; i < pixbuf.Height; i++) {
-						byte* src = (byte*)pixbuf.Pixels + pixbuf.Rowstride * i;
-						byte* dst = src;
-						int width = pixbuf.Width;
-						for (int j = 0; j < width; j++) {
-							byte r = *src++;
-							byte g = *src++;
-							byte b = *src++;
-							*dst++ = b;
-							*dst++ = g;
-							*dst++ = r;
-						}
-					}
-				}
+			if (!bitmap.HasAlpha || (bitmap.Width == 1 && bitmap.Height == 1)) {
+				return bitmap;
 			}
+			var pixels = bitmap.GetPixels();
+			BleedAlpha(pixels, bitmap.Width, bitmap.Height);
+			return new Bitmap(pixels, bitmap.Width, bitmap.Height);
 		}
 
-		public static unsafe void BleedAlpha(Pixbuf pixbuf)
+		private static void BleedAlpha(Color4[] image, int width, int height)
 		{
-			if (!pixbuf.HasAlpha || (pixbuf.Width == 1 && pixbuf.Height == 1)) {
-				return;
-			}
-			var pixels = (byte*)pixbuf.Pixels;
-			if (pixbuf.Rowstride != pixbuf.Width * 4) {
-				throw new InvalidOperationException();
-			}
-			BleedAlpha(pixels, pixbuf.Width, pixbuf.Height);
-		}
-
-		unsafe static void BleedAlpha(byte* image, int width, int height)
-		{
-			int N = width * height;
-			var processed = new bool[N];
-			var pending = new List<int>(N);
-			var pendingNext = new List<int>(N);
-			var hOffsets = new int[8] { -1, 0, 1, -1, 1, -1, 0, 1 };
-			var vOffsets = new int[8] { -1, -1, -1, 0, 0, 1, 1, 1 };
-			for (int i = 0, j = 3; i < N; i++, j += 4) {
-				// If the pixel alpha != 0
-				if (image[j] != 0) {
+			var processed = new bool[image.Length];
+			var pending = new List<int>(image.Length);
+			var pendingNext = new List<int>(image.Length);
+			var hOffsets = new[] { -1, 0, 1, -1, 1, -1, 0, 1 };
+			var vOffsets = new[] { -1, -1, -1, 0, 0, 1, 1, 1 };
+			for (int i = 0; i < image.Length; i++) {
+				if (image[i].A != 0) {
 					processed[i] = true;
-				} else {
+				}
+				else {
+					// Pend transparent pixel if it has any non-transparent adjacent pixel.
 					int x = i % width;
 					int y = i / width;
-					// Iterate across 8 adjacent pixels
-					for (int k = 0; k < 8; k++) {
-						int s = hOffsets[k];
-						int t = vOffsets[k];
-						if (x + s >= 0 && x + s < width && y + t >= 0 && y + t < height) {
-							var index = j + 4 * (s + t * width);
-							if (image[index] != 0) {
+					for (int j = 0; j < hOffsets.Length; j++) {
+						int hOffset = hOffsets[j];
+						int vOffset = vOffsets[j];
+						if (x + hOffset >= 0 && x + hOffset < width && y + vOffset >= 0 && y + vOffset < height) {
+							int index = i + (vOffset * width + hOffset);
+							if (image[index].A != 0) {
 								pending.Add(i);
 								break;
 							}
@@ -174,67 +91,82 @@ namespace Orange
 			}
 			while (pending.Count > 0) {
 				pendingNext.Clear();
-				for (int p = 0; p < pending.Count; p++) {
-					var j = pending[p];
-					if (processed[j])
-						continue;
-					processed[j] = true;
-					var i = pending[p] * 4;
-					int x = j % width;
-					int y = j / width;
-					int r = 0;
-					int g = 0;
-					int b = 0;
-					int count = 0;
-					for (int k = 0; k < 8; k++) {
-						int s = hOffsets[k];
-						int t = vOffsets[k];
-						if (x + s >= 0 && x + s < width && y + t >= 0 && y + t < height) {
-							t *= width;
-							if (processed[j + s + t]) {
-								var index = i + 4 * (s + t);
-								r += image[index + 0];
-								g += image[index + 1];
-								b += image[index + 2];
-								count++;
-							} else {
-								pendingNext.Add(j + s + t);
+				foreach (var i in pending) {
+					if (!processed[i]) {
+						processed[i] = true;
+						int x = i % width;
+						int y = i / width;
+						int r, g, b, count;
+						r = g = b = count = 0;
+						for (int j = 0; j < hOffsets.Length; j++) {
+							int hOffset = hOffsets[j];
+							int vOffset = vOffsets[j];
+							if (x + hOffset >= 0 && x + hOffset < width && y + vOffset >= 0 && y + vOffset < height) {
+								int index = i + (vOffset * width + hOffset);
+								if (processed[index]) {
+									Color4 color = image[index];
+									r += color.R;
+									g += color.G;
+									b += color.B;
+									count++;
+								}
+								else {
+									pendingNext.Add(index);
+								}
 							}
 						}
+						if (count == 0) {
+							throw new InvalidOperationException("Pending pixel has no non-transparent adjacent pixel.");
+						}
+						image[i] = new Color4((byte) (r / count), (byte) (g / count), (byte) (b / count), 0);
 					}
-					if (count == 0) {
-						throw new InvalidOperationException();
-					}
-					image[i + 0] = (byte)(r / count);
-					image[i + 1] = (byte)(g / count);
-					image[i + 2] = (byte)(b / count);
 				}
 				Lime.Toolbox.Swap(ref pending, ref pendingNext);
 			}
 		}
 
-		public static void SaveToTGA(Pixbuf pixbuf, string path)
+		public static void SaveToTGA(Bitmap bitmap, string path, bool swapRedAndBlue)
 		{
-			using (Stream stream = new FileStream(path, FileMode.Create)) {
-				using (BinaryWriter o = new BinaryWriter(stream)) {
-					o.Write((byte)0); // size of ID field that follows 18 byte header(0 usually)
-					o.Write((byte)0); // type of colour map 0 = none, 1 = has palette
-					o.Write((byte)2); // type of image 0 = none, 1 = indexed, 2 = rgb, 3 = grey, +8 = rle packed
-					o.Write((short)0); // first colour map entry in palette
-					o.Write((short)0); // number of colours in palette
-					o.Write((byte)0); // number of bits per palette entry 15,16,24,32
-					o.Write((short)0); // image x origin
-					o.Write((short)0); // image y origin
-					o.Write((short)pixbuf.Width); // image width in pixels
-					o.Write((short)pixbuf.Height); // image height in pixels
-					o.Write((byte)(pixbuf.HasAlpha ? 32 : 24)); // image bits per pixel 8,16,24,32
-					o.Write((byte)0); // descriptor
-					int bpp = pixbuf.HasAlpha ? 4 : 3;
-					byte[] buffer = new byte[pixbuf.Width * bpp];
-					for (int i = pixbuf.Height - 1; i >= 0; i--) {
-						Marshal.Copy(pixbuf.Pixels + pixbuf.Rowstride * i, buffer, 0, pixbuf.Width * bpp);
-						o.Write(buffer, 0, buffer.Length);
+			using (var stream = new FileStream(path, FileMode.Create)) {
+				using (var writer = new BinaryWriter(stream)) {
+					int width = bitmap.Width;
+					int height = bitmap.Height;
+					bool hasAlpha = bitmap.HasAlpha;
+					writer.Write((byte) 0); // size of ID field that follows 18 byte header(0 usually)
+					writer.Write((byte) 0); // type of color map 0 = none, 1 = has palette
+					writer.Write((byte) 2); // type of image 0 = none, 1 = indexed, 2 = rgb, 3 = grey, +8 = rle packed
+					writer.Write((short) 0); // first color map entry in palette
+					writer.Write((short) 0); // number of colors in palette
+					writer.Write((byte) 0); // number of bits per palette entry 15,16,24,32
+					writer.Write((short) 0); // image x origin
+					writer.Write((short) 0); // image y origin
+					writer.Write((short) width); // image width in pixels
+					writer.Write((short) height); // image height in pixels
+					writer.Write((byte) (hasAlpha ? 32 : 24)); // image bits per pixel 8,16,24,32
+					writer.Write((byte) 0); // descriptor
+					Color4[] pixels = bitmap.GetPixels();
+					var bytes = new byte[hasAlpha ? pixels.Length * 4 : pixels.Length * 3];
+					int bi = 0;
+					for (int y = height - 1; y >= 0; y--) {
+						int rowsOffset = y * width;
+						for (int x = 0; x < width; x++) {
+							Color4 pixel = pixels[x + rowsOffset];
+							if (swapRedAndBlue) {
+								bytes[bi++] = pixel.B;
+								bytes[bi++] = pixel.G;
+								bytes[bi++] = pixel.R;
+							}
+							else {
+								bytes[bi++] = pixel.R;
+								bytes[bi++] = pixel.G;
+								bytes[bi++] = pixel.B;
+							}
+							if (hasAlpha) {
+								bytes[bi++] = pixel.A;
+							}
+						}
 					}
+					writer.Write(bytes, 0, bytes.Length);
 				}
 			}
 		}
@@ -243,8 +175,8 @@ namespace Orange
 		{
 			width = height = 0;
 			hasAlpha = false;
-			using(var stream = new FileStream(path, FileMode.Open)) {
-				using(var reader = new BinaryReader(stream)) {
+			using (var stream = new FileStream(path, FileMode.Open)) {
+				using (var reader = new BinaryReader(stream)) {
 					byte[] sign = reader.ReadBytes(8); // PNG signature
 					if (sign[1] != 'P' || sign[2] != 'N' || sign[3] != 'G')
 						return false;
@@ -254,7 +186,7 @@ namespace Orange
 					height = IPAddress.NetworkToHostOrder(reader.ReadInt32());
 					reader.ReadByte(); // color depth
 					int colorType = reader.ReadByte();
-					hasAlpha = (colorType == 4) ||(colorType == 6);
+					hasAlpha = (colorType == 4) || (colorType == 6);
 				}
 			}
 			return true;
