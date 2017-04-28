@@ -2,8 +2,8 @@ using Lime;
 
 namespace EmptyProject.Scenes
 {
-	public class ParsedWidget
+	public class ParsedNode
 	{
-		public Widget Widget { get; protected set; }
+		public Node Node { get; protected set; }
 	}
 }

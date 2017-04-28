@@ -10,12 +10,12 @@ namespace EmptyProject.Dialogs
 	{
 		private const string DialogTag = "Dialog";
 
-		protected ParsedWidget Scene { get; }
-		protected Widget Root => Scene.Widget;
+		protected ParsedNode Scene { get; }
+		protected Widget Root => (Widget) Scene.Node;
 		protected TaskList Tasks { get; } = new TaskList();
 		public DialogState State { get; protected set; }
 
-		protected Dialog(ParsedWidget scene)
+		protected Dialog(ParsedNode scene)
 		{
 			Scene = scene;
 			Root.Tag = DialogTag;
@@ -205,7 +205,7 @@ namespace EmptyProject.Dialogs
 		protected Logger Log => The.Log;
 	}
 
-	public class Dialog<T> : Dialog where T: ParsedWidget, new()
+	public class Dialog<T> : Dialog where T: ParsedNode, new()
 	{
 		protected Dialog(): base(new T()) { }
 
