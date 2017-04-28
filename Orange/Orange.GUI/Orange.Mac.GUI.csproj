@@ -8,7 +8,7 @@
     <ProjectGuid>{4B2BDD5B-2AAE-46AE-AA1A-8C9308BAA50D}</ProjectGuid>
     <ProjectTypeGuids>{948B3504-5B70-4649-8FE4-BDE1FB46EC69};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Orange</RootNamespace>
+    <RootNamespace>Orange.GUI</RootNamespace>
     <AssemblyName>Orange.GUI</AssemblyName>
     <newfilesearch>OnLoad</newfilesearch>
     <SuppressXamMacUpsell>True</SuppressXamMacUpsell>

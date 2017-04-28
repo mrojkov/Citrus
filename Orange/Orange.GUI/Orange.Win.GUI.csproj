@@ -7,7 +7,7 @@
     <ProjectGuid>{D95BDCE1-EA8F-4544-AFCE-E72C01A1D3A0}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Orange.Win.GUI</RootNamespace>
+    <RootNamespace>Orange.GUI</RootNamespace>
     <AssemblyName>Orange.GUI</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -19,7 +19,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Win\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;ORANGE_GUI</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -29,7 +29,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Win\Release\</OutputPath>
-    <DefineConstants>TRACE;ORANGE_GUI</DefineConstants>
+    <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -43,7 +43,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>..\bin\Win\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;WIN;ORANGE_GUI</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;WIN</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -53,7 +53,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>..\bin\Win\Release\</OutputPath>
-    <DefineConstants>TRACE;WIN;ORANGE_GUI</DefineConstants>
+    <DefineConstants>TRACE;WIN</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x86</PlatformTarget>
@@ -94,6 +94,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\App.config" />
+    <EmbeddedResource Include="Resources\SegoeUIRegular.ttf" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
@@ -104,12 +105,24 @@
     <Compile Include="DictionaryExtractorWindow.cs" />
     <Compile Include="DictionaryOldFormatExtractor.cs" />
     <Compile Include="Main.GUI.cs" />
+    <Compile Include="OrangeApp.cs" />
     <Compile Include="UI\MainWindow.cs" />
     <Compile Include="UI\MainWindow.PluginUI.cs" />
     <Compile Include="UI\MainWindow.UI.cs" />
+    <Compile Include="UI\OrangeInterface.cs" />
+    <Compile Include="UI\PlatformPicker.cs" />
     <Compile Include="UI\PluginUIBuilder.cs" />
+    <Compile Include="UI\TextView.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Lemon\Lemon.Win.csproj">
+      <Project>{538e41e4-725c-4521-bcf3-a5591a1a3afd}</Project>
+      <Name>Lemon.Win</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Lime\Extensions\DynamicFont\DynamicFont.Win.csproj">
+      <Project>{FE8512BC-7A55-425C-8BC1-AD4D9785CF12}</Project>
+      <Name>DynamicFont.Win</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Lime\Lime.Win.csproj">
       <Project>{fc2de6c9-641a-4230-8d29-ea4035cd8708}</Project>
       <Name>Lime.Win</Name>

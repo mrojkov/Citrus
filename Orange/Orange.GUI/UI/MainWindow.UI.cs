@@ -1,4 +1,3 @@
-#if ORANGE_GUI
 using System;
 using System.IO;
 using Gtk;
@@ -153,4 +152,3 @@ namespace Orange
 		}
 	}
 }
-#endif // ORANGE_GUI

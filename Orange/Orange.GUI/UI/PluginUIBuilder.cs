@@ -1,4 +1,3 @@
-#if ORANGE_GUI
 using Gtk;
 
 namespace Orange
@@ -45,4 +44,3 @@ namespace Orange
 		}
 	}
 }
-#endif // ORANGE_GUI

@@ -199,6 +199,10 @@
       <Project>{b1a51655-d2ad-4d03-b3f2-619f27fecbc4}</Project>
       <Name>Kumquat.Win</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Lemon\Lemon.Win.csproj">
+      <Project>{538e41e4-725c-4521-bcf3-a5591a1a3afd}</Project>
+      <Name>Lemon.Win</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Lime\Lime.Win.csproj">
       <Project>{FC2DE6C9-641A-4230-8D29-EA4035CD8708}</Project>
       <Name>Lime.Win</Name>
