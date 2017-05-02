@@ -56,22 +56,7 @@ namespace Orange
 
 		public static string GetMonoPath()
 		{
-			if (monoPath == null) {
-				// Get path to mscorlib assembly and remove four last segments of path.
-				var up = 4;
-				var path = typeof(int).Assembly.Location;
-				for (int i = path.Length - 1; i >= 0; i--) {
-					if (path[i] == Path.DirectorySeparatorChar) {
-						up--;
-						if (up == 0) {
-							path = path.Substring(0, i);
-							break;
-						}
-					}
-				}
-				monoPath = Path.Combine(path, "bin", "mono");
-			}
-			return monoPath;
+			return "/Library/Frameworks/Mono.framework/Versions/Current/bin/mono";
 		}
 
 		public static string GetTargetPlatformString(TargetPlatform platform)
