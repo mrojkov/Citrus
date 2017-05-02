@@ -32,8 +32,8 @@ namespace Orange
 
 		public override string Text
 		{
-			get => text.Text;
-			set => text.Text = value;
+			get { return text.Text; }
+			set { text.Text = value; }
 		}
 
 		public TextWriter GetTextWriter() => new Writer(this);

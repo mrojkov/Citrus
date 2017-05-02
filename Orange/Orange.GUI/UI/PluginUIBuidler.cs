@@ -24,8 +24,8 @@ namespace Orange
 
 		public string Title
 		{
-			get => label.Text;
-			set => label.Text = value;
+			get { return label.Text; }
+			set { label.Text = value; }
 		}
 
 		public ICheckBox AddCheckBox(string label)
@@ -67,8 +67,8 @@ namespace Orange
 
 			public bool Active
 			{
-				get => checkBox.Checked;
-				set => checkBox.Checked = value;
+				get { return checkBox.Checked; }
+				set { checkBox.Checked = value; }
 			}
 		}
 	}
