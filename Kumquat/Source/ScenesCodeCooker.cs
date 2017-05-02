@@ -384,7 +384,7 @@ namespace Kumquat
 				nodesToParse.RemoveAt(0);
 
 				foreach (var n in current.Nodes) {
-					if (n.Id.StartsWith(">")) {
+					if (!string.IsNullOrEmpty(n.Id) && n.Id.StartsWith(">")) {
 						string nextName;
 						string nextBaseName;
 						ParsedFramesTree innerClass;
@@ -396,7 +396,7 @@ namespace Kumquat
 						parsedFramesTree.InnerClasses.Add(innerClass);
 					} else {
 						ParsedNode parsedNode = null;
-						if (n.Id.StartsWith("@")) {
+						if (!string.IsNullOrEmpty(n.Id) && n.Id.StartsWith("@")) {
 							parsedNode = new ParsedNode(n, n.Id.Substring(1));
 							parsedFramesTree.ParsedNodes.Add(parsedNode);
 						}
