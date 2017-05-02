@@ -4,12 +4,12 @@ using Lime;
 
 namespace Orange
 {
-	public class TextViewe : Widget
+	public class TextView : Widget
 	{
 		private Frame frame;
 		private SimpleText text;
 
-		public TextViewe()
+		public TextView()
 		{
 			frame = new Frame {
 				ClipChildren = ClipMethod.ScissorTest,
@@ -40,9 +40,9 @@ namespace Orange
 
 		private class Writer : TextWriter
 		{
-			private readonly TextViewe text;
+			private readonly TextView text;
 
-			public Writer(TextViewe text)
+			public Writer(TextView text)
 			{
 				this.text = text;
 			}

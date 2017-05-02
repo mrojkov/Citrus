@@ -55,6 +55,7 @@ namespace Orange
 				Items.Add(new Item(platform.Name, platform));
 			}
 			Index = 0;
+			selected = targets[0];
 		}
 
 		public TargetPlatform? SelectedPlatform => selected?.Platform;

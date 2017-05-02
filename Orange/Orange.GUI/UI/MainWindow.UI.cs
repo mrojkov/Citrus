@@ -9,7 +9,7 @@ namespace Orange
 		public Window NativeWindow;
 		public FileChooserButton CitrusProjectChooser;
 		private ComboBox platformPicker;
-		public TextView OutputPane;
+		public Gtk.TextView OutputPane;
 		public ComboBox ActionPicker;
 		public CheckButton UpdateBeforeBuildCheckbox;
 		public Button GoButton;
@@ -99,7 +99,7 @@ namespace Orange
 		private Widget CreateOutputPane()
 		{
 			var scrolledWindow = new ScrolledWindow() { ShadowType = ShadowType.In };
-			OutputPane = new TextView() {
+			OutputPane = new Gtk.TextView() {
 				CanFocus = true,
 				Editable = false,
 				CursorVisible = false

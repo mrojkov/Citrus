@@ -15,14 +15,12 @@ namespace Orange
 				return;
 			}
 			pluginPanel = builder.SidePanel as PluginPanel;
-			mainHBox.PackStart(pluginPanel, false, true, 0);
 			NativeWindow.Resize(650, NativeWindow.DefaultHeight);
 			NativeWindow.ShowAll();
 		}
 
 		public override void DestroyPluginUI()
 		{
-			pluginPanel?.Destroy();
 			pluginPanel = null;
 			NativeWindow.Resize(NativeWindow.DefaultWidth, NativeWindow.DefaultHeight);
 		}

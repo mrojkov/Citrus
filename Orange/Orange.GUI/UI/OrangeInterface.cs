@@ -7,9 +7,11 @@ namespace Orange
 {
 	public class OrangeInterface: UserInterface
 	{
-		private Window window;
-		private WindowWidget windowWidget;
+		private readonly Window window;
+		private readonly WindowWidget windowWidget;
 		private PlatformPicker platformPicker;
+		private PluginPanel pluginPanel;
+		private TextView textView;
 
 		public OrangeInterface()
 		{
@@ -19,17 +21,24 @@ namespace Orange
 				FixedSize = false,
 				Title = "Orange"
 			});
+			window.Closed += The.Workspace.Save;
 			windowWidget = new DefaultWindowWidget(window) {
 				Id = "MainWindow",
-				Layout = new VBoxLayout {
+				Layout = new HBoxLayout {
 					Spacing = 6
 				},
 				Padding = new Thickness(6),
 				Size = windowSize
 			};
-			windowWidget.AddNode(CreateHeaderSection());
-			windowWidget.AddNode(CreateTextView());
-			windowWidget.AddNode(CreateFooterSection());
+			var mainVBox = new Widget {
+				Layout = new VBoxLayout {
+					Spacing = 6
+				}
+			};
+			mainVBox.AddNode(CreateHeaderSection());
+			mainVBox.AddNode(CreateTextView());
+			mainVBox.AddNode(CreateFooterSection());
+			windowWidget.AddNode(mainVBox);
 		}
 
 		private Widget CreateHeaderSection()
@@ -52,11 +61,11 @@ namespace Orange
 				LayoutCell = new LayoutCell { StretchY = 0 }
 			};
 			AddPicker(header, "Target platform", platformPicker = new PlatformPicker());
-			AddPicker(header, "Citrus Project", GetProjectPicker());
+			AddPicker(header, "Citrus Project", CreateProjectPicker());
 			return header;
 		}
 
-		private void AddPicker(Widget table, string name, Widget picker)
+		private static void AddPicker(Node table, string name, Node picker)
 		{
 			var label = new SimpleText(name) {
 				VAlignment = VAlignment.Center,
@@ -66,45 +75,16 @@ namespace Orange
 			table.AddNode(picker);
 		}
 
-		private Widget GetProjectPicker()
+		private static Widget CreateProjectPicker()
 		{
-			var container = new Widget {
-				Layout = new HBoxLayout()
-			};
-			EditBox editor;
-			Button button;
-			container.AddNode(new Widget {
-				Layout = new HBoxLayout(),
-				Nodes = {
-					(editor = new EditBox { LayoutCell = new LayoutCell(Alignment.Center) }),
-					new Widget{MinMaxWidth = 4},
-					(button = new Button {
-						Text = "...",
-						MinMaxWidth = 20,
-						Draggable = true,
-						LayoutCell = new LayoutCell(Alignment.Center)
-					})
-				}
-			});
-			editor.Submitted += text => editor.Text = text;
-			button.Clicked += () => {
-				var dlg = new FileDialog {
-					AllowedFileTypes = new[] { "citproj" },
-					Mode = FileDialogMode.Open,
-					InitialDirectory = "D:\\Dev\\EmptyProject"// Directory.GetCurrentDirectory(),
-				};
-				if (dlg.RunModal()) {
-					editor.Text = dlg.FileName;
-					The.Workspace.Open(dlg.FileName);
-					platformPicker.Reload();
-				}
-			};
-			return container;
+			var picker = new FileChooser();
+			picker.FileChosen += file => The.Workspace.Open(file);
+			return picker;
 		}
 
 		private Widget CreateTextView()
 		{
-			var textView = new TextViewe {
+			textView = new TextView {
 				LayoutCell = new LayoutCell(),
 			};
 			var writer = textView.GetTextWriter();
@@ -129,47 +109,70 @@ namespace Orange
 			container.AddNode(actionPicker);
 			actionPicker.Index = 0;
 			var go = new Button("Go");
-			go.Clicked += () => System.Threading.Tasks.Task.Run(() => ((Action)actionPicker.Value)());
+			go.Clicked += () => Execute((Action) actionPicker.Value);
 			container.AddNode(go);
 			return container;
 		}
 
+		private void Execute(Action action)
+		{
+#if WIN
+			if (GetActivePlatform() == TargetPlatform.iOS) {
+				ShowError("iOS target is not supported on Windows platform");
+				return;
+			}
+#endif
+			windowWidget.Tasks.Add(ExecuteAsync(action));
+		}
+
+		private IEnumerator<object> ExecuteAsync(Action action)
+		{
+			var startTime = DateTime.Now;
+			The.Workspace.Save();
+			EnableControls(false);
+			The.Workspace?.AssetFiles?.Rescan();
+			yield return Task.ExecuteAsync(action);
+			EnableControls(true);
+			ShowTimeStatistics(startTime);
+
+		}
+
+		private void EnableControls(bool b)
+		{
+			//throw new NotImplementedException();
+		}
+
+		private void ShowTimeStatistics(DateTime startTime)
+		{
+			var endTime = DateTime.Now;
+			var delta = endTime - startTime;
+			Console.WriteLine("Elapsed time {0}:{1}:{2}", delta.Hours, delta.Minutes, delta.Seconds);
+		}
+
+		public override void ClearLog()
+		{
+			textView.Text = string.Empty;
+		}
+
 		public override bool AskConfirmation(string text)
 		{
-			ConfirmationWindow confirmation = null;
-			Application.InvokeOnMainThread(() => confirmation = new ConfirmationWindow());
-			while (confirmation == null) {
-				Thread.Sleep(1);
-			}
 			bool? result = null;
-			confirmation.Closed += () => result = confirmation.Result;
+			Application.InvokeOnMainThread(() => result = ConfirmationDialog.Show(text));
 			while (result == null) {
 				Thread.Sleep(1);
 			}
 			return result.Value;
-			/*var box = new MessageDialog(NativeWindow,
-				DialogFlags.Modal, MessageType.Question,
-				ButtonsType.YesNo,
-				text);
-			box.Title = "Orange";
-			box.Modal = true;
-			var result = box.Run();
-			box.Destroy();
-			return result == (int)ResponseType.Yes;
-			return true;*/
-			//throw new System.NotImplementedException();
 		}
 
 		public override bool AskChoice(string text, out bool yes)
 		{
 			yes = true;
 			return true;
-			//throw new System.NotImplementedException();
 		}
 
 		public override void ShowError(string message)
 		{
-			//throw new System.NotImplementedException();
+			Application.InvokeOnMainThread(() => AlertDialog.Show(message));
 		}
 
 		public override TargetPlatform GetActivePlatform()
@@ -185,7 +188,6 @@ namespace Orange
 		public override bool DoesNeedSvnUpdate()
 		{
 			return false;
-			//throw new System.NotImplementedException();
 		}
 
 		public override IPluginUIBuilder GetPluginUIBuilder()
@@ -195,23 +197,22 @@ namespace Orange
 
 		public override void CreatePluginUI(IPluginUIBuilder builder)
 		{
-			//throw new System.NotImplementedException();
+			if (!builder.SidePanel.Enabled)
+			{
+				return;
+			}
+			pluginPanel = builder.SidePanel as PluginPanel;
+			windowWidget.AddNode(pluginPanel);
+			window.ClientSize = new Vector2(window.ClientSize.X + 150, window.ClientSize.Y);
 		}
 
 		public override void DestroyPluginUI()
 		{
-			//throw new System.NotImplementedException();
+			windowWidget.Nodes.Remove(pluginPanel);
+			if (pluginPanel != null) {
+				window.ClientSize = new Vector2(window.ClientSize.X - 150, window.ClientSize.Y);
+				pluginPanel = null;
+			}
 		}
-	}
-
-	public class ConfirmationWindow : Window
-	{
-
-		public ConfirmationWindow()
-		{
-			Result = true;
-		}
-
-		public bool Result { get; private set; }
 	}
 }

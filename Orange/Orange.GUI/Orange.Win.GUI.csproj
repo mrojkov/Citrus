@@ -106,12 +106,14 @@
     <Compile Include="DictionaryOldFormatExtractor.cs" />
     <Compile Include="Main.GUI.cs" />
     <Compile Include="OrangeApp.cs" />
+    <Compile Include="UI\AlertDialog.cs" />
+    <Compile Include="UI\FileChooser.cs" />
     <Compile Include="UI\MainWindow.cs" />
     <Compile Include="UI\MainWindow.PluginUI.cs" />
     <Compile Include="UI\MainWindow.UI.cs" />
     <Compile Include="UI\OrangeInterface.cs" />
     <Compile Include="UI\PlatformPicker.cs" />
-    <Compile Include="UI\PluginUIBuilder.cs" />
+    <Compile Include="UI\PluginUIBuidler.cs" />
     <Compile Include="UI\TextView.cs" />
   </ItemGroup>
   <ItemGroup>

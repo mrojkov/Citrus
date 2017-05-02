@@ -18,12 +18,12 @@ namespace Orange
 
 		class LogWriter : TextWriter
 		{
-			TextView textView;
+			Gtk.TextView textView;
 #if !WIN
 			int bufferedLines;
 #endif
 
-			public LogWriter(TextView textView)
+			public LogWriter(Gtk.TextView textView)
 			{
 				this.textView = textView;
 			}
