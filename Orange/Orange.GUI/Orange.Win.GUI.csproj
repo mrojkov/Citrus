@@ -83,13 +83,7 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="atk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f, processorArchitecture=MSIL" />
-    <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f, processorArchitecture=MSIL" />
-    <Reference Include="glib-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f, processorArchitecture=MSIL" />
-    <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f, processorArchitecture=MSIL" />
-    <Reference Include="pango-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f, processorArchitecture=MSIL" />
     <Reference Include="System" />
-    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
@@ -101,16 +95,10 @@
     <Content Include="..\Orange.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Actions\UpdateDictionaryTxtOldFormat.cs" />
-    <Compile Include="DictionaryExtractorWindow.cs" />
-    <Compile Include="DictionaryOldFormatExtractor.cs" />
     <Compile Include="Main.GUI.cs" />
     <Compile Include="OrangeApp.cs" />
     <Compile Include="UI\AlertDialog.cs" />
     <Compile Include="UI\FileChooser.cs" />
-    <Compile Include="UI\MainWindow.cs" />
-    <Compile Include="UI\MainWindow.PluginUI.cs" />
-    <Compile Include="UI\MainWindow.UI.cs" />
     <Compile Include="UI\OrangeInterface.cs" />
     <Compile Include="UI\PlatformPicker.cs" />
     <Compile Include="UI\PluginUIBuidler.cs" />

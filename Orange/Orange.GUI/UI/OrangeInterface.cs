@@ -117,7 +117,7 @@ namespace Orange
 		private void Execute(Action action)
 		{
 #if WIN
-			if (GetActivePlatform() == TargetPlatform.iOS) {
+			if (GetActiveTarget().Platform == TargetPlatform.iOS) {
 				ShowError("iOS target is not supported on Windows platform");
 				return;
 			}
@@ -175,14 +175,9 @@ namespace Orange
 			Application.InvokeOnMainThread(() => AlertDialog.Show(message));
 		}
 
-		public override TargetPlatform GetActivePlatform()
+		public override Target GetActiveTarget()
 		{
-			return platformPicker.SelectedPlatform ?? TargetPlatform.Win;
-		}
-
-		public override SubTarget GetActiveSubTarget()
-		{
-			return platformPicker.SelectedSubTarget;
+			return platformPicker.SelectedTarget;
 		}
 
 		public override bool DoesNeedSvnUpdate()
