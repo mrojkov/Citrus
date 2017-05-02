@@ -133,14 +133,17 @@ namespace Orange
 			The.Workspace.Save();
 			EnableControls(false);
 			The.Workspace?.AssetFiles?.Rescan();
+			textView.Text = string.Empty;
 			yield return Task.ExecuteAsync(() => {
 				try {
 					action();
 				}
 				catch (System.Exception ex) {
-					textWriter.Write(ex);
+					textWriter.WriteLine(ex);
 				}
 			});
+			textWriter.WriteLine("Output has been copied to clipboard.");
+			Clipboard.Text = textView.Text;
 			EnableControls(true);
 			ShowTimeStatistics(startTime);
 
