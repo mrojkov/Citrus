@@ -21,7 +21,6 @@ namespace EmptyProject.Android
 					new Lime.ApplicationOptions
 					{
 						DecodeAudioInSeparateThread = false,
-						UsingDeferredHitTest = true
 					}
 				);
 				EmptyProject.Application.Application.Initialize();
