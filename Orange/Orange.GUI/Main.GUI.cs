@@ -1,10 +1,15 @@
+﻿#if WIN
 using System;
+#elif MAC
+using AppKit;
+#endif
 using Lime;
 
 namespace Orange
 {
 	class MainClass
 	{
+#if WIN
 		[STAThread]
 		public static void Main(string[] args)
 		{
@@ -19,5 +24,13 @@ namespace Orange
 			OrangeApp.Initialize();
 			Application.Run();
 		}
+#elif MAC
+		static void Main(string[] args)
+		{
+			Application.Initialize();
+			NSApplication.SharedApplication.DidFinishLaunching += (sender, e) => OrangeApp.Initialize();
+			Application.Run();
+		}
 	}
+#endif
 }

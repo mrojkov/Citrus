@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -68,8 +68,7 @@ namespace Orange
 				args.AppendFormat(" -i \"{0}\" -o \"{1}\" -r {2},{3} -shh", tga, dstPath, width, height);
 #if MAC
 				var pvrTexTool = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Mac", "PVRTexTool");
-				Mono.Unix.Native.Syscall.chmod(
-					pvrTexTool, Mono.Unix.Native.FilePermissions.S_IXOTH | Mono.Unix.Native.FilePermissions.S_IXUSR);
+				var chmodResult = Process.Start("chmod", $"+x {pvrTexTool}");
 #else
 				var pvrTexTool = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Win", "PVRTexToolCli");
 #endif
@@ -132,8 +131,7 @@ namespace Orange
 			string nvcompress = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Win", "nvcompress.exe");
 #else
 			string nvcompress = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Mac", "nvcompress");
-			Mono.Unix.Native.Syscall.chmod(
-				nvcompress, Mono.Unix.Native.FilePermissions.S_IXOTH | Mono.Unix.Native.FilePermissions.S_IXUSR);
+			var chmodResult = Process.Start("chmod", $"+x {nvcompress}");
 #endif
 			srcPath = Path.Combine(Directory.GetCurrentDirectory(), srcPath);
 			dstPath = Path.Combine(Directory.GetCurrentDirectory(), dstPath);

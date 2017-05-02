@@ -1,9 +1,5 @@
 ﻿using System.IO;
 
-#if MAC
-using Mono.Unix.Native;
-#endif
-
 namespace Orange
 {
 	internal static class Nuget
@@ -17,16 +13,7 @@ namespace Orange
 		{
 			nugetPath = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Win", "nuget.exe");
 #if MAC
-			// Mono requiers to set "chmod +x" for assemblies
-			var plusX =
-				FilePermissions.S_IRWXU |
-				FilePermissions.S_IRGRP |
-				FilePermissions.S_IXGRP |
-				FilePermissions.S_IROTH |
-				FilePermissions.S_IXOTH;
-
-			Syscall.chmod(nugetPath, plusX);
-
+			var chmodResult = Process.Start("chmod", $"+x {nugetPath}");
 			monoPath = Toolbox.GetMonoPath();
 #endif
 		}

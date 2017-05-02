@@ -1,0 +1,14 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+      <CreateAppBundleDependsOn>$(CreateAppBundleDependsOn);CopyToolchain</CreateAppBundleDependsOn>
+  </PropertyGroup>
+
+  <Target Name="CopyToolchain">
+  	<ItemGroup>
+  		<Toolchain Include="$(OutputPath)/Toolchain.*/*.*" />
+  	</ItemGroup>
+    <Message Text="Copying toolchain" />
+      <Copy SourceFiles="@(Toolchain)" DestinationFiles="$(AppBundleDir)/Contents/MonoBundle/%(RecursiveDir)%(Filename)%(Extension)" SkipUnchangedFiles="true" />
+  </Target>
+</Project>

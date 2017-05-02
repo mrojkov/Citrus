@@ -1,19 +1,21 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lemon.MonoMac", "..\Lemon\Lemon.MonoMac.csproj", "{4604AA2E-129F-4814-AD0D-8BA35346ECC4}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lime.MonoMac", "..\Lime\Lime.MonoMac.csproj", "{DC16EEBF-404D-4610-B87A-15B57464D707}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yuzu", "..\Yuzu\Yuzu.csproj", "{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orange.Mac.CLI", "Orange.CLI\Orange.Mac.CLI.csproj", "{B41A4095-699B-457F-90EA-0EBC7D8B8CB4}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orange.Mac.GUI", "Orange.GUI\Orange.Mac.GUI.csproj", "{4B2BDD5B-2AAE-46AE-AA1A-8C9308BAA50D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orange.Mac", "Orange.Mac.csproj", "{4B2BDD5A-2AAE-46AE-AA1A-8C9308BAA50D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kumquat.Mac", "..\Kumquat\Kumquat.Mac.csproj", "{B1A51655-D2AD-4D03-B3F2-619F27FECBC4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lemon.Mac", "..\Lemon\Lemon.Mac.csproj", "{BB697671-700C-455D-B8EE-66A6B122B949}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lime.Mac", "..\Lime\Lime.Mac.csproj", "{DC16EEBF-404D-4610-B87A-15B57464D707}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orange.Mac.GUI", "Orange.GUI\Orange.Mac.GUI.csproj", "{BC6D9E62-E83E-4FD6-ACA3-F3A5EBD1F1E2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kumquat.Mac", "..\Kumquat\Kumquat.Mac.csproj", "{56D2F029-2E73-4CF9-80C7-6175A9DBCFFE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yuzu.Mac", "..\Yuzu\Yuzu.Mac.csproj", "{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicFont.Mac", "..\Lime\Extensions\DynamicFont\DynamicFont.Mac.csproj", "{B5F74505-80BB-4373-B194-219D743C1FA0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,34 +23,38 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{4604AA2E-129F-4814-AD0D-8BA35346ECC4}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{4604AA2E-129F-4814-AD0D-8BA35346ECC4}.Debug|x86.Build.0 = Debug|Any CPU
-		{4604AA2E-129F-4814-AD0D-8BA35346ECC4}.Release|x86.ActiveCfg = Release|Any CPU
-		{4604AA2E-129F-4814-AD0D-8BA35346ECC4}.Release|x86.Build.0 = Release|Any CPU
-		{DC16EEBF-404D-4610-B87A-15B57464D707}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{DC16EEBF-404D-4610-B87A-15B57464D707}.Debug|x86.Build.0 = Debug|Any CPU
-		{DC16EEBF-404D-4610-B87A-15B57464D707}.Release|x86.ActiveCfg = Release|Any CPU
-		{DC16EEBF-404D-4610-B87A-15B57464D707}.Release|x86.Build.0 = Release|Any CPU
-		{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}.Debug|x86.Build.0 = Debug|Any CPU
-		{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}.Release|x86.ActiveCfg = Release|Any CPU
-		{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}.Release|x86.Build.0 = Release|Any CPU
 		{B41A4095-699B-457F-90EA-0EBC7D8B8CB4}.Debug|x86.ActiveCfg = Debug|x86
 		{B41A4095-699B-457F-90EA-0EBC7D8B8CB4}.Debug|x86.Build.0 = Debug|x86
 		{B41A4095-699B-457F-90EA-0EBC7D8B8CB4}.Release|x86.ActiveCfg = Release|x86
 		{B41A4095-699B-457F-90EA-0EBC7D8B8CB4}.Release|x86.Build.0 = Release|x86
-		{4B2BDD5B-2AAE-46AE-AA1A-8C9308BAA50D}.Debug|x86.ActiveCfg = Debug|x86
-		{4B2BDD5B-2AAE-46AE-AA1A-8C9308BAA50D}.Debug|x86.Build.0 = Debug|x86
-		{4B2BDD5B-2AAE-46AE-AA1A-8C9308BAA50D}.Release|x86.ActiveCfg = Release|x86
-		{4B2BDD5B-2AAE-46AE-AA1A-8C9308BAA50D}.Release|x86.Build.0 = Release|x86
 		{4B2BDD5A-2AAE-46AE-AA1A-8C9308BAA50D}.Debug|x86.ActiveCfg = Debug|x86
 		{4B2BDD5A-2AAE-46AE-AA1A-8C9308BAA50D}.Debug|x86.Build.0 = Debug|x86
 		{4B2BDD5A-2AAE-46AE-AA1A-8C9308BAA50D}.Release|x86.ActiveCfg = Release|x86
 		{4B2BDD5A-2AAE-46AE-AA1A-8C9308BAA50D}.Release|x86.Build.0 = Release|x86
-		{B1A51655-D2AD-4D03-B3F2-619F27FECBC4}.Debug|x86.ActiveCfg = Debug|x86
-		{B1A51655-D2AD-4D03-B3F2-619F27FECBC4}.Debug|x86.Build.0 = Debug|x86
-		{B1A51655-D2AD-4D03-B3F2-619F27FECBC4}.Release|x86.ActiveCfg = Release|x86
-		{B1A51655-D2AD-4D03-B3F2-619F27FECBC4}.Release|x86.Build.0 = Release|x86
+		{BB697671-700C-455D-B8EE-66A6B122B949}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BB697671-700C-455D-B8EE-66A6B122B949}.Debug|x86.Build.0 = Debug|Any CPU
+		{BB697671-700C-455D-B8EE-66A6B122B949}.Release|x86.ActiveCfg = Release|Any CPU
+		{BB697671-700C-455D-B8EE-66A6B122B949}.Release|x86.Build.0 = Release|Any CPU
+		{DC16EEBF-404D-4610-B87A-15B57464D707}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DC16EEBF-404D-4610-B87A-15B57464D707}.Debug|x86.Build.0 = Debug|Any CPU
+		{DC16EEBF-404D-4610-B87A-15B57464D707}.Release|x86.ActiveCfg = Release|Any CPU
+		{DC16EEBF-404D-4610-B87A-15B57464D707}.Release|x86.Build.0 = Release|Any CPU
+		{BC6D9E62-E83E-4FD6-ACA3-F3A5EBD1F1E2}.Debug|x86.ActiveCfg = Debug|x86
+		{BC6D9E62-E83E-4FD6-ACA3-F3A5EBD1F1E2}.Debug|x86.Build.0 = Debug|x86
+		{BC6D9E62-E83E-4FD6-ACA3-F3A5EBD1F1E2}.Release|x86.ActiveCfg = Release|x86
+		{BC6D9E62-E83E-4FD6-ACA3-F3A5EBD1F1E2}.Release|x86.Build.0 = Release|x86
+		{56D2F029-2E73-4CF9-80C7-6175A9DBCFFE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{56D2F029-2E73-4CF9-80C7-6175A9DBCFFE}.Debug|x86.Build.0 = Debug|Any CPU
+		{56D2F029-2E73-4CF9-80C7-6175A9DBCFFE}.Release|x86.ActiveCfg = Release|Any CPU
+		{56D2F029-2E73-4CF9-80C7-6175A9DBCFFE}.Release|x86.Build.0 = Release|Any CPU
+		{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}.Debug|x86.Build.0 = Debug|Any CPU
+		{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}.Release|x86.ActiveCfg = Release|Any CPU
+		{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}.Release|x86.Build.0 = Release|Any CPU
+		{B5F74505-80BB-4373-B194-219D743C1FA0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B5F74505-80BB-4373-B194-219D743C1FA0}.Debug|x86.Build.0 = Debug|Any CPU
+		{B5F74505-80BB-4373-B194-219D743C1FA0}.Release|x86.ActiveCfg = Release|Any CPU
+		{B5F74505-80BB-4373-B194-219D743C1FA0}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
@@ -71,21 +77,18 @@ Global
 		$2.inheritsScope = text/x-csharp
 		$2.scope = text/x-csharp
 		$0.TextStylePolicy = $3
-		$3.FileWidth = 120
-		$3.TabWidth = 4
 		$3.EolMarker = Windows
 		$3.inheritsSet = Mono
 		$3.inheritsScope = text/plain
 		$3.scope = text/plain
+		$3.IndentWidth = 8
+		$3.FileWidth = 80
+		$3.TabWidth = 8
 		$0.TextStylePolicy = $4
 		$4.inheritsSet = null
 		$4.scope = text/x-csrc
 		$0.StandardHeader = $5
-		$5.Text = 
-		$5.IncludeInNewFiles = True
 		$0.DotNetNamingPolicy = $6
-		$6.DirectoryNamespaceAssociation = None
-		$6.ResourceNamePolicy = FileFormatDefault
 		$0.TextStylePolicy = $7
 		$7.inheritsSet = null
 		$7.scope = application/xml

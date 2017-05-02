@@ -1,5 +1,6 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using Lime;
 
@@ -12,6 +13,7 @@ namespace Orange
 		private PlatformPicker platformPicker;
 		private PluginPanel pluginPanel;
 		private TextView textView;
+		private TextWriter textWriter;
 
 		public OrangeInterface()
 		{
@@ -87,9 +89,9 @@ namespace Orange
 			textView = new TextView {
 				LayoutCell = new LayoutCell(),
 			};
-			var writer = textView.GetTextWriter();
-			Console.SetOut(writer);
-			Console.SetError(writer);
+			textWriter = textView.GetTextWriter();
+			Console.SetOut(textWriter);
+			Console.SetError(textWriter);
 			return textView;
 		}
 
@@ -131,7 +133,14 @@ namespace Orange
 			The.Workspace.Save();
 			EnableControls(false);
 			The.Workspace?.AssetFiles?.Rescan();
-			yield return Task.ExecuteAsync(action);
+			yield return Task.ExecuteAsync(() => {
+				try {
+					action();
+				}
+				catch (System.Exception ex) {
+					textWriter.Write(ex);
+				}
+			});
 			EnableControls(true);
 			ShowTimeStatistics(startTime);
 
