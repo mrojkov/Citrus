@@ -6,35 +6,45 @@ namespace Lime
 	/// <summary>
 	/// A node reference is used for referencing to a node within a serialized scene by the node Id.
 	/// </summary>
-	public struct NodeReference<T> where T: Node
+	public class NodeReference<T> where T: Node
 	{
-		[YuzuMember]
-		// Public field only because of Yuzu serialization.
-		public string Id;
+		private string id;
+		private Node cachedRoot;
+		private T cachedNode;
+		private long cacheValidationCode;
 
-		public T Node { get; private set; }
+		[YuzuMember]
+		public string Id
+		{
+			get { return id; }
+			set
+			{
+				if (id != value) {
+					id = value;
+					cachedRoot = null;
+					cachedNode = null;
+					cacheValidationCode = 0;
+				}
+			}
+		}
+
+		public NodeReference() { }
 
 		public NodeReference(string id)
 		{
 			Id = id;
-			Node = null;
 		}
 
-		public NodeReference(T node)
-		{
-			Id = node?.Id;
-			Node = node;
-		}
+		public NodeReference<T> Clone() => new NodeReference<T>(Id);
 
-		/// <summary>
-		/// Create a copy with the resolved Node reference. This method should be called from Node.LookupReferences().
-		/// </summary>
-		public NodeReference<T> Resolve(Node context)
+		public T GetNode(Node root)
 		{
-			return new NodeReference<T> {
-				Id = Id,
-				Node = Id != null ? context.TryFind<T>(Id) : null
-			};
+			if (cachedRoot != root || cacheValidationCode != Node.NodeReferenceCacheValidationCode) {
+				cachedRoot = root;
+				cachedNode = root.TryFind<T>(Id);
+				cacheValidationCode = Node.NodeReferenceCacheValidationCode;
+			}
+			return cachedNode;
 		}
 	}
 }

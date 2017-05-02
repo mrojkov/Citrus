@@ -124,7 +124,6 @@ namespace Tangerine
 		{
 			public override void Process(IOperation op)
 			{
-				Document.Current.RootNode.RefreshReferencesDeep();
 				Document.Current.RootNode.Update(0);
 			}
 		}

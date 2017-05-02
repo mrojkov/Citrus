@@ -11,25 +11,18 @@ namespace Lime
 		[YuzuMember]
 		public NodeReference<Spline3D> SplineRef { get; set; }
 
-		public Node3D Node
-		{
-			get { return NodeRef.Node; }
-			set { NodeRef = new NodeReference<Node3D>(value); }
-		}
-
-		public Spline3D Spline
-		{
-			get { return SplineRef.Node; }
-			set { SplineRef = new NodeReference<Spline3D>(value); }
-		}
+		public Node3D Node => NodeRef?.GetNode(Parent);
+		public Spline3D Spline => SplineRef?.GetNode(Parent);
 
 		[YuzuMember]
 		public float SplineOffset { get; set; }
 
-		protected override void RefreshReferences()
+		public override Node Clone()
 		{
-			NodeRef = NodeRef.Resolve(Parent);
-			SplineRef = SplineRef.Resolve(Parent);
+			var clone = (SplineGear3D)base.Clone();
+			clone.NodeRef = clone.NodeRef?.Clone();
+			clone.SplineRef = clone.SplineRef?.Clone();
+			return clone;
 		}
 
 		protected override void SelfLateUpdate(float delta)
@@ -37,13 +30,13 @@ namespace Lime
 			if (Parent == null) {
 				return;
 			}
-			// TODO: Rework NodeReference, remove this line.
-			RefreshReferences();
-			if (Spline != null && Node != null) {
-				var length = Spline.CalcLengthRough();
-				var transform = Spline.CalcPointTransform(SplineOffset * length);
-				NodeRef.Node.Position = Vector3.Zero * transform;
-				NodeRef.Node.Rotation = Quaternion.CreateFromRotationMatrix(transform);;
+			var spline = Spline;
+			var node = Node;
+			if (spline != null && node != null) {
+				var length = spline.CalcLengthRough();
+				var transform = spline.CalcPointTransform(SplineOffset * length);
+				node.Position = Vector3.Zero * transform;
+				node.Rotation = Quaternion.CreateFromRotationMatrix(transform);
 			}
 		}
 	}

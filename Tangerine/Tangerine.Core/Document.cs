@@ -121,7 +121,7 @@ namespace Tangerine.Core
 				if (RootNode is Node3D) {
 					var vp = new Viewport3D { Width = 1024, Height = 768 };
 					vp.AddNode(RootNode);
-					vp.Camera = new Camera3D {
+					var camera = new Camera3D {
 						Id = "DefaultCamera",
 						Position = new Vector3(0, 0, 10),
 						FarClipPlane = 10000,
@@ -131,6 +131,7 @@ namespace Tangerine.Core
 						OrthographicSize = 1.0f
 					};
 					vp.AddNode(vp.Camera);
+					vp.CameraRef = new NodeReference<Camera3D>(camera.Id);
 					RootNode = vp;
 				}
 			}

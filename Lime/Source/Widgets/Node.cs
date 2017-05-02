@@ -110,13 +110,25 @@ namespace Lime
 		public Guid Guid { get; set; }
 #endif
 
+		private string id;
+
 		/// <summary>
 		/// Name field in HotStudio.
 		/// May be non-unique.
 		/// </summary>
 		[YuzuMember]
 		[TangerineStaticProperty]
-		public string Id { get; set; }
+		public string Id
+		{
+			get { return id; }
+			set
+			{
+				if (id != value) {
+					id = value;
+					InvalidateNodeRefrenceCache();
+				}
+			}
+		}
 
 		private string contentsPath;
 		/// <summary>
@@ -129,6 +141,13 @@ namespace Lime
 		{
 			get { return Serialization.ShrinkPath(contentsPath); }
 			set { contentsPath = Serialization.ExpandPath(value); }
+		}
+
+		internal static long NodeReferenceCacheValidationCode = 1;
+
+		internal static void InvalidateNodeRefrenceCache()
+		{
+			System.Threading.Interlocked.Increment(ref NodeReferenceCacheValidationCode);
 		}
 
 		/// <summary>
@@ -574,25 +593,8 @@ namespace Lime
 		/// </summary>
 		protected virtual void Awake()
 		{
-			RefreshReferences();
 			foreach (var c in Components) {
 				c.Awake();
-			}
-		}
-
-		/// <summary>
-		/// Refreshes the node references.
-		/// </summary>
-		protected virtual void RefreshReferences() { }
-
-		/// <summary>
-		/// Refreshes all the node references through the nodes hierarchy.
-		/// </summary>
-		public void RefreshReferencesDeep()
-		{
-			RefreshReferences();
-			foreach (var n in Nodes) {
-				n.RefreshReferences();
 			}
 		}
 
@@ -804,6 +806,9 @@ namespace Lime
 		/// (i.e. for path Root/Human/Head/Eye Human or Head can be ommited).</param>
 		public Node TryFindNode(string path)
 		{
+			if (path == null) {
+				return null;
+			}
 			if (path.IndexOf('/') >= 0) {
 				return TryFindNodeByPath(path);
 			} else {

@@ -32,11 +32,7 @@ namespace Lime
 		[YuzuMember]
 		public NodeReference<Camera3D> CameraRef { get; set; }
 
-		public Camera3D Camera
-		{
-			get { return CameraRef.Node; }
-			set { CameraRef = new NodeReference<Camera3D>(value); }
-		}
+		public Camera3D Camera => CameraRef?.GetNode(Parent);
 
 		[YuzuMember]
 		public float Frame
@@ -61,12 +57,7 @@ namespace Lime
 				OrthographicSize = 1.0f
 			};
 			Nodes.Add(camera);
-			Camera = camera;
-		}
-
-		protected override void RefreshReferences()
-		{
-			CameraRef = CameraRef.Resolve(this);
+			CameraRef = new NodeReference<Camera3D>(camera.Id);
 		}
 
 		protected override void OnSizeChanged(Vector2 sizeDelta)
@@ -186,6 +177,7 @@ namespace Lime
 			var vp = (Viewport3D)base.Clone();
 			vp.opaqueList = new List<RenderItem>();
 			vp.transparentList = new List<RenderItem>();
+			vp.CameraRef = CameraRef?.Clone();
 			return vp;
 		}
 

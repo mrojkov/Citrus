@@ -10,25 +10,18 @@ namespace Lime
 		[YuzuMember]
 		public NodeReference<Spline> SplineRef { get; set; }
 
-		public Widget Widget
-		{
-			get { return WidgetRef.Node; }
-			set { WidgetRef = new NodeReference<Widget>(value); }
-		}
-
-		public Spline Spline
-		{
-			get { return SplineRef.Node; }
-			set { SplineRef = new NodeReference<Spline>(value); }
-		}
+		public Widget Widget => WidgetRef?.GetNode(Parent);
+		public Spline Spline => SplineRef?.GetNode(Parent);
 
 		[YuzuMember]
 		public float SplineOffset { get; set; }
 
-		protected override void RefreshReferences()
+		public override Node Clone()
 		{
-			WidgetRef = WidgetRef.Resolve(Parent);
-			SplineRef = SplineRef.Resolve(Parent);
+			var clone = (SplineGear)base.Clone();
+			clone.WidgetRef = clone.WidgetRef?.Clone();
+			clone.SplineRef = clone.SplineRef?.Clone();
+			return clone;
 		}
 
 		protected override void SelfLateUpdate(float delta)
@@ -36,12 +29,12 @@ namespace Lime
 			if (Parent == null) {
 				return;
 			}
-			// TODO: Rework NodeReference, remove this line.
-			RefreshReferences();
-			if (Spline != null && Widget != null) {
-				var length = Spline.CalcLengthRough();
-				var point = Spline.CalcPoint(SplineOffset * length);
-				Widget.Position = Spline.CalcLocalToParentTransform().TransformVector(point);
+			var spline = Spline;
+			var widget = Widget;
+			if (spline != null && widget != null) {
+				var length = spline.CalcLengthRough();
+				var point = spline.CalcPoint(SplineOffset * length);
+				widget.Position = spline.CalcLocalToParentTransform().TransformVector(point);
 			}
 		}
 	}

@@ -187,6 +187,7 @@ namespace Lime
 				list[index].NextSibling = list[index + 1];
 			}
 			node.PropagateDirtyFlags();
+			Node.InvalidateNodeRefrenceCache();
 		}
 
 		private void RuntimeChecksBeforeInsertion(Node node)
@@ -226,6 +227,7 @@ namespace Lime
 			if (list == null) {
 				return;
 			}
+			Node.InvalidateNodeRefrenceCache();
 			foreach (var node in list) {
 				node.Parent = null;
 				node.NextSibling = null;
@@ -261,6 +263,7 @@ namespace Lime
 			if (index > 0) {
 				list[index - 1].NextSibling = index < Count ? list[index] : null;
 			}
+			Node.InvalidateNodeRefrenceCache();
 		}
 
 		public Node this[int index]
@@ -289,6 +292,7 @@ namespace Lime
 					value.NextSibling = list[index + 1];
 				}
 				value.PropagateDirtyFlags();
+				Node.InvalidateNodeRefrenceCache();
 			}
 		}
 
@@ -318,6 +322,7 @@ namespace Lime
 				list[indexTo - 1].NextSibling = tmp;
 			}
 			tmp.NextSibling = (indexTo + 1 < Count) ? list[indexTo + 1] : null;
+			Node.InvalidateNodeRefrenceCache();
 		}
 	}
 }

@@ -12,11 +12,7 @@ namespace Lime
 		public readonly ObservableCollection<Item> Items = new ObservableCollection<Item>();
 		public NodeReference<Widget> LabelRef { get; set; } = new NodeReference<Widget>("Label");
 		
-		public Widget Label
-		{
-			get { return LabelRef.Node; }
-			set { LabelRef = new NodeReference<Widget>(value); }
-		}
+		public Widget Label => LabelRef.GetNode(Parent);
 
 		public int Index
 		{
@@ -26,6 +22,13 @@ namespace Lime
 				index = value;
 				RefreshLabel();
 			}
+		}
+
+		public override Node Clone()
+		{
+			var clone = (CommonDropDownList)base.Clone();
+			clone.LabelRef = clone.LabelRef?.Clone();
+			return clone;
 		}
 
 		public override string Text
@@ -59,11 +62,6 @@ namespace Lime
 		{
 			base.Awake();
 			Tasks.Add(Loop());
-		}
-
-		protected override void RefreshReferences()
-		{
-			LabelRef = LabelRef.Resolve(Parent);
 		}
 
 		IEnumerator<object> Loop()
