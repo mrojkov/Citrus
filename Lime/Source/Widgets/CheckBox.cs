@@ -48,7 +48,7 @@ namespace Lime
 			}
 		}
 
-		void Toggle()
+		public void Toggle()
 		{
 			Checked = !Checked;
 			if (Changed != null) {
