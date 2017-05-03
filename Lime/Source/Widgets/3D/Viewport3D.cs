@@ -32,7 +32,7 @@ namespace Lime
 		[YuzuMember]
 		public NodeReference<Camera3D> CameraRef { get; set; }
 
-		public Camera3D Camera => CameraRef?.GetNode(Parent);
+		public Camera3D Camera => CameraRef?.GetNode(this);
 
 		[YuzuMember]
 		public float Frame
@@ -94,7 +94,7 @@ namespace Lime
 			try {
 				if (Camera == null) {
 					return false;
-				}	
+				}
 				args.Ray = ScreenPointToRay(args.Point);
 				args.Distance = float.MaxValue;
 				foreach (var node in Nodes) {
@@ -148,7 +148,7 @@ namespace Lime
 				foreach (var item in layer) {
 					var p = item.Node as IZSorterParams;
 					if (p == null) {
-						continue;	
+						continue;
 					}
 					var list = p.Opaque ? opaqueList : transparentList;
 					list.Add(new RenderItem {
@@ -194,7 +194,7 @@ namespace Lime
 		{
 			orthoProjection.M33 = 1; // Discard Z normalization, since it comes from the camera projection matrix
 			orthoProjection.M43 = 0;
-			var p = 
+			var p =
 				// Transform from <-1, 1> normalized coordinates to the widget space
 				Matrix44.CreateScale(Width / 2, -Height / 2, 1) *
 				Matrix44.CreateTranslation(Width / 2, Height / 2, 0) *
