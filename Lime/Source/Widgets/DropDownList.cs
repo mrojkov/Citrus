@@ -10,7 +10,7 @@ namespace Lime
 		public event Action<ChangedEventArgs> Changed;
 		public readonly ObservableCollection<Item> Items = new ObservableCollection<Item>();
 		public NodeReference<Widget> TextWidgetRef { get; set; } = new NodeReference<Widget>("TextWidget");
-		
+
 		public Widget TextWidget => TextWidgetRef.GetNode(this);
 
 		private int index = -1;
@@ -28,7 +28,7 @@ namespace Lime
 
 		public override string Text
 		{
-			get { return (uint)Index < Items.Count ? Items[Index].Text : (string)userValue; }
+			get { return Items.ElementAtOrDefault(Index)?.Text ?? (string)userValue; }
 			set
 			{
 				var item = Items.FirstOrDefault(i => i.Text == value);
@@ -91,7 +91,7 @@ namespace Lime
 				yield return Task.WaitForInput();
 			}
 		}
-		
+
 		protected abstract bool ShouldHandleSpacebar();
 
 		IEnumerator<object> ShowDropDownListTask()
@@ -113,7 +113,7 @@ namespace Lime
 				}
 				var t = j;
 				command.Issued += () => {
-					Index = t; 
+					Index = t;
 					RaiseChanged();
 				};
 				menu.Add(command);
