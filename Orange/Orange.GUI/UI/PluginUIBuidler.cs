@@ -69,8 +69,8 @@ namespace Orange
 
 		public bool Checked
 		{
-			get => CheckBox.Checked;
-			set => CheckBox.Checked = value;
+			get { return CheckBox.Checked; }
+			set { CheckBox.Checked = value; }
 		}
 
 		public SimpleText Label { get; }
