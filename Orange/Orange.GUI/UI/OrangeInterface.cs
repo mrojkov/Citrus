@@ -77,10 +77,13 @@ namespace Orange
 			table.AddNode(picker);
 		}
 
-		private static Widget CreateProjectPicker()
+		private Widget CreateProjectPicker()
 		{
 			var picker = new FileChooser();
-			picker.FileChosen += file => The.Workspace.Open(file);
+			picker.FileChosen += file => {
+				The.Workspace.Open(file);
+				platformPicker.Reload();
+			};
 			return picker;
 		}
 
@@ -204,8 +207,7 @@ namespace Orange
 
 		public override void CreatePluginUI(IPluginUIBuilder builder)
 		{
-			if (!builder.SidePanel.Enabled)
-			{
+			if (!builder.SidePanel.Enabled) {
 				return;
 			}
 			pluginPanel = builder.SidePanel as PluginPanel;
