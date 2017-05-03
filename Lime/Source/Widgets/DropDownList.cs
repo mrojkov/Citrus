@@ -14,7 +14,7 @@ namespace Lime
 		public Widget TextWidget => TextWidgetRef.GetNode(this);
 
 		private int index = -1;
-		protected string userText;
+		protected object userValue;
 
 		public int Index
 		{
@@ -28,23 +28,23 @@ namespace Lime
 
 		public override string Text
 		{
-			get { return (uint)Index < Items.Count ? Items[Index].Text : userText; }
+			get { return (uint)Index < Items.Count ? Items[Index].Text : (string)userValue; }
 			set
 			{
 				var item = Items.FirstOrDefault(i => i.Text == value);
 				Index = (item != null) ? Items.IndexOf(item) : -1;
-				userText = Index == -1 ? value : null;
+				userValue = Index == -1 ? value : null;
 			}
 		}
 
 		public object Value
 		{
-			get { return (uint)Index < Items.Count ? Items[Index].Value : userText; }
+			get { return (uint)Index < Items.Count ? Items[Index].Value : userValue; }
 			set
 			{
 				var item = Items.FirstOrDefault(i => i.Value.Equals(value));
 				Index = (item != null) ? Items.IndexOf(item) : -1;
-				userText = Index == -1 ? (string)value : null;
+				userValue = Index == -1 ? value : null;
 			}
 		}
 
@@ -185,10 +185,10 @@ namespace Lime
 		{
 			var item = Items.FirstOrDefault(i => i.Text == text);
 			if (item != null) {
-				userText = null;
+				userValue = null;
 				Index = Items.IndexOf(item);
 			} else {
-				userText = text;
+				userValue = text;
 				Index = -1;
 			}
 			RaiseChanged();
