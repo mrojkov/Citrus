@@ -10,6 +10,7 @@ namespace Orange
 	{
 		private readonly Window window;
 		private readonly WindowWidget windowWidget;
+		private FileChooser projectPicker;
 		private PlatformPicker platformPicker;
 		private PluginPanel pluginPanel;
 		private TextView textView;
@@ -63,7 +64,7 @@ namespace Orange
 				LayoutCell = new LayoutCell { StretchY = 0 }
 			};
 			AddPicker(header, "Target platform", platformPicker = new PlatformPicker());
-			AddPicker(header, "Citrus Project", CreateProjectPicker());
+			AddPicker(header, "Citrus Project", projectPicker = CreateProjectPicker());
 			return header;
 		}
 
@@ -77,13 +78,10 @@ namespace Orange
 			table.AddNode(picker);
 		}
 
-		private Widget CreateProjectPicker()
+		private static FileChooser CreateProjectPicker()
 		{
 			var picker = new FileChooser();
-			picker.FileChosen += file => {
-				The.Workspace.Open(file);
-				platformPicker.Reload();
-			};
+			picker.FileChosenByUser += The.Workspace.Open;
 			return picker;
 		}
 
@@ -162,6 +160,12 @@ namespace Orange
 			var endTime = DateTime.Now;
 			var delta = endTime - startTime;
 			Console.WriteLine("Elapsed time {0}:{1}:{2}", delta.Hours, delta.Minutes, delta.Seconds);
+		}
+
+		public override void OnWorkspaceOpened()
+		{
+			platformPicker.Reload();
+			projectPicker.ChosenFile = The.Workspace.ProjectFile;
 		}
 
 		public override void ClearLog()

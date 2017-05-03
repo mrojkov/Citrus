@@ -1,12 +1,14 @@
 using System;
+using System.IO;
 using Lime;
+using Environment = System.Environment;
 
 namespace Orange
 {
 	public class FileChooser : Widget
 	{
 		private EditBox editor;
-		public event Action<string> FileChosen;
+		public event Action<string> FileChosenByUser;
 
 		public FileChooser()
 		{
@@ -22,15 +24,14 @@ namespace Orange
 				LayoutCell = new LayoutCell(Alignment.Center)
 			};
 			AddNode(button);
-			editor.Submitted += ChooseFile;
+			editor.Submitted += ChooseFileByUser;
 			button.Clicked += ButtonClicked;
 		}
 
-		public void ChooseFile(string file)
+		private void ChooseFileByUser(string file)
 		{
 			ChosenFile = file;
-			editor.Text = file;
-			FileChosen?.Invoke(file);
+			FileChosenByUser?.Invoke(file);
 		}
 
 		private void ButtonClicked()
@@ -38,12 +39,20 @@ namespace Orange
 			var dialog = new FileDialog {
 				AllowedFileTypes = new[] { "citproj" },
 				Mode = FileDialogMode.Open,
-				InitialDirectory = "D:\\Dev\\LetsEat" // Directory.GetCurrentDirectory(),
+				InitialDirectory = InitialDirectory
 			};
 			if (dialog.RunModal())
-				ChooseFile(dialog.FileName);
+				ChooseFileByUser(dialog.FileName);
 		}
 
-		public string ChosenFile { get; set; }
+		private string InitialDirectory => !string.IsNullOrEmpty(ChosenFile) ?
+			Directory.GetParent(ChosenFile).FullName :
+			Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments);
+
+		public string ChosenFile
+		{
+			get { return editor.Text; }
+			set { editor.Text = value; }
+		}
 	}
 }

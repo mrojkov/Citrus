@@ -18,17 +18,21 @@ namespace Orange
 			WidgetInput.AcceptMouseBeyondWidgetByDefault = false;
 			Widget.DefaultWidgetSize = Vector2.Zero;
 			LoadFont();
-			Theme.Current = new DesktopTheme();
-			DesktopTheme.Colors = DesktopTheme.ColorTheme.CreateLightTheme();
-			The.Workspace.Load();
+			SetupTheme();
 			CreateMenuItems();
 			UserInterface.Instance = Interface = new OrangeInterface();
+			The.Workspace.Load();
 		}
 
 		private static void CreateMenuItems()
 		{
-			var assembly = System.Reflection.Assembly.GetExecutingAssembly();
 			The.MenuController.CreateAssemblyMenuItems();
+		}
+
+		private static void SetupTheme()
+		{
+			Theme.Current = new DesktopTheme();
+			DesktopTheme.Colors = DesktopTheme.ColorTheme.CreateLightTheme();
 		}
 
 		private static void LoadFont()
