@@ -31,6 +31,6 @@ namespace Orange
 			NSApplication.SharedApplication.DidFinishLaunching += (sender, e) => OrangeApp.Initialize();
 			Application.Run();
 		}
-	}
 #endif
+	}
 }
