@@ -21,6 +21,7 @@ namespace Tangerine
 
 		private TangerineApp()
 		{
+			Orange.UserInterface.Instance = new OrangeInterface();
 			WindowOptions.DefaultRefreshRate = 60;
 			WidgetInput.AcceptMouseBeyondWidgetByDefault = false;
 			Application.IsTangerine = true;
