@@ -349,7 +349,7 @@ namespace Tangerine.UI
 			foreach (var i in Enum.GetNames(propType).Zip(Enum.GetValues(propType).Cast<object>(), (a, b) => new DropDownList.Item(a, b))) {
 				selector.Items.Add(i);
 			}
-			selector.Changed += index => SetProperty(editorParams.PropertyName, (T)selector.Items[index].Value);
+			selector.Changed += a => SetProperty(editorParams.PropertyName, (T)selector.Items[a.Index].Value);
 			selector.AddChangeWatcher(CoalescedPropertyValue<T>(editorParams), v => selector.Value = v);
 		}
 
@@ -590,8 +590,8 @@ namespace Tangerine.UI
 			foreach (var i in items) {
 				selector.Items.Add(i);
 			}
-			selector.Changed += index => {
-				var font = new SerializableFont(selector.Items[index].Text);
+			selector.Changed += a => {
+				var font = new SerializableFont((string)a.Value);
 				SetProperty(editorParams.PropertyName, font);
 			};
 			selector.AddChangeWatcher(CoalescedPropertyValue<SerializableFont>(editorParams), i => {
@@ -610,7 +610,7 @@ namespace Tangerine.UI
 		{
 			comboBox = new ComboBox { LayoutCell = new LayoutCell(Alignment.Center) };
 			ContainerWidget.AddNode(comboBox);
-			comboBox.Changed += index => SetProperty(editorParams.PropertyName, comboBox.Items[index].Text);
+			comboBox.Changed += a => SetProperty(editorParams.PropertyName, (string)a.Value);
 			if (editorParams.Objects.Count == 1) {
 				var node = (Node)editorParams.Objects[0];
 				foreach (var a in node.Animations) {

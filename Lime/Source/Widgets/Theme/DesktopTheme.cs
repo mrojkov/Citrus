@@ -373,7 +373,7 @@ namespace Lime
 			dropDownList.MaxHeight = Metrics.DefaultButtonSize.Y;
 			dropDownList.TabTravesable = new TabTraversable();
 			var text = new SimpleText {
-				Id = "Label",
+				Id = "TextWidget",
 				VAlignment = VAlignment.Center,
 			};
 			text.CompoundPresenter.Add(new DropDownListPresenter());
@@ -388,11 +388,11 @@ namespace Lime
 			var comboBox = (ComboBox)widget;
 			comboBox.MinSize = Metrics.DefaultButtonSize;
 			comboBox.MaxHeight = Metrics.DefaultButtonSize.Y;
-			var text = new EditBox { Id = "Label" };
 			comboBox.CompoundPresenter.Add(new DropDownListPresenter());
-			comboBox.AddNode(text);
-			ExpandToContainer(text);
-			text.Width -= DropDownListPresenter.IconWidth;
+			var editBox = new EditBox { Id = "TextWidget" };
+			comboBox.AddNode(editBox);
+			ExpandToContainer(editBox);
+			editBox.Width -= DropDownListPresenter.IconWidth;
 		}
 
 		private void DecorateTabBar(Widget widget)

@@ -7,12 +7,14 @@ namespace Lime
 {
 	public abstract class CommonDropDownList : Widget
 	{
-		private int index = -1;
-		public event Action<int> Changed;
+		public event Action<ChangedEventArgs> Changed;
 		public readonly ObservableCollection<Item> Items = new ObservableCollection<Item>();
-		public NodeReference<Widget> LabelRef { get; set; } = new NodeReference<Widget>("Label");
+		public NodeReference<Widget> TextWidgetRef { get; set; } = new NodeReference<Widget>("TextWidget");
 		
-		public Widget Label => LabelRef.GetNode(Parent);
+		public Widget TextWidget => TextWidgetRef.GetNode(this);
+
+		private int index = -1;
+		protected string userText;
 
 		public int Index
 		{
@@ -20,42 +22,44 @@ namespace Lime
 			set
 			{
 				index = value;
-				RefreshLabel();
+				RefreshTextWidget();
 			}
-		}
-
-		public override Node Clone()
-		{
-			var clone = (CommonDropDownList)base.Clone();
-			clone.LabelRef = clone.LabelRef?.Clone();
-			return clone;
 		}
 
 		public override string Text
 		{
-			get { return Index == -1 ? null : Items[Index].Text; }
+			get { return (uint)Index < Items.Count ? Items[Index].Text : userText; }
 			set
 			{
 				var item = Items.FirstOrDefault(i => i.Text == value);
 				Index = (item != null) ? Items.IndexOf(item) : -1;
+				userText = Index == -1 ? value : null;
 			}
 		}
 
 		public object Value
 		{
-			get { return Index == -1 ? null : Items[Index].Value; }
+			get { return (uint)Index < Items.Count ? Items[Index].Value : userText; }
 			set
 			{
 				var item = Items.FirstOrDefault(i => i.Value.Equals(value));
 				Index = (item != null) ? Items.IndexOf(item) : -1;
+				userText = Index == -1 ? (string)value : null;
 			}
 		}
 
 		public CommonDropDownList()
 		{
 			Input.AcceptMouseBeyondWidget = false;
-			Items.CollectionChanged += (sender, e) => RefreshLabel();
+			Items.CollectionChanged += (sender, e) => RefreshTextWidget();
 			HitTestTarget = true;
+		}
+
+		public override Node Clone()
+		{
+			var clone = (CommonDropDownList)base.Clone();
+			clone.TextWidgetRef = clone.TextWidgetRef?.Clone();
+			return clone;
 		}
 
 		protected override void Awake()
@@ -66,7 +70,7 @@ namespace Lime
 
 		IEnumerator<object> Loop()
 		{
-			RefreshLabel();
+			RefreshTextWidget();
 			while (true) {
 				if (Input.WasMousePressed() && IsMouseOver()) {
 					SetFocus();
@@ -110,9 +114,7 @@ namespace Lime
 				var t = j;
 				command.Issued += () => {
 					Index = t; 
-					if (Changed != null) {
-						Changed(Index);
-					}
+					RaiseChanged();
 				};
 				menu.Add(command);
 				j++;
@@ -124,10 +126,15 @@ namespace Lime
 #endif
 		}
 
-		private void RefreshLabel()
+		protected void RaiseChanged()
 		{
-			if (Label != null) {
-				Label.Text = Text;
+			Changed?.Invoke(new ChangedEventArgs { Index = Index, Value = Value });
+		}
+
+		protected void RefreshTextWidget()
+		{
+			if (TextWidget != null) {
+				TextWidget.Text = Text;
 			}
 		}
 
@@ -150,6 +157,12 @@ namespace Lime
 		}
 	}
 
+	public class ChangedEventArgs
+	{
+		public int Index;
+		public object Value;
+	}
+
 	public class DropDownList : CommonDropDownList
 	{
 		public DropDownList()
@@ -165,8 +178,22 @@ namespace Lime
 		public ComboBox()
 		{
 			Theme.Current.Apply(this);
+			((EditBox)TextWidget).Submitted += TextWidget_Submitted;
 		}
-		
+
+		private void TextWidget_Submitted(string text)
+		{
+			var item = Items.FirstOrDefault(i => i.Text == text);
+			if (item != null) {
+				userText = null;
+				Index = Items.IndexOf(item);
+			} else {
+				userText = text;
+				Index = -1;
+			}
+			RaiseChanged();
+		}
+
 		protected override bool ShouldHandleSpacebar() => false;
 	}
 }
