@@ -16,6 +16,7 @@ namespace Orange
 		private TextView textView;
 		private TextWriter textWriter;
 		private CheckBoxWithLabel updateVcs;
+		private Widget inputLocker = new Widget();
 
 		public OrangeInterface()
 		{
@@ -121,6 +122,7 @@ namespace Orange
 			actionPicker.Index = 0;
 			var go = new Button("Go");
 			go.Clicked += () => Execute((Action) actionPicker.Value);
+			go.AddNode(inputLocker);
 			container.AddNode(go);
 			return container;
 		}
@@ -169,9 +171,14 @@ namespace Orange
 			return true;
 		}
 
-		private void EnableControls(bool b)
+		private void EnableControls(bool value)
 		{
-			//throw new NotImplementedException();
+			if (value) {
+				inputLocker.Input.DerestrictScope();
+			}
+			else {
+				inputLocker.Input.RestrictScope();
+			}
 		}
 
 		private void ShowTimeStatistics(DateTime startTime)
