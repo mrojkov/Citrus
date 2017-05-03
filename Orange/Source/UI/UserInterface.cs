@@ -32,6 +32,8 @@ namespace Orange
 
 		public virtual void ProcessPendingEvents() { }
 
+		public virtual void OnWorkspaceLoaded(WorkspaceConfig config) { }
+
 		public virtual void OnWorkspaceOpened() { }
 
 		public abstract bool DoesNeedSvnUpdate();

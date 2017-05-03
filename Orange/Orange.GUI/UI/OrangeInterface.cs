@@ -15,6 +15,7 @@ namespace Orange
 		private PluginPanel pluginPanel;
 		private TextView textView;
 		private TextWriter textWriter;
+		private CheckBoxWithLabel updateVcs;
 
 		public OrangeInterface()
 		{
@@ -39,6 +40,7 @@ namespace Orange
 				}
 			};
 			mainVBox.AddNode(CreateHeaderSection());
+			mainVBox.AddNode(CreateVcsSection());
 			mainVBox.AddNode(CreateTextView());
 			mainVBox.AddNode(CreateFooterSection());
 			windowWidget.AddNode(mainVBox);
@@ -66,6 +68,12 @@ namespace Orange
 			AddPicker(header, "Target platform", platformPicker = new PlatformPicker());
 			AddPicker(header, "Citrus Project", projectPicker = CreateProjectPicker());
 			return header;
+		}
+
+		private Widget CreateVcsSection()
+		{
+			updateVcs = new CheckBoxWithLabel("Update project before build");
+			return updateVcs;
 		}
 
 		private static void AddPicker(Node table, string name, Node picker)
@@ -125,29 +133,40 @@ namespace Orange
 				return;
 			}
 #endif
-			windowWidget.Tasks.Add(ExecuteAsync(action));
+			windowWidget.Tasks.Add(ExecuteTask(action));
 		}
 
-		private IEnumerator<object> ExecuteAsync(Action action)
+		private IEnumerator<object> ExecuteTask(Action action)
 		{
 			var startTime = DateTime.Now;
 			The.Workspace.Save();
 			EnableControls(false);
-			The.Workspace?.AssetFiles?.Rescan();
 			textView.Text = string.Empty;
-			yield return Task.ExecuteAsync(() => {
-				try {
-					action();
-				}
-				catch (System.Exception ex) {
-					textWriter.WriteLine(ex);
-				}
-			});
-			textWriter.WriteLine("Output has been copied to clipboard.");
+			var updateCompleted = true;
+			if (DoesNeedSvnUpdate()) {
+				var builder = new SolutionBuilder(The.Workspace.ActivePlatform, The.Workspace.CustomSolution);
+				yield return Task.ExecuteAsync(() => updateCompleted = SafeExecute(builder.SvnUpdate));
+			}
+			if (updateCompleted) {
+				The.Workspace?.AssetFiles?.Rescan();
+				yield return Task.ExecuteAsync(() => SafeExecute(action));
+				textWriter.WriteLine("Output has been copied to clipboard.");
+			}
 			Clipboard.Text = textView.Text;
 			EnableControls(true);
 			ShowTimeStatistics(startTime);
+		}
 
+		private bool SafeExecute(Action action)
+		{
+			try {
+				action();
+			}
+			catch (System.Exception ex) {
+				textWriter.WriteLine(ex);
+				return false;
+			}
+			return true;
 		}
 
 		private void EnableControls(bool b)
@@ -165,7 +184,12 @@ namespace Orange
 		public override void OnWorkspaceOpened()
 		{
 			platformPicker.Reload();
-			projectPicker.ChosenFile = The.Workspace.ProjectFile;
+		}
+
+		public override void OnWorkspaceLoaded(WorkspaceConfig config)
+		{
+			updateVcs.CheckBox.Checked = config.UpdateBeforeBuild;
+			projectPicker.ChosenFile = config.CitrusProject;
 		}
 
 		public override void ClearLog()
@@ -201,7 +225,7 @@ namespace Orange
 
 		public override bool DoesNeedSvnUpdate()
 		{
-			return false;
+			return updateVcs.Checked;
 		}
 
 		public override IPluginUIBuilder GetPluginUIBuilder()

@@ -35,41 +35,44 @@ namespace Orange
 			return checkBox;
 		}
 
-		private class PluginCheckBox : Widget, ICheckBox
+		private class PluginCheckBox : CheckBoxWithLabel, ICheckBox
 		{
-			private SimpleText label;
-			private CheckBox checkBox;
-
-			public PluginCheckBox(string label)
+			public PluginCheckBox(string label) : base(label)
 			{
-				Layout = new HBoxLayout { Spacing = 8 };
-				SetupCheckBox();
-				SetupLabel(label);
-			}
-
-			private void SetupCheckBox()
-			{
-				checkBox = new CheckBox { Checked = false };
-				checkBox.Changed += value => Toggled?.Invoke(this, EventArgs.Empty);
-				AddNode(checkBox);
-			}
-
-			private void SetupLabel(string text)
-			{
-				label = new SimpleText(text) {
-					HitTestTarget = true,
-					Clicked = checkBox.Toggle
-				};
-				AddNode(label);
+				CheckBox.Changed += value => Toggled?.Invoke(this, EventArgs.Empty);
 			}
 
 			public event EventHandler Toggled;
 
 			public bool Active
 			{
-				get { return checkBox.Checked; }
-				set { checkBox.Checked = value; }
+				get { return CheckBox.Checked; }
+				set { CheckBox.Checked = value; }
 			}
 		}
+	}
+
+	public class CheckBoxWithLabel: Widget
+	{
+		public CheckBoxWithLabel(string text)
+		{
+			Layout = new HBoxLayout { Spacing = 8 };
+			AddNode(CheckBox = new CheckBox());
+			Label = new SimpleText(text) {
+				HitTestTarget = true,
+				Clicked = CheckBox.Toggle
+			};
+			AddNode(Label);
+		}
+
+		public CheckBox CheckBox { get; }
+
+		public bool Checked
+		{
+			get => CheckBox.Checked;
+			set => CheckBox.Checked = value;
+		}
+
+		public SimpleText Label { get; }
 	}
 }
