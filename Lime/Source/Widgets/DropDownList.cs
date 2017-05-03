@@ -39,7 +39,7 @@ namespace Lime
 
 		public object Value
 		{
-			get { return (uint)Index < Items.Count ? Items[Index].Value : userValue; }
+			get { return Items.ElementAtOrDefault(Index)?.Value ?? userValue; }
 			set
 			{
 				var item = Items.FirstOrDefault(i => i.Value.Equals(value));
