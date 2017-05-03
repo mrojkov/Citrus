@@ -46,11 +46,13 @@ namespace Tangerine
 			var timelinePanel = new DockPanel("Timeline");
 			var inspectorPanel = new DockPanel("Inspector");
 			var searchPanel = new DockPanel("Search");
+			var filesystemPanel = new DockPanel("Filesystem");
 
 			var dockManager = DockManager.Instance;
 			dockManager.AddPanel(timelinePanel, DockSite.Top, new Vector2(800, 300));
 			dockManager.AddPanel(inspectorPanel, DockSite.Left, new Vector2(300, 700));
 			dockManager.AddPanel(searchPanel, DockSite.Right, new Vector2(300, 700));
+			dockManager.AddPanel(filesystemPanel, DockSite.Right, new Vector2(300, 700));
 			DockManagerInitialState = dockManager.ExportState();
 			var documentViewContainer = InitializeDocumentArea(dockManager);
 
@@ -103,6 +105,7 @@ namespace Tangerine
 						new UI.Timeline.Timeline(timelinePanel),
 						new UI.SceneView.SceneView(documentViewContainer),
 						new UI.SearchPanel(searchPanel.ContentWidget),
+						new UI.FilesystemView.FilesystemView(filesystemPanel.ContentWidget),
 					});
 				}
 			};
@@ -270,7 +273,7 @@ namespace Tangerine
 			};
 			var nodeTypes = new[] {
 				typeof(Frame),
-				typeof(Button),	
+				typeof(Button),
 				typeof(Image),
 				typeof(Audio),
 				typeof(Movie),
@@ -342,7 +345,7 @@ namespace Tangerine
 			h.Connect(Tools.ResetRotation, new ResetRotation());
 			h.Connect(Tools.FitToContainer, new FitToContainer());
 			h.Connect(Tools.FitToContent, new FitToContent());
-			h.Connect(Tools.FlipX, new FlipX());		
+			h.Connect(Tools.FlipX, new FlipX());
 			h.Connect(Tools.FlipY, new FlipY());
 			h.Connect(Command.Copy, Core.Operations.Copy.CopyToClipboard, () => Document.Current?.SelectedRows().Any() ?? false);
 			h.Connect(Command.Cut, Core.Operations.Cut.Perform, () => Document.Current?.SelectedRows().Any() ?? false);

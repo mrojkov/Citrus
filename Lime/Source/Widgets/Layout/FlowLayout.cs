@@ -60,6 +60,8 @@ namespace Lime
 			}
 		}
 
+		// TODO: apply fixes from GD branch
+		// TODO: Optimize equal size for all elements case
 		public override void MeasureSizeConstraints(Widget widget)
 		{
 			ConstraintsValid = true;

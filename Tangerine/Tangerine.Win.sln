@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yuzu", "..\Yuzu\Yuzu.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangerine.UI.SceneView.Win", "Tangerine.UI.SceneView\Tangerine.UI.SceneView.Win.csproj", "{80486551-A659-42B0-AADA-165C54E9B0AF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangerine.UI.FilesystemView.Win", "Tangerine.UI.FilesystemView\Tangerine.UI.FilesystemView.Win.csproj", "{74F91BD5-9E43-40FD-B8EA-B9819D1CA926}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -111,6 +113,14 @@ Global
 		{80486551-A659-42B0-AADA-165C54E9B0AF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{80486551-A659-42B0-AADA-165C54E9B0AF}.Release|x86.ActiveCfg = Release|Any CPU
 		{80486551-A659-42B0-AADA-165C54E9B0AF}.Release|x86.Build.0 = Release|Any CPU
+		{74F91BD5-9E43-40FD-B8EA-B9819D1CA926}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74F91BD5-9E43-40FD-B8EA-B9819D1CA926}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74F91BD5-9E43-40FD-B8EA-B9819D1CA926}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{74F91BD5-9E43-40FD-B8EA-B9819D1CA926}.Debug|x86.Build.0 = Debug|Any CPU
+		{74F91BD5-9E43-40FD-B8EA-B9819D1CA926}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74F91BD5-9E43-40FD-B8EA-B9819D1CA926}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74F91BD5-9E43-40FD-B8EA-B9819D1CA926}.Release|x86.ActiveCfg = Release|Any CPU
+		{74F91BD5-9E43-40FD-B8EA-B9819D1CA926}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

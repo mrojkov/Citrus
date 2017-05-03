@@ -85,6 +85,10 @@
       <Project>{05fb6476-c29b-49a7-918c-a52caf73fca7}</Project>
       <Name>Tangerine.Core.Win</Name>
     </ProjectReference>
+    <ProjectReference Include="Tangerine.UI.FilesystemView\Tangerine.UI.FilesystemView.Win.csproj">
+      <Project>{74f91bd5-9e43-40fd-b8ea-b9819d1ca926}</Project>
+      <Name>Tangerine.UI.FilesystemView.Win</Name>
+    </ProjectReference>
     <ProjectReference Include="Tangerine.UI.Inspector\Tangerine.UI.Inspector.Win.csproj">
       <Project>{d6b543cb-0223-4210-bb0f-7d8250760895}</Project>
       <Name>Tangerine.UI.Inspector.Win</Name>
