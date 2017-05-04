@@ -139,14 +139,13 @@ namespace Tangerine.Core
 				RootNode.AnimationSpeed = 0.5f;
 			}
 			Decorate(RootNode);
-			RootNode.Update(0);
 			Container = RootNode;
 			// Hide all hitboxes
 			foreach (var n in RootNode.Descendants.Where(n => n.Id == "HitBox")) {
 				(n as Node3D).Visible = false;
 			}
 		}
-		
+
 		static DocumentFormat ResolveFormat(string path)
 		{
 			if (AssetExists(path, "scene")) {
