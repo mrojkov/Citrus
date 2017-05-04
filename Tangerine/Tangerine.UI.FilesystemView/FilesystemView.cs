@@ -29,6 +29,7 @@ namespace Tangerine.UI.FilesystemView
 
 		void InitializeWidgets()
 		{
+			selection.Changed += Selection_Changed;
 			FilesWidget.HitTestTarget = true;
 			FilesWidget.Content.Layout = new FlowLayout { Spacing = 1.0f };
 			FilesWidget.Padding = new Thickness(5.0f);
@@ -71,15 +72,15 @@ namespace Tangerine.UI.FilesystemView
 						input.ConsumeKey(Key.Mouse0);
 						if (input.IsKeyPressed(Key.Control) && !input.IsKeyPressed(Key.Shift)) {
 							input.ConsumeKey(Key.Control);
-							if (Model.Selection.Contains(item)) {
-								Model.Selection.Remove(item);
+							if (selection.Contains(item)) {
+								selection.Deselect(item);
 							} else {
-								Model.Selection.Add(item);
+								selection.Select(item);
 							}
 							// TODO: Ctrl + Shift, Shift clicks
 						} else {
-							Model.Selection.Clear();
-							Model.Selection.Add(item);
+							selection.Clear();
+							selection.Select(item);
 						}
 						Window.Current.Invalidate();
 					}
@@ -93,7 +94,7 @@ namespace Tangerine.UI.FilesystemView
 
 		private void RenderIconSelection(Icon icon)
 		{
-			if (Model.Selection.Contains(icon.FilesystemPath)) {
+			if (selection.Contains(icon.FilesystemPath)) {
 				icon.PrepareRendererState();
 				Renderer.DrawRect(Vector2.Zero, icon.Size, DesktopTheme.Colors.SelectedBackground.Transparentify(0.5f));
 				Renderer.DrawRectOutline(Vector2.Zero, icon.Size, DesktopTheme.Colors.SelectedBackground);
@@ -119,10 +120,10 @@ namespace Tangerine.UI.FilesystemView
 				var ic = n as Icon;
 				var r1 = new Rectangle(ic.Position, ic.Position + ic.Size);
 				if (Rectangle.Intersect(r0, r1) != Rectangle.Empty) {
-					Model.Selection.Add(ic.FilesystemPath);
+					selection.Select(ic.FilesystemPath);
 				} else {
-					if (Model.Selection.Contains(ic.FilesystemPath)) {
-						Model.Selection.Remove(ic.FilesystemPath);
+					if (selection.Contains(ic.FilesystemPath)) {
+						selection.Deselect(ic.FilesystemPath);
 					}
 				}
 			}
