@@ -29,7 +29,7 @@ namespace Tangerine.Core
 			DiscardChanges
 		}
 
-		public static readonly string[] AllowedFileTypes = new string[] { "scene", "tan", "model" };
+		public static readonly string[] AllowedFileTypes = { "scene", "tan", "model" };
 
 		readonly string defaultPath = "Untitled";
 		readonly Vector2 defaultSceneSize = new Vector2(1024, 768);
