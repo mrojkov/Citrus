@@ -312,6 +312,16 @@ namespace Lime
 			};
 		}
 
+		/// <summary>
+		/// Colorizes <see cref="SimpleText"/>'s or <see cref="RichText"/>'s grayscale font.
+		/// </summary>
+		/// <remarks>
+		/// To apply this shader you need:
+		/// 1. Non-ETC1 font texture.
+		/// 2. Data/gradient_map.png file with size of 256x256 and ARGB8 compression.
+		/// 3. Use <see cref="Node.Tag"/> field of <see cref="SimpleText"/> or <see cref="TextStyle"/>
+		///    to specify color row from this file.
+		/// </remarks>
 		public class ColorfulTextShaderProgram : ShaderProgram
 		{
 			private static string vertexShaderText = @"
@@ -335,12 +345,6 @@ namespace Lime
 				texCoords2 = inTexCoords2;
 			}";
 
-#if ANDROID
-		private static string UseAlphaTexture1 = "t1.a = texture2D(tex1a, texCoords1).r;";
-#else
-			private static string UseAlphaTexture1 = "";
-#endif
-
 			private static string fragmentShaderText = $@"
 			varying lowp vec4 color;
 			varying lowp vec2 texCoords1;
@@ -353,7 +357,6 @@ namespace Lime
 			void main()
 			{{
 				lowp vec4 t1 = texture2D(tex1, texCoords1);
-				{UseAlphaTexture1}
 				lowp vec4 t2 = texture2D(tex2, vec2(t1.x, colorIndex));
 				gl_FragColor = color * vec4(t2.rgb, t1.a * t2.a);
 			}}";
