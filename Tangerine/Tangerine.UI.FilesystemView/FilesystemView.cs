@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
 using Lime;
 using Tangerine.Core;
 
@@ -15,14 +17,15 @@ namespace Tangerine.UI.FilesystemView
 		private Vector2 rectSelectionBeginPoint;
 		private Vector2 rectSelectionEndPoint;
 		private bool rectSelecting;
-		private Widget CookingRulesRoot;
+		private ScrollViewWidget CookingRulesRoot;
+		private Selection selection = new Selection();
 
 		public FilesystemView(Widget panelWidget)
 		{
 			PanelWidget = panelWidget;
 			RootWidget = new Widget();
 			Toolbar = new Toolbar();
-			CookingRulesRoot = new Widget();
+			CookingRulesRoot = new ScrollViewWidget();
 			FilesWidget = new ScrollViewWidget();
 			InitializeWidgets();
 		}
@@ -53,6 +56,72 @@ namespace Tangerine.UI.FilesystemView
 					CookingRulesRoot
 				}
 			});
+			CookingRulesRoot.Content.Layout = new VBoxLayout();
+
+		}
+
+		private static Stream GenerateStreamFromString(string s)
+		{
+			MemoryStream stream = new MemoryStream();
+			StreamWriter writer = new StreamWriter(stream);
+			writer.Write(s);
+			writer.Flush();
+			stream.Position = 0;
+			return stream;
+		}
+
+		public static string WriteObjectToString<T>(T instance, Lime.Serialization.Format format)
+		{
+			using (var stream = GenerateStreamFromString("")) {
+				Lime.Serialization.WriteObject<T>("", stream, instance, format);
+				var reader = new StreamReader(stream);
+				stream.Seek(0, SeekOrigin.Begin);
+				return reader.ReadToEnd();
+			}
+		}
+
+		private void Selection_Changed()
+		{
+			CookingRulesRoot.Content.Nodes.Clear();
+			var sw = new System.Diagnostics.Stopwatch();
+			sw.Start();
+			var t0 = Orange.CookingRulesBuilder.Build(Orange.The.Workspace.AssetFiles,
+				Orange.UserInterface.Instance.GetActivePlatform(), Orange.The.Workspace.Target);
+			sw.Stop();
+			System.Console.WriteLine($"Cooking Rules usual way took {sw.ElapsedMilliseconds}ms");
+			sw.Reset();
+			sw.Start();
+			var t1 = Orange.CookingRulesBuilder.BuildWithOverride(Orange.The.Workspace.AssetFiles,
+				Orange.UserInterface.Instance.GetActivePlatform(), Orange.The.Workspace.Target);
+			sw.Stop();
+			System.Console.WriteLine($"Cooking Rules with Classes and new way took {sw.ElapsedMilliseconds}ms");
+			bool correct = true;
+			correct = t0.Count == t1.Count;
+			foreach (var kv in t1) {
+				if (!kv.Value.ResultingRules.Equal(t0[kv.Key])) {
+					correct = false;
+				}
+			}
+			if (!correct) {
+				System.Console.WriteLine("Incorrect penis");
+			}
+			//foreach (var item in selection) {
+			//	var key = item;
+			//	if (key.StartsWith(Orange.Workspace.Instance.AssetsDirectory)) {
+			//		key = key.Substring(Orange.Workspace.Instance.AssetsDirectory.Length);
+			//		if (key.StartsWith("\\") || key.StartsWith("/")) {
+			//			key = key.Substring(1);
+			//		}
+			//	}
+			//	key = key.Replace('\\', '/');
+			//	if (t.ContainsKey(key)) {
+			//		CookingRulesRoot.Content.AddNode(new SimpleText
+			//		{
+			//			Text = WriteObjectToString(t[key], Serialization.Format.JSON),
+			//			//AutoSizeConstraints = false,
+			//		});
+			//	}
+			//}
 		}
 
 		private void WhenModelCurrentPathChanged(string value)
