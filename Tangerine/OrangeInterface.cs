@@ -29,7 +29,7 @@ namespace Tangerine
 #endif
 		}
 
-		public override SubTarget GetActiveSubTarget()
+		public override Target GetActiveTarget()
 		{
 			return null;
 		}

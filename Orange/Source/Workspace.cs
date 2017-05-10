@@ -15,8 +15,7 @@ namespace Orange
 		public string Title { get; private set; }
 		public FileEnumerator AssetFiles { get; private set; }
 		public Json ProjectJson { get; private set; }
-		public string Target { get; private set; }
-		public List<SubTarget> SubTargets { get; private set; }
+		public List<Target> Targets { get; private set; }
 
 		private string dataFolderName;
 		private string pluginName;
@@ -61,10 +60,10 @@ namespace Orange
 				yield return file;
 			}
 
-			var subtargets = The.Workspace.SubTargets.Where(i => i.Platform == platform);
-			foreach (var subTarget in subtargets) {
-				foreach (var subTargetCsprojFile in dirInfo.GetFiles(Path.GetFileName(subTarget.ProjectPath), SearchOption.AllDirectories)) {
-					yield return subTargetCsprojFile.FullName;
+			var targets = The.Workspace.Targets.Where(i => i.Platform == platform);
+			foreach (var target in targets) {
+				foreach (var targetCsprojFile in dirInfo.GetFiles(Path.GetFileName(target.ProjectPath), SearchOption.AllDirectories)) {
+					yield return targetCsprojFile.FullName;
 				}
 			}
 		}
@@ -82,20 +81,13 @@ namespace Orange
 
 		public static readonly Workspace Instance = new Workspace();
 
-		public TargetPlatform ActivePlatform
-		{
-			get { return The.UI.GetActivePlatform(); }
-		}
+		public TargetPlatform ActivePlatform => The.UI.GetActivePlatform();
 
-		public string CustomSolution
-		{
-			get { return The.UI.GetActiveSubTarget() == null ? null : The.UI.GetActiveSubTarget().ProjectPath; }
-		}
+		public Target ActiveTarget => The.UI.GetActiveTarget();
 
-		public bool CleanBeforeBuild
-		{
-			get { return The.UI.GetActiveSubTarget() != null && The.UI.GetActiveSubTarget().CleanBeforeBuild; }
-		}
+		public string CustomSolution => The.UI.GetActiveTarget() == null ? null : The.UI.GetActiveTarget().ProjectPath;
+
+		public bool CleanBeforeBuild => The.UI.GetActiveTarget() != null && The.UI.GetActiveTarget().CleanBeforeBuild;
 
 		public void Load()
 		{
@@ -146,18 +138,17 @@ namespace Orange
 			var jobject = JObject.Parse(File.ReadAllText(file));
 			ProjectJson = new Json(jobject, file);
 			Title = ProjectJson["Title"] as string;
-			Target = ProjectJson.GetValue("Target", "");
-			SubTargets = new List<SubTarget>();
+			Targets = new List<Target>();
 			dataFolderName = ProjectJson.GetValue("DataFolderName", "Data");
 			pluginName = ProjectJson.GetValue("Plugin", "");
 
-			foreach (var target in ProjectJson.GetArray("SubTargets", new Dictionary<string, object>[0])) {
+			foreach (var target in ProjectJson.GetArray("Targets", new Dictionary<string, object>[0])) {
 				var cleanBeforeBuild = false;
 				if (target.ContainsKey("CleanBeforeBuild")) {
 					cleanBeforeBuild = (bool)target["CleanBeforeBuild"];
 				}
 
-				SubTargets.Add(new SubTarget(target["Name"] as string, target["Project"] as string,
+				Targets.Add(new Target(target["Name"] as string, target["Project"] as string,
 											 cleanBeforeBuild, GetPlaformByName(target["Platform"] as string)));
 			}
 		}
@@ -179,7 +170,7 @@ namespace Orange
 
 		public string GetBundlePath(string bundleName, TargetPlatform platform)
 		{
-			if (bundleName == CookingRules.MainBundleName) {
+			if (bundleName == CookingRulesBuilder.MainBundleName) {
 				return The.Workspace.GetMainBundlePath(platform);
 			} else {
 				return Path.Combine(Path.GetDirectoryName(AssetsDirectory), bundleName + "." + Toolbox.GetTargetPlatformString(platform));

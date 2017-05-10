@@ -71,20 +71,20 @@ namespace Orange
 		public static void Cook(TargetPlatform platform)
 		{
 			AssetCooker.Platform = platform;
-			cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, platform, The.Workspace.Target);
+			cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, platform, The.Workspace.ActiveTarget);
 			var extraBundles = new HashSet<string>();
 			foreach (var dictionaryItem in cookingRulesMap) {
-				foreach (var bundle in dictionaryItem.Value.Bundles) {
-					if (bundle != CookingRules.MainBundleName) {
+				foreach (var bundle in dictionaryItem.Value.Bundle) {
+					if (bundle != CookingRulesBuilder.MainBundleName) {
 						extraBundles.Add(bundle);
 					}
 				}
 			}
-			CookBundle(CookingRules.MainBundleName);
+			CookBundle(CookingRulesBuilder.MainBundleName);
 			foreach (var extraBundle in extraBundles) {
 				CookBundle(extraBundle);
 			}
-			extraBundles.Add(CookingRules.MainBundleName);
+			extraBundles.Add(CookingRulesBuilder.MainBundleName);
 			CodeCooker.Cook(cookingRulesMap, extraBundles.ToList());
 		}
 
@@ -109,7 +109,7 @@ namespace Orange
 		{
 			if (Platform == TargetPlatform.Unity) {
 				var path = The.Workspace.GetUnityProjectDirectory();
-				path = bundleName == CookingRules.MainBundleName ?
+				path = bundleName == CookingRulesBuilder.MainBundleName ?
 					Path.Combine(path, "Assets", "Resources") :
 					Path.Combine(path, "Assets", "Bundles", bundleName);
 				Directory.CreateDirectory(path);
@@ -131,14 +131,14 @@ namespace Orange
 				if (cookingRulesMap.TryGetValue(info.Path, out rules)) {
 					if (rules.Ignore)
 						return false;
-					return Array.IndexOf(rules.Bundles, bundleName) != -1;
+					return Array.IndexOf(rules.Bundle, bundleName) != -1;
 				} else {
 					// There are no cooking rules for text files, consider them as part of the main bundle.
-					return bundleName == CookingRules.MainBundleName;
+					return bundleName == CookingRulesBuilder.MainBundleName;
 				}
 			};
 			// Every asset bundle must have its own atlases folder, so they aren't conflict with each other
-			atlasesPostfix = bundleName != CookingRules.MainBundleName ? bundleName : "";
+			atlasesPostfix = bundleName != CookingRulesBuilder.MainBundleName ? bundleName : "";
 			try {
 				using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
 					foreach (var stage in CookStages) {
@@ -390,9 +390,7 @@ namespace Orange
 			public Gdk.Pixbuf Pixbuf;
 			public IntRectangle AtlasRect;
 			public bool Allocated;
-			public bool MipMapped;
-			public PVRFormat PVRFormat;
-			public DDSFormat DDSFormat;
+			public CookingRules CookingRules;
 			public string SourceExtension;
 		}
 
@@ -432,9 +430,7 @@ namespace Orange
 					var item = new AtlasItem {
 						Path = Path.ChangeExtension(fileInfo.Path, ".atlasPart"),
 						Pixbuf = pixbuf,
-						MipMapped = cookingRules.MipMaps,
-						PVRFormat = cookingRules.PVRFormat,
-						DDSFormat = cookingRules.DDSFormat,
+						CookingRules = cookingRules,
 						SourceExtension = Path.GetExtension(fileInfo.Path)
 					};
 					var k = cookingRules.AtlasPacker;
@@ -474,9 +470,9 @@ namespace Orange
 
 			// PVRTC2/4 textures must be square
 			var squareAtlas = (Platform == TargetPlatform.iOS) && items.Any(
-				i => i.PVRFormat == PVRFormat.PVRTC4 ||
-					i.PVRFormat == PVRFormat.PVRTC4_Forced ||
-					i.PVRFormat == PVRFormat.PVRTC2);
+				i => i.CookingRules.PVRFormat == PVRFormat.PVRTC4 ||
+					i.CookingRules.PVRFormat == PVRFormat.PVRTC4_Forced ||
+					i.CookingRules.PVRFormat == PVRFormat.PVRTC2);
 			var atlasId = initialAtlasId;
 			while (items.Count > 0) {
 				if (atlasId >= MaxAtlasChainLength) {
@@ -570,16 +566,16 @@ namespace Orange
 		/// </summary>
 		public static bool AreAtlasItemsCompatible(AtlasItem item1, AtlasItem item2)
 		{
-			if (item1.MipMapped != item2.MipMapped) {
+			if (item1.CookingRules.MipMaps != item2.CookingRules.MipMaps) {
 				return false;
 			}
 			switch (Platform) {
 				case TargetPlatform.Android:
 				case TargetPlatform.iOS:
-					return item1.PVRFormat == item2.PVRFormat && item1.Pixbuf.HasAlpha == item2.Pixbuf.HasAlpha;
+					return item1.CookingRules.PVRFormat == item2.CookingRules.PVRFormat && item1.Pixbuf.HasAlpha == item2.Pixbuf.HasAlpha;
 				case TargetPlatform.Win:
 				case TargetPlatform.Mac:
-					return item1.DDSFormat == item2.DDSFormat;
+					return item1.CookingRules.DDSFormat == item2.CookingRules.DDSFormat;
 				case TargetPlatform.Unity:
 					return true;
 				default:
@@ -609,12 +605,7 @@ namespace Orange
 				}
 				Console.WriteLine("+ " + atlasPath);
 				var firstItem = items.First(i => i.Allocated);
-				var rules = new CookingRules {
-					MipMaps = firstItem.MipMapped,
-					PVRFormat = firstItem.PVRFormat,
-					DDSFormat = firstItem.DDSFormat
-				};
-				ImportTexture(atlasPath, atlas, rules);
+				ImportTexture(atlasPath, atlas, firstItem.CookingRules);
 			}
 		}
 

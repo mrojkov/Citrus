@@ -151,8 +151,8 @@ namespace Orange
 			platformPicker.AppendText("Android");
 			platformPicker.AppendText("Unity");
 
-			if (The.Workspace.SubTargets != null) {
-				foreach (var target in The.Workspace.SubTargets)
+			if (The.Workspace.Targets != null) {
+				foreach (var target in The.Workspace.Targets)
 					platformPicker.AppendText(target.Name);
 			}
 

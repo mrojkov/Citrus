@@ -11,6 +11,7 @@ namespace Tangerine.UI.FilesystemView
 	{
 		public event Action Changed;
 		private readonly HashSet<string> selection = new HashSet<string>();
+		public bool Empty => selection.Count == 0;
 		public void Select(string path)
 		{
 			if (!selection.Contains(path)) {

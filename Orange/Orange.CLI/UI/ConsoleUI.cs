@@ -135,9 +135,9 @@ namespace Orange
 
 		public override TargetPlatform GetActivePlatform()
 		{
-			var subTarget = GetActiveSubTarget();
-			if (subTarget != null)
-				return subTarget.Platform;
+			var target = GetActiveTarget();
+			if (target != null)
+				return target.Platform;
 
 			var platform = Toolbox.GetCommandLineArg("--platform");
 			switch (platform) {
@@ -162,12 +162,12 @@ namespace Orange
 			}
 		}
 
-		public override SubTarget GetActiveSubTarget()
+		public override Target GetActiveTarget()
 		{
 			var platform = Toolbox.GetCommandLineArg("--platform");
-			foreach (var subTarget in The.Workspace.SubTargets) {
-				if (platform == subTarget.Name) {
-					return subTarget;
+			foreach (var target in The.Workspace.Targets) {
+				if (platform == target.Name) {
+					return target;
 				}
 			}
 			return null;

@@ -13,12 +13,12 @@ namespace Tangerine.UI.FilesystemView
 		public Widget RootWidget;
 		public ScrollViewWidget FilesWidget;
 		public Toolbar Toolbar;
-		Model Model = new Model();
+		readonly Model Model = new Model();
 		private Vector2 rectSelectionBeginPoint;
 		private Vector2 rectSelectionEndPoint;
 		private bool rectSelecting;
-		private ScrollViewWidget CookingRulesRoot;
-		private Selection selection = new Selection();
+		private readonly ScrollViewWidget CookingRulesRoot;
+		private readonly Selection selection = new Selection();
 
 		public FilesystemView(Widget panelWidget)
 		{
@@ -82,46 +82,30 @@ namespace Tangerine.UI.FilesystemView
 
 		private void Selection_Changed()
 		{
+			if (selection.Empty) {
+				return;
+			}
 			CookingRulesRoot.Content.Nodes.Clear();
-			var sw = new System.Diagnostics.Stopwatch();
-			sw.Start();
-			var t0 = Orange.CookingRulesBuilder.Build(Orange.The.Workspace.AssetFiles,
-				Orange.UserInterface.Instance.GetActivePlatform(), Orange.The.Workspace.Target);
-			sw.Stop();
-			System.Console.WriteLine($"Cooking Rules usual way took {sw.ElapsedMilliseconds}ms");
-			sw.Reset();
-			sw.Start();
-			var t1 = Orange.CookingRulesBuilder.BuildWithOverride(Orange.The.Workspace.AssetFiles,
-				Orange.UserInterface.Instance.GetActivePlatform(), Orange.The.Workspace.Target);
-			sw.Stop();
-			System.Console.WriteLine($"Cooking Rules with Classes and new way took {sw.ElapsedMilliseconds}ms");
-			bool correct = true;
-			correct = t0.Count == t1.Count;
-			foreach (var kv in t1) {
-				if (!kv.Value.ResultingRules.Equal(t0[kv.Key])) {
-					correct = false;
+			var t = Orange.CookingRulesBuilder.Build(Orange.The.Workspace.AssetFiles,
+				Orange.UserInterface.Instance.GetActivePlatform(), Orange.The.Workspace.ActiveTarget);
+
+			foreach (var item in selection) {
+				var key = item;
+				if (key.StartsWith(Orange.Workspace.Instance.AssetsDirectory)) {
+					key = key.Substring(Orange.Workspace.Instance.AssetsDirectory.Length);
+					if (key.StartsWith("\\") || key.StartsWith("/")) {
+						key = key.Substring(1);
+					}
+				}
+				key = key.Replace('\\', '/');
+				if (t.ContainsKey(key)) {
+					CookingRulesRoot.Content.AddNode(new SimpleText
+					{
+						Text = WriteObjectToString(t[key].ResultingRules, Serialization.Format.JSON),
+						//AutoSizeConstraints = false,
+					});
 				}
 			}
-			if (!correct) {
-				System.Console.WriteLine("Incorrect penis");
-			}
-			//foreach (var item in selection) {
-			//	var key = item;
-			//	if (key.StartsWith(Orange.Workspace.Instance.AssetsDirectory)) {
-			//		key = key.Substring(Orange.Workspace.Instance.AssetsDirectory.Length);
-			//		if (key.StartsWith("\\") || key.StartsWith("/")) {
-			//			key = key.Substring(1);
-			//		}
-			//	}
-			//	key = key.Replace('\\', '/');
-			//	if (t.ContainsKey(key)) {
-			//		CookingRulesRoot.Content.AddNode(new SimpleText
-			//		{
-			//			Text = WriteObjectToString(t[key], Serialization.Format.JSON),
-			//			//AutoSizeConstraints = false,
-			//		});
-			//	}
-			//}
 		}
 
 		private void WhenModelCurrentPathChanged(string value)

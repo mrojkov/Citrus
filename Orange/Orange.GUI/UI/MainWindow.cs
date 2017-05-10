@@ -14,9 +14,9 @@ namespace Orange
 
 		public override TargetPlatform GetActivePlatform()
 		{
-			var subTarget = GetActiveSubTarget();
-			if (subTarget != null)
-				return subTarget.Platform;
+			var target = GetActiveTarget();
+			if (target != null)
+				return target.Platform;
 
 			switch (platformPicker.Active) {
 				case 0:
@@ -38,12 +38,12 @@ namespace Orange
 			};
 		}
 
-		public override SubTarget GetActiveSubTarget()
+		public override Target GetActiveTarget()
 		{
 			var platformsCount = Enum.GetValues(typeof(TargetPlatform)).Length;
 
 			if (platformPicker.Active > (platformsCount - 1))
-				return The.Workspace.SubTargets[platformPicker.Active - platformsCount];
+				return The.Workspace.Targets[platformPicker.Active - platformsCount];
 
 			return null;
 		}
