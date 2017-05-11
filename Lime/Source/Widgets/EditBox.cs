@@ -7,7 +7,7 @@ namespace Lime
 		public SimpleText TextWidget { get; private set; }
 		public Editor Editor { get; set; }
 		public event Action<string> Submitted;
-		public ScrollView Scroll { get; private set; }
+		public ScrollView Scroll { get; protected set; }
 
 		public override string Text
 		{

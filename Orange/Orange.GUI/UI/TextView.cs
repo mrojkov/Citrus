@@ -6,34 +6,31 @@ namespace Orange
 {
 	public class TextView : Widget
 	{
-		private Frame frame;
-		private SimpleText text;
+		private readonly TextViewEditBox editor;
 
 		public TextView()
 		{
-			frame = new Frame {
-				ClipChildren = ClipMethod.ScissorTest,
+			editor = new TextViewEditBox {
 				Anchors = Anchors.LeftRightTopBottom
 			};
-			frame.CompoundPresenter.Add(new DelegatePresenter<Widget>(w => {
-				w.PrepareRendererState();
-				Renderer.DrawRect(Vector2.Zero, w.Size, Color4.White);
-			}));
-			text = new SimpleText {
-				VAlignment = VAlignment.Bottom,
-				Size = new Vector2(int.MaxValue / 1000, int.MaxValue / 1000),
-				Pivot = new Vector2(0, 1),
-				Position = frame.Size * new Vector2(0, 1),
-				Anchors = Anchors.Bottom | Anchors.Left
-			};
-			frame.AddNode(text);
-			AddNode(frame);
+			AddNode(editor);
 		}
 
 		public override string Text
 		{
-			get { return text.Text; }
-			set { text.Text = value; }
+			get { return editor.Text; }
+			set { editor.Text = value; }
+		}
+
+		public void ScrollToEnd()
+		{
+			editor.Scroll.ScrollPosition = editor.Scroll.MaxScrollPosition;
+		}
+
+		public void Clear()
+		{
+			Text = string.Empty;
+			editor.Scroll.ScrollPosition = editor.Scroll.MinScrollPosition;
 		}
 
 		public TextWriter GetTextWriter() => new Writer(this);
@@ -54,10 +51,25 @@ namespace Orange
 
 			public override void Write(string value)
 			{
-				Application.InvokeOnMainThread(() => text.Text += value);
+				Application.InvokeOnMainThread(() => {
+					text.Text += value;
+					text.ScrollToEnd();
+				});
 			}
 
 			public override Encoding Encoding { get; }
+		}
+
+		private class TextViewEditBox : CommonEditBox
+		{
+			public TextViewEditBox()
+			{
+				Scroll.Dispose();
+				Scroll = new ScrollView(this) { ScrollBySlider = true };
+				TextWidget.Unlink();
+				Scroll.Content.AddNode(TextWidget);
+				Theme.Current.Apply(this, typeof(EditBox));
+			}
 		}
 	}
 }

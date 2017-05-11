@@ -96,9 +96,7 @@ namespace Orange
 
 		private Widget CreateTextView()
 		{
-			textView = new TextView {
-				LayoutCell = new LayoutCell(),
-			};
+			textView = new TextView();
 			textWriter = textView.GetTextWriter();
 			Console.SetOut(textWriter);
 			Console.SetError(textWriter);
@@ -143,7 +141,7 @@ namespace Orange
 			var startTime = DateTime.Now;
 			The.Workspace.Save();
 			EnableControls(false);
-			textView.Text = string.Empty;
+			textView.Clear();
 			var updateCompleted = true;
 			if (DoesNeedSvnUpdate()) {
 				var builder = new SolutionBuilder(The.Workspace.ActivePlatform, The.Workspace.CustomSolution);
@@ -174,10 +172,10 @@ namespace Orange
 		private void EnableControls(bool value)
 		{
 			if (value) {
-				inputLocker.Input.DerestrictScope();
+				textView.Input.DerestrictScope();
 			}
 			else {
-				inputLocker.Input.RestrictScope();
+				textView.Input.RestrictScope();
 			}
 		}
 
@@ -201,7 +199,7 @@ namespace Orange
 
 		public override void ClearLog()
 		{
-			textView.Text = string.Empty;
+			textView.Clear();
 		}
 
 		public override bool AskConfirmation(string text)
