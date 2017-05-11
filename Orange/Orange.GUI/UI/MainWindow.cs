@@ -12,40 +12,9 @@ namespace Orange
 			Instance = this;
 		}
 
-		public override TargetPlatform GetActivePlatform()
-		{
-			var target = GetActiveTarget();
-			if (target != null)
-				return target.Platform;
-
-			switch (platformPicker.Active) {
-				case 0:
-#if WIN
-					return TargetPlatform.Win;
-#elif MAC
-					return TargetPlatform.Mac;
-#else
-					throw new NotImplementedException();
-#endif
-				case 1:
-					return TargetPlatform.iOS;
-				case 2:
-					return TargetPlatform.Android;
-				case 3:
-					return TargetPlatform.Unity;
-				default:
-					throw new NotSupportedException();
-			};
-		}
-
 		public override Target GetActiveTarget()
 		{
-			var platformsCount = Enum.GetValues(typeof(TargetPlatform)).Length;
-
-			if (platformPicker.Active > (platformsCount - 1))
-				return The.Workspace.Targets[platformPicker.Active - platformsCount];
-
-			return null;
+			return The.Workspace.Targets[platformPicker.Active];
 		}
 
 		class LogWriter : TextWriter
@@ -161,8 +130,6 @@ namespace Orange
 
 		private void Execute(System.Action action)
 		{
-			if (!CheckTargetAvailability())
-				return;
 			var startTime = DateTime.Now;
 			The.Workspace.Save();
 			EnableControls(false);
@@ -237,17 +204,6 @@ namespace Orange
 			if (menuItem != null) {
 				Execute(menuItem.Action);
 			}
-		}
-
-		private bool CheckTargetAvailability()
-		{
-#if WIN
-			if (GetActivePlatform() == TargetPlatform.iOS) {
-				ShowError("iOS target is not supported on Windows platform");
-				return false;
-			}
-#endif
-			return true;
 		}
 
 		public override void ShowError(string message)

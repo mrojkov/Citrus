@@ -20,6 +20,12 @@ namespace Orange
 		private string dataFolderName;
 		private string pluginName;
 
+		public Workspace()
+		{
+			Targets = new List<Target>();
+			FillDefaultTargets();
+		}
+
 		public string GetPlatformSuffix(TargetPlatform? platform = null)
 		{
 			if (platform == null) {
@@ -47,28 +53,6 @@ namespace Orange
 		}
 
 		/// <summary>
-		/// Enumerate all game projects. E.g: Zx3.Game/Zx3.Game.Win.csproj
-		/// </summary>
-		public IEnumerable<string> EnumerateGameCsprojFilePaths(TargetPlatform? platform = null)
-		{
-			if (platform == null) {
-				platform = The.Workspace.ActivePlatform;
-			}
-			var dirInfo = new System.IO.DirectoryInfo(ProjectDirectory);
-			foreach (var fileInfo in dirInfo.GetFiles("*" + GetPlatformSuffix(platform) + ".csproj", SearchOption.AllDirectories)) {
-				var file = fileInfo.FullName;
-				yield return file;
-			}
-
-			var targets = The.Workspace.Targets.Where(i => i.Platform == platform);
-			foreach (var target in targets) {
-				foreach (var targetCsprojFile in dirInfo.GetFiles(Path.GetFileName(target.ProjectPath), SearchOption.AllDirectories)) {
-					yield return targetCsprojFile.FullName;
-				}
-			}
-		}
-
-		/// <summary>
 		/// Returns Citrus/Lime project path. It is supposed that Citrus lies beside the game.
 		/// </summary>
 		public string GetLimeCsprojFilePath(TargetPlatform? platform = null)
@@ -81,7 +65,7 @@ namespace Orange
 
 		public static readonly Workspace Instance = new Workspace();
 
-		public TargetPlatform ActivePlatform => The.UI.GetActivePlatform();
+		public TargetPlatform ActivePlatform => The.UI.GetActiveTarget().Platform;
 
 		public Target ActiveTarget => The.UI.GetActiveTarget();
 
@@ -133,12 +117,20 @@ namespace Orange
 			}
 		}
 
+		private void FillDefaultTargets()
+		{
+			foreach (TargetPlatform platform in Enum.GetValues(typeof(TargetPlatform))) {
+				Targets.Add(new Target(Enum.GetName(typeof(TargetPlatform), platform), null, false, platform));
+			}
+		}
+
 		private void ReadProject(string file)
 		{
 			var jobject = JObject.Parse(File.ReadAllText(file));
 			ProjectJson = new Json(jobject, file);
 			Title = ProjectJson["Title"] as string;
 			Targets = new List<Target>();
+			FillDefaultTargets();
 			dataFolderName = ProjectJson.GetValue("DataFolderName", "Data");
 			pluginName = ProjectJson.GetValue("Plugin", "");
 
