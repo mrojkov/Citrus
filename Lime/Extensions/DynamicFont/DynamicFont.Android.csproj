@@ -42,7 +42,6 @@
     <Reference Include="Mono.Android" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
-  <ItemGroup />
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CharCache.cs" />
@@ -79,8 +78,14 @@
     <Compile Include="SharpFont\Internal\SizeRec.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedNativeLibrary Include="..\..\..\3rdParty\FreeType\libfreetype\armeabi\libfreetype6.so">
-      <Link>libfreetype\armeabi\libfreetype6.so</Link>
+    <ProjectReference Include="..\..\Lime.Android.csproj">
+      <Project>{72E2DDBB-C320-4356-89EC-BDED6036D29B}</Project>
+      <Name>Lime.Android</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedNativeLibrary Include="..\..\..\3rdParty\FreeType\libfreetype\arm64-v8a\libfreetype6.so">
+      <Link>libfreetype\arm64-v8a\libfreetype6.so</Link>
     </EmbeddedNativeLibrary>
     <EmbeddedNativeLibrary Include="..\..\..\3rdParty\FreeType\libfreetype\armeabi-v7a\libfreetype6.so">
       <Link>libfreetype\armeabi-v7a\libfreetype6.so</Link>
@@ -88,11 +93,8 @@
     <EmbeddedNativeLibrary Include="..\..\..\3rdParty\FreeType\libfreetype\x86\libfreetype6.so">
       <Link>libfreetype\x86\libfreetype6.so</Link>
     </EmbeddedNativeLibrary>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Lime.Android.csproj">
-      <Project>{72E2DDBB-C320-4356-89EC-BDED6036D29B}</Project>
-      <Name>Lime.Android</Name>
-    </ProjectReference>
+    <EmbeddedNativeLibrary Include="..\..\..\3rdParty\FreeType\libfreetype\x86_64\libfreetype6.so">
+      <Link>libfreetype\x86_64\libfreetype6.so</Link>
+    </EmbeddedNativeLibrary>
   </ItemGroup>
 </Project>

@@ -48,7 +48,6 @@
 #ifdef __ANDROID__
 #  define BIG_ENDIAN 0
 #  define LITTLE_ENDIAN 1
-#  include <machine/_types.h>
 #ifdef __ARMEB__
 #  define BYTE_ORDER BIG_ENDIAN
 #else
