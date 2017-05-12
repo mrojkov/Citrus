@@ -12,12 +12,17 @@ namespace Tangerine.Core
 		readonly VersionedCollection<Document> documents = new VersionedCollection<Document>();
 		public IReadOnlyVersionedCollection<Document> Documents => documents;
 
+		private Lime.FileSystemWatcher fsWatcher;
+
 		public static readonly Project Null = new Project();
 		public static Project Current { get; private set; } = Null;
 
 		public readonly string CitprojPath;
 		public readonly string UserprefsPath;
 		public readonly string AssetsDirectory;
+
+		public delegate bool DocumentReloadConfirmationDelegate(Document document);
+		public static DocumentReloadConfirmationDelegate DocumentReloadConfirmation;
 
 		private Project() { }
 
@@ -51,10 +56,16 @@ namespace Tangerine.Core
 					Debug.Write($"Failed to load the project user preferences: {e}");
 				}
 			}
+			fsWatcher = new Lime.FileSystemWatcher(AssetsDirectory);
+			fsWatcher.Changed += HandleFileSystemWatcherEvent;
+			fsWatcher.Created += HandleFileSystemWatcherEvent;
+			fsWatcher.Deleted += HandleFileSystemWatcherEvent;
+			fsWatcher.Renamed += HandleFileSystemWatcherEvent;
 		}
 
 		public bool Close()
 		{
+			fsWatcher.Dispose();
 			if (Current != this) {
 				throw new InvalidOperationException();
 			}
@@ -108,7 +119,7 @@ namespace Tangerine.Core
 			return doc;
 		}
 			
-		public Document OpenDocument(string path, bool selectFirstNode = true)
+		public Document OpenDocument(string path)
 		{
 			var doc = Documents.FirstOrDefault(i => i.Path == path);
 			if (doc == null) {
@@ -116,12 +127,6 @@ namespace Tangerine.Core
 				documents.Add(doc);
 			}
 			doc.MakeCurrent();
-			if (selectFirstNode) {
-				Operations.Dummy.Perform();
-				if (doc.Rows.Count > 0) {
-					Operations.SelectRow.Perform(doc.Rows[0]);
-				}
-			}
 			return doc;
 		}
 
@@ -158,6 +163,38 @@ namespace Tangerine.Core
 				int currentIndex = documents.IndexOf(Document.Current);
 				documents[(currentIndex + direction).Wrap(0, Documents.Count - 1)].MakeCurrent();
 			}
+		}
+
+		public void HandleFileSystemWatcherEvent(string path)
+		{
+			if (path.EndsWith(".png")) {
+				TexturePool.Instance.DiscardAllTextures();
+			}
+			ReloadModifiedDocuments();
+		}
+
+		public void ReloadModifiedDocuments()
+		{
+			foreach (var doc in Documents.ToList()) {
+				if (doc.WasModifiedOutsideTangerine()) {
+					if (DocumentReloadConfirmation(doc)) {
+						ReloadDocument(doc);
+					} else {
+						doc.SetModificationTimeToNow();
+					}
+				}
+			}
+		}
+
+		void ReloadDocument(Document doc)
+		{
+			int index = documents.IndexOf(doc);
+			documents.Remove(doc);
+			var newDoc = new Document(doc.Path);
+			documents.Insert(index, newDoc);
+			var savedCurrent = Document.Current == doc ? null : Document.Current;
+			newDoc.MakeCurrent();
+			savedCurrent?.MakeCurrent();
 		}
 
 		public class Userprefs

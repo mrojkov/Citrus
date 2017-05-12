@@ -38,8 +38,10 @@ namespace Tangerine.Core
 
 		private readonly Dictionary<object, Row> rowCache = new Dictionary<object, Row>();
 
+		private DateTime modificationTime;
+
 		public static event Action<Document> AttachingViews;
-		public static Func<Document, CloseAction> Closing;
+		public static Func<Document, CloseAction> CloseConfirmation;
 		public static PathSelectorDelegate PathSelector;
 
 		public static Document Current { get; private set; }
@@ -110,40 +112,69 @@ namespace Tangerine.Core
 			Path = defaultPath;
 			Container = RootNode = new Frame { Size = defaultSceneSize };
 			RootNode.AnimationSpeed = 0.5f;
+			SetModificationTimeToNow();
 		}
 
 		public Document(string path)
 		{
-			Path = path;
-			Format = ResolveFormat(path);
-			using (Theme.Push(DefaultTheme.Instance)) {
-				RootNode = Node.CreateFromAssetBundle(path);
-				if (RootNode is Node3D) {
-					var vp = new Viewport3D { Width = 1024, Height = 768 };
-					vp.AddNode(RootNode);
-					var camera = new Camera3D {
-						Id = "DefaultCamera",
-						Position = new Vector3(0, 0, 10),
-						FarClipPlane = 10000,
-						NearClipPlane = 0.001f,
-						FieldOfView = 1.0f,
-						AspectRatio = 1.3f,
-						OrthographicSize = 1.0f
-					};
-					vp.AddNode(vp.Camera);
-					vp.CameraRef = new NodeReference<Camera3D>(camera.Id);
-					RootNode = vp;
+			try {
+				Path = path;
+				Format = ResolveFormat(path);
+				using (Theme.Push(DefaultTheme.Instance)) {
+					RootNode = Node.CreateFromAssetBundle(path);
+					SetModificationTimeToNow();
+					if (RootNode is Node3D) {
+						RootNode = WrapNodeWithViewport3D(RootNode);
+					}
 				}
+				if (Format == DocumentFormat.Scene) {
+					RootNode.AnimationSpeed = 0.5f;
+				}
+				Decorate(RootNode);
+				Container = RootNode;
+				HideHitBoxesIn3DScene();
+			} catch (System.Exception e) {
+				throw new System.InvalidOperationException($"Can't open '{path}': {e.Message}");
 			}
-			if (Format == DocumentFormat.Scene) {
-				RootNode.AnimationSpeed = 0.5f;
-			}
-			Decorate(RootNode);
-			Container = RootNode;
-			// Hide all hitboxes
+		}
+
+		Viewport3D WrapNodeWithViewport3D(Node node)
+		{
+			var vp = new Viewport3D { Width = 1024, Height = 768 };
+			vp.AddNode(node);
+			var camera = new Camera3D {
+				Id = "DefaultCamera",
+				Position = new Vector3(0, 0, 10),
+				FarClipPlane = 10000,
+				NearClipPlane = 0.001f,
+				FieldOfView = 1.0f,
+				AspectRatio = 1.3f,
+				OrthographicSize = 1.0f
+			};
+			vp.AddNode(vp.Camera);
+			vp.CameraRef = new NodeReference<Camera3D>(camera.Id);
+			return vp;
+		}
+
+		void HideHitBoxesIn3DScene()
+		{
 			foreach (var n in RootNode.Descendants.Where(n => n.Id == "HitBox")) {
 				(n as Node3D).Visible = false;
 			}
+		}
+
+		public bool WasModifiedOutsideTangerine()
+		{
+			if (Path == defaultPath) {
+				return false;
+			}
+			var fullPath = Project.Current.GetSystemPath(Path, GetFileExtension(Format));
+			return File.GetLastWriteTimeUtc(fullPath) > modificationTime;
+		}
+
+		public void SetModificationTimeToNow()
+		{
+			modificationTime = DateTime.UtcNow;
 		}
 
 		static DocumentFormat ResolveFormat(string path)
@@ -194,6 +225,17 @@ namespace Tangerine.Core
 			foreach (var i in Current.Views) {
 				i.Attach();
 			}
+			SelectFirstRowIfNoneSelected();
+		}
+
+		private void SelectFirstRowIfNoneSelected()
+		{
+			if (!SelectedRows().Any()) {
+				Operations.Dummy.Perform();
+				if (Rows.Count > 0) {
+					Operations.SelectRow.Perform(Rows[0]);
+				}
+			}
 		}
 
 		public void RefreshExternalScenes() => RefreshExternalScenes(RootNode);
@@ -225,8 +267,8 @@ namespace Tangerine.Core
 			if (!IsModified) {
 				return true;
 			}
-			if (Closing != null) {
-				var r = Closing(this);
+			if (CloseConfirmation != null) {
+				var r = CloseConfirmation(this);
 				if (r == CloseAction.Cancel) {
 					return false;
 				}
@@ -256,6 +298,7 @@ namespace Tangerine.Core
 			History.AddSavePoint();
 			Path = path;
 			WriteNodeToFile(path, Format, RootNode);
+			SetModificationTimeToNow();
 		}
 
 		public static void WriteNodeToFile(string path, DocumentFormat format, Node node)

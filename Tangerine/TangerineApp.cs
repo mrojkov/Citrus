@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Lime;
@@ -55,7 +55,7 @@ namespace Tangerine
 			var documentViewContainer = InitializeDocumentArea(dockManager);
 
 			dockManager.ImportState(UserPreferences.Instance.DockState);
-			Document.Closing += doc => {
+			Document.CloseConfirmation += doc => {
 				var alert = new AlertDialog($"Save the changes to document '{doc.Path}' before closing?", "Yes", "No", "Cancel");
 				switch (alert.Show()) {
 					case 0: return Document.CloseAction.SaveChanges;
@@ -63,7 +63,10 @@ namespace Tangerine
 					default: return Document.CloseAction.Cancel;
 				}
 			};
-
+			Project.DocumentReloadConfirmation += doc => {
+				var alert = new AlertDialog($"The file '{doc.Path}' has been changed outside of Tangerine.\nDo you want to keep your changes, or reload the file from disk?", "Keep", "Reload");
+				return alert.Show() == 0 ? false : true;
+			};
 			Document.NodeDecorators.AddFor<Spline>(n => n.CompoundPostPresenter.Add(new UI.SceneView.SplinePresenter()));
 			Document.NodeDecorators.AddFor<Viewport3D>(n => n.CompoundPostPresenter.Add(new UI.SceneView.Spline3DPresenter()));
 			Document.NodeDecorators.AddFor<PointObject>(n => n.CompoundPostPresenter.Add(new UI.SceneView.PointObjectPresenter()));
