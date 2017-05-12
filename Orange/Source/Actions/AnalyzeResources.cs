@@ -85,10 +85,8 @@ namespace Orange
 			var missingResourcesReport = new List<string>();
 			var suspiciousTexturesReport = new List<string>();
 			var bundles = new HashSet<string>();
-			var cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles,
-				The.Workspace.ActivePlatform, The.Workspace.ActiveTarget);
-			AssetBundle.Instance = new PackedAssetBundle(
-				The.Workspace.GetBundlePath(CookingRulesBuilder.MainBundleName));
+			var cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, The.Workspace.ActiveTarget);
+			AssetBundle.Instance = new PackedAssetBundle(The.Workspace.GetBundlePath(CookingRulesBuilder.MainBundleName));
 			foreach (var i in cookingRulesMap) {
 				if (i.Key.EndsWith(".png")) {
 					if (i.Value.TextureAtlas == null && i.Value.PVRFormat != PVRFormat.PVRTC4 && i.Value.PVRFormat != PVRFormat.PVRTC4_Forced) {

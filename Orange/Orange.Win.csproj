@@ -125,6 +125,7 @@
     <Compile Include="Source\CsprojSynchronization\CsprojSynchronization.cs" />
     <Compile Include="Source\Plugins\IPluginUIBuilder.cs" />
     <Compile Include="Source\Target.cs" />
+    <Compile Include="Source\Toolbox\IFileEnumerator.cs" />
     <Compile Include="Source\Toolbox\Json.cs" />
     <Compile Include="Source\Toolbox\Process.cs" />
     <Compile Include="Source\Toolbox\Subversion.cs" />

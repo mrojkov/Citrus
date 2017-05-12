@@ -117,11 +117,17 @@ namespace Orange
 			}
 		}
 
+		// Preserving default targets references just in case since they're used as keys in cooking rules for target
+		private static List<Target> defaultTargets;
 		private void FillDefaultTargets()
 		{
-			foreach (TargetPlatform platform in Enum.GetValues(typeof(TargetPlatform))) {
-				Targets.Add(new Target(Enum.GetName(typeof(TargetPlatform), platform), null, false, platform));
+			if (defaultTargets == null) {
+				defaultTargets = new List<Target>();
+				foreach (TargetPlatform platform in Enum.GetValues(typeof(TargetPlatform))) {
+					defaultTargets.Add(new Target(Enum.GetName(typeof(TargetPlatform), platform), null, false, platform));
+				}
 			}
+			Targets.AddRange(defaultTargets);
 		}
 
 		private void ReadProject(string file)

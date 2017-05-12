@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Orange;
 
 namespace Tangerine
@@ -20,18 +21,9 @@ namespace Tangerine
 			throw new NotImplementedException();
 		}
 
-		public override TargetPlatform GetActivePlatform()
-		{
-#if WIN
-			return TargetPlatform.Win;
-#elif MAC
-			return TargetPlatform.Mac;
-#endif
-		}
-
 		public override Target GetActiveTarget()
 		{
-			return null;
+			return The.Workspace.Targets.First();
 		}
 
 		public override bool DoesNeedSvnUpdate()

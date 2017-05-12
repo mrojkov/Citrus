@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
+using System.Linq;
 
 namespace Orange
 {
@@ -12,13 +11,11 @@ namespace Orange
 		public DateTime LastWriteTime;
 	}
 
-	public class FileEnumerator
+	public class FileEnumerator : IFileEnumerator
 	{
-		public string Directory { get; private set; }
-
+		public string Directory { get; }
 		public Predicate<FileInfo> EnumerationFilter;
-
-		List<FileInfo> files = new List<FileInfo>();
+		readonly List<FileInfo> files = new List<FileInfo>();
 
 		public FileEnumerator(string directory)
 		{
@@ -29,7 +26,7 @@ namespace Orange
 		public void Rescan()
 		{
 			files.Clear();
-			var dirInfo = new System.IO.DirectoryInfo(Directory);
+			var dirInfo = new DirectoryInfo(Directory);
 
 			foreach (var fileInfo in dirInfo.GetFiles("*.*", SearchOption.AllDirectories)) {
 				var file = fileInfo.FullName;

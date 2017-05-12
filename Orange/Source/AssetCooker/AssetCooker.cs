@@ -71,7 +71,7 @@ namespace Orange
 		public static void Cook(TargetPlatform platform)
 		{
 			AssetCooker.Platform = platform;
-			cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, platform, The.Workspace.ActiveTarget);
+			cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, The.Workspace.ActiveTarget);
 			var extraBundles = new HashSet<string>();
 			foreach (var dictionaryItem in cookingRulesMap) {
 				foreach (var bundle in dictionaryItem.Value.Bundle) {
@@ -769,7 +769,21 @@ namespace Orange
 				var model = new ModelImporter(srcPath, The.Workspace.ActivePlatform).Model;
 				// Create .model file for tangerine.
 				Serialization.WriteObjectToBundle(sourceAssetBundle, dstPath, model, Serialization.Format.Binary, ".model");
-				AssetBundle.ImportFile(dstPath, dstPath, 0,  ".model", compression);
+				AssetAttributes assetAttributes;
+				switch (compression) {
+					case ModelCompression.None:
+						assetAttributes = AssetAttributes.None;
+						break;
+					case ModelCompression.Deflate:
+						assetAttributes = AssetAttributes.ZippedDeflate;
+						break;
+					case ModelCompression.LZMA:
+						assetAttributes = AssetAttributes.ZippedLZMA;
+						break;
+					default:
+						throw new ArgumentOutOfRangeException($"Unknown compression: {compression}");
+				}
+				AssetBundle.ImportFile(dstPath, dstPath, 0, ".model", assetAttributes);
 				return true;
 			});
 		}
