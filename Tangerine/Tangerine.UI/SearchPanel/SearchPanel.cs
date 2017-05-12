@@ -84,7 +84,13 @@ namespace Tangerine.UI
 			if (ea != null) {
 				var searchString = searchStringEditor.Text;
 				var localIndex = GetResults(ea, searchString).ToList().IndexOf(node);
-				var externalSceneDoc = Project.Current.OpenDocument(ea.ContentsPath, selectFirstNode: false);
+				Document externalSceneDoc = null;
+				try {
+					externalSceneDoc = Project.Current.OpenDocument(ea.ContentsPath);
+				} catch (System.Exception e) {
+					AlertDialog.Show(e.Message);
+					return;
+				}
 				externalSceneDoc.SceneNavigatedFrom = curScenePath; 
 				node = GetResults(externalSceneDoc.RootNode, searchString).ToList()[localIndex];
 			}
@@ -183,6 +189,7 @@ namespace Tangerine.UI
 		{
 			Instance = this;
 			PanelWidget.PushNode(RootWidget);
+			RefreshResultPane(searchStringEditor.Text);
 		}
 
 		public void Detach()
