@@ -54,15 +54,23 @@ namespace Orange
 
 		private static void SynchronizeAll()
 		{
-			foreach (var platform in (TargetPlatform[])Enum.GetValues(typeof(TargetPlatform))) {
+			var dontSynchronizeProject = The.Workspace.ProjectJson["DontSynchronizeProject"] as bool?;
+			if (dontSynchronizeProject != null && dontSynchronizeProject.Value) {
+				return;
+			}
+
+			foreach (var target in The.Workspace.Targets) {
+				var platform = target.Platform;
 				var limeProj = The.Workspace.GetLimeCsprojFilePath(platform);
 				CsprojSynchronization.SynchronizeProject(limeProj);
-				var dontSynchronizeProject = The.Workspace.ProjectJson["DontSynchronizeProject"] as bool?;
-				if (dontSynchronizeProject != null && dontSynchronizeProject.Value) {
-					return;
+				var dirInfo = new System.IO.DirectoryInfo(The.Workspace.ProjectDirectory);
+				foreach (var fileInfo in dirInfo.GetFiles("*" + The.Workspace.GetPlatformSuffix(platform) + ".csproj", SearchOption.AllDirectories)) {
+					CsprojSynchronization.SynchronizeProject(fileInfo.FullName);
 				}
-				foreach (var gameProj in The.Workspace.EnumerateGameCsprojFilePaths(platform)) {
-					CsprojSynchronization.SynchronizeProject(gameProj);
+				if (target.ProjectPath != null) {
+					foreach (var targetCsprojFile in dirInfo.GetFiles(Path.GetFileName(target.ProjectPath), SearchOption.AllDirectories)) {
+						CsprojSynchronization.SynchronizeProject(targetCsprojFile.FullName);
+					}
 				}
 			}
 		}
@@ -182,10 +190,10 @@ namespace Orange
 			all.Sort ((a, b) => b.CreationTime.CompareTo (a.CreationTime));
 			if (all.Count > 0) {
 				var path = Path.Combine(
-					directory, 
-					all[0].FullName, 
-					"Contents", 
-					"MacOS", 
+					directory,
+					all[0].FullName,
+					"Contents",
+					"MacOS",
 					Path.GetFileNameWithoutExtension(all[0].FullName)
 				);
 				return path;

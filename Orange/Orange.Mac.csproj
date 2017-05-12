@@ -121,7 +121,6 @@
     <Compile Include="Source\Builder\MSBuild.cs" />
     <Compile Include="Source\Builder\MDTool.cs" />
     <Compile Include="Source\ModelImport\ModelImporter.cs" />
-    <Compile Include="Source\SubTarget.cs" />
     <Compile Include="Source\ModelImport\KeyframeReducer.cs" />
     <Compile Include="Source\Actions\ConvertAssetsToTangerine.cs" />
     <Compile Include="Source\Actions\GenerateAppDeserializers.cs" />
@@ -134,6 +133,8 @@
     <Compile Include="Source\AssetCooker\CodeCooker.cs" />
     <Compile Include="Source\Toolbox\EmbeddedResource.cs" />
     <Compile Include="Source\Toolbox\FontBuilder.cs" />
+    <Compile Include="Source\Target.cs" />
+    <Compile Include="Source\Toolbox\IFileEnumerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Toolchain.Mac\PVRTexTool">

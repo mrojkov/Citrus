@@ -9,7 +9,7 @@ namespace Tangerine.UI.Timeline
 	public class Toolbar
 	{
 		public Widget RootWidget { get; private set; }
-		
+
 		public Toolbar()
 		{
 			RootWidget = new Widget {
@@ -30,11 +30,11 @@ namespace Tangerine.UI.Timeline
 				}
 			};
 		}
-		
+
 		void Render(Widget widget)
 		{
 			widget.PrepareRendererState();
-			Renderer.DrawRect(Vector2.Zero, widget.Size, ColorTheme.Current.Toolbar.Background); 
+			Renderer.DrawRect(Vector2.Zero, widget.Size, ColorTheme.Current.Toolbar.Background);
 		}
 
 		ToolbarButton CreateAnimationModeButton()
@@ -52,7 +52,7 @@ namespace Tangerine.UI.Timeline
 			var t = new SimpleText { Padding = new Thickness(4, 0) };
 			Action f = () => {
 				var distance = Timeline.Instance.Ruler.MeasuredFrameDistance;
-				t.Text = (distance == 0) ? 
+				t.Text = (distance == 0) ?
 					$"Col : {Document.Current.Container.AnimationFrame}" :
 					$"Col : {Document.Current.Container.AnimationFrame} {Timeline.Instance.Ruler.MeasuredFrameDistance:+#;-#;0}";
 			};

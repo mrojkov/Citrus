@@ -117,7 +117,7 @@ namespace Orange
 			};
 
 			// Platform section
-			var label1 = new Label() { Xalign = 1, LabelProp = "Target platform" };
+			var label1 = new Label() { Xalign = 1, LabelProp = "Target" };
 			table.Attach(label1, 0, 1, 0, 1, xoptions: AttachOptions.Fill, yoptions: 0,
 				xpadding: 0, ypadding: 0);
 
@@ -146,15 +146,8 @@ namespace Orange
 		{
 			(platformPicker.Model as ListStore).Clear();
 
-			platformPicker.AppendText("Desktop (PC, Mac, Linux)");
-			platformPicker.AppendText("iPhone/iPad");
-			platformPicker.AppendText("Android");
-			platformPicker.AppendText("Unity");
-
-			if (The.Workspace.SubTargets != null) {
-				foreach (var target in The.Workspace.SubTargets)
-					platformPicker.AppendText(target.Name);
-			}
+			foreach (var target in The.Workspace.Targets)
+				platformPicker.AppendText(target.Name);
 
 			platformPicker.Active = 0;
 		}

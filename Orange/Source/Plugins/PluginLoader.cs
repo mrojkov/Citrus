@@ -108,8 +108,10 @@ namespace Orange
 			}
 			CurrentPlugin?.Initialize?.Invoke();
 			var uiBuilder = The.UI.GetPluginUIBuilder();
-			CurrentPlugin?.BuildUI?.Invoke(uiBuilder);
-			The.UI.CreatePluginUI(uiBuilder);
+			if (uiBuilder != null) {
+				CurrentPlugin?.BuildUI?.Invoke(uiBuilder);
+				The.UI.CreatePluginUI(uiBuilder);
+			}
 			The.MenuController.CreateAssemblyMenuItems();
 		}
 

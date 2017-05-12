@@ -85,10 +85,8 @@ namespace Orange
 			var missingResourcesReport = new List<string>();
 			var suspiciousTexturesReport = new List<string>();
 			var bundles = new HashSet<string>();
-			var cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles,
-				The.Workspace.ActivePlatform, The.Workspace.Target);
-			AssetBundle.Instance = new PackedAssetBundle(
-				The.Workspace.GetBundlePath(CookingRules.MainBundleName));
+			var cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, The.Workspace.ActiveTarget);
+			AssetBundle.Instance = new PackedAssetBundle(The.Workspace.GetBundlePath(CookingRulesBuilder.MainBundleName));
 			foreach (var i in cookingRulesMap) {
 				if (i.Key.EndsWith(".png")) {
 					if (i.Value.TextureAtlas == null && i.Value.PVRFormat != PVRFormat.PVRTC4 && i.Value.PVRFormat != PVRFormat.PVRTC4_Forced) {
@@ -108,8 +106,8 @@ namespace Orange
 						}
 					}
 				}
-				foreach (var bundle in i.Value.Bundles) {
-					if (bundle != CookingRules.MainBundleName) {
+				foreach (var bundle in i.Value.Bundle) {
+					if (bundle != CookingRulesBuilder.MainBundleName) {
 						bundles.Add(bundle);
 					}
 				}
@@ -210,10 +208,10 @@ namespace Orange
 					foreach (Match m in Regex.Matches(rpr.bundle, pattern, RegexOptions.IgnoreCase)) {
 						bundle = m.Groups[1].Value;
 					}
-					int index = Array.IndexOf(cookingRulesMap[srcPath].Bundles, bundle);
+					int index = Array.IndexOf(cookingRulesMap[srcPath].Bundle, bundle);
 					if (index == -1) {
 						reportList.Add(string.Format("\t[{0}]=>[{2}]: {1}",
-							string.Join(", ", cookingRulesMap[srcPath].Bundles), rpr.path, bundle));
+							string.Join(", ", cookingRulesMap[srcPath].Bundle), rpr.path, bundle));
 					}
 				}
 				requestedPaths.Clear();

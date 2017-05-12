@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -124,7 +124,8 @@
     <Compile Include="Source\Nuget\Nuget.cs" />
     <Compile Include="Source\CsprojSynchronization\CsprojSynchronization.cs" />
     <Compile Include="Source\Plugins\IPluginUIBuilder.cs" />
-    <Compile Include="Source\SubTarget.cs" />
+    <Compile Include="Source\Target.cs" />
+    <Compile Include="Source\Toolbox\IFileEnumerator.cs" />
     <Compile Include="Source\Toolbox\Json.cs" />
     <Compile Include="Source\Toolbox\Process.cs" />
     <Compile Include="Source\Toolbox\Subversion.cs" />

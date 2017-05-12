@@ -29,8 +29,8 @@ namespace Orange
 				return;
 			}
 
-			var sceneToBundleMap = cookingRulesMap.ToDictionary(i => i.Key, i => i.Value.Bundles[0]);
-			new ScenesCodeCooker(The.Workspace.ProjectDirectory, The.Workspace.Title, CookingRules.MainBundleName,
+			var sceneToBundleMap = cookingRulesMap.ToDictionary(i => i.Key, i => i.Value.Bundle[0]);
+			new ScenesCodeCooker(The.Workspace.ProjectDirectory, The.Workspace.Title, CookingRulesBuilder.MainBundleName,
 				sceneToBundleMap, scenes).Start();
 			AssetBundle.Instance = null;
 		}

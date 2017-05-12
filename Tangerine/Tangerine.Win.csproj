@@ -49,6 +49,7 @@
     <Compile Include="MainMenu\FileMenu.cs" />
     <Compile Include="MainMenu\ViewMenu.cs" />
     <Compile Include="MainMenu\WindowMenu.cs" />
+    <Compile Include="OrangeInterface.cs" />
     <Compile Include="PreferencesDialog\PreferencesDialog.cs" />
     <Compile Include="TangerineApp.cs" />
     <Compile Include="Main.Win.cs" />
@@ -77,6 +78,10 @@
       <Project>{fc2de6c9-641a-4230-8d29-ea4035cd8708}</Project>
       <Name>Lime.Win</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Orange\Orange.Win.csproj">
+      <Project>{6f0c1a51-492a-4e6e-b302-e212d441ebf3}</Project>
+      <Name>Orange.Win</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Yuzu\Yuzu.csproj">
       <Project>{ddd2dfe9-ced2-4cea-adf0-5a6865865a46}</Project>
       <Name>Yuzu</Name>
@@ -84,6 +89,10 @@
     <ProjectReference Include="Tangerine.Core\Tangerine.Core.Win.csproj">
       <Project>{05fb6476-c29b-49a7-918c-a52caf73fca7}</Project>
       <Name>Tangerine.Core.Win</Name>
+    </ProjectReference>
+    <ProjectReference Include="Tangerine.UI.FilesystemView\Tangerine.UI.FilesystemView.Win.csproj">
+      <Project>{74f91bd5-9e43-40fd-b8ea-b9819d1ca926}</Project>
+      <Name>Tangerine.UI.FilesystemView.Win</Name>
     </ProjectReference>
     <ProjectReference Include="Tangerine.UI.Inspector\Tangerine.UI.Inspector.Win.csproj">
       <Project>{d6b543cb-0223-4210-bb0f-7d8250760895}</Project>
@@ -203,5 +212,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Viewport3D.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Icons\Filesystem\Folded.png" />
+    <EmbeddedResource Include="Resources\Icons\Filesystem\Unfolded.png" />
   </ItemGroup>
 </Project>

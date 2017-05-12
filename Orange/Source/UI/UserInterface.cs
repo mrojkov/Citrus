@@ -26,9 +26,7 @@ namespace Orange
 
 		public abstract void ShowError(string message);
 
-		public abstract TargetPlatform GetActivePlatform();
-
-		public abstract SubTarget GetActiveSubTarget();
+		public abstract Target GetActiveTarget();
 
 		public virtual void ExitWithErrorIfPossible() { }
 

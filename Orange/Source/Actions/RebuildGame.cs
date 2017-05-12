@@ -60,10 +60,10 @@ namespace Orange
 		private static HashSet<string> GetAllBundles()
 		{
 			var bundles = new HashSet<string>() {
-				CookingRules.MainBundleName
+				CookingRulesBuilder.MainBundleName
 			};
-			var cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, The.Workspace.ActivePlatform, The.Workspace.Target);
-			foreach (var bundle in cookingRulesMap.SelectMany(i => i.Value.Bundles.Where(bundle => bundle != CookingRules.MainBundleName))) {
+			var cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, The.Workspace.ActiveTarget);
+			foreach (var bundle in cookingRulesMap.SelectMany(i => i.Value.Bundle.Where(bundle => bundle != CookingRulesBuilder.MainBundleName))) {
 				bundles.Add(bundle);
 			}
 			return bundles;

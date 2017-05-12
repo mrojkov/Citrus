@@ -133,41 +133,12 @@ namespace Orange
 			Console.WriteLine(message);
 		}
 
-		public override TargetPlatform GetActivePlatform()
+		public override Target GetActiveTarget()
 		{
-			var subTarget = GetActiveSubTarget();
-			if (subTarget != null)
-				return subTarget.Platform;
-
-			var platform = Toolbox.GetCommandLineArg("--platform");
-			switch (platform) {
-				case "ios":
-					return TargetPlatform.iOS;
-				case "android":
-					return TargetPlatform.Android;
-				case "desktop":
-				case null:
-#if WIN
-					return TargetPlatform.Win;
-#elif MAC
-					return TargetPlatform.Mac;
-#endif
-				case "win":
-					return TargetPlatform.Win;
-				case "mac":
-					return TargetPlatform.Mac;
-				default:
-					Console.WriteLine("Target platform must be either ios, android, desktop, win, mac");
-					throw new TerminateException(1);
-			}
-		}
-
-		public override SubTarget GetActiveSubTarget()
-		{
-			var platform = Toolbox.GetCommandLineArg("--platform");
-			foreach (var subTarget in The.Workspace.SubTargets) {
-				if (platform == subTarget.Name) {
-					return subTarget;
+			var specifiedTarget = Toolbox.GetCommandLineArg("--target");
+			foreach (var target in The.Workspace.Targets) {
+				if (specifiedTarget == target.Name) {
+					return target;
 				}
 			}
 			return null;

@@ -1,7 +1,10 @@
 using System;
+using System.Collections;
 using System.IO;
 using System.Collections.Generic;
 using Lime;
+using Yuzu;
+using Yuzu.Metadata;
 
 namespace Orange
 {
@@ -30,27 +33,104 @@ namespace Orange
 		DrawCalls
 	}
 
-	public struct CookingRules
+	public enum ModelCompression
 	{
-		public const string MainBundleName = "Main";
+		None,
+		Deflate,
+		LZMA,
+	}
 
-		public string TextureAtlas;
-		public bool MipMaps;
-		public bool HighQualityCompression;
-		public float TextureScaleFactor;
-		public PVRFormat PVRFormat;
-		public DDSFormat DDSFormat;
+	public interface ICookingRules
+	{
+		string TextureAtlas { get; }
+		bool MipMaps { get; }
+		bool HighQualityCompression { get; }
+		float TextureScaleFactor { get; }
+		PVRFormat PVRFormat { get; }
+		DDSFormat DDSFormat { get; }
+		string[] Bundle { get; }
+		bool Ignore { get; }
+		int ADPCMLimit { get; }
+		AtlasOptimization AtlasOptimization { get; }
+		ModelCompression ModelCompressing { get; }
+		string AtlasPacker { get; }
+	}
+
+	public class ParticularCookingRules : ICookingRules
+	{
+		// NOTE: function `Override` uses the fact that rule name being parsed matches the field name
+		// for all fields marked with `YuzuRequired`. So don't rename them or do so with cautiousness.
+		// e.g. don't rename `Bundle` to `Bundles`
+
+		[YuzuRequired]
+		public string TextureAtlas { get; set; }
+
+		[YuzuRequired]
+		public bool MipMaps { get; set; }
+
+		[YuzuRequired]
+		public bool HighQualityCompression { get; set; }
+
+		[YuzuRequired]
+		public float TextureScaleFactor { get; set; }
+
+		[YuzuRequired]
+		public PVRFormat PVRFormat { get; set; }
+
+		[YuzuRequired]
+		public DDSFormat DDSFormat { get; set; }
+
+		[YuzuRequired]
+		public string[] Bundle { get; set; }
+
+		[YuzuRequired]
+		public bool Ignore { get; set; }
+
+		[YuzuRequired]
+		public int ADPCMLimit { get; set; } // Kb
+
+		[YuzuRequired]
+		public AtlasOptimization AtlasOptimization { get; set; }
+
+		[YuzuRequired]
+		public ModelCompression ModelCompressing { get; set; }
+
+		[YuzuRequired]
+		public string AtlasPacker { get; set; }
+
 		public DateTime LastChangeTime;
-		public string[] Bundles;
-		public bool Ignore;
-		public int ADPCMLimit; // Kb
-		public AtlasOptimization AtlasOptimization;
-		public AssetAttributes ModelCompressing;
-		public string AtlasPacker;
 
-		public static CookingRules GetDefault(TargetPlatform platform)
+		public HashSet<Meta.Item> FieldOverrides;
+
+		public ParticularCookingRules Parent;
+
+		private static readonly Meta meta = Meta.Get(typeof (ParticularCookingRules), new CommonOptions());
+
+		private static readonly Dictionary<string, Meta.Item> fieldNameToYuzuMetaItemCache =
+			new Dictionary<string, Meta.Item>();
+
+		private static readonly Dictionary<TargetPlatform, ParticularCookingRules> defaultRules =
+			new Dictionary<TargetPlatform, ParticularCookingRules>();
+
+		static ParticularCookingRules()
 		{
-			return new CookingRules() {
+			foreach (var item in meta.Items) {
+				fieldNameToYuzuMetaItemCache.Add(item.Name, item);
+			}
+		}
+
+		public void Override(string fieldName)
+		{
+			FieldOverrides.Add(fieldNameToYuzuMetaItemCache[fieldName]);
+		}
+
+		public static ParticularCookingRules GetDefault(TargetPlatform platform)
+		{
+			if (defaultRules.ContainsKey(platform)) {
+				return defaultRules[platform];
+			}
+			defaultRules.Add(platform, new ParticularCookingRules
+			{
 				TextureAtlas = null,
 				MipMaps = false,
 				HighQualityCompression = false,
@@ -58,25 +138,169 @@ namespace Orange
 				PVRFormat = platform == TargetPlatform.Android ? PVRFormat.ETC1 : PVRFormat.PVRTC4,
 				DDSFormat = DDSFormat.DXTi,
 				LastChangeTime = new DateTime(0),
-				Bundles = new[] { MainBundleName },
+				Bundle = new[] { CookingRulesBuilder.MainBundleName },
 				Ignore = false,
 				ADPCMLimit = 100,
 				AtlasOptimization = AtlasOptimization.Memory,
-				ModelCompressing = AssetAttributes.ZippedDeflate
-			};
+				ModelCompressing = ModelCompression.Deflate,
+				FieldOverrides = new HashSet<Meta.Item>(),
+			});
+			return defaultRules[platform];
+		}
+
+		public ParticularCookingRules InheritClone()
+		{
+			var r = (ParticularCookingRules)MemberwiseClone();
+			r.FieldOverrides = new HashSet<Meta.Item>();
+			r.Parent = this;
+			return r;
+		}
+	}
+
+	public class CookingRules : ICookingRules
+	{
+		public Dictionary<Target, ParticularCookingRules> TargetRules = new Dictionary<Target, ParticularCookingRules>();
+		public ParticularCookingRules CommonRules;
+		private ParticularCookingRules effectiveRules;
+		public CookingRules Parent;
+		public static List<string> KnownBundles = new List<string>();
+
+		public string TextureAtlas => effectiveRules.TextureAtlas;
+		public bool MipMaps => effectiveRules.MipMaps;
+		public bool HighQualityCompression => effectiveRules.HighQualityCompression;
+		public float TextureScaleFactor => effectiveRules.TextureScaleFactor;
+		public PVRFormat PVRFormat => effectiveRules.PVRFormat;
+		public DDSFormat DDSFormat => effectiveRules.DDSFormat;
+		public string[] Bundle => effectiveRules.Bundle;
+		public int ADPCMLimit => effectiveRules.ADPCMLimit;
+		public AtlasOptimization AtlasOptimization => effectiveRules.AtlasOptimization;
+		public ModelCompression ModelCompressing => effectiveRules.ModelCompressing;
+		public string AtlasPacker => effectiveRules.AtlasPacker;
+
+		public bool Ignore
+		{
+			get { return effectiveRules.Ignore; }
+			set
+			{
+				foreach (var target in The.Workspace.Targets) {
+					TargetRules[target].Ignore = value;
+				}
+				CommonRules.Ignore = value;
+				if (effectiveRules != null) {
+					effectiveRules.Ignore = value;
+				}
+			}
+		}
+
+		public IEnumerable<KeyValuePair<Target, ParticularCookingRules>> Enumerate()
+		{
+			yield return new KeyValuePair<Target, ParticularCookingRules>(null, CommonRules);
+			foreach (var kv in TargetRules) {
+				yield return kv;
+			}
+		}
+
+		public CookingRules(bool initialize = true)
+		{
+			if (!initialize) {
+				return;
+			}
+			foreach (var target in The.Workspace.Targets) {
+				TargetRules.Add(target, ParticularCookingRules.GetDefault(target.Platform));
+			}
+			CommonRules = ParticularCookingRules.GetDefault(The.Workspace.ActivePlatform);
+		}
+
+		public CookingRules InheritClone()
+		{
+			var r = new CookingRules(false);
+			r.Parent = this;
+			foreach (var kv in TargetRules) {
+				r.TargetRules.Add(kv.Key, kv.Value.InheritClone());
+			}
+			if (effectiveRules != null) {
+				r.CommonRules = effectiveRules.InheritClone();
+				r.effectiveRules = effectiveRules.InheritClone();
+			} else {
+				r.CommonRules = CommonRules.InheritClone();
+			}
+			return r;
+		}
+
+		public string SourceFilename;
+		public void Save()
+		{
+			using (var fs = new FileStream(SourceFilename, FileMode.Create)) {
+				using (var sw = new StreamWriter(fs)) {
+					SaveCookingRules(sw, CommonRules, null);
+					foreach (var kv in TargetRules) {
+						SaveCookingRules(sw, kv.Value, kv.Key);
+					}
+				}
+			}
+		}
+
+		private string StringForValue(Meta.Item yi, object value)
+		{
+			if (value is bool) {
+				return (bool)value ? "Yes" : "No";
+			} else if (value is DDSFormat) {
+				return (DDSFormat)value == DDSFormat.DXTi ? "DXTi" : "RGBA8";
+			} else if (yi.Name == "TextureAtlas") {
+				var fi = new System.IO.FileInfo(SourceFilename);
+				if (fi.Directory.Name == value.ToString()) {
+					return "${DirectoryName}";
+				} else {
+					return value.ToString();
+				}
+			} else {
+				return value.ToString();
+			}
+		}
+
+		public void SaveCookingRules(StreamWriter sw, ParticularCookingRules rules, Target target)
+		{
+			var targetString = target == null ? "" : $"({target.Name})";
+			foreach (var yi in rules.FieldOverrides) {
+				var value = yi.GetValue(rules);
+				var valueString = StringForValue(yi, value);
+				sw.Write($"{yi.Name}{targetString} {valueString}\n");
+			}
+		}
+
+		public void DeduceEffectiveRules(string path, Target target)
+		{
+			effectiveRules = CommonRules.InheritClone();
+			var targetRules = TargetRules[target];
+			foreach (var i in targetRules.FieldOverrides) {
+				i.SetValue(effectiveRules, i.GetValue(targetRules));
+			}
+			// TODO: implement this workaround in a general way
+			if (target.Platform == TargetPlatform.Android) {
+				switch (effectiveRules.PVRFormat) {
+					case PVRFormat.PVRTC2:
+					case PVRFormat.PVRTC4:
+					case PVRFormat.PVRTC4_Forced:
+						effectiveRules.PVRFormat = PVRFormat.ETC1;
+						break;
+				}
+			}
 		}
 	}
 
 	public class CookingRulesBuilder
 	{
-		public static Dictionary<string, CookingRules> Build(FileEnumerator fileEnumerator, TargetPlatform platform, string target)
+		public const string MainBundleName = "Main";
+
+		public static Dictionary<string, CookingRules> Build(IFileEnumerator fileEnumerator, Target target)
 		{
+			var targetName = target?.Name;
 			var shouldRescanEnumerator = false;
 			var pathStack = new Stack<string>();
 			var rulesStack = new Stack<CookingRules>();
 			var map = new Dictionary<string, CookingRules>();
 			pathStack.Push("");
-			rulesStack.Push(CookingRules.GetDefault(platform));
+			rulesStack.Push(new CookingRules());
 			using (new DirectoryChanger(fileEnumerator.Directory)) {
 				foreach (var fileInfo in fileEnumerator.Enumerate()) {
 					var path = fileInfo.Path;
@@ -86,24 +310,30 @@ namespace Orange
 					}
 					if (Path.GetFileName(path) == "#CookingRules.txt") {
 						pathStack.Push(Lime.AssetPath.GetDirectoryName(path));
-						var rules = ParseCookingRules(rulesStack.Peek(), path, platform, target);
+						var rules = ParseCookingRules(rulesStack.Peek(), path, target);
+						rules.SourceFilename = Path.Combine(fileEnumerator.Directory, path);
 						rulesStack.Push(rules);
 						// Add 'ignore' cooking rules for this #CookingRules.txt itself
-						var ignoreRules = rules;
+						var ignoreRules = rules.InheritClone();
 						ignoreRules.Ignore = true;
 						map[path] = ignoreRules;
 					} else if (Path.GetExtension(path) != ".txt") {
-						var rules = rulesStack.Peek();
 						var rulesFile = path + ".txt";
+						var rules = rulesStack.Peek();
 						if (File.Exists(rulesFile)) {
-							rules = ParseCookingRules(rulesStack.Peek(), rulesFile, platform, target);
+							rules = ParseCookingRules(rulesStack.Peek(), rulesFile, target);
+							rules.SourceFilename = Path.Combine(fileEnumerator.Directory, rulesFile);
 							// Add 'ignore' cooking rules for this cooking rules text file
-							var ignoreRules = rules;
+							var ignoreRules = rules.InheritClone();
 							ignoreRules.Ignore = true;
 							map[rulesFile] = ignoreRules;
 						}
-						if (rules.LastChangeTime > fileInfo.LastWriteTime) {
-							File.SetLastWriteTime(path, rules.LastChangeTime);
+						if (rules.CommonRules.LastChangeTime > fileInfo.LastWriteTime) {
+							try {
+								File.SetLastWriteTime(path, rules.CommonRules.LastChangeTime);
+							} catch (UnauthorizedAccessException e) {
+								// In case this is a folder
+							}
 							shouldRescanEnumerator = true;
 						}
 						map[path] = rules;
@@ -116,14 +346,15 @@ namespace Orange
 			return map;
 		}
 
-		static bool ParseBool(string value)
+		private static bool ParseBool(string value)
 		{
-			if (value != "Yes" && value != "No")
+			if (value != "Yes" && value != "No") {
 				throw new Lime.Exception("Invalid value. Must be either 'Yes' or 'No'");
+			}
 			return value == "Yes";
 		}
 
-		static DDSFormat ParseDDSFormat(string value)
+		private static DDSFormat ParseDDSFormat(string value)
 		{
 			switch (value) {
 				case "DXTi":
@@ -136,16 +367,16 @@ namespace Orange
 			}
 		}
 
-		static PVRFormat ParsePVRFormat(string value, TargetPlatform platform)
+		private static PVRFormat ParsePVRFormat(string value)
 		{
 			switch (value) {
 				case "":
 				case "PVRTC4":
-					return (platform == TargetPlatform.Android) ? PVRFormat.ETC1 : PVRFormat.PVRTC4;
+					return PVRFormat.PVRTC4;
 				case "PVRTC4_Forced":
-					return (platform == TargetPlatform.Android) ? PVRFormat.ETC1 : PVRFormat.PVRTC4_Forced;
+					return PVRFormat.PVRTC4_Forced;
 				case "PVRTC2":
-					return (platform == TargetPlatform.Android) ? PVRFormat.ETC1 : PVRFormat.PVRTC2;
+					return PVRFormat.PVRTC2;
 				case "RGBA4":
 					return PVRFormat.RGBA4;
 				case "RGB565":
@@ -155,11 +386,12 @@ namespace Orange
 				case "RGBA8":
 					return PVRFormat.ARGB8;
 				default:
-					throw new Lime.Exception("Error parsing PVR format. Must be one of: PVRTC4, PVRTC4_Forced, PVRTC2, RGBA4, RGB565, ARGB8");
+					throw new Lime.Exception(
+						"Error parsing PVR format. Must be one of: PVRTC4, PVRTC4_Forced, PVRTC2, RGBA4, RGB565, ARGB8");
 			}
 		}
 
-		static AtlasOptimization ParseAtlasOptimization(string value)
+		private static AtlasOptimization ParseAtlasOptimization(string value)
 		{
 			switch (value) {
 				case "":
@@ -172,127 +404,135 @@ namespace Orange
 			}
 		}
 
-		static AssetAttributes ParseModelCompressing(string value)
+		private static ModelCompression ParseModelCompressing(string value)
 		{
 			switch (value) {
 				case "None":
-					return AssetAttributes.None;
+					return ModelCompression.None;
 				case "":
 				case "Deflate":
-					return AssetAttributes.ZippedDeflate;
+					return ModelCompression.Deflate;
 				case "LZMA":
-					return AssetAttributes.ZippedLZMA;
+					return ModelCompression.LZMA;
 				default:
 					throw new Lime.Exception("Error parsing ModelCompressing. Must be one of: None, Deflate, LZMA");
 			}
 		}
 
-		static CookingRules ParseCookingRules(CookingRules basicRules, string path, TargetPlatform platform, string target)
+		private static CookingRules ParseCookingRules(CookingRules basicRules, string path, Target target)
 		{
-			var rules = basicRules;
+			var rules = basicRules.InheritClone();
+			var currentRules = rules.CommonRules;
 			try {
-				rules.LastChangeTime = File.GetLastWriteTime(path);
+				rules.CommonRules.LastChangeTime = File.GetLastWriteTime(path);
 				using (var s = new FileStream(path, FileMode.Open)) {
 					TextReader r = new StreamReader(s);
 					string line;
-					string currentTarget = null;
 					while ((line = r.ReadLine()) != null) {
 						line = line.Trim();
 						if (line == "") {
-							continue;
-						}
-						if (line[0] == '[') {
-							currentTarget = line.Split('[', ']')[1];
-							continue;
-						}
-						if (currentTarget != null && currentTarget != target) {
 							continue;
 						}
 						var words = line.Split(' ');
 						if (words.Length < 2) {
 							throw new Lime.Exception("Invalid rule format");
 						}
-						// platform-specific cooking rules
+						// target-specific cooking rules
 						if (words[0].EndsWith(")")) {
-							int cut = words[0].LastIndexOf('(');
+							int cut = words[0].IndexOf('(');
 							if (cut >= 0) {
-								string platformTag = words[0].Substring(cut + 1, words[0].Length - cut - 2);
+								string targetName = words[0].Substring(cut + 1, words[0].Length - cut - 2);
 								words[0] = words[0].Substring(0, cut);
-								if (platformTag != Toolbox.GetTargetPlatformString(platform)) {
-									continue;
+								currentRules = null;
+								foreach (var t in The.Workspace.Targets) {
+									if (targetName == t.Name) {
+										currentRules = rules.TargetRules[t];
+									}
+								}
+								if (currentRules == null) {
+									throw new Lime.Exception($"Invalid platform or target: {targetName}");
 								}
 							}
+						} else {
+							currentRules = rules.CommonRules;
 						}
-						switch (words[0]) {
-							case "TextureAtlas":
-								switch (words[1]) {
-									case "None":
-										rules.TextureAtlas = null;
-										break;
-									case "${DirectoryName}":
-										string atlasName = Path.GetFileName(Lime.AssetPath.GetDirectoryName(path));
-										if (string.IsNullOrEmpty(atlasName)) {
-											throw new Lime.Exception(
-												"Atlas directory is empty. Choose another atlas name");
-										}
-										rules.TextureAtlas = atlasName;
-										break;
-									default:
-										rules.TextureAtlas = words[1];
-										break;
-								}
-								break;
-							case "MipMaps":
-								rules.MipMaps = ParseBool(words[1]);
-								break;
-							case "HighQualityCompression":
-								rules.HighQualityCompression = ParseBool(words[1]);
-								break;
-							case "PVRFormat":
-								rules.PVRFormat = ParsePVRFormat(words[1], platform);
-								break;
-							case "DDSFormat":
-								rules.DDSFormat = ParseDDSFormat(words[1]);
-								break;
-							case "Bundle":
-								rules.Bundles = new string[words.Length - 1];
-								for (var i = 0; i < rules.Bundles.Length; i++) {
-									rules.Bundles[i] = ParseBundle(words[i + 1]);
-								}
-								break;
-							case "Ignore":
-								rules.Ignore = ParseBool(words[1]);
-								break;
-							case "ADPCMLimit":
-								rules.ADPCMLimit = int.Parse(words[1]);
-								break;
-							case "TextureScaleFactor":
-								rules.TextureScaleFactor = float.Parse(words[1]);
-								break;
-							case "AtlasOptimization":
-								rules.AtlasOptimization = ParseAtlasOptimization(words[1]);
-								break;
-							case "AtlasPacker":
-								rules.AtlasPacker = words[1];
-								break;
-							case "ModelCompressing":
-								rules.ModelCompressing = ParseModelCompressing(words[1]);
-								break;
-							default:
-								throw new Lime.Exception("Unknown attribute {0}", words[0]);
-						}
+						ParseRule(currentRules, words, path);
 					}
 				}
 			} catch (Lime.Exception e) {
 				throw new Lime.Exception("Syntax error in {0}: {1}", path, e.Message);
 			}
+			rules.DeduceEffectiveRules(path, target);
 			return rules;
 		}
 
-		static string ParseBundle(string word)
+		private static void ParseRule(ParticularCookingRules rules, IReadOnlyList<string> words, string path)
+		{
+			switch (words[0]) {
+				case "TextureAtlas":
+					switch (words[1]) {
+						case "None":
+							rules.TextureAtlas = null;
+							break;
+						case "${DirectoryName}":
+							string atlasName = Path.GetFileName(Lime.AssetPath.GetDirectoryName(path));
+							if (string.IsNullOrEmpty(atlasName)) {
+								throw new Lime.Exception(
+									"Atlas directory is empty. Choose another atlas name");
+							}
+							rules.TextureAtlas = atlasName;
+							break;
+						default:
+							rules.TextureAtlas = words[1];
+							break;
+					}
+					break;
+				case "MipMaps":
+					rules.MipMaps = ParseBool(words[1]);
+					break;
+				case "HighQualityCompression":
+					rules.HighQualityCompression = ParseBool(words[1]);
+					break;
+				case "PVRFormat":
+					rules.PVRFormat = ParsePVRFormat(words[1]);
+					break;
+				case "DDSFormat":
+					rules.DDSFormat = ParseDDSFormat(words[1]);
+					break;
+				case "Bundle":
+					rules.Bundle = new string[words.Count - 1];
+					for (var i = 0; i < rules.Bundle.Length; i++) {
+						rules.Bundle[i] = ParseBundle(words[i + 1]);
+					}
+					break;
+				case "Ignore":
+					rules.Ignore = ParseBool(words[1]);
+					break;
+				case "ADPCMLimit":
+					rules.ADPCMLimit = int.Parse(words[1]);
+					break;
+				case "TextureScaleFactor":
+					rules.TextureScaleFactor = float.Parse(words[1]);
+					break;
+				case "AtlasOptimization":
+					rules.AtlasOptimization = ParseAtlasOptimization(words[1]);
+					break;
+				case "AtlasPacker":
+					rules.AtlasPacker = words[1];
+					break;
+				case "ModelCompressing":
+					rules.ModelCompressing = ParseModelCompressing(words[1]);
+					break;
+				default:
+					throw new Lime.Exception("Unknown attribute {0}", words[0]);
+			}
+			rules.Override(words[0]);
+		}
+
+		private static string ParseBundle(string word)
 		{
 			if (word.ToLowerInvariant() == "<default>" || word.ToLowerInvariant() == "data") {
-				return CookingRules.MainBundleName;
+				return MainBundleName;
 			} else {
 				return word;
 			}

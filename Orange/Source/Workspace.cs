@@ -15,11 +15,16 @@ namespace Orange
 		public string Title { get; private set; }
 		public FileEnumerator AssetFiles { get; private set; }
 		public Json ProjectJson { get; private set; }
-		public string Target { get; private set; }
-		public List<SubTarget> SubTargets { get; private set; }
+		public List<Target> Targets { get; private set; }
 
 		private string dataFolderName;
 		private string pluginName;
+
+		public Workspace()
+		{
+			Targets = new List<Target>();
+			FillDefaultTargets();
+		}
 
 		public string GetPlatformSuffix(TargetPlatform? platform = null)
 		{
@@ -48,28 +53,6 @@ namespace Orange
 		}
 
 		/// <summary>
-		/// Enumerate all game projects. E.g: Zx3.Game/Zx3.Game.Win.csproj
-		/// </summary>
-		public IEnumerable<string> EnumerateGameCsprojFilePaths(TargetPlatform? platform = null)
-		{
-			if (platform == null) {
-				platform = The.Workspace.ActivePlatform;
-			}
-			var dirInfo = new System.IO.DirectoryInfo(ProjectDirectory);
-			foreach (var fileInfo in dirInfo.GetFiles("*" + GetPlatformSuffix(platform) + ".csproj", SearchOption.AllDirectories)) {
-				var file = fileInfo.FullName;
-				yield return file;
-			}
-
-			var subtargets = The.Workspace.SubTargets.Where(i => i.Platform == platform);
-			foreach (var subTarget in subtargets) {
-				foreach (var subTargetCsprojFile in dirInfo.GetFiles(Path.GetFileName(subTarget.ProjectPath), SearchOption.AllDirectories)) {
-					yield return subTargetCsprojFile.FullName;
-				}
-			}
-		}
-
-		/// <summary>
 		/// Returns Citrus/Lime project path. It is supposed that Citrus lies beside the game.
 		/// </summary>
 		public string GetLimeCsprojFilePath(TargetPlatform? platform = null)
@@ -82,20 +65,13 @@ namespace Orange
 
 		public static readonly Workspace Instance = new Workspace();
 
-		public TargetPlatform ActivePlatform
-		{
-			get { return The.UI.GetActivePlatform(); }
-		}
+		public TargetPlatform ActivePlatform => The.UI.GetActiveTarget().Platform;
 
-		public string CustomSolution
-		{
-			get { return The.UI.GetActiveSubTarget() == null ? null : The.UI.GetActiveSubTarget().ProjectPath; }
-		}
+		public Target ActiveTarget => The.UI.GetActiveTarget();
 
-		public bool CleanBeforeBuild
-		{
-			get { return The.UI.GetActiveSubTarget() != null && The.UI.GetActiveSubTarget().CleanBeforeBuild; }
-		}
+		public string CustomSolution => The.UI.GetActiveTarget() == null ? null : The.UI.GetActiveTarget().ProjectPath;
+
+		public bool CleanBeforeBuild => The.UI.GetActiveTarget() != null && The.UI.GetActiveTarget().CleanBeforeBuild;
 
 		public void Load()
 		{
@@ -141,23 +117,36 @@ namespace Orange
 			}
 		}
 
+		// Preserving default targets references just in case since they're used as keys in cooking rules for target
+		private static List<Target> defaultTargets;
+		private void FillDefaultTargets()
+		{
+			if (defaultTargets == null) {
+				defaultTargets = new List<Target>();
+				foreach (TargetPlatform platform in Enum.GetValues(typeof(TargetPlatform))) {
+					defaultTargets.Add(new Target(Enum.GetName(typeof(TargetPlatform), platform), null, false, platform));
+				}
+			}
+			Targets.AddRange(defaultTargets);
+		}
+
 		private void ReadProject(string file)
 		{
 			var jobject = JObject.Parse(File.ReadAllText(file));
 			ProjectJson = new Json(jobject, file);
 			Title = ProjectJson["Title"] as string;
-			Target = ProjectJson.GetValue("Target", "");
-			SubTargets = new List<SubTarget>();
+			Targets = new List<Target>();
+			FillDefaultTargets();
 			dataFolderName = ProjectJson.GetValue("DataFolderName", "Data");
 			pluginName = ProjectJson.GetValue("Plugin", "");
 
-			foreach (var target in ProjectJson.GetArray("SubTargets", new Dictionary<string, object>[0])) {
+			foreach (var target in ProjectJson.GetArray("Targets", new Dictionary<string, object>[0])) {
 				var cleanBeforeBuild = false;
 				if (target.ContainsKey("CleanBeforeBuild")) {
 					cleanBeforeBuild = (bool)target["CleanBeforeBuild"];
 				}
 
-				SubTargets.Add(new SubTarget(target["Name"] as string, target["Project"] as string,
+				Targets.Add(new Target(target["Name"] as string, target["Project"] as string,
 											 cleanBeforeBuild, GetPlaformByName(target["Platform"] as string)));
 			}
 		}
@@ -179,7 +168,7 @@ namespace Orange
 
 		public string GetBundlePath(string bundleName, TargetPlatform platform)
 		{
-			if (bundleName == CookingRules.MainBundleName) {
+			if (bundleName == CookingRulesBuilder.MainBundleName) {
 				return The.Workspace.GetMainBundlePath(platform);
 			} else {
 				return Path.Combine(Path.GetDirectoryName(AssetsDirectory), bundleName + "." + Toolbox.GetTargetPlatformString(platform));
