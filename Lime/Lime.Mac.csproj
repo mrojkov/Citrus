@@ -169,7 +169,6 @@
     <Compile Include="Source\Widgets\WindowWidget.cs" />
     <Compile Include="Source\Application\CommonWindow.cs" />
     <Compile Include="Source\Widgets\WidgetContext.cs" />
-    <Compile Include="Source\Application\Window.Mac.cs" />
     <Compile Include="Source\Application\Mac\ColorFormat.cs" />
     <Compile Include="Source\Application\Mac\DisplayDevice.cs" />
     <Compile Include="Source\Application\Mac\GraphicsMode.cs" />
@@ -291,6 +290,10 @@
     <Compile Include="Source\Widgets\NodeComponentCollection.cs" />
     <Compile Include="Source\Widgets\3D\SplineGear3D.cs" />
     <Compile Include="Source\Graphics\OpenGL\ShaderPrograms.cs" />
+    <Compile Include="Source\Application\FileSystemWatcher\IFileSystemWatcher.cs" />
+    <Compile Include="Source\Application\Window.Mac.cs" />
+    <Compile Include="Source\Application\FileSystemWatcher\FileSystemWatcher.Mac.cs" />
+    <Compile Include="Source\Application\FileSystemWatcher\FileSystemWatcher.Win.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
@@ -383,6 +386,7 @@
     <Folder Include="Source\Widgets\Theme\" />
     <Folder Include="Source\Application\FileDialog\" />
     <Folder Include="Source\Binding\" />
+    <Folder Include="Source\Application\FileSystemWatcher\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

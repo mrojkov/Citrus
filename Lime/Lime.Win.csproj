@@ -103,6 +103,9 @@
     <Compile Include="Source\Application\Display\Display.Win.cs" />
     <Compile Include="Source\Application\Display\IDisplay.cs" />
     <Compile Include="Source\Application\DummyWindow.cs" />
+    <Compile Include="Source\Application\FileSystemWatcher\FileSystemWatcher.Mac.cs" />
+    <Compile Include="Source\Application\FileSystemWatcher\FileSystemWatcher.Win.cs" />
+    <Compile Include="Source\Application\FileSystemWatcher\IFileSystemWatcher.cs" />
     <Compile Include="Source\Application\Menu\Menu.Win.cs" />
     <Compile Include="Source\Application\MessageBox.cs" />
     <Compile Include="Source\Application\MouseCursor\MouseCursor.cs" />
