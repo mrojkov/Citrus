@@ -18,6 +18,8 @@ namespace Lime
 		public static IWindow Current { get; private set; }
 		public IContext Context { get; set; }
 
+		public event Action<System.Exception> UnhandledExceptionOnUpdate;
+
 		protected CommonWindow()
 		{
 			if (Current == null) {
@@ -65,13 +67,21 @@ namespace Lime
 		protected void RaiseUpdating(float delta)
 		{
 			using (Context.Activate().Scoped()) {
-				if (Updating != null) {
-					Updating(delta);
-				}
-				if (Current.Active) {
-					Application.MainMenu?.Refresh();
-					Application.RaiseActiveWindowUpdated(Current);
-					Application.UpdateCounter++;
+				try {
+					if (Updating != null) {
+						Updating(delta);
+					}
+					if (Current.Active) {
+						Application.MainMenu?.Refresh();
+						Application.RaiseActiveWindowUpdated(Current);
+						Application.UpdateCounter++;
+					}
+				} catch (System.Exception e) {
+					if (UnhandledExceptionOnUpdate != null) {
+						UnhandledExceptionOnUpdate(e);
+					} else {
+						throw;
+					}
 				}
 			}
 		}

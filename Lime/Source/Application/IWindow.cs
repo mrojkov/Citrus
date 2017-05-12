@@ -245,5 +245,10 @@ namespace Lime
 		/// Occurs when files are dropped.
 		/// </summary>
 		event Action<IEnumerable<string>> FilesDropped;
+
+		/// <summary>
+		/// Occurs when unhandled exception on update.
+		/// </summary>
+		event Action<System.Exception> UnhandledExceptionOnUpdate;
 	}
 }
