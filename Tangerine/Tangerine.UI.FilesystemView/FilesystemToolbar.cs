@@ -3,25 +3,32 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.FilesystemView
 {
-	public class Toolbar
+	public class Toolbar : Widget
 	{
-		public Widget RootWidget { get; private set; }
-
 		public Toolbar()
 		{
-			RootWidget = new Widget
-			{
-				Padding = new Thickness { Left = 4 },
-				MinMaxHeight = Metrics.ToolbarHeight,
-				MinWidth = TimelineMetrics.ToolbarMinWidth,
-				Presenter = new DelegatePresenter<Widget>(Render),
-				Layout = new HBoxLayout { Spacing = 2, CellDefaults = new LayoutCell(Alignment.Center) },
-				Nodes = {
-					CreateUpButton(),
-					CreateGotoCurrentProjectDirectoryButton(),
-					CreateToggleCookingRulesButton(),
-				}
-			};
+			Padding = new Thickness { Left = 4 };
+			MinMaxHeight = Metrics.ToolbarHeight;
+			MinWidth = TimelineMetrics.ToolbarMinWidth;
+			Presenter = new DelegatePresenter<Widget>(Render);
+			Layout = new HBoxLayout { Spacing = 2, CellDefaults = new LayoutCell(Alignment.Center) };
+		}
+
+		static void Render(Widget widget)
+		{
+			widget.PrepareRendererState();
+			Renderer.DrawRect(Vector2.Zero, widget.Size, ColorTheme.Current.Toolbar.Background);
+		}
+	}
+	public class FilesystemToolbar : Toolbar
+	{
+		public FilesystemToolbar()
+		{
+			Nodes.AddRange(
+				CreateUpButton(),
+				CreateGotoCurrentProjectDirectoryButton(),
+				CreateToggleCookingRulesButton()
+			);
 		}
 
 		private static Widget CreateGotoCurrentProjectDirectoryButton()
@@ -55,12 +62,6 @@ namespace Tangerine.UI.FilesystemView
 					FilesystemView.Instance.ToggleCookingRules();
 				}
 			};
-		}
-
-		void Render(Widget widget)
-		{
-			widget.PrepareRendererState();
-			Renderer.DrawRect(Vector2.Zero, widget.Size, ColorTheme.Current.Toolbar.Background);
 		}
 	}
 }

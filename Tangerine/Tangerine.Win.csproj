@@ -213,4 +213,8 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Viewport3D.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Icons\Filesystem\Folded.png" />
+    <EmbeddedResource Include="Resources\Icons\Filesystem\Unfolded.png" />
+  </ItemGroup>
 </Project>
