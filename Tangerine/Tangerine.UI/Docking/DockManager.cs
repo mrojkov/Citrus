@@ -40,6 +40,7 @@ namespace Tangerine.UI
 		{
 			this.padsMenu = padsMenu;
 			var window = new Window(new WindowOptions { ClientSize = windowSize, FixedSize = false, Title = "Tangerine" });
+			window.UnhandledExceptionOnUpdate += HandleException;
 			SetDropHandler(window);
 			MainWindowWidget = new InvalidableWindowWidget(window) {
 				Id = "MainWindow",
@@ -154,6 +155,7 @@ namespace Tangerine.UI
 				if (!p.Placement.Hidden) {
 					if (p.WindowWidget == null) {
 						var window = new Window(new WindowOptions { Title = p.Title, FixedSize = false });
+						window.UnhandledExceptionOnUpdate += HandleException;
 						SetDropHandler(window);
 						window.Closing += reason => {
 							if (reason == CloseReason.MainWindowClosing) {
@@ -183,6 +185,11 @@ namespace Tangerine.UI
 					ClosePanelWindow(p);
 				}
 			}
+		}
+
+		void HandleException(System.Exception e)
+		{
+			AlertDialog.Show(e.Message);
 		}
 
 		void ClosePanelWindow(DockPanel panel)
