@@ -347,6 +347,9 @@
     <Compile Include="Source\ComponentCollection.cs" />
     <Compile Include="Source\Widgets\3D\SplineGear3D.cs" />
     <Compile Include="Source\Graphics\OpenGL\ShaderPrograms.cs" />
+    <Compile Include="Source\Application\FileSystemWatcher\FileSystemWatcher.Mac.cs" />
+    <Compile Include="Source\Application\FileSystemWatcher\FileSystemWatcher.Win.cs" />
+    <Compile Include="Source\Application\FileSystemWatcher\IFileSystemWatcher.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
