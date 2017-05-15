@@ -5,12 +5,10 @@ namespace Orange
 {
 	public class PlatformPicker : DropDownList
 	{
-		private Target selected;
-
 		public PlatformPicker()
 		{
 			Theme.Current.Apply(this, typeof(DropDownList));
-			Changed += args => selected = (Target) args.Value;
+			Changed += args => SelectedTarget = (Target) args.Value;
 			Reload();
 		}
 
@@ -22,11 +20,9 @@ namespace Orange
 				Items.Add(new Item(target.Name, target));
 			}
 			Index = 0;
-			selected = (Target) Items.First().Value;
+			SelectedTarget = (Target) Items.First().Value;
 		}
 
-		public Target SelectedTarget => selected;
-
-		public TargetPlatform? SelectedPlatform => selected?.Platform;
+		public Target SelectedTarget { get; private set; }
 	}
 }
