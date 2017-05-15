@@ -13,7 +13,7 @@ namespace Orange
 		public static void RunTangerine()
 		{
 			var path = Uri.UnescapeDataString((new Uri(Assembly.GetExecutingAssembly().CodeBase)).AbsolutePath);
-			while (Path.GetFileName(path) != "Citrus") {
+			while (!string.Equals(Path.GetFileName(path), "Citrus", StringComparison.CurrentCultureIgnoreCase)) {
 				path = Path.GetDirectoryName(path);
 			}
 			path = Path.Combine(path, "Tangerine");
