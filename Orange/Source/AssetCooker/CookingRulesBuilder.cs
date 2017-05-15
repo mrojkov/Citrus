@@ -268,7 +268,7 @@ namespace Orange
 			}
 		}
 
-		public void DeduceEffectiveRules(string path, Target target)
+		public void DeduceEffectiveRules(Target target)
 		{
 			effectiveRules = CommonRules.InheritClone();
 			var targetRules = TargetRules[target];
@@ -300,7 +300,9 @@ namespace Orange
 			var rulesStack = new Stack<CookingRules>();
 			var map = new Dictionary<string, CookingRules>();
 			pathStack.Push("");
-			rulesStack.Push(new CookingRules());
+			var rootRules = new CookingRules();
+			rootRules.DeduceEffectiveRules(target);
+			rulesStack.Push(rootRules);
 			using (new DirectoryChanger(fileEnumerator.Directory)) {
 				foreach (var fileInfo in fileEnumerator.Enumerate()) {
 					var path = fileInfo.Path;
@@ -462,7 +464,7 @@ namespace Orange
 			} catch (Lime.Exception e) {
 				throw new Lime.Exception("Syntax error in {0}: {1}", path, e.Message);
 			}
-			rules.DeduceEffectiveRules(path, target);
+			rules.DeduceEffectiveRules(target);
 			return rules;
 		}
 
