@@ -323,7 +323,7 @@ namespace Lime
 			if (context == null) {
 				return new Sound();
 			}
-			path += ".sound";
+			path += Application.IsTangerine ? ".ogg" : ".sound";
 			var sound = new Sound();
 			var stream = cache.OpenStream(path);
 			if (stream == null) {
