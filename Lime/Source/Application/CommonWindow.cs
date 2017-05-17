@@ -67,22 +67,27 @@ namespace Lime
 		protected void RaiseUpdating(float delta)
 		{
 			using (Context.Activate().Scoped()) {
-				try {
-					if (Updating != null) {
-						Updating(delta);
-					}
-					if (Current.Active) {
-						Application.MainMenu?.Refresh();
-						Application.RaiseActiveWindowUpdated(Current);
-						Application.UpdateCounter++;
-					}
-				} catch (System.Exception e) {
-					if (UnhandledExceptionOnUpdate != null) {
+				if (UnhandledExceptionOnUpdate != null) {
+					try {
+						RaiseUpdatingHelper(delta);
+					} catch (System.Exception e) {
 						UnhandledExceptionOnUpdate(e);
-					} else {
-						throw;
 					}
+				} else {
+					RaiseUpdatingHelper(delta);
 				}
+			}
+		}
+
+		private void RaiseUpdatingHelper(float delta)
+		{
+			if (Updating != null) {
+				Updating(delta);
+			}
+			if (Current.Active) {
+				Application.MainMenu?.Refresh();
+				Application.RaiseActiveWindowUpdated(Current);
+				Application.UpdateCounter++;
 			}
 		}
 
