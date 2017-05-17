@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace Launcher
 {
@@ -62,14 +63,14 @@ namespace Launcher
 
 		private string CalcCitrusDirectory()
 		{
-			var currentDirectory = new DirectoryInfo(Environment.CurrentDirectory);
-			while (currentDirectory.GetDirectories().All(d => d.Name != "Orange")) {
-				if (currentDirectory.Parent == null) {
+			var path = Uri.UnescapeDataString((new Uri(Assembly.GetExecutingAssembly().CodeBase)).AbsolutePath);
+			while (!string.Equals(Path.GetFileName(path), "Citrus", StringComparison.CurrentCultureIgnoreCase)) {
+				path = Path.GetDirectoryName(path);
+				if (string.IsNullOrEmpty(path)) {
 					SetFailedBuildStatus("Cannot find Orange directory");
 				}
-				currentDirectory = currentDirectory.Parent;
 			}
-			return currentDirectory.FullName;
+			return path;
 		}
 
 		private void BuildAndRun(bool runExecutable)
