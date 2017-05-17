@@ -85,7 +85,7 @@ namespace Orange
 				CookBundle(extraBundle);
 			}
 			extraBundles.Add(CookingRulesBuilder.MainBundleName);
-			CodeCooker.Cook(cookingRulesMap, extraBundles.ToList());
+			CodeCooker.Cook(extraBundles.ToList());
 		}
 
 		private static void CookBundle(string bundleName)
