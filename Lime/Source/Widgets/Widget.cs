@@ -690,7 +690,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Returns a copy of the widget's hierarchy. 
+		/// Returns a copy of the widget's hierarchy.
 		/// </summary>
 		public override Node Clone()
 		{
@@ -1050,12 +1050,18 @@ namespace Lime
 				var savedWorld = Renderer.World;
 				var savedView = Renderer.View;
 				var savedProj = Renderer.Projection;
+				var savedZTestEnabled = Renderer.ZTestEnabled;
+				var savedZWriteEnabled = Renderer.ZWriteEnabled;
+				var savedCullMode = Renderer.CullMode;
 				Renderer.Viewport = new WindowRect { X = 0, Y = 0, Width = texture.ImageSize.Width, Height = texture.ImageSize.Height };
 				if (clearRenderTarget) {
 					Renderer.Clear(0, 0, 0, 0);
 				}
 				Renderer.World = Renderer.View = Matrix44.Identity;
 				Renderer.SetOrthogonalProjection(0, 0, Width, Height);
+				Renderer.ZTestEnabled = false;
+				Renderer.ZWriteEnabled = true;
+				Renderer.CullMode = CullMode.None;
 				for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
 					node.AddToRenderChain(renderChain);
 				}
@@ -1068,6 +1074,9 @@ namespace Lime
 				if (scissorTest) {
 					Renderer.ScissorTestEnabled = true;
 				}
+				Renderer.ZTestEnabled = savedZTestEnabled;
+				Renderer.ZWriteEnabled = savedZWriteEnabled;
+				Renderer.CullMode = savedCullMode;
 			}
 		}
 
