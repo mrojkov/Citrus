@@ -9,6 +9,7 @@ namespace Lime
 	{
 		public const string DefaultAnimationName = "Default";
 
+		public readonly List<string> HitBoxMeshes = new List<string>();
 		public readonly List<Animation> Animations = new List<Animation>();
 		public readonly List<MaterialEffect> MaterialEffects = new List<MaterialEffect>();
 
@@ -31,8 +32,31 @@ namespace Lime
 
 		public void Apply(Node3D model)
 		{
+			ProcessHitBoxes(model);
 			ProcessAnimations(model);
 			ProcessMaterialEffects(model);
+		}
+
+		private void ProcessHitBoxes(Node3D model)
+		{
+			if (HitBoxMeshes.Count == 0) {
+				return;
+			}
+
+			var meshes = model.Descendants
+				.OfType<Mesh3D>()
+				.Where(d => !string.IsNullOrEmpty(d.Id));
+			foreach (var mesh in meshes) {
+				foreach (var hitBoxMesh in HitBoxMeshes) {
+					if (mesh.Id != hitBoxMesh) {
+						continue;
+					}
+
+					mesh.HitTestTarget = true;
+					mesh.SkipRender = true;
+					break;
+				}
+			}
 		}
 
 		private void ProcessAnimations(Node3D model)
@@ -116,6 +140,9 @@ namespace Lime
 
 		public class ModelAttachmentFormat
 		{
+			[YuzuOptional]
+			public List<string> HitBoxMeshes = null;
+
 			[YuzuOptional]
 			public Dictionary<string, ModelAnimationFormat> Animations = null;
 
@@ -207,6 +234,13 @@ namespace Lime
 			try {
 				var modelAttachmentFormat = Serialization.ReadObject<ModelAttachmentFormat>(attachmentPath);
 				var attachment = new Model3DAttachment();
+
+				if (modelAttachmentFormat.HitBoxMeshes != null) {
+					foreach (var hitBoxMesh in modelAttachmentFormat.HitBoxMeshes) {
+						attachment.HitBoxMeshes.Add(hitBoxMesh);
+					}
+				}
+
 				foreach (var animationFormat in modelAttachmentFormat.Animations) {
 					var animation = new Model3DAttachment.Animation {
 						Name = animationFormat.Key,
