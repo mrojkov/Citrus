@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lime;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -11,7 +12,27 @@ namespace Orange.FbxImporter
 	{
 		public string Path { get; private set; }
 
-		//add Lime Color
+		public Color4 DiffuseColor { get; private set; }
+
+		public Material(IntPtr ptr) : base(ptr)
+		{
+			var matPtr = SerializeMaterial(NativePtr);
+			if (matPtr != IntPtr.Zero) {
+				var material = matPtr.To<Texture>();
+				Path = material.texturePath;
+				DiffuseColor = Color4.FromFloats(
+					material.colorDiffuse.V1,
+					material.colorDiffuse.V2,
+					material.colorDiffuse.V3,
+					material.colorDiffuse.V4
+				);
+			}
+		}
+
+		public override string ToString(int level)
+		{
+			return ("Path: " + Path);
+		}
 
 		#region Pinvokes
 
@@ -21,20 +42,7 @@ namespace Orange.FbxImporter
 
 		#endregion
 
-		public Material(IntPtr ptr) : base(ptr)
-		{
-			var matPtr = SerializeMaterial(NativePtr);
-			if (matPtr != IntPtr.Zero) {
-				var material = matPtr.To<Texture>();
-				Path = material.texturePath;
-				var color = material.colorDiffuse;
-			}
-		}
-
-		public override string ToString(int level)
-		{
-			return ("Path: " + Path);
-		}
+		#region MarshalingStructures
 
 		[StructLayout(LayoutKind.Sequential)]
 		private class Texture
@@ -42,8 +50,10 @@ namespace Orange.FbxImporter
 			[MarshalAs(UnmanagedType.LPStr)]
 			public string texturePath;
 
-			[MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
-			public double[] colorDiffuse;
+			[MarshalAs(UnmanagedType.Struct)]
+			public Vec4 colorDiffuse;
 		}
+
+		#endregion
 	}
 }
