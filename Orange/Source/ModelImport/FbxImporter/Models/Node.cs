@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lime;
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -13,18 +14,9 @@ namespace Orange.FbxImporter
 
 		public Material Material { get; private set; }
 
-		#region PInvokes
+		public string Name { get; private set; }
 
-		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr GetChildNode(IntPtr node, int index);
-
-		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern int GetChildCount(IntPtr node);
-
-		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr GetMaterial(IntPtr node);
-
-		#endregion
+		public Matrix44 LocalTransform { get; private set; }
 
 		public Node(IntPtr ptr) : base (ptr)
 		{
@@ -36,9 +28,12 @@ namespace Orange.FbxImporter
 			}
 
 			Attribute = NodeAttribute.GetFromNode(NativePtr);
+			Name = Marshal.PtrToStringAnsi(GetName(NativePtr));
+			Attribute = NodeAttribute.GetFromNode(NativePtr, 0);
 			for (int i = 0; i < count; i++) {
 				Children.Add(new Node(GetChildNode(NativePtr, i)));
 			}
+			LocalTransform = CalcLocalTransform();
 		}
 
 		public override string ToString(int level)
@@ -55,5 +50,32 @@ namespace Orange.FbxImporter
 			}
 			return builder.ToString();
 		}
+
+		public Matrix44 CalcLocalTransform()
+		{
+			return GetLocalTransform(NativePtr).To<Mat4x4>().ToLime();
+		}
+
+		#region PInvokes
+
+		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
+		public static extern IntPtr GetChildNode(IntPtr node, int index);
+
+		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
+		public static extern int GetChildCount(IntPtr node);
+
+		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
+		public static extern IntPtr GetMaterial(IntPtr node);
+
+		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
+		public static extern IntPtr GetLocalTransform(IntPtr node);
+
+		[DllImport(ImportConfig.LibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+		public static extern IntPtr GetName(IntPtr node);
+
+		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
+		public static extern int GetAttributeCount(IntPtr node);
+
+		#endregion
 	}
 }
