@@ -120,6 +120,17 @@
     <Compile Include="Source\Builder\BuildSystem.cs" />
     <Compile Include="Source\Builder\MSBuild.cs" />
     <Compile Include="Source\Builder\MDTool.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\MarshalingUtils.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\Models\Attributes\CameraAttribute.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\Models\Attributes\MeshAttribute.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\Models\Attributes\NodeAttribute.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\Models\FbxObject.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\Models\Manager.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\Models\Material.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\Models\Node.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\Models\Scene.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\Utils.cs" />
+    <Compile Include="Source\ModelImport\FbxModelImporter.cs" />
     <Compile Include="Source\ModelImport\KeyframeReducer.cs" />
     <Compile Include="Source\ModelImport\ModelImporter.cs" />
     <Compile Include="Source\Nuget\Nuget.cs" />
@@ -165,6 +176,10 @@
     </None>
     <None Include="..\3rdParty\AssimpNet\Assimp64.dll">
       <Link>Assimp64.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\3rdParty\FbxSdk\FbxSdk.dll">
+      <Link>FbxSdk.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <Content Include="Orange.ico" />
