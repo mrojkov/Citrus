@@ -9,20 +9,9 @@ namespace Orange.FbxImporter
 {
 	public class NodeAttribute : FbxObject
 	{
-		#region Pinvokes
-
-		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern FbxNodeType GetAttributeType(IntPtr node);
-
-		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr GetCameraAttribute(IntPtr node);
-
-		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr GetAttribute(IntPtr node);
-
-		#endregion
-
 		public static NodeAttribute Empty = new NodeAttribute(IntPtr.Zero);
+
+		public virtual FbxNodeType Type { get; } = FbxNodeType.NONE;
 
 		protected NodeAttribute(IntPtr ptr) : base(ptr)
 		{ }
@@ -35,10 +24,10 @@ namespace Orange.FbxImporter
 			CAMERA
 		};
 
-		public static NodeAttribute GetFromNode(IntPtr ptr)
+		public static NodeAttribute GetFromNode(IntPtr ptr, int idx)
 		{
-			var attribute = GetAttribute(ptr);
-			switch (GetAttributeType(ptr)) {
+			var attribute = GetAttribute(ptr, idx);
+			switch (GetAttributeType(ptr, idx)) {
 				case FbxNodeType.NONE:
 					return Empty;
 				case FbxNodeType.UNKNOWN:
@@ -51,9 +40,23 @@ namespace Orange.FbxImporter
 					return Empty;
 			}
 		}
+
 		public override string ToString(int level)
 		{
 			return "Empty";
 		}
+
+		#region Pinvokes
+
+		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
+		public static extern FbxNodeType GetAttributeType(IntPtr node, int idx);
+
+		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
+		public static extern IntPtr GetCameraAttribute(IntPtr node);
+
+		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
+		public static extern IntPtr GetAttribute(IntPtr node, int idx);
+
+		#endregion
 	}
 }
