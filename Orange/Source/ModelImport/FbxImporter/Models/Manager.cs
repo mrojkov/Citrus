@@ -9,16 +9,6 @@ namespace Orange.FbxImporter
 {
 	public class Manager : FbxObject
 	{
-		#region PInvokes
-
-		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
-		private static extern IntPtr CreateFbxManager();
-
-		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
-		private static extern IntPtr LoadScene(IntPtr manager, StringBuilder pFileName);
-
-		#endregion
-
 		public static Manager instance;
 		public static Manager Instance
 		{
@@ -37,5 +27,15 @@ namespace Orange.FbxImporter
 		public Scene LoadScene(string fileName) {
 			return new Scene(LoadScene(NativePtr, new StringBuilder(fileName)));
 		}
+
+		#region PInvokes
+
+		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
+		private static extern IntPtr CreateFbxManager();
+
+		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
+		private static extern IntPtr LoadScene(IntPtr manager, StringBuilder pFileName);
+
+		#endregion
 	}
 }
