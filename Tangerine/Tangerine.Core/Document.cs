@@ -132,7 +132,6 @@ namespace Tangerine.Core
 				}
 				Decorate(RootNode);
 				Container = RootNode;
-				HideHitBoxesIn3DScene();
 			} catch (System.Exception e) {
 				throw new System.InvalidOperationException($"Can't open '{path}': {e.Message}");
 			}
@@ -154,13 +153,6 @@ namespace Tangerine.Core
 			vp.AddNode(vp.Camera);
 			vp.CameraRef = new NodeReference<Camera3D>(camera.Id);
 			return vp;
-		}
-
-		void HideHitBoxesIn3DScene()
-		{
-			foreach (var n in RootNode.Descendants.Where(n => n.Id == "HitBox")) {
-				(n as Node3D).Visible = false;
-			}
 		}
 
 		public bool WasModifiedOutsideTangerine()
@@ -189,7 +181,7 @@ namespace Tangerine.Core
 				throw new FileNotFoundException(path);
 			}
 		}
-		
+
 		public static string GetFileExtension(DocumentFormat format)
 		{
 			switch (format) {
@@ -201,7 +193,7 @@ namespace Tangerine.Core
 		}
 
 		public string GetFileExtension() => GetFileExtension(Format);
-		
+
 		static bool AssetExists(string path, string ext) => AssetBundle.Instance.FileExists(System.IO.Path.ChangeExtension(path, ext));
 
 		public void MakeCurrent()
@@ -292,7 +284,7 @@ namespace Tangerine.Core
 				SaveAs(Path);
 			}
 		}
-		
+
 		public void SaveAs(string path)
 		{
 			History.AddSavePoint();
