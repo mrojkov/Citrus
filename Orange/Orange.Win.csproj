@@ -126,6 +126,7 @@
     <Compile Include="Source\ModelImport\FbxImporter\Models\Attributes\NodeAttribute.cs" />
     <Compile Include="Source\ModelImport\FbxImporter\Models\FbxObject.cs" />
     <Compile Include="Source\ModelImport\FbxImporter\Models\Manager.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\Models\MarshalingStructures.cs" />
     <Compile Include="Source\ModelImport\FbxImporter\Models\Material.cs" />
     <Compile Include="Source\ModelImport\FbxImporter\Models\Node.cs" />
     <Compile Include="Source\ModelImport\FbxImporter\Models\Scene.cs" />
