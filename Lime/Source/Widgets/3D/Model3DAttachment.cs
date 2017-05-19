@@ -60,18 +60,19 @@ namespace Lime
 
 		private void ProcessMaterialEffects(Node3D model)
 		{
-			var fxEngine = new MaterialEffectEngine();
-			foreach (var fxData in MaterialEffects) {
-				fxEngine.Register(fxData.Name, fxData.MaterialName);
-				var fx = new MaterialEffectWidget(fxData.Name, fxData.Path);
-				var fxAdapter = new WidgetAdapter3D {
-					Widget = fx,
+			var effectEngine = new MaterialEffectEngine();
+			foreach (var effect in MaterialEffects) {
+				var effectPresenter = new MaterialEffectPresenter(effect.MaterialName, effect.Name, effect.Path);
+				model.CompoundPresenter.Add(effectPresenter);
+
+				var animation = new Lime.Animation {
+					Id = effect.Name,
+					AnimationEngine = effectEngine
 				};
-				model.PushNode(fxAdapter);
-				model.Animations.Add(new Lime.Animation {
-					Id = fxData.Name,
-					AnimationEngine = fxEngine
-				});
+				foreach (var marker in effectPresenter.Animation.Markers) {
+					animation.Markers.Add(marker.Clone());
+				}
+				model.Animations.Add(animation);
 			}
 		}
 
@@ -279,50 +280,51 @@ namespace Lime
 		}
 	}
 
-
 	public class MaterialEffectEngine : DefaultAnimationEngine
 	{
-		private readonly Dictionary<string, string> materialNames = new Dictionary<string, string>();
-
-		public void Register(string effectName, string materialName)
-		{
-			materialNames.Add(effectName, materialName);
-		}
-
-		private MaterialEffectWidget FindEffect(Animation animation)
-		{
-			return (MaterialEffectWidget)animation.Owner.FindNode(animation.Id);
-		}
-
 		public override void AdvanceAnimation(Animation animation, float delta)
 		{
-			base.AdvanceAnimation(FindEffect(animation).Animation, delta);
+			var effectAnimation = GetPresenter(animation).Animation;
+			effectAnimation.AnimationEngine.AdvanceAnimation(effectAnimation, delta);
+
+			base.AdvanceAnimation(animation, delta);
 		}
 
 		public override void ApplyAnimators(Animation animation, bool invokeTriggers)
 		{
-			base.ApplyAnimators(FindEffect(animation).Animation, invokeTriggers);
+			var effectAnimation = GetPresenter(animation).Animation;
+			effectAnimation.AnimationEngine.ApplyAnimators(effectAnimation, invokeTriggers);
+
+			base.ApplyAnimators(animation, invokeTriggers);
 		}
 
 		public override bool TryRunAnimation(Animation animation, string markerId)
 		{
-			var fx = FindEffect(animation);
-			if (base.TryRunAnimation(fx.Animation, markerId)) {
-				var snapshot = fx.GetSnapshot();
-				foreach (var material in GetMaterialsForAnimation(animation)) {
-					material.DiffuseTexture = snapshot;
-				}
-				return true;
+			var presenter = GetPresenter(animation);
+			if (!base.TryRunAnimation(animation, markerId) || !base.TryRunAnimation(presenter.Animation, markerId)) {
+				return false;
 			}
-			return false;
+
+			presenter.WasSnapshotDeprecated = true;
+			foreach (var material in GetMaterialsForAnimation(animation)) {
+				material.DiffuseTexture = presenter.Snapshot;
+			}
+			return true;
 		}
 
-		private IEnumerable<CommonMaterial> GetMaterialsForAnimation(Animation animation)
+		private static MaterialEffectPresenter GetPresenter(Animation animation)
 		{
-			return GetMaterials(animation.Owner, materialNames[animation.Id]);
+			return animation.Owner.CompoundPresenter
+				.OfType<MaterialEffectPresenter>()
+				.First(p => p.EffectName == animation.Id);
 		}
 
-		private IEnumerable<CommonMaterial> GetMaterials(Node model, string name)
+		public static IEnumerable<CommonMaterial> GetMaterialsForAnimation(Animation animation)
+		{
+			return GetMaterials(animation.Owner, GetPresenter(animation).MaterialName);
+		}
+
+		private static IEnumerable<CommonMaterial> GetMaterials(Node model, string name)
 		{
 			return model
 				.Descendants
@@ -334,41 +336,40 @@ namespace Lime
 		}
 	}
 
-	public class MaterialEffectWidget : Widget
+	public class MaterialEffectPresenter : CustomPresenter
 	{
 		private static readonly RenderChain renderChain = new RenderChain();
 		private ITexture snapshot;
 
+		public string MaterialName { get; }
+		public string EffectName { get; }
 		public Widget Scene { get; private set; }
+		public bool WasSnapshotDeprecated { get; set; } = true;
 		public Animation Animation => Scene.DefaultAnimation;
+		public ITexture Snapshot => snapshot ?? (snapshot = new RenderTexture((int)Scene.Width, (int)Scene.Height));
 
-		public MaterialEffectWidget(string id, string path)
+		public MaterialEffectPresenter(string materialName, string effectName, string path)
 		{
-			Id = id;
+			MaterialName = materialName;
+			EffectName = effectName;
 			Scene = new Frame(path);
 		}
 
-		protected override void SelfUpdate(float delta)
+		public override void Render(Node node)
 		{
-			Scene.Update(delta);
-		}
-
-		public override void Render()
-		{
-			if (Animation.IsRunning) {
-				Scene.RenderToTexture(GetSnapshot(), renderChain);
-				renderChain.Clear();
+			if (!Animation.IsRunning && !WasSnapshotDeprecated) {
+				return;
 			}
+
+			Scene.RenderToTexture(Snapshot, renderChain);
+			renderChain.Clear();
+			WasSnapshotDeprecated = false;
 		}
 
-		public ITexture GetSnapshot()
+		public override IPresenter Clone()
 		{
-			return snapshot ?? (snapshot = new RenderTexture((int)Scene.Width, (int)Scene.Height));
-		}
-
-		public override Node Clone()
-		{
-			var clone = (MaterialEffectWidget)base.Clone();
+			var clone = (MaterialEffectPresenter)MemberwiseClone();
+			clone.snapshot = null;
 			clone.Scene = Scene.Clone<Widget>();
 			return clone;
 		}
