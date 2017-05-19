@@ -1018,6 +1018,9 @@ namespace Lime
 				Nodes.Clear();
 				Nodes.AddRange(nodes);
 			}
+
+			Presenter = content.Presenter?.Clone();
+			PostPresenter = content.PostPresenter?.Clone();
 		}
 
 		private static readonly string[] sceneExtensions = { ".scene", ".model", ".tan" };
