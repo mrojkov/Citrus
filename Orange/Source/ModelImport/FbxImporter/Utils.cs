@@ -15,9 +15,9 @@ namespace Orange.FbxImporter
 		public static T To<T>(this IntPtr ptr) {
 			return ptr == IntPtr.Zero ? default(T) : (T)Marshal.PtrToStructure(ptr, typeof(T));
 		}
-		public static T ToStruct<T>(this IntPtr ptr, int count)
+		public static T ToStruct<T>(this IntPtr ptr) where T: class
 		{
-			return ptr == IntPtr.Zero ? default(T) : (T)Marshal.PtrToStructure(ptr, typeof(T));
+			return ptr == IntPtr.Zero ? null : (T)Marshal.PtrToStructure(ptr, typeof(T));
 		}
 
 		public static int[] ToIntArray(this IntPtr ptr, int size)
@@ -35,6 +35,17 @@ namespace Orange.FbxImporter
 				return null;
 			double[] result = new double[size];
 			Marshal.Copy(ptr, result, 0, size);
+			return result;
+		}
+
+		public static T[] ToStructArray<T>(this IntPtr ptr, int size)
+		{
+			T[] result = new T[size];
+			var strucSize = Marshal.SizeOf(typeof(T));
+			for (int i = 0; i < size; i++) {
+				var structPtr = new IntPtr(ptr.ToInt64() + strucSize * i);
+				result[i] = (T)Marshal.PtrToStructure(structPtr, typeof(T));
+			}
 			return result;
 		}
 
