@@ -9,9 +9,16 @@ namespace Lime
 	{
 		public const string DefaultAnimationName = "Default";
 
-		public readonly List<string> HitBoxMeshes = new List<string>();
+		public readonly List<MeshOption> MeshOptions = new List<MeshOption>();
 		public readonly List<Animation> Animations = new List<Animation>();
 		public readonly List<MaterialEffect> MaterialEffects = new List<MaterialEffect>();
+
+		public class MeshOption
+		{
+			public string Id;
+			public bool HitTestTarget;
+			public CullMode? CullMode;
+		}
 
 		public class Animation
 		{
@@ -32,14 +39,14 @@ namespace Lime
 
 		public void Apply(Node3D model)
 		{
-			ProcessHitBoxes(model);
+			ProcessMeshOptions(model);
 			ProcessAnimations(model);
 			ProcessMaterialEffects(model);
 		}
 
-		private void ProcessHitBoxes(Node3D model)
+		private void ProcessMeshOptions(Node3D model)
 		{
-			if (HitBoxMeshes.Count == 0) {
+			if (MeshOptions.Count == 0) {
 				return;
 			}
 
@@ -47,13 +54,18 @@ namespace Lime
 				.OfType<Mesh3D>()
 				.Where(d => !string.IsNullOrEmpty(d.Id));
 			foreach (var mesh in meshes) {
-				foreach (var hitBoxMesh in HitBoxMeshes) {
-					if (mesh.Id != hitBoxMesh) {
+				foreach (var meshOption in MeshOptions) {
+					if (mesh.Id != meshOption.Id) {
 						continue;
 					}
 
-					mesh.HitTestTarget = true;
-					mesh.SkipRender = true;
+					if (meshOption.HitTestTarget) {
+						mesh.HitTestTarget = true;
+						mesh.SkipRender = true;
+					}
+					if (meshOption.CullMode.HasValue) {
+						mesh.CullMode = meshOption.CullMode.Value;
+					}
 					break;
 				}
 			}
@@ -141,7 +153,7 @@ namespace Lime
 		public class ModelAttachmentFormat
 		{
 			[YuzuOptional]
-			public List<string> HitBoxMeshes = null;
+			public Dictionary<string, MeshOptionFormat> MeshOptions = null;
 
 			[YuzuOptional]
 			public Dictionary<string, ModelAnimationFormat> Animations = null;
@@ -151,6 +163,15 @@ namespace Lime
 
 			[YuzuOptional]
 			public List<UVAnimationFormat> UVAnimations = null;
+		}
+
+		public class MeshOptionFormat
+		{
+			[YuzuOptional]
+			public bool HitTestTarget;
+
+			[YuzuOptional]
+			public string CullMode = null;
 		}
 
 		public class UVAnimationFormat
@@ -235,9 +256,26 @@ namespace Lime
 				var modelAttachmentFormat = Serialization.ReadObject<ModelAttachmentFormat>(attachmentPath);
 				var attachment = new Model3DAttachment();
 
-				if (modelAttachmentFormat.HitBoxMeshes != null) {
-					foreach (var hitBoxMesh in modelAttachmentFormat.HitBoxMeshes) {
-						attachment.HitBoxMeshes.Add(hitBoxMesh);
+				if (modelAttachmentFormat.MeshOptions != null) {
+					foreach (var meshOptionFormat in modelAttachmentFormat.MeshOptions) {
+						var meshOption = new Model3DAttachment.MeshOption() {
+							Id = meshOptionFormat.Key,
+							HitTestTarget = meshOptionFormat.Value.HitTestTarget
+						};
+						if (!string.IsNullOrEmpty(meshOptionFormat.Value.CullMode)) {
+							switch (meshOptionFormat.Value.CullMode) {
+								case "None":
+									meshOption.CullMode = CullMode.None;
+									break;
+								case "CullClockwise":
+									meshOption.CullMode = CullMode.CullClockwise;
+									break;
+								case "CullCounterClockwise":
+									meshOption.CullMode = CullMode.CullCounterClockwise;
+									break;
+							}
+						}
+						attachment.MeshOptions.Add(meshOption);
 					}
 				}
 
