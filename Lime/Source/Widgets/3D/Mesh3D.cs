@@ -15,30 +15,30 @@ namespace Lime
 		{
 			[YuzuMember("0")]
 			public byte Index0;
-	
+
 			[YuzuMember("1")]
 			public byte Index1;
-	
+
 			[YuzuMember("2")]
 			public byte Index2;
-	
+
 			[YuzuMember("3")]
 			public byte Index3;
 		}
-	
+
 		[YuzuCompact]
 		[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 16)]
 		public struct BlendWeights
 		{
 			[YuzuMember("0")]
 			public float Weight0;
-	
+
 			[YuzuMember("1")]
 			public float Weight1;
-	
+
 			[YuzuMember("2")]
 			public float Weight2;
-	
+
 			[YuzuMember("3")]
 			public float Weight3;
 		}
@@ -48,20 +48,20 @@ namespace Lime
 		{
 			[YuzuMember("0")]
 			public Vector3 Pos;
-			
+
 			[YuzuMember("1")]
 			public Color4 Color;
-	
+
 			[YuzuMember("2")]
 			public Vector2 UV1;
-	
+
 			[YuzuMember("3")]
 			public BlendIndices BlendIndices;
-			
+
 			[YuzuMember("4")]
 			public BlendWeights BlendWeights;
 		}
-		
+
 		private static Matrix44[] sharedBoneTransforms = new Matrix44[0];
 
 		[YuzuMember]
@@ -95,7 +95,7 @@ namespace Lime
 				return;
 			}
 			Renderer.World = GlobalTransform;
-			Renderer.CullMode = Application.IsTangerine ? CullMode.None : CullMode;
+			Renderer.CullMode = CullMode;
 			var invWorld = GlobalTransform.CalcInverted();
 			foreach (var sm in Submeshes) {
 				var skin = sm.Material as IMaterialSkin;
@@ -184,7 +184,7 @@ namespace Lime
 			}
 			Center /= n;
 		}
-		
+
 		private IEnumerable<Vector3> GetVertexPositions()
 		{
 			foreach (var sm in Submeshes) {
@@ -236,7 +236,7 @@ namespace Lime
 			BoneNames = new List<string>();
 			Bones = new List<Node3D>();
 		}
-		
+
 		[YuzuAfterDeserialization]
 		public void AfterDeserialization()
 		{
