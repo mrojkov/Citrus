@@ -633,9 +633,11 @@ namespace Tangerine.UI
 			}
 			var triggers = new List<string>();
 			var added = false;
-			(string newMarker, string newAnimation) = SplitTrigger(newTrigger);
+			string newMarker, newAnimation;
+			SplitTrigger(newTrigger, out newMarker, out newAnimation);
 			foreach (var trigger in currentTriggers.Split(',').Select(i => i.Trim())) {
-				(string marker, string animation) = SplitTrigger(trigger);
+				string marker, animation;
+				SplitTrigger(trigger, out marker, out animation);
 				if (animation == newAnimation) {
 					if (!added) {
 						added = true;
@@ -653,13 +655,16 @@ namespace Tangerine.UI
 			comboBox.Text = newValue;
 		}
 
-		private static (string markerId, string animationId) SplitTrigger(string trigger)
+		private static void SplitTrigger(string trigger, out string markerId, out string animationId)
 		{
 			if (!trigger.Contains('@')) {
-				return (trigger, null);
+				markerId = trigger;
+				animationId = null;
+			} else {
+				var t = trigger.Split('@');
+				markerId = t[0];
+				animationId = t[1];
 			}
-			var t = trigger.Split('@');
-			return (t[0], t[1]);
 		}
 
 		public override void SetFocus() => comboBox.SetFocus();
