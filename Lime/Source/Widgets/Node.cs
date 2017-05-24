@@ -658,16 +658,32 @@ namespace Lime
 				AnimationTime = 0;
 				IsRunning = true;
 			} else {
-				if (Trigger.Contains('@')) {
-					var s = Trigger.Split('@');
-					if (s.Length == 2) {
-						var markerId = s[0];
-						var animationId = s[1];
-						TryRunAnimation(markerId, animationId);
-					}
-				} else {
-					TryRunAnimation(Trigger);
+				TriggerMultipleAnimations();
+			}
+		}
+
+		private void TriggerMultipleAnimations()
+		{
+			if (Trigger.Contains(',')) {
+				foreach (var s in Trigger.Split(',')) {
+					TriggerAnimation(s.Trim());
 				}
+			} else {
+				TriggerAnimation(Trigger);
+			}
+		}
+
+		private void TriggerAnimation(string markerWithOptionalAnimationId)
+		{
+			if (markerWithOptionalAnimationId.Contains('@')) {
+				var s = markerWithOptionalAnimationId.Split('@');
+				if (s.Length == 2) {
+					var markerId = s[0];
+					var animationId = s[1];
+					TryRunAnimation(markerId, animationId);
+				}
+			} else {
+				TryRunAnimation(markerWithOptionalAnimationId);
 			}
 		}
 
