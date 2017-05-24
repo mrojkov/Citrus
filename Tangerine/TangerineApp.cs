@@ -21,7 +21,9 @@ namespace Tangerine
 
 		private TangerineApp()
 		{
+			#if WIN
 			Orange.UserInterface.Instance = new OrangeInterface();
+			#endif
 			WindowOptions.DefaultRefreshRate = 60;
 			WidgetInput.AcceptMouseBeyondWidgetByDefault = false;
 			Application.IsTangerine = true;
@@ -109,7 +111,9 @@ namespace Tangerine
 						new UI.Timeline.Timeline(timelinePanel),
 						new UI.SceneView.SceneView(documentViewContainer),
 						new UI.SearchPanel(searchPanel.ContentWidget),
+						#if WIN
 						new UI.FilesystemView.FilesystemView(filesystemPanel.ContentWidget),
+						#endif
 					});
 				}
 			};

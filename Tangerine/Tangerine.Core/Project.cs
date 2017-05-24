@@ -31,7 +31,9 @@ namespace Tangerine.Core
 			CitprojPath = citprojPath;
 			UserprefsPath = Path.ChangeExtension(citprojPath, ".userprefs");
 			AssetsDirectory = Path.Combine(Path.GetDirectoryName(CitprojPath), "Data");
+			#if WIN
 			Orange.The.Workspace.Open(citprojPath);
+			#endif
 		}
 
 		public void Open()
