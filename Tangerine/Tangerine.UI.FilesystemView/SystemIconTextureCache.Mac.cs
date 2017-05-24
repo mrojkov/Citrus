@@ -1,8 +1,9 @@
+#if MAC
 using System;
 using System.Collections.Generic;
-using System.Drawing.Imaging;
 using System.IO;
-using System.Runtime.InteropServices;
+using AppKit;
+using Foundation;
 using Lime;
 
 namespace Tangerine.UI.FilesystemView
@@ -11,6 +12,7 @@ namespace Tangerine.UI.FilesystemView
 	{
 		private static readonly Dictionary<string, ITexture> textureCache = new Dictionary<string, ITexture>();
 		private static ITexture directoryTexture;
+
 		public static ITexture GetTexture(string path)
 		{
 			if (path.IsNullOrWhiteSpace()) {
@@ -28,24 +30,25 @@ namespace Tangerine.UI.FilesystemView
 			if (textureCache.ContainsKey(ext)) {
 				return textureCache[ext];
 			}
-			var shInfo = new WinAPI.SHFILEINFO();
-			IntPtr r = WinAPI.SHGetFileInfo(path, 0, ref shInfo, (uint)Marshal.SizeOf(shInfo), WinAPI.SHGFI_ICON | WinAPI.SHGFI_SMALLICON);
-			if (r == IntPtr.Zero) {
-				return TexturePool.Instance.GetTexture(null);
+			var icon = NSWorkspace.SharedWorkspace.IconForFileType(isDirectory ? NSFileTypeForHFSTypeCode.FinderIcon : ext);
+			using (var stream = new MemoryStream())
+			using (var representation = new NSBitmapImageRep(icon.CGImage)) {
+				NSData data = null;
+				data = representation.RepresentationUsingTypeProperties(NSBitmapImageFileType.Png);//, new NSDictionary());
+				using (var bitmapStream = data.AsStream()) {
+					bitmapStream.CopyTo(stream);
+				}
+				data.Dispose();
+				var texture = new Texture2D();
+				texture.LoadImage(stream);
+				if (isDirectory) {
+					directoryTexture = texture;
+				} else {
+					textureCache.Add(ext, texture);
+				}
+				return texture;
 			}
-			var b = System.Drawing.Bitmap.FromHicon(shInfo.hIcon);
-			WinAPI.DestroyIcon(shInfo.hIcon);
-			var t = new Texture2D();
-			using (var s = new MemoryStream()) {
-				b.Save(s, ImageFormat.Png);
-				t.LoadImage(s);
-			}
-			if (isDirectory) {
-				directoryTexture = t;
-			} else {
-				textureCache.Add(ext, t);
-			}
-			return t;
 		}
 	}
 }
+#endif
