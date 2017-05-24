@@ -376,7 +376,7 @@ namespace Lime
 				Id = "TextWidget",
 				VAlignment = VAlignment.Center,
 			};
-			text.CompoundPresenter.Add(new DropDownListPresenter());
+			text.CompoundPresenter.Add(new DropDownListPresenter(dropDownList));
 			dropDownList.PostPresenter = new KeyboardFocusBorderPresenter();
 			text.Padding = Metrics.ControlsPadding;
 			dropDownList.AddNode(text);
@@ -388,7 +388,7 @@ namespace Lime
 			var comboBox = (ComboBox)widget;
 			comboBox.MinSize = Metrics.DefaultButtonSize;
 			comboBox.MaxHeight = Metrics.DefaultButtonSize.Y;
-			comboBox.CompoundPresenter.Add(new DropDownListPresenter());
+			comboBox.CompoundPresenter.Add(new DropDownListPresenter(comboBox));
 			var editBox = new EditBox { Id = "TextWidget" };
 			comboBox.AddNode(editBox);
 			ExpandToContainer(editBox);
@@ -542,13 +542,22 @@ namespace Lime
 		class DropDownListPresenter : CustomPresenter
 		{
 			public const float IconWidth = 20;
-			private VectorShape icon = new VectorShape {
+
+			readonly CommonDropDownList list;
+			readonly VectorShape separator = new VectorShape {
 				new VectorShape.Line(0, 0.1f, 0, 0.9f, Colors.ControlBorder, 0.05f),
-				new VectorShape.Line(0.5f, 0.8f, 0.7f, 0.65f, Colors.BlackText, 0.07f),
-				new VectorShape.Line(0.5f, 0.8f, 0.3f, 0.65f, Colors.BlackText, 0.07f),
-				new VectorShape.Line(0.5f, 0.2f, 0.7f, 0.35f, Colors.BlackText, 0.07f),
-				new VectorShape.Line(0.5f, 0.2f, 0.3f, 0.35f, Colors.BlackText, 0.07f),
 			};
+			readonly VectorShape icon = new VectorShape {
+				new VectorShape.Line(0.5f, 0.8f, 0.7f, 0.65f, Color4.White, 0.07f),
+				new VectorShape.Line(0.5f, 0.8f, 0.3f, 0.65f, Color4.White, 0.07f),
+				new VectorShape.Line(0.5f, 0.2f, 0.7f, 0.35f, Color4.White, 0.07f),
+				new VectorShape.Line(0.5f, 0.2f, 0.3f, 0.35f, Color4.White, 0.07f),
+			};
+
+			public DropDownListPresenter(CommonDropDownList list)
+			{
+				this.list = list;
+			}
 
 			public override void Render(Node node)
 			{
@@ -557,7 +566,8 @@ namespace Lime
 				Renderer.DrawVerticalGradientRect(Vector2.Zero, widget.Size, Colors.ButtonDefault);
 				Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Colors.ControlBorder);
 				var transform = Matrix32.Scaling(IconWidth, widget.Height) * Matrix32.Translation(widget.Width - IconWidth, 0);
-				icon.Draw(transform);
+				separator.Draw(transform);
+				icon.Draw(transform, list.Items.Count > 0 ? Colors.BlackText : Colors.GrayText);
 			}
 		}
 
