@@ -26,6 +26,7 @@ namespace Lime
 		private bool active;
 		private RenderingState renderingState = RenderingState.Rendered;
 		private Point lastMousePosition;
+		private bool isInvalidated;
 
 		public Input Input { get; private set; }
 		public bool Active => active;
@@ -462,6 +463,7 @@ namespace Lime
 
 		private void Update()
 		{
+			isInvalidated = false;
 			if (!form.Visible || !form.CanFocus) {
 				return;
 			}
@@ -651,7 +653,10 @@ namespace Lime
 
 		public void Invalidate()
 		{
-			glControl.Invalidate();
+			if (!isInvalidated) {
+				glControl.Invalidate();
+				isInvalidated = true;
+			}
 		}
 
 		internal void SetMenu(Menu menu)
