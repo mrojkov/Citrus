@@ -610,7 +610,7 @@ namespace Tangerine.UI
 		{
 			comboBox = new ComboBox { LayoutCell = new LayoutCell(Alignment.Center) };
 			ContainerWidget.AddNode(comboBox);
-			comboBox.Changed += a => SetProperty(editorParams.PropertyName, (string)a.Value);
+			comboBox.Changed += ComboBox_Changed;
 			if (editorParams.Objects.Count == 1) {
 				var node = (Node)editorParams.Objects[0];
 				foreach (var a in node.Animations) {
@@ -621,6 +621,45 @@ namespace Tangerine.UI
 				}
 			}
 			comboBox.AddChangeWatcher(CoalescedPropertyValue<string>(editorParams), v => comboBox.Text = v);
+		}
+
+		void ComboBox_Changed(ChangedEventArgs args)
+		{
+			var newTrigger = (string)args.Value;
+			var currentTriggers = CoalescedPropertyValue<string>(EditorParams).GetValue();
+			if (string.IsNullOrWhiteSpace(currentTriggers) || args.Index < 0) {
+				SetProperty(EditorParams.PropertyName, newTrigger);
+				return;
+			}
+			var triggers = new List<string>();
+			var added = false;
+			(string newMarker, string newAnimation) = SplitTrigger(newTrigger);
+			foreach (var trigger in currentTriggers.Split(',').Select(i => i.Trim())) {
+				(string marker, string animation) = SplitTrigger(trigger);
+				if (animation == newAnimation) {
+					if (!added) {
+						added = true;
+						triggers.Add(newTrigger);
+					}
+				} else {
+					triggers.Add(trigger);
+				}
+			}
+			if (!added) {
+				triggers.Add(newTrigger);
+			}
+			var newValue = string.Join(",", triggers);
+			SetProperty(EditorParams.PropertyName, newValue);
+			comboBox.Text = newValue;
+		}
+
+		private static (string markerId, string animationId) SplitTrigger(string trigger)
+		{
+			if (!trigger.Contains('@')) {
+				return (trigger, null);
+			}
+			var t = trigger.Split('@');
+			return (t[0], t[1]);
 		}
 
 		public override void SetFocus() => comboBox.SetFocus();
