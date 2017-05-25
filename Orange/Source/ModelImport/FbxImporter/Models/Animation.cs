@@ -28,10 +28,10 @@ namespace Orange.FbxImporter
 				var animation = id.ToStruct<AnimationWrapper>();
 				if (animation.count == 0)
 					return;
-				var stacks = animation.stacks.FromArrayOfPointersToStructArray<AnimationStack>(animation.count);
+				var stacks = animation.stacks.FromArrayOfPointersToStructArrayUnsafe<AnimationStack>(animation.count);
 				Name = stacks[0].name;
 				for(int i = 0; i < animation.count; i++) {
-					var layers = stacks[i].layers.FromArrayOfPointersToStructArray<AnimationLayer>(stacks[i].count);
+					var layers = stacks[i].layers.FromArrayOfPointersToStructArrayUnsafe<AnimationLayer>(stacks[i].count);
 					for (int j = 0; j < stacks[i].count; j++) {
 						if (layers[j].count == 0)
 							continue;

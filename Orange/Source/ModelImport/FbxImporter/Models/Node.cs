@@ -14,11 +14,11 @@ namespace Orange.FbxImporter
 
 		public Material Material { get; private set; }
 
-		public string Name { get; private set; }
-
 		public Matrix44 GlobalTranform { get; private set; }
 
 		public Matrix44 LocalTranform { get; private set; }
+
+		public string Name { get; private set; }
 
 		public Node(IntPtr ptr) : base (ptr)
 		{

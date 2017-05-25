@@ -66,11 +66,17 @@ namespace Orange
 						ShaderPrograms.Attributes.Pos1,
 						ShaderPrograms.Attributes.Color1,
 						ShaderPrograms.Attributes.UV1,
-						//ShaderPrograms.Attributes.BlendIndices,
-						//ShaderPrograms.Attributes.BlendWeights
+						ShaderPrograms.Attributes.BlendIndices,
+						ShaderPrograms.Attributes.BlendWeights
 					}}
 				};
 			sm.Material = node.Material.ToLime(path);
+			if (meshAttribute.Bones.Length > 0) {
+				foreach (var bone in meshAttribute.Bones) {
+					sm.BoneNames.Add(bone.Name);
+					sm.BoneBindPoses.Add(bone.Offset);
+				}
+			}
 			mesh.Submeshes.Add(sm);
 			mesh.SetLocalTransform(node.LocalTranform);
 			mesh.RecalcBounds();

@@ -60,7 +60,7 @@ namespace Orange.FbxImporter
 			return result;
 		}
 
-		public static T[] FromArrayOfPointersToStructArray<T>(this IntPtr ptr, int size)
+		public static T[] FromArrayOfPointersToStructArrayUnsafe<T>(this IntPtr ptr, int size)
 		{
 			if (ptr != IntPtr.Zero) {
 				T[] result = new T[size];
@@ -68,8 +68,13 @@ namespace Orange.FbxImporter
 				for (int i = 0; i < size; i++) {
 					var pointer = new IntPtr(ptr.ToInt64() + sizeof(long) * i);
 					var structPtr = Marshal.ReadIntPtr(pointer);
-					result[i] = (T)Marshal.PtrToStructure(structPtr, typeof(T));
-					Utils.ReleaseNative(structPtr);
+					if(structPtr == IntPtr.Zero) {
+						result[i] = default(T);
+					} else {
+						result[i] = (T)Marshal.PtrToStructure(structPtr, typeof(T));
+						//Can cause crash if array contains simillar pointers
+						Utils.ReleaseNative(structPtr);
+					}
 				}
 				Utils.ReleaseNative(ptr);
 				return result;
