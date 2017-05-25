@@ -22,6 +22,7 @@ namespace Tangerine.UI.SceneView
 			while (true) {
 				var sv = SceneView.Instance;
 				if (sv.Input.ConsumeKeyPress(MainKey) || sv.Input.ConsumeKeyPress(MultiSelectKey)) {
+					Audio.GloballyEnable = false;
 					sv.Components.Get<ExpositionComponent>().InProgress = true;
 					using (var exposition = new Exposition(sv.Frame, sv.Input)) {
 						float t = 0;
@@ -44,6 +45,7 @@ namespace Tangerine.UI.SceneView
 							yield return null;
 						}
 					}
+					Audio.GloballyEnable = true;
 					sv.Components.Get<ExpositionComponent>().InProgress = false;
 				}
 				yield return Lime.Task.WaitForInput();
