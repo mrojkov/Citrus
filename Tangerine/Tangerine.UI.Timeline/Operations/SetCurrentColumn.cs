@@ -36,26 +36,31 @@ namespace Tangerine.UI.Timeline.Operations
 		
 			void SetColumn(int value)
 			{
-				var doc = Document.Current;
-				if (UserPreferences.Instance.AnimationMode && doc.AnimationFrame != value) {
-					doc.Container.SetTangerineFlag(TangerineFlags.IgnoreMarkers, true);
-					if (doc.AnimationFrame < value) {
-						doc.Container.IsRunning = true;
-						UpdateToFrame(doc.Container, value);
+				Audio.GloballyEnable = false;
+				try {
+					var doc = Document.Current;
+					if (UserPreferences.Instance.AnimationMode && doc.AnimationFrame != value) {
+						doc.Container.SetTangerineFlag(TangerineFlags.IgnoreMarkers, true);
+						if (doc.AnimationFrame < value) {
+							doc.Container.IsRunning = true;
+							UpdateToFrame(doc.Container, value);
+						} else {
+							SetCurrentFrameRecursive(doc.Container, 0);
+							ClearParticlesRecursive(doc.RootNode);
+							doc.Container.IsRunning = true;
+							UpdateToFrame(doc.Container, value);
+						}
+						StopAnimationRecursive(doc.Container);
+						doc.Container.SetTangerineFlag(TangerineFlags.IgnoreMarkers, false);
 					} else {
-						SetCurrentFrameRecursive(doc.Container, 0);
+						doc.AnimationFrame = value;
+						doc.Container.Update(0);
 						ClearParticlesRecursive(doc.RootNode);
-						doc.Container.IsRunning = true;
-						UpdateToFrame(doc.Container, value);
 					}
-					StopAnimationRecursive(doc.Container);
-					doc.Container.SetTangerineFlag(TangerineFlags.IgnoreMarkers, false);
-				} else {
-					doc.AnimationFrame = value;
-					doc.Container.Update(0);
-					ClearParticlesRecursive(doc.RootNode);
+					Timeline.Instance.EnsureColumnVisible(value);
+				} finally {
+					Audio.GloballyEnable = true;
 				}
-				Timeline.Instance.EnsureColumnVisible(value);
 			}
 
 			static void UpdateToFrame(Node node, int frame)

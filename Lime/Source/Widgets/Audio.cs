@@ -10,6 +10,8 @@ namespace Lime
 
 	public class Audio : Node
 	{
+		public static bool GloballyEnable = true;
+
 		Sound sound = new Sound() { IsBumpable = true };
 
 		[YuzuMember]
@@ -103,10 +105,12 @@ namespace Lime
 		public override void OnTrigger(string property)
 		{
 			if (property == "Action") {
-				if (Action == AudioAction.Play) {
-					Play();
-				} else {
-					Stop();
+				if (GloballyEnable) {
+					if (Action == AudioAction.Play) {
+						Play();
+					} else {
+						Stop();
+					}
 				}
 			} else {
 				base.OnTrigger(property);
