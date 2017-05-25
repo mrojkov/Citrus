@@ -121,12 +121,16 @@ namespace Lime
 			foreach (var touch in touches.ToArray<UITouch>()) {
 				for (int i = 0; i < Input.MaxTouches; i++) {
 					if (activeTouches[i] == touch) {
+						var pt = touch.LocationInView(this);
+						var position = new Vector2((float)pt.X, (float)pt.Y) * input.ScreenToWorldTransform;
 						if (i == 0) {
 							input.SetKeyState(Key.Mouse0, false);
+							input.MousePosition = position;
 						}
 						activeTouches[i] = null;
 						Key key = (Key)((int)Key.Touch0 + i);
 						input.SetKeyState(key, false);
+						input.SetTouchPosition(i, position);
 					}
 				}
 			}
