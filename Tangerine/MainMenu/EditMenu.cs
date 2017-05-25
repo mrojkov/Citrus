@@ -58,7 +58,7 @@ namespace Tangerine
 	{
 		public override void Execute()
 		{
-			var groups = Document.Current?.SelectedNodes().Editable().Where(n => n is Frame).ToList();
+			var groups = Document.Current?.SelectedNodes().Editable().OfType<Frame>().ToList();
 			if (groups.Count == 0) {
 				return;
 			}
@@ -76,10 +76,10 @@ namespace Tangerine
 					p.Index++;
 					var widget = node as Widget;
 					if (widget != null) {
-						GroupNodes.TransformPropertyAndKeyframes<Vector2>(node, nameof(Widget.Position), v => container.CalcLocalToParentTransform() * v);
-						GroupNodes.TransformPropertyAndKeyframes<Vector2>(node, nameof(Widget.Scale), v => container.Scale * v);
-						GroupNodes.TransformPropertyAndKeyframes<float>(node, nameof(Widget.Rotation), v => container.Rotation + v);
-						GroupNodes.TransformPropertyAndKeyframes<Color4>(node, nameof(Widget.Color), v => container.Color * v);
+						GroupNodes.TransformPropertyAndKeyframes<Vector2>(node, nameof(Widget.Position), v => group.CalcLocalToParentTransform() * v);
+						GroupNodes.TransformPropertyAndKeyframes<Vector2>(node, nameof(Widget.Scale), v => group.Scale * v);
+						GroupNodes.TransformPropertyAndKeyframes<float>(node, nameof(Widget.Rotation), v => group.Rotation + v);
+						GroupNodes.TransformPropertyAndKeyframes<Color4>(node, nameof(Widget.Color), v => group.Color * v);
 					}
 				}
 			}
