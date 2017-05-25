@@ -1,45 +1,42 @@
 ﻿using Lime;
 using Orange.FbxImporter;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Orange
 {
 	public partial class FbxModelImporter
 	{
 		private string path;
-		public Scene scene;
+		private Scene scene;
+
+		public Model3D Model { get; private set; }
 
 		public FbxModelImporter(string path, TargetPlatform platform)
 		{
+			this.path = path;
 			scene = Manager.Instance.LoadScene(path);
-		}
-
-		public Model3D GetModel()
-		{
-			var Model = new Model3D();
+			Model = new Model3D();
 			Model.Nodes.Add(ImportNodes(scene.Root));
-			return Model;
 		}
 
 		private Lime.Node ImportNodes(FbxImporter.Node root, Lime.Node parent = null)
 		{
-			Lime.Node node = null;
-			if (root.Attribute != NodeAttribute.Empty ) {
-				switch (root.Attribute.Type) {
-					case NodeAttribute.FbxNodeType.MESH:
-						if ((root.Attribute as MeshAttribute).Vertices.Length != 0) {
-							node = GetMeshNode(root.Attribute as MeshAttribute, root);
-						}
-						break;
-				}
-			} else {
-				node = new Node3D { Id = root.Name };
+			Node3D node = null;
+			if (root == null)
+				return null;
+			switch (root.Attribute.Type) {
+				case NodeAttribute.FbxNodeType.MESH:
+					if ((root.Attribute as MeshAttribute).Vertices.Length != 0) {
+						node = GetMeshNode(root.Attribute as MeshAttribute, root);
+					}
+					break;
+				default: 
+					node = new Node3D { Id = root.Name };
+					node.SetLocalTransform(root.LocalTranform);
+					break;
 			}
+
 			if (node != null) {
 				if (parent != null) {
 					parent.Nodes.Add(node);
@@ -72,8 +69,9 @@ namespace Orange
 						//ShaderPrograms.Attributes.BlendWeights
 					}}
 				};
+			sm.Material = node.Material.ToLime(path);
 			mesh.Submeshes.Add(sm);
-			mesh.SetLocalTransform(node.LocalTransform);
+			mesh.SetLocalTransform(node.LocalTranform);
 			mesh.RecalcBounds();
 			mesh.RecalcCenter();
 			return mesh;

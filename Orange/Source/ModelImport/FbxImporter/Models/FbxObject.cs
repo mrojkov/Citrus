@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Orange.FbxImporter
 {
@@ -10,7 +6,7 @@ namespace Orange.FbxImporter
 	{
 		public static string ToLevel(this string str, int level)
 		{
-			return string.Empty.PadRight(level * 4) + str;
+			return string.Empty.PadRight(level * 2) + str;
 		}
 	}
 

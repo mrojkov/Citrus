@@ -1,10 +1,7 @@
 ﻿using Lime;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Orange.FbxImporter
 {
@@ -18,19 +15,21 @@ namespace Orange.FbxImporter
 
 		public MeshAttribute(IntPtr ptr) : base(ptr)
 		{
-			var mesh = GetMeshAttribute(NativePtr).To<MeshData>();
+			var mesh = FbxNodeGetMeshAttribute(NativePtr).To<MeshData>();
 			Indices = mesh.vertices.ToIntArray(mesh.verticesCount);
 			Vertices = new Mesh3D.Vertex[mesh.verticesCount];
-			var colors = mesh.colors.ToStructArray<Vec4>(mesh.colorsCount);
-			var verices = mesh.points.ToStructArray<Vec3>(mesh.pointsCount);
-			var uv = mesh.uvCoords.ToStructArray<Vec2>(mesh.uvCount);
-			for (var i = 0; i < mesh.pointsCount; i++) {
+			var colors = mesh.colors.ToStructArray<Vec4>(mesh.verticesCount);
+			var verices = mesh.points.ToStructArray<Vec3>(mesh.verticesCount);
+			var materialCount = FbxNodeGetMeshMaterialCount(NativePtr);
+			var uv = mesh.uvCoords.ToStructArray<Vec2>(mesh.verticesCount);
+
+			for (var i = 0; i < mesh.verticesCount; i++) {
 				var vertex = 
 				Vertices[i].Pos = new Vector3(
 					verices[i].V1,
 					verices[i].V2,
 					verices[i].V3);
-				Vertices[i].Color = colors.Length != 0 ?
+				Vertices[i].Color = colors != null ? 
 					Color4.FromFloats(
 						colors[i].V1,
 						colors[i].V2,
@@ -63,7 +62,13 @@ namespace Orange.FbxImporter
 		#region Pinvokes
 
 		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr GetMeshAttribute(IntPtr node);
+		public static extern IntPtr FbxNodeGetMeshAttribute(IntPtr node);
+
+		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
+		public static extern int FbxNodeGetMeshMaterialCount(IntPtr pMesh);
+
+		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
+		public static extern IntPtr FbxNodeGetMeshMaterial(IntPtr pMesh, int idx);
 
 		#endregion
 
@@ -72,34 +77,18 @@ namespace Orange.FbxImporter
 		[StructLayout(LayoutKind.Sequential)]
 		private class MeshData
 		{
-			public IntPtr vertices;
-
 			[MarshalAs(UnmanagedType.I4)]
 			public int verticesCount;
 
-			public IntPtr points;
+			public IntPtr vertices;
 
-			[MarshalAs(UnmanagedType.I4)]
-			public int pointsCount;
+			public IntPtr points;
 
 			public IntPtr colors;
 
-			[MarshalAs(UnmanagedType.I4)]
-			public int colorsCount;
-
 			public IntPtr uvCoords;
-
-			[MarshalAs(UnmanagedType.I4)]
-			public int uvCount;
-
-			~MeshData()
-			{
-				Utils.ReleaseNative(vertices);
-				Utils.ReleaseNative(colors);
-				Utils.ReleaseNative(uvCoords);
-				Utils.ReleaseNative(points);
-			}
 		}
+
 		#endregion
 	}
 }

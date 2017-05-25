@@ -1,23 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Orange.FbxImporter
 {
 	public class Scene : FbxObject
 	{
-		#region PInvokes
-		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr GetRootNode(IntPtr scene);
-		#endregion
-
 		public Scene(IntPtr ptr) : base(ptr)
 		{
 			try {
-				root = new Node(GetRootNode(NativePtr));
+				root = new Node(FbxSceneGetRootNode(NativePtr));
 			} catch(Exception e) {
 				Console.WriteLine(e.Message);
 			}
@@ -36,5 +27,20 @@ namespace Orange.FbxImporter
 		{
 			return "Scene: \n" + Root.ToString(0);
 		}
+
+		~Scene() {
+			FbxSceneDestroy(NativePtr);
+		}
+
+		#region PInvokes
+
+		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
+		public static extern IntPtr FbxSceneGetRootNode(IntPtr scene);
+
+		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
+		public static extern void FbxSceneDestroy(IntPtr scene);
+
+		#endregion
+
 	}
 }

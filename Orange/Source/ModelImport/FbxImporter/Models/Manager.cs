@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Orange.FbxImporter
 {
@@ -15,7 +12,7 @@ namespace Orange.FbxImporter
 			get 
 			{
 				if (instance == null) {
-					instance = new Manager(CreateFbxManager());
+					instance = new Manager(FbxCreateManager());
 				}
 				return instance;
 			}
@@ -25,16 +22,24 @@ namespace Orange.FbxImporter
 		{ }
 
 		public Scene LoadScene(string fileName) {
-			return new Scene(LoadScene(NativePtr, new StringBuilder(fileName)));
+			return new Scene(FbxManagerLoadScene(NativePtr, new StringBuilder(fileName)));
+		}
+
+		~Manager()
+		{
+			FbxManagerDestroy(NativePtr);
 		}
 
 		#region PInvokes
 
 		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
-		private static extern IntPtr CreateFbxManager();
+		private static extern IntPtr FbxCreateManager();
 
 		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
-		private static extern IntPtr LoadScene(IntPtr manager, StringBuilder pFileName);
+		private static extern IntPtr FbxManagerLoadScene(IntPtr manager, StringBuilder pFileName);
+
+		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
+		private static extern void FbxManagerDestroy(IntPtr manager);
 
 		#endregion
 	}

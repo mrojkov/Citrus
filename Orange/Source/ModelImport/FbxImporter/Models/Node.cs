@@ -16,24 +16,23 @@ namespace Orange.FbxImporter
 
 		public string Name { get; private set; }
 
-		public Matrix44 LocalTransform { get; private set; }
+		public Matrix44 GlobalTranform { get; private set; }
+
+		public Matrix44 LocalTranform { get; private set; }
 
 		public Node(IntPtr ptr) : base (ptr)
 		{
-			int count = GetChildCount(NativePtr);
-			var materialPtr = GetMaterial(NativePtr);
+			int count = FbxNodeGetChildCount(NativePtr);
+			var materialPtr = FbxNodeGetMaterial(NativePtr);
+			Material = new Material(materialPtr);
 
-			if (materialPtr != IntPtr.Zero) {
-				Material = new Material(materialPtr);
-			}
-
-			Attribute = NodeAttribute.GetFromNode(NativePtr);
-			Name = Marshal.PtrToStringAnsi(GetName(NativePtr));
+			Name = Marshal.PtrToStringAnsi(FbxNodeGetName(NativePtr));
 			Attribute = NodeAttribute.GetFromNode(NativePtr, 0);
 			for (int i = 0; i < count; i++) {
-				Children.Add(new Node(GetChildNode(NativePtr, i)));
+				Children.Add(new Node(FbxNodeGetChildNode(NativePtr, i)));
 			}
-			LocalTransform = CalcLocalTransform();
+			GlobalTranform = FbxNodeGetGlobalTransform(NativePtr).To<Mat4x4>().ToLime();
+			LocalTranform =  FbxNodeGetLocalTransform(NativePtr).To<Mat4x4>().ToLime();
 		}
 
 		public override string ToString(int level)
@@ -51,30 +50,28 @@ namespace Orange.FbxImporter
 			return builder.ToString();
 		}
 
-		public Matrix44 CalcLocalTransform()
-		{
-			return GetLocalTransform(NativePtr).To<Mat4x4>().ToLime();
-		}
-
 		#region PInvokes
 
 		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr GetChildNode(IntPtr node, int index);
+		public static extern IntPtr FbxNodeGetChildNode(IntPtr node, int index);
 
 		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern int GetChildCount(IntPtr node);
+		public static extern int FbxNodeGetChildCount(IntPtr node);
 
 		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr GetMaterial(IntPtr node);
+		public static extern IntPtr FbxNodeGetMaterial(IntPtr node);
 
 		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr GetLocalTransform(IntPtr node);
+		public static extern IntPtr FbxNodeGetGlobalTransform(IntPtr node);
+
+		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
+		public static extern IntPtr FbxNodeGetLocalTransform(IntPtr node);
 
 		[DllImport(ImportConfig.LibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr GetName(IntPtr node);
+		public static extern IntPtr FbxNodeGetName(IntPtr node);
 
 		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern int GetAttributeCount(IntPtr node);
+		public static extern int FbxNodeGetAttributeCount(IntPtr node);
 
 		#endregion
 	}
