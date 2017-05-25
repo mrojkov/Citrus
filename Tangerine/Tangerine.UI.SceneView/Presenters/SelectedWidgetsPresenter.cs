@@ -15,7 +15,7 @@ namespace Tangerine.UI.SceneView
 		private void RenderSelection(Widget canvas)
 		{
 			if (
-				SceneView.Instance.Components.Get<ExpositionComponent>().InProgress ||
+				Core.Document.Current.ExpositionMode ||
 				Core.Document.Current.Container.IsRunning
 			) {
 				return;

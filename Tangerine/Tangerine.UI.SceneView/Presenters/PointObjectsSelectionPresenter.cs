@@ -15,7 +15,7 @@ namespace Tangerine.UI.SceneView
 		void Render(Widget canvas)
 		{
 			if (
-				SceneView.Instance.Components.Get<ExpositionComponent>().InProgress ||
+				Document.Current.ExpositionMode ||
 				Document.Current.Container.IsRunning ||
 				!Document.Current.Container.Nodes.Any(i => i is PointObject)
 			) {

@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Linq;
 using System.Collections.Generic;
 using Lime;
@@ -6,15 +6,10 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.SceneView
 {
-	public class ExpositionComponent : IComponent
-	{
-		public bool InProgress;
-	}
-
 	public class ExpositionProcessor : Core.ITaskProvider
 	{
 		public static readonly Key MainKey = Key.MapShortcut(Key.Tab);
-		public static readonly Key MultiSelectKey = Key.MapShortcut(Modifiers.Shift, Key.Tab);
+		public static readonly Key MultiSelectKey = Key.MapShortcut(Modifiers.Control, Key.Tab);
 
 		public IEnumerator<object> Task()
 		{
@@ -23,7 +18,7 @@ namespace Tangerine.UI.SceneView
 				var sv = SceneView.Instance;
 				if (sv.Input.ConsumeKeyPress(MainKey) || sv.Input.ConsumeKeyPress(MultiSelectKey)) {
 					Audio.GloballyEnable = false;
-					sv.Components.Get<ExpositionComponent>().InProgress = true;
+					Document.Current.ExpositionMode = true;
 					using (var exposition = new Exposition(sv.Frame, sv.Input)) {
 						float t = 0;
 						float animationSpeed = CalcAnimationSpeed(exposition.ItemCount);
@@ -46,7 +41,7 @@ namespace Tangerine.UI.SceneView
 						}
 					}
 					Audio.GloballyEnable = true;
-					sv.Components.Get<ExpositionComponent>().InProgress = false;
+					Document.Current.ExpositionMode = false;
 				}
 				yield return Lime.Task.WaitForInput();
 			}

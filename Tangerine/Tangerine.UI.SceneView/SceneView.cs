@@ -153,10 +153,7 @@ namespace Tangerine.UI.SceneView
 			}
 		}
 
-		void CreateComponents()
-		{
-			Components.Add(new ExpositionComponent());
-		}
+		void CreateComponents() { }
 
 		void CreateProcessors()
 		{
