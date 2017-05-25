@@ -9,6 +9,7 @@ namespace Orange.FbxImporter
 		{
 			try {
 				root = new Node(FbxSceneGetRootNode(NativePtr));
+				Animations = new Animation(ptr);
 			} catch(Exception e) {
 				Console.WriteLine(e.Message);
 			}
@@ -22,6 +23,8 @@ namespace Orange.FbxImporter
 				return root;
 			}
 		}
+
+		public Animation Animations { get; set; } 
 
 		public override string ToString()
 		{

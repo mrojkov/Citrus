@@ -121,6 +121,7 @@
     <Compile Include="Source\Builder\MSBuild.cs" />
     <Compile Include="Source\Builder\MDTool.cs" />
     <Compile Include="Source\ModelImport\FbxImporter\MarshalingUtils.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\Models\Animation.cs" />
     <Compile Include="Source\ModelImport\FbxImporter\Models\Attributes\CameraAttribute.cs" />
     <Compile Include="Source\ModelImport\FbxImporter\Models\Attributes\MeshAttribute.cs" />
     <Compile Include="Source\ModelImport\FbxImporter\Models\Attributes\NodeAttribute.cs" />
