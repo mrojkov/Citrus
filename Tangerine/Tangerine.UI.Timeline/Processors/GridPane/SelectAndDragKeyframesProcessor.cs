@@ -66,6 +66,7 @@ namespace Tangerine.UI.Timeline
 
 		private IEnumerator<object> DragKeyframeTask(IntVector2 cell)
 		{
+			Core.Operations.ClearRowSelection.Perform();
 			Operations.ClearGridSelection.Perform();
 			Operations.SelectGridSpan.Perform(cell.Y, new GridSpan(cell.X, cell.X + 1));
 			yield return DragSelectionTask(cell);
