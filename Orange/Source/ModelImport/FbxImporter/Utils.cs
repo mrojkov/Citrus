@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Runtime.InteropServices;
 
 
@@ -13,11 +12,21 @@ namespace Orange.FbxImporter
 	public static class IntPtrExtensions
 	{
 		public static T To<T>(this IntPtr ptr) {
-			return ptr == IntPtr.Zero ? default(T) : (T)Marshal.PtrToStructure(ptr, typeof(T));
+			if(ptr != IntPtr.Zero) {
+				var structure = (T)Marshal.PtrToStructure(ptr, typeof(T));
+				Utils.ReleaseNative(ptr);
+				return structure;
+			}
+			return default(T);
 		}
 		public static T ToStruct<T>(this IntPtr ptr) where T: class
 		{
-			return ptr == IntPtr.Zero ? null : (T)Marshal.PtrToStructure(ptr, typeof(T));
+			if (ptr != IntPtr.Zero) {
+				var structure = (T)Marshal.PtrToStructure(ptr, typeof(T));
+				Utils.ReleaseNative(ptr);
+				return structure;
+			}
+			return null;
 		}
 
 		public static int[] ToIntArray(this IntPtr ptr, int size)
@@ -26,6 +35,18 @@ namespace Orange.FbxImporter
 				return null;
 			int[] result = new int[size];
 			Marshal.Copy(ptr, result, 0 ,size);
+			Utils.ReleaseNative(ptr);
+			return result;
+		}
+
+
+		public static float[] ToFloatArray(this IntPtr ptr, int size)
+		{
+			if (size == 0)
+				return null;
+			float[] result = new float[size];
+			Marshal.Copy(ptr, result, 0, size);
+			Utils.ReleaseNative(ptr);
 			return result;
 		}
 
@@ -35,35 +56,42 @@ namespace Orange.FbxImporter
 				return null;
 			double[] result = new double[size];
 			Marshal.Copy(ptr, result, 0, size);
+			Utils.ReleaseNative(ptr);
 			return result;
 		}
 
 		public static T[] ToStructArray<T>(this IntPtr ptr, int size)
 		{
-			T[] result = new T[size];
-			var strucSize = Marshal.SizeOf(typeof(T));
-			for (int i = 0; i < size; i++) {
-				var structPtr = new IntPtr(ptr.ToInt64() + strucSize * i);
-				result[i] = (T)Marshal.PtrToStructure(structPtr, typeof(T));
+			if (ptr != IntPtr.Zero) {
+				T[] result = new T[size];
+				var strucSize = Marshal.SizeOf(typeof(T));
+				for (int i = 0; i < size; i++) {
+					var structPtr = new IntPtr(ptr.ToInt64() + strucSize * i);
+					result[i] = (T)Marshal.PtrToStructure(structPtr, typeof(T));
+				}
+				Utils.ReleaseNative(ptr);
+				return result;
 			}
-			return result;
+			return null;
 		}
 
-		public static T[] ToArrayStruct<T, TStruct>(this IntPtr ptr, int size)
+		public static string ToCharArray(this IntPtr ptr)
 		{
-			T[] result = new T[size];
-			Marshal.Copy(ptr, result as IntPtr[], 0, size);
-			return result;
+			if (ptr != IntPtr.Zero) {
+				return Marshal.PtrToStringAnsi(ptr);
+			}
+			Utils.ReleaseNative(ptr);
+			return null;
 		}
 	}
 
 	public static class Utils
 	{
 		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
-		private static extern void ReleaseMemory(IntPtr ptr);
+		private static extern void FbxUtilsReleaseMemory(IntPtr ptr);
 
 		public static void ReleaseNative(IntPtr ptr) {
-			ReleaseMemory(ptr);
+			FbxUtilsReleaseMemory(ptr);
 		}
 	}
 }
