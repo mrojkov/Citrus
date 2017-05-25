@@ -67,6 +67,7 @@ namespace Tangerine.UI.SceneView
 				}
 			} finally {
 				sv.Input.ReleaseMouse();
+				sv.Input.ConsumeKey(Key.Mouse0);
 				Document.Current.History.EndTransaction();
 			}
 		}

@@ -16,7 +16,7 @@ namespace Tangerine.UI.SceneView
 				Rectangle aabb;
 				var pobjects = Document.Current.SelectedNodes().Editable().OfType<PointObject>();
 				if (
-					Utils.CalcAABB(pobjects, sv.Scene, out aabb) && 
+					Utils.CalcAABB(pobjects, sv.Scene, out aabb) &&
 					sv.HitTestControlPoint(aabb.Center))
 				{
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
@@ -68,6 +68,7 @@ namespace Tangerine.UI.SceneView
 				}
 			} finally {
 				sv.Input.ReleaseMouse();
+				sv.Input.ConsumeKey(Key.Mouse0);
 				Document.Current.History.EndTransaction();
 			}
 		}
