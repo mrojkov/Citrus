@@ -80,8 +80,8 @@ namespace Lime
 			}
 			while (true) {
 				ShowSliderIfNeeded();
-				MoveSlider();
 				ResizeSlider();
+				MoveSlider();
 				yield return null;
 			}
 		}
