@@ -41,15 +41,10 @@ namespace Tangerine.UI.Timeline.Operations
 					var doc = Document.Current;
 					if (UserPreferences.Instance.AnimationMode && doc.AnimationFrame != value) {
 						doc.Container.SetTangerineFlag(TangerineFlags.IgnoreMarkers, true);
-						if (doc.AnimationFrame < value) {
-							doc.Container.IsRunning = true;
-							UpdateToFrame(doc.Container, value);
-						} else {
-							SetCurrentFrameRecursive(doc.Container, 0);
-							ClearParticlesRecursive(doc.RootNode);
-							doc.Container.IsRunning = true;
-							UpdateToFrame(doc.Container, value);
-						}
+						SetCurrentFrameRecursive(doc.Container, 0);
+						ClearParticlesRecursive(doc.RootNode);
+						doc.Container.IsRunning = true;
+						FastForwardToFrame(doc.Container, value);
 						StopAnimationRecursive(doc.Container);
 						doc.Container.SetTangerineFlag(TangerineFlags.IgnoreMarkers, false);
 					} else {
@@ -63,7 +58,7 @@ namespace Tangerine.UI.Timeline.Operations
 				}
 			}
 
-			static void UpdateToFrame(Node node, int frame)
+			static void FastForwardToFrame(Node node, int frame)
 			{
 				node.Update((float)(AnimationUtils.SecondsPerFrame * (frame - node.AnimationFrame)));
 				// Set animation frame explicitly to avoid inaccuracy, leading to skipped markers, triggers, etc.
