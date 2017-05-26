@@ -177,7 +177,7 @@ namespace Tangerine.Core.Operations
 
 		public static void Perform(Node container, FolderItemLocation location, IFolderItem item)
 		{
-			if (item is Node && !NodeCompositionValidator.Validate(Document.Current.Container.GetType(), item.GetType())) {
+			if (item is Node && !NodeCompositionValidator.Validate(container.GetType(), item.GetType())) {
 				throw new InvalidOperationException($"Can't put {item.GetType()} into {container.GetType()}");
 			}
 			Document.Current.History.Perform(new InsertFolderItem(container, location, item));
