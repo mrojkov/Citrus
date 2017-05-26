@@ -18,6 +18,7 @@ namespace Tangerine
 					prefs.RecentProjects.Remove(dlg.FileName);
 					prefs.RecentProjects.Insert(0, dlg.FileName);
 					prefs.Save();
+					DockManager.Instance.UpdateWindowTitle();
 				}
 			}
 		}

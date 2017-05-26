@@ -119,6 +119,7 @@ namespace Tangerine
 			var proj = UserPreferences.Instance.RecentProjects.FirstOrDefault();
 			if (proj != null) {
 				new Project(proj).Open();
+				dockManager.UpdateWindowTitle();
 			}
 			RegisterGlobalCommands();
 		}

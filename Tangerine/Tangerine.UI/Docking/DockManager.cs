@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using Lime;
+using Tangerine.Core;
 using Yuzu;
 
 namespace Tangerine.UI
@@ -241,6 +242,16 @@ namespace Tangerine.UI
 			public Vector2 MainWindowPosition;
 			[YuzuMember]
 			public Vector2 MainWindowSize;
+		}
+
+		public void UpdateWindowTitle()
+		{
+			var title = "Tangerine";
+			if (Project.Current != null) {
+				var citProjName = Path.GetFileNameWithoutExtension(Project.Current.CitprojPath);
+				title = $"{citProjName} - Tangerine";
+			}
+			MainWindowWidget.Window.Title = title;
 		}
 	}
 }
