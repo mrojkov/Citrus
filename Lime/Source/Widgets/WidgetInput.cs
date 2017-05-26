@@ -10,8 +10,6 @@ namespace Lime
 	/// </summary>
 	public class WidgetInput : IDisposable
 	{
-		public delegate void KeyEventHandler(WidgetInput input, Key key);
-
 		private Widget widget;
 		private Input windowInput { get { return CommonWindow.Current.Input; } }
 		private WidgetContext context { get { return WidgetContext.Current; } }
@@ -21,10 +19,6 @@ namespace Lime
 
 		public delegate bool FilterFunc(Widget widget, Key key);
 		public static FilterFunc Filter;
-
-		public event KeyEventHandler KeyPressed;
-		public event KeyEventHandler KeyReleased;
-		public event KeyEventHandler KeyRepeated;
 
 		public static bool AcceptMouseBeyondWidgetByDefault = true;
 
@@ -196,34 +190,6 @@ namespace Lime
 		{
 			foreach (var key in keys) {
 				ConsumeKey(key);
-			}
-		}
-
-		internal void DispatchEvents()
-		{
-			if (!windowInput.Changed) {
-				return;
-			}
-			if (KeyPressed != null) {
-				for (var key = Key.Unknown; key < Key.Count; key++) {
-					if (WasKeyPressed(key)) {
-						KeyPressed(this, key);
-					}
-				}
-			}
-			if (KeyRepeated != null) {
-				for (var key = Key.Unknown; key < Key.Count; key++) {
-					if (WasKeyRepeated(key)) {
-						KeyRepeated(this, key);
-					}
-				}
-			}
-			if (KeyReleased != null) {
-				for (var key = Key.Unknown; key < Key.Count; key++) {
-					if (WasKeyReleased(key)) {
-						KeyReleased(this, key);
-					}
-				}
 			}
 		}
 
