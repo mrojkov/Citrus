@@ -76,8 +76,7 @@
     <Compile Include="Components\DragKeyframesRequest.cs" />
     <Compile Include="Components\HasKeyframeRequest.cs" />
     <Compile Include="MarkerPropertiesDialog.cs" />
-    <Compile Include="Processors\Rulerbar\EditMarkerProcessor.cs" />
-    <Compile Include="Processors\Rulerbar\RulerMouseScrollProcessor.cs" />
+    <Compile Include="Processors\Rulerbar\RulerbarMouseScrollProcessor.cs" />
     <Compile Include="Components\GridCurveView.cs" />
     <Compile Include="Components\GridNodeView.cs" />
     <Compile Include="Components\GridPropertyView.cs" />

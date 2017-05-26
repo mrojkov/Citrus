@@ -49,31 +49,34 @@ namespace Tangerine.UI
 						DesktopTheme.Colors.SelectedBackground);
 				}
 			}));
-			scrollView.Input.KeyRepeated += (input, key) => {
-				if (Cmds.All.Contains(key)) {
-					input.ConsumeKey(key);
-				}
-				if (results.Count == 0) {
-					return;
-				}
-				if (key == Key.Mouse0) {
-					scrollView.SetFocus();
-					selectedIndex = (resultPane.Input.LocalMousePosition.Y / rowHeight).Floor().Clamp(0, results.Count - 1);
-				} else if (key == Cmds.Down) {
-					selectedIndex++;
-				} else if (key == Cmds.Up) {
-					selectedIndex--;
-				} else if (key == Cmds.Cancel) {
-					scrollView.RevokeFocus();
-				} else if (key == Cmds.Enter || key == Key.Mouse0DoubleClick) {
-					NavigateToItem(selectedIndex);
-				} else {
-					return;
-				}
-				selectedIndex = selectedIndex.Clamp(0, results != null ? results.Count - 1 : 0);
-				EnsureRowVisible(selectedIndex);
-				Window.Current.Invalidate();
-			};
+			scrollView.LateTasks.Add(new KeyRepeatHandler(ScrollView_KeyRepeated));
+		}
+
+		void ScrollView_KeyRepeated(WidgetInput input, Key key)
+		{
+			if (Cmds.All.Contains(key)) {
+				input.ConsumeKey(key);
+			}
+			if (results.Count == 0) {
+				return;
+			}
+			if (key == Key.Mouse0) {
+				scrollView.SetFocus();
+				selectedIndex = (resultPane.Input.LocalMousePosition.Y / rowHeight).Floor().Clamp(0, results.Count - 1);
+			} else if (key == Cmds.Down) {
+				selectedIndex++;
+			} else if (key == Cmds.Up) {
+				selectedIndex--;
+			} else if (key == Cmds.Cancel) {
+				scrollView.RevokeFocus();
+			} else if (key == Cmds.Enter || key == Key.Mouse0DoubleClick) {
+				NavigateToItem(selectedIndex);
+			} else {
+				return;
+			}
+			selectedIndex = selectedIndex.Clamp(0, results != null ? results.Count - 1 : 0);
+			EnsureRowVisible(selectedIndex);
+			Window.Current.Invalidate();
 		}
 
 		void NavigateToItem(int selectedIndex)

@@ -71,6 +71,7 @@
     <Compile Include="VersionedCollection.cs" />
     <Compile Include="WidgetExtensions.cs" />
     <Compile Include="NodeCompositionValidator.cs" />
+    <Compile Include="KeyHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Win.csproj">

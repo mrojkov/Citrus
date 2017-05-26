@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Lime;
+using Tangerine.Core;
 
 namespace Tangerine.UI.Timeline
 {
@@ -76,12 +77,11 @@ namespace Tangerine.UI.Timeline
 				};
 			}
 			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
-			rootWidget.Input.KeyPressed += (input, key) => {
-				if (key == Key.Escape) {
+			rootWidget.LateTasks.Add(new KeyPressHandler(Key.Escape,
+				(input, key) => {
 					input.ConsumeKey(key);
 					window.Close();
-				}
-			};
+				}));
 			okButton.Clicked += () => {
 				result = Result.Ok;
 				window.Close();

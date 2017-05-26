@@ -89,6 +89,7 @@
     <Compile Include="Components.cs" />
     <Compile Include="Operations\SyncFolderDescriptorsProcessor.cs" />
     <Compile Include="NodeCompositionValidator.cs" />
+    <Compile Include="KeyHandler.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

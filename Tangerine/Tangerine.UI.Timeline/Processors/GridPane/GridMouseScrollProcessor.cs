@@ -21,7 +21,7 @@ namespace Tangerine.UI.Timeline
 					} else if (p.X < cw / 2) {
 						timeline.OffsetX -= cw;
 					}
-					Operations.SetCurrentColumn.Perform(RulerMouseScrollProcessor.CalcColumn(p.X));
+					Operations.SetCurrentColumn.Perform(RulerbarMouseScrollProcessor.CalcColumn(p.X));
 					var rh = TimelineMetrics.DefaultRowHeight;
 					if (p.Y > widget.Height - rh / 2) {
 						timeline.OffsetY += rh;

@@ -124,7 +124,7 @@ namespace Tangerine.UI.Timeline
 
 		void CreateProcessors()
 		{
-			RootWidget.LateTasks.Add(new ITaskProvider[] {
+			RootWidget.LateTasks.Add(
 				new OverviewScrollProcessor(),
 				new MouseWheelProcessor(),
 				new ResizeGridCurveViewProcessor(),
@@ -134,11 +134,10 @@ namespace Tangerine.UI.Timeline
 				new DragKeyframesRespondentProcessor(),
 				new GridMouseScrollProcessor(),
 				new SelectAndDragRowsProcessor(),
-				new RulerMouseScrollProcessor(),
+				new RulerbarMouseScrollProcessor(),
 				new ClampScrollPosProcessor(),
-				new EditMarkerProcessor(),
-				PanelTitleUpdater(),
-			});
+				PanelTitleUpdater()
+			);
 		}
 
 		ITaskProvider PanelTitleUpdater()

@@ -90,14 +90,14 @@
     <Compile Include="Components\DragKeyframesRequest.cs" />
     <Compile Include="Components\HasKeyframeRequest.cs" />
     <Compile Include="MarkerPropertiesDialog.cs" />
-    <Compile Include="Processors\Rulerbar\EditMarkerProcessor.cs" />
-    <Compile Include="Processors\Rulerbar\RulerMouseScrollProcessor.cs" />
+    <Compile Include="Processors\Rulerbar\RulerbarMouseScrollProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Commands\" />
     <Folder Include="Components\Model\" />
     <Folder Include="Components\Presentation\" />
     <Folder Include="Tasks\Rulerbar\" />
+    <Folder Include="Processors\Rulerbar\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Win.csproj">

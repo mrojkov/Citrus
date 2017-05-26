@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Lime;
 using Tangerine.Core;
 
@@ -17,8 +18,26 @@ namespace Tangerine.UI.Timeline
 				HitTestTarget = true
 			};
 			RootWidget.CompoundPresenter.Add(new DelegatePresenter<Widget>(Render));
+			RootWidget.LateTasks.Add(
+				new KeyPressHandler(Key.Mouse0DoubleClick, RootWidget_DoubleClick),
+				new KeyPressHandler(Key.Mouse1, (input, key) => new ContextMenu().Show())
+			);
 		}
-		
+
+		void RootWidget_DoubleClick(WidgetInput input, Key key)
+		{
+			var timeline = Timeline.Instance;
+			var marker = Document.Current.Container.Markers.FirstOrDefault(
+				i => i.Frame == timeline.CurrentColumn);
+			var newMarker = marker?.Clone() ?? new Marker { Frame = timeline.CurrentColumn };
+			var r = new MarkerPropertiesDialog().Show(newMarker, canDelete: marker != null);
+			if (r == MarkerPropertiesDialog.Result.Ok) {
+				Core.Operations.SetMarker.Perform(Document.Current.Container.DefaultAnimation.Markers, newMarker);
+			} else if (r == MarkerPropertiesDialog.Result.Delete) {
+				Core.Operations.DeleteMarker.Perform(Document.Current.Container.DefaultAnimation.Markers, marker);
+			}
+		}
+
 		void Render(Widget widget)
 		{
 			widget.PrepareRendererState();
@@ -87,6 +106,25 @@ namespace Tangerine.UI.Timeline
 				A = new Vector2(frame * TimelineMetrics.ColWidth + 0.5f, 0),
 				B = new Vector2((frame + 1) * TimelineMetrics.ColWidth + 0.5f, RootWidget.Height)
 			};
+		}
+
+		class ContextMenu
+		{
+			public void Show()
+			{
+				var i = Window.Current.Input;
+				var m = new Menu {
+					Command.Undo,
+					Command.MenuSeparator,
+					Command.Cut,
+					Command.Copy,
+					Command.Paste,
+					Command.Delete,
+					Command.MenuSeparator,
+					Command.SelectAll,
+				};
+				m.Popup();
+			}
 		}
 	}
 }
