@@ -31,9 +31,9 @@ namespace Orange.FbxImporter
 
 		public static int[] ToIntArray(this IntPtr ptr, int size)
 		{
-			if (size == 0)
-				return null;
 			int[] result = new int[size];
+			if (size == 0)
+				return result;
 			Marshal.Copy(ptr, result, 0 ,size);
 			Utils.ReleaseNative(ptr);
 			return result;
@@ -42,9 +42,9 @@ namespace Orange.FbxImporter
 
 		public static float[] ToFloatArray(this IntPtr ptr, int size)
 		{
-			if (size == 0)
-				return null;
 			float[] result = new float[size];
+			if (size == 0)
+				return new float[0];
 			Marshal.Copy(ptr, result, 0, size);
 			Utils.ReleaseNative(ptr);
 			return result;
@@ -52,9 +52,9 @@ namespace Orange.FbxImporter
 
 		public static double[] ToDoubleArray(this IntPtr ptr, int size)
 		{
-			if (size == 0)
-				return null;
 			double[] result = new double[size];
+			if (size == 0)
+				return result;
 			Marshal.Copy(ptr, result, 0, size);
 			Utils.ReleaseNative(ptr);
 			return result;
