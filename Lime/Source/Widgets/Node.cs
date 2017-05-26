@@ -1037,6 +1037,7 @@ namespace Lime
 
 			Presenter = content.Presenter?.Clone();
 			PostPresenter = content.PostPresenter?.Clone();
+			Components = content.Components.Clone(this);
 		}
 
 		private static readonly string[] sceneExtensions = { ".scene", ".model", ".tan" };

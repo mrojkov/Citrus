@@ -28,6 +28,8 @@ namespace Lime
 			public List<Marker> Markers = new List<Marker>();
 			public List<string> Nodes = new List<string>();
 			public List<string> IgnoredNodes = new List<string>();
+			public BlendingOption Blending;
+			public readonly Dictionary<string, MarkerBlending> MarkersBlendings = new Dictionary<string, MarkerBlending>();
 		}
 
 		public class MaterialEffect
@@ -35,6 +37,7 @@ namespace Lime
 			public string Name;
 			public string MaterialName;
 			public string Path;
+			public BlendingOption Blending;
 		}
 
 		public void Apply(Node3D model)
@@ -88,8 +91,24 @@ namespace Lime
 					}
 					model.Animations.Add(animation);
 				}
+
 				foreach (var markerData in animationData.Markers) {
 					animation.Markers.AddOrdered(markerData.Clone());
+				}
+
+				if (animationData.Blending != null || animationData.MarkersBlendings.Count > 0) {
+					animation.AnimationEngine = BlendAnimationEngine.Instance;
+					var blender = model.Components.GetOrAdd<AnimationBlender>();
+
+					var animationBlending = new AnimationBlending() {
+						Option = animationData.Blending
+					};
+					if (animationData.MarkersBlendings.Count > 0) {
+						foreach (var markersBlendings in animationData.MarkersBlendings) {
+							animationBlending.MarkersOptions.Add(markersBlendings.Key, markersBlendings.Value);
+						}
+					}
+					blender.Options.Add(animation.Id ?? "", animationBlending);
 				}
 			}
 		}
@@ -101,13 +120,24 @@ namespace Lime
 				var effectPresenter = new MaterialEffectPresenter(effect.MaterialName, effect.Name, effect.Path);
 				model.CompoundPresenter.Add(effectPresenter);
 
+				if (effect.Blending != null) {
+					effectPresenter.Animation.AnimationEngine = BlendAnimationEngine.Instance;
+					var blender = effectPresenter.Scene.Components.GetOrAdd<AnimationBlender>();
+					var animationBlending = new AnimationBlending() {
+						Option = effect.Blending
+					};
+					blender.Options.Add(effectPresenter.Animation.Id ?? "", animationBlending);
+				}
+
 				var animation = new Lime.Animation {
 					Id = effect.Name,
 					AnimationEngine = effectEngine
 				};
+
 				foreach (var marker in effectPresenter.Animation.Markers) {
 					animation.Markers.Add(marker.Clone());
 				}
+
 				model.Animations.Add(animation);
 			}
 		}
@@ -168,7 +198,7 @@ namespace Lime
 		public class MeshOptionFormat
 		{
 			[YuzuOptional]
-			public bool HitTestTarget;
+			public bool HitTestTarget = false;
 
 			[YuzuOptional]
 			public string CullMode = null;
@@ -223,6 +253,9 @@ namespace Lime
 
 			[YuzuOptional]
 			public Dictionary<string, ModelMarkerFormat> Markers = null;
+
+			[YuzuOptional]
+			public int Blending = 0;
 		}
 
 		public class ModelMarkerFormat
@@ -235,6 +268,12 @@ namespace Lime
 
 			[YuzuOptional]
 			public string JumpTarget = null;
+
+			[YuzuOptional]
+			public readonly Dictionary<string, int> SourceMarkersBlending = null;
+
+			[YuzuOptional]
+			public int Blending = 0;
 		}
 
 		public class ModelMaterialEffectFormat
@@ -244,6 +283,9 @@ namespace Lime
 
 			[YuzuOptional]
 			public string Path = null;
+
+			[YuzuOptional]
+			public int Blending = 0;
 		}
 
 		public Model3DAttachment Parse(string modelPath)
@@ -306,8 +348,34 @@ namespace Lime
 										break;
 								}
 							}
+							if (markerFormat.Value.Blending > 0) {
+								var markerBlending = new MarkerBlending() {
+									Option = new BlendingOption(markerFormat.Value.Blending)
+								};
+								animation.MarkersBlendings.Add(markerFormat.Key, markerBlending);
+							}
+							if (markerFormat.Value.SourceMarkersBlending != null) {
+								MarkerBlending markerBlending;
+								animation.MarkersBlendings.TryGetValue(markerFormat.Key, out markerBlending);
+								if (markerBlending == null) {
+									markerBlending = new MarkerBlending();
+									animation.MarkersBlendings.Add(markerFormat.Key, markerBlending);
+								}
+
+								foreach (var sourceMarkerFormat in markerFormat.Value.SourceMarkersBlending) {
+									markerBlending.SourceMarkersOptions.Add(
+										sourceMarkerFormat.Key,
+										new BlendingOption(sourceMarkerFormat.Value)
+									);
+								}
+							}
+
 							animation.Markers.Add(marker);
 						}
+					}
+
+					if (animationFormat.Value.Blending > 0) {
+						animation.Blending = new BlendingOption(animationFormat.Value.Blending);
 					}
 
 					if (animationFormat.Value.Nodes != null) {
@@ -326,11 +394,15 @@ namespace Lime
 
 				if (modelAttachmentFormat.MaterialEffects != null) {
 					foreach (var materialEffectFormat in modelAttachmentFormat.MaterialEffects) {
-						attachment.MaterialEffects.Add(new Model3DAttachment.MaterialEffect() {
+						var materialEffect = new Model3DAttachment.MaterialEffect() {
 							Name = materialEffectFormat.Key,
 							MaterialName = materialEffectFormat.Value.MaterialName,
 							Path = FixPath(modelPath, materialEffectFormat.Value.Path)
-						});
+						};
+						if (materialEffectFormat.Value.Blending > 0) {
+							materialEffect.Blending = new BlendingOption(materialEffectFormat.Value.Blending);
+						}
+						attachment.MaterialEffects.Add(materialEffect);
 					}
 				}
 
@@ -373,7 +445,10 @@ namespace Lime
 		public override bool TryRunAnimation(Animation animation, string markerId)
 		{
 			var presenter = GetPresenter(animation);
-			if (!base.TryRunAnimation(animation, markerId) || !base.TryRunAnimation(presenter.Animation, markerId)) {
+			if (
+				!base.TryRunAnimation(animation, markerId) ||
+				!presenter.Animation.AnimationEngine.TryRunAnimation(presenter.Animation, markerId)
+			) {
 				return false;
 			}
 
