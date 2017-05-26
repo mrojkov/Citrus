@@ -481,7 +481,7 @@ namespace Lime
 			get
 			{
 				if (tasks == null) {
-					tasks = new TaskList();
+					tasks = new TaskList(this);
 					Updating += tasks.Update;
 				}
 				return tasks;
@@ -496,7 +496,7 @@ namespace Lime
 			get
 			{
 				if (lateTasks == null) {
-					lateTasks = new TaskList();
+					lateTasks = new TaskList(this);
 					Updated += lateTasks.Update;
 				}
 				return lateTasks;
@@ -741,9 +741,6 @@ namespace Lime
 			}
 			if (Updated != null) {
 				Updated(delta);
-			}
-			if (input != null) {
-				input.DispatchEvents();
 			}
 		}
 

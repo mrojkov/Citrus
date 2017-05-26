@@ -22,6 +22,18 @@ namespace Lime
 		private static TaskList current;
 
 		/// <summary>
+		/// Gets the widget this instance belongs to.
+		/// </summary>
+		public Widget Widget { get; private set; }
+
+		public TaskList() { }
+
+		public TaskList(Widget widget)
+		{
+			Widget = widget;
+		}
+
+		/// <summary>
 		/// Currently processing TaskList.
 		/// </summary>
 		public static TaskList Current {
