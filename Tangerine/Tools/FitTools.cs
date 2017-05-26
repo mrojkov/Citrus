@@ -5,6 +5,17 @@ using Tangerine.UI;
 
 namespace Tangerine
 {
+	public class RestoreOriginalSize : DocumentCommandHandler
+	{
+		public override void Execute()
+		{
+			foreach (var widget in Core.Document.Current.SelectedNodes().Editable().OfType<Widget>()) {
+				var originalSize = widget.Texture == null ? Widget.DefaultWidgetSize : (Vector2)widget.Texture.ImageSize;
+				Core.Operations.SetProperty.Perform(widget, nameof(Widget.Size), originalSize);
+			}
+		}
+	}
+
 	public class ResetScale : DocumentCommandHandler
 	{
 		public override void Execute()

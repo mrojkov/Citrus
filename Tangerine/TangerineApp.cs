@@ -28,7 +28,6 @@ namespace Tangerine
 			WidgetInput.AcceptMouseBeyondWidgetByDefault = false;
 			Application.IsTangerine = true;
 			Serialization.DeserializerBuilders.Insert(0, DeserializeHotStudioAssets);
-			Widget.DefaultWidgetSize = Vector2.Zero;
 
 			UserPreferences.Initialize();
 			SetColorTheme(UserPreferences.Instance.Theme);
@@ -152,6 +151,7 @@ namespace Tangerine
 			tb.Add(Tools.AlignCentersVertically);
 			tb.Add(Tools.CenterHorizontally);
 			tb.Add(Tools.CenterVertically);
+			tb.Add(Tools.RestoreOriginalSize);
 			tb.Add(Tools.ResetScale);
 			tb.Add(Tools.ResetRotation);
 			tb.Add(Tools.FitToContainer);
@@ -351,6 +351,7 @@ namespace Tangerine
 			h.Connect(Tools.CenterVertically, new CenterVertically());
 			h.Connect(Tools.AlignCentersHorizontally, new AlignCentersHorizontally());
 			h.Connect(Tools.AlignCentersVertically, new AlignCentersVertically());
+			h.Connect(Tools.RestoreOriginalSize, new RestoreOriginalSize());
 			h.Connect(Tools.ResetScale, new ResetScale());
 			h.Connect(Tools.ResetRotation, new ResetRotation());
 			h.Connect(Tools.FitToContainer, new FitToContainer());
