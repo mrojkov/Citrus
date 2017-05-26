@@ -207,6 +207,10 @@ namespace Tangerine.UI.Timeline
 			h.Connect(TimelineCommands.FastScrollLeft, () => AdvanceCurrentColumn(-10), Document.HasCurrent);
 			h.Connect(TimelineCommands.FastScrollRight, () => AdvanceCurrentColumn(10), Document.HasCurrent);
 			h.Connect(TimelineCommands.DeleteKeyframes, RemoveKeyframes, Document.HasCurrent);
+			h.Connect(TimelineCommands.CreateMarkerPlay, () => CreateMarker(MarkerAction.Play), Document.HasCurrent);
+			h.Connect(TimelineCommands.CreateMarkerStop, () => CreateMarker(MarkerAction.Stop), Document.HasCurrent);
+			h.Connect(TimelineCommands.CreateMarkerJump, () => CreateMarker(MarkerAction.Jump), Document.HasCurrent);
+			h.Connect(TimelineCommands.DeleteMarker, DeleteMarker, Document.HasCurrent);
 		}
 
 		static void SelectRow(int advance, bool multiselection)
@@ -258,6 +262,27 @@ namespace Tangerine.UI.Timeline
 		{
 			Operations.SetCurrentColumn.Perform(Math.Max(0, Instance.CurrentColumn + stride));
 		}
+
+		static void CreateMarker(MarkerAction action)
+		{
+			var timeline = Instance;
+			var newMarker = new Marker(
+				action == MarkerAction.Play ? "Start" : "",
+				timeline.CurrentColumn,
+				action
+			);
+			Core.Operations.SetMarker.Perform(Document.Current.Container.DefaultAnimation.Markers, newMarker);
+		}
+
+		static void DeleteMarker()
+		{
+			var timeline = Instance;
+			var marker = Document.Current.Container.Markers.FirstOrDefault(i => i.Frame == timeline.CurrentColumn);
+			if (marker != null) {
+				Core.Operations.DeleteMarker.Perform(Document.Current.Container.DefaultAnimation.Markers, marker);
+			}
+		}
+
 	}
 
 	public static class RowExtensions
