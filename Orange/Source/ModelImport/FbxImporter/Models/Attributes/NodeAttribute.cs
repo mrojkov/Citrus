@@ -33,6 +33,8 @@ namespace Orange.FbxImporter
 					return Empty;
 				case FbxNodeType.MESH:
 					return new MeshAttribute(attribute);
+				case FbxNodeType.CAMERA:
+					return new CameraAttribute(attribute);
 				default:
 					return Empty;
 			}
@@ -47,9 +49,6 @@ namespace Orange.FbxImporter
 
 		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
 		public static extern FbxNodeType FbxNodeGetAttributeType(IntPtr node, int idx);
-
-		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr FbxNodeGetCameraAttribute(IntPtr node);
 
 		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
 		public static extern IntPtr FbxNodeGetAttribute(IntPtr node, int idx);

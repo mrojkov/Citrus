@@ -26,30 +26,36 @@ namespace Orange
 			Node3D node = null;
 			if (root == null)
 				return null;
-			if (root.Attributes.Length == 0) {
-				node = new Node3D { Id = root.Name };
-				node.SetLocalTransform(root.LocalTranform);
-			} else {
-				switch (root.Attributes[0].Type) {
-					case NodeAttribute.FbxNodeType.MESH:
-						var mesh = new Mesh3D { Id = root.Name };
-						foreach (var attribute in root.Attributes) {
-							if ((attribute as MeshAttribute).Vertices.Length > 0) {
-								mesh.Submeshes.Add(ImportSubmesh(attribute as MeshAttribute, root));
-							}
+			switch (root.Attributes[0].Type) {
+				case NodeAttribute.FbxNodeType.MESH:
+					var mesh = new Mesh3D { Id = root.Name };
+					foreach (var attribute in root.Attributes) {
+						if ((attribute as MeshAttribute).Vertices.Length > 0) {
+							mesh.Submeshes.Add(ImportSubmesh(attribute as MeshAttribute, root));
 						}
-						if (mesh.Submeshes.Count != 0) {
-							node = mesh;
-							mesh.SetLocalTransform(root.LocalTranform);
-							mesh.RecalcBounds();
-							mesh.RecalcCenter();
-						}
-						break;
-					default:
-						node = new Node3D { Id = root.Name };
-						node.SetLocalTransform(root.LocalTranform);
-						break;
-				}
+					}
+					if (mesh.Submeshes.Count != 0) {
+						node = mesh;
+						mesh.SetLocalTransform(root.LocalTranform);
+						mesh.RecalcBounds();
+						mesh.RecalcCenter();
+					}
+					break;
+				case NodeAttribute.FbxNodeType.CAMERA:
+					var cam = root.Attributes[0] as CameraAttribute; 
+					node = new Camera3D {
+						Id = root.Name,
+						FieldOfView = cam.FieldOfView,
+						AspectRatio = cam.AspectRatio,
+						NearClipPlane = cam.NearClipPlane,
+						FarClipPlane = cam.FarClipPlane,
+					};
+					node.SetLocalTransform(root.LocalTranform);
+					break;
+				default:
+					node = new Node3D { Id = root.Name };
+					node.SetLocalTransform(root.LocalTranform);
+					break;
 			}
 
 			if (node != null) {

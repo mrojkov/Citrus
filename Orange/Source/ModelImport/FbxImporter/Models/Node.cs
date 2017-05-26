@@ -8,7 +8,7 @@ namespace Orange.FbxImporter
 {
 	public class Node : FbxObject
 	{
-		public NodeAttribute[] Attributes { get; private set; }
+		public NodeAttribute[] Attributes { get; private set; } = new NodeAttribute[1] { NodeAttribute.Empty };
 
 		public List<Node> Children { get; } = new List<Node>();
 
@@ -30,9 +30,11 @@ namespace Orange.FbxImporter
 				Materials[i] = new Material(FbxNodeGetMaterial(NativePtr, i));
 			}
 
-			Attributes = new NodeAttribute[attribCount];
-			for (int i = 0; i < attribCount; i++) {
-				Attributes[i] = NodeAttribute.GetFromNode(NativePtr, i);
+			if (attribCount > 0) {
+				Attributes = new NodeAttribute[attribCount];
+				for (int i = 0; i < attribCount; i++) {
+					Attributes[i] = NodeAttribute.GetFromNode(NativePtr, i);
+				}
 			}
 
 			for (int i = 0; i < nodeCount; i++) {
