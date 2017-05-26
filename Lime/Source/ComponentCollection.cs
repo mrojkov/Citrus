@@ -6,7 +6,7 @@ namespace Lime
 {
 	public class ComponentCollection<Component> : IEnumerable<Component>
 	{
-		private Bucket[] buckets = empty;
+		protected Bucket[] buckets = empty;
 
 		private static Bucket[] empty = new Bucket[0];
 
@@ -132,7 +132,7 @@ namespace Lime
 			public static readonly int Key = System.Threading.Interlocked.Increment(ref componentKeyCounter);
 		}
 
-		private struct Bucket
+		protected struct Bucket
 		{
 			// Key special values:
 			//  0 - means an empty bucket.

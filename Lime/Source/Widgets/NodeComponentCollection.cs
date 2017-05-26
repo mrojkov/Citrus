@@ -1,5 +1,4 @@
 using System;
-using Yuzu;
 
 namespace Lime
 {
@@ -22,9 +21,18 @@ namespace Lime
 
 		public NodeComponentCollection Clone(Node newOwner)
 		{
-			var result = new NodeComponentCollection(newOwner);
-			foreach (var node in this) {
-				result.Add(node.Clone());
+			// Hack. Remove this when non-generic Add() is designed
+			var result = new NodeComponentCollection(newOwner) {
+				buckets = new Bucket[buckets.Length]
+			};
+			for (var i = 0; i < buckets.Length; i++) {
+				var bucket = buckets[i];
+				var clone = new Bucket() {
+					Key = bucket.Key,
+					Component = bucket.Component.Clone(),
+				};
+				clone.Component.Owner = newOwner;
+				result.buckets[i] = clone;
 			}
 			return result;
 		}
