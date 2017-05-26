@@ -8,13 +8,11 @@ namespace Orange.FbxImporter
 {
 	public class Node : FbxObject
 	{
-		public NodeAttribute Attribute { get; private set; } = NodeAttribute.Empty;
+		public NodeAttribute[] Attributes { get; private set; }
 
 		public List<Node> Children { get; } = new List<Node>();
 
-		public Material Material { get; private set; }
-
-		public Matrix44 GlobalTranform { get; private set; }
+		public Material[] Materials { get; private set; }
 
 		public Matrix44 LocalTranform { get; private set; }
 
@@ -22,32 +20,26 @@ namespace Orange.FbxImporter
 
 		public Node(IntPtr ptr) : base (ptr)
 		{
-			int count = FbxNodeGetChildCount(NativePtr);
-			var materialPtr = FbxNodeGetMaterial(NativePtr);
-			Material = new Material(materialPtr);
+			var nodeCount = FbxNodeGetChildCount(NativePtr);
+			var attribCount = FbxNodeGetAttributeCount(NativePtr);
+			var materialsCount = FbxNodeGetMaterialCount(NativePtr);
 
 			Name = Marshal.PtrToStringAnsi(FbxNodeGetName(NativePtr));
-			Attribute = NodeAttribute.GetFromNode(NativePtr, 0);
-			for (int i = 0; i < count; i++) {
+			Materials = new Material[materialsCount];
+			for (int i = 0; i < materialsCount; i++) {
+				Materials[i] = new Material(FbxNodeGetMaterial(NativePtr, i));
+			}
+
+			Attributes = new NodeAttribute[attribCount];
+			for (int i = 0; i < attribCount; i++) {
+				Attributes[i] = NodeAttribute.GetFromNode(NativePtr, i);
+			}
+
+			for (int i = 0; i < nodeCount; i++) {
 				Children.Add(new Node(FbxNodeGetChildNode(NativePtr, i)));
 			}
-			GlobalTranform = FbxNodeGetGlobalTransform(NativePtr).To<Mat4x4>().ToLime();
-			LocalTranform =  FbxNodeGetLocalTransform(NativePtr).To<Mat4x4>().ToLime();
-		}
 
-		public override string ToString(int level)
-		{
-			StringBuilder builder = new StringBuilder();
-			builder.AppendLine("Node: ".ToLevel(level + 1));
-			builder.Append("Attribute: ".ToLevel(level + 2));
-			builder.AppendLine(Attribute.ToString(level + 3));
-			builder.Append("Material: ".ToLevel(level + 2));
-			builder.AppendLine(Material?.ToString(level + 3) ?? "None");
-			builder.AppendLine("Children: ".ToLevel(level + 2));
-			foreach(var node in Children) {
-				builder.Append(node.ToString(level + 1));
-			}
-			return builder.ToString();
+			LocalTranform =  FbxNodeGetLocalTransform(NativePtr).To<Mat4x4>().ToLime();
 		}
 
 		#region PInvokes
@@ -59,10 +51,7 @@ namespace Orange.FbxImporter
 		public static extern int FbxNodeGetChildCount(IntPtr node);
 
 		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr FbxNodeGetMaterial(IntPtr node);
-
-		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr FbxNodeGetGlobalTransform(IntPtr node);
+		public static extern IntPtr FbxNodeGetMaterial(IntPtr node, int idx);
 
 		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
 		public static extern IntPtr FbxNodeGetLocalTransform(IntPtr node);
@@ -72,6 +61,9 @@ namespace Orange.FbxImporter
 
 		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
 		public static extern int FbxNodeGetAttributeCount(IntPtr node);
+
+		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
+		public static extern int FbxNodeGetMaterialCount(IntPtr node);
 
 		#endregion
 	}

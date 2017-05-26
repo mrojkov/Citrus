@@ -26,16 +26,30 @@ namespace Orange
 			Node3D node = null;
 			if (root == null)
 				return null;
-			switch (root.Attribute.Type) {
-				case NodeAttribute.FbxNodeType.MESH:
-					if ((root.Attribute as MeshAttribute).Vertices.Length != 0) {
-						node = GetMeshNode(root.Attribute as MeshAttribute, root);
-					}
-					break;
-				default: 
-					node = new Node3D { Id = root.Name };
-					node.SetLocalTransform(root.LocalTranform);
-					break;
+			if (root.Attributes.Length == 0) {
+				node = new Node3D { Id = root.Name };
+				node.SetLocalTransform(root.LocalTranform);
+			} else {
+				switch (root.Attributes[0].Type) {
+					case NodeAttribute.FbxNodeType.MESH:
+						var mesh = new Mesh3D { Id = root.Name };
+						foreach (var attribute in root.Attributes) {
+							if ((attribute as MeshAttribute).Vertices.Length > 0) {
+								mesh.Submeshes.Add(ImportSubmesh(attribute as MeshAttribute, root));
+							}
+						}
+						if (mesh.Submeshes.Count != 0) {
+							node = mesh;
+							mesh.SetLocalTransform(root.LocalTranform);
+							mesh.RecalcBounds();
+							mesh.RecalcCenter();
+						}
+						break;
+					default:
+						node = new Node3D { Id = root.Name };
+						node.SetLocalTransform(root.LocalTranform);
+						break;
+				}
 			}
 
 			if (node != null) {
@@ -50,38 +64,38 @@ namespace Orange
 			return node;
 		}
 
-		private Node3D GetMeshNode(MeshAttribute meshAttribute, FbxImporter.Node node)
+		private Submesh3D ImportSubmesh(MeshAttribute meshAttribute, FbxImporter.Node node)
 		{
-			var mesh = new Mesh3D { Id = node.Name };
-			
-				var sm = new Submesh3D();
-				sm.Mesh = new Mesh {
-					VertexBuffers = new[] {
-						new VertexBuffer<Mesh3D.Vertex> {
-							Data = meshAttribute.Vertices,
-						}
+			var sm = new Submesh3D();
+			sm.Mesh = new Mesh {
+				VertexBuffers = new[] {
+					new VertexBuffer<Mesh3D.Vertex> {
+						Data = meshAttribute.Vertices,
 					},
-					IndexBuffer = new IndexBuffer { Data = meshAttribute.Indices.Select(index => checked((ushort)index)).ToArray() },
-					Attributes = new[] { new[] {
-						ShaderPrograms.Attributes.Pos1,
-						ShaderPrograms.Attributes.Color1,
-						ShaderPrograms.Attributes.UV1,
-						ShaderPrograms.Attributes.BlendIndices,
-						ShaderPrograms.Attributes.BlendWeights
-					}}
-				};
-			sm.Material = node.Material.ToLime(path);
+				},
+				IndexBuffer = new IndexBuffer { Data = meshAttribute.Indices.Select(index => checked((ushort)index)).ToArray() },
+				Attributes = new[] { new[] {
+					ShaderPrograms.Attributes.Pos1,
+					ShaderPrograms.Attributes.Color1,
+					ShaderPrograms.Attributes.UV1,
+					ShaderPrograms.Attributes.BlendIndices,
+					ShaderPrograms.Attributes.BlendWeights
+				}}
+			};
+			
+			if (meshAttribute.MaterialIndex != -1) {
+				sm.Material = node.Materials[meshAttribute.MaterialIndex].ToLime(path);
+			} else {
+				sm.Material = Material.Default;
+			}
+
 			if (meshAttribute.Bones.Length > 0) {
 				foreach (var bone in meshAttribute.Bones) {
 					sm.BoneNames.Add(bone.Name);
 					sm.BoneBindPoses.Add(bone.Offset);
 				}
 			}
-			mesh.Submeshes.Add(sm);
-			mesh.SetLocalTransform(node.LocalTranform);
-			mesh.RecalcBounds();
-			mesh.RecalcCenter();
-			return mesh;
+			return sm;
 		}
 
 		private void ImportAnimations() {

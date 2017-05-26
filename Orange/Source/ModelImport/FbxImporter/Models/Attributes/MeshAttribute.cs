@@ -16,6 +16,8 @@ namespace Orange.FbxImporter
 	{
 		public int[] Indices { get; private set; }
 
+		public int MaterialIndex { get; private set; }
+
 		public Mesh3D.Vertex[] Vertices { get; private set; }
 
 		public Bone[] Bones { get; private set; }
@@ -27,12 +29,13 @@ namespace Orange.FbxImporter
 			var mesh = FbxNodeGetMeshAttribute(NativePtr).To<MeshData>();
 			var colors = mesh.colors.ToStructArray<Vec4>(mesh.verticesCount);
 			var verices = mesh.points.ToStructArray<Vec3>(mesh.verticesCount);
-			var materialCount = FbxNodeGetMeshMaterialCount(NativePtr);
+
 			var uv = mesh.uvCoords.ToStructArray<Vec2>(mesh.verticesCount);
 			var weights = mesh.weights.ToStructArray<WeightData>(mesh.verticesCount);
 			var bones = mesh.bones.ToStructArray<BoneData>(mesh.boneCount);
 
 			Indices = mesh.vertices.ToIntArray(mesh.verticesCount);
+			MaterialIndex = mesh.materialIndex;
 			Vertices = new Mesh3D.Vertex[mesh.verticesCount];
 			Bones = new Bone[mesh.boneCount];
 
@@ -104,9 +107,6 @@ namespace Orange.FbxImporter
 		public static extern IntPtr FbxNodeGetMeshAttribute(IntPtr node);
 
 		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern int FbxNodeGetMeshMaterialCount(IntPtr pMesh);
-
-		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
 		public static extern IntPtr FbxNodeGetMeshMaterial(IntPtr pMesh, int idx);
 
 		#endregion
@@ -116,9 +116,6 @@ namespace Orange.FbxImporter
 		[StructLayout(LayoutKind.Sequential)]
 		private class MeshData
 		{
-			[MarshalAs(UnmanagedType.I4)]
-			public int verticesCount;
-
 			public IntPtr vertices;
 
 			public IntPtr points;
@@ -129,10 +126,16 @@ namespace Orange.FbxImporter
 
 			public IntPtr weights;
 
+			public IntPtr bones;
+
+			[MarshalAs(UnmanagedType.I4)]
+			public int materialIndex;
+
+			[MarshalAs(UnmanagedType.I4)]
+			public int verticesCount;
+
 			[MarshalAs(UnmanagedType.I4)]
 			public int boneCount;
-
-			public IntPtr bones;
 		}
 
 		[StructLayout(LayoutKind.Sequential)]

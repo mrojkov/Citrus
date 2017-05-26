@@ -6,6 +6,10 @@ namespace Orange.FbxImporter
 {
 	public class Material : FbxObject
 	{
+		internal static IMaterial Default = new CommonMaterial {
+			Name = "Default",
+		};
+
 		public string Path { get; private set; }
 
 		public string Name { get; private set; }
