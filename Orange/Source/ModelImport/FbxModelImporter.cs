@@ -89,11 +89,8 @@ namespace Orange
 				}}
 			};
 			
-			if (meshAttribute.MaterialIndex != -1) {
-				sm.Material = node.Materials[meshAttribute.MaterialIndex].ToLime(path);
-			} else {
-				sm.Material = Material.Default;
-			}
+			sm.Material = meshAttribute.MaterialIndex != -1 ? 
+				node.Materials[meshAttribute.MaterialIndex].ToLime(path) : Material.Default;
 
 			if (meshAttribute.Bones.Length > 0) {
 				foreach (var bone in meshAttribute.Bones) {

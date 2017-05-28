@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -21,8 +22,14 @@ namespace Orange.FbxImporter
 		private Manager(IntPtr ptr) : base(ptr)
 		{ }
 
-		public Scene LoadScene(string fileName) {
-			return new Scene(FbxManagerLoadScene(NativePtr, new StringBuilder(fileName)));
+		[HandleProcessCorruptedStateExceptions]
+		public Scene LoadScene(string fileName)
+		{
+			try {
+				return new Scene(FbxManagerLoadScene(NativePtr, new StringBuilder(fileName)));
+			} catch(Exception e) {
+				throw new Exception(e.Message, e);
+			}
 		}
 
 		~Manager()
