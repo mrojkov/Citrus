@@ -14,6 +14,7 @@ namespace Orange
 
 		public FbxModelImporter(string path, TargetPlatform platform)
 		{
+			this.platform = platform;
 			this.path = path;
 			scene = Manager.Instance.LoadScene(path);
 			Model = new Model3D();
@@ -33,6 +34,9 @@ namespace Orange
 						if ((attribute as MeshAttribute).Vertices.Length > 0) {
 							mesh.Submeshes.Add(ImportSubmesh(attribute as MeshAttribute, root));
 						}
+					}
+					if (platform == TargetPlatform.Unity) {
+						mesh.CullMode = CullMode.CullCounterClockwise;
 					}
 					if (mesh.Submeshes.Count != 0) {
 						node = mesh;
