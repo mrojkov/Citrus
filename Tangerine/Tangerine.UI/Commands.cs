@@ -20,6 +20,8 @@ namespace Tangerine.UI
 		public static readonly ICommand CreateMarkerStop = new Command("Create Stop Marker", new Shortcut(Modifiers.Alt, Key.Number2));
 		public static readonly ICommand CreateMarkerJump = new Command("Create Jump Marker", new Shortcut(Modifiers.Alt, Key.Number3));
 		public static readonly ICommand DeleteMarker = new Command("Delete Marker", new Shortcut(Modifiers.Alt, Key.Number4));
+		public static readonly ICommand CopyMarkers = new Command("Copy Markers");
+		public static readonly ICommand PasteMarkers = new Command("Paste Markers");
 	}
 
 	public static class InspectorCommands

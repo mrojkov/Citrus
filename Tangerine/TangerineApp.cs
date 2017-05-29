@@ -338,7 +338,7 @@ namespace Tangerine
 		void RegisterGlobalCommands()
 		{
 			UI.Inspector.Inspector.RegisterGlobalCommands();
-			UI.Timeline.Timeline.RegisterGlobalCommands();
+			UI.Timeline.CommandBindings.Bind();
 			UI.SceneView.SceneView.RegisterGlobalCommands();
 
 			var h = CommandHandlerList.Global;

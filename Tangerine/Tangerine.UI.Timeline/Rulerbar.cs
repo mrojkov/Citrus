@@ -114,14 +114,8 @@ namespace Tangerine.UI.Timeline
 			{
 				var i = Window.Current.Input;
 				var m = new Menu {
-					Command.Undo,
-					Command.MenuSeparator,
-					Command.Cut,
-					Command.Copy,
-					Command.Paste,
-					Command.Delete,
-					Command.MenuSeparator,
-					Command.SelectAll,
+					TimelineCommands.CopyMarkers,
+					TimelineCommands.PasteMarkers,
 				};
 				m.Popup();
 			}
