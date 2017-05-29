@@ -122,7 +122,12 @@ namespace Tangerine.UI.FilesystemView
 				return;
 			}
 			CookingRulesScrollView.Content.Nodes.Clear();
-			var t = Orange.CookingRulesBuilder.Build(new FileEnumerator(Orange.The.Workspace.AssetsDirectory, new System.IO.FileInfo(selection.First()).Directory.FullName), ActiveTarget);
+			var targetDir = new System.IO.FileInfo(selection.First()).Directory.FullName;
+			if (!targetDir.StartsWith(Orange.The.Workspace.AssetsDirectory)) {
+				// We're somewhere outside the project directory
+				return;
+			}
+			var t = Orange.CookingRulesBuilder.Build(new FileEnumerator(Orange.The.Workspace.AssetsDirectory, targetDir), ActiveTarget);
 
 			foreach (var item in selection) {
 				var key = item;
