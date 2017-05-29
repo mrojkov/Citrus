@@ -68,13 +68,14 @@ namespace Tangerine.Core
 
 		public bool Close()
 		{
-			fsWatcher.Dispose();
 			if (Current != this) {
 				throw new InvalidOperationException();
 			}
 			if (Current == Null) {
 				return true;
 			}
+			fsWatcher?.Dispose();
+			fsWatcher = null;
 			var userprefs = new Userprefs();
 			if (Document.Current != null) {
 				userprefs.CurrentDocument = Document.Current.Path;
