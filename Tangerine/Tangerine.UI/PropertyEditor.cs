@@ -704,8 +704,8 @@ namespace Tangerine.UI
 			return tb;
 		}
 
-		float[] a = { 0, 0, 1, 0, 0, 0, 0, 1, 0, 0.5f, 0.5f, 0 };
-		float[] b = { 0, 1, 1, 1, 1, 0, 1, 1, 1, 0.5f, 0.5f, 1 };
+		float[] a = { 0, 0, 1, 0, 0, 0, 0, 1, 0.5f, 0, 0, 0.5f };
+		float[] b = { 0, 1, 1, 1, 1, 0, 1, 1, 0.5f, 1, 1, 0.5f };
 
 		void DrawIcon(Widget button, Anchors anchor)
 		{
