@@ -226,10 +226,8 @@ namespace Lime
 			eb.Updated += delta => {
 				vc.Width = eb.Editor.OverwriteMode && !eb.Editor.HasSelection() ?
 					tw.Font.Chars.Get(eb.Editor.CurrentChar(), tw.FontHeight)?.Width ?? 5f : 0f;
-				if (eb.IsFocused()) {
-					if (eb.IsMouseOverThisOrDescendant() && WidgetContext.Current.MouseCursor == MouseCursor.Default) {
-						WidgetContext.Current.MouseCursor = MouseCursor.IBeam;
-					}
+				if (eb.IsMouseOverThisOrDescendant() && WidgetContext.Current.MouseCursor == MouseCursor.Default) {
+					WidgetContext.Current.MouseCursor = MouseCursor.IBeam;
 				}
 			};
 			new CaretDisplay(
