@@ -41,7 +41,7 @@ namespace Lime
 			public Color4 ScrollbarBackground;
 			public Color4 ScrollbarThumb;
 			public Color4 TextCaret;
-		
+
 			public static ColorTheme CreateDarkTheme()
 			{
 				var grayBackground = new Color4(45, 45, 48);
@@ -223,9 +223,15 @@ namespace Lime
 			};
 			eb.Editor = new Editor(tw, editorParams, eb);
 			var vc = new VerticalLineCaret { Color = Colors.TextCaret };
-			eb.Updated += delta =>
+			eb.Updated += delta => {
 				vc.Width = eb.Editor.OverwriteMode && !eb.Editor.HasSelection() ?
 					tw.Font.Chars.Get(eb.Editor.CurrentChar(), tw.FontHeight)?.Width ?? 5f : 0f;
+				if (eb.IsFocused()) {
+					if (eb.IsMouseOverThisOrDescendant() && WidgetContext.Current.MouseCursor == MouseCursor.Default) {
+						WidgetContext.Current.MouseCursor = MouseCursor.IBeam;
+					}
+				}
+			};
 			new CaretDisplay(
 				tw, eb.Editor.CaretPos, new CaretParams { CaretPresenter = vc });
 			new SelectionPresenter(
