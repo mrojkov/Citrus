@@ -26,14 +26,15 @@ namespace Tangerine.UI.FilesystemView
 		private readonly Selection selection = new Selection();
 		private Widget cookingRulesRoot;
 
-		public FilesystemView(Widget panelWidget)
+		public FilesystemView(DockPanel dockPanel)
 		{
-			PanelWidget = panelWidget;
+			PanelWidget = dockPanel.ContentWidget;
 			RootWidget = new Widget();
 			FilesystemToolbar = new FilesystemToolbar();
 			CookingRulesToolbar = new Toolbar();
 			CookingRulesScrollView = new ScrollViewWidget();
 			FilesScrollView = new ScrollViewWidget();
+			RootWidget.AddChangeWatcher(() => Model.CurrentPath, (path) => dockPanel.Title = $"Filesystem: {path}");
 			InitializeWidgets();
 		}
 

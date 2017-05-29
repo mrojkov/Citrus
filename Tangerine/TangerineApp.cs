@@ -112,7 +112,7 @@ namespace Tangerine
 						new UI.SceneView.SceneView(documentViewContainer),
 						new UI.SearchPanel(searchPanel.ContentWidget),
 						#if WIN
-						new UI.FilesystemView.FilesystemView(filesystemPanel.ContentWidget),
+						new UI.FilesystemView.FilesystemView(filesystemPanel),
 						#endif
 					});
 				}
