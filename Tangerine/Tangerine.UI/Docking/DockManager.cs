@@ -243,15 +243,5 @@ namespace Tangerine.UI
 			[YuzuMember]
 			public Vector2 MainWindowSize;
 		}
-
-		public void UpdateWindowTitle()
-		{
-			var title = "Tangerine";
-			if (Project.Current != null) {
-				var citProjName = Path.GetFileNameWithoutExtension(Project.Current.CitprojPath);
-				title = $"{citProjName} - Tangerine";
-			}
-			MainWindowWidget.Window.Title = title;
-		}
 	}
 }

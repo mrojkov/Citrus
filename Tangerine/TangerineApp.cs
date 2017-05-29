@@ -37,6 +37,7 @@ namespace Tangerine
 			PadsMenu = new Menu();
 			DockManager.Initialize(new Vector2(1024, 768), PadsMenu);
 			DockManager.Instance.MainWindowWidget.Window.AllowDropFiles = true;
+			SetupMainWindowTitle();
 			CreateMainMenu();
 
 			Application.Exiting += () => Project.Current.Close();
@@ -119,9 +120,21 @@ namespace Tangerine
 			var proj = UserPreferences.Instance.RecentProjects.FirstOrDefault();
 			if (proj != null) {
 				new Project(proj).Open();
-				dockManager.UpdateWindowTitle();
 			}
 			RegisterGlobalCommands();
+		}
+
+		void SetupMainWindowTitle()
+		{
+			var mainWidget = DockManager.Instance.MainWindowWidget;
+			mainWidget.AddChangeWatcher(() => Project.Current, _ => {
+				var title = "Tangerine";
+				if (Project.Current != Project.Null) {
+					var citProjName = System.IO.Path.GetFileNameWithoutExtension(Project.Current.CitprojPath);
+					title = $"{citProjName} - Tangerine";
+				}
+				mainWidget.Window.Title = title;
+			});
 		}
 
 		void SetColorTheme(ColorThemeEnum theme)
