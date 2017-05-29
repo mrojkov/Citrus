@@ -91,6 +91,7 @@
     <Compile Include="Components\HasKeyframeRequest.cs" />
     <Compile Include="MarkerPropertiesDialog.cs" />
     <Compile Include="Processors\Rulerbar\RulerbarMouseScrollProcessor.cs" />
+    <Compile Include="CommandBindings.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Commands\" />
@@ -111,6 +112,10 @@
     <ProjectReference Include="..\Tangerine.UI\Tangerine.UI.Win.csproj">
       <Project>{e62ba18f-4e1a-466a-8299-67ad567f17e5}</Project>
       <Name>Tangerine.UI.Win</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Yuzu\Yuzu.csproj">
+      <Project>{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}</Project>
+      <Name>Yuzu</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

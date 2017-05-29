@@ -22,6 +22,7 @@ namespace Tangerine.UI
 		public static readonly ICommand DeleteMarker = new Command("Delete Marker", new Shortcut(Modifiers.Alt, Key.Number4));
 		public static readonly ICommand CopyMarkers = new Command("Copy Markers");
 		public static readonly ICommand PasteMarkers = new Command("Paste Markers");
+		public static readonly ICommand DeleteMarkers = new Command("Delete Markers");
 	}
 
 	public static class InspectorCommands

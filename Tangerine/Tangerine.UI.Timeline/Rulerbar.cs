@@ -116,6 +116,7 @@ namespace Tangerine.UI.Timeline
 				var m = new Menu {
 					TimelineCommands.CopyMarkers,
 					TimelineCommands.PasteMarkers,
+					TimelineCommands.DeleteMarkers
 				};
 				m.Popup();
 			}

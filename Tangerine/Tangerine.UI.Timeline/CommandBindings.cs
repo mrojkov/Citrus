@@ -34,6 +34,7 @@ namespace Tangerine.UI.Timeline
 			h.Connect(TimelineCommands.DeleteMarker, DeleteMarker, Document.HasCurrent);
 			h.Connect(TimelineCommands.CopyMarkers, CopyMarkers, Document.HasCurrent);
 			h.Connect(TimelineCommands.PasteMarkers, PasteMarkers, Document.HasCurrent);
+			h.Connect(TimelineCommands.DeleteMarkers, DeleteMarkers, Document.HasCurrent);
 		}
 
 		static void SelectRow(int advance, bool multiselection)
@@ -108,12 +109,39 @@ namespace Tangerine.UI.Timeline
 
 		static void CopyMarkers()
 		{
-
+			var frame = new Frame();
+			foreach (var marker in Document.Current.Container.Markers) {
+				frame.Markers.Add(marker);
+			}
+			var stream = new System.IO.MemoryStream();
+			Serialization.WriteObject(Document.Current.Path, stream, frame, Serialization.Format.JSON);
+			var text = System.Text.Encoding.UTF8.GetString(stream.ToArray());
+			Clipboard.Text = text;
 		}
 
 		static void PasteMarkers()
 		{
+			try {
+				var text = Clipboard.Text;
+				var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(text));
+				Frame frame;
+				using (Theme.Push(DefaultTheme.Instance)) {
+					frame = Serialization.ReadObject<Frame>(Document.Current.Path, stream);
+				}
+				foreach (var marker in frame.Markers) {
+					Core.Operations.SetMarker.Perform(Document.Current.Container.DefaultAnimation.Markers, marker);
+				}
+			} catch (System.Exception e) {
+				Debug.Write(e);
+			}
+		}
 
+		static void DeleteMarkers()
+		{
+			var timeline = Timeline.Instance;
+			foreach (var marker in Document.Current.Container.Markers.ToList()) {
+				Core.Operations.DeleteMarker.Perform(Document.Current.Container.DefaultAnimation.Markers, marker);
+			}
 		}
 	}
 }
