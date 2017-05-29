@@ -8,12 +8,13 @@ using Lime;
 
 namespace Tangerine.UI.FilesystemView
 {
-	public static class SystemIconTextureCache
+	public class SystemIconTextureProvider : ISystemIconTextureProvider
 	{
 		private static readonly Dictionary<string, ITexture> textureCache = new Dictionary<string, ITexture>();
 		private static ITexture directoryTexture;
+		public static SystemIconTextureProvider Instance { get; set; } = new SystemIconTextureProvider();
 
-		public static ITexture GetTexture(string path)
+		public ITexture GetTexture(string path)
 		{
 			if (path.IsNullOrWhiteSpace()) {
 				return TexturePool.Instance.GetTexture(null);

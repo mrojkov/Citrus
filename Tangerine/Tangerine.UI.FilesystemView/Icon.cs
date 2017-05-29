@@ -18,7 +18,7 @@ namespace Tangerine.UI.FilesystemView
 					Stretch = Vector2.Zero
 				},
 				MinSize = MaxSize = new Vector2(16, 16),
-				Texture = SystemIconTextureCache.GetTexture(path),
+				Texture = SystemIconTextureProvider.Instance.GetTexture(path),
 			});
 			Nodes.Add(new SimpleText { Text = Path.GetFileName(path) });
 			Padding = new Thickness(5.0f);

@@ -278,6 +278,10 @@ namespace Tangerine.UI.FilesystemView
 						input.ConsumeKey(Key.Mouse0DoubleClick);
 						Model.GoTo(item);
 					}
+					if (iconWidget.Input.WasKeyPressed(Key.Mouse1)) {
+						iconWidget.Input.ConsumeKey(Key.Mouse1);
+						SystemShellContextMenu.Instance.Show(item);
+					}
 					if (iconWidget.Input.WasKeyPressed(Key.Mouse0)) {
 						input.ConsumeKey(Key.Mouse0);
 						if (input.IsKeyPressed(Key.Control) && !input.IsKeyPressed(Key.Shift)) {
@@ -347,6 +351,12 @@ namespace Tangerine.UI.FilesystemView
 					input.ConsumeKey(Key.Mouse0);
 					rectSelecting = true;
 					rectSelectionBeginPoint = input.LocalMousePosition;
+				}
+				if (input.WasKeyPressed(Key.Mouse1)) {
+					input.ConsumeKey(Key.Mouse1);
+					rectSelecting = false;
+					selection.Clear();
+					SystemShellContextMenu.Instance.Show(Model.CurrentPath);
 				}
 			}
 			if (rectSelecting) {

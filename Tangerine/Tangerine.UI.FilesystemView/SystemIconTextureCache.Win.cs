@@ -8,12 +8,13 @@ using Lime;
 
 namespace Tangerine.UI.FilesystemView
 {
-	public static class SystemIconTextureCache
+	public class SystemIconTextureProvider : ISystemIconTextureProvider
 	{
 		private static readonly Dictionary<string, ITexture> textureCache = new Dictionary<string, ITexture>();
 		private static ITexture directoryTexture;
+		public static SystemIconTextureProvider Instance { get; set; } = new SystemIconTextureProvider();
 
-		public static ITexture GetTexture(string path)
+		public ITexture GetTexture(string path)
 		{
 			if (path.IsNullOrWhiteSpace()) {
 				return TexturePool.Instance.GetTexture(null);
@@ -31,7 +32,7 @@ namespace Tangerine.UI.FilesystemView
 				return textureCache[ext];
 			}
 			var shInfo = new WinAPI.SHFILEINFO();
-			IntPtr r = WinAPI.SHGetFileInfo(path, 0, ref shInfo, (uint)Marshal.SizeOf(shInfo), WinAPI.SHGFI_ICON | WinAPI.SHGFI_SMALLICON);
+			IntPtr r = WinAPI.SHGetFileInfo(path, 0, out shInfo, (uint)Marshal.SizeOf(shInfo), WinAPI.SHGFI.SHGFI_ICON | WinAPI.SHGFI.SHGFI_SMALLICON);
 			if (r == IntPtr.Zero) {
 				return TexturePool.Instance.GetTexture(null);
 			}
@@ -48,32 +49,6 @@ namespace Tangerine.UI.FilesystemView
 				textureCache.Add(ext, t);
 			}
 			return t;
-		}	
-
-		class WinAPI
-		{
-			[StructLayout(LayoutKind.Sequential)]
-			public struct SHFILEINFO
-			{
-				public IntPtr hIcon;
-				public IntPtr iIcon;
-				public uint dwAttributes;
-				[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
-				public string szDisplayName;
-				[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 80)]
-				public string szTypeName;
-			};
-
-			public const uint SHGFI_ICON = 0x100;
-			public const uint SHGFI_LARGEICON = 0x0;	// 'Large icon
-			public const uint SHGFI_SMALLICON = 0x1;	// 'Small icon
-			public const uint SHGFI_ADDOVERLAYS = 0x000000020;
-
-			[DllImport("shell32.dll")]
-			public static extern IntPtr SHGetFileInfo(string pszPath, uint dwFileAttributes, ref SHFILEINFO psfi, uint cbSizeFileInfo, uint uFlags);
-
-			[DllImport("user32")]
-			public static extern int DestroyIcon(IntPtr hIcon);
 		}
 	}
 }
