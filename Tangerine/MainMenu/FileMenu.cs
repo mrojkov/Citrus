@@ -27,7 +27,7 @@ namespace Tangerine
 	{
 		public override void RefreshCommand(ICommand command)
 		{
-			command.Enabled = Project.Current != null;
+			command.Enabled = Project.Current != Project.Null;
 		}
 
 		public override void Execute()
@@ -40,7 +40,7 @@ namespace Tangerine
 	{
 		public override void RefreshCommand(ICommand command)
 		{
-			command.Enabled = Project.Current != null;
+			command.Enabled = Project.Current != Project.Null;
 		}
 
 		public override void Execute()
