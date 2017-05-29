@@ -31,10 +31,6 @@ namespace Orange.FbxImporter
 			return "Scene: \n" + Root.ToString(0);
 		}
 
-		~Scene() {
-			FbxSceneDestroy(NativePtr);
-		}
-
 		#region PInvokes
 
 		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]

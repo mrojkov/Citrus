@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -7,26 +8,23 @@ namespace Orange.FbxImporter
 {
 	public class Manager : FbxObject
 	{
-		public static Manager instance;
-		public static Manager Instance
+		private List<Scene> createdScenes = new List<Scene>();
+
+		public static Manager Create()
 		{
-			get 
-			{
-				if (instance == null) {
-					instance = new Manager(FbxCreateManager());
-				}
-				return instance;
-			}
+			return new Manager(FbxCreateManager());
 		}
 
-		private Manager(IntPtr ptr) : base(ptr)
+		public Manager(IntPtr ptr) : base(ptr)
 		{ }
 
 		[HandleProcessCorruptedStateExceptions]
 		public Scene LoadScene(string fileName)
 		{
 			try {
-				return new Scene(FbxManagerLoadScene(NativePtr, new StringBuilder(fileName)));
+				var scene = new Scene(FbxManagerLoadScene(NativePtr, new StringBuilder(fileName)));
+				createdScenes.Add(scene);
+				return scene;
 			} catch(Exception e) {
 				throw new Exception(e.Message, e);
 			}

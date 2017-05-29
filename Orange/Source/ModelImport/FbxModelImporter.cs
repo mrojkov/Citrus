@@ -8,7 +8,8 @@ namespace Orange
 	public partial class FbxModelImporter
 	{
 		private string path;
-		private Scene scene;
+		private Manager manager;
+		private TargetPlatform platform;
 
 		public Model3D Model { get; private set; }
 
@@ -16,10 +17,11 @@ namespace Orange
 		{
 			this.platform = platform;
 			this.path = path;
-			scene = Manager.Instance.LoadScene(path);
+			manager = Manager.Create();
+			var scene = manager.LoadScene(path);
 			Model = new Model3D();
 			Model.Nodes.Add(ImportNodes(scene.Root));
-			ImportAnimations();
+			ImportAnimations(scene);
 		}
 
 		private Lime.Node ImportNodes(FbxImporter.Node root, Lime.Node parent = null)
@@ -105,7 +107,7 @@ namespace Orange
 			return sm;
 		}
 
-		private void ImportAnimations() {
+		private void ImportAnimations(Scene scene) {
 			foreach(var animation in scene.Animations.Animations) {
 				var n = Model.TryFind<Node3D>(animation.Key);
 				var animationId = scene.Animations.Name;
