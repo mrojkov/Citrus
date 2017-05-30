@@ -112,13 +112,11 @@ namespace Tangerine.UI.Timeline
 		{
 			public void Show()
 			{
-				var i = Window.Current.Input;
-				var m = new Menu {
+				new Menu {
 					TimelineCommands.CopyMarkers,
 					TimelineCommands.PasteMarkers,
 					TimelineCommands.DeleteMarkers
-				};
-				m.Popup();
+				}.Popup();
 			}
 		}
 	}
