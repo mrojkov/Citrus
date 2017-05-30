@@ -118,8 +118,13 @@ namespace Tangerine.UI
 			}
 		}
 
-		static Yuzu.Json.JsonSerializer serializer = new Yuzu.Json.JsonSerializer();
-		static Yuzu.Json.JsonDeserializer deserializer = new Yuzu.Json.JsonDeserializer();
+		static Yuzu.Json.JsonSerializer serializer = new Yuzu.Json.JsonSerializer {
+			JsonOptions = new Yuzu.Json.JsonSerializeOptions { FieldSeparator = " ", Indent = "", EnumAsString = true } 
+		};
+
+		static Yuzu.Json.JsonDeserializer deserializer = new Yuzu.Json.JsonDeserializer {
+			JsonOptions = new Yuzu.Json.JsonSerializeOptions { EnumAsString = true } 
+		};
 
 		protected virtual void Copy()
 		{
