@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Globalization;
+using System.Linq;
 using Yuzu;
 
 namespace Lime
@@ -216,6 +218,47 @@ namespace Lime
 		public float SqrLength
 		{
 			get { return X * X + Y * Y + Z * Z; }
+		}
+
+		/// <summary>
+		/// Converts the string representation of the number to its <see cref="Vector3"/> equivalent.
+		/// </summary>
+		/// <param name="s">The string containing the vector to convert.</param>
+		/// <example>"12, 34, 56".</example>
+		public static Vector3 Parse(string s)
+		{
+			if (s == null) {
+				throw new ArgumentNullException();
+			}
+			Vector3 vector;
+			if (!TryParse(s, out vector)) {
+				throw new FormatException();
+			}
+			return vector;
+		}
+
+		/// <summary>
+		/// Converts the string representation of the vector to its <see cref="Vector3"/> equivalent.
+		/// The return value indicates whether the conversion succeeded.
+		/// </summary>
+		/// <param name="s">The string containing the vector to convert.</param>
+		/// <example>"12, 34, 56".</example>
+		/// <param name="vector">The result of conversion if it succeeds, <see cref="Zero"/> otherwise.</param>
+		public static bool TryParse(string s, out Vector3 vector)
+		{
+			vector = Zero;
+			if (s.IsNullOrWhiteSpace()) {
+				return false;
+			}
+
+			var parts = s.Split(new [] {", "}, StringSplitOptions.None);
+			if (parts.Length != 3 || parts.Any(i => i.IsNullOrWhiteSpace())) {
+				return false;
+			}
+
+			return float.TryParse(parts[0], NumberStyles.Float, CultureInfo.InvariantCulture, out vector.X)
+				&& float.TryParse(parts[1], NumberStyles.Float, CultureInfo.InvariantCulture, out vector.Y)
+				&& float.TryParse(parts[2], NumberStyles.Float, CultureInfo.InvariantCulture, out vector.Z);
 		}
 
 		/// <summary>
