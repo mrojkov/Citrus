@@ -159,6 +159,7 @@ namespace Orange
 
 	public class CookingRules : ICookingRules
 	{
+		public string SourceFilename;
 		public Dictionary<Target, ParticularCookingRules> TargetRules = new Dictionary<Target, ParticularCookingRules>();
 		public ParticularCookingRules CommonRules;
 		private ParticularCookingRules effectiveRules;
@@ -227,7 +228,6 @@ namespace Orange
 			return r;
 		}
 
-		public string SourceFilename;
 		public void Save()
 		{
 			using (var fs = new FileStream(SourceFilename, FileMode.Create)) {
@@ -240,6 +240,7 @@ namespace Orange
 			}
 		}
 
+		// TODO: rename
 		private string StringForValue(Meta.Item yi, object value)
 		{
 			if (value is bool) {
@@ -258,7 +259,7 @@ namespace Orange
 			}
 		}
 
-		public void SaveCookingRules(StreamWriter sw, ParticularCookingRules rules, Target target)
+		private void SaveCookingRules(StreamWriter sw, ParticularCookingRules rules, Target target)
 		{
 			var targetString = target == null ? "" : $"({target.Name})";
 			foreach (var yi in rules.FieldOverrides) {
@@ -291,10 +292,10 @@ namespace Orange
 	public class CookingRulesBuilder
 	{
 		public const string MainBundleName = "Main";
+		public const string CookingRulesFilename = "#CookingRules.txt";
 
 		public static Dictionary<string, CookingRules> Build(IFileEnumerator fileEnumerator, Target target)
 		{
-			var targetName = target?.Name;
 			var shouldRescanEnumerator = false;
 			var pathStack = new Stack<string>();
 			var rulesStack = new Stack<CookingRules>();
@@ -306,25 +307,34 @@ namespace Orange
 			using (new DirectoryChanger(fileEnumerator.Directory)) {
 				foreach (var fileInfo in fileEnumerator.Enumerate()) {
 					var path = fileInfo.Path;
-					while (!path.StartsWith(pathStack.Peek())) {
+					while (!("/" + path).StartsWith(pathStack.Peek())) {
 						rulesStack.Pop();
 						pathStack.Pop();
 					}
-					if (Path.GetFileName(path) == "#CookingRules.txt") {
-						pathStack.Push(Lime.AssetPath.GetDirectoryName(path));
+					if (Path.GetFileName(path) == CookingRulesFilename) {
+						pathStack.Push(Lime.AssetPath.GetDirectoryName(path) + "/");
 						var rules = ParseCookingRules(rulesStack.Peek(), path, target);
-						rules.SourceFilename = Path.Combine(fileEnumerator.Directory, path);
+						rules.SourceFilename = AssetPath.Combine(fileEnumerator.Directory, path);
 						rulesStack.Push(rules);
 						// Add 'ignore' cooking rules for this #CookingRules.txt itself
 						var ignoreRules = rules.InheritClone();
 						ignoreRules.Ignore = true;
 						map[path] = ignoreRules;
+						var directoryName = pathStack.Peek();
+						if (!string.IsNullOrEmpty(directoryName)) {
+							directoryName = directoryName.Remove(directoryName.Length - 1);
+							if (map.ContainsKey(directoryName)) {
+								map[directoryName] = rules;
+							} else {
+								throw new Lime.Exception("CookingRulesBuilder: invalid file enumeration format: directory should preceed it's cooking rules file");
+							}
+						}
 					} else if (Path.GetExtension(path) != ".txt") {
 						var rulesFile = path + ".txt";
 						var rules = rulesStack.Peek();
 						if (File.Exists(rulesFile)) {
 							rules = ParseCookingRules(rulesStack.Peek(), rulesFile, target);
-							rules.SourceFilename = Path.Combine(fileEnumerator.Directory, rulesFile);
+							rules.SourceFilename = AssetPath.Combine(fileEnumerator.Directory, rulesFile);
 							// Add 'ignore' cooking rules for this cooking rules text file
 							var ignoreRules = rules.InheritClone();
 							ignoreRules.Ignore = true;
