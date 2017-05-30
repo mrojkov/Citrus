@@ -45,7 +45,7 @@ namespace Lime
 			if (Contains<T>()) {
 				throw new InvalidOperationException("Attempt to add a component twice.");
 			}
-			if (buckets == empty) {
+			if (buckets.Length == 0) {
 				buckets = new Bucket[1];
 			}
 			var loadFactor = CalcLoadFactor();
