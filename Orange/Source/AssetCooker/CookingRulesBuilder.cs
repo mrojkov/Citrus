@@ -329,7 +329,13 @@ namespace Orange
 								throw new Lime.Exception("CookingRulesBuilder: invalid file enumeration format: directory should preceed it's cooking rules file");
 							}
 						}
-					} else if (Path.GetExtension(path) != ".txt") {
+					} else  {
+						if (Path.GetExtension(path) == ".txt") {
+							var filename = path.Remove(path.Length - 4);
+							if (File.Exists(filename) || Directory.Exists(filename)) {
+								continue;
+							}
+						}
 						var rulesFile = path + ".txt";
 						var rules = rulesStack.Peek();
 						if (File.Exists(rulesFile)) {
