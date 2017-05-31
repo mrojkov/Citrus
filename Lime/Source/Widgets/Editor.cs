@@ -487,9 +487,13 @@ namespace Lime
 					SelectAll();
 					CaretPos.TextPos = TextLength;
 				}
-				if (DisplayWidget.Input.WasMousePressed()) {
+				if (DisplayWidget.Input.WasMousePressed() || DisplayWidget.Input.WasMousePressed(1)) {
 					focusedByClick = !InputWidget.IsFocused();
 					InputWidget.SetFocus();
+					if (DisplayWidget.Input.WasMousePressed(1) && EditorParams.SelectAllOnFocus) {
+						SelectAll();
+						Window.Current.Invalidate();
+					}
 				}
 				if (InputWidget.IsFocused()) {
 					if (input.WasMouseReleased(1))
@@ -541,6 +545,12 @@ namespace Lime
 		private void ShowContextMenu(bool atCaret)
 		{
 #if MAC || WIN
+			var hs = HasSelection();
+			Command.Cut.Enabled = hs && IsTextReadable;
+			Command.Copy.Enabled = hs && IsTextReadable;
+			Command.Delete.Enabled = hs || CaretPos.TextPos < TextLength;
+			Command.Paste.Enabled = !string.IsNullOrEmpty(Clipboard.Text);
+			Command.Undo.Enabled = History.CanUndo();
 			var i = Window.Current.Input;
 			var m = new Menu {
 				Command.Undo,
