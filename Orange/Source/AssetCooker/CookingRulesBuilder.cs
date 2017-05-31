@@ -331,12 +331,13 @@ namespace Orange
 			using (new DirectoryChanger(fileEnumerator.Directory)) {
 				foreach (var fileInfo in fileEnumerator.Enumerate()) {
 					var path = fileInfo.Path;
-					while (!("/" + path).StartsWith(pathStack.Peek())) {
+					while (!path.StartsWith(pathStack.Peek())) {
 						rulesStack.Pop();
 						pathStack.Pop();
 					}
 					if (Path.GetFileName(path) == CookingRulesFilename) {
-						pathStack.Push(Lime.AssetPath.GetDirectoryName(path) + "/");
+						var dirName = Lime.AssetPath.GetDirectoryName(path);
+						pathStack.Push(dirName == string.Empty ? "" : dirName + "/");
 						var rules = ParseCookingRules(rulesStack.Peek(), path, target);
 						rules.SourceFilename = AssetPath.Combine(fileEnumerator.Directory, path);
 						rulesStack.Push(rules);
@@ -347,10 +348,9 @@ namespace Orange
 						var directoryName = pathStack.Peek();
 						if (!string.IsNullOrEmpty(directoryName)) {
 							directoryName = directoryName.Remove(directoryName.Length - 1);
+							// it is possible for map to not contain this directoryName since not every IFileEnumerator enumerates directories
 							if (map.ContainsKey(directoryName)) {
 								map[directoryName] = rules;
-							} else {
-								throw new Lime.Exception("CookingRulesBuilder: invalid file enumeration format: directory should preceed it's cooking rules file");
 							}
 						}
 					} else  {
