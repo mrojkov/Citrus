@@ -243,7 +243,19 @@ namespace Orange
 		// TODO: rename
 		private string StringForValue(Meta.Item yi, object value)
 		{
-			if (value is bool) {
+			if (value == null) {
+				return "";
+			} if (yi.Name == "Bundle") {
+				var vlist = (string[])value;
+				var r = "";
+				if (vlist.Length > 0) {
+					foreach (var i in vlist) {
+						r += i + ",";
+					}
+					r = r.Remove(r.Length - 1);
+				}
+				return r;
+			} else if (value is bool) {
 				return (bool)value ? "Yes" : "No";
 			} else if (value is DDSFormat) {
 				return (DDSFormat)value == DDSFormat.DXTi ? "DXTi" : "RGBA8";
@@ -265,7 +277,9 @@ namespace Orange
 			foreach (var yi in rules.FieldOverrides) {
 				var value = yi.GetValue(rules);
 				var valueString = StringForValue(yi, value);
-				sw.Write($"{yi.Name}{targetString} {valueString}\n");
+				if (!string.IsNullOrEmpty(valueString)) {
+					sw.Write($"{yi.Name}{targetString} {valueString}\n");
+				}
 			}
 		}
 
