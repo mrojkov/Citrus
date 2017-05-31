@@ -9,6 +9,8 @@ namespace Tangerine.UI.FilesystemView
 	// Enumerates all parent directories from target directory to root directory
 	// also enumerating all #CookingRules.txt files by the way
 	// afterwards enumerates top level files and folders in target directory
+	// for each folder in target directory also enumerates folder/#CookingRules.txt if present
+	// so it can be applied to this folder
 	public class FileEnumerator : IFileEnumerator
 	{
 		public string Directory { get; }
@@ -38,6 +40,15 @@ namespace Tangerine.UI.FilesystemView
 			return r;
 		}
 
+		private void TryAddCookingRulesInDirectory(string FullName, ref string cookingRulesPath)
+		{
+			cookingRulesPath = Path.Combine(FullName, CookingRulesBuilder.CookingRulesFilename);
+			if (File.Exists(cookingRulesPath)) {
+				var fi = new System.IO.FileInfo(cookingRulesPath);
+				files.Add(new Orange.FileInfo { Path = ProcessPath(cookingRulesPath), LastWriteTime = fi.LastWriteTime });
+			}
+		}
+
 		public void Rescan()
 		{
 			files.Clear();
@@ -53,13 +64,9 @@ namespace Tangerine.UI.FilesystemView
 			string cookingRulesPath = "";
 			foreach (var di in trunc) {
 				files.Add(new Orange.FileInfo { Path = ProcessPath(di.FullName), LastWriteTime = di.LastWriteTime });
-				cookingRulesPath = Path.Combine(di.FullName, "#CookingRules.txt");
-				if (File.Exists(cookingRulesPath)) {
-					var fi = new System.IO.FileInfo(cookingRulesPath);
-					files.Add(new Orange.FileInfo { Path = ProcessPath(cookingRulesPath), LastWriteTime = fi.LastWriteTime });
-				}
+				TryAddCookingRulesInDirectory(di.FullName, ref cookingRulesPath);
 			}
-
+			string innerCookingRulesPath = null;
 			foreach (var fileInfo in dirInfoTarget.GetFileSystemInfos("*.*", SearchOption.TopDirectoryOnly)) {
 				var file = fileInfo.FullName;
 				if (file.Contains(".svn"))
@@ -68,6 +75,9 @@ namespace Tangerine.UI.FilesystemView
 					continue;
 				}
 				files.Add(new Orange.FileInfo { Path = ProcessPath(file), LastWriteTime = fileInfo.LastWriteTime });
+				if (fileInfo.Attributes == FileAttributes.Directory) {
+					TryAddCookingRulesInDirectory(fileInfo.FullName, ref innerCookingRulesPath);
+				}
 			}
 		}
 
