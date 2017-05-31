@@ -102,7 +102,6 @@ namespace Lime
 			var w = Window.Current as Window;
 			w.Input.ClearKeyState();
 			NativeContextMenu.Show(w.Form, w.WorldToWindow(w.Input.MousePosition));
-			NativeContextMenu.Capture = true;
 		}
 
 		public void Popup(IWindow window, Vector2 position, float minimumWidth, ICommand command)
@@ -120,7 +119,6 @@ namespace Lime
 				}
 			}
 			NativeContextMenu.Show(window.Form, (window as Window).WorldToWindow(position));
-			NativeContextMenu.Capture = true;
 		}
 	}
 
