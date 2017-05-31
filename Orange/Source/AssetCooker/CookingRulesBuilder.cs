@@ -247,14 +247,7 @@ namespace Orange
 				return "";
 			} if (yi.Name == "Bundle") {
 				var vlist = (string[])value;
-				var r = "";
-				if (vlist.Length > 0) {
-					foreach (var i in vlist) {
-						r += i + ",";
-					}
-					r = r.Remove(r.Length - 1);
-				}
-				return r;
+				return string.Join(",", vlist);
 			} else if (value is bool) {
 				return (bool)value ? "Yes" : "No";
 			} else if (value is DDSFormat) {
