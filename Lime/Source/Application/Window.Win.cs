@@ -281,6 +281,7 @@ namespace Lime
 				Closed += Application.DoExited;
 			} else {
 				Form.Owner = Application.MainWindow.Form;
+				Form.StartPosition = FormStartPosition.CenterParent;
 			}
 			Application.Windows.Add(this);
 		}
