@@ -12,6 +12,8 @@ namespace Lime
 		public event Action<string> Created;
 		public event Action<string> Deleted;
 		public event Action<string> Renamed;
+		public string Path { get { return fsWatcher.Path; } set { fsWatcher.Path = value; } }
+		public bool IncludeSubdirectories { get { return fsWatcher.IncludeSubdirectories; } set { fsWatcher.IncludeSubdirectories = value; } }
 
 		public FileSystemWatcher(string path)
 		{

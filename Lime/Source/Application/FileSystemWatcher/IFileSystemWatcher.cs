@@ -8,5 +8,8 @@ namespace Lime
 		event Action<string> Created;
 		event Action<string> Deleted;
 		event Action<string> Renamed;
+
+		string Path { get; set; }
+		bool IncludeSubdirectories { get; set; }
 	}
 }
