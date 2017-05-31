@@ -298,7 +298,10 @@ namespace Tangerine
 					GenericCommands.NextDocument,
 					GenericCommands.PreviousDocument
 				}),
-			};
+				new Command("Orange", new Menu {
+					OrangeCommands.Run
+				}),
+		};
 			var nodeTypes = new[] {
 				typeof(Frame),
 				typeof(Button),
@@ -387,6 +390,7 @@ namespace Tangerine
 			}, () => Document.Current?.Rows.Count > 0);
 			h.Connect(Command.Undo, () => Document.Current.History.Undo(), () => Document.Current?.History.CanUndo() ?? false);
 			h.Connect(Command.Redo, () => Document.Current.History.Redo(), () => Document.Current?.History.CanRedo() ?? false);
+			h.Connect(OrangeCommands.Run, () => Orange.Actions.BuildAndRunAction());
 		}
 
 		static void Paste()

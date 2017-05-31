@@ -88,4 +88,9 @@ namespace Tangerine.UI
 		public static readonly ICommand FitToContainer = new Command("Fit To Container") { Icon = IconPool.GetTexture("Tools.FitToContainer") };
 		public static readonly ICommand FitToContent = new Command("Fit To Content") { Icon = IconPool.GetTexture("Tools.FitToContent") };
 	}
+
+	public static class OrangeCommands
+	{
+		public static readonly ICommand Run = new Command { Text = "Run", Shortcut = new Shortcut(Key.F9) };
+	}
 }
