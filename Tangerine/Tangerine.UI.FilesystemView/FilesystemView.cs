@@ -1,4 +1,7 @@
-﻿using System.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Claims;
@@ -7,6 +10,8 @@ using Orange;
 using Tangerine.Core;
 using Yuzu;
 using Yuzu.Metadata;
+
+using CookingRulesCollection = System.Collections.Generic.Dictionary<string, Orange.CookingRules>;
 
 namespace Tangerine.UI.FilesystemView
 {
@@ -25,9 +30,29 @@ namespace Tangerine.UI.FilesystemView
 		private readonly ScrollViewWidget CookingRulesScrollView;
 		private readonly Selection selection = new Selection();
 		private Widget cookingRulesRoot;
+		private Lime.FileSystemWatcher fsWatcher;
+		private double timeSinceLastFSEvent = 0.0;
 
 		public FilesystemView(DockPanel dockPanel)
 		{
+			fsWatcher = new Lime.FileSystemWatcher(Model.CurrentPath) {
+				IncludeSubdirectories = false
+			};
+			// TODO: throttle
+			Action OnFsWatcherChanged = () => {
+				// TODO: update selection
+				WhenModelCurrentPathChanged(Model.CurrentPath);
+			};
+			fsWatcher.Deleted += (path) => {
+				selection.Deselect(path);
+				OnFsWatcherChanged();
+			};
+			fsWatcher.Created += (path) => {
+				OnFsWatcherChanged();
+			};
+			fsWatcher.Renamed += (path) => {
+				OnFsWatcherChanged();
+			};
 			PanelWidget = dockPanel.ContentWidget;
 			RootWidget = new Widget();
 			FilesystemToolbar = new FilesystemToolbar();
@@ -267,6 +292,7 @@ namespace Tangerine.UI.FilesystemView
 
 		private void WhenModelCurrentPathChanged(string value)
 		{
+			fsWatcher.Path = value;
 			FilesScrollView.Content.Nodes.Clear();
 			foreach (var item in Model.EnumerateItems()) {
 				var iconWidget = new Icon(item);
@@ -368,6 +394,7 @@ namespace Tangerine.UI.FilesystemView
 				Window.Current.Invalidate();
 			}
 		}
+
 
 		private void RenderFilesWidgetRectSelection(ScrollViewWidget canvas)
 		{
