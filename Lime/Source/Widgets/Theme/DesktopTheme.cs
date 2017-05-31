@@ -67,7 +67,7 @@ namespace Lime
 					CloseButtonPressed = grayBackground.Lighten(1),
 					ScrollbarBackground = new Color4(51, 51, 51),
 					ScrollbarThumb = new Color4(107, 107, 107),
-					TextCaret = new Color4(204, 204, 204)
+					TextCaret = new Color4(204, 204, 204),
 				};
 			}
 
@@ -95,7 +95,7 @@ namespace Lime
 					CloseButtonPressed = grayBackground.Darken(1),
 					ScrollbarBackground = new Color4(210, 210, 210),
 					ScrollbarThumb = new Color4(120, 120, 120),
-					TextCaret = Color4.Black
+					TextCaret = Color4.Black,
 				};
 			}
 		}
@@ -241,8 +241,10 @@ namespace Lime
 				});
 
 			eb.TabTravesable = new TabTraversable();
-			eb.CompoundPresenter.Add(new BorderedFramePresenter(Colors.WhiteBackground, Colors.ControlBorder));
+			eb.CompoundPresenter.Add(new BorderedFrameHoverPresenter(
+				Colors.WhiteBackground, Colors.ControlBorder, Colors.KeyboardFocusBorder));
 			eb.CompoundPostPresenter.Add(new KeyboardFocusBorderPresenter());
+			eb.LateTasks.Add(MouseHoverInvalidationTask(eb));
 		}
 
 		private void DecorateEditBoxWithSpinner(Widget widget)
@@ -367,7 +369,8 @@ namespace Lime
 				TabTravesable = null
 			});
 			cb.TabTravesable = new TabTraversable();
-			cb.CompoundPostPresenter.Add(new KeyboardFocusBorderPresenter());
+			cb.CompoundPostPresenter.Add(new MouseHoverBorderPresenter());
+			cb.LateTasks.Add(MouseHoverInvalidationTask(cb));
 		}
 
 		private void DecorateDropDownList(Widget widget)
@@ -381,7 +384,8 @@ namespace Lime
 				VAlignment = VAlignment.Center,
 			};
 			text.CompoundPresenter.Add(new DropDownListPresenter(dropDownList));
-			dropDownList.PostPresenter = new KeyboardFocusBorderPresenter();
+			dropDownList.PostPresenter = new MouseHoverBorderPresenter();
+			dropDownList.LateTasks.Add(MouseHoverInvalidationTask(dropDownList));
 			text.Padding = Metrics.ControlsPadding;
 			dropDownList.AddNode(text);
 			ExpandToContainer(text);
@@ -433,6 +437,7 @@ namespace Lime
 			var closeButton = new TabCloseButton { Id = "CloseButton" };
 			tab.AddNode(caption);
 			tab.AddNode(closeButton);
+			tab.LateTasks.Add(MouseHoverInvalidationTask(tab));
 		}
 
 		private void DecorateTabCloseButton(Widget widget)
@@ -511,6 +516,19 @@ namespace Lime
 			widget.Anchors = Anchors.LeftRightTopBottom;
 		}
 
+		private static IEnumerator<object> MouseHoverInvalidationTask(Widget widget)
+		{
+			var isHovered = widget.IsMouseOverThisOrDescendant();
+			while (true) {
+				var isMouseOver = widget.IsMouseOverThisOrDescendant();
+				if (isMouseOver != isHovered) {
+					isHovered = isMouseOver;
+					Window.Current.Invalidate();
+				}
+				yield return null;
+			}
+		}
+
 		class BorderedFramePresenter : CustomPresenter
 		{
 			private readonly Color4 innerColor;
@@ -531,12 +549,50 @@ namespace Lime
 			}
 		}
 
+		class BorderedFrameHoverPresenter : CustomPresenter
+		{
+			private readonly Color4 innerColor;
+			private readonly Color4 borderColor;
+			private readonly Color4 borderHoverColor;
+
+			public BorderedFrameHoverPresenter(Color4 innerColor, Color4 borderColor, Color4 borderHoverColor)
+			{
+				this.innerColor = innerColor;
+				this.borderColor = borderColor;
+				this.borderHoverColor = borderHoverColor;
+			}
+
+			public override void Render(Node node)
+			{
+				var widget = node.AsWidget;
+				widget.PrepareRendererState();
+				Renderer.DrawRect(Vector2.Zero, widget.Size, innerColor);
+				if (widget.IsMouseOverThisOrDescendant()) {
+					Renderer.DrawRectOutline(Vector2.Zero, widget.Size, borderHoverColor);
+				} else {
+					Renderer.DrawRectOutline(Vector2.Zero, widget.Size, borderColor);
+				}
+			}
+		}
+
 		class KeyboardFocusBorderPresenter : CustomPresenter
 		{
 			public override void Render(Node node)
 			{
 				if (Widget.Focused == node) {
 					var widget = node.AsWidget;
+					widget.PrepareRendererState();
+					Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Colors.KeyboardFocusBorder, 1);
+				}
+			}
+		}
+
+		class MouseHoverBorderPresenter : CustomPresenter
+		{
+			public override void Render(Node node)
+			{
+				var widget = node.AsWidget;
+				if (widget.IsMouseOverThisOrDescendant()) {
 					widget.PrepareRendererState();
 					Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Colors.KeyboardFocusBorder, 1);
 				}
@@ -658,7 +714,8 @@ namespace Lime
 			{
 				var widget = node.AsWidget;
 				widget.PrepareRendererState();
-				Renderer.DrawRect(Vector2.Zero, widget.Size - new Vector2(1, 0), active ? Colors.TabActive : Colors.TabNormal);
+				var color = active || widget.IsMouseOverThisOrDescendant() ? Colors.TabActive : Colors.TabNormal;
+				Renderer.DrawRect(Vector2.Zero, widget.Size - new Vector2(1, 0), color);
 			}
 
 			public override bool PartialHitTest(Node node, ref HitTestArgs args)
