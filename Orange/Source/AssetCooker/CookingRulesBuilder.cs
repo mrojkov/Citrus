@@ -301,6 +301,16 @@ namespace Orange
 				}
 			}
 		}
+
+		public bool HasOverrides()
+		{
+			var r = false;
+			r = r || CommonRules.FieldOverrides.Count > 0;
+			foreach (var cr in TargetRules) {
+				r = r || cr.Value.FieldOverrides.Count > 0;
+			}
+			return r;
+		}
 	}
 
 	public class CookingRulesBuilder
