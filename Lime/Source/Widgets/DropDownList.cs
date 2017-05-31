@@ -74,9 +74,7 @@ namespace Lime
 			while (true) {
 				if (Input.WasMousePressed() && IsMouseOver()) {
 					SetFocus();
-#if MAC
 					Window.Current.Input.SetKeyState(Key.Mouse0, false);
-#endif
 					yield return ShowDropDownListTask();
 				}
 				if (
