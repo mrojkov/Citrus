@@ -25,25 +25,28 @@ namespace Tangerine.UI.FilesystemView
 		private Vector2 rectSelectionEndPoint;
 		private bool rectSelecting;
 		private readonly Selection selection = new Selection();
-		private readonly Lime.FileSystemWatcher fsWatcher;
+		private Lime.FileSystemWatcher fsWatcher;
 		private CookingRulesEditor crEditor;
 
-		public FilesystemView(DockPanel dockPanel)
+		private void InvalidateFSWatcher(string path)
 		{
-			fsWatcher = new Lime.FileSystemWatcher(Model.CurrentPath) {
-				IncludeSubdirectories = false
-			};
+			fsWatcher?.Dispose();
+			fsWatcher = new Lime.FileSystemWatcher(path, includeSubdirectories: false);
 			// TODO: throttle
 			Action OnFsWatcherChanged = () => {
 				// TODO: update selection
-				WhenModelCurrentPathChanged(Model.CurrentPath);
+				InvalidateView(Model.CurrentPath);
 			};
-			fsWatcher.Deleted += (path) => {
-				selection.Deselect(path);
+			fsWatcher.Deleted += (p) => {
+				selection.Deselect(p);
 				OnFsWatcherChanged();
 			};
-			fsWatcher.Created += (path) => OnFsWatcherChanged();
-			fsWatcher.Renamed += (path) => OnFsWatcherChanged();
+			fsWatcher.Created += (p) => OnFsWatcherChanged();
+			fsWatcher.Renamed += (p) => OnFsWatcherChanged();
+		}
+
+		public FilesystemView(DockPanel dockPanel)
+		{
 			DockPanelWidget = dockPanel.ContentWidget;
 			RootWidget = new Widget();
 			FilesystemToolbar = new FilesystemToolbar();
@@ -71,7 +74,10 @@ namespace Tangerine.UI.FilesystemView
 					Window.Current.Invalidate();
 				}
 			});
-			RootWidget.AddChangeWatcher(() => Model.CurrentPath, WhenModelCurrentPathChanged);
+			RootWidget.AddChangeWatcher(() => Model.CurrentPath, (p) => {
+				InvalidateView(p);
+				InvalidateFSWatcher(p);
+			});
 			RootWidget.Layout = new VBoxLayout();
 			RootWidget.AddNode(new HSplitter {
 				Layout = new HBoxLayout(),
@@ -92,9 +98,8 @@ namespace Tangerine.UI.FilesystemView
 			crEditor.InvalidateForSelection(selection);
 		}
 
-		private void WhenModelCurrentPathChanged(string value)
+		private void InvalidateView(string path)
 		{
-			fsWatcher.Path = value;
 			FilesScrollView.Content.Nodes.Clear();
 			foreach (var item in Model.EnumerateItems()) {
 				var iconWidget = new Icon(item);

@@ -82,7 +82,7 @@ namespace Tangerine.UI.FilesystemView
 
 		public void GoTo(string path)
 		{
-			FileAttributes attr = File.GetAttributes(path);
+			var attr = File.GetAttributes(path);
 			if ((attr & FileAttributes.Directory) == FileAttributes.Directory) {
 				CurrentPath = path;
 			}

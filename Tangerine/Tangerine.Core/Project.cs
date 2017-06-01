@@ -59,7 +59,7 @@ namespace Tangerine.Core
 					Debug.Write($"Failed to load the project user preferences: {e}");
 				}
 			}
-			fsWatcher = new Lime.FileSystemWatcher(AssetsDirectory);
+			fsWatcher = new Lime.FileSystemWatcher(AssetsDirectory, includeSubdirectories: true);
 			fsWatcher.Changed += HandleFileSystemWatcherEvent;
 			fsWatcher.Created += HandleFileSystemWatcherEvent;
 			fsWatcher.Deleted += HandleFileSystemWatcherEvent;
