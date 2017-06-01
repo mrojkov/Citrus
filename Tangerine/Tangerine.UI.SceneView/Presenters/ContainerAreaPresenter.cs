@@ -25,6 +25,43 @@ namespace Tangerine.UI.SceneView
 					}
 				}
 			}));
+
+			const float deviceHeight = 768;
+			const float deviceWidth1 = 1366;
+			const float deviceWidth2 = 1152;
+			const float deviceWidth3 = 1024;
+			sceneView.Scene.CompoundPostPresenter.Push(
+				new DelegatePresenter<Widget>(
+					(w) => {
+						var ctr = Core.Document.Current.Container as Widget;
+						if (ctr != null) {
+							ctr.PrepareRendererState();
+							var mtx = ctr.LocalToWorldTransform;
+							var t1 = 1 / mtx.U.Length;
+							var t2 = 1 / mtx.V.Length;
+							Renderer.Transform1 = mtx;
+							var ctrCenter = ctr.Size * 0.5f;
+							var a1 = new Vector2(deviceWidth1, deviceHeight) * 0.5f + ctrCenter;
+							var b1 = new Vector2(deviceWidth1, deviceHeight) * -0.5f + ctrCenter;
+							var a2 = new Vector2(deviceHeight, deviceWidth1) * 0.5f + ctrCenter;
+							var b2 = new Vector2(deviceHeight, deviceWidth1) * -0.5f + ctrCenter;
+							var a3 = new Vector2(deviceWidth2, deviceHeight) * 0.5f + ctrCenter;
+							var b3 = new Vector2(deviceWidth2, deviceHeight) * -0.5f + ctrCenter;
+							var a4 = new Vector2(deviceHeight, deviceWidth2) * 0.5f + ctrCenter;
+							var b4 = new Vector2(deviceHeight, deviceWidth2) * -0.5f + ctrCenter;
+							var a5 = new Vector2(deviceWidth3, deviceHeight) * 0.5f + ctrCenter;
+							var b5 = new Vector2(deviceWidth3, deviceHeight) * -0.5f + ctrCenter;
+							var a6 = new Vector2(deviceHeight, deviceWidth3) * 0.5f + ctrCenter;
+							var b6 = new Vector2(deviceHeight, deviceWidth3) * -0.5f + ctrCenter;
+							Renderer.DrawRectOutline(a1, b1, Color4.White, t1);
+							Renderer.DrawRectOutline(a2, b2, Color4.White, t1);
+							Renderer.DrawRectOutline(a3, b3, Color4.White, t1);
+							Renderer.DrawRectOutline(a4, b4, Color4.White, t1);
+							Renderer.DrawRectOutline(a5, b5, Color4.White, t1);
+							Renderer.DrawRectOutline(a6, b6, Color4.White, t1);
+						}
+					}));
+
 			sceneView.Scene.CompoundPostPresenter.Push(new DelegatePresenter<Widget>(w => {
 				var ctr = Core.Document.Current.Container as Widget;
 				if (ctr != null && !Core.Document.Current.PreviewAnimation) {
