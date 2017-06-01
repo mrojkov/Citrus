@@ -65,12 +65,6 @@ namespace Lime
 		private const float DragDetectionTime = 0.15f;
 
 		/// <summary>
-		/// Для маленьких кнопок: радиус круга, в который нужно попасть, чтобы кнопка нажалась
-		/// (иначе в маленькую кнопку невозможно было бы попасть)
-		/// </summary>
-		public static float ButtonEffectiveRadius = 200;
-
-		/// <summary>
 		/// Indicates whether all buttons should use tablet control scheme that doesn't includes
 		/// 'focused' state support, but behaves better when multiple buttons overlap each other.
 		///
@@ -207,9 +201,7 @@ namespace Lime
 				if (!Input.IsMouseOwner()) {
 					State = ReleaseState;
 				}
-				// Check if this button is still mouse owner since button may be inside list view which took control of a mouse.
-				bool isPressed = IsMouseOver() || (Input.IsMouseOwner() &&
-					(Input.MousePosition - this.GlobalCenter).Length < ButtonEffectiveRadius);
+				bool isPressed = IsMouseOverThisOrDescendant();
 				if (!Input.IsMousePressed()) {
 					if (isPressed) {
 						HandleClick();
