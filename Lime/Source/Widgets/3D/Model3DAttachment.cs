@@ -290,6 +290,10 @@ namespace Lime
 
 		public Model3DAttachment Parse(string modelPath)
 		{
+			modelPath = AssetPath.CorrectSlashes(
+				Path.Combine(Path.GetDirectoryName(modelPath) ?? "",
+				Path.GetFileNameWithoutExtension(AssetPath.CorrectSlashes(modelPath) ?? "")
+			));
 			var attachmentPath = modelPath + ".Attachment.txt";
 			if (!AssetBundle.Instance.FileExists(attachmentPath)) {
 				return null;

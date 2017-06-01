@@ -7,6 +7,18 @@ namespace Kumquat
 {
 	public class ParsedNode
 	{
+		public class AnimationMarker
+		{
+			public readonly string AnimationId;
+			public readonly string Name;
+
+			public AnimationMarker(string animationId, string name)
+			{
+				AnimationId = animationId;
+				Name = name;
+			}
+		}
+
 		public readonly string Id;
 		public readonly string Name;
 		public string Type;
@@ -14,6 +26,7 @@ namespace Kumquat
 		public readonly string FieldName;
 		public readonly string ContentsPath;
 		public readonly List<string> Markers = new List<string>();
+		public readonly List<AnimationMarker> NamedMarkers = new List<AnimationMarker>();
 
 		public bool IsExternalScene => !string.IsNullOrEmpty(ContentsPath);
 
@@ -26,6 +39,7 @@ namespace Kumquat
 			FieldName = parsedNode.FieldName;
 			ContentsPath = parsedNode.ContentsPath;
 			Markers = parsedNode.Markers;
+			NamedMarkers = parsedNode.NamedMarkers;
 		}
 
 		public ParsedNode(Node node, string name)
@@ -44,8 +58,14 @@ namespace Kumquat
 				ClassName = externalName;
 			}
 
-			foreach (var marker in node.Markers.Where(marker => !string.IsNullOrEmpty(marker.Id))) {
-				Markers.Add(marker.Id);
+			foreach (var animation in node.Animations) {
+				var isDefault = animation == node.DefaultAnimation;
+				foreach (var marker in animation.Markers.Where(marker => !string.IsNullOrEmpty(marker.Id))) {
+					if (isDefault) {
+						Markers.Add(marker.Id);
+					}
+					NamedMarkers.Add(new AnimationMarker(animation.Id, marker.Id));
+				}
 			}
 		}
 
@@ -67,15 +87,19 @@ namespace Kumquat
 		public string GenerateAnimations(string customType = null)
 		{
 			var result = "";
-			foreach (var marker in Markers) {
-				var safeMarker = marker;
+			foreach (var marker in NamedMarkers) {
+				var safeMarker = marker.Name;
 				if (safeMarker.StartsWith("@")) {
 					safeMarker = safeMarker.Substring(1);
 				}
-				result += string.Format("public {1} RunAnimation{0}() \n", safeMarker, customType ?? Type);
+				result += $"public {customType ?? Type} Run{marker.AnimationId ?? "Animation"}{safeMarker}() \n";
 				result += "{ \n";
-				result += string.Format("Node.RunAnimation(\"{0}\");\n", marker);
-				result += string.Format("return ({0})Node;\n", customType ?? Type);
+				if (marker.AnimationId == null) {
+					result += $"Node.RunAnimation(\"{marker.Name}\");\n";
+				} else {
+					result += $"Node.RunAnimation(\"{marker.Name}\", \"{marker.AnimationId}\");\n";
+				}
+				result += $"return ({customType ?? Type})Node;\n";
 				result += "} \n";
 			}
 			return result;
