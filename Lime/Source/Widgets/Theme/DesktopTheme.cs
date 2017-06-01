@@ -227,7 +227,13 @@ namespace Lime
 				vc.Width = eb.Editor.OverwriteMode && !eb.Editor.HasSelection() ?
 					tw.Font.Chars.Get(eb.Editor.CurrentChar(), tw.FontHeight)?.Width ?? 5f : 0f;
 				if (eb.IsMouseOverThisOrDescendant() && WidgetContext.Current.MouseCursor == MouseCursor.Default) {
-					WidgetContext.Current.MouseCursor = MouseCursor.IBeam;
+					var rect = new Rectangle {
+						A = tw.ContentPosition,
+						B = tw.ContentPosition + tw.ContentSize,
+					};
+					if (rect.Contains(tw.Input.LocalMousePosition)) {
+						WidgetContext.Current.MouseCursor = MouseCursor.IBeam;
+					}
 				}
 			};
 			new CaretDisplay(
