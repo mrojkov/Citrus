@@ -425,8 +425,11 @@ namespace Tangerine.UI
 
 		public BooleanPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
-			checkBox = new CheckBox { LayoutCell = new LayoutCell(Alignment.Center) };
-			ContainerWidget.AddNode(checkBox);
+			var group = new Widget { Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center) } };
+			checkBox = new CheckBox { LayoutCell = new LayoutCell(Alignment.LeftCenter) };
+			group.AddNode(checkBox);
+			group.AddNode(new Widget());
+			ContainerWidget.AddNode(group);
 			checkBox.Changed += value => SetProperty(value);
 			checkBox.AddChangeWatcher(CoalescedPropertyValue(), v => checkBox.Checked = v);
 		}
