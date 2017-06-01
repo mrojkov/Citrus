@@ -83,6 +83,8 @@ namespace Lime
 			get { return GlobalTransform.TransformVector(Center); }
 		}
 
+		public virtual Action Clicked { get; set; }
+
 		public Mesh3D()
 		{
 			Submeshes = new Submesh3DCollection(this);
@@ -193,6 +195,32 @@ namespace Lime
 					yield return v.Pos;
 				}
 			}
+		}
+
+		public override void Update(float delta)
+		{
+			base.Update(delta);
+
+			if (Clicked != null) {
+				HandleClick();
+			}
+		}
+
+		private void HandleClick()
+		{
+			if (!CommonWindow.Current.Input.WasKeyReleased(Key.Mouse0) || !IsMouseOver()) {
+				return;
+			}
+			var viewport = GetViewport();
+			if (WidgetInput.Filter != null && !WidgetInput.Filter(viewport, Key.Mouse0)) {
+				return;
+			}
+			var mouseOwner = WidgetInput.MouseCaptureStack.Top;
+			if (mouseOwner != null && mouseOwner != viewport) {
+				return;
+			}
+
+			Clicked();
 		}
 
 		public override Node Clone()
