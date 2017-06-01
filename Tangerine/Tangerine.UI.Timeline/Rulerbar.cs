@@ -19,8 +19,8 @@ namespace Tangerine.UI.Timeline
 			};
 			RootWidget.CompoundPresenter.Add(new DelegatePresenter<Widget>(Render));
 			RootWidget.LateTasks.Add(
-				new KeyReleaseHandler(Key.Mouse0DoubleClick, RootWidget_DoubleClick),
-				new KeyReleaseHandler(Key.Mouse1, (input, key) => new ContextMenu().Show())
+				new KeyPressHandler(Key.Mouse0DoubleClick, RootWidget_DoubleClick),
+				new KeyPressHandler(Key.Mouse1, (input, key) => new ContextMenu().Show())
 			);
 		}
 
