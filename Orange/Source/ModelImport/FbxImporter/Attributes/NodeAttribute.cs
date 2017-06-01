@@ -40,11 +40,6 @@ namespace Orange.FbxImporter
 			}
 		}
 
-		public override string ToString(int level)
-		{
-			return "Empty";
-		}
-
 		#region Pinvokes
 
 		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]

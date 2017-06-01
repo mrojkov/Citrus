@@ -26,11 +26,6 @@ namespace Orange.FbxImporter
 
 		public Animation Animations { get; set; } 
 
-		public override string ToString()
-		{
-			return "Scene: \n" + Root.ToString(0);
-		}
-
 		#region PInvokes
 
 		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]

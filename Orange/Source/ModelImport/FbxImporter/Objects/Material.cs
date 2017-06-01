@@ -37,11 +37,6 @@ namespace Orange.FbxImporter
 			
 		}
 
-		public override string ToString(int level)
-		{
-			return ("Path: " + Path);
-		}
-
 		public CommonMaterial ToLime(string path) 
 		{
 			var res = new CommonMaterial();

@@ -85,22 +85,6 @@ namespace Orange.FbxImporter
 			}
 		}	
 
-		public override string ToString(int level)
-		{
-			StringBuilder builder = new StringBuilder();
-			builder.Append("Points: ".ToLevel(level + 1));
-			if (Vertices == null) {
-				builder.AppendLine("None");
-			} else {
-				builder.AppendLine("[".ToLevel(level + 2));
-				for (int i =0; i < Vertices.Length; i+=3) {
-					builder.AppendLine($"[{Vertices[i]}, {Vertices[i + 1]}, {Vertices[i + 2]}],".ToLevel(level + 3));
-				}
-				builder.AppendLine("[".ToLevel(level + 2));
-			}
-			return builder.ToString();
-		}
-
 		#region Pinvokes
 
 		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
