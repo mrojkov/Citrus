@@ -157,12 +157,15 @@ namespace Tangerine.UI.Timeline
 
 		public void EnsureColumnVisible(int column)
 		{
+			var target = OffsetX;
 			if ((column + 1) * TimelineMetrics.ColWidth - Offset.X >= Grid.RootWidget.Width) {
-				OffsetX = (column + 1) * TimelineMetrics.ColWidth - Grid.RootWidget.Width;
+				target = (column + 1) * TimelineMetrics.ColWidth - Grid.RootWidget.Width;
 			}
 			if (column * TimelineMetrics.ColWidth < Offset.X) {
-				OffsetX = Math.Max(0, column * TimelineMetrics.ColWidth);
+				target = Math.Max(0, column * TimelineMetrics.ColWidth);
 			}
+			var diff = target - OffsetX;
+			OffsetX += diff.Clamp(-TimelineMetrics.MaxScrollSpeed, TimelineMetrics.MaxScrollSpeed);
 		}
 
 		public void EnsureRowVisible(Row row)

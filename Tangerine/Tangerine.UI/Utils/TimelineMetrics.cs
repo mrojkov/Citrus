@@ -14,5 +14,6 @@ namespace Tangerine.UI
 		public const float DefaultRowHeight = 25;
 		public const float RowSpacing = 1;
 		public const float ToolbarMinWidth = 50;
+		public const float MaxScrollSpeed = 15;
 	}
 }
