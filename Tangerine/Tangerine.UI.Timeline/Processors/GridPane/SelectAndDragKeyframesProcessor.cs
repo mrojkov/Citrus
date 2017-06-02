@@ -29,7 +29,8 @@ namespace Tangerine.UI.Timeline
 							timeline.Globals.Add(r);
 							yield return null;
 							timeline.Globals.Remove<HasKeyframeRequest>();
-							if (r.Result) {
+							var isInMultiselectMode = input.IsKeyPressed(Key.Control);
+							if (r.Result && !isInMultiselectMode) {
 								yield return DragKeyframeTask(initialCell);
 							} else {
 								yield return SelectTask(initialCell);
