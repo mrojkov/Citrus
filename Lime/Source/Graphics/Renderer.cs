@@ -26,6 +26,8 @@ namespace Lime
 		Diffuse,
 		Silhuette,
 		InversedSilhuette,
+
+		[TangerineIgnore]
 		Custom,
 	}
 
