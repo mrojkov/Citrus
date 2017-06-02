@@ -26,11 +26,12 @@ namespace Orange.FbxImporter
 					var material = matPtr.To<Texture>();
 					Path = material.texturePath;
 					Name = material.Name;
+					var color = material.colorDiffuse.ToStruct<Vec4> ();
 					DiffuseColor = Color4.FromFloats(
-						material.colorDiffuse.V1,
-						material.colorDiffuse.V2,
-						material.colorDiffuse.V3,
-						material.colorDiffuse.V4
+						color.V1,
+						color.V2,
+						color.V3,
+						color.V4
 					);
 				}
 			}
@@ -74,8 +75,7 @@ namespace Orange.FbxImporter
 			[MarshalAs(UnmanagedType.LPStr)]
 			public string texturePath;
 
-			[MarshalAs(UnmanagedType.Struct)]
-			public Vec4 colorDiffuse;
+			public IntPtr colorDiffuse;
 
 			[MarshalAs(UnmanagedType.LPStr)]
 			public string Name;

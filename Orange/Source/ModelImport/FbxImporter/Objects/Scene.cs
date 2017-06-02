@@ -7,12 +7,9 @@ namespace Orange.FbxImporter
 	{
 		public Scene(IntPtr ptr) : base(ptr)
 		{
-			try {
-				root = new Node(FbxSceneGetRootNode(NativePtr));
-				Animations = new Animation(ptr);
-			} catch(Exception e) {
-				Console.WriteLine(e.Message);
-			}
+			var r = FbxSceneGetRootNode (NativePtr);
+			root = new Node(r);
+			Animations = new Animation(ptr);
 		}
 
 		private Node root;

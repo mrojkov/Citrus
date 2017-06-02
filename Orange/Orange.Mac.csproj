@@ -135,6 +135,18 @@
     <Compile Include="Source\Toolbox\FontBuilder.cs" />
     <Compile Include="Source\Target.cs" />
     <Compile Include="Source\Toolbox\IFileEnumerator.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\Animation.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\MarshalingStructures.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\Utils.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\Attributes\CameraAttribute.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\Attributes\MeshAttribute.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\Attributes\NodeAttribute.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\Objects\FbxObject.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\Objects\Manager.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\Objects\Material.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\Objects\Node.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\Objects\Scene.cs" />
+    <Compile Include="Source\ModelImport\FbxModelImporter.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Toolchain.Mac\PVRTexTool">
@@ -156,6 +168,11 @@
     </None>
     <None Include="Orange.Win.v12.suo">
       <Visible>False</Visible>
+    </None>
+    <None Include="app.config" />
+    <None Include="..\3rdParty\FbxSdk\libFbxSdkUtils.dylib">
+      <Link>libFbxSdkUtils.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -182,4 +199,7 @@
       <Name>Kumquat.Mac</Name>
     </ProjectReference>
   </ItemGroup>
+  <Target Name="AfterBuild">
+    <Copy SourceFiles="..\3rdParty\FbxSdk\libfbxsdk.dylib" DestinationFolder="\usr\local\lib" SkipUnchangedFiles="true"/>
+</Target>
 </Project>
