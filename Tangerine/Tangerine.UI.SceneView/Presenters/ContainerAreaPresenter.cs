@@ -33,14 +33,14 @@ namespace Tangerine.UI.SceneView
 			sceneView.Scene.CompoundPostPresenter.Push(
 				new DelegatePresenter<Widget>(
 					(w) => {
-						var ctr = Core.Document.Current.Container as Widget;
-						if (ctr != null) {
-							ctr.PrepareRendererState();
-							var mtx = ctr.LocalToWorldTransform;
+						var root = Core.Document.Current.RootNode as Widget;
+						if (root != null) {
+							root.PrepareRendererState();
+							var mtx = root.LocalToWorldTransform;
 							var t1 = 1 / mtx.U.Length;
 							var t2 = 1 / mtx.V.Length;
 							Renderer.Transform1 = mtx;
-							var ctrCenter = ctr.Size * 0.5f;
+							var ctrCenter = root.Size * 0.5f;
 							var a1 = new Vector2(deviceWidth1, deviceHeight) * 0.5f + ctrCenter;
 							var b1 = new Vector2(deviceWidth1, deviceHeight) * -0.5f + ctrCenter;
 							var a2 = new Vector2(deviceHeight, deviceWidth1) * 0.5f + ctrCenter;
