@@ -98,6 +98,58 @@ namespace Lime
 
 		public virtual bool IsStubTexture { get { return false; } }
 
+		private TextureWrapMode wrapModeU = TextureWrapMode.Clamp;
+		private TextureWrapMode wrapModeV = TextureWrapMode.Clamp;
+		private TextureFilter minFilter = TextureFilter.Linear;
+		private TextureFilter magFilter = TextureFilter.Linear;
+
+		private void SetTextureParameter(TextureParameterName name, int value)
+		{
+			PlatformRenderer.PushTexture(handle, 0);
+			GL.TexParameter(TextureTarget.Texture2D, name, value);
+			PlatformRenderer.PopTexture(0);
+		}
+
+		public TextureWrapMode WrapModeU
+		{
+			get { return wrapModeU; }
+			set
+			{
+				wrapModeU = value;
+				SetTextureParameter(TextureParameterName.TextureWrapS, wrapModeU.ToInt());
+			}
+		}
+
+		public TextureWrapMode WrapModeV
+		{
+			get { return wrapModeV; }
+			set
+			{
+				wrapModeV = value;
+				SetTextureParameter(TextureParameterName.TextureWrapT, wrapModeV.ToInt());
+			}
+		}
+
+		public TextureFilter MinFilter
+		{
+			get { return minFilter; }
+			set
+			{
+				minFilter = value;
+				SetTextureParameter(TextureParameterName.TextureMinFilter, minFilter.ToInt());
+			}
+		}
+
+		public TextureFilter MagFilter
+		{
+			get { return magFilter; }
+			set
+			{
+				magFilter = value;
+				SetTextureParameter(TextureParameterName.TextureMagFilter, magFilter.ToInt());
+			}
+		}
+
 		public Texture2D()
 		{
 			GLObjectRegistry.Instance.Add(this);
@@ -184,10 +236,10 @@ namespace Lime
 				handle = (uint)t[0];
 			}
 			PlatformRenderer.PushTexture(handle, 0);
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Linear);
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)All.ClampToEdge);
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)All.ClampToEdge);
+			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, MinFilter.ToInt());
+			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, MagFilter.ToInt());
+			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, WrapModeU.ToInt());
+			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, WrapModeV.ToInt());
 			PlatformRenderer.PopTexture(0);
 			PlatformRenderer.CheckErrors();
 		}
