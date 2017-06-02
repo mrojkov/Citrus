@@ -29,7 +29,7 @@ namespace Lime
 		private uint handle;
 		private uint framebuffer;
 		private uint depthBuffer;
-		
+
 		private readonly Size size = new Size(0, 0);
 		private readonly Rectangle uvRect;
 		private static readonly Stack<uint> framebufferStack = new Stack<uint>();
@@ -104,8 +104,8 @@ namespace Lime
 
 		public Size SurfaceSize {
 			get { return size; }
-		}		
-		
+		}
+
 		public Rectangle AtlasUVRect {
 			get { return uvRect; }
 		}
@@ -114,7 +114,7 @@ namespace Lime
 
 		public void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv) {}
 
-		public void Discard() 
+		public void Discard()
 		{
 			MemoryUsed = 0;
 			if (framebuffer != 0) {
@@ -147,7 +147,7 @@ namespace Lime
 			}
 			renderBuffer = 0;
 		}
-		
+
 		public override void Dispose()
 		{
 			Discard();

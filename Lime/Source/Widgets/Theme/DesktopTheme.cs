@@ -614,10 +614,10 @@ namespace Lime
 				new VectorShape.Line(0, 0.1f, 0, 0.9f, Colors.ControlBorder, 0.05f),
 			};
 			readonly VectorShape icon = new VectorShape {
-				new VectorShape.Line(0.5f, 0.8f, 0.7f, 0.65f, Color4.White, 0.07f),
-				new VectorShape.Line(0.5f, 0.8f, 0.3f, 0.65f, Color4.White, 0.07f),
-				new VectorShape.Line(0.5f, 0.2f, 0.7f, 0.35f, Color4.White, 0.07f),
-				new VectorShape.Line(0.5f, 0.2f, 0.3f, 0.35f, Color4.White, 0.07f),
+				new VectorShape.Line(0.5f, 0.6f, 0.7f, 0.4f, Color4.White.Transparentify(0.2f), 0.04f, false),
+				new VectorShape.Line(0.5f, 0.6f, 0.3f, 0.4f, Color4.White.Transparentify(0.2f), 0.04f, false),
+				new VectorShape.Line(0.5f, 0.55f, 0.7f, 0.35f, Color4.White.Transparentify(0.5f), 0.04f, false),
+				new VectorShape.Line(0.5f, 0.55f, 0.3f, 0.35f, Color4.White.Transparentify(0.5f), 0.04f, false),
 			};
 
 			public DropDownListPresenter(CommonDropDownList list)
