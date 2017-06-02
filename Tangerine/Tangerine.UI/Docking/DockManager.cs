@@ -216,6 +216,7 @@ namespace Tangerine.UI
 			}
 			state.MainWindowPosition = MainWindowWidget.Window.ClientPosition;
 			state.MainWindowSize = MainWindowWidget.Window.ClientSize;
+			state.MainWindowState = MainWindowWidget.Window.State;
 			return state;
 		}
 
@@ -224,6 +225,7 @@ namespace Tangerine.UI
 			if (resizeMainWindow && state.MainWindowSize != Vector2.Zero) {
 				MainWindowWidget.Window.ClientSize = state.MainWindowSize;
 				MainWindowWidget.Window.ClientPosition = state.MainWindowPosition;
+				MainWindowWidget.Window.State = state.MainWindowState;
 			}
 			foreach (var p in panels) {
 				var pp = state.PanelPlacements.FirstOrDefault(i => i.Title == p.Id);
@@ -242,6 +244,8 @@ namespace Tangerine.UI
 			public Vector2 MainWindowPosition;
 			[YuzuMember]
 			public Vector2 MainWindowSize;
+			[YuzuMember]
+			public WindowState MainWindowState;
 		}
 	}
 }
