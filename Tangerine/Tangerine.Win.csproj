@@ -220,4 +220,11 @@
     <EmbeddedResource Include="Resources\Icons\Filesystem\Folded.png" />
     <EmbeddedResource Include="Resources\Icons\Filesystem\Unfolded.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Icons\Filesystem\Zebra.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Icons\Filesystem\Cross.png" />
+    <EmbeddedResource Include="Resources\Icons\Filesystem\Plus.png" />
+  </ItemGroup>
 </Project>

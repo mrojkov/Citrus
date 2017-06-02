@@ -14,8 +14,15 @@ namespace Lime
 		public event Action<string> Deleted;
 		public event Action<string> Renamed;
 
-		public FileSystemWatcher(string path)
+		private Func<string, bool> Filter;
+
+		public FileSystemWatcher(string path, bool includeSubdirectories)
 		{
+			if (!includeSubdirectories) {
+				Filter = (s) => {
+					return System.IO.Path.GetDirectoryName(s) == path;
+				};
+			}
 			fsEventStream = new FSEventStream(
 				new string[] { path }, TimeSpan.FromSeconds(1),
 				FSEventStreamCreateFlags.FileEvents | FSEventStreamCreateFlags.IgnoreSelf);
@@ -28,16 +35,24 @@ namespace Lime
 		{
 			foreach (var e in args.Events) {
 				if ((e.Flags & FSEventStreamEventFlags.ItemModified) != 0) {
-					Changed?.Invoke(e.Path);
+					if (Filter?.Invoke(e.Path) ?? true) {
+						Changed?.Invoke(e.Path);
+					}
 				}
 				if ((e.Flags & FSEventStreamEventFlags.ItemCreated) != 0) {
-					Created?.Invoke(e.Path);
+					if (Filter?.Invoke(e.Path) ?? true) {
+						Changed?.Invoke(e.Path);
+					}
 				}
 				if ((e.Flags & FSEventStreamEventFlags.ItemRemoved) != 0) {
-					Deleted?.Invoke(e.Path);
+					if (Filter?.Invoke(e.Path) ?? true) {
+						Changed?.Invoke(e.Path);
+					}
 				}
 				if ((e.Flags & FSEventStreamEventFlags.ItemRenamed) != 0) {
-					Renamed?.Invoke(e.Path);
+					if (Filter?.Invoke(e.Path) ?? true) {
+						Changed?.Invoke(e.Path);
+					}
 				}
 			}
 		}

@@ -48,9 +48,81 @@ namespace Lime
 			texture = null;
 		}
 
+		public TextureWrapMode WrapModeU
+		{
+			get
+			{
+				if (texture == null) {
+					texture = LoadTexture();
+				}
+				return texture.WrapModeU;
+			}
+			set
+			{
+				if (texture == null) {
+					texture = LoadTexture();
+				}
+				texture.WrapModeU = value;
+			}
+		}
+
+		public TextureWrapMode WrapModeV
+		{
+			get
+			{
+				if (texture == null) {
+					texture = LoadTexture();
+				}
+				return texture.WrapModeV;
+			}
+			set
+			{
+				if (texture == null) {
+					texture = LoadTexture();
+				}
+				texture.WrapModeV = value;
+			}
+		}
+
+		public TextureFilter MinFilter
+		{
+			get
+			{
+				if (texture == null) {
+					texture = LoadTexture();
+				}
+				return texture.MinFilter;
+			}
+			set
+			{
+				if (texture == null) {
+					texture = LoadTexture();
+				}
+				texture.MinFilter = value;
+			}
+		}
+
+		public TextureFilter MagFilter
+		{
+			get
+			{
+				if (texture == null) {
+					texture = LoadTexture();
+				}
+				return texture.MagFilter;
+			}
+			set
+			{
+				if (texture == null) {
+					texture = LoadTexture();
+				}
+				texture.MagFilter = value;
+			}
+		}
+
 		public bool IsStubTexture
 		{
-			get 
+			get
 			{
 				if (texture == null) {
 					texture = LoadTexture();
@@ -60,22 +132,22 @@ namespace Lime
 		}
 
 		public Size ImageSize {
-			get 
+			get
 			{
 				if (texture == null) {
 					texture = LoadTexture();
 				}
-				return texture.ImageSize; 
+				return texture.ImageSize;
 			}
 		}
 
 		public Size SurfaceSize {
-			get 
+			get
 			{
 				if (texture == null) {
 					texture = LoadTexture();
 				}
-				return texture.SurfaceSize; 
+				return texture.SurfaceSize;
 			}
 		}
 
@@ -84,18 +156,18 @@ namespace Lime
 				if (texture == null) {
 					texture = LoadTexture();
 				}
-				return texture.AtlasUVRect; 
+				return texture.AtlasUVRect;
 			}
 		}
 
-		public ITexture AlphaTexture 
-		{ 
-			get 
+		public ITexture AlphaTexture
+		{
+			get
 			{
 				if (texture == null) {
 					texture = LoadTexture();
 				}
-				return texture.AlphaTexture; 
+				return texture.AlphaTexture;
 			}
 		}
 

@@ -21,9 +21,9 @@ namespace Tangerine
 
 		private TangerineApp()
 		{
-			#if WIN
+#if WIN
 			Orange.UserInterface.Instance = new OrangeInterface();
-			#endif
+#endif
 			WindowOptions.DefaultRefreshRate = 60;
 			WidgetInput.AcceptMouseBeyondWidgetByDefault = false;
 			Application.IsTangerine = true;
@@ -298,9 +298,11 @@ namespace Tangerine
 					GenericCommands.NextDocument,
 					GenericCommands.PreviousDocument
 				}),
+#if WIN
 				new Command("Orange", new Menu {
 					OrangeCommands.Run
 				}),
+#endif
 		};
 			var nodeTypes = new[] {
 				typeof(Frame),
@@ -383,14 +385,18 @@ namespace Tangerine
 			h.Connect(Command.Cut, Core.Operations.Cut.Perform, () => Document.Current?.SelectedRows().Any() ?? false);
 			h.Connect(Command.Paste, Paste, Document.HasCurrent);
 			h.Connect(Command.Delete, Core.Operations.Delete.Perform, () => Document.Current?.SelectedRows().Any() ?? false);
-			h.Connect(Command.SelectAll, () => {
-				foreach (var row in Document.Current.Rows) {
+			h.Connect(Command.SelectAll, () =>
+			{
+				foreach (var row in Document.Current.Rows)
+				{
 					Core.Operations.SelectRow.Perform(row, true);
 				}
 			}, () => Document.Current?.Rows.Count > 0);
 			h.Connect(Command.Undo, () => Document.Current.History.Undo(), () => Document.Current?.History.CanUndo() ?? false);
 			h.Connect(Command.Redo, () => Document.Current.History.Redo(), () => Document.Current?.History.CanRedo() ?? false);
+#if WIN
 			h.Connect(OrangeCommands.Run, () => Orange.Actions.BuildAndRunAction());
+#endif
 		}
 
 		static void Paste()

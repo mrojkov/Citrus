@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
 using System.Linq;
 using Lime;
-using Orange;
 using Tangerine.Core;
 using Yuzu;
 using Yuzu.Metadata;
@@ -27,6 +25,7 @@ namespace Tangerine.UI.FilesystemView
 		public Widget RootWidget;
 		private readonly ScrollViewWidget scrollView;
 		private Selection savedSelection;
+		private const float RowHeight = 16.0f;
 
 		public CookingRulesEditor()
 		{
@@ -114,18 +113,6 @@ namespace Tangerine.UI.FilesystemView
 						cr = crc[key].Parent;
 					} else {
 						throw new Lime.Exception("CookingRule record for cooking rules file itself should already be present in collection");
-						//cr = FindFirstAncestor(cookingRules, path).InheritClone();
-						//cr.SourceFilename = path;
-						//ignoreRules(path, cr);
-						//if (isPerDirectory) {
-						//	foreach (var kv in cookingRules) {
-						//		if (kv.Key.StartsWith(Path.GetDirectoryName(path))) {
-						//			cookingRules[kv.Key] = cr;
-						//		}
-						//	}
-						//} else if (isPerFile) {
-						//	cookingRules[filename] = cr;
-						//}
 					}
 				} else {
 					// Regular File
@@ -164,6 +151,13 @@ namespace Tangerine.UI.FilesystemView
 			foreach (var path in selection) {
 				CreateEditingInterfaceForPath(t, path);
 			}
+			scrollView.Content.Presenter = new DelegatePresenter<Widget>((w) => {
+				var ico = IconPool.GetTexture("Filesystem.Zebra");
+				ico.WrapModeV = ico.WrapModeU = TextureWrapMode.Repeat;
+				ico.MinFilter = ico.MagFilter = TextureFilter.Nearest;
+				w.PrepareRendererState();
+				Renderer.DrawSprite(ico, Color4.White, Vector2.Zero, w.Size, Vector2.Zero, w.Size / (Vector2)ico.ImageSize / RowHeight);
+			});
 		}
 
 		private void CreateEditingInterfaceForPath(CookingRulesCollection crc, string path)
@@ -189,28 +183,26 @@ namespace Tangerine.UI.FilesystemView
 				Layout = new VBoxLayout(),
 				Nodes = {
 					(headerWidget = new Widget {
-						Layout = new HBoxLayout(),
-						PostPresenter = new LayoutDebugPresenter(Color4.Red, 0.5f)
+						Layout = new HBoxLayout {
+							IgnoreHidden = false,
+						},
+						// TODO: maybe some Metrics.ScrollView.SliderWidth ? (though ScrollView is decorated in DesktopTheme which is inside Lime)
+						Padding = new Thickness { Right = 10.0f },
 					}),
 					(overridesWidget = new Widget {
 						Visible = false,
 						Layout = new VBoxLayout(),
-						Padding = new Thickness
-						{
+						Padding = new Thickness {
 							Left = 30.0f
 						},
-						PostPresenter = new LayoutDebugPresenter(Color4.Red, 0.5f)
 					})
 				},
-				PostPresenter = new LayoutDebugPresenter(Color4.Red, 0.5f)
 			};
 			scrollView.Content.AddNode(fieldRootWidget);
-			int odd = 0;
 			bool rootAdded = false;
 			while (parent != null) {
 				var isRoot = parent == crc[key];
 				foreach (var kv in parent.Enumerate()) {
-					odd++;
 					if (isRoot && !rootAdded) {
 						rootAdded = true;
 						CreateHeaderWidgets(crc, path, yi, headerWidget, overridesWidget, parent);
@@ -227,7 +219,6 @@ namespace Tangerine.UI.FilesystemView
 		{
 			var container = new Widget
 			{
-				Padding = new Thickness(2.0f),
 				Nodes = {
 					new SimpleText(string.IsNullOrEmpty(rules.SourceFilename)
 						? "Default"
@@ -238,9 +229,6 @@ namespace Tangerine.UI.FilesystemView
 						}
 				},
 				Layout = new HBoxLayout(),
-				CompoundPostPresenter = {
-					new LayoutDebugPresenter(Color4.Red, 0.5f)
-				}
 			};
 			container.Components.Add(new PropertyOverrideComponent
 			{
@@ -265,27 +253,27 @@ namespace Tangerine.UI.FilesystemView
 			SimpleText computedValueText;
 			Button createOrDestroyOverride = null;
 
-			headerWidget.Nodes.Add(new Widget {
-				Layout = new HBoxLayout
-				{
-					IgnoreHidden = false
-				},
-				PostPresenter = new LayoutDebugPresenter(Color4.Red, 0.5f),
-				Nodes = {
-					CreateFoldButton(overridesWidget),
-					(computedValueText = new SimpleText()),
-					new Widget {
-						LayoutCell = new LayoutCell {
-							StretchX = 999999,
-						}
+			Func<ITexture> btnTexture = () => IsOverridedByAssociatedCookingRules(crc, path, yi) ? IconPool.GetTexture("Filesystem.Cross") : IconPool.GetTexture("Filesystem.Plus");
+
+			headerWidget.Nodes.AddRange(
+				CreateFoldButton(overridesWidget),
+				(computedValueText = new SimpleText {
+					VAlignment = VAlignment.Center,
+				}),
+				new Widget {
+					LayoutCell = new LayoutCell {
+						StretchX = 999999,
 					},
-					(createOrDestroyOverride = new Button {
-						Text = IsOverridedByAssociatedCookingRules(crc, path, yi) ? "-" : "+",
-						Padding = new Thickness(2.0f),
-						Clicked = () => CreateOrDestroyFieldOverride(crc, path, yi, overridesWidget, createOrDestroyOverride),
-					})
-				}
-			});
+				},
+				(createOrDestroyOverride = new ToolbarButton()
+				{
+					Texture = btnTexture(),
+					Padding = new Thickness(2.0f),
+					Clicked = () => CreateOrDestroyFieldOverride(crc, path, yi, overridesWidget, createOrDestroyOverride),
+				})
+			);
+			createOrDestroyOverride.Padding = Thickness.Zero;
+			createOrDestroyOverride.Size = createOrDestroyOverride.MinMaxSize = RowHeight * Vector2.One;
 			computedValueText.AddChangeWatcher(() => yi.GetValue(rules.CommonRules),
 				(o) => computedValueText.Text = $"{yi.Name} : {yi.GetValue(rules.CommonRules)}");
 		}
@@ -319,12 +307,12 @@ namespace Tangerine.UI.FilesystemView
 				foreach (var node in toUnlink) {
 					node.Unlink();
 				}
-				addRemoveField.Text = "+";
+				addRemoveField.Texture = IconPool.GetTexture("Filesystem.Plus");
 			} else {
 				var cr = GetAssociatedCookingRules(crc, path, true);
 				cr.CommonRules.Override(yi.Name);
 				cr.Save();
-				addRemoveField.Text = "-";
+				addRemoveField.Texture = IconPool.GetTexture("Filesystem.Cross");
 				CreateOverridesWidgets(yi, cr, overridesWidget);
 			}
 			overridesWidget.Nodes.Sort((a, b) => {
@@ -337,8 +325,10 @@ namespace Tangerine.UI.FilesystemView
 		private static Widget CreateFoldButton(Widget container)
 		{
 			ToolbarButton b = null;
-			b = new ToolbarButton(IconPool.GetTexture("Filesystem.Folded"))
-			{
+			b = new ToolbarButton(IconPool.GetTexture("Filesystem.Folded")) {
+				Size = Vector2.One * RowHeight,
+				MinMaxSize = Vector2.One * RowHeight,
+				Padding = Thickness.Zero,
 				Highlightable = false,
 				Clicked = () => {
 					container.Visible = !container.Visible;
