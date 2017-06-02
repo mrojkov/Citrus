@@ -376,7 +376,7 @@ namespace Tangerine.UI
 			editor.Submitted += text => {
 				SetProperty(new NodeReference<T>(text));
 			};
-			editor.AddChangeWatcher(CoalescedPropertyValue(), v => editor.Text = v.Id);
+			editor.AddChangeWatcher(CoalescedPropertyValue(), v => editor.Text = v?.Id);
 		}
 
 		public override void SetFocus() => editor.SetFocus();
