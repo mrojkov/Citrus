@@ -1,5 +1,13 @@
 using System;
 using Yuzu;
+#if OPENGL
+#if iOS || ANDROID || WIN
+using OpenTK.Graphics.ES20;
+#elif MAC
+using OpenTK.Graphics.OpenGL;
+#elif MONOMAC
+using MonoMac.OpenGL;
+#endif
 
 namespace Lime
 {
@@ -23,9 +31,9 @@ namespace Lime
 		{
 			switch (filter) {
 				case TextureFilter.Linear:
-					return (int)OpenTK.Graphics.ES20.All.Linear;
+					return (int)All.Linear;
 				case TextureFilter.Nearest:
-					return (int)OpenTK.Graphics.ES20.All.Nearest;
+					return (int)All.Nearest;
 				default:
 					throw new ArgumentOutOfRangeException(nameof(filter), filter, null);
 			}
@@ -35,17 +43,18 @@ namespace Lime
 		{
 			switch (wrapMode) {
 				case TextureWrapMode.Clamp:
-					return (int)OpenTK.Graphics.ES20.All.ClampToEdge;
+					return (int)All.ClampToEdge;
 				case TextureWrapMode.Repeat:
-					return (int)OpenTK.Graphics.ES20.All.Repeat;
+					return (int)All.Repeat;
 				case TextureWrapMode.MirroredRepeat:
-					return (int)OpenTK.Graphics.ES20.All.MirroredRepeat;
+					return (int)All.MirroredRepeat;
 				default:
 					throw new ArgumentOutOfRangeException(nameof(wrapMode), wrapMode, null);
 			}
 		}
 	}
-
+#endif
+ 
 	public interface ITexture : IDisposable
 	{
 		Size ImageSize { get; }

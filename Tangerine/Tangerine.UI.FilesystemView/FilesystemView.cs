@@ -1,15 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Security.Claims;
 using Lime;
-using Orange;
 using Tangerine.Core;
-using Yuzu;
-using Yuzu.Metadata;
 
 namespace Tangerine.UI.FilesystemView
 {

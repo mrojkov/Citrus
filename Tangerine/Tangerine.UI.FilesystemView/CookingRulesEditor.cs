@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
 using System.Linq;
 using Lime;
-using Orange;
 using Tangerine.Core;
 using Yuzu;
 using Yuzu.Metadata;
