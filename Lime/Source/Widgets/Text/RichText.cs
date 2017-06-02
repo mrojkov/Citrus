@@ -15,6 +15,8 @@ namespace Lime
 		public SpriteList spriteList;
 		internal TextRenderer Renderer;
 		public Action<RichText, Sprite> SpriteListElementHandler = null;
+		private string displayText;
+		private TextProcessorDelegate textProcessor;
 
 		[YuzuMember]
 		public override string Text
@@ -29,11 +31,30 @@ namespace Lime
 			}
 		}
 
-		public string DisplayText { get { return text; } }
+		public string DisplayText
+		{
+			get
+			{
+				if (displayText == null) {
+					displayText = Localizable ? Text.Localize() : Text;
+					textProcessor?.Invoke(ref displayText);
+				}
+				return displayText;
+			}
+		}
 
-		public event TextProcessorDelegate TextProcessor {
-			add { throw new NotImplementedException(); }
-			remove { throw new NotImplementedException(); }
+		public event TextProcessorDelegate TextProcessor
+		{
+			add
+			{
+				textProcessor += value;
+				Invalidate();
+			}
+			remove
+			{
+				textProcessor -= value;
+				Invalidate();
+			}
 		}
 
 		[YuzuMember]
@@ -207,8 +228,7 @@ namespace Lime
 			if (parser != null) {
 				return;
 			}
-			var localizedText = Localization.GetString(text);
-			parser = new TextParser(localizedText);
+			parser = new TextParser(DisplayText);
 			errorMessage = parser.ErrorMessage;
 			if (errorMessage != null) {
 				parser = new TextParser("Error: " + errorMessage);
@@ -220,6 +240,7 @@ namespace Lime
 			spriteList = null;
 			parser = null;
 			Renderer = null;
+			displayText = null;
 			InvalidateParentConstraintsAndArrangement();
 			Window.Current?.Invalidate();
 		}
