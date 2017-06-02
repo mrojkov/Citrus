@@ -33,6 +33,8 @@ namespace Tangerine.UI.Timeline
 						ClearRowSelection.Perform();
 						SelectRow.Perform(row);
 					}
+				} else if (input.IsKeyPressed(Key.Control)) {
+					SelectRow.Perform(row, !row.Selected);
 				} else {
 					input.CaptureMouse();
 					if (!row.Selected) {
