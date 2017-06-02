@@ -72,7 +72,7 @@ namespace Tangerine.UI.Inspector
 				}
 				var yuzuField = PropertyAttributes<YuzuField>.Get(type, property.Name);
 				var tang = PropertyAttributes<TangerineKeyframeColorAttribute>.Get(type, property.Name);
-				var tangIgnore = PropertyAttributes<TangerineIgnorePropertyAttribute>.Get(type, property.Name);
+				var tangIgnore = PropertyAttributes<TangerineIgnoreAttribute>.Get(type, property.Name);
 				if (yuzuField == null && tang == null || tangIgnore != null)
 					continue;
 				if (!categoryLabelAdded) {

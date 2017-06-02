@@ -19,9 +19,10 @@ namespace Lime
 	/// <summary>
 	/// Denotes a property which can not be animated within Tangerine.
 	/// </summary>
-	public class TangerineStaticPropertyAttribute : Attribute { }
+	public sealed class TangerineStaticPropertyAttribute : Attribute
+	{ }
 
-	public class TangerineKeyframeColorAttribute : Attribute
+	public sealed class TangerineKeyframeColorAttribute : Attribute
 	{
 		public int ColorIndex;
 
@@ -31,7 +32,7 @@ namespace Lime
 		}
 	}
 
-	public class TangerineNodeBuilderAttribute : Attribute
+	public sealed class TangerineNodeBuilderAttribute : Attribute
 	{
 		public string MethodName { get; private set; }
 
@@ -41,7 +42,7 @@ namespace Lime
 		}
 	}
 
-	public class AllowedParentTypes : Attribute
+	public sealed class AllowedParentTypes : Attribute
 	{
 		public Type[] Types;
 
@@ -51,7 +52,7 @@ namespace Lime
 		}
 	}
 
-	public class AllowedChildrenTypes : Attribute
+	public sealed class AllowedChildrenTypes : Attribute
 	{
 		public Type[] Types;
 
@@ -61,7 +62,9 @@ namespace Lime
 		}
 	}
 
-	public class TangerineIgnorePropertyAttribute : Attribute { }
+	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
+	public sealed class TangerineIgnoreAttribute : Attribute
+	{ }
 
 	[Flags]
 	public enum TangerineFlags

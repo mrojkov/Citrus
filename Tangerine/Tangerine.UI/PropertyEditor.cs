@@ -4,6 +4,7 @@ using System.Linq;
 using Lime;
 using Tangerine.Core;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace Tangerine.UI
 {
@@ -409,8 +410,10 @@ namespace Tangerine.UI
 			selector = new DropDownList { LayoutCell = new LayoutCell(Alignment.Center) };
 			ContainerWidget.AddNode(selector);
 			var propType = editorParams.PropertyInfo.PropertyType;
-			foreach (var i in Enum.GetNames(propType).Zip(Enum.GetValues(propType).Cast<object>(), (a, b) => new DropDownList.Item(a, b))) {
-				selector.Items.Add(i);
+			var fields = propType.GetFields(BindingFlags.Public | BindingFlags.Static);
+			var allowedFields = fields.Where(f => !Attribute.IsDefined(f, typeof(TangerineIgnoreAttribute)));
+			foreach (var field in allowedFields) {
+				selector.Items.Add(new CommonDropDownList.Item(field.Name, field.GetValue(null)));
 			}
 			selector.Changed += a => SetProperty((T)selector.Items[a.Index].Value);
 			selector.AddChangeWatcher(CoalescedPropertyValue(), v => selector.Value = v);
