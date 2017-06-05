@@ -37,6 +37,7 @@ namespace Tangerine.UI
 		{
 			public Color4 PropertyRowBackground;
 			public Color4 Lines;
+			public Color4 LinesLight;
 			public Color4 Selection;
 			public Color4 Cursor;
 			public Color4 RunningCursor;
@@ -122,6 +123,7 @@ namespace Tangerine.UI
 			var timelineGrid = new TimelineGridColors {
 				PropertyRowBackground = DesktopTheme.Colors.GrayBackground.Darken(0.5f),
 				Lines = new Color4(45, 45, 48),
+				LinesLight = new Color4(45, 45, 48).Lighten(0.065f),
 				Selection = Color4.Gray.Transparentify(0.5f),
 				Cursor = new Color4(163, 0, 0).Darken(0.15f),
 				RunningCursor = new Color4(0, 163, 0).Darken(0.15f)
@@ -196,7 +198,8 @@ namespace Tangerine.UI
 			};
 			var timelineGrid = new TimelineGridColors {
 				PropertyRowBackground = DesktopTheme.Colors.GrayBackground.Lighten(0.5f),
-				Lines = Color4.White.Darken(0.25f),
+				Lines = new Color4(160, 160, 160),
+				LinesLight = new Color4(240, 240, 240),
 				Selection = Color4.Gray.Transparentify(0.5f),
 				Cursor = Color4.Red.Lighten(0.4f),
 				RunningCursor = Color4.Green.Lighten(0.4f)

@@ -58,11 +58,21 @@ namespace Tangerine.UI.Timeline
 			float x = 0.5f;
 			for (int i = 0; i <= numCols; i++) {
 				if (timeline.IsColumnVisible(i)) {
-					Renderer.DrawLine(x, 0, x, ContentWidget.Height, ColorTheme.Current.TimelineGrid.Lines);
+					Renderer.DrawLine(
+						x, 1, x, ContentWidget.Height,
+						Document.Current.Container.Markers.Exists(m => m.Frame == i) ?
+							ColorTheme.Current.TimelineGrid.Lines :
+							ColorTheme.Current.TimelineGrid.LinesLight);
 				}
 				x += TimelineMetrics.ColWidth;
 			}
 			x = TimelineMetrics.ColWidth * (timeline.CurrentColumn + 0.5f);
+
+			foreach (var row in Document.Current.Rows) {
+				var y = row.GetGridWidget().Bottom;
+				Renderer.DrawLine(0, y, ContentWidget.Width, y, ColorTheme.Current.TimelineGrid.Lines);
+			}
+
 			Renderer.DrawLine(
 				x, 0, x, ContentWidget.Height,
 				Document.Current.Container.IsRunning ? 
