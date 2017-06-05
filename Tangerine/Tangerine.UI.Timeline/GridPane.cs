@@ -55,24 +55,31 @@ namespace Tangerine.UI.Timeline
 		{
 			ContentWidget.PrepareRendererState();
 			int numCols = timeline.ColumnCount;
+			// Render vertical lines.
 			float x = 0.5f;
 			for (int i = 0; i <= numCols; i++) {
 				if (timeline.IsColumnVisible(i)) {
 					Renderer.DrawLine(
-						x, 1, x, ContentWidget.Height,
-						Document.Current.Container.Markers.Exists(m => m.Frame == i) ?
-							ColorTheme.Current.TimelineGrid.Lines :
-							ColorTheme.Current.TimelineGrid.LinesLight);
+						x, 1, x, ContentWidget.Height - 1,
+						ColorTheme.Current.TimelineGrid.LinesLight);
 				}
 				x += TimelineMetrics.ColWidth;
 			}
+			// Render dark vertical lines below markers.
+			foreach (var m in Document.Current.Container.Markers) {
+				x = TimelineMetrics.ColWidth * m.Frame + 0.5f;
+				if (timeline.IsColumnVisible(m.Frame)) {
+					Renderer.DrawLine(
+						x, 1, x, ContentWidget.Height - 1, ColorTheme.Current.TimelineGrid.Lines);
+				}
+			}
+			// Render dark horizonal lines.
 			x = TimelineMetrics.ColWidth * (timeline.CurrentColumn + 0.5f);
-
 			foreach (var row in Document.Current.Rows) {
-				var y = row.GetGridWidget().Bottom;
+				var y = row.GetGridWidget().Bottom + 0.5f;
 				Renderer.DrawLine(0, y, ContentWidget.Width, y, ColorTheme.Current.TimelineGrid.Lines);
 			}
-
+			// Render the cursor.
 			Renderer.DrawLine(
 				x, 0, x, ContentWidget.Height,
 				Document.Current.Container.IsRunning ? 
