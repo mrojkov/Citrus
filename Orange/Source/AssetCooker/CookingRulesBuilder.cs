@@ -240,8 +240,7 @@ namespace Orange
 			}
 		}
 
-		// TODO: rename
-		private string StringForValue(Meta.Item yi, object value)
+		public string FieldValueToString(Meta.Item yi, object value)
 		{
 			if (value == null) {
 				return "";
@@ -269,7 +268,7 @@ namespace Orange
 			var targetString = target == null ? "" : $"({target.Name})";
 			foreach (var yi in rules.FieldOverrides) {
 				var value = yi.GetValue(rules);
-				var valueString = StringForValue(yi, value);
+				var valueString = FieldValueToString(yi, value);
 				if (!string.IsNullOrEmpty(valueString)) {
 					sw.Write($"{yi.Name}{targetString} {valueString}\n");
 				}

@@ -137,10 +137,15 @@ namespace Tangerine.UI.FilesystemView
 			return cr;
 		}
 
+		Texture2D cachedZebraTexture = null;
+
 		public void InvalidateForSelection(Selection selection)
 		{
 			savedSelection = selection;
 			scrollView.Content.Nodes.Clear();
+			if (RootWidget.Parent == null) {
+				return;
+			}
 			if (selection == null || selection.Empty) {
 				return;
 			}
@@ -154,11 +159,15 @@ namespace Tangerine.UI.FilesystemView
 				CreateEditingInterfaceForPath(t, path);
 			}
 			scrollView.Content.Presenter = new DelegatePresenter<Widget>((w) => {
-				var ico = IconPool.GetTexture("Filesystem.Zebra");
-				ico.WrapModeV = ico.WrapModeU = TextureWrapMode.Repeat;
-				ico.MinFilter = ico.MagFilter = TextureFilter.Nearest;
+				if (cachedZebraTexture == null) {
+					cachedZebraTexture = new Texture2D();
+					cachedZebraTexture.LoadImage(new[] { DesktopTheme.Colors.ZebraColor1, DesktopTheme.Colors.ZebraColor2 }, 1, 2);
+					cachedZebraTexture.WrapModeV = cachedZebraTexture.WrapModeU = TextureWrapMode.Repeat;
+					cachedZebraTexture.MinFilter = cachedZebraTexture.MagFilter = TextureFilter.Nearest;
+				}
+
 				w.PrepareRendererState();
-				Renderer.DrawSprite(ico, Color4.White, Vector2.Zero, w.Size, Vector2.Zero, w.Size / (Vector2)ico.ImageSize / RowHeight);
+				Renderer.DrawSprite(cachedZebraTexture, Color4.White, Vector2.Zero, w.Size, Vector2.Zero, w.Size / (Vector2)cachedZebraTexture.ImageSize / RowHeight);
 			});
 		}
 
@@ -201,6 +210,11 @@ namespace Tangerine.UI.FilesystemView
 				},
 			};
 			scrollView.Content.AddNode(fieldRootWidget);
+			fieldRootWidget.AddChangeWatcher(() => WidgetContext.Current.NodeUnderMouse, (value) => {
+				if (value != null && value.Parent == fieldRootWidget) {
+					Window.Current?.Invalidate();
+				}
+			});
 			bool rootAdded = false;
 			while (parent != null) {
 				var isRoot = parent == crc[key];
@@ -219,15 +233,24 @@ namespace Tangerine.UI.FilesystemView
 
 		private void CreateOverridesWidgets(Meta.Item yi, CookingRules rules, Widget overridesWidget)
 		{
+			Widget innerContainer;
 			var container = new Widget
 			{
+				Padding = new Thickness { Right = 30 },
 				Nodes = {
+					(innerContainer = new Widget {
+						Layout = new HBoxLayout(),
+					}),
 					new SimpleText(string.IsNullOrEmpty(rules.SourceFilename)
 						? "Default"
 						: rules.SourceFilename.Substring(The.Workspace.AssetsDirectory.Length)) {
 							FontHeight = 16,
 							AutoSizeConstraints = false,
-							OverflowMode = TextOverflowMode.Ellipsis
+							OverflowMode = TextOverflowMode.Ellipsis,
+							HAlignment = HAlignment.Right,
+							VAlignment = VAlignment.Center,
+							MinSize = new Vector2(100, RowHeight),
+							MaxSize = new Vector2(500, RowHeight)
 						}
 				},
 				Layout = new HBoxLayout(),
@@ -238,12 +261,31 @@ namespace Tangerine.UI.FilesystemView
 				YuzuItem = yi,
 			});
 			overridesWidget.Nodes.Add(container);
-			var editorParams = new PropertyEditorParams(container, rules.CommonRules, yi.Name)
+			var editorParams = new PropertyEditorParams(innerContainer, rules.CommonRules, yi.Name)
 			{
+				ShowLabel = false,
 				PropertySetter = (owner, name, value) => {
 					yi.SetValue(owner, value);
 					rules.CommonRules.Override(name);
 					rules.Save();
+				},
+				NumericEditBoxFactory = () => {
+					var r = new NumericEditBox();
+					r.MinMaxHeight = r.Height = RowHeight;
+					r.TextWidget.VAlignment = VAlignment.Center;
+					r.TextWidget.Padding.Top = r.TextWidget.Padding.Bottom = 0.0f;
+					return r;
+				},
+				DropDownListFactory = () => {
+					var r = new DropDownList();
+					r.MinMaxHeight = r.Height = RowHeight;
+					return r;
+				},
+				EditBoxFactory = () => {
+					var r = new EditBox();
+					r.MinMaxHeight = r.Height = RowHeight;
+					r.TextWidget.Padding.Top = r.TextWidget.Padding.Bottom = 0.0f;
+					return r;
 				},
 			};
 			CreatePropertyEditorForType(yi, editorParams);
@@ -254,19 +296,39 @@ namespace Tangerine.UI.FilesystemView
 		{
 			SimpleText computedValueText;
 			Button createOrDestroyOverride = null;
-
+			headerWidget.HitTestTarget = true;
+			headerWidget.CompoundPostPresenter.Add(new DelegatePresenter<Widget>((widget) => {
+				if (widget.IsMouseOver()) {
+					widget.PrepareRendererState();
+					Renderer.DrawRect(
+						Vector2.Zero,
+						widget.Size,
+						DesktopTheme.Colors.SelectedBackground.Transparentify(0.8f));
+				}
+			}));
 			Func<ITexture> btnTexture = () => IsOverridedByAssociatedCookingRules(crc, path, yi) ? IconPool.GetTexture("Filesystem.Cross") : IconPool.GetTexture("Filesystem.Plus");
-
+			Widget foldButton;
 			headerWidget.Nodes.AddRange(
-				CreateFoldButton(overridesWidget),
-				(computedValueText = new SimpleText {
+				(foldButton = CreateFoldButton(overridesWidget)),
+				(new SimpleText {
+					AutoSizeConstraints = false,
 					VAlignment = VAlignment.Center,
+					HAlignment = HAlignment.Left,
+					OverflowMode = TextOverflowMode.Ellipsis,
+					LayoutCell = new LayoutCell { StretchX = 1 },
+					Size = new Vector2(150, RowHeight),
+					MinSize = new Vector2(100, RowHeight),
+					MaxSize = new Vector2(200, RowHeight),
+					Text = yi.Name,
 				}),
-				new Widget {
-					LayoutCell = new LayoutCell {
-						StretchX = 999999,
-					},
-				},
+				(computedValueText = new SimpleText {
+					LayoutCell = new LayoutCell { StretchX = 3 },
+					AutoSizeConstraints = false,
+					HAlignment = HAlignment.Left,
+					Size = new Vector2(150, RowHeight),
+					MinSize = new Vector2(50, RowHeight),
+					MaxSize = new Vector2(300, RowHeight),
+				}),
 				(createOrDestroyOverride = new ToolbarButton()
 				{
 					Texture = btnTexture(),
@@ -274,10 +336,11 @@ namespace Tangerine.UI.FilesystemView
 					Clicked = () => CreateOrDestroyFieldOverride(crc, path, yi, overridesWidget, createOrDestroyOverride),
 				})
 			);
+			headerWidget.Clicked = foldButton.Clicked;
 			createOrDestroyOverride.Padding = Thickness.Zero;
 			createOrDestroyOverride.Size = createOrDestroyOverride.MinMaxSize = RowHeight * Vector2.One;
 			computedValueText.AddChangeWatcher(() => yi.GetValue(rules.CommonRules),
-				(o) => computedValueText.Text = $"{yi.Name} : {yi.GetValue(rules.CommonRules)}");
+				(o) => computedValueText.Text = rules.FieldValueToString(yi, yi.GetValue(rules.CommonRules)));
 		}
 
 		private bool IsOverridedByAssociatedCookingRules(CookingRulesCollection crc, string path, Meta.Item yi)

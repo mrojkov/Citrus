@@ -7,11 +7,11 @@ namespace Tangerine.UI.FilesystemView
 	public class FilesystemView : IDocumentView
 	{
 		public static FilesystemView Instance;
-		public Widget DockPanelWidget;
-		public Widget RootWidget;
-		public ScrollViewWidget FilesScrollView;
-		public readonly FilesystemToolbar FilesystemToolbar;
-		readonly Model Model = new Model();
+		private Widget dockPanelWidget;
+		private Widget rootWidget;
+		private ScrollViewWidget scrollView;
+		private readonly FilesystemToolbar toolbar;
+		private readonly Model model = new Model();
 		private Vector2 rectSelectionBeginPoint;
 		private Vector2 rectSelectionEndPoint;
 		private bool rectSelecting;
@@ -25,8 +25,7 @@ namespace Tangerine.UI.FilesystemView
 			fsWatcher = new Lime.FileSystemWatcher(path, includeSubdirectories: false);
 			// TODO: throttle
 			Action OnFsWatcherChanged = () => {
-				// TODO: update selection
-				InvalidateView(Model.CurrentPath);
+				InvalidateView(model.CurrentPath);
 			};
 			fsWatcher.Deleted += (p) => {
 				selection.Deselect(p);
@@ -38,11 +37,11 @@ namespace Tangerine.UI.FilesystemView
 
 		public FilesystemView(DockPanel dockPanel)
 		{
-			DockPanelWidget = dockPanel.ContentWidget;
-			RootWidget = new Widget();
-			FilesystemToolbar = new FilesystemToolbar();
-			FilesScrollView = new ScrollViewWidget();
-			RootWidget.AddChangeWatcher(() => Model.CurrentPath, (path) => dockPanel.Title = $"Filesystem: {path}");
+			dockPanelWidget = dockPanel.ContentWidget;
+			rootWidget = new Widget();
+			toolbar = new FilesystemToolbar();
+			scrollView = new ScrollViewWidget();
+			rootWidget.AddChangeWatcher(() => model.CurrentPath, (path) => dockPanel.Title = $"Filesystem: {path}");
 			crEditor = new CookingRulesEditor();
 			InitializeWidgets();
 		}
@@ -50,34 +49,34 @@ namespace Tangerine.UI.FilesystemView
 		void InitializeWidgets()
 		{
 			selection.Changed += Selection_Changed;
-			FilesScrollView.HitTestTarget = true;
-			FilesScrollView.Content.Layout = new FlowLayout { Spacing = 1.0f };
-			FilesScrollView.Padding = new Thickness(5.0f);
-			FilesScrollView.CompoundPostPresenter.Insert(0, new DelegatePresenter<ScrollViewWidget>(RenderFilesWidgetRectSelection));
-			FilesScrollView.Updated += FilesScrollViewUpdated;
-			FilesScrollView.Content.Presenter = new DelegatePresenter<ScrollView.ScrollViewContentWidget>((canvas) => {
+			scrollView.HitTestTarget = true;
+			scrollView.Content.Layout = new FlowLayout { Spacing = 1.0f };
+			scrollView.Padding = new Thickness(5.0f);
+			scrollView.Content.CompoundPostPresenter.Insert(0, new DelegatePresenter<Widget>(RenderFilesWidgetRectSelection));
+			scrollView.Updated += ScrollViewUpdated;
+			scrollView.Content.Presenter = new DelegatePresenter<ScrollView.ScrollViewContentWidget>((canvas) => {
 				canvas.PrepareRendererState();
 				Renderer.DrawRect(Vector2.Zero, canvas.Size, DesktopTheme.Colors.WhiteBackground);
 			});
-			RootWidget.AddChangeWatcher(() => rectSelectionEndPoint, WhenSelectionRectChanged);
-			RootWidget.AddChangeWatcher(() => WidgetContext.Current.NodeUnderMouse, (value) => {
-				if (value != null && FilesScrollView.Content.Nodes.Contains(value)) {
+			rootWidget.AddChangeWatcher(() => rectSelectionEndPoint, WhenSelectionRectChanged);
+			rootWidget.AddChangeWatcher(() => WidgetContext.Current.NodeUnderMouse, (value) => {
+				if (value != null && scrollView.Content == value.Parent) {
 					Window.Current.Invalidate();
 				}
 			});
-			RootWidget.AddChangeWatcher(() => Model.CurrentPath, (p) => {
+			rootWidget.AddChangeWatcher(() => model.CurrentPath, (p) => {
 				InvalidateView(p);
 				InvalidateFSWatcher(p);
 			});
-			RootWidget.Layout = new VBoxLayout();
-			RootWidget.AddNode(new HSplitter {
+			rootWidget.Layout = new VBoxLayout();
+			rootWidget.AddNode(new HSplitter {
 				Layout = new HBoxLayout(),
 				Nodes = {
 					(new Widget {
 						Layout = new VBoxLayout(),
 						Nodes = {
-							FilesystemToolbar,
-							FilesScrollView,
+							toolbar,
+							scrollView,
 						}}),
 						crEditor.RootWidget,
 				}
@@ -91,8 +90,8 @@ namespace Tangerine.UI.FilesystemView
 
 		private void InvalidateView(string path)
 		{
-			FilesScrollView.Content.Nodes.Clear();
-			foreach (var item in Model.EnumerateItems()) {
+			scrollView.Content.Nodes.Clear();
+			foreach (var item in model.EnumerateItems()) {
 				var iconWidget = new Icon(item);
 				iconWidget.CompoundPostPresenter.Insert(0, new DelegatePresenter<Icon>(RenderIconSelection));
 				iconWidget.Updated += (dt) => {
@@ -100,7 +99,7 @@ namespace Tangerine.UI.FilesystemView
 					var input = iconWidget.Input;
 					if (input.WasKeyPressed(Key.Mouse0DoubleClick)) {
 						input.ConsumeKey(Key.Mouse0DoubleClick);
-						Model.GoTo(item);
+						model.GoTo(item);
 					}
 					if (iconWidget.Input.WasKeyPressed(Key.Mouse1)) {
 						iconWidget.Input.ConsumeKey(Key.Mouse1);
@@ -126,7 +125,7 @@ namespace Tangerine.UI.FilesystemView
 						// TODO: Context menu
 					}
 				};
-				FilesScrollView.Content.AddNode(iconWidget);
+				scrollView.Content.AddNode(iconWidget);
 			}
 		}
 
@@ -154,7 +153,7 @@ namespace Tangerine.UI.FilesystemView
 			var p1 = rectSelectionEndPoint;
 			var r0 = new Rectangle(new Vector2(Mathf.Min(p0.X, p1.X), Mathf.Min(p0.Y, p1.Y)),
 				new Vector2(Mathf.Max(p0.X, p1.X), Mathf.Max(p0.Y, p1.Y)));
-			foreach (var n in FilesScrollView.Content.Nodes) {
+			foreach (var n in scrollView.Content.Nodes) {
 				var ic = n as Icon;
 				var r1 = new Rectangle(ic.Position, ic.Position + ic.Size);
 				if (Rectangle.Intersect(r0, r1) != Rectangle.Empty) {
@@ -167,20 +166,20 @@ namespace Tangerine.UI.FilesystemView
 			}
 		}
 
-		private void FilesScrollViewUpdated(float delta)
+		private void ScrollViewUpdated(float delta)
 		{
-			var input = FilesScrollView.Input;
-			if (FilesScrollView.IsMouseOver()) {
+			var input = scrollView.Input;
+			if (scrollView.IsMouseOver()) {
 				if (!rectSelecting && input.WasKeyPressed(Key.Mouse0)) {
 					input.ConsumeKey(Key.Mouse0);
 					rectSelecting = true;
-					rectSelectionBeginPoint = input.LocalMousePosition;
+					rectSelectionBeginPoint = scrollView.Content.Input.LocalMousePosition;
 				}
 				if (input.WasKeyPressed(Key.Mouse1)) {
 					input.ConsumeKey(Key.Mouse1);
 					rectSelecting = false;
 					selection.Clear();
-					SystemShellContextMenu.Instance.Show(Model.CurrentPath);
+					SystemShellContextMenu.Instance.Show(model.CurrentPath);
 				}
 			}
 			if (rectSelecting) {
@@ -188,12 +187,12 @@ namespace Tangerine.UI.FilesystemView
 					Window.Current.Input.ConsumeKey(Key.Mouse0);
 					rectSelecting = false;
 				}
-				rectSelectionEndPoint = input.LocalMousePosition;
+				rectSelectionEndPoint = scrollView.Content.Input.LocalMousePosition;
 				Window.Current.Invalidate();
 			}
 		}
 
-		private void RenderFilesWidgetRectSelection(ScrollViewWidget canvas)
+		private void RenderFilesWidgetRectSelection(Widget canvas)
 		{
 				if (!rectSelecting) {
 					return;
@@ -206,24 +205,24 @@ namespace Tangerine.UI.FilesystemView
 		public void Attach()
 		{
 			Instance = this;
-			DockPanelWidget.PushNode(RootWidget);
-			RootWidget.SetFocus();
+			dockPanelWidget.PushNode(rootWidget);
+			rootWidget.SetFocus();
 		}
 
 		public void Detach()
 		{
 			Instance = null;
-			RootWidget.Unlink();
+			rootWidget.Unlink();
 		}
 
 		public void GoUp()
 		{
-			Model.GoUp();
+			model.GoUp();
 		}
 
 		public void GoTo(string path)
 		{
-			Model.GoTo(path);
+			model.GoTo(path);
 		}
 
 		private Node crEditorSavedParentWidget;
@@ -238,6 +237,7 @@ namespace Tangerine.UI.FilesystemView
 				crRoot.Unlink();
 			} else {
 				crEditorSavedParentWidget.Nodes.Insert(crEditorSavedIndexInParent, crRoot);
+				crEditor.InvalidateForSelection(selection);
 			}
 		}
 	}
