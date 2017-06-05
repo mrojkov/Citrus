@@ -75,7 +75,6 @@ namespace Tangerine.UI
 			EditorParams = editorParams;
 			ContainerWidget = new Widget {
 				Layout = new HBoxLayout { IgnoreHidden = false },
-				Padding = new Thickness { Left = 4, Right = 12 },
 				LayoutCell = new LayoutCell { StretchY = 0 },
 			};
 			editorParams.InspectorPane.AddNode(ContainerWidget);

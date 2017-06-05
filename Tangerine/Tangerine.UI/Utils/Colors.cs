@@ -76,8 +76,10 @@ namespace Tangerine.UI
 
 		public class InspectorColors
 		{
-			public Color4 BorderAroundKeyframeColorbox = DesktopTheme.Colors.ControlBorder;
-			public Color4 CategoryLabelBackground = Color4.Black.Lighten(0.13f);
+			public Color4 BorderAroundKeyframeColorbox;
+			public Color4 CategoryLabelBackground;
+			public Color4 StripeBackground1;
+			public Color4 StripeBackground2;
 		}
 
 		public DesktopTheme.ColorTheme Basic;
@@ -153,7 +155,9 @@ namespace Tangerine.UI
 			};
 			var inspector = new InspectorColors {
 				BorderAroundKeyframeColorbox = DesktopTheme.Colors.ControlBorder,
-				CategoryLabelBackground = Color4.Black.Lighten(0.13f)
+				CategoryLabelBackground = Color4.Black.Lighten(0.3f),
+				StripeBackground1 = DesktopTheme.Colors.GrayBackground,
+				StripeBackground2 = DesktopTheme.Colors.GrayBackground.Lighten(0.05f),
 			};
 			return new ColorTheme {
 				Basic = DesktopTheme.Colors,
@@ -229,7 +233,9 @@ namespace Tangerine.UI
 			};
 			var inspector = new InspectorColors {
 				BorderAroundKeyframeColorbox = DesktopTheme.Colors.ControlBorder,
-				CategoryLabelBackground = Color4.White.Darken(0.13f)
+				CategoryLabelBackground = Color4.White.Darken(0.2f),
+				StripeBackground1 = DesktopTheme.Colors.GrayBackground,
+				StripeBackground2 = DesktopTheme.Colors.GrayBackground.Darken(0.05f),
 			};
 			return new ColorTheme {
 				Basic = DesktopTheme.Colors,

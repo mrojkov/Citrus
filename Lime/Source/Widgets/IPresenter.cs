@@ -143,6 +143,7 @@ namespace Lime
 	public class WidgetFlatFillPresenter : CustomPresenter<Widget>
 	{
 		public Color4 Color { get; set; }
+		public bool IgnorePadding { get; set; }
 
 		public WidgetFlatFillPresenter(Color4 color)
 		{
@@ -152,7 +153,11 @@ namespace Lime
 		protected override void InternalRender(Widget widget)
 		{
 			widget.PrepareRendererState();
-			Renderer.DrawRect(widget.ContentPosition, widget.ContentSize, Color * widget.GlobalColor);
+			if (IgnorePadding) {
+				Renderer.DrawRect(Vector2.Zero, widget.Size, Color * widget.GlobalColor);
+			} else {
+				Renderer.DrawRect(widget.ContentPosition, widget.ContentSize, Color * widget.GlobalColor);
+			}
 		}
 	}
 }

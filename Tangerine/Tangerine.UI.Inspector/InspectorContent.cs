@@ -64,6 +64,7 @@ namespace Tangerine.UI.Inspector
 
 		private void PopulateContentForType(Type type, List<object> objects)
 		{
+			int row = 0;
 			var categoryLabelAdded = false;
 			foreach (var property in type.GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public)) {
 				if (property.Name == "Item") {
@@ -105,7 +106,7 @@ namespace Tangerine.UI.Inspector
 					if (i.Condition(context)) {
 						var propertyEditor = i.Builder(context);
 						if (propertyEditor != null) {
-							DecoratePropertyEditor(propertyEditor);
+							DecoratePropertyEditor(propertyEditor, row++);
 							editors.Add(propertyEditor);
 						}
 						break;
@@ -114,7 +115,7 @@ namespace Tangerine.UI.Inspector
 			}
 		}
 
-		private void DecoratePropertyEditor(IPropertyEditor editor)
+		private void DecoratePropertyEditor(IPropertyEditor editor, int row)
 		{
 			var ctr = editor.ContainerWidget;
 			if (PropertyAttributes<TangerineStaticPropertyAttribute>.Get(editor.EditorParams.PropertyInfo) == null) {
@@ -135,6 +136,12 @@ namespace Tangerine.UI.Inspector
 			} else {
 				ctr.Nodes.Insert(1, new HSpacer(41));
 			}
+			editor.ContainerWidget.Padding = new Thickness { Left = 4, Top = 1, Right = 12, Bottom = 1 };
+			editor.ContainerWidget.CompoundPresenter.Add(new WidgetFlatFillPresenter(
+				row % 2 == 0 ?
+				ColorTheme.Current.Inspector.StripeBackground1 : 
+				ColorTheme.Current.Inspector.StripeBackground2
+			) { IgnorePadding = true });
 		}
 
 		class TransactionalNumericEditBox : NumericEditBox
