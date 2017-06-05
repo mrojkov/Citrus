@@ -34,25 +34,25 @@ namespace Tangerine.UI.SceneView
 				new DelegatePresenter<Widget>(
 					(w) => {
 						var root = Core.Document.Current.RootNode as Widget;
-						if (root != null) {
+						if (root != null && UserPreferences.Instance.ShowOverlays) {
 							root.PrepareRendererState();
 							var mtx = root.LocalToWorldTransform;
 							var t1 = 1 / mtx.U.Length;
 							var t2 = 1 / mtx.V.Length;
 							Renderer.Transform1 = mtx;
-							var ctrCenter = root.Size * 0.5f;
-							var a1 = new Vector2(deviceWidth1, deviceHeight) * 0.5f + ctrCenter;
-							var b1 = new Vector2(deviceWidth1, deviceHeight) * -0.5f + ctrCenter;
-							var a2 = new Vector2(deviceHeight, deviceWidth1) * 0.5f + ctrCenter;
-							var b2 = new Vector2(deviceHeight, deviceWidth1) * -0.5f + ctrCenter;
-							var a3 = new Vector2(deviceWidth2, deviceHeight) * 0.5f + ctrCenter;
-							var b3 = new Vector2(deviceWidth2, deviceHeight) * -0.5f + ctrCenter;
-							var a4 = new Vector2(deviceHeight, deviceWidth2) * 0.5f + ctrCenter;
-							var b4 = new Vector2(deviceHeight, deviceWidth2) * -0.5f + ctrCenter;
-							var a5 = new Vector2(deviceWidth3, deviceHeight) * 0.5f + ctrCenter;
-							var b5 = new Vector2(deviceWidth3, deviceHeight) * -0.5f + ctrCenter;
-							var a6 = new Vector2(deviceHeight, deviceWidth3) * 0.5f + ctrCenter;
-							var b6 = new Vector2(deviceHeight, deviceWidth3) * -0.5f + ctrCenter;
+							var rootCenter = root.Size * 0.5f;
+							var a1 = new Vector2(deviceWidth1, deviceHeight) * 0.5f + rootCenter;
+							var b1 = new Vector2(deviceWidth1, deviceHeight) * -0.5f + rootCenter;
+							var a2 = new Vector2(deviceHeight, deviceWidth1) * 0.5f + rootCenter;
+							var b2 = new Vector2(deviceHeight, deviceWidth1) * -0.5f + rootCenter;
+							var a3 = new Vector2(deviceWidth2, deviceHeight) * 0.5f + rootCenter;
+							var b3 = new Vector2(deviceWidth2, deviceHeight) * -0.5f + rootCenter;
+							var a4 = new Vector2(deviceHeight, deviceWidth2) * 0.5f + rootCenter;
+							var b4 = new Vector2(deviceHeight, deviceWidth2) * -0.5f + rootCenter;
+							var a5 = new Vector2(deviceWidth3, deviceHeight) * 0.5f + rootCenter;
+							var b5 = new Vector2(deviceWidth3, deviceHeight) * -0.5f + rootCenter;
+							var a6 = new Vector2(deviceHeight, deviceWidth3) * 0.5f + rootCenter;
+							var b6 = new Vector2(deviceHeight, deviceWidth3) * -0.5f + rootCenter;
 							Renderer.DrawRectOutline(a1, b1, Color4.White, t1);
 							Renderer.DrawRectOutline(a2, b2, Color4.White, t1);
 							Renderer.DrawRectOutline(a3, b3, Color4.White, t1);

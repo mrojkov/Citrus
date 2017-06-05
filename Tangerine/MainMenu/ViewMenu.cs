@@ -12,4 +12,13 @@ namespace Tangerine
 			DockManager.Instance.ImportState(TangerineApp.Instance.DockManagerInitialState, resizeMainWindow: false);
 		}
 	}
+
+	public class OverlaysCommand : CommandHandler
+	{
+		public override void Execute()
+		{
+			UserPreferences.Instance.ShowOverlays = !UserPreferences.Instance.ShowOverlays;
+			Window.Current.Invalidate();
+		}
+	}
 }

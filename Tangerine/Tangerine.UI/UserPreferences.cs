@@ -32,6 +32,9 @@ namespace Tangerine.UI
 		[YuzuRequired]
 		public Vector2 DefaultSceneDimensions { get; set; } = new Vector2(1024, 768);
 
+		[YuzuOptional]
+		public bool ShowOverlays { get; set; }
+
 		public static UserPreferences Instance { get; private set; }
 
 		public static void Initialize()

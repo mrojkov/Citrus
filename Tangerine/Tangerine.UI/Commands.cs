@@ -55,6 +55,7 @@ namespace Tangerine.UI
 		public static readonly ICommand GroupContentsToMorphableMeshes = new Command("Group Contents To Morphable Meshes", new Shortcut(Modifiers.Command | Modifiers.Control, Key.M));
 		public static readonly ICommand ExportScene = new Command("Export Scene...");
 		public static readonly ICommand UpsampleAnimationTwice = new Command("Upsample Animation Twice");
+		public static readonly ICommand Overlays = new Command("Overlays");
 	}
 
 	public static class SceneViewCommands

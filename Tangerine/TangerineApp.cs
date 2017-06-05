@@ -293,6 +293,7 @@ namespace Tangerine
 				new Command("View", new Menu {
 					GenericCommands.DefaultLayout,
 					new Command("Pads", PadsMenu),
+					GenericCommands.Overlays,
 				}),
 				new Command("Window", new Menu {
 					GenericCommands.NextDocument,
@@ -366,6 +367,7 @@ namespace Tangerine
 			h.Connect(GenericCommands.GroupContentsToMorphableMeshes, new GroupContentsToMorphableMeshes());
 			h.Connect(GenericCommands.ExportScene, new ExportScene());
 			h.Connect(GenericCommands.UpsampleAnimationTwice, new UpsampleAnimationTwice());
+			h.Connect(GenericCommands.Overlays, new OverlaysCommand());
 			h.Connect(Tools.AlignLeft, new AlignLeft());
 			h.Connect(Tools.AlignRight, new AlignRight());
 			h.Connect(Tools.AlignTop, new AlignTop());
