@@ -41,6 +41,8 @@ namespace Lime
 			public Color4 ScrollbarBackground;
 			public Color4 ScrollbarThumb;
 			public Color4 TextCaret;
+			public Color4 ZebraColor1;
+			public Color4 ZebraColor2;
 
 			public static ColorTheme CreateDarkTheme()
 			{
@@ -68,6 +70,8 @@ namespace Lime
 					ScrollbarBackground = new Color4(51, 51, 51),
 					ScrollbarThumb = new Color4(107, 107, 107),
 					TextCaret = new Color4(204, 204, 204),
+					ZebraColor1 = grayBackground.Lighten(0.2f),
+					ZebraColor2 = grayBackground.Lighten(0.3f),
 				};
 			}
 
@@ -96,6 +100,8 @@ namespace Lime
 					ScrollbarBackground = new Color4(210, 210, 210),
 					ScrollbarThumb = new Color4(120, 120, 120),
 					TextCaret = Color4.Black,
+					ZebraColor1 = Color4.White,
+					ZebraColor2 = Color4.White.Darken(0.1f),
 				};
 			}
 		}
