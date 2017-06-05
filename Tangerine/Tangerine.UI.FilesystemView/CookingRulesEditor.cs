@@ -28,9 +28,11 @@ namespace Tangerine.UI.FilesystemView
 		private readonly ScrollViewWidget scrollView;
 		private Selection savedSelection;
 		private const float RowHeight = 16.0f;
+		private Action<string> navigateAndSelect;
 
-		public CookingRulesEditor()
+		public CookingRulesEditor(Action<string> navigateAndSelect)
 		{
+			this.navigateAndSelect = navigateAndSelect;
 			scrollView = new ScrollViewWidget();
 			scrollView.Content.Layout = new VBoxLayout();
 			DropDownList targetSelector;
@@ -234,6 +236,9 @@ namespace Tangerine.UI.FilesystemView
 		private void CreateOverridesWidgets(Meta.Item yi, CookingRules rules, Widget overridesWidget)
 		{
 			Widget innerContainer;
+			var sourceFilenameText = string.IsNullOrEmpty(rules.SourceFilename)
+				? "Default"
+				: rules.SourceFilename.Substring(The.Workspace.AssetsDirectory.Length);
 			var container = new Widget
 			{
 				Padding = new Thickness { Right = 30 },
@@ -241,17 +246,22 @@ namespace Tangerine.UI.FilesystemView
 					(innerContainer = new Widget {
 						Layout = new HBoxLayout(),
 					}),
-					new SimpleText(string.IsNullOrEmpty(rules.SourceFilename)
-						? "Default"
-						: rules.SourceFilename.Substring(The.Workspace.AssetsDirectory.Length)) {
-							FontHeight = 16,
-							AutoSizeConstraints = false,
-							OverflowMode = TextOverflowMode.Ellipsis,
-							HAlignment = HAlignment.Right,
-							VAlignment = VAlignment.Center,
-							MinSize = new Vector2(100, RowHeight),
-							MaxSize = new Vector2(500, RowHeight)
-						}
+					new SimpleText(sourceFilenameText) {
+						FontHeight = 16,
+						AutoSizeConstraints = false,
+						OverflowMode = TextOverflowMode.Ellipsis,
+						HAlignment = HAlignment.Right,
+						VAlignment = VAlignment.Center,
+						MinSize = new Vector2(100, RowHeight),
+						MaxSize = new Vector2(500, RowHeight)
+					},
+					(new ToolbarButton {
+						Texture = IconPool.GetTexture("Filesystem.ArrowRight"),
+						Padding = Thickness.Zero,
+						Size = RowHeight * Vector2.One,
+						MinMaxSize = RowHeight * Vector2.One,
+						Clicked = () => navigateAndSelect(rules.SourceFilename),
+					})
 				},
 				Layout = new HBoxLayout(),
 			};
@@ -329,10 +339,8 @@ namespace Tangerine.UI.FilesystemView
 					MinSize = new Vector2(50, RowHeight),
 					MaxSize = new Vector2(300, RowHeight),
 				}),
-				(createOrDestroyOverride = new ToolbarButton()
-				{
+				(createOrDestroyOverride = new ToolbarButton {
 					Texture = btnTexture(),
-					Padding = new Thickness(2.0f),
 					Clicked = () => CreateOrDestroyFieldOverride(crc, path, yi, overridesWidget, createOrDestroyOverride),
 				})
 			);

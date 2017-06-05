@@ -224,4 +224,7 @@
     <EmbeddedResource Include="Resources\Icons\Filesystem\Cross.png" />
     <EmbeddedResource Include="Resources\Icons\Filesystem\Plus.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Icons\Filesystem\ArrowRight.png" />
+  </ItemGroup>
 </Project>

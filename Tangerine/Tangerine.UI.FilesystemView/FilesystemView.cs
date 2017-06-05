@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Lime;
 using Tangerine.Core;
 
@@ -42,8 +43,15 @@ namespace Tangerine.UI.FilesystemView
 			toolbar = new FilesystemToolbar();
 			scrollView = new ScrollViewWidget();
 			rootWidget.AddChangeWatcher(() => model.CurrentPath, (path) => dockPanel.Title = $"Filesystem: {path}");
-			crEditor = new CookingRulesEditor();
+			crEditor = new CookingRulesEditor(NavigateAndSelect);
 			InitializeWidgets();
+		}
+
+		private void NavigateAndSelect(string filename)
+		{
+			GoTo(Path.GetDirectoryName(filename));
+			selection.Clear();
+			selection.Select(filename);
 		}
 
 		void InitializeWidgets()
