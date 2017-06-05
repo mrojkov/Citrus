@@ -23,9 +23,12 @@ namespace Tangerine.UI
 		Type Type { get; set; }
 		string PropertyName { get; set; }
 		string DisplayName { get; set; }
+		bool ShowLabel { get; set; }
 		TangerineKeyframeColorAttribute TangerineAttribute { get; set; }
 		System.Reflection.PropertyInfo PropertyInfo { get; set; }
 		Func<NumericEditBox> NumericEditBoxFactory { get; set; }
+		Func<DropDownList> DropDownListFactory { get; set; }
+		Func<EditBox> EditBoxFactory { get; set; }
 		PropertySetterDelegate PropertySetter { get; set; }
 	}
 
@@ -33,6 +36,7 @@ namespace Tangerine.UI
 
 	public class PropertyEditorParams : IPropertyEditorParams
 	{
+		public bool ShowLabel { get; set; } = true;
 		public Widget InspectorPane { get; set; }
 		public List<object> Objects { get; set; }
 		public Type Type { get; set; }
@@ -41,6 +45,8 @@ namespace Tangerine.UI
 		public TangerineKeyframeColorAttribute TangerineAttribute { get; set; }
 		public System.Reflection.PropertyInfo PropertyInfo { get; set; }
 		public Func<NumericEditBox> NumericEditBoxFactory { get; set; }
+		public Func<EditBox> EditBoxFactory { get; set; }
+		public Func<DropDownList> DropDownListFactory { get; set; }
 		public PropertySetterDelegate PropertySetter { get; set; }
 
 		public PropertyEditorParams(Widget inspectorPane, List<object> objects, Type type, string propertyName)
@@ -53,6 +59,8 @@ namespace Tangerine.UI
 			PropertyInfo = Type.GetProperty(PropertyName);
 			PropertySetter = SetProperty;
 			NumericEditBoxFactory = () => new NumericEditBox();
+			DropDownListFactory = () => new DropDownList();
+			EditBoxFactory = () => new EditBox();
 		}
 
 		public PropertyEditorParams(Widget inspectorPane, object obj, string propertyName, string displayName = null)
@@ -78,16 +86,19 @@ namespace Tangerine.UI
 				LayoutCell = new LayoutCell { StretchY = 0 },
 			};
 			editorParams.InspectorPane.AddNode(ContainerWidget);
-			PropertyLabel = new SimpleText {
-				Text = editorParams.DisplayName ?? editorParams.PropertyName,
-				VAlignment = VAlignment.Center,
-				LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0.5f),
-				AutoSizeConstraints = false,
-				HitTestTarget = true,
-				TabTravesable = new TabTraversable()
-			};
-			PropertyLabel.Tasks.Add(ManageLabelTask());
-			ContainerWidget.AddNode(PropertyLabel);
+			if (editorParams.ShowLabel) {
+				PropertyLabel = new SimpleText
+				{
+					Text = editorParams.DisplayName ?? editorParams.PropertyName,
+					VAlignment = VAlignment.Center,
+					LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0.5f),
+					AutoSizeConstraints = false,
+					HitTestTarget = true,
+					TabTravesable = new TabTraversable()
+				};
+				PropertyLabel.Tasks.Add(ManageLabelTask());
+				ContainerWidget.AddNode(PropertyLabel);
+			}
 		}
 
 		IEnumerator<object> ManageLabelTask()
@@ -119,11 +130,11 @@ namespace Tangerine.UI
 		}
 
 		static Yuzu.Json.JsonSerializer serializer = new Yuzu.Json.JsonSerializer {
-			JsonOptions = new Yuzu.Json.JsonSerializeOptions { FieldSeparator = " ", Indent = "", EnumAsString = true } 
+			JsonOptions = new Yuzu.Json.JsonSerializeOptions { FieldSeparator = " ", Indent = "", EnumAsString = true }
 		};
 
 		static Yuzu.Json.JsonDeserializer deserializer = new Yuzu.Json.JsonDeserializer {
-			JsonOptions = new Yuzu.Json.JsonSerializeOptions { EnumAsString = true } 
+			JsonOptions = new Yuzu.Json.JsonSerializeOptions { EnumAsString = true }
 		};
 
 		protected virtual void Copy()
@@ -371,7 +382,8 @@ namespace Tangerine.UI
 			if (propName.EndsWith("Ref")) {
 				PropertyLabel.Text = propName.Substring(0, propName.Length - 3);
 			}
-			editor = new EditBox { LayoutCell = new LayoutCell(Alignment.Center) };
+			editor = editorParams.EditBoxFactory();
+			editor.LayoutCell = new LayoutCell(Alignment.Center);
 			ContainerWidget.AddNode(editor);
 			editor.Submitted += text => {
 				SetProperty(new NodeReference<T>(text));
@@ -389,7 +401,8 @@ namespace Tangerine.UI
 
 		public StringPropertyEditor(IPropertyEditorParams editorParams, bool multiline = false) : base(editorParams)
 		{
-			editor = new EditBox { LayoutCell = new LayoutCell(Alignment.Center) };
+			editor = editorParams.EditBoxFactory();
+			editor.LayoutCell = new LayoutCell(Alignment.Center);
 			editor.Editor.EditorParams.MaxLines = multiline ? maxLines : 1;
 			editor.MinHeight += multiline ? editor.TextWidget.FontHeight * (maxLines - 1) : 0;
 			ContainerWidget.AddNode(editor);
@@ -406,7 +419,8 @@ namespace Tangerine.UI
 
 		public EnumPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
-			selector = new DropDownList { LayoutCell = new LayoutCell(Alignment.Center) };
+			selector = editorParams.DropDownListFactory();
+			selector.LayoutCell = new LayoutCell(Alignment.Center);
 			ContainerWidget.AddNode(selector);
 			var propType = editorParams.PropertyInfo.PropertyType;
 			var fields = propType.GetFields(BindingFlags.Public | BindingFlags.Static);
@@ -470,7 +484,8 @@ namespace Tangerine.UI
 
 		public IntPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
-			editor = new EditBox { LayoutCell = new LayoutCell(Alignment.Center) };
+			editor = editorParams.EditBoxFactory();
+			editor.LayoutCell = new LayoutCell(Alignment.Center);
 			editor.TextWidget.HAlignment = HAlignment.Right;
 			ContainerWidget.AddNode(editor);
 			var current = CoalescedPropertyValue();
@@ -499,7 +514,7 @@ namespace Tangerine.UI
 			ContainerWidget.AddNode(new Widget {
 				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center) },
 				Nodes = {
-					(editor = new EditBox()),
+					(editor = editorParams.EditBoxFactory()),
 					new HSpacer(4),
 					(colorBox = new ColorBoxButton(currentColor)),
 				}
@@ -560,7 +575,7 @@ namespace Tangerine.UI
 			ContainerWidget.AddNode(new Widget {
 				Layout = new HBoxLayout(),
 				Nodes = {
-					(editor = new EditBox { LayoutCell = new LayoutCell(Alignment.Center) }),
+					(editor = editorParams.EditBoxFactory()),
 					new HSpacer(4),
 					(button = new Button {
 						Text = "...",
@@ -570,6 +585,7 @@ namespace Tangerine.UI
 					})
 				}
 			});
+			editor.LayoutCell = new LayoutCell(Alignment.Center);
 			editor.Submitted += text => AssignAsset(AssetPath.CorrectSlashes(text));
 			button.Clicked += () => {
 				var dlg = new FileDialog {
@@ -661,7 +677,8 @@ namespace Tangerine.UI
 
 		public FontPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
-			selector = new DropDownList { LayoutCell = new LayoutCell(Alignment.Center) };
+			selector = editorParams.DropDownListFactory();
+			selector.LayoutCell = new LayoutCell(Alignment.Center);
 			ContainerWidget.AddNode(selector);
 			var propType = editorParams.PropertyInfo.PropertyType;
 			var items = AssetBundle.Instance.EnumerateFiles("Fonts").
@@ -795,8 +812,8 @@ namespace Tangerine.UI
 			var w = button.Width;
 			var h = button.Height;
 			Renderer.DrawLine(
-				Scale(a[t * 2], w), Scale(a[t * 2 + 1], h), 
-				Scale(b[t * 2], w), Scale(b[t * 2 + 1], h), 
+				Scale(a[t * 2], w), Scale(a[t * 2 + 1], h),
+				Scale(b[t * 2], w), Scale(b[t * 2 + 1], h),
 				ColorTheme.Current.Basic.BlackText);
 		}
 
