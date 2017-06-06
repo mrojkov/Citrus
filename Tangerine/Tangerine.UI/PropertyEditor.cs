@@ -209,8 +209,6 @@ namespace Tangerine.UI
 			});
 			var currentX = CoalescedPropertyComponentValue(v => v.X);
 			var currentY = CoalescedPropertyComponentValue(v => v.Y);
-			editorX.TextWidget.HAlignment = HAlignment.Right;
-			editorY.TextWidget.HAlignment = HAlignment.Right;
 			editorX.Submitted += text => SetComponent(editorParams, 0, editorX, currentX.GetValue());
 			editorY.Submitted += text => SetComponent(editorParams, 1, editorY, currentY.GetValue());
 			editorX.AddChangeWatcher(currentX, v => editorX.Text = v.ToString());
@@ -251,9 +249,6 @@ namespace Tangerine.UI
 			var currentX = CoalescedPropertyComponentValue(v => v.X);
 			var currentY = CoalescedPropertyComponentValue(v => v.Y);
 			var currentZ = CoalescedPropertyComponentValue(v => v.Z);
-			editorX.TextWidget.HAlignment = HAlignment.Right;
-			editorY.TextWidget.HAlignment = HAlignment.Right;
-			editorZ.TextWidget.HAlignment = HAlignment.Right;
 			editorX.Submitted += text => SetComponent(editorParams, 0, editorX, currentX.GetValue());
 			editorY.Submitted += text => SetComponent(editorParams, 1, editorY, currentY.GetValue());
 			editorZ.Submitted += text => SetComponent(editorParams, 2, editorZ, currentZ.GetValue());
@@ -294,9 +289,6 @@ namespace Tangerine.UI
 				}
 			});
 			var current = CoalescedPropertyValue();
-			editorX.TextWidget.HAlignment = HAlignment.Right;
-			editorY.TextWidget.HAlignment = HAlignment.Right;
-			editorZ.TextWidget.HAlignment = HAlignment.Right;
 			editorX.Submitted += text => SetComponent(editorParams, 0, editorX, current.GetValue());
 			editorY.Submitted += text => SetComponent(editorParams, 1, editorY, current.GetValue());
 			editorZ.Submitted += text => SetComponent(editorParams, 2, editorZ, current.GetValue());
@@ -343,8 +335,6 @@ namespace Tangerine.UI
 			});
 			var currentMed = CoalescedPropertyComponentValue(v => v.Median);
 			var currentDisp = CoalescedPropertyComponentValue(v => v.Dispersion);
-			medEditor.TextWidget.HAlignment = HAlignment.Right;
-			dispEditor.TextWidget.HAlignment = HAlignment.Right;
 			medEditor.Submitted += text => SetComponent(editorParams, 0, medEditor, currentMed.GetValue());
 			dispEditor.Submitted += text => SetComponent(editorParams, 1, dispEditor, currentDisp.GetValue());
 			medEditor.AddChangeWatcher(currentMed, v => medEditor.Text = v.ToString());
@@ -461,7 +451,6 @@ namespace Tangerine.UI
 		{
 			editor = editorParams.NumericEditBoxFactory();
 			editor.LayoutCell = new LayoutCell(Alignment.Center);
-			editor.TextWidget.HAlignment = HAlignment.Right;
 			ContainerWidget.AddNode(editor);
 			var current = CoalescedPropertyValue();
 			editor.Submitted += text => {
@@ -775,13 +764,13 @@ namespace Tangerine.UI
 		{
 			group = new Widget { Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center), Spacing = 4 } };
 			ContainerWidget.AddNode(group);
-			group.AddNode(new Widget());
 			firstButton = AddButton(Anchors.Left, "Anchor to the left");
 			AddButton(Anchors.Right, "Anchor to the right");
 			AddButton(Anchors.Top, "Anchor to the top");
 			AddButton(Anchors.Bottom, "Anchor to the bottom");
 			AddButton(Anchors.CenterH, "Anchor to the center horizontally");
 			AddButton(Anchors.CenterV, "Anchor to the center vertically");
+			group.AddNode(new Widget());
 		}
 
 		ToolbarButton AddButton(Anchors anchor, string tip)
