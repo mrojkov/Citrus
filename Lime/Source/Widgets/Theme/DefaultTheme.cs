@@ -18,7 +18,7 @@ namespace Lime
 			text.Font = new SerializableFont();
 			text.FontHeight = 15;
 			text.TextColor = Color4.White;
-			text.AutoSizeConstraints = true;
+			text.ForceUncutText = true;
 			text.Localizable = true;
 			text.TrimWhitespaces = true;
 			text.Text = "";

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Yuzu;
 
@@ -15,7 +15,8 @@ namespace Lime
 		private HAlignment hAlignment;
 		private VAlignment vAlignment;
 		private Color4 textColor;
-		private bool minSizeValid;
+		private Vector2 uncutTextSize;
+		private bool uncutTextSizeValid;
 		private string displayText;
 		private TextOverflowMode overflowMode;
 		private bool wordSplitAllowed;
@@ -160,39 +161,16 @@ namespace Lime
 			set { textColor = value; }
 		}
 
-		/// <summary>
-		/// Gets or sets a value indicating whether this <see cref="Lime.RichText"/> calculates MinSize and MaxSize automatically.
-		/// </summary>
-		public bool AutoSizeConstraints { get; set; }
+		public bool ForceUncutText { get; set; }
 
-		public override Vector2 MinSize
-		{
-			get
-			{
-				if (AutoSizeConstraints && !minSizeValid) {
-					base.MinSize = CalcContentSize() + Padding;
-					minSizeValid = true;
-				}
-				return base.MinSize;
-			}
-			set
-			{
-				if (!AutoSizeConstraints) {
-					base.MinSize = value;
-				}
-			}
-		}
+		public override Vector2 EffectiveMinSize =>
+			Vector2.Max(MeasuredMinSize, ForceUncutText ? Vector2.Max(MinSize, MeasureUncutText() + Padding) : MinSize);
 
-		public override Vector2 MaxSize
-		{
-			get { return AutoSizeConstraints ? MinSize : base.MaxSize; }
-			set
-			{
-				if (!AutoSizeConstraints) {
-					base.MaxSize = value;
-				}
-			}
-		}
+		public override Vector2 EffectiveMaxSize =>
+			Vector2.Max(
+				EffectiveMinSize,
+				Vector2.Min(MeasuredMaxSize, ForceUncutText ? Vector2.Min(MaxSize, MeasureUncutText() + Padding) : MaxSize)
+			);
 
 		public bool TrimWhitespaces { get; set; }
 
@@ -222,11 +200,6 @@ namespace Lime
 		public bool CanDisplay(char ch)
 		{
 			return Font.Chars.Get(ch, fontHeight) != FontChar.Null;
-		}
-
-		public override Vector2 CalcContentSize()
-		{
-			return Renderer.MeasureTextLine(Font, DisplayText, FontHeight);
 		}
 
 		protected override void OnSizeChanged(Vector2 sizeDelta)
@@ -293,6 +266,15 @@ namespace Lime
 		{
 			PrepareSpriteListAndExtent();
 			return extent;
+		}
+
+		private Vector2 MeasureUncutText()
+		{
+			if (!uncutTextSizeValid) {
+				uncutTextSizeValid = true;
+				uncutTextSize = MeasureTextLine(DisplayText);
+			}
+			return uncutTextSize;
 		}
 
 		public override void StaticScale(float ratio, bool roundCoordinates)
@@ -447,7 +429,7 @@ namespace Lime
 			return Renderer.MeasureTextLine(Font, line, FontHeight, start, count).X <= ContentWidth;
 		}
 
-		public Vector2 MeasureTextLine(string line)
+		private Vector2 MeasureTextLine(string line)
 		{
 			return Renderer.MeasureTextLine(Font, line, FontHeight);
 		}
@@ -471,7 +453,7 @@ namespace Lime
 			displayText = null;
 			Caret.InvalidatePreservingTextPos();
 			spriteList = null;
-			minSizeValid = false;
+			uncutTextSizeValid = false;
 			InvalidateParentConstraintsAndArrangement();
 			Window.Current?.Invalidate();
 		}

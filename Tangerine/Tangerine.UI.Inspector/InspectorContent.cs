@@ -91,7 +91,7 @@ namespace Tangerine.UI.Inspector
 								Text = text,
 								Padding = new Thickness(4, 0),
 								VAlignment = VAlignment.Center,
-								AutoSizeConstraints = false,
+								ForceUncutText = false,
 							}
 						}
 					};

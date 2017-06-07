@@ -16,7 +16,7 @@ namespace Tangerine.UI.Timeline.Components
 		{
 			this.row = row;
 			var c = row.Components.Get<Core.Components.CurveRow>();
-			label = new SimpleText { AutoSizeConstraints = false, LayoutCell = new LayoutCell(Alignment.Center), Text = c.State.Component };
+			label = new SimpleText { ForceUncutText = false, LayoutCell = new LayoutCell(Alignment.Center), Text = c.State.Component };
 			widget = new Widget {
 				Padding = new Thickness { Left = 4, Right = 2 },
 				MinHeight = c.State.RowHeight - 1,

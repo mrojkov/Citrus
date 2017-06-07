@@ -93,8 +93,8 @@ namespace Lime
 		/// </summary>
 		public LayoutCell LayoutCell { get; set; }
 
-		public Vector2 EffectiveMinSize { get { return Vector2.Max(MinSize, MeasuredMinSize); } }
-		public Vector2 EffectiveMaxSize { get { return Vector2.Max(Vector2.Min(MaxSize, MeasuredMaxSize), EffectiveMinSize); } }
+		public virtual Vector2 EffectiveMinSize => Vector2.Max(MinSize, MeasuredMinSize);
+		public virtual Vector2 EffectiveMaxSize => Vector2.Max(Vector2.Min(MaxSize, MeasuredMaxSize), EffectiveMinSize);
 
 		public Vector2 MeasuredMinSize
 		{
@@ -118,7 +118,7 @@ namespace Lime
 			}
 		}
 
-		public virtual Vector2 MinSize
+		public Vector2 MinSize
 		{
 			get { return minSize; }
 			set
@@ -142,7 +142,7 @@ namespace Lime
 			set { MinSize = new Vector2(MinSize.X, value); }
 		}
 
-		public virtual Vector2 MaxSize
+		public Vector2 MaxSize
 		{
 			get { return maxSize; }
 			set

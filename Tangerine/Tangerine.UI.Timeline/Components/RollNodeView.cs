@@ -26,7 +26,7 @@ namespace Tangerine.UI.Timeline.Components
 			this.row = row;
 			nodeData = row.Components.Get<NodeRow>();
 			label = new SimpleText {
-				AutoSizeConstraints = false,
+				ForceUncutText = false,
 				VAlignment = VAlignment.Center,
 				LayoutCell = new LayoutCell(Alignment.LeftCenter, float.MaxValue)
 			};

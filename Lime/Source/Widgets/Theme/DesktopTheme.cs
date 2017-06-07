@@ -1,4 +1,4 @@
-#if !ANDROID && !iOS && !UNITY
+﻿#if !ANDROID && !iOS && !UNITY
 using System;
 using System.Collections.Generic;
 
@@ -173,7 +173,7 @@ namespace Lime
 			fc.Layout = new HBoxLayout();
 			var label = new SimpleText {
 				Id = "Label",
-				AutoSizeConstraints = false,
+				ForceUncutText = false,
 				MinMaxHeight = Metrics.DefaultButtonSize.Y,
 				Padding = Metrics.ControlsPadding,
 				LayoutCell = new LayoutCell { StretchX = float.MaxValue }
@@ -191,7 +191,7 @@ namespace Lime
 		private void DecorateSimpleText(Widget widget)
 		{
 			var text = (SimpleText)widget;
-			text.AutoSizeConstraints = true;
+			text.ForceUncutText = true;
 			text.Localizable = true;
 			text.TextColor = Color4.White;
 			text.Color = Colors.BlackText;
@@ -214,7 +214,7 @@ namespace Lime
 			var eb = (CommonEditBox)widget;
 			var tw = eb.TextWidget;
 			DecorateSimpleText(tw);
-			tw.AutoSizeConstraints = false;
+			tw.ForceUncutText = false;
 			eb.MinSize = Metrics.DefaultEditBoxSize;
 			eb.MaxHeight = eb.MinHeight;
 			tw.Localizable = false;
@@ -263,6 +263,7 @@ namespace Lime
 		{
 			DecorateEditBox(widget);
 			var eb = (NumericEditBox)widget;
+			eb.MinMaxWidth = 80;
 			eb.TextWidget.Padding = new Thickness(SpinButtonPresenter.ButtonWidth + 2, 2);
 			eb.CompoundPostPresenter.Add(new SpinButtonPresenter(true));
 			eb.CompoundPostPresenter.Add(new SpinButtonPresenter(false));
@@ -339,7 +340,6 @@ namespace Lime
 			static Color4 color = Color4.Lerp(0.25f, Colors.ControlBorder, Colors.BlackText);
 
 			private readonly VectorShape buttonShape = new VectorShape {
-				new VectorShape.TriangleFan(new float[] { 0, 0, 1, 0, 1, 1, 0, 1 }, Colors.WhiteBackground),
 				new VectorShape.TriangleFan(new float[] { 0.3f, 0.3f, 0.7f, 0.5f, 0.3f, 0.7f }, color)
 			};
 
@@ -431,7 +431,7 @@ namespace Lime
 			tab.Layout = new HBoxLayout();
 			var caption = new SimpleText {
 				Id = "TextPresenter",
-				AutoSizeConstraints = false,
+				ForceUncutText = false,
 				FontHeight = Metrics.TextHeight,
 				HAlignment = HAlignment.Center,
 				VAlignment = VAlignment.Center,

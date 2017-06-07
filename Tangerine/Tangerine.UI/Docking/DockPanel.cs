@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
@@ -33,7 +33,7 @@ namespace Tangerine.UI
 				Nodes = {
 					(TitleLabel = new SimpleText {
 						Padding = new Thickness(4, 0),
-						AutoSizeConstraints = false,
+						ForceUncutText = false,
 						MinMaxHeight = DesktopTheme.Metrics.MinTabSize.Y,
 						VAlignment = VAlignment.Center
 					}),
@@ -195,7 +195,7 @@ namespace Tangerine.UI
 					Nodes = {
 						new SimpleText {
 							Text = title,
-							AutoSizeConstraints = false, 
+							ForceUncutText = false, 
 							LayoutCell = new LayoutCell(Alignment.Center),
 							OverflowMode = TextOverflowMode.Ellipsis,
 							HAlignment = HAlignment.Center,
