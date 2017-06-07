@@ -121,6 +121,7 @@ namespace Tangerine.UI
 						var window = WidgetContext.Current.Root;
 						var tip = new Widget {
 							Position = CalcPositionInSpaceOf(window) + new Vector2(Width * 0.66f, Height),
+							Size = Vector2.Zero,
 							LayoutCell = new LayoutCell { Ignore = true },
 							Layout = new StackLayout(),
 							Nodes = {
