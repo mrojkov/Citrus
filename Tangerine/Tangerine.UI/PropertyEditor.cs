@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using Lime;
@@ -91,8 +91,10 @@ namespace Tangerine.UI
 				{
 					Text = editorParams.DisplayName ?? editorParams.PropertyName,
 					VAlignment = VAlignment.Center,
-					LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0.5f),
-					AutoSizeConstraints = false,
+					LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0),
+					ForceUncutText = false,
+					MinWidth = 120,
+					OverflowMode = TextOverflowMode.Minify,
 					HitTestTarget = true,
 					TabTravesable = new TabTraversable()
 				};
@@ -204,7 +206,7 @@ namespace Tangerine.UI
 				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center), Spacing = 4 },
 				Nodes = {
 					(editorX = editorParams.NumericEditBoxFactory()),
-					(editorY = editorParams.NumericEditBoxFactory()),
+					(editorY = editorParams.NumericEditBoxFactory())
 				}
 			});
 			var currentX = CoalescedPropertyComponentValue(v => v.X);
@@ -431,11 +433,8 @@ namespace Tangerine.UI
 
 		public BooleanPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
-			var group = new Widget { Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center) } };
 			checkBox = new CheckBox { LayoutCell = new LayoutCell(Alignment.LeftCenter) };
-			group.AddNode(checkBox);
-			group.AddNode(new Widget());
-			ContainerWidget.AddNode(group);
+			ContainerWidget.AddNode(checkBox);
 			checkBox.Changed += value => SetProperty(value);
 			checkBox.AddChangeWatcher(CoalescedPropertyValue(), v => checkBox.Checked = v);
 		}
@@ -450,7 +449,6 @@ namespace Tangerine.UI
 		public FloatPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
 			editor = editorParams.NumericEditBoxFactory();
-			editor.LayoutCell = new LayoutCell(Alignment.Center);
 			ContainerWidget.AddNode(editor);
 			var current = CoalescedPropertyValue();
 			editor.Submitted += text => {
@@ -770,7 +768,6 @@ namespace Tangerine.UI
 			AddButton(Anchors.Bottom, "Anchor to the bottom");
 			AddButton(Anchors.CenterH, "Anchor to the center horizontally");
 			AddButton(Anchors.CenterV, "Anchor to the center vertically");
-			group.AddNode(new Widget());
 		}
 
 		ToolbarButton AddButton(Anchors anchor, string tip)
