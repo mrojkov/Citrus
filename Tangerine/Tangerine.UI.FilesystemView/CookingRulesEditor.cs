@@ -248,7 +248,7 @@ namespace Tangerine.UI.FilesystemView
 					}),
 					new SimpleText(sourceFilenameText) {
 						FontHeight = 16,
-						AutoSizeConstraints = false,
+						ForceUncutText = false,
 						OverflowMode = TextOverflowMode.Ellipsis,
 						HAlignment = HAlignment.Right,
 						VAlignment = VAlignment.Center,
@@ -321,7 +321,7 @@ namespace Tangerine.UI.FilesystemView
 			headerWidget.Nodes.AddRange(
 				(foldButton = CreateFoldButton(overridesWidget)),
 				(new SimpleText {
-					AutoSizeConstraints = false,
+					ForceUncutText = false,
 					VAlignment = VAlignment.Center,
 					HAlignment = HAlignment.Left,
 					OverflowMode = TextOverflowMode.Ellipsis,
@@ -333,7 +333,7 @@ namespace Tangerine.UI.FilesystemView
 				}),
 				(computedValueText = new SimpleText {
 					LayoutCell = new LayoutCell { StretchX = 3 },
-					AutoSizeConstraints = false,
+					ForceUncutText = false,
 					HAlignment = HAlignment.Left,
 					Size = new Vector2(150, RowHeight),
 					MinSize = new Vector2(50, RowHeight),
