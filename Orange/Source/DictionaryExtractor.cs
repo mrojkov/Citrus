@@ -93,6 +93,7 @@ namespace Orange
 			}
 			using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
 				var files = The.Workspace.AssetFiles.Enumerate(".scene");
+				files.AddRange(The.Workspace.AssetFiles.Enumerate(".tan"));
 				foreach (var fileInfo in files) {
 					// First of all scan lines like this: "[]..."
 					ProcessSourceFile(fileInfo.Path);
