@@ -100,11 +100,11 @@ namespace Tangerine.UI
 		protected override void Awake()
 		{
 			base.Awake();
-			Tasks.Add(ShowTipTask());
+			Tasks.Add(ShowTipWhenMouseHangsOverButtonTask());
 			this.AddChangeWatcher(() => Enabled, _ => Window.Current.Invalidate());
 		}
 
-		private IEnumerator<object> ShowTipTask()
+		private IEnumerator<object> ShowTipWhenMouseHangsOverButtonTask()
 		{
 			while (true) {
 				yield return null;
@@ -118,28 +118,33 @@ namespace Tangerine.UI
 						yield return null;
 					}
 					if (showTip) {
-						var window = WidgetContext.Current.Root;
-						var tip = new Widget {
-							Position = CalcPositionInSpaceOf(window) + new Vector2(Width * 0.66f, Height),
-							Size = Vector2.Zero,
-							LayoutCell = new LayoutCell { Ignore = true },
-							Layout = new StackLayout(),
-							Nodes = {
-								new SimpleText { Text = Tip, Padding = new Thickness(4) },
-								new BorderedFrame()
-							}
-						};
-						tip.Updated += _ => tip.Size = tip.EffectiveMinSize;
-						window.PushNode(tip);
-						try {
-							while (IsMouseOver()) {
-								yield return null;
-							}
-						} finally {
-							tip.Unlink();
-						}
+						WidgetContext.Current.Root.Tasks.Add(ShowTipTask());
 					}
 				}
+			}
+		}
+
+		private IEnumerator<object> ShowTipTask()
+		{
+			var window = WidgetContext.Current.Root;
+			var tip = new Widget {
+				Position = CalcPositionInSpaceOf(window) + new Vector2(Width * 0.66f, Height),
+				Size = Vector2.Zero,
+				LayoutCell = new LayoutCell { Ignore = true },
+				Layout = new StackLayout(),
+				Nodes = {
+					new SimpleText { Text = Tip, Padding = new Thickness(4) },
+					new BorderedFrame()
+				}
+			};
+			tip.Updated += _ => tip.Size = tip.EffectiveMinSize;
+			window.PushNode(tip);
+			try {
+				while (IsMouseOver()) {
+					yield return null;
+				}
+			} finally {
+				tip.Unlink();
 			}
 		}
 
