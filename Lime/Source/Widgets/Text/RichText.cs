@@ -4,6 +4,7 @@ using Yuzu;
 
 namespace Lime
 {
+	[TangerineNodeBuilder("BuildForTangerine")]
 	[AllowedChildrenTypes(typeof(TextStyle))]
 	public class RichText : Widget, IText
 	{
@@ -280,5 +281,10 @@ namespace Lime
 
 		public bool CanDisplay(char ch) { return true; }
 
+		private void BuildForTangerine()
+		{
+			var style = new TextStyle { Id = "TextStyle1" };
+			Nodes.Add(style);
+		}
 	}
 }
