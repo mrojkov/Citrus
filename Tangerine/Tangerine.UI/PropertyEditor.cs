@@ -472,8 +472,8 @@ namespace Tangerine.UI
 		public IntPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
 			editor = editorParams.EditBoxFactory();
+			editor.MinMaxWidth = 80;
 			editor.LayoutCell = new LayoutCell(Alignment.Center);
-			editor.TextWidget.HAlignment = HAlignment.Right;
 			ContainerWidget.AddNode(editor);
 			var current = CoalescedPropertyValue();
 			editor.Submitted += text => {
