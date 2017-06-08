@@ -430,8 +430,11 @@ namespace Orange
 					case Blending.Opaque: return 8;
 				}
 			}
-			if (blending == Blending.Alpha && shader == ShaderId.Silhuette) {
-				return 7;
+			if (shader == ShaderId.Silhuette) {
+				switch (blending) {
+					case Blending.Alpha: return 7;
+					default: throw new InvalidOperationException("Can't use Silhuette shader with blending other than Alpha");
+				}
 			}
 			return 1;
 		}
