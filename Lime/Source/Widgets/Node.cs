@@ -371,10 +371,7 @@ namespace Lime
 			Animators = new AnimatorCollection(this);
 			Animations = new AnimationList(this);
 			Nodes = new NodeList(this);
-			// Hack for Tangerine. Misha will come and clean up the mess.
-			if (Application.IsTangerine) {
-				Presenter = DefaultPresenter.Instance;
-			}
+			Presenter = DefaultPresenter.Instance;
 			RenderChainBuilder = DefaultRenderChainBuilder.Instance;
 			++CreatedCount;
 		}
