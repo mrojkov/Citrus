@@ -28,6 +28,7 @@ namespace Lime
 
 		public Image()
 		{
+			Presenter = DefaultPresenter.Instance;
 			UV1 = Vector2.One;
 			HitTestMethod = HitTestMethod.Contents;
 			Texture = new SerializableTexture();
@@ -35,6 +36,7 @@ namespace Lime
 
 		public Image(ITexture texture)
 		{
+			Presenter = DefaultPresenter.Instance;
 			UV1 = Vector2.One;
 			Texture = texture;
 			HitTestMethod = HitTestMethod.Contents;
@@ -51,7 +53,7 @@ namespace Lime
 			return (Vector2)Texture.ImageSize;
 		}
 
-		public override void AddToRenderChain(RenderChain chain)
+		internal protected override void AddToRenderChain(RenderChain chain)
 		{
 			if (GloballyVisible && !skipRender) {
 				AddSelfToRenderChain(chain);

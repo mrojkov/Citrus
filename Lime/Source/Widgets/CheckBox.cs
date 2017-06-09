@@ -31,7 +31,7 @@ namespace Lime
 		}
 
 		IEnumerator<object> Loop()
-		{	
+		{
 			var button = TryFind<Widget>("Button");
 			while (true) {
 				if (button != null && button.WasClicked()) {

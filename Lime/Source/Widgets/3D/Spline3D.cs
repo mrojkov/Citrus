@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Yuzu;
 
 namespace Lime
@@ -14,6 +13,11 @@ namespace Lime
 	{
 		[YuzuMember]
 		public bool Closed { get; set; }
+
+		public Spline3D()
+		{
+			RenderChainBuilder = null;
+		}
 
 		public float CalcLengthRough()
 		{
@@ -119,11 +123,6 @@ namespace Lime
 			matrix.Up = normal;
 			return matrix;
 		}
-
-		public override void AddToRenderChain(RenderChain chain)
-		{
-			base.AddToRenderChain(chain);
-		}
 	}
 
 	[AllowedParentTypes(typeof(Spline3D))]
@@ -143,6 +142,7 @@ namespace Lime
 
 		public SplinePoint3D()
 		{
+			RenderChainBuilder = null;
 			Interpolation = SplineInterpolation.Bezier;
 		}
 

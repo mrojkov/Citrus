@@ -47,6 +47,7 @@ namespace Lime
 
 		public ImageCombiner()
 		{
+			Presenter = DefaultPresenter.Instance;
 			Enabled = true;
 			Blending = Blending.Inherited;
 			Shader = ShaderId.Inherited;
@@ -72,7 +73,7 @@ namespace Lime
 			return false;
 		}
 
-		public override void AddToRenderChain(RenderChain chain)
+		internal protected override void AddToRenderChain(RenderChain chain)
 		{
 			if (Enabled) {
 				IImageCombinerArg arg1, arg2;

@@ -77,6 +77,7 @@ namespace Lime
 
 		public Audio()
 		{
+			RenderChainBuilder = null;
 			Priority = 0.5f;
 			Bumpable = true;
 		}

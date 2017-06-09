@@ -107,6 +107,7 @@ namespace Lime
 
 		public RichText()
 		{
+			Presenter = DefaultPresenter.Instance;
 			Localizable = true;
 			Theme.Current.Apply(this);
 		}

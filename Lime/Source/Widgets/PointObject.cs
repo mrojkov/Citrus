@@ -8,8 +8,7 @@ namespace Lime
 
 		public PointObject()
 		{
-			// Just in sake of optimization set Presenter to null because all of PointObjects have empty Render() methods.
-			Presenter = null;
+			RenderChainBuilder = null;
 		}
 
 		[YuzuMember]

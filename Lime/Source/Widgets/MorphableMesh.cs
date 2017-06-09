@@ -9,8 +9,13 @@ namespace Lime
 	public class DiscreteMorphableMesh : Node
 	{
 		public List<MorphableMesh> Meshes { get; private set; } = new List<MorphableMesh>();
-		
+
 		private int currMeshIndex;
+
+		public DiscreteMorphableMesh()
+		{
+			Presenter = DefaultPresenter.Instance;
+		}
 
 		public override Node Clone()
 		{
@@ -55,19 +60,19 @@ namespace Lime
 	{
 		[YuzuMember]
 		public IndexBuffer IndexBuffer { get; set; }
-		
+
 		[YuzuMember]
 		public IVertexBuffer<Vector2> UVBuffer { get; set; }
-		
+
 		[YuzuMember]
 		public readonly List<MorphTarget> MorphTargets = new List<MorphTarget>();
-		
+
 		[YuzuMember]
 		public readonly List<RenderBatch> Batches = new List<RenderBatch>();
-		
+
 		[YuzuMember]
 		public double LeftBound { get; set; }
-		
+
 		[YuzuMember]
 		public double RightBound { get; set; }
 
@@ -116,7 +121,7 @@ namespace Lime
 			if (target0.Mesh == null) {
 				target0.Mesh = new Mesh {
 					VertexBuffers = new IVertexBuffer[] { UVBuffer, target0.PosColorBuffer, target1.PosColorBuffer },
-					Attributes = new[] { 
+					Attributes = new[] {
 						new[] { ShaderPrograms.Attributes.UV1 },
 						new[] { ShaderPrograms.Attributes.Pos1, ShaderPrograms.Attributes.Color1 },
 						new[] { ShaderPrograms.Attributes.Pos2, ShaderPrograms.Attributes.Color2 }
@@ -152,7 +157,7 @@ namespace Lime
 				loadedGlobalColor = globalColor;
 				var globalColorVec4 = (globalColor.ABGR == 0xFFFFFFFF) ?
 					Vector4.One : new Vector4(
-						globalColor.R / 255f, 
+						globalColor.R / 255f,
 						globalColor.G / 255f,
 						globalColor.B / 255f,
 						globalColor.A / 255f);
@@ -171,7 +176,7 @@ namespace Lime
 			[FieldOffset(0)]
 			[YuzuMember]
 			public Vector2 Position;
-			
+
 			[FieldOffset(12)]
 			[YuzuMember]
 			public Color4 Color;
@@ -181,10 +186,10 @@ namespace Lime
 		{
 			[YuzuMember]
 			public double Timestamp { get; set; }
-						
+
 			[YuzuMember]
 			public IVertexBuffer<PosColor> PosColorBuffer { get; set; }
-			
+
 			public IMesh Mesh { get; set; }
 		}
 
@@ -192,16 +197,16 @@ namespace Lime
 		{
 			[YuzuMember]
 			public ITexture Texture { get; set; }
-			
+
 			[YuzuMember]
 			public Blending Blending { get; set; }
-			
+
 			[YuzuMember]
 			public ShaderId Shader { get; set; }
-			
+
 			[YuzuMember]
 			public int StartIndex { get; set; }
-			
+
 			[YuzuMember]
 			public int IndexCount { get; set; }
 		}

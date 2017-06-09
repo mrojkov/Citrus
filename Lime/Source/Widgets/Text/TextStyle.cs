@@ -170,6 +170,7 @@ namespace Lime
 
 		public TextStyle()
 		{
+			RenderChainBuilder = null;
 			Size = 15;
 			TextColor = Color4.White;
 			ShadowColor = Color4.Black;

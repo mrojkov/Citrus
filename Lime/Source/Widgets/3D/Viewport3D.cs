@@ -45,6 +45,11 @@ namespace Lime
 			}
 		}
 
+		public Viewport3D()
+		{
+			Presenter = DefaultPresenter.Instance;
+		}
+
 		private void BuildForTangerine()
 		{
 			var camera = new Camera3D {
@@ -73,7 +78,7 @@ namespace Lime
 			}
 		}
 
-		public override void AddToRenderChain(RenderChain chain)
+		internal protected override void AddToRenderChain(RenderChain chain)
 		{
 			if (!GloballyVisible) {
 				return;
@@ -98,7 +103,7 @@ namespace Lime
 				args.Ray = ScreenPointToRay(args.Point);
 				args.Distance = float.MaxValue;
 				foreach (var node in Nodes) {
-					node.AddToRenderChain(renderChain);
+					node.RenderChainBuilder?.AddToRenderChain(node, renderChain);
 				}
 				var layers = renderChain.Layers;
 				for (var i = layers.Length - 1; i >= 0; i--) {
@@ -128,7 +133,7 @@ namespace Lime
 			}
 			AdjustCameraAspectRatio();
 			foreach (var node in Nodes) {
-				node.AddToRenderChain(renderChain);
+				node.RenderChainBuilder?.AddToRenderChain(node, renderChain);
 			}
 			var oldWorld = Renderer.World;
 			var oldView = Renderer.View;

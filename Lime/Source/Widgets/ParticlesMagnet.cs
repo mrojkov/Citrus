@@ -8,6 +8,7 @@ namespace Lime
 	{
 		public ParticlesMagnet()
 		{
+			RenderChainBuilder = null;
 			Shape = EmitterShape.Area;
 			Attenuation = 0;
 			Strength = 1000;

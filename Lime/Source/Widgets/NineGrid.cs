@@ -29,6 +29,7 @@ namespace Lime
 
 		public NineGrid()
 		{
+			Presenter = DefaultPresenter.Instance;
 			HitTestMethod = HitTestMethod.Contents;
 			Texture = new SerializableTexture();
 		}

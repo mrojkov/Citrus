@@ -46,7 +46,7 @@ namespace Lime
 						skipConvertionCounter = 2;
 						node.AddNode(child);
 					} else if (child is Bone) {
-						// Bones already have affected mesh animations. No need to add them to the container. 
+						// Bones already have affected mesh animations. No need to add them to the container.
 					} else if (child is DiscreteMorphableMesh) {
 						node.AddNode(child);
 					} else if (child is DistortionMesh) {
@@ -124,7 +124,7 @@ namespace Lime
 				foreach (var time in interval.Timestamps) {
 					node.AnimationTime = time;
 					node.Update(0);
-					node.AddToRenderChain(renderChain);
+					node.RenderChainBuilder?.AddToRenderChain(node, renderChain);
 					renderChain.RenderAndClear();
 					int vc = 0;
 					int ic = 0;
@@ -332,5 +332,5 @@ namespace Lime
 		{
 			public readonly List<double> Timestamps = new List<double>();
 		}
-	}	
+	}
 }

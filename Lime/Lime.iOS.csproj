@@ -352,6 +352,7 @@
     <Compile Include="Source\Application\FileSystemWatcher\IFileSystemWatcher.cs" />
     <Compile Include="Source\Widgets\Animation\AnimationBlender.cs" />
     <Compile Include="Source\Widgets\Animation\BlendAnimationEngine.cs" />
+    <Compile Include="Source\Widgets\IRenderChainBuilder.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

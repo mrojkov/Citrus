@@ -22,6 +22,7 @@ namespace Lime
 
 		public Polyline(float thickness = 20)
 		{
+			Presenter = DefaultPresenter.Instance;
 			this.Thickness = thickness;
 		}
 

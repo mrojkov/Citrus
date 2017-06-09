@@ -7,6 +7,11 @@ namespace Lime.PopupMenu
 {
 	public class ExpandSiblingsToParent : Node
 	{
+		public ExpandSiblingsToParent()
+		{
+			RenderChainBuilder = null;
+		}
+
 		protected override void SelfUpdate(float delta)
 		{
 			foreach (var item in Parent.Nodes.OfType<Widget>()) {
@@ -19,6 +24,11 @@ namespace Lime.PopupMenu
 
 	public class CenterSiblingsVertically : Node
 	{
+		public CenterSiblingsVertically()
+		{
+			RenderChainBuilder = null;
+		}
+
 		protected override void SelfUpdate(float delta)
 		{
 			foreach (var item in Parent.Nodes.OfType<Widget>()) {
@@ -32,9 +42,12 @@ namespace Lime.PopupMenu
 	{
 		public string StretchWidget { get; set; }
 
-		public StackSiblingsHorizontally() { }
+		public StackSiblingsHorizontally()
+		{
+			RenderChainBuilder = null;
+		}
 
-		public StackSiblingsHorizontally(string stretch)
+		public StackSiblingsHorizontally(string stretch) : this()
 		{
 			StretchWidget = stretch;
 		}

@@ -14,8 +14,9 @@ namespace Lime
 			set { implementation.Url = value; }
 		}
 
-		public WebBrowser(): base()
+		public WebBrowser()
 		{
+			Presenter = DefaultPresenter.Instance;
 			implementation = BrowserFactory(this);
 		}
 

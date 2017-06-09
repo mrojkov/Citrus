@@ -420,7 +420,7 @@ namespace Lime
 			public bool ReverseOrderRendering;
 			public ScrollDirection ScrollDirection;
 
-			public override void AddToRenderChain(RenderChain chain)
+			internal protected override void AddToRenderChain(RenderChain chain)
 			{
 				if (PostPresenter != null) {
 					chain.Add(this, PostPresenter);
@@ -439,7 +439,7 @@ namespace Lime
 			{
 				for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
 					if (IsItemOnscreen(node.AsWidget)) {
-						node.AddToRenderChain(chain);
+						node.RenderChainBuilder?.AddToRenderChain(node, chain);
 					}
 				}
 			}
@@ -449,7 +449,7 @@ namespace Lime
 				for (int i = Nodes.Count - 1; i >= 0; i--) {
 					var item = Nodes[i].AsWidget;
 					if (IsItemOnscreen(item)) {
-						item.AddToRenderChain(chain);
+						item.RenderChainBuilder?.AddToRenderChain(item, chain);
 					}
 				}
 			}

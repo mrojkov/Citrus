@@ -18,6 +18,7 @@ namespace Lime
 
 		public DistortionMesh()
 		{
+			Presenter = DefaultPresenter.Instance;
 			NumCols = 2;
 			NumRows = 2;
 			Texture = new SerializableTexture();

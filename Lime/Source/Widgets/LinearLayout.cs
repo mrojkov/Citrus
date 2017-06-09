@@ -88,6 +88,11 @@ namespace Lime
 		[YuzuMember]
 		public bool ProcessHidden { get; set; }
 
+		public LinearLayout()
+		{
+			RenderChainBuilder = null;
+		}
+
 		protected override void OnParentChanged(Node oldParent)
 		{
 			if (Parent != null) {

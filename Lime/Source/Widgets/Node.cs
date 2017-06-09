@@ -211,6 +211,8 @@ namespace Lime
 
 		public Node3D AsNode3D { get; internal set; }
 
+		public IRenderChainBuilder RenderChainBuilder { get; set; }
+
 		/// <summary>
 		/// The presenter used for rendering and hit-testing the node.
 		/// TODO: Add Add/RemovePresenter methods. Remove CompoundPresenter property and Presenter setter.
@@ -369,7 +371,11 @@ namespace Lime
 			Animators = new AnimatorCollection(this);
 			Animations = new AnimationList(this);
 			Nodes = new NodeList(this);
-			Presenter = DefaultPresenter.Instance;
+			// Hack for Tangerine. Misha will come and clean up the mess.
+			if (Application.IsTangerine) {
+				Presenter = DefaultPresenter.Instance;
+			}
+			RenderChainBuilder = DefaultRenderChainBuilder.Instance;
 			++CreatedCount;
 		}
 
@@ -517,6 +523,9 @@ namespace Lime
 			clone.Components = Components.Clone(clone);
 			clone.ancestorComponentsCache = null;
 			clone.IsAwoken = false;
+			if (RenderChainBuilder != null) {
+				clone.RenderChainBuilder = RenderChainBuilder.Clone();
+			}
 			if (Presenter != null) {
 				clone.Presenter = Presenter.Clone();
 			}
@@ -616,7 +625,7 @@ namespace Lime
 		/// <summary>
 		/// Adds this node and all its descendant nodes to render chain.
 		/// </summary>
-		public virtual void AddToRenderChain(RenderChain chain)
+		internal protected virtual void AddToRenderChain(RenderChain chain)
 		{
 			var savedLayer = chain.CurrentLayer;
 			if (Layer != 0) {
@@ -626,7 +635,7 @@ namespace Lime
 				chain.Add(this, PostPresenter);
 			}
 			for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
-				node.AddToRenderChain(chain);
+				node.RenderChainBuilder?.AddToRenderChain(node, chain);
 			}
 			if (Presenter != null) {
 				chain.Add(this, Presenter);
@@ -1038,6 +1047,7 @@ namespace Lime
 				Nodes.AddRange(nodes);
 			}
 
+			RenderChainBuilder = content.RenderChainBuilder?.Clone();
 			Presenter = content.Presenter?.Clone();
 			PostPresenter = content.PostPresenter?.Clone();
 			Components = content.Components.Clone(this);

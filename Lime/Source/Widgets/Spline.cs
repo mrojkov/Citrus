@@ -5,6 +5,11 @@ namespace Lime
 	[AllowedChildrenTypes(typeof(SplinePoint))]
 	public class Spline : Widget
 	{
+		public Spline()
+		{
+			RenderChainBuilder = null;
+		}
+
 		public float CalcLengthRough()
 		{
 			float length = 0;
@@ -63,7 +68,7 @@ namespace Lime
 			}
 			return length;
 		}
-		
+
 		public Vector2 CalcPoint(float lengthFromBeginnning)
 		{
 			SplinePoint pre = null;
@@ -85,7 +90,7 @@ namespace Lime
 			}
 			return pre != null ? pre.Position * Size : Vector2.Zero;
 		}
-		
+
 		public IEnumerable<Vector2> CalcPoints(float step)
 		{
 			SplinePoint pre = null;

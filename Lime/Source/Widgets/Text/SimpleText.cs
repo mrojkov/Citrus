@@ -182,6 +182,7 @@ namespace Lime
 
 		public SimpleText()
 		{
+			Presenter = DefaultPresenter.Instance;
 			Theme.Current.Apply(this);
 		}
 

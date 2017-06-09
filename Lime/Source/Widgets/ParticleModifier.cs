@@ -52,6 +52,7 @@ namespace Lime
 
 		public ParticleModifier()
 		{
+			RenderChainBuilder = null;
 			Scale = 1;
 			AspectRatio = 1;
 			Velocity = 1;

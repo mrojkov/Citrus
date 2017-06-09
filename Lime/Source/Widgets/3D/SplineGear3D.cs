@@ -17,6 +17,11 @@ namespace Lime
 		[YuzuMember]
 		public float SplineOffset { get; set; }
 
+		public SplineGear3D()
+		{
+			RenderChainBuilder = null;
+		}
+
 		public override Node Clone()
 		{
 			var clone = (SplineGear3D)base.Clone();

@@ -65,6 +65,7 @@ namespace Lime
 
 		public Bone()
 		{
+			RenderChainBuilder = null;
 			Length = 100;
 			EffectiveRadius = 100;
 			FadeoutZone = 50;

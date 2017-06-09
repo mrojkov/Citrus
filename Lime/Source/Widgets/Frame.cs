@@ -45,6 +45,7 @@ namespace Lime
 
 		public Frame(Vector2 position)
 		{
+			Presenter = DefaultPresenter.Instance;
 			this.Position = position;
 		}
 
@@ -92,7 +93,7 @@ namespace Lime
 			try {
 				EnsureRenderChain();
 				foreach (var node in Nodes) {
-					node.AddToRenderChain(renderChain);
+					node.RenderChainBuilder?.AddToRenderChain(node, renderChain);
 				}
 				renderChain.RenderAndClear();
 			} finally {
@@ -109,7 +110,7 @@ namespace Lime
 				try {
 					args.ClipperWidget = ClipByWidget ?? this;
 					foreach (var node in Nodes) {
-						node.AddToRenderChain(renderChain);
+						node.RenderChainBuilder?.AddToRenderChain(node, renderChain);
 					}
 					if (renderChain.HitTest(ref args)) {
 						return true;
@@ -143,7 +144,7 @@ namespace Lime
 			return (WindowRect)aabb;
 		}
 
-		public override void AddToRenderChain(RenderChain chain)
+		internal protected override void AddToRenderChain(RenderChain chain)
 		{
 			if (!GloballyVisible || ClipChildren == ClipMethod.NoRender) {
 				return;

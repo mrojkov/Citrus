@@ -87,6 +87,7 @@ namespace Lime
 
 		public Mesh3D()
 		{
+			Presenter = DefaultPresenter.Instance;
 			Submeshes = new Submesh3DCollection(this);
 			CullMode = CullMode.CullClockwise;
 		}

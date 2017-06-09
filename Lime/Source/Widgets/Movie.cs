@@ -31,6 +31,7 @@ namespace Lime
 
 		public Movie()
 		{
+			Presenter = DefaultPresenter.Instance;
 			movieTexture = new MovieTexture();
 		}
 
@@ -57,7 +58,7 @@ namespace Lime
 
 		Matrix32 IImageCombinerArg.UVTransform { get { return Matrix32.Identity; } }
 
-		public override void AddToRenderChain(RenderChain chain)
+		internal protected override void AddToRenderChain(RenderChain chain)
 		{
 			if (GloballyVisible && !skipRender && textureInitialized) {
 				AddSelfToRenderChain(chain);

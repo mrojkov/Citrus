@@ -296,6 +296,7 @@
     <Compile Include="Source\Application\FileSystemWatcher\FileSystemWatcher.Win.cs" />
     <Compile Include="Source\Widgets\Animation\AnimationBlender.cs" />
     <Compile Include="Source\Widgets\Animation\BlendAnimationEngine.cs" />
+    <Compile Include="Source\Widgets\IRenderChainBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

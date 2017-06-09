@@ -236,6 +236,7 @@ namespace Lime
 
 		public ParticleEmitter()
 		{
+			Presenter = DefaultPresenter.Instance;
 			Shape = EmitterShape.Point;
 			EmissionType = EmissionType.Outer;
 			ParticlesLinkage = ParticlesLinkage.Parent;
