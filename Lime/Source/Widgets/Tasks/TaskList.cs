@@ -136,7 +136,13 @@ namespace Lime
 					if (task.Completed) {
 						Remove(task);
 					} else {
+#if PROFILE
+						var timeBefore = DateTime.Now;
 						task.Advance(delta);
+						TasksProfiler.Register(task, DateTime.Now - timeBefore);
+#else
+						task.Advance(delta);
+#endif
 						i++;
 					}
 				}

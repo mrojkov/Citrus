@@ -24,6 +24,7 @@ namespace Lime
 		{
 			Tag = tag;
 			stack.Push(e);
+			InitialEnumeratorType = e.GetType();
 		}
 
 		/// <summary>
@@ -46,6 +47,8 @@ namespace Lime
 		{
 			return Completed ? "Completed" : stack.Peek().GetType().ToString();
 		}
+
+		public Type InitialEnumeratorType { get; private set; }
 
 		/// <summary>
 		/// Advances task to the next step of enumerator.
