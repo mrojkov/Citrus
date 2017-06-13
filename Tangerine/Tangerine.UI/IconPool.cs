@@ -21,9 +21,9 @@ namespace Tangerine.UI
 		{
 			var icon = new Image(GetTexture(id, defaultId));
 			icon.MinMaxSize = (Vector2)icon.Texture.ImageSize;
-			return icon;		
+			return icon;
 		}
-		
+
 		private static ITexture CreateTexture(string id, string defaultId = null)
 		{
 			var path = $"Tangerine.Resources.Icons.{id}.png";
@@ -32,7 +32,7 @@ namespace Tangerine.UI
 				if (defaultId != null) {
 					return CreateTexture(defaultId);
 				}
-				throw new ArgumentException($"Icon '{path}' doesn't exist"); 
+				throw new ArgumentException($"Icon '{path}' doesn't exist");
 			}
 			using (var bmp = new Bitmap(png)) {
 				var texture = new Texture2D();

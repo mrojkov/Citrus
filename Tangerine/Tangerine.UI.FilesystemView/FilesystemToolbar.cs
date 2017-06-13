@@ -25,17 +25,32 @@ namespace Tangerine.UI.FilesystemView
 		public FilesystemToolbar()
 		{
 			Nodes.AddRange(
-				CreateUpButton(),
 				CreateGotoCurrentProjectDirectoryButton(),
-				CreateToggleCookingRulesButton()
+				CreateUpButton(),
+				CreateGoBackwardButton(),
+				CreateGoForwardButton(),
+				CreateToggleCookingRulesButton(),
+				CreateTogglePreviewButton()
 			);
+		}
+
+		private Widget CreateGoBackwardButton()
+		{
+			return new ToolbarButton(IconPool.GetTexture("Filesystem.ArrowLeft")) {
+				Clicked = () => FilesystemView.Instance?.GoBackward(),
+			};
+		}
+
+		private Widget CreateGoForwardButton()
+		{
+			return new ToolbarButton(IconPool.GetTexture("Filesystem.ArrowRight")) {
+				Clicked = () => FilesystemView.Instance?.GoForward(),
+			};
 		}
 
 		private static Widget CreateGotoCurrentProjectDirectoryButton()
 		{
-			return new Button
-			{
-				Text = "Project Dir",
+			return new ToolbarButton(IconPool.GetTexture("Filesystem.Home")) {
 				Clicked = () => {
 					FilesystemView.Instance?.GoTo(Project.Current.AssetsDirectory);
 				}
@@ -44,9 +59,7 @@ namespace Tangerine.UI.FilesystemView
 
 		private static Widget CreateUpButton()
 		{
-			return new Button
-			{
-				Text = "UP",
+			return new ToolbarButton(IconPool.GetTexture("Filesystem.ArrowUp")) {
 				Clicked = () => {
 					FilesystemView.Instance?.GoUp();
 				}
@@ -55,11 +68,23 @@ namespace Tangerine.UI.FilesystemView
 
 		private static Widget CreateToggleCookingRulesButton()
 		{
-			return new Button
-			{
-				Text = "Cooking Rules",
+			ToolbarButton b = null;
+			return b = new ToolbarButton(IconPool.GetTexture("Filesystem.CookingRules")) {
+				Checked = true,
 				Clicked = () => {
-					FilesystemView.Instance.ToggleCookingRules();
+					FilesystemView.Instance.ToggleCookingRules(b);
+				}
+			};
+		}
+
+		private static Widget CreateTogglePreviewButton()
+		{
+			ToolbarButton b = null;
+			return b = new ToolbarButton(IconPool.GetTexture("Filesystem.Preview"))
+			{
+				Checked = true,
+				Clicked = () => {
+					FilesystemView.Instance.TogglePreview(b);
 				}
 			};
 		}

@@ -227,4 +227,22 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Icons\Filesystem\ArrowRight.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\segoeui.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Icons\Filesystem\ArrowLeft.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Icons\Filesystem\Preview.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Icons\Filesystem\CookingRules.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Icons\Filesystem\Home.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Icons\Filesystem\ArrowUp.png" />
+  </ItemGroup>
 </Project>

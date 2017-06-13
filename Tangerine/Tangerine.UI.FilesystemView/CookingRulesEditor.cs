@@ -48,7 +48,7 @@ namespace Tangerine.UI.FilesystemView
 			}
 			targetSelector.Changed += (value) => {
 				activeTarget = (Target)value.Value;
-				InvalidateForSelection(savedSelection);
+				Invalidate(savedSelection);
 			};
 			targetSelector.Index = 0;
 			activeTarget = Orange.The.Workspace.Targets.First();
@@ -141,7 +141,7 @@ namespace Tangerine.UI.FilesystemView
 
 		Texture2D cachedZebraTexture = null;
 
-		public void InvalidateForSelection(Selection selection)
+		public void Invalidate(Selection selection)
 		{
 			savedSelection = selection;
 			scrollView.Content.Nodes.Clear();

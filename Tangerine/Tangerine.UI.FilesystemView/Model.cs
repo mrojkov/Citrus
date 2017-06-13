@@ -9,8 +9,14 @@ namespace Tangerine.UI.FilesystemView
 {
 	public class Selection : IEnumerable<string>
 	{
+		public Selection Clone()
+		{
+			var r = new Selection();
+			r.selection = new HashSet<string>(this);
+			return r;
+		}
 		public event Action Changed;
-		private readonly HashSet<string> selection = new HashSet<string>();
+		private HashSet<string> selection = new HashSet<string>();
 		public bool Empty => selection.Count == 0;
 		public void Select(string path)
 		{

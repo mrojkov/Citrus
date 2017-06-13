@@ -43,7 +43,7 @@ namespace Tangerine.UI.Timeline.Components
 				LayoutCell = new LayoutCell(Alignment.Center),
 				Nodes = { expandButton }
 			};
-			expandButtonContainer.Updating += delta => 
+			expandButtonContainer.Updating += delta =>
 				expandButtonContainer.Visible = nodeData.Node.Animators.Count > 0;
 			enterButton = NodeCompositionValidator.CanHaveChildren(nodeData.Node.GetType()) ? CreateEnterButton() : null;
 			eyeButton = CreateEyeButton();

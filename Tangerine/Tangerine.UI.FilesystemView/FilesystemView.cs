@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Lime;
 using Tangerine.Core;
@@ -19,6 +20,53 @@ namespace Tangerine.UI.FilesystemView
 		private readonly Selection selection = new Selection();
 		private Lime.FileSystemWatcher fsWatcher;
 		private CookingRulesEditor crEditor;
+		private Preview preview;
+		private List<Tuple<string, Selection>> navHystory = new List<Tuple<string, Selection>>();
+		private int navHystoryIndex = -1;
+		private NodeToggler toggleCookingRules;
+		private NodeToggler togglePreview;
+
+		public void GoBackward()
+		{
+			var newIndex = navHystoryIndex - 1;
+			if (newIndex < 0 || newIndex >= navHystory.Count) {
+				return;
+			}
+			var i = navHystory[newIndex];
+			GoTo(i.Item1);
+			selection.Clear();
+			foreach (var s in i.Item2) {
+				selection.Select(s);
+			}
+			navHystoryIndex = newIndex;
+		}
+
+		public void GoForward()
+		{
+			var newIndex = navHystoryIndex + 1;
+			if (newIndex >= navHystory.Count) {
+				return;
+			}
+			var i = navHystory[newIndex];
+			GoTo(i.Item1);
+			selection.Clear();
+			foreach (var s in i.Item2) {
+				selection.Select(s);
+			}
+			navHystoryIndex = newIndex;
+		}
+
+		private void AddToNavHystory(string path)
+		{
+			if (navHystory.Count > 0 && navHystory[navHystoryIndex].Item1 == path) {
+				return;
+			}
+			var i = new Tuple<string, Selection>(path, selection.Clone());
+			navHystory.Add(i);
+			int newIndex = navHystoryIndex + 1;
+			navHystory.RemoveRange(newIndex, navHystory.Count - newIndex - 1);
+			navHystoryIndex = newIndex;
+		}
 
 		private void InvalidateFSWatcher(string path)
 		{
@@ -44,7 +92,11 @@ namespace Tangerine.UI.FilesystemView
 			scrollView = new ScrollViewWidget();
 			rootWidget.AddChangeWatcher(() => model.CurrentPath, (path) => dockPanel.Title = $"Filesystem: {path}");
 			crEditor = new CookingRulesEditor(NavigateAndSelect);
+			preview = new Preview();
 			InitializeWidgets();
+
+			toggleCookingRules = new NodeToggler(crEditor.RootWidget, () => { crEditor.Invalidate(selection); });
+			togglePreview = new NodeToggler(preview.RootWidget, () => { preview.Invalidate(selection); });
 		}
 
 		private void NavigateAndSelect(string filename)
@@ -73,6 +125,7 @@ namespace Tangerine.UI.FilesystemView
 				}
 			});
 			rootWidget.AddChangeWatcher(() => model.CurrentPath, (p) => {
+				AddToNavHystory(p);
 				InvalidateView(p);
 				InvalidateFSWatcher(p);
 			});
@@ -87,13 +140,15 @@ namespace Tangerine.UI.FilesystemView
 							scrollView,
 						}}),
 						crEditor.RootWidget,
+						preview.RootWidget,
 				}
 			});
 		}
 
 		private void Selection_Changed()
 		{
-			crEditor.InvalidateForSelection(selection);
+			crEditor.Invalidate(selection);
+			preview.Invalidate(selection);
 		}
 
 		private void InvalidateView(string path)
@@ -233,20 +288,40 @@ namespace Tangerine.UI.FilesystemView
 			model.GoTo(path);
 		}
 
-		private Node crEditorSavedParentWidget;
-		private int crEditorSavedIndexInParent;
-
-		public void ToggleCookingRules()
+		private class NodeToggler
 		{
-			var crRoot = crEditor.RootWidget;
-			if (crRoot.Parent != null) {
-				crEditorSavedParentWidget = crRoot.Parent;
-				crEditorSavedIndexInParent = crEditorSavedParentWidget.Nodes.IndexOf(crRoot);
-				crRoot.Unlink();
-			} else {
-				crEditorSavedParentWidget.Nodes.Insert(crEditorSavedIndexInParent, crRoot);
-				crEditor.InvalidateForSelection(selection);
+			private Node savedParent;
+			private int savedIndex;
+			private Node node;
+			private Action invalidator;
+			public NodeToggler(Node n, Action invalidator)
+			{
+				node = n;
+				this.invalidator = invalidator;
 			}
+			public void Toggle(ToolbarButton button)
+			{
+				if (node.Parent != null) {
+					savedParent = node.Parent;
+					savedIndex = savedParent.Nodes.IndexOf(node);
+					node.Unlink();
+					button.Checked = false;
+				} else {
+					savedParent.Nodes.Insert(Mathf.Clamp(savedIndex, 0, savedParent.Nodes.Count), node);
+					invalidator?.Invoke();
+					button.Checked = true;
+				}
+			}
+		}
+
+		public void TogglePreview(ToolbarButton button)
+		{
+			togglePreview.Toggle(button);
+		}
+
+		public void ToggleCookingRules(ToolbarButton button)
+		{
+			toggleCookingRules.Toggle(button);
 		}
 	}
 }
