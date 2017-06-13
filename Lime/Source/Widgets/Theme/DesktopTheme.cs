@@ -11,6 +11,7 @@ namespace Lime
 			public static readonly int TextHeight = 16;
 			public static readonly Vector2 CheckBoxSize = new Vector2(16, 16);
 			public static readonly Vector2 DefaultButtonSize = new Vector2(75, 22);
+			public static readonly Vector2 DefaultToolbarButtonSize = new Vector2(20, 20);
 			public static readonly Vector2 DefaultEditBoxSize = new Vector2(75, 22);
 			public static readonly Vector2 MaxTabSize = new Vector2(250, 24);
 			public static readonly Vector2 MinTabSize = new Vector2(25, 24);

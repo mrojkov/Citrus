@@ -61,7 +61,7 @@ namespace Tangerine.UI.Timeline.Components
 					label,
 					editBox,
 					new Widget(),
-					(Widget)enterButton ?? (Widget)new HSpacer(ToolbarButton.DefaultSize.X),
+					(Widget)enterButton ?? (Widget)new HSpacer(DesktopTheme.Metrics.DefaultToolbarButtonSize.X),
 					eyeButton,
 					lockButton,
 				}
@@ -89,7 +89,7 @@ namespace Tangerine.UI.Timeline.Components
 			}
 			label.Color = IsGrayedLabel(node) ? DesktopTheme.Colors.BlackText : ColorTheme.Current.TimelineRoll.GrayedLabel;
 		}
-		
+
 		ToolbarButton CreateEnterButton()
 		{
 			var button = new ToolbarButton {
@@ -122,7 +122,7 @@ namespace Tangerine.UI.Timeline.Components
 		{
 			var button = new ToolbarButton { Highlightable = false };
 			button.AddChangeWatcher(
-				() => nodeData.Locked, 
+				() => nodeData.Locked,
 				i => button.Texture = IconPool.GetTexture(i ? "Timeline.Lock" : "Timeline.Dot")
 			);
 			button.Clicked += () => Core.Operations.SetProperty.Perform(nodeData, nameof(NodeRow.Locked), !nodeData.Locked);
