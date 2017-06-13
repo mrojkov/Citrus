@@ -228,9 +228,6 @@
     <EmbeddedResource Include="Resources\Icons\Filesystem\ArrowRight.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\segoeui.ttf" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\Icons\Filesystem\ArrowLeft.png" />
   </ItemGroup>
   <ItemGroup>
