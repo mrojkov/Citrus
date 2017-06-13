@@ -137,9 +137,9 @@ namespace Lime
 						Remove(task);
 					} else {
 #if PROFILE
-						var timeBefore = DateTime.Now;
+						System.Diagnostics.Stopwatch.StartNew();
 						task.Advance(delta);
-						TasksProfiler.Register(task, DateTime.Now - timeBefore);
+						TasksProfiler.Register(task, System.Diagnostics.Stopwatch.GetTimestamp());
 #else
 						task.Advance(delta);
 #endif

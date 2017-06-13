@@ -10,23 +10,31 @@ namespace Lime
 	{
 		public class UsageData
 		{
-			public string TaskId;
-			public TimeSpan ConsumedTime;
+			public readonly string TaskId;
+			public long ConsumedTicks;
 			public int Updates;
-			public float TimePerUpdate => (float)ConsumedTime.Ticks / Updates;
+			public float TicksPerUpdate => (float)ConsumedTicks / Updates;
+
+			public UsageData(string taskId)
+			{
+				TaskId = taskId;
+			}
 		}
 
 		private static readonly Dictionary<string, UsageData> records = new Dictionary<string,UsageData>();
 
-		public static void Register(Task task, TimeSpan timeSpan)
+		public static void Register(Task task, long ticks)
 		{
 			var id = task.InitialEnumeratorType.ToString();
-			if (!records.ContainsKey(id)) {
-				records[id] = new UsageData();
-				records[id].TaskId = id;
+			UsageData ud;
+			if (records.ContainsKey(id)) {
+				ud = records[id];
+			} else {
+				ud = new UsageData(id);
+				records[id] = ud;
 			}
-			records[id].ConsumedTime += timeSpan;
-			records[id].Updates += 1;
+			ud.ConsumedTicks += ticks;
+			ud.Updates += 1;
 		}
 
 		public static void Reset()
@@ -41,17 +49,17 @@ namespace Lime
 			return values.Take(count).ToList();
 		}
 
-		public static List<UsageData> GetTopByConsumedTime(int count)
+		public static List<UsageData> GetTopByConsumedTicks(int count)
 		{
 			var values = records.Values.ToList();
-			values.Sort((a, b) => b.ConsumedTime.CompareTo(a.ConsumedTime));
+			values.Sort((a, b) => b.ConsumedTicks.CompareTo(a.ConsumedTicks));
 			return values.Take(count).ToList();
 		}
 
-		public static List<UsageData> GetTopByConsumedTimePerUpdate(int count)
+		public static List<UsageData> GetTopByConsumedTicksPerUpdate(int count)
 		{
 			var values = records.Values.ToList();
-			values.Sort((a, b) => b.TimePerUpdate.CompareTo(a.TimePerUpdate));
+			values.Sort((a, b) => b.TicksPerUpdate.CompareTo(a.TicksPerUpdate));
 			return values.Take(count).ToList();
 		}
 
