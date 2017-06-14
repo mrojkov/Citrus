@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Windows.Forms;
 using Lime;
 using Tangerine.Core;
 
@@ -25,6 +27,8 @@ namespace Tangerine.UI.FilesystemView
 		private int navHystoryIndex = -1;
 		private NodeToggler toggleCookingRules;
 		private NodeToggler togglePreview;
+		private bool beginDrag;
+		private Vector2 dragStartPosition;
 
 		public void GoBackward()
 		{
@@ -168,9 +172,18 @@ namespace Tangerine.UI.FilesystemView
 						input.ConsumeKey(Key.Mouse0DoubleClick);
 						OnDoubleClick(item);
 					}
-					if (iconWidget.Input.WasKeyPressed(Key.Mouse1)) {
+					if (iconWidget.Input.WasKeyReleased(Key.Mouse1)) {
 						iconWidget.Input.ConsumeKey(Key.Mouse1);
 						SystemShellContextMenu.Instance.Show(item);
+					}
+					if (iconWidget.Input.WasKeyReleased(Key.Mouse0)) {
+						if (!selection.Contains(item)) {
+							iconWidget.Input.ConsumeKey(Key.Mouse0);
+							if (!iconWidget.Input.IsKeyPressed(Key.Control)) {
+								selection.Clear();
+							}
+							selection.Select(item);
+						}
 					}
 					if (iconWidget.Input.WasKeyPressed(Key.Mouse0)) {
 						input.ConsumeKey(Key.Mouse0);
@@ -183,13 +196,14 @@ namespace Tangerine.UI.FilesystemView
 							}
 							// TODO: Ctrl + Shift, Shift clicks
 						} else {
-							selection.Clear();
-							selection.Select(item);
+							if (!selection.Contains(item)) {
+								selection.Clear();
+								selection.Select(item);
+							}
+							beginDrag = true;
+							dragStartPosition = Window.Current.Input.MousePosition;
 						}
 						Window.Current?.Invalidate();
-					}
-					if (iconWidget.Input.WasKeyPressed(Key.Mouse1)) {
-						// TODO: Context menu
 					}
 				};
 				scrollView.Content.AddNode(iconWidget);
@@ -252,6 +266,16 @@ namespace Tangerine.UI.FilesystemView
 
 		private void ScrollViewUpdated(float delta)
 		{
+			if (beginDrag) {
+				if ((dragStartPosition - Window.Current.Input.MousePosition).Length > 5.0f) {
+					beginDrag = false;
+					CommonWindow.Current.DragFiles(selection.ToArray());
+				}
+				if (Window.Current.Input.WasKeyReleased(Key.Mouse0)) {
+					beginDrag = false;
+				}
+				return;
+			}
 			var input = scrollView.Input;
 			if (scrollView.IsMouseOver()) {
 				if (!rectSelecting && input.WasKeyPressed(Key.Mouse0)) {

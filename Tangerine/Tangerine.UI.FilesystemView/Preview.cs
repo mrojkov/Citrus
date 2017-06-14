@@ -26,6 +26,9 @@ namespace Tangerine.UI.FilesystemView
 
 		public void Invalidate(Selection selection)
 		{
+			if (RootWidget.Parent == null) {
+				return;
+			}
 			if (savedSelection == selection) {
 				return;
 			}
