@@ -143,6 +143,10 @@ namespace Lime
 			{
 				ImageSize = SurfaceSize = size;
 				Data = new Color4[size.Width * size.Height];
+				for (int i = 0; i < size.Width * size.Height; i++) {
+					Data[i] = Color4.White;
+					Data[i].A = 0;
+				}
 			}
 
 			public override uint GetHandle()
