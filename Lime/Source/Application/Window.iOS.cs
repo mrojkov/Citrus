@@ -44,6 +44,11 @@ namespace Lime
 
 		public event Action<IEnumerable<string>> FilesDropped;
 
+		public void DragFiles(string[] filenames)
+		{
+			throw new NotImplementedException();
+		}
+
 		public float PixelScale
 		{
 			get { return (float)UIScreen.MainScreen.Scale; }
