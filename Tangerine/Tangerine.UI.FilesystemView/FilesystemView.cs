@@ -34,7 +34,6 @@ namespace Tangerine.UI.FilesystemView
 			}
 			var i = navHystory[newIndex];
 			GoTo(i.Item1);
-			selection.Clear();
 			foreach (var s in i.Item2) {
 				selection.Select(s);
 			}
@@ -49,7 +48,6 @@ namespace Tangerine.UI.FilesystemView
 			}
 			var i = navHystory[newIndex];
 			GoTo(i.Item1);
-			selection.Clear();
 			foreach (var s in i.Item2) {
 				selection.Select(s);
 			}
@@ -102,7 +100,6 @@ namespace Tangerine.UI.FilesystemView
 		private void NavigateAndSelect(string filename)
 		{
 			GoTo(Path.GetDirectoryName(filename));
-			selection.Clear();
 			selection.Select(filename);
 		}
 
@@ -126,8 +123,10 @@ namespace Tangerine.UI.FilesystemView
 			});
 			rootWidget.AddChangeWatcher(() => model.CurrentPath, (p) => {
 				AddToNavHystory(p);
+				selection.Clear();
 				InvalidateView(p);
 				InvalidateFSWatcher(p);
+				preview.ClearTextureCache();
 			});
 			rootWidget.Layout = new VBoxLayout();
 			rootWidget.AddNode(new HSplitter {
@@ -137,10 +136,15 @@ namespace Tangerine.UI.FilesystemView
 						Layout = new VBoxLayout(),
 						Nodes = {
 							toolbar,
-							scrollView,
+							new VSplitter {
+								Layout = new VBoxLayout(),
+								Nodes = {
+									scrollView,
+									preview.RootWidget,
+								}
+							}
 						}}),
 						crEditor.RootWidget,
-						preview.RootWidget,
 				}
 			});
 		}
@@ -162,7 +166,7 @@ namespace Tangerine.UI.FilesystemView
 					var input = iconWidget.Input;
 					if (input.WasKeyPressed(Key.Mouse0DoubleClick)) {
 						input.ConsumeKey(Key.Mouse0DoubleClick);
-						model.GoTo(item);
+						GoTo(item);
 					}
 					if (iconWidget.Input.WasKeyPressed(Key.Mouse1)) {
 						iconWidget.Input.ConsumeKey(Key.Mouse1);

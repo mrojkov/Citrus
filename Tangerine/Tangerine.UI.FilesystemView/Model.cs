@@ -53,6 +53,22 @@ namespace Tangerine.UI.FilesystemView
 		{
 			return GetEnumerator();
 		}
+
+		public static bool operator !=(Selection lhs, Selection rhs)
+		{
+			return !(lhs == rhs);
+		}
+
+		public static bool operator ==(Selection lhs, Selection rhs)
+		{
+			if (object.ReferenceEquals(lhs, null) && object.ReferenceEquals(rhs, null)) {
+				return true;
+			}
+			if (object.ReferenceEquals(lhs, null) || object.ReferenceEquals(rhs, null)) {
+				return false;
+			}
+			return lhs.SequenceEqual(rhs);
+		}
 	}
 
 	public class Model

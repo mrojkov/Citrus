@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Lime;
@@ -6,45 +8,105 @@ namespace Tangerine.UI.FilesystemView
 {
 	public class Preview
 	{
-		public Widget RootWidget;
+		public ScrollViewWidget RootWidget;
+		private Selection savedSelection = new Selection();
+		// TODO: Clear Cache on fs navigation
+		private Dictionary<string, ITexture> textureCache = new Dictionary<string, ITexture>();
+
+		public void ClearTextureCache()
+		{
+			textureCache.Clear();
+		}
 
 		public Preview()
 		{
-			RootWidget = new Widget {
-				Layout = new VBoxLayout()
-			};
+			RootWidget = new ScrollViewWidget();
+			RootWidget.Content.Layout = new FlowLayout();
 		}
 
 		public void Invalidate(Selection selection)
 		{
-			RootWidget.Nodes.Clear();
+			if (savedSelection == selection) {
+				return;
+			}
+			savedSelection = selection.Clone();
+			RootWidget.Content.Nodes.Clear();
 			if (selection.Empty) {
 				return;
 			}
-			var filename = selection.First();
+			RootWidget.ScrollPosition = 0;
+			List<Tuple<string, Image>> previews = new List<Tuple<string, Image>>();
+			foreach (var filename in selection) {
+				var pv = GeneratePreview(filename);
+				if (pv != null) {
+					previews.Add(new Tuple<string, Image>(filename, pv));
+				}
+			}
+			previews.Sort((a, b) => {
+				var szA = a.Item2.Texture.SurfaceSize;
+				var szB = b.Item2.Texture.SurfaceSize;
+				return Comparer<float>.Default.Compare((float)szB.Width / szB.Height, (float)szA.Width / szA.Height);
+			});
+			foreach (var t in previews) {
+				RootWidget.Content.AddNode(new Widget {
+					Layout = new VBoxLayout(),
+					Nodes = {
+						t.Item2,
+						new SimpleText {
+							OverflowMode = TextOverflowMode.Ellipsis,
+							Text = Path.GetFileName(t.Item1)
+						}
+					}
+				});
+			}
+		}
+
+		private Image GeneratePreview(string filename)
+		{
+			ITexture texture = null;
+			if (textureCache.ContainsKey(filename)) {
+				texture = textureCache[filename];
+			} else {
+				texture = GetTexture(filename);
+			}
+			if (texture == null) {
+				return null;
+			}
+			textureCache[filename] = texture;
+			var img = new Image(texture);
+			img.Texture.MinFilter = img.Texture.MagFilter = TextureFilter.Nearest;
+			img.MinMaxSize = img.Size = (Vector2)img.Texture.SurfaceSize;
+			return img;
+		}
+
+		private static ITexture GetTexture(string filename)
+		{
 			if (Directory.Exists(filename)) {
-				return;
+				return null;
 			}
 			if (filename.EndsWith(".scene") || filename.EndsWith(".tan")) {
 				const string SceneThumbnailSeparator = "{8069CDD4-F02F-4981-A3CB-A0BAD4018D00}";
 				var allText = File.ReadAllText(filename);
 				var index = allText.IndexOf(SceneThumbnailSeparator);
 				// Trim zeroes from the end of file since they tend to appear there for unknown reason
-				if (index > 0) {
-					var endOfBase64Index = allText.Length - 1;
-					while (allText[endOfBase64Index] == 0) {
-						endOfBase64Index--;
-					}
-					int startOfBase64Index = index + SceneThumbnailSeparator.Length;
-					var previewText = allText.Substring(startOfBase64Index, endOfBase64Index - startOfBase64Index + 1);
-					var previewBytes = System.Convert.FromBase64String(previewText);
-					var texture = new Texture2D();
-					texture.LoadImage(previewBytes);
-					var img = new Image(texture);
-					img.Texture.MinFilter = img.Texture.MagFilter = TextureFilter.Nearest;
-					RootWidget.AddNode(img);
+				if (index <= 0) {
+					return null;
 				}
+				var endOfBase64Index = allText.Length - 1;
+				while (allText[endOfBase64Index] == 0 || allText[endOfBase64Index] == '\n' || allText[endOfBase64Index] == '\r') {
+					endOfBase64Index--;
+				}
+				int startOfBase64Index = index + SceneThumbnailSeparator.Length;
+				var previewText = allText.Substring(startOfBase64Index, endOfBase64Index - startOfBase64Index + 1);
+				var previewBytes = System.Convert.FromBase64String(previewText);
+				var texture = new Texture2D();
+				texture.LoadImage(previewBytes);
+				return texture;
 			} else {
+				var fi = new FileInfo(filename);
+				if (fi.Length > 1024 * 1024 * 10) {
+					return null;
+				}
 				var texture = new Texture2D();
 				try {
 					texture.LoadImage(filename);
@@ -52,7 +114,7 @@ namespace Tangerine.UI.FilesystemView
 					var bytes = File.ReadAllBytes(filename);
 					var len = bytes.Length;
 					if (len == 0) {
-						return;
+						return null;
 					}
 					int trueLen = len + 3 - len % 3;
 					int side = Mathf.Sqrt(trueLen / 3).Truncate();
@@ -65,9 +127,7 @@ namespace Tangerine.UI.FilesystemView
 					}
 					texture.LoadImage(pixels, side, side);
 				}
-				var img = new Image(texture);
-				img.Texture.MinFilter = img.Texture.MagFilter = TextureFilter.Nearest;
-				RootWidget.AddNode(img);
+				return texture;
 			}
 		}
 	}
