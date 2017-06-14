@@ -46,6 +46,10 @@ namespace Lime
 		public bool AllowDropFiles { get; set; }
 
 		public event Action<IEnumerable<string>> FilesDropped;
+		public void DragFiles(string[] filenames)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }
 #endif

@@ -683,11 +683,26 @@ namespace Lime
 					if (value) {
 						form.DragEnter += Form_DragEnter;
 						form.DragDrop += Form_DragDrop;
+						form.QueryContinueDrag += Form_QueryContinueDrag;
 					} else {
 						form.DragEnter -= Form_DragEnter;
 						form.DragDrop -= Form_DragDrop;
+						form.QueryContinueDrag -= Form_QueryContinueDrag;
 					}
 				}
+			}
+		}
+
+		private void Form_QueryContinueDrag(object sender, QueryContinueDragEventArgs e)
+		{
+			if (e.Action == DragAction.Drop) {
+				Input.SetKeyState(Key.Mouse0, false);
+				Input.SetKeyState(Key.Mouse1, false);
+				Input.SetKeyState(Key.Mouse2, false);
+				Input.SetKeyState(Key.Touch0, false);
+				Input.SetKeyState(Key.Touch1, false);
+				Input.SetKeyState(Key.Touch2, false);
+				Input.SetKeyState(Key.Touch3, false);
 			}
 		}
 
@@ -707,6 +722,11 @@ namespace Lime
 		}
 
 		public event Action<IEnumerable<string>> FilesDropped;
+		public void DragFiles(string[] filenames)
+		{
+			var dragObject = new DataObject(DataFormats.FileDrop, filenames);
+			form.DoDragDrop(dragObject, DragDropEffects.All);
+		}
 	}
 
 	static class SDToLime

@@ -269,7 +269,7 @@ namespace Lime
 			return extent;
 		}
 
-		private Vector2 MeasureUncutText()
+		public Vector2 MeasureUncutText()
 		{
 			if (!uncutTextSizeValid) {
 				uncutTextSizeValid = true;

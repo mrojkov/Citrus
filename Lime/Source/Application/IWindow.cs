@@ -230,7 +230,7 @@ namespace Lime
 		object Tag { get; set; }
 
 		/// <summary>
-		/// You can use this method to display a modal dialog box in your application. 
+		/// You can use this method to display a modal dialog box in your application.
 		/// When this method is called, the code following it is not executed until after the dialog box is closed.
 		/// The window must be hidden before calling this method.
 		/// </summary>
@@ -245,6 +245,12 @@ namespace Lime
 		/// Occurs when files are dropped.
 		/// </summary>
 		event Action<IEnumerable<string>> FilesDropped;
+
+		/// <summary>
+		/// Initiate dragging of files supported by native controls
+		/// </summary>
+		/// <param name="filenames">list of paths to files</param>
+		void DragFiles(string[] filenames);
 
 		/// <summary>
 		/// Occurs when unhandled exception on update.
