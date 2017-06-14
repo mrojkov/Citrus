@@ -107,6 +107,8 @@ namespace Tangerine.UI.FilesystemView
 			var attr = File.GetAttributes(path);
 			if ((attr & FileAttributes.Directory) == FileAttributes.Directory) {
 				CurrentPath = path;
+			} else {
+				throw new Lime.Exception("Can only navigate to directories");
 			}
 		}
 	}

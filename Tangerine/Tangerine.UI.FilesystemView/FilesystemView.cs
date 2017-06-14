@@ -166,7 +166,7 @@ namespace Tangerine.UI.FilesystemView
 					var input = iconWidget.Input;
 					if (input.WasKeyPressed(Key.Mouse0DoubleClick)) {
 						input.ConsumeKey(Key.Mouse0DoubleClick);
-						GoTo(item);
+						OnDoubleClick(item);
 					}
 					if (iconWidget.Input.WasKeyPressed(Key.Mouse1)) {
 						iconWidget.Input.ConsumeKey(Key.Mouse1);
@@ -193,6 +193,23 @@ namespace Tangerine.UI.FilesystemView
 					}
 				};
 				scrollView.Content.AddNode(iconWidget);
+			}
+		}
+
+		private void OnDoubleClick(string path)
+		{
+			var attr = File.GetAttributes(path);
+			if ((attr & FileAttributes.Directory) == FileAttributes.Directory) {
+				GoTo(path);
+			} else {
+				if (path.EndsWith(".scene") || path.EndsWith(".tan")) {
+					string localPath;
+					if (!Project.Current.TryGetAssetPath(path, out localPath)) {
+						AlertDialog.Show("Can't open a document outside the project directory");
+					} else {
+						Project.Current.OpenDocument(localPath);
+					}
+				}
 			}
 		}
 
