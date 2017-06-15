@@ -67,7 +67,7 @@ namespace Orange
 				}
 				args.AppendFormat(" -i \"{0}\" -o \"{1}\" -r {2},{3} -shh", tga, dstPath, width, height);
 #if MAC
-				var pvrTexTool = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Mac", "PVRTexTool");
+				var pvrTexTool = Path.Combine(Toolbox.GetApplicationDirectory(), "PVRTexTool");
 				var chmodResult = Process.Start("chmod", $"+x {pvrTexTool}");
 #else
 				var pvrTexTool = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Win", "PVRTexToolCli");

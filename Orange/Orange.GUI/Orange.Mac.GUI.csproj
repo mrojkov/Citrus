@@ -18,7 +18,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug</OutputPath>
+    <OutputPath>..\bin\Mac\Debug</OutputPath>
     <DefineConstants>__UNIFIED__;DEBUG;MAC</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -33,13 +33,14 @@
     <PlatformTarget>x86</PlatformTarget>
     <HttpClientHandler></HttpClientHandler>
     <LinkMode></LinkMode>
-    <XamMacArch></XamMacArch>
+    <XamMacArch>i386</XamMacArch>
     <PackageSigningKey>3rd Party Mac Developer Installer</PackageSigningKey>
+    <I18n>west</I18n>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType></DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release</OutputPath>
+    <OutputPath>..\bin\Mac\Release</OutputPath>
     <DefineConstants>__UNIFIED__;MAC</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -52,7 +53,8 @@
     <LinkMode>SdkOnly</LinkMode>
     <PlatformTarget>x86</PlatformTarget>
     <HttpClientHandler></HttpClientHandler>
-    <XamMacArch></XamMacArch>
+    <XamMacArch>i386</XamMacArch>
+    <I18n>west</I18n>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -114,6 +116,10 @@
       <SmartLink>False</SmartLink>
     </NativeReference>
     <NativeReference Include="..\..\3rdParty\FreeType\libfreetype6.dylib">
+      <Kind>Dynamic</Kind>
+      <SmartLink>False</SmartLink>
+    </NativeReference>
+    <NativeReference Include="..\..\3rdParty\AssimpNet\libassimp.dylib">
       <Kind>Dynamic</Kind>
       <SmartLink>False</SmartLink>
     </NativeReference>

@@ -173,14 +173,16 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Toolchain.Mac\nvcompress">
+    <Content Include="Toolchain.Win\nuget.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Toolchain.Mac\PVRTexTool">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Toolchain.Win\nuget.exe">
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Toolchain.Mac\nvcompress">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    </BundleResource>
   </ItemGroup>
 </Project>
