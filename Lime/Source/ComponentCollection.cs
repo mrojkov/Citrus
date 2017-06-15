@@ -114,7 +114,7 @@ namespace Lime
 			throw new InvalidOperationException();
 		}
 
-		public virtual bool Remove<T>() where T : TComponent
+		public bool Remove<T>() where T : TComponent
 		{
 			var c = Get<T>();
 			return c != null && Remove(c);
@@ -153,7 +153,7 @@ namespace Lime
 			}
 		}
 
-		public void Clear()
+		public virtual void Clear()
 		{
 			for (int i = 0; i < buckets.Length; i++) {
 				buckets[i].Key = 0;

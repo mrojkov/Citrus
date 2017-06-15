@@ -7,7 +7,12 @@ namespace Lime
 		public Node Owner { get; set; }
 
 		public virtual void Awake() { }
-		public virtual NodeComponent Clone() { return (NodeComponent)MemberwiseClone(); }
+		public virtual NodeComponent Clone()
+		{
+			var clone = (NodeComponent)MemberwiseClone();
+			clone.Owner = null;
+			return clone;
+		}
 	}
 
 	public class NodeComponentCollection : ComponentCollection<NodeComponent>
@@ -21,18 +26,9 @@ namespace Lime
 
 		public NodeComponentCollection Clone(Node newOwner)
 		{
-			// Hack. Remove this when non-generic Add() is designed
-			var result = new NodeComponentCollection(newOwner) {
-				buckets = new Bucket[buckets.Length]
-			};
-			for (var i = 0; i < buckets.Length; i++) {
-				var bucket = buckets[i];
-				var clone = new Bucket() {
-					Key = bucket.Key,
-					Component = bucket.Component.Clone(),
-				};
-				clone.Component.Owner = newOwner;
-				result.buckets[i] = clone;
+			var result = new NodeComponentCollection(newOwner);
+			foreach (var c in this) {
+				result.Add(c.Clone());
 			}
 			return result;
 		}
@@ -47,16 +43,25 @@ namespace Lime
 			owner.PropagateDirtyFlags(Node.DirtyFlags.Components);
 		}
 
-		public override bool Remove<T>()
+		public override bool Remove(NodeComponent component)
 		{
-			var c = Get<T>();
-			if (c != null) {
-				base.Remove<T>();
+			if (base.Remove(component)) {
 				owner.PropagateDirtyFlags(Node.DirtyFlags.Components);
-				c.Owner = null;
+				component.Owner = null;
 				return true;
 			}
 			return false;
+		}
+
+		public override void Clear()
+		{
+			for (int i = 0; i < buckets.Length; i++) {
+				if (buckets[i].Key > 0) {
+					buckets[i].Component.Owner = null;
+				}
+			}
+			base.Clear();
+			owner.PropagateDirtyFlags(Node.DirtyFlags.Components);
 		}
 	}
 }

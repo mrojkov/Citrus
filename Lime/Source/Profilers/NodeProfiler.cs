@@ -9,7 +9,7 @@ namespace Lime
 {
 	public static class NodeProfiler
 	{
-		private class UsageData : NodeComponent
+		private sealed class UsageData : NodeComponent
 		{
 			public long ConsumedTicks;
 
@@ -19,7 +19,7 @@ namespace Lime
 			}
 		}
 
-		private class UsageSummary : NodeComponent
+		private sealed class UsageSummary : NodeComponent
 		{
 			public long Usage;
 		}
