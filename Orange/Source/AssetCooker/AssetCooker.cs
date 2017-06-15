@@ -368,6 +368,7 @@ namespace Orange
 						try {
 							if (converter(srcPath, dstPath)) {
 								Console.WriteLine((bundled ? "* " : "+ ") + dstPath);
+								PluginLoader.AfterAssetUpdated(bundle, dstPath);
 							}
 						} catch (System.Exception e) {
 							Console.WriteLine(
