@@ -16,7 +16,13 @@ namespace Lime
 
 		public void Render(Node node)
 		{
+#if PROFILE
+			System.Diagnostics.Stopwatch.StartNew();
 			node.Render();
+			NodeProfiler.Register(node, System.Diagnostics.Stopwatch.GetTimestamp());
+#else
+			node.Render();
+#endif
 		}
 
 		public bool PartialHitTest(Node node, ref HitTestArgs args)
