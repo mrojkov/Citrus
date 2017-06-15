@@ -19,7 +19,7 @@ namespace Lime
 #if PROFILE
 			System.Diagnostics.Stopwatch.StartNew();
 			node.Render();
-			NodeProfiler.Register(node, System.Diagnostics.Stopwatch.GetTimestamp());
+			NodeProfiler.RegisterRender(node, System.Diagnostics.Stopwatch.GetTimestamp());
 #else
 			node.Render();
 #endif

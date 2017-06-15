@@ -717,6 +717,9 @@ namespace Lime
 		/// </summary>
 		public override void Update(float delta)
 		{
+#if PROFILE
+			var watch = System.Diagnostics.Stopwatch.StartNew();
+#endif
 			if (!IsAwoken) {
 				Awoken?.Invoke(this);
 				Awake();
@@ -729,11 +732,17 @@ namespace Lime
 			if (GloballyVisible) {
 				AdvanceAnimation(delta);
 				SelfUpdate(delta);
+#if PROFILE
+				watch.Stop();
+#endif
 				for (var node = Nodes.FirstOrNull(); node != null; ) {
 					var next = node.NextSibling;
 					node.Update(delta);
 					node = next;
 				}
+#if PROFILE
+				watch.Start();
+#endif
 				SelfLateUpdate(delta);
 				if (clicked != null) {
 					HandleClick();
@@ -742,6 +751,10 @@ namespace Lime
 			if (Updated != null) {
 				Updated(delta);
 			}
+#if PROFILE
+			watch.Stop();
+			NodeProfiler.RegisterUpdate(this, watch.ElapsedTicks);
+#endif
 		}
 
 		/// <summary>

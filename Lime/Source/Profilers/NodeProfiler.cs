@@ -11,23 +11,41 @@ namespace Lime
 	{
 		private sealed class UsageData : NodeComponent
 		{
-			public long ConsumedTicks;
+			public long RenderTicks;
+			public long UpdateTicks;
 
 			public void Clear()
 			{
-				ConsumedTicks = 0;
+				RenderTicks = 0;
+				UpdateTicks = 0;
 			}
 		}
 
 		private sealed class UsageSummary : NodeComponent
 		{
-			public long Usage;
+			public long RenderUsage;
+			public long UpdateUsage;
 		}
 
-		private static long totalTicks;
+		private static long totalRenderTicks;
+		private static long totalUpdateTicks;
 		private static readonly List<UsageData> createdComponents = new List<UsageData>();
 
-		internal static void Register(Node node, long ticks)
+		internal static void RegisterRender(Node node, long ticks)
+		{
+			var ud = GetComponent(node);
+			ud.RenderTicks += ticks;
+			totalRenderTicks += ticks;
+		}
+
+		internal static void RegisterUpdate(Node node, long ticks)
+		{
+			var ud = GetComponent(node);
+			ud.UpdateTicks += ticks;
+			totalUpdateTicks += ticks;
+		}
+
+		private static UsageData GetComponent(Node node)
 		{
 			var ud = node.Components.Get<UsageData>();
 			if (ud == null) {
@@ -35,13 +53,13 @@ namespace Lime
 				node.Components.Add(ud);
 				createdComponents.Add(ud);
 			}
-			ud.ConsumedTicks += ticks;
-			totalTicks += ticks;
+			return ud;
 		}
 
 		public static void Reset()
 		{
-			totalTicks = 0;
+			totalRenderTicks = 0;
+			totalUpdateTicks = 0;
 			createdComponents.ForEach(ud => ud.Clear());
 		}
 
@@ -80,13 +98,23 @@ namespace Lime
 			return clone;
 		}
 
-		private static long CalculateUsageSummary(Node node)
+		private static Tuple<long, long> CalculateUsageSummary(Node node)
 		{
 			var ud = node.Components.Get<UsageData>();
-			long usage = ud?.ConsumedTicks ?? 0;
-			usage += node.Nodes.Sum(subNode => CalculateUsageSummary(subNode));
-			node.Components.GetOrAdd<UsageSummary>().Usage = usage;
-			return usage;
+
+			long renderTicks = ud?.RenderTicks ?? 0;
+			long updateTicks = ud?.UpdateTicks ?? 0;
+
+			foreach (var ticks in node.Nodes.Select(CalculateUsageSummary)) {
+				renderTicks += ticks.Item1;
+				updateTicks += ticks.Item2;
+			}
+
+			var us = node.Components.GetOrAdd<UsageSummary>();
+			us.RenderUsage = renderTicks;
+			us.UpdateUsage = updateTicks;
+
+			return new Tuple<long, long>(renderTicks, updateTicks);
 		}
 
 		private static void ProcessExternalContent(Node clone)
@@ -113,13 +141,15 @@ namespace Lime
 		private static void AlterId(Node node)
 		{
 			// Add profiler result to the node Id
-			var usage = 0f;
+			var renderUsage = 0f;
+			var updateUsage = 0f;
 			var ud = node.Components.Get<UsageSummary>();
 			if (ud != null) {
-				usage = (float) ud.Usage / totalTicks;
+				renderUsage = (float)ud.RenderUsage / totalRenderTicks;
+				updateUsage = (float)ud.UpdateUsage / totalUpdateTicks;
 			}
 			if (!(node is Camera3D)) {
-				node.Id += $"({usage:P})";
+				node.Id += $"({renderUsage:P} | {updateUsage:P})";
 			}
 		}
 

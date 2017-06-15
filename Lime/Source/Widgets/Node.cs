@@ -581,6 +581,9 @@ namespace Lime
 		/// <param name="delta">Time delta since last Update.</param>
 		public virtual void Update(float delta)
 		{
+#if PROFILE
+			var watch = System.Diagnostics.Stopwatch.StartNew();
+#endif
 			delta *= AnimationSpeed;
 			if (!IsAwoken) {
 				Awoken?.Invoke(this);
@@ -589,12 +592,22 @@ namespace Lime
 			}
 			AdvanceAnimation(delta);
 			SelfUpdate(delta);
+#if PROFILE
+			watch.Stop();
+#endif
 			for (var node = Nodes.FirstOrNull(); node != null; ) {
 				var next = node.NextSibling;
 				node.Update(delta);
 				node = next;
 			}
+#if PROFILE
+			watch.Start();
+#endif
 			SelfLateUpdate(delta);
+#if PROFILE
+			watch.Stop();
+			NodeProfiler.RegisterUpdate(this, watch.ElapsedTicks);
+#endif
 		}
 
 		/// <summary>
