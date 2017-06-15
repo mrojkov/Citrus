@@ -431,7 +431,6 @@ namespace Orange
 						bitmap = new Bitmap(stream);
 					}
 					if (ShouldDownscale(bitmap, cookingRules)) {
-						bitmap.Dispose();
 						bitmap = DownscaleTexture(bitmap, srcTexturePath, cookingRules);
 					}
 					// Ensure that no image exceeded maxAtlasSize limit
