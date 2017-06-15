@@ -39,7 +39,7 @@ namespace Tangerine.UI.Timeline
 
 		public int CurrentColumn => Document.Current.AnimationFrame;
 		public int ColumnCount { get; set; }
-		public readonly ComponentCollection<IComponent> Globals = new ComponentCollection<IComponent>();
+		public readonly ComponentCollection<Component> Globals = new ComponentCollection<Component>();
 
 		public event Action<Vector2> OffsetChanged;
 
@@ -167,12 +167,12 @@ namespace Tangerine.UI.Timeline
 
 		public void EnsureRowVisible(Row row)
 		{
-			var gw = row.GetGridWidget();
-			if (gw.Bottom > Offset.Y + Grid.Size.Y) {
-				OffsetY = gw.Bottom - Grid.Size.Y;
+			var gw = row.GridWidget();
+			if (gw.Bottom() > Offset.Y + Grid.Size.Y) {
+				OffsetY = gw.Bottom() - Grid.Size.Y;
 			}
-			if (gw.Top < Offset.Y) {
-				OffsetY = Math.Max(0, gw.Top);
+			if (gw.Top() < Offset.Y) {
+				OffsetY = Math.Max(0, gw.Y);
 			}
 		}
 
@@ -184,13 +184,13 @@ namespace Tangerine.UI.Timeline
 		
 		public bool IsRowVisible(int row)
 		{
-			var pos = Document.Current.Rows[row].GetGridWidget().Top - Offset.Y;
+			var pos = Document.Current.Rows[row].GridWidget().Top() - Offset.Y;
 			return pos >= 0 && pos < Grid.Size.Y;
 		}
 	}
 
 	public static class RowExtensions
 	{
-		public static Components.IGridWidget GetGridWidget(this Row row) => row.Components.Get<Components.IGridWidget>();
+		public static Widget GridWidget(this Row row) => row.Components.Get<RowView>()?.GridRow.GridWidget;
 	}
 }

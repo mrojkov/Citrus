@@ -6,7 +6,7 @@ using Tangerine.Core.Components;
 
 namespace Tangerine.UI.Timeline.Components
 {
-	public class RollPropertyView : IRollWidget
+	public class RollPropertyView : IRollRowView
 	{
 		readonly Row row;
 		readonly SimpleText label;
@@ -60,7 +60,7 @@ namespace Tangerine.UI.Timeline.Components
 				row.Selected ? ColorTheme.Current.Basic.SelectedBackground : ColorTheme.Current.Basic.WhiteBackground);
 		}
 
-		Widget IRollWidget.Widget => widget;
-		float IRollWidget.Indentation { set { spacer.MinMaxWidth = value; } }
+		public Widget Widget => widget;
+		public float Indentation { set { spacer.MinMaxWidth = value; } }
 	}	
 }

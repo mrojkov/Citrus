@@ -6,29 +6,23 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.Timeline.Components
 {
-	public class GridPropertyView : IGridWidget, IOverviewWidget
+	public class GridPropertyView : IGridRowView
 	{
 		readonly Node node;
 		readonly IAnimator animator;
-		readonly Widget gridWidget;
-		readonly Widget overviewWidget;
+
+		public Widget GridWidget { get; private set; }
+		public Widget OverviewWidget { get; private set; }
 
 		public GridPropertyView(Node node, IAnimator animator)
 		{
 			this.node = node;
 			this.animator = animator;
-			gridWidget = new Widget { LayoutCell = new LayoutCell { StretchY = 0 }, MinHeight = TimelineMetrics.DefaultRowHeight };
-			overviewWidget = new Widget { LayoutCell = new LayoutCell { StretchY = 0 }, MinHeight = TimelineMetrics.DefaultRowHeight };
-			gridWidget.Presenter = new DelegatePresenter<Widget>(Render);
-			overviewWidget.Presenter = new DelegatePresenter<Widget>(Render);
+			GridWidget = new Widget { LayoutCell = new LayoutCell { StretchY = 0 }, MinHeight = TimelineMetrics.DefaultRowHeight };
+			OverviewWidget = new Widget { LayoutCell = new LayoutCell { StretchY = 0 }, MinHeight = TimelineMetrics.DefaultRowHeight };
+			GridWidget.Presenter = new DelegatePresenter<Widget>(Render);
+			OverviewWidget.Presenter = new DelegatePresenter<Widget>(Render);
 		}
-
-		Widget IGridWidget.Widget => gridWidget;
-		Widget IOverviewWidget.Widget => overviewWidget;
-
-		float IGridWidget.Top => gridWidget.Y;
-		float IGridWidget.Bottom => gridWidget.Y + gridWidget.Height;
-		float IGridWidget.Height => gridWidget.Height;
 
 		void Render(Widget widget)
 		{

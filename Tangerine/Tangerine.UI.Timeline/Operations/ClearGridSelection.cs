@@ -24,9 +24,9 @@ namespace Tangerine.UI.Timeline.Operations
 				
 			protected override void InternalRedo(ClearGridSelection op)
 			{
-				op.Save(new Backup { Spans = Document.Current.Rows.Select(r => r.Components.GetOrAdd<GridSpanList>()).ToList() });
+				op.Save(new Backup { Spans = Document.Current.Rows.Select(r => r.Components.GetOrAdd<GridSpanListComponent>().Spans).ToList() });
 				foreach (var row in Document.Current.Rows) {
-					row.Components.Remove<GridSpanList>();
+					row.Components.Remove<GridSpanListComponent>();
 				}
 			}
 
@@ -34,8 +34,8 @@ namespace Tangerine.UI.Timeline.Operations
 			{
 				var s = op.Restore<Backup>().Spans;
 				foreach (var row in Document.Current.Rows) {
-					row.Components.Remove<GridSpanList>();
-					row.Components.Add(s[row.Index]);
+					row.Components.Remove<GridSpanListComponent>();
+					row.Components.Add(new GridSpanListComponent(s[row.Index]));
 				}
 			}
 		}

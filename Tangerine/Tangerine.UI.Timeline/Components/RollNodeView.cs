@@ -7,7 +7,7 @@ using Tangerine.Core.Components;
 
 namespace Tangerine.UI.Timeline.Components
 {
-	public class RollNodeView : IRollWidget
+	public class RollNodeView : IRollRowView
 	{
 		protected readonly Row row;
 		protected readonly NodeRow nodeData;
@@ -74,8 +74,8 @@ namespace Tangerine.UI.Timeline.Components
 			widget.Tasks.Add(HandleDoubleClickTask());
 		}
 
-		Widget IRollWidget.Widget => widget;
-		float IRollWidget.Indentation { set { spacer.MinMaxWidth = value; } }
+		public Widget Widget => widget;
+		public float Indentation { set { spacer.MinMaxWidth = value; } }
 
 		bool IsGrayedLabel(Node node) => node.AsWidget?.Visible ?? true;
 

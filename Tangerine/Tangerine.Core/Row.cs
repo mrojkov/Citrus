@@ -24,8 +24,6 @@ namespace Tangerine.Core
 		public bool CanHaveChildren { get; set; }
 		public Row Parent { get; set; }
 		public readonly List<Row> Rows = new List<Row>();
-		public readonly ComponentCollection<IComponent> Components = new ComponentCollection<IComponent>();
+		public readonly ComponentCollection<Component> Components = new ComponentCollection<Component>();
 	}
-
-	public interface IComponent { }
 }

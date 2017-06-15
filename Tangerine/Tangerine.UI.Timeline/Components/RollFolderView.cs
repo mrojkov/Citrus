@@ -7,7 +7,7 @@ using Tangerine.Core.Components;
 
 namespace Tangerine.UI.Timeline.Components
 {
-	public class RollFolderView : IRollWidget
+	public class RollFolderView : IRollRowView
 	{
 		protected readonly Row row;
 		protected readonly Folder folder;
@@ -62,8 +62,8 @@ namespace Tangerine.UI.Timeline.Components
 			widget.Tasks.Add(HandleDobleClickTask());
 		}
 
-		Widget IRollWidget.Widget => widget;
-		float IRollWidget.Indentation { set { spacer.MinMaxWidth = value; } }
+		public Widget Widget => widget;
+		public float Indentation { set { spacer.MinMaxWidth = value; } }
 
 		ToolbarButton CreateEyeButton()
 		{

@@ -42,7 +42,7 @@ namespace Tangerine.UI.Timeline.Operations
 			void ShiftX(int offset)
 			{
 				foreach (var row in Document.Current.Rows) {
-					var spans = row.Components.GetOrAdd<GridSpanList>();
+					var spans = row.Components.GetOrAdd<GridSpanListComponent>().Spans;
 					for (int i = 0; i < spans.Count; i++) {
 						var s = spans[i];
 						s.A += offset;
@@ -54,13 +54,13 @@ namespace Tangerine.UI.Timeline.Operations
 
 			void ShiftY(ShiftGridSelection op)
 			{
-				var b = new Backup { Spans = Document.Current.Rows.Select(r => r.Components.GetOrAdd<GridSpanList>()).ToList() };
+				var b = new Backup { Spans = Document.Current.Rows.Select(r => r.Components.GetOrAdd<GridSpanListComponent>().Spans).ToList() };
 				op.Save(b);
 				if (op.Offset.Y != 0) {
 					foreach (var row in Document.Current.Rows) {
 						var i = row.Index - op.Offset.Y;
-						row.Components.Remove<GridSpanList>();
-						row.Components.Add(i >= 0 && i < Document.Current.Rows.Count ? b.Spans[i] : new GridSpanList());
+						row.Components.Remove<GridSpanListComponent>();
+						row.Components.Add(i >= 0 && i < Document.Current.Rows.Count ? new GridSpanListComponent(b.Spans[i]) : new GridSpanListComponent());
 					}
 				}
 			}
@@ -69,8 +69,8 @@ namespace Tangerine.UI.Timeline.Operations
 			{
 				var b = op.Restore<Backup>();
 				foreach (var row in Document.Current.Rows) {
-					row.Components.Remove<GridSpanList>();
-					row.Components.Add(b.Spans[row.Index]);
+					row.Components.Remove<GridSpanListComponent>();
+					row.Components.Add(new GridSpanListComponent(b.Spans[row.Index]));
 				}
 			}
 		}

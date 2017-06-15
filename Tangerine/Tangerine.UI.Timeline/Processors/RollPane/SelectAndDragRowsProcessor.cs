@@ -102,12 +102,12 @@ namespace Tangerine.UI.Timeline
 			float y = 1;
 			var pr = rowLocation.ParentRow;
 			if (rowLocation.Index < pr.Rows.Count) {
-				y = pr.Rows[rowLocation.Index].GetGridWidget().Top;
+				y = pr.Rows[rowLocation.Index].GridWidget().Top();
 			} else if (pr.Rows.Count > 0) {
 				var lastRow = pr.Rows[rowLocation.Index - 1];
-				y = lastRow.GetGridWidget().Bottom + CalcSubtreeHeight(lastRow) + TimelineMetrics.RowSpacing;
+				y = lastRow.GridWidget().Bottom() + CalcSubtreeHeight(lastRow) + TimelineMetrics.RowSpacing;
 			} else if (pr != Document.Current.RowTree) {
-				y = pr.GetGridWidget().Bottom + TimelineMetrics.RowSpacing;
+				y = pr.GridWidget().Bottom() + TimelineMetrics.RowSpacing;
 			}
 			Timeline.Instance.Roll.ContentWidget.PrepareRendererState();
 			Renderer.DrawRect(
@@ -128,7 +128,7 @@ namespace Tangerine.UI.Timeline
 		{
 			float r = 0;
 			foreach (var i in row.Rows) {
-				r += i.GetGridWidget().Height + TimelineMetrics.RowSpacing + CalcSubtreeHeight(i);
+				r += i.GridWidget().Height + TimelineMetrics.RowSpacing + CalcSubtreeHeight(i);
 			}
 			return r;
 		}
@@ -144,8 +144,8 @@ namespace Tangerine.UI.Timeline
 				return doc.Rows[0];
 			}
 			foreach (var row in doc.Rows) {
-				var gw = row.GetGridWidget();
-				if (position.Y >= gw.Top && position.Y < gw.Bottom + TimelineMetrics.RowSpacing) {
+				var gw = row.GridWidget();
+				if (position.Y >= gw.Top() && position.Y < gw.Bottom() + TimelineMetrics.RowSpacing) {
 					return doc.Rows[row.Index];
 				}
 			}
@@ -159,14 +159,14 @@ namespace Tangerine.UI.Timeline
 				return new RowLocation(Document.Current.RowTree, 0);
 			}
 			foreach (var row in Document.Current.Rows) {
-				var gw = row.GetGridWidget();
-				if (position.Y >= gw.Top && position.Y < gw.Bottom + TimelineMetrics.RowSpacing) {
+				var gw = row.GridWidget();
+				if (position.Y >= gw.Top() && position.Y < gw.Bottom() + TimelineMetrics.RowSpacing) {
 					var index = row.Parent.Rows.IndexOf(row);
-					if (position.Y < gw.Top + gw.Height * 0.5f) {
+					if (position.Y < gw.Y + gw.Height * 0.5f) {
 						return new RowLocation(row.Parent, index);
 					} else if (row.Rows.Count > 0) {
 						return new RowLocation(row, 0);
-					} else if (position.Y < gw.Top + gw.Height * 0.75f && row.CanHaveChildren) {
+					} else if (position.Y < gw.Y + gw.Height * 0.75f && row.CanHaveChildren) {
 						return new RowLocation(row, 0);
 					} else {
 						return new RowLocation(row.Parent, index + 1);

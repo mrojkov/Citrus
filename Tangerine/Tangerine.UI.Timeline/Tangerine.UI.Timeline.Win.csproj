@@ -52,9 +52,6 @@
     <Compile Include="Components\GridNodeView.cs" />
     <Compile Include="Components\GridPropertyView.cs" />
     <Compile Include="Components\GridSpanList.cs" />
-    <Compile Include="Components\IGridWidget.cs" />
-    <Compile Include="Components\IOverviewWidget.cs" />
-    <Compile Include="Components\IRollWidget.cs" />
     <Compile Include="Components\RollCurveView.cs" />
     <Compile Include="Components\RollFolderView.cs" />
     <Compile Include="Components\RollNodeView.cs" />
@@ -92,6 +89,7 @@
     <Compile Include="MarkerPropertiesDialog.cs" />
     <Compile Include="Processors\Rulerbar\RulerbarMouseScrollProcessor.cs" />
     <Compile Include="CommandBindings.cs" />
+    <Compile Include="Components\RowView.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Commands\" />

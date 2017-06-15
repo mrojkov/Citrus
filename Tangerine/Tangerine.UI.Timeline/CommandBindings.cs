@@ -63,7 +63,7 @@ namespace Tangerine.UI.Timeline
 		static void RemoveKeyframes()
 		{
 			foreach (var row in Document.Current.Rows) {
-				var spans = row.Components.GetOrAdd<GridSpanList>();
+				var spans = row.Components.GetOrAdd<GridSpanListComponent>().Spans;
 				foreach (var span in spans.GetNonOverlappedSpans()) {
 					var node = row.Components.Get<NodeRow>()?.Node ?? row.Components.Get<PropertyRow>()?.Node;
 					if (node == null) {

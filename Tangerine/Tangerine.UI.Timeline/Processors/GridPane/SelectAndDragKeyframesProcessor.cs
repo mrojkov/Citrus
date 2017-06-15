@@ -45,7 +45,7 @@ namespace Tangerine.UI.Timeline
 
 		bool IsCellSelected(IntVector2 cell)
 		{
-			return Document.Current.Rows[cell.Y].Components.GetOrAdd<Components.GridSpanList>().IsCellSelected(cell.X);
+			return Document.Current.Rows[cell.Y].Components.GetOrAdd<GridSpanListComponent>().Spans.IsCellSelected(cell.X);
 		}
 
 		private IEnumerator<object> DragSelectionTask(IntVector2 initialCell)

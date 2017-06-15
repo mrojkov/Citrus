@@ -4,7 +4,7 @@ using Lime;
 
 namespace Tangerine.Core.Components
 {
-	public sealed class CurveRow : IComponent
+	public sealed class CurveRow : Component
 	{
 		public Node Node { get; private set; }
 		public IAnimator Animator { get; private set; }
@@ -18,7 +18,7 @@ namespace Tangerine.Core.Components
 		}
 	}
 
-	public class NodeRow : IComponent
+	public sealed class NodeRow : Component
 	{
 		public Node Node { get; private set; }
 
@@ -46,7 +46,7 @@ namespace Tangerine.Core.Components
 		}
 	}
 
-	public sealed class FolderRow : IComponent
+	public sealed class FolderRow : Component
 	{
 		public Folder Folder { get; private set; }
 
@@ -56,7 +56,7 @@ namespace Tangerine.Core.Components
 		}
 	}
 
-	public sealed class PropertyRow : IComponent
+	public sealed class PropertyRow : Component
 	{
 		public Node Node { get; private set; }
 		public IAnimator Animator { get; private set; }

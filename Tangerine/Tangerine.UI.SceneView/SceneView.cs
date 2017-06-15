@@ -23,7 +23,7 @@ namespace Tangerine.UI.SceneView
 		/// </summary>
 		public Vector2 MousePosition => Scene.Input.LocalMousePosition;
 
-		public ComponentCollection<IComponent> Components = new ComponentCollection<IComponent>();
+		public ComponentCollection<Component> Components = new ComponentCollection<Component>();
 
 		public static SceneView Instance { get; private set; }
 
@@ -212,11 +212,11 @@ namespace Tangerine.UI.SceneView
 		}
 	}
 
-	public class CreateNodeRequestComponent : IComponent
+	public class CreateNodeRequestComponent : Component
 	{
 		public Type NodeType { get; set; }
 
-		public static bool Consume<T>(ComponentCollection<IComponent> components, out Type nodeType) where T: Node
+		public static bool Consume<T>(ComponentCollection<Component> components, out Type nodeType) where T: Node
 		{
 			var c = components.Get<CreateNodeRequestComponent>();
 			if (c != null && (c.NodeType.IsSubclassOf(typeof(T)) || c.NodeType == typeof(T))) {
@@ -228,7 +228,7 @@ namespace Tangerine.UI.SceneView
 			return false;
 		}
 
-		public static bool Consume<T>(ComponentCollection<IComponent> components) where T: Node
+		public static bool Consume<T>(ComponentCollection<Component> components) where T: Node
 		{
 			Type type;
 			return Consume<T>(components, out type);

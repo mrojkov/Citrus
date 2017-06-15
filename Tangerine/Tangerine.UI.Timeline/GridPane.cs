@@ -76,7 +76,7 @@ namespace Tangerine.UI.Timeline
 			// Render dark horizonal lines.
 			x = TimelineMetrics.ColWidth * (timeline.CurrentColumn + 0.5f);
 			foreach (var row in Document.Current.Rows) {
-				var y = row.GetGridWidget().Bottom + 0.5f;
+				var y = row.GridWidget().Bottom() + 0.5f;
 				Renderer.DrawLine(0, y, ContentWidget.Width, y, ColorTheme.Current.TimelineGrid.Lines);
 			}
 			// Render the cursor.
@@ -96,7 +96,7 @@ namespace Tangerine.UI.Timeline
 		{
 			widget.PrepareRendererState();
 			foreach (var row in Document.Current.Rows) {
-				var s = row.Components.GetOrAdd<Components.GridSpanList>();
+				var s = row.Components.GetOrAdd<Components.GridSpanListComponent>().Spans;
 				foreach (var i in s.GetNonOverlappedSpans()) {
 					var a = CellToGridCoordinates(new IntVector2(i.A, row.Index) + offset);
 					var b = CellToGridCoordinates(new IntVector2(i.B, row.Index + 1) + offset);
@@ -113,7 +113,7 @@ namespace Tangerine.UI.Timeline
 		public Vector2 CellToGridCoordinates(int row, int col)
 		{
 			var rows = Document.Current.Rows;
-			var y = row < rows.Count ? rows[Math.Max(row, 0)].GetGridWidget().Top : rows[rows.Count - 1].GetGridWidget().Bottom;
+			var y = row < rows.Count ? rows[Math.Max(row, 0)].GridWidget().Top() : rows[rows.Count - 1].GridWidget().Bottom();
 			return new Vector2(col * TimelineMetrics.ColWidth, y);
 		}
 
@@ -154,7 +154,7 @@ namespace Tangerine.UI.Timeline
 				return r;
 			}
 			foreach (var row in Document.Current.Rows) {
-				if (mousePos.Y >= row.GetGridWidget().Top && mousePos.Y < row.GetGridWidget().Bottom + TimelineMetrics.RowSpacing) {
+				if (mousePos.Y >= row.GridWidget().Top() && mousePos.Y < row.GridWidget().Bottom() + TimelineMetrics.RowSpacing) {
 					r.Y = row.Index;
 					break;
 				}

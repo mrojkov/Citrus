@@ -12,94 +12,46 @@ namespace Tangerine.UI.Timeline
 		public override void Process(IOperation op)
 		{
 			foreach (var row in Document.Current.Rows) {
-				TryCreateGridNodeView(row);
-				TryCreateGridFolderView(row);
-				TryCreateGridPropertyView(row);
-				TryCreateGridCurveView(row);
-				TryCreateRollNodeView(row);
-				TryCreateRollFolderView(row);
-				TryCreateRollPropertyView(row);
-				TryCreateRollCurveView(row);
+				var view = row.Components.GetOrAdd<RowView>();
+				TryCreateRollView(row);
+				TryCreateGridView(row);
 			}
 		}
 
-		static void TryCreateRollNodeView(Row row)
+		static void TryCreateRollView(Row row)
 		{
-			var nodeRow = row.Components.Get<Core.Components.NodeRow>();
-			var view = row.Components.Get<IRollWidget>();
-			if (view == null && nodeRow != null) {
-				view = new RollNodeView(row);
-				row.Components.Add(view);
+			var view = row.Components.GetOrAdd<RowView>();
+			if (view.RollRow != null) {
+				return;
+			}
+			if (row.Components.Contains<Core.Components.NodeRow>()) {
+				view.RollRow = new RollNodeView(row);
+			} else if (row.Components.Contains<Core.Components.FolderRow>()) {
+				view.RollRow = new RollFolderView(row);
+			} else if (row.Components.Contains<Core.Components.PropertyRow>()) {
+				view.RollRow = new RollPropertyView(row);
+			} else if (row.Components.Contains<Core.Components.CurveRow>()) {
+				view.RollRow = new RollCurveView(row);
 			}
 		}
 
-		static void TryCreateRollFolderView(Row row)
+		static void TryCreateGridView(Row row)
 		{
-			var folderRow = row.Components.Get<Core.Components.FolderRow>();
-			var view = row.Components.Get<IRollWidget>();
-			if (view == null && folderRow != null) {
-				view = new RollFolderView(row);
-				row.Components.Add(view);
+			var view = row.Components.GetOrAdd<RowView>();
+			if (view.GridRow != null) {
+				return;
 			}
-		}
-
-		static void TryCreateRollPropertyView(Row row)
-		{
-			var propRow = row.Components.Get<Core.Components.PropertyRow>();
-			var view = row.Components.Get<IRollWidget>();
-			if (view == null && propRow != null) {
-				view = new RollPropertyView(row);
-				row.Components.Add(view);
-			}
-		}
-
-		static void TryCreateRollCurveView(Row row)
-		{
-			var curveRow = row.Components.Get<Core.Components.CurveRow>();
-			var view = row.Components.Get<IRollWidget>();
-			if (view == null && curveRow != null) {
-				view = new RollCurveView(row);
-				row.Components.Add(view);
-			}
-		}
-
-		static void TryCreateGridNodeView(Row row)
-		{
-			var nodeRow = row.Components.Get<Core.Components.NodeRow>();
-			if (nodeRow != null && !row.Components.Contains<IGridWidget>()) {
-				var c = new GridNodeView(nodeRow.Node);
-				row.Components.Add<IGridWidget>(c);
-				row.Components.Add<IOverviewWidget>(c);
-			}
-		}
-
-		static void TryCreateGridFolderView(Row row)
-		{
-			var folderRow = row.Components.Get<Core.Components.FolderRow>();
-			if (folderRow != null && !row.Components.Contains<IGridWidget>()) {
-				var c = new GridFolderView();
-				row.Components.Add<IGridWidget>(c);
-				row.Components.Add<IOverviewWidget>(c);
-			}
-		}
-
-		static void TryCreateGridPropertyView(Row row)
-		{
-			var propRow = row.Components.Get<Core.Components.PropertyRow>();
-			if (propRow != null && !row.Components.Contains<IGridWidget>()) {
-				var c = new GridPropertyView(propRow.Node, propRow.Animator);
-				row.Components.Add<IGridWidget>(c);
-				row.Components.Add<IOverviewWidget>(c);
-			}
-		}
-
-		static void TryCreateGridCurveView(Row row)
-		{
-			var curveRow = row.Components.Get<Core.Components.CurveRow>();
-			if (curveRow != null && !row.Components.Contains<IGridWidget>()) {
-				var c = new GridCurveView(curveRow.Node, curveRow.Animator, curveRow.State);
-				row.Components.Add<IGridWidget>(c);
-				row.Components.Add<IOverviewWidget>(c);
+			if (row.Components.Contains<Core.Components.NodeRow>()) {
+				var nodeRow = row.Components.Get<Core.Components.NodeRow>();
+				view.GridRow = new GridNodeView(nodeRow.Node);
+			} else if (row.Components.Contains<Core.Components.FolderRow>()) {
+				view.GridRow = new GridFolderView();
+			} else if (row.Components.Contains<Core.Components.PropertyRow>()) {
+				var propRow = row.Components.Get<Core.Components.PropertyRow>();
+				view.GridRow = new GridPropertyView(propRow.Node, propRow.Animator);
+			} else if (row.Components.Contains<Core.Components.CurveRow>()) {
+				var curveRow = row.Components.Get<Core.Components.CurveRow>();
+				view.GridRow = new GridCurveView(curveRow.Node, curveRow.Animator, curveRow.State);
 			}
 		}
 	}

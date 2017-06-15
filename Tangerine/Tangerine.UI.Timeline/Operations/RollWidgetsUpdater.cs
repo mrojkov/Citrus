@@ -19,7 +19,7 @@ namespace Tangerine.UI.Timeline
 		void UpdateIndentation()
 		{
 			foreach (var row in Document.Current.Rows) {
-				row.Components.Get<Components.IRollWidget>().Indentation = CalcIndentation(row) * TimelineMetrics.RollIndentation;
+				row.Components.Get<Components.RowView>().RollRow.Indentation = CalcIndentation(row) * TimelineMetrics.RollIndentation;
 			}
 		}
 
@@ -37,7 +37,7 @@ namespace Tangerine.UI.Timeline
 			var content = timeline.Roll.ContentWidget;
 			content.Nodes.Clear();
 			foreach (var row in Document.Current.Rows) {
-				var widget = row.Components.Get<Components.IRollWidget>().Widget;
+				var widget = row.Components.Get<Components.RowView>().RollRow.Widget;
 				if (!widget.IsAwoken) {
 					widget.Update(0);
 				}
@@ -52,7 +52,7 @@ namespace Tangerine.UI.Timeline
 				return false;
 			}
 			foreach (var row in Document.Current.Rows) {
-				if (row.Components.Get<Components.IRollWidget>().Widget != content.Nodes[row.Index]) {
+				if (row.Components.Get<Components.RowView>().RollRow.Widget != content.Nodes[row.Index]) {
 					return false;
 				}
 			}

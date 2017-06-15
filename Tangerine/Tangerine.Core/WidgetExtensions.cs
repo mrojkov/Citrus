@@ -24,5 +24,8 @@ namespace Tangerine.Core
 		{
 			widget.LateTasks.Add(provider.DistinctUntilChanged().Consume(action));
 		}
+
+		public static float Top(this Widget widget) => widget.Y;
+		public static float Bottom(this Widget widget) => widget.Y + widget.Height;
 	}
 }

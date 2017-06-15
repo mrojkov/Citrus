@@ -19,8 +19,8 @@ namespace Tangerine.UI.Timeline
 		void AdjustWidths()
 		{
 			foreach (var row in Document.Current.Rows) {
-				var gw = row.Components.Get<Components.IOverviewWidget>();
-				gw.Widget.MinWidth = Timeline.Instance.ColumnCount * TimelineMetrics.ColWidth;
+				var gw = row.Components.Get<Components.RowView>().GridRow;
+				gw.OverviewWidget.MinWidth = Timeline.Instance.ColumnCount * TimelineMetrics.ColWidth;
 			}
 		}
 
@@ -29,7 +29,7 @@ namespace Tangerine.UI.Timeline
 			var content = timeline.Overview.ContentWidget;
 			content.Nodes.Clear();
 			foreach (var row in Document.Current.Rows) {
-				var widget = row.Components.Get<Components.IOverviewWidget>().Widget;
+				var widget = row.Components.Get<Components.RowView>().GridRow.OverviewWidget;
 				if (!widget.IsAwoken) {
 					widget.Update(0);
 				}
@@ -44,7 +44,7 @@ namespace Tangerine.UI.Timeline
 				return false;
 			}
 			foreach (var row in Document.Current.Rows) {
-				if (row.Components.Get<Components.IOverviewWidget>().Widget != content.Nodes[row.Index]) {
+				if (row.Components.Get<Components.RowView>().GridRow.OverviewWidget != content.Nodes[row.Index]) {
 					return false;
 				}
 			}

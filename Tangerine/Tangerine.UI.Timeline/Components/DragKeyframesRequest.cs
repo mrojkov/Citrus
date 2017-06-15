@@ -4,7 +4,7 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.Timeline.Components
 {
-	class DragKeyframesRequest : IComponent
+	class DragKeyframesRequest : Component
 	{
 		public bool RemoveOriginals { get; private set; }
 		public IntVector2 Offset { get; private set; }

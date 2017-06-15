@@ -19,7 +19,7 @@ namespace Tangerine.UI.Timeline
 					if (!row.Components.Contains<CurveRow>()) {
 						continue;
 					}
-					var widget = row.Components.Get<IGridWidget>().Widget;
+					var widget = row.GridWidget();
 					if (widget != null && widget.Input.WasMousePressed()) {
 						if (HitTestSeparator(widget)) {
 							yield return DragSeparatorTask(row);
@@ -39,7 +39,7 @@ namespace Tangerine.UI.Timeline
 
 		private IEnumerator<object> DragSeparatorTask(Row row)
 		{
-			var widget = row.Components.Get<IGridWidget>().Widget;
+			var widget = row.GridWidget();
 			var cr = row.Components.Get<CurveRow>();
 			var input = widget.Input;
 			var initialMousePosition = input.MousePosition;

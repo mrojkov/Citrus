@@ -22,7 +22,7 @@ namespace Tangerine.UI.Timeline.Components
 		}
 	}
 
-	public class GridSpanList : List<GridSpan>, IComponent
+	public class GridSpanList : List<GridSpan>
 	{
 		public GridSpanList GetNonOverlappedSpans()
 		{
@@ -57,5 +57,13 @@ namespace Tangerine.UI.Timeline.Components
 			}
 			return false;
 		}
+	}
+
+	public sealed class GridSpanListComponent : Component
+	{
+		public readonly GridSpanList Spans;
+
+		public GridSpanListComponent() { Spans = new GridSpanList(); }
+		public GridSpanListComponent(GridSpanList spans) { Spans = spans; }
 	}
 }

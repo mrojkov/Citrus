@@ -5,7 +5,7 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.Timeline.Components
 {
-	public class RollCurveView : IRollWidget
+	public class RollCurveView : IRollRowView
 	{
 		readonly Row row;
 		readonly SimpleText label;
@@ -31,8 +31,8 @@ namespace Tangerine.UI.Timeline.Components
 			widget.Updated += delta => widget.MinHeight = c.State.RowHeight;
 		}
 
-		Widget IRollWidget.Widget => widget;
-		float IRollWidget.Indentation { set { spacer.MinMaxWidth = value; } }
+		public Widget Widget => widget;
+		public float Indentation { set { spacer.MinMaxWidth = value; } }
 
 		void RenderBackground(Widget widget)
 		{

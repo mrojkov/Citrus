@@ -34,7 +34,7 @@ namespace Tangerine.UI.Timeline
 			var processedKeys = new HashSet<IKeyframe>();
 			var operations = new List<Action>();
 			foreach (var row in Document.Current.Rows) {
-				var spans = row.Components.GetOrAdd<GridSpanList>();
+				var spans = row.Components.GetOrAdd<GridSpanListComponent>().Spans;
 				foreach (var span in spans.GetNonOverlappedSpans()) {
 					var node = row.Components.Get<NodeRow>()?.Node ?? row.Components.Get<PropertyRow>()?.Node;
 					if (node == null) {
