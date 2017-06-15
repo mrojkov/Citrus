@@ -453,7 +453,7 @@ namespace Lime
 				var c = node.Components.Get<T>();
 				if (c != null) {
 					ancestorComponentsCache = ancestorComponentsCache ?? new ComponentCollection<NodeComponent>();
-					ancestorComponentsCache.Add<T>(c);
+					ancestorComponentsCache.Add(c);
 					return c;
 				}
 			}

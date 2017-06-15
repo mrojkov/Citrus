@@ -2,7 +2,7 @@ using System;
 
 namespace Lime
 {
-	public class NodeComponent
+	public class NodeComponent : Component
 	{
 		public Node Owner { get; set; }
 
@@ -37,7 +37,7 @@ namespace Lime
 			return result;
 		}
 
-		public override void Add<T>(T component)
+		public override void Add(NodeComponent component)
 		{
 			if (component.Owner != null) {
 				throw new InvalidOperationException("The component is already in a collection.");
