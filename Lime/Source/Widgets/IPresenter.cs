@@ -17,9 +17,10 @@ namespace Lime
 		public void Render(Node node)
 		{
 #if PROFILE
-			System.Diagnostics.Stopwatch.StartNew();
+			var watch = System.Diagnostics.Stopwatch.StartNew();
 			node.Render();
-			NodeProfiler.RegisterRender(node, System.Diagnostics.Stopwatch.GetTimestamp());
+			watch.Stop();
+			NodeProfiler.RegisterRender(node, watch.ElapsedTicks);
 #else
 			node.Render();
 #endif
