@@ -90,7 +90,7 @@ namespace Lime
 
 		List<SerializableTexture> textures;
 
-		internal ITexture GetTexture(int index)
+		public ITexture GetTexture(int index)
 		{
 			if (FirstFrame == LastFrame) {
 				return texture;
