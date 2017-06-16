@@ -244,6 +244,7 @@ namespace Lime
 		/// <summary>
 		/// Collections of Components.
 		/// </summary>
+		[YuzuMember]
 		public NodeComponentCollection Components { get; private set; }
 
 		private ComponentCollection<NodeComponent> ancestorComponentsCache;
