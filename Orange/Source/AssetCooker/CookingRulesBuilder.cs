@@ -54,6 +54,7 @@ namespace Orange
 		AtlasOptimization AtlasOptimization { get; }
 		ModelCompression ModelCompressing { get; }
 		string AtlasPacker { get; }
+		string CustomRule { get; }
 	}
 
 	public class ParticularCookingRules : ICookingRules
@@ -97,6 +98,9 @@ namespace Orange
 
 		[YuzuRequired]
 		public string AtlasPacker { get; set; }
+
+		[YuzuRequired]
+		public string CustomRule { get; set; }
 
 		public DateTime LastChangeTime;
 
@@ -177,6 +181,7 @@ namespace Orange
 		public AtlasOptimization AtlasOptimization => effectiveRules.AtlasOptimization;
 		public ModelCompression ModelCompressing => effectiveRules.ModelCompressing;
 		public string AtlasPacker => effectiveRules.AtlasPacker;
+		public string CustomRule => effectiveRules.CustomRule;
 
 		public bool Ignore
 		{
@@ -556,6 +561,9 @@ namespace Orange
 					break;
 				case "ModelCompressing":
 					rules.ModelCompressing = ParseModelCompressing(words[1]);
+					break;
+				case "CustomRule":
+					rules.CustomRule = words[1];
 					break;
 				default:
 					throw new Lime.Exception("Unknown attribute {0}", words[0]);
