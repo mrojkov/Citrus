@@ -297,7 +297,8 @@
     <Compile Include="Source\Widgets\Animation\AnimationBlender.cs" />
     <Compile Include="Source\Widgets\Animation\BlendAnimationEngine.cs" />
     <Compile Include="Source\Widgets\IRenderChainBuilder.cs" />
-    <Compile Include="Source\Widgets\Tasks\TasksProfiler.cs" />
+    <Compile Include="Source\Profilers\NodeProfiler.cs" />
+    <Compile Include="Source\Profilers\TasksProfiler.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
