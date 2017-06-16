@@ -41,7 +41,7 @@ namespace Orange
 		public IEnumerable<Lazy<Func<string, List<AssetCooker.AtlasItem>, int, int>, IAtlasPackerMetadata>> AtlasPackers { get; set; }
 
 		[ImportMany(nameof(AfterAssetUpdated), AllowRecomposition = true)]
-		public IEnumerable<Action<Lime.AssetBundle, string>> AfterAssetUpdated { get; set; }
+		public IEnumerable<Action<Lime.AssetBundle, CookingRules, string>> AfterAssetUpdated { get; set; }
 
 		[ImportMany(nameof(AfterAssetsCooked), AllowRecomposition = true)]
 		public IEnumerable<Action<string>> AfterAssetsCooked { get; set; }
@@ -118,10 +118,10 @@ namespace Orange
 			The.MenuController.CreateAssemblyMenuItems();
 		}
 
-		public static void AfterAssetUpdated(Lime.AssetBundle bundle, string path)
+		public static void AfterAssetUpdated(Lime.AssetBundle bundle, CookingRules cookingRules, string path)
 		{
 			foreach (var i in CurrentPlugin.AfterAssetUpdated) {
-				i(bundle, path);
+				i(bundle, cookingRules, path);
 			}
 		}
 
