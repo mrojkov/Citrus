@@ -615,7 +615,7 @@ namespace Orange
 			return !The.Workspace.ProjectJson.GetValue("DontGenerateOpacityMasks", false);
 		}
 
-		public static void ImportTexture(string path, Gdk.Pixbuf texture, CookingRules rules)
+		public static void ImportTexture(string path, Gdk.Pixbuf texture, ICookingRules rules)
 		{
 			if (ShouldGenerateOpacityMasks()) {
 				var maskPath = Path.ChangeExtension(path, ".mask");
