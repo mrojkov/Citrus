@@ -368,7 +368,11 @@ namespace Orange
 						try {
 							if (converter(srcPath, dstPath)) {
 								Console.WriteLine((bundled ? "* " : "+ ") + dstPath);
-								PluginLoader.AfterAssetUpdated(bundle, cookingRulesMap[dstPath], dstPath);
+								CookingRules rules = null;
+								if (!string.IsNullOrEmpty(dstPath)) {
+									cookingRulesMap.TryGetValue(dstPath, out rules);
+								}
+								PluginLoader.AfterAssetUpdated(bundle, rules, dstPath);
 							}
 						} catch (System.Exception e) {
 							Console.WriteLine(
