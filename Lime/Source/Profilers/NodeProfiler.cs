@@ -88,6 +88,7 @@ namespace Lime
 		{
 			var clone = node.Clone();
 			CalculateUsageSummary(clone);
+			RemoveNodeComponents(clone);
 			foreach (var n in clone.Descendants) {
 				AlterId(n);
 				RenameBonesInMesh3D(n);
@@ -96,6 +97,14 @@ namespace Lime
 			}
 			ProcessExternalContent(clone);
 			return clone;
+		}
+
+		private static void RemoveNodeComponents(Node node)
+		{
+			node.Components.Clear();
+			foreach (var n in node.Descendants) {
+				n.Components.Clear();
+			}
 		}
 
 		private static Tuple<long, long> CalculateUsageSummary(Node node)
