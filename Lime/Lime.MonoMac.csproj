@@ -115,14 +115,6 @@
     <Compile Include="Source\Widgets\ListView\ScrollView.SpeedMeter.cs" />
     <Compile Include="Source\Widgets\ListView\ScrollView.cs" />
     <Compile Include="Source\Widgets\ListView\ScrollViewWithSlider.cs" />
-    <Compile Include="Source\Widgets\PopupMenu\ImageBox.cs" />
-    <Compile Include="Source\Widgets\PopupMenu\LayoutTools.cs" />
-    <Compile Include="Source\Widgets\PopupMenu\MenuButton.cs" />
-    <Compile Include="Source\Widgets\PopupMenu\MenuItem.cs" />
-    <Compile Include="Source\Widgets\PopupMenu\PopupMenu.cs" />
-    <Compile Include="Source\Widgets\PopupMenu\RoundedRectangle.cs" />
-    <Compile Include="Source\Widgets\PopupMenu\Separator.cs" />
-    <Compile Include="Source\Widgets\PopupMenu\StringItem.cs" />
     <Compile Include="Source\Graphics\OgvDecoder.cs" />
     <Compile Include="Source\Graphics\RenderList.cs" />
     <Compile Include="Source\Graphics\RenderBatch.cs" />
