@@ -4,38 +4,16 @@ using System.Linq;
 
 namespace Lime
 {
-	/// <summary>
-	/// Математические функции для чисел типа float (аналогично классу Math)
-	/// </summary>
 	public static class Mathf
 	{
 		public static System.Random RandomGenerator = new System.Random();
 
 		public const float ZeroTolerance = 1e-6f; // Value a 8x higher than 1.19209290E-07F
 
-		/// <summary>
-		/// Возвращает число Пи
-		/// </summary>
 		public const float Pi = 3.141592653f;
-
-		/// <summary>
-		/// Возвращает Пи * 2
-		/// </summary>
 		public const float TwoPi = 2 * 3.141592653f;
-
-		/// <summary>
-		/// Возвращает Пи / 2
-		/// </summary>
 		public const float HalfPi = 3.141592653f / 2;
-
-		/// <summary>
-		/// Для перевода градусов в радианы умножайте на это число
-		/// </summary>
 		public const float DegToRad = Pi / 180;
-
-		/// <summary>
-		/// Для перевода радиан в градусы умножайте на это число
-		/// </summary>
 		public const float RadToDeg = 180 / Pi;
 
 		public static float Max(float x, float y)
@@ -245,9 +223,6 @@ namespace Lime
 			return RandomGenerator.RandomOf(objects);
 		}
 
-		/// <summary>
-		/// Перечисляет элементы коллекции в случайном порядке
-		/// </summary>
 		public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> source, Random rng = null)
 		{
 			if (rng == null)
