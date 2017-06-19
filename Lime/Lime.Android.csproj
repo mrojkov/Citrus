@@ -171,14 +171,6 @@
     <Compile Include="Source\Application\AndroidGameView.cs" />
     <Compile Include="Source\Graphics\Bitmap.Android.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Source\Widgets\PopupMenu\ImageBox.cs" />
-    <Compile Include="Source\Widgets\PopupMenu\LayoutTools.cs" />
-    <Compile Include="Source\Widgets\PopupMenu\MenuButton.cs" />
-    <Compile Include="Source\Widgets\PopupMenu\MenuItem.cs" />
-    <Compile Include="Source\Widgets\PopupMenu\PopupMenu.cs" />
-    <Compile Include="Source\Widgets\PopupMenu\RoundedRectangle.cs" />
-    <Compile Include="Source\Widgets\PopupMenu\Separator.cs" />
-    <Compile Include="Source\Widgets\PopupMenu\StringItem.cs" />
     <Compile Include="Source\Widgets\ListView\ExpandableListItem.cs" />
     <Compile Include="Source\Widgets\ListView\ListView.cs" />
     <Compile Include="Source\Widgets\ListView\ListView.ItemDrag.cs" />

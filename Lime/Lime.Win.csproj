@@ -247,13 +247,7 @@
     <Compile Include="Source\AssetBundle\AssetBundle.cs" />
     <Compile Include="Source\Audio\SerializableSample.cs" />
     <Compile Include="Source\Audio\Sound.cs" />
-    <Compile Include="Source\Widgets\PopupMenu\ImageBox.cs" />
-    <Compile Include="Source\Widgets\PopupMenu\LayoutTools.cs" />
-    <Compile Include="Source\Widgets\PopupMenu\MenuButton.cs" />
-    <Compile Include="Source\Widgets\PopupMenu\MenuItem.cs" />
-    <Compile Include="Source\Widgets\PopupMenu\PopupMenu.cs" />
     <Compile Include="Source\Environment.cs" />
-    <Compile Include="Source\Widgets\PopupMenu\RoundedRectangle.cs" />
     <Compile Include="Source\GeometryUtils.cs" />
     <Compile Include="Source\AssetBundle\PackedAssetBundle.cs" />
     <Compile Include="Source\Audio\AudioSystem.cs" />
@@ -265,8 +259,6 @@
     <Compile Include="Source\Graphics\MovieTexture.cs" />
     <Compile Include="Source\Localization\Localization.cs" />
     <Compile Include="Source\Mathf.cs" />
-    <Compile Include="Source\Widgets\PopupMenu\Separator.cs" />
-    <Compile Include="Source\Widgets\PopupMenu\StringItem.cs" />
     <Compile Include="Source\Serialization.cs" />
     <Compile Include="Source\StringExtensions.cs" />
     <Compile Include="Source\Types\Color4.cs" />
