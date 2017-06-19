@@ -37,6 +37,9 @@ namespace Orange
 		[Import(nameof(Finalize), AllowRecomposition = true, AllowDefault = true)]
 		public Action Finalize;
 
+		[Import(nameof(GetRequiredAssemblies), AllowRecomposition = true, AllowDefault = true)]
+		public Func<string[]> GetRequiredAssemblies;
+
 		[ImportMany(nameof(AtlasPackers), AllowRecomposition = true)]
 		public IEnumerable<Lazy<Func<string, List<AssetCooker.AtlasItem>, int, int>, IAtlasPackerMetadata>> AtlasPackers { get; set; }
 
@@ -63,6 +66,7 @@ namespace Orange
 
 		static PluginLoader()
 		{
+			AppDomain.CurrentDomain.AssemblyResolve += AssemblyResolve;
 			catalog = new AggregateCatalog();
 			RegisterAssembly(typeof(PluginLoader).Assembly);
 			ResetPlugins();
@@ -182,6 +186,31 @@ namespace Orange
 					$"WARNING: Plugin composition missmatch found.\nThe given assemblies defines [{exportedCount}] " +
 					$"exports, but only [{importedCount}] has been imported.\nPlease check export contracts.\n");
 			}
+		}
+
+		private static readonly Dictionary<string, Assembly> resolvedAssemblies = new Dictionary<string, Assembly>();
+
+		private static Assembly AssemblyResolve(object sender, ResolveEventArgs args)
+		{
+			var commaIndex = args.Name.IndexOf(',');
+			var name = commaIndex < 0 ? args.Name : args.Name.Substring(0, commaIndex);
+			if (string.IsNullOrEmpty(name)) {
+				return null;
+			}
+
+			var requiredAssemblies = CurrentPlugin?.GetRequiredAssemblies?.Invoke();
+			if (requiredAssemblies == null || !requiredAssemblies.Contains(name)) {
+				return null;
+			}
+
+			Assembly assembly;
+			if (!resolvedAssemblies.TryGetValue(name, out assembly)) {
+				var dllPath = Path.ChangeExtension(Path.Combine(CurrentPluginDirectory, name), ".dll");
+				var readAllBytes = File.ReadAllBytes(dllPath);
+				assembly = Assembly.Load(readAllBytes);
+				resolvedAssemblies.Add(name, assembly);
+			}
+			return assembly;
 		}
 	}
 }
