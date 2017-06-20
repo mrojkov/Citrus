@@ -24,7 +24,7 @@ namespace Orange.FbxImporter
 				var matPtr = FbxNodeSerializeMaterial(NativePtr);
 				if (matPtr != IntPtr.Zero) {
 					var material = matPtr.To<Texture>();
-					Path = material.texturePath;
+					Path = material.texturePath.ToCharArray();
 					Name = material.Name;
 					var color = material.colorDiffuse.ToStruct<Vec4> ();
 					DiffuseColor = Color4.FromFloats(
@@ -72,8 +72,7 @@ namespace Orange.FbxImporter
 		[StructLayout(LayoutKind.Sequential)]
 		public class Texture
 		{
-			[MarshalAs(UnmanagedType.LPStr)]
-			public string texturePath;
+			public IntPtr texturePath;
 
 			public IntPtr colorDiffuse;
 
