@@ -95,7 +95,16 @@ namespace Lime
 				ReplaceRenderTexturesInNode(n);
 			}
 			ProcessExternalContent(clone);
+			RemoveNodeComponents(clone);
 			return clone;
+		}
+
+		private static void RemoveNodeComponents(Node node)
+		{
+			node.Components.Clear();
+			foreach (var n in node.Descendants) {
+				n.Components.Clear();
+			}
 		}
 
 		private static Tuple<long, long> CalculateUsageSummary(Node node)
