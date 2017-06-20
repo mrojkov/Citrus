@@ -232,12 +232,16 @@ namespace Tangerine.UI
 				MainWindowWidget.Window.ClientPosition = state.MainWindowPosition;
 				MainWindowWidget.Window.State = state.MainWindowState;
 			}
-			foreach (var p in panels) {
-				var pp = state.PanelPlacements.FirstOrDefault(i => i.Title == p.Id);
-				if (pp != null) {
+			var savedPanels = panels.ToList();
+			panels.Clear();
+			foreach (var pp in state.PanelPlacements) {
+				var p = savedPanels.FirstOrDefault(i => i.Id == pp.Title);
+				if (p != null) {
 					p.Placement = pp;
+					panels.Add(p);
 				}
 			}
+			panels.AddRange(savedPanels.Except(panels).ToList());
 			Refresh();
 		}
 
