@@ -11,7 +11,7 @@ namespace Lime
 			Tasks.Add(MainTask());
 			PostPresenter = new DelegatePresenter<Widget>(RenderSeparator);
 			Theme.Current.Apply(this);
-			Layout = new VBoxLayout { Spacing = SeparatorWidth };
+			Layout = new VSplitterLayout { Spacing = SeparatorWidth };
 		}
 
 		void RenderSeparator(Widget widget)
@@ -97,6 +97,24 @@ namespace Lime
 				}
 				SeparatorUnderMouse = -1;
 				return false;
+			}
+		}
+
+		class VSplitterLayout : VBoxLayout
+		{
+			public override void MeasureSizeConstraints(Widget widget)
+			{
+				UpdateLayoutCells((Splitter)widget);
+				base.MeasureSizeConstraints(widget);
+			}
+
+			void UpdateLayoutCells(Splitter splitter)
+			{
+				for (int i = 0; i < splitter.Nodes.Count; i++) {
+					var widget = (Widget)splitter.Nodes[i];
+					var cell = widget.LayoutCell ?? (widget.LayoutCell = new LayoutCell());
+					cell.StretchY = i < splitter.Stretches.Count ? splitter.Stretches[i] : 1;
+				}
 			}
 		}
 	}

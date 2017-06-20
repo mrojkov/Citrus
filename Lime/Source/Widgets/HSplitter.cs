@@ -19,26 +19,6 @@ namespace Lime
 		protected void RaiseDragStarted() => DragStarted?.Invoke();
 		protected void RaiseDragEnded() => DragEnded?.Invoke();
 
-		public override void Update(float delta)
-		{
-			base.Update(delta);
-			UpdateLayoutCells();
-		}
-
-		private void UpdateLayoutCells()
-		{
-			for (int i = 0; i < Nodes.Count; i++) {
-				var widget = (Widget)Nodes[i];
-				var cell = widget.LayoutCell ?? (widget.LayoutCell = new LayoutCell());
-				var s = i < Stretches.Count ? Stretches[i] : 1;
-				if (cell.StretchX != s || cell.StretchY != s) {
-					cell.StretchX = s;
-					cell.StretchY = s;
-					Layout.InvalidateConstraintsAndArrangement(this);
-				}
-			}
-		}
-
 		public static List<float> GetStretchesFromDictionary(Dictionary<string, List<float>> storage, string name, params float[] defaults)
 		{
 			List<float> stretches;
@@ -57,7 +37,7 @@ namespace Lime
 			Tasks.Add(MainTask());
 			PostPresenter = new DelegatePresenter<Widget>(RenderSeparator);
 			Theme.Current.Apply(this);
-			Layout = new HBoxLayout { Spacing = SeparatorWidth };
+			Layout = new HSplitterLayout { Spacing = SeparatorWidth };
 		}
 
 		void RenderSeparator(Widget widget)
@@ -105,6 +85,7 @@ namespace Lime
 					}
 					Stretches[i] = initialWidths[i] + d;
 				}
+				Layout.InvalidateConstraintsAndArrangement(this);
 				yield return null;
 			}
 			Input.ReleaseMouse();
@@ -142,6 +123,24 @@ namespace Lime
 				}
 				SeparatorUnderMouse = -1;
 				return false;
+			}
+		}
+
+		class HSplitterLayout : HBoxLayout
+		{
+			public override void MeasureSizeConstraints(Widget widget)
+			{
+				UpdateLayoutCells((Splitter)widget);
+				base.MeasureSizeConstraints(widget);
+			}
+
+			void UpdateLayoutCells(Splitter splitter)
+			{
+				for (int i = 0; i < splitter.Nodes.Count; i++) {
+					var widget = (Widget)splitter.Nodes[i];
+					var cell = widget.LayoutCell ?? (widget.LayoutCell = new LayoutCell());
+					cell.StretchX = i < splitter.Stretches.Count ? splitter.Stretches[i] : 1;
+				}
 			}
 		}
 	}
