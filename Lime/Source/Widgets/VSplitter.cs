@@ -54,7 +54,10 @@ namespace Lime
 				dragDelta = -dragDelta;
 				for (int i = 0; i < Nodes.Count; i++) {
 					var d = (i == index) ? dragDelta : ((i == index + 1) ? -dragDelta : 0);
-					Nodes[i].AsWidget.LayoutCell = new LayoutCell { StretchY = initialHeights[i] + d };
+					if (i == Stretches.Count) {
+						Stretches.Add(0);
+					}
+					Stretches[i] = initialHeights[i] + d;
 				}
 				Layout.InvalidateConstraintsAndArrangement(this);
 				yield return null;

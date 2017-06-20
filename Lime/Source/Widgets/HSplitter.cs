@@ -11,21 +11,42 @@ namespace Lime
 		public float SeparatorWidth;
 		public Color4 SeparatorColor;
 
+		public List<float> Stretches { get; set; } = new List<float>();
+
 		public event Action DragStarted;
 		public event Action DragEnded;
 
-		protected void RaiseDragStarted()
+		protected void RaiseDragStarted() => DragStarted?.Invoke();
+		protected void RaiseDragEnded() => DragEnded?.Invoke();
+
+		public override void Update(float delta)
 		{
-			if (DragStarted != null) {
-				DragStarted();
+			base.Update(delta);
+			UpdateLayoutCells();
+		}
+
+		private void UpdateLayoutCells()
+		{
+			for (int i = 0; i < Nodes.Count; i++) {
+				var widget = (Widget)Nodes[i];
+				var cell = widget.LayoutCell ?? (widget.LayoutCell = new LayoutCell());
+				var s = i < Stretches.Count ? Stretches[i] : 1;
+				if (cell.StretchX != s || cell.StretchY != s) {
+					cell.StretchX = s;
+					cell.StretchY = s;
+					Layout.InvalidateConstraintsAndArrangement(this);
+				}
 			}
 		}
 
-		protected void RaiseDragEnded()
+		public static List<float> GetStretchesFromDictionary(Dictionary<string, List<float>> storage, string name, params float[] defaults)
 		{
-			if (DragEnded != null) {
-				DragEnded();
+			List<float> stretches;
+			if (!storage.TryGetValue(name, out stretches)) {
+				stretches = new List<float>();
+				stretches.AddRange(defaults);
 			}
+			return stretches;
 		}
 	}
 
@@ -79,9 +100,11 @@ namespace Lime
 				dragDelta = -dragDelta;
 				for (int i = 0; i < Nodes.Count; i++) {
 					var d = (i == index) ? dragDelta : ((i == index + 1) ? -dragDelta : 0);
-					Nodes[i].AsWidget.LayoutCell = new LayoutCell { StretchX = initialWidths[i] + d };
+					if (i == Stretches.Count) {
+						Stretches.Add(0);
+					}
+					Stretches[i] = initialWidths[i] + d;
 				}
-				Layout.InvalidateConstraintsAndArrangement(this);
 				yield return null;
 			}
 			Input.ReleaseMouse();
