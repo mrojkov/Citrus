@@ -124,29 +124,34 @@ namespace Tangerine.UI
 			ToolbarArea.Unlink();
 			DocumentArea.Unlink();
 			MainWindowWidget.Nodes.Add(ToolbarArea);
-			var currentContainer = new Widget { Layout = new HBoxLayout() };
+			Splitter currentContainer = new HSplitter();
 			MainWindowWidget.Nodes.Add(currentContainer);
 			int insertAt = 0;
-			var stretch = Vector2.Zero;
+			float stretch = 0;
 			foreach (var p in panels.Where(p => p.Placement.Docked)) {
 				ClosePanelWindow(p);
 				if (!p.Placement.Hidden) {
 					p.RootWidget.Unlink();
-					p.RootWidget.LayoutCell.Stretch = p.Placement.DockedSize;
-					var splitter = (p.Placement.Site == DockSite.Left || p.Placement.Site == DockSite.Right) ?
-						(Splitter)new HSplitter() : (Splitter)new VSplitter();
+					Splitter splitter;
+					if (p.Placement.Site == DockSite.Left || p.Placement.Site == DockSite.Right) {
+						splitter = new HSplitter();
+						splitter.Stretches.Add(p.Placement.DockedSize.X);
+					} else {
+						splitter = new VSplitter();
+						splitter.Stretches.Add(p.Placement.DockedSize.Y);
+					}
 					splitter.DragEnded += p.RefreshDockedSize;
 					splitter.AddNode(p.RootWidget);
-					splitter.LayoutCell = new LayoutCell { Stretch = Vector2.One - stretch };
+					currentContainer.Stretches.Insert(insertAt, 1 - stretch);
 					currentContainer.Nodes.Insert(insertAt, splitter);
 					currentContainer = splitter;
 					insertAt = (p.Placement.Site == DockSite.Left || p.Placement.Site == DockSite.Top) ? 1 : 0;
-					stretch = p.Placement.DockedSize;
+					stretch = splitter.Stretches[0];
 				} else {
 					p.RootWidget.Unlink();
 				}
 			}
-			DocumentArea.LayoutCell = new LayoutCell { Stretch = Vector2.One - stretch };
+			currentContainer.Stretches.Insert(insertAt, 1 - stretch);
 			currentContainer.Nodes.Insert(insertAt, DocumentArea);
 		}
 

@@ -35,6 +35,12 @@ namespace Tangerine.UI
 		[YuzuOptional]
 		public bool ShowOverlays { get; set; }
 
+		[YuzuOptional]
+		public float TimelineColWidth { get; set; } = 15;
+
+		[YuzuOptional]
+		public Dictionary<string, List<float>> Splitters { get; } = new Dictionary<string, List<float>>();
+
 		public static UserPreferences Instance { get; private set; }
 
 		public static void Initialize()

@@ -97,13 +97,14 @@ namespace Tangerine.UI.Timeline
 		{
 			RootWidget.Layout = new StackLayout();
 			RootWidget.AddNode(new VSplitter {
+				Stretches = Splitter.GetStretchesFromDictionary(UserPreferences.Instance.Splitters, "TimelineVSplitter", 0.5f, 1),
 				Nodes = {
 					Overview.RootWidget,
 					new HSplitter {
+						Stretches = Splitter.GetStretchesFromDictionary(UserPreferences.Instance.Splitters, "TimelineHSplitter", 0.3f, 1),
 						Nodes = {
 							new Widget {
 								Layout = new VBoxLayout(),
-								LayoutCell = new LayoutCell { StretchX = 0.33f },
 								Nodes = {
 									Toolbar.RootWidget,
 									Roll.RootWidget,
