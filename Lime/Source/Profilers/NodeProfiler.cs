@@ -88,7 +88,6 @@ namespace Lime
 		{
 			var clone = node.Clone();
 			CalculateUsageSummary(clone);
-			RemoveNodeComponents(clone);
 			foreach (var n in clone.Descendants) {
 				AlterId(n);
 				RenameBonesInMesh3D(n);
@@ -96,6 +95,7 @@ namespace Lime
 				ReplaceRenderTexturesInNode(n);
 			}
 			ProcessExternalContent(clone);
+			RemoveNodeComponents(clone);
 			return clone;
 		}
 
