@@ -129,7 +129,7 @@ namespace Lime
 		/// </summary>
 		/// <param name="colors">The array of colors.</param>
 		/// <returns>True if there is any non-opaque pixel, otherwise False.</returns>
-		public static bool AnyAlpha(Color4[] colors)
+		internal static bool AnyAlpha(Color4[] colors)
 		{
 			foreach (var color in colors) {
 				if (color.A != 255) {
