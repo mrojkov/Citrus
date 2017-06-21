@@ -6,7 +6,11 @@ namespace Orange.FbxImporter
 {
 	public static class ImportConfig
 	{
-		public const string LibName = "libFbx";
+#if WIN
+		public const string LibName = "FbxSdk.dll";
+#elif MAC
+		public const string LibName = "libFbxSdkUtils.dylib";
+#endif
 	}
 
 	public static class IntPtrExtensions
