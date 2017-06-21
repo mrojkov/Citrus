@@ -21,7 +21,6 @@ namespace Lime
 	{
 		None,
 		ScissorTest,
-		StencilBuffer,
 		NoRender,
 	}
 
@@ -104,24 +103,29 @@ namespace Lime
 
 		internal protected override bool PartialHitTest(ref HitTestArgs args)
 		{
-			if (ClipChildren == ClipMethod.ScissorTest) {
-				EnsureRenderChain();
-				var savedClipperWidget = args.ClipperWidget;
-				try {
-					args.ClipperWidget = ClipByWidget ?? this;
-					foreach (var node in Nodes) {
-						node.RenderChainBuilder?.AddToRenderChain(node, renderChain);
-					}
-					if (renderChain.HitTest(ref args)) {
-						return true;
-					}
+			switch (ClipChildren) {
+				case ClipMethod.None:
 					return base.PartialHitTest(ref args);
-				} finally {
-					renderChain.Clear();
-					args.ClipperWidget = savedClipperWidget;
-				}
-			} else {
-				return base.PartialHitTest(ref args);
+				case ClipMethod.ScissorTest:
+					if (!(ClipByWidget ?? this).BoundingRectHitTest(args.Point)) {
+						return false;
+					}
+					EnsureRenderChain();
+					try {
+						foreach (var node in Nodes) {
+							node.RenderChainBuilder?.AddToRenderChain(node, renderChain);
+						}
+						if (renderChain.HitTest(ref args)) {
+							return true;
+						}
+						return base.PartialHitTest(ref args);
+					} finally {
+						renderChain.Clear();
+					}
+				case ClipMethod.NoRender:
+					return false;
+				default:
+					throw new InvalidOperationException();
 			}
 		}
 

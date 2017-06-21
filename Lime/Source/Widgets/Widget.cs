@@ -1002,7 +1002,7 @@ namespace Lime
 					break;
 				}
 			}
-			if (targetNode == null || !IsPointInsideClipperWidget(ref args)) {
+			if (targetNode == null) {
 				return false;
 			}
 			if (
@@ -1033,11 +1033,6 @@ namespace Lime
 				size.Y = -size.Y;
 			}
 			return position.X >= 0 && position.Y >= 0 && position.X < size.X && position.Y < size.Y;
-		}
-
-		private bool IsPointInsideClipperWidget(ref HitTestArgs args)
-		{
-			return args.ClipperWidget == null || args.ClipperWidget.BoundingRectHitTest(args.Point);
 		}
 
 		/// <summary>

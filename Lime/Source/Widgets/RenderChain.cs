@@ -6,7 +6,6 @@ namespace Lime
 	{
 		public Ray Ray;
 		public Vector2 Point;
-		public Widget ClipperWidget;
 		public float Distance;
 		public Node Node;
 
