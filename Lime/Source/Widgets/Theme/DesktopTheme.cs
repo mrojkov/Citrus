@@ -254,9 +254,9 @@ namespace Lime
 				});
 
 			eb.TabTravesable = new TabTraversable();
-			eb.CompoundPresenter.Add(new BorderedFrameHoverPresenter(
-				Colors.WhiteBackground, Colors.ControlBorder, Colors.KeyboardFocusBorder));
+			eb.CompoundPresenter.Add(new BorderedFramePresenter(Colors.WhiteBackground, Colors.ControlBorder));
 			eb.CompoundPostPresenter.Add(new KeyboardFocusBorderPresenter());
+			eb.CompoundPostPresenter.Add(new MouseHoverBorderPresenter());
 			eb.LateTasks.Add(MouseHoverInvalidationTask(eb));
 		}
 
@@ -554,32 +554,6 @@ namespace Lime
 				widget.PrepareRendererState();
 				Renderer.DrawRect(Vector2.Zero, widget.Size, innerColor);
 				Renderer.DrawRectOutline(Vector2.Zero, widget.Size, borderColor);
-			}
-		}
-
-		class BorderedFrameHoverPresenter : CustomPresenter
-		{
-			private readonly Color4 innerColor;
-			private readonly Color4 borderColor;
-			private readonly Color4 borderHoverColor;
-
-			public BorderedFrameHoverPresenter(Color4 innerColor, Color4 borderColor, Color4 borderHoverColor)
-			{
-				this.innerColor = innerColor;
-				this.borderColor = borderColor;
-				this.borderHoverColor = borderHoverColor;
-			}
-
-			public override void Render(Node node)
-			{
-				var widget = node.AsWidget;
-				widget.PrepareRendererState();
-				Renderer.DrawRect(Vector2.Zero, widget.Size, innerColor);
-				if (widget.IsMouseOverThisOrDescendant()) {
-					Renderer.DrawRectOutline(Vector2.Zero, widget.Size, borderHoverColor);
-				} else {
-					Renderer.DrawRectOutline(Vector2.Zero, widget.Size, borderColor);
-				}
 			}
 		}
 
