@@ -107,6 +107,7 @@
     <Compile Include="Source\Actions\ExtractTangerineScenes.cs" />
     <Compile Include="Source\Actions\AnalyzeResources.cs" />
     <Compile Include="Source\Actions\GenerateLimeDeserializers.cs" />
+    <Compile Include="Source\Actions\OptimizePNG.cs" />
     <Compile Include="Source\Actions\RebuildGame.cs" />
     <Compile Include="Source\Actions\GenerateAppDeserializers.cs" />
     <Compile Include="Source\Actions\RevealCookedAssets.cs" />
@@ -189,6 +190,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Toolchain.Win\pngcrush_1_7_83_w32.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Toolchain.Win\PngOptimizerCL.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Toolchain.Win\PVRTexToolCLI.exe">

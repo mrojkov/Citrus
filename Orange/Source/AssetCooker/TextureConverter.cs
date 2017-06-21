@@ -166,6 +166,19 @@ namespace Orange
 			}
 		}
 
+		// Invokes PngOptimizerCL on png. It tries to optimize idat chunk. It also removes all unwanted chunks like itxt and text.
+		public static void OptimizePNG(string dstPath)
+		{
+			var pngOptimizerPath = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Win", "PngOptimizerCL");
+			dstPath = MakeAbsolutePath(dstPath);
+			var args = $"\"{dstPath}\"";
+			int result = Process.Start(pngOptimizerPath, args, Process.Options.RedirectErrors);
+			if (result != 0) {
+				throw new Lime.Exception(
+					$"Error converting '{dstPath}'\nCommand line: {pngOptimizerPath} {args}");
+			}
+		}
+
 		private static string MakeAbsolutePath(string path)
 		{
 			if (!Path.IsPathRooted(path)) {
