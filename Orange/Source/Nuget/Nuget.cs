@@ -11,7 +11,11 @@ namespace Orange
 
 		static Nuget()
 		{
+#if MAC
+			nugetPath = Path.Combine(Toolbox.GetApplicationDirectory(), "nuget.exe");
+#else 
 			nugetPath = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Win", "nuget.exe");
+#endif
 #if MAC
 			var chmodResult = Process.Start("chmod", $"+x {nugetPath}");
 			monoPath = Toolbox.GetMonoPath();
