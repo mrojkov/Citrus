@@ -49,7 +49,7 @@ namespace Tangerine.UI.Timeline
 
 		Widget CreateAnimationIndicator()
 		{
-			var t = new SimpleText { Padding = new Thickness(4, 0) };
+			var t = new SimpleText { Padding = new Thickness(4, 0), MinWidth = 100 };
 			Action f = () => {
 				var distance = Timeline.Instance.Ruler.MeasuredFrameDistance;
 				t.Text = (distance == 0) ?
