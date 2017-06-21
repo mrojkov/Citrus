@@ -45,4 +45,32 @@ namespace Orange.FbxImporter
 			);
 		}
 	}
+
+	public static class VectorExtensions
+	{
+		public static Quaternion toLimeQuaternion(this Vec4 vector)
+		{
+			return new Quaternion(vector.V1, vector.V2, vector.V3, vector.V4);
+		}
+
+		public static Color4 toLimeColor(this Vec4 vector)
+		{
+			return Color4.FromFloats(vector.V1, vector.V2, vector.V3, vector.V4);
+		}
+
+		public static Vector4 toLime(this Vec4 vector)
+		{
+			return new Vector4(vector.V1, vector.V2, vector.V3, vector.V4);
+		}
+
+		public static Vector3 toLime(this Vec3 vector)
+		{
+			return new Vector3(vector.V1, vector.V2, vector.V3);
+		}
+
+		public static Vector2 toLime(this Vec2 vector)
+		{
+			return new Vector2(vector.V1, vector.V2);
+		}
+	}
 }

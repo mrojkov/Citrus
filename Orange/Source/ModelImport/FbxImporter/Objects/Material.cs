@@ -27,12 +27,7 @@ namespace Orange.FbxImporter
 					Path = material.texturePath.ToCharArray();
 					Name = material.Name;
 					var color = material.colorDiffuse.ToStruct<Vec4> ();
-					DiffuseColor = Color4.FromFloats(
-						color.V1,
-						color.V2,
-						color.V3,
-						color.V4
-					);
+					DiffuseColor = color.toLimeColor();
 				}
 			}
 			

@@ -1,4 +1,5 @@
 ﻿using Lime;
+using Orange.FbxImporter;
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -46,22 +47,10 @@ namespace Orange.FbxImporter
 			}
 
 			for (var i = 0; i < mesh.verticesCount; i++) {
-				var vertex = 
-				Vertices[i].Pos = new Vector3(
-					verices[i].V1,
-					verices[i].V2,
-					verices[i].V3);
-				Vertices[i].Color = colors != null ? 
-					Color4.FromFloats(
-						colors[i].V1,
-						colors[i].V2,
-						colors[i].V3,
-						colors[i].V4) :
-					Color4.White;
-				Vertices[i].UV1 = new Vector2(
-					uv[i].V1,
-					uv[i].V2
-				);
+				var vertex =
+				Vertices[i].Pos = verices[i].toLime();
+				Vertices[i].Color = colors != null ? colors[i].toLimeColor() : Color4.White;
+				Vertices[i].UV1 = uv[i].toLime();
 
 				byte index;
 				float weight;
