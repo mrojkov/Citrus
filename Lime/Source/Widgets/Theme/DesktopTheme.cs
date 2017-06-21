@@ -351,11 +351,6 @@ namespace Lime
 				this.leftToRight = leftToRight;
 			}
 
-			public override bool PartialHitTest(Node node, ref HitTestArgs args)
-			{
-				return base.PartialHitTest(node, ref args);
-			}
-
 			public override void Render(Node node)
 			{
 				var widget = node.AsWidget;
