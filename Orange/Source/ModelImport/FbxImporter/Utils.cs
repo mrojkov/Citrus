@@ -11,6 +11,7 @@ namespace Orange.FbxImporter
 #elif MAC
 		public const string LibName = "libFbxSdkUtils.dylib";
 #endif
+		public const int BoneLimit = 4;
 	}
 
 	public static class IntPtrExtensions

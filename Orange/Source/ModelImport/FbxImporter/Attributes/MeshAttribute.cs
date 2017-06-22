@@ -26,7 +26,7 @@ namespace Orange.FbxImporter
 
 		public MeshAttribute(IntPtr ptr) : base(ptr)
 		{
-			var mesh = FbxNodeGetMeshAttribute(NativePtr).To<MeshData>();
+			var mesh = FbxNodeGetMeshAttribute(NativePtr, true).To<MeshData>();
 			var colors = mesh.colors.ToStructArray<Vec4>(mesh.verticesCount);
 			var verices = mesh.points.ToStructArray<Vec3>(mesh.verticesCount);
 
@@ -62,25 +62,35 @@ namespace Orange.FbxImporter
 					uv[i].V1,
 					uv[i].V2
 				);
-				
-				if (weights[i].I1 != -1) {
-					Vertices[i].BlendIndices.Index0 = (byte)weights[i].I1;
-					Vertices[i].BlendWeights.Weight0 = weights[i].W1;
-				}
 
-				if (weights[i].I2 != -1) {
-					Vertices[i].BlendIndices.Index1 = (byte)weights[i].I2;
-					Vertices[i].BlendWeights.Weight1 = weights[i].W2;
-				}
+				byte index;
+				float weight;
 
-				if (weights[i].I3 != -1) {
-					Vertices[i].BlendIndices.Index2 = (byte)weights[i].I3;
-					Vertices[i].BlendWeights.Weight2 = weights[i].W3;
-				}
-
-				if (weights[i].I4 != -1) {
-					Vertices[i].BlendIndices.Index3 = (byte)weights[i].I4;
-					Vertices[i].BlendWeights.Weight3 = weights[i].W4;
+				for (int j = 0; j < ImportConfig.BoneLimit; j++) {
+					if (weights[i].Weights[j] != -1) {
+						index = weights[i].Indices[j];
+						weight = weights[i].Weights[j];
+						switch (j) {
+							case 0:
+								Vertices[i].BlendIndices.Index0 = index;
+								Vertices[i].BlendWeights.Weight0 = weight;
+								break;
+							case 1:
+								Vertices[i].BlendIndices.Index1 = index;
+								Vertices[i].BlendWeights.Weight1 = weight;
+								break;
+							case 2:
+								Vertices[i].BlendIndices.Index2 = index;
+								Vertices[i].BlendWeights.Weight2 = weight;
+								break;
+							case 3:
+								Vertices[i].BlendIndices.Index3 = index;
+								Vertices[i].BlendWeights.Weight3 = weight;
+								break;
+							default:
+								break;
+						}
+					}
 				}
 			}
 		}	
@@ -88,7 +98,7 @@ namespace Orange.FbxImporter
 		#region Pinvokes
 
 		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr FbxNodeGetMeshAttribute(IntPtr node);
+		public static extern IntPtr FbxNodeGetMeshAttribute(IntPtr node, bool IsLimitBoneWeights);
 
 		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
 		public static extern IntPtr FbxNodeGetMeshMaterial(IntPtr pMesh, int idx);
@@ -133,29 +143,11 @@ namespace Orange.FbxImporter
 		[StructLayout(LayoutKind.Sequential)]
 		private class WeightData
 		{
-			[MarshalAs(UnmanagedType.R4)]
-			public float W1;
+			[MarshalAs(UnmanagedType.ByValArray, SizeConst = ImportConfig.BoneLimit)]
+			public byte[] Indices;
 
-			[MarshalAs(UnmanagedType.I1)]
-			public sbyte I1;
-
-			[MarshalAs(UnmanagedType.R4)]
-			public float W2;
-
-			[MarshalAs(UnmanagedType.I1)]
-			public sbyte I2;
-
-			[MarshalAs(UnmanagedType.R4)]
-			public float W3;
-
-			[MarshalAs(UnmanagedType.I1)]
-			public sbyte I3;
-
-			[MarshalAs(UnmanagedType.R4)]
-			public float W4;
-
-			[MarshalAs(UnmanagedType.I1)]
-			public sbyte I4;
+			[MarshalAs(UnmanagedType.ByValArray, SizeConst = ImportConfig.BoneLimit)]
+			public float[] Weights;
 		}
 
 		#endregion
