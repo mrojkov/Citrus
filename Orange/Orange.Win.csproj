@@ -86,10 +86,6 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AssimpNet, Version=3.3.1.0, Culture=neutral, PublicKeyToken=0d51b391f59f42a6, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\3rdParty\AssimpNet\AssimpNet.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\3rdParty\Newtonsoft.Json\Newtonsoft.Json.dll</HintPath>
@@ -120,8 +116,19 @@
     <Compile Include="Source\Builder\BuildSystem.cs" />
     <Compile Include="Source\Builder\MSBuild.cs" />
     <Compile Include="Source\Builder\MDTool.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\Animation.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\Attributes\CameraAttribute.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\Attributes\MeshAttribute.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\Attributes\NodeAttribute.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\Objects\FbxObject.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\Objects\Manager.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\MarshalingStructures.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\Objects\Material.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\Objects\Node.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\Objects\Scene.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\Utils.cs" />
+    <Compile Include="Source\ModelImport\FbxModelImporter.cs" />
     <Compile Include="Source\ModelImport\KeyframeReducer.cs" />
-    <Compile Include="Source\ModelImport\ModelImporter.cs" />
     <Compile Include="Source\Nuget\Nuget.cs" />
     <Compile Include="Source\CsprojSynchronization\CsprojSynchronization.cs" />
     <Compile Include="Source\Plugins\IPluginUIBuilder.cs" />
@@ -159,12 +166,8 @@
     <Compile Include="Source\Toolbox\FontBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\3rdParty\AssimpNet\Assimp32.dll">
-      <Link>Assimp32.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\3rdParty\AssimpNet\Assimp64.dll">
-      <Link>Assimp64.dll</Link>
+    <None Include="..\3rdParty\FbxSdk\FbxSdk.dll">
+      <Link>FbxSdk.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <Content Include="Orange.ico" />
