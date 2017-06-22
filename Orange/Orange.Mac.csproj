@@ -189,7 +189,4 @@
       <Name>Kumquat.Mac</Name>
     </ProjectReference>
   </ItemGroup>
-  <Target Name="AfterBuild">
-    <Copy SourceFiles="..\3rdParty\FbxSdk\libfbxsdk.dylib" DestinationFolder="\usr\local\lib" SkipUnchangedFiles="true" />
-</Target>
 </Project>
