@@ -44,12 +44,6 @@
     <Compile Include="UI\ConsoleUI.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\3rdParty\AssimpNet\libassimp.dylib">
-      <Link>libassimp.dylib</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Orange.Mac.csproj">
       <Project>{4B2BDD5A-2AAE-46AE-AA1A-8C9308BAA50D}</Project>
       <Name>Orange.Mac</Name>

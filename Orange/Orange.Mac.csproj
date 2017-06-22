@@ -68,9 +68,6 @@
     <Reference Include="MonoMac" />
     <Reference Include="Mono.Posix" />
     <Reference Include="Microsoft.Build.Engine" />
-    <Reference Include="AssimpNet">
-      <HintPath>..\3rdParty\AssimpNet\AssimpNet.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\3rdParty\Newtonsoft.Json\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -120,7 +117,6 @@
     <Compile Include="Source\Builder\BuildSystem.cs" />
     <Compile Include="Source\Builder\MSBuild.cs" />
     <Compile Include="Source\Builder\MDTool.cs" />
-    <Compile Include="Source\ModelImport\ModelImporter.cs" />
     <Compile Include="Source\ModelImport\KeyframeReducer.cs" />
     <Compile Include="Source\Actions\ConvertAssetsToTangerine.cs" />
     <Compile Include="Source\Actions\GenerateAppDeserializers.cs" />
@@ -176,12 +172,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <NativeReference Include="..\3rdParty\AssimpNet\libassimp.dylib">
-      <IsCxx>False</IsCxx>
-      <Kind>Dynamic</Kind>
-    </NativeReference>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Lime\Lime.MonoMac.csproj">
       <Project>{DC16EEBF-404D-4610-B87A-15B57464D707}</Project>
       <Name>Lime.MonoMac</Name>
@@ -200,6 +190,6 @@
     </ProjectReference>
   </ItemGroup>
   <Target Name="AfterBuild">
-    <Copy SourceFiles="..\3rdParty\FbxSdk\libfbxsdk.dylib" DestinationFolder="\usr\local\lib" SkipUnchangedFiles="true"/>
+    <Copy SourceFiles="..\3rdParty\FbxSdk\libfbxsdk.dylib" DestinationFolder="\usr\local\lib" SkipUnchangedFiles="true" />
 </Target>
 </Project>
