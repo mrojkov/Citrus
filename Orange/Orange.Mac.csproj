@@ -143,6 +143,7 @@
     <Compile Include="Source\ModelImport\FbxImporter\Objects\Node.cs" />
     <Compile Include="Source\ModelImport\FbxImporter\Objects\Scene.cs" />
     <Compile Include="Source\ModelImport\FbxModelImporter.cs" />
+    <Compile Include="Source\Actions\OptimizePNG.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Toolchain.Mac\PVRTexTool">
