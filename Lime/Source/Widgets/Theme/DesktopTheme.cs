@@ -507,7 +507,7 @@ namespace Lime
 			widget.Anchors = Anchors.LeftRightTopBottom;
 		}
 
-		class BorderedFramePresenter : CustomPresenter
+		public class BorderedFramePresenter : CustomPresenter
 		{
 			private readonly Color4 innerColor;
 			private readonly Color4 borderColor;

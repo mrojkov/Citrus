@@ -1,36 +1,64 @@
 using System.IO;
 using System.Text;
+using System.Collections.Generic;
 using Lime;
 
 namespace Orange
 {
-	public class TextView : Widget
+	public class TextView : ScrollViewWidget
 	{
-		private readonly TextViewEditBox editor;
+		private List<SimpleText> lines = new List<SimpleText>();
 
 		public TextView()
 		{
-			editor = new TextViewEditBox {
-				Anchors = Anchors.LeftRightTopBottom
-			};
-			AddNode(editor);
+			Theme.Current.Apply(this, typeof(ScrollViewWidget));
+			Behaviour.Content.Padding = new Thickness(4);
+			Behaviour.Content.Layout = new VBoxLayout();
+			Behaviour.Frame.CompoundPresenter.Add(new DesktopTheme.BorderedFramePresenter(DesktopTheme.Colors.WhiteBackground, DesktopTheme.Colors.ControlBorder));
+		}
+
+		public void Append(string text)
+		{
+			var lastLine = lines.Count > 0 ? lines[lines.Count - 1] : null;
+			foreach (var l in text.Split('\n')) {
+				if (lastLine != null) {
+					lastLine.Text += l;
+					lastLine = null;
+				} else {
+					var line = new SimpleText(l);
+					lines.Add(line);
+					Behaviour.Content.AddNode(line);
+				}
+			}
 		}
 
 		public override string Text
 		{
-			get { return editor.Text; }
-			set { editor.Text = value; }
+			get
+			{
+				var sb = new StringBuilder();
+				foreach (var l in lines) {
+					sb.AppendLine(l.Text);
+				}
+				return sb.ToString();
+			}
+			set
+			{
+				Clear();
+				Append(value);
+			}
 		}
 
 		public void ScrollToEnd()
 		{
-			editor.Scroll.ScrollPosition = editor.Scroll.MaxScrollPosition;
+			Behaviour.ScrollPosition = Behaviour.MaxScrollPosition;
 		}
 
 		public void Clear()
 		{
-			Text = string.Empty;
-			editor.Scroll.ScrollPosition = editor.Scroll.MinScrollPosition;
+			Behaviour.Content.Nodes.Clear();
+			lines.Clear();
+			Behaviour.ScrollPosition = 0;
 		}
 
 		public TextWriter GetTextWriter() => new Writer(this);
@@ -52,24 +80,12 @@ namespace Orange
 			public override void Write(string value)
 			{
 				Application.InvokeOnMainThread(() => {
-					text.Text += value;
+					text.Append(value);
 					text.ScrollToEnd();
 				});
 			}
 
 			public override Encoding Encoding { get; }
-		}
-
-		private class TextViewEditBox : CommonEditBox
-		{
-			public TextViewEditBox()
-			{
-				Scroll.Dispose();
-				Scroll = new ScrollView(this) { ScrollBySlider = true };
-				TextWidget.Unlink();
-				Scroll.Content.AddNode(TextWidget);
-				Theme.Current.Apply(this, typeof(EditBox));
-			}
 		}
 	}
 }
