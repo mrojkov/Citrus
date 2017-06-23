@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading;
 using Lime;
 
@@ -97,7 +98,7 @@ namespace Orange
 		private Widget CreateTextView()
 		{
 			textView = new TextView();
-			textWriter = textView.GetTextWriter();
+			textWriter = new TextViewWriter(textView);
 			Console.SetOut(textWriter);
 			Console.SetError(textWriter);
 			return textView;
@@ -255,6 +256,31 @@ namespace Orange
 				window.ClientSize = new Vector2(window.ClientSize.X - 150, window.ClientSize.Y);
 				pluginPanel = null;
 			}
+		}
+
+		private class TextViewWriter : TextWriter
+		{
+			private readonly TextView textView;
+
+			public TextViewWriter(TextView textView)
+			{
+				this.textView = textView;
+			}
+
+			public override void WriteLine(string value)
+			{
+				Write(value + '\n');
+			}
+
+			public override void Write(string value)
+			{
+				Application.InvokeOnMainThread(() => {
+					textView.Append(value);
+					textView.ScrollToEnd();
+				});
+			}
+
+			public override Encoding Encoding { get; }
 		}
 	}
 }

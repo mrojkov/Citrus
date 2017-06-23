@@ -1,30 +1,60 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Lime
 {
-	public class TextView : Frame
+	public class TextView : ScrollViewWidget
 	{
-		private SimpleText text;
-		private ScrollViewWithSlider scrollView;
+		private List<SimpleText> lines = new List<SimpleText>();
 
 		public TextView()
 		{
 			Theme.Current.Apply(this);
-			scrollView = new ScrollViewWithSlider(this);
-			text = new SimpleText();
-			text.OverflowMode = TextOverflowMode.Ignore;
-			scrollView.Content.Nodes.Add(text);
+		}
+
+		public void Append(string text)
+		{
+			var lastLine = lines.Count > 0 ? lines[lines.Count - 1] : null;
+			foreach (var l in text.Split('\n')) {
+				if (lastLine != null) {
+					lastLine.Text += l;
+					lastLine = null;
+				} else {
+					var line = new SimpleText(l);
+					lines.Add(line);
+					Behaviour.Content.AddNode(line);
+				}
+			}
 		}
 
 		public override string Text
 		{
-			get { return text.Text; }
+			get
+			{
+				var sb = new StringBuilder();
+				foreach (var l in lines) {
+					sb.AppendLine(l.Text);
+				}
+				return sb.ToString();
+			}
 			set
 			{
-				text.Text = value;
-				scrollView.Content.Size = text.Size = text.MeasureText().Size;
+				Clear();
+				Append(value);
 			}
+		}
+
+		public void ScrollToEnd()
+		{
+			Behaviour.ScrollPosition = Behaviour.MaxScrollPosition;
+		}
+
+		public void Clear()
+		{
+			Behaviour.Content.Nodes.Clear();
+			lines.Clear();
+			Behaviour.ScrollPosition = 0;
 		}
 	}
 }
