@@ -462,6 +462,9 @@ namespace Orange
 					}
 				}
 			} catch (Lime.Exception e) {
+				if (!Path.IsPathRooted(path)) {
+					path = Path.Combine(Directory.GetCurrentDirectory(), path);
+				}
 				throw new Lime.Exception("Syntax error in {0}: {1}", path, e.Message);
 			}
 			rules.DeduceEffectiveRules(target);
