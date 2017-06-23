@@ -42,8 +42,11 @@ namespace Lime
 							var iniMousePos = input.MousePosition;
 							var iniScrollPos = ScrollPosition;
 							while (input.IsMousePressed()) {
-								var d = (input.MousePosition - iniMousePos) * ProjectToScrollAxis(Frame.Size) / CalcSliderLength();
-								ScrollPosition = (iniScrollPos + ProjectToScrollAxis(d)).Clamp(MinScrollPosition, MaxScrollPosition);
+								var projectedFrameSize = ProjectToScrollAxis(Frame.Size);
+								if (projectedFrameSize > Mathf.ZeroTolerance) {
+									var d = ProjectToScrollAxis(input.MousePosition - iniMousePos) * ContentLength / projectedFrameSize;
+									ScrollPosition = (iniScrollPos + d).Clamp(MinScrollPosition, MaxScrollPosition);
+								}
 								yield return null;
 							}
 						} finally {
