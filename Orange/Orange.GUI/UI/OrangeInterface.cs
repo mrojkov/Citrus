@@ -56,11 +56,11 @@ namespace Orange
 					RowSpacing = 6,
 					ColSpacing = 6,
 					RowDefaults = new List<LayoutCell> {
-						new LayoutCell{ StretchY = 0 },
-						new LayoutCell{ StretchY = 0 },
+						new LayoutCell { StretchY = 0 },
+						new LayoutCell { StretchY = 0 },
 					},
 					ColDefaults = new List<LayoutCell> {
-						new LayoutCell{ StretchX = 0 },
+						new LayoutCell { StretchX = 0 },
 						new LayoutCell(),
 					}
 				},
