@@ -105,7 +105,7 @@ namespace Tangerine.Core.Operations
 			}
 			var items = frame.RootFolder().Items.ToList();
 			foreach (var n in items.OfType<Node>()) {
-				Document.Decorate(n);
+				Document.Current.Decorate(n);
 			}
 			frame.RootFolder().Items.Clear();
 			frame.RootFolder().SyncDescriptorsAndNodes(frame);

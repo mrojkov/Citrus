@@ -112,7 +112,7 @@ namespace Tangerine.Core
 			Format = DocumentFormat.Scene;
 			Path = defaultPath;
 			Container = RootNode = new Frame { Size = defaultSceneSize };
-			RootNode.AnimationSpeed = 0.5f;
+			RootNode.DefaultAnimation.AnimationEngine = new Orange.CompatibilityAnimationEngine();
 			SetModificationTimeToNow();
 		}
 
@@ -127,9 +127,6 @@ namespace Tangerine.Core
 					if (RootNode is Node3D) {
 						RootNode = WrapNodeWithViewport3D(RootNode);
 					}
-				}
-				if (Format == DocumentFormat.Scene) {
-					RootNode.AnimationSpeed = 0.5f;
 				}
 				Decorate(RootNode);
 				Container = RootNode;
@@ -394,8 +391,11 @@ namespace Tangerine.Core
 
 		public static bool HasCurrent() => Current != null;
 
-		public static void Decorate(Node node)
+		public void Decorate(Node node)
 		{
+			if (Format == DocumentFormat.Scene) {
+				node.DefaultAnimation.AnimationEngine = new Orange.CompatibilityAnimationEngine();
+			}
 			foreach (var decorator in NodeDecorators) {
 				decorator(node);
 				foreach (var descendant in node.Descendants) {

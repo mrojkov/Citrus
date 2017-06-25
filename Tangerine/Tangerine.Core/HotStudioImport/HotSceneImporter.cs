@@ -19,6 +19,24 @@ namespace Orange
 		}
 	}
 
+	public class CompatibilityAnimationEngine : AnimationEngine
+	{
+		public override void AdvanceAnimation(Animation animation, float delta)
+		{
+			DefaultAnimationEngine.Instance.AdvanceAnimation(animation, delta / 2);	
+		}
+
+		public override void ApplyAnimators(Animation animation, bool invokeTriggers)
+		{
+			DefaultAnimationEngine.Instance.ApplyAnimators(animation, invokeTriggers);
+		}
+
+		public override bool TryRunAnimation(Animation animation, string markerId)
+		{
+			return DefaultAnimationEngine.Instance.TryRunAnimation(animation, markerId);
+		}
+	}
+
 	public class HotSceneDeserializer : Yuzu.Deserializer.AbstractReaderDeserializer
 	{
 		Stream stream;
@@ -66,7 +84,16 @@ namespace Orange
 				lexer.ReadLine();
 				node.EditorState().ThumbnailData = ReadThumbnail(lexer);
 				ConvertFolderBeginEndToDescriptors(node);
+				ReplaceAnimationEngine(node);
 				return node;
+			}
+		}
+
+		void ReplaceAnimationEngine(Node node)
+		{
+			node.DefaultAnimation.AnimationEngine = new CompatibilityAnimationEngine();
+			foreach (var child in node.Nodes) {
+				ReplaceAnimationEngine(child);
 			}
 		}
 

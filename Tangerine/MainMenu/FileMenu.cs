@@ -154,12 +154,20 @@ namespace Tangerine
 			try {
 				AssetBundle.Instance.DeleteFile(Path.ChangeExtension(Document.Current.Path, "scene"));
 				Document.Current.Format = DocumentFormat.Tan;
-				Document.Current.RootNode.AnimationSpeed = 1;
+				RestoreDefaultAnimationEngine(Document.Current.RootNode);
 				new UpsampleAnimationTwice().Execute();
 				Document.Current.Save();
 			} catch (System.Exception e) {
 				AlertDialog.Show($"Upgrade document format error: '{e.Message}'");
 			}				
+		}
+
+		private void RestoreDefaultAnimationEngine(Node node)
+		{
+			node.DefaultAnimation.AnimationEngine = DefaultAnimationEngine.Instance;
+			foreach (var child in node.Nodes) {
+				RestoreDefaultAnimationEngine(child);
+			}
 		}
 	}
 }
