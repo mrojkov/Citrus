@@ -397,11 +397,12 @@ namespace Lime
 					continue;
 				}
 				float scale = fontHeight / fontChar.Height;
-				position.X += scale * (fontChar.ACWidths.X + fontChar.Kerning(prevChar));
+				var xDelta = scale * (fontChar.ACWidths.X + fontChar.Kerning(prevChar));
+				position.X += xDelta;
 				var size = new Vector2(scale * fontChar.Width, fontHeight - fontChar.VerticalOffset);
 				var roundPos = new Vector2(position.X.Round(), position.Y.Round() + fontChar.VerticalOffset);
 				if (onDrawChar != null) {
-					onDrawChar(i, roundPos, size);
+					onDrawChar(i, new Vector2((position.X - xDelta).Round(), position.Y.Round()), size);
 				}
 				if (list == null) {
 					DrawSprite(fontChar.Texture, color, roundPos, size, fontChar.UV0, fontChar.UV1);
