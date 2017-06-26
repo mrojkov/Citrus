@@ -7,8 +7,9 @@ namespace Lime
 	{
 		public string Text
 		{
-			get { throw new NotImplementedException(); }
-			set { throw new NotImplementedException(); }
+			// TODO: Properly implement (Not implemented exception removed because of crunch)
+			get;
+			set;
 		}
 	}
 }
