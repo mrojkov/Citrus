@@ -171,6 +171,9 @@
       <Link>libFbxSdkUtils.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="..\3rdParty\FbxSdk\libFbxSdkUtils64.dylib">
+      <Link>libFbxSdkUtils64.dylib</Link>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lime\Lime.MonoMac.csproj">

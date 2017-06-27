@@ -49,5 +49,13 @@
       <Name>Orange.Mac</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\3rdParty\FbxSdk\libFbxSdkUtils64.dylib">
+      <Link>libFbxSdkUtils64.dylib</Link>
+    </None>
+    <None Include="..\..\3rdParty\FbxSdk\libFbxSdkUtils.dylib">
+      <Link>libFbxSdkUtils.dylib</Link>
+    </None>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
