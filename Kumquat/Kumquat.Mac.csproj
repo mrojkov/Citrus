@@ -2,69 +2,58 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{B1A51655-D2AD-4D03-B3F2-619F27FECBC4}</ProjectGuid>
+    <ProjectGuid>{56D2F029-2E73-4CF9-80C7-6175A9DBCFFE}</ProjectGuid>
     <ProjectTypeGuids>{A3F8F2AB-B479-4A4A-A458-A89E7DC349F1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
-    <RootNamespace>Kumquat</RootNamespace>
-    <AssemblyName>Kumquat</AssemblyName>
-    <newfilesearch>OnLoad</newfilesearch>
-    <SuppressXamMacUpsell>True</SuppressXamMacUpsell>
-    <SuppressXamMacMigration>True</SuppressXamMacMigration>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <RootNamespace>Kumquat.Mac</RootNamespace>
+    <AssemblyName>Kumquat.Mac</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkIdentifier>Xamarin.Mac</TargetFrameworkIdentifier>
+    <MonoMacResourcePrefix>Resources</MonoMacResourcePrefix>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <DebugSymbols>True</DebugSymbols>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>False</Optimize>
-    <OutputPath>bin\Mac\Debug</OutputPath>
-    <DefineConstants>DEBUG;MAC</DefineConstants>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
-    <ConsolePause>False</ConsolePause>
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <EnableCodeSigning>False</EnableCodeSigning>
-    <CreatePackage>False</CreatePackage>
-    <EnablePackageSigning>False</EnablePackageSigning>
-    <IncludeMonoRuntime>False</IncludeMonoRuntime>
-    <UseSGen>False</UseSGen>
-    <UseRefCounting>false</UseRefCounting>
-    <Profiling>false</Profiling>
-    <HttpClientHandler>HttpClientHandler</HttpClientHandler>
-    <TlsProvider>Default</TlsProvider>
-    <LinkMode>None</LinkMode>
+    <EnableCodeSigning>false</EnableCodeSigning>
+    <CreatePackage>false</CreatePackage>
+    <EnablePackageSigning>false</EnablePackageSigning>
+    <IncludeMonoRuntime>false</IncludeMonoRuntime>
+    <UseSGen>false</UseSGen>
+    <HttpClientHandler></HttpClientHandler>
+    <LinkMode></LinkMode>
+    <XamMacArch></XamMacArch>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <DebugType>full</DebugType>
-    <Optimize>True</Optimize>
-    <OutputPath>bin\Mac\Release</OutputPath>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <DefineConstants></DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
-    <ConsolePause>False</ConsolePause>
-    <DebugSymbols>True</DebugSymbols>
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <DefineConstants>MAC</DefineConstants>
-    <EnableCodeSigning>False</EnableCodeSigning>
-    <CreatePackage>False</CreatePackage>
-    <EnablePackageSigning>False</EnablePackageSigning>
-    <IncludeMonoRuntime>False</IncludeMonoRuntime>
-    <UseSGen>False</UseSGen>
-    <UseRefCounting>false</UseRefCounting>
-    <Profiling>false</Profiling>
-    <HttpClientHandler>HttpClientHandler</HttpClientHandler>
-    <TlsProvider>Default</TlsProvider>
-    <LinkMode>None</LinkMode>
+    <EnableCodeSigning>false</EnableCodeSigning>
+    <CreatePackage>false</CreatePackage>
+    <EnablePackageSigning>false</EnablePackageSigning>
+    <IncludeMonoRuntime>false</IncludeMonoRuntime>
+    <UseSGen>false</UseSGen>
+    <HttpClientHandler></HttpClientHandler>
+    <LinkMode></LinkMode>
+    <XamMacArch></XamMacArch>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="Xamarin.Mac" />
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <None Include="Info.plist" />
+  </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\CodeFormatter.cs" />
     <Compile Include="Source\ParsedFramesTree.cs" />
@@ -72,18 +61,19 @@
     <Compile Include="Source\ScenesCodeCooker.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Lime\Lime.MonoMac.csproj">
-      <Project>{DC16EEBF-404D-4610-B87A-15B57464D707}</Project>
-      <Name>Lime.MonoMac</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
+    <EmbeddedResource Include="Templates\GeneratedScenes.Android.csproj" />
+    <EmbeddedResource Include="Templates\GeneratedScenes.Win.csproj" />
+    <EmbeddedResource Include="Templates\GeneratedScenes.iOS.csproj" />
+    <EmbeddedResource Include="Templates\ParsedWidget.cs" />
     <EmbeddedResource Include="Source\CodeTemplates\ParsedFrame.txt" />
     <EmbeddedResource Include="Source\CodeTemplates\ParsedNode.txt" />
     <EmbeddedResource Include="Source\CodeTemplates\SceneFile.txt" />
-    <EmbeddedResource Include="Templates\GeneratedScenes.Android.csproj" />
-    <EmbeddedResource Include="Templates\GeneratedScenes.iOS.csproj" />
-    <EmbeddedResource Include="Templates\GeneratedScenes.Win.csproj" />
-    <EmbeddedResource Include="Templates\ParsedWidget.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Lime\Lime.Mac.csproj">
+      <Project>{DC16EEBF-404D-4610-B87A-15B57464D707}</Project>
+      <Name>Lime.Mac</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
 </Project>

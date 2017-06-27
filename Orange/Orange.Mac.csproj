@@ -13,7 +13,8 @@
     <newfilesearch>OnLoad</newfilesearch>
     <SuppressXamMacUpsell>True</SuppressXamMacUpsell>
     <SuppressXamMacMigration>True</SuppressXamMacMigration>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkIdentifier>Xamarin.Mac</TargetFrameworkIdentifier>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>True</DebugSymbols>
@@ -64,16 +65,11 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="MonoMac" />
-    <Reference Include="Mono.Posix" />
-    <Reference Include="Microsoft.Build.Engine" />
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\3rdParty\Newtonsoft.Json\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="glib-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
-    <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="Xamarin.Mac" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -111,7 +107,8 @@
     <Compile Include="Source\Toolbox\Subversion.cs" />
     <Compile Include="Source\Toolbox\Toolbox.cs" />
     <Compile Include="Source\Actions\UpdateXCodeProject.cs" />
-    <Compile Include="Source\AssetCooker\TextureConverter.cs" />
+    <Compile Include="Source\AssetCooker\TextureConverter.cs">
+    </Compile>
     <Compile Include="Source\AssetCooker\OpacityMaskCreator.cs" />
     <Compile Include="Source\Actions\ConvertDictionaryToNewFormat.cs" />
     <Compile Include="Source\Builder\BuildSystem.cs" />
@@ -146,17 +143,6 @@
     <Compile Include="Source\Actions\OptimizePNG.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Toolchain.Mac\PVRTexTool">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Toolchain.Mac\nvcompress">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Toolchain.Win\nuget.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Orange.Mac.userprefs">
       <Visible>False</Visible>
     </None>
@@ -176,21 +162,38 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Lime\Lime.MonoMac.csproj">
+    <ProjectReference Include="..\Lemon\Lemon.Mac.csproj">
+      <Project>{BB697671-700C-455D-B8EE-66A6B122B949}</Project>
+      <Name>Lemon.Mac</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Lime\Lime.Mac.csproj">
       <Project>{DC16EEBF-404D-4610-B87A-15B57464D707}</Project>
-      <Name>Lime.MonoMac</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Lemon\Lemon.MonoMac.csproj">
-      <Project>{4604AA2E-129F-4814-AD0D-8BA35346ECC4}</Project>
-      <Name>Lemon.MonoMac</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Yuzu\Yuzu.csproj">
-      <Project>{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}</Project>
-      <Name>Yuzu</Name>
+      <Name>Lime.Mac</Name>
     </ProjectReference>
     <ProjectReference Include="..\Kumquat\Kumquat.Mac.csproj">
-      <Project>{B1A51655-D2AD-4D03-B3F2-619F27FECBC4}</Project>
+      <Project>{56D2F029-2E73-4CF9-80C7-6175A9DBCFFE}</Project>
       <Name>Kumquat.Mac</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Yuzu\Yuzu.Mac.csproj">
+      <Project>{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}</Project>
+      <Name>Yuzu.Mac</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Lime\Extensions\DynamicFont\DynamicFont.Mac.csproj">
+      <Project>{B5F74505-80BB-4373-B194-219D743C1FA0}</Project>
+      <Name>DynamicFont.Mac</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Toolchain.Win\nuget.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Toolchain.Mac\PVRTexTool">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Toolchain.Mac\nvcompress">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </BundleResource>
   </ItemGroup>
 </Project>
