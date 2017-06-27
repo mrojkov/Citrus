@@ -139,44 +139,100 @@ namespace Lime
 		public Color4[] GetPixels()
 		{
 			var isColorSpaceRGB = Bitmap.CGImage.ColorSpace.Model == CGColorSpaceModel.RGB;
-			if (!isColorSpaceRGB && Bitmap.CGImage.BitsPerPixel != 32) {
-				throw new FormatException(
-					"Can not return array of pixels if bitmap is not in 32 bit format or if not in RGBA format.");
+			var isMonochrome = Bitmap.CGImage.ColorSpace.Model == CGColorSpaceModel.Monochrome;
+			var bpp = Bitmap.CGImage.BitsPerPixel;
+			if (!((isColorSpaceRGB && (bpp == 32 || bpp == 64)) || (isMonochrome && bpp == 8))) {
+				throw new FormatException("Can not return array of pixels: bitmap should be either 32/64 bpp RGBA or 8 bpp monochrome");
 			}
 
 			var doSwap = Bitmap.CGImage.BitmapInfo.HasFlag(CGBitmapFlags.ByteOrder32Little);
 			var isPremultiplied = Bitmap.CGImage.AlphaInfo == CGImageAlphaInfo.PremultipliedFirst ||
 				Bitmap.CGImage.AlphaInfo == CGImageAlphaInfo.PremultipliedLast;
-			var rowLength = Bitmap.CGImage.BytesPerRow / 4;
+			var rowLength = Bitmap.CGImage.BytesPerRow / (bpp / 8);
 			var width = Width;
 			var height = Height;
 			var pixels = new Color4[width * height];
-			using (var data = Bitmap.CGImage.DataProvider.CopyData()) {
-				unsafe {
-					byte* pBytes = (byte*)data.Bytes;
-					byte r, g, b, a;
-					int index = 0;
-					for (int i = 0; i < height; i++) {
-						for (int j = 0; j < width; j++) {
-							r = (byte)(*pBytes++);
-							g = (byte)(*pBytes++);
-							b = (byte)(*pBytes++);
-							a = (byte)(*pBytes++);
-							if (isPremultiplied && a != 255 && a != 0) {
-								r = (byte)(255 * r / a);
-								g = (byte)(255 * g / a);
-								b = (byte)(255 * b / a);
-							}
-							pixels[index++] = doSwap ? new Color4(b, g, r, a) : new Color4(r, g, b, a);
-						}
+			if (isColorSpaceRGB) {
+				if (bpp == 32) {
+					using (var data = Bitmap.CGImage.DataProvider.CopyData()) {
+						unsafe {
+							byte* pBytes = (byte*)data.Bytes;
+							byte r, g, b, a;
+							int index = 0;
+							for (int i = 0; i < height; i++) {
+								for (int j = 0; j < width; j++) {
+									r = (byte)(*pBytes++);
+									g = (byte)(*pBytes++);
+									b = (byte)(*pBytes++);
+									a = (byte)(*pBytes++);
+									if (isPremultiplied && a != 255 && a != 0) {
+										r = (byte)(255 * r / a);
+										g = (byte)(255 * g / a);
+										b = (byte)(255 * b / a);
+									}
+									pixels[index++] = doSwap ? new Color4(b, g, r, a) : new Color4(r, g, b, a);
+								}
 
-						// Sometimes Width can be smaller then length of a row due to byte alignment.
-						// It's just an empty bytes at the end of each row, so we can skip them here.
-						for (int k = 0; k < rowLength - width; k++) {
-							pBytes += 4;
+								// Sometimes Width can be smaller then length of a row due to byte alignment.
+								// It's just an empty bytes at the end of each row, so we can skip them here.
+								for (int k = 0; k < rowLength - width; k++) {
+									pBytes += 4;
+								}
+							}
+						}
+					}
+				} else if (bpp == 64) {
+					using (var data = Bitmap.CGImage.DataProvider.CopyData()) {
+						unsafe {
+							ushort* pBytes = (ushort*)data.Bytes;
+							ushort r, g, b, a;
+							int index = 0;
+							for (int i = 0; i < height; i++) {
+								for (int j = 0; j < width; j++) {
+									r = (ushort)(*pBytes++);
+									g = (ushort)(*pBytes++);
+									b = (ushort)(*pBytes++);
+									a = (ushort)(*pBytes++);
+									if (isPremultiplied && a != 65536 && a != 0) {
+										r = (ushort)(65536 * r / a);
+										g = (ushort)(65536 * g / a);
+										b = (ushort)(65536 * b / a);
+									}
+									pixels[index++] = doSwap ? new Color4((byte)(b / 255), (byte)(g / 255), (byte)(r / 255), (byte)(a / 255))
+										: new Color4((byte)(r / 255), (byte)(g / 255), (byte)(b / 255), (byte)(a / 255));
+								}
+
+								// Sometimes Width can be smaller then length of a row due to byte alignment.
+								// It's just an empty bytes at the end of each row, so we can skip them here.
+								for (int k = 0; k < rowLength - width; k++) {
+									pBytes += bpp / 8;
+								}
+							}
 						}
 					}
 				}
+
+			} else if (isMonochrome) {
+				using (var data = Bitmap.CGImage.DataProvider.CopyData()) {
+					unsafe {
+						byte* pBytes = (byte*)data.Bytes;
+						byte v;
+						int index = 0;
+						for (int i = 0; i < height; i++) {
+							for (int j = 0; j < width; j++) {
+								v = (*pBytes++);
+								pixels[index++] = new Color4(v, v, v, 255);
+							}
+
+							// Sometimes Width can be smaller then length of a row due to byte alignment.
+							// It's just an empty bytes at the end of each row, so we can skip them here.
+							for (int k = 0; k < rowLength - width; k++) {
+								pBytes += bpp / 8;
+							}
+						}
+					}
+				}
+
 			}
 			return pixels;
 		}

@@ -102,7 +102,6 @@
     <Compile Include="UI\OrangeInterface.cs" />
     <Compile Include="UI\PlatformPicker.cs" />
     <Compile Include="UI\PluginUIBuidler.cs" />
-    <Compile Include="UI\TextView.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lemon\Lemon.Win.csproj">

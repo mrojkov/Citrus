@@ -465,8 +465,11 @@ namespace Lime
 
 		private void DecorateTextView(Widget widget)
 		{
-			var tv = (TextView)widget;
-			tv.CompoundPresenter.Push(new BorderedFramePresenter(Colors.WhiteBackground, Colors.ControlBorder));
+			DecorateScrollViewWidget(widget);
+			var tw = (TextView)widget;
+			tw.Behaviour.Content.Padding = new Thickness(4);
+			tw.Behaviour.Content.Layout = new VBoxLayout();
+			tw.Behaviour.Frame.CompoundPresenter.Add(new BorderedFramePresenter(DesktopTheme.Colors.WhiteBackground, DesktopTheme.Colors.ControlBorder));
 		}
 
 		private void DecorateBorderedFrame(Widget widget)

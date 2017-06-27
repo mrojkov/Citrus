@@ -184,10 +184,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Toolchain.Win\nuget.exe">
+    <Content Include="Toolchain.Mac\PVRTexTool">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Toolchain.Mac\PVRTexTool">
+    <Content Include="Toolchain.Win\nuget.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -197,3 +197,4 @@
     </BundleResource>
   </ItemGroup>
 </Project>
+
