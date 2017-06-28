@@ -96,12 +96,21 @@ namespace Lime
 			};
 			window.Updating += UpdateAndResize;
 			window.Resized += deviceRotated => UpdateAndResize(0);
-			window.VisibleChanging += showing => {
-				if (showing) {
-					UpdateAndResize(0);
-					window.Center();
-				}
-			};
+			window.VisibleChanging += Window_VisibleChanging;
+		}
+
+		private void Window_VisibleChanging(bool showing, bool modal)
+		{
+			if (modal && showing) {
+				Input.RestrictScope();
+			}
+			if (!showing)
+				Input.DerestrictScope();{
+			}
+			if (showing) {
+				UpdateAndResize(0);
+				Window.Center();
+			}
 		}
 
 		private void UpdateAndResize(float delta)
