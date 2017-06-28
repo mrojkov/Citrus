@@ -26,7 +26,8 @@ namespace Lime
 	/// Delegate used by <see cref="IWindow.VisibleChanging"/> event.
 	/// </summary>
 	/// <param name="value">New value of <see cref="IWindow.Visible"/>.</param>
-	public delegate void VisibleChangingDelegate(bool value);
+	/// <param name="modal">Indicates whether the window is showing modal.</param>
+	public delegate void VisibleChangingDelegate(bool value, bool modal);
 
 	/// <summary>
 	/// Enumerates available window states.

@@ -119,11 +119,11 @@ namespace Lime
 			}
 		}
 
-		protected void RaiseVisibleChanging(bool value)
+		protected void RaiseVisibleChanging(bool value, bool modal)
 		{
 			using (Context.Activate().Scoped()) {
 				if (VisibleChanging != null) {
-					VisibleChanging(value);
+					VisibleChanging(value, modal);
 				}
 			}
 		}
