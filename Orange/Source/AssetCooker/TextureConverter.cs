@@ -180,7 +180,7 @@ namespace Orange
 		{
 			var pngOptimizerPath = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Win", "PngOptimizerCL");
 			dstPath = MakeAbsolutePath(dstPath);
-			var args = $"--DontOptimize \"{dstPath}\"";
+			var args = $"--KeepPixels \"{dstPath}\"";
 			int result = Process.Start(pngOptimizerPath, args, Process.Options.RedirectErrors);
 			if (result != 0) {
 				throw new Lime.Exception(
