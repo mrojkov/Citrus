@@ -25,7 +25,7 @@ namespace Lime
 		private Stopwatch stopwatch;
 		private bool invalidated;
 		private float refreshRate;
-		private bool dialogMode;
+		private bool modal;
 		private Display display;
 		private bool closed;
 
@@ -40,7 +40,17 @@ namespace Lime
 		public bool Visible
 		{
 			get { return !View.Hidden; }
-			set { SetVisible(value, dialogMode: false); }
+			set
+			{
+				RaiseVisibleChanging(value, false);
+				modal = false;
+				View.Hidden = !value;
+				View.Stop();
+				if (value) {
+					View.Run(refreshRate, false);
+					window.MakeKeyAndOrderFront(window);
+				}
+			}
 		}
 
 		public Vector2 ClientPosition
@@ -320,6 +330,7 @@ namespace Lime
 			if (closed) {
 				return;
 			}
+			RaiseVisibleChanging(false, true);
 			RaiseClosed();
 			View.Stop();
 			Application.Windows.Remove(this);
@@ -350,7 +361,7 @@ namespace Lime
 		public void Close()
 		{
 			window.Close();
-			if (dialogMode) {
+			if (modal) {
 				NSApplication.SharedApplication.StopModal();
 			}
 		}
@@ -360,7 +371,16 @@ namespace Lime
 			if (Visible) {
 				throw new InvalidOperationException();
 			}
-			SetVisible(true, dialogMode: true);
+			RaiseVisibleChanging(true, true);
+			modal = true;
+			View.Hidden = false;
+			View.Stop();
+			View.Run(refreshRate, true);
+			window.MakeKeyAndOrderFront(window);
+			// Showing a new modal window should consume issued commands or we may fall into infinite loop otherwise.
+			Application.UpdateCounter++;
+			NSApplication.SharedApplication.RunModalForWindow(window);
+			RaiseVisibleChanging(false, true);
 		}
 
 		private void HandleRenderFrame()
@@ -403,23 +423,6 @@ namespace Lime
 		{
 			var p = window.MouseLocationOutsideOfEventStream;
 			Input.MousePosition = new Vector2((float)p.X, (float)(NSGameView.Frame.Height - p.Y)) * Input.ScreenToWorldTransform;
-		}
-
-		private void SetVisible(bool value, bool dialogMode)
-		{
-			RaiseVisibleChanging(value);
-			this.dialogMode = dialogMode;
-			View.Hidden = !value;
-			View.Stop();
-			if (value) {
-				View.Run(refreshRate, dialogMode);
-				window.MakeKeyAndOrderFront(window);
-			}
-			if (dialogMode) {
-				// Showing a new modal window should consume issued commands or we may fall into infinite loop otherwise.
-				Application.UpdateCounter++;
-				NSApplication.SharedApplication.RunModalForWindow(window);
-			}
 		}
 
 		private void RaiseFilesDropped(IEnumerable<string> files)

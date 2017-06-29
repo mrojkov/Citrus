@@ -141,7 +141,7 @@ namespace Lime
 			get { return form.Visible; }
 			set
 			{
-				RaiseVisibleChanging(value);
+				RaiseVisibleChanging(value, false);
 				form.Visible = value;
 			}
 		}
@@ -175,6 +175,7 @@ namespace Lime
 
 		public void Close()
 		{
+			RaiseVisibleChanging(false, false);
 			form.Close();
 		}
 
@@ -290,8 +291,9 @@ namespace Lime
 		{
 			// Showing a new modal window should consume issued commands or we may fall into infinite loop otherwise.
 			Application.UpdateCounter++;
-			RaiseVisibleChanging(true);
+			RaiseVisibleChanging(true, true);
 			form.ShowDialog();
+			RaiseVisibleChanging(false, true);
 		}
 
 		/// <summary>
