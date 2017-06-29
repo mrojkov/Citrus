@@ -220,7 +220,6 @@
     <Compile Include="Source\Application\FileDialog\FileDialog.Mac.cs" />
     <Compile Include="Source\Widgets\Layout\HBoxLayout.cs" />
     <Compile Include="Source\Application\DummyWindow.cs" />
-    <Compile Include="Source\Graphics\Bitmap.Cocoa.cs" />
     <Compile Include="Source\EnumExtensions.cs" />
     <Compile Include="Source\Widgets\3D\Camera3D.cs" />
     <Compile Include="Source\Widgets\3D\Material.cs" />
@@ -293,6 +292,7 @@
     <Compile Include="Source\Widgets\IRenderChainBuilder.cs" />
     <Compile Include="Source\Profilers\NodeProfiler.cs" />
     <Compile Include="Source\Profilers\TasksProfiler.cs" />
+    <Compile Include="Source\Graphics\Bitmap.Apple.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

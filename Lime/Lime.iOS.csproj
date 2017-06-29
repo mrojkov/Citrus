@@ -281,7 +281,7 @@
     <Compile Include="Source\Widgets\Layout\FlowLayout.cs" />
     <Compile Include="Source\Widgets\Layout\HBoxLayout.cs" />
     <Compile Include="Source\Widgets\Layout\LayoutDebugPresenter.cs" />
-    <Compile Include="Source\Graphics\Bitmap.Cocoa.cs" />
+    <Compile Include="Source\Graphics\Bitmap.Apple.cs" />
     <Compile Include="Source\EnumExtensions.cs" />
     <Compile Include="Source\GeometryUtils.cs" />
     <Compile Include="Source\Graphics\Unity\MovieTexture.cs" />

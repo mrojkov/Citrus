@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -374,7 +374,6 @@
     <Compile Include="Source\Widgets\Theme\DefaultTheme.cs" />
     <Compile Include="Source\Widgets\Theme\DesktopTheme.cs" />
     <Compile Include="Source\Widgets\Theme\ITheme.cs" />
-    <Compile Include="Source\Graphics\Bitmap.Cocoa.cs" />
     <Compile Include="Source\Graphics\Unity\MovieTexture.cs" />
     <Compile Include="Source\Types\MonoMac\CG.cs" />
     <Compile Include="Source\Widgets\Layout\StackLayout.cs" />
@@ -394,6 +393,7 @@
     <Compile Include="Source\Widgets\3D\SplineGear3D.cs" />
     <Compile Include="Source\Widgets\Animation\AnimationBlender.cs" />
     <Compile Include="Source\Widgets\Animation\BlendAnimationEngine.cs" />
+    <Compile Include="Source\Graphics\Bitmap.Apple.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\3rdParty\OpenAL\OpenAL32.dll">

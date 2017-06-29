@@ -3,12 +3,8 @@ using System.IO;
 
 #if WIN
 using NativeBitmap = System.Drawing.Bitmap;
-#elif MAC
-using NativeBitmap = AppKit.NSImage;
-#elif MONOMAC
-using NativeBitmap = MonoMac.AppKit.NSImage;
-#elif iOS
-using NativeBitmap = UIKit.UIImage;
+#elif iOS || MAC
+using NativeBitmap = CoreGraphics.CGImage;
 #elif ANDROID
 using NativeBitmap = Android.Graphics.Bitmap;
 #elif UNITY
@@ -42,7 +38,7 @@ namespace Lime
 	/// </summary>
 	public class Bitmap : IDisposable
 	{
-		private readonly IBitmapImplementation implementation;
+		private IBitmapImplementation implementation;
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="Bitmap"/> class with the specified
@@ -227,15 +223,33 @@ namespace Lime
 			}
 		}
 
-		/// <summary>
-		/// Releases all resources used by this bitmap.
-		/// </summary>
-		public void Dispose()
+		private bool disposed;
+
+		private void Dispose(bool disposing)
 		{
-			if (implementation != null) {
-				implementation.Dispose();
+			if (!disposed) {
+				if (disposing) {
+					if (implementation != null) {
+						implementation.Dispose();
+						implementation = null;
+					}
+				}
+
+				disposed = true;
 			}
 		}
+
+		~Bitmap()
+		{
+			Dispose(false);
+		}
+
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+		
 
 		private void CacheDimensions()
 		{

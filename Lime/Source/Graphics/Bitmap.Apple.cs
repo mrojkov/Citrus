@@ -1,36 +1,31 @@
-#if iOS || MAC || MONOMAC
+#if iOS || MAC
 using System;
 using System.IO;
-#if iOS
-using Foundation;
+using System.Runtime.InteropServices;
 using CoreGraphics;
-using CocoaBitmap = UIKit.UIImage;
-#elif MAC
-using AppKit;
-using CoreGraphics;
+using ImageIO;
 using Foundation;
-using CocoaBitmap = AppKit.NSImage;
-#else
-using MonoMac.AppKit;
-using MonoMac.CoreGraphics;
-using MonoMac.Foundation;
-using CocoaBitmap = MonoMac.AppKit.NSImage;
-#endif
 
 namespace Lime
 {
 	class BitmapImplementation : IBitmapImplementation
 	{
+		[DllImport("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation")]
+		internal static extern void CFRelease(System.IntPtr obj);
+
+		private CGImage cgImage;
+
+		public CGImage Bitmap { get { return cgImage; } private set { cgImage = value; } }
+
 		public BitmapImplementation(Stream stream)
 		{
-#if iOS
-			using (var nsData = NSData.FromStream(stream)) {
-				Bitmap = CocoaBitmap.LoadFromData(nsData);
+			byte[] data;
+			using (var ms = new MemoryStream()) {
+				stream.CopyTo(ms);
+				data = ms.ToArray();
 			}
-#elif MAC || MONOMAC
-			Bitmap = CocoaBitmap.FromStream(stream);
-#endif
-			var alphaInfo = Bitmap.CGImage.AlphaInfo;
+			cgImage = CGImage.FromPNG(new CGDataProvider(data), null, false, CGColorRenderingIntent.Default);
+			var alphaInfo = cgImage.AlphaInfo;
 			HasAlpha =
 				alphaInfo != CGImageAlphaInfo.None &&
 				alphaInfo != CGImageAlphaInfo.NoneSkipFirst &&
@@ -49,7 +44,7 @@ namespace Lime
 				data[j++] = pixels[i].A;
 			}
 			var alphaInfo = Lime.Bitmap.AnyAlpha(pixels) ? CGBitmapFlags.Last : CGBitmapFlags.NoneSkipLast;
-			var img = new CGImage(
+			cgImage = new CGImage(
 				width,
 				height,
 				8,
@@ -61,35 +56,33 @@ namespace Lime
 				null,
 				false,
 				CGColorRenderingIntent.Default);
-#if iOS
-			Bitmap = new CocoaBitmap(img);
-#elif MAC || MONOMAC
-			Bitmap = new CocoaBitmap(img, new CGSize(width, height));
-#endif
+
 			HasAlpha = alphaInfo == CGBitmapFlags.Last;
 		}
 
-		private BitmapImplementation(CocoaBitmap bitmap)
+		private BitmapImplementation(CGImage cgImage)
 		{
-			Bitmap = bitmap;
-			HasAlpha = Lime.Bitmap.AnyAlpha(GetPixels());
+			this.cgImage = cgImage;
+			var alphaInfo = cgImage.AlphaInfo;
+			HasAlpha =
+				alphaInfo != CGImageAlphaInfo.None &&
+				alphaInfo != CGImageAlphaInfo.NoneSkipFirst &&
+				alphaInfo != CGImageAlphaInfo.NoneSkipLast;
 		}
-
-		public CocoaBitmap Bitmap { get; private set; }
 
 		public int Width
 		{
-			get { return Bitmap != null ? (int)Bitmap.CGImage.Width : 0; }
+			get { return cgImage != null ? (int)cgImage.Width : 0; }
 		}
 
 		public int Height
 		{
-			get { return Bitmap != null ? (int)Bitmap.CGImage.Height : 0; }
+			get { return cgImage != null ? (int)cgImage.Height : 0; }
 		}
 
 		public bool IsValid
 		{
-			get { return (Bitmap != null && (Width > 0 && Height > 0)); }
+			get { return (cgImage != null && (Width > 0 && Height > 0)); }
 		}
 
 		public bool HasAlpha
@@ -101,60 +94,47 @@ namespace Lime
 		{
 #if iOS
 			return Crop(new IntRectangle(0, 0, Width, Height));
-#elif MAC || MONOMAC
-			return new BitmapImplementation((CocoaBitmap)Bitmap.Copy());
+#elif MAC
+			return new BitmapImplementation(GetPixels(), Width, Height);
 #endif
 		}
 
 		public IBitmapImplementation Rescale(int newWidth, int newHeight)
 		{
-#if iOS
-			return new BitmapImplementation(Bitmap.Scale(new CGSize(newWidth, newHeight)));
-#elif MAC || MONOMAC
-			var newImage = new CocoaBitmap(new CGSize(newWidth, newHeight));
-			newImage.LockFocus();
-			var ctx = NSGraphicsContext.CurrentContext;
-			ctx.ImageInterpolation = NSImageInterpolation.High;
-			Bitmap.DrawInRect(
-				new CGRect(0, 0, newWidth, newHeight),
-				new CGRect(0, 0, Bitmap.Size.Width, Bitmap.Size.Height),
-				NSCompositingOperation.Copy,
-				1);
-			newImage.UnlockFocus();
-			return new BitmapImplementation(newImage);
-#endif
+			CGBitmapContext bctx = new CGBitmapContext(null, newWidth, newHeight,
+				cgImage.BitsPerComponent, 0, CGColorSpace.CreateDeviceRGB(), CGImageAlphaInfo.PremultipliedLast);
+			bctx.InterpolationQuality = CGInterpolationQuality.High;
+			bctx.DrawImage(new CGRect(0, 0, newWidth, newHeight), cgImage);
+			var img = bctx.ToImage();
+			bctx.Dispose();
+			return new BitmapImplementation(img);
 		}
 
 		public IBitmapImplementation Crop(IntRectangle cropArea)
 		{
 			var rect = new CGRect(cropArea.Left, cropArea.Top, cropArea.Width, cropArea.Height);
-#if iOS
-			return new BitmapImplementation(new CocoaBitmap(Bitmap.CGImage.WithImageInRect(rect)));
-#elif MAC || MONOMAC
-			var size = new CGSize(cropArea.Width, cropArea.Height);
-			return new BitmapImplementation(new CocoaBitmap(Bitmap.CGImage.WithImageInRect(rect), size));
-#endif
+			return new BitmapImplementation(cgImage.WithImageInRect(rect));
 		}
 
 		public Color4[] GetPixels()
 		{
-			var isColorSpaceRGB = Bitmap.CGImage.ColorSpace.Model == CGColorSpaceModel.RGB;
-			var isMonochrome = Bitmap.CGImage.ColorSpace.Model == CGColorSpaceModel.Monochrome;
-			var bpp = Bitmap.CGImage.BitsPerPixel;
+			var isColorSpaceRGB = cgImage.ColorSpace.Model == CGColorSpaceModel.RGB;
+			var isMonochrome = cgImage.ColorSpace.Model == CGColorSpaceModel.Monochrome;
+			var bpp = cgImage.BitsPerPixel;
 			if (!((isColorSpaceRGB && (bpp == 32 || bpp == 64)) || (isMonochrome && bpp == 8))) {
 				throw new FormatException("Can not return array of pixels: bitmap should be either 32/64 bpp RGBA or 8 bpp monochrome");
 			}
 
-			var doSwap = Bitmap.CGImage.BitmapInfo.HasFlag(CGBitmapFlags.ByteOrder32Little);
-			var isPremultiplied = Bitmap.CGImage.AlphaInfo == CGImageAlphaInfo.PremultipliedFirst ||
-				Bitmap.CGImage.AlphaInfo == CGImageAlphaInfo.PremultipliedLast;
-			var rowLength = Bitmap.CGImage.BytesPerRow / (bpp / 8);
+			var doSwap = cgImage.BitmapInfo.HasFlag(CGBitmapFlags.ByteOrder32Little);
+			var isPremultiplied = cgImage.AlphaInfo == CGImageAlphaInfo.PremultipliedFirst ||
+				cgImage.AlphaInfo == CGImageAlphaInfo.PremultipliedLast;
+			var rowLength = cgImage.BytesPerRow / (bpp / 8);
 			var width = Width;
 			var height = Height;
 			var pixels = new Color4[width * height];
 			if (isColorSpaceRGB) {
 				if (bpp == 32) {
-					using (var data = Bitmap.CGImage.DataProvider.CopyData()) {
+					using (var data = cgImage.DataProvider.CopyData()) {
 						unsafe {
 							byte* pBytes = (byte*)data.Bytes;
 							byte r, g, b, a;
@@ -182,7 +162,7 @@ namespace Lime
 						}
 					}
 				} else if (bpp == 64) {
-					using (var data = Bitmap.CGImage.DataProvider.CopyData()) {
+					using (var data = cgImage.DataProvider.CopyData()) {
 						unsafe {
 							ushort* pBytes = (ushort*)data.Bytes;
 							ushort r, g, b, a;
@@ -211,9 +191,8 @@ namespace Lime
 						}
 					}
 				}
-
 			} else if (isMonochrome) {
-				using (var data = Bitmap.CGImage.DataProvider.CopyData()) {
+				using (var data = cgImage.DataProvider.CopyData()) {
 					unsafe {
 						byte* pBytes = (byte*)data.Bytes;
 						byte v;
@@ -239,51 +218,55 @@ namespace Lime
 
 		public void SaveTo(Stream stream, CompressionFormat compression)
 		{
-#if iOS
-			NSData data = null;
+			var data = new NSMutableData();
+			CGImageDestination dest = null;
+
 			switch (compression) {
 				case CompressionFormat.Jpeg:
-					data = Bitmap.AsJPEG(0.8f);
+					dest = CGImageDestination.Create(data, MobileCoreServices.UTType.JPEG, imageCount: 1);
 					break;
 				case CompressionFormat.Png:
-					data = Bitmap.AsPNG();
+					dest = CGImageDestination.Create(data, MobileCoreServices.UTType.PNG, imageCount: 1);
 					break;
 			}
-			if (data != null) {
+			if (dest != null) {
+				dest.AddImage(cgImage);
+				dest.Close(); 
 				using (var bitmapStream = data.AsStream()) {
 					bitmapStream.CopyTo(stream);
 				}
 				data.Dispose();
 			}
-#elif MAC || MONOMAC
-			using (var representation = new NSBitmapImageRep(Bitmap.CGImage)) {
-				NSData data = null;
-				NSDictionary parameters = null;
-				switch (compression) {
-					case CompressionFormat.Jpeg:
-						parameters = NSDictionary.FromObjectAndKey(
-							NSNumber.FromFloat(0.8f), NSBitmapImageRep.CompressionFactor);
-						data = representation.RepresentationUsingTypeProperties(NSBitmapImageFileType.Jpeg, parameters);
-						break;
-					case CompressionFormat.Png:
-						parameters = new NSDictionary();
-						data = representation.RepresentationUsingTypeProperties(NSBitmapImageFileType.Png, parameters);
-						break;
+		}
+
+		#region IDisposable Support
+		private bool disposed;
+
+		private void Dispose(bool disposing)
+		{
+			if (!disposed) {
+				if (disposing) {
+					if (cgImage != null) {
+						cgImage.Dispose();
+					}
 				}
-				using (var bitmapStream = data.AsStream()) {
-					bitmapStream.CopyTo(stream);
-				}
-				data.Dispose();
+				disposed = true;
 			}
-#endif
+		}
+
+		~BitmapImplementation()
+		{
+			Dispose(false);
 		}
 
 		public void Dispose()
 		{
-			if (Bitmap != null) {
-				Bitmap.Dispose();
-			}
+			Dispose(true);
+			GC.SuppressFinalize(this);
 		}
+		#endregion
+
+		
 	}
 }
 #endif

@@ -223,7 +223,6 @@
     <Compile Include="Source\Widgets\HSplitter.cs" />
     <Compile Include="Source\Widgets\VSplitter.cs" />
     <Compile Include="Source\Widgets\Layout\LayoutDebugPresenter.cs" />
-    <Compile Include="Source\Graphics\Bitmap.Cocoa.cs" />
     <Compile Include="Source\Widgets\Layout\StackLayout.cs" />
     <Compile Include="Source\Widgets\Layout\HBoxLayout.cs" />
     <Compile Include="Source\Widgets\3D\Camera3D.cs" />
@@ -291,6 +290,7 @@
     <Compile Include="Source\Widgets\IRenderChainBuilder.cs" />
     <Compile Include="Source\Profilers\NodeProfiler.cs" />
     <Compile Include="Source\Profilers\TasksProfiler.cs" />
+    <Compile Include="Source\Graphics\Bitmap.Apple.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
