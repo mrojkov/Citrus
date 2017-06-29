@@ -102,18 +102,20 @@ namespace Orange
 			Console.SetOut(textWriter);
 			Console.SetError(textWriter);
 			var menu = new Menu();
+			var shCopy = new Shortcut(Modifiers.Control, Key.C);
 			var command = new Command
 			{
-				Shortcut = new Shortcut(Modifiers.Control, Key.C),
+				Shortcut = shCopy,
 				Text = "Copy All",
-			};
-			command.Issued += () => {
-				Clipboard.Text = textView.Text;
 			};
 			menu.Add(command);
 			textView.Updated += (dt) => {
 				if (textView.Input.WasKeyPressed(Key.Mouse1)) {
 					menu.Popup();
+				}
+				if (command.WasIssued()) {
+					command.Consume();
+					Clipboard.Text = textView.Text;
 				}
 			};
 
