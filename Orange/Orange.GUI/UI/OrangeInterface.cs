@@ -101,6 +101,22 @@ namespace Orange
 			textWriter = new TextViewWriter(textView);
 			Console.SetOut(textWriter);
 			Console.SetError(textWriter);
+			var menu = new Menu();
+			var command = new Command
+			{
+				Shortcut = new Shortcut(Modifiers.Control, Key.C),
+				Text = "Copy All",
+			};
+			command.Issued += () => {
+				Clipboard.Text = textView.Text;
+			};
+			menu.Add(command);
+			textView.Updated += (dt) => {
+				if (textView.Input.WasKeyPressed(Key.Mouse1)) {
+					menu.Popup();
+				}
+			};
+
 			return textView;
 		}
 
