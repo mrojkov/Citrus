@@ -646,7 +646,7 @@ namespace Orange
 			return !The.Workspace.ProjectJson.GetValue("DontGenerateOpacityMasks", false);
 		}
 
-		private static void ImportTexture(string path, Bitmap texture, ICookingRules rules)
+		public static void ImportTexture(string path, Bitmap texture, ICookingRules rules)
 		{
 			if (ShouldGenerateOpacityMasks()) {
 				var maskPath = Path.ChangeExtension(path, ".mask");
