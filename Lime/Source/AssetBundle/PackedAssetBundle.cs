@@ -426,7 +426,7 @@ namespace Lime
 			stream.Seek(0, SeekOrigin.Begin);
 			var signature = reader.ReadInt32();
 			if (signature != Signature) {
-				throw new Exception("The asset bundle has been corrupted");
+				throw new Exception($"The asset bundle at \"{Path}\" has been corrupted");
 			}
 			reader.ReadInt32(); // CheckSum
 			var version = reader.ReadInt32();
