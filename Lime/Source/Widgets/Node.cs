@@ -995,38 +995,35 @@ namespace Lime
 		[ThreadStatic]
 		private static HashSet<string> scenesBeingLoaded;
 
-		public static Node CreateFromAssetBundle(string path, Node instance = null, bool useDefaultTheme = true)
+		public static Node CreateFromAssetBundle(string path, Node instance = null)
 		{
-			var theme = useDefaultTheme ? DefaultTheme.Instance : Theme.Current;
-			using (Theme.Push(theme)) {
-				if (scenesBeingLoaded == null) {
-					scenesBeingLoaded = new HashSet<string>();
-				}
-				var fullPath = ResolveScenePath(path);
-				if (fullPath == null) {
-					throw new Exception($"Scene '{path}' not found in current asset bundle");
-				}
-				if (scenesBeingLoaded.Contains(fullPath)) {
-					throw new Exception($"Cyclic scenes dependency was detected: {fullPath}");
-				}
-				scenesBeingLoaded.Add(fullPath);
-				try {
-					using (Stream stream = AssetBundle.Instance.OpenFileLocalized(fullPath)) {
-						instance = Serialization.ReadObject<Node>(fullPath, stream, instance);
-					}
-					instance.LoadExternalScenes();
-					if (!Application.IsTangerine) {
-						instance.Tag = fullPath;
-					}
-				} finally {
-					scenesBeingLoaded.Remove(fullPath);
-				}
-				if (instance is Model3D) {
-					var attachment = new Model3DAttachmentParser().Parse(path);
-					attachment?.Apply((Model3D)instance);
-				}
-				return instance;
+			if (scenesBeingLoaded == null) {
+				scenesBeingLoaded = new HashSet<string>();
 			}
+			var fullPath = ResolveScenePath(path);
+			if (fullPath == null) {
+				throw new Exception($"Scene '{path}' not found in current asset bundle");
+			}
+			if (scenesBeingLoaded.Contains(fullPath)) {
+				throw new Exception($"Cyclic scenes dependency was detected: {fullPath}");
+			}
+			scenesBeingLoaded.Add(fullPath);
+			try {
+				using (Stream stream = AssetBundle.Instance.OpenFileLocalized(fullPath)) {
+					instance = Serialization.ReadObject<Node>(fullPath, stream, instance);
+				}
+				instance.LoadExternalScenes();
+				if (!Application.IsTangerine) {
+					instance.Tag = fullPath;
+				}
+			} finally {
+				scenesBeingLoaded.Remove(fullPath);
+			}
+			if (instance is Model3D) {
+				var attachment = new Model3DAttachmentParser().Parse(path);
+				attachment?.Apply((Model3D)instance);
+			}
+			return instance;
 		}
 
 		public void LoadExternalScenes()
