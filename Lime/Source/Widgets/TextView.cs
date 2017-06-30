@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if WIN || MAC
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -63,3 +64,4 @@ namespace Lime
 		}
 	}
 }
+#endif
