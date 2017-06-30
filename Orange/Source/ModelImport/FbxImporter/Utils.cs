@@ -9,7 +9,7 @@ namespace Orange.FbxImporter
 #if WIN
 		public const string LibName = "FbxSdk.dll";
 #elif MAC
-		public const string LibName = "libFbxSdkUtils.dylib";
+		public const string LibName = "FbxSdkUtils";
 #endif
 		public const int BoneLimit = 4;
 	}
