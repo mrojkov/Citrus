@@ -7,6 +7,7 @@ namespace Lime
 	public class TextView : ScrollViewWidget
 	{
 		private List<SimpleText> lines = new List<SimpleText>();
+		private DesktopTheme desktopTheme = new DesktopTheme();
 
 		public TextView()
 		{
@@ -21,7 +22,11 @@ namespace Lime
 					lastLine.Text += l;
 					lastLine = null;
 				} else {
-					var line = new SimpleText(l);
+					SimpleText line;
+					// TODO: remove when proper fix is ready
+					using (Theme.Push(desktopTheme)) {
+						line = new SimpleText(l);
+					}
 					lines.Add(line);
 					Behaviour.Content.AddNode(line);
 				}

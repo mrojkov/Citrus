@@ -23,7 +23,10 @@ namespace Orange
 
 		public static void CookForActivePlatform()
 		{
-			Cook(The.Workspace.ActivePlatform);
+			// TODO: remove when proper fix is ready
+			using (Theme.Push(DefaultTheme.Instance)) {
+				Cook(The.Workspace.ActivePlatform);
+			}
 		}
 
 		public static void AddStage(Action action)
