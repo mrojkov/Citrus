@@ -42,6 +42,7 @@ namespace Tangerine.UI.FilesystemView
 					LayoutCell = new LayoutCell(Alignment.Center)
 				})
 			);
+			targetSelector.Items.Add(new DropDownList.Item("None", null));
 			foreach (var t in Orange.The.Workspace.Targets) {
 				targetSelector.Items.Add(new ThemedDropDownList.Item(t.Name, t));
 			}
@@ -50,7 +51,7 @@ namespace Tangerine.UI.FilesystemView
 				Invalidate(savedSelection);
 			};
 			targetSelector.Index = 0;
-			activeTarget = Orange.The.Workspace.Targets.First();
+			activeTarget = null;
 			RootWidget = new Widget {
 				Layout = new VBoxLayout(),
 				Nodes = {
@@ -225,27 +226,27 @@ namespace Tangerine.UI.FilesystemView
 						CreateHeaderWidgets(crc, path, yi, headerWidget, overridesWidget, parent);
 					}
 					if (kv.Value.FieldOverrides.Contains(yi)) {
-						CreateOverridesWidgets(yi, parent, overridesWidget);
+						CreateOverridesWidgets(crc, key, kv.Key, yi, parent, overridesWidget);
 					}
 				}
 				parent = parent.Parent;
 			}
 		}
 
-		private void CreateOverridesWidgets(Meta.Item yi, CookingRules rules, Widget overridesWidget)
+		private void CreateOverridesWidgets(CookingRulesCollection crc, string key, Target target, Meta.Item yi, CookingRules rules, Widget overridesWidget)
 		{
 			Widget innerContainer;
 			var sourceFilenameText = string.IsNullOrEmpty(rules.SourceFilename)
 				? "Default"
 				: rules.SourceFilename.Substring(The.Workspace.AssetsDirectory.Length);
-			var container = new Widget
-			{
+			var targetName = target == null ? "" : $" ({target.Name})";
+			var container = new Widget {
 				Padding = new Thickness { Right = 30 },
 				Nodes = {
 					(innerContainer = new Widget {
 						Layout = new HBoxLayout(),
 					}),
-					new ThemedSimpleText(sourceFilenameText) {
+					new ThemedSimpleText(sourceFilenameText + targetName) {
 						FontHeight = 16,
 						ForceUncutText = false,
 						OverflowMode = TextOverflowMode.Ellipsis,
@@ -264,18 +265,25 @@ namespace Tangerine.UI.FilesystemView
 				},
 				Layout = new HBoxLayout(),
 			};
+			container.CompoundPostPresenter.Add(new DelegatePresenter<Widget>((w) => {
+				if (target != activeTarget || rules != crc[key]) {
+					w.PrepareRendererState();
+					Renderer.DrawLine(10.0f - 30.0f, w.Height * 0.6f, w.Width - 10.0f, w.Height * 0.6f, Color4.Black.Transparentify(0.5f), 1.0f);
+				}
+			}));
 			container.Components.Add(new PropertyOverrideComponent
 			{
 				Rules = rules,
 				YuzuItem = yi,
 			});
 			overridesWidget.Nodes.Add(container);
-			var editorParams = new PropertyEditorParams(innerContainer, rules.CommonRules, yi.Name)
+			var targetRuels = RulesForTarget(rules, target);
+			var editorParams = new PropertyEditorParams(innerContainer, targetRuels, yi.Name)
 			{
 				ShowLabel = false,
 				PropertySetter = (owner, name, value) => {
 					yi.SetValue(owner, value);
-					rules.CommonRules.Override(name);
+					targetRuels.Override(name);
 					rules.Save();
 				},
 				NumericEditBoxFactory = () => {
@@ -346,25 +354,37 @@ namespace Tangerine.UI.FilesystemView
 			headerWidget.Clicked = foldButton.Clicked;
 			createOrDestroyOverride.Padding = Thickness.Zero;
 			createOrDestroyOverride.Size = createOrDestroyOverride.MinMaxSize = RowHeight * Vector2.One;
-			computedValueText.AddChangeWatcher(() => yi.GetValue(rules.CommonRules),
-				(o) => computedValueText.Text = rules.FieldValueToString(yi, yi.GetValue(rules.CommonRules)));
+			computedValueText.AddChangeWatcher(() => yi.GetValue(rules.EffectiveRules),
+				(o) => computedValueText.Text = rules.FieldValueToString(yi, yi.GetValue(rules.EffectiveRules)));
+		}
+
+		private static ParticularCookingRules RulesForTarget(CookingRules CookingRules, Target target)
+		{
+			return target == null ? CookingRules.CommonRules : CookingRules.TargetRules[target];
+		}
+
+		private ParticularCookingRules RulesForActiveTarget(CookingRules CookingRules)
+		{
+			return RulesForTarget(CookingRules, activeTarget);
 		}
 
 		private bool IsOverridedByAssociatedCookingRules(CookingRulesCollection crc, string path, Meta.Item yi)
 		{
 			var cr = GetAssociatedCookingRules(crc, path);
-			return cr != null && cr.CommonRules.FieldOverrides.Contains(yi);
+			return cr != null && RulesForActiveTarget(cr).FieldOverrides.Contains(yi);
 		}
 
 		private void CreateOrDestroyFieldOverride(CookingRulesCollection crc, string path, Meta.Item yi, Widget overridesWidget, Button addRemoveField)
 		{
 			var overrided = IsOverridedByAssociatedCookingRules(crc, path, yi);
+			var key = NormalizePath(path);
 			if (overrided) {
 				var cr = GetAssociatedCookingRules(crc, path);
-				cr.CommonRules.FieldOverrides.Remove(yi);
+				var targetRules = RulesForActiveTarget(cr);
+				targetRules.FieldOverrides.Remove(yi);
 				cr.Save();
 				if (!cr.HasOverrides()) {
-					crc[NormalizePath(path)] = cr.Parent;
+					crc[key] = cr.Parent;
 					var acr = GetAssociatedCookingRules(crc, cr.SourceFilename);
 					crc.Remove(NormalizePath(acr.SourceFilename));
 					System.IO.File.Delete(cr.SourceFilename);
@@ -382,16 +402,12 @@ namespace Tangerine.UI.FilesystemView
 				addRemoveField.Texture = IconPool.GetTexture("Filesystem.Plus");
 			} else {
 				var cr = GetAssociatedCookingRules(crc, path, true);
-				cr.CommonRules.Override(yi.Name);
+				var targetRules = RulesForActiveTarget(cr);
+				targetRules.Override(yi.Name);
 				cr.Save();
 				addRemoveField.Texture = IconPool.GetTexture("Filesystem.Cross");
-				CreateOverridesWidgets(yi, cr, overridesWidget);
+				CreateOverridesWidgets(crc, key, activeTarget, yi, cr, overridesWidget);
 			}
-			overridesWidget.Nodes.Sort((a, b) => {
-				var ca = a.Components.Get<PropertyOverrideComponent>();
-				var cb = b.Components.Get<PropertyOverrideComponent>();
-				return string.Compare(ca.Rules.SourceFilename, cb.Rules.SourceFilename);
-			});
 		}
 
 		private static Widget CreateFoldButton(Widget container)
