@@ -79,6 +79,17 @@ namespace Tangerine.UI.FilesystemView
 			return path;
 		}
 
+		private bool IsCookingRulesFileItself(string path)
+		{
+			path = AssetPath.CorrectSlashes(path);
+			if (File.GetAttributes(path) == FileAttributes.Directory) {
+				return false;
+			}
+			bool isPerDirectory = Path.GetFileName(path) == CookingRulesBuilder.CookingRulesFilename;
+			bool isPerFile = path.EndsWith(".txt") && File.Exists(path.Remove(path.Length - 4));
+			return isPerDirectory || isPerFile;
+		}
+
 		private static CookingRules GetAssociatedCookingRules(CookingRulesCollection crc, string path, bool createIfNotExists = false)
 		{
 			Action<string, CookingRules> ignoreRules = (p, r) => {
@@ -266,9 +277,18 @@ namespace Tangerine.UI.FilesystemView
 				Layout = new HBoxLayout(),
 			};
 			container.CompoundPostPresenter.Add(new DelegatePresenter<Widget>((w) => {
-				if (target != activeTarget || rules != crc[key]) {
+				var topmostOverride = crc[key];
+				while (
+					topmostOverride.Parent != null &&
+					!(topmostOverride.CommonRules.FieldOverrides.Contains(yi) ||
+					RulesForActiveTarget(topmostOverride).FieldOverrides.Contains(yi))
+				) {
+					topmostOverride = topmostOverride.Parent;
+				}
+				if (target != activeTarget || rules != topmostOverride) {
 					w.PrepareRendererState();
-					Renderer.DrawLine(10.0f - 30.0f, w.Height * 0.6f, w.Width - 10.0f, w.Height * 0.6f, Color4.Black.Transparentify(0.5f), 1.0f);
+					//Renderer.DrawLine(10.0f - 30.0f, w.Height * 0.6f, w.Width - 10.0f, w.Height * 0.6f, Color4.Black.Transparentify(0.5f), 1.0f);
+					Renderer.DrawRect(Vector2.Zero, w.Size, Color4.Red.Transparentify(0.5f));
 				}
 			}));
 			container.Components.Add(new PropertyOverrideComponent
@@ -354,6 +374,9 @@ namespace Tangerine.UI.FilesystemView
 			headerWidget.Clicked = foldButton.Clicked;
 			createOrDestroyOverride.Padding = Thickness.Zero;
 			createOrDestroyOverride.Size = createOrDestroyOverride.MinMaxSize = RowHeight * Vector2.One;
+			if (IsCookingRulesFileItself(path)) {
+				rules = GetAssociatedCookingRules(crc, path);
+			}
 			computedValueText.AddChangeWatcher(() => yi.GetValue(rules.EffectiveRules),
 				(o) => computedValueText.Text = rules.FieldValueToString(yi, yi.GetValue(rules.EffectiveRules)));
 		}
