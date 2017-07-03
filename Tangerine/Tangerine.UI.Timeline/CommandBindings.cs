@@ -124,10 +124,7 @@ namespace Tangerine.UI.Timeline
 			try {
 				var text = Clipboard.Text;
 				var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(text));
-				Frame frame;
-				using (Theme.Push(DefaultTheme.Instance)) {
-					frame = Serialization.ReadObject<Frame>(Document.Current.Path, stream);
-				}
+				var frame = Serialization.ReadObject<Frame>(Document.Current.Path, stream);
 				foreach (var marker in frame.Markers) {
 					Core.Operations.SetMarker.Perform(Document.Current.Container.DefaultAnimation.Markers, marker);
 				}

@@ -182,7 +182,7 @@ namespace Tangerine.UI.SceneView
 					frame.HitTestTarget = true;
 					var clickArea = new Widget { Size = frame.Size, Anchors = Anchors.LeftRightTopBottom, HitTestTarget = true };
 					frame.AddNode(clickArea);
-					label = new SimpleText { 
+					label = new ThemedSimpleText { 
 						Visible = showLabel,
 						Position = new Vector2(3, 2),
 						Color = ColorTheme.Current.SceneView.Label,

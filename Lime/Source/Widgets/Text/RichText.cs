@@ -109,7 +109,10 @@ namespace Lime
 		{
 			Presenter = DefaultPresenter.Instance;
 			Localizable = true;
-			Theme.Current.Apply(this);
+			Localizable = true;
+			TrimWhitespaces = true;
+			Text = "";
+			SpriteListElementHandler = Lime.ShaderPrograms.ColorfulTextShaderProgram.HandleRichTextSprite;
 		}
 
 		void IText.Submit()

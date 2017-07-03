@@ -19,7 +19,6 @@ namespace Lime
 		public Tab()
 		{
 			HitTestTarget = true;
-			Theme.Current.Apply(this);
 		}
 
 		public bool Active
@@ -70,11 +69,6 @@ namespace Lime
 
 	public class TabBar : Widget
 	{
-		public TabBar()
-		{
-			Theme.Current.Apply(this);
-		}
-
 		public void ActivateTab(Tab tab)
 		{
 			foreach (var t in Nodes.OfType<Tab>()) {

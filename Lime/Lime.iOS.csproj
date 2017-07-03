@@ -258,14 +258,10 @@
     <Compile Include="Source\Types\ColorGradient.cs" />
     <Compile Include="Source\Widgets\EditBox.cs" />
     <Compile Include="Source\Widgets\IPresenter.cs" />
-    <Compile Include="Source\Widgets\TextView.cs" />
     <Compile Include="Source\Widgets\Layout\LayoutCell.cs" />
     <Compile Include="Source\Widgets\Layout\LayoutManager.cs" />
     <Compile Include="Source\Widgets\Layout\LinearAllocator.cs" />
     <Compile Include="Source\Widgets\Layout\VBoxLayout.cs" />
-    <Compile Include="Source\Widgets\Theme\DefaultTheme.cs" />
-    <Compile Include="Source\Widgets\Theme\DesktopTheme.cs" />
-    <Compile Include="Source\Widgets\Theme\ITheme.cs" />
     <Compile Include="Source\Application\Menu\Menu.Win.cs" />
     <Compile Include="Source\Application\MouseCursor\MouseCursor.cs" />
     <Compile Include="Source\Application\MouseCursor\MouseCursor.Mac.cs" />
@@ -275,7 +271,6 @@
     <Compile Include="Source\Application\FileDialog\FileDialog.Win.cs" />
     <Compile Include="Source\Application\FileDialog\FileDialog.cs" />
     <Compile Include="Source\Types\Thickness.cs" />
-    <Compile Include="Source\Widgets\FileChooserButton.cs" />
     <Compile Include="Source\Widgets\HSplitter.cs" />
     <Compile Include="Source\Widgets\VSplitter.cs" />
     <Compile Include="Source\Widgets\Layout\FlowLayout.cs" />
@@ -305,14 +300,12 @@
     <Compile Include="Source\Widgets\KeyboardFocus.cs" />
     <Compile Include="Source\Input\Shortcut.cs" />
     <Compile Include="Source\Application\Menu\Command.cs" />
-    <Compile Include="Source\Widgets\BorderedFrame.cs" />
     <Compile Include="Source\Widgets\CheckBox.cs" />
     <Compile Include="Source\Widgets\DropDownList.cs" />
     <Compile Include="Source\Widgets\TabBar.cs" />
     <Compile Include="Source\GeneratedDeserializersBIN.cs" />
     <Compile Include="Source\Types\Quadrangle.cs" />
     <Compile Include="Source\Types\Transform2.cs" />
-    <Compile Include="Source\Widgets\ListView\ScrollViewWidget.cs" />
     <Compile Include="Source\Widgets\Folder.cs" />
     <Compile Include="Source\Application\Display\Display.Android.cs" />
     <Compile Include="Source\Application\Display\Display.Mac.cs" />
@@ -347,6 +340,21 @@
     <Compile Include="Source\Widgets\Animation\AnimationBlender.cs" />
     <Compile Include="Source\Widgets\Animation\BlendAnimationEngine.cs" />
     <Compile Include="Source\Widgets\IRenderChainBuilder.cs" />
+    <Compile Include="Source\Widgets\Theme\Theme.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedButton.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedCheckBox.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedComboBox.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedDropDownList.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedEditBox.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedFileChooserButton.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedFrame.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedScrollView.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedSimpleText.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedSlider.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedSplitters.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedTabBar.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedTextView.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedWindowWidget.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />
@@ -359,6 +367,9 @@
       <Project>{DF52C768-5E17-4A26-AD77-4BDD31A2224C}</Project>
       <Name>Yuzu.iOS</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Source\Widgets\Theme\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>

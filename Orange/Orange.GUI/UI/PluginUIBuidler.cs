@@ -10,7 +10,7 @@ namespace Orange
 
 	public class PluginPanel : Widget, IPluginPanel
 	{
-		private readonly SimpleText label = new SimpleText { Anchors = Anchors.LeftRight };
+		private readonly SimpleText label = new ThemedSimpleText { Anchors = Anchors.LeftRight };
 
 		public PluginPanel()
 		{
@@ -57,8 +57,8 @@ namespace Orange
 		public CheckBoxWithLabel(string text)
 		{
 			Layout = new HBoxLayout { Spacing = 8 };
-			AddNode(CheckBox = new CheckBox());
-			Label = new SimpleText(text) {
+			AddNode(CheckBox = new ThemedCheckBox());
+			Label = new ThemedSimpleText(text) {
 				HitTestTarget = true,
 				Clicked = CheckBox.Toggle
 			};

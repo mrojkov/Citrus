@@ -139,8 +139,7 @@ namespace Tangerine
 
 		void SetColorTheme(ColorThemeEnum theme)
 		{
-			Theme.Current = new DesktopTheme();
-			DesktopTheme.Colors = theme == ColorThemeEnum.Light ? DesktopTheme.ColorTheme.CreateLightTheme() : DesktopTheme.ColorTheme.CreateDarkTheme();
+			Theme.Colors = theme == ColorThemeEnum.Light ? Theme.ColorTheme.CreateLightTheme() : Theme.ColorTheme.CreateDarkTheme();
 			ColorTheme.Current = theme == ColorThemeEnum.Light ? ColorTheme.CreateLightTheme() : ColorTheme.CreateDarkTheme();
 		}
 
@@ -186,7 +185,7 @@ namespace Tangerine
 
 		static Frame InitializeDocumentArea(DockManager dockManager)
 		{
-			var tabBar = new TabBar { LayoutCell = new LayoutCell { StretchY = 0 } };
+			var tabBar = new ThemedTabBar { LayoutCell = new LayoutCell { StretchY = 0 } };
 			var documentViewContainer = new Frame {
 				ClipChildren = ClipMethod.ScissorTest,
 				Layout = new StackLayout(),
@@ -214,7 +213,7 @@ namespace Tangerine
 			{
 				tabBar.Nodes.Clear();
 				foreach (var doc in Project.Current.Documents) {
-					var tab = new Tab { Closable = true };
+					var tab = new ThemedTab { Closable = true };
 					var currentDocumentChanged = new Property<bool>(() => Document.Current == doc).DistinctUntilChanged().Where(i => i);
 					tab.Tasks.Add(currentDocumentChanged.Consume(_ => tabBar.ActivateTab(tab)));
 					tab.AddChangeWatcher(() => doc.Path, _ => RefreshTabText(doc, tab));

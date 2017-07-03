@@ -232,10 +232,7 @@ namespace Tangerine.Core.Operations
 				throw new InvalidOperationException();
 			}
 			var ctr = nodeType.GetConstructor(Type.EmptyTypes);
-			Node node;
-			using (Theme.Push(DefaultTheme.Instance)) {
-				node = (Node)ctr.Invoke(new object[] {});
-			}
+			var node = (Node)ctr.Invoke(new object[] {});
 			Document.Current.Decorate(node);
 			var attrs = ClassAttributes<TangerineNodeBuilderAttribute>.Get(nodeType);
 			if (attrs?.MethodName != null) {

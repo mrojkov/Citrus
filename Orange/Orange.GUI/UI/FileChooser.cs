@@ -13,11 +13,11 @@ namespace Orange
 		public FileChooser()
 		{
 			Layout = new HBoxLayout { Spacing = 4 };
-			editor = new EditBox {
+			editor = new ThemedEditBox {
 				LayoutCell = new LayoutCell(Alignment.Center)
 			};
 			AddNode(editor);
-			var button = new Button {
+			var button = new ThemedButton {
 				Text = "...",
 				MinMaxWidth = 20,
 				Draggable = true,

@@ -43,7 +43,7 @@ namespace Tangerine.UI
 			var window = new Window(new WindowOptions { ClientSize = windowSize, FixedSize = false, Title = "Tangerine" });
 			window.UnhandledExceptionOnUpdate += HandleException;
 			SetDropHandler(window);
-			MainWindowWidget = new InvalidableWindowWidget(window) {
+			MainWindowWidget = new ThemedInvalidableWindowWidget(window) {
 				Id = "MainWindow",
 				Layout = new VBoxLayout(),
 				Size = windowSize,
@@ -124,7 +124,7 @@ namespace Tangerine.UI
 			ToolbarArea.Unlink();
 			DocumentArea.Unlink();
 			MainWindowWidget.Nodes.Add(ToolbarArea);
-			Splitter currentContainer = new HSplitter();
+			Splitter currentContainer = new ThemedHSplitter();
 			MainWindowWidget.Nodes.Add(currentContainer);
 			int insertAt = 0;
 			float stretch = 0;
@@ -134,10 +134,10 @@ namespace Tangerine.UI
 					p.RootWidget.Unlink();
 					Splitter splitter;
 					if (p.Placement.Site == DockSite.Left || p.Placement.Site == DockSite.Right) {
-						splitter = new HSplitter();
+						splitter = new ThemedHSplitter();
 						splitter.Stretches.Add(p.Placement.DockedSize.X);
 					} else {
-						splitter = new VSplitter();
+						splitter = new ThemedVSplitter();
 						splitter.Stretches.Add(p.Placement.DockedSize.Y);
 					}
 					splitter.DragEnded += p.RefreshDockedSize;
@@ -181,7 +181,7 @@ namespace Tangerine.UI
 						window.Resized += (deviceRotated) => {
 							p.Placement.UndockedSize = window.ClientSize;
 						};
-						p.WindowWidget = new InvalidableWindowWidget(window) {
+						p.WindowWidget = new ThemedInvalidableWindowWidget(window) {
 							Layout = new StackLayout(),
 						};
 						p.RootWidget.Unlink();

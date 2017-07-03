@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using Lime;
@@ -14,10 +14,10 @@ namespace Tangerine.UI
 		public readonly Frame RootWidget;
 		readonly EditBox searchStringEditor;
 		readonly Widget resultPane;
-		readonly ScrollViewWidget scrollView;
+		readonly ThemedScrollView scrollView;
 		private List<Node> results = new List<Node>();
 		private int selectedIndex;
-		private int rowHeight = DesktopTheme.Metrics.TextHeight;
+		private int rowHeight = Theme.Metrics.TextHeight;
 
 		class Cmds
 		{
@@ -31,11 +31,11 @@ namespace Tangerine.UI
 		public SearchPanel(Widget rootWidget)
 		{
 			PanelWidget = rootWidget;
-			scrollView = new ScrollViewWidget();
+			scrollView = new ThemedScrollView();
 			RootWidget = new Frame { Id = "SearchPanel",
 				Padding = new Thickness(4),
 				Layout = new VBoxLayout { Spacing = 4 },
-				Nodes = { (searchStringEditor = new EditBox()), scrollView }
+				Nodes = { (searchStringEditor = new ThemedEditBox()), scrollView }
 			};
 			resultPane = scrollView.Content;
 			RootWidget.AddChangeWatcher(() => searchStringEditor.Text, RefreshResultPane);
@@ -46,7 +46,7 @@ namespace Tangerine.UI
 					Renderer.DrawRect(
 						0, rowHeight * selectedIndex,
 						w.Width, (selectedIndex + 1) * rowHeight, 
-						DesktopTheme.Colors.SelectedBackground);
+						Theme.Colors.SelectedBackground);
 				}
 			}));
 			scrollView.LateTasks.Add(new KeyRepeatHandler(ScrollView_KeyRepeated));
@@ -130,9 +130,9 @@ namespace Tangerine.UI
 				}
 			};
 			foreach (var r in results) {
-				resultPane.Nodes.Add(new SimpleText(r.Id));
-				resultPane.Nodes.Add(new SimpleText(GetTypeName(r)));
-				resultPane.Nodes.Add(new SimpleText(GetContainerPath(r)));
+				resultPane.Nodes.Add(new ThemedSimpleText(r.Id));
+				resultPane.Nodes.Add(new ThemedSimpleText(GetTypeName(r)));
+				resultPane.Nodes.Add(new ThemedSimpleText(GetContainerPath(r)));
 			}
 			selectedIndex = 0;
 			scrollView.ScrollPosition = scrollView.MinScrollPosition;

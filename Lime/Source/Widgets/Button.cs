@@ -80,12 +80,6 @@ namespace Lime
 		{
 			HitTestTarget = true;
 			Input.AcceptMouseBeyondWidget = false;
-			Theme.Current.Apply(this);
-		}
-
-		public Button(string text) : this()
-		{
-			Text = text;
 		}
 
 		private IEnumerator<int> InitialState()

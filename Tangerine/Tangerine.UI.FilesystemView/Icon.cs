@@ -25,7 +25,7 @@ namespace Tangerine.UI.FilesystemView
 					MinMaxSize = new Vector2(16, 16),
 					Texture = SystemIconTextureProvider.Instance.GetTexture(path),
 				},
-				(text = new SimpleText {
+				(text = new ThemedSimpleText {
 					ForceUncutText = false,
 					OverflowMode = TextOverflowMode.Ellipsis,
 					Text = Path.GetFileName(path),

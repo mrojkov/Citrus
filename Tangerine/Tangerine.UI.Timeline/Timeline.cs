@@ -96,11 +96,11 @@ namespace Tangerine.UI.Timeline
 		void InitializeWidgets()
 		{
 			RootWidget.Layout = new StackLayout();
-			RootWidget.AddNode(new VSplitter {
+			RootWidget.AddNode(new ThemedVSplitter {
 				Stretches = Splitter.GetStretchesFromDictionary(UserPreferences.Instance.Splitters, "TimelineVSplitter", 0.5f, 1),
 				Nodes = {
 					Overview.RootWidget,
-					new HSplitter {
+					new ThemedHSplitter {
 						Stretches = Splitter.GetStretchesFromDictionary(UserPreferences.Instance.Splitters, "TimelineHSplitter", 0.3f, 1),
 						Nodes = {
 							new Widget {

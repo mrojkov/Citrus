@@ -1,18 +1,21 @@
-﻿#if WIN || MAC
+#if !ANDROID && !iOS
 using System;
-using System.Collections.Generic;
 using System.Text;
+using System.Collections.Generic;
 
 namespace Lime
 {
-	public class TextView : ScrollViewWidget
+	public class ThemedTextView : ThemedScrollView
 	{
 		private List<SimpleText> lines = new List<SimpleText>();
-		private DesktopTheme desktopTheme = new DesktopTheme();
 
-		public TextView()
+		public override bool IsNotDecorated() => false;
+
+		public ThemedTextView()
 		{
-			Theme.Current.Apply(this);
+			Behaviour.Content.Padding = new Thickness(4);
+			Behaviour.Content.Layout = new VBoxLayout();
+			Behaviour.Frame.CompoundPresenter.Add(new ThemedFramePresenter(Theme.Colors.WhiteBackground, Theme.Colors.ControlBorder));
 		}
 
 		public void Append(string text)
@@ -23,11 +26,7 @@ namespace Lime
 					lastLine.Text += l;
 					lastLine = null;
 				} else {
-					SimpleText line;
-					// TODO: remove when proper fix is ready
-					using (Theme.Push(desktopTheme)) {
-						line = new SimpleText(l);
-					}
+					var line = new ThemedSimpleText(l);
 					lines.Add(line);
 					Behaviour.Content.AddNode(line);
 				}

@@ -3,11 +3,10 @@ using Lime;
 
 namespace Orange
 {
-	public class PlatformPicker : DropDownList
+	public class PlatformPicker : ThemedDropDownList
 	{
 		public PlatformPicker()
 		{
-			Theme.Current.Apply(this, typeof(DropDownList));
 			Changed += args => SelectedTarget = (Target) args.Value;
 			Reload();
 		}

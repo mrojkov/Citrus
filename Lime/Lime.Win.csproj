@@ -199,7 +199,6 @@
     <Compile Include="Source\Localization\LocalizationDictionaryTextSerializer.cs" />
     <Compile Include="Source\Version.cs" />
     <Compile Include="Source\Widgets\EditorUtils.cs" />
-    <Compile Include="Source\Widgets\FileChooserButton.cs" />
     <Compile Include="Source\Widgets\Folder.cs" />
     <Compile Include="Source\Widgets\HSplitter.cs" />
     <Compile Include="Source\Widgets\IRenderChainBuilder.cs" />
@@ -208,7 +207,6 @@
     <Compile Include="Source\Widgets\Layout\LayoutDebugPresenter.cs" />
     <Compile Include="Source\Widgets\Layout\FlowLayout.cs" />
     <Compile Include="Source\Widgets\3D\WidgetAdapter3D.cs" />
-    <Compile Include="Source\Widgets\ListView\ScrollViewWidget.cs" />
     <Compile Include="Source\Widgets\MorphableMesh.cs" />
     <Compile Include="Source\Widgets\MorphableMeshBuilder.cs" />
     <Compile Include="Source\Widgets\NodeReference.cs" />
@@ -366,14 +364,10 @@
     <Compile Include="Source\Types\ColorGradient.cs" />
     <Compile Include="Source\Widgets\EditBox.cs" />
     <Compile Include="Source\Widgets\IPresenter.cs" />
-    <Compile Include="Source\Widgets\TextView.cs" />
     <Compile Include="Source\Widgets\Layout\LayoutCell.cs" />
     <Compile Include="Source\Widgets\Layout\LayoutManager.cs" />
     <Compile Include="Source\Widgets\Layout\LinearAllocator.cs" />
     <Compile Include="Source\Widgets\Layout\VBoxLayout.cs" />
-    <Compile Include="Source\Widgets\Theme\DefaultTheme.cs" />
-    <Compile Include="Source\Widgets\Theme\DesktopTheme.cs" />
-    <Compile Include="Source\Widgets\Theme\ITheme.cs" />
     <Compile Include="Source\Graphics\Unity\MovieTexture.cs" />
     <Compile Include="Source\Types\MonoMac\CG.cs" />
     <Compile Include="Source\Widgets\Layout\StackLayout.cs" />
@@ -383,7 +377,6 @@
     <Compile Include="Source\Application\MouseCursor\StockCursors.Win.cs" />
     <Compile Include="Source\Widgets\CheckBox.cs" />
     <Compile Include="Source\Application\Menu\Command.cs" />
-    <Compile Include="Source\Widgets\BorderedFrame.cs" />
     <Compile Include="Source\Widgets\TabBar.cs" />
     <Compile Include="Source\Types\Quadrangle.cs" />
     <Compile Include="Source\Types\Transform2.cs" />
@@ -394,6 +387,21 @@
     <Compile Include="Source\Widgets\Animation\AnimationBlender.cs" />
     <Compile Include="Source\Widgets\Animation\BlendAnimationEngine.cs" />
     <Compile Include="Source\Graphics\Bitmap.Apple.cs" />
+    <Compile Include="Source\Widgets\Theme\Theme.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedButton.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedCheckBox.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedComboBox.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedDropDownList.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedEditBox.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedFileChooserButton.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedFrame.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedScrollView.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedSimpleText.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedSlider.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedSplitters.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedTabBar.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedTextView.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedWindowWidget.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\3rdParty\OpenAL\OpenAL32.dll">

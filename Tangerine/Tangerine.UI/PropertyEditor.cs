@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using Lime;
@@ -58,9 +58,9 @@ namespace Tangerine.UI
 			TangerineAttribute = PropertyAttributes<TangerineKeyframeColorAttribute>.Get(Type, PropertyName) ?? new TangerineKeyframeColorAttribute(0);
 			PropertyInfo = Type.GetProperty(PropertyName);
 			PropertySetter = SetProperty;
-			NumericEditBoxFactory = () => new NumericEditBox();
-			DropDownListFactory = () => new DropDownList();
-			EditBoxFactory = () => new EditBox();
+			NumericEditBoxFactory = () => new ThemedNumericEditBox();
+			DropDownListFactory = () => new ThemedDropDownList();
+			EditBoxFactory = () => new ThemedEditBox();
 		}
 
 		public PropertyEditorParams(Widget inspectorPane, object obj, string propertyName, string displayName = null)
@@ -87,7 +87,7 @@ namespace Tangerine.UI
 			};
 			editorParams.InspectorPane.AddNode(ContainerWidget);
 			if (editorParams.ShowLabel) {
-				PropertyLabel = new SimpleText
+				PropertyLabel = new ThemedSimpleText
 				{
 					Text = editorParams.DisplayName ?? editorParams.PropertyName,
 					VAlignment = VAlignment.Center,
@@ -110,7 +110,7 @@ namespace Tangerine.UI
 				if (popupMenu || PropertyLabel.Input.WasMouseReleased(0)) {
 					PropertyLabel.SetFocus();
 				}
-				PropertyLabel.Color = PropertyLabel.IsFocused() ? DesktopTheme.Colors.KeyboardFocusBorder : DesktopTheme.Colors.BlackText;
+				PropertyLabel.Color = PropertyLabel.IsFocused() ? Theme.Colors.KeyboardFocusBorder : Theme.Colors.BlackText;
 				if (popupMenu) {
 					// Wait until the label actually change its color.
 					yield return null;
@@ -433,7 +433,7 @@ namespace Tangerine.UI
 
 		public BooleanPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
-			checkBox = new CheckBox { LayoutCell = new LayoutCell(Alignment.LeftCenter) };
+			checkBox = new ThemedCheckBox { LayoutCell = new LayoutCell(Alignment.LeftCenter) };
 			ContainerWidget.AddNode(checkBox);
 			checkBox.Changed += value => SetProperty(value);
 			checkBox.AddChangeWatcher(CoalescedPropertyValue(), v => checkBox.Checked = v);
@@ -534,7 +534,7 @@ namespace Tangerine.UI
 			public ColorBoxButton(IDataflowProvider<Color4> colorProvider)
 			{
 				Nodes.Clear();
-				Size = MinMaxSize = new Vector2(25, DesktopTheme.Metrics.DefaultButtonSize.Y);
+				Size = MinMaxSize = new Vector2(25, Theme.Metrics.DefaultButtonSize.Y);
 				var color = colorProvider.GetDataflow();
 				PostPresenter = new DelegatePresenter<Widget>(widget => {
 					widget.PrepareRendererState();
@@ -564,7 +564,7 @@ namespace Tangerine.UI
 				Nodes = {
 					(editor = editorParams.EditBoxFactory()),
 					new HSpacer(4),
-					(button = new Button {
+					(button = new ThemedButton {
 						Text = "...",
 						MinMaxWidth = 20,
 						Draggable = true,
@@ -691,7 +691,7 @@ namespace Tangerine.UI
 
 		public TriggerPropertyEditor(IPropertyEditorParams editorParams, bool multiline = false) : base(editorParams)
 		{
-			comboBox = new ComboBox { LayoutCell = new LayoutCell(Alignment.Center) };
+			comboBox = new ThemedComboBox { LayoutCell = new LayoutCell(Alignment.Center) };
 			ContainerWidget.AddNode(comboBox);
 			comboBox.Changed += ComboBox_Changed;
 			if (editorParams.Objects.Count == 1) {

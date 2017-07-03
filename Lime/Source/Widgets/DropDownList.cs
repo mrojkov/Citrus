@@ -166,20 +166,15 @@ namespace Lime
 
 	public class DropDownList : CommonDropDownList
 	{
-		public DropDownList()
-		{
-			Theme.Current.Apply(this);
-		}
-
 		protected override bool ShouldHandleSpacebar() => true;
 	}
 
 	public class ComboBox : CommonDropDownList
 	{
-		public ComboBox()
+		protected override void Awake()
 		{
-			Theme.Current.Apply(this);
 			((EditBox)TextWidget).Submitted += TextWidget_Submitted;
+			base.Awake();
 		}
 
 		private void TextWidget_Submitted(string text)

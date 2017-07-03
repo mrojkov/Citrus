@@ -22,7 +22,6 @@ namespace Lime
 		public CheckBox()
 		{
 			Input.AcceptMouseBeyondWidget = false;
-			Theme.Current.Apply(this);
 		}
 
 		protected override void Awake()

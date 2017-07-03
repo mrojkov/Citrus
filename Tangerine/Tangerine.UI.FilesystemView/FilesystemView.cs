@@ -13,7 +13,7 @@ namespace Tangerine.UI.FilesystemView
 		public static FilesystemView Instance;
 		private Widget dockPanelWidget;
 		private Widget rootWidget;
-		private ScrollViewWidget scrollView;
+		private ThemedScrollView scrollView;
 		private readonly FilesystemToolbar toolbar;
 		private readonly Model model = new Model();
 		private Vector2 rectSelectionBeginPoint;
@@ -91,7 +91,7 @@ namespace Tangerine.UI.FilesystemView
 			dockPanelWidget = dockPanel.ContentWidget;
 			rootWidget = new Widget();
 			toolbar = new FilesystemToolbar();
-			scrollView = new ScrollViewWidget();
+			scrollView = new ThemedScrollView();
 			rootWidget.AddChangeWatcher(() => model.CurrentPath, (path) => dockPanel.Title = $"Filesystem: {path}");
 			crEditor = new CookingRulesEditor(NavigateAndSelect);
 			preview = new Preview();
@@ -117,7 +117,7 @@ namespace Tangerine.UI.FilesystemView
 			scrollView.Updated += ScrollViewUpdated;
 			scrollView.Content.Presenter = new DelegatePresenter<ScrollView.ScrollViewContentWidget>((canvas) => {
 				canvas.PrepareRendererState();
-				Renderer.DrawRect(Vector2.Zero, canvas.Size, DesktopTheme.Colors.WhiteBackground);
+				Renderer.DrawRect(Vector2.Zero, canvas.Size, Theme.Colors.WhiteBackground);
 			});
 			rootWidget.AddChangeWatcher(() => rectSelectionEndPoint, WhenSelectionRectChanged);
 			rootWidget.AddChangeWatcher(() => WidgetContext.Current.NodeUnderMouse, (value) => {
@@ -133,15 +133,13 @@ namespace Tangerine.UI.FilesystemView
 				preview.ClearTextureCache();
 			});
 			rootWidget.Layout = new VBoxLayout();
-			rootWidget.AddNode(new HSplitter {
-				Layout = new HBoxLayout(),
+			rootWidget.AddNode(new ThemedHSplitter {
 				Nodes = {
 					(new Widget {
 						Layout = new VBoxLayout(),
 						Nodes = {
 							toolbar,
-							new VSplitter {
-								Layout = new VBoxLayout(),
+							new ThemedVSplitter {
 								Nodes = {
 									scrollView,
 									preview.RootWidget,
@@ -231,14 +229,14 @@ namespace Tangerine.UI.FilesystemView
 		{
 			if (selection.Contains(icon.FilesystemPath)) {
 				icon.PrepareRendererState();
-				Renderer.DrawRect(Vector2.Zero, icon.Size, DesktopTheme.Colors.SelectedBackground.Transparentify(0.5f));
-				Renderer.DrawRectOutline(Vector2.Zero, icon.Size, DesktopTheme.Colors.SelectedBackground);
+				Renderer.DrawRect(Vector2.Zero, icon.Size, Theme.Colors.SelectedBackground.Transparentify(0.5f));
+				Renderer.DrawRectOutline(Vector2.Zero, icon.Size, Theme.Colors.SelectedBackground);
 			} else if (icon.IsMouseOver()) {
 				icon.PrepareRendererState();
 				Renderer.DrawRect(
 					Vector2.Zero,
 					icon.Size,
-					DesktopTheme.Colors.SelectedBackground.Transparentify(0.8f));
+					Theme.Colors.SelectedBackground.Transparentify(0.8f));
 			}
 		}
 
@@ -306,8 +304,8 @@ namespace Tangerine.UI.FilesystemView
 					return;
 				}
 				canvas.PrepareRendererState();
-				Renderer.DrawRect(rectSelectionBeginPoint, rectSelectionEndPoint, DesktopTheme.Colors.SelectedBackground.Transparentify(0.5f));
-				Renderer.DrawRectOutline(rectSelectionBeginPoint, rectSelectionEndPoint, DesktopTheme.Colors.SelectedBackground.Darken(0.2f));
+				Renderer.DrawRect(rectSelectionBeginPoint, rectSelectionEndPoint, Theme.Colors.SelectedBackground.Transparentify(0.5f));
+				Renderer.DrawRectOutline(rectSelectionBeginPoint, rectSelectionEndPoint, Theme.Colors.SelectedBackground.Darken(0.2f));
 		}
 
 		public void Attach()

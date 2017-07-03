@@ -22,12 +22,12 @@ namespace Tangerine.UI
 				Visible = false,
 				Style = WindowStyle.Dialog
 			});
-			rootWidget = new InvalidableWindowWidget(window) {
+			rootWidget = new ThemedInvalidableWindowWidget(window) {
 				LayoutBasedWindowSize = true,
 				Padding = new Thickness(8),
 				Layout = new VBoxLayout { Spacing = 16 },
 				Nodes = {
-					new SimpleText(text) {
+					new ThemedSimpleText(text) {
 						Padding = new Thickness(4)
 					},
 					(buttonsPanel = new Widget {
@@ -46,7 +46,7 @@ namespace Tangerine.UI
 				});
 			}
 			for (int i = 0; i < buttons.Length; i++) {
-				var button = new Button { Text = buttons[i] };
+				var button = new ThemedButton { Text = buttons[i] };
 				int j = i;
 				button.Clicked += () => Close(j);
 				buttonsPanel.AddNode(button);

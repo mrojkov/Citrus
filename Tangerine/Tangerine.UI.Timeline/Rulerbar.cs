@@ -47,12 +47,12 @@ namespace Tangerine.UI.Timeline
 			for (int i = 0; i < Timeline.Instance.ColumnCount; i++) {
 				var x = i * TimelineMetrics.ColWidth + 0.5f;
 				if (i % 10 == 0) {
-					float textHeight = DesktopTheme.Metrics.TextHeight;
+					float textHeight = Theme.Metrics.TextHeight;
 					float y = (RootWidget.Height - textHeight) / 2;
 					Renderer.DrawTextLine(
 						new Vector2(x, y), i.ToString(),
-						DesktopTheme.Metrics.TextHeight, 
-						DesktopTheme.Colors.BlackText);
+						Theme.Metrics.TextHeight, 
+						Theme.Colors.BlackText);
 					Renderer.DrawLine(x, 0, x, RootWidget.Height, ColorTheme.Current.TimelineRuler.Notchings);
 				}
 			}
@@ -77,12 +77,12 @@ namespace Tangerine.UI.Timeline
 			r.A.Y = r.B.Y - 4;
 			Renderer.DrawRect(r.A, r.B, GetMarkerColor(marker));
 			if (!string.IsNullOrWhiteSpace(marker.Id)) {
-				var h = DesktopTheme.Metrics.TextHeight;
+				var h = Theme.Metrics.TextHeight;
 				var extent = Renderer.MeasureTextLine(FontPool.Instance.DefaultFont, marker.Id, h) + Vector2.One;
 				var pos = new Vector2(r.A.X, r.A.Y - extent.Y);
-				Renderer.DrawRect(pos, pos + extent, DesktopTheme.Colors.WhiteBackground);
-				Renderer.DrawRectOutline(pos, pos + extent, DesktopTheme.Colors.ControlBorder);
-				Renderer.DrawTextLine(pos, marker.Id, h, DesktopTheme.Colors.BlackText);
+				Renderer.DrawRect(pos, pos + extent, Theme.Colors.WhiteBackground);
+				Renderer.DrawRectOutline(pos, pos + extent, Theme.Colors.ControlBorder);
+				Renderer.DrawTextLine(pos, marker.Id, h, Theme.Colors.BlackText);
 			}
 		}
 

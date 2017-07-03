@@ -48,7 +48,6 @@ namespace Lime
 			Value = 0;
 			Step = 0;
 			Enabled = true;
-			Theme.Current.Apply(this);
 		}
 
 		public Widget Thumb

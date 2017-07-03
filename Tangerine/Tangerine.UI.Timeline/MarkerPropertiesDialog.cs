@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Lime;
@@ -26,7 +26,7 @@ namespace Tangerine.UI.Timeline
 			EditBox jumpToEditor;
 			Result result;
 			var window = new Window(new WindowOptions { FixedSize = true, Title = "Marker properties", Visible = false, Style = WindowStyle.Dialog });
-			var rootWidget = new InvalidableWindowWidget(window) {
+			var rootWidget = new ThemedInvalidableWindowWidget(window) {
 				LayoutBasedWindowSize = true,
 				Padding = new Thickness(8),
 				Layout = new VBoxLayout { Spacing = 16 },
@@ -42,10 +42,10 @@ namespace Tangerine.UI.Timeline
 							}
 						},
 						Nodes = {
-							new SimpleText("Marker Id"),
-							(markerIdEditor = new EditBox { Text = marker.Id, MinSize = DesktopTheme.Metrics.DefaultEditBoxSize * new Vector2(2, 1) }),
-							new SimpleText("Action"),
-							(actionSelector = new DropDownList {
+							new ThemedSimpleText("Marker Id"),
+							(markerIdEditor = new ThemedEditBox { Text = marker.Id, MinSize = Theme.Metrics.DefaultEditBoxSize * new Vector2(2, 1) }),
+							new ThemedSimpleText("Action"),
+							(actionSelector = new ThemedDropDownList {
 								Items = {
 									new DropDownList.Item("Play", MarkerAction.Play),
 									new DropDownList.Item("Jump", MarkerAction.Jump),
@@ -54,22 +54,22 @@ namespace Tangerine.UI.Timeline
 								},
 								Value = marker.Action
 							}),
-							new SimpleText("Jump to"),
-							(jumpToEditor = new EditBox { Text = marker.JumpTo }),
+							new ThemedSimpleText("Jump to"),
+							(jumpToEditor = new ThemedEditBox { Text = marker.JumpTo }),
 						}
 					},
 					(buttonsPanel = new Widget {
 						Layout = new HBoxLayout { Spacing = 8 },
 						LayoutCell = new LayoutCell(Alignment.RightCenter),
 						Nodes = {
-							(okButton = new Button("Ok")),
-							(cancelButton = new Button("Cancel")),
+							(okButton = new ThemedButton("Ok")),
+							(cancelButton = new ThemedButton("Cancel")),
 						}
 					})
 				}
 			};
 			if (canDelete) {
-				deleteButton = new Button("Delete");
+				deleteButton = new ThemedButton("Delete");
 				buttonsPanel.AddNode(deleteButton);
 				deleteButton.Clicked += () => {
 					result = Result.Delete;
