@@ -15,7 +15,7 @@ namespace Orange
 
 		public static AssetBundle AssetBundle { get { return AssetBundle.Instance; } }
 		public static TargetPlatform Platform;
-		private static Dictionary<string, CookingRules> cookingRulesMap;
+		private static IReadOnlyDictionary<string, ICookingRules> cookingRulesMap;
 
 		private static string atlasesPostfix = string.Empty;
 
@@ -71,7 +71,7 @@ namespace Orange
 		public static void Cook(TargetPlatform platform)
 		{
 			AssetCooker.Platform = platform;
-			cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, The.Workspace.ActiveTarget);
+			cookingRulesMap = (IReadOnlyDictionary<string, ICookingRules>)CookingRulesBuilder.Build(The.Workspace.AssetFiles, The.Workspace.ActiveTarget);
 			var extraBundles = new HashSet<string>();
 			foreach (var dictionaryItem in cookingRulesMap) {
 				foreach (var bundle in dictionaryItem.Value.Bundle) {
@@ -127,7 +127,7 @@ namespace Orange
 		{
 			Console.WriteLine("------------- Cooking Assets ({0}) -------------", bundleName);
 			The.Workspace.AssetFiles.EnumerationFilter = (info) => {
-				CookingRules rules;
+				ICookingRules rules;
 				if (cookingRulesMap.TryGetValue(info.Path, out rules)) {
 					if (rules.Ignore)
 						return false;
@@ -371,7 +371,7 @@ namespace Orange
 						try {
 							if (converter(srcPath, dstPath)) {
 								Console.WriteLine((bundled ? "* " : "+ ") + dstPath);
-								CookingRules rules = null;
+								ICookingRules rules = null;
 								if (!string.IsNullOrEmpty(dstPath)) {
 									cookingRulesMap.TryGetValue(dstPath, out rules);
 								}
@@ -398,7 +398,7 @@ namespace Orange
 			public Bitmap Bitmap;
 			public IntRectangle AtlasRect;
 			public bool Allocated;
-			public CookingRules CookingRules;
+			public ICookingRules CookingRules;
 			public string SourceExtension;
 		}
 
@@ -722,7 +722,7 @@ namespace Orange
 			Console.WriteLine($"WARNING: '{path}' downscaled to {newWidth}x{newHeight}");
 		}
 
-		private static bool ShouldDownscale(Bitmap texture, CookingRules rules)
+		private static bool ShouldDownscale(Bitmap texture, ICookingRules rules)
 		{
 			if (rules.TextureScaleFactor != 1.0f) {
 				int scaleThreshold = Platform == TargetPlatform.Android ? 32 : 256;
@@ -733,7 +733,7 @@ namespace Orange
 			return false;
 		}
 
-		private static Bitmap DownscaleTexture(Bitmap texture, string path, CookingRules rules)
+		private static Bitmap DownscaleTexture(Bitmap texture, string path, ICookingRules rules)
 		{
 			const int MaxSize = 1024;
 			int scaleThreshold = Platform == TargetPlatform.Android ? 32 : 256;
