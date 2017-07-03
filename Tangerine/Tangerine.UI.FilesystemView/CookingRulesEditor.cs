@@ -384,8 +384,10 @@ namespace Tangerine.UI.FilesystemView
 				targetRules.FieldOverrides.Remove(yi);
 				cr.Save();
 				if (!cr.HasOverrides()) {
-					crc[key] = cr.Parent;
 					var acr = GetAssociatedCookingRules(crc, cr.SourceFilename);
+					if (!acr.SourceFilename.EndsWith(key)) {
+						crc[key] = cr.Parent;
+					}
 					crc.Remove(NormalizePath(acr.SourceFilename));
 					System.IO.File.Delete(cr.SourceFilename);
 				}
