@@ -183,12 +183,14 @@ namespace Lime
 		public SimpleText()
 		{
 			Presenter = DefaultPresenter.Instance;
-			Theme.Current.Apply(this);
-		}
-
-		public SimpleText(string text) : this()
-		{
-			Text = text;
+			Font = new SerializableFont();
+			FontHeight = 15;
+			TextColor = Color4.White;
+			ForceUncutText = true;
+			Localizable = true;
+			TrimWhitespaces = true;
+			Text = "";
+			SpriteListElementHandler = ShaderPrograms.ColorfulTextShaderProgram.HandleSimpleTextSprite;
 		}
 
 		void IText.Submit()

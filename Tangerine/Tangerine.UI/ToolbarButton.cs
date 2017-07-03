@@ -63,7 +63,7 @@ namespace Tangerine.UI
 			highlightable = true;
 			Nodes.Clear();
 			Padding = new Thickness(2);
-			Size = MinMaxSize = DesktopTheme.Metrics.DefaultToolbarButtonSize;
+			Size = MinMaxSize = Theme.Metrics.DefaultToolbarButtonSize;
 			DefaultAnimation.AnimationEngine = new AnimationEngineDelegate {
 				OnRunAnimation = (animation, markerId) => {
 					if (markerId == "Focus") {
@@ -131,8 +131,8 @@ namespace Tangerine.UI
 				LayoutCell = new LayoutCell { Ignore = true },
 				Layout = new StackLayout(),
 				Nodes = {
-					new SimpleText { Text = Tip, Padding = new Thickness(4) },
-					new BorderedFrame()
+					new ThemedSimpleText { Text = Tip, Padding = new Thickness(4) },
+					new ThemedFrame()
 				}
 			};
 			tip.Updated += _ => tip.Size = tip.EffectiveMinSize;

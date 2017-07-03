@@ -85,9 +85,9 @@ namespace Tangerine.UI.Inspector
 					var label = new Widget {
 						LayoutCell = new LayoutCell { StretchY = 0 },
 						Layout = new StackLayout(),
-						MinHeight = DesktopTheme.Metrics.DefaultButtonSize.Y,
+						MinHeight = Theme.Metrics.DefaultButtonSize.Y,
 						Nodes = {
-							new SimpleText {
+							new ThemedSimpleText {
 								Text = text,
 								Padding = new Thickness(4, 0),
 								VAlignment = VAlignment.Center,
@@ -144,11 +144,10 @@ namespace Tangerine.UI.Inspector
 			) { IgnorePadding = true });
 		}
 
-		class TransactionalNumericEditBox : NumericEditBox
+		class TransactionalNumericEditBox : ThemedNumericEditBox
 		{
 			public TransactionalNumericEditBox()
 			{
-				Theme.Current.Apply(this, typeof(NumericEditBox));
 				BeginSpin += () => Document.Current.History.BeginTransaction();
 				EndSpin += () => Document.Current.History.EndTransaction();
 			}

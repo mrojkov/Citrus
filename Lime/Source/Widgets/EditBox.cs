@@ -42,13 +42,7 @@ namespace Lime
 		protected void OnSubmit() => Submitted?.Invoke(Text);
 	}
 
-	public class EditBox : CommonEditBox
-	{
-		public EditBox()
-		{
-			Theme.Current.Apply(this);
-		}
-	}
+	public class EditBox : CommonEditBox { }
 
 	public class NumericEditBox : CommonEditBox
 	{
@@ -69,11 +63,6 @@ namespace Lime
 				Text = value.ToString();
 				OnSubmit();
 			}
-		}
-
-		public NumericEditBox()
-		{
-			Theme.Current.Apply(this);
 		}
 
 		public void RaiseBeginSpin() => BeginSpin?.Invoke();

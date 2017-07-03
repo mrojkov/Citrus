@@ -23,19 +23,19 @@ namespace Tangerine
 				Title = "Preferences",
 				MinimumDecoratedSize = new Vector2(400, 300)
 			});
-			rootWidget = new InvalidableWindowWidget(window) {
+			rootWidget = new ThemedInvalidableWindowWidget(window) {
 				Padding = new Thickness(8),
 				Layout = new VBoxLayout(),
 				Nodes = {
-					new TabBar {
+					new ThemedTabBar {
 						Nodes = {
-							new Tab {
+							new ThemedTab {
 								Text = "General",
 								Active = true
 							}
 						}
 					},
-					new BorderedFrame {
+					new ThemedFrame {
 						Padding = new Thickness(8),
 						LayoutCell = new LayoutCell { StretchY = float.MaxValue },
 						Layout = new StackLayout(),
@@ -48,8 +48,8 @@ namespace Tangerine
 						Layout = new HBoxLayout { Spacing = 8 },
 						LayoutCell = new LayoutCell(Alignment.RightCenter),
 						Nodes = {
-							(okButton = new Button { Text = "Ok" }),
-							(cancelButton = new Button { Text = "Cancel" }),
+							(okButton = new ThemedButton { Text = "Ok" }),
+							(cancelButton = new ThemedButton { Text = "Cancel" }),
 						}
 					}
 				}
@@ -77,7 +77,7 @@ namespace Tangerine
 
 		Widget CreateGenericPane()
 		{
-			var pane = new ScrollViewWidget();
+			var pane = new ThemedScrollView();
 			pane.Content.Layout = new VBoxLayout { Spacing = 4 };
 			new EnumPropertyEditor<ColorThemeEnum>(
 				new PropertyEditorParams(pane.Content, UserPreferences.Instance, "Theme", "User interface theme"));

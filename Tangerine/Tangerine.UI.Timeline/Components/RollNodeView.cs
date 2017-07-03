@@ -25,12 +25,12 @@ namespace Tangerine.UI.Timeline.Components
 		{
 			this.row = row;
 			nodeData = row.Components.Get<NodeRow>();
-			label = new SimpleText {
+			label = new ThemedSimpleText {
 				ForceUncutText = false,
 				VAlignment = VAlignment.Center,
 				LayoutCell = new LayoutCell(Alignment.LeftCenter, float.MaxValue)
 			};
-			editBox = new EditBox {
+			editBox = new ThemedEditBox {
 				LayoutCell = new LayoutCell(Alignment.LeftCenter, float.MaxValue)
 			};
 			nodeIcon = new Image(NodeIconPool.GetTexture(nodeData.Node.GetType())) {
@@ -61,7 +61,7 @@ namespace Tangerine.UI.Timeline.Components
 					label,
 					editBox,
 					new Widget(),
-					(Widget)enterButton ?? (Widget)new HSpacer(DesktopTheme.Metrics.DefaultToolbarButtonSize.X),
+					(Widget)enterButton ?? (Widget)new HSpacer(Theme.Metrics.DefaultToolbarButtonSize.X),
 					eyeButton,
 					lockButton,
 				}
@@ -87,7 +87,7 @@ namespace Tangerine.UI.Timeline.Components
 			} else {
 				label.Text = node.Id;
 			}
-			label.Color = IsGrayedLabel(node) ? DesktopTheme.Colors.BlackText : ColorTheme.Current.TimelineRoll.GrayedLabel;
+			label.Color = IsGrayedLabel(node) ? Theme.Colors.BlackText : ColorTheme.Current.TimelineRoll.GrayedLabel;
 		}
 
 		ToolbarButton CreateEnterButton()

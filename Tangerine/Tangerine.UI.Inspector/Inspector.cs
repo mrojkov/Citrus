@@ -16,7 +16,7 @@ namespace Tangerine.UI.Inspector
 		public static Inspector Instance { get; private set; }
 
 		public readonly Widget PanelWidget;
-		public readonly ScrollViewWidget RootWidget;
+		public readonly ThemedScrollView RootWidget;
 		public readonly Toolbar Toolbar;
 		public readonly List<object> Objects;
 		public bool InspectRootNode { get; set; }
@@ -45,7 +45,7 @@ namespace Tangerine.UI.Inspector
 		public Inspector(Widget panelWidget)
 		{
 			PanelWidget = panelWidget;
-			RootWidget = new ScrollViewWidget();
+			RootWidget = new ThemedScrollView();
 			var toolbarArea = new Widget { Layout = new StackLayout(), Padding = new Thickness(4, 0) };
 			contentWidget = new Widget();
 			RootWidget.Content.AddNode(toolbarArea);

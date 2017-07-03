@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using Lime;
@@ -35,7 +35,7 @@ namespace Tangerine.UI
 			alphaSlider = new AlphaSlider(colorProperty);
 			SetupSliderDragHandlers(valueSlider.Widget);
 			SetupSliderDragHandlers(alphaSlider.Widget);
-			RootWidget = new Frame {
+			RootWidget = new ThemedFrame {
 				Padding = new Thickness(8),
 				Layout = new VBoxLayout { Spacing = 8 },
 				Nodes = {
@@ -153,7 +153,7 @@ namespace Tangerine.UI
 
 			public ValueSlider(Property<ColorHSVA> color)
 			{
-				Widget = new Slider { RangeMin = 0, RangeMax = 1 };
+				Widget = new ThemedSlider { RangeMin = 0, RangeMax = 1 };
 				Widget.Changed += () => {
 					color.Value = new ColorHSVA(color.Value.H, color.Value.S, 1 - Widget.Value, color.Value.A);
 				};
@@ -176,7 +176,7 @@ namespace Tangerine.UI
 					var widget = node.AsWidget;
 					widget.PrepareRendererState();
 					Renderer.DrawHorizontalGradientRect(Vector2.Zero, widget.Size, GetGradient());
-					Renderer.DrawRectOutline(Vector2.Zero, widget.Size, DesktopTheme.Colors.ControlBorder);
+					Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Theme.Colors.ControlBorder);
 				}
 
 				ColorGradient GetGradient()
@@ -194,7 +194,7 @@ namespace Tangerine.UI
 
 			public AlphaSlider(Property<ColorHSVA> color)
 			{
-				Widget = new Slider { RangeMin = 0, RangeMax = 1 };
+				Widget = new ThemedSlider { RangeMin = 0, RangeMax = 1 };
 				Widget.Changed += () => {
 					color.Value = new ColorHSVA(color.Value.H, color.Value.S, color.Value.V, 1 - Widget.Value);
 				};
@@ -224,7 +224,7 @@ namespace Tangerine.UI
 						Renderer.DrawRect(checkPos, checkPos + checkSize, Color4.Black);
 					}
 					Renderer.DrawRect(Vector2.Zero, widget.Size, color.Value.ToRGBA());
-					Renderer.DrawRectOutline(Vector2.Zero, widget.Size, DesktopTheme.Colors.ControlBorder);
+					Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Theme.Colors.ControlBorder);
 				}
 			}
 		}

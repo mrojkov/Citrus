@@ -43,7 +43,7 @@ namespace Tangerine.UI
 			var window = new Window(new WindowOptions { ClientSize = windowSize, FixedSize = false, Title = "Tangerine" });
 			window.UnhandledExceptionOnUpdate += HandleException;
 			SetDropHandler(window);
-			MainWindowWidget = new InvalidableWindowWidget(window) {
+			MainWindowWidget = new ThemedInvalidableWindowWidget(window) {
 				Id = "MainWindow",
 				Layout = new VBoxLayout(),
 				Size = windowSize,
@@ -181,7 +181,7 @@ namespace Tangerine.UI
 						window.Resized += (deviceRotated) => {
 							p.Placement.UndockedSize = window.ClientSize;
 						};
-						p.WindowWidget = new InvalidableWindowWidget(window) {
+						p.WindowWidget = new ThemedInvalidableWindowWidget(window) {
 							Layout = new StackLayout(),
 						};
 						p.RootWidget.Unlink();

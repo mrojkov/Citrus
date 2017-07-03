@@ -92,9 +92,7 @@ namespace Tangerine.Core.Operations
 			Frame frame;
 			try {
 				var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(data));
-				using (Theme.Push(DefaultTheme.Instance)) {
-					frame = Serialization.ReadObject<Frame>(Document.Current.Path, stream);
-				}
+				frame = Serialization.ReadObject<Frame>(Document.Current.Path, stream);
 			} catch (System.Exception e) {
 				Debug.Write(e);
 				return false;

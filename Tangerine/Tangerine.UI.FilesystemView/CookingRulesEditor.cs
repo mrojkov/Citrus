@@ -25,7 +25,7 @@ namespace Tangerine.UI.FilesystemView
 		private Target activeTarget { get; set; }
 		private Toolbar toolbar;
 		public Widget RootWidget;
-		private readonly ScrollViewWidget scrollView;
+		private readonly ThemedScrollView scrollView;
 		private Selection savedSelection;
 		private const float RowHeight = 16.0f;
 		private Action<string> navigateAndSelect;
@@ -33,7 +33,7 @@ namespace Tangerine.UI.FilesystemView
 		public CookingRulesEditor(Action<string> navigateAndSelect)
 		{
 			this.navigateAndSelect = navigateAndSelect;
-			scrollView = new ScrollViewWidget();
+			scrollView = new ThemedScrollView();
 			scrollView.Content.Layout = new VBoxLayout();
 			DropDownList targetSelector;
 			toolbar = new Toolbar();
@@ -163,7 +163,7 @@ namespace Tangerine.UI.FilesystemView
 			scrollView.Content.Presenter = new DelegatePresenter<Widget>((w) => {
 				if (cachedZebraTexture == null) {
 					cachedZebraTexture = new Texture2D();
-					cachedZebraTexture.LoadImage(new[] { DesktopTheme.Colors.ZebraColor1, DesktopTheme.Colors.ZebraColor2 }, 1, 2);
+					cachedZebraTexture.LoadImage(new[] { Theme.Colors.ZebraColor1, Theme.Colors.ZebraColor2 }, 1, 2);
 					cachedZebraTexture.WrapModeV = cachedZebraTexture.WrapModeU = TextureWrapMode.Repeat;
 					cachedZebraTexture.MinFilter = cachedZebraTexture.MagFilter = TextureFilter.Nearest;
 				}
@@ -246,7 +246,7 @@ namespace Tangerine.UI.FilesystemView
 					(innerContainer = new Widget {
 						Layout = new HBoxLayout(),
 					}),
-					new SimpleText(sourceFilenameText) {
+					new ThemedSimpleText(sourceFilenameText) {
 						FontHeight = 16,
 						ForceUncutText = false,
 						OverflowMode = TextOverflowMode.Ellipsis,
@@ -313,14 +313,14 @@ namespace Tangerine.UI.FilesystemView
 					Renderer.DrawRect(
 						Vector2.Zero,
 						widget.Size,
-						DesktopTheme.Colors.SelectedBackground.Transparentify(0.8f));
+						Theme.Colors.SelectedBackground.Transparentify(0.8f));
 				}
 			}));
 			Func<ITexture> btnTexture = () => IsOverridedByAssociatedCookingRules(crc, path, yi) ? IconPool.GetTexture("Filesystem.Cross") : IconPool.GetTexture("Filesystem.Plus");
 			Widget foldButton;
 			headerWidget.Nodes.AddRange(
 				(foldButton = CreateFoldButton(overridesWidget)),
-				(new SimpleText {
+				(new ThemedSimpleText {
 					ForceUncutText = false,
 					VAlignment = VAlignment.Center,
 					HAlignment = HAlignment.Left,
@@ -331,7 +331,7 @@ namespace Tangerine.UI.FilesystemView
 					MaxSize = new Vector2(200, RowHeight),
 					Text = yi.Name,
 				}),
-				(computedValueText = new SimpleText {
+				(computedValueText = new ThemedSimpleText {
 					LayoutCell = new LayoutCell { StretchX = 3 },
 					ForceUncutText = false,
 					HAlignment = HAlignment.Left,

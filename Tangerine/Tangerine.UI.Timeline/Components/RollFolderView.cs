@@ -24,8 +24,8 @@ namespace Tangerine.UI.Timeline.Components
 		{
 			this.row = row;
 			folder = row.Components.Get<FolderRow>().Folder;
-			label = new SimpleText();
-			editBox = new EditBox { LayoutCell = new LayoutCell(Alignment.Center, stretchX: float.MaxValue) };
+			label = new ThemedSimpleText();
+			editBox = new ThemedEditBox { LayoutCell = new LayoutCell(Alignment.Center, stretchX: float.MaxValue) };
 			nodeIcon = new Image(IconPool.GetTexture("Tools.NewFolder")) {
 				HitTestTarget = true,
 				MinMaxSize = new Vector2(16, 16)

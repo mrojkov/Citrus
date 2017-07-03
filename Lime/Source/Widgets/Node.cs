@@ -260,6 +260,7 @@ namespace Lime
 		/// For enumerating all descendants use Descendants.
 		/// </summary>
 		[YuzuMember]
+		[YuzuSerializeIf(nameof(IsNotDecorated))]
 		public NodeList Nodes { get; private set; }
 
 		/// <summary>
@@ -376,6 +377,8 @@ namespace Lime
 			RenderChainBuilder = DefaultRenderChainBuilder.Instance;
 			++CreatedCount;
 		}
+
+		protected virtual bool IsNotDecorated() => true;
 
 		public virtual void Dispose()
 		{

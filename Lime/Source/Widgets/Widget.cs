@@ -374,6 +374,7 @@ namespace Lime
 		/// </summary>
 		[YuzuMember]
 		[TangerineKeyframeColor(9)]
+		[YuzuSerializeIf(nameof(IsNotDecorated))]
 		public Color4 Color
 		{
 			get { return color; }
@@ -1255,6 +1256,13 @@ namespace Lime
 			Renderer.Transform1 = LocalToWorldTransform;
 			Renderer.Blending = GlobalBlending;
 			Renderer.Shader = GlobalShader;
+		}
+
+		public void ExpandToContainerWithAnchors()
+		{
+			Anchors = Anchors.None;
+			Size = ParentWidget.Size;
+			Anchors = Anchors.LeftRightTopBottom;
 		}
 	}
 }

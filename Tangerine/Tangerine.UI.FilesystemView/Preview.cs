@@ -8,7 +8,7 @@ namespace Tangerine.UI.FilesystemView
 {
 	public class Preview
 	{
-		public ScrollViewWidget RootWidget;
+		public ThemedScrollView RootWidget;
 		private Selection savedSelection = new Selection();
 		// TODO: Clear Cache on fs navigation
 		private Dictionary<string, ITexture> textureCache = new Dictionary<string, ITexture>();
@@ -20,7 +20,7 @@ namespace Tangerine.UI.FilesystemView
 
 		public Preview()
 		{
-			RootWidget = new ScrollViewWidget();
+			RootWidget = new ThemedScrollView();
 			RootWidget.Content.Layout = new FlowLayout();
 		}
 

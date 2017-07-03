@@ -199,13 +199,9 @@
     <Compile Include="Source\Widgets\Layout\LayoutManager.cs" />
     <Compile Include="Source\Widgets\Layout\LinearAllocator.cs" />
     <Compile Include="Source\Widgets\Layout\VBoxLayout.cs" />
-    <Compile Include="Source\Widgets\Theme\DefaultTheme.cs" />
-    <Compile Include="Source\Widgets\Theme\DesktopTheme.cs" />
-    <Compile Include="Source\Widgets\Theme\ITheme.cs" />
     <Compile Include="Source\Types\ColorGradient.cs" />
     <Compile Include="Source\Widgets\EditBox.cs" />
     <Compile Include="Source\Widgets\IPresenter.cs" />
-    <Compile Include="Source\Widgets\TextView.cs" />
     <Compile Include="Source\Application\Menu\Menu.cs" />
     <Compile Include="Source\Application\Menu\Menu.Mac.cs" />
     <Compile Include="Source\Widgets\DropDownList.cs" />
@@ -219,7 +215,6 @@
     <Compile Include="Source\Application\MouseCursor\MouseCursor.Win.cs" />
     <Compile Include="Source\Application\FileDialog\FileDialog.cs" />
     <Compile Include="Source\Application\FileDialog\FileDialog.Mac.cs" />
-    <Compile Include="Source\Widgets\FileChooserButton.cs" />
     <Compile Include="Source\Types\Thickness.cs" />
     <Compile Include="Source\Application\FileDialog\FileDialog.Win.cs" />
     <Compile Include="Source\Widgets\HSplitter.cs" />
@@ -250,11 +245,9 @@
     <Compile Include="Source\Widgets\CheckBox.cs" />
     <Compile Include="Source\Application\Menu\Command.cs" />
     <Compile Include="Source\Widgets\TabBar.cs" />
-    <Compile Include="Source\Widgets\BorderedFrame.cs" />
     <Compile Include="Source\GeneratedDeserializersBIN.cs" />
     <Compile Include="Source\Types\Quadrangle.cs" />
     <Compile Include="Source\Types\Transform2.cs" />
-    <Compile Include="Source\Widgets\ListView\ScrollViewWidget.cs" />
     <Compile Include="Source\Widgets\Folder.cs" />
     <Compile Include="Source\Application\Display\Display.Android.cs" />
     <Compile Include="Source\Application\Display\Display.Mac.cs" />
@@ -293,6 +286,21 @@
     <Compile Include="Source\Profilers\NodeProfiler.cs" />
     <Compile Include="Source\Profilers\TasksProfiler.cs" />
     <Compile Include="Source\Graphics\Bitmap.Apple.cs" />
+    <Compile Include="Source\Widgets\Theme\Theme.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedButton.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedCheckBox.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedComboBox.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedDropDownList.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedEditBox.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedFileChooserButton.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedFrame.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedScrollView.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedSimpleText.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedSlider.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedSplitters.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedTabBar.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedTextView.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedWindowWidget.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
@@ -364,8 +372,14 @@
     <MonoDevelop>
       <Properties>
         <Policies>
-          <TextStylePolicy FileWidth="80" TabWidth="4" IndentWidth="4" RemoveTrailingWhitespace="True" NoTabsAfterNonTabs="False" EolMarker="Native" TabsToSpaces="False" inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/x-csharp" />
-          <CSharpFormattingPolicy IndentBlock="True" IndentBraces="False" IndentSwitchSection="False" IndentSwitchCaseSection="True" LabelPositioning="OneLess" NewLinesForBracesInTypes="True" NewLinesForBracesInMethods="True" NewLinesForBracesInProperties="False" NewLinesForBracesInAccessors="False" NewLinesForBracesInAnonymousMethods="False" NewLinesForBracesInControlBlocks="False" NewLinesForBracesInAnonymousTypes="False" NewLinesForBracesInObjectCollectionArrayInitializers="False" NewLinesForBracesInLambdaExpressionBody="False" NewLineForElse="False" NewLineForCatch="False" NewLineForFinally="False" NewLineForMembersInObjectInit="False" NewLineForMembersInAnonymousTypes="False" NewLineForClausesInQuery="False" SpacingAfterMethodDeclarationName="True" SpaceWithinMethodDeclarationParenthesis="False" SpaceBetweenEmptyMethodDeclarationParentheses="False" SpaceAfterMethodCallName="True" SpaceWithinMethodCallParentheses="False" SpaceBetweenEmptyMethodCallParentheses="False" SpaceAfterControlFlowStatementKeyword="True" SpaceWithinExpressionParentheses="False" SpaceWithinCastParentheses="False" SpaceWithinOtherParentheses="False" SpaceAfterCast="False" SpacesIgnoreAroundVariableDeclaration="False" SpaceBeforeOpenSquareBracket="True" SpaceBetweenEmptySquareBrackets="False" SpaceWithinSquareBrackets="False" SpaceAfterColonInBaseTypeDeclaration="True" SpaceAfterComma="True" SpaceAfterDot="False" SpaceAfterSemicolonsInForStatement="True" SpaceBeforeColonInBaseTypeDeclaration="True" SpaceBeforeComma="False" SpaceBeforeDot="False" SpaceBeforeSemicolonsInForStatement="False" SpacingAroundBinaryOperator="Single" WrappingPreserveSingleLine="True" WrappingKeepStatementsOnSingleLine="True" PlaceSystemDirectiveFirst="True" inheritsSet="Mono" inheritsScope="text/x-csharp" scope="text/x-csharp" />
+          <TextStylePolicy TabWidth="4" TabsToSpaces="False" IndentWidth="4" RemoveTrailingWhitespace="True" NoTabsAfterNonTabs="False" EolMarker="Native" FileWidth="80" scope="text/x-csharp">
+            <inheritsSet />
+            <inheritsScope />
+          </TextStylePolicy>
+          <CSharpFormattingPolicy IndentBlock="True" IndentBraces="False" IndentSwitchCaseSection="True" LabelPositioning="OneLess" NewLinesForBracesInTypes="True" NewLinesForBracesInMethods="True" SpaceWithinMethodDeclarationParenthesis="False" SpaceBetweenEmptyMethodDeclarationParentheses="False" SpaceWithinMethodCallParentheses="False" SpaceBetweenEmptyMethodCallParentheses="False" SpaceAfterControlFlowStatementKeyword="True" SpaceWithinExpressionParentheses="False" SpaceWithinCastParentheses="False" SpaceWithinOtherParentheses="False" SpaceAfterCast="False" SpacesIgnoreAroundVariableDeclaration="False" SpaceBetweenEmptySquareBrackets="False" SpaceWithinSquareBrackets="False" SpaceAfterColonInBaseTypeDeclaration="True" SpaceAfterComma="True" SpaceAfterDot="False" SpaceAfterSemicolonsInForStatement="True" SpaceBeforeColonInBaseTypeDeclaration="True" SpaceBeforeComma="False" SpaceBeforeDot="False" SpaceBeforeSemicolonsInForStatement="False" SpacingAroundBinaryOperator="Single" WrappingPreserveSingleLine="True" WrappingKeepStatementsOnSingleLine="True" PlaceSystemDirectiveFirst="True" IndentSwitchSection="False" NewLinesForBracesInProperties="False" NewLinesForBracesInAccessors="False" NewLinesForBracesInAnonymousMethods="False" NewLinesForBracesInControlBlocks="False" NewLinesForBracesInAnonymousTypes="False" NewLinesForBracesInObjectCollectionArrayInitializers="False" NewLinesForBracesInLambdaExpressionBody="False" NewLineForElse="False" NewLineForCatch="False" NewLineForFinally="False" NewLineForMembersInObjectInit="False" NewLineForMembersInAnonymousTypes="False" NewLineForClausesInQuery="False" SpacingAfterMethodDeclarationName="True" SpaceAfterMethodCallName="True" SpaceBeforeOpenSquareBracket="True" scope="text/x-csharp">
+            <inheritsSet />
+            <inheritsScope />
+          </CSharpFormattingPolicy>
         </Policies>
       </Properties>
     </MonoDevelop>
@@ -382,7 +396,6 @@
     <Folder Include="Source\Application\Mac\Input\" />
     <Folder Include="Source\Widgets\Layout\" />
     <Folder Include="Source\Application\Menu\" />
-    <Folder Include="Source\Widgets\Theme\" />
     <Folder Include="Source\Application\FileDialog\" />
     <Folder Include="Source\Binding\" />
     <Folder Include="Source\Application\FileSystemWatcher\" />

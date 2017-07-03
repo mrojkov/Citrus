@@ -18,7 +18,6 @@ namespace Orange
 			WidgetInput.AcceptMouseBeyondWidgetByDefault = false;
 			Widget.DefaultWidgetSize = Vector2.Zero;
 			LoadFont();
-			SetupTheme();
 			CreateMenuItems();
 			UserInterface.Instance = Interface = new OrangeInterface();
 			The.Workspace.Load();
@@ -27,12 +26,6 @@ namespace Orange
 		private static void CreateMenuItems()
 		{
 			The.MenuController.CreateAssemblyMenuItems();
-		}
-
-		private static void SetupTheme()
-		{
-			Theme.Current = new DesktopTheme();
-			DesktopTheme.Colors = DesktopTheme.ColorTheme.CreateLightTheme();
 		}
 
 		private static void LoadFont()

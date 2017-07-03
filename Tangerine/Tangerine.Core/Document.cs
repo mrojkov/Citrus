@@ -121,12 +121,10 @@ namespace Tangerine.Core
 			try {
 				Path = path;
 				Format = ResolveFormat(path);
-				using (Theme.Push(DefaultTheme.Instance)) {
-					RootNode = Node.CreateFromAssetBundle(path);
-					SetModificationTimeToNow();
-					if (RootNode is Node3D) {
-						RootNode = WrapNodeWithViewport3D(RootNode);
-					}
+				RootNode = Node.CreateFromAssetBundle(path);
+				SetModificationTimeToNow();
+				if (RootNode is Node3D) {
+					RootNode = WrapNodeWithViewport3D(RootNode);
 				}
 				Decorate(RootNode);
 				Container = RootNode;

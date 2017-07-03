@@ -14,7 +14,7 @@ namespace Orange
 		private FileChooser projectPicker;
 		private PlatformPicker platformPicker;
 		private PluginPanel pluginPanel;
-		private TextView textView;
+		private ThemedTextView textView;
 		private TextWriter textWriter;
 		private CheckBoxWithLabel updateVcs;
 		private Widget inputLocker = new Widget();
@@ -28,7 +28,7 @@ namespace Orange
 				Title = "Orange"
 			});
 			window.Closed += The.Workspace.Save;
-			windowWidget = new DefaultWindowWidget(window) {
+			windowWidget = new ThemedDefaultWindowWidget(window) {
 				Id = "MainWindow",
 				Layout = new HBoxLayout {
 					Spacing = 6
@@ -80,7 +80,7 @@ namespace Orange
 
 		private static void AddPicker(Node table, string name, Node picker)
 		{
-			var label = new SimpleText(name) {
+			var label = new ThemedSimpleText(name) {
 				VAlignment = VAlignment.Center,
 				HAlignment = HAlignment.Left
 			};
@@ -97,7 +97,7 @@ namespace Orange
 
 		private Widget CreateTextView()
 		{
-			textView = new TextView();
+			textView = new ThemedTextView();
 			textWriter = new TextViewWriter(textView);
 			Console.SetOut(textWriter);
 			Console.SetError(textWriter);
@@ -129,7 +129,7 @@ namespace Orange
 					Spacing = 5
 				},
 			};
-			var actionPicker = new DropDownList();
+			var actionPicker = new ThemedDropDownList();
 
 			foreach (var menuItem in The.MenuController.GetVisibleAndSortedItems()) {
 				actionPicker.Items.Add(new CommonDropDownList.Item(menuItem.Label, menuItem.Action));
@@ -137,7 +137,7 @@ namespace Orange
 
 			container.AddNode(actionPicker);
 			actionPicker.Index = 0;
-			var go = new Button("Go");
+			var go = new ThemedButton("Go");
 			go.Clicked += () => Execute((Action) actionPicker.Value);
 			go.AddNode(inputLocker);
 			container.AddNode(go);
@@ -278,9 +278,9 @@ namespace Orange
 
 		private class TextViewWriter : TextWriter
 		{
-			private readonly TextView textView;
+			private readonly ThemedTextView textView;
 
-			public TextViewWriter(TextView textView)
+			public TextViewWriter(ThemedTextView textView)
 			{
 				this.textView = textView;
 			}

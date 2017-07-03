@@ -12,24 +12,21 @@ namespace Orange
 
 		public AlertDialog(string text, params string[] buttons)
 		{
-			if (buttons.Length == 0)
-			{
+			if (buttons.Length == 0) {
 				buttons = new[] { "Ok" };
 			}
-			window = new Window(new WindowOptions
-			{
+			window = new Window(new WindowOptions {
 				FixedSize = true,
 				Title = "Orange",
 				Visible = false,
 				Style = WindowStyle.Dialog
 			});
-			rootWidget = new InvalidableWindowWidget(window)
-			{
+			rootWidget = new ThemedInvalidableWindowWidget(window) {
 				LayoutBasedWindowSize = true,
 				Padding = new Thickness(8),
 				Layout = new VBoxLayout { Spacing = 16 },
 				Nodes = {
-					new SimpleText(text) {
+					new ThemedSimpleText(text) {
 						Padding = new Thickness(4)
 					},
 					(buttonsPanel = new Widget {
@@ -40,23 +37,19 @@ namespace Orange
 			};
 			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
 			var cancelIndex = buttons.ToList().IndexOf("Cancel");
-			if (cancelIndex >= 0)
-			{
+			if (cancelIndex >= 0) {
 				rootWidget.LateTasks.AddLoop(() => {
-					if (rootWidget.Input.ConsumeKeyPress(Key.Escape))
-					{
+					if (rootWidget.Input.ConsumeKeyPress(Key.Escape)) {
 						Close(cancelIndex);
 					}
 				});
 			}
-			for (int i = 0; i < buttons.Length; i++)
-			{
-				var button = new Button { Text = buttons[i] };
+			for (int i = 0; i < buttons.Length; i++) {
+				var button = new ThemedButton(buttons[i]);
 				int j = i;
 				button.Clicked += () => Close(j);
 				buttonsPanel.AddNode(button);
-				if (i == 0)
-				{
+				if (i == 0) {
 					button.SetFocus();
 				}
 			}

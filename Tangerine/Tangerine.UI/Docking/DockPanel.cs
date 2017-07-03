@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
@@ -31,13 +31,13 @@ namespace Tangerine.UI
 			TitleWidget = new Widget {
 				Layout = new HBoxLayout(),
 				Nodes = {
-					(TitleLabel = new SimpleText {
+					(TitleLabel = new ThemedSimpleText {
 						Padding = new Thickness(4, 0),
 						ForceUncutText = false,
-						MinMaxHeight = DesktopTheme.Metrics.MinTabSize.Y,
+						MinMaxHeight = Theme.Metrics.MinTabSize.Y,
 						VAlignment = VAlignment.Center
 					}),
-					(CloseButton = new DesktopTheme.TabCloseButton { LayoutCell = new LayoutCell(Alignment.Center) })
+					(CloseButton = new ThemedTabCloseButton { LayoutCell = new LayoutCell(Alignment.Center) })
 				},
 				HitTestTarget = true
 			};
@@ -189,11 +189,11 @@ namespace Tangerine.UI
 			public ThumbnalWindow(string title)
 			{
 				window = new Window(new WindowOptions { FixedSize = true, ClientSize = new Vector2(100, 40), Style = WindowStyle.Borderless });
-				rootWidget = new InvalidableWindowWidget(window) {
+				rootWidget = new ThemedInvalidableWindowWidget(window) {
 					PostPresenter = new WidgetBoundsPresenter(Color4.Black, 1),
 					Layout = new StackLayout(),
 					Nodes = {
-						new SimpleText {
+						new ThemedSimpleText {
 							Text = title,
 							ForceUncutText = false, 
 							LayoutCell = new LayoutCell(Alignment.Center),

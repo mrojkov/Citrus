@@ -19,7 +19,6 @@ namespace Lime
 			Window = window;
 			Window.Context = new CombinedContext(Window.Context, new WidgetContext(this));
 			renderChain = new RenderChain();
-			Theme.Current.Apply(this);
 			window.Activated += () => windowActivated = true;
 		}
 
@@ -84,10 +83,9 @@ namespace Lime
 	{
 		public bool LayoutBasedWindowSize { get; set; }
 
-		public DefaultWindowWidget(Window window)
+		public DefaultWindowWidget(IWindow window)
 			: base(window)
 		{
-			Theme.Current.Apply(this, typeof(WindowWidget));
 			window.Rendering += () => {
 				Renderer.BeginFrame();
 				Renderer.Projection = GetProjection();
@@ -129,10 +127,9 @@ namespace Lime
 	{
 		public bool RedrawMarkVisible { get; set; }
 
-		public InvalidableWindowWidget(Window window)
+		public InvalidableWindowWidget(IWindow window)
 			: base(window)
 		{
-			Theme.Current.Apply(this, typeof(WindowWidget));
 		}
 
 		protected override bool ContinuousRendering() { return false; }
