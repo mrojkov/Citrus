@@ -5,7 +5,7 @@ namespace Lime
 {
 	public class ThemedButton : Button
 	{
-		protected override bool IsNotDecorated() => false;
+		public override bool IsNotDecorated() => false;
 
 		public ThemedButton(string caption) : this()
 		{

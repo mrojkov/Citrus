@@ -378,7 +378,7 @@ namespace Lime
 			++CreatedCount;
 		}
 
-		protected virtual bool IsNotDecorated() => true;
+		public virtual bool IsNotDecorated() => true;
 
 		public virtual void Dispose()
 		{

@@ -5,7 +5,7 @@ namespace Lime
 {
 	public class ThemedFrame : Frame
 	{
-		protected override bool IsNotDecorated() => false;
+		public override bool IsNotDecorated() => false;
 
 		public ThemedFrame()
 		{

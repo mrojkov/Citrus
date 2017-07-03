@@ -5,7 +5,7 @@ namespace Lime
 {
 	public class ThemedCheckBox : CheckBox
 	{
-		protected override bool IsNotDecorated() => false;
+		public override bool IsNotDecorated() => false;
 
 		public ThemedCheckBox()
 		{

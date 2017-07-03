@@ -5,7 +5,7 @@ namespace Lime
 {
 	public class ThemedScrollView : Frame
 	{
-		protected override bool IsNotDecorated() => false;
+		public override bool IsNotDecorated() => false;
 
 		public ScrollView Behaviour { get; set; }
 

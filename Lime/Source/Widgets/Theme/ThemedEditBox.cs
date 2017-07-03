@@ -6,7 +6,7 @@ namespace Lime
 {
 	public class ThemedEditBox : EditBox
 	{
-		protected override bool IsNotDecorated() => false;
+		public override bool IsNotDecorated() => false;
 
 		public ThemedEditBox()
 		{

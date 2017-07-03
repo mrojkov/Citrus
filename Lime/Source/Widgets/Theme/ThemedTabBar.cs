@@ -5,7 +5,7 @@ namespace Lime
 {
 	public class ThemedTabBar : TabBar
 	{
-		protected override bool IsNotDecorated() => false;
+		public override bool IsNotDecorated() => false;
 
 		public ThemedTabBar()
 		{
@@ -15,7 +15,7 @@ namespace Lime
 
 	public class ThemedTab : Tab
 	{
-		protected override bool IsNotDecorated() => false;
+		public override bool IsNotDecorated() => false;
 
 		public ThemedTab()
 		{
@@ -78,7 +78,7 @@ namespace Lime
 
 	public class ThemedTabCloseButton : Button
 	{
-		protected override bool IsNotDecorated() => false;
+		public override bool IsNotDecorated() => false;
 
 		public ThemedTabCloseButton()
 		{

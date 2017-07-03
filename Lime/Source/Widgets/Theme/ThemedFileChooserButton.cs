@@ -9,7 +9,7 @@ namespace Lime
 		private Widget button;
 		private string fileName;
 
-		protected override bool IsNotDecorated() => false;
+		public override bool IsNotDecorated() => false;
 
 		public IFileDialog FileDialog { get; private set; }
 

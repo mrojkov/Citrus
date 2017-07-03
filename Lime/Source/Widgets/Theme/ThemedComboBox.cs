@@ -5,7 +5,7 @@ namespace Lime
 {
 	public class ThemedComboBox : ComboBox
 	{
-		protected override bool IsNotDecorated() => false;
+		public override bool IsNotDecorated() => false;
 
 		public ThemedComboBox()
 		{

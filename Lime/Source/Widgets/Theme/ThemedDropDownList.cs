@@ -5,7 +5,7 @@ namespace Lime
 {
 	public class ThemedDropDownList : DropDownList
 	{
-		protected override bool IsNotDecorated() => false;
+		public override bool IsNotDecorated() => false;
 
 		public ThemedDropDownList()
 		{

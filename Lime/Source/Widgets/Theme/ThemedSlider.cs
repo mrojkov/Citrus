@@ -5,7 +5,7 @@ namespace Lime
 {
 	public class ThemedSlider : Slider
 	{
-		protected override bool IsNotDecorated() => false;
+		public override bool IsNotDecorated() => false;
 
 		public ThemedSlider()
 		{

@@ -5,7 +5,7 @@ namespace Lime
 {
 	public class ThemedDefaultWindowWidget : DefaultWindowWidget
 	{
-		protected override bool IsNotDecorated() => false;
+		public override bool IsNotDecorated() => false;
 
 		public ThemedDefaultWindowWidget(IWindow window) : base(window)
 		{
@@ -15,7 +15,7 @@ namespace Lime
 
 	public class ThemedInvalidableWindowWidget : InvalidableWindowWidget
 	{
-		protected override bool IsNotDecorated() => false;
+		public override bool IsNotDecorated() => false;
 
 		public ThemedInvalidableWindowWidget(IWindow window) : base(window)
 		{

@@ -5,7 +5,7 @@ namespace Lime
 {
 	public class ThemedHSplitter : HSplitter
 	{
-		protected override bool IsNotDecorated() => false;
+		public override bool IsNotDecorated() => false;
 
 		public ThemedHSplitter()
 		{
@@ -17,7 +17,7 @@ namespace Lime
 
 	public class ThemedVSplitter : VSplitter
 	{
-		protected override bool IsNotDecorated() => false;
+		public override bool IsNotDecorated() => false;
 
 		public ThemedVSplitter()
 		{

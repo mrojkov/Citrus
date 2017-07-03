@@ -9,7 +9,7 @@ namespace Lime
 	{
 		private List<SimpleText> lines = new List<SimpleText>();
 
-		protected override bool IsNotDecorated() => false;
+		public override bool IsNotDecorated() => false;
 
 		public ThemedTextView()
 		{

@@ -5,7 +5,7 @@ namespace Lime
 {
 	public class ThemedSimpleText : SimpleText
 	{
-		protected override bool IsNotDecorated() => false;
+		public override bool IsNotDecorated() => false;
 
 		public ThemedSimpleText()
 		{
