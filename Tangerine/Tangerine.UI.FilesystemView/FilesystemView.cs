@@ -133,15 +133,13 @@ namespace Tangerine.UI.FilesystemView
 				preview.ClearTextureCache();
 			});
 			rootWidget.Layout = new VBoxLayout();
-			rootWidget.AddNode(new HSplitter {
-				Layout = new HBoxLayout(),
+			rootWidget.AddNode(new ThemedHSplitter {
 				Nodes = {
 					(new Widget {
 						Layout = new VBoxLayout(),
 						Nodes = {
 							toolbar,
-							new VSplitter {
-								Layout = new VBoxLayout(),
+							new ThemedVSplitter {
 								Nodes = {
 									scrollView,
 									preview.RootWidget,

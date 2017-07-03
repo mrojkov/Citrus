@@ -55,7 +55,7 @@ namespace Tangerine.UI.FilesystemView
 					Layout = new VBoxLayout(),
 					Nodes = {
 						t.Item2,
-						new SimpleText {
+						new ThemedSimpleText {
 							OverflowMode = TextOverflowMode.Ellipsis,
 							Text = Path.GetFileName(t.Item1)
 						}

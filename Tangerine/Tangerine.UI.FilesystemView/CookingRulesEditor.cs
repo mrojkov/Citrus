@@ -35,16 +35,15 @@ namespace Tangerine.UI.FilesystemView
 			this.navigateAndSelect = navigateAndSelect;
 			scrollView = new ThemedScrollView();
 			scrollView.Content.Layout = new VBoxLayout();
-			DropDownList targetSelector;
+			ThemedDropDownList targetSelector;
 			toolbar = new Toolbar();
 			toolbar.Nodes.AddRange(
-				(targetSelector = new DropDownList
-				{
+				(targetSelector = new ThemedDropDownList {
 					LayoutCell = new LayoutCell(Alignment.Center)
 				})
 			);
 			foreach (var t in Orange.The.Workspace.Targets) {
-				targetSelector.Items.Add(new DropDownList.Item(t.Name, t));
+				targetSelector.Items.Add(new ThemedDropDownList.Item(t.Name, t));
 			}
 			targetSelector.Changed += (value) => {
 				activeTarget = (Target)value.Value;
@@ -280,19 +279,19 @@ namespace Tangerine.UI.FilesystemView
 					rules.Save();
 				},
 				NumericEditBoxFactory = () => {
-					var r = new NumericEditBox();
+					var r = new ThemedNumericEditBox();
 					r.MinMaxHeight = r.Height = RowHeight;
 					r.TextWidget.VAlignment = VAlignment.Center;
 					r.TextWidget.Padding.Top = r.TextWidget.Padding.Bottom = 0.0f;
 					return r;
 				},
 				DropDownListFactory = () => {
-					var r = new DropDownList();
+					var r = new ThemedDropDownList();
 					r.MinMaxHeight = r.Height = RowHeight;
 					return r;
 				},
 				EditBoxFactory = () => {
-					var r = new EditBox();
+					var r = new ThemedEditBox();
 					r.MinMaxHeight = r.Height = RowHeight;
 					r.TextWidget.Padding.Top = r.TextWidget.Padding.Bottom = 0.0f;
 					return r;
