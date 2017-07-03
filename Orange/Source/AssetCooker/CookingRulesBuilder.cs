@@ -166,37 +166,38 @@ namespace Orange
 		public string SourceFilename;
 		public Dictionary<Target, ParticularCookingRules> TargetRules = new Dictionary<Target, ParticularCookingRules>();
 		public ParticularCookingRules CommonRules;
-		private ParticularCookingRules effectiveRules;
 		public CookingRules Parent;
 		public static List<string> KnownBundles = new List<string>();
 
-		public string TextureAtlas => effectiveRules.TextureAtlas;
-		public bool MipMaps => effectiveRules.MipMaps;
-		public bool HighQualityCompression => effectiveRules.HighQualityCompression;
-		public float TextureScaleFactor => effectiveRules.TextureScaleFactor;
-		public PVRFormat PVRFormat => effectiveRules.PVRFormat;
-		public DDSFormat DDSFormat => effectiveRules.DDSFormat;
-		public string[] Bundle => effectiveRules.Bundle;
-		public int ADPCMLimit => effectiveRules.ADPCMLimit;
-		public AtlasOptimization AtlasOptimization => effectiveRules.AtlasOptimization;
-		public ModelCompression ModelCompressing => effectiveRules.ModelCompressing;
-		public string AtlasPacker => effectiveRules.AtlasPacker;
-		public string CustomRule => effectiveRules.CustomRule;
+		public string TextureAtlas => EffectiveRules.TextureAtlas;
+		public bool MipMaps => EffectiveRules.MipMaps;
+		public bool HighQualityCompression => EffectiveRules.HighQualityCompression;
+		public float TextureScaleFactor => EffectiveRules.TextureScaleFactor;
+		public PVRFormat PVRFormat => EffectiveRules.PVRFormat;
+		public DDSFormat DDSFormat => EffectiveRules.DDSFormat;
+		public string[] Bundle => EffectiveRules.Bundle;
+		public int ADPCMLimit => EffectiveRules.ADPCMLimit;
+		public AtlasOptimization AtlasOptimization => EffectiveRules.AtlasOptimization;
+		public ModelCompression ModelCompressing => EffectiveRules.ModelCompressing;
+		public string AtlasPacker => EffectiveRules.AtlasPacker;
+		public string CustomRule => EffectiveRules.CustomRule;
 
 		public bool Ignore
 		{
-			get { return effectiveRules.Ignore; }
+			get { return EffectiveRules.Ignore; }
 			set
 			{
 				foreach (var target in The.Workspace.Targets) {
 					TargetRules[target].Ignore = value;
 				}
 				CommonRules.Ignore = value;
-				if (effectiveRules != null) {
-					effectiveRules.Ignore = value;
+				if (EffectiveRules != null) {
+					EffectiveRules.Ignore = value;
 				}
 			}
 		}
+
+		public ParticularCookingRules EffectiveRules { get; private set; }
 
 		public IEnumerable<KeyValuePair<Target, ParticularCookingRules>> Enumerate()
 		{
@@ -224,9 +225,9 @@ namespace Orange
 			foreach (var kv in TargetRules) {
 				r.TargetRules.Add(kv.Key, kv.Value.InheritClone());
 			}
-			if (effectiveRules != null) {
-				r.CommonRules = effectiveRules.InheritClone();
-				r.effectiveRules = effectiveRules.InheritClone();
+			if (EffectiveRules != null) {
+				r.CommonRules = EffectiveRules.InheritClone();
+				r.EffectiveRules = EffectiveRules.InheritClone();
 			} else {
 				r.CommonRules = CommonRules.InheritClone();
 			}
@@ -282,19 +283,21 @@ namespace Orange
 
 		public void DeduceEffectiveRules(Target target)
 		{
-			effectiveRules = CommonRules.InheritClone();
-			var targetRules = TargetRules[target];
-			foreach (var i in targetRules.FieldOverrides) {
-				i.SetValue(effectiveRules, i.GetValue(targetRules));
-			}
-			// TODO: implement this workaround in a general way
-			if (target.Platform == TargetPlatform.Android) {
-				switch (effectiveRules.PVRFormat) {
-					case PVRFormat.PVRTC2:
-					case PVRFormat.PVRTC4:
-					case PVRFormat.PVRTC4_Forced:
-						effectiveRules.PVRFormat = PVRFormat.ETC1;
-						break;
+			EffectiveRules = CommonRules.InheritClone();
+			if (target != null) {
+				var targetRules = TargetRules[target];
+				foreach (var i in targetRules.FieldOverrides) {
+					i.SetValue(EffectiveRules, i.GetValue(targetRules));
+				}
+				// TODO: implement this workaround in a general way
+				if (target.Platform == TargetPlatform.Android) {
+					switch (EffectiveRules.PVRFormat) {
+						case PVRFormat.PVRTC2:
+						case PVRFormat.PVRTC4:
+						case PVRFormat.PVRTC4_Forced:
+							EffectiveRules.PVRFormat = PVRFormat.ETC1;
+							break;
+					}
 				}
 			}
 		}
