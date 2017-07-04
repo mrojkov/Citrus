@@ -16,10 +16,10 @@ namespace Tangerine.UI.Timeline
 		public float ColWidth { get; set; } = 15;
 
 		[YuzuRequired]
-		public List<float> TimelineVSplitterStretches;
+		public List<float> TimelineVSplitterStretches = new List<float>();
 
 		[YuzuRequired]
-		public List<float> TimelineHSplitterStretches;
+		public List<float> TimelineHSplitterStretches = new List<float>();
 
 		public static UserPreferences Instance;
 
