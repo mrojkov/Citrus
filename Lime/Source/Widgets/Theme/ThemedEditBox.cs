@@ -24,6 +24,7 @@ namespace Lime
 			tw.TrimWhitespaces = false;
 			tw.OverflowMode = TextOverflowMode.Ignore;
 			tw.Padding = Theme.Metrics.ControlsPadding;
+			tw.VAlignment = VAlignment.Center;
 
 			var editorParams = new EditorParams {
 				MaxLines = 1, Scroll = eb.Scroll,

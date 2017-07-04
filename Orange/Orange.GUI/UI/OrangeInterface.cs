@@ -84,6 +84,7 @@ namespace Orange
 				VAlignment = VAlignment.Center,
 				HAlignment = HAlignment.Left
 			};
+			label.MinHeight = Theme.Metrics.DefaultButtonSize.Y;
 			table.AddNode(label);
 			table.AddNode(picker);
 		}
