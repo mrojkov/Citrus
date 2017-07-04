@@ -65,6 +65,8 @@ namespace Lime
 
 	public class ThemedNumericEditBox : NumericEditBox
 	{
+		public override bool IsNotDecorated() => false;
+
 		public ThemedNumericEditBox()
 		{
 			ThemedEditBox.Decorate(this);
@@ -74,8 +76,9 @@ namespace Lime
 			CompoundPostPresenter.Add(new SpinButtonPresenter(false));
 		}
 
-		protected override void Awake ()
+		protected override void Awake()
 		{
+			base.Awake();
 			Tasks.Add(HandleSpinButtonTask(true));
 			Tasks.Add(HandleSpinButtonTask(false));
 		}
