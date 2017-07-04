@@ -117,9 +117,6 @@ namespace Tangerine
 						new UI.Timeline.Timeline(timelinePanel),
 						new UI.SceneView.SceneView(documentViewContainer),
 						new UI.SearchPanel(searchPanel.ContentWidget),
-						#if WIN
-						new UI.FilesystemView.FilesystemView(filesystemPanel),
-						#endif
 					});
 				}
 			};
@@ -127,6 +124,10 @@ namespace Tangerine
 			if (proj != null) {
 				new Project(proj).Open();
 			}
+#if WIN
+			var fsView = new UI.FilesystemView.FilesystemView(filesystemPanel);
+			fsView.Attach();
+#endif
 			RegisterGlobalCommands();
 		}
 
