@@ -28,13 +28,13 @@ namespace Tangerine
 		public Vector2 DefaultSceneDimensions { get; set; } = new Vector2(1024, 768);
 
 		[YuzuRequired]
-		public UI.SceneView.UserPreferences SceneViewUserPreferences { get; private set; } = new UI.SceneView.UserPreferences(true);
+		public UI.SceneView.UserPreferences SceneView { get; private set; } = new UI.SceneView.UserPreferences(true);
 
 		[YuzuRequired]
-		public UI.Timeline.UserPreferences TimelineUserPreferences { get; private set; } = new UI.Timeline.UserPreferences(true);
+		public UI.Timeline.UserPreferences Timeline { get; private set; } = new UI.Timeline.UserPreferences(true);
 
 		[YuzuRequired]
-		public UI.FilesystemView.UserPreferences FilesystemViewPreferences { get; private set; } = new UI.FilesystemView.UserPreferences(true);
+		public UI.FilesystemView.UserPreferences FilesystemView { get; private set; } = new UI.FilesystemView.UserPreferences(true);
 
 		public static UserPreferences Instance { get; private set; }
 
