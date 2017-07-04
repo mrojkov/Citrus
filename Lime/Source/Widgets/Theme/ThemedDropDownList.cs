@@ -22,6 +22,8 @@ namespace Lime
 			Padding = Theme.Metrics.ControlsPadding;
 			AddNode(text);
 			text.ExpandToContainerWithAnchors();
+			text.X += 4;
+			text.Width -= DropDownListPresenter.IconWidth + 4;
 		}
 
 		internal class DropDownListPresenter : CustomPresenter
