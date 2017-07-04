@@ -80,18 +80,18 @@ namespace Tangerine
 			var pane = new ThemedScrollView();
 			pane.Content.Layout = new VBoxLayout { Spacing = 4 };
 			new EnumPropertyEditor<ColorThemeEnum>(
-				new PropertyEditorParams(pane.Content, UserPreferences.Instance, "Theme", "User interface theme"));
+				new PropertyEditorParams(pane.Content, UserPreferences.Instance, nameof(Tangerine.UserPreferences.Theme), "User interface theme"));
 			new Vector2PropertyEditor(
-				new PropertyEditorParams(pane.Content, UserPreferences.Instance, "DefaultSceneDimensions", "Default scene dimensions"));
+				new PropertyEditorParams(pane.Content, UserPreferences.Instance, nameof(Tangerine.UserPreferences.DefaultSceneDimensions), "Default scene dimensions"));
 			new BooleanPropertyEditor(
-				new PropertyEditorParams(pane.Content, UserPreferences.Instance, "AutoKeyframes", "Automatic keyframes"));
+				new PropertyEditorParams(pane.Content, UserPreferences.Instance.Timeline, nameof(UI.Timeline.UserPreferences.AutoKeyframes), "Automatic keyframes"));
 			new BooleanPropertyEditor(
-				new PropertyEditorParams(pane.Content, UserPreferences.Instance, "AnimationMode", "Animation mode"));
+				new PropertyEditorParams(pane.Content, UserPreferences.Instance.Timeline, nameof(UI.Timeline.UserPreferences.AnimationMode), "Animation mode"));
 
 			var overlaysEditor = new BooleanPropertyEditor(new PropertyEditorParams(
-				pane.Content, UserPreferences.Instance, nameof(UI.SceneView.UserPreferences.ShowOverlays), "Show overlays"));
+				pane.Content, UserPreferences.Instance.SceneView, nameof(UI.SceneView.UserPreferences.ShowOverlays), "Show overlays"));
 			overlaysEditor.ContainerWidget.AddChangeWatcher(
-				() => UserPreferences.Instance.SceneViewUserPreferences.ShowOverlays, (v) => Application.InvalidateWindows());
+				() => UserPreferences.Instance.SceneView.ShowOverlays, (v) => Application.InvalidateWindows());
 
 			return pane;
 		}
