@@ -97,11 +97,11 @@ namespace Tangerine.UI.Timeline
 		{
 			RootWidget.Layout = new StackLayout();
 			RootWidget.AddNode(new ThemedVSplitter {
-				Stretches = Splitter.GetStretchesList(ref UserPreferences.Instance.TimelineVSplitterStretches, 0.5f, 1),
+				Stretches = Splitter.GetStretchesList(Core.UserPreferences.Instance.Get<UserPreferences>().TimelineVSplitterStretches, 0.5f, 1),
 				Nodes = {
 					Overview.RootWidget,
 					new ThemedHSplitter {
-						Stretches = Splitter.GetStretchesList(ref UserPreferences.Instance.TimelineHSplitterStretches, 0.3f, 1),
+						Stretches = Splitter.GetStretchesList(Core.UserPreferences.Instance.Get<UserPreferences>().TimelineHSplitterStretches, 0.3f, 1),
 						Nodes = {
 							new Widget {
 								Layout = new VBoxLayout(),

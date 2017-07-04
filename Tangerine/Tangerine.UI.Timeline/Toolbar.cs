@@ -40,9 +40,9 @@ namespace Tangerine.UI.Timeline
 		ToolbarButton CreateAnimationModeButton()
 		{
 			var button = new ToolbarButton(IconPool.GetTexture("Timeline.AnimationMode")) { Tip = "Animation mode" };
-			button.AddChangeWatcher(() => UserPreferences.Instance.AnimationMode, i => button.Checked = i);
+			button.AddChangeWatcher(() => Core.UserPreferences.Instance.Get<UserPreferences>().AnimationMode, i => button.Checked = i);
 			button.Clicked += () => {
-				UserPreferences.Instance.AnimationMode = !UserPreferences.Instance.AnimationMode;
+				Core.UserPreferences.Instance.Get<UserPreferences>().AnimationMode = !Core.UserPreferences.Instance.Get<UserPreferences>().AnimationMode;
 			};
 			return button;
 		}
@@ -64,9 +64,9 @@ namespace Tangerine.UI.Timeline
 		ToolbarButton CreateAutoKeyframesButton()
 		{
 			var button = new ToolbarButton(IconPool.GetTexture("Timeline.Key")) { Tip = "Automatic keyframes" };
-			button.AddChangeWatcher(() => UserPreferences.Instance.AutoKeyframes, i => button.Checked = i);
+			button.AddChangeWatcher(() => Core.UserPreferences.Instance.Get<UserPreferences>().AutoKeyframes, i => button.Checked = i);
 			button.Clicked += () => {
-				UserPreferences.Instance.AutoKeyframes = !UserPreferences.Instance.AutoKeyframes;
+				Core.UserPreferences.Instance.Get<UserPreferences>().AutoKeyframes = !Core.UserPreferences.Instance.Get<UserPreferences>().AutoKeyframes;
 			};
 			return button;
 		}

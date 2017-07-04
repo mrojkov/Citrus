@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
+using Lime;
 using Yuzu;
 
 namespace Tangerine.UI.Timeline
 {
-	public class UserPreferences
+	public class UserPreferences : Component
 	{
 		[YuzuRequired]
 		public bool AutoKeyframes { get; set; }
@@ -20,22 +21,5 @@ namespace Tangerine.UI.Timeline
 
 		[YuzuRequired]
 		public List<float> TimelineHSplitterStretches = new List<float>();
-
-		public static UserPreferences Instance;
-
-		public UserPreferences()
-		{
-
-		}
-
-		public UserPreferences(bool makeInstance)
-		{
-			if (makeInstance) {
-				if (Instance != null) {
-					throw new InvalidOperationException();
-				}
-				Instance = this;
-			}
-		}
 	}
 }

@@ -29,8 +29,14 @@ namespace Tangerine
 			Application.IsTangerine = true;
 			Serialization.DeserializerBuilders.Insert(0, DeserializeHotStudioAssets);
 
-			UserPreferences.Initialize();
-			SetColorTheme(UserPreferences.Instance.Theme);
+			if (!Core.UserPreferences.Initialize()) {
+				Core.UserPreferences.Instance.Clear();
+				Core.UserPreferences.Instance.Add(new UserPreferences());
+				Core.UserPreferences.Instance.Add(new UI.SceneView.UserPreferences());
+				Core.UserPreferences.Instance.Add(new UI.Timeline.UserPreferences());
+				Core.UserPreferences.Instance.Add(new UI.FilesystemView.UserPreferences());
+			}
+			SetColorTheme(Core.UserPreferences.Instance.Get<UserPreferences>().Theme);
 
 			LoadFont();
 
@@ -42,8 +48,8 @@ namespace Tangerine
 
 			Application.Exiting += () => Project.Current.Close();
 			Application.Exited += () => {
-				UserPreferences.Instance.DockState = DockManager.Instance.ExportState();
-				UserPreferences.Instance.Save();
+				Core.UserPreferences.Instance.Get<UserPreferences>().DockState = DockManager.Instance.ExportState();
+				Core.UserPreferences.Instance.Save();
 			};
 
 			var timelinePanel = new DockPanel("Timeline");
@@ -59,7 +65,7 @@ namespace Tangerine
 			DockManagerInitialState = dockManager.ExportState();
 			var documentViewContainer = InitializeDocumentArea(dockManager);
 
-			dockManager.ImportState(UserPreferences.Instance.DockState);
+			dockManager.ImportState(Core.UserPreferences.Instance.Get<UserPreferences>().DockState);
 			Document.CloseConfirmation += doc => {
 				var alert = new AlertDialog($"Save the changes to document '{doc.Path}' before closing?", "Yes", "No", "Cancel");
 				switch (alert.Show()) {
@@ -117,7 +123,7 @@ namespace Tangerine
 					});
 				}
 			};
-			var proj = UserPreferences.Instance.RecentProjects.FirstOrDefault();
+			var proj = Core.UserPreferences.Instance.Get<UserPreferences>().RecentProjects.FirstOrDefault();
 			if (proj != null) {
 				new Project(proj).Open();
 			}

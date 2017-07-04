@@ -34,7 +34,7 @@ namespace Tangerine.UI.SceneView
 				new DelegatePresenter<Widget>(
 					(w) => {
 						var root = Core.Document.Current.RootNode as Widget;
-						if (root != null && UserPreferences.Instance.ShowOverlays) {
+						if (root != null && Core.UserPreferences.Instance.Get<UserPreferences>().ShowOverlays) {
 							root.PrepareRendererState();
 							var mtx = root.LocalToWorldTransform;
 							var t1 = 1 / mtx.U.Length;

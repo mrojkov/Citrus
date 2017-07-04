@@ -1,23 +1,12 @@
 using System;
+using Lime;
 using Yuzu;
 
 namespace Tangerine.UI.SceneView
 {
-	public class UserPreferences
+	public class UserPreferences : Component
 	{
-		public static UserPreferences Instance;
-
 		[YuzuRequired]
 		public bool ShowOverlays { get; set; }
-
-		public UserPreferences(bool makeInstance)
-		{
-			if (makeInstance) {
-				if (Instance != null) {
-					throw new InvalidOperationException();
-				}
-				Instance = this;
-			}
-		}
 	}
 }

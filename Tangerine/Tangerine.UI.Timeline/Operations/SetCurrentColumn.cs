@@ -33,13 +33,13 @@ namespace Tangerine.UI.Timeline.Operations
 			{
 				SetColumn(op.Restore<Backup>().Column);
 			}
-		
+
 			void SetColumn(int value)
 			{
 				Audio.GloballyEnable = false;
 				try {
 					var doc = Document.Current;
-					if (UserPreferences.Instance.AnimationMode && doc.AnimationFrame != value) {
+					if (Core.UserPreferences.Instance.Get<UserPreferences>().AnimationMode && doc.AnimationFrame != value) {
 						doc.Container.SetTangerineFlag(TangerineFlags.IgnoreMarkers, true);
 						SetCurrentFrameRecursive(doc.Container, 0);
 						ClearParticlesRecursive(doc.RootNode);
