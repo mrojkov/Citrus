@@ -96,9 +96,15 @@ namespace Tangerine.UI.FilesystemView
 			crEditor = new CookingRulesEditor(NavigateAndSelect);
 			preview = new Preview();
 			InitializeWidgets();
-
 			toggleCookingRules = new NodeToggler(crEditor.RootWidget, () => { crEditor.Invalidate(selection); });
 			togglePreview = new NodeToggler(preview.RootWidget, () => { preview.Invalidate(selection); });
+			var up = Core.UserPreferences.Instance.Get<UserPreferences>();
+			if (!up.ShowCookingRulesEditor) {
+				toggleCookingRules.Toggle();
+			}
+			if (!up.ShowSelectionPreview) {
+				togglePreview.Toggle();
+			}
 		}
 
 		private void NavigateAndSelect(string filename)
@@ -342,29 +348,27 @@ namespace Tangerine.UI.FilesystemView
 				node = n;
 				this.invalidator = invalidator;
 			}
-			public void Toggle(ToolbarButton button)
+			public void Toggle()
 			{
 				if (node.Parent != null) {
 					savedParent = node.Parent;
 					savedIndex = savedParent.Nodes.IndexOf(node);
 					node.Unlink();
-					button.Checked = false;
 				} else {
 					savedParent.Nodes.Insert(Mathf.Clamp(savedIndex, 0, savedParent.Nodes.Count), node);
 					invalidator?.Invoke();
-					button.Checked = true;
 				}
 			}
 		}
 
-		public void TogglePreview(ToolbarButton button)
+		public void TogglePreview()
 		{
-			togglePreview.Toggle(button);
+			togglePreview.Toggle();
 		}
 
-		public void ToggleCookingRules(ToolbarButton button)
+		public void ToggleCookingRules()
 		{
-			toggleCookingRules.Toggle(button);
+			toggleCookingRules.Toggle();
 		}
 	}
 }

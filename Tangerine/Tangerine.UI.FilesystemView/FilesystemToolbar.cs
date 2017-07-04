@@ -69,10 +69,12 @@ namespace Tangerine.UI.FilesystemView
 		private static Widget CreateToggleCookingRulesButton()
 		{
 			ToolbarButton b = null;
+			var up = Core.UserPreferences.Instance.Get<UserPreferences>();
 			return b = new ToolbarButton(IconPool.GetTexture("Filesystem.CookingRules")) {
-				Checked = true,
+				Checked = up.ShowCookingRulesEditor,
 				Clicked = () => {
-					FilesystemView.Instance.ToggleCookingRules(b);
+					FilesystemView.Instance.ToggleCookingRules();
+					up.ShowCookingRulesEditor = b.Checked = !b.Checked;
 				}
 			};
 		}
@@ -80,11 +82,12 @@ namespace Tangerine.UI.FilesystemView
 		private static Widget CreateTogglePreviewButton()
 		{
 			ToolbarButton b = null;
-			return b = new ToolbarButton(IconPool.GetTexture("Filesystem.Preview"))
-			{
-				Checked = true,
+			var up = Core.UserPreferences.Instance.Get<UserPreferences>();
+			return b = new ToolbarButton(IconPool.GetTexture("Filesystem.Preview")) {
+				Checked = up.ShowSelectionPreview,
 				Clicked = () => {
-					FilesystemView.Instance.TogglePreview(b);
+					FilesystemView.Instance.TogglePreview();
+					up.ShowSelectionPreview = b.Checked = !b.Checked;
 				}
 			};
 		}

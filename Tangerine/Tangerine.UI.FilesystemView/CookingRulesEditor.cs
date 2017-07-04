@@ -285,14 +285,14 @@ namespace Tangerine.UI.FilesystemView
 				) {
 					topmostOverride = topmostOverride.Parent;
 				}
+				w.PrepareRendererState();
 				if (target != activeTarget || rules != topmostOverride) {
-					w.PrepareRendererState();
-					//Renderer.DrawLine(10.0f - 30.0f, w.Height * 0.6f, w.Width - 10.0f, w.Height * 0.6f, Color4.Black.Transparentify(0.5f), 1.0f);
-					Renderer.DrawRect(Vector2.Zero, w.Size, Color4.Red.Transparentify(0.5f));
+					Renderer.DrawLine(10.0f - 30.0f, w.Height * 0.6f, w.Width - 10.0f, w.Height * 0.6f, Color4.Black.Transparentify(0.5f), 1.0f);
+				} else {
+					Renderer.DrawRect(Vector2.Right * -20.0f, w.Size, Color4.Green.Lighten(0.5f).Transparentify(0.5f));
 				}
 			}));
-			container.Components.Add(new PropertyOverrideComponent
-			{
+			container.Components.Add(new PropertyOverrideComponent {
 				Rules = rules,
 				YuzuItem = yi,
 			});
@@ -304,6 +304,7 @@ namespace Tangerine.UI.FilesystemView
 				PropertySetter = (owner, name, value) => {
 					yi.SetValue(owner, value);
 					targetRuels.Override(name);
+					rules.DeduceEffectiveRules(target);
 					rules.Save();
 				},
 				NumericEditBoxFactory = () => {
