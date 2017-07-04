@@ -106,7 +106,7 @@ namespace Tangerine.UI.SceneView
 		}
 
 		/// <summary>
-		/// Checks whether the mouse is over a control point within a given radius. 
+		/// Checks whether the mouse is over a control point within a given radius.
 		/// </summary>
 		public bool HitTestControlPoint(Vector2 controlPoint, float radius = 10)
 		{

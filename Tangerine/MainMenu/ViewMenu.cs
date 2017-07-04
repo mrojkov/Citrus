@@ -17,7 +17,7 @@ namespace Tangerine
 	{
 		public override void Execute()
 		{
-			UserPreferences.Instance.ShowOverlays = !UserPreferences.Instance.ShowOverlays;
+			Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>().ShowOverlays = !Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>().ShowOverlays;
 			Window.Current.Invalidate();
 		}
 	}

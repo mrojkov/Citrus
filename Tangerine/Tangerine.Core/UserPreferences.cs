@@ -4,7 +4,7 @@ using Lime;
 using Yuzu;
 using System.Collections.Generic;
 
-namespace Tangerine.UI
+namespace Tangerine.Core
 {
 	public enum ColorThemeEnum
 	{
@@ -12,55 +12,32 @@ namespace Tangerine.UI
 		Dark
 	}
 
-	public class UserPreferences
+	public class UserPreferences : ComponentCollection<Component>
 	{
-		[YuzuMember]
-		public UI.DockManager.State DockState = new UI.DockManager.State();
-
-		[YuzuMember]
-		public readonly List<string> RecentProjects = new List<string>();
-
-		[YuzuRequired]
-		public bool AutoKeyframes { get; set; }
-
-		[YuzuRequired]
-		public bool AnimationMode { get; set; }
-
-		[YuzuRequired]
-		public ColorThemeEnum Theme { get; set; }
-
-		[YuzuRequired]
-		public Vector2 DefaultSceneDimensions { get; set; } = new Vector2(1024, 768);
-
-		[YuzuOptional]
-		public bool ShowOverlays { get; set; }
-
-		[YuzuOptional]
-		public float TimelineColWidth { get; set; } = 15;
-
-		[YuzuOptional]
-		public Dictionary<string, List<float>> Splitters { get; } = new Dictionary<string, List<float>>();
-
 		public static UserPreferences Instance { get; private set; }
 
-		public static void Initialize()
+		public static bool Initialize()
 		{
 			if (Instance != null) {
 				throw new InvalidOperationException();
 			}
 			Instance = new UserPreferences();
-			Instance.Load();
+			return Instance.Load();
 		}
 
-		public void Load()
+		public bool Load()
 		{
 			var path = GetPath();
 			if (System.IO.File.Exists(path)) {
 				try {
 					Serialization.ReadObjectFromFile<UserPreferences>(path, this);
+					return true;
 				} catch (System.Exception e) {
 					Debug.Write($"Failed to load the user preferences ({path}): {e}");
+					return false;
 				}
+			} else {
+				return false;
 			}
 		}
 

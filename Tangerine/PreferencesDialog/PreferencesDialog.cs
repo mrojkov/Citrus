@@ -16,7 +16,7 @@ namespace Tangerine
 
 		public PreferencesDialog()
 		{
-			theme = UserPreferences.Instance.Theme;
+			theme = Core.UserPreferences.Instance.Get<UserPreferences>().Theme;
 			window = new Window(new WindowOptions {
 				ClientSize = new Vector2(600, 400),
 				FixedSize = false,
@@ -56,20 +56,20 @@ namespace Tangerine
 			};
 			okButton.Clicked += () => {
 				window.Close();
-				if (theme != UserPreferences.Instance.Theme) {
+				if (theme != Core.UserPreferences.Instance.Get<UserPreferences>().Theme) {
 					AlertDialog.Show("The color theme change will take effect next time you run Tangerine.");
 				}
-				UserPreferences.Instance.Save();
+				Core.UserPreferences.Instance.Save();
 			};
 			cancelButton.Clicked += () => {
 				window.Close();
-				UserPreferences.Instance.Load();
+				Core.UserPreferences.Instance.Load();
 			};
 			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
 			rootWidget.LateTasks.AddLoop(() => {
 				if (rootWidget.Input.ConsumeKeyPress(Key.Escape)) {
 					window.Close();
-					UserPreferences.Instance.Load();
+					Core.UserPreferences.Instance.Load();
 				}
 			});
 			okButton.SetFocus();
@@ -80,18 +80,18 @@ namespace Tangerine
 			var pane = new ThemedScrollView();
 			pane.Content.Layout = new VBoxLayout { Spacing = 4 };
 			new EnumPropertyEditor<ColorThemeEnum>(
-				new PropertyEditorParams(pane.Content, UserPreferences.Instance, "Theme", "User interface theme"));
+				new PropertyEditorParams(pane.Content, Core.UserPreferences.Instance.Get<Tangerine.UserPreferences>(), nameof(Tangerine.UserPreferences.Theme), "User interface theme"));
 			new Vector2PropertyEditor(
-				new PropertyEditorParams(pane.Content, UserPreferences.Instance, "DefaultSceneDimensions", "Default scene dimensions"));
+				new PropertyEditorParams(pane.Content, Core.UserPreferences.Instance.Get<Tangerine.UserPreferences>(), nameof(Tangerine.UserPreferences.DefaultSceneDimensions), "Default scene dimensions"));
 			new BooleanPropertyEditor(
-				new PropertyEditorParams(pane.Content, UserPreferences.Instance, "AutoKeyframes", "Automatic keyframes"));
+				new PropertyEditorParams(pane.Content, Core.UserPreferences.Instance.Get<UI.Timeline.UserPreferences>(), nameof(UI.Timeline.UserPreferences.AutoKeyframes), "Automatic keyframes"));
 			new BooleanPropertyEditor(
-				new PropertyEditorParams(pane.Content, UserPreferences.Instance, "AnimationMode", "Animation mode"));
+				new PropertyEditorParams(pane.Content, Core.UserPreferences.Instance.Get<UI.Timeline.UserPreferences>(), nameof(UI.Timeline.UserPreferences.AnimationMode), "Animation mode"));
 
 			var overlaysEditor = new BooleanPropertyEditor(new PropertyEditorParams(
-				pane.Content, UserPreferences.Instance, nameof(UserPreferences.ShowOverlays), "Show overlays"));
+				pane.Content, Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>(), nameof(UI.SceneView.UserPreferences.ShowOverlays), "Show overlays"));
 			overlaysEditor.ContainerWidget.AddChangeWatcher(
-				() => UserPreferences.Instance.ShowOverlays, (v) => Application.InvalidateWindows());
+				() => Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>().ShowOverlays, (v) => Application.InvalidateWindows());
 
 			return pane;
 		}

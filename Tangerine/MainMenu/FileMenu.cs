@@ -14,10 +14,10 @@ namespace Tangerine
 			if (dlg.RunModal()) {
 				if (Project.Current.Close()) {
 					new Project(dlg.FileName).Open();
-					var prefs = UserPreferences.Instance;
+					var prefs = Core.UserPreferences.Instance.Get<UserPreferences>();
 					prefs.RecentProjects.Remove(dlg.FileName);
 					prefs.RecentProjects.Insert(0, dlg.FileName);
-					prefs.Save();
+					Core.UserPreferences.Instance.Save();
 				}
 			}
 		}
@@ -76,9 +76,9 @@ namespace Tangerine
 				Document.Current.Save();
 			} catch (System.Exception e) {
 				ShowErrorMessageBox(e);
-			}				
+			}
 		}
-		
+
 		public static void ShowErrorMessageBox(System.Exception e)
 		{
 			AlertDialog.Show($"Save document error: '{e.Message}'.\nYou may have to upgrade the document format.");
@@ -141,7 +141,7 @@ namespace Tangerine
 			}
 		}
 	}
-	
+
 	public class UpgradeDocumentFormat : DocumentCommandHandler
 	{
 		public override bool GetEnabled()
@@ -159,7 +159,7 @@ namespace Tangerine
 				Document.Current.Save();
 			} catch (System.Exception e) {
 				AlertDialog.Show($"Upgrade document format error: '{e.Message}'");
-			}				
+			}
 		}
 
 		private void RestoreDefaultAnimationEngine(Node node)
