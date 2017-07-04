@@ -12,9 +12,6 @@ namespace Tangerine.UI.FilesystemView
 		[YuzuRequired]
 		public bool ShowSelectionPreview = true;
 
-		[YuzuRequired]
-		public Dictionary<string, List<float>> Splitters { get; } = new Dictionary<string, List<float>>();
-
 		public static UserPreferences Instance;
 
 		public UserPreferences(bool makeInstance)
