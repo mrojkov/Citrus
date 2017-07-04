@@ -4,7 +4,7 @@ using Lime;
 using Yuzu;
 using System.Collections.Generic;
 
-namespace Tangerine.UI
+namespace Tangerine
 {
 	public enum ColorThemeEnum
 	{
@@ -12,19 +12,14 @@ namespace Tangerine.UI
 		Dark
 	}
 
+	// Don't use YuzuRequired or YuzuDefault here since it will trigger exception in UserPreferences classes c-tor
 	public class UserPreferences
 	{
-		[YuzuMember]
+		[YuzuRequired]
 		public UI.DockManager.State DockState = new UI.DockManager.State();
 
-		[YuzuMember]
+		[YuzuRequired]
 		public readonly List<string> RecentProjects = new List<string>();
-
-		[YuzuRequired]
-		public bool AutoKeyframes { get; set; }
-
-		[YuzuRequired]
-		public bool AnimationMode { get; set; }
 
 		[YuzuRequired]
 		public ColorThemeEnum Theme { get; set; }
@@ -32,14 +27,14 @@ namespace Tangerine.UI
 		[YuzuRequired]
 		public Vector2 DefaultSceneDimensions { get; set; } = new Vector2(1024, 768);
 
-		[YuzuOptional]
-		public bool ShowOverlays { get; set; }
+		[YuzuRequired]
+		public UI.SceneView.UserPreferences SceneViewUserPreferences { get; private set; } = new UI.SceneView.UserPreferences(true);
 
-		[YuzuOptional]
-		public float TimelineColWidth { get; set; } = 15;
+		[YuzuRequired]
+		public UI.Timeline.UserPreferences TimelineUserPreferences { get; private set; } = new UI.Timeline.UserPreferences(true);
 
-		[YuzuOptional]
-		public Dictionary<string, List<float>> Splitters { get; } = new Dictionary<string, List<float>>();
+		[YuzuRequired]
+		public UI.FilesystemView.UserPreferences FilesystemViewPreferences { get; private set; } = new UI.FilesystemView.UserPreferences(true);
 
 		public static UserPreferences Instance { get; private set; }
 

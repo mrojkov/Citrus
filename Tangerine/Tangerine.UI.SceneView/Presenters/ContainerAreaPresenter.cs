@@ -4,7 +4,7 @@ using Lime;
 
 namespace Tangerine.UI.SceneView
 {
-	public class ContainerAreaPresenter 
+	public class ContainerAreaPresenter
 	{
 		public ContainerAreaPresenter(SceneView sceneView)
 		{

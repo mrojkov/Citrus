@@ -11,7 +11,7 @@ namespace Tangerine.UI.Timeline
 	public class Timeline : IDocumentView
 	{
 		public static Timeline Instance { get; private set; }
-			
+
 		public readonly Toolbar Toolbar;
 		public readonly Rulerbar Ruler;
 		public readonly OverviewPane Overview;
@@ -97,11 +97,11 @@ namespace Tangerine.UI.Timeline
 		{
 			RootWidget.Layout = new StackLayout();
 			RootWidget.AddNode(new ThemedVSplitter {
-				Stretches = Splitter.GetStretchesFromDictionary(UserPreferences.Instance.Splitters, "TimelineVSplitter", 0.5f, 1),
+				Stretches = Splitter.GetStretchesList(ref UserPreferences.Instance.TimelineVSplitterStretches, 0.5f, 1),
 				Nodes = {
 					Overview.RootWidget,
 					new ThemedHSplitter {
-						Stretches = Splitter.GetStretchesFromDictionary(UserPreferences.Instance.Splitters, "TimelineHSplitter", 0.3f, 1),
+						Stretches = Splitter.GetStretchesList(ref UserPreferences.Instance.TimelineHSplitterStretches, 0.3f, 1),
 						Nodes = {
 							new Widget {
 								Layout = new VBoxLayout(),
@@ -182,7 +182,7 @@ namespace Tangerine.UI.Timeline
 			var pos = col * TimelineMetrics.ColWidth - Offset.X;
 			return pos >= 0 && pos < Grid.Size.X;
 		}
-		
+
 		public bool IsRowVisible(int row)
 		{
 			var pos = Document.Current.Rows[row].GridWidget().Top() - Offset.Y;

@@ -19,10 +19,9 @@ namespace Lime
 		protected void RaiseDragStarted() => DragStarted?.Invoke();
 		protected void RaiseDragEnded() => DragEnded?.Invoke();
 
-		public static List<float> GetStretchesFromDictionary(Dictionary<string, List<float>> storage, string name, params float[] defaults)
+		public static List<float> GetStretchesList(ref List<float> stretches, params float[] defaults)
 		{
-			List<float> stretches;
-			if (!storage.TryGetValue(name, out stretches)) {
+			if (stretches == null || stretches.Count < defaults.Length) {
 				stretches = new List<float>();
 				stretches.AddRange(defaults);
 			}

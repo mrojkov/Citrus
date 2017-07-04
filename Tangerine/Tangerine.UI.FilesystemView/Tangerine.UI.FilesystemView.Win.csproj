@@ -58,6 +58,7 @@
     <Compile Include="FilesystemToolbar.cs" />
     <Compile Include="SystemShellContextMenu.cs" />
     <Compile Include="SystemIconTextureCache.Win.cs" />
+    <Compile Include="UserPreferences.cs" />
     <Compile Include="WinAPI.cs" />
   </ItemGroup>
   <ItemGroup>

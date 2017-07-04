@@ -90,13 +90,14 @@
     <Compile Include="Processors\Rulerbar\RulerbarMouseScrollProcessor.cs" />
     <Compile Include="CommandBindings.cs" />
     <Compile Include="Components\RowView.cs" />
+    <Compile Include="UserPreferences.cs" />
+    <Compile Include="Utils\TimelineMetrics.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Commands\" />
     <Folder Include="Components\Model\" />
     <Folder Include="Components\Presentation\" />
     <Folder Include="Tasks\Rulerbar\" />
-    <Folder Include="Processors\Rulerbar\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Win.csproj">

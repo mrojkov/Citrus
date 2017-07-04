@@ -9,7 +9,7 @@ namespace Tangerine.UI.FilesystemView
 		{
 			Padding = new Thickness { Left = 4 };
 			MinMaxHeight = Metrics.ToolbarHeight;
-			MinWidth = TimelineMetrics.ToolbarMinWidth;
+			MinWidth = 50;// TimelineMetrics.ToolbarMinWidth;
 			Presenter = new DelegatePresenter<Widget>(Render);
 			Layout = new HBoxLayout { Spacing = 2, CellDefaults = new LayoutCell(Alignment.Center) };
 		}

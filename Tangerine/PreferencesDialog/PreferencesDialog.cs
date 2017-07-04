@@ -89,9 +89,9 @@ namespace Tangerine
 				new PropertyEditorParams(pane.Content, UserPreferences.Instance, "AnimationMode", "Animation mode"));
 
 			var overlaysEditor = new BooleanPropertyEditor(new PropertyEditorParams(
-				pane.Content, UserPreferences.Instance, nameof(UserPreferences.ShowOverlays), "Show overlays"));
+				pane.Content, UserPreferences.Instance, nameof(UI.SceneView.UserPreferences.ShowOverlays), "Show overlays"));
 			overlaysEditor.ContainerWidget.AddChangeWatcher(
-				() => UserPreferences.Instance.ShowOverlays, (v) => Application.InvalidateWindows());
+				() => UserPreferences.Instance.SceneViewUserPreferences.ShowOverlays, (v) => Application.InvalidateWindows());
 
 			return pane;
 		}
