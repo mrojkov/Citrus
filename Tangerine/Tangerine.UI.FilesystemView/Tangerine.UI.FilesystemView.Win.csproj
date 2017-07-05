@@ -48,7 +48,9 @@
   <ItemGroup>
     <Compile Include="CookingRulesEditor.cs" />
     <Compile Include="FileEnumerator.cs" />
+    <Compile Include="FilesystemPane.cs" />
     <Compile Include="FilesystemView.cs" />
+    <Compile Include="FilesystemViewExtensions.cs" />
     <Compile Include="Icon.cs" />
     <Compile Include="ISystemIconTextureProvider.cs" />
     <Compile Include="ISystemShellContextMenu.cs" />
@@ -59,6 +61,7 @@
     <Compile Include="SystemShellContextMenu.cs" />
     <Compile Include="SystemIconTextureCache.Win.cs" />
     <Compile Include="UserPreferences.cs" />
+    <Compile Include="ViewNode.cs" />
     <Compile Include="WinAPI.cs" />
   </ItemGroup>
   <ItemGroup>

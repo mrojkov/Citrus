@@ -125,8 +125,7 @@ namespace Tangerine
 				new Project(proj).Open();
 			}
 #if WIN
-			var fsView = new UI.FilesystemView.FilesystemView(filesystemPanel);
-			fsView.Attach();
+			new UI.FilesystemView.FilesystemPane(filesystemPanel);
 #endif
 			RegisterGlobalCommands();
 		}

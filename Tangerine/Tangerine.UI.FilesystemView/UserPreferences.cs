@@ -1,6 +1,6 @@
-using System;
 using System.Collections.Generic;
 using Lime;
+using Tangerine.Core;
 using Yuzu;
 
 namespace Tangerine.UI.FilesystemView
@@ -8,9 +8,22 @@ namespace Tangerine.UI.FilesystemView
 	public class UserPreferences : Component
 	{
 		[YuzuRequired]
-		public bool ShowCookingRulesEditor = true;
+		public Dictionary<string, ViewNode> ViewRootPerProjectFile = new Dictionary<string, ViewNode>();
 
-		[YuzuRequired]
-		public bool ShowSelectionPreview = true;
+		public ViewNode ViewRoot
+		{
+			get
+			{
+				var path = Project.Current.CitprojPath ?? "";
+				if (!ViewRootPerProjectFile.ContainsKey(path)) {
+					ViewRootPerProjectFile.Add(path, new FSViewNode());
+				}
+				return ViewRootPerProjectFile[path];
+			}
+			set
+			{
+				ViewRootPerProjectFile[Project.Current.CitprojPath ?? ""] = value;
+			}
+		}
 	}
 }

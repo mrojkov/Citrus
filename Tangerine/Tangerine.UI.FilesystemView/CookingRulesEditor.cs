@@ -163,7 +163,7 @@ namespace Tangerine.UI.FilesystemView
 				return;
 			}
 			var targetDir = new System.IO.FileInfo(selection.First()).Directory.FullName;
-			if (!targetDir.StartsWith(Orange.The.Workspace.AssetsDirectory)) {
+			if (Orange.The.Workspace.AssetsDirectory == null || !targetDir.StartsWith(Orange.The.Workspace.AssetsDirectory)) {
 				// We're somewhere outside the project directory
 				return;
 			}

@@ -73,7 +73,7 @@ namespace Tangerine.UI.FilesystemView
 
 	public class Model
 	{
-		private string currentPath = Project.Current?.AssetsDirectory ?? Directory.GetCurrentDirectory();
+		private string currentPath;
 		public string CurrentPath
 		{
 			get { return currentPath; }
@@ -85,6 +85,14 @@ namespace Tangerine.UI.FilesystemView
 				} catch {
 					(new AlertDialog("Invalid Directory")).Show();
 				}
+			}
+		}
+
+		public Model(string path)
+		{
+			currentPath = path;
+			if (!Directory.Exists(path)) {
+				currentPath = Directory.GetCurrentDirectory();
 			}
 		}
 

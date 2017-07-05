@@ -243,4 +243,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Icons\Filesystem\ArrowUp.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Icons\Filesystem\Close.png" />
+    <EmbeddedResource Include="Resources\Icons\Filesystem\SplitH.png" />
+    <EmbeddedResource Include="Resources\Icons\Filesystem\SplitV.png" />
+  </ItemGroup>
 </Project>

@@ -2,20 +2,19 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Windows.Forms;
 using Lime;
 using Tangerine.Core;
 
 namespace Tangerine.UI.FilesystemView
 {
-	public class FilesystemView : IDocumentView
+	// Single instance of view on filesystem, cooking rules editor and preview
+	// Created and managed by FilesystemPane
+	public class FilesystemView
 	{
-		public static FilesystemView Instance;
-		private Widget dockPanelWidget;
-		private Widget rootWidget;
+		public Widget RootWidget;
 		private ThemedScrollView scrollView;
-		private readonly FilesystemToolbar toolbar;
-		private readonly Model model = new Model();
+		private FilesystemToolbar toolbar;
+		private Model model;
 		private Vector2 rectSelectionBeginPoint;
 		private Vector2 rectSelectionEndPoint;
 		private bool rectSelecting;
@@ -29,6 +28,18 @@ namespace Tangerine.UI.FilesystemView
 		private NodeToggler togglePreview;
 		private bool beginDrag;
 		private Vector2 dragStartPosition;
+		private ThemedHSplitter cookingRulesSplitter;
+		private ThemedVSplitter selectionPreviewSplitter;
+
+		public void Split(SplitterType type)
+		{
+			FilesystemPane.Split(this, type);
+		}
+
+		public void Close()
+		{
+			FilesystemPane.Close(this);
+		}
 
 		public void GoBackward()
 		{
@@ -86,19 +97,27 @@ namespace Tangerine.UI.FilesystemView
 			fsWatcher.Renamed += (p) => OnFsWatcherChanged();
 		}
 
-		public FilesystemView(DockPanel dockPanel)
+		public FilesystemView()
 		{
-			dockPanelWidget = dockPanel.ContentWidget;
-			rootWidget = new Widget();
-			toolbar = new FilesystemToolbar();
+			RootWidget = new Widget();
 			scrollView = new ThemedScrollView();
-			rootWidget.AddChangeWatcher(() => model.CurrentPath, (path) => dockPanel.Title = $"Filesystem: {path}");
+			// TODO: Display path
+			RootWidget.AddChangeWatcher(() => model.CurrentPath, (path) => toolbar.Path = $"Filesystem: {path}");
 			crEditor = new CookingRulesEditor(NavigateAndSelect);
 			preview = new Preview();
+		}
+
+		// Component with user preferences should be added to rootWidget at this moment
+		public void Initialize()
+		{
+			var up = RootWidget.Components.Get<ViewNodeComponent>().ViewNode as FSViewNode;
+			toolbar = new FilesystemToolbar(this);
+			model = new Model(up.Path);
 			InitializeWidgets();
+			selectionPreviewSplitter.Stretches = Splitter.GetStretchesList(up.SelectionPreviewSplitterStretches, 1, 1);
+			cookingRulesSplitter.Stretches = Splitter.GetStretchesList(up.CookingRulesSplitterStretches, 1, 1);
 			toggleCookingRules = new NodeToggler(crEditor.RootWidget, () => { crEditor.Invalidate(selection); });
 			togglePreview = new NodeToggler(preview.RootWidget, () => { preview.Invalidate(selection); });
-			var up = Core.UserPreferences.Instance.Get<UserPreferences>();
 			if (!up.ShowCookingRulesEditor) {
 				toggleCookingRules.Toggle();
 			}
@@ -125,36 +144,38 @@ namespace Tangerine.UI.FilesystemView
 				canvas.PrepareRendererState();
 				Renderer.DrawRect(Vector2.Zero, canvas.Size, Theme.Colors.WhiteBackground);
 			});
-			rootWidget.AddChangeWatcher(() => rectSelectionEndPoint, WhenSelectionRectChanged);
-			rootWidget.AddChangeWatcher(() => WidgetContext.Current.NodeUnderMouse, (value) => {
+			RootWidget.AddChangeWatcher(() => rectSelectionEndPoint, WhenSelectionRectChanged);
+			RootWidget.AddChangeWatcher(() => WidgetContext.Current.NodeUnderMouse, (value) => {
 				if (value != null && scrollView.Content == value.Parent) {
 					Window.Current.Invalidate();
 				}
 			});
-			rootWidget.AddChangeWatcher(() => model.CurrentPath, (p) => {
+			RootWidget.AddChangeWatcher(() => model.CurrentPath, (p) => {
+				var up = RootWidget.Components.Get<ViewNodeComponent>().ViewNode as FSViewNode;
+				up.Path = p;
 				AddToNavHystory(p);
 				selection.Clear();
 				InvalidateView(p);
 				InvalidateFSWatcher(p);
 				preview.ClearTextureCache();
 			});
-			rootWidget.Layout = new VBoxLayout();
-			rootWidget.AddNode(new ThemedHSplitter {
+			RootWidget.Layout = new VBoxLayout();
+			RootWidget.AddNode((cookingRulesSplitter = new ThemedHSplitter {
 				Nodes = {
 					(new Widget {
 						Layout = new VBoxLayout(),
 						Nodes = {
 							toolbar,
-							new ThemedVSplitter {
+							(selectionPreviewSplitter = new ThemedVSplitter {
 								Nodes = {
 									scrollView,
 									preview.RootWidget,
 								}
-							}
+							})
 						}}),
 						crEditor.RootWidget,
 				}
-			});
+			}));
 		}
 
 		private void Selection_Changed()
@@ -312,19 +333,6 @@ namespace Tangerine.UI.FilesystemView
 				canvas.PrepareRendererState();
 				Renderer.DrawRect(rectSelectionBeginPoint, rectSelectionEndPoint, Theme.Colors.SelectedBackground.Transparentify(0.5f));
 				Renderer.DrawRectOutline(rectSelectionBeginPoint, rectSelectionEndPoint, Theme.Colors.SelectedBackground.Darken(0.2f));
-		}
-
-		public void Attach()
-		{
-			Instance = this;
-			dockPanelWidget.PushNode(rootWidget);
-			rootWidget.SetFocus();
-		}
-
-		public void Detach()
-		{
-			Instance = null;
-			rootWidget.Unlink();
 		}
 
 		public void GoUp()

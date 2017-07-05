@@ -22,72 +22,128 @@ namespace Tangerine.UI.FilesystemView
 	}
 	public class FilesystemToolbar : Toolbar
 	{
-		public FilesystemToolbar()
+		FilesystemView view;
+		private SimpleText pathText;
+
+		public FilesystemToolbar(FilesystemView view)
 		{
+			this.view = view;
 			Nodes.AddRange(
-				CreateGotoCurrentProjectDirectoryButton(),
-				CreateUpButton(),
-				CreateGoBackwardButton(),
-				CreateGoForwardButton(),
-				CreateToggleCookingRulesButton(),
-				CreateTogglePreviewButton()
+				new Widget {
+					Layout = new VBoxLayout(),
+					Nodes = {
+						(pathText = new ThemedSimpleText {
+						}),
+						new Widget {
+							Layout = new HBoxLayout(),
+							Nodes = {
+								CreateGotoCurrentProjectDirectoryButton(),
+								CreateUpButton(),
+								CreateGoBackwardButton(),
+								CreateGoForwardButton(),
+								CreateToggleCookingRulesButton(),
+								CreateTogglePreviewButton(),
+								CreateSplitHButton(),
+								CreateSplitVButton(),
+								CreateCloseButton()
+							}
+						}
+					}
+				}
 			);
+		}
+
+		public string Path
+		{
+			get
+			{
+				return pathText.Text;
+			}
+			set
+			{
+				pathText.Text = value;
+			}
 		}
 
 		private Widget CreateGoBackwardButton()
 		{
 			return new ToolbarButton(IconPool.GetTexture("Filesystem.ArrowLeft")) {
-				Clicked = () => FilesystemView.Instance?.GoBackward(),
+				Clicked = () => view.GoBackward(),
 			};
 		}
 
 		private Widget CreateGoForwardButton()
 		{
 			return new ToolbarButton(IconPool.GetTexture("Filesystem.ArrowRight")) {
-				Clicked = () => FilesystemView.Instance?.GoForward(),
+				Clicked = () => view.GoForward(),
 			};
 		}
 
-		private static Widget CreateGotoCurrentProjectDirectoryButton()
+		private Widget CreateGotoCurrentProjectDirectoryButton()
 		{
 			return new ToolbarButton(IconPool.GetTexture("Filesystem.Home")) {
-				Clicked = () => {
-					FilesystemView.Instance?.GoTo(Project.Current.AssetsDirectory);
-				}
+				Clicked = () => { view.GoTo(Project.Current.AssetsDirectory); }
 			};
 		}
 
-		private static Widget CreateUpButton()
+		private Widget CreateUpButton()
 		{
 			return new ToolbarButton(IconPool.GetTexture("Filesystem.ArrowUp")) {
-				Clicked = () => {
-					FilesystemView.Instance?.GoUp();
-				}
+				Clicked = () => { view.GoUp(); }
 			};
 		}
 
-		private static Widget CreateToggleCookingRulesButton()
+		private Widget CreateToggleCookingRulesButton()
 		{
 			ToolbarButton b = null;
-			var up = Core.UserPreferences.Instance.Get<UserPreferences>();
+			var up = view.RootWidget.Components.Get<ViewNodeComponent>().ViewNode as FSViewNode;
 			return b = new ToolbarButton(IconPool.GetTexture("Filesystem.CookingRules")) {
 				Checked = up.ShowCookingRulesEditor,
 				Clicked = () => {
-					FilesystemView.Instance.ToggleCookingRules();
+					view.ToggleCookingRules();
 					up.ShowCookingRulesEditor = b.Checked = !b.Checked;
 				}
 			};
 		}
 
-		private static Widget CreateTogglePreviewButton()
+		private Widget CreateTogglePreviewButton()
 		{
 			ToolbarButton b = null;
-			var up = Core.UserPreferences.Instance.Get<UserPreferences>();
+			var up = view.RootWidget.Components.Get<ViewNodeComponent>().ViewNode as FSViewNode;
 			return b = new ToolbarButton(IconPool.GetTexture("Filesystem.Preview")) {
 				Checked = up.ShowSelectionPreview,
 				Clicked = () => {
-					FilesystemView.Instance.TogglePreview();
+					view.TogglePreview();
 					up.ShowSelectionPreview = b.Checked = !b.Checked;
+				}
+			};
+		}
+
+		private Widget CreateSplitHButton()
+		{
+			ToolbarButton b = null;
+			return b = new ToolbarButton(IconPool.GetTexture("Filesystem.SplitH")) {
+				Clicked = () => {
+					view.Split(SplitterType.Horizontal);
+				}
+			};
+		}
+
+		private Widget CreateSplitVButton()
+		{
+			ToolbarButton b = null;
+			return b = new ToolbarButton(IconPool.GetTexture("Filesystem.SplitV")) {
+				Clicked = () => {
+					view.Split(SplitterType.Vertical);
+				}
+			};
+		}
+
+		private Widget CreateCloseButton()
+		{
+			return new ToolbarButton(IconPool.GetTexture("Filesystem.Close")) {
+				Clicked = () => {
+					view.Close();
 				}
 			};
 		}
