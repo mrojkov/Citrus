@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace Lime
 {
@@ -72,10 +71,10 @@ namespace Lime
 			DumpNodeWithProfilingInfo(frame, fileName);
 		}
 
-		public static void DumpNodeWithProfilingInfo(Node node, string fileName)
+		public static void DumpNodeWithProfilingInfo(Node node, string fileName, Action<Node> customOperation = null)
 		{
 			var ms = new MemoryStream();
-			using (var clone = CreateCloneForSerialization(node)) {
+			using (var clone = CreateCloneForSerialization(node, customOperation)) {
 				Serialization.WriteObject(fileName, ms, clone, Serialization.Format.JSON);
 			}
 			using (var fs = new FileStream(fileName, FileMode.Create)) {
@@ -84,11 +83,12 @@ namespace Lime
 			}
 		}
 
-		private static Node CreateCloneForSerialization(Node node)
+		private static Node CreateCloneForSerialization(Node node, Action<Node> customOperation = null)
 		{
 			var clone = node.Clone();
 			CalculateUsageSummary(clone);
 			foreach (var n in clone.Descendants) {
+				customOperation?.Invoke(n);
 				AlterId(n);
 				RenameBonesInMesh3D(n);
 				ResetFoldersAndAnimations(n);
@@ -129,6 +129,7 @@ namespace Lime
 		private static void ProcessExternalContent(Node clone)
 		{
 			// Models should be external content, others should be inlined
+			clone.ContentsPath = null;
 			foreach (var n in clone.Descendants.Where(i => !string.IsNullOrEmpty(i.ContentsPath))) {
 				if (n is Model3D) {
 					n.Nodes.Clear();
