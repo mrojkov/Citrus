@@ -23,7 +23,13 @@ namespace Orange
 
 		public static void CookForActivePlatform()
 		{
-			Cook(The.Workspace.ActivePlatform);
+			var skipCooking = The.Workspace.ProjectJson.GetValue<bool>("SkipAssetsCook");
+			if (!skipCooking) {
+				Cook(The.Workspace.ActivePlatform);
+			}
+			else {
+				Console.WriteLine("-------------  Skip Assets Cooking -------------");
+			}
 		}
 
 		public static void AddStage(Action action)
