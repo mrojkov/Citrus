@@ -117,7 +117,16 @@ namespace Lime
 
 		public bool Contains(Vector2 value)
 		{
-			return (value.X >= A.X) && (value.Y >= A.Y) && (value.X < B.X) && (value.Y < B.Y);
+			return A.X < B.X ? CheckContains(value, A, B) : CheckContains(value, B, A);
+		}
+
+		private static bool CheckContains(Vector2 value, Vector2 a, Vector2 b)
+		{
+			if (a.Y > b.Y) {
+				return (value.X >= a.X) && (value.Y <= a.Y) && (value.X < b.X) && (value.Y > b.Y);
+			} else {
+				return (value.X >= a.X) && (value.Y >= a.Y) && (value.X < b.X) && (value.Y < b.Y);
+			}
 		}
 
 		public Vector2 Size {
