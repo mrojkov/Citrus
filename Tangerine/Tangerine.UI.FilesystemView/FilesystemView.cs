@@ -102,7 +102,7 @@ namespace Tangerine.UI.FilesystemView
 			RootWidget = new Widget();
 			scrollView = new ThemedScrollView();
 			// TODO: Display path
-			RootWidget.AddChangeWatcher(() => model.CurrentPath, (path) => toolbar.Path = $"Filesystem: {path}");
+			RootWidget.AddChangeWatcher(() => model.CurrentPath, (path) => toolbar.Path = path.ToString());
 			crEditor = new CookingRulesEditor(NavigateAndSelect);
 			preview = new Preview();
 		}
@@ -140,9 +140,12 @@ namespace Tangerine.UI.FilesystemView
 			scrollView.Padding = new Thickness(5.0f);
 			scrollView.Content.CompoundPostPresenter.Insert(0, new DelegatePresenter<Widget>(RenderFilesWidgetRectSelection));
 			scrollView.Updated += ScrollViewUpdated;
-			scrollView.Content.Presenter = new DelegatePresenter<ScrollView.ScrollViewContentWidget>((canvas) => {
-				canvas.PrepareRendererState();
-				Renderer.DrawRect(Vector2.Zero, canvas.Size, Theme.Colors.WhiteBackground);
+			scrollView.Content.Presenter = new DelegatePresenter<Widget>((w) => {
+				w.PrepareRendererState();
+				var wp = w.ParentWidget;
+				var p = wp.Padding;
+				Renderer.DrawRect(-w.Position + Vector2.Zero - new Vector2(p.Left, p.Top),
+					-w.Position + wp.Size + new Vector2(p.Right, p.Bottom), Theme.Colors.WhiteBackground);
 			});
 			RootWidget.AddChangeWatcher(() => rectSelectionEndPoint, WhenSelectionRectChanged);
 			RootWidget.AddChangeWatcher(() => WidgetContext.Current.NodeUnderMouse, (value) => {

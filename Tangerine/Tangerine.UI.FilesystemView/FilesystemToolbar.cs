@@ -30,10 +30,12 @@ namespace Tangerine.UI.FilesystemView
 			this.view = view;
 			Nodes.AddRange(
 				new Widget {
+					Presenter = new DelegatePresenter<Widget>((w) => {
+						w.PrepareRendererState();
+						Renderer.DrawLine(0.0f, w.Size.Y, w.Size.X, w.Size.Y, Theme.Colors.SeparatorColor);
+					}),
 					Layout = new VBoxLayout(),
 					Nodes = {
-						(pathText = new ThemedSimpleText {
-						}),
 						new Widget {
 							Layout = new HBoxLayout(),
 							Nodes = {
@@ -45,9 +47,14 @@ namespace Tangerine.UI.FilesystemView
 								CreateTogglePreviewButton(),
 								CreateSplitHButton(),
 								CreateSplitVButton(),
+								new Widget {
+									LayoutCell = new LayoutCell { Stretch = new Vector2(9999, 9999)}
+								},
 								CreateCloseButton()
 							}
-						}
+						},
+						(pathText = new ThemedSimpleText {
+						}),
 					}
 				}
 			);
