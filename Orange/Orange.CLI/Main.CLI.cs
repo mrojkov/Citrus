@@ -1,12 +1,10 @@
-#if ORANGE_CLI
 using System;
 
 namespace Orange
 {
 	class MainClass
 	{
-		[STAThread]
-		public static void Main (string[] args)
+		static void Main(string[] args)
 		{
 			var culture = System.Globalization.CultureInfo.InvariantCulture;
 			System.Threading.Thread.CurrentThread.CurrentCulture = culture;
@@ -16,4 +14,3 @@ namespace Orange
 		}
 	}
 }
-#endif // ORANGE_CLI

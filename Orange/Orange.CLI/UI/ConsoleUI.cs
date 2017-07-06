@@ -1,5 +1,4 @@
-﻿#if ORANGE_CLI
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -203,4 +202,3 @@ namespace Orange
 		}
 	}
 }
-#endif // ORANGE_CLI

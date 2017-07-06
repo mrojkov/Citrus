@@ -1,4 +1,3 @@
-#if ORANGE_CLI
 using System.ComponentModel.Composition;
 
 namespace Orange
@@ -15,4 +14,3 @@ namespace Orange
 		}
 	}
 }
-#endif // ORANGE_CLI
