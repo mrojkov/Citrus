@@ -8,6 +8,7 @@ namespace Lime
 	public abstract class CommonDropDownList : Widget
 	{
 		public event Action<ChangedEventArgs> Changed;
+		public event Action ShowingDropDownList;
 		public readonly ObservableCollection<Item> Items = new ObservableCollection<Item>();
 		public NodeReference<Widget> TextWidgetRef { get; set; } = new NodeReference<Widget>("TextWidget");
 
@@ -100,6 +101,7 @@ namespace Lime
 
 		private void ShowDropDownList()
 		{
+			ShowingDropDownList?.Invoke();
 #if MAC || WIN
 			var menu = new Menu();
 			int j = 0;
