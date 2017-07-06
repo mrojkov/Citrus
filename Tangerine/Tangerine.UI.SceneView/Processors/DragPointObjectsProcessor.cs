@@ -77,7 +77,7 @@ namespace Tangerine.UI.SceneView
 		{
 			if (po.SkinningWeights == null && po.Parent?.AsWidget != null) {
 				var parentSize = po.Parent.AsWidget.Size;
-				if (parentSize.X > 0 && parentSize.Y > 0) {
+				if (parentSize.X != 0 && parentSize.Y != 0) {
 					var p = (value - po.Offset) / parentSize;
 					Core.Operations.SetAnimableProperty.Perform(po, nameof(PointObject.Position), p);
 				}
