@@ -240,5 +240,12 @@ namespace Lime
 			}
 			yield return to;
 		}
+
+		public static IEnumerator<object> Repeat(Func<bool> f)
+		{
+			while (f()) {
+				yield return null;
+			}
+		}
 	}
 }
