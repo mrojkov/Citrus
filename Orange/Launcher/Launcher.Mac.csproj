@@ -116,6 +116,7 @@
     <Compile Include="..\Source\Toolbox\IFileEnumerator.cs">
       <Link>IFileEnumerator.cs</Link>
     </Compile>
+    <Compile Include="AssembliesInstaller.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="Mac\MainWindow.xib" />
