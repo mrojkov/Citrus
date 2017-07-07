@@ -19,14 +19,14 @@ namespace Tangerine.UI.SceneView
 				if (Utils.CalcHullAndPivot(widgets, sv.Scene, out hull, out pivot)) {
 					for (int i = 0; i < 4; i++) {
 						var a = hull[i];
-						if (sv.HitTestControlPoint(a, 6)) {
+						if (sv.HitTestResizeControlPoint(a)) {
 							Utils.ChangeCursorIfDefault(MouseCursor.SizeNS);
 							if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {
 								yield return Resize(i * 2, pivot);
 							}
 						}
 						var b = hull[(i + 1) % 4];
-						if (sv.HitTestControlPoint((a + b) / 2, 6)) {
+						if (sv.HitTestResizeControlPoint((a + b) / 2)) {
 							var cursor = (b.X - a.X).Abs() > (b.Y - a.Y).Abs() ? MouseCursor.SizeNS : MouseCursor.SizeWE;
 							Utils.ChangeCursorIfDefault(cursor);
 							if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {

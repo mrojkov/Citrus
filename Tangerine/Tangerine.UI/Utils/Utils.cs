@@ -7,7 +7,7 @@ namespace Tangerine.UI
 {
 	public static class Utils
 	{
-		public static IEnumerable<T> Editable<T>(this IEnumerable<T> nodes) where T: Node
+		public static IEnumerable<T> Editable<T>(this IEnumerable<T> nodes) where T : Node
 		{
 			return nodes.Where(n => !n.GetTangerineFlag(TangerineFlags.Locked) && !n.GetTangerineFlag(TangerineFlags.Hidden));
 		}
@@ -85,6 +85,15 @@ namespace Tangerine.UI
 				}
 			}
 			return result;
+		}
+
+		public static Quadrangle CalcAABB(IEnumerable<PointObject> points, bool IncludeOffset = false)
+		{
+			var aabb = new Rectangle(new Vector2(float.MaxValue), new Vector2(float.MinValue));
+			foreach (var point in points) {
+				aabb = aabb.IncludingPoint(point.Position + (IncludeOffset ? point.Offset / point.Parent.AsWidget.Size : Vector2.Zero));
+			}
+			return aabb.ToQuadrangle();
 		}
 
 		public static bool ExtractAssetPathOrShowAlert(string filePath, out string assetPath, out string assetType)

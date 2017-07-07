@@ -21,11 +21,13 @@ namespace Lime
 			}
 			set
 			{
-				if (index == 0) V1 = value;
-				if (index == 1) V2 = value;
-				if (index == 2) V3 = value;
-				if (index == 3) V4 = value;
-				throw new IndexOutOfRangeException();
+				switch (index) {
+					case 0: V1 = value; break;
+					case 1: V2 = value; break;
+					case 2: V3 = value; break;
+					case 3: V4 = value; break;
+					default: throw new IndexOutOfRangeException();
+				}
 			}
 		}
 

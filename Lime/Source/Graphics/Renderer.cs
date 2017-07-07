@@ -805,6 +805,17 @@ namespace Lime
 		}
 
 		/// <summary>
+		/// Draws the quadrangle outline inscribed within the given bounds.
+		/// </summary>
+		public static void DrawQuadrangleOutline(Quadrangle q, Color4 color, float thickness = 1)
+		{
+			for (int i = 0; i < 4; i++) {
+				DrawLine(q[i].X, q[i].Y, q[(i + 1) % 4].X, q[(i + 1) % 4].Y, color, thickness, LineCap.Square);
+
+			}
+		}
+
+		/// <summary>
 		/// Draws the rectangle outline inscribed within the given bounds.
 		/// </summary>
 		public static void DrawRectOutline(float x0, float y0, float x1, float y1, Color4 color, float thickness = 1)
