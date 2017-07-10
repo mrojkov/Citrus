@@ -49,6 +49,9 @@ namespace Orange
 		[ImportMany(nameof(AfterAssetsCooked), AllowRecomposition = true)]
 		public IEnumerable<Action<string>> AfterAssetsCooked { get; set; }
 
+		[Import(nameof(AfterBundlesCooked), AllowRecomposition = true, AllowDefault = true)]
+		public Action<IReadOnlyCollection<string>> AfterBundlesCooked;
+
 		[ImportMany(nameof(CommandLineArguments), AllowRecomposition = true)]
 		public IEnumerable<Func<string>> CommandLineArguments { get; set; }
 
@@ -134,6 +137,11 @@ namespace Orange
 			foreach (var i in CurrentPlugin.AfterAssetsCooked) {
 				i(bundleName);
 			}
+		}
+
+		public static void AfterBundlesCooked(IReadOnlyCollection<string> bundles)
+		{
+			CurrentPlugin.AfterBundlesCooked?.Invoke(bundles);
 		}
 
 		public static string GetCommandLineArguments()

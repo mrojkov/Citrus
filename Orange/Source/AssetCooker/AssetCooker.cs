@@ -91,7 +91,10 @@ namespace Orange
 				CookBundle(extraBundle);
 			}
 			extraBundles.Add(CookingRulesBuilder.MainBundleName);
-			CodeCooker.Cook(extraBundles.ToList());
+
+			var extraBundlesList = extraBundles.ToList();
+			PluginLoader.AfterBundlesCooked(extraBundlesList);
+			CodeCooker.Cook(extraBundlesList);
 		}
 
 		private static void CookBundle(string bundleName)
