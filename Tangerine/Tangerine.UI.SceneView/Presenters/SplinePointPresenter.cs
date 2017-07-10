@@ -1,24 +1,37 @@
 ﻿using System;
 using Lime;
 using Tangerine.Core;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace Tangerine.UI.SceneView
 {
 	public class SplinePointPresenter : CustomPresenter<SplinePoint>
 	{
+
+		List<SplinePoint> emptySelection = new List<SplinePoint>();
+
 		protected override void InternalRender(SplinePoint point)
 		{
-			if (Document.Current.Container.IsRunning) {
-				return;
+			if (!Document.Current.Container.IsRunning && Document.Current.Container is Spline) {
+				var color = GetSelectedPoints().Contains(point) ? Color4.Green : Color4.Blue;
+				SceneView.Instance.Frame.PrepareRendererState();
+				var t = point.Parent.AsWidget.CalcTransitionToSpaceOf(SceneView.Instance.Frame);
+				var a = Vector2.CosSin(point.TangentAngle * Mathf.DegToRad) * 10 * point.TangentWeight;
+				var p1 = t * (point.TransformedPosition + a);
+				var p2 = t * (point.TransformedPosition - a);
+				Renderer.DrawLine(p1, p2, color);
+				Renderer.DrawRound(p1, 3, 10, color);
+				Renderer.DrawRound(p2, 3, 10, color);
 			}
-			SceneView.Instance.Frame.PrepareRendererState();
-			var t = point.Parent.AsWidget.CalcTransitionToSpaceOf(SceneView.Instance.Frame);
-			var a = Vector2.CosSin(point.TangentAngle * Mathf.DegToRad) * 10 * point.TangentWeight;
-			var p1 = t * (point.TransformedPosition + a);
-			var p2 = t * (point.TransformedPosition - a);
-			Renderer.DrawLine(p1, p2, ColorTheme.Current.SceneView.PointObject);
-			Renderer.DrawRound(p1, 3, 10, ColorTheme.Current.SceneView.PointObject);
-			Renderer.DrawRound(p2, 3, 10, ColorTheme.Current.SceneView.PointObject);
+		}
+
+		List<SplinePoint> GetSelectedPoints()
+		{
+			if (Document.Current.Container is Spline) {
+				return Document.Current.SelectedNodes().OfType<SplinePoint>().Editable().ToList();
+			}
+			return emptySelection;
 		}
 	}
 }
