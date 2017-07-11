@@ -107,7 +107,12 @@ namespace Tangerine.UI.FilesystemView
 
 		public IEnumerable<string> EnumerateItems()
 		{
-			return Directory.EnumerateFileSystemEntries(CurrentPath);
+			foreach (var i in Directory.EnumerateDirectories(CurrentPath).OrderBy(f => f)) {
+				yield return i;
+			}
+			foreach (var i in Directory.EnumerateFiles(CurrentPath).OrderBy(f => f)) {
+				yield return i;
+			}
 		}
 
 		public void GoTo(string path)
