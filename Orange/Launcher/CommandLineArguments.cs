@@ -6,8 +6,8 @@ namespace Launcher
 	{
 		public CommandLineArguments(string[] args)
 		{
-			AreArgumentsValid =
-				args.All(arg => arg.StartsWith("-")) &&
+			AreArgumentsValid = 
+				args.All(arg => arg.StartsWith("-")) && 
 				args
 				    // Mac-specific argument
 				    .Where(arg => !arg.StartsWith("-psn"))
@@ -35,9 +35,6 @@ namespace Launcher
 				case "run":
 					ExecutablePath = parts[1];
 					return true;
-				case "assemblies":
-					Assemblies = parts[1].Split(';');
-					return true;
 				default:
 					return false;
 			}
@@ -49,6 +46,5 @@ namespace Launcher
 		public bool ShowHelp { get; private set; }
 		public string SolutionPath { get; private set; }
 		public string ExecutablePath { get; private set; }
-		public string[] Assemblies { get; private set; }
 	}
 }

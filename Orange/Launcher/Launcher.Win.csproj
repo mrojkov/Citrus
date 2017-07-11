@@ -73,7 +73,6 @@
     <Compile Include="..\Source\Toolbox\IFileEnumerator.cs">
       <Link>IFileEnumerator.cs</Link>
     </Compile>
-    <Compile Include="AssembliesInstaller.cs" />
     <Compile Include="CommandLineArguments.cs" />
     <Compile Include="Win\Builder.cs" />
     <Compile Include="CommonBuilder.cs" />
