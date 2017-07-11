@@ -69,9 +69,7 @@ namespace Orange
 
 		static PluginLoader()
 		{
-#if DEBUG
 			AppDomain.CurrentDomain.AssemblyResolve += AssemblyResolve;
-#endif
 			catalog = new AggregateCatalog();
 			RegisterAssembly(typeof(PluginLoader).Assembly);
 			ResetPlugins();
@@ -125,10 +123,6 @@ namespace Orange
 				The.UI.CreatePluginUI(uiBuilder);
 			}
 			The.MenuController.CreateAssemblyMenuItems();
-
-#if !DEBUG
-			InstallPluginAssemblies(Path.GetFileNameWithoutExtension(citrusProjectFile));
-#endif
 		}
 
 		public static void AfterAssetUpdated(Lime.AssetBundle bundle, CookingRules cookingRules, string path)
@@ -202,7 +196,6 @@ namespace Orange
 			}
 		}
 
-#if DEBUG
 		private static readonly Dictionary<string, Assembly> resolvedAssemblies = new Dictionary<string, Assembly>();
 
 		private static Assembly AssemblyResolve(object sender, ResolveEventArgs args)
@@ -227,60 +220,5 @@ namespace Orange
 			}
 			return assembly;
 		}
-#else
-		private static void InstallPluginAssemblies (string pluginName)
-		{
-			if (CurrentPlugin?.GetRequiredAssemblies == null) {
-				return;
-			}
-
-			var assembliesNames = CurrentPlugin.GetRequiredAssemblies ();
-			if (assembliesNames == null || assembliesNames.Length == 0) {
-				return;
-			}
-
-			var requiredAssemblies = new List<string> ();
-			var applicationBase = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
-			foreach (var assemblyName in assembliesNames) {
-				var dllName = Path.ChangeExtension (assemblyName, ".dll");
-				var sourcePath = Path.Combine (CurrentPluginDirectory, dllName);
-				var destinationPath = Path.Combine (AppDomain.CurrentDomain.SetupInformation.ApplicationBase, "../../../", dllName);
-				var sourceFile = new System.IO.FileInfo (sourcePath);
-				var destinationFile = new System.IO.FileInfo (destinationPath);
-
-				if (destinationFile.Exists && destinationFile.LastWriteTime >= sourceFile.LastWriteTime) {
-					continue;
-				}
-
-				var fileUri = new Uri (sourcePath);
-				var referenceUri = new Uri (applicationBase);
-				var relativePath = referenceUri.MakeRelativeUri (fileUri).ToString ();
-				requiredAssemblies.Add (relativePath);
-			}
-			if (requiredAssemblies.Count == 0) {
-				return;
-			}
-
-#if WIN
-			var executablePath = Path.Combine(AppDomain.CurrentDomain.SetupInformation.ApplicationBase, "Orange.exe");
-#elif MAC
-			var executablePath = Path.Combine(AppDomain.CurrentDomain.SetupInformation.ApplicationBase, "../../../Orange.app/Contents/MacOS/Orange");
-#endif
-			if (File.Exists(executablePath)) {
-				var commandLineArgs = $"-assemblies:{string.Join(";", requiredAssemblies)}";
-				var process = new System.Diagnostics.Process {
-					StartInfo = {
-						WorkingDirectory = AppDomain.CurrentDomain.SetupInformation.ApplicationBase,
-						FileName = executablePath,
-						Arguments = commandLineArgs
-					}
-				};
-				process.Start();
-				Environment.Exit(0);
-			} else {
-				throw new Exception($"Can't install required assemblies. Executable \"{executablePath}\" was not found.");
-			}
-		}
-#endif
-		}
+	}
 }
