@@ -42,7 +42,7 @@ namespace Lime
 		{
 			var marker = TryFind(id);
 			if (marker == null) {
-				throw new ArgumentException("Unknown marker '{0}'", id);
+				throw new ArgumentException($"Unknown marker '{id}'");
 			}
 			return marker;
 		}
