@@ -239,23 +239,27 @@ namespace Orange
 				return;
 			}
 
-			var requiredAssemblies = new List<string> ();
+			var requiredAssemblies = new List<string>();
 			var applicationBase = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
 			foreach (var assemblyName in assembliesNames) {
-				var dllName = Path.ChangeExtension (assemblyName, ".dll");
-				var sourcePath = Path.Combine (CurrentPluginDirectory, dllName);
-				var destinationPath = Path.Combine (AppDomain.CurrentDomain.SetupInformation.ApplicationBase, "../../../", dllName);
-				var sourceFile = new System.IO.FileInfo (sourcePath);
-				var destinationFile = new System.IO.FileInfo (destinationPath);
+				var dllName = Path.ChangeExtension(assemblyName, ".dll");
+				var sourcePath = Path.Combine(CurrentPluginDirectory, dllName);
+#if WIN
+				var destinationPath = Path.Combine(AppDomain.CurrentDomain.SetupInformation.ApplicationBase, dllName);
+#elif MAC
+				var destinationPath = Path.Combine(AppDomain.CurrentDomain.SetupInformation.ApplicationBase, "../../../", dllName);
+#endif
+				var sourceFile = new System.IO.FileInfo(sourcePath);
+				var destinationFile = new System.IO.FileInfo(destinationPath);
 
 				if (destinationFile.Exists && destinationFile.LastWriteTime >= sourceFile.LastWriteTime) {
 					continue;
 				}
 
-				var fileUri = new Uri (sourcePath);
-				var referenceUri = new Uri (applicationBase);
-				var relativePath = referenceUri.MakeRelativeUri (fileUri).ToString ();
-				requiredAssemblies.Add (relativePath);
+				var fileUri = new Uri(sourcePath);
+				var referenceUri = new Uri(applicationBase);
+				var relativePath = referenceUri.MakeRelativeUri(fileUri).ToString();
+				requiredAssemblies.Add(relativePath);
 			}
 			if (requiredAssemblies.Count == 0) {
 				return;
@@ -282,5 +286,5 @@ namespace Orange
 			}
 		}
 #endif
+			}
 		}
-}
