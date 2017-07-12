@@ -352,6 +352,11 @@
     <Compile Include="Source\Widgets\Theme\ThemedTabBar.cs" />
     <Compile Include="Source\Widgets\Theme\ThemedTextView.cs" />
     <Compile Include="Source\Widgets\Theme\ThemedWindowWidget.cs" />
+    <Compile Include="Source\Optimizations\ContentSizeComponent.cs" />
+    <Compile Include="Source\Optimizations\RenderOptimizer.cs" />
+    <Compile Include="Source\Optimizations\RenderOptimizerHelpers.cs" />
+    <Compile Include="Source\Optimizations\ViewProjector.cs" />
+    <Compile Include="Source\Types\Bounds.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Android.csproj">

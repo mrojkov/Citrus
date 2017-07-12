@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -157,8 +157,13 @@
     <Compile Include="Source\Graphics\OpenGL\Mesh.cs" />
     <Compile Include="Source\Input\Shortcut.cs" />
     <Compile Include="Source\Input\SoftKeyboard.cs" />
+    <Compile Include="Source\Optimizations\ContentSizeComponent.cs" />
+    <Compile Include="Source\Optimizations\RenderOptimizerHelpers.cs" />
+    <Compile Include="Source\Optimizations\RenderOptimizer.cs" />
+    <Compile Include="Source\Optimizations\ViewProjector.cs" />
     <Compile Include="Source\Profilers\NodeProfiler.cs" />
     <Compile Include="Source\Types\BoundingSphere.cs" />
+    <Compile Include="Source\Types\Bounds.cs" />
     <Compile Include="Source\Types\ContainmentType.cs" />
     <Compile Include="Source\Types\Plane.cs" />
     <Compile Include="Source\Types\Quaternion.cs" />
@@ -438,6 +443,7 @@
       <Name>Yuzu</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
