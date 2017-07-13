@@ -25,6 +25,9 @@ namespace Lime
 				data = ms.ToArray();
 			}
 			cgImage = CGImage.FromPNG(new CGDataProvider(data), null, false, CGColorRenderingIntent.Default);
+            if (cgImage == null) {
+                cgImage = CGImage.FromJPEG(new CGDataProvider(data), null, false, CGColorRenderingIntent.Default);
+            }
 			var alphaInfo = cgImage.AlphaInfo;
 			HasAlpha =
 				alphaInfo != CGImageAlphaInfo.None &&
