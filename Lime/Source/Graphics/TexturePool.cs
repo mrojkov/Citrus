@@ -109,10 +109,9 @@ namespace Lime
 #if iOS || ANDROID
 				TryLoadImage(path + ".pvr") ??
 				TryLoadImage(path + ".jpg");
-#elif UNITY
-				TryLoadImage(path + ".png");
 #else
 				TryLoadImage(path + ".dds") ??
+				TryLoadImage(path + ".pvr") ??
 				TryLoadImage(path + ".jpg") ??
 				TryLoadImage(path + ".png");
 #endif

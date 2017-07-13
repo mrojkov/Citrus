@@ -1,24 +1,17 @@
-#if OPENGL
+#if (MAC || WIN) && OPENGL
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
-
-#if MAC
-using OpenTK.Graphics.OpenGL;
-#elif MONOMAC
-using MonoMac.OpenGL;
-#elif ANDROID || WIN
+#if WIN
 using OpenTK.Graphics.ES20;
+#else
+using OpenTK.Graphics.OpenGL;
 #endif
-
 #pragma warning disable 0618
 
 namespace Lime
 {
 	public partial class Texture2D : CommonTexture, ITexture
 	{
-#if WIN || MAC || ANDROID || MONOMAC
 		enum DDSFourCC
 		{
 			DXT1 = ('D' | ('X' << 8) | ('T' << 16) | ('1' << 24)),
@@ -41,7 +34,7 @@ namespace Lime
 			UInt32 magic = reader.ReadUInt32();
 			UInt32 size = reader.ReadUInt32();
 			if (magic != DDSMagic || size != 124) {
-				throw new Lime.Exception("Invalid DDS file header");
+				throw new InvalidDataException("Invalid DDS file header");
 			}
 			// UInt32 flags =
 			reader.ReadUInt32();
@@ -91,7 +84,7 @@ namespace Lime
 				} else if ((pfFlags & DDSPFFlags.FourCC) != 0) {
 					ReadCompressedImage(ref glCommands, reader, level, width, height, pitchOrLinearSize, pfFourCC);
 				} else {
-					throw new Lime.Exception("Error reading DDS");
+					throw new InvalidDataException("Error reading DDS");
 				}
 				pitchOrLinearSize /= 4;
 				width /= 2;
@@ -103,7 +96,7 @@ namespace Lime
 		private void ReadRGBAImage(ref Action glCommands, BinaryReader reader, int level, int width, int height, int pitch)
 		{
 			if (pitch != width * 4) {
-				throw new Lime.Exception("Error reading RGBA texture. Must be 32 bit rgba");
+				throw new InvalidDataException("Error reading RGBA texture. Must be 32 bit rgba");
 			}
 			var buffer = ReadTextureData(reader, pitch * height);
 			glCommands += () => {
@@ -117,54 +110,28 @@ namespace Lime
 
 		private void ReadCompressedImage(ref Action glCommands, BinaryReader reader, int level, int width, int height, int linearSize, UInt32 pfFourCC)
 		{
-#if ANDROID
-			throw new NotSupportedException();
-#else
-#if WIN
-			var pif = All.CompressedRgbaS3tcDxt1Ext;
+			var pif = (PixelInternalFormat)All.CompressedRgbS3tcDxt1Ext;
 			switch ((DDSFourCC)pfFourCC) {
 				case DDSFourCC.DXT1:
-					pif = All.CompressedRgbaS3tcDxt1Ext;
+					pif = (PixelInternalFormat)All.CompressedRgbS3tcDxt1Ext;
 					break;
 				case DDSFourCC.DXT3:
-					pif = All.CompressedRgbaS3tcDxt3Ext;
+					pif = (PixelInternalFormat)All.CompressedRgbaS3tcDxt3Ext;
 					break;
 				case DDSFourCC.DXT5:
-					pif = All.CompressedRgbaS3tcDxt5Angle;
+					pif = (PixelInternalFormat)All.CompressedRgbaS3tcDxt5Ext;
 					break;
 				default:
-					throw new Lime.Exception("Unsupported texture format");
+					throw new InvalidDataException("Unsupported texture format");
 			}
-#else
-			var pif = PixelInternalFormat.CompressedRgbS3tcDxt1Ext;
-			switch ((DDSFourCC)pfFourCC) {
-				case DDSFourCC.DXT1:
-					pif = PixelInternalFormat.CompressedRgbS3tcDxt1Ext;
-					break;
-				case DDSFourCC.DXT3:
-					pif = PixelInternalFormat.CompressedRgbaS3tcDxt3Ext;
-					break;
-				case DDSFourCC.DXT5:
-					pif = PixelInternalFormat.CompressedRgbaS3tcDxt5Ext;
-					break;
-				default:
-					throw new Lime.Exception("Unsupported texture format");
-			}
-#endif
 			var buffer = ReadTextureData(reader, linearSize);
 			glCommands += () => {
 				PlatformRenderer.PushTexture(handle, 0);
-#if WIN
-				GL.CompressedTexImage2D(All.Texture2D, level, pif, width, height, 0, buffer.Length, buffer);
-#else
 				GL.CompressedTexImage2D(TextureTarget.Texture2D, level, pif, width, height, 0, buffer.Length, buffer);
-#endif
 				PlatformRenderer.PopTexture(0);
 				PlatformRenderer.CheckErrors();
 			};
-#endif
 		}
-#endif
 	}
 }
 #endif

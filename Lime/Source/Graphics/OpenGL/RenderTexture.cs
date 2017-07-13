@@ -3,14 +3,10 @@ using System;
 using System.Diagnostics;
 #if iOS || ANDROID || WIN
 using OpenTK.Graphics.ES20;
-#elif MAC
+#else
 using OpenTK.Graphics.OpenGL;
 using FramebufferSlot = OpenTK.Graphics.OpenGL.FramebufferAttachment;
 using RenderbufferInternalFormat = OpenTK.Graphics.OpenGL.RenderbufferStorage;
-#elif MONOMAC
-using MonoMac.OpenGL;
-using FramebufferSlot = MonoMac.OpenGL.FramebufferAttachment;
-using RenderbufferInternalFormat = MonoMac.OpenGL.RenderbufferStorage;
 #endif
 using System.Collections.Generic;
 

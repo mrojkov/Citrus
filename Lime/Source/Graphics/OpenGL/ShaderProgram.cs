@@ -3,15 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-#if !MONOMAC
-using OpenTK.Graphics;
 #if iOS || ANDROID || WIN
 using OpenTK.Graphics.ES20;
 #else
 using OpenTK.Graphics.OpenGL;
-#endif
-#else
-using MonoMac.OpenGL;
 #endif
 
 #pragma warning disable 0618

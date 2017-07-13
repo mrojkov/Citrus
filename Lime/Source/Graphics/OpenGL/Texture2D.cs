@@ -4,10 +4,8 @@ using System.IO;
 using System.Runtime.InteropServices;
 #if iOS || ANDROID || WIN
 using OpenTK.Graphics.ES20;
-#elif MAC
+#else
 using OpenTK.Graphics.OpenGL;
-#elif MONOMAC
-using MonoMac.OpenGL;
 #endif
 
 #pragma warning disable 0618
@@ -201,21 +199,19 @@ namespace Lime
 			using (var reader = new BinaryReader(stream)) {
 				int sign = reader.ReadInt32();
 				stream.Seek(0, SeekOrigin.Begin);
-#if iOS || ANDROID
-				if (sign == LegacyPVRMagic) {
-					InitWithLegacyPVRTexture(reader);
-				} else if (sign == PVRMagic) {
+				if (sign == PVRMagic) {
 					InitWithPVRTexture(reader);
-				} else {
-					InitWithPngOrJpg(stream);
+				} else if (sign == KTXMagic) {
+					InitWithKTXTexture(reader);
 				}
-#elif OPENGL
-				if (sign == DDSMagic) {
+#if WIN || MAC
+				else if (sign == DDSMagic) {
 					InitWithDDSBitmap(reader);
-				} else {
-					InitWithPngOrJpg(stream);
 				}
 #endif
+				else {
+					InitWithPngOrJpg(stream);
+				}
 			}
 			uvRect = new Rectangle(Vector2.Zero, (Vector2)ImageSize / (Vector2)SurfaceSize);
 		}

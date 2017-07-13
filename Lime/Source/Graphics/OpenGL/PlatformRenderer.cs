@@ -3,10 +3,8 @@ using System;
 
 #if iOS || ANDROID || WIN
 using OpenTK.Graphics.ES20;
-#elif MAC
+#else
 using OpenTK.Graphics.OpenGL;
-#elif MONOMAC
-using MonoMac.OpenGL;
 #endif
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -24,6 +22,17 @@ namespace Lime
 
 		// First texture pair is used for creation mask effect, second pair - for representing ETC1 alpha channel
 		private static readonly uint[] textures = new uint[4];
+
+		public static int GetGLESMajorVersion()
+		{
+#if iOS || ANDROID
+			int majorVersion;
+			GL.GetInteger((GetPName)33307, out majorVersion);
+			return majorVersion;
+#else
+			return 0;
+#endif
+		}
 
 		[System.Diagnostics.Conditional("DEBUG")]
 		public static void CheckErrors()
@@ -311,7 +320,7 @@ namespace Lime
 		{
 			(mesh as Mesh).Bind();
 			int offset = startIndex * sizeof(short);
-#if MAC || MONOMAC
+#if MAC || MONOMAC || ANDROID
 			GL.DrawElements(BeginMode.Triangles, count, DrawElementsType.UnsignedShort, (IntPtr)offset);
 #else
 			GL.DrawElements(PrimitiveType.Triangles, count, DrawElementsType.UnsignedShort, (IntPtr)offset);

@@ -5,10 +5,8 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 #if iOS || ANDROID || WIN
 using OpenTK.Graphics.ES20;
-#elif MAC
+#else
 using OpenTK.Graphics.OpenGL;
-#elif MONOMAC
-using MonoMac.OpenGL;
 #endif
 using Yuzu;
 

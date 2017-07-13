@@ -2,10 +2,8 @@
 using System;
 #if iOS || ANDROID || WIN
 using OpenTK.Graphics.ES20;
-#elif MAC
+#else
 using OpenTK.Graphics.OpenGL;
-#elif MONOMAC
-using MonoMac.OpenGL;
 #endif
 using Yuzu;
 
@@ -75,7 +73,7 @@ namespace Lime
 			if (iboHandle != 0) {
 				var capturedIboHandle = iboHandle;
 				Application.InvokeOnMainThread(() => {
-#if !MAC && !MONOMAC
+#if !MAC
 					if (OpenTK.Graphics.GraphicsContext.CurrentContext == null)
 						return;
 #endif

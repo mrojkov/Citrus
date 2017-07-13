@@ -1,9 +1,13 @@
-#if (iOS || ANDROID) && OPENGL
+#if OPENGL
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+#if iOS || ANDROID || WIN
 using OpenTK.Graphics.ES20;
+#else
+using OpenTK.Graphics.OpenGL;
+#endif
 
 #pragma warning disable 0618
 
@@ -51,98 +55,7 @@ namespace Lime
 			ETC1 = 6 << 32,
 		}
 
-		private UInt32 LegacyPVRMagic = 52;
 		private UInt32 PVRMagic = 0x03525650;
-
-		private void InitWithLegacyPVRTexture(BinaryReader reader)
-		{
-			UInt32 headerLength = reader.ReadUInt32();
-			if (headerLength != LegacyPVRMagic) {
-				throw new Exception("Invalid PVR header");
-			}
-			Int32 height = reader.ReadInt32();
-			Int32 width = reader.ReadInt32();
-			UInt32 numMipmaps = reader.ReadUInt32();
-			Int32 flags = reader.ReadInt32();
-			reader.ReadUInt32(); // dataLength
-			reader.ReadUInt32(); // bpp
-			reader.ReadUInt32(); // bitmaskRed
-			reader.ReadUInt32(); // bnitmaskGreen
-			reader.ReadUInt32(); // bitmaskBlue
-			reader.ReadUInt32(); // bitmaskAlpha
-			reader.ReadUInt32(); // UInt32 pvrTag
-			reader.ReadUInt32(); // UInt32 numSurfs
-			SurfaceSize = ImageSize = new Size(width, height);
-			Action glCommands = PrepareOpenGLTexture;
-			MemoryUsed = 0;
-			for (int i = 0; i <= numMipmaps; i++) {
-				if (i > 0 && (width < 8 || height < 8)) {
-					continue;
-				}
-				// Cloning variables to prevent wrong capturing
-				int mipLevel = i;
-				int width2 = width;
-				int height2 = height;
-				var format = (LegacyPVRFormat)(flags & 0xFF);
-				switch(format)	{
-				case LegacyPVRFormat.PVRTC_4: {
-					var buffer = ReadTextureData(reader, width * height * 4 / 8);
-					glCommands += () => {
-						PlatformRenderer.PushTexture(handle, 0);
-						GL.CompressedTexImage2D(All.Texture2D, mipLevel, All.CompressedRgbaPvrtc4Bppv1Img, width2, height2, 0, buffer.Length, buffer);
-						PlatformRenderer.PopTexture(0);
-						PlatformRenderer.CheckErrors();
-					};
-					break;
-				}
-				case LegacyPVRFormat.PVRTC_2: {
-					var buffer = ReadTextureData(reader, width * height * 2 / 8);
-					glCommands += () => {
-						PlatformRenderer.PushTexture(handle, 0);
-						GL.CompressedTexImage2D(All.Texture2D, mipLevel, All.CompressedRgbaPvrtc2Bppv1Img, width2, height2, 0, buffer.Length, buffer);
-						PlatformRenderer.PopTexture(0);
-						PlatformRenderer.CheckErrors();
-					};
-					break;
-				}
-				case LegacyPVRFormat.GLARGB_4444: {
-					var buffer = ReadTextureData(reader, width * height * 2);
-					glCommands += () => {
-						PlatformRenderer.PushTexture(handle, 0);
-						GL.TexImage2D(All.Texture2D, mipLevel, (int)All.Rgba, width2, height2, 0, All.Rgba, All.UnsignedShort4444, buffer);
-						PlatformRenderer.PopTexture(0);
-						PlatformRenderer.CheckErrors();
-					};
-					break;
-				}
-				case LegacyPVRFormat.GLRGB_565: {
-					var buffer = ReadTextureData(reader, width * height * 2);
-					glCommands += () => {
-						PlatformRenderer.PushTexture(handle, 0);
-						GL.TexImage2D(All.Texture2D, mipLevel, (int)All.Rgb, width2, height2, 0, All.Rgb, All.UnsignedShort565, buffer);
-						PlatformRenderer.PopTexture(0);
-						PlatformRenderer.CheckErrors();
-					};
-					break;
-				}
-				case LegacyPVRFormat.GLARGB_8888: {
-					var buffer = ReadTextureData(reader, width * height * 4);
-					glCommands += () => {
-						PlatformRenderer.PushTexture(handle, 0);
-						GL.TexImage2D(All.Texture2D, mipLevel, (int)All.Rgba, width2, height2, 0, All.Rgba, All.UnsignedByte, buffer);
-						PlatformRenderer.PopTexture(0);
-						PlatformRenderer.CheckErrors();
-					};
-					break;
-				}
-				default:
-					throw new NotImplementedException();
-				}
-				width /= 2;
-				height /= 2;
-			}
-			Application.InvokeOnMainThread(glCommands);
-		}
 
 		private void InitWithPVRTexture(BinaryReader reader)
 		{
@@ -176,6 +89,7 @@ namespace Lime
 				int width2 = width;
 				int height2 = height;
 				switch(pixelFormat)	{
+#if iOS
 				case PVRFormat.PVRTC_4_RGBA: {
 					var buffer = ReadTextureData(reader, width * height * 4 / 8);
 					glCommands += () => {
@@ -199,7 +113,7 @@ namespace Lime
 					};
 					break;
 				}
-#if ANDROID
+#elif ANDROID
 				case PVRFormat.ETC1: {
 					var buffer = ReadTextureData(reader, width * height * 4 / 8);
 					glCommands += () => {
@@ -215,7 +129,7 @@ namespace Lime
 					var buffer = ReadTextureData(reader, width * height * 2);
 					glCommands += () => {
 						PlatformRenderer.PushTexture(handle, 0);
-						GL.TexImage2D(All.Texture2D, mipLevel, (int)All.Rgba, width2, height2, 0, All.Rgba, All.UnsignedShort4444, buffer);
+						GL.TexImage2D(TextureTarget.Texture2D, mipLevel, PixelInternalFormat.Rgba, width2, height2, 0, PixelFormat.Rgba, PixelType.UnsignedShort4444, buffer);
 						PlatformRenderer.PopTexture(0);
 						PlatformRenderer.CheckErrors();
 					};
@@ -225,7 +139,7 @@ namespace Lime
 					var buffer = ReadTextureData(reader, width * height * 2);
 					glCommands += () => {
 						PlatformRenderer.PushTexture(handle, 0);
-						GL.TexImage2D(All.Texture2D, mipLevel, (int)All.Rgb, width2, height2, 0, All.Rgb, All.UnsignedShort565, buffer);
+						GL.TexImage2D(TextureTarget.Texture2D, mipLevel, PixelInternalFormat.Rgb, width2, height2, 0, PixelFormat.Rgb, PixelType.UnsignedShort565, buffer);
 						PlatformRenderer.PopTexture(0);
 						PlatformRenderer.CheckErrors();
 					};
@@ -235,7 +149,7 @@ namespace Lime
 					var buffer = ReadTextureData(reader, width * height * 4);
 					glCommands += () => {
 						PlatformRenderer.PushTexture(handle, 0);
-						GL.TexImage2D(All.Texture2D, mipLevel, (int)All.Rgba, width2, height2, 0, All.Rgba, All.UnsignedByte, buffer);
+						GL.TexImage2D(TextureTarget.Texture2D, mipLevel, PixelInternalFormat.Rgba, width2, height2, 0, PixelFormat.Rgba, PixelType.UnsignedByte, buffer);
 						PlatformRenderer.PopTexture(0);
 						PlatformRenderer.CheckErrors();
 					};
