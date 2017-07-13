@@ -80,7 +80,8 @@ namespace Lime
 							Debug.Write(etc2Supported ? "ETC2 textures supported." : "ETC2 textures not supported.");
 						}
 						PlatformRenderer.PushTexture(handle, 0);
-						if (etc2Supported || glInternalFormat == (int)All.Etc1Rgb8Oes) {
+						const int etc1Rgb8Oes = 36196;
+						if (etc2Supported || glInternalFormat == etc1Rgb8Oes) {
 							GL.CompressedTexImage2D(
 								TextureTarget.Texture2D, mipLevel, (PixelInternalFormat)glInternalFormat, 
 								width, height, 0, dataLength, data);
