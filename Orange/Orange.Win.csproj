@@ -193,9 +193,6 @@
     <Content Include="Toolchain.Win\nvtt.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Toolchain.Win\pngcrush_1_7_83_w32.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Toolchain.Win\PngOptimizerCL.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
