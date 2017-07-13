@@ -28,7 +28,7 @@ namespace Orange
 				Title = "Orange"
 			});
 			window.Closed += The.Workspace.Save;
-			windowWidget = new ThemedDefaultWindowWidget(window) {
+			windowWidget = new ThemedInvalidableWindowWidget(window) {
 				Id = "MainWindow",
 				Layout = new HBoxLayout {
 					Spacing = 6

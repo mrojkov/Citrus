@@ -96,6 +96,8 @@
     <Compile Include="Components\GridFolderView.cs" />
     <Compile Include="CommandBindings.cs" />
     <Compile Include="Components\RowView.cs" />
+    <Compile Include="Utils\TimelineMetrics.cs" />
+    <Compile Include="UserPreferences.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tangerine.Core\Tangerine.Core.Mac.csproj">

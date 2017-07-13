@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -8,7 +8,32 @@ namespace Orange
 {
 	public static class TextureConverter
 	{
-		public static void ToPVR(Bitmap bitmap, string dstPath, bool mipMaps, bool highQualityCompression, PVRFormat pvrFormat)
+		public static void RunEtcTool(Bitmap bitmap, AssetBundle bundle, string path, AssetAttributes attributes, bool mipMaps, bool highQualityCompression)
+		{
+			var hasAlpha = bitmap.HasAlpha;
+			var bledBitmap = hasAlpha ? TextureConverterUtils.BleedAlpha(bitmap) : null;
+			var ktxPath = Toolbox.GetTempFilePathWithExtension(".ktx");
+			var pngPath = Path.ChangeExtension(ktxPath, ".png");
+			try {
+				(bledBitmap ?? bitmap).SaveTo(pngPath);
+				var etcTool = GetToolPath("EtcTool");
+				var args = 
+					$"{pngPath} -format " + (hasAlpha ? "RGBA8" : "ETC1") +
+					" -effort " + (highQualityCompression ? "50" : "30") +
+					(mipMaps ? " -mipmaps 4" : "") + 
+					$" -output {ktxPath}";
+				if (Process.Start(etcTool, args) != 0) {
+					throw new Lime.Exception($"ETCTool error\nCommand line: {etcTool} {args}\"");
+				}
+				bundle.ImportFile(ktxPath, path, 0, "", attributes);
+			} finally {
+				bledBitmap?.Dispose();
+				DeletePossibleLockedFile(pngPath);
+				DeletePossibleLockedFile(ktxPath);
+			}
+		}
+
+		public static void RunPVRTexTool(Bitmap bitmap, AssetBundle bundle, string path, AssetAttributes attributes, bool mipMaps, bool highQualityCompression, PVRFormat pvrFormat)
 		{
 			int width = bitmap.Width;
 			int height = bitmap.Height;
@@ -34,7 +59,7 @@ namespace Orange
 					args.Append(" -f PVRTC1_2");
 					width = height = Math.Max(potWidth, potHeight);
 					break;
-				case PVRFormat.ETC1:
+				case PVRFormat.ETC2:
 					args.Append(" -f ETC1 -q etcfast");
 					break;
 				case PVRFormat.RGB565:
@@ -56,29 +81,95 @@ namespace Orange
 			if (highQualityCompression && (new [] { PVRFormat.PVRTC2, PVRFormat.PVRTC4, PVRFormat.PVRTC4_Forced }.Contains (pvrFormat))) {
 				args.Append(" -q pvrtcbest");
 			}
-			string tga = Path.ChangeExtension(dstPath, ".tga");
+			var pvrPath = Toolbox.GetTempFilePathWithExtension(".pvr");
+			var tgaPath = Path.ChangeExtension(pvrPath, ".tga");
 			try {
 				if (hasAlpha) {
 					args.Append(" -l"); // Enable alpha bleed
 				}
-				TextureConverterUtils.SaveToTGA(bitmap, tga, swapRedAndBlue: true);
+				TextureConverterUtils.SaveToTGA(bitmap, tgaPath, swapRedAndBlue: true);
 				if (mipMaps) {
 					args.Append(" -m");
 				}
-				args.AppendFormat(" -i \"{0}\" -o \"{1}\" -r {2},{3} -shh", tga, dstPath, width, height);
+				args.AppendFormat(" -i \"{0}\" -o \"{1}\" -r {2},{3} -shh", tgaPath, pvrPath, width, height);
 #if MAC
-				var pvrTexTool = Path.Combine(Toolbox.GetApplicationDirectory(), "PVRTexTool");
-				var chmodResult = Process.Start("chmod", $"+x {pvrTexTool}");
+				var pvrTexTool = GetToolPath("PVRTexTool");
 #else
-				var pvrTexTool = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Win", "PVRTexToolCli");
+				var pvrTexTool = GetToolPath("PVRTexToolCli");
 #endif
-				int result = Process.Start(pvrTexTool, args.ToString());
-				if (result != 0) {
-					throw new Lime.Exception("Failed to convert '{0}' to PVR format(error code: {1})", tga, result);
+				if (Process.Start(pvrTexTool, args.ToString()) != 0) {
+					throw new Lime.Exception($"PVRTextTool error\nCommand line: {pvrTexTool} {args}\"");
 				}
+				bundle.ImportFile(pvrPath, path, 0, "", attributes);
 			} finally {
-				DeletePossibleLockedFile(tga);
+				DeletePossibleLockedFile(tgaPath);
+				DeletePossibleLockedFile(pvrPath);
 			}
+		}
+
+		public static void RunNVCompress(Bitmap bitmap, AssetBundle bundle, string path, AssetAttributes attributes, DDSFormat format, bool mipMaps)
+		{
+			bool compressed = format == DDSFormat.DXTi;
+			Bitmap bledBitmap = null;
+			if (bitmap.HasAlpha) {
+				bledBitmap = TextureConverterUtils.BleedAlpha(bitmap);
+			}
+			var ddsPath = Toolbox.GetTempFilePathWithExtension(".dds");
+			var tgaPath = Path.ChangeExtension(ddsPath, ".tga");
+			try {
+				TextureConverterUtils.SaveToTGA(bledBitmap ?? bitmap, tgaPath, swapRedAndBlue: compressed);
+				if (bledBitmap != null && bledBitmap != bitmap) {
+					bledBitmap.Dispose();
+				}
+				RunNVCompressHelper(tgaPath, ddsPath, bitmap.HasAlpha, compressed, mipMaps);
+				bundle.ImportFile(ddsPath, path, 0, "", attributes);
+			} finally {
+				DeletePossibleLockedFile(ddsPath);
+				DeletePossibleLockedFile(tgaPath);
+			}
+		}
+
+		private static void RunNVCompressHelper(
+			string srcPath, string dstPath, bool hasAlpha, bool compressed, bool mipMaps)
+		{
+			string mipsFlag = mipMaps ? string.Empty : "-nomips";
+			string compressionMethod;
+			if (compressed) {
+				compressionMethod = hasAlpha ? "-bc3" : "-bc1";
+			} else {
+#if WIN
+				compressionMethod = "-rgb";
+#else
+				compressionMethod = "-rgb -rgbfmt bgra8";
+#endif
+			}
+			var nvcompress = GetToolPath("nvcompress");
+			srcPath = Path.Combine(Directory.GetCurrentDirectory(), srcPath);
+			dstPath = Path.Combine(Directory.GetCurrentDirectory(), dstPath);
+			string args = string.Format("{0} {1} \"{2}\" \"{3}\"", mipsFlag, compressionMethod, srcPath, dstPath);
+			if (Process.Start(nvcompress, args, Process.Options.RedirectErrors) != 0) {
+				throw new Lime.Exception($"NVCompress error\nCommand line: {nvcompress} {args}\"");
+			}
+		}
+
+		// Invokes PngOptimizerCL on png with option not to optimize idat chunk.
+		// It removes all unwanted chunks like itxt and text.
+		public static void OptimizePNG(string dstPath)
+		{
+			var pngOptimizerPath = GetToolPath("PngOptimizerCL");
+			dstPath = MakeAbsolutePath(dstPath);
+			var args = $"--KeepPixels \"{dstPath}\"";
+			if (Process.Start(pngOptimizerPath, args, Process.Options.RedirectErrors) != 0) {
+				throw new Lime.Exception($"Error converting '{dstPath}'\nCommand line: {pngOptimizerPath} {args}");
+			}
+		}
+
+		private static string MakeAbsolutePath(string path)
+		{
+			if (!Path.IsPathRooted(path)) {
+				path = Path.Combine(Directory.GetCurrentDirectory(), path);
+			}
+			return path;
 		}
 
 		private static void DeletePossibleLockedFile(string file)
@@ -95,105 +186,22 @@ namespace Orange
 			}
 		}
 
-		public static void ToDDS(Bitmap bitmap, string dstPath, DDSFormat format, bool mipMaps)
+		private static string GetToolPath(string tool)
 		{
-			bool compressed = format == DDSFormat.DXTi;
-			Bitmap bledBitmap = null;
-			if (bitmap.HasAlpha) {
-				bledBitmap = TextureConverterUtils.BleedAlpha(bitmap);
+			var appDirectory = Toolbox.GetApplicationDirectory();
+#if MAC
+			var toolChainDirectory = Path.Combine(appDirectory, "Toolchain.Mac");
+			if (!Directory.Exists(toolChainDirectory)) {
+				toolChainDirectory = appDirectory;
 			}
-			var tga = Path.ChangeExtension(dstPath, ".tga");
-			TextureConverterUtils.SaveToTGA(bledBitmap ?? bitmap, tga, swapRedAndBlue: compressed);
-			if (bledBitmap != null && bledBitmap != bitmap) {
-				bledBitmap.Dispose();
-			}
-			ToDDSTextureHelper(tga, dstPath, bitmap.HasAlpha, compressed, mipMaps);
-
-			// Do not delete the bitmap if an exception has occurred
-			File.Delete(tga);
-		}
-
-		private static void ToDDSTextureHelper(
-			string srcPath, string dstPath, bool hasAlpha, bool compressed, bool mipMaps)
-		{
-			string mipsFlag = mipMaps ? string.Empty : "-nomips";
-			string compressionMethod;
-			if (compressed) {
-				compressionMethod = hasAlpha ? "-bc3" : "-bc1";
-			} else {
-#if WIN
-				compressionMethod = "-rgb";
 #else
-				compressionMethod = "-rgb -rgbfmt bgra8";
+			var toolChainDirectory = Path.Combine(appDirectory, "Toolchain.Win");
 #endif
-			}
-#if WIN
-			string nvcompress = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Win", "nvcompress.exe");
-#else
-			string nvcompress = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Mac", "nvcompress");
-			var chmodResult = Process.Start("chmod", $"+x {nvcompress}");
+			var toolPath = Path.Combine(toolChainDirectory, tool);
+#if MAC
+			Process.Start("chmod", $"+x {toolPath}");
 #endif
-			srcPath = Path.Combine(Directory.GetCurrentDirectory(), srcPath);
-			dstPath = Path.Combine(Directory.GetCurrentDirectory(), dstPath);
-			string args = string.Format("{0} {1} \"{2}\" \"{3}\"", mipsFlag, compressionMethod, srcPath, dstPath);
-			int result = Process.Start(nvcompress, args, Process.Options.RedirectErrors);
-			if (result != 0) {
-				throw new Lime.Exception("Failed to convert '{0}' to DDS format(error code: {1})", srcPath, result);
-			}
-		}
-
-		public static void ToJPG(Bitmap bitmap, string dstPath)
-		{
-			Bitmap bledBitmap = null;
-			if (bitmap.HasAlpha) {
-				bledBitmap = TextureConverterUtils.BleedAlpha(bitmap);
-			}
-			using (var stream = File.OpenWrite(dstPath)) {
-				(bledBitmap ?? bitmap).SaveTo(stream, CompressionFormat.Jpeg);
-			}
-			if (bledBitmap != null && bledBitmap != bitmap) {
-				bledBitmap.Dispose();
-			}
-		}
-
-		public static void ToPNG(Bitmap bitmap, string dstPath)
-		{
-			using (var stream = File.OpenWrite(dstPath)) {
-				bitmap.SaveTo(stream, CompressionFormat.Png);
-			}
-			var pngcrushTool = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Win", "pngcrush_1_7_83_w32");
-			// -ow - overwrite
-			// -s - silent
-			// -c 0 - change color type to greyscale
-			dstPath = MakeAbsolutePath(dstPath);
-			var args = string.Format("-ow -s -c 0 \"{0}\"", dstPath);
-			int result = Process.Start(pngcrushTool, args, Process.Options.RedirectErrors);
-			if (result != 0) {
-				throw new Lime.Exception(
-					"Error converting '{0}'\nCommand line: {1}", dstPath, pngcrushTool + ' ' + args);
-			}
-		}
-
-		// Invokes PngOptimizerCL on png with option not to optimize idat chunk.
-		// It removes all unwanted chunks like itxt and text.
-		public static void OptimizePNG(string dstPath)
-		{
-			var pngOptimizerPath = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Win", "PngOptimizerCL");
-			dstPath = MakeAbsolutePath(dstPath);
-			var args = $"--KeepPixels \"{dstPath}\"";
-			int result = Process.Start(pngOptimizerPath, args, Process.Options.RedirectErrors);
-			if (result != 0) {
-				throw new Lime.Exception(
-					$"Error converting '{dstPath}'\nCommand line: {pngOptimizerPath} {args}");
-			}
-		}
-
-		private static string MakeAbsolutePath(string path)
-		{
-			if (!Path.IsPathRooted(path)) {
-				path = Path.Combine(Directory.GetCurrentDirectory(), path);
-			}
-			return path;
+			return toolPath;
 		}
 	}
 }

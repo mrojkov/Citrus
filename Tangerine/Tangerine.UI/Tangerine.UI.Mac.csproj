@@ -72,14 +72,13 @@
     <Compile Include="ToolbarButton.cs" />
     <Compile Include="Dialogs\AlertDialog.cs" />
     <Compile Include="SearchPanel\SearchPanel.cs" />
-    <Compile Include="UserPreferences.cs" />
     <Compile Include="NodeIconPool.cs" />
     <Compile Include="Toolbar.cs" />
     <Compile Include="Utils\Utils.cs" />
-    <Compile Include="Utils\TimelineMetrics.cs" />
     <Compile Include="CommandHandler.cs" />
     <Compile Include="ColorPickerPanel.cs" />
     <Compile Include="PropertyEditor.cs" />
+    <Compile Include="Utils\Metrics.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

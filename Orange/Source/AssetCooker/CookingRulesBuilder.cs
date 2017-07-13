@@ -15,7 +15,7 @@ namespace Orange
 		PVRTC4,
 		PVRTC4_Forced,
 		PVRTC2,
-		ETC1,
+		ETC2,
 		RGB565,
 		RGBA4,
 		ARGB8,
@@ -139,7 +139,7 @@ namespace Orange
 				MipMaps = false,
 				HighQualityCompression = false,
 				TextureScaleFactor = 1.0f,
-				PVRFormat = platform == TargetPlatform.Android ? PVRFormat.ETC1 : PVRFormat.PVRTC4,
+				PVRFormat = platform == TargetPlatform.Android ? PVRFormat.ETC2 : PVRFormat.PVRTC4,
 				DDSFormat = DDSFormat.DXTi,
 				LastChangeTime = new DateTime(0),
 				Bundle = new[] { CookingRulesBuilder.MainBundleName },
@@ -295,7 +295,7 @@ namespace Orange
 						case PVRFormat.PVRTC2:
 						case PVRFormat.PVRTC4:
 						case PVRFormat.PVRTC4_Forced:
-							EffectiveRules.PVRFormat = PVRFormat.ETC1;
+							EffectiveRules.PVRFormat = PVRFormat.ETC2;
 							break;
 					}
 				}

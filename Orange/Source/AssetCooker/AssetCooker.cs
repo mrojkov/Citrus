@@ -64,7 +64,6 @@ namespace Orange
 		{
 			switch (Platform) {
 				case TargetPlatform.iOS:
-					return ".pvr";
 				case TargetPlatform.Android:
 					return ".pvr";
 				case TargetPlatform.Unity:
@@ -176,7 +175,6 @@ namespace Orange
 			}
 			AddStage(SyncTextures);
 			AddStage(DeleteOrphanedMasks);
-			AddStage(DeleteOrphanedAlphaTextures);
 			AddStage(SyncFonts);
 			AddStage(SyncHotFonts);
 			AddStage(() => SyncRawAssets(".ttf"));
@@ -197,20 +195,6 @@ namespace Orange
 			foreach (var path in AssetBundle.EnumerateFiles()) {
 				if ((AssetBundle.GetAttributes(path) & AssetAttributes.NonPowerOf2Texture) != 0) {
 					Console.WriteLine("Warning: non-power of two texture: {0}", path);
-				}
-			}
-		}
-
-		private static void DeleteOrphanedAlphaTextures()
-		{
-			var alphaExt = ".alpha" + GetPlatformTextureExtension();
-			foreach (var path in AssetBundle.EnumerateFiles()) {
-				if (path.EndsWith(alphaExt)) {
-					var origImageFile =
-						path.Substring(0, path.Length - alphaExt.Length) + GetPlatformTextureExtension();
-					if (!AssetBundle.FileExists(origImageFile)) {
-						DeleteFileFromBundle(path);
-					}
 				}
 			}
 		}
@@ -351,11 +335,6 @@ namespace Orange
 				if (ext == ".atlasPart" || ext == ".mask") {
 					continue;
 				}
-				var pathWithoutExt = Path.GetFileNameWithoutExtension(path);
-				if (!string.IsNullOrEmpty(pathWithoutExt) && Path.GetExtension(pathWithoutExt) == ".alpha") {
-					// Alpha mask
-					continue;
-				}
 				var assetPath = Path.ChangeExtension(path, GetOriginalAssetExtension(path));
 				if (!assetFiles.Contains(assetPath)) {
 					DeleteFileFromBundle(path);
@@ -374,7 +353,7 @@ namespace Orange
 				var srcPath = srcFileInfo.Path;
 				var dstPath = Path.ChangeExtension(srcPath, bundleAssetExtension);
 				var bundled = bundle.FileExists(dstPath);
-				var needUpdate =  !bundled || srcFileInfo.LastWriteTime > bundle.GetFileLastWriteTime(dstPath);
+				var needUpdate = !bundled || srcFileInfo.LastWriteTime > bundle.GetFileLastWriteTime(dstPath);
 				if (needUpdate) {
 					if (converter != null) {
 						try {
@@ -424,10 +403,6 @@ namespace Orange
 				var atlasPath = GetAtlasPath(atlasChain, i);
 				if (AssetBundle.FileExists(atlasPath)) {
 					DeleteFileFromBundle(atlasPath);
-					var alphaPath = GetAlphaTexturePath(atlasPath);
-					if (AssetBundle.FileExists(alphaPath)) {
-						DeleteFileFromBundle(alphaPath);
-					}
 				} else {
 					break;
 				}
@@ -540,11 +515,6 @@ namespace Orange
 				atlasId++;
 			}
 			return atlasId;
-		}
-
-		private static string GetAlphaTexturePath(string path)
-		{
-			return Path.ChangeExtension(path, ".alpha" + GetPlatformTextureExtension());
 		}
 
 		public static IEnumerable<Size> EnumerateAtlasSizes(bool squareAtlas)
@@ -662,57 +632,24 @@ namespace Orange
 			if (!TextureConverterUtils.IsPowerOf2(texture.Width) || !TextureConverterUtils.IsPowerOf2(texture.Height)) {
 				attributes |= AssetAttributes.NonPowerOf2Texture;
 			}
-			var alphaPath = GetAlphaTexturePath(path);
 			switch (Platform) {
-				case TargetPlatform.Unity:
-					ConvertTexture(path, attributes, file => {
-						using (var stream = File.OpenWrite(file)) {
-							texture.SaveTo(stream);
-						}
-					});
-					break;
 				case TargetPlatform.Android:
-					ConvertTexture(
-						path,
-						attributes,
-						file => TextureConverter.ToPVR(texture, file, rules.MipMaps, rules.HighQualityCompression, rules.PVRFormat));
-					// ETC1 textures on Android use separate alpha channel
-					if (texture.HasAlpha && rules.PVRFormat == PVRFormat.ETC1) {
-						using (var alphaMask = TextureConverterUtils.ConvertBitmapToAlphaMask(texture)) {
-							ConvertTexture(
-								alphaPath,
-								AssetAttributes.Zipped,
-								file => TextureConverter.ToPVR(alphaMask, file, rules.MipMaps, rules.HighQualityCompression, PVRFormat.ETC1));
-						}
+					var f = rules.PVRFormat;
+					if (f == PVRFormat.ARGB8 || f == PVRFormat.RGB565 || f == PVRFormat.RGBA4) {
+						TextureConverter.RunPVRTexTool(texture, AssetBundle, path, attributes, rules.MipMaps, rules.HighQualityCompression, rules.PVRFormat);
+					} else {
+						TextureConverter.RunEtcTool(texture, AssetBundle, path, attributes, rules.MipMaps, rules.HighQualityCompression);
 					}
 					break;
 				case TargetPlatform.iOS:
-					ConvertTexture(
-						path,
-						attributes,
-						file => TextureConverter.ToPVR(texture, file, rules.MipMaps, rules.HighQualityCompression, rules.PVRFormat));
+					TextureConverter.RunPVRTexTool(texture, AssetBundle, path, attributes, rules.MipMaps, rules.HighQualityCompression, rules.PVRFormat);
 					break;
 				case TargetPlatform.Win:
-				case TargetPlatform.Mac:
-					ConvertTexture(
-						path,
-						attributes,
-						file => TextureConverter.ToDDS(texture, file, rules.DDSFormat, rules.MipMaps));
+				case TargetPlatform.Mac:	
+					TextureConverter.RunNVCompress(texture, AssetBundle, path, attributes, rules.DDSFormat, rules.MipMaps);
 					break;
 				default:
 					throw new Lime.Exception();
-			}
-		}
-
-		private static void ConvertTexture(string path, AssetAttributes attributes, Action<string> converter)
-		{
-			string sourceExtension = Path.GetExtension(path);
-			var tmpFile = Toolbox.GetTempFilePathWithExtension(sourceExtension);
-			try {
-				converter(tmpFile);
-				AssetBundle.ImportFile(tmpFile, path, 0, "", attributes);
-			} finally {
-				File.Delete(tmpFile);
 			}
 		}
 

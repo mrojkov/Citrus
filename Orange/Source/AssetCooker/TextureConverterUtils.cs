@@ -8,49 +8,6 @@ namespace Orange
 {
 	public static class TextureConverterUtils
 	{
-		/// <summary>
-		/// Fills RGB channels with alpha values.
-		/// </summary>
-		public static Bitmap ConvertBitmapToAlphaMask(Bitmap bitmap)
-		{
-			Color4[] pixels = bitmap.GetPixels();
-			for (int i = 0; i < pixels.Length; i++)
-			{
-				Color4 color = pixels[i];
-				pixels[i] = new Color4(color.A, color.A, color.A);
-			}
-			return new Bitmap(pixels, bitmap.Width, bitmap.Height);
-		}
-
-		/// <summary>
-		/// Fills RGB channels with Alpha value, Alpha remains untouched
-		/// </summary>
-		public static Bitmap ConvertBitmapToGrayscaleAlphaMask(Bitmap bitmap)
-		{
-			Color4[] pixels = bitmap.GetPixels();
-			for (int i = 0; i < pixels.Length; i++)
-			{
-				Color4 color = pixels[i];
-				pixels[i] = new Color4(color.A, color.A, color.A, color.A);
-			}
-			return new Bitmap(pixels, bitmap.Width, bitmap.Height);
-		}
-
-		public static bool IsWhiteImageWithAlpha(Bitmap bitmap)
-		{
-			if (!bitmap.HasAlpha) {
-				return false;
-			}
-			foreach (var pixel in bitmap.GetPixels()) {
-				if (pixel.A > 0) {
-					if (pixel.R != 255 || pixel.G != 255 || pixel.B != 255) {
-						return false;
-					}
-				}
-			}
-			return true;
-		}
-
 		public static Bitmap BleedAlpha(Bitmap bitmap)
 		{
 			if (!bitmap.HasAlpha || (bitmap.Width == 1 && bitmap.Height == 1)) {
