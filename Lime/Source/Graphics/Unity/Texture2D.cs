@@ -42,8 +42,6 @@ namespace Lime
 			get { return new Rectangle(0, 0, 1, 1); }
 		}
 
-		public ITexture AlphaTexture { get; protected set; }
-		
 		public void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv) { }
 
 		public Texture2D()

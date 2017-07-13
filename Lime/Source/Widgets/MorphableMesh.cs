@@ -141,9 +141,6 @@ namespace Lime
 			// Render all of it.
 			if (shaderProgram == null) {
 				var options = ShaderOptions.VertexAnimation;
-				#if ANDROID
-					options |= ShaderOptions.UseAlphaTexture1;
-				#endif
 				shaderProgram = ShaderPrograms.Instance.GetShaderProgram(ShaderId.Diffuse, 1, options);
 				morphKoeffUid = shaderProgram.GetUniformId("morphKoeff");
 				globalColorUid = shaderProgram.GetUniformId("globalColor");

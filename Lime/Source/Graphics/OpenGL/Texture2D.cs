@@ -90,7 +90,6 @@ namespace Lime
 		}
 
 		public Rectangle AtlasUVRect { get { return uvRect; } }
-		public ITexture AlphaTexture { get; private set; }
 
 		public void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv) { }
 
@@ -159,13 +158,6 @@ namespace Lime
 				LoadImageHelper(stream, createReloader: false);
 			}
 			reloader = new TextureBundleReloader(path);
-			var alphaTexturePath = Path.ChangeExtension(path, ".alpha.pvr");
-			if (AssetBundle.Instance.FileExists(alphaTexturePath)) {
-				if (AlphaTexture == null) {
-					AlphaTexture = new Texture2D();
-				}
-				((Texture2D)AlphaTexture).LoadImage(alphaTexturePath);
-			}
 			var maskPath = Path.ChangeExtension(path, ".mask");
 			if (AssetBundle.Instance.FileExists(maskPath)) {
 				OpacityMask = new OpacityMask(maskPath);
@@ -312,9 +304,6 @@ namespace Lime
 		public void Discard()
 		{
 			MemoryUsed = 0;
-			if (AlphaTexture != null) {
-				AlphaTexture.Discard();
-			}
 			if (handle != 0) {
 				var capturedHandle = handle;
 				Application.InvokeOnMainThread(() => {

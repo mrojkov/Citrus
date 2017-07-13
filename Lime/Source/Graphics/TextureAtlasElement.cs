@@ -48,11 +48,6 @@ namespace Lime
 			get { return atlasTexture.SurfaceSize; }
 		}
 
-		public ITexture AlphaTexture
-		{
-			get { return atlasTexture.AlphaTexture; }
-		}
-
 		public void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv)
 		{
 			float width = AtlasUVRect.B.X - AtlasUVRect.A.X;

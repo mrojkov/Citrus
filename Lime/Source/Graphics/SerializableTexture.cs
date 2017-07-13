@@ -160,17 +160,6 @@ namespace Lime
 			}
 		}
 
-		public ITexture AlphaTexture
-		{
-			get
-			{
-				if (texture == null) {
-					texture = LoadTexture();
-				}
-				return texture.AlphaTexture;
-			}
-		}
-
 		public void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv)
 		{
 			if (texture == null) {

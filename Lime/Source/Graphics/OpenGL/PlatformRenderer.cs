@@ -66,14 +66,6 @@ namespace Lime
 		public static ShaderProgram GetShaderProgram(ShaderId value, ShaderProgram customShaderProgram, ShaderOptions options = ShaderOptions.None)
 		{
 			int numTextures = textures[1] != 0 ? 2 : (textures[0] != 0 ? 1 : 0);
-		#if ANDROID
-			if (textures[2] != 0) {
-				options |= ShaderOptions.UseAlphaTexture1;
-			}
-			if (textures[3] != 0) {
-				options |= ShaderOptions.UseAlphaTexture2;
-			}
-		#endif
 			if (!premultipliedAlphaMode && (blending == Blending.Burn || blending == Blending.Darken)) {
 				options |= ShaderOptions.PremultiplyAlpha;
 			}
@@ -144,17 +136,6 @@ namespace Lime
 		{
 			var handle = texture != null ? texture.GetHandle() : 0;
 			SetTexture(handle, stage);
-#if ANDROID
-			// Only Android supports ETC1 without embedded alpha channel
-			if (texture != null) {
-				var alphaTexture = texture.AlphaTexture;
-				if (alphaTexture != null) {
-					SetTexture(alphaTexture.GetHandle(), stage + 2);
-					return;
-				}
-			}
-			SetTexture(0, stage + 2);
-#endif
 		}
 
 		internal static void SetTexture(uint glTexNum, int stage, bool force = false)

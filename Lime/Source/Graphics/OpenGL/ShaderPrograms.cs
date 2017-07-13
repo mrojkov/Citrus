@@ -10,11 +10,9 @@ namespace Lime
 	public enum ShaderOptions
 	{
 		None = 0,
-		UseAlphaTexture1 = 1,
-		UseAlphaTexture2 = 2,
-		PremultiplyAlpha = 4,
-		VertexAnimation = 8,
-		Count = 4,
+		PremultiplyAlpha = 1,
+		VertexAnimation = 2,
+		Count = 2,
 	}
 
 	public class ShaderPrograms
@@ -198,14 +196,9 @@ namespace Lime
 			varying lowp vec4 color;
 			varying lowp vec2 texCoords;
 			uniform lowp sampler2D tex1;
-			uniform lowp sampler2D tex1a;
 			void main()
 			{
-				lowp vec4 t1 = texture2D(tex1, texCoords);
-				$ifdef UseAlphaTexture1
-					t1.a = texture2D(tex1a, texCoords).r;
-				$endif
-				gl_FragColor = color * t1;
+				gl_FragColor = color * texture2D(tex1, texCoords);
 				$ifdef PremultiplyAlpha
 					gl_FragColor.rgb *= gl_FragColor.a;
 				$endif
@@ -217,19 +210,9 @@ namespace Lime
 			varying lowp vec2 texCoords2;
 			uniform lowp sampler2D tex1;
 			uniform lowp sampler2D tex2;
-			uniform lowp sampler2D tex1a;
-			uniform lowp sampler2D tex2a;
 			void main()
 			{
-				lowp vec4 t1 = texture2D(tex1, texCoords1);
-				lowp vec4 t2 = texture2D(tex2, texCoords2);
-				$ifdef UseAlphaTexture1
-					t1.a = texture2D(tex1a, texCoords1).r;
-				$endif
-				$ifdef UseAlphaTexture2
-					t2.a = texture2D(tex2a, texCoords2).r;
-				$endif
-				gl_FragColor = color * t1 * t2;
+				gl_FragColor = color * texture2D(tex1, texCoords1) * texture2D(tex2, texCoords2);
 				$ifdef PremultiplyAlpha
 					gl_FragColor.rgb *= gl_FragColor.a;
 				$endif
@@ -239,15 +222,9 @@ namespace Lime
 			varying lowp vec4 color;
 			varying lowp vec2 texCoords;
 			uniform lowp sampler2D tex1;
-			uniform lowp sampler2D tex1a;
 			void main()
 			{
-				$ifdef UseAlphaTexture1
-					lowp float a = texture2D(tex1a, texCoords).r;
-				$else
-					lowp float a = texture2D(tex1, texCoords).a;
-				$endif
-				gl_FragColor = color * vec4(1.0, 1.0, 1.0, a);
+				gl_FragColor = color * vec4(1.0, 1.0, 1.0, texture2D(tex1, texCoords).a);
 			}";
 
 		readonly string twoTexturesSilhouetteFragmentShader = @"
@@ -255,36 +232,19 @@ namespace Lime
 			varying lowp vec2 texCoords1;
 			varying lowp vec2 texCoords2;
 			uniform lowp sampler2D tex1;
-			uniform lowp sampler2D tex1a;
 			uniform lowp sampler2D tex2;
-			uniform lowp sampler2D tex2a;
 			void main()
 			{
-				lowp vec4 t1 = texture2D(tex1, texCoords1);
-				$ifdef UseAlphaTexture1
-					t1.a = texture2D(tex1a, texCoords1).r;
-				$endif
-				$ifdef UseAlphaTexture2
-					lowp float a2 = texture2D(tex2a, texCoords2).r;
-				$else
-					lowp float a2 = texture2D(tex2, texCoords2).a;
-				$endif
-				gl_FragColor = t1 * color * vec4(1.0, 1.0, 1.0, a2);
+				gl_FragColor = texture2D(tex1, texCoords1) * color * vec4(1.0, 1.0, 1.0, texture2D(tex2, texCoords2).a);
 			}";
 
 		readonly string inversedSilhouetteFragmentShader = @"
 			varying lowp vec4 color;
 			varying lowp vec2 texCoords;
 			uniform lowp sampler2D tex1;
-			uniform lowp sampler2D tex1a;
 			void main()
 			{
-				$ifdef UseAlphaTexture1
-					lowp float a = 1.0 - texture2D(tex1a, texCoords).r;
-				$else
-					lowp float a = 1.0 - texture2D(tex1, texCoords).a;
-				$endif
-				gl_FragColor = color * vec4(1.0, 1.0, 1.0, a);
+				gl_FragColor = color * vec4(1.0, 1.0, 1.0, 1.0 - texture2D(tex1, texCoords).a);
 			}";
 
 		private readonly CustomShaderProgram colorOnlyBlendingProgram;
@@ -307,8 +267,6 @@ namespace Lime
 			return new ShaderProgram.Sampler[] {
 				new ShaderProgram.Sampler { Name = "tex1", Stage = 0 },
 				new ShaderProgram.Sampler { Name = "tex2", Stage = 1 },
-				new ShaderProgram.Sampler { Name = "tex1a", Stage = 2 },
-				new ShaderProgram.Sampler { Name = "tex2a", Stage = 3 }
 			};
 		}
 
@@ -351,8 +309,6 @@ namespace Lime
 			varying lowp vec2 texCoords2;
 			uniform lowp sampler2D tex1;
 			uniform lowp sampler2D tex2;
-			uniform lowp sampler2D tex1a;
-			uniform lowp sampler2D tex2a;
 			uniform lowp float colorIndex;
 			void main()
 			{{
