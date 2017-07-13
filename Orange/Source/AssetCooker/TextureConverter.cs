@@ -19,7 +19,8 @@ namespace Orange
 				var etcTool = GetToolPath("EtcTool");
 				var args = 
 					$"{pngPath} -format " + (hasAlpha ? "RGBA8" : "ETC1") +
-					" -effort " + (highQualityCompression ? "50" : "30") +
+					" -jobs 8 " +
+					" -effort " + (highQualityCompression ? "60" : "40") +
 					(mipMaps ? " -mipmaps 4" : "") + 
 					$" -output {ktxPath}";
 				if (Process.Start(etcTool, args) != 0) {
