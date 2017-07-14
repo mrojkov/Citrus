@@ -81,7 +81,7 @@ namespace Lime
 						}
 						PlatformRenderer.PushTexture(handle, 0);
 						const int etc1Rgb8Oes = 36196;
-						if (etc2Supported || glInternalFormat == etc1Rgb8Oes) {
+						if (etc2Supported || (Application.Platform == PlatformId.Android && glInternalFormat == etc1Rgb8Oes)) {
 							GL.CompressedTexImage2D(
 								TextureTarget.Texture2D, mipLevel, (PixelInternalFormat)glInternalFormat, 
 								width, height, 0, dataLength, data);

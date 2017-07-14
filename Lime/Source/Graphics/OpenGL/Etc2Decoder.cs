@@ -25,7 +25,7 @@ namespace Lime
 				throw new ArgumentException("Invalid glInternalFormat");
 			}
 			if ((width & 3) != 0 || (height & 3) != 0) {
-				throw new ArgumentException("Texture dimensions should multiple of 4");
+				throw new ArgumentException("Texture dimensions should be multiple of 4");
 			}
 			uint* decodedBlock = stackalloc uint[16];  
 			fixed (byte* fixedEtcData = &etcData[0]) {
