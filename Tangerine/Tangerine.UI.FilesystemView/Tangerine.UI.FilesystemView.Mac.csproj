@@ -59,6 +59,18 @@
     <Compile Include="FilesystemToolbar.cs" />
     <Compile Include="FileEnumerator.cs" />
     <Compile Include="SystemIconTextureCache.Mac.cs" />
+    <Compile Include="CookingRulesEditor.cs" />
+    <Compile Include="FilesystemPane.cs" />
+    <Compile Include="FilesystemViewExtensions.cs" />
+    <Compile Include="ISystemIconTextureProvider.cs" />
+    <Compile Include="ISystemShellContextMenu.cs" />
+    <Compile Include="Preview.cs" />
+    <Compile Include="SystemIconTextureCache.Win.cs" />
+    <Compile Include="SystemShellContextMenu.Win.cs" />
+    <Compile Include="UserPreferences.cs" />
+    <Compile Include="ViewNode.cs" />
+    <Compile Include="WinAPI.cs" />
+    <Compile Include="SystemShellContextMenu.Mac.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Mac.csproj">
@@ -76,6 +88,10 @@
     <ProjectReference Include="..\..\Yuzu\Yuzu.Mac.csproj">
       <Project>{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}</Project>
       <Name>Yuzu.Mac</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Orange\Orange.Mac.csproj">
+      <Project>{4B2BDD5A-2AAE-46AE-AA1A-8C9308BAA50D}</Project>
+      <Name>Orange.Mac</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />

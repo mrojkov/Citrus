@@ -58,11 +58,13 @@
     <Compile Include="Preview.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FilesystemToolbar.cs" />
-    <Compile Include="SystemShellContextMenu.cs" />
     <Compile Include="SystemIconTextureCache.Win.cs" />
     <Compile Include="UserPreferences.cs" />
     <Compile Include="ViewNode.cs" />
     <Compile Include="WinAPI.cs" />
+    <Compile Include="SystemShellContextMenu.Win.cs" />
+    <Compile Include="SystemShellContextMenu.Mac.cs" />
+    <Compile Include="SystemIconTextureCache.Mac.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Win.csproj">

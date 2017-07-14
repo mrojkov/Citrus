@@ -34,9 +34,7 @@ namespace Tangerine
 				Core.UserPreferences.Instance.Add(new UserPreferences());
 				Core.UserPreferences.Instance.Add(new UI.SceneView.UserPreferences());
 				Core.UserPreferences.Instance.Add(new UI.Timeline.UserPreferences());
-#if WIN
 				Core.UserPreferences.Instance.Add(new UI.FilesystemView.UserPreferences());
-#endif
 			}
 			SetColorTheme(Core.UserPreferences.Instance.Get<UserPreferences>().Theme);
 
@@ -126,9 +124,7 @@ namespace Tangerine
 			if (proj != null) {
 				new Project(proj).Open();
 			}
-#if WIN
 			new UI.FilesystemView.FilesystemPane(filesystemPanel);
-#endif
 			RegisterGlobalCommands();
 		}
 

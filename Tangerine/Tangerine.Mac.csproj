@@ -133,6 +133,10 @@
       <Project>{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}</Project>
       <Name>Yuzu.Mac</Name>
     </ProjectReference>
+    <ProjectReference Include="Tangerine.UI.FilesystemView\Tangerine.UI.FilesystemView.Mac.csproj">
+      <Project>{8799EA66-04E0-4075-95FE-BF0EC1BC88A1}</Project>
+      <Name>Tangerine.UI.FilesystemView.Mac</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\SegoeUIRegular.ttf" />
@@ -213,6 +217,19 @@
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Spline3D.png" />
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.SplinePoint3D.png" />
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.SplineGear3D.png" />
+    <EmbeddedResource Include="Resources\Icons\Filesystem\ArrowLeft.png" />
+    <EmbeddedResource Include="Resources\Icons\Filesystem\ArrowRight.png" />
+    <EmbeddedResource Include="Resources\Icons\Filesystem\ArrowUp.png" />
+    <EmbeddedResource Include="Resources\Icons\Filesystem\Close.png" />
+    <EmbeddedResource Include="Resources\Icons\Filesystem\CookingRules.png" />
+    <EmbeddedResource Include="Resources\Icons\Filesystem\Cross.png" />
+    <EmbeddedResource Include="Resources\Icons\Filesystem\Folded.png" />
+    <EmbeddedResource Include="Resources\Icons\Filesystem\Home.png" />
+    <EmbeddedResource Include="Resources\Icons\Filesystem\Plus.png" />
+    <EmbeddedResource Include="Resources\Icons\Filesystem\Preview.png" />
+    <EmbeddedResource Include="Resources\Icons\Filesystem\SplitH.png" />
+    <EmbeddedResource Include="Resources\Icons\Filesystem\SplitV.png" />
+    <EmbeddedResource Include="Resources\Icons\Filesystem\Unfolded.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PreferencesDialog\" />
