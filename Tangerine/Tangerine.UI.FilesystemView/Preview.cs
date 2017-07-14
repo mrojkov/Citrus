@@ -90,7 +90,8 @@ namespace Tangerine.UI.FilesystemView
 			if (Directory.Exists(filename)) {
 				return null;
 			}
-			if (filename.EndsWith(".scene") || filename.EndsWith(".tan")) {
+			var extension = Path.GetExtension(filename).ToLower();
+			if (extension == ".scene" || extension == ".tan") {
 				const string SceneThumbnailSeparator = "{8069CDD4-F02F-4981-A3CB-A0BAD4018D00}";
 				var allText = File.ReadAllText(filename);
 				var index = allText.IndexOf(SceneThumbnailSeparator);
@@ -113,28 +114,39 @@ namespace Tangerine.UI.FilesystemView
 				if (fi.Length > 1024 * 1024 * 10) {
 					return null;
 				}
-				var texture = new Texture2D();
-				try {
-					texture.LoadImage(filename);
-				} catch {
-					var bytes = File.ReadAllBytes(filename);
-					var len = bytes.Length;
-					if (len == 0) {
-						return null;
+				if (extension == ".png" || extension == ".jpg") {
+					try {
+						var texture = new Texture2D();
+						texture.LoadImage(filename);
+						return texture;
+					} catch {
+						return LoadFileAsRawBitmap(filename);
 					}
-					int trueLen = len + 3 - len % 3;
-					int side = Mathf.Sqrt(trueLen / 3).Truncate();
-					Color4[] pixels = new Color4[side * side];
-					for (int i = 0; i < side * side; i++) {
-						pixels[i].R = i * 3 + 0 >= len ? (byte)0 : bytes[i * 3 + 0];
-						pixels[i].G = i * 3 + 1 >= len ? (byte)0 : bytes[i * 3 + 1];
-						pixels[i].B = i * 3 + 2 >= len ? (byte)0 : bytes[i * 3 + 2];
-						pixels[i].A = 255;
-					}
-					texture.LoadImage(pixels, side, side);
+				} else {
+					return LoadFileAsRawBitmap(filename);
 				}
-				return texture;
 			}
+		}
+
+		private static ITexture LoadFileAsRawBitmap(string filename)
+		{
+			var bytes = File.ReadAllBytes(filename);
+			var len = bytes.Length;
+			if (len == 0) {
+				return null;
+			}
+			var texture = new Texture2D();
+			int trueLen = len + 3 - len % 3;
+			int side = Mathf.Sqrt(trueLen / 3).Truncate();
+			Color4[] pixels = new Color4[side * side];
+			for (int i = 0; i < side * side; i++) {
+				pixels[i].R = i * 3 + 0 >= len ? (byte)0 : bytes[i * 3 + 0];
+				pixels[i].G = i * 3 + 1 >= len ? (byte)0 : bytes[i * 3 + 1];
+				pixels[i].B = i * 3 + 2 >= len ? (byte)0 : bytes[i * 3 + 2];
+				pixels[i].A = 255;
+			}
+			texture.LoadImage(pixels, side, side);
+			return texture;
 		}
 	}
 }
