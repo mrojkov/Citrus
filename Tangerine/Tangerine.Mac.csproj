@@ -94,6 +94,7 @@
     <Compile Include="Tools\FitTools.cs" />
     <Compile Include="MainMenu\EditMenu.cs" />
     <Compile Include="UserPreferences.cs" />
+    <Compile Include="OrangeInterface.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>
@@ -136,6 +137,10 @@
     <ProjectReference Include="Tangerine.UI.FilesystemView\Tangerine.UI.FilesystemView.Mac.csproj">
       <Project>{8799EA66-04E0-4075-95FE-BF0EC1BC88A1}</Project>
       <Name>Tangerine.UI.FilesystemView.Mac</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Orange\Orange.Mac.csproj">
+      <Project>{4B2BDD5A-2AAE-46AE-AA1A-8C9308BAA50D}</Project>
+      <Name>Orange.Mac</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

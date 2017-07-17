@@ -109,8 +109,10 @@ namespace Orange
 			CurrentPlugin = new OrangePlugin();
 			ResetPlugins();
 			try {
-				catalog.Catalogs.Add(new DirectoryCatalog(CurrentPluginDirectory));
-				ValidateComposition();
+				if (Directory.Exists(CurrentPluginDirectory)) {
+					catalog.Catalogs.Add(new DirectoryCatalog(CurrentPluginDirectory));
+					ValidateComposition();
+				}
 			} catch (BadImageFormatException e) {
 				Console.WriteLine(e.Message);
 			} catch (System.Exception e) {

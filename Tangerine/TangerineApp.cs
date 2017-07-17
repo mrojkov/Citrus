@@ -21,9 +21,7 @@ namespace Tangerine
 
 		private TangerineApp()
 		{
-#if WIN
 			Orange.UserInterface.Instance = new OrangeInterface();
-#endif
 			WindowOptions.DefaultRefreshRate = 60;
 			WidgetInput.AcceptMouseBeyondWidgetByDefault = false;
 			Application.IsTangerine = true;
@@ -302,11 +300,9 @@ namespace Tangerine
 					GenericCommands.NextDocument,
 					GenericCommands.PreviousDocument
 				}),
-#if WIN
 				new Command("Orange", new Menu {
 					OrangeCommands.Run
 				}),
-#endif
 		};
 			var nodeTypes = new[] {
 				typeof(Frame),
@@ -399,9 +395,7 @@ namespace Tangerine
 			}, () => Document.Current?.Rows.Count > 0);
 			h.Connect(Command.Undo, () => Document.Current.History.Undo(), () => Document.Current?.History.CanUndo() ?? false);
 			h.Connect(Command.Redo, () => Document.Current.History.Redo(), () => Document.Current?.History.CanRedo() ?? false);
-#if WIN
 			h.Connect(OrangeCommands.Run, () => Orange.Actions.BuildAndRunAction());
-#endif
 		}
 
 		static void Paste()
