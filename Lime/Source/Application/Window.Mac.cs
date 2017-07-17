@@ -1,20 +1,13 @@
-#if MONOMAC || MAC
+#if MAC
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using Lime.Platform;
-#if MAC
 using AppKit;
 using Foundation;
 using CoreGraphics;
-using OpenTK.Graphics;
-#else
-using MonoMac.AppKit;
-using MonoMac.CoreGraphics;
-using MonoMac.Foundation;
-#endif
 
 namespace Lime
 {
@@ -175,7 +168,9 @@ namespace Lime
 
 		public void DragFiles(string[] filenames)
 		{
-			throw new NotImplementedException();
+			foreach (var filename in filenames) {
+				View.DragFile(filename, new CGRect(), false, NSApplication.SharedApplication.CurrentEvent);
+			}
 		}
 
 		public float FPS { get { return fpsCounter.FPS; } }
