@@ -156,6 +156,9 @@ namespace Lime
 				if (key == Key.Delete) {
 					return ((char)127).ToString();
 				}
+				if (key >= Key.F1 && key <= Key.F12) {
+					return ((char)((int)NSFunctionKey.F1 + (key.Code - Key.F1.Code))).ToString();
+				}
 				throw new ArgumentException();
 			}
 
