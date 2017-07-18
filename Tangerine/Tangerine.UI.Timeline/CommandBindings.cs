@@ -58,7 +58,7 @@ namespace Tangerine.UI.Timeline
 				Core.Operations.SelectRow.Perform(doc.Rows[0]);
 				return;
 			}
-			var lastSelectedRow = doc.SelectedRows().OrderByDescending(i => i.SelectedAtUpdate).First();
+			var lastSelectedRow = doc.SelectedRows().OrderByDescending(i => i.SelectCounter).First();
 			var nextRow = doc.Rows[Mathf.Clamp(lastSelectedRow.Index + advance, 0, doc.Rows.Count - 1)];
 			if (nextRow != lastSelectedRow) {
 				if (!multiselection) {

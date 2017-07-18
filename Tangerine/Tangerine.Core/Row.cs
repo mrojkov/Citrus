@@ -19,8 +19,8 @@ namespace Tangerine.Core
 	public class Row
 	{
 		public int Index { get; set; }
-		public bool Selected => SelectedAtUpdate > 0;
-		public long SelectedAtUpdate { get; set; }
+		public bool Selected => SelectCounter != 0;
+		public int SelectCounter { get; set; }
 		public bool CanHaveChildren { get; set; }
 		public Row Parent { get; set; }
 		public readonly List<Row> Rows = new List<Row>();

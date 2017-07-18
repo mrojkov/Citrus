@@ -10,6 +10,8 @@ namespace Tangerine.Core.Operations
 
 		public override bool IsChangingDocument => false;
 
+		static int selectCounter = 1;
+
 		public static void Perform(Row row, bool select = true)
 		{
 			Document.Current.History.Perform(new SelectRow(row, select));
@@ -23,17 +25,17 @@ namespace Tangerine.Core.Operations
 
 		public class Processor : OperationProcessor<SelectRow>
 		{
-			class Backup { public long selectedAtUpdate; }
+			class Backup { public int selectCounter; }
 
 			protected override void InternalRedo(SelectRow op)
 			{
-				op.Save(new Backup { selectedAtUpdate = op.Row.SelectedAtUpdate });
-				op.Row.SelectedAtUpdate = op.Select ? Application.UpdateCounter : 0;
+				op.Save(new Backup { selectCounter = op.Row.SelectCounter });
+				op.Row.SelectCounter = op.Select ? selectCounter++ : 0;
 			}
 
 			protected override void InternalUndo(SelectRow op)
 			{
-				op.Row.SelectedAtUpdate = op.Restore<Backup>().selectedAtUpdate;
+				op.Row.SelectCounter = op.Restore<Backup>().selectCounter;
 			}
 		}
 	}
