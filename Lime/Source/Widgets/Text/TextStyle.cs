@@ -17,6 +17,7 @@ namespace Lime
 		private Color4 textColor;
 		private Color4 shadowColor;
 		public ShaderProgram ShaderProgram;
+		internal int PalleteIndex = -1;
 
 		public static TextStyle Default = new TextStyle();
 
@@ -183,6 +184,9 @@ namespace Lime
 		protected override void OnTagChanged()
 		{
 			ShaderProgram = null;
+			if (!int.TryParse(Tag, out PalleteIndex)) {
+				PalleteIndex = -1;
+			}
 		}
 	}
 }

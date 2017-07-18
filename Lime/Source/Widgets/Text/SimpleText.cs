@@ -22,6 +22,7 @@ namespace Lime
 		private bool wordSplitAllowed;
 		private TextProcessorDelegate textProcessor;
 		public Action<SimpleText, Sprite> SpriteListElementHandler;
+		internal int PalleteIndex = -1;
 		public ShaderProgram ShaderProgram;
 
 		public event TextProcessorDelegate TextProcessor
@@ -219,6 +220,19 @@ namespace Lime
 		protected override void OnTagChanged()
 		{
 			ShaderProgram = null;
+			if (!int.TryParse(Tag, out PalleteIndex)) {
+				PalleteIndex = -1;
+			}
+		}
+
+		private bool InvertPaletteIndex()
+		{
+			if (PalleteIndex == -1) {
+				return false;
+			}
+			PalleteIndex = ShaderPrograms.ColorfulTextShaderProgram.GradientMapTextureSize - PalleteIndex - 1;
+			ShaderProgram = null;
+			return true;
 		}
 
 		public override void Render()
@@ -228,6 +242,10 @@ namespace Lime
 			Renderer.Blending = GlobalBlending;
 			Renderer.Shader = GlobalShader;
 			spriteList.Render(GlobalColor * textColor, InvokeSpriteHandler);
+			if (InvertPaletteIndex()) {
+				spriteList.Render(GlobalColor * textColor, InvokeSpriteHandler);
+				InvertPaletteIndex();
+			}
 		}
 
 		void IText.SyncCaretPosition()

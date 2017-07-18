@@ -351,6 +351,8 @@ namespace Lime
 			};
 			}
 
+			public const int GradientMapTextureSize = 256;
+
 			private static ITexture fontGradientTexture;
 			private static readonly List<ColorfulTextShaderProgram> cachedShaderPrograms = new List<ColorfulTextShaderProgram>();
 			private static ColorfulTextShaderProgram GetShaderProgram(int styleIndex)
@@ -360,17 +362,12 @@ namespace Lime
 						if (i < cachedShaderPrograms.Count) {
 							continue;
 						}
-						cachedShaderPrograms.Add(new ColorfulTextShaderProgram { ColorIndex = (i * 2 + 1) / 512.0f });
+						cachedShaderPrograms.Add(new ColorfulTextShaderProgram { ColorIndex = (i * 2 + 1) / (GradientMapTextureSize * 2.0f) });
 					}
 				}
 				return cachedShaderPrograms[styleIndex];
 			}
-			private static ITexture GradientRampTexture
-			{
-				get {
-					return fontGradientTexture = fontGradientTexture ?? new SerializableTexture("Fonts/gradient_map");
-				}
-			}
+			private static ITexture GradientRampTexture => fontGradientTexture = fontGradientTexture ?? new SerializableTexture("Fonts/gradient_map");
 
 			public static void HandleSimpleTextSprite(SimpleText text, Sprite sprite)
 			{
@@ -379,8 +376,8 @@ namespace Lime
 					sprite.Texture2 = GradientRampTexture;
 					return;
 				}
-				if (!string.IsNullOrEmpty(text.Tag)) {
-					text.ShaderProgram = sprite.ShaderProgram = GetShaderProgram(int.Parse(text.Tag));
+				if (text.PalleteIndex != -1) {
+					text.ShaderProgram = sprite.ShaderProgram = GetShaderProgram(text.PalleteIndex);
 					sprite.Texture2 = GradientRampTexture;
 				}
 			}
@@ -393,8 +390,8 @@ namespace Lime
 					sprite.Texture2 = GradientRampTexture;
 					return;
 				}
-				if (!string.IsNullOrEmpty(style.Tag)) {
-					style.ShaderProgram = sprite.ShaderProgram = GetShaderProgram(int.Parse(style.Tag));
+				if (style.PalleteIndex != -1) {
+					style.ShaderProgram = sprite.ShaderProgram = GetShaderProgram(style.PalleteIndex);
 					sprite.Texture2 = GradientRampTexture;
 				}
 			}

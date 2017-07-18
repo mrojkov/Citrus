@@ -150,6 +150,19 @@ namespace Lime
 			SpriteListElementHandler?.Invoke(this, sprite);
 		}
 
+		private bool InvertStylesPalleteIndex()
+		{
+			bool dirty = false;
+			foreach (var s in Renderer.Styles) {
+				if (s.PalleteIndex != -1) {
+					dirty = true;
+					s.PalleteIndex = ShaderPrograms.ColorfulTextShaderProgram.GradientMapTextureSize - s.PalleteIndex - 1;
+					s.ShaderProgram = null;
+				}
+			}
+			return dirty;
+		}
+
 		public override void Render()
 		{
 			EnsureSpriteList();
@@ -157,6 +170,10 @@ namespace Lime
 			Lime.Renderer.Blending = GlobalBlending;
 			Lime.Renderer.Shader = GlobalShader;
 			spriteList.Render(GlobalColor, InvokeSpriteHandler);
+			if (InvertStylesPalleteIndex()) {
+				spriteList.Render(GlobalColor, InvokeSpriteHandler);
+				InvertStylesPalleteIndex();
+			}
 		}
 
 		private void EnsureSpriteList()
