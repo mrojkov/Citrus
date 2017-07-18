@@ -6,13 +6,14 @@ namespace Tangerine.Core
 {
 	public class DocumentHistory
 	{
-		public static readonly List<IOperationProcessor> Processors = new List<IOperationProcessor>();
+		private int transactionCounter;
+		private long currentBatchId;
+		private long transactionBatchId;
+		private readonly List<IOperation> operations = new List<IOperation>();
+		private int headPos;
+		private int savePos;
 
-		int transactionCounter;
-		long transactionBatchId;
-		readonly List<IOperation> operations = new List<IOperation>();
-		int headPos;
-		int savePos;
+		public static readonly List<IOperationProcessor> Processors = new List<IOperationProcessor>();
 
 		public bool CanUndo() => headPos > 0;
 		public bool CanRedo() => headPos < operations.Count;
@@ -20,10 +21,15 @@ namespace Tangerine.Core
 
 		public event Action Changed;
 
+		public void NextBatch()
+		{
+			currentBatchId++;
+		}
+
 		public void BeginTransaction()
 		{
 			transactionCounter++;
-			transactionBatchId = Lime.Application.UpdateCounter;
+			transactionBatchId = currentBatchId;
 		}
 
 		public void EndTransaction()
@@ -33,7 +39,7 @@ namespace Tangerine.Core
 
 		public void Perform(IOperation operation)
 		{
-			operation.BatchId = (transactionCounter > 0) ? transactionBatchId : Lime.Application.UpdateCounter;
+			operation.BatchId = (transactionCounter > 0) ? transactionBatchId : currentBatchId;
 			if (savePos > headPos) {
 				savePos = -1;
 			}

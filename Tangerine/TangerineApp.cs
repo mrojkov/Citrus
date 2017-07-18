@@ -81,6 +81,7 @@ namespace Tangerine
 			Document.NodeDecorators.AddFor<PointObject>(n => n.CompoundPostPresenter.Add(new UI.SceneView.PointObjectPresenter()));
 			Document.NodeDecorators.AddFor<SplinePoint>(n => n.CompoundPostPresenter.Add(new UI.SceneView.SplinePointPresenter()));
 
+			dockManager.MainWindowWidget.Updated += delta => Document.Current.History.NextBatch();
 			DocumentHistory.Processors.AddRange(new IOperationProcessor[] {
 				new Core.Operations.SelectRow.Processor(),
 				new Core.Operations.SetProperty.Processor(),
