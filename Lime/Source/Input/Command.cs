@@ -58,7 +58,7 @@ namespace Lime
 		int Version { get; }
 
 		/// <summary>
-		/// Returns true, if the command was issued since the last active window update.
+		/// Returns true, if the command was issued.
 		/// </summary>
 		bool WasIssued();
 
@@ -66,11 +66,6 @@ namespace Lime
 		/// Consumes the command. WasIssued is false if the command was consumed.
 		/// </summary>
 		void Consume();
-
-		/// <summary>
-		/// Returns true if the command was consumed.
-		/// </summary>
-		bool IsConsumed();
 
 		/// <summary>
 		/// Occurs when command is issued by clicking on menu item, activating menu shortcut or clicking a tool button.
@@ -92,8 +87,7 @@ namespace Lime
 			Undo, Redo, SelectAll, Cut, Copy, Paste, Delete
 		};
 
-		private long issuedAtUpdate;
-		private long consumedAtUpdate;
+		private bool wasIssued;
 		private string text;
 		private Shortcut shortcut;
 		private Key mappedShortcut;
@@ -226,7 +220,7 @@ namespace Lime
 
 		public void Issue()
 		{
-			issuedAtUpdate = Application.UpdateCounter;
+			wasIssued = true;
 			Issued?.Invoke();
 		}
 
@@ -234,7 +228,7 @@ namespace Lime
 		{
 			var input = Window.Current.Input;
 			return Enabled && (
-				issuedAtUpdate == Application.UpdateCounter ||
+				wasIssued ||
 				mappedShortcut != Key.Unknown &&
 				(Repeatable && input.WasKeyRepeated(mappedShortcut) ||
 		 		!Repeatable && input.WasKeyPressed(mappedShortcut))
@@ -243,14 +237,11 @@ namespace Lime
 
 		public void Consume()
 		{
-			consumedAtUpdate = Application.UpdateCounter;
-			issuedAtUpdate = 0;
+			wasIssued = false;
 			if (mappedShortcut != Key.Unknown) {
 				Window.Current.Input.ConsumeKey(mappedShortcut);
 			}
 		}
-
-		public bool IsConsumed() => consumedAtUpdate == Application.UpdateCounter;
 
 		public static void ConsumeRange(List<ICommand> commands)
 		{
