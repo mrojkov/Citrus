@@ -30,6 +30,7 @@ namespace Tangerine.Core
 			var path = GetPath();
 			if (System.IO.File.Exists(path)) {
 				try {
+					Clear();
 					Serialization.ReadObjectFromFile<UserPreferences>(path, this);
 					return true;
 				} catch (System.Exception e) {
