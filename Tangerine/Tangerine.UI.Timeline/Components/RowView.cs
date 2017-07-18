@@ -13,6 +13,7 @@ namespace Tangerine.UI.Timeline.Components
 	{
 		Widget Widget { get; }
 		float Indentation { set; }
+		void Rename();
 	}
 
 	public interface IGridRowView

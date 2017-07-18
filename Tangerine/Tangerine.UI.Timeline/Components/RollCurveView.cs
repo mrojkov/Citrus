@@ -31,6 +31,8 @@ namespace Tangerine.UI.Timeline.Components
 			widget.Updated += delta => widget.MinHeight = c.State.RowHeight;
 		}
 
+		public void Rename() { }
+
 		public Widget Widget => widget;
 		public float Indentation { set { spacer.MinMaxWidth = value; } }
 

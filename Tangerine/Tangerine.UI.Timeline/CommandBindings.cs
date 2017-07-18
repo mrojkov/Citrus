@@ -18,6 +18,7 @@ namespace Tangerine.UI.Timeline
 					Core.Operations.EnterNode.Perform(node);
 				}
 			}, Document.HasCurrent);
+			h.Connect(TimelineCommands.RenameRow, () => RenameCurrentRow(), Document.HasCurrent);
 			h.Connect(TimelineCommands.ExitNode, Core.Operations.LeaveNode.Perform, Document.HasCurrent);
 			h.Connect(TimelineCommands.ScrollUp, () => SelectRow(-1, false), Document.HasCurrent);
 			h.Connect(TimelineCommands.ScrollDown, () => SelectRow(1, false), Document.HasCurrent);
@@ -35,6 +36,16 @@ namespace Tangerine.UI.Timeline
 			h.Connect(TimelineCommands.CopyMarkers, CopyMarkers, Document.HasCurrent);
 			h.Connect(TimelineCommands.PasteMarkers, PasteMarkers, Document.HasCurrent);
 			h.Connect(TimelineCommands.DeleteMarkers, DeleteMarkers, Document.HasCurrent);
+		}
+
+		static void RenameCurrentRow()
+		{
+			var doc = Document.Current;
+			if (doc.SelectedRows().Count() != 1) {
+				return;
+			}
+			var row = doc.SelectedRows().First();
+			row.Components.Get<RowView>().RollRow.Rename();
 		}
 
 		static void SelectRow(int advance, bool multiselection)

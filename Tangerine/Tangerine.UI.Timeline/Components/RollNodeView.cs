@@ -154,16 +154,21 @@ namespace Tangerine.UI.Timeline.Components
 				if (nodeIcon.Input.WasKeyPressed(Key.Mouse0DoubleClick)) {
 					Core.Operations.ClearRowSelection.Perform();
 					Core.Operations.SelectRow.Perform(row);
-					label.Visible = false;
-					editBox.Visible = true;
-					editBox.Text = nodeData.Node.Id;
-					editBox.SetFocus();
-					editBox.Tasks.Add(EditNodeIdTask());
+					Rename();
 				} else if (widget.Input.WasKeyPressed(Key.Mouse0DoubleClick)) {
 					Core.Operations.EnterNode.Perform(nodeData.Node);
 				}
 				yield return null;
 			}
+		}
+
+		public void Rename()
+		{
+			label.Visible = false;
+			editBox.Visible = true;
+			editBox.Text = nodeData.Node.Id;
+			editBox.SetFocus();
+			editBox.Tasks.Add(EditNodeIdTask());
 		}
 
 		IEnumerator<object> EditNodeIdTask()

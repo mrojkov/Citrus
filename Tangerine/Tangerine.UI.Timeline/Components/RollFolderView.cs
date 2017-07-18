@@ -135,14 +135,19 @@ namespace Tangerine.UI.Timeline.Components
 				if (nodeIcon.Input.WasKeyPressed(Key.Mouse0DoubleClick)) {
 					Core.Operations.ClearRowSelection.Perform();
 					Core.Operations.SelectRow.Perform(row);
-					label.Visible = false;
-					editBox.Visible = true;
-					editBox.Text = folder.Id;
-					editBox.SetFocus();
-					editBox.Tasks.Add(EditFolderIdTask());
+					Rename();
 				}
 				yield return null;
 			}
+		}
+
+		public void Rename()
+		{
+			label.Visible = false;
+			editBox.Visible = true;
+			editBox.Text = folder.Id;
+			editBox.SetFocus();
+			editBox.Tasks.Add(EditFolderIdTask());
 		}
 
 		IEnumerator<object> EditFolderIdTask()

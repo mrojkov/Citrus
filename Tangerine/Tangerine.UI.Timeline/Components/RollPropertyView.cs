@@ -60,6 +60,8 @@ namespace Tangerine.UI.Timeline.Components
 				row.Selected ? ColorTheme.Current.Basic.SelectedBackground : ColorTheme.Current.Basic.WhiteBackground);
 		}
 
+		public void Rename() { }
+
 		public Widget Widget => widget;
 		public float Indentation { set { spacer.MinMaxWidth = value; } }
 	}	
