@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Lime;
 using Widget = Lime.Widget;
@@ -124,7 +125,8 @@ namespace Orange
 				}
 				return true;
 			};
-			foreach (var srcFileInfo in The.Workspace.AssetFiles.Enumerate(".scene")) {
+			var usedImages = new HashSet<string>();
+			foreach (var srcFileInfo in The.Workspace.AssetFiles.Enumerate(".scene").Concat(The.Workspace.AssetFiles.Enumerate(".tan"))) {
 				var srcPath = srcFileInfo.Path;
 				using (Lime.Frame scene = new Lime.Frame(srcPath)) {
 					foreach (var j in scene.Descendants) {
@@ -163,6 +165,7 @@ namespace Orange
 							foreach (var tpp in possiblePaths) {
 								if (Lime.AssetBundle.Instance.FileExists(tpp)) {
 									Lime.AssetBundle.Instance.OpenFile(tpp);
+									usedImages.Add(texPath.Replace('\\', '/'));
 									return;
 								}
 							}
@@ -220,6 +223,19 @@ namespace Orange
 				}
 				Lime.Application.FreeScheduledActions();
 			}
+
+			var allImages = new Dictionary<string, bool>();
+			foreach (var img in The.Workspace.AssetFiles.Enumerate(".png")) {
+				var key = Path.Combine(Path.GetDirectoryName(img.Path), Path.GetFileNameWithoutExtension(img.Path)).Replace('\\', '/');
+				if (!key.StartsWith("Fonts")) {
+					allImages[key] = false;
+				}
+			}
+			foreach (var img in usedImages) {
+				allImages[img] = true;
+			}
+			var unusedImages = allImages.Where(kv => !kv.Value).Select(kv => kv.Key).ToList();
+
 			Action<string> writeHeader = (s) => {
 				int n0 = (80 - s.Length) / 2;
 				int n1 = (80 - s.Length)%2 == 0 ? n0 : n0 - 1;
@@ -234,6 +250,10 @@ namespace Orange
 			}
 			writeHeader("Missing Resources");
 			foreach (var s in missingResourcesReport) {
+				Console.WriteLine(s);
+			}
+			writeHeader("Unused Images");
+			foreach (var s in unusedImages) {
 				Console.WriteLine(s);
 			}
 			writeHeader("Suspicious Textures");
