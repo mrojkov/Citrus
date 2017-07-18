@@ -34,6 +34,11 @@ namespace Lime
 			if (Window.Input.WasKeyPressed(Key.DismissSoftKeyboard)) {
 				Widget.SetFocus(null);
 			}
+			if (Window.Active) {
+				// Process global commands if the current window is active, to give the priority to the focused widget.
+				// Global commands should be processed after updating the main hierarchy, but before the layouting.
+				CommandHandlerList.Global.ProcessCommands();
+			}
 			Window.Cursor = WidgetContext.Current.MouseCursor;
 			LayoutManager.Instance.Layout();
 			renderChain.Clear();

@@ -243,7 +243,6 @@
     <Compile Include="Source\Widgets\KeyboardFocus.cs" />
     <Compile Include="Source\Input\Shortcut.cs" />
     <Compile Include="Source\Widgets\CheckBox.cs" />
-    <Compile Include="Source\Application\Menu\Command.cs" />
     <Compile Include="Source\Widgets\TabBar.cs" />
     <Compile Include="Source\GeneratedDeserializersBIN.cs" />
     <Compile Include="Source\Types\Quadrangle.cs" />
@@ -308,6 +307,8 @@
     <Compile Include="Source\Types\Bounds.cs" />
     <Compile Include="Source\Graphics\OpenGL\Texture2D.Ktx.cs" />
     <Compile Include="Source\Graphics\OpenGL\Etc2Decoder.cs" />
+    <Compile Include="Source\Input\Command.cs" />
+    <Compile Include="Source\Input\CommandHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

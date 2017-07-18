@@ -2,22 +2,12 @@
 using System.Collections.Generic;
 using Lime;
 
-namespace Tangerine.UI
+namespace Lime
 {
 	public abstract class CommandHandler
 	{
 		public virtual void RefreshCommand(ICommand command) { }
 		public abstract void Execute();
-	}
-
-	public abstract class DocumentCommandHandler : CommandHandler
-	{
-		public override void RefreshCommand(ICommand command)
-		{
-			command.Enabled = Core.Document.Current != null && GetEnabled();
-		}
-
-		public virtual bool GetEnabled() => true;
 	}
 
 	public class CommandHandlerList
@@ -31,11 +21,6 @@ namespace Tangerine.UI
 		private readonly List<Item> items = new List<Item>();
 
 		public static readonly CommandHandlerList Global = new CommandHandlerList();
-
-		static CommandHandlerList()
-		{
-			Application.ActiveWindowUpdated += _ => Global.ProcessCommands();
-		}
 
 		public void Connect(ICommand command, CommandHandler handler)
 		{

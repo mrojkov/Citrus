@@ -378,7 +378,6 @@
     <Compile Include="Source\Application\MouseCursor\StockCursors.Null.cs" />
     <Compile Include="Source\Application\MouseCursor\StockCursors.Win.cs" />
     <Compile Include="Source\Widgets\CheckBox.cs" />
-    <Compile Include="Source\Application\Menu\Command.cs" />
     <Compile Include="Source\Widgets\TabBar.cs" />
     <Compile Include="Source\Types\Quadrangle.cs" />
     <Compile Include="Source\Types\Transform2.cs" />
@@ -409,6 +408,8 @@
     <Compile Include="Source\Optimizations\RenderOptimizerHelpers.cs" />
     <Compile Include="Source\Optimizations\ViewProjector.cs" />
     <Compile Include="Source\Types\Bounds.cs" />
+    <Compile Include="Source\Input\Command.cs" />
+    <Compile Include="Source\Input\CommandHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\3rdParty\OpenAL\OpenAL32.dll">

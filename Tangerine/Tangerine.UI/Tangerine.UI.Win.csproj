@@ -42,7 +42,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ColorPickerPanel.cs" />
-    <Compile Include="CommandHandler.cs" />
     <Compile Include="Commands.cs" />
     <Compile Include="Console.cs" />
     <Compile Include="Dialogs\AlertDialog.cs" />
@@ -61,6 +60,7 @@
     <Compile Include="Utils\Metrics.cs" />
     <Compile Include="Utils\Utils.cs" />
     <Compile Include="PropertyEditor.cs" />
+    <Compile Include="DocumentCommandHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Win.csproj">
