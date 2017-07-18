@@ -289,8 +289,6 @@ namespace Lime
 
 		public void ShowModal()
 		{
-			// Showing a new modal window should consume issued commands or we may fall into infinite loop otherwise.
-			Application.UpdateCounter++;
 			RaiseVisibleChanging(true, true);
 			form.ShowDialog();
 			RaiseVisibleChanging(false, true);

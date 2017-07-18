@@ -372,8 +372,6 @@ namespace Lime
 			View.Stop();
 			View.Run(refreshRate, true);
 			window.MakeKeyAndOrderFront(window);
-			// Showing a new modal window should consume issued commands or we may fall into infinite loop otherwise.
-			Application.UpdateCounter++;
 			NSApplication.SharedApplication.RunModalForWindow(window);
 			RaiseVisibleChanging(false, true);
 		}

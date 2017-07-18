@@ -64,13 +64,6 @@ namespace Lime
 		public static readonly List<IWindow> Windows = new List<IWindow>();
 		public static bool IsTangerine;
 
-		/// <summary>
-		/// Gets the global update counter. The counter is incremented every time the active window got updated.
-		/// </summary>
-		public static long UpdateCounter { get; internal set; } = 1;
-
-		public static event Action<IWindow> ActiveWindowUpdated;
-
 		private static IWindow mainWindow;
 		public static IWindow MainWindow
 		{
@@ -112,11 +105,6 @@ namespace Lime
 					SupportedDeviceOrientationsChanged?.Invoke(value);
 				}
 			}
-		}
-
-		internal static void RaiseActiveWindowUpdated(IWindow window)
-		{
-			ActiveWindowUpdated?.Invoke(window);
 		}
 
 		/// <summary>

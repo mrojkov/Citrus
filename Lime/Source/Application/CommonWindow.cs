@@ -86,8 +86,6 @@ namespace Lime
 			}
 			if (Current.Active) {
 				Application.MainMenu?.Refresh();
-				Application.RaiseActiveWindowUpdated(Current);
-				Application.UpdateCounter++;
 			}
 		}
 
