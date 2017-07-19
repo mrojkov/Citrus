@@ -311,27 +311,27 @@ namespace Lime
 			MainRenderList.Flush();
 		}
 
-		public static void DrawTextLine(float x, float y, string text, float fontHeight, Color4 color)
+		public static void DrawTextLine(float x, float y, string text, float fontHeight, Color4 color, float letterSpacing)
 		{
-			DrawTextLine(new Vector2(x, y), text, fontHeight, color);
+			DrawTextLine(new Vector2(x, y), text, fontHeight, color, letterSpacing);
 		}
 
-		public static void DrawTextLine(Vector2 position, string text, float fontHeight, Color4 color)
+		public static void DrawTextLine(Vector2 position, string text, float fontHeight, Color4 color, float letterSpacing)
 		{
-			DrawTextLine(FontPool.Instance[null], position, text, fontHeight, color);
+			DrawTextLine(FontPool.Instance[null], position, text, fontHeight, color, letterSpacing);
 		}
 
-		public static void DrawTextLine(IFont font, Vector2 position, string text, float fontHeight, Color4 color)
+		public static void DrawTextLine(IFont font, Vector2 position, string text, float fontHeight, Color4 color, float letterSpacing)
 		{
-			DrawTextLine(font, position, text, color, fontHeight, 0, text.Length);
+			DrawTextLine(font, position, text, color, fontHeight, 0, text.Length, letterSpacing);
 		}
 
-		public static Vector2 MeasureTextLine(IFont font, string text, float fontHeight)
+		public static Vector2 MeasureTextLine(IFont font, string text, float fontHeight, float letterSpacing)
 		{
-			return MeasureTextLine(font, text, fontHeight, 0, text.Length);
+			return MeasureTextLine(font, text, fontHeight, 0, text.Length, letterSpacing);
 		}
 
-		public static Vector2 MeasureTextLine(IFont font, string text, float fontHeight, int start, int length)
+		public static Vector2 MeasureTextLine(IFont font, string text, float fontHeight, int start, int length, float letterSpacing)
 		{
 			FontChar prevChar = null;
 			var size = new Vector2(0, fontHeight);
@@ -352,6 +352,7 @@ namespace Lime
 				float scale = fontHeight / fontChar.Height;
 				width += scale * (fontChar.ACWidths.X + fontChar.Kerning(prevChar));
 				width += scale * (fontChar.Width + fontChar.ACWidths.Y);
+				width += scale * letterSpacing;
 				size.X = Math.Max(size.X, width);
 				prevChar = fontChar;
 			}
@@ -359,8 +360,8 @@ namespace Lime
 		}
 
 		public static void DrawTextLine(
-			IFont font, Vector2 position, string text, Color4 color, float fontHeight, int start, int length, SpriteList list = null,
-			Action<int, Vector2, Vector2> onDrawChar = null, int tag = -1)
+			IFont font, Vector2 position, string text, Color4 color, float fontHeight, int start, int length, float letterSpacing,
+			SpriteList list = null, Action<int, Vector2, Vector2> onDrawChar = null, int tag = -1)
 		{
 			int j = 0;
 			if (list != null) {
@@ -397,7 +398,7 @@ namespace Lime
 					continue;
 				}
 				float scale = fontHeight / fontChar.Height;
-				var xDelta = scale * (fontChar.ACWidths.X + fontChar.Kerning(prevChar));
+				var xDelta = scale * (fontChar.ACWidths.X + fontChar.Kerning(prevChar) + letterSpacing);
 				position.X += xDelta;
 				var size = new Vector2(scale * fontChar.Width, fontHeight - fontChar.VerticalOffset);
 				var roundPos = new Vector2(position.X.Round(), position.Y.Round() + fontChar.VerticalOffset);

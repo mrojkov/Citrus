@@ -24,6 +24,7 @@ namespace Lime
 		public Action<SimpleText, Sprite> SpriteListElementHandler;
 		internal int PalleteIndex = -1;
 		public ShaderProgram ShaderProgram;
+		private float letterSpacing;
 
 		public event TextProcessorDelegate TextProcessor
 		{
@@ -160,6 +161,19 @@ namespace Lime
 		{
 			get { return textColor; }
 			set { textColor = value; }
+		}
+
+		[YuzuMember]
+		public float LetterSpacing
+		{
+			get { return letterSpacing; }
+			set
+			{
+				if (letterSpacing != value) {
+					letterSpacing = value;
+					Invalidate();
+				}
+			}
 		}
 
 		public bool ForceUncutText { get; set; }
@@ -359,7 +373,7 @@ namespace Lime
 				pos.X = CalcXByAlignment(lineWidth);
 				if (spriteList != null) {
 					Renderer.DrawTextLine(
-						Font, pos, line, Color4.White, FontHeight, 0, line.Length, spriteList, caret.Sync, -1);
+						Font, pos, line, Color4.White, FontHeight, 0, line.Length, letterSpacing, spriteList, caret.Sync, -1);
 				}
 				Rectangle lineRect = new Rectangle(pos.X, pos.Y, pos.X + lineWidth, pos.Y + FontHeight);
 				if (lastLine) {
@@ -447,12 +461,12 @@ namespace Lime
 
 		private bool IsTextLinePartFitToWidth(string line, int start, int count)
 		{
-			return Renderer.MeasureTextLine(Font, line, FontHeight, start, count).X <= ContentWidth;
+			return Renderer.MeasureTextLine(Font, line, FontHeight, start, count, letterSpacing).X <= ContentWidth;
 		}
 
 		private Vector2 MeasureTextLine(string line)
 		{
-			return Renderer.MeasureTextLine(Font, line, FontHeight);
+			return Renderer.MeasureTextLine(Font, line, FontHeight, letterSpacing);
 		}
 
 		private string ClipLineWithEllipsis(string line)

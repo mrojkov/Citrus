@@ -18,7 +18,7 @@ namespace Lime
 		private Color4 shadowColor;
 		public ShaderProgram ShaderProgram;
 		internal int PalleteIndex = -1;
-
+		private float letterSpacing;
 		public static TextStyle Default = new TextStyle();
 
 		public enum ImageUsageEnum
@@ -164,6 +164,19 @@ namespace Lime
 			{
 				if (shadowColor != value) {
 					shadowColor = value;
+					InvalidateRichText();
+				}
+			}
+		}
+
+		[YuzuMember]
+		public float LetterSpacing
+		{
+			get { return letterSpacing; }
+			set
+			{
+				if (letterSpacing != value) {
+					letterSpacing = value;
 					InvalidateRichText();
 				}
 			}
