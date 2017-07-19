@@ -43,6 +43,16 @@ namespace Lime
 			}
 		}
 
+		public bool RoundCoordinates
+		{
+			get
+			{
+				if (font == null)
+					font = FontPool.Instance[Name];
+				return font.RoundCoordinates;
+			}
+		}
+
 		private string name;
 
 		public SerializableFont()

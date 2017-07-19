@@ -11,6 +11,7 @@ namespace Lime
 		string About { get; }
 		IFontCharSource Chars { get; }
 		void ClearCache();
+		bool RoundCoordinates { get; }
 	}
 
 	public interface IFontCharSource : IDisposable
@@ -29,6 +30,8 @@ namespace Lime
 		[YuzuMember]
 		public FontCharCollection CharCollection { get; private set; }
 		public IFontCharSource Chars { get { return CharCollection; } }
+		[YuzuMember]
+		public bool RoundCoordinates { get; set; } = false;
 
 		public Font()
 		{

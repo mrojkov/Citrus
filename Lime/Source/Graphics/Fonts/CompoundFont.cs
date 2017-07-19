@@ -45,6 +45,8 @@ namespace Lime
 			chars.ClearCache();
 		}
 
+		public bool RoundCoordinates { get; } = true;
+
 		public void Dispose()
 		{
 			chars.Dispose();

@@ -401,9 +401,17 @@ namespace Lime
 				var xDelta = scale * (fontChar.ACWidths.X + fontChar.Kerning(prevChar) + letterSpacing);
 				position.X += xDelta;
 				var size = new Vector2(scale * fontChar.Width, fontHeight - fontChar.VerticalOffset);
-				var roundPos = new Vector2(position.X.Round(), position.Y.Round() + fontChar.VerticalOffset);
-				if (onDrawChar != null) {
-					onDrawChar(i, new Vector2((position.X - xDelta).Round(), position.Y.Round()), size);
+				Vector2 roundPos;
+				if (font.RoundCoordinates) {
+					 roundPos = new Vector2(position.X.Round(), position.Y.Round() + fontChar.VerticalOffset);
+					if (onDrawChar != null) {
+						onDrawChar(i, new Vector2((position.X - xDelta).Round(), position.Y.Round()), size);
+					}
+				} else {
+					roundPos = new Vector2(position.X, position.Y + fontChar.VerticalOffset);
+					if (onDrawChar != null) {
+						onDrawChar(i, new Vector2(position.X - xDelta, position.Y), size);
+					}
 				}
 				if (list == null) {
 					DrawSprite(fontChar.Texture, color, roundPos, size, fontChar.UV0, fontChar.UV1);

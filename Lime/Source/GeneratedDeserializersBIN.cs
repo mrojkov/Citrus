@@ -30,6 +30,10 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
+				result.RoundCoordinates = d.Reader.ReadBoolean();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (4 == fd.OurIndex) {
 				var tmp3 = d.Reader.ReadInt32();
 				if (tmp3 >= 0) {
 					while (--tmp3 >= 0) {

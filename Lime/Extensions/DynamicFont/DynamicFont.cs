@@ -56,6 +56,8 @@ namespace Lime
 			(Chars as DynamicFontCharSource).ClearCache();
 		}
 
+		public bool RoundCoordinates { get; set; } = true;
+
 		public void Dispose()
 		{
 			if (Chars != null) {
