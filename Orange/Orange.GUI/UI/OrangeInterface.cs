@@ -123,6 +123,8 @@ namespace Orange
 			return textView;
 		}
 
+		private ThemedDropDownList actionPicker;
+
 		private Widget CreateFooterSection()
 		{
 			var container = new Widget {
@@ -130,7 +132,7 @@ namespace Orange
 					Spacing = 5
 				},
 			};
-			var actionPicker = new ThemedDropDownList();
+			actionPicker = new ThemedDropDownList();
 
 			foreach (var menuItem in The.MenuController.GetVisibleAndSortedItems()) {
 				actionPicker.Items.Add(new CommonDropDownList.Item(menuItem.Label, menuItem.Action));
@@ -220,6 +222,14 @@ namespace Orange
 		public override void ClearLog()
 		{
 			textView.Clear();
+		}
+
+		public override void RefreshMenu()
+		{
+			actionPicker.Items.Clear();
+			foreach (var menuItem in The.MenuController.GetVisibleAndSortedItems()) {
+				actionPicker.Items.Add(new CommonDropDownList.Item(menuItem.Label, menuItem.Action));
+			}
 		}
 
 		public override bool AskConfirmation(string text)

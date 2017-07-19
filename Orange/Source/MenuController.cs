@@ -39,7 +39,7 @@ namespace Orange
 					Priority = i.Metadata.Priority,
 				});
 			}
-			//The.UI.RefreshMenu();
+			The.UI.RefreshMenu();
 		}
 
 	}
