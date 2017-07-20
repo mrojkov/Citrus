@@ -15,19 +15,23 @@ namespace Orange.FbxImporter
 			return new Manager(FbxCreateManager());
 		}
 
-		public Manager(IntPtr ptr) : base(ptr)
-		{ }
+		private Manager(IntPtr ptr) : base(ptr)
+		{
+			if (ptr == IntPtr.Zero) {
+				throw new FbxImportException("An error has occured while initializing FbxSdk manager");
+			}
+		}
 
 		[HandleProcessCorruptedStateExceptions]
 		public Scene LoadScene(string fileName)
 		{
-			try {
-				var scene = new Scene(FbxManagerLoadScene(NativePtr, new StringBuilder(fileName)));
-				createdScenes.Add(scene);
-				return scene;
-			} catch(Exception e) {
-				throw new Exception(e.Message, e);
+			var native = FbxManagerLoadScene(NativePtr, new StringBuilder(fileName));
+			if (native == IntPtr.Zero) {
+				throw new FbxImportException("An error has occured while loading scene");
 			}
+			var scene = new Scene(native);
+			createdScenes.Add(scene);
+			return scene;
 		}
 
 		~Manager()

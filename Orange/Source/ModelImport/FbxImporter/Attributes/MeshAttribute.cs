@@ -27,7 +27,11 @@ namespace Orange.FbxImporter
 
 		public MeshAttribute(IntPtr ptr) : base(ptr)
 		{
-			var mesh = FbxNodeGetMeshAttribute(NativePtr, true).To<MeshData>();
+			var native = FbxNodeGetMeshAttribute(NativePtr, true);
+			if (native == IntPtr.Zero) {
+				throw new FbxAtributeImportException(Type);
+			}
+			var mesh = native.To<MeshData>();
 			var colors = mesh.colors.ToStructArray<Vec4>(mesh.verticesCount);
 			var verices = mesh.points.ToStructArray<Vec3>(mesh.verticesCount);
 

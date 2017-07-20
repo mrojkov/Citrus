@@ -23,7 +23,11 @@ namespace Orange.FbxImporter
 
 		public CameraAttribute(IntPtr ptr) : base(ptr)
 		{
-			var cam = FbxNodeGetCameraAttribute(ptr).ToStruct<Camera>();
+			var native = FbxNodeGetCameraAttribute(ptr);
+			if (native == IntPtr.Zero) {
+				throw new FbxAtributeImportException(Type);
+			}
+			var cam = native.ToStruct<Camera>();
 			Name = cam.name.ToCharArray();
 			FieldOfView = cam.fieldOfView;
 			AspectRatio = cam.aspectRatio;
