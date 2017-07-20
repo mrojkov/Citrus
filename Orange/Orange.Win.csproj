@@ -114,6 +114,7 @@
     <Compile Include="Source\Builder\BuildSystem.cs" />
     <Compile Include="Source\Builder\MSBuild.cs" />
     <Compile Include="Source\Builder\MDTool.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\FbxImportException.cs" />
     <Compile Include="Source\ModelImport\FbxImporter\Animation.cs" />
     <Compile Include="Source\ModelImport\FbxImporter\Attributes\CameraAttribute.cs" />
     <Compile Include="Source\ModelImport\FbxImporter\Attributes\MeshAttribute.cs" />

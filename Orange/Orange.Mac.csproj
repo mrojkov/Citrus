@@ -129,6 +129,7 @@
     <Compile Include="Source\Target.cs" />
     <Compile Include="Source\Toolbox\IFileEnumerator.cs" />
     <Compile Include="Source\ModelImport\FbxImporter\Animation.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\FbxImportException.cs" />
     <Compile Include="Source\ModelImport\FbxImporter\MarshalingStructures.cs" />
     <Compile Include="Source\ModelImport\FbxImporter\Utils.cs" />
     <Compile Include="Source\ModelImport\FbxImporter\Attributes\CameraAttribute.cs" />
