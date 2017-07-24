@@ -149,12 +149,6 @@ namespace Orange
 
 		private void Execute(Action action)
 		{
-#if WIN
-			if (GetActiveTarget().Platform == TargetPlatform.iOS) {
-				ShowError("iOS target is not supported on Windows platform");
-				return;
-			}
-#endif
 			windowWidget.Tasks.Add(ExecuteTask(action));
 		}
 
