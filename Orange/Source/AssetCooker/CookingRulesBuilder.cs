@@ -259,8 +259,11 @@ namespace Orange
 				return (DDSFormat)value == DDSFormat.DXTi ? "DXTi" : "RGBA8";
 			} else if (yi.Name == "TextureAtlas") {
 				var fi = new System.IO.FileInfo(SourceFilename);
-				var atlasKey = fi.DirectoryName.Substring(The.Workspace.AssetsDirectory.Length).Replace('\\', '#');
-				if (atlasKey == value.ToString()) {
+				var atlasName = fi.DirectoryName.Substring(The.Workspace.AssetsDirectory.Length).Replace('\\', '#');
+				if (!atlasName.StartsWith("#")) {
+					atlasName = "#" + atlasName;
+				}
+				if (atlasName == value.ToString()) {
 					return CookingRulesBuilder.DirectoryNameToken;
 				} else {
 					return value.ToString();
