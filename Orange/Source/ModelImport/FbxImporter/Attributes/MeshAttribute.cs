@@ -37,7 +37,7 @@ namespace Orange.FbxImporter
 
 			var uv = mesh.uvCoords.ToStructArray<Vec2>(mesh.verticesCount);
 			var weights = mesh.weights.ToStructArray<WeightData>(mesh.verticesCount);
-			var bones = mesh.bones.ToStructArray<BoneData>(mesh.boneCount);
+			var bones = mesh.bones.FromArrayOfPointersToStructArrayUnsafe<BoneData>(mesh.boneCount);
 
 			Indices = mesh.vertices.ToIntArray(mesh.verticesCount);
 			MaterialIndex = mesh.materialIndex;

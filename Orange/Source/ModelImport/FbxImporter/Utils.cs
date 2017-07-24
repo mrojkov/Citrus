@@ -8,16 +8,19 @@ namespace Orange.FbxImporter
 	{
 #if WIN
 		public const string LibName = "FbxSdk.dll";
+		public const byte PtrSize = sizeof(int);
 #elif MAC
 		public const string LibName = "FbxSdkUtils";
+		public const byte PtrSize = sizeof(long);
 #endif
 		public const int BoneLimit = 4;
 	}
 
 	public static class IntPtrExtensions
 	{
-		public static T To<T>(this IntPtr ptr) {
-			if(ptr != IntPtr.Zero) {
+		public static T To<T>(this IntPtr ptr)
+		{
+			if (ptr != IntPtr.Zero) {
 				var structure = (T)Marshal.PtrToStructure(ptr, typeof(T));
 				Utils.ReleaseNative(ptr);
 				return structure;
@@ -39,7 +42,7 @@ namespace Orange.FbxImporter
 			int[] result = new int[size];
 			if (size == 0)
 				return result;
-			Marshal.Copy(ptr, result, 0 ,size);
+			Marshal.Copy(ptr, result, 0, size);
 			Utils.ReleaseNative(ptr);
 			return result;
 		}
@@ -71,9 +74,9 @@ namespace Orange.FbxImporter
 				T[] result = new T[size];
 				var strucSize = Marshal.SizeOf(typeof(T));
 				for (int i = 0; i < size; i++) {
-					var pointer = new IntPtr(ptr.ToInt64() + sizeof(long) * i);
+					var pointer = new IntPtr(ptr.ToInt64() + ImportConfig.PtrSize * i);
 					var structPtr = Marshal.ReadIntPtr(pointer);
-					if(structPtr == IntPtr.Zero) {
+					if (structPtr == IntPtr.Zero) {
 						result[i] = default(T);
 					} else {
 						result[i] = (T)Marshal.PtrToStructure(structPtr, typeof(T));
@@ -117,7 +120,8 @@ namespace Orange.FbxImporter
 		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
 		private static extern void FbxUtilsReleaseMemory(IntPtr ptr);
 
-		public static void ReleaseNative(IntPtr ptr) {
+		public static void ReleaseNative(IntPtr ptr)
+		{
 			FbxUtilsReleaseMemory(ptr);
 		}
 	}
