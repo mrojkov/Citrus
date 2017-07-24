@@ -1,4 +1,5 @@
 using System;
+using System.Deployment.Internal;
 using Yuzu;
 
 namespace Lime
@@ -7,8 +8,20 @@ namespace Lime
 	{
 		public struct Params
 		{
+			private string atlasPath;
+
 			[YuzuMember]
-			public string AtlasPath;
+			public string AtlasPath
+			{
+				get
+				{
+					return atlasPath;
+				}
+				set
+				{
+					atlasPath = string.Intern(value);
+				}
+			}
 
 			[YuzuMember]
 			public IntRectangle AtlasRect;
