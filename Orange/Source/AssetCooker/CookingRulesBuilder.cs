@@ -259,8 +259,12 @@ namespace Orange
 				return (DDSFormat)value == DDSFormat.DXTi ? "DXTi" : "RGBA8";
 			} else if (yi.Name == "TextureAtlas") {
 				var fi = new System.IO.FileInfo(SourceFilename);
-				if (fi.Directory.Name == value.ToString()) {
-					return "${DirectoryName}";
+				var atlasName = fi.DirectoryName.Substring(The.Workspace.AssetsDirectory.Length).Replace('\\', '#');
+				if (!atlasName.StartsWith("#")) {
+					atlasName = "#" + atlasName;
+				}
+				if (atlasName == value.ToString()) {
+					return CookingRulesBuilder.DirectoryNameToken;
 				} else {
 					return value.ToString();
 				}
@@ -317,6 +321,7 @@ namespace Orange
 	{
 		public const string MainBundleName = "Main";
 		public const string CookingRulesFilename = "#CookingRules.txt";
+		public const string DirectoryNameToken = "${DirectoryName}";
 
 		public static Dictionary<string, CookingRules> Build(IFileEnumerator fileEnumerator, Target target)
 		{
@@ -519,8 +524,8 @@ namespace Orange
 						case "None":
 							rules.TextureAtlas = null;
 							break;
-						case "${DirectoryName}":
-							string atlasName = Path.GetFileName(Lime.AssetPath.GetDirectoryName(path));
+						case DirectoryNameToken:
+							string atlasName = "#" + Lime.AssetPath.GetDirectoryName(path).Replace('/', '#');
 							if (string.IsNullOrEmpty(atlasName)) {
 								throw new Lime.Exception(
 									"Atlas directory is empty. Choose another atlas name");
