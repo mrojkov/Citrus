@@ -126,6 +126,7 @@ namespace Orange
 				return true;
 			};
 			var usedImages = new HashSet<string>();
+			var usedSounds = new HashSet<string>();
 			foreach (var srcFileInfo in The.Workspace.AssetFiles.Enumerate(".scene").Concat(The.Workspace.AssetFiles.Enumerate(".tan"))) {
 				var srcPath = srcFileInfo.Path;
 				using (Lime.Frame scene = new Lime.Frame(srcPath)) {
@@ -191,6 +192,7 @@ namespace Orange
 						} else if (j is Lime.Audio) {
 							var au = j as Lime.Audio;
 							var path = au.Sample.SerializationPath + ".sound";
+							usedSounds.Add(au.Sample.SerializationPath.Replace('\\', '/'));
 							if (!Lime.AssetBundle.Instance.FileExists(path)) {
 								missingResourcesReport.Add(string.Format("audio missing:\n\taudio path: {0}\n\tscene path: {1}\n",
 									path, j.ToString()));
@@ -236,6 +238,17 @@ namespace Orange
 			}
 			var unusedImages = allImages.Where(kv => !kv.Value).Select(kv => kv.Key).ToList();
 
+			var allSounds = new Dictionary<string, bool>();
+			foreach (var sound in The.Workspace.AssetFiles.Enumerate(".ogg")) {
+				var key = Path.Combine(Path.GetDirectoryName(sound.Path), Path.GetFileNameWithoutExtension(sound.Path))
+					.Replace('\\', '/');
+				allSounds[key] = false;
+			}
+			foreach (var sound in usedSounds) {
+				allSounds[sound] = true;
+			}
+			var unusedSounds = allSounds.Where(kv => !kv.Value).Select(kv => kv.Key).ToList();
+
 			Action<string> writeHeader = (s) => {
 				int n0 = (80 - s.Length) / 2;
 				int n1 = (80 - s.Length)%2 == 0 ? n0 : n0 - 1;
@@ -254,6 +267,10 @@ namespace Orange
 			}
 			writeHeader("Unused Images");
 			foreach (var s in unusedImages) {
+				Console.WriteLine(s);
+			}
+			writeHeader("Unused Sounds");
+			foreach (var s in unusedSounds) {
 				Console.WriteLine(s);
 			}
 			writeHeader("Suspicious Textures");
