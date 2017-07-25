@@ -8,10 +8,8 @@ namespace Orange.FbxImporter
 	{
 #if WIN
 		public const string LibName = "FbxSdk.dll";
-		public const byte PtrSize = sizeof(int);
 #elif MAC
 		public const string LibName = "FbxSdkUtils";
-		public const byte PtrSize = sizeof(long);
 #endif
 		public const int BoneLimit = 4;
 	}
@@ -74,7 +72,7 @@ namespace Orange.FbxImporter
 				T[] result = new T[size];
 				var strucSize = Marshal.SizeOf(typeof(T));
 				for (int i = 0; i < size; i++) {
-					var pointer = new IntPtr(ptr.ToInt64() + ImportConfig.PtrSize * i);
+					var pointer = new IntPtr(ptr.ToInt64() + IntPtr.Size * i);
 					var structPtr = Marshal.ReadIntPtr(pointer);
 					if (structPtr == IntPtr.Zero) {
 						result[i] = default(T);
