@@ -19,7 +19,7 @@ namespace Tangerine.UI.SceneView
 				if (Utils.CalcHullAndPivot(widgets, sv.Scene, out hull, out pivot)) {
 					for (int i = 0; i < 4; i++) {
 						if (sv.HitTestControlPoint(hull[i])) {
-							Utils.ChangeCursorIfDefault(MouseCursor.Hand);
+							Utils.ChangeCursorIfDefault(Cursors.Rotate);
 							if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {
 								yield return Rotate(pivot);
 							}
@@ -44,7 +44,7 @@ namespace Tangerine.UI.SceneView
 				var mousePos = sv.MousePosition;
 				var t = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
 				while (sv.Input.IsMousePressed()) {
-					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
+					Utils.ChangeCursorIfDefault(Cursors.Rotate);
 					var a = mousePos * t - pivot * t;
 					var b = sv.MousePosition * t - pivot * t;
 					mousePos = sv.MousePosition;

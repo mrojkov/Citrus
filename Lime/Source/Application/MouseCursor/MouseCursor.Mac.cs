@@ -13,7 +13,9 @@ namespace Lime
 	{
 		public MouseCursorImplementation(Bitmap bitmap, IntVector2 hotSpot)
 		{
-			throw new NotImplementedException();
+			var handle = bitmap.NativeBitmap;
+			var icon = new NSImage (bitmap.NativeBitmap, new CoreGraphics.CGSize (bitmap.NativeBitmap.Width, bitmap.NativeBitmap.Height));
+			NativeCursor = new NSCursor (icon, new CoreGraphics.CGPoint (hotSpot.X, hotSpot.Y));
 		}
 
 		public MouseCursorImplementation(NSCursor nativeCursor)

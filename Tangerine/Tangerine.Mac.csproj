@@ -144,6 +144,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Resources\Cursors\rotate.png" />
     <EmbeddedResource Include="Resources\SegoeUIRegular.ttf" />
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Audio.png" />
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Bone.png" />

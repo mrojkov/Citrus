@@ -79,6 +79,7 @@
     <Compile Include="PropertyEditor.cs" />
     <Compile Include="Utils\Metrics.cs" />
     <Compile Include="DocumentCommandHandler.cs" />
+    <Compile Include="Cursors.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

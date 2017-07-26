@@ -33,7 +33,7 @@ namespace Tangerine.UI.SceneView
 						var dir2 = expandedHull[i] - expandedHull[prev];
 						var corner = (dir1.Normalized + dir2.Normalized);
 						if (sv.HitTestControlPoint(expandedHull[i] + corner * cornerOffset / sv.Scene.Scale)) {
-							Utils.ChangeCursorIfDefault(MouseCursor.Hand);
+							Utils.ChangeCursorIfDefault(Cursors.Rotate);
 							if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {
 								yield return Rotate(hull, selectedPointObjects);
 							}
@@ -63,7 +63,7 @@ namespace Tangerine.UI.SceneView
 							СurrentBounds = bounds,
 						});
 					}
-					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
+					Utils.ChangeCursorIfDefault(Cursors.Rotate);
 					var a = mousePosPrev;
 					var b = (sv.MousePosition * t - center * size) / size;
 					mousePosPrev = b;

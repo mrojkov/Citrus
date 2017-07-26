@@ -44,6 +44,7 @@
     <Compile Include="ColorPickerPanel.cs" />
     <Compile Include="Commands.cs" />
     <Compile Include="Console.cs" />
+    <Compile Include="Cursors.cs" />
     <Compile Include="Dialogs\AlertDialog.cs" />
     <Compile Include="IconPool.cs" />
     <Compile Include="NodeIconPool.cs" />

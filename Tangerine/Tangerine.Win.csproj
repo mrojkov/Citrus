@@ -247,5 +247,6 @@
     <EmbeddedResource Include="Resources\Icons\Filesystem\Close.png" />
     <EmbeddedResource Include="Resources\Icons\Filesystem\SplitH.png" />
     <EmbeddedResource Include="Resources\Icons\Filesystem\SplitV.png" />
+    <EmbeddedResource Include="Resources\Cursors\rotate.png" />
   </ItemGroup>
 </Project>
