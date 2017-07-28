@@ -71,6 +71,7 @@
     <Compile Include="PreviewAnimationHandler.cs" />
     <Compile Include="Processors\CreateNodeProcessor.cs" />
     <Compile Include="Processors\CreatePointObjectProcessor.cs" />
+    <Compile Include="Processors\CreateSplinePointProcessor.cs" />
     <Compile Include="Processors\CreateWidgetProcessor.cs" />
     <Compile Include="Processors\DragPivotProcessor.cs" />
     <Compile Include="Processors\DragPointObjectsProcessor.cs" />

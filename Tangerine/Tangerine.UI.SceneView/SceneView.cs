@@ -178,6 +178,7 @@ namespace Tangerine.UI.SceneView
 		{
 			Frame.Tasks.Add(
 				new CreateWidgetProcessor(),
+				new CreateSplinePointProcessor(),
 				new CreatePointObjectProcessor(),
 				new CreateSplinePoint3DProcessor(),
 				new CreateNodeProcessor(),

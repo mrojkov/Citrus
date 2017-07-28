@@ -11,6 +11,8 @@ namespace Tangerine.UI.SceneView
 
 		List<SplinePoint> emptySelection = new List<SplinePoint>();
 
+		public const float TangentWeightRatio = 10f;
+
 		protected override void InternalRender(SplinePoint point)
 		{
 			if (!Document.Current.Container.IsRunning && Document.Current.Container is Spline) {
@@ -19,7 +21,7 @@ namespace Tangerine.UI.SceneView
 					ColorTheme.Current.SceneView.PointObject;
 				SceneView.Instance.Frame.PrepareRendererState();
 				var t = point.Parent.AsWidget.CalcTransitionToSpaceOf(SceneView.Instance.Frame);
-				var a = Vector2.CosSin(point.TangentAngle * Mathf.DegToRad) * 10 * point.TangentWeight;
+				var a = Vector2.CosSin(point.TangentAngle * Mathf.DegToRad) * TangentWeightRatio * point.TangentWeight;
 				var p1 = t * (point.TransformedPosition + a);
 				var p2 = t * (point.TransformedPosition - a);
 				Renderer.DrawLine(p1, p2, color);

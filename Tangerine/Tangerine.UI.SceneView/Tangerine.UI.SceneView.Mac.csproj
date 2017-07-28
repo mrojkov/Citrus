@@ -62,6 +62,7 @@
     <Compile Include="Processors\RotateWidgetsProcessor.cs" />
     <Compile Include="Processors\DragPivotProcessor.cs" />
     <Compile Include="Processors\CreateNodeProcessor.cs" />
+    <Compile Include="Processors\CreateSplinePointProcessor.cs" />
     <Compile Include="Processors\CreateWidgetProcessor.cs" />
     <Compile Include="Processors\ShiftClickProcessor.cs" />
     <Compile Include="Presenters\SelectedWidgetsPresenter.cs" />
