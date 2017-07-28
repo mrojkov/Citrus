@@ -444,9 +444,11 @@ namespace Orange
 			}
 			var initialAtlasId = 0;
 			foreach (var kv in items) {
-				initialAtlasId = PackItemsToAtlasWithBestSize(atlasChain, kv.Value, kv.Key, initialAtlasId);
-				foreach (var item in kv.Value) {
-					item.Bitmap.Dispose();
+				if (kv.Value.Any()) {
+					initialAtlasId = PackItemsToAtlasWithBestSize(atlasChain, kv.Value, kv.Key, initialAtlasId);
+					foreach (var item in kv.Value) {
+						item.Bitmap.Dispose();
+					}
 				}
 			}
 			var packers = PluginLoader.CurrentPlugin.AtlasPackers.ToDictionary(i => i.Metadata.Id, i => i.Value);
@@ -481,8 +483,14 @@ namespace Orange
 				var bestSize = new Size(0, 0);
 				double bestPackRate = 0;
 				int minItemsLeft = Int32.MaxValue;
-				foreach (var size in EnumerateAtlasSizes(squareAtlas: squareAtlas)) {
+
+				// TODO: Fix for non-square atlases
+				var maxTextureSize = items.Max(item => Math.Max(item.Bitmap.Height, item.Bitmap.Width));
+				var minAtlasSize = Math.Max(64, CalcUpperPowerOfTwo(maxTextureSize));
+
+				foreach (var size in EnumerateAtlasSizes(squareAtlas: squareAtlas, minSize: minAtlasSize)) {
 					double packRate;
+					var prevAllocated = items.Where(i => i.Allocated).ToList();
 					PackItemsToAtlas(items, size, out packRate);
 					switch (atlasOptimization) {
 						case AtlasOptimization.Memory:
@@ -496,11 +504,22 @@ namespace Orange
 							if (notAllocatedCount < minItemsLeft) {
 								minItemsLeft = notAllocatedCount;
 								bestSize = size;
+							} else if (notAllocatedCount == minItemsLeft) {
+								if (items.Where(i => i.Allocated).SequenceEqual(prevAllocated)) {
+									continue;
+								} else {
+									minItemsLeft = notAllocatedCount;
+									bestSize = size;
+								}
+							}
+							if (notAllocatedCount == 0) {
+								goto end;
 							}
 							break;
 						}
 					}
 				}
+				end:
 				if (atlasOptimization == AtlasOptimization.Memory && bestPackRate == 0) {
 					throw new Lime.Exception("Failed to create atlas '{0}'", atlasChain);
 				}
@@ -517,14 +536,25 @@ namespace Orange
 			return atlasId;
 		}
 
-		public static IEnumerable<Size> EnumerateAtlasSizes(bool squareAtlas)
+		private static int CalcUpperPowerOfTwo(int x)
+		{
+			x--;
+			x |= (x >> 1);
+			x |= (x >> 2);
+			x |= (x >> 4);
+			x |= (x >> 8);
+			x |= (x >> 16);
+			return (x + 1);
+		}
+
+		public static IEnumerable<Size> EnumerateAtlasSizes(bool squareAtlas, int minSize)
 		{
 			if (squareAtlas) {
-				for (var i = 64; i <= GetMaxAtlasSize().Width; i *= 2) {
+				for (var i = minSize; i <= GetMaxAtlasSize().Width; i *= 2) {
 					yield return new Size(i, i);
 				}
 			} else {
-				for (var i = 64; i <= GetMaxAtlasSize().Width / 2; i *= 2) {
+				for (var i = minSize; i <= GetMaxAtlasSize().Width / 2; i *= 2) {
 					yield return new Size(i, i);
 					yield return new Size(i * 2, i);
 					yield return new Size(i, i * 2);
