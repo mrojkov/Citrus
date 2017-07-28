@@ -61,6 +61,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Components\PointObjectSelectionComponent.cs" />
     <Compile Include="Presenters\ContainerAreaPresenter.cs" />
     <Compile Include="Presenters\PointObjectPresenter.cs" />
     <Compile Include="Presenters\PointObjectsSelectionPresenter.cs" />
@@ -75,6 +76,8 @@
     <Compile Include="Processors\DragPointObjectsProcessor.cs" />
     <Compile Include="Processors\DragSplineTangentsProcessor.cs" />
     <Compile Include="Processors\RescalePointObjectSelectionProcessor.cs" />
+    <Compile Include="Processors\RotatePointObjectSelectionProcessor.cs" />
+    <Compile Include="Processors\RotationHelper.cs" />
     <Compile Include="Processors\ShiftClickProcessor.cs" />
     <Compile Include="SceneView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -91,7 +94,6 @@
     <Compile Include="Processors\3D\DragSplinePoint3DProcessor.cs" />
     <Compile Include="UserPreferences.cs" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Win.csproj">
       <Project>{fc2de6c9-641a-4230-8d29-ea4035cd8708}</Project>

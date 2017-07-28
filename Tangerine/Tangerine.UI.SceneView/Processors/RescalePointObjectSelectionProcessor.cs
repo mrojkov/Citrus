@@ -23,7 +23,7 @@ namespace Tangerine.UI.SceneView
 					var hull = Utils.CalcAABB(Document.Current.SelectedNodes().Editable().OfType<PointObject>(), true);
 					var t = Document.Current.Container.AsWidget.CalcTransitionToSpaceOf(sv.Scene);
 					var size = Document.Current.Container.AsWidget.Size;
-					var cornerOffset = 15f;
+					var cornerOffset = PointObjectSelectionComponent.cornerOffset;
 					var hullSize = hull[0] - hull[2];
 					var expandedHull = new Quadrangle();
 					for (int i = 0; i < 4; i++) {

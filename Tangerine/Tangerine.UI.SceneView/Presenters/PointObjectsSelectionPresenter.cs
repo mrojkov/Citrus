@@ -35,8 +35,8 @@ namespace Tangerine.UI.SceneView
 			}
 			if (selectedPointObjects.Count == 0)
 				return;
-			var hull = Utils.CalcAABB(selectedPointObjects, true);
-			var cornerOffset = 15f;
+			var hull = sv.Components.Get<PointObjectSelectionComponent>()?.СurrentBounds ?? Utils.CalcAABB(selectedPointObjects, true);
+			var cornerOffset = PointObjectSelectionComponent.cornerOffset;
 			var size = Document.Current.Container.AsWidget.Size;
 			var corners = new Quadrangle();
 

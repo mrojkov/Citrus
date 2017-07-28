@@ -51,6 +51,7 @@
     <Reference Include="Xamarin.Mac" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Components\PointObjectSelectionComponent.cs" />
     <Compile Include="SceneView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Processors\MouseScrollProcessor.cs" />
@@ -80,6 +81,8 @@
     <Compile Include="Processors\3D\DragSplinePoint3DProcessor.cs" />
     <Compile Include="UserPreferences.cs" />
     <Compile Include="Processors\RescalePointObjectSelectionProcessor.cs" />
+    <Compile Include="Processors\RotationHelper.cs" />
+    <Compile Include="Processors\RotatePointObjectSelectionProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Mac.csproj">

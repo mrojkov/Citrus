@@ -49,10 +49,10 @@ namespace Tangerine.UI.SceneView
 					var b = sv.MousePosition * t - pivot * t;
 					mousePos = sv.MousePosition;
 					if (a.Length > Mathf.ZeroTolerance && b.Length > Mathf.ZeroTolerance) {
-						rotation += WrapAngle(b.Atan2Deg - a.Atan2Deg);
+						rotation += RotatationHelper.WrapAngle(b.Atan2Deg - a.Atan2Deg);
 					}
 					for (int i = 0; i < widgets.Count; i++) {
-						SetWidgetRotation(widgets[i], rotations[i] + GetSnappedRotation(rotation));
+						SetWidgetRotation(widgets[i], rotations[i] + RotatationHelper.GetSnappedRotation(rotation, sv.Input.IsKeyPressed(Key.Shift)));
 					}
 					yield return null;
 				}
@@ -60,26 +60,6 @@ namespace Tangerine.UI.SceneView
 				sv.Input.ReleaseMouse();
 				sv.Input.ConsumeKey(Key.Mouse0);
 				Document.Current.History.EndTransaction();
-			}
-		}
-
-		static float WrapAngle(float angle)
-		{
-			if (angle > 180) {
-				return angle - 360;
-			}
-			if (angle < -180) {
-				return angle + 360;
-			}
-			return angle;
-		}
-
-		float GetSnappedRotation(float rotation)
-		{
-			if (sv.Input.IsKeyPressed(Key.Shift)) {
-				return ((rotation / 15f).Round() * 15f).Snap(0);
-			} else {
-				return rotation.Snap(0);
 			}
 		}
 
