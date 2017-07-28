@@ -198,7 +198,7 @@ namespace Tangerine.UI
 				ContainerOuterSpace = Color4.Gray,
 				ContainerInnerSpace = Color4.White,
 				ContainerBorder = Color4.Blue,
-				PointObject = Color4.Blue
+				PointObject = Color4.Red
 			};
 			var timelineGrid = new TimelineGridColors {
 				PropertyRowBackground = Theme.Colors.GrayBackground.Lighten(0.5f),

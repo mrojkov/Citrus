@@ -14,7 +14,9 @@ namespace Tangerine.UI.SceneView
 		protected override void InternalRender(SplinePoint point)
 		{
 			if (!Document.Current.Container.IsRunning && Document.Current.Container is Spline) {
-				var color = GetSelectedPoints().Contains(point) ? Color4.Green : Color4.Blue;
+				var color = GetSelectedPoints().Contains(point) ?
+					ColorTheme.Current.SceneView.Selection :
+					ColorTheme.Current.SceneView.PointObject;
 				SceneView.Instance.Frame.PrepareRendererState();
 				var t = point.Parent.AsWidget.CalcTransitionToSpaceOf(SceneView.Instance.Frame);
 				var a = Vector2.CosSin(point.TangentAngle * Mathf.DegToRad) * 10 * point.TangentWeight;
