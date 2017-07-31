@@ -233,7 +233,6 @@ namespace Tangerine.Core.Operations
 			}
 			var ctr = nodeType.GetConstructor(Type.EmptyTypes);
 			var node = (Node)ctr.Invoke(new object[] {});
-			Document.Current.Decorate(node);
 			var attrs = ClassAttributes<TangerineNodeBuilderAttribute>.Get(nodeType);
 			if (attrs?.MethodName != null) {
 				var builder = nodeType.GetMethod(attrs.MethodName, BindingFlags.NonPublic | BindingFlags.Instance);
@@ -243,6 +242,7 @@ namespace Tangerine.Core.Operations
 			InsertFolderItem.Perform(container, location, node);
 			ClearRowSelection.Perform();
 			SelectNode.Perform(node);
+			Document.Current.Decorate(node);
 			return node;
 		}
 
