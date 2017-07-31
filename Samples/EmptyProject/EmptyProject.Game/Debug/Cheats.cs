@@ -129,9 +129,9 @@ namespace EmptyProject.Debug
 			};
 
 			var text = string.Join("\n", fields.Concat(debugInfoStrings));
-
-			Renderer.DrawTextLine(font, new Vector2(x + 1, y + 1), text, height, new Color4(0, 0, 0)); // shadow
-			Renderer.DrawTextLine(font, new Vector2(x, y), text, height, new Color4(255, 255, 255));
+			
+			Renderer.DrawTextLine(font, new Vector2(x + 1, y + 1), text, height, new Color4(0, 0, 0), 0); // shadow
+			Renderer.DrawTextLine(font, new Vector2(x, y), text, height, new Color4(255, 255, 255), 0);
 
 			debugInfoStrings.Clear();
 		}
