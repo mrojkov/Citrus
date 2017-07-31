@@ -192,6 +192,9 @@ namespace Lime
 			TryRunAnimation("Press");
 			bool wasPressed = true;
 			while (true) {
+				if (Input.GetNumTouches() > 1) {
+					State = NormalState;
+				}
 				if (!Input.IsMouseOwner()) {
 					State = ReleaseState;
 				}
