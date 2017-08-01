@@ -56,7 +56,7 @@ namespace Lime
 
 		public class Particle
 		{
-			public int ModifierIndex;
+			public ParticleModifier Modifier;
 			// Position of particle with random motion.
 			public Vector2 FullPosition;
 			// Position if particle without random motion.
@@ -226,7 +226,6 @@ namespace Lime
 		public List<Particle> particles = new List<Particle>();
 		private static readonly List<Particle> particlePool = new List<Particle>();
 		private static readonly object particlePoolSync = new object();
-		private List<ParticleModifier> modifiers = new List<ParticleModifier>();
 		private List<EmitterShapePoint> emitterShapePoints = new List<EmitterShapePoint>();
 		private List<Vector2> cachedShapePoints = new List<Vector2>();
 		// indexed triangle list (3 values per triangle)
@@ -268,11 +267,13 @@ namespace Lime
 		{
 			var clone = base.Clone() as ParticleEmitter;
 			clone.particles = new List<Particle>();
-			clone.modifiers = new List<ParticleModifier>();
 			clone.emitterShapePoints = new List<EmitterShapePoint>();
 			clone.cachedShapePoints = new List<Vector2>();
 			clone.cachedShapeTriangles = new List<int>();
 			clone.cachedShapeTriangleSizes = new List<float>();
+			foreach (var node in Nodes) {
+				clone.Nodes.Add(node.Clone());
+			}
 			return clone;
 		}
 
@@ -280,6 +281,8 @@ namespace Lime
 		{
 			particles.Clear();
 		}
+
+		private List<ParticleModifier> GetModifiers() => Nodes.OfType<ParticleModifier>().ToList();
 
 		private Widget GetBasicWidget()
 		{
@@ -640,25 +643,13 @@ namespace Lime
 			default:
 				throw new Lime.Exception("Invalid particle emitter shape");
 			}
-			int modifierCount = 0;
-			if (modifiers.Count() == 0) {
-				for (int i = 0; i < Nodes.Count; i++) {
-					var node = Nodes[i];
-					if (node is ParticleModifier) {
-						modifiers.Add(node as ParticleModifier);
-						modifierCount++;
-					}
-				}
-			} else {
-				modifierCount = modifiers.Count();
-			}
 			p.RegularPosition = transform.TransformVector(position);
-			p.ModifierIndex = Rng.RandomInt(modifierCount);
-			var modifier = modifiers[p.ModifierIndex];
-			if (modifier == null) {
+			var modifiers = GetModifiers();
+			if (modifiers.Count == 0) {
 				return false;
 			}
-			int duration = modifier.Animators.GetOverallDuration();
+			p.Modifier = modifiers[Rng.RandomInt(modifiers.Count)];
+			int duration = p.Modifier.Animators.GetOverallDuration();
 			p.AgeToFrame = duration / p.Lifetime;
 			if (EmissionType == EmissionType.Inner) {
 				p.RegularDirection += 180;
@@ -718,9 +709,8 @@ namespace Lime
 		private bool AdvanceParticle(Particle p, float delta)
 		{
 			p.Age += delta;
-			var modifier = modifiers[p.ModifierIndex];
 			if (p.AgeToFrame > 0) {
-				modifier.Animators.Apply(AnimationUtils.FramesToSeconds((int)(p.Age * p.AgeToFrame)));
+				p.Modifier.Animators.Apply(AnimationUtils.FramesToSeconds((int)(p.Age * p.AgeToFrame)));
 			}
 			if (ImmortalParticles) {
 				if (p.Lifetime > 0.0f)
@@ -728,34 +718,34 @@ namespace Lime
 			}
 			// Updating a particle texture index.
 			if (p.TextureIndex == 0.0f) {
-				p.TextureIndex = (float)modifier.FirstFrame;
+				p.TextureIndex = (float)p.Modifier.FirstFrame;
 			}
-			if (modifier.FirstFrame == modifier.LastFrame) {
-				p.TextureIndex = (float)modifier.FirstFrame;
-			} else if (modifier.FirstFrame < modifier.LastFrame) {
-				p.TextureIndex += delta * Math.Max(0, modifier.AnimationFps);
-				if (modifier.LoopedAnimation) {
-					float upLimit = modifier.LastFrame + 1.0f;
+			if (p.Modifier.FirstFrame == p.Modifier.LastFrame) {
+				p.TextureIndex = (float)p.Modifier.FirstFrame;
+			} else if (p.Modifier.FirstFrame < p.Modifier.LastFrame) {
+				p.TextureIndex += delta * Math.Max(0, p.Modifier.AnimationFps);
+				if (p.Modifier.LoopedAnimation) {
+					float upLimit = p.Modifier.LastFrame + 1.0f;
 					while (p.TextureIndex > upLimit) {
-						p.TextureIndex -= upLimit - modifier.FirstFrame;
+						p.TextureIndex -= upLimit - p.Modifier.FirstFrame;
 					}
 				} else {
-					p.TextureIndex = Math.Min(p.TextureIndex, modifier.LastFrame);
+					p.TextureIndex = Math.Min(p.TextureIndex, p.Modifier.LastFrame);
 				}
-				p.TextureIndex = Math.Max(p.TextureIndex, modifier.FirstFrame);
+				p.TextureIndex = Math.Max(p.TextureIndex, p.Modifier.FirstFrame);
 			} else {
-				p.TextureIndex -= delta * Math.Max(0, modifier.AnimationFps);
-				if (modifier.LoopedAnimation) {
-					float downLimit = modifier.LastFrame - 1f;
+				p.TextureIndex -= delta * Math.Max(0, p.Modifier.AnimationFps);
+				if (p.Modifier.LoopedAnimation) {
+					float downLimit = p.Modifier.LastFrame - 1f;
 					while (p.TextureIndex < downLimit)
-						p.TextureIndex += modifier.FirstFrame - downLimit;
+						p.TextureIndex += p.Modifier.FirstFrame - downLimit;
 				} else {
-					p.TextureIndex = Math.Max(p.TextureIndex, modifier.LastFrame);
+					p.TextureIndex = Math.Max(p.TextureIndex, p.Modifier.LastFrame);
 				}
-				p.TextureIndex = Math.Min(p.TextureIndex, modifier.FirstFrame);
+				p.TextureIndex = Math.Min(p.TextureIndex, p.Modifier.FirstFrame);
 			}
 			// Updating other properties of a particle.
-			float windVelocity = p.WindAmount * modifier.WindAmount;
+			float windVelocity = p.WindAmount * p.Modifier.WindAmount;
 			if (windVelocity != 0) {
 				var windDirection = Vector2.CosSinRough(p.WindDirection * Mathf.DegToRad);
 				p.RegularPosition += windVelocity * delta * windDirection;
@@ -765,19 +755,19 @@ namespace Lime
 				p.RegularPosition += p.GravityVelocity * delta * gravityDirection;
 			}
 			var direction = Vector2.CosSinRough(p.RegularDirection * Mathf.DegToRad);
-			float velocity = p.Velocity * modifier.Velocity;
-			p.RegularDirection += p.AngularVelocity * modifier.AngularVelocity * delta;
-			p.GravityAcceleration += p.GravityAmount * modifier.GravityAmount * delta;
+			float velocity = p.Velocity * p.Modifier.Velocity;
+			p.RegularDirection += p.AngularVelocity * p.Modifier.AngularVelocity * delta;
+			p.GravityAcceleration += p.GravityAmount * p.Modifier.GravityAmount * delta;
 			p.GravityVelocity += p.GravityAcceleration * delta;
 			p.RegularPosition += velocity * delta * direction;
-			p.Angle += p.Spin * modifier.Spin * delta;
-			p.ScaleCurrent = p.ScaleInitial * modifier.Scale;
-			if (modifier.AspectRatio != 1f) {
-				p.ScaleCurrent.X *= modifier.AspectRatio;
-				p.ScaleCurrent.Y /= Math.Max(0.0001f, modifier.AspectRatio);
+			p.Angle += p.Spin * p.Modifier.Spin * delta;
+			p.ScaleCurrent = p.ScaleInitial * p.Modifier.Scale;
+			if (p.Modifier.AspectRatio != 1f) {
+				p.ScaleCurrent.X *= p.Modifier.AspectRatio;
+				p.ScaleCurrent.Y /= Math.Max(0.0001f, p.Modifier.AspectRatio);
 			}
-			p.ColorCurrent = p.ColorInitial * modifier.Color;
-			p.MagnetAmountCurrent = p.MagnetAmountInitial * modifier.MagnetAmount;
+			p.ColorCurrent = p.ColorInitial * p.Modifier.Color;
+			p.MagnetAmountCurrent = p.MagnetAmountInitial * p.Modifier.MagnetAmount;
 			ApplyMagnetsToParticle(p, delta);
 			Vector2 positionOnSpline = Vector2.Zero;
 			if (p.RandomMotionSpeed > 0.0f) {
@@ -812,7 +802,7 @@ namespace Lime
 			if (AlongPathOrientation) {
 				angle += p.FullDirection;
 			}
-			ITexture texture = modifiers[p.ModifierIndex].GetTexture((int)p.TextureIndex - 1);
+			ITexture texture = p.Modifier.GetTexture((int)p.TextureIndex - 1);
 			var imageSize = (Vector2)texture.ImageSize;
 			var particleSize = p.ScaleCurrent * imageSize;
 			var orientation = Vector2.CosSinRough(angle * Mathf.DegToRad);
