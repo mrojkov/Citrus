@@ -28,7 +28,9 @@ namespace Tangerine
 			int i = 0;
 			foreach (var node in nodes) {
 				Core.Operations.InsertFolderItem.Perform(group, new FolderItemLocation(group.RootFolder(), i++), node);
-				TransformPropertyAndKeyframes<Vector2>(node, nameof(Widget.Position), v => v - aabb.A);
+				if (node is Widget) {
+					TransformPropertyAndKeyframes<Vector2>(node, nameof(Widget.Position), v => v - aabb.A);
+				}
 			}
 			Core.Operations.ClearRowSelection.Perform();
 			Core.Operations.SelectNode.Perform(group);
