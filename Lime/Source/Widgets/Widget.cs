@@ -797,14 +797,6 @@ namespace Lime
 		{
 			base.RecalcDirtyGlobalsUsingParents();
 			// TODO: Optimize using DirtyMask
-			if (IsRenderedToTexture()) {
-				localToWorldTransform = Matrix32.Identity;
-				globalColor = color;
-				globalBlending = Blending.Inherited;
-				globalShader = ShaderId.Inherited;
-				globallyVisible = Visible && (color.A != 0 || RenderTransparentWidgets);
-				return;
-			}
 			globalColor = Color;
 			globalBlending = Blending;
 			globalShader = Shader;
@@ -1059,6 +1051,7 @@ namespace Lime
 				var savedZTestEnabled = Renderer.ZTestEnabled;
 				var savedZWriteEnabled = Renderer.ZWriteEnabled;
 				var savedCullMode = Renderer.CullMode;
+				var savedTransform2 = Renderer.Transform2;
 				Renderer.Viewport = new WindowRect { X = 0, Y = 0, Width = texture.ImageSize.Width, Height = texture.ImageSize.Height };
 				if (clearRenderTarget) {
 					Renderer.Clear(0, 0, 0, 0);
@@ -1068,11 +1061,13 @@ namespace Lime
 				Renderer.ZTestEnabled = false;
 				Renderer.ZWriteEnabled = true;
 				Renderer.CullMode = CullMode.None;
+				Renderer.Transform2 = LocalToWorldTransform.CalcInversed();
 				for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
 					node.RenderChainBuilder?.AddToRenderChain(node, renderChain);
 				}
 				renderChain.RenderAndClear();
 				texture.RestoreRenderTarget();
+				Renderer.Transform2 = savedTransform2;
 				Renderer.Viewport = savedViewport;
 				Renderer.World = savedWorld;
 				Renderer.View = savedView;
