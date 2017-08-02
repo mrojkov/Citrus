@@ -166,9 +166,7 @@ namespace Orange
 			if (updateCompleted) {
 				The.Workspace?.AssetFiles?.Rescan();
 				yield return Task.ExecuteAsync(() => SafeExecute(action));
-				textWriter.WriteLine("Output has been copied to clipboard.");
 			}
-			Clipboard.Text = textView.Text;
 			EnableControls(true);
 			ShowTimeStatistics(startTime);
 		}
