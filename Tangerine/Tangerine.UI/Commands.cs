@@ -70,6 +70,7 @@ namespace Tangerine.UI
 		public static readonly ICommand DragLeftFast = new Command(new Shortcut(Modifiers.Shift, Key.A));
 		public static readonly ICommand DragUpFast = new Command(new Shortcut(Modifiers.Shift, Key.W));
 		public static readonly ICommand DragDownFast = new Command(new Shortcut(Modifiers.Shift, Key.S));
+		public static readonly ICommand DisplayBones = new Command(new Shortcut(Modifiers.Control, Key.B));
 	}
 
 	public static class Tools

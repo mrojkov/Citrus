@@ -39,6 +39,18 @@ namespace Tangerine.UI.SceneView
 			h.Connect(SceneViewCommands.DragDownFast, () => DragNodes(new Vector2(0, 5)));
 			h.Connect(SceneViewCommands.DragLeftFast, () => DragNodes(new Vector2(-5, 0)));
 			h.Connect(SceneViewCommands.DragRightFast, () => DragNodes(new Vector2(5, 0)));
+			h.Connect(SceneViewCommands.DisplayBones, () => DisplayBones());
+		}
+
+		private static void DisplayBones()
+		{
+			var postPresenter = Instance.Frame.CompoundPostPresenter;
+			if (postPresenter.Contains(Bone3DPresenter.Presenter)) {
+				postPresenter.Remove(Bone3DPresenter.Presenter);
+			} else {
+				postPresenter.Add(Bone3DPresenter.Presenter);
+			}
+			CommonWindow.Current.Invalidate();
 		}
 
 		static void DragNodes(Vector2 delta)

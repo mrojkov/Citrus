@@ -84,6 +84,7 @@
     <Compile Include="Processors\RescalePointObjectSelectionProcessor.cs" />
     <Compile Include="Processors\RotationHelper.cs" />
     <Compile Include="Processors\RotatePointObjectSelectionProcessor.cs" />
+    <Compile Include="Presenters\Bone3DPresenter.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Mac.csproj">
