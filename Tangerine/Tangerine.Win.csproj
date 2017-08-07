@@ -249,4 +249,7 @@
     <EmbeddedResource Include="Resources\Icons\Filesystem\SplitV.png" />
     <EmbeddedResource Include="Resources\Cursors\rotate.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Icons\SceneView\Round.png" />
+  </ItemGroup>
 </Project>

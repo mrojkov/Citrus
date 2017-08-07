@@ -31,6 +31,10 @@ namespace Tangerine.UI
 			public Color4 ContainerInnerSpace;
 			public Color4 ContainerBorder;
 			public Color4 PointObject;
+			public Color4 Bone;
+			public Color4 BoneOutline;
+			public Color4 BoneEffectiveRadius;
+			public Color4 BoneFadeoutZone;
 		}
 
 		public class TimelineGridColors
@@ -120,7 +124,11 @@ namespace Tangerine.UI
 				ContainerOuterSpace = Color4.Gray,
 				ContainerInnerSpace = Color4.White,
 				ContainerBorder = Color4.Blue,
-				PointObject = Color4.Blue
+				PointObject = Color4.Red,
+				Bone = new Color4(136, 136, 136, 128),
+				BoneOutline =  new Color4(105, 105, 105),
+				BoneEffectiveRadius = Color4.Yellow,
+				BoneFadeoutZone = Color4.Red,
 			};
 			var timelineGrid = new TimelineGridColors {
 				PropertyRowBackground = Theme.Colors.GrayBackground.Darken(0.5f),
@@ -198,7 +206,11 @@ namespace Tangerine.UI
 				ContainerOuterSpace = Color4.Gray,
 				ContainerInnerSpace = Color4.White,
 				ContainerBorder = Color4.Blue,
-				PointObject = Color4.Red
+				PointObject = Color4.Red,
+				Bone = new Color4(136, 136, 136, 128),
+				BoneOutline = new Color4(105, 105, 105),
+				BoneEffectiveRadius = Color4.Yellow,
+				BoneFadeoutZone = Color4.Red,
 			};
 			var timelineGrid = new TimelineGridColors {
 				PropertyRowBackground = Theme.Colors.GrayBackground.Lighten(0.5f),

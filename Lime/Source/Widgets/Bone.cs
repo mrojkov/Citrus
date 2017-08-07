@@ -63,6 +63,21 @@ namespace Lime
 		[YuzuMember]
 		public float RefLength { get; set; }
 
+		public Matrix32 WorldToLocalTransform
+		{
+			get
+			{
+				if (BaseIndex == 0) {
+					return Matrix32.Identity;
+				}
+				BoneArray.Entry b = Parent.AsWidget.BoneArray[BaseIndex];
+				var l = ClipAboutZero(b.Length);
+				Vector2 u = b.Tip - b.Joint;
+				Vector2 v = new Vector2(-u.Y / l, u.X / l);
+				return new Matrix32(u, v, Vector2.Zero).CalcInversed();
+			}
+		}
+
 		public Bone()
 		{
 			RenderChainBuilder = null;

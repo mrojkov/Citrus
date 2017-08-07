@@ -8,5 +8,8 @@ namespace Tangerine.UI.SceneView
 	{
 		[YuzuRequired]
 		public bool ShowOverlays { get; set; }
+
+		[YuzuRequired]
+		public float DefaultBoneWidth { get; set; } = 5;
 	}
 }

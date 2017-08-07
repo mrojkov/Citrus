@@ -236,6 +236,7 @@
     <EmbeddedResource Include="Resources\Icons\Filesystem\SplitH.png" />
     <EmbeddedResource Include="Resources\Icons\Filesystem\SplitV.png" />
     <EmbeddedResource Include="Resources\Icons\Filesystem\Unfolded.png" />
+    <EmbeddedResource Include="Resources\Icons\SceneView\Round.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PreferencesDialog\" />

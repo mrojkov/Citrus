@@ -157,7 +157,7 @@ namespace Lime
 				viewProjDirty = worldViewProjDirty = true;
 				PlatformRenderer.InvalidateShaderProgram();
 			}
-			}
+		}
 
 		public static Matrix44 WorldView
 		{
@@ -403,7 +403,7 @@ namespace Lime
 				var size = new Vector2(scale * fontChar.Width, fontHeight - fontChar.VerticalOffset);
 				Vector2 roundPos;
 				if (font.RoundCoordinates) {
-					 roundPos = new Vector2(position.X.Round(), position.Y.Round() + fontChar.VerticalOffset);
+					roundPos = new Vector2(position.X.Round(), position.Y.Round() + fontChar.VerticalOffset);
 					if (onDrawChar != null) {
 						onDrawChar(i, new Vector2((position.X - xDelta).Round(), position.Y.Round()), size);
 					}
@@ -623,8 +623,7 @@ namespace Lime
 					if (s.Position.X + s.Size.X < clipRect.A.X ||
 						s.Position.X > clipRect.B.X ||
 						s.Position.Y + s.Size.Y < clipRect.A.Y ||
-						s.Position.Y > clipRect.B.Y)
-					{
+						s.Position.Y > clipRect.B.Y) {
 						continue;
 					}
 				}
@@ -733,7 +732,7 @@ namespace Lime
 			return aabb;
 		}
 
-		public static void DrawLine(float x0, float y0, float x1, float y1, Color4 color, float thickness = 1, LineCap cap  = LineCap.Butt)
+		public static void DrawLine(float x0, float y0, float x1, float y1, Color4 color, float thickness = 1, LineCap cap = LineCap.Butt)
 		{
 			DrawLine(new Vector2(x0, y0), new Vector2(x1, y1), color, thickness, cap);
 		}
@@ -811,8 +810,18 @@ namespace Lime
 		{
 			for (int i = 0; i < 4; i++) {
 				DrawLine(q[i].X, q[i].Y, q[(i + 1) % 4].X, q[(i + 1) % 4].Y, color, thickness, LineCap.Square);
-
 			}
+		}
+
+		/// <summary>
+		/// Draws the quadrangle
+		/// </summary>
+		public static void DrawQuadrangle(Quadrangle q, Color4 color, float thickness = 1)
+		{
+			for (int i = 0; i < 4; i++) {
+				v[i] = new Vertex { Pos = q[i], Color = color };
+			}
+			Renderer.DrawTriangleFan(null, null, v, 4);
 		}
 
 		/// <summary>
@@ -887,6 +896,36 @@ namespace Lime
 		public static void DrawRound(Vector2 center, float radius, int numSegments, Color4 color)
 		{
 			DrawRound(center, radius, numSegments, color, color);
+		}
+
+		public static void DrawDashedLine(ITexture texture, Vector2 a, Vector2 b, Color4 color, float size = 8)
+		{
+			var dir = (b - a).Normalized;
+			var l = (b - a).Length;
+			var n = new Vector2(-dir.Y, dir.X) * size / 2;
+			Vertex[] vertices = {
+				new Vertex {
+					Pos = a - n,
+					UV1 = Vector2.Zero,
+					Color = color,
+				},
+				new Vertex {
+					Pos = a + n,
+					UV1 = new Vector2(0, 1),
+					Color = color,
+				},
+				new Vertex {
+					Pos = b + n,
+					UV1 = new Vector2(l / size, 1),
+					Color = color,
+				},
+				new Vertex {
+					Pos = b - n,
+					UV1 = new Vector2(l / size, 0),
+					Color = color,
+				}
+			};
+			Renderer.DrawTriangleFan(texture, vertices, vertices.Length);
 		}
 	}
 }

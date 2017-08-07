@@ -78,13 +78,33 @@ namespace Lime
 			return false;
 		}
 
+		public static Quadrangle operator *(Quadrangle q, Vector2 v)
+		{
+			return new Quadrangle {
+				V1 = q.V1 * v,
+				V2 = q.V2 * v,
+				V3 = q.V3 * v,
+				V4 = q.V4 * v,
+			};
+		}
+
+		public static Quadrangle operator *(Quadrangle q, Matrix32 m)
+		{
+			return new Quadrangle {
+				V1 = q.V1 * m,
+				V2 = q.V2 * m,
+				V3 = q.V3 * m,
+				V4 = q.V4 * m,
+			};
+		}
+
 		public bool Contains(Vector2 point)
 		{
 			var sign = Vector2.CrossProduct(V2 - V1, V4 - V1);
 			var inside = true;
 			for (int i = 0; i < 4; i++) {
 				var a = this[i];
-				var b = this[(i + 1) % 4];			
+				var b = this[(i + 1) % 4];
 				inside &= GeometryUtils.CalcPointHalfPlane(point, a, b) * sign > 0;
 			}
 			return inside;

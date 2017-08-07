@@ -193,10 +193,13 @@ namespace Tangerine.UI.SceneView
 				new CreateSplinePointProcessor(),
 				new CreatePointObjectProcessor(),
 				new CreateSplinePoint3DProcessor(),
+				new CreateBoneProcessor(),
 				new CreateNodeProcessor(),
 				new ExpositionProcessor(),
 				new MouseScrollProcessor(),
 				new DragPivotProcessor(),
+				new DragBoneProcessor(),
+				new RotateBoneProcessor(),
 				new DragWidgetsProcessor(),
 				new DragPointObjectsProcessor(),
 				new DragSplineTangentsProcessor(),
@@ -217,6 +220,7 @@ namespace Tangerine.UI.SceneView
 			new SelectedWidgetsPresenter(this);
 			new PointObjectsSelectionPresenter(this);
 			new TranslationGizmoPresenter(this);
+			new BonePresenter(this);
 		}
 
 		public void CreateNode(Type nodeType)
