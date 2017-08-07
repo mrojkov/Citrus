@@ -383,17 +383,17 @@ namespace Tangerine
 			h.Connect(Tools.FitToContent, new FitToContent());
 			h.Connect(Tools.FlipX, new FlipX());
 			h.Connect(Tools.FlipY, new FlipY());
-			h.Connect(Command.Copy, Core.Operations.Copy.CopyToClipboard);
-			h.Connect(Command.Cut, Core.Operations.Cut.Perform);
-			h.Connect(Command.Paste, Paste);
-			h.Connect(Command.Delete, Core.Operations.Delete.Perform);
+			h.Connect(Command.Copy, Core.Operations.Copy.CopyToClipboard, () => Document.Current?.SelectedRows().Any() ?? false);
+			h.Connect(Command.Cut, Core.Operations.Cut.Perform, () => Document.Current?.SelectedRows().Any() ?? false);
+			h.Connect(Command.Paste, Paste, Document.HasCurrent);
+			h.Connect(Command.Delete, Core.Operations.Delete.Perform, () => Document.Current?.SelectedRows().Any() ?? false);
 			h.Connect(Command.SelectAll, () =>
 			{
 				foreach (var row in Document.Current.Rows)
 				{
 					Core.Operations.SelectRow.Perform(row, true);
 				}
-			});
+			}, 	() => Document.Current?.Rows.Count > 0);
 			h.Connect(Command.Undo, () => Document.Current.History.Undo(), () => Document.Current?.History.CanUndo() ?? false);
 			h.Connect(Command.Redo, () => Document.Current.History.Redo(), () => Document.Current?.History.CanRedo() ?? false);
 			h.Connect(OrangeCommands.Run, () => Orange.Actions.BuildAndRunAction());
