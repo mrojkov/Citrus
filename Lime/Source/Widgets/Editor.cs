@@ -363,8 +363,11 @@ namespace Lime
 
 				if (Cmds.ToggleOverwrite.WasIssued())
 					OverwriteMode = !OverwriteMode;
-				if (Command.Delete.WasIssued())
-					DeleteChar();
+				if (!Command.Delete.IsConsumed()) {
+					Command.Delete.Enabled = HasSelection() || CaretPos.TextPos < TextLength;
+					if (Command.Delete.WasIssued())
+						DeleteChar();
+				}
 				if (Cmds.DeleteWordPrev.WasIssued() && IsTextReadable) {
 					var p = PreviousWord(Text.Text, CaretPos.TextPos);
 					if (p < CaretPos.TextPos)
@@ -395,29 +398,37 @@ namespace Lime
 					Cmds.Cancel.Consume();
 					InputWidget.RevokeFocus();
 				}
-
-				if (Command.Copy.WasIssued() && HasSelection() && IsTextReadable) {
-					var r = GetSelectionRange();
-					Clipboard.Text = Text.Text.Substring(r.Start, r.Length);
+				if (!Command.Copy.IsConsumed()) {
+					Command.Copy.Enabled = HasSelection() && IsTextReadable;
+					if (Command.Copy.WasIssued()) {
+						var r = GetSelectionRange();
+						Clipboard.Text = Text.Text.Substring(r.Start, r.Length);
+					}
 				}
-				if (Command.Cut.WasIssued() && HasSelection() && IsTextReadable) {
-					var r = GetSelectionRange();
-					Clipboard.Text = Text.Text.Substring(r.Start, r.Length);
-					DeleteSelection();
+				if (!Command.Cut.IsConsumed()) {
+					Command.Cut.Enabled = HasSelection() && IsTextReadable;
+					if (Command.Cut.WasIssued()) {
+						var r = GetSelectionRange();
+						Clipboard.Text = Text.Text.Substring(r.Start, r.Length);
+						DeleteSelection();
+					}
 				}
-				if (Command.Paste.WasIssued())
-					InsertText(Clipboard.Text);
-				if (Command.Undo.WasIssued() && History.CanUndo())
-					ApplyUndoItem(History.Undo(MakeUndoItem()));
-				if (Command.Redo.WasIssued() && History.CanRedo())
-					ApplyUndoItem(History.Redo());
+				if (!Command.Paste.IsConsumed()) {
+					Command.Paste.Enabled = !string.IsNullOrEmpty(Clipboard.Text);
+					if (Command.Paste.WasIssued())
+						InsertText(Clipboard.Text);
+				}
+				if (!Command.Undo.IsConsumed()) {
+					Command.Undo.Enabled = History.CanUndo();
+					if (Command.Undo.WasIssued())
+						ApplyUndoItem(History.Undo(MakeUndoItem()));
+				}
+				if (!Command.Redo.IsConsumed()) {
+					Command.Redo.Enabled = History.CanRedo();
+					if (Command.Redo.WasIssued())
+						ApplyUndoItem(History.Redo());
+				}
 			} finally {
-				var hs = HasSelection();
-				Command.Cut.Enabled = hs && IsTextReadable;
-				Command.Copy.Enabled = hs && IsTextReadable;
-				Command.Delete.Enabled = hs || CaretPos.TextPos < TextLength;
-				Command.Paste.Enabled = !string.IsNullOrEmpty(Clipboard.Text);
-				Command.Undo.Enabled = History.CanUndo();
 				Command.ConsumeRange(consumingCommands);
 				if (IsMultiline()) {
 					Cmds.MoveLinePrev.Consume();

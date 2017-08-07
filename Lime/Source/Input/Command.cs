@@ -58,7 +58,7 @@ namespace Lime
 		int Version { get; }
 
 		/// <summary>
-		/// Returns true, if the command was issued.
+		/// Returns true, if the command was issued, enabled and has not been consumed yet.
 		/// </summary>
 		bool WasIssued();
 
@@ -66,6 +66,11 @@ namespace Lime
 		/// Consumes the command. WasIssued is false if the command was consumed.
 		/// </summary>
 		void Consume();
+
+		/// <summary>
+		/// Gets a value indicating whether the command has been consumed. The command should not be consumed before changing its Enabled property.
+		/// </summary>
+		bool IsConsumed();
 
 		/// <summary>
 		/// Occurs when command is issued by clicking on menu item, activating menu shortcut or clicking a tool button.
@@ -87,7 +92,10 @@ namespace Lime
 			Undo, Redo, SelectAll, Cut, Copy, Paste, Delete
 		};
 
+		private static long consumeGeneration = 1;
+
 		private bool wasIssued;
+		private long consumedAt;
 		private string text;
 		private Shortcut shortcut;
 		private Key mappedShortcut;
@@ -178,6 +186,8 @@ namespace Lime
 		public event Action Issued;
 		public static readonly ICommand MenuSeparator = new Command();
 
+		public static void ResetConsumedCommands() => consumeGeneration++;
+
 		public Command() { }
 
 		public Command(string text) { Text = text; }
@@ -226,17 +236,20 @@ namespace Lime
 
 		public bool WasIssued()
 		{
+			if (!Enabled) {
+				return false;
+			}
 			var input = Window.Current.Input;
-			return Enabled && (
-				wasIssued ||
-				mappedShortcut != Key.Unknown &&
-				(Repeatable && input.WasKeyRepeated(mappedShortcut) ||
-		 		!Repeatable && input.WasKeyPressed(mappedShortcut))
-			);
+			return wasIssued ||
+				mappedShortcut != Key.Unknown && 
+				(Repeatable && input.WasKeyRepeated(mappedShortcut) || !Repeatable && input.WasKeyPressed(mappedShortcut));
 		}
+
+		public bool IsConsumed() => consumedAt == consumeGeneration;
 
 		public void Consume()
 		{
+			consumedAt = consumeGeneration;
 			wasIssued = false;
 			if (mappedShortcut != Key.Unknown) {
 				Window.Current.Input.ConsumeKey(mappedShortcut);
@@ -254,6 +267,31 @@ namespace Lime
 		{
 			foreach (var cmd in commands) {
 				cmd.Consume();
+			}
+		}
+	}
+
+	public class CommandQueue
+	{
+		private List<Command> items = new List<Command>();
+
+		public static CommandQueue Instance = new CommandQueue();
+
+		public void Add(Command command)
+		{
+			if (!items.Contains(command)) {
+				items.Add(command);
+			}
+		}
+
+		public void IssueCommands()
+		{
+			if (items.Count != 0) {
+				var t = items.ToArray();
+				items.Clear();
+				foreach (var i in t) {
+					i.Issue();
+				}
 			}
 		}
 	}

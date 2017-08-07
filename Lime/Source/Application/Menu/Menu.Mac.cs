@@ -102,7 +102,7 @@ namespace Lime
 				} else {
 					NativeMenuItem = new NSMenuItem();
 					NativeMenuItem.Activated += (s, e) => {
-						((Command)Command).Issue();
+						CommandQueue.Instance.Add((Command)Command);
 					};
 					Refresh();
 				}

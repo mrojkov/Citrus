@@ -81,11 +81,17 @@ namespace Lime
 
 		private void RaiseUpdatingHelper(float delta)
 		{
-			if (Updating != null) {
-				Updating(delta);
-			}
 			if (Current.Active) {
-				Application.MainMenu?.Refresh();
+				Command.ResetConsumedCommands();
+				CommandQueue.Instance.IssueCommands();
+				try {
+					Updating?.Invoke(delta);
+					CommandHandlerList.Global.ProcessCommands();
+				} finally {
+					Application.MainMenu?.Refresh();
+				}
+			} else {
+				Updating?.Invoke(delta);
 			}
 		}
 

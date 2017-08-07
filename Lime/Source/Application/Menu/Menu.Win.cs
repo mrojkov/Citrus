@@ -135,7 +135,7 @@ namespace Lime
 				NativeItem = new ToolStripSeparator();
 			} else {
 				NativeItem = new ToolStripMenuItem();
-				NativeItem.Click += (s, e) => ((Command)command).Issue();
+				NativeItem.Click += (s, e) => CommandQueue.Instance.Add((Command)Command);
 			}
 			Refresh();
 		}

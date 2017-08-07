@@ -24,7 +24,7 @@ namespace Tangerine
 			widget.Nodes.Clear();
 			foreach (var c in this) {
 				var b = new ToolbarButton(c.Icon ?? new SerializableTexture());
-				b.Clicked += () => ((Command)c).Issue();
+				b.Clicked += () => CommandQueue.Instance.Add((Command)c);
 				b.Updating += _ => {
 					b.Enabled = c.Enabled;
 					b.Tip = c.Text;

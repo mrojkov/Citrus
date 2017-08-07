@@ -35,10 +35,12 @@ namespace Lime
 		public void ProcessCommands()
 		{
 			foreach (var i in items) {
-				i.Handler.RefreshCommand(i.Command);
-				if (i.Command.WasIssued()) {
+				if (!i.Command.IsConsumed()) {
+					i.Handler.RefreshCommand(i.Command);
+					if (i.Command.WasIssued()) {
+						i.Handler.Execute();
+					}
 					i.Command.Consume();
-					i.Handler.Execute();
 				}
 			}
 		}
