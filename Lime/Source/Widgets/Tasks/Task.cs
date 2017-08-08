@@ -9,9 +9,15 @@ namespace Lime
 	/// </summary>
 	public class Task : IDisposable
 	{
+		private class StackEntry
+		{
+			public IEnumerator<object> Enumerator;
+			public StackEntry Caller;
+		}
+
 		[ThreadStatic]
 		private static Task current;
-		private Stack<IEnumerator<object>> stack = new Stack<IEnumerator<object>>();
+		private StackEntry callStack;
 		private WaitPredicate waitPredicate;
 		private float waitTime;
 
@@ -23,7 +29,7 @@ namespace Lime
 		public Task(IEnumerator<object> e, object tag = null)
 		{
 			Tag = tag;
-			stack.Push(e);
+			callStack = new StackEntry { Enumerator = e };
 			InitialEnumeratorType = e.GetType();
 		}
 
@@ -37,15 +43,15 @@ namespace Lime
 		/// </summary>
 		public float LifeTime { get; private set; }
 
-		public static Task Current { get { return current; } }
+		public static Task Current => current;
 
 		public object Tag { get; set; }
 
-		public bool Completed { get { return stack.Count == 0; } }
+		public bool Completed => callStack == null;
 
 		public override string ToString()
 		{
-			return Completed ? "Completed" : stack.Peek().GetType().ToString();
+			return Completed ? "Completed" : callStack.Enumerator.GetType().ToString();
 		}
 
 		public Type InitialEnumeratorType { get; private set; }
@@ -55,18 +61,17 @@ namespace Lime
 		/// </summary>
 		public void Advance(float delta)
 		{
-			if (Completed) {
+			if (callStack == null) {
 				return;
 			}
 			var savedCurrent = current;
 			current = this;
 			Delta = delta;
 			LifeTime += delta;
-			var e = stack.Peek();
 			try {
 				if (Updating != null) {
 					Updating();
-					if (Completed) {
+					if (callStack == null) {
 						return;
 					}
 				}
@@ -84,11 +89,11 @@ namespace Lime
 					}
 					waitPredicate = null;
 				}
-				if (e.MoveNext()) {
-					HandleYieldedResult(e.Current);
-				} else if (!Completed) {
-					stack.Pop();
-					if (!Completed) {
+				if (callStack.Enumerator.MoveNext()) {
+					HandleYieldedResult(callStack.Enumerator.Current);
+				} else if (callStack != null) {
+					callStack = callStack.Caller;
+					if (callStack != null) {
 						Advance(0);
 					}
 				}
@@ -102,9 +107,9 @@ namespace Lime
 		/// </summary>
 		public void Dispose()
 		{
-			while (stack.Count > 0) {
-				var e = stack.Pop();
-				e.Dispose();
+			while (callStack != null) {
+				callStack.Enumerator.Dispose();
+				callStack = callStack.Caller;
 			}
 			waitPredicate = null;
 			Updating = null;
@@ -121,7 +126,7 @@ namespace Lime
 			} else if (result is double) {
 				waitTime = (float)((double)result);
 			} else if (result is IEnumerator<object>) {
-				stack.Push((IEnumerator<object>) result);
+				callStack = new StackEntry { Enumerator = (IEnumerator<object>)result, Caller = callStack };
 				Advance(0);
 			} else if (result is WaitPredicate) {
 				waitPredicate = (WaitPredicate) result;
