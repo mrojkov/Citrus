@@ -29,6 +29,7 @@ namespace Tangerine.UI
 		Func<NumericEditBox> NumericEditBoxFactory { get; set; }
 		Func<DropDownList> DropDownListFactory { get; set; }
 		Func<EditBox> EditBoxFactory { get; set; }
+		Func<object> DefaultValueGetter { get; set; }
 		PropertySetterDelegate PropertySetter { get; set; }
 	}
 
@@ -47,6 +48,7 @@ namespace Tangerine.UI
 		public Func<NumericEditBox> NumericEditBoxFactory { get; set; }
 		public Func<EditBox> EditBoxFactory { get; set; }
 		public Func<DropDownList> DropDownListFactory { get; set; }
+		public Func<object> DefaultValueGetter { get; set; }
 		public PropertySetterDelegate PropertySetter { get; set; }
 
 		public PropertyEditorParams(Widget inspectorPane, List<object> objects, Type type, string propertyName)
@@ -126,6 +128,11 @@ namespace Tangerine.UI
 						Command.Paste.Consume();
 						Paste();
 					}
+					if (resetToDefault.WasIssued()) {
+						var defaultValue = EditorParams.DefaultValueGetter();
+						if (defaultValue != null)
+							SetProperty(defaultValue);
+					}
 				}
 				yield return null;
 			}
@@ -156,12 +163,18 @@ namespace Tangerine.UI
 		protected virtual string Serialize(T value) => serializer.ToString(value);
 		protected virtual T Deserialize(string source) => deserializer.FromString<T>(source + ' ');
 
+		private ICommand resetToDefault = new Command("Reset To Default");
+
 		void ShowPropertyContextMenu()
 		{
-			new Menu {
+			var menu = new Menu {
 				Command.Copy,
-				Command.Paste,
-			}.Popup();
+				Command.Paste 
+			};
+			if (EditorParams.DefaultValueGetter != null) {
+				menu.Insert(0, resetToDefault);
+			}
+			menu.Popup();
 		}
 
 		public virtual void DropFiles(IEnumerable<string> files) { }

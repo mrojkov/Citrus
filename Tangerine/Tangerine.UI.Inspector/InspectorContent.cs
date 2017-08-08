@@ -100,7 +100,16 @@ namespace Tangerine.UI.Inspector
 				}
 				var context = new PropertyEditorParams(widget, objects, type, property.Name) {
 					NumericEditBoxFactory = () => new TransactionalNumericEditBox(),
-					PropertySetter = Core.Operations.SetAnimableProperty.Perform
+					PropertySetter = Core.Operations.SetAnimableProperty.Perform,
+					DefaultValueGetter = () => {
+						var ctr = type.GetConstructor(new Type[] {});
+						if (ctr != null) {
+							var obj = ctr.Invoke(null);
+							var prop = type.GetProperty(property.Name);
+							return prop.GetValue(obj);
+						}
+						return null;	
+					}
 				};
 				foreach (var i in InspectorPropertyRegistry.Instance.Items) {
 					if (i.Condition(context)) {
