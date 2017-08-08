@@ -312,15 +312,19 @@ namespace Tangerine.Core
 		public static Node CreateCloneForSerialization(Node node)
 		{
 			var clone = node.Clone();
-			foreach (var n in clone.Descendants) {
+			Action<Node> f = (n) => {
 				n.AnimationFrame = 0;
 				if (n.Folders != null && n.Folders.Count == 0) {
 					n.Folders = null;
 				}
-			}
-			foreach (var n in clone.Descendants.Where(i => !string.IsNullOrEmpty(i.ContentsPath))) {
-				n.Nodes.Clear();
-				n.Markers.Clear();
+				if (!string.IsNullOrEmpty(n.ContentsPath)) {
+					n.Nodes.Clear();
+					n.Markers.Clear();
+				}
+			};
+			f(clone);
+			foreach (var n in clone.Descendants) {
+				f(n);
 			}
 			return clone;
 		}
