@@ -166,6 +166,7 @@ namespace Orange
 			if (updateCompleted) {
 				The.Workspace?.AssetFiles?.Rescan();
 				yield return Task.ExecuteAsync(() => SafeExecute(action));
+				textWriter.WriteLine("Done.");
 			}
 			EnableControls(true);
 			ShowTimeStatistics(startTime);
