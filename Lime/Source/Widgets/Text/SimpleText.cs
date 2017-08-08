@@ -226,11 +226,6 @@ namespace Lime
 			Invalidate();
 		}
 
-		private void InvokeSpriteHandler(Sprite sprite)
-		{
-			SpriteListElementHandler?.Invoke(this, sprite);
-		}
-
 		protected override void OnTagChanged()
 		{
 			ShaderProgram = null;
@@ -249,15 +244,20 @@ namespace Lime
 			return true;
 		}
 
+		private Action<Sprite> spritePostProcessor;
+
 		public override void Render()
 		{
 			PrepareSpriteListAndSyncCaret();
 			Renderer.Transform1 = LocalToWorldTransform;
 			Renderer.Blending = GlobalBlending;
 			Renderer.Shader = GlobalShader;
-			spriteList.Render(GlobalColor * textColor, InvokeSpriteHandler);
+			if (spritePostProcessor == null) {
+				spritePostProcessor = sprite => SpriteListElementHandler?.Invoke(this, sprite);
+			}
+			spriteList.Render(GlobalColor * textColor, spritePostProcessor);
 			if (InvertPaletteIndex()) {
-				spriteList.Render(GlobalColor * textColor, InvokeSpriteHandler);
+				spriteList.Render(GlobalColor * textColor, spritePostProcessor);
 				InvertPaletteIndex();
 			}
 		}
