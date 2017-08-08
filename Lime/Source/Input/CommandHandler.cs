@@ -40,6 +40,8 @@ namespace Lime
 					if (i.Command.WasIssued()) {
 						i.Command.Consume();
 						i.Handler.Execute();
+					} else {
+						i.Command.Consume();
 					}
 				}
 			}
