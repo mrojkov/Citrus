@@ -38,9 +38,9 @@ namespace Lime
 				if (!i.Command.IsConsumed()) {
 					i.Handler.RefreshCommand(i.Command);
 					if (i.Command.WasIssued()) {
+						i.Command.Consume();
 						i.Handler.Execute();
 					}
-					i.Command.Consume();
 				}
 			}
 		}
