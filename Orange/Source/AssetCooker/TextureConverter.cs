@@ -86,7 +86,7 @@ namespace Orange
 			var tgaPath = Path.ChangeExtension(pvrPath, ".tga");
 			try {
 				if (hasAlpha) {
-					args.Append(" -l"); // Enable alpha bleed
+					bitmap = TextureConverterUtils.BleedAlpha(bitmap);
 				}
 				TextureConverterUtils.SaveToTGA(bitmap, tgaPath, swapRedAndBlue: true);
 				if (mipMaps) {
