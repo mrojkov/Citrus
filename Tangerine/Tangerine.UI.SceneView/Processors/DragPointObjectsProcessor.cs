@@ -75,7 +75,7 @@ namespace Tangerine.UI.SceneView
 
 		public static void SetPosition(PointObject po, Vector2 value)
 		{
-			if (po.SkinningWeights == null && po.Parent?.AsWidget != null) {
+			if (po.Parent?.AsWidget != null) {
 				var parentSize = po.Parent.AsWidget.Size;
 				if (parentSize.X != 0 && parentSize.Y != 0) {
 					var p = (value - po.Offset) / parentSize;

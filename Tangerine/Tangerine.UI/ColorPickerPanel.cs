@@ -8,10 +8,10 @@ namespace Tangerine.UI
 {
 	public class ColorPickerPanel
 	{
-		public readonly Frame RootWidget;
 		readonly Spectrum spectrum;
 		readonly ValueSlider valueSlider;
 		readonly AlphaSlider alphaSlider;
+		public readonly Widget Widget;
 		ColorHSVA colorHSVA;
 	
 		public event Action DragStarted;
@@ -35,7 +35,8 @@ namespace Tangerine.UI
 			alphaSlider = new AlphaSlider(colorProperty);
 			SetupSliderDragHandlers(valueSlider.Widget);
 			SetupSliderDragHandlers(alphaSlider.Widget);
-			RootWidget = new ThemedFrame {
+			Widget = new Widget
+			{
 				Padding = new Thickness(8),
 				Layout = new VBoxLayout { Spacing = 8 },
 				Nodes = {
@@ -50,7 +51,7 @@ namespace Tangerine.UI
 					alphaSlider.Widget,
 				}
 			};
-			RootWidget.FocusScope = new KeyboardFocusScope(RootWidget);
+			Widget.FocusScope = new KeyboardFocusScope(Widget);
 		}
 
 		void SetupSliderDragHandlers(Slider slider)

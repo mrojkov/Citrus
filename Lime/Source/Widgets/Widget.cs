@@ -448,6 +448,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineStaticProperty]
 		public SkinningWeights SkinningWeights { get; set; }
 
 		[YuzuMember]

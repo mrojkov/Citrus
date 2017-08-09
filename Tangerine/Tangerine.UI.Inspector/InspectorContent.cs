@@ -118,6 +118,9 @@ namespace Tangerine.UI.Inspector
 		private void DecoratePropertyEditor(IPropertyEditor editor, int row)
 		{
 			var ctr = editor.ContainerWidget;
+			if (!(editor is IExpandableContent)) {
+				ctr.Nodes.Insert(0, new HSpacer(20));
+			}
 			if (PropertyAttributes<TangerineStaticPropertyAttribute>.Get(editor.EditorParams.PropertyInfo) == null) {
 				var keyFunctionButton = new KeyFunctionButton {
 					LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0),
@@ -128,13 +131,13 @@ namespace Tangerine.UI.Inspector
 				};
 				keyFunctionButton.Clicked += editor.SetFocus;
 				keyframeButton.Clicked += editor.SetFocus;
-				ctr.Nodes.Insert(1, keyFunctionButton);
-				ctr.Nodes.Insert(2, keyframeButton);
-				ctr.Nodes.Insert(3, new HSpacer(4));
+				ctr.Nodes.Insert(2, keyFunctionButton);
+				ctr.Nodes.Insert(3, keyframeButton);
+				ctr.Nodes.Insert(4, new HSpacer(4));
 				ctr.Tasks.Add(new KeyframeButtonBinding(editor.EditorParams, keyframeButton));
 				ctr.Tasks.Add(new KeyFunctionButtonBinding(editor.EditorParams, keyFunctionButton));
 			} else {
-				ctr.Nodes.Insert(1, new HSpacer(42));
+				ctr.Nodes.Insert(2, new HSpacer(42));
 			}
 			editor.ContainerWidget.Padding = new Thickness { Left = 4, Top = 1, Right = 12, Bottom = 1 };
 			editor.ContainerWidget.CompoundPresenter.Add(new WidgetFlatFillPresenter(

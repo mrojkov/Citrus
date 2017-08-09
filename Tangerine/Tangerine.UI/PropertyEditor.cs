@@ -15,6 +15,12 @@ namespace Tangerine.UI
 		void SetFocus();
 		void DropFiles(IEnumerable<string> files);
 	}
+	
+	public interface IExpandableContent
+	{
+		Widget ExpandableContent { get; }
+		bool Expanded { get; set; }
+	}
 
 	public interface IPropertyEditorParams
 	{
@@ -72,6 +78,41 @@ namespace Tangerine.UI
 		private void SetProperty(object obj, string propertyName, object value) => PropertyInfo.SetValue(obj, value);
 	}
 
+	
+	public class ExpandablePropertyEditor<T> : CommonPropertyEditor<T>, IExpandableContent
+	{
+		private bool expanded;
+		public bool Expanded
+		{
+			get { return expanded; }
+			set
+			{
+				expanded = value;
+				ExpandButton.Expanded = value;
+				ExpandableContent.Visible = value;
+			}
+		}
+		public Widget ExpandableContent { get; }
+		public ThemedExpandButton ExpandButton { get; }
+		
+		public ExpandablePropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
+		{
+			ExpandableContent = new ThemedFrame {
+				Padding = new Thickness(4),
+				Layout = new VBoxLayout(),
+				Visible = false
+			};
+			ExpandButton = new ThemedExpandButton { MinMaxHeight = 8, MinMaxWidth = 8 };
+			ExpandButton.Clicked += () => Expanded = !Expanded;
+			editorParams.InspectorPane.AddNode(ExpandableContent);
+			ContainerWidget.Nodes.Insert(0, new Widget {
+				Padding =  new Thickness(5, 9),
+				Anchors = Anchors.Center,
+				Layout = new VBoxLayout {DefaultCell = new LayoutCell(Alignment.Center)},
+				Nodes = { ExpandButton } 
+			});
+		}
+	}
 	public class CommonPropertyEditor<T> : IPropertyEditor
 	{
 		public IPropertyEditorParams EditorParams { get; private set; }
@@ -102,7 +143,7 @@ namespace Tangerine.UI
 				ContainerWidget.AddNode(PropertyLabel);
 			}
 		}
-
+		
 		IEnumerator<object> ManageLabelTask()
 		{
 			while (true) {
@@ -490,7 +531,7 @@ namespace Tangerine.UI
 		public override void SetFocus() => editor.SetFocus();
 	}
 
-	public class Color4PropertyEditor : CommonPropertyEditor<Color4>
+	public class Color4PropertyEditor : ExpandablePropertyEditor<Color4>
 	{
 		private EditBox editor;
 
@@ -507,14 +548,13 @@ namespace Tangerine.UI
 				}
 			});
 			var panel = new ColorPickerPanel();
-			editorParams.InspectorPane.AddNode(panel.RootWidget);
-			panel.RootWidget.Visible = false;
-			panel.RootWidget.Padding.Right = 12;
-			panel.RootWidget.Tasks.Add(currentColor.Consume(v => panel.Color = v));
+			ExpandableContent.AddNode(panel.Widget);
+			panel.Widget.Padding.Right = 12;
+			panel.Widget.Tasks.Add(currentColor.Consume(v => panel.Color = v));
 			panel.Changed += () => SetProperty(panel.Color);
 			panel.DragStarted += Document.Current.History.BeginTransaction;
 			panel.DragEnded += Document.Current.History.EndTransaction;
-			colorBox.Clicked += () => panel.RootWidget.Visible = !panel.RootWidget.Visible;
+			colorBox.Clicked += () => Expanded = !Expanded;
 			var currentColorString = currentColor.Select(i => i.ToString(Color4.StringPresentation.Dec));
 			editor.Submitted += text => {
 				Color4 newColor;
@@ -822,6 +862,98 @@ namespace Tangerine.UI
 					bgColor = ColorTheme.Current.Basic.WhiteBackground;
 					borderColor = ColorTheme.Current.Basic.ControlBorder;
 				}
+			}
+		}
+	}
+
+	public class SkinningWeightsPropertyEditor : ExpandablePropertyEditor<SkinningWeights>
+	{
+		private readonly NumericEditBox[] indexEditors;
+		private readonly NumericEditBox[] weigthsEditors;
+		public SkinningWeightsPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
+		{
+			indexEditors = new NumericEditBox[4];
+			weigthsEditors = new NumericEditBox[4];
+			foreach (var o in editorParams.Objects) {
+				var prop = new Property<SkinningWeights>(o, editorParams.PropertyName).Value;
+				if (prop == null) {
+					editorParams.PropertySetter(o, editorParams.PropertyName, new SkinningWeights());
+				}
+			}
+			for (var i = 0; i <= 3; i++) {
+				indexEditors[i] = editorParams.NumericEditBoxFactory();
+				indexEditors[i].Step = 1;
+				weigthsEditors[i] = editorParams.NumericEditBoxFactory();
+				var wrapper = new Widget {
+					Padding = new Thickness { Left = 20 },
+					Layout = new HBoxLayout(),
+					LayoutCell = new LayoutCell { StretchY = 0 }
+				};
+				var propertyLabel = new ThemedSimpleText {
+					Text = $"Bone { char.ConvertFromUtf32(65 + i) }",
+					VAlignment = VAlignment.Center,
+					LayoutCell = new LayoutCell(Alignment.LeftCenter, 0),
+					ForceUncutText = false,
+					MinWidth = 140,
+					OverflowMode = TextOverflowMode.Minify,
+					HitTestTarget = true,
+					TabTravesable = new TabTraversable(),
+				};
+				wrapper.AddNode(propertyLabel);
+				wrapper.AddNode(new Widget {
+					Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center), Spacing = 4 },
+					Nodes = {
+						indexEditors[i] ,
+						weigthsEditors[i]
+					}
+				});
+				ExpandableContent.AddNode(wrapper);
+				SetLink(i, CoalescedPropertyValue(new SkinningWeights()));
+			}
+		}
+
+		private void SetLink(int idx, IDataflowProvider<SkinningWeights> provider)
+		{
+			var currentValue = provider.GetValue();
+			indexEditors[idx].Submitted += text => SetIndexValue(EditorParams, idx, indexEditors[idx], currentValue);
+			weigthsEditors[idx].Submitted += text => SetWeightValue(EditorParams, idx, weigthsEditors[idx], currentValue);
+			indexEditors[idx].AddChangeWatcher(provider, v => indexEditors[idx].Text = v[idx].Index.ToString());
+			weigthsEditors[idx].AddChangeWatcher(provider, v => weigthsEditors[idx].Text = v[idx].Weight.ToString());
+		}
+
+		public override void SetFocus() => indexEditors[0].SetFocus();
+
+		private void SetIndexValue(IPropertyEditorParams editorParams, int idx, CommonEditBox editor, SkinningWeights sw)
+		{
+			float newValue;
+			if (float.TryParse(editor.Text, out newValue)) {
+				foreach (var obj in editorParams.Objects) {
+					var prop = new Property<SkinningWeights>(obj, editorParams.PropertyName).Value.Clone();
+					prop[idx] = new BoneWeight {
+						Index = (int) newValue,
+						Weight = prop[idx].Weight
+					};
+					editorParams.PropertySetter(obj, editorParams.PropertyName, prop);
+				}
+			} else {
+				editor.Text = sw[idx].Index.ToString();
+			}
+		}
+
+		private void SetWeightValue(IPropertyEditorParams editorParams, int idx, CommonEditBox editor, SkinningWeights sw)
+		{
+			float newValue;
+			if (float.TryParse(editor.Text, out newValue)) {
+				foreach (var obj in editorParams.Objects) {
+					var prop = new Property<SkinningWeights>(obj, editorParams.PropertyName).Value.Clone();
+					prop[idx] = new BoneWeight {
+						Index = prop[idx].Index,
+						Weight = newValue
+					};
+					editorParams.PropertySetter(obj, editorParams.PropertyName, prop);
+				}
+			} else {
+				editor.Text = sw[idx].Weight.ToString();
 			}
 		}
 	}

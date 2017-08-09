@@ -232,6 +232,7 @@
     <Compile Include="Source\Widgets\Text\TextLineSplitter.cs" />
     <Compile Include="Source\Widgets\Text\TextRenderer.cs" />
     <Compile Include="Source\Widgets\Text\TextParser.cs" />
+    <Compile Include="Source\Widgets\Theme\ThemedExpandButton.cs" />
     <Compile Include="Source\Widgets\VSplitter.cs" />
     <Compile Include="Source\Widgets\WebBrowser\IWebBrowserImplementation.cs" />
     <Compile Include="Source\Widgets\WebBrowser\WebBrowser.Win.cs" />
