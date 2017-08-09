@@ -38,6 +38,7 @@ namespace Lime
 		public static readonly Color4 Yellow = new Color4(255, 255, 0, 255);
 		public static readonly Color4 Orange = new Color4(255, 128, 0, 255);
 		public static readonly Color4 Transparent = new Color4(255, 255, 255, 0);
+		public static readonly Color4 Zero = new Color4(0, 0, 0, 0);
 
 		public Color4(uint abgr)
 		{
