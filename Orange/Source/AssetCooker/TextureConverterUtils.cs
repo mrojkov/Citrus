@@ -18,7 +18,7 @@ namespace Orange
 			return new Bitmap(pixels, bitmap.Width, bitmap.Height);
 		}
 
-		private static void BleedAlpha(Color4[] image, int width, int height)
+		private static void BleedAlpha(Color4[] image, int width, int height, int radius = 8)
 		{
 			var processed = new bool[image.Length];
 			var pending = new List<int>(image.Length);
@@ -28,8 +28,7 @@ namespace Orange
 			for (int i = 0; i < image.Length; i++) {
 				if (image[i].A != 0) {
 					processed[i] = true;
-				}
-				else {
+				} else {
 					// Pend transparent pixel if it has any non-transparent adjacent pixel.
 					int x = i % width;
 					int y = i / width;
@@ -66,8 +65,7 @@ namespace Orange
 									g += color.G;
 									b += color.B;
 									count++;
-								}
-								else {
+								} else {
 									pendingNext.Add(index);
 								}
 							}
@@ -75,10 +73,15 @@ namespace Orange
 						if (count == 0) {
 							throw new InvalidOperationException("Pending pixel has no non-transparent adjacent pixel.");
 						}
-						image[i] = new Color4((byte) (r / count), (byte) (g / count), (byte) (b / count), 0);
+						if (radius > 0) {
+							image[i] = new Color4((byte) (r / count), (byte) (g / count), (byte) (b / count), 0);
+						} else {
+							image[i] = Color4.Zero;
+						}
 					}
 				}
 				Lime.Toolbox.Swap(ref pending, ref pendingNext);
+				radius--;
 			}
 		}
 
