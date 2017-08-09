@@ -39,8 +39,60 @@ namespace Tangerine.UI.SceneView
 			h.Connect(SceneViewCommands.DragDownFast, () => DragNodes(new Vector2(0, 5)));
 			h.Connect(SceneViewCommands.DragLeftFast, () => DragNodes(new Vector2(-5, 0)));
 			h.Connect(SceneViewCommands.DragRightFast, () => DragNodes(new Vector2(5, 0)));
-			h.Connect(SceneViewCommands.DisplayBones, () => DisplayBones());
+			h.Connect(SceneViewCommands.DisplayBones, DisplayBones);
+			h.Connect(SceneViewCommands.BindBones, BindBones);
 		}
+
+		private static void BindBones()
+		{
+			var bones = Document.Current.SelectedNodes().Editable().OfType<Bone>().ToList();
+			var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>().ToList();
+			if (widgets.Count == 0) {
+				return;
+			}
+			Document.Current.History.BeginTransaction();
+			try
+			{
+				foreach (var widget in widgets)
+				{
+					if (widget is DistortionMesh) {
+						var mesh = widget as DistortionMesh;
+						foreach (PointObject point in mesh.Nodes) {
+							Core.Operations.SetAnimableProperty.Perform(point, nameof(PointObject.SkinningWeights),
+								CalcSkinningWeight(point.CalcPositionInSpaceOf(widget.ParentWidget), point.SkinningWeights, bones));
+						}
+					} else {
+						Core.Operations.SetAnimableProperty.Perform(widget, nameof(PointObject.SkinningWeights),
+						CalcSkinningWeight(widget.Position, widget.SkinningWeights, bones));
+					}
+				}
+				foreach (var bone in bones)
+				{
+					var entry = bone.Parent.AsWidget.BoneArray[bone.Index];
+					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.RefPosition), entry.Joint);
+					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.RefLength), entry.Length);
+					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.RefRotation), entry.Rotation);
+				}
+			} finally {
+				Document.Current.History.EndTransaction();
+			}
+		}
+
+		private static SkinningWeights CalcSkinningWeight(Vector2 position, SkinningWeights skinningWeights, List<Bone> bones)
+		{
+			skinningWeights = skinningWeights == null ? new SkinningWeights() : skinningWeights.Clone();
+			var i = 0;
+			while (i < bones.Count && i < 4) {
+				var bone = bones[i];
+				skinningWeights[i] = new BoneWeight {
+					Weight = bone.CalcWeightForPoint(position),
+					Index = bone.Index
+				};
+				i++;
+			}
+			return skinningWeights;
+		}
+
 
 		private static void DisplayBones()
 		{

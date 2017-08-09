@@ -1,3 +1,4 @@
+using System;
 using Yuzu;
 
 namespace Lime
@@ -26,6 +27,38 @@ namespace Lime
 
 		[YuzuMember("3")]
 		public BoneWeight Bone3;
+
+		public BoneWeight this[int index]
+		{
+			get
+			{
+				if (index == 0) return Bone0;
+				if (index == 1) return Bone1;
+				if (index == 2) return Bone2;
+				if (index == 3) return Bone3;
+				throw new IndexOutOfRangeException();
+			}
+			set
+			{
+				switch (index) {
+					case 0: Bone0 = value; break;
+					case 1: Bone1 = value; break;
+					case 2: Bone2 = value; break;
+					case 3: Bone3 = value; break;
+					default: throw new IndexOutOfRangeException();
+				}
+			}
+		}
+
+		public SkinningWeights Clone()
+		{
+			return new SkinningWeights {
+				Bone0 = Bone0,
+				Bone1 = Bone1,
+				Bone2 = Bone2,
+				Bone3 = Bone3,
+			};
+		}
 	}
 
 	public class Bone : Node
@@ -87,6 +120,7 @@ namespace Lime
 			IKStopper = true;
 		}
 
+
 		protected override void SelfLateUpdate(float delta)
 		{
 			if (Index > 0 && Parent != null) {
@@ -125,6 +159,20 @@ namespace Lime
 				return eps < 0 ? -eps : eps;
 			else
 				return value;
+		}
+
+		public float CalcWeightForPoint(Vector2 point)
+		{
+			var entry = Parent.AsWidget.BoneArray[Index];
+			var a = entry.Joint;
+			var b = entry.Tip;
+			var distance = (float)Mathf.CalcDistanceToSegment(a, b, point);
+			if (distance < EffectiveRadius) {
+				return Mathf.HermiteSpline(distance / EffectiveRadius, 100, 0, 1, -1);
+			} else if (distance < EffectiveRadius + FadeoutZone) {
+				return Mathf.HermiteSpline((distance - EffectiveRadius) / FadeoutZone, 1, -1, 0, 0);
+			}
+			return 0;
 		}
 	}
 }
