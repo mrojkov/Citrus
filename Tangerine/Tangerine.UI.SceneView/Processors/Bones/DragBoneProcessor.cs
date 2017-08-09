@@ -40,7 +40,9 @@ namespace Tangerine.UI.SceneView
 		private IEnumerator<object> Drag(Bone bone, BoneArray.Entry entry, bool dragTip)
 		{
 			Document.Current.History.BeginTransaction();
+
 			try {
+				sv.Input.CaptureMouse();
 				var iniMousePos = sv.MousePosition;
 				var worldToLocal = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
 				while (sv.Input.IsMousePressed()) {
@@ -56,6 +58,7 @@ namespace Tangerine.UI.SceneView
 						var position = bone.WorldToLocalTransform * (entry.Joint + dragDelta - b.Tip);
 						Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.Position), position);
 					}
+					bone.Parent.Update(0);
 					yield return null;
 				}
 			} finally {

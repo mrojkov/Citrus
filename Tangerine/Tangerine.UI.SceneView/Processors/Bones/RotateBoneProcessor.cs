@@ -48,6 +48,7 @@ namespace Tangerine.UI.SceneView
 						rotation += RotatationHelper.WrapAngle(b.Atan2Deg - a.Atan2Deg);
 					}
 					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.Rotation), initRotation + rotation);
+					bone.Parent.Update(0);
 					yield return null;
 				}
 				yield return null;
