@@ -75,6 +75,7 @@
     <Compile Include="Presenters\PointObjectPresenter.cs" />
     <Compile Include="Processors\DragPointObjectsProcessor.cs" />
     <Compile Include="PreviewAnimationHandler.cs" />
+    <Compile Include="Processors\Bones\ChangeBoneRadiusProcessor.cs" />
     <Compile Include="Processors\PreviewAnimationProcessor.cs" />
     <Compile Include="Presenters\SplinePresenter.cs" />
     <Compile Include="Processors\CreatePointObjectProcessor.cs" />
