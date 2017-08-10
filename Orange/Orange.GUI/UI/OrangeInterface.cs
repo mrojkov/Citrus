@@ -206,12 +206,6 @@ namespace Orange
 			platformPicker.Reload();
 		}
 
-		public override void OnWorkspaceLoaded(WorkspaceConfig config)
-		{
-			updateVcs.CheckBox.Checked = config.UpdateBeforeBuild;
-			projectPicker.ChosenFile = config.CitrusProject;
-		}
-
 		public override void ClearLog()
 		{
 			textView.Clear();
@@ -278,6 +272,23 @@ namespace Orange
 				window.ClientSize = new Vector2(window.ClientSize.X - 150, window.ClientSize.Y);
 				pluginPanel = null;
 			}
+		}
+
+		public override void SaveToWorkspaceConfig(ref WorkspaceConfig config)
+		{
+			config.UpdateBeforeBuild = DoesNeedSvnUpdate();
+			config.ActiveTargetIndex = platformPicker.Index;
+		}
+
+		public override void LoadFromWorkspaceConfig(WorkspaceConfig config)
+		{
+			var newIndex = config.ActiveTargetIndex;
+			if (newIndex < 0 || newIndex >= platformPicker.Items.Count) {
+				newIndex = 0;
+			}
+			platformPicker.Index = newIndex;
+			updateVcs.CheckBox.Checked = config.UpdateBeforeBuild;
+			projectPicker.ChosenFile = config.CitrusProject;
 		}
 
 		private class TextViewWriter : TextWriter

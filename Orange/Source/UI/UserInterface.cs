@@ -32,8 +32,6 @@ namespace Orange
 
 		public virtual void ProcessPendingEvents() { }
 
-		public virtual void OnWorkspaceLoaded(WorkspaceConfig config) { }
-
 		public virtual void OnWorkspaceOpened() { }
 
 		public abstract bool DoesNeedSvnUpdate();
@@ -43,5 +41,9 @@ namespace Orange
 		public abstract void CreatePluginUI(IPluginUIBuilder builder);
 
 		public abstract void DestroyPluginUI();
+
+		public virtual void SaveToWorkspaceConfig(ref WorkspaceConfig config) { }
+
+		public virtual void LoadFromWorkspaceConfig(WorkspaceConfig config) { }
 	}
 }

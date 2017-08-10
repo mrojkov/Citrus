@@ -10,7 +10,7 @@ namespace Orange
 		public string CitrusProject = "";
 
 		[YuzuMember]
-		public int TargetPlatform;
+		public int ActiveTargetIndex;
 
 		[YuzuMember]
 		public bool UpdateBeforeBuild;

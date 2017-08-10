@@ -77,15 +77,14 @@ namespace Orange
 		{
 			var config = WorkspaceConfig.Load();
 			Open(config.CitrusProject);
-			The.UI.OnWorkspaceLoaded(config);
+			The.UI.LoadFromWorkspaceConfig(config);
 		}
 
 		public void Save()
 		{
 			var config = WorkspaceConfig.Load();
 			config.CitrusProject = ProjectFile;
-			config.TargetPlatform = (int)ActivePlatform;
-			config.UpdateBeforeBuild = The.UI.DoesNeedSvnUpdate();
+			The.UI.SaveToWorkspaceConfig(ref config);
 			WorkspaceConfig.Save(config);
 		}
 
