@@ -7,7 +7,6 @@ namespace Orange
 	{
 		public PlatformPicker()
 		{
-			Changed += args => SelectedTarget = (Target) args.Value;
 			Reload();
 		}
 
@@ -19,9 +18,11 @@ namespace Orange
 				Items.Add(new Item(target.Name, target));
 			}
 			Index = 0;
-			SelectedTarget = (Target) Items.First().Value;
 		}
 
-		public Target SelectedTarget { get; private set; }
+		public Target SelectedTarget
+		{
+			get => (Target)Items[Index].Value;
+		}
 	}
 }
