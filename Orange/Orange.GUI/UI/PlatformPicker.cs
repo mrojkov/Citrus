@@ -20,9 +20,6 @@ namespace Orange
 			Index = 0;
 		}
 
-		public Target SelectedTarget
-		{
-			get => (Target)Items[Index].Value;
-		}
+		public Target SelectedTarget => (Target)Items[Index].Value;
 	}
 }
