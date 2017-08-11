@@ -414,7 +414,6 @@ namespace Lime
 					}
 				}
 				if (!Command.Paste.IsConsumed()) {
-					Command.Paste.Enabled = !string.IsNullOrEmpty(Clipboard.Text);
 					if (Command.Paste.WasIssued())
 						InsertText(Clipboard.Text);
 				}
