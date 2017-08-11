@@ -1,5 +1,5 @@
 ﻿#if iOS
-using System;
+using UIKit;
 
 namespace Lime
 {
@@ -7,9 +7,15 @@ namespace Lime
 	{
 		public string Text
 		{
-			// TODO: Properly implement (Not implemented exception removed because of crunch)
-			get;
-			set;
+			get
+			{
+				return UIPasteboard.General.String ?? string.Empty;
+			}
+
+			set
+			{
+				UIPasteboard.General.String = value;
+			}
 		}
 	}
 }
