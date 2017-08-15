@@ -798,6 +798,17 @@ namespace Lime
 		{
 			base.RecalcDirtyGlobalsUsingParents();
 			// TODO: Optimize using DirtyMask
+			if (IsRenderedToTexture()) {
+				localToWorldTransform = CalcLocalToParentTransform();
+				if (Parent?.AsWidget != null) {
+					localToWorldTransform *= Parent.AsWidget.localToWorldTransform;
+				}
+				globalColor = color;
+				globalBlending = Blending.Inherited;
+				globalShader = ShaderId.Inherited;
+				globallyVisible = Visible && (color.A != 0 || RenderTransparentWidgets);
+				return;
+			}
 			globalColor = Color;
 			globalBlending = Blending;
 			globalShader = Shader;

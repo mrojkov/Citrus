@@ -442,30 +442,29 @@ namespace Tangerine.UI
 			editor.Submitted += SetProperty;
 			editor.AddChangeWatcher(CoalescedPropertyValue(), v => editor.Text = v);
 		}
-
 		public override void SetFocus() => editor.SetFocus();
 	}
 
 	public class EnumPropertyEditor<T> : CommonPropertyEditor<T>
 	{
-		private DropDownList selector;
+		public DropDownList Selector { get; }
 
 		public EnumPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
-			selector = editorParams.DropDownListFactory();
-			selector.LayoutCell = new LayoutCell(Alignment.Center);
-			ContainerWidget.AddNode(selector);
+			Selector = editorParams.DropDownListFactory();
+			Selector.LayoutCell = new LayoutCell(Alignment.Center);
+			ContainerWidget.AddNode(Selector);
 			var propType = editorParams.PropertyInfo.PropertyType;
 			var fields = propType.GetFields(BindingFlags.Public | BindingFlags.Static);
 			var allowedFields = fields.Where(f => !Attribute.IsDefined(f, typeof(TangerineIgnoreAttribute)));
 			foreach (var field in allowedFields) {
-				selector.Items.Add(new CommonDropDownList.Item(field.Name, field.GetValue(null)));
+				Selector.Items.Add(new CommonDropDownList.Item(field.Name, field.GetValue(null)));
 			}
-			selector.Changed += a => SetProperty((T)selector.Items[a.Index].Value);
-			selector.AddChangeWatcher(CoalescedPropertyValue(), v => selector.Value = v);
+			Selector.Changed += a => SetProperty((T)Selector.Items[a.Index].Value);
+			Selector.AddChangeWatcher(CoalescedPropertyValue(), v => Selector.Value = v);
 		}
 
-		public override void SetFocus() => selector.SetFocus();
+		public override void SetFocus() => Selector.SetFocus();
 	}
 
 	public class BooleanPropertyEditor : CommonPropertyEditor<bool>
@@ -955,6 +954,24 @@ namespace Tangerine.UI
 			} else {
 				editor.Text = sw[idx].Weight.ToString();
 			}
+		}
+	}
+	
+	public class RenderTargetPropertyEditor :  EnumPropertyEditor<RenderTarget>
+	{
+		private const string SmallTexDesc = " (256x256)";
+		private const string MiddleTexDesc = " (512x512)";
+		private const string LargeTexDesc = " (1024x1024)";
+		
+		public RenderTargetPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
+		{	
+			Selector.Items[1].Text += SmallTexDesc;
+			Selector.Items[2].Text += SmallTexDesc;
+			Selector.Items[3].Text += MiddleTexDesc;
+			Selector.Items[4].Text += LargeTexDesc;
+			Selector.Items[5].Text += LargeTexDesc;
+			Selector.Items[6].Text += LargeTexDesc;
+			Selector.Items[7].Text += LargeTexDesc;
 		}
 	}
 }

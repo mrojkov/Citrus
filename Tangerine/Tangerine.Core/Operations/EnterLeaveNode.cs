@@ -25,6 +25,8 @@ namespace Tangerine.Core.Operations
 			} else {
 				ChangeContainer(container, selectFirstNode);
 			}
+			container.SetTangerineFlag(TangerineFlags.DisplayContent, true);
+
 			return true;
 		}
 
@@ -51,6 +53,7 @@ namespace Tangerine.Core.Operations
 		public static void Perform()
 		{
 			var doc = Document.Current;
+			doc.Container.SetTangerineFlag(TangerineFlags.DisplayContent, false);
 			if (doc.Container == doc.RootNode) {
 				var path = doc.SceneNavigatedFrom;
 				if (path != null) {
