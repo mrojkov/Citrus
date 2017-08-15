@@ -62,14 +62,27 @@ namespace Tangerine.UI.SceneView
 		void RenderGizmo(Node3D node)
 		{
 			Renderer.Flush();
-			Renderer.World = node.GlobalTransform;
+			Renderer.World = CalcGizmoTransform(node.GlobalTransform, 100);
 			Renderer.CullMode = CullMode.CullClockwise;
 			PlatformRenderer.SetTexture(null, 0);
 			PlatformRenderer.SetTexture(null, 1);
 			PlatformRenderer.SetShader(ShaderId.Diffuse, null);
 			PlatformRenderer.DrawTriangles(gizmo, 0, gizmo.IndexBuffer.Data.Length);
 		}
-			
+
+		Matrix44 CalcGizmoTransform(Matrix44 modelGlobalTransform, float gizmoRadiusInPixels)
+		{
+			var viewport = GetCurrentViewport3D();
+			var camera = viewport.Camera;
+			Vector3 scale, translation;
+			Quaternion rotation;
+			modelGlobalTransform.Decompose(out scale, out rotation, out translation);
+			float distance = (camera.Position - translation).Length;
+			var vfov = camera.FieldOfView / camera.AspectRatio;
+			float s = gizmoRadiusInPixels * distance  * (2 * (float)Math.Tan(vfov / 2) / viewport.Height);
+			return Matrix44.CreateRotation(rotation) * Matrix44.CreateScale(s, s, s) * Matrix44.CreateTranslation(translation);
+		}
+
 		static IMesh gizmo = CreateTranslationGizmo();
 
 		static IMesh CreateTranslationGizmo()
@@ -83,7 +96,7 @@ namespace Tangerine.UI.SceneView
 		static IMesh CreateArrow(Matrix44 matrix, Color4 color)
 		{
 			const float tipHeight = 0.25f;
-			const float tipRadius = 0.075f;
+			const float tipRadius = 0.06f;
 			const float poleRadius = 0.01f;
 			var tip = Mesh.CreateCone(tipHeight, tipRadius, 20, color);
 			TransformMesh(tip, Matrix44.CreateTranslation(0, 1 - tipHeight, 0));
