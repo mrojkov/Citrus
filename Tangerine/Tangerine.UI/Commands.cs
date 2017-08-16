@@ -37,6 +37,7 @@ namespace Tangerine.UI
 		public static readonly ICommand Open = new Command("Open", new Shortcut(Modifiers.Command, Key.O));
 		public static readonly ICommand Save = new Command("Save", new Shortcut(Modifiers.Command, Key.S));
 		public static readonly ICommand SaveAs = new Command("Save As", new Shortcut(Modifiers.Command | Modifiers.Shift, Key.S));
+		public static readonly ICommand Revert = new Command("Revert", new Shortcut(Modifiers.Command, Key.R));
 		public static readonly ICommand UpgradeDocumentFormat = new Command("Upgrade Document Format (.tan)");
 		public static readonly ICommand OpenProject = new Command("Open Project...", new Shortcut(Modifiers.Command | Modifiers.Shift, Key.O));
 		public static readonly ICommand PreferencesDialog = new Command("Preferences...", new Shortcut(Modifiers.Command, Key.P));

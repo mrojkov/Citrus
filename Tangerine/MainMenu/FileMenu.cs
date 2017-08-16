@@ -103,6 +103,16 @@ namespace Tangerine
 		}
 	}
 
+	public class FileRevert : DocumentCommandHandler
+	{
+		public override void Execute()
+		{
+			if (new AlertDialog($"Are you sure you want to revert \"{Document.Current.Path}\"?", "Yes", "Cancel").Show() == 0) {
+				Project.Current.RevertDocument(Document.Current);
+			}
+		}
+	}
+
 	public class FileSaveAs : DocumentCommandHandler
 	{
 		public override void Execute()

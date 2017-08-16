@@ -255,6 +255,7 @@ namespace Tangerine
 					Command.MenuSeparator,
 					GenericCommands.Save,
 					GenericCommands.SaveAs,
+					GenericCommands.Revert,
 					GenericCommands.UpgradeDocumentFormat,
 					Command.MenuSeparator,
 #if !MAC
@@ -353,6 +354,7 @@ namespace Tangerine
 			h.Connect(GenericCommands.OpenProject, new FileOpenProject());
 			h.Connect(GenericCommands.Save, new FileSave());
 			h.Connect(GenericCommands.SaveAs, new FileSaveAs());
+			h.Connect(GenericCommands.Revert, new FileRevert());
 			h.Connect(GenericCommands.UpgradeDocumentFormat, new UpgradeDocumentFormat());
 			h.Connect(GenericCommands.CloseDocument, new FileClose());
 			h.Connect(GenericCommands.Quit, Application.Exit);
