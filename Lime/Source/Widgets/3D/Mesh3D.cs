@@ -117,6 +117,7 @@ namespace Lime
 				sm.Material.ColorFactor = GlobalColor;
 				sm.Material.Apply();
 				PlatformRenderer.DrawTriangles(sm.Mesh, 0, sm.Mesh.IndexBuffer.Data.Length);
+				Renderer.PolyCount3d += sm.Mesh.IndexBuffer.Data.Length / 3;
 			}
 		}
 

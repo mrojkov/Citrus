@@ -121,6 +121,7 @@ namespace Lime
 		public static int RenderCycle { get; private set; }
 		public static bool PremultipliedAlphaMode;
 		public static int DrawCalls = 0;
+		public static int PolyCount3d = 0;
 		public static readonly RenderList MainRenderList = new RenderList();
 		public static RenderList CurrentRenderList;
 #if ANDROID
@@ -290,6 +291,7 @@ namespace Lime
 		{
 			PlatformRenderer.BeginFrame();
 			DrawCalls = 0;
+			PolyCount3d = 0;
 			Blending = Blending.None;
 			Shader = ShaderId.None;
 			CullMode = CullMode.None;
