@@ -27,9 +27,7 @@ namespace Tangerine.UI.SceneView
 			}));
 
 			const float deviceHeight = 768;
-			const float deviceWidth1 = 1366;
-			const float deviceWidth2 = 1152;
-			const float deviceWidth3 = 1024;
+			float[] deviceWidths = { 1366, 1152, 1024, 1579 };
 			sceneView.Scene.CompoundPostPresenter.Push(
 				new DelegatePresenter<Widget>(
 					(w) => {
@@ -38,27 +36,11 @@ namespace Tangerine.UI.SceneView
 							root.PrepareRendererState();
 							var mtx = root.LocalToWorldTransform;
 							var t1 = 1 / mtx.U.Length;
-							var t2 = 1 / mtx.V.Length;
 							Renderer.Transform1 = mtx;
 							var rootCenter = root.Size * 0.5f;
-							var a1 = new Vector2(deviceWidth1, deviceHeight) * 0.5f + rootCenter;
-							var b1 = new Vector2(deviceWidth1, deviceHeight) * -0.5f + rootCenter;
-							var a2 = new Vector2(deviceHeight, deviceWidth1) * 0.5f + rootCenter;
-							var b2 = new Vector2(deviceHeight, deviceWidth1) * -0.5f + rootCenter;
-							var a3 = new Vector2(deviceWidth2, deviceHeight) * 0.5f + rootCenter;
-							var b3 = new Vector2(deviceWidth2, deviceHeight) * -0.5f + rootCenter;
-							var a4 = new Vector2(deviceHeight, deviceWidth2) * 0.5f + rootCenter;
-							var b4 = new Vector2(deviceHeight, deviceWidth2) * -0.5f + rootCenter;
-							var a5 = new Vector2(deviceWidth3, deviceHeight) * 0.5f + rootCenter;
-							var b5 = new Vector2(deviceWidth3, deviceHeight) * -0.5f + rootCenter;
-							var a6 = new Vector2(deviceHeight, deviceWidth3) * 0.5f + rootCenter;
-							var b6 = new Vector2(deviceHeight, deviceWidth3) * -0.5f + rootCenter;
-							Renderer.DrawRectOutline(a1, b1, Color4.White, t1);
-							Renderer.DrawRectOutline(a2, b2, Color4.White, t1);
-							Renderer.DrawRectOutline(a3, b3, Color4.White, t1);
-							Renderer.DrawRectOutline(a4, b4, Color4.White, t1);
-							Renderer.DrawRectOutline(a5, b5, Color4.White, t1);
-							Renderer.DrawRectOutline(a6, b6, Color4.White, t1);
+							foreach (var width in deviceWidths) {
+								SetAndRenderOverlay(width, deviceHeight, rootCenter, t1);
+							}
 						}
 					}));
 
@@ -77,6 +59,16 @@ namespace Tangerine.UI.SceneView
 					Renderer.DrawLine(new Vector2(-inf, ctr.Height), new Vector2(inf, ctr.Height), c, t2);
 				}
 			}));
+		}
+
+		private static void SetAndRenderOverlay(float width, float height, Vector2 rootCenter, float thickness)
+		{
+			var a1 = new Vector2(width, height) * 0.5f + rootCenter;
+			var b1 = new Vector2(width, height) * -0.5f + rootCenter;
+			var a2 = new Vector2(height, width) * 0.5f + rootCenter;
+			var b2 = new Vector2(height, width) * -0.5f + rootCenter;
+			Renderer.DrawRectOutline(a1, b1, Color4.White, thickness);
+			Renderer.DrawRectOutline(a2, b2, Color4.White, thickness);
 		}
 	}
 }
