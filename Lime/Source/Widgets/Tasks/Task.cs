@@ -90,7 +90,9 @@ namespace Lime
 					waitPredicate = null;
 				}
 				if (callStack.Enumerator.MoveNext()) {
-					HandleYieldedResult(callStack.Enumerator.Current);
+					if (callStack != null) {
+						HandleYieldedResult(callStack.Enumerator.Current);
+					}
 				} else if (callStack != null) {
 					callStack = callStack.Caller;
 					if (callStack != null) {
