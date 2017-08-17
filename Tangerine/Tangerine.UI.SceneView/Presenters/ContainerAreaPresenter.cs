@@ -6,22 +6,29 @@ namespace Tangerine.UI.SceneView
 {
 	public class ContainerAreaPresenter
 	{
+		private const float ChessCellSize = 50;
+
 		public ContainerAreaPresenter(SceneView sceneView)
 		{
-			const float inf = 1000000f;
+			var backgroundTexture = PrepareChessTexture(Color4.Gray, Color4.Gray.Darken(0.15f));
 			sceneView.Scene.CompoundPresenter.Push(new DelegatePresenter<Widget>(w => {
-				var ctr = Core.Document.Current.Container as Widget;
+				var ctr = SceneView.Instance.Frame;
 				if (ctr != null) {
 					ctr.PrepareRendererState();
 					if (Core.Document.Current.PreviewAnimation) {
-						Renderer.DrawRect(new Vector2(-inf, -inf), new Vector2(inf, inf), Color4.Black);
+						Renderer.DrawRect(Vector2.Zero, ctr.Size, Color4.Black);
 					} else {
-						var c = ColorTheme.Current.SceneView.ContainerOuterSpace;
-						Renderer.DrawRect(new Vector2(-inf, -inf), new Vector2(inf, 0), c);
-						Renderer.DrawRect(new Vector2(-inf, ctr.Height), new Vector2(inf, inf), c);
-						Renderer.DrawRect(new Vector2(-inf, 0), new Vector2(0, ctr.Height), c);
-						Renderer.DrawRect(new Vector2(ctr.Width, 0), new Vector2(inf, ctr.Height), c);
-						Renderer.DrawRect(Vector2.Zero, ctr.Size, ColorTheme.Current.SceneView.ContainerInnerSpace);
+						var ratio = ChessCellSize * sceneView.Scene.Scale;
+						Renderer.DrawSprite(
+							backgroundTexture,
+							Color4.White,
+							Vector2.Zero,
+							ctr.Size,
+							-sceneView.Scene.Position / ratio,
+							 (ctr.Size - sceneView.Scene.Position) / ratio);
+						var root = Core.Document.Current.RootNode as Widget;
+						Renderer.Transform1 = root.LocalToWorldTransform;
+						Renderer.DrawRect(Vector2.Zero, root.Size, Color4.White.Transparentify(0.8f));
 					}
 				}
 			}));
@@ -63,20 +70,30 @@ namespace Tangerine.UI.SceneView
 					}));
 
 			sceneView.Scene.CompoundPostPresenter.Push(new DelegatePresenter<Widget>(w => {
-				var ctr = Core.Document.Current.Container as Widget;
-				if (ctr != null && !Core.Document.Current.PreviewAnimation) {
-					ctr.PrepareRendererState();
+				var frame = SceneView.Instance.Frame;
+				if (frame != null && !Core.Document.Current.PreviewAnimation) {
+					frame.PrepareRendererState();
 					var c = ColorTheme.Current.SceneView.ContainerBorder;
-					var mtx = ctr.LocalToWorldTransform;
+					var mtx = frame.LocalToWorldTransform;
 					var t1 = 1 / mtx.U.Length;
 					var t2 = 1 / mtx.V.Length;
 					Renderer.Transform1 = mtx;
-					Renderer.DrawLine(new Vector2(0, -inf), new Vector2(0, inf), c, t1);
-					Renderer.DrawLine(new Vector2(ctr.Width, -inf), new Vector2(ctr.Width, inf), c, t1);
-					Renderer.DrawLine(new Vector2(-inf, 0), new Vector2(inf, 0), c, t2);
-					Renderer.DrawLine(new Vector2(-inf, ctr.Height), new Vector2(inf, ctr.Height), c, t2);
+					var rect = (Core.Document.Current.Container as Widget).CalcAABBInSpaceOf(SceneView.Instance.Frame);
+					Renderer.DrawLine(new Vector2(0, rect.A.Y), new Vector2(frame.Size.X, rect.A.Y), c, t1);
+					Renderer.DrawLine(new Vector2(0, rect.B.Y), new Vector2(frame.Size.X, rect.B.Y), c, t1);
+					Renderer.DrawLine(new Vector2(rect.A.X, 0), new Vector2(rect.A.X, frame.Size.Y), c, t2);
+					Renderer.DrawLine(new Vector2(rect.B.X, 0), new Vector2(rect.B.X, frame.Size.Y), c, t2);
 				}
 			}));
+		}
+
+		private ITexture PrepareChessTexture(Color4 color1, Color4 color2)
+		{
+			var chessTexture = new Texture2D();
+			chessTexture.LoadImage(new[] { color1, color2, color2, color1 }, 2, 2);
+			chessTexture.WrapModeV = chessTexture.WrapModeU = TextureWrapMode.Repeat;
+			chessTexture.MinFilter = chessTexture.MagFilter = TextureFilter.Nearest;
+			return chessTexture;
 		}
 	}
 }
