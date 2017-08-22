@@ -445,7 +445,20 @@ namespace Orange
 			var initialAtlasId = 0;
 			foreach (var kv in items) {
 				if (kv.Value.Any()) {
-					initialAtlasId = PackItemsToAtlasWithBestSize(atlasChain, kv.Value, kv.Key, initialAtlasId);
+					if (Platform == TargetPlatform.iOS) {
+						Predicate<PVRFormat> isRequireSquare = (format) => {
+							return
+								format == PVRFormat.PVRTC2 ||
+								format == PVRFormat.PVRTC4 ||
+								format == PVRFormat.PVRTC4_Forced;
+						};
+						var square = kv.Value.Where(item => isRequireSquare(item.CookingRules.PVRFormat)).ToList();
+						var nonSquare = kv.Value.Where(item => !isRequireSquare(item.CookingRules.PVRFormat)).ToList();
+						initialAtlasId = PackItemsToAtlas(atlasChain, square, kv.Key, initialAtlasId, true);
+						initialAtlasId = PackItemsToAtlas(atlasChain, nonSquare, kv.Key, initialAtlasId, false);
+					} else {
+						initialAtlasId = PackItemsToAtlas(atlasChain, kv.Value, kv.Key, initialAtlasId, false);
+					}
 					foreach (var item in kv.Value) {
 						item.Bitmap.Dispose();
 					}
@@ -460,8 +473,8 @@ namespace Orange
 			}
 		}
 
-		private static int PackItemsToAtlasWithBestSize(string atlasChain, List<AtlasItem> items,
-			AtlasOptimization atlasOptimization, int initialAtlasId)
+		private static int PackItemsToAtlas(string atlasChain, List<AtlasItem> items,
+			AtlasOptimization atlasOptimization, int initialAtlasId, bool squareAtlas)
 		{
 			// Sort images in descending size order
 			items.Sort((x, y) => {
@@ -470,11 +483,6 @@ namespace Orange
 				return b - a;
 			});
 
-			// PVRTC2/4 textures must be square
-			var squareAtlas = (Platform == TargetPlatform.iOS) && items.Any(
-				i => i.CookingRules.PVRFormat == PVRFormat.PVRTC4 ||
-					i.CookingRules.PVRFormat == PVRFormat.PVRTC4_Forced ||
-					i.CookingRules.PVRFormat == PVRFormat.PVRTC2);
 			var atlasId = initialAtlasId;
 			while (items.Count > 0) {
 				if (atlasId >= MaxAtlasChainLength) {
