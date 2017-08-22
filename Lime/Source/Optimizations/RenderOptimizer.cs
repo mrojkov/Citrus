@@ -6,7 +6,9 @@ namespace Lime.RenderOptimizer
 	public class RenderOptimizer
 	{
 		private static readonly List<Type> simpleWidgetTypes = new List<Type>() {
-			typeof(Image)
+			typeof(Image),
+			typeof(SimpleText),
+			typeof(RichText),
 		};
 
 		private readonly Widget viewWidget;
