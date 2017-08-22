@@ -53,16 +53,16 @@ namespace Lime.RenderOptimizer
 				}
 			}
 
-			Dictionary<Node, ContentSizeComponent> childsContent = null;
+			Dictionary<Node, ContentSizeComponent> childrenContent = null;
 			if (node.Nodes.Count > 0) {
 				var existsNonOptimizable = false;
-				childsContent = new Dictionary<Node, ContentSizeComponent>();
+				childrenContent = new Dictionary<Node, ContentSizeComponent>();
 				for (var i = 0; i < node.Nodes.Count; i++) {
 					var child = node.Nodes[i];
 					var childContent = ProcessContentSize(child);
 					if (childContent != null) {
 						if (!childContent.IsEmpty) {
-							childsContent.Add(child, childContent);
+							childrenContent.Add(child, childContent);
 						}
 					} else {
 						existsNonOptimizable = true;
@@ -73,16 +73,20 @@ namespace Lime.RenderOptimizer
 				}
 			}
 
-			if (childsContent == null || childsContent.Count == 0) {
-				return node is Widget || node.RenderChainBuilder == null ? ProcessEmptyNode(node) : null;
+			if (childrenContent == null || childrenContent.Count == 0) {
+				if (node is Widget) {
+					return ProcessSimpleWidget(node as Widget);
+				} else {
+					return node.RenderChainBuilder == null ? ProcessEmptyNode(node) : null;
+				}
 			}
 			var viewport = node as Viewport3D;
 			if (viewport != null) {
-				return ProcessViewport(viewport, childsContent);
+				return ProcessViewport(viewport, childrenContent);
 			}
 			var widget = node as Widget;
 			if (widget != null) {
-				return ProcessWidget(widget, childsContent);
+				return ProcessWidget(widget, childrenContent);
 			}
 			var widgetAdapter = node as WidgetAdapter3D;
 			if (widgetAdapter != null) {
@@ -90,7 +94,7 @@ namespace Lime.RenderOptimizer
 			}
 			var node3D = node as Node3D;
 			if (node3D != null) {
-				return ProcessNode3D(node3D, childsContent);
+				return ProcessNode3D(node3D, childrenContent);
 			}
 			return null;
 		}
@@ -121,10 +125,10 @@ namespace Lime.RenderOptimizer
 			return selfSize;
 		}
 
-		private static ContentSizeComponent ProcessWidget(Widget widget, Dictionary<Node, ContentSizeComponent> childs)
+		private static ContentSizeComponent ProcessWidget(Widget widget, Dictionary<Node, ContentSizeComponent> children)
 		{
 			var animationDuration = 0;
-			foreach (var child in childs) {
+			foreach (var child in children) {
 				var childWidget = (Widget)child.Key;
 				foreach (var animator in childWidget.Animators) {
 					animationDuration = Math.Max(animationDuration, animator.Duration);
@@ -137,7 +141,7 @@ namespace Lime.RenderOptimizer
 			var isEmpty = true;
 			for (var frame = 0; frame <= animationDuration; frame++) {
 				widget.DefaultAnimation.Frame = frame;
-				foreach (var child in childs) {
+				foreach (var child in children) {
 					var childWidget = (Widget)child.Key;
 					if (!childWidget.Visible || childWidget.Color.A == 0) {
 						continue;
@@ -273,13 +277,13 @@ namespace Lime.RenderOptimizer
 			return selfSize;
 		}
 
-		private static ContentSizeComponent ProcessNode3D(Node3D node3D, Dictionary<Node, ContentSizeComponent> childs)
+		private static ContentSizeComponent ProcessNode3D(Node3D node3D, Dictionary<Node, ContentSizeComponent> children)
 		{
 			// TODO: Content size for 3D nodes
 			return null;
 		}
 
-		private static ContentSizeComponent ProcessViewport(Viewport3D viewport, Dictionary<Node, ContentSizeComponent> childs)
+		private static ContentSizeComponent ProcessViewport(Viewport3D viewport, Dictionary<Node, ContentSizeComponent> children)
 		{
 			// TODO: Content size for viewports
 			return null;
