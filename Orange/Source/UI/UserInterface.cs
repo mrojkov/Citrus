@@ -12,6 +12,7 @@ namespace Orange
 		public virtual void Initialize()
 		{
 			var w = new Lime.DummyWindow();
+			var windowWidget = new Lime.WindowWidget(w);
 		}
 
 		public virtual void ClearLog() { }

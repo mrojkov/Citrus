@@ -17,7 +17,7 @@ namespace Lime
 		public Vector2 MinimumDecoratedSize { get; set; }
 		public Vector2 MaximumDecoratedSize { get; set; }
 		public bool Visible { get; set; }
-		public Input Input { get; set; }
+		public Input Input { get; set; } = new Input();
 		public float FPS { get; set; }
 		public IDisplay Display { get; }
 		public float CalcFPS()
