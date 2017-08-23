@@ -772,10 +772,6 @@ namespace Lime
 			p.RegularPosition += velocity * delta * direction;
 			p.Angle += p.Spin * modifier.Spin * delta;
 			p.ScaleCurrent = p.ScaleInitial * modifier.Scale;
-			if (modifier.AspectRatio != 1f) {
-				p.ScaleCurrent.X *= modifier.AspectRatio;
-				p.ScaleCurrent.Y /= Math.Max(0.0001f, modifier.AspectRatio);
-			}
 			p.ColorCurrent = p.ColorInitial * modifier.Color;
 			p.MagnetAmountCurrent = p.MagnetAmountInitial * modifier.MagnetAmount;
 			ApplyMagnetsToParticle(p, delta);
@@ -812,8 +808,9 @@ namespace Lime
 			if (AlongPathOrientation) {
 				angle += p.FullDirection;
 			}
-			ITexture texture = modifiers[p.ModifierIndex].GetTexture((int)p.TextureIndex - 1);
-			var imageSize = (Vector2)texture.ImageSize;
+			var m = modifiers[p.ModifierIndex];
+			ITexture texture = m.GetTexture((int)p.TextureIndex - 1);
+			var imageSize = m.Size;
 			var particleSize = p.ScaleCurrent * imageSize;
 			var orientation = Vector2.CosSinRough(angle * Mathf.DegToRad);
 			var perpendicularOrientation = new Vector2(-orientation.Y, orientation.X);

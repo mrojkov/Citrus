@@ -544,8 +544,12 @@ namespace Orange
 			WriteProperty("LastFrame", node.LastFrame, 1);
 			WriteProperty("LoopedAnimation", node.LoopedAnimation, true);
 			WriteProperty("AnimationFPS", node.AnimationFps, 20f);
-			WriteProperty("Scale", node.Scale, 1f);
-			WriteProperty("AspectRatio", node.AspectRatio, 1f);
+			var originalSize = node.Texture.ImageSize;
+			var trueScale = node.Size / (Vector2)originalSize * node.Scale;
+			var ar = Mathf.Sqrt(trueScale.X / trueScale.Y);
+			var scale = trueScale.Y * ar;
+			WriteProperty("Scale", scale, 1f);
+			WriteProperty("AspectRatio", ar, 1f);
 			WriteProperty("Velocity", node.Velocity, 1f);
 			WriteProperty("WindAmount", node.WindAmount, 1f);
 			WriteProperty("GravityAmount", node.GravityAmount, 1f);

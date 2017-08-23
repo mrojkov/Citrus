@@ -8,10 +8,10 @@ namespace Lime
 	public class ParticleModifier : Node
 	{
 		[YuzuMember]
-		public float Scale { get; set; }
+		public Vector2 Size { get; set; }
 
 		[YuzuMember]
-		public float AspectRatio { get; set; }
+		public Vector2 Scale { get; set; }
 
 		[YuzuMember]
 		public float Velocity { get; set; }
@@ -53,8 +53,8 @@ namespace Lime
 		public ParticleModifier()
 		{
 			RenderChainBuilder = null;
-			Scale = 1;
-			AspectRatio = 1;
+			Size = Widget.DefaultWidgetSize;
+			Scale = Vector2.One;
 			Velocity = 1;
 			Spin = 1;
 			AngularVelocity = 1;
