@@ -192,8 +192,8 @@ namespace Orange
 			}
 
 			if (exportedCount != importedCount) {
-				throw new Exception(
-					$"WARNING: Plugin composition missmatch found.\nThe given assemblies defines [{exportedCount}] " +
+				Console.WriteLine(
+					$"WARNING: Plugin composition mismatch found.\nThe given assemblies defines [{exportedCount}] " +
 					$"exports, but only [{importedCount}] has been imported.\nPlease check export contracts.\n");
 			}
 		}
