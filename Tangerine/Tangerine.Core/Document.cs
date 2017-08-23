@@ -340,11 +340,18 @@ namespace Tangerine.Core
 
 		public IEnumerable<Node> SelectedNodes()
 		{
+			Node prevNode = null;
 			foreach (var row in Rows) {
 				if (row.Selected) {
 					var nr = row.Components.Get<NodeRow>();
 					if (nr != null) {
 						yield return nr.Node;
+						prevNode = nr.Node;
+					}
+					var pr = row.Components.Get<PropertyRow>();
+					if (pr != null && pr.Node != prevNode) {
+						yield return pr.Node;
+						prevNode = pr.Node;
 					}
 				}
 			}
