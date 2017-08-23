@@ -128,9 +128,8 @@ namespace Lime.RenderOptimizer
 		private static ContentSizeComponent ProcessWidget(Widget widget, Dictionary<Node, ContentSizeComponent> children)
 		{
 			var animationDuration = 0;
-			foreach (var child in children) {
-				var childWidget = (Widget)child.Key;
-				foreach (var animator in childWidget.Animators) {
+			foreach (var child in widget.Nodes) {
+				foreach (var animator in child.Animators) {
 					animationDuration = Math.Max(animationDuration, animator.Duration);
 				}
 			}
@@ -141,6 +140,7 @@ namespace Lime.RenderOptimizer
 			var isEmpty = true;
 			for (var frame = 0; frame <= animationDuration; frame++) {
 				widget.DefaultAnimation.Frame = frame;
+				widget.Update(0);
 				foreach (var child in children) {
 					var childWidget = (Widget)child.Key;
 					if (!childWidget.Visible || childWidget.Color.A == 0) {
