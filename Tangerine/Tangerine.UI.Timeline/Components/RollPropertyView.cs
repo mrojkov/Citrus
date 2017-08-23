@@ -19,7 +19,7 @@ namespace Tangerine.UI.Timeline.Components
 		{
 			this.row = row;
 			propRow = row.Components.Get<PropertyRow>();
-			label = new SimpleText { Text = propRow.Animator.TargetProperty };
+			label = new ThemedSimpleText { Text = propRow.Animator.TargetProperty };
 			propIcon = new Image {
 				LayoutCell = new LayoutCell(Alignment.Center),
 				Texture = IconPool.GetTexture("Nodes.Unknown"),
@@ -37,6 +37,9 @@ namespace Tangerine.UI.Timeline.Components
 					new HSpacer(3),
 					label,
 					new Widget(),
+					CreateLockAnimationButton(),
+					new HSpacer(Theme.Metrics.DefaultToolbarButtonSize.X),
+					new HSpacer(Theme.Metrics.DefaultToolbarButtonSize.X)
 				},
 			};
 			widget.CompoundPresenter.Push(new DelegatePresenter<Widget>(RenderBackground));
@@ -49,6 +52,19 @@ namespace Tangerine.UI.Timeline.Components
 			button.AddChangeWatcher(() => s.CurvesShown, 
 				i => button.Texture = IconPool.GetTexture(i ? "Timeline.Expanded" : "Timeline.Collapsed"));
 			button.Clicked += () => Core.Operations.SetProperty.Perform(s, nameof(AnimatorEditorState.CurvesShown), !s.CurvesShown);
+			return button;
+		}
+
+		ToolbarButton CreateLockAnimationButton()
+		{
+			var button = new ToolbarButton { Highlightable = false };
+			button.AddChangeWatcher(
+				() => propRow.Animator.Enabled,
+				i => button.Texture = IconPool.GetTexture(i ? "Timeline.AnimationEnabled" : "Timeline.AnimationDisabled")
+			);
+			button.Clicked += () => {
+				Core.Operations.SetProperty.Perform(propRow.Animator, nameof(IAnimator.Enabled), !propRow.Animator.Enabled);
+			};
 			return button;
 		}
 

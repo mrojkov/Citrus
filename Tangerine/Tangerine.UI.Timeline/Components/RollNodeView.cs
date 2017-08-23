@@ -19,6 +19,7 @@ namespace Tangerine.UI.Timeline.Components
 		protected readonly ToolbarButton expandButton;
 		protected readonly ToolbarButton eyeButton;
 		protected readonly ToolbarButton lockButton;
+		protected readonly ToolbarButton lockAnimationButton;
 		readonly Widget spacer;
 
 		public RollNodeView(Row row)
@@ -48,6 +49,7 @@ namespace Tangerine.UI.Timeline.Components
 			enterButton = NodeCompositionValidator.CanHaveChildren(nodeData.Node.GetType()) ? CreateEnterButton() : null;
 			eyeButton = CreateEyeButton();
 			lockButton = CreateLockButton();
+			lockAnimationButton = CreateLockAnimationButton();
 			widget = new Widget {
 				Padding = new Thickness { Left = 4, Right = 2 },
 				MinHeight = TimelineMetrics.DefaultRowHeight,
@@ -62,6 +64,7 @@ namespace Tangerine.UI.Timeline.Components
 					editBox,
 					new Widget(),
 					(Widget)enterButton ?? (Widget)new HSpacer(Theme.Metrics.DefaultToolbarButtonSize.X),
+					lockAnimationButton,
 					eyeButton,
 					lockButton,
 				}
@@ -127,6 +130,57 @@ namespace Tangerine.UI.Timeline.Components
 			);
 			button.Clicked += () => Core.Operations.SetProperty.Perform(nodeData, nameof(NodeRow.Locked), !nodeData.Locked);
 			return button;
+		}
+
+		ToolbarButton CreateLockAnimationButton()
+		{
+			var button = new ToolbarButton { Highlightable = false };
+			button.AddChangeWatcher(
+				() => GetAnimationState(nodeData.Node),
+				i => {
+					var texture = "Timeline.Empty";
+					if (i == AnimationState.Enabled) 
+						texture = "Timeline.AnimationEnabled";
+					else if (i == AnimationState.PartiallyEnabled)
+						texture = "Timeline.AnimationPartiallyEnabled";
+					else if (i == AnimationState.Disabled)
+						texture = "Timeline.AnimationDisabled";
+					button.Texture = IconPool.GetTexture(texture);
+				}
+			);
+			button.Clicked += () => {
+				var enabled = GetAnimationState(nodeData.Node) == AnimationState.Enabled;
+				foreach (var a in nodeData.Node.Animators) {
+					Core.Operations.SetProperty.Perform(a, nameof(IAnimator.Enabled), !enabled);
+				}
+			};
+			return button;
+		}
+
+		enum AnimationState
+		{
+			None,
+			Enabled,
+			PartiallyEnabled,
+			Disabled
+		}
+
+		static AnimationState GetAnimationState(IAnimable animable)
+		{
+			var animators = animable.Animators;
+			if (animators.Count == 0) 
+				return AnimationState.None;
+			int enabled = 0;
+			foreach (var a in animators.AsArray) {
+				if (a.Enabled)
+					enabled++;
+			}
+			if (enabled == 0)
+				return AnimationState.Disabled;
+			else if (enabled == animators.Count) 
+				return AnimationState.Enabled;
+			else
+				return AnimationState.PartiallyEnabled;
 		}
 
 		ToolbarButton CreateExpandButton()

@@ -68,6 +68,10 @@
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Spline3D.png" />
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.SplinePoint3D.png" />
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.SplineGear3D.png" />
+    <EmbeddedResource Include="Resources\Icons\Timeline\AnimationDisabled.png" />
+    <EmbeddedResource Include="Resources\Icons\Timeline\AnimationEnabled.png" />
+    <EmbeddedResource Include="Resources\Icons\Timeline\AnimationPartiallyEnabled.png" />
+    <EmbeddedResource Include="Resources\Icons\Timeline\Empty.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Win.csproj">

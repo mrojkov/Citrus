@@ -13,11 +13,11 @@ namespace Tangerine.UI.Timeline
 		public Toolbar()
 		{
 			RootWidget = new Widget {
-				Padding = new Thickness { Left = 4 },
+				Padding = new Thickness(2, 0),
 				MinMaxHeight = Metrics.ToolbarHeight,
 				MinWidth = TimelineMetrics.ToolbarMinWidth,
 				Presenter = new DelegatePresenter<Widget>(Render),
-				Layout = new HBoxLayout { Spacing = 2, CellDefaults = new LayoutCell(Alignment.Center) },
+				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center) },
 				Nodes = {
 					CreateAnimationModeButton(),
 					CreateAutoKeyframesButton(),
@@ -25,6 +25,7 @@ namespace Tangerine.UI.Timeline
 					CreateAnimationIndicator(),
 					new Widget(),
 					CreateExitButton(),
+					CreateLockAnimationButton(),
 					CreateEyeButton(),
 					CreateLockButton()
 				}
@@ -119,6 +120,29 @@ namespace Tangerine.UI.Timeline
 				}
 			};
 			return button;
+		}
+
+		ToolbarButton CreateLockAnimationButton()
+		{
+			var button = new ToolbarButton(IconPool.GetTexture("Timeline.AnimationEnabled")) { Tip = "Lock animation" };
+			button.Clicked += () => {
+				var enable = !Document.Current.Container.Nodes.All(IsAnimationEnabled);
+				foreach (var node in Document.Current.Container.Nodes) {
+					foreach (var animator in node.Animators) {
+						Core.Operations.SetProperty.Perform(animator, nameof(IAnimator.Enabled), enable);
+					}
+				}
+			};
+			return button;
+		}
+
+		static bool IsAnimationEnabled(IAnimable animable)
+		{
+			foreach (var a in animable.Animators) {
+				if (!a.Enabled)
+					return false;
+			}
+			return true;
 		}
 	}
 }

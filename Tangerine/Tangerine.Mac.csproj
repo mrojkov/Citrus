@@ -236,6 +236,10 @@
     <EmbeddedResource Include="Resources\Icons\Filesystem\SplitH.png" />
     <EmbeddedResource Include="Resources\Icons\Filesystem\SplitV.png" />
     <EmbeddedResource Include="Resources\Icons\Filesystem\Unfolded.png" />
+    <EmbeddedResource Include="Resources\Icons\Timeline\AnimationPartiallyEnabled.png" />
+    <EmbeddedResource Include="Resources\Icons\Timeline\AnimationEnabled.png" />
+    <EmbeddedResource Include="Resources\Icons\Timeline\AnimationDisabled.png" />
+    <EmbeddedResource Include="Resources\Icons\Timeline\Empty.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PreferencesDialog\" />

@@ -17,6 +17,8 @@ namespace Lime
 
 		string AnimationId { get; set; }
 
+		bool Enabled { get; set; }
+
 		int Duration { get; }
 
 		void InvokeTrigger(int frame);
@@ -39,6 +41,8 @@ namespace Lime
 		private int currentKey = 0;
 
 		public bool IsTriggerable { get; set; }
+
+		public bool Enabled { get; set; } = true;
 
 		[YuzuMember]
 		public string TargetProperty { get; set; }
@@ -141,7 +145,7 @@ namespace Lime
 
 		public void InvokeTrigger(int frame)
 		{
-			if (ReadonlyKeys.Count > 0) {
+			if (ReadonlyKeys.Count > 0 && Enabled) {
 				// This function relies on currentKey value. Therefore Apply(time) must be called before.
 				if (ReadonlyKeys[currentKey].Frame == frame) {
 					Owner.OnTrigger(TargetProperty);
@@ -151,6 +155,8 @@ namespace Lime
 
 		public void Apply(double time)
 		{
+			if (!Enabled)
+				return;
 			int count = ReadonlyKeys.Count;
 			if (count == 0)
 				return;
