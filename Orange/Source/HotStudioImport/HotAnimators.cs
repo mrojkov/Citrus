@@ -198,6 +198,14 @@ namespace Orange
 					animator.Keys.Add(frames[i], values[i], functions[i]);
 				}
 			}
+			switch (propertyName + '@' + className) {
+				case "AspectRatio@Hot::ParticleTemplate":
+					particleModifierAspectRatioAnimator = animator;
+					break;
+				case "Scale@Hot::ParticleTemplate":
+					particleModifierScaleAnimator = animator;
+					break;
+			}
 		}
 
 		private void ProcessBlendingAndShaderAnimators(Node node, IAnimator animator)
