@@ -22,6 +22,7 @@ namespace Orange
 			Model = new Model3D();
 			Model.Nodes.Add(ImportNodes(scene.Root));
 			ImportAnimations(scene);
+			manager.Destroy();
 		}
 
 		private Lime.Node ImportNodes(FbxImporter.Node root, Lime.Node parent = null)

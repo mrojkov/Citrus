@@ -34,7 +34,7 @@ namespace Orange.FbxImporter
 			return scene;
 		}
 
-		~Manager()
+		public void Destroy()
 		{
 			FbxManagerDestroy(NativePtr);
 		}
