@@ -294,7 +294,9 @@ namespace Lime
 			RaiseVisibleChanging(false, true);
 		}
 
-		public void Activate() { }
+		public void Activate() {
+			form.Activate();
+		}
 
 		/// <summary>
 		/// Gets the display device containing the largest portion of this window.
