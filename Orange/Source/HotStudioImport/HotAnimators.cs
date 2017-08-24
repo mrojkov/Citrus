@@ -226,38 +226,42 @@ namespace Orange
 			if (particleModifierScaleAnimator == null && particleModifierAspectRatioAnimator == null) {
 				return;
 			}
-			var sad = particleModifierScaleAnimator;
-			var arad = particleModifierAspectRatioAnimator;
+			var sa = particleModifierScaleAnimator;
+			var ara = particleModifierAspectRatioAnimator;
 			var scaleAnimator = node.Animators["Scale"];
-			for (int i = 0; i < sad.Keys.Count; i++) {
-				scaleAnimator.Keys.Add(sad.Keys[i].Frame, new Vector2((float)sad.Keys[i].Value), sad.Keys[i].Function);
-			}
-			var scaleAnimatorClone = scaleAnimator.Clone();
-			for (int i = 0; i < arad.Keys.Count; i++) {
-				IKeyframe keyframe = null;
-				foreach (var k in scaleAnimator.Keys) {
-					if (k.Frame == arad.Keys[i].Frame) {
-						keyframe = k;
-						break;
-					}
+			if (sa != null) {
+				for (int i = 0; i < sa.Keys.Count; i++) {
+					scaleAnimator.Keys.Add(sa.Keys[i].Frame, new Vector2((float)sa.Keys[i].Value), sa.Keys[i].Function);
 				}
-				var ar = (float)arad.Keys[i].Value;
-				if (keyframe != null) {
-					var scale = (Vector2)keyframe.Value;
-					var newValue = new Vector2(scale.X * ar, scale.Y / Math.Max(0.0001f, ar));
-					keyframe.Value = newValue;
-				} else {
-					if (scaleAnimator.Keys.Count > 1 && arad.Keys[i].Frame > scaleAnimator.Keys[0].Frame) {
-						scaleAnimatorClone.Apply(AnimationUtils.FramesToSeconds(arad.Keys[i].Frame));
-						var scale = (node as ParticleModifier).Scale;
+			}
+			if (ara != null) {
+				var scaleAnimatorClone = scaleAnimator.Clone();
+				for (int i = 0; i < ara.Keys.Count; i++) {
+					IKeyframe keyframe = null;
+					foreach (var k in scaleAnimator.Keys) {
+						if (k.Frame == ara.Keys[i].Frame) {
+							keyframe = k;
+							break;
+						}
+					}
+					var ar = (float)ara.Keys[i].Value;
+					if (keyframe != null) {
+						var scale = (Vector2)keyframe.Value;
 						var newValue = new Vector2(scale.X * ar, scale.Y / Math.Max(0.0001f, ar));
-						scaleAnimator.Keys.AddOrdered(arad.Keys[i].Frame, newValue, arad.Keys[i].Function);
+						keyframe.Value = newValue;
 					} else {
-						var scale = (node as ParticleModifier).Scale;
-						var implyiedAr = Mathf.Sqrt(scale.X / scale.Y);
-						var implyiedScale = scale.Y * implyiedAr;
-						var newValue = new Vector2(implyiedScale * ar, implyiedScale / Math.Max(0.0001f, ar));
-						scaleAnimator.Keys.AddOrdered(arad.Keys[i].Frame, scale, arad.Keys[i].Function);
+						if (scaleAnimator.Keys.Count > 1 && ara.Keys[i].Frame > scaleAnimator.Keys[0].Frame) {
+							scaleAnimatorClone.Apply(AnimationUtils.FramesToSeconds(ara.Keys[i].Frame));
+							var scale = (node as ParticleModifier).Scale;
+							var newValue = new Vector2(scale.X * ar, scale.Y / Math.Max(0.0001f, ar));
+							scaleAnimator.Keys.AddOrdered(ara.Keys[i].Frame, newValue, ara.Keys[i].Function);
+						} else {
+							var scale = (node as ParticleModifier).Scale;
+							var implyiedAr = Mathf.Sqrt(scale.X / scale.Y);
+							var implyiedScale = scale.Y * implyiedAr;
+							var newValue = new Vector2(implyiedScale * ar, implyiedScale / Math.Max(0.0001f, ar));
+							scaleAnimator.Keys.AddOrdered(ara.Keys[i].Frame, scale, ara.Keys[i].Function);
+						}
 					}
 				}
 			}
