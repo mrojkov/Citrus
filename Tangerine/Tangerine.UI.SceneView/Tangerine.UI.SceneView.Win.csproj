@@ -77,7 +77,6 @@
     <Compile Include="Processors\DragSplineTangentsProcessor.cs" />
     <Compile Include="Processors\RescalePointObjectSelectionProcessor.cs" />
     <Compile Include="Processors\RotatePointObjectSelectionProcessor.cs" />
-    <Compile Include="Processors\RotationHelper.cs" />
     <Compile Include="Processors\ShiftClickProcessor.cs" />
     <Compile Include="SceneView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

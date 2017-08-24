@@ -69,11 +69,11 @@ namespace Tangerine.UI.SceneView
 					mousePosPrev = b;
 					var angle = 0f;
 					if (a.Length > Mathf.ZeroTolerance && b.Length > Mathf.ZeroTolerance) {
-						angle = RotatationHelper.WrapAngle(b.Atan2Deg - a.Atan2Deg);
+						angle = Mathf.Wrap360(b.Atan2Deg - a.Atan2Deg);
 						rotation += angle;
 					}
 					if (Math.Abs(angle) > Mathf.ZeroTolerance) {
-						var roundedAngle = RotatationHelper.GetSnappedRotation(rotation, true);
+						var roundedAngle = Utils.RoundTo(rotation, 15);
 						var effectiveAngle = sv.Input.IsKeyPressed(Key.Shift) ? roundedAngle - prevAngle : angle;
 						prevAngle = roundedAngle;
 						for (int i = 0; i < 4; i++) {

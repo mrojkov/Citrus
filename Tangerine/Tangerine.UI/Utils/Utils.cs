@@ -29,6 +29,11 @@ namespace Tangerine.UI
 			return (value - origin).Abs() > distanceTolerance ? value : origin;
 		}
 
+		public static float RoundTo(float value, float step)
+		{
+			return (value / step).Round() * step;
+		}
+
 		public static bool CalcHullAndPivot(IEnumerable<Widget> widgets, Widget canvas, out Quadrangle hull, out Vector2 pivot)
 		{
 			Widget first = null;

@@ -49,10 +49,11 @@ namespace Tangerine.UI.SceneView
 					var b = sv.MousePosition * t - pivot * t;
 					mousePos = sv.MousePosition;
 					if (a.Length > Mathf.ZeroTolerance && b.Length > Mathf.ZeroTolerance) {
-						rotation += RotatationHelper.WrapAngle(b.Atan2Deg - a.Atan2Deg);
+						rotation += Mathf.Wrap360(b.Atan2Deg - a.Atan2Deg);
 					}
 					for (int i = 0; i < widgets.Count; i++) {
-						SetWidgetRotation(widgets[i], rotations[i] + RotatationHelper.GetSnappedRotation(rotation, sv.Input.IsKeyPressed(Key.Shift)));
+						var roundedRotation = sv.Input.IsKeyPressed(Key.Shift) ? Utils.RoundTo(rotation, 15) : rotation;
+						SetWidgetRotation(widgets[i], rotations[i] + roundedRotation.Snap(0));
 					}
 					yield return null;
 				}
