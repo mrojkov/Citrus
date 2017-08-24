@@ -23,7 +23,7 @@ namespace Orange
 	{
 		public override void AdvanceAnimation(Animation animation, float delta)
 		{
-			DefaultAnimationEngine.Instance.AdvanceAnimation(animation, delta / 2);	
+			DefaultAnimationEngine.Instance.AdvanceAnimation(animation, delta / 2);
 		}
 
 		public override void ApplyAnimators(Animation animation, bool invokeTriggers)
@@ -184,6 +184,11 @@ namespace Orange
 				lexer.ParseToken('[');
 				while (lexer.PeekChar() != ']') {
 					ParseAnimator(node);
+				}
+				if (node is ParticleModifier) {
+					TryMergeScaleAndAspectRatioForParticleTemplate(node as ParticleModifier);
+					particleModifierScaleAnimator = null;
+					particleModifierAspectRatioAnimator = null;
 				}
 				lexer.ParseToken(']');
 				break;
@@ -370,6 +375,7 @@ namespace Orange
 			switch (name) {
 			case "TexturePath":
 				pm.Texture = new SerializableTexture(lexer.ParsePath());
+				pm.Size = (Vector2)pm.Texture.ImageSize;
 				break;
 			case "FirstFrame":
 				pm.FirstFrame = lexer.ParseInt();
@@ -383,15 +389,21 @@ namespace Orange
 			case "AnimationFPS":
 				pm.AnimationFps = lexer.ParseFloat();
 				break;
-			case "Scale":
-				pm.Scale = lexer.ParseFloat();
+			case "Scale": {
+				var scale = lexer.ParseFloat();
+				pm.Scale = new Vector2(scale, scale);
 				break;
-			case "AspectRatio":
-				pm.AspectRatio = lexer.ParseFloat();
+			}
+			case "AspectRatio": {
+				var ar = lexer.ParseFloat();
+				if (ar != 1f) {
+					pm.Scale = new Vector2(pm.Scale.X * ar, pm.Scale.Y / Math.Max(0.0001f, ar));
+				}
 				break;
+			}
 			case "Velocity":
-				pm.Velocity = lexer.ParseFloat();
-				break;
+			pm.Velocity = lexer.ParseFloat();
+			break;
 			case "WindAmount":
 				pm.WindAmount = lexer.ParseFloat();
 				break;

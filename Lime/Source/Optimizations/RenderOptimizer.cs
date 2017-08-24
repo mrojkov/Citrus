@@ -224,9 +224,8 @@ namespace Lime.RenderOptimizer
 						if (emitter.AlongPathOrientation) {
 							angle += particle.FullDirection;
 						}
-						var texture = modifiers[particle.ModifierIndex].GetTexture((int)particle.TextureIndex - 1);
-						var imageSize = (Vector2)texture.ImageSize;
-						var particleSize = particle.ScaleCurrent * imageSize;
+						var m = modifiers[particle.ModifierIndex];
+						var particleSize = particle.ScaleCurrent * m.Size;
 						var orientation = Vector2.CosSinRough(angle * Mathf.DegToRad);
 						var perpendicularOrientation = new Vector2(-orientation.Y, orientation.X);
 						var transform = new Matrix32 {

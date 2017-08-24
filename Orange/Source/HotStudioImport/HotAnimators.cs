@@ -10,6 +10,8 @@ namespace Orange
 		readonly List<int> frames = new List<int>();
 		readonly List<KeyFunction> functions = new List<KeyFunction>();
 		readonly List<object> values = new List<object>();
+		private IAnimator particleModifierAspectRatioAnimator;
+		private IAnimator particleModifierScaleAnimator;
 
 		delegate object KeyReader();
 
@@ -156,8 +158,12 @@ namespace Orange
 					case "SplineId@Hot::Gear":
 						animator = new Animator<NodeReference<Spline>>();
 						break;
+					case "AspectRatio@Hot::ParticleTemplate":
+					case "Scale@Hot::ParticleTemplate":
+						animator = new Animator<float>();
+						break;
 					default:
-						animator = node.Animators[propertyName]; 
+						animator = node.Animators[propertyName];
 						break;
 					}
 					break;
@@ -192,6 +198,14 @@ namespace Orange
 					animator.Keys.Add(frames[i], values[i], functions[i]);
 				}
 			}
+			switch (propertyName + '@' + className) {
+				case "AspectRatio@Hot::ParticleTemplate":
+					particleModifierAspectRatioAnimator = animator;
+					break;
+				case "Scale@Hot::ParticleTemplate":
+					particleModifierScaleAnimator = animator;
+					break;
+			}
 		}
 
 		private void ProcessBlendingAndShaderAnimators(Node node, IAnimator animator)
@@ -201,6 +215,51 @@ namespace Orange
 				var type = values[i] as Tuple<Blending, ShaderId>;
 				animator.Keys.Add(frames[i], type.Item1, functions[i]);
 				shaderAnimator.Keys.Add(frames[i], type.Item2, functions[i]);
+			}
+		}
+
+		private void TryMergeScaleAndAspectRatioForParticleTemplate(Node node)
+		{
+			if (node == null) {
+				throw new ArgumentException("node can't be null");
+			}
+			if (particleModifierScaleAnimator == null && particleModifierAspectRatioAnimator == null) {
+				return;
+			}
+			var sad = particleModifierScaleAnimator;
+			var arad = particleModifierAspectRatioAnimator;
+			var scaleAnimator = node.Animators["Scale"];
+			for (int i = 0; i < sad.Keys.Count; i++) {
+				scaleAnimator.Keys.Add(sad.Keys[i].Frame, new Vector2((float)sad.Keys[i].Value), sad.Keys[i].Function);
+			}
+			var scaleAnimatorClone = scaleAnimator.Clone();
+			for (int i = 0; i < arad.Keys.Count; i++) {
+				IKeyframe keyframe = null;
+				foreach (var k in scaleAnimator.Keys) {
+					if (k.Frame == arad.Keys[i].Frame) {
+						keyframe = k;
+						break;
+					}
+				}
+				var ar = (float)arad.Keys[i].Value;
+				if (keyframe != null) {
+					var scale = (Vector2)keyframe.Value;
+					var newValue = new Vector2(scale.X * ar, scale.Y / Math.Max(0.0001f, ar));
+					keyframe.Value = newValue;
+				} else {
+					if (scaleAnimator.Keys.Count > 1 && arad.Keys[i].Frame > scaleAnimator.Keys[0].Frame) {
+						scaleAnimatorClone.Apply(AnimationUtils.FramesToSeconds(arad.Keys[i].Frame));
+						var scale = (node as ParticleModifier).Scale;
+						var newValue = new Vector2(scale.X * ar, scale.Y / Math.Max(0.0001f, ar));
+						scaleAnimator.Keys.AddOrdered(arad.Keys[i].Frame, newValue, arad.Keys[i].Function);
+					} else {
+						var scale = (node as ParticleModifier).Scale;
+						var implyiedAr = Mathf.Sqrt(scale.X / scale.Y);
+						var implyiedScale = scale.Y * implyiedAr;
+						var newValue = new Vector2(implyiedScale * ar, implyiedScale / Math.Max(0.0001f, ar));
+						scaleAnimator.Keys.AddOrdered(arad.Keys[i].Frame, scale, arad.Keys[i].Function);
+					}
+				}
 			}
 		}
 	}
