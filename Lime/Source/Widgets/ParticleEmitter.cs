@@ -115,7 +115,7 @@ namespace Lime
 			// Current texture of the particle.
 			public float TextureIndex;
 			// modifier.Animators.OverallDuration / LifeTime
-			public float AgeToFrame;
+			public float AgeToAnimationTime;
 		};
 
 		public static bool EnabledGlobally = true;
@@ -216,8 +216,6 @@ namespace Lime
 		public float RandomMotionAspectRatio { get; set; }
 		[YuzuMember]
 		public NumericRange RandomMotionRotation { get; set; }
-		// NOTE: last unprotobuffed field was `particles` under index `29`.
-		// Next protobuf index must be `30`
 		private bool firstUpdate = true;
 		/// <summary>
 		/// Number of particles to generate on Update. Used to make particle count FPS independent.
@@ -658,8 +656,8 @@ namespace Lime
 			if (modifier == null) {
 				return false;
 			}
-			int duration = modifier.Animators.GetOverallDuration();
-			p.AgeToFrame = duration / p.Lifetime;
+			var animationDuration = AnimationUtils.FramesToSeconds(modifier.Animators.GetOverallDuration());
+			p.AgeToAnimationTime = (float)(animationDuration / p.Lifetime);
 			if (EmissionType == EmissionType.Inner) {
 				p.RegularDirection += 180;
 			} else if ((EmissionType & EmissionType.Inner) != 0) {
@@ -719,8 +717,8 @@ namespace Lime
 		{
 			p.Age += delta;
 			var modifier = modifiers[p.ModifierIndex];
-			if (p.AgeToFrame > 0) {
-				modifier.Animators.Apply(AnimationUtils.FramesToSeconds((int)(p.Age * p.AgeToFrame)));
+			if (p.AgeToAnimationTime > 0) {
+				modifier.Animators.Apply(p.Age * p.AgeToAnimationTime);
 			}
 			if (ImmortalParticles) {
 				if (p.Lifetime > 0.0f)
