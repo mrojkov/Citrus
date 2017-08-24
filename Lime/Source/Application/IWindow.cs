@@ -154,6 +154,11 @@ namespace Lime
 		void Center();
 
 		/// <summary>
+		/// Activates this window.
+		/// </summary>
+		void Activate();
+
+		/// <summary>
 		/// Gets or sets the cursor for this window.
 		/// </summary>
 		MouseCursor Cursor { get; set; }

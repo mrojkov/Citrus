@@ -34,6 +34,7 @@ namespace Lime
 			throw new NotImplementedException();
 		}
 		public void Invalidate() {}
+		public void Activate() {}
 #if MAC
 		public Platform.NSGameView NSGameView { get; set; }
 #elif WIN

@@ -92,6 +92,7 @@
     <Compile Include="Presenters\Spline3DPresenter.cs" />
     <Compile Include="Processors\3D\DragSplinePoint3DProcessor.cs" />
     <Compile Include="UserPreferences.cs" />
+    <Compile Include="Processors\ActivateOnMouseOverProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Win.csproj">

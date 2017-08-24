@@ -91,6 +91,7 @@ namespace Lime
 		public void Close() {}
 		public void Invalidate() {}
 		public void ShowModal() {}
+		public void Activate() {}
 
 		/// <summary>
 		/// Gets the default display device.

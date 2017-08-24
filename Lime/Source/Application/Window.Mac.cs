@@ -353,6 +353,11 @@ namespace Lime
 			};
 		}
 
+		public void Activate()
+		{
+			window.MakeKeyAndOrderFront(window);
+		}
+
 		public void Close()
 		{
 			window.Close();

@@ -72,6 +72,7 @@
     <Compile Include="Processors\PreviewAnimationProcessor.cs" />
     <Compile Include="Presenters\SplinePresenter.cs" />
     <Compile Include="Processors\CreatePointObjectProcessor.cs" />
+    <Compile Include="Processors\ActivateOnMouseOverProcessor.cs" />
     <Compile Include="Presenters\PointObjectsSelectionPresenter.cs" />
     <Compile Include="Presenters\SplinePointPresenter.cs" />
     <Compile Include="Processors\DragSplineTangentsProcessor.cs" />

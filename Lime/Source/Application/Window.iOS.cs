@@ -111,6 +111,7 @@ namespace Lime
 		public void Close() { }
 		public void ShowModal() { }
 		public void Invalidate() { }
+		public void Activate() { }
 
 		private void OnUpdateFrame(object s, Xamarin.FrameEventArgs e)
 		{

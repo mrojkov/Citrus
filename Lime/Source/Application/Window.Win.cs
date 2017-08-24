@@ -294,6 +294,8 @@ namespace Lime
 			RaiseVisibleChanging(false, true);
 		}
 
+		public void Activate() { }
+
 		/// <summary>
 		/// Gets the display device containing the largest portion of this window.
 		/// </summary>
