@@ -375,7 +375,15 @@ namespace Orange
 			switch (name) {
 			case "TexturePath":
 				pm.Texture = new SerializableTexture(lexer.ParsePath());
-				pm.Size = (Vector2)pm.Texture.ImageSize;
+				try {
+					using (var s = System.IO.File.OpenRead(Path.ChangeExtension(pm.Texture.SerializationPath, "png"))) {
+						using (var b = new Bitmap(s)) {
+							pm.Size = new Vector2(b.Width, b.Height);
+						}
+					}
+				} catch (System.Exception e) {
+					Console.WriteLine($"Warning: can't extract size for particle modifier from {pm.Texture.SerializationPath}, {e.Message}");
+				}
 				break;
 			case "FirstFrame":
 				pm.FirstFrame = lexer.ParseInt();
@@ -397,7 +405,7 @@ namespace Orange
 			case "AspectRatio": {
 				var ar = lexer.ParseFloat();
 				if (ar != 1f) {
-					pm.Scale = new Vector2(pm.Scale.X * ar, pm.Scale.Y / Math.Max(0.0001f, ar));
+					pm.Scale = ParticleEmitter.ApplyAspectRatio(pm.Scale, ar);
 				}
 				break;
 			}

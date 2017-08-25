@@ -297,7 +297,7 @@ namespace Orange
 			case "AspectRatio": {
 				var ar = lexer.ParseFloat();
 				if (ar != 1f) {
-					pm.Scale = new Vector2(pm.Scale.X * ar, pm.Scale.Y / Math.Max(0.0001f, ar));
+					pm.Scale = ParticleEmitter.ApplyAspectRatio(pm.Scale, ar);
 				}
 				break;
 			}

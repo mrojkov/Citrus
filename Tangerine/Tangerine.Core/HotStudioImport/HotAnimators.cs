@@ -10,8 +10,8 @@ namespace Orange
 		readonly List<int> frames = new List<int>();
 		readonly List<KeyFunction> functions = new List<KeyFunction>();
 		readonly List<object> values = new List<object>();
-		private IAnimator particleModifierAspectRatioAnimator;
-		private IAnimator particleModifierScaleAnimator;
+		private NumericAnimator particleModifierAspectRatioAnimator;
+		private NumericAnimator particleModifierScaleAnimator;
 
 		delegate object KeyReader();
 
@@ -195,7 +195,7 @@ namespace Orange
 						break;
 					case "AspectRatio@Hot::ParticleTemplate":
 					case "Scale@Hot::ParticleTemplate":
-						animator = new Animator<float>();
+						animator = new NumericAnimator();
 						break;
 					default:
 						animator = node.Animators[propertyName];
@@ -235,10 +235,10 @@ namespace Orange
 			}
 			switch (propertyName + '@' + className) {
 			case "AspectRatio@Hot::ParticleTemplate":
-				particleModifierAspectRatioAnimator = animator;
+				particleModifierAspectRatioAnimator = animator as NumericAnimator;
 				break;
 			case "Scale@Hot::ParticleTemplate":
-				particleModifierScaleAnimator = animator;
+				particleModifierScaleAnimator = animator as NumericAnimator;
 				break;
 			}
 		}
@@ -251,45 +251,86 @@ namespace Orange
 			if (particleModifierScaleAnimator == null && particleModifierAspectRatioAnimator == null) {
 				return;
 			}
-			var sa = particleModifierScaleAnimator;
-			var ara = particleModifierAspectRatioAnimator;
 			var scaleAnimator = node.Animators["Scale"];
-			if (sa != null) {
-				for (int i = 0; i < sa.Keys.Count; i++) {
-					scaleAnimator.Keys.Add(sa.Keys[i].Frame, new Vector2((float)sa.Keys[i].Value), sa.Keys[i].Function);
+			var zoomAnimator = particleModifierScaleAnimator;
+			var aspectRatioAnimator = particleModifierAspectRatioAnimator;
+			int zoomAnimatorIndex = 0;
+			int aspectRatioAnimatorIndex = 0;
+			float zoom;
+			float aspectRatio;
+			ParticleEmitter.DecomposeScale((node as ParticleModifier).Scale, out aspectRatio, out zoom);
+			while (true) {
+				int state;
+				int frame;
+				KeyFunction keyFunction;
+				IKeyframe aspectRatioKey = null;
+				IKeyframe zoomKey = null;
+				if (aspectRatioAnimator != null && aspectRatioAnimatorIndex == aspectRatioAnimator.Keys.Count) {
+					aspectRatioAnimator = null;
 				}
-			}
-			if (ara != null) {
-				var scaleAnimatorClone = scaleAnimator.Clone();
-				for (int i = 0; i < ara.Keys.Count; i++) {
-					IKeyframe keyframe = null;
-					foreach (var k in scaleAnimator.Keys) {
-						if (k.Frame == ara.Keys[i].Frame) {
-							keyframe = k;
-							break;
-						}
-					}
-					var ar = (float)ara.Keys[i].Value;
-					if (keyframe != null) {
-						var scale = (Vector2)keyframe.Value;
-						var newValue = new Vector2(scale.X * ar, scale.Y / Math.Max(0.0001f, ar));
-						keyframe.Value = newValue;
-					} else {
-						if (scaleAnimator.Keys.Count > 1 && ara.Keys[i].Frame > scaleAnimator.Keys[0].Frame) {
-							scaleAnimatorClone.Apply(AnimationUtils.FramesToSeconds(ara.Keys[i].Frame));
-							var scale = (node as ParticleModifier).Scale;
-							var newValue = new Vector2(scale.X * ar, scale.Y / Math.Max(0.0001f, ar));
-							scaleAnimator.Keys.AddOrdered(ara.Keys[i].Frame, newValue, ara.Keys[i].Function);
-						} else {
-							var scale = (node as ParticleModifier).Scale;
-							var implyiedAr = Mathf.Sqrt(scale.X / scale.Y);
-							var implyiedScale = scale.Y * implyiedAr;
-							var newValue = new Vector2(implyiedScale * ar, implyiedScale / Math.Max(0.0001f, ar));
-							scaleAnimator.Keys.AddOrdered(ara.Keys[i].Frame, scale, ara.Keys[i].Function);
-						}
-					}
+				if (zoomAnimator != null && zoomAnimatorIndex == zoomAnimator.Keys.Count) {
+					zoomAnimator = null;
 				}
+				if (zoomAnimator == null && aspectRatioAnimator == null) {
+					break;
+				}
+				if (zoomAnimator != null) {
+					zoomKey = zoomAnimator.Keys[zoomAnimatorIndex];
+				}
+				if (aspectRatioAnimator != null) {
+					aspectRatioKey = aspectRatioAnimator.Keys[aspectRatioAnimatorIndex];
+				}
+				if (zoomAnimator == null) {
+					state = 1;
+				} else if (aspectRatioAnimator == null) {
+					state = -1;
+				} else {
+					state = zoomKey.Frame.CompareTo(aspectRatioKey.Frame);
+				}
+				switch (state) {
+				case -1:
+					frame = zoomKey.Frame;
+					keyFunction = zoomKey.Function;
+					zoom = (float)zoomKey.Value;
+					aspectRatio = aspectRatioAnimator?.Value(AnimationUtils.FramesToSeconds(frame)) ?? aspectRatio;
+					zoomAnimatorIndex++;
+					break;
+				case 0:
+					frame = aspectRatioKey.Frame;
+					keyFunction = SelectKeyFunction(aspectRatioKey.Function, zoomKey.Function);
+					aspectRatio = (float)aspectRatioKey.Value;
+					zoom = (float)zoomKey.Value;
+					aspectRatioAnimatorIndex++;
+					zoomAnimatorIndex++;
+					break;
+				case 1:
+					frame = aspectRatioKey.Frame;
+					keyFunction = aspectRatioKey.Function;
+					aspectRatio = (float)aspectRatioKey.Value;
+					zoom = zoomAnimator?.Value(AnimationUtils.FramesToSeconds(frame)) ?? zoom;
+					aspectRatioAnimatorIndex++;
+					break;
+				default: throw new InvalidOperationException();
+				}
+				scaleAnimator.Keys.Add(frame, ParticleEmitter.ApplyAspectRatio(zoom, aspectRatio), keyFunction);
 			}
+		}
+
+		private KeyFunction SelectKeyFunction(KeyFunction a, KeyFunction b)
+		{
+			if (a == b) {
+				return a;
+			}
+			if (a == KeyFunction.Steep || b == KeyFunction.Steep) {
+				return KeyFunction.Steep;
+			}
+			if (a == KeyFunction.ClosedSpline || b == KeyFunction.ClosedSpline) {
+				return KeyFunction.ClosedSpline;
+			}
+			if (a == KeyFunction.Spline || b == KeyFunction.Spline) {
+				return KeyFunction.Spline;
+			}
+			return KeyFunction.Linear;
 		}
 
 		private void ProcessBlendingAndShaderAnimators(Node node, IAnimator animator)

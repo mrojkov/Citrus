@@ -544,12 +544,11 @@ namespace Orange
 			WriteProperty("LastFrame", node.LastFrame, 1);
 			WriteProperty("LoopedAnimation", node.LoopedAnimation, true);
 			WriteProperty("AnimationFPS", node.AnimationFps, 20f);
-			var originalSize = node.Texture.ImageSize;
-			var trueScale = node.Size / (Vector2)originalSize * node.Scale;
-			var ar = Mathf.Sqrt(trueScale.X / trueScale.Y);
-			var scale = trueScale.Y * ar;
-			WriteProperty("Scale", scale, 1f);
-			WriteProperty("AspectRatio", ar, 1f);
+			float aspectRatio;
+			float zoom;
+			ParticleEmitter.DecomposeScale(node.Size / (Vector2)node.Texture.ImageSize * node.Scale, out aspectRatio, out zoom);
+			WriteProperty("Scale", zoom, 1f);
+			WriteProperty("AspectRatio", aspectRatio, 1f);
 			WriteProperty("Velocity", node.Velocity, 1f);
 			WriteProperty("WindAmount", node.WindAmount, 1f);
 			WriteProperty("GravityAmount", node.GravityAmount, 1f);
