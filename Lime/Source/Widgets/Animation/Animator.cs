@@ -127,6 +127,18 @@ namespace Lime
 			Setter = (SetterDelegate)Delegate.CreateDelegate(typeof(SetterDelegate), owner, mi);
 		}
 
+		public T Value(double time)
+		{
+			var oldSetter = Setter;
+			T value = default(T);
+			Setter = (v) => {
+				value = v;
+			};
+			Apply(time);
+			Setter = oldSetter;
+			return value;
+		}
+
 		protected virtual void InterpolateAndSet(float t, Keyframe<T> a, Keyframe<T> b)
 		{
 			Setter(a.Value);
