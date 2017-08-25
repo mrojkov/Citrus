@@ -24,9 +24,7 @@ namespace Tangerine.UI.SceneView
 						if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {
 							yield return Drag(bones.First(), entry, false);
 						}
-					}
-
-					if (sv.HitTestControlPoint(t * entry.Tip, 6)) {
+					} else if (sv.HitTestControlPoint(t * entry.Tip, 6)) {
 						Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 						if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {
 							yield return Drag(bones.First(), entry, true);
@@ -45,8 +43,24 @@ namespace Tangerine.UI.SceneView
 				sv.Input.CaptureMouse();
 				var iniMousePos = sv.MousePosition;
 				var worldToLocal = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
+				int index = 0;
 				while (sv.Input.IsMousePressed()) {
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
+					var transform = Document.Current.Container.AsWidget.CalcTransitionToSpaceOf(sv.Scene);
+					var items = Document.Current.Container.AsWidget.BoneArray.items;
+					index = 0;
+					if (items != null) {
+						for (var i = 0; i < items.Length; i++) {
+							if (sv.HitTestControlPoint(transform * items[i].Tip)) {
+								index = i;
+								break;
+							}
+						}
+						if (bone.Index != index) {
+							SceneView.Instance.Scene.Components.GetOrAdd<CreateBoneHelper>().HitTip =
+							index != 0 && !dragTip ? items[index].Tip : default(Vector2);
+						}
+					}
 					var b = bone.Parent.AsWidget.BoneArray[bone.BaseIndex];
 					var dragDelta = sv.MousePosition * worldToLocal - iniMousePos * worldToLocal;
 					if (dragTip) {
@@ -55,13 +69,20 @@ namespace Tangerine.UI.SceneView
 							Core.Operations.SetAnimableProperty.Perform(pair.Item1, nameof(Bone.Rotation), pair.Item2);
 						}
 					} else {
-						var position = bone.WorldToLocalTransform * (entry.Joint + dragDelta - b.Tip);
+						var position = bone.WorldToLocalTransform *
+							(entry.Joint - b.Tip + (index != 0 && index != bone.Index ? items[index].Tip - entry.Joint : dragDelta));
 						Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.Position), position);
+
 					}
 					bone.Parent.Update(0);
 					yield return null;
 				}
+				if (index != 0 && index != bone.Index && !dragTip) {
+					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.Position), Vector2.Zero);
+					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.BaseIndex), index);
+				}
 			} finally {
+				SceneView.Instance.Scene.Components.Remove<CreateBoneHelper>();
 				sv.Input.ReleaseMouse();
 				sv.Input.ConsumeKey(Key.Mouse0);
 				Document.Current.History.EndTransaction();
