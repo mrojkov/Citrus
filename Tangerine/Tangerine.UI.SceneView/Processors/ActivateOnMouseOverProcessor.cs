@@ -12,7 +12,7 @@ namespace Tangerine.UI.SceneView
 		{
 			while (true) {
 				if (SceneView.Instance.InputArea.IsMouseOverThisOrDescendant()) {
-					if (Application.Windows.Any(w => w.Active) && !Window.Current.Active) {
+					if (!Window.Current.Active && Application.Windows.Any(w => w.Active)) {
 						Window.Current.Activate();
 					}
 					SceneView.Instance.InputArea.SetFocus();
