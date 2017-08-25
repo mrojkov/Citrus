@@ -582,12 +582,12 @@ namespace Lime
 			float emitterAngle = transform.U.Atan2Deg;
 			NumericRange aspectRatioVariationPair = new NumericRange(0, Math.Max(0.0f, AspectRatio.Dispersion));
 			float zoom = Zoom.NormalRandomNumber(Rng);
-			float aspectRatio = Math.Max(0.00001f, AspectRatio.Median *
+			float aspectRatio = AspectRatio.Median *
 				(1 + Math.Abs(aspectRatioVariationPair.NormalRandomNumber(Rng))) /
-				(1 + Math.Abs(aspectRatioVariationPair.NormalRandomNumber(Rng))));
+				(1 + Math.Abs(aspectRatioVariationPair.NormalRandomNumber(Rng)));
 			p.TextureIndex = 0.0f;
 			p.Velocity = Velocity.NormalRandomNumber(Rng) * emitterScaleAmount;
-			p.ScaleInitial = emitterScale * new Vector2(zoom * aspectRatio, zoom / aspectRatio);
+			p.ScaleInitial = emitterScale * ApplyAspectRatio(zoom, aspectRatio);
 			p.ScaleCurrent = p.ScaleInitial;
 			p.WindDirection = WindDirection.UniformRandomNumber(Rng);
 			p.WindAmount = WindAmount.NormalRandomNumber(Rng) * emitterScaleAmount;
@@ -840,6 +840,23 @@ namespace Lime
 		public void DeleteAllParticles()
 		{
 			FreeLastParticles(particles.Count);
+		}
+
+		public static Vector2 ApplyAspectRatio(Vector2 scale, float aspectRatio)
+		{
+			return new Vector2(scale.X * aspectRatio, scale.Y / Math.Max(0.0001f, aspectRatio));
+		}
+
+		public static Vector2 ApplyAspectRatio(float zoom, float aspectRatio)
+		{
+			return new Vector2(zoom * aspectRatio, zoom / Math.Max(0.0001f, aspectRatio));
+		}
+
+		// Decompose 2d scale into 1d scale and aspect ratio
+		public static void DecomposeScale(Vector2 scale, out float aspectRatio, out float zoom)
+		{
+			aspectRatio = Mathf.Sqrt(scale.X / scale.Y);
+			zoom = scale.Y * aspectRatio;
 		}
 	}
 }
