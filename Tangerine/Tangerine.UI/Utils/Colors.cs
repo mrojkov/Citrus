@@ -149,7 +149,7 @@ namespace Tangerine.UI
 				DragCursor = new Color4(254, 170, 24)
 			};
 			var docking = new DockingColors {
-				DragRectagleOutline = new Color4(51, 51, 255),
+				DragRectagleOutline = new Color4(0, 255, 255),
 				PanelTitleBackground = Theme.Colors.GrayBackground.Lighten(0.1f),
 				PanelTitleSeparator = Theme.Colors.GrayBackground.Lighten(0.15f)
 			};
