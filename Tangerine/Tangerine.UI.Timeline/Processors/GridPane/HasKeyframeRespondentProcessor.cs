@@ -16,7 +16,7 @@ namespace Tangerine.UI.Timeline
 			while (true) {
 				var r = g.Get<HasKeyframeRequest>();
 				if (r != null) {
-					r.Result = HasKeyframeOnCell(r.cell);
+					r.Result = HasKeyframeOnCell(r.Cell);
 				}
 				yield return null;
 			}

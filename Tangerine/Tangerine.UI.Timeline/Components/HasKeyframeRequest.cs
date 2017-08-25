@@ -6,12 +6,12 @@ namespace Tangerine.UI.Timeline.Components
 {
 	class HasKeyframeRequest : Component
 	{
-		public readonly IntVector2 cell;
+		public readonly IntVector2 Cell;
 		public bool Result;
 
 		public HasKeyframeRequest(IntVector2 cell)
 		{
-			this.cell = cell;
+			this.Cell = cell;
 		}
 	}	
 }

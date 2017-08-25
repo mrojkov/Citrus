@@ -13,16 +13,16 @@ namespace Tangerine.UI.Timeline.Operations
 
 		public override bool IsChangingDocument => false;
 
-		public static void Perform(int row, GridSpan span)
+		public static void Perform(int row, int a, int b)
 		{
-			Document.Current.History.Perform(new SelectGridSpan(row, span));
+			Document.Current.History.Perform(new SelectGridSpan(row, a, b));
 			Core.Operations.SelectRow.Perform(Document.Current.Rows[row]);
 		}
 
-		private SelectGridSpan(int row, GridSpan span)
+		private SelectGridSpan(int row, int a, int b)
 		{
 			Row = row;
-			Span = span;
+			Span = new GridSpan(a, b, true);
 		}
 
 		public class Processor : OperationProcessor<SelectGridSpan>

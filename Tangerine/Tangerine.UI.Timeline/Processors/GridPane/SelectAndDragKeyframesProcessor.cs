@@ -54,12 +54,25 @@ namespace Tangerine.UI.Timeline
 			var offset = IntVector2.Zero;
 			Action<Widget> r = widget => timeline.Grid.RenderSelection(widget, offset);
 			grid.OnPostRender += r;
+			float time = 0;
 			while (input.IsMousePressed()) {
+				time += Lime.Task.Current.Delta;
 				offset = grid.CellUnderMouse() - initialCell;
 				Window.Current.Invalidate();
 				yield return null;
 			}
+			// If a user has clicked with control on a keyframe, try to deselect it [CIT-125].
+			if (input.IsKeyPressed(Key.Control) && time < 0.2f) {
+				var kfr = new HasKeyframeRequest(initialCell);
+				timeline.Globals.Add(kfr);
+				yield return null;
+				timeline.Globals.Remove<HasKeyframeRequest>();
+				if (kfr.Result) {
+					Operations.DeselectGridSpan.Perform(kfr.Cell.Y, kfr.Cell.X, kfr.Cell.X + 1);
+				}
+			}
 			grid.OnPostRender -= r;
+			Window.Current.Invalidate();
 			if (offset != IntVector2.Zero) {
 				timeline.Globals.Add(new DragKeyframesRequest(offset, !input.IsKeyPressed(Key.Alt)));
 			}
@@ -69,7 +82,7 @@ namespace Tangerine.UI.Timeline
 		{
 			Core.Operations.ClearRowSelection.Perform();
 			Operations.ClearGridSelection.Perform();
-			Operations.SelectGridSpan.Perform(cell.Y, new GridSpan(cell.X, cell.X + 1));
+			Operations.SelectGridSpan.Perform(cell.Y, cell.X, cell.X + 1);
 			yield return DragSelectionTask(cell);
 		}
 
@@ -106,7 +119,7 @@ namespace Tangerine.UI.Timeline
 			Timeline.Instance.Ruler.MeasuredFrameDistance = 0;
 			grid.OnPostRender -= RenderSelectionRect;
 			for (var r = rect.A.Y; r < rect.B.Y; r++) {
-				Operations.SelectGridSpan.Perform(r, new GridSpan(rect.A.X, rect.B.X));
+				Operations.SelectGridSpan.Perform(r, rect.A.X, rect.B.X);
 			}
 		}
 

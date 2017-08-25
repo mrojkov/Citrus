@@ -9,17 +9,16 @@ namespace Tangerine.UI.Timeline.Components
 	{
 		public int A;
 		public int B;
+		public bool Inclusive;
 
-		public GridSpan(int a, int b)
+		public GridSpan(int a, int b, bool inclusive)
 		{
 			A = a;
 			B = b;
+			Inclusive = inclusive;
 		}
 
-		public bool Contains(int cell)
-		{
-			return cell >= A && cell < B;
-		}
+		public bool Contains(int cell) => cell >= A && cell < B;
 	}
 
 	public class GridSpanList : List<GridSpan>
@@ -40,7 +39,7 @@ namespace Tangerine.UI.Timeline.Components
 				if (prevCol.HasValue) {
 					var cell = (col + prevCol.Value) / 2;
 					if (IsCellSelected(cell)) {
-						result.Add(new GridSpan(prevCol.Value, col));
+						result.Add(new GridSpan(prevCol.Value, col, true));
 					}
 				}
 				prevCol = col;
@@ -50,12 +49,13 @@ namespace Tangerine.UI.Timeline.Components
 
 		public bool IsCellSelected(int cell)
 		{
-			foreach (var r in this) {
-				if (r.Contains(cell)) {
-					return true;
+			var r = false;
+			foreach (var s in this) {
+				if (s.Contains(cell)) {
+					r = s.Inclusive;
 				}
 			}
-			return false;
+			return r;
 		}
 	}
 

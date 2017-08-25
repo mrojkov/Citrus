@@ -92,6 +92,7 @@
     <Compile Include="Components\RowView.cs" />
     <Compile Include="UserPreferences.cs" />
     <Compile Include="Utils\TimelineMetrics.cs" />
+    <Compile Include="Operations\DeselectGridSpan.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Commands\" />

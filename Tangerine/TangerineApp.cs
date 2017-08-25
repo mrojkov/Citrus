@@ -95,6 +95,7 @@ namespace Tangerine
 				new Core.Operations.SyncFolderDescriptorsProcessor(),
 				new Core.Operations.TimelineHorizontalShift.Processor(),
 				new UI.Timeline.Operations.SelectGridSpan.Processor(),
+				new UI.Timeline.Operations.DeselectGridSpan.Processor(),
 				new UI.Timeline.Operations.ClearGridSelection.Processor(),
 				new UI.Timeline.Operations.ShiftGridSelection.Processor(),
 				new UI.Timeline.Operations.SetCurrentColumn.Processor(),
