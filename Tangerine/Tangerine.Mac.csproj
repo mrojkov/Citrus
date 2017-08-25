@@ -209,6 +209,8 @@
     <EmbeddedResource Include="Resources\Icons\Timeline\Interpolation\NoneGrayed.png" />
     <EmbeddedResource Include="Resources\Icons\Timeline\Interpolation\Spline.png" />
     <EmbeddedResource Include="Resources\Icons\Timeline\Interpolation\SplineGrayed.png" />
+    <EmbeddedResource Include="Resources\Icons\Timeline\minus.png" />
+    <EmbeddedResource Include="Resources\Icons\Timeline\plus.png" />
     <EmbeddedResource Include="Resources\Icons\Timeline\Key.png" />
     <EmbeddedResource Include="Resources\Icons\Timeline\AnimationMode.png" />
     <EmbeddedResource Include="Resources\Icons\Tools\Root.png" />
