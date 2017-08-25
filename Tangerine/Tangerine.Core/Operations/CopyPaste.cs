@@ -126,6 +126,13 @@ namespace Tangerine.Core.Operations
 				if (item != null) {
 					UnlinkFolderItem.Perform(Document.Current.Container, item);
 				}
+				var root = row.Components.Get<BoneRow>()?.Bone;
+				if (root != null) {
+					var bones = Document.Current.Container.Nodes.OfType<Bone>().ToList();
+					foreach (var bone in Utils.FindBoneDescendats(root, bones)) {
+						UnlinkFolderItem.Perform(Document.Current.Container, bone);
+					}
+				}
 			}
 		}
 	}
