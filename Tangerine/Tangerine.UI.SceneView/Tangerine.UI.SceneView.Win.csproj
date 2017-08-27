@@ -63,6 +63,7 @@
   <ItemGroup>
     <Compile Include="Components\PointObjectSelectionComponent.cs" />
     <Compile Include="IKSolver.cs" />
+    <Compile Include="Presenters\BoneAsistantPresenter.cs" />
     <Compile Include="Presenters\BonePresenter.cs" />
     <Compile Include="Presenters\ContainerAreaPresenter.cs" />
     <Compile Include="Presenters\PointObjectPresenter.cs" />

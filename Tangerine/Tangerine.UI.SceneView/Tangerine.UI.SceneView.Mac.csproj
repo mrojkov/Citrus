@@ -55,6 +55,7 @@
     <Compile Include="SceneView.cs" />
     <Compile Include="IKSolver.cs" />
     <Compile Include="Presenters\BonePresenter.cs" />
+    <Compile Include="Presenters\BoneAsistantPresenter.cs" />
     <Compile Include="Processors\Bones\CreateBoneProcessor.cs" />
     <Compile Include="Processors\Bones\DragBoneProcessor.cs" />
     <Compile Include="Processors\Bones\RotateBoneProcessor.cs" />

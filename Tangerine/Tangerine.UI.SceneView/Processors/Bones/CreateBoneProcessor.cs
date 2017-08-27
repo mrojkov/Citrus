@@ -25,13 +25,29 @@ namespace Tangerine.UI.SceneView
 		IEnumerator<object> CreateBoneTask()
 		{
 			while (true) {
+				var transform = Document.Current.Container.AsWidget.CalcTransitionToSpaceOf(sv.Scene);
 				if (sv.InputArea.IsMouseOver()) {
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 				}
+				var items = Document.Current.Container.AsWidget.BoneArray.items;
+				var index = 0;
+				if (items != null) {
+					for (var i = 0; i < items.Length; i++) {
+						if (sv.HitTestControlPoint(transform * items[i].Tip)) {
+							index = i;
+							break;
+						}
+					}
+					SceneView.Instance.Scene.Components.GetOrAdd<CreateBoneHelper>().HitTip =
+						index != 0 ? items[index].Tip : default(Vector2);
+				}
+
+				Window.Current.Invalidate();
 				CreateNodeRequestComponent.Consume<Node>(sv.Components);
+				var bone = default(Bone);
 				if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {
 					try {
-						var bone = (Bone)Core.Operations.CreateNode.Perform(typeof(Bone), aboveSelected: false);
+						bone = (Bone)Core.Operations.CreateNode.Perform(typeof(Bone));
 						var container = (Widget)Document.Current.Container;
 						if (!container.BoneArray.Equals(default(BoneArray))) {
 							bone.Index = container.BoneArray.items.Length + 1;
@@ -40,28 +56,48 @@ namespace Tangerine.UI.SceneView
 						}
 						var t = sv.Scene.CalcTransitionToSpaceOf(container);
 						var pos = Vector2.Zero;
-						if (container.Width.Abs() > Mathf.ZeroTolerance && container.Height.Abs() > Mathf.ZeroTolerance) {
+						if (index == 0 && container.Width.Abs() > Mathf.ZeroTolerance && container.Height.Abs() > Mathf.ZeroTolerance) {
 							pos = sv.MousePosition * t;
 						}
 						Core.Operations.SetProperty.Perform(bone, nameof(Bone.Position), pos);
+						Core.Operations.SetProperty.Perform(bone, nameof(Bone.BaseIndex), index);
 						sv.Input.CaptureMouse();
 						Document.Current.History.BeginTransaction();
+						var initPosition = sv.MousePosition * t;
 						while (sv.Input.IsMousePressed()) {
-							var dir = (sv.MousePosition * t - bone.Position).Snap(Vector2.Zero);
-							Core.Operations.SetProperty.Perform(bone, nameof(Bone.Rotation), dir.Atan2Deg);
+							var dir = (sv.MousePosition * t - initPosition).Snap(Vector2.Zero);
+							var angle = dir.Atan2Deg;
+							if (index != 0) {
+								var prentDir = items[index].Tip - items[index].Joint;
+								angle = Vector2.AngleDeg(prentDir, dir);
+							}
+							Core.Operations.SetProperty.Perform(bone, nameof(Bone.Rotation), angle);
 							Core.Operations.SetProperty.Perform(bone, nameof(Bone.Length), dir.Length);
 							yield return null;
 						}
+
 					} finally {
 						sv.Input.ReleaseMouse();
+						SceneView.Instance.Scene.Components.Remove<CreateBoneHelper>();
 						Document.Current.History.EndTransaction();
 					}
+				}
+				if (bone != null && bone?.Length == 0) {
+					Document.Current.History.RevertLastTransaction();
+					break;
 				}
 				if (sv.Input.WasMousePressed(1)) {
 					break;
 				}
+
 				yield return null;
 			}
+			SceneView.Instance.Scene.Components.Remove<CreateBoneHelper>();
 		}
+	}
+
+	internal class CreateBoneHelper : NodeComponent
+	{
+		public Vector2 HitTip { get; set; }
 	}
 }

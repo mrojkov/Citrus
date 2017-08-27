@@ -274,6 +274,7 @@ namespace Tangerine.UI.SceneView
 			new PointObjectsSelectionPresenter(this);
 			new TranslationGizmoPresenter(this);
 			new BonePresenter(this);
+			new BoneAsistantPresenter(this);
 		}
 
 		public void CreateNode(Type nodeType)
