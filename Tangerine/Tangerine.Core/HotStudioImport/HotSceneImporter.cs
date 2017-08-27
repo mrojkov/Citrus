@@ -179,6 +179,20 @@ namespace Orange
 						node.Nodes.Add(child);
 				}
 				lexer.ParseToken(']');
+				if (node is Widget) {
+					var allBones = node.AsWidget.Nodes.OfType<Bone>();
+					foreach (var root in allBones.Where(b => b.BaseIndex == 0)) {
+						var loc = node.AsWidget.Nodes.IndexOf(root);
+						if (loc == 0) {
+							loc++;
+						}
+						var bones = Utils.SortBones(Utils.FindBoneDescendats(root, allBones));
+						foreach (var bone in bones) {
+							bone.Unlink();
+							node.AsWidget.Nodes.Insert(loc, bone);
+						}
+					}
+				}
 				break;
 			case "Animators":
 				lexer.ParseToken('[');
@@ -200,61 +214,6 @@ namespace Orange
 				break;
 			default:
 				throw new Exception("Unknown property '{0}'. Parsing: {1}", name, node.GetType());
-			}
-		}
-
-		// Reorder widget bones with topological sort to maintain correct update
-		// order of transformations
-		private static void ReorderBones(Widget widget)
-		{
-			var bones = new Dictionary<int, Bone>();
-			int maxIndex = 0;
-			for (int i = 0; i < widget.Nodes.Count; i++) {
-				var bone = widget.Nodes[i] as Bone;
-				if (bone != null) {
-					if (bones.ContainsKey(bone.Index)) {
-						throw new InvalidOperationException("more than one bone with same index");
-					}
-					bones[bone.Index] = bone;
-					if (bone.Index > maxIndex) {
-						maxIndex = bone.Index;
-					}
-				}
-			}
-			int n = maxIndex + 1;
-			var visited = new bool[n];
-			var g = new List<int>[n];
-			for (int i = 0; i < n; i++) {
-				g[i] = new List<int>();
-			}
-			foreach (var kv in bones) {
-				var b = kv.Value;
-				g[b.BaseIndex].Add(b.Index);
-			}
-			var orderedIndices = new List<int>();
-			Action<int> visit = null;
-			visit = (index) => {
-				visited[index] = true;
-				for (int i = 0; i < g[index].Count; i++) {
-					if (visited[g[index][i]]) {
-						throw new InvalidOperationException("found cycle in bones parent child relations");
-					}
-					visit(g[index][i]);
-				}
-				orderedIndices.Add(index);
-			};
-			for (int i = 0; i < n; i++) {
-				if (!visited[i]) {
-					visit(i);
-				}
-			}
-			foreach (var i in orderedIndices) {
-				// holes in indices and zero index (implicit bone with Identity transformation)
-				if (!bones.ContainsKey(i)) {
-					continue;
-				}
-				bones[i].Unlink();
-				widget.Nodes.Insert(0, bones[i]);
 			}
 		}
 

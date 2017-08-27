@@ -70,6 +70,7 @@
     <Compile Include="RowsSynchronizer.cs" />
     <Compile Include="Operation.cs" />
     <Compile Include="UserPreferences.cs" />
+    <Compile Include="Utils.cs" />
     <Compile Include="VersionedCollection.cs" />
     <Compile Include="WidgetExtensions.cs" />
     <Compile Include="NodeCompositionValidator.cs" />

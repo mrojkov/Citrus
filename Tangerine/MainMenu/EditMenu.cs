@@ -12,7 +12,7 @@ namespace Tangerine
 		{
 			var nodes = Document.Current?.SelectedNodes().Editable().Where(IsValidNode).ToList();
 			Rectangle aabb;
-			if (!Utils.CalcAABB(nodes, (Widget)Document.Current.Container, out aabb)) {
+			if (!UI.Utils.CalcAABB(nodes, (Widget)Document.Current.Container, out aabb)) {
 				return;
 			}
 			var container = Document.Current.Container;

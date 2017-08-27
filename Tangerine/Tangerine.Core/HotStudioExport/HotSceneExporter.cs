@@ -200,10 +200,29 @@ namespace Orange
 			};
 		}
 
+		private void ReorderBonesRecursive(Widget widget)
+		{
+			if (widget == null) return;
+			var allBones = widget.Nodes.OfType<Bone>();
+			foreach (var root in allBones.Where(b => b.BaseIndex == 0)) {
+				var bones = Utils.SortBones(Utils.FindBoneDescendats(root, allBones), reverseOrder: true);
+				var loc = widget.Nodes.IndexOf(root);
+				foreach (var bone in bones) {
+					bone.Unlink();
+					widget.AsWidget.Nodes.Insert(loc++, bone);
+				}
+			}
+
+			foreach (var child in widget.Nodes) {
+				ReorderBonesRecursive(child.AsWidget);
+			}
+		}
+
 		public void Export(Stream stream, Node node)
 		{
 			CreateFolderBeginEndNodes(node);
 			try {
+				ReorderBonesRecursive(node.AsWidget);
 				using (var tw = new StreamWriter(stream)) {
 					writer = new Writer(tw);
 					Write(node);
