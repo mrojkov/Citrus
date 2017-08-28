@@ -276,7 +276,7 @@ namespace Orange
 		{
 			SyncUpdated(".scene", ".scene", (srcPath, dstPath) => {
 				using (Stream stream = new FileStream(srcPath, FileMode.Open)) {
-					var node = new HotSceneImporter(false).Import(stream, null, null);
+					var node = new HotSceneImporter(false, srcPath).Import(stream, null, null);
 					Serialization.WriteObjectToBundle(AssetBundle, dstPath, node, Serialization.Format.Binary, ".scene");
 				}
 				return true;

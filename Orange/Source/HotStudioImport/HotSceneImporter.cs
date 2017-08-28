@@ -32,10 +32,16 @@ namespace Orange
 		private List<KnownActorType> knownActorTypes;
 		public const string ThumbnailMarker = "{8069CDD4-F02F-4981-A3CB-A0BAD4018D00}";
 		private readonly bool isTangerine;
+		private readonly string sourcePath;
 
-		public HotSceneImporter(bool isTangerine)
+		public HotSceneImporter(bool isTangerine, string sourcePath = null)
 		{
 			this.isTangerine = isTangerine;
+			this.sourcePath = sourcePath;
+			if (!isTangerine && string.IsNullOrEmpty(sourcePath)) {
+				// When importing scenes from orange you should provide source path, since it doesn't use one in Serialization
+				throw new ArgumentException();
+			}
 			RegisterKnownActorTypes();
 		}
 
@@ -43,7 +49,7 @@ namespace Orange
 		{
 			using (TextReader reader = new StreamReader(stream)) {
 				string text = reader.ReadToEnd();
-				lexer = new HotLexer("", text, isTangerine);
+				lexer = new HotLexer(sourcePath, text, isTangerine);
 				var savedDefaultWidgetSize = Widget.DefaultWidgetSize;
 				try {
 					Widget.DefaultWidgetSize = new Vector2(100, 100);

@@ -27,7 +27,7 @@ namespace Orange
 					Directory.CreateDirectory(dstDir);
 					if (path.EndsWith(".scene")) {
 						using (Stream stream = new FileStream(srcPath, FileMode.Open)) {
-							var node = new HotSceneImporter(false).Import(stream, null, null);
+							var node = new HotSceneImporter(false, srcPath).Import(stream, null, null);
 							dstPath = Path.ChangeExtension(dstPath, "tan");
 							Serialization.WriteObjectToFile(dstPath, node, Serialization.Format.JSON);
 						}
