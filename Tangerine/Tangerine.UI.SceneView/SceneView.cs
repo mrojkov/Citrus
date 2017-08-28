@@ -252,6 +252,7 @@ namespace Tangerine.UI.SceneView
 				new DragPivotProcessor(),
 				new DragBoneProcessor(),
 				new ChangeBoneRadiusProcessor(),
+				new ChangeBoneLengthProcessor(),
 				new RotateBoneProcessor(),
 				new DragWidgetsProcessor(),
 				new DragPointObjectsProcessor(),

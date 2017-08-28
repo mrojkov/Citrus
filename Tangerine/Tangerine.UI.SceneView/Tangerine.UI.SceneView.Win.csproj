@@ -73,6 +73,7 @@
     <Compile Include="Presenters\SplinePointPresenter.cs" />
     <Compile Include="Presenters\SplinePresenter.cs" />
     <Compile Include="PreviewAnimationHandler.cs" />
+    <Compile Include="Processors\Bones\ChangeBoneLengthProcessor.cs" />
     <Compile Include="Processors\Bones\ChangeBoneRadiusProcessor.cs" />
     <Compile Include="Processors\Bones\CreateBoneProcessor.cs" />
     <Compile Include="Processors\CreateNodeProcessor.cs" />
