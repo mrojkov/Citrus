@@ -129,10 +129,11 @@ namespace Tangerine.UI
 						Paste();
 					}
 					if (resetToDefault.WasIssued()) {
+						resetToDefault.Consume();
 						var defaultValue = EditorParams.DefaultValueGetter();
 						if (defaultValue != null)
 							SetProperty(defaultValue);
-					}
+                    }
 				}
 				yield return null;
 			}
