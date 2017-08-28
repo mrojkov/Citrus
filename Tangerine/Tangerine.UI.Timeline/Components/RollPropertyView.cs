@@ -19,7 +19,7 @@ namespace Tangerine.UI.Timeline.Components
 		{
 			this.row = row;
 			propRow = row.Components.Get<PropertyRow>();
-			label = new SimpleText { Text = propRow.Animator.TargetProperty };
+			label = new ThemedSimpleText { Text = propRow.Animator.TargetProperty };
 			propIcon = new Image {
 				LayoutCell = new LayoutCell(Alignment.Center),
 				Texture = IconPool.GetTexture("Nodes.Unknown"),
@@ -46,7 +46,7 @@ namespace Tangerine.UI.Timeline.Components
 		{
 			var button = new ToolbarButton { LayoutCell = new LayoutCell(Alignment.Center) };
 			var s = propRow.Animator.EditorState();
-			button.AddChangeWatcher(() => s.CurvesShown, 
+			button.AddChangeWatcher(() => s.CurvesShown,
 				i => button.Texture = IconPool.GetTexture(i ? "Timeline.Expanded" : "Timeline.Collapsed"));
 			button.Clicked += () => Core.Operations.SetProperty.Perform(s, nameof(AnimatorEditorState.CurvesShown), !s.CurvesShown);
 			return button;
@@ -64,5 +64,5 @@ namespace Tangerine.UI.Timeline.Components
 
 		public Widget Widget => widget;
 		public float Indentation { set { spacer.MinMaxWidth = value; } }
-	}	
+	}
 }

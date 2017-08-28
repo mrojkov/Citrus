@@ -26,13 +26,19 @@ namespace Tangerine.Core
 
 		void AddFolderContent(Row parentRow)
 		{
-			var parentFolder = parentRow.Components.Get<FolderRow>().Folder;
+			var parentFolder = parentRow.Components.Get<FolderRow>()?.Folder;
+			var bones = parentFolder.Items.OfType<Bone>().ToList();
 			foreach (var i in parentFolder.Items) {
 				var node = i as Node;
 				var folder = i as Folder;
-				if (node != null) {
+				var bone = i as Bone;
+				if (bone != null) {
+					if (bone.BaseIndex == 0) {
+						AddBoneContent(bone, null, parentRow, bones);
+					}
+				} else if (node != null) {
 					var nodeRow = AddNodeRow(parentRow, node);
-					if (node.EditorState().Expanded) {
+					if (node.EditorState().PropertiesExpanded) {
 						foreach (var animator in node.Animators) {
 							AddAnimatorRow(nodeRow, node, animator);
 						}
@@ -43,6 +49,26 @@ namespace Tangerine.Core
 						AddFolderContent(folderRow);
 					}
 				}
+			}
+		}
+
+		private void AddBoneContent(Bone bone, Bone parentBone, Row parentRow, List<Bone> bones)
+		{
+			var row = AddBoneRow(parentRow, bone, parentBone);
+			if (bone.EditorState().PropertiesExpanded) {
+				foreach (var animator in bone.Animators) {
+					AddAnimatorRow(row, bone, animator);
+				}
+			}
+			if (bone.EditorState().ChildrenExpanded) {
+				AddBoneContent(row, bone, bones);
+			}
+		}
+
+		private void AddBoneContent(Row parentRow, Bone parentBone, List<Bone> bones)
+		{
+			foreach (var bone in bones.Where(b => b.BaseIndex == parentBone.Index)) {
+				AddBoneContent(bone, parentBone, parentRow, bones);
 			}
 		}
 
@@ -63,6 +89,24 @@ namespace Tangerine.Core
 				row.Components.Add(new NodeRow(node));
 				row.CanHaveChildren = true;
 			}
+			AddRow(parent, row);
+			return row;
+		}
+
+		Row AddBoneRow(Row parent, Bone bone, Bone parentBone)
+		{
+			var row = Document.Current.GetRowForObject(bone);
+			if (!row.Components.Contains<NodeRow>()) {
+				row.Components.Add(new NodeRow(bone));
+				row.CanHaveChildren = true;
+			}
+			var boneRow = row.Components.Get<BoneRow>();
+			if (boneRow == null) {
+				row.Components.Add(boneRow = new BoneRow(bone));
+			}
+			boneRow.HaveChildren = bone.Parent?.AsWidget.Nodes
+				.OfType<Bone>()
+				.Any(b => b.BaseIndex == bone.Index) ?? false;
 			AddRow(parent, row);
 			return row;
 		}

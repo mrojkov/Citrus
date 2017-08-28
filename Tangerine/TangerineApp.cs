@@ -89,6 +89,7 @@ namespace Tangerine
 				new Core.Operations.SetKeyframe.Processor(),
 				new Core.Operations.InsertFolderItem.Processor(),
 				new Core.Operations.UnlinkFolderItem.Processor(),
+				new Core.Operations.MoveNodes.Processor(),
 				new Core.Operations.SetMarker.Processor(),
 				new Core.Operations.DeleteMarker.Processor(),
 				new Core.Operations.DistortionMeshProcessor(),
@@ -98,8 +99,8 @@ namespace Tangerine
 				new UI.Timeline.Operations.ClearGridSelection.Processor(),
 				new UI.Timeline.Operations.ShiftGridSelection.Processor(),
 				new UI.Timeline.Operations.SetCurrentColumn.Processor(),
-				new RowsSynchronizer(),
 				new UpdateNodesAndApplyAnimatorsProcessor(),
+				new RowsSynchronizer(),
 			});
 			DocumentHistory.Processors.AddRange(UI.Timeline.Timeline.GetOperationProcessors());
 
@@ -111,7 +112,7 @@ namespace Tangerine
 			CreateToolsToolbar();
 			Document.AttachingViews += doc => {
 				if (doc.Views.Count == 0) {
-					doc.Views.AddRange(new IDocumentView [] {
+					doc.Views.AddRange(new IDocumentView[] {
 						new UI.Inspector.Inspector(inspectorPanel.ContentWidget),
 						new UI.Timeline.Timeline(timelinePanel),
 						new UI.SceneView.SceneView(documentViewContainer),
@@ -225,7 +226,7 @@ namespace Tangerine
 					tab.Closing += () => Project.Current.CloseDocument(doc);
 					tabBar.AddNode(tab);
 				}
-				tabBar.AddNode(new Widget { LayoutCell = new LayoutCell { StretchX = 0 }});
+				tabBar.AddNode(new Widget { LayoutCell = new LayoutCell { StretchX = 0 } });
 			}
 
 			void RefreshTabText(Document doc, Tab tab)
@@ -389,10 +390,8 @@ namespace Tangerine
 			h.Connect(Command.Cut, Core.Operations.Cut.Perform);
 			h.Connect(Command.Paste, Paste);
 			h.Connect(Command.Delete, Core.Operations.Delete.Perform);
-			h.Connect(Command.SelectAll, () =>
-			{
-				foreach (var row in Document.Current.Rows)
-				{
+			h.Connect(Command.SelectAll, () => {
+				foreach (var row in Document.Current.Rows) {
 					Core.Operations.SelectRow.Perform(row, true);
 				}
 			});

@@ -62,7 +62,13 @@ namespace Tangerine.UI.SceneView
 						Core.Operations.SetProperty.Perform(bone, nameof(Bone.Position), pos);
 						Core.Operations.SetProperty.Perform(bone, nameof(Bone.BaseIndex), index);
 						sv.Input.CaptureMouse();
+						Core.Operations.SelectNode.Perform(bone);
 						Document.Current.History.BeginTransaction();
+						var bones = Document.Current.Container.Nodes.OfType<Bone>().ToList();
+						Core.Operations.MoveNodes.Perform(
+							Core.Utils.ReorderBones(Core.Utils.FindBoneDescendats(bone, bones), 1),
+							new FolderItemLocation(Document.Current.Container.RootFolder(), 0));
+
 						var initPosition = sv.MousePosition * t;
 						while (sv.Input.IsMousePressed()) {
 							var dir = (sv.MousePosition * t - initPosition).Snap(Vector2.Zero);

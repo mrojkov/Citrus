@@ -73,10 +73,11 @@ namespace Lime
 		Hidden = 1,
 		Locked = 2,
 		Shown = 4,
-		Expanded = 8,
-		HiddenOnExposition = 16,
-		IgnoreMarkers = 32,
-		DisplayContent = 64
+		PropertiesExpanded = 8,
+		ChildrenExpanded = 16,
+		HiddenOnExposition = 32,
+		IgnoreMarkers = 64,
+		DisplayContent = 128
 	}
 
 	public delegate void UpdateHandler(float delta);

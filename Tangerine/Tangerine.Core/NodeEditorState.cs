@@ -37,7 +37,9 @@ namespace Tangerine.Core
 			}
 		}
 		public bool Locked { get { return node.GetTangerineFlag(TangerineFlags.Locked); } set { node.SetTangerineFlag(TangerineFlags.Locked, value); } }
-		public bool Expanded { get { return node.GetTangerineFlag(TangerineFlags.Expanded); } set { node.SetTangerineFlag(TangerineFlags.Expanded, value); } }
+		public bool PropertiesExpanded { get { return node.GetTangerineFlag(TangerineFlags.PropertiesExpanded); } set { node.SetTangerineFlag(TangerineFlags.PropertiesExpanded, value); } }
+		public bool ChildrenExpanded { get { return node.GetTangerineFlag(TangerineFlags.ChildrenExpanded); } set { node.SetTangerineFlag(TangerineFlags.ChildrenExpanded, value); } }
+
 
 		Folder rootFolder;
 		public Folder RootFolder => rootFolder ?? (rootFolder = Folder.BuildTree(node));

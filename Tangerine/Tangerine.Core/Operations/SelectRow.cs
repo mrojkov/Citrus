@@ -1,6 +1,9 @@
 using System;
 using Lime;
 
+using System.Linq;
+using Tangerine.Core.Components;
+
 namespace Tangerine.Core.Operations
 {
 	public class SelectRow : Operation
@@ -48,6 +51,13 @@ namespace Tangerine.Core.Operations
 				throw new InvalidOperationException();
 			}
 			if (select) {
+				if (node is Bone && (node as Bone).Index != 0) {
+					var bone = Document.Current.Container.Nodes.GetBone(((Bone)node).BaseIndex);
+					while (bone != null && !bone.EditorState().ChildrenExpanded) {
+						SetProperty.Perform(bone.EditorState(), nameof(NodeEditorState.ChildrenExpanded), true);
+						bone = Document.Current.Container.Nodes.GetBone(bone.BaseIndex);
+					}
+				}
 				var rootFolder = Document.Current.Container.EditorState().RootFolder;
 				var folder = rootFolder.Find(node).Folder;
 				while (folder != null) {
