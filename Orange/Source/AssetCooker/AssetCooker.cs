@@ -275,9 +275,10 @@ namespace Orange
 		private static void SyncHotScenes()
 		{
 			SyncUpdated(".scene", ".scene", (srcPath, dstPath) => {
-				var importer = HotSceneImporterFactory.CreateImporter(srcPath);
-				var node = importer.ParseNode();
-				Serialization.WriteObjectToBundle(AssetBundle, dstPath, node, Serialization.Format.Binary, ".scene");
+				using (Stream stream = new FileStream(srcPath, FileMode.Open)) {
+					var node = new HotSceneImporter(false).Import(stream, null, null);
+					Serialization.WriteObjectToBundle(AssetBundle, dstPath, node, Serialization.Format.Binary, ".scene");
+				}
 				return true;
 			});
 		}
@@ -683,7 +684,7 @@ namespace Orange
 					TextureConverter.RunPVRTexTool(texture, AssetBundle, path, attributes, rules.MipMaps, rules.HighQualityCompression, rules.PVRFormat);
 					break;
 				case TargetPlatform.Win:
-				case TargetPlatform.Mac:	
+				case TargetPlatform.Mac:
 					TextureConverter.RunNVCompress(texture, AssetBundle, path, attributes, rules.DDSFormat, rules.MipMaps);
 					break;
 				default:

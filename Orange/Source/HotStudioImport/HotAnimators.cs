@@ -25,7 +25,7 @@ namespace Orange
 			case "Hot::TypedAnimator<Hot::EmitterShape>":
 				return () => (EmitterShape)lexer.ParseInt();
 			case "Hot::TypedAnimator<Hot::BlendMode>":
-				return () => lexer.ParseBlendMode();
+				return () => ParseBlendMode();
 			case "Hot::TypedAnimator<Hot::Color>":
 				return () => lexer.ParseColor4();
 			case "Hot::TypedAnimator<Hot::Vector2>":
@@ -58,10 +58,45 @@ namespace Orange
 			case "Hot::TypedAnimator<Hot::Movie::Action>":
 				return () => (MovieAction)lexer.ParseInt();
 			case "Hot::TypedAnimator<Hot::EmissionType>":
-				return () => (EmissionType)lexer.ParseInt();
+				return () => (EmissionType) lexer.ParseInt();
 			default:
 				throw new Lime.Exception("Unknown type of animator '{0}'", animatorType);
 			}
+		}
+
+		Tuple<Blending, ShaderId> ParseBlendMode()
+		{
+			Blending blending = Blending.Inherited;
+			ShaderId shader = ShaderId.Inherited;
+			switch(lexer.ParseInt()) {
+				case 0:
+				break;
+				case 2:
+					blending = Blending.Add;
+					shader = ShaderId.Diffuse;
+				break;
+				case 3:
+					blending = Blending.Burn;
+					shader = ShaderId.Diffuse;
+				break;
+				case 5:
+					blending = Blending.Modulate;
+					shader = ShaderId.Diffuse;
+				break;
+				case 7:
+					blending = Blending.Alpha;
+					shader = ShaderId.Silhuette;
+				break;
+				case 8:
+					blending = Blending.Opaque;
+					shader = ShaderId.Diffuse;
+				break;
+				default:
+					blending = Blending.Alpha;
+					shader = ShaderId.Diffuse;
+				break;
+			}
+			return new Tuple<Blending, ShaderId>(blending, shader);
 		}
 
 		void ParseAnimator(Node node)
@@ -170,7 +205,11 @@ namespace Orange
 				case "Frames":
 					lexer.ParseToken('[');
 					while (lexer.PeekChar() != ']')
-						frames.Add(lexer.ParseInt() * 2);
+						if (!isTangerine) {
+							frames.Add(lexer.ParseInt() * 2);
+						} else {
+							frames.Add(lexer.ParseInt());
+						}
 					lexer.ParseToken(']');
 					break;
 				case "Attributes":
@@ -199,12 +238,12 @@ namespace Orange
 				}
 			}
 			switch (propertyName + '@' + className) {
-				case "AspectRatio@Hot::ParticleTemplate":
-					particleModifierAspectRatioAnimator = animator as NumericAnimator;
-					break;
-				case "Scale@Hot::ParticleTemplate":
-					particleModifierScaleAnimator = animator as NumericAnimator;
-					break;
+			case "AspectRatio@Hot::ParticleTemplate":
+				particleModifierAspectRatioAnimator = animator as NumericAnimator;
+				break;
+			case "Scale@Hot::ParticleTemplate":
+				particleModifierScaleAnimator = animator as NumericAnimator;
+				break;
 			}
 		}
 

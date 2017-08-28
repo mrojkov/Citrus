@@ -180,7 +180,7 @@ namespace Tangerine
 		Yuzu.AbstractDeserializer DeserializeHotStudioAssets(string path, System.IO.Stream stream)
 		{
 			if (path.EndsWith(".scene", StringComparison.CurrentCultureIgnoreCase)) {
-				return new Orange.HotSceneDeserializer(stream);
+				return new HotSceneDeserializer(stream);
 			} else if (path.EndsWith(".fnt", StringComparison.CurrentCultureIgnoreCase)) {
 				return new Orange.HotFontDeserializer(stream);
 			}

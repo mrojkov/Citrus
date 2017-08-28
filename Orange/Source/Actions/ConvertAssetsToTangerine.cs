@@ -26,10 +26,11 @@ namespace Orange
 					var srcPath = path;
 					Directory.CreateDirectory(dstDir);
 					if (path.EndsWith(".scene")) {
-						var importer = HotSceneImporterFactory.CreateImporter(srcPath);
-						var node = importer.ParseNode();
-						dstPath = Path.ChangeExtension(dstPath, "tan");
-						Serialization.WriteObjectToFile(dstPath, node, Serialization.Format.JSON);
+						using (Stream stream = new FileStream(srcPath, FileMode.Open)) {
+							var node = new HotSceneImporter(false).Import(stream, null, null);
+							dstPath = Path.ChangeExtension(dstPath, "tan");
+							Serialization.WriteObjectToFile(dstPath, node, Serialization.Format.JSON);
+						}
 					} else if (path.EndsWith(".fnt")) {
 						dstPath = Path.ChangeExtension(dstPath, "tft");
 						var importer = new HotFontImporter();

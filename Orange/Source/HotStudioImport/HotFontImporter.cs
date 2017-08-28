@@ -4,6 +4,31 @@ using System.Collections.Generic;
 
 namespace Orange
 {
+	public class HotFontDeserializer : Yuzu.Deserializer.AbstractReaderDeserializer
+	{
+		Stream stream;
+
+		public HotFontDeserializer(Stream stream)
+		{
+			this.stream = stream;
+		}
+
+		public override object FromReaderInt()
+		{
+			return new Orange.HotFontImporter().ParseFont(stream);
+		}
+
+		public override object FromReaderInt(object obj)
+		{
+			return new Orange.HotFontImporter().ParseFont(stream);
+		}
+
+		public override T FromReaderInt<T>()
+		{
+			return (T)(object)new Orange.HotFontImporter().ParseFont(stream);
+		}
+	}
+
 	public partial class HotFontImporter
 	{
 		HotLexer lexer;
@@ -132,6 +157,28 @@ namespace Orange
 			return font;
 		}
 
+		public Font ParseFont(Stream stream, Font font = null)
+		{
+			var path = Serialization.GetCurrentSerializationPath();
+			this.textureSize = GetTextureSize(path);
+			using(var reader = new StreamReader(stream)) {
+				string text = reader.ReadToEnd();
+				lexer = new HotLexer("", text, true);
+			}
+			var type = lexer.ParseQuotedString();
+			if (type != "Hot::Font")
+				throw new Exception("Unknown type of object '{0}'", type);
+			if (font == null) {
+				font = new Font();
+			}
+			AddFontTextures(font, path);
+			lexer.ParseToken('{');
+			while (lexer.PeekChar() != '}')
+				ParseFontProperty(font, lexer.ParseWord());
+			lexer.ParseToken('}');
+			return font;
+		}
+
 		private static void AddFontTextures(Font font, string srcPath, string dstPath)
 		{
 			for (var i = 0; ; i++) {
@@ -145,12 +192,25 @@ namespace Orange
 			}
 		}
 
+		private static void AddFontTextures(Font font, string path)
+		{
+			for (var i = 0; ; i++) {
+				var texturePath = Path.ChangeExtension(Path.GetFileName(path), null);
+				var index = (i == 0) ? "" : i.ToString("00");
+				var texturePng = Path.ChangeExtension(path, null) + index + ".png";
+				if (!AssetBundle.Instance.FileExists(texturePng)) {
+					break;
+				}
+				font.Textures.Add(new SerializableTexture(texturePath + index));
+			}
+		}
+
 		private static HotLexer CreateLexer(string path)
 		{
 			using (Stream stream = new FileStream(path, FileMode.Open)) {
 				using (TextReader reader = new StreamReader(stream)) {
 					var text = reader.ReadToEnd();
-					return new HotLexer(path, text);
+					return new HotLexer(path, text, false);
 				}
 			}
 		}

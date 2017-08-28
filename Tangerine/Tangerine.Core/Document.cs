@@ -296,7 +296,7 @@ namespace Tangerine.Core
 			// Dispose cloned object to preserve keyframes identity in the original node. See Animator.Dispose().
 			using (node = CreateCloneForSerialization(node)) {
 				if (format == DocumentFormat.Scene) {
-					var serializer = new Orange.HotSceneExporter.Serializer();
+					var serializer = new HotSceneSerializer();
 					Serialization.WriteObject(path, ms, node, serializer);
 				} else {
 					Serialization.WriteObject(path, ms, node, Serialization.Format.JSON);

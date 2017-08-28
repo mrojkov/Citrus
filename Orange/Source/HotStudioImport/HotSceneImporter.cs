@@ -1,39 +1,122 @@
 using System;
 using System.IO;
+using System;
+using System.Linq;
 using Lime;
 using System.Collections.Generic;
 using Exception = Lime.Exception;
 
 namespace Orange
 {
-	public static class HotSceneImporterFactory
+	public class CompatibilityAnimationEngine : AnimationEngine
 	{
-		public static System.Type ImporterClass = typeof(HotSceneImporter);
-
-		public static HotSceneImporter CreateImporter(string srcPath)
+		public override void AdvanceAnimation(Animation animation, float delta)
 		{
-			var ctr = ImporterClass.GetConstructor(new System.Type[] { typeof(string) });
-			return ctr.Invoke(new object[] { srcPath }) as HotSceneImporter;
+			DefaultAnimationEngine.Instance.AdvanceAnimation(animation, delta / 2);
+		}
+
+		public override void ApplyAnimators(Animation animation, bool invokeTriggers)
+		{
+			DefaultAnimationEngine.Instance.ApplyAnimators(animation, invokeTriggers);
+		}
+
+		public override bool TryRunAnimation(Animation animation, string markerId)
+		{
+			return DefaultAnimationEngine.Instance.TryRunAnimation(animation, markerId);
 		}
 	}
 
 	public partial class HotSceneImporter
 	{
-		protected HotLexer lexer;
-		protected List<KnownActorType> knownActorTypes;
+		private HotLexer lexer;
+		private List<KnownActorType> knownActorTypes;
+		public const string ThumbnailMarker = "{8069CDD4-F02F-4981-A3CB-A0BAD4018D00}";
+		private readonly bool isTangerine;
 
-		public HotSceneImporter(string path)
+		public HotSceneImporter(bool isTangerine)
 		{
+			this.isTangerine = isTangerine;
 			RegisterKnownActorTypes();
-			using(Stream stream = new FileStream(path, FileMode.Open)) {
-				using(TextReader reader = new StreamReader(stream)) {
-					string text = reader.ReadToEnd();
-					lexer = new HotLexer(path, text);
+		}
+
+		public Node Import(Stream stream, Node node, INodeThumbnailProvider thumbnailProvider)
+		{
+			using (TextReader reader = new StreamReader(stream)) {
+				string text = reader.ReadToEnd();
+				lexer = new HotLexer("", text, isTangerine);
+				var savedDefaultWidgetSize = Widget.DefaultWidgetSize;
+				try {
+					Widget.DefaultWidgetSize = new Vector2(100, 100);
+					node = ParseNode(node);
+				} finally {
+					Widget.DefaultWidgetSize = savedDefaultWidgetSize;
+				}
+				lexer.ReadLine();
+				thumbnailProvider?.SetThumbnail(node, ReadThumbnail(lexer));
+				if (isTangerine) {
+					ConvertFolderBeginEndToDescriptors(node);
+					ReplaceAnimationEngine(node);
+				}
+				return node;
+			}
+		}
+
+		void ReplaceAnimationEngine(Node node)
+		{
+			node.DefaultAnimation.AnimationEngine = new CompatibilityAnimationEngine();
+			foreach (var child in node.Nodes) {
+				ReplaceAnimationEngine(child);
+			}
+		}
+
+		void ConvertFolderBeginEndToDescriptors(Node node)
+		{
+			var stack = new Stack<Folder.Descriptor>();
+			int j = 0;
+			foreach (var n in node.Nodes.ToList()) {
+				if (n is FolderBegin) {
+					var fb = (FolderBegin)n;
+					node.Nodes.RemoveAt(j);
+					var fd = new Folder.Descriptor { Id = fb.Id, Expanded = fb.Expanded, Index = j };
+					stack.Push(fd);
+					if (node.Folders == null) {
+						node.Folders = new List<Folder.Descriptor>();
+					}
+					node.Folders.Add(fd);
+				} else if (n is FolderEnd) {
+					node.Nodes.RemoveAt(j);
+					stack.Pop();
+					if (stack.Count > 0) {
+						stack.Peek().ItemCount++;
+					}
+				} else {
+					ConvertFolderBeginEndToDescriptors(n);
+					if (stack.Count > 0) {
+						stack.Peek().ItemCount++;
+					}
+					j++;
 				}
 			}
 		}
 
-		#region LimeParse
+		string ReadThumbnail(HotLexer lexer)
+		{
+			var l = lexer.ReadLine();
+			if (l != ThumbnailMarker) {
+				return null;
+			}
+			var sb = new System.Text.StringBuilder();
+			var firstLine = true;
+			while ((l = lexer.ReadLine()) != null) {
+				if (!firstLine) {
+					sb.Append('\r');
+					sb.Append('\n');
+				}
+				firstLine = false;
+				sb.Append(l);
+			}
+			return sb.ToString();
+		}
 
 		protected void ParseActorProperty(Node node, string name)
 		{
@@ -52,10 +135,10 @@ namespace Orange
 				node.ContentsPath = s;
 				break;
 			case "Attributes":
-				lexer.ParseInt();
+				node.TangerineFlags = (TangerineFlags)(lexer.ParseInt() & 7);
 				break;
 			case "Trigger":
-				lexer.ParseQuotedString();
+				node.Trigger = lexer.ParseQuotedString();
 				break;
 			case "Tag":
 				node.Tag = lexer.ParseQuotedString();
@@ -63,13 +146,15 @@ namespace Orange
 			case "Actors":
 				lexer.ParseToken('[');
 				while (lexer.PeekChar() != ']') {
-					var child = ParseNode();
+					var child = ParseNode(null);
 					if (child != null)
 						node.Nodes.Add(child);
 				}
 				lexer.ParseToken(']');
-				if (node is Widget) {
-					ReorderBones(node as Widget);
+				if (!isTangerine) {
+					if (node is Widget) {
+						ReorderBones(node as Widget);
+					}
 				}
 				break;
 			case "Animators":
@@ -190,7 +275,7 @@ namespace Orange
 				widget.Rotation = lexer.ParseFloat();
 				break;
 			case "BlendMode":
-				var t = lexer.ParseBlendMode();
+				var t = ParseBlendMode();
 				widget.Blending = t.Item1;
 				widget.Shader = t.Item2;
 				break;
@@ -471,7 +556,7 @@ namespace Orange
 				combiner.Enabled = lexer.ParseBool();
 				break;
 			case "BlendMode":
-				var t = lexer.ParseBlendMode();
+				var t = ParseBlendMode();
 				combiner.Blending = t.Item1;
 				combiner.Shader = t.Item2;
 				break;
@@ -576,14 +661,15 @@ namespace Orange
 				audio.Sample = new SerializableSample(lexer.ParsePath());
 				break;
 			case "Flags":
-				audio.Looping = (lexer.ParseInt() & 4) != 0;
+				var flags = lexer.ParseInt();
+				audio.Looping = (flags & 4) != 0;
+				audio.Bumpable = (flags & 1) == 0;
 				break;
 			case "Action":
 				lexer.ParseInt();
 				break;
 			case "Group":
-				var group = lexer.ParseInt();
-				audio.Group = (AudioChannelGroup)(group == 1 || group == 2 ? group : 0);
+				audio.Group = lexer.ParseInt() == 1 ? AudioChannelGroup.Music : AudioChannelGroup.Effects;
 				break;
 			case "Priority":
 				audio.Priority = (int)lexer.ParseFloat();
@@ -629,7 +715,11 @@ namespace Orange
 				marker.Id = lexer.ParseQuotedString();
 				break;
 			case "Frame":
-				marker.Frame = lexer.ParseInt() * 2;
+				if (!isTangerine) {
+					marker.Frame = lexer.ParseInt() * 2;
+				} else {
+					marker.Frame = lexer.ParseInt();
+				}
 				break;
 			case "EaseInterpolation":
 				lexer.ParseBool();
@@ -712,7 +802,6 @@ namespace Orange
 			switch (name) {
 			case "Position":
 				throw new Exception("`Position` property of spline point must not be used. Use `Anchor` instead.");
-				break;
 			case "Anchor":
 				point.Position = lexer.ParseVector2();
 				break;
@@ -847,9 +936,10 @@ namespace Orange
 
 		protected void ParseFolderBeginProperty(Node node, string name)
 		{
+			var fb = (FolderBegin)node;
 			switch (name) {
 			case "Expanded":
-				lexer.ParseBool();
+				fb.Expanded = lexer.ParseBool();
 				break;
 			default:
 				ParseActorProperty(node, name);
@@ -887,7 +977,7 @@ namespace Orange
 			}
 		}
 
-		public object CreateObject(string className)
+		private object CreateObject(string className)
 		{
 			var type = System.Type.GetType(className);
 			if (type == null) {
@@ -900,25 +990,29 @@ namespace Orange
 			return obj;
 		}
 
-		public Node ParseNode()
+		private Node ParseNode(Node node)
 		{
 			string actorClass = lexer.ParseQuotedString();
 			foreach (KnownActorType t in knownActorTypes) {
 				if (t.ActorClass == actorClass) {
-					Node n = (Node)CreateObject(t.NodeClass);
+					if (node == null) {
+						node = (Node)CreateObject(t.NodeClass);
+					}
 					lexer.ParseToken('{');
 					while (lexer.PeekChar() != '}')
-						t.PropReader(n, lexer.ParseWord());
+						t.PropReader(node, lexer.ParseWord());
 					lexer.ParseToken('}');
-					if (t.ActorClass == "Hot::FolderBegin" || t.ActorClass == "Hot::FolderEnd")
-						return null;
-					return n;
+					if (!isTangerine) {
+						if (t.ActorClass == "Hot::FolderBegin" || t.ActorClass == "Hot::FolderEnd")
+							return null;
+					}
+					return node;
 				}
 			}
 			throw new Exception("Unknown type of actor '{0}'", actorClass);
 		}
 
-		protected void ParseLinearLayoutProperty(Node node, string name)
+		private void ParseLinearLayoutProperty(Node node, string name)
 		{
 			var layout = (LinearLayout)node;
 			switch (name) {
@@ -959,7 +1053,6 @@ namespace Orange
 			switch (name) {
 			case "Position":
 				throw new Exception("`Position` property of emitter shape point must not be used. Use `Anchor` instead.");
-				break;
 			case "Anchor":
 				point.Position = lexer.ParseVector2();
 				break;
@@ -972,9 +1065,7 @@ namespace Orange
 			}
 		}
 
-		#endregion
-
-		protected virtual void RegisterKnownActorTypes()
+		private void RegisterKnownActorTypes()
 		{
 			knownActorTypes = new List<KnownActorType> {
 				new KnownActorType {ActorClass = "Hot::Scene", NodeClass = "Lime.Frame, Lime", PropReader = ParseSceneProperty},
@@ -996,8 +1087,8 @@ namespace Orange
 				new KnownActorType {ActorClass = "Hot::SplinePoint", NodeClass = "Lime.SplinePoint, Lime", PropReader = ParseSplinePointProperty},
 				new KnownActorType {ActorClass = "Hot::Gear", NodeClass = "Lime.SplineGear, Lime", PropReader = ParseGearProperty},
 				new KnownActorType {ActorClass = "Hot::Button", NodeClass = "Lime.Button, Lime", PropReader = ParseButtonProperty},
-				new KnownActorType {ActorClass = "Hot::FolderBegin", NodeClass = "Lime.Node, Lime", PropReader = ParseFolderBeginProperty},
-				new KnownActorType {ActorClass = "Hot::FolderEnd", NodeClass = "Lime.Node, Lime", PropReader = ParseFolderEndProperty},
+				new KnownActorType {ActorClass = "Hot::FolderBegin", NodeClass = "Orange.FolderBegin, Orange", PropReader = ParseFolderBeginProperty},
+				new KnownActorType {ActorClass = "Hot::FolderEnd", NodeClass = "Orange.FolderEnd, Orange", PropReader = ParseFolderEndProperty},
 				new KnownActorType {ActorClass = "Hot::NineGrid", NodeClass = "Lime.NineGrid, Lime", PropReader = ParseNineGridProperty},
 				new KnownActorType {ActorClass = "Hot::Slider", NodeClass = "Lime.Slider, Lime", PropReader = ParseSliderProperty},
 				new KnownActorType {ActorClass = "Hot::RichText", NodeClass = "Lime.RichText, Lime", PropReader = ParseRichTextProperty},

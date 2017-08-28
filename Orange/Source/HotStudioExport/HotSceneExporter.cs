@@ -3,10 +3,15 @@ using System.Linq;
 using System.IO;
 using System.Collections.Generic;
 using Lime;
-using Tangerine.Core;
 
 namespace Orange
 {
+	public interface INodeThumbnailProvider
+	{
+		string GetThumbnail(Node node);
+		void SetThumbnail(Node node, string thumbnailData);
+	}
+
 	public class FolderBegin : Node
 	{
 		public bool Expanded { get; set; }
@@ -21,29 +26,6 @@ namespace Orange
 
 	public class HotSceneExporter
 	{
-		public class Serializer : Yuzu.AbstractSerializer
-		{
-			public override void ToWriter(object obj, BinaryWriter writer)
-			{
-				throw new NotImplementedException();
-			}
-
-			public override string ToString(object obj)
-			{
-				throw new NotImplementedException();
-			}
-
-			public override byte[] ToBytes(object obj)
-			{
-				throw new NotImplementedException();
-			}
-
-			public override void ToStream(object obj, Stream target)
-			{
-				new HotSceneExporter().Export(target, (Node)obj);
-			}
-		}
-
 		static string ObjectToString(object value)
 		{
 			if (value is ITexture) {
@@ -200,14 +182,14 @@ namespace Orange
 			};
 		}
 
-		public void Export(Stream stream, Node node)
+		public void Export(Stream stream, Node node, INodeThumbnailProvider thumbnailProvider)
 		{
 			CreateFolderBeginEndNodes(node);
 			try {
 				using (var tw = new StreamWriter(stream)) {
 					writer = new Writer(tw);
 					Write(node);
-					var thumbnail = node.EditorState().ThumbnailData;
+					var thumbnail = thumbnailProvider.GetThumbnail(node);
 					if (thumbnail != null) {
 						tw.NewLine = "\r\n";
 						tw.WriteLine(HotSceneImporter.ThumbnailMarker);

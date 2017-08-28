@@ -1,21 +1,24 @@
 using System;
 using System.Globalization;
 using System.IO;
+using System.Text;
 using Lime;
 
 namespace Orange
 {
 	public class HotLexer
 	{
-		string sourcePath;
-		string text;
-		int position = 0;
+		private string sourcePath;
+		private string text;
+		private int position = 0;
+		private readonly bool isTangerine;
 		NumberFormatInfo numberFormat = new CultureInfo("en-US", false).NumberFormat;
 
-		public HotLexer(string sourcePath, string text)
+		public HotLexer(string sourcePath, string text, bool isTangerine)
 		{
 			this.sourcePath = sourcePath;
 			this.text = text;
+			this.isTangerine = isTangerine;
 		}
 
 		string GetSubstring(int position, int length)
@@ -28,8 +31,10 @@ namespace Orange
 		{
 			SkipWhitespace();
 			int p = position;
-			if (PeekByte() == '-')
+			var negative = PeekByte() == '-';
+			if (negative) {
 				ReadByte();
+			}
 			while (Char.IsDigit((char)PeekByte())) {
 				ReadByte();
 			}
@@ -39,7 +44,12 @@ namespace Orange
 				ReadByte();
 			}
 			string number = GetSubstring(p, position - p);
-			return Single.Parse(number, numberFormat);
+			var f = float.Parse(number, numberFormat);
+			if (negative && f == 0f) {
+				// Store negative zero for the lesser diff with the exported scene.
+				f = -float.Epsilon;
+			}
+			return f;
 		}
 
 		public int ParseInt()
@@ -62,7 +72,7 @@ namespace Orange
 			if (quote != '\'' && quote != '\"')
 				throw new Lime.Exception("Illegal symbol found near quoted string");
 			ReadByte();
-			string result = "";
+			var sb = new StringBuilder();
 			while (true) {
 				if (PeekByte() < 0)
 					throw new Lime.Exception("Unterminated string");
@@ -74,22 +84,22 @@ namespace Orange
 					ReadByte();
 					switch(ReadByte()) {
 					case '\\':
-						result += '\\';
+						sb.Append('\\');
 						break;
 					case 'n':
-						result += '\n';
+						sb.Append('\n');
 						break;
 					case 't':
-						result += '\t';
+						sb.Append('\t');
 						break;
 					case 'r':
-						result += '\r';
+						sb.Append('\r');
 						break;
 					case '\"':
-						result += '\"';
+						sb.Append('\"');
 						break;
 					case '\'':
-						result += '\'';
+						sb.Append('\'');
 						break;
 					default:
 						throw new Lime.Exception("Invalid escape sequence");
@@ -97,44 +107,29 @@ namespace Orange
 				} else if (PeekByte() == '\n')
 					throw new Lime.Exception("Illegal EOL found inside quoted string");
 				else
-					result += (char)ReadByte();
+					sb.Append((char)ReadByte());
 			}
-			return result;
+			return sb.ToString();
 		}
 
-		public Tuple<Blending, ShaderId> ParseBlendMode()
+		public string ReadLine()
 		{
-			Blending blending = Blending.Inherited;
-			ShaderId shader = ShaderId.Inherited;
-			switch(ParseInt()) {
-			case 0:
-				break;
-			case 2:
-				blending = Blending.Add;
-				shader = ShaderId.Diffuse;
-				break;
-			case 3:
-				blending = Blending.Burn;
-				shader = ShaderId.Diffuse;
-				break;
-			case 5:
-				blending = Blending.Modulate;
-				shader = ShaderId.Diffuse;
-				break;
-			case 7:
-				blending = Blending.Alpha;
-				shader = ShaderId.Silhuette;
-				break;
-			case 8:
-				blending = Blending.Opaque;
-				shader = ShaderId.Diffuse;
-				break;
-			default:
-				blending = Blending.Alpha;
-				shader = ShaderId.Diffuse;
-				break;
+			var sb = new StringBuilder();
+			while (!EndOfStream()) {
+				if (PeekByte() == '\r') {
+					ReadByte();
+					if (PeekByte() == '\n') {
+						ReadByte();
+					}
+					break;
+				}
+				if (PeekByte() == '\n') {
+					ReadByte();
+					break;
+				}
+				sb.Append((char)ReadByte());
 			}
-			return new Tuple<Blending, ShaderId>(blending, shader);
+			return sb.Length > 0 ? sb.ToString() : null;
 		}
 
 		public uint ParseHex()
@@ -172,10 +167,10 @@ namespace Orange
 		public string ParseWord()
 		{
 			SkipWhitespace();
-			string result = "";
+			var sb = new StringBuilder();
 			while ((PeekByte() == '.' || Char.IsLetterOrDigit((char)PeekByte()) && !EndOfStream()))
-				result += (char)ReadByte();
-			return result;
+				sb.Append((char)ReadByte());
+			return sb.ToString();
 		}
 
 		public string PeekWord()
@@ -305,15 +300,15 @@ namespace Orange
 		public string ParsePath()
 		{
 			string path = ParseQuotedString();
-			if (string.IsNullOrEmpty(path))
+			if (string.IsNullOrEmpty(path) || path[0] == '#')
 				return path;
-			else if (path[0] == '#')
-				return path;
-			else if (path[0] == '/' || path[0] == '\\')
-				path = path.Substring(1);
-			else {
-				string d = Path.GetDirectoryName(sourcePath);
-				path = Path.Combine(d, path);
+			if (!isTangerine) {
+				if (path[0] == '/' || path[0] == '\\')
+					path = path.Substring(1);
+				else {
+					string d = Path.GetDirectoryName(sourcePath);
+					path = Path.Combine(d, path);
+				}
 			}
 			path = Path.ChangeExtension(path, null);
 			path = path.Replace('\\', '/');
