@@ -264,7 +264,7 @@ namespace Orange
 			if (node.Animators.Count > 0) {
 				writer.BeginCollection("Animators");
 				foreach (var a in node.Animators) {
-					WriteAnimator(a);
+					WriteAnimator(node, a);
 				}
 				writer.EndCollection();
 			}
@@ -295,14 +295,22 @@ namespace Orange
 			writer.EndStruct();
 		}
 
-		void WriteAnimator(IAnimator animator)
+		void WriteAnimator(Node owner, IAnimator animator)
 		{
 			if (animator is Animator<ShaderId>) {
 				return;
 			}
+			if (owner is ParticleModifier && animator.TargetProperty == "Scale" && animator is Vector2Animator) {
+				NumericAnimator zoomAnimator;
+				NumericAnimator aspectRatioAnimator;
+				DecomposeParticleModifierScaleAnimator(animator, out zoomAnimator, out aspectRatioAnimator);
+				WriteAnimator(owner, zoomAnimator);
+				WriteAnimator(owner, aspectRatioAnimator);
+				return;
+			}
 			var type = GetHotStudioValueType(animator.GetValueType());
 			writer.BeginStruct($"Hot::TypedAnimator<{type}>");
-			WriteProperty("Property", GetAnimatorPropertyReference(animator), null);
+			WriteProperty("Property", GetAnimatorPropertyReference(owner, animator), null);
 			if (animator.ReadonlyKeys.Count == 0) {
 				writer.WriteLine("Frames [ ]");
 				writer.WriteLine("Attributes [ ]");
@@ -311,7 +319,7 @@ namespace Orange
 				writer.WriteLine("Frames [ " + string.Join(" ", animator.ReadonlyKeys.Select(i => i.Frame)) + " ]");
 				writer.WriteLine("Attributes [ " + string.Join(" ", animator.ReadonlyKeys.Select(i => (int)i.Function)) + " ]");
 				if (animator is Animator<Blending>) {
-					var shaderAnimator = animator.Owner.Animators.OfType<Animator<ShaderId>>().First();
+					var shaderAnimator = owner.Animators.OfType<Animator<ShaderId>>().First();
 					writer.WriteLine("Keys [ " + string.Join(" ",
 						animator.ReadonlyKeys.Select((b, i) =>
 							GetHotStudioBlending((Blending)b.Value, shaderAnimator.ReadonlyKeys[i].Value).ToString())) + " ]");
@@ -322,18 +330,43 @@ namespace Orange
 			writer.EndStruct();
 		}
 
-		string GetAnimatorPropertyReference(IAnimator animator)
+		private void DecomposeParticleModifierScaleAnimator(IAnimator animator, out NumericAnimator zoomAnimator, out NumericAnimator aspectRatioAnimator)
 		{
-			var p = GetHotStudioPropertyName(animator.Owner.GetType(), animator.TargetProperty) + '@' + GetHotStudioActorName(animator);
+			zoomAnimator = new NumericAnimator {
+				TargetProperty = "Scale"
+			};
+			aspectRatioAnimator = new NumericAnimator() {
+				TargetProperty = "AspectRatio"
+			};
+			if (animator.ReadonlyKeys.Count == 0) {
+				return;
+			}
+			foreach (var key in animator.ReadonlyKeys) {
+				float aspectRatio;
+				float zoom;
+				ParticleEmitter.DecomposeScale((Vector2)key.Value, out aspectRatio, out zoom);
+				zoomAnimator.Keys.Add(key.Frame, zoom, key.Function);
+				aspectRatioAnimator.Keys.Add(key.Frame, aspectRatio, key.Function);
+			}
+		}
+
+		string GetAnimatorPropertyReference(Node owner, IAnimator animator)
+		{
+			var p = GetHotStudioPropertyName(owner.GetType(), animator.TargetProperty) + '@' + GetHotStudioActorName(owner, animator);
 			if (p == "Position@Hot::PointObject") {
 				return "Anchor@Hot::PointObject";
 			}
 			return p;
 		}
 
-		string GetHotStudioActorName(IAnimator animator)
+		string GetHotStudioActorName(Node owner, IAnimator animator)
 		{
-			var t = animator.Owner.GetType();
+			var t = owner.GetType();
+			if (owner is ParticleModifier) {
+				if (animator.TargetProperty == "AspectRatio" || animator.TargetProperty == "Scale") {
+					return "Hot::ParticleTemplate";
+				}
+			}
 			var nodeType = t.GetProperty(animator.TargetProperty).DeclaringType;
 			var a = nodeWriters.First(i => i.Key == nodeType).Value.ActorClass;
 			if (a == "Hot::ParticleEmitter2") {
