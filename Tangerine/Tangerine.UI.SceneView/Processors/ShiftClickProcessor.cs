@@ -10,8 +10,16 @@ namespace Tangerine.UI.SceneView
 		public IEnumerator<object> Task()
 		{
 			var sv = SceneView.Instance;
+			var mouseDownPosition = Vector2.Zero;
 			while (true) {
-				if (sv.Input.WasMouseReleased() && sv.Input.IsKeyPressed(Key.Shift)) {
+				if (sv.Input.WasMousePressed()) {
+					mouseDownPosition = sv.Input.MousePosition;	
+				}
+				if (
+					sv.Input.WasMouseReleased() && 
+					sv.Input.IsKeyPressed(Key.Shift) && 
+					(mouseDownPosition - sv.Input.MousePosition).Length < 5
+				) {
 					sv.Input.ConsumeKey(Key.Mouse0);
 					HandleClick(sv);
 				}
