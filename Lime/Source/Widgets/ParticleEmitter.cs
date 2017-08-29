@@ -855,6 +855,11 @@ namespace Lime
 		// Decompose 2d scale into 1d scale and aspect ratio
 		public static void DecomposeScale(Vector2 scale, out float aspectRatio, out float zoom)
 		{
+			if (scale.Y == 0.0f) {
+				aspectRatio = 1.0f;
+				zoom = 0.0f;
+				return;
+			}
 			aspectRatio = Mathf.Sqrt(scale.X / scale.Y);
 			zoom = scale.Y * aspectRatio;
 		}
