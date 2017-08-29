@@ -457,4 +457,21 @@ namespace Tangerine.Core.Operations
 			}
 		}
 	}
+
+	public static class SortBonesInChain
+	{
+		public static void Perform(Bone boneInChain)
+		{
+			var bones = Document.Current.Container.Nodes.OfType<Bone>();
+			var rootParent = bones.GetBone(boneInChain.BaseIndex) ?? boneInChain;
+			while (rootParent != null && rootParent.BaseIndex != 0) {
+				rootParent = bones.GetBone(rootParent.BaseIndex);
+			}
+			var tree = Utils.SortBones(Utils.FindBoneDescendats(rootParent, bones));
+			var loc = Document.Current.Container.RootFolder().Find(rootParent);
+			foreach (var child in tree) {
+				MoveNodes.Perform(child, new FolderItemLocation(loc.Folder, ++loc.Index));
+			}
+		}
+	}
 }

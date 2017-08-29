@@ -80,6 +80,7 @@ namespace Tangerine.UI.SceneView
 				if (index != 0 && index != bone.Index && !dragTip) {
 					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.Position), Vector2.Zero);
 					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.BaseIndex), index);
+					Core.Operations.SortBonesInChain.Perform(bone);
 				}
 			} finally {
 				SceneView.Instance.Scene.Components.Remove<CreateBoneHelper>();

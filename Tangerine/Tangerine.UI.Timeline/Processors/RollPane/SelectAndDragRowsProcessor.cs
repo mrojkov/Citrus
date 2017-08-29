@@ -247,22 +247,12 @@ namespace Tangerine.UI.Timeline
 					}
 
 					SetProperty.Perform(bone, nameof(Bone.BaseIndex), targetParent?.Index ?? 0);
-					var bones = Document.Current.Container.Nodes.OfType<Bone>();
-					var rootParent = bones.FirstOrDefault(b => b.Index == bone.BaseIndex) ?? bone;
-					while (rootParent != null && rootParent.BaseIndex != 0) {
-						rootParent = bones.FirstOrDefault(b => b.Index == rootParent.BaseIndex);
-					}
-					//Reorder root bone descendants
-					var descentants = Core.Utils.FindBoneDescendats(rootParent, bones).ToList();
-					var tree = Core.Utils.ReorderBones((IEnumerable<Bone>)descentants);
-					var loc = Document.Current.Container.RootFolder().Find(rootParent);
-					foreach (var child in tree) {
-						MoveNodes.Perform(child, new FolderItemLocation(loc.Folder, ++loc.Index));
-					}
-					var parentBone = bones.FirstOrDefault(b => b.Index == bone.BaseIndex);
+					SortBonesInChain.Perform(bone);
+					var nodes = Document.Current.Container.Nodes;
+					var parentBone = nodes.GetBone(bone.BaseIndex);
 					while (parentBone != null && !parentBone.EditorState().ChildrenExpanded) {
 						SetProperty.Perform(parentBone.EditorState(), nameof(NodeEditorState.ChildrenExpanded), true);
-						bone = bones.FirstOrDefault(b => b.Index == bone.BaseIndex);
+						bone = nodes.GetBone(bone.BaseIndex);
 					}
 				} catch (InvalidOperationException e) {
 					AlertDialog.Show(e.Message);
@@ -277,8 +267,7 @@ namespace Tangerine.UI.Timeline
 					if (targetParent == bone) {
 						return true;
 					} else {
-						targetParent = Document.Current.Container.Nodes
-							.OfType<Bone>().FirstOrDefault(b => b.Index == targetParent.BaseIndex);
+						targetParent = Document.Current.Container.Nodes.GetBone(targetParent.BaseIndex);
 					}
 				}
 				return false;
