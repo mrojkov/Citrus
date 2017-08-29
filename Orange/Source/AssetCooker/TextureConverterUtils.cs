@@ -131,11 +131,11 @@ namespace Orange
 			}
 		}
 
-		public static bool GetPngFileInfo(string path, out int width, out int height, out bool hasAlpha)
+		public static bool GetPngFileInfo(string path, out int width, out int height, out bool hasAlpha, bool fromAssetBundle)
 		{
 			width = height = 0;
 			hasAlpha = false;
-			using (var stream = new FileStream(path, FileMode.Open)) {
+			using (var stream = fromAssetBundle ? AssetBundle.Instance.OpenFile(path) : new FileStream(path, FileMode.Open)) {
 				using (var reader = new BinaryReader(stream)) {
 					byte[] sign = reader.ReadBytes(8); // PNG signature
 					if (sign[1] != 'P' || sign[2] != 'N' || sign[3] != 'G')

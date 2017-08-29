@@ -65,4 +65,29 @@ namespace Tangerine.Core
 			new HotSceneExporter().Export(target, (Node)obj, new EditorStateNodeThumbnailProvider());
 		}
 	}
+
+	public class HotFontDeserializer : Yuzu.Deserializer.AbstractReaderDeserializer
+	{
+		Stream stream;
+
+		public HotFontDeserializer(Stream stream)
+		{
+			this.stream = stream;
+		}
+
+		public override object FromReaderInt()
+		{
+			return new HotFontImporter(true).ParseFont(stream);
+		}
+
+		public override object FromReaderInt(object obj)
+		{
+			return new HotFontImporter(true).ParseFont(stream);
+		}
+
+		public override T FromReaderInt<T>()
+		{
+			return (T)(object)new HotFontImporter(true).ParseFont(stream);
+		}
+	}
 }

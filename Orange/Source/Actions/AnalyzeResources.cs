@@ -100,7 +100,7 @@ namespace Orange
 						bool hasAlpha;
 						TextureConverterUtils.GetPngFileInfo(
 							Path.Combine(The.Workspace.AssetsDirectory, i.Key), out w, out h,
-							out hasAlpha);
+							out hasAlpha, false);
 						if (w >= 1024 || h >= 1024) {
 							suspiciousTexturesReport.Add(string.Format("{3}: {0}, {1}, {2}, {4}, atlas: {5}",
 								w, h, hasAlpha, i.Key, i.Value.PVRFormat, i.Value.TextureAtlas));

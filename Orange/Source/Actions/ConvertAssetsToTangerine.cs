@@ -33,7 +33,7 @@ namespace Orange
 						}
 					} else if (path.EndsWith(".fnt")) {
 						dstPath = Path.ChangeExtension(dstPath, "tft");
-						var importer = new HotFontImporter();
+						var importer = new HotFontImporter(false);
 						var dstRelativePath = Path.ChangeExtension(srcPath, "tft");
 						var font = importer.ParseFont(srcPath, dstRelativePath);
 						Serialization.WriteObjectToFile(dstPath, font, Serialization.Format.JSON);

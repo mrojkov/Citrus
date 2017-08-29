@@ -4,35 +4,16 @@ using System.Collections.Generic;
 
 namespace Orange
 {
-	public class HotFontDeserializer : Yuzu.Deserializer.AbstractReaderDeserializer
+	public class HotFontImporter
 	{
-		Stream stream;
+		private HotLexer lexer;
+		private Size textureSize;
+		private bool isTangerine;
 
-		public HotFontDeserializer(Stream stream)
+		public HotFontImporter(bool isTangerine)
 		{
-			this.stream = stream;
+			this.isTangerine = isTangerine;
 		}
-
-		public override object FromReaderInt()
-		{
-			return new Orange.HotFontImporter().ParseFont(stream);
-		}
-
-		public override object FromReaderInt(object obj)
-		{
-			return new Orange.HotFontImporter().ParseFont(stream);
-		}
-
-		public override T FromReaderInt<T>()
-		{
-			return (T)(object)new Orange.HotFontImporter().ParseFont(stream);
-		}
-	}
-
-	public partial class HotFontImporter
-	{
-		HotLexer lexer;
-		Size textureSize;
 
 		void ParseFontCharProperty(ref FontChar fontChar, string name)
 		{
@@ -215,12 +196,12 @@ namespace Orange
 			}
 		}
 
-		private static Size GetTextureSize(string srcPath)
+		private Size GetTextureSize(string srcPath)
 		{
 			var fontPngFile = Path.ChangeExtension(srcPath, ".png");
 			Size size;
 			bool hasAlpha;
-			if (!TextureConverterUtils.GetPngFileInfo(fontPngFile, out size.Width, out size.Height, out hasAlpha)) {
+			if (!TextureConverterUtils.GetPngFileInfo(fontPngFile, out size.Width, out size.Height, out hasAlpha, isTangerine)) {
 				throw new Lime.Exception("Font doesn't have an appropriate png texture file");
 			}
 			return size;

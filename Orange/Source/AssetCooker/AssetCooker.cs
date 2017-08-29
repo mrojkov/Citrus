@@ -286,7 +286,7 @@ namespace Orange
 		private static void SyncHotFonts()
 		{
 			SyncUpdated(".fnt", ".fnt", (srcPath, dstPath) => {
-				var importer = new HotFontImporter();
+				var importer = new HotFontImporter(false);
 				var font = importer.ParseFont(srcPath, dstPath);
 				Serialization.WriteObjectToBundle(AssetBundle, dstPath, font, Serialization.Format.Binary, ".fnt");
 				return true;

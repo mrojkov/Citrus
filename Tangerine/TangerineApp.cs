@@ -182,7 +182,7 @@ namespace Tangerine
 			if (path.EndsWith(".scene", StringComparison.CurrentCultureIgnoreCase)) {
 				return new HotSceneDeserializer(stream);
 			} else if (path.EndsWith(".fnt", StringComparison.CurrentCultureIgnoreCase)) {
-				return new Orange.HotFontDeserializer(stream);
+				return new HotFontDeserializer(stream);
 			}
 			return null;
 		}
