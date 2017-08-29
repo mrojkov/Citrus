@@ -202,6 +202,7 @@ namespace Tangerine.UI.SceneView
 		void CreatePresenters()
 		{
 			new ContainerAreaPresenter(this);
+			new TransparentWidgetsPresenter(this);
 			new SelectedWidgetsPresenter(this);
 			new PointObjectsSelectionPresenter(this);
 			new TranslationGizmoPresenter(this);

@@ -68,6 +68,7 @@
     <Compile Include="Presenters\SelectedWidgetsPresenter.cs" />
     <Compile Include="Presenters\SplinePointPresenter.cs" />
     <Compile Include="Presenters\SplinePresenter.cs" />
+    <Compile Include="Presenters\TransparentWidgetsPresenter.cs" />
     <Compile Include="PreviewAnimationHandler.cs" />
     <Compile Include="Processors\CreateNodeProcessor.cs" />
     <Compile Include="Processors\CreatePointObjectProcessor.cs" />
