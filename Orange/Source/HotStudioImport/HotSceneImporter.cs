@@ -359,7 +359,10 @@ namespace Orange
 			case "TexturePath":
 				pm.Texture = new SerializableTexture(lexer.ParsePath());
 				try {
-					using (var s = System.IO.File.OpenRead(Path.ChangeExtension(pm.Texture.SerializationPath, "png"))) {
+					var path = Path.ChangeExtension(pm.Texture.SerializationPath, "png");
+					using (var s = isTangerine
+						? AssetBundle.Instance.OpenFile(Serialization.ExpandPath(path))
+						: System.IO.File.OpenRead(path)) {
 						using (var b = new Bitmap(s)) {
 							pm.Size = new Vector2(b.Width, b.Height);
 						}
