@@ -142,6 +142,7 @@
     <Compile Include="Source\ModelImport\FbxImporter\Objects\Scene.cs" />
     <Compile Include="Source\ModelImport\FbxModelImporter.cs" />
     <Compile Include="Source\Actions\OptimizePNG.cs" />
+    <Compile Include="Source\HotStudioExport\HotSceneExporter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Orange.Mac.userprefs">
@@ -210,4 +211,3 @@
     </MonoDevelop>
   </ProjectExtensions>
 </Project>
-

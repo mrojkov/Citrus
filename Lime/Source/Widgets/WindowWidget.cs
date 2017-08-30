@@ -22,6 +22,8 @@ namespace Lime
 			window.Activated += () => windowActivated = true;
 		}
 
+		public object RenderChainBuilderSync { get; private set; } = new object();
+
 		protected virtual bool ContinuousRendering() { return true; }
 
 		public override void Update(float delta)
@@ -37,7 +39,9 @@ namespace Lime
 			Window.Cursor = WidgetContext.Current.MouseCursor;
 			renderChain.Clear();
 			LayoutManager.Instance.Layout();
-			RenderChainBuilder?.AddToRenderChain(this, renderChain);
+			lock (RenderChainBuilderSync) {
+				RenderChainBuilder?.AddToRenderChain(this, renderChain);
+			}
 			var hitTestArgs = new HitTestArgs(Window.Input.MousePosition);
 			renderChain.HitTest(ref hitTestArgs);
 			WidgetContext.Current.NodeUnderMouse = hitTestArgs.Node;
