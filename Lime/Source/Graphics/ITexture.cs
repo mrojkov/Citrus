@@ -25,36 +25,66 @@ namespace Lime
 		MirroredRepeat,
 	}
 
+	public class TextureParams
+	{
+		[YuzuMember]
+		public TextureWrapMode WrapModeU { get; set; } = TextureWrapMode.Clamp;
+		[YuzuMember]
+		public TextureWrapMode WrapModeV { get; set; } = TextureWrapMode.Clamp;
+		[YuzuMember]
+		public TextureFilter MinFilter { get; set; } = TextureFilter.Linear;
+		[YuzuMember]
+		public TextureFilter MagFilter { get; set; } = TextureFilter.Linear;
+
+		public TextureWrapMode WrapMode
+		{
+			set
+			{
+				WrapModeU = WrapModeV = value;
+			}
+		}
+
+		public TextureFilter MinMagFilter
+		{
+			set
+			{
+				MinFilter = MagFilter = value;
+			}
+		}
+
+		public static TextureParams Default = new TextureParams();
+	}
+
 	internal static class TextureParamsExtensions
 	{
 		public static int ToInt(this TextureFilter filter)
 		{
 			switch (filter) {
-				case TextureFilter.Linear:
-					return (int)All.Linear;
-				case TextureFilter.Nearest:
-					return (int)All.Nearest;
-				default:
-					throw new ArgumentOutOfRangeException(nameof(filter), filter, null);
+			case TextureFilter.Linear:
+				return (int)All.Linear;
+			case TextureFilter.Nearest:
+				return (int)All.Nearest;
+			default:
+				throw new ArgumentOutOfRangeException(nameof(filter), filter, null);
 			}
 		}
 
 		public static int ToInt(this TextureWrapMode wrapMode)
 		{
 			switch (wrapMode) {
-				case TextureWrapMode.Clamp:
-					return (int)All.ClampToEdge;
-				case TextureWrapMode.Repeat:
-					return (int)All.Repeat;
-				case TextureWrapMode.MirroredRepeat:
-					return (int)All.MirroredRepeat;
-				default:
-					throw new ArgumentOutOfRangeException(nameof(wrapMode), wrapMode, null);
+			case TextureWrapMode.Clamp:
+				return (int)All.ClampToEdge;
+			case TextureWrapMode.Repeat:
+				return (int)All.Repeat;
+			case TextureWrapMode.MirroredRepeat:
+				return (int)All.MirroredRepeat;
+			default:
+				throw new ArgumentOutOfRangeException(nameof(wrapMode), wrapMode, null);
 			}
 		}
 	}
 #endif
- 
+
 	public interface ITexture : IDisposable
 	{
 		Size ImageSize { get; }
@@ -72,10 +102,7 @@ namespace Lime
 		string SerializationPath { get; set; }
 
 		int MemoryUsed { get; }
-		TextureWrapMode WrapModeU { get; set; }
-		TextureWrapMode WrapModeV { get; set; }
-		TextureFilter MinFilter { get; set; }
-		TextureFilter MagFilter { get; set; }
+		TextureParams TextureParams { get; set; }
 #if UNITY
 		UnityEngine.Texture GetUnityTexture();
 #endif

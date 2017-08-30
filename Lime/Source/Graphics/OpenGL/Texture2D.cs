@@ -95,11 +95,6 @@ namespace Lime
 
 		public virtual bool IsStubTexture { get { return false; } }
 
-		private TextureWrapMode wrapModeU = TextureWrapMode.Clamp;
-		private TextureWrapMode wrapModeV = TextureWrapMode.Clamp;
-		private TextureFilter minFilter = TextureFilter.Linear;
-		private TextureFilter magFilter = TextureFilter.Linear;
-
 		private void SetTextureParameter(TextureParameterName name, int value)
 		{
 			PlatformRenderer.PushTexture(handle, 0);
@@ -107,43 +102,22 @@ namespace Lime
 			PlatformRenderer.PopTexture(0);
 		}
 
-		public TextureWrapMode WrapModeU
-		{
-			get { return wrapModeU; }
-			set
+		private TextureParams textureParams;
+		public TextureParams TextureParams {
+			get
 			{
-				wrapModeU = value;
-				SetTextureParameter(TextureParameterName.TextureWrapS, wrapModeU.ToInt());
+				return textureParams;
 			}
-		}
-
-		public TextureWrapMode WrapModeV
-		{
-			get { return wrapModeV; }
 			set
 			{
-				wrapModeV = value;
-				SetTextureParameter(TextureParameterName.TextureWrapT, wrapModeV.ToInt());
-			}
-		}
-
-		public TextureFilter MinFilter
-		{
-			get { return minFilter; }
-			set
-			{
-				minFilter = value;
-				SetTextureParameter(TextureParameterName.TextureMinFilter, minFilter.ToInt());
-			}
-		}
-
-		public TextureFilter MagFilter
-		{
-			get { return magFilter; }
-			set
-			{
-				magFilter = value;
-				SetTextureParameter(TextureParameterName.TextureMagFilter, magFilter.ToInt());
+				if (textureParams == value) {
+					return;
+				}
+				if (textureParams.WrapModeU != value.WrapModeU) SetTextureParameter(TextureParameterName.TextureWrapS, value.WrapModeU.ToInt());
+				if (textureParams.WrapModeV != value.WrapModeV) SetTextureParameter(TextureParameterName.TextureWrapT, value.WrapModeV.ToInt());
+				if (textureParams.MinFilter != value.MinFilter) SetTextureParameter(TextureParameterName.TextureMinFilter, value.MinFilter.ToInt());
+				if (textureParams.MagFilter != value.MagFilter) SetTextureParameter(TextureParameterName.TextureMagFilter, value.MagFilter.ToInt());
+				textureParams = value;
 			}
 		}
 
@@ -224,10 +198,10 @@ namespace Lime
 				handle = (uint)t[0];
 			}
 			PlatformRenderer.PushTexture(handle, 0);
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, MinFilter.ToInt());
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, MagFilter.ToInt());
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, WrapModeU.ToInt());
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, WrapModeV.ToInt());
+			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, textureParams.MinFilter.ToInt());
+			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, textureParams.MagFilter.ToInt());
+			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, textureParams.WrapModeU.ToInt());
+			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, textureParams.WrapModeV.ToInt());
 			PlatformRenderer.PopTexture(0);
 			PlatformRenderer.CheckErrors();
 		}

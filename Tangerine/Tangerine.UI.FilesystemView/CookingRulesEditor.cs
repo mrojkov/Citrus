@@ -175,8 +175,10 @@ namespace Tangerine.UI.FilesystemView
 				if (cachedZebraTexture == null) {
 					cachedZebraTexture = new Texture2D();
 					cachedZebraTexture.LoadImage(new[] { Theme.Colors.ZebraColor1, Theme.Colors.ZebraColor2 }, 1, 2);
-					cachedZebraTexture.WrapModeV = cachedZebraTexture.WrapModeU = TextureWrapMode.Repeat;
-					cachedZebraTexture.MinFilter = cachedZebraTexture.MagFilter = TextureFilter.Nearest;
+					cachedZebraTexture.TextureParams = new TextureParams {
+						WrapMode = TextureWrapMode.Repeat,
+						MinMagFilter = TextureFilter.Nearest
+					};
 				}
 
 				w.PrepareRendererState();
