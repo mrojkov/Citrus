@@ -102,7 +102,7 @@ namespace Lime
 			PlatformRenderer.PopTexture(0);
 		}
 
-		private TextureParams textureParams;
+		private TextureParams textureParams = TextureParams.Default;
 		public TextureParams TextureParams {
 			get
 			{
