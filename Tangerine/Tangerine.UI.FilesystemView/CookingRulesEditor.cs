@@ -459,14 +459,8 @@ namespace Tangerine.UI.FilesystemView
 
 		private static void CreatePropertyEditorForType(Meta.Item yi, IPropertyEditorParams editorParams)
 		{
-			if (yi.Type == typeof(PVRFormat)) {
-				new EnumPropertyEditor<PVRFormat>(editorParams);
-			} else if (yi.Type == typeof(DDSFormat)) {
-				new EnumPropertyEditor<DDSFormat>(editorParams);
-			} else if (yi.Type == typeof(AtlasOptimization)) {
-				new EnumPropertyEditor<AtlasOptimization>(editorParams);
-			} else if (yi.Type == typeof(ModelCompression)) {
-				new EnumPropertyEditor<ModelCompression>(editorParams);
+			if (yi.Type.IsEnum) {
+				Activator.CreateInstance(typeof(EnumPropertyEditor<>).MakeGenericType(yi.Type), editorParams);
 			} else if (yi.Type == typeof(string)) {
 				new StringPropertyEditor(editorParams);
 			} else if (yi.Type == typeof(int)) {
