@@ -1,11 +1,12 @@
-﻿namespace Lime
+﻿#if !ANDROID && !iOS
+namespace Lime
 {
-    public class ThemedExpandButton : ThemedButton
-    {
-	    public bool Expanded { get; set; }
+	public class ThemedExpandButton : ThemedButton
+	{
+		public bool Expanded { get; set; }
 		public ThemedExpandButton()
 		{
-			var presenter =  new EpandButtonPresenter();
+			var presenter = new EpandButtonPresenter();
 			Presenter = presenter;
 			DefaultAnimation.AnimationEngine = new AnimationEngineDelegate {
 				OnRunAnimation = (animation, markerId) => {
@@ -27,8 +28,7 @@
 			public void SetState(string state)
 			{
 				CommonWindow.Current.Invalidate();
-				switch (state)
-				{
+				switch (state) {
 					case "Press":
 						innerGradient = Theme.Colors.ExpandButtonPress;
 						break;
@@ -43,19 +43,19 @@
 						break;
 				}
 			}
-			
+
 			protected override void InternalRender(ThemedExpandButton widget)
 			{
 				widget.PrepareRendererState();
 				var vertices = new Vertex[3];
 				if (widget.Expanded) {
-					vertices[0] = new Vertex { Pos = Vector2.Zero, Color = innerGradient.A};
-					vertices[1] = new Vertex { Pos = new Vector2(widget.Size.X, 0), Color = innerGradient.A};
-					vertices[2] = new Vertex { Pos = new Vector2(widget.Size.X / 2, widget.Size.Y), Color = innerGradient.B};
+					vertices[0] = new Vertex { Pos = Vector2.Zero, Color = innerGradient.A };
+					vertices[1] = new Vertex { Pos = new Vector2(widget.Size.X, 0), Color = innerGradient.A };
+					vertices[2] = new Vertex { Pos = new Vector2(widget.Size.X / 2, widget.Size.Y), Color = innerGradient.B };
 				} else {
-					vertices[0] = new Vertex { Pos = Vector2.Zero, Color = innerGradient.A};
-					vertices[1] = new Vertex { Pos = new Vector2(0, widget.Size.Y), Color = innerGradient.A};
-					vertices[2] = new Vertex { Pos = new Vector2(widget.Size.X, widget.Size.Y / 2), Color = innerGradient.B};
+					vertices[0] = new Vertex { Pos = Vector2.Zero, Color = innerGradient.A };
+					vertices[1] = new Vertex { Pos = new Vector2(0, widget.Size.Y), Color = innerGradient.A };
+					vertices[2] = new Vertex { Pos = new Vector2(widget.Size.X, widget.Size.Y / 2), Color = innerGradient.B };
 				}
 				Renderer.DrawTriangleFan(null, null, vertices, vertices.Length);
 			}
@@ -67,3 +67,4 @@
 		}
 	}
 }
+#endif
