@@ -127,6 +127,7 @@ namespace Tangerine.UI
 					if (dockSite != DockSite.None) {
 						widget.PrepareRendererState();
 						Renderer.DrawRectOutline(dockSiteRect.A + Vector2.One, dockSiteRect.B - Vector2.One, ColorTheme.Current.Docking.DragRectagleOutline, 2);
+						Renderer.DrawRect(dockSiteRect.A + Vector2.One, dockSiteRect.B - Vector2.One, ColorTheme.Current.Docking.DragRectagleOutline.Transparentify(0.8f));
 					}
 				});
 				var input = panel.TitleWidget.Input;

@@ -20,6 +20,7 @@ namespace Lime
 		public float Y { get { return position.Y; } set { position.Y = value; } }
 
 		[YuzuMember]
+		[TangerineStaticProperty]
 		public SkinningWeights SkinningWeights { get; set; }
 
 		public virtual Vector2 Offset { get; set; }

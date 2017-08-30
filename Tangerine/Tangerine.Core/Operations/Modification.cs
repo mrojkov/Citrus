@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Lime;
 using System.Reflection;
+using Tangerine.Core.Components;
 
 namespace Tangerine.Core.Operations
 {
@@ -226,23 +227,28 @@ namespace Tangerine.Core.Operations
 			return Perform(Document.Current.Container, InsertFolderItem.GetNewFolderItemLocation(aboveSelected), nodeType);
 		}
 
+		public static Node Perform(Type nodeType, FolderItemLocation location)
+		{
+			return Perform(Document.Current.Container, location, nodeType);
+		}
+
 		public static Node Perform(Node container, FolderItemLocation location, Type nodeType)
 		{
 			if (!nodeType.IsSubclassOf(typeof(Node))) {
 				throw new InvalidOperationException();
 			}
 			var ctr = nodeType.GetConstructor(Type.EmptyTypes);
-			var node = (Node)ctr.Invoke(new object[] {});
-			Document.Current.Decorate(node);
+			var node = (Node)ctr.Invoke(new object[] { });
 			var attrs = ClassAttributes<TangerineNodeBuilderAttribute>.Get(nodeType);
 			if (attrs?.MethodName != null) {
 				var builder = nodeType.GetMethod(attrs.MethodName, BindingFlags.NonPublic | BindingFlags.Instance);
-				builder.Invoke(node, new object[] {});
+				builder.Invoke(node, new object[] { });
 			}
 			node.Id = GenerateNodeId(container, nodeType);
 			InsertFolderItem.Perform(container, location, node);
 			ClearRowSelection.Perform();
 			SelectNode.Perform(node);
+			Document.Current.Decorate(node);
 			return node;
 		}
 
@@ -368,6 +374,103 @@ namespace Tangerine.Core.Operations
 			protected override void InternalUndo(DeleteMarker op)
 			{
 				op.Collection.AddOrdered(op.Marker);
+			}
+		}
+	}
+
+	public class MoveNodes : Operation
+	{
+		public FolderItemLocation Location { get; }
+		public FolderItemLocation PrevLocation { get; }
+		public Node Container { get; }
+		public IFolderItem Item { get; }
+		public override bool IsChangingDocument => true;
+		private static FolderItemLocation GetParentFolder(IFolderItem item) => Document.Current.Container.RootFolder().Find(item);
+
+		private MoveNodes(Node container, FolderItemLocation location, FolderItemLocation prevLocation, IFolderItem item)
+		{
+			Container = container;
+			Location = location;
+			Item = item;
+			PrevLocation = prevLocation;
+		}
+
+		public static void Perform(IEnumerable<IFolderItem> items, FolderItemLocation targetFolder)
+		{
+			foreach (var item in items) {
+				Perform(item, targetFolder);
+			}
+		}
+
+		public static void Perform(IFolderItem item, FolderItemLocation targetFolder)
+		{
+			Document.Current.History.Perform(
+				new MoveNodes(
+					Document.Current.Container,
+					targetFolder,
+					GetParentFolder(item),
+					item));
+		}
+
+		public static void Perform(RowLocation newLocation)
+		{
+			var i = newLocation.Index;
+			var nodes = Document.Current.SelectedNodes().ToList();
+			var targetFolder = newLocation.ParentRow.Components.Get<FolderRow>()?.Folder;
+			if (targetFolder == null) {
+				throw new Lime.Exception("Cant put nodes in a non folder row");
+			}
+			foreach (var node in nodes) {
+				Document.Current.History.Perform(
+					new MoveNodes(
+						Document.Current.Container,
+						new FolderItemLocation(targetFolder, i++),
+						GetParentFolder(node),
+						node));
+			}
+		}
+
+		public class Processor : OperationProcessor<MoveNodes>
+		{
+			protected override void InternalRedo(MoveNodes op)
+			{
+
+				if (op.PrevLocation.Folder == op.Location.Folder) {
+					var oldIndex = op.PrevLocation.Folder.Items.IndexOf(op.Item);
+					var index = op.Location.Index;
+					op.PrevLocation.Folder.Items.Remove(op.Item);
+					if (op.Location.Index > oldIndex) index--;
+					var idx = op.PrevLocation.Folder.Items.IndexOf(op.Item);
+					op.Location.Folder.Items.Insert(index, op.Item);
+				} else {
+					op.PrevLocation.Folder.Items.Remove(op.Item);
+					op.Location.Folder.Items.Insert(op.Location.Index, op.Item);
+				}
+				op.Container.SyncFolderDescriptorsAndNodes();
+			}
+
+			protected override void InternalUndo(MoveNodes op)
+			{
+				op.Location.Folder.Items.Remove(op.Item);
+				op.PrevLocation.Folder.Items.Insert(op.PrevLocation.Index, op.Item);
+				op.Container.SyncFolderDescriptorsAndNodes();
+			}
+		}
+	}
+
+	public static class SortBonesInChain
+	{
+		public static void Perform(Bone boneInChain)
+		{
+			var bones = Document.Current.Container.Nodes.OfType<Bone>();
+			var rootParent = bones.GetBone(boneInChain.BaseIndex) ?? boneInChain;
+			while (rootParent != null && rootParent.BaseIndex != 0) {
+				rootParent = bones.GetBone(rootParent.BaseIndex);
+			}
+			var tree = BoneUtils.SortBones(BoneUtils.FindBoneDescendats(rootParent, bones));
+			var loc = Document.Current.Container.RootFolder().Find(rootParent);
+			foreach (var child in tree) {
+				MoveNodes.Perform(child, new FolderItemLocation(loc.Folder, ++loc.Index));
 			}
 		}
 	}

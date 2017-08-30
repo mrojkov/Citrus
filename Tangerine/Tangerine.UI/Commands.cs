@@ -37,6 +37,7 @@ namespace Tangerine.UI
 		public static readonly ICommand Open = new Command("Open", new Shortcut(Modifiers.Command, Key.O));
 		public static readonly ICommand Save = new Command("Save", new Shortcut(Modifiers.Command, Key.S));
 		public static readonly ICommand SaveAs = new Command("Save As", new Shortcut(Modifiers.Command | Modifiers.Shift, Key.S));
+		public static readonly ICommand Revert = new Command("Revert", new Shortcut(Modifiers.Command, Key.R));
 		public static readonly ICommand UpgradeDocumentFormat = new Command("Upgrade Document Format (.tan)");
 		public static readonly ICommand OpenProject = new Command("Open Project...", new Shortcut(Modifiers.Command | Modifiers.Shift, Key.O));
 		public static readonly ICommand PreferencesDialog = new Command("Preferences...", new Shortcut(Modifiers.Command, Key.P));
@@ -70,6 +71,8 @@ namespace Tangerine.UI
 		public static readonly ICommand DragLeftFast = new Command(new Shortcut(Modifiers.Shift, Key.A));
 		public static readonly ICommand DragUpFast = new Command(new Shortcut(Modifiers.Shift, Key.W));
 		public static readonly ICommand DragDownFast = new Command(new Shortcut(Modifiers.Shift, Key.S));
+		public static readonly ICommand DisplayBones = new Command(new Shortcut(Modifiers.Control, Key.B));
+		public static readonly ICommand BindBones = new Command(new Shortcut(Modifiers.Control, Key.T));
 	}
 
 	public static class Tools

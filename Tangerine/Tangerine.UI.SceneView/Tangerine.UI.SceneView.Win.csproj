@@ -62,18 +62,28 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Components\PointObjectSelectionComponent.cs" />
+    <Compile Include="IKSolver.cs" />
+    <Compile Include="Presenters\BoneAsistantPresenter.cs" />
+    <Compile Include="Presenters\BonePresenter.cs" />
     <Compile Include="Presenters\ContainerAreaPresenter.cs" />
     <Compile Include="Presenters\PointObjectPresenter.cs" />
     <Compile Include="Presenters\PointObjectsSelectionPresenter.cs" />
     <Compile Include="Presenters\SelectedWidgetsPresenter.cs" />
+    <Compile Include="Presenters\Bone3DPresenter.cs" />
     <Compile Include="Presenters\SplinePointPresenter.cs" />
     <Compile Include="Presenters\SplinePresenter.cs" />
     <Compile Include="Presenters\TransparentWidgetsPresenter.cs" />
     <Compile Include="PreviewAnimationHandler.cs" />
+    <Compile Include="Processors\Bones\ChangeBoneLengthProcessor.cs" />
+    <Compile Include="Processors\Bones\ChangeBoneRadiusProcessor.cs" />
+    <Compile Include="Processors\Bones\CreateBoneProcessor.cs" />
     <Compile Include="Processors\CreateNodeProcessor.cs" />
     <Compile Include="Processors\CreatePointObjectProcessor.cs" />
+    <Compile Include="Processors\CreateSplinePointProcessor.cs" />
     <Compile Include="Processors\CreateWidgetProcessor.cs" />
+    <Compile Include="Processors\Bones\DragBoneProcessor.cs" />
     <Compile Include="Processors\DragPivotProcessor.cs" />
+    <Compile Include="Processors\Bones\RotateBoneProcessor.cs" />
     <Compile Include="Processors\DragPointObjectsProcessor.cs" />
     <Compile Include="Processors\DragSplineTangentsProcessor.cs" />
     <Compile Include="Processors\RescalePointObjectSelectionProcessor.cs" />

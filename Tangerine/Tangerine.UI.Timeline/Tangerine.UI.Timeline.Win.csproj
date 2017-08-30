@@ -62,6 +62,7 @@
     <Compile Include="Operations\EnsureRowVisibleIfSelected.cs" />
     <Compile Include="Operations\GridWidgetsUpdater.cs" />
     <Compile Include="Operations\OverviewWidgetsUpdater.cs" />
+    <Compile Include="Components\RollBoneView.cs" />
     <Compile Include="Operations\RollWidgetsUpdater.cs" />
     <Compile Include="Operations\RowViewsUpdater.cs" />
     <Compile Include="Operations\SelectGridSpan.cs" />

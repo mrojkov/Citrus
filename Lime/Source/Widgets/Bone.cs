@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Yuzu;
 
 namespace Lime
@@ -26,6 +29,38 @@ namespace Lime
 
 		[YuzuMember("3")]
 		public BoneWeight Bone3;
+
+		public BoneWeight this[int index]
+		{
+			get
+			{
+				if (index == 0) return Bone0;
+				if (index == 1) return Bone1;
+				if (index == 2) return Bone2;
+				if (index == 3) return Bone3;
+				throw new IndexOutOfRangeException();
+			}
+			set
+			{
+				switch (index) {
+					case 0: Bone0 = value; break;
+					case 1: Bone1 = value; break;
+					case 2: Bone2 = value; break;
+					case 3: Bone3 = value; break;
+					default: throw new IndexOutOfRangeException();
+				}
+			}
+		}
+
+		public SkinningWeights Clone()
+		{
+			return new SkinningWeights {
+				Bone0 = Bone0,
+				Bone1 = Bone1,
+				Bone2 = Bone2,
+				Bone3 = Bone3,
+			};
+		}
 	}
 
 	public class Bone : Node
@@ -43,9 +78,11 @@ namespace Lime
 		public bool IKStopper { get; set; }
 
 		[YuzuMember]
+		[TangerineIgnore]
 		public int Index { get; set; }
 
 		[YuzuMember]
+		[TangerineIgnore]
 		public int BaseIndex { get; set; }
 
 		[YuzuMember]
@@ -63,6 +100,21 @@ namespace Lime
 		[YuzuMember]
 		public float RefLength { get; set; }
 
+		public Matrix32 WorldToLocalTransform
+		{
+			get
+			{
+				if (BaseIndex == 0) {
+					return Matrix32.Identity;
+				}
+				BoneArray.Entry b = Parent.AsWidget.BoneArray[BaseIndex];
+				var l = ClipAboutZero(b.Length);
+				Vector2 u = b.Tip - b.Joint;
+				Vector2 v = new Vector2(-u.Y / l, u.X / l);
+				return new Matrix32(u, v, Vector2.Zero).CalcInversed();
+			}
+		}
+
 		public Bone()
 		{
 			RenderChainBuilder = null;
@@ -71,6 +123,7 @@ namespace Lime
 			FadeoutZone = 50;
 			IKStopper = true;
 		}
+
 
 		protected override void SelfLateUpdate(float delta)
 		{
@@ -110,6 +163,102 @@ namespace Lime
 				return eps < 0 ? -eps : eps;
 			else
 				return value;
+		}
+
+		public float CalcWeightForPoint(Vector2 point)
+		{
+			var entry = Parent.AsWidget.BoneArray[Index];
+			var a = entry.Joint;
+			var b = entry.Tip;
+			var distance = (float)Mathf.CalcDistanceToSegment(a, b, point);
+			if (distance < EffectiveRadius) {
+				return Mathf.HermiteSpline(distance / EffectiveRadius, 100, 0, 1, -1);
+			} else if (distance < EffectiveRadius + FadeoutZone) {
+				return Mathf.HermiteSpline((distance - EffectiveRadius) / FadeoutZone, 1, -1, 0, 0);
+			}
+			return 0;
+		}
+	}
+
+	public static class BoneUtils
+	{
+		/// <summary>
+		/// Reorder bones with topological sort to maintain correct update
+		/// order of transformations
+		/// </summary>
+		public static List<Bone> SortBones(IEnumerable<Bone> bonesCollection, bool reverseOrder = false)
+		{
+			var bones = new Dictionary<int, Bone>();
+			int maxIndex = 0;
+			foreach (var bone in bonesCollection) {
+				if (bones.ContainsKey(bone.Index)) {
+					throw new InvalidOperationException("more than one bone with same index");
+				}
+				bones[bone.Index] = bone;
+				if (bone.Index > maxIndex) {
+					maxIndex = bone.Index;
+				}
+			}
+			var visited = new Dictionary<int, bool>();
+			var g = new Dictionary<int, List<int>>();
+			foreach (var kv in bones) {
+				var b = kv.Value;
+				(g.ContainsKey(b.BaseIndex) ? g[b.BaseIndex] : g[b.BaseIndex] = new List<int>()).Add(b.Index);
+				if (!g.ContainsKey(b.Index))
+					g[b.Index] = new List<int>();
+				visited.Add(b.Index, false);
+				if (!visited.ContainsKey(b.BaseIndex))
+					visited.Add(b.BaseIndex, false);
+			}
+			var orderedIndices = new List<int>();
+			Action<int> visit = null;
+			visit = (index) => {
+				visited[index] = true;
+				for (int i = 0; i < g[index].Count; i++) {
+					if (visited[g[index][i]]) {
+						throw new InvalidOperationException("found cycle in bones parent child relations");
+					}
+					visit(g[index][i]);
+				}
+				orderedIndices.Add(index);
+			};
+			foreach (var kv in g) {
+				if (!visited[kv.Key]) {
+					visit(kv.Key);
+				}
+			}
+			if (reverseOrder) {
+				orderedIndices.Reverse();
+			}
+			var res = new List<Bone>();
+			foreach (var i in orderedIndices) {
+				// holes in indices and zero index (implicit bone with Identity transformation)
+				if (!bones.ContainsKey(i)) {
+					continue;
+				}
+				res.Insert(0, bones[i]);
+			}
+			return res;
+		}
+
+		public static IEnumerable<Bone> FindBoneDescendats(Bone root, IEnumerable<Bone> bones)
+		{
+			foreach (var bone in bones.Where(b => b.BaseIndex == root.Index)) {
+				yield return bone;
+				foreach (var b in FindBoneDescendats(bone, bones)) {
+					yield return b;
+				}
+			}
+		}
+
+		public static Bone GetBone(this IEnumerable<Node> nodes, int index)
+		{
+			foreach (var node in nodes) {
+				if (node is Bone && ((Bone)node).Index == index) {
+					return node as Bone;
+				}
+			}
+			return null;
 		}
 	}
 }

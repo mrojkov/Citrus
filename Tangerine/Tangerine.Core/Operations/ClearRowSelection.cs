@@ -10,7 +10,9 @@ namespace Tangerine.Core.Operations
 	{
 		public static void Perform()
 		{
-			foreach (var row in Document.Current.Rows) {
+			var rows = Document.Current.Rows.ToList();
+			// Use temporal row list to avoid 'Collection was modified' exception
+			foreach (var row in rows) {
 				if (row.Selected) {
 					SelectRow.Perform(row, false);
 				}

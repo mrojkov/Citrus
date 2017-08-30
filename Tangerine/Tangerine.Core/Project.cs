@@ -199,6 +199,11 @@ namespace Tangerine.Core
 			savedCurrent?.MakeCurrent();
 		}
 
+		public void RevertDocument(Document doc)
+		{
+			ReloadDocument(doc);
+		}
+
 		public class Userprefs
 		{
 			[YuzuMember]

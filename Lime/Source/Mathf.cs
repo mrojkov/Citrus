@@ -157,6 +157,19 @@ namespace Lime
 			return rng.NextDouble() * (max - min) + min;
 		}
 
+		public static float CalcDistanceToSegment(Vector2 start, Vector2 end, Vector2 point)
+		{
+			var d = end - start;
+			if (d.Length < ZeroTolerance) {
+				return (point - start).Length;
+			}
+			var dir = d.Normalized;
+			var f = Vector2.DotProduct(dir, point - start);
+			var offset = Mathf.Clamp(f / d.Length, 0f, 1f);
+			var projPoint = start + offset * d;
+			return (projPoint - point).Length;
+		}
+
 		/// <summary>
 		/// Returns a random floating-point number that is within a specified range.
 		/// </summary>

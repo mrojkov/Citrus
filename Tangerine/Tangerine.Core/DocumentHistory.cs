@@ -37,6 +37,12 @@ namespace Tangerine.Core
 			transactionCounter--;
 		}
 
+		public void RevertLastTransaction()
+		{
+			Undo();
+			operations.RemoveRange(headPos, operations.Count - headPos);
+		}
+
 		public void Perform(IOperation operation)
 		{
 			operation.BatchId = (transactionCounter > 0) ? transactionBatchId : currentBatchId;

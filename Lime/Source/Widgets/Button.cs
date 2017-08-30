@@ -221,7 +221,7 @@ namespace Lime
 			}
 		}
 
-		private void HandleClick()
+		protected virtual void HandleClick()
 		{
 			// Release mouse for case we are showing a modal native dialog.
 			Input.ReleaseMouse();

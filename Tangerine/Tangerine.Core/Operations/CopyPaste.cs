@@ -68,7 +68,7 @@ namespace Tangerine.Core.Operations
 		public static void Perform()
 		{
 			var row = Document.Current.SelectedRows().FirstOrDefault();
-			var loc = row == null ? 
+			var loc = row == null ?
 				new RowLocation(Document.Current.RowTree, 0) :
 				new RowLocation(row.Parent, row.Parent.Rows.IndexOf(row));
 			var data = Clipboard.Text;
@@ -125,6 +125,13 @@ namespace Tangerine.Core.Operations
 				var item = (row.Components.Get<NodeRow>()?.Node as IFolderItem) ?? row.Components.Get<FolderRow>()?.Folder;
 				if (item != null) {
 					UnlinkFolderItem.Perform(Document.Current.Container, item);
+				}
+				var root = row.Components.Get<BoneRow>()?.Bone;
+				if (root != null) {
+					var bones = Document.Current.Container.Nodes.OfType<Bone>().ToList();
+					foreach (var bone in BoneUtils.FindBoneDescendats(root, bones)) {
+						UnlinkFolderItem.Perform(Document.Current.Container, bone);
+					}
 				}
 			}
 		}

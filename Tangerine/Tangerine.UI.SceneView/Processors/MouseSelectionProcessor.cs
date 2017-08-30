@@ -12,6 +12,7 @@ namespace Tangerine.UI.SceneView
 
 		static MouseSelectionProcessor()
 		{
+			Probers.Add(new BoneProber());
 			Probers.Add(new WidgetProber());
 			Probers.Add(new PointObjectProber());
 			Probers.Add(new SplinePoint3DProber());
@@ -89,7 +90,7 @@ namespace Tangerine.UI.SceneView
 			bool Probe(Node node, Rectangle rectangle);
 		}
 
-		public abstract class Prober<T> : IProber where T: Node
+		public abstract class Prober<T> : IProber where T : Node
 		{
 			public bool Probe(Node node, Vector2 point) => (node is T) && ProbeInternal((T)node, point);
 			public bool Probe(Node node, Rectangle rectangle) => (node is T) && ProbeInternal((T)node, rectangle);
@@ -117,6 +118,32 @@ namespace Tangerine.UI.SceneView
 				}
 				var pivot = widget.CalcPositionInSpaceOf(canvas);
 				return rectangle.Contains(pivot);
+			}
+		}
+
+		public class BoneProber : Prober<Bone>
+		{
+			protected override bool ProbeInternal(Bone bone, Vector2 point)
+			{
+				var t = SceneView.Instance.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget).CalcInversed();
+				var hull = BonePresenter.CalcHull(bone);
+				for (int i = 0; i < 4; i++) {
+					hull[i] = hull[i] * t;
+				}
+				return hull.Contains(point);
+			}
+
+			protected override bool ProbeInternal(Bone bone, Rectangle rectangle)
+			{
+				var t = SceneView.Instance.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget).CalcInversed();
+				var hull = BonePresenter.CalcHull(bone);
+				for (int i = 0; i < 4; i++) {
+					if (rectangle.Contains(hull[i] * t)) {
+						return true;
+					}
+				}
+				var center = (hull.V1 * t + hull.V3 * t) / 2;
+				return rectangle.Contains(center);
 			}
 		}
 

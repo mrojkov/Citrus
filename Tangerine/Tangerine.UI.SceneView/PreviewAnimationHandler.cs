@@ -13,6 +13,7 @@ namespace Tangerine.UI.SceneView
 				doc.PreviewAnimation = false;
 				StopAnimationRecursive(doc.PreviewAnimationContainer);
 				doc.PreviewAnimationContainer.AnimationFrame = doc.PreviewAnimationBegin;
+				doc.Container.Update(0);
 			} else {
 				doc.PreviewAnimation = true;
 				doc.Container.IsRunning = doc.PreviewAnimation;

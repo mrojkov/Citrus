@@ -111,11 +111,15 @@ namespace Tangerine.UI.Timeline.Components
 
 		ToolbarButton CreateExpandButton()
 		{
-			var button = new ToolbarButton { Highlightable = false };
-			button.Texture = IconPool.GetTexture("Timeline.Expanded");
+			var button = new ToolbarButton { Highlightable = false, Padding = new Thickness(5) };
+			button.Texture = IconPool.GetTexture("Timeline.minus");
 			button.AddChangeWatcher(
 				() => folder.Expanded,
-				i => button.Texture = IconPool.GetTexture(i ? "Timeline.Expanded" : "Timeline.Collapsed")
+				i => button.Texture = IconPool.GetTexture(i ? "Timeline.minus" : "Timeline.plus")
+			);
+			button.AddChangeWatcher(
+				() => folder.Items.Count != 0,
+				i => button.Visible = folder.Items.Count != 0
 			);
 			button.Clicked += () => Core.Operations.SetProperty.Perform(folder, nameof(Folder.Expanded), !folder.Expanded);
 			return button;

@@ -31,6 +31,10 @@ namespace Lime
 			public ColorGradient ButtonHover;
 			public ColorGradient ButtonPress;
 			public ColorGradient ButtonDisable;
+			public ColorGradient ExpandButtonDefault;
+			public ColorGradient ExpandButtonHover;
+			public ColorGradient ExpandButtonPress;
+			public ColorGradient ExpandButtonDisable;
 			public Color4 TabNormal;
 			public Color4 TabActive;
 			public Color4 SeparatorColor;
@@ -60,6 +64,10 @@ namespace Lime
 					ButtonHover = new ColorGradient(new Color4(133, 133, 133), new Color4(133, 133, 133)),
 					ButtonPress = new ColorGradient(new Color4(141, 167, 204), new Color4(141, 167, 204)),
 					ButtonDisable = new ColorGradient(new Color4(64, 64, 64), new Color4(64, 64, 64)),
+					ExpandButtonDefault = new ColorGradient(new Color4(107, 107, 107), new Color4(107, 107, 107)),
+					ExpandButtonHover = new ColorGradient(new Color4(133, 133, 133), new Color4(133, 133, 133)),
+					ExpandButtonPress = new ColorGradient(new Color4(141, 167, 204), new Color4(141, 167, 204)),
+					ExpandButtonDisable = new ColorGradient(new Color4(64, 64, 64), new Color4(64, 64, 64)),
 					TabNormal = grayBackground.Lighten(0.1f),
 					TabActive = grayBackground.Lighten(0.05f),
 					SeparatorColor = grayBackground.Lighten(0.3f),
@@ -74,6 +82,7 @@ namespace Lime
 					ZebraColor1 = grayBackground.Lighten(0.2f),
 					ZebraColor2 = grayBackground.Lighten(0.3f),
 				};
+
 			}
 
 			public static ColorTheme CreateLightTheme()
@@ -90,6 +99,10 @@ namespace Lime
 					ButtonHover = new ColorGradient(new Color4(235, 244, 252), new Color4(222, 238, 252)),
 					ButtonPress = new ColorGradient(new Color4(215, 234, 252), new Color4(199, 226, 252)),
 					ButtonDisable = new ColorGradient(new Color4(244, 244, 244), new Color4(244, 244, 244)),
+					ExpandButtonDefault = new ColorGradient(new Color4(107, 107, 107), new Color4(107, 107, 107)),
+					ExpandButtonHover = new ColorGradient(new Color4(133, 133, 133), new Color4(133, 133, 133)),
+					ExpandButtonPress = new ColorGradient(new Color4(141, 167, 204), new Color4(141, 167, 204)),
+					ExpandButtonDisable = new ColorGradient(new Color4(64, 64, 64), new Color4(64, 64, 64)),
 					TabNormal = grayBackground.Darken(0.1f),
 					TabActive = grayBackground.Darken(0.05f),
 					SeparatorColor = grayBackground.Darken(0.3f),

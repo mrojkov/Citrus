@@ -62,7 +62,7 @@ namespace Lime
 
 		internal protected override bool IsRenderedToTexture()
 		{
-			return base.IsRenderedToTexture() || renderTarget != RenderTarget.None;
+			return (base.IsRenderedToTexture() || renderTarget != RenderTarget.None);
 		}
 
 		public override void Render()
@@ -70,6 +70,9 @@ namespace Lime
 			if (renderTexture != null) {
 				EnsureRenderChain();
 				RenderToTexture(renderTexture, renderChain);
+				if (GetTangerineFlag(TangerineFlags.DisplayContent)) {
+					RenderWithScissorTest();
+				}
 			} else if (ClipChildren == ClipMethod.ScissorTest) {
 				RenderWithScissorTest();
 			}
@@ -153,8 +156,11 @@ namespace Lime
 			if (!GloballyVisible || ClipChildren == ClipMethod.NoRender) {
 				return;
 			}
-			if (renderTexture != null || ClipChildren == ClipMethod.ScissorTest) {
+			if ((renderTexture != null || ClipChildren == ClipMethod.ScissorTest)) {
 				AddSelfToRenderChain(chain);
+				if (GetTangerineFlag(TangerineFlags.DisplayContent) && ClipChildren != ClipMethod.ScissorTest) {
+					base.AddToRenderChain(chain);
+				}
 			} else {
 				base.AddToRenderChain(chain);
 			}

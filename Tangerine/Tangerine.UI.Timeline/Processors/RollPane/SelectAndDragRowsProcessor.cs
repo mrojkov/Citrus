@@ -4,11 +4,19 @@ using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Operations;
+using Tangerine.Core.Components;
 
 namespace Tangerine.UI.Timeline
 {
 	public class SelectAndDragRowsProcessor : ITaskProvider
 	{
+		public SelectAndDragRowsProcessor()
+		{
+			Probers.Add(new BoneRowProber());
+			Probers.Add(new FolderRowProber());
+			Probers.Add(new NodeRowProber());
+		}
+
 		public IEnumerator<object> Task()
 		{
 			var roll = Timeline.Instance.Roll;
@@ -42,7 +50,7 @@ namespace Tangerine.UI.Timeline
 						SelectRow.Perform(row);
 					}
 					while (
-						input.IsMousePressed() && 
+						input.IsMousePressed() &&
 						Math.Abs(initialMousePosition.Y - input.MousePosition.Y) < TimelineMetrics.DefaultRowHeight / 4
 					) {
 						yield return null;
@@ -74,27 +82,11 @@ namespace Tangerine.UI.Timeline
 
 		static void DragRows(RowLocation dragLocation)
 		{
-			if (!CanDrag(dragLocation)) {
-				// Do not allow to drag the rows into their own guts.
-				return;
+			var rows = Document.Current.TopLevelSelectedRows().ToList();
+			foreach (var elem in rows) {
+				Probers.Any(p => p.Probe(elem, dragLocation));
+				dragLocation.Index++;
 			}
-			var c = Document.Current.TopLevelSelectedRows().Count(
-				r => r.Parent == dragLocation.ParentRow && dragLocation.ParentRow.Rows.IndexOf(r) < dragLocation.Index);
-			dragLocation.Index -= c;
-			var data = Copy.CopyToString();
-			if (Paste.CanPaste(data, dragLocation)) {
-				Delete.Perform();
-				try {
-					Paste.Perform(data, dragLocation);
-				} catch (InvalidOperationException e) {
-					AlertDialog.Show(e.Message);
-				}
-			}
-		}
-
-		static bool CanDrag(RowLocation dragLocation)
-		{
-			return !Document.Current.TopLevelSelectedRows().Any(i => i == dragLocation.ParentRow || i.Rows.Contains(dragLocation.ParentRow));
 		}
 
 		static void RenderDragCursor(RowLocation rowLocation)
@@ -111,7 +103,7 @@ namespace Tangerine.UI.Timeline
 			}
 			Timeline.Instance.Roll.ContentWidget.PrepareRendererState();
 			Renderer.DrawRect(
-				new Vector2(TimelineMetrics.RollIndentation * CalcIndentation(pr), y - 1), 
+				new Vector2(TimelineMetrics.RollIndentation * CalcIndentation(pr), y - 1),
 				new Vector2(Timeline.Instance.Roll.ContentWidget.Width, y + 1), ColorTheme.Current.TimelineRoll.DragCursor);
 		}
 
@@ -174,6 +166,112 @@ namespace Tangerine.UI.Timeline
 				}
 			}
 			return new RowLocation(Document.Current.RowTree, Document.Current.RowTree.Rows.Count);
+		}
+
+		public static readonly List<IRowProber> Probers = new List<IRowProber>();
+
+		public interface IRowProber
+		{
+			bool Probe(Row node, RowLocation location);
+		}
+
+		public abstract class Prober<T> : IRowProber where T : Component
+		{
+			public bool Probe(Row row, RowLocation location) => row.Components.Contains<T>() && ProbeInternal(row.Components.Get<T>(), row, location);
+
+			protected abstract bool ProbeInternal(T component, Row row, RowLocation location);
+
+			protected void MoveFolderItemTo(IFolderItem item, RowLocation newLocation)
+			{
+				FolderItemLocation targetLoc;
+				var folder = newLocation.ParentRow.Components.Get<FolderRow>().Folder;
+				if (newLocation.ParentRow.Rows.Count <= newLocation.Index) {
+					targetLoc = new FolderItemLocation(folder, folder.Items.Count);
+				} else {
+					var r = newLocation.ParentRow.Rows[newLocation.Index];
+					IFolderItem fi = r.Components.Get<NodeRow>()?.Node ?? (IFolderItem)r.Components.Get<FolderRow>()?.Folder;
+					targetLoc = Document.Current.Container.RootFolder().Find(fi);
+				}
+				MoveNodes.Perform(item, targetLoc);
+			}
+		}
+
+		public class NodeRowProber : Prober<NodeRow>
+		{
+			protected override bool ProbeInternal(NodeRow component, Row row, RowLocation location)
+			{
+				if (!location.ParentRow.Components.Contains<FolderRow>() || row == location.ParentRow || row.Rows.Contains(location.ParentRow))
+					return false;
+				try {
+					MoveFolderItemTo(component.Node, location);
+				} catch (InvalidOperationException e) {
+					AlertDialog.Show(e.Message);
+					return false;
+				}
+				return true;
+			}
+		}
+
+		public class FolderRowProber : Prober<FolderRow>
+		{
+			protected override bool ProbeInternal(FolderRow component, Row row, RowLocation location)
+			{
+				if (!location.ParentRow.Components.Contains<FolderRow>() || row == location.ParentRow || row.Rows.Contains(location.ParentRow))
+					return false;
+				try {
+					MoveFolderItemTo(component.Folder, location);
+				} catch (InvalidOperationException e) {
+					AlertDialog.Show(e.Message);
+					return false;
+				}
+				return true;
+			}
+		}
+
+		public class BoneRowProber : Prober<BoneRow>
+		{
+			protected override bool ProbeInternal(BoneRow node, Row row, RowLocation location)
+			{
+				if (!(location.ParentRow.Components.Contains<BoneRow>() || location.ParentRow.Components.Contains<FolderRow>())) {
+					return false;
+				}
+				var targetParent = location.ParentRow.Components.Get<BoneRow>()?.Bone;
+				try {
+					var bone = row.Components.Get<BoneRow>().Bone;
+					// Check if bone target parent is bone descendant
+					if (IsDescendant(bone, targetParent)) return false;
+					if (bone.BaseIndex == 0 && !location.ParentRow.Components.Contains<BoneRow>()) {
+						MoveFolderItemTo(bone, location);
+					} else {
+						SetProperty.Perform(bone, nameof(Bone.Position), Vector2.Zero);
+					}
+
+					SetProperty.Perform(bone, nameof(Bone.BaseIndex), targetParent?.Index ?? 0);
+					SortBonesInChain.Perform(bone);
+					var nodes = Document.Current.Container.Nodes;
+					var parentBone = nodes.GetBone(bone.BaseIndex);
+					while (parentBone != null && !parentBone.EditorState().ChildrenExpanded) {
+						SetProperty.Perform(parentBone.EditorState(), nameof(NodeEditorState.ChildrenExpanded), true);
+						bone = nodes.GetBone(bone.BaseIndex);
+					}
+				} catch (InvalidOperationException e) {
+					AlertDialog.Show(e.Message);
+					return false;
+				}
+				return true;
+			}
+
+			private bool IsDescendant(Bone bone, Bone targetParent)
+			{
+				while (targetParent != null) {
+					if (targetParent == bone) {
+						return true;
+					} else {
+						targetParent = Document.Current.Container.Nodes.GetBone(targetParent.BaseIndex);
+					}
+				}
+				return false;
+			}
 		}
 	}
 }

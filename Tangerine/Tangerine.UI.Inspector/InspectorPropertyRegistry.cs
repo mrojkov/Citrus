@@ -37,7 +37,7 @@ namespace Tangerine.UI.Inspector
 			AddEditor(typeof(Anchors), c => new AnchorsPropertyEditor(c));
 			AddEditor(typeof(Blending), c => new EnumPropertyEditor<Blending>(c));
 			AddEditor(typeof(ShaderId), c => new EnumPropertyEditor<ShaderId>(c));
-			AddEditor(typeof(RenderTarget), c => new EnumPropertyEditor<RenderTarget>(c));
+			AddEditor(typeof(RenderTarget), c => new RenderTargetPropertyEditor(c));
 			AddEditor(typeof(CameraProjectionMode), c => new EnumPropertyEditor<CameraProjectionMode>(c));
 			AddEditor(typeof(ITexture), c => new TexturePropertyEditor(c));
 			AddEditor(typeof(SerializableSample), c => new AudioSamplePropertyEditor(c));
@@ -54,6 +54,7 @@ namespace Tangerine.UI.Inspector
 			AddEditor(typeof(NodeReference<Widget>), c => new NodeReferencePropertyEditor<Widget>(c));
 			AddEditor(typeof(NodeReference<Node3D>), c => new NodeReferencePropertyEditor<Node3D>(c));
 			AddEditor(typeof(NodeReference<Spline3D>), c => new NodeReferencePropertyEditor<Spline3D>(c));
+			AddEditor(typeof(SkinningWeights), c => new SkinningWeightsPropertyEditor(c));
 		}
 
 		void AddEditor(Type type, PropertyEditorBuilder builder)

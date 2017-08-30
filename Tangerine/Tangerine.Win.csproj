@@ -253,4 +253,9 @@
     <EmbeddedResource Include="Resources\Icons\Filesystem\SplitV.png" />
     <EmbeddedResource Include="Resources\Cursors\rotate.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Icons\SceneView\Round.png" />
+    <EmbeddedResource Include="Resources\Icons\Timeline\minus.png" />
+    <EmbeddedResource Include="Resources\Icons\Timeline\plus.png" />
+  </ItemGroup>
 </Project>

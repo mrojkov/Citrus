@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using Lime;
 
+using System.Linq;
+
 namespace Tangerine.Core.Components
 {
 	public sealed class CurveRow : Component
@@ -36,8 +38,8 @@ namespace Tangerine.Core.Components
 
 		public bool Expanded
 		{
-			get { return Node.EditorState().Expanded; }
-			set { Node.EditorState().Expanded = value; }
+			get { return Node.EditorState().PropertiesExpanded; }
+			set { Node.EditorState().PropertiesExpanded = value; }
 		}
 
 		public NodeRow(Node node)
@@ -65,6 +67,24 @@ namespace Tangerine.Core.Components
 		{
 			Node = node;
 			Animator = animator;
+		}
+	}
+
+	public sealed class BoneRow : Component
+	{
+		public Bone Bone { get; private set; }
+
+		public bool ChildrenExpanded
+		{
+			get { return Bone.EditorState().ChildrenExpanded; }
+			set { Bone.EditorState().ChildrenExpanded = value; }
+		}
+
+		public bool HaveChildren { get; set; }
+
+		public BoneRow(Bone bone)
+		{
+			Bone = bone;
 		}
 	}
 }
