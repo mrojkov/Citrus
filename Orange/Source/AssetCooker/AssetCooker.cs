@@ -333,7 +333,7 @@ namespace Orange
 				}
 				// Ignore atlas parts and masks
 				var ext = Path.GetExtension(path);
-				if (ext == ".atlasPart" || ext == ".mask") {
+				if (ext == ".atlasPart" || ext == ".mask" || ext == ".texture") {
 					continue;
 				}
 				var assetPath = Path.ChangeExtension(path, GetOriginalAssetExtension(path));
@@ -585,7 +585,7 @@ namespace Orange
 			AtlasItem firstAllocatedItem = null;
 			foreach (var item in items) {
 				var sz = new Size(item.Bitmap.Width + 2, item.Bitmap.Height + 2);
-				if (firstAllocatedItem == null || AreAtlasItemsCompatible(firstAllocatedItem, item)) {
+				if (firstAllocatedItem == null || AreAtlasItemsCompatible(items, firstAllocatedItem, item)) {
 					if (a.Allocate(sz, out item.AtlasRect)) {
 						item.Allocated = true;
 						firstAllocatedItem = firstAllocatedItem ?? item;
@@ -598,10 +598,24 @@ namespace Orange
 		/// <summary>
 		/// Checks whether two items can be packed to the same texture
 		/// </summary>
-		public static bool AreAtlasItemsCompatible(AtlasItem item1, AtlasItem item2)
+		public static bool AreAtlasItemsCompatible(List<AtlasItem> items, AtlasItem item1, AtlasItem item2)
 		{
+			if (item1.CookingRules.WrapMode != item2.CookingRules.WrapMode) {
+				return false;
+			}
+			if (item1.CookingRules.MinFilter != item2.CookingRules.MinFilter) {
+				return false;
+			}
+			if (item1.CookingRules.MagFilter != item2.CookingRules.MagFilter) {
+				return false;
+			}
 			if (item1.CookingRules.MipMaps != item2.CookingRules.MipMaps) {
 				return false;
+			}
+			if (items.Count > 0) {
+				if (item1.CookingRules.WrapMode != TextureWrapMode.Clamp || item2.CookingRules.WrapMode != TextureWrapMode.Clamp) {
+					return false;
+				}
 			}
 			switch (Platform) {
 				case TargetPlatform.Android:
@@ -661,8 +675,24 @@ namespace Orange
 			return !The.Workspace.ProjectJson.GetValue("DontGenerateOpacityMasks", false);
 		}
 
+		private static bool AreTextureParamsDefault(ICookingRules rules)
+		{
+			return rules.MinFilter == TextureParams.Default.MinFilter &&
+				rules.MagFilter == TextureParams.Default.MagFilter &&
+				rules.WrapMode == TextureParams.Default.WrapModeU;
+		}
+
 		public static void ImportTexture(string path, Bitmap texture, ICookingRules rules)
 		{
+			if (!AreTextureParamsDefault(rules)) {
+				UpscaleTextureIfNeeded(ref texture, rules, false);
+				var textureParamsPath = Path.ChangeExtension(path, ".texture");
+				var textureParams = new TextureParams();
+				textureParams.WrapMode = rules.WrapMode;
+				textureParams.MinFilter = rules.MinFilter;
+				textureParams.MagFilter = rules.MagFilter;
+				Serialization.WriteObjectToBundle(AssetBundle, textureParamsPath, textureParams, Serialization.Format.Binary, ".texture");
+			}
 			if (ShouldGenerateOpacityMasks()) {
 				var maskPath = Path.ChangeExtension(path, ".mask");
 				OpacityMaskCreator.CreateMask(AssetBundle, texture, maskPath);
@@ -690,6 +720,24 @@ namespace Orange
 				default:
 					throw new Lime.Exception();
 			}
+		}
+
+		private static void UpscaleTextureIfNeeded(ref Bitmap texture, ICookingRules rules, bool square)
+		{
+			if (rules.WrapMode == TextureWrapMode.Clamp) {
+				return;
+			}
+			if (TextureConverterUtils.IsPowerOf2(texture.Width) && TextureConverterUtils.IsPowerOf2(texture.Height)) {
+				return;
+			}
+			int newWidth = CalcUpperPowerOfTwo(texture.Width);
+			int newHeight = CalcUpperPowerOfTwo(texture.Height);
+			if (square) {
+				newHeight = newWidth = Math.Max(newWidth, newHeight);
+			}
+			var newTexture = texture.Rescale(newWidth, newHeight);
+			texture.Dispose();
+			texture = newTexture;
 		}
 
 		private static void DownscaleTextureToFitAtlas(ref Bitmap bitmap, string path)

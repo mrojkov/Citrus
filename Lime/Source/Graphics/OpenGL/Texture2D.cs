@@ -97,6 +97,9 @@ namespace Lime
 
 		private void SetTextureParameter(TextureParameterName name, int value)
 		{
+			if (handle == 0) {
+				return;
+			}
 			PlatformRenderer.PushTexture(handle, 0);
 			GL.TexParameter(TextureTarget.Texture2D, name, value);
 			PlatformRenderer.PopTexture(0);

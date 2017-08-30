@@ -131,6 +131,12 @@ namespace Lime
 				return null;
 			}
 			var texture = new Texture2D();
+			var textureParamsPath = Path.ChangeExtension(path, ".texture");
+			if (AssetBundle.Instance.FileExists(textureParamsPath)) {
+				using (var stream = AssetBundle.Instance.OpenFile(textureParamsPath)) {
+					texture.TextureParams = Serialization.ReadObject<TextureParams>(textureParamsPath, stream);
+				}
+			}
 			texture.LoadImage(path);
 			AudioSystem.Update();
 			return texture;

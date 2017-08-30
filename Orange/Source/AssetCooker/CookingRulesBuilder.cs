@@ -318,6 +318,9 @@ namespace Orange
 							break;
 					}
 				}
+				if (EffectiveRules.WrapMode != TextureWrapMode.Clamp) {
+					EffectiveRules.TextureAtlas = null;
+				}
 			}
 		}
 
