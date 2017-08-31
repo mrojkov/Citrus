@@ -99,6 +99,17 @@ namespace Lime
 			return angle;
 		}
 
+		public static float Wrap180(float angle)
+		{
+			if (angle > 180) {
+				return angle - 2 * (float)Math.Floor(angle * (1.0f / 180.0f)) * 180.0f;
+			}
+			if (angle < -180) {
+				return angle - 2 * (float)Math.Ceiling(angle * (1.0f / 180.0f)) * 180.0f;
+			}
+			return angle;
+		}
+
 		public static float Sqr(float x)
 		{
 			return x * x;

@@ -69,7 +69,7 @@ namespace Tangerine.UI.SceneView
 					mousePosPrev = b;
 					var angle = 0f;
 					if (a.Length > Mathf.ZeroTolerance && b.Length > Mathf.ZeroTolerance) {
-						angle = Mathf.Wrap360(b.Atan2Deg - a.Atan2Deg);
+						angle = Mathf.Wrap180(b.Atan2Deg - a.Atan2Deg);
 						rotation += angle;
 					}
 					if (Math.Abs(angle) > Mathf.ZeroTolerance) {
@@ -88,7 +88,7 @@ namespace Tangerine.UI.SceneView
 								Core.Operations.SetAnimableProperty.Perform(
 									points[i],
 									nameof(SplinePoint.TangentAngle),
-									(points[i] as SplinePoint).TangentAngle + effectiveAngle);
+									(points[i] as SplinePoint).TangentAngle - effectiveAngle);
 							}
 						}
 					}

@@ -45,7 +45,7 @@ namespace Tangerine.UI.SceneView
 					var b = sv.MousePosition * t - entry.Joint;
 					mousePos = sv.MousePosition;
 					if (a.Length > Mathf.ZeroTolerance && b.Length > Mathf.ZeroTolerance) {
-						rotation += Mathf.Wrap360(b.Atan2Deg - a.Atan2Deg);
+						rotation += Mathf.Wrap180(b.Atan2Deg - a.Atan2Deg);
 					}
 					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.Rotation), initRotation + rotation);
 					bone.Parent.Update(0);
