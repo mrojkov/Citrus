@@ -188,9 +188,7 @@ namespace Tangerine.UI.Timeline
 				if (newLocation.ParentRow.Rows.Count <= newLocation.Index) {
 					targetLoc = new FolderItemLocation(folder, folder.Items.Count);
 				} else {
-					var r = newLocation.ParentRow.Rows[newLocation.Index];
-					IFolderItem fi = r.Components.Get<NodeRow>()?.Node ?? (IFolderItem)r.Components.Get<FolderRow>()?.Folder;
-					targetLoc = Document.Current.Container.RootFolder().Find(fi);
+					targetLoc = Row.GetFolderItemLocation(newLocation.ParentRow.Rows[newLocation.Index]);
 				}
 				MoveNodes.Perform(item, targetLoc);
 			}

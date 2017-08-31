@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Lime;
+using Tangerine.Core.Components;
 
 namespace Tangerine.Core
 {
@@ -25,5 +26,16 @@ namespace Tangerine.Core
 		public Row Parent { get; set; }
 		public readonly List<Row> Rows = new List<Row>();
 		public readonly ComponentCollection<Component> Components = new ComponentCollection<Component>();
+
+		public static FolderItemLocation GetFolderItemLocation(Row r)
+		{
+			var fi = GetFolderItem(r);
+			return fi == null ? new FolderItemLocation(null, -1) : Document.Current.Container.RootFolder().Find(fi);
+		}
+
+		public static IFolderItem GetFolderItem(Row r)
+		{
+			return (r.Components.Get<NodeRow>()?.Node as IFolderItem) ?? r.Components.Get<FolderRow>()?.Folder;
+		}
 	}
 }

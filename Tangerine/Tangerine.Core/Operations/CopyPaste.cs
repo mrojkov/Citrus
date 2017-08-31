@@ -3,6 +3,7 @@ using System.Linq;
 using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Components;
+using System.Collections.Generic;
 
 namespace Tangerine.Core.Operations
 {
@@ -27,6 +28,20 @@ namespace Tangerine.Core.Operations
 		{
 			var frame = new Frame();
 			foreach (var row in Document.Current.TopLevelSelectedRows()) {
+				var bone = row.Components.Get<BoneRow>()?.Bone;
+				if (bone != null) {
+					var c = (Bone)Document.CreateCloneForSerialization(bone);
+					c.BaseIndex = 0;
+					frame.RootFolder().Items.Add(c);
+					if (!bone.EditorState().ChildrenExpanded) {
+						var children = BoneUtils.FindBoneDescendats(bone, Document.Current.Container.Nodes.OfType<Bone>());
+						foreach (var b in children) {
+							c = (Bone)Document.CreateCloneForSerialization(b);
+							frame.RootFolder().Items.Add(c);
+						}
+					}
+					continue;
+				}
 				var node = row.Components.Get<NodeRow>()?.Node;
 				if (node != null) {
 					frame.RootFolder().Items.Add(Document.CreateCloneForSerialization(node));
@@ -79,9 +94,9 @@ namespace Tangerine.Core.Operations
 
 		public static bool CanPaste(string data, RowLocation location)
 		{
-			var parentFolder = location.ParentRow.Components.Get<FolderRow>()?.Folder;
 			// We are support only paste into folders for now.
-			return parentFolder != null;
+			return location.ParentRow.Components.Contains<FolderRow>() ||
+				   location.ParentRow.Components.Contains<BoneRow>();
 		}
 
 		public static bool Perform(string data, RowLocation location)
@@ -97,9 +112,10 @@ namespace Tangerine.Core.Operations
 				Debug.Write(e);
 				return false;
 			}
-			var parentFolder = location.ParentRow.Components.Get<FolderRow>()?.Folder;
-			if (!parentFolder.Expanded) {
-				SetProperty.Perform(parentFolder, nameof(Folder.Expanded), true);
+			var folderLocation = Row.GetFolderItemLocation(location.ParentRow.Rows[location.Index]);
+			folderLocation.Index++;
+			if (!folderLocation.Folder.Expanded) {
+				SetProperty.Perform(folderLocation.Folder, nameof(Folder.Expanded), true);
 			}
 			var items = frame.RootFolder().Items.ToList();
 			foreach (var n in items.OfType<Node>()) {
@@ -108,10 +124,45 @@ namespace Tangerine.Core.Operations
 			frame.RootFolder().Items.Clear();
 			frame.RootFolder().SyncDescriptorsAndNodes(frame);
 			ClearRowSelection.Perform();
-			foreach (var i in items) {
-				InsertFolderItem.Perform(Document.Current.Container, new FolderItemLocation(parentFolder, location.Index), i);
-				location.Index++;
-				SelectRow.Perform(Document.Current.GetRowForObject(i));
+			while (items.Count > 0) {
+				var item = items.First();
+				var bone = item as Bone;
+				if (bone != null) {
+					if (bone.BaseIndex != 0) {
+						continue;
+					}
+					var newIndex = Document.Current.Container.Nodes.OfType<Bone>().Max(b => b.Index) + 1;
+					var children = BoneUtils.FindBoneDescendats(bone, items.OfType<Bone>()).ToList();
+					var map = new Dictionary<int, int>();
+					map.Add(bone.Index, newIndex);
+					bone.BaseIndex = location.ParentRow.Components.Get<BoneRow>()?.Bone.Index ?? 0;
+					bone.Index = newIndex;
+					InsertFolderItem.Perform(
+						Document.Current.Container,
+						folderLocation, bone);
+					folderLocation.Index++;
+					foreach (var b in children) {
+						b.BaseIndex = map[b.BaseIndex];
+						map.Add(b.Index, b.Index = ++newIndex);
+						InsertFolderItem.Perform(
+							Document.Current.Container,
+							folderLocation, b);
+						folderLocation.Index++;
+						items.Remove(b);
+					}
+					Document.Current.Container.RootFolder().SyncDescriptorsAndNodes(Document.Current.Container);
+					SortBonesInChain.Perform(bone);
+					SelectRow.Perform(Document.Current.GetRowForObject(item));
+				} else {
+					if (!location.ParentRow.Components.Contains<BoneRow>()) {
+						InsertFolderItem.Perform(
+							Document.Current.Container,
+							folderLocation, item);
+						folderLocation.Index++;
+						SelectRow.Perform(Document.Current.GetRowForObject(item));
+					}
+				}
+				items.Remove(item);
 			}
 			return true;
 		}
@@ -122,7 +173,7 @@ namespace Tangerine.Core.Operations
 		public static void Perform()
 		{
 			foreach (var row in Document.Current.TopLevelSelectedRows().ToList()) {
-				var item = (row.Components.Get<NodeRow>()?.Node as IFolderItem) ?? row.Components.Get<FolderRow>()?.Folder;
+				var item = Row.GetFolderItem(row);
 				if (item != null) {
 					UnlinkFolderItem.Perform(Document.Current.Container, item);
 				}
