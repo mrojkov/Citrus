@@ -175,6 +175,7 @@ namespace Orange
 			}
 			AddStage(SyncTextures);
 			AddStage(DeleteOrphanedMasks);
+			AddStage(DeleteOrphanedTextureParams);
 			AddStage(SyncFonts);
 			AddStage(SyncHotFonts);
 			AddStage(() => SyncRawAssets(".ttf"));
@@ -203,6 +204,18 @@ namespace Orange
 		{
 			Console.WriteLine("- " + path);
 			AssetBundle.DeleteFile(path);
+		}
+
+		private static void DeleteOrphanedTextureParams()
+		{
+			foreach (var path in AssetBundle.EnumerateFiles()) {
+				if (Path.GetExtension(path) == ".texture") {
+					var origImageFile = Path.ChangeExtension(path, GetPlatformTextureExtension());
+					if (!AssetBundle.FileExists(origImageFile)) {
+						DeleteFileFromBundle(path);
+					}
+				}
+			}
 		}
 
 		private static void DeleteOrphanedMasks()
