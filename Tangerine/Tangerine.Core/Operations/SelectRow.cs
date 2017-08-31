@@ -53,7 +53,7 @@ namespace Tangerine.Core.Operations
 			if (select) {
 				if (node is Bone && (node as Bone).Index != 0) {
 					var bone = Document.Current.Container.Nodes.GetBone(((Bone)node).BaseIndex);
-					while (bone != null && !bone.EditorState().ChildrenExpanded) {
+					while (bone != null) {
 						SetProperty.Perform(bone.EditorState(), nameof(NodeEditorState.ChildrenExpanded), true);
 						bone = Document.Current.Container.Nodes.GetBone(bone.BaseIndex);
 					}
