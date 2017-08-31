@@ -83,8 +83,10 @@ namespace Tangerine.UI.SceneView
 		{
 			var chessTexture = new Texture2D();
 			chessTexture.LoadImage(new[] { color1, color2, color2, color1 }, 2, 2);
-			chessTexture.WrapModeV = chessTexture.WrapModeU = TextureWrapMode.Repeat;
-			chessTexture.MinFilter = chessTexture.MagFilter = TextureFilter.Nearest;
+			chessTexture.TextureParams = new TextureParams {
+				WrapMode = TextureWrapMode.Repeat,
+				MinMagFilter = TextureFilter.Nearest,
+			};
 			return chessTexture;
 		}
 	}
