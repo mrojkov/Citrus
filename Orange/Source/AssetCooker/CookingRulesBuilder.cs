@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.IO;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using Lime;
 using Yuzu;
 using Yuzu.Metadata;
@@ -40,6 +42,16 @@ namespace Orange
 		LZMA,
 	}
 
+	public class TargetPlatformsAttribute : Attribute
+	{
+		public readonly TargetPlatform[] TargetPlatforms;
+
+		public TargetPlatformsAttribute(params TargetPlatform []TargetPlatforms)
+		{
+			this.TargetPlatforms = TargetPlatforms;
+		}
+	}
+
 	public interface ICookingRules
 	{
 		string TextureAtlas { get; }
@@ -55,6 +67,12 @@ namespace Orange
 		ModelCompression ModelCompressing { get; }
 		string AtlasPacker { get; }
 		string CustomRule { get; }
+		[TargetPlatforms]
+		TextureWrapMode WrapMode { get; }
+		[TargetPlatforms]
+		TextureFilter MinFilter { get; }
+		[TargetPlatforms]
+		TextureFilter MagFilter { get; }
 	}
 
 	public class ParticularCookingRules : ICookingRules
@@ -304,6 +322,9 @@ namespace Orange
 					}
 				}
 			}
+			if (EffectiveRules.WrapMode != TextureWrapMode.Clamp) {
+				EffectiveRules.TextureAtlas = null;
+			}
 		}
 
 		public bool HasOverrides()
@@ -323,6 +344,7 @@ namespace Orange
 		public const string CookingRulesFilename = "#CookingRules.txt";
 		public const string DirectoryNameToken = "${DirectoryName}";
 
+		// pass target as null to build cooking rules disregarding targets
 		public static Dictionary<string, CookingRules> Build(IFileEnumerator fileEnumerator, Target target)
 		{
 			var shouldRescanEnumerator = false;
@@ -491,13 +513,22 @@ namespace Orange
 								string targetName = words[0].Substring(cut + 1, words[0].Length - cut - 2);
 								words[0] = words[0].Substring(0, cut);
 								currentRules = null;
+								Target currentTarget = null;
 								foreach (var t in The.Workspace.Targets) {
 									if (targetName == t.Name) {
-										currentRules = rules.TargetRules[t];
+										currentTarget = t;
 									}
 								}
-								if (currentRules == null) {
-									throw new Lime.Exception($"Invalid platform or target: {targetName}");
+								if (currentTarget == null) {
+									throw new Lime.Exception($"Invalid target: {targetName}");
+								}
+								currentRules = rules.TargetRules[currentTarget];
+								{
+									var targetPlatformAttribute = (TargetPlatformsAttribute)typeof(ICookingRules)
+										.GetProperty(words[0]).GetCustomAttribute(typeof(TargetPlatformsAttribute));
+									if (targetPlatformAttribute != null && !targetPlatformAttribute.TargetPlatforms.Contains(currentTarget.Platform)) {
+										throw new Lime.Exception($"Invalid platform {currentTarget.Platform} for cooking rule {words[0]}");
+									}
 								}
 							}
 						} else {
