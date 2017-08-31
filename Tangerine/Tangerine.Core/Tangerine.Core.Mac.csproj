@@ -54,7 +54,6 @@
   <ItemGroup>
     <Folder Include="Resources\" />
     <Folder Include="Operations\" />
-    <Folder Include="HotStudioExport\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -65,10 +64,6 @@
     <Compile Include="AnimatorEditorState.cs" />
     <Compile Include="Operation.cs" />
     <Compile Include="ITaskProvider.cs" />
-    <Compile Include="HotStudioImport\HotAnimators.cs" />
-    <Compile Include="HotStudioImport\HotFontImporter.cs" />
-    <Compile Include="HotStudioImport\HotLexer.cs" />
-    <Compile Include="HotStudioImport\HotSceneImporter.cs" />
     <Compile Include="Project.cs" />
     <Compile Include="IDataflow.cs" />
     <Compile Include="VersionedCollection.cs" />
@@ -79,7 +74,6 @@
     <Compile Include="Operations\SelectRowRange.cs" />
     <Compile Include="Operations\EnterLeaveNode.cs" />
     <Compile Include="RowsSynchronizer.cs" />
-    <Compile Include="HotStudioExport\HotSceneExporter.cs" />
     <Compile Include="WidgetExtensions.cs" />
     <Compile Include="ClassAttributes.cs" />
     <Compile Include="PropertyAttributes.cs" />
@@ -90,8 +84,8 @@
     <Compile Include="Operations\SyncFolderDescriptorsProcessor.cs" />
     <Compile Include="NodeCompositionValidator.cs" />
     <Compile Include="KeyHandler.cs" />
-    <Compile Include="Utils.cs" />
     <Compile Include="UserPreferences.cs" />
+    <Compile Include="HotSerialization.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

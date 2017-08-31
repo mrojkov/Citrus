@@ -93,6 +93,7 @@
     <Compile Include="Processors\RotatePointObjectSelectionProcessor.cs" />
     <Compile Include="Processors\Bones\ChangeBoneLengthProcessor.cs" />
     <Compile Include="Presenters\Bone3DPresenter.cs" />
+    <Compile Include="Presenters\TransparentWidgetsPresenter.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Mac.csproj">
