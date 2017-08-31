@@ -31,6 +31,8 @@ namespace Lime
 
 		public Widget ClipByWidget { get; set; }
 
+		private bool fastAddToRenderChain = true;
+
 		RenderTarget renderTarget;
 		ITexture renderTexture;
 
@@ -156,10 +158,15 @@ namespace Lime
 			if (!GloballyVisible || ClipChildren == ClipMethod.NoRender) {
 				return;
 			}
-			if ((renderTexture != null || ClipChildren == ClipMethod.ScissorTest)) {
+			if (renderTexture != null || ClipChildren == ClipMethod.ScissorTest) {
 				AddSelfToRenderChain(chain);
 				if (GetTangerineFlag(TangerineFlags.DisplayContent) && ClipChildren != ClipMethod.ScissorTest) {
 					base.AddToRenderChain(chain);
+				}
+			} else if (Layer == 0 && PostPresenter == null && Presenter == DefaultPresenter.Instance) {
+				// 90% calls should go here.
+				for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
+					node.RenderChainBuilder?.AddToRenderChain(node, chain);
 				}
 			} else {
 				base.AddToRenderChain(chain);
