@@ -11,6 +11,7 @@ namespace Tangerine.UI.SceneView
 	public class BoneAsistantPresenter
 	{
 		private readonly SceneView sv;
+		private const float RectSize = 15;
 
 		public BoneAsistantPresenter(SceneView sceneView)
 		{
@@ -22,24 +23,18 @@ namespace Tangerine.UI.SceneView
 		{
 			var ctr = Document.Current.Container as Widget;
 			if (ctr != null) {
-				ctr.PrepareRendererState();
-				var mtx = ctr.LocalToWorldTransform;
-				Renderer.Transform1 = mtx;
-				var t1 = 1 / mtx.U.Length;
-				var t2 = 1 / mtx.V.Length;
-				Renderer.Flush();
+				var t = ctr.CalcTransitionToSpaceOf(canvas);
 				if (!Document.Current.PreviewAnimation) {
-					var helper = SceneView.Instance.Scene.Components.Get<CreateBoneHelper>();
+					var helper = SceneView.Instance.Components.Get<CreateBoneHelper>();
 					if (helper != null && helper.HitTip != default(Vector2)) {
-						var size = 15 / SceneView.Instance.Scene.Scale.X;
-						var lt = helper.HitTip - Vector2.One * size;
-						var rb = helper.HitTip + Vector2.One * size;
-						var rt = helper.HitTip + new Vector2(-size, size);
-						var lb = helper.HitTip + new Vector2(size, -size);
-						Renderer.DrawLine(lt, rt, Color4.Green, t1);
-						Renderer.DrawLine(rt, rb, Color4.Green, t2);
-						Renderer.DrawLine(rb, lb, Color4.Green, t1);
-						Renderer.DrawLine(lb, lt, Color4.Green, t2);
+						var hull = new Rectangle(helper.HitTip * t, helper.HitTip * t)
+							.ExpandedBy(new Thickness(RectSize))
+							.ToQuadrangle();
+						for (int i = 0; i < 4; i++) {
+							var a = hull[i];
+							var b = hull[(i + 1) % 4];
+							Renderer.DrawLine(a, b, Color4.Green);
+						}
 					}
 				}
 			}
