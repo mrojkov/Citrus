@@ -661,8 +661,29 @@ namespace Orange
 			return !The.Workspace.ProjectJson.GetValue("DontGenerateOpacityMasks", false);
 		}
 
+		public static bool AreTextureParamsDefault(ICookingRules rules)
+		{
+			return rules.MinFilter == TextureParams.Default.MinFilter &&
+				rules.MagFilter == TextureParams.Default.MagFilter &&
+				rules.WrapMode == TextureParams.Default.WrapModeU;
+		}
+
 		public static void ImportTexture(string path, Bitmap texture, ICookingRules rules)
 		{
+			var textureParamsPath = Path.ChangeExtension(path, ".texture");
+			if (!AreTextureParamsDefault(rules)) {
+				UpscaleTextureIfNeeded(ref texture, rules, false);
+				var textureParams = new TextureParams {
+					WrapMode = rules.WrapMode,
+					MinFilter = rules.MinFilter,
+					MagFilter = rules.MagFilter,
+				};
+				Serialization.WriteObjectToBundle(AssetBundle, textureParamsPath, textureParams, Serialization.Format.Binary, ".texture");
+			} else {
+				if (AssetBundle.FileExists(textureParamsPath)) {
+					DeleteFileFromBundle(textureParamsPath);
+				}
+			}
 			if (ShouldGenerateOpacityMasks()) {
 				var maskPath = Path.ChangeExtension(path, ".mask");
 				OpacityMaskCreator.CreateMask(AssetBundle, texture, maskPath);
