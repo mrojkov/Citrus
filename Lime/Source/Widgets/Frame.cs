@@ -31,8 +31,6 @@ namespace Lime
 
 		public Widget ClipByWidget { get; set; }
 
-		private bool fastAddToRenderChain = true;
-
 		RenderTarget renderTarget;
 		ITexture renderTexture;
 
@@ -163,11 +161,12 @@ namespace Lime
 				if (GetTangerineFlag(TangerineFlags.DisplayContent) && ClipChildren != ClipMethod.ScissorTest) {
 					base.AddToRenderChain(chain);
 				}
-			} else if (Layer == 0 && PostPresenter == null && Presenter == DefaultPresenter.Instance) {
+			} else if (Layer == 0 && Presenter != null && PostPresenter == null) {
 				// 90% calls should go here.
 				for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
 					node.RenderChainBuilder?.AddToRenderChain(node, chain);
 				}
+				chain.Add(this, Presenter);
 			} else {
 				base.AddToRenderChain(chain);
 			}
