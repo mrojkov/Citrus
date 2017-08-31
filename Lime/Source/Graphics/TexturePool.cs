@@ -131,6 +131,7 @@ namespace Lime
 				return null;
 			}
 			var texture = new Texture2D();
+			texture.LoadTextureParams(path);
 			texture.LoadImage(path);
 			AudioSystem.Update();
 			return texture;

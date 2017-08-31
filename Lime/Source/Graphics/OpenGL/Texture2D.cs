@@ -34,6 +34,7 @@ namespace Lime
 
 			public override void Reload(Texture2D texture)
 			{
+				texture.LoadTextureParams(path);
 				texture.LoadImage(path);
 			}
 		}
@@ -150,6 +151,18 @@ namespace Lime
 		public Texture2D()
 		{
 			GLObjectRegistry.Instance.Add(this);
+		}
+
+		public void LoadTextureParams(string path)
+		{
+			var textureParamsPath = Path.ChangeExtension(path, ".texture");
+			if (AssetBundle.Instance.FileExists(textureParamsPath)) {
+				using (var stream = AssetBundle.Instance.OpenFile(textureParamsPath)) {
+					TextureParams = Serialization.ReadObject<TextureParams>(textureParamsPath, stream);
+				}
+			} else {
+				TextureParams = TextureParams.Default;
+			}
 		}
 
 		public void LoadImage(string path)
