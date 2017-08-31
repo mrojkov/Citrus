@@ -27,7 +27,7 @@ namespace Tangerine.UI.Timeline
 							if (mp > rulerWidget.Width - cw / 2) {
 								timeline.OffsetX += cw;
 							} else if (mp < cw / 2) {
-								timeline.OffsetX -= cw;
+								timeline.OffsetX = Math.Max(0, timeline.OffsetX - cw);
 							}
 							if (input.IsKeyPressed(Key.Control) && !input.WasMousePressed()) {
 								if (input.IsKeyPressed(Key.Shift)) {
