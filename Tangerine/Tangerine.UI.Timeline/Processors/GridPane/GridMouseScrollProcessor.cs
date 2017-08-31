@@ -19,7 +19,7 @@ namespace Tangerine.UI.Timeline
 					if (p.X > widget.Width - cw / 2) {
 						timeline.OffsetX += cw;
 					} else if (p.X < cw / 2) {
-						timeline.OffsetX -= cw;
+						timeline.OffsetX = Math.Max(0, timeline.OffsetX - cw);
 					}
 					Operations.SetCurrentColumn.Perform(RulerbarMouseScrollProcessor.CalcColumn(p.X));
 					var rh = TimelineMetrics.DefaultRowHeight;
