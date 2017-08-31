@@ -463,12 +463,12 @@ namespace Tangerine.Core.Operations
 		public static void Perform(Bone boneInChain)
 		{
 			var bones = Document.Current.Container.Nodes.OfType<Bone>();
-			var rootParent = bones.GetBone(boneInChain.BaseIndex) ?? boneInChain;
+			var rootParent = bones.GetBone(boneInChain.BaseIndex);
 			while (rootParent != null && rootParent.BaseIndex != 0) {
 				rootParent = bones.GetBone(rootParent.BaseIndex);
 			}
-			var tree = BoneUtils.SortBones(BoneUtils.FindBoneDescendats(rootParent, bones));
-			var loc = Document.Current.Container.RootFolder().Find(rootParent);
+			var tree = BoneUtils.SortBones(BoneUtils.FindBoneDescendats(rootParent ?? boneInChain, bones));
+			var loc = Document.Current.Container.RootFolder().Find(rootParent ?? boneInChain);
 			foreach (var child in tree) {
 				MoveNodes.Perform(child, new FolderItemLocation(loc.Folder, ++loc.Index));
 			}
