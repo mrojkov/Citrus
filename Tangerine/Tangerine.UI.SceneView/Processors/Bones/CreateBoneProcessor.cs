@@ -38,7 +38,7 @@ namespace Tangerine.UI.SceneView
 							break;
 						}
 					}
-					SceneView.Instance.Scene.Components.GetOrAdd<CreateBoneHelper>().HitTip =
+					SceneView.Instance.Components.GetOrAdd<CreateBoneHelper>().HitTip =
 						index != 0 ? items[index].Tip : default(Vector2);
 				}
 
@@ -82,7 +82,7 @@ namespace Tangerine.UI.SceneView
 
 					} finally {
 						sv.Input.ReleaseMouse();
-						SceneView.Instance.Scene.Components.Remove<CreateBoneHelper>();
+						SceneView.Instance.Components.Remove<CreateBoneHelper>();
 						Document.Current.History.EndTransaction();
 					}
 				}
@@ -96,7 +96,7 @@ namespace Tangerine.UI.SceneView
 
 				yield return null;
 			}
-			SceneView.Instance.Scene.Components.Remove<CreateBoneHelper>();
+			SceneView.Instance.Components.Remove<CreateBoneHelper>();
 		}
 	}
 
