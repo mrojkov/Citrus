@@ -126,10 +126,7 @@ namespace Tangerine.UI.SceneView
 			protected override bool ProbeInternal(Bone bone, Vector2 point)
 			{
 				var t = SceneView.Instance.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget).CalcInversed();
-				var hull = BonePresenter.CalcHull(bone);
-				for (int i = 0; i < 4; i++) {
-					hull[i] = hull[i] * t;
-				}
+				var hull = BonePresenter.CalcHull(bone) * t;
 				return hull.Contains(point);
 			}
 
