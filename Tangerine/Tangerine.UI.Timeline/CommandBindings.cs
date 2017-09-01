@@ -101,11 +101,13 @@ namespace Tangerine.UI.Timeline
 		static void CreateMarker(MarkerAction action)
 		{
 			var timeline = Timeline.Instance;
+			var nearestMarker = Document.Current.Container.Markers.LastOrDefault(
+				m => m.Frame < timeline.CurrentColumn && m.Action == MarkerAction.Play);
 			var newMarker = new Marker(
 				action == MarkerAction.Play ? "Start" : "",
 				timeline.CurrentColumn,
 				action,
-				action == MarkerAction.Jump ? "Start" : ""
+				action == MarkerAction.Jump && nearestMarker != null ? nearestMarker.Id : ""
 			);
 			Core.Operations.SetMarker.Perform(Document.Current.Container.DefaultAnimation.Markers, newMarker);
 		}
