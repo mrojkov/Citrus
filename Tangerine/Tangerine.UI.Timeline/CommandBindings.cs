@@ -104,7 +104,8 @@ namespace Tangerine.UI.Timeline
 			var newMarker = new Marker(
 				action == MarkerAction.Play ? "Start" : "",
 				timeline.CurrentColumn,
-				action
+				action,
+				action == MarkerAction.Jump ? "Start" : ""
 			);
 			Core.Operations.SetMarker.Perform(Document.Current.Container.DefaultAnimation.Markers, newMarker);
 		}
