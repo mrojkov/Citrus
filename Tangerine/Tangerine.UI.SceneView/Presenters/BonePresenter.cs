@@ -76,8 +76,10 @@ namespace Tangerine.UI.SceneView
 				var p = bone.Parent.AsWidget.BoneArray[bone.BaseIndex].Tip * t;
 				var dashTexture = new Texture2D();
 				dashTexture.LoadImage(new Bitmap(new EmbeddedResource(DashTexturePath, "Tangerine").GetResourceStream()));
-				dashTexture.WrapModeV = dashTexture.WrapModeU = TextureWrapMode.Repeat;
-				dashTexture.MinFilter = dashTexture.MagFilter = TextureFilter.Nearest;
+				dashTexture.TextureParams = new TextureParams {
+					WrapMode = TextureWrapMode.Repeat,
+					MinMagFilter = TextureFilter.Nearest
+				};
 				Renderer.DrawDashedLine(dashTexture, p, hull.V1 * t, ColorTheme.Current.SceneView.BoneOutline);
 			}
 			if (selected) {

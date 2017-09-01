@@ -119,28 +119,10 @@ namespace Lime
 			set { throw new NotSupportedException(); }
 		}
 
-		public TextureWrapMode WrapModeU
+		public TextureParams TextureParams
 		{
-			get { return atlasTexture.WrapModeU; }
-			set { atlasTexture.WrapModeU = value; }
-		}
-
-		public TextureWrapMode WrapModeV
-		{
-			get { return atlasTexture.WrapModeV; }
-			set { atlasTexture.WrapModeV = value; }
-		}
-
-		public TextureFilter MinFilter
-		{
-			get { return atlasTexture.MinFilter; }
-			set { atlasTexture.MinFilter = value; }
-		}
-
-		public TextureFilter MagFilter
-		{
-			get { return atlasTexture.MagFilter; }
-			set { atlasTexture.MagFilter = value; }
+			get { return atlasTexture.TextureParams;}
+			set { atlasTexture.TextureParams = value; }
 		}
 	}
 }

@@ -77,7 +77,9 @@ namespace Tangerine.UI.FilesystemView
 			}
 			textureCache[filename] = texture;
 			var img = new Image(texture);
-			img.Texture.MinFilter = img.Texture.MagFilter = TextureFilter.Nearest;
+			img.Texture.TextureParams = new TextureParams {
+				MinMagFilter = TextureFilter.Nearest
+			};
 			img.MinMaxSize = img.Size = (Vector2)img.Texture.SurfaceSize;
 			return img;
 		}

@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.IO;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using Lime;
 using Yuzu;
 using Yuzu.Metadata;
@@ -40,6 +42,16 @@ namespace Orange
 		LZMA,
 	}
 
+	public class TargetPlatformsAttribute : Attribute
+	{
+		public readonly TargetPlatform[] TargetPlatforms;
+
+		public TargetPlatformsAttribute(params TargetPlatform []TargetPlatforms)
+		{
+			this.TargetPlatforms = TargetPlatforms;
+		}
+	}
+
 	public interface ICookingRules
 	{
 		string TextureAtlas { get; }
@@ -55,6 +67,12 @@ namespace Orange
 		ModelCompression ModelCompressing { get; }
 		string AtlasPacker { get; }
 		string CustomRule { get; }
+		[TargetPlatforms]
+		TextureWrapMode WrapMode { get; }
+		[TargetPlatforms]
+		TextureFilter MinFilter { get; }
+		[TargetPlatforms]
+		TextureFilter MagFilter { get; }
 	}
 
 	public class ParticularCookingRules : ICookingRules
@@ -98,6 +116,15 @@ namespace Orange
 
 		[YuzuRequired]
 		public string AtlasPacker { get; set; }
+
+		[YuzuRequired]
+		public TextureWrapMode WrapMode { get; set; }
+
+		[YuzuRequired]
+		public TextureFilter MinFilter { get; set; }
+
+		[YuzuRequired]
+		public TextureFilter MagFilter { get; set; }
 
 		[YuzuRequired]
 		public string CustomRule { get; set; }
@@ -180,6 +207,9 @@ namespace Orange
 		public AtlasOptimization AtlasOptimization => EffectiveRules.AtlasOptimization;
 		public ModelCompression ModelCompressing => EffectiveRules.ModelCompressing;
 		public string AtlasPacker => EffectiveRules.AtlasPacker;
+		public TextureWrapMode WrapMode => EffectiveRules.WrapMode;
+		public TextureFilter MinFilter => EffectiveRules.MinFilter;
+		public TextureFilter MagFilter => EffectiveRules.MagFilter;
 		public string CustomRule => EffectiveRules.CustomRule;
 
 		public bool Ignore
@@ -303,6 +333,12 @@ namespace Orange
 							break;
 					}
 				}
+				if (EffectiveRules.WrapMode != TextureWrapMode.Clamp) {
+					EffectiveRules.TextureAtlas = null;
+				}
+			}
+			if (EffectiveRules.WrapMode != TextureWrapMode.Clamp) {
+				EffectiveRules.TextureAtlas = null;
 			}
 		}
 
@@ -323,6 +359,7 @@ namespace Orange
 		public const string CookingRulesFilename = "#CookingRules.txt";
 		public const string DirectoryNameToken = "${DirectoryName}";
 
+		// pass target as null to build cooking rules disregarding targets
 		public static Dictionary<string, CookingRules> Build(IFileEnumerator fileEnumerator, Target target)
 		{
 			var shouldRescanEnumerator = false;
@@ -491,13 +528,22 @@ namespace Orange
 								string targetName = words[0].Substring(cut + 1, words[0].Length - cut - 2);
 								words[0] = words[0].Substring(0, cut);
 								currentRules = null;
+								Target currentTarget = null;
 								foreach (var t in The.Workspace.Targets) {
 									if (targetName == t.Name) {
-										currentRules = rules.TargetRules[t];
+										currentTarget = t;
 									}
 								}
-								if (currentRules == null) {
-									throw new Lime.Exception($"Invalid platform or target: {targetName}");
+								if (currentTarget == null) {
+									throw new Lime.Exception($"Invalid target: {targetName}");
+								}
+								currentRules = rules.TargetRules[currentTarget];
+								{
+									var targetPlatformAttribute = (TargetPlatformsAttribute)typeof(ICookingRules)
+										.GetProperty(words[0]).GetCustomAttribute(typeof(TargetPlatformsAttribute));
+									if (targetPlatformAttribute != null && !targetPlatformAttribute.TargetPlatforms.Contains(currentTarget.Platform)) {
+										throw new Lime.Exception($"Invalid platform {currentTarget.Platform} for cooking rule {words[0]}");
+									}
 								}
 							}
 						} else {
@@ -519,67 +565,104 @@ namespace Orange
 		private static void ParseRule(ParticularCookingRules rules, IReadOnlyList<string> words, string path)
 		{
 			switch (words[0]) {
-				case "TextureAtlas":
-					switch (words[1]) {
-						case "None":
-							rules.TextureAtlas = null;
-							break;
-						case DirectoryNameToken:
-							string atlasName = "#" + Lime.AssetPath.GetDirectoryName(path).Replace('/', '#');
-							if (string.IsNullOrEmpty(atlasName)) {
-								throw new Lime.Exception(
-									"Atlas directory is empty. Choose another atlas name");
-							}
-							rules.TextureAtlas = atlasName;
-							break;
-						default:
-							rules.TextureAtlas = words[1];
-							break;
+			case "TextureAtlas":
+				switch (words[1]) {
+				case "None":
+					rules.TextureAtlas = null;
+					break;
+				case DirectoryNameToken:
+					string atlasName = "#" + Lime.AssetPath.GetDirectoryName(path).Replace('/', '#');
+					if (string.IsNullOrEmpty(atlasName)) {
+						throw new Lime.Exception(
+							"Atlas directory is empty. Choose another atlas name");
 					}
-					break;
-				case "MipMaps":
-					rules.MipMaps = ParseBool(words[1]);
-					break;
-				case "HighQualityCompression":
-					rules.HighQualityCompression = ParseBool(words[1]);
-					break;
-				case "PVRFormat":
-					rules.PVRFormat = ParsePVRFormat(words[1]);
-					break;
-				case "DDSFormat":
-					rules.DDSFormat = ParseDDSFormat(words[1]);
-					break;
-				case "Bundle":
-					rules.Bundle = new string[words.Count - 1];
-					for (var i = 0; i < rules.Bundle.Length; i++) {
-						rules.Bundle[i] = ParseBundle(words[i + 1]);
-					}
-					break;
-				case "Ignore":
-					rules.Ignore = ParseBool(words[1]);
-					break;
-				case "ADPCMLimit":
-					rules.ADPCMLimit = int.Parse(words[1]);
-					break;
-				case "TextureScaleFactor":
-					rules.TextureScaleFactor = float.Parse(words[1]);
-					break;
-				case "AtlasOptimization":
-					rules.AtlasOptimization = ParseAtlasOptimization(words[1]);
-					break;
-				case "AtlasPacker":
-					rules.AtlasPacker = words[1];
-					break;
-				case "ModelCompressing":
-					rules.ModelCompressing = ParseModelCompressing(words[1]);
-					break;
-				case "CustomRule":
-					rules.CustomRule = words[1];
+					rules.TextureAtlas = atlasName;
 					break;
 				default:
-					throw new Lime.Exception("Unknown attribute {0}", words[0]);
+					rules.TextureAtlas = words[1];
+					break;
+				}
+				break;
+			case "MipMaps":
+				rules.MipMaps = ParseBool(words[1]);
+				break;
+			case "HighQualityCompression":
+				rules.HighQualityCompression = ParseBool(words[1]);
+				break;
+			case "PVRFormat":
+				rules.PVRFormat = ParsePVRFormat(words[1]);
+				break;
+			case "DDSFormat":
+				rules.DDSFormat = ParseDDSFormat(words[1]);
+				break;
+			case "Bundle":
+				rules.Bundle = new string[words.Count - 1];
+				for (var i = 0; i < rules.Bundle.Length; i++) {
+					rules.Bundle[i] = ParseBundle(words[i + 1]);
+				}
+				break;
+			case "Ignore":
+				rules.Ignore = ParseBool(words[1]);
+				break;
+			case "ADPCMLimit":
+				rules.ADPCMLimit = int.Parse(words[1]);
+				break;
+			case "TextureScaleFactor":
+				rules.TextureScaleFactor = float.Parse(words[1]);
+				break;
+			case "AtlasOptimization":
+				rules.AtlasOptimization = ParseAtlasOptimization(words[1]);
+				break;
+			case "AtlasPacker":
+				rules.AtlasPacker = words[1];
+				break;
+			case "ModelCompressing":
+				rules.ModelCompressing = ParseModelCompressing(words[1]);
+				break;
+			case "CustomRule":
+				rules.CustomRule = words[1];
+				break;
+			case "WrapMode":
+				rules.WrapMode = ParseWrapMode(words[1]);
+				break;
+			case "MinFilter":
+				rules.MinFilter = ParseTextureFilter(words[1]);
+				break;
+			case "MagFilter":
+				rules.MagFilter = ParseTextureFilter(words[1]);
+				break;
+			default:
+				throw new Lime.Exception("Unknown attribute {0}", words[0]);
 			}
 			rules.Override(words[0]);
+		}
+
+		private static TextureFilter ParseTextureFilter(string value)
+		{
+			switch (value) {
+			case "":
+			case "Linear":
+				return TextureFilter.Linear;
+			case "Nearest":
+				return TextureFilter.Nearest;
+			default:
+				throw new Lime.Exception("Error parsing TextureFtiler. Must be one of: Linear, Nearest");
+			}
+		}
+
+		private static TextureWrapMode ParseWrapMode(string value)
+		{
+			switch (value) {
+			case "":
+			case "Clamp":
+				return TextureWrapMode.Clamp;
+			case "Repeat":
+				return TextureWrapMode.Repeat;
+			case "MirroredRepeat":
+				return TextureWrapMode.MirroredRepeat;
+			default:
+				throw new Lime.Exception("Error parsing AtlasOptimization. Must be one of: Memory, DrawCalls");
+			}
 		}
 
 		private static string ParseBundle(string word)

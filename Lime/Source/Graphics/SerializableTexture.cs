@@ -48,75 +48,21 @@ namespace Lime
 			texture = null;
 		}
 
-		public TextureWrapMode WrapModeU
+		public TextureParams TextureParams
 		{
 			get
 			{
 				if (texture == null) {
 					texture = LoadTexture();
 				}
-				return texture.WrapModeU;
+				return texture.TextureParams;
 			}
 			set
 			{
 				if (texture == null) {
 					texture = LoadTexture();
 				}
-				texture.WrapModeU = value;
-			}
-		}
-
-		public TextureWrapMode WrapModeV
-		{
-			get
-			{
-				if (texture == null) {
-					texture = LoadTexture();
-				}
-				return texture.WrapModeV;
-			}
-			set
-			{
-				if (texture == null) {
-					texture = LoadTexture();
-				}
-				texture.WrapModeV = value;
-			}
-		}
-
-		public TextureFilter MinFilter
-		{
-			get
-			{
-				if (texture == null) {
-					texture = LoadTexture();
-				}
-				return texture.MinFilter;
-			}
-			set
-			{
-				if (texture == null) {
-					texture = LoadTexture();
-				}
-				texture.MinFilter = value;
-			}
-		}
-
-		public TextureFilter MagFilter
-		{
-			get
-			{
-				if (texture == null) {
-					texture = LoadTexture();
-				}
-				return texture.MagFilter;
-			}
-			set
-			{
-				if (texture == null) {
-					texture = LoadTexture();
-				}
-				texture.MagFilter = value;
+				texture.TextureParams = value;
 			}
 		}
 

@@ -174,7 +174,7 @@ namespace Tangerine.UI
 						var defaultValue = EditorParams.DefaultValueGetter();
 						if (defaultValue != null)
 							SetProperty(defaultValue);
-                    }
+					}
 				}
 				yield return null;
 			}
@@ -211,7 +211,7 @@ namespace Tangerine.UI
 		{
 			var menu = new Menu {
 				Command.Copy,
-				Command.Paste 
+				Command.Paste
 			};
 			if (EditorParams.DefaultValueGetter != null) {
 				menu.Insert(0, resetToDefault);

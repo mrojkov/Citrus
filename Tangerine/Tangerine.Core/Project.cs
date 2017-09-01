@@ -32,6 +32,7 @@ namespace Tangerine.Core
 			UserprefsPath = Path.ChangeExtension(citprojPath, ".userprefs");
 			AssetsDirectory = Path.Combine(Path.GetDirectoryName(CitprojPath), "Data");
 			Orange.The.Workspace.Open(citprojPath);
+			UpdateTextureParams();
 		}
 
 		public void Open()
@@ -171,8 +172,12 @@ namespace Tangerine.Core
 		{
 			if (path.EndsWith(".png")) {
 				TexturePool.Instance.DiscardAllTextures();
+			} else if (path == "#CookingRules.txt" || (path.EndsWith(".png.txt") && File.Exists(Path.ChangeExtension(path, null)))) {
+				UpdateTextureParams();
+				TexturePool.Instance.DiscardAllTextures();
 			}
 			ReloadModifiedDocuments();
+			Window.Current.Invalidate();
 		}
 
 		public void ReloadModifiedDocuments()
@@ -211,6 +216,30 @@ namespace Tangerine.Core
 
 			[YuzuMember]
 			public string CurrentDocument;
+		}
+
+		private void UpdateTextureParams()
+		{
+			var rules = Orange.CookingRulesBuilder.Build(Orange.The.Workspace.AssetFiles, null);
+			foreach (var kv in rules) {
+				var path = kv.Key;
+				var rule = kv.Value;
+				if (path.EndsWith(".png")) {
+					var textureParamsPath = Path.Combine(Orange.The.Workspace.AssetsDirectory, Path.ChangeExtension(path, ".texture"));
+					if (!Orange.AssetCooker.AreTextureParamsDefault(rule)) {
+						var textureParams = new TextureParams {
+							WrapMode = rule.WrapMode,
+							MinFilter = rule.MinFilter,
+							MagFilter = rule.MagFilter,
+						};
+						Serialization.WriteObjectToFile(textureParamsPath, textureParams, Serialization.Format.JSON);
+					} else if (File.Exists(textureParamsPath)) {
+						File.Delete(textureParamsPath);
+					}
+				} else if (path.EndsWith(".texture") && !File.Exists(Path.Combine(AssetsDirectory, Path.ChangeExtension(path, ".png")))) {
+					File.Delete(Path.Combine(AssetsDirectory, path));
+				}
+			}
 		}
 	}
 }
