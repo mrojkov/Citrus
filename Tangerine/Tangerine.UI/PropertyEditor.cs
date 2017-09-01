@@ -885,6 +885,7 @@ namespace Tangerine.UI
 		private readonly NumericEditBox[] weigthsEditors;
 		public SkinningWeightsPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
+			editorParams.DefaultValueGetter = () => new SkinningWeights();
 			indexEditors = new NumericEditBox[4];
 			weigthsEditors = new NumericEditBox[4];
 			foreach (var o in editorParams.Objects) {
