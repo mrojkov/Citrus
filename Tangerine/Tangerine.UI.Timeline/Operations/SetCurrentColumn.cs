@@ -6,17 +6,24 @@ namespace Tangerine.UI.Timeline.Operations
 	public class SetCurrentColumn : Operation
 	{
 		protected int Column;
+		protected Node Container;
 
 		public override bool IsChangingDocument => false;
 
-		public static void Perform(int column)
+		public static void Perform(int column, Node container)
 		{
-			Document.Current.History.Perform(new SetCurrentColumn(column));
+			Document.Current.History.Perform(new SetCurrentColumn(column, container));
 		}
 
-		private SetCurrentColumn(int column)
+		public static void Perform(int column)
+		{
+			Document.Current.History.Perform(new SetCurrentColumn(column, Document.Current.Container));
+		}
+
+		private SetCurrentColumn(int column, Node node)
 		{
 			Column = column;
+			Container = node;
 		}
 
 		public class Processor : OperationProcessor<SetCurrentColumn>
@@ -26,31 +33,31 @@ namespace Tangerine.UI.Timeline.Operations
 			protected override void InternalRedo(SetCurrentColumn op)
 			{
 				op.Save(new Backup { Column = Timeline.Instance.CurrentColumn });
-				SetColumn(op.Column);
+				SetColumn(op.Column, op.Container);
 			}
 
 			protected override void InternalUndo(SetCurrentColumn op)
 			{
-				SetColumn(op.Restore<Backup>().Column);
+				SetColumn(op.Restore<Backup>().Column, op.Container);
 			}
 
-			void SetColumn(int value)
+			void SetColumn(int value, Node node)
 			{
 				Audio.GloballyEnable = false;
 				try {
 					var doc = Document.Current;
 					if (Core.UserPreferences.Instance.Get<UserPreferences>().AnimationMode && doc.AnimationFrame != value) {
-						doc.Container.SetTangerineFlag(TangerineFlags.IgnoreMarkers, true);
-						SetCurrentFrameRecursive(doc.Container, 0);
+						node.SetTangerineFlag(TangerineFlags.IgnoreMarkers, true);
+						SetCurrentFrameRecursive(node, 0);
 						ClearParticlesRecursive(doc.RootNode);
-						doc.Container.IsRunning = true;
-						FastForwardToFrame(doc.Container, value);
-						StopAnimationRecursive(doc.Container);
-						doc.Container.SetTangerineFlag(TangerineFlags.IgnoreMarkers, false);
+						node.IsRunning = true;
+						FastForwardToFrame(node, value);
+						StopAnimationRecursive(node);
+						node.SetTangerineFlag(TangerineFlags.IgnoreMarkers, false);
 					} else {
-						doc.AnimationFrame = value;
-						doc.Container.Update(0);
-						ClearParticlesRecursive(doc.RootNode);
+						node.AnimationFrame = value;
+						node.Update(0);
+						ClearParticlesRecursive(node);
 					}
 					Timeline.Instance.EnsureColumnVisible(value);
 				} finally {

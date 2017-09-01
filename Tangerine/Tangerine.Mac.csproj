@@ -95,6 +95,7 @@
     <Compile Include="MainMenu\EditMenu.cs" />
     <Compile Include="UserPreferences.cs" />
     <Compile Include="OrangeInterface.cs" />
+    <Compile Include="DisplayResolutions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

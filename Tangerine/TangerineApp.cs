@@ -11,6 +11,7 @@ namespace Tangerine
 	{
 		public static TangerineApp Instance { get; private set; }
 		public readonly IMenu PadsMenu;
+		public readonly IMenu Resolution;
 		public readonly Dictionary<string, Toolbar> Toolbars = new Dictionary<string, Toolbar>();
 		public readonly DockManager.State DockManagerInitialState;
 
@@ -39,6 +40,8 @@ namespace Tangerine
 			LoadFont();
 
 			PadsMenu = new Menu();
+			Resolution = new Menu();
+			CreateResolutionMenu();
 			DockManager.Initialize(new Vector2(1024, 768), PadsMenu);
 			DockManager.Instance.MainWindowWidget.Window.AllowDropFiles = true;
 			SetupMainWindowTitle();
@@ -127,6 +130,13 @@ namespace Tangerine
 			}
 			new UI.FilesystemView.FilesystemPane(filesystemPanel);
 			RegisterGlobalCommands();
+		}
+
+		private void CreateResolutionMenu()
+		{
+			foreach (var orientation in DisplayResolutions.Items) {
+				Resolution.Add(new Command(orientation.Name, () => DisplayResolutions.SetResolution(orientation)));
+			}
 		}
 
 		void SetupMainWindowTitle()
@@ -298,6 +308,7 @@ namespace Tangerine
 				new Command("View", new Menu {
 					GenericCommands.DefaultLayout,
 					new Command("Pads", PadsMenu),
+					new Command("Resolution", Resolution),
 					GenericCommands.Overlays,
 				}),
 				new Command("Window", new Menu {
