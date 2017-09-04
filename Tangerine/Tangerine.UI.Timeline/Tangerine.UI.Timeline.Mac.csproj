@@ -30,6 +30,7 @@
     <CodeSignResourceRules></CodeSignResourceRules>
     <XamMacArch></XamMacArch>
     <Profiling>true</Profiling>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -46,6 +47,7 @@
     <CodeSignEntitlements></CodeSignEntitlements>
     <CodeSignResourceRules></CodeSignResourceRules>
     <XamMacArch></XamMacArch>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -100,6 +102,7 @@
     <Compile Include="Utils\TimelineMetrics.cs" />
     <Compile Include="UserPreferences.cs" />
     <Compile Include="Operations\DeselectGridSpan.cs" />
+    <Compile Include="Components\GridAudioView.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tangerine.Core\Tangerine.Core.Mac.csproj">

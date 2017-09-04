@@ -49,7 +49,11 @@ namespace Tangerine.UI.Timeline
 			}
 			if (row.Components.Contains<Core.Components.NodeRow>()) {
 				var nodeRow = row.Components.Get<Core.Components.NodeRow>();
-				view.GridRow = new GridNodeView(nodeRow.Node);
+				if (nodeRow.Node is Audio) {
+					view.GridRow = new GridAudioView((Audio)nodeRow.Node);
+				} else {
+					view.GridRow = new GridNodeView(nodeRow.Node);
+				}
 			} else if (row.Components.Contains<Core.Components.FolderRow>()) {
 				view.GridRow = new GridFolderView();
 			} else if (row.Components.Contains<Core.Components.PropertyRow>()) {
