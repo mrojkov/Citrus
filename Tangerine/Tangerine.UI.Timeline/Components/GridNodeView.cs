@@ -24,7 +24,7 @@ namespace Tangerine.UI.Timeline.Components
 
 		static BitSet32[] keyStrips = new BitSet32[0];
 
-		void Render(Widget widget)
+		protected virtual void Render(Widget widget)
 		{
 			var maxCol = Timeline.Instance.ColumnCount;
 			widget.PrepareRendererState();
@@ -34,7 +34,6 @@ namespace Tangerine.UI.Timeline.Components
 			for (int i = 0; i < maxCol; i++) {
 				keyStrips[i] = BitSet32.Empty;
 			}
-			Renderer.DrawRect(Vector2.Zero, widget.ContentSize, ColorTheme.Current.Basic.WhiteBackground);
 			foreach (var a in node.Animators.AsArray) {
 				for (int j = 0; j < a.ReadonlyKeys.Count; j++) {
 					var key = a.ReadonlyKeys[j];
@@ -49,11 +48,11 @@ namespace Tangerine.UI.Timeline.Components
 					for (int j = 0; j < 32; j++) {
 						c += s[j] ? 1 : 0;
 					}
-					var a = new Vector2(i * TimelineMetrics.ColWidth, 0);
+					var a = new Vector2(i * TimelineMetrics.ColWidth + 1, 0);
 					var d = widget.Height / c;
 					for (int j = 0; j < 32; j++) {
 						if (s[j]) {
-							var b = a + new Vector2(TimelineMetrics.ColWidth, d);
+							var b = a + new Vector2(TimelineMetrics.ColWidth - 1, d);
 							Renderer.DrawRect(a, b, KeyframePalette.Colors[j]);
 							a.Y += d;
 						}

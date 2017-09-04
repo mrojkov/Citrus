@@ -19,10 +19,6 @@ namespace Tangerine.UI.Timeline.Components
 			OverviewWidget.Presenter = new DelegatePresenter<Widget>(Render);
 		}
 
-		void Render(Widget widget)
-		{
-			widget.PrepareRendererState();
-			Renderer.DrawRect(Vector2.Zero, widget.ContentSize, ColorTheme.Current.Basic.WhiteBackground);
-		}
+		void Render(Widget widget) { }
 	}
 }

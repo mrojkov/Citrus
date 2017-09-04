@@ -131,7 +131,7 @@ namespace Tangerine.UI
 				BoneFadeoutZone = Color4.Red,
 			};
 			var timelineGrid = new TimelineGridColors {
-				PropertyRowBackground = Theme.Colors.GrayBackground.Darken(0.5f),
+				PropertyRowBackground = Color4.White.Transparentify(0.95f),
 				Lines = new Color4(45, 45, 48),
 				LinesLight = new Color4(45, 45, 48).Lighten(0.065f),
 				Selection = Color4.Gray.Transparentify(0.5f),
@@ -213,7 +213,7 @@ namespace Tangerine.UI
 				BoneFadeoutZone = Color4.Red,
 			};
 			var timelineGrid = new TimelineGridColors {
-				PropertyRowBackground = Theme.Colors.GrayBackground.Lighten(0.5f),
+				PropertyRowBackground = Color4.Black.Transparentify(0.95f),
 				Lines = new Color4(160, 160, 160),
 				LinesLight = new Color4(240, 240, 240),
 				Selection = Color4.Gray.Transparentify(0.5f),

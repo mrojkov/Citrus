@@ -29,38 +29,33 @@ namespace Tangerine.UI.Timeline
 				Id = nameof(GridPane) + "Content",
 				Padding = new Thickness { Top = 1, Bottom = 1 },
 				Layout = new VBoxLayout { Spacing = TimelineMetrics.RowSpacing },
-				Presenter = new DelegatePresenter<Node>(RenderBackground),
+				Presenter = new DelegatePresenter<Node>(RenderBackgroundAndGrid),
 				PostPresenter = new DelegatePresenter<Widget>(w => OnPostRender(w))
 			};
 			RootWidget.AddNode(ContentWidget);
 			RootWidget.AddChangeWatcher(() => RootWidget.Size, 
 				// Some document operation processors (e.g. ColumnCountUpdater) require up-to-date timeline dimensions.
 				_ => Core.Operations.Dummy.Perform());
-			OnPostRender += RenderGrid;
+			OnPostRender += RenderCursor;
 			OnPostRender += RenderSelection;
 		}
 		
-		private void RenderBackground(Node node)
+		private void RenderBackgroundAndGrid(Node node)
 		{
 			RootWidget.PrepareRendererState();
 			Renderer.DrawRect(Vector2.Zero, RootWidget.Size, ColorTheme.Current.TimelineGrid.Lines);
-		}
-
-		public void SetOffset(Vector2 value)
-		{
-			ContentWidget.Position = -value;
-		}
-		
-		private void RenderGrid(Widget widget)
-		{
+			if (ContentWidget.Nodes.Count == 0) {
+				return;
+			}
 			ContentWidget.PrepareRendererState();
+			Renderer.DrawRect(Vector2.Zero, ContentWidget.Size, ColorTheme.Current.Basic.WhiteBackground);
 			int numCols = timeline.ColumnCount;
 			// Render vertical lines.
 			float x = 0.5f;
 			for (int i = 0; i <= numCols; i++) {
 				if (timeline.IsColumnVisible(i)) {
 					Renderer.DrawLine(
-						x, 1, x, ContentWidget.Height - 1,
+						x, 1, x, ContentWidget.Height - 2,
 						ColorTheme.Current.TimelineGrid.LinesLight);
 				}
 				x += TimelineMetrics.ColWidth;
@@ -70,23 +65,33 @@ namespace Tangerine.UI.Timeline
 				x = TimelineMetrics.ColWidth * m.Frame + 0.5f;
 				if (timeline.IsColumnVisible(m.Frame)) {
 					Renderer.DrawLine(
-						x, 1, x, ContentWidget.Height - 1, ColorTheme.Current.TimelineGrid.Lines);
+						x, 1, x, ContentWidget.Height - 2, ColorTheme.Current.TimelineGrid.Lines);
 				}
 			}
 			// Render dark horizonal lines.
-			x = TimelineMetrics.ColWidth * (timeline.CurrentColumn + 0.5f);
+			Renderer.DrawLine(0, 0.5f, ContentWidget.Width, 0.5f, ColorTheme.Current.TimelineGrid.Lines);
 			foreach (var row in Document.Current.Rows) {
 				var y = row.GridWidget().Bottom() + 0.5f;
 				Renderer.DrawLine(0, y, ContentWidget.Width, y, ColorTheme.Current.TimelineGrid.Lines);
 			}
-			// Render the cursor.
-			Renderer.DrawLine(
-				x, 0, x, ContentWidget.Height,
-				Document.Current.Container.IsRunning ? 
-					ColorTheme.Current.TimelineRuler.RunningCursor : 
-					ColorTheme.Current.TimelineRuler.Cursor);
 		}
 
+		private void RenderCursor(Node node)
+		{
+			var x = TimelineMetrics.ColWidth * (timeline.CurrentColumn + 0.5f);
+			ContentWidget.PrepareRendererState();
+			Renderer.DrawLine(
+				x, 0, x, ContentWidget.Height - 1,
+				Document.Current.Container.IsRunning ? 
+				ColorTheme.Current.TimelineRuler.RunningCursor : 
+				ColorTheme.Current.TimelineRuler.Cursor);
+		}
+
+		public void SetOffset(Vector2 value)
+		{
+			ContentWidget.Position = -value;
+		}
+		
 		void RenderSelection(Widget widget)
 		{
 			RenderSelection(widget, IntVector2.Zero);
