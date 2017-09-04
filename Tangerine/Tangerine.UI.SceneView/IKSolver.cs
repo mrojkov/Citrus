@@ -54,10 +54,10 @@ namespace Tangerine.UI.SceneView
 					var b = boneChain[i].Parent.AsWidget.BoneArray[boneChain[i].BaseIndex];
 					angle = Vector2.AngleDeg(b.Tip - b.Joint, points[i + 1].Position - points[i].Position);
 				} else {
-					angle = Vector2.AngleDeg(prev, points[i + 1].Position - points[i].Position);
+					angle = Vector2.AngleDeg(prev, points[i + 1].Position - points[i].Position) + points[i].AngleOffset;
 				}
 				prev = points[i + 1].Position - points[i].Position;
-				lst.Add(new Tuple<Bone, float>(boneChain[i], angle - points[i + 1].AngleOffset + points[i].AngleOffset));
+				lst.Add(new Tuple<Bone, float>(boneChain[i], angle - points[i + 1].AngleOffset));
 			}
 			return lst;
 		}
