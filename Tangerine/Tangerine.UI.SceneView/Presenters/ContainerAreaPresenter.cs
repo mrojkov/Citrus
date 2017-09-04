@@ -53,7 +53,7 @@ namespace Tangerine.UI.SceneView
 
 			sceneView.Scene.CompoundPostPresenter.Push(new DelegatePresenter<Widget>(w => {
 				var frame = SceneView.Instance.Frame;
-				if (frame != null && !Core.Document.Current.PreviewAnimation) {
+				if (frame != null && !Core.Document.Current.PreviewAnimation && Core.Document.Current.Container is Widget) {
 					frame.PrepareRendererState();
 					var c = ColorTheme.Current.SceneView.ContainerBorder;
 					var mtx = frame.LocalToWorldTransform;
