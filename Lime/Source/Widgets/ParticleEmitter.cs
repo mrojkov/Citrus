@@ -286,8 +286,7 @@ namespace Lime
 		{
 			switch (ParticlesLinkage) {
 			case ParticlesLinkage.Parent:
-				return (Parent != null && !ParentWidget.IsRenderedToTexture()) ?
-					ParentWidget : null;
+				return ParentWidget;
 			case ParticlesLinkage.Other: {
 				var widget = ParentWidget;
 				while (widget != null) {
