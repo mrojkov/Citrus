@@ -10,6 +10,7 @@ namespace Lime
 	struct AssetDescriptor
 	{
 		public DateTime ModificationTime;
+		public byte[] CookingRulesSHA1;
 		public int Offset;
 		public int Length;
 		public int AllocatedSize;
@@ -325,6 +326,11 @@ namespace Lime
 			return GetDescriptor(path).ModificationTime;
 		}
 
+		public override byte[] GetCookingRulesSHA1(string path)
+		{
+			return GetDescriptor(path).CookingRulesSHA1;
+		}
+
 		public override void DeleteFile(string path)
 		{
 			path = AssetPath.CorrectSlashes(path);
@@ -349,7 +355,7 @@ namespace Lime
 			index[AssetPath.CorrectSlashes(path)] = desc;
 		}
 
-		public override void ImportFile(string path, Stream stream, int reserve, string sourceExtension, AssetAttributes attributes)
+		public override void ImportFile(string path, Stream stream, int reserve, string sourceExtension, AssetAttributes attributes, byte[] cookingRulesSHA1)
 		{
 			AssetDescriptor d;
 			if ((attributes & AssetAttributes.Zipped) != 0) {
@@ -361,6 +367,7 @@ namespace Lime
 			if (reuseExistingDescriptor) {
 				d.Length = (int)stream.Length;
 				d.ModificationTime = DateTime.Now;
+				d.CookingRulesSHA1 = cookingRulesSHA1;
 				d.Attributes = attributes;
 				d.SourceExtension = sourceExtension;
 				index[AssetPath.CorrectSlashes(path)] = d;
@@ -377,6 +384,7 @@ namespace Lime
 				}
 				d = new AssetDescriptor();
 				d.ModificationTime = DateTime.Now;
+				d.CookingRulesSHA1 = cookingRulesSHA1;
 				d.Length = (int)stream.Length;
 				d.Offset = indexOffset;
 				d.AllocatedSize = d.Length + reserve;
@@ -431,7 +439,7 @@ namespace Lime
 			reader.ReadInt32(); // CheckSum
 			var version = reader.ReadInt32();
 			if (version != Lime.Version.GetBundleFormatVersion()) {
-				throw new Exception(string.Format("The bundle format or serialization scheme has been changed. Please update Orange, rebuild the game and serializer.dll.\n" +
+				throw new Exception(string.Format("The bundle format has been changed. Please update Citrus and rebuild game.\n" +
 					"Bundle format version: {0}, but expected: {1}", version, Lime.Version.GetBundleFormatVersion()));
 			}
 			indexOffset = reader.ReadInt32();
@@ -442,6 +450,13 @@ namespace Lime
 				var desc = new AssetDescriptor();
 				string name = reader.ReadString();
 				desc.ModificationTime = DateTime.FromBinary(reader.ReadInt64());
+				ushort sha1Length = reader.ReadUInt16();
+				if (sha1Length != 0) {
+					desc.CookingRulesSHA1 = new byte[sha1Length];
+					for (int j = 0; j < sha1Length; j++) {
+						desc.CookingRulesSHA1[j] = reader.ReadByte();
+					}
+				}
 				desc.Offset = reader.ReadInt32();
 				desc.Length = reader.ReadInt32();
 				desc.AllocatedSize = reader.ReadInt32();
@@ -464,6 +479,14 @@ namespace Lime
 			foreach (KeyValuePair <string, AssetDescriptor> p in index) {
 				writer.Write(p.Key);
 				writer.Write((Int64)p.Value.ModificationTime.ToBinary());
+				if (p.Value.CookingRulesSHA1 != null && p.Value.CookingRulesSHA1.Length > ushort.MaxValue) {
+					throw new InvalidOperationException("Invalid Cooking Rules hash in asset descriptor. Must be 20 byte long SHA1");
+				}
+				ushort sha1Length = (ushort)(p.Value.CookingRulesSHA1?.Length ?? 0);
+				writer.Write(sha1Length);
+				if (sha1Length != 0) {
+					writer.Write(p.Value.CookingRulesSHA1);
+				}
 				writer.Write(p.Value.Offset);
 				writer.Write(p.Value.Length);
 				writer.Write(p.Value.AllocatedSize);

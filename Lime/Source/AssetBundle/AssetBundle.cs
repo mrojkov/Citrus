@@ -60,18 +60,19 @@ namespace Lime
 		}
 
 		public abstract DateTime GetFileLastWriteTime(string path);
+		public abstract byte[] GetCookingRulesSHA1(string path);
 
 		public abstract void DeleteFile(string path);
 		public abstract bool FileExists(string path);
 
-		public abstract void ImportFile(string path, Stream stream, int reserve, string sourceExtension, AssetAttributes attributes = AssetAttributes.None);
+		public abstract void ImportFile(string path, Stream stream, int reserve, string sourceExtension, AssetAttributes attributes, byte[] cookingRulesSHA1);
 
 		public abstract IEnumerable<string> EnumerateFiles(string path = null);
 
-		public void ImportFile(string srcPath, string dstPath, int reserve, string sourceExtension, AssetAttributes attributes = AssetAttributes.None)
+		public void ImportFile(string srcPath, string dstPath, int reserve, string sourceExtension, AssetAttributes attributes, byte[] cookingRulesSHA1)
 		{
 			using (var stream = new FileStream(srcPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
-				ImportFile(dstPath, stream, reserve, sourceExtension, attributes);
+				ImportFile(dstPath, stream, reserve, sourceExtension, attributes, cookingRulesSHA1);
 			}
 		}
 

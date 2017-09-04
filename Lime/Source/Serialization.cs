@@ -104,12 +104,12 @@ namespace Lime
 				WriteObject(path, stream, instance, format);
 		}
 
-		public static void WriteObjectToBundle<T>(AssetBundle bundle, string path, T instance, Format format, string sourceExtension, AssetAttributes attributes = AssetAttributes.None)
+		public static void WriteObjectToBundle<T>(AssetBundle bundle, string path, T instance, Format format, string sourceExtension, AssetAttributes attributes, byte[] cookingRulesSHA1)
 		{
 			using (MemoryStream stream = new MemoryStream()) {
 				WriteObject(path, stream, instance, format);
 				stream.Seek(0, SeekOrigin.Begin);
-				bundle.ImportFile(path, stream, 0, sourceExtension, attributes);
+				bundle.ImportFile(path, stream, 0, sourceExtension, attributes, cookingRulesSHA1);
 			}
 		}
 

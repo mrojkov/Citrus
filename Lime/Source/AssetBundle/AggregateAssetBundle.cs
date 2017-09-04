@@ -47,6 +47,16 @@ namespace Lime
 			throw new InvalidOperationException($"Path {path} not found in aggregate asset bundle.");
 		}
 
+		public override byte[] GetCookingRulesSHA1(string path)
+		{
+			foreach (var bundle in bundles) {
+				if (bundle.FileExists(path)) {
+					return bundle.GetCookingRulesSHA1(path);
+				}
+			}
+			throw new InvalidOperationException($"Path {path} not found in aggregate asset bundle.");
+		}
+
 		public override void DeleteFile(string path)
 		{
 			throw new InvalidOperationException("Not supported by aggregate asset bundle.");
@@ -63,7 +73,7 @@ namespace Lime
 		}
 
 		public override void ImportFile(string path, Stream stream, int reserve, string sourceExtension,
-			AssetAttributes attributes = AssetAttributes.None)
+			AssetAttributes attributes = AssetAttributes.None, byte[] cookingRulesSHA1 = null)
 		{
 			throw new InvalidOperationException("Not supported by aggregate asset bundle.");
 		}

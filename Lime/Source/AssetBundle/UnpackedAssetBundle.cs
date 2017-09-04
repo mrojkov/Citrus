@@ -29,6 +29,11 @@ namespace Lime
 #endif
 		}
 
+		public override byte[] GetCookingRulesSHA1(string path)
+		{
+			throw new NotImplementedException();
+		}
+
 		public override void DeleteFile(string path)
 		{
 			File.Delete(Path.Combine(BaseDirectory, path));
@@ -39,7 +44,7 @@ namespace Lime
 			return File.Exists(Path.Combine(BaseDirectory, path));
 		}
 
-		public override void ImportFile(string path, Stream stream, int reserve, string sourceExtension, AssetAttributes attributes)
+		public override void ImportFile(string path, Stream stream, int reserve, string sourceExtension, AssetAttributes attributes, byte[] cookingRulesSHA1)
 		{
 #if UNITY
 			throw new NotImplementedException();

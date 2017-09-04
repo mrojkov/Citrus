@@ -45,9 +45,9 @@ namespace Orange
 			return base.FileExists(AdjustExtensionForBinaryAsset(path));
 		}
 
-		public override void ImportFile(string path, Stream stream, int reserve, string sourceExtension, Lime.AssetAttributes attributes)
+		public override void ImportFile(string path, Stream stream, int reserve, string sourceExtension, Lime.AssetAttributes attributes, byte[] cookingRulesSHA1)
 		{
-			base.ImportFile(AdjustExtensionForBinaryAsset(path), stream, reserve, sourceExtension, attributes);
+			base.ImportFile(AdjustExtensionForBinaryAsset(path), stream, reserve, sourceExtension, attributes, cookingRulesSHA1);
 			needToUpdateFilesTXT = true;
 		}
 
