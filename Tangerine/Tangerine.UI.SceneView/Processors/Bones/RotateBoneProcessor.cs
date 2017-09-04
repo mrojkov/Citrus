@@ -14,14 +14,15 @@ namespace Tangerine.UI.SceneView
 		public IEnumerator<object> Task()
 		{
 			while (true) {
-				var bones = Document.Current.SelectedNodes().Editable().OfType<Bone>().ToList();
-				if (bones.Count == 1) {
-					var entry = bones[0].Parent.AsWidget.BoneArray[bones[0].Index];
+				var bone = Document.Current.SelectedNodes().Editable().OfType<Bone>().FirstOrDefault();
+				if (bone != null) {
+					var entry = bone.Parent.AsWidget.BoneArray[bone.Index];
 					var t = Document.Current.Container.AsWidget.CalcTransitionToSpaceOf(sv.Scene);
-					if (sv.HitTestControlPoint(t * entry.Tip) && !sv.Input.IsKeyPressed(Key.Control)) {
+					var hull = BonePresenter.CalcHull(bone) * t;
+					if (hull.Contains(sv.MousePosition) && !sv.Input.IsKeyPressed(Key.Control)) {
 						Utils.ChangeCursorIfDefault(Cursors.Rotate);
 						if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {
-							yield return Rotate(bones[0], entry);
+							yield return Rotate(bone, entry);
 						}
 					}
 				}

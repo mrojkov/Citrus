@@ -16,12 +16,12 @@ namespace Tangerine.UI.SceneView
 				if (bone != null) {
 					var entry = bone.Parent.AsWidget.BoneArray[bone.Index];
 					var t = Document.Current.Container.AsWidget.CalcTransitionToSpaceOf(sv.Scene);
-					if (sv.HitTestControlPoint(t * entry.Joint)) {
+					if (sv.HitTestControlPoint(t * entry.Joint, 20)) {
 						Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 						if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {
 							yield return Drag(bone, entry);
 						}
-					} else if (sv.HitTestControlPoint(t * entry.Tip, 6)) {
+					} else if (sv.HitTestControlPoint(t * entry.Tip, 20)) {
 						Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 						if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {
 							yield return DragTip(bone, entry);
