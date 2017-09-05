@@ -45,7 +45,8 @@ namespace Lime
 			if (errCode == ErrorCode.NoError)
 				return;
 			string errors = "";
-			while (errCode != ErrorCode.NoError) {
+			int maxErrorCount = 256;
+			while (errCode != ErrorCode.NoError && maxErrorCount > 0) {
 				if (errors != "")
 					errors += ", ";
 				errors += errCode.ToString();
@@ -54,6 +55,7 @@ namespace Lime
 #else
 				errCode = GL.GetError();
 #endif
+				maxErrorCount--;
 			}
 			throw new Exception("OpenGL error(s): " + errors);
 		}
@@ -115,7 +117,7 @@ namespace Lime
 				DefaultFramebuffer = (uint)p[0];
 			}
 		}
-		
+
 		public static void Clear(ClearTarget targets, float r, float g, float b, float a)
 		{
 			if (targets == ClearTarget.None) {
@@ -131,7 +133,7 @@ namespace Lime
 			}
 			GL.Clear(clearBufferMask);
 		}
-		
+
 		public static void SetTexture(ITexture texture, int stage)
 		{
 			var handle = texture != null ? texture.GetHandle() : 0;
@@ -174,7 +176,7 @@ namespace Lime
 		{
 			SetTexture(textureStack.Pop(), stage);
 		}
-		
+
 		public static void InvalidateTexture(uint handle)
 		{
 			for (int i = 0; i < textures.Length; i++) {
