@@ -37,8 +37,24 @@ namespace Tangerine.UI.Timeline
 			button.AddChangeWatcher(
 				() => boneData.HaveChildren,
 				i => button.Visible = i);
-			button.Clicked += () => Core.Operations.SetProperty.Perform(boneData, nameof(BoneRow.ChildrenExpanded), !boneData.ChildrenExpanded);
+			button.Clicked += () => {
+				Core.Operations.SetProperty.Perform(boneData, nameof(BoneRow.ChildrenExpanded), !boneData.ChildrenExpanded);
+				if (button.Input.IsKeyPressed(Key.Control)) {
+					ExpandChildrenRecursively(
+						boneData.Bone,
+						boneData.Bone.Parent.AsWidget.Nodes.OfType<Bone>().ToList(),
+						boneData.ChildrenExpanded);
+				}
+			};
 			return button;
+		}
+
+		private void ExpandChildrenRecursively(Bone bone, List<Bone> bones, bool expand)
+		{
+			foreach (var b in bones.Where(b => b.BaseIndex == bone.Index)) {
+				Core.Operations.SetProperty.Perform(b.EditorState(), nameof(NodeEditorState.ChildrenExpanded), expand);
+				ExpandChildrenRecursively(b, bones, expand);
+			}
 		}
 	}
 }
