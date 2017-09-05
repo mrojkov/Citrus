@@ -13,6 +13,8 @@ namespace Tangerine
 		readonly Button okButton;
 		readonly Button cancelButton;
 		readonly ColorThemeEnum theme;
+		readonly Frame Frame;
+		readonly TabbedWidget Content;
 
 		public PreferencesDialog()
 		{
@@ -23,27 +25,20 @@ namespace Tangerine
 				Title = "Preferences",
 				MinimumDecoratedSize = new Vector2(400, 300)
 			});
+			Frame = new ThemedFrame {
+				Padding = new Thickness(8),
+				LayoutCell = new LayoutCell { StretchY = float.MaxValue },
+				Layout = new StackLayout(),
+			};
+			Content = new TabbedWidget();
+			Content.AddTab("General", CreateGeneralPane(), true);
+			Content.AddTab("Appearance", CreateColorsPane());
+
 			rootWidget = new ThemedInvalidableWindowWidget(window) {
 				Padding = new Thickness(8),
 				Layout = new VBoxLayout(),
 				Nodes = {
-					new ThemedTabBar {
-						Nodes = {
-							new ThemedTab {
-								Text = "General",
-								Active = true
-							}
-						}
-					},
-					new ThemedFrame {
-						Padding = new Thickness(8),
-						LayoutCell = new LayoutCell { StretchY = float.MaxValue },
-						Layout = new StackLayout(),
-						Nodes = {
-							CreateGenericPane(),
-						}
-					},
-					new Widget { MinHeight = 8 },
+					Content,
 					new Widget {
 						Layout = new HBoxLayout { Spacing = 8 },
 						LayoutCell = new LayoutCell(Alignment.RightCenter),
@@ -75,25 +70,59 @@ namespace Tangerine
 			okButton.SetFocus();
 		}
 
-		Widget CreateGenericPane()
+		private Widget CreateColorsPane()
 		{
-			var pane = new ThemedScrollView();
+			var pane = new ThemedScrollView {
+				Padding = new Thickness {
+					Right = 15,
+				},
+			};
 			pane.Content.Layout = new VBoxLayout { Spacing = 4 };
 			new EnumPropertyEditor<ColorThemeEnum>(
-				new PropertyEditorParams(pane.Content, Core.UserPreferences.Instance.Get<Tangerine.UserPreferences>(), nameof(Tangerine.UserPreferences.Theme), "User interface theme"));
+			new PropertyEditorParams(pane.Content, Core.UserPreferences.Instance.Get<Tangerine.UserPreferences>(), nameof(Tangerine.UserPreferences.Theme), "User interface theme"));
+			var chessBackgroundPropertyEditor = new BooleanPropertyEditor(
+				new PropertyEditorParams(pane.Content, Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>(), nameof(UI.SceneView.UserPreferences.EnableChessBackground), "Chess background"));
+			chessBackgroundPropertyEditor.ContainerWidget.AddChangeWatcher(
+				() => Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>().EnableChessBackground, (v) => Application.InvalidateWindows());
+			var backgroundColorpropertyEditor = new Color4PropertyEditor(
+				new PropertyEditorParams(pane.Content, Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>(), nameof(UI.SceneView.UserPreferences.BackgroundColorA), "Background color A"));
+			backgroundColorpropertyEditor.EditorParams.DefaultValueGetter = () => ColorTheme.Current.SceneView.BackgroundColorA;
+			backgroundColorpropertyEditor.ContainerWidget.AddChangeWatcher(
+				() => Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>().BackgroundColorA, (v) => Application.InvalidateWindows());
+			backgroundColorpropertyEditor = new Color4PropertyEditor(
+				new PropertyEditorParams(pane.Content, Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>(), nameof(UI.SceneView.UserPreferences.BackgroundColorB), "Background color B"));
+			backgroundColorpropertyEditor.EditorParams.DefaultValueGetter = () => ColorTheme.Current.SceneView.BackgroundColorB;
+			backgroundColorpropertyEditor.ContainerWidget.AddChangeWatcher(
+				() => Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>().BackgroundColorB, (v) => Application.InvalidateWindows());
+			var rootWidgetOverlayPropertyEditor = new Color4PropertyEditor(
+				new PropertyEditorParams(pane.Content, Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>(), nameof(UI.SceneView.UserPreferences.RootWidgetOverlayColor), "Root overlay color"));
+			rootWidgetOverlayPropertyEditor.ContainerWidget.AddChangeWatcher(
+				() => Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>().RootWidgetOverlayColor, (v) => Application.InvalidateWindows());
+			return pane;
+		}
+
+		Widget CreateGeneralPane()
+		{
+			var pane = new ThemedScrollView {
+				Padding = new Thickness {
+					Right = 15,
+				},
+			};
+			pane.Content.Layout = new VBoxLayout { Spacing = 4 };
 			new Vector2PropertyEditor(
 				new PropertyEditorParams(pane.Content, Core.UserPreferences.Instance.Get<Tangerine.UserPreferences>(), nameof(Tangerine.UserPreferences.DefaultSceneDimensions), "Default scene dimensions"));
 			new BooleanPropertyEditor(
 				new PropertyEditorParams(pane.Content, Core.UserPreferences.Instance.Get<UI.Timeline.UserPreferences>(), nameof(UI.Timeline.UserPreferences.AutoKeyframes), "Automatic keyframes"));
 			new BooleanPropertyEditor(
 				new PropertyEditorParams(pane.Content, Core.UserPreferences.Instance.Get<UI.Timeline.UserPreferences>(), nameof(UI.Timeline.UserPreferences.AnimationMode), "Animation mode"));
-			new FloatPropertyEditor(
+			var boneWidthPropertyEditor = new FloatPropertyEditor(
 				new PropertyEditorParams(pane.Content, Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>(), nameof(UI.SceneView.UserPreferences.DefaultBoneWidth), "Bone Width"));
-
+			boneWidthPropertyEditor.ContainerWidget.AddChangeWatcher(
+						() => Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>().DefaultBoneWidth, (v) => Application.InvalidateWindows());
 			var overlaysEditor = new BooleanPropertyEditor(new PropertyEditorParams(
 				pane.Content, Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>(), nameof(UI.SceneView.UserPreferences.ShowOverlays), "Show overlays"));
 			overlaysEditor.ContainerWidget.AddChangeWatcher(
-				() => Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>().ShowOverlays, (v) => Application.InvalidateWindows());
+						() => Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>().ShowOverlays, (v) => Application.InvalidateWindows());
 
 			return pane;
 		}

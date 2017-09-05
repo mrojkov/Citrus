@@ -1,16 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using Lime;
+using Tangerine.Core;
 
 namespace Tangerine.UI.SceneView
 {
 	public class ContainerAreaPresenter
 	{
 		private const float ChessCellSize = 50;
-
+		private Color4 Color1 => Core.UserPreferences.Instance.Get<UserPreferences>().BackgroundColorA;
+		private Color4 Color2 => Core.UserPreferences.Instance.Get<UserPreferences>().BackgroundColorB;
+		private Color4 RootWidgetBackgroundColor => Core.UserPreferences.Instance.Get<UserPreferences>().RootWidgetOverlayColor;
 		public ContainerAreaPresenter(SceneView sceneView)
 		{
-			var backgroundTexture = PrepareChessTexture(Color4.Gray, Color4.Gray.Darken(0.15f));
+			var backgroundTexture = PrepareChessTexture(Color1, Color2);
+			sceneView.Frame.AddChangeWatcher(
+				() => Core.UserPreferences.Instance.Get<UserPreferences>().BackgroundColorA,
+				(v) => backgroundTexture = PrepareChessTexture(v, Color2));
+			sceneView.Frame.AddChangeWatcher(
+				() => Core.UserPreferences.Instance.Get<UserPreferences>().BackgroundColorB,
+				(v) => backgroundTexture = PrepareChessTexture(Color1, v));
 			sceneView.Scene.CompoundPresenter.Push(new DelegatePresenter<Widget>(w => {
 				var ctr = SceneView.Instance.Frame;
 				if (ctr != null) {
@@ -18,17 +27,22 @@ namespace Tangerine.UI.SceneView
 					if (Core.Document.Current.PreviewAnimation) {
 						Renderer.DrawRect(Vector2.Zero, ctr.Size, Color4.Black);
 					} else {
-						var ratio = ChessCellSize * sceneView.Scene.Scale;
-						Renderer.DrawSprite(
-							backgroundTexture,
-							Color4.White,
-							Vector2.Zero,
-							ctr.Size,
-							-sceneView.Scene.Position / ratio,
-							 (ctr.Size - sceneView.Scene.Position) / ratio);
+						if (Core.UserPreferences.Instance.Get<UserPreferences>().EnableChessBackground) {
+							var ratio = ChessCellSize * sceneView.Scene.Scale;
+							Renderer.DrawSprite(
+								backgroundTexture,
+								Color4.White,
+								Vector2.Zero,
+								ctr.Size,
+								-sceneView.Scene.Position / ratio,
+								 (ctr.Size - sceneView.Scene.Position) / ratio);
+						} else {
+							Renderer.DrawRect(Vector2.Zero, ctr.Size, Color1);
+						}
 						var root = Core.Document.Current.RootNode as Widget;
 						Renderer.Transform1 = root.LocalToWorldTransform;
-						Renderer.DrawRect(Vector2.Zero, root.Size, Color4.White.Transparentify(0.8f));
+						Renderer.DrawRect(Vector2.Zero, root.Size, RootWidgetBackgroundColor);
+
 					}
 				}
 			}));
