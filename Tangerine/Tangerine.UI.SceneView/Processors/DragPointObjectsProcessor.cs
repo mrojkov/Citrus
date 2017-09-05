@@ -8,7 +8,7 @@ namespace Tangerine.UI.SceneView
 {
 	public class DragPointObjectsProcessor : ITaskProvider
 	{
-		SceneView sv => SceneView.Instance;
+		static SceneView sv => SceneView.Instance;
 
 		public IEnumerator<object> Task()
 		{
@@ -42,6 +42,7 @@ namespace Tangerine.UI.SceneView
 				var transform = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
 				var dragDirection = DragDirection.Any;
 				var positions = pobjects.Select(i => i.TransformedPosition).ToList();
+				var uvs = pobjects.OfType<DistortionMeshPoint>().Select(i => i.UV).ToList();
 				while (sv.Input.IsMousePressed()) {
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					var curMousePos = sv.MousePosition;
@@ -61,7 +62,16 @@ namespace Tangerine.UI.SceneView
 					dragDelta = dragDelta.Snap(Vector2.Zero);
 					if (dragDelta != Vector2.Zero) {
 						for (int i = 0; i < pobjects.Count; i++) {
-							SetPosition(pobjects[i], positions[i] + dragDelta);
+							var parent = pobjects[i].Parent?.AsWidget;
+							if (parent != null &&
+								parent.Size.X != 0 &&
+								parent.Size.Y != 0
+							) {
+								SetPosition(pobjects[i], (positions[i] + dragDelta - pobjects[i].Offset) / parent.Size);
+								if (sv.Input.IsKeyPressed(Key.Control) && pobjects[i] is DistortionMeshPoint) {
+									SetUV(pobjects[i], uvs[i] + dragDelta / parent.Size);
+								}
+							}
 						}
 					}
 					yield return null;
@@ -73,15 +83,14 @@ namespace Tangerine.UI.SceneView
 			}
 		}
 
+		private void SetUV(PointObject pointObject, Vector2 value)
+		{
+			Core.Operations.SetAnimableProperty.Perform(pointObject, nameof(DistortionMeshPoint.UV), value);
+		}
+
 		public static void SetPosition(PointObject po, Vector2 value)
 		{
-			if (po.Parent?.AsWidget != null) {
-				var parentSize = po.Parent.AsWidget.Size;
-				if (parentSize.X != 0 && parentSize.Y != 0) {
-					var p = (value - po.Offset) / parentSize;
-					Core.Operations.SetAnimableProperty.Perform(po, nameof(PointObject.Position), p);
-				}
-			}
+			Core.Operations.SetAnimableProperty.Perform(po, nameof(PointObject.Position), value);
 		}
 	}
 }
