@@ -78,7 +78,7 @@ namespace Lime
 			if (Filter != null && !Filter(widget, key)) {
 				return false;
 			}
-			if (InputScopeStack.Top != null && !widget.DescendantOrThis(InputScopeStack.Top)) {
+			if (InputScopeStack.Top != null && !widget.SameOrDescendantOf(InputScopeStack.Top)) {
 				return false;
 			}
 			if (key.IsMouseKey()) {
@@ -92,7 +92,7 @@ namespace Lime
 				var nodeUnderMouse = WidgetContext.Current.NodeUnderMouse;
 				if (AcceptMouseThroughDescendants) {
 					return
-						nodeUnderMouse != null && nodeUnderMouse.DescendantOrThis(widget) &&
+						nodeUnderMouse != null && nodeUnderMouse.SameOrDescendantOf(widget) &&
 						// Full HitTest would be better.
 						widget.HitTestTarget && widget.BoundingRectHitTest(MousePosition);
 				}
@@ -102,7 +102,7 @@ namespace Lime
 				return true;
 			}
 			var focused = Widget.Focused;
-			return focused != null && focused.DescendantOrThis(widget);
+			return focused != null && focused.SameOrDescendantOf(widget);
 		}
 
 		public bool IsMousePressed(int button = 0)

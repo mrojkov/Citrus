@@ -47,13 +47,13 @@ namespace Lime
 		private void ManageFocusOnWindowActivation()
 		{
 			if (Window.Active) {
-				if (Widget.Focused != null && Widget.Focused.DescendantOrThis(this)) {
+				if (Widget.Focused != null && Widget.Focused.SameOrDescendantOf(this)) {
 					lastFocused = Widget.Focused;
 				}
 			}
 			if (windowActivated) {
 				windowActivated = false;
-				if (lastFocused == null || !lastFocused.GloballyVisible || !lastFocused.DescendantOrThis(this)) {
+				if (lastFocused == null || !lastFocused.GloballyVisible || !lastFocused.SameOrDescendantOf(this)) {
 					// Looking the first focus scope widget on the window and make it focused.
 					lastFocused = Descendants.OfType<Widget>().FirstOrDefault(i => i.FocusScope != null && i.GloballyVisible);
 				}

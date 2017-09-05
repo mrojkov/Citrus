@@ -949,7 +949,7 @@ namespace Lime
 		public bool IsMouseOverThisOrDescendant()
 		{
 			var mouseOwner = WidgetInput.MouseCaptureStack.Top;
-			return (mouseOwner == null || mouseOwner == this) && (WidgetContext.Current.NodeUnderMouse?.DescendantOrThis(this) ?? false);
+			return (mouseOwner == null || mouseOwner == this) && (WidgetContext.Current.NodeUnderMouse?.SameOrDescendantOf(this) ?? false);
 		}
 
 		public int GetEffectiveLayer()
@@ -1222,7 +1222,7 @@ namespace Lime
 
 		public virtual IEnumerable<string> GetVisibilityIssues()
 		{
-			if (!DescendantOrThis(WidgetContext.Current.Root)) {
+			if (!SameOrDescendantOf(WidgetContext.Current.Root)) {
 				yield return "The widget is not included to the world hierarchy";
 			}
 			if (!Visible) {

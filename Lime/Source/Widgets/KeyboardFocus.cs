@@ -48,7 +48,7 @@ namespace Lime
 		{
 			var focused = Widget.Focused;
 			if (FocusOnMousePress && Widget.Input.WasMousePressed()) {
-				if (focused == null || !focused.DescendantOrThis(Widget) || !focused.GloballyVisible) {
+				if (focused == null || !focused.SameOrDescendantOf(Widget) || !focused.GloballyVisible) {
 					Widget.SetFocus();
 				}
 			}

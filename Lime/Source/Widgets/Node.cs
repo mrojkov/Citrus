@@ -478,7 +478,7 @@ namespace Lime
 			return false;
 		}
 
-		public bool DescendantOrThis(Node node)
+		public bool SameOrDescendantOf(Node node)
 		{
 			return node == this || DescendantOf(node);
 		}
