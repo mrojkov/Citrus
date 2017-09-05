@@ -58,6 +58,7 @@ namespace Tangerine.Core.Operations
 					animator.ReadonlyKeys.FirstOrDefault(i => i.Frame == Document.Current.AnimationFrame)?.Clone() ??
 					Keyframe.CreateForType(type);
 				key.Frame = Document.Current.AnimationFrame;
+				key.Function = animator.Keys.LastOrDefault(k => k.Frame < key.Frame)?.Function ?? KeyFunction.Linear;
 				key.Value = value;
 				SetKeyframe.Perform(animable, propertyName, Document.Current.AnimationId, key);
 			}
