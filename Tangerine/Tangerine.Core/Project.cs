@@ -31,6 +31,9 @@ namespace Tangerine.Core
 			CitprojPath = citprojPath;
 			UserprefsPath = Path.ChangeExtension(citprojPath, ".userprefs");
 			AssetsDirectory = Path.Combine(Path.GetDirectoryName(CitprojPath), "Data");
+			if (!Directory.Exists(AssetsDirectory)) {
+				throw new InvalidOperationException($"Assets directory {AssetsDirectory} doesn't exist.");
+			}
 			Orange.The.Workspace.Open(citprojPath);
 			UpdateTextureParams();
 		}
