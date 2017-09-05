@@ -43,10 +43,12 @@ namespace Tangerine.UI.SceneView
 				var transformInversed = transform.CalcInversed();
 				int index = 0;
 				while (sv.Input.IsMousePressed()) {
+					var snapEnabled = sv.Input.IsKeyPressed(Key.Alt);
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					var items = Document.Current.Container.AsWidget.BoneArray.items;
 					index = 0;
-					if (items != null) {
+					SceneView.Instance.Components.GetOrAdd<CreateBoneHelper>().HitTip = default(Vector2);
+					if (items != null && snapEnabled) {
 						for (var i = 0; i < items.Length; i++) {
 							if (sv.HitTestControlPoint(transformInversed * items[i].Tip)) {
 								index = i;
@@ -61,13 +63,13 @@ namespace Tangerine.UI.SceneView
 					var b = bone.Parent.AsWidget.BoneArray[bone.BaseIndex];
 					var dragDelta = sv.MousePosition * transform - iniMousePos * transform;
 					var position = bone.WorldToLocalTransform *
-						(entry.Joint - b.Tip + (index != 0 && index != bone.Index ? items[index].Tip - entry.Joint : dragDelta));
+						(entry.Joint - b.Tip + (index != 0 && index != bone.Index && snapEnabled ? items[index].Tip - entry.Joint : dragDelta));
 					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.Position), position);
 
 					bone.Parent.Update(0);
 					yield return null;
 				}
-				if (index != 0 && index != bone.Index) {
+				if (index != 0 && index != bone.Index && sv.Input.IsKeyPressed(Key.Alt)) {
 					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.Position), Vector2.Zero);
 					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.BaseIndex), index);
 					Core.Operations.SortBonesInChain.Perform(bone);
@@ -100,7 +102,9 @@ namespace Tangerine.UI.SceneView
 							var prentDir = parent.Tip - parent.Joint;
 							angle = Vector2.AngleDeg(prentDir, dir);
 						}
-						Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.Rotation), angle);
+						if (!sv.Input.IsKeyPressed(Key.Alt)) {
+							Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.Rotation), angle);
+						}
 						Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.Length), dir.Length);
 					} else {
 						var dragDelta = sv.MousePosition * transform - iniMousePos * transform;
