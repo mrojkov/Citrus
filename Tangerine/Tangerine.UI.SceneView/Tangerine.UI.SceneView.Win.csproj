@@ -66,6 +66,7 @@
     <Compile Include="Presenters\BoneAsistantPresenter.cs" />
     <Compile Include="Presenters\BonePresenter.cs" />
     <Compile Include="Presenters\ContainerAreaPresenter.cs" />
+    <Compile Include="Presenters\DistortionMeshPresenter.cs" />
     <Compile Include="Presenters\PointObjectPresenter.cs" />
     <Compile Include="Presenters\PointObjectsSelectionPresenter.cs" />
     <Compile Include="Presenters\SelectedWidgetsPresenter.cs" />

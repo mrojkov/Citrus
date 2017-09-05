@@ -86,7 +86,7 @@ namespace Tangerine.UI.SceneView
 
 		void DrawPointObject(Vector2 position)
 		{
-			Renderer.DrawRound(position, 3, 10, ColorTheme.Current.SceneView.Selection);
+			Renderer.DrawRound(position, 4, 10, ColorTheme.Current.SceneView.Selection);
 		}
 
 		void DrawStretchMark(Vector2 position)

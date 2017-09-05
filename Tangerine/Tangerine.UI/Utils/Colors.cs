@@ -38,6 +38,7 @@ namespace Tangerine.UI
 			public Color4 BackgroundColorA;
 			public Color4 BackgroundColorB;
 			public Color4 RootWidgetOverlayColor;
+			public Color4 DistortionMeshOutline;
 		}
 
 		public class TimelineGridColors
@@ -128,14 +129,15 @@ namespace Tangerine.UI
 				ContainerOuterSpace = Color4.Gray,
 				ContainerInnerSpace = Color4.White,
 				ContainerBorder = Color4.Blue,
-				PointObject = Color4.Red,
+				PointObject = Color4.Gray.Lighten(0.3f),
 				Bone = new Color4(136, 136, 136, 128),
 				BoneOutline = new Color4(105, 105, 105),
 				BoneEffectiveRadius = Color4.Yellow,
 				BoneFadeoutZone = Color4.Red,
 				BackgroundColorA = Color4.Gray,
 				BackgroundColorB = Color4.Gray.Darken(0.15f),
-				RootWidgetOverlayColor = Color4.White.Transparentify(0.8f)
+				RootWidgetOverlayColor = Color4.White.Transparentify(0.8f),
+				DistortionMeshOutline = new Color4(0, 255, 255),
 			};
 			var timelineGrid = new TimelineGridColors {
 				PropertyRowBackground = Color4.White.Transparentify(0.95f),
@@ -214,14 +216,15 @@ namespace Tangerine.UI
 				ContainerOuterSpace = Color4.Gray,
 				ContainerInnerSpace = Color4.White,
 				ContainerBorder = Color4.Blue,
-				PointObject = Color4.Red,
+				PointObject = Color4.Gray.Lighten(0.2f),
 				Bone = new Color4(136, 136, 136, 128),
 				BoneOutline = new Color4(105, 105, 105),
 				BoneEffectiveRadius = Color4.Yellow,
 				BoneFadeoutZone = Color4.Red,
 				BackgroundColorA = new Color4(202, 202, 202),
 				BackgroundColorB = new Color4(190, 190, 190),
-				RootWidgetOverlayColor = new Color4(255, 255, 255, 85)
+				RootWidgetOverlayColor = new Color4(255, 255, 255, 85),
+				DistortionMeshOutline = new Color4(0, 255, 255),
 			};
 			var timelineGrid = new TimelineGridColors {
 				PropertyRowBackground = Color4.Black.Transparentify(0.95f),

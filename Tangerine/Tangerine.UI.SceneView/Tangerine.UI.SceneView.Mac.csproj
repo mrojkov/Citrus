@@ -92,6 +92,7 @@
     <Compile Include="Processors\RescalePointObjectSelectionProcessor.cs" />
     <Compile Include="Processors\RotatePointObjectSelectionProcessor.cs" />
     <Compile Include="Presenters\Bone3DPresenter.cs" />
+    <Compile Include="Presenters\DistortionMeshPresenter.cs" />
     <Compile Include="Presenters\TransparentWidgetsPresenter.cs" />
   </ItemGroup>
   <ItemGroup>
