@@ -269,9 +269,6 @@ namespace Lime
 			clone.cachedShapePoints = new List<Vector2>();
 			clone.cachedShapeTriangles = new List<int>();
 			clone.cachedShapeTriangleSizes = new List<float>();
-			foreach (var node in Nodes) {
-				clone.Nodes.Add(node.Clone());
-			}
 			return clone;
 		}
 
