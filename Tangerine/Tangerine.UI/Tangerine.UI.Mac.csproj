@@ -80,6 +80,7 @@
     <Compile Include="Utils\Metrics.cs" />
     <Compile Include="DocumentCommandHandler.cs" />
     <Compile Include="Cursors.cs" />
+    <Compile Include="TabbedWidget.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

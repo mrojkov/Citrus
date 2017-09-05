@@ -51,6 +51,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EmbeddedResource.cs" />
     <Compile Include="SearchPanel\SearchPanel.cs" />
+    <Compile Include="TabbedWidget.cs" />
     <Compile Include="Toolbar.cs" />
     <Compile Include="ToolbarButton.cs" />
     <Compile Include="Utils\HSpacer.cs" />
