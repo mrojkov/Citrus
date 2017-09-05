@@ -79,7 +79,7 @@ namespace Orange
 			cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, The.Workspace.ActiveTarget);
 			var extraBundles = new HashSet<string>();
 			foreach (var dictionaryItem in cookingRulesMap) {
-				foreach (var bundle in dictionaryItem.Value.Bundle) {
+				foreach (var bundle in dictionaryItem.Value.Bundles) {
 					if (bundle != CookingRulesBuilder.MainBundleName) {
 						extraBundles.Add(bundle);
 					}
@@ -139,7 +139,7 @@ namespace Orange
 				if (cookingRulesMap.TryGetValue(info.Path, out rules)) {
 					if (rules.Ignore)
 						return false;
-					return Array.IndexOf(rules.Bundle, bundleName) != -1;
+					return Array.IndexOf(rules.Bundles, bundleName) != -1;
 				} else {
 					// There are no cooking rules for text files, consider them as part of the main bundle.
 					return bundleName == CookingRulesBuilder.MainBundleName;
@@ -233,7 +233,7 @@ namespace Orange
 		private static void SyncRawAssets(string extension, AssetAttributes attributes = AssetAttributes.None)
 		{
 			SyncUpdated(extension, extension, (srcPath, dstPath) => {
-				AssetBundle.ImportFile(srcPath, dstPath, 0, extension, attributes);
+				AssetBundle.ImportFile(srcPath, dstPath, 0, extension, attributes, cookingRulesMap[srcPath].SHA1);
 				return true;
 			});
 		}
@@ -251,14 +251,14 @@ namespace Orange
 					// from OGG to Wav/Adpcm
 					var rules = cookingRulesMap[srcPath];
 					if (stream.Length > rules.ADPCMLimit * 1024) {
-						AssetBundle.ImportFile(dstPath, stream, 0, sourceExtension);
+						AssetBundle.ImportFile(dstPath, stream, 0, sourceExtension, AssetAttributes.None, cookingRulesMap[srcPath].SHA1);
 					} else {
 						Console.WriteLine("Converting sound to ADPCM/IMA4 format...");
 						using (var input = new OggDecoder(stream)) {
 							using (var output = new MemoryStream()) {
 								WaveIMA4Converter.Encode(input, output);
 								output.Seek(0, SeekOrigin.Begin);
-								AssetBundle.ImportFile(dstPath, output, 0, sourceExtension);
+								AssetBundle.ImportFile(dstPath, output, 0, sourceExtension, AssetAttributes.None, cookingRulesMap[srcPath].SHA1);
 							}
 						}
 					}
@@ -271,7 +271,7 @@ namespace Orange
 		{
 			SyncUpdated(".tan", ".tan", (srcPath, dstPath) => {
 				var node = Serialization.ReadObjectFromFile<Node>(srcPath);
-				Serialization.WriteObjectToBundle(AssetBundle, dstPath, node, Serialization.Format.Binary, ".tan");
+				Serialization.WriteObjectToBundle(AssetBundle, dstPath, node, Serialization.Format.Binary, ".tan", AssetAttributes.None, cookingRulesMap[srcPath].SHA1);
 				return true;
 			});
 		}
@@ -280,7 +280,7 @@ namespace Orange
 		{
 			SyncUpdated(".tft", ".tft", (srcPath, dstPath) => {
 				var font = Serialization.ReadObjectFromFile<Font>(srcPath);
-				Serialization.WriteObjectToBundle(AssetBundle, dstPath, font, Serialization.Format.Binary, ".tft");
+				Serialization.WriteObjectToBundle(AssetBundle, dstPath, font, Serialization.Format.Binary, ".tft", AssetAttributes.None, cookingRulesMap[srcPath].SHA1);
 				return true;
 			});
 		}
@@ -290,7 +290,7 @@ namespace Orange
 			SyncUpdated(".scene", ".scene", (srcPath, dstPath) => {
 				using (Stream stream = new FileStream(srcPath, FileMode.Open)) {
 					var node = new HotSceneImporter(false, srcPath).Import(stream, null, null);
-					Serialization.WriteObjectToBundle(AssetBundle, dstPath, node, Serialization.Format.Binary, ".scene");
+					Serialization.WriteObjectToBundle(AssetBundle, dstPath, node, Serialization.Format.Binary, ".scene", AssetAttributes.None, cookingRulesMap[srcPath].SHA1);
 				}
 				return true;
 			});
@@ -301,7 +301,7 @@ namespace Orange
 			SyncUpdated(".fnt", ".fnt", (srcPath, dstPath) => {
 				var importer = new HotFontImporter(false);
 				var font = importer.ParseFont(srcPath, dstPath);
-				Serialization.WriteObjectToBundle(AssetBundle, dstPath, font, Serialization.Format.Binary, ".fnt");
+				Serialization.WriteObjectToBundle(AssetBundle, dstPath, font, Serialization.Format.Binary, ".fnt", AssetAttributes.None, cookingRulesMap[srcPath].SHA1);
 				return true;
 			});
 		}
@@ -315,7 +315,7 @@ namespace Orange
 					return false;
 				}
 				if (Platform == TargetPlatform.Unity) {
-					AssetBundle.ImportFile(srcPath, dstPath, reserve: 0, sourceExtension: ".png");
+					AssetBundle.ImportFile(srcPath, dstPath, 0, ".png", AssetAttributes.None, cookingRulesMap[srcPath].SHA1);
 				}
 				else {
 					using (var stream = File.OpenRead(srcPath)) {
@@ -325,7 +325,7 @@ namespace Orange
 							bitmap.Dispose();
 							bitmap = scaledBitmap;
 						}
-						ImportTexture(dstPath, bitmap, rules);
+						ImportTexture(dstPath, bitmap, rules, rules.SHA1);
 						bitmap.Dispose();
 					}
 				}
@@ -367,7 +367,9 @@ namespace Orange
 				var srcPath = srcFileInfo.Path;
 				var dstPath = Path.ChangeExtension(srcPath, bundleAssetExtension);
 				var bundled = bundle.FileExists(dstPath);
+				var srcRules = cookingRulesMap[srcPath];
 				var needUpdate = !bundled || srcFileInfo.LastWriteTime > bundle.GetFileLastWriteTime(dstPath);
+				needUpdate = needUpdate || !srcRules.SHA1.SequenceEqual(bundle.GetCookingRulesSHA1(dstPath));
 				if (needUpdate) {
 					if (converter != null) {
 						try {
@@ -387,7 +389,7 @@ namespace Orange
 					} else {
 						Console.WriteLine((bundled ? "* " : "+ ") + dstPath);
 						using (Stream stream = new FileStream(srcPath, FileMode.Open, FileAccess.Read)) {
-							bundle.ImportFile(dstPath, stream, 0, fileExtension);
+							bundle.ImportFile(dstPath, stream, 0, fileExtension, AssetAttributes.None, cookingRulesMap[srcPath].SHA1);
 						}
 					}
 				}
@@ -654,7 +656,8 @@ namespace Orange
 				atlasPart.AtlasRect = item.AtlasRect;
 				atlasPart.AtlasRect.B -= new IntVector2(2, 2);
 				atlasPart.AtlasPath = Path.ChangeExtension(atlasPath, null);
-				Serialization.WriteObjectToBundle(AssetBundle, item.Path, atlasPart, Serialization.Format.Binary, item.SourceExtension);
+				Serialization.WriteObjectToBundle(AssetBundle, item.Path, atlasPart, Serialization.Format.Binary,
+					item.SourceExtension, AssetAttributes.None, item.CookingRules.SHA1);
 				// Delete non-atlased texture since now its useless
 				var texturePath = Path.ChangeExtension(item.Path, GetPlatformTextureExtension());
 				if (AssetBundle.FileExists(texturePath)) {
@@ -664,7 +667,7 @@ namespace Orange
 			Console.WriteLine("+ " + atlasPath);
 			var firstItem = items.First(i => i.Allocated);
 			using (var atlas = new Bitmap(atlasPixels, size.Width, size.Height)) {
-				ImportTexture(atlasPath, atlas, firstItem.CookingRules);
+				ImportTexture(atlasPath, atlas, firstItem.CookingRules, CookingRulesSHA1: null);
 			}
 		}
 
@@ -695,7 +698,7 @@ namespace Orange
 				rules.WrapMode == TextureParams.Default.WrapModeU;
 		}
 
-		public static void ImportTexture(string path, Bitmap texture, ICookingRules rules)
+		public static void ImportTexture(string path, Bitmap texture, ICookingRules rules, byte[] CookingRulesSHA1)
 		{
 			var textureParamsPath = Path.ChangeExtension(path, ".texture");
 			if (!AreTextureParamsDefault(rules)) {
@@ -705,7 +708,7 @@ namespace Orange
 					MinFilter = rules.MinFilter,
 					MagFilter = rules.MagFilter,
 				};
-				Serialization.WriteObjectToBundle(AssetBundle, textureParamsPath, textureParams, Serialization.Format.Binary, ".texture");
+				Serialization.WriteObjectToBundle(AssetBundle, textureParamsPath, textureParams, Serialization.Format.Binary, ".texture", AssetAttributes.None, null);
 			} else {
 				if (AssetBundle.FileExists(textureParamsPath)) {
 					DeleteFileFromBundle(textureParamsPath);
@@ -723,17 +726,17 @@ namespace Orange
 				case TargetPlatform.Android:
 					var f = rules.PVRFormat;
 					if (f == PVRFormat.ARGB8 || f == PVRFormat.RGB565 || f == PVRFormat.RGBA4) {
-						TextureConverter.RunPVRTexTool(texture, AssetBundle, path, attributes, rules.MipMaps, rules.HighQualityCompression, rules.PVRFormat);
+						TextureConverter.RunPVRTexTool(texture, AssetBundle, path, attributes, rules.MipMaps, rules.HighQualityCompression, rules.PVRFormat, CookingRulesSHA1);
 					} else {
-						TextureConverter.RunEtcTool(texture, AssetBundle, path, attributes, rules.MipMaps, rules.HighQualityCompression);
+						TextureConverter.RunEtcTool(texture, AssetBundle, path, attributes, rules.MipMaps, rules.HighQualityCompression, CookingRulesSHA1);
 					}
 					break;
 				case TargetPlatform.iOS:
-					TextureConverter.RunPVRTexTool(texture, AssetBundle, path, attributes, rules.MipMaps, rules.HighQualityCompression, rules.PVRFormat);
+					TextureConverter.RunPVRTexTool(texture, AssetBundle, path, attributes, rules.MipMaps, rules.HighQualityCompression, rules.PVRFormat, CookingRulesSHA1);
 					break;
 				case TargetPlatform.Win:
 				case TargetPlatform.Mac:
-					TextureConverter.RunNVCompress(texture, AssetBundle, path, attributes, rules.DDSFormat, rules.MipMaps);
+					TextureConverter.RunNVCompress(texture, AssetBundle, path, attributes, rules.DDSFormat, rules.MipMaps, CookingRulesSHA1);
 					break;
 				default:
 					throw new Lime.Exception();
@@ -819,7 +822,11 @@ namespace Orange
 
 				// If atlas part has been outdated we should rebuild full atlas chain
 				var srcTexturePath = Path.ChangeExtension(atlasPartPath, ".png");
-				if (!textures.ContainsKey(srcTexturePath) || AssetBundle.GetFileLastWriteTime(atlasPartPath) < textures[srcTexturePath]) {
+				if (
+					!textures.ContainsKey(srcTexturePath) ||
+					AssetBundle.GetFileLastWriteTime(atlasPartPath) < textures[srcTexturePath] ||
+					!AssetBundle.GetCookingRulesSHA1(atlasPartPath).SequenceEqual(cookingRulesMap[srcTexturePath].SHA1)
+				) {
 					srcTexturePath = AssetPath.Combine(The.Workspace.AssetsDirectory, srcTexturePath);
 					var part = TextureAtlasElement.Params.ReadFromBundle(atlasPartPath);
 					var atlasChain = Path.GetFileNameWithoutExtension(part.AtlasPath);
@@ -855,10 +862,10 @@ namespace Orange
 		{
 			var sourceAssetBundle = new UnpackedAssetBundle(The.Workspace.AssetsDirectory);
 			SyncUpdated(".fbx", ".model", (srcPath, dstPath) => {
-				var compression = cookingRulesMap[srcPath].ModelCompressing;
+				var compression = cookingRulesMap[srcPath].ModelCompression;
 				var model = new FbxModelImporter(srcPath, The.Workspace.ActivePlatform).Model;
 				// Create .model file for tangerine.
-				Serialization.WriteObjectToBundle(sourceAssetBundle, dstPath, model, Serialization.Format.Binary, ".model");
+				Serialization.WriteObjectToBundle(sourceAssetBundle, dstPath, model, Serialization.Format.Binary, ".model", AssetAttributes.None, cookingRulesMap[srcPath].SHA1);
 				AssetAttributes assetAttributes;
 				switch (compression) {
 					case ModelCompression.None:
@@ -873,7 +880,7 @@ namespace Orange
 					default:
 						throw new ArgumentOutOfRangeException($"Unknown compression: {compression}");
 				}
-				AssetBundle.ImportFile(dstPath, dstPath, 0, ".model", assetAttributes);
+				AssetBundle.ImportFile(dstPath, dstPath, 0, ".model", assetAttributes, cookingRulesMap[srcPath].SHA1);
 				return true;
 			});
 		}

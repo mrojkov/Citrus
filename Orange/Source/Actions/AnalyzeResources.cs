@@ -18,64 +18,6 @@ namespace Orange
 		}
 
 		internal static List<PathRequestRecord> requestedPaths;
-		public class BundleSwitcher : AssetBundle
-		{
-			AssetBundle mainBundle;
-			AssetBundle secondaryBundle;
-
-			public BundleSwitcher(AssetBundle mainBundle, AssetBundle secondaryBundle)
-			{
-				this.mainBundle = mainBundle;
-				this.secondaryBundle = secondaryBundle;
-			}
-
-			public override Stream OpenFile(string path)
-			{
-				if (mainBundle.FileExists(path)) {
-					requestedPaths.Add(new PathRequestRecord() {
-						path = path,
-						bundle = (mainBundle as PackedAssetBundle).Path,
-					});
-					return mainBundle.OpenFile(path);
-				} else {
-					return secondaryBundle.OpenFile(path);
-				}
-			}
-
-			public override DateTime GetFileLastWriteTime(string path)
-			{
-				if (mainBundle.FileExists(path)) {
-					return mainBundle.GetFileLastWriteTime(path);
-				} else {
-					return secondaryBundle.GetFileLastWriteTime(path);
-				}
-			}
-
-			public override void DeleteFile(string path)
-			{
-				throw new Lime.Exception("DeleteFile is not supported for BundleSwitcher (file '{0}')", path);
-			}
-
-			public override bool FileExists(string path)
-			{
-				return mainBundle.FileExists(path) || secondaryBundle.FileExists(path);
-			}
-
-			public override void ImportFile(string path, Stream stream, int reserve, string sourceExtension, AssetAttributes attributes)
-			{
-				throw new Lime.Exception("ImportFile is not supported for BundleSwitcher (file '{0}')", path);
-			}
-
-			public override IEnumerable<string> EnumerateFiles(string path = null)
-			{
-				foreach (var s in mainBundle.EnumerateFiles(path)) {
-					yield return s;
-				}
-				foreach (var s in secondaryBundle.EnumerateFiles(path)) {
-					yield return s;
-				}
-			}
-		}
 
 		[Export(nameof(OrangePlugin.MenuItems))]
 		[ExportMetadata("Label", "Analyze Resources")]
@@ -107,16 +49,13 @@ namespace Orange
 						}
 					}
 				}
-				foreach (var bundle in i.Value.Bundle) {
+				foreach (var bundle in i.Value.Bundles) {
 					if (bundle != CookingRulesBuilder.MainBundleName) {
 						bundles.Add(bundle);
 					}
 				}
 			}
-			foreach (var i in bundles) {
-				AssetBundle.Instance = new BundleSwitcher(new PackedAssetBundle(The.Workspace.GetBundlePath(i)),
-					AssetBundle.Instance);
-			}
+			AssetBundle.Instance = new AggregateAssetBundle(bundles.Select(i => new PackedAssetBundle(The.Workspace.GetBundlePath(i))).ToArray());
 			The.Workspace.AssetFiles.EnumerationFilter = (info) => {
 				CookingRules rules;
 				if (cookingRulesMap.TryGetValue(info.Path, out rules)) {
@@ -213,10 +152,10 @@ namespace Orange
 					foreach (Match m in Regex.Matches(rpr.bundle, pattern, RegexOptions.IgnoreCase)) {
 						bundle = m.Groups[1].Value;
 					}
-					int index = Array.IndexOf(cookingRulesMap[srcPath].Bundle, bundle);
+					int index = Array.IndexOf(cookingRulesMap[srcPath].Bundles, bundle);
 					if (index == -1) {
 						reportList.Add(string.Format("\t[{0}]=>[{2}]: {1}",
-							string.Join(", ", cookingRulesMap[srcPath].Bundle), rpr.path, bundle));
+							string.Join(", ", cookingRulesMap[srcPath].Bundles), rpr.path, bundle));
 					}
 				}
 				requestedPaths.Clear();

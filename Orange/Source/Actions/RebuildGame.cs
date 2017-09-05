@@ -63,7 +63,7 @@ namespace Orange
 				CookingRulesBuilder.MainBundleName
 			};
 			var cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, The.Workspace.ActiveTarget);
-			foreach (var bundle in cookingRulesMap.SelectMany(i => i.Value.Bundle.Where(bundle => bundle != CookingRulesBuilder.MainBundleName))) {
+			foreach (var bundle in cookingRulesMap.SelectMany(i => i.Value.Bundles.Where(bundle => bundle != CookingRulesBuilder.MainBundleName))) {
 				bundles.Add(bundle);
 			}
 			return bundles;

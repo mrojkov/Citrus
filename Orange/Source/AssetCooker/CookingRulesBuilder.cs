@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using Lime;
 using Yuzu;
+using Yuzu.Json;
 using Yuzu.Metadata;
 
 namespace Orange
@@ -42,6 +43,7 @@ namespace Orange
 		LZMA,
 	}
 
+	// Specifying empty target platforms for single cooking rule means no platform must be specified in cooking rules.
 	public class TargetPlatformsAttribute : Attribute
 	{
 		public readonly TargetPlatform[] TargetPlatforms;
@@ -60,11 +62,11 @@ namespace Orange
 		float TextureScaleFactor { get; }
 		PVRFormat PVRFormat { get; }
 		DDSFormat DDSFormat { get; }
-		string[] Bundle { get; }
+		string[] Bundles { get; }
 		bool Ignore { get; }
 		int ADPCMLimit { get; }
 		AtlasOptimization AtlasOptimization { get; }
-		ModelCompression ModelCompressing { get; }
+		ModelCompression ModelCompression { get; }
 		string AtlasPacker { get; }
 		string CustomRule { get; }
 		[TargetPlatforms]
@@ -81,53 +83,60 @@ namespace Orange
 		// for all fields marked with `YuzuRequired`. So don't rename them or do so with cautiousness.
 		// e.g. don't rename `Bundle` to `Bundles`
 
-		[YuzuRequired]
+		[YuzuMember]
 		public string TextureAtlas { get; set; }
 
-		[YuzuRequired]
+		[YuzuMember]
 		public bool MipMaps { get; set; }
 
-		[YuzuRequired]
+		[YuzuMember]
 		public bool HighQualityCompression { get; set; }
 
-		[YuzuRequired]
+		[YuzuMember]
 		public float TextureScaleFactor { get; set; }
 
-		[YuzuRequired]
+		[YuzuMember]
 		public PVRFormat PVRFormat { get; set; }
 
-		[YuzuRequired]
+		[YuzuMember]
 		public DDSFormat DDSFormat { get; set; }
 
-		[YuzuRequired]
-		public string[] Bundle { get; set; }
+		[YuzuMember]
+		public string[] Bundles { get; set; }
 
-		[YuzuRequired]
+		[YuzuMember]
 		public bool Ignore { get; set; }
 
-		[YuzuRequired]
+		[YuzuMember]
 		public int ADPCMLimit { get; set; } // Kb
 
-		[YuzuRequired]
+		[YuzuMember]
 		public AtlasOptimization AtlasOptimization { get; set; }
 
-		[YuzuRequired]
-		public ModelCompression ModelCompressing { get; set; }
+		[YuzuMember]
+		public ModelCompression ModelCompression { get; set; }
 
-		[YuzuRequired]
+		[YuzuMember]
 		public string AtlasPacker { get; set; }
 
-		[YuzuRequired]
+		[YuzuMember]
 		public TextureWrapMode WrapMode { get; set; }
 
-		[YuzuRequired]
+		[YuzuMember]
 		public TextureFilter MinFilter { get; set; }
 
-		[YuzuRequired]
+		[YuzuMember]
 		public TextureFilter MagFilter { get; set; }
 
-		[YuzuRequired]
+		[YuzuMember]
 		public string CustomRule { get; set; }
+
+		private static System.Security.Cryptography.SHA1 sha1 = System.Security.Cryptography.SHA1.Create();
+		// using json format for SHA1 since binary one includes all fields definitions header anyway.
+		// so adding a field with binary triggers rebuild of all bundles
+		private static Yuzu.Json.JsonSerializer yjs = new Yuzu.Json.JsonSerializer();
+
+		public byte[] SHA1 { get { return sha1.ComputeHash(yjs.ToBytes(this)); } }
 
 		public DateTime LastChangeTime;
 
@@ -148,6 +157,22 @@ namespace Orange
 			foreach (var item in meta.Items) {
 				fieldNameToYuzuMetaItemCache.Add(item.Name, item);
 			}
+			// initializing all fields here, so any changes to yuzu default values won't affect us here
+			yjs.JsonOptions = new JsonSerializeOptions {
+				ArrayLengthPrefix = false,
+				ClassTag = "class",
+				DateFormat = "O",
+				TimeSpanFormat = "c",
+				DecimalAsString = false,
+				EnumAsString = false,
+				FieldSeparator = "",
+				IgnoreCompact = false,
+				Indent = "",
+				Int64AsString = false,
+				MaxOnelineFields = 0,
+				SaveRootClass = false,
+				Unordered = false,
+			};
 		}
 
 		public void Override(string fieldName)
@@ -169,11 +194,11 @@ namespace Orange
 				PVRFormat = platform == TargetPlatform.Android ? PVRFormat.ETC2 : PVRFormat.PVRTC4,
 				DDSFormat = DDSFormat.DXTi,
 				LastChangeTime = new DateTime(0),
-				Bundle = new[] { CookingRulesBuilder.MainBundleName },
+				Bundles = new[] { CookingRulesBuilder.MainBundleName },
 				Ignore = false,
 				ADPCMLimit = 100,
 				AtlasOptimization = AtlasOptimization.Memory,
-				ModelCompressing = ModelCompression.Deflate,
+				ModelCompression = ModelCompression.Deflate,
 				FieldOverrides = new HashSet<Meta.Item>(),
 			});
 			return defaultRules[platform];
@@ -202,15 +227,17 @@ namespace Orange
 		public float TextureScaleFactor => EffectiveRules.TextureScaleFactor;
 		public PVRFormat PVRFormat => EffectiveRules.PVRFormat;
 		public DDSFormat DDSFormat => EffectiveRules.DDSFormat;
-		public string[] Bundle => EffectiveRules.Bundle;
+		public string[] Bundles => EffectiveRules.Bundles;
 		public int ADPCMLimit => EffectiveRules.ADPCMLimit;
 		public AtlasOptimization AtlasOptimization => EffectiveRules.AtlasOptimization;
-		public ModelCompression ModelCompressing => EffectiveRules.ModelCompressing;
+		public ModelCompression ModelCompression => EffectiveRules.ModelCompression;
 		public string AtlasPacker => EffectiveRules.AtlasPacker;
 		public TextureWrapMode WrapMode => EffectiveRules.WrapMode;
 		public TextureFilter MinFilter => EffectiveRules.MinFilter;
 		public TextureFilter MagFilter => EffectiveRules.MagFilter;
 		public string CustomRule => EffectiveRules.CustomRule;
+
+		public byte[] SHA1 => EffectiveRules.SHA1;
 
 		public bool Ignore
 		{
@@ -280,7 +307,7 @@ namespace Orange
 		{
 			if (value == null) {
 				return "";
-			} if (yi.Name == "Bundle") {
+			} if (yi.Name == "Bundles") {
 				var vlist = (string[])value;
 				return string.Join(",", vlist);
 			} else if (value is bool) {
@@ -488,7 +515,7 @@ namespace Orange
 			}
 		}
 
-		private static ModelCompression ParseModelCompressing(string value)
+		private static ModelCompression ParseModelCompression(string value)
 		{
 			switch (value) {
 				case "None":
@@ -499,7 +526,7 @@ namespace Orange
 				case "LZMA":
 					return ModelCompression.LZMA;
 				default:
-					throw new Lime.Exception("Error parsing ModelCompressing. Must be one of: None, Deflate, LZMA");
+					throw new Lime.Exception("Error parsing ModelCompression. Must be one of: None, Deflate, LZMA");
 			}
 		}
 
@@ -595,10 +622,10 @@ namespace Orange
 			case "DDSFormat":
 				rules.DDSFormat = ParseDDSFormat(words[1]);
 				break;
-			case "Bundle":
-				rules.Bundle = new string[words.Count - 1];
-				for (var i = 0; i < rules.Bundle.Length; i++) {
-					rules.Bundle[i] = ParseBundle(words[i + 1]);
+			case "Bundles":
+				rules.Bundles = new string[words.Count - 1];
+				for (var i = 0; i < rules.Bundles.Length; i++) {
+					rules.Bundles[i] = ParseBundle(words[i + 1]);
 				}
 				break;
 			case "Ignore":
@@ -616,8 +643,8 @@ namespace Orange
 			case "AtlasPacker":
 				rules.AtlasPacker = words[1];
 				break;
-			case "ModelCompressing":
-				rules.ModelCompressing = ParseModelCompressing(words[1]);
+			case "ModelCompression":
+				rules.ModelCompression = ParseModelCompression(words[1]);
 				break;
 			case "CustomRule":
 				rules.CustomRule = words[1];
