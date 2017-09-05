@@ -94,7 +94,7 @@ namespace Lime
 			var glyphMaxArea = fontHeight * (fontHeight / 2);
 			var size =
 				CalcUpperPowerOfTwo((int)Math.Sqrt(glyphMaxArea * glyphsPerTexture))
-				.Clamp(64, 1024);
+				.Clamp(64, 2048);
 			return new Size(size, size);
 		}
 

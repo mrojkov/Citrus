@@ -40,8 +40,8 @@ namespace Orange
 			int height = bitmap.Height;
 			bool hasAlpha = bitmap.HasAlpha;
 
-			int potWidth = TextureConverterUtils.GetNearestPowerOf2(width, 8, 1024);
-			int potHeight = TextureConverterUtils.GetNearestPowerOf2(height, 8, 1024);
+			int potWidth = TextureConverterUtils.GetNearestPowerOf2(width, 8, 2048);
+			int potHeight = TextureConverterUtils.GetNearestPowerOf2(height, 8, 2048);
 			var args = new StringBuilder();
 			switch (pvrFormat) {
 				case PVRFormat.PVRTC4:

@@ -587,7 +587,7 @@ namespace Orange
 
 		private static Size GetMaxAtlasSize()
 		{
-			return new Size(1024, 1024);
+			return new Size(2048, 2048);
 		}
 
 		private static void PackItemsToAtlas(List<AtlasItem> items, Size size, out double packRate)
@@ -786,7 +786,7 @@ namespace Orange
 
 		private static Bitmap DownscaleTexture(Bitmap texture, string path, CookingRules rules)
 		{
-			const int MaxSize = 1024;
+			int MaxSize = GetMaxAtlasSize().Width;
 			int scaleThreshold = Platform == TargetPlatform.Android ? 32 : 256;
 			var ratio = rules.TextureScaleFactor;
 			if (texture.Width > MaxSize || texture.Height > MaxSize) {
