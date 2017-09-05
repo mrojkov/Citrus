@@ -63,6 +63,10 @@ namespace Lime
 
 		public void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv)
 		{
+			if (uv.X < 0) uv.X = 0;
+			if (uv.X > 1) uv.X = 1;
+			if (uv.Y < 0) uv.Y = 0;
+			if (uv.Y > 1) uv.Y = 1;
 			float width = AtlasUVRect.B.X - AtlasUVRect.A.X;
 			float height = AtlasUVRect.B.Y - AtlasUVRect.A.Y;
 			uv.X = AtlasUVRect.Left + width * uv.X;
