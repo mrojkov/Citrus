@@ -17,7 +17,7 @@ namespace Lime
 	/// </summary>
 	public class KeyboardFocusScope
 	{
-		private readonly Key FocusNext = Key.Tab;
+		private readonly Key FocusNext = Key.MapShortcut(Key.Tab);
 		private readonly Key FocusPrevious = Key.MapShortcut(new Shortcut(Modifiers.Shift, Key.Tab));
 		private Widget lastFocused;
 
