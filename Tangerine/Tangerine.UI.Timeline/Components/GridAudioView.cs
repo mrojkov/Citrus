@@ -97,7 +97,7 @@ namespace Tangerine.UI.Timeline.Components
 					throw new NotImplementedException("Magnified waveform isn't supported yet");
 				} else {
 					while (accumulator < numSamples && currentSample < numSamples) {
-						int s = *samples * 4;
+						int s = *samples;
 						samples += stride;
 						currentSample++;
 						if (s < rangeMin) rangeMin = s;
@@ -108,8 +108,9 @@ namespace Tangerine.UI.Timeline.Components
 				}
 				int a = (top + bottom) / 2 + (bottom - top) * Math.Max(rangeMin, -32767) / 65536;
 				int b = (top + bottom) / 2 + (bottom - top) * Math.Min(rangeMax, 32767) / 65536;
+				var color = ColorTheme.Current.TimelineGrid.WaveformColor;
 				for (int j = a; j <= b; j++) {
-					pixels[i + j * textureWidth] = Color4.Black;
+					pixels[i + j * textureWidth] = color;
 				}
 			}
 		}

@@ -45,6 +45,7 @@ namespace Tangerine.UI
 			public Color4 Selection;
 			public Color4 Cursor;
 			public Color4 RunningCursor;
+			public Color4 WaveformColor;
 		}
 
 		public class TimelineRulerColors
@@ -136,7 +137,8 @@ namespace Tangerine.UI
 				LinesLight = new Color4(45, 45, 48).Lighten(0.065f),
 				Selection = Color4.Gray.Transparentify(0.5f),
 				Cursor = new Color4(163, 0, 0).Darken(0.15f),
-				RunningCursor = new Color4(0, 163, 0).Darken(0.15f)
+				RunningCursor = new Color4(0, 163, 0).Darken(0.15f),
+				WaveformColor = new Color4(170, 255, 140)
 			};
 			var timelineRuler = new TimelineRulerColors {
 				Notchings = timelineGrid.Lines,
@@ -218,7 +220,8 @@ namespace Tangerine.UI
 				LinesLight = new Color4(240, 240, 240),
 				Selection = Color4.Gray.Transparentify(0.5f),
 				Cursor = Color4.Red.Lighten(0.4f),
-				RunningCursor = Color4.Green.Lighten(0.4f)
+				RunningCursor = Color4.Green.Lighten(0.4f),
+				WaveformColor = new Color4(140, 170, 255)
 			};
 			var timelineRuler = new TimelineRulerColors {
 				Notchings = timelineGrid.Lines,
