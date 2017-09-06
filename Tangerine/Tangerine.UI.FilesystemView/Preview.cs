@@ -116,16 +116,20 @@ namespace Tangerine.UI.FilesystemView
 				if (fi.Length > 1024 * 1024 * 10) {
 					return null;
 				}
-				if (extension == ".png" || extension == ".jpg") {
-					try {
-						var texture = new Texture2D();
-						texture.LoadImage(filename);
-						return texture;
-					} catch {
+				try {
+					if (extension == ".png" || extension == ".jpg") {
+						try {
+							var texture = new Texture2D();
+							texture.LoadImage(filename);
+							return texture;
+						} catch {
+							return LoadFileAsRawBitmap(filename);
+						}
+					} else {
 						return LoadFileAsRawBitmap(filename);
 					}
-				} else {
-					return LoadFileAsRawBitmap(filename);
+				} catch {
+					return new Texture2D();
 				}
 			}
 		}
