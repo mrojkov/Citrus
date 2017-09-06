@@ -81,8 +81,18 @@ namespace Tangerine
 			};
 			Document.NodeDecorators.AddFor<Spline>(n => n.CompoundPostPresenter.Add(new UI.SceneView.SplinePresenter()));
 			Document.NodeDecorators.AddFor<Viewport3D>(n => n.CompoundPostPresenter.Add(new UI.SceneView.Spline3DPresenter()));
-			Document.NodeDecorators.AddFor<PointObject>(n => n.CompoundPostPresenter.Add(new UI.SceneView.PointObjectPresenter()));
 			Document.NodeDecorators.AddFor<SplinePoint>(n => n.CompoundPostPresenter.Add(new UI.SceneView.SplinePointPresenter()));
+			Document.NodeDecorators.AddFor<Widget>(n => {
+				if (n.AsWidget.SkinningWeights == null) {
+					n.AsWidget.SkinningWeights = new SkinningWeights();
+				}
+			});
+			Document.NodeDecorators.AddFor<PointObject>(n => {
+				n.CompoundPostPresenter.Add(new UI.SceneView.PointObjectPresenter());
+				if ((n as PointObject).SkinningWeights == null) {
+					(n as PointObject).SkinningWeights = new SkinningWeights();
+				}
+			});
 
 			dockManager.MainWindowWidget.Updated += delta => Document.Current?.History.NextBatch();
 			DocumentHistory.Processors.AddRange(new IOperationProcessor[] {

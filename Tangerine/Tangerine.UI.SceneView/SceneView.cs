@@ -59,11 +59,11 @@ namespace Tangerine.UI.SceneView
 						var mesh = widget as DistortionMesh;
 						foreach (PointObject point in mesh.Nodes) {
 							Core.Operations.SetAnimableProperty.Perform(point, nameof(PointObject.SkinningWeights),
-								CalcSkinningWeight(point.CalcPositionInSpaceOf(widget.ParentWidget), point.SkinningWeights, bones));
+								CalcSkinningWeight(point.CalcPositionInSpaceOf(widget.ParentWidget), bones));
 						}
 					} else {
 						Core.Operations.SetAnimableProperty.Perform(widget, nameof(PointObject.SkinningWeights),
-						CalcSkinningWeight(widget.Position, widget.SkinningWeights, bones));
+							CalcSkinningWeight(widget.Position, bones));
 					}
 				}
 				foreach (var bone in bones)
@@ -78,9 +78,9 @@ namespace Tangerine.UI.SceneView
 			}
 		}
 
-		private static SkinningWeights CalcSkinningWeight(Vector2 position, SkinningWeights skinningWeights, List<Bone> bones)
+		private static SkinningWeights CalcSkinningWeight(Vector2 position, List<Bone> bones)
 		{
-			skinningWeights = skinningWeights == null ? new SkinningWeights() : skinningWeights.Clone();
+			var skinningWeights = new SkinningWeights();
 			var i = 0;
 			while (i < bones.Count && i < 4) {
 				var bone = bones[i];

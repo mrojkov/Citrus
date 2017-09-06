@@ -30,6 +30,12 @@ namespace Lime
 		[YuzuMember("3")]
 		public BoneWeight Bone3;
 
+		public bool IsEmpty()
+		{
+			return Bone0.Index == 0 && Bone1.Index == 0 && Bone2.Index == 0 && Bone3.Index == 0 &&
+				   Bone0.Weight == 0 && Bone1.Weight == 0 && Bone2.Weight == 0 && Bone3.Weight == 0;
+		}
+
 		public BoneWeight this[int index]
 		{
 			get

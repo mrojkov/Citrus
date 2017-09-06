@@ -890,9 +890,6 @@ namespace Tangerine.UI
 			weigthsEditors = new NumericEditBox[4];
 			foreach (var o in editorParams.Objects) {
 				var prop = new Property<SkinningWeights>(o, editorParams.PropertyName).Value;
-				if (prop == null) {
-					editorParams.PropertySetter(o, editorParams.PropertyName, new SkinningWeights());
-				}
 			}
 			for (var i = 0; i <= 3; i++) {
 				indexEditors[i] = editorParams.NumericEditBoxFactory();

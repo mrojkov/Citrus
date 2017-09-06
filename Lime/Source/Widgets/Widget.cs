@@ -703,6 +703,9 @@ namespace Lime
 			clone.lateTasks = null;
 			clone.Updated = null;
 			clone.Updating = null;
+			if (clone.SkinningWeights.IsEmpty()) {
+				clone.SkinningWeights = null;
+			}
 			return clone;
 		}
 
