@@ -452,10 +452,7 @@ namespace Lime
 				desc.ModificationTime = DateTime.FromBinary(reader.ReadInt64());
 				ushort sha1Length = reader.ReadUInt16();
 				if (sha1Length != 0) {
-					desc.CookingRulesSHA1 = new byte[sha1Length];
-					for (int j = 0; j < sha1Length; j++) {
-						desc.CookingRulesSHA1[j] = reader.ReadByte();
-					}
+					desc.CookingRulesSHA1 = reader.ReadBytes(sha1Length);
 				}
 				desc.Offset = reader.ReadInt32();
 				desc.Length = reader.ReadInt32();
