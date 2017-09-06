@@ -321,6 +321,11 @@ namespace Tangerine.Core
 					n.Nodes.Clear();
 					n.Markers.Clear();
 				}
+				if (n.AsWidget?.SkinningWeights?.IsEmpty() ?? false) {
+					n.AsWidget.SkinningWeights = null;
+				} else if ((n as PointObject)?.SkinningWeights?.IsEmpty() ?? false) {
+					(n as PointObject).SkinningWeights = null;
+				}
 			};
 			f(clone);
 			foreach (var n in clone.Descendants) {
