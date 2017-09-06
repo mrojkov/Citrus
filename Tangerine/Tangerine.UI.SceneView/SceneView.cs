@@ -39,8 +39,19 @@ namespace Tangerine.UI.SceneView
 			h.Connect(SceneViewCommands.DragDownFast, () => DragNodes(new Vector2(0, 5)));
 			h.Connect(SceneViewCommands.DragLeftFast, () => DragNodes(new Vector2(-5, 0)));
 			h.Connect(SceneViewCommands.DragRightFast, () => DragNodes(new Vector2(5, 0)));
+			h.Connect(SceneViewCommands.Duplicate, DuplicateNodes);
 			h.Connect(SceneViewCommands.DisplayBones, DisplayBones);
 			h.Connect(SceneViewCommands.BindBones, BindBones);
+		}
+
+		private static void DuplicateNodes()
+		{
+			Document.Current.History.BeginTransaction();
+			var text = Clipboard.Text;
+			Core.Operations.Copy.CopyToClipboard();
+			Core.Operations.Paste.Perform();
+			Clipboard.Text = text;
+			Document.Current.History.EndTransaction();
 		}
 
 		private static void BindBones()

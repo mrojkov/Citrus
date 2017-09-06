@@ -82,7 +82,7 @@ namespace Tangerine.Core.Operations
 	{
 		public static void Perform()
 		{
-			var row = Document.Current.SelectedRows().FirstOrDefault();
+			var row = Document.Current.SelectedRows().LastOrDefault();
 			var loc = row == null ?
 				new RowLocation(Document.Current.RowTree, 0) :
 				new RowLocation(row.Parent, row.Parent.Rows.IndexOf(row));
