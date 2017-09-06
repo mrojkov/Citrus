@@ -253,14 +253,22 @@ namespace Lime
 			form.Deactivate += OnDeactivate;
 			form.FormClosing += OnClosing;
 			form.FormClosed += OnClosed;
+			glControl.MakeCurrent();
+			glControl.VSync = options.VSync;
 			form.Controls.Add(glControl);
 			stopwatch = new Stopwatch();
 			stopwatch.Start();
-			timer = new Timer();
-			// kuzymov: Without adding 5 frames to refresh rate, game have been getting FPS drops (minus ~20 FPS)
-			timer.Interval = (int)(1000 / (options.RefreshRate + 5));
-			timer.Tick += OnTick;
-			timer.Start();
+
+			if (options.VSync) {
+				timer = new Timer();
+				// kuzymov: Without adding 5 frames to refresh rate, game have been getting FPS drops (minus ~20 FPS)
+				timer.Interval = (int)(1000 / 65.0f);
+				timer.Tick += OnTick;
+				timer.Start();
+			} else {
+				System.Windows.Forms.Application.Idle += OnTick;
+			}
+
 			if (options.Icon != null) {
 				form.Icon = (Icon)options.Icon;
 			}
@@ -328,6 +336,7 @@ namespace Lime
 			if (this == Application.MainWindow) {
 				System.Windows.Forms.Application.Exit();
 			}
+			System.Windows.Forms.Application.Idle -= OnTick;
 		}
 
 		private void OnClosing(object sender, FormClosingEventArgs e)
