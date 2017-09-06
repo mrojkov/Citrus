@@ -822,10 +822,14 @@ namespace Orange
 
 				// If atlas part has been outdated we should rebuild full atlas chain
 				var srcTexturePath = Path.ChangeExtension(atlasPartPath, ".png");
+				var bundleSHA1 = AssetBundle.GetCookingRulesSHA1(atlasPartPath);
+				if (bundleSHA1 == null) {
+					throw new InvalidOperationException("CookingRules SHA1 for atlas part shouldn't be null");
+				}
 				if (
 					!textures.ContainsKey(srcTexturePath) ||
 					AssetBundle.GetFileLastWriteTime(atlasPartPath) < textures[srcTexturePath] ||
-					!AssetBundle.GetCookingRulesSHA1(atlasPartPath).SequenceEqual(cookingRulesMap[srcTexturePath].SHA1)
+					(!cookingRulesMap[srcTexturePath].SHA1.SequenceEqual(bundleSHA1))
 				) {
 					srcTexturePath = AssetPath.Combine(The.Workspace.AssetsDirectory, srcTexturePath);
 					var part = TextureAtlasElement.Params.ReadFromBundle(atlasPartPath);
