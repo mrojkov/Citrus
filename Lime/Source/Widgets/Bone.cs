@@ -206,12 +206,12 @@ namespace Lime
 				}
 			}
 			var visited = new Dictionary<int, bool>();
-			var g = new Dictionary<int, List<int>>();
+			var g = new Dictionary<int, SortedSet<int>>();
 			foreach (var kv in bones) {
 				var b = kv.Value;
-				(g.ContainsKey(b.BaseIndex) ? g[b.BaseIndex] : g[b.BaseIndex] = new List<int>()).Add(b.Index);
+				(g.ContainsKey(b.BaseIndex) ? g[b.BaseIndex] : g[b.BaseIndex] = new SortedSet<int>()).Add(b.Index);
 				if (!g.ContainsKey(b.Index))
-					g[b.Index] = new List<int>();
+					g[b.Index] = new SortedSet<int>();
 				visited.Add(b.Index, false);
 				if (!visited.ContainsKey(b.BaseIndex))
 					visited.Add(b.BaseIndex, false);
@@ -220,11 +220,11 @@ namespace Lime
 			Action<int> visit = null;
 			visit = (index) => {
 				visited[index] = true;
-				for (int i = 0; i < g[index].Count; i++) {
-					if (visited[g[index][i]]) {
+				foreach (var i in g[index]) {
+					if (visited[i]) {
 						throw new InvalidOperationException("found cycle in bones parent child relations");
 					}
-					visit(g[index][i]);
+					visit(i);
 				}
 				orderedIndices.Add(index);
 			};
