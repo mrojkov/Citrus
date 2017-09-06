@@ -106,7 +106,7 @@ namespace Lime
 					TabNormal = grayBackground.Darken(0.1f),
 					TabActive = grayBackground.Darken(0.05f),
 					SeparatorColor = grayBackground.Darken(0.3f),
-					KeyboardFocusBorder = new Color4(150, 200, 255),
+					KeyboardFocusBorder = new Color4(0, 120, 215),
 					TextSelection = new Color4(200, 230, 255),
 					CloseButtonNormal = grayBackground.Darken(0.6f),
 					CloseButtonHovered = grayBackground.Darken(0.8f),
@@ -122,14 +122,14 @@ namespace Lime
 
 		public static ColorTheme Colors = ColorTheme.CreateLightTheme();
 
-		internal class KeyboardFocusBorderPresenter : CustomPresenter
+		public class KeyboardFocusBorderPresenter : CustomPresenter
 		{
 			public override void Render(Node node)
 			{
 				if (Widget.Focused == node) {
 					var widget = node.AsWidget;
 					widget.PrepareRendererState();
-					Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Colors.KeyboardFocusBorder, 1);
+					Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Colors.KeyboardFocusBorder, 2);
 				}
 			}
 		}
