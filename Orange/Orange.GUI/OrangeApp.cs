@@ -14,7 +14,6 @@ namespace Orange
 
 		private OrangeApp()
 		{
-			WindowOptions.DefaultRefreshRate = 60;
 			WidgetInput.AcceptMouseBeyondWidgetByDefault = false;
 			Widget.DefaultWidgetSize = Vector2.Zero;
 			LoadFont();
