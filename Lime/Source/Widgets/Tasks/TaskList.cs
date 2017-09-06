@@ -116,6 +116,16 @@ namespace Lime
 			return Add(e(), tag);
 		}
 
+		public bool AnyTagged(object tag)
+		{
+			foreach (var task in this) {
+				if (task.Tag == tag) {
+					return true;
+				}
+			}
+			return false;
+		}
+
 		private bool isBeingUpdated;
 
 		/// <summary>
