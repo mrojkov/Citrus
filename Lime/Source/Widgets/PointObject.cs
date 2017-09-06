@@ -48,14 +48,5 @@ namespace Lime
 				return result;
 			}
 		}
-
-		public override Node Clone()
-		{
-			var clone = base.Clone() as PointObject;
-			if (clone.SkinningWeights.IsEmpty()) {
-				clone.SkinningWeights = null;
-			}
-			return clone;
-		}
 	}
 }
