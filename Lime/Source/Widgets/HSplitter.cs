@@ -5,11 +5,12 @@ using System.Linq;
 namespace Lime
 {
 	[AllowedChildrenTypes(typeof(Node))]
-	public class Splitter : Widget
+	public abstract class Splitter : Widget
 	{
 		public float SeparatorActiveAreaWidth;
-		public float SeparatorWidth;
 		public Color4 SeparatorColor;
+
+		public abstract float SeparatorWidth { get; set; }
 
 		public List<float> Stretches { get; set; } = new List<float>();
 
@@ -38,7 +39,23 @@ namespace Lime
 		{
 			Tasks.Add(MainTask());
 			PostPresenter = new DelegatePresenter<Widget>(RenderSeparator);
-			Layout = new HSplitterLayout { Spacing = SeparatorWidth };
+			Layout = new HSplitterLayout();
+		}
+
+		public override float SeparatorWidth
+		{
+			get
+			{
+				return (Layout as HSplitterLayout).Spacing;
+			}
+			set
+			{
+				var l = (Layout as HSplitterLayout);
+				if (l.Spacing != value) {
+					l.Spacing = value;
+					l.InvalidateArrangement(this);
+				}
+			}
 		}
 
 		void RenderSeparator(Widget widget)

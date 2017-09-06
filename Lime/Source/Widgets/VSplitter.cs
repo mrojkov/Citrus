@@ -10,7 +10,23 @@ namespace Lime
 		{
 			Tasks.Add(MainTask());
 			PostPresenter = new DelegatePresenter<Widget>(RenderSeparator);
-			Layout = new VSplitterLayout { Spacing = SeparatorWidth };
+			Layout = new VSplitterLayout();
+		}
+
+		public override float SeparatorWidth
+		{
+			get
+			{
+				return (Layout as VSplitterLayout).Spacing;
+			}
+			set
+			{
+				var l = (Layout as VSplitterLayout);
+				if (l.Spacing != value) {
+					l.Spacing = value;
+					l.InvalidateArrangement(this);
+				}
+			}
 		}
 
 		void RenderSeparator(Widget widget)
