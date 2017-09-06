@@ -104,23 +104,6 @@ namespace Lime
 
 		public void ConsumeKey(Key key)
 		{
-			if (keys[key].PreviousState == keys[key].CurrentState && keys[key].Repeated == false) {
-				return;
-			}
-			// We need to consume all shortcuts having this key as their Main key and also to consume Main key of this shortcut.
-			foreach (var sh in Key.ShortcutMap) {
-				if (sh.Key.Main == key) {
-					ConsumeKeyState(sh.Value);
-				}
-				if (sh.Value == key) {
-					ConsumeKeyState(sh.Key.Main);
-				}
-			}
-			ConsumeKeyState(key);
-		}
-
-		private void ConsumeKeyState(Key key)
-		{
 			keys[key].PreviousState = keys[key].CurrentState;
 			keys[key].Repeated = false;
 		}
@@ -208,7 +191,7 @@ namespace Lime
 
 		private string textInput;
 		public string TextInput
-		{
+		{ 
 			get { return textInput; }
 			internal set
 			{
