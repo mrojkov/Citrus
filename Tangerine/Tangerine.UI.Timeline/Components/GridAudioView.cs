@@ -30,7 +30,12 @@ namespace Tangerine.UI.Timeline.Components
 			foreach (var key in actionAnimator.ReadonlyKeys) {
 				if (key.Value == AudioAction.Play) {
 					var sample = GetSampleAtFrame(key.Frame);
-					var waveform = GetWaveform(sample.Path);
+					Waveform waveform = null;
+					try {
+						waveform = GetWaveform(sample.Path);
+					} catch (System.Exception) {
+						continue;
+					}
 					var pos = new Vector2(key.Frame * TimelineMetrics.ColWidth + 1, 0);
 					var scale = Document.Current.Format == DocumentFormat.Scene ? 0.5f : 1;
 					foreach (var p in waveform.Parts) {
