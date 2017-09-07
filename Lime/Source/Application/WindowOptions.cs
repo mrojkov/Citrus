@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿
 namespace Lime
 {
 	public enum WindowStyle
@@ -21,7 +20,8 @@ namespace Lime
 		public Vector2 MaximumDecoratedSize;
 		public string Title = "Citrus";
 		public bool Visible = true;
-		public bool VSync = false;
+		public bool VSync = true;
+
 		// System.Drawing.Icon on Windows
 		public object Icon;
 	}

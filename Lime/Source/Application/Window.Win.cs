@@ -21,12 +21,12 @@ namespace Lime
 		}
 		private OpenTK.GLControl glControl;
 		private Form form;
-		private Timer timer;
 		private Stopwatch stopwatch;
 		private bool active;
 		private RenderingState renderingState = RenderingState.Rendered;
 		private Point lastMousePosition;
 		private bool isInvalidated;
+		private bool vSync;
 
 		public Input Input { get; private set; }
 		public bool Active => active;
@@ -253,21 +253,15 @@ namespace Lime
 			form.Deactivate += OnDeactivate;
 			form.FormClosing += OnClosing;
 			form.FormClosed += OnClosed;
+
+			VSync = options.VSync;
 			glControl.MakeCurrent();
-			glControl.VSync = options.VSync;
+			glControl.VSync = VSync;
+			System.Windows.Forms.Application.Idle += OnTick;
+
 			form.Controls.Add(glControl);
 			stopwatch = new Stopwatch();
 			stopwatch.Start();
-
-			if (options.VSync) {
-				timer = new Timer();
-				// kuzymov: Without adding 5 frames to refresh rate, game have been getting FPS drops (minus ~20 FPS)
-				timer.Interval = (int)(1000 / 65.0f);
-				timer.Tick += OnTick;
-				timer.Start();
-			} else {
-				System.Windows.Forms.Application.Idle += OnTick;
-			}
 
 			if (options.Icon != null) {
 				form.Icon = (Icon)options.Icon;
@@ -293,6 +287,23 @@ namespace Lime
 				Form.StartPosition = FormStartPosition.CenterParent;
 			}
 			Application.Windows.Add(this);
+		}
+
+		public override bool VSync
+		{
+			get
+			{
+				return vSync;
+			}
+
+			set
+			{
+				if (vSync != value) {
+					vSync = value;
+					glControl.MakeCurrent();
+					glControl.VSync = value;
+				}
+			}
 		}
 
 		public void ShowModal()

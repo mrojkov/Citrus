@@ -262,5 +262,7 @@ namespace Lime
 		/// Occurs when unhandled exception on update.
 		/// </summary>
 		event Action<System.Exception> UnhandledExceptionOnUpdate;
+
+		bool VSync { get; set; }
 	}
 }

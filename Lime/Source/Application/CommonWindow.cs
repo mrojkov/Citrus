@@ -18,6 +18,11 @@ namespace Lime
 		public static IWindow Current { get; private set; }
 		public IContext Context { get; set; }
 
+		/// <summary>
+		/// Keeps refresh rate the same as monitor's refresh rate.
+		/// </summary>
+		public virtual bool VSync { get; set; }
+
 		public event Action<System.Exception> UnhandledExceptionOnUpdate;
 
 		protected CommonWindow()
