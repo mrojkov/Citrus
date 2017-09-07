@@ -30,6 +30,7 @@ namespace Tangerine.UI.FilesystemView
 		private Vector2 dragStartPosition;
 		private ThemedHSplitter cookingRulesSplitter;
 		private ThemedVSplitter selectionPreviewSplitter;
+		private Icon lastKeyboardSelectedIcon;
 
 		public void Split(SplitterType type)
 		{
@@ -100,11 +101,16 @@ namespace Tangerine.UI.FilesystemView
 		public FilesystemView()
 		{
 			RootWidget = new Widget();
-			scrollView = new ThemedScrollView();
+			RootWidget.FocusScope = new KeyboardFocusScope(RootWidget);
+			scrollView = new ThemedScrollView {
+				TabTravesable = new TabTraversable()
+			};
 			// TODO: Display path
 			RootWidget.AddChangeWatcher(() => model.CurrentPath, (path) => toolbar.Path = path.ToString());
 			crEditor = new CookingRulesEditor(NavigateAndSelect);
+			crEditor.RootWidget.TabTravesable = new TabTraversable();
 			preview = new Preview();
+			preview.RootWidget.TabTravesable = new TabTraversable();
 		}
 
 		// Component with user preferences should be added to rootWidget at this moment
@@ -112,6 +118,7 @@ namespace Tangerine.UI.FilesystemView
 		{
 			var up = RootWidget.Components.Get<ViewNodeComponent>().ViewNode as FSViewNode;
 			toolbar = new FilesystemToolbar(this);
+			toolbar.TabTravesable = new TabTraversable();
 			model = new Model(up.Path);
 			InitializeWidgets();
 			selectionPreviewSplitter.Stretches = Splitter.GetStretchesList(up.SelectionPreviewSplitterStretches, 1, 1);
@@ -124,6 +131,21 @@ namespace Tangerine.UI.FilesystemView
 			if (!up.ShowSelectionPreview) {
 				togglePreview.Toggle();
 			}
+			foreach (var n in RootWidget.Descendants) {
+				var w = n.AsWidget;
+				if (w.TabTravesable != null) {
+					w.CompoundPostPresenter.Add(new Theme.KeyboardFocusBorderPresenter());
+					w.HitTestTarget = true;
+					w.Updated += (dt) => {
+						if (w.IsMouseOver() && !w.IsFocused()) {
+							if (w.Input.WasKeyPressed(Key.Mouse0)) {
+								w.SetFocus();
+							}
+							w.Input.ConsumeKey(Key.Mouse0);
+						}
+					};
+				}
+			}
 		}
 
 		private void NavigateAndSelect(string filename)
@@ -135,7 +157,6 @@ namespace Tangerine.UI.FilesystemView
 		void InitializeWidgets()
 		{
 			selection.Changed += Selection_Changed;
-			scrollView.HitTestTarget = true;
 			scrollView.Content.Layout = new FlowLayout { Spacing = 1.0f };
 			scrollView.Padding = new Thickness(5.0f);
 			scrollView.Content.CompoundPostPresenter.Insert(0, new DelegatePresenter<Widget>(RenderFilesWidgetRectSelection));
@@ -161,6 +182,7 @@ namespace Tangerine.UI.FilesystemView
 				InvalidateView(p);
 				InvalidateFSWatcher(p);
 				preview.ClearTextureCache();
+				lastKeyboardSelectedIcon = scrollView.Content.Nodes.FirstOrNull() as Icon;
 			});
 			RootWidget.Layout = new VBoxLayout();
 			RootWidget.AddNode((cookingRulesSplitter = new ThemedHSplitter {
@@ -185,6 +207,7 @@ namespace Tangerine.UI.FilesystemView
 		{
 			crEditor.Invalidate(selection);
 			preview.Invalidate(selection);
+			Window.Current.Invalidate();
 		}
 
 		private void InvalidateView(string path)
@@ -321,12 +344,46 @@ namespace Tangerine.UI.FilesystemView
 			if (rectSelecting) {
 				if (Window.Current.Input.WasKeyReleased(Key.Mouse0)) {
 					Window.Current.Input.ConsumeKey(Key.Mouse0);
+					scrollView.SetFocus();
 					rectSelecting = false;
 				}
 				rectSelectionEndPoint = scrollView.Content.Input.LocalMousePosition;
 				Window.Current.Invalidate();
 			}
+
+			if (scrollView.IsFocused()) {
+				int indexDelta = 0;
+				if (input.WasKeyPressed(shRight) || input.WasKeyRepeated(shRight)) {
+					indexDelta = 1;
+				} else if (input.WasKeyPressed(shLeft) || input.WasKeyRepeated(shLeft)) {
+					indexDelta = -1;
+				} else if (input.WasKeyPressed(shUp) || input.WasKeyRepeated(shUp)) {
+					indexDelta = -(scrollView.Content.Layout as FlowLayout).ColumnCount(0);
+				} else if (input.WasKeyPressed(shDown) || input.WasKeyRepeated(shDown)) {
+					indexDelta = (scrollView.Content.Layout as FlowLayout).ColumnCount(0);
+				}
+				input.ConsumeKey(shRight);
+				input.ConsumeKey(shLeft);
+				input.ConsumeKey(shUp);
+				input.ConsumeKey(shDown);
+				if (indexDelta != 0) {
+					if (lastKeyboardSelectedIcon == null) {
+						return;
+					}
+					var index = scrollView.Content.Nodes.IndexOf(lastKeyboardSelectedIcon);
+					if (index + indexDelta < scrollView.Content.Nodes.Count && index + indexDelta >= 0) {
+						lastKeyboardSelectedIcon = scrollView.Content.Nodes[index + indexDelta] as Icon;
+						selection.Clear();
+						selection.Select(lastKeyboardSelectedIcon.FilesystemPath);
+					}
+				}
+			}
 		}
+
+		private Key shRight = Key.MapShortcut(Key.Right);
+		private Key shLeft = Key.MapShortcut(Key.Left);
+		private Key shUp = Key.MapShortcut(Key.Up);
+		private Key shDown = Key.MapShortcut(Key.Down);
 
 		private void RenderFilesWidgetRectSelection(Widget canvas)
 		{
