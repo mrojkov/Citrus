@@ -380,6 +380,7 @@ namespace Lime
 
 		private void OnActivated(object sender, EventArgs e)
 		{
+			glControl.MakeCurrent();
 			active = true;
 			RaiseActivated();
 		}
