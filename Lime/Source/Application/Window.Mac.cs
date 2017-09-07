@@ -17,7 +17,6 @@ namespace Lime
 		private FPSCounter fpsCounter;
 		private Stopwatch stopwatch;
 		private bool invalidated;
-		private float refreshRate;
 		private bool modal;
 		private Display display;
 		private bool closed;
@@ -40,7 +39,7 @@ namespace Lime
 				View.Hidden = !value;
 				View.Stop();
 				if (value) {
-					View.Run(refreshRate, false);
+					View.Run(60, false);
 					window.MakeKeyAndOrderFront(window);
 				}
 			}
@@ -182,7 +181,6 @@ namespace Lime
 
 		public Window(WindowOptions options)
 		{
-			this.refreshRate = options.RefreshRate;
 			Input = new Input();
 			fpsCounter = new FPSCounter();
 			CreateNativeWindow(options);
@@ -375,7 +373,7 @@ namespace Lime
 			modal = true;
 			View.Hidden = false;
 			View.Stop();
-			View.Run(refreshRate, true);
+			View.Run(60, true);
 			window.MakeKeyAndOrderFront(window);
 			NSApplication.SharedApplication.RunModalForWindow(window);
 			RaiseVisibleChanging(false, true);
