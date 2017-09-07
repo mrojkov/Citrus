@@ -13,6 +13,7 @@ namespace Tangerine.UI.Timeline
 
 		Timeline timeline => Timeline.Instance;
 		GridPane grid => Timeline.Instance.Grid;
+		IntVector2 lastSelectedCell;
 
 		public IEnumerator<object> Task()
 		{
@@ -30,17 +31,36 @@ namespace Tangerine.UI.Timeline
 							yield return null;
 							timeline.Globals.Remove<HasKeyframeRequest>();
 							var isInMultiselectMode = input.IsKeyPressed(Key.Control);
+							var isSelectRangeMode = input.IsKeyPressed(Key.Shift);
 							if (r.Result && !isInMultiselectMode) {
 								yield return DragKeyframeTask(initialCell);
+							} else if (isSelectRangeMode) {
+								yield return SelectRangeTask(lastSelectedCell, initialCell);
 							} else {
 								yield return SelectTask(initialCell);
 							}
+							lastSelectedCell = initialCell;
 						}
 						input.ReleaseMouse();
 					}
 				}
 				yield return null;
 			}
+		}
+
+		private object SelectRangeTask(IntVector2 A, IntVector2 B)
+		{
+			Operations.ClearGridSelection.Perform();
+			Core.Operations.ClearRowSelection.Perform();
+			var r = new IntRectangle();
+			r.A.X = Math.Min(A.X, B.X);
+			r.A.Y = Math.Min(A.Y, B.Y);
+			r.B.X = Math.Max(A.X, B.X);
+			r.B.Y = Math.Max(A.Y, B.Y);
+			for (int i = r.A.Y; i <= r.B.Y; i++) {
+				Operations.SelectGridSpan.Perform(i, r.A.X, r.B.X + 1);
+			}
+			return null;
 		}
 
 		bool IsCellSelected(IntVector2 cell)
@@ -92,6 +112,7 @@ namespace Tangerine.UI.Timeline
 			if (!input.IsKeyPressed(Key.Control)) {
 				Operations.ClearGridSelection.Perform();
 				Core.Operations.ClearRowSelection.Perform();
+				rect = new IntRectangle();
 			}
 			grid.OnPostRender += RenderSelectionRect;
 			var showMeasuredFrameDistance = false;

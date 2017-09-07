@@ -11,20 +11,35 @@ namespace Tangerine.UI.Timeline
 
 		public IEnumerator<object> Task()
 		{
+			var rollHandler = HandleScroll(timeline.Roll.RootWidget.Input);
+			var gridHandler = HandleScroll(timeline.Grid.RootWidget.Input);
+			var overviewHandler = HandleScroll(timeline.Overview.RootWidget.Input);
 			while (true) {
-				HandleScroll(timeline.Roll.RootWidget.Input);
-				HandleScroll(timeline.Grid.RootWidget.Input);
-				HandleScroll(timeline.Overview.RootWidget.Input);
+				rollHandler.MoveNext();
+				gridHandler.MoveNext();
+				overviewHandler.MoveNext();
 				HandleCellsMagnification(timeline.Grid.RootWidget.Input);
 				yield return null;
 			}
 		}
 
-		void HandleScroll(WidgetInput input)
+		private IEnumerator<object> HandleScroll(WidgetInput input)
 		{
-			var delta = GetWheelDelta(input);
-			if (delta != 0 && !input.IsKeyPressed(Key.Alt)) {
-				timeline.OffsetY += delta * TimelineMetrics.DefaultRowHeight;
+			var prevPosition = Vector2.Zero;
+			while (true) {
+				var scrollDelta = GetWheelDelta(input);
+				if (scrollDelta != 0 && !input.IsKeyPressed(Key.Alt)) {
+					timeline.OffsetY += scrollDelta * TimelineMetrics.DefaultRowHeight;
+				}
+				if (input.IsKeyPressed(Key.Mouse2)) {
+					var delta = input.MousePosition - prevPosition;
+					if (delta != Vector2.Zero && timeline.Offset.X - delta.X > 0 && timeline.Offset.Y - delta.Y > 0) {
+						timeline.Offset -= delta;
+						Core.Operations.Dummy.Perform();
+					}
+				}
+				prevPosition = input.MousePosition;
+				yield return null;
 			}
 		}
 
