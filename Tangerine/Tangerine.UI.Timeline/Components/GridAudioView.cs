@@ -35,7 +35,8 @@ namespace Tangerine.UI.Timeline.Components
 					var scale = Document.Current.Format == DocumentFormat.Scene ? 0.5f : 1;
 					foreach (var p in waveform.Parts) {
 						var size = new Vector2(p.Width * scale * TimelineMetrics.ColWidth / pixelsPerFrame, widget.Height);
-						Renderer.DrawSprite(p.Texture, Color4.White, pos, size, Vector2.Zero, Vector2.One);
+						Renderer.DrawRect(pos, pos + size, ColorTheme.Current.TimelineGrid.WaveformBackground);
+						Renderer.DrawSprite(p.Texture, ColorTheme.Current.TimelineGrid.WaveformColor, pos, size, Vector2.Zero, Vector2.One);
 						pos.X += size.X;
 					}
 				}
@@ -108,9 +109,8 @@ namespace Tangerine.UI.Timeline.Components
 				}
 				int a = (top + bottom) / 2 + (bottom - top) * Math.Max(rangeMin, -32767) / 65536;
 				int b = (top + bottom) / 2 + (bottom - top) * Math.Min(rangeMax, 32767) / 65536;
-				var color = ColorTheme.Current.TimelineGrid.WaveformColor;
 				for (int j = a; j <= b; j++) {
-					pixels[i + j * textureWidth] = color;
+					pixels[i + j * textureWidth] = Color4.White;
 				}
 			}
 		}
