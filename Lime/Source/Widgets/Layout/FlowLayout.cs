@@ -14,6 +14,12 @@ namespace Lime
 			DebugRectangles = new List<Rectangle>();
 		}
 
+		public int RowCount => splitIndices.Count - 1;
+		public int ColumnCount(int row)
+		{
+			return splitIndices[row + 1] - splitIndices[row];
+		}
+
 		public override void OnSizeChanged(Widget widget, Vector2 sizeDelta)
 		{
 			InvalidateConstraintsAndArrangement(widget);
