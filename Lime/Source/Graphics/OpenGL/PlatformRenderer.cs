@@ -45,8 +45,7 @@ namespace Lime
 			if (errCode == ErrorCode.NoError)
 				return;
 			string errors = "";
-			int maxErrorCount = 256;
-			while (errCode != ErrorCode.NoError && maxErrorCount > 0) {
+			while (errCode != ErrorCode.NoError) {
 				if (errors != "")
 					errors += ", ";
 				errors += errCode.ToString();
@@ -55,7 +54,6 @@ namespace Lime
 #else
 				errCode = GL.GetError();
 #endif
-				maxErrorCount--;
 			}
 			throw new Exception("OpenGL error(s): " + errors);
 		}
