@@ -81,6 +81,8 @@
     <Compile Include="DocumentCommandHandler.cs" />
     <Compile Include="Cursors.cs" />
     <Compile Include="TabbedWidget.cs" />
+    <Compile Include="UIProcessors.cs" />
+    <Compile Include="ColorPicker.Mac.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

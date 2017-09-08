@@ -12,7 +12,7 @@ namespace Tangerine.UI
 
 		private static Bitmap GetBitmapFromEmbededResource(string id)
 		{
-			var path = $"Tangerine.Resources.Cursors.{id}.png";
+			var path = $"Tangerine.Resources.{id}.png";
 			var png = new EmbeddedResource(path, "Tangerine").GetResourceStream();
 			if (png == null) {
 				throw new ArgumentException($"Icon '{path}' doesn't exist");
@@ -26,6 +26,7 @@ namespace Tangerine.UI
 			return new MouseCursor(icon, hotSpot);
 		}
 
-		public static MouseCursor Rotate { get; } = CreateCursorFromEmbededResource("rotate", new IntVector2(8, 8));
+		public static MouseCursor Rotate { get; } = CreateCursorFromEmbededResource("Cursors.Rotate", new IntVector2(8, 8));
+		public static MouseCursor Pipette { get; } = CreateCursorFromEmbededResource("Icons.Tools.Pipette", new IntVector2(0, 23));
 	}
 }

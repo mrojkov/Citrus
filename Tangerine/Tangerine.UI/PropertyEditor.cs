@@ -581,6 +581,8 @@ namespace Tangerine.UI
 		public Color4PropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
 			ColorBoxButton colorBox;
+			ToolbarButton pipette;
+			var panel = new ColorPickerPanel();
 			var currentColor = CoalescedPropertyValue(Color4.White).DistinctUntilChanged();
 			ContainerWidget.AddNode(new Widget {
 				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center) },
@@ -588,9 +590,14 @@ namespace Tangerine.UI
 					(editor = editorParams.EditBoxFactory()),
 					new HSpacer(4),
 					(colorBox = new ColorBoxButton(currentColor)),
+					(pipette = new ToolbarButton {
+						Highlightable = true,
+						Texture = IconPool.GetTexture("Tools.Pipette"),
+						Clicked = () => WidgetContext.Current.Root.Tasks.Add(
+							UIProcessors.PickColorProcessor(new Property<Color4>(panel, nameof(ColorPickerPanel.Color))))
+					}),
 				}
 			});
-			var panel = new ColorPickerPanel();
 			ExpandableContent.AddNode(panel.Widget);
 			panel.Widget.Padding.Right = 12;
 			panel.Widget.Tasks.Add(currentColor.Consume(v => panel.Color = v));

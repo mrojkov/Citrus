@@ -252,11 +252,14 @@
     <EmbeddedResource Include="Resources\Icons\Filesystem\Close.png" />
     <EmbeddedResource Include="Resources\Icons\Filesystem\SplitH.png" />
     <EmbeddedResource Include="Resources\Icons\Filesystem\SplitV.png" />
-    <EmbeddedResource Include="Resources\Cursors\rotate.png" />
+    <EmbeddedResource Include="Resources\Cursors\Rotate.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Icons\SceneView\Round.png" />
     <EmbeddedResource Include="Resources\Icons\Timeline\minus.png" />
     <EmbeddedResource Include="Resources\Icons\Timeline\plus.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Icons\Tools\Pipette.png" />
   </ItemGroup>
 </Project>

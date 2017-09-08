@@ -42,6 +42,7 @@
     <Folder Include="Resources\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ColorPicker.Win.cs" />
     <Compile Include="ColorPickerPanel.cs" />
     <Compile Include="Commands.cs" />
     <Compile Include="Console.cs" />
@@ -49,6 +50,7 @@
     <Compile Include="Dialogs\AlertDialog.cs" />
     <Compile Include="IconPool.cs" />
     <Compile Include="NodeIconPool.cs" />
+    <Compile Include="UIProcessors.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EmbeddedResource.cs" />
     <Compile Include="SearchPanel\SearchPanel.cs" />
