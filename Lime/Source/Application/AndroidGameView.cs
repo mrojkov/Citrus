@@ -1,5 +1,6 @@
 #if ANDROID
 using System;
+using System.Diagnostics;
 
 using Android.Content.PM;
 using Android.OS;
@@ -81,6 +82,7 @@ namespace Lime
 			}
 		}
 
+		private readonly Stopwatch stopwatch = new Stopwatch();
 		private KeyboardHandler keyboardHandler;
 		private Input input;
 		private AndroidSoftKeyboard androidSoftKeyboard;
@@ -95,6 +97,7 @@ namespace Lime
 			}
 			keyboardHandler = new KeyboardHandler(input);
 			SetOnKeyListener(keyboardHandler);
+			stopwatch.Start();
 		}
 
 		public override IInputConnection OnCreateInputConnection(EditorInfo outAttrs)
@@ -332,23 +335,13 @@ namespace Lime
 
 		protected override void OnUpdateFrame(FrameEventArgs e)
 		{
-			float delta;
-			RefreshFrameTimeStamp(out delta);
+			var delta = Mathf.Clamp((float)stopwatch.Elapsed.TotalSeconds, 0, 1 / Application.LowFPSLimit);
+			stopwatch.Restart();
 			base.OnUpdateFrame(new FrameEventArgs(delta));
 			AudioSystem.Update();
 			input.CopyKeysState();
 			input.ProcessPendingKeyEvents(delta);
 			keyboardHandler.ProcessTextInput();
-		}
-
-		private DateTime lastFrameTimeStamp = DateTime.UtcNow;
-
-		private void RefreshFrameTimeStamp(out float delta)
-		{
-			var now = DateTime.UtcNow;
-			delta = (float)(now - lastFrameTimeStamp).TotalSeconds;
-			delta = delta.Clamp(0, 1 / Application.LowFPSLimit);
-			lastFrameTimeStamp = now;
 		}
 
 		/// <summary>
