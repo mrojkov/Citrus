@@ -7,7 +7,7 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.FilesystemView
 {
-	public class Selection : IEnumerable<string>
+	public class Selection : IEnumerable<string>, IReadOnlyVersionedCollection<string>
 	{
 		public Selection Clone()
 		{
@@ -15,28 +15,40 @@ namespace Tangerine.UI.FilesystemView
 			r.selection = new HashSet<string>(this);
 			return r;
 		}
-		public event Action Changed;
 		private HashSet<string> selection = new HashSet<string>();
 		public bool Empty => selection.Count == 0;
 		public void Select(string path)
 		{
 			if (!selection.Contains(path)) {
 				selection.Add(path);
-				Changed?.Invoke();
+				Version++;
+			}
+		}
+		public void SelectRange(IEnumerable<string> source)
+		{
+			bool changed = false;
+			foreach (var path in source) {
+				if (!selection.Contains(path)) {
+					changed = true;
+					selection.Add(path);
+				}
+			}
+			if (changed) {
+				Version++;
 			}
 		}
 		public void Deselect(string path)
 		{
 			if (selection.Contains(path)) {
 				selection.Remove(path);
-				Changed?.Invoke();
+				Version++;
 			}
 		}
 		public void Clear()
 		{
 			if (selection.Count != 0) {
 				selection.Clear();
-				Changed?.Invoke();
+				Version++;
 			}
 		}
 		public bool Contains(string path)
@@ -69,6 +81,10 @@ namespace Tangerine.UI.FilesystemView
 			}
 			return lhs.SequenceEqual(rhs);
 		}
+
+		public int Count => selection.Count;
+
+		public int Version { get; private set; }
 	}
 
 	public class Model

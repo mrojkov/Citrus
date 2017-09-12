@@ -156,7 +156,7 @@ namespace Tangerine.UI.FilesystemView
 
 		void InitializeWidgets()
 		{
-			selection.Changed += Selection_Changed;
+			RootWidget.AddChangeWatcher(() => selection.Version, Selection_Changed);
 			scrollView.Content.Layout = new FlowLayout { Spacing = 1.0f };
 			scrollView.Padding = new Thickness(5.0f);
 			scrollView.Content.CompoundPostPresenter.Insert(0, new DelegatePresenter<Widget>(RenderFilesWidgetRectSelection));
@@ -203,7 +203,7 @@ namespace Tangerine.UI.FilesystemView
 			}));
 		}
 
-		private void Selection_Changed()
+		private void Selection_Changed(int version)
 		{
 			crEditor.Invalidate(selection);
 			preview.Invalidate(selection);
