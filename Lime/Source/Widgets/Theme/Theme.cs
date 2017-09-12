@@ -124,12 +124,17 @@ namespace Lime
 
 		public class KeyboardFocusBorderPresenter : CustomPresenter
 		{
+			private float thikness = 1.0f;
+			public KeyboardFocusBorderPresenter(float thikness = 1.0f)
+			{
+				this.thikness = thikness;
+			}
 			public override void Render(Node node)
 			{
-				if (Widget.Focused == node) {
+				if (Widget.Focused == node && !node.AsWidget.IsMouseOverThisOrDescendant()) {
 					var widget = node.AsWidget;
 					widget.PrepareRendererState();
-					Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Colors.KeyboardFocusBorder, 2);
+					Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Colors.KeyboardFocusBorder, thikness);
 				}
 			}
 		}

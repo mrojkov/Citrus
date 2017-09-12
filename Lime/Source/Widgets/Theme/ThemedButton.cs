@@ -20,7 +20,7 @@ namespace Lime
 			Size = MinSize;
 			Padding = Theme.Metrics.ControlsPadding;
 			Presenter = presenter;
-			PostPresenter = new Theme.KeyboardFocusBorderPresenter();
+			PostPresenter = new Theme.KeyboardFocusBorderPresenter(2.0f);
 			DefaultAnimation.AnimationEngine = new AnimationEngineDelegate {
 				OnRunAnimation = (animation, markerId) => {
 					presenter.SetState(markerId);
