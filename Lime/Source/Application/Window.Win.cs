@@ -19,6 +19,7 @@ namespace Lime
 			RenderDeferred,
 			Rendered,
 		}
+		private readonly Timer timer;
 		private OpenTK.GLControl glControl;
 		private Form form;
 		private Stopwatch stopwatch;
@@ -287,6 +288,12 @@ namespace Lime
 				Form.StartPosition = FormStartPosition.CenterParent;
 			}
 			Application.Windows.Add(this);
+
+			// Ensure Application.Idle for InvalidableWindowWidget
+			timer = new Timer {
+				Interval = (int)(1000.0 / 65),
+				Enabled = true,
+			};
 		}
 
 		public override bool VSync
@@ -348,6 +355,7 @@ namespace Lime
 				System.Windows.Forms.Application.Exit();
 			}
 			System.Windows.Forms.Application.Idle -= OnTick;
+			timer.Dispose();
 		}
 
 		private void OnClosing(object sender, FormClosingEventArgs e)
@@ -720,6 +728,7 @@ namespace Lime
 
 		private void Form_QueryContinueDrag(object sender, QueryContinueDragEventArgs e)
 		{
+			Update();
 			if (e.Action == DragAction.Drop) {
 				Input.SetKeyState(Key.Mouse0, false);
 				Input.SetKeyState(Key.Mouse1, false);
