@@ -205,26 +205,25 @@ namespace Tangerine.UI.FilesystemView
 			var parent = crc[key];
 			Widget headerWidget;
 			Widget overridesWidget;
-			var fieldRootWidget = new Widget {
-				Layout = new VBoxLayout(),
-				Nodes = {
-					(headerWidget = new Widget {
-						Layout = new HBoxLayout {
-							IgnoreHidden = false,
-						},
-						// TODO: maybe some Metrics.ScrollView.SliderWidth ? (though ScrollView is decorated in DesktopTheme which is inside Lime)
-						Padding = new Thickness { Right = 10.0f },
-					}),
-					(overridesWidget = new Widget {
-						Visible = false,
-						Layout = new VBoxLayout(),
-						Padding = new Thickness {
-							Left = 30.0f
-						},
-					})
-				},
-			};
+			var fieldRootWidget = new Widget();
 			scrollView.Content.AddNode(fieldRootWidget);
+			// making sure to insert root into parent before adding nodes to root
+			// to avoid O(N^2) relayout lag once
+			fieldRootWidget.Layout = new VBoxLayout();
+			fieldRootWidget.Nodes.Add(
+				(headerWidget = new Widget {
+					Layout = new HBoxLayout {
+						IgnoreHidden = false,
+					},
+					// TODO: maybe some Metrics.ScrollView.SliderWidth ? (though ScrollView is decorated in DesktopTheme which is inside Lime)
+					Padding = new Thickness { Right = 10.0f },
+				}));
+			fieldRootWidget.Nodes.Add(overridesWidget = new Widget {
+				Visible = false,
+				Layout = new VBoxLayout(),
+				Padding = new Thickness {
+					Left = 30.0f
+				}});
 			fieldRootWidget.AddChangeWatcher(() => WidgetContext.Current.NodeUnderMouse, (value) => {
 				if (value != null && value.Parent == fieldRootWidget) {
 					Window.Current?.Invalidate();
