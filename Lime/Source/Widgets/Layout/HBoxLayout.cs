@@ -35,7 +35,7 @@ namespace Lime
 			var sizes = LinearAllocator.Allocate(availableWidth, constraints, roundSizes: true);
 			i = 0;
 			DebugRectangles.Clear();
-			var position = new Vector2(widget.Padding.Left, widget.Padding.Top);
+			var position = widget.Padding.LeftTop;
 			foreach (var child in widgets) {
 				var size = new Vector2(sizes[i], widget.ContentHeight);
 				var align = (child.LayoutCell ?? CellDefaults).Alignment;

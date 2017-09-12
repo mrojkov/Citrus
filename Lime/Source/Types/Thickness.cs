@@ -2,36 +2,35 @@ namespace Lime
 {
 	public struct Thickness
 	{
-		public float Left;
-		public float Top;
-		public float Right;
-		public float Bottom;
+		public float Left { get { return LeftTop.X; } set { LeftTop.X = value; } }
+		public float Top { get { return LeftTop.Y; } set { LeftTop.Y = value; } }
+		public float Right { get { return RightBottom.X; } set { RightBottom.X = value; } }
+		public float Bottom { get { return RightBottom.Y; } set { RightBottom.Y = value; } }
+
+		public Vector2 LeftTop;
+		public Vector2 RightBottom;
 
 		public static Thickness Zero = new Thickness(0);
 
 		public Thickness(float overall)
 		{
-			Left = Top = Right = Bottom = overall;
+			LeftTop.X = RightBottom.X = LeftTop.Y = RightBottom.Y = overall;
 		}
 
 		public Thickness(float horizontal, float vertical)
 		{
-			Left = Right = horizontal;
-			Top = Bottom = vertical;
+			LeftTop.X = RightBottom.X = horizontal;
+			LeftTop.Y = RightBottom.Y = vertical;
 		}
 
 		public static Vector2 operator + (Vector2 size, Thickness padding)
 		{
-			return new Vector2(
-				size.X + padding.Left + padding.Right,
-				size.Y + padding.Top + padding.Bottom);
+			return size + padding.LeftTop + padding.RightBottom;
 		}
 
 		public static Vector2 operator - (Vector2 size, Thickness padding)
 		{
-			return new Vector2(
-				size.X - padding.Left - padding.Right,
-				size.Y - padding.Top - padding.Bottom);
+			return size - padding.LeftTop - padding.RightBottom;
 		}
 
 		public override string ToString()
