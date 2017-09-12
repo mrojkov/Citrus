@@ -362,10 +362,15 @@ namespace Tangerine.UI.FilesystemView
 				} else if (input.WasKeyPressed(shDown) || input.WasKeyRepeated(shDown)) {
 					indexDelta = (scrollView.Content.Layout as FlowLayout).ColumnCount(0);
 				}
+				if (Command.SelectAll.WasIssued()) {
+					selection.Clear();
+					selection.SelectRange(scrollView.Content.Nodes.Select(n => (n as Icon).FilesystemPath));
+				}
 				input.ConsumeKey(shRight);
 				input.ConsumeKey(shLeft);
 				input.ConsumeKey(shUp);
 				input.ConsumeKey(shDown);
+				Command.SelectAll.Consume();
 				if (indexDelta != 0) {
 					if (lastKeyboardSelectedIcon == null) {
 						return;
