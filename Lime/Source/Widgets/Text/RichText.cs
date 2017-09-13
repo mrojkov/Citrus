@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Lime.Text;
 using Yuzu;
 
@@ -18,6 +18,7 @@ namespace Lime
 		public Action<RichText, Sprite> SpriteListElementHandler = null;
 		private string displayText;
 		private TextProcessorDelegate textProcessor;
+		private int maxDisplayCharacters = -1;
 
 		[YuzuMember]
 		public override string Text
@@ -180,7 +181,7 @@ namespace Lime
 		{
 			if (spriteList == null) {
 				spriteList = new SpriteList();
-				PrepareRenderer().Render(spriteList, Size, HAlignment, VAlignment);
+				PrepareRenderer().Render(spriteList, Size, HAlignment, VAlignment, maxDisplayCharacters);
 			}
 		}
 
@@ -306,6 +307,25 @@ namespace Lime
 		{
 			var style = new TextStyle { Id = "TextStyle1" };
 			Nodes.Add(style);
+		}
+
+		public int CalcNumCharacters()
+		{
+			return PrepareRenderer().CalcNumCharacters(Size);
+		}
+
+		public int MaxDisplayCharacters {
+			get {
+				return maxDisplayCharacters;
+			}
+			set {
+				// buz: предполагается, что это свойство выставляется много раз подряд, чтобы создать
+				// эффект "пропечатывания" символов, поэтому не делаем каждый раз полный Invalidate.
+				if (maxDisplayCharacters != value) {
+					maxDisplayCharacters = value;
+					spriteList = null;
+				}
+			}
 		}
 	}
 }

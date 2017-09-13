@@ -119,7 +119,7 @@ namespace Lime.Text
 			return (size * scaleFactor).Floor();
 		}
 
-		public void Render(SpriteList spriteList, Vector2 area, HAlignment hAlign, VAlignment vAlign)
+		public void Render(SpriteList spriteList, Vector2 area, HAlignment hAlign, VAlignment vAlign, int maxCharacters = -1)
 		{
 			if (overflowMode == TextOverflowMode.Minify) {
 				FitTextInsideArea(area);
@@ -131,6 +131,7 @@ namespace Lime.Text
 			// Draw all lines.
 			int b = 0;
 			float y = 0;
+			int c = 0;
 			foreach (int count in lines) {
 				// Calculate height and width of line in pixels.
 				float maxHeight = 0;
@@ -162,11 +163,15 @@ namespace Lime.Text
 					TextStyle style = Styles[word.Style];
 					Vector2 position = new Vector2(word.X, y) + offset;
 					if (IsBullet(word) && style.ImageTexture != null) {
+						if (maxCharacters >= 0 && c >= maxCharacters) {
+							break;
+						}
 						var sz = style.ImageSize * scaleFactor;
 						spriteList.Add(
 							style.ImageTexture, Color4.White, position + new Vector2(0, (maxHeight - sz.Y) * 0.5f),
 							sz, Vector2.Zero, Vector2.One, tag: word.Style);
 						position.X += sz.X;
+						c++;
 					}
 					var yOffset = new Vector2(0, (maxHeight - ScaleSize(style.Size)) * 0.5f);
 					var font = style.Font;
@@ -177,11 +182,19 @@ namespace Lime.Text
 								word.Start, word.Length, style.LetterSpacing, spriteList, tag: word.Style);
 						}
 					}
+					int wordLength = word.Length;
+					if (maxCharacters >= 0) {
+						if (c >= maxCharacters) {
+							break;
+						}
+						wordLength = wordLength.Min(maxCharacters - c);
+					}
 					for (int k = 0; k < (style.Bold ? 2 : 1); k++) {
 						Renderer.DrawTextLine(
 							font, position + yOffset, t, style.TextColor, ScaleSize(style.Size),
-							word.Start, word.Length, style.LetterSpacing, spriteList, tag: word.Style);
+							word.Start, wordLength, style.LetterSpacing, spriteList, tag: word.Style);
 					}
+					c += wordLength;
 				}
 				// Draw overlays
 				for (int j = 0; j < count; j++) {
@@ -236,6 +249,30 @@ namespace Lime.Text
 			PrepareWordsAndLines(maxWidth, maxHeight, out lines, out totalHeight, out longestLineWidth);
 			var extent = new Vector2(longestLineWidth, totalHeight);
 			return extent;
+		}
+
+		public int CalcNumCharacters(Vector2 area)
+		{
+			List<int> lines;
+			float totalHeight;
+			float longestLineWidth;
+			PrepareWordsAndLines(area.X, area.Y, out lines, out totalHeight, out longestLineWidth);
+
+			int result = 0;
+			int b = 0;
+			foreach (int count in lines) {
+				for (int j = 0; j < count; j++) {
+					var word = fittedWords[b + j];
+					TextStyle style = Styles[word.Style];
+					if (IsBullet(word) && style.ImageTexture != null) {
+						result++;
+					}
+					result += word.Length;
+				}
+				// buz: с оверлеями пока лень разбираться
+				b += count;
+			}
+			return result;
 		}
 
 		private void PrepareWordsAndLines(
