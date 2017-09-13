@@ -37,10 +37,11 @@ namespace Tangerine.UI.FilesystemView
 					LayoutCell = new LayoutCell
 					{
 						StretchX = float.MaxValue
-					}
+					},
+					MinWidth = 0
 				}
 			);
-			text.Width = text.MinMaxWidth = Mathf.Min(200 - 16, text.MeasureUncutText().X);
+			text.Width = text.MinMaxWidth = Mathf.Min(200 - 20, text.MeasureUncutText().X);
 		}
 	}
 }

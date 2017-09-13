@@ -1,8 +1,8 @@
 ﻿#if MAC
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using Lime;
 
 namespace Tangerine.UI.FilesystemView
@@ -16,7 +16,15 @@ namespace Tangerine.UI.FilesystemView
 			Show(new[] { path });
 		}
 
-		public void Show(string[] multiplePaths)
+		public void Show(IEnumerable<string> paths)
+		{
+		}
+
+		public void Show(string path, Vector2 position)
+		{
+		}
+
+		public void Show(IEnumerable<string> paths, Vector2 position)
 		{
 		}
 	}

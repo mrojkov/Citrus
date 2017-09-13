@@ -1,5 +1,6 @@
 ﻿#if WIN
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -17,10 +18,20 @@ namespace Tangerine.UI.FilesystemView
 			Show(new[] { path });
 		}
 
-		public void Show(string[] multiplePaths)
+		public void Show(IEnumerable<string> paths)
 		{
 			// TODO: multiple paths support
-			ShowShellContextMenu(multiplePaths.First(), CommonWindow.Current.Form.Handle, (IntVector2)Application.DesktopMousePosition);
+			ShowShellContextMenu(paths.First(), CommonWindow.Current.Form.Handle, (IntVector2)Application.DesktopMousePosition);
+		}
+
+		public void Show(string path, Vector2 position)
+		{
+			ShowShellContextMenu(path, CommonWindow.Current.Form.Handle, (IntVector2)position);
+		}
+
+		public void Show(IEnumerable<string> paths, Vector2 position)
+		{
+			ShowShellContextMenu(paths.First(), CommonWindow.Current.Form.Handle, (IntVector2)position);
 		}
 
 		private static unsafe IntPtr MenuCallback(IntPtr wnd, WinAPI.WM msg, IntPtr wparam, IntPtr lparam)
