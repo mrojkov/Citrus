@@ -118,7 +118,8 @@ namespace Lime
 		private void KeyboardShowCallback(object sender, UIKeyboardEventArgs args)
 		{
 			softKeyboard.Visible = true;
-			softKeyboard.Height = (float)(args.FrameBegin.Y - args.FrameEnd.Y);
+			var screen = UIScreen.MainScreen.Bounds;
+			softKeyboard.Height = (float)(screen.Bottom - args.FrameEnd.Top);
 		}
 
 		private void KeyboardHideCallback(object sender, UIKeyboardEventArgs args)
