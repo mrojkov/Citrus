@@ -217,6 +217,8 @@ namespace Tangerine.UI.FilesystemView
 			scrollView.Content.Nodes.Clear();
 			foreach (var item in model.EnumerateItems()) {
 				var fsItem = new FilesystemItem(item);
+				scrollView.Content.AddNode(fsItem);
+				fsItem.Initialize();
 				fsItem.CompoundPresenter.Insert(0, new DelegatePresenter<FilesystemItem>(RenderFSItemSelection));
 				fsItem.Updated += (dt) => {
 					if (!fsItem.IsMouseOver()) return;
@@ -259,7 +261,6 @@ namespace Tangerine.UI.FilesystemView
 						Window.Current?.Invalidate();
 					}
 				};
-				scrollView.Content.AddNode(fsItem);
 			}
 		}
 

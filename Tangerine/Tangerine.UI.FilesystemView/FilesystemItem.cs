@@ -10,8 +10,14 @@ namespace Tangerine.UI.FilesystemView
 		public const float ItemPadding = 2.0f;
 		public FilesystemItem(string path)
 		{
-			SimpleText text = null;
 			FilesystemPath = path;
+		}
+
+		// Initializing in separate function, so we can add this widget to parent BEFORE
+		// adding any children to this widget, so it will not trigger O(N^2) relayout bug(http://gitlab.game-forest.com:2000/browse/CIT-157)
+		public void Initialize()
+		{
+			SimpleText text = null;
 			MinMaxSize = new Vector2(200, 16);
 			Layout = new HBoxLayout();
 			//PostPresenter = new LayoutDebugPresenter(Color4.Red.Transparentify(0.5f));
@@ -19,25 +25,23 @@ namespace Tangerine.UI.FilesystemView
 			HitTestTarget = true;
 			Nodes.AddRange(
 				new Image {
-					LayoutCell = new LayoutCell
-					{
+					LayoutCell = new LayoutCell {
 						Stretch = Vector2.Zero,
 						Alignment = new Alignment { X = HAlignment.Right, Y = VAlignment.Center }
 					},
 					MinMaxSize = new Vector2(16, 16),
-					Texture = SystemIconTextureProvider.Instance.GetTexture(path),
+					Texture = SystemIconTextureProvider.Instance.GetTexture(FilesystemPath),
 				},
 				(text = new ThemedSimpleText {
 					ForceUncutText = false,
 					OverflowMode = TextOverflowMode.Ellipsis,
-					Text = Path.GetFileName(path),
+					Text = Path.GetFileName(FilesystemPath),
 					LayoutCell = new LayoutCell {
 						Alignment = new Alignment { X = HAlignment.Right, Y = VAlignment.Bottom }
 					}
 				}),
 				new Widget {
-					LayoutCell = new LayoutCell
-					{
+					LayoutCell = new LayoutCell {
 						StretchX = float.MaxValue
 					},
 					MinWidth = 0
