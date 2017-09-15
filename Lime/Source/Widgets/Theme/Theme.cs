@@ -26,6 +26,7 @@ namespace Lime
 			public Color4 WhiteBackground;
 			public Color4 GrayBackground;
 			public Color4 SelectedBackground;
+			public Color4 HoveredBackground;
 			public Color4 ControlBorder;
 			public ColorGradient ButtonDefault;
 			public ColorGradient ButtonHover;
@@ -48,6 +49,7 @@ namespace Lime
 			public Color4 TextCaret;
 			public Color4 ZebraColor1;
 			public Color4 ZebraColor2;
+			public Color4 SelectedBorder;
 
 			public static ColorTheme CreateDarkTheme()
 			{
@@ -59,6 +61,8 @@ namespace Lime
 					WhiteBackground = Color4.Black.Lighten(0.25f),
 					GrayBackground = new Color4(45, 45, 48),
 					SelectedBackground = new Color4(86, 86, 86),
+					SelectedBorder = new Color4(153, 209, 255),
+					HoveredBackground = new Color4(86, 86, 86).Lighten(0.25f),
 					ControlBorder = new Color4(39, 39, 39),
 					ButtonDefault = new ColorGradient(new Color4(107, 107, 107), new Color4(107, 107, 107)),
 					ButtonHover = new ColorGradient(new Color4(133, 133, 133), new Color4(133, 133, 133)),
@@ -93,7 +97,9 @@ namespace Lime
 					GrayText = Color4.Black.Lighten(0.35f),
 					WhiteBackground = Color4.White,
 					GrayBackground = grayBackground,
-					SelectedBackground = new Color4(140, 170, 255),
+					SelectedBackground = new Color4(205, 232, 255),
+					SelectedBorder = new Color4(153, 209, 255),
+					HoveredBackground = new Color4(229, 243, 255),
 					ControlBorder = new Color4(172, 172, 172).Lighten(0.3f),
 					ButtonDefault = new ColorGradient(new Color4(239, 239, 239), new Color4(229, 229, 229)),
 					ButtonHover = new ColorGradient(new Color4(235, 244, 252), new Color4(222, 238, 252)),
