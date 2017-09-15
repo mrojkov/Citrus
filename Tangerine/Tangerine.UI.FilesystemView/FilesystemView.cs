@@ -217,7 +217,7 @@ namespace Tangerine.UI.FilesystemView
 			scrollView.Content.Nodes.Clear();
 			foreach (var item in model.EnumerateItems()) {
 				var fsItem = new FilesystemItem(item);
-				fsItem.CompoundPostPresenter.Insert(0, new DelegatePresenter<FilesystemItem>(RenderFSItemSelection));
+				fsItem.CompoundPresenter.Insert(0, new DelegatePresenter<FilesystemItem>(RenderFSItemSelection));
 				fsItem.Updated += (dt) => {
 					if (!fsItem.IsMouseOver()) return;
 					var input = fsItem.Input;
@@ -289,14 +289,17 @@ namespace Tangerine.UI.FilesystemView
 		{
 			if (selection.Contains(filesystemItem.FilesystemPath)) {
 				filesystemItem.PrepareRendererState();
-				Renderer.DrawRect(Vector2.Zero, filesystemItem.Size, Theme.Colors.SelectedBackground.Transparentify(0.5f));
-				Renderer.DrawRectOutline(Vector2.Zero, filesystemItem.Size, Theme.Colors.SelectedBackground);
+				Renderer.DrawRect(Vector2.Zero, filesystemItem.Size, Theme.Colors.SelectedBackground);
 			} else if (filesystemItem.IsMouseOver()) {
 				filesystemItem.PrepareRendererState();
 				Renderer.DrawRect(
 					Vector2.Zero,
 					filesystemItem.Size,
-					Theme.Colors.SelectedBackground.Transparentify(0.8f));
+					Theme.Colors.HoveredBackground);
+			}
+			if (filesystemItem == lastKeyboardRangeSelectionEndFilesystemItem) {
+				filesystemItem.PrepareRendererState();
+				Renderer.DrawRectOutline(Vector2.Zero, filesystemItem.Size, Theme.Colors.SelectedBorder);
 			}
 		}
 
@@ -401,6 +404,15 @@ namespace Tangerine.UI.FilesystemView
 					} else if (Command.SelectAll.WasIssued()) {
 						selection.Clear();
 						selection.SelectRange(scrollView.Content.Nodes.Select(n => (n as FilesystemItem).FilesystemPath));
+					} else if (Cmds.ToggleSelection.WasIssued()) {
+						if (lastKeyboardRangeSelectionEndFilesystemItem != null) {
+							var path = lastKeyboardRangeSelectionEndFilesystemItem.FilesystemPath;
+							if (selection.Contains(path)) {
+								selection.Deselect(path);
+							} else {
+								selection.Select(path);
+							}
+						}
 					}
 				}
 
@@ -461,6 +473,10 @@ namespace Tangerine.UI.FilesystemView
 			if (lastKeyboardSelectedFilesystemItem != null) {
 				index = scrollView.Content.Nodes.IndexOf(lastKeyboardSelectedFilesystemItem);
 			}
+			int rangeSelectionIndex = index;
+			if (lastKeyboardRangeSelectionEndFilesystemItem != null) {
+				rangeSelectionIndex = scrollView.Content.Nodes.IndexOf(lastKeyboardRangeSelectionEndFilesystemItem);
+			}
 			var flowLayout = (scrollView.Content.Layout as FlowLayout);
 			int columnCount = flowLayout.ColumnCount(0);
 			float rowHeight = FilesystemItem.ItemPadding * 2 + FilesystemItem.IconSize;
@@ -470,31 +486,18 @@ namespace Tangerine.UI.FilesystemView
 					if (cmd.WasIssued()) {
 						select = navType == 1;
 						toggle = navType == 2;
+						var sign = (navOffset % 2 == 0 ? -1 : 1);
 						switch (navOffset) {
-						// Left
-						case 0: indexDelta = -1; break;
-						// Right
-						case 1: indexDelta = 1; break;
-						// Up
-						case 2: indexDelta = -columnCount; break;
-						// Down
-						case 3: indexDelta = columnCount; break;
-						// PageUp
-						case 4: {
-								int itemsPerScreen = (int)scrollView.Size.Y / (int)(rowHeight + flowLayout.Spacing);
-								indexDelta = -columnCount * (itemsPerScreen - 1);
-							}
-							break;
-						// PageDown
-						case 5: {
-								int itemsPerScreen = (int)scrollView.Size.Y / (int)(rowHeight + flowLayout.Spacing);
-								indexDelta = columnCount * (itemsPerScreen - 1);
-							}
-							break;
+						// Left, Right
+						case 0: case 1: indexDelta = sign * 1; break;
+						// Up,  Down
+						case 2: case 3:  indexDelta = sign * columnCount; break;
+						// PageUp, PageDown
+						case 4: case 5: indexDelta = sign * columnCount * ((int)(scrollView.Size.Y / (rowHeight + flowLayout.Spacing)) - 1); break;
 						// Home
-						case 6: indexDelta = -index; break;
+						case 6: indexDelta = -rangeSelectionIndex; break;
 						// End
-						case 7: indexDelta = maxIndex - index; break;
+						case 7: indexDelta = maxIndex - rangeSelectionIndex; break;
 						}
 					}
 				}
@@ -514,17 +517,28 @@ namespace Tangerine.UI.FilesystemView
 						lastKeyboardRangeSelectionEndFilesystemItem = scrollView.Content.Nodes[newIndex] as FilesystemItem;
 						AssureFSItemVisible(lastKeyboardRangeSelectionEndFilesystemItem);
 					}
-				} else if (toggle) {
-
 				} else {
-					int newIndex = index + indexDelta;
-					if (newIndex >= 0 && newIndex <= maxIndex) {
-						lastKeyboardSelectedFilesystemItem = scrollView.Content.Nodes[newIndex] as FilesystemItem;
-						lastKeyboardRangeSelectionEndFilesystemItem = null;
-						var path = lastKeyboardSelectedFilesystemItem.FilesystemPath;
-						selection.Clear();
-						selection.Select(path);
-						AssureFSItemVisible(lastKeyboardSelectedFilesystemItem);
+					if (!toggle) {
+						int newIndex = index + indexDelta;
+						if (newIndex >= 0 && newIndex <= maxIndex) {
+
+							lastKeyboardSelectedFilesystemItem = scrollView.Content.Nodes[newIndex] as FilesystemItem;
+							var path = lastKeyboardSelectedFilesystemItem.FilesystemPath;
+							selection.Clear();
+							selection.Select(path);
+							lastKeyboardRangeSelectionEndFilesystemItem = null;
+							AssureFSItemVisible(lastKeyboardSelectedFilesystemItem);
+						}
+					} else {
+						int selectionEndIndex = lastKeyboardRangeSelectionEndFilesystemItem != null
+							? scrollView.Content.Nodes.IndexOf(lastKeyboardRangeSelectionEndFilesystemItem)
+							: index;
+						int newIndex = selectionEndIndex + indexDelta;
+						if (newIndex >= 0 && newIndex <= maxIndex) {
+							lastKeyboardRangeSelectionEndFilesystemItem = scrollView.Content.Nodes[newIndex] as FilesystemItem;
+							AssureFSItemVisible(lastKeyboardRangeSelectionEndFilesystemItem);
+							Window.Current.Invalidate();
+						}
 					}
 				}
 			}
@@ -569,7 +583,6 @@ namespace Tangerine.UI.FilesystemView
 			public static readonly ICommand TogglePageDown = new Command(Modifiers.Command, Key.PageDown);
 			public static readonly ICommand ToggleHome = new Command(Modifiers.Command, Key.Home);
 			public static readonly ICommand ToggleEnd = new Command(Modifiers.Command, Key.End);
-			public static readonly ICommand SelectAll = new Command(Modifiers.Command, Key.A);
 			public static readonly ICommand Cancel = new Command(Key.Escape);
 			public static readonly ICommand Enter = new Command(Key.Enter);
 			public static readonly ICommand EnterSpecial = new Command(Modifiers.Command, Key.Enter);
@@ -578,7 +591,7 @@ namespace Tangerine.UI.FilesystemView
 			public static readonly ICommand GoUpAlso = new Command(Modifiers.Alt, Key.Up);
 			public static readonly ICommand GoBack = new Command(Modifiers.Alt, Key.Left);
 			public static readonly ICommand GoForward = new Command(Modifiers.Alt, Key.Right);
-			public static readonly ICommand Select = new Command(Modifiers.Command, Key.Space);
+			public static readonly ICommand ToggleSelection = new Command(Modifiers.Command, Key.Space);
 		}
 
 		static readonly List<List<ICommand>> navCommands = new List<List<ICommand>> {
@@ -622,7 +635,6 @@ namespace Tangerine.UI.FilesystemView
 			Key.Enumerate().Where(k => k.IsPrintable()).Select(i => new Command(i)).Union(
 			Key.Enumerate().Where(k => k.IsPrintable()).Select(i => new Command(new Shortcut(Modifiers.Shift, i)))).Union(
 				new[] {
-					Cmds.SelectAll,
 					Command.SelectAll,
 					Cmds.Cancel,
 					Cmds.Enter,
@@ -632,6 +644,7 @@ namespace Tangerine.UI.FilesystemView
 					Cmds.GoForward,
 					Cmds.GoUpAlso,
 					Cmds.EnterSpecial,
+					Cmds.ToggleSelection,
 				}
 			).Union(
 				navCommands.SelectMany(i => i)
@@ -643,8 +656,8 @@ namespace Tangerine.UI.FilesystemView
 					return;
 				}
 				canvas.PrepareRendererState();
-				Renderer.DrawRect(rectSelectionBeginPoint, rectSelectionEndPoint, Theme.Colors.SelectedBackground.Transparentify(0.5f));
-				Renderer.DrawRectOutline(rectSelectionBeginPoint, rectSelectionEndPoint, Theme.Colors.SelectedBackground.Darken(0.2f));
+				Renderer.DrawRect(rectSelectionBeginPoint, rectSelectionEndPoint, new Color4(150, 180, 230, 128));
+				Renderer.DrawRectOutline(rectSelectionBeginPoint, rectSelectionEndPoint, Theme.Colors.KeyboardFocusBorder);
 		}
 
 		public void GoUp()
