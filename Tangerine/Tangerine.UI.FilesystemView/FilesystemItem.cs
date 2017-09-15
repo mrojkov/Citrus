@@ -3,10 +3,12 @@ using Lime;
 
 namespace Tangerine.UI.FilesystemView
 {
-	public class Icon : Widget
+	public class FilesystemItem : Widget
 	{
 		public string FilesystemPath;
-		public Icon(string path)
+		public const float IconSize = 16;
+		public const float ItemPadding = 2.0f;
+		public FilesystemItem(string path)
 		{
 			SimpleText text = null;
 			FilesystemPath = path;

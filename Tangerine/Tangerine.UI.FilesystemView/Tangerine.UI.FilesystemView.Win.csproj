@@ -51,7 +51,7 @@
     <Compile Include="FilesystemPane.cs" />
     <Compile Include="FilesystemView.cs" />
     <Compile Include="FilesystemViewExtensions.cs" />
-    <Compile Include="Icon.cs" />
+    <Compile Include="FilesystemItem.cs" />
     <Compile Include="ISystemIconTextureProvider.cs" />
     <Compile Include="ISystemShellContextMenu.cs" />
     <Compile Include="Model.cs" />

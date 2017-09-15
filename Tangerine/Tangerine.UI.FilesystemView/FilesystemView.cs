@@ -31,8 +31,8 @@ namespace Tangerine.UI.FilesystemView
 		private Vector2 dragStartPosition;
 		private ThemedHSplitter cookingRulesSplitter;
 		private ThemedVSplitter selectionPreviewSplitter;
-		private Icon lastKeyboardSelectedIcon;
-		private Icon lastKeyboardRangeSelectionEndIcon;
+		private FilesystemItem lastKeyboardSelectedFilesystemItem;
+		private FilesystemItem lastKeyboardRangeSelectionEndFilesystemItem;
 
 		public void Split(SplitterType type)
 		{
@@ -184,7 +184,7 @@ namespace Tangerine.UI.FilesystemView
 				InvalidateView(p);
 				InvalidateFSWatcher(p);
 				preview.ClearTextureCache();
-				lastKeyboardSelectedIcon = scrollView.Content.Nodes.FirstOrNull() as Icon;
+				lastKeyboardSelectedFilesystemItem = scrollView.Content.Nodes.FirstOrNull() as FilesystemItem;
 			});
 			RootWidget.Layout = new VBoxLayout();
 			RootWidget.AddNode((cookingRulesSplitter = new ThemedHSplitter {
@@ -216,29 +216,29 @@ namespace Tangerine.UI.FilesystemView
 		{
 			scrollView.Content.Nodes.Clear();
 			foreach (var item in model.EnumerateItems()) {
-				var iconWidget = new Icon(item);
-				iconWidget.CompoundPostPresenter.Insert(0, new DelegatePresenter<Icon>(RenderIconSelection));
-				iconWidget.Updated += (dt) => {
-					if (!iconWidget.IsMouseOver()) return;
-					var input = iconWidget.Input;
+				var fsItem = new FilesystemItem(item);
+				fsItem.CompoundPostPresenter.Insert(0, new DelegatePresenter<FilesystemItem>(RenderFSItemSelection));
+				fsItem.Updated += (dt) => {
+					if (!fsItem.IsMouseOver()) return;
+					var input = fsItem.Input;
 					if (input.WasKeyPressed(Key.Mouse0DoubleClick)) {
 						input.ConsumeKey(Key.Mouse0DoubleClick);
 						Open(item);
 					}
-					if (iconWidget.Input.WasKeyReleased(Key.Mouse1)) {
-						iconWidget.Input.ConsumeKey(Key.Mouse1);
+					if (fsItem.Input.WasKeyReleased(Key.Mouse1)) {
+						fsItem.Input.ConsumeKey(Key.Mouse1);
 						SystemShellContextMenu.Instance.Show(item);
 					}
-					if (iconWidget.Input.WasKeyReleased(Key.Mouse0)) {
+					if (fsItem.Input.WasKeyReleased(Key.Mouse0)) {
 						if (!selection.Contains(item)) {
-							iconWidget.Input.ConsumeKey(Key.Mouse0);
-							if (!iconWidget.Input.IsKeyPressed(Key.Control)) {
+							fsItem.Input.ConsumeKey(Key.Mouse0);
+							if (!fsItem.Input.IsKeyPressed(Key.Control)) {
 								selection.Clear();
 							}
 							selection.Select(item);
 						}
 					}
-					if (iconWidget.Input.WasKeyPressed(Key.Mouse0)) {
+					if (fsItem.Input.WasKeyPressed(Key.Mouse0)) {
 						input.ConsumeKey(Key.Mouse0);
 						if (input.IsKeyPressed(Key.Control) && !input.IsKeyPressed(Key.Shift)) {
 							input.ConsumeKey(Key.Control);
@@ -259,7 +259,7 @@ namespace Tangerine.UI.FilesystemView
 						Window.Current?.Invalidate();
 					}
 				};
-				scrollView.Content.AddNode(iconWidget);
+				scrollView.Content.AddNode(fsItem);
 			}
 		}
 
@@ -285,17 +285,17 @@ namespace Tangerine.UI.FilesystemView
 			System.Diagnostics.Process.Start(path);
 		}
 
-		private void RenderIconSelection(Icon icon)
+		private void RenderFSItemSelection(FilesystemItem filesystemItem)
 		{
-			if (selection.Contains(icon.FilesystemPath)) {
-				icon.PrepareRendererState();
-				Renderer.DrawRect(Vector2.Zero, icon.Size, Theme.Colors.SelectedBackground.Transparentify(0.5f));
-				Renderer.DrawRectOutline(Vector2.Zero, icon.Size, Theme.Colors.SelectedBackground);
-			} else if (icon.IsMouseOver()) {
-				icon.PrepareRendererState();
+			if (selection.Contains(filesystemItem.FilesystemPath)) {
+				filesystemItem.PrepareRendererState();
+				Renderer.DrawRect(Vector2.Zero, filesystemItem.Size, Theme.Colors.SelectedBackground.Transparentify(0.5f));
+				Renderer.DrawRectOutline(Vector2.Zero, filesystemItem.Size, Theme.Colors.SelectedBackground);
+			} else if (filesystemItem.IsMouseOver()) {
+				filesystemItem.PrepareRendererState();
 				Renderer.DrawRect(
 					Vector2.Zero,
-					icon.Size,
+					filesystemItem.Size,
 					Theme.Colors.SelectedBackground.Transparentify(0.8f));
 			}
 		}
@@ -310,7 +310,7 @@ namespace Tangerine.UI.FilesystemView
 			var r0 = new Rectangle(new Vector2(Mathf.Min(p0.X, p1.X), Mathf.Min(p0.Y, p1.Y)),
 				new Vector2(Mathf.Max(p0.X, p1.X), Mathf.Max(p0.Y, p1.Y)));
 			foreach (var n in scrollView.Content.Nodes) {
-				var ic = n as Icon;
+				var ic = n as FilesystemItem;
 				var r1 = new Rectangle(ic.Position, ic.Position + ic.Size);
 				if (Rectangle.Intersect(r0, r1) != Rectangle.Empty) {
 					selection.Select(ic.FilesystemPath);
@@ -359,46 +359,21 @@ namespace Tangerine.UI.FilesystemView
 					rectSelecting = false;
 				}
 				rectSelectionEndPoint = scrollView.Content.Input.LocalMousePosition;
+				var scrollOffset = 0.0f;
+				if (scrollView.Input.LocalMousePosition.Y < 0) {
+					scrollOffset = scrollView.Input.LocalMousePosition.Y;
+
+				} else if (scrollView.Input.LocalMousePosition.Y > scrollView.Size.Y) {
+					scrollOffset = scrollView.Input.LocalMousePosition.Y - scrollView.Size.Y;
+				}
+				scrollView.ScrollPosition += Math.Sign(scrollOffset) * Mathf.Sqr(scrollOffset) * 0.1f * dt;
+				scrollView.ScrollPosition = Mathf.Clamp(scrollView.ScrollPosition, scrollView.MinScrollPosition, scrollView.MaxScrollPosition);
 				Window.Current.Invalidate();
 			}
 
 			typeNavigationTimeout -= dt;
 			if (scrollView.IsFocused()) {
-				{ // text input
-					if (!string.IsNullOrEmpty(input.TextInput)) {
-						if (typeNavigationTimeout <= 0.0f) {
-							typeNavigationPrefix = string.Empty;
-						}
-						typeNavigationTimeout = typeNavigationInterval;
-						var prevPrefix = typeNavigationPrefix;
-						bool offset = false;
-						if (prevPrefix == input.TextInput) {
-							offset = true;
-						} else {
-							typeNavigationPrefix += input.TextInput;
-						}
-						var matches = scrollView.Content.Nodes
-							.Select(i => i as Icon)
-							.Where(i => {
-								var a = Path.GetFileName(i.FilesystemPath);
-								var b = typeNavigationPrefix;
-								return a.StartsWith(b, true, CultureInfo.CurrentCulture);
-							})
-							.ToList();
-						if (matches.Count != 0) {
-							var index = matches.IndexOf(lastKeyboardSelectedIcon);
-							if (index == -1) {
-								index = 0;
-							}
-							if (offset) {
-								index = (index + 1) % matches.Count;
-							}
-							selection.Clear();
-							selection.Select(matches[index].FilesystemPath);
-							lastKeyboardSelectedIcon = matches[index];
-						}
-					}
-				}
+				ProcessTypingNavigation();
 
 				{ // other shortcuts
 					if (Cmds.Cancel.WasIssued()) {
@@ -407,7 +382,7 @@ namespace Tangerine.UI.FilesystemView
 					} else if (Window.Current.Input.WasKeyReleased(Key.Menu)) {
 						if (!selection.Empty) {
 							Window.Current.Input.ConsumeKey(Key.Menu);
-							SystemShellContextMenu.Instance.Show(selection.ToArray(), lastKeyboardSelectedIcon.GlobalPosition);
+							SystemShellContextMenu.Instance.Show(selection.ToArray(), lastKeyboardSelectedFilesystemItem.GlobalPosition);
 						}
 					} else if (Cmds.GoBack.WasIssued()) {
 						GoBackward();
@@ -416,80 +391,156 @@ namespace Tangerine.UI.FilesystemView
 					} else if (Cmds.GoUp.WasIssued() || Cmds.GoUpAlso.WasIssued()) {
 						GoUp();
 					} else if (Cmds.Enter.WasIssued()) {
-						if (lastKeyboardSelectedIcon != null) {
-							Open(lastKeyboardSelectedIcon.FilesystemPath);
+						if (lastKeyboardSelectedFilesystemItem != null) {
+							Open(lastKeyboardSelectedFilesystemItem.FilesystemPath);
 						}
 					} else if (Cmds.EnterSpecial.WasIssued()) {
-						if (lastKeyboardSelectedIcon != null) {
-							OpenSpecial(lastKeyboardSelectedIcon.FilesystemPath);
+						if (lastKeyboardSelectedFilesystemItem != null) {
+							OpenSpecial(lastKeyboardSelectedFilesystemItem.FilesystemPath);
 						}
 					} else if (Command.SelectAll.WasIssued()) {
 						selection.Clear();
-						selection.SelectRange(scrollView.Content.Nodes.Select(n => (n as Icon).FilesystemPath));
+						selection.SelectRange(scrollView.Content.Nodes.Select(n => (n as FilesystemItem).FilesystemPath));
 					}
 				}
 
-				{ // navigation hotkeys
-					int indexDelta = 0;
-					bool select = false;
-					bool toggle = false;
-					var index = 0;
-					var maxIndex = scrollView.Content.Nodes.Count - 1;
-					if (lastKeyboardSelectedIcon != null) {
-						index = scrollView.Content.Nodes.IndexOf(lastKeyboardSelectedIcon);
-					}
+				ProcessNavigation();
 
-					for (int navType = 0; navType < navCommands.Count; navType++) {
-						for (int navOffset = 0; navOffset < navCommands[navType].Count; navOffset++) {
-							var cmd = navCommands[navType][navOffset];
-							if (cmd.WasIssued()) {
-								select = navType == 1;
-								toggle = navType == 2;
-								switch (navOffset) {
-								case 0: indexDelta = -1; break;
-								case 1: indexDelta = 1; break;
-								case 2: indexDelta = -(scrollView.Content.Layout as FlowLayout).ColumnCount(0); break;
-								case 3: indexDelta = (scrollView.Content.Layout as FlowLayout).ColumnCount(0); break;
-								case 4: indexDelta = -(scrollView.Content.Layout as FlowLayout).ColumnCount(0) * 1; break; // * rows per screen
-								case 5: indexDelta = (scrollView.Content.Layout as FlowLayout).ColumnCount(0); break;
-								case 6: indexDelta = -index; break;
-								case 7: indexDelta = maxIndex - index; break;
-								}
-							}
-						}
-					}
-					if (indexDelta != 0) {
-						if (select) {
-							int selectionEndIndex = lastKeyboardRangeSelectionEndIcon != null
-								? scrollView.Content.Nodes.IndexOf(lastKeyboardRangeSelectionEndIcon)
-								: index;
-							int newIndex = selectionEndIndex + indexDelta;
-							if (newIndex >= 0 && newIndex <= maxIndex) {
-								selection.Clear();
-								for (int i = Math.Min(index, newIndex); i <= Math.Max(index, newIndex); i++) {
-									var path = (scrollView.Content.Nodes[i] as Icon).FilesystemPath;
-									selection.Select(path);
-								}
-								lastKeyboardRangeSelectionEndIcon = scrollView.Content.Nodes[newIndex] as Icon;
-							}
-						} else if (toggle) {
-
-						} else {
-							int newIndex = index + indexDelta;
-							if (newIndex >= 0 && newIndex <= maxIndex) {
-								lastKeyboardSelectedIcon = scrollView.Content.Nodes[newIndex] as Icon;
-								lastKeyboardRangeSelectionEndIcon = null;
-								var path = lastKeyboardSelectedIcon.FilesystemPath;
-								selection.Clear();
-								selection.Select(path);
-							}
-						}
-					}
-				}
 				foreach (var cmd in consumingCommands) {
 					cmd.Consume();
 				}
 			}
+		}
+
+		private void ProcessTypingNavigation()
+		{
+			var input = scrollView.Input;
+			if (string.IsNullOrEmpty(input.TextInput)) {
+				return;
+			}
+			if (typeNavigationTimeout <= 0.0f) {
+				typeNavigationPrefix = string.Empty;
+			}
+			typeNavigationTimeout = typeNavigationInterval;
+			var prevPrefix = typeNavigationPrefix;
+			bool offset = false;
+			if (prevPrefix == input.TextInput) {
+				offset = true;
+			} else {
+				typeNavigationPrefix += input.TextInput;
+			}
+			var matches = scrollView.Content.Nodes
+				.Select(i => i as FilesystemItem)
+				.Where(i => {
+					var a = Path.GetFileName(i.FilesystemPath);
+					var b = typeNavigationPrefix;
+					return a.StartsWith(b, true, CultureInfo.CurrentCulture);
+				})
+				.ToList();
+			if (matches.Count != 0) {
+				var index = matches.IndexOf(lastKeyboardSelectedFilesystemItem);
+				if (index == -1) {
+					index = 0;
+				}
+				if (offset) {
+					index = (index + 1) % matches.Count;
+				}
+				selection.Clear();
+				selection.Select(matches[index].FilesystemPath);
+				lastKeyboardSelectedFilesystemItem = matches[index];
+			}
+		}
+
+		private void ProcessNavigation()
+		{
+			int indexDelta = 0;
+			bool select = false;
+			bool toggle = false;
+			var index = 0;
+			var maxIndex = scrollView.Content.Nodes.Count - 1;
+			if (lastKeyboardSelectedFilesystemItem != null) {
+				index = scrollView.Content.Nodes.IndexOf(lastKeyboardSelectedFilesystemItem);
+			}
+			var flowLayout = (scrollView.Content.Layout as FlowLayout);
+			int columnCount = flowLayout.ColumnCount(0);
+			float rowHeight = FilesystemItem.ItemPadding * 2 + FilesystemItem.IconSize;
+			for (int navType = 0; navType < navCommands.Count; navType++) {
+				for (int navOffset = 0; navOffset < navCommands[navType].Count; navOffset++) {
+					var cmd = navCommands[navType][navOffset];
+					if (cmd.WasIssued()) {
+						select = navType == 1;
+						toggle = navType == 2;
+						switch (navOffset) {
+						// Left
+						case 0: indexDelta = -1; break;
+						// Right
+						case 1: indexDelta = 1; break;
+						// Up
+						case 2: indexDelta = -columnCount; break;
+						// Down
+						case 3: indexDelta = columnCount; break;
+						// PageUp
+						case 4: {
+								int itemsPerScreen = (int)scrollView.Size.Y / (int)(rowHeight + flowLayout.Spacing);
+								indexDelta = -columnCount * (itemsPerScreen - 1);
+							}
+							break;
+						// PageDown
+						case 5: {
+								int itemsPerScreen = (int)scrollView.Size.Y / (int)(rowHeight + flowLayout.Spacing);
+								indexDelta = columnCount * (itemsPerScreen - 1);
+							}
+							break;
+						// Home
+						case 6: indexDelta = -index; break;
+						// End
+						case 7: indexDelta = maxIndex - index; break;
+						}
+					}
+				}
+			}
+			if (indexDelta != 0) {
+				if (select) {
+					int selectionEndIndex = lastKeyboardRangeSelectionEndFilesystemItem != null
+						? scrollView.Content.Nodes.IndexOf(lastKeyboardRangeSelectionEndFilesystemItem)
+						: index;
+					int newIndex = selectionEndIndex + indexDelta;
+					if (newIndex >= 0 && newIndex <= maxIndex) {
+						selection.Clear();
+						for (int i = Math.Min(index, newIndex); i <= Math.Max(index, newIndex); i++) {
+							var path = (scrollView.Content.Nodes[i] as FilesystemItem).FilesystemPath;
+							selection.Select(path);
+						}
+						lastKeyboardRangeSelectionEndFilesystemItem = scrollView.Content.Nodes[newIndex] as FilesystemItem;
+						AssureFSItemVisible(lastKeyboardRangeSelectionEndFilesystemItem);
+					}
+				} else if (toggle) {
+
+				} else {
+					int newIndex = index + indexDelta;
+					if (newIndex >= 0 && newIndex <= maxIndex) {
+						lastKeyboardSelectedFilesystemItem = scrollView.Content.Nodes[newIndex] as FilesystemItem;
+						lastKeyboardRangeSelectionEndFilesystemItem = null;
+						var path = lastKeyboardSelectedFilesystemItem.FilesystemPath;
+						selection.Clear();
+						selection.Select(path);
+						AssureFSItemVisible(lastKeyboardSelectedFilesystemItem);
+					}
+				}
+			}
+		}
+
+		private void AssureFSItemVisible(FilesystemItem fsItem)
+		{
+			var y = fsItem.CalcPositionInSpaceOf(scrollView).Y;
+			var offset = y + fsItem.Height - scrollView.Height;
+			if (offset > 0.0f) {
+				scrollView.ScrollPosition += offset;
+			}
+			if (y < 0.0f) {
+				scrollView.ScrollPosition += y;
+			}
+			scrollView.ScrollPosition = Mathf.Clamp(scrollView.ScrollPosition, scrollView.MinScrollPosition, scrollView.MaxScrollPosition);
 		}
 
 		private static class Cmds
