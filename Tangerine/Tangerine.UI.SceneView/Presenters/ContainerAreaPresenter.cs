@@ -24,25 +24,27 @@ namespace Tangerine.UI.SceneView
 				var ctr = SceneView.Instance.Frame;
 				if (ctr != null) {
 					ctr.PrepareRendererState();
-					if (Core.Document.Current.PreviewAnimation) {
-						Renderer.DrawRect(Vector2.Zero, ctr.Size, Color4.Black);
+					if (Core.UserPreferences.Instance.Get<UserPreferences>().EnableChessBackground) {
+						var ratio = ChessCellSize * sceneView.Scene.Scale;
+						Renderer.DrawSprite(
+							backgroundTexture,
+							Color4.White,
+							Vector2.Zero,
+							ctr.Size,
+							-sceneView.Scene.Position / ratio,
+							 (ctr.Size - sceneView.Scene.Position) / ratio);
 					} else {
-						if (Core.UserPreferences.Instance.Get<UserPreferences>().EnableChessBackground) {
-							var ratio = ChessCellSize * sceneView.Scene.Scale;
-							Renderer.DrawSprite(
-								backgroundTexture,
-								Color4.White,
-								Vector2.Zero,
-								ctr.Size,
-								-sceneView.Scene.Position / ratio,
-								 (ctr.Size - sceneView.Scene.Position) / ratio);
-						} else {
-							Renderer.DrawRect(Vector2.Zero, ctr.Size, Color1);
-						}
+						Renderer.DrawRect(Vector2.Zero, ctr.Size, Color1);
+					}
+					if (Document.Current.PreviewAnimation) {
+						Renderer.DrawRect(
+							Vector2.Zero,
+							ctr.Size,
+							Core.UserPreferences.Instance.Get<UserPreferences>().AnimationPreviewBackground);
+					} else {
 						var root = Core.Document.Current.RootNode as Widget;
 						Renderer.Transform1 = root.LocalToWorldTransform;
 						Renderer.DrawRect(Vector2.Zero, root.Size, RootWidgetBackgroundColor);
-
 					}
 				}
 			}));

@@ -80,24 +80,53 @@ namespace Tangerine
 			pane.Content.Layout = new VBoxLayout { Spacing = 4 };
 			new EnumPropertyEditor<ColorThemeEnum>(
 			new PropertyEditorParams(pane.Content, Core.UserPreferences.Instance.Get<Tangerine.UserPreferences>(), nameof(Tangerine.UserPreferences.Theme), "User interface theme"));
-			var chessBackgroundPropertyEditor = new BooleanPropertyEditor(
+			IPropertyEditor tmp;
+			tmp = new BooleanPropertyEditor(
 				new PropertyEditorParams(pane.Content, Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>(), nameof(UI.SceneView.UserPreferences.EnableChessBackground), "Chess background"));
-			chessBackgroundPropertyEditor.ContainerWidget.AddChangeWatcher(
+			tmp.ContainerWidget.AddChangeWatcher(
 				() => Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>().EnableChessBackground, (v) => Application.InvalidateWindows());
-			var backgroundColorpropertyEditor = new Color4PropertyEditor(
-				new PropertyEditorParams(pane.Content, Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>(), nameof(UI.SceneView.UserPreferences.BackgroundColorA), "Background color A"));
-			backgroundColorpropertyEditor.EditorParams.DefaultValueGetter = () => ColorTheme.Current.SceneView.BackgroundColorA;
-			backgroundColorpropertyEditor.ContainerWidget.AddChangeWatcher(
+			tmp = new Color4PropertyEditor(
+				new PropertyEditorParams(
+					pane.Content,
+					Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>(),
+					nameof(UI.SceneView.UserPreferences.BackgroundColorA),
+					"Background color A"
+				) {
+					DefaultValueGetter = () => ColorTheme.Current.SceneView.BackgroundColorA
+				});
+			tmp.ContainerWidget.AddChangeWatcher(
 				() => Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>().BackgroundColorA, (v) => Application.InvalidateWindows());
-			backgroundColorpropertyEditor = new Color4PropertyEditor(
-				new PropertyEditorParams(pane.Content, Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>(), nameof(UI.SceneView.UserPreferences.BackgroundColorB), "Background color B"));
-			backgroundColorpropertyEditor.EditorParams.DefaultValueGetter = () => ColorTheme.Current.SceneView.BackgroundColorB;
-			backgroundColorpropertyEditor.ContainerWidget.AddChangeWatcher(
+			tmp = new Color4PropertyEditor(
+				new PropertyEditorParams(
+					pane.Content,
+					Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>(),
+					nameof(UI.SceneView.UserPreferences.BackgroundColorB),
+					"Background color B"
+				) {
+					DefaultValueGetter = () => ColorTheme.Current.SceneView.BackgroundColorB
+				});
+			tmp.ContainerWidget.AddChangeWatcher(
 				() => Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>().BackgroundColorB, (v) => Application.InvalidateWindows());
-			var rootWidgetOverlayPropertyEditor = new Color4PropertyEditor(
-				new PropertyEditorParams(pane.Content, Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>(), nameof(UI.SceneView.UserPreferences.RootWidgetOverlayColor), "Root overlay color"));
-			rootWidgetOverlayPropertyEditor.ContainerWidget.AddChangeWatcher(
+			tmp = new Color4PropertyEditor(
+				new PropertyEditorParams(
+					pane.Content,
+					Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>(),
+					nameof(UI.SceneView.UserPreferences.RootWidgetOverlayColor),
+					"Root overlay color"
+				) {
+					DefaultValueGetter = () => ColorTheme.Current.SceneView.RootWidgetOverlayColor
+				});
+			tmp.ContainerWidget.AddChangeWatcher(
 				() => Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>().RootWidgetOverlayColor, (v) => Application.InvalidateWindows());
+			new Color4PropertyEditor(
+				new PropertyEditorParams(
+					pane.Content,
+					Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>(),
+					nameof(UI.SceneView.UserPreferences.AnimationPreviewBackground),
+					"Animation preview background"
+				) {
+					DefaultValueGetter = () => Color4.Black.Transparentify(0.6f)
+				});
 			return pane;
 		}
 

@@ -23,5 +23,8 @@ namespace Tangerine.UI.SceneView
 
 		[YuzuRequired]
 		public Color4 RootWidgetOverlayColor { get; set; } = ColorTheme.Current.SceneView.RootWidgetOverlayColor;
+
+		[YuzuRequired]
+		public Color4 AnimationPreviewBackground { get; set; } = Color4.Black.Transparentify(0.6f);
 	}
 }
