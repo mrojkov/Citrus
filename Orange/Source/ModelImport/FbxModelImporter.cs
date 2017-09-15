@@ -134,9 +134,11 @@ namespace Orange
 
 				(n.Animators["Position", animation.MarkerId] as Animator<Vector3>).Keys.AddRange(
 					Vector3KeyReducer.Default.Reduce(translationKeys));
-				Model.Animations.Add(new Lime.Animation {
-					Id = animation.MarkerId,
-				});
+				if (!Model.Animations.Any(a => a.Id == animation.MarkerId)) {
+					Model.Animations.Add(new Lime.Animation {
+						Id = animation.MarkerId,
+					});
+				}
 			}
 		}
 	}
