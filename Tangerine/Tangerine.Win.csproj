@@ -262,4 +262,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Icons\Tools\Pipette.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Icons\SceneView\Play.png" />
+  </ItemGroup>
 </Project>

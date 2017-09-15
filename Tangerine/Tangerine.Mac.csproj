@@ -245,6 +245,7 @@
     <EmbeddedResource Include="Resources\Icons\Timeline\Empty.png" />
     <EmbeddedResource Include="Resources\Icons\SceneView\Round.png" />
     <EmbeddedResource Include="Resources\Icons\Tools\Pipette.png" />
+    <EmbeddedResource Include="Resources\Icons\SceneView\Play.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PreferencesDialog\" />

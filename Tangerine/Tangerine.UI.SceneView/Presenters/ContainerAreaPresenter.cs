@@ -11,9 +11,14 @@ namespace Tangerine.UI.SceneView
 		private Color4 Color1 => Core.UserPreferences.Instance.Get<UserPreferences>().BackgroundColorA;
 		private Color4 Color2 => Core.UserPreferences.Instance.Get<UserPreferences>().BackgroundColorB;
 		private Color4 RootWidgetBackgroundColor => Core.UserPreferences.Instance.Get<UserPreferences>().RootWidgetOverlayColor;
+		private const string PlayTexturePath = "Tangerine.Resources.Icons.SceneView.Play.png";
+
 		public ContainerAreaPresenter(SceneView sceneView)
 		{
 			var backgroundTexture = PrepareChessTexture(Color1, Color2);
+			var playButtonTexture = new Texture2D();
+
+			playButtonTexture.LoadImage(new Bitmap(new EmbeddedResource(PlayTexturePath, "Tangerine").GetResourceStream()));
 			sceneView.Frame.AddChangeWatcher(
 				() => Core.UserPreferences.Instance.Get<UserPreferences>().BackgroundColorA,
 				(v) => backgroundTexture = PrepareChessTexture(v, Color2));
@@ -83,6 +88,22 @@ namespace Tangerine.UI.SceneView
 					Renderer.DrawLine(new Vector2(rect.B.X, 0), new Vector2(rect.B.X, frame.Size.Y), c, t2);
 				}
 			}));
+			sceneView.Scene.CompoundPostPresenter.Push(
+				new DelegatePresenter<Widget>(
+					(w) => {
+						if (Document.Current.PreviewAnimation) {
+							var ctr = SceneView.Instance.Frame;
+							if (ctr != null) {
+								ctr.PrepareRendererState();
+								Renderer.DrawSprite(
+									playButtonTexture,
+									Color4.White,
+									new Vector2(10),
+									new Vector2(35), Vector2.Zero, Vector2.One);
+							}
+						}
+					}
+			));
 		}
 
 		private static void SetAndRenderOverlay(float width, float height, Vector2 rootCenter, float thickness)
