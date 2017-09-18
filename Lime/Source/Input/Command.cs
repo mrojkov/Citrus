@@ -76,6 +76,11 @@ namespace Lime
 		/// Occurs when command is issued by clicking on menu item, activating menu shortcut or clicking a tool button.
 		/// </summary>
 		event Action Issued;
+
+		/// <summary>
+		///  Any data you need to pass to consumer of the command.
+		/// </summary>
+		object UserData { get; set; }
 	}
 
 	public class Command : ICommand
@@ -184,6 +189,7 @@ namespace Lime
 		public bool Checked { get; set; }
 
 		public event Action Issued;
+		public object UserData { get; set; }
 		public static readonly ICommand MenuSeparator = new Command();
 
 		public static void ResetConsumedCommands() => consumeGeneration++;
@@ -241,7 +247,7 @@ namespace Lime
 			}
 			var input = Window.Current.Input;
 			return wasIssued ||
-				mappedShortcut != Key.Unknown && 
+				mappedShortcut != Key.Unknown &&
 				(Repeatable && input.WasKeyRepeated(mappedShortcut) || !Repeatable && input.WasKeyPressed(mappedShortcut));
 		}
 
