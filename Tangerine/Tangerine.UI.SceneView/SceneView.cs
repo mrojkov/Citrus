@@ -164,6 +164,7 @@ namespace Tangerine.UI.SceneView
 			CreateComponents();
 			CreateProcessors();
 			CreatePresenters();
+			panelWidget.Updated += HandleDropImage;
 		}
 
 		public void Attach()
@@ -189,7 +190,7 @@ namespace Tangerine.UI.SceneView
 		}
 
 		/// <summary>
-		/// Checks whether the mouse is over a control point within a specific for resize radius. 
+		/// Checks whether the mouse is over a control point within a specific for resize radius.
 		/// </summary>
 		public bool HitTestResizeControlPoint(Vector2 controlPoint)
 		{
@@ -209,12 +210,14 @@ namespace Tangerine.UI.SceneView
 						string assetPath, assetType;
 						if (Utils.ExtractAssetPathOrShowAlert(file, out assetPath, out assetType)) {
 							if (assetType == ".png") {
-								var node = Core.Operations.CreateNode.Perform(typeof(Image));
-								var texture = new SerializableTexture(assetPath);
-								Core.Operations.SetProperty.Perform(node, nameof(Image.Texture), texture);
-								Core.Operations.SetProperty.Perform(node, nameof(Widget.Position), widgetPos);
-								Core.Operations.SetProperty.Perform(node, nameof(Widget.Pivot), Vector2.Half);
-								Core.Operations.SetProperty.Perform(node, nameof(Widget.Size), (Vector2)texture.ImageSize);
+								var menu = new Menu() {
+									ImageDropCommands.AsImage,
+									ImageDropCommands.AsDistortionMesh,
+									ImageDropCommands.AsNineGrid,
+									ImageDropCommands.AsParticleModifier,
+								};
+								ImageDropCommands.AssetPath = assetPath;
+								menu.Popup();
 							} else if (assetType == ".ogg") {
 								var node = Core.Operations.CreateNode.Perform(typeof(Audio));
 								var sample = new SerializableSample(assetPath);
@@ -245,6 +248,44 @@ namespace Tangerine.UI.SceneView
 			} finally {
 				Document.Current.History.EndTransaction();
 			}
+		}
+
+		private static class ImageDropCommands
+		{
+			public static ICommand AsImage = new Command("Create Image");
+			public static ICommand AsDistortionMesh = new Command("Create Distortion Mesh");
+			public static ICommand AsNineGrid = new Command("Create Nine Grid");
+			public static ICommand AsParticleModifier = new Command("Create Particle Modifier");
+
+			public static string AssetPath;
+		}
+
+		private void HandleDropImage(float dt)
+		{
+			Node node = null;
+			Document.Current.History.BeginTransaction();
+			if (ImageDropCommands.AsImage.WasIssued()) {
+				ImageDropCommands.AsImage.Consume();
+				node = Core.Operations.CreateNode.Perform(typeof(Image));
+			} else if (ImageDropCommands.AsDistortionMesh.WasIssued()) {
+				ImageDropCommands.AsDistortionMesh.Consume();
+				node = Core.Operations.CreateNode.Perform(typeof(DistortionMesh));
+			} else if (ImageDropCommands.AsNineGrid.WasIssued()) {
+				ImageDropCommands.AsNineGrid.Consume();
+				node = Core.Operations.CreateNode.Perform(typeof(NineGrid));
+			} else if (ImageDropCommands.AsParticleModifier.WasIssued()) {
+				ImageDropCommands.AsParticleModifier.Consume();
+				node = Core.Operations.CreateNode.Perform(typeof(ParticleModifier));
+			}
+			if (node != null) {
+				var widgetPos = MousePosition * Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
+				var texture = new SerializableTexture(ImageDropCommands.AssetPath);
+				Core.Operations.SetProperty.Perform(node, nameof(Widget.Texture), texture);
+				Core.Operations.SetProperty.Perform(node, nameof(Widget.Position), widgetPos);
+				Core.Operations.SetProperty.Perform(node, nameof(Widget.Pivot), Vector2.Half);
+				Core.Operations.SetProperty.Perform(node, nameof(Widget.Size), (Vector2)texture.ImageSize);
+			}
+			Document.Current.History.EndTransaction();
 		}
 
 		void CreateComponents() { }
