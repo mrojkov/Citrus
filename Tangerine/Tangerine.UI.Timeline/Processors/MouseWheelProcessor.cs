@@ -33,7 +33,7 @@ namespace Tangerine.UI.Timeline
 				}
 				if (input.IsKeyPressed(Key.Mouse2)) {
 					var delta = input.MousePosition - prevPosition;
-					if (delta != Vector2.Zero && timeline.Offset.X - delta.X > 0 && timeline.Offset.Y - delta.Y > 0) {
+					if (delta != Vector2.Zero && (timeline.Offset.X - delta.X > 0 || timeline.Offset.Y - delta.Y > 0)) {
 						timeline.Offset -= delta;
 						Core.Operations.Dummy.Perform();
 					}
