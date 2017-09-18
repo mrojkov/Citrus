@@ -290,6 +290,7 @@ namespace Tangerine
 
 		void CreateMainMenu()
 		{
+			Menu viewMenu;
 			Application.MainMenu = new Menu {
 #if MAC
 				new Command("Application", new Menu {
@@ -326,6 +327,7 @@ namespace Tangerine
 					Command.Copy,
 					Command.Paste,
 					Command.Delete,
+					SceneViewCommands.Duplicate,
 					TimelineCommands.DeleteKeyframes,
 					TimelineCommands.CreateMarkerPlay,
 					TimelineCommands.CreateMarkerStop,
@@ -339,17 +341,19 @@ namespace Tangerine
 					GenericCommands.InsertTimelineColumn,
 					GenericCommands.RemoveTimelineColumn,
 					Command.MenuSeparator,
+					SceneViewCommands.BindBones,
 					GenericCommands.GroupContentsToMorphableMeshes,
 					GenericCommands.ExportScene,
 					GenericCommands.UpsampleAnimationTwice,
 				}),
 				new Command("Create", new Menu()),
-				new Command("View", new Menu {
+				new Command("View", (viewMenu = new Menu {
 					GenericCommands.DefaultLayout,
 					new Command("Pads", PadsMenu),
 					new Command("Resolution", Resolution),
 					GenericCommands.Overlays,
-				}),
+					SceneViewCommands.DisplayBones,
+				})),
 				new Command("Window", new Menu {
 					GenericCommands.NextDocument,
 					GenericCommands.PreviousDocument
@@ -392,6 +396,7 @@ namespace Tangerine
 				CommandHandlerList.Global.Connect(cmd, new CreateNode(t));
 				Application.MainMenu.FindCommand("Create").Menu.Add(cmd);
 			}
+			viewMenu.DisplayCheckMark = true;
 		}
 
 		void RegisterGlobalCommands()
@@ -445,7 +450,7 @@ namespace Tangerine
 				foreach (var row in Document.Current.Rows) {
 					Core.Operations.SelectRow.Perform(row, true);
 				}
-			}, 	() => Document.Current?.Rows.Count > 0);
+			}, () => Document.Current?.Rows.Count > 0);
 			h.Connect(Command.Undo, () => Document.Current.History.Undo(), () => Document.Current?.History.CanUndo() ?? false);
 			h.Connect(Command.Redo, () => Document.Current.History.Redo(), () => Document.Current?.History.CanRedo() ?? false);
 			h.Connect(OrangeCommands.Run, () => Orange.Actions.BuildAndRunAction());

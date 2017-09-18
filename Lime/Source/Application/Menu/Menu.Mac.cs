@@ -9,8 +9,8 @@ namespace Lime
 	public class Menu : List<ICommand>, IMenu
 	{
 		List<MenuItem> items = new List<MenuItem>();
-
 		internal readonly NSMenu NativeMenu;
+		public bool DisplayCheckMark { get; set; }
 
 		public Menu()
 		{
@@ -101,6 +101,9 @@ namespace Lime
 					separator = true;
 				} else {
 					NativeMenuItem = new NSMenuItem();
+					Command.Issued += () => {
+						NativeMenuItem.State = Command.Checked ? NSCellStateValue.On : NSCellStateValue.Off;
+					};
 					NativeMenuItem.Activated += (s, e) => {
 						CommandQueue.Instance.Add((Command)Command);
 					};
@@ -123,6 +126,7 @@ namespace Lime
 				NativeMenuItem.Hidden = !Command.Visible;
 				NativeMenuItem.Enabled = Command.Enabled;
 				NativeMenuItem.Title = Command.Text;
+				NativeMenuItem.State = Command.Checked ? NSCellStateValue.On : NSCellStateValue.Off;
 				if (Command.Shortcut.Main != Key.Unknown) {
 					NativeMenuItem.KeyEquivalent = GetKeyEquivalent(Command.Shortcut.Main);
 					NativeMenuItem.KeyEquivalentModifierMask = GetModifierMask(Command.Shortcut.Modifiers);

@@ -188,6 +188,8 @@ namespace Lime
 
 		public bool Checked { get; set; }
 
+		public bool EnableChecking { get; set; }
+
 		public event Action Issued;
 		public object UserData { get; set; }
 		public static readonly ICommand MenuSeparator = new Command();
@@ -237,6 +239,9 @@ namespace Lime
 		public void Issue()
 		{
 			wasIssued = true;
+			if (EnableChecking) {
+				Checked = !Checked;
+			}
 			Issued?.Invoke();
 		}
 

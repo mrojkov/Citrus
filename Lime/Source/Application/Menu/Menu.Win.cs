@@ -12,7 +12,19 @@ namespace Lime
 
 		private MenuStrip nativeMainMenu;
 		private ContextMenuStrip nativeContextMenu;
-
+		private bool displayCheckMark;
+		public bool DisplayCheckMark
+		{
+			get
+			{
+				return displayCheckMark;
+			}
+			set
+			{
+				displayCheckMark = value;
+				NativeContextMenu.ShowImageMargin = value;
+			}
+		}
 		internal MenuStrip NativeMainMenu
 		{
 			get
@@ -31,7 +43,7 @@ namespace Lime
 			{
 				if (nativeContextMenu == null) {
 					nativeContextMenu = new ContextMenuStrip {
-						ShowImageMargin = false
+						ShowImageMargin = DisplayCheckMark
 					};
 					UpdateNativeMenu(nativeContextMenu);
 				}
@@ -135,7 +147,11 @@ namespace Lime
 				NativeItem = new ToolStripSeparator();
 			} else {
 				NativeItem = new ToolStripMenuItem();
+				Command.Issued += () => {
+					((ToolStripMenuItem)NativeItem).Checked = Command.Checked;
+				};
 				NativeItem.Click += (s, e) => CommandQueue.Instance.Add((Command)Command);
+
 			}
 			Refresh();
 		}
@@ -156,6 +172,7 @@ namespace Lime
 			if (mi == null)
 				return;
 			mi.ShortcutKeys = ToNativeKeys(Command.Shortcut);
+			mi.Checked = Command.Checked;
 			if (Command.Menu != null) {
 				mi.DropDown = ((Menu)Command.Menu).NativeContextMenu;
 			} else {

@@ -57,7 +57,7 @@ namespace Tangerine.UI
 		public static readonly ICommand GroupContentsToMorphableMeshes = new Command("Group Contents To Morphable Meshes", new Shortcut(Modifiers.Command | Modifiers.Control, Key.M));
 		public static readonly ICommand ExportScene = new Command("Export Scene...");
 		public static readonly ICommand UpsampleAnimationTwice = new Command("Upsample Animation Twice");
-		public static readonly ICommand Overlays = new Command("Overlays");
+		public static readonly ICommand Overlays = new Command("Overlays") { EnableChecking = true };
 	}
 
 	public static class SceneViewCommands
@@ -71,9 +71,9 @@ namespace Tangerine.UI
 		public static readonly ICommand DragLeftFast = new Command(new Shortcut(Modifiers.Shift, Key.A));
 		public static readonly ICommand DragUpFast = new Command(new Shortcut(Modifiers.Shift, Key.W));
 		public static readonly ICommand DragDownFast = new Command(new Shortcut(Modifiers.Shift, Key.S));
-		public static readonly ICommand DisplayBones = new Command(new Shortcut(Modifiers.Control, Key.B));
-		public static readonly ICommand BindBones = new Command(new Shortcut(Modifiers.Control, Key.T));
-		public static readonly ICommand Duplicate = new Command(new Shortcut(Modifiers.Control, Key.D));
+		public static readonly ICommand DisplayBones = new Command("Display bones (3D)", new Shortcut(Modifiers.Command, Key.B)) { EnableChecking = true };
+		public static readonly ICommand BindBones = new Command("Bind bones", new Shortcut(Modifiers.Command, Key.T));
+		public static readonly ICommand Duplicate = new Command("Duplicate", new Shortcut(Modifiers.Command, Key.D)) { EnableChecking = true };
 	}
 
 	public static class Tools
