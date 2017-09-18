@@ -328,6 +328,11 @@ namespace Lime
 			DrawTextLine(font, position, text, color, fontHeight, 0, text.Length, letterSpacing);
 		}
 
+		public static Vector2 MeasureTextLine(string text, float fontHeight, float letterSpacing)
+		{
+			return MeasureTextLine(FontPool.Instance[null], text, fontHeight, 0, text.Length, letterSpacing);
+		}
+
 		public static Vector2 MeasureTextLine(IFont font, string text, float fontHeight, float letterSpacing)
 		{
 			return MeasureTextLine(font, text, fontHeight, 0, text.Length, letterSpacing);
