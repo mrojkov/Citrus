@@ -80,6 +80,8 @@ namespace Lime
 
 	public class FontPool
 	{
+		public const string DefaultFontDirectory = "Fonts/";
+		public const string DefaultFontName = "Default";
 		public IFont Null = new Font();
 		private Dictionary<string, IFont> fonts = new Dictionary<string, IFont>();
 
@@ -102,13 +104,13 @@ namespace Lime
 				if (FontNameChanger != null)
 					name = FontNameChanger(name);
 				if (string.IsNullOrEmpty(name))
-					name = "Default";
+					name = DefaultFontName;
 				IFont font;
 				if (fonts.TryGetValue(name, out font))
 					return font;
 				string[] fontExtensions = { ".tft", ".fnt" };
 				foreach (var e in fontExtensions) {
-					string path = "Fonts/" + name + e;
+					string path = DefaultFontDirectory + name + e;
 					if (!AssetBundle.Initialized || !AssetBundle.Instance.FileExists(path))
 						continue;
 					font = Serialization.ReadObject<Font>(path);
