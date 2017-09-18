@@ -264,6 +264,7 @@ namespace Tangerine
 						if (tab.Input.WasKeyReleased(Key.Mouse1)) {
 							var menu = new Menu {
 								GenericCommands.CloseDocument,
+								GenericCommands.Save,
 								FilesystemCommands.NavigateTo,
 								FilesystemCommands.OpenInSystemFileManager,
 							};
