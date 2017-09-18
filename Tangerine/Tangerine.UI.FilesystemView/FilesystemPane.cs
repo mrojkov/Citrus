@@ -14,14 +14,19 @@ namespace Tangerine.UI.FilesystemView
 		public static FilesystemPane Instance;
 		private Widget dockPanelWidget;
 		private Widget rootWidget;
+		private DockPanel dockPanel;
+		private List<FilesystemView> views = new List<FilesystemView>();
 
 		public FilesystemPane(DockPanel dockPanel)
 		{
 			Instance = this;
+			this.dockPanel = dockPanel;
 			dockPanelWidget = dockPanel.ContentWidget;
 			dockPanelWidget.AddChangeWatcher(() => Core.Project.Current.CitprojPath, (path) => {
 				Initialize();
 			});
+			CommandHandlerList.Global.Connect(FilesystemCommands.NavigateTo, HandleHavigateTo);
+			CommandHandlerList.Global.Connect(FilesystemCommands.OpenInSystemFileManager, HandleOpenInSystemFileManager);
 		}
 
 		private void Initialize()
@@ -40,6 +45,7 @@ namespace Tangerine.UI.FilesystemView
 				Widget w;
 				if (n is FSViewNode) {
 					var fsView = new FilesystemView();
+					views.Add(fsView);
 					w = fsView.RootWidget;
 					w.Components.Add(new ViewNodeComponent { ViewNode = n });
 					fsView.Initialize();
@@ -63,12 +69,13 @@ namespace Tangerine.UI.FilesystemView
 			rootWidget.SetFocus();
 		}
 
-		public static void Split(FilesystemView fsView, SplitterType type)
+		public void Split(FilesystemView fsView, SplitterType type)
 		{
 			var RootWidget = fsView.RootWidget;
 			FSViewNode vn = RootWidget.Components.Get<ViewNodeComponent>().ViewNode as FSViewNode;
 
 			var newFsView = new FilesystemView();
+			views.Add(newFsView);
 			var newVn = new FSViewNode {
 				Widget = newFsView.RootWidget,
 				Path = vn.Path,
@@ -143,8 +150,9 @@ namespace Tangerine.UI.FilesystemView
 
 		}
 
-		public static void Close(FilesystemView fsView)
+		public void Close(FilesystemView fsView)
 		{
+			views.Remove(fsView);
 			var RootWidget = fsView.RootWidget;
 			ViewNode vn = RootWidget.Components.Get<ViewNodeComponent>().ViewNode;
 
@@ -185,6 +193,52 @@ namespace Tangerine.UI.FilesystemView
 				}
 			} else {
 				// wat
+			}
+		}
+
+		private void HandleHavigateTo()
+		{
+			if (views.Count == 0) {
+				// In case we start Tangerine with FilesystemPane hidden we want to invoke above added task
+				// which calls initialize for the first time regardless of this pane being hidden or not.
+				dockPanelWidget.Update(0);
+			}
+			var view = views.First();
+			DockManager.Instance.ShowPanel(dockPanel);
+			var path = FilesystemCommands.NavigateTo.UserData as string;
+			var dir = Path.GetDirectoryName(path);
+			view.GoTo(dir);
+			// kind of force reaction to GoTo with Update(0)
+			view.RootWidget.Update(0);
+			view.SelectAsset(path);
+			FilesystemCommands.NavigateTo.UserData = null;
+		}
+
+		private void OpenInSystemFileManager(string path)
+		{
+#if WIN
+			System.Diagnostics.Process.Start("explorer.exe", "/select, \"" + path + "\"");
+#elif MAC
+			throw new NotImplementedException();
+#else
+			throw new NotImplementedException();
+#endif
+		}
+
+		private void HandleOpenInSystemFileManager()
+		{
+			var path = FilesystemCommands.OpenInSystemFileManager.UserData as string;
+			path = path.Replace('/', '\\');
+			var extension = Path.GetExtension(path);
+			if (string.IsNullOrEmpty(extension)) {
+				foreach (string f in Directory.GetFiles(Path.GetDirectoryName(path))) {
+					if (Path.ChangeExtension(f, null) == path && !f.EndsWith(".txt")) {
+						OpenInSystemFileManager(f);
+						break;
+					}
+				}
+			} else {
+				OpenInSystemFileManager(path);
 			}
 		}
 	}

@@ -208,7 +208,7 @@ namespace Tangerine.UI.FilesystemView
 			var fieldRootWidget = new Widget();
 			scrollView.Content.AddNode(fieldRootWidget);
 			// making sure to insert root into parent before adding nodes to root
-			// to avoid O(N^2) relayout lag once
+			// to avoid O(N^2) relayout lag once; bug (CIT-157)
 			fieldRootWidget.Layout = new VBoxLayout();
 			fieldRootWidget.Nodes.Add(
 				(headerWidget = new Widget {

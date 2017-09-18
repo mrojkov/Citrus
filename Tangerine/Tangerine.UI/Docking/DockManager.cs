@@ -106,7 +106,7 @@ namespace Tangerine.UI
 			return size / MainWindowWidget.Size;
 		}
 
-		void ShowPanel(DockPanel panel)
+		public void ShowPanel(DockPanel panel)
 		{
 			panel.Placement.Hidden = false;
 			Refresh();

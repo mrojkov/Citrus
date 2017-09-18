@@ -15,7 +15,7 @@ namespace Tangerine.UI
 		void SetFocus();
 		void DropFiles(IEnumerable<string> files);
 	}
-	
+
 	public interface IExpandableContent
 	{
 		Widget ExpandableContent { get; }
@@ -80,7 +80,7 @@ namespace Tangerine.UI
 		private void SetProperty(object obj, string propertyName, object value) => PropertyInfo.SetValue(obj, value);
 	}
 
-	
+
 	public class ExpandablePropertyEditor<T> : CommonPropertyEditor<T>, IExpandableContent
 	{
 		private bool expanded;
@@ -96,7 +96,7 @@ namespace Tangerine.UI
 		}
 		public Widget ExpandableContent { get; }
 		public ThemedExpandButton ExpandButton { get; }
-		
+
 		public ExpandablePropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
 			ExpandableContent = new ThemedFrame {
@@ -111,7 +111,7 @@ namespace Tangerine.UI
 				Padding =  new Thickness(5, 9),
 				Anchors = Anchors.Center,
 				Layout = new VBoxLayout {DefaultCell = new LayoutCell(Alignment.Center)},
-				Nodes = { ExpandButton } 
+				Nodes = { ExpandButton }
 			});
 		}
 	}
@@ -145,7 +145,7 @@ namespace Tangerine.UI
 				ContainerWidget.AddNode(PropertyLabel);
 			}
 		}
-		
+
 		IEnumerator<object> ManageLabelTask()
 		{
 			while (true) {
@@ -215,6 +215,36 @@ namespace Tangerine.UI
 			};
 			if (EditorParams.DefaultValueGetter != null) {
 				menu.Insert(0, resetToDefault);
+			}
+			if (EditorParams.Objects.Count == 1) {
+				var owner = EditorParams.Objects.First();
+				var value = CoalescedPropertyValue().GetValue();
+				var pi = EditorParams.PropertyInfo;
+				if (value != null) {
+					string path = null;
+					if (pi.PropertyType == typeof(ITexture)) {
+						path = (value as ITexture).SerializationPath;
+					} else if (pi.PropertyType == typeof(SerializableSample)) {
+						path = (value as SerializableSample).SerializationPath;
+					} else if (pi.PropertyType == typeof(SerializableFont)) {
+						var name = (value as SerializableFont).Name;
+						if (string.IsNullOrEmpty(name)) {
+							name = FontPool.DefaultFontName;
+						}
+						path = FontPool.DefaultFontDirectory + name;
+					} else if (owner is Movie && pi.Name == "Path") {
+						path = (owner as Movie).Path;
+					} else if (owner is Node && pi.Name == "ContentsPath") {
+						path = (owner as Node).ContentsPath;
+					}
+					if (!string.IsNullOrEmpty(path)) {
+						path = Path.Combine(Project.Current.AssetsDirectory, path);
+						FilesystemCommands.NavigateTo.UserData = path;
+						menu.Insert(0, FilesystemCommands.NavigateTo);
+						FilesystemCommands.OpenInSystemFileManager.UserData = path;
+						menu.Insert(0, FilesystemCommands.OpenInSystemFileManager);
+					}
+				}
 			}
 			menu.Popup();
 		}
@@ -968,15 +998,15 @@ namespace Tangerine.UI
 			}
 		}
 	}
-	
+
 	public class RenderTargetPropertyEditor :  EnumPropertyEditor<RenderTarget>
 	{
 		private const string SmallTexDesc = " (256x256)";
 		private const string MiddleTexDesc = " (512x512)";
 		private const string LargeTexDesc = " (1024x1024)";
-		
+
 		public RenderTargetPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
-		{	
+		{
 			Selector.Items[1].Text += SmallTexDesc;
 			Selector.Items[2].Text += SmallTexDesc;
 			Selector.Items[3].Text += MiddleTexDesc;

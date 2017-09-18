@@ -30,7 +30,7 @@ namespace Tangerine.UI.Inspector
 			Nodes.Add(image);
 			image.PostPresenter = new WidgetBoundsPresenter(ColorTheme.Current.Inspector.BorderAroundKeyframeColorbox);
 		}
-	}	
+	}
 
 	class KeyframeButtonBinding : ITaskProvider
 	{
@@ -68,7 +68,7 @@ namespace Tangerine.UI.Inspector
 				if (animable.Animators.TryFind(editorParams.PropertyName, out animator, Document.Current.AnimationId)) {
 					hasKey = animator.ReadonlyKeys.Any(i => i.Frame == Document.Current.AnimationFrame);
 					if (hasKey && !value) {
-						Core.Operations.RemoveKeyframe.Perform(animator, Document.Current.AnimationFrame); 
+						Core.Operations.RemoveKeyframe.Perform(animator, Document.Current.AnimationFrame);
 					}
 				}
 				if (!hasKey && value) {

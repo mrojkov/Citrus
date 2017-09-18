@@ -78,5 +78,5 @@ namespace Tangerine.UI.Inspector
 				Builder = builder;
 			}
 		}
-	}	
+	}
 }

@@ -36,12 +36,12 @@ namespace Tangerine.UI.FilesystemView
 
 		public void Split(SplitterType type)
 		{
-			FilesystemPane.Split(this, type);
+			FilesystemPane.Instance.Split(this, type);
 		}
 
 		public void Close()
 		{
-			FilesystemPane.Close(this);
+			FilesystemPane.Instance.Close(this);
 		}
 
 		public void GoBackward()
@@ -376,11 +376,12 @@ namespace Tangerine.UI.FilesystemView
 			}
 
 			typeNavigationTimeout -= dt;
+
 			if (scrollView.IsFocused()) {
 				ProcessTypingNavigation();
 
 				{ // other shortcuts
-					if (Cmds.Cancel.WasIssued()) {
+					if (FilesystemCommands.Cancel.WasIssued()) {
 						typeNavigationTimeout = typeNavigationInterval;
 						typeNavigationPrefix = string.Empty;
 					} else if (Window.Current.Input.WasKeyReleased(Key.Menu)) {
@@ -388,24 +389,24 @@ namespace Tangerine.UI.FilesystemView
 							Window.Current.Input.ConsumeKey(Key.Menu);
 							SystemShellContextMenu.Instance.Show(selection.ToArray(), lastKeyboardSelectedFilesystemItem.GlobalPosition);
 						}
-					} else if (Cmds.GoBack.WasIssued()) {
+					} else if (FilesystemCommands.GoBack.WasIssued()) {
 						GoBackward();
-					} else if (Cmds.GoForward.WasIssued()) {
+					} else if (FilesystemCommands.GoForward.WasIssued()) {
 						GoForward();
-					} else if (Cmds.GoUp.WasIssued() || Cmds.GoUpAlso.WasIssued()) {
+					} else if (FilesystemCommands.GoUp.WasIssued() || FilesystemCommands.GoUpAlso.WasIssued()) {
 						GoUp();
-					} else if (Cmds.Enter.WasIssued()) {
+					} else if (FilesystemCommands.Enter.WasIssued()) {
 						if (lastKeyboardSelectedFilesystemItem != null) {
 							Open(lastKeyboardSelectedFilesystemItem.FilesystemPath);
 						}
-					} else if (Cmds.EnterSpecial.WasIssued()) {
+					} else if (FilesystemCommands.EnterSpecial.WasIssued()) {
 						if (lastKeyboardSelectedFilesystemItem != null) {
 							OpenSpecial(lastKeyboardSelectedFilesystemItem.FilesystemPath);
 						}
 					} else if (Command.SelectAll.WasIssued()) {
 						selection.Clear();
 						selection.SelectRange(scrollView.Content.Nodes.Select(n => (n as FilesystemItem).FilesystemPath));
-					} else if (Cmds.ToggleSelection.WasIssued()) {
+					} else if (FilesystemCommands.ToggleSelection.WasIssued()) {
 						if (lastKeyboardRangeSelectionEndFilesystemItem != null) {
 							var path = lastKeyboardRangeSelectionEndFilesystemItem.FilesystemPath;
 							if (selection.Contains(path)) {
@@ -516,7 +517,7 @@ namespace Tangerine.UI.FilesystemView
 							selection.Select(path);
 						}
 						lastKeyboardRangeSelectionEndFilesystemItem = scrollView.Content.Nodes[newIndex] as FilesystemItem;
-						AssureFSItemVisible(lastKeyboardRangeSelectionEndFilesystemItem);
+						EnsureFSItemVisible(lastKeyboardRangeSelectionEndFilesystemItem);
 					}
 				} else {
 					if (!toggle) {
@@ -528,7 +529,7 @@ namespace Tangerine.UI.FilesystemView
 							selection.Clear();
 							selection.Select(path);
 							lastKeyboardRangeSelectionEndFilesystemItem = null;
-							AssureFSItemVisible(lastKeyboardSelectedFilesystemItem);
+							EnsureFSItemVisible(lastKeyboardSelectedFilesystemItem);
 						}
 					} else {
 						int selectionEndIndex = lastKeyboardRangeSelectionEndFilesystemItem != null
@@ -537,7 +538,7 @@ namespace Tangerine.UI.FilesystemView
 						int newIndex = selectionEndIndex + indexDelta;
 						if (newIndex >= 0 && newIndex <= maxIndex) {
 							lastKeyboardRangeSelectionEndFilesystemItem = scrollView.Content.Nodes[newIndex] as FilesystemItem;
-							AssureFSItemVisible(lastKeyboardRangeSelectionEndFilesystemItem);
+							EnsureFSItemVisible(lastKeyboardRangeSelectionEndFilesystemItem);
 							Window.Current.Invalidate();
 						}
 					}
@@ -545,89 +546,71 @@ namespace Tangerine.UI.FilesystemView
 			}
 		}
 
-		private void AssureFSItemVisible(FilesystemItem fsItem)
+		private void EnsureFSItemVisible(FilesystemItem fsItem)
 		{
 			var y = fsItem.CalcPositionInSpaceOf(scrollView).Y;
-			var offset = y + fsItem.Height - scrollView.Height;
+			EnsureRangeVisible(y, y + fsItem.Height);
+		}
+
+		private void EnsureSelectionVisible()
+		{
+			float minY = float.MaxValue;
+			float maxY = float.MinValue;
+			foreach (var n in scrollView.Content.Nodes) {
+				var fsItem = n as FilesystemItem;
+				if (selection.Contains(fsItem.FilesystemPath)) {
+					minY = Mathf.Min(minY, fsItem.CalcPositionInSpaceOf(scrollView).Y);
+					maxY = Mathf.Max(maxY, fsItem.CalcPositionInSpaceOf(scrollView).Y + fsItem.Height);
+				}
+			}
+			EnsureRangeVisible(minY, maxY);
+		}
+
+		private void EnsureRangeVisible(float min, float max)
+		{
+			var offset = max - scrollView.Height;
 			if (offset > 0.0f) {
 				scrollView.ScrollPosition += offset;
 			}
-			if (y < 0.0f) {
-				scrollView.ScrollPosition += y;
+			if (min < 0.0f) {
+				scrollView.ScrollPosition += min;
 			}
 			scrollView.ScrollPosition = Mathf.Clamp(scrollView.ScrollPosition, scrollView.MinScrollPosition, scrollView.MaxScrollPosition);
-		}
-
-		private static class Cmds
-		{
-			public static readonly ICommand Left = new Command(Key.Left);
-			public static readonly ICommand Right = new Command(Key.Right);
-			public static readonly ICommand Up = new Command(Key.Up);
-			public static readonly ICommand Down = new Command(Key.Down);
-			public static readonly ICommand PageUp = new Command(Key.PageUp);
-			public static readonly ICommand PageDown = new Command(Key.PageDown);
-			public static readonly ICommand Home = new Command(Key.Home);
-			public static readonly ICommand End = new Command(Key.End);
-			public static readonly ICommand SelectLeft = new Command(Modifiers.Shift, Key.Left);
-			public static readonly ICommand SelectRight = new Command(Modifiers.Shift, Key.Right);
-			public static readonly ICommand SelectUp = new Command(Modifiers.Shift, Key.Up);
-			public static readonly ICommand SelectDown = new Command(Modifiers.Shift, Key.Down);
-			public static readonly ICommand SelectPageUp = new Command(Modifiers.Shift, Key.PageUp);
-			public static readonly ICommand SelectPageDown = new Command(Modifiers.Shift, Key.PageDown);
-			public static readonly ICommand SelectHome = new Command(Modifiers.Shift, Key.Home);
-			public static readonly ICommand SelectEnd = new Command(Modifiers.Shift, Key.End);
-			public static readonly ICommand ToggleLeft = new Command(Modifiers.Command, Key.Left);
-			public static readonly ICommand ToggleRight = new Command(Modifiers.Command, Key.Right);
-			public static readonly ICommand ToggleUp = new Command(Modifiers.Command, Key.Up);
-			public static readonly ICommand ToggleDown = new Command(Modifiers.Command, Key.Down);
-			public static readonly ICommand TogglePageUp = new Command(Modifiers.Command, Key.PageUp);
-			public static readonly ICommand TogglePageDown = new Command(Modifiers.Command, Key.PageDown);
-			public static readonly ICommand ToggleHome = new Command(Modifiers.Command, Key.Home);
-			public static readonly ICommand ToggleEnd = new Command(Modifiers.Command, Key.End);
-			public static readonly ICommand Cancel = new Command(Key.Escape);
-			public static readonly ICommand Enter = new Command(Key.Enter);
-			public static readonly ICommand EnterSpecial = new Command(Modifiers.Command, Key.Enter);
-			public static readonly ICommand GoUp = new Command(Key.BackSpace);
-			// Also go up on Alt + Up
-			public static readonly ICommand GoUpAlso = new Command(Modifiers.Alt, Key.Up);
-			public static readonly ICommand GoBack = new Command(Modifiers.Alt, Key.Left);
-			public static readonly ICommand GoForward = new Command(Modifiers.Alt, Key.Right);
-			public static readonly ICommand ToggleSelection = new Command(Modifiers.Command, Key.Space);
 		}
 
 		static readonly List<List<ICommand>> navCommands = new List<List<ICommand>> {
 			// simple navigation
 			new List<ICommand> {
-				Cmds.Left,
-				Cmds.Right,
-				Cmds.Up,
-				Cmds.Down,
-				Cmds.PageUp,
-				Cmds.PageDown,
-				Cmds.Home,
-				Cmds.End,
+				FilesystemCommands.Left,
+				FilesystemCommands.Right,
+				FilesystemCommands.Up,
+				FilesystemCommands.Down,
+				FilesystemCommands.PageUp,
+				FilesystemCommands.PageDown,
+				FilesystemCommands.Home,
+				FilesystemCommands.End,
 			},
 			// Range-select (shift) navigation
 			new List<ICommand> {
-				Cmds.SelectLeft,
-				Cmds.SelectRight,
-				Cmds.SelectUp,
-				Cmds.SelectDown,
-				Cmds.SelectPageUp,
-				Cmds.SelectPageDown,
-				Cmds.SelectHome,
-				Cmds.SelectEnd,
+				FilesystemCommands.SelectLeft,
+				FilesystemCommands.SelectRight,
+				FilesystemCommands.SelectUp,
+				FilesystemCommands.SelectDown,
+				FilesystemCommands.SelectPageUp,
+				FilesystemCommands.SelectPageDown,
+				FilesystemCommands.SelectHome,
+				FilesystemCommands.SelectEnd,
 			},
 			// Toggle-select (hold ctrl, navigate, toggle with space)
 			new List<ICommand> {
-				Cmds.ToggleLeft,
-				Cmds.ToggleRight,
-				Cmds.ToggleUp,
-				Cmds.ToggleDown,
-				Cmds.TogglePageUp,
-				Cmds.TogglePageDown,
-				Cmds.ToggleHome,
-				Cmds.ToggleEnd,
+				FilesystemCommands.ToggleLeft,
+				FilesystemCommands.ToggleRight,
+				FilesystemCommands.ToggleUp,
+				FilesystemCommands.ToggleDown,
+				FilesystemCommands.TogglePageUp,
+				FilesystemCommands.TogglePageDown,
+				FilesystemCommands.ToggleHome,
+				FilesystemCommands.ToggleEnd,
 			},
 		};
 
@@ -637,15 +620,15 @@ namespace Tangerine.UI.FilesystemView
 			Key.Enumerate().Where(k => k.IsPrintable()).Select(i => new Command(new Shortcut(Modifiers.Shift, i)))).Union(
 				new[] {
 					Command.SelectAll,
-					Cmds.Cancel,
-					Cmds.Enter,
-					Cmds.GoUp,
-					Cmds.GoUpAlso,
-					Cmds.GoBack,
-					Cmds.GoForward,
-					Cmds.GoUpAlso,
-					Cmds.EnterSpecial,
-					Cmds.ToggleSelection,
+					FilesystemCommands.Cancel,
+					FilesystemCommands.Enter,
+					FilesystemCommands.GoUp,
+					FilesystemCommands.GoUpAlso,
+					FilesystemCommands.GoBack,
+					FilesystemCommands.GoForward,
+					FilesystemCommands.GoUpAlso,
+					FilesystemCommands.EnterSpecial,
+					FilesystemCommands.ToggleSelection,
 				}
 			).Union(
 				navCommands.SelectMany(i => i)
@@ -703,6 +686,21 @@ namespace Tangerine.UI.FilesystemView
 		public void ToggleCookingRules()
 		{
 			toggleCookingRules.Toggle();
+		}
+
+		public void SelectAsset(string path)
+		{
+			var dir = Path.GetDirectoryName(path);
+			path = path.Replace('/', '\\');
+			selection.Clear();
+			foreach (string f in Directory.GetFiles(dir)) {
+				if (Path.ChangeExtension(f, null).EndsWith(path)) {
+					selection.Select(f);
+				}
+			}
+			// Ensure children are layed out already
+			LayoutManager.Instance.Layout();
+			EnsureSelectionVisible();
 		}
 	}
 }

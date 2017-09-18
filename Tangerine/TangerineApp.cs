@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Lime;
 using Tangerine.Core;
@@ -244,6 +245,19 @@ namespace Tangerine
 					tab.AddChangeWatcher(() => doc.IsModified, _ => RefreshTabText(doc, tab));
 					tab.Clicked += doc.MakeCurrent;
 					tab.Closing += () => Project.Current.CloseDocument(doc);
+					tab.Updated += (dt) => {
+						if (tab.Input.WasKeyReleased(Key.Mouse1)) {
+							var menu = new Menu {
+								GenericCommands.CloseDocument,
+								FilesystemCommands.NavigateTo,
+								FilesystemCommands.OpenInSystemFileManager,
+							};
+							var path = Path.Combine(Project.Current.AssetsDirectory, doc.Path);
+							FilesystemCommands.NavigateTo.UserData = path;
+							FilesystemCommands.OpenInSystemFileManager.UserData = path;
+							menu.Popup();
+						}
+					};
 					tabBar.AddNode(tab);
 				}
 				tabBar.AddNode(new Widget { LayoutCell = new LayoutCell { StretchX = 0 } });

@@ -95,6 +95,50 @@ namespace Tangerine.UI
 		public static readonly ICommand FitToContent = new Command("Fit To Content") { Icon = IconPool.GetTexture("Tools.FitToContent") };
 	}
 
+	public static class FilesystemCommands
+	{
+		public static readonly ICommand Left = new Command(Key.Left);
+		public static readonly ICommand Right = new Command(Key.Right);
+		public static readonly ICommand Up = new Command(Key.Up);
+		public static readonly ICommand Down = new Command(Key.Down);
+		public static readonly ICommand PageUp = new Command(Key.PageUp);
+		public static readonly ICommand PageDown = new Command(Key.PageDown);
+		public static readonly ICommand Home = new Command(Key.Home);
+		public static readonly ICommand End = new Command(Key.End);
+		public static readonly ICommand SelectLeft = new Command(Modifiers.Shift, Key.Left);
+		public static readonly ICommand SelectRight = new Command(Modifiers.Shift, Key.Right);
+		public static readonly ICommand SelectUp = new Command(Modifiers.Shift, Key.Up);
+		public static readonly ICommand SelectDown = new Command(Modifiers.Shift, Key.Down);
+		public static readonly ICommand SelectPageUp = new Command(Modifiers.Shift, Key.PageUp);
+		public static readonly ICommand SelectPageDown = new Command(Modifiers.Shift, Key.PageDown);
+		public static readonly ICommand SelectHome = new Command(Modifiers.Shift, Key.Home);
+		public static readonly ICommand SelectEnd = new Command(Modifiers.Shift, Key.End);
+		public static readonly ICommand ToggleLeft = new Command(Modifiers.Command, Key.Left);
+		public static readonly ICommand ToggleRight = new Command(Modifiers.Command, Key.Right);
+		public static readonly ICommand ToggleUp = new Command(Modifiers.Command, Key.Up);
+		public static readonly ICommand ToggleDown = new Command(Modifiers.Command, Key.Down);
+		public static readonly ICommand TogglePageUp = new Command(Modifiers.Command, Key.PageUp);
+		public static readonly ICommand TogglePageDown = new Command(Modifiers.Command, Key.PageDown);
+		public static readonly ICommand ToggleHome = new Command(Modifiers.Command, Key.Home);
+		public static readonly ICommand ToggleEnd = new Command(Modifiers.Command, Key.End);
+		public static readonly ICommand Cancel = new Command(Key.Escape);
+		public static readonly ICommand Enter = new Command(Key.Enter);
+		public static readonly ICommand EnterSpecial = new Command(Modifiers.Command, Key.Enter);
+		public static readonly ICommand GoUp = new Command(Key.BackSpace);
+		// Also go up on Alt + Up
+		public static readonly ICommand GoUpAlso = new Command(Modifiers.Alt, Key.Up);
+		public static readonly ICommand GoBack = new Command(Modifiers.Alt, Key.Left);
+		public static readonly ICommand GoForward = new Command(Modifiers.Alt, Key.Right);
+		public static readonly ICommand ToggleSelection = new Command(Modifiers.Command, Key.Space);
+		public static readonly ICommand NavigateTo = new Command("Navigate to");
+#if WIN
+		private const string OpenInSystemFileManagerDescription = "Show in Explorer";
+#elif MAC
+		private const string OpenInSystemFileManagerDescription = "Show in Finder";
+#endif
+		public static readonly ICommand OpenInSystemFileManager = new Command(OpenInSystemFileManagerDescription);
+	}
+
 	public static class OrangeCommands
 	{
 		public static readonly ICommand Run = new Command("Run", new Shortcut(Key.F9));

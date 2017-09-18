@@ -47,7 +47,7 @@ namespace Tangerine.UI.Inspector
 			var provider = KeyframeDataflow.GetProvider(editorParams, i => i?.Function).DistinctUntilChanged();
 			var keyFunction = provider.GetDataflow();
 			while (true) {
-				KeyFunction? v; 
+				KeyFunction? v;
 				if (keyFunction.Poll(out v)) {
 					if ((button.Visible = v.HasValue)) {
 						button.SetKeyFunction(v.Value);
@@ -73,7 +73,7 @@ namespace Tangerine.UI.Inspector
 				if (animable.Animators.TryFind(editorParams.PropertyName, out animator, Document.Current.AnimationId)) {
 					var keyframe = animator.ReadonlyKeys.FirstOrDefault(i => i.Frame == Document.Current.AnimationFrame).Clone();
 					keyframe.Function = value;
-					Core.Operations.SetKeyframe.Perform(animable, editorParams.PropertyName, Document.Current.AnimationId, keyframe); 
+					Core.Operations.SetKeyframe.Perform(animable, editorParams.PropertyName, Document.Current.AnimationId, keyframe);
 				}
 			}
 		}

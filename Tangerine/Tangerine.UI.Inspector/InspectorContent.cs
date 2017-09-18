@@ -108,7 +108,7 @@ namespace Tangerine.UI.Inspector
 							var prop = type.GetProperty(property.Name);
 							return prop.GetValue(obj);
 						}
-						return null;	
+						return null;
 					}
 				};
 				foreach (var i in InspectorPropertyRegistry.Instance.Items) {
@@ -151,7 +151,7 @@ namespace Tangerine.UI.Inspector
 			editor.ContainerWidget.Padding = new Thickness { Left = 4, Top = 1, Right = 12, Bottom = 1 };
 			editor.ContainerWidget.CompoundPresenter.Add(new WidgetFlatFillPresenter(
 				row % 2 == 0 ?
-				ColorTheme.Current.Inspector.StripeBackground1 : 
+				ColorTheme.Current.Inspector.StripeBackground1 :
 				ColorTheme.Current.Inspector.StripeBackground2
 			) { IgnorePadding = true });
 		}
