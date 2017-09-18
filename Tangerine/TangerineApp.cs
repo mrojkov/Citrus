@@ -227,11 +227,26 @@ namespace Tangerine
 
 		class DocumentTabsProcessor
 		{
+			private TabBar tabBar;
 			public DocumentTabsProcessor(TabBar tabBar)
 			{
+				tabBar.HitTestTarget = true;
+				this.tabBar = tabBar;
+				DockManager.Instance.FilesDropped += DropFiles;
 				RebuildTabs(tabBar);
 				tabBar.AddChangeWatcher(() => Project.Current.Documents.Version, _ => RebuildTabs(tabBar));
 				tabBar.AddChangeWatcher(() => Project.Current, _ => RebuildTabs(tabBar));
+			}
+
+			private void DropFiles(IEnumerable<string> obj)
+			{
+				if (tabBar.IsMouseOverThisOrDescendant()) {
+					foreach (var path in obj) {
+						if (path.EndsWith(".scene") || path.EndsWith(".tan")) {
+							Project.Current.OpenDocument(path);
+						}
+					}
+				}
 			}
 
 			private void RebuildTabs(TabBar tabBar)
