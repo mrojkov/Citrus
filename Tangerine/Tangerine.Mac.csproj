@@ -145,7 +145,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Cursors\Rotate.png" />
+    <EmbeddedResource Include="Resources\Cursors\rotate.png" />
     <EmbeddedResource Include="Resources\SegoeUIRegular.ttf" />
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Audio.png" />
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Bone.png" />
@@ -244,8 +244,7 @@
     <EmbeddedResource Include="Resources\Icons\Timeline\AnimationDisabled.png" />
     <EmbeddedResource Include="Resources\Icons\Timeline\Empty.png" />
     <EmbeddedResource Include="Resources\Icons\SceneView\Round.png" />
-    <EmbeddedResource Include="Resources\Icons\Tools\Pipette.png" />
-    <EmbeddedResource Include="Resources\Icons\SceneView\Play.png" />
+    <EmbeddedResource Include="Resources\Icons\Timeline\Curve.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PreferencesDialog\" />

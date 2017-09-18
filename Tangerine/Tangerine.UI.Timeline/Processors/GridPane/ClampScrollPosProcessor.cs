@@ -14,7 +14,7 @@ namespace Tangerine.UI.Timeline
 		{
 			var doc = Document.Current;
 			while (true) {
-				var maxScrollPos = new Vector2(float.MaxValue, Math.Max(0, timeline.Grid.ContentSize.Y - timeline.Grid.Size.Y));
+				var maxScrollPos = new Vector2(float.MaxValue, Math.Max(0, timeline.Roll.ContentWidget.Height - timeline.Roll.RootWidget.Height));
 				timeline.Offset = Vector2.Clamp(timeline.Offset, Vector2.Zero, maxScrollPos);
 				yield return null;
 			}

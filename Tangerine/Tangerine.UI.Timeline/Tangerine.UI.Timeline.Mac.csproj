@@ -60,7 +60,6 @@
     <Compile Include="Processors\GridPane\DragKeyframesRespondentProcessor.cs" />
     <Compile Include="Processors\GridPane\GridMouseScrollProcessor.cs" />
     <Compile Include="Processors\GridPane\HasKeyframeRespondentProcessor.cs" />
-    <Compile Include="Processors\GridPane\ResizeGridCurveViewProcessor.cs" />
     <Compile Include="Processors\GridPane\SelectAndDragKeyframesProcessor.cs" />
     <Compile Include="Processors\OverviewPane\OverviewScrollProcessor.cs" />
     <Compile Include="Processors\RollPane\RollMouseScrollProcessor.cs" />
@@ -79,10 +78,8 @@
     <Compile Include="Components\HasKeyframeRequest.cs" />
     <Compile Include="MarkerPropertiesDialog.cs" />
     <Compile Include="Processors\Rulerbar\RulerbarMouseScrollProcessor.cs" />
-    <Compile Include="Components\GridCurveView.cs" />
     <Compile Include="Components\GridNodeView.cs" />
     <Compile Include="Components\GridPropertyView.cs" />
-    <Compile Include="Components\RollCurveView.cs" />
     <Compile Include="Components\RollNodeView.cs" />
     <Compile Include="Components\RollPropertyView.cs" />
     <Compile Include="Components\GridSpanList.cs" />
@@ -103,6 +100,9 @@
     <Compile Include="UserPreferences.cs" />
     <Compile Include="Operations\DeselectGridSpan.cs" />
     <Compile Include="Components\GridAudioView.cs" />
+    <Compile Include="CurveEditorPane.cs" />
+    <Compile Include="Processors\CurveEditor\VerticalZoomProcessor.cs" />
+    <Compile Include="Processors\CurveEditor\PanProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tangerine.Core\Tangerine.Core.Mac.csproj">
@@ -127,6 +127,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Processors\Rulerbar\" />
+    <Folder Include="Processors\CurveEditor\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
 </Project>

@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using Lime;
-using Tangerine.UI.Timeline.Operations;
 
 namespace Tangerine.UI.Timeline
 {
 	public class MouseWheelProcessor : Core.ITaskProvider
 	{
-		Timeline timeline => Timeline.Instance;
+		readonly Timeline timeline;
+
+		public MouseWheelProcessor(Timeline timeline) { this.timeline = timeline; }
 
 		public IEnumerator<object> Task()
 		{
@@ -19,6 +20,7 @@ namespace Tangerine.UI.Timeline
 				gridHandler.MoveNext();
 				overviewHandler.MoveNext();
 				HandleCellsMagnification(timeline.Grid.RootWidget.Input);
+				HandleCellsMagnification(timeline.CurveEditor.MainAreaWidget.Input);
 				yield return null;
 			}
 		}

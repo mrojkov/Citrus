@@ -17,6 +17,9 @@ namespace Tangerine.UI.Timeline
 		public float ColWidth { get; set; } = 15;
 
 		[YuzuRequired]
+		public bool EditCurves { get; set; } = true;
+
+		[YuzuRequired]
 		public List<float> TimelineVSplitterStretches = new List<float>();
 
 		[YuzuRequired]

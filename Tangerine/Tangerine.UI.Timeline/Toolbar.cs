@@ -16,12 +16,13 @@ namespace Tangerine.UI.Timeline
 				Padding = new Thickness(2, 0),
 				MinMaxHeight = Metrics.ToolbarHeight,
 				MinWidth = TimelineMetrics.ToolbarMinWidth,
-				Presenter = new DelegatePresenter<Widget>(Render),
+				Presenter = new WidgetFlatFillPresenter(ColorTheme.Current.Toolbar.Background),
 				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center) },
 				Nodes = {
 					CreateAnimationModeButton(),
 					CreateAutoKeyframesButton(),
 					CreateNewFolderButton(),
+					CreateCurveEditorButton(),
 					CreateAnimationIndicator(),
 					new Widget(),
 					CreateExitButton(),
@@ -32,19 +33,21 @@ namespace Tangerine.UI.Timeline
 			};
 		}
 
-		void Render(Widget widget)
-		{
-			widget.PrepareRendererState();
-			Renderer.DrawRect(Vector2.Zero, widget.Size, ColorTheme.Current.Toolbar.Background);
-		}
+		UserPreferences UserPreferences => Core.UserPreferences.Instance.Get<UserPreferences>();
 
 		ToolbarButton CreateAnimationModeButton()
 		{
 			var button = new ToolbarButton(IconPool.GetTexture("Timeline.AnimationMode")) { Tip = "Animation mode" };
-			button.AddChangeWatcher(() => Core.UserPreferences.Instance.Get<UserPreferences>().AnimationMode, i => button.Checked = i);
-			button.Clicked += () => {
-				Core.UserPreferences.Instance.Get<UserPreferences>().AnimationMode = !Core.UserPreferences.Instance.Get<UserPreferences>().AnimationMode;
-			};
+			button.AddChangeWatcher(() => UserPreferences.AnimationMode, i => button.Checked = i);
+			button.Clicked += () => UserPreferences.AnimationMode = !UserPreferences.AnimationMode;
+			return button;
+		}
+
+		ToolbarButton CreateCurveEditorButton()
+		{
+			var button = new ToolbarButton(IconPool.GetTexture("Timeline.Curve")) { Tip = "Edit curves" };
+			button.AddChangeWatcher(() => UserPreferences.EditCurves, i => button.Checked = i);
+			button.Clicked += () => UserPreferences.EditCurves = !UserPreferences.EditCurves;
 			return button;
 		}
 
@@ -65,10 +68,8 @@ namespace Tangerine.UI.Timeline
 		ToolbarButton CreateAutoKeyframesButton()
 		{
 			var button = new ToolbarButton(IconPool.GetTexture("Timeline.Key")) { Tip = "Automatic keyframes" };
-			button.AddChangeWatcher(() => Core.UserPreferences.Instance.Get<UserPreferences>().AutoKeyframes, i => button.Checked = i);
-			button.Clicked += () => {
-				Core.UserPreferences.Instance.Get<UserPreferences>().AutoKeyframes = !Core.UserPreferences.Instance.Get<UserPreferences>().AutoKeyframes;
-			};
+			button.AddChangeWatcher(() => UserPreferences.AutoKeyframes, i => button.Checked = i);
+			button.Clicked += () => UserPreferences.AutoKeyframes = !UserPreferences.AutoKeyframes;
 			return button;
 		}
 

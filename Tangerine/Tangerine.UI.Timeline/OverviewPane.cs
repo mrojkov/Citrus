@@ -47,7 +47,7 @@ namespace Tangerine.UI.Timeline
 			var veilColor = ColorTheme.Current.TimelineOverview.Veil;
 			var zoom = ContentWidget.Scale;
 			var a = Vector2.Floor(timeline.Offset * zoom);
-			var b = a + Vector2.Floor(timeline.Grid.Size * zoom);
+			var b = a + Vector2.Floor(new Vector2(timeline.Ruler.RootWidget.Width, timeline.Roll.RootWidget.Height) * zoom);
 			b = Vector2.Min(size, b);
 			Renderer.DrawRect(0, 0, a.X, size.Y, veilColor);
 			Renderer.DrawRect(b.X, 0, size.X, size.Y, veilColor);

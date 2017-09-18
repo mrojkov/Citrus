@@ -7,7 +7,8 @@ namespace Tangerine.UI.Timeline
 {
 	public class ColumnCountUpdater : SymmetricOperationProcessor
 	{
-		private const int ExtraFramesCount = 100;
+		const int ExtraFramesCount = 100;
+
 		public override void Process(IOperation op)
 		{
 			var timeline = Timeline.Instance;
@@ -25,7 +26,7 @@ namespace Tangerine.UI.Timeline
 					maxColumn = Math.Max(maxMarkerColumn, maxAnimatorColumn);
 				}
 			}
-			var maxVisibleColumn = ((timeline.OffsetX + timeline.Grid.Size.X) / TimelineMetrics.ColWidth).Ceiling();
+			var maxVisibleColumn = ((timeline.OffsetX + timeline.Ruler.RootWidget.Width) / TimelineMetrics.ColWidth).Ceiling();
 			timeline.ColumnCount = Math.Max(maxColumn + 1, maxVisibleColumn);
 		}
 	}

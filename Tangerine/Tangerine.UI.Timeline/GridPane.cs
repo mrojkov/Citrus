@@ -8,7 +8,7 @@ namespace Tangerine.UI.Timeline
 {
 	public class GridPane
 	{
-		Timeline timeline => Timeline.Instance;
+		readonly Timeline timeline;
 
 		public readonly Widget RootWidget;
 		public readonly Widget ContentWidget;
@@ -17,8 +17,10 @@ namespace Tangerine.UI.Timeline
 		public Vector2 Size => RootWidget.Size;
 		public Vector2 ContentSize => ContentWidget.Size;
 
-		public GridPane()
+		public GridPane(Timeline timeline)
 		{
+			this.timeline = timeline;
+			timeline.OffsetChanged += value => ContentWidget.Position = -value;
 			RootWidget = new Frame {
 				Id = nameof(GridPane),
 				Layout = new StackLayout { HorizontallySizeable = true, VerticallySizeable = true },
@@ -87,11 +89,6 @@ namespace Tangerine.UI.Timeline
 				ColorTheme.Current.TimelineRuler.Cursor);
 		}
 
-		public void SetOffset(Vector2 value)
-		{
-			ContentWidget.Position = -value;
-		}
-		
 		void RenderSelection(Widget widget)
 		{
 			RenderSelection(widget, IntVector2.Zero);

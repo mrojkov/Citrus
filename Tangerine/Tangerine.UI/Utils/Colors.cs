@@ -52,6 +52,11 @@ namespace Tangerine.UI
 			public Color4 WaveformBackground;
 		}
 
+		public class TimelineCurveEditorColors
+		{
+			public Color4[] Curves;
+		}
+
 		public class TimelineRulerColors
 		{
 			public Color4 Notchings;
@@ -102,6 +107,7 @@ namespace Tangerine.UI
 		public ToolbarColors Toolbar;
 		public SceneViewColors SceneView;
 		public TimelineGridColors TimelineGrid;
+		public TimelineCurveEditorColors TimelineCurveEditor;
 		public TimelineRulerColors TimelineRuler;
 		public TimelineOverviewColors TimelineOverview;
 		public TimelineRollColors TimelineRoll;
@@ -155,6 +161,9 @@ namespace Tangerine.UI
 				WaveformColor = new Color4(170, 255, 140),
 				WaveformBackground = new Color4(160, 160, 220, 60)
 			};
+			var timelineCurveEditor = new TimelineCurveEditorColors {
+				Curves = new[] { Color4.Red, Color4.Green, Color4.Blue, Color4.Yellow }
+			};
 			var timelineRuler = new TimelineRulerColors {
 				Notchings = timelineGrid.Lines,
 				JumpMarker = new Color4(209, 206, 0),
@@ -196,6 +205,7 @@ namespace Tangerine.UI
 				Toolbar = toolbar,
 				SceneView = sceneView,
 				TimelineGrid = timelineGrid,
+				TimelineCurveEditor = timelineCurveEditor,
 				TimelineRuler = timelineRuler,
 				TimelineOverview = timelineOverview,
 				TimelineRoll = timelineRoll,
@@ -249,6 +259,9 @@ namespace Tangerine.UI
 				WaveformColor = new Color4(140, 170, 255),
 				WaveformBackground = new Color4(255, 200, 140, 60)
 			};
+			var timelineCurveEditor = new TimelineCurveEditorColors {
+				Curves = new[] { Color4.Red, Color4.Green, Color4.Blue, Color4.Yellow }
+			};
 			var timelineRuler = new TimelineRulerColors {
 				Notchings = timelineGrid.Lines,
 				JumpMarker = Color4.Yellow,
@@ -290,6 +303,7 @@ namespace Tangerine.UI
 				Toolbar = toolbar,
 				SceneView = sceneView,
 				TimelineGrid = timelineGrid,
+				TimelineCurveEditor = timelineCurveEditor,
 				TimelineRuler = timelineRuler,
 				TimelineOverview = timelineOverview,
 				TimelineRoll = timelineRoll,

@@ -4,7 +4,6 @@ using Lime;
 using Tangerine.Core;
 using System.Collections.Generic;
 using Tangerine.UI.Timeline.Components;
-using Tangerine.Core.Components;
 
 namespace Tangerine.UI.Timeline
 {
@@ -16,6 +15,7 @@ namespace Tangerine.UI.Timeline
 		public readonly Rulerbar Ruler;
 		public readonly OverviewPane Overview;
 		public readonly GridPane Grid;
+		public readonly CurveEditorPane CurveEditor;
 		public readonly RollPane Roll;
 		public readonly Widget PanelWidget;
 		public readonly DockPanel Panel;
@@ -63,10 +63,10 @@ namespace Tangerine.UI.Timeline
 			Toolbar = new Toolbar();
 			Ruler = new Rulerbar();
 			Overview = new OverviewPane();
-			Grid = new GridPane();
+			Grid = new GridPane(this);
+			CurveEditor = new CurveEditorPane(this);
 			Roll = new RollPane();
 			RootWidget = new Widget();
-			OffsetChanged += v => Grid.SetOffset(v);
 			CreateProcessors();
 			InitializeWidgets();
 		}
@@ -111,12 +111,20 @@ namespace Tangerine.UI.Timeline
 								}
 							},
 							new Widget {
-								Layout = new VBoxLayout(),
+								Layout = new HBoxLayout(),
 								Nodes = {
-									Ruler.RootWidget,
-									Grid.RootWidget,
+									new Widget { MinMaxWidth = 0 },
+									new Frame {
+										ClipChildren = ClipMethod.ScissorTest,
+										Layout = new VBoxLayout(),
+										Nodes = {
+											Ruler.RootWidget,
+											Grid.RootWidget,
+											CurveEditor.RootWidget,
+										}
+									},
 								}
-							},
+							}
 						}
 					}
 				}
@@ -126,9 +134,9 @@ namespace Tangerine.UI.Timeline
 		void CreateProcessors()
 		{
 			RootWidget.LateTasks.Add(
+				ShowCurveEditorTask(),
 				new OverviewScrollProcessor(),
-				new MouseWheelProcessor(),
-				new ResizeGridCurveViewProcessor(),
+				new MouseWheelProcessor(this),
 				new RollMouseScrollProcessor(),
 				new SelectAndDragKeyframesProcessor(),
 				new HasKeyframeRespondentProcessor(),
@@ -156,10 +164,28 @@ namespace Tangerine.UI.Timeline
 			});
 		}
 
+		ITaskProvider ShowCurveEditorTask()
+		{
+			var editCurvesProp = new Property<bool>(() => Core.UserPreferences.Instance.Get<UserPreferences>().EditCurves);
+			return new Property<Row>(FirstSelectedRow).Coalesce(editCurvesProp).WhenChanged(t => {
+				var row = t.Item1;
+				var showCurves = 
+					Core.UserPreferences.Instance.Get<UserPreferences>().EditCurves &&
+					row != null && CurveEditorPane.CanEditRow(row);
+				CurveEditor.RootWidget.Visible = showCurves;
+				Grid.RootWidget.Visible = !showCurves;
+				if (showCurves) {
+					CurveEditor.EditRow(row);
+				}
+			});
+		}
+
+		Row FirstSelectedRow() => Document.Current.SelectedRows().FirstOrDefault();
+
 		public void EnsureColumnVisible(int column)
 		{
-			if ((column + 1) * TimelineMetrics.ColWidth - Offset.X >= Grid.RootWidget.Width) {
-				OffsetX = (column + 1) * TimelineMetrics.ColWidth - Grid.RootWidget.Width;
+			if ((column + 1) * TimelineMetrics.ColWidth - Offset.X >= Ruler.RootWidget.Width) {
+				OffsetX = (column + 1) * TimelineMetrics.ColWidth - Ruler.RootWidget.Width;
 			}
 			if (column * TimelineMetrics.ColWidth < Offset.X) {
 				OffsetX = Math.Max(0, column * TimelineMetrics.ColWidth);
@@ -168,9 +194,9 @@ namespace Tangerine.UI.Timeline
 
 		public void EnsureRowVisible(Row row)
 		{
-			var gw = row.GridWidget();
-			if (gw.Bottom() > Offset.Y + Grid.Size.Y) {
-				OffsetY = gw.Bottom() - Grid.Size.Y;
+			var gw = row.RollWidget();
+			if (gw.Bottom() > Offset.Y + Roll.RootWidget.Height) {
+				OffsetY = gw.Bottom() - Roll.RootWidget.Height;
 			}
 			if (gw.Top() < Offset.Y) {
 				OffsetY = Math.Max(0, gw.Y);
@@ -180,18 +206,19 @@ namespace Tangerine.UI.Timeline
 		public bool IsColumnVisible(int col)
 		{
 			var pos = col * TimelineMetrics.ColWidth - Offset.X;
-			return pos >= 0 && pos < Grid.Size.X;
+			return pos >= 0 && pos < Ruler.RootWidget.Width;
 		}
 
 		public bool IsRowVisible(int row)
 		{
-			var pos = Document.Current.Rows[row].GridWidget().Top() - Offset.Y;
-			return pos >= 0 && pos < Grid.Size.Y;
+			var pos = Document.Current.Rows[row].RollWidget().Top() - Offset.Y;
+			return pos >= 0 && pos < Roll.RootWidget.Height;
 		}
 	}
 
 	public static class RowExtensions
 	{
 		public static Widget GridWidget(this Row row) => row.Components.Get<RowView>()?.GridRow.GridWidget;
+		public static Widget RollWidget(this Row row) => row.Components.Get<RowView>()?.RollRow.Widget;
 	}
 }
