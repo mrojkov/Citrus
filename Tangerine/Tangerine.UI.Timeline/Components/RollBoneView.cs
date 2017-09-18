@@ -23,7 +23,7 @@ namespace Tangerine.UI.Timeline
 				Visible = true,
 				Nodes = { contentExpandButton }
 			};
-			Widget.Nodes.Insert(1, contentExpandButtonContainer);
+			Widget.Nodes.Insert(2, contentExpandButtonContainer);
 		}
 
 		ToolbarButton CreateContentExpandButton()

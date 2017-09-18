@@ -74,6 +74,13 @@ namespace Tangerine.UI
 			public Color4 Lines;
 			public Color4 GrayedLabel;
 			public Color4 DragCursor;
+			public Color4 BlueMark;
+			public Color4 RedMark;
+			public Color4 GreenMark;
+			public Color4 OrangeMark;
+			public Color4 YellowMark;
+			public Color4 VioletMark;
+			public Color4 GrayMark;
 		}
 
 		public class DockingColors
@@ -164,7 +171,14 @@ namespace Tangerine.UI
 			var timelineRoll = new TimelineRollColors {
 				Lines = timelineGrid.Lines,
 				GrayedLabel = Theme.Colors.BlackText.Darken(0.5f),
-				DragCursor = new Color4(254, 170, 24)
+				DragCursor = new Color4(254, 170, 24),
+				BlueMark = new Color4(0, 255, 255).Darken(0.15f),
+				RedMark = Color4.Red.Darken(0.15f),
+				GreenMark = Color4.Green.Darken(0.15f),
+				OrangeMark = Color4.Orange.Darken(0.15f),
+				YellowMark = Color4.Yellow.Darken(0.15f),
+				VioletMark = new Color4(238, 130, 238).Darken(0.15f),
+				GrayMark = Color4.Gray.Darken(0.15f),
 			};
 			var docking = new DockingColors {
 				DragRectagleOutline = new Color4(0, 255, 255),
@@ -251,7 +265,14 @@ namespace Tangerine.UI
 			var timelineRoll = new TimelineRollColors {
 				Lines = timelineGrid.Lines,
 				GrayedLabel = Theme.Colors.BlackText.Lighten(0.5f),
-				DragCursor = Color4.Black
+				DragCursor = Color4.Black,
+				BlueMark = new Color4(0, 255, 255),
+				RedMark = Color4.Red,
+				GreenMark = Color4.Green,
+				OrangeMark = Color4.Orange,
+				YellowMark = Color4.Yellow,
+				VioletMark = new Color4(238, 130, 238),
+				GrayMark = Color4.Gray,
 			};
 			var docking = new DockingColors {
 				DragRectagleOutline = Color4.FromFloats(0.2f, 0.2f, 1f),

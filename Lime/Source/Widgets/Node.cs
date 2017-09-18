@@ -77,7 +77,10 @@ namespace Lime
 		ChildrenExpanded = 16,
 		HiddenOnExposition = 32,
 		IgnoreMarkers = 64,
-		DisplayContent = 128
+		DisplayContent = 128,
+		ColorBit1 = 256,
+		ColorBit2 = 512,
+		ColorBit3 = 1024,
 	}
 
 	public delegate void UpdateHandler(float delta);
