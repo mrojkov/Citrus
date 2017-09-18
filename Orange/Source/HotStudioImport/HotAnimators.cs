@@ -296,7 +296,7 @@ namespace Orange
 					frame = zoomKey.Frame;
 					keyFunction = zoomKey.Function;
 					zoom = (float)zoomKey.Value;
-					aspectRatio = aspectRatioAnimator?.Value(AnimationUtils.FramesToSeconds(frame)) ?? aspectRatio;
+					aspectRatio = aspectRatioAnimator?.CalcValue(AnimationUtils.FramesToSeconds(frame)) ?? aspectRatio;
 					zoomAnimatorIndex++;
 					break;
 				case 0:
@@ -311,7 +311,7 @@ namespace Orange
 					frame = aspectRatioKey.Frame;
 					keyFunction = aspectRatioKey.Function;
 					aspectRatio = (float)aspectRatioKey.Value;
-					zoom = zoomAnimator?.Value(AnimationUtils.FramesToSeconds(frame)) ?? zoom;
+					zoom = zoomAnimator?.CalcValue(AnimationUtils.FramesToSeconds(frame)) ?? zoom;
 					aspectRatioAnimatorIndex++;
 					break;
 				default: throw new InvalidOperationException();

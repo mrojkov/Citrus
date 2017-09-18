@@ -127,26 +127,14 @@ namespace Lime
 			Setter = (SetterDelegate)Delegate.CreateDelegate(typeof(SetterDelegate), owner, mi);
 		}
 
-		public T Value(double time)
+		protected virtual T Interpolate(float t, Keyframe<T> a, Keyframe<T> b)
 		{
-			var oldSetter = Setter;
-			T value = default(T);
-			Setter = (v) => {
-				value = v;
-			};
-			Apply(time);
-			Setter = oldSetter;
-			return value;
+			return a.Value;
 		}
 
-		protected virtual void InterpolateAndSet(float t, Keyframe<T> a, Keyframe<T> b)
+		protected virtual T Interpolate(float t, Keyframe<T> a, Keyframe<T> b, Keyframe<T> c, Keyframe<T> d)
 		{
-			Setter(a.Value);
-		}
-
-		protected virtual void InterpolateAndSet(float t, Keyframe<T> a, Keyframe<T> b, Keyframe<T> c, Keyframe<T> d)
-		{
-			InterpolateAndSet(t, b, c);
+			return Interpolate(t, b, c);
 		}
 
 		public void Clear()
@@ -167,11 +155,14 @@ namespace Lime
 
 		public void Apply(double time)
 		{
-			if (!Enabled)
-				return;
+			if (Enabled && ReadonlyKeys.Count > 0) {
+				Setter(CalcValue(time));
+			}
+		}
+
+		public T CalcValue(double time)
+		{
 			int count = ReadonlyKeys.Count;
-			if (count == 0)
-				return;
 			if (currentKey >= count) {
 				currentKey = count - 1;
 			}
@@ -182,38 +173,30 @@ namespace Lime
 			while (currentKey >= 0 && frame < ReadonlyKeys[currentKey].Frame)
 				currentKey--;
 			if (currentKey < 0) {
-				Setter(ReadonlyKeys[0].Value);
 				currentKey = 0;
-			} else if (currentKey == count - 1) {
-				Setter(ReadonlyKeys[count - 1].Value);
-			} else {
-				ApplyHelper(time);
+				return ReadonlyKeys[0].Value;
 			}
-		}
-
-		private void ApplyHelper(double time)
-		{
+			if (currentKey == count - 1) {
+				return ReadonlyKeys[count - 1].Value;
+			}
 			int i = currentKey;
 			var key1 = ReadonlyKeys[i];
-			KeyFunction function = key1.Function;
+			var function = key1.Function;
 			if (function == KeyFunction.Steep || !IsInterpolable()) {
-				Setter(key1.Value);
-				return;
+				return key1.Value;
 			}
 			var key2 = ReadonlyKeys[i + 1];
 			var t = (float)(time * AnimationUtils.FramesPerSecond - key1.Frame) / (key2.Frame - key1.Frame);
 			if (function == KeyFunction.Linear) {
-				InterpolateAndSet(t, key1, key2);
+				return Interpolate(t, key1, key2);
 			} else if (function == KeyFunction.Spline) {
-				int count = ReadonlyKeys.Count;
 				var key0 = ReadonlyKeys[i < 1 ? 0 : i - 1];
 				var key3 = ReadonlyKeys[i + 1 >= count - 1 ? count - 1 : i + 2];
-				InterpolateAndSet(t, key0, key1, key2, key3);
-			} else if (function == KeyFunction.ClosedSpline) {
-				int count = ReadonlyKeys.Count;
+				return Interpolate(t, key0, key1, key2, key3);
+			} else { // KeyFunction.ClosedSpline
 				var key0 = ReadonlyKeys[i < 1 ? count - 2 : i - 1];
 				var key3 = ReadonlyKeys[i + 1 >= count - 1 ? 1 : i + 2];
-				InterpolateAndSet(t, key0, key1, key2, key3);
+				return Interpolate(t, key0, key1, key2, key3);
 			}
 		}
 
@@ -225,107 +208,89 @@ namespace Lime
 			}
 		}
 
-		protected virtual bool IsInterpolable()
-		{
-			return false;
-		}
+		protected virtual bool IsInterpolable() => false;
 	}
 
 	public class Vector2Animator : Animator<Vector2>
 	{
-		protected override bool IsInterpolable()
+		protected override bool IsInterpolable() => true;
+
+		protected override Vector2 Interpolate(float t, Keyframe<Vector2> a, Keyframe<Vector2> b)
 		{
-			return true;
+			Vector2 r;
+			r.X = a.Value.X + (b.Value.X - a.Value.X) * t;
+			r.Y = a.Value.Y + (b.Value.Y - a.Value.Y) * t;
+			return r;
 		}
 
-		protected override void InterpolateAndSet(float t, Keyframe<Vector2> a, Keyframe<Vector2> b)
+		protected override Vector2 Interpolate(float t, Keyframe<Vector2> a, Keyframe<Vector2> b, Keyframe<Vector2> c, Keyframe<Vector2> d)
 		{
-			Setter(Vector2.Lerp(t, a.Value, b.Value));
-		}
-
-		protected override void InterpolateAndSet(float t, Keyframe<Vector2> a, Keyframe<Vector2> b, Keyframe<Vector2> c, Keyframe<Vector2> d)
-		{
-			Setter(Mathf.CatmullRomSpline(t, a.Value, b.Value, c.Value, d.Value));
+			return Mathf.CatmullRomSpline(t, a.Value, b.Value, c.Value, d.Value);
 		}
 	}
 
 	public class Vector3Animator : Animator<Vector3>
 	{
-		protected override bool IsInterpolable()
+		protected override bool IsInterpolable() => true;
+
+		protected override Vector3 Interpolate(float t, Keyframe<Vector3> a, Keyframe<Vector3> b)
 		{
-			return true;
+			return Vector3.Lerp(t, a.Value, b.Value);
 		}
 
-		protected override void InterpolateAndSet(float t, Keyframe<Vector3> a, Keyframe<Vector3> b)
+		protected override Vector3 Interpolate(float t, Keyframe<Vector3> a, Keyframe<Vector3> b, Keyframe<Vector3> c, Keyframe<Vector3> d)
 		{
-			Setter(Vector3.Lerp(t, a.Value, b.Value));
-		}
-
-		protected override void InterpolateAndSet(float t, Keyframe<Vector3> a, Keyframe<Vector3> b, Keyframe<Vector3> c, Keyframe<Vector3> d)
-		{
-			Setter(Mathf.CatmullRomSpline(t, a.Value, b.Value, c.Value, d.Value));
+			return Mathf.CatmullRomSpline(t, a.Value, b.Value, c.Value, d.Value);
 		}
 	}
 
 	public class NumericAnimator : Animator<float>
 	{
-		protected override bool IsInterpolable()
+		protected override bool IsInterpolable() => true;
+
+		protected override float Interpolate(float t, Keyframe<float> a, Keyframe<float> b)
 		{
-			return true;
+			return t * (b.Value - a.Value) + a.Value;
 		}
 
-		protected override void InterpolateAndSet(float t, Keyframe<float> a, Keyframe<float> b)
+		protected override float Interpolate(float t, Keyframe<float> a, Keyframe<float> b, Keyframe<float> c, Keyframe<float> d)
 		{
-			Setter(t * (b.Value - a.Value) + a.Value);
-		}
-
-		protected override void InterpolateAndSet(float t, Keyframe<float> a, Keyframe<float> b, Keyframe<float> c, Keyframe<float> d)
-		{
-			Setter(Mathf.CatmullRomSpline(t, a.Value, b.Value, c.Value, d.Value));
+			return Mathf.CatmullRomSpline(t, a.Value, b.Value, c.Value, d.Value);
 		}
 	}
 
 	public class Color4Animator : Animator<Color4>
 	{
-		protected override bool IsInterpolable()
-		{
-			return true;
-		}
+		protected override bool IsInterpolable() => true;
 
-		protected override void InterpolateAndSet(float t, Keyframe<Color4> a, Keyframe<Color4> b)
+		protected override Color4 Interpolate(float t, Keyframe<Color4> a, Keyframe<Color4> b)
 		{
-			Setter(Color4.Lerp(t, a.Value, b.Value));
+			return Color4.Lerp(t, a.Value, b.Value);
 		}
 	}
 
 	public class QuaternionAnimator : Animator<Quaternion>
 	{
-		protected override bool IsInterpolable()
-		{
-			return true;
-		}
+		protected override bool IsInterpolable() => true;
 
-		protected override void InterpolateAndSet(float t, Keyframe<Quaternion> a, Keyframe<Quaternion> b)
+		protected override Quaternion Interpolate(float t, Keyframe<Quaternion> a, Keyframe<Quaternion> b)
 		{
-			Setter(Quaternion.Slerp(a.Value, b.Value, t));
+			return Quaternion.Slerp(a.Value, b.Value, t);
 		}
 	}
 
 	public class Matrix44Animator : Animator<Matrix44>
 	{
-		protected override bool IsInterpolable()
+		protected override bool IsInterpolable() => true;
+
+		protected override Matrix44 Interpolate(float t, Keyframe<Matrix44> a, Keyframe<Matrix44> b)
 		{
-			return true;
+			return Matrix44.Lerp(a.Value, b.Value, t);
 		}
 
-		protected override void InterpolateAndSet(float t, Keyframe<Matrix44> a, Keyframe<Matrix44> b)
+		protected override Matrix44 Interpolate(float t, Keyframe<Matrix44> a, Keyframe<Matrix44> b, Keyframe<Matrix44> c, Keyframe<Matrix44> d)
 		{
-			Setter(Matrix44.Lerp(a.Value, b.Value, t));
-		}
-
-		protected override void InterpolateAndSet(float t, Keyframe<Matrix44> a, Keyframe<Matrix44> b, Keyframe<Matrix44> c, Keyframe<Matrix44> d)
-		{
-			Setter(Matrix44.Lerp(b.Value, c.Value, t));
+			return Matrix44.Lerp(b.Value, c.Value, t);
 		}
 	}
 }
