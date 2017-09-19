@@ -257,35 +257,34 @@ namespace Tangerine.UI.SceneView
 			public static ICommand AsNineGrid = new Command("Create Nine Grid");
 			public static ICommand AsParticleModifier = new Command("Create Particle Modifier");
 
+			public static List<KeyValuePair<ICommand, Type>> Commands = new List<KeyValuePair<ICommand, Type>> {
+				new KeyValuePair<ICommand, Type>(AsImage, typeof(Image)),
+				new KeyValuePair<ICommand, Type>(AsDistortionMesh, typeof(DistortionMesh)),
+				new KeyValuePair<ICommand, Type>(AsNineGrid, typeof(NineGrid)),
+				new KeyValuePair<ICommand, Type>(AsParticleModifier, typeof(ParticleModifier)),
+			};
+
 			public static string AssetPath;
 		}
 
 		private void HandleDropImage(float dt)
 		{
-			Node node = null;
-			Document.Current.History.BeginTransaction();
-			if (ImageDropCommands.AsImage.WasIssued()) {
-				ImageDropCommands.AsImage.Consume();
-				node = Core.Operations.CreateNode.Perform(typeof(Image));
-			} else if (ImageDropCommands.AsDistortionMesh.WasIssued()) {
-				ImageDropCommands.AsDistortionMesh.Consume();
-				node = Core.Operations.CreateNode.Perform(typeof(DistortionMesh));
-			} else if (ImageDropCommands.AsNineGrid.WasIssued()) {
-				ImageDropCommands.AsNineGrid.Consume();
-				node = Core.Operations.CreateNode.Perform(typeof(NineGrid));
-			} else if (ImageDropCommands.AsParticleModifier.WasIssued()) {
-				ImageDropCommands.AsParticleModifier.Consume();
-				node = Core.Operations.CreateNode.Perform(typeof(ParticleModifier));
+			foreach (var kv in ImageDropCommands.Commands) {
+				if (kv.Key.WasIssued()) {
+					kv.Key.Consume();
+					Document.Current.History.BeginTransaction();
+					var node = Core.Operations.CreateNode.Perform(kv.Value);
+					var widgetPos = MousePosition * Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
+					var texture = new SerializableTexture(ImageDropCommands.AssetPath);
+					Core.Operations.SetProperty.Perform(node, nameof(Widget.Texture), texture);
+					Core.Operations.SetProperty.Perform(node, nameof(Widget.Position), widgetPos);
+					Core.Operations.SetProperty.Perform(node, nameof(Widget.Pivot), Vector2.Half);
+					Core.Operations.SetProperty.Perform(node, nameof(Widget.Size), (Vector2)texture.ImageSize);
+					Document.Current.History.EndTransaction();
+				} else {
+					kv.Key.Consume();
+				}
 			}
-			if (node != null) {
-				var widgetPos = MousePosition * Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
-				var texture = new SerializableTexture(ImageDropCommands.AssetPath);
-				Core.Operations.SetProperty.Perform(node, nameof(Widget.Texture), texture);
-				Core.Operations.SetProperty.Perform(node, nameof(Widget.Position), widgetPos);
-				Core.Operations.SetProperty.Perform(node, nameof(Widget.Pivot), Vector2.Half);
-				Core.Operations.SetProperty.Perform(node, nameof(Widget.Size), (Vector2)texture.ImageSize);
-			}
-			Document.Current.History.EndTransaction();
 		}
 
 		void CreateComponents() { }
