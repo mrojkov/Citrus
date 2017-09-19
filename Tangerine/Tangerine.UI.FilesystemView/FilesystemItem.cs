@@ -17,6 +17,7 @@ namespace Tangerine.UI.FilesystemView
 		// adding any children to this widget, so it will not trigger O(N^2) relayout bug(http://gitlab.game-forest.com:2000/browse/CIT-157)
 		public void Initialize()
 		{
+			this.Input.AcceptMouseThroughDescendants = true;
 			SimpleText text = null;
 			MinMaxSize = new Vector2(200, 16);
 			Layout = new HBoxLayout();
@@ -44,7 +45,8 @@ namespace Tangerine.UI.FilesystemView
 					LayoutCell = new LayoutCell {
 						StretchX = float.MaxValue
 					},
-					MinWidth = 0
+					MinWidth = 0,
+					HitTestTarget = true
 				}
 			);
 			text.Width = text.MinMaxWidth = Mathf.Min(200 - 20, text.MeasureUncutText().X);

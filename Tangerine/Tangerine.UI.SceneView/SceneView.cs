@@ -252,12 +252,12 @@ namespace Tangerine.UI.SceneView
 
 		private static class ImageDropCommands
 		{
-			public static ICommand AsImage = new Command("Create Image");
-			public static ICommand AsDistortionMesh = new Command("Create Distortion Mesh");
-			public static ICommand AsNineGrid = new Command("Create Nine Grid");
-			public static ICommand AsParticleModifier = new Command("Create Particle Modifier");
+			public static readonly ICommand AsImage = new Command("Create Image");
+			public static readonly ICommand AsDistortionMesh = new Command("Create Distortion Mesh");
+			public static readonly ICommand AsNineGrid = new Command("Create Nine Grid");
+			public static readonly ICommand AsParticleModifier = new Command("Create Particle Modifier");
 
-			public static List<KeyValuePair<ICommand, Type>> Commands = new List<KeyValuePair<ICommand, Type>> {
+			public static readonly List<KeyValuePair<ICommand, Type>> Commands = new List<KeyValuePair<ICommand, Type>> {
 				new KeyValuePair<ICommand, Type>(AsImage, typeof(Image)),
 				new KeyValuePair<ICommand, Type>(AsDistortionMesh, typeof(DistortionMesh)),
 				new KeyValuePair<ICommand, Type>(AsNineGrid, typeof(NineGrid)),
