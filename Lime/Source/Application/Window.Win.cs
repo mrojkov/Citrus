@@ -255,10 +255,18 @@ namespace Lime
 			form.FormClosing += OnClosing;
 			form.FormClosed += OnClosed;
 
-			VSync = options.VSync;
-			glControl.MakeCurrent();
-			glControl.VSync = VSync;
-			System.Windows.Forms.Application.Idle += OnTick;
+			if (options.UseTimer) {
+				timer = new Timer {
+					Interval = (int)(1000.0 / 65),
+					Enabled = true,
+				};
+				timer.Tick += OnTick;
+			} else {
+				VSync = options.VSync;
+				glControl.MakeCurrent();
+				glControl.VSync = VSync;
+				System.Windows.Forms.Application.Idle += OnTick;
+			}
 
 			form.Controls.Add(glControl);
 			stopwatch = new Stopwatch();
@@ -288,12 +296,6 @@ namespace Lime
 				Form.StartPosition = FormStartPosition.CenterParent;
 			}
 			Application.Windows.Add(this);
-
-			// Ensure Application.Idle for InvalidableWindowWidget
-			timer = new Timer {
-				Interval = (int)(1000.0 / 65),
-				Enabled = true,
-			};
 		}
 
 		public override bool VSync
@@ -305,7 +307,7 @@ namespace Lime
 
 			set
 			{
-				if (vSync != value) {
+				if (vSync != value && timer == null) {
 					vSync = value;
 					glControl.MakeCurrent();
 					glControl.VSync = value;
@@ -354,8 +356,11 @@ namespace Lime
 			if (this == Application.MainWindow) {
 				System.Windows.Forms.Application.Exit();
 			}
-			System.Windows.Forms.Application.Idle -= OnTick;
-			timer.Dispose();
+			if (timer == null) {
+				System.Windows.Forms.Application.Idle -= OnTick;
+			} else {
+				timer.Dispose();
+			}
 		}
 
 		private void OnClosing(object sender, FormClosingEventArgs e)
@@ -728,7 +733,6 @@ namespace Lime
 
 		private void Form_QueryContinueDrag(object sender, QueryContinueDragEventArgs e)
 		{
-			Update();
 			if (e.Action == DragAction.Drop) {
 				Input.SetKeyState(Key.Mouse0, false);
 				Input.SetKeyState(Key.Mouse1, false);

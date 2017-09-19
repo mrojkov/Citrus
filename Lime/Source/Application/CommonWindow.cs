@@ -20,6 +20,8 @@ namespace Lime
 
 		/// <summary>
 		/// Keeps refresh rate the same as monitor's refresh rate.
+		/// Setting to false allows to render as much frames as possible.
+		/// Works only on Windows with disabled Timer.
 		/// </summary>
 		public virtual bool VSync { get; set; }
 

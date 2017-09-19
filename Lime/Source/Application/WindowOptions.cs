@@ -21,6 +21,7 @@ namespace Lime
 		public string Title = "Citrus";
 		public bool Visible = true;
 		public bool VSync = true;
+		public bool UseTimer = true;
 
 		// System.Drawing.Icon on Windows
 		public object Icon;
