@@ -895,6 +895,19 @@ namespace Lime
 			DrawTriangleFan(null, v, numSegments + 1);
 		}
 
+		public static void DrawCircle(Vector2 center, float radius, int numSegments, Color4 color)
+		{
+			if (v.Length < numSegments + 1) {
+				v = new Vertex[numSegments + 1];
+			}
+			var prevPos = Vector2.CosSin(0) * radius + center;
+			for (int i = 0; i < numSegments; i++) {
+				var pos = Vector2.CosSin(i * Mathf.TwoPi / (numSegments - 1)) * radius + center;
+				DrawLine(prevPos, pos, color);
+				prevPos = pos;
+			}
+		}
+
 		public static void DrawRound(Vector2 center, float radius, int numSegments, Color4 color)
 		{
 			DrawRound(center, radius, numSegments, color, color);

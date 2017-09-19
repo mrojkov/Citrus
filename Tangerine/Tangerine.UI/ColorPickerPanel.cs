@@ -100,14 +100,13 @@ namespace Tangerine.UI
 			{
 				widget.PrepareRendererState();
 				DrawSpectrumCircle();
-				DrawCross();
+				DrawCircle();
 			}
 
-			void DrawCross()
+			void DrawCircle()
 			{
 				var cursor = Radius * (color.Value.S * Vector2.CosSin(Mathf.DegToRad * color.Value.H) + Vector2.One);
-				Renderer.DrawLine(cursor + new Vector2(-10, 0), cursor + new Vector2(10, 0), Color4.Black);
-				Renderer.DrawLine(cursor + new Vector2(0, -10), cursor + new Vector2(0, 10), Color4.Black);
+				Renderer.DrawCircle(cursor, 10, 20, Color4.Black);
 			}
 
 			void DrawSpectrumCircle()
