@@ -1,49 +1,91 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using Lime;
 using Tangerine.Core;
 
 namespace Tangerine.UI
 {
-	public class Console : IDocumentView
+	public class Console
 	{
+		private class TextViewWriter : TextWriter
+		{
+			private readonly ThemedTextView textView;
+
+			public TextViewWriter(ThemedTextView textView)
+			{
+				this.textView = textView;
+			}
+
+			public override void WriteLine(string value)
+			{
+				Write(value + '\n');
+			}
+
+			public override void Write(string value)
+			{
+				Application.InvokeOnMainThread(() => {
+					textView.Append(value);
+					textView.ScrollToEnd();
+				});
+			}
+
+			public override Encoding Encoding { get; }
+		}
+
 		public static Console Instance { get; private set; }
 
-		public readonly Widget PanelWidget;
-		public readonly Frame RootWidget;
-		public readonly Frame ScrollViewWidget;
-		public readonly Widget ContentWidget;
+		private DockPanel dockPanel;
+		public readonly Widget RootWidget;
+		private ThemedTextView textView;
+		private TextWriter textWriter;
 
-		public Console(Widget rootWidget)
+		public Console(DockPanel dockPanel)
 		{
-			PanelWidget = rootWidget;
-			RootWidget = new Frame { Layout = new StackLayout { VerticallySizeable = true } };
-			ContentWidget = new ScrollView(RootWidget).Content;
-			ContentWidget.Layout = new VBoxLayout { Tag = "ConsoleContent", Spacing = 4 };
-			ContentWidget.Padding = new Thickness(4);
-			//Logger.OnWrite += text => {
-			//	var widget = new SimpleText {
-			//		Text = $"{DateTime.Now.ToString("hh:mm:ss")} {text}",
-			//		AutoSizeConstraints = false,
-			//		FontHeight = DesktopTheme.Metrics.TextHeight * 0.8f
-			//	};
-			//	ContentWidget.PushNode(widget);
-			//	var i = ContentWidget.Nodes.Count;
-			//	if (i >= 100) {
-			//		ContentWidget.Nodes.RemoveAt(i - 1);
-			//	}
-			//};
-		}
-
-		public void Attach()
-		{
+			if (Instance != null) {
+				throw new InvalidOperationException();
+			}
 			Instance = this;
-			PanelWidget.PushNode(RootWidget);
+			this.dockPanel = dockPanel;
+			RootWidget = new Widget {
+				Layout = new VBoxLayout {
+					Spacing = 6
+				}
+			};
+			dockPanel.ContentWidget.AddNode(RootWidget);
+			RootWidget.AddNode(CreateTextView());
 		}
 
-		public void Detach()
+		private Widget CreateTextView()
 		{
-			Instance = null;
-			RootWidget.Unlink();
+			textView = new ThemedTextView();
+			textWriter = new TextViewWriter(textView);
+			System.Console.SetOut(textWriter);
+			System.Console.SetError(textWriter);
+			var menu = new Menu();
+			menu.Add(Command.Copy);
+			textView.Updated += (dt) => {
+				if (textView.Input.WasKeyPressed(Key.Mouse1)) {
+					menu.Popup();
+				}
+				if (Command.Copy.WasIssued()) {
+					Command.Copy.Consume();
+					Clipboard.Text = textView.Text;
+				}
+				var i = textView.Content.Nodes.Count;
+				// numbers choosen by guess
+				if (i >= 1000) {
+					textView.Content.Nodes.RemoveRange(0, 500);
+				}
+			};
+
+			return textView;
+		}
+
+		public void Show()
+		{
+			DockManager.Instance.ShowPanel(dockPanel);
 		}
 	}
 }

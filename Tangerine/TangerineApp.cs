@@ -57,12 +57,14 @@ namespace Tangerine
 			var inspectorPanel = new DockPanel("Inspector");
 			var searchPanel = new DockPanel("Search");
 			var filesystemPanel = new DockPanel("Filesystem");
+			var consolePanel = new DockPanel("Console");
 
 			var dockManager = DockManager.Instance;
 			dockManager.AddPanel(timelinePanel, DockSite.Top, new Vector2(800, 300));
 			dockManager.AddPanel(inspectorPanel, DockSite.Left, new Vector2(300, 700));
 			dockManager.AddPanel(searchPanel, DockSite.Right, new Vector2(300, 700));
 			dockManager.AddPanel(filesystemPanel, DockSite.Right, new Vector2(300, 700));
+			dockManager.AddPanel(consolePanel, DockSite.Bottom, new Vector2(800, 200));
 			DockManagerInitialState = dockManager.ExportState();
 			var documentViewContainer = InitializeDocumentArea(dockManager);
 
@@ -139,6 +141,7 @@ namespace Tangerine
 				new Project(proj).Open();
 			}
 			new UI.FilesystemView.FilesystemPane(filesystemPanel);
+			new UI.Console(consolePanel);
 			RegisterGlobalCommands();
 		}
 
