@@ -250,15 +250,34 @@ namespace Lime
 			return null;
 		}
 
+		private void CleanNode(Node node)
+		{
+			node.Parent = null;
+			node.NextSibling = null;
+			node.PropagateDirtyFlags();
+		}
+
+		public void RemoveRange(int index, int count)
+		{
+			if (list == null || index + count > list.Count) {
+				throw new IndexOutOfRangeException();
+			}
+			for (int i = index; i < index + count; i++) {
+				CleanNode(list[i]);
+			}
+			list.RemoveRange(index, count);
+			if (index > 0 && count > 0) {
+				list[index - 1].NextSibling = index < Count ? list[index] : null;
+			}
+			Node.InvalidateNodeRefrenceCache();
+		}
+
 		public void RemoveAt(int index)
 		{
 			if (list == null) {
 				throw new IndexOutOfRangeException();
 			}
-			var node = list[index];
-			node.Parent = null;
-			node.NextSibling = null;
-			node.PropagateDirtyFlags();
+			CleanNode(list[index]);
 			list.RemoveAt(index);
 			if (index > 0) {
 				list[index - 1].NextSibling = index < Count ? list[index] : null;
