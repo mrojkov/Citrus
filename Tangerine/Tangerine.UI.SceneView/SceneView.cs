@@ -257,11 +257,11 @@ namespace Tangerine.UI.SceneView
 			public static readonly ICommand AsNineGrid = new Command("Create Nine Grid");
 			public static readonly ICommand AsParticleModifier = new Command("Create Particle Modifier");
 
-			public static readonly List<KeyValuePair<ICommand, Type>> Commands = new List<KeyValuePair<ICommand, Type>> {
-				new KeyValuePair<ICommand, Type>(AsImage, typeof(Image)),
-				new KeyValuePair<ICommand, Type>(AsDistortionMesh, typeof(DistortionMesh)),
-				new KeyValuePair<ICommand, Type>(AsNineGrid, typeof(NineGrid)),
-				new KeyValuePair<ICommand, Type>(AsParticleModifier, typeof(ParticleModifier)),
+			public static readonly Dictionary<ICommand, Type> Commands = new Dictionary<ICommand, Type> {
+				{ AsImage, typeof(Image) },
+				{ AsDistortionMesh, typeof(DistortionMesh) },
+				{ AsNineGrid, typeof(NineGrid) },
+				{ AsParticleModifier, typeof(ParticleModifier) },
 			};
 
 			public static string AssetPath;
