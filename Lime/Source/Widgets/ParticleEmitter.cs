@@ -118,7 +118,6 @@ namespace Lime
 			public float AgeToAnimationTime;
 		};
 
-		public static bool EnabledGlobally = true;
 		/// <summary>
 		/// Particles are generated once and live forever.
 		/// </summary>
