@@ -456,7 +456,21 @@ namespace Tangerine
 			}, () => Document.Current?.Rows.Count > 0);
 			h.Connect(Command.Undo, () => Document.Current.History.Undo(), () => Document.Current?.History.CanUndo() ?? false);
 			h.Connect(Command.Redo, () => Document.Current.History.Redo(), () => Document.Current?.History.CanRedo() ?? false);
-			h.Connect(OrangeCommands.Run, () => Orange.Actions.BuildAndRunAction());
+			h.Connect(OrangeCommands.Run, () => WidgetContext.Current.Root.Tasks.Add(OrangeTask));
+		}
+
+		private IEnumerator<object> OrangeTask()
+		{
+			Tangerine.UI.Console.Instance.Show();
+			Orange.The.Workspace?.AssetFiles?.Rescan();
+			yield return Task.ExecuteAsync(() => {
+				try {
+					Orange.Actions.BuildAndRunAction();
+				} catch (System.Exception e) {
+					System.Console.WriteLine(e);
+				}
+			});
+			System.Console.WriteLine("Done.");
 		}
 
 		static void Paste()
