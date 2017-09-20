@@ -89,10 +89,10 @@ namespace Lime
 			Y = y;
 		}
 
-		public Vector2(float value)
+		public Vector2(float xy)
 		{
-			X = value;
-			Y = value;
+			X = xy;
+			Y = xy;
 		}
 
 		public static explicit operator IntVector2(Vector2 value)

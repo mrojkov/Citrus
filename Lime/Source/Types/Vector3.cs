@@ -52,11 +52,11 @@ namespace Lime
 			Z = z;
 		}
 
-		public Vector3(float value)
+		public Vector3(float xyz)
 		{
-			X = value;
-			Y = value;
-			Z = value;
+			X = xyz;
+			Y = xyz;
+			Z = xyz;
 		}
 
 		public static explicit operator Vector2(Vector3 value)
