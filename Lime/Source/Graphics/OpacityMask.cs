@@ -16,7 +16,7 @@ namespace Lime
 		public byte[] Data { get; private set; }
 		public OpacityMask(string path)
 		{
-			using (var stream = AssetBundle.Instance.OpenFileLocalized(path)) {
+			using (var stream = AssetBundle.Current.OpenFileLocalized(path)) {
 				using (var reader = new BinaryReader(stream)) {
 					Width = reader.ReadInt32();
 					Height = reader.ReadInt32();

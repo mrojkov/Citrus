@@ -133,8 +133,8 @@ namespace Lime
 		public void LoadTextureParams(string path)
 		{
 			var textureParamsPath = Path.ChangeExtension(path, ".texture");
-			if (AssetBundle.Instance.FileExists(textureParamsPath)) {
-				using (var stream = AssetBundle.Instance.OpenFile(textureParamsPath)) {
+			if (AssetBundle.Current.FileExists(textureParamsPath)) {
+				using (var stream = AssetBundle.Current.OpenFile(textureParamsPath)) {
 					TextureParams = Serialization.ReadObject<TextureParams>(textureParamsPath, stream);
 				}
 			} else {
@@ -144,12 +144,12 @@ namespace Lime
 
 		public void LoadImage(string path)
 		{
-			using (var stream = AssetBundle.Instance.OpenFileLocalized(path)) {
+			using (var stream = AssetBundle.Current.OpenFileLocalized(path)) {
 				LoadImageHelper(stream, createReloader: false);
 			}
 			reloader = new TextureBundleReloader(path);
 			var maskPath = Path.ChangeExtension(path, ".mask");
-			if (AssetBundle.Instance.FileExists(maskPath)) {
+			if (AssetBundle.Current.FileExists(maskPath)) {
 				OpacityMask = new OpacityMask(maskPath);
 			}
 		}

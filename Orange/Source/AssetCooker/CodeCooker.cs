@@ -17,7 +17,7 @@ namespace Orange
 			foreach (var bundleName in bundles) {
 				assetBundles.Add(bundleName, new PackedAssetBundle(The.Workspace.GetBundlePath(bundleName)));
 			}
-			AssetBundle.Instance = new AggregateAssetBundle(assetBundles.Values.Cast<AssetBundle>().ToArray());
+			AssetBundle.Current = new AggregateAssetBundle(assetBundles.Values.Cast<AssetBundle>().ToArray());
 
 			Func<string, bool> filter = (path) => scenesExtensions.Contains(Path.GetExtension(path));
 			var scenes = new Dictionary<string, Node>();
@@ -35,7 +35,7 @@ namespace Orange
 			}
 
 			if (scenes.Count == 0) {
-				AssetBundle.Instance = null;
+				AssetBundle.Current = null;
 				return;
 			}
 			new ScenesCodeCooker(
@@ -46,7 +46,7 @@ namespace Orange
 				scenes
 			).Start();
 
-			AssetBundle.Instance = null;
+			AssetBundle.Current = null;
 		}
 	}
 }

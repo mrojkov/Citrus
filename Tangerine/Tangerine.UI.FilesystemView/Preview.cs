@@ -86,7 +86,7 @@ namespace Tangerine.UI.FilesystemView
 
 		private static ITexture GetTexture(string filename)
 		{
-			if (AssetBundle.Instance == null) {
+			if (AssetBundle.Current == null) {
 				return null;
 			}
 			if (Directory.Exists(filename)) {

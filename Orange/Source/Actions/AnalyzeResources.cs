@@ -29,7 +29,7 @@ namespace Orange
 			var suspiciousTexturesReport = new List<string>();
 			var bundles = new HashSet<string>();
 			var cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, The.Workspace.ActiveTarget);
-			AssetBundle.Instance = new PackedAssetBundle(The.Workspace.GetBundlePath(CookingRulesBuilder.MainBundleName));
+			AssetBundle.Current = new PackedAssetBundle(The.Workspace.GetBundlePath(CookingRulesBuilder.MainBundleName));
 			foreach (var i in cookingRulesMap) {
 				if (i.Key.EndsWith(".png")) {
 					if (i.Value.TextureAtlas == null && i.Value.PVRFormat != PVRFormat.PVRTC4 && i.Value.PVRFormat != PVRFormat.PVRTC4_Forced) {
@@ -55,7 +55,7 @@ namespace Orange
 					}
 				}
 			}
-			AssetBundle.Instance = new AggregateAssetBundle(bundles.Select(i => new PackedAssetBundle(The.Workspace.GetBundlePath(i))).ToArray());
+			AssetBundle.Current = new AggregateAssetBundle(bundles.Select(i => new PackedAssetBundle(The.Workspace.GetBundlePath(i))).ToArray());
 			The.Workspace.AssetFiles.EnumerationFilter = (info) => {
 				CookingRules rules;
 				if (cookingRulesMap.TryGetValue(info.Path, out rules)) {
@@ -103,8 +103,8 @@ namespace Orange
 								texPath + ".png",
 							};
 							foreach (var tpp in possiblePaths) {
-								if (Lime.AssetBundle.Instance.FileExists(tpp)) {
-									Lime.AssetBundle.Instance.OpenFile(tpp);
+								if (Lime.AssetBundle.Current.FileExists(tpp)) {
+									Lime.AssetBundle.Current.OpenFile(tpp);
 									usedImages.Add(texPath.Replace('\\', '/'));
 									return;
 								}
@@ -132,11 +132,11 @@ namespace Orange
 							var au = j as Lime.Audio;
 							var path = au.Sample.SerializationPath + ".sound";
 							usedSounds.Add(au.Sample.SerializationPath.Replace('\\', '/'));
-							if (!Lime.AssetBundle.Instance.FileExists(path)) {
+							if (!Lime.AssetBundle.Current.FileExists(path)) {
 								missingResourcesReport.Add(string.Format("audio missing:\n\taudio path: {0}\n\tscene path: {1}\n",
 									path, j.ToString()));
 							} else {
-								using (var tempStream = Lime.AssetBundle.Instance.OpenFile(path)) {
+								using (var tempStream = Lime.AssetBundle.Current.OpenFile(path)) {
 
 								}
 							}

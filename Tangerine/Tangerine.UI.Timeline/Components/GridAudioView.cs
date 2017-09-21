@@ -57,7 +57,7 @@ namespace Tangerine.UI.Timeline.Components
 			waveform = new Waveform();
 			var textureWidth = 256;
 			var textureHeight = 64;
-			using (var fs = AssetBundle.Instance.OpenFile(path + ".ogg")) {
+			using (var fs = AssetBundle.Current.OpenFile(path + ".ogg")) {
 					using (var decoder = AudioDecoderFactory.CreateDecoder(fs)) {
 					var stereo = decoder.GetFormat() == AudioFormat.Stereo16;
 					while (true) {

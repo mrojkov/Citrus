@@ -190,7 +190,7 @@ namespace Tangerine.Core
 
 		public string GetFileExtension() => GetFileExtension(Format);
 
-		static bool AssetExists(string path, string ext) => AssetBundle.Instance.FileExists(System.IO.Path.ChangeExtension(path, ext));
+		static bool AssetExists(string path, string ext) => AssetBundle.Current.FileExists(System.IO.Path.ChangeExtension(path, ext));
 
 		public void MakeCurrent()
 		{

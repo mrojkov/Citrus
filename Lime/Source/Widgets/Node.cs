@@ -1017,7 +1017,7 @@ namespace Lime
 			}
 			scenesBeingLoaded.Add(fullPath);
 			try {
-				using (Stream stream = AssetBundle.Instance.OpenFileLocalized(fullPath)) {
+				using (Stream stream = AssetBundle.Current.OpenFileLocalized(fullPath)) {
 					instance = Serialization.ReadObject<Node>(fullPath, stream, instance);
 				}
 				instance.LoadExternalScenes();
@@ -1080,7 +1080,7 @@ namespace Lime
 		/// </summary>
 		public static string ResolveScenePath(string path)
 		{
-			var candidates = sceneExtensions.Select(ext => Path.ChangeExtension(path, ext)).Where(AssetBundle.Instance.FileExists);
+			var candidates = sceneExtensions.Select(ext => Path.ChangeExtension(path, ext)).Where(AssetBundle.Current.FileExists);
 			if (candidates.Count() > 1) {
 				throw new Exception("Ambiguity between: {0}", string.Join("; ", candidates.ToArray()));
 			}

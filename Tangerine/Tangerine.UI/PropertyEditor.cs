@@ -758,7 +758,7 @@ namespace Tangerine.UI
 			selector.LayoutCell = new LayoutCell(Alignment.Center);
 			ContainerWidget.AddNode(selector);
 			var propType = editorParams.PropertyInfo.PropertyType;
-			var items = AssetBundle.Instance.EnumerateFiles("Fonts").
+			var items = AssetBundle.Current.EnumerateFiles("Fonts").
 				Where(i => i.EndsWith(".fnt") || i.EndsWith(".tft")).
 				Select(i => new DropDownList.Item(Path.ChangeExtension(Path.GetFileName(i), null)));
 			foreach (var i in items) {

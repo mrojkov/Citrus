@@ -16,32 +16,33 @@ namespace Lime
 
 	public abstract class AssetBundle : IDisposable
 	{
-		private static AssetBundle instance;
+		[ThreadStatic]
+		private static AssetBundle current;
 
-		public static AssetBundle Instance
+		public static AssetBundle Current
 		{
 			get
 			{
-				if (instance == null) {
-					throw new Lime.Exception("AssetBundle.Instance should be initialized before the usage");
+				if (current == null) {
+					throw new Lime.Exception("AssetBundle.Current must be initialized before use.");
 				}
-				return instance;
+				return current;
 			}
 			set
 			{
-				instance = value;
+				current = value;
 				// The game could use some of textures from this bundle, and if they are missing
 				// we should notify texture pool to search them again.
 				TexturePool.Instance.DiscardAllStubTextures();
 			}
 		}
 
-		public static bool Initialized { get { return instance != null; } }
+		public static bool Initialized => current != null;
 
 		public virtual void Dispose()
 		{
-			if (instance == this) {
-				instance = null;
+			if (Current == this) {
+				Current = null;
 			}
 		}
 

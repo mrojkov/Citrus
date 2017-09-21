@@ -295,7 +295,7 @@ namespace Lime
 				Path.GetFileNameWithoutExtension(AssetPath.CorrectSlashes(modelPath) ?? "")
 			));
 			var attachmentPath = modelPath + ".Attachment.txt";
-			if (!AssetBundle.Instance.FileExists(attachmentPath)) {
+			if (!AssetBundle.Current.FileExists(attachmentPath)) {
 				return null;
 			}
 			try {

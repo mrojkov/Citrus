@@ -179,7 +179,7 @@ namespace Orange
 				var texturePath = Path.ChangeExtension(Path.GetFileName(path), null);
 				var index = (i == 0) ? "" : i.ToString("00");
 				var texturePng = Path.ChangeExtension(path, null) + index + ".png";
-				if (!AssetBundle.Instance.FileExists(texturePng)) {
+				if (!AssetBundle.Current.FileExists(texturePng)) {
 					break;
 				}
 				font.Textures.Add(new SerializableTexture(texturePath + index));

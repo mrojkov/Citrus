@@ -13,7 +13,7 @@ namespace Orange
 
 		private delegate bool Converter(string srcPath, string dstPath);
 
-		public static AssetBundle AssetBundle { get { return AssetBundle.Instance; } }
+		public static AssetBundle AssetBundle { get { return AssetBundle.Current; } }
 		public static TargetPlatform Platform;
 		private static Dictionary<string, CookingRules> cookingRulesMap;
 
@@ -98,11 +98,11 @@ namespace Orange
 
 		private static void CookBundle(string bundleName)
 		{
-			using (AssetBundle.Instance = CreateBundle(bundleName)) {
+			using (AssetBundle.Current = CreateBundle(bundleName)) {
 				CookBundleHelper(bundleName);
 			}
 			// Open the bundle again in order to make some plugin post-processing (e.g. generate code from scene assets)
-			using (AssetBundle.Instance = CreateBundle(bundleName)) {
+			using (AssetBundle.Current = CreateBundle(bundleName)) {
 				using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
 					PluginLoader.AfterAssetsCooked(bundleName);
 				}
@@ -358,7 +358,7 @@ namespace Orange
 
 		static void SyncUpdated(string fileExtension, string bundleAssetExtension, Converter converter)
 		{
-			SyncUpdated(fileExtension, bundleAssetExtension, AssetBundle.Instance, converter);
+			SyncUpdated(fileExtension, bundleAssetExtension, AssetBundle.Current, converter);
 		}
 
 		static void SyncUpdated(string fileExtension, string bundleAssetExtension, AssetBundle bundle, Converter converter)

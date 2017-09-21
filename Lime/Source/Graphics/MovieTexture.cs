@@ -44,11 +44,11 @@ namespace Lime
 				throw new ArgumentException();
 			}
 			Stop();
-			rgbStream = AssetBundle.Instance.OpenFile(Path + ".ogv");
+			rgbStream = AssetBundle.Current.OpenFile(Path + ".ogv");
 			rgbDecoder = new OgvDecoder(rgbStream);
 			foreach (var i in new string[] { "_alpha.ogv", "_Alpha.ogv" }) {
-				if (AssetBundle.Instance.FileExists(Path + i)) {
-					alphaStream = AssetBundle.Instance.OpenFile(Path + i);
+				if (AssetBundle.Current.FileExists(Path + i)) {
+					alphaStream = AssetBundle.Current.OpenFile(Path + i);
 					alphaDecoder = new OgvDecoder(alphaStream);
 					break;
 				}

@@ -127,7 +127,7 @@ namespace Lime
 
 		private static ITexture TryLoadImage(string path)
 		{
-			if (!AssetBundle.Instance.FileExists(path)) {
+			if (!AssetBundle.Current.FileExists(path)) {
 				return null;
 			}
 			var texture = new Texture2D();
@@ -160,7 +160,7 @@ namespace Lime
 
 		private static ITexture TryLoadTextureAtlasPart(string path)
 		{
-			if (!AssetBundle.Instance.FileExists(path)) {
+			if (!AssetBundle.Current.FileExists(path)) {
 				return null;
 			}
 			var data = TextureAtlasElement.Params.ReadFromBundle(path);

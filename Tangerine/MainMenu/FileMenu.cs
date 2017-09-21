@@ -162,7 +162,7 @@ namespace Tangerine
 		public override void Execute()
 		{
 			try {
-				AssetBundle.Instance.DeleteFile(Path.ChangeExtension(Document.Current.Path, "scene"));
+				AssetBundle.Current.DeleteFile(Path.ChangeExtension(Document.Current.Path, "scene"));
 				Document.Current.Format = DocumentFormat.Tan;
 				RestoreDefaultAnimationEngine(Document.Current.RootNode);
 				new UpsampleAnimationTwice().Execute();

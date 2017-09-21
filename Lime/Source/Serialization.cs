@@ -152,7 +152,7 @@ namespace Lime
 
 		public static T ReadObject<T>(string path, object obj = null)
 		{
-			using (Stream stream = AssetBundle.Instance.OpenFileLocalized(path))
+			using (Stream stream = AssetBundle.Current.OpenFileLocalized(path))
 				return ReadObject<T>(path, stream, obj);
 		}
 
