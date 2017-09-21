@@ -95,6 +95,7 @@ namespace Lime
 
 		protected override void OnParentChanged(Node oldParent)
 		{
+			base.OnParentChanged(oldParent);
 			if (Parent != null) {
 				Parent.AsWidget.Layout = new LayoutHandler(this);
 			}

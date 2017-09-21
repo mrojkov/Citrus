@@ -708,6 +708,7 @@ namespace Lime
 
 		protected override void OnParentChanged(Node oldParent)
 		{
+			base.OnParentChanged(oldParent);
 			if (oldParent != null && oldParent.AsWidget != null) {
 				var w = oldParent.AsWidget;
 				w.Layout.InvalidateConstraintsAndArrangement(w);
