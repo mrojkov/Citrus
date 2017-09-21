@@ -187,7 +187,7 @@ namespace Lime
 				list[index].NextSibling = list[index + 1];
 			}
 			node.PropagateDirtyFlags();
-			Node.InvalidateNodeRefrenceCache();
+			Node.InvalidateNodeReferenceCache();
 		}
 
 		private void RuntimeChecksBeforeInsertion(Node node)
@@ -227,7 +227,7 @@ namespace Lime
 			if (list == null) {
 				return;
 			}
-			Node.InvalidateNodeRefrenceCache();
+			Node.InvalidateNodeReferenceCache();
 			foreach (var node in list) {
 				node.Parent = null;
 				node.NextSibling = null;
@@ -269,7 +269,7 @@ namespace Lime
 			if (index > 0 && count > 0) {
 				list[index - 1].NextSibling = index < Count ? list[index] : null;
 			}
-			Node.InvalidateNodeRefrenceCache();
+			Node.InvalidateNodeReferenceCache();
 		}
 
 		public void RemoveAt(int index)
@@ -282,7 +282,7 @@ namespace Lime
 			if (index > 0) {
 				list[index - 1].NextSibling = index < Count ? list[index] : null;
 			}
-			Node.InvalidateNodeRefrenceCache();
+			Node.InvalidateNodeReferenceCache();
 		}
 
 		public Node this[int index]
@@ -311,7 +311,7 @@ namespace Lime
 					value.NextSibling = list[index + 1];
 				}
 				value.PropagateDirtyFlags();
-				Node.InvalidateNodeRefrenceCache();
+				Node.InvalidateNodeReferenceCache();
 			}
 		}
 
@@ -341,7 +341,7 @@ namespace Lime
 				list[indexTo - 1].NextSibling = tmp;
 			}
 			tmp.NextSibling = (indexTo + 1 < Count) ? list[indexTo + 1] : null;
-			Node.InvalidateNodeRefrenceCache();
+			Node.InvalidateNodeReferenceCache();
 		}
 	}
 }

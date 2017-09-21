@@ -114,10 +114,6 @@ namespace Lime
 			remove { DefaultAnimation.Stopped -= value; }
 		}
 
-#if WIN
-		public Guid Guid { get; set; }
-#endif
-
 		private string id;
 
 		/// <summary>
@@ -133,7 +129,7 @@ namespace Lime
 			{
 				if (id != value) {
 					id = value;
-					InvalidateNodeRefrenceCache();
+					InvalidateNodeReferenceCache();
 				}
 			}
 		}
@@ -153,7 +149,7 @@ namespace Lime
 
 		internal static long NodeReferenceCacheValidationCode = 1;
 
-		internal static void InvalidateNodeRefrenceCache()
+		internal static void InvalidateNodeReferenceCache()
 		{
 			System.Threading.Interlocked.Increment(ref NodeReferenceCacheValidationCode);
 		}
