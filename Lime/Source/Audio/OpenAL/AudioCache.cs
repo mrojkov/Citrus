@@ -48,9 +48,10 @@ namespace Lime
 
 		private void CacheSoundAsync(string path)
 		{
+			var assetBundle = AssetBundle.Current;
 			var bw = new BackgroundWorker();
 			bw.DoWork += (s, e) => {
-				using (var stream = PackedAssetBundle.Instance.OpenFileLocalized(path)) {
+				using (var stream = assetBundle.OpenFileLocalized(path)) {
 					var memStream = new MemoryStream((int)stream.Length);
 					stream.CopyTo(memStream);
 					memStream.Position = 0;
