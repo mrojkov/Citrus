@@ -31,6 +31,7 @@ namespace Lime
 
 			public const int Pos2 = 8;
 			public const int Color2 = 9;
+			public const int Normal = 10;
 
 			public static IEnumerable<ShaderProgram.AttribLocation> GetLocations()
 			{

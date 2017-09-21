@@ -60,6 +60,9 @@ namespace Lime
 
 			[YuzuMember("4")]
 			public BlendWeights BlendWeights;
+
+			[YuzuMember("5")]
+			public Vector3 Normal;
 		}
 
 		private static Matrix44[] sharedBoneTransforms = new Matrix44[0];
@@ -275,7 +278,8 @@ namespace Lime
 				ShaderPrograms.Attributes.Color1,
 				ShaderPrograms.Attributes.UV1,
 				ShaderPrograms.Attributes.BlendIndices,
-				ShaderPrograms.Attributes.BlendWeights
+				ShaderPrograms.Attributes.BlendWeights,
+				ShaderPrograms.Attributes.Normal,
 			} };
 		}
 

@@ -38,6 +38,7 @@ namespace Orange.FbxImporter
 			var uv = mesh.uvCoords.ToStructArray<Vec2>(mesh.verticesCount);
 			var weights = mesh.weights.ToStructArray<WeightData>(mesh.verticesCount);
 			var bones = mesh.bones.FromArrayOfPointersToStructArrayUnsafe<BoneData>(mesh.boneCount);
+			var normals = mesh.normals.ToStructArray<Vec3>(mesh.verticesCount);
 
 			Indices = mesh.vertices.ToIntArray(mesh.verticesCount);
 			MaterialIndex = mesh.materialIndex;
@@ -55,6 +56,7 @@ namespace Orange.FbxImporter
 				Vertices[i].Pos = verices[i].toLime();
 				Vertices[i].Color = colors != null ? colors[i].toLimeColor() : Color4.White;
 				Vertices[i].UV1 = uv[i].toLime();
+				Vertices[i].Normal = normals[i].toLime();
 
 				byte index;
 				float weight;
@@ -110,6 +112,8 @@ namespace Orange.FbxImporter
 			public IntPtr colors;
 
 			public IntPtr uvCoords;
+
+			public IntPtr normals;
 
 			public IntPtr weights;
 

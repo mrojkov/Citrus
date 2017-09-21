@@ -239,6 +239,13 @@ namespace GeneratedDeserializersBIN
 				result.BlendWeights.Weight3 = d.Reader.ReadSingle();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
+			if (6 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Vector3));
+				result.Normal.X = d.Reader.ReadSingle();
+				result.Normal.Y = d.Reader.ReadSingle();
+				result.Normal.Z = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
 			return result;
 		}

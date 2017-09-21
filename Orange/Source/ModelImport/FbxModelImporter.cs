@@ -93,7 +93,8 @@ namespace Orange
 					ShaderPrograms.Attributes.Color1,
 					ShaderPrograms.Attributes.UV1,
 					ShaderPrograms.Attributes.BlendIndices,
-					ShaderPrograms.Attributes.BlendWeights
+					ShaderPrograms.Attributes.BlendWeights,
+					ShaderPrograms.Attributes.Normal
 				}}
 			};
 
