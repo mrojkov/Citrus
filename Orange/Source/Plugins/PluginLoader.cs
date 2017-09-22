@@ -178,14 +178,14 @@ namespace Orange
 					var property = member as PropertyInfo;
 					if (property.PropertyType.GetInterfaces().Contains(typeof(IEnumerable))) {
 						importedCount += ((ICollection)property.GetValue(CurrentPlugin)).Count;
-					} else {
+					} else if (property.GetValue(CurrentPlugin) != null) {
 						importedCount++;
 					}
 				} else if (member is FieldInfo) {
 					var field = member as FieldInfo;
 					if (field.FieldType.GetInterfaces().Contains(typeof(IEnumerable))) {
 						importedCount += ((ICollection)field.GetValue(CurrentPlugin)).Count;
-					} else {
+					} else if (field.GetValue(CurrentPlugin) != null ){
 						importedCount++;
 					}
 				}
