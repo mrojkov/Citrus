@@ -55,7 +55,7 @@ namespace Lime
 		public void LoadImage(string path)
 		{
 			Dispose();
-			unityTexture = UnityAssetBundle.Instance.LoadUnityAsset<UnityEngine.Texture2D>(path);
+			unityTexture = UnityAssetBundle.Current.LoadUnityAsset<UnityEngine.Texture2D>(path);
 			SetTextureDefaultParameters();
 		}
 
@@ -158,7 +158,7 @@ namespace Lime
 
 		public virtual void Dispose()
 		{
-			//UnityAssetBundle.Instance.UnloadUnityAsset(unityTexture);
+			//UnityAssetBundle.Current.UnloadUnityAsset(unityTexture);
 		}
 
 		/// <summary>

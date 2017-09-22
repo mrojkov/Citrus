@@ -6,6 +6,8 @@ using System.Linq;
 using Lime;
 using Tangerine.Core;
 
+using Cmds = Tangerine.UI.FilesystemCommands;
+
 namespace Tangerine.UI.FilesystemView
 {
 	// Single instance of view on filesystem, cooking rules editor and preview
@@ -303,7 +305,7 @@ namespace Tangerine.UI.FilesystemView
 				ProcessTypingNavigation();
 
 				{ // other shortcuts
-					if (FilesystemCommands.Cancel.WasIssued()) {
+					if (Cmds.Cancel.WasIssued()) {
 						typeNavigationTimeout = typeNavigationInterval;
 						typeNavigationPrefix = string.Empty;
 					} else if (Window.Current.Input.WasKeyReleased(Key.Menu)) {
@@ -311,24 +313,24 @@ namespace Tangerine.UI.FilesystemView
 							Window.Current.Input.ConsumeKey(Key.Menu);
 							SystemShellContextMenu.Instance.Show(selection.ToArray(), lastKeyboardSelectedFilesystemItem.GlobalPosition);
 						}
-					} else if (FilesystemCommands.GoBack.WasIssued()) {
+					} else if (Cmds.GoBack.WasIssued()) {
 						GoBackward();
-					} else if (FilesystemCommands.GoForward.WasIssued()) {
+					} else if (Cmds.GoForward.WasIssued()) {
 						GoForward();
-					} else if (FilesystemCommands.GoUp.WasIssued() || FilesystemCommands.GoUpAlso.WasIssued()) {
+					} else if (Cmds.GoUp.WasIssued() || Cmds.GoUpAlso.WasIssued()) {
 						GoUp();
-					} else if (FilesystemCommands.Enter.WasIssued()) {
+					} else if (Cmds.Enter.WasIssued()) {
 						if (lastKeyboardSelectedFilesystemItem != null) {
 							Open(lastKeyboardSelectedFilesystemItem.FilesystemPath);
 						}
-					} else if (FilesystemCommands.EnterSpecial.WasIssued()) {
+					} else if (Cmds.EnterSpecial.WasIssued()) {
 						if (lastKeyboardSelectedFilesystemItem != null) {
 							OpenSpecial(lastKeyboardSelectedFilesystemItem.FilesystemPath);
 						}
 					} else if (Command.SelectAll.WasIssued()) {
 						selection.Clear();
 						selection.SelectRange(scrollView.Content.Nodes.Select(n => (n as FilesystemItem).FilesystemPath));
-					} else if (FilesystemCommands.ToggleSelection.WasIssued()) {
+					} else if (Cmds.ToggleSelection.WasIssued()) {
 						if (lastKeyboardRangeSelectionEndFilesystemItem != null) {
 							var path = lastKeyboardRangeSelectionEndFilesystemItem.FilesystemPath;
 							if (selection.Contains(path)) {
@@ -602,36 +604,36 @@ namespace Tangerine.UI.FilesystemView
 		static readonly List<List<ICommand>> navCommands = new List<List<ICommand>> {
 			// simple navigation
 			new List<ICommand> {
-				FilesystemCommands.Left,
-				FilesystemCommands.Right,
-				FilesystemCommands.Up,
-				FilesystemCommands.Down,
-				FilesystemCommands.PageUp,
-				FilesystemCommands.PageDown,
-				FilesystemCommands.Home,
-				FilesystemCommands.End,
+				Cmds.Left,
+				Cmds.Right,
+				Cmds.Up,
+				Cmds.Down,
+				Cmds.PageUp,
+				Cmds.PageDown,
+				Cmds.Home,
+				Cmds.End,
 			},
 			// Range-select (shift) navigation
 			new List<ICommand> {
-				FilesystemCommands.SelectLeft,
-				FilesystemCommands.SelectRight,
-				FilesystemCommands.SelectUp,
-				FilesystemCommands.SelectDown,
-				FilesystemCommands.SelectPageUp,
-				FilesystemCommands.SelectPageDown,
-				FilesystemCommands.SelectHome,
-				FilesystemCommands.SelectEnd,
+				Cmds.SelectLeft,
+				Cmds.SelectRight,
+				Cmds.SelectUp,
+				Cmds.SelectDown,
+				Cmds.SelectPageUp,
+				Cmds.SelectPageDown,
+				Cmds.SelectHome,
+				Cmds.SelectEnd,
 			},
 			// Toggle-select (hold ctrl, navigate, toggle with space)
 			new List<ICommand> {
-				FilesystemCommands.ToggleLeft,
-				FilesystemCommands.ToggleRight,
-				FilesystemCommands.ToggleUp,
-				FilesystemCommands.ToggleDown,
-				FilesystemCommands.TogglePageUp,
-				FilesystemCommands.TogglePageDown,
-				FilesystemCommands.ToggleHome,
-				FilesystemCommands.ToggleEnd,
+				Cmds.ToggleLeft,
+				Cmds.ToggleRight,
+				Cmds.ToggleUp,
+				Cmds.ToggleDown,
+				Cmds.TogglePageUp,
+				Cmds.TogglePageDown,
+				Cmds.ToggleHome,
+				Cmds.ToggleEnd,
 			},
 		};
 
@@ -641,15 +643,15 @@ namespace Tangerine.UI.FilesystemView
 			Key.Enumerate().Where(k => k.IsPrintable()).Select(i => new Command(new Shortcut(Modifiers.Shift, i)))).Union(
 				new[] {
 					Command.SelectAll,
-					FilesystemCommands.Cancel,
-					FilesystemCommands.Enter,
-					FilesystemCommands.GoUp,
-					FilesystemCommands.GoUpAlso,
-					FilesystemCommands.GoBack,
-					FilesystemCommands.GoForward,
-					FilesystemCommands.GoUpAlso,
-					FilesystemCommands.EnterSpecial,
-					FilesystemCommands.ToggleSelection,
+					Cmds.Cancel,
+					Cmds.Enter,
+					Cmds.GoUp,
+					Cmds.GoUpAlso,
+					Cmds.GoBack,
+					Cmds.GoForward,
+					Cmds.GoUpAlso,
+					Cmds.EnterSpecial,
+					Cmds.ToggleSelection,
 				}
 			).Union(
 				navCommands.SelectMany(i => i)
