@@ -101,9 +101,9 @@ namespace Lime
 				for (int i = 0; i < 100; i++) {
 					if (!ChangeTextureFrameIndex(ref path, i))
 						break;
-					if (PackedAssetBundle.Current.FileExists(path + ".atlasPart") ||
-						PackedAssetBundle.Current.FileExists(path))
-					{
+					if (AssetBundle.Current.FileExists(path + ".atlasPart") ||
+						AssetBundle.Current.FileExists(path + ".png")
+					) {
 						var t = new SerializableTexture(path);
 						textures.Add(t);
 					} else if (i > 0)
