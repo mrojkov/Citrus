@@ -50,6 +50,7 @@ namespace Tangerine.UI.Inspector
 			AddEditor(typeof(EmissionType), c => new EnumPropertyEditor<EmissionType>(c));
 			AddEditor(typeof(TextOverflowMode), c => new EnumPropertyEditor<TextOverflowMode>(c));
 			AddEditor(typeof(NodeReference<Camera3D>), c => new NodeReferencePropertyEditor<Camera3D>(c));
+			AddEditor(typeof(NodeReference<LightSource>), c => new NodeReferencePropertyEditor<LightSource>(c));
 			AddEditor(typeof(NodeReference<Spline>), c => new NodeReferencePropertyEditor<Spline>(c));
 			AddEditor(typeof(NodeReference<Widget>), c => new NodeReferencePropertyEditor<Widget>(c));
 			AddEditor(typeof(NodeReference<Node3D>), c => new NodeReferencePropertyEditor<Node3D>(c));

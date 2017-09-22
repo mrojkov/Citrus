@@ -19,7 +19,7 @@ namespace Lime
 		private bool skinEnabled;
 		private FogMode fogMode;
 		private bool processLightning;
-		private DirectionalLight lightData;
+		private LightSource lightSource;
 		
 		[YuzuMember]
 		public string Name { get; set; }
@@ -105,9 +105,9 @@ namespace Lime
 			Blending = Blending.Alpha;
 		}
 
-		public void SetLightData(DirectionalLight data)
+		public void SetLightData(LightSource data)
 		{
-			lightData = data;
+			lightSource = data;
 		}
 
 		public void SetBones(Matrix44[] boneTransforms, int boneCount)
@@ -125,9 +125,10 @@ namespace Lime
 			program.LoadColor(program.DiffuseColorUniformId, DiffuseColor * ColorFactor);
 			program.LoadMatrix(program.WorldUniformId, Renderer.World);
 
-			if (processLightning) {
-				program.LoadColor(program.LightColorUniformId, lightData.Color);
-				program.LoadVector3(program.LightDirectionUniformId, lightData.DirectionNormalized);
+			if (processLightning && lightSource != null) {
+				program.LoadColor(program.LightColorUniformId, lightSource.Color);
+				program.LoadVector3(program.LightDirectionUniformId, lightSource.Position.Normalized);
+				program.LoadFloat(program.LightIntensityUniformId, lightSource.Intensity);
 			}
 
 			if (skinEnabled) {

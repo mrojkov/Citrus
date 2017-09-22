@@ -122,7 +122,7 @@ namespace Lime
 
 				var mat = sm.Material as IMaterialLightning;
 				if (mat != null && viewport != null) {
-					mat.SetLightData(viewport.Lightning);
+					mat.SetLightData(viewport.LightSource);
 				}
 
 				sm.Material.Apply();

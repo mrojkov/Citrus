@@ -77,8 +77,12 @@
 
 			uniform vec4 u_DiffuseColor;
 			uniform sampler2D u_DiffuseTexture;
+
+			#ifdef LIGHTNING_ENABLED
 			uniform vec3 u_LightDirection;
 			uniform vec4 u_LightColor;
+			uniform float u_LightIntensity;
+			#endif
 
 			void main()
 			{
@@ -93,7 +97,7 @@
 			#ifdef LIGHTNING_ENABLED
 				vec3 normal = normalize(v_Normal);
 				float light = dot(normal, u_LightDirection);
-				color.rgb *= (light * u_LightColor.rgb);
+				color.rgb *= ((light * u_LightIntensity) * u_LightColor.rgb);
 			#endif
 
 				gl_FragColor = color;
@@ -112,6 +116,7 @@
 		public int FogDensityUniformId;
 		public int LightColorUniformId;
 		public int LightDirectionUniformId;
+		public int LightIntensityUniformId;
 
 		public const int DiffuseTextureStage = 0;
 
@@ -127,6 +132,7 @@
 			DiffuseColorUniformId = GetUniformId("u_DiffuseColor");
 			LightColorUniformId = GetUniformId("u_LightColor");
 			LightDirectionUniformId = GetUniformId("u_LightDirection");
+			LightIntensityUniformId = GetUniformId("u_LightIntensity");
 			OpacityUniformId = GetUniformId("u_Opacity");
 			BonesUniformId = GetUniformId("u_Bones");
 			FogColorUniformId = GetUniformId("u_FogColor");

@@ -10,7 +10,7 @@
 	public interface IMaterialLightning
 	{
 		bool ProcessLightning { get; set; }
-		void SetLightData(DirectionalLight light);
+		void SetLightData(LightSource light);
 	}
 
 	public interface IMaterialSkin

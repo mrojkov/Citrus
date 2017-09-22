@@ -24,7 +24,7 @@ namespace Lime
 			float CalcDistanceToCamera(Camera3D camera);
 			bool Opaque { get; }
 		}
-
+		
 		private float frame;
 		private List<RenderItem> opaqueList = new List<RenderItem>();
 		private List<RenderItem> transparentList = new List<RenderItem>();
@@ -33,28 +33,11 @@ namespace Lime
 		[YuzuMember]
 		public NodeReference<Camera3D> CameraRef { get; set; }
 
-		[TangerineInspect]
-		public Vector3 LightDirection
-		{
-			get
-			{ return Lightning.Direction; }
-			set
-			{ Lightning.Direction = value; }
-		}
-
-		[TangerineInspect]
-		public Color4 LightColor
-		{
-			get
-			{ return Lightning.Color; }
-			set
-			{ Lightning.Color = value; }
-		}
-
 		[YuzuMember]
-		public DirectionalLight Lightning;
+		public NodeReference<LightSource> LightSourceRef { get; set; }
 
 		public Camera3D Camera => CameraRef?.GetNode(this);
+		public LightSource LightSource => LightSourceRef?.GetNode(this);
 
 		[YuzuMember]
 		public float Frame
@@ -205,6 +188,7 @@ namespace Lime
 			vp.opaqueList = new List<RenderItem>();
 			vp.transparentList = new List<RenderItem>();
 			vp.CameraRef = CameraRef?.Clone();
+			vp.LightSourceRef = LightSourceRef?.Clone();
 			return vp;
 		}
 

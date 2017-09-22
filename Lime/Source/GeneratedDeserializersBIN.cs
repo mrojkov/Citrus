@@ -1381,7 +1381,7 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (14 == fd.OurIndex) {
-				dg.ReadIntoStruct(ref result.Lightning);
+				result.LightSourceRef = (global::Lime.NodeReference<global::Lime.LightSource>)dg.ReadObject<global::Lime.NodeReference<global::Lime.LightSource>>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (15 == fd.OurIndex) {
