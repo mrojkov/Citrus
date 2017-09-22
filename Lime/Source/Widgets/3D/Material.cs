@@ -7,6 +7,12 @@
 		void Apply();
 	}
 
+	public interface IMaterialLightning
+	{
+		bool ProcessLightning { get; set; }
+		void SetLightData(DirectionalLight light);
+	}
+
 	public interface IMaterialSkin
 	{
 		bool SkinEnabled { get; set; }

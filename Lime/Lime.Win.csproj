@@ -172,6 +172,7 @@
     <Compile Include="Source\Types\Vector4.cs" />
     <Compile Include="Source\Widgets\3D\CommonMaterial.cs" />
     <Compile Include="Source\Widgets\3D\CommonMaterialProgram.cs" />
+    <Compile Include="Source\Widgets\3D\DirectionalLight.cs" />
     <Compile Include="Source\Widgets\3D\Model3D.cs" />
     <Compile Include="Source\Widgets\3D\Model3DAttachment.cs" />
     <Compile Include="Source\Widgets\3D\Spline3D.cs" />

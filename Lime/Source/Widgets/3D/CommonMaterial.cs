@@ -7,7 +7,7 @@ using Yuzu;
 
 namespace Lime
 {
-	public class CommonMaterial : IMaterial, IMaterialSkin, IMaterialFog
+	public class CommonMaterial : IMaterial, IMaterialSkin, IMaterialFog, IMaterialLightning
 	{
 		private static Dictionary<CommonMaterialProgramSpec, CommonMaterialProgram> programCache =
 			new Dictionary<CommonMaterialProgramSpec, CommonMaterialProgram>();
@@ -18,7 +18,9 @@ namespace Lime
 		private int boneCount;
 		private bool skinEnabled;
 		private FogMode fogMode;
-
+		private bool processLightning;
+		private DirectionalLight lightData;
+		
 		[YuzuMember]
 		public string Name { get; set; }
 
@@ -82,12 +84,30 @@ namespace Lime
 			}
 		}
 
+		[YuzuMember]
+		public bool ProcessLightning
+		{
+			get { return processLightning; }
+			set
+			{
+				if (processLightning != value) {
+					processLightning = value;
+					program = null;
+				}
+			}
+		}
+
 		public CommonMaterial()
 		{
 			DiffuseColor = Color4.White;
 			ColorFactor = Color4.White;
 			FogColor = Color4.White;
 			Blending = Blending.Alpha;
+		}
+
+		public void SetLightData(DirectionalLight data)
+		{
+			lightData = data;
 		}
 
 		public void SetBones(Matrix44[] boneTransforms, int boneCount)
@@ -103,9 +123,17 @@ namespace Lime
 			program.Use();
 			program.LoadMatrix(program.WorldViewProjUniformId, Renderer.FixupWVP(Renderer.WorldViewProjection));
 			program.LoadColor(program.DiffuseColorUniformId, DiffuseColor * ColorFactor);
+			program.LoadMatrix(program.WorldUniformId, Renderer.World);
+
+			if (processLightning) {
+				program.LoadColor(program.LightColorUniformId, lightData.Color);
+				program.LoadVector3(program.LightDirectionUniformId, lightData.DirectionNormalized);
+			}
+
 			if (skinEnabled) {
 				program.LoadMatrixArray(program.BonesUniformId, boneTransforms, boneCount);
 			}
+
 			if (fogMode != FogMode.None) {
 				program.LoadMatrix(program.WorldViewUniformId, Renderer.WorldView);
 				program.LoadColor(program.FogColorUniformId, FogColor);
@@ -116,6 +144,7 @@ namespace Lime
 					program.LoadFloat(program.FogDensityUniformId, FogDensity);
 				}
 			}
+
 			if (diffuseTexture != null) {
 				PlatformRenderer.SetTexture(diffuseTexture, CommonMaterialProgram.DiffuseTextureStage);
 			}
@@ -129,7 +158,8 @@ namespace Lime
 			var spec = new CommonMaterialProgramSpec {
 				SkinEnabled = skinEnabled,
 				DiffuseTextureEnabled = diffuseTexture != null,
-				FogMode = FogMode
+				FogMode = FogMode,
+				ProcessLightning = ProcessLightning
 			};
 			if (programCache.TryGetValue(spec, out program)) {
 				return;
@@ -151,7 +181,8 @@ namespace Lime
 				FogDensity = FogDensity,
 				Blending = Blending,
 				DiffuseTexture = DiffuseTexture,
-				SkinEnabled = SkinEnabled
+				SkinEnabled = SkinEnabled,
+				ProcessLightning = ProcessLightning
 			};
 		}
 	}

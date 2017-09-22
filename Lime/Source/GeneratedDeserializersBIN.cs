@@ -769,6 +769,10 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (11 == fd.OurIndex) {
+				result.ProcessLightning = d.Reader.ReadBoolean();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (12 == fd.OurIndex) {
 				result.SkinEnabled = d.Reader.ReadBoolean();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
@@ -1377,6 +1381,10 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (14 == fd.OurIndex) {
+				dg.ReadIntoStruct(ref result.Lightning);
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (15 == fd.OurIndex) {
 				var tmp9 = d.Reader.ReadInt32();
 				if (tmp9 >= 0) {
 					while (--tmp9 >= 0) {
@@ -1386,44 +1394,44 @@ namespace GeneratedDeserializersBIN
 				}
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (15 == fd.OurIndex) {
+			if (16 == fd.OurIndex) {
 				result.Pivot = (global::Lime.Vector2)dg.ReadStruct<global::Lime.Vector2>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (16 == fd.OurIndex) {
+			if (17 == fd.OurIndex) {
 				result.Position = (global::Lime.Vector2)dg.ReadStruct<global::Lime.Vector2>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (17 == fd.OurIndex) {
+			if (18 == fd.OurIndex) {
 				result.Rotation = d.Reader.ReadSingle();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (18 == fd.OurIndex) {
+			if (19 == fd.OurIndex) {
 				result.Scale = (global::Lime.Vector2)dg.ReadStruct<global::Lime.Vector2>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (19 == fd.OurIndex) {
+			if (20 == fd.OurIndex) {
 				result.Shader = (global::Lime.ShaderId)d.Reader.ReadInt32();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (20 == fd.OurIndex) {
+			if (21 == fd.OurIndex) {
 				result.SilentSize = (global::Lime.Vector2)dg.ReadStruct<global::Lime.Vector2>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (21 == fd.OurIndex) {
+			if (22 == fd.OurIndex) {
 				result.SkinningWeights = (global::Lime.SkinningWeights)dg.ReadObject<global::Lime.SkinningWeights>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (22 == fd.OurIndex) {
+			if (23 == fd.OurIndex) {
 				result.Tag = d.Reader.ReadString();
 				if (result.Tag == "" && d.Reader.ReadBoolean()) result.Tag = null;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (23 == fd.OurIndex) {
+			if (24 == fd.OurIndex) {
 				result.TangerineFlags = (global::Lime.TangerineFlags)d.Reader.ReadInt32();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (24 == fd.OurIndex) {
+			if (25 == fd.OurIndex) {
 				result.Visible = d.Reader.ReadBoolean();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}

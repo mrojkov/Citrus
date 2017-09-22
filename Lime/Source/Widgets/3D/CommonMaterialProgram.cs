@@ -12,9 +12,11 @@
 			attribute vec2 a_UV;
 			attribute vec4 a_BlendIndices;
 			attribute vec4 a_BlendWeights;
+			attribute vec4 a_Normal;
 
 			varying vec4 v_Color;
 			varying vec2 v_UV;
+			varying vec3 v_Normal;
 
 			#ifdef FOG_ENABLED
 			varying float v_FogFactor;
@@ -23,6 +25,7 @@
 			uniform float u_FogDensity;
 			#endif
 
+			uniform mat4 u_World;
 			uniform mat4 u_WorldView;
 			uniform mat4 u_WorldViewProj;
 			uniform mat4 u_Bones[50];
@@ -52,7 +55,9 @@
 			#endif
 				v_FogFactor = clamp(v_FogFactor, 0.0, 1.0);
 			#endif
+				
 				gl_Position = u_WorldViewProj * position;
+				v_Normal = mat3(u_World) * a_Normal.xyz;
 			}
 		";
 
@@ -63,6 +68,7 @@
 
 			varying vec4 v_Color;
 			varying vec2 v_UV;
+			varying vec3 v_Normal;
 
 			#ifdef FOG_ENABLED
 			varying float v_FogFactor;
@@ -71,6 +77,8 @@
 
 			uniform vec4 u_DiffuseColor;
 			uniform sampler2D u_DiffuseTexture;
+			uniform vec3 u_LightDirection;
+			uniform vec4 u_LightColor;
 
 			void main()
 			{
@@ -81,10 +89,18 @@
 			#ifdef FOG_ENABLED
 				color.rgb = mix(color.rgb, u_FogColor.rgb, v_FogFactor);
 			#endif
+				
+			#ifdef LIGHTNING_ENABLED
+				vec3 normal = normalize(v_Normal);
+				float light = dot(normal, u_LightDirection);
+				color.rgb *= (light * u_LightColor.rgb);
+			#endif
+
 				gl_FragColor = color;
 			}
 		";
 
+		public int WorldUniformId;
 		public int WorldViewUniformId;
 		public int WorldViewProjUniformId;
 		public int DiffuseColorUniformId;
@@ -94,19 +110,23 @@
 		public int FogStartUniformId;
 		public int FogEndUniformId;
 		public int FogDensityUniformId;
+		public int LightColorUniformId;
+		public int LightDirectionUniformId;
 
 		public const int DiffuseTextureStage = 0;
 
 		public CommonMaterialProgram(CommonMaterialProgramSpec spec)
 			: base(GetShaders(spec), GetAttribLocations(), GetSamplers())
-		{
-		}
+		{ }
 
 		protected override void InitializeUniformIds()
 		{
+			WorldUniformId = GetUniformId("u_World");
 			WorldViewUniformId = GetUniformId("u_WorldView");
 			WorldViewProjUniformId = GetUniformId("u_WorldViewProj");
 			DiffuseColorUniformId = GetUniformId("u_DiffuseColor");
+			LightColorUniformId = GetUniformId("u_LightColor");
+			LightDirectionUniformId = GetUniformId("u_LightDirection");
 			OpacityUniformId = GetUniformId("u_Opacity");
 			BonesUniformId = GetUniformId("u_Bones");
 			FogColorUniformId = GetUniformId("u_FogColor");
@@ -143,6 +163,9 @@
 					preamble += "#define FOG_EXP_SQUARED\n";
 				}
 			}
+			if (spec.ProcessLightning) {
+				preamble += "#define LIGHTNING_ENABLED\n";
+			}
 			return preamble;
 		}
 
@@ -160,7 +183,8 @@
 				new AttribLocation { Name = "a_UV", Index = ShaderPrograms.Attributes.UV1 },
 				new AttribLocation { Name = "a_Color", Index = ShaderPrograms.Attributes.Color1 },
 				new AttribLocation { Name = "a_BlendIndices", Index = ShaderPrograms.Attributes.BlendIndices },
-				new AttribLocation { Name = "a_BlendWeights", Index = ShaderPrograms.Attributes.BlendWeights }
+				new AttribLocation { Name = "a_BlendWeights", Index = ShaderPrograms.Attributes.BlendWeights },
+				new AttribLocation { Name = "a_Normal", Index =  ShaderPrograms.Attributes.Normal }
 			};
 		}
 	}
@@ -170,5 +194,6 @@
 		public bool SkinEnabled;
 		public bool DiffuseTextureEnabled;
 		public FogMode FogMode;
+		public bool ProcessLightning;
 	}
 }

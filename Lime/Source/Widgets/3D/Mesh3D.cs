@@ -100,6 +100,7 @@ namespace Lime
 			if (SkipRender) {
 				return;
 			}
+
 			Renderer.World = GlobalTransform;
 			Renderer.CullMode = CullMode;
 			var invWorld = GlobalTransform.CalcInverted();
@@ -118,7 +119,14 @@ namespace Lime
 					}
 				}
 				sm.Material.ColorFactor = GlobalColor;
+
+				var mat = sm.Material as IMaterialLightning;
+				if (mat != null && viewport != null) {
+					mat.SetLightData(viewport.Lightning);
+				}
+
 				sm.Material.Apply();
+				
 				PlatformRenderer.DrawTriangles(sm.Mesh, 0, sm.Mesh.IndexBuffer.Data.Length);
 				Renderer.PolyCount3d += sm.Mesh.IndexBuffer.Data.Length / 3;
 			}

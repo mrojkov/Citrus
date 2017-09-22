@@ -367,6 +367,7 @@
     <Compile Include="Source\Profilers\NodeProfilerHelpers\UsageData.cs" />
     <Compile Include="Source\Profilers\NodeProfilerHelpers\UsageSummary.cs" />
     <Compile Include="Source\Widgets\Theme\ThemedExpandButton.cs" />
+    <Compile Include="Source\Widgets\3D\DirectionalLight.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />

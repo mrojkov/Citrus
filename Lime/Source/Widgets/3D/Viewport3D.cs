@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Yuzu;
 using System;
+using System.Linq;
 #if OPENGL
 #if !MAC && !MONOMAC
 using OpenTK.Graphics.ES20;
@@ -31,6 +32,27 @@ namespace Lime
 
 		[YuzuMember]
 		public NodeReference<Camera3D> CameraRef { get; set; }
+
+		[TangerineInspect]
+		public Vector3 LightDirection
+		{
+			get
+			{ return Lightning.Direction; }
+			set
+			{ Lightning.Direction = value; }
+		}
+
+		[TangerineInspect]
+		public Color4 LightColor
+		{
+			get
+			{ return Lightning.Color; }
+			set
+			{ Lightning.Color = value; }
+		}
+
+		[YuzuMember]
+		public DirectionalLight Lightning;
 
 		public Camera3D Camera => CameraRef?.GetNode(this);
 
