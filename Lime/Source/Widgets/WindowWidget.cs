@@ -20,6 +20,7 @@ namespace Lime
 			Window.Context = new CombinedContext(Window.Context, new WidgetContext(this));
 			renderChain = new RenderChain();
 			window.Activated += () => windowActivated = true;
+			LayoutManager = new LayoutManager();
 		}
 
 		protected virtual bool ContinuousRendering() { return true; }
@@ -36,7 +37,7 @@ namespace Lime
 			}
 			Window.Cursor = WidgetContext.Current.MouseCursor;
 			renderChain.Clear();
-			LayoutManager.Instance.Layout();
+			LayoutManager.Layout();
 			RenderChainBuilder?.AddToRenderChain(this, renderChain);
 			var hitTestArgs = new HitTestArgs(Window.Input.MousePosition);
 			renderChain.HitTest(ref hitTestArgs);

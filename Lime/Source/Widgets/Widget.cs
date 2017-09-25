@@ -85,7 +85,24 @@ namespace Lime
 		public static Vector2 DefaultWidgetSize = new Vector2(100);
 		public static bool RenderTransparentWidgets;
 
-#region Layout properties
+		#region Layout properties
+		private LayoutManager layoutManager;
+		public LayoutManager LayoutManager
+		{
+			get
+			{
+				RecalcDirtyGlobals();
+				return layoutManager;
+			}
+			set
+			{
+				if (layoutManager != value) {
+					layoutManager = value;
+					PropagateDirtyFlags(DirtyFlags.LayoutManager);
+				}
+			}
+		}
+
 		public ILayout Layout = AnchorLayout.Instance;
 
 		/// <summary>
@@ -713,9 +730,21 @@ namespace Lime
 			base.OnParentChanged(oldParent);
 			if (oldParent != null && oldParent.AsWidget != null) {
 				var w = oldParent.AsWidget;
-				w.Layout.InvalidateConstraintsAndArrangement(w);
+				if (w.LayoutManager != null) {
+					w.Layout.InvalidateConstraintsAndArrangement(w);
+				}
 			}
-			InvalidateParentConstraintsAndArrangement();
+			if (Parent?.AsWidget == null) {
+				LayoutManager = null;
+			} else if (LayoutManager != null) {
+				InvalidateParentConstraintsAndArrangement();
+				this.Layout.InvalidateConstraintsAndArrangement(this);
+				foreach (var n in Descendants) {
+					if (n is Widget) {
+						((Widget)n).Layout.InvalidateConstraintsAndArrangement((Widget)n);
+					}
+				}
+			}
 		}
 
 		/// <summary>
@@ -802,6 +831,11 @@ namespace Lime
 		{
 			base.RecalcDirtyGlobalsUsingParents();
 			var parentWidget = Parent?.AsWidget;
+			if ((DirtyMask & DirtyFlags.LayoutManager) != 0) {
+				if (parentWidget != null) {
+					layoutManager = parentWidget.layoutManager;
+				}
+			}
 			if (IsRenderedToTexture()) {
 				localToWorldTransform = CalcLocalToParentTransform();
 				if (Parent?.AsWidget != null) {

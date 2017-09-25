@@ -721,8 +721,6 @@ namespace Tangerine.UI.FilesystemView
 					selection.Select(f);
 				}
 			}
-			// Ensure children are layed out already
-			LayoutManager.Instance.Layout();
 			EnsureSelectionVisible();
 		}
 	}

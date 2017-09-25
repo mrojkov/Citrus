@@ -94,13 +94,13 @@ namespace Lime
 		[Flags]
 		protected internal enum DirtyFlags
 		{
-			None      = 0,
-			Visible   = 1 << 0,
-			Color     = 1 << 1,
+			None = 0,
+			Visible = 1 << 0,
+			Color = 1 << 1,
 			Transform = 1 << 2,
-			Components = 1 << 3,
+			LayoutManager = 1 << 3,
 			TangerineFlags = 1 << 4,
-			All       = ~None
+			All = ~None
 		}
 
 		/// <summary>
