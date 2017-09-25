@@ -301,6 +301,7 @@ namespace Lime
 			{
 				if (size.X != value) {
 					Size = new Vector2(value, Height);
+					PropagateDirtyFlags(DirtyFlags.Transform);
 				}
 			}
 		}
@@ -312,6 +313,7 @@ namespace Lime
 			{
 				if (size.Y != value) {
 					Size = new Vector2(Width, value);
+					PropagateDirtyFlags(DirtyFlags.Transform);
 				}
 			}
 		}
@@ -381,7 +383,7 @@ namespace Lime
 			set {
 				if (color.ABGR != value.ABGR) {
 					color = value;
-					PropagateDirtyFlags(DirtyFlags.Color);
+					PropagateDirtyFlags(DirtyFlags.Color | DirtyFlags.Visible);
 				}
 			}
 		}
@@ -397,7 +399,7 @@ namespace Lime
 				var a = (byte)(value * 255f);
 				if (color.A != a) {
 					color.A = a;
-					PropagateDirtyFlags(DirtyFlags.Color);
+					PropagateDirtyFlags(DirtyFlags.Color | DirtyFlags.Visible);
 				}
 			}
 		}
@@ -799,7 +801,7 @@ namespace Lime
 		protected override void RecalcDirtyGlobalsUsingParents()
 		{
 			base.RecalcDirtyGlobalsUsingParents();
-			// TODO: Optimize using DirtyMask
+			var parentWidget = Parent?.AsWidget;
 			if (IsRenderedToTexture()) {
 				localToWorldTransform = CalcLocalToParentTransform();
 				if (Parent?.AsWidget != null) {
@@ -811,27 +813,35 @@ namespace Lime
 				globallyVisible = Visible && (color.A != 0 || RenderTransparentWidgets);
 				return;
 			}
-			globalColor = Color;
-			globalBlending = Blending;
-			globalShader = Shader;
-			globallyVisible = Visible && (color.A != 0 || RenderTransparentWidgets);
-			if (Application.IsTangerine) {
-				globallyVisible |= GetTangerineFlag(TangerineFlags.Shown);
-				globallyVisible &= !GetTangerineFlag(TangerineFlags.Hidden | TangerineFlags.HiddenOnExposition);
-			}
-			localToWorldTransform = CalcLocalToParentTransform();
-			if (Parent != null) {
-				var parentWidget = Parent.AsWidget;
-				var parentNode3D = Parent.AsNode3D;
+			var parentNode3D = Parent?.AsNode3D;
+			if ((DirtyMask & DirtyFlags.Color) != 0) {
+				globalColor = Color;
+				globalBlending = Blending;
+				globalShader = Shader;
 				if (parentWidget != null) {
-					localToWorldTransform *= parentWidget.localToWorldTransform;
 					globalColor *= parentWidget.globalColor;
 					globalBlending = Blending == Blending.Inherited ? parentWidget.globalBlending : Blending;
 					globalShader = Shader == ShaderId.Inherited ? parentWidget.globalShader : Shader;
-					globallyVisible &= parentWidget.globallyVisible;
 				} else if (parentNode3D != null) {
 					globalColor *= parentNode3D.GlobalColor;
+				}
+			}
+			if ((DirtyMask & DirtyFlags.Visible) != 0) {
+				globallyVisible = Visible && (color.A != 0 || RenderTransparentWidgets);
+				if (parentWidget != null) {
+					globallyVisible &= parentWidget.globallyVisible;
+				} else if (parentNode3D != null) {
 					globallyVisible &= parentNode3D.GloballyVisible;
+				}
+			}
+			if (Application.IsTangerine && ((DirtyMask & DirtyFlags.TangerineFlags) != 0)) {
+				globallyVisible |= GetTangerineFlag(TangerineFlags.Shown);
+				globallyVisible &= !GetTangerineFlag(TangerineFlags.Hidden | TangerineFlags.HiddenOnExposition);
+			}
+			if ((DirtyMask & DirtyFlags.Transform) != 0) {
+				localToWorldTransform = CalcLocalToParentTransform();
+				if (parentWidget != null) {
+					localToWorldTransform *= parentWidget.localToWorldTransform;
 				}
 			}
 		}
