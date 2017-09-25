@@ -248,8 +248,6 @@ namespace Lime
 		[YuzuMember]
 		public NodeComponentCollection Components { get; private set; }
 
-		private ComponentCollection<NodeComponent> ancestorComponentsCache;
-
 		/// <summary>
 		/// Collections of Animators.
 		/// </summary>
@@ -424,12 +422,7 @@ namespace Lime
 		/// <summary>
 		/// TODO: Add summary
 		/// </summary>
-		protected virtual void RecalcDirtyGlobalsUsingParents()
-		{
-			if ((DirtyMask & DirtyFlags.Components) != 0) {
-				ancestorComponentsCache?.Clear();
-			}
-		}
+		protected virtual void RecalcDirtyGlobalsUsingParents() { }
 
 #if LIME_COUNT_NODES
 		~Node() {
@@ -444,25 +437,6 @@ namespace Lime
 				node = node.Parent;
 			}
 			return node;
-		}
-
-		public T GetAncestorComponent<T>() where T : NodeComponent
-		{
-			if (ancestorComponentsCache != null) {
-				var c = ancestorComponentsCache.Get<T>();
-				if (c != null) {
-					return c;
-				}
-			}
-			for (var node = this; node != null; node = node.Parent) {
-				var c = node.Components.Get<T>();
-				if (c != null) {
-					ancestorComponentsCache = ancestorComponentsCache ?? new ComponentCollection<NodeComponent>();
-					ancestorComponentsCache.Add(c);
-					return c;
-				}
-			}
-			return null;
 		}
 
 		/// <summary>
@@ -523,7 +497,6 @@ namespace Lime
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
 			clone.Nodes = Nodes.Clone(clone);
 			clone.Components = Components.Clone(clone);
-			clone.ancestorComponentsCache = null;
 			clone.IsAwoken = false;
 			if (RenderChainBuilder != null) {
 				clone.RenderChainBuilder = RenderChainBuilder.Clone();

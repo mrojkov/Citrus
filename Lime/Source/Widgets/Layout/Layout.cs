@@ -66,7 +66,7 @@ namespace Lime
 		protected List<Widget> GetChildren(Widget widget)
 		{
 			return widget.Nodes.OfType<Widget>().Where(
-				i => (!IgnoreHidden || i.Visible) && 
+				i => (!IgnoreHidden || i.Visible) &&
 				!(i.LayoutCell ?? LayoutCell.Default).Ignore
 			).ToList();
 		}

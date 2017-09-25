@@ -40,13 +40,11 @@ namespace Lime
 			}
 			base.Add(component);
 			component.Owner = owner;
-			owner.PropagateDirtyFlags(Node.DirtyFlags.Components);
 		}
 
 		public override bool Remove(NodeComponent component)
 		{
 			if (base.Remove(component)) {
-				owner.PropagateDirtyFlags(Node.DirtyFlags.Components);
 				component.Owner = null;
 				return true;
 			}
@@ -61,7 +59,6 @@ namespace Lime
 				}
 			}
 			base.Clear();
-			owner.PropagateDirtyFlags(Node.DirtyFlags.Components);
 		}
 	}
 }
