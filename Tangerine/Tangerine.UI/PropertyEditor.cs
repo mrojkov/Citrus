@@ -640,6 +640,7 @@ namespace Tangerine.UI
 	{
 		protected readonly EditBox editor;
 		protected readonly Button button;
+		protected static string LastOpenedDirectory = Project.Current.GetSystemDirectory(Document.Current.Path);
 
 		protected FilePropertyEditor(IPropertyEditorParams editorParams, string[] allowedFileTypes) : base(editorParams)
 		{
@@ -662,10 +663,11 @@ namespace Tangerine.UI
 				var dlg = new FileDialog {
 					AllowedFileTypes = allowedFileTypes,
 					Mode = FileDialogMode.Open,
-					InitialDirectory = Project.Current.GetSystemDirectory(Document.Current.Path),
+					InitialDirectory = Directory.Exists(LastOpenedDirectory) ? LastOpenedDirectory : Project.Current.GetSystemDirectory(Document.Current.Path),
 				};
 				if (dlg.RunModal()) {
 					SetFilePath(dlg.FileName);
+					LastOpenedDirectory = Project.Current.GetSystemDirectory(dlg.FileName);
 				}
 			};
 		}
