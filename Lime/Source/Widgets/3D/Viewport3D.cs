@@ -39,6 +39,12 @@ namespace Lime
 		public Camera3D Camera => CameraRef?.GetNode(this);
 		public LightSource LightSource => LightSourceRef?.GetNode(this);
 
+#if DEBUG
+		[TangerineInspect]
+		public NodeReference<Image> DebugShadowMapImageRef { get; set; }
+		public Image DebugShadowMapImage => DebugShadowMapImageRef?.GetNode(this.Parent);
+#endif
+
 		[YuzuMember]
 		public float Frame
 		{
@@ -53,7 +59,21 @@ namespace Lime
 		public Viewport3D()
 		{
 			Presenter = DefaultPresenter.Instance;
+#if DEBUG
+			DebugShadowMapImageRef = new NodeReference<Image>("ShadowMap");
+#endif
 		}
+
+#if DEBUG
+		public override void Update(float delta)
+		{
+			base.Update(delta);
+
+			if (DebugShadowMapImage != null) {
+				DebugShadowMapImage.Texture = LightSource?.ShadowMap;
+			}
+		}
+#endif
 
 		private void BuildForTangerine()
 		{

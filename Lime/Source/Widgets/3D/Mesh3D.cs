@@ -7,7 +7,7 @@ using Yuzu;
 
 namespace Lime
 {
-	public class Mesh3D : Node3D
+	public class Mesh3D : Node3D, IShadowCaster
 	{
 		[YuzuCompact]
 		[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 4)]
@@ -87,6 +87,9 @@ namespace Lime
 		}
 
 		public virtual Action Clicked { get; set; }
+
+		public bool CastShadow
+		{ get; set; } = true;
 
 		public Mesh3D()
 		{
@@ -251,6 +254,28 @@ namespace Lime
 		{
 			Submeshes.Clear();
 			base.Dispose();
+		}
+
+		public void RenderDepthBuffer(IMaterial mat)
+		{
+			if (SkipRender) {
+				return;
+			}
+
+			Renderer.World = GlobalTransform;
+			Renderer.CullMode = CullMode;
+
+			foreach (var sm in Submeshes) {
+				var def = sm.Material;
+
+				sm.Material = mat;
+				sm.Material.Apply();
+
+				PlatformRenderer.DrawTriangles(sm.Mesh, 0, sm.Mesh.IndexBuffer.Data.Length);
+				Renderer.PolyCount3d += sm.Mesh.IndexBuffer.Data.Length / 3;
+
+				sm.Material = def;
+			}
 		}
 	}
 
