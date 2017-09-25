@@ -12,6 +12,7 @@ namespace Lime
 		public readonly List<MeshOption> MeshOptions = new List<MeshOption>();
 		public readonly List<Animation> Animations = new List<Animation>();
 		public readonly List<MaterialEffect> MaterialEffects = new List<MaterialEffect>();
+		public float ScaleFactor = 0.01f;
 
 		public class MeshOption
 		{
@@ -45,6 +46,45 @@ namespace Lime
 			ProcessMeshOptions(model);
 			ProcessAnimations(model);
 			ProcessMaterialEffects(model);
+		}
+
+		public void ApplyScaleFactor(Node3D model)
+		{
+			if (ScaleFactor == 1) {
+				return;
+			}
+			var sf = Vector3.One * ScaleFactor;
+			var nodes = model.Descendants.OfType<Node3D>();
+			Vector3 tranlation;
+			Quaternion rotation;
+			Vector3 scale;
+			foreach (var node in nodes) {
+				node.Position *= sf;
+				if (node is Mesh3D) {
+					foreach (var submesh in (node as Mesh3D).Submeshes) {
+						foreach (VertexBuffer<Mesh3D.Vertex> vb in submesh.Mesh.VertexBuffers) {
+							for (var i = 0; i < vb.Data.Length; i++) {
+								vb.Data[i].Pos *= sf;
+							}
+						};
+						for (int i = 0; i < submesh.BoneBindPoses.Count; i++) {
+							submesh.BoneBindPoses[i].Decompose(out scale, out rotation, out tranlation);
+							tranlation *= sf;
+							submesh.BoneBindPoses[i] =
+								Matrix44.CreateRotation(rotation) *
+								Matrix44.CreateScale(scale) *
+								Matrix44.CreateTranslation(tranlation);
+						}
+					}
+				}
+				foreach (var animator in node.Animators) {
+					if (animator.TargetProperty == "Position") {
+						foreach (Keyframe<Vector3> key in animator.Keys) {
+							key.Value *= sf;
+						}
+					}
+				}
+			}
 		}
 
 		private void ProcessMeshOptions(Node3D model)
@@ -165,7 +205,7 @@ namespace Lime
 		}
 	}
 
-	class Model3DAttachmentParser
+	public class Model3DAttachmentParser
 	{
 		public enum UVAnimationType
 		{
@@ -193,6 +233,9 @@ namespace Lime
 
 			[YuzuOptional]
 			public List<UVAnimationFormat> UVAnimations = null;
+
+			[YuzuOptional]
+			public float ScaleFactor = 0.01f;
 		}
 
 		public class MeshOptionFormat
@@ -302,6 +345,7 @@ namespace Lime
 				var modelAttachmentFormat = Serialization.ReadObject<ModelAttachmentFormat>(attachmentPath);
 				var attachment = new Model3DAttachment();
 
+				attachment.ScaleFactor = modelAttachmentFormat.ScaleFactor;
 				if (modelAttachmentFormat.MeshOptions != null) {
 					foreach (var meshOptionFormat in modelAttachmentFormat.MeshOptions) {
 						var meshOption = new Model3DAttachment.MeshOption() {
