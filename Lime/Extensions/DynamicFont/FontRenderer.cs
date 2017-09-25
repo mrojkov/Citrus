@@ -51,7 +51,7 @@ namespace Lime
 		{
 			if (lastHeight != height) {
 				lastHeight = height;
-				var pixelSize = (uint)CalcPixelSize(face, height).Round();
+				var pixelSize = (uint)Math.Abs(CalcPixelSize(face, height).Round());
 				face.SetPixelSizes(pixelSize, pixelSize);
 			}
 

@@ -351,7 +351,7 @@ namespace Lime
 				if (fontChar == FontChar.Null) {
 					continue;
 				}
-				float scale = fontHeight / fontChar.Height;
+				float scale = fontChar.Height != 0.0f ? fontHeight / fontChar.Height : 0.0f;
 				width += scale * (fontChar.ACWidths.X + fontChar.Kerning(prevChar));
 				width += scale * (fontChar.Width + fontChar.ACWidths.Y);
 				width += scale * letterSpacing;
@@ -399,7 +399,7 @@ namespace Lime
 					}
 					continue;
 				}
-				float scale = fontHeight / fontChar.Height;
+				float scale = fontChar.Height != 0.0f ? fontHeight / fontChar.Height : 0.0f;
 				var xDelta = scale * (fontChar.ACWidths.X + fontChar.Kerning(prevChar) + letterSpacing);
 				position.X += xDelta;
 				var size = new Vector2(scale * fontChar.Width, fontHeight - fontChar.VerticalOffset);
