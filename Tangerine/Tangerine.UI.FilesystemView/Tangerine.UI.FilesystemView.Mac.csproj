@@ -54,7 +54,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Model.cs" />
-    <Compile Include="Icon.cs" />
     <Compile Include="FilesystemView.cs" />
     <Compile Include="FilesystemToolbar.cs" />
     <Compile Include="FileEnumerator.cs" />
@@ -71,6 +70,7 @@
     <Compile Include="ViewNode.cs" />
     <Compile Include="WinAPI.cs" />
     <Compile Include="SystemShellContextMenu.Mac.cs" />
+    <Compile Include="FilesystemItem.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Mac.csproj">
