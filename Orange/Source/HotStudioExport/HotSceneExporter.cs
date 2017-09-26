@@ -20,9 +20,17 @@ namespace Orange
 		{
 			Expanded = true;
 		}
+
+		protected override void AddToRenderChain(RenderChain chain)
+		{
+		}
 	}
 
-	public class FolderEnd : Node { }
+	public class FolderEnd : Node {
+		protected override void AddToRenderChain(RenderChain chain)
+		{
+		}
+	}
 
 	public class HotSceneExporter
 	{

@@ -166,6 +166,10 @@ namespace Lime
 			}
 		}
 
+		protected internal override void AddToRenderChain(RenderChain chain)
+		{
+		}
+
 		static float ClipAboutZero(float value, float eps = 0.0001f)
 		{
 			if (value > -eps && value < eps)

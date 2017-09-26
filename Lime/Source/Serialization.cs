@@ -334,7 +334,6 @@ namespace Lime
 				jd.Generate<Marker>();
 				jd.Generate<Movie>();
 				jd.Generate<NineGrid>();
-				jd.Generate<Node>();
 				jd.Generate<ParticleEmitter>();
 				jd.Generate<ParticleModifier>();
 				jd.Generate<ParticlesMagnet>();

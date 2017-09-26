@@ -48,5 +48,9 @@ namespace Lime
 				return result;
 			}
 		}
+
+		protected internal override void AddToRenderChain(RenderChain chain)
+		{
+		}
 	}
 }

@@ -158,5 +158,9 @@ namespace Lime
 		{
 			return camera.View.TransformVector(CalcGlobalPosition()).Z;
 		}
+
+		protected internal override void AddToRenderChain(RenderChain chain)
+		{
+		}
 	}
 }

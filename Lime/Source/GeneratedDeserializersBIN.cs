@@ -4682,93 +4682,6 @@ namespace GeneratedDeserializersBIN
 			return result;
 		}
 
-		private static void Read_Lime__Node(BinaryDeserializer d, ReaderClassDef def, object obj)
-		{
-			var result = (global::Lime.Node)obj;
-			var dg = (BinaryDeserializerGen)d;
-			ReaderClassDef.FieldDef fd;
-			fd = def.Fields[d.Reader.ReadInt16()];
-			if (1 == fd.OurIndex) {
-				var tmp1 = d.Reader.ReadInt32();
-				if (tmp1 >= 0) {
-					while (--tmp1 >= 0) {
-						var tmp2 = (global::Lime.Animation)dg.ReadObject<global::Lime.Animation>();
-						result.Animations.Add(tmp2);
-					}
-				}
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (2 == fd.OurIndex) {
-				var tmp3 = d.Reader.ReadInt32();
-				if (tmp3 >= 0) {
-					while (--tmp3 >= 0) {
-						var tmp4 = (global::Lime.IAnimator)dg.ReadObject<global::Lime.IAnimator>();
-						result.Animators.Add(tmp4);
-					}
-				}
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (3 == fd.OurIndex) {
-				var tmp5 = d.Reader.ReadInt32();
-				if (tmp5 >= 0) {
-					while (--tmp5 >= 0) {
-						var tmp6 = (global::Lime.NodeComponent)dg.ReadObject<global::Lime.NodeComponent>();
-						result.Components.Add(tmp6);
-					}
-				}
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (4 == fd.OurIndex) {
-				result.ContentsPath = d.Reader.ReadString();
-				if (result.ContentsPath == "" && d.Reader.ReadBoolean()) result.ContentsPath = null;
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (5 == fd.OurIndex) {
-				result.Folders = (global::System.Collections.Generic.List<global::Lime.Folder.Descriptor>)null;
-				var tmp7 = d.Reader.ReadInt32();
-				if (tmp7 >= 0) {
-					result.Folders = new global::System.Collections.Generic.List<global::Lime.Folder.Descriptor>();
-					while (--tmp7 >= 0) {
-						var tmp8 = (global::Lime.Folder.Descriptor)dg.ReadObject<global::Lime.Folder.Descriptor>();
-						result.Folders.Add(tmp8);
-					}
-				}
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (6 == fd.OurIndex) {
-				result.Id = d.Reader.ReadString();
-				if (result.Id == "" && d.Reader.ReadBoolean()) result.Id = null;
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (7 == fd.OurIndex) {
-				var tmp9 = d.Reader.ReadInt32();
-				if (tmp9 >= 0) {
-					while (--tmp9 >= 0) {
-						var tmp10 = (global::Lime.Node)dg.ReadObject<global::Lime.Node>();
-						result.Nodes.Add(tmp10);
-					}
-				}
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (8 == fd.OurIndex) {
-				result.Tag = d.Reader.ReadString();
-				if (result.Tag == "" && d.Reader.ReadBoolean()) result.Tag = null;
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (9 == fd.OurIndex) {
-				result.TangerineFlags = (global::Lime.TangerineFlags)d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
-		}
-
-		private static object Make_Lime__Node(BinaryDeserializer d, ReaderClassDef def)
-		{
-			var result = new global::Lime.Node();
-			Read_Lime__Node(d, def, result);
-			return result;
-		}
-
 		private static void Read_Lime__ParticleEmitter(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.ParticleEmitter)obj;
@@ -6538,7 +6451,6 @@ namespace GeneratedDeserializersBIN
 			readCache[typeof(global::Lime.Marker)] = Read_Lime__Marker;
 			readCache[typeof(global::Lime.Movie)] = Read_Lime__Movie;
 			readCache[typeof(global::Lime.NineGrid)] = Read_Lime__NineGrid;
-			readCache[typeof(global::Lime.Node)] = Read_Lime__Node;
 			readCache[typeof(global::Lime.ParticleEmitter)] = Read_Lime__ParticleEmitter;
 			readCache[typeof(global::Lime.ParticleModifier)] = Read_Lime__ParticleModifier;
 			readCache[typeof(global::Lime.ParticlesMagnet)] = Read_Lime__ParticlesMagnet;
@@ -6653,7 +6565,6 @@ namespace GeneratedDeserializersBIN
 			makeCache[typeof(global::Lime.Marker)] = Make_Lime__Marker;
 			makeCache[typeof(global::Lime.Movie)] = Make_Lime__Movie;
 			makeCache[typeof(global::Lime.NineGrid)] = Make_Lime__NineGrid;
-			makeCache[typeof(global::Lime.Node)] = Make_Lime__Node;
 			makeCache[typeof(global::Lime.ParticleEmitter)] = Make_Lime__ParticleEmitter;
 			makeCache[typeof(global::Lime.ParticleModifier)] = Make_Lime__ParticleModifier;
 			makeCache[typeof(global::Lime.ParticlesMagnet)] = Make_Lime__ParticlesMagnet;

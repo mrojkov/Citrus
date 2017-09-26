@@ -89,7 +89,7 @@ namespace Lime
 	/// Scene tree element.
 	/// </summary>
 	[DebuggerTypeProxy(typeof(NodeDebugView))]
-	public class Node : IDisposable, IAnimable, IFolderItem, IFolderContext
+	public abstract class Node : IDisposable, IAnimable, IFolderItem, IFolderContext
 	{
 		[Flags]
 		protected internal enum DirtyFlags
@@ -611,9 +611,11 @@ namespace Lime
 		public virtual void Render() { }
 
 		/// <summary>
-		/// Adds this node and all its descendant nodes to render chain.
+		/// Decides what descendant nodes should be added to render chain and under which conditions
 		/// </summary>
-		internal protected virtual void AddToRenderChain(RenderChain chain)
+		internal protected abstract void AddToRenderChain(RenderChain chain);
+
+		protected void AddChildrenToRenderChain(RenderChain chain)
 		{
 			var savedLayer = chain.CurrentLayer;
 			if (Layer != 0) {

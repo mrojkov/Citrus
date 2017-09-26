@@ -47,6 +47,10 @@ namespace Lime
 			mesh.Render(parentWidget);
 		}
 
+		protected internal override void AddToRenderChain(RenderChain chain)
+		{
+		}
+
 		public void RefreshMeshBounds()
 		{
 			for (int i = 0; i < Meshes.Count; i++) {

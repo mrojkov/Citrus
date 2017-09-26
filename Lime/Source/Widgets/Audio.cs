@@ -103,6 +103,10 @@ namespace Lime
 			sound.Bump();
 		}
 
+		protected internal override void AddToRenderChain(RenderChain chain)
+		{
+		}
+
 		public override void OnTrigger(string property)
 		{
 			if (property == "Action") {

@@ -979,7 +979,7 @@ namespace Lime
 		internal protected override void AddToRenderChain(RenderChain chain)
 		{
 			if (GloballyVisible) {
-				base.AddToRenderChain(chain);
+				AddChildrenToRenderChain(chain);
 			}
 		}
 

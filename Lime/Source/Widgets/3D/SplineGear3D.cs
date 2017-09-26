@@ -44,5 +44,9 @@ namespace Lime
 				node.Rotation = Quaternion.CreateFromRotationMatrix(transform);
 			}
 		}
+
+		protected internal override void AddToRenderChain(RenderChain chain)
+		{
+		}
 	}
 }

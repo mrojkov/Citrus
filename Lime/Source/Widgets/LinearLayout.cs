@@ -100,5 +100,9 @@ namespace Lime
 				Parent.AsWidget.Layout = new LayoutHandler(this);
 			}
 		}
+
+		protected internal override void AddToRenderChain(RenderChain chain)
+		{
+		}
 	}
 }

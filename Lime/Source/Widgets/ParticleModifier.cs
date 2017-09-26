@@ -115,5 +115,9 @@ namespace Lime
 			index = Mathf.Clamp(index, 0, textures.Count - 1);
 			return textures[index];
 		}
+
+		protected internal override void AddToRenderChain(RenderChain chain)
+		{
+		}
 	}
 }

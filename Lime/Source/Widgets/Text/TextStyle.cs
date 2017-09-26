@@ -201,5 +201,9 @@ namespace Lime
 				PalleteIndex = -1;
 			}
 		}
+
+		protected internal override void AddToRenderChain(RenderChain chain)
+		{
+		}
 	}
 }

@@ -42,5 +42,9 @@ namespace Lime
 				widget.Position = spline.CalcLocalToParentTransform().TransformVector(point);
 			}
 		}
+
+		protected internal override void AddToRenderChain(RenderChain chain)
+		{
+		}
 	}
 }
