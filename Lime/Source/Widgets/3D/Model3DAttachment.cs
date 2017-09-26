@@ -343,9 +343,10 @@ namespace Lime
 			}
 			try {
 				var modelAttachmentFormat = Serialization.ReadObject<ModelAttachmentFormat>(attachmentPath);
-				var attachment = new Model3DAttachment();
+				var attachment = new Model3DAttachment {
+					ScaleFactor = modelAttachmentFormat.ScaleFactor
+				};
 
-				attachment.ScaleFactor = modelAttachmentFormat.ScaleFactor;
 				if (modelAttachmentFormat.MeshOptions != null) {
 					foreach (var meshOptionFormat in modelAttachmentFormat.MeshOptions) {
 						var meshOption = new Model3DAttachment.MeshOption() {
@@ -369,75 +370,77 @@ namespace Lime
 					}
 				}
 
-				foreach (var animationFormat in modelAttachmentFormat.Animations) {
-					var animation = new Model3DAttachment.Animation {
-						Name = animationFormat.Key,
-						StartFrame = animationFormat.Value.StartFrame,
-						LastFrame = animationFormat.Value.LastFrame
-					};
+				if (modelAttachmentFormat.Animations != null) {
+					foreach (var animationFormat in modelAttachmentFormat.Animations) {
+						var animation = new Model3DAttachment.Animation {
+							Name = animationFormat.Key,
+							StartFrame = animationFormat.Value.StartFrame,
+							LastFrame = animationFormat.Value.LastFrame
+						};
 
-					if (animationFormat.Value.Markers != null) {
-						foreach (var markerFormat in animationFormat.Value.Markers) {
-							var marker = new Marker {
-								Id = markerFormat.Key,
-								Frame = FixFrame(markerFormat.Value.Frame)
-							};
-							if (!string.IsNullOrEmpty(markerFormat.Value.Action)) {
-								switch (markerFormat.Value.Action) {
-									case "Start":
-										marker.Action = MarkerAction.Play;
-										break;
-									case "Stop":
-										marker.Action = MarkerAction.Stop;
-										break;
-									case "Jump":
-										marker.Action = MarkerAction.Jump;
-										marker.JumpTo = markerFormat.Value.JumpTarget;
-										break;
-								}
-							}
-							if (markerFormat.Value.Blending > 0) {
-								var markerBlending = new MarkerBlending() {
-									Option = new BlendingOption(markerFormat.Value.Blending)
+						if (animationFormat.Value.Markers != null) {
+							foreach (var markerFormat in animationFormat.Value.Markers) {
+								var marker = new Marker {
+									Id = markerFormat.Key,
+									Frame = FixFrame(markerFormat.Value.Frame)
 								};
-								animation.MarkersBlendings.Add(markerFormat.Key, markerBlending);
-							}
-							if (markerFormat.Value.SourceMarkersBlending != null) {
-								MarkerBlending markerBlending;
-								animation.MarkersBlendings.TryGetValue(markerFormat.Key, out markerBlending);
-								if (markerBlending == null) {
-									markerBlending = new MarkerBlending();
+								if (!string.IsNullOrEmpty(markerFormat.Value.Action)) {
+									switch (markerFormat.Value.Action) {
+										case "Start":
+											marker.Action = MarkerAction.Play;
+											break;
+										case "Stop":
+											marker.Action = MarkerAction.Stop;
+											break;
+										case "Jump":
+											marker.Action = MarkerAction.Jump;
+											marker.JumpTo = markerFormat.Value.JumpTarget;
+											break;
+									}
+								}
+								if (markerFormat.Value.Blending > 0) {
+									var markerBlending = new MarkerBlending() {
+										Option = new BlendingOption(markerFormat.Value.Blending)
+									};
 									animation.MarkersBlendings.Add(markerFormat.Key, markerBlending);
 								}
+								if (markerFormat.Value.SourceMarkersBlending != null) {
+									MarkerBlending markerBlending;
+									animation.MarkersBlendings.TryGetValue(markerFormat.Key, out markerBlending);
+									if (markerBlending == null) {
+										markerBlending = new MarkerBlending();
+										animation.MarkersBlendings.Add(markerFormat.Key, markerBlending);
+									}
 
-								foreach (var sourceMarkerFormat in markerFormat.Value.SourceMarkersBlending) {
-									markerBlending.SourceMarkersOptions.Add(
-										sourceMarkerFormat.Key,
-										new BlendingOption(sourceMarkerFormat.Value)
-									);
+									foreach (var sourceMarkerFormat in markerFormat.Value.SourceMarkersBlending) {
+										markerBlending.SourceMarkersOptions.Add(
+											sourceMarkerFormat.Key,
+											new BlendingOption(sourceMarkerFormat.Value)
+										);
+									}
 								}
+
+								animation.Markers.Add(marker);
 							}
-
-							animation.Markers.Add(marker);
 						}
-					}
 
-					if (animationFormat.Value.Blending > 0) {
-						animation.Blending = new BlendingOption(animationFormat.Value.Blending);
-					}
-
-					if (animationFormat.Value.Nodes != null) {
-						animation.Nodes = animationFormat.Value.Nodes;
-					}
-
-					if (animationFormat.Value.IgnoredNodes != null && animationFormat.Value.IgnoredNodes.Count > 0) {
-						if (animation.Nodes.Count > 0) {
-							throw new Exception("Conflict between 'Nodes' and 'IgnoredNodes' in animation '{0}", animation.Name);
+						if (animationFormat.Value.Blending > 0) {
+							animation.Blending = new BlendingOption(animationFormat.Value.Blending);
 						}
-						animation.IgnoredNodes = animationFormat.Value.IgnoredNodes;
-					}
 
-					attachment.Animations.Add(animation);
+						if (animationFormat.Value.Nodes != null) {
+							animation.Nodes = animationFormat.Value.Nodes;
+						}
+
+						if (animationFormat.Value.IgnoredNodes != null && animationFormat.Value.IgnoredNodes.Count > 0) {
+							if (animation.Nodes.Count > 0) {
+								throw new Exception("Conflict between 'Nodes' and 'IgnoredNodes' in animation '{0}", animation.Name);
+							}
+							animation.IgnoredNodes = animationFormat.Value.IgnoredNodes;
+						}
+
+						attachment.Animations.Add(animation);
+					}
 				}
 
 				if (modelAttachmentFormat.MaterialEffects != null) {
