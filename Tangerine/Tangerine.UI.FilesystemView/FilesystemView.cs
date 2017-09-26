@@ -212,7 +212,6 @@ namespace Tangerine.UI.FilesystemView
 			foreach (var item in model.EnumerateItems()) {
 				var fsItem = new FilesystemItem(item);
 				scrollView.Content.AddNode(fsItem);
-				fsItem.Initialize();
 				fsItem.CompoundPresenter.Insert(0, new DelegatePresenter<FilesystemItem>(RenderFSItemSelection));
 			}
 		}
@@ -721,8 +720,6 @@ namespace Tangerine.UI.FilesystemView
 					selection.Select(f);
 				}
 			}
-			// Ensure children are layed out already
-			LayoutManager.Instance.Layout();
 			EnsureSelectionVisible();
 		}
 	}

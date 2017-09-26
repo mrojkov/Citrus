@@ -37,18 +37,18 @@ namespace Lime
 
 		public void InvalidateConstraintsAndArrangement(Widget widget)
 		{
-			if (ConstraintsValid) {
+			if (widget.LayoutManager != null && ConstraintsValid) {
 				ConstraintsValid = false;
-				LayoutManager.Instance.AddToMeasureQueue(widget);
+				widget.LayoutManager.AddToMeasureQueue(widget);
 			}
 			InvalidateArrangement(widget);
 		}
 
 		public void InvalidateArrangement(Widget widget)
 		{
-			if (ArrangementValid) {
+			if (widget.LayoutManager != null && ArrangementValid) {
 				ArrangementValid = false;
-				LayoutManager.Instance.AddToArrangeQueue(widget);
+				widget.LayoutManager.AddToArrangeQueue(widget);
 			}
 		}
 

@@ -35,7 +35,7 @@ namespace Tangerine.UI.Timeline
 				content.AddNode(widget);
 			}
 			// Layout widgets in order to have valid row positions and sizes, which are used for rows visibility determination.
-			Lime.LayoutManager.Instance.Layout();
+			Lime.WidgetContext.Current.Root.LayoutManager.Layout();
 		}
 
 		bool AreWidgetsValid()

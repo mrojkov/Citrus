@@ -10,8 +10,6 @@ namespace Lime
 		// MeasureQueue has leaf-nodes first order, because widget size constraints depends only on the widget's children constraints.
 		private DepthOrderedQueue measureQueue = new DepthOrderedQueue(rootToLeavesOrder: false);
 
-		public static readonly LayoutManager Instance = new LayoutManager();
-
 		public void AddToArrangeQueue(Widget widget)
 		{
 			arrangeQueue.Enqueue(widget);
