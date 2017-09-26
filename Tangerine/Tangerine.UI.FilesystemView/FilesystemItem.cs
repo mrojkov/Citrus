@@ -11,12 +11,6 @@ namespace Tangerine.UI.FilesystemView
 		public FilesystemItem(string path)
 		{
 			FilesystemPath = path;
-		}
-
-		// Initializing in separate function, so we can add this widget to parent BEFORE
-		// adding any children to this widget, so it will not trigger O(N^2) relayout bug(http://gitlab.game-forest.com:2000/browse/CIT-157)
-		public void Initialize()
-		{
 			this.Input.AcceptMouseThroughDescendants = true;
 			SimpleText text = null;
 			MinMaxSize = new Vector2(200, 16);
