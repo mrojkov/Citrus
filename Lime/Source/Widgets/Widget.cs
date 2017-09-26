@@ -738,11 +738,10 @@ namespace Lime
 				LayoutManager = null;
 			} else if (LayoutManager != null) {
 				InvalidateParentConstraintsAndArrangement();
-				this.Layout.InvalidateConstraintsAndArrangement(this);
+				Layout.InvalidateConstraintsAndArrangement(this);
 				foreach (var n in Descendants) {
-					if (n is Widget) {
-						((Widget)n).Layout.InvalidateConstraintsAndArrangement((Widget)n);
-					}
+					var w = n as Widget;
+					w?.Layout.InvalidateConstraintsAndArrangement(w);
 				}
 			}
 		}
@@ -829,7 +828,6 @@ namespace Lime
 		/// </summary>
 		protected override void RecalcDirtyGlobalsUsingParents()
 		{
-			base.RecalcDirtyGlobalsUsingParents();
 			var parentWidget = Parent?.AsWidget;
 			if ((DirtyMask & DirtyFlags.LayoutManager) != 0) {
 				if (parentWidget != null) {
