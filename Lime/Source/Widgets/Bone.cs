@@ -72,12 +72,15 @@ namespace Lime
 	public class Bone : Node
 	{
 		[YuzuMember]
+		[TangerineKeyframeColor(10)]
 		public Vector2 Position { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(1)]
 		public float Rotation { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(2)]
 		public float Length { get; set; }
 
 		[YuzuMember]
