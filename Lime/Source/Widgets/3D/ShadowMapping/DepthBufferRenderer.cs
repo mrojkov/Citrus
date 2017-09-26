@@ -10,7 +10,9 @@ namespace Lime
 	}
 
 	public interface IShadowReciever
-	{ }
+	{
+		bool RecieveShadow { get; set; }
+	}
 
 	public class DepthBufferRenderer
 	{
@@ -49,7 +51,6 @@ namespace Lime
 
 			Renderer.Flush();
 			Renderer.Viewport = lightViewport;
-			Renderer.World = Matrix44.Identity;
 
 			var list = new List<RenderItem>();
 			var chain = new RenderChain();
@@ -77,8 +78,6 @@ namespace Lime
 			}
 
 			chain.Clear();
-
-			Renderer.DrawRect(new Vector2(0, 0), new Vector2(1536, 1536), Color4.Red);
 
 			Renderer.World = oldWorld;
 			Renderer.Viewport = oldViewport;

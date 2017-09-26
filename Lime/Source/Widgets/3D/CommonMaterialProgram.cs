@@ -30,6 +30,11 @@
 			uniform mat4 u_WorldViewProj;
 			uniform mat4 u_Bones[50];
 
+			#ifdef RECIEVE_SHADOWS
+			varying vec4 v_ShadowCoord;
+			uniform mat4 u_LightWorldViewProjection;
+			#endif
+
 			void main()
 			{
 				vec4 position = a_Position;
@@ -55,6 +60,10 @@
 			#endif
 				v_FogFactor = clamp(v_FogFactor, 0.0, 1.0);
 			#endif
+
+			#ifdef RECIEVE_SHADOWS
+				v_ShadowCoord = u_LightWorldViewProjection * position;
+			#endif
 				
 				gl_Position = u_WorldViewProj * position;
 				v_Normal = mat3(u_World) * a_Normal.xyz;
@@ -78,6 +87,11 @@
 			uniform vec4 u_DiffuseColor;
 			uniform sampler2D u_DiffuseTexture;
 
+			#ifdef RECIEVE_SHADOWS
+			varying vec4 v_ShadowCoord;
+			uniform sampler2D u_ShadowMapTexture;
+			#endif
+
 			#ifdef LIGHTNING_ENABLED
 			uniform vec3 u_LightDirection;
 			uniform vec4 u_LightColor;
@@ -97,7 +111,33 @@
 			#ifdef LIGHTNING_ENABLED
 				vec3 normal = normalize(v_Normal);
 				float light = dot(normal, u_LightDirection);
-				color.rgb *= ((light * u_LightIntensity) * u_LightColor.rgb);
+				float visibility = 1.0;
+
+			#ifdef RECIEVE_SHADOWS
+
+				vec2 shadowUV = (v_ShadowCoord.xy + vec2(1.0)) / 2.0;
+				float bias = clamp(0.005 * tan(acos(clamp(light, 0, 0.75))), 0, 0.005);
+			#ifdef SHADOW_SAMPLING
+				vec2 poissonDisk[4];
+				poissonDisk[0] = vec2( -0.94201624, -0.39906216 );
+				poissonDisk[1] = vec2( 0.94558609, -0.76890725 );
+				poissonDisk[2] = vec2( -0.094184101, -0.92938870 );
+				poissonDisk[3] = vec2( 0.34495938, 0.29387760 );
+				
+				for (int i = 0; i < 4; i++) {
+					if (texture2D(u_ShadowMapTexture, shadowUV.xy + poissonDisk[i] / 700.0).z < v_ShadowCoord.z - bias) {
+						visibility -= 0.2;
+					}
+				}
+			#else
+				if (texture2D(u_ShadowMapTexture, shadowUV.xy).z < v_ShadowCoord.z - bias) {
+					visibility = 0.2;
+				}
+			#endif
+
+			#endif
+
+				color.rgb *= (max(0.25, visibility * light * u_LightIntensity) * u_LightColor.rgb);
 			#endif
 
 				gl_FragColor = color;
@@ -117,11 +157,13 @@
 		public int LightColorUniformId;
 		public int LightDirectionUniformId;
 		public int LightIntensityUniformId;
+		public int LightWorldViewProjectionUniformId;
 
 		public const int DiffuseTextureStage = 0;
+		public const int ShadowMapTextureStage = 1;
 
 		public CommonMaterialProgram(CommonMaterialProgramSpec spec)
-			: base(GetShaders(spec), GetAttribLocations(), GetSamplers())
+			: base(GetShaders(spec), GetAttribLocations(), GetSamplers(spec))
 		{ }
 
 		protected override void InitializeUniformIds()
@@ -130,15 +172,16 @@
 			WorldViewUniformId = GetUniformId("u_WorldView");
 			WorldViewProjUniformId = GetUniformId("u_WorldViewProj");
 			DiffuseColorUniformId = GetUniformId("u_DiffuseColor");
-			LightColorUniformId = GetUniformId("u_LightColor");
-			LightDirectionUniformId = GetUniformId("u_LightDirection");
-			LightIntensityUniformId = GetUniformId("u_LightIntensity");
 			OpacityUniformId = GetUniformId("u_Opacity");
 			BonesUniformId = GetUniformId("u_Bones");
 			FogColorUniformId = GetUniformId("u_FogColor");
 			FogStartUniformId = GetUniformId("u_FogStart");
 			FogEndUniformId = GetUniformId("u_FogEnd");
 			FogDensityUniformId = GetUniformId("u_FogDensity");
+			LightColorUniformId = GetUniformId("u_LightColor");
+			LightDirectionUniformId = GetUniformId("u_LightDirection");
+			LightIntensityUniformId = GetUniformId("u_LightIntensity");
+			LightWorldViewProjectionUniformId = GetUniformId("u_LightWorldViewProjection");
 		}
 
 		private static Shader[] GetShaders(CommonMaterialProgramSpec spec)
@@ -172,14 +215,26 @@
 			if (spec.ProcessLightning) {
 				preamble += "#define LIGHTNING_ENABLED\n";
 			}
+			if (spec.RecieveShadows) {
+				preamble += "#define RECIEVE_SHADOWS\n";
+				if (spec.SoftShadow) {
+					preamble += "#define _SHADOW_SAMPLING\n";
+				}
+			}
+
 			return preamble;
 		}
 
-		private static Sampler[] GetSamplers()
+		private static Sampler[] GetSamplers(CommonMaterialProgramSpec spec)
 		{
-			return new Sampler[] {
-				new Sampler { Name = "u_DiffuseTexture", Stage = DiffuseTextureStage }
-			};
+			var samplers = new System.Collections.Generic.List<Sampler>(2);
+			samplers.Add(new Sampler { Name = "u_DiffuseTexture", Stage = DiffuseTextureStage });
+			if (spec.RecieveShadows) {
+				samplers.Add(new Sampler { Name = "u_ShadowMapTexture", Stage = ShadowMapTextureStage });
+			}
+
+			return samplers.ToArray();
+
 		}
 
 		private static AttribLocation[] GetAttribLocations()
@@ -201,5 +256,7 @@
 		public bool DiffuseTextureEnabled;
 		public FogMode FogMode;
 		public bool ProcessLightning;
+		public bool RecieveShadows;
+		public bool SoftShadow;
 	}
 }

@@ -13,6 +13,11 @@
 		void SetLightData(LightSource light);
 	}
 
+	public interface IMaterialShadowReciever : IMaterialLightning
+	{
+		bool RecieveShadows { get; set; }
+	}
+
 	public interface IMaterialSkin
 	{
 		bool SkinEnabled { get; set; }

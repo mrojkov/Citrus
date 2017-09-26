@@ -7,7 +7,7 @@ using Yuzu;
 
 namespace Lime
 {
-	public class Mesh3D : Node3D, IShadowCaster
+	public class Mesh3D : Node3D, IShadowCaster, IShadowReciever
 	{
 		[YuzuCompact]
 		[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 4)]
@@ -91,6 +91,9 @@ namespace Lime
 		public bool CastShadow
 		{ get; set; } = true;
 
+		public bool RecieveShadow
+		{ get; set; } = true;
+
 		public Mesh3D()
 		{
 			Presenter = DefaultPresenter.Instance;
@@ -103,6 +106,9 @@ namespace Lime
 			if (SkipRender) {
 				return;
 			}
+
+			bool lightningEnabled = viewport != null && viewport.LightSource != null;
+			bool shadowsEnabled = lightningEnabled && viewport.LightSource.ShadowMapping;
 
 			Renderer.World = GlobalTransform;
 			Renderer.CullMode = CullMode;
@@ -123,9 +129,14 @@ namespace Lime
 				}
 				sm.Material.ColorFactor = GlobalColor;
 
-				var mat = sm.Material as IMaterialLightning;
-				if (mat != null && viewport != null) {
-					mat.SetLightData(viewport.LightSource);
+				var lightningMaterial = sm.Material as IMaterialLightning;
+				if (lightningMaterial != null) {
+					lightningMaterial.SetLightData(viewport.LightSource);
+				}
+
+				var shadowMaterial = sm.Material as IMaterialShadowReciever;
+				if (shadowMaterial != null) {
+					shadowMaterial.RecieveShadows = shadowsEnabled && RecieveShadow;
 				}
 
 				sm.Material.Apply();

@@ -7,7 +7,7 @@ using Yuzu;
 
 namespace Lime
 {
-	public class CommonMaterial : IMaterial, IMaterialSkin, IMaterialFog, IMaterialLightning
+	public class CommonMaterial : IMaterial, IMaterialSkin, IMaterialFog, IMaterialLightning, IMaterialShadowReciever
 	{
 		private static Dictionary<CommonMaterialProgramSpec, CommonMaterialProgram> programCache =
 			new Dictionary<CommonMaterialProgramSpec, CommonMaterialProgram>();
@@ -20,6 +20,7 @@ namespace Lime
 		private FogMode fogMode;
 		private bool processLightning;
 		private LightSource lightSource;
+		private bool recieveShadows;
 		
 		[YuzuMember]
 		public string Name { get; set; }
@@ -97,6 +98,19 @@ namespace Lime
 			}
 		}
 
+		public bool RecieveShadows
+		{
+			get { return recieveShadows; }
+			set
+			{
+				if (recieveShadows != value) {
+					recieveShadows = value;
+					program = null;
+				}
+				
+			}
+		}
+
 		public CommonMaterial()
 		{
 			DiffuseColor = Color4.White;
@@ -129,6 +143,12 @@ namespace Lime
 				program.LoadColor(program.LightColorUniformId, lightSource.Color);
 				program.LoadVector3(program.LightDirectionUniformId, lightSource.Position.Normalized);
 				program.LoadFloat(program.LightIntensityUniformId, lightSource.Intensity);
+
+				if (recieveShadows) {
+					var lightWVP = Renderer.World * lightSource.ViewProjection * Matrix44.CreateScale(new Vector3(1, -1, 1));
+					program.LoadMatrix(program.LightWorldViewProjectionUniformId, lightWVP);
+					PlatformRenderer.SetTexture(lightSource.ShadowMap, CommonMaterialProgram.ShadowMapTextureStage);
+				}
 			}
 
 			if (skinEnabled) {
@@ -160,7 +180,8 @@ namespace Lime
 				SkinEnabled = skinEnabled,
 				DiffuseTextureEnabled = diffuseTexture != null,
 				FogMode = FogMode,
-				ProcessLightning = ProcessLightning
+				ProcessLightning = ProcessLightning,
+				RecieveShadows = RecieveShadows
 			};
 			if (programCache.TryGetValue(spec, out program)) {
 				return;
@@ -183,7 +204,8 @@ namespace Lime
 				Blending = Blending,
 				DiffuseTexture = DiffuseTexture,
 				SkinEnabled = SkinEnabled,
-				ProcessLightning = ProcessLightning
+				ProcessLightning = ProcessLightning,
+				RecieveShadows = RecieveShadows
 			};
 		}
 	}

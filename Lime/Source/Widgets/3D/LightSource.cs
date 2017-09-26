@@ -4,16 +4,30 @@ namespace Lime
 {
 	public class LightSource : Node3D
 	{
-		private const int shadowMapSize = 2048;
+		private const int TextureSize = 1024;
 
 		public ITexture ShadowMap
 		{ get { return depthBufferRenderer?.Texture ?? null; } }
+
+		public Matrix44 ViewProjection
+		{ get { return lightViewProjection; } }
+
+		[YuzuMember]
+		public new Vector3 Position
+		{
+			get { return base.Position; }
+			set
+			{
+				base.Position = value;
+				recalcViewProjection = true;
+			}
+		}
 
 		[YuzuMember]
 		public float Intensity
 		{ get; set; } = 1f;
 
-		[TangerineInspect]
+		[YuzuMember]
 		public bool ShadowMapping
 		{
 			get { return shadowMappingEnabled; }
@@ -24,39 +38,78 @@ namespace Lime
 				}
 
 				shadowMappingEnabled = value;
+			}
+		}
 
-				if (shadowMappingEnabled) {
-					depthBufferRenderer = new DepthBufferRenderer(viewport, shadowMapSize);
+		[YuzuMember]
+		public float ShadowMapSize
+		{
+			get { return shadowMapSize; }
+			set
+			{
+				if (shadowMapSize != value) {
+					shadowMapSize = value;
+					recalcViewProjection = true;
 				}
-				else {
-					depthBufferRenderer = null;
+			}
+		}
+
+		[YuzuMember]
+		public float ShadowMapZNear
+		{
+			get { return shadowMapZNear; }
+			set
+			{
+				if (shadowMapZNear != value) {
+					shadowMapZNear = value;
+					recalcViewProjection = true;
 				}
 			}
 		}
 
 		[TangerineInspect]
-		public float ShadowMapSize
-		{ get; set; } = 35;
-
-		[TangerineInspect]
-		public float ShadowMapZNear
-		{ get; set; } = 1;
-
-		[TangerineInspect]
 		public float ShadowMapZFar
-		{ get; set; } = 5;
+		{
+			get { return shadowMapZFar; }
+			set
+			{
+				if (shadowMapZFar != value) {
+					shadowMapZFar = value;
+					recalcViewProjection = true;
+				}
+			}
+		}
 
+		private float shadowMapSize = 15;
+		private float shadowMapZNear = -15;
+		private float shadowMapZFar = 15;
+
+		private DepthBufferRenderer depthBufferRenderer;
+		private Matrix44 lightView;
+		private Matrix44 lightProjection;
+		private Matrix44 lightViewProjection;
+		private WindowRect lightViewport = new WindowRect() {
+			Width = TextureSize,
+			Height = TextureSize
+		};
 
 		private bool shadowMappingEnabled;
-		private DepthBufferRenderer depthBufferRenderer;
+		private bool recalcViewProjection = true;
 
 		public override void Update(float delta)
 		{
 			if (shadowMappingEnabled) {
-				var lightViewport = new WindowRect() { Width = shadowMapSize, Height = shadowMapSize };
-				var lightProjection = Matrix44.CreateOrthographic(ShadowMapSize, ShadowMapSize, ShadowMapZNear, ShadowMapZFar);
-				var lightView = Matrix44.CreateLookAt(Position.Normalized * ShadowMapSize / 2f, Vector3.Zero, Vector3.UnitY);
-				var lightViewProjection = lightView * lightProjection;
+				if (depthBufferRenderer == null) {
+					depthBufferRenderer = new DepthBufferRenderer(viewport, TextureSize);
+				}
+
+				if (recalcViewProjection) {
+					lightProjection = Matrix44.CreateOrthographic(shadowMapSize, shadowMapSize, shadowMapZNear, shadowMapZFar);
+					lightView = Matrix44.CreateLookAt(Position.Normalized * shadowMapSize / 2f, Vector3.Zero, Vector3.UnitY);
+					lightViewProjection = lightView * lightProjection;
+
+					recalcViewProjection = false;
+				}
 
 				depthBufferRenderer.Render(lightViewProjection, lightViewport);
 			}
