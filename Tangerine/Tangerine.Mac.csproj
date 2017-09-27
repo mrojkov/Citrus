@@ -145,7 +145,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Cursors\rotate.png" />
     <EmbeddedResource Include="Resources\SegoeUIRegular.ttf" />
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Audio.png" />
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Bone.png" />
@@ -245,11 +244,15 @@
     <EmbeddedResource Include="Resources\Icons\Timeline\Empty.png" />
     <EmbeddedResource Include="Resources\Icons\SceneView\Round.png" />
     <EmbeddedResource Include="Resources\Icons\Timeline\Curve.png" />
+    <EmbeddedResource Include="Resources\Icons\SceneView\Play.png" />
+    <EmbeddedResource Include="Resources\Icons\Tools\Pipette.png" />
+    <EmbeddedResource Include="Resources\Cursors\Rotate.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PreferencesDialog\" />
     <Folder Include="MainMenu\" />
     <Folder Include="Tools\" />
+    <Folder Include="Resources\Cursors\" />
   </ItemGroup>
   <ItemGroup>
     <NativeReference Include="..\3rdParty\FreeType\libfreetype6.dylib">
