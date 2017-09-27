@@ -11,8 +11,6 @@ namespace Tangerine
 	public class TangerineApp
 	{
 		public static TangerineApp Instance { get; private set; }
-		public readonly IMenu PadsMenu;
-		public readonly IMenu Resolution;
 		public readonly Dictionary<string, Toolbar> Toolbars = new Dictionary<string, Toolbar>();
 		public readonly DockManager.State DockManagerInitialState;
 
@@ -38,14 +36,14 @@ namespace Tangerine
 			SetColorTheme(Core.UserPreferences.Instance.Get<UserPreferences>().Theme);
 
 			LoadFont();
-
-			PadsMenu = new Menu();
-			Resolution = new Menu();
-			CreateResolutionMenu();
-			DockManager.Initialize(new Vector2(1024, 768), PadsMenu);
-			DockManager.Instance.MainWindowWidget.Window.AllowDropFiles = true;
-			SetupMainWindowTitle();
-			CreateMainMenu();
+			DockManager.Initialize(new Vector2(1024, 768), TangerineMenu.PadsMenu);
+			TangerineMenu.Create();
+			var mainWidget = DockManager.Instance.MainWindowWidget;
+			mainWidget.Window.AllowDropFiles = true;
+			mainWidget.AddChangeWatcher(() => Project.Current, _ => {
+				SetupMainWindowTitle(mainWidget);
+				TangerineMenu.RebuildCreateImportedTypeMenu();
+			});
 
 			Application.Exiting += () => Project.Current.Close();
 			Application.Exited += () => {
@@ -145,24 +143,14 @@ namespace Tangerine
 			RegisterGlobalCommands();
 		}
 
-		private void CreateResolutionMenu()
+		void SetupMainWindowTitle(WindowWidget windowWidget)
 		{
-			foreach (var orientation in DisplayResolutions.Items) {
-				Resolution.Add(new Command(orientation.Name, () => DisplayResolutions.SetResolution(orientation)));
+			var title = "Tangerine";
+			if (Project.Current != Project.Null) {
+				var citProjName = System.IO.Path.GetFileNameWithoutExtension(Project.Current.CitprojPath);
+				title = $"{citProjName} - Tangerine";
 			}
-		}
-
-		void SetupMainWindowTitle()
-		{
-			var mainWidget = DockManager.Instance.MainWindowWidget;
-			mainWidget.AddChangeWatcher(() => Project.Current, _ => {
-				var title = "Tangerine";
-				if (Project.Current != Project.Null) {
-					var citProjName = System.IO.Path.GetFileNameWithoutExtension(Project.Current.CitprojPath);
-					title = $"{citProjName} - Tangerine";
-				}
-				mainWidget.Window.Title = title;
-			});
+			windowWidget.Window.Title = title;
 		}
 
 		void SetColorTheme(ColorThemeEnum theme)
@@ -291,115 +279,11 @@ namespace Tangerine
 			}
 		}
 
-		void CreateMainMenu()
+		static void LoadFont()
 		{
-			Menu viewMenu;
-			Application.MainMenu = new Menu {
-#if MAC
-				new Command("Application", new Menu {
-					GenericCommands.PreferencesDialog,
-					Command.MenuSeparator,
-					GenericCommands.Quit,
-				}),
-#endif
-				new Command("File", new Menu {
-					GenericCommands.New,
-					Command.MenuSeparator,
-					GenericCommands.Open,
-					GenericCommands.OpenProject,
-					Command.MenuSeparator,
-					GenericCommands.Save,
-					GenericCommands.SaveAs,
-					GenericCommands.Revert,
-					GenericCommands.UpgradeDocumentFormat,
-					Command.MenuSeparator,
-#if !MAC
-					GenericCommands.PreferencesDialog,
-					Command.MenuSeparator,
-#endif
-					GenericCommands.CloseDocument,
-#if !MAC
-					GenericCommands.Quit,
-#endif
-				}),
-				new Command("Edit", new Menu {
-					Command.Undo,
-					Command.Redo,
-					Command.MenuSeparator,
-					Command.Cut,
-					Command.Copy,
-					Command.Paste,
-					Command.Delete,
-					SceneViewCommands.Duplicate,
-					TimelineCommands.DeleteKeyframes,
-					TimelineCommands.CreateMarkerPlay,
-					TimelineCommands.CreateMarkerStop,
-					TimelineCommands.CreateMarkerJump,
-					TimelineCommands.DeleteMarker,
-					Command.MenuSeparator,
-					Command.SelectAll,
-					Command.MenuSeparator,
-					GenericCommands.Group,
-					GenericCommands.Ungroup,
-					GenericCommands.InsertTimelineColumn,
-					GenericCommands.RemoveTimelineColumn,
-					Command.MenuSeparator,
-					SceneViewCommands.BindBones,
-					GenericCommands.GroupContentsToMorphableMeshes,
-					GenericCommands.ExportScene,
-					GenericCommands.UpsampleAnimationTwice,
-				}),
-				new Command("Create", new Menu()),
-				new Command("View", (viewMenu = new Menu {
-					GenericCommands.DefaultLayout,
-					new Command("Pads", PadsMenu),
-					new Command("Resolution", Resolution),
-					GenericCommands.Overlays,
-					SceneViewCommands.DisplayBones,
-				})),
-				new Command("Window", new Menu {
-					GenericCommands.NextDocument,
-					GenericCommands.PreviousDocument
-				}),
-				new Command("Orange", new Menu {
-					OrangeCommands.Run
-				}),
-		};
-			var nodeTypes = new[] {
-				typeof(Frame),
-				typeof(Button),
-				typeof(Image),
-				typeof(Audio),
-				typeof(Movie),
-				typeof(Bone),
-				typeof(ParticleEmitter),
-				typeof(ParticleModifier),
-				typeof(EmitterShapePoint),
-				typeof(ParticlesMagnet),
-				typeof(SimpleText),
-				typeof(RichText),
-				typeof(TextStyle),
-				typeof(NineGrid),
-				typeof(DistortionMesh),
-				typeof(Spline),
-				typeof(SplinePoint),
-				typeof(SplineGear),
-				typeof(ImageCombiner),
-				typeof(Viewport3D),
-				typeof(Camera3D),
-				typeof(Model3D),
-				typeof(Node3D),
-				typeof(WidgetAdapter3D),
-				typeof(Spline3D),
-				typeof(SplinePoint3D),
-				typeof(SplineGear3D),
-			};
-			foreach (var t in nodeTypes) {
-				var cmd = new Command(t.Name) { Icon = NodeIconPool.GetTexture(t) };
-				CommandHandlerList.Global.Connect(cmd, new CreateNode(t));
-				Application.MainMenu.FindCommand("Create").Menu.Add(cmd);
-			}
-			viewMenu.DisplayCheckMark = true;
+			var fontData = new EmbeddedResource("Tangerine.Resources.SegoeUIRegular.ttf", "Tangerine").GetResourceBytes();
+			var font = new DynamicFont(fontData);
+			FontPool.Instance.AddFont("Default", font);
 		}
 
 		void RegisterGlobalCommands()
@@ -480,13 +364,6 @@ namespace Tangerine
 			} catch (InvalidOperationException e) {
 				AlertDialog.Show(e.Message);
 			}
-		}
-
-		static void LoadFont()
-		{
-			var fontData = new EmbeddedResource("Tangerine.Resources.SegoeUIRegular.ttf", "Tangerine").GetResourceBytes();
-			var font = new DynamicFont(fontData);
-			FontPool.Instance.AddFont("Default", font);
 		}
 	}
 }

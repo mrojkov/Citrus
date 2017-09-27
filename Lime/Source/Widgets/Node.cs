@@ -16,6 +16,11 @@ namespace Lime
 		void OnTrigger(string property);
 	}
 
+	public sealed class TangerineExportAttribute : Attribute
+	{
+
+	}
+
 	/// <summary>
 	/// Denotes a property which can not be animated within Tangerine.
 	/// </summary>
@@ -611,7 +616,9 @@ namespace Lime
 		public virtual void Render() { }
 
 		/// <summary>
-		/// Decides what descendant nodes should be added to render chain and under which conditions
+		/// Decides what descendant nodes should be added to render chain and under which conditions.
+		/// This includes children Nodes as well as this Node itself. i.e. if you want Render()
+		/// of this node to be called you should invoke AddSelfToRenderChain in AddToRenderChain override.
 		/// </summary>
 		internal protected abstract void AddToRenderChain(RenderChain chain);
 

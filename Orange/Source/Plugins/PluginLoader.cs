@@ -8,6 +8,7 @@ using System.ComponentModel.Composition.Primitives;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Lime;
 using Action = System.Action;
 
 namespace Orange
@@ -200,6 +201,23 @@ namespace Orange
 
 		private static readonly Dictionary<string, Assembly> resolvedAssemblies = new Dictionary<string, Assembly>();
 
+		public static IEnumerable<Type> EnumerateTangerineExportedTypes()
+		{
+			var requiredAssemblies = CurrentPlugin?.GetRequiredAssemblies;
+			if (requiredAssemblies == null) {
+				yield break;
+			}
+			foreach (var name in requiredAssemblies()) {
+				var aseembly = AssemblyResolve(null, new ResolveEventArgs(name, null));
+				foreach (var t in aseembly.GetExportedTypes()) {
+					var attr = t.GetCustomAttributes(false).FirstOrDefault(i => i is TangerineExportAttribute);
+					if (attr != null) {
+						yield return t;
+					}
+				}
+			}
+		}
+
 		private static Assembly AssemblyResolve(object sender, ResolveEventArgs args)
 		{
 			var commaIndex = args.Name.IndexOf(',');
@@ -215,7 +233,7 @@ namespace Orange
 
 			Assembly assembly;
 			if (!resolvedAssemblies.TryGetValue(name, out assembly)) {
-				var dllPath = Path.ChangeExtension(Path.Combine(CurrentPluginDirectory, name), ".dll");
+				var dllPath = Path.Combine(CurrentPluginDirectory, name) + ".dll";
 				var readAllBytes = File.ReadAllBytes(dllPath);
 				assembly = Assembly.Load(readAllBytes);
 				resolvedAssemblies.Add(name, assembly);
