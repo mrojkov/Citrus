@@ -218,7 +218,7 @@
 			if (spec.RecieveShadows) {
 				preamble += "#define RECIEVE_SHADOWS\n";
 				if (spec.ShadowSampling) {
-					preamble += "#define _SHADOW_SAMPLING\n";
+					preamble += "#define SHADOW_SAMPLING\n";
 				}
 			}
 
