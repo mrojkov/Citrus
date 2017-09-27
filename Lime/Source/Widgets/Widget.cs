@@ -985,15 +985,19 @@ namespace Lime
 
 		public bool IsMouseOver()
 		{
-			var mouseOwner = WidgetInput.MouseCaptureStack.Top;
-			return (mouseOwner == null || mouseOwner == this) && WidgetContext.Current.NodeUnderMouse == this;
+			var mouseOver = WidgetContext.Current.NodeUnderMouse == this;
+			return Window.Current.Input.IsMousePressed() ?
+				WidgetContext.Current.NodeMousePressedOn == this && mouseOver : mouseOver;
 		}
 
 		public bool IsMouseOverThisOrDescendant()
 		{
-			var mouseOwner = WidgetInput.MouseCaptureStack.Top;
-			return (mouseOwner == null || mouseOwner == this) && (WidgetContext.Current.NodeUnderMouse?.SameOrDescendantOf(this) ?? false);
+			var mouseOver = WidgetContext.Current.NodeUnderMouse?.SameOrDescendantOf(this) ?? false;
+			return Window.Current.Input.IsMousePressed() ?
+				WidgetContext.Current.NodeMousePressedOn == this && mouseOver : mouseOver;
 		}
+
+		public Vector2 LocalMousePosition() => Window.Current.Input.MousePosition * LocalToWorldTransform.CalcInversed();
 
 		public int GetEffectiveLayer()
 		{

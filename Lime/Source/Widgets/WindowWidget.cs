@@ -30,6 +30,10 @@ namespace Lime
 			if (ContinuousRendering()) {
 				Window.Invalidate();
 			}
+			var mouseReleased = !Window.Input.IsMousePressed();
+			if (Window.Input.WasMousePressed()) {
+				WidgetContext.Current.NodeMousePressedOn = WidgetContext.Current.NodeUnderMouse;
+			}
 			WidgetContext.Current.MouseCursor = MouseCursor.Default;
 			base.Update(delta);
 			if (Window.Input.WasKeyPressed(Key.DismissSoftKeyboard)) {
@@ -42,6 +46,9 @@ namespace Lime
 			var hitTestArgs = new HitTestArgs(Window.Input.MousePosition);
 			renderChain.HitTest(ref hitTestArgs);
 			WidgetContext.Current.NodeUnderMouse = hitTestArgs.Node;
+			if (mouseReleased) {
+				WidgetContext.Current.NodeMousePressedOn = null;
+			}
 			ManageFocusOnWindowActivation();
 		}
 

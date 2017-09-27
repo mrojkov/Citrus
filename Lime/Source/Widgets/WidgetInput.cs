@@ -44,6 +44,7 @@ namespace Lime
 
 		public Vector2 MousePosition { get { return windowInput.MousePosition; } }
 
+		[Obsolete("Use Widget.LocalMousePosition()")]
 		public Vector2 LocalMousePosition { get { return windowInput.MousePosition * widget.LocalToWorldTransform.CalcInversed(); } }
 
 		public Vector2 GetTouchPosition(int index)
