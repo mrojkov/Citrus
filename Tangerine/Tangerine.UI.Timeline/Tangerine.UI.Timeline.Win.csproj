@@ -49,15 +49,14 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Components\GridCurveView.cs" />
     <Compile Include="Components\GridFolderView.cs" />
     <Compile Include="Components\GridNodeView.cs" />
     <Compile Include="Components\GridPropertyView.cs" />
     <Compile Include="Components\GridSpanList.cs" />
-    <Compile Include="Components\RollCurveView.cs" />
     <Compile Include="Components\RollFolderView.cs" />
     <Compile Include="Components\RollNodeView.cs" />
     <Compile Include="Components\RollPropertyView.cs" />
+    <Compile Include="CurveEditorPane.cs" />
     <Compile Include="Operations\ClearGridSelection.cs" />
     <Compile Include="Operations\ColumnCountUpdater.cs" />
     <Compile Include="Operations\EnsureCurrentColumnVisibleIfContainerChanged.cs" />
@@ -70,12 +69,13 @@
     <Compile Include="Operations\SelectGridSpan.cs" />
     <Compile Include="Operations\SetCurrentColumn.cs" />
     <Compile Include="Operations\ShiftGridSelection.cs" />
+    <Compile Include="Processors\CurveEditor\PanProcessor.cs" />
+    <Compile Include="Processors\CurveEditor\VerticalZoomProcessor.cs" />
     <Compile Include="Processors\GridPane\ClampScrollPosProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Processors\GridPane\DragKeyframesRespondentProcessor.cs" />
     <Compile Include="Processors\GridPane\GridMouseScrollProcessor.cs" />
     <Compile Include="Processors\GridPane\HasKeyframeRespondentProcessor.cs" />
-    <Compile Include="Processors\GridPane\ResizeGridCurveViewProcessor.cs" />
     <Compile Include="Processors\GridPane\SelectAndDragKeyframesProcessor.cs" />
     <Compile Include="Processors\OverviewPane\OverviewScrollProcessor.cs" />
     <Compile Include="Processors\RollPane\RollMouseScrollProcessor.cs" />
