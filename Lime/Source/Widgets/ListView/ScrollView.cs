@@ -256,18 +256,22 @@ namespace Lime
 					Bounce();
 					yield return null;
 				}
-				StopScrolling();
-				Vector2 mousePos = Input.MousePosition;
-				var velocityMeter = new VelocityMeter();
-				velocityMeter.AddSample(ScrollPosition);
-				if (RejectOrtogonalSwipes) {
-					var r = new TaskResult<bool>();
-					yield return !SwipeSensitivity.HasValue ? DetectSwipeAlongScrollAxisTask(r) : DetectSwipeUsingSensitivityTask(r);
-					if (r.Value) {
+				if (Frame.Input.WasMousePressed()) {
+					StopScrolling();
+					Vector2 mousePos = Input.MousePosition;
+					var velocityMeter = new VelocityMeter();
+					velocityMeter.AddSample(ScrollPosition);
+					if (RejectOrtogonalSwipes) {
+						var r = new TaskResult<bool>();
+						yield return !SwipeSensitivity.HasValue ? DetectSwipeAlongScrollAxisTask(r) : DetectSwipeUsingSensitivityTask(r);
+						if (r.Value) {
+							yield return HandleDragTask(velocityMeter, ProjectToScrollAxisWithFrameRotation(mousePos));
+						}
+					} else {
 						yield return HandleDragTask(velocityMeter, ProjectToScrollAxisWithFrameRotation(mousePos));
 					}
 				} else {
-					yield return HandleDragTask(velocityMeter, ProjectToScrollAxisWithFrameRotation(mousePos));
+					yield return null;
 				}
 			}
 		}
@@ -369,31 +373,25 @@ namespace Lime
 		{
 			if (!CanScroll || !ScrollWhenContentFits && MaxScrollPosition == 0 || ScrollBySlider)
 				yield break;
-			if (!Frame.Input.IsAcceptingMouse()) {
-				yield break;
-			}
+
 			IsBeingRefreshed = false; // Do not block scrollview on refresh gesture
 			IsDragging = true;
-			Frame.Input.CaptureMouse();
-			try {
-				float realScrollPosition = ScrollPosition;
-				wheelScrollState = WheelScrollState.Stop;
-				do {
-					if (IsItemDragInProgress()) {
-						IsDragging = false;
-						yield break;
-					}
-					realScrollPosition += mouseProjectedPosition - ProjectToScrollAxisWithFrameRotation(Input.MousePosition);
-					// Round scrolling position to prevent blurring
-					ScrollPosition = ClampScrollPositionWithinBounceZone(realScrollPosition)
-						.Round();
-					mouseProjectedPosition = ProjectToScrollAxisWithFrameRotation(Input.MousePosition);
-					velocityMeter.AddSample(realScrollPosition);
-					yield return null;
-				} while (Input.IsMousePressed());
-			} finally {
-				Frame.Input.ReleaseMouse();
-			}
+			Frame.Input.ConsumeKeyPress(Key.Touch0);
+			float realScrollPosition = ScrollPosition;
+			wheelScrollState = WheelScrollState.Stop;
+			do {
+				if (IsItemDragInProgress()) {
+					IsDragging = false;
+					yield break;
+				}
+				realScrollPosition += mouseProjectedPosition - ProjectToScrollAxisWithFrameRotation(Input.MousePosition);
+				// Round scrolling position to prevent blurring
+				ScrollPosition = ClampScrollPositionWithinBounceZone(realScrollPosition)
+					.Round();
+				mouseProjectedPosition = ProjectToScrollAxisWithFrameRotation(Input.MousePosition);
+				velocityMeter.AddSample(realScrollPosition);
+				yield return null;
+			} while (Input.IsMousePressed());
 			StartScrolling(InertialScrollingTask(velocityMeter.CalcVelocity()));
 			IsDragging = false;
 		}
