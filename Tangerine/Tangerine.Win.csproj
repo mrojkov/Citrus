@@ -73,6 +73,7 @@
     <EmbeddedResource Include="Resources\Icons\Timeline\AnimationEnabled.png" />
     <EmbeddedResource Include="Resources\Icons\Timeline\AnimationPartiallyEnabled.png" />
     <EmbeddedResource Include="Resources\Icons\Timeline\Empty.png" />
+    <EmbeddedResource Include="Resources\Icons\Timeline\Curve.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Win.csproj">
