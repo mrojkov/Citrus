@@ -217,7 +217,7 @@
 			}
 			if (spec.RecieveShadows) {
 				preamble += "#define RECIEVE_SHADOWS\n";
-				if (spec.SoftShadow) {
+				if (spec.ShadowSampling) {
 					preamble += "#define _SHADOW_SAMPLING\n";
 				}
 			}
@@ -257,6 +257,6 @@
 		public FogMode FogMode;
 		public bool ProcessLightning;
 		public bool RecieveShadows;
-		public bool SoftShadow;
+		public bool ShadowSampling;
 	}
 }

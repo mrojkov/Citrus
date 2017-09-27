@@ -88,11 +88,9 @@ namespace Lime
 
 		public virtual Action Clicked { get; set; }
 
-		public bool CastShadow
-		{ get; set; } = true;
-
-		public bool RecieveShadow
-		{ get; set; } = true;
+		public bool CastShadow { get; set; }
+		public bool RecieveShadow { get; set; }
+		public bool ProcessLightning { get; set; }
 
 		public Mesh3D()
 		{
@@ -106,8 +104,8 @@ namespace Lime
 			if (SkipRender) {
 				return;
 			}
-
-			bool lightningEnabled = viewport != null && viewport.LightSource != null;
+			
+			bool lightningEnabled = ProcessLightning && viewport != null && viewport.LightSource != null;
 			bool shadowsEnabled = lightningEnabled && viewport.LightSource.ShadowMapping;
 
 			Renderer.World = GlobalTransform;
@@ -131,7 +129,10 @@ namespace Lime
 
 				var lightningMaterial = sm.Material as IMaterialLightning;
 				if (lightningMaterial != null) {
-					lightningMaterial.SetLightData(viewport.LightSource);
+					lightningMaterial.ProcessLightning = lightningEnabled;
+					if (lightningEnabled) {
+						lightningMaterial.SetLightData(viewport.LightSource);
+					}
 				}
 
 				var shadowMaterial = sm.Material as IMaterialShadowReciever;

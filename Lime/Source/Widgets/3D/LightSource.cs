@@ -12,6 +12,9 @@ namespace Lime
 		public Matrix44 ViewProjection
 		{ get { return lightViewProjection; } }
 
+		public Matrix44 View
+		{ get { return lightView; } }
+
 		[YuzuMember]
 		public new Vector3 Position
 		{
@@ -67,7 +70,7 @@ namespace Lime
 			}
 		}
 
-		[TangerineInspect]
+		[YuzuMember]
 		public float ShadowMapZFar
 		{
 			get { return shadowMapZFar; }
@@ -111,7 +114,7 @@ namespace Lime
 					recalcViewProjection = false;
 				}
 
-				depthBufferRenderer.Render(lightViewProjection, lightViewport);
+				depthBufferRenderer.Render(lightView, lightViewProjection, lightViewport);
 			}
 		}
 	}

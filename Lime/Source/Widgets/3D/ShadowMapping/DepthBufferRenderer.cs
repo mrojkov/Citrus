@@ -34,7 +34,7 @@ namespace Lime
 			this.depthmat = new DepthBuffer();
 		}
 
-		public void Render(Matrix44 lightViewProjection, WindowRect lightViewport)
+		public void Render(Matrix44 lightView, Matrix44 lightViewProjection, WindowRect lightViewport)
 		{
 			depthmat.ViewProjection = lightViewProjection;
 			map.SetAsRenderTarget();
@@ -67,8 +67,8 @@ namespace Lime
 					var node = layer[j].Node.AsNode3D;
 					list.Add(new RenderItem {
 						Node = node,
-						Distance = node.CalcDistanceToCamera(viewport.Camera)
-					});
+						Distance = lightView.TransformVector(node.GlobalTransform.Translation).Z
+				});
 				}
 
 				list.Sort(RenderOrderComparers.FrontToBack);

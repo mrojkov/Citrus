@@ -15,10 +15,40 @@ namespace Lime
 			set
 			{
 				lightningEnabled = value;
-				ResetMaterial();
+				ResetLightning();
 			}
 		}
 
+		[YuzuMember]
+		public bool CastShadow
+		{
+			get
+			{
+				return castShadow;
+			}
+			set
+			{
+				castShadow = value;
+				ResetLightning();
+			}
+		}
+
+		[YuzuMember]
+		public bool RecieveShadow
+		{
+			get
+			{
+				return recieveShadow;
+			}
+			set
+			{
+				recieveShadow = value;
+				ResetLightning();
+			}
+		}
+
+		private bool castShadow;
+		private bool recieveShadow;
 		private bool lightningEnabled;
 
 		[YuzuAfterDeserialization]
@@ -30,7 +60,7 @@ namespace Lime
 		protected override void Awake()
 		{
 			base.Awake();
-			ResetMaterial();
+			ResetLightning();
 		}
 
 		public override Node Clone()
@@ -50,14 +80,12 @@ namespace Lime
 			}
 		}
 
-		private void ResetMaterial()
+		private void ResetLightning()
 		{
-			foreach (var material in Descendants
-						.OfType<Mesh3D>()
-						.SelectMany(m => m.Submeshes)
-						.Select((s) => s.Material)
-						.OfType<IMaterialLightning>()) {
-				material.ProcessLightning = lightningEnabled;
+			foreach (var mesh in Descendants.OfType<Mesh3D>()) {
+				mesh.ProcessLightning = lightningEnabled;
+				mesh.RecieveShadow = recieveShadow;
+				mesh.CastShadow = castShadow;
 			}
 		}
 	}
