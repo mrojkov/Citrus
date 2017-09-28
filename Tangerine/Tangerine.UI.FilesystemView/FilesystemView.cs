@@ -323,6 +323,7 @@ namespace Tangerine.UI.FilesystemView
 							Open(lastKeyboardSelectedFilesystemItem.FilesystemPath);
 						}
 					} else if (Cmds.EnterSpecial.WasIssued()) {
+						Cmds.EnterSpecial.Consume();
 						if (lastKeyboardSelectedFilesystemItem != null) {
 							OpenSpecial(lastKeyboardSelectedFilesystemItem.FilesystemPath);
 						}
@@ -649,7 +650,6 @@ namespace Tangerine.UI.FilesystemView
 					Cmds.GoBack,
 					Cmds.GoForward,
 					Cmds.GoUpAlso,
-					Cmds.EnterSpecial,
 					Cmds.ToggleSelection,
 				}
 			).Union(
