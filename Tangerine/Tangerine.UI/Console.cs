@@ -59,7 +59,7 @@ namespace Tangerine.UI
 
 		private Widget CreateTextView()
 		{
-			textView = new ThemedTextView();
+			textView = new ThemedTextView { SquashDuplicateLines = true };
 			textWriter = new TextViewWriter(textView);
 			System.Console.SetOut(textWriter);
 			System.Console.SetError(textWriter);
@@ -75,8 +75,8 @@ namespace Tangerine.UI
 				}
 				var i = textView.Content.Nodes.Count;
 				// numbers choosen by guess
-				if (i >= 1000) {
-					textView.Content.Nodes.RemoveRange(0, 500);
+				if (i >= 500) {
+					textView.Content.Nodes.RemoveRange(0, 250);
 				}
 			};
 

@@ -2,14 +2,21 @@
 using System;
 using System.Text;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Lime
 {
 	public class ThemedTextView : ThemedScrollView
 	{
-		private List<SimpleText> lines = new List<SimpleText>();
+		public class TextLineMultiplicity : NodeComponent
+		{
+			public int Multiplicity = 1;
+		}
+		private readonly List<SimpleText> lines = new List<SimpleText>();
 
 		public override bool IsNotDecorated() => false;
+
+		public bool SquashDuplicateLines { get; set; } = false;
 
 		public ThemedTextView()
 		{
@@ -21,17 +28,46 @@ namespace Lime
 		public void Append(string text)
 		{
 			var lastLine = lines.Count > 0 ? lines[lines.Count - 1] : null;
-			foreach (var l in text.Split('\n')) {
+			SimpleText lastNonSentinelLine = null;
+			if (SquashDuplicateLines) {
+				lastNonSentinelLine = lines.Count > 1 ? lines[lines.Count - 2] : null;
+			}
+			var newLines = text.Split('\n');
+			for (int i = 0; i < newLines.Length; i++) {
+				var l = newLines[i];
+				if (SquashDuplicateLines) {
+					if (lastNonSentinelLine != null && lastNonSentinelLine.Text == l) {
+						lastNonSentinelLine.Components.Get<ThemedTextView.TextLineMultiplicity>().Multiplicity++;
+						lastNonSentinelLine.Invalidate();
+						(GetRoot() as WindowWidget).Window.Invalidate();
+						continue;
+					}
+				}
 				if (lastLine != null) {
 					lastLine.Text += l;
+					if (SquashDuplicateLines) {
+						lastNonSentinelLine = lastLine;
+					}
 					lastLine = null;
 				} else {
 					var line = new ThemedSimpleText(l);
+					line.TextProcessor += ProcessTextLine;
+					line.Components.Add(new TextLineMultiplicity());
 					lines.Add(line);
 					Behaviour.Content.AddNode(line);
 				}
 			}
 		}
+
+		private void ProcessTextLine(ref string text, Widget w)
+		{
+			var m = w.Components.Get<TextLineMultiplicity>().Multiplicity;
+			text = m == 1 ? text : $"{text} (x{m})";
+		}
+
+		public bool IsEmpty => lines.Count == 0;
+
+		public SimpleText LastLine => lines[lines.Count - 1];
 
 		public override string Text
 		{
