@@ -398,6 +398,9 @@ namespace Lime
 					Cmds.Cancel.Consume();
 					InputWidget.RevokeFocus();
 				}
+				if (!Command.SelectAll.IsConsumed()) {
+					Command.SelectAll.Enabled = true;
+				}
 				if (!Command.Copy.IsConsumed()) {
 					Command.Copy.Enabled = HasSelection() && IsTextReadable;
 					if (Command.Copy.WasIssued()) {
