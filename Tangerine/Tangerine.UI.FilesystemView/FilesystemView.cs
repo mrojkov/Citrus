@@ -154,7 +154,7 @@ namespace Tangerine.UI.FilesystemView
 		{
 			RootWidget.AddChangeWatcher(() => selection.Version, Selection_Changed);
 			scrollView.Content.Layout = new FlowLayout { Spacing = 1.0f };
-			scrollView.Padding = new Thickness(5.0f);
+			scrollView.Content.Padding = new Thickness(5.0f);
 			scrollView.Content.CompoundPostPresenter.Insert(0, new DelegatePresenter<Widget>(RenderFilesWidgetRectSelection));
 			scrollView.Updated += ScrollViewUpdated;
 			scrollView.Content.Presenter = new DelegatePresenter<Widget>((w) => {

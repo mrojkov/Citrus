@@ -8,14 +8,15 @@ namespace Tangerine.UI.FilesystemView
 		public string FilesystemPath;
 		public const float IconSize = 16;
 		public const float ItemPadding = 2.0f;
+		public const float ItemWidth = 200.0f;
+		public const float Spacing = 2.0f;
 		public FilesystemItem(string path)
 		{
 			FilesystemPath = path;
 			this.Input.AcceptMouseThroughDescendants = true;
 			SimpleText text = null;
-			MinMaxSize = new Vector2(200, 16);
-			Layout = new HBoxLayout();
-			//PostPresenter = new LayoutDebugPresenter(Color4.Red.Transparentify(0.5f));
+			MinMaxSize = new Vector2(ItemWidth, IconSize);
+			Layout = new HBoxLayout { Spacing = Spacing };
 			Padding = new Thickness(2);
 			HitTestTarget = true;
 			Nodes.AddRange(
@@ -43,7 +44,7 @@ namespace Tangerine.UI.FilesystemView
 					HitTestTarget = true
 				}
 			);
-			text.Width = text.MinMaxWidth = Mathf.Min(200 - 20, text.MeasureUncutText().X);
+			text.Width = text.MinMaxWidth = Mathf.Min(ItemWidth - (IconSize + ItemPadding * 2 + Spacing + 2), text.MeasureUncutText().X);
 		}
 	}
 }
