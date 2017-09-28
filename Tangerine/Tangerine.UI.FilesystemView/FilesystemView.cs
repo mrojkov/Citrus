@@ -340,6 +340,9 @@ namespace Tangerine.UI.FilesystemView
 							}
 						}
 					}
+					if (!Command.SelectAll.IsConsumed()) {
+						Command.SelectAll.Enabled = true;
+					}
 				}
 
 				ProcessSelectionCommands();
