@@ -304,7 +304,11 @@ namespace Tangerine.UI.FilesystemView
 				ProcessTypingNavigation();
 
 				{ // other shortcuts
-					if (Cmds.Cancel.WasIssued()) {
+					if (!Command.SelectAll.IsConsumed()) {
+						Command.SelectAll.Enabled = true;
+					}
+
+					if (Cmds.Cancel.Consume()) {
 						typeNavigationTimeout = typeNavigationInterval;
 						typeNavigationPrefix = string.Empty;
 					} else if (Window.Current.Input.WasKeyReleased(Key.Menu)) {
@@ -312,25 +316,24 @@ namespace Tangerine.UI.FilesystemView
 							Window.Current.Input.ConsumeKey(Key.Menu);
 							SystemShellContextMenu.Instance.Show(selection.ToArray(), lastKeyboardSelectedFilesystemItem.GlobalPosition);
 						}
-					} else if (Cmds.GoBack.WasIssued()) {
+					} else if (Cmds.GoBack.Consume()) {
 						GoBackward();
-					} else if (Cmds.GoForward.WasIssued()) {
+					} else if (Cmds.GoForward.Consume()) {
 						GoForward();
-					} else if (Cmds.GoUp.WasIssued() || Cmds.GoUpAlso.WasIssued()) {
+					} else if (Cmds.GoUp.Consume() || Cmds.GoUpAlso.Consume()) {
 						GoUp();
-					} else if (Cmds.Enter.WasIssued()) {
+					} else if (Cmds.Enter.Consume()) {
 						if (lastKeyboardSelectedFilesystemItem != null) {
 							Open(lastKeyboardSelectedFilesystemItem.FilesystemPath);
 						}
-					} else if (Cmds.EnterSpecial.WasIssued()) {
-						Cmds.EnterSpecial.Consume();
+					} else if (Cmds.EnterSpecial.Consume()) {
 						if (lastKeyboardSelectedFilesystemItem != null) {
 							OpenSpecial(lastKeyboardSelectedFilesystemItem.FilesystemPath);
 						}
-					} else if (Command.SelectAll.WasIssued()) {
+					} else if (Command.SelectAll.Consume()) {
 						selection.Clear();
 						selection.SelectRange(scrollView.Content.Nodes.Select(n => (n as FilesystemItem).FilesystemPath));
-					} else if (Cmds.ToggleSelection.WasIssued()) {
+					} else if (Cmds.ToggleSelection.Consume()) {
 						if (lastKeyboardRangeSelectionEndFilesystemItem != null) {
 							var path = lastKeyboardRangeSelectionEndFilesystemItem.FilesystemPath;
 							if (selection.Contains(path)) {
@@ -340,16 +343,9 @@ namespace Tangerine.UI.FilesystemView
 							}
 						}
 					}
-					if (!Command.SelectAll.IsConsumed()) {
-						Command.SelectAll.Enabled = true;
-					}
 				}
 
 				ProcessSelectionCommands();
-
-				foreach (var cmd in consumingCommands) {
-					cmd.Consume();
-				}
 			}
 		}
 
@@ -511,7 +507,7 @@ namespace Tangerine.UI.FilesystemView
 			for (int navType = 0; navType < navCommands.Count; navType++) {
 				for (int navOffset = 0; navOffset < navCommands[navType].Count; navOffset++) {
 					var cmd = navCommands[navType][navOffset];
-					if (cmd.WasIssued()) {
+					if (cmd.Consume()) {
 						select = navType == 1;
 						toggle = navType == 2;
 						var sign = (navOffset % 2 == 0 ? -1 : 1);
@@ -639,25 +635,6 @@ namespace Tangerine.UI.FilesystemView
 				Cmds.ToggleEnd,
 			},
 		};
-
-		static readonly List<ICommand> consumingCommands =
-			Command.Editing.Union(
-			Key.Enumerate().Where(k => k.IsPrintable()).Select(i => new Command(i)).Union(
-			Key.Enumerate().Where(k => k.IsPrintable()).Select(i => new Command(new Shortcut(Modifiers.Shift, i)))).Union(
-				new[] {
-					Command.SelectAll,
-					Cmds.Cancel,
-					Cmds.Enter,
-					Cmds.GoUp,
-					Cmds.GoUpAlso,
-					Cmds.GoBack,
-					Cmds.GoForward,
-					Cmds.GoUpAlso,
-					Cmds.ToggleSelection,
-				}
-			).Union(
-				navCommands.SelectMany(i => i)
-			)).ToList();
 
 		private void RenderFilesWidgetRectSelection(Widget canvas)
 		{
