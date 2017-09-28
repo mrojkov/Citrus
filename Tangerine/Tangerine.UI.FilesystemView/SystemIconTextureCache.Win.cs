@@ -1,10 +1,12 @@
 #if WIN
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
 using Lime;
+using Bitmap = System.Drawing.Bitmap;
 
 namespace Tangerine.UI.FilesystemView
 {
@@ -36,13 +38,17 @@ namespace Tangerine.UI.FilesystemView
 			if (r == IntPtr.Zero) {
 				return TexturePool.Instance.GetTexture(null);
 			}
-			var b = System.Drawing.Bitmap.FromHicon(shInfo.hIcon);
-			WinAPI.DestroyIcon(shInfo.hIcon);
 			var t = new Texture2D();
-			using (var s = new MemoryStream()) {
-				b.Save(s, ImageFormat.Png);
-				t.LoadImage(s);
+			using (var icon = Icon.FromHandle(shInfo.hIcon)) {
+				var b = new Bitmap(icon.Size.Width, icon.Size.Height);
+				using (Graphics g = Graphics.FromImage(b))
+					g.DrawIcon(icon, 0, 0);
+					using (var s = new MemoryStream()) {
+						b.Save(s, ImageFormat.Png);
+						t.LoadImage(s);
+					}
 			}
+			WinAPI.DestroyIcon(shInfo.hIcon);
 			if (isDirectory) {
 				directoryTexture = t;
 			} else {
