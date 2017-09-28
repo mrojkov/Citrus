@@ -12,7 +12,7 @@ namespace Lime
 		public readonly List<MeshOption> MeshOptions = new List<MeshOption>();
 		public readonly List<Animation> Animations = new List<Animation>();
 		public readonly List<MaterialEffect> MaterialEffects = new List<MaterialEffect>();
-		public float ScaleFactor = 0.01f;
+		public float ScaleFactor;
 
 		public class MeshOption
 		{
@@ -235,7 +235,7 @@ namespace Lime
 			public List<UVAnimationFormat> UVAnimations = null;
 
 			[YuzuOptional]
-			public float ScaleFactor = 0.01f;
+			public float ScaleFactor = 1f;
 		}
 
 		public class MeshOptionFormat

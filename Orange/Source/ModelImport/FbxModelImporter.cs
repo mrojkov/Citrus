@@ -21,8 +21,7 @@ namespace Orange
 			var scene = manager.LoadScene(path);
 			Model = new Model3D();
 			Model.Nodes.Add(ImportNodes(scene.Root));
-			ImportAnimations(scene);
-			(new Model3DAttachmentParser().Parse(path) ?? new Model3DAttachment()).ApplyScaleFactor(Model);
+			new Model3DAttachmentParser().Parse(path)?.ApplyScaleFactor(Model);
 			manager.Destroy();
 		}
 
