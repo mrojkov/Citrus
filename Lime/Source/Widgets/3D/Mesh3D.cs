@@ -277,10 +277,29 @@ namespace Lime
 			Renderer.World = GlobalTransform;
 			Renderer.CullMode = CullMode;
 
+			var invWorld = GlobalTransform.CalcInverted();
+
 			foreach (var sm in Submeshes) {
 				var def = sm.Material;
 
 				sm.Material = mat;
+
+				var skin = sm.Material as IMaterialSkin;
+				if (skin != null && sm.Bones.Count > 0) {
+					if(sharedBoneTransforms.Length < sm.Bones.Count) {
+						sharedBoneTransforms = new Matrix44[sm.Bones.Count];
+					}
+					for (var i = 0; i < sm.Bones.Count; i++) {
+						sharedBoneTransforms[i] = sm.BoneBindPoses[i] * sm.Bones[i].GlobalTransform * invWorld;
+					}
+
+					skin.SkinEnabled = true;
+					skin.SetBones(sharedBoneTransforms, sm.Bones.Count);
+				}
+				else {
+					skin.SkinEnabled = false;
+				}
+
 				sm.Material.Apply();
 
 				PlatformRenderer.DrawTriangles(sm.Mesh, 0, sm.Mesh.IndexBuffer.Data.Length);

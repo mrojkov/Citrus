@@ -51,6 +51,7 @@ namespace Lime
 
 			Renderer.Flush();
 			Renderer.Viewport = lightViewport;
+			Renderer.ZTestEnabled = true;
 
 			var list = new List<RenderItem>();
 			var chain = new RenderChain();
