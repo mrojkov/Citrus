@@ -64,8 +64,9 @@ namespace Lime
 
 		/// <summary>
 		/// Consumes the command. WasIssued is false if the command was consumed.
+		/// Returns true is command was issued before consuming.
 		/// </summary>
-		void Consume();
+		bool Consume();
 
 		/// <summary>
 		/// Gets a value indicating whether the command has been consumed. The command should not be consumed before changing its Enabled property.
@@ -258,13 +259,15 @@ namespace Lime
 
 		public bool IsConsumed() => consumedAt == consumeGeneration;
 
-		public void Consume()
+		public bool Consume()
 		{
+			var r = WasIssued();
 			consumedAt = consumeGeneration;
 			wasIssued = false;
 			if (mappedShortcut != Key.Unknown) {
 				Window.Current.Input.ConsumeKey(mappedShortcut);
 			}
+			return r;
 		}
 
 		public static void ConsumeRange(List<ICommand> commands)
