@@ -69,7 +69,7 @@ namespace Lime
 		void AssignFrom(ICaretPosition c);
 	}
 
-	public delegate void TextProcessorDelegate(ref string text);
+	public delegate void TextProcessorDelegate(ref string text, Widget widget);
 
 	public interface IText
 	{

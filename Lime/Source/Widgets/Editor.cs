@@ -136,14 +136,14 @@ namespace Lime
 			}
 		}
 
-		private void ProcessHiddenPassword(ref string text)
+		private void ProcessHiddenPassword(ref string text, Widget w)
 		{
 			text = lastChar.Visible ?
 				PasswordChars(lastChar.Pos) + lastChar.Value + PasswordChars(TextLength - lastChar.Pos - 1) :
 				PasswordChars(TextLength);
 		}
 
-		private void ProcessUnsecuredPassword(ref string text) { text = Unsecure(Password); }
+		private void ProcessUnsecuredPassword(ref string text, Widget w) { text = Unsecure(Password); }
 
 		public void Unlink()
 		{

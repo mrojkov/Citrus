@@ -73,7 +73,7 @@ namespace Lime
 				if (displayText != null) return displayText;
 				displayText = Localizable ? Text.Localize() : Text;
 				if (textProcessor != null)
-					textProcessor(ref displayText);
+					textProcessor(ref displayText, this);
 				return displayText;
 			}
 		}
