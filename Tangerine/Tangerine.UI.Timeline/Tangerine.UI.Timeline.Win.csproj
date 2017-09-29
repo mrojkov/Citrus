@@ -97,6 +97,13 @@
     <Compile Include="Utils\TimelineMetrics.cs" />
     <Compile Include="Operations\DeselectGridSpan.cs" />
     <Compile Include="Components\GridAudioView.cs" />
+    <Compile Include="AnimatorAdapter.cs" />
+    <Compile Include="Curve.cs" />
+    <Compile Include="CurveEditorPane.cs" />
+    <Compile Include="Processors\CurveEditor\PanProcessor.cs" />
+    <Compile Include="Processors\CurveEditor\SelectAndDragKeysProcessor.cs" />
+    <Compile Include="Processors\CurveEditor\SelectCurveKey.cs" />
+    <Compile Include="Processors\CurveEditor\VerticalZoomProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Commands\" />

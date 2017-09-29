@@ -8,52 +8,6 @@ namespace Tangerine.UI.Timeline
 {
 	public class CurveEditorPane
 	{
-		public interface IAnimatorAdapter
-		{
-			int ComponentCount { get; }
-			string GetComponentName(int component);
-			float GetComponentValue(IAnimator animator, double time, int component);
-		}
-
-		public class NumericAnimatorAdapter : IAnimatorAdapter
-		{
-			public int ComponentCount => 1;
-			public string GetComponentName(int component) => null;
-
-			public float GetComponentValue(IAnimator animator, double time, int component)
-			{	
-				return ((NumericAnimator)animator).CalcValue(time);
-			}
-		}
-
-		public class Vector2AnimatorAdapter : IAnimatorAdapter
-		{
-			static string[] names = { "X", "Y" };
-			public int ComponentCount => 2;
-			public string GetComponentName(int component) => names[component];
-
-			public float GetComponentValue(IAnimator animator, double time, int component)
-			{	
-				return ((Vector2Animator)animator).CalcValue(time)[component];
-			}
-		}
-
-		public class Curve
-		{
-			public IAnimator Animator { get; private set; }
-			public int Component { get; private set; }
-			public IAnimatorAdapter Adapter { get; private set; }
-			public Color4 Color { get; private set; }
-
-			public Curve(IAnimator animator, int component, IAnimatorAdapter adapter, Color4 color)
-			{
-				Animator = animator;
-				Component = component;
-				Adapter = adapter;
-				Color = color;
-			}
-		}
-
 		static Dictionary<Type, IAnimatorAdapter> adapters = new Dictionary<Type, IAnimatorAdapter>();
 
 		public readonly Widget RootWidget;
@@ -116,6 +70,7 @@ namespace Tangerine.UI.Timeline
 				_ => Core.Operations.Dummy.Perform());
 			RootWidget.Tasks.Add(
 				new CurveEditorVerticalZoomProcessor(this),
+				new CurveEditorSelectAndDragKeysProcessor(this),
 				new CurveEditorPanProcessor(timeline)
 			);
 		}
@@ -196,6 +151,9 @@ namespace Tangerine.UI.Timeline
 			foreach (var c in Curves) {
 				RenderCurve(c);
 			}
+			foreach (var c in Curves) {
+				RenderSelectedKeys(c);
+			}
 			RenderCursor();
 			MainAreaWidget.PrepareRendererState();
 			for (var v = a; v <= b; v += step) {
@@ -218,6 +176,9 @@ namespace Tangerine.UI.Timeline
 				}
 			}
 			var range = maxValue - minValue;
+			if (range < 1) {
+				range = 1;
+			}
 			maxValue += range * 0.2f;
 			minValue -= range * 0.2f;
 		}
@@ -263,6 +224,14 @@ namespace Tangerine.UI.Timeline
 			}
 		}
 
+		void RenderSelectedKeys(Curve curve)
+		{
+			foreach (var key in curve.SelectedKeys) {
+				var p = CalcPosition(curve, key.Frame);
+				Renderer.DrawRectOutline(p - new Vector2(4, 4), p + new Vector2(4, 4), ColorTheme.Current.TimelineCurveEditor.Selection);
+			}
+		}
+
 		public float ValueToCoord(float value)
 		{
 			var t = (value - MinValue) / (MaxValue - MinValue);
@@ -275,7 +244,7 @@ namespace Tangerine.UI.Timeline
 			return (1 - t) * MinValue + t * MaxValue;
 		}
 
-		Vector2 CalcPosition(Curve curve, int frame)
+		public Vector2 CalcPosition(Curve curve, int frame)
 		{
 			return new Vector2(
 				(frame + 0.5f) * TimelineMetrics.ColWidth,

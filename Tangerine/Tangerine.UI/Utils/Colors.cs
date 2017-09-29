@@ -55,6 +55,7 @@ namespace Tangerine.UI
 		public class TimelineCurveEditorColors
 		{
 			public Color4[] Curves;
+			public Color4 Selection;
 		}
 
 		public class TimelineRulerColors
@@ -162,7 +163,8 @@ namespace Tangerine.UI
 				WaveformBackground = new Color4(160, 160, 220, 60)
 			};
 			var timelineCurveEditor = new TimelineCurveEditorColors {
-				Curves = new[] { Color4.Red, Color4.Green, Color4.Blue, Color4.Yellow }
+				Curves = new[] { Color4.Red, Color4.Green, Color4.Blue, Color4.Yellow },
+				Selection = Color4.Green
 			};
 			var timelineRuler = new TimelineRulerColors {
 				Notchings = timelineGrid.Lines,
@@ -260,7 +262,8 @@ namespace Tangerine.UI
 				WaveformBackground = new Color4(255, 200, 140, 60)
 			};
 			var timelineCurveEditor = new TimelineCurveEditorColors {
-				Curves = new[] { Color4.Red, Color4.Green, Color4.Blue, Color4.Yellow }
+				Curves = new[] { Color4.Red, Color4.Green, Color4.Blue, Color4.Yellow },
+				Selection = Color4.Green
 			};
 			var timelineRuler = new TimelineRulerColors {
 				Notchings = timelineGrid.Lines,

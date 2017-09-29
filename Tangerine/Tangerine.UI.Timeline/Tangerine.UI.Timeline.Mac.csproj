@@ -103,6 +103,10 @@
     <Compile Include="CurveEditorPane.cs" />
     <Compile Include="Processors\CurveEditor\VerticalZoomProcessor.cs" />
     <Compile Include="Processors\CurveEditor\PanProcessor.cs" />
+    <Compile Include="Processors\CurveEditor\SelectAndDragKeysProcessor.cs" />
+    <Compile Include="Processors\CurveEditor\SelectCurveKey.cs" />
+    <Compile Include="Curve.cs" />
+    <Compile Include="AnimatorAdapter.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tangerine.Core\Tangerine.Core.Mac.csproj">
