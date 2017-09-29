@@ -27,6 +27,13 @@ namespace Lime
 			items.Add(new Item { Command = command, Handler = handler });
 		}
 
+		public void Disconnect(ICommand command)
+		{
+			foreach (var item in items.FindAll(i => i.Command == command)) {
+				items.Remove(item);
+			}
+		}
+
 		public void Connect(ICommand command, Action action, Func<bool> enableChecker = null)
 		{
 			items.Add(new Item { Command = command, Handler = new DelegateHandler { Action = action, EnableChecker = enableChecker } });

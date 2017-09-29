@@ -38,6 +38,8 @@ namespace Tangerine.UI
 			public Color4 BackgroundColorB;
 			public Color4 RootWidgetOverlayColor;
 			public Color4 DistortionMeshOutline;
+			public Color4 Ruler;
+			public Color4 RulerEditable;
 		}
 
 		public class TimelineGridColors
@@ -144,6 +146,8 @@ namespace Tangerine.UI
 				BackgroundColorB = Color4.Gray.Darken(0.15f),
 				RootWidgetOverlayColor = Color4.White.Transparentify(0.8f),
 				DistortionMeshOutline = new Color4(0, 255, 255),
+				RulerEditable = new Color4(255, 0, 255),
+				Ruler = new Color4(0, 255, 255),
 			};
 			var timelineGrid = new TimelineGridColors {
 				PropertyRowBackground = Color4.White.Transparentify(0.95f),
@@ -238,6 +242,8 @@ namespace Tangerine.UI
 				BackgroundColorB = new Color4(190, 190, 190),
 				RootWidgetOverlayColor = new Color4(255, 255, 255, 85),
 				DistortionMeshOutline = new Color4(0, 255, 255),
+				RulerEditable = new Color4(255, 0, 255),
+				Ruler = new Color4(0, 255, 255),
 			};
 			var timelineGrid = new TimelineGridColors {
 				PropertyRowBackground = Color4.Black.Transparentify(0.95f),

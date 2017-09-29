@@ -84,6 +84,7 @@
     <Compile Include="UIProcessors.cs" />
     <Compile Include="ColorPicker.Mac.cs" />
     <Compile Include="ThemedExpandButton.cs" />
+    <Compile Include="Dialogs\SaveOverlayDialog.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

@@ -61,6 +61,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Components\CommandComponent.cs" />
     <Compile Include="Components\PointObjectSelectionComponent.cs" />
     <Compile Include="IKSolver.cs" />
     <Compile Include="Presenters\BoneAsistantPresenter.cs" />
@@ -104,6 +105,7 @@
     <Compile Include="Processors\3D\DragSplinePoint3DProcessor.cs" />
     <Compile Include="UserPreferences.cs" />
     <Compile Include="Processors\ActivateOnMouseOverProcessor.cs" />
+    <Compile Include="Widgets\Ruler.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Win.csproj">

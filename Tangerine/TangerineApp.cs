@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,6 +12,8 @@ namespace Tangerine
 	public class TangerineApp
 	{
 		public static TangerineApp Instance { get; private set; }
+		public Menu OverlaysMenu { get; private set; }
+		public Menu RulerMenu { get; private set; }
 		public readonly IMenu PadsMenu;
 		public readonly IMenu Resolution;
 		public readonly Dictionary<string, Toolbar> Toolbars = new Dictionary<string, Toolbar>();
@@ -138,14 +141,99 @@ namespace Tangerine
 			if (proj != null) {
 				new Project(proj).Open();
 			}
+			WidgetContext.Current.Root.AddChangeWatcher(() => Project.Current, project => ProjectChanged(project));
 			new UI.FilesystemView.FilesystemPane(filesystemPanel);
 			RegisterGlobalCommands();
+		}
+
+		private void ProjectChanged(Project proj)
+		{
+			Command command;
+			foreach (var item in OverlaysMenu) {
+				CommandHandlerList.Global.Disconnect(item);
+			}
+			OverlaysMenu.Clear();
+			foreach (var item in RulerMenu) {
+				CommandHandlerList.Global.Disconnect(item);
+			}
+			RulerMenu.Clear();
+			if (proj == Project.Null)
+				return;
+			foreach (var overlayPair in proj.Overlays) {
+				overlayPair.Value.Components.Add(new UI.SceneView.NodeCommandComponent {
+					Command = (command = new Command(overlayPair.Key))
+				});
+				OverlaysMenu.Add(command);
+				CommandHandlerList.Global.Connect(command, new OverlayToggleCommandHandler());
+			}
+			AddRulersCommands(proj.Rulers);
+			AddRulersCommands(proj.DefaultRulers);
+			RebuildRulerMenu();
+			proj.Rulers.CollectionChanged += Rulers_CollectionChanged;
+		}
+
+		private void RebuildRulerMenu()
+		{
+			RulerMenu.Clear();
+			RulerMenu.Add(SceneViewCommands.ToggleDisplayRuler);
+			RulerMenu.Add(SceneViewCommands.SaveCurrentRuler);
+			RulerMenu.Add(SceneViewCommands.DeleteRulers);
+			RulerMenu.Add(Command.MenuSeparator);
+			foreach (var ruler in Project.Current.DefaultRulers) {
+				RulerMenu.Add(ruler.GetComponents().Get<UI.SceneView.CommandComponent>().Command);
+			}
+			if (Project.Current.Rulers.Count > 0) {
+				RulerMenu.Add(Command.MenuSeparator);
+			}
+			foreach (var ruler in Project.Current.Rulers) {
+				RulerMenu.Add(ruler.GetComponents().Get<UI.SceneView.CommandComponent>().Command);
+			}
 		}
 
 		private void CreateResolutionMenu()
 		{
 			foreach (var orientation in DisplayResolutions.Items) {
 				Resolution.Add(new Command(orientation.Name, () => DisplayResolutions.SetResolution(orientation)));
+			}
+		}
+
+		private void Rulers_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+		{
+			WidgetContext.Current.Root.LateTasks.Add(RulerColectionChangedTask(e.NewItems, e.OldItems));
+		}
+
+		private IEnumerator<object> RulerColectionChangedTask(IList newItems, IList oldItems)
+		{
+			AddRulersCommands(newItems);
+			RemoveRulersCommands(oldItems);
+			if (newItems != null) {
+				foreach (RulerData ruler in newItems) {
+					ruler.GetComponents().Get<UI.SceneView.CommandComponent>().Command.Issue();
+				}
+			}
+			RebuildRulerMenu();
+			yield return null;
+		}
+
+		private void RemoveRulersCommands(IList rulers)
+		{
+			if (rulers == null)
+				return;
+			foreach (RulerData ruler in rulers) {
+				CommandHandlerList.Global.Disconnect(ruler.GetComponents().Get<UI.SceneView.CommandComponent>().Command);
+			}
+		}
+
+		private void AddRulersCommands(IList rulers)
+		{
+			if (rulers == null)
+				return;
+			foreach (RulerData ruler in rulers) {
+				Command c;
+				ruler.GetComponents().Add(new UI.SceneView.CommandComponent {
+					Command = (c = new Command(ruler.Name))
+				});
+				CommandHandlerList.Global.Connect(c, new OverlayToggleCommandHandler());
 			}
 		}
 
@@ -351,8 +439,12 @@ namespace Tangerine
 					GenericCommands.DefaultLayout,
 					new Command("Pads", PadsMenu),
 					new Command("Resolution", Resolution),
-					GenericCommands.Overlays,
 					SceneViewCommands.DisplayBones,
+					Command.MenuSeparator,
+					new Command("Overlays", (OverlaysMenu = new Menu())),
+					new Command("Rulers", (RulerMenu = new Menu())),
+					SceneViewCommands.SnapWidgetBorderToRuler,
+					SceneViewCommands.SnapWidgetPivotToRuler,
 				})),
 				new Command("Window", new Menu {
 					GenericCommands.NextDocument,
@@ -390,6 +482,8 @@ namespace Tangerine
 				typeof(Spline3D),
 				typeof(SplinePoint3D),
 				typeof(SplineGear3D),
+				typeof(Polyline),
+				typeof(PolylinePoint),
 			};
 			foreach (var t in nodeTypes) {
 				var cmd = new Command(t.Name) { Icon = NodeIconPool.GetTexture(t) };
@@ -415,6 +509,7 @@ namespace Tangerine
 			h.Connect(GenericCommands.CloseDocument, new FileClose());
 			h.Connect(GenericCommands.Quit, Application.Exit);
 			h.Connect(GenericCommands.PreferencesDialog, () => new PreferencesDialog());
+			h.Connect(SceneViewCommands.DeleteRulers, new DeleteRulers());
 			h.Connect(GenericCommands.Group, new GroupNodes());
 			h.Connect(GenericCommands.Ungroup, new UngroupNodes());
 			h.Connect(GenericCommands.InsertTimelineColumn, new InsertTimelineColumn());
@@ -425,7 +520,6 @@ namespace Tangerine
 			h.Connect(GenericCommands.GroupContentsToMorphableMeshes, new GroupContentsToMorphableMeshes());
 			h.Connect(GenericCommands.ExportScene, new ExportScene());
 			h.Connect(GenericCommands.UpsampleAnimationTwice, new UpsampleAnimationTwice());
-			h.Connect(GenericCommands.Overlays, new OverlaysCommand());
 			h.Connect(Tools.AlignLeft, new AlignLeft());
 			h.Connect(Tools.AlignRight, new AlignRight());
 			h.Connect(Tools.AlignTop, new AlignTop());
@@ -453,6 +547,8 @@ namespace Tangerine
 			h.Connect(Command.Undo, () => Document.Current.History.Undo(), () => Document.Current?.History.CanUndo() ?? false);
 			h.Connect(Command.Redo, () => Document.Current.History.Redo(), () => Document.Current?.History.CanRedo() ?? false);
 			h.Connect(OrangeCommands.Run, () => Orange.Actions.BuildAndRunAction());
+			h.Connect(SceneViewCommands.SnapWidgetBorderToRuler, new ToggleDisplayCommandHandler());
+			h.Connect(SceneViewCommands.SnapWidgetPivotToRuler, new ToggleDisplayCommandHandler());
 		}
 
 		static void Paste()
@@ -469,6 +565,18 @@ namespace Tangerine
 			var fontData = new EmbeddedResource("Tangerine.Resources.SegoeUIRegular.ttf", "Tangerine").GetResourceBytes();
 			var font = new DynamicFont(fontData);
 			FontPool.Instance.AddFont("Default", font);
+		}
+
+		private class OverlayToggleCommandHandler : ToggleDisplayCommandHandler
+		{
+			public override void RefreshCommand(ICommand command)
+			{
+				var checkedState = command.Checked;
+				base.RefreshCommand(command);
+				if (command.Checked != checkedState) {
+					CommonWindow.Current.Invalidate();
+				}
+			}
 		}
 	}
 }

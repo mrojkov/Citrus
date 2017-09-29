@@ -13,12 +13,16 @@ namespace Tangerine
 		}
 	}
 
-	public class OverlaysCommand : CommandHandler
+	public class DeleteRulers : DocumentCommandHandler
 	{
+		public override bool GetEnabled()
+		{
+			return Project.Current.Rulers.Count > 0;
+		}
+
 		public override void Execute()
 		{
-			Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>().ShowOverlays = !Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>().ShowOverlays;
-			Window.Current.Invalidate();
+			new DeleteRulerDialog();
 		}
 	}
 }

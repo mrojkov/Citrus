@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.IO;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Yuzu;
 using Lime;
 
@@ -23,21 +24,58 @@ namespace Tangerine.Core
 
 		public delegate bool DocumentReloadConfirmationDelegate(Document document);
 		public static DocumentReloadConfirmationDelegate DocumentReloadConfirmation;
+		public ObservableCollection<RulerData> Rulers { get; } = new ObservableCollection<RulerData>();
+		public Dictionary<string, Widget> Overlays { get; } = new Dictionary<string, Widget>();
+		public List<RulerData> DefaultRulers { get; } = new List<RulerData>();
 
 		private Project() { }
 
 		public Project(string citprojPath)
 		{
 			CitprojPath = citprojPath;
+			AddDefaultRulers();
 			UserprefsPath = Path.ChangeExtension(citprojPath, ".userprefs");
 			AssetsDirectory = Path.Combine(Path.GetDirectoryName(CitprojPath), "Data");
 			if (!Directory.Exists(AssetsDirectory)) {
 				throw new InvalidOperationException($"Assets directory {AssetsDirectory} doesn't exist.");
 			}
 			Orange.The.Workspace.Open(citprojPath);
+			foreach (var ruler in Orange.The.Workspace.ProjectJson.GetArray("Rulers", new RulerData[0])) {
+				Rulers.Add(ruler);
+			}
 			UpdateTextureParams();
 		}
 
+
+		private void AddDefaultRulers()
+		{
+			var l1 = new RulerLine { Value = -384 };
+			var l2 = new RulerLine { Value = 384 };
+			var ruler = new RulerData { Name = "1152x768 (3:2)" };
+			ruler.Lines.Add(new RulerLine { IsVertical = true, Value = -576 });
+			ruler.Lines.Add(new RulerLine { IsVertical = true, Value = 576 });
+			ruler.Lines.Add(l1);
+			ruler.Lines.Add(l2);
+			DefaultRulers.Add(ruler);
+			ruler = new RulerData { Name = "1024x768 (3:4)" };
+			ruler.Lines.Add(new RulerLine { IsVertical = true, Value = -512 });
+			ruler.Lines.Add(new RulerLine { IsVertical = true, Value = 512 });
+			ruler.Lines.Add(l1);
+			ruler.Lines.Add(l2);
+			DefaultRulers.Add(ruler);
+			ruler = new RulerData { Name = "1366x768 (16:9)" };
+			ruler.Lines.Add(new RulerLine { IsVertical = true, Value = -683 });
+			ruler.Lines.Add(new RulerLine { IsVertical = true, Value = 683 });
+			ruler.Lines.Add(l1);
+			ruler.Lines.Add(l2);
+			DefaultRulers.Add(ruler);
+			ruler = new RulerData { Name = "1579x768" };
+			ruler.Lines.Add(new RulerLine { IsVertical = true, Value = -790 });
+			ruler.Lines.Add(new RulerLine { IsVertical = true, Value = 790 });
+			ruler.Lines.Add(l1);
+			ruler.Lines.Add(l2);
+			DefaultRulers.Add(ruler);
+		}
 		public void Open()
 		{
 			if (Current != Null) {
@@ -66,6 +104,26 @@ namespace Tangerine.Core
 			fsWatcher.Created += HandleFileSystemWatcherEvent;
 			fsWatcher.Deleted += HandleFileSystemWatcherEvent;
 			fsWatcher.Renamed += HandleFileSystemWatcherEvent;
+			var files = Directory.EnumerateFiles(Path.Combine(Project.Current.AssetsDirectory, "Overlays"))
+				.Where(file => Path.GetExtension(file) == ".tan" || Path.GetExtension(file) == ".scene");
+			foreach (var file in files) {
+				Project.Current.Overlays.Add(Path.GetFileNameWithoutExtension(file), new Frame(file));
+			}
+		}
+
+
+		public void AddRuler(RulerData ruler)
+		{
+			Orange.The.Workspace.ProjectJson.AddToArray("Rulers", ruler);
+			Rulers.Add(ruler);
+			Orange.The.Workspace.SaveCurrentProject();
+		}
+
+		public void RemoveRuler(RulerData ruler)
+		{
+			Orange.The.Workspace.ProjectJson.RemoveFromArray("Rulers", ruler);
+			Rulers.Remove(ruler);
+			Orange.The.Workspace.SaveCurrentProject();
 		}
 
 		public bool Close()
@@ -243,6 +301,26 @@ namespace Tangerine.Core
 					File.Delete(Path.Combine(AssetsDirectory, path));
 				}
 			}
+		}
+	}
+
+	public class RulerData
+	{
+		public string Name { get; set; }
+		public List<RulerLine> Lines { get; set; } = new List<RulerLine>();
+		private ComponentCollection<Component> components = new ComponentCollection<Component>();
+		// Use method instead of property to avoid aut-serialization via Newtonsoft.Json
+		public ComponentCollection<Component> GetComponents() => components;
+	}
+
+	public class RulerLine
+	{
+		public float Value { get; set; }
+		public bool IsVertical { get; set; }
+
+		public Vector2 ToVector2()
+		{
+			return IsVertical ? new Vector2(Value, 0) : new Vector2(0, Value);
 		}
 	}
 }
