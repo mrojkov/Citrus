@@ -69,8 +69,6 @@
     <Compile Include="Operations\SelectGridSpan.cs" />
     <Compile Include="Operations\SetCurrentColumn.cs" />
     <Compile Include="Operations\ShiftGridSelection.cs" />
-    <Compile Include="Processors\CurveEditor\PanProcessor.cs" />
-    <Compile Include="Processors\CurveEditor\VerticalZoomProcessor.cs" />
     <Compile Include="Processors\GridPane\ClampScrollPosProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Processors\GridPane\DragKeyframesRespondentProcessor.cs" />
@@ -99,7 +97,6 @@
     <Compile Include="Components\GridAudioView.cs" />
     <Compile Include="AnimatorAdapter.cs" />
     <Compile Include="Curve.cs" />
-    <Compile Include="CurveEditorPane.cs" />
     <Compile Include="Processors\CurveEditor\PanProcessor.cs" />
     <Compile Include="Processors\CurveEditor\SelectAndDragKeysProcessor.cs" />
     <Compile Include="Processors\CurveEditor\SelectCurveKey.cs" />

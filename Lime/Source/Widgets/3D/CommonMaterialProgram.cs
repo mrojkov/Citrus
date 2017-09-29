@@ -12,9 +12,11 @@
 			attribute vec2 a_UV;
 			attribute vec4 a_BlendIndices;
 			attribute vec4 a_BlendWeights;
+			attribute vec4 a_Normal;
 
 			varying vec4 v_Color;
 			varying vec2 v_UV;
+			varying vec3 v_Normal;
 
 			#ifdef FOG_ENABLED
 			varying float v_FogFactor;
@@ -23,9 +25,15 @@
 			uniform float u_FogDensity;
 			#endif
 
+			uniform mat4 u_World;
 			uniform mat4 u_WorldView;
 			uniform mat4 u_WorldViewProj;
 			uniform mat4 u_Bones[50];
+
+			#ifdef RECIEVE_SHADOWS
+			varying vec4 v_ShadowCoord;
+			uniform mat4 u_LightWorldViewProjection;
+			#endif
 
 			void main()
 			{
@@ -52,7 +60,13 @@
 			#endif
 				v_FogFactor = clamp(v_FogFactor, 0.0, 1.0);
 			#endif
+
+			#ifdef RECIEVE_SHADOWS
+				v_ShadowCoord = u_LightWorldViewProjection * position;
+			#endif
+				
 				gl_Position = u_WorldViewProj * position;
+				v_Normal = mat3(u_World) * a_Normal.xyz;
 			}
 		";
 
@@ -63,6 +77,7 @@
 
 			varying vec4 v_Color;
 			varying vec2 v_UV;
+			varying vec3 v_Normal;
 
 			#ifdef FOG_ENABLED
 			varying float v_FogFactor;
@@ -71,6 +86,45 @@
 
 			uniform vec4 u_DiffuseColor;
 			uniform sampler2D u_DiffuseTexture;
+
+			#ifdef RECIEVE_SHADOWS
+			varying vec4 v_ShadowCoord;
+			uniform sampler2D u_ShadowMapTexture;
+			#endif
+
+			#ifdef LIGHTNING_ENABLED
+			uniform vec3 u_LightDirection;
+			uniform vec4 u_LightColor;
+			uniform float u_LightIntensity;
+			#endif
+
+			#ifdef RECIEVE_SHADOWS
+			float texture2DPCF4(sampler2D shadowMap, vec2 uv)
+			{
+				float x,y,r;
+
+				for (x = -0.5; x <= 0.5; x += 1.0) {
+					for (y = -0.5; y <= 0.5; y += 1.0) {
+						r += texture2D(shadowMap, uv + vec2(x * SHADOW_MAP_TEXEL_X, y * SHADOW_MAP_TEXEL_Y)).z;
+					}
+				}
+				
+				return r / 4.0;
+			}
+
+			float texture2DPCF16(sampler2D shadowMap, vec2 uv)
+			{
+				float x,y,r;
+
+				for (x = -1.5; x <= 1.5; x += 1.0) {
+					for (y = -1.5; y <= 1.5; y += 1.0) {
+						r += texture2D(shadowMap, uv + vec2(x * SHADOW_MAP_TEXEL_X, y * SHADOW_MAP_TEXEL_Y)).z;
+					}
+				}
+				
+				return r / 16.0;
+			}
+			#endif
 
 			void main()
 			{
@@ -81,10 +135,33 @@
 			#ifdef FOG_ENABLED
 				color.rgb = mix(color.rgb, u_FogColor.rgb, v_FogFactor);
 			#endif
+				
+			#ifdef LIGHTNING_ENABLED
+				vec3 normal = normalize(v_Normal);
+				float light = dot(normal, u_LightDirection);
+				float visibility = 1.0;
+
+			#ifdef RECIEVE_SHADOWS
+				vec2 shadowUV = (v_ShadowCoord.xy + vec2(1.0)) / 2.0;
+				float bias = clamp(0.005 * tan(acos(clamp(light, 0, 0.75))), 0, 0.005);
+			#ifdef SMOOTH_SHADOW
+				float factor = clamp((v_ShadowCoord.z - bias) - TEXTURE_PCF(u_ShadowMapTexture, shadowUV.xy), 0.0, 0.025) * 10.0;
+				visibility = 1.0 - factor;
+			#else
+				if (texture2D(u_ShadowMapTexture, shadowUV.xy).z < v_ShadowCoord.z - bias) {
+					visibility = 0.2;
+				}
+			#endif
+			#endif
+
+				color.rgb *= (max(0.25, visibility * light * u_LightIntensity) * u_LightColor.rgb);
+			#endif
+
 				gl_FragColor = color;
 			}
 		";
 
+		public int WorldUniformId;
 		public int WorldViewUniformId;
 		public int WorldViewProjUniformId;
 		public int DiffuseColorUniformId;
@@ -94,16 +171,21 @@
 		public int FogStartUniformId;
 		public int FogEndUniformId;
 		public int FogDensityUniformId;
+		public int LightColorUniformId;
+		public int LightDirectionUniformId;
+		public int LightIntensityUniformId;
+		public int LightWorldViewProjectionUniformId;
 
 		public const int DiffuseTextureStage = 0;
+		public const int ShadowMapTextureStage = 1;
 
 		public CommonMaterialProgram(CommonMaterialProgramSpec spec)
-			: base(GetShaders(spec), GetAttribLocations(), GetSamplers())
-		{
-		}
+			: base(GetShaders(spec), GetAttribLocations(), GetSamplers(spec))
+		{ }
 
 		protected override void InitializeUniformIds()
 		{
+			WorldUniformId = GetUniformId("u_World");
 			WorldViewUniformId = GetUniformId("u_WorldView");
 			WorldViewProjUniformId = GetUniformId("u_WorldViewProj");
 			DiffuseColorUniformId = GetUniformId("u_DiffuseColor");
@@ -113,6 +195,10 @@
 			FogStartUniformId = GetUniformId("u_FogStart");
 			FogEndUniformId = GetUniformId("u_FogEnd");
 			FogDensityUniformId = GetUniformId("u_FogDensity");
+			LightColorUniformId = GetUniformId("u_LightColor");
+			LightDirectionUniformId = GetUniformId("u_LightDirection");
+			LightIntensityUniformId = GetUniformId("u_LightIntensity");
+			LightWorldViewProjectionUniformId = GetUniformId("u_LightWorldViewProjection");
 		}
 
 		private static Shader[] GetShaders(CommonMaterialProgramSpec spec)
@@ -143,14 +229,33 @@
 					preamble += "#define FOG_EXP_SQUARED\n";
 				}
 			}
+			if (spec.ProcessLightning) {
+				preamble += "#define LIGHTNING_ENABLED\n";
+			}
+			if (spec.RecieveShadows) {
+				preamble += "#define RECIEVE_SHADOWS\n";
+				preamble += "#define SHADOW_MAP_TEXEL_X " + (1f / (spec.ShadowMapSize.X <= 0 ? 1024 : spec.ShadowMapSize.X)) + "\n";
+				preamble += "#define SHADOW_MAP_TEXEL_Y " + (1f / (spec.ShadowMapSize.Y <= 0 ? 1024 : spec.ShadowMapSize.Y)) + "\n";
+
+				if (spec.SmoothShadows) {
+					preamble += "#define SMOOTH_SHADOW\n";
+					preamble += "#define TEXTURE_PCF " + (spec.HighQualitySmoothShadows ? "texture2DPCF16" : "texture2DPCF4") + "\n";
+				}
+			}
+
 			return preamble;
 		}
 
-		private static Sampler[] GetSamplers()
+		private static Sampler[] GetSamplers(CommonMaterialProgramSpec spec)
 		{
-			return new Sampler[] {
-				new Sampler { Name = "u_DiffuseTexture", Stage = DiffuseTextureStage }
-			};
+			var samplers = new System.Collections.Generic.List<Sampler>(2);
+			samplers.Add(new Sampler { Name = "u_DiffuseTexture", Stage = DiffuseTextureStage });
+			if (spec.RecieveShadows) {
+				samplers.Add(new Sampler { Name = "u_ShadowMapTexture", Stage = ShadowMapTextureStage });
+			}
+
+			return samplers.ToArray();
+
 		}
 
 		private static AttribLocation[] GetAttribLocations()
@@ -160,7 +265,8 @@
 				new AttribLocation { Name = "a_UV", Index = ShaderPrograms.Attributes.UV1 },
 				new AttribLocation { Name = "a_Color", Index = ShaderPrograms.Attributes.Color1 },
 				new AttribLocation { Name = "a_BlendIndices", Index = ShaderPrograms.Attributes.BlendIndices },
-				new AttribLocation { Name = "a_BlendWeights", Index = ShaderPrograms.Attributes.BlendWeights }
+				new AttribLocation { Name = "a_BlendWeights", Index = ShaderPrograms.Attributes.BlendWeights },
+				new AttribLocation { Name = "a_Normal", Index =  ShaderPrograms.Attributes.Normal }
 			};
 		}
 	}
@@ -170,5 +276,10 @@
 		public bool SkinEnabled;
 		public bool DiffuseTextureEnabled;
 		public FogMode FogMode;
+		public bool ProcessLightning;
+		public bool RecieveShadows;
+		public bool SmoothShadows;
+		public bool HighQualitySmoothShadows;
+		public IntVector2 ShadowMapSize;
 	}
 }

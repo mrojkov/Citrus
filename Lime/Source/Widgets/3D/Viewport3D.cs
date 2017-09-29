@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Yuzu;
 using System;
+using System.Linq;
 #if OPENGL
 #if !MAC && !MONOMAC
 using OpenTK.Graphics.ES20;
@@ -23,7 +24,7 @@ namespace Lime
 			float CalcDistanceToCamera(Camera3D camera);
 			bool Opaque { get; }
 		}
-
+		
 		private float frame;
 		private List<RenderItem> opaqueList = new List<RenderItem>();
 		private List<RenderItem> transparentList = new List<RenderItem>();
@@ -32,7 +33,17 @@ namespace Lime
 		[YuzuMember]
 		public NodeReference<Camera3D> CameraRef { get; set; }
 
+		[YuzuMember]
+		public NodeReference<LightSource> LightSourceRef { get; set; }
+
 		public Camera3D Camera => CameraRef?.GetNode(this);
+		public LightSource LightSource => LightSourceRef?.GetNode(this);
+
+#if DEBUG
+		[TangerineInspect]
+		public NodeReference<Image> DebugShadowMapImageRef { get; set; }
+		public Image DebugShadowMapImage => DebugShadowMapImageRef?.GetNode(this.Parent);
+#endif
 
 		[YuzuMember]
 		public float Frame
@@ -48,7 +59,21 @@ namespace Lime
 		public Viewport3D()
 		{
 			Presenter = DefaultPresenter.Instance;
+#if DEBUG
+			DebugShadowMapImageRef = new NodeReference<Image>("ShadowMap");
+#endif
 		}
+
+#if DEBUG
+		public override void Update(float delta)
+		{
+			base.Update(delta);
+
+			if (DebugShadowMapImage != null) {
+				DebugShadowMapImage.Texture = LightSource?.ShadowMap;
+			}
+		}
+#endif
 
 		private void BuildForTangerine()
 		{
@@ -183,6 +208,7 @@ namespace Lime
 			vp.opaqueList = new List<RenderItem>();
 			vp.transparentList = new List<RenderItem>();
 			vp.CameraRef = CameraRef?.Clone();
+			vp.LightSourceRef = LightSourceRef?.Clone();
 			return vp;
 		}
 
@@ -208,6 +234,13 @@ namespace Lime
 				return Camera.Projection * p;
 			} else {
 				return p;
+			}
+		}
+
+		public void InvalidateMaterials()
+		{
+			foreach (var mesh in Descendants.OfType<Mesh3D>().SelectMany((m) => m.Submeshes)) {
+				mesh.Material.Invalidate();
 			}
 		}
 

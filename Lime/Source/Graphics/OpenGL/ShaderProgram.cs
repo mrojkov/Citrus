@@ -217,6 +217,11 @@ namespace Lime
 			GL.Uniform1(uniformId, length, value);
 		}
 
+		public void LoadVector3(int uniformId, Vector3 vector)
+		{
+			GL.Uniform3(uniformId, vector.X, vector.Y, vector.Z);
+		}
+
 		public void LoadVector4(int uniformId, Vector4 vector)
 		{
 			GL.Uniform4(uniformId, vector.X, vector.Y, vector.Z, vector.W);

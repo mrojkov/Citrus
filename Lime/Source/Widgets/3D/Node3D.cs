@@ -16,6 +16,7 @@ namespace Lime
 		protected Matrix44 globalTransform;
 		protected bool globallyVisible;
 		protected Color4 globalColor;
+		protected Viewport3D viewport;
 
 		[YuzuMember]
 		[TangerineKeyframeColor(2)]
@@ -99,6 +100,12 @@ namespace Lime
 			rotation = Quaternion.Identity;
 			visible = true;
 			color = Color4.White;
+		}
+
+		protected override void Awake()
+		{
+			base.Awake();
+			viewport = GetViewport();
 		}
 
 		public virtual float CalcDistanceToCamera(Camera3D camera)
@@ -207,6 +214,12 @@ namespace Lime
 			if (GloballyVisible) {
 				AddChildrenToRenderChain(chain);
 			}
+		}
+
+		protected override void OnParentChanged(Node oldParent)
+		{
+			base.OnParentChanged(oldParent);
+			viewport = GetViewport();
 		}
 	}
 }

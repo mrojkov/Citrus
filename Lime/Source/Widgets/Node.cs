@@ -71,6 +71,10 @@ namespace Lime
 	public sealed class TangerineIgnoreAttribute : Attribute
 	{ }
 
+	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
+	public sealed class TangerineInspectAttribute : Attribute
+	{ }
+
 	[Flags]
 	public enum TangerineFlags
 	{

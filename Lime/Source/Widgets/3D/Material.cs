@@ -5,6 +5,18 @@
 		Color4 ColorFactor { get; set; }
 		IMaterial Clone();
 		void Apply();
+		void Invalidate();
+	}
+
+	public interface IMaterialLightning
+	{
+		bool ProcessLightning { get; set; }
+		void SetLightData(LightSource light);
+	}
+
+	public interface IMaterialShadowReciever : IMaterialLightning
+	{
+		bool RecieveShadows { get; set; }
 	}
 
 	public interface IMaterialSkin

@@ -7,7 +7,7 @@ using Yuzu;
 
 namespace Lime
 {
-	public class Mesh3D : Node3D
+	public class Mesh3D : Node3D, IShadowCaster, IShadowReciever
 	{
 		[YuzuCompact]
 		[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 4)]
@@ -60,6 +60,9 @@ namespace Lime
 
 			[YuzuMember("4")]
 			public BlendWeights BlendWeights;
+
+			[YuzuMember("5")]
+			public Vector3 Normal;
 		}
 
 		private static Matrix44[] sharedBoneTransforms = new Matrix44[0];
@@ -85,6 +88,10 @@ namespace Lime
 
 		public virtual Action Clicked { get; set; }
 
+		public bool CastShadow { get; set; }
+		public bool RecieveShadow { get; set; }
+		public bool ProcessLightning { get; set; }
+
 		public Mesh3D()
 		{
 			Presenter = DefaultPresenter.Instance;
@@ -97,6 +104,10 @@ namespace Lime
 			if (SkipRender) {
 				return;
 			}
+			
+			bool lightningEnabled = ProcessLightning && viewport != null && viewport.LightSource != null && viewport.LightSource.Visible;
+			bool shadowsEnabled = lightningEnabled && viewport.LightSource.ShadowMappingEnabled;
+
 			Renderer.World = GlobalTransform;
 			Renderer.CullMode = CullMode;
 			var invWorld = GlobalTransform.CalcInverted();
@@ -115,7 +126,22 @@ namespace Lime
 					}
 				}
 				sm.Material.ColorFactor = GlobalColor;
+
+				var lightningMaterial = sm.Material as IMaterialLightning;
+				if (lightningMaterial != null) {
+					lightningMaterial.ProcessLightning = lightningEnabled;
+					if (lightningEnabled) {
+						lightningMaterial.SetLightData(viewport.LightSource);
+					}
+				}
+
+				var shadowMaterial = sm.Material as IMaterialShadowReciever;
+				if (shadowMaterial != null) {
+					shadowMaterial.RecieveShadows = shadowsEnabled && RecieveShadow;
+				}
+
 				sm.Material.Apply();
+				
 				PlatformRenderer.DrawTriangles(sm.Mesh, 0, sm.Mesh.IndexBuffer.Data.Length);
 				Renderer.PolyCount3d += sm.Mesh.IndexBuffer.Data.Length / 3;
 			}
@@ -241,6 +267,47 @@ namespace Lime
 			Submeshes.Clear();
 			base.Dispose();
 		}
+
+		public void RenderDepthBuffer(IMaterial mat)
+		{
+			if (SkipRender) {
+				return;
+			}
+
+			Renderer.World = GlobalTransform;
+			Renderer.CullMode = CullMode;
+
+			var invWorld = GlobalTransform.CalcInverted();
+
+			foreach (var sm in Submeshes) {
+				var def = sm.Material;
+
+				sm.Material = mat;
+
+				var skin = sm.Material as IMaterialSkin;
+				if (skin != null && sm.Bones.Count > 0) {
+					if(sharedBoneTransforms.Length < sm.Bones.Count) {
+						sharedBoneTransforms = new Matrix44[sm.Bones.Count];
+					}
+					for (var i = 0; i < sm.Bones.Count; i++) {
+						sharedBoneTransforms[i] = sm.BoneBindPoses[i] * sm.Bones[i].GlobalTransform * invWorld;
+					}
+
+					skin.SkinEnabled = true;
+					skin.SetBones(sharedBoneTransforms, sm.Bones.Count);
+				}
+				else {
+					skin.SkinEnabled = false;
+				}
+
+				sm.Material.Apply();
+
+				PlatformRenderer.DrawTriangles(sm.Mesh, 0, sm.Mesh.IndexBuffer.Data.Length);
+				Renderer.PolyCount3d += sm.Mesh.IndexBuffer.Data.Length / 3;
+
+				sm.Material = def;
+			}
+		}
 	}
 
 	public class Submesh3D
@@ -275,7 +342,8 @@ namespace Lime
 				ShaderPrograms.Attributes.Color1,
 				ShaderPrograms.Attributes.UV1,
 				ShaderPrograms.Attributes.BlendIndices,
-				ShaderPrograms.Attributes.BlendWeights
+				ShaderPrograms.Attributes.BlendWeights,
+				ShaderPrograms.Attributes.Normal,
 			} };
 		}
 
