@@ -153,6 +153,7 @@ namespace Tangerine
 				typeof(Spline3D),
 				typeof(SplinePoint3D),
 				typeof(SplineGear3D),
+				typeof(LightSource)
 			};
 			foreach (var t in nodeTypes) {
 				var cmd = new Command(t.Name) { Icon = NodeIconPool.GetTexture(t) };

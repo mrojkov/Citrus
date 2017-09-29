@@ -178,15 +178,16 @@ namespace Lime
 			}
 
 			// TODO: We need to tweak shadow quality settings
+			var lightSourceAvailable = lightSource != null;
 			var spec = new CommonMaterialProgramSpec {
 				SkinEnabled = skinEnabled,
 				DiffuseTextureEnabled = diffuseTexture != null,
 				FogMode = FogMode,
 				ProcessLightning = ProcessLightning,
 				RecieveShadows = RecieveShadows,
-				ShadowMapSize = lightSource.ShadowMapSize,
+				ShadowMapSize = lightSourceAvailable ? lightSource.ShadowMapSize : IntVector2.Zero,
 				SmoothShadows = true,
-				HighQualitySmoothShadows = lightSource.ShadowMapQuality > ShadowMapTextureQuality.Medium
+				HighQualitySmoothShadows = lightSourceAvailable && lightSource.ShadowMapQuality > ShadowMapTextureQuality.Medium
 			};
 			if (programCache.TryGetValue(spec, out program)) {
 				return;
