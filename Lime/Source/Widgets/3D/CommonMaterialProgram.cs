@@ -143,7 +143,7 @@
 
 			#ifdef RECIEVE_SHADOWS
 				vec2 shadowUV = (v_ShadowCoord.xy + vec2(1.0)) / 2.0;
-				float bias = clamp(0.005 * tan(acos(clamp(light, 0, 0.75))), 0, 0.005);
+				float bias = clamp(0.005 * tan(acos(clamp(light, 0.0, 0.75))), 0.0, 0.005);
 			#ifdef SMOOTH_SHADOW
 				float factor = clamp((v_ShadowCoord.z - bias) - TEXTURE_PCF(u_ShadowMapTexture, shadowUV.xy), 0.0, 0.025) * 10.0;
 				visibility = 1.0 - factor;
