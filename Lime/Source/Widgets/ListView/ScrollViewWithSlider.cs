@@ -45,7 +45,7 @@ namespace Lime
 								var projectedFrameSize = ProjectToScrollAxis(Frame.Size);
 								if (projectedFrameSize > Mathf.ZeroTolerance) {
 									var d = ProjectToScrollAxis(input.MousePosition - iniMousePos) * ContentLength / projectedFrameSize;
-									ScrollPosition = (iniScrollPos + d).Clamp(MinScrollPosition, MaxScrollPosition);
+									ScrollPosition = Mathf.Clamp(((iniScrollPos + d).Round()), MinScrollPosition, MaxScrollPosition);
 								}
 								yield return null;
 							}
