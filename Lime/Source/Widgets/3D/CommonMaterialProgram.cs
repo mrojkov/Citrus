@@ -98,6 +98,34 @@
 			uniform float u_LightIntensity;
 			#endif
 
+			#ifdef RECIEVE_SHADOWS
+			float texture2DPCF4(sampler2D shadowMap, vec2 uv)
+			{
+				float x,y,r;
+
+				for (x = -0.5; x <= 0.5; x += 1.0) {
+					for (y = -0.5; y <= 0.5; y += 1.0) {
+						r += texture2D(shadowMap, uv + vec2(x * SHADOW_MAP_TEXEL_X, y * SHADOW_MAP_TEXEL_Y)).z;
+					}
+				}
+				
+				return r / 4.0;
+			}
+
+			float texture2DPCF16(sampler2D shadowMap, vec2 uv)
+			{
+				float x,y,r;
+
+				for (x = -1.5; x <= 1.5; x += 1.0) {
+					for (y = -1.5; y <= 1.5; y += 1.0) {
+						r += texture2D(shadowMap, uv + vec2(x * SHADOW_MAP_TEXEL_X, y * SHADOW_MAP_TEXEL_Y)).z;
+					}
+				}
+				
+				return r / 16.0;
+			}
+			#endif
+
 			void main()
 			{
 				vec4 color = v_Color * u_DiffuseColor;
@@ -114,27 +142,16 @@
 				float visibility = 1.0;
 
 			#ifdef RECIEVE_SHADOWS
-
 				vec2 shadowUV = (v_ShadowCoord.xy + vec2(1.0)) / 2.0;
 				float bias = clamp(0.005 * tan(acos(clamp(light, 0, 0.75))), 0, 0.005);
-			#ifdef SHADOW_SAMPLING
-				vec2 poissonDisk[4];
-				poissonDisk[0] = vec2( -0.94201624, -0.39906216 );
-				poissonDisk[1] = vec2( 0.94558609, -0.76890725 );
-				poissonDisk[2] = vec2( -0.094184101, -0.92938870 );
-				poissonDisk[3] = vec2( 0.34495938, 0.29387760 );
-				
-				for (int i = 0; i < 4; i++) {
-					if (texture2D(u_ShadowMapTexture, shadowUV.xy + poissonDisk[i] / 700.0).z < v_ShadowCoord.z - bias) {
-						visibility -= 0.2;
-					}
-				}
+			#ifdef SMOOTH_SHADOW
+				float factor = clamp((v_ShadowCoord.z - bias) - TEXTURE_PCF(u_ShadowMapTexture, shadowUV.xy), 0.0, 0.025) * 10.0;
+				visibility = 1.0 - factor;
 			#else
 				if (texture2D(u_ShadowMapTexture, shadowUV.xy).z < v_ShadowCoord.z - bias) {
 					visibility = 0.2;
 				}
 			#endif
-
 			#endif
 
 				color.rgb *= (max(0.25, visibility * light * u_LightIntensity) * u_LightColor.rgb);
@@ -217,8 +234,12 @@
 			}
 			if (spec.RecieveShadows) {
 				preamble += "#define RECIEVE_SHADOWS\n";
-				if (spec.ShadowSampling) {
-					preamble += "#define SHADOW_SAMPLING\n";
+				preamble += "#define SHADOW_MAP_TEXEL_X " + (1f / (spec.ShadowMapSize.X <= 0 ? 1024 : spec.ShadowMapSize.X)) + "\n";
+				preamble += "#define SHADOW_MAP_TEXEL_Y " + (1f / (spec.ShadowMapSize.Y <= 0 ? 1024 : spec.ShadowMapSize.Y)) + "\n";
+
+				if (spec.SmoothShadows) {
+					preamble += "#define SMOOTH_SHADOW\n";
+					preamble += "#define TEXTURE_PCF " + (spec.HighQualitySmoothShadows ? "texture2DPCF16" : "texture2DPCF4") + "\n";
 				}
 			}
 
@@ -257,6 +278,8 @@
 		public FogMode FogMode;
 		public bool ProcessLightning;
 		public bool RecieveShadows;
-		public bool ShadowSampling;
+		public bool SmoothShadows;
+		public bool HighQualitySmoothShadows;
+		public IntVector2 ShadowMapSize;
 	}
 }

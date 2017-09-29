@@ -52,6 +52,11 @@ namespace Lime
 			program = new DepthBufferProgram(skinEnabled);
 		}
 
+		public void Invalidate()
+		{
+			program = null;
+		}
+
 		public IMaterial Clone()
 		{
 			return new DepthBuffer {

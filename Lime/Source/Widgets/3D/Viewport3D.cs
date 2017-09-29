@@ -237,6 +237,13 @@ namespace Lime
 			}
 		}
 
+		public void InvalidateMaterials()
+		{
+			foreach (var mesh in Descendants.OfType<Mesh3D>().SelectMany((m) => m.Submeshes)) {
+				mesh.Material.Invalidate();
+			}
+		}
+
 		public Vector3 WorldToScreenPoint(Vector3 pt)
 		{
 			pt = WorldToViewportPoint(pt);

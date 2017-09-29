@@ -176,18 +176,28 @@ namespace Lime
 			if (program != null) {
 				return;
 			}
+
+			// TODO: We need to tweak shadow quality settings
 			var spec = new CommonMaterialProgramSpec {
 				SkinEnabled = skinEnabled,
 				DiffuseTextureEnabled = diffuseTexture != null,
 				FogMode = FogMode,
 				ProcessLightning = ProcessLightning,
-				RecieveShadows = RecieveShadows
+				RecieveShadows = RecieveShadows,
+				ShadowMapSize = lightSource.ShadowMapSize,
+				SmoothShadows = true,
+				HighQualitySmoothShadows = lightSource.ShadowMapQuality > ShadowMapTextureQuality.Medium
 			};
 			if (programCache.TryGetValue(spec, out program)) {
 				return;
 			}
 			program = new CommonMaterialProgram(spec);
 			programCache[spec] = program;
+		}
+
+		public void Invalidate()
+		{
+			program = null;
 		}
 
 		public IMaterial Clone()

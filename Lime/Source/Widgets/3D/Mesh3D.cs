@@ -105,8 +105,8 @@ namespace Lime
 				return;
 			}
 			
-			bool lightningEnabled = ProcessLightning && viewport != null && viewport.LightSource != null;
-			bool shadowsEnabled = lightningEnabled && viewport.LightSource.ShadowMapping;
+			bool lightningEnabled = ProcessLightning && viewport != null && viewport.LightSource != null && viewport.LightSource.Visible;
+			bool shadowsEnabled = lightningEnabled && viewport.LightSource.ShadowMappingEnabled;
 
 			Renderer.World = GlobalTransform;
 			Renderer.CullMode = CullMode;

@@ -5,6 +5,7 @@
 		Color4 ColorFactor { get; set; }
 		IMaterial Clone();
 		void Apply();
+		void Invalidate();
 	}
 
 	public interface IMaterialLightning
