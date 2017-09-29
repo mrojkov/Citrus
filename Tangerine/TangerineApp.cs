@@ -396,7 +396,6 @@ namespace Tangerine
 				CommandHandlerList.Global.Connect(cmd, new CreateNode(t));
 				Application.MainMenu.FindCommand("Create").Menu.Add(cmd);
 			}
-			viewMenu.DisplayCheckMark = true;
 		}
 
 		void RegisterGlobalCommands()

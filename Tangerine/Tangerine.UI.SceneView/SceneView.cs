@@ -40,7 +40,7 @@ namespace Tangerine.UI.SceneView
 			h.Connect(SceneViewCommands.DragLeftFast, () => DragNodes(new Vector2(-5, 0)));
 			h.Connect(SceneViewCommands.DragRightFast, () => DragNodes(new Vector2(5, 0)));
 			h.Connect(SceneViewCommands.Duplicate, DuplicateNodes);
-			h.Connect(SceneViewCommands.DisplayBones, DisplayBones);
+			h.Connect(SceneViewCommands.DisplayBones, new DisplayBones());
 			h.Connect(SceneViewCommands.BindBones, BindBones);
 		}
 
@@ -105,15 +105,19 @@ namespace Tangerine.UI.SceneView
 		}
 
 
-		private static void DisplayBones()
+		private class DisplayBones : ToggleDisplayCommandHandler
 		{
-			var postPresenter = Instance.Frame.CompoundPostPresenter;
-			if (postPresenter.Contains(Bone3DPresenter.Presenter)) {
-				postPresenter.Remove(Bone3DPresenter.Presenter);
-			} else {
-				postPresenter.Add(Bone3DPresenter.Presenter);
+			public override void Execute()
+			{
+				var postPresenter = Instance.Frame.CompoundPostPresenter;
+				if (Visible) {
+					postPresenter.Remove(Bone3DPresenter.Presenter);
+				} else {
+					postPresenter.Add(Bone3DPresenter.Presenter);
+				}
+				CommonWindow.Current.Invalidate();
+				base.Execute();
 			}
-			CommonWindow.Current.Invalidate();
 		}
 
 		static void DragNodes(Vector2 delta)

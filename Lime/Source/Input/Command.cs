@@ -106,6 +106,7 @@ namespace Lime
 		private Key mappedShortcut;
 		private IMenu submenu;
 		private bool enabled = true;
+		private bool @checked = false;
 		private bool visible = true;
 		private ITexture icon;
 
@@ -184,11 +185,19 @@ namespace Lime
 			}
 		}
 
+		public bool Checked
+		{
+			get { return @checked; }
+			set
+			{
+				if (@checked != value) {
+					@checked = value;
+					Version++;
+				}
+			}
+		}
+
 		public bool Repeatable { get; set; } = true;
-
-		public bool Checked { get; set; }
-
-		public bool EnableChecking { get; set; }
 
 		public event Action Issued;
 		public object UserData { get; set; }
@@ -239,9 +248,6 @@ namespace Lime
 		public void Issue()
 		{
 			wasIssued = true;
-			if (EnableChecking) {
-				Checked = !Checked;
-			}
 			Issued?.Invoke();
 		}
 

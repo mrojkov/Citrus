@@ -268,7 +268,6 @@ namespace Tangerine.UI.Timeline.Components
 						CreateColorCommand("Gray", 7),
 				}))
 			};
-			submenu.DisplayCheckMark = true;
 			menu.Popup();
 		}
 
