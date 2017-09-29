@@ -50,6 +50,7 @@
     <Compile Include="Dialogs\AlertDialog.cs" />
     <Compile Include="IconPool.cs" />
     <Compile Include="NodeIconPool.cs" />
+    <Compile Include="ThemedExpandButton.cs" />
     <Compile Include="UIProcessors.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EmbeddedResource.cs" />
