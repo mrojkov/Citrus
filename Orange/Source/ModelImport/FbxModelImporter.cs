@@ -21,6 +21,7 @@ namespace Orange
 			var scene = manager.LoadScene(path);
 			Model = new Model3D();
 			Model.Nodes.Add(ImportNodes(scene.Root));
+			ImportAnimations(scene);
 			new Model3DAttachmentParser().Parse(path)?.ApplyScaleFactor(Model);
 			manager.Destroy();
 		}
@@ -49,7 +50,7 @@ namespace Orange
 					}
 					break;
 				case NodeAttribute.FbxNodeType.CAMERA:
-					var cam = root.Attributes[0] as CameraAttribute; 
+					var cam = root.Attributes[0] as CameraAttribute;
 					node = new Camera3D {
 						Id = root.Name,
 						FieldOfView = cam.FieldOfView,
@@ -95,8 +96,8 @@ namespace Orange
 					ShaderPrograms.Attributes.BlendWeights
 				}}
 			};
-			
-			sm.Material = meshAttribute.MaterialIndex != -1 ? 
+
+			sm.Material = meshAttribute.MaterialIndex != -1 ?
 				node.Materials[meshAttribute.MaterialIndex].ToLime(path) : Material.Default;
 
 			if (meshAttribute.Bones.Length > 0) {
