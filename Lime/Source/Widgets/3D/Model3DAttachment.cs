@@ -331,22 +331,30 @@ namespace Lime
 			public int Blending = 0;
 		}
 
-		public Model3DAttachment Parse(string modelPath)
+		public Model3DAttachment Parse(string modelPath, bool useBundle = true)
 		{
 			modelPath = AssetPath.CorrectSlashes(
 				Path.Combine(Path.GetDirectoryName(modelPath) ?? "",
 				Path.GetFileNameWithoutExtension(AssetPath.CorrectSlashes(modelPath) ?? "")
 			));
 			var attachmentPath = modelPath + ".Attachment.txt";
-			if (!AssetBundle.Current.FileExists(attachmentPath)) {
-				return null;
-			}
 			try {
-				var modelAttachmentFormat = Serialization.ReadObject<ModelAttachmentFormat>(attachmentPath);
+				ModelAttachmentFormat modelAttachmentFormat;
+				if (useBundle) {
+					if (!AssetBundle.Current.FileExists(attachmentPath)) {
+						return null;
+					}
+					modelAttachmentFormat = Serialization.ReadObject<ModelAttachmentFormat>(attachmentPath);
+				} else {
+					if (!File.Exists(attachmentPath)) {
+						return null;
+					}
+					modelAttachmentFormat = Serialization.ReadObjectFromFile<ModelAttachmentFormat>(attachmentPath);
+				}
+
 				var attachment = new Model3DAttachment {
 					ScaleFactor = modelAttachmentFormat.ScaleFactor
 				};
-
 				if (modelAttachmentFormat.MeshOptions != null) {
 					foreach (var meshOptionFormat in modelAttachmentFormat.MeshOptions) {
 						var meshOption = new Model3DAttachment.MeshOption() {
