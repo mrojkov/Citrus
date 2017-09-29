@@ -18,10 +18,39 @@ namespace Tangerine.UI.FilesystemView
 			textureCache.Clear();
 		}
 
+		private ITexture PrepareChessTexture(Color4 color1, Color4 color2)
+		{
+			var chessTexture = new Texture2D();
+			chessTexture.LoadImage(new[] { color1, color2, color2, color1 }, 2, 2);
+			chessTexture.TextureParams = new TextureParams {
+				WrapMode = TextureWrapMode.Repeat,
+				MinMagFilter = TextureFilter.Nearest,
+			};
+			return chessTexture;
+		}
+
 		public Preview()
 		{
+			var t = PrepareChessTexture(ColorTheme.Current.Basic.ZebraColor1.Transparentify(0.5f), ColorTheme.Current.Basic.ZebraColor2);
+			const float ChessCellSize = 50;
+			//Color4 Color1 = Core.UserPreferences.Instance.Get<UserPreferences>().BackgroundColorA;
+			//Color4 Color2 = Core.UserPreferences.Instance.Get<UserPreferences>().BackgroundColorB;
 			RootWidget = new ThemedScrollView();
-			RootWidget.Content.Layout = new FlowLayout();
+			RootWidget.Content.Layout = new FlowLayout {
+				Spacing = 5.0f,
+			};
+			RootWidget.Content.Padding = new Thickness(5.0f);
+			RootWidget.CompoundPresenter.Insert(1, new DelegatePresenter<Widget>((w) => {
+				w.PrepareRendererState();
+				var ratio = ChessCellSize * 1.0f;
+				Renderer.DrawSprite(
+					t,
+					Color4.White,
+					Vector2.Zero,
+					w.Size,
+					-Vector2.Zero / ratio,
+					 (w.Size - Vector2.Zero) / ratio);
+			}));
 		}
 
 		public void Invalidate(Selection selection)
