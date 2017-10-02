@@ -4,10 +4,36 @@ namespace Lime
 {
 	public abstract class CommonEditBox : Frame
 	{
+		public bool AllowEdit
+		{
+			get { return allowEdit; }
+			set
+			{
+				if (allowEdit != value) {
+					allowEdit = value;
+					if (Editor != null) {
+						Editor.AllowInput = value;
+					}
+				}
+			}
+		}
+
+		public Editor Editor
+		{
+			get { return editor; }
+			set
+			{
+				editor = value;
+				editor.AllowInput = allowEdit;
+			}
+		}
+
 		public SimpleText TextWidget { get; private set; }
-		public Editor Editor { get; set; }
 		public event Action<string> Submitted;
 		public ScrollView Scroll { get; protected set; }
+
+		private Editor editor;
+		private bool allowEdit = true;
 
 		public override string Text
 		{
@@ -60,6 +86,10 @@ namespace Lime
 			}
 			set
 			{
+				if (!AllowEdit) {
+					return;
+				}
+
 				Text = value.ToString();
 				OnSubmit();
 			}

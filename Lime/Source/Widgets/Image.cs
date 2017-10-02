@@ -8,6 +8,7 @@ namespace Lime
 		private ITexture texture;
 
 		[YuzuMember]
+		[YuzuSerializeIf(nameof(IsNotRenderTexture))]
 		public override sealed ITexture Texture
 		{
 			get { return texture; }
@@ -109,6 +110,11 @@ namespace Lime
 		{
 			PrepareRendererState();
 			Renderer.DrawSprite(Texture, GlobalColor, ContentPosition, ContentSize, UV0, UV1);
+		}
+
+		public bool IsNotRenderTexture()
+		{
+			return !(texture is RenderTexture);
 		}
 	}
 }

@@ -39,6 +39,12 @@ namespace Tangerine.UI.Inspector
 			AddEditor(typeof(ShaderId), c => new EnumPropertyEditor<ShaderId>(c));
 			AddEditor(typeof(RenderTarget), c => new RenderTargetPropertyEditor(c));
 			AddEditor(typeof(CameraProjectionMode), c => new EnumPropertyEditor<CameraProjectionMode>(c));
+			AddEditor(c => {
+				return
+					c.Objects.Count == 1 &&
+					c.PropertyInfo.PropertyType == typeof(ITexture) &&
+					c.PropertyInfo.GetValue(c.Objects[0]).GetType() == typeof(RenderTexture);
+			}, c => new RenderTexturePropertyEditor(c));
 			AddEditor(typeof(ITexture), c => new TexturePropertyEditor(c));
 			AddEditor(typeof(SerializableSample), c => new AudioSamplePropertyEditor(c));
 			AddEditor(typeof(SerializableFont), c => new FontPropertyEditor(c));

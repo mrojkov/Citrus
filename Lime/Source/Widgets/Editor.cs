@@ -13,6 +13,16 @@ namespace Lime
 	/// </summary>
 	public class Editor
 	{
+		public bool AllowInput
+		{
+			get { return allowInput; }
+			set
+			{
+				allowInput = value;
+				CaretPos.IsVisible = value;
+			}
+		}
+
 		public readonly Widget DisplayWidget;
 		public readonly Widget InputWidget;
 		public readonly IText Text;
@@ -23,6 +33,8 @@ namespace Lime
 		public ICaretPosition CaretPos { get; } = new CaretPosition();
 		public ICaretPosition SelectionStart { get; } = new CaretPosition();
 		public ICaretPosition SelectionEnd { get; } = new CaretPosition();
+
+		private bool allowInput = true;
 
 		public struct UndoItem : IEquatable<UndoItem>
 		{
@@ -441,7 +453,7 @@ namespace Lime
 
 		private void HandleTextInput()
 		{
-			if (input.TextInput == null)
+			if (!allowInput || input.TextInput == null)
 				return;
 			foreach (var ch in input.TextInput) {
 				// Some platforms, notably iOS, do not generate Key.BackSpace.
