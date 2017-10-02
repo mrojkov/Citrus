@@ -4,15 +4,15 @@ namespace Lime
 {
 	public abstract class CommonEditBox : Frame
 	{
-		public bool AllowEdit
+		public bool IsReadOnly
 		{
-			get { return allowEdit; }
+			get { return isReadOnly; }
 			set
 			{
-				if (allowEdit != value) {
-					allowEdit = value;
+				if (isReadOnly != value) {
+					isReadOnly = value;
 					if (Editor != null) {
-						Editor.AllowInput = value;
+						Editor.ProcessInput = !isReadOnly;
 					}
 				}
 			}
@@ -24,7 +24,7 @@ namespace Lime
 			set
 			{
 				editor = value;
-				editor.AllowInput = allowEdit;
+				editor.ProcessInput = !isReadOnly;
 			}
 		}
 
@@ -33,7 +33,7 @@ namespace Lime
 		public ScrollView Scroll { get; protected set; }
 
 		private Editor editor;
-		private bool allowEdit = true;
+		private bool isReadOnly;
 
 		public override string Text
 		{
@@ -86,10 +86,6 @@ namespace Lime
 			}
 			set
 			{
-				if (!AllowEdit) {
-					return;
-				}
-
 				Text = value.ToString();
 				OnSubmit();
 			}

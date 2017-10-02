@@ -728,7 +728,7 @@ namespace Tangerine.UI
 		public RenderTexturePropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
 			editor = editorParams.EditBoxFactory();
-			editor.AllowEdit = false;
+			editor.IsReadOnly = true;
 			editor.LayoutCell = new LayoutCell(Alignment.Center);
 			ContainerWidget.AddNode(editor);
 			editor.AddChangeWatcher(CoalescedPropertyValue(), v =>

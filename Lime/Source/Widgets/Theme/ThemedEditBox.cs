@@ -121,7 +121,9 @@ namespace Lime
 							} else if (Input.IsKeyPressed(Key.Control)) {
 								delta *= 0.1f;
 							}
-							Value += delta;
+							if (!IsReadOnly) {
+								Value += delta;
+							}
 							prevMousePos = Application.DesktopMousePosition;
 							yield return null;
 						}
@@ -132,7 +134,9 @@ namespace Lime
 							} else if (Input.IsKeyPressed(Key.Control)) {
 								delta *= 0.1f;
 							}
-							Value += delta;
+							if (!IsReadOnly) {
+								Value += delta;
+							}
 						}
 						Input.ConsumeKey(Key.Mouse0);
 						Input.ReleaseMouse();
