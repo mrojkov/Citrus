@@ -266,4 +266,8 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Icons\SceneView\Play.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Polyline.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.PolylinePoint.png" />
+  </ItemGroup>
 </Project>

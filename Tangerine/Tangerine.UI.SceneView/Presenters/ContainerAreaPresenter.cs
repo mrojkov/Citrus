@@ -92,14 +92,16 @@ namespace Tangerine.UI.SceneView
 			sceneView.Frame.CompoundPostPresenter.Push(
 				new DelegatePresenter<Widget>(
 					(w) => {
-						foreach (var widget in Project.Current.Overlays.Values) {
-							if (widget.Components.Get<NodeCommandComponent>()?.Command.Checked ?? false) {
-								widget.Position = Document.Current.RootNode.AsWidget.LocalToWorldTransform.T;
-								widget.Scale = SceneView.Instance.Scene.Scale;
-								DefaultRenderChainBuilder.Instance.AddToRenderChain(widget, rh);
+						if (!Document.Current.ExpositionMode) {
+							foreach (var widget in Project.Current.Overlays.Values) {
+								if (widget.Components.Get<NodeCommandComponent>()?.Command.Checked ?? false) {
+									widget.Position = Document.Current.RootNode.AsWidget.LocalToWorldTransform.T;
+									widget.Scale = SceneView.Instance.Scene.Scale;
+									DefaultRenderChainBuilder.Instance.AddToRenderChain(widget, rh);
+								}
 							}
+							rh.Render();
 						}
-						rh.Render();
 						w.PrepareRendererState();
 						var size = Document.Current.RootNode.AsWidget.Size / 2;
 						foreach (var ruler in Project.Current.Rulers) {

@@ -246,6 +246,8 @@
     <EmbeddedResource Include="Resources\Icons\SceneView\Round.png" />
     <EmbeddedResource Include="Resources\Icons\Tools\Pipette.png" />
     <EmbeddedResource Include="Resources\Icons\SceneView\Play.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Polyline.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.PolylinePoint.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PreferencesDialog\" />
