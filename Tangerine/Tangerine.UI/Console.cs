@@ -66,10 +66,13 @@ namespace Tangerine.UI
 			var menu = new Menu();
 			menu.Add(Command.Copy);
 			textView.Updated += (dt) => {
+				if (textView.Input.WasKeyPressed(Key.Mouse0)) {
+					textView.SetFocus();
+				}
 				if (textView.Input.WasKeyPressed(Key.Mouse1)) {
 					menu.Popup();
 				}
-				if (Command.Copy.WasIssued()) {
+				if (textView.IsFocused() && Command.Copy.WasIssued()) {
 					Command.Copy.Consume();
 					Clipboard.Text = textView.Text;
 				}
