@@ -50,6 +50,7 @@ namespace Tangerine.UI
 		public string PropertyName { get; set; }
 		public string DisplayName { get; set; }
 		public TangerineKeyframeColorAttribute TangerineAttribute { get; set; }
+		public string Group { get; set; }
 		public System.Reflection.PropertyInfo PropertyInfo { get; set; }
 		public Func<NumericEditBox> NumericEditBoxFactory { get; set; }
 		public Func<EditBox> EditBoxFactory { get; set; }
@@ -64,6 +65,7 @@ namespace Tangerine.UI
 			Type = type;
 			PropertyName = propertyName;
 			TangerineAttribute = PropertyAttributes<TangerineKeyframeColorAttribute>.Get(Type, PropertyName) ?? new TangerineKeyframeColorAttribute(0);
+			Group = PropertyAttributes<TangerineGroupAttribute>.Get(Type, PropertyName)?.Name ?? String.Empty;
 			PropertyInfo = Type.GetProperty(PropertyName);
 			PropertySetter = SetProperty;
 			NumericEditBoxFactory = () => new ThemedNumericEditBox();

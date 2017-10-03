@@ -26,6 +26,7 @@ namespace Lime
 		{ get { return lightView; } }
 
 		[YuzuMember]
+		[TangerineGroup("Shadow")]
 		public ShadowMapTextureQuality ShadowMapQuality
 		{
 			get { return shadowMapQuality; }
@@ -71,10 +72,12 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineGroup("Light")]
 		public float Intensity
 		{ get; set; } = 1f;
 
 		[YuzuMember]
+		[TangerineGroup("Shadow")]
 		public bool ShadowMappingEnabled
 		{
 			get { return shadowMappingEnabled; }
@@ -88,6 +91,8 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineGroup("Shadow")]
+		[TangerineIgnoreIf(nameof(ShadowMappingDisabled))]
 		public float ShadowMapProjectionSize
 		{
 			get { return shadowMapProjSize; }
@@ -101,6 +106,8 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineGroup("Shadow")]
+		[TangerineIgnoreIf(nameof(ShadowMappingDisabled))]
 		public float ShadowMapProjectionZNear
 		{
 			get { return shadowMapProjZNear; }
@@ -114,6 +121,8 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineGroup("Shadow")]
+		[TangerineIgnoreIf(nameof(ShadowMappingDisabled))]
 		public float ShadowMapProjectionZFar
 		{
 			get { return shadowMapProjZFar; }
@@ -163,6 +172,11 @@ namespace Lime
 
 				depthBufferRenderer.Render(lightView, lightViewProjection, lightViewport);
 			}
+		}
+		
+		private bool ShadowMappingDisabled()
+		{
+			return !shadowMappingEnabled;
 		}
 	}
 }

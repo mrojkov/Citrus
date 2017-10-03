@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 
 using Yuzu;
@@ -68,12 +69,52 @@ namespace Lime
 	}
 
 	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
+	public sealed class TangerineIgnoreIfAttribute : Attribute
+	{
+		public readonly string Method;
+
+		private Func<object, bool> checker;
+
+		public TangerineIgnoreIfAttribute(string method)
+		{
+			Method = method;
+		}
+
+		public bool Check(object obj)
+		{
+			if (checker == null) {
+				var fn = obj.GetType().GetMethod(Method, BindingFlags.NonPublic | BindingFlags.Instance);
+				if (fn == null) {
+					throw new System.Exception("Couldn't find method " + Method);
+				}
+
+				var p = Expression.Parameter(typeof(object));
+				var e = Expression.Call(Expression.Convert(p, obj.GetType()), fn);
+				checker = Expression.Lambda<Func<object, bool>>(e, p).Compile();
+			}
+
+			return checker(obj);
+		}
+	}
+
+	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
 	public sealed class TangerineIgnoreAttribute : Attribute
 	{ }
 
 	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
 	public sealed class TangerineInspectAttribute : Attribute
 	{ }
+
+	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
+	public sealed class TangerineGroupAttribute : Attribute
+	{
+		public readonly string Name;
+
+		public TangerineGroupAttribute(string name)
+		{
+			Name = name ?? String.Empty;
+		}
+	}
 
 	[Flags]
 	public enum TangerineFlags

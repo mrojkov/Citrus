@@ -100,6 +100,7 @@ namespace Tangerine.UI
 		{
 			public Color4 BorderAroundKeyframeColorbox;
 			public Color4 CategoryLabelBackground;
+			public Color4 GroupHeaderLabelBackground;
 			public Color4 StripeBackground1;
 			public Color4 StripeBackground2;
 		}
@@ -199,6 +200,7 @@ namespace Tangerine.UI
 			var inspector = new InspectorColors {
 				BorderAroundKeyframeColorbox = Theme.Colors.ControlBorder,
 				CategoryLabelBackground = Color4.Black.Lighten(0.3f),
+				GroupHeaderLabelBackground = Color4.Black.Lighten(0.275f),
 				StripeBackground1 = Theme.Colors.GrayBackground,
 				StripeBackground2 = Theme.Colors.GrayBackground.Lighten(0.05f),
 			};
@@ -298,6 +300,7 @@ namespace Tangerine.UI
 			var inspector = new InspectorColors {
 				BorderAroundKeyframeColorbox = Theme.Colors.ControlBorder,
 				CategoryLabelBackground = Color4.White.Darken(0.2f),
+				GroupHeaderLabelBackground = Color4.White.Darken(0.175f),
 				StripeBackground1 = Theme.Colors.GrayBackground,
 				StripeBackground2 = Theme.Colors.GrayBackground.Darken(0.05f),
 			};

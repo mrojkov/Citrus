@@ -66,6 +66,7 @@ namespace Tangerine.UI.Inspector
 		{
 			int row = 0;
 			var categoryLabelAdded = false;
+			var editorParams = new Dictionary<string, List<PropertyEditorParams>>();
 			foreach (var property in type.GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public)) {
 				if (property.Name == "Item") {
 					// WTF, Bug in Mono?
@@ -77,6 +78,7 @@ namespace Tangerine.UI.Inspector
 				var tangInspect = PropertyAttributes<TangerineInspectAttribute>.Get(type, property.Name);
 				if (tangInspect == null && (yuzuField == null && tang == null || tangIgnore != null))
 					continue;
+					
 				if (!categoryLabelAdded) {
 					categoryLabelAdded = true;
 					var text = type.Name;
@@ -112,17 +114,61 @@ namespace Tangerine.UI.Inspector
 						return null;
 					}
 				};
-				foreach (var i in InspectorPropertyRegistry.Instance.Items) {
-					if (i.Condition(context)) {
-						var propertyEditor = i.Builder(context);
-						if (propertyEditor != null) {
-							DecoratePropertyEditor(propertyEditor, row++);
-							editors.Add(propertyEditor);
+
+				if (!editorParams.Keys.Contains(context.Group)) {
+					editorParams.Add(context.Group, new List<PropertyEditorParams>());
+				}
+
+				editorParams[context.Group].Add(context);
+			}
+
+			foreach (var header in editorParams.Keys.OrderBy((s) => s)) {
+				AddGroupHeader(header);
+				foreach (var param in editorParams[header]) {
+					foreach (var i in InspectorPropertyRegistry.Instance.Items) {
+						if (i.Condition(param)) {
+							var propertyEditor = i.Builder(param);
+							if (propertyEditor != null) {
+								DecoratePropertyEditor(propertyEditor, row++);
+								editors.Add(propertyEditor);
+
+								var showCondition = PropertyAttributes<TangerineIgnoreIfAttribute>.Get(type, param.PropertyInfo.Name);
+								if (showCondition != null) {
+									propertyEditor.ContainerWidget.Updated += (delta) => {
+										propertyEditor.ContainerWidget.Visible = !showCondition.Check(param.Objects[0]);
+									};
+								}
+							}
+							break;
 						}
-						break;
 					}
 				}
 			}
+		}
+
+		private void AddGroupHeader(string text)
+		{
+			if (String.IsNullOrEmpty(text)) {
+				return;
+			}
+
+			var label = new Widget {
+				LayoutCell = new LayoutCell { StretchY = 0 },
+				Layout = new StackLayout(),
+				MinHeight = Theme.Metrics.DefaultButtonSize.Y,
+				Nodes = {
+					new ThemedSimpleText {
+						Text = text,
+						Padding = new Thickness(12, 0),
+						VAlignment = VAlignment.Center,
+						ForceUncutText = false,
+						FontHeight = 14
+					}
+				}
+			};
+			label.CompoundPresenter.Add(new WidgetFlatFillPresenter(ColorTheme.Current.Inspector.GroupHeaderLabelBackground));
+
+			widget.AddNode(label);
 		}
 
 		private void DecoratePropertyEditor(IPropertyEditor editor, int row)
