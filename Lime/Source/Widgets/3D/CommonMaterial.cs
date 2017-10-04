@@ -143,10 +143,13 @@ namespace Lime
 				program.LoadColor(program.LightColorUniformId, lightSource.Color);
 				program.LoadVector3(program.LightDirectionUniformId, lightSource.Position.Normalized);
 				program.LoadFloat(program.LightIntensityUniformId, lightSource.Intensity);
+				program.LoadFloat(program.LightStrengthUniformId, lightSource.Strength);
+				program.LoadFloat(program.AmbientLightUniformId, lightSource.Ambient);
 
 				if (recieveShadows) {
 					var lightWVP = Renderer.World * lightSource.ViewProjection * Matrix44.CreateScale(new Vector3(1, -1, 1));
 					program.LoadMatrix(program.LightWorldViewProjectionUniformId, lightWVP);
+					program.LoadColor(program.ShadowColorUniformId, lightSource.ShadowColor);
 					PlatformRenderer.SetTexture(lightSource.ShadowMap, CommonMaterialProgram.ShadowMapTextureStage);
 				}
 			}

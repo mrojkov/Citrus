@@ -541,9 +541,9 @@ namespace Tangerine.UI
 				float newValue;
 				if (float.TryParse(text, out newValue)) {
 					SetProperty(newValue);
-				} else {
-					editor.Text = current.GetValue().ToString();
 				}
+
+				editor.Text = current.GetValue().ToString();
 			};
 			editor.AddChangeWatcher(current, v => editor.Text = v.ToString());
 		}

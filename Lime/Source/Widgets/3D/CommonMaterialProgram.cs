@@ -90,12 +90,15 @@
 			#ifdef RECIEVE_SHADOWS
 			varying vec4 v_ShadowCoord;
 			uniform sampler2D u_ShadowMapTexture;
+			uniform vec4 u_ShadowColor;
 			#endif
 
 			#ifdef LIGHTNING_ENABLED
+			uniform float u_LightStrength;
 			uniform vec3 u_LightDirection;
 			uniform vec4 u_LightColor;
 			uniform float u_LightIntensity;
+			uniform float u_AmbientLight;
 			#endif
 
 			#ifdef RECIEVE_SHADOWS
@@ -139,23 +142,33 @@
 			#ifdef LIGHTNING_ENABLED
 				vec3 normal = normalize(v_Normal);
 				float light = dot(normal, u_LightDirection);
-				float visibility = 1.0;
+				vec3 shadowColor = vec3(1.0, 1.0, 1.0);
 
 			#ifdef RECIEVE_SHADOWS
 				vec2 shadowUV = (v_ShadowCoord.xy + vec2(1.0)) / 2.0;
 				float bias = clamp(0.005 * tan(acos(clamp(light, 0.0, 0.75))), 0.0, 0.005);
+				float visibility = 1.0;
+				float shadowFactor = 0.0;
 			#ifdef SMOOTH_SHADOW
-				float factor = clamp((v_ShadowCoord.z - bias) - TEXTURE_PCF(u_ShadowMapTexture, shadowUV.xy), 0.0, 0.025) * 10.0;
-				visibility = 1.0 - factor;
+				shadowFactor = 
+					clamp((v_ShadowCoord.z - bias) - TEXTURE_PCF(u_ShadowMapTexture, shadowUV.xy), 0.0, 0.0125) * 
+					(80.0 * u_ShadowColor.a);
+
+				visibility = 1.0 - shadowFactor;
 			#else
 				if (texture2D(u_ShadowMapTexture, shadowUV.xy).z < v_ShadowCoord.z - bias) {
-					visibility = 0.2;
+					shadowFactor = 1.0 * u_ShadowColor.a;
+					visibility = 1.0 - shadowFactor;
 				}
-			#endif
-			#endif
+			#endif // SMOOTH_SHADOW
+				shadowColor = visibility + (shadowFactor * u_ShadowColor);
+			#endif // RECIEVE_SHADOWS
 
-				color.rgb *= (max(0.25, visibility * light * u_LightIntensity) * u_LightColor.rgb);
-			#endif
+				color.rgb *= 
+					clamp((light * u_LightIntensity), u_AmbientLight, u_LightStrength * max(u_AmbientLight, u_LightIntensity)) * 
+					shadowColor * 
+					u_LightColor.a * u_LightColor.rgb;
+			#endif // LIGHTNING_ENABLED
 
 				gl_FragColor = color;
 			}
@@ -175,6 +188,9 @@
 		public int LightDirectionUniformId;
 		public int LightIntensityUniformId;
 		public int LightWorldViewProjectionUniformId;
+		public int LightStrengthUniformId;
+		public int AmbientLightUniformId;
+		public int ShadowColorUniformId;
 
 		public const int DiffuseTextureStage = 0;
 		public const int ShadowMapTextureStage = 1;
@@ -199,6 +215,9 @@
 			LightDirectionUniformId = GetUniformId("u_LightDirection");
 			LightIntensityUniformId = GetUniformId("u_LightIntensity");
 			LightWorldViewProjectionUniformId = GetUniformId("u_LightWorldViewProjection");
+			LightStrengthUniformId = GetUniformId("u_LightStrength");
+			AmbientLightUniformId = GetUniformId("u_AmbientLight");
+			ShadowColorUniformId = GetUniformId("u_ShadowColor");
 		}
 
 		private static Shader[] GetShaders(CommonMaterialProgramSpec spec)

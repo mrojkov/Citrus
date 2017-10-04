@@ -74,7 +74,26 @@ namespace Lime
 		[YuzuMember]
 		[TangerineGroup("Light")]
 		public float Intensity
-		{ get; set; } = 1f;
+		{
+			get { return intensity; }
+			set { intensity = Mathf.Clamp(value, 0.0f, 10.0f); }
+		}
+
+		[YuzuMember]
+		[TangerineGroup("Light")]
+		public float Strength
+		{
+			get { return strength; }
+			set { strength = Mathf.Clamp(value, 0.0f, 1.0f); }
+		}
+
+		[YuzuMember]
+		[TangerineGroup("Light")]
+		public float Ambient
+		{
+			get { return ambient; }
+			set { ambient = Mathf.Clamp(value, 0.0f, 1.0f); }
+		}
 
 		[YuzuMember]
 		[TangerineGroup("Shadow")]
@@ -89,6 +108,15 @@ namespace Lime
 				}
 			}
 		}
+
+		[YuzuMember]
+		[TangerineGroup("Shadow")]
+		[TangerineIgnoreIf(nameof(ShadowMappingDisabled))]
+		public Color4 ShadowColor
+		{
+			get;
+			set;
+		} = Color4.Black;
 
 		[YuzuMember]
 		[TangerineGroup("Shadow")]
@@ -146,6 +174,9 @@ namespace Lime
 		private Matrix44 lightProjection;
 		private Matrix44 lightViewProjection;
 		private WindowRect lightViewport;
+		private float intensity = 1.0f;
+		private float ambient = 0.05f;
+		private float strength = 1f;
 
 		private bool shadowMappingEnabled = false;
 		private bool recalcViewProjection = true;
