@@ -42,8 +42,8 @@ namespace Orange
 					if (platform == TargetPlatform.Unity) {
 						mesh.CullMode = CullMode.CullCounterClockwise;
 					}
+					node = mesh;
 					if (mesh.Submeshes.Count != 0) {
-						node = mesh;
 						mesh.SetLocalTransform(root.LocalTranform);
 						mesh.RecalcBounds();
 						mesh.RecalcCenter();
