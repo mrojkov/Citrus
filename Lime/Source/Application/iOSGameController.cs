@@ -119,7 +119,23 @@ namespace Lime
 		{
 			softKeyboard.Visible = true;
 			var screen = UIScreen.MainScreen.Bounds;
-			softKeyboard.Height = (float)(screen.Bottom - args.FrameEnd.Top);
+			var isOrientationDependent = UIDevice.CurrentDevice.CheckSystemVersion(8, 0) ||
+				Application.CurrentDeviceOrientation == DeviceOrientation.Portrait;
+			if (isOrientationDependent) {
+				softKeyboard.Height = (float)(screen.Bottom - args.FrameEnd.Top);
+			} else {
+				switch (Application.CurrentDeviceOrientation) {
+					case DeviceOrientation.PortraitUpsideDown:
+						softKeyboard.Height = (float)args.FrameEnd.Bottom;
+						break;
+					case DeviceOrientation.LandscapeLeft:
+						softKeyboard.Height = (float)(screen.Right - args.FrameEnd.Left);
+						break;
+					case DeviceOrientation.LandscapeRight:
+						softKeyboard.Height = (float)args.FrameEnd.Right;
+						break;
+				}
+			}
 		}
 
 		private void KeyboardHideCallback(object sender, UIKeyboardEventArgs args)
