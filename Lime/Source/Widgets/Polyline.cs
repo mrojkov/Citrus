@@ -2,28 +2,32 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Yuzu;
 
 namespace Lime
 {
 	/// <summary>
 	/// Ломаная линия
 	/// </summary>
+	[AllowedChildrenTypes(typeof(PolylinePoint))]
 	public class Polyline : Widget
 	{
 		/// <summary>
 		/// Толщина
 		/// </summary>
-		public float Thickness;
+		[YuzuMember]
+		public float Thickness { get; set; }
 
-		/// <summary>
-		/// Точки, по которым строится линия
-		/// </summary>
-		public List<Vector2> Points = new List<Vector2>();
+		[YuzuMember]
+		public bool StaticThickness { get; set; }
 
-		public Polyline(float thickness = 20)
+		[YuzuMember]
+		public bool Closed { get; set; }
+
+		public Polyline()
 		{
 			Presenter = DefaultPresenter.Instance;
-			this.Thickness = thickness;
+			Thickness = 1f;
 		}
 
 		static Vector2 GetVectorNormal(Vector2 v)
@@ -31,39 +35,66 @@ namespace Lime
 			return new Vector2(-v.Y, v.X).Normalized;
 		}
 
+		static List<Vector2> positions = new List<Vector2>();
+
 		public override void Render()
 		{
-			Renderer.Blending = GlobalBlending;
-			Renderer.Shader = GlobalShader;
-			Renderer.Transform1 = LocalToWorldTransform;
-			int n = Points.Count;
+			var t = Matrix32.Identity;
+			PrepareRendererState();
+			if (StaticThickness) {
+				Renderer.Transform1 = Matrix32.Identity;
+				t = LocalToWorldTransform;
+			}
+			int n = Nodes.Count;
+			positions.Clear();
+			foreach (PolylinePoint point in Nodes) {
+				positions.Add(StaticThickness ? point.TransformedPosition * t : point.TransformedPosition);
+			}
 			if (n >= 2) {
-				bool closed = Points[0] == Points[n - 1];
-				if (!closed) {
-					DrawCap(Points[0], Points[1]);
-					DrawSegment(Points[0], (Points[0] + Points[1]) / 2);
-				}
-				if (closed) {
-					Vector2 a = Points[n - 2];
-					Vector2 b = Points[0];
-					Vector2 c = Points[1];
-					a = (a + b) / 2;
-					c = (b + c) / 2;
-					DrawJoint(a, b, c);
+				if (!Closed || n == 2) {
+					DrawHalfLeft(positions[0], positions[1]);
+					DrawHalfRight(positions[n - 1], positions[n - 2]);
+				} else {
+					DrawPart(
+						positions[n - 1],
+						positions[0],
+						positions[1]);
+					DrawPart(
+						positions[n - 2],
+						positions[n - 1],
+						positions[0]);
 				}
 				for (int i = 0; i < n - 2; i++) {
-					Vector2 a = Points[i];
-					Vector2 b = Points[i + 1];
-					Vector2 c = Points[i + 2];
-					a = (a + b) / 2;
-					c = (b + c) / 2;
-					DrawJoint(a, b, c);
-				}
-				if (!closed) {
-					DrawCap(Points[n - 1], Points[n - 2]);
-					DrawSegment((Points[n - 1] + Points[n - 2]) / 2, Points[n - 1]);
+					DrawPart(
+						positions[i],
+						positions[i + 1],
+						positions[i + 2]);
 				}
 			}
+		}
+
+		private static Vector2 GetPosition(Node n)
+		{
+			return (n as PolylinePoint).TransformedPosition;
+		}
+
+		private void DrawHalfLeft(Vector2 p0, Vector2 p1)
+		{
+			DrawCap(p0, p1);
+			DrawSegment(p0, (p0 + p1) / 2);
+		}
+
+		private void DrawHalfRight(Vector2 p0, Vector2 p1)
+		{
+			DrawCap(p0, p1);
+			DrawSegment((p0 + p1) / 2, p0);
+		}
+
+		private void DrawPart(Vector2 p0, Vector2 p1, Vector2 p3)
+		{
+			p0 = (p0 + p1) / 2;
+			p3 = (p1 + p3) / 2;
+			DrawJoint(p0, p1, p3);
 		}
 
 		private void DrawJoint(Vector2 a, Vector2 b, Vector2 c)
@@ -75,10 +106,15 @@ namespace Lime
 				n2 = -n2;
 			}
 			Vector2 p;
-			GeometryUtils.CalcLinesIntersection(a + n1, b + n1, b + n2, c + n2, out p);
-			DrawQuad(a - n1, b - n1, p, a + n1);
-			DrawQuad(c - n2, b - n2, p, c + n2);
-			FillJointGap(p, b, n1, n2);
+			if (GeometryUtils.CalcLinesIntersection(a + n1, b + n1, b + n2, c + n2, out p)) {
+				FillJointGap(p, b, n1, n2);
+				DrawQuad(a - n1, b - n1, p, a + n1);
+				DrawQuad(c - n2, b - n2, p, c + n2);
+			} else {
+				FillJointGap(b, b, n1, n2);
+				DrawQuad(a - n1, b - n1, b + n1, a + n1);
+				DrawQuad(c - n2, b - n2, b + n2, c + n2);
+			}
 		}
 
 		private void DrawQuad(Vector2 a, Vector2 b, Vector2 c, Vector2 d)
@@ -141,5 +177,10 @@ namespace Lime
 			v[3] = new Vertex { Pos = a + n, Color = GlobalColor };
 			Renderer.DrawTriangleFan(null, null, v, v.Length);
 		}
+	}
+
+	[AllowedParentTypes(typeof(Polyline))]
+	public class PolylinePoint : PointObject
+	{
 	}
 }

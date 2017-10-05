@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,6 +15,8 @@ namespace Tangerine
 	static class TangerineMenu
 	{
 		public static IMenu PadsMenu;
+		public static Menu overlaysMenu;
+		public static Menu rulerMenu;
 		private static IMenu resolution;
 		private static List<ICommand> imported = new List<ICommand>();
 		private static IMenu create;
@@ -26,6 +29,8 @@ namespace Tangerine
 		public static void Create()
 		{
 			resolution = new Menu();
+			overlaysMenu = new Menu();
+			rulerMenu = new Menu();
 			CreateMainMenu();
 			CreateResolutionMenu();
 		}
@@ -114,8 +119,12 @@ namespace Tangerine
 					GenericCommands.DefaultLayout,
 					new Command("Pads", PadsMenu),
 					new Command("Resolution", resolution),
-					GenericCommands.Overlays,
 					SceneViewCommands.DisplayBones,
+					Command.MenuSeparator,
+					new Command("Overlays", overlaysMenu),
+					new Command("Rulers", rulerMenu),
+					SceneViewCommands.SnapWidgetBorderToRuler,
+					SceneViewCommands.SnapWidgetPivotToRuler,
 				})),
 				new Command("Window", new Menu {
 					GenericCommands.NextDocument,
@@ -153,14 +162,111 @@ namespace Tangerine
 				typeof(Spline3D),
 				typeof(SplinePoint3D),
 				typeof(SplineGear3D),
-				typeof(LightSource)
+				typeof(LightSource),
+				typeof(Polyline),
+				typeof(PolylinePoint),
 			};
 			foreach (var t in nodeTypes) {
 				var cmd = new Command(t.Name) { Icon = NodeIconPool.GetTexture(t) };
 				CommandHandlerList.Global.Connect(cmd, new CreateNode(t));
 				create.Add(cmd);
 			}
-			viewMenu.DisplayCheckMark = true;
+		}
+
+		public static void OnProjectChanged(Project proj)
+		{
+			Command command;
+			foreach (var item in overlaysMenu) {
+				CommandHandlerList.Global.Disconnect(item);
+			}
+			overlaysMenu.Clear();
+			foreach (var item in rulerMenu) {
+				CommandHandlerList.Global.Disconnect(item);
+			}
+			rulerMenu.Clear();
+			if (proj == Project.Null)
+				return;
+			foreach (var overlayPair in proj.Overlays) {
+				overlayPair.Value.Components.Add(new UI.SceneView.NodeCommandComponent {
+					Command = (command = new Command(overlayPair.Key))
+				});
+				overlaysMenu.Add(command);
+				CommandHandlerList.Global.Connect(command, new OverlayToggleCommandHandler());
+			}
+			AddRulersCommands(proj.Rulers);
+			AddRulersCommands(proj.DefaultRulers);
+			RebuildRulerMenu();
+			proj.Rulers.CollectionChanged += Rulers_CollectionChanged;
+		}
+
+		private static void RebuildRulerMenu()
+		{
+			rulerMenu.Clear();
+			rulerMenu.Add(SceneViewCommands.ToggleDisplayRuler);
+			rulerMenu.Add(SceneViewCommands.SaveCurrentRuler);
+			rulerMenu.Add(SceneViewCommands.DeleteRulers);
+			rulerMenu.Add(Command.MenuSeparator);
+			foreach (var ruler in Project.Current.DefaultRulers) {
+				rulerMenu.Add(ruler.GetComponents().Get<UI.SceneView.CommandComponent>().Command);
+			}
+			if (Project.Current.Rulers.Count > 0) {
+				rulerMenu.Add(Command.MenuSeparator);
+			}
+			foreach (var ruler in Project.Current.Rulers) {
+				rulerMenu.Add(ruler.GetComponents().Get<UI.SceneView.CommandComponent>().Command);
+			}
+		}
+
+		private static void Rulers_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+		{
+			WidgetContext.Current.Root.LateTasks.Add(RulerColectionChangedTask(e.NewItems, e.OldItems));
+		}
+
+		private static IEnumerator<object> RulerColectionChangedTask(IList newItems, IList oldItems)
+		{
+			AddRulersCommands(newItems);
+			RemoveRulersCommands(oldItems);
+			if (newItems != null) {
+				foreach (RulerData ruler in newItems) {
+					ruler.GetComponents().Get<UI.SceneView.CommandComponent>().Command.Issue();
+				}
+			}
+			RebuildRulerMenu();
+			yield return null;
+		}
+
+		private static void RemoveRulersCommands(IList rulers)
+		{
+			if (rulers == null)
+				return;
+			foreach (RulerData ruler in rulers) {
+				CommandHandlerList.Global.Disconnect(ruler.GetComponents().Get<UI.SceneView.CommandComponent>().Command);
+			}
+		}
+
+		private static void AddRulersCommands(IList rulers)
+		{
+			if (rulers == null)
+				return;
+			foreach (RulerData ruler in rulers) {
+				Command c;
+				ruler.GetComponents().Add(new UI.SceneView.CommandComponent {
+					Command = (c = new Command(ruler.Name))
+				});
+				CommandHandlerList.Global.Connect(c, new OverlayToggleCommandHandler());
+			}
+		}
+
+		private class OverlayToggleCommandHandler : ToggleDisplayCommandHandler
+		{
+			public override void RefreshCommand(ICommand command)
+			{
+				var checkedState = command.Checked;
+				base.RefreshCommand(command);
+				if (command.Checked != checkedState) {
+					CommonWindow.Current.Invalidate();
+				}
+			}
 		}
 	}
 }

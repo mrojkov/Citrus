@@ -73,6 +73,8 @@ namespace Orange
 
 		public bool CleanBeforeBuild => The.UI.GetActiveTarget() != null && The.UI.GetActiveTarget().CleanBeforeBuild;
 
+		public JObject JObject { get; private set; }
+
 		public void Load()
 		{
 			var config = WorkspaceConfig.Load();
@@ -125,8 +127,8 @@ namespace Orange
 
 		private void ReadProject(string file)
 		{
-			var jobject = JObject.Parse(File.ReadAllText(file));
-			ProjectJson = new Json(jobject, file);
+			JObject = JObject.Parse(File.ReadAllText(file));
+			ProjectJson = new Json(JObject, file);
 			Title = ProjectJson["Title"] as string;
 			Targets = new List<Target>();
 			FillDefaultTargets();
@@ -142,6 +144,11 @@ namespace Orange
 				Targets.Add(new Target(target["Name"] as string, target["Project"] as string,
 											 cleanBeforeBuild, GetPlaformByName(target["Platform"] as string)));
 			}
+		}
+
+		public void SaveCurrentProject()
+		{
+			ProjectJson.RewriteOrigin();
 		}
 
 		public string GetMainBundlePath()

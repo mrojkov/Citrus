@@ -40,8 +40,38 @@ namespace Tangerine.UI.SceneView
 			h.Connect(SceneViewCommands.DragLeftFast, () => DragNodes(new Vector2(-5, 0)));
 			h.Connect(SceneViewCommands.DragRightFast, () => DragNodes(new Vector2(5, 0)));
 			h.Connect(SceneViewCommands.Duplicate, DuplicateNodes);
-			h.Connect(SceneViewCommands.DisplayBones, DisplayBones);
+			h.Connect(SceneViewCommands.DisplayBones, new DisplayBones());
 			h.Connect(SceneViewCommands.BindBones, BindBones);
+			h.Connect(SceneViewCommands.ToggleDisplayRuler, new DisplayRuler());
+			h.Connect(SceneViewCommands.SaveCurrentRuler, new SaveRuler());
+		}
+
+		private class SaveRuler : DocumentCommandHandler
+		{
+			public override bool GetEnabled()
+			{
+				return SceneViewCommands.ToggleDisplayRuler.Checked && UI.SceneView.Ruler.Lines.Count > 0;
+			}
+
+			public override void Execute()
+			{
+				var ruler = Ruler.GetRulerData();
+				ruler.Name = new SaveRulerDialog().Show();
+				if (Project.Current.Rulers.Any(o => o.Name == ruler.Name)) {
+					new AlertDialog("Ruler with exact name already exist").Show();
+				} else {
+					Project.Current.AddRuler(ruler);
+					Ruler.Clear();
+				}
+			}
+		}
+
+		private class DisplayRuler : ToggleDisplayCommandHandler
+		{
+			public override void Execute()
+			{
+				Visible = Ruler.ToggleDisplay();
+			}
 		}
 
 		private static void DuplicateNodes()
@@ -105,15 +135,19 @@ namespace Tangerine.UI.SceneView
 		}
 
 
-		private static void DisplayBones()
+		private class DisplayBones : ToggleDisplayCommandHandler
 		{
-			var postPresenter = Instance.Frame.CompoundPostPresenter;
-			if (postPresenter.Contains(Bone3DPresenter.Presenter)) {
-				postPresenter.Remove(Bone3DPresenter.Presenter);
-			} else {
-				postPresenter.Add(Bone3DPresenter.Presenter);
+			public override void Execute()
+			{
+				var postPresenter = Instance.Frame.CompoundPostPresenter;
+				if (Visible) {
+					postPresenter.Remove(Bone3DPresenter.Presenter);
+				} else {
+					postPresenter.Add(Bone3DPresenter.Presenter);
+				}
+				CommonWindow.Current.Invalidate();
+				base.Execute();
 			}
-			CommonWindow.Current.Invalidate();
 		}
 
 		static void DragNodes(Vector2 delta)

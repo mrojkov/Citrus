@@ -312,7 +312,6 @@
     <Compile Include="Source\Profilers\NodeProfilerHelpers\ResultExporter.cs" />
     <Compile Include="Source\Profilers\NodeProfilerHelpers\UsageData.cs" />
     <Compile Include="Source\Profilers\NodeProfilerHelpers\UsageSummary.cs" />
-    <Compile Include="Source\Widgets\Theme\ThemedExpandButton.cs" />
     <Compile Include="Source\Widgets\3D\LightSource.cs" />
     <Compile Include="Source\Widgets\3D\ShadowMapping\DepthBuffer.cs" />
     <Compile Include="Source\Widgets\3D\ShadowMapping\DepthBufferProgram.cs" />

@@ -83,13 +83,15 @@
     <None Include="Info.plist" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Dialogs\DeleteRulerDialog.cs" />
+    <Compile Include="Dialogs\PreferencesDialog.cs" />
     <Compile Include="TangerineApp.cs" />
     <Compile Include="Main.Mac.cs" />
-    <Compile Include="PreferencesDialog\PreferencesDialog.cs" />
     <Compile Include="MainMenu\WindowMenu.cs" />
     <Compile Include="MainMenu\FileMenu.cs" />
     <Compile Include="MainMenu\ViewMenu.cs" />
     <Compile Include="MainMenu\CreateMenu.cs" />
+    <Compile Include="TangerineMenu.cs" />
     <Compile Include="Tools\AlignTools.cs" />
     <Compile Include="Tools\FitTools.cs" />
     <Compile Include="MainMenu\EditMenu.cs" />
@@ -247,6 +249,8 @@
     <EmbeddedResource Include="Resources\Icons\SceneView\Play.png" />
     <EmbeddedResource Include="Resources\Icons\Tools\Pipette.png" />
     <EmbeddedResource Include="Resources\Cursors\Rotate.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Polyline.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.PolylinePoint.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PreferencesDialog\" />

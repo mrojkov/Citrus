@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Timers;
 using Lime;
 using Tangerine.Core;
 
@@ -54,23 +55,6 @@ namespace Tangerine.UI.SceneView
 				}
 			}));
 
-			const float deviceHeight = 768;
-			float[] deviceWidths = { 1366, 1152, 1024, 1579 };
-			sceneView.Scene.CompoundPostPresenter.Push(
-				new DelegatePresenter<Widget>(
-					(w) => {
-						var root = Core.Document.Current.RootNode as Widget;
-						if (root != null && Core.UserPreferences.Instance.Get<UserPreferences>().ShowOverlays) {
-							root.PrepareRendererState();
-							var mtx = root.LocalToWorldTransform;
-							var t1 = 1 / mtx.U.Length;
-							Renderer.Transform1 = mtx;
-							var rootCenter = root.Size * 0.5f;
-							foreach (var width in deviceWidths) {
-								SetAndRenderOverlay(width, deviceHeight, rootCenter, t1);
-							}
-						}
-					}));
 
 			sceneView.Scene.CompoundPostPresenter.Push(new DelegatePresenter<Widget>(w => {
 				var frame = SceneView.Instance.Frame;
@@ -104,16 +88,47 @@ namespace Tangerine.UI.SceneView
 						}
 					}
 			));
+			var rh = new RenderChain();
+			sceneView.Frame.CompoundPostPresenter.Push(
+				new DelegatePresenter<Widget>(
+					(w) => {
+						if (!Document.Current.ExpositionMode) {
+							foreach (var widget in Project.Current.Overlays.Values) {
+								if (widget.Components.Get<NodeCommandComponent>()?.Command.Checked ?? false) {
+									widget.Position = Document.Current.RootNode.AsWidget.LocalToWorldTransform.T;
+									widget.Scale = SceneView.Instance.Scene.Scale;
+									DefaultRenderChainBuilder.Instance.AddToRenderChain(widget, rh);
+								}
+							}
+							rh.Render();
+						}
+						w.PrepareRendererState();
+						var size = Document.Current.RootNode.AsWidget.Size / 2;
+						foreach (var ruler in Project.Current.Rulers) {
+							if (ruler.GetComponents().Get<CommandComponent>()?.Command.Checked ?? false) {
+								DrawRuler(ruler, size, w);
+							}
+						}
+						foreach (var ruler in Project.Current.DefaultRulers) {
+							if (ruler.GetComponents().Get<CommandComponent>()?.Command.Checked ?? false) {
+								DrawRuler(ruler, size, w);
+							}
+						}
+					}));
 		}
 
-		private static void SetAndRenderOverlay(float width, float height, Vector2 rootCenter, float thickness)
+		private void DrawRuler(RulerData ruler, Vector2 size, Widget root)
 		{
-			var a1 = new Vector2(width, height) * 0.5f + rootCenter;
-			var b1 = new Vector2(width, height) * -0.5f + rootCenter;
-			var a2 = new Vector2(height, width) * 0.5f + rootCenter;
-			var b2 = new Vector2(height, width) * -0.5f + rootCenter;
-			Renderer.DrawRectOutline(a1, b1, Color4.White, thickness);
-			Renderer.DrawRectOutline(a2, b2, Color4.White, thickness);
+			var t = Document.Current.RootNode.AsWidget.CalcTransitionToSpaceOf(root);
+			foreach (var line in ruler.Lines) {
+				if (line.IsVertical) {
+					var val = (new Vector2(line.Value + size.X, 0) * t).X;
+					Renderer.DrawLine(new Vector2(val, 0), new Vector2(val, root.Size.Y), ColorTheme.Current.SceneView.Ruler);
+				} else {
+					var val = (new Vector2(0, line.Value + size.Y) * t).Y;
+					Renderer.DrawLine(new Vector2(0, val), new Vector2(root.Size.X, val), ColorTheme.Current.SceneView.Ruler);
+				}
+			}
 		}
 
 		private ITexture PrepareChessTexture(Color4 color1, Color4 color2)

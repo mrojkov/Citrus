@@ -25,6 +25,11 @@ namespace Tangerine.Core
 			widget.LateTasks.Add(provider.DistinctUntilChanged().Consume(action));
 		}
 
+		public static void AddChangeWatcher<T>(this Widget widget, Property<T> prop, Action<T> action)
+		{
+			widget.Tasks.Add(new Property<T>(prop.Getter).DistinctUntilChanged().Consume(action));
+		}
+
 		public static float Top(this Widget widget) => widget.Y;
 		public static float Bottom(this Widget widget) => widget.Y + widget.Height;
 	}

@@ -219,7 +219,6 @@
     <Compile Include="Source\Application\FileDialog\FileDialog.Win.cs" />
     <Compile Include="Source\Widgets\HSplitter.cs" />
     <Compile Include="Source\Widgets\VSplitter.cs" />
-    <Compile Include="Source\Widgets\Theme\ThemedExpandButton.cs" />
     <Compile Include="Source\Widgets\Layout\LayoutDebugPresenter.cs" />
     <Compile Include="Source\Widgets\Layout\StackLayout.cs" />
     <Compile Include="Source\Widgets\Layout\HBoxLayout.cs" />

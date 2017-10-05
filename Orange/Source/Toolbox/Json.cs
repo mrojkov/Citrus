@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.IO;
 
 namespace Orange
 {
@@ -64,6 +66,34 @@ namespace Orange
 
 				json = token as JObject;
 			}
+		}
+
+		public void AddToArray(string name, object target)
+		{
+			if (name == null)
+				return;
+			var array = obj.GetValue(name) as JArray;
+			if (array == null) {
+				array = new JArray();
+				obj.Add(name, array);
+			}
+			array.Add(JObject.FromObject(target));
+		}
+
+		public void RemoveFromArray(string name, object target)
+		{
+			if (name == null)
+				return;
+			var array = obj.GetValue(name) as JArray;
+			var targetJson = JObject.FromObject(target);
+			if (array != null) {
+				array.Remove(array.FirstOrDefault(v => v.ToString() == targetJson.ToString()));
+			}
+		}
+
+		public void RewriteOrigin()
+		{
+			File.WriteAllText(sourcePath, obj.ToString());
 		}
 	}
 }

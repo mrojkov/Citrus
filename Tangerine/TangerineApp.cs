@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -139,6 +140,7 @@ namespace Tangerine
 			if (proj != null) {
 				new Project(proj).Open();
 			}
+			WidgetContext.Current.Root.AddChangeWatcher(() => Project.Current, project => TangerineMenu.OnProjectChanged(project));
 			new UI.FilesystemView.FilesystemPane(filesystemPanel);
 			new UI.Console(consolePanel);
 			RegisterGlobalCommands();
@@ -304,6 +306,7 @@ namespace Tangerine
 			h.Connect(GenericCommands.CloseDocument, new FileClose());
 			h.Connect(GenericCommands.Quit, Application.Exit);
 			h.Connect(GenericCommands.PreferencesDialog, () => new PreferencesDialog());
+			h.Connect(SceneViewCommands.DeleteRulers, new DeleteRulers());
 			h.Connect(GenericCommands.Group, new GroupNodes());
 			h.Connect(GenericCommands.Ungroup, new UngroupNodes());
 			h.Connect(GenericCommands.InsertTimelineColumn, new InsertTimelineColumn());
@@ -314,7 +317,6 @@ namespace Tangerine
 			h.Connect(GenericCommands.GroupContentsToMorphableMeshes, new GroupContentsToMorphableMeshes());
 			h.Connect(GenericCommands.ExportScene, new ExportScene());
 			h.Connect(GenericCommands.UpsampleAnimationTwice, new UpsampleAnimationTwice());
-			h.Connect(GenericCommands.Overlays, new OverlaysCommand());
 			h.Connect(Tools.AlignLeft, new AlignLeft());
 			h.Connect(Tools.AlignRight, new AlignRight());
 			h.Connect(Tools.AlignTop, new AlignTop());
@@ -342,6 +344,9 @@ namespace Tangerine
 			h.Connect(Command.Undo, () => Document.Current.History.Undo(), () => Document.Current?.History.CanUndo() ?? false);
 			h.Connect(Command.Redo, () => Document.Current.History.Redo(), () => Document.Current?.History.CanRedo() ?? false);
 			h.Connect(OrangeCommands.Run, () => WidgetContext.Current.Root.Tasks.Add(OrangeTask));
+			h.Connect(SceneViewCommands.SnapWidgetBorderToRuler, new ToggleDisplayCommandHandler());
+			h.Connect(SceneViewCommands.SnapWidgetPivotToRuler, new ToggleDisplayCommandHandler());
+			h.Connect(SceneViewCommands.DeleteRulers, new DeleteRulers());
 		}
 
 		private IEnumerator<object> OrangeTask()

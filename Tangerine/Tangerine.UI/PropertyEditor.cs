@@ -16,12 +16,6 @@ namespace Tangerine.UI
 		void DropFiles(IEnumerable<string> files);
 	}
 
-	public interface IExpandableContent
-	{
-		Widget ExpandableContent { get; }
-		bool Expanded { get; set; }
-	}
-
 	public interface IPropertyEditorParams
 	{
 		Widget InspectorPane { get; set; }
@@ -82,8 +76,7 @@ namespace Tangerine.UI
 		private void SetProperty(object obj, string propertyName, object value) => PropertyInfo.SetValue(obj, value);
 	}
 
-
-	public class ExpandablePropertyEditor<T> : CommonPropertyEditor<T>, IExpandableContent
+	public class ExpandablePropertyEditor<T> : CommonPropertyEditor<T>
 	{
 		private bool expanded;
 		public bool Expanded
@@ -110,13 +103,14 @@ namespace Tangerine.UI
 			ExpandButton.Clicked += () => Expanded = !Expanded;
 			editorParams.InspectorPane.AddNode(ExpandableContent);
 			ContainerWidget.Nodes.Insert(0, new Widget {
-				Padding =  new Thickness(5, 9),
+				Padding = new Thickness(5, 9) { Left = -15 },
 				Anchors = Anchors.Center,
 				Layout = new VBoxLayout {DefaultCell = new LayoutCell(Alignment.Center)},
 				Nodes = { ExpandButton }
 			});
 		}
 	}
+
 	public class CommonPropertyEditor<T> : IPropertyEditor
 	{
 		public IPropertyEditorParams EditorParams { get; private set; }
@@ -648,6 +642,7 @@ namespace Tangerine.UI
 	{
 		protected readonly EditBox editor;
 		protected readonly Button button;
+		protected static string LastOpenedDirectory = Project.Current.GetSystemDirectory(Document.Current.Path);
 
 		protected FilePropertyEditor(IPropertyEditorParams editorParams, string[] allowedFileTypes) : base(editorParams)
 		{
@@ -670,10 +665,11 @@ namespace Tangerine.UI
 				var dlg = new FileDialog {
 					AllowedFileTypes = allowedFileTypes,
 					Mode = FileDialogMode.Open,
-					InitialDirectory = Project.Current.GetSystemDirectory(Document.Current.Path),
+					InitialDirectory = Directory.Exists(LastOpenedDirectory) ? LastOpenedDirectory : Project.Current.GetSystemDirectory(Document.Current.Path),
 				};
 				if (dlg.RunModal()) {
 					SetFilePath(dlg.FileName);
+					LastOpenedDirectory = Project.Current.GetSystemDirectory(dlg.FileName);
 				}
 			};
 		}
