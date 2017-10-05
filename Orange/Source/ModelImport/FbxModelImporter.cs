@@ -10,6 +10,8 @@ namespace Orange
 		private string path;
 		private Manager manager;
 		private TargetPlatform platform;
+		private const float MmToCm = 100;
+		private const float AngularToLinearFov = Mathf.TwoPi * MmToCm / 360;
 
 		public Model3D Model { get; private set; }
 
@@ -53,12 +55,12 @@ namespace Orange
 					var cam = root.Attributes[0] as CameraAttribute;
 					node = new Camera3D {
 						Id = root.Name,
-						FieldOfView = cam.FieldOfView,
+						FieldOfView = cam.FieldOfView * AngularToLinearFov,
 						AspectRatio = cam.AspectRatio,
-						NearClipPlane = cam.NearClipPlane,
-						FarClipPlane = cam.FarClipPlane,
+						NearClipPlane = cam.NearClipPlane * MmToCm,
+						FarClipPlane = cam.FarClipPlane * MmToCm,
 					};
-					node.SetLocalTransform(root.LocalTranform);
+					node.SetLocalTransform(CorrectCameraTransform(root.LocalTranform));
 					break;
 				default:
 					node = new Node3D { Id = root.Name };
@@ -110,6 +112,22 @@ namespace Orange
 			return sm;
 		}
 
+		private Matrix44 CorrectCameraTransform(Matrix44 origin)
+		{
+			/*
+			* According to the fbx-documentation the camera's forward vector
+			* points along a node's positive X axis.
+			* so we have to rotate it by 90 around the Y-axis to correct it.
+			*/
+			var r = origin.Rotation.ToEulerAngles() - new Vector3(0, Mathf.Pi / 2, 0);
+			Matrix44 rot;
+			Vector3 pos;
+			Vector3 scale;
+			origin.Decompose(out scale, out rot, out pos);
+			return Matrix44.CreateRotation(Quaternion.CreateFromEulerAngles(r)) *
+				Matrix44.CreateScale(scale) * Matrix44.CreateTranslation(pos);
+		}
+
 		private void ImportAnimations(Scene scene)
 		{
 			foreach (var animation in scene.Animations.Animations) {
@@ -122,6 +140,10 @@ namespace Orange
 					Vector3 finalScale;
 					Quaternion finalRotation;
 					Vector3 finalTranslation;
+					if (n is Camera3D) {
+						animation.Transform[i] = CorrectCameraTransform(animation.Transform[i]);
+					}
+
 					animation.Transform[i].Decompose(out finalScale, out finalRotation, out finalTranslation);
 					scaleKeys.Add(new Keyframe<Vector3>(time, finalScale));
 					rotationKeys.Add(new Keyframe<Quaternion>(time, finalRotation));
