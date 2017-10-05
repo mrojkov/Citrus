@@ -858,7 +858,7 @@ namespace Lime
 					globalColor *= parentNode3D.GlobalColor;
 				}
 			}
-			if ((DirtyMask & DirtyFlags.Visible) != 0) {
+			if ((DirtyMask & (DirtyFlags.Visible | DirtyFlags.TangerineFlags)) != 0) {
 				globallyVisible = Visible && (color.A != 0 || RenderTransparentWidgets);
 				if (parentWidget != null) {
 					globallyVisible &= parentWidget.globallyVisible;
