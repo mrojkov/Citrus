@@ -122,6 +122,7 @@ namespace Lime
 			var aabb = CalcAABBInWindowSpace();
 			menu.Popup(Window.Current, aabb.A, aabb.Width, selectedCommand);
 #if WIN
+			menu.ShowImageMargin = false;
 			menu.NativeContextMenu.Capture = true;
 #endif
 #else

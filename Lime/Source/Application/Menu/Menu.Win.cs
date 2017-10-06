@@ -24,13 +24,32 @@ namespace Lime
 			}
 		}
 
+		private bool showImageMargin = true;
+		public bool ShowImageMargin
+		{
+			get
+			{
+				return showImageMargin;
+			}
+
+			set
+			{
+				if (value != showImageMargin) {
+					if (nativeContextMenu != null) {
+						nativeContextMenu.ShowImageMargin = value;
+					}
+					showImageMargin = value;
+				}
+			}
+		}
+
 		internal ContextMenuStrip NativeContextMenu
 		{
 			get
 			{
 				if (nativeContextMenu == null) {
 					nativeContextMenu = new ContextMenuStrip {
-						ShowImageMargin = true
+						ShowImageMargin = showImageMargin
 					};
 					UpdateNativeMenu(nativeContextMenu);
 				}

@@ -10,7 +10,6 @@ namespace Lime
 	{
 		List<MenuItem> items = new List<MenuItem>();
 		internal readonly NSMenu NativeMenu;
-		public bool DisplayCheckMark { get; set; }
 
 		public Menu()
 		{
