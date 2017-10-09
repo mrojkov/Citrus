@@ -54,6 +54,7 @@ namespace Lime
 			Add(typeof(NodeReference<Spline>), typeof(Animator<NodeReference<Spline>>));
 			Add(typeof(NodeReference<Node3D>), typeof(Animator<NodeReference<Node3D>>));
 			Add(typeof(NodeReference<Spline3D>), typeof(Animator<NodeReference<Spline3D>>));
+			Add(typeof(NodeReference<Camera3D>), typeof(Animator<NodeReference<Camera3D>>));
 		}
 		
 		Dictionary<Type, Type> map = new Dictionary<Type, Type>();
