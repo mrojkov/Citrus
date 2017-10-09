@@ -119,13 +119,12 @@ namespace Orange
 			* points along a node's positive X axis.
 			* so we have to rotate it by 90 around the Y-axis to correct it.
 			*/
-			var r = origin.Rotation.ToEulerAngles() - new Vector3(0, Mathf.Pi / 2, 0);
-			Matrix44 rot;
-			Vector3 pos;
+			Matrix44 rotationMatrix;
+			Vector3 translation;
 			Vector3 scale;
-			origin.Decompose(out scale, out rot, out pos);
-			return Matrix44.CreateRotation(Quaternion.CreateFromEulerAngles(r)) *
-				Matrix44.CreateScale(scale) * Matrix44.CreateTranslation(pos);
+			origin.Decompose(out scale, out rotationMatrix, out translation);
+			var newRotation = rotationMatrix.Rotation * Quaternion.CreateFromEulerAngles(Vector3.UnitY * -Mathf.Pi / 2);
+			return Matrix44.CreateRotation(newRotation) * Matrix44.CreateScale(scale) * Matrix44.CreateTranslation(translation);
 		}
 
 		private void ImportAnimations(Scene scene)
