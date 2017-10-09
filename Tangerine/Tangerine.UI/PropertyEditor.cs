@@ -590,7 +590,7 @@ namespace Tangerine.UI
 						Highlightable = true,
 						Texture = IconPool.GetTexture("Tools.Pipette"),
 						Clicked = () => WidgetContext.Current.Root.Tasks.Add(
-							UIProcessors.PickColorProcessor(new Property<Color4>(panel, nameof(ColorPickerPanel.Color))))
+							UIProcessors.PickColorProcessor(v => SetProperty(v)))
 					}),
 				}
 			});

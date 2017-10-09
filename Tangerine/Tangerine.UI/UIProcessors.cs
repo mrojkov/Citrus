@@ -8,7 +8,7 @@ namespace Tangerine.UI
 {
 	public static class UIProcessors
 	{
-		public static IEnumerator<object> PickColorProcessor(Property<Color4> prop)
+		public static IEnumerator<object> PickColorProcessor(Action<Color4> setter)
 		{
 			var root = WidgetContext.Current.Root;
 			root.Input.CaptureMouse();
@@ -17,7 +17,7 @@ namespace Tangerine.UI
 			while (true) {
 				Utils.ChangeCursorIfDefault(Cursors.Pipette);
 				if (root.Input.IsMousePressed()) {
-					prop.Value = ColorPicker.PickAtCursor();
+					setter(ColorPicker.PickAtCursor());
 				} else if (root.Input.WasMouseReleased()) {
 					Utils.ChangeCursorIfDefault(MouseCursor.Default);
 					root.Input.ReleaseMouse();

@@ -21,28 +21,15 @@ namespace Tangerine.UI
 		public Color4 Color
 		{
 			get { return colorHSVA.ToRGBA(); }
-			set
-			{
-				var newValue = ColorHSVA.FromRGBA(value);
-				if (newValue.GetHashCode() != colorHSVA.GetHashCode()) {
-					colorHSVA = newValue;
-					Changed?.Invoke();
-				}
-			}
+			set { colorHSVA = ColorHSVA.FromRGBA(value); }
 		}
 
 		public ColorPickerPanel()
 		{
-			var colorProperty = new Property<ColorHSVA>(
-				() => colorHSVA,
-				c => {
-					if (colorHSVA.GetHashCode() != c.GetHashCode()) {
-						colorHSVA = c;
-						Changed?.Invoke();
-					}
-				});
+			var colorProperty = new Property<ColorHSVA>(() => colorHSVA, c => colorHSVA = c);
 			spectrum = new Spectrum(colorProperty);
 			spectrum.DragStarted += () => DragStarted?.Invoke();
+			spectrum.Changed += () => Changed?.Invoke();
 			spectrum.DragEnded += () => DragEnded?.Invoke();
 			valueSlider = new ValueSlider(colorProperty);
 			alphaSlider = new AlphaSlider(colorProperty);
@@ -71,6 +58,7 @@ namespace Tangerine.UI
 		{
 			slider.DragStarted += () => DragStarted?.Invoke();
 			slider.DragEnded += () => DragEnded?.Invoke();
+			slider.Changed += () => Changed?.Invoke();
 		}
 
 		class Spectrum
