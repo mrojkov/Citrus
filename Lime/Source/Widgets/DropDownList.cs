@@ -34,7 +34,12 @@ namespace Lime
 			{
 				var item = Items.FirstOrDefault(i => i.Text == value);
 				Index = (item != null) ? Items.IndexOf(item) : -1;
-				userValue = Index == -1 ? value : null;
+				if (Index == -1) {
+					userValue = value;
+					RefreshTextWidget();
+				} else {
+					userValue = null;
+				}
 			}
 		}
 
