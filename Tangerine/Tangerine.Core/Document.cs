@@ -146,7 +146,7 @@ namespace Tangerine.Core
 				AspectRatio = 1.3f,
 				OrthographicSize = 1.0f
 			};
-			vp.AddNode(vp.Camera);
+			vp.AddNode(camera);
 			vp.CameraRef = new NodeReference<Camera3D>(camera.Id);
 			return vp;
 		}
