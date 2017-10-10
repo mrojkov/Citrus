@@ -95,7 +95,9 @@ namespace Tangerine.UI.SceneView
 						if (!Document.Current.ExpositionMode) {
 							foreach (var widget in Project.Current.Overlays.Values) {
 								if (widget.Components.Get<NodeCommandComponent>()?.Command.Checked ?? false) {
-									widget.Position = Document.Current.RootNode.AsWidget.LocalToWorldTransform.T;
+									widget.Position = (Document.Current.RootNode.AsWidget.Position +
+										(Document.Current.RootNode.AsWidget.Size - widget.Size) / 2) *
+										Document.Current.RootNode.AsWidget.LocalToWorldTransform;
 									widget.Scale = SceneView.Instance.Scene.Scale;
 									DefaultRenderChainBuilder.Instance.AddToRenderChain(widget, rh);
 								}
