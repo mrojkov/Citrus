@@ -10,8 +10,6 @@ namespace Orange
 		private string path;
 		private Manager manager;
 		private TargetPlatform platform;
-		private const float MmToCm = 100;
-		private const float AngularToLinearFov = Mathf.TwoPi * MmToCm / 360;
 
 		public Model3D Model { get; private set; }
 
@@ -55,10 +53,10 @@ namespace Orange
 					var cam = root.Attributes[0] as CameraAttribute;
 					node = new Camera3D {
 						Id = root.Name,
-						FieldOfView = cam.FieldOfView * AngularToLinearFov,
+						FieldOfView = cam.FieldOfView * Mathf.DegToRad,
 						AspectRatio = cam.AspectRatio,
-						NearClipPlane = cam.NearClipPlane * MmToCm,
-						FarClipPlane = cam.FarClipPlane * MmToCm,
+						NearClipPlane = cam.NearClipPlane,
+						FarClipPlane = cam.FarClipPlane,
 					};
 					node.SetLocalTransform(CorrectCameraTransform(root.LocalTranform));
 					break;

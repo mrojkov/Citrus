@@ -76,6 +76,10 @@ namespace Lime
 								Matrix44.CreateTranslation(tranlation);
 						}
 					}
+				} else if (node is Camera3D) {
+					var cam = node as Camera3D;
+					cam.NearClipPlane *= ScaleFactor;
+					cam.FarClipPlane *= ScaleFactor;
 				}
 				foreach (var animator in node.Animators) {
 					if (animator.TargetProperty == "Position") {
