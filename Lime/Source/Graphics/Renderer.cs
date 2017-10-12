@@ -523,23 +523,34 @@ namespace Lime
 
 		public static void DrawSprite(ITexture texture, Color4 color, Vector2 position, Vector2 size, Vector2 uv0, Vector2 uv1)
 		{
+			DrawSprite(texture, null, color, position, size, uv0, uv1);
+		}
+
+		public static void DrawSprite(ITexture texture1, ITexture texture2, Color4 color, Vector2 position, Vector2 size, Vector2 uv0, Vector2 uv1)
+		{
+			Vector2 uv0tex2 = uv0;
+			Vector2 uv1tex2 = uv1;
 			if (Blending == Blending.Glow) {
 				Blending = Blending.Alpha;
-				DrawSprite(texture, color, position, size, uv0, uv1);
+				DrawSprite(texture1, texture2, color, position, size, uv0, uv1);
 				Blending = Blending.Glow;
 			}
 			if (Blending == Blending.Darken) {
 				Blending = Blending.Alpha;
-				DrawSprite(texture, color, position, size, uv0, uv1);
+				DrawSprite(texture1, texture2, color, position, size, uv0, uv1);
 				Blending = Blending.Darken;
 			}
-			var batch = CurrentRenderList.GetBatch(texture, null, Blending, Shader, CustomShaderProgram, 4, 6);
+			var batch = CurrentRenderList.GetBatch(texture1, texture2, Blending, Shader, CustomShaderProgram, 4, 6);
 			if (PremultipliedAlphaMode && color.A != 255) {
 				color = Color4.PremulAlpha(color);
 			}
-			if (texture != null) {
-				texture.TransformUVCoordinatesToAtlasSpace(ref uv0);
-				texture.TransformUVCoordinatesToAtlasSpace(ref uv1);
+			if (texture1 != null) {
+				texture1.TransformUVCoordinatesToAtlasSpace(ref uv0);
+				texture1.TransformUVCoordinatesToAtlasSpace(ref uv1);
+			}
+			if (texture2 != null) {
+				texture2.TransformUVCoordinatesToAtlasSpace(ref uv0tex2);
+				texture2.TransformUVCoordinatesToAtlasSpace(ref uv1tex2);
 			}
 			batch.VertexBuffer.Dirty = true;
 			batch.IndexBuffer.Dirty = true;
@@ -570,16 +581,20 @@ namespace Lime
 			var vertices = batch.VertexBuffer.Data;
 			vertices[v].Pos = new Vector2 { X = x0ux + y0vx + matrix.T.X, Y = x0uy + y0vy + matrix.T.Y };
 			vertices[v].Color = color;
-			vertices[v++].UV1 = uv0;
+			vertices[v].UV1 = uv0;
+			vertices[v++].UV2 = uv0tex2;
 			vertices[v].Pos = new Vector2 { X = x1ux + y0vx + matrix.T.X, Y = x1uy + y0vy + matrix.T.Y };
 			vertices[v].Color = color;
-			vertices[v++].UV1 = new Vector2 { X = uv1.X, Y = uv0.Y };
+			vertices[v].UV1 = new Vector2 { X = uv1.X, Y = uv0.Y };
+			vertices[v++].UV2 = new Vector2 { X = uv1tex2.X, Y = uv0tex2.Y };
 			vertices[v].Pos = new Vector2 { X = x0ux + y1vx + matrix.T.X, Y = x0uy + y1vy + matrix.T.Y };
 			vertices[v].Color = color;
-			vertices[v++].UV1 = new Vector2 { X = uv0.X, Y = uv1.Y };
+			vertices[v].UV1 = new Vector2 { X = uv0.X, Y = uv1.Y };
+			vertices[v++].UV2 = new Vector2 { X = uv0tex2.X, Y = uv1tex2.Y };
 			vertices[v].Pos = new Vector2 { X = x1ux + y1vx + matrix.T.X, Y = x1uy + y1vy + matrix.T.Y };
 			vertices[v].Color = color;
 			vertices[v].UV1 = uv1;
+			vertices[v].UV2 = uv1tex2;
 		}
 
 		private static Matrix32 GetEffectiveTransform()
