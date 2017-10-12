@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,6 +13,8 @@ namespace Tangerine
 		public static TangerineApp Instance { get; private set; }
 		public readonly Dictionary<string, Toolbar> Toolbars = new Dictionary<string, Toolbar>();
 		public readonly DockManager.State DockManagerInitialState;
+
+		private ModalOperationDialog cookingOfModifiedAssetsDialog;
 
 		public static void Initialize()
 		{
@@ -80,6 +81,16 @@ namespace Tangerine
 				var alert = new AlertDialog($"The file '{doc.Path}' has been changed outside of Tangerine.\nDo you want to keep your changes, or reload the file from disk?", "Keep", "Reload");
 				return alert.Show() == 0 ? false : true;
 			};
+
+			Project.CookingOfModifiedAssetsStarted += () => {
+				cookingOfModifiedAssetsDialog = new ModalOperationDialog(() => Project.CookingOfModifiedAssetsStatus, "Cooking of modified assets");
+				cookingOfModifiedAssetsDialog.Show();
+			};
+			Project.CookingOfModifiedAssetsEnded += () => {
+				cookingOfModifiedAssetsDialog.Close();
+				cookingOfModifiedAssetsDialog = null;
+			};
+			Project.Tasks = dockManager.MainWindowWidget.Tasks;
 			Document.NodeDecorators.AddFor<Spline>(n => n.CompoundPostPresenter.Add(new UI.SceneView.SplinePresenter()));
 			Document.NodeDecorators.AddFor<Viewport3D>(n => n.CompoundPostPresenter.Add(new UI.SceneView.Spline3DPresenter()));
 			Document.NodeDecorators.AddFor<SplinePoint>(n => n.CompoundPostPresenter.Add(new UI.SceneView.SplinePointPresenter()));

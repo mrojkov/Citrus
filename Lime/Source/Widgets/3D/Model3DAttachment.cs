@@ -7,6 +7,7 @@ namespace Lime
 {
 	public class Model3DAttachment
 	{
+		public const string FileExtension = ".Attachment.txt";
 		public const string DefaultAnimationName = "Default";
 
 		public readonly List<MeshOption> MeshOptions = new List<MeshOption>();
@@ -341,7 +342,7 @@ namespace Lime
 				Path.Combine(Path.GetDirectoryName(modelPath) ?? "",
 				Path.GetFileNameWithoutExtension(AssetPath.CorrectSlashes(modelPath) ?? "")
 			));
-			var attachmentPath = modelPath + ".Attachment.txt";
+			var attachmentPath = modelPath + Model3DAttachment.FileExtension;
 			try {
 				ModelAttachmentFormat modelAttachmentFormat;
 				if (useBundle) {
