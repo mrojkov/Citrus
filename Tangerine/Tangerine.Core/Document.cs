@@ -233,7 +233,8 @@ namespace Tangerine.Core
 			if (!string.IsNullOrEmpty(node.ContentsPath)) {
 				var doc = Project.Current.Documents.FirstOrDefault(i => i.Path == node.ContentsPath);
 				if (doc != null && doc.IsModified) {
-					node.ReplaceContent(doc.RootNode.Clone());
+					var docRootNode = doc.RootNode is Viewport3D ? doc.RootNode.Nodes[0] : doc.RootNode;
+					node.ReplaceContent(docRootNode.Clone());
 				} else {
 					node.LoadExternalScenes();
 				}
