@@ -14,7 +14,7 @@ namespace Tangerine.UI.FilesystemView
 	public class FileEnumerator : IFileEnumerator
 	{
 		public string Directory { get; }
-		public Predicate<Orange.FileInfo> EnumerationFilter;
+		public Predicate<Orange.FileInfo> EnumerationFilter { get; set; }
 		readonly List<Orange.FileInfo> files = new List<Orange.FileInfo>();
 		private readonly string targetDirectory;
 		DirectoryInfo dirInfoRoot;

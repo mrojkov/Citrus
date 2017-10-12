@@ -14,7 +14,7 @@ namespace Orange
 	public class FileEnumerator : IFileEnumerator
 	{
 		public string Directory { get; }
-		public Predicate<FileInfo> EnumerationFilter;
+		public Predicate<FileInfo> EnumerationFilter { get; set; }
 		readonly List<FileInfo> files = new List<FileInfo>();
 
 		public FileEnumerator(string directory)
@@ -43,7 +43,8 @@ namespace Orange
 			if (extension == null && EnumerationFilter == null) {
 				return files;
 			}
-			return files.Where(file => extension == null || Path.GetExtension(file.Path) == extension)
+			return files
+				.Where(file => extension == null || Path.GetExtension(file.Path) == extension)
 				.Where(file => EnumerationFilter == null || EnumerationFilter(file))
 				.ToList();
 		}

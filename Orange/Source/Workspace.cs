@@ -13,7 +13,7 @@ namespace Orange
 		public string ProjectDirectory { get; private set; }
 		public string AssetsDirectory { get; private set; }
 		public string Title { get; private set; }
-		public FileEnumerator AssetFiles { get; private set; }
+		public IFileEnumerator AssetFiles { get; set; }
 		public Json ProjectJson { get; private set; }
 		public List<Target> Targets { get; private set; }
 

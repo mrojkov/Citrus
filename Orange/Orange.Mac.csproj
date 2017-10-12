@@ -143,6 +143,7 @@
     <Compile Include="Source\ModelImport\FbxModelImporter.cs" />
     <Compile Include="Source\Actions\OptimizePNG.cs" />
     <Compile Include="Source\HotStudioExport\HotSceneExporter.cs" />
+    <Compile Include="Source\Toolbox\CustomFileEnumerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Orange.Mac.userprefs">
