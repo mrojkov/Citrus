@@ -6,14 +6,22 @@ using Lime;
 
 namespace Orange
 {
+	public enum CookingProfile
+	{
+		Total,
+		Partial
+	}
+
 	public static class AssetCooker
 	{
-		private static readonly List<Action> cookStages = new List<Action>();
-		public static IEnumerable<Action> CookStages { get { return cookStages; } }
+		private static readonly CookingProfile[] defaultCookingProfiles = { CookingProfile.Total, CookingProfile.Partial };
+		private static readonly Dictionary<Action, CookingProfile[]> cookStages = new Dictionary<Action, CookingProfile[]>();
+		private static CookingProfile cookingProfile = CookingProfile.Total;
+		public static IEnumerable<Action> CookStages => cookStages.Keys;
 
 		private delegate bool Converter(string srcPath, string dstPath);
 
-		public static AssetBundle AssetBundle { get { return AssetBundle.Current; } }
+		public static AssetBundle AssetBundle => AssetBundle.Current;
 		public static TargetPlatform Platform;
 		private static Dictionary<string, CookingRules> cookingRulesMap;
 
@@ -32,9 +40,9 @@ namespace Orange
 			}
 		}
 
-		public static void AddStage(Action action)
+		public static void AddStage(Action action, params CookingProfile[] cookingProfiles)
 		{
-			cookStages.Add(action);
+			cookStages.Add(action, cookingProfiles.Length == 0 ? defaultCookingProfiles : cookingProfiles);
 		}
 
 		public static void RemoveStage(Action action)
@@ -77,6 +85,30 @@ namespace Orange
 		{
 			AssetCooker.Platform = platform;
 			cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, The.Workspace.ActiveTarget);
+			CookBundles();
+		}
+
+		public static void CookCustomAssets(TargetPlatform platform, List<string> assets)
+		{
+			AssetCooker.Platform = platform;
+			cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, The.Workspace.ActiveTarget);
+
+			var defaultAssetsEnumerator = The.Workspace.AssetFiles;
+			var assetsFileInfo = assets
+				.Select(asset => new FileInfo { Path = asset, LastWriteTime = DateTime.Now })
+				.ToList();
+			The.Workspace.AssetFiles = new CustomFilesEnumerator(defaultAssetsEnumerator.Directory, assetsFileInfo);
+
+			var defaultCookingProfile = AssetCooker.cookingProfile;
+			AssetCooker.cookingProfile = CookingProfile.Partial;
+
+			CookBundles(requiredCookCode: false);
+			The.Workspace.AssetFiles = defaultAssetsEnumerator;
+			AssetCooker.cookingProfile = defaultCookingProfile;
+		}
+
+		private static void CookBundles(bool requiredCookCode = true)
+		{
 			var extraBundles = new HashSet<string>();
 			foreach (var dictionaryItem in cookingRulesMap) {
 				foreach (var bundle in dictionaryItem.Value.Bundles) {
@@ -93,7 +125,9 @@ namespace Orange
 
 			var extraBundlesList = extraBundles.ToList();
 			PluginLoader.AfterBundlesCooked(extraBundlesList);
-			CodeCooker.Cook(extraBundlesList);
+			if (requiredCookCode) {
+				CodeCooker.Cook(extraBundlesList);
+			}
 		}
 
 		private static void CookBundle(string bundleName)
@@ -149,7 +183,10 @@ namespace Orange
 			atlasesPostfix = bundleName != CookingRulesBuilder.MainBundleName ? bundleName : "";
 			try {
 				using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
-					foreach (var stage in CookStages) {
+					var profileCookStages = cookStages
+						.Where(kv => kv.Value.Contains(cookingProfile))
+						.Select(kv => kv.Key);
+					foreach (var stage in profileCookStages) {
 						stage();
 					}
 				}
@@ -162,20 +199,20 @@ namespace Orange
 		static AssetCooker()
 		{
 			AddStage(SyncModels);
-			AddStage(SyncAtlases);
-			AddStage(SyncDeleted);
+			AddStage(SyncAtlases, CookingProfile.Total);
+			AddStage(SyncDeleted, CookingProfile.Total);
 			AddStage(() => SyncRawAssets(".json", AssetAttributes.ZippedDeflate));
 			AddStage(() => SyncRawAssets(".txt", AssetAttributes.ZippedDeflate));
 			AddStage(() => SyncRawAssets(".csv", AssetAttributes.ZippedDeflate));
-			string rawAssetExtensions = The.Workspace.ProjectJson["RawAssetExtensions"] as string;
+			var rawAssetExtensions = The.Workspace.ProjectJson["RawAssetExtensions"] as string;
 			if (rawAssetExtensions != null) {
 				foreach (var extension in rawAssetExtensions.Split(' ')) {
 					AddStage(() => SyncRawAssets(extension, AssetAttributes.ZippedDeflate));
 				}
 			}
-			AddStage(SyncTextures);
-			AddStage(DeleteOrphanedMasks);
-			AddStage(DeleteOrphanedTextureParams);
+			AddStage(SyncTextures, CookingProfile.Total);
+			AddStage(DeleteOrphanedMasks, CookingProfile.Total);
+			AddStage(DeleteOrphanedTextureParams, CookingProfile.Total);
 			AddStage(SyncFonts);
 			AddStage(SyncHotFonts);
 			AddStage(() => SyncRawAssets(".ttf"));
@@ -187,7 +224,7 @@ namespace Orange
 			AddStage(() => SyncRawAssets(".shader"));
 			AddStage(() => SyncRawAssets(".xml"));
 			AddStage(() => SyncRawAssets(".raw"));
-			AddStage(WarnAboutNPOTTextures);
+			AddStage(WarnAboutNPOTTextures, CookingProfile.Total);
 			AddStage(() => SyncRawAssets(".bin"));
 		}
 

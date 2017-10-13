@@ -140,8 +140,8 @@ namespace Tangerine.Core
 			var camera = new Camera3D {
 				Id = "DefaultCamera",
 				Position = new Vector3(0, 0, 10),
-				FarClipPlane = 10000,
-				NearClipPlane = 0.001f,
+				FarClipPlane = 1000,
+				NearClipPlane = 0.01f,
 				FieldOfView = 1.0f,
 				AspectRatio = 1.3f,
 				OrthographicSize = 1.0f
@@ -233,7 +233,8 @@ namespace Tangerine.Core
 			if (!string.IsNullOrEmpty(node.ContentsPath)) {
 				var doc = Project.Current.Documents.FirstOrDefault(i => i.Path == node.ContentsPath);
 				if (doc != null && doc.IsModified) {
-					node.ReplaceContent(doc.RootNode.Clone());
+					var docRootNode = doc.RootNode is Viewport3D ? doc.RootNode.Nodes[0] : doc.RootNode;
+					node.ReplaceContent(docRootNode.Clone());
 				} else {
 					node.LoadExternalScenes();
 				}
