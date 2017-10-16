@@ -41,6 +41,7 @@ namespace Tangerine.UI.FilesystemView
 		private FilesystemItem lastKeyboardRangeSelectionEndFilesystemItem;
 		private Vector2 dragStartPosition;
 		private Vector2 dragEndPosition;
+		private Selection savedSelection;
 
 		public void Split(SplitterType type)
 		{
@@ -275,9 +276,23 @@ namespace Tangerine.UI.FilesystemView
 				var ic = n as FilesystemItem;
 				var r1 = new Rectangle(ic.Position, ic.Position + ic.Size);
 				if (Rectangle.Intersect(r0, r1) != Rectangle.Empty) {
-					selection.Select(ic.FilesystemPath);
+					if (savedSelection != null) {
+						if (savedSelection.Contains(ic.FilesystemPath)) {
+							selection.Deselect(ic.FilesystemPath);
+						} else {
+							selection.Select(ic.FilesystemPath);
+						}
+					} else {
+						selection.Select(ic.FilesystemPath);
+					}
 				} else {
-					if (selection.Contains(ic.FilesystemPath) && !scrollView.Input.IsKeyPressed(Key.Shift)) {
+					if (savedSelection != null) {
+						if (savedSelection.Contains(ic.FilesystemPath)) {
+							selection.Select(ic.FilesystemPath);
+						} else {
+							selection.Deselect(ic.FilesystemPath);
+						}
+					} else if (selection.Contains(ic.FilesystemPath) && !scrollView.Input.IsKeyPressed(Key.Shift)) {
 						selection.Deselect(ic.FilesystemPath);
 					}
 				}
@@ -403,6 +418,11 @@ namespace Tangerine.UI.FilesystemView
 				} else if (input.IsKeyPressed(Key.Mouse0)) {
 					if ((scrollView.Content.LocalMousePosition() - dragStartPosition).Length > 6.0f) {
 						dragState = DragState.Selecting;
+						if (input.IsKeyPressed(Key.Control)) {
+							savedSelection = selection.Clone();
+						} else {
+							savedSelection = null;
+						}
 					}
 				}
 				break;
@@ -417,6 +437,7 @@ namespace Tangerine.UI.FilesystemView
 
 		private void ProcessInputOverFSItem()
 		{
+			// TODO: Ctrl + Shift, Shift clicks
 			var nodeUnderMouse = WidgetContext.Current.NodeUnderMouse;
 			if (
 				nodeUnderMouse == null ||
@@ -461,7 +482,6 @@ namespace Tangerine.UI.FilesystemView
 					} else {
 						selection.Select(path);
 					}
-					// TODO: Ctrl + Shift, Shift clicks
 				} else {
 					if (selection.Contains(path)) {
 						dragState = DragState.WaitingForDragging;
