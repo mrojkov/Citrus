@@ -144,7 +144,6 @@ namespace Tangerine.UI.FilesystemView
 			foreach (var n in RootWidget.Descendants) {
 				var w = n.AsWidget;
 				if (w.TabTravesable != null) {
-					w.CompoundPostPresenter.Add(new Theme.KeyboardFocusBorderPresenter(2.0f));
 					w.HitTestTarget = true;
 				}
 			}
