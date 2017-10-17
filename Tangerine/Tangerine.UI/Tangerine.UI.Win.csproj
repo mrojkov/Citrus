@@ -69,6 +69,7 @@
     <Compile Include="Utils\Utils.cs" />
     <Compile Include="PropertyEditor.cs" />
     <Compile Include="DocumentCommandHandler.cs" />
+    <Compile Include="Widgets\ListWidget.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Win.csproj">
