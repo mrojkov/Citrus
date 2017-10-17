@@ -76,10 +76,10 @@ namespace Tangerine
 			okButton.SetFocus();
 		}
 
-		internal class OverlayRowView : Widget
+		internal class RulerRowView : Widget
 		{
 			private ThemedSimpleText Label;
-			private ThemedTabCloseButton CloseButton;
+			private ThemedDeleteButton deleteButton;
 			private static IPresenter StripePresenter = new DelegatePresenter<Widget>(
 				w => {
 					if (w.Parent != null) {
@@ -90,23 +90,21 @@ namespace Tangerine
 					}
 				});
 
-			public OverlayRowView(RulerData overlay, IList<RulerData> overlays) : base()
+			public RulerRowView(RulerData overlay, IList<RulerData> overlays) : base()
 			{
-				LayoutCell = new LayoutCell { StretchY = 0, RowSpan = 5 };
-				Layout = new HBoxLayout() { Spacing = 5, IgnoreHidden = true };
+				Layout = new HBoxLayout();
 				Nodes.Add(Label = new ThemedSimpleText {
-					LayoutCell = new LayoutCell(Alignment.LeftTop) { StretchY = 0 },
 					Padding = new Thickness { Left = 10 },
 				});
 				this.AddChangeWatcher(() => overlay.Name, (name) => Label.Text = name);
 				Nodes.Add(new Widget());
-				Nodes.Add(CloseButton = new ThemedTabCloseButton {
+				Nodes.Add(deleteButton = new ThemedDeleteButton {
 					Anchors = Anchors.Right,
 					LayoutCell = new LayoutCell(Alignment.LeftTop)
 				});
 				CompoundPresenter.Add(StripePresenter);
-				CloseButton.Clicked = () => overlays.Remove(overlay);
-				MinMaxHeight = 15;
+				deleteButton.Clicked = () => overlays.Remove(overlay);
+				MinMaxHeight = 20;
 			}
 		}
 	}
