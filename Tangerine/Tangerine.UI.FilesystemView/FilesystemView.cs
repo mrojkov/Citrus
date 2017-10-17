@@ -312,8 +312,15 @@ namespace Tangerine.UI.FilesystemView
 				ProcessTypingNavigation();
 				ProcessOtherCommands();
 				ProcessSelectionCommands();
+				foreach (var c in printableKeysCommands) {
+					c.Consume();
+				}
 			}
 		}
+
+		private static readonly List<Command> printableKeysCommands =
+				Key.Enumerate().Where(k => k.IsPrintable()).Select(i => new Command(i)).Union(
+					Key.Enumerate().Where(k => k.IsPrintable()).Select(i => new Command(new Shortcut(Modifiers.Shift, i)))).ToList();
 
 		private void ProcessOtherCommands()
 		{
