@@ -19,6 +19,8 @@ namespace Lime
 	{
 		public double Duration;
 
+		public double DurationInFrames => AnimationUtils.SecondsToFrames(Duration);
+
 		public BlendingOption() { }
 
 		public BlendingOption(double duration)

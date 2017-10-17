@@ -10,6 +10,7 @@ namespace Tangerine.UI
 		{
 			var presenter = new ExpandButtonPresenter();
 			Presenter = presenter;
+			LayoutCell = new LayoutCell() { Alignment = Alignment.Center };
 			DefaultAnimation.AnimationEngine = new AnimationEngineDelegate {
 				OnRunAnimation = (animation, markerId) => {
 					presenter.SetState(markerId);
@@ -51,14 +52,16 @@ namespace Tangerine.UI
 			protected override void InternalRender(ThemedExpandButton widget)
 			{
 				widget.PrepareRendererState();
+				var pos = widget.ContentPosition;
+				var size = widget.ContentSize;
 				if (widget.Expanded) {
-					vertices[0] = new Vertex { Pos = Vector2.Zero, Color = innerGradient.A };
-					vertices[1] = new Vertex { Pos = new Vector2(widget.Size.X, 0), Color = innerGradient.A };
-					vertices[2] = new Vertex { Pos = new Vector2(widget.Size.X / 2, widget.Size.Y), Color = innerGradient.B };
+					vertices[0] = new Vertex { Pos = pos, Color = innerGradient.A };
+					vertices[1] = new Vertex { Pos = new Vector2(pos.X + size.X, pos.Y), Color = innerGradient.A };
+					vertices[2] = new Vertex { Pos = new Vector2(pos.X + size.X / 2, pos.Y + size.Y), Color = innerGradient.B };
 				} else {
-					vertices[0] = new Vertex { Pos = Vector2.Zero, Color = innerGradient.A };
-					vertices[1] = new Vertex { Pos = new Vector2(0, widget.Size.Y), Color = innerGradient.A };
-					vertices[2] = new Vertex { Pos = new Vector2(widget.Size.X, widget.Size.Y / 2), Color = innerGradient.B };
+					vertices[0] = new Vertex { Pos = pos, Color = innerGradient.A };
+					vertices[1] = new Vertex { Pos = new Vector2(pos.X, pos.Y + size.Y), Color = innerGradient.A };
+					vertices[2] = new Vertex { Pos = new Vector2(pos.X + size.X, pos.Y + size.Y / 2), Color = innerGradient.B };
 				}
 				Renderer.DrawTriangleFan(null, null, vertices, vertices.Length);
 			}

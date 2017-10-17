@@ -268,7 +268,16 @@ namespace Tangerine.UI.Timeline.Components
 						CreateColorCommand("Gray", 7),
 				}))
 			};
+			if (nodeData.Node is Model3D) {
+				menu.Insert(0, new Command("Edit Attachment Properties", DisplayAttachmentDialog));
+			}
+
 			menu.Popup();
+		}
+
+		private void DisplayAttachmentDialog()
+		{
+			new AttachmentDialog(nodeData.Node as Model3D);
 		}
 
 		private ICommand CreateColorCommand(string title, int index)

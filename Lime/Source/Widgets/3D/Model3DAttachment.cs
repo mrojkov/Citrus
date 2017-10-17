@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using Yuzu;
@@ -10,36 +12,54 @@ namespace Lime
 		public const string FileExtension = ".Attachment.txt";
 		public const string DefaultAnimationName = "Default";
 
-		public readonly List<MeshOption> MeshOptions = new List<MeshOption>();
-		public readonly List<Animation> Animations = new List<Animation>();
-		public readonly List<MaterialEffect> MaterialEffects = new List<MaterialEffect>();
-		public float ScaleFactor;
+		public readonly ObservableCollection<MeshOption> MeshOptions = new ObservableCollection<MeshOption>();
+		public readonly ObservableCollection<Animation> Animations = new ObservableCollection<Animation>();
+		public readonly ObservableCollection<MaterialEffect> MaterialEffects = new ObservableCollection<MaterialEffect>();
+		public float ScaleFactor { get; set; }
 
 		public class MeshOption
 		{
-			public string Id;
-			public bool HitTestTarget;
-			public CullMode? CullMode;
+			public string Id { get; set; }
+			public bool HitTestTarget { get; set; }
+			public CullMode CullMode { get; set; }
 		}
 
 		public class Animation
 		{
-			public string Name;
-			public int StartFrame;
-			public int LastFrame;
-			public List<Marker> Markers = new List<Marker>();
-			public List<string> Nodes = new List<string>();
-			public List<string> IgnoredNodes = new List<string>();
-			public BlendingOption Blending;
-			public readonly Dictionary<string, MarkerBlending> MarkersBlendings = new Dictionary<string, MarkerBlending>();
+			public string Name { get; set; }
+			public int StartFrame { get; set; }
+			public int LastFrame { get; set; }
+			public ObservableCollection<MarkerData> Markers = new ObservableCollection<MarkerData>();
+			public ObservableCollection<NodeData> Nodes = new ObservableCollection<NodeData>();
+			public ObservableCollection<NodeData> IgnoredNodes = new ObservableCollection<NodeData>();
+			public BlendingOption Blending { get; set; } = new BlendingOption();
+			public readonly ObservableCollection<MarkerBlendingData> MarkersBlendings = new ObservableCollection<MarkerBlendingData>();
+		}
+
+		public class NodeData
+		{
+			public string Id { get; set; }
+		}
+
+		public class MarkerData
+		{
+			public Marker Marker { get; set; }
+			public BlendingOption Blending { get; set; } = new BlendingOption();
+		}
+
+		public class MarkerBlendingData
+		{
+			public string SourceMarkerId { get; set; }
+			public string DestMarkerId { get; set; }
+			public BlendingOption Blending { get; set; } = new BlendingOption();
 		}
 
 		public class MaterialEffect
 		{
-			public string Name;
-			public string MaterialName;
-			public string Path;
-			public BlendingOption Blending;
+			public string Name { get; set; }
+			public string MaterialName { get; set; }
+			public string Path { get; set; }
+			public BlendingOption Blending { get; set; } = new BlendingOption();
 		}
 
 		public void Apply(Node3D model)
@@ -111,9 +131,7 @@ namespace Lime
 						mesh.HitTestTarget = true;
 						mesh.SkipRender = true;
 					}
-					if (meshOption.CullMode.HasValue) {
-						mesh.CullMode = meshOption.CullMode.Value;
-					}
+					mesh.CullMode = meshOption.CullMode;
 					break;
 				}
 			}
@@ -138,7 +156,7 @@ namespace Lime
 				}
 
 				foreach (var markerData in animationData.Markers) {
-					animation.Markers.AddOrdered(markerData.Clone());
+					animation.Markers.AddOrdered(markerData.Marker.Clone());
 				}
 
 				if (animationData.Blending != null || animationData.MarkersBlendings.Count > 0) {
@@ -150,7 +168,13 @@ namespace Lime
 					};
 					if (animationData.MarkersBlendings.Count > 0) {
 						foreach (var markersBlendings in animationData.MarkersBlendings) {
-							animationBlending.MarkersOptions.Add(markersBlendings.Key, markersBlendings.Value);
+							if (!animationBlending.MarkersOptions.ContainsKey(markersBlendings.DestMarkerId)) {
+								animationBlending.MarkersOptions.Add(markersBlendings.DestMarkerId, new MarkerBlending {
+									Option = markersBlendings.Blending,
+								});
+							}
+							animationBlending.MarkersOptions[markersBlendings.DestMarkerId].SourceMarkersOptions
+								.Add(markersBlendings.SourceMarkerId, markersBlendings.Blending);
 						}
 					}
 					blender.Options.Add(animation.Id ?? "", animationBlending);
@@ -162,28 +186,32 @@ namespace Lime
 		{
 			var effectEngine = new MaterialEffectEngine();
 			foreach (var effect in MaterialEffects) {
-				var effectPresenter = new MaterialEffectPresenter(effect.MaterialName, effect.Name, effect.Path);
-				model.CompoundPresenter.Add(effectPresenter);
+				try {
+					var effectPresenter = new MaterialEffectPresenter(effect.MaterialName, effect.Name, effect.Path);
+					model.CompoundPresenter.Add(effectPresenter);
 
-				if (effect.Blending != null) {
-					effectPresenter.Animation.AnimationEngine = BlendAnimationEngine.Instance;
-					var blender = effectPresenter.Scene.Components.GetOrAdd<AnimationBlender>();
-					var animationBlending = new AnimationBlending() {
-						Option = effect.Blending
+					if (effect.Blending != null) {
+						effectPresenter.Animation.AnimationEngine = BlendAnimationEngine.Instance;
+						var blender = effectPresenter.Scene.Components.GetOrAdd<AnimationBlender>();
+						var animationBlending = new AnimationBlending() {
+							Option = effect.Blending
+						};
+						blender.Options.Add(effectPresenter.Animation.Id ?? "", animationBlending);
+					}
+
+					var animation = new Lime.Animation {
+						Id = effect.Name,
+						AnimationEngine = effectEngine
 					};
-					blender.Options.Add(effectPresenter.Animation.Id ?? "", animationBlending);
+
+					foreach (var marker in effectPresenter.Animation.Markers) {
+						animation.Markers.Add(marker.Clone());
+					}
+
+					model.Animations.Add(animation);
+				} catch {
+					Console.WriteLine($"Warning: Unable to load material effect { effect.Path }");
 				}
-
-				var animation = new Lime.Animation {
-					Id = effect.Name,
-					AnimationEngine = effectEngine
-				};
-
-				foreach (var marker in effectPresenter.Animation.Markers) {
-					animation.Markers.Add(marker.Clone());
-				}
-
-				model.Animations.Add(animation);
 			}
 		}
 
@@ -200,10 +228,10 @@ namespace Lime
 		private IEnumerable<Node> GetAnimationNodes(Node3D model, Animation animationData)
 		{
 			if (animationData.Nodes.Count > 0) {
-				return animationData.Nodes.Distinct().Select(model.FindNode);
+				return animationData.Nodes.Distinct().Select(n => model.FindNode(n.Id));
 			}
 			if (animationData.IgnoredNodes.Count > 0) {
-				var ignoredNodes = new HashSet<Node>(animationData.IgnoredNodes.Select(model.FindNode));
+				var ignoredNodes = new HashSet<Node>(animationData.IgnoredNodes.Select(n => model.FindNode(n.Id)));
 				return model.Descendants.Where(i => !ignoredNodes.Contains(i));
 			}
 			return model.Descendants;
@@ -318,7 +346,7 @@ namespace Lime
 			public string JumpTarget = null;
 
 			[YuzuOptional]
-			public readonly Dictionary<string, int> SourceMarkersBlending = null;
+			public Dictionary<string, int> SourceMarkersBlending = null;
 
 			[YuzuOptional]
 			public int Blending = 0;
@@ -393,47 +421,40 @@ namespace Lime
 
 						if (animationFormat.Value.Markers != null) {
 							foreach (var markerFormat in animationFormat.Value.Markers) {
-								var marker = new Marker {
-									Id = markerFormat.Key,
-									Frame = FixFrame(markerFormat.Value.Frame)
+								var markerData = new Model3DAttachment.MarkerData {
+									Marker = new Marker {
+										Id = markerFormat.Key,
+										Frame = FixFrame(markerFormat.Value.Frame)
+									}
 								};
 								if (!string.IsNullOrEmpty(markerFormat.Value.Action)) {
 									switch (markerFormat.Value.Action) {
 										case "Start":
-											marker.Action = MarkerAction.Play;
+											markerData.Marker.Action = MarkerAction.Play;
 											break;
 										case "Stop":
-											marker.Action = MarkerAction.Stop;
+											markerData.Marker.Action = MarkerAction.Stop;
 											break;
 										case "Jump":
-											marker.Action = MarkerAction.Jump;
-											marker.JumpTo = markerFormat.Value.JumpTarget;
+											markerData.Marker.Action = MarkerAction.Jump;
+											markerData.Marker.JumpTo = markerFormat.Value.JumpTarget;
 											break;
 									}
 								}
 								if (markerFormat.Value.Blending > 0) {
-									var markerBlending = new MarkerBlending() {
-										Option = new BlendingOption(markerFormat.Value.Blending)
-									};
-									animation.MarkersBlendings.Add(markerFormat.Key, markerBlending);
+									markerData.Blending = new BlendingOption(markerFormat.Value.Blending);
 								}
 								if (markerFormat.Value.SourceMarkersBlending != null) {
-									MarkerBlending markerBlending;
-									animation.MarkersBlendings.TryGetValue(markerFormat.Key, out markerBlending);
-									if (markerBlending == null) {
-										markerBlending = new MarkerBlending();
-										animation.MarkersBlendings.Add(markerFormat.Key, markerBlending);
-									}
-
-									foreach (var sourceMarkerFormat in markerFormat.Value.SourceMarkersBlending) {
-										markerBlending.SourceMarkersOptions.Add(
-											sourceMarkerFormat.Key,
-											new BlendingOption(sourceMarkerFormat.Value)
-										);
+									foreach (var elem in markerFormat.Value.SourceMarkersBlending) {
+										animation.MarkersBlendings.Add(new Model3DAttachment.MarkerBlendingData {
+											DestMarkerId = markerFormat.Key,
+											SourceMarkerId = elem.Key,
+											Blending = new BlendingOption(elem.Value),
+										});
 									}
 								}
 
-								animation.Markers.Add(marker);
+								animation.Markers.Add(markerData);
 							}
 						}
 
@@ -442,14 +463,16 @@ namespace Lime
 						}
 
 						if (animationFormat.Value.Nodes != null) {
-							animation.Nodes = animationFormat.Value.Nodes;
+							animation.Nodes = new ObservableCollection<Model3DAttachment.NodeData>(
+								animationFormat.Value.Nodes.Select(n => new Model3DAttachment.NodeData { Id = n }));
 						}
 
 						if (animationFormat.Value.IgnoredNodes != null && animationFormat.Value.IgnoredNodes.Count > 0) {
 							if (animation.Nodes.Count > 0) {
 								throw new Exception("Conflict between 'Nodes' and 'IgnoredNodes' in animation '{0}", animation.Name);
 							}
-							animation.IgnoredNodes = animationFormat.Value.IgnoredNodes;
+							animation.IgnoredNodes = new ObservableCollection<Model3DAttachment.NodeData>(
+								animationFormat.Value.IgnoredNodes.Select(n => new Model3DAttachment.NodeData { Id = n }));
 						}
 
 						attachment.Animations.Add(animation);
@@ -474,6 +497,101 @@ namespace Lime
 			} catch (System.Exception e) {
 				throw new System.Exception(modelPath + ": " + e.Message, e);
 			}
+		}
+
+		public static void Save(Model3DAttachment attachment, string path)
+		{
+			var attachmentPath = path + ".Attachment.txt";
+			Serialization.WriteObjectToFile(attachmentPath, CreateFromModel3DAttachment(attachment), Serialization.Format.JSON);
+		}
+
+		private static ModelAttachmentFormat CreateFromModel3DAttachment(Model3DAttachment attachment)
+		{
+			var origin = new ModelAttachmentFormat();
+			origin.ScaleFactor = attachment.ScaleFactor;
+			if (attachment.MeshOptions.Count > 0) {
+				origin.MeshOptions = new Dictionary<string, MeshOptionFormat>();
+			}
+			if (attachment.Animations.Count > 0) {
+				origin.Animations = new Dictionary<string, ModelAnimationFormat>();
+			}
+			if (attachment.MaterialEffects.Count > 0) {
+				origin.MaterialEffects = new Dictionary<string, ModelMaterialEffectFormat>();
+			}
+			foreach (var meshOption in attachment.MeshOptions) {
+				var meshOptionFormat = new MeshOptionFormat {
+					HitTestTarget = meshOption.HitTestTarget,
+				};
+				switch (meshOption.CullMode) {
+					case CullMode.None:
+						meshOptionFormat.CullMode = "None";
+						break;
+					case CullMode.CullClockwise:
+						meshOptionFormat.CullMode = "CullClockwise";
+						break;
+					case CullMode.CullCounterClockwise:
+						meshOptionFormat.CullMode = "CullCounterClockwise";
+						break;
+				}
+				origin.MeshOptions.Add(meshOption.Id, meshOptionFormat);
+			}
+
+			foreach (var animation in attachment.Animations) {
+				var animationFormat = new ModelAnimationFormat {
+					LastFrame = animation.LastFrame,
+					StartFrame = animation.StartFrame,
+					Markers = new Dictionary<string, ModelMarkerFormat>(),
+				};
+				foreach (var markerData in animation.Markers) {
+					var markerFormat = new ModelMarkerFormat {
+						Frame = markerData.Marker.Frame
+					};
+					switch (markerData.Marker.Action) {
+						case MarkerAction.Play:
+							markerFormat.Action = "Start";
+							break;
+						case MarkerAction.Stop:
+							markerFormat.Action = "Stop";
+							break;
+						case MarkerAction.Jump:
+							markerFormat.Action = "Jump";
+							markerFormat.JumpTarget = markerData.Marker.JumpTo;
+							break;
+					}
+					if (animation.MarkersBlendings.Count > 0) {
+						markerFormat.SourceMarkersBlending = new Dictionary<string, int>();
+						foreach (var markerBlending in animation.MarkersBlendings.Where(m => m.DestMarkerId == markerData.Marker.Id)) {
+							markerFormat.SourceMarkersBlending.Add(markerBlending.SourceMarkerId, (int)markerBlending.Blending.DurationInFrames);
+						}
+					}
+					animationFormat.Markers.Add(markerData.Marker.Id, markerFormat);
+				}
+
+				if (animation.Blending.Duration > 0) {
+					animationFormat.Blending = (int)animation.Blending.DurationInFrames;
+				}
+
+				if (animation.Nodes.Count > 0) {
+					animationFormat.Nodes = animation.Nodes.Count > 0 ? animation.Nodes.Select(n => n.Id).ToList() : null;
+				} else if (animation.IgnoredNodes.Count > 0) {
+					animationFormat.IgnoredNodes = animation.IgnoredNodes.Select(n => n.Id).ToList();
+				}
+				origin.Animations.Add(animation.Name, animationFormat);
+			}
+
+			foreach (var materialEffect in attachment.MaterialEffects) {
+				var name = materialEffect.Path.Split('/');
+				var materialEffectFormat = new ModelMaterialEffectFormat {
+					Path = name.Last(),
+					MaterialName = materialEffect.Name,
+				};
+				if (materialEffect.Blending != null) {
+					materialEffectFormat.Blending = (int)materialEffect.Blending.Duration;
+				}
+				origin.MaterialEffects.Add(materialEffect.Name, materialEffectFormat);
+			}
+
+			return origin;
 		}
 
 		private static string FixPath(string modelPath, string path)

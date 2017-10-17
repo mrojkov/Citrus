@@ -87,6 +87,8 @@
     <Compile Include="ColorPicker.Mac.cs" />
     <Compile Include="ThemedExpandButton.cs" />
     <Compile Include="Widgets\ListWidget.cs" />
+    <Compile Include="Dialogs\AttachmentDialog.cs" />
+    <Compile Include="Widgets\ThemedButtons.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>
