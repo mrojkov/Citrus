@@ -174,7 +174,10 @@ namespace Tangerine.UI.Inspector
 		private void DecoratePropertyEditor(IPropertyEditor editor, int row)
 		{
 			var ctr = editor.ContainerWidget;
-			ctr.Nodes.Insert(0, new HSpacer(20));
+			if (!typeof(Color4PropertyEditor).IsInstanceOfType(editor) && !typeof(SkinningWeightsPropertyEditor).IsInstanceOfType(editor)) {
+				ctr.Nodes.Insert(0, new HSpacer(20));
+			}
+
 			var index = ctr.Nodes.Count() - 1;
 			if (PropertyAttributes<TangerineStaticPropertyAttribute>.Get(editor.EditorParams.PropertyInfo) == null) {
 				var keyFunctionButton = new KeyFunctionButton {

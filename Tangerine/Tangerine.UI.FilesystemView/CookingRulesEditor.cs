@@ -440,16 +440,14 @@ namespace Tangerine.UI.FilesystemView
 
 		private static Widget CreateFoldButton(Widget container)
 		{
-			ToolbarButton b = null;
-			b = new ToolbarButton(IconPool.GetTexture("Filesystem.Folded")) {
+			var b = new ThemedExpandButton {
 				Size = Vector2.One * RowHeight,
 				MinMaxSize = Vector2.One * RowHeight,
 				Padding = Thickness.Zero,
 				Highlightable = false,
-				Clicked = () => {
-					container.Visible = !container.Visible;
-					b.Texture = IconPool.GetTexture(container.Visible ? "Filesystem.Unfolded" : "Filesystem.Folded");
-				}
+			};
+			b.Clicked = () => {
+				container.Visible = !container.Visible;
 			};
 			b.Updated += (dt) => {
 				b.Visible = container.Nodes.Count != 0;

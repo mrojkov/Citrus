@@ -90,7 +90,7 @@ namespace Tangerine.UI
 			}
 		}
 		public Widget ExpandableContent { get; }
-		public ThemedExpandButton ExpandButton { get; }
+		private ThemedExpandButton ExpandButton { get; }
 
 		public ExpandablePropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
@@ -99,15 +99,13 @@ namespace Tangerine.UI
 				Layout = new VBoxLayout(),
 				Visible = false
 			};
-			ExpandButton = new ThemedExpandButton { MinMaxHeight = 8, MinMaxWidth = 8 };
+			ExpandButton = new ThemedExpandButton {
+				Anchors = Anchors.Left,
+				MinMaxSize = Vector2.One * 20f,
+			};
 			ExpandButton.Clicked += () => Expanded = !Expanded;
 			editorParams.InspectorPane.AddNode(ExpandableContent);
-			ContainerWidget.Nodes.Insert(0, new Widget {
-				Padding = new Thickness(5, 9) { Left = -15 },
-				Anchors = Anchors.Center,
-				Layout = new VBoxLayout {DefaultCell = new LayoutCell(Alignment.Center)},
-				Nodes = { ExpandButton }
-			});
+			ContainerWidget.Nodes.Insert(0, ExpandButton);
 		}
 	}
 
@@ -126,8 +124,7 @@ namespace Tangerine.UI
 			};
 			editorParams.InspectorPane.AddNode(ContainerWidget);
 			if (editorParams.ShowLabel) {
-				PropertyLabel = new ThemedSimpleText
-				{
+				PropertyLabel = new ThemedSimpleText {
 					Text = editorParams.DisplayName ?? editorParams.PropertyName,
 					VAlignment = VAlignment.Center,
 					LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0),
@@ -996,7 +993,7 @@ namespace Tangerine.UI
 				foreach (var obj in editorParams.Objects) {
 					var prop = new Property<SkinningWeights>(obj, editorParams.PropertyName).Value.Clone();
 					prop[idx] = new BoneWeight {
-						Index = (int) newValue,
+						Index = (int)newValue,
 						Weight = prop[idx].Weight
 					};
 					editorParams.PropertySetter(obj, editorParams.PropertyName, prop);
@@ -1024,7 +1021,7 @@ namespace Tangerine.UI
 		}
 	}
 
-	public class RenderTargetPropertyEditor :  EnumPropertyEditor<RenderTarget>
+	public class RenderTargetPropertyEditor : EnumPropertyEditor<RenderTarget>
 	{
 		private const string SmallTexDesc = " (256x256)";
 		private const string MiddleTexDesc = " (512x512)";

@@ -2,6 +2,37 @@
 
 namespace Tangerine.UI
 {
+	public class ThemedExpandButton : ToolbarButton
+	{
+		private bool expanded;
+		public bool Expanded
+		{
+			get
+			{
+				return expanded;
+			}
+
+			set
+			{
+				if (expanded != value) {
+					expanded = value;
+					Texture = IconPool.GetTexture(value ? "Filesystem.Unfolded" : "Filesystem.Folded");
+				}
+			}
+		}
+
+		public ThemedExpandButton() : base(IconPool.GetTexture("Filesystem.Folded"))
+		{
+			Highlightable = false;
+		}
+
+		protected override void HandleClick()
+		{
+			Expanded = !Expanded;
+			base.HandleClick();
+		}
+	}
+
 	public class ThemedDeleteButton : Button
 	{
 		public override bool IsNotDecorated() => false;
