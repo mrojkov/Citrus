@@ -33,6 +33,10 @@ namespace Tangerine.UI
 		PropertySetterDelegate PropertySetter { get; set; }
 	}
 
+	// Used to unify generic descendants of ExpandableProperty for type checking
+	public interface IExpandablePropertyEditor
+	{ }
+
 	public delegate void PropertySetterDelegate(object obj, string propertyName, object value);
 
 	public class PropertyEditorParams : IPropertyEditorParams
@@ -76,7 +80,7 @@ namespace Tangerine.UI
 		private void SetProperty(object obj, string propertyName, object value) => PropertyInfo.SetValue(obj, value);
 	}
 
-	public class ExpandablePropertyEditor<T> : CommonPropertyEditor<T>
+	public class ExpandablePropertyEditor<T> : CommonPropertyEditor<T>, IExpandablePropertyEditor
 	{
 		private bool expanded;
 		public bool Expanded

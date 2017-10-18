@@ -174,7 +174,7 @@ namespace Tangerine.UI.Inspector
 		private void DecoratePropertyEditor(IPropertyEditor editor, int row)
 		{
 			var ctr = editor.ContainerWidget;
-			if (!typeof(Color4PropertyEditor).IsInstanceOfType(editor) && !typeof(SkinningWeightsPropertyEditor).IsInstanceOfType(editor)) {
+			if (!(editor is IExpandablePropertyEditor)) {
 				ctr.Nodes.Insert(0, new HSpacer(20));
 			}
 
@@ -195,7 +195,7 @@ namespace Tangerine.UI.Inspector
 				ctr.Tasks.Add(new KeyframeButtonBinding(editor.EditorParams, keyframeButton));
 				ctr.Tasks.Add(new KeyFunctionButtonBinding(editor.EditorParams, keyFunctionButton));
 			} else {
-				ctr.Nodes.Insert(++index, new HSpacer(42));
+				ctr.Nodes.Insert(2, new HSpacer(42));
 			}
 			editor.ContainerWidget.Padding = new Thickness { Left = 4, Top = 1, Right = 12, Bottom = 1 };
 			editor.ContainerWidget.CompoundPresenter.Add(new WidgetFlatFillPresenter(
