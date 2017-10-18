@@ -10,6 +10,11 @@ namespace Tangerine.UI.FilesystemView
 	{
 		public ThemedScrollView RootWidget;
 		private Selection savedSelection = new Selection();
+		// zoom, maxZoom for each element
+		private List<Tuple<int, int>> zoom = new List<Tuple<int, int>>();
+		private int maxZoom = zoomValues.Length - 1;
+		private static float[] zoomValues = { 1/32.0f, 1/24.0f, 1/16.0f, 1/12.0f, 1/8.0f, 1/6.0f, 1/4.0f, 1/3.0f, 1/2.0f, 1/1.5f,
+			1.0f, 1.5f, 2.0f, 3.0f, 4.0f, 6.0f, 8.0f, 12.0f, 16.0f, 24.0f, 32.0f };
 		// TODO: Clear Cache on fs navigation
 		private Dictionary<string, ITexture> textureCache = new Dictionary<string, ITexture>();
 
@@ -51,6 +56,47 @@ namespace Tangerine.UI.FilesystemView
 					-Vector2.Zero / ratio,
 					 (w.Size - Vector2.Zero) / ratio);
 			}));
+			RootWidget.Updated += (dt) => {
+				if (RootWidget.IsMouseOver()) {
+					if (!RootWidget.Input.IsKeyPressed(Key.Control)) {
+						return;
+					}
+					int zoomDelta = 0;
+					if (RootWidget.Input.WasKeyPressed(Key.MouseWheelUp)) {
+						zoomDelta = 1;
+					}
+					if (RootWidget.Input.WasKeyPressed(Key.MouseWheelDown)) {
+						zoomDelta = -1;
+					}
+					if (zoomDelta != 0) {
+						for (int i = 0; i < zoom.Count; i++) {
+							var z = zoom[i];
+							int newZoom = Mathf.Clamp(z.Item1 + zoomDelta, 0, z.Item2);
+							if (newZoom != z.Item1) {
+								zoom[i] = new Tuple<int, int>(newZoom, z.Item2);
+							}
+						}
+						ApplyZoom();
+					}
+				}
+			};
+		}
+
+		private void CalcZoomAndMaxZoom()
+		{
+			int identitiyZoom = zoomValues.ToList().IndexOf(1.0f);
+			zoom.Clear();
+			foreach (var n in RootWidget.Content.Nodes) {
+				var w = n.Nodes[0] as Widget;
+				var z = zoomValues.Length - 1;
+				while (z > 0 && w.MinSize.X * zoomValues[z] > RootWidget.Size.X) {
+					z--;
+				}
+				zoom.Add(new Tuple<int, int>(identitiyZoom > z ? z : identitiyZoom, z));
+				if (identitiyZoom > z) {
+					w.MinMaxSize = (Vector2)w.Texture.ImageSize * z;
+				}
+			}
 		}
 
 		public void Invalidate(Selection selection)
@@ -71,6 +117,7 @@ namespace Tangerine.UI.FilesystemView
 			foreach (var filename in selection) {
 				var pv = GeneratePreview(filename);
 				if (pv != null) {
+					pv.MinMaxSize = (Vector2)pv.Texture.ImageSize;
 					previews.Add(new Tuple<string, Image>(filename, pv));
 				}
 			}
@@ -90,6 +137,15 @@ namespace Tangerine.UI.FilesystemView
 						}
 					}
 				});
+			}
+			CalcZoomAndMaxZoom();
+		}
+
+		private void ApplyZoom()
+		{
+			for (int i = 0; i < RootWidget.Content.Nodes.Count; i++) {
+				var w = RootWidget.Content.Nodes[i].Nodes[0] as Widget;
+				w.MinMaxSize = (Vector2)w.Texture.ImageSize * zoomValues[zoom[i].Item1];
 			}
 		}
 
