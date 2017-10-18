@@ -50,9 +50,11 @@ namespace Tangerine
 				}
 			};
 			Container.Content.Layout = new VBoxLayout { Spacing = 4 };
-			Container.Content.AddNode(new ListWidget<RulerData>((w) => new RulerRowView(w, collection), collection) {
-				Layout = new VBoxLayout()
-			});
+			var list = new Widget {
+				Layout = new VBoxLayout(),
+			};
+			Container.Content.AddNode(list);
+			list.Components.Add(new WidgetFactoryComponent<RulerData>((w) => new RulerRowView(w, collection), collection));
 
 			okButton.Clicked += () => {
 				window.Close();

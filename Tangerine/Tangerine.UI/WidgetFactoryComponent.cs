@@ -1,0 +1,67 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Lime;
+
+namespace Tangerine.UI
+{
+	public class WidgetFactoryComponent<TItem> : NodeComponent
+	{
+		private Func<TItem, Widget> rowBuilder;
+		protected Widget Container { get; }
+		protected readonly Dictionary<TItem, Widget> widgetCache;
+
+		public WidgetFactoryComponent(Func<TItem, Widget> rowBuilder, ObservableCollection<TItem> source)
+		{
+			Source = source;
+			source.CollectionChanged += OnCollectionChanged;
+			this.rowBuilder = rowBuilder;
+			Container = new Widget { Layout = new VBoxLayout() };
+			widgetCache = new Dictionary<TItem, Widget>();
+			Rebuild();
+		}
+
+		protected override void OnOwnerChanged(Node oldOwner)
+		{
+			oldOwner?.Nodes.Clear();
+			Owner?.AddNode(Container);
+		}
+
+		protected void Rebuild()
+		{
+			widgetCache.Clear();
+			Container.Nodes.Clear();
+			foreach (var item in Source) {
+				var row = rowBuilder(item);
+				widgetCache.Add(item, row);
+				Container.AddNode(row);
+			}
+		}
+
+		protected virtual void OnCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+		{
+			int idx;
+			switch (e.Action) {
+				case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+					idx = e.NewStartingIndex;
+					foreach (TItem item in e.NewItems) {
+						var row = rowBuilder(item);
+						widgetCache.Add(item, row);
+						Container.Nodes.Insert(idx++, row);
+					}
+					break;
+				case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+					foreach (TItem item in e.OldItems) {
+						Container.Nodes.Remove(widgetCache[item]);
+						widgetCache.Remove(item);
+					}
+					break;
+			}
+		}
+
+		public ObservableCollection<TItem> Source { get; private set; }
+	}
+}

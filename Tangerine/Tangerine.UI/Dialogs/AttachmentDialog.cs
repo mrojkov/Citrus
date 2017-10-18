@@ -109,16 +109,20 @@ namespace Tangerine.UI
 					Right = 15,
 				},
 			};
-			pane.Content.Layout = new VBoxLayout { Spacing = AttachmentMetrics.Spacing };
-			pane.Content.AddNode(new ListWidget<Model3DAttachment.Animation>(w => new AnimationRow(w, attachment.Animations), attachment.Animations) {
+			var list = new Widget {
 				Layout = new VBoxLayout(),
-				Header = AnimationRow.CreateHeader(),
-				Footer = AnimationRow.CreateFooter(() => {
-					attachment.Animations.Add(new Model3DAttachment.Animation {
-						Name = "Animation",
-					});
-				})
-			});
+			};
+			pane.Content.Layout = new VBoxLayout { Spacing = AttachmentMetrics.Spacing };
+			pane.Content.AddNode(list);
+			var widgetFactory = new AttachmentWidgetFactory<Model3DAttachment.Animation>(
+					w => new AnimationRow(w, attachment.Animations), attachment.Animations);
+			widgetFactory.AddHeader(AnimationRow.CreateHeader());
+			widgetFactory.AddFooter(AnimationRow.CreateFooter(() => {
+				attachment.Animations.Add(new Model3DAttachment.Animation {
+					Name = "Animation",
+				});
+			}));
+			list.Components.Add(widgetFactory);
 			return pane;
 		}
 
@@ -129,18 +133,20 @@ namespace Tangerine.UI
 					Right = 15,
 				},
 			};
-			pane.Content.Layout = new VBoxLayout { Spacing = AttachmentMetrics.Spacing };
-			pane.Content.AddNode(new ListWidget<Model3DAttachment.MeshOption>(
-				w => new MeshRow(w, attachment.MeshOptions), attachment.MeshOptions) {
+			var list = new Widget {
 				Layout = new VBoxLayout(),
-				Header = MeshRow.CreateHeader(),
-				Footer = MeshRow.CreateFooter(
-					() => {
-						attachment.MeshOptions.Add(new Model3DAttachment.MeshOption {
-							Id = "MeshOption",
-						});
-					})
-			});
+			};
+			pane.Content.Layout = new VBoxLayout { Spacing = AttachmentMetrics.Spacing };
+			pane.Content.AddNode(list);
+			var widgetFactory = new AttachmentWidgetFactory<Model3DAttachment.MeshOption>(
+				w => new MeshRow(w, attachment.MeshOptions), attachment.MeshOptions);
+			widgetFactory.AddHeader(MeshRow.CreateHeader());
+			widgetFactory.AddFooter(MeshRow.CreateFooter(() => {
+				attachment.MeshOptions.Add(new Model3DAttachment.MeshOption {
+					Id = "MeshOption",
+				});
+			}));
+			list.Components.Add(widgetFactory);
 			return pane;
 		}
 
@@ -151,20 +157,22 @@ namespace Tangerine.UI
 					Right = 15,
 				},
 			};
-			pane.Content.Layout = new VBoxLayout { Spacing = AttachmentMetrics.Spacing };
-			pane.Content.AddNode(new ListWidget<Model3DAttachment.MaterialEffect>(
-				w => new MaterialEffectRow(w, attachment.MaterialEffects), attachment.MaterialEffects) {
+			var list = new Widget {
 				Layout = new VBoxLayout(),
-				Header = MaterialEffectRow.CreateHeader(),
-				Footer = DeletableRow<Model3DAttachment.MaterialEffect>.CreateFooter(
-					() => {
-						attachment.MaterialEffects.Add(new Model3DAttachment.MaterialEffect {
-							Name = "MaterialEffect",
-							MaterialName = "MaterialName",
-							Path = "MaterialPath",
-						});
-					})
-			});
+			};
+			pane.Content.Layout = new VBoxLayout { Spacing = AttachmentMetrics.Spacing };
+			pane.Content.AddNode(list);
+			var widgetFactory = new AttachmentWidgetFactory<Model3DAttachment.MaterialEffect>(
+					w => new MaterialEffectRow(w, attachment.MaterialEffects), attachment.MaterialEffects);
+			widgetFactory.AddHeader(MaterialEffectRow.CreateHeader());
+			widgetFactory.AddFooter(DeletableRow<Model3DAttachment.MaterialEffect>.CreateFooter(() => {
+				attachment.MaterialEffects.Add(new Model3DAttachment.MaterialEffect {
+					Name = "MaterialEffect",
+					MaterialName = "MaterialName",
+					Path = "MaterialPath",
+				});
+			}));
+			list.Components.Add(widgetFactory);
 			return pane;
 		}
 
@@ -391,7 +399,6 @@ namespace Tangerine.UI
 
 			private void BuildList<TData, TRow>(ObservableCollection<TData> source, Widget container, string title, Func<TData> activator, Widget header) where TRow : DeletableRow<TData>
 			{
-				Widget list;
 				ThemedExpandButton markersExpandButton;
 				container.AddNode(new Widget {
 					Layout = new HBoxLayout { Spacing = AttachmentMetrics.Spacing },
@@ -402,18 +409,24 @@ namespace Tangerine.UI
 						new ThemedSimpleText { Text = title },
 					}
 				});
-				container.AddNode(list = new ListWidget<TData>(
-					w => (TRow)Activator.CreateInstance(typeof(TRow), new object[] { w, source }), source) {
+				var list = new Widget {
 					Layout = new VBoxLayout(),
 					Padding = new Thickness {
 						Left = AttachmentMetrics.ExpandContentPadding,
 						Top = AttachmentMetrics.Spacing
 					},
-					Header = header,
-					Footer = DeletableRow<TData>.CreateFooter(() => {
-						source.Add(activator());
-					})
-				});
+				};
+				container.AddNode(list);
+				var widgetFactory = new AttachmentWidgetFactory<TData>(
+					w => (TRow)Activator.CreateInstance(typeof(TRow), new object[] { w, source }), source);
+				widgetFactory.AddHeader(header);
+				widgetFactory.AddFooter(DeletableRow<TData>.CreateFooter(() => {
+					source.Add(activator());
+				}));
+				list.Components.Add(widgetFactory);
+
+
+
 				this.AddChangeWatcher(() => markersExpandButton.Expanded, (e) => list.Visible = e);
 			}
 
@@ -554,10 +567,10 @@ namespace Tangerine.UI
 						nameof(Marker.Frame)) { ShowLabel = false });
 
 				var actionPropEditor = new EnumPropertyEditor<MarkerAction>(
-						new PropertyEditorParams(
-							Header,
-							Source.Marker,
-							nameof(Marker.Action)) { ShowLabel = false });
+					new PropertyEditorParams(
+						Header,
+						Source.Marker,
+						nameof(Marker.Action)) { ShowLabel = false });
 				actionPropEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.ControlWidth;
 
 				var jumpToPropEditor = new StringPropertyEditor(
@@ -696,6 +709,34 @@ namespace Tangerine.UI
 					}
 				};
 				editor.AddChangeWatcher(current, v => editor.Text = v?.DurationInFrames.ToString() ?? "0");
+			}
+		}
+
+		private class AttachmentWidgetFactory<T> : WidgetFactoryComponent<T>
+		{
+			public Widget wrapper;
+
+			public AttachmentWidgetFactory(Func<T, Widget> rowBuilder, ObservableCollection<T> source) : base(rowBuilder, source)
+			{
+				wrapper = new Widget {
+					Layout = new VBoxLayout(),
+					Nodes = { Container }
+				};
+			}
+
+			protected override void OnOwnerChanged(Node oldOwner)
+			{
+				Owner?.AddNode(wrapper);
+			}
+
+			public void AddHeader(Widget header)
+			{
+				wrapper.PushNode(header);
+			}
+
+			public void AddFooter(Widget footer)
+			{
+				wrapper.AddNode(footer);
 			}
 		}
 	}
