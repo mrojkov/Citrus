@@ -40,10 +40,9 @@ namespace Lime
 		{
 			var noClickRecognizersAnymore = false;
 			while (node != null) {
-				var collection = node.Components.Get<GestureRecognizerCollection>();
-				if (collection != null) {
+				if (node.HasGestureRecognizers()) {
 					var anyClickRecognizer = false;
-					foreach (var r in collection) {
+					foreach (var r in node.GestureRecognizers) {
 						if (r is MulticlickRecognizer && noClickRecognizersAnymore) {
 							continue;
 						}

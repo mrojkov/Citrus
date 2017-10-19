@@ -425,7 +425,9 @@ namespace Lime
 			++CreatedCount;
 		}
 
-		public GestureRecognizerCollection GestureRecognizers => Components.GetOrAdd<GestureRecognizerCollection>();
+		private GestureRecognizerCollection gestureRecognizers;
+		public GestureRecognizerCollection GestureRecognizers => gestureRecognizers ?? (gestureRecognizers = new GestureRecognizerCollection(this));
+		public bool HasGestureRecognizers() => gestureRecognizers != null;
 
 		public virtual bool IsNotDecorated() => true;
 
@@ -542,6 +544,7 @@ namespace Lime
 			++CreatedCount;
 			clone.Parent = null;
 			clone.NextSibling = null;
+			clone.gestureRecognizers = null;
 			clone.AsWidget = clone as Widget;
 			clone.Animations = Animations.Clone(clone);
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
@@ -1117,7 +1120,7 @@ namespace Lime
 				return false;
 			}
 			return
-				context.NodeMousePressedOn != null ? 
+				context.NodeMousePressedOn != null ?
 				context.NodeMousePressedOn == this : true;
 		}
 
@@ -1129,7 +1132,7 @@ namespace Lime
 				return false;
 			}
 			return
-				context.NodeMousePressedOn != null ? 
+				context.NodeMousePressedOn != null ?
 				context.NodeMousePressedOn.SameOrDescendantOf(this) : true;
 		}
 

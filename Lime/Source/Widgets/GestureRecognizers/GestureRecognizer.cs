@@ -7,7 +7,7 @@ namespace Lime
 {
 	public abstract class GestureRecognizer
 	{
-		public Node Owner { get; internal set; } 
+		public Node Owner { get; internal set; }
 		protected Input Input => CommonWindow.Current.Input;
 
 		internal protected abstract void Cancel();
@@ -32,19 +32,25 @@ namespace Lime
 		}
 	}
 
-	public class GestureRecognizerCollection : NodeComponent, ICollection<GestureRecognizer>
+	public class GestureRecognizerCollection : ICollection<GestureRecognizer>
 	{
 		private List<GestureRecognizer> gestures = new List<GestureRecognizer>();
 
 		public int Count => gestures.Count;
 		public bool IsReadOnly => false;
+		private Node owner;
+
+		public GestureRecognizerCollection(Node owner)
+		{
+			this.owner = owner;
+		}
 
 		public void Add(GestureRecognizer item)
 		{
 			if (item.Owner != null) {
 				throw new InvalidOperationException();
 			}
-			item.Owner = Owner;
+			item.Owner = owner;
 			gestures.Add(item);
 		}
 
@@ -63,14 +69,6 @@ namespace Lime
 		}
 
 		IEnumerator IEnumerable.GetEnumerator() => gestures.GetEnumerator();
-
-		/// <summary>
-		/// Clone this instance. Does not populate the clone with the gesture recognizers.
-		/// </summary>
-		public override NodeComponent Clone()
-		{
-			return new GestureRecognizerCollection();
-		}
 	}
 
 }
