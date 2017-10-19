@@ -109,7 +109,6 @@
     <Compile Include="Source\Graphics\Bitmap.Android.cs" />
     <Compile Include="Source\Widgets\Editor.cs" />
     <Compile Include="Source\Widgets\ListView\ExpandableListItem.cs" />
-    <Compile Include="Source\Widgets\ListView\ListView.ItemDrag.cs" />
     <Compile Include="Source\Widgets\ListView\ListView.RefreshGesture.cs" />
     <Compile Include="Source\Widgets\ListView\ListView.cs" />
     <Compile Include="Source\Widgets\ListView\ScrollView.SpeedMeter.cs" />
@@ -316,6 +315,10 @@
     <Compile Include="Source\Widgets\3D\ShadowMapping\DepthBuffer.cs" />
     <Compile Include="Source\Widgets\3D\ShadowMapping\DepthBufferProgram.cs" />
     <Compile Include="Source\Widgets\3D\ShadowMapping\DepthBufferRenderer.cs" />
+    <Compile Include="Source\Widgets\GestureRecognizers\ClickRecognizer.cs" />
+    <Compile Include="Source\Widgets\GestureRecognizers\DragRecognizer.cs" />
+    <Compile Include="Source\Widgets\GestureRecognizers\GestureRecognizer.cs" />
+    <Compile Include="Source\Widgets\GestureRecognizers\GestureRecognizerManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
