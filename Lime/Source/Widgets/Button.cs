@@ -38,8 +38,6 @@ namespace Lime
 		{
 			HitTestTarget = true;
 			Input.AcceptMouseBeyondWidget = false;
-			clickRecognizer = new ClickRecognizer();
-			GestureRecognizers.Add(clickRecognizer);
 		}
 
 		private IEnumerator<int> InitialState()
@@ -57,6 +55,8 @@ namespace Lime
 			// so delay its initialization until the next frame.
 			State = InitialState;
 			textPresentersFeeder = new TextPresentersFeeder(this);
+			clickRecognizer = new ClickRecognizer();
+			GestureRecognizers.Add(clickRecognizer);
 		}
 
 		private IEnumerator<int> NormalState()

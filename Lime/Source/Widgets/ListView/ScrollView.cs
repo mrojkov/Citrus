@@ -80,7 +80,6 @@ namespace Lime
 		}
 
 		private Task scrollingTask;
-		private DragRecognizer dragRecognizer;
 
 		public ScrollView(Frame frame, ScrollDirection scrollDirection = ScrollDirection.Vertical, bool processChildrenFirst = false)
 		{
@@ -91,8 +90,6 @@ namespace Lime
 			Frame.Input.AcceptMouseThroughDescendants = true;
 			Frame.HitTestTarget = true;
 			Frame.ClipChildren = ClipMethod.ScissorTest;
-			dragRecognizer = new DragRecognizer(0, (DragDirection)scrollDirection);
-			Frame.GestureRecognizers.Add(dragRecognizer);
 			CanScroll = true;
 			Content = CreateContentWidget();
 			Content.ScrollDirection = ScrollDirection;
@@ -249,13 +246,15 @@ namespace Lime
 
 		private IEnumerator<object> MainTask()
 		{
+			var dragRecognizer = new DragRecognizer(0, (DragDirection)ScrollDirection);
+			Frame.GestureRecognizers.Add(dragRecognizer);
 			while (true) {
 				if (dragRecognizer.WasBegan()) {
 					StopScrolling();
 					Vector2 mousePos = Input.MousePosition;
 					var velocityMeter = new VelocityMeter();
 					velocityMeter.AddSample(ScrollPosition);
-					yield return HandleDragTask(velocityMeter, ProjectToScrollAxisWithFrameRotation(mousePos));
+					yield return HandleDragTask(velocityMeter, ProjectToScrollAxisWithFrameRotation(mousePos), dragRecognizer);
 				}
 				Bounce();
 				yield return null;
@@ -328,7 +327,7 @@ namespace Lime
 			scrollingTask = null;
 		}
 
-		private IEnumerator<object> HandleDragTask(VelocityMeter velocityMeter, float mouseProjectedPosition)
+		private IEnumerator<object> HandleDragTask(VelocityMeter velocityMeter, float mouseProjectedPosition, DragRecognizer dragRecognizer)
 		{
 			if (!CanScroll || !ScrollWhenContentFits && MaxScrollPosition == 0 || ScrollBySlider)
 				yield break;
