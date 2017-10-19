@@ -1110,6 +1110,29 @@ namespace Lime
 			return candidates.FirstOrDefault();
 		}
 
+		public bool IsMouseOver()
+		{
+			var context = WidgetContext.Current;
+			if (context.NodeUnderMouse != this) {
+				return false;
+			}
+			return
+				context.NodeMousePressedOn != null ? 
+				context.NodeMousePressedOn == this : true;
+		}
+
+		public bool IsMouseOverThisOrDescendant()
+		{
+			var context = WidgetContext.Current;
+			var nodeUnderMouse = context.NodeUnderMouse;
+			if (nodeUnderMouse == null || !nodeUnderMouse.SameOrDescendantOf(this)) {
+				return false;
+			}
+			return
+				context.NodeMousePressedOn != null ? 
+				context.NodeMousePressedOn.SameOrDescendantOf(this) : true;
+		}
+
 		internal protected virtual bool PartialHitTest(ref HitTestArgs args)
 		{
 			return false;

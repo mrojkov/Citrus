@@ -87,11 +87,6 @@ namespace Lime
 		public bool GloballyVisible { get { RecalcDirtyGlobals(); return globallyVisible; } }
 		public Color4 GlobalColor { get { RecalcDirtyGlobals(); return globalColor; } }
 
-		public bool IsMouseOver()
-		{
-			return WidgetContext.Current.NodeUnderMouse == this;
-		}
-
 		public Node3D()
 		{
 			AsNode3D = this;

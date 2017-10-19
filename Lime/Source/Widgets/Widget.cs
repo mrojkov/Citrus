@@ -983,20 +983,7 @@ namespace Lime
 			}
 		}
 
-		public bool IsMouseOver()
-		{
-			var mouseOver = WidgetContext.Current.NodeUnderMouse == this;
-			return Window.Current.Input.IsMousePressed() ?
-				WidgetContext.Current.NodeMousePressedOn == this && mouseOver : mouseOver;
-		}
-
-		public bool IsMouseOverThisOrDescendant()
-		{
-			var mouseOver = WidgetContext.Current.NodeUnderMouse?.SameOrDescendantOf(this) ?? false;
-			return Window.Current.Input.IsMousePressed() ?
-				WidgetContext.Current.NodeMousePressedOn == this && mouseOver : mouseOver;
-		}
-
+		public Vector2 ToLocalMousePosition(Vector2 mousePosition) => mousePosition * LocalToWorldTransform.CalcInversed();
 		public Vector2 LocalMousePosition() => Window.Current.Input.MousePosition * LocalToWorldTransform.CalcInversed();
 
 		public int GetEffectiveLayer()
