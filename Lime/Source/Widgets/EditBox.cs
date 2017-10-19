@@ -2,7 +2,7 @@
 
 namespace Lime
 {
-	public abstract class CommonEditBox : Frame
+	public abstract class CommonEditBox : Widget
 	{
 		public bool IsReadOnly
 		{
@@ -28,9 +28,10 @@ namespace Lime
 			}
 		}
 
+		public Frame ScrollWidget { get; private set; }
 		public SimpleText TextWidget { get; private set; }
 		public event Action<string> Submitted;
-		public ScrollView Scroll { get; protected set; }
+		public ScrollView ScrollView { get; protected set; }
 
 		private Editor editor;
 		private bool isReadOnly;
@@ -43,26 +44,20 @@ namespace Lime
 
 		public CommonEditBox()
 		{
-			Scroll = new ScrollView(this, ScrollDirection.Horizontal);
-			Scroll.CanScroll = false;
+			ScrollWidget = new Frame();
+			ScrollView = new ScrollView(ScrollWidget, ScrollDirection.Horizontal);
+			ScrollView.CanScroll = false;
 			TextWidget = new SimpleText();
 			TextWidget.Height = Height;
-			Scroll.Content.AddNode(TextWidget);
+			ScrollView.Content.AddNode(TextWidget);
+			Layout = new StackLayout();
+			AddNode(ScrollWidget);
 		}
 
 		protected override void Awake()
 		{
 			TextWidget.Submitted += text => Submitted?.Invoke(text);
 			base.Awake();
-		}
-
-		protected override void OnSizeChanged(Vector2 sizeDelta)
-		{
-			base.OnSizeChanged(sizeDelta);
-			if (TextWidget != null) { // Size is assigned in Widget constructor.
-				TextWidget.Height = Height;
-				Editor?.AdjustSizeAndScrollToCaret();
-			}
 		}
 
 		protected void OnSubmit() => Submitted?.Invoke(Text);
