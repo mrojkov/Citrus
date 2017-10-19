@@ -7,32 +7,38 @@ namespace Lime
 {
 	public class GestureRecognizerManager
 	{
-		private Input input;
-		private WidgetContext context;
+		private readonly WidgetContext context;
 		private readonly List<GestureRecognizer> activeRecognizers = new List<GestureRecognizer>();
 		private Node activeNode;
 		public int CurrentIteration { get; private set; }
 
-		public GestureRecognizerManager(WidgetContext context, Input input)
+		public GestureRecognizerManager(WidgetContext context)
 		{
-			this.input = input;
 			this.context = context;
 		}
 
 		public void Process()
 		{
 			CurrentIteration++;
-			if (context.NodeMousePressedOn != null && context.NodeMousePressedOn != activeNode) {
-				activeNode = context.NodeMousePressedOn;
-				CancelRecognizers();
-				activeRecognizers.AddRange(EnumerateRecognizers(activeNode));
-			}
 			if (!(activeNode as Widget)?.GloballyVisible ?? false) {
 				activeNode = null;
-				CancelRecognizers();
+				foreach (var r in activeRecognizers) {
+					r.Cancel();
+				}
+				activeRecognizers.Clear();
 			}
 			foreach (var r in activeRecognizers) {
 				r.Update(activeRecognizers);
+			}
+			if (context.NodeMousePressedOn != activeNode) {
+				activeNode = context.NodeMousePressedOn;
+				activeRecognizers.Clear();
+				if (activeNode != null) {
+					activeRecognizers.AddRange(EnumerateRecognizers(activeNode));
+					foreach (var r in activeRecognizers) {
+						r.Update(activeRecognizers);
+					}
+				}
 			}
 		}
 
@@ -53,14 +59,6 @@ namespace Lime
 				}
 				node = node.Parent;
 			}
-		}
-
-		private void CancelRecognizers()
-		{
-			foreach (var r in activeRecognizers) {
-				r.Cancel();
-			}
-			activeRecognizers.Clear();
 		}
 	}
 }

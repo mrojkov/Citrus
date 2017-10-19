@@ -20,7 +20,7 @@ namespace Lime
 			Window = window;
 			Window.Context = new CombinedContext(Window.Context, widgetContext);
 			renderChain = new RenderChain();
-			widgetContext.GestureRecognizerManager = new GestureRecognizerManager(widgetContext, window.Input);
+			widgetContext.GestureRecognizerManager = new GestureRecognizerManager(widgetContext);
 			window.Activated += () => windowActivated = true;
 			LayoutManager = new LayoutManager();
 		}
