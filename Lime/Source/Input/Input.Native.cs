@@ -131,6 +131,11 @@ namespace Lime
 			return IsKeyPressed(GetMouseButtonByIndex(0));
 		}
 
+		public bool AnyMouseButtonPressed()
+		{
+			return IsKeyPressed(Key.Mouse0) || IsKeyPressed(Key.Mouse1) || IsKeyPressed(Key.Mouse2);
+		}
+
 		public bool WasMousePressed(int button)
 		{
 			return WasKeyPressed(GetMouseButtonByIndex(button));

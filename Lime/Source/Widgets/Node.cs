@@ -18,9 +18,7 @@ namespace Lime
 	}
 
 	public sealed class TangerineExportAttribute : Attribute
-	{
-
-	}
+	{ }
 
 	/// <summary>
 	/// Denotes a property which can not be animated within Tangerine.
@@ -426,6 +424,8 @@ namespace Lime
 			RenderChainBuilder = DefaultRenderChainBuilder.Instance;
 			++CreatedCount;
 		}
+
+		public GestureRecognizerCollection GestureRecognizers => Components.GetOrAdd<GestureRecognizerCollection>();
 
 		public virtual bool IsNotDecorated() => true;
 

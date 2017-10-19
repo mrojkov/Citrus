@@ -16,39 +16,60 @@ namespace Lime
 
 		public WindowWidget(IWindow window)
 		{
+			var widgetContext = new WidgetContext(this);
 			Window = window;
-			Window.Context = new CombinedContext(Window.Context, new WidgetContext(this));
+			Window.Context = new CombinedContext(Window.Context, widgetContext);
 			renderChain = new RenderChain();
+			widgetContext.GestureRecognizerManager = new GestureRecognizerManager(widgetContext, window.Input);
 			window.Activated += () => windowActivated = true;
 			LayoutManager = new LayoutManager();
 		}
 
 		protected virtual bool ContinuousRendering() { return true; }
 
+		private bool prevAnyMouseButtonPressed;
+
 		public override void Update(float delta)
 		{
 			if (ContinuousRendering()) {
 				Window.Invalidate();
 			}
-			var mouseReleased = !Window.Input.IsMousePressed();
-			if (Window.Input.WasMousePressed()) {
-				WidgetContext.Current.NodeMousePressedOn = WidgetContext.Current.NodeUnderMouse;
+			var context = WidgetContext.Current;
+
+			// Find the node under mouse, using the render chain built on one frame before.
+			context.NodeUnderMouse = LookForNodeUnderMouse(renderChain);
+
+			// Assign NodeMousePressedOn if any mouse button was pressed.
+			var anyMouseButtonPressed = Window.Input.AnyMouseButtonPressed();
+			if (!prevAnyMouseButtonPressed && anyMouseButtonPressed) {
+				context.NodeMousePressedOn = context.NodeUnderMouse;
 			}
-			WidgetContext.Current.MouseCursor = MouseCursor.Default;
-			base.Update(delta);
+
+			// Process mouse/touch screen input.
+			context.GestureRecognizerManager.Process();
+
+			// Update the widget hierarchy.
+			context.MouseCursor = MouseCursor.Default;
+			base.Update (delta);
+			Window.Cursor = context.MouseCursor;
+
+			// Set NodeMousePressedOn to null if all mouse buttons were released.
+			if (prevAnyMouseButtonPressed && !anyMouseButtonPressed) {
+				context.NodeMousePressedOn = null;
+			}
+			prevAnyMouseButtonPressed = anyMouseButtonPressed;
+
 			if (Window.Input.WasKeyPressed(Key.DismissSoftKeyboard)) {
 				SetFocus(null);
 			}
-			Window.Cursor = WidgetContext.Current.MouseCursor;
-			renderChain.Clear();
+
+			// Refresh widgets layout.
 			LayoutManager.Layout();
+
+			// Rebuild the render chain.
+			renderChain.Clear();
 			RenderChainBuilder?.AddToRenderChain(this, renderChain);
-			var hitTestArgs = new HitTestArgs(Window.Input.MousePosition);
-			renderChain.HitTest(ref hitTestArgs);
-			WidgetContext.Current.NodeUnderMouse = hitTestArgs.Node;
-			if (mouseReleased) {
-				WidgetContext.Current.NodeMousePressedOn = null;
-			}
+
 			ManageFocusOnWindowActivation();
 		}
 
@@ -67,6 +88,13 @@ namespace Lime
 				}
 				Widget.SetFocus(lastFocused);
 			}
+		}
+
+		private Node LookForNodeUnderMouse(RenderChain renderChain)
+		{
+			var hitTestArgs = new HitTestArgs(Window.Input.MousePosition);
+			renderChain.HitTest(ref hitTestArgs);
+			return hitTestArgs.Node;
 		}
 
 		public virtual void RenderAll()

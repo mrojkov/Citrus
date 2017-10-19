@@ -23,7 +23,7 @@ namespace Lime
 		public Node NodeUnderMouse { get; internal set; }
 
 		/// <summary>
-		/// Gets the topmost node under mouse at the moment left mouse button down.
+		/// Gets the topmost node under mouse at the moment any of mouse buttons down.
 		/// </summary>
 		public Node NodeMousePressedOn { get; internal set; }
 
@@ -31,6 +31,8 @@ namespace Lime
 		/// Gets or sets the mouse cursor. The WindowWidget resets mouse cursor to the default value in the beginning of every update cycle.
 		/// </summary>
 		public MouseCursor MouseCursor { get; set; }
+
+		public GestureRecognizerManager GestureRecognizerManager { get; internal set; }
 
 		public WidgetContext(Widget root) : base("Current")
 		{
