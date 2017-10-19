@@ -59,6 +59,23 @@ namespace Tangerine.UI.SceneView
 			};
 		}
 
+		public static Quadrangle CalcRect(Bone bone)
+		{
+			var entry = bone.Parent.AsWidget.BoneArray[bone.Index];
+			var start = entry.Joint;
+			var end = entry.Tip;
+			var dir = end - start;
+			var n = new Vector2(-dir.Y, dir.X).Normalized;
+			var scaleFactor = Math.Min(SceneView.Instance.Scene.Scale.X, 1f);
+			var delta = n * TipWidth * scaleFactor;
+			return new Quadrangle {
+				V1 = start + delta,
+				V2 = end + delta,
+				V3 = end - delta,
+				V4 = start - delta,
+			};
+		}
+
 		private void DrawBones(Bone bone, Widget canvas)
 		{
 			var t = bone.Parent.AsWidget.CalcTransitionToSpaceOf(canvas);

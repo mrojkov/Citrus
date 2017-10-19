@@ -18,7 +18,7 @@ namespace Tangerine.UI.SceneView
 				if (bone != null) {
 					var entry = bone.Parent.AsWidget.BoneArray[bone.Index];
 					var t = Document.Current.Container.AsWidget.CalcTransitionToSpaceOf(sv.Scene);
-					var hull = BonePresenter.CalcHull(bone) * t;
+					var hull = BonePresenter.CalcRect(bone) * t;
 					if (hull.Contains(sv.MousePosition) && !sv.Input.IsKeyPressed(Key.Control)) {
 						Utils.ChangeCursorIfDefault(Cursors.Rotate);
 						if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {
