@@ -12,7 +12,7 @@ namespace Tangerine.UI.Timeline
 		{
 			var input = timeline.Roll.RootWidget.Input;
 			while (true) {
-				if (input.IsMouseOwner()) {
+				if (input.IsMousePressed()) {
 					var s = TimelineMetrics.DefaultRowHeight;
 					if (input.LocalMousePosition.Y > timeline.Roll.RootWidget.Height - s / 2) {
 						timeline.OffsetY += s;

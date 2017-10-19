@@ -35,7 +35,6 @@ namespace Tangerine.UI.SceneView
 
 		private IEnumerator<object> Resize(Bone bone)
 		{
-			sv.Input.CaptureMouse();
 			Document.Current.History.BeginTransaction();
 			try {
 				var iniMousePos = sv.MousePosition;
@@ -49,7 +48,6 @@ namespace Tangerine.UI.SceneView
 					yield return null;
 				}
 			} finally {
-				sv.Input.ReleaseMouse();
 				sv.Input.ConsumeKey(Key.Mouse0);
 				Document.Current.History.EndTransaction();
 			}

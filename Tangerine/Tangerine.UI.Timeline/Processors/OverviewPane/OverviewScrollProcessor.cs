@@ -13,7 +13,6 @@ namespace Tangerine.UI.Timeline
 			var input = timeline.Overview.RootWidget.Input;
 			while (true) {
 				if (input.WasMousePressed()) {
-					input.CaptureMouse();
 					var originalMousePosition = input.MousePosition;
 					var scrollPos = timeline.Offset;
 					while (input.IsMousePressed()) {
@@ -23,7 +22,6 @@ namespace Tangerine.UI.Timeline
 						timeline.Offset = Vector2.Clamp(scrollPos + scrollDelta, Vector2.Zero, maxScrollPos);
 						yield return null;
 					}
-					input.ReleaseMouse();
 				}
 				yield return null;
 			}

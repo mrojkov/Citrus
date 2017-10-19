@@ -73,7 +73,6 @@ namespace Tangerine.UI.SceneView
 
 		IEnumerator<object> Rescale(int controlPointIndex, MouseCursor cursor, List<PointObject> points)
 		{
-			sv.Input.CaptureMouse();
 			var t = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
 			Document.Current.History.BeginTransaction();
 			try {
@@ -91,7 +90,6 @@ namespace Tangerine.UI.SceneView
 					yield return null;
 				}
 			} finally {
-				sv.Input.ReleaseMouse();
 				sv.Input.ConsumeKey(Key.Mouse0);
 				Document.Current.History.EndTransaction();
 			}

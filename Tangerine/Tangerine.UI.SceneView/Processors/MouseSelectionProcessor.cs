@@ -31,7 +31,6 @@ namespace Tangerine.UI.SceneView
 						Renderer.DrawRectOutline(rect.A * t, rect.B * t, ColorTheme.Current.SceneView.MouseSelection);
 					});
 					sceneView.Frame.CompoundPostPresenter.Add(presenter);
-					input.CaptureMouse();
 					Document.Current.History.BeginTransaction();
 					try {
 						var clicked = true;
@@ -58,7 +57,6 @@ namespace Tangerine.UI.SceneView
 						sceneView.Frame.CompoundPostPresenter.Remove(presenter);
 						CommonWindow.Current.Invalidate();
 					} finally {
-						input.ReleaseMouse();
 						input.ConsumeKey(Key.Mouse0);
 						Document.Current.History.EndTransaction();
 					}

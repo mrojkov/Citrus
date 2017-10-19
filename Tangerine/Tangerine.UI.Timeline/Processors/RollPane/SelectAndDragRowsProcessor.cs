@@ -44,7 +44,6 @@ namespace Tangerine.UI.Timeline
 				} else if (input.IsKeyPressed(Key.Control)) {
 					SelectRow.Perform(row, !row.Selected);
 				} else {
-					input.CaptureMouse();
 					if (!row.Selected) {
 						ClearRowSelection.Perform();
 						SelectRow.Perform(row);
@@ -58,7 +57,6 @@ namespace Tangerine.UI.Timeline
 					if (input.IsMousePressed()) {
 						yield return DragTask();
 					}
-					input.ReleaseMouse();
 				}
 			}
 		}

@@ -131,7 +131,6 @@ namespace Tangerine.UI
 					}
 				});
 				var input = panel.TitleWidget.Input;
-				input.CaptureMouse();
 				const float dockSiteWidth = 0.25f;
 				var dockSiteRects = new Rectangle[4] {
 					new Rectangle(Vector2.Zero, new Vector2(dockSiteWidth, 1)),
@@ -169,7 +168,6 @@ namespace Tangerine.UI
 					}
 					yield return null;
 				}
-				input.ReleaseMouse();
 				mainWidget.PostPresenter = null;
 				mainWindow.Invalidate();
 				thumbWindow?.Dispose();

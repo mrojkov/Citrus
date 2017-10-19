@@ -42,7 +42,6 @@ namespace Tangerine.UI.SceneView
 		IEnumerator<object> Resize(int controlPointIndex, Vector2 pivot)
 		{
 			var cursor = WidgetContext.Current.MouseCursor;
-			sv.Input.CaptureMouse();
 			Document.Current.History.BeginTransaction();
 			try {
 				var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>().ToList();
@@ -63,7 +62,6 @@ namespace Tangerine.UI.SceneView
 					yield return null;
 				}
 			} finally {
-				sv.Input.ReleaseMouse();
 				sv.Input.ConsumeKey(Key.Mouse0);
 				Document.Current.History.EndTransaction();
 			}

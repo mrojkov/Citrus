@@ -88,7 +88,6 @@ namespace Lime
 			RaiseDragStarted();
 			var initialMousePosition = Input.MousePosition;
 			var initialWidths = Nodes.Select(i => i.AsWidget.Width).ToList();
-			Input.CaptureMouse();
 			while (Input.IsMousePressed()) {
 				WidgetContext.Current.MouseCursor = MouseCursor.SizeWE;
 				var dragDelta = Input.MousePosition.X - initialMousePosition.X;
@@ -106,7 +105,6 @@ namespace Lime
 				Layout.InvalidateConstraintsAndArrangement(this);
 				yield return null;
 			}
-			Input.ReleaseMouse();
 			RaiseDragEnded();
 		}
 

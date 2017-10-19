@@ -115,7 +115,6 @@ namespace Tangerine.UI
 			{
 				while (true) {
 					if (Widget.Input.WasMousePressed() && HitTest(Widget.Input.MousePosition)) {
-						Widget.Input.CaptureMouse();
 						DragStarted?.Invoke();
 						while (Widget.Input.IsMousePressed()) {
 							var c = color.Value;
@@ -125,7 +124,6 @@ namespace Tangerine.UI
 							Changed?.Invoke();
 							yield return null;
 						}
-						Widget.Input.ReleaseMouse();
 						DragEnded?.Invoke();
 					}
 					yield return null;

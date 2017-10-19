@@ -14,7 +14,6 @@ namespace Lime
 		private Input windowInput { get { return CommonWindow.Current.Input; } }
 		private WidgetContext context { get { return WidgetContext.Current; } }
 
-		public static readonly WidgetStack MouseCaptureStack = new WidgetStack();
 		public static readonly WidgetStack InputScopeStack = new WidgetStack();
 
 		public delegate bool FilterFunc(Widget widget, Key key);
@@ -57,18 +56,6 @@ namespace Lime
 			return IsAcceptingKey(Key.Touch0) ? windowInput.GetNumTouches() : 0;
 		}
 
-		public void CaptureMouse()
-		{
-			MouseCaptureStack.Add(widget);
-		}
-
-		public void ReleaseMouse()
-		{
-			MouseCaptureStack.Remove(widget);
-		}
-
-		public bool IsMouseOwner() { return widget == MouseCaptureStack.Top; }
-
 		public bool IsAcceptingMouse()
 		{
 			return IsAcceptingKey(Key.Mouse0);
@@ -83,21 +70,11 @@ namespace Lime
 				return false;
 			}
 			if (key.IsMouseKey()) {
-				var mouseOwner = MouseCaptureStack.Top;
-				if (mouseOwner != null) {
-					return mouseOwner == widget;
-				}
 				if (AcceptMouseBeyondWidget) {
 					return true;
 				}
-				var nodeUnderMouse = WidgetContext.Current.NodeUnderMouse;
-				if (AcceptMouseThroughDescendants) {
-					return
-						nodeUnderMouse != null && nodeUnderMouse.SameOrDescendantOf(widget) &&
-						// Full HitTest would be better.
-						widget.HitTestTarget && widget.BoundingRectHitTest(MousePosition);
-				}
-				return nodeUnderMouse == widget;
+				var node = context.NodeMousePressedOn ?? context.NodeUnderMouse; 
+				return AcceptMouseThroughDescendants ? (node?.SameOrDescendantOf(widget) ?? false) : node == widget;
 			}
 			if (key.IsModifier()) {
 				return true;
@@ -281,7 +258,6 @@ namespace Lime
 		public void Dispose()
 		{
 			InputScopeStack.RemoveAll(i => i == widget);
-			MouseCaptureStack.RemoveAll(i => i == widget);
 		}
 	}
 }

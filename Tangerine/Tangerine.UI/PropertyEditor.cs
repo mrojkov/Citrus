@@ -654,7 +654,6 @@ namespace Tangerine.UI
 					(button = new ThemedButton {
 						Text = "...",
 						MinMaxWidth = 20,
-						Draggable = true,
 						LayoutCell = new LayoutCell(Alignment.Center)
 					})
 				}

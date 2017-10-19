@@ -32,7 +32,6 @@ namespace Tangerine.UI.SceneView
 
 		IEnumerator<object> Rotate(Vector2 pivot)
 		{
-			sv.Input.CaptureMouse();
 			Document.Current.History.BeginTransaction();
 			try {
 				var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>().ToList();
@@ -58,7 +57,6 @@ namespace Tangerine.UI.SceneView
 					yield return null;
 				}
 			} finally {
-				sv.Input.ReleaseMouse();
 				sv.Input.ConsumeKey(Key.Mouse0);
 				Document.Current.History.EndTransaction();
 			}

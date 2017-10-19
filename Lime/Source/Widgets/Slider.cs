@@ -38,7 +38,6 @@ namespace Lime
 
 		private float value;
 		private Widget thumb;
-		private bool mouseOwnerOnLastUpdate;
 
 		public Slider()
 		{
@@ -100,20 +99,14 @@ namespace Lime
 					dragInitialOffset = (Value - RangeMin) / (RangeMax - RangeMin);
 					draggingJustBegun = false;
 				}
-			} else if (Input.IsMouseOwner() && !Input.IsMousePressed()) {
+			} else if (!Input.IsMousePressed()) {
 				Release();
-				mouseOwnerOnLastUpdate = false;
 			}
-			if (Enabled && Input.IsMouseOwner()) {
+			if (Enabled && Input.IsAcceptingMouse()) {
 				SetValueFromCurrentMousePosition(draggingJustBegun);
 			}
 			InterpolateGraphicsBetweenMinAndMaxMarkers();
 			RefreshThumbPosition();
-			// Handle occasional mouse lose
-			if (!Input.IsMouseOwner() && mouseOwnerOnLastUpdate) {
-				Release();
-			}
-			mouseOwnerOnLastUpdate = Input.IsMouseOwner();
 		}
 
 		private void RaiseDragEnded()
@@ -126,7 +119,6 @@ namespace Lime
 		private void StartDrag()
 		{
 			RunThumbAnimation("Press");
-			Input.CaptureMouse();
 			if (DragStarted != null) {
 				DragStarted();
 			}
@@ -159,9 +151,6 @@ namespace Lime
 		{
 			RaiseDragEnded();
 			RunThumbAnimation("Normal");
-			if (Input.IsMouseOwner()) {
-				Input.ReleaseMouse();
-			}
 		}
 
 		private void RunThumbAnimation(string name)

@@ -37,7 +37,6 @@ namespace Tangerine.UI.SceneView
 			Document.Current.History.BeginTransaction();
 
 			try {
-				sv.Input.CaptureMouse();
 				var iniMousePos = sv.MousePosition;
 				var transform = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
 				var transformInversed = transform.CalcInversed();
@@ -76,7 +75,6 @@ namespace Tangerine.UI.SceneView
 				}
 			} finally {
 				SceneView.Instance.Components.Remove<CreateBoneHelper>();
-				sv.Input.ReleaseMouse();
 				sv.Input.ConsumeKey(Key.Mouse0);
 				Document.Current.History.EndTransaction();
 				Window.Current.Invalidate();
@@ -88,7 +86,6 @@ namespace Tangerine.UI.SceneView
 			Document.Current.History.BeginTransaction();
 
 			try {
-				sv.Input.CaptureMouse();
 				var iniMousePos = sv.MousePosition;
 				var transform = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
 				while (sv.Input.IsMousePressed()) {
@@ -117,7 +114,6 @@ namespace Tangerine.UI.SceneView
 					yield return null;
 				}
 			} finally {
-				sv.Input.ReleaseMouse();
 				sv.Input.ConsumeKey(Key.Mouse0);
 				Document.Current.History.EndTransaction();
 				Window.Current.Invalidate();

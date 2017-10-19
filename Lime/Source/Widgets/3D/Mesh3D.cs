@@ -243,11 +243,9 @@ namespace Lime
 			if (WidgetInput.Filter != null && !WidgetInput.Filter(viewport, Key.Mouse0)) {
 				return;
 			}
-			var mouseOwner = WidgetInput.MouseCaptureStack.Top;
-			if (mouseOwner != null && mouseOwner != viewport) {
+			if (!viewport.IsMouseOverThisOrDescendant()) {
 				return;
 			}
-
 			Clicked();
 		}
 

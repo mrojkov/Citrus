@@ -39,7 +39,6 @@ namespace Tangerine.UI.SceneView
 							pos = sv.MousePosition * t / container.Size;
 						}
 						Core.Operations.SetProperty.Perform(currentPoint, nameof(PointObject.Position), pos);
-						sv.Input.CaptureMouse();
 						Document.Current.History.BeginTransaction();
 						while (sv.Input.IsMousePressed()) {
 							var dir = (sv.MousePosition * t - currentPoint.TransformedPosition) / SplinePointPresenter.TangentWeightRatio;
@@ -48,7 +47,6 @@ namespace Tangerine.UI.SceneView
 							yield return null;
 						}
 					} finally {
-						sv.Input.ReleaseMouse();
 						Document.Current.History.EndTransaction();
 					}
 				}
