@@ -9,7 +9,6 @@ namespace Lime
 
 		public ThemedSlider()
 		{
-			Options = SliderOptions.ClickOnRail;
 			var rail = new Spline { Id = "Rail" };
 			rail.AddNode(new SplinePoint { Position = new Vector2(0, 0.5f) });
 			rail.AddNode(new SplinePoint { Position = new Vector2(1, 0.5f) });

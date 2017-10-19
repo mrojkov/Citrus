@@ -22,15 +22,6 @@ namespace Lime
 		[YuzuMember]
 		public float Step { get; set; }
 
-		[Flags]
-		public enum SliderOptions
-		{
-			None = 0,
-			ClickOnRail = 1,
-		}
-
-		public SliderOptions Options;
-
 		public event Action DragStarted;
 		public event Action DragEnded;
 		public event Action Changed;
@@ -38,6 +29,10 @@ namespace Lime
 
 		private float value;
 		private Widget thumb;
+		private DragRecognizer dragThumbRecognizer;
+		private DragRecognizer dragSliderRecognizer;
+		private ClickRecognizer clickRecognizer;
+		private DragRecognizer activeDragRecognizer;
 
 		public Slider()
 		{
@@ -47,6 +42,13 @@ namespace Lime
 			Value = 0;
 			Step = 0;
 			Enabled = true;
+		}
+
+		protected override void Awake()
+		{
+			Thumb?.GestureRecognizers.Add(dragThumbRecognizer = new DragRecognizer());
+			GestureRecognizers.Add(dragSliderRecognizer = new DragRecognizer());
+			GestureRecognizers.Add(clickRecognizer = new ClickRecognizer());
 		}
 
 		public Widget Thumb
@@ -89,20 +91,32 @@ namespace Lime
 				return;
 			}
 			var draggingJustBegun = false;
-			if (Enabled && RangeMax > RangeMin && (Thumb.Input.WasMousePressed() || Input.WasMousePressed())) {
-				if (Thumb.IsMouseOver()) {
+			if (Enabled && RangeMax > RangeMin) {
+				if (dragThumbRecognizer.WasBegan()) {
+					activeDragRecognizer = dragThumbRecognizer;
 					StartDrag();
 					draggingJustBegun = true;
-				} else if ((Options & SliderOptions.ClickOnRail) != 0 && IsMouseOver()) {
-					StartDrag();
-					dragInitialDelta = 0;
-					dragInitialOffset = (Value - RangeMin) / (RangeMax - RangeMin);
-					draggingJustBegun = false;
+				} else {
+					if (clickRecognizer.WasBegan()) {
+						StartDrag();
+						SetValueFromCurrentMousePosition(false);
+					}
+					if (clickRecognizer.WasRecognizedOrCanceled() && !dragSliderRecognizer.WasBegan()) {
+						Release();
+					}
+					if (dragSliderRecognizer.WasBegan()) {
+						activeDragRecognizer = dragSliderRecognizer;
+						StartDrag();
+						dragInitialDelta = 0;
+						dragInitialOffset = (Value - RangeMin) / (RangeMax - RangeMin);
+						draggingJustBegun = false;
+					}
 				}
-			} else if (!Input.IsMousePressed()) {
+			}
+			if (activeDragRecognizer?.WasEnded() ?? false) {
 				Release();
 			}
-			if (Enabled && Input.IsAcceptingMouse()) {
+			if (Enabled && (activeDragRecognizer?.IsDragging() ?? false)) {
 				SetValueFromCurrentMousePosition(draggingJustBegun);
 			}
 			InterpolateGraphicsBetweenMinAndMaxMarkers();
@@ -111,17 +125,13 @@ namespace Lime
 
 		private void RaiseDragEnded()
 		{
-			if (DragEnded != null) {
-				DragEnded();
-			}
+			DragEnded?.Invoke();
 		}
 
 		private void StartDrag()
 		{
 			RunThumbAnimation("Press");
-			if (DragStarted != null) {
-				DragStarted();
-			}
+			DragStarted?.Invoke();
 		}
 
 		private void InterpolateGraphicsBetweenMinAndMaxMarkers()
@@ -155,9 +165,7 @@ namespace Lime
 
 		private void RunThumbAnimation(string name)
 		{
-			if (Thumb != null) {
-				Thumb.TryRunAnimation(name);
-			}
+			Thumb?.TryRunAnimation(name);
 		}
 
 		private float dragInitialOffset;
@@ -202,9 +210,7 @@ namespace Lime
 
 		private void RaiseChanged()
 		{
-			if (Changed != null) {
-				Changed();
-			}
+			Changed?.Invoke();
 		}
 
 		public void SetValue(float newValue)
