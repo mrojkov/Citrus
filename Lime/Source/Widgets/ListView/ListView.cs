@@ -19,7 +19,6 @@ namespace Lime
 		{
 			Content.ReverseOrderRendering = true;
 			Content.Tasks.Add(RefreshLayoutTask());
-			Content.Tasks.Add(DragItemMainTask());
 		}
 
 		public void Refresh()
