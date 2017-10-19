@@ -223,7 +223,6 @@
     <Compile Include="Source\Widgets\Text\IText.cs" />
     <Compile Include="Source\Widgets\ListView\ExpandableListItem.cs" />
     <Compile Include="Source\Widgets\ListView\ListView.cs" />
-    <Compile Include="Source\Widgets\ListView\ListView.ItemDrag.cs" />
     <Compile Include="Source\Widgets\ListView\ListView.RefreshGesture.cs" />
     <Compile Include="Source\Widgets\ListView\ScrollView.cs" />
     <Compile Include="Source\Widgets\ListView\ScrollView.SpeedMeter.cs" />
