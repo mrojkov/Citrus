@@ -46,7 +46,7 @@ namespace Lime
 			State = NormalState;
 		}
 
-		public override bool WasClicked() => clickRecognizer.WasRecognized();
+		public override bool WasClicked() => clickRecognizer?.WasRecognized() ?? false;
 
 		protected override void Awake()
 		{
