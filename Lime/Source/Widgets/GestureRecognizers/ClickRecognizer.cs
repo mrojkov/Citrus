@@ -23,7 +23,7 @@ namespace Lime
 		private PollableEvent recognized;
 
 		/// <summary>
-		/// Occurs if a user has touched upon the widget. 
+		/// Occurs if a user has touched upon the widget.
 		/// If the widget lies within a scrollable panel,
 		/// the began event might be deferred in order to give the priority to drag gesture.
 		/// </summary>
@@ -40,6 +40,7 @@ namespace Lime
 		public bool WasBegan() => began.HasOccurred();
 		public bool WasCanceled() => canceled.HasOccurred();
 		public bool WasRecognized() => recognized.HasOccurred();
+		public bool WasRecognizedOrCanceled() => WasCanceled() || WasRecognized();
 
 		public MulticlickRecognizer(int buttonIndex, int numClicks, Action recognized = null)
 		{
@@ -96,7 +97,7 @@ namespace Lime
 		void CancelOtherRecognizers(IEnumerable<GestureRecognizer> recognizers)
 		{
 			foreach (var r in recognizers) {
-				var ok = r == this || 
+				var ok = r == this ||
 					(r as MulticlickRecognizer)?.NumClicks > NumClicks ||
 				                                (r as MulticlickRecognizer)?.ButtonIndex != ButtonIndex;
 				if (!ok) {
