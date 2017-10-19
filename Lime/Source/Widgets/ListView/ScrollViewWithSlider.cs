@@ -37,20 +37,15 @@ namespace Lime
 					slider.HitTestTarget = true;
 					var input = slider.Input;
 					if (input.WasMousePressed()) {
-						input.CaptureMouse();
-						try {
-							var iniMousePos = input.MousePosition;
-							var iniScrollPos = ScrollPosition;
-							while (input.IsMousePressed()) {
-								var projectedFrameSize = ProjectToScrollAxis(Frame.Size);
-								if (projectedFrameSize > Mathf.ZeroTolerance) {
-									var d = ProjectToScrollAxis(input.MousePosition - iniMousePos) * ContentLength / projectedFrameSize;
-									ScrollPosition = Mathf.Clamp(((iniScrollPos + d).Round()), MinScrollPosition, MaxScrollPosition);
-								}
-								yield return null;
+						var iniMousePos = input.MousePosition;
+						var iniScrollPos = ScrollPosition;
+						while (input.IsMousePressed()) {
+							var projectedFrameSize = ProjectToScrollAxis(Frame.Size);
+							if (projectedFrameSize > Mathf.ZeroTolerance) {
+								var d = ProjectToScrollAxis(input.MousePosition - iniMousePos) * ContentLength / projectedFrameSize;
+								ScrollPosition = Mathf.Clamp(((iniScrollPos + d).Round()), MinScrollPosition, MaxScrollPosition);
 							}
-						} finally {
-							input.ReleaseMouse();
+							yield return null;
 						}
 					}
 				}
