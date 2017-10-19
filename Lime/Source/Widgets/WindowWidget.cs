@@ -94,7 +94,15 @@ namespace Lime
 		{
 			var hitTestArgs = new HitTestArgs(Window.Input.MousePosition);
 			renderChain.HitTest(ref hitTestArgs);
-			return hitTestArgs.Node;
+			var n = hitTestArgs.Node;
+			if (
+				n != null &&
+				WidgetInput.InputScopeStack.Top != null &&
+				!n.SameOrDescendantOf(WidgetInput.InputScopeStack.Top)
+			) {
+				n = null;
+			}
+			return n;
 		}
 
 		public virtual void RenderAll()

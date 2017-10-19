@@ -7,7 +7,7 @@ namespace Lime
 {
 	public enum DragDirection
 	{
-		Any,	
+		Any,
 		Horizontal,
 		Vertical
 	}
@@ -53,7 +53,7 @@ namespace Lime
 		public bool WasMoved() => dragged.HasOccurred();
 		public bool WasEnded() => ended.HasOccurred();
 
-		public bool IsDragging() => state == State.Dragging; 
+		public bool IsDragging() => state == State.Dragging;
 
 		public DragRecognizer(int buttonIndex = 0, DragDirection direction = DragDirection.Any, float dragThreshold = DefaultDragThreshold)
 		{
@@ -106,7 +106,7 @@ namespace Lime
 			var d = Input.MousePosition - MousePressPosition;
 			var dx = Math.Abs(d.X);
 			var dy = Math.Abs(d.Y);
-			return 
+			return
 				Direction == DragDirection.Any && (dx > DragThreshold || dy > DragThreshold) ||
 				Direction == DragDirection.Horizontal && dx > DragThreshold ||
 				Direction == DragDirection.Vertical && dy > DragThreshold;
