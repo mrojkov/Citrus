@@ -167,10 +167,7 @@ namespace Lime
 			var screen = Screen.FromControl(form).WorkingArea;
 			var x = (int)((screen.Width / PixelScale - DecoratedSize.X) / 2);
 			var y = (int)((screen.Height / PixelScale - DecoratedSize.Y) / 2);
-			var position = new Vector2(
-				screen.X + (x > 0 ? x : 0),
-				screen.Y + (y > 0 ? y : 0)
-				);
+			var position = new Vector2(screen.X + x, screen.Y + y);
 			DecoratedPosition = position;
 		}
 
