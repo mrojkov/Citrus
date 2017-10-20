@@ -22,17 +22,14 @@ namespace Lime
 			CurrentIteration++;
 			if (!(activeNode as Widget)?.GloballyVisible ?? false) {
 				activeNode = null;
-				foreach (var r in activeRecognizers) {
-					r.Cancel();
-				}
-				activeRecognizers.Clear();
+				CancelGestures();
 			}
 			foreach (var r in activeRecognizers) {
 				r.Update(activeRecognizers);
 			}
 			if (context.NodeMousePressedOn != activeNode) {
 				activeNode = context.NodeMousePressedOn;
-				activeRecognizers.Clear();
+				CancelGestures();
 				if (activeNode != null) {
 					activeRecognizers.AddRange(EnumerateRecognizers(activeNode));
 					foreach (var r in activeRecognizers) {
@@ -40,6 +37,14 @@ namespace Lime
 					}
 				}
 			}
+		}
+
+		private void CancelGestures()
+		{
+			foreach (var r in activeRecognizers) {
+				r.Cancel();
+			}
+			activeRecognizers.Clear();
 		}
 
 		private IEnumerable<GestureRecognizer> EnumerateRecognizers(Node node)
