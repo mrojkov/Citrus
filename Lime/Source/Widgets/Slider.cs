@@ -165,7 +165,9 @@ namespace Lime
 
 		private void RunThumbAnimation(string name)
 		{
-			Thumb?.TryRunAnimation(name);
+			if (Thumb?.CurrentAnimation != name) {
+				Thumb?.TryRunAnimation(name);
+			}
 		}
 
 		private float dragInitialOffset;
