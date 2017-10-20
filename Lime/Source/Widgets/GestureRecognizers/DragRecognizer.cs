@@ -114,7 +114,7 @@ namespace Lime
 
 		private void CancelClickRecognition(IEnumerable<GestureRecognizer> recognizers)
 		{
-			foreach (var r in recognizers.OfType<MulticlickRecognizer>().Where(r => r.ButtonIndex == ButtonIndex)) {
+			foreach (var r in recognizers.OfType<ClickRecognizer>().Where(r => r.ButtonIndex == ButtonIndex)) {
 				r.Cancel();
 			}
 		}

@@ -5,19 +5,19 @@ using System.Collections.Generic;
 
 namespace Lime
 {
-	public class MulticlickRecognizer : GestureRecognizer
+	public class ClickRecognizer : GestureRecognizer
 	{
-		private Vector2 pressPosition;
-		private DateTime pressTime;
-		private int pressCounter;
-		private bool recognizing;
+		enum State
+		{
+			Initial,
+			WaitDrags,
+			Began
+		};
 
 		private readonly TimeSpan ClickBeginDelay = TimeSpan.FromSeconds(0.15);
-		private readonly TimeSpan MaxTimeBetweenClicks = TimeSpan.FromSeconds(0.3);
 
-		public int ButtonIndex { get; private set; }
-		public int NumClicks { get; private set; }
-
+		private State state;
+		private DateTime pressTime;
 		private PollableEvent began;
 		private PollableEvent canceled;
 		private PollableEvent recognized;
@@ -42,94 +42,124 @@ namespace Lime
 		public bool WasRecognized() => recognized.HasOccurred();
 		public bool WasRecognizedOrCanceled() => WasCanceled() || WasRecognized();
 
-		public MulticlickRecognizer(int buttonIndex, int numClicks, Action recognized = null)
+		public int ButtonIndex { get; }
+
+		public ClickRecognizer(int buttonIndex, Action recognized = null)
 		{
 			ButtonIndex = buttonIndex;
-			NumClicks = numClicks;
 			if (recognized != null) {
 				Recognized += recognized;
 			}
 		}
 
+		public ClickRecognizer(Action recognized = null)
+			: this(0, recognized)
+		{
+		}
+		
 		internal protected override void Cancel()
 		{
-			pressCounter = 0;
-			if (recognizing) {
-				recognizing = false;
+			if (state == State.Began) {
 				canceled.Raise();
 			}
+			state = State.Initial;
 		}
 
 		internal protected override void Update(IEnumerable<GestureRecognizer> recognizers)
 		{
-			if (pressCounter > 0 && pressCounter < NumClicks && DateTime.Now - pressTime > MaxTimeBetweenClicks) {
-				Cancel();
-			}
-			if (Input.WasMousePressed(ButtonIndex)) {
-				pressCounter++;
+			if (state == State.Initial && Input.WasMousePressed(ButtonIndex)) {
 				pressTime = DateTime.Now;
-				pressPosition = Input.MousePosition;
+				state = State.WaitDrags;
 			}
-			if (!recognizing && pressCounter > 0) {
+			if (state == State.WaitDrags) {
 				// Defer began event if there are any drag gesture.
-				if (!recognizers.Any(r => r.ShouldDeferClicks(ButtonIndex)) || (DateTime.Now - pressTime > ClickBeginDelay)) {
-					recognizing = true;
+				if (
+					!recognizers.Any(r => r.ShouldDeferClicks(ButtonIndex)) ||
+					(DateTime.Now - pressTime > ClickBeginDelay) ||
+					!Input.IsMousePressed(ButtonIndex)
+				) {
+					state = State.Began;
 					began.Raise();
 				}
 			}
-			if (Input.WasMouseReleased(ButtonIndex)) {
-				if (pressCounter == NumClicks) {
-					if (Owner.IsMouseOverThisOrDescendant() && Input.GetNumTouches() == 0) {
-						CancelOtherRecognizers(recognizers);
-						pressCounter = 0;
-						if (!recognizing) {
-							began.Raise();
-						}
-						recognizing = false;
+			if (state == State.Began) {
+				if (!Input.IsMousePressed(ButtonIndex)) {
+					state = State.Initial;
+					if (Input.GetNumTouches() == 0) {
 						recognized.Raise();
-					} else {
-						Cancel();
 					}
 				}
 			}
 		}
+	}
 
-		void CancelOtherRecognizers(IEnumerable<GestureRecognizer> recognizers)
+	public class DoubleClickRecognizer : GestureRecognizer
+	{
+		enum State
 		{
-			foreach (var r in recognizers) {
-				var ok = r == this ||
-					(r as MulticlickRecognizer)?.NumClicks > NumClicks ||
-				                                (r as MulticlickRecognizer)?.ButtonIndex != ButtonIndex;
-				if (!ok) {
-					r.Cancel();
+			Initial,
+			FirstPress,
+			WaitSecondPress,
+		};
+
+		private readonly TimeSpan DoubleClickTimeout = TimeSpan.FromSeconds(0.3);
+		private readonly float MaxDistanceBetweenPresses = 5;
+
+		private State state;
+		private DateTime pressTime;
+		private Vector2 pressPosition;
+		private PollableEvent recognized;
+
+		public event Action Recognized { add { recognized.Handler += value; } remove { recognized.Handler -= value; } }
+		public bool WasRecognized() => recognized.HasOccurred();
+
+		public int ButtonIndex { get; }
+
+		public DoubleClickRecognizer(int buttonIndex, Action recognized = null)
+		{
+			ButtonIndex = buttonIndex;
+			if (recognized != null) {
+				Recognized += recognized;
+			}
+		}
+
+		public DoubleClickRecognizer(Action recognized = null)
+			: this(0, recognized)
+		{
+		}
+
+		internal protected override void Cancel()
+		{
+		}
+
+		internal protected override void Update(IEnumerable<GestureRecognizer> recognizers)
+		{
+			if (state != State.Initial && DateTime.Now - pressTime > DoubleClickTimeout) {
+				state = State.Initial;
+			}
+			if (state == State.Initial && Input.WasMousePressed(ButtonIndex)) {
+				pressTime = DateTime.Now;
+				pressPosition = Input.MousePosition;
+				state = State.FirstPress;
+			}
+			if (state == State.FirstPress && !Input.IsMousePressed(ButtonIndex)) {
+					state = State.WaitSecondPress;
+			}
+			if (state == State.WaitSecondPress && Input.WasMousePressed(ButtonIndex)) {
+				state = State.Initial;
+				if (Input.GetNumTouches() == 1 && (Input.MousePosition - pressPosition).Length < MaxDistanceBetweenPresses) {
+					CancelOtherGestures(recognizers);
+					recognized.Raise();
 				}
 			}
 		}
-	}
 
-	public class ClickRecognizer : MulticlickRecognizer
-	{
-		public ClickRecognizer(Action recognized = null)
-			: base(0, 1, recognized)
+		void CancelOtherGestures(IEnumerable<GestureRecognizer> recognizers)
 		{
-		}
-
-		public ClickRecognizer(int buttonIndex, Action recognized = null)
-			: base(buttonIndex, 1, recognized)
-		{
-		}
-	}
-
-	public class DoubleClickRecognizer : MulticlickRecognizer
-	{
-		public DoubleClickRecognizer(Action recognized = null)
-			: base(0, 2, recognized)
-		{
-		}
-
-		public DoubleClickRecognizer(int buttonIndex, Action recognized = null)
-			: base(buttonIndex, 2, recognized)
-		{
+			foreach (var r in recognizers) {
+				if (r != this)
+					r.Cancel();
+			}
 		}
 	}
 }

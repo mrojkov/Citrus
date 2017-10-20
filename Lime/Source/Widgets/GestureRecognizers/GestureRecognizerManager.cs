@@ -49,10 +49,11 @@ namespace Lime
 				if (node.HasGestureRecognizers()) {
 					var anyClickRecognizer = false;
 					foreach (var r in node.GestureRecognizers) {
-						if (r is MulticlickRecognizer && noClickRecognizersAnymore) {
+						bool isWrongRecognizer = r is ClickRecognizer || r is DoubleClickRecognizer;
+						if (isWrongRecognizer && noClickRecognizersAnymore) {
 							continue;
 						}
-						anyClickRecognizer |= r is MulticlickRecognizer;
+						anyClickRecognizer |= isWrongRecognizer;
 						yield return r;
 					}
 					noClickRecognizersAnymore |= anyClickRecognizer;
