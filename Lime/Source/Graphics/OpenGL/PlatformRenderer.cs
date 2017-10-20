@@ -237,11 +237,19 @@ namespace Lime
 			switch (blending) {
 				case Blending.Inherited:
 				case Blending.Alpha:
-					GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+					if (premultipliedAlphaMode) {
+						GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.OneMinusSrcAlpha);
+					} else {
+						GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+					}
 					break;
 				case Blending.Add:
 				case Blending.Glow:
-					GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
+					if (premultipliedAlphaMode) {
+						GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.One);
+					} else {
+						GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
+					}
 					break;
 				case Blending.Burn:
 				case Blending.Darken:
