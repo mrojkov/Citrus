@@ -10,7 +10,7 @@ namespace Lime
 	{
 		private bool windowActivated;
 		private Widget lastFocused;
-		private readonly RenderChain renderChain;
+		protected readonly RenderChain renderChain;
 
 		public IWindow Window { get; private set; }
 
