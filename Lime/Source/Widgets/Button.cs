@@ -95,6 +95,9 @@ namespace Lime
 			var wasMouseOver = true;
 			while (true) {
 				if (clickRecognizer.WasRecognized()) {
+					while (IsRunning) {
+						yield return 0;
+					}
 					HandleClick();
 					// buz: don't play release animation
 					// if button's parent became invisible due to
