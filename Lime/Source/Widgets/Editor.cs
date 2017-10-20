@@ -500,8 +500,8 @@ namespace Lime
 			var doubleClickRecognizer = new DoubleClickRecognizer();
 			var dragRecognizer = new DragRecognizer(0, DragDirection.Any, EditorParams.MouseSelectionThreshold);
 			ClickableWidget.GestureRecognizers.Add(rightClickRecognizer);
-			ClickableWidget.GestureRecognizers.Add(doubleClickRecognizer);
 			ClickableWidget.GestureRecognizers.Add(clickRecognizer);
+			ClickableWidget.GestureRecognizers.Add(doubleClickRecognizer);
 			ClickableWidget.GestureRecognizers.Add(dragRecognizer);
 
 			while (true) {

@@ -84,6 +84,7 @@ namespace Tangerine.UI.Timeline.Components
 			label.AddChangeWatcher(() => nodeData.Node.ContentsPath, s => RefreshLabel());
 			widget.CompoundPresenter.Push(new DelegatePresenter<Widget>(RenderBackground));
 			editBox.Visible = false;
+			widget.GestureRecognizers.Add(new ClickRecognizer(1, ShowPropertyContextMenu));
 			widget.GestureRecognizers.Add(new DoubleClickRecognizer(() => {
 				Core.Operations.EnterNode.Perform(nodeData.Node);
 			}));
@@ -92,7 +93,6 @@ namespace Tangerine.UI.Timeline.Components
 				Core.Operations.SelectRow.Perform(row);
 				Rename();
 			}));
-			widget.GestureRecognizers.Add(new ClickRecognizer(1, ShowPropertyContextMenu));
 		}
 
 		public Widget Widget => widget;
