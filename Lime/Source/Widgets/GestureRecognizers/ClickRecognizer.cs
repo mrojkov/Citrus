@@ -67,6 +67,10 @@ namespace Lime
 
 		internal protected override void Update(IEnumerable<GestureRecognizer> recognizers)
 		{
+			if (Input.GetNumTouches() > 1) {
+				Cancel();
+				return;
+			}
 			if (state == State.Initial && Input.WasMousePressed(ButtonIndex)) {
 				pressTime = DateTime.Now;
 				state = State.WaitDrags;
@@ -91,6 +95,8 @@ namespace Lime
 						} else {
 							canceled.Raise();
 						}
+					} else {
+						canceled.Raise();
 					}
 				}
 			}
