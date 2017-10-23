@@ -56,7 +56,7 @@ namespace Lime
 			: this(0, recognized)
 		{
 		}
-		
+
 		internal protected override void Cancel()
 		{
 			if (state == State.Began) {
@@ -86,7 +86,11 @@ namespace Lime
 				if (!Input.IsMousePressed(ButtonIndex)) {
 					state = State.Initial;
 					if (Input.GetNumTouches() == 0) {
-						recognized.Raise();
+						if (Owner.IsMouseOverThisOrDescendant()) {
+							recognized.Raise();
+						} else {
+							canceled.Raise();
+						}
 					}
 				}
 			}
