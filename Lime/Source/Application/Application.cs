@@ -30,7 +30,7 @@ namespace Lime
 
 	public static class DeviceOrientationExtensions
 	{
-		public static bool IsPortrait(this DeviceOrientation value) => 
+		public static bool IsPortrait(this DeviceOrientation value) =>
 			(value == DeviceOrientation.Portrait) ||
 			(value == DeviceOrientation.PortraitUpsideDown);
 
@@ -141,7 +141,7 @@ namespace Lime
 
 		// Specifies the lowest possible 1/(time delta) passed to Window.Updating.
 		// TODO: Move to IWindow
-		public static float LowFPSLimit = 20;
+		public static float LowFPSLimit = 33.333f;
 
 		/// <summary>
 		/// Gets the main (UI) thread. All rendering is beging processed on the main thread.
@@ -391,7 +391,7 @@ namespace Lime
 #endif
 
 		/// <summary>
-		/// Returns the main display's pixel density. 
+		/// Returns the main display's pixel density.
 		/// </summary>
 		public static Vector2 ScreenDPI
 		{
