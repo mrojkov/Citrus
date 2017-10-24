@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace Lime
 {
-	internal interface IVectorShapeElement
+	public interface IVectorShapeElement
 	{
 		void Draw(Color4 tint);
 	}
 
 	// This class should be removed after NanoVG integration.
-	internal class VectorShape : List<IVectorShapeElement>
+	public class VectorShape : List<IVectorShapeElement>
 	{
 		public void Draw()
 		{

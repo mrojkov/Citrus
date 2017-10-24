@@ -34,7 +34,10 @@ namespace Tangerine
 			rootWidget = new ThemedInvalidableWindowWidget(window) {
 				Padding = new Thickness(8),
 				Layout = new VBoxLayout(),
-				Nodes = {(Container = new ListView<RulerData>((w) => new OverlayRowView(w, collection), collection)),
+				Nodes = {
+					(Container = new ThemedScrollView {
+						Padding = new Thickness { Right = 10 },
+					}),
 					new Widget {
 						Padding = new Thickness { Top = 10 },
 						Layout = new HBoxLayout { Spacing = 8 },
@@ -46,8 +49,13 @@ namespace Tangerine
 					}
 				}
 			};
-			Container.Padding = new Thickness { Left = 1, Top = 1, Bottom = 1, Right = 10 };
 			Container.Content.Layout = new VBoxLayout { Spacing = 4 };
+			var list = new Widget {
+				Layout = new VBoxLayout(),
+			};
+			Container.Content.AddNode(list);
+			list.Components.Add(new WidgetFactoryComponent<RulerData>((w) => new RulerRowView(w, collection), collection));
+
 			okButton.Clicked += () => {
 				window.Close();
 				Core.UserPreferences.Instance.Save();
@@ -70,38 +78,10 @@ namespace Tangerine
 			okButton.SetFocus();
 		}
 
-		internal class ListView<TItem> : ThemedScrollView
-		{
-			private Func<TItem, Widget> rowBuilder;
-			public ObservableCollection<TItem> Source { get; private set; }
-
-			public ListView(Func<TItem, Widget> rowBuilder, ObservableCollection<TItem> source)
-			{
-				Source = source;
-				(Source as ObservableCollection<TItem>).CollectionChanged += CollectionChanged;
-				this.rowBuilder = rowBuilder;
-				Rebuild();
-			}
-
-			private void CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-			{
-				Rebuild();
-			}
-
-			private void Rebuild()
-			{
-				Content.Nodes.Clear();
-				foreach (var item in Source) {
-					var cell = rowBuilder(item);
-					Content.AddNode(cell);
-				}
-			}
-		}
-
-		internal class OverlayRowView : Widget
+		internal class RulerRowView : Widget
 		{
 			private ThemedSimpleText Label;
-			private ThemedTabCloseButton CloseButton;
+			private ThemedDeleteButton deleteButton;
 			private static IPresenter StripePresenter = new DelegatePresenter<Widget>(
 				w => {
 					if (w.Parent != null) {
@@ -112,23 +92,21 @@ namespace Tangerine
 					}
 				});
 
-			public OverlayRowView(RulerData overlay, IList<RulerData> overlays) : base()
+			public RulerRowView(RulerData overlay, IList<RulerData> overlays) : base()
 			{
-				LayoutCell = new LayoutCell { StretchY = 0, RowSpan = 5 };
-				Layout = new HBoxLayout() { Spacing = 5, IgnoreHidden = true };
+				Layout = new HBoxLayout();
 				Nodes.Add(Label = new ThemedSimpleText {
-					LayoutCell = new LayoutCell(Alignment.LeftTop) { StretchY = 0 },
 					Padding = new Thickness { Left = 10 },
 				});
 				this.AddChangeWatcher(() => overlay.Name, (name) => Label.Text = name);
 				Nodes.Add(new Widget());
-				Nodes.Add(CloseButton = new ThemedTabCloseButton {
+				Nodes.Add(deleteButton = new ThemedDeleteButton {
 					Anchors = Anchors.Right,
 					LayoutCell = new LayoutCell(Alignment.LeftTop)
 				});
 				CompoundPresenter.Add(StripePresenter);
-				CloseButton.Clicked = () => overlays.Remove(overlay);
-				MinMaxHeight = 15;
+				deleteButton.Clicked = () => overlays.Remove(overlay);
+				MinMaxHeight = 20;
 			}
 		}
 	}

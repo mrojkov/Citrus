@@ -4,7 +4,27 @@ namespace Lime
 {
 	public class NodeComponent : Component
 	{
-		public Node Owner { get; set; }
+		private Node owner;
+		public Node Owner
+		{
+			get
+			{
+				return owner;
+			}
+
+			set
+			{
+				if (value != owner) {
+					var oldOwner = owner;
+					owner = value;
+					OnOwnerChanged(oldOwner);
+				}
+			}
+		}
+
+		protected virtual void OnOwnerChanged(Node oldOwner)
+		{
+		}
 
 		public virtual void Awake() { }
 		public virtual NodeComponent Clone()

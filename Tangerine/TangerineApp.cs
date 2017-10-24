@@ -58,6 +58,7 @@ namespace Tangerine
 			var searchPanel = new DockPanel("Search");
 			var filesystemPanel = new DockPanel("Filesystem");
 			var consolePanel = new DockPanel("Console");
+			new UI.Console(consolePanel);
 
 			var dockManager = DockManager.Instance;
 			dockManager.AddPanel(timelinePanel, DockSite.Top, new Vector2(800, 300));
@@ -153,7 +154,6 @@ namespace Tangerine
 			}
 			WidgetContext.Current.Root.AddChangeWatcher(() => Project.Current, project => TangerineMenu.OnProjectChanged(project));
 			new UI.FilesystemView.FilesystemPane(filesystemPanel);
-			new UI.Console(consolePanel);
 			RegisterGlobalCommands();
 		}
 

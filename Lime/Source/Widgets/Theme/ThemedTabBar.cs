@@ -76,13 +76,53 @@ namespace Lime
 		}
 	}
 
+	public class VectorShapeButtonPresenter : CustomPresenter
+	{
+		private readonly VectorShape Shape;
+
+		public VectorShapeButtonPresenter(VectorShape shape)
+		{
+			Shape = shape;
+		}
+
+		Color4 color;
+
+		public override void Render(Node node)
+		{
+			var widget = node.AsWidget;
+			widget.PrepareRendererState();
+			var transform = Matrix32.Scaling(widget.Size);
+			Shape.Draw(transform, color);
+		}
+
+		public override bool PartialHitTest(Node node, ref HitTestArgs args)
+		{
+			return node.PartialHitTest(ref args);
+		}
+
+		public void SetState(string state)
+		{
+			CommonWindow.Current.Invalidate();
+			if (state == "Normal") {
+				color = Theme.Colors.CloseButtonNormal;
+			} else if (state == "Focus") {
+				color = Theme.Colors.CloseButtonHovered;
+			} else {
+				color = Theme.Colors.CloseButtonPressed;
+			}
+		}
+	}
+
 	public class ThemedTabCloseButton : Button
 	{
 		public override bool IsNotDecorated() => false;
 
 		public ThemedTabCloseButton()
 		{
-			var presenter = new TabCloseButtonPresenter();
+			var presenter = new VectorShapeButtonPresenter(new VectorShape {
+				new VectorShape.Line(0.3f, 0.3f, 0.7f, 0.7f, Color4.White, 0.075f * 1.5f),
+				new VectorShape.Line(0.3f, 0.7f, 0.7f, 0.3f, Color4.White, 0.0751f * 1.5f),
+			});
 			LayoutCell = new LayoutCell(Alignment.Center, stretchX: 0);
 			Presenter = presenter;
 			MinMaxSize = Theme.Metrics.CloseButtonSize;
@@ -94,40 +134,7 @@ namespace Lime
 			};
 		}
 
-		class TabCloseButtonPresenter : CustomPresenter
-		{
-			private VectorShape icon = new VectorShape {
-				new VectorShape.Line(0.3f, 0.3f, 0.7f, 0.7f, Color4.White, 0.075f * 1.5f),
-				new VectorShape.Line(0.3f, 0.7f, 0.7f, 0.3f, Color4.White, 0.0751f * 1.5f),
-			};
-
-			Color4 color;
-
-			public override void Render(Node node)
-			{
-				var widget = node.AsWidget;
-				widget.PrepareRendererState();
-				var transform = Matrix32.Scaling(Theme.Metrics.CloseButtonSize);
-				icon.Draw(transform, color);
-			}
-
-			public override bool PartialHitTest(Node node, ref HitTestArgs args)
-			{
-				return node.PartialHitTest(ref args);
-			}
-
-			public void SetState(string state)
-			{
-				CommonWindow.Current.Invalidate();
-				if (state == "Normal") {
-					color = Theme.Colors.CloseButtonNormal;
-				} else if (state == "Focus") {
-					color = Theme.Colors.CloseButtonHovered;
-				} else {
-					color = Theme.Colors.CloseButtonPressed;
-				}
-			}
-		}
 	}
 }
+
 #endif

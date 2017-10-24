@@ -251,6 +251,7 @@ namespace Lime
 			form.Deactivate += OnDeactivate;
 			form.FormClosing += OnClosing;
 			form.FormClosed += OnClosed;
+			active = Form.ActiveForm == form;
 
 			if (options.UseTimer) {
 				timer = new Timer {
