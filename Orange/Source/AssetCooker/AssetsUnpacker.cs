@@ -11,10 +11,20 @@ namespace Orange
 	{
 		public static void Unpack(TargetPlatform platform)
 		{
-			string bundlePath = The.Workspace.GetMainBundlePath(platform);
-			var dirInfo = new System.IO.DirectoryInfo(Path.GetDirectoryName(bundlePath));
-			foreach (var fileInfo in dirInfo.GetFiles('*' + Path.GetExtension(bundlePath), SearchOption.TopDirectoryOnly)) {
-				UnpackBundle(fileInfo.FullName);
+			var cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, The.Workspace.ActiveTarget);
+			var bundles = new HashSet<string>();
+			foreach (var dictionaryItem in cookingRulesMap) {
+				foreach (var bundle in dictionaryItem.Value.Bundles) {
+					bundles.Add(bundle);
+				}
+			}
+
+			foreach (var bundleName in bundles) {
+				string bundlePath = The.Workspace.GetBundlePath(bundleName, The.Workspace.ActivePlatform);
+				var dirInfo = new System.IO.DirectoryInfo(Path.GetDirectoryName(bundlePath));
+				foreach (var fileInfo in dirInfo.GetFiles('*' + Path.GetExtension(bundlePath), SearchOption.TopDirectoryOnly)) {
+					UnpackBundle(fileInfo.FullName);
+				}
 			}
 		}
 
