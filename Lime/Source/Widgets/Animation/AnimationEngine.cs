@@ -1,26 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Lime
 {
 	public class AnimationEngine
 	{
-		public virtual bool TryRunAnimation(Animation animation, string markerId) { return false; }
+		public virtual bool TryRunAnimation(Animation animation, string markerId, double animationTimeCorrection = 0) { return false; }
 		public virtual void AdvanceAnimation(Animation animation, float delta) { }
-		public virtual void ApplyAnimators(Animation animation, bool invokeTriggers) { }
+		public virtual void ApplyAnimators(Animation animation, bool invokeTriggers, double animationTimeCorrection = 0) { }
 	}
 
 	public class AnimationEngineDelegate : AnimationEngine
 	{
-		public Func<Animation, string, bool> OnRunAnimation;
+		public Func<Animation, string, double, bool> OnRunAnimation;
 		public Action<Animation, float> OnAdvanceAnimation;
-		public Action<Animation, bool> OnApplyAnimators;
+		public Action<Animation, bool, double> OnApplyAnimators;
 
-		public override bool TryRunAnimation(Animation animation, string markerId)
+		public override bool TryRunAnimation(Animation animation, string markerId, double animationTimeCorrection = 0)
 		{
-			return (OnRunAnimation != null) && OnRunAnimation(animation, markerId);
+			return (OnRunAnimation != null) && OnRunAnimation(animation, markerId, animationTimeCorrection);
 		}
 
 		public override void AdvanceAnimation(Animation animation, float delta)
@@ -30,10 +27,10 @@ namespace Lime
 			}
 		}
 
-		public override void ApplyAnimators(Animation animation, bool invokeTriggers)
+		public override void ApplyAnimators(Animation animation, bool invokeTriggers, double animationTimeCorrection = 0)
 		{
 			if (OnApplyAnimators != null) {
-				OnApplyAnimators(animation, invokeTriggers);
+				OnApplyAnimators(animation, invokeTriggers, animationTimeCorrection);
 			}
 		}
 	}
@@ -42,7 +39,7 @@ namespace Lime
 	{
 		public static readonly DefaultAnimationEngine Instance = new DefaultAnimationEngine();
 
-		public override bool TryRunAnimation(Animation animation, string markerId)
+		public override bool TryRunAnimation(Animation animation, string markerId, double animationTimeCorrection = 0)
 		{
 			var frame = 0;
 			if (markerId != null) {
@@ -52,7 +49,7 @@ namespace Lime
 				}
 				frame = marker.Frame;
 			}
-			animation.Frame = frame;
+			animation.Time = AnimationUtils.FramesToSeconds(frame) + animationTimeCorrection;
 			animation.RunningMarkerId = markerId;
 			animation.IsRunning = true;
 			return true;
@@ -88,7 +85,7 @@ namespace Lime
 				}
 			}
 			if (applyAnimators || stepOverFrame) {
-				ApplyAnimators(animation, invokeTriggers: stepOverFrame);
+				ApplyAnimators(animation, stepOverFrame, previousTime - frameTime);
 				if (!animation.IsRunning) {
 					animation.OnStopped();
 				}
@@ -106,7 +103,7 @@ namespace Lime
 					if (gotoMarker != null && gotoMarker != marker) {
 						var delta = animation.Time - AnimationUtils.FramesToSeconds(animation.Frame);
 						animation.TimeInternal = gotoMarker.Time;
-						AdvanceAnimationHelper(animation, delta, applyAnimators: true); 
+						AdvanceAnimationHelper(animation, delta, applyAnimators: true);
 					}
 					break;
 				case MarkerAction.Stop:
@@ -124,18 +121,18 @@ namespace Lime
 			}
 		}
 
-		public override void ApplyAnimators(Animation animation, bool invokeTriggers)
+		public override void ApplyAnimators(Animation animation, bool invokeTriggers, double animationTimeCorrection = 0)
 		{
-			ApplyAnimators(animation.Owner, animation, invokeTriggers);
+			ApplyAnimators(animation.Owner, animation, invokeTriggers, animationTimeCorrection);
 		}
 
-		private static void ApplyAnimators(Node node, Animation animation, bool invokeTriggers)
+		private static void ApplyAnimators(Node node, Animation animation, bool invokeTriggers, double animationTimeCorrection = 0)
 		{
 			for (var child = node.Nodes.FirstOrNull(); child != null; child = child.NextSibling) {
 				var animators = child.Animators;
 				animators.Apply(animation.Time, animation.Id);
 				if (invokeTriggers) {
-					animators.InvokeTriggers(animation.Frame);
+					animators.InvokeTriggers(animation.Frame, animationTimeCorrection);
 				}
 				if (animation.Id != null) {
 					ApplyAnimators(child, animation, invokeTriggers);

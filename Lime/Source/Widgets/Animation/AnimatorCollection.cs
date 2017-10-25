@@ -173,11 +173,11 @@ namespace Lime
 			}
 		}
 
-		public void InvokeTriggers(int frame)
+		public void InvokeTriggers(int frame, double animationTimeCorrection = 0)
 		{
 			foreach (var animator in AsArray) {
 				if (animator.IsTriggerable) {
-					animator.InvokeTrigger(frame);
+					animator.InvokeTrigger(frame, animationTimeCorrection);
 				}
 			}
 		}

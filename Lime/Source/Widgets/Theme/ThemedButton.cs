@@ -22,7 +22,7 @@ namespace Lime
 			Presenter = presenter;
 			PostPresenter = new Theme.KeyboardFocusBorderPresenter(2.0f);
 			DefaultAnimation.AnimationEngine = new AnimationEngineDelegate {
-				OnRunAnimation = (animation, markerId) => {
+				OnRunAnimation = (animation, markerId, animationTimeCorrection) => {
 					presenter.SetState(markerId);
 					return true;
 				}

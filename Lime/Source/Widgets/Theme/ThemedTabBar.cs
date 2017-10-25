@@ -36,7 +36,7 @@ namespace Lime
 			var presenter = new TabPresenter(caption);
 			Presenter = presenter;
 			DefaultAnimation.AnimationEngine = new AnimationEngineDelegate {
-				OnRunAnimation = (animation, markerId) => {
+				OnRunAnimation = (animation, markerId, animationTimeCorrection) => {
 					presenter.SetState(markerId);
 					return true;
 				}
@@ -127,7 +127,7 @@ namespace Lime
 			Presenter = presenter;
 			MinMaxSize = Theme.Metrics.CloseButtonSize;
 			DefaultAnimation.AnimationEngine = new AnimationEngineDelegate {
-				OnRunAnimation = (animation, markerId) => {
+				OnRunAnimation = (animation, markerId, animationTimeCorrection) => {
 					presenter.SetState(markerId);
 					return true;
 				}

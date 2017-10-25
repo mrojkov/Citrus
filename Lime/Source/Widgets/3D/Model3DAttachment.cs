@@ -611,20 +611,20 @@ namespace Lime
 			base.AdvanceAnimation(animation, delta);
 		}
 
-		public override void ApplyAnimators(Animation animation, bool invokeTriggers)
+		public override void ApplyAnimators(Animation animation, bool invokeTriggers, double animationTimeCorrection = 0)
 		{
 			var effectAnimation = GetPresenter(animation).Animation;
-			effectAnimation.AnimationEngine.ApplyAnimators(effectAnimation, invokeTriggers);
+			effectAnimation.AnimationEngine.ApplyAnimators(effectAnimation, invokeTriggers, animationTimeCorrection);
 
-			base.ApplyAnimators(animation, invokeTriggers);
+			base.ApplyAnimators(animation, invokeTriggers, animationTimeCorrection);
 		}
 
-		public override bool TryRunAnimation(Animation animation, string markerId)
+		public override bool TryRunAnimation(Animation animation, string markerId, double animationTimeCorrection = 0)
 		{
 			var presenter = GetPresenter(animation);
 			if (
-				!base.TryRunAnimation(animation, markerId) ||
-				!presenter.Animation.AnimationEngine.TryRunAnimation(presenter.Animation, markerId)
+				!base.TryRunAnimation(animation, markerId, animationTimeCorrection) ||
+				!presenter.Animation.AnimationEngine.TryRunAnimation(presenter.Animation, markerId, animationTimeCorrection)
 			) {
 				return false;
 			}

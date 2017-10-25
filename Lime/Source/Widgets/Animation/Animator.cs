@@ -21,7 +21,7 @@ namespace Lime
 
 		int Duration { get; }
 
-		void InvokeTrigger(int frame);
+		void InvokeTrigger(int frame, double animationTimeCorrection = 0);
 
 		void Apply(double time);
 
@@ -143,12 +143,12 @@ namespace Lime
 			Keys.Clear();
 		}
 
-		public void InvokeTrigger(int frame)
+		public void InvokeTrigger(int frame, double animationTimeCorrection = 0)
 		{
 			if (ReadonlyKeys.Count > 0 && Enabled) {
 				// This function relies on currentKey value. Therefore Apply(time) must be called before.
 				if (ReadonlyKeys[currentKey].Frame == frame) {
-					Owner.OnTrigger(TargetProperty);
+					Owner.OnTrigger(TargetProperty, animationTimeCorrection);
 				}
 			}
 		}

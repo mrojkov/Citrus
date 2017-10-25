@@ -59,9 +59,9 @@ namespace Lime
 			}
 		}
 
-		public bool TryRun(string markerId = null)
+		public bool TryRun(string markerId = null, double animationTimeCorrection = 0)
 		{
-			if (AnimationEngine.TryRunAnimation(this, markerId)) {
+			if (AnimationEngine.TryRunAnimation(this, markerId, animationTimeCorrection)) {
 				Stopped = null;
 				return true;
 			}

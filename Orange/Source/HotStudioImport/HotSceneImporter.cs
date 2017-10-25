@@ -1,9 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System;
 using System.Linq;
 using Lime;
-using System.Collections.Generic;
 using Exception = Lime.Exception;
 
 namespace Orange
@@ -12,17 +11,17 @@ namespace Orange
 	{
 		public override void AdvanceAnimation(Animation animation, float delta)
 		{
-			DefaultAnimationEngine.Instance.AdvanceAnimation(animation, delta / 2);
+			DefaultAnimationEngine.Instance.AdvanceAnimation(animation, delta * 0.5f);
 		}
 
-		public override void ApplyAnimators(Animation animation, bool invokeTriggers)
+		public override void ApplyAnimators(Animation animation, bool invokeTriggers, double animationTimeCorrection = 0)
 		{
-			DefaultAnimationEngine.Instance.ApplyAnimators(animation, invokeTriggers);
+			DefaultAnimationEngine.Instance.ApplyAnimators(animation, invokeTriggers, animationTimeCorrection);
 		}
 
-		public override bool TryRunAnimation(Animation animation, string markerId)
+		public override bool TryRunAnimation(Animation animation, string markerId, double animationTimeCorrection = 0)
 		{
-			return DefaultAnimationEngine.Instance.TryRunAnimation(animation, markerId);
+			return DefaultAnimationEngine.Instance.TryRunAnimation(animation, markerId, animationTimeCorrection);
 		}
 	}
 

@@ -88,7 +88,7 @@ namespace Lime
 			}
 		}
 
-		public override void OnTrigger(string property)
+		public override void OnTrigger(string property, double animationTimeCorrection = 0)
 		{
 			if (property == "Action") {
 				HandleAction();
