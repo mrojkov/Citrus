@@ -223,6 +223,8 @@ namespace Lime
 				key == Key.ScrollLock ? Keys.Scroll :
 				key == Key.PrintScreen ? Keys.PrintScreen :
 				key == Key.Pause ? Keys.Pause :
+				key == Key.EqualsSign ? Keys.Oemplus :
+				key == Key.Minus ? Keys.OemMinus :
 				InvalidKeyExceptionFunc();
 		}
 

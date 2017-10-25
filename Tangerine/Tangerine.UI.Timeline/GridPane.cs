@@ -40,8 +40,22 @@ namespace Tangerine.UI.Timeline
 				_ => Core.Operations.Dummy.Perform());
 			OnPostRender += RenderCursor;
 			OnPostRender += RenderSelection;
+			RootWidget.Tasks.Add(HandleRightClickTask);
 		}
 		
+		IEnumerator<object> HandleRightClickTask()
+		{
+			while (true) {
+				if (RootWidget.Input.WasMouseReleased(1)) {
+					new Menu {
+						TimelineCommands.InsertFrame,
+						TimelineCommands.DeleteFrame,
+					}.Popup();
+				}
+				yield return null;
+			}
+		}
+
 		private void RenderBackgroundAndGrid(Node node)
 		{
 			RootWidget.PrepareRendererState();

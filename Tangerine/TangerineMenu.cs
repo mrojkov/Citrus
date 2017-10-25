@@ -101,6 +101,8 @@ namespace Tangerine
 					TimelineCommands.CreateMarkerStop,
 					TimelineCommands.CreateMarkerJump,
 					TimelineCommands.DeleteMarker,
+					TimelineCommands.InsertFrame,
+					TimelineCommands.DeleteFrame,
 					Command.MenuSeparator,
 					Command.SelectAll,
 					Command.MenuSeparator,

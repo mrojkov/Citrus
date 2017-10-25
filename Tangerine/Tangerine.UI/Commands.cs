@@ -17,6 +17,8 @@ namespace Tangerine.UI
 		public static readonly ICommand ExitNode = new Command(new Shortcut(Key.BackSpace));
 		public static readonly ICommand RenameRow = new Command(new Shortcut(Key.F2));
 		public static readonly ICommand DeleteKeyframes = new Command("Delete Selected Keyframes", new Shortcut(Modifiers.Shift, Key.Delete));
+		public static readonly ICommand InsertFrame = new Command("Insert Frame", new Shortcut(Modifiers.Command, Key.EqualsSign));
+		public static readonly ICommand DeleteFrame = new Command("Delete Frame", new Shortcut(Modifiers.Command, Key.Minus));
 		public static readonly ICommand CreateMarkerPlay = new Command("Create Play Marker", new Shortcut(Modifiers.Alt, Key.Number1));
 		public static readonly ICommand CreateMarkerStop = new Command("Create Stop Marker", new Shortcut(Modifiers.Alt, Key.Number2));
 		public static readonly ICommand CreateMarkerJump = new Command("Create Jump Marker", new Shortcut(Modifiers.Alt, Key.Number3));
