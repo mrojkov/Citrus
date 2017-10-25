@@ -75,12 +75,13 @@ namespace Tangerine
 				switch (alert.Show()) {
 					case 0: return Document.CloseAction.SaveChanges;
 					case 1: return Document.CloseAction.DiscardChanges;
+					case -1:
 					default: return Document.CloseAction.Cancel;
 				}
 			};
 			Project.DocumentReloadConfirmation += doc => {
 				var alert = new AlertDialog($"The file '{doc.Path}' has been changed outside of Tangerine.\nDo you want to keep your changes, or reload the file from disk?", "Keep", "Reload");
-				return alert.Show() == 0 ? false : true;
+				return alert.Show() == 0 || alert.Show() == -1 ? false : true;
 			};
 
 			Project.CookingOfModifiedAssetsStarted += () => {

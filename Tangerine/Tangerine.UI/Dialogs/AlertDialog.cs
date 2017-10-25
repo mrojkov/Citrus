@@ -9,7 +9,7 @@ namespace Tangerine.UI
 		readonly Window window;
 		readonly WindowWidget rootWidget;
 		readonly Widget buttonsPanel;
-		int result;
+		int result = -1;
 
 		public AlertDialog(string text, params string[] buttons)
 		{
@@ -39,6 +39,7 @@ namespace Tangerine.UI
 			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
 			var cancelIndex = buttons.ToList().IndexOf("Cancel");
 			if (cancelIndex >= 0) {
+				result = cancelIndex;
 				rootWidget.LateTasks.AddLoop(() => {
 					if (rootWidget.Input.ConsumeKeyPress(Key.Escape)) {
 						Close(cancelIndex);
