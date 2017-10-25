@@ -162,6 +162,12 @@ namespace Lime
 				if (key >= Key.F1 && key <= Key.F12) {
 					return ((char)((int)NSFunctionKey.F1 + (key.Code - Key.F1.Code))).ToString();
 				}
+				if (key == Key.EqualsSign) {
+					return "=";
+				}
+				if (key == Key.Minus) {
+					return "-";
+				}
 				throw new ArgumentException();
 			}
 
