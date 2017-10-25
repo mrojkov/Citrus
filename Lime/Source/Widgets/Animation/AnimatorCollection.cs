@@ -152,6 +152,10 @@ namespace Lime
 			animatorArray = null;
 			animator.Bind(owner);
 			animatorList.Add(animator);
+			Animation animation;
+			if (owner.Animations.TryFind(animator.AnimationId, out animation)) {
+				animation.NextMarkerOrTriggerTime = null;
+			}
 			Version++;
 		}
 

@@ -5,17 +5,26 @@ namespace Lime
 {
 	public class MarkerCollection : List<Marker>
 	{
-		public MarkerCollection() { }
-		public MarkerCollection(int capacity) : base(capacity) { }
+		private readonly Animation owner;
+
+		public MarkerCollection(Animation owner)
+		{
+			this.owner = owner;
+		}
+
+		public MarkerCollection(Animation owner, int capacity) : base(capacity)
+		{
+			this.owner = owner;
+		}
 
 		public Marker this[string id]
 		{
 			get { return Find(id); }
 		}
 
-		internal static MarkerCollection DeepClone(MarkerCollection source)
+		internal static MarkerCollection DeepClone(MarkerCollection source, Animation owner)
 		{
-			var result = new MarkerCollection(source.Count);
+			var result = new MarkerCollection(owner, source.Count);
 			foreach (var marker in source) {
 				result.Add(marker.Clone());
 			}
@@ -59,11 +68,11 @@ namespace Lime
 
 		public new void Add(Marker marker)
 		{
-			if (Count == 0 || marker.Frame > this[Count - 1].Frame) {
-				base.Add(marker);
-			} else {
+			if (Count != 0 && marker.Frame <= this[Count - 1].Frame) {
 				throw new InvalidOperationException();
 			}
+			base.Add(marker);
+			owner.NextMarkerOrTriggerTime = null;
 		}
 
 		public void AddOrdered(Marker marker)
@@ -81,6 +90,7 @@ namespace Lime
 					Insert(i, marker);
 				}
 			}
+			owner.NextMarkerOrTriggerTime = null;
 		}
 	}
 }

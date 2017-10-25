@@ -57,39 +57,65 @@ namespace Lime
 
 		public override void AdvanceAnimation(Animation animation, float delta)
 		{
-			double remainedDelta = delta;
-			// Set the delta limit to ensure we process no more than one frame at a time.
-			const double deltaLimit = AnimationUtils.SecondsPerFrame * 0.99;
-			while (remainedDelta > deltaLimit) {
-				AdvanceAnimationHelper(animation, deltaLimit, applyAnimators: false);
-				remainedDelta -= deltaLimit;
-			}
-			AdvanceAnimationHelper(animation, remainedDelta, applyAnimators: true);
-		}
-
-		private void AdvanceAnimationHelper(Animation animation, double delta, bool applyAnimators)
-		{
 			if (!animation.IsRunning) {
 				return;
 			}
+
 			var previousTime = animation.TimeInternal;
 			var currentTime = previousTime + delta;
 			animation.TimeInternal = currentTime;
-			var frameIndex = AnimationUtils.SecondsToFrames(currentTime);
-			var frameTime = AnimationUtils.SecondsPerFrame * frameIndex;
-			var stepOverFrame = previousTime <= frameTime && frameTime < currentTime;
-			if (stepOverFrame && animation.Markers.Count > 0) {
-				var marker = animation.Markers.GetByFrame(frameIndex);
-				if (marker != null) {
-					ProcessMarker(animation, marker);
-				}
+			if (!animation.NextMarkerOrTriggerTime.HasValue) {
+				var frameIndex = AnimationUtils.SecondsToFrames(currentTime);
+				var frameTime = AnimationUtils.SecondsPerFrame * frameIndex;
+				var stepOverFrame = previousTime <= frameTime && frameTime <= currentTime;
+				animation.NextMarkerOrTriggerTime = GetNextMarkerOrTriggerTime(animation, frameIndex + (stepOverFrame ? 0 : 1));
 			}
-			if (applyAnimators || stepOverFrame) {
-				ApplyAnimators(animation, stepOverFrame, previousTime - frameTime);
+
+			if (!animation.NextMarkerOrTriggerTime.HasValue || currentTime <= animation.NextMarkerOrTriggerTime.Value) {
+				ApplyAnimators(animation, invokeTriggers: false);
+			} else {
+				var frameTime = animation.NextMarkerOrTriggerTime.Value;
+				var frameIndex = AnimationUtils.SecondsToFrames(frameTime);
+				animation.NextMarkerOrTriggerTime = null;
+				var currentMarker = animation.Markers.GetByFrame(frameIndex);
+				if (currentMarker != null) {
+					ProcessMarker(animation, currentMarker);
+				}
+				ApplyAnimators(animation, invokeTriggers: true, animationTimeCorrection: previousTime - frameTime);
 				if (!animation.IsRunning) {
 					animation.OnStopped();
 				}
 			}
+		}
+
+		private static double? GetNextMarkerOrTriggerTime(Animation animation, int nextFrame)
+		{
+			int? nextMarkerOrTriggerFrame = null;
+			foreach (var marker in animation.Markers) {
+				if (marker.Frame >= nextFrame) {
+					nextMarkerOrTriggerFrame = marker.Frame;
+					break;
+				}
+			}
+			for (var child = animation.Owner.Nodes.FirstOrNull(); child != null; child = child.NextSibling) {
+				foreach (var animator in child.Animators) {
+					if (!animator.Enabled || !animator.IsTriggerable || animator.AnimationId != animation.Id) {
+						continue;
+					}
+
+					foreach (var key in animator.ReadonlyKeys) {
+						if (key.Frame < nextFrame) {
+							continue;
+						}
+
+						if (!nextMarkerOrTriggerFrame.HasValue || key.Frame < nextMarkerOrTriggerFrame.Value) {
+							nextMarkerOrTriggerFrame = key.Frame;
+						}
+						break;
+					}
+				}
+			}
+			return nextMarkerOrTriggerFrame * AnimationUtils.SecondsPerFrame;
 		}
 
 		private void ProcessMarker(Animation animation, Marker marker)
@@ -103,7 +129,7 @@ namespace Lime
 					if (gotoMarker != null && gotoMarker != marker) {
 						var delta = animation.Time - AnimationUtils.FramesToSeconds(animation.Frame);
 						animation.TimeInternal = gotoMarker.Time;
-						AdvanceAnimationHelper(animation, delta, applyAnimators: true);
+						AdvanceAnimation(animation, (float)delta);
 					}
 					break;
 				case MarkerAction.Stop:
@@ -116,9 +142,7 @@ namespace Lime
 					animation.Owner.Unlink();
 					break;
 			}
-			if (marker.CustomAction != null) {
-				marker.CustomAction();
-			}
+			marker.CustomAction?.Invoke();
 		}
 
 		public override void ApplyAnimators(Animation animation, bool invokeTriggers, double animationTimeCorrection = 0)
