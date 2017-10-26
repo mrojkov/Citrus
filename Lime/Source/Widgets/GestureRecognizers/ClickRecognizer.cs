@@ -89,12 +89,8 @@ namespace Lime
 			if (state == State.Began) {
 				if (!Input.IsMousePressed(ButtonIndex)) {
 					state = State.Initial;
-					if (Input.GetNumTouches() == 0) {
-						if (Owner.IsMouseOverThisOrDescendant()) {
-							recognized.Raise();
-						} else {
-							canceled.Raise();
-						}
+					if (Owner.IsMouseOverThisOrDescendant()) {
+						recognized.Raise();
 					} else {
 						canceled.Raise();
 					}

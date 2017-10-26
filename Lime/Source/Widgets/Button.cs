@@ -113,6 +113,12 @@ namespace Lime
 						State = ReleaseState;
 					}
 				} else if (clickRecognizer.WasCanceled()) {
+					if (CurrentAnimation == "Press") {
+						TryRunAnimation("Release");
+						while (IsRunning) {
+							yield return 0;
+						}
+					}
 					State = NormalState;
 				}
 				var mouseOver = IsMouseOverThisOrDescendant();
