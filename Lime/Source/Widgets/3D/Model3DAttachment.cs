@@ -32,7 +32,7 @@ namespace Lime
 			public ObservableCollection<MarkerData> Markers = new ObservableCollection<MarkerData>();
 			public ObservableCollection<NodeData> Nodes = new ObservableCollection<NodeData>();
 			public ObservableCollection<NodeData> IgnoredNodes = new ObservableCollection<NodeData>();
-			public BlendingOption Blending { get; set; } = new BlendingOption();
+			public BlendingOption Blending { get; set; }
 			public readonly ObservableCollection<MarkerBlendingData> MarkersBlendings = new ObservableCollection<MarkerBlendingData>();
 		}
 
@@ -44,7 +44,7 @@ namespace Lime
 		public class MarkerData
 		{
 			public Marker Marker { get; set; }
-			public BlendingOption Blending { get; set; } = new BlendingOption();
+			public BlendingOption Blending { get; set; }
 		}
 
 		public class MarkerBlendingData
@@ -59,7 +59,7 @@ namespace Lime
 			public string Name { get; set; }
 			public string MaterialName { get; set; }
 			public string Path { get; set; }
-			public BlendingOption Blending { get; set; } = new BlendingOption();
+			public BlendingOption Blending { get; set; }
 		}
 
 		public void Apply(Node3D model)
@@ -255,113 +255,113 @@ namespace Lime
 
 		public class ModelAttachmentFormat
 		{
-			[YuzuOptional]
+			[YuzuMember]
 			public Dictionary<string, MeshOptionFormat> MeshOptions = null;
 
-			[YuzuOptional]
+			[YuzuMember]
 			public Dictionary<string, ModelAnimationFormat> Animations = null;
 
-			[YuzuOptional]
+			[YuzuMember]
 			public Dictionary<string, ModelMaterialEffectFormat> MaterialEffects = null;
 
-			[YuzuOptional]
+			[YuzuMember]
 			public List<UVAnimationFormat> UVAnimations = null;
 
-			[YuzuOptional]
+			[YuzuMember]
 			public float ScaleFactor = 1f;
 		}
 
 		public class MeshOptionFormat
 		{
-			[YuzuOptional]
+			[YuzuMember]
 			public bool HitTestTarget = false;
 
-			[YuzuOptional]
+			[YuzuMember]
 			public string CullMode = null;
 		}
 
 		public class UVAnimationFormat
 		{
-			[YuzuOptional]
+			[YuzuMember]
 			public string MeshName = null;
 
-			[YuzuOptional]
+			[YuzuMember]
 			public string DiffuseTexture = null;
 
-			[YuzuOptional]
+			[YuzuMember]
 			public string OverlayTexture = null;
 
-			[YuzuOptional]
+			[YuzuMember]
 			public string MaskTexture = null;
 
-			[YuzuOptional]
+			[YuzuMember]
 			public float AnimationSpeed = 0;
 
-			[YuzuOptional]
+			[YuzuMember]
 			public UVAnimationType AnimationType = UVAnimationType.Rotation;
 
-			[YuzuOptional]
+			[YuzuMember]
 			public UVAnimationOverlayBlending BlendingMode = UVAnimationOverlayBlending.Multiply;
 
-			[YuzuOptional]
+			[YuzuMember]
 			public bool AnimateOverlay = false;
 
-			[YuzuOptional]
+			[YuzuMember]
 			public float TileX = 1f;
 
-			[YuzuOptional]
+			[YuzuMember]
 			public float TileY = 1f;
 		}
 
 		public class ModelAnimationFormat
 		{
-			[YuzuOptional]
+			[YuzuMember]
 			public int StartFrame = 0;
 
-			[YuzuOptional]
+			[YuzuMember]
 			public int LastFrame = 0;
 
-			[YuzuOptional]
+			[YuzuMember]
 			public List<string> Nodes = null;
 
-			[YuzuOptional]
+			[YuzuMember]
 			public List<string> IgnoredNodes = null;
 
-			[YuzuOptional]
+			[YuzuMember]
 			public Dictionary<string, ModelMarkerFormat> Markers = null;
 
-			[YuzuOptional]
-			public int Blending = 0;
+			[YuzuMember]
+			public int? Blending = null;
 		}
 
 		public class ModelMarkerFormat
 		{
-			[YuzuOptional]
+			[YuzuMember]
 			public int Frame = 0;
 
-			[YuzuOptional]
+			[YuzuMember]
 			public string Action = null;
 
-			[YuzuOptional]
+			[YuzuMember]
 			public string JumpTarget = null;
 
-			[YuzuOptional]
+			[YuzuMember]
 			public Dictionary<string, int> SourceMarkersBlending = null;
 
-			[YuzuOptional]
-			public int Blending = 0;
+			[YuzuMember]
+			public int? Blending = null;
 		}
 
 		public class ModelMaterialEffectFormat
 		{
-			[YuzuOptional]
+			[YuzuMember]
 			public string MaterialName = null;
 
-			[YuzuOptional]
+			[YuzuMember]
 			public string Path = null;
 
-			[YuzuOptional]
-			public int Blending = 0;
+			[YuzuMember]
+			public int? Blending = null;
 		}
 
 		public Model3DAttachment Parse(string modelPath, bool useBundle = true)
@@ -441,8 +441,8 @@ namespace Lime
 											break;
 									}
 								}
-								if (markerFormat.Value.Blending > 0) {
-									markerData.Blending = new BlendingOption(markerFormat.Value.Blending);
+								if (markerFormat.Value.Blending != null) {
+									markerData.Blending = new BlendingOption((int)markerFormat.Value.Blending);
 								}
 								if (markerFormat.Value.SourceMarkersBlending != null) {
 									foreach (var elem in markerFormat.Value.SourceMarkersBlending) {
@@ -458,8 +458,8 @@ namespace Lime
 							}
 						}
 
-						if (animationFormat.Value.Blending > 0) {
-							animation.Blending = new BlendingOption(animationFormat.Value.Blending);
+						if (animationFormat.Value.Blending != null) {
+							animation.Blending = new BlendingOption((int)animationFormat.Value.Blending);
 						}
 
 						if (animationFormat.Value.Nodes != null) {
@@ -486,8 +486,8 @@ namespace Lime
 							MaterialName = materialEffectFormat.Value.MaterialName,
 							Path = FixPath(modelPath, materialEffectFormat.Value.Path)
 						};
-						if (materialEffectFormat.Value.Blending > 0) {
-							materialEffect.Blending = new BlendingOption(materialEffectFormat.Value.Blending);
+						if (materialEffectFormat.Value.Blending != null) {
+							materialEffect.Blending = new BlendingOption((int)materialEffectFormat.Value.Blending);
 						}
 						attachment.MaterialEffects.Add(materialEffect);
 					}
@@ -564,10 +564,13 @@ namespace Lime
 							markerFormat.SourceMarkersBlending.Add(markerBlending.SourceMarkerId, (int)markerBlending.Blending.DurationInFrames);
 						}
 					}
+					if (markerData.Blending != null) {
+						markerFormat.Blending = (int)markerData.Blending.DurationInFrames;
+					}
 					animationFormat.Markers.Add(markerData.Marker.Id, markerFormat);
 				}
 
-				if (animation.Blending.Duration > 0) {
+				if (animation.Blending != null) {
 					animationFormat.Blending = (int)animation.Blending.DurationInFrames;
 				}
 
