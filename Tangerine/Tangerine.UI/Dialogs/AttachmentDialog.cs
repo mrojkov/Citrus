@@ -366,18 +366,6 @@ namespace Tangerine.UI
 						nameof(Model3DAttachment.Animation.Name)) { ShowLabel = false });
 				animationNamePropEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.EditorWidth;
 
-				var startFramePropEditor = new IntPropertyEditor(
-					new PropertyEditorParams(
-						Header,
-						animation,
-						nameof(Model3DAttachment.Animation.StartFrame)) { ShowLabel = false });
-
-				var lastFramePropEditor = new IntPropertyEditor(
-					new PropertyEditorParams(
-						Header,
-						animation,
-						nameof(Model3DAttachment.Animation.LastFrame)) { ShowLabel = false });
-
 				Header.AddNode(new BlendingCell(Source, nameof(Model3DAttachment.Animation.Blending)));
 
 				var expandableContentWrapper = new Widget {
@@ -475,14 +463,6 @@ namespace Tangerine.UI
 						new ThemedSimpleText {
 							Text = "Animation name",
 							MinMaxWidth = AttachmentMetrics.EditorWidth,
-						},
-						new ThemedSimpleText {
-							Text = "Start Frame",
-							MinMaxWidth = 80,
-						},
-						new ThemedSimpleText {
-							Text = "Last Frame",
-							MinMaxWidth = 80,
 						},
 						new ThemedSimpleText {
 							Text = "Blending",

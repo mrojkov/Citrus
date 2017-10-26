@@ -27,8 +27,6 @@ namespace Lime
 		public class Animation
 		{
 			public string Name { get; set; }
-			public int StartFrame { get; set; }
-			public int LastFrame { get; set; }
 			public ObservableCollection<MarkerData> Markers = new ObservableCollection<MarkerData>();
 			public ObservableCollection<NodeData> Nodes = new ObservableCollection<NodeData>();
 			public ObservableCollection<NodeData> IgnoredNodes = new ObservableCollection<NodeData>();
@@ -318,11 +316,6 @@ namespace Lime
 
 		public class ModelAnimationFormat
 		{
-			[YuzuMember]
-			public int StartFrame = 0;
-
-			[YuzuMember]
-			public int LastFrame = 0;
 
 			[YuzuMember]
 			public List<string> Nodes = null;
@@ -418,8 +411,6 @@ namespace Lime
 					foreach (var animationFormat in modelAttachmentFormat.Animations) {
 						var animation = new Model3DAttachment.Animation {
 							Name = animationFormat.Key,
-							StartFrame = animationFormat.Value.StartFrame,
-							LastFrame = animationFormat.Value.LastFrame
 						};
 
 						if (animationFormat.Value.Markers != null) {
@@ -541,8 +532,6 @@ namespace Lime
 
 			foreach (var animation in attachment.Animations) {
 				var animationFormat = new ModelAnimationFormat {
-					LastFrame = animation.LastFrame,
-					StartFrame = animation.StartFrame,
 					Markers = new Dictionary<string, ModelMarkerFormat>(),
 				};
 				foreach (var markerData in animation.Markers) {
