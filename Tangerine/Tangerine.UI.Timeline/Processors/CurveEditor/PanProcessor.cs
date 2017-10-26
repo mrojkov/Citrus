@@ -16,7 +16,6 @@ namespace Tangerine.UI.Timeline
 			var input = curveEditor.MainAreaWidget.Input;
 			while (true) {
 				if (input.IsMousePressed(2) || (input.IsMousePressed(0) && CommonWindow.Current.Input.IsKeyPressed(Key.Space))) {
-					input.CaptureMouse();
 					var prevPosition = input.MousePosition;
 					while (input.IsMousePressed(0) || input.IsMousePressed(2)) {
 						var delta = input.MousePosition - prevPosition;
@@ -33,7 +32,6 @@ namespace Tangerine.UI.Timeline
 						prevPosition = input.MousePosition;
 						yield return null;
 					}
-					input.ReleaseMouse();
 				}
 				yield return null;
 			}

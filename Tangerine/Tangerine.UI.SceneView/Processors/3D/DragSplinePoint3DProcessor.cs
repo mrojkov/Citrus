@@ -49,7 +49,6 @@ namespace Tangerine.UI.SceneView
 		IEnumerator<object> DragPoints(IEnumerable<SplinePoint3D> points)
 		{
 			var input = SceneView.Instance.Input;
-			input.CaptureMouse();
 			Document.Current.History.BeginTransaction();
 			var offsets = new Vector3?[points.Count()];
 			try {
@@ -90,7 +89,6 @@ namespace Tangerine.UI.SceneView
 					yield return null;
 				}
 			} finally {
-				input.ReleaseMouse();
 				Document.Current.History.EndTransaction();
 			}
 		}
@@ -98,7 +96,6 @@ namespace Tangerine.UI.SceneView
 		IEnumerator<object> DragTangent(SplinePoint3D point, int tangentIndex)
 		{
 			var input = SceneView.Instance.Input;
-			input.CaptureMouse();
 			Document.Current.History.BeginTransaction();
 			Vector3? posCorrection = null;
 			try {
@@ -121,7 +118,6 @@ namespace Tangerine.UI.SceneView
 					yield return null;
 				}
 			} finally {
-				input.ReleaseMouse();
 				Document.Current.History.EndTransaction();
 			}
 		}

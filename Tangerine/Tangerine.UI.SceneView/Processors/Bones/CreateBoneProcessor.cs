@@ -61,7 +61,6 @@ namespace Tangerine.UI.SceneView
 						}
 						Core.Operations.SetProperty.Perform(bone, nameof(Bone.Position), pos);
 						Core.Operations.SetProperty.Perform(bone, nameof(Bone.BaseIndex), index);
-						sv.Input.CaptureMouse();
 						Core.Operations.SelectNode.Perform(bone);
 						Document.Current.History.BeginTransaction();
 						if (bone.BaseIndex != 0) {
@@ -79,9 +78,7 @@ namespace Tangerine.UI.SceneView
 							Core.Operations.SetProperty.Perform(bone, nameof(Bone.Length), dir.Length);
 							yield return null;
 						}
-
 					} finally {
-						sv.Input.ReleaseMouse();
 						SceneView.Instance.Components.Remove<CreateBoneHelper>();
 						Document.Current.History.EndTransaction();
 					}

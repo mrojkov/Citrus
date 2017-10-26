@@ -18,9 +18,7 @@ namespace Lime
 	}
 
 	public sealed class TangerineExportAttribute : Attribute
-	{
-
-	}
+	{ }
 
 	/// <summary>
 	/// Denotes a property which can not be animated within Tangerine.
@@ -427,6 +425,10 @@ namespace Lime
 			++CreatedCount;
 		}
 
+		private GestureList gestures;
+		public GestureList Gestures => gestures ?? (gestures = new GestureList(this));
+		public bool HasGestures() => gestures != null;
+
 		public virtual bool IsNotDecorated() => true;
 
 		public virtual void Dispose()
@@ -542,6 +544,7 @@ namespace Lime
 			++CreatedCount;
 			clone.Parent = null;
 			clone.NextSibling = null;
+			clone.gestures = null;
 			clone.AsWidget = clone as Widget;
 			clone.Animations = Animations.Clone(clone);
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
@@ -1108,6 +1111,29 @@ namespace Lime
 				throw new Exception("Ambiguity between: {0}", string.Join("; ", candidates.ToArray()));
 			}
 			return candidates.FirstOrDefault();
+		}
+
+		public bool IsMouseOver()
+		{
+			var context = WidgetContext.Current;
+			if (context.NodeUnderMouse != this) {
+				return false;
+			}
+			return
+				context.NodeMousePressedOn != null ?
+				context.NodeMousePressedOn == this : true;
+		}
+
+		public bool IsMouseOverThisOrDescendant()
+		{
+			var context = WidgetContext.Current;
+			var nodeUnderMouse = context.NodeUnderMouse;
+			if (nodeUnderMouse == null || !nodeUnderMouse.SameOrDescendantOf(this)) {
+				return false;
+			}
+			return
+				context.NodeMousePressedOn != null ?
+				context.NodeMousePressedOn.SameOrDescendantOf(this) : true;
 		}
 
 		internal protected virtual bool PartialHitTest(ref HitTestArgs args)

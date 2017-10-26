@@ -11,7 +11,6 @@ namespace Tangerine.UI
 		public static IEnumerator<object> PickColorProcessor(Action<Color4> setter)
 		{
 			var root = WidgetContext.Current.Root;
-			root.Input.CaptureMouse();
 			Document.Current.History.BeginTransaction();
 			yield return null;
 			while (true) {
@@ -20,7 +19,6 @@ namespace Tangerine.UI
 					setter(ColorPicker.PickAtCursor());
 				} else if (root.Input.WasMouseReleased()) {
 					Utils.ChangeCursorIfDefault(MouseCursor.Default);
-					root.Input.ReleaseMouse();
 					Document.Current.History.EndTransaction();
 					yield break;
 				}

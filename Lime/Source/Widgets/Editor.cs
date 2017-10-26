@@ -14,7 +14,8 @@ namespace Lime
 	public class Editor
 	{
 		public readonly Widget DisplayWidget;
-		public readonly Widget InputWidget;
+		public readonly Widget FocusableWidget;
+		public readonly Widget ClickableWidget;
 		public readonly IText Text;
 		public readonly IEditorParams EditorParams;
 		public SecureString Password;
@@ -35,12 +36,13 @@ namespace Lime
 
 		public UndoHistory<UndoItem> History = new UndoHistory<UndoItem>();
 
-		public Editor(Widget container, IEditorParams editorParams, Widget inputWidget = null)
+		public Editor(Widget displayWidget, IEditorParams editorParams, Widget focusableWidget = null, Widget clickableWidget = null)
 		{
-			DisplayWidget = container;
-			InputWidget = inputWidget ?? container;
+			DisplayWidget = displayWidget;
+			FocusableWidget = focusableWidget ?? displayWidget;
+			ClickableWidget = clickableWidget ?? displayWidget;
 			DisplayWidget.HitTestTarget = true;
-			Text = (IText)container;
+			Text = (IText)displayWidget;
 			Text.TrimWhitespaces = false;
 			Text.Localizable = false;
 
@@ -56,7 +58,7 @@ namespace Lime
 			if (EditorParams.PasswordChar.HasValue) {
 				Text.TextProcessor += ProcessHiddenPassword;
 				if (EditorParams.PasswordLastCharShowTime > 0)
-					container.Tasks.Add(TrackLastCharInput, this);
+					displayWidget.Tasks.Add(TrackLastCharInput, this);
 			}
 			else if (EditorParams.UseSecureString) {
 				Text.TextProcessor += ProcessUnsecuredPassword;
@@ -64,7 +66,7 @@ namespace Lime
 			if (EditorParams.UseSecureString)
 				Password = new SecureString();
 
-			container.Tasks.Add(HandleInputTask(), this);
+			displayWidget.Tasks.Add(HandleInputTask(), this);
 		}
 
 		public static class Cmds {
@@ -148,8 +150,8 @@ namespace Lime
 
 		public void Unlink()
 		{
-			if (InputWidget.IsFocused()) {
-				InputWidget.RevokeFocus();
+			if (FocusableWidget.IsFocused()) {
+				FocusableWidget.RevokeFocus();
 				CaretPos.IsVisible = false;
 			}
 			DisplayWidget.Tasks.StopByTag(this);
@@ -168,8 +170,6 @@ namespace Lime
 			CaretPos.TextPos = i.TextPos;
 			CaretPos.InvalidatePreservingTextPos();
 		}
-
-		private WidgetInput input => InputWidget.Input;
 
 		private float CalcTextHeight(string s)
 		{
@@ -388,7 +388,7 @@ namespace Lime
 					} else {
 						HideSelection();
 						Cmds.Submit.Consume();
-						InputWidget.RevokeFocus();
+						FocusableWidget.RevokeFocus();
 					}
 				}
 				if (Cmds.Cancel.WasIssued() && IsTextReadable) {
@@ -397,7 +397,7 @@ namespace Lime
 					HideSelection();
 					History.Clear();
 					Cmds.Cancel.Consume();
-					InputWidget.RevokeFocus();
+					FocusableWidget.RevokeFocus();
 				}
 				if (!Command.SelectAll.IsConsumed()) {
 					Command.SelectAll.Enabled = true;
@@ -442,10 +442,10 @@ namespace Lime
 
 		private void HandleTextInput()
 		{
-			if (!ProcessInput || input.TextInput == null)
+			if (!ProcessInput || FocusableWidget.Input.TextInput == null)
 				return;
 
-			foreach (var ch in input.TextInput) {
+			foreach (var ch in FocusableWidget.Input.TextInput) {
 				// Some platforms, notably iOS, do not generate Key.BackSpace.
 				// OTOH, '\b' is emulated everywhere.
 				if (ch == '\b') {
@@ -493,58 +493,60 @@ namespace Lime
 
 		private IEnumerator<object> HandleInputTask()
 		{
-			bool focusedByClick = false;
 			bool wasFocused = false;
-			Vector2 lastClickPos = Vector2.Zero;
+
+			var rightClickGesture = new ClickGesture(1);
+			var clickGesture = new ClickGesture();
+			var doubleClickGesture = new DoubleClickGesture();
+			var dragGesture = new DragGesture(0, DragDirection.Any, EditorParams.MouseSelectionThreshold);
+			ClickableWidget.Gestures.Add(rightClickGesture);
+			ClickableWidget.Gestures.Add(clickGesture);
+			ClickableWidget.Gestures.Add(doubleClickGesture);
+			ClickableWidget.Gestures.Add(dragGesture);
 
 			while (true) {
-				if (EditorParams.SelectAllOnFocus && !wasFocused && InputWidget.IsFocused()) {
+				if (EditorParams.SelectAllOnFocus && !wasFocused && FocusableWidget.IsFocused()) {
 					SelectAll();
 					CaretPos.TextPos = TextLength;
 				}
-				if (DisplayWidget.Input.WasMousePressed() || DisplayWidget.Input.WasMousePressed(1)) {
-					focusedByClick = !InputWidget.IsFocused();
-					InputWidget.SetFocus();
-					if (DisplayWidget.Input.WasMousePressed(1) && EditorParams.SelectAllOnFocus) {
-						SelectAll();
-						Window.Current.Invalidate();
-					}
-				}
-				if (InputWidget.IsFocused()) {
-					if (input.WasMouseReleased(1))
-						ShowContextMenu(atCaret: false);
+				if (FocusableWidget.IsFocused()) {
 					HandleKeys();
 					HandleTextInput();
-					var p = input.MousePosition;
-					if (input.IsMousePressed()) {
-						CaretPos.WorldPos = DisplayWidget.LocalToWorldTransform.CalcInversed().TransformVector(p);
-						if (input.WasKeyPressed(Key.Mouse0DoubleClick)) {
-							if (IsTextReadable)
-								SelectWord();
-							else
-								SelectAll();
-							Window.Current.Invalidate();
-						} else if (input.WasMousePressed()) {
-							lastClickPos = p;
-							HideSelection();
-							input.CaptureMouse();
-						} else if ((p - lastClickPos).SqrLength > EditorParams.MouseSelectionThreshold) {
-							EnsureSelection();
-							SelectionEnd.AssignFrom(CaretPos);
-						}
-					} else if (input.WasMouseReleased()) {
-						input.ReleaseMouse();
-						if (EditorParams.SelectAllOnFocus && focusedByClick) {
-							if ((p - lastClickPos).SqrLength < EditorParams.MouseSelectionThreshold) {
-								SelectAll();
-								Window.Current.Invalidate();
-							}
-						}
-					}
-					Text.SyncCaretPosition();
 				}
+				if (clickGesture.WasRecognized()) {
+					if (!FocusableWidget.IsFocused()) {
+						FocusableWidget.SetFocus();
+						if (EditorParams.SelectAllOnFocus)
+							SelectAll();
+					} else {
+						HideSelection();
+					}
+					CaretPos.WorldPos = DisplayWidget.LocalMousePosition();
+				}
+				if (doubleClickGesture.WasRecognized()) {
+					if (IsTextReadable)
+						SelectWord();
+					else
+						SelectAll();
+				}
+				if (rightClickGesture.WasRecognized()) {
+					FocusableWidget.SetFocus();
+					ShowContextMenu(true);
+				}
+				if (dragGesture.WasBegan()) {
+					FocusableWidget.SetFocus();
+					CaretPos.WorldPos = DisplayWidget.ToLocalMousePosition(dragGesture.MousePressPosition);
+					HideSelection();
+					EnsureSelection();
+					SelectionStart.AssignFrom(CaretPos);
+				} else if (dragGesture.WasMoved()) {
+					CaretPos.WorldPos = DisplayWidget.LocalMousePosition();
+					EnsureSelection();
+					SelectionEnd.AssignFrom(CaretPos);
+				}
+				Text.SyncCaretPosition();
 				AdjustSizeAndScrollToCaret();
-				var isFocused = CaretPos.IsVisible = InputWidget.IsFocused();
+				var isFocused = CaretPos.IsVisible = FocusableWidget.IsFocused();
 				if (wasFocused && !isFocused) {
 					HideSelection();
 					if (History.CanUndo()) {

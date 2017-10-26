@@ -53,7 +53,6 @@ namespace Lime
 					var t = list[j];
 					t.Presenter.Render(t.Node);
 				}
-				list.Clear();
 			}
 		}
 

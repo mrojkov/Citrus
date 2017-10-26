@@ -33,7 +33,6 @@ namespace Tangerine.UI.SceneView
 
 		IEnumerator<object> Rotate(Bone bone, BoneArray.Entry entry)
 		{
-			sv.Input.CaptureMouse();
 			Document.Current.History.BeginTransaction();
 			try {
 				float rotation = 0;
@@ -54,7 +53,6 @@ namespace Tangerine.UI.SceneView
 				}
 				yield return null;
 			} finally {
-				sv.Input.ReleaseMouse();
 				sv.Input.ConsumeKey(Key.Mouse0);
 				Document.Current.History.EndTransaction();
 			}

@@ -22,7 +22,6 @@ namespace Tangerine.UI.Timeline
 				if (input.WasMousePressed()) {
 					var initialCell = grid.CellUnderMouse();
 					if (initialCell.Y < Document.Current.Rows.Count) {
-						input.CaptureMouse();
 						if (IsCellSelected(initialCell)) {
 							yield return DragSelectionTask(initialCell);
 						} else {
@@ -41,7 +40,6 @@ namespace Tangerine.UI.Timeline
 							}
 							lastSelectedCell = initialCell;
 						}
-						input.ReleaseMouse();
 					}
 				}
 				yield return null;

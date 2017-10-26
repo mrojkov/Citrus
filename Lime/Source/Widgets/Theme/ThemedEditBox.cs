@@ -27,11 +27,11 @@ namespace Lime
 			tw.VAlignment = VAlignment.Center;
 
 			var editorParams = new EditorParams {
-				MaxLines = 1, Scroll = eb.Scroll,
+				MaxLines = 1, Scroll = eb.ScrollView,
 				OffsetContextMenu = p => p + new Vector2(1f, tw.FontHeight + 1f),
 				SelectAllOnFocus = true
 			};
-			eb.Editor = new Editor(tw, editorParams, eb);
+			eb.Editor = new Editor(tw, editorParams, eb, eb.ScrollWidget);
 			var vc = new VerticalLineCaret { Color = Theme.Colors.TextCaret };
 			eb.Updated += delta => {
 				vc.Width = eb.Editor.OverwriteMode && !eb.Editor.HasSelection() ?
@@ -41,7 +41,7 @@ namespace Lime
 						A = tw.ContentPosition,
 						B = tw.ContentPosition + tw.ContentSize,
 					};
-					if (rect.Contains(tw.Input.LocalMousePosition)) {
+					if (rect.Contains(tw.LocalMousePosition())) {
 						WidgetContext.Current.MouseCursor = MouseCursor.IBeam;
 					}
 				}
@@ -72,78 +72,80 @@ namespace Lime
 		{
 			ThemedEditBox.Decorate(this);
 			MinMaxWidth = 80;
-			TextWidget.Padding = new Thickness(SpinButtonPresenter.ButtonWidth + 2, 2);
-			CompoundPostPresenter.Add(new SpinButtonPresenter(true));
-			CompoundPostPresenter.Add(new SpinButtonPresenter(false));
+			TextWidget.Padding = new Thickness(2);
+			Layout = new HBoxLayout();
+			Nodes.Insert(0, CreateSpinButton(SpinButtonType.Subtractive));
+			Nodes.Add(CreateSpinButton(SpinButtonType.Additive));
 		}
 
-		protected override void Awake()
+		enum SpinButtonType
 		{
-			base.Awake();
-			Tasks.Add(HandleSpinButtonTask(true));
-			Tasks.Add(HandleSpinButtonTask(false));
+			Subtractive,
+			Additive
 		}
 
-		private IEnumerator<object> HandleSpinButtonTask(bool leftToRight)
+		Widget CreateSpinButton(SpinButtonType type)
 		{
-			while (true) {
-				if (Input.WasMousePressed()) {
-					if (
-						leftToRight && Input.LocalMousePosition.X > Width - SpinButtonPresenter.ButtonWidth ||
-						!leftToRight && Input.LocalMousePosition.X < SpinButtonPresenter.ButtonWidth
-					) {
-						RaiseBeginSpin();
-						Input.CaptureMouse();
-						Input.ConsumeKey(Key.Mouse0);
-						var prevMousePos = Application.DesktopMousePosition;
-						var dragged = false;
-						var disp = Window.Current.Display;
-						// TODO: Remove focus revoke and block editor input while dragging.
-						SetFocus();
-						RevokeFocus();
-						while (Input.IsMousePressed()) {
-							dragged |= Application.DesktopMousePosition != prevMousePos;
-							var wrapped = false;
-							if (Application.DesktopMousePosition.X > disp.Position.X + disp.Size.X - 5) {
-								prevMousePos.X = disp.Position.X + 5;
-								wrapped = true;
-							}
-							if (Application.DesktopMousePosition.X < disp.Position.X + 5) {
-								prevMousePos.X = disp.Position.X + disp.Size.X - 5;
-								wrapped = true;
-							}
-							if (wrapped) {
-								Application.DesktopMousePosition = new Vector2(prevMousePos.X, Application.DesktopMousePosition.Y);
-							}
-							var delta = (Application.DesktopMousePosition.X - prevMousePos.X).Round() * Step;
-							if (Input.IsKeyPressed(Key.Shift)) {
-								delta *= 10f;
-							} else if (Input.IsKeyPressed(Key.Control)) {
-								delta *= 0.1f;
-							}
-							if (!IsReadOnly) {
-								Value += delta;
-							}
-							prevMousePos = Application.DesktopMousePosition;
-							yield return null;
-						}
-						if (!dragged) {
-							var delta = (leftToRight ? 1 : -1) * Step;
-							if (Input.IsKeyPressed(Key.Shift)) {
-								delta *= 10f;
-							} else if (Input.IsKeyPressed(Key.Control)) {
-								delta *= 0.1f;
-							}
-							if (!IsReadOnly) {
-								Value += delta;
-							}
-						}
-						Input.ConsumeKey(Key.Mouse0);
-						Input.ReleaseMouse();
-						RaiseEndSpin();
+			var button = new Widget {
+				HitTestTarget = true,
+				LayoutCell = new LayoutCell { StretchX = 0 },
+				MinWidth = SpinButtonPresenter.ButtonWidth,
+				PostPresenter = new SpinButtonPresenter(type)
+			};
+			button.Awoken += instance => {
+				var dragGesture = new DragGesture();
+				dragGesture.Began += () => Tasks.Add(SpinByDragTask(dragGesture));
+				var clickGesture = new ClickGesture(() => {
+					var delta = (type == SpinButtonType.Additive ? 1 : -1) * Step;
+					if (Input.IsKeyPressed(Key.Shift)) {
+						delta *= 10f;
+					} else if (Input.IsKeyPressed(Key.Control)) {
+						delta *= 0.1f;
 					}
+					if (!IsReadOnly) {
+						Value += delta;
+					}
+				});
+				var gestures = ((Widget)instance).Gestures;
+				gestures.Add(clickGesture);
+				gestures.Add(dragGesture);
+			};
+			return button;
+		}
+
+		private IEnumerator<object> SpinByDragTask(DragGesture dragGesture)
+		{
+			RaiseBeginSpin();
+			try {
+				var prevMousePos = Application.DesktopMousePosition;
+				while (dragGesture.IsDragging()) {
+					var disp = CommonWindow.Current.Display;
+					var wrapped = false;
+					if (Application.DesktopMousePosition.X > disp.Position.X + disp.Size.X - 5) {
+						prevMousePos.X = disp.Position.X + 5;
+						wrapped = true;
+					}
+					if (Application.DesktopMousePosition.X < disp.Position.X + 5) {
+						prevMousePos.X = disp.Position.X + disp.Size.X - 5;
+						wrapped = true;
+					}
+					if (wrapped) {
+						Application.DesktopMousePosition = new Vector2(prevMousePos.X, Application.DesktopMousePosition.Y);
+					}
+					var delta = (Application.DesktopMousePosition.X - prevMousePos.X).Round() * Step;
+					if (Input.IsKeyPressed(Key.Shift)) {
+						delta *= 10f;
+					} else if (Input.IsKeyPressed(Key.Control)) {
+						delta *= 0.1f;
+					}
+					if (!IsReadOnly) {
+						Value += delta;
+					}
+					prevMousePos = Application.DesktopMousePosition;
+					yield return null;
 				}
-				yield return null;
+			} finally {
+				RaiseEndSpin();
 			}
 		}
 
@@ -157,11 +159,11 @@ namespace Lime
 				new VectorShape.TriangleFan(new float[] { 0.3f, 0.3f, 0.7f, 0.5f, 0.3f, 0.7f }, color)
 			};
 
-			private bool leftToRight;
+			private SpinButtonType type;
 
-			public SpinButtonPresenter(bool leftToRight)
+			public SpinButtonPresenter(SpinButtonType type)
 			{
-				this.leftToRight = leftToRight;
+				this.type = type;
 			}
 
 			public override void Render(Node node)
@@ -169,8 +171,8 @@ namespace Lime
 				var widget = node.AsWidget;
 				widget.PrepareRendererState();
 				Matrix32 transform;
-				if (leftToRight) {
-					transform = Matrix32.Scaling(ButtonWidth, widget.Height - 2) * Matrix32.Translation(widget.Width - ButtonWidth - 1, 1);
+				if (type == SpinButtonType.Additive) {
+					transform = Matrix32.Scaling(ButtonWidth, widget.Height - 2) * Matrix32.Translation(1, 1);
 				} else {
 					transform = Matrix32.Scaling(-ButtonWidth, widget.Height - 2) * Matrix32.Translation(ButtonWidth + 1, 1);
 				}

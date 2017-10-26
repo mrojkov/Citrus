@@ -11,16 +11,16 @@ namespace Tangerine.UI.Timeline.Components
 	{
 		protected readonly Row row;
 		protected readonly NodeRow nodeData;
+		protected readonly Widget widget;
 		protected readonly SimpleText label;
 		protected readonly EditBox editBox;
 		protected readonly Image nodeIcon;
-		protected readonly Widget widget;
 		protected readonly ToolbarButton enterButton;
 		protected readonly ToolbarButton expandButton;
 		protected readonly ToolbarButton eyeButton;
 		protected readonly ToolbarButton lockButton;
 		protected readonly ToolbarButton lockAnimationButton;
-		readonly Widget spacer;
+		protected readonly Widget indentSpacer;
 
 		public RollNodeView(Row row)
 		{
@@ -67,7 +67,7 @@ namespace Tangerine.UI.Timeline.Components
 				HitTestTarget = true,
 				Nodes = {
 					expandButtonContainer,
-					(spacer = new Widget()),
+					(indentSpacer = new Widget()),
 					nodeIcon,
 					new HSpacer(3),
 					label,
@@ -84,12 +84,19 @@ namespace Tangerine.UI.Timeline.Components
 			label.AddChangeWatcher(() => nodeData.Node.ContentsPath, s => RefreshLabel());
 			widget.CompoundPresenter.Push(new DelegatePresenter<Widget>(RenderBackground));
 			editBox.Visible = false;
-			widget.Tasks.Add(HandleDoubleClickTask());
-			widget.Tasks.Add(HandleRightClickTask());
+			widget.Gestures.Add(new ClickGesture(1, ShowPropertyContextMenu));
+			widget.Gestures.Add(new DoubleClickGesture(() => {
+				Core.Operations.EnterNode.Perform(nodeData.Node);
+			}));
+			nodeIcon.Gestures.Add(new DoubleClickGesture(() => {
+				Core.Operations.ClearRowSelection.Perform();
+				Core.Operations.SelectRow.Perform(row);
+				Rename();
+			}));
 		}
 
 		public Widget Widget => widget;
-		public float Indentation { set { spacer.MinMaxWidth = value; } }
+		public float Indentation { set { indentSpacer.MinMaxWidth = value; } }
 
 		bool IsGrayedLabel(Node node) => node.AsWidget?.Visible ?? true;
 
@@ -150,7 +157,7 @@ namespace Tangerine.UI.Timeline.Components
 				() => GetAnimationState(nodeData.Node),
 				i => {
 					var texture = "Timeline.Empty";
-					if (i == AnimationState.Enabled) 
+					if (i == AnimationState.Enabled)
 						texture = "Timeline.AnimationEnabled";
 					else if (i == AnimationState.PartiallyEnabled)
 						texture = "Timeline.AnimationPartiallyEnabled";
@@ -179,7 +186,7 @@ namespace Tangerine.UI.Timeline.Components
 		static AnimationState GetAnimationState(IAnimable animable)
 		{
 			var animators = animable.Animators;
-			if (animators.Count == 0) 
+			if (animators.Count == 0)
 				return AnimationState.None;
 			int enabled = 0;
 			foreach (var a in animators.AsArray) {
@@ -188,7 +195,7 @@ namespace Tangerine.UI.Timeline.Components
 			}
 			if (enabled == 0)
 				return AnimationState.Disabled;
-			else if (enabled == animators.Count) 
+			else if (enabled == animators.Count)
 				return AnimationState.Enabled;
 			else
 				return AnimationState.PartiallyEnabled;
@@ -201,7 +208,9 @@ namespace Tangerine.UI.Timeline.Components
 				() => nodeData.Expanded,
 				i => button.Texture = IconPool.GetTexture(i ? "Timeline.Expanded" : "Timeline.Collapsed")
 			);
-			button.Clicked += () => Core.Operations.SetProperty.Perform(nodeData, nameof(NodeRow.Expanded), !nodeData.Expanded);
+			button.Clicked += () => {
+				Core.Operations.SetProperty.Perform(nodeData, nameof(NodeRow.Expanded), !nodeData.Expanded);
+			};
 			return button;
 		}
 
@@ -211,20 +220,6 @@ namespace Tangerine.UI.Timeline.Components
 			Renderer.DrawRect(
 				Vector2.Zero, widget.Size,
 				row.Selected ? ColorTheme.Current.Basic.SelectedBackground : ColorTheme.Current.Basic.WhiteBackground);
-		}
-
-		IEnumerator<object> HandleDoubleClickTask()
-		{
-			while (true) {
-				if (nodeIcon.Input.WasKeyPressed(Key.Mouse0DoubleClick)) {
-					Core.Operations.ClearRowSelection.Perform();
-					Core.Operations.SelectRow.Perform(row);
-					Rename();
-				} else if (widget.Input.WasKeyPressed(Key.Mouse0DoubleClick)) {
-					Core.Operations.EnterNode.Perform(nodeData.Node);
-				}
-				yield return null;
-			}
 		}
 
 		public void Rename()
@@ -285,16 +280,6 @@ namespace Tangerine.UI.Timeline.Components
 			return new Command(title, () => nodeData.Node.SetColorIndex((uint)index)) {
 				Checked = nodeData.Node.GetColorIndex() == index
 			};
-		}
-
-		IEnumerator<object> HandleRightClickTask()
-		{
-			while (true) {
-				if (widget.Input.WasMouseReleased(1)) {
-					ShowPropertyContextMenu();
-				}
-				yield return null;
-			}
 		}
 	}
 

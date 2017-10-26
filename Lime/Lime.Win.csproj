@@ -223,7 +223,6 @@
     <Compile Include="Source\Widgets\Text\IText.cs" />
     <Compile Include="Source\Widgets\ListView\ExpandableListItem.cs" />
     <Compile Include="Source\Widgets\ListView\ListView.cs" />
-    <Compile Include="Source\Widgets\ListView\ListView.ItemDrag.cs" />
     <Compile Include="Source\Widgets\ListView\ListView.RefreshGesture.cs" />
     <Compile Include="Source\Widgets\ListView\ScrollView.cs" />
     <Compile Include="Source\Widgets\ListView\ScrollView.SpeedMeter.cs" />
@@ -417,6 +416,11 @@
     <Compile Include="Source\Types\Bounds.cs" />
     <Compile Include="Source\Input\Command.cs" />
     <Compile Include="Source\Input\CommandHandler.cs" />
+    <Compile Include="Source\Widgets\Gestures\ClickGesture.cs" />
+    <Compile Include="Source\Widgets\Gestures\DoubleClickGesture.cs" />
+    <Compile Include="Source\Widgets\Gestures\DragGesture.cs" />
+    <Compile Include="Source\Widgets\Gestures\Gesture.cs" />
+    <Compile Include="Source\Widgets\Gestures\GestureManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\3rdParty\OpenAL\OpenAL32.dll">

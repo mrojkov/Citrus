@@ -29,7 +29,6 @@ namespace Tangerine.UI.SceneView
 				var container = Document.Current.Container as Widget;
 				CreateNodeRequestComponent.Consume<Node>(sv.Components);
 				if (sv.Input.WasMousePressed() && container != null) {
-					sv.Input.CaptureMouse();
 					sv.Input.ConsumeKey(Key.Mouse0);
 					var t = sv.Scene.CalcTransitionToSpaceOf(container);
 					var rect = new Rectangle(sv.MousePosition * t, sv.MousePosition * t);
@@ -45,7 +44,6 @@ namespace Tangerine.UI.SceneView
 						CommonWindow.Current.Invalidate();
 						yield return null;
 					}
-					sv.Input.ReleaseMouse();
 					sv.Frame.CompoundPostPresenter.Remove(presenter);
 					try {
 						var widget = (Widget)Core.Operations.CreateNode.Perform(nodeType);

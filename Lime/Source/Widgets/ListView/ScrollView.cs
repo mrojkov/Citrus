@@ -4,13 +4,11 @@ using System.Linq;
 
 namespace Lime
 {
-	[Flags]
 	public enum ScrollDirection
 	{
-		None = 0,
-		Horizontal = 1,
-		Vertical = 2,
-		Both = 3,
+		Any,
+		Horizontal,
+		Vertical,
 	}
 
 	public partial class ScrollView
@@ -22,7 +20,6 @@ namespace Lime
 		public bool CanScroll { get; set; }
 		public bool ScrollBySlider { get; set; }
 		public bool RejectOrtogonalSwipes { get; set; }
-		public Vector2? SwipeSensitivity { get; set; }
 		public float BounceZoneThickness = 100;
 		public float ScrollToItemVelocity = 800;
 		public float InertialScrollingStopVelocity = 40;
@@ -86,7 +83,7 @@ namespace Lime
 
 		public ScrollView(Frame frame, ScrollDirection scrollDirection = ScrollDirection.Vertical, bool processChildrenFirst = false)
 		{
-			this.ScrollDirection = scrollDirection;
+			ScrollDirection = scrollDirection;
 			RejectOrtogonalSwipes = true;
 			Frame = frame;
 			Frame.Input.AcceptMouseBeyondWidget = false;
@@ -99,8 +96,7 @@ namespace Lime
 			if (ScrollDirection == ScrollDirection.Vertical) {
 				Content.Width = Frame.Width;
 				Content.Height = 0;
-			}
-			else {
+			} else {
 				Content.Width = 0;
 				Content.Height = Frame.Height;
 			}
@@ -110,7 +106,7 @@ namespace Lime
 			} else {
 				Content.Tasks.Add(MainTask());
 			}
-#if MAC || MONOMAC || WIN
+#if MAC || WIN
 			Content.Tasks.Add(WheelScrollingTask());
 #endif
 			Frame.Layout = new Layout(scrollDirection, Content);
@@ -245,29 +241,18 @@ namespace Lime
 
 		private IEnumerator<object> MainTask()
 		{
+			var dragGesture = new DragGesture(0, (DragDirection)ScrollDirection);
+			Frame.Gestures.Add(dragGesture);
 			while (true) {
-				// Wait until a user starts dragging the widget
-				while (!Frame.Input.IsMousePressed()) {
-					Bounce();
-					yield return null;
-				}
-				if (Frame.Input.WasMousePressed()) {
+				if (dragGesture.WasBegan()) {
 					StopScrolling();
 					Vector2 mousePos = Input.MousePosition;
 					var velocityMeter = new VelocityMeter();
 					velocityMeter.AddSample(ScrollPosition);
-					if (RejectOrtogonalSwipes) {
-						var r = new TaskResult<bool>();
-						yield return !SwipeSensitivity.HasValue ? DetectSwipeAlongScrollAxisTask(r) : DetectSwipeUsingSensitivityTask(r);
-						if (r.Value) {
-							yield return HandleDragTask(velocityMeter, ProjectToScrollAxisWithFrameRotation(mousePos));
-						}
-					} else {
-						yield return HandleDragTask(velocityMeter, ProjectToScrollAxisWithFrameRotation(mousePos));
-					}
-				} else {
-					yield return null;
+					yield return HandleDragTask(velocityMeter, ProjectToScrollAxisWithFrameRotation(mousePos), dragGesture);
 				}
+				Bounce();
+				yield return null;
 			}
 		}
 
@@ -321,33 +306,6 @@ namespace Lime
 			result.Value = dt.Abs() > dn.Abs();
 		}
 
-		private IEnumerator<object> DetectSwipeUsingSensitivityTask(TaskResult<bool> result) {
-			if (ScrollDirection == ScrollDirection.None) {
-				yield break;
-			}
-
-			var mousePos = Input.MousePosition;
-			while (Input.IsMousePressed()) {
-				var deltaPosition = Input.MousePosition - mousePos;
-				var isHSwipe = Mathf.Abs(deltaPosition.X) >= SwipeSensitivity.Value.X;
-				var isVSwipe = Mathf.Abs(deltaPosition.Y) >= SwipeSensitivity.Value.Y;
-				if (isHSwipe || isVSwipe) {
-					switch (ScrollDirection) {
-						case ScrollDirection.Horizontal:
-							result.Value = isHSwipe;
-							yield break;
-						case ScrollDirection.Vertical:
-							result.Value = isVSwipe;
-							yield break;
-						case ScrollDirection.Both:
-							result.Value = true;
-							yield break;
-					}
-				}
-				yield return null;
-			}
-		}
-
 		private IEnumerator<object> InertialScrollingTask(float velocity)
 		{
 			while (true) {
@@ -364,21 +322,15 @@ namespace Lime
 			scrollingTask = null;
 		}
 
-		private IEnumerator<object> HandleDragTask(VelocityMeter velocityMeter, float mouseProjectedPosition)
+		private IEnumerator<object> HandleDragTask(VelocityMeter velocityMeter, float mouseProjectedPosition, DragGesture dragGesture)
 		{
 			if (!CanScroll || !ScrollWhenContentFits && MaxScrollPosition == 0 || ScrollBySlider)
 				yield break;
-
 			IsBeingRefreshed = false; // Do not block scrollview on refresh gesture
 			IsDragging = true;
-			Frame.Input.ConsumeKeyPress(Key.Touch0);
 			float realScrollPosition = ScrollPosition;
 			wheelScrollState = WheelScrollState.Stop;
-			do {
-				if (IsItemDragInProgress()) {
-					IsDragging = false;
-					yield break;
-				}
+			while (dragGesture.IsDragging()) {
 				realScrollPosition += mouseProjectedPosition - ProjectToScrollAxisWithFrameRotation(Input.MousePosition);
 				// Round scrolling position to prevent blurring
 				ScrollPosition = ClampScrollPositionWithinBounceZone(realScrollPosition)
@@ -386,7 +338,7 @@ namespace Lime
 				mouseProjectedPosition = ProjectToScrollAxisWithFrameRotation(Input.MousePosition);
 				velocityMeter.AddSample(realScrollPosition);
 				yield return null;
-			} while (Input.IsMousePressed());
+			}
 			StartScrolling(InertialScrollingTask(velocityMeter.CalcVelocity()));
 			IsDragging = false;
 		}
@@ -401,11 +353,6 @@ namespace Lime
 			} else {
 				return scrollPosition;
 			}
-		}
-
-		protected virtual bool IsItemDragInProgress()
-		{
-			return false;
 		}
 
 		public class ScrollViewContentWidget : Widget

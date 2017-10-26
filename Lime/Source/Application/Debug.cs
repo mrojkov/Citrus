@@ -7,8 +7,6 @@ namespace Lime
 {
 	public static class Debug
 	{
-		public static bool BreakOnButtonClick { get; set; }
-		
 		public static void Write(string message)
 		{
 			Logger.Write(message);
@@ -16,7 +14,7 @@ namespace Lime
 
 		public static void Write(object value)
 		{
-			Write(value != null ? value.ToString() : "null");
+			Write(value?.ToString() ?? "null");
 		}
 
 		public static void Write(string msg, params object[] args)

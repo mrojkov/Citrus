@@ -144,7 +144,6 @@ namespace Tangerine.UI.SceneView
 				var hull = rect.ToQuadrangle();
 				if ((rect.Contains(widget.Input.LocalMousePosition))) {
 					if (widget.Input.WasMousePressed()) {
-						widget.Input.CaptureMouse();
 						var line = GetLineUnderMouse(widget, lineOrientation);
 						if (line != null) {
 							SceneView.Instance.Components.Add(new LineSelectionComponent { Line = line });
@@ -167,7 +166,6 @@ namespace Tangerine.UI.SceneView
 								yield return null;
 							}
 						}
-						widget.Input.ReleaseMouse();
 						SceneView.Instance.Components.Remove<LineSelectionComponent>();
 					} else if (widget.Input.WasMouseReleased(1)) {
 						Lines.Remove(GetLineUnderMouse(widget, lineOrientation));

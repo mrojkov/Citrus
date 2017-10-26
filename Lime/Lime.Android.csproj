@@ -173,7 +173,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Source\Widgets\ListView\ExpandableListItem.cs" />
     <Compile Include="Source\Widgets\ListView\ListView.cs" />
-    <Compile Include="Source\Widgets\ListView\ListView.ItemDrag.cs" />
     <Compile Include="Source\Widgets\ListView\ListView.RefreshGesture.cs" />
     <Compile Include="Source\Widgets\ListView\ScrollView.cs" />
     <Compile Include="Source\Widgets\ListView\ScrollView.SpeedMeter.cs" />
@@ -367,6 +366,10 @@
     <Compile Include="Source\Widgets\3D\ShadowMapping\DepthBuffer.cs" />
     <Compile Include="Source\Widgets\3D\ShadowMapping\DepthBufferProgram.cs" />
     <Compile Include="Source\Widgets\3D\ShadowMapping\DepthBufferRenderer.cs" />
+    <Compile Include="Source\Widgets\GestureRecognizers\ClickRecognizer.cs" />
+    <Compile Include="Source\Widgets\GestureRecognizers\DragRecognizer.cs" />
+    <Compile Include="Source\Widgets\GestureRecognizers\GestureRecognizer.cs" />
+    <Compile Include="Source\Widgets\GestureRecognizers\GestureRecognizerManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Android.csproj">

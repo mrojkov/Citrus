@@ -38,7 +38,6 @@ namespace Tangerine.UI.SceneView
 
 		IEnumerator<object> Drag(SplinePoint point, int index)
 		{
-			sv.Input.CaptureMouse();
 			Document.Current.History.BeginTransaction();
 			try {
 				var iniMousePos = sv.MousePosition;
@@ -57,7 +56,6 @@ namespace Tangerine.UI.SceneView
 					yield return null;
 				}
 			} finally {
-				sv.Input.ReleaseMouse();
 				Document.Current.History.EndTransaction();
 			}
 		}

@@ -41,7 +41,6 @@ namespace Tangerine.UI.SceneView
 					if (d.HasValue) {
 						var pos = (ray.Position + ray.Direction * d.Value) * spline.GlobalTransform.CalcInverted();
 						Core.Operations.SetProperty.Perform(point, nameof(SplinePoint3D.Position), pos);
-						input.CaptureMouse();
 						Document.Current.History.BeginTransaction();
 						try {
 							while (input.IsMousePressed()) {
@@ -59,7 +58,6 @@ namespace Tangerine.UI.SceneView
 								Core.Operations.SetProperty.Perform(point, nameof(SplinePoint3D.TangentA), new Vector3(1, 0, 0));
 								Core.Operations.SetProperty.Perform(point, nameof(SplinePoint3D.TangentB), new Vector3(-1, 0, 0));
 							}
-							input.ReleaseMouse();
 							Document.Current.History.EndTransaction();
 						}
 					}
