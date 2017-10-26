@@ -5,13 +5,13 @@ using System.Collections.Generic;
 
 namespace Lime
 {
-	public abstract class GestureRecognizer
+	public abstract class Gesture
 	{
 		public Node Owner { get; internal set; }
 		protected Input Input => CommonWindow.Current.Input;
 
 		internal protected abstract void Cancel();
-		internal protected abstract void Update(IEnumerable<GestureRecognizer> recognizers);
+		internal protected abstract void Update(IEnumerable<Gesture> gestures);
 
 		internal protected virtual bool ShouldDeferClicks(int buttonIndex) => false;
 
@@ -21,31 +21,31 @@ namespace Lime
 
 			public event Action Handler;
 
-			public bool HasOccurred() => occurredOnIteration == WidgetContext.Current.GestureRecognizerManager.CurrentIteration;
+			public bool HasOccurred() => occurredOnIteration == WidgetContext.Current.GestureManager.CurrentIteration;
 
 			public void Raise()
 			{
 				CommonWindow.Current.Invalidate();
-				occurredOnIteration = WidgetContext.Current.GestureRecognizerManager.CurrentIteration;
+				occurredOnIteration = WidgetContext.Current.GestureManager.CurrentIteration;
 				Handler?.Invoke();
 			}
 		}
 	}
 
-	public class GestureRecognizerCollection : ICollection<GestureRecognizer>
+	public class GestureCollection : ICollection<Gesture>
 	{
-		private List<GestureRecognizer> gestures = new List<GestureRecognizer>();
+		private List<Gesture> gestures = new List<Gesture>();
 
 		public int Count => gestures.Count;
 		public bool IsReadOnly => false;
 		private Node owner;
 
-		public GestureRecognizerCollection(Node owner)
+		public GestureCollection(Node owner)
 		{
 			this.owner = owner;
 		}
 
-		public void Add(GestureRecognizer item)
+		public void Add(Gesture item)
 		{
 			if (item.Owner != null) {
 				throw new InvalidOperationException();
@@ -55,11 +55,11 @@ namespace Lime
 		}
 
 		public void Clear() => gestures.Clear();
-		public bool Contains (GestureRecognizer item) => gestures.Contains(item);
-		public void CopyTo(GestureRecognizer [] array, int arrayIndex) => gestures.CopyTo(array, arrayIndex);
-		public IEnumerator<GestureRecognizer> GetEnumerator() => gestures.GetEnumerator();
+		public bool Contains (Gesture item) => gestures.Contains(item);
+		public void CopyTo(Gesture [] array, int arrayIndex) => gestures.CopyTo(array, arrayIndex);
+		public IEnumerator<Gesture> GetEnumerator() => gestures.GetEnumerator();
 
-		public bool Remove(GestureRecognizer item)
+		public bool Remove(Gesture item)
 		{
 			if (gestures.Remove(item)) {
 				item.Owner = null;

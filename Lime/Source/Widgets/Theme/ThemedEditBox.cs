@@ -93,9 +93,9 @@ namespace Lime
 				PostPresenter = new SpinButtonPresenter(type)
 			};
 			button.Awoken += instance => {
-				var dragRecognizer = new DragRecognizer();
-				dragRecognizer.Began += () => Tasks.Add(SpinByDragTask(dragRecognizer));
-				var clickRecognizer = new ClickRecognizer(() => {
+				var dragGesture = new DragGesture();
+				dragGesture.Began += () => Tasks.Add(SpinByDragTask(dragGesture));
+				var clickGesture = new ClickGesture(() => {
 					var delta = (type == SpinButtonType.Additive ? 1 : -1) * Step;
 					if (Input.IsKeyPressed(Key.Shift)) {
 						delta *= 10f;
@@ -106,19 +106,19 @@ namespace Lime
 						Value += delta;
 					}
 				});
-				var recognizers = ((Widget)instance).GestureRecognizers;
-				recognizers.Add(clickRecognizer);
-				recognizers.Add(dragRecognizer);
+				var gestures = ((Widget)instance).Gestures;
+				gestures.Add(clickGesture);
+				gestures.Add(dragGesture);
 			};
 			return button;
 		}
 
-		private IEnumerator<object> SpinByDragTask(DragRecognizer dragRecognizer)
+		private IEnumerator<object> SpinByDragTask(DragGesture dragGesture)
 		{
 			RaiseBeginSpin();
 			try {
 				var prevMousePos = Application.DesktopMousePosition;
-				while (dragRecognizer.IsDragging()) {
+				while (dragGesture.IsDragging()) {
 					var disp = CommonWindow.Current.Display;
 					var wrapped = false;
 					if (Application.DesktopMousePosition.X > disp.Position.X + disp.Size.X - 5) {

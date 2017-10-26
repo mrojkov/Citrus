@@ -246,15 +246,15 @@ namespace Lime
 
 		private IEnumerator<object> MainTask()
 		{
-			var dragRecognizer = new DragRecognizer(0, (DragDirection)ScrollDirection);
-			Frame.GestureRecognizers.Add(dragRecognizer);
+			var dragGesture = new DragGesture(0, (DragDirection)ScrollDirection);
+			Frame.Gestures.Add(dragGesture);
 			while (true) {
-				if (dragRecognizer.WasBegan()) {
+				if (dragGesture.WasBegan()) {
 					StopScrolling();
 					Vector2 mousePos = Input.MousePosition;
 					var velocityMeter = new VelocityMeter();
 					velocityMeter.AddSample(ScrollPosition);
-					yield return HandleDragTask(velocityMeter, ProjectToScrollAxisWithFrameRotation(mousePos), dragRecognizer);
+					yield return HandleDragTask(velocityMeter, ProjectToScrollAxisWithFrameRotation(mousePos), dragGesture);
 				}
 				Bounce();
 				yield return null;
@@ -327,7 +327,7 @@ namespace Lime
 			scrollingTask = null;
 		}
 
-		private IEnumerator<object> HandleDragTask(VelocityMeter velocityMeter, float mouseProjectedPosition, DragRecognizer dragRecognizer)
+		private IEnumerator<object> HandleDragTask(VelocityMeter velocityMeter, float mouseProjectedPosition, DragGesture dragGesture)
 		{
 			if (!CanScroll || !ScrollWhenContentFits && MaxScrollPosition == 0 || ScrollBySlider)
 				yield break;
@@ -335,7 +335,7 @@ namespace Lime
 			IsDragging = true;
 			float realScrollPosition = ScrollPosition;
 			wheelScrollState = WheelScrollState.Stop;
-			while (dragRecognizer.IsDragging()) {
+			while (dragGesture.IsDragging()) {
 				realScrollPosition += mouseProjectedPosition - ProjectToScrollAxisWithFrameRotation(Input.MousePosition);
 				// Round scrolling position to prevent blurring
 				ScrollPosition = ClampScrollPositionWithinBounceZone(realScrollPosition)

@@ -29,10 +29,10 @@ namespace Lime
 
 		private float value;
 		private Widget thumb;
-		private DragRecognizer dragThumbRecognizer;
-		private DragRecognizer dragSliderRecognizer;
-		private ClickRecognizer clickRecognizer;
-		private DragRecognizer activeDragRecognizer;
+		private DragGesture dragGestureThumb;
+		private DragGesture dragGestureSlider;
+		private ClickGesture clickGesture;
+		private DragGesture activeDragGesture;
 
 		public Slider()
 		{
@@ -46,9 +46,9 @@ namespace Lime
 
 		protected override void Awake()
 		{
-			Thumb?.GestureRecognizers.Add(dragThumbRecognizer = new DragRecognizer());
-			GestureRecognizers.Add(dragSliderRecognizer = new DragRecognizer());
-			GestureRecognizers.Add(clickRecognizer = new ClickRecognizer());
+			Thumb?.Gestures.Add(dragGestureThumb = new DragGesture());
+			Gestures.Add(dragGestureSlider = new DragGesture());
+			Gestures.Add(clickGesture = new ClickGesture());
 		}
 
 		public Widget Thumb
@@ -92,20 +92,20 @@ namespace Lime
 			}
 			var draggingJustBegun = false;
 			if (Enabled && RangeMax > RangeMin) {
-				if (dragThumbRecognizer.WasBegan()) {
-					activeDragRecognizer = dragThumbRecognizer;
+				if (dragGestureThumb.WasBegan()) {
+					activeDragGesture = dragGestureThumb;
 					StartDrag();
 					draggingJustBegun = true;
 				} else {
-					if (clickRecognizer.WasBegan()) {
+					if (clickGesture.WasBegan()) {
 						StartDrag();
 						SetValueFromCurrentMousePosition(false);
 					}
-					if (clickRecognizer.WasRecognizedOrCanceled() && !dragSliderRecognizer.WasBegan()) {
+					if (clickGesture.WasRecognizedOrCanceled() && !dragGestureSlider.WasBegan()) {
 						Release();
 					}
-					if (dragSliderRecognizer.WasBegan()) {
-						activeDragRecognizer = dragSliderRecognizer;
+					if (dragGestureSlider.WasBegan()) {
+						activeDragGesture = dragGestureSlider;
 						StartDrag();
 						dragInitialDelta = 0;
 						dragInitialOffset = (Value - RangeMin) / (RangeMax - RangeMin);
@@ -113,10 +113,10 @@ namespace Lime
 					}
 				}
 			}
-			if (activeDragRecognizer?.WasEnded() ?? false) {
+			if (activeDragGesture?.WasEnded() ?? false) {
 				Release();
 			}
-			if (Enabled && (activeDragRecognizer?.IsDragging() ?? false)) {
+			if (Enabled && (activeDragGesture?.IsDragging() ?? false)) {
 				SetValueFromCurrentMousePosition(draggingJustBegun);
 			}
 			InterpolateGraphicsBetweenMinAndMaxMarkers();

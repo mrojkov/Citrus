@@ -32,7 +32,7 @@ namespace Lime
 			set { stateMachine.SetState(value); }
 		}
 
-		private ClickRecognizer clickRecognizer;
+		private ClickGesture clickGesture;
 
 		public Button()
 		{
@@ -46,7 +46,7 @@ namespace Lime
 			State = NormalState;
 		}
 
-		public override bool WasClicked() => clickRecognizer?.WasRecognized() ?? false;
+		public override bool WasClicked() => clickGesture?.WasRecognized() ?? false;
 
 		protected override void Awake()
 		{
@@ -55,8 +55,8 @@ namespace Lime
 			// so delay its initialization until the next frame.
 			State = InitialState;
 			textPresentersFeeder = new TextPresentersFeeder(this);
-			clickRecognizer = new ClickRecognizer();
-			GestureRecognizers.Add(clickRecognizer);
+			clickGesture = new ClickGesture();
+			Gestures.Add(clickGesture);
 		}
 
 		private IEnumerator<int> NormalState()
@@ -68,7 +68,7 @@ namespace Lime
 					State = HoveredState;
 				}
 #else
-				if (clickRecognizer.WasBegan()) {
+				if (clickGesture.WasBegan()) {
 					State = PressedState;
 				}
 #endif
@@ -82,7 +82,7 @@ namespace Lime
 			while (true) {
 				if (!IsMouseOverThisOrDescendant()) {
 					State = NormalState;
-				} else if (clickRecognizer.WasBegan()) {
+				} else if (clickGesture.WasBegan()) {
 					State = PressedState;
 				}
 				yield return 0;
@@ -94,7 +94,7 @@ namespace Lime
 			TryRunAnimation("Press");
 			var wasMouseOver = true;
 			while (true) {
-				if (clickRecognizer.WasRecognized()) {
+				if (clickGesture.WasRecognized()) {
 					while (IsRunning) {
 						yield return 0;
 					}
@@ -112,7 +112,7 @@ namespace Lime
 					} else {
 						State = ReleaseState;
 					}
-				} else if (clickRecognizer.WasCanceled()) {
+				} else if (clickGesture.WasCanceled()) {
 					if (CurrentAnimation == "Press") {
 						TryRunAnimation("Release");
 						while (IsRunning) {

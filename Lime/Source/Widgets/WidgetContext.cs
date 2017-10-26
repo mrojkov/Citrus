@@ -32,7 +32,7 @@ namespace Lime
 		/// </summary>
 		public MouseCursor MouseCursor { get; set; }
 
-		public GestureRecognizerManager GestureRecognizerManager { get; internal set; }
+		public GestureManager GestureManager { get; internal set; }
 
 		public WidgetContext(Widget root) : base("Current")
 		{

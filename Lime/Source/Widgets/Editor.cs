@@ -495,14 +495,14 @@ namespace Lime
 		{
 			bool wasFocused = false;
 
-			var rightClickRecognizer = new ClickRecognizer(1);
-			var clickRecognizer = new ClickRecognizer();
-			var doubleClickRecognizer = new DoubleClickRecognizer();
-			var dragRecognizer = new DragRecognizer(0, DragDirection.Any, EditorParams.MouseSelectionThreshold);
-			ClickableWidget.GestureRecognizers.Add(rightClickRecognizer);
-			ClickableWidget.GestureRecognizers.Add(clickRecognizer);
-			ClickableWidget.GestureRecognizers.Add(doubleClickRecognizer);
-			ClickableWidget.GestureRecognizers.Add(dragRecognizer);
+			var rightClickGesture = new ClickGesture(1);
+			var clickGesture = new ClickGesture();
+			var doubleClickGesture = new DoubleClickGesture();
+			var dragGesture = new DragGesture(0, DragDirection.Any, EditorParams.MouseSelectionThreshold);
+			ClickableWidget.Gestures.Add(rightClickGesture);
+			ClickableWidget.Gestures.Add(clickGesture);
+			ClickableWidget.Gestures.Add(doubleClickGesture);
+			ClickableWidget.Gestures.Add(dragGesture);
 
 			while (true) {
 				if (EditorParams.SelectAllOnFocus && !wasFocused && FocusableWidget.IsFocused()) {
@@ -513,7 +513,7 @@ namespace Lime
 					HandleKeys();
 					HandleTextInput();
 				}
-				if (clickRecognizer.WasRecognized()) {
+				if (clickGesture.WasRecognized()) {
 					if (!FocusableWidget.IsFocused()) {
 						FocusableWidget.SetFocus();
 						if (EditorParams.SelectAllOnFocus)
@@ -523,23 +523,23 @@ namespace Lime
 					}
 					CaretPos.WorldPos = DisplayWidget.LocalMousePosition();
 				}
-				if (doubleClickRecognizer.WasRecognized()) {
+				if (doubleClickGesture.WasRecognized()) {
 					if (IsTextReadable)
 						SelectWord();
 					else
 						SelectAll();
 				}
-				if (rightClickRecognizer.WasRecognized()) {
+				if (rightClickGesture.WasRecognized()) {
 					FocusableWidget.SetFocus();
 					ShowContextMenu(true);
 				}
-				if (dragRecognizer.WasBegan()) {
+				if (dragGesture.WasBegan()) {
 					FocusableWidget.SetFocus();
-					CaretPos.WorldPos = DisplayWidget.ToLocalMousePosition(dragRecognizer.MousePressPosition);
+					CaretPos.WorldPos = DisplayWidget.ToLocalMousePosition(dragGesture.MousePressPosition);
 					HideSelection();
 					EnsureSelection();
 					SelectionStart.AssignFrom(CaretPos);
-				} else if (dragRecognizer.WasMoved()) {
+				} else if (dragGesture.WasMoved()) {
 					CaretPos.WorldPos = DisplayWidget.LocalMousePosition();
 					EnsureSelection();
 					SelectionEnd.AssignFrom(CaretPos);

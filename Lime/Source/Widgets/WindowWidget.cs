@@ -20,7 +20,7 @@ namespace Lime
 			Window = window;
 			Window.Context = new CombinedContext(Window.Context, widgetContext);
 			renderChain = new RenderChain();
-			widgetContext.GestureRecognizerManager = new GestureRecognizerManager(widgetContext);
+			widgetContext.GestureManager = new GestureManager(widgetContext);
 			window.Activated += () => windowActivated = true;
 			LayoutManager = new LayoutManager();
 		}
@@ -46,7 +46,7 @@ namespace Lime
 			}
 
 			// Process mouse/touch screen input.
-			context.GestureRecognizerManager.Process();
+			context.GestureManager.Process();
 
 			// Update the widget hierarchy.
 			context.MouseCursor = MouseCursor.Default;

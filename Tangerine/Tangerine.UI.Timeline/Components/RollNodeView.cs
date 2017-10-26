@@ -84,11 +84,11 @@ namespace Tangerine.UI.Timeline.Components
 			label.AddChangeWatcher(() => nodeData.Node.ContentsPath, s => RefreshLabel());
 			widget.CompoundPresenter.Push(new DelegatePresenter<Widget>(RenderBackground));
 			editBox.Visible = false;
-			widget.GestureRecognizers.Add(new ClickRecognizer(1, ShowPropertyContextMenu));
-			widget.GestureRecognizers.Add(new DoubleClickRecognizer(() => {
+			widget.Gestures.Add(new ClickGesture(1, ShowPropertyContextMenu));
+			widget.Gestures.Add(new DoubleClickGesture(() => {
 				Core.Operations.EnterNode.Perform(nodeData.Node);
 			}));
-			nodeIcon.GestureRecognizers.Add(new DoubleClickRecognizer(() => {
+			nodeIcon.Gestures.Add(new DoubleClickGesture(() => {
 				Core.Operations.ClearRowSelection.Perform();
 				Core.Operations.SelectRow.Perform(row);
 				Rename();
@@ -157,7 +157,7 @@ namespace Tangerine.UI.Timeline.Components
 				() => GetAnimationState(nodeData.Node),
 				i => {
 					var texture = "Timeline.Empty";
-					if (i == AnimationState.Enabled) 
+					if (i == AnimationState.Enabled)
 						texture = "Timeline.AnimationEnabled";
 					else if (i == AnimationState.PartiallyEnabled)
 						texture = "Timeline.AnimationPartiallyEnabled";
@@ -186,7 +186,7 @@ namespace Tangerine.UI.Timeline.Components
 		static AnimationState GetAnimationState(IAnimable animable)
 		{
 			var animators = animable.Animators;
-			if (animators.Count == 0) 
+			if (animators.Count == 0)
 				return AnimationState.None;
 			int enabled = 0;
 			foreach (var a in animators.AsArray) {
@@ -195,7 +195,7 @@ namespace Tangerine.UI.Timeline.Components
 			}
 			if (enabled == 0)
 				return AnimationState.Disabled;
-			else if (enabled == animators.Count) 
+			else if (enabled == animators.Count)
 				return AnimationState.Enabled;
 			else
 				return AnimationState.PartiallyEnabled;

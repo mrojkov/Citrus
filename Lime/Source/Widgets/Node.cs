@@ -425,9 +425,9 @@ namespace Lime
 			++CreatedCount;
 		}
 
-		private GestureRecognizerCollection gestureRecognizers;
-		public GestureRecognizerCollection GestureRecognizers => gestureRecognizers ?? (gestureRecognizers = new GestureRecognizerCollection(this));
-		public bool HasGestureRecognizers() => gestureRecognizers != null;
+		private GestureCollection gestures;
+		public GestureCollection Gestures => gestures ?? (gestures = new GestureCollection(this));
+		public bool HasGestures() => gestures != null;
 
 		public virtual bool IsNotDecorated() => true;
 
@@ -544,7 +544,7 @@ namespace Lime
 			++CreatedCount;
 			clone.Parent = null;
 			clone.NextSibling = null;
-			clone.gestureRecognizers = null;
+			clone.gestures = null;
 			clone.AsWidget = clone as Widget;
 			clone.Animations = Animations.Clone(clone);
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);

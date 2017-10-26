@@ -12,7 +12,7 @@ namespace Lime
 		Vertical
 	}
 
-	public class DragRecognizer : GestureRecognizer
+	public class DragGesture : Gesture
 	{
 		enum State
 		{
@@ -55,7 +55,7 @@ namespace Lime
 
 		public bool IsDragging() => state == State.Dragging;
 
-		public DragRecognizer(int buttonIndex = 0, DragDirection direction = DragDirection.Any, float dragThreshold = DefaultDragThreshold)
+		public DragGesture(int buttonIndex = 0, DragDirection direction = DragDirection.Any, float dragThreshold = DefaultDragThreshold)
 		{
 			ButtonIndex = buttonIndex;
 			Direction = direction;
@@ -72,7 +72,7 @@ namespace Lime
 
 		internal protected override bool ShouldDeferClicks(int buttonIndex) => buttonIndex == ButtonIndex;
 
-		internal protected override void Update(IEnumerable<GestureRecognizer> recognizers)
+		internal protected override void Update(IEnumerable<Gesture> gestures)
 		{
 			if (state == State.Initial && Input.WasMousePressed(ButtonIndex)) {
 				state = State.Recognizing;
@@ -82,7 +82,7 @@ namespace Lime
 				if (!Input.IsMousePressed(ButtonIndex)) {
 					state = State.Initial;
 				} else if (Recognize()) {
-					CancelClickRecognition(recognizers);
+					CancelClickRecognition(gestures);
 					state = State.Dragging;
 					prevMousePosition = Input.MousePosition;
 					began.Raise();
@@ -112,9 +112,9 @@ namespace Lime
 				Direction == DragDirection.Vertical && dy > DragThreshold;
 		}
 
-		private void CancelClickRecognition(IEnumerable<GestureRecognizer> recognizers)
+		private void CancelClickRecognition(IEnumerable<Gesture> gestures)
 		{
-			foreach (var r in recognizers.OfType<ClickRecognizer>().Where(r => r.ButtonIndex == ButtonIndex)) {
+			foreach (var r in gestures.OfType<ClickGesture>().Where(r => r.ButtonIndex == ButtonIndex)) {
 				r.Cancel();
 			}
 		}
