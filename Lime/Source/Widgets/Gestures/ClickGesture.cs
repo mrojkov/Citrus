@@ -22,6 +22,8 @@ namespace Lime
 		private PollableEvent canceled;
 		private PollableEvent recognized;
 
+		internal Action InternalRecognized;
+
 		/// <summary>
 		/// Occurs if a user has touched upon the widget.
 		/// If the widget lies within a scrollable panel,
@@ -90,6 +92,7 @@ namespace Lime
 				if (!Input.IsMousePressed(ButtonIndex)) {
 					state = State.Initial;
 					if (Owner.IsMouseOverThisOrDescendant()) {
+						InternalRecognized?.Invoke();
 						recognized.Raise();
 					} else {
 						canceled.Raise();

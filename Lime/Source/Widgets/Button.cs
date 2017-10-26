@@ -98,7 +98,7 @@ namespace Lime
 					while (IsRunning) {
 						yield return 0;
 					}
-					HandleClick();
+					Clicked?.Invoke();
 					// buz: don't play release animation
 					// if button's parent became invisible due to
 					// button press (or it will be played when
@@ -129,18 +129,6 @@ namespace Lime
 				}
 				wasMouseOver = mouseOver;
 				yield return 0;
-			}
-		}
-
-		protected virtual void HandleClick()
-		{
-			if (Clicked != null) {
-#if !iOS
-				if (Debug.BreakOnButtonClick) {
-					Debugger.Break();
-				}
-#endif
-				Clicked();
 			}
 		}
 
@@ -195,7 +183,7 @@ namespace Lime
 #if WIN || MAC
 			if (Enabled) {
 				if (Input.ConsumeKeyPress(Key.Space) || Input.ConsumeKeyPress(Key.Enter)) {
-					HandleClick();
+					Clicked?.Invoke();
 				}
 			}
 #endif

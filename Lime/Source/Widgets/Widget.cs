@@ -61,7 +61,6 @@ namespace Lime
 		private float rotation;
 		private Vector2 direction;
 		private Color4 color;
-		private Action clicked;
 		private Blending blending;
 		private ShaderId shader;
 		private Vector2 pivot;
@@ -623,13 +622,32 @@ namespace Lime
 
 		public virtual Action Clicked
 		{
-			get { return clicked; }
-			set { clicked = value; }
+			get { return DefaultClickGesture()?.InternalRecognized; }
+			set
+			{
+				var g = DefaultClickGesture();
+				if (g == null) {
+					g = new ClickGesture();
+					Gestures.Add(g);
+				}
+				g.InternalRecognized = value;
+			}
+		}
+
+		private ClickGesture DefaultClickGesture()
+		{
+			foreach (var g in Gestures) {
+				var cg = g as ClickGesture;
+				if (cg != null && cg.ButtonIndex == 0) {
+					return cg;
+				}
+			}
+			return null;
 		}
 
 		public virtual bool WasClicked()
 		{
-			return Input.WasMouseReleased() && IsMouseOver();
+			return DefaultClickGesture()?.WasRecognized() ?? false;
 		}
 
 		private static bool IsNumber(float x)
@@ -778,9 +796,6 @@ namespace Lime
 				watch.Start();
 #endif
 				SelfLateUpdate(delta);
-				if (clicked != null) {
-					HandleClick();
-				}
 			}
 			if (Updated != null) {
 				Updated(delta);
@@ -810,16 +825,6 @@ namespace Lime
 		{
 			if (Updated != null) {
 				Updated(delta * AnimationSpeed);
-			}
-		}
-
-		private void HandleClick()
-		{
-			if (Input.WasMouseReleased() && IsMouseOver()) {
-				if (Lime.Debug.BreakOnButtonClick) {
-					Debugger.Break();
-				}
-				clicked();
 			}
 		}
 

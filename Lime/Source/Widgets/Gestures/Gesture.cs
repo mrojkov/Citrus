@@ -32,15 +32,15 @@ namespace Lime
 		}
 	}
 
-	public class GestureCollection : ICollection<Gesture>
+	public class GestureList : IList<Gesture>
 	{
-		private List<Gesture> gestures = new List<Gesture>();
+		private readonly List<Gesture> gestures = new List<Gesture>();
 
 		public int Count => gestures.Count;
 		public bool IsReadOnly => false;
 		private Node owner;
 
-		public GestureCollection(Node owner)
+		public GestureList(Node owner)
 		{
 			this.owner = owner;
 		}
@@ -57,7 +57,10 @@ namespace Lime
 		public void Clear() => gestures.Clear();
 		public bool Contains (Gesture item) => gestures.Contains(item);
 		public void CopyTo(Gesture [] array, int arrayIndex) => gestures.CopyTo(array, arrayIndex);
-		public IEnumerator<Gesture> GetEnumerator() => gestures.GetEnumerator();
+		public List<Gesture>.Enumerator GetEnumerator() => gestures.GetEnumerator();
+
+		IEnumerator<Gesture> IEnumerable<Gesture>.GetEnumerator() => gestures.GetEnumerator();
+		IEnumerator IEnumerable.GetEnumerator() => gestures.GetEnumerator();
 
 		public bool Remove(Gesture item)
 		{
@@ -68,7 +71,33 @@ namespace Lime
 			return false;
 		}
 
-		IEnumerator IEnumerable.GetEnumerator() => gestures.GetEnumerator();
+		public int IndexOf(Gesture item) { return gestures.IndexOf(item); }
+
+		public void Insert(int index, Gesture item)
+		{
+			if (item.Owner != null) {
+				throw new InvalidOperationException();
+			}
+			item.Owner = owner;
+			gestures.Insert(index, item);
+		}
+
+		public void RemoveAt(int index)
+		{
+			gestures[index].Owner = null;
+			gestures.RemoveAt(index);
+		}
+
+		public Gesture this[int index]
+		{
+			get { return gestures[index]; }
+			set
+			{
+				gestures[index].Owner = null;
+				gestures[index] = value;
+				value.Owner = owner;
+			}
+		}
 	}
 
 }

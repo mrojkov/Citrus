@@ -425,8 +425,8 @@ namespace Lime
 			++CreatedCount;
 		}
 
-		private GestureCollection gestures;
-		public GestureCollection Gestures => gestures ?? (gestures = new GestureCollection(this));
+		private GestureList gestures;
+		public GestureList Gestures => gestures ?? (gestures = new GestureList(this));
 		public bool HasGestures() => gestures != null;
 
 		public virtual bool IsNotDecorated() => true;
