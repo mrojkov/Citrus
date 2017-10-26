@@ -226,10 +226,6 @@
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Viewport3D.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Icons\Filesystem\Folded.png" />
-    <EmbeddedResource Include="Resources\Icons\Filesystem\Unfolded.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\Icons\Filesystem\Cross.png" />
     <EmbeddedResource Include="Resources\Icons\Filesystem\Plus.png" />
   </ItemGroup>
@@ -271,5 +267,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Polyline.png" />
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.PolylinePoint.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Icons\Tools\Folded.png" />
+    <EmbeddedResource Include="Resources\Icons\Tools\Unfolded.png" />
   </ItemGroup>
 </Project>

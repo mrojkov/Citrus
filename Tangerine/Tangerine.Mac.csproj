@@ -233,13 +233,11 @@
     <EmbeddedResource Include="Resources\Icons\Filesystem\Close.png" />
     <EmbeddedResource Include="Resources\Icons\Filesystem\CookingRules.png" />
     <EmbeddedResource Include="Resources\Icons\Filesystem\Cross.png" />
-    <EmbeddedResource Include="Resources\Icons\Filesystem\Folded.png" />
     <EmbeddedResource Include="Resources\Icons\Filesystem\Home.png" />
     <EmbeddedResource Include="Resources\Icons\Filesystem\Plus.png" />
     <EmbeddedResource Include="Resources\Icons\Filesystem\Preview.png" />
     <EmbeddedResource Include="Resources\Icons\Filesystem\SplitH.png" />
     <EmbeddedResource Include="Resources\Icons\Filesystem\SplitV.png" />
-    <EmbeddedResource Include="Resources\Icons\Filesystem\Unfolded.png" />
     <EmbeddedResource Include="Resources\Icons\Timeline\AnimationPartiallyEnabled.png" />
     <EmbeddedResource Include="Resources\Icons\Timeline\AnimationEnabled.png" />
     <EmbeddedResource Include="Resources\Icons\Timeline\AnimationDisabled.png" />
@@ -251,6 +249,8 @@
     <EmbeddedResource Include="Resources\Cursors\Rotate.png" />
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Polyline.png" />
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.PolylinePoint.png" />
+    <EmbeddedResource Include="Resources\Icons\Tools\Folded.png" />
+    <EmbeddedResource Include="Resources\Icons\Tools\Unfolded.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PreferencesDialog\" />

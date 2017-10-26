@@ -16,12 +16,12 @@ namespace Tangerine.UI
 			{
 				if (expanded != value) {
 					expanded = value;
-					Texture = IconPool.GetTexture(value ? "Filesystem.Unfolded" : "Filesystem.Folded");
+					Texture = IconPool.GetTexture(value ? "Tools.Unfolded" : "Tools.Folded");
 				}
 			}
 		}
 
-		public ThemedExpandButton() : base(IconPool.GetTexture("Filesystem.Folded"))
+		public ThemedExpandButton() : base(IconPool.GetTexture("Tools.Folded"))
 		{
 			Highlightable = false;
 			Clicked += () => { Expanded = !Expanded; };
