@@ -155,29 +155,32 @@ namespace Lime
 					model.Animations.Add(animation);
 				}
 
+				var animationBlending = new AnimationBlending() {
+					Option = animationData.Blending
+				};
+
 				foreach (var markerData in animationData.Markers) {
 					animation.Markers.AddOrdered(markerData.Marker.Clone());
+					if (markerData.Blending != null) {
+						animationBlending.MarkersOptions.Add(
+							markerData.Marker.Id,
+							new MarkerBlending {
+								Option = markerData.Blending
+							});
+					}
 				}
 
-				if (animationData.Blending != null || animationData.MarkersBlendings.Count > 0) {
-					animation.AnimationEngine = BlendAnimationEngine.Instance;
-					var blender = model.Components.GetOrAdd<AnimationBlender>();
-
-					var animationBlending = new AnimationBlending() {
-						Option = animationData.Blending
-					};
-					if (animationData.MarkersBlendings.Count > 0) {
-						foreach (var markersBlendings in animationData.MarkersBlendings) {
-							if (!animationBlending.MarkersOptions.ContainsKey(markersBlendings.DestMarkerId)) {
-								animationBlending.MarkersOptions.Add(markersBlendings.DestMarkerId, new MarkerBlending {
-									Option = markersBlendings.Blending,
-								});
-							}
-							animationBlending.MarkersOptions[markersBlendings.DestMarkerId].SourceMarkersOptions
-								.Add(markersBlendings.SourceMarkerId, markersBlendings.Blending);
-						}
+				foreach (var markersBlendings in animationData.MarkersBlendings) {
+					if (!animationBlending.MarkersOptions.ContainsKey(markersBlendings.DestMarkerId)) {
+						animationBlending.MarkersOptions.Add(markersBlendings.DestMarkerId, new MarkerBlending());
 					}
-					blender.Options.Add(animation.Id ?? "", animationBlending);
+					animationBlending.MarkersOptions[markersBlendings.DestMarkerId].SourceMarkersOptions
+						.Add(markersBlendings.SourceMarkerId, markersBlendings.Blending);
+				}
+
+				if (animationBlending.Option != null || animationBlending.MarkersOptions.Count > 0) {
+					animation.AnimationEngine = BlendAnimationEngine.Instance;
+					model.Components.GetOrAdd<AnimationBlender>().Options.Add(animation.Id ?? "", animationBlending);
 				}
 			}
 		}
