@@ -24,12 +24,7 @@ namespace Tangerine.UI
 		public ThemedExpandButton() : base(IconPool.GetTexture("Filesystem.Folded"))
 		{
 			Highlightable = false;
-		}
-
-		protected override void HandleClick()
-		{
-			Expanded = !Expanded;
-			base.HandleClick();
+			Clicked += () => { Expanded = !Expanded; };
 		}
 	}
 
