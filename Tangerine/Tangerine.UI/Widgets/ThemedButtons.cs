@@ -56,8 +56,8 @@ namespace Tangerine.UI
 		public ThemedAddButton()
 		{
 			var presenter = new VectorShapeButtonPresenter(new VectorShape {
-				new VectorShape.Line(0.45f, 0.15f, 0.45f, 0.75f, Color4.White, 0.075f * 1.5f),
-				new VectorShape.Line(0.15f, 0.45f, 0.75f, 0.45f, Color4.White, 0.075f * 1.5f),
+				new VectorShape.Line(0.5f, 0.25f, 0.5f, 0.75f, Color4.White, 0.075f * 1.5f),
+				new VectorShape.Line(0.25f, 0.5f, 0.75f, 0.5f, Color4.White, 0.075f * 1.5f),
 			});
 			LayoutCell = new LayoutCell(Alignment.Center, stretchX: 0);
 			Presenter = presenter;
