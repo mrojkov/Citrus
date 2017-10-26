@@ -10,6 +10,7 @@ namespace Lime
 		Left,
 		Center,
 		Right,
+		Justify,
 	}
 
 	/// <summary>
@@ -20,6 +21,7 @@ namespace Lime
 		Top,
 		Center,
 		Bottom,
+		Justify,
 	}
 
 	/// <summary>

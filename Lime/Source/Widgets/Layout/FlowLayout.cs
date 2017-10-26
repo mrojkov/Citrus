@@ -8,6 +8,9 @@ namespace Lime
 	{
 		private readonly List<int> splitIndices = new List<int>();
 		public float Spacing { get; set; }
+		// TODO: implement for any alignment other than justify or left
+		public HAlignment RowAlignment { get; set; }
+		public VAlignment ColumnAlignment { get; set; }
 
 		public FlowLayout()
 		{
@@ -33,14 +36,24 @@ namespace Lime
 				return;
 			}
 			DebugRectangles.Clear();
+
+			List<Widget>[] lines = new List<Widget>[splitIndices.Count - 1];
+			float[] maxLineHeights = new float[splitIndices.Count - 1];
+			for (int j = 0; j < splitIndices.Count - 1; j++) {
+				int i0 = splitIndices[j];
+				int i1 = splitIndices[j + 1];
+				lines[j] = widgets.GetRange(i0, i1 - i0);
+				maxLineHeights[j] = lines[j].Max((w) => w.EffectiveMinSize.Y);
+			}
+			var availableHeight = Math.Max(0, widget.ContentHeight - (lines.Length - 1) * Spacing);
 			float dy = 0.0f;
 			for (int j = 0; j < splitIndices.Count - 1; j++) {
 				int i0 = splitIndices[j];
 				int i1 = splitIndices[j + 1];
 				var constraints = new LinearAllocator.Constraints[i1 - i0];
-				var line = widgets.GetRange(i0, i1 - i0);
-				var maxLineHeight = line.Max((w) => w.EffectiveMinSize.Y);
-				var availableLength = Math.Max(0, widget.ContentWidth - (line.Count - 1) * Spacing);
+				var line = lines[j];
+				var maxLineHeight = maxLineHeights[j];
+				var availableWidth = Math.Max(0, widget.ContentWidth - (line.Count - 1) * Spacing);
 				int i = 0;
 				foreach (var w in line) {
 					constraints[i++] = new LinearAllocator.Constraints {
@@ -49,10 +62,19 @@ namespace Lime
 						Stretch = (w.LayoutCell ?? LayoutCell.Default).StretchX
 					};
 				}
-				var sizes = LinearAllocator.Allocate(availableLength, constraints, roundSizes: true);
+				var sizes = LinearAllocator.Allocate(availableWidth, constraints, roundSizes: true);
 				i = 0;
+				float justifyDx = 0.0f;
+				if (RowAlignment == HAlignment.Justify) {
+					justifyDx = (availableWidth - sizes.Sum(size => size)) / (line.Count + 1);
+				}
+				if (ColumnAlignment == VAlignment.Justify) {
+					var justifyDy = (availableHeight - maxLineHeights.Sum(h => h)) / (lines.Length + 1);
+					dy += justifyDy;
+				}
 				var position = new Vector2(widget.Padding.Left, widget.Padding.Top + dy);
 				foreach (var w in line) {
+					position.X += justifyDx;
 					var height = (w.LayoutCell ?? LayoutCell.Default).Stretch.Y == 0.0f
 						? w.EffectiveMinSize.Y
 						: maxLineHeight;
@@ -66,7 +88,6 @@ namespace Lime
 			}
 		}
 
-		// TODO: apply fixes from GD branch
 		// TODO: Optimize equal size for all elements case
 		public override void MeasureSizeConstraints(Widget widget)
 		{
