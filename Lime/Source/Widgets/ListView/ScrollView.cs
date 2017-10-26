@@ -13,7 +13,7 @@ namespace Lime
 		Both = 3,
 	}
 
-	public partial class ScrollView : IDisposable
+	public partial class ScrollView
 	{
 		public readonly Frame Frame;
 		public readonly ScrollViewContentWidget Content;
@@ -149,11 +149,6 @@ namespace Lime
 			else {
 				w.Width = position;
 			}
-		}
-
-		public virtual void Dispose()
-		{
-			Content.UnlinkAndDispose();
 		}
 
 		/// <summary>
