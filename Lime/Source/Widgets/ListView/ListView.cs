@@ -34,12 +34,12 @@ namespace Lime
 						if (!ManualItemsPositioning) {
 							item.Y = p;
 						}
-						p += item.Height;
+						p += item.Height * item.Scale.Y;
 					} else {
 						if (!ManualItemsPositioning) {
 							item.X = p;
 						}
-						p += item.Width;
+						p += item.Width * item.Scale.X;
 					}
 				}
 			}
@@ -81,11 +81,11 @@ namespace Lime
 			item.Pivot = Vector2.Zero;
 			if (ScrollDirection == ScrollDirection.Vertical) {
 				item.X = 0;
-				item.Width = Content.Width;
+				item.Width = Content.Width / item.Scale.X;
 				item.Anchors = Anchors.LeftRight;
 			} else {
 				item.Y = 0;
-				item.Height = Content.Height;
+				item.Height = Content.Height / item.Scale.Y;
 				item.Anchors = Anchors.TopBottom;
 			}
 		}
