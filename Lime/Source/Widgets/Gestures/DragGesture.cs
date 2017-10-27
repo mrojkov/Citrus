@@ -18,7 +18,7 @@ namespace Lime
 		{
 			Initial,
 			Recognizing,
-			Dragging
+			Changing
 		}
 
 		private const float DefaultDragThreshold = 5;
@@ -56,7 +56,7 @@ namespace Lime
 		public bool WasEnded() => ended.HasOccurred();
 
 		public bool IsRecognizing() => state == State.Recognizing;
-		public bool IsDragging() => state == State.Dragging;
+		public bool IsChanging() => state == State.Changing;
 
 		public DragGesture(int buttonIndex = 0, DragDirection direction = DragDirection.Any, float dragThreshold = DefaultDragThreshold)
 		{
@@ -67,7 +67,7 @@ namespace Lime
 
 		internal protected override void Cancel()
 		{
-			if (state == State.Dragging) {
+			if (state == State.Changing) {
 				ended.Raise();
 			}
 			state = State.Initial;
@@ -87,12 +87,12 @@ namespace Lime
 					state = State.Initial;
 				} else if (Recognize()) {
 					CancelClickRecognition(gestures);
-					state = State.Dragging;
+					state = State.Changing;
 					prevMousePosition = Input.MousePosition;
 					recognized.Raise();
 				}
 			}
-			if (state == State.Dragging) {
+			if (state == State.Changing) {
 				var curMousePos = Input.MousePosition;
 				if (prevMousePosition != curMousePos) {
 					changed.Raise();

@@ -52,7 +52,7 @@ namespace Lime
 		public virtual bool IsDragging { get; protected set; }
 
 		// TODO: Use WidgetInput instead
-		private Input Input { get { return Window.Current.Input; } }
+		private Input Input => Window.Current.Input;
 
 		public float ContentLength
 		{
@@ -67,17 +67,7 @@ namespace Lime
 		}
 
 		public float MinScrollPosition = 0;
-
-		public float MaxScrollPosition
-		{
-			get { return
-					Mathf.Max(0, ProjectToScrollAxis(Content.Size - Frame.Size).Round()) + MinScrollPosition; }
-		}
-
-		public float MaxOverscroll
-		{
-			get { return ProjectToScrollAxis(Frame.Size * Vector2.Half); }
-		}
+		public float MaxScrollPosition => Mathf.Max(0, ProjectToScrollAxis(Content.Size - Frame.Size).Round()) + MinScrollPosition;
 
 		private Task scrollingTask;
 
@@ -246,12 +236,13 @@ namespace Lime
 			while (true) {
 				if (dragGesture.WasBegan()) {
 					StopScrolling();
-					Vector2 mousePos = Input.MousePosition;
+				} else if (dragGesture.WasRecognized()) {
 					var velocityMeter = new VelocityMeter();
 					velocityMeter.AddSample(ScrollPosition);
-					yield return HandleDragTask(velocityMeter, ProjectToScrollAxisWithFrameRotation(mousePos), dragGesture);
+					yield return HandleDragTask(velocityMeter, ProjectToScrollAxisWithFrameRotation(dragGesture.MousePressPosition), dragGesture);
+				} else if (!dragGesture.IsRecognizing()) {
+					Bounce();
 				}
-				Bounce();
 				yield return null;
 			}
 		}
@@ -294,18 +285,6 @@ namespace Lime
 			}
 		}
 
-		private IEnumerator<object> DetectSwipeAlongScrollAxisTask(TaskResult<bool> result)
-		{
-			Vector2 mousePos = Input.MousePosition;
-			while (Input.IsMousePressed() && (Input.MousePosition - mousePos).Length < 10) {
-				yield return null;
-			}
-			Vector2 d = Input.MousePosition - mousePos;
-			var dt = Vector2.DotProduct(ScrollAxis, d);
-			var dn = Vector2.DotProduct(new Vector2(ScrollAxis.Y, -ScrollAxis.X), d);
-			result.Value = dt.Abs() > dn.Abs();
-		}
-
 		private IEnumerator<object> InertialScrollingTask(float velocity)
 		{
 			while (true) {
@@ -316,7 +295,8 @@ namespace Lime
 					break;
 				}
 				// Round scrolling position to prevent blurring
-				ScrollPosition = Mathf.Clamp(value: (ScrollPosition + velocity * delta).Round(), min: MinScrollPosition - MaxOverscroll, max: MaxScrollPosition + MaxOverscroll);
+				ScrollPosition = Mathf.Clamp(value: (ScrollPosition + velocity * delta).Round(), min: MinScrollPosition, max: MaxScrollPosition);
+				ScrollPosition = ClampScrollPositionWithinBounceZone(ScrollPosition);
 				yield return null;
 			}
 			scrollingTask = null;
@@ -324,18 +304,20 @@ namespace Lime
 
 		private IEnumerator<object> HandleDragTask(VelocityMeter velocityMeter, float mouseProjectedPosition, DragGesture dragGesture)
 		{
-			if (!CanScroll || !ScrollWhenContentFits && MaxScrollPosition == 0 || ScrollBySlider)
+			if (!CanScroll || !ScrollWhenContentFits && MaxScrollPosition == 0 || ScrollBySlider) {
 				yield break;
-			IsBeingRefreshed = false; // Do not block scrollview on refresh gesture
+			}
+			// Do not block scrollview on refresh gesture
+			IsBeingRefreshed = false;
 			IsDragging = true;
 			float realScrollPosition = ScrollPosition;
 			wheelScrollState = WheelScrollState.Stop;
 			while (dragGesture.IsDragging()) {
-				realScrollPosition += mouseProjectedPosition - ProjectToScrollAxisWithFrameRotation(Input.MousePosition);
+				var newMouseProjectedPosition = ProjectToScrollAxisWithFrameRotation(Input.MousePosition);
+				realScrollPosition += mouseProjectedPosition - newMouseProjectedPosition;
 				// Round scrolling position to prevent blurring
-				ScrollPosition = ClampScrollPositionWithinBounceZone(realScrollPosition)
-					.Round();
-				mouseProjectedPosition = ProjectToScrollAxisWithFrameRotation(Input.MousePosition);
+				ScrollPosition = ClampScrollPositionWithinBounceZone(realScrollPosition).Round();
+				mouseProjectedPosition = newMouseProjectedPosition;
 				velocityMeter.AddSample(realScrollPosition);
 				yield return null;
 			}
@@ -345,7 +327,7 @@ namespace Lime
 
 		private float ClampScrollPositionWithinBounceZone(float scrollPosition)
 		{
-			float resistance = 1.0f / 3;
+			const float resistance = 1.0f / 3;
 			if (scrollPosition < 0) {
 				return (scrollPosition * resistance).Clamp(-BounceZoneThickness, 0);
 			} else if (scrollPosition > MaxScrollPosition) {
