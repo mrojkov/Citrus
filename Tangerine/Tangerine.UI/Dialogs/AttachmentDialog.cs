@@ -253,6 +253,44 @@ namespace Tangerine.UI
 			}
 		}
 
+		private class BlendingCell : Widget
+		{
+			private readonly ThemedAddButton AddButton;
+			private readonly ThemedTabCloseButton RemoveButton;
+			private readonly Property<BlendingOption> property;
+
+			public BlendingCell(object obj, string propName)
+			{
+				Layout = new HBoxLayout();
+				MinMaxHeight = 20;
+				Anchors = Anchors.LeftRightTopBottom;
+				property = new Property<BlendingOption>(obj, propName);
+				AddButton = new ThemedAddButton {
+					Anchors = Anchors.Center,
+					Clicked = () => property.Value = new BlendingOption(),
+					LayoutCell = new LayoutCell { Alignment = Alignment.Center }
+				};
+				RemoveButton = new ThemedTabCloseButton {
+					Clicked = () => property.Value = null
+				};
+				Nodes.Add(AddButton);
+				AddChangeWatcher(() => property.Value, (v) => {
+					Nodes.Clear();
+					if (v == null) {
+						Nodes.Add(AddButton);
+					} else {
+						new BlendingPropertyEditor(new PropertyEditorParams(this, obj, propName) { ShowLabel = false });
+						Nodes.Add(RemoveButton);
+					}
+				});
+			}
+
+			private void AddChangeWatcher(Func<BlendingOption> getter, Action<BlendingOption> action)
+			{
+				Tasks.Add(new Property<BlendingOption>(getter).DistinctUntilChanged().Consume(action));
+			}
+		}
+
 		private class MeshRow : DeletableRow<Model3DAttachment.MeshOption>
 		{
 			public MeshRow(Model3DAttachment.MeshOption mesh, ObservableCollection<Model3DAttachment.MeshOption> options) : base(mesh, options)
@@ -320,6 +358,7 @@ namespace Tangerine.UI
 				};
 				Padding = new Thickness(AttachmentMetrics.Spacing);
 				Header.Nodes.Add(expandedButton);
+
 				var animationNamePropEditor = new StringPropertyEditor(
 					new PropertyEditorParams(
 						Header,
@@ -339,11 +378,7 @@ namespace Tangerine.UI
 						animation,
 						nameof(Model3DAttachment.Animation.LastFrame)) { ShowLabel = false });
 
-				var blendingPropEditor = new BlendingPropertyEditor(
-					new PropertyEditorParams(
-						Header,
-						animation,
-						nameof(Model3DAttachment.Animation.Blending)) { ShowLabel = false });
+				Header.AddNode(new BlendingCell(Source, nameof(Model3DAttachment.Animation.Blending)));
 
 				var expandableContentWrapper = new Widget {
 					Layout = new VBoxLayout { Spacing = AttachmentMetrics.Spacing },
@@ -367,6 +402,7 @@ namespace Tangerine.UI
 						}
 					},
 					MarkerRow.CreateHeader());
+
 				BuildList<Model3DAttachment.MarkerBlendingData, MarkerBlendingRow>(
 					animation.MarkersBlendings,
 					expandableContentWrapper,
@@ -390,6 +426,7 @@ namespace Tangerine.UI
 					"Ignored Nodes",
 					() => new Model3DAttachment.NodeData { Id = "NodeId" },
 					NodeRow.CreateHeader());
+
 				Nodes.Add(expandableContentWrapper);
 				expandableContentWrapper.AddChangeWatcher(
 					() => expandedButton.Expanded,
@@ -424,9 +461,6 @@ namespace Tangerine.UI
 					source.Add(activator());
 				}));
 				list.Components.Add(widgetFactory);
-
-
-
 				this.AddChangeWatcher(() => markersExpandButton.Expanded, (e) => list.Visible = e);
 			}
 
@@ -579,13 +613,7 @@ namespace Tangerine.UI
 						Source.Marker,
 						nameof(Marker.JumpTo)) { ShowLabel = false });
 				jumpToPropEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.ControlWidth;
-
-				var blendingPropEditor = new BlendingPropertyEditor(
-					new PropertyEditorParams(
-						Header,
-						Source,
-						nameof(Model3DAttachment.MarkerData.Blending)) { ShowLabel = false });
-				blendingPropEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.ControlWidth;
+				Header.AddNode(new BlendingCell(Source, nameof(Model3DAttachment.MarkerData.Blending)));
 			}
 
 			public static Widget CreateHeader()
@@ -650,12 +678,7 @@ namespace Tangerine.UI
 						nameof(Model3DAttachment.MaterialEffect.Path)) { ShowLabel = false });
 				pathPropEditor.ContainerWidget.MinMaxWidth = 2 * AttachmentMetrics.EditorWidth;
 
-				var blendingPropEditor = new BlendingPropertyEditor(
-					new PropertyEditorParams(
-						Header,
-						Source,
-						nameof(Model3DAttachment.MaterialEffect.Blending)) { ShowLabel = false });
-				blendingPropEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.ControlWidth;
+				Header.AddNode(new BlendingCell(Source, nameof(Model3DAttachment.MaterialEffect.Blending)));
 			}
 
 			public static Widget CreateHeader()
