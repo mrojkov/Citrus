@@ -291,12 +291,15 @@ namespace Lime
 				var delta = Task.Current.Delta;
 				float damping = InertialScrollingDamping * (ScrollPosition.InRange(MinScrollPosition, MaxScrollPosition) ? 1 : 10);
 				velocity -= velocity * damping * delta;
-				if (velocity.Abs() < InertialScrollingStopVelocity) {
+				if (
+					velocity.Abs() < InertialScrollingStopVelocity ||
+					ScrollPosition == MinScrollPosition - BounceZoneThickness ||
+					ScrollPosition == MaxScrollPosition + BounceZoneThickness
+				) {
 					break;
 				}
 				// Round scrolling position to prevent blurring
-				ScrollPosition = Mathf.Clamp(value: (ScrollPosition + velocity * delta).Round(), min: MinScrollPosition, max: MaxScrollPosition);
-				ScrollPosition = ClampScrollPositionWithinBounceZone(ScrollPosition);
+				ScrollPosition = ClampScrollPositionWithinBounceZone((ScrollPosition + velocity * delta).Round());
 				yield return null;
 			}
 			scrollingTask = null;
@@ -327,14 +330,7 @@ namespace Lime
 
 		private float ClampScrollPositionWithinBounceZone(float scrollPosition)
 		{
-			const float resistance = 1.0f / 3;
-			if (scrollPosition < 0) {
-				return (scrollPosition * resistance).Clamp(-BounceZoneThickness, 0);
-			} else if (scrollPosition > MaxScrollPosition) {
-				return ((scrollPosition - MaxScrollPosition) * resistance).Clamp(0, BounceZoneThickness) + MaxScrollPosition;
-			} else {
-				return scrollPosition;
-			}
+			return scrollPosition.Clamp(MinScrollPosition - BounceZoneThickness, MaxScrollPosition + BounceZoneThickness);
 		}
 
 		public class ScrollViewContentWidget : Widget
