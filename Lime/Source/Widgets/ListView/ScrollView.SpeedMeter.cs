@@ -21,8 +21,12 @@ namespace Lime
 
 			public void AddSample(float position)
 			{
-				samples.Add(new Sample() { Position = position, Time = DateTime.Now });
-				samples.RemoveAll(s => (DateTime.Now - s.Time).TotalSeconds > MeasureTimeInterval);
+				var timeStamp = DateTime.Now;
+				if (samples.Count > 0 && samples[samples.Count - 1].Time == timeStamp) {
+					return;
+				}
+				samples.Add(new Sample { Position = position, Time = timeStamp });
+				samples.RemoveAll(s => (timeStamp - s.Time).TotalSeconds > MeasureTimeInterval);
 			}
 
 			public float CalcVelocity()
@@ -33,11 +37,7 @@ namespace Lime
 				var s0 = samples.First();
 				var s1 = samples.Last();
 				var delta = (float)(s1.Time - s0.Time).TotalSeconds;
-				if (delta < float.Epsilon) {
-					return float.MaxValue;
-				} else {
-					return (s1.Position - s0.Position) / delta;
-				}
+				return (s1.Position - s0.Position) / delta;
 			}
 		}
 	}
