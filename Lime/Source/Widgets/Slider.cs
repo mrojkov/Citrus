@@ -92,7 +92,7 @@ namespace Lime
 			}
 			var draggingJustBegun = false;
 			if (Enabled && RangeMax > RangeMin) {
-				if (dragGestureThumb.WasBegan()) {
+				if (dragGestureThumb.WasRecognized()) {
 					activeDragGesture = dragGestureThumb;
 					StartDrag();
 					draggingJustBegun = true;
@@ -101,10 +101,10 @@ namespace Lime
 						StartDrag();
 						SetValueFromCurrentMousePosition(false);
 					}
-					if (clickGesture.WasRecognizedOrCanceled() && !dragGestureSlider.WasBegan()) {
+					if (clickGesture.WasRecognizedOrCanceled() && !dragGestureSlider.WasRecognized()) {
 						Release();
 					}
-					if (dragGestureSlider.WasBegan()) {
+					if (dragGestureSlider.WasRecognized()) {
 						activeDragGesture = dragGestureSlider;
 						StartDrag();
 						dragInitialDelta = 0;

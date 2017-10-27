@@ -94,7 +94,7 @@ namespace Lime
 			};
 			button.Awoken += instance => {
 				var dragGesture = new DragGesture();
-				dragGesture.Began += () => Tasks.Add(SpinByDragTask(dragGesture));
+				dragGesture.Recognized += () => Tasks.Add(SpinByDragTask(dragGesture));
 				var clickGesture = new ClickGesture(() => {
 					var delta = (type == SpinButtonType.Additive ? 1 : -1) * Step;
 					if (Input.IsKeyPressed(Key.Shift)) {

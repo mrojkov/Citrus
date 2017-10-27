@@ -533,13 +533,13 @@ namespace Lime
 					FocusableWidget.SetFocus();
 					ShowContextMenu(true);
 				}
-				if (dragGesture.WasBegan()) {
+				if (dragGesture.WasRecognized()) {
 					FocusableWidget.SetFocus();
 					CaretPos.WorldPos = DisplayWidget.ToLocalMousePosition(dragGesture.MousePressPosition);
 					HideSelection();
 					EnsureSelection();
 					SelectionStart.AssignFrom(CaretPos);
-				} else if (dragGesture.WasMoved()) {
+				} else if (dragGesture.WasChanged()) {
 					CaretPos.WorldPos = DisplayWidget.LocalMousePosition();
 					EnsureSelection();
 					SelectionEnd.AssignFrom(CaretPos);
