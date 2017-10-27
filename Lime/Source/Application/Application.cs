@@ -139,9 +139,8 @@ namespace Lime
 		}
 #endif
 
-		// Specifies the lowest possible 1/(time delta) passed to Window.Updating.
-		// TODO: Move to IWindow
-		public static float LowFPSLimit = 33.333f;
+		// Specifies the highest possible time delta passed to Window.Updating.
+		public const float MaxDelta = 1 / 33.333f;
 
 		/// <summary>
 		/// Gets the main (UI) thread. All rendering is beging processed on the main thread.

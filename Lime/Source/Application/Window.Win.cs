@@ -504,7 +504,7 @@ namespace Lime
 			if (!form.Visible || !form.CanFocus) {
 				return;
 			}
-			float delta = Mathf.Clamp((float)stopwatch.Elapsed.TotalSeconds, 0, 1 / Application.LowFPSLimit);
+			float delta = Mathf.Clamp((float)stopwatch.Elapsed.TotalSeconds, 0, Application.MaxDelta);
 			stopwatch.Restart();
 			if (this == Application.MainWindow && Application.MainMenu != null) {
 				Application.MainMenu.Refresh();

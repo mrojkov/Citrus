@@ -615,30 +615,48 @@ namespace Lime
 #if PROFILE
 			var watch = System.Diagnostics.Stopwatch.StartNew();
 #endif
-			delta *= AnimationSpeed;
 			if (!IsAwoken) {
 				Awoken?.Invoke(this);
 				Awake();
 				IsAwoken = true;
 			}
-			AdvanceAnimation(delta);
-			SelfUpdate(delta);
+			if (delta > Application.MaxDelta) {
 #if PROFILE
-			watch.Stop();
+				watch.Stop();
+				NodeProfiler.RegisterUpdate(this, watch.ElapsedTicks);
 #endif
-			for (var node = Nodes.FirstOrNull(); node != null; ) {
-				var next = node.NextSibling;
-				node.Update(delta);
-				node = next;
+				SafeUpdate(delta);
+			} else {
+				AdvanceAnimation(delta);
+				SelfUpdate(delta);
+#if PROFILE
+				watch.Stop();
+#endif
+				for (var node = Nodes.FirstOrNull(); node != null;) {
+					var next = node.NextSibling;
+					node.Update(node.AnimationSpeed * delta);
+					node = next;
+				}
+#if PROFILE
+				watch.Start();
+#endif
+				SelfLateUpdate(delta);
+
+#if PROFILE
+				watch.Stop();
+				NodeProfiler.RegisterUpdate(this, watch.ElapsedTicks);
+#endif
 			}
-#if PROFILE
-			watch.Start();
-#endif
-			SelfLateUpdate(delta);
-#if PROFILE
-			watch.Stop();
-			NodeProfiler.RegisterUpdate(this, watch.ElapsedTicks);
-#endif
+		}
+
+		public void SafeUpdate(float delta)
+		{
+			var remainDelta = delta;
+			do {
+				delta = Mathf.Min(remainDelta, Application.MaxDelta);
+				Update(delta);
+				remainDelta -= delta;
+			} while (remainDelta > 0f);
 		}
 
 		/// <summary>

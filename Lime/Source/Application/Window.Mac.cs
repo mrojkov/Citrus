@@ -405,7 +405,7 @@ namespace Lime
 		{
 			var delta = (float)stopwatch.Elapsed.TotalSeconds;
 			stopwatch.Restart();
-			delta = Mathf.Clamp(delta, 0, 1 / Application.LowFPSLimit);
+			delta = Mathf.Clamp(delta, 0, MaxDelta);
 			// Refresh mouse position on every frame to make HitTest work properly if mouse is outside of the window.
 			RefreshMousePosition();
 			Input.ProcessPendingKeyEvents(delta);
