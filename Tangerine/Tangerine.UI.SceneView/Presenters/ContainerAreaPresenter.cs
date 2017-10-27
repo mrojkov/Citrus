@@ -102,7 +102,7 @@ namespace Tangerine.UI.SceneView
 									DefaultRenderChainBuilder.Instance.AddToRenderChain(widget, rh);
 								}
 							}
-							rh.Render();
+							rh.RenderAndClear();
 						}
 						w.PrepareRendererState();
 						var size = Document.Current.RootNode.AsWidget.Size / 2;
