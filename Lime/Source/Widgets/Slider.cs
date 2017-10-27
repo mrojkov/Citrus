@@ -116,7 +116,7 @@ namespace Lime
 			if (activeDragGesture?.WasEnded() ?? false) {
 				Release();
 			}
-			if (Enabled && (activeDragGesture?.IsDragging() ?? false)) {
+			if (Enabled && (activeDragGesture?.IsChanging() ?? false)) {
 				SetValueFromCurrentMousePosition(draggingJustBegun);
 			}
 			InterpolateGraphicsBetweenMinAndMaxMarkers();

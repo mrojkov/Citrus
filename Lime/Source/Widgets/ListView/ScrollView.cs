@@ -312,7 +312,7 @@ namespace Lime
 			IsDragging = true;
 			float realScrollPosition = ScrollPosition;
 			wheelScrollState = WheelScrollState.Stop;
-			while (dragGesture.IsDragging()) {
+			while (dragGesture.IsChanging()) {
 				var newMouseProjectedPosition = ProjectToScrollAxisWithFrameRotation(Input.MousePosition);
 				realScrollPosition += mouseProjectedPosition - newMouseProjectedPosition;
 				// Round scrolling position to prevent blurring

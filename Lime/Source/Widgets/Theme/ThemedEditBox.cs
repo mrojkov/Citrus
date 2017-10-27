@@ -118,7 +118,7 @@ namespace Lime
 			RaiseBeginSpin();
 			try {
 				var prevMousePos = Application.DesktopMousePosition;
-				while (dragGesture.IsDragging()) {
+				while (dragGesture.IsChanging()) {
 					var disp = CommonWindow.Current.Display;
 					var wrapped = false;
 					if (Application.DesktopMousePosition.X > disp.Position.X + disp.Size.X - 5) {
