@@ -48,7 +48,8 @@ namespace Tangerine.UI.Timeline.Operations
 					var doc = Document.Current;
 					if (Core.UserPreferences.Instance.Get<UserPreferences>().AnimationMode && doc.AnimationFrame != value) {
 						node.SetTangerineFlag(TangerineFlags.IgnoreMarkers, true);
-						SetCurrentFrameRecursive(node, 0);
+						StopAnimationRecursive(node);
+						SetTimeRecursive(node, 0);
 						ClearParticlesRecursive(doc.RootNode);
 						node.IsRunning = true;
 						FastForwardToFrame(node, value);
@@ -68,29 +69,28 @@ namespace Tangerine.UI.Timeline.Operations
 			static void FastForwardToFrame(Node node, int frame)
 			{
 				var forwardDelta = AnimationUtils.SecondsPerFrame * (frame - node.AnimationFrame);
-				// Set the delta limit to ensure we process no more than one frame at a time.
-				const float DeltaLimit = (float)(AnimationUtils.SecondsPerFrame * 0.99);
-				var forwardSteps = (int)(forwardDelta / DeltaLimit);
-				for (var i = 0; i < forwardSteps; i++) {
-					node.Update(DeltaLimit);
-				}
+				node.Update((float)forwardDelta);
 				// Make sure that animation engine will invoke triggers on last frame
 				var animationTime = AnimationUtils.FramesToSeconds(frame) + 0.000001;
 				node.Update((float)(animationTime - node.AnimationTime));
 				node.AnimationFrame = frame;
 			}
 
-			static void SetCurrentFrameRecursive(Node node, int frame)
+			static void SetTimeRecursive(Node node, double time)
 			{
-				node.AnimationFrame = frame;
+				foreach (var animation in node.Animations) {
+					animation.Time = time;
+				}
 				foreach (var child in node.Nodes) {
-					SetCurrentFrameRecursive(child, frame);
+					SetTimeRecursive(child, time);
 				}
 			}
 
 			static void StopAnimationRecursive(Node node)
 			{
-				node.IsRunning = false;
+				foreach (var animation in node.Animations) {
+					animation.IsRunning = false;
+				}
 				foreach (var child in node.Nodes) {
 					StopAnimationRecursive(child);
 				}
