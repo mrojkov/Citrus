@@ -21,11 +21,6 @@ namespace Lime
 		private WaitPredicate waitPredicate;
 		private float waitTime;
 
-		/// <summary>
-		/// Invoked on every Task update. Useful for disposing of the Task on some condition.
-		/// </summary>
-		public Action Updating;
-
 		public Task(IEnumerator<object> e, object tag = null)
 		{
 			Tag = tag;
@@ -37,11 +32,6 @@ namespace Lime
 		/// Time delta since last Update.
 		/// </summary>
 		public float Delta { get; private set; }
-
-		/// <summary>
-		/// Total time accumulated via Update.
-		/// </summary>
-		public float LifeTime { get; private set; }
 
 		public static Task Current => current;
 
@@ -67,14 +57,7 @@ namespace Lime
 			var savedCurrent = current;
 			current = this;
 			Delta = delta;
-			LifeTime += delta;
 			try {
-				if (Updating != null) {
-					Updating();
-					if (callStack == null) {
-						return;
-					}
-				}
 				if (waitTime > 0) {
 					waitTime -= delta;
 					if (waitTime >= 0) {
@@ -114,7 +97,6 @@ namespace Lime
 				callStack = callStack.Caller;
 			}
 			waitPredicate = null;
-			Updating = null;
 		}
 
 		private void HandleYieldedResult(object result)
@@ -188,18 +170,6 @@ namespace Lime
 				yield return null;
 			}
 #endif
-		}
-
-		/// <summary>
-		/// Sets stopping condition for current task.
-		/// </summary>
-		public static void StopIf(Func<bool> pred)
-		{
-			Current.Updating = () => {
-				if (pred()) {
-					Current.Dispose();
-				}
-			};
 		}
 
 		/// <summary>
