@@ -622,19 +622,11 @@ namespace Lime
 
 		public virtual Action Clicked
 		{
-			get { return DefaultClickGesture()?.InternalRecognized; }
-			set
-			{
-				var g = DefaultClickGesture();
-				if (g == null) {
-					g = new ClickGesture();
-					Gestures.Add(g);
-				}
-				g.InternalRecognized = value;
-			}
+			get { return DefaultClickGesture(false)?.InternalRecognized; }
+			set { DefaultClickGesture(true).InternalRecognized = value; }
 		}
 
-		private ClickGesture DefaultClickGesture()
+		private ClickGesture DefaultClickGesture(bool createIfNotExists)
 		{
 			foreach (var g in Gestures) {
 				var cg = g as ClickGesture;
@@ -642,12 +634,17 @@ namespace Lime
 					return cg;
 				}
 			}
+			if (createIfNotExists) {
+				var g = new ClickGesture();
+				Gestures.Add(g);
+				return g;
+			}
 			return null;
 		}
 
 		public virtual bool WasClicked()
 		{
-			return DefaultClickGesture()?.WasRecognized() ?? false;
+			return DefaultClickGesture(true)?.WasRecognized() ?? false;
 		}
 
 		private static bool IsNumber(float x)
