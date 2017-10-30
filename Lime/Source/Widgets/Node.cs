@@ -649,7 +649,7 @@ namespace Lime
 			}
 		}
 
-		private void SafeUpdate(float delta)
+		protected void SafeUpdate(float delta)
 		{
 			var remainDelta = delta;
 			do {
