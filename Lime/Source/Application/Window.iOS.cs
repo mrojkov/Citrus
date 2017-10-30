@@ -118,7 +118,7 @@ namespace Lime
 			if (!Active || UIViewController.SoftKeyboardBeingShownOrHid) {
 				return;
 			}
-			var delta = (float)Math.Min(e.Time, MaxDelta);
+			var delta = (float)Math.Min(e.Time, Application.MaxDelta);
 			RaiseUpdating(delta);
 			Input.CopyKeysState();
 			Input.ProcessPendingKeyEvents(delta);
