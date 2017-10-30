@@ -10,24 +10,24 @@
 			Blending(animation, delta);
 		}
 
-		public override void ApplyAnimators(Animation animation, bool invokeTriggers)
+		public override void ApplyAnimators(Animation animation, bool invokeTriggers, double animationTimeCorrection = 0)
 		{
-			base.ApplyAnimators(animation, invokeTriggers);
+			base.ApplyAnimators(animation, invokeTriggers, animationTimeCorrection);
 			Blending(animation);
 		}
 
-		public override bool TryRunAnimation(Animation animation, string markerId)
+		public override bool TryRunAnimation(Animation animation, string markerId, double animationTimeCorrection = 0)
 		{
 			var blender = animation.Owner.Components.Get<AnimationBlender>();
 			if (blender == null) {
-				return base.TryRunAnimation(animation, markerId);
+				return base.TryRunAnimation(animation, markerId, animationTimeCorrection);
 			}
 			if (markerId != null && animation.Markers.TryFind(markerId) == null) {
 				return false;
 			}
 
 			blender.Attach(animation, markerId, animation.RunningMarkerId);
-			base.TryRunAnimation(animation, markerId);
+			base.TryRunAnimation(animation, markerId, animationTimeCorrection);
 			Blending(animation);
 			return true;
 		}

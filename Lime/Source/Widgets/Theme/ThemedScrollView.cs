@@ -41,7 +41,7 @@ namespace Lime
 				Renderer.DrawRect(new Vector2(2, 0), new Vector2(slider.Width - 2, slider.Height), Theme.Colors.ScrollbarThumb);
 			}));
 			var ae = new AnimationEngineDelegate();
-			ae.OnRunAnimation = (_, marker) => {
+			ae.OnRunAnimation = (_, marker, animationTimeCorrection) => {
 				slider.Opacity = marker == "Show" ? 1 : 0;
 				return true;
 			};

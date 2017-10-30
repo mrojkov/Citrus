@@ -774,33 +774,36 @@ namespace Lime
 				Awake();
 				IsAwoken = true;
 			}
-			delta *= AnimationSpeed;
-			if (Updating != null) {
-				Updating(delta);
-			}
-			if (GloballyVisible) {
-				AdvanceAnimation(delta);
-				SelfUpdate(delta);
+			if (delta > Application.MaxDelta) {
 #if PROFILE
 				watch.Stop();
+				NodeProfiler.RegisterUpdate(this, watch.ElapsedTicks);
 #endif
-				for (var node = Nodes.FirstOrNull(); node != null; ) {
-					var next = node.NextSibling;
-					node.Update(delta);
-					node = next;
+				SafeUpdate(delta);
+			} else {
+				Updating?.Invoke(delta);
+				if (GloballyVisible) {
+					AdvanceAnimation(delta);
+					SelfUpdate(delta);
+#if PROFILE
+					watch.Stop();
+#endif
+					for (var node = Nodes.FirstOrNull(); node != null;) {
+						var next = node.NextSibling;
+						node.Update(node.AnimationSpeed * delta);
+						node = next;
+					}
+#if PROFILE
+					watch.Start();
+#endif
+					SelfLateUpdate(delta);
 				}
+				Updated?.Invoke(delta);
 #if PROFILE
-				watch.Start();
+				watch.Stop();
+				NodeProfiler.RegisterUpdate(this, watch.ElapsedTicks);
 #endif
-				SelfLateUpdate(delta);
 			}
-			if (Updated != null) {
-				Updated(delta);
-			}
-#if PROFILE
-			watch.Stop();
-			NodeProfiler.RegisterUpdate(this, watch.ElapsedTicks);
-#endif
 		}
 
 		/// <summary>

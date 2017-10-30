@@ -97,10 +97,10 @@ namespace Lime
 			return false;
 		}
 
-		public bool TryRun(string animationId, string markerId = null)
+		public bool TryRun(string animationId, string markerId = null, double animationTimeCorrection = 0)
 		{
 			Animation animation;
-			return TryFind(animationId, out animation) && animation.TryRun(markerId);
+			return TryFind(animationId, out animation) && animation.TryRun(markerId, animationTimeCorrection);
 		}
 
 		public void Run(string animationId, string markerId = null)
@@ -143,7 +143,7 @@ namespace Lime
 			item.Owner = owner;
 			defaultAnimation = null;
 		}
-		
+
 		public void AddRange(IEnumerable<Animation> collection)
 		{
 			foreach (var animation in collection) {

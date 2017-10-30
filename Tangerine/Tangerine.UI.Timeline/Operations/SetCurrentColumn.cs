@@ -67,8 +67,16 @@ namespace Tangerine.UI.Timeline.Operations
 
 			static void FastForwardToFrame(Node node, int frame)
 			{
-				node.Update((float)(AnimationUtils.SecondsPerFrame * (frame - node.AnimationFrame)));
-				// Set animation frame explicitly to avoid inaccuracy, leading to skipped markers, triggers, etc.
+				var forwardDelta = AnimationUtils.SecondsPerFrame * (frame - node.AnimationFrame);
+				// Set the delta limit to ensure we process no more than one frame at a time.
+				const float DeltaLimit = (float)(AnimationUtils.SecondsPerFrame * 0.99);
+				var forwardSteps = (int)(forwardDelta / DeltaLimit);
+				for (var i = 0; i < forwardSteps; i++) {
+					node.Update(DeltaLimit);
+				}
+				// Make sure that animation engine will invoke triggers on last frame
+				var animationTime = AnimationUtils.FramesToSeconds(frame) + 0.000001;
+				node.Update((float)(animationTime - node.AnimationTime));
 				node.AnimationFrame = frame;
 			}
 

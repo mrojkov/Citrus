@@ -152,6 +152,10 @@ namespace Lime
 			animatorArray = null;
 			animator.Bind(owner);
 			animatorList.Add(animator);
+			Animation animation;
+			if (owner.Animations.TryFind(animator.AnimationId, out animation)) {
+				animation.NextMarkerOrTriggerTime = null;
+			}
 			Version++;
 		}
 
@@ -173,11 +177,11 @@ namespace Lime
 			}
 		}
 
-		public void InvokeTriggers(int frame)
+		public void InvokeTriggers(int frame, double animationTimeCorrection = 0)
 		{
 			foreach (var animator in AsArray) {
 				if (animator.IsTriggerable) {
-					animator.InvokeTrigger(frame);
+					animator.InvokeTrigger(frame, animationTimeCorrection);
 				}
 			}
 		}

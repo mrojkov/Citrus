@@ -14,7 +14,7 @@ namespace Lime
 	public interface IAnimable
 	{
 		AnimatorCollection Animators { get; }
-		void OnTrigger(string property);
+		void OnTrigger(string property, double animationTimeCorrection = 0);
 	}
 
 	public sealed class TangerineExportAttribute : Attribute
@@ -512,9 +512,9 @@ namespace Lime
 		/// Runs animation with provided Id and provided marker.
 		/// Returns false if sought-for animation or marker doesn't exist.
 		/// </summary>
-		public bool TryRunAnimation(string markerId, string animationId = null)
+		public bool TryRunAnimation(string markerId, string animationId = null, double animationTimeCorrection = 0)
 		{
-			return Animations.TryRun(animationId, markerId);
+			return Animations.TryRun(animationId, markerId, animationTimeCorrection);
 		}
 
 		/// <summary>
@@ -615,30 +615,48 @@ namespace Lime
 #if PROFILE
 			var watch = System.Diagnostics.Stopwatch.StartNew();
 #endif
-			delta *= AnimationSpeed;
 			if (!IsAwoken) {
 				Awoken?.Invoke(this);
 				Awake();
 				IsAwoken = true;
 			}
-			AdvanceAnimation(delta);
-			SelfUpdate(delta);
+			if (delta > Application.MaxDelta) {
 #if PROFILE
-			watch.Stop();
+				watch.Stop();
+				NodeProfiler.RegisterUpdate(this, watch.ElapsedTicks);
 #endif
-			for (var node = Nodes.FirstOrNull(); node != null; ) {
-				var next = node.NextSibling;
-				node.Update(delta);
-				node = next;
+				SafeUpdate(delta);
+			} else {
+				AdvanceAnimation(delta);
+				SelfUpdate(delta);
+#if PROFILE
+				watch.Stop();
+#endif
+				for (var node = Nodes.FirstOrNull(); node != null;) {
+					var next = node.NextSibling;
+					node.Update(node.AnimationSpeed * delta);
+					node = next;
+				}
+#if PROFILE
+				watch.Start();
+#endif
+				SelfLateUpdate(delta);
+
+#if PROFILE
+				watch.Stop();
+				NodeProfiler.RegisterUpdate(this, watch.ElapsedTicks);
+#endif
 			}
-#if PROFILE
-			watch.Start();
-#endif
-			SelfLateUpdate(delta);
-#if PROFILE
-			watch.Stop();
-			NodeProfiler.RegisterUpdate(this, watch.ElapsedTicks);
-#endif
+		}
+
+		public void SafeUpdate(float delta)
+		{
+			var remainDelta = delta;
+			do {
+				delta = Mathf.Min(remainDelta, Application.MaxDelta);
+				Update(delta);
+				remainDelta -= delta;
+			} while (remainDelta > 0f);
 		}
 
 		/// <summary>
@@ -706,41 +724,41 @@ namespace Lime
 		/// <summary>
 		/// TODO: Add summary
 		/// </summary>
-		public virtual void OnTrigger(string property)
+		public virtual void OnTrigger(string property, double animationTimeCorrection = 0)
 		{
 			if (property != "Trigger") {
 				return;
 			}
 			if (String.IsNullOrEmpty(Trigger)) {
-				AnimationTime = 0;
+				AnimationTime = animationTimeCorrection;
 				IsRunning = true;
 			} else {
-				TriggerMultipleAnimations();
+				TriggerMultipleAnimations(animationTimeCorrection);
 			}
 		}
 
-		private void TriggerMultipleAnimations()
+		private void TriggerMultipleAnimations(double animationTimeCorrection = 0)
 		{
 			if (Trigger.Contains(',')) {
 				foreach (var s in Trigger.Split(',')) {
-					TriggerAnimation(s.Trim());
+					TriggerAnimation(s.Trim(), animationTimeCorrection);
 				}
 			} else {
-				TriggerAnimation(Trigger);
+				TriggerAnimation(Trigger, animationTimeCorrection);
 			}
 		}
 
-		private void TriggerAnimation(string markerWithOptionalAnimationId)
+		private void TriggerAnimation(string markerWithOptionalAnimationId, double animationTimeCorrection = 0)
 		{
 			if (markerWithOptionalAnimationId.Contains('@')) {
 				var s = markerWithOptionalAnimationId.Split('@');
 				if (s.Length == 2) {
 					var markerId = s[0];
 					var animationId = s[1];
-					TryRunAnimation(markerId, animationId);
+					TryRunAnimation(markerId, animationId, animationTimeCorrection);
 				}
 			} else {
-				TryRunAnimation(markerWithOptionalAnimationId);
+				TryRunAnimation(markerWithOptionalAnimationId, null, animationTimeCorrection);
 			}
 		}
 

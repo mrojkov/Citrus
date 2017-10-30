@@ -65,7 +65,7 @@ namespace Tangerine.UI
 			Padding = new Thickness(2);
 			Size = MinMaxSize = Theme.Metrics.DefaultToolbarButtonSize;
 			DefaultAnimation.AnimationEngine = new AnimationEngineDelegate {
-				OnRunAnimation = (animation, markerId) => {
+				OnRunAnimation = (animation, markerId, animationTimeCorrection) => {
 					if (markerId == "Focus") {
 						state = State.Highlight;
 					} else if (markerId == "Press") {

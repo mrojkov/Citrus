@@ -335,7 +335,7 @@ namespace Lime
 
 		protected override void OnUpdateFrame(FrameEventArgs e)
 		{
-			var delta = Mathf.Clamp((float)stopwatch.Elapsed.TotalSeconds, 0, 1 / Application.LowFPSLimit);
+			var delta = Mathf.Clamp((float)stopwatch.Elapsed.TotalSeconds, 0, MaxDelta);
 			stopwatch.Restart();
 			base.OnUpdateFrame(new FrameEventArgs(delta));
 			AudioSystem.Update();

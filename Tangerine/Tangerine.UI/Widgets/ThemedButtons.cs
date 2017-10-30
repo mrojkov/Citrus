@@ -41,7 +41,7 @@ namespace Tangerine.UI
 			PostPresenter = presenter;
 			MinMaxSize = Theme.Metrics.CloseButtonSize;
 			DefaultAnimation.AnimationEngine = new AnimationEngineDelegate {
-				OnRunAnimation = (animation, markerId) => {
+				OnRunAnimation = (animation, markerId, animationTimeCorrection) => {
 					presenter.SetState(markerId);
 					return true;
 				}
@@ -63,7 +63,7 @@ namespace Tangerine.UI
 			Presenter = presenter;
 			MinMaxSize = Theme.Metrics.CloseButtonSize;
 			DefaultAnimation.AnimationEngine = new AnimationEngineDelegate {
-				OnRunAnimation = (animation, markerId) => {
+				OnRunAnimation = (animation, markerId, animationTimeCorrection) => {
 					presenter.SetState(markerId);
 					return true;
 				}

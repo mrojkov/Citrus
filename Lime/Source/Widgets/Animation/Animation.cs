@@ -6,6 +6,7 @@ namespace Lime
 	public class Animation : ICloneable
 	{
 		internal double TimeInternal;
+		internal double? NextMarkerOrTriggerTime;
 
 		[YuzuMember]
 		public MarkerCollection Markers { get; private set; }
@@ -19,6 +20,7 @@ namespace Lime
 			set
 			{
 				TimeInternal = value;
+				NextMarkerOrTriggerTime = null;
 				AnimationEngine.ApplyAnimators(this, false);
 			}
 		}
@@ -41,7 +43,7 @@ namespace Lime
 
 		public Animation()
 		{
-			Markers = new MarkerCollection();
+			Markers = new MarkerCollection(this);
 		}
 
 		public void Advance(Node owner, float delta)
@@ -59,9 +61,9 @@ namespace Lime
 			}
 		}
 
-		public bool TryRun(string markerId = null)
+		public bool TryRun(string markerId = null, double animationTimeCorrection = 0)
 		{
-			if (AnimationEngine.TryRunAnimation(this, markerId)) {
+			if (AnimationEngine.TryRunAnimation(this, markerId, animationTimeCorrection)) {
 				Stopped = null;
 				return true;
 			}
@@ -84,7 +86,7 @@ namespace Lime
 		{
 			var clone = (Animation)MemberwiseClone();
 			clone.Owner = null;
-			clone.Markers = MarkerCollection.DeepClone(Markers);
+			clone.Markers = MarkerCollection.DeepClone(Markers, clone);
 			return clone;
 		}
 
