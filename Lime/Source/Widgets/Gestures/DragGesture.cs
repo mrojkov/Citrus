@@ -29,8 +29,11 @@ namespace Lime
 		public int ButtonIndex { get; private set; }
 		public DragDirection Direction { get; private set; }
 		public float DragThreshold { get; private set; }
+		// Will cancel any other drag gestures
+		public bool Exclusive { get; set; }
 
 		public Vector2 MousePressPosition { get; private set; }
+		public Vector2 MousePosition => Input.MousePosition;
 
 		private PollableEvent began;
 		private PollableEvent recognized;
@@ -58,11 +61,12 @@ namespace Lime
 		public bool IsRecognizing() => state == State.Recognizing;
 		public bool IsChanging() => state == State.Changing;
 
-		public DragGesture(int buttonIndex = 0, DragDirection direction = DragDirection.Any, float dragThreshold = DefaultDragThreshold)
+		public DragGesture(int buttonIndex = 0, DragDirection direction = DragDirection.Any, bool exclusive = false, float dragThreshold = DefaultDragThreshold)
 		{
 			ButtonIndex = buttonIndex;
 			Direction = direction;
 			DragThreshold = dragThreshold;
+			Exclusive = exclusive;
 		}
 
 		internal protected override void Cancel()
@@ -84,9 +88,10 @@ namespace Lime
 			}
 			if (state == State.Recognizing) {
 				if (!Input.IsMousePressed(ButtonIndex)) {
+					ended.Raise();
 					state = State.Initial;
 				} else if (Recognize()) {
-					CancelClickRecognition(gestures);
+					CancelOtherGestures(gestures);
 					state = State.Changing;
 					prevMousePosition = Input.MousePosition;
 					recognized.Raise();
@@ -116,10 +121,16 @@ namespace Lime
 				Direction == DragDirection.Vertical && dy > DragThreshold;
 		}
 
-		private void CancelClickRecognition(IEnumerable<Gesture> gestures)
+		private void CancelOtherGestures(IEnumerable<Gesture> gestures)
 		{
-			foreach (var r in gestures.OfType<ClickGesture>().Where(r => r.ButtonIndex == ButtonIndex)) {
-				r.Cancel();
+			foreach (var r in gestures) {
+				var clickGesture = r as ClickGesture;
+				if (clickGesture?.ButtonIndex == ButtonIndex) {
+					r.Cancel();
+				}
+				if (Exclusive) {
+					(r as DragGesture)?.Cancel();
+				}
 			}
 		}
 	}

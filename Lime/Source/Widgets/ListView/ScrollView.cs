@@ -29,6 +29,7 @@ namespace Lime
 		public bool ScrollWhenContentFits = true;
 		private float? lastFrameRotation = null;
 		private Vector2? lastScrollAxis = null;
+		private DragGesture dragGesture;
 		private Vector2 ScrollAxis
 		{
 			get
@@ -43,6 +44,7 @@ namespace Lime
 				return lastScrollAxis.Value;
 			}
 		}
+		public bool ExclusiveDrag { get { return dragGesture.Exclusive; } set { dragGesture.Exclusive = value; } }
 
 		private float ProjectToScrollAxisWithFrameRotation(Vector2 v)
 		{
@@ -100,6 +102,8 @@ namespace Lime
 			Content.Tasks.Add(WheelScrollingTask());
 #endif
 			Frame.Layout = new Layout(scrollDirection, Content);
+			dragGesture = new DragGesture(0, (DragDirection)ScrollDirection);
+			Frame.Gestures.Add(dragGesture);
 		}
 
 		public bool IsItemOnscreen(Widget item)
@@ -231,8 +235,6 @@ namespace Lime
 
 		private IEnumerator<object> MainTask()
 		{
-			var dragGesture = new DragGesture(0, (DragDirection)ScrollDirection);
-			Frame.Gestures.Add(dragGesture);
 			while (true) {
 				if (dragGesture.WasBegan()) {
 					StopScrolling();

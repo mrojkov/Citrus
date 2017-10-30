@@ -498,7 +498,7 @@ namespace Lime
 			var rightClickGesture = new ClickGesture(1);
 			var clickGesture = new ClickGesture();
 			var doubleClickGesture = new DoubleClickGesture();
-			var dragGesture = new DragGesture(0, DragDirection.Any, EditorParams.MouseSelectionThreshold);
+			var dragGesture = new DragGesture(0, DragDirection.Any, dragThreshold: EditorParams.MouseSelectionThreshold);
 			ClickableWidget.Gestures.Add(rightClickGesture);
 			ClickableWidget.Gestures.Add(clickGesture);
 			ClickableWidget.Gestures.Add(doubleClickGesture);
