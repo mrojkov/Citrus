@@ -86,7 +86,12 @@ namespace Tangerine.UI.Timeline.Components
 			editBox.Visible = false;
 			widget.Gestures.Add(new ClickGesture(1, ShowPropertyContextMenu));
 			widget.Gestures.Add(new DoubleClickGesture(() => {
-				Core.Operations.EnterNode.Perform(nodeData.Node);
+				var labelExtent = label.MeasureUncutText();
+				if (label.LocalMousePosition().X < labelExtent.X) {
+					Rename();
+				} else {
+					Core.Operations.EnterNode.Perform(nodeData.Node);
+				}
 			}));
 			nodeIcon.Gestures.Add(new DoubleClickGesture(() => {
 				Core.Operations.ClearRowSelection.Perform();
