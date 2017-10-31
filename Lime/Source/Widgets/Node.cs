@@ -1137,9 +1137,7 @@ namespace Lime
 			if (context.NodeUnderMouse != this) {
 				return false;
 			}
-			return
-				context.NodeMousePressedOn != null ?
-				context.NodeMousePressedOn == this : true;
+			return context.NodeCapturedByMouse == null || context.NodeCapturedByMouse == this;
 		}
 
 		public bool IsMouseOverThisOrDescendant()
@@ -1149,9 +1147,7 @@ namespace Lime
 			if (nodeUnderMouse == null || !nodeUnderMouse.SameOrDescendantOf(this)) {
 				return false;
 			}
-			return
-				context.NodeMousePressedOn != null ?
-				context.NodeMousePressedOn.SameOrDescendantOf(this) : true;
+			return context.NodeCapturedByMouse?.SameOrDescendantOf(this) ?? true;
 		}
 
 		internal protected virtual bool PartialHitTest(ref HitTestArgs args)

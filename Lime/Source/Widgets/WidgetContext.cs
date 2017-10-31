@@ -10,6 +10,7 @@ namespace Lime
 	/// </summary>
 	public class WidgetContext : Context
 	{
+		public static readonly List<Key> NodeCaptureKeys = new List<Key> { Key.Mouse0, Key.Mouse1, Key.Mouse2 };
 		/// <summary>
 		/// Gets the current global context. The context is set on every window's callback.
 		/// </summary>
@@ -25,7 +26,7 @@ namespace Lime
 		/// <summary>
 		/// Gets the topmost node under mouse at the moment any of mouse buttons down.
 		/// </summary>
-		public Node NodeMousePressedOn { get; internal set; }
+		public Node NodeCapturedByMouse { get; internal set; }
 
 		/// <summary>
 		/// Gets or sets the mouse cursor. The WindowWidget resets mouse cursor to the default value in the beginning of every update cycle.

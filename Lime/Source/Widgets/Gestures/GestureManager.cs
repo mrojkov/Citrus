@@ -27,8 +27,8 @@ namespace Lime
 			foreach (var r in activeGestures) {
 				r.Update(activeGestures);
 			}
-			if (context.NodeMousePressedOn != activeNode) {
-				activeNode = context.NodeMousePressedOn;
+			if (context.NodeCapturedByMouse != activeNode) {
+				activeNode = context.NodeCapturedByMouse;
 				CancelGestures();
 				if (activeNode != null) {
 					activeGestures.AddRange(EnumerateGestures(activeNode));

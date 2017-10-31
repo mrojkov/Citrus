@@ -73,7 +73,7 @@ namespace Lime
 				if (AcceptMouseBeyondWidget) {
 					return true;
 				}
-				var node = context.NodeMousePressedOn ?? context.NodeUnderMouse; 
+				var node = context.NodeCapturedByMouse ?? context.NodeUnderMouse; 
 				return AcceptMouseThroughDescendants ? (node?.SameOrDescendantOf(widget) ?? false) : node == widget;
 			}
 			if (key.IsModifier()) {

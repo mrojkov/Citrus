@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Lime
@@ -27,7 +28,7 @@ namespace Lime
 
 		protected virtual bool ContinuousRendering() { return true; }
 
-		private bool prevAnyMouseButtonPressed;
+		private bool prevAnyCaptureKeyPressed;
 
 		public override void Update(float delta)
 		{
@@ -39,10 +40,10 @@ namespace Lime
 			// Find the node under mouse, using the render chain built on one frame before.
 			context.NodeUnderMouse = LookForNodeUnderMouse(renderChain);
 
-			// Assign NodeMousePressedOn if any mouse button was pressed.
-			var anyMouseButtonPressed = Window.Input.AnyMouseButtonPressed();
-			if (!prevAnyMouseButtonPressed && anyMouseButtonPressed) {
-				context.NodeMousePressedOn = context.NodeUnderMouse;
+			// Assign NodeCapturedByMouse if any mouse button was pressed.
+			var anyCaptureKeyPressed = IsAnyCaptureKeyPressed();
+			if (!prevAnyCaptureKeyPressed && anyCaptureKeyPressed) {
+				context.NodeCapturedByMouse = context.NodeUnderMouse;
 			}
 
 			// Process mouse/touch screen input.
@@ -53,11 +54,11 @@ namespace Lime
 			base.Update (delta);
 			Window.Cursor = context.MouseCursor;
 
-			// Set NodeMousePressedOn to null if all mouse buttons were released.
-			if (prevAnyMouseButtonPressed && !anyMouseButtonPressed) {
-				context.NodeMousePressedOn = null;
+			// Set NodeCapturedByMouse to null if all mouse buttons were released.
+			if (prevAnyCaptureKeyPressed && !anyCaptureKeyPressed) {
+				context.NodeCapturedByMouse = null;
 			}
-			prevAnyMouseButtonPressed = anyMouseButtonPressed;
+			prevAnyCaptureKeyPressed = anyCaptureKeyPressed;
 
 			if (Window.Input.WasKeyPressed(Key.DismissSoftKeyboard)) {
 				SetFocus(null);
@@ -71,6 +72,16 @@ namespace Lime
 			RenderChainBuilder?.AddToRenderChain(this, renderChain);
 
 			ManageFocusOnWindowActivation();
+		}
+
+		private bool IsAnyCaptureKeyPressed()
+		{
+			foreach (var key in WidgetContext.NodeCaptureKeys) {
+				if (Window.Input.IsKeyPressed(key)) {
+					return true;
+				}
+			}
+			return false;
 		}
 
 		private void ManageFocusOnWindowActivation()

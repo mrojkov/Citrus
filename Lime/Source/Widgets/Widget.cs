@@ -523,10 +523,7 @@ namespace Lime
 			}
 		}
 
-		public WidgetInput Input
-		{
-			get { return input ?? (input = new WidgetInput(this)); }
-		}
+		public WidgetInput Input => input ?? (input = new WidgetInput(this));
 
 		public bool HasInput() => input != null;
 
