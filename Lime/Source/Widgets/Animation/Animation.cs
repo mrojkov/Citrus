@@ -9,7 +9,7 @@ namespace Lime
 		internal double? NextMarkerOrTriggerTime;
 
 		[YuzuMember]
-		public MarkerCollection Markers { get; private set; }
+		public MarkerList Markers { get; private set; }
 
 		[YuzuMember]
 		public string Id;
@@ -43,7 +43,7 @@ namespace Lime
 
 		public Animation()
 		{
-			Markers = new MarkerCollection(this);
+			Markers = new MarkerList(this);
 		}
 
 		public void Advance(Node owner, float delta)
@@ -86,7 +86,7 @@ namespace Lime
 		{
 			var clone = (Animation)MemberwiseClone();
 			clone.Owner = null;
-			clone.Markers = MarkerCollection.DeepClone(Markers, clone);
+			clone.Markers = MarkerList.DeepClone(Markers, clone);
 			return clone;
 		}
 

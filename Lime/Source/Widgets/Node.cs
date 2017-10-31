@@ -313,7 +313,7 @@ namespace Lime
 		/// <summary>
 		/// Markers of default animation.
 		/// </summary>
-		public MarkerCollection Markers { get { return DefaultAnimation.Markers; } }
+		public MarkerList Markers { get { return DefaultAnimation.Markers; } }
 
 		/// <summary>
 		/// Returns true if this node is running animation.

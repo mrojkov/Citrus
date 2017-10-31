@@ -135,7 +135,6 @@
     <Compile Include="Source\Widgets\ImageCombiner.cs" />
     <Compile Include="Source\Widgets\LinearLayout.cs" />
     <Compile Include="Source\Widgets\Marker.cs" />
-    <Compile Include="Source\Widgets\MarkerCollection.cs" />
     <Compile Include="Source\Widgets\Movie.cs" />
     <Compile Include="Source\Widgets\NineGrid.cs" />
     <Compile Include="Source\Widgets\Node.cs" />
@@ -371,6 +370,7 @@
     <Compile Include="Source\Widgets\Gestures\DragGesture.cs" />
     <Compile Include="Source\Widgets\Gestures\Gesture.cs" />
     <Compile Include="Source\Widgets\Gestures\GestureManager.cs" />
+    <Compile Include="Source\Widgets\MarkerList.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Android.csproj">

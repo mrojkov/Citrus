@@ -297,7 +297,7 @@
     <Compile Include="Source\Widgets\Animation\KeyframeCollection.cs" />
     <Compile Include="Source\Widgets\LinearLayout.cs" />
     <Compile Include="Source\Widgets\Marker.cs" />
-    <Compile Include="Source\Widgets\MarkerCollection.cs" />
+    <Compile Include="Source\Widgets\MarkerList.cs" />
     <Compile Include="Source\Widgets\NineGrid.cs" />
     <Compile Include="Source\Widgets\Node.cs" />
     <Compile Include="Source\Widgets\NodeList.cs" />
