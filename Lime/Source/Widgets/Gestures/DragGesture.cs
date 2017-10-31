@@ -26,14 +26,34 @@ namespace Lime
 		private State state;
 		private Vector2 prevMousePosition;
 
-		public int ButtonIndex { get; private set; }
-		public DragDirection Direction { get; private set; }
-		public float DragThreshold { get; private set; }
+		public int ButtonIndex { get; }
+		public DragDirection Direction { get; }
+		public float DragThreshold { get; }
 		// Will cancel any other drag gestures
 		public bool Exclusive { get; set; }
 
 		public Vector2 MousePressPosition { get; private set; }
-		public Vector2 MousePosition => Input.MousePosition;
+		/// <summary>
+		/// MousePosition depends on DragDirection so (MousePosition - DragDirection).X or Y
+		/// will always be zero if DragDirection is Vertical or Horizontal respectively.
+		/// This fact is used when checking for threshold.
+		/// </summary>
+		public Vector2 MousePosition
+		{
+			get
+			{
+				switch (Direction) {
+				case DragDirection.Horizontal:
+					return new Vector2(Input.MousePosition.X, MousePressPosition.Y);
+				case DragDirection.Vertical:
+					return new Vector2(MousePressPosition.X, Input.MousePosition.Y);
+				case DragDirection.Any:
+					return Input.MousePosition;
+				default:
+					throw new ArgumentOutOfRangeException();
+				}
+			}
+		}
 
 		private PollableEvent began;
 		private PollableEvent recognized;
@@ -90,7 +110,7 @@ namespace Lime
 				if (!Input.IsMousePressed(ButtonIndex)) {
 					ended.Raise();
 					state = State.Initial;
-				} else if (Recognize()) {
+				} else if ((MousePosition - MousePressPosition).SqrLength > DragThreshold.Sqr()) {
 					CancelOtherGestures(gestures);
 					state = State.Changing;
 					prevMousePosition = Input.MousePosition;
@@ -108,17 +128,6 @@ namespace Lime
 					state = State.Initial;
 				}
 			}
-		}
-
-		private bool Recognize()
-		{
-			var d = Input.MousePosition - MousePressPosition;
-			var dx = Math.Abs(d.X);
-			var dy = Math.Abs(d.Y);
-			return
-				Direction == DragDirection.Any && (dx > DragThreshold || dy > DragThreshold) ||
-				Direction == DragDirection.Horizontal && dx > DragThreshold ||
-				Direction == DragDirection.Vertical && dy > DragThreshold;
 		}
 
 		private void CancelOtherGestures(IEnumerable<Gesture> gestures)
