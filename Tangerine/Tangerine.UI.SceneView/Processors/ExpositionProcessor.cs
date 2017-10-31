@@ -173,6 +173,7 @@ namespace Tangerine.UI.SceneView
 				public Item(Widget widget, Frame frame, WidgetInput input, bool showLabel)
 				{
 					this.frame = frame;
+					var totalTime = 0d;
 					originalWidget = widget;
 					exposedWidget = (Widget)widget.Clone();
 					exposedWidget.Animations.Clear();
@@ -198,8 +199,9 @@ namespace Tangerine.UI.SceneView
 						borderPresenter.Color = Document.Current.SelectedNodes().Contains(widget) ?
 							ColorTheme.Current.SceneView.ExposedItemSelectedBorder :
 							ColorTheme.Current.SceneView.ExposedItemInactiveBorder;
+						totalTime += Lime.Task.Current.Delta;
 						if (clickArea.IsMouseOver()) {
-							if (Lime.Task.Current.LifeTime % 0.5f < 0.25f) {
+							if (totalTime % 0.5f < 0.25f) {
 								borderPresenter.Color = ColorTheme.Current.SceneView.ExposedItemActiveBorder;
 							}
 							label.Visible = true;
