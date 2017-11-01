@@ -785,7 +785,7 @@ namespace Lime
 #if PROFILE
 					watch.Stop();
 #endif
-					for (var node = Nodes.First; node != null;) {
+					for (var node = FirstChild; node != null;) {
 						var next = node.NextSibling;
 						node.Update(node.AnimationSpeed * delta);
 						node = next;
@@ -1120,7 +1120,7 @@ namespace Lime
 				Renderer.ZWriteEnabled = true;
 				Renderer.CullMode = CullMode.None;
 				Renderer.Transform2 = LocalToWorldTransform.CalcInversed();
-				for (var node = Nodes.First; node != null; node = node.NextSibling) {
+				for (var node = FirstChild; node != null; node = node.NextSibling) {
 					node.RenderChainBuilder?.AddToRenderChain(node, renderChain);
 				}
 				renderChain.RenderAndClear();

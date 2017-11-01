@@ -7,8 +7,6 @@ namespace Lime
 {
 	public class NodeList : IList<Node>
 	{
-		public Node First { get; private set; }
-
 		private readonly Node owner;
 		private List<Node> list;
 
@@ -58,17 +56,17 @@ namespace Lime
 		/// </summary>
 		public Enumerator GetEnumerator()
 		{
-			return new Enumerator(First);
+			return new Enumerator(owner.FirstChild);
 		}
 
 		IEnumerator<Node> IEnumerable<Node>.GetEnumerator()
 		{
-			return new Enumerator(First);
+			return new Enumerator(owner.FirstChild);
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return new Enumerator(First);
+			return new Enumerator(owner.FirstChild);
 		}
 
 		public bool IsReadOnly => false;
@@ -85,7 +83,7 @@ namespace Lime
 			if (Count > 0) {
 				list[Count - 1].NextSibling = null;
 			}
-			RecacheFirst();
+			RefreshFirstChild();
 		}
 
 		public bool Contains(Node node)
@@ -113,7 +111,7 @@ namespace Lime
 				list[Count - 1].NextSibling = node;
 			}
 			list.Add(node);
-			RecacheFirst();
+			RefreshFirstChild();
 			node.PropagateDirtyFlags();
 		}
 
@@ -150,7 +148,7 @@ namespace Lime
 			if (index + 1 < Count) {
 				list[index].NextSibling = list[index + 1];
 			}
-			RecacheFirst();
+			RefreshFirstChild();
 			node.PropagateDirtyFlags();
 			Node.InvalidateNodeReferenceCache();
 		}
@@ -199,7 +197,7 @@ namespace Lime
 				node.PropagateDirtyFlags();
 			}
 			list = null;
-			RecacheFirst();
+			RefreshFirstChild();
 		}
 
 		/// <summary>
@@ -208,7 +206,7 @@ namespace Lime
 		/// </summary>
 		public Node TryFind(string id)
 		{
-			for (var node = First; node != null; node = node.NextSibling) {
+			for (var node = owner.FirstChild; node != null; node = node.NextSibling) {
 				if (node.Id == id) {
 					return node;
 				}
@@ -235,7 +233,7 @@ namespace Lime
 			if (index > 0 && count > 0) {
 				list[index - 1].NextSibling = index < Count ? list[index] : null;
 			}
-			RecacheFirst();
+			RefreshFirstChild();
 			Node.InvalidateNodeReferenceCache();
 		}
 
@@ -252,7 +250,7 @@ namespace Lime
 			if (list.Count == 0) {
 				list = null;
 			}
-			RecacheFirst();
+			RefreshFirstChild();
 			Node.InvalidateNodeReferenceCache();
 		}
 
@@ -281,7 +279,7 @@ namespace Lime
 				if (index + 1 < Count) {
 					value.NextSibling = list[index + 1];
 				}
-				RecacheFirst();
+				RefreshFirstChild();
 				value.PropagateDirtyFlags();
 				Node.InvalidateNodeReferenceCache();
 			}
@@ -313,13 +311,13 @@ namespace Lime
 				list[indexTo - 1].NextSibling = tmp;
 			}
 			tmp.NextSibling = (indexTo + 1 < Count) ? list[indexTo + 1] : null;
-			RecacheFirst();
+			RefreshFirstChild();
 			Node.InvalidateNodeReferenceCache();
 		}
 
-		private void RecacheFirst()
+		private void RefreshFirstChild()
 		{
-			First = (list == null || list.Count == 0) ? null : list[0];
+			owner.FirstChild = (list == null || list.Count == 0) ? null : list[0];
 		}
 
 		public struct Enumerator : IEnumerator<Node>

@@ -8,7 +8,7 @@ namespace Lime
 
 		public override void OnSizeChanged(Widget widget, Vector2 sizeDelta)
 		{
-			for (var child = widget.Nodes.First; child != null; child = child.NextSibling) {
+			for (var child = widget.FirstChild; child != null; child = child.NextSibling) {
 				if (child.AsWidget != null) {
 					ApplyAnchors(child.AsWidget, sizeDelta);
 				}
