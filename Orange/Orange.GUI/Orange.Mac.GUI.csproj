@@ -36,6 +36,7 @@
     <XamMacArch>x86_64</XamMacArch>
     <PackageSigningKey>3rd Party Mac Developer Installer</PackageSigningKey>
     <I18n>west</I18n>
+    <EnableSGenConc>true</EnableSGenConc>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType></DebugType>
