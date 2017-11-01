@@ -7,9 +7,7 @@ namespace Lime
 {
 	public class NodeList : IList<Node>
 	{
-		private Node First { get; set; }
-
-		public Node FirstOrNull() => First;
+		public Node First { get; private set; }
 
 		private readonly Node owner;
 		private List<Node> list;

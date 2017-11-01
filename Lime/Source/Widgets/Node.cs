@@ -446,7 +446,7 @@ namespace Lime
 
 		public virtual void Dispose()
 		{
-			for (var n = Nodes.FirstOrNull(); n != null; n = n.NextSibling) {
+			for (var n = Nodes.First; n != null; n = n.NextSibling) {
 				n.Dispose();
 			}
 			Nodes.Clear();
@@ -462,7 +462,7 @@ namespace Lime
 				return;
 			Window.Current?.Invalidate();
 			DirtyMask |= mask;
-			for (var n = Nodes.FirstOrNull(); n != null; n = n.NextSibling) {
+			for (var n = Nodes.First; n != null; n = n.NextSibling) {
 				if ((n.DirtyMask & mask) != mask) {
 					n.PropagateDirtyFlags(mask);
 				}
@@ -645,7 +645,7 @@ namespace Lime
 #if PROFILE
 				watch.Stop();
 #endif
-				for (var node = Nodes.FirstOrNull(); node != null;) {
+				for (var node = Nodes.First; node != null;) {
 					var next = node.NextSibling;
 					node.Update(node.AnimationSpeed * delta);
 					node = next;
@@ -710,7 +710,7 @@ namespace Lime
 			if (PostPresenter != null) {
 				chain.Add(this, PostPresenter);
 			}
-			for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
+			for (var node = Nodes.First; node != null; node = node.NextSibling) {
 				node.RenderChainBuilder?.AddToRenderChain(node, chain);
 			}
 			if (Presenter != null) {
@@ -990,7 +990,7 @@ namespace Lime
 			queue.Enqueue(this);
 			while (queue.Count > 0) {
 				var parent = queue.Dequeue();
-				var child = parent.Nodes.FirstOrNull();
+				var child = parent.Nodes.First;
 				for (; child != null; child = child.NextSibling) {
 					if (child.Id == id) {
 						queue.Clear();
@@ -1223,7 +1223,7 @@ namespace Lime
 					if (current == null) {
 						current = root;
 					}
-					var node = current.Nodes.FirstOrNull();
+					var node = current.Nodes.First;
 					if (node != null) {
 						current = node;
 						return true;

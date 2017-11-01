@@ -357,7 +357,7 @@ namespace Lime
 
 			private void AddToRenderChainDirect(RenderChain chain)
 			{
-				for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
+				for (var node = Nodes.First; node != null; node = node.NextSibling) {
 					if (IsItemOnscreen(node.AsWidget)) {
 						node.RenderChainBuilder?.AddToRenderChain(node, chain);
 					}

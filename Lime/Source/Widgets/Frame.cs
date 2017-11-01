@@ -163,7 +163,7 @@ namespace Lime
 				}
 			} else if (Layer == 0 && Presenter != null && PostPresenter == null) {
 				// 90% calls should go here.
-				for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
+				for (var node = Nodes.First; node != null; node = node.NextSibling) {
 					node.RenderChainBuilder?.AddToRenderChain(node, chain);
 				}
 				chain.Add(this, Presenter);
