@@ -428,7 +428,7 @@ namespace Lime
 		public static int CreatedCount = 0;
 		public static int FinalizedCount = 0;
 
-		public bool IsAwoken;
+		public bool IsAwoken { get; protected set; }
 		internal int RunningAnimationsCount;
 
 		public Action<Node> Awoken;
