@@ -57,10 +57,6 @@ namespace Lime
 
 		public override void AdvanceAnimation(Animation animation, float delta)
 		{
-			if (!animation.IsRunning) {
-				return;
-			}
-
 			var previousTime = animation.TimeInternal;
 			var currentTime = previousTime + delta;
 			animation.TimeInternal = currentTime;

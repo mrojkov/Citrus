@@ -189,7 +189,7 @@
     <Compile Include="Source\Widgets\Layout\Layout.cs" />
     <Compile Include="Source\Widgets\Layout\TableLayout.cs" />
     <Compile Include="Source\Widgets\Animation\Animation.cs" />
-    <Compile Include="Source\Widgets\Animation\AnimationList.cs" />
+    <Compile Include="Source\Widgets\Animation\AnimationCollection.cs" />
     <Compile Include="Source\Types\Quaternion.cs" />
     <Compile Include="Source\Types\BoundingSphere.cs" />
     <Compile Include="Source\Types\ContainmentType.cs" />

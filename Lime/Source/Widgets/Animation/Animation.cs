@@ -5,8 +5,14 @@ namespace Lime
 {
 	public class Animation : ICloneable
 	{
+		private Node owner;
+		private bool isRunning;
+		internal Animation Next;
 		internal double TimeInternal;
 		internal double? NextMarkerOrTriggerTime;
+		public event Action Stopped;
+		public AnimationEngine AnimationEngine = DefaultAnimationEngine.Instance;
+		public string RunningMarkerId { get; set; }
 
 		[YuzuMember]
 		public MarkerList Markers { get; private set; }
@@ -31,27 +37,44 @@ namespace Lime
 			set { Time = AnimationUtils.FramesToSeconds(value); }
 		}
 
-		public bool IsRunning;
+		public Node Owner
+		{
+			get { return owner; }
+			internal set
+			{
+				if (value == null) {
+					IsRunning = false;
+				}
+				owner = value;
+			}
+		}
 
-		public Node Owner;
-
-		public event Action Stopped;
-
-		public AnimationEngine AnimationEngine = DefaultAnimationEngine.Instance;
-
-		public string RunningMarkerId { get; set; }
+		public bool IsRunning
+		{
+			get { return isRunning; }
+			set
+			{
+				if (isRunning != value) {
+					isRunning = value;
+					if (value) {
+						Owner.RunningAnimationsCount++;
+					} else {
+						Owner.RunningAnimationsCount--;
+					}
+				}
+			}
+		}
 
 		public Animation()
 		{
 			Markers = new MarkerList(this);
 		}
 
-		public void Advance(Node owner, float delta)
+		public void Advance(float delta)
 		{
-			if (!IsRunning) {
-				return;
+			if (IsRunning) {
+				AnimationEngine.AdvanceAnimation(this, delta);
 			}
-			AnimationEngine.AdvanceAnimation(this, delta);
 		}
 
 		public void Run(string markerId = null)
@@ -70,7 +93,7 @@ namespace Lime
 			return false;
 		}
 
-		public void ApplyAnimators(Node owner, bool invokeTriggers)
+		public void ApplyAnimators(bool invokeTriggers)
 		{
 			AnimationEngine.ApplyAnimators(this, invokeTriggers);
 		}
@@ -86,7 +109,8 @@ namespace Lime
 		{
 			var clone = (Animation)MemberwiseClone();
 			clone.Owner = null;
-			clone.Markers = MarkerList.DeepClone(Markers, clone);
+			clone.Next = null;
+			clone.Markers = MarkerCollection.DeepClone(Markers, clone);
 			return clone;
 		}
 

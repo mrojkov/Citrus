@@ -342,10 +342,21 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Returns first animation in animation list
-		/// (or creates an empty animation if list is empty).
+		/// Returns the first animation in the animation collection
+		/// or creates an animation if the collection is empty.
 		/// </summary>
-		public Animation DefaultAnimation => Animations.DefaultAnimation;
+		public Animation DefaultAnimation
+		{
+			get
+			{
+				var a = Animations.First;
+				if (a == null) {
+					a = new Animation();
+					Animations.Add(a);
+				}
+				return a;
+			}
+		}
 
 		/// <summary>
 		/// Custom data. Can be set via Tangerine (this way it will contain path to external scene).
@@ -368,10 +379,10 @@ namespace Lime
 
 		[YuzuMember]
 		[YuzuSerializeIf(nameof(NeedSerializeAnimations))]
-		public AnimationList Animations { get; private set; }
+		public AnimationCollection Animations { get; private set; }
 
 		public bool NeedSerializeAnimations() =>
-			Animations.Count > 1 || (Animations.Count == 1 && (Animations[0].Id != null || Animations[0].Markers.Count > 0));
+			Animations.Count > 1 || (Animations.Count == 1 && (Animations.First.Id != null || Animations.First.Markers.Count > 0));
 
 		[YuzuMember]
 		public List<Folder.Descriptor> Folders { get; set; }
@@ -411,14 +422,16 @@ namespace Lime
 		public static int FinalizedCount = 0;
 
 		public bool IsAwoken;
+		internal int RunningAnimationsCount;
+
 		public Action<Node> Awoken;
 
 		public Node()
 		{
 			AnimationSpeed = 1;
 			Components = new NodeComponentCollection(this);
-			Animators = new AnimatorList(this);
-			Animations = new AnimationList(this);
+			Animators = new AnimatorCollection(this);
+			Animations = new AnimationCollection(this);
 			Nodes = new NodeList(this);
 			Presenter = DefaultPresenter.Instance;
 			RenderChainBuilder = DefaultRenderChainBuilder.Instance;
@@ -995,10 +1008,13 @@ namespace Lime
 		/// <param name="delta">Time delta (in seconds).</param>
 		public void AdvanceAnimation(float delta)
 		{
-			for (var i = 0; i < Animations.Count; i++) {
-				var a = Animations[i];
-				if (a.IsRunning) {
-					a.Advance(this, delta);
+			if (RunningAnimationsCount > 0) {
+				if (Animations.Count == 1) {
+					Animations.First.Advance(delta);
+				} else if (Animations.Count > 1) {
+					for (var a = Animations.First; a != null; a = a.Next) {
+						a.Advance(delta);
+					}
 				}
 			}
 		}
@@ -1094,7 +1110,9 @@ namespace Lime
 				((Widget)content).Size = (this as Widget).Size;
 			}
 			Animations.Clear();
-			Animations.AddRange(content.Animations);
+			var animations = content.Animations.ToList();
+			content.Animations.Clear();
+			Animations.AddRange(animations);
 			if ((content is Viewport3D) && (this is Node3D) && (content.Nodes.Count > 0)) {
 				// Handle a special case: the 3d scene is wrapped up with a Viewport3D.
 				var node = content.Nodes[0];
