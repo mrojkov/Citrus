@@ -292,6 +292,11 @@ namespace Lime
 		public Node NextSibling { get; internal set; }
 
 		/// <summary>
+		/// Animation speed multiplier.
+		/// </summary>
+		public float AnimationSpeed { get; set; }
+
+		/// <summary>
 		/// Gets or sets Z-order (the rendering order).
 		/// 0 - inherit Z-order from the parent node. 1 - the lowest, (RenderChain.LayerCount - 1) - the topmost.
 		/// </summary>
@@ -402,11 +407,6 @@ namespace Lime
 			get { return DefaultAnimation.RunningMarkerId; }
 			set { DefaultAnimation.RunningMarkerId = value; }
 		}
-
-		/// <summary>
-		/// Animation speed multiplier.
-		/// </summary>
-		public float AnimationSpeed { get; set; }
 
 		/// <summary>
 		/// Custom data. Can only be set programmatically.
