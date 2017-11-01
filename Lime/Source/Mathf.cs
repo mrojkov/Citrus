@@ -46,6 +46,11 @@ namespace Lime
 			return Math.Sign(x);
 		}
 
+		public static Vector2 Sign(Vector2 x)
+		{
+			return new Vector2(Sign(x.X), Sign(x.Y));
+		}
+
 		public static float Cos(float radians)
 		{
 			return (float)Math.Cos(radians);
@@ -356,6 +361,14 @@ namespace Lime
 		public static double Clamp(double value, double min, double max)
 		{
 			return (value < min) ? min : (value > max ? max : value);
+		}
+
+		public static Vector2 Clamp(Vector2 value, Vector2 min, Vector2 max)
+		{
+			return new Vector2(
+				Clamp(value.X, min.X, max.X),
+				Clamp(value.Y, min.Y, max.Y)
+			);
 		}
 
 		public static Vector2 HermiteSpline(float t, Vector2 p0, Vector2 m0, Vector2 p1, Vector2 m1)
