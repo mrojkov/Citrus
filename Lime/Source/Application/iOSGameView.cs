@@ -225,9 +225,15 @@ namespace Lime
 			ProcessTextInput();
 		}
 
+		private int prevTextLength = -1;
+
 		private void ProcessTextInput()
 		{
-			textView.SelectedRange = new NSRange(textView.Text.Length, 0);
+			var textLength = textView.Text.Length;
+			if (textLength != prevTextLength) {
+				prevTextLength = textLength;
+				textView.SelectedRange = new NSRange(textLength, 0);
+			}
 			input.TextInput = null;
 			var currText = textView.Text ?? "";
 			prevText = prevText ?? "";
