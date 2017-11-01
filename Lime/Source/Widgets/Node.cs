@@ -280,6 +280,18 @@ namespace Lime
 			(PostPresenter as CompoundPresenter) ?? (CompoundPresenter)(PostPresenter = new CompoundPresenter(PostPresenter));
 
 		/// <summary>
+		/// Indicates whether the node is awake. Node gets awake on the first update.
+		/// </summary>
+		public bool IsAwake { get; protected set; }
+
+		internal int RunningAnimationsCount;
+
+		/// <summary>
+		/// Gets the cached reference to the first animation in the animation collection.
+		/// </summary>
+		public Animation FirstAnimation { get; internal set; }
+
+		/// <summary>
 		/// Gets the cached reference to the first children node. 
 		/// Use it for fast iteration through nodes collection in a performance-critical code.
 		/// </summary>
@@ -361,12 +373,10 @@ namespace Lime
 		{
 			get
 			{
-				var a = Animations.First;
-				if (a == null) {
-					a = new Animation();
-					Animations.Add(a);
+				if (FirstAnimation == null) {
+					Animations.Add(new Animation());
 				}
-				return a;
+				return FirstAnimation;
 			}
 		}
 
@@ -394,7 +404,7 @@ namespace Lime
 		public AnimationCollection Animations { get; private set; }
 
 		public bool NeedSerializeAnimations() =>
-			Animations.Count > 1 || (Animations.Count == 1 && (Animations.First.Id != null || Animations.First.Markers.Count > 0));
+			Animations.Count > 1 || (Animations.Count == 1 && (FirstAnimation.Id != null || FirstAnimation.Markers.Count > 0));
 
 		[YuzuMember]
 		public List<Folder.Descriptor> Folders { get; set; }
@@ -427,9 +437,6 @@ namespace Lime
 
 		public static int CreatedCount = 0;
 		public static int FinalizedCount = 0;
-
-		public bool IsAwoken { get; protected set; }
-		internal int RunningAnimationsCount;
 
 		public Action<Node> Awoken;
 
@@ -563,6 +570,8 @@ namespace Lime
 			var clone = (Node)MemberwiseClone();
 			++CreatedCount;
 			clone.Parent = null;
+			clone.FirstAnimation = null;
+			clone.FirstChild = null;
 			clone.NextSibling = null;
 			clone.gestures = null;
 			clone.AsWidget = clone as Widget;
@@ -570,7 +579,7 @@ namespace Lime
 			clone.Animators = AnimatorList.SharedClone(clone, Animators);
 			clone.Nodes = Nodes.Clone(clone);
 			clone.Components = Components.Clone(clone);
-			clone.IsAwoken = false;
+			clone.IsAwake = false;
 			if (RenderChainBuilder != null) {
 				clone.RenderChainBuilder = RenderChainBuilder.Clone();
 			}
@@ -635,10 +644,10 @@ namespace Lime
 #if PROFILE
 			var watch = System.Diagnostics.Stopwatch.StartNew();
 #endif
-			if (!IsAwoken) {
+			if (!IsAwake) {
 				Awoken?.Invoke(this);
 				Awake();
-				IsAwoken = true;
+				IsAwake = true;
 			}
 			if (delta > Application.MaxDelta) {
 #if PROFILE
@@ -1016,12 +1025,8 @@ namespace Lime
 		public void AdvanceAnimation(float delta)
 		{
 			if (RunningAnimationsCount > 0) {
-				if (Animations.Count == 1) {
-					Animations.First.Advance(delta);
-				} else if (Animations.Count > 1) {
-					for (var a = Animations.First; a != null; a = a.Next) {
-						a.Advance(delta);
-					}
+				for (var a = FirstAnimation; a != null; a = a.Next) {
+					a.Advance(delta);
 				}
 			}
 		}

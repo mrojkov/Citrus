@@ -766,10 +766,10 @@ namespace Lime
 #if PROFILE
 			var watch = System.Diagnostics.Stopwatch.StartNew();
 #endif
-			if (!IsAwoken) {
+			if (!IsAwake) {
 				Awoken?.Invoke(this);
 				Awake();
-				IsAwoken = true;
+				IsAwake = true;
 			}
 			if (delta > Application.MaxDelta) {
 #if PROFILE

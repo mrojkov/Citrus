@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace Lime
 {
@@ -9,7 +8,6 @@ namespace Lime
 	{
 		private Node owner;
 
-		internal Animation First { get; private set; }
 		public int Count { get; private set; }
 
 		public bool IsReadOnly => false;
@@ -27,7 +25,7 @@ namespace Lime
 		public AnimationCollection Clone(Node owner)
 		{
 			var result = new AnimationCollection(owner);
-			for (var a = First; a != null; a = a.Next) {
+			for (var a = this.owner.FirstAnimation; a != null; a = a.Next) {
 				result.Add(a.Clone());
 			}
 			return result;
@@ -44,7 +42,7 @@ namespace Lime
 
 		public bool TryFind(string id, out Animation animation)
 		{
-			for (var a = First; a != null; a = a.Next) {
+			for (var a = owner.FirstAnimation; a != null; a = a.Next) {
 				if (a.Id == id) {
 					animation = a;
 					return true;
@@ -81,10 +79,10 @@ namespace Lime
 				throw new InvalidOperationException();
 			}
 			item.Owner = owner;
-			if (First == null) {
-				First = item;
+			if (owner.FirstAnimation == null) {
+				owner.FirstAnimation = item;
 			} else {
-				Animation a = First;
+				var a = owner.FirstAnimation;
 				while (a.Next != null) {
 					a = a.Next;
 				}
@@ -102,19 +100,19 @@ namespace Lime
 
 		public void Clear()
 		{
-			for (var a = First; a != null; ) {
+			for (var a = owner.FirstAnimation; a != null; ) {
 				var t = a.Next;
 				a.Owner = null;
 				a.Next = null;
 				a = t;
 			}
-			First = null;
+			owner.FirstAnimation = null;
 			Count = 0;
 		}
 
 		public bool Contains(Animation item)
 		{
-			for (var a = First; a != null; a = a.Next) {
+			for (var a = owner.FirstAnimation; a != null; a = a.Next) {
 				if (a == item) {
 					return true;
 				}
@@ -125,7 +123,7 @@ namespace Lime
 		public void CopyTo(Animation[] array, int arrayIndex)
 		{
 			int i = arrayIndex;
-			for (var a = First; a != null; a = a.Next) {
+			for (var a = owner.FirstAnimation; a != null; a = a.Next) {
 				array[i++] = a;
 			}
 		}
@@ -136,10 +134,10 @@ namespace Lime
 				throw new InvalidOperationException();
 			}
 			Animation prev = null;
-			for (var a = First; a != null; a = a.Next) {
+			for (var a = owner.FirstAnimation; a != null; a = a.Next) {
 				if (a == item) {
 					if (prev == null) {
-						First = a.Next;
+						owner.FirstAnimation = a.Next;
 					} else {
 						prev.Next = a.Next;
 					}
@@ -153,10 +151,10 @@ namespace Lime
 			return false;
 		}
 
-		IEnumerator<Animation> IEnumerable<Animation>.GetEnumerator() => new Enumerator(First);
-		IEnumerator IEnumerable.GetEnumerator() => new Enumerator(First);
+		IEnumerator<Animation> IEnumerable<Animation>.GetEnumerator() => new Enumerator(owner.FirstAnimation);
+		IEnumerator IEnumerable.GetEnumerator() => new Enumerator(owner.FirstAnimation);
 
-		public Enumerator GetEnumerator() => new Enumerator(First);
+		public Enumerator GetEnumerator() => new Enumerator(owner.FirstAnimation);
 
 		public struct Enumerator : IEnumerator<Animation>
 		{
