@@ -38,7 +38,10 @@ namespace Lime
 	{
 		public IAnimable Owner { get; private set; }
 
-		private int currentKey = 0;
+		private int keyIndex;
+		private KeyFunction function;
+		private int frame1, frame2;
+		private T value1, value2, value3, value4;
 
 		public bool IsTriggerable { get; set; }
 
@@ -139,7 +142,7 @@ namespace Lime
 
 		public void Clear()
 		{
-			currentKey = 0;
+			keyIndex = 0;
 			Keys.Clear();
 		}
 
@@ -147,7 +150,7 @@ namespace Lime
 		{
 			if (ReadonlyKeys.Count > 0 && Enabled) {
 				// This function relies on currentKey value. Therefore Apply(time) must be called before.
-				if (ReadonlyKeys[currentKey].Frame == frame) {
+				if (ReadonlyKeys[keyIndex].Frame == frame) {
 					Owner.OnTrigger(TargetProperty, animationTimeCorrection);
 				}
 			}
@@ -162,41 +165,59 @@ namespace Lime
 
 		public T CalcValue(double time)
 		{
-			int count = ReadonlyKeys.Count;
-			if (currentKey >= count) {
-				currentKey = count - 1;
-			}
 			int frame = AnimationUtils.SecondsToFrames(time);
-			// find rightmost key on the left from given frame
-			while (currentKey < count - 1 && frame > ReadonlyKeys[currentKey].Frame)
-				currentKey++;
-			while (currentKey >= 0 && frame < ReadonlyKeys[currentKey].Frame)
-				currentKey--;
-			if (currentKey < 0) {
-				currentKey = 0;
-				return ReadonlyKeys[0].Value;
+			if (frame < frame1 || frame >= frame2) {
+				CacheInterpolationParameters(frame);
 			}
-			if (currentKey == count - 1) {
-				return ReadonlyKeys[count - 1].Value;
+			if (function == KeyFunction.Steep) {
+				return value2;
 			}
-			int i = currentKey;
-			var key1 = ReadonlyKeys[i];
-			var function = key1.Function;
-			if (function == KeyFunction.Steep || !IsInterpolable()) {
-				return key1.Value;
-			}
-			var key2 = ReadonlyKeys[i + 1];
-			var t = (float)(time * AnimationUtils.FramesPerSecond - key1.Frame) / (key2.Frame - key1.Frame);
+			var t = (float)(time * AnimationUtils.FramesPerSecond - frame1) / (frame2 - frame1);
 			if (function == KeyFunction.Linear) {
-				return Interpolate(t, key1.Value, key2.Value);
-			} else if (function == KeyFunction.Spline) {
-				var key0 = ReadonlyKeys[i < 1 ? 0 : i - 1];
-				var key3 = ReadonlyKeys[i + 1 >= count - 1 ? count - 1 : i + 2];
-				return Interpolate(t, key0.Value, key1.Value, key2.Value, key3.Value);
-			} else { // KeyFunction.ClosedSpline
-				var key0 = ReadonlyKeys[i < 1 ? count - 2 : i - 1];
-				var key3 = ReadonlyKeys[i + 1 >= count - 1 ? 1 : i + 2];
-				return Interpolate(t, key0.Value, key1.Value, key2.Value, key3.Value);
+				return Interpolate(t, value2, value3);
+			} else {
+				return Interpolate(t, value1, value2, value3, value4);
+			}
+		}
+
+		private void CacheInterpolationParameters(int frame)
+		{
+			int count = ReadonlyKeys.Count;
+			var i = keyIndex;
+			// find rightmost key on the left from the given frame
+			while (i < count - 1 && frame > ReadonlyKeys[i].Frame) {
+				i++;
+			}
+			while (i >= 0 && frame < ReadonlyKeys[i].Frame) {
+				i--;
+			}
+			keyIndex = i;
+			if (i < 0) {
+				keyIndex = 0;
+				frame1 = int.MinValue;
+				frame2 = ReadonlyKeys[0].Frame;
+				value2 = ReadonlyKeys[0].Value;
+				function = KeyFunction.Steep;
+			} else if (i == count - 1) {
+				frame1 = ReadonlyKeys[i].Frame;
+				frame2 = int.MaxValue;
+				value2 = ReadonlyKeys[i].Value;
+				function = KeyFunction.Steep;
+			} else {
+				var key1 = ReadonlyKeys[i];
+				var key2 = ReadonlyKeys[i + 1];
+				frame1 = key1.Frame;
+				frame2 = key2.Frame;
+				value2 = key1.Value;
+				value3 = key2.Value;
+				function = IsInterpolable() ? key1.Function : KeyFunction.Steep;
+				if (function == KeyFunction.Spline) {
+					value1 = ReadonlyKeys[i < 1 ? 0 : i - 1].Value;
+					value4 = ReadonlyKeys[i + 1 >= count - 1 ? count - 1 : i + 2].Value;
+				} else if (function == KeyFunction.ClosedSpline) {
+					value1 = ReadonlyKeys[i < 1 ? count - 2 : i - 1].Value;
+					value4 = ReadonlyKeys[i + 1 >= count - 1 ? 1 : i + 2].Value;
+				}
 			}
 		}
 
