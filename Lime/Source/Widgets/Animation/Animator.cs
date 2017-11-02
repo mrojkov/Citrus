@@ -41,7 +41,7 @@ namespace Lime
 		private int keyIndex;
 		private KeyFunction function;
 		private int frame1, frame2;
-		private T value1, value2, value3, value4;
+		protected T Value1, Value2, Value3, Value4;
 
 		public bool IsTriggerable { get; set; }
 
@@ -130,15 +130,8 @@ namespace Lime
 			Setter = (SetterDelegate)Delegate.CreateDelegate(typeof(SetterDelegate), owner, mi);
 		}
 
-		protected virtual T Interpolate(float t, T a, T b)
-		{
-			return a;
-		}
-
-		protected virtual T Interpolate(float t, T a, T b, T c, T d)
-		{
-			return Interpolate(t, b, c);
-		}
+		protected virtual T InterpolateLinear(float t) => Value2;
+		protected virtual T InterpolateSplined(float t) => InterpolateLinear(t);
 
 		public void Clear()
 		{
@@ -170,13 +163,13 @@ namespace Lime
 				CacheInterpolationParameters(frame);
 			}
 			if (function == KeyFunction.Steep) {
-				return value2;
+				return Value2;
 			}
 			var t = (float)(time * AnimationUtils.FramesPerSecond - frame1) / (frame2 - frame1);
 			if (function == KeyFunction.Linear) {
-				return Interpolate(t, value2, value3);
+				return InterpolateLinear(t);
 			} else {
-				return Interpolate(t, value1, value2, value3, value4);
+				return InterpolateSplined(t);
 			}
 		}
 
@@ -196,27 +189,27 @@ namespace Lime
 				keyIndex = 0;
 				frame1 = int.MinValue;
 				frame2 = ReadonlyKeys[0].Frame;
-				value2 = ReadonlyKeys[0].Value;
+				Value2 = ReadonlyKeys[0].Value;
 				function = KeyFunction.Steep;
 			} else if (i == count - 1) {
 				frame1 = ReadonlyKeys[i].Frame;
 				frame2 = int.MaxValue;
-				value2 = ReadonlyKeys[i].Value;
+				Value2 = ReadonlyKeys[i].Value;
 				function = KeyFunction.Steep;
 			} else {
 				var key1 = ReadonlyKeys[i];
 				var key2 = ReadonlyKeys[i + 1];
 				frame1 = key1.Frame;
 				frame2 = key2.Frame;
-				value2 = key1.Value;
-				value3 = key2.Value;
+				Value2 = key1.Value;
+				Value3 = key2.Value;
 				function = IsInterpolable() ? key1.Function : KeyFunction.Steep;
 				if (function == KeyFunction.Spline) {
-					value1 = ReadonlyKeys[i < 1 ? 0 : i - 1].Value;
-					value4 = ReadonlyKeys[i + 1 >= count - 1 ? count - 1 : i + 2].Value;
+					Value1 = ReadonlyKeys[i < 1 ? 0 : i - 1].Value;
+					Value4 = ReadonlyKeys[i + 1 >= count - 1 ? count - 1 : i + 2].Value;
 				} else if (function == KeyFunction.ClosedSpline) {
-					value1 = ReadonlyKeys[i < 1 ? count - 2 : i - 1].Value;
-					value4 = ReadonlyKeys[i + 1 >= count - 1 ? 1 : i + 2].Value;
+					Value1 = ReadonlyKeys[i < 1 ? count - 2 : i - 1].Value;
+					Value4 = ReadonlyKeys[i + 1 >= count - 1 ? 1 : i + 2].Value;
 				}
 			}
 		}
@@ -236,19 +229,19 @@ namespace Lime
 	{
 		protected override bool IsInterpolable() => true;
 
-		protected override Vector2 Interpolate(float t, Vector2 a, Vector2 b)
+		protected override Vector2 InterpolateLinear(float t)
 		{
 			Vector2 r;
-			r.X = a.X + (b.X - a.X) * t;
-			r.Y = a.Y + (b.Y - a.Y) * t;
+			r.X = Value2.X + (Value3.X - Value2.X) * t;
+			r.Y = Value2.Y + (Value3.Y - Value2.Y) * t;
 			return r;
 		}
 
-		protected override Vector2 Interpolate(float t, Vector2 a, Vector2 b, Vector2 c, Vector2 d)
+		protected override Vector2 InterpolateSplined(float t)
 		{
 			return new Vector2(
-				Mathf.CatmullRomSpline(t, a.X, b.X, c.X, d.X),
-				Mathf.CatmullRomSpline(t, a.Y, b.Y, c.Y, d.Y)
+				Mathf.CatmullRomSpline(t, Value1.X, Value2.X, Value3.X, Value4.X),
+				Mathf.CatmullRomSpline(t, Value1.Y, Value2.Y, Value3.Y, Value4.Y)
 			);
 		}
 	}
@@ -257,14 +250,14 @@ namespace Lime
 	{
 		protected override bool IsInterpolable() => true;
 
-		protected override Vector3 Interpolate(float t, Vector3 a, Vector3 b)
+		protected override Vector3 InterpolateLinear(float t)
 		{
-			return Vector3.Lerp(t, a, b);
+			return Vector3.Lerp(t, Value2, Value3);
 		}
 
-		protected override Vector3 Interpolate(float t, Vector3 a, Vector3 b, Vector3 c, Vector3 d)
+		protected override Vector3 InterpolateSplined(float t)
 		{
-			return Mathf.CatmullRomSpline(t, a, b, c, d);
+			return Mathf.CatmullRomSpline(t, Value1, Value2, Value3, Value4);
 		}
 	}
 
@@ -272,14 +265,14 @@ namespace Lime
 	{
 		protected override bool IsInterpolable() => true;
 
-		protected override float Interpolate(float t, float a, float b)
+		protected override float InterpolateLinear(float t)
 		{
-			return t * (b - a) + a;
+			return t * (Value3 - Value2) + Value2;
 		}
 
-		protected override float Interpolate(float t, float a, float b, float c, float d)
+		protected override float InterpolateSplined(float t)
 		{
-			return Mathf.CatmullRomSpline(t, a, b, c, d);
+			return Mathf.CatmullRomSpline(t, Value1, Value2, Value3, Value4);
 		}
 	}
 
@@ -287,9 +280,9 @@ namespace Lime
 	{
 		protected override bool IsInterpolable() => true;
 
-		protected override Color4 Interpolate(float t, Color4 a, Color4 b)
+		protected override Color4 InterpolateLinear(float t)
 		{
-			return Color4.Lerp(t, a, b);
+			return Color4.Lerp(t, Value2, Value3);
 		}
 	}
 
@@ -297,9 +290,9 @@ namespace Lime
 	{
 		protected override bool IsInterpolable() => true;
 
-		protected override Quaternion Interpolate(float t, Quaternion a, Quaternion b)
+		protected override Quaternion InterpolateLinear(float t)
 		{
-			return Quaternion.Slerp(a, b, t);
+			return Quaternion.Slerp(Value2, Value3, t);
 		}
 	}
 
@@ -307,14 +300,9 @@ namespace Lime
 	{
 		protected override bool IsInterpolable() => true;
 
-		protected override Matrix44 Interpolate(float t, Matrix44 a, Matrix44 b)
+		protected override Matrix44 InterpolateLinear(float t)
 		{
-			return Matrix44.Lerp(a, b, t);
-		}
-
-		protected override Matrix44 Interpolate(float t, Matrix44 a, Matrix44 b, Matrix44 c, Matrix44 d)
-		{
-			return Matrix44.Lerp(b, c, t);
+			return Matrix44.Lerp(Value2, Value3, t);
 		}
 	}
 }

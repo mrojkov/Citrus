@@ -62,7 +62,7 @@ namespace Lime
 
 		public IKeyframe this[int index]
 		{
-			get { return (IKeyframe)source[index]; }
+			get { return source[index]; }
 			set { source[index] = (Keyframe<T>)value; Version++; }
 		}
 
@@ -80,7 +80,7 @@ namespace Lime
 		public void CopyTo(IKeyframe[] array, int arrayIndex)
 		{
 			foreach (var item in source) {
-				array[arrayIndex++] = (IKeyframe)item;
+				array[arrayIndex++] = item;
 			}
 		}
 
