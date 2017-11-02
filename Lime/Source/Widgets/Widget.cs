@@ -963,7 +963,9 @@ namespace Lime
 			}
 			Animators.TryFind("Size", out sizeAnimator);
 			if (sizeAnimator != null) {
-				sizeAnimator.Keys.ForEach(k => k.Value = RoundVectorIf(k.Value * ratio, roundCoordinates));
+				foreach (var k in sizeAnimator.Keys) {
+					k.Value = RoundVectorIf(k.Value * ratio, roundCoordinates);
+				}
 			}
 		}
 

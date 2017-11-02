@@ -1,5 +1,6 @@
-using System.Collections.Generic;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Lime
 {
@@ -16,9 +17,13 @@ namespace Lime
 
 	public class KeyframeListProxy<T> : IKeyframeList
 	{
-		KeyframeList<T> source;
+		private KeyframeList<T> source;
 
-		public int Version { get; private set; }
+		public int Version => source.Version;
+
+		public int Count => source.Count;
+
+		public bool IsReadOnly => false;
 
 		public KeyframeListProxy(KeyframeList<T> source)
 		{
@@ -27,7 +32,6 @@ namespace Lime
 
 		public void Add(IKeyframe item)
 		{
-			Version++;
 			source.Add((Keyframe<T>)item);
 		}
 
@@ -42,7 +46,6 @@ namespace Lime
 
 		public void AddOrdered(IKeyframe item)
 		{
-			Version++;
 			source.AddOrdered((Keyframe<T>)item);
 		}
 
@@ -55,21 +58,17 @@ namespace Lime
 			});
 		}
 
-		public IKeyframe CreateKeyframe()
-		{
-			return new Keyframe<T>();
-		}
+		public IKeyframe CreateKeyframe() => new Keyframe<T>();
 
 		public IKeyframe this[int index]
 		{
 			get { return source[index]; }
-			set { source[index] = (Keyframe<T>)value; Version++; }
+			set { source[index] = (Keyframe<T>)value; }
 		}
 
 		public void Clear()
 		{
 			source.Clear();
-			Version++;
 		}
 
 		public bool Contains(IKeyframe item)
@@ -84,19 +83,8 @@ namespace Lime
 			}
 		}
 
-		public int Count
-		{
-			get { return source.Count; }
-		}
-
-		public bool IsReadOnly
-		{
-			get { return false; }
-		}
-
 		public bool Remove(IKeyframe item)
 		{
-			Version++;
 			return source.Remove((Keyframe<T>)item);
 		}
 
@@ -105,7 +93,7 @@ namespace Lime
 			return source.GetEnumerator();
 		}
 
-		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return source.GetEnumerator();
 		}
@@ -117,20 +105,23 @@ namespace Lime
 
 		public void Insert(int index, IKeyframe item)
 		{
-			Version++;
 			source.Insert(index, (Keyframe<T>)item);
 		}
 
 		public void RemoveAt(int index)
 		{
-			Version++;
 			source.RemoveAt(index);
 		}
 	}
 
-	public class KeyframeList<T> : List<Keyframe<T>>
+	public class KeyframeList<T> : IList<Keyframe<T>>
 	{
+		private List<Keyframe<T>> items = new List<Keyframe<T>>();
+
+		public int Version { get; private set; }
 		internal int RefCount { get; private set; }
+		public int Count => items.Count;
+		public bool IsReadOnly => false;
 
 		internal void AddRef() => RefCount++;
 		internal void Release() => RefCount--;
@@ -144,24 +135,30 @@ namespace Lime
 			return clone;
 		}
 
-		public void Add(int frame, T value, KeyFunction function = KeyFunction.Linear)
+		public void Add(Keyframe<T> item)
 		{
-			Add(new Keyframe<T>(frame, value, function));
-		}
-
-		public new void Add(Keyframe<T> keyframe)
-		{
-			if (Count == 0 || keyframe.Frame > this[Count - 1].Frame) {
-				base.Add(keyframe);
+			Version++;
+			if (Count == 0 || item.Frame > this[Count - 1].Frame) {
+				items.Add(item);
 			} else {
 				throw new InvalidOperationException();
 			}
 		}
 
+		public void Add(int frame, T value, KeyFunction function = KeyFunction.Linear)
+		{
+			Add(new Keyframe<T> {
+				Frame = frame,
+				Value = value,
+				Function = function
+			});
+		}
+
 		public void AddOrdered(Keyframe<T> keyframe)
 		{
+			Version++;
 			if (Count == 0 || keyframe.Frame > this[Count - 1].Frame) {
-				base.Add(keyframe);
+				items.Add(keyframe);
 			} else {
 				int i = 0;
 				while (this[i].Frame < keyframe.Frame) {
@@ -173,6 +170,92 @@ namespace Lime
 					Insert(i, keyframe);
 				}
 			}
+		}
+
+		public void AddOrdered(int frame, T value, KeyFunction function = KeyFunction.Linear)
+		{
+			AddOrdered(new Keyframe<T> {
+				Frame = frame,
+				Value = value,
+				Function = function
+			});
+		}
+
+		public Keyframe<T> CreateKeyframe()
+		{
+			return new Keyframe<T>();
+		}
+
+		public Keyframe<T> this[int index]
+		{
+			get { return items[index]; }
+			set { items[index] = value; Version++; }
+		}
+
+		public void Clear()
+		{
+			items.Clear();
+			Version++;
+		}
+
+		public bool Contains(Keyframe<T> item)
+		{
+			return items.Contains(item);
+		}
+
+		public void CopyTo(Keyframe<T>[] array, int arrayIndex)
+		{
+			foreach (var item in items) {
+				array[arrayIndex++] = item;
+			}
+		}
+
+		public bool Remove(Keyframe<T> item)
+		{
+			Version++;
+			return items.Remove(item);
+		}
+
+		public int IndexOf(Keyframe<T> item)
+		{
+			return items.IndexOf(item);
+		}
+
+		public void Insert(int index, Keyframe<T> item)
+		{
+			Version++;
+			items.Insert(index, item);
+		}
+
+		public void RemoveAt(int index)
+		{
+			Version++;
+			items.RemoveAt(index);
+		}
+
+		public IEnumerator<Keyframe<T>> GetEnumerator()
+		{
+			return items.GetEnumerator();
+		}
+
+		IEnumerator<Keyframe<T>> IEnumerable<Keyframe<T>>.GetEnumerator()
+		{
+			return items.GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return items.GetEnumerator();
+		}
+
+		public int FindIndex(Predicate<Keyframe<T>> match)
+		{
+			return items.FindIndex(match);
+		}
+
+		public int FindLastIndex(Predicate<Keyframe<T>> match)
+		{
+			return items.FindLastIndex(match);
 		}
 	}
 }
