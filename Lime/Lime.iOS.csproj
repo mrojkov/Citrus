@@ -135,7 +135,7 @@
     <Compile Include="Source\Widgets\Animation\Animator.cs" />
     <Compile Include="Source\Widgets\Animation\AnimatorRegistry.cs" />
     <Compile Include="Source\Widgets\Animation\Keyframe.cs" />
-    <Compile Include="Source\Widgets\Animation\KeyframeCollection.cs" />
+    <Compile Include="Source\Widgets\Animation\KeyframeList.cs" />
     <Compile Include="Source\Input\Key.cs" />
     <Compile Include="Source\Widgets\WidgetDebugView.cs" />
     <Compile Include="Source\Widgets\WidgetInput.cs" />

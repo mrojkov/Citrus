@@ -25,9 +25,9 @@ namespace Lime
 
 		void Apply(double time);
 
-		IKeyframeCollection ReadonlyKeys { get; }
+		IKeyframeList ReadonlyKeys { get; }
 
-		IKeyframeCollection Keys { get; }
+		IKeyframeList Keys { get; }
 
 		object UserData { get; set; }
 
@@ -54,7 +54,7 @@ namespace Lime
 		public Type GetValueType() { return typeof(T); }
 
 		[YuzuMember]
-		public KeyframeCollection<T> ReadonlyKeys { get; private set; }
+		public KeyframeList<T> ReadonlyKeys { get; private set; }
 
 		[YuzuMember]
 		public string AnimationId { get; set; }
@@ -63,7 +63,7 @@ namespace Lime
 
 		public Animator()
 		{
-			ReadonlyKeys = new KeyframeCollection<T>();
+			ReadonlyKeys = new KeyframeList<T>();
 			ReadonlyKeys.AddRef();
 		}
 
@@ -72,7 +72,7 @@ namespace Lime
 			ReadonlyKeys.Release();
 		}
 
-		public KeyframeCollection<T> Keys
+		public KeyframeList<T> Keys
 		{
 			get {
 				if (ReadonlyKeys.RefCount > 1) {
@@ -84,23 +84,23 @@ namespace Lime
 			}
 		}
 
-		IKeyframeCollection proxyKeys;
-		IKeyframeCollection IAnimator.Keys {
+		IKeyframeList proxyKeys;
+		IKeyframeList IAnimator.Keys {
 			get {
 				if (ReadonlyKeys.RefCount > 1) {
 					proxyKeys = null;
 				}
 				if (proxyKeys == null) {
-					proxyKeys = new KeyframeCollectionProxy<T>(Keys);
+					proxyKeys = new KeyframeListProxy<T>(Keys);
 				}
 				return proxyKeys;
 			}
 		}
 
-		IKeyframeCollection IAnimator.ReadonlyKeys {
+		IKeyframeList IAnimator.ReadonlyKeys {
 			get {
 				if (proxyKeys == null) {
-					proxyKeys = new KeyframeCollectionProxy<T>(ReadonlyKeys);
+					proxyKeys = new KeyframeListProxy<T>(ReadonlyKeys);
 				}
 				return proxyKeys;
 			}

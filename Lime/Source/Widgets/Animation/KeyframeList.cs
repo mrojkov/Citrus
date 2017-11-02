@@ -3,7 +3,7 @@ using System;
 
 namespace Lime
 {
-	public interface IKeyframeCollection : IList<IKeyframe>
+	public interface IKeyframeList : IList<IKeyframe>
 	{
 		IKeyframe CreateKeyframe();
 
@@ -14,13 +14,13 @@ namespace Lime
 		int Version { get; }
 	}
 
-	public class KeyframeCollectionProxy<T> : IKeyframeCollection
+	public class KeyframeListProxy<T> : IKeyframeList
 	{
-		KeyframeCollection<T> source;
+		KeyframeList<T> source;
 
 		public int Version { get; private set; }
 
-		public KeyframeCollectionProxy(KeyframeCollection<T> source)
+		public KeyframeListProxy(KeyframeList<T> source)
 		{
 			this.source = source;
 		}
@@ -128,16 +128,16 @@ namespace Lime
 		}
 	}
 
-	public class KeyframeCollection<T> : List<Keyframe<T>>
+	public class KeyframeList<T> : List<Keyframe<T>>
 	{
 		internal int RefCount { get; private set; }
 
 		internal void AddRef() => RefCount++;
 		internal void Release() => RefCount--;
 
-		public KeyframeCollection<T> Clone()
+		public KeyframeList<T> Clone()
 		{
-			var clone = new KeyframeCollection<T>();
+			var clone = new KeyframeList<T>();
 			foreach (var i in this) {
 				clone.Add(i.Clone());
 			}
