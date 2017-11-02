@@ -38,9 +38,10 @@ namespace Lime
 	{
 		public IAnimable Owner { get; private set; }
 
-		private int keyIndex;
+		private double minTime;
+		private double maxTime;
 		private KeyFunction function;
-		private int frame1, frame2;
+		private int keyIndex;
 		protected T Value1, Value2, Value3, Value4;
 
 		public bool IsTriggerable { get; set; }
@@ -158,14 +159,13 @@ namespace Lime
 
 		public T CalcValue(double time)
 		{
-			int frame = AnimationUtils.SecondsToFrames(time);
-			if (frame < frame1 || frame >= frame2) {
-				CacheInterpolationParameters(frame);
+			if (time < minTime || time >= maxTime) {
+				CacheInterpolationParameters(time);
 			}
 			if (function == KeyFunction.Steep) {
 				return Value2;
 			}
-			var t = (float)(time * AnimationUtils.FramesPerSecond - frame1) / (frame2 - frame1);
+			var t = (float)((time - minTime) / (maxTime - minTime));
 			if (function == KeyFunction.Linear) {
 				return InterpolateLinear(t);
 			} else {
@@ -173,8 +173,10 @@ namespace Lime
 			}
 		}
 
-		private void CacheInterpolationParameters(int frame)
+		private void CacheInterpolationParameters(double time)
 		{
+			int frame = AnimationUtils.SecondsToFrames(time);
+			int minFrame, maxFrame;
 			int count = ReadonlyKeys.Count;
 			var i = keyIndex;
 			// find rightmost key on the left from the given frame
@@ -187,23 +189,23 @@ namespace Lime
 			keyIndex = i;
 			if (i < 0) {
 				keyIndex = 0;
-				frame1 = int.MinValue;
-				frame2 = ReadonlyKeys[0].Frame;
+				maxFrame = ReadonlyKeys[0].Frame;
+				minFrame = int.MinValue;
 				Value2 = ReadonlyKeys[0].Value;
 				function = KeyFunction.Steep;
 			} else if (i == count - 1) {
-				frame1 = ReadonlyKeys[i].Frame;
-				frame2 = int.MaxValue;
+				minFrame = ReadonlyKeys[i].Frame;
+				maxFrame = int.MaxValue;
 				Value2 = ReadonlyKeys[i].Value;
 				function = KeyFunction.Steep;
 			} else {
 				var key1 = ReadonlyKeys[i];
 				var key2 = ReadonlyKeys[i + 1];
-				frame1 = key1.Frame;
-				frame2 = key2.Frame;
+				minFrame = key1.Frame;
+				maxFrame = key2.Frame;
 				Value2 = key1.Value;
 				Value3 = key2.Value;
-				function = IsInterpolable() ? key1.Function : KeyFunction.Steep;
+				function = key1.Function;
 				if (function == KeyFunction.Spline) {
 					Value1 = ReadonlyKeys[i < 1 ? 0 : i - 1].Value;
 					Value4 = ReadonlyKeys[i + 1 >= count - 1 ? count - 1 : i + 2].Value;
@@ -212,6 +214,8 @@ namespace Lime
 					Value4 = ReadonlyKeys[i + 1 >= count - 1 ? 1 : i + 2].Value;
 				}
 			}
+			minTime = minFrame * AnimationUtils.SecondsPerFrame;
+			maxTime = maxFrame * AnimationUtils.SecondsPerFrame;
 		}
 
 		public int Duration {
@@ -221,14 +225,10 @@ namespace Lime
 				return ReadonlyKeys[ReadonlyKeys.Count - 1].Frame;
 			}
 		}
-
-		protected virtual bool IsInterpolable() => false;
 	}
 
 	public class Vector2Animator : Animator<Vector2>
 	{
-		protected override bool IsInterpolable() => true;
-
 		protected override Vector2 InterpolateLinear(float t)
 		{
 			Vector2 r;
@@ -248,8 +248,6 @@ namespace Lime
 
 	public class Vector3Animator : Animator<Vector3>
 	{
-		protected override bool IsInterpolable() => true;
-
 		protected override Vector3 InterpolateLinear(float t)
 		{
 			return Vector3.Lerp(t, Value2, Value3);
@@ -263,8 +261,6 @@ namespace Lime
 
 	public class NumericAnimator : Animator<float>
 	{
-		protected override bool IsInterpolable() => true;
-
 		protected override float InterpolateLinear(float t)
 		{
 			return t * (Value3 - Value2) + Value2;
@@ -278,8 +274,6 @@ namespace Lime
 
 	public class Color4Animator : Animator<Color4>
 	{
-		protected override bool IsInterpolable() => true;
-
 		protected override Color4 InterpolateLinear(float t)
 		{
 			return Color4.Lerp(t, Value2, Value3);
@@ -288,8 +282,6 @@ namespace Lime
 
 	public class QuaternionAnimator : Animator<Quaternion>
 	{
-		protected override bool IsInterpolable() => true;
-
 		protected override Quaternion InterpolateLinear(float t)
 		{
 			return Quaternion.Slerp(Value2, Value3, t);
@@ -298,8 +290,6 @@ namespace Lime
 
 	public class Matrix44Animator : Animator<Matrix44>
 	{
-		protected override bool IsInterpolable() => true;
-
 		protected override Matrix44 InterpolateLinear(float t)
 		{
 			return Matrix44.Lerp(Value2, Value3, t);
