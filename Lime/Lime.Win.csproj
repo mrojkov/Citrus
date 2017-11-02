@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -282,7 +282,6 @@
     <Compile Include="Source\Widgets\Tasks\Task.cs" />
     <Compile Include="Source\Widgets\Animation\AnimationUtils.cs" />
     <Compile Include="Source\Widgets\Animation\Animator.cs" />
-    <Compile Include="Source\Widgets\Animation\AnimatorCollection.cs" />
     <Compile Include="Source\Widgets\Animation\AnimatorRegistry.cs" />
     <Compile Include="Source\Widgets\Animation\Keyframe.cs" />
     <Compile Include="Source\Widgets\Audio.cs" />
@@ -297,7 +296,7 @@
     <Compile Include="Source\Widgets\Animation\KeyframeCollection.cs" />
     <Compile Include="Source\Widgets\LinearLayout.cs" />
     <Compile Include="Source\Widgets\Marker.cs" />
-    <Compile Include="Source\Widgets\MarkerCollection.cs" />
+    <Compile Include="Source\Widgets\MarkerList.cs" />
     <Compile Include="Source\Widgets\NineGrid.cs" />
     <Compile Include="Source\Widgets\Node.cs" />
     <Compile Include="Source\Widgets\NodeList.cs" />
@@ -421,6 +420,7 @@
     <Compile Include="Source\Widgets\Gestures\DragGesture.cs" />
     <Compile Include="Source\Widgets\Gestures\Gesture.cs" />
     <Compile Include="Source\Widgets\Gestures\GestureManager.cs" />
+    <Compile Include="Source\Widgets\Animation\AnimatorList.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\3rdParty\OpenAL\OpenAL32.dll">

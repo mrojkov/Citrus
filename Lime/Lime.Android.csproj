@@ -117,7 +117,6 @@
     <Compile Include="Source\Widgets\3D\Model3D.cs" />
     <Compile Include="Source\Widgets\Animation\AnimationUtils.cs" />
     <Compile Include="Source\Widgets\Animation\Animator.cs" />
-    <Compile Include="Source\Widgets\Animation\AnimatorCollection.cs" />
     <Compile Include="Source\Widgets\Animation\AnimatorRegistry.cs" />
     <Compile Include="Source\Widgets\Animation\Keyframe.cs" />
     <Compile Include="Source\Widgets\Animation\KeyframeCollection.cs" />
@@ -135,7 +134,6 @@
     <Compile Include="Source\Widgets\ImageCombiner.cs" />
     <Compile Include="Source\Widgets\LinearLayout.cs" />
     <Compile Include="Source\Widgets\Marker.cs" />
-    <Compile Include="Source\Widgets\MarkerCollection.cs" />
     <Compile Include="Source\Widgets\Movie.cs" />
     <Compile Include="Source\Widgets\NineGrid.cs" />
     <Compile Include="Source\Widgets\Node.cs" />
@@ -371,6 +369,8 @@
     <Compile Include="Source\Widgets\Gestures\DragGesture.cs" />
     <Compile Include="Source\Widgets\Gestures\Gesture.cs" />
     <Compile Include="Source\Widgets\Gestures\GestureManager.cs" />
+    <Compile Include="Source\Widgets\MarkerList.cs" />
+    <Compile Include="Source\Widgets\Animation\AnimatorList.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Android.csproj">

@@ -13,7 +13,7 @@ namespace Lime
 {
 	public interface IAnimable
 	{
-		AnimatorCollection Animators { get; }
+		AnimatorList Animators { get; }
 		void OnTrigger(string property, double animationTimeCorrection = 0);
 	}
 
@@ -300,7 +300,7 @@ namespace Lime
 		/// Collections of Animators.
 		/// </summary>
 		[YuzuMember]
-		public AnimatorCollection Animators { get; private set; }
+		public AnimatorList Animators { get; private set; }
 
 		/// <summary>
 		/// Child nodes.
@@ -313,7 +313,7 @@ namespace Lime
 		/// <summary>
 		/// Markers of default animation.
 		/// </summary>
-		public MarkerCollection Markers { get { return DefaultAnimation.Markers; } }
+		public MarkerList Markers { get { return DefaultAnimation.Markers; } }
 
 		/// <summary>
 		/// Returns true if this node is running animation.
@@ -417,7 +417,7 @@ namespace Lime
 		{
 			AnimationSpeed = 1;
 			Components = new NodeComponentCollection(this);
-			Animators = new AnimatorCollection(this);
+			Animators = new AnimatorList(this);
 			Animations = new AnimationList(this);
 			Nodes = new NodeList(this);
 			Presenter = DefaultPresenter.Instance;
@@ -547,7 +547,7 @@ namespace Lime
 			clone.gestures = null;
 			clone.AsWidget = clone as Widget;
 			clone.Animations = Animations.Clone(clone);
-			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
+			clone.Animators = AnimatorList.SharedClone(clone, Animators);
 			clone.Nodes = Nodes.Clone(clone);
 			clone.Components = Components.Clone(clone);
 			clone.IsAwoken = false;

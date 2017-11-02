@@ -310,19 +310,19 @@ namespace Tangerine.Core.Operations
 
 	public class SetMarker : Operation
 	{
-		public readonly MarkerCollection Collection;
+		public readonly MarkerList List;
 		public readonly Marker Marker;
 
 		public override bool IsChangingDocument => true;
 
-		public static void Perform(MarkerCollection collection, Marker marker)
+		public static void Perform(MarkerList list, Marker marker)
 		{
-			Document.Current.History.Perform(new SetMarker(collection, marker));
+			Document.Current.History.Perform(new SetMarker(list, marker));
 		}
 
-		private SetMarker(MarkerCollection collection, Marker marker)
+		private SetMarker(MarkerList list, Marker marker)
 		{
-			Collection = collection;
+			List = list;
 			Marker = marker;
 		}
 
@@ -332,16 +332,16 @@ namespace Tangerine.Core.Operations
 
 			protected override void InternalRedo(SetMarker op)
 			{
-				op.Save(new Backup { Marker = op.Collection.FirstOrDefault(i => i.Frame == op.Marker.Frame) });
-				op.Collection.AddOrdered(op.Marker);
+				op.Save(new Backup { Marker = op.List.FirstOrDefault(i => i.Frame == op.Marker.Frame) });
+				op.List.AddOrdered(op.Marker);
 			}
 
 			protected override void InternalUndo(SetMarker op)
 			{
-				op.Collection.Remove(op.Marker);
+				op.List.Remove(op.Marker);
 				var b = op.Restore<Backup>();
 				if (b.Marker != null) {
-					op.Collection.AddOrdered(b.Marker);
+					op.List.AddOrdered(b.Marker);
 				}
 			}
 		}
@@ -349,19 +349,19 @@ namespace Tangerine.Core.Operations
 
 	public class DeleteMarker : Operation
 	{
-		public readonly MarkerCollection Collection;
+		public readonly MarkerList List;
 		public readonly Marker Marker;
 
 		public override bool IsChangingDocument => true;
 
-		public static void Perform(MarkerCollection collection, Marker marker)
+		public static void Perform(MarkerList list, Marker marker)
 		{
-			Document.Current.History.Perform(new DeleteMarker(collection, marker));
+			Document.Current.History.Perform(new DeleteMarker(list, marker));
 		}
 
-		private DeleteMarker(MarkerCollection collection, Marker marker)
+		private DeleteMarker(MarkerList list, Marker marker)
 		{
-			Collection = collection;
+			List = list;
 			Marker = marker;
 		}
 
@@ -369,12 +369,12 @@ namespace Tangerine.Core.Operations
 		{
 			protected override void InternalRedo(DeleteMarker op)
 			{
-				op.Collection.Remove(op.Marker);
+				op.List.Remove(op.Marker);
 			}
 
 			protected override void InternalUndo(DeleteMarker op)
 			{
-				op.Collection.AddOrdered(op.Marker);
+				op.List.AddOrdered(op.Marker);
 			}
 		}
 	}
