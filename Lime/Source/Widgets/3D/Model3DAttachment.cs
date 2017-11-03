@@ -148,7 +148,7 @@ namespace Lime
 						Id = animationData.Name
 					};
 					foreach (var node in GetAnimationNodes(model, animationData)) {
-						CopyAnimationKeys(node, srcAnimation, animation);
+						OverrideAnimation(node, srcAnimation, animation);
 					}
 					model.Animations.Add(animation);
 				}
@@ -210,19 +210,25 @@ namespace Lime
 					}
 
 					model.Animations.Add(animation);
-				} catch {
-					Console.WriteLine($"Warning: Unable to load material effect { effect.Path }");
+				} catch (Lime.Exception e) {
+					if (Application.IsTangerine) {
+						Console.WriteLine(e.Message);
+					} else {
+						throw;
+					}
 				}
 			}
 		}
 
-		private void CopyAnimationKeys(Node node, Lime.Animation srcAnimation, Lime.Animation dstAnimation)
+		private void OverrideAnimation(Node node, Lime.Animation srcAnimation, Lime.Animation dstAnimation)
 		{
 			var srcAnimators = new List<IAnimator>(node.Animators.Where(i => i.AnimationId == srcAnimation.Id));
-			foreach (var srcAnimator in srcAnimators) {
-				var dstAnimator = srcAnimator.Clone();
-				dstAnimator.AnimationId = dstAnimation.Id;
-				node.Animators.Add(dstAnimator);
+			var srcAnimationName = node.Animators.FirstOrDefault()?.AnimationId ?? srcAnimation.Id;
+			foreach (var srcAnimator in node.Animators) {
+				srcAnimator.AnimationId = dstAnimation.Id;
+			}
+			if (Application.IsTangerine && srcAnimationName != srcAnimation.Id) {
+				Console.WriteLine($"Warning: animation \"{ dstAnimation.Id }\" overriding \"{ srcAnimationName }\" at { node.Id } node");
 			}
 		}
 

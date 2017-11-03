@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Collections;
+using System.Linq;
 using Lime;
 using Tangerine.Core;
 
@@ -90,8 +91,13 @@ namespace Tangerine.UI
 				Core.UserPreferences.Instance.Load();
 			};
 			okButton.Clicked += () => {
-				window.Close();
-				Model3DAttachmentParser.Save(attachment, System.IO.Path.Combine(Project.Current.AssetsDirectory, Path));
+				try {
+					CheckErrors();
+					window.Close();
+					Model3DAttachmentParser.Save(attachment, System.IO.Path.Combine(Project.Current.AssetsDirectory, Path));
+				} catch (Lime.Exception e) {
+					new AlertDialog(e.Message).Show();
+				}
 			};
 			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
 			rootWidget.LateTasks.AddLoop(() => {
@@ -100,6 +106,16 @@ namespace Tangerine.UI
 					Core.UserPreferences.Instance.Load();
 				}
 			});
+		}
+
+		private void CheckErrors()
+		{
+			if (new HashSet<string>(attachment.Animations.Select(a => a.Name)).Count != attachment.Animations.Count ||
+				attachment.Animations.Any(a => a.Name == source.Animations.DefaultAnimation.Id)
+			) {
+				throw new Lime.Exception("Animations have simmilar names");
+			}
+			var defaultAnimation = attachment.Animations.FirstOrDefault(a => a.Name == Model3DAttachment.DefaultAnimationName);
 		}
 
 		private Widget CreateAnimationsPane()
@@ -122,6 +138,11 @@ namespace Tangerine.UI
 					Name = "Animation",
 				});
 			}));
+			if (!attachment.Animations.Any(a => a.Name == Model3DAttachment.DefaultAnimationName)) {
+				attachment.Animations.Insert(0, new Model3DAttachment.Animation {
+					Name = Model3DAttachment.DefaultAnimationName,
+				});
+			}
 			list.Components.Add(widgetFactory);
 			return pane;
 		}
@@ -210,6 +231,7 @@ namespace Tangerine.UI
 			public T Source { get; set; }
 			public Widget Header { get; private set; }
 			public IList<T> SourceCollection { get; private set; }
+			protected readonly ThemedDeleteButton deleteButton;
 
 			public static Widget CreateFooter(Action action)
 			{
@@ -239,7 +261,7 @@ namespace Tangerine.UI
 				var headerWrapper = new Widget {
 					Layout = new HBoxLayout() { Spacing = AttachmentMetrics.Spacing },
 				};
-				var deleteButton = new ThemedDeleteButton {
+				deleteButton = new ThemedDeleteButton {
 					Anchors = Anchors.Right,
 					LayoutCell = new LayoutCell(Alignment.LeftTop),
 				};
@@ -351,6 +373,8 @@ namespace Tangerine.UI
 			public AnimationRow(Model3DAttachment.Animation animation, ObservableCollection<Model3DAttachment.Animation> options)
 				: base(animation, options)
 			{
+				var isDefault = animation.Name == Model3DAttachment.DefaultAnimationName;
+				deleteButton.Visible = !isDefault;
 				Layout = new VBoxLayout();
 				var expandedButton = new ThemedExpandButton {
 					MinMaxSize = new Vector2(AttachmentMetrics.ExpandButtonSize),
@@ -400,20 +424,22 @@ namespace Tangerine.UI
 						DestMarkerId = "Marker1"
 					},
 					MarkerBlendingRow.CreateHeader());
+				if (!isDefault) {
+					BuildList<Model3DAttachment.NodeData, NodeRow>(
+						animation.Nodes,
+						expandableContentWrapper,
+						"Nodes",
+						() => new Model3DAttachment.NodeData { Id = "NodeId" },
+						NodeRow.CreateHeader());
 
-				BuildList<Model3DAttachment.NodeData, NodeRow>(
-					animation.Nodes,
-					expandableContentWrapper,
-					"Nodes",
-					() => new Model3DAttachment.NodeData { Id = "NodeId" },
-					NodeRow.CreateHeader());
+					BuildList<Model3DAttachment.NodeData, NodeRow>(
+						animation.IgnoredNodes,
+						expandableContentWrapper,
+						"Ignored Nodes",
+						() => new Model3DAttachment.NodeData { Id = "NodeId" },
+						NodeRow.CreateHeader());
+				}
 
-				BuildList<Model3DAttachment.NodeData, NodeRow>(
-					animation.IgnoredNodes,
-					expandableContentWrapper,
-					"Ignored Nodes",
-					() => new Model3DAttachment.NodeData { Id = "NodeId" },
-					NodeRow.CreateHeader());
 
 				Nodes.Add(expandableContentWrapper);
 				expandableContentWrapper.AddChangeWatcher(
