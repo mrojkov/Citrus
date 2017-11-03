@@ -2,6 +2,12 @@
 
 namespace Lime.RenderOptimizer
 {
+	// Absence of this component at root node of a scene
+	// means RenderOptimizer has never been invoked on this scene
+	public class HasContentSizeComponent : NodeComponent
+	{
+
+	}
 	public class ContentSizeComponent : NodeComponent
 	{
 		[YuzuRequired]

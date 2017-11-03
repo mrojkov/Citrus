@@ -38,36 +38,28 @@ namespace Lime
 		protected void RaiseActivated()
 		{
 			using (Context.Activate().Scoped()) {
-				if (Activated != null) {
-					Activated();
-				}
+				Activated?.Invoke();
 			}
 		}
 
 		protected void RaiseDeactivated()
 		{
 			using (Context.Activate().Scoped()) {
-				if (Deactivated != null) {
-					Deactivated();
-				}
+				Deactivated?.Invoke();
 			}
 		}
 
 		protected void RaiseClosed()
 		{
 			using (Context.Activate().Scoped()) {
-				if (Closed != null) {
-					Closed();
-				}
+				Closed?.Invoke();
 			}
 		}
 
 		protected void RaiseRendering()
 		{
 			using (Context.Activate().Scoped()) {
-				if (Rendering != null) {
-					Rendering();
-				}
+				Rendering?.Invoke();
 			}
 		}
 
@@ -115,27 +107,21 @@ namespace Lime
 		protected void RaiseMoved()
 		{
 			using (Context.Activate().Scoped()) {
-				if (Moved != null) {
-					Moved();
-				}
+				Moved?.Invoke();
 			}
 		}
 
 		protected void RaiseResized(bool deviceRotated)
 		{
 			using (Context.Activate().Scoped()) {
-				if (Resized != null) {
-					Resized(deviceRotated);
-				}
+				Resized?.Invoke(deviceRotated);
 			}
 		}
 
 		protected void RaiseVisibleChanging(bool value, bool modal)
 		{
 			using (Context.Activate().Scoped()) {
-				if (VisibleChanging != null) {
-					VisibleChanging(value, modal);
-				}
+				VisibleChanging?.Invoke(value, modal);
 			}
 		}
 	}

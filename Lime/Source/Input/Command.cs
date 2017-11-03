@@ -293,7 +293,7 @@ namespace Lime
 
 	public class CommandQueue
 	{
-		private List<Command> items = new List<Command>();
+		private readonly List<Command> items = new List<Command>();
 
 		public static CommandQueue Instance = new CommandQueue();
 

@@ -8,7 +8,7 @@ namespace Lime
 {
 	public class Menu : List<ICommand>, IMenu
 	{
-		List<MenuItem> items = new List<MenuItem>();
+		readonly List<MenuItem> items = new List<MenuItem>();
 
 		private MenuStrip nativeMainMenu;
 		private ContextMenuStrip nativeContextMenu;
@@ -161,9 +161,7 @@ namespace Lime
 
 		public void Refresh()
 		{
-			if (Command.Menu != null) {
-				Command.Menu.Refresh();
-			}
+			Command.Menu?.Refresh();
 			if (Command.Version == commandVersion) {
 				return;
 			}
@@ -176,11 +174,7 @@ namespace Lime
 				return;
 			mi.ShortcutKeys = ToNativeKeys(Command.Shortcut);
 			mi.Checked = Command.Checked;
-			if (Command.Menu != null) {
-				mi.DropDown = ((Menu)Command.Menu).NativeContextMenu;
-			} else {
-				mi.DropDown = null;
-			}
+			mi.DropDown = ((Menu)Command.Menu)?.NativeContextMenu;
 		}
 
 		private static Keys ToNativeKeys(Shortcut shortcut)

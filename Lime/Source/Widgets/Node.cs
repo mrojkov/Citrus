@@ -928,10 +928,7 @@ namespace Lime
 		/// <summary>
 		/// Gets a DFS-enumeration of all descendant nodes.
 		/// </summary>
-		public IEnumerable<Node> Descendants
-		{
-			get { return new DescendantsEnumerable(this); }
-		}
+		public IEnumerable<Node> Descendants => new DescendantsEnumerable(this);
 
 		/// <summary>
 		/// Enumerate all node's ancestors.
@@ -1039,13 +1036,13 @@ namespace Lime
 		{
 			var getter = prop.GetGetMethod();
 			var texture = getter.Invoke(this, new object[]{}) as ITexture;
-			if (texture != null) {
-				texture.GetHandle();
-			}
+			texture?.GetHandle();
 		}
 
 		[ThreadStatic]
 		private static HashSet<string> scenesBeingLoaded;
+		[ThreadStatic]
+		public static Action<string> SceneLoading;
 
 		public static Node CreateFromAssetBundle(string path, Node instance = null)
 		{
@@ -1085,6 +1082,7 @@ namespace Lime
 					child.LoadExternalScenes();
 				}
 			} else if (ResolveScenePath(ContentsPath) != null) {
+				SceneLoading?.Invoke(ContentsPath);
 				var content = CreateFromAssetBundle(ContentsPath, null);
 				ReplaceContent(content);
 			}
@@ -1093,7 +1091,7 @@ namespace Lime
 		public void ReplaceContent(Node content)
 		{
 			if ((content is Widget) && (this is Widget)) {
-				(content as Widget).Size = (this as Widget).Size;
+				((Widget)content).Size = (this as Widget).Size;
 			}
 			Animations.Clear();
 			Animations.AddRange(content.Animations);
@@ -1195,10 +1193,7 @@ namespace Lime
 					}
 				}
 
-				object IEnumerator.Current
-				{
-					get { return Current; }
-				}
+				object IEnumerator.Current => Current;
 
 				public void Dispose()
 				{
