@@ -34,7 +34,7 @@ namespace Tangerine.UI.Timeline.Components
 			for (int i = 0; i < maxCol; i++) {
 				keyStrips[i] = BitSet32.Empty;
 			}
-			foreach (var a in node.Animators.AsArray) {
+			foreach (var a in node.Animators) {
 				for (int j = 0; j < a.ReadonlyKeys.Count; j++) {
 					var key = a.ReadonlyKeys[j];
 					var colorIndex = PropertyAttributes<TangerineKeyframeColorAttribute>.Get(node.GetType(), a.TargetProperty)?.ColorIndex ?? 0;
