@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Yuzu;
 
 namespace Lime
@@ -25,6 +26,8 @@ namespace Lime
 
 		void Apply(double time);
 
+		void ResetCache();
+
 		IKeyframeList ReadonlyKeys { get; }
 
 		IKeyframeList Keys { get; }
@@ -32,6 +35,17 @@ namespace Lime
 		object UserData { get; set; }
 
 		Type GetValueType();
+	}
+
+	public interface IKeyframeList : IList<IKeyframe>
+	{
+		IKeyframe CreateKeyframe();
+
+		void Add(int frame, object value, KeyFunction function = KeyFunction.Linear);
+		void AddOrdered(int frame, object value, KeyFunction function = KeyFunction.Linear);
+		void AddOrdered(IKeyframe keyframe);
+
+		int Version { get; }
 	}
 
 	public class Animator<T> : IAnimator
@@ -45,7 +59,6 @@ namespace Lime
 		protected T Value1, Value2, Value3, Value4;
 
 		public bool IsTriggerable { get; set; }
-
 		public bool Enabled { get; set; } = true;
 
 		[YuzuMember]
@@ -54,7 +67,7 @@ namespace Lime
 		public Type GetValueType() { return typeof(T); }
 
 		[YuzuMember]
-		public KeyframeList<T> ReadonlyKeys { get; private set; }
+		public TypedKeyframeList<T> ReadonlyKeys { get; private set; }
 
 		[YuzuMember]
 		public string AnimationId { get; set; }
@@ -63,7 +76,7 @@ namespace Lime
 
 		public Animator()
 		{
-			ReadonlyKeys = new KeyframeList<T>();
+			ReadonlyKeys = new TypedKeyframeList<T>();
 			ReadonlyKeys.AddRef();
 		}
 
@@ -72,9 +85,10 @@ namespace Lime
 			ReadonlyKeys.Release();
 		}
 
-		public KeyframeList<T> Keys
+		public TypedKeyframeList<T> Keys
 		{
-			get {
+			get
+			{
 				if (ReadonlyKeys.RefCount > 1) {
 					ReadonlyKeys.Release();
 					ReadonlyKeys = ReadonlyKeys.Clone();
@@ -84,33 +98,37 @@ namespace Lime
 			}
 		}
 
-		IKeyframeList proxyKeys;
-		IKeyframeList IAnimator.Keys {
-			get {
+		IKeyframeList boxedKeys;
+		IKeyframeList IAnimator.Keys
+		{
+			get
+			{
 				if (ReadonlyKeys.RefCount > 1) {
-					proxyKeys = null;
+					boxedKeys = null;
 				}
-				if (proxyKeys == null) {
-					proxyKeys = new KeyframeListProxy<T>(Keys);
+				if (boxedKeys == null) {
+					boxedKeys = new BoxedKeyframeList<T>(Keys);
 				}
-				return proxyKeys;
+				return boxedKeys;
 			}
 		}
 
-		IKeyframeList IAnimator.ReadonlyKeys {
-			get {
-				if (proxyKeys == null) {
-					proxyKeys = new KeyframeListProxy<T>(ReadonlyKeys);
+		IKeyframeList IAnimator.ReadonlyKeys
+		{
+			get
+			{
+				if (boxedKeys == null) {
+					boxedKeys = new BoxedKeyframeList<T>(ReadonlyKeys);
 				}
-				return proxyKeys;
+				return boxedKeys;
 			}
 		}
 
 		public IAnimator Clone()
 		{
 			var clone = (Animator<T>)MemberwiseClone();
-			clone.proxyKeys = null;
-			proxyKeys = null;
+			clone.boxedKeys = null;
+			boxedKeys = null;
 			ReadonlyKeys.AddRef();
 			return clone;
 		}
@@ -121,7 +139,7 @@ namespace Lime
 
 		public void Bind(IAnimable owner)
 		{
-			this.Owner = owner;
+			Owner = owner;
 			var p = AnimationUtils.GetProperty(owner.GetType(), TargetProperty);
 			IsTriggerable = p.Triggerable;
 			var mi = p.Info.GetSetMethod();
@@ -179,6 +197,9 @@ namespace Lime
 			int minFrame, maxFrame;
 			int count = ReadonlyKeys.Count;
 			var i = keyIndex;
+			if (i >= count) {
+				i = count - 1;
+			}
 			// find rightmost key on the left from the given frame
 			while (i < count - 1 && frame > ReadonlyKeys[i].Frame) {
 				i++;
@@ -218,13 +239,7 @@ namespace Lime
 			maxTime = maxFrame * AnimationUtils.SecondsPerFrame;
 		}
 
-		public int Duration {
-			get {
-				if (ReadonlyKeys.Count == 0)
-					return 0;
-				return ReadonlyKeys[ReadonlyKeys.Count - 1].Frame;
-			}
-		}
+		public int Duration => (ReadonlyKeys.Count == 0) ? 0 : ReadonlyKeys[ReadonlyKeys.Count - 1].Frame;
 	}
 
 	public class Vector2Animator : Animator<Vector2>
