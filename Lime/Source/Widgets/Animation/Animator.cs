@@ -6,7 +6,8 @@ namespace Lime
 {
 	public interface IAnimator : IDisposable
 	{
-		IAnimable Owner { get; }
+		IAnimable Owner { get; set; }
+		IAnimator Next { get; set; }
 
 		void Bind(IAnimable owner);
 
@@ -50,7 +51,8 @@ namespace Lime
 
 	public class Animator<T> : IAnimator
 	{
-		public IAnimable Owner { get; private set; }
+		public IAnimable Owner { get; set; }
+		public IAnimator Next { get; set; }
 
 		private double minTime;
 		private double maxTime;
