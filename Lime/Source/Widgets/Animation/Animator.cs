@@ -175,6 +175,11 @@ namespace Lime
 			}
 		}
 
+		public void ResetCache()
+		{
+			minTime = maxTime = 0;
+		}
+
 		public T CalcValue(double time)
 		{
 			if (time < minTime || time >= maxTime) {
