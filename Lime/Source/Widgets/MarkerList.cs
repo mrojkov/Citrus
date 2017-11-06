@@ -83,6 +83,16 @@ namespace Lime
 			return marker;
 		}
 
+		public int FindIndex(Predicate<Marker> match)
+		{
+			return markers.FindIndex(match);
+		}
+
+		public bool Exists(Predicate<Marker> match)
+		{
+			return markers.Exists(match);
+		}
+
 		public Marker GetByFrame(int frame)
 		{
 			foreach (var marker in this) {
@@ -95,9 +105,6 @@ namespace Lime
 
 		public void Add(Marker marker)
 		{
-			if (Count != 0 && marker.Frame <= this[Count - 1].Frame) {
-				throw new InvalidOperationException();
-			}
 			markers.Add(marker);
 			owner.NextMarkerOrTriggerTime = null;
 		}
