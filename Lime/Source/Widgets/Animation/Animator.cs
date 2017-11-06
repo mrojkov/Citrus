@@ -174,7 +174,7 @@ namespace Lime
 
 		public void Apply(double time)
 		{
-			if (Enabled && ReadonlyKeys.Count > 0) {
+			if (Enabled) {
 				Setter(CalcValue(time));
 			}
 		}
@@ -202,13 +202,19 @@ namespace Lime
 
 		private void CacheInterpolationParameters(double time)
 		{
-			int frame = AnimationUtils.SecondsToFrames(time);
-			int minFrame, maxFrame;
 			int count = ReadonlyKeys.Count;
+			if (count == 0) {
+				Value2 = default(T);
+				minTime = -float.MaxValue;
+				maxTime = float.MaxValue;
+				function = KeyFunction.Steep;
+				return;
+			}
 			var i = keyIndex;
 			if (i >= count) {
 				i = count - 1;
 			}
+			int frame = AnimationUtils.SecondsToFrames(time);
 			// find rightmost key on the left from the given frame
 			while (i < count - 1 && frame > ReadonlyKeys[i].Frame) {
 				i++;
@@ -217,6 +223,7 @@ namespace Lime
 				i--;
 			}
 			keyIndex = i;
+			int minFrame, maxFrame;
 			if (i < 0) {
 				keyIndex = 0;
 				maxFrame = ReadonlyKeys[0].Frame;
