@@ -79,7 +79,6 @@
     <Compile Include="Source\Widgets\Animation\Animator.cs" />
     <Compile Include="Source\Widgets\Animation\AnimatorRegistry.cs" />
     <Compile Include="Source\Widgets\Animation\Keyframe.cs" />
-    <Compile Include="Source\Widgets\Animation\KeyframeCollection.cs" />
     <Compile Include="Source\Version.cs" />
     <Compile Include="Source\Application\Debug.cs" />
     <Compile Include="Source\Input\Key.cs" />
@@ -144,7 +143,6 @@
     <Compile Include="Source\Types\Quaternion.cs" />
     <Compile Include="Source\Types\Ray.cs" />
     <Compile Include="Source\Widgets\Animation\Animation.cs" />
-    <Compile Include="Source\Widgets\Animation\AnimationList.cs" />
     <Compile Include="Source\Application\Clipboard\Clipboard.Android.cs" />
     <Compile Include="Source\Application\Clipboard\Clipboard.Mac.cs" />
     <Compile Include="Source\Application\Clipboard\Clipboard.Win.cs" />
@@ -320,7 +318,10 @@
     <Compile Include="Source\Widgets\Gestures\Gesture.cs" />
     <Compile Include="Source\Widgets\Gestures\GestureManager.cs" />
     <Compile Include="Source\Widgets\MarkerList.cs" />
-    <Compile Include="Source\Widgets\Animation\AnimatorList.cs" />
+    <Compile Include="Source\Widgets\Animation\AnimatorCollection.cs" />
+    <Compile Include="Source\Widgets\Animation\AnimationCollection.cs" />
+    <Compile Include="Source\Widgets\Animation\TypedKeyframeList.cs" />
+    <Compile Include="Source\Widgets\Animation\BoxedKeyframeList.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

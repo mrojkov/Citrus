@@ -110,7 +110,7 @@ namespace Lime
 			var clone = (Animation)MemberwiseClone();
 			clone.Owner = null;
 			clone.Next = null;
-			clone.Markers = MarkerCollection.DeepClone(Markers, clone);
+			clone.Markers = MarkerList.DeepClone(Markers, clone);
 			return clone;
 		}
 

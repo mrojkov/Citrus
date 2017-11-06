@@ -13,7 +13,7 @@ namespace Lime
 {
 	public interface IAnimable
 	{
-		AnimatorList Animators { get; }
+		AnimatorCollection Animators { get; }
 		void OnTrigger(string property, double animationTimeCorrection = 0);
 	}
 
@@ -324,7 +324,7 @@ namespace Lime
 		/// Collections of Animators.
 		/// </summary>
 		[YuzuMember]
-		public AnimatorList Animators { get; private set; }
+		public AnimatorCollection Animators { get; private set; }
 
 		/// <summary>
 		/// Child nodes.
@@ -576,7 +576,7 @@ namespace Lime
 			clone.gestures = null;
 			clone.AsWidget = clone as Widget;
 			clone.Animations = Animations.Clone(clone);
-			clone.Animators = AnimatorList.SharedClone(clone, Animators);
+			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
 			clone.Nodes = Nodes.Clone(clone);
 			clone.Components = Components.Clone(clone);
 			clone.IsAwake = false;
