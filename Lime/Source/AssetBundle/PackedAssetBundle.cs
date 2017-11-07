@@ -284,6 +284,7 @@ namespace Lime
 			if (writer != null) {
 				CleanupBundle();
 				WriteIndexTable();
+				RefreshBundleCheckSum(Path);
 				writer.Close();
 			}
 			if (reader != null)
