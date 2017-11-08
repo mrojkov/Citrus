@@ -245,6 +245,9 @@ namespace Orange
 				particleModifierScaleAnimator = animator as NumericAnimator;
 				break;
 			}
+			if (animator.ReadonlyKeys.Count == 0) {
+				node.Animators.Remove(animator);
+			}
 		}
 
 		private void TryMergeScaleAndAspectRatioForParticleTemplate(Node node)

@@ -318,6 +318,11 @@ namespace Tangerine.Core
 				if (n.Folders != null && n.Folders.Count == 0) {
 					n.Folders = null;
 				}
+				foreach (var a in n.Animators.ToList()) {
+					if (a.ReadonlyKeys.Count == 0) {
+						n.Animators.Remove(a);
+					}
+				}
 				if (!string.IsNullOrEmpty(n.ContentsPath)) {
 					n.Nodes.Clear();
 					n.Markers.Clear();
