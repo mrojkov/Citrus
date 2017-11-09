@@ -12,62 +12,57 @@ In first case cooking rules are applied to all files and directories in current 
 In second case cooking rules are only applied to specified asset file.
 Cooking rules only override concrete rule lines specified.
 
-Second way doesn't work for `.txt` files. Gummy Drop has workaround for this, ask Buzer for details.
-
 ### Format
 
 grammar:
 
 ```
-cooking_rules_file: one of
-    target_line
-    rule_line
+rule_list: one of
+    rule '\n' rule_list
+    rule
 
-target_line: '[' <target_name> ']' '\n'
+rule: rule_name ['(' target_name ')'] ' ' rule_value '\n'
 
-rule_line: one of
-    rule_id ' ' <rule_value>
-    rule_id '(' platform_name ')' ' ' <rule_value> '\n'
-
-platform_name: one of
+target_name: one of
     'Win'
     'Mac'
     'iOS'
     'Android'
     'Unity'
+    <user_defined_in_citproj_file>
 
-rule_id: one of
+rule_name: one of
     'TextureAtlas'
     'MipMaps'
     'HighQualityCompression'
     'PVRFormat'
     'DDSFormat'
-    'Bundle'
+    'Bundles'
     'Ignore'
     'ADPCMLimit'
     'TextureScaleFactor'
     'AtlasOptimization'
     'AtlasPacker'
-    'ModelCompressing'
+    'ModelCompression'
+    'CustomRule'
+    'WrapMode'
+    'MinFilter'
+    'MagFilter'
 ```
 
 e.g.:
 ```
-[Target1]
-Rule1(Platform1) Value
-Rule2(Platform2) Value
-Rule2(Platform1) Value
+Rule1(Target1) Value
+Rule2(Target1) Value
+Rule2(Target1) Value
 Rule3 Value
 ...
-[Target2]
-Rule1(Platform1) Value
+Rule1(Target2) Value
 Rule10 Value
 ...
 ```
 
-Targets are listed in `.citproj` project file. Only current target's rules are being used. Targets act as sections in cooking rules file.
-
-Rules can be optionally marked with platform identifier to specify to which platform the rule applies to.
+There's a list of default targets, which are Win, Mac, iOS, Android and Unity. Other targets are listed in `.citproj` project file.
 
 ### Rules
 
@@ -75,14 +70,18 @@ Rules can be optionally marked with platform identifier to specify to which plat
 'MipMaps'
 'HighQualityCompression'
 'PVRFormat'
-''
-'Bundle'
+'DDSFormat'
+'Bundles'
 'Ignore'
 'ADPCMLimit'
 'TextureScaleFactor'
 'AtlasOptimization'
 'AtlasPacker'
-'ModelCompressing'
+'ModelCompression'
+'CustomRule'
+'WrapMode'
+'MinFilter'
+'MagFilter'
 
 | rule                     | values              | description  |
 | ------------------------ | ------------------- | ------------ |
@@ -97,18 +96,25 @@ Rules can be optionally marked with platform identifier to specify to which plat
 |                          | `RGBA8`             | |
 | `AtlasOptimization`      | `Memory`            | Default; best pack rate heuristics |
 |                          | `DrawCalls`         | try to fit as many items to atlas as possible |
-| `ModelCompressing`       | `Deflate`           | |
+| `ModelCompression`       | `Deflate`           | |
 |                          | `LZMA`              | |
 | `TextureAtlas`           | `None`              | |
-|                          | `${DirectoryName}`  | |
-|                          | custom value        | |
-| `MipMaps`                | `Yes` or `No`       | doesn't seem to work at all |
+|                          | `${DirectoryName}`  | atlas name will be the same as directory name |
+|                          | <atlas_name>        | user defined atlas |
+| `MipMaps`                | `Yes` or `No`       | doesn't work |
 | `HighQualityCompression` | `Yes` or `No`       | |
-| `Bundle`                 | `<default>`, `data` | main bundle |
-|                          | custom value        | |
+| `Bundles`                | `<default>`, `data` | main bundle |
+|                          | <bundle_name>       | user defined bundle name; it's possible to specify multiple bundles; it's possible to include directory name e.g. `Bundles/Restaurant` |
 | `Ignore`                 | `Yes`, `No`         | if set to `Yes` applicable assets won't make it to bundle |
 | `ADPCMLimit`             | int                 | |
 | `TextureScaleFactor`     | float               | designed to be texture size multiplier. however if it's not 1.0f texture size multiplied by 0.75 with a mix of some logic. see code for detail. |
 | `AtlasPacker`            | string              | custom packer defined via plugin |
-
+| `CustomRule`             | string              | any string
+| `WrapMode`               | `Clamp`             | texture wrap mode, default is `Clamp`
+|                          | `Repeat`            |
+|                          | `MirroredRepeat`    |
+| `MinFilter`              | `Linear`            | texture min filter, default is `Linear`
+|                          | `Nearest`           |
+| `MagFilter`              | `Linear`            | texture mag filter, default is `Linear`
+|                          | `Nearest`           |
 
