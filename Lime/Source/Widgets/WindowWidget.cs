@@ -104,6 +104,11 @@ namespace Lime
 
 		private Node LookForNodeUnderMouse(RenderChain renderChain)
 		{
+#if iOS || ANDROID
+			if (!Window.Input.IsTouching(0) && !Window.Input.WasTouchEnded(0)) {
+				return null;
+			}
+#endif
 			var hitTestArgs = new HitTestArgs(Window.Input.MousePosition);
 			renderChain.HitTest(ref hitTestArgs);
 			var n = hitTestArgs.Node;
