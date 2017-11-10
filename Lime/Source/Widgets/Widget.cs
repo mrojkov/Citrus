@@ -61,6 +61,7 @@ namespace Lime
 		private float rotation;
 		private Vector2 direction;
 		private Color4 color;
+		private bool visible;
 		private Blending blending;
 		private ShaderId shader;
 		private Vector2 pivot;
@@ -69,12 +70,12 @@ namespace Lime
 		private Vector2 maxSize = Vector2.PositiveInfinity;
 		private Vector2 measuredMinSize;
 		private Vector2 measuredMaxSize = Vector2.PositiveInfinity;
-		private bool visible;
 		private WidgetInput input;
 		private TaskList tasks;
 		private TaskList lateTasks;
 
 		protected Matrix32 localToWorldTransform;
+		protected Rectangle globalBoundingRect;
 		protected Color4 globalColor;
 		protected Blending globalBlending;
 		protected ShaderId globalShader;
@@ -566,6 +567,7 @@ namespace Lime
 		{
 			get
 			{
+				//return visible && (color.ABGR & 0xFF000000) != 0;
 				if ((DirtyMask & (DirtyFlags.Visible | DirtyFlags.Color | DirtyFlags.TangerineFlags)) == 0) {
 					return globallyVisible;
 				}
@@ -573,6 +575,15 @@ namespace Lime
 				return globallyVisible;
 			}
 		}
+
+		/// <summary>
+		/// Gets the axis-aligned bounding rectangle based on LocalToWorldTransform.
+		/// </summary>
+		public Rectangle GlobalBoundingRect
+		{
+			get { RecalcDirtyGlobals(); return globalBoundingRect; }
+		}
+
 #endregion
 
 		/// <summary>
@@ -825,6 +836,14 @@ namespace Lime
 			}
 		}
 
+		public bool ClipRegionTest(Rectangle clipRegion)
+		{
+			RecalcDirtyGlobals();
+			return
+				globalBoundingRect.B.X >= clipRegion.A.X && globalBoundingRect.B.Y >= clipRegion.A.Y &&
+				globalBoundingRect.A.X <= clipRegion.B.X && globalBoundingRect.A.Y <= clipRegion.B.Y;
+		}
+
 		/// <summary>
 		/// TODO: Add summary
 		/// </summary>
@@ -838,8 +857,8 @@ namespace Lime
 			}
 			if (IsRenderedToTexture()) {
 				localToWorldTransform = CalcLocalToParentTransform();
-				if (Parent?.AsWidget != null) {
-					localToWorldTransform *= Parent.AsWidget.localToWorldTransform;
+				if (parentWidget != null) {
+					localToWorldTransform *= parentWidget.localToWorldTransform;
 				}
 				globalColor = color;
 				globalBlending = Blending.Inherited;
@@ -877,7 +896,39 @@ namespace Lime
 				if (parentWidget != null) {
 					localToWorldTransform *= parentWidget.localToWorldTransform;
 				}
+				RefreshGlobalBoundingRect();
 			}
+		}
+
+		private void RefreshGlobalBoundingRect()
+		{
+			var u = localToWorldTransform.U * size.X;
+			var v = localToWorldTransform.V * size.Y;
+			var w = u + v;
+
+			var a = new Vector2();
+			var b = new Vector2();
+
+			if (u.X < a.X) a.X = u.X;
+			if (u.X > b.X) b.X = u.X;
+
+			if (u.Y < a.Y) a.Y = u.Y;
+			if (u.Y > b.Y) b.Y = u.Y;
+
+			if (v.X < a.X) a.X = v.X;
+			if (v.X > b.X) b.X = v.X;
+
+			if (v.Y < a.Y) a.Y = v.Y;
+			if (v.Y > b.Y) b.Y = v.Y;
+
+			if (w.X < a.X) a.X = w.X;
+			if (w.X > b.X) b.X = w.X;
+
+			if (w.Y < a.Y) a.Y = w.Y;
+			if (w.Y > b.Y) b.Y = w.Y;
+
+			globalBoundingRect.A = a + localToWorldTransform.T;
+			globalBoundingRect.B = b + localToWorldTransform.T;
 		}
 
 		/// <summary>

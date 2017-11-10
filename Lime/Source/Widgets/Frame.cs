@@ -69,6 +69,7 @@ namespace Lime
 		{
 			if (renderTexture != null) {
 				EnsureRenderChain();
+				renderChain.ClipRegion = new Rectangle(0, 0, Width, Height);
 				RenderToTexture(renderTexture, renderChain);
 				if (GetTangerineFlag(TangerineFlags.DisplayContent)) {
 					RenderWithScissorTest();
@@ -94,6 +95,7 @@ namespace Lime
 			Renderer.ScissorRectangle = rect;
 			try {
 				EnsureRenderChain();
+				renderChain.ClipRegion = GlobalBoundingRect;
 				foreach (var node in Nodes) {
 					node.RenderChainBuilder?.AddToRenderChain(node, renderChain);
 				}
@@ -134,9 +136,7 @@ namespace Lime
 
 		private void EnsureRenderChain()
 		{
-			if (renderChain == null) {
-				renderChain = new RenderChain();
-			}
+			renderChain = renderChain ?? new RenderChain();
 		}
 
 		private bool IntersectRectangles(WindowRect a, WindowRect b, out WindowRect r)

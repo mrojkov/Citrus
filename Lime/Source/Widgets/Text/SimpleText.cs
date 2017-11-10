@@ -208,6 +208,13 @@ namespace Lime
 			SpriteListElementHandler = ShaderPrograms.ColorfulTextShaderProgram.HandleSimpleTextSprite;
 		}
 
+		internal protected override void AddToRenderChain(RenderChain chain)
+		{
+			if (GloballyVisible && ClipRegionTest(chain.ClipRegion)) {
+				AddChildrenToRenderChain(chain);
+			}
+		}
+
 		void IText.Submit()
 		{
 			if (Submitted != null) {

@@ -164,6 +164,13 @@ namespace Lime
 			return dirty;
 		}
 
+		internal protected override void AddToRenderChain(RenderChain chain)
+		{
+			if (GloballyVisible && ClipRegionTest(chain.ClipRegion)) {
+				AddChildrenToRenderChain(chain);
+			}
+		}
+
 		public override void Render()
 		{
 			EnsureSpriteList();

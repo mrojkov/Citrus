@@ -69,6 +69,7 @@ namespace Lime
 
 			// Rebuild the render chain.
 			renderChain.Clear();
+			renderChain.ClipRegion = new Rectangle(Vector2.Zero, Size);
 			RenderChainBuilder?.AddToRenderChain(this, renderChain);
 
 			ManageFocusOnWindowActivation();

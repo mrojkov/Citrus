@@ -26,6 +26,7 @@ namespace Lime
 		public const int LayerCount = 100;
 		public int CurrentLayer;
 		public readonly List<Item>[] Layers = new List<Item>[LayerCount];
+		public Rectangle ClipRegion = new Rectangle(-float.MaxValue, -float.MaxValue, float.MaxValue, float.MaxValue);
 
 		public void Add(Node node, IPresenter presenter)
 		{
