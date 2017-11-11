@@ -24,29 +24,10 @@ namespace Lime
 		Center = CenterH | CenterV,
 	}
 
-	/// <summary>
-	/// TODO: Translate
-	/// Способы проверки столкновений
-	/// </summary>
 	public enum HitTestMethod
 	{
-		/// <summary>
-		/// TODO: Translate
-		/// Ограничивающий прямоугольник. Проверка без рекурсии. Грубо, но быстро
-		/// </summary>
 		BoundingRect,
-
-		/// <summary>
-		/// TODO: Translate
-		/// Содержимое. Проверка с рекурсией. Проверка всех вложенных контейнеров.
-		/// Картинки проверяются по маске. Точно, но медленно
-		/// </summary>
 		Contents,
-
-		/// <summary>
-		/// TODO: Translate
-		/// Пропуск проверки столкновений
-		/// </summary>
 		Skip
 	}
 
