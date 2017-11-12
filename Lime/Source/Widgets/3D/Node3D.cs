@@ -87,7 +87,7 @@ namespace Lime
 		{
 			get
 			{
-				if (Undirty(DirtyFlags.Transform)) {
+				if (CleanDirtyFlags(DirtyFlags.Transform)) {
 					RecalcGlobalTransform();
 				}
 				return globalTransform;
@@ -107,7 +107,7 @@ namespace Lime
 		{
 			get
 			{
-				if (Undirty(DirtyFlags.Visible)) {
+				if (CleanDirtyFlags(DirtyFlags.Visible)) {
 					RecalcGloballyVisible();
 				}
 				return globallyVisible;
@@ -134,7 +134,7 @@ namespace Lime
 		{
 			get
 			{
-				if (Undirty(DirtyFlags.Color)) {
+				if (CleanDirtyFlags(DirtyFlags.Color)) {
 					RecalcGlobalColor();
 				}
 				return globalColor;

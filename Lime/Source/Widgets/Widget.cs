@@ -72,7 +72,7 @@ namespace Lime
 		{
 			get
 			{
-				if (Undirty(DirtyFlags.LayoutManager)) {
+				if (CleanDirtyFlags(DirtyFlags.LayoutManager)) {
 					if (ParentWidget != null) {
 						layoutManager = ParentWidget.LayoutManager;
 					}
@@ -521,7 +521,7 @@ namespace Lime
 		{
 			get
 			{
-				if (Undirty(DirtyFlags.Transform)) {
+				if (CleanDirtyFlags(DirtyFlags.Transform)) {
 					RecalcGlobalTransformAndBoundingRect();
 				}
 				return localToWorldTransform;
@@ -565,7 +565,7 @@ namespace Lime
 		{
 			get
 			{
-				if (Undirty(DirtyFlags.Color)) {
+				if (CleanDirtyFlags(DirtyFlags.Color)) {
 					RecalcGlobalColor();
 				}
 				return globalColor;
@@ -591,7 +591,7 @@ namespace Lime
 		{
 			get
 			{
-				if (Undirty(DirtyFlags.Blending)) {
+				if (CleanDirtyFlags(DirtyFlags.Blending)) {
 					RecalcGlobalBlending();
 				}
 				return globalBlending;
@@ -616,7 +616,7 @@ namespace Lime
 		{
 			get
 			{
-				if (Undirty(DirtyFlags.Shader)) {
+				if (CleanDirtyFlags(DirtyFlags.Shader)) {
 					RecalcGlobalShader();
 				}
 				return globalShader;
@@ -673,7 +673,7 @@ namespace Lime
 		{
 			get
 			{
-				if (Undirty(DirtyFlags.Transform)) {
+				if (CleanDirtyFlags(DirtyFlags.Transform)) {
 					RecalcGlobalTransformAndBoundingRect();
 				}
 				return globalBoundingRect;
@@ -928,7 +928,7 @@ namespace Lime
 
 		public bool ClipRegionTest(Rectangle clipRegion)
 		{
-			if (Undirty(DirtyFlags.Transform)) {
+			if (CleanDirtyFlags(DirtyFlags.Transform)) {
 				RecalcGlobalTransformAndBoundingRect();
 			}
 			return

@@ -101,7 +101,7 @@ namespace Lime
 		{
 			get
 			{
-				if (Undirty(DirtyFlags.Transform)) {
+				if (CleanDirtyFlags(DirtyFlags.Transform)) {
 					RecalcGlobalTransform();
 				}
 				return view;

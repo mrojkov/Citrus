@@ -435,7 +435,7 @@ namespace Lime
 		protected bool IsDirty(DirtyFlags mask) { return (DirtyMask & mask) != 0; }
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		protected bool Undirty(DirtyFlags mask)
+		protected bool CleanDirtyFlags(DirtyFlags mask)
 		{
 			if ((DirtyMask & mask) != 0) {
 				DirtyMask &= ~mask;
