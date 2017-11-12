@@ -117,7 +117,7 @@ namespace Lime
 					}
 					EnsureRenderChain();
 					try {
-						foreach (var node in Nodes) {
+						for (var node = FirstChild; node != null; node = node.NextSibling) {
 							node.RenderChainBuilder?.AddToRenderChain(node, renderChain);
 						}
 						if (renderChain.HitTest(ref args)) {
