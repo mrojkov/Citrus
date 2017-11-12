@@ -681,7 +681,7 @@ namespace Lime
 		/// </summary>
 		internal protected abstract void AddToRenderChain(RenderChain chain);
 
-		protected void AddChildrenToRenderChain(RenderChain chain)
+		protected void AddSelfAndChildrenToRenderChain(RenderChain chain)
 		{
 			var savedLayer = chain.CurrentLayer;
 			if (Layer != 0) {

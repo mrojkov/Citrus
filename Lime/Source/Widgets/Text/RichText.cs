@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Lime.Text;
 using Yuzu;
 
@@ -167,7 +167,7 @@ namespace Lime
 		internal protected override void AddToRenderChain(RenderChain chain)
 		{
 			if (GloballyVisible && ClipRegionTest(chain.ClipRegion)) {
-				AddChildrenToRenderChain(chain);
+				AddSelfAndChildrenToRenderChain(chain);
 			}
 		}
 

@@ -244,7 +244,7 @@ namespace Lime
 		internal protected override void AddToRenderChain(RenderChain chain)
 		{
 			if (GloballyVisible) {
-				AddChildrenToRenderChain(chain);
+				AddSelfAndChildrenToRenderChain(chain);
 			}
 		}
 
