@@ -171,8 +171,9 @@ namespace Lime
 			State = NormalState;
 		}
 
-		protected override void SelfUpdate(float delta)
+		public override void Update(float delta)
 		{
+			base.Update(delta);
 			if (GloballyVisible) {
 				stateMachine.Advance();
 				textPresentersFeeder.Update();

@@ -882,7 +882,6 @@ namespace Lime
 				Updating?.Invoke(delta);
 				if (GloballyVisible) {
 					AdvanceAnimation(delta);
-					SelfUpdate(delta);
 #if PROFILE
 					watch.Stop();
 #endif
@@ -894,7 +893,6 @@ namespace Lime
 #if PROFILE
 					watch.Start();
 #endif
-					SelfLateUpdate(delta);
 				}
 				Updated?.Invoke(delta);
 #if PROFILE

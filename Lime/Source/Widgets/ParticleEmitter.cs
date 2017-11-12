@@ -530,8 +530,9 @@ namespace Lime
 			}
 		}
 
-		protected override void SelfLateUpdate(float delta)
+		public override void Update(float delta)
 		{
+			base.Update(delta);
 			if (firstUpdate) {
 				firstUpdate = false;
 				const float ModellingStep = 0.04f;

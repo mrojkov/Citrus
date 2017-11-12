@@ -632,38 +632,18 @@ namespace Lime
 		/// <param name="delta">Time delta since last Update.</param>
 		public virtual void Update(float delta)
 		{
-#if PROFILE
-			var watch = System.Diagnostics.Stopwatch.StartNew();
-#endif
 			if (!IsAwake) {
 				RaiseAwake();
 			}
 			if (delta > Application.MaxDelta) {
-#if PROFILE
-				watch.Stop();
-				NodeProfiler.RegisterUpdate(this, watch.ElapsedTicks);
-#endif
 				SafeUpdate(delta);
 			} else {
 				AdvanceAnimation(delta);
-				SelfUpdate(delta);
-#if PROFILE
-				watch.Stop();
-#endif
 				for (var node = FirstChild; node != null;) {
 					var next = node.NextSibling;
 					node.Update(node.AnimationSpeed * delta);
 					node = next;
 				}
-#if PROFILE
-				watch.Start();
-#endif
-				SelfLateUpdate(delta);
-
-#if PROFILE
-				watch.Stop();
-				NodeProfiler.RegisterUpdate(this, watch.ElapsedTicks);
-#endif
 			}
 		}
 
@@ -691,16 +671,6 @@ namespace Lime
 		/// Awake is called on the first node update, before changing node state.
 		/// </summary>
 		protected virtual void Awake() { }
-
-		/// <summary>
-		/// Called before updating child nodes.
-		/// </summary>
-		protected virtual void SelfUpdate(float delta) { }
-
-		/// <summary>
-		/// Called after updating child nodes.
-		/// </summary>
-		protected virtual void SelfLateUpdate(float delta) { }
 
 		public virtual void Render() { }
 

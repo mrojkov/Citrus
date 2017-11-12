@@ -134,8 +134,9 @@ namespace Lime
 		}
 
 
-		protected override void SelfLateUpdate(float delta)
+		public override void Update(float delta)
 		{
+			base.Update(delta);
 			if (Index > 0 && Parent != null) {
 				BoneArray.Entry e;
 				e.Joint = Position;
