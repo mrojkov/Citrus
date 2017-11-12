@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -66,7 +66,6 @@ namespace Lime
 
 		protected override void Awake()
 		{
-			base.Awake();
 			Tasks.Add(Loop());
 		}
 

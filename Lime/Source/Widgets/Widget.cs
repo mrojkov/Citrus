@@ -870,21 +870,15 @@ namespace Lime
 		/// </summary>
 		public override void Update(float delta)
 		{
-#if PROFILE
-			var watch = System.Diagnostics.Stopwatch.StartNew();
-#endif
 			if (!IsAwake) {
-				Awoken?.Invoke(this);
-				Awake();
-				IsAwake = true;
+				RaiseAwake();
 			}
 			if (delta > Application.MaxDelta) {
-#if PROFILE
-				watch.Stop();
-				NodeProfiler.RegisterUpdate(this, watch.ElapsedTicks);
-#endif
 				SafeUpdate(delta);
 			} else {
+#if PROFILE
+				var watch = System.Diagnostics.Stopwatch.StartNew();
+#endif
 				Updating?.Invoke(delta);
 				if (GloballyVisible) {
 					AdvanceAnimation(delta);

@@ -636,9 +636,7 @@ namespace Lime
 			var watch = System.Diagnostics.Stopwatch.StartNew();
 #endif
 			if (!IsAwake) {
-				Awoken?.Invoke(this);
-				Awake();
-				IsAwake = true;
+				RaiseAwake();
 			}
 			if (delta > Application.MaxDelta) {
 #if PROFILE
@@ -679,15 +677,20 @@ namespace Lime
 			} while (remainDelta > 0f);
 		}
 
-		/// <summary>
-		/// Awake is called on the first node update, before changing node state.
-		/// </summary>
-		protected virtual void Awake()
+		protected void RaiseAwake()
 		{
+			IsAwake = true;
 			foreach (var c in Components) {
 				c.Awake();
 			}
+			Awake();
+			Awoken?.Invoke(this);
 		}
+
+		/// <summary>
+		/// Awake is called on the first node update, before changing node state.
+		/// </summary>
+		protected virtual void Awake() { }
 
 		/// <summary>
 		/// Called before updating child nodes.

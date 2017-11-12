@@ -165,7 +165,6 @@ namespace Lime
 
 		protected override void Awake()
 		{
-			base.Awake();
 			viewport = GetViewport();
 		}
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Lime
 {
@@ -57,7 +57,6 @@ namespace Lime
 		protected override void Awake()
 		{
 			TextWidget.Submitted += text => Submitted?.Invoke(text);
-			base.Awake();
 		}
 
 		protected void OnSubmit() => Submitted?.Invoke(Text);
