@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using Yuzu;
 
 namespace Lime
@@ -54,9 +55,8 @@ namespace Lime
 		private WidgetInput input;
 		private TaskList tasks;
 		private TaskList lateTasks;
-
-		protected Matrix32 localToWorldTransform;
-		protected Rectangle globalBoundingRect;
+		private Matrix32 localToWorldTransform;
+		private Rectangle globalBoundingRect;
 		protected Color4 globalColor;
 		protected Blending globalBlending;
 		protected ShaderId globalShader;
@@ -72,7 +72,11 @@ namespace Lime
 		{
 			get
 			{
-				RecalcDirtyGlobals();
+				if (Undirty(DirtyFlags.LayoutManager)) {
+					if (ParentWidget != null) {
+						layoutManager = ParentWidget.LayoutManager;
+					}
+				}
 				return layoutManager;
 			}
 			set
@@ -349,12 +353,12 @@ namespace Lime
 		public float ContentHeight => Size.Y - Padding.Top - Padding.Bottom;
 
 		/// <summary>
-		/// Absolute position of this widget.
+		/// Gets position of this widget in the root widget space.
 		/// </summary>
 		public Vector2 GlobalPosition => LocalToWorldTransform.T;
 
 		/// <summary>
-		/// Absolute position of center of this widget.
+		/// Gets position of this widget's center in the root widget space.
 		/// </summary>
 		public Vector2 GlobalCenter => LocalToWorldTransform * (Size / 2);
 
@@ -365,7 +369,7 @@ namespace Lime
 #endregion
 
 #region Misc properties
-		public Widget ParentWidget => Parent != null ? Parent.AsWidget : null;
+		public Widget ParentWidget => Parent?.AsWidget;
 		public TabTraversable TabTravesable { get; set; }
 		public KeyboardFocusScope FocusScope { get; set; }
 
@@ -378,10 +382,11 @@ namespace Lime
 		public Color4 Color
 		{
 			get { return color; }
-			set {
+			set
+			{
 				if (color.ABGR != value.ABGR) {
+					PropagateDirtyFlags((color.A == 0) != (value.A == 0) ? DirtyFlags.Color | DirtyFlags.Visible : DirtyFlags.Color);
 					color = value;
-					PropagateDirtyFlags(DirtyFlags.Color | DirtyFlags.Visible);
 				}
 			}
 		}
@@ -391,7 +396,7 @@ namespace Lime
 		/// </summary>
 		public float Opacity
 		{
-			get { return (float)color.A * (1 / 255f); }
+			get { return color.A * (1 / 255f); }
 			set
 			{
 				var a = (byte)(value * 255f);
@@ -414,7 +419,7 @@ namespace Lime
 			{
 				if (blending != value) {
 					blending = value;
-					PropagateDirtyFlags(DirtyFlags.Color);
+					PropagateDirtyFlags(DirtyFlags.Blending);
 				}
 			}
 		}
@@ -427,7 +432,7 @@ namespace Lime
 			{
 				if (shader != value) {
 					shader = value;
-					PropagateDirtyFlags(DirtyFlags.Color);
+					PropagateDirtyFlags(DirtyFlags.Shader);
 				}
 			}
 		}
@@ -510,50 +515,154 @@ namespace Lime
 		public bool HasInput() => input != null;
 
 		/// <summary>
-		/// TODO: Add summary
+		/// Get the matrix represents transformation from this widget space into the root widget space.
 		/// </summary>
 		public Matrix32 LocalToWorldTransform
 		{
-			get { RecalcDirtyGlobals(); return localToWorldTransform; }
+			get
+			{
+				if (Undirty(DirtyFlags.Transform)) {
+					RecalcGlobalTransformAndBoundingRect();
+				}
+				return localToWorldTransform;
+			}
+		}
+
+		private void RecalcGlobalTransformAndBoundingRect()
+		{
+			var parentWidget = Parent?.AsWidget;
+			if (parentWidget == null) {
+				localToWorldTransform = CalcLocalToParentTransform();
+			} else {
+				localToWorldTransform = CalcLocalToParentTransform() * parentWidget.LocalToWorldTransform;
+			}
+			// Recalc the global bounding rect.
+			var u = localToWorldTransform.U * size.X;
+			var v = localToWorldTransform.V * size.Y;
+			var w = u + v;
+			var a = new Vector2();
+			var b = new Vector2();
+			if (u.X < a.X) a.X = u.X;
+			if (u.X > b.X) b.X = u.X;
+			if (u.Y < a.Y) a.Y = u.Y;
+			if (u.Y > b.Y) b.Y = u.Y;
+			if (v.X < a.X) a.X = v.X;
+			if (v.X > b.X) b.X = v.X;
+			if (v.Y < a.Y) a.Y = v.Y;
+			if (v.Y > b.Y) b.Y = v.Y;
+			if (w.X < a.X) a.X = w.X;
+			if (w.X > b.X) b.X = w.X;
+			if (w.Y < a.Y) a.Y = w.Y;
+			if (w.Y > b.Y) b.Y = w.Y;
+			globalBoundingRect.A = a + localToWorldTransform.T;
+			globalBoundingRect.B = b + localToWorldTransform.T;
 		}
 
 		/// <summary>
-		/// TODO: Add summary
+		/// Gets the widget's effective color.
 		/// </summary>
 		public Color4 GlobalColor
 		{
-			get { RecalcDirtyGlobals(); return globalColor; }
+			get
+			{
+				if (Undirty(DirtyFlags.Color)) {
+					RecalcGlobalColor();
+				}
+				return globalColor;
+			}
+		}
+
+		private void RecalcGlobalColor()
+		{
+			globalColor = color;
+			if (!IsRenderedToTexture() && Parent != null) {
+				if (Parent.AsWidget != null) {
+					globalColor = color * Parent.AsWidget.GlobalColor;
+				} else if (Parent.AsNode3D != null) {
+					globalColor = color * Parent.AsNode3D.GlobalColor;
+				}
+			}
 		}
 
 		/// <summary>
-		/// TODO: Add summary
+		/// Gets the widget's effective blending.
 		/// </summary>
 		public Blending GlobalBlending
 		{
-			get { RecalcDirtyGlobals(); return globalBlending; }
+			get
+			{
+				if (Undirty(DirtyFlags.Blending)) {
+					RecalcGlobalBlending();
+				}
+				return globalBlending;
+			}
+		}
+
+		private void RecalcGlobalBlending()
+		{
+			if (IsRenderedToTexture()) {
+				globalBlending = Blending.Inherited;
+			} else if (Blending == Blending.Inherited && ParentWidget != null) {
+				globalBlending = ParentWidget.GlobalBlending;
+			} else {
+				globalBlending = Blending;
+			}
 		}
 
 		/// <summary>
-		/// TODO: Add summary
+		/// Gets the widget's effective shader.
 		/// </summary>
 		public ShaderId GlobalShader
 		{
-			get { RecalcDirtyGlobals(); return globalShader; }
+			get
+			{
+				if (Undirty(DirtyFlags.Shader)) {
+					RecalcGlobalShader();
+				}
+				return globalShader;
+			}
+		}
+
+		private void RecalcGlobalShader()
+		{
+			if (IsRenderedToTexture()) {
+				globalShader = ShaderId.Inherited;
+			} else if (Shader == ShaderId.Inherited && ParentWidget != null) {
+				globalShader = ParentWidget.GlobalShader;
+			} else {
+				globalShader = Shader;
+			}
 		}
 
 		/// <summary>
-		/// TODO: Add summary
+		/// Indicates whether the widget is actually visible.
 		/// </summary>
 		public bool GloballyVisible
 		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			get
 			{
-				//return visible && (color.ABGR & 0xFF000000) != 0;
-				if ((DirtyMask & (DirtyFlags.Visible | DirtyFlags.Color | DirtyFlags.TangerineFlags)) == 0) {
-					return globallyVisible;
+				if ((DirtyMask & DirtyFlags.Visible) != 0) {
+					DirtyMask &= ~DirtyFlags.Visible;
+					RecalcGloballyVisible();
 				}
-				RecalcDirtyGlobals();
 				return globallyVisible;
+			}
+		}
+
+		private void RecalcGloballyVisible()
+		{
+			globallyVisible = Visible && (color.A != 0 || RenderTransparentWidgets);
+			if (!IsRenderedToTexture() && Parent != null) {
+				if (Parent.AsWidget != null) {
+					globallyVisible &= Parent.AsWidget.GloballyVisible;
+				} else if (Parent.AsNode3D != null) {
+					globallyVisible &= Parent.AsNode3D.GloballyVisible;
+				}
+			}
+			if (Application.IsTangerine) {
+				globallyVisible |= GetTangerineFlag(TangerineFlags.Shown);
+				globallyVisible &= !GetTangerineFlag(TangerineFlags.Hidden | TangerineFlags.HiddenOnExposition);
 			}
 		}
 
@@ -562,7 +671,13 @@ namespace Lime
 		/// </summary>
 		public Rectangle GlobalBoundingRect
 		{
-			get { RecalcDirtyGlobals(); return globalBoundingRect; }
+			get
+			{
+				if (Undirty(DirtyFlags.Transform)) {
+					RecalcGlobalTransformAndBoundingRect();
+				}
+				return globalBoundingRect;
+			}
 		}
 
 #endregion
@@ -819,97 +934,12 @@ namespace Lime
 
 		public bool ClipRegionTest(Rectangle clipRegion)
 		{
-			RecalcDirtyGlobals();
+			if (Undirty(DirtyFlags.Transform)) {
+				RecalcGlobalTransformAndBoundingRect();
+			}
 			return
 				globalBoundingRect.B.X >= clipRegion.A.X && globalBoundingRect.B.Y >= clipRegion.A.Y &&
 				globalBoundingRect.A.X <= clipRegion.B.X && globalBoundingRect.A.Y <= clipRegion.B.Y;
-		}
-
-		/// <summary>
-		/// TODO: Add summary
-		/// </summary>
-		protected override void RecalcDirtyGlobalsUsingParents()
-		{
-			var parentWidget = Parent?.AsWidget;
-			if ((DirtyMask & DirtyFlags.LayoutManager) != 0) {
-				if (parentWidget != null) {
-					layoutManager = parentWidget.layoutManager;
-				}
-			}
-			if (IsRenderedToTexture()) {
-				localToWorldTransform = CalcLocalToParentTransform();
-				if (parentWidget != null) {
-					localToWorldTransform *= parentWidget.localToWorldTransform;
-				}
-				globalColor = color;
-				globalBlending = Blending.Inherited;
-				globalShader = ShaderId.Inherited;
-				globallyVisible = Visible && (color.A != 0 || RenderTransparentWidgets);
-				return;
-			}
-			var parentNode3D = Parent?.AsNode3D;
-			if ((DirtyMask & DirtyFlags.Color) != 0) {
-				globalColor = Color;
-				globalBlending = Blending;
-				globalShader = Shader;
-				if (parentWidget != null) {
-					globalColor *= parentWidget.globalColor;
-					globalBlending = Blending == Blending.Inherited ? parentWidget.globalBlending : Blending;
-					globalShader = Shader == ShaderId.Inherited ? parentWidget.globalShader : Shader;
-				} else if (parentNode3D != null) {
-					globalColor *= parentNode3D.GlobalColor;
-				}
-			}
-			if ((DirtyMask & (DirtyFlags.Visible | DirtyFlags.TangerineFlags)) != 0) {
-				globallyVisible = Visible && (color.A != 0 || RenderTransparentWidgets);
-				if (parentWidget != null) {
-					globallyVisible &= parentWidget.globallyVisible;
-				} else if (parentNode3D != null) {
-					globallyVisible &= parentNode3D.GloballyVisible;
-				}
-			}
-			if (Application.IsTangerine && ((DirtyMask & DirtyFlags.TangerineFlags) != 0)) {
-				globallyVisible |= GetTangerineFlag(TangerineFlags.Shown);
-				globallyVisible &= !GetTangerineFlag(TangerineFlags.Hidden | TangerineFlags.HiddenOnExposition);
-			}
-			if ((DirtyMask & DirtyFlags.Transform) != 0) {
-				localToWorldTransform = CalcLocalToParentTransform();
-				if (parentWidget != null) {
-					localToWorldTransform *= parentWidget.localToWorldTransform;
-				}
-				RefreshGlobalBoundingRect();
-			}
-		}
-
-		private void RefreshGlobalBoundingRect()
-		{
-			var u = localToWorldTransform.U * size.X;
-			var v = localToWorldTransform.V * size.Y;
-			var w = u + v;
-
-			var a = new Vector2();
-			var b = new Vector2();
-
-			if (u.X < a.X) a.X = u.X;
-			if (u.X > b.X) b.X = u.X;
-
-			if (u.Y < a.Y) a.Y = u.Y;
-			if (u.Y > b.Y) b.Y = u.Y;
-
-			if (v.X < a.X) a.X = v.X;
-			if (v.X > b.X) b.X = v.X;
-
-			if (v.Y < a.Y) a.Y = v.Y;
-			if (v.Y > b.Y) b.Y = v.Y;
-
-			if (w.X < a.X) a.X = w.X;
-			if (w.X > b.X) b.X = w.X;
-
-			if (w.Y < a.Y) a.Y = w.Y;
-			if (w.Y > b.Y) b.Y = w.Y;
-
-			globalBoundingRect.A = a + localToWorldTransform.T;
-			globalBoundingRect.B = b + localToWorldTransform.T;
 		}
 
 		/// <summary>

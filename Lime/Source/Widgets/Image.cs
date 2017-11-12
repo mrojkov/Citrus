@@ -57,7 +57,6 @@ namespace Lime
 		internal protected override void AddToRenderChain(RenderChain chain)
 		{
 			if (GloballyVisible && !skipRender) {
-				RecalcDirtyGlobals();
 				if (ClipRegionTest(chain.ClipRegion)) {
 					AddSelfToRenderChain(chain);
 				}

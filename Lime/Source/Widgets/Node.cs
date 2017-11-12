@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-
+using System.Runtime.CompilerServices;
 using Yuzu;
 
 namespace Lime
@@ -145,9 +145,10 @@ namespace Lime
 			None = 0,
 			Visible = 1 << 0,
 			Color = 1 << 1,
-			Transform = 1 << 2,
-			LayoutManager = 1 << 3,
-			TangerineFlags = 1 << 4,
+			Shader = 1 << 2,
+			Blending = 1 << 3,
+			Transform = 1 << 4,
+			LayoutManager = 1 << 5,
 			All = ~None
 		}
 
@@ -235,7 +236,7 @@ namespace Lime
 			{
 				if (tangerineFlags != value) {
 					tangerineFlags = value;
-					PropagateDirtyFlags(DirtyFlags.TangerineFlags);
+					PropagateDirtyFlags(DirtyFlags.Visible);
 				}
 			}
 		}
@@ -433,6 +434,16 @@ namespace Lime
 		/// </summary>
 		protected bool IsDirty(DirtyFlags mask) { return (DirtyMask & mask) != 0; }
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		protected bool Undirty(DirtyFlags mask)
+		{
+			if ((DirtyMask & mask) != 0) {
+				DirtyMask &= ~mask;
+				return true;
+			}
+			return false;
+		}
+
 		public bool HitTestTarget;
 
 		public static int CreatedCount = 0;
@@ -482,26 +493,6 @@ namespace Lime
 				}
 			}
 		}
-
-		/// <summary>
-		/// TODO: Add summary
-		/// </summary>
-		protected void RecalcDirtyGlobals()
-		{
-			if (DirtyMask == DirtyFlags.None) {
-				return;
-			}
-			if (Parent != null && Parent.DirtyMask != DirtyFlags.None) {
-				Parent.RecalcDirtyGlobals();
-			}
-			RecalcDirtyGlobalsUsingParents();
-			DirtyMask = DirtyFlags.None;
-		}
-
-		/// <summary>
-		/// TODO: Add summary
-		/// </summary>
-		protected virtual void RecalcDirtyGlobalsUsingParents() { }
 
 #if LIME_COUNT_NODES
 		~Node() {
