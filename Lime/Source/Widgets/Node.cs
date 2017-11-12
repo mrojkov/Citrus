@@ -701,17 +701,24 @@ namespace Lime
 
 		protected void AddSelfToRenderChain(RenderChain chain)
 		{
-			var savedLayer = chain.CurrentLayer;
-			if (Layer != 0) {
+			if (Layer == 0) {
+				if (PostPresenter != null) {
+					chain.Add(this, PostPresenter);
+				}
+				if (Presenter != null) {
+					chain.Add(this, Presenter);
+				}
+			} else {
+				var savedLayer = chain.CurrentLayer;
 				chain.CurrentLayer = Layer;
+				if (PostPresenter != null) {
+					chain.Add(this, PostPresenter);
+				}
+				if (Presenter != null) {
+					chain.Add(this, Presenter);
+				}
+				chain.CurrentLayer = savedLayer;
 			}
-			if (PostPresenter != null) {
-				chain.Add(this, PostPresenter);
-			}
-			if (Presenter != null) {
-				chain.Add(this, Presenter);
-			}
-			chain.CurrentLayer = savedLayer;
 		}
 
 		/// <summary>

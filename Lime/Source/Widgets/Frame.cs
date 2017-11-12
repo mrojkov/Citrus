@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
 using Yuzu;
 
@@ -60,10 +59,7 @@ namespace Lime
 			PropagateDirtyFlags();
 		}
 
-		internal protected override bool IsRenderedToTexture()
-		{
-			return (base.IsRenderedToTexture() || renderTarget != RenderTarget.None);
-		}
+		internal protected override bool IsRenderedToTexture() => renderTarget != RenderTarget.None;
 
 		public override void Render()
 		{
