@@ -941,15 +941,15 @@ namespace Lime
 		/// </summary>
 		public Matrix32 CalcLocalToParentTransform()
 		{
-			Matrix32 matrix;
+			var matrix = new Matrix32();
 			var center = new Vector2 { X = Size.X * Pivot.X, Y = Size.Y * Pivot.Y };
 			if (rotation == 0 && SkinningWeights == null) {
-				matrix.U.X = scale.X;
-				matrix.U.Y = 0;
-				matrix.V.X = 0;
-				matrix.V.Y = scale.Y;
-				matrix.T.X = position.X - center.X * scale.X;
-				matrix.T.Y = position.Y - center.Y * scale.Y;
+				matrix.UX = scale.X;
+				matrix.UY = 0;
+				matrix.VX = 0;
+				matrix.VY = scale.Y;
+				matrix.TX = position.X - center.X * scale.X;
+				matrix.TY = position.Y - center.Y * scale.Y;
 				return matrix;
 			}
 			Vector2 u, v;
@@ -966,8 +966,8 @@ namespace Lime
 			}
 			matrix.U = u;
 			matrix.V = v;
-			matrix.T.X = -(center.X * u.X) - center.Y * v.X + translation.X;
-			matrix.T.Y = -(center.X * u.Y) - center.Y * v.Y + translation.Y;
+			matrix.TX = -(center.X * u.X) - center.Y * v.X + translation.X;
+			matrix.TY = -(center.X * u.Y) - center.Y * v.Y + translation.Y;
 			return matrix;
 		}
 
