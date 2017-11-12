@@ -451,7 +451,7 @@ namespace Lime
 
 		public Action<Node> Awoken;
 
-		public Node()
+		protected Node()
 		{
 			AnimationSpeed = 1;
 			Components = new NodeComponentCollection(this);
