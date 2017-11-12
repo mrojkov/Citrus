@@ -159,16 +159,21 @@ namespace Lime
 			if (renderTexture != null || ClipChildren == ClipMethod.ScissorTest) {
 				AddSelfToRenderChain(chain);
 				if (GetTangerineFlag(TangerineFlags.DisplayContent) && ClipChildren != ClipMethod.ScissorTest) {
-					base.AddToRenderChain(chain);
+					AddChildrenToRenderChain(chain);
 				}
-			} else if (Layer == 0 && Presenter != null && PostPresenter == null) {
+			} else if (Layer == 0) {
 				// 90% calls should go here.
+				if (PostPresenter != null) {
+					chain.Add(this, PostPresenter);
+				}
 				for (var node = FirstChild; node != null; node = node.NextSibling) {
 					node.RenderChainBuilder?.AddToRenderChain(node, chain);
 				}
-				chain.Add(this, Presenter);
+				if (Presenter != null) {
+					chain.Add(this, Presenter);
+				}
 			} else {
-				base.AddToRenderChain(chain);
+				AddChildrenToRenderChain(chain);
 			}
 		}
 
