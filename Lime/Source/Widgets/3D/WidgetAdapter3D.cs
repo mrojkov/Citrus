@@ -53,7 +53,7 @@ namespace Lime
 			return new Plane(new Vector3(0, 0, 1), 0).Transform(GlobalTransform);
 		}
 
-		internal protected override void AddToRenderChain(RenderChain chain)
+		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (GloballyVisible) {
 				AddSelfToRenderChain(chain);
@@ -65,7 +65,7 @@ namespace Lime
 			if (Widget == null) {
 				return;
 			}
-			Widget.RenderChainBuilder?.AddToRenderChain(Widget, renderChain);
+			Widget.RenderChainBuilder?.AddToRenderChain(renderChain);
 			var oldCullMode = Renderer.CullMode;
 			var oldWorld = Renderer.World;
 			Renderer.CullMode = CullMode.None;
@@ -88,7 +88,7 @@ namespace Lime
 				var oldPoint = args.Point;
 				try {
 					args.Point = (Vector2)GlobalTransform.CalcInverted().TransformVector(ray.Position + ray.Direction * distance.Value) * new Vector2(1, -1);
-					Widget.RenderChainBuilder?.AddToRenderChain(Widget, renderChain);
+					Widget.RenderChainBuilder?.AddToRenderChain(renderChain);
 					if (renderChain.HitTest(ref args)) {
 						args.Distance = distance.Value;
 						return true;

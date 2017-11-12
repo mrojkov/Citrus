@@ -241,7 +241,7 @@ namespace Lime
 			return GlobalTransform * node.GlobalTransform.CalcInverted();
 		}
 
-		internal protected override void AddToRenderChain(RenderChain chain)
+		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (GloballyVisible) {
 				AddSelfAndChildrenToRenderChain(chain);

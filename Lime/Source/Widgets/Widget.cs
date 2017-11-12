@@ -1043,7 +1043,7 @@ namespace Lime
 		/// <summary>
 		/// Adds widget and all its descendants to render chain.
 		/// </summary>
-		internal protected override void AddToRenderChain(RenderChain chain)
+		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (GloballyVisible) {
 				AddSelfAndChildrenToRenderChain(chain);
@@ -1075,7 +1075,7 @@ namespace Lime
 				var savedHitTestTarget = HitTestTarget;
 				try {
 					HitTestTarget = true;
-					RenderChainBuilder?.AddToRenderChain(this, renderChain);
+					RenderChainBuilder?.AddToRenderChain(renderChain);
 					return renderChain.HitTest(ref args);
 				} finally {
 					renderChain.Clear();
@@ -1177,7 +1177,7 @@ namespace Lime
 				Renderer.CullMode = CullMode.None;
 				Renderer.Transform2 = LocalToWorldTransform.CalcInversed();
 				for (var node = FirstChild; node != null; node = node.NextSibling) {
-					node.RenderChainBuilder?.AddToRenderChain(node, renderChain);
+					node.RenderChainBuilder?.AddToRenderChain(renderChain);
 				}
 				renderChain.RenderAndClear();
 				texture.RestoreRenderTarget();
@@ -1215,7 +1215,7 @@ namespace Lime
 
 				using (var texture = new RenderTexture(scaledWidth, scaledHeight)) {
 					var renderChain = new RenderChain();
-					RenderChainBuilder?.AddToRenderChain(this, renderChain);
+					RenderChainBuilder?.AddToRenderChain(renderChain);
 					RenderToTexture(texture, renderChain);
 					return new Bitmap(texture.GetPixels(), scaledWidth, scaledHeight);
 				}

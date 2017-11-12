@@ -137,7 +137,7 @@ namespace Lime
 	/// Scene tree element.
 	/// </summary>
 	[DebuggerTypeProxy(typeof(NodeDebugView))]
-	public abstract class Node : IDisposable, IAnimable, IFolderItem, IFolderContext
+	public abstract class Node : IDisposable, IAnimable, IFolderItem, IFolderContext, IRenderChainBuilder
 	{
 		[Flags]
 		protected internal enum DirtyFlags
@@ -459,7 +459,7 @@ namespace Lime
 			Animations = new AnimationCollection(this);
 			Nodes = new NodeList(this);
 			Presenter = DefaultPresenter.Instance;
-			RenderChainBuilder = DefaultRenderChainBuilder.Instance;
+			RenderChainBuilder = this;
 			++CreatedCount;
 		}
 
@@ -572,7 +572,7 @@ namespace Lime
 			clone.Components = Components.Clone(clone);
 			clone.IsAwake = false;
 			if (RenderChainBuilder != null) {
-				clone.RenderChainBuilder = RenderChainBuilder.Clone();
+				clone.RenderChainBuilder = RenderChainBuilder.Clone(clone);
 			}
 			if (Presenter != null) {
 				clone.Presenter = Presenter.Clone();
@@ -679,7 +679,9 @@ namespace Lime
 		/// This includes children Nodes as well as this Node itself. i.e. if you want Render()
 		/// of this node to be called you should invoke AddSelfToRenderChain in AddToRenderChain override.
 		/// </summary>
-		internal protected abstract void AddToRenderChain(RenderChain chain);
+		public abstract void AddToRenderChain(RenderChain chain);
+
+		IRenderChainBuilder IRenderChainBuilder.Clone(Node newOwner) => newOwner;
 
 		protected void AddSelfAndChildrenToRenderChain(RenderChain chain)
 		{
@@ -691,7 +693,7 @@ namespace Lime
 				chain.Add(this, PostPresenter);
 			}
 			for (var node = FirstChild; node != null; node = node.NextSibling) {
-				node.RenderChainBuilder?.AddToRenderChain(node, chain);
+				node.RenderChainBuilder?.AddToRenderChain(chain);
 			}
 			if (Presenter != null) {
 				chain.Add(this, Presenter);
@@ -1109,7 +1111,7 @@ namespace Lime
 				Nodes.AddRange(nodes);
 			}
 
-			RenderChainBuilder = content.RenderChainBuilder?.Clone();
+			RenderChainBuilder = content.RenderChainBuilder?.Clone(this);
 			Presenter = content.Presenter?.Clone();
 			PostPresenter = content.PostPresenter?.Clone();
 			Components = content.Components.Clone(this);

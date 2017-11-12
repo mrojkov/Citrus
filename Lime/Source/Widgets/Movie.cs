@@ -58,7 +58,7 @@ namespace Lime
 
 		Matrix32 IImageCombinerArg.UVTransform { get { return Matrix32.Identity; } }
 
-		internal protected override void AddToRenderChain(RenderChain chain)
+		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (GloballyVisible && !skipRender && textureInitialized) {
 				AddSelfToRenderChain(chain);

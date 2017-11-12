@@ -116,7 +116,7 @@ namespace Lime
 			return textures[index];
 		}
 
-		protected internal override void AddToRenderChain(RenderChain chain)
+		public override void AddToRenderChain(RenderChain chain)
 		{
 		}
 	}

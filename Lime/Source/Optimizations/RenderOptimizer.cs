@@ -396,12 +396,12 @@ namespace Lime.RenderOptimizer
 
 		private static void InsideRenderChain(Node node)
 		{
-			node.RenderChainBuilder = DefaultRenderChainBuilder.Instance;
+			node.RenderChainBuilder = node;
 		}
 
 		private static bool IsInsideRenderChain(Node node)
 		{
-			return node.RenderChainBuilder == DefaultRenderChainBuilder.Instance;
+			return node.RenderChainBuilder == node;
 		}
 	}
 }

@@ -35,7 +35,7 @@ namespace Lime
 		protected static Vertex[] polygon = new Vertex[6];
 		protected static DistortionMeshPoint[] points = new DistortionMeshPoint[4];
 
-		internal protected override void AddToRenderChain(RenderChain chain)
+		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (GloballyVisible && ClipRegionTest(chain.ClipRegion)) {
 				AddSelfAndChildrenToRenderChain(chain);

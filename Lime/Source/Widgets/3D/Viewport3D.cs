@@ -103,7 +103,7 @@ namespace Lime
 			}
 		}
 
-		internal protected override void AddToRenderChain(RenderChain chain)
+		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (GloballyVisible && ClipRegionTest(chain.ClipRegion)) {
 				AddSelfToRenderChain(chain);
@@ -127,7 +127,7 @@ namespace Lime
 				args.Ray = ScreenPointToRay(args.Point);
 				args.Distance = float.MaxValue;
 				foreach (var node in Nodes) {
-					node.RenderChainBuilder?.AddToRenderChain(node, renderChain);
+					node.RenderChainBuilder?.AddToRenderChain(renderChain);
 				}
 				var layers = renderChain.Layers;
 				for (var i = layers.Length - 1; i >= 0; i--) {
@@ -157,7 +157,7 @@ namespace Lime
 			}
 			AdjustCameraAspectRatio();
 			foreach (var node in Nodes) {
-				node.RenderChainBuilder?.AddToRenderChain(node, renderChain);
+				node.RenderChainBuilder?.AddToRenderChain(renderChain);
 			}
 			var oldWorld = Renderer.World;
 			var oldView = Renderer.View;

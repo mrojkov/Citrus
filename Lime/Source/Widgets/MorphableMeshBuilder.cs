@@ -124,7 +124,7 @@ namespace Lime
 				foreach (var time in interval.Timestamps) {
 					node.AnimationTime = time;
 					node.Update(0);
-					node.RenderChainBuilder?.AddToRenderChain(node, renderChain);
+					node.RenderChainBuilder?.AddToRenderChain(renderChain);
 					renderChain.RenderAndClear();
 					int vc = 0;
 					int ic = 0;

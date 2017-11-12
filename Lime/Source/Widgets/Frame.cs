@@ -93,7 +93,7 @@ namespace Lime
 				EnsureRenderChain();
 				renderChain.ClipRegion = GlobalBoundingRect;
 				foreach (var node in Nodes) {
-					node.RenderChainBuilder?.AddToRenderChain(node, renderChain);
+					node.RenderChainBuilder?.AddToRenderChain(renderChain);
 				}
 				renderChain.RenderAndClear();
 			} finally {
@@ -114,7 +114,7 @@ namespace Lime
 					EnsureRenderChain();
 					try {
 						for (var node = FirstChild; node != null; node = node.NextSibling) {
-							node.RenderChainBuilder?.AddToRenderChain(node, renderChain);
+							node.RenderChainBuilder?.AddToRenderChain(renderChain);
 						}
 						if (renderChain.HitTest(ref args)) {
 							return true;
@@ -147,7 +147,7 @@ namespace Lime
 			return (WindowRect)aabb;
 		}
 
-		internal protected override void AddToRenderChain(RenderChain chain)
+		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (!GloballyVisible || ClipChildren == ClipMethod.NoRender) {
 				return;
@@ -163,7 +163,7 @@ namespace Lime
 					chain.Add(this, PostPresenter);
 				}
 				for (var node = FirstChild; node != null; node = node.NextSibling) {
-					node.RenderChainBuilder?.AddToRenderChain(node, chain);
+					node.RenderChainBuilder?.AddToRenderChain(chain);
 				}
 				if (Presenter != null) {
 					chain.Add(this, Presenter);

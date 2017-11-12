@@ -73,7 +73,7 @@ namespace Lime
 			return false;
 		}
 
-		internal protected override void AddToRenderChain(RenderChain chain)
+		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (Enabled) {
 				IImageCombinerArg arg1, arg2;
