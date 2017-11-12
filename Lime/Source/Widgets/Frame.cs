@@ -65,7 +65,7 @@ namespace Lime
 			return (base.IsRenderedToTexture() || renderTarget != RenderTarget.None);
 		}
 
-		public override void Render()
+		public sealed override void Render()
 		{
 			if (renderTexture != null) {
 				EnsureRenderChain();
@@ -169,7 +169,7 @@ namespace Lime
 				for (var node = FirstChild; node != null; node = node.NextSibling) {
 					node.RenderChainBuilder?.AddToRenderChain(node, chain);
 				}
-				if (Presenter != null) {
+				if (Presenter != null && Presenter != DefaultPresenter.Instance) {
 					chain.Add(this, Presenter);
 				}
 			} else {
