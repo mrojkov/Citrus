@@ -43,7 +43,7 @@ namespace Orange
 			var totalError = 0f;
 			outputKeys.Add(keys[0]);
 			for (int i = 1; i < keys.Count - 1; i++) {
-				var k1 = keys[i - 1];
+				var k1 = outputKeys[outputKeys.Count - 1];
 				var k2 = keys[i];
 				var k3 = keys[i + 1];
 				var t = (float)(k2.Frame - k1.Frame) / (k3.Frame - k1.Frame);
