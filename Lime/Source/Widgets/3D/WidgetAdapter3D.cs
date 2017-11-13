@@ -56,7 +56,7 @@ namespace Lime
 		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (GloballyVisible) {
-				AddSelfToRenderChain(chain);
+				AddSelfToRenderChain(chain, Layer);
 			}
 		}
 

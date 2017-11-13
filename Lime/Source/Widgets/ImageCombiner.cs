@@ -89,7 +89,7 @@ namespace Lime
 						return;
 					}
 				}
-				AddSelfToRenderChain(chain);
+				AddSelfToRenderChain(chain, Layer);
 			}
 		}
 

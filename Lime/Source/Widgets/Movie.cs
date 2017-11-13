@@ -61,7 +61,7 @@ namespace Lime
 		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (GloballyVisible && !skipRender && textureInitialized) {
-				AddSelfToRenderChain(chain);
+				AddSelfToRenderChain(chain, Layer);
 			}
 			skipRender = false;
 		}

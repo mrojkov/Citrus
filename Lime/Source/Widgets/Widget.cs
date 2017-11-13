@@ -1046,7 +1046,7 @@ namespace Lime
 		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (GloballyVisible) {
-				AddSelfAndChildrenToRenderChain(chain);
+				AddSelfAndChildrenToRenderChain(chain, Layer);
 			}
 		}
 

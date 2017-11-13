@@ -49,12 +49,13 @@ namespace Lime
 			}
 		}
 
-		protected override void SelfUpdate(float delta)
+		public override void Update(float delta)
 		{
 			if (webView == null) {
 				return;
 			}
 			webView.Frame = CalculateAABBInWorldSpace(this);
+			base.Update(delta);
 		}
 
 		private CGRect CalculateAABBInWorldSpace(Widget widget)

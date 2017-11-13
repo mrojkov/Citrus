@@ -167,7 +167,7 @@ namespace Lime
 		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (GloballyVisible && ClipRegionTest(chain.ClipRegion)) {
-				AddSelfAndChildrenToRenderChain(chain);
+				AddSelfAndChildrenToRenderChain(chain, Layer);
 			}
 		}
 

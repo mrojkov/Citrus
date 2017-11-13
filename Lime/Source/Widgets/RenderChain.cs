@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Lime
 {
@@ -24,17 +25,34 @@ namespace Lime
 	public class RenderChain
 	{
 		public const int LayerCount = 100;
-		public int CurrentLayer;
-		public readonly List<Item>[] Layers = new List<Item>[LayerCount];
+
+		private int currentLayer;
+		private List<Item> currentList;
+		private List<Item>[] layers;
+			
 		public Rectangle ClipRegion = new Rectangle(-float.MaxValue, -float.MaxValue, float.MaxValue, float.MaxValue);
 
+		public List<Item>[] Layers { get; private set; } = new List<Item>[LayerCount];
+
+		public int CurrentLayer
+		{
+			get { return currentLayer; }
+			set
+			{
+				currentLayer = value;
+				currentList = Layers[CurrentLayer] ?? (Layers[CurrentLayer] = new List<Item>());
+			}
+		}
+
+		public RenderChain()
+		{
+			CurrentLayer = 0;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Add(Node node, IPresenter presenter)
 		{
-			var list = Layers[CurrentLayer];
-			if (list == null) {
-				list = Layers[CurrentLayer] = new List<Item>();
-			}
-			list.Add(new Item { Node = node, Presenter = presenter });
+			currentList.Add(new Item { Node = node, Presenter = presenter });
 		}
 
 		public void RenderAndClear()

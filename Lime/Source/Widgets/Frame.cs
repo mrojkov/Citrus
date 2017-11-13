@@ -153,9 +153,9 @@ namespace Lime
 				return;
 			}
 			if (renderTexture != null || ClipChildren == ClipMethod.ScissorTest) {
-				AddSelfToRenderChain(chain);
+				AddSelfToRenderChain(chain, Layer);
 				if (GetTangerineFlag(TangerineFlags.DisplayContent) && ClipChildren != ClipMethod.ScissorTest) {
-					AddSelfAndChildrenToRenderChain(chain);
+					AddSelfAndChildrenToRenderChain(chain, Layer);
 				}
 			} else if (Layer == 0) {
 				// 90% calls should go here.
@@ -169,7 +169,7 @@ namespace Lime
 					chain.Add(this, Presenter);
 				}
 			} else {
-				AddSelfAndChildrenToRenderChain(chain);
+				AddSelfAndChildrenToRenderChain(chain, Layer);
 			}
 		}
 

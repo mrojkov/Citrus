@@ -261,8 +261,6 @@ namespace Lime
 
 		public Node3D AsNode3D { get; internal set; }
 
-		public IRenderChainBuilder RenderChainBuilder { get; set; }
-
 		/// <summary>
 		/// The presenter used for rendering and hit-testing the node.
 		/// TODO: Add Add/RemovePresenter methods. Remove CompoundPresenter property and Presenter setter.
@@ -308,6 +306,8 @@ namespace Lime
 		/// Animation speed multiplier.
 		/// </summary>
 		public float AnimationSpeed { get; set; }
+
+		public IRenderChainBuilder RenderChainBuilder { get; set; }
 
 		/// <summary>
 		/// Gets or sets Z-order (the rendering order).
@@ -683,27 +683,29 @@ namespace Lime
 
 		IRenderChainBuilder IRenderChainBuilder.Clone(Node newOwner) => newOwner;
 
-		protected void AddSelfAndChildrenToRenderChain(RenderChain chain)
+		protected void AddSelfAndChildrenToRenderChain(RenderChain chain, int layer)
 		{
-			var savedLayer = chain.CurrentLayer;
-			if (Layer != 0) {
-				chain.CurrentLayer = Layer;
+			if (layer == 0) {
+				if (PostPresenter != null) {
+					chain.Add(this, PostPresenter);
+				}
+				for (var node = FirstChild; node != null; node = node.NextSibling) {
+					node.RenderChainBuilder?.AddToRenderChain(chain);
+				}
+				if (Presenter != null) {
+					chain.Add(this, Presenter);
+				}
+			} else {
+				var savedLayer = chain.CurrentLayer;
+				chain.CurrentLayer = layer;
+				AddSelfAndChildrenToRenderChain(chain, 0);
+				chain.CurrentLayer = savedLayer;
 			}
-			if (PostPresenter != null) {
-				chain.Add(this, PostPresenter);
-			}
-			for (var node = FirstChild; node != null; node = node.NextSibling) {
-				node.RenderChainBuilder?.AddToRenderChain(chain);
-			}
-			if (Presenter != null) {
-				chain.Add(this, Presenter);
-			}
-			chain.CurrentLayer = savedLayer;
 		}
 
-		protected void AddSelfToRenderChain(RenderChain chain)
+		protected void AddSelfToRenderChain(RenderChain chain, int layer)
 		{
-			if (Layer == 0) {
+			if (layer == 0) {
 				if (PostPresenter != null) {
 					chain.Add(this, PostPresenter);
 				}
@@ -712,13 +714,8 @@ namespace Lime
 				}
 			} else {
 				var savedLayer = chain.CurrentLayer;
-				chain.CurrentLayer = Layer;
-				if (PostPresenter != null) {
-					chain.Add(this, PostPresenter);
-				}
-				if (Presenter != null) {
-					chain.Add(this, Presenter);
-				}
+				chain.CurrentLayer = layer;
+				AddSelfToRenderChain(chain, 0);
 				chain.CurrentLayer = savedLayer;
 			}
 		}
