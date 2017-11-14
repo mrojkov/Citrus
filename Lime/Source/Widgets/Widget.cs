@@ -537,25 +537,23 @@ namespace Lime
 				localToWorldTransform = CalcLocalToParentTransform() * parentWidget.LocalToWorldTransform;
 			}
 			// Recalc the global bounding rect.
-			var u = localToWorldTransform.U * size.X;
-			var v = localToWorldTransform.V * size.Y;
+			var u = localToWorldTransform.U * size.X + localToWorldTransform.T;
+			var v = localToWorldTransform.V * size.Y + localToWorldTransform.T;
 			var w = u + v;
-			var a = new Vector2();
-			var b = new Vector2();
-			if (u.X < a.X) a.X = u.X;
-			if (u.X > b.X) b.X = u.X;
-			if (u.Y < a.Y) a.Y = u.Y;
-			if (u.Y > b.Y) b.Y = u.Y;
-			if (v.X < a.X) a.X = v.X;
-			if (v.X > b.X) b.X = v.X;
-			if (v.Y < a.Y) a.Y = v.Y;
-			if (v.Y > b.Y) b.Y = v.Y;
-			if (w.X < a.X) a.X = w.X;
-			if (w.X > b.X) b.X = w.X;
-			if (w.Y < a.Y) a.Y = w.Y;
-			if (w.Y > b.Y) b.Y = w.Y;
-			globalBoundingRect.A = a + localToWorldTransform.T;
-			globalBoundingRect.B = b + localToWorldTransform.T;
+			var r = new Rectangle();
+			if (u.X < r.AX) r.AX = u.X;
+			if (u.X > r.BX) r.BX = u.X;
+			if (u.Y < r.AY) r.AY = u.Y;
+			if (u.Y > r.BY) r.BY = u.Y;
+			if (v.X < r.AX) r.AX = v.X;
+			if (v.X > r.BX) r.BX = v.X;
+			if (v.Y < r.AY) r.AY = v.Y;
+			if (v.Y > r.BY) r.BY = v.Y;
+			if (w.X < r.AX) r.AX = w.X;
+			if (w.X > r.BX) r.BX = w.X;
+			if (w.Y < r.AY) r.AY = w.Y;
+			if (w.Y > r.BY) r.BY = w.Y;
+			globalBoundingRect = r;
 		}
 
 		/// <summary>
@@ -930,8 +928,8 @@ namespace Lime
 				RecalcGlobalTransformAndBoundingRect();
 			}
 			return
-				globalBoundingRect.B.X >= clipRegion.A.X && globalBoundingRect.B.Y >= clipRegion.A.Y &&
-				globalBoundingRect.A.X <= clipRegion.B.X && globalBoundingRect.A.Y <= clipRegion.B.Y;
+				globalBoundingRect.BX >= clipRegion.AX && globalBoundingRect.BY >= clipRegion.AY &&
+				globalBoundingRect.AX <= clipRegion.BX && globalBoundingRect.AY <= clipRegion.BY;
 		}
 
 		/// <summary>

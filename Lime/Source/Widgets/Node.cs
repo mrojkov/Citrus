@@ -486,10 +486,15 @@ namespace Lime
 			if ((DirtyMask & mask) == mask)
 				return;
 			Window.Current?.Invalidate();
+			PropagateDirtyFlagsHelper(mask);
+		}
+
+		private void PropagateDirtyFlagsHelper(DirtyFlags mask)
+		{
 			DirtyMask |= mask;
 			for (var n = FirstChild; n != null; n = n.NextSibling) {
 				if ((n.DirtyMask & mask) != mask) {
-					n.PropagateDirtyFlags(mask);
+					n.PropagateDirtyFlagsHelper(mask);
 				}
 			}
 		}
