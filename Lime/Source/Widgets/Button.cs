@@ -5,34 +5,28 @@ using Yuzu;
 
 namespace Lime
 {
-	using StateFunc = Func<IEnumerator<int>>;
-	using System.Diagnostics;
-
 	[AllowedChildrenTypes(typeof(Node))]
 	public class Button : Widget
 	{
+		private TextPresentersFeeder textPresentersFeeder;
+		private IEnumerator<int> stateHandler;
+		private ClickGesture clickGesture;
+		private bool isChangingState;
+		private bool isDisabledState;
+
 		public BitSet32 EnableMask = BitSet32.Full;
 
 		[YuzuMember]
 		public override string Text { get; set; }
 
 		[YuzuMember]
-		public bool Enabled {
+		public bool Enabled
+		{
 			get { return EnableMask[0]; }
 			set { EnableMask[0] = value; }
 		}
 
 		public override Action Clicked { get; set; }
-
-		private TextPresentersFeeder textPresentersFeeder;
-		private StateMachine stateMachine;
-		private StateFunc State
-		{
-			get { return stateMachine.State; }
-			set { stateMachine.SetState(value); }
-		}
-
-		private ClickGesture clickGesture;
 
 		public Button()
 		{
@@ -40,20 +34,29 @@ namespace Lime
 			Input.AcceptMouseBeyondWidget = false;
 		}
 
+		private void SetState(IEnumerator<int> newState)
+		{
+			stateHandler = newState;
+			if (!isChangingState) {
+				isChangingState = true;
+				stateHandler.MoveNext();
+				isChangingState = false;
+			}
+		}
+
 		private IEnumerator<int> InitialState()
 		{
 			yield return 0;
-			State = NormalState;
+			SetState(NormalState());
 		}
 
 		public override bool WasClicked() => clickGesture?.WasRecognized() ?? false;
 
 		protected override void Awake()
 		{
-			stateMachine = new StateMachine();
 			// On the current frame the button contents may not be loaded,
 			// so delay its initialization until the next frame.
-			State = InitialState;
+			SetState(InitialState());
 			textPresentersFeeder = new TextPresentersFeeder(this);
 			clickGesture = new ClickGesture();
 			Gestures.Add(clickGesture);
@@ -65,11 +68,11 @@ namespace Lime
 			while (true) {
 #if WIN || MAC
 				if (IsMouseOverThisOrDescendant()) {
-					State = HoveredState;
+					SetState(HoveredState());
 				}
 #else
 				if (clickGesture.WasBegan()) {
-					State = PressedState;
+					SetState(PressedState());
 				}
 #endif
 				yield return 0;
@@ -81,9 +84,9 @@ namespace Lime
 			TryRunAnimation("Focus");
 			while (true) {
 				if (!IsMouseOverThisOrDescendant()) {
-					State = NormalState;
+					SetState(NormalState());
 				} else if (clickGesture.WasBegan()) {
-					State = PressedState;
+					SetState(PressedState());
 				}
 				yield return 0;
 			}
@@ -105,12 +108,12 @@ namespace Lime
 					// parent is visible again)
 					if (!GloballyVisible) {
 #if WIN || MAC
-						State = HoveredState;
+						SetState(HoveredState());
 #else
-						State = NormalState;
+						SetState(NormalState());
 #endif
 					} else {
-						State = ReleaseState;
+						SetState(ReleaseState());
 					}
 				} else if (clickGesture.WasCanceled()) {
 					if (CurrentAnimation == "Press") {
@@ -119,7 +122,7 @@ namespace Lime
 							yield return 0;
 						}
 					}
-					State = NormalState;
+					SetState(NormalState());
 				}
 				var mouseOver = IsMouseOverThisOrDescendant();
 				if (wasMouseOver && !mouseOver) {
@@ -142,14 +145,15 @@ namespace Lime
 				}
 			}
 #if WIN || MAC
-			State = HoveredState;
+			SetState(HoveredState());
 #else
-			State = NormalState;
+			SetState(NormalState());
 #endif
 		}
 
 		private IEnumerator<int> DisabledState()
 		{
+			isDisabledState = true;
 			if (CurrentAnimation == "Release") {
 				// The release animation should be played if we disable the button
 				// right after click on it.
@@ -168,18 +172,19 @@ namespace Lime
 			while (IsRunning) {
 				yield return 0;
 			}
-			State = NormalState;
+			isDisabledState = false;
+			SetState(NormalState());
 		}
 
 		public override void Update(float delta)
 		{
 			base.Update(delta);
 			if (GloballyVisible) {
-				stateMachine.Advance();
+				stateHandler.MoveNext();
 				textPresentersFeeder.Update();
 			}
-			if (!EnableMask.All() && State != DisabledState) {
-				State = DisabledState;
+			if (!EnableMask.All() && !isDisabledState) {
+				SetState(DisabledState());
 			}
 #if WIN || MAC
 			if (Enabled) {
@@ -189,31 +194,6 @@ namespace Lime
 			}
 #endif
 		}
-
-#region StateMachine
-		class StateMachine
-		{
-			private IEnumerator<int> stateHandler;
-			public StateFunc State { get; private set; }
-			private bool isChanging;
-
-			public void SetState(StateFunc state)
-			{
-				State = state;
-				stateHandler = state();
-				if (!isChanging) {
-					isChanging = true;
-					stateHandler.MoveNext();
-					isChanging = false;
-				}
-			}
-
-			public void Advance()
-			{
-				stateHandler.MoveNext();
-			}
-		}
-#endregion
 	}
 
 	internal class TextPresentersFeeder
