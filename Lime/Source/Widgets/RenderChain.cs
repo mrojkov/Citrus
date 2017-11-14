@@ -28,7 +28,6 @@ namespace Lime
 
 		private int currentLayer;
 		private List<Item> currentList;
-		private List<Item>[] layers;
 			
 		public Rectangle ClipRegion = new Rectangle(-float.MaxValue, -float.MaxValue, float.MaxValue, float.MaxValue);
 
