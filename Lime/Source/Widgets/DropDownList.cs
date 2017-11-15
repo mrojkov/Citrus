@@ -24,6 +24,7 @@ namespace Lime
 			{
 				index = value;
 				RefreshTextWidget();
+				RaiseChanged();
 			}
 		}
 
