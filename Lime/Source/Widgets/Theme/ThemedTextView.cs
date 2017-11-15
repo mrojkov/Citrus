@@ -39,7 +39,8 @@ namespace Lime
 					if (lastNonSentinelLine != null && lastNonSentinelLine.Text == l) {
 						lastNonSentinelLine.Components.Get<ThemedTextView.TextLineMultiplicity>().Multiplicity++;
 						lastNonSentinelLine.Invalidate();
-						(GetRoot() as WindowWidget).Window.Invalidate();
+						//TODO: invalidate window only if it isn't docked
+						(GetRoot() as WindowWidget)?.Window.Invalidate();
 						continue;
 					}
 				}
