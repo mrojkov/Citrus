@@ -541,13 +541,10 @@ namespace GeneratedDeserializersBIN
 		private static object Make_Lime__Rectangle(BinaryDeserializer d, ReaderClassDef def)
 		{
 			var result = new global::Lime.Rectangle();
-			var dg = (BinaryDeserializerGen)d;
-			dg.EnsureClassDef(typeof(global::Lime.Vector2));
-			result.A.X = d.Reader.ReadSingle();
-			result.A.Y = d.Reader.ReadSingle();
-			dg.EnsureClassDef(typeof(global::Lime.Vector2));
-			result.B.X = d.Reader.ReadSingle();
-			result.B.Y = d.Reader.ReadSingle();
+			result.AX = d.Reader.ReadSingle();
+			result.AY = d.Reader.ReadSingle();
+			result.BX = d.Reader.ReadSingle();
+			result.BY = d.Reader.ReadSingle();
 			return result;
 		}
 

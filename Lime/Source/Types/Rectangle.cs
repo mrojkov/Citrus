@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 using Yuzu;
 
 namespace Lime
@@ -9,34 +8,18 @@ namespace Lime
 	/// </summary>
 	[System.Diagnostics.DebuggerStepThrough]
 	[YuzuCompact]
-	[StructLayout(LayoutKind.Explicit)]
 	public struct Rectangle : IEquatable<Rectangle>
 	{
-		/// <summary>
-		/// Left-top corner of this rectangle.
-		/// </summary>
 		[YuzuMember("0")]
-		[FieldOffset(0)]
-		public Vector2 A;
-
-		/// <summary>
-		/// Right-bottom corner of this rectangle.
-		/// </summary>
-		/// <remarks>Rectangle doesn't contain this point.</remarks>
-		[YuzuMember("1")]
-		[FieldOffset(8)]
-		public Vector2 B;
-
-		[FieldOffset(0)]
 		public float AX;
 
-		[FieldOffset(4)]
+		[YuzuMember("1")]
 		public float AY;
 
-		[FieldOffset(8)]
+		[YuzuMember("2")]
 		public float BX;
 
-		[FieldOffset(12)]
+		[YuzuMember("3")]
 		public float BY;
 
 		/// <summary>
@@ -44,9 +27,18 @@ namespace Lime
 		/// </summary>
 		public static readonly Rectangle Empty = new Rectangle();
 
+		/// <summary>
+		/// Left-top corner of this rectangle.
+		/// </summary>
+		public Vector2 A { get { return new Vector2(AX, AY); } set { AX = value.X; AY = value.Y; } }
+
+		/// <summary>
+		/// Right-bottom corner of this rectangle.
+		/// </summary>
+		public Vector2 B { get { return new Vector2(BX, BY); } set { BX = value.X; BY = value.Y; } }
+
 		public Rectangle(float left, float top, float right, float bottom)
 		{
-			A = B = Vector2.Zero;
 			AX = left;
 			AY = top;
 			BX = right;
@@ -55,9 +47,10 @@ namespace Lime
 
 		public Rectangle(Vector2 a, Vector2 b)
 		{
-			AX = AY = BX = BY = 0;
-			A = a;
-			B = b;
+			AX = a.X;
+			AY = a.Y;
+			BX = b.X;
+			BY = b.Y;
 		}
 
 		public static explicit operator IntRectangle(Rectangle value)
