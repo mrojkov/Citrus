@@ -133,7 +133,6 @@ namespace Lime
 			IKStopper = true;
 		}
 
-
 		public override void Update(float delta)
 		{
 			base.Update(delta);
@@ -163,7 +162,10 @@ namespace Lime
 				} else
 					e.RelativeTransform = Matrix32.Identity;
 				Parent.AsWidget.BoneArray[Index] = e;
-				Parent.PropagateDirtyFlags(DirtyFlags.Transform);
+				Parent.PropagateDirtyFlags(DirtyFlags.GlobalTransform);
+				for (var child = Parent.FirstChild; child != null; child = child.NextSibling) {
+					child.DirtyMask |= DirtyFlags.LocalTransform | DirtyFlags.ParentBoundingRect;
+				}
 			}
 		}
 

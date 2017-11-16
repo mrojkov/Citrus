@@ -147,8 +147,10 @@ namespace Lime
 			Color = 1 << 1,
 			Shader = 1 << 2,
 			Blending = 1 << 3,
-			Transform = 1 << 4,
-			LayoutManager = 1 << 5,
+			LayoutManager = 1 << 4,
+			LocalTransform = 1 << 5,
+			GlobalTransform = 1 << 6,
+			ParentBoundingRect = 1 << 7,
 			All = ~None
 		}
 
@@ -427,7 +429,7 @@ namespace Lime
 		/// <summary>
 		/// TODO: Add summary
 		/// </summary>
-		protected DirtyFlags DirtyMask = DirtyFlags.All;
+		internal protected DirtyFlags DirtyMask = DirtyFlags.All;
 
 		/// <summary>
 		/// TODO: Add summary

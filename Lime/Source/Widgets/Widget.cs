@@ -55,8 +55,9 @@ namespace Lime
 		private WidgetInput input;
 		private TaskList tasks;
 		private TaskList lateTasks;
+		private Matrix32 localToParentTransform;
 		private Matrix32 localToWorldTransform;
-		private Rectangle globalBoundingRect;
+		private Rectangle boundingRect;
 		protected Color4 globalColor;
 		protected Blending globalBlending;
 		protected ShaderId globalShader;
@@ -200,7 +201,8 @@ namespace Lime
 				System.Diagnostics.Debug.Assert(IsNumber(value.Y));
 				if (position.X != value.X || position.Y != value.Y) {
 					position = value;
-					PropagateDirtyFlags(DirtyFlags.Transform);
+					DirtyMask |= DirtyFlags.LocalTransform | DirtyFlags.ParentBoundingRect;
+					PropagateDirtyFlags(DirtyFlags.GlobalTransform);
 				}
 			}
 		}
@@ -216,7 +218,8 @@ namespace Lime
 				System.Diagnostics.Debug.Assert(IsNumber(value));
 				if (position.X != value) {
 					position.X = value;
-					PropagateDirtyFlags(DirtyFlags.Transform);
+					DirtyMask |= DirtyFlags.LocalTransform | DirtyFlags.ParentBoundingRect;
+					PropagateDirtyFlags(DirtyFlags.GlobalTransform);
 				}
 			}
 		}
@@ -232,7 +235,8 @@ namespace Lime
 				System.Diagnostics.Debug.Assert(IsNumber(value));
 				if (position.Y != value) {
 					position.Y = value;
-					PropagateDirtyFlags(DirtyFlags.Transform);
+					DirtyMask |= DirtyFlags.LocalTransform | DirtyFlags.ParentBoundingRect;
+					PropagateDirtyFlags(DirtyFlags.GlobalTransform);
 				}
 			}
 		}
@@ -248,7 +252,8 @@ namespace Lime
 				System.Diagnostics.Debug.Assert(IsNumber(value.Y));
 				if (scale.X != value.X || scale.Y != value.Y) {
 					scale = value;
-					PropagateDirtyFlags(DirtyFlags.Transform);
+					DirtyMask |= DirtyFlags.LocalTransform | DirtyFlags.ParentBoundingRect;
+					PropagateDirtyFlags(DirtyFlags.GlobalTransform);
 				}
 			}
 		}
@@ -266,7 +271,8 @@ namespace Lime
 				if (rotation != value) {
 					rotation = value;
 					direction = Vector2.CosSinRough(Mathf.DegToRad * value);
-					PropagateDirtyFlags(DirtyFlags.Transform);
+					DirtyMask |= DirtyFlags.LocalTransform | DirtyFlags.ParentBoundingRect;
+					PropagateDirtyFlags(DirtyFlags.GlobalTransform);
 				}
 			}
 		}
@@ -282,8 +288,10 @@ namespace Lime
 				if (value.X != size.X || value.Y != size.Y) {
 					var sizeDelta = value - size;
 					size = value;
+					if (boundingRect.BX < value.X) boundingRect.BX = value.X;
+					if (boundingRect.BY < value.Y) boundingRect.BY = value.Y;
 					OnSizeChanged(sizeDelta);
-					PropagateDirtyFlags(DirtyFlags.Transform);
+					PropagateDirtyFlags(DirtyFlags.GlobalTransform);
 				}
 			}
 		}
@@ -294,7 +302,16 @@ namespace Lime
 		/// </summary>
 		[YuzuMember("Size")]
 		[TangerineIgnore]
-		public Vector2 SilentSize { get { return size; } set { size = value; } }
+		public Vector2 SilentSize
+		{
+			get { return size; }
+			set
+			{
+				size = value;
+				if (boundingRect.BX < value.X) boundingRect.BX = value.X;
+				if (boundingRect.BY < value.Y) boundingRect.BY = value.Y;
+			}
+		}
 
 		public float Width
 		{
@@ -303,7 +320,7 @@ namespace Lime
 			{
 				if (size.X != value) {
 					Size = new Vector2(value, Height);
-					PropagateDirtyFlags(DirtyFlags.Transform);
+					PropagateDirtyFlags(DirtyFlags.GlobalTransform);
 				}
 			}
 		}
@@ -315,7 +332,7 @@ namespace Lime
 			{
 				if (size.Y != value) {
 					Size = new Vector2(Width, value);
-					PropagateDirtyFlags(DirtyFlags.Transform);
+					PropagateDirtyFlags(DirtyFlags.GlobalTransform);
 				}
 			}
 		}
@@ -335,7 +352,8 @@ namespace Lime
 				System.Diagnostics.Debug.Assert(IsNumber(value.Y));
 				if (pivot.X != value.X || pivot.Y != value.Y) {
 					pivot = value;
-					PropagateDirtyFlags(DirtyFlags.Transform);
+					DirtyMask |= DirtyFlags.LocalTransform | DirtyFlags.ParentBoundingRect;
+					PropagateDirtyFlags(DirtyFlags.GlobalTransform);
 				}
 			}
 		}
@@ -521,39 +539,22 @@ namespace Lime
 		{
 			get
 			{
-				if (CleanDirtyFlags(DirtyFlags.Transform)) {
-					RecalcGlobalTransformAndBoundingRect();
+				if (CleanDirtyFlags(DirtyFlags.GlobalTransform)) {
+					RecalcGlobalTransform();
 				}
 				return localToWorldTransform;
 			}
 		}
 
-		private void RecalcGlobalTransformAndBoundingRect()
+		private void RecalcGlobalTransform()
 		{
+			var localToParentTransform = CalcLocalToParentTransform();
 			var parentWidget = Parent?.AsWidget;
 			if (parentWidget == null) {
-				localToWorldTransform = CalcLocalToParentTransform();
+				localToWorldTransform = localToParentTransform;
 			} else {
-				localToWorldTransform = CalcLocalToParentTransform() * parentWidget.LocalToWorldTransform;
+				localToWorldTransform = localToParentTransform * parentWidget.LocalToWorldTransform;
 			}
-			// Recalc the global bounding rect.
-			var u = localToWorldTransform.U * size.X + localToWorldTransform.T;
-			var v = localToWorldTransform.V * size.Y + localToWorldTransform.T;
-			var w = u + v;
-			var r = new Rectangle();
-			if (u.X < r.AX) r.AX = u.X;
-			if (u.X > r.BX) r.BX = u.X;
-			if (u.Y < r.AY) r.AY = u.Y;
-			if (u.Y > r.BY) r.BY = u.Y;
-			if (v.X < r.AX) r.AX = v.X;
-			if (v.X > r.BX) r.BX = v.X;
-			if (v.Y < r.AY) r.AY = v.Y;
-			if (v.Y > r.BY) r.BY = v.Y;
-			if (w.X < r.AX) r.AX = w.X;
-			if (w.X > r.BX) r.BX = w.X;
-			if (w.Y < r.AY) r.AY = w.Y;
-			if (w.Y > r.BY) r.BY = w.Y;
-			globalBoundingRect = r;
 		}
 
 		/// <summary>
@@ -667,15 +668,50 @@ namespace Lime
 		/// <summary>
 		/// Gets the axis-aligned bounding rectangle based on LocalToWorldTransform.
 		/// </summary>
-		public Rectangle GlobalBoundingRect
+		public Rectangle CalcGlobalBoundingRect()
 		{
-			get
-			{
-				if (CleanDirtyFlags(DirtyFlags.Transform)) {
-					RecalcGlobalTransformAndBoundingRect();
-				}
-				return globalBoundingRect;
+			if (CleanDirtyFlags(DirtyFlags.GlobalTransform)) {
+				RecalcGlobalTransform();
 			}
+			// The code below is optimized version of:
+			// var v1 = localToWorldTransform.TransformVector(boundingRect.AX, boundingRect.AY);
+			// var v2 = localToWorldTransform.TransformVector(boundingRect.BX, boundingRect.AY);
+			// var v3 = localToWorldTransform.TransformVector(boundingRect.AX, boundingRect.BY);
+			// var v4 = v2 + v3 - v1;
+			var tux = localToWorldTransform.UX;
+			var tuy = localToWorldTransform.UY;
+			var tvx = localToWorldTransform.VX;
+			var tvy = localToWorldTransform.VY;
+			var ttx = localToWorldTransform.TX;
+			var tty = localToWorldTransform.TY;
+			var axux = boundingRect.AX * tux;
+			var axuy = boundingRect.AX * tuy;
+			var ayvx = boundingRect.AY * tvx + ttx;
+			var ayvy = boundingRect.AY * tvy + tty;
+			float v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y;
+			v1x = axux + ayvx;
+			v1y = axuy + ayvy;
+			v2x = boundingRect.BX * tux + ayvx;
+			v2y = boundingRect.BX * tuy + ayvy;
+			v3x = axux + boundingRect.BY * tvx + ttx;
+			v3y = axuy + boundingRect.BY * tvy + tty;
+			v4x = v2x + v3x - v1x;
+			v4y = v2y + v3y - v1y;
+			// Now build an aabb.
+			var r = new Rectangle(v1x, v1y, v1x, v1y);
+			if (v2x < r.AX) r.AX = v2x;
+			if (v2x > r.BX) r.BX = v2x;
+			if (v2y < r.AY) r.AY = v2y;
+			if (v2y > r.BY) r.BY = v2y;
+			if (v3x < r.AX) r.AX = v3x;
+			if (v3x > r.BX) r.BX = v3x;
+			if (v3y < r.AY) r.AY = v3y;
+			if (v3y > r.BY) r.BY = v3y;
+			if (v4x < r.AX) r.AX = v4x;
+			if (v4x > r.BX) r.BX = v4x;
+			if (v4y < r.AY) r.AY = v4y;
+			if (v4y > r.BY) r.BY = v4y;
+			return r;
 		}
 
 #endregion
@@ -893,6 +929,9 @@ namespace Lime
 #endif
 				}
 				Updated?.Invoke(delta);
+				if (CleanDirtyFlags(DirtyFlags.ParentBoundingRect)) {
+					ExpandParentBoundingRect();
+				}
 #if PROFILE
 				watch.Stop();
 				NodeProfiler.RegisterUpdate(this, watch.ElapsedTicks);
@@ -924,29 +963,32 @@ namespace Lime
 
 		public bool ClipRegionTest(Rectangle clipRegion)
 		{
-			if (CleanDirtyFlags(DirtyFlags.Transform)) {
-				RecalcGlobalTransformAndBoundingRect();
-			}
+			var r = CalcGlobalBoundingRect();
 			return
-				globalBoundingRect.BX >= clipRegion.AX && globalBoundingRect.BY >= clipRegion.AY &&
-				globalBoundingRect.AX <= clipRegion.BX && globalBoundingRect.AY <= clipRegion.BY;
+				r.BX >= clipRegion.AX && r.BY >= clipRegion.AY &&
+				r.AX <= clipRegion.BX && r.AY <= clipRegion.BY;
 		}
 
-		/// <summary>
-		/// TODO: Add summary
-		/// </summary>
 		public Matrix32 CalcLocalToParentTransform()
 		{
-			var matrix = new Matrix32();
-			var center = new Vector2 { X = Size.X * Pivot.X, Y = Size.Y * Pivot.Y };
+			if (CleanDirtyFlags(DirtyFlags.LocalTransform)) {
+				RecalcLocalToParentTransform();
+			}
+			return localToParentTransform;
+		}
+
+		private void RecalcLocalToParentTransform()
+		{
+			var centerX = size.X * pivot.X;
+			var centerY = size.Y * pivot.Y;
 			if (rotation == 0 && SkinningWeights == null) {
-				matrix.UX = scale.X;
-				matrix.UY = 0;
-				matrix.VX = 0;
-				matrix.VY = scale.Y;
-				matrix.TX = position.X - center.X * scale.X;
-				matrix.TY = position.Y - center.Y * scale.Y;
-				return matrix;
+				localToParentTransform.UX = scale.X;
+				localToParentTransform.UY = 0;
+				localToParentTransform.VX = 0;
+				localToParentTransform.VY = scale.Y;
+				localToParentTransform.TX = position.X - centerX * scale.X;
+				localToParentTransform.TY = position.Y - centerY * scale.Y;
+				return;
 			}
 			Vector2 u, v;
 			var translation = position;
@@ -960,11 +1002,46 @@ namespace Lime
 				u = a.ApplySkinningToVector(u + position, SkinningWeights) - translation;
 				v = a.ApplySkinningToVector(v + position, SkinningWeights) - translation;
 			}
-			matrix.U = u;
-			matrix.V = v;
-			matrix.TX = -(center.X * u.X) - center.Y * v.X + translation.X;
-			matrix.TY = -(center.X * u.Y) - center.Y * v.Y + translation.Y;
-			return matrix;
+			localToParentTransform.U = u;
+			localToParentTransform.V = v;
+			localToParentTransform.TX = -(centerX * u.X) - centerY * v.X + translation.X;
+			localToParentTransform.TY = -(centerX * u.Y) - centerY * v.Y + translation.Y;
+		}
+
+		private void ExpandParentBoundingRect()
+		{
+			if (!CleanDirtyFlags(DirtyFlags.ParentBoundingRect) || ParentWidget == null) {
+				return;
+			}
+			if (CleanDirtyFlags(DirtyFlags.LocalTransform)) {
+				RecalcLocalToParentTransform();
+			}
+			var v1 = localToParentTransform.TransformVector(boundingRect.AX, boundingRect.AY);
+			var v2 = localToParentTransform.TransformVector(boundingRect.BX, boundingRect.AY);
+			var v3 = localToParentTransform.TransformVector(boundingRect.AX, boundingRect.BY);
+			var v4 = v2 + v3 - v1;
+			var r = ParentWidget.boundingRect;
+			var t = false;
+			if (v1.X < r.AX) { r.AX = v1.X; t = true; }
+			if (v1.X > r.BX) { r.BX = v1.X; t = true; }
+			if (v1.Y < r.AY) { r.AY = v1.Y; t = true; }
+			if (v1.Y > r.BY) { r.BY = v1.Y; t = true; }
+			if (v2.X < r.AX) { r.AX = v2.X; t = true; }
+			if (v2.X > r.BX) { r.BX = v2.X; t = true; }
+			if (v2.Y < r.AY) { r.AY = v2.Y; t = true; }
+			if (v2.Y > r.BY) { r.BY = v2.Y; t = true; }
+			if (v3.X < r.AX) { r.AX = v3.X; t = true; }
+			if (v3.X > r.BX) { r.BX = v3.X; t = true; }
+			if (v3.Y < r.AY) { r.AY = v3.Y; t = true; }
+			if (v3.Y > r.BY) { r.BY = v3.Y; t = true; }
+			if (v4.X < r.AX) { r.AX = v4.X; t = true; }
+			if (v4.X > r.BX) { r.BX = v4.X; t = true; }
+			if (v4.Y < r.AY) { r.AY = v4.Y; t = true; }
+			if (v4.Y > r.BY) { r.BY = v4.Y; t = true; }
+			if (t) {
+				ParentWidget.boundingRect = r;
+				ParentWidget.ExpandParentBoundingRect();
+			}
 		}
 
 		public Transform2 CalcApplicableTransfrom2(Matrix32 fromLocalToParentTransform)
