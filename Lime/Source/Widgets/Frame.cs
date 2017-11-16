@@ -91,7 +91,7 @@ namespace Lime
 			Renderer.ScissorRectangle = rect;
 			try {
 				EnsureRenderChain();
-				renderChain.ClipRegion = GlobalBoundingRect;
+				renderChain.ClipRegion = CalcGlobalBoundingRect();
 				foreach (var node in Nodes) {
 					node.RenderChainBuilder?.AddToRenderChain(renderChain);
 				}
@@ -149,7 +149,7 @@ namespace Lime
 
 		public override void AddToRenderChain(RenderChain chain)
 		{
-			if (!GloballyVisible || ClipChildren == ClipMethod.NoRender) {
+			if (!GloballyVisible || ClipChildren == ClipMethod.NoRender || !ClipRegionTest(chain.ClipRegion)) {
 				return;
 			}
 			if (renderTexture != null || ClipChildren == ClipMethod.ScissorTest) {

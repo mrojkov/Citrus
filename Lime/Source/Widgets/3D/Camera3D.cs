@@ -1,4 +1,4 @@
-﻿using Yuzu;
+using Yuzu;
 
 namespace Lime
 {
@@ -101,7 +101,7 @@ namespace Lime
 		{
 			get
 			{
-				if (CleanDirtyFlags(DirtyFlags.Transform)) {
+				if (CleanDirtyFlags(DirtyFlags.GlobalTransform)) {
 					RecalcGlobalTransform();
 				}
 				return view;

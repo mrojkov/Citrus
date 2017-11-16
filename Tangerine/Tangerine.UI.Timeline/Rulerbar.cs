@@ -75,7 +75,7 @@ namespace Tangerine.UI.Timeline
 		void RenderMarker(Marker marker)
 		{
 			var r = GetRectangle(marker.Frame);
-			r.A.Y = r.B.Y - 4;
+			r.AY = r.BY - 4;
 			Renderer.DrawRect(r.A, r.B, GetMarkerColor(marker));
 			if (!string.IsNullOrWhiteSpace(marker.Id)) {
 				var h = Theme.Metrics.TextHeight;

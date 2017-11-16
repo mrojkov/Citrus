@@ -40,7 +40,7 @@ namespace Lime
 			set
 			{
 				scale = value;
-				PropagateDirtyFlags(DirtyFlags.Transform);
+				PropagateDirtyFlags(DirtyFlags.GlobalTransform);
 			}
 		}
 
@@ -52,7 +52,7 @@ namespace Lime
 			set
 			{
 				rotation = value;
-				PropagateDirtyFlags(DirtyFlags.Transform);
+				PropagateDirtyFlags(DirtyFlags.GlobalTransform);
 			}
 		}
 
@@ -64,7 +64,7 @@ namespace Lime
 			set
 			{
 				position = value;
-				PropagateDirtyFlags(DirtyFlags.Transform);
+				PropagateDirtyFlags(DirtyFlags.GlobalTransform);
 			}
 		}
 
@@ -87,7 +87,7 @@ namespace Lime
 		{
 			get
 			{
-				if (CleanDirtyFlags(DirtyFlags.Transform)) {
+				if (CleanDirtyFlags(DirtyFlags.GlobalTransform)) {
 					RecalcGlobalTransform();
 				}
 				return globalTransform;
@@ -189,7 +189,7 @@ namespace Lime
 		public void SetLocalTransform(Matrix44 transform)
 		{
 			transform.Decompose(out scale, out rotation, out position);
-			PropagateDirtyFlags(DirtyFlags.Transform);
+			PropagateDirtyFlags(DirtyFlags.GlobalTransform);
 		}
 
 		public Viewport3D GetViewport()
