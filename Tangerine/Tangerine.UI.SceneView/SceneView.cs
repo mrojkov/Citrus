@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Lime;
 using Tangerine.Core;
+using Tangerine.Core.Operations;
 
 namespace Tangerine.UI.SceneView
 {
@@ -78,9 +79,12 @@ namespace Tangerine.UI.SceneView
 		{
 			Document.Current.History.BeginTransaction();
 			var text = Clipboard.Text;
-			Core.Operations.Copy.CopyToClipboard();
-			Core.Operations.Paste.Perform();
-			Clipboard.Text = text;
+			try {
+				Copy.CopyToClipboard();
+				Paste.Perform();
+			} finally {
+				Clipboard.Text = text;
+			}
 			Document.Current.History.EndTransaction();
 		}
 
@@ -368,6 +372,11 @@ namespace Tangerine.UI.SceneView
 		public void CreateNode(Type nodeType)
 		{
 			Components.Add(new CreateNodeRequestComponent { NodeType = nodeType });
+		}
+
+		public void DuplicateSelectedNodes()
+		{
+			DuplicateNodes();
 		}
 
 		public class SceneWidget : Widget

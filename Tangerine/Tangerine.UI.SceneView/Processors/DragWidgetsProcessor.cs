@@ -19,6 +19,9 @@ namespace Tangerine.UI.SceneView
 				if (Utils.CalcHullAndPivot(widgets, sv.Scene, out hull, out pivot) && sv.HitTestControlPoint(pivot)) {
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {
+						if (sv.Input.IsKeyPressed(Key.Alt)) {
+							sv.DuplicateSelectedNodes();
+						}
 						yield return Drag();
 					}
 				}
