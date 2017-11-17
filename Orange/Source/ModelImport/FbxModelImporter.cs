@@ -7,10 +7,15 @@ namespace Orange
 {
 	public partial class FbxModelImporter
 	{
+		/*
+		* According to the fbx-documentation the camera's forward vector
+		* points along a node's positive X axis.
+		* so we have to rotate it by 90 around the Y-axis to correct it.
+		*/
+		private readonly static Quaternion CameraPostRotation = Quaternion.CreateFromEulerAngles(Vector3.UnitY * -Mathf.Pi / 2);
 		private string path;
 		private Manager manager;
 		private TargetPlatform platform;
-
 		public Model3D Model { get; private set; }
 
 		public FbxModelImporter(string path, TargetPlatform platform)
@@ -31,12 +36,13 @@ namespace Orange
 			Node3D node = null;
 			if (root == null)
 				return null;
-			switch (root.Attributes[0].Type) {
+			switch (root.Attribute.Type) {
 				case NodeAttribute.FbxNodeType.MESH:
+					var meshAttribute = root.Attribute as MeshAttribute;
 					var mesh = new Mesh3D { Id = root.Name };
-					foreach (var attribute in root.Attributes) {
-						if ((attribute as MeshAttribute).Vertices.Length > 0) {
-							mesh.Submeshes.Add(ImportSubmesh(attribute as MeshAttribute, root));
+					foreach (var submesh in meshAttribute.Submeshes) {
+						if (submesh.Vertices.Length > 0) {
+							mesh.Submeshes.Add(ImportSubmesh(submesh, root));
 						}
 					}
 					if (platform == TargetPlatform.Unity) {
@@ -50,7 +56,7 @@ namespace Orange
 					}
 					break;
 				case NodeAttribute.FbxNodeType.CAMERA:
-					var cam = root.Attributes[0] as CameraAttribute;
+					var cam = root.Attribute as CameraAttribute;
 					node = new Camera3D {
 						Id = root.Name,
 						FieldOfView = cam.FieldOfView * Mathf.DegToRad,
@@ -78,7 +84,7 @@ namespace Orange
 			return node;
 		}
 
-		private Submesh3D ImportSubmesh(MeshAttribute meshAttribute, FbxImporter.Node node)
+		private Submesh3D ImportSubmesh(Submesh meshAttribute, FbxImporter.Node node)
 		{
 			var sm = new Submesh3D();
 			sm.Mesh = new Mesh {
@@ -112,49 +118,35 @@ namespace Orange
 
 		private Matrix44 CorrectCameraTransform(Matrix44 origin)
 		{
-			/*
-			* According to the fbx-documentation the camera's forward vector
-			* points along a node's positive X axis.
-			* so we have to rotate it by 90 around the Y-axis to correct it.
-			*/
 			Matrix44 rotationMatrix;
 			Vector3 translation;
 			Vector3 scale;
 			origin.Decompose(out scale, out rotationMatrix, out translation);
-			var newRotation = rotationMatrix.Rotation * Quaternion.CreateFromEulerAngles(Vector3.UnitY * -Mathf.Pi / 2);
+			var newRotation = rotationMatrix.Rotation * CameraPostRotation;
 			return Matrix44.CreateRotation(newRotation) * Matrix44.CreateScale(scale) * Matrix44.CreateTranslation(translation);
+		}
+
+		private void CorrectCameraAnimationKeys(IEnumerable<Keyframe<Quaternion>> keys)
+		{
+			foreach (var key in keys) {
+				key.Value *= CameraPostRotation;
+			}
 		}
 
 		private void ImportAnimations(Scene scene)
 		{
 			foreach (var animation in scene.Animations.Animations) {
 				var n = Model.TryFind<Node3D>(animation.Key);
-				var scaleKeys = new List<Keyframe<Vector3>>();
-				var rotationKeys = new List<Keyframe<Quaternion>>();
-				var translationKeys = new List<Keyframe<Vector3>>();
-				for (int i = 0; i < animation.TimeSteps.Length; i++) {
-					var time = AnimationUtils.SecondsToFrames(animation.TimeSteps[i]);
-					Vector3 finalScale;
-					Quaternion finalRotation;
-					Vector3 finalTranslation;
-					if (n is Camera3D) {
-						animation.Transform[i] = CorrectCameraTransform(animation.Transform[i]);
-					}
-
-					animation.Transform[i].Decompose(out finalScale, out finalRotation, out finalTranslation);
-					scaleKeys.Add(new Keyframe<Vector3>(time, finalScale));
-					rotationKeys.Add(new Keyframe<Quaternion>(time, finalRotation));
-					translationKeys.Add(new Keyframe<Vector3>(time, finalTranslation));
-				}
-
 				(n.Animators["Scale", animation.MarkerId] as Animator<Vector3>).Keys.AddRange(
-					Vector3KeyReducer.Default.Reduce(scaleKeys));
-
-				(n.Animators["Rotation", animation.MarkerId] as Animator<Quaternion>).Keys.AddRange(
-					QuaternionKeyReducer.Default.Reduce(rotationKeys));
-
+					Vector3KeyReducer.Default.Reduce(animation.scaleKeys));
+				var rotAnimator = n.Animators["Rotation", animation.MarkerId] as Animator<Quaternion>;
+				rotAnimator.Keys.AddRange(
+					QuaternionKeyReducer.Default.Reduce(animation.rotationKeys));
+				if (n is Camera3D) {
+					CorrectCameraAnimationKeys(rotAnimator.Keys);
+				}
 				(n.Animators["Position", animation.MarkerId] as Animator<Vector3>).Keys.AddRange(
-					Vector3KeyReducer.Default.Reduce(translationKeys));
+					Vector3KeyReducer.Default.Reduce(animation.positionKeys));
 				if (!Model.Animations.Any(a => a.Id == animation.MarkerId)) {
 					Model.Animations.Add(new Lime.Animation {
 						Id = animation.MarkerId,

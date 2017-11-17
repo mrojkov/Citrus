@@ -1,8 +1,7 @@
-﻿using Lime;
-using Orange.FbxImporter;
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
-using System.Text;
+using System.Collections.Generic;
+using Lime;
 
 namespace Orange.FbxImporter
 {
@@ -15,17 +14,43 @@ namespace Orange.FbxImporter
 
 	public class MeshAttribute : NodeAttribute
 	{
-		public int[] Indices { get; private set; }
-
-		public int MaterialIndex { get; private set; }
-
-		public Mesh3D.Vertex[] Vertices { get; private set; }
-
-		public Bone[] Bones { get; private set; }
+		public List<Submesh> Submeshes { get; private set; } = new List<Submesh>();
 
 		public override FbxNodeType Type { get; } = FbxNodeType.MESH;
 
-		public MeshAttribute(IntPtr ptr) : base(ptr)
+		public MeshAttribute() : base(IntPtr.Zero)
+		{
+		}
+
+		public static MeshAttribute FromSubmesh(IntPtr submeshPtr)
+		{
+			return new MeshAttribute {
+				Submeshes = { new Submesh(submeshPtr) }
+			};
+		}
+
+		public static MeshAttribute Combine(MeshAttribute meshAttribute1, MeshAttribute meshAttribute2)
+		{
+			var sm = new List<Submesh>();
+			sm.AddRange(meshAttribute1.Submeshes);
+			sm.AddRange(meshAttribute2.Submeshes);
+			return new MeshAttribute {
+				Submeshes = sm
+			};
+		}
+	}
+
+	public class Submesh : NodeAttribute
+	{
+		public int[] Indices { get; set; }
+
+		public int MaterialIndex { get; set; }
+
+		public Mesh3D.Vertex[] Vertices { get; set; }
+
+		public Bone[] Bones { get; set; }
+
+		public Submesh(IntPtr ptr) : base(ptr)
 		{
 			var native = FbxNodeGetMeshAttribute(NativePtr, true);
 			if (native == IntPtr.Zero) {

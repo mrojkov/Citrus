@@ -8,9 +8,11 @@ namespace Orange.FbxImporter
 {
 	public class AnimationData
 	{
-		public Matrix44[] Transform { get; set; }
+		public List<Keyframe<Vector3>> positionKeys { get; set; }
 
-		public double[] TimeSteps { get; set; }
+		public List<Keyframe<Vector3>> scaleKeys { get; set; }
+
+		public List<Keyframe<Quaternion>> rotationKeys { get; set; }
 
 		public string Key { get; set; }
 
@@ -36,16 +38,26 @@ namespace Orange.FbxImporter
 					for (int j = 0; j < stacks[i].count; j++) {
 						if (layers[j].count == 0)
 							continue;
-						var animations = layers[j].nodes.ToStructArray<AnimationData>(layers[j].count);
+						var animations = layers[j].nodes.ToStructArray<KeyframeCollection>(layers[j].count);
 						for (int k = 0; k < layers[j].count; k++) {
 							var data = new FbxImporter.AnimationData();
 							Animations.Add(data);
 							data.MarkerId = stacks[i].name;
-							data.Key = animations[k].key.ToCharArray();
-							data.TimeSteps = animations[k].times.ToDoubleArray(animations[k].count);
-							data.Transform = animations[k].transforms
-								.ToStructArray<Mat4x4>(animations[k].count)
-								.Select(v => v.ToLime()).ToArray();
+							data.Key = animations[k].id;
+							data.positionKeys = animations[k].positionKeys.keyframes
+								.ToStructArray<Vec3Keyframe>(animations[k].positionKeys.count)
+								.Select(key => new Keyframe<Vector3>(AnimationUtils.SecondsToFrames(key.time), key.data.toLime()))
+								.ToList();
+
+							data.rotationKeys = animations[k].rotationKeys.keyframes
+								.ToStructArray<Vec4Keyframe>(animations[k].rotationKeys.count)
+								.Select(key => new Keyframe<Quaternion>(AnimationUtils.SecondsToFrames(key.time), key.data.toLimeQuaternion()))
+								.ToList();
+
+							data.scaleKeys = animations[k].scaleKeys.keyframes
+								.ToStructArray<Vec3Keyframe>(animations[k].scaleKeys.count)
+								.Select(key => new Keyframe<Vector3>(AnimationUtils.SecondsToFrames(key.time), key.data.toLime()))
+								.ToList();
 						}
 					}
 				}
@@ -70,42 +82,68 @@ namespace Orange.FbxImporter
 			public IntPtr stacks;
 		}
 
-		[StructLayout(LayoutKind.Sequential)]
+		[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
 		private class AnimationStack
 		{
 			[MarshalAs(UnmanagedType.I4)]
 			public int count;
 
-			[MarshalAs(UnmanagedType.LPStr)]
 			public string name;
 
 			public IntPtr layers;
 		}
 
-		[StructLayout(LayoutKind.Sequential)]
+		[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
 		private class AnimationLayer
 		{
 			[MarshalAs(UnmanagedType.I4)]
 			public int count;
 
-			[MarshalAs(UnmanagedType.LPStr)]
 			public string name;
 
 			public IntPtr nodes;
 		}
 
-		[StructLayout(LayoutKind.Sequential)]
-		private class AnimationData
+		[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+		private class KeyframeCollection
 		{
-			public IntPtr transforms;
+			public string id;
 
-			public IntPtr times;
+			public AnimationKeyframeSet positionKeys;
 
+			public AnimationKeyframeSet scaleKeys;
+
+			public AnimationKeyframeSet rotationKeys;
+		}
+
+		[StructLayout(LayoutKind.Sequential)]
+		private class AnimationKeyframeSet
+		{
 			[MarshalAs(UnmanagedType.I4)]
 			public int count;
 
-			public IntPtr key;
+			public IntPtr keyframes;
 		}
+
+
+		[StructLayout(LayoutKind.Sequential)]
+		private class AnimationKeyframe
+		{
+			public double time;
+		}
+
+		[StructLayout(LayoutKind.Sequential)]
+		private class Vec3Keyframe : AnimationKeyframe
+		{
+			public Vec3 data;
+		}
+
+		[StructLayout(LayoutKind.Sequential)]
+		private class Vec4Keyframe : AnimationKeyframe
+		{
+			public Vec4 data;
+		}
+
 
 		#endregion
 	}

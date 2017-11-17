@@ -8,7 +8,7 @@ namespace Orange.FbxImporter
 {
 	public class Node : FbxObject
 	{
-		public NodeAttribute[] Attributes { get; private set; } = new NodeAttribute[1] { NodeAttribute.Empty };
+		public NodeAttribute Attribute { get; private set; } = NodeAttribute.Empty;
 
 		public List<Node> Children { get; } = new List<Node>();
 
@@ -21,7 +21,6 @@ namespace Orange.FbxImporter
 		public Node(IntPtr ptr) : base (ptr)
 		{
 			var nodeCount = FbxNodeGetChildCount(NativePtr);
-			var attribCount = FbxNodeGetAttributeCount(NativePtr);
 			var materialsCount = FbxNodeGetMaterialCount(NativePtr);
 
 			Name = Marshal.PtrToStringAnsi(FbxNodeGetName(NativePtr));
@@ -30,12 +29,7 @@ namespace Orange.FbxImporter
 				Materials[i] = new Material(FbxNodeGetMaterial(NativePtr, i));
 			}
 
-			if (attribCount > 0) {
-				Attributes = new NodeAttribute[attribCount];
-				for (int i = 0; i < attribCount; i++) {
-					Attributes[i] = NodeAttribute.GetFromNode(NativePtr, i);
-				}
-			}
+			Attribute = NodeAttribute.GetFromNode(NativePtr);
 
 			for (int i = 0; i < nodeCount; i++) {
 				Children.Add(new Node(FbxNodeGetChildNode(NativePtr, i)));
@@ -60,9 +54,6 @@ namespace Orange.FbxImporter
 
 		[DllImport(ImportConfig.LibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
 		public static extern IntPtr FbxNodeGetName(IntPtr node);
-
-		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern int FbxNodeGetAttributeCount(IntPtr node);
 
 		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
 		public static extern int FbxNodeGetMaterialCount(IntPtr node);
