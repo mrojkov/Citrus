@@ -73,9 +73,15 @@ namespace Tangerine.UI.Timeline
 			Action<Widget> r = widget => timeline.Grid.RenderSelection(widget, offset);
 			grid.OnPostRender += r;
 			float time = 0;
+
 			while (input.IsMousePressed()) {
 				time += Lime.Task.Current.Delta;
 				offset = grid.CellUnderMouse() - initialCell;
+
+				if (!input.IsKeyPressed(Key.Shift)) {
+					offset.Y = 0;
+				}
+
 				Window.Current.Invalidate();
 				yield return null;
 			}
