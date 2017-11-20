@@ -32,6 +32,8 @@ namespace Tangerine.Core
 		public static CookingOfModifiedAssetsStartedDelegate CookingOfModifiedAssetsStarted;
 		public delegate void CookingOfModifiedAssetsEndedDelegate();
 		public static CookingOfModifiedAssetsEndedDelegate CookingOfModifiedAssetsEnded;
+		public delegate void OpenFileOutsideProjectAttemptDelegate(string filePath);
+		public static OpenFileOutsideProjectAttemptDelegate OpenFileOutsideProjectAttempt;
 		public static volatile string CookingOfModifiedAssetsStatus;
 		public static TaskList Tasks { get; set; }
 		public ObservableCollection<RulerData> Rulers { get; } = new ObservableCollection<RulerData>();
@@ -193,11 +195,19 @@ namespace Tangerine.Core
 			return doc;
 		}
 
-		public Document OpenDocument(string path)
+		public Document OpenDocument(string path, bool pathIsGlobal = false)
 		{
-			var doc = Documents.FirstOrDefault(i => i.Path == path);
+			string localPath = path;
+			if (pathIsGlobal) {
+				if (!Current.TryGetAssetPath(path, out localPath)) {
+					OpenFileOutsideProjectAttempt(path);
+					return null;
+				}
+			}
+
+			var doc = Documents.FirstOrDefault(i => i.Path == localPath);
 			if (doc == null) {
-				doc = new Document(path);
+				doc = new Document(localPath);
 				documents.Add(doc);
 			}
 			doc.MakeCurrent();
@@ -339,7 +349,7 @@ namespace Tangerine.Core
 		{
 			foreach (var asset in assets) {
 				CookingOfModifiedAssetsStatus = asset;
-				Orange.AssetCooker.CookCustomAssets(Orange.The.Workspace.ActivePlatform, new List<string> {asset});
+				Orange.AssetCooker.CookCustomAssets(Orange.The.Workspace.ActivePlatform, new List<string> { asset });
 			}
 		}
 

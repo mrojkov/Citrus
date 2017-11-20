@@ -230,12 +230,7 @@ namespace Tangerine.UI.FilesystemView
 				GoTo(path);
 			} else {
 				if (path.EndsWith(".scene") || path.EndsWith(".tan")) {
-					string localPath;
-					if (!Project.Current.TryGetAssetPath(path, out localPath)) {
-						AlertDialog.Show("Can't open a document outside the project directory");
-					} else {
-						Project.Current.OpenDocument(localPath);
-					}
+					Project.Current.OpenDocument(path, true);
 				}
 			}
 		}

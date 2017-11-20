@@ -12,13 +12,18 @@ namespace Tangerine
 		{
 			var dlg = new FileDialog { AllowedFileTypes = new string[] { "citproj" }, Mode = FileDialogMode.Open };
 			if (dlg.RunModal()) {
-				if (Project.Current.Close()) {
-					new Project(dlg.FileName).Open();
-					var prefs = Core.UserPreferences.Instance.Get<UserPreferences>();
-					prefs.RecentProjects.Remove(dlg.FileName);
-					prefs.RecentProjects.Insert(0, dlg.FileName);
-					Core.UserPreferences.Instance.Save();
-				}
+				Execute(dlg.FileName);
+			}
+		}
+
+		public static void Execute(string fileName)
+		{
+			if (Project.Current.Close()) {
+				new Project(fileName).Open();
+				var prefs = Core.UserPreferences.Instance.Get<UserPreferences>();
+				prefs.RecentProjects.Remove(fileName);
+				prefs.RecentProjects.Insert(0, fileName);
+				Core.UserPreferences.Instance.Save();
 			}
 		}
 	}
@@ -53,12 +58,7 @@ namespace Tangerine
 				dlg.InitialDirectory = Project.Current.GetSystemDirectory(Document.Current.Path);
 			}
 			if (dlg.RunModal()) {
-				string localPath;
-				if (!Project.Current.TryGetAssetPath(dlg.FileName, out localPath)) {
-					AlertDialog.Show("Can't open a document outside the project directory");
-				} else {
-					Project.Current.OpenDocument(localPath);
-				}
+				Project.Current.OpenDocument(dlg.FileName, true);
 			}
 		}
 	}

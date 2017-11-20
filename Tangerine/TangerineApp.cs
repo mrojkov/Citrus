@@ -92,6 +92,28 @@ namespace Tangerine
 				cookingOfModifiedAssetsDialog.Close();
 				cookingOfModifiedAssetsDialog = null;
 			};
+			Project.OpenFileOutsideProjectAttempt += (string filePath) => {
+				var path = filePath.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+				path[0] += '\\';
+				string projectFilePath = null;
+				for (int i = path.Length - 2; i >= 0; i--) {
+					var ppp = Path.Combine(path.Take(i + 1).ToArray());
+					var projectFileCandidates = Directory.GetFiles(ppp, "*.citproj", SearchOption.TopDirectoryOnly);
+					if (projectFileCandidates.Length > 0) {
+						projectFilePath = projectFileCandidates[0];
+						break;
+					}
+				}
+				if (projectFilePath != null) {
+					var alert = new AlertDialog($"You're trying to open a document outside the project directory. Change the current project to '{Path.GetFileName(projectFilePath)}'?", "Yes", "No");
+					if (alert.Show() == 0) {
+						FileOpenProject.Execute(projectFilePath);
+						Project.Current.OpenDocument(filePath, true);
+						return;
+					}
+				}
+				AlertDialog.Show("Can't open a document outside the project directory");
+			};
 			Project.Tasks = dockManager.MainWindowWidget.Tasks;
 			Document.NodeDecorators.AddFor<Spline>(n => n.CompoundPostPresenter.Add(new UI.SceneView.SplinePresenter()));
 			Document.NodeDecorators.AddFor<Viewport3D>(n => n.CompoundPostPresenter.Add(new UI.SceneView.Spline3DPresenter()));
