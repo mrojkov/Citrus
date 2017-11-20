@@ -47,8 +47,10 @@ namespace Tangerine.UI.FilesystemView
 				targetSelector.Items.Add(new ThemedDropDownList.Item(t.Name, t));
 			}
 			targetSelector.Changed += (value) => {
-				activeTarget = (Target)value.Value;
-				Invalidate(savedSelection);
+				if (value.ChangedByUser) {
+					activeTarget = (Target)value.Value;
+					Invalidate(savedSelection);
+				}
 			};
 			targetSelector.Index = 0;
 			activeTarget = null;

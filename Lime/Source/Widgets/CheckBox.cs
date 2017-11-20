@@ -7,16 +7,12 @@ namespace Lime
 	{
 		private bool @checked;
 
-		public event Action<bool> Changed;
+		public event Action<ChangedEventArgs> Changed;
 
 		public bool Checked
 		{
 			get { return @checked; }
-			set
-			{
-				@checked = value;
-				Window.Current.Invalidate();
-			}
+			set { SetChecked(value); }
 		}
 
 		public CheckBox()
@@ -35,10 +31,10 @@ namespace Lime
 			while (true) {
 				if (button != null && button.WasClicked()) {
 					SetFocus();
-					Toggle();
+					ToggleInternal(true);
 				}
 				if (Input.ConsumeKeyPress(Key.Space)) {
-					Toggle();
+					ToggleInternal(true);
 				}
 				if (Input.ConsumeKeyPress(Key.Enter) || Input.ConsumeKeyPress(Key.Escape)) {
 					RevokeFocus();
@@ -50,9 +46,29 @@ namespace Lime
 		public void Toggle()
 		{
 			Checked = !Checked;
-			if (Changed != null) {
-				Changed(Checked);
-			}
+		}
+
+		private void ToggleInternal(bool changedByUser = false)
+		{
+			SetChecked(!@checked, changedByUser);
+		}
+
+		private void SetChecked(bool @checked, bool changedByUser = false)
+		{
+			this.@checked = @checked;
+			RiseChanged(changedByUser);
+			Window.Current.Invalidate();
+		}
+
+		protected void RiseChanged(bool changedByUser = false)
+		{
+			Changed?.Invoke(new ChangedEventArgs { Value = Checked, ChangedByUser = changedByUser });
+		}
+
+		public class ChangedEventArgs
+		{
+			public bool Value;
+			public bool ChangedByUser;
 		}
 	}
 }
