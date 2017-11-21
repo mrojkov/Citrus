@@ -60,35 +60,77 @@ namespace Tangerine.UI.Timeline
 		{
 			RootWidget.PrepareRendererState();
 			Renderer.DrawRect(Vector2.Zero, RootWidget.Size, ColorTheme.Current.TimelineGrid.Lines);
-			if (ContentWidget.Nodes.Count == 0) {
-				return;
+
+			if (ContentWidget.Nodes.Count > 0) {
+				ContentWidget.PrepareRendererState();
+				Renderer.DrawRect(Vector2.Zero, ContentWidget.Size, ColorTheme.Current.Basic.WhiteBackground);
+
+				RenderInvolvedFrames();
+				RenderVerticalLines();
+				RenderHorizontalLines();
+				RenderMarkersBoundaries();
 			}
-			ContentWidget.PrepareRendererState();
-			Renderer.DrawRect(Vector2.Zero, ContentWidget.Size, ColorTheme.Current.Basic.WhiteBackground);
-			int numCols = timeline.ColumnCount;
-			// Render vertical lines.
-			float x = 0.5f;
-			for (int i = 0; i <= numCols; i++) {
-				if (timeline.IsColumnVisible(i)) {
-					Renderer.DrawLine(
-						x, 1, x, ContentWidget.Height - 2,
-						ColorTheme.Current.TimelineGrid.LinesLight);
-				}
-				x += TimelineMetrics.ColWidth;
-			}
-			// Render dark vertical lines below markers.
-			foreach (var m in Document.Current.Container.Markers) {
-				x = TimelineMetrics.ColWidth * m.Frame + 0.5f;
-				if (timeline.IsColumnVisible(m.Frame)) {
-					Renderer.DrawLine(
-						x, 1, x, ContentWidget.Height - 2, ColorTheme.Current.TimelineGrid.Lines);
-				}
-			}
-			// Render dark horizonal lines.
-			Renderer.DrawLine(0, 0.5f, ContentWidget.Width, 0.5f, ColorTheme.Current.TimelineGrid.Lines);
+		}
+
+		private void RenderInvolvedFrames()
+		{
 			foreach (var row in Document.Current.Rows) {
-				var y = row.GridWidget().Bottom() + 0.5f;
-				Renderer.DrawLine(0, y, ContentWidget.Width, y, ColorTheme.Current.TimelineGrid.Lines);
+				var nodeRow = row.Components.Get<Core.Components.NodeRow>().Node;
+				int lastFrameIndex = 0;
+
+				foreach (var animator in nodeRow.Animators) {
+					var key = animator.ReadonlyKeys.LastOrDefault();
+					if (key != null && key.Frame > lastFrameIndex) {
+						lastFrameIndex = key.Frame;
+					}
+				}
+
+				if (lastFrameIndex > 0) {
+					var gridWidget = row.GridWidget();
+
+					Renderer.DrawRect(
+						0.0f, gridWidget.Top(), (lastFrameIndex * TimelineMetrics.ColWidth), gridWidget.Bottom(),
+						ColorTheme.Current.TimelineGrid.InvolvedFrames);
+				}
+			}
+		}
+
+		private void RenderVerticalLines()
+		{
+			Vector2 from = new Vector2(0.0f, 1.0f);
+			Vector2 to = new Vector2(0.0f, ContentWidget.Height - 2.0f);
+
+			for (int columnIndex = 0; columnIndex <= timeline.ColumnCount; columnIndex++) {
+				if (timeline.IsColumnVisible(columnIndex)) {
+					from.X = to.X = 0.5f + columnIndex * TimelineMetrics.ColWidth;
+					Renderer.DrawLine(from, to, ColorTheme.Current.TimelineGrid.LinesLight);
+				}
+			}
+		}
+
+		private void RenderHorizontalLines()
+		{
+			Vector2 from = new Vector2(0.0f, 0.5f);
+			Vector2 to = new Vector2(ContentWidget.Width, 0.5f);
+
+			Renderer.DrawLine(from, to, ColorTheme.Current.TimelineGrid.Lines);
+
+			foreach (var row in Document.Current.Rows) {
+				from.Y = to.Y = 0.5f + row.GridWidget().Bottom();
+				Renderer.DrawLine(from, to, ColorTheme.Current.TimelineGrid.Lines);
+			}
+		}
+
+		private void RenderMarkersBoundaries()
+		{
+			Vector2 from = new Vector2(0.0f, 1.0f);
+			Vector2 to = new Vector2(0.0f, ContentWidget.Height - 2.0f);
+
+			foreach (var marker in Document.Current.Container.Markers) {
+				if (timeline.IsColumnVisible(marker.Frame)) {
+					from.X = to.X = 0.5f + TimelineMetrics.ColWidth * marker.Frame;
+					Renderer.DrawLine(from, to, ColorTheme.Current.TimelineGrid.Lines);
+				}
 			}
 		}
 
