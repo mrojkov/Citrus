@@ -20,12 +20,7 @@ namespace Lime
 		public int Index
 		{
 			get { return index; }
-			set
-			{
-				index = value;
-				RefreshTextWidget();
-				RaiseChanged();
-			}
+			set { SetIndex(value); }
 		}
 
 		public override string Text
@@ -119,8 +114,7 @@ namespace Lime
 				}
 				var t = j;
 				command.Issued += () => {
-					Index = t;
-					RaiseChanged();
+					SetIndex(t, true);
 				};
 				menu.Add(command);
 				j++;
@@ -136,9 +130,16 @@ namespace Lime
 #endif
 		}
 
-		protected void RaiseChanged()
+		private void SetIndex(int t, bool changedByUser = false)
 		{
-			Changed?.Invoke(new ChangedEventArgs { Index = Index, Value = Value });
+			index = t;
+			RefreshTextWidget();
+			RaiseChanged(changedByUser);
+		}
+
+		protected void RaiseChanged(bool changedByUser = false)
+		{
+			Changed.Invoke(new ChangedEventArgs { Index = Index, Value = Value, ChangedByUser = changedByUser });
 		}
 
 		protected void RefreshTextWidget()
@@ -165,12 +166,13 @@ namespace Lime
 				Value = value;
 			}
 		}
-	}
 
-	public class ChangedEventArgs
-	{
-		public int Index;
-		public object Value;
+		public class ChangedEventArgs
+		{
+			public int Index;
+			public object Value;
+			public bool ChangedByUser;
+		}
 	}
 
 	public class DropDownList : CommonDropDownList
