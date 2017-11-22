@@ -70,7 +70,8 @@ namespace Tangerine.Core.Operations
 		public static void Perform(object obj, string propertyName, object value)
 		{
 			var animable = obj as IAnimable;
-			if (animable != null && animable.Animators.TryFind(propertyName, out var animator, Document.Current.AnimationId) &&
+			IAnimator animator;
+			if (animable != null && animable.Animators.TryFind(propertyName, out animator, Document.Current.AnimationId) &&
 				animator.ReadonlyKeys.Count > 0) {
 				SetAnimableProperty.Perform(obj, propertyName, value);
 
