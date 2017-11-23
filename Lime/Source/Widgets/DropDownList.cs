@@ -139,7 +139,7 @@ namespace Lime
 
 		protected void RaiseChanged(bool changedByUser = false)
 		{
-			Changed.Invoke(new ChangedEventArgs { Index = Index, Value = Value, ChangedByUser = changedByUser });
+			Changed?.Invoke(new ChangedEventArgs { Index = Index, Value = Value, ChangedByUser = changedByUser });
 		}
 
 		protected void RefreshTextWidget()
