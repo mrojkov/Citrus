@@ -105,8 +105,8 @@ namespace Lime
 				return;
 			}
 			
-			bool lightningEnabled = ProcessLightning && viewport != null && viewport.LightSource != null && viewport.LightSource.Visible;
-			bool shadowsEnabled = lightningEnabled && viewport.LightSource.ShadowMappingEnabled;
+			bool lightningEnabled = ProcessLightning && Viewport != null && Viewport.LightSource != null && Viewport.LightSource.Visible;
+			bool shadowsEnabled = lightningEnabled && Viewport.LightSource.ShadowMappingEnabled;
 
 			Renderer.World = GlobalTransform;
 			Renderer.CullMode = CullMode;
@@ -131,7 +131,7 @@ namespace Lime
 				if (lightningMaterial != null) {
 					lightningMaterial.ProcessLightning = lightningEnabled;
 					if (lightningEnabled) {
-						lightningMaterial.SetLightData(viewport.LightSource);
+						lightningMaterial.SetLightData(Viewport.LightSource);
 					}
 				}
 
@@ -239,11 +239,10 @@ namespace Lime
 			if (!CommonWindow.Current.Input.WasKeyReleased(Key.Mouse0) || !IsMouseOver()) {
 				return;
 			}
-			var viewport = GetViewport();
-			if (WidgetInput.Filter != null && !WidgetInput.Filter(viewport, Key.Mouse0)) {
+			if (WidgetInput.Filter != null && !WidgetInput.Filter(Viewport, Key.Mouse0)) {
 				return;
 			}
-			if (!viewport.IsMouseOverThisOrDescendant()) {
+			if (!Viewport.IsMouseOverThisOrDescendant()) {
 				return;
 			}
 			Clicked();

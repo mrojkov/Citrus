@@ -12,11 +12,26 @@ namespace Lime
 		private Vector3 position;
 		private bool visible;
 		private Color4 color;
+		private Viewport3D viewport;
 
 		protected Matrix44 globalTransform;
 		protected bool globallyVisible;
 		protected Color4 globalColor;
-		protected Viewport3D viewport;
+
+		public Viewport3D Viewport
+		{
+			get
+			{
+				if (viewport == null) {
+					var p = Parent;
+					while (p != null && !(p is Viewport3D)) {
+						p = p.Parent;
+					}
+					viewport = p as Viewport3D;
+				}
+				return viewport;
+			}
+		}
 
 		[YuzuMember]
 		[TangerineKeyframeColor(2)]
@@ -163,11 +178,6 @@ namespace Lime
 			color = Color4.White;
 		}
 
-		protected override void Awake()
-		{
-			viewport = GetViewport();
-		}
-
 		public virtual float CalcDistanceToCamera(Camera3D camera)
 		{
 			return camera.View.TransformVector(GlobalTransform.Translation).Z;
@@ -190,15 +200,6 @@ namespace Lime
 		{
 			transform.Decompose(out scale, out rotation, out position);
 			PropagateDirtyFlags(DirtyFlags.GlobalTransform);
-		}
-
-		public Viewport3D GetViewport()
-		{
-			Node p = Parent;
-			while (p != null && !(p is Viewport3D)) {
-				p = p.Parent;
-			}
-			return p as Viewport3D;
 		}
 
 		public Model3D FindModel()
@@ -228,6 +229,7 @@ namespace Lime
 			var clone = base.Clone() as Node3D;
 			clone.AsNode3D = clone;
 			clone.Opaque = Opaque;
+			clone.viewport = null;
 			return clone;
 		}
 
@@ -251,7 +253,7 @@ namespace Lime
 		protected override void OnParentChanged(Node oldParent)
 		{
 			base.OnParentChanged(oldParent);
-			viewport = GetViewport();
+			viewport = null;
 		}
 	}
 }
