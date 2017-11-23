@@ -66,7 +66,7 @@
 			#endif
 				
 				gl_Position = u_WorldViewProj * position;
-				v_Normal = mat3(u_World) * a_Normal.xyz;
+				v_Normal = mat3(u_World[0].xyz, u_World[1].xyz, u_World[2].xyz) * a_Normal.xyz;
 			}
 		";
 
