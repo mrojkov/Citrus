@@ -17,6 +17,9 @@ namespace Lime
 		private static readonly IWindowManager WindowManager =
 			AndroidApp.Context.GetSystemService(AndroidContext.WindowService).JavaCast<IWindowManager>();
 
+		// This line only suppresses warning: "Window.Current: a name can be simplified".
+		public new static IWindow Current => CommonWindow.Current;
+
 		private readonly Display display = new Display(WindowManager.DefaultDisplay);
 		private readonly FPSCounter fpsCounter;
 
