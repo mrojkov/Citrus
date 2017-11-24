@@ -28,7 +28,6 @@ namespace Tangerine.UI
 		public static DockManager Instance { get; private set; }
 
 		public event Action<IEnumerable<string>> FilesDropped;
-		private const string appIconPath = @"Resources/Icons/icon.ico";
 
 		public static void Initialize(Vector2 windowSize, IMenu padsMenu)
 		{
@@ -41,14 +40,7 @@ namespace Tangerine.UI
 		private DockManager(Vector2 windowSize, IMenu padsMenu)
 		{
 			this.padsMenu = padsMenu;
-			var window = new Window(new WindowOptions {
-				ClientSize = windowSize,
-				FixedSize = false,
-				Title = "Tangerine",
-#if WIN
-				Icon = new System.Drawing.Icon(appIconPath),
-#endif // WIN
-		});
+			var window = new Window(new WindowOptions { ClientSize = windowSize, FixedSize = false, Title = "Tangerine" });
 			window.UnhandledExceptionOnUpdate += HandleException;
 			SetDropHandler(window);
 			MainWindowWidget = new ThemedInvalidableWindowWidget(window) {
@@ -168,13 +160,7 @@ namespace Tangerine.UI
 			foreach (var p in panels.Where(p => !p.Placement.Docked)) {
 				if (!p.Placement.Hidden) {
 					if (p.WindowWidget == null) {
-						var window = new Window(new WindowOptions {
-							Title = p.Title,
-							FixedSize = false,
-#if WIN
-							Icon = new System.Drawing.Icon(appIconPath),
-#endif // WIN
-						});
+						var window = new Window(new WindowOptions { Title = p.Title, FixedSize = false });
 						window.UnhandledExceptionOnUpdate += HandleException;
 						SetDropHandler(window);
 						window.Closing += reason => {

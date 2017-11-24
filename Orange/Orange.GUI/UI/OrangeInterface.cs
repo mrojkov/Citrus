@@ -25,11 +25,8 @@ namespace Orange
 			window = new Window(new WindowOptions {
 				ClientSize = windowSize,
 				FixedSize = false,
-				Title = "Orange",
-#if WIN
-				Icon = new System.Drawing.Icon(@"Resources/Orange.ico"),
-#endif // WIN
-		});
+				Title = "Orange"
+			});
 			window.Closed += The.Workspace.Save;
 			windowWidget = new ThemedInvalidableWindowWidget(window) {
 				Id = "MainWindow",
