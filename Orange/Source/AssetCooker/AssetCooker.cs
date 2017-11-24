@@ -1,5 +1,4 @@
 using System;
-using System.Windows.Forms;
 using System.Linq;
 using System.IO;
 using System.Collections.Generic;
@@ -965,7 +964,7 @@ namespace Orange
 			}
 		}
 
-		private static bool TryMakeBackup(string filePath, out string backupFilePath, bool showReplaceDialog = true)
+		private static bool TryMakeBackup(string filePath, out string backupFilePath)
 		{
 			backupFilePath = filePath + ".bak";
 
@@ -973,36 +972,17 @@ namespace Orange
 				return false;
 			}
 
-			DialogResult userChoice = DialogResult.None;
-
-			while (true) {
-				try {
-					File.Copy(filePath, backupFilePath);
-					return true;
-				} catch (IOException) {
-					if (!showReplaceDialog || userChoice == DialogResult.No) {
-						break;
-					}
-
-					userChoice = MessageBox.Show(
-						"A backup file already exists. Do you want to replace it? Click \"No\" to leave the existing backup",
-						"Backup file already exists",
-						MessageBoxButtons.YesNo,
-						MessageBoxIcon.Question);
-
-					if (userChoice == DialogResult.Yes) {
-						File.Delete(backupFilePath);
-					}
-				} catch (System.Exception e) {
-					Console.WriteLine(e);
-					break;
-				}
+			try {
+				File.Copy(filePath, backupFilePath);
+				return true;
+			} catch (System.Exception e) {
+				Console.WriteLine(e);
 			}
 
 			return false;
 		}
 
-		private static bool TryRestoreBackup(string backupFilePath, bool showRetryDialog = true)
+		private static bool TryRestoreBackup(string backupFilePath)
 		{
 			if (!Path.GetExtension(backupFilePath).Equals(".bak")) {
 				return false;
@@ -1010,52 +990,36 @@ namespace Orange
 
 			// Remove ".bak" extension.
 			string targetFilePath = Path.ChangeExtension(backupFilePath, null);
-			DialogResult userChoice = DialogResult.None;
 
-			do {
-				try {
-					if (File.Exists(targetFilePath)) {
-						File.Delete(targetFilePath);
-					}
-					File.Move(backupFilePath, targetFilePath);
-					return true;
-				} catch (IOException) {
-					if (!showRetryDialog) {
-						break;
-					}
-					userChoice = MessageBox.Show(
-						$"A target file \"{targetFilePath}\" is in use. " +
-						"Please close the applications that use it and try again",
-						"Target file is in use",
-						MessageBoxButtons.RetryCancel,
-						MessageBoxIcon.Warning);
-				} catch (System.Exception e) {
-					Console.WriteLine(e);
+			try {
+				if (File.Exists(targetFilePath)) {
+					File.Delete(targetFilePath);
 				}
-			} while (userChoice == DialogResult.Retry);
+				File.Move(backupFilePath, targetFilePath);
+				return true;
+			} catch (System.Exception e) {
+				Console.WriteLine(e);
+			}
 
 			return false;
 		}
 
 		private static void RemoveBackups()
 		{
-			try {
-				foreach (var backupPath in bundleBackupFiles) {
+			foreach (var backupPath in bundleBackupFiles) {
+				try {
 					File.Delete(backupPath);
+				} catch (System.Exception e) {
+					Console.WriteLine(e);
 				}
-			} finally {
-				bundleBackupFiles.Clear();
 			}
+			bundleBackupFiles.Clear();
 		}
 
 		private static void RestoreBackups()
 		{
-			try {
-				foreach (var backupPath in bundleBackupFiles) {
-					TryRestoreBackup(backupPath, File.Exists(backupPath));
-				}
-			} finally {
-				bundleBackupFiles.Clear();
+			foreach (var backupPath in bundleBackupFiles) {
+				TryRestoreBackup(backupPath);
 			}
 		}
 	}
