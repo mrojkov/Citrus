@@ -17,7 +17,7 @@ namespace Orange
 		private ThemedTextView textView;
 		private TextWriter textWriter;
 		private CheckBoxWithLabel updateVcs;
-		private Widget inputLocker = new Widget();
+		private Button abortButton;
 
 		public OrangeInterface()
 		{
@@ -132,18 +132,24 @@ namespace Orange
 					Spacing = 5
 				},
 			};
-			actionPicker = new ThemedDropDownList();
 
+			actionPicker = new ThemedDropDownList();
 			foreach (var menuItem in The.MenuController.GetVisibleAndSortedItems()) {
 				actionPicker.Items.Add(new CommonDropDownList.Item(menuItem.Label, menuItem.Action));
 			}
-
-			container.AddNode(actionPicker);
 			actionPicker.Index = 0;
+			container.AddNode(actionPicker);
+
 			var go = new ThemedButton("Go");
 			go.Clicked += () => Execute((Action) actionPicker.Value);
-			go.AddNode(inputLocker);
 			container.AddNode(go);
+
+			abortButton = new ThemedButton("Abort") {
+				Enabled = false
+			};
+			abortButton.Clicked += () => AssetCooker.CancelCook();
+			container.AddNode(abortButton);
+
 			return container;
 		}
 
@@ -187,23 +193,23 @@ namespace Orange
 		private void EnableControls(bool value)
 		{
 			if (value) {
-				textView.Input.DerestrictScope();
+				abortButton.Input.DerestrictScope();
 			}
 			else {
-				textView.Input.RestrictScope();
+				abortButton.Input.RestrictScope();
 			}
 		}
 
 		private void ShowTimeStatistics(DateTime startTime)
 		{
-			var endTime = DateTime.Now;
-			var delta = endTime - startTime;
-			Console.WriteLine("Elapsed time {0}:{1}:{2}", delta.Hours, delta.Minutes, delta.Seconds);
+			Console.WriteLine(@"Elapsed time {0:hh\:mm\:ss}", DateTime.Now - startTime);
 		}
 
 		public override void OnWorkspaceOpened()
 		{
 			platformPicker.Reload();
+			AssetCooker.BeginCookBundles += () => abortButton.Enabled = true;
+			AssetCooker.EndCookBundles += () => abortButton.Enabled = false;
 		}
 
 		public override void ClearLog()

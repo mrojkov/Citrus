@@ -1,4 +1,5 @@
 using System;
+using System.Windows.Forms;
 using System.Linq;
 using System.IO;
 using System.Collections.Generic;
@@ -28,6 +29,12 @@ namespace Orange
 		private static string atlasesPostfix = string.Empty;
 
 		public const int MaxAtlasChainLength = 1000;
+
+		public static event Action BeginCookBundles;
+		public static event Action EndCookBundles;
+
+		private static bool cookCanceled = false;
+		private static ICollection<string> bundleBackupFiles;
 
 		public static void CookForActivePlatform()
 		{
@@ -117,21 +124,38 @@ namespace Orange
 					}
 				}
 			}
-			CookBundle(CookingRulesBuilder.MainBundleName);
-			foreach (var extraBundle in extraBundles) {
-				CookBundle(extraBundle);
-			}
-			extraBundles.Add(CookingRulesBuilder.MainBundleName);
 
-			var extraBundlesList = extraBundles.ToList();
-			PluginLoader.AfterBundlesCooked(extraBundlesList);
-			if (requiredCookCode) {
-				CodeCooker.Cook(extraBundlesList);
+			try {
+				BeginCookBundles?.Invoke();
+
+				CookBundle(CookingRulesBuilder.MainBundleName);
+				foreach (var extraBundle in extraBundles) {
+					CookBundle(extraBundle);
+				}
+				extraBundles.Add(CookingRulesBuilder.MainBundleName);
+
+				var extraBundlesList = extraBundles.ToList();
+				PluginLoader.AfterBundlesCooked(extraBundlesList);
+				if (requiredCookCode) {
+					CodeCooker.Cook(extraBundlesList);
+				}
+			} catch (OperationCanceledException e) {
+				Console.WriteLine(e.Message);
+				RestoreBackups();
+			} finally {
+				cookCanceled = false;
+				RemoveBackups();
+				EndCookBundles?.Invoke();
 			}
 		}
 
 		private static void CookBundle(string bundleName)
 		{
+			string bundlePath = The.Workspace.GetBundlePath(bundleName);
+			string backupFilePath;
+			TryMakeBackup(bundlePath, out backupFilePath);
+			bundleBackupFiles.Add(backupFilePath);
+
 			using (AssetBundle.Current = CreateBundle(bundleName)) {
 				CookBundleHelper(bundleName);
 			}
@@ -142,7 +166,6 @@ namespace Orange
 				}
 			}
 			if (Platform != TargetPlatform.Unity) {
-				var bundlePath = The.Workspace.GetBundlePath(bundleName);
 				PackedAssetBundle.RefreshBundleCheckSum(bundlePath);
 			}
 		}
@@ -187,6 +210,7 @@ namespace Orange
 						.Where(kv => kv.Value.Contains(cookingProfile))
 						.Select(kv => kv.Key);
 					foreach (var stage in profileCookStages) {
+						CheckCookCancelation();
 						stage();
 					}
 				}
@@ -198,6 +222,8 @@ namespace Orange
 
 		static AssetCooker()
 		{
+			bundleBackupFiles = new List<String>();
+
 			AddStage(SyncModels);
 			AddStage(SyncAtlases, CookingProfile.Total);
 			AddStage(SyncDeleted, CookingProfile.Total);
@@ -895,6 +921,7 @@ namespace Orange
 				}
 			}
 			foreach (var atlasChain in atlasChainsToRebuild) {
+				CheckCookCancelation();
 				BuildAtlasChain(atlasChain);
 			}
 		}
@@ -924,6 +951,112 @@ namespace Orange
 				AssetBundle.ImportFile(dstPath, dstPath, 0, ".model", assetAttributes, cookingRulesMap[srcPath].SHA1);
 				return true;
 			});
+		}
+
+		public static void CancelCook()
+		{
+			cookCanceled = true;
+		}
+
+		private static void CheckCookCancelation()
+		{
+			if (cookCanceled) {
+				throw new OperationCanceledException("------------- Cooking canceled -------------");
+			}
+		}
+
+		private static bool TryMakeBackup(string filePath, out string backupFilePath, bool showReplaceDialog = true)
+		{
+			backupFilePath = filePath + ".bak";
+
+			if (!File.Exists(filePath) ) {
+				return false;
+			}
+
+			DialogResult userChoice = DialogResult.None;
+
+			while (true) {
+				try {
+					File.Copy(filePath, backupFilePath);
+					return true;
+				} catch (IOException) {
+					if (!showReplaceDialog || userChoice == DialogResult.No) {
+						break;
+					}
+
+					userChoice = MessageBox.Show(
+						"A backup file already exists. Do you want to replace it? Click \"No\" to leave the existing backup",
+						"Backup file already exists",
+						MessageBoxButtons.YesNo,
+						MessageBoxIcon.Question);
+
+					if (userChoice == DialogResult.Yes) {
+						File.Delete(backupFilePath);
+					}
+				} catch (System.Exception e) {
+					Console.WriteLine(e);
+					break;
+				}
+			}
+
+			return false;
+		}
+
+		private static bool TryRestoreBackup(string backupFilePath, bool showRetryDialog = true)
+		{
+			if (!Path.GetExtension(backupFilePath).Equals(".bak")) {
+				return false;
+			}
+
+			// Remove ".bak" extension.
+			string targetFilePath = Path.ChangeExtension(backupFilePath, null);
+			DialogResult userChoice = DialogResult.None;
+
+			do {
+				try {
+					if (File.Exists(targetFilePath)) {
+						File.Delete(targetFilePath);
+					}
+					File.Move(backupFilePath, targetFilePath);
+					return true;
+				} catch (IOException) {
+					if (!showRetryDialog) {
+						break;
+					}
+					userChoice = MessageBox.Show(
+						$"A target file \"{targetFilePath}\" is in use. " +
+						"Please close the applications that use it and try again",
+						"Target file is in use",
+						MessageBoxButtons.RetryCancel,
+						MessageBoxIcon.Warning);
+				} catch (System.Exception e) {
+					Console.WriteLine(e);
+				}
+			} while (userChoice == DialogResult.Retry);
+
+			return false;
+		}
+
+		private static void RemoveBackups()
+		{
+			try {
+				foreach (var backupPath in bundleBackupFiles) {
+					File.Delete(backupPath);
+				}
+			} finally {
+				bundleBackupFiles.Clear();
+			}
+		}
+
+		private static void RestoreBackups()
+		{
+			try {
+				foreach (var backupPath in bundleBackupFiles) {
+					TryRestoreBackup(backupPath, File.Exists(backupPath));
+				}
+			} finally {
+				bundleBackupFiles.Clear();
+			}
 		}
 	}
 }
