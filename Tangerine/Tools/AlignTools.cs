@@ -16,13 +16,19 @@ namespace Tangerine
 			if (Utils.CalcAABB(nodes, container, out aabb)) {
 				foreach (var widget in nodes.Editable().OfType<Widget>()) {
 					var p = widget.Position;
-					p.X += (container.Width - aabb.Width) / 2 - aabb.A.X;
-					Core.Operations.SetProperty.Perform(widget, nameof(Widget.Position), p);
+					float d = (container.Width - aabb.Width) / 2 - aabb.A.X;
+					if (Mathf.Abs(d) > Mathf.ZeroTolerance) {
+						p.X += d;
+						Core.Operations.SetAnimablePropertyWhenNeeded.Perform(widget, nameof(Widget.Position), p);
+					}
 				}
 				foreach (var po in nodes.Editable().OfType<PointObject>()) {
 					var p = po.Position;
-					p.X += (container.Width - aabb.Width) / 2 - aabb.A.X;
-					Core.Operations.SetProperty.Perform(po, nameof(Widget.Position), p);
+					float d = (container.Width - aabb.Width) / 2 - aabb.A.X;
+					if (Mathf.Abs(d) > Mathf.ZeroTolerance) {
+						p.X += d;
+						Core.Operations.SetAnimablePropertyWhenNeeded.Perform(po, nameof(Widget.Position), p);
+					}
 				}
 			}
 		}
@@ -38,13 +44,19 @@ namespace Tangerine
 			if (Utils.CalcAABB(nodes, container, out aabb)) {
 				foreach (var widget in nodes.Editable().OfType<Widget>()) {
 					var p = widget.Position;
-					p.Y += (container.Height - aabb.Height) / 2 - aabb.A.Y;
-					Core.Operations.SetProperty.Perform(widget, nameof(Widget.Position), p);
+					float d = (container.Height - aabb.Height) / 2 - aabb.A.Y;
+					if (Mathf.Abs(d) > Mathf.ZeroTolerance) {
+						p.Y += d;
+						Core.Operations.SetAnimablePropertyWhenNeeded.Perform(widget, nameof(Widget.Position), p);
+					}
 				}
 				foreach (var po in nodes.Editable().OfType<PointObject>()) {
 					var p = po.Position;
-					p.Y += (container.Height - aabb.Height) / 2 - aabb.A.Y;
-					Core.Operations.SetProperty.Perform(po, nameof(Widget.Position), p);
+					float d = (container.Height - aabb.Height) / 2 - aabb.A.Y;
+					if (Mathf.Abs(d) > Mathf.ZeroTolerance) {
+						p.X += d;
+						Core.Operations.SetAnimablePropertyWhenNeeded.Perform(po, nameof(Widget.Position), p);
+					}
 				}
 			}
 		}
@@ -60,13 +72,18 @@ namespace Tangerine
 			if (Utils.CalcAABB(nodes, container, out aabb)) {
 				foreach (var widget in nodes.Editable().OfType<Widget>()) {
 					var p = widget.Position;
-					p.X += aabb.Center.X - widget.CalcAABBInSpaceOf(container).Center.X;
-					Core.Operations.SetProperty.Perform(widget, nameof(Widget.Position), p);
+					float d = aabb.Center.X - widget.CalcAABBInSpaceOf(container).Center.X;
+					if (Mathf.Abs(d) > Mathf.ZeroTolerance) {
+						p.X += d;
+						Core.Operations.SetAnimablePropertyWhenNeeded.Perform(widget, nameof(Widget.Position), p);
+					}
 				}
 				foreach (var po in nodes.Editable().OfType<PointObject>()) {
 					var p = po.Position;
-					p.X += aabb.Center.X;
-					Core.Operations.SetProperty.Perform(po, nameof(Widget.Position), p);
+					if (Mathf.Abs(aabb.Center.X) > Mathf.ZeroTolerance) {
+						p.X += aabb.Center.X;
+						Core.Operations.SetAnimablePropertyWhenNeeded.Perform(po, nameof(Widget.Position), p);
+					}
 				}
 			}
 		}
@@ -82,13 +99,18 @@ namespace Tangerine
 			if (Utils.CalcAABB(nodes, container, out aabb)) {
 				foreach (var widget in nodes.Editable().OfType<Widget>()) {
 					var p = widget.Position;
-					p.Y += aabb.Center.Y - widget.CalcAABBInSpaceOf(container).Center.Y;
-					Core.Operations.SetProperty.Perform(widget, nameof(Widget.Position), p);
+					float d = aabb.Center.Y - widget.CalcAABBInSpaceOf(container).Center.Y;
+					if (Mathf.Abs(d) > Mathf.ZeroTolerance) {
+						p.Y += d;
+						Core.Operations.SetAnimablePropertyWhenNeeded.Perform(widget, nameof(Widget.Position), p);
+					}
 				}
 				foreach (var po in nodes.Editable().OfType<PointObject>()) {
 					var p = po.Position;
-					p.Y += aabb.Center.Y;
-					Core.Operations.SetProperty.Perform(po, nameof(Widget.Position), p);
+					if (Mathf.Abs(aabb.Center.Y) > Mathf.ZeroTolerance) {
+						p.Y += aabb.Center.Y;
+						Core.Operations.SetAnimablePropertyWhenNeeded.Perform(po, nameof(Widget.Position), p);
+					}
 				}
 			}
 		}
@@ -104,13 +126,18 @@ namespace Tangerine
 			if (Utils.CalcAABB(nodes, container, out aabb)) {
 				foreach (var widget in nodes.Editable().OfType<Widget>()) {
 					var p = widget.Position;
-					p.Y -= widget.CalcAABBInSpaceOf(container).Top - aabb.Top;
-					Core.Operations.SetProperty.Perform(widget, nameof(Widget.Position), p);
+					float d = widget.CalcAABBInSpaceOf(container).Top - aabb.Top;
+					if (Mathf.Abs(d) > Mathf.ZeroTolerance) {
+						p.Y -= d;
+						Core.Operations.SetAnimablePropertyWhenNeeded.Perform(widget, nameof(Widget.Position), p);
+					}
 				}
 				foreach (var po in nodes.Editable().OfType<PointObject>()) {
 					var p = po.Position;
-					p.Y = aabb.Top;
-					Core.Operations.SetProperty.Perform(po, nameof(Widget.Position), p);
+					if (Mathf.Abs(p.Y - aabb.Top) > Mathf.ZeroTolerance) {
+						p.Y = aabb.Top;
+						Core.Operations.SetAnimablePropertyWhenNeeded.Perform(po, nameof(Widget.Position), p);
+					}
 				}
 			}
 		}
@@ -126,13 +153,18 @@ namespace Tangerine
 			if (Utils.CalcAABB(nodes, container, out aabb)) {
 				foreach (var widget in nodes.Editable().OfType<Widget>()) {
 					var p = widget.Position;
-					p.Y -= widget.CalcAABBInSpaceOf(container).Bottom - aabb.Bottom;
-					Core.Operations.SetProperty.Perform(widget, nameof(Widget.Position), p);
+					float d = widget.CalcAABBInSpaceOf(container).Bottom - aabb.Bottom;
+					if (Mathf.Abs(d) > Mathf.ZeroTolerance) {
+						p.Y -= d;
+						Core.Operations.SetAnimablePropertyWhenNeeded.Perform(widget, nameof(Widget.Position), p);
+					}
 				}
 				foreach (var po in nodes.Editable().OfType<PointObject>()) {
 					var p = po.Position;
-					p.Y = aabb.Bottom;
-					Core.Operations.SetProperty.Perform(po, nameof(Widget.Position), p);
+					if (Mathf.Abs(p.Y - aabb.Bottom) > Mathf.ZeroTolerance) {
+						p.Y = aabb.Bottom;
+						Core.Operations.SetAnimablePropertyWhenNeeded.Perform(po, nameof(Widget.Position), p);
+					}
 				}
 			}
 		}
@@ -148,13 +180,18 @@ namespace Tangerine
 			if (Utils.CalcAABB(nodes, container, out aabb)) {
 				foreach (var widget in nodes.Editable().OfType<Widget>()) {
 					var p = widget.Position;
-					p.X -= widget.CalcAABBInSpaceOf(container).Left - aabb.Left;
-					Core.Operations.SetProperty.Perform(widget, nameof(Widget.Position), p);
+					float d = widget.CalcAABBInSpaceOf(container).Left - aabb.Left;
+					if (Mathf.Abs(d) > Mathf.ZeroTolerance) {
+						p.X -= d;
+						Core.Operations.SetAnimablePropertyWhenNeeded.Perform(widget, nameof(Widget.Position), p);
+					}
 				}
 				foreach (var po in nodes.Editable().OfType<PointObject>()) {
 					var p = po.Position;
-					p.X = aabb.Left;
-					Core.Operations.SetProperty.Perform(po, nameof(Widget.Position), p);
+					if (Mathf.Abs(p.X - aabb.Left) > Mathf.ZeroTolerance) {
+						p.X = aabb.Left;
+						Core.Operations.SetAnimablePropertyWhenNeeded.Perform(po, nameof(Widget.Position), p);
+					}
 				}
 			}
 		}
@@ -170,13 +207,18 @@ namespace Tangerine
 			if (Utils.CalcAABB(nodes, container, out aabb)) {
 				foreach (var widget in nodes.Editable().OfType<Widget>()) {
 					var p = widget.Position;
-					p.X -= widget.CalcAABBInSpaceOf(container).Right - aabb.Right;
-					Core.Operations.SetProperty.Perform(widget, nameof(Widget.Position), p);
+					float d = widget.CalcAABBInSpaceOf(container).Right - aabb.Right;
+					if (Mathf.Abs(d) > Mathf.ZeroTolerance) {
+						p.X -= d;
+						Core.Operations.SetAnimablePropertyWhenNeeded.Perform(widget, nameof(Widget.Position), p);
+					}
 				}
 				foreach (var po in nodes.Editable().OfType<PointObject>()) {
 					var p = po.Position;
-					p.X = aabb.Right;
-					Core.Operations.SetProperty.Perform(po, nameof(Widget.Position), p);
+					if (Mathf.Abs(p.X - aabb.Right) > Mathf.ZeroTolerance) {
+						p.X = aabb.Right;
+						Core.Operations.SetAnimablePropertyWhenNeeded.Perform(po, nameof(Widget.Position), p);
+					}
 				}
 			}
 		}

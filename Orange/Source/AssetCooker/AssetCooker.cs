@@ -29,6 +29,12 @@ namespace Orange
 
 		public const int MaxAtlasChainLength = 1000;
 
+		public static event Action BeginCookBundles;
+		public static event Action EndCookBundles;
+
+		private static bool cookCanceled = false;
+		private static ICollection<string> bundleBackupFiles;
+
 		public static void CookForActivePlatform()
 		{
 			var skipCooking = The.Workspace.ProjectJson.GetValue<bool>("SkipAssetsCooking");
@@ -117,21 +123,38 @@ namespace Orange
 					}
 				}
 			}
-			CookBundle(CookingRulesBuilder.MainBundleName);
-			foreach (var extraBundle in extraBundles) {
-				CookBundle(extraBundle);
-			}
-			extraBundles.Add(CookingRulesBuilder.MainBundleName);
 
-			var extraBundlesList = extraBundles.ToList();
-			PluginLoader.AfterBundlesCooked(extraBundlesList);
-			if (requiredCookCode) {
-				CodeCooker.Cook(extraBundlesList);
+			try {
+				BeginCookBundles?.Invoke();
+
+				CookBundle(CookingRulesBuilder.MainBundleName);
+				foreach (var extraBundle in extraBundles) {
+					CookBundle(extraBundle);
+				}
+				extraBundles.Add(CookingRulesBuilder.MainBundleName);
+
+				var extraBundlesList = extraBundles.ToList();
+				PluginLoader.AfterBundlesCooked(extraBundlesList);
+				if (requiredCookCode) {
+					CodeCooker.Cook(extraBundlesList);
+				}
+			} catch (OperationCanceledException e) {
+				Console.WriteLine(e.Message);
+				RestoreBackups();
+			} finally {
+				cookCanceled = false;
+				RemoveBackups();
+				EndCookBundles?.Invoke();
 			}
 		}
 
 		private static void CookBundle(string bundleName)
 		{
+			string bundlePath = The.Workspace.GetBundlePath(bundleName);
+			string backupFilePath;
+			TryMakeBackup(bundlePath, out backupFilePath);
+			bundleBackupFiles.Add(backupFilePath);
+
 			using (AssetBundle.Current = CreateBundle(bundleName)) {
 				CookBundleHelper(bundleName);
 			}
@@ -142,7 +165,6 @@ namespace Orange
 				}
 			}
 			if (Platform != TargetPlatform.Unity) {
-				var bundlePath = The.Workspace.GetBundlePath(bundleName);
 				PackedAssetBundle.RefreshBundleCheckSum(bundlePath);
 			}
 		}
@@ -187,6 +209,7 @@ namespace Orange
 						.Where(kv => kv.Value.Contains(cookingProfile))
 						.Select(kv => kv.Key);
 					foreach (var stage in profileCookStages) {
+						CheckCookCancelation();
 						stage();
 					}
 				}
@@ -198,6 +221,8 @@ namespace Orange
 
 		static AssetCooker()
 		{
+			bundleBackupFiles = new List<String>();
+
 			AddStage(SyncModels);
 			AddStage(SyncAtlases, CookingProfile.Total);
 			AddStage(SyncDeleted, CookingProfile.Total);
@@ -895,6 +920,7 @@ namespace Orange
 				}
 			}
 			foreach (var atlasChain in atlasChainsToRebuild) {
+				CheckCookCancelation();
 				BuildAtlasChain(atlasChain);
 			}
 		}
@@ -924,6 +950,77 @@ namespace Orange
 				AssetBundle.ImportFile(dstPath, dstPath, 0, ".model", assetAttributes, cookingRulesMap[srcPath].SHA1);
 				return true;
 			});
+		}
+
+		public static void CancelCook()
+		{
+			cookCanceled = true;
+		}
+
+		private static void CheckCookCancelation()
+		{
+			if (cookCanceled) {
+				throw new OperationCanceledException("------------- Cooking canceled -------------");
+			}
+		}
+
+		private static bool TryMakeBackup(string filePath, out string backupFilePath)
+		{
+			backupFilePath = filePath + ".bak";
+
+			if (!File.Exists(filePath) ) {
+				return false;
+			}
+
+			try {
+				File.Copy(filePath, backupFilePath);
+				return true;
+			} catch (System.Exception e) {
+				Console.WriteLine(e);
+			}
+
+			return false;
+		}
+
+		private static bool TryRestoreBackup(string backupFilePath)
+		{
+			if (!Path.GetExtension(backupFilePath).Equals(".bak")) {
+				return false;
+			}
+
+			// Remove ".bak" extension.
+			string targetFilePath = Path.ChangeExtension(backupFilePath, null);
+
+			try {
+				if (File.Exists(targetFilePath)) {
+					File.Delete(targetFilePath);
+				}
+				File.Move(backupFilePath, targetFilePath);
+				return true;
+			} catch (System.Exception e) {
+				Console.WriteLine(e);
+			}
+
+			return false;
+		}
+
+		private static void RemoveBackups()
+		{
+			foreach (var backupPath in bundleBackupFiles) {
+				try {
+					File.Delete(backupPath);
+				} catch (System.Exception e) {
+					Console.WriteLine(e);
+				}
+			}
+			bundleBackupFiles.Clear();
+		}
+
+		private static void RestoreBackups()
+		{
+			foreach (var backupPath in bundleBackupFiles) {
+				TryRestoreBackup(backupPath);
+			}
 		}
 	}
 }

@@ -65,6 +65,22 @@ namespace Tangerine.Core.Operations
 		}
 	}
 
+	public class SetAnimablePropertyWhenNeeded
+	{
+		public static void Perform(object obj, string propertyName, object value)
+		{
+			var animable = obj as IAnimable;
+			IAnimator animator;
+			if (animable != null && animable.Animators.TryFind(propertyName, out animator, Document.Current.AnimationId) &&
+				animator.ReadonlyKeys.Count > 0) {
+				SetAnimableProperty.Perform(obj, propertyName, value);
+
+			} else {
+				SetProperty.Perform(obj, propertyName, value);
+			}
+		}
+	}
+
 	public class RemoveKeyframe : Operation
 	{
 		public readonly int Frame;

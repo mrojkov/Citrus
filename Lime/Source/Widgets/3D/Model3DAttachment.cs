@@ -60,23 +60,26 @@ namespace Lime
 			public BlendingOption Blending { get; set; }
 		}
 
-		public void Apply(Node3D model)
+		public void ApplyOnImport(Node3D model)
 		{
-			ProcessMeshOptions(model);
-			ProcessAnimations(model);
-			ProcessMaterialEffects(model);
+			ApplyScaleFactor(model);
+			ApplyAnimations(model);
 		}
 
-		public void ApplyScaleFactor(Node3D model)
+		public void ApplyOnInstance(Node3D model)
+		{
+			ApplyMeshOptionsOnInstance(model);
+			ApplyAnimationsOnInstance(model);
+			ApplyMaterialEffectsOnInstance(model);
+		}
+
+		private void ApplyScaleFactor(Node3D model)
 		{
 			if (ScaleFactor == 1) {
 				return;
 			}
 			var sf = Vector3.One * ScaleFactor;
 			var nodes = model.Descendants.OfType<Node3D>();
-			Vector3 tranlation;
-			Quaternion rotation;
-			Vector3 scale;
 			foreach (var node in nodes) {
 				node.Position *= sf;
 				if (node is Mesh3D) {
@@ -87,6 +90,9 @@ namespace Lime
 							}
 						};
 						for (int i = 0; i < submesh.BoneBindPoses.Count; i++) {
+							Vector3 tranlation;
+							Quaternion rotation;
+							Vector3 scale;
 							submesh.BoneBindPoses[i].Decompose(out scale, out rotation, out tranlation);
 							tranlation *= sf;
 							submesh.BoneBindPoses[i] =
@@ -110,7 +116,7 @@ namespace Lime
 			}
 		}
 
-		private void ProcessMeshOptions(Node3D model)
+		private void ApplyMeshOptionsOnInstance(Node3D model)
 		{
 			if (MeshOptions.Count == 0) {
 				return;
@@ -135,7 +141,7 @@ namespace Lime
 			}
 		}
 
-		private void ProcessAnimations(Node3D model)
+		private void ApplyAnimations(Node3D model)
 		{
 			if (Animations.Count == 0) {
 				return;
@@ -183,7 +189,21 @@ namespace Lime
 			}
 		}
 
-		private void ProcessMaterialEffects(Node3D model)
+		private void ApplyAnimationsOnInstance(Node3D model)
+		{
+			var blender = model.Components.Get<AnimationBlender>();
+			if (blender == null) {
+				return;
+			}
+
+			foreach (var animation in model.Animations) {
+				if (blender.Options.ContainsKey(animation.Id ?? "")) {
+					animation.AnimationEngine = BlendAnimationEngine.Instance;
+				}
+			}
+		}
+
+		private void ApplyMaterialEffectsOnInstance(Node3D model)
 		{
 			var effectEngine = new MaterialEffectEngine();
 			foreach (var effect in MaterialEffects) {
@@ -220,9 +240,8 @@ namespace Lime
 			}
 		}
 
-		private void OverrideAnimation(Node node, Lime.Animation srcAnimation, Lime.Animation dstAnimation)
+		private static void OverrideAnimation(Node node, Lime.Animation srcAnimation, Lime.Animation dstAnimation)
 		{
-			var srcAnimators = new List<IAnimator>(node.Animators.Where(i => i.AnimationId == srcAnimation.Id));
 			var srcAnimationName = node.Animators.FirstOrDefault()?.AnimationId ?? srcAnimation.Id;
 			foreach (var srcAnimator in node.Animators) {
 				srcAnimator.AnimationId = dstAnimation.Id;
@@ -232,7 +251,7 @@ namespace Lime
 			}
 		}
 
-		private IEnumerable<Node> GetAnimationNodes(Node3D model, Animation animationData)
+		private static IEnumerable<Node> GetAnimationNodes(Node3D model, Animation animationData)
 		{
 			if (animationData.Nodes.Count > 0) {
 				return animationData.Nodes.Distinct().Select(n => model.FindNode(n.Id));

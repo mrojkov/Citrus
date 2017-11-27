@@ -61,19 +61,24 @@ namespace Tangerine.UI.Inspector
 
 		void SetKeyframe(bool value)
 		{
+			int currentFrame = Document.Current.AnimationFrame;
+
 			foreach (var animable in editorParams.Objects.OfType<IAnimable>()) {
-				IKeyframe keyframe = null;
 				IAnimator animator;
-				var hasKey = false;
+				bool hasKey = false;
+
 				if (animable.Animators.TryFind(editorParams.PropertyName, out animator, Document.Current.AnimationId)) {
-					hasKey = animator.ReadonlyKeys.Any(i => i.Frame == Document.Current.AnimationFrame);
+					hasKey = animator.ReadonlyKeys.Any(i => i.Frame == currentFrame);
 					if (hasKey && !value) {
-						Core.Operations.RemoveKeyframe.Perform(animator, Document.Current.AnimationFrame);
+						Core.Operations.RemoveKeyframe.Perform(animator, currentFrame);
 					}
 				}
+
 				if (!hasKey && value) {
 					var propValue = new Property(animable, editorParams.PropertyName).Getter();
-					keyframe = Keyframe.CreateForType(editorParams.PropertyInfo.PropertyType, Document.Current.AnimationFrame, propValue);
+					var keyFunction = animator.Keys.LastOrDefault(k => k.Frame < currentFrame)?.Function ?? KeyFunction.Linear;
+					IKeyframe keyframe = Keyframe.CreateForType(editorParams.PropertyInfo.PropertyType, currentFrame, propValue, keyFunction);
+
 					Core.Operations.SetKeyframe.Perform(animable, editorParams.PropertyName, Document.Current.AnimationId, keyframe);
 				}
 			}

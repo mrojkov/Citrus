@@ -501,7 +501,10 @@ namespace Tangerine.UI
 			foreach (var field in allowedFields) {
 				Selector.Items.Add(new CommonDropDownList.Item(field.Name, field.GetValue(null)));
 			}
-			Selector.Changed += a => SetProperty((T)Selector.Items[a.Index].Value);
+			Selector.Changed += a => {
+				if (a.ChangedByUser)
+					SetProperty((T)Selector.Items[a.Index].Value);
+			};
 			Selector.AddChangeWatcher(CoalescedPropertyValue(), v => Selector.Value = v);
 		}
 
@@ -516,7 +519,7 @@ namespace Tangerine.UI
 		{
 			checkBox = new ThemedCheckBox { LayoutCell = new LayoutCell(Alignment.LeftCenter) };
 			ContainerWidget.AddNode(checkBox);
-			checkBox.Changed += value => SetProperty(value);
+			checkBox.Changed += args => SetProperty(args.Value);
 			checkBox.AddChangeWatcher(CoalescedPropertyValue(), v => checkBox.Checked = v);
 		}
 
@@ -814,8 +817,10 @@ namespace Tangerine.UI
 			comboBox.AddChangeWatcher(CoalescedPropertyValue(), v => comboBox.Text = v);
 		}
 
-		void ComboBox_Changed(ChangedEventArgs args)
+		void ComboBox_Changed(DropDownList.ChangedEventArgs args)
 		{
+			if (!args.ChangedByUser)
+				return;
 			var newTrigger = (string)args.Value;
 			var currentTriggers = CoalescedPropertyValue().GetValue();
 			if (string.IsNullOrWhiteSpace(currentTriggers) || args.Index < 0) {

@@ -172,6 +172,7 @@ namespace Orange
 				{ typeof(ImageCombiner), new NodeWriter { ActorClass = "Hot::MaskedEffect", Writer = n => WriteImageCombinerProperties((ImageCombiner)n) } },
 				{ typeof(ParticleEmitter), new NodeWriter { ActorClass = "Hot::ParticleEmitter2", Writer = n => WriteParticleEmitterProperties((ParticleEmitter)n) } },
 				{ typeof(ParticleModifier), new NodeWriter { ActorClass = "Hot::ParticleTemplate", Writer = n => WriteParticleModifierProperties((ParticleModifier)n) } },
+				{ typeof(EmitterShapePoint), new NodeWriter { ActorClass = "Hot::EmitterShapePoint", Writer = n => WriteEmitterShapePointProperties((EmitterShapePoint)n) } },
 				{ typeof(ParticlesMagnet), new NodeWriter { ActorClass = "Hot::ParticlesMagnet", Writer = n => WriteParticlesMagnetProperties((ParticlesMagnet)n) } },
 				{ typeof(SplineGear), new NodeWriter { ActorClass = "Hot::Gear", Writer = n => WriteSplineGearProperties((SplineGear)n) } },
 				{ typeof(Spline), new NodeWriter { ActorClass = "Hot::Spline", Writer = n => WriteWidgetProperties((Spline)n) } },
@@ -624,6 +625,13 @@ namespace Orange
 			WriteProperty("TangentAngle", node.TangentAngle, 0f);
 			WriteProperty("TangentWeight", node.TangentWeight, 0f);
 			WriteProperty("Straight", node.Straight, false);
+		}
+
+		private void WriteEmitterShapePointProperties(EmitterShapePoint node)
+		{
+			WriteNodeProperties(node);
+			WriteProperty("Anchor", node.Position, Vector2.Zero);
+			WriteProperty("SkinningWeights", node.SkinningWeights, new SkinningWeights());
 		}
 
 		void WriteDistortionMeshProperties(DistortionMesh node)

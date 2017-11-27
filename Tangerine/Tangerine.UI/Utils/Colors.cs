@@ -52,6 +52,7 @@ namespace Tangerine.UI
 			public Color4 RunningCursor;
 			public Color4 WaveformColor;
 			public Color4 WaveformBackground;
+			public Color4 InvolvedFrames;
 		}
 
 		public class TimelineCurveEditorColors
@@ -165,7 +166,8 @@ namespace Tangerine.UI
 				Cursor = new Color4(163, 0, 0).Darken(0.15f),
 				RunningCursor = new Color4(0, 163, 0).Darken(0.15f),
 				WaveformColor = new Color4(170, 255, 140),
-				WaveformBackground = new Color4(160, 160, 220, 60)
+				WaveformBackground = new Color4(160, 160, 220, 60),
+				InvolvedFrames = new Color4(85, 85, 85)
 			};
 			var timelineCurveEditor = new TimelineCurveEditorColors {
 				Curves = new[] { Color4.Red, Color4.Green, Color4.Blue, Color4.Yellow },
@@ -262,12 +264,13 @@ namespace Tangerine.UI
 			var timelineGrid = new TimelineGridColors {
 				PropertyRowBackground = Color4.Black.Transparentify(0.95f),
 				Lines = new Color4(160, 160, 160),
-				LinesLight = new Color4(240, 240, 240),
+				LinesLight = new Color4(225, 225, 225),
 				Selection = Color4.Gray.Transparentify(0.5f),
 				Cursor = Color4.Red.Lighten(0.4f),
 				RunningCursor = Color4.Green.Lighten(0.4f),
 				WaveformColor = new Color4(140, 170, 255),
-				WaveformBackground = new Color4(255, 200, 140, 60)
+				WaveformBackground = new Color4(255, 200, 140, 60),
+				InvolvedFrames = new Color4(240, 240, 240)
 			};
 			var timelineCurveEditor = new TimelineCurveEditorColors {
 				Curves = new[] { Color4.Red, Color4.Green, Color4.Blue, Color4.Yellow },
