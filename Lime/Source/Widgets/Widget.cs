@@ -1014,7 +1014,7 @@ namespace Lime
 
 		private void ExpandParentBoundingRect()
 		{
-			if (!CleanDirtyFlags(DirtyFlags.ParentBoundingRect) || ParentWidget == null) {
+			if (ParentWidget == null) {
 				return;
 			}
 			if (CleanDirtyFlags(DirtyFlags.LocalTransform)) {
