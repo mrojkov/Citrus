@@ -22,7 +22,7 @@ namespace Tangerine.UI.SceneView
 						if (sv.HitTestResizeControlPoint(a)) {
 							Utils.ChangeCursorIfDefault(MouseCursor.SizeNS);
 							if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {
-								yield return Resize(i * 2, pivot);
+								yield return Resize(hull, i * 2, pivot);
 							}
 						}
 						var b = hull[(i + 1) % 4];
@@ -30,7 +30,7 @@ namespace Tangerine.UI.SceneView
 							var cursor = (b.X - a.X).Abs() > (b.Y - a.Y).Abs() ? MouseCursor.SizeNS : MouseCursor.SizeWE;
 							Utils.ChangeCursorIfDefault(cursor);
 							if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {
-								yield return Resize(i * 2 + 1, pivot);
+								yield return Resize(hull, i * 2 + 1, pivot);
 							}
 						}
 					}
@@ -39,24 +39,27 @@ namespace Tangerine.UI.SceneView
 			}
 		}
 
-		IEnumerator<object> Resize(int controlPointIndex, Vector2 pivot)
+		IEnumerator<object> Resize(Quadrangle hull, int controlPointIndex, Vector2 pivot)
 		{
 			var cursor = WidgetContext.Current.MouseCursor;
 			Document.Current.History.BeginTransaction();
 			try {
 				var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>().ToList();
 				var mouseStartPos = sv.MousePosition;
-				var startStates = widgets.Select(w => new WidgetState(w)).ToList();
+				var startStates = widgets.Select(w => new Utils.WidgetState(w)).ToList();
 
 				while (sv.Input.IsMousePressed()) {
 					Utils.ChangeCursorIfDefault(cursor);
 					var proportional = sv.Input.IsKeyPressed(Key.Shift);
 					for (int i = 0; i < widgets.Count; i++) {
-						startStates[i].SetDataTo(widgets[i]);
-						if (sv.Input.IsKeyPressed(Key.Control)) {
-							RescaleWidget(widgets[i], controlPointIndex, sv.MousePosition, mouseStartPos, pivot, proportional);
-						} else {
-							ResizeWidget(widgets[i], controlPointIndex, sv.MousePosition, mouseStartPos, proportional);
+						startStates[i].Restore(widgets[i]);
+					}
+					if (sv.Input.IsKeyPressed(Key.Control)) {
+						RescaleWidgets(hull, widgets.Count <= 1, widgets, controlPointIndex, sv.MousePosition, mouseStartPos,
+							proportional);
+					} else {
+						foreach (Widget widget in widgets) {
+							ResizeWidget(widget, controlPointIndex, sv.MousePosition, mouseStartPos, proportional);
 						}
 					}
 					yield return null;
@@ -66,6 +69,21 @@ namespace Tangerine.UI.SceneView
 				Document.Current.History.EndTransaction();
 			}
 		}
+
+		private static readonly int[] LookupPivotIndex = {
+			4, 5, 6, 7, 0, 1, 2, 3
+		};
+
+		private static readonly bool[][] LookupInvolvedAxes = {
+			new[] {true, true},
+			new[] {false, true},
+			new[] {true, true},
+			new[] {true, false},
+			new[] {true, true},
+			new[] {false, true},
+			new[] {true, true},
+			new[] {true, false},
+		};
 
 		readonly Vector2[] directionLookup = {
 			new Vector2(-1, -1),
@@ -137,74 +155,43 @@ namespace Tangerine.UI.SceneView
 				size.Y = size.Y.Sign() * Mathf.ZeroTolerance;
 			}
 
-			var position = widget.Position + Vector2.RotateDeg(deltaPosition + widget.Pivot * deltaSize, widget.Rotation).Snap(Vector2.Zero);
+			var position = widget.Position +
+					Vector2.RotateDeg(deltaPosition + widget.Pivot * deltaSize, widget.Rotation).Snap(Vector2.Zero);
 			Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), position);
 			Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Size), size);
 		}
 
-		void RescaleWidget(Widget widget, int controlPointIndex, Vector2 curMousePos, Vector2 prevMousePos, Vector2 masterPivot, bool proportional)
+		void RescaleWidgets(Quadrangle originalHull, bool hullInFirstWidgetSpace, List<Widget> widgets, int controlPointIndex,
+			Vector2 curMousePos, Vector2 prevMousePos, bool proportional)
 		{
-			var transform = sv.Scene.CalcTransitionToSpaceOf(widget.ParentWidget);
-			var a = Vector2.RotateDeg(transform * prevMousePos - transform * masterPivot, -widget.Rotation);
-			var b = Vector2.RotateDeg(transform * curMousePos - transform * masterPivot, -widget.Rotation);
-			var scale = Vector2.One;
+			Utils.ApplyTransformationToWidgetsGroupOobb(
+				widgets, originalHull[LookupPivotIndex[controlPointIndex] / 2], hullInFirstWidgetSpace, curMousePos, prevMousePos,
+				(originalVectorInOobbSpace, deformedVectorInOobbSpace) => {
+					Vector2 deformationScaleInOobbSpace =
+							new Vector2(
+								Math.Abs(originalVectorInOobbSpace.X) < Mathf.ZeroTolerance
+									? 1
+									: deformedVectorInOobbSpace.X / originalVectorInOobbSpace.X,
+								Math.Abs(originalVectorInOobbSpace.Y) < Mathf.ZeroTolerance
+									? 1
+									: deformedVectorInOobbSpace.Y / originalVectorInOobbSpace.Y
+							);
+					if (proportional) {
+						deformationScaleInOobbSpace.X = (deformationScaleInOobbSpace.X + deformationScaleInOobbSpace.Y) / 2;
+						deformationScaleInOobbSpace.Y = deformationScaleInOobbSpace.X;
+					}
 
-			if (directionLookup[controlPointIndex].X != 0) {
-				scale.X = b.X / a.X;
-				if (proportional) {
-					scale.Y = scale.X;
+					if (!LookupInvolvedAxes[controlPointIndex][0]) {
+						deformationScaleInOobbSpace.X = proportional ? deformationScaleInOobbSpace.Y : 1;
+					}
+					if (!LookupInvolvedAxes[controlPointIndex][1]) {
+						deformationScaleInOobbSpace.Y = proportional ? deformationScaleInOobbSpace.X : 1;
+					}
+
+					return Matrix32.Scaling(deformationScaleInOobbSpace);
 				}
-			}
-
-			if (directionLookup[controlPointIndex].Y != 0) {
-				scale.Y  = a.Y != 0 ? b.Y / a.Y : 0;
-				if (proportional) {
-					scale.X = scale.Y;
-				}
-			}
-
-			var newPivot = sv.Scene.CalcTransitionToSpaceOf(widget) * masterPivot;
-			if (float.IsInfinity(newPivot.X) || float.IsNaN(newPivot.X)) {
-				newPivot.X = 0;
-			}
-
-			if (float.IsInfinity(newPivot.Y) || float.IsNaN(newPivot.Y)) {
-				newPivot.Y = 0;
-			}
-			
-			newPivot.X /= widget.Width;
-			newPivot.Y /= widget.Height;
-			var scaledSize = widget.Size * widget.Scale;
-			var deltaPos = Vector2.RotateDeg((newPivot - widget.Pivot) * scaledSize, widget.Rotation);
-			var newPos = widget.Position + deltaPos;
-			var newScale = widget.Scale * scale;
-			Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Scale), newScale);
-			Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Pivot), newPivot);
-			Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), newPos);
+			);
 		}
 
-		private class WidgetState
-		{
-			Vector2 Position { get; set; }
-			Vector2 Scale { get; set; }
-			Vector2 Size { get; set; }
-			Vector2 Pivot { get; set; }
-
-			public WidgetState(Widget widget)
-			{
-				Position = widget.Position;
-				Scale = widget.Scale;
-				Size = widget.Size;
-				Pivot = widget.Pivot;
-			}
-
-			internal void SetDataTo(Widget widget)
-			{
-				widget.Position = Position;
-				widget.Scale = Scale;
-				widget.Size = Size;
-				widget.Pivot = Pivot;
-			}
-		}
 	}
 }

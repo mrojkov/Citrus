@@ -915,6 +915,15 @@ namespace Lime
 			return matrix;
 		}
 
+		public Transform2 CalcApplicableTransfrom2(Matrix32 fromLocalToParentTransform)
+		{
+			// take pivot into account
+			fromLocalToParentTransform = Matrix32.Translation(-Pivot * Size).CalcInversed() * fromLocalToParentTransform;
+			// TODO Apply SkinningWeights
+			// extract simple transformations from matrix
+			return fromLocalToParentTransform.ToTransform2();
+		}
+
 		/// <summary>
 		/// TODO: Add summary
 		/// </summary>

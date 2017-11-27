@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.IO;
 using Lime;
+using Tangerine.Core;
+using Tangerine.Core.Operations;
 
 namespace Tangerine.UI
 {
@@ -32,6 +35,81 @@ namespace Tangerine.UI
 		public static float RoundTo(float value, float step)
 		{
 			return (value / step).Round() * step;
+		}
+
+		public static void ApplyTransformationToWidgetsGroupOobb(IList<Widget> widgetsInParentSpace,
+			Vector2 pivotInParentSpace, bool oobbInFirstWidgetSpace,
+			Vector2 curMousePos, Vector2 prevMousePos,
+			Func<Vector2, Vector2, Matrix32> onCalcTransformationFromOriginalVectorInOobbSpaceAndDeformedVectorInOobbSpace)
+		{
+			if (widgetsInParentSpace.Count == 0) return;
+
+			Matrix32 originalOobbToParentSpace = Matrix32.Translation(pivotInParentSpace);
+			if (oobbInFirstWidgetSpace) {
+				Matrix32 firstWidgetToParentSpace = widgetsInParentSpace[0].CalcLocalToParentTransform();
+
+				originalOobbToParentSpace = firstWidgetToParentSpace *
+						Matrix32.Translation(firstWidgetToParentSpace.T).CalcInversed() * Matrix32.Translation(pivotInParentSpace);
+			}
+
+			ApplyTransformationToWidgetsGroupOobb(
+				widgetsInParentSpace, widgetsInParentSpace[0].ParentWidget, originalOobbToParentSpace, curMousePos, prevMousePos,
+				onCalcTransformationFromOriginalVectorInOobbSpaceAndDeformedVectorInOobbSpace
+			);
+		}
+
+		public static void ApplyTransformationToWidgetsGroupOobb(IEnumerable<Widget> widgetsInParentSpace,
+			Widget parentWidget, Matrix32 oobbInParentSpace,
+			Vector2 curMousePos, Vector2 prevMousePos,
+			Func<Vector2, Vector2, Matrix32> onCalcTransformationFromOriginalVectorInOobbSpaceAndDeformedVectorInOobbSpace)
+		{
+			Vector2 pivotInParentSpace = oobbInParentSpace.T;
+
+			Vector2 pivotInOobbSpace = pivotInParentSpace;
+			Vector2 controlPointInOobbSpace = prevMousePos;
+			Vector2 targetPointInOobbSpace = curMousePos;
+
+			Matrix32 transformationFromParentToOobb = oobbInParentSpace.CalcInversed();
+			pivotInOobbSpace = pivotInOobbSpace * transformationFromParentToOobb;
+			controlPointInOobbSpace = controlPointInOobbSpace * transformationFromParentToOobb;
+			targetPointInOobbSpace = targetPointInOobbSpace * transformationFromParentToOobb;
+
+			Vector2 originalVectorInOobbSpace = controlPointInOobbSpace - pivotInOobbSpace;
+			Vector2 deformedVectorInOobbSpace = targetPointInOobbSpace - pivotInOobbSpace;
+
+			// calculate transformation from original vector to deformed vector
+			Matrix32 deformationInOobbSpace =
+					onCalcTransformationFromOriginalVectorInOobbSpaceAndDeformedVectorInOobbSpace(originalVectorInOobbSpace,
+						deformedVectorInOobbSpace);
+
+			ApplyTransformationToWidgetsGroupOobb(
+				widgetsInParentSpace, parentWidget, oobbInParentSpace, deformationInOobbSpace
+			);
+		}
+
+		public static void ApplyTransformationToWidgetsGroupOobb(IEnumerable<Widget> widgetsInParentSpace,
+			Widget parentWidget, Matrix32 oobbInParentSpace, Matrix32 oobbTransformation)
+		{
+
+			Matrix32 originalOobbToWorldSpace = oobbInParentSpace * parentWidget.LocalToWorldTransform;
+
+			foreach (Widget widget in widgetsInParentSpace) {
+				Matrix32 widgetToOriginalOobbSpace = widget.LocalToWorldTransform * originalOobbToWorldSpace.CalcInversed();
+
+				// calculate new oobb transformation in world space
+				Matrix32 deformedOobbToWorldSpace = oobbTransformation * originalOobbToWorldSpace;
+
+				Matrix32 deformedWidgetToWorldSpace = widgetToOriginalOobbSpace * deformedOobbToWorldSpace;
+
+				Matrix32 deformedWidgetToParentSpace =
+						deformedWidgetToWorldSpace * widget.ParentWidget.LocalToWorldTransform.CalcInversed();
+
+				Transform2 widgetResultTransform = widget.CalcApplicableTransfrom2(deformedWidgetToParentSpace);
+
+				SetAnimableProperty.Perform(widget, nameof(Widget.Position), widgetResultTransform.Translation);
+				SetAnimableProperty.Perform(widget, nameof(Widget.Rotation), widgetResultTransform.Rotation);
+				SetAnimableProperty.Perform(widget, nameof(Widget.Scale), widgetResultTransform.Scale);
+			}
 		}
 
 		public static bool CalcHullAndPivot(IEnumerable<Widget> widgets, Widget canvas, out Quadrangle hull, out Vector2 pivot)
@@ -115,5 +193,33 @@ namespace Tangerine.UI
 				return true;
 			}
 		}
+
+		public class WidgetState
+		{
+			Vector2 Position { get; }
+			Vector2 Scale { get; }
+			float Rotation { get; }
+			Vector2 Size { get; }
+			Vector2 Pivot { get; }
+
+			public WidgetState(Widget widget)
+			{
+				Position = widget.Position;
+				Rotation = widget.Rotation;
+				Scale = widget.Scale;
+				Size = widget.Size;
+				Pivot = widget.Pivot;
+			}
+
+			public void Restore(Widget widget)
+			{
+				widget.Position = Position;
+				widget.Rotation = Rotation;
+				widget.Scale = Scale;
+				widget.Size = Size;
+				widget.Pivot = Pivot;
+			}
+		}
+
 	}
 }
