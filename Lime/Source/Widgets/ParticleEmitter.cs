@@ -116,6 +116,8 @@ namespace Lime
 			public float TextureIndex;
 			// modifier.Animators.OverallDuration / LifeTime
 			public float AgeToAnimationTime;
+			// The final particle's transform
+			public Matrix32 Transform;
 		};
 
 		/// <summary>
@@ -344,10 +346,11 @@ namespace Lime
 			} else {
 				particlesToSpawn += Number * delta;
 			}
+			var currentBoundingRect = new Rectangle();
 			while (particlesToSpawn >= 1f) {
 				Particle particle = AllocParticle();
 				if (GloballyEnabled && Nodes.Count > 0 && InitializeParticle(particle)) {
-					AdvanceParticle(particle, 0);
+					AdvanceParticle(particle, 0, ref currentBoundingRect);
 				} else {
 					FreeLastParticles(1);
 				}
@@ -360,7 +363,7 @@ namespace Lime
 			int i = particles.Count - 1;
 			while (i >= 0) {
 				Particle particle = particles[i];
-				AdvanceParticle(particle, delta);
+				AdvanceParticle(particle, delta, ref currentBoundingRect);
 				if (!ImmortalParticles && particle.Age > particle.Lifetime) {
 					particles[i] = particles[particles.Count - particlesToFreeCount - 1];
 					particles[particles.Count - particlesToFreeCount - 1] = particle;
@@ -369,6 +372,7 @@ namespace Lime
 				i--;
 			}
 			FreeLastParticles(particlesToFreeCount);
+			ExpandBoundingRect(currentBoundingRect);
 		}
 
 		private bool CheckIntersection(Vector2[] v, int[] workPoints, int count, float sign, int startIndex = 0)
@@ -700,7 +704,7 @@ namespace Lime
 			}
 		}
 
-		private bool AdvanceParticle(Particle p, float delta)
+		private bool AdvanceParticle(Particle p, float delta, ref Rectangle boundingRect)
 		{
 			p.Age += delta;
 			if (p.AgeToAnimationTime > 0) {
@@ -780,6 +784,63 @@ namespace Lime
 				if (deltaPos.SqrLength > 0.00001f)
 					p.FullDirection = deltaPos.Atan2Deg;
 			}
+			// Recalc transformation matrix.
+			float angle = p.Angle;
+			if (AlongPathOrientation) {
+				angle += p.FullDirection;
+			}
+			var imageSize = p.Modifier.Size;
+			var particleSize = p.ScaleCurrent * imageSize;
+			var orientation = Vector2.CosSinRough(angle * Mathf.DegToRad);
+			var tux = particleSize.X * orientation.X;
+			var tuy = particleSize.X * orientation.Y;
+			var tvx = -particleSize.Y * orientation.Y;
+			var tvy = particleSize.Y * orientation.X;
+			var ttx = p.FullPosition.X;
+			var tty = p.FullPosition.Y;
+			p.Transform.UX = tux;
+			p.Transform.UY = tuy;
+			p.Transform.VX = tvx;
+			p.Transform.VY = tvy;
+			p.Transform.TX = ttx;
+			p.Transform.TY = tty;
+			// Calculate particle's convex hull.
+			// The code below is optimized version of:
+			// var v1 = transform.TransformVector(-0.5f, -0.5f);
+			// var v2 = transform.TransformVector(0.5f, -0.5f);
+			// var v3 = transform.TransformVector(-0.5f, 0.5f);
+			// var v4 = v2 + v3 - v1;
+			var axux = -0.5f * tux;
+			var axuy = -0.5f * tuy;
+			var ayvx = -0.5f * tvx + ttx;
+			var ayvy = -0.5f * tvy + tty;
+			float v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y;
+			v1x = axux + ayvx;
+			v1y = axuy + ayvy;
+			v2x = 0.5f * tux + ayvx;
+			v2y = 0.5f * tuy + ayvy;
+			v3x = axux + 0.5f * tvx + ttx;
+			v3y = axuy + 0.5f * tvy + tty;
+			v4x = v2x + v3x - v1x;
+			v4y = v2y + v3y - v1y;
+			// Update given bounding rect.
+			if (boundingRect.AX == boundingRect.BX && boundingRect.AY == boundingRect.BY) {
+				boundingRect = new Rectangle(v1x, v1y, v1x, v1y);
+			}
+			if (v1x < boundingRect.AX) boundingRect.AX = v1x;
+			if (v1x > boundingRect.BX) boundingRect.BX = v1x;
+			if (v2x < boundingRect.AX) boundingRect.AX = v2x;
+			if (v2x > boundingRect.BX) boundingRect.BX = v2x;
+			if (v2y < boundingRect.AY) boundingRect.AY = v2y;
+			if (v2y > boundingRect.BY) boundingRect.BY = v2y;
+			if (v3x < boundingRect.AX) boundingRect.AX = v3x;
+			if (v3x > boundingRect.BX) boundingRect.BX = v3x;
+			if (v3y < boundingRect.AY) boundingRect.AY = v3y;
+			if (v3y > boundingRect.BY) boundingRect.BY = v3y;
+			if (v4x < boundingRect.AX) boundingRect.AX = v4x;
+			if (v4x > boundingRect.BX) boundingRect.BX = v4x;
+			if (v4y < boundingRect.AY) boundingRect.AY = v4y;
+			if (v4y > boundingRect.BY) boundingRect.BY = v4y;
 			return true;
 		}
 
@@ -793,17 +854,18 @@ namespace Lime
 				angle += p.FullDirection;
 			}
 			ITexture texture = p.Modifier.GetTexture((int)p.TextureIndex - 1);
-			var imageSize = p.Modifier.Size;
-			var particleSize = p.ScaleCurrent * imageSize;
-			var orientation = Vector2.CosSinRough(angle * Mathf.DegToRad);
-			var perpendicularOrientation = new Vector2(-orientation.Y, orientation.X);
-			var globalMatrix = new Matrix32 {
-				U = particleSize.X * orientation,
-				V = particleSize.Y * perpendicularOrientation,
-				T = p.FullPosition
-			};
-			Renderer.Transform1 = globalMatrix * matrix;
+			Renderer.Transform1 = p.Transform * matrix;
 			Renderer.DrawSprite(texture, p.ColorCurrent * color, -Vector2.Half, Vector2.One, Vector2.Zero, Vector2.One);
+		}
+
+		public override void AddToRenderChain(RenderChain chain)
+		{
+			if (
+				GloballyVisible && particles.Count > 0 &&
+				(ParticlesLinkage != ParticlesLinkage.Parent || ClipRegionTest(chain.ClipRegion))
+			) {
+				AddSelfToRenderChain(chain, Layer);
+			}
 		}
 
 		public override void Render()
@@ -820,6 +882,7 @@ namespace Lime
 			foreach (var particle in particles) {
 				RenderParticle(particle, matrix, color);
 			}
+			Renderer.Transform1 = basicWidget.LocalToWorldTransform;
 		}
 
 		public void DeleteAllParticles()

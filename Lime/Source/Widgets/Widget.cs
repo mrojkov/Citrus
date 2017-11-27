@@ -1012,6 +1012,18 @@ namespace Lime
 			localToParentTransform.TY = -(centerX * u.Y) - centerY * v.Y + translation.Y;
 		}
 
+		internal void ExpandBoundingRect(Rectangle newBounds)
+		{
+			var t = false;
+			if (boundingRect.AX > newBounds.AX) { boundingRect.AX = newBounds.AX; t = true; }
+			if (boundingRect.AY > newBounds.AY) { boundingRect.AY = newBounds.AY; t = true; }
+			if (boundingRect.BX < newBounds.BX) { boundingRect.BX = newBounds.BX; t = true; }
+			if (boundingRect.BY < newBounds.BY) { boundingRect.BY = newBounds.BY; t = true; }
+			if (t) {
+				ExpandParentBoundingRect();
+			}
+		}
+
 		private void ExpandParentBoundingRect()
 		{
 			if (ParentWidget == null) {
