@@ -141,7 +141,7 @@ namespace Orange
 			container.AddNode(actionPicker);
 
 			var go = new ThemedButton("Go");
-			go.Clicked += () => Execute((Action) actionPicker.Value);
+			go.Clicked += () => Execute((Func<string>) actionPicker.Value);
 			container.AddNode(go);
 
 			abortButton = new ThemedButton("Abort") {
@@ -153,29 +153,47 @@ namespace Orange
 			return container;
 		}
 
-		private void Execute(Action action)
+		private void Execute(Func<string> action)
 		{
 			windowWidget.Tasks.Add(ExecuteTask(action));
 		}
 
-		private IEnumerator<object> ExecuteTask(Action action)
+		private IEnumerator<object> ExecuteTask(Func<string> action)
 		{
 			var startTime = DateTime.Now;
 			The.Workspace.Save();
 			EnableControls(false);
-			textView.Clear();
-			var updateCompleted = true;
-			if (DoesNeedSvnUpdate()) {
-				var builder = new SolutionBuilder(The.Workspace.ActivePlatform, The.Workspace.CustomSolution);
-				yield return Task.ExecuteAsync(() => updateCompleted = SafeExecute(builder.SvnUpdate));
-			}
-			if (updateCompleted) {
+			string executonResultReadable = "Build Failed! Unknown Error.";
+			try {
+				textView.Clear();
+				var updateCompleted = true;
+				if (DoesNeedSvnUpdate()) {
+					var builder = new SolutionBuilder(The.Workspace.ActivePlatform, The.Workspace.CustomSolution);
+					yield return Task.ExecuteAsync(() => {
+						updateCompleted = SafeExecute(builder.SvnUpdate);
+						if (!updateCompleted) executonResultReadable = "Build Failed! Can not update a repository.";
+					});
+				}
+
+				if (!updateCompleted) yield break;
+
 				The.Workspace?.AssetFiles?.Rescan();
-				yield return Task.ExecuteAsync(() => SafeExecute(action));
-				textWriter.WriteLine("Done.");
+				executonResultReadable = "Done.";
+				yield return Task.ExecuteAsync(() => {
+					string errorDetails = SafeExecuteWithErrorDetails(action);
+					if (errorDetails != null) {
+						if (errorDetails.Length > 0) {
+							textWriter.WriteLine(errorDetails);
+						}
+						executonResultReadable = "Build Failed!";
+					}
+				});
+			} finally {
+				textWriter.WriteLine(executonResultReadable);
+				EnableControls(true);
+				ShowTimeStatistics(startTime);
+				The.UI.ScrollLogToEnd();
 			}
-			EnableControls(true);
-			ShowTimeStatistics(startTime);
 		}
 
 		private bool SafeExecute(Action action)
@@ -188,6 +206,15 @@ namespace Orange
 				return false;
 			}
 			return true;
+		}
+
+		private string SafeExecuteWithErrorDetails(Func<string> action)
+		{
+			try {
+				return action();
+			} catch (System.Exception ex) {
+				return ex.ToString();
+			}
 		}
 
 		private void EnableControls(bool value)

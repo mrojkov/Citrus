@@ -58,6 +58,12 @@ namespace Orange
 
 		[ImportMany(nameof(MenuItems), AllowRecomposition = true)]
 		public IEnumerable<Lazy<Action, IMenuItemMetadata>> MenuItems { get; set; }
+
+		/// <summary>
+		/// Used with and as MenuItems but should return null on success or a textual info about error on error
+		/// </summary>
+		[ImportMany(nameof(MenuItemsWithErrorDetails), AllowRecomposition = true)]
+		public IEnumerable<Lazy<Func<string>, IMenuItemMetadata>> MenuItemsWithErrorDetails { get; set; }
 	}
 
 	public static class PluginLoader

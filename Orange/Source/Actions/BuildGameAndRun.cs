@@ -1,21 +1,22 @@
 using System;
 using System.ComponentModel.Composition;
-using System.IO;
 
 namespace Orange
 {
 	public static partial class Actions
 	{
-		[Export(nameof(OrangePlugin.MenuItems))]
+		[Export(nameof(OrangePlugin.MenuItemsWithErrorDetails))]
 		[ExportMetadata("Label", "Build & Run")]
 		[ExportMetadata("Priority", 0)]
-		public static void BuildAndRunAction()
+		public static string BuildAndRunAction()
 		{
 			AssetCooker.CookForActivePlatform();
-			if (BuildGame()) {
-				The.UI.ScrollLogToEnd();
-				RunGame();
-			}
+
+			if (!BuildGame()) return "Can not BuildGame";
+
+			The.UI.ScrollLogToEnd();
+			RunGame();
+			return null;
 		}
 
 		public static bool BuildGame()

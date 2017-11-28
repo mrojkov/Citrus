@@ -9,16 +9,17 @@ namespace Orange
 {
 	static partial class Actions
 	{
-		[Export(nameof(OrangePlugin.MenuItems))]
+		[Export(nameof(OrangePlugin.MenuItemsWithErrorDetails))]
 		[ExportMetadata("Label", "Rebuild Game")]
 		[ExportMetadata("Priority", 2)]
-		public static void RebuildGameAction()
+		public static string RebuildGameAction()
 		{
 			if (The.UI.AskConfirmation("Are you sure you want to rebuild the game?")) {
 				CleanupGame();
 				AssetCooker.CookForActivePlatform();
-				BuildGame();
+				if (!BuildGame()) return "Can not BuildGame";
 			}
+			return null;
 		}
 
 		public static bool CleanupGame()

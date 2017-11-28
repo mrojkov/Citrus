@@ -1,16 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 
 namespace Orange
 {
 	public class MenuItem
 	{
 		public string Label;
-		public Action Action;
+		public Func<string> Action;
 		public int Priority;
+
+		public MenuItem(Func<string> action, string label, int priority)
+		{
+			Label = label;
+			Action = action;
+			Priority = priority;
+		}
+
 	}
 
 	public class MenuController
@@ -32,12 +38,21 @@ namespace Orange
 			if (PluginLoader.CurrentPlugin == null) {
 				return;
 			}
-			foreach (var i in PluginLoader.CurrentPlugin?.MenuItems) {
-				Items.Add(new MenuItem() {
-					Action = i.Value,
-					Label = i.Metadata.Label,
-					Priority = i.Metadata.Priority,
-				});
+			foreach (Lazy<Action, IMenuItemMetadata> menuItem in PluginLoader.CurrentPlugin?.MenuItems) {
+				Items.Add(new MenuItem(() => {
+						menuItem.Value();
+						return null;
+					}, menuItem.Metadata.Label,
+					menuItem.Metadata.Priority)
+				);
+			}
+			foreach (Lazy<Func<string>, IMenuItemMetadata> menuItem in PluginLoader.CurrentPlugin?.MenuItemsWithErrorDetails)
+			{
+				Items.Add(new MenuItem(
+					menuItem.Value, 
+					menuItem.Metadata.Label,
+					menuItem.Metadata.Priority)
+				);
 			}
 			The.UI.RefreshMenu();
 		}

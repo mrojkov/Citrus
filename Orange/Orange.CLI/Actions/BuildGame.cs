@@ -4,13 +4,14 @@ namespace Orange
 {
 	public static class CustomActions
 	{
-		[Export(nameof(OrangePlugin.MenuItems))]
+		[Export(nameof(OrangePlugin.MenuItemsWithErrorDetails))]
 		[ExportMetadata("Label", "Build")]
 		[ExportMetadata("Priority", 0)]
-		public static void BuildAndRunAction()
+		public static string BuildAndRunAction()
 		{
 			AssetCooker.CookForActivePlatform();
-			Actions.BuildGame();
+			if (!Actions.BuildGame()) return "Can not BuildGame";
+			return null;
 		}
 	}
 }
