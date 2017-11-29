@@ -323,6 +323,8 @@
     <Compile Include="Source\Widgets\Animation\AnimatorCollection.cs" />
     <Compile Include="Source\Widgets\Animation\BoxedKeyframeList.cs" />
     <Compile Include="Source\Widgets\Animation\TypedKeyframeList.cs" />
+    <Compile Include="Source\Audio\OpenAL\ALMOB\OpenAL.cs" />
+    <Compile Include="Source\Audio\OpenAL\ALMOB\OpenALC.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
