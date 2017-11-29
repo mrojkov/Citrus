@@ -1,4 +1,4 @@
-﻿#if OPENAL
+﻿#if OPENAL && iOS
 using System;
 using System.Runtime.InteropServices;
 using System.Security;
