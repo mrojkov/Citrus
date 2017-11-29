@@ -7,18 +7,14 @@ using System.Runtime.InteropServices;
 #endif
 using System.Threading;
 
-using OpenTK;
-using OpenTK.Audio;
-
-#if !MONOMAC
-using OpenTK.Audio.OpenAL;
-#else
-using MonoMac.OpenAL;
-#endif
-
 #if iOS
 using Foundation;
 using AVFoundation;
+using Lime.OpenALSoft;
+#else
+using OpenTK;
+using OpenTK.Audio;
+using OpenTK.Audio.OpenAL;
 #endif
 
 namespace Lime
@@ -102,7 +98,8 @@ namespace Lime
 				context = new AudioContext();
 			}
 #endif
-			if (AL.GetError() == ALError.NoError) {
+			var err = AL.GetError();
+			if (err == ALError.NoError) {
 				// iOS dislike to mix stereo and mono buffers on one audio source, so separate them
 				for (int i = 0; i < options.NumStereoChannels; i++) {
 					channels.Add(new AudioChannel(i, AudioFormat.Stereo16));
@@ -120,7 +117,11 @@ namespace Lime
 
 		public static bool Active
 		{
+#if iOS			
+			get { return context != null && Alc.GetCurrentContext() != IntPtr.Zero; }
+#else
 			get { return context != null && Alc.GetCurrentContext().Handle != IntPtr.Zero; }
+#endif
 			set
 			{
 				if (Active == value) {
@@ -152,15 +153,11 @@ namespace Lime
 		{
 			if (value) {
 				if (context != null) {
-					try {
-						context.MakeCurrent();
-						context.Process();
-					} catch (AudioContextException) {
-						Logger.Write("Error: failed to resume OpenAL after interruption ended");
-					}
+					context.MakeCurrent();
+					context.Process();
 				}
 			} else {
-				Alc.MakeContextCurrent(ContextHandle.Zero);
+				Alc.MakeContextCurrent(IntPtr.Zero);
 				if (context != null) {
 					context.Suspend();
 				}
@@ -405,5 +402,42 @@ namespace Lime
 			return sound;
 		}
 	}
+
+#if iOS
+	class AudioContext : IDisposable
+	{
+		IntPtr handle;
+
+		public unsafe AudioContext()
+		{
+			IntPtr device = Alc.OpenDevice(null);
+			handle = Alc.CreateContext(device, (int*)null);
+			Alc.MakeContextCurrent(handle);
+		}
+
+		public void MakeCurrent()
+		{
+			Alc.MakeContextCurrent(handle);
+		}
+
+		public void Suspend()
+		{
+			Alc.SuspendContext(handle);
+		}
+
+		public void Process()
+		{
+			Alc.ProcessContext(handle);
+		}
+
+		public void Dispose()
+		{
+			if (handle != IntPtr.Zero) {
+				handle = IntPtr.Zero;
+				Alc.DestroyContext(handle);
+			}
+		}
+	}
+#endif
 }
 #endif

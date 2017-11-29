@@ -3,10 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-#if !MONOMAC
-using OpenTK.Audio.OpenAL;
+#if iOS
+using Lime.OpenALSoft;
 #else
-using MonoMac.OpenAL;
+using OpenTK.Audio.OpenAL;
 #endif
 
 namespace Lime
@@ -88,7 +88,10 @@ namespace Lime
 			this.Id = index;
 			decodedData = Marshal.AllocHGlobal(BufferSize);
 			using (new PlatformAudioSystem.ErrorChecker()) {
-				allBuffers = new List<int>(AL.GenBuffers(NumBuffers));
+				allBuffers = new List<int>();
+				for (int i = 0; i < NumBuffers; i++) {
+					allBuffers.Add(AL.GenBuffer());
+				}
 				source = AL.GenSource();
 			}
 			processedBuffers = new Stack<int>(allBuffers);
@@ -104,7 +107,9 @@ namespace Lime
 			}
 			AL.SourceStop(source);
 			AL.DeleteSource(source);
-			AL.DeleteBuffers(allBuffers.ToArray());
+			foreach (var bid in allBuffers) {
+				AL.DeleteBuffer(bid);
+			}
 			Marshal.FreeHGlobal(decodedData);
 		}
 
@@ -293,15 +298,7 @@ namespace Lime
 			int buffer = AcquireBuffer();
 			if (buffer != 0) {
 				if (FillBuffer(buffer)) {
-					// iOS OpenAL implementation is buggy, so protect ourselves
-					if (AL.GetError() != ALError.NoError) {
-						RecreateBuffers();
-					} else {
-						AL.SourceQueueBuffer(source, buffer);
-						if (AL.GetError() != ALError.NoError) {
-							RecreateBuffers();
-						}
-					}
+					AL.SourceQueueBuffer(source, buffer);
 					return true;
 				} else {
 					processedBuffers.Push(buffer);
@@ -309,18 +306,6 @@ namespace Lime
 				}
 			}
 			return false;
-		}
-
-		private void RecreateBuffers()
-		{
-			Logger.Write("Recreating audio buffers (sample: {0})", SamplePath);
-			DetachBuffers();
-			foreach (var buffer in allBuffers) {
-				AL.DeleteBuffer(buffer);
-				AL.GetError();
-			}
-			allBuffers = new List<int>(AL.GenBuffers(NumBuffers));
-			processedBuffers = new Stack<int>(allBuffers);
 		}
 
 		private bool FillBuffer(int buffer)
