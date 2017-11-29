@@ -293,6 +293,7 @@ namespace Lime
 					if (boundingRect.AX > value.X) boundingRect.AX = value.X;
 					if (boundingRect.AY > value.Y) boundingRect.AY = value.Y;
 					OnSizeChanged(sizeDelta);
+					DirtyMask |= DirtyFlags.LocalTransform;
 					PropagateDirtyFlags(DirtyFlags.GlobalTransform);
 				}
 			}
@@ -310,6 +311,7 @@ namespace Lime
 			set
 			{
 				size = value;
+				DirtyMask |= DirtyFlags.LocalTransform;
 				if (boundingRect.BX < value.X) boundingRect.BX = value.X;
 				if (boundingRect.BY < value.Y) boundingRect.BY = value.Y;
 				if (boundingRect.AX > value.X) boundingRect.AX = value.X;
