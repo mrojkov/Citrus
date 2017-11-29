@@ -81,7 +81,7 @@ namespace Lime
 		public override void Update(float delta)
 		{
 			base.Update(delta);
-			if (GloballyVisible) {
+			if (GloballyVisible && !Application.IsTangerine) {
 				Advance();
 			}
 		}
