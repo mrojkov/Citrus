@@ -101,7 +101,7 @@ namespace Lime
 			}
 		}
 
-		protected internal override void AddToRenderChain(RenderChain chain)
+		public override void AddToRenderChain(RenderChain chain)
 		{
 		}
 	}

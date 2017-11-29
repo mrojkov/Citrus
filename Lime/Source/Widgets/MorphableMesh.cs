@@ -47,7 +47,7 @@ namespace Lime
 			mesh.Render(parentWidget);
 		}
 
-		protected internal override void AddToRenderChain(RenderChain chain)
+		public override void AddToRenderChain(RenderChain chain)
 		{
 		}
 

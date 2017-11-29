@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Lime
 {
@@ -57,10 +57,6 @@ namespace Lime
 
 		public override void AdvanceAnimation(Animation animation, float delta)
 		{
-			if (!animation.IsRunning) {
-				return;
-			}
-
 			var previousTime = animation.TimeInternal;
 			var currentTime = previousTime + delta;
 			animation.TimeInternal = currentTime;
@@ -97,7 +93,7 @@ namespace Lime
 					break;
 				}
 			}
-			for (var child = animation.Owner.Nodes.FirstOrNull(); child != null; child = child.NextSibling) {
+			for (var child = animation.Owner.FirstChild; child != null; child = child.NextSibling) {
 				foreach (var animator in child.Animators) {
 					if (!animator.Enabled || !animator.IsTriggerable || animator.AnimationId != animation.Id) {
 						continue;
@@ -152,7 +148,7 @@ namespace Lime
 
 		private static void ApplyAnimators(Node node, Animation animation, bool invokeTriggers, double animationTimeCorrection = 0)
 		{
-			for (var child = node.Nodes.FirstOrNull(); child != null; child = child.NextSibling) {
+			for (var child = node.FirstChild; child != null; child = child.NextSibling) {
 				var animators = child.Animators;
 				animators.Apply(animation.Time, animation.Id);
 				if (invokeTriggers) {

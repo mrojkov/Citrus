@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using Yuzu;
 
 namespace Lime
@@ -8,16 +9,38 @@ namespace Lime
 	/// </summary>
 	[YuzuCompact]
 	[System.Diagnostics.DebuggerStepThrough]
+	[StructLayout(LayoutKind.Explicit)]
 	public struct Matrix32 : IEquatable<Matrix32>
 	{
+		[FieldOffset(0)]
 		[YuzuMember("0")]
 		public Vector2 U;
 
+		[FieldOffset(8)]
 		[YuzuMember("1")]
 		public Vector2 V;
 
+		[FieldOffset(16)]
 		[YuzuMember("2")]
 		public Vector2 T;
+
+		[FieldOffset(0)]
+		public float UX;
+
+		[FieldOffset(4)]
+		public float UY;
+
+		[FieldOffset(8)]
+		public float VX;
+
+		[FieldOffset(12)]
+		public float VY;
+
+		[FieldOffset(16)]
+		public float TX;
+
+		[FieldOffset(20)]
+		public float TY;
 
 		/// <summary>
 		/// Returns the identity matrix. It doesn't move the points at all.
@@ -26,6 +49,12 @@ namespace Lime
 
 		public Matrix32(Vector2 u, Vector2 v, Vector2 t)
 		{
+			UX = 0;
+			UY = 0;
+			VX = 0;
+			VY = 0;
+			TX = 0;
+			TY = 0;
 			U = u;
 			V = v;
 			T = t;
@@ -33,7 +62,7 @@ namespace Lime
 
 		public bool Equals(Matrix32 rhs)
 		{
-			return U.X == rhs.U.X && U.Y == rhs.U.Y && V.X == rhs.V.X && V.Y == rhs.V.Y && T.X == rhs.T.X && T.Y == rhs.T.Y;
+			return UX == rhs.UX && UY == rhs.UY && VX == rhs.VX && VY == rhs.VY && TX == rhs.TX && TY == rhs.TY;
 		}
 
 		public float CalcDeterminant()
@@ -43,12 +72,12 @@ namespace Lime
 
 		public Matrix32 CalcInversed()
 		{
-			Matrix32 m;
+			var m = new Matrix32();
 			float invDet = 1.0f / CalcDeterminant();
-			m.U.X = invDet * V.Y; m.U.Y = -invDet * U.Y;
-			m.V.X = -invDet * V.X; m.V.Y = invDet * U.X;
-			m.T.X = invDet * (V.X * T.Y - V.Y * T.X);
-			m.T.Y = invDet * (U.Y * T.X - U.X * T.Y);
+			m.UX = invDet * VY; m.UY = -invDet * UY;
+			m.VX = -invDet * VX; m.VY = invDet * UX;
+			m.TX = invDet * (VX * TY - VY * TX);
+			m.TY = invDet * (UY * TX - UX * TY);
 			return m;
 		}
 
@@ -58,14 +87,12 @@ namespace Lime
 		public static Matrix32 Rotation(float radians)
 		{
 			var cs = Vector2.CosSinRough(radians);
-			Matrix32 m;
-			m.U.X = cs.X;
-			m.U.Y = cs.Y;
-			m.V.X = -cs.Y;
-			m.V.Y = cs.X;
-			m.T.X = 0;
-			m.T.Y = 0;
-			return m;
+			return new Matrix32 {
+				UX = cs.X,
+				UY = cs.Y,
+				VX = -cs.Y,
+				VY = cs.X
+			};
 		}
 
 		/// <summary>
@@ -74,8 +101,8 @@ namespace Lime
 		public static Matrix32 Scaling(Vector2 scaling)
 		{
 			var m = Identity;
-			m.U.X = scaling.X;
-			m.V.Y = scaling.Y;
+			m.UX = scaling.X;
+			m.VY = scaling.Y;
 			return m;
 		}
 
@@ -113,13 +140,13 @@ namespace Lime
 		public static Matrix32 Transformation(Vector2 center, Vector2 scaling, float rotation, Vector2 translation)
 		{
 			var cs = Vector2.CosSinRough(rotation);
-			Matrix32 m;
-			m.U.X = scaling.X * cs.X;
-			m.U.Y = scaling.X * cs.Y;
-			m.V.X = -scaling.Y * cs.Y;
-			m.V.Y = scaling.Y * cs.X;
-			m.T.X = -center.X * m.U.X - center.Y * m.V.X + center.X + translation.X;
-			m.T.Y = -center.X * m.U.Y - center.Y * m.V.Y + center.Y + translation.Y;
+			var m = new Matrix32();
+			m.UX = scaling.X * cs.X;
+			m.UY = scaling.X * cs.Y;
+			m.VX = -scaling.Y * cs.Y;
+			m.VY = scaling.Y * cs.X;
+			m.TX = -center.X * m.UX - center.Y * m.VX + center.X + translation.X;
+			m.TY = -center.X * m.UY - center.Y * m.VY + center.Y + translation.Y;
 			return m;
 		}
 
@@ -129,14 +156,14 @@ namespace Lime
 		/// </summary>
 		public static Matrix32 operator *(Matrix32 a, Matrix32 b)
 		{
-			Matrix32 m;
-			m.U.X = a.U.X * b.U.X + a.U.Y * b.V.X;
-			m.U.Y = a.U.X * b.U.Y + a.U.Y * b.V.Y;
-			m.V.X = a.V.X * b.U.X + a.V.Y * b.V.X;
-			m.V.Y = a.V.X * b.U.Y + a.V.Y * b.V.Y;
-			m.T.X = a.T.X * b.U.X + a.T.Y * b.V.X + b.T.X;
-			m.T.Y = a.T.X * b.U.Y + a.T.Y * b.V.Y + b.T.Y;
-			return m;
+			return new Matrix32 {
+				UX = a.UX * b.UX + a.UY * b.VX,
+				UY = a.UX * b.UY + a.UY * b.VY,
+				VX = a.VX * b.UX + a.VY * b.VX,
+				VY = a.VX * b.UY + a.VY * b.VY,
+				TX = a.TX * b.UX + a.TY * b.VX + b.TX,
+				TY = a.TX * b.UY + a.TY * b.VY + b.TY
+			};
 		}
 
 		/// <summary>
@@ -145,12 +172,14 @@ namespace Lime
 		/// </summary>
 		public static void Multiply(ref Matrix32 a, ref Matrix32 b, out Matrix32 result)
 		{
-			result.U.X = a.U.X * b.U.X + a.U.Y * b.V.X;
-			result.U.Y = a.U.X * b.U.Y + a.U.Y * b.V.Y;
-			result.V.X = a.V.X * b.U.X + a.V.Y * b.V.X;
-			result.V.Y = a.V.X * b.U.Y + a.V.Y * b.V.Y;
-			result.T.X = a.T.X * b.U.X + a.T.Y * b.V.X + b.T.X;
-			result.T.Y = a.T.X * b.U.Y + a.T.Y * b.V.Y + b.T.Y;
+			result = new Matrix32 {
+				UX = a.UX * b.UX + a.UY * b.VX,
+				UY = a.UX * b.UY + a.UY * b.VY,
+				VX = a.VX * b.UX + a.VY * b.VX,
+				VY = a.VX * b.UY + a.VY * b.VY,
+				TX = a.TX * b.UX + a.TY * b.VX + b.TX,
+				TY = a.TX * b.UY + a.TY * b.VY + b.TY
+			};
 		}
 
 		/// <summary>
@@ -158,26 +187,26 @@ namespace Lime
 		/// </summary>
 		public static Vector2 operator *(Matrix32 a, Vector2 b)
 		{
-			Vector2 v;
-			v.X = b.X * a.U.X + b.Y * a.V.X + a.T.X;
-			v.Y = b.X * a.U.Y + b.Y * a.V.Y + a.T.Y;
-			return v;
+			return new Vector2 {
+				X = b.X * a.UX + b.Y * a.VX + a.TX,
+				Y = b.X * a.UY + b.Y * a.VY + a.TY
+			};
 		}
 
 		public Vector2 TransformVector(Vector2 a)
 		{
-			Vector2 v;
-			v.X = a.X * U.X + a.Y * V.X + T.X;
-			v.Y = a.X * U.Y + a.Y * V.Y + T.Y;
-			return v;
+			return new Vector2 {
+				X = a.X * UX + a.Y * VX + TX,
+				Y = a.X * UY + a.Y * VY + TY
+			};
 		}
 
 		public Vector2 TransformVector(float x, float y)
 		{
-			Vector2 v;
-			v.X = x * U.X + y * V.X + T.X;
-			v.Y = x * U.Y + y * V.Y + T.Y;
-			return v;
+			return new Vector2 {
+				X = x * UX + y * VX + TX,
+				Y = x * UY + y * VY + TY
+			};
 		}
 
 		public Transform2 ToTransform2()
@@ -198,12 +227,12 @@ namespace Lime
 		public static explicit operator Matrix44(Matrix32 m)
 		{
 			var r = Matrix44.Identity;
-			r.M41 = m.T.X;
-			r.M42 = m.T.Y;
-			r.M11 = m.U.X;
-			r.M12 = m.U.Y;
-			r.M21 = m.V.X;
-			r.M22 = m.V.Y;
+			r.M41 = m.TX;
+			r.M42 = m.TY;
+			r.M11 = m.UX;
+			r.M12 = m.UY;
+			r.M21 = m.VX;
+			r.M22 = m.VY;
 			return r;
 		}
 
@@ -216,7 +245,7 @@ namespace Lime
 		/// <param name="value2">The second matrix.</param>
 		public static Matrix32 Lerp(float amount, Matrix32 value1, Matrix32 value2)
 		{
-			Matrix32 result;
+			var result = new Matrix32();
 			result.T = Mathf.Lerp(amount, value1.T, value2.T);
 			result.U = Mathf.Lerp(amount, value1.U, value2.U);
 			result.V = Mathf.Lerp(amount, value1.V, value2.V);

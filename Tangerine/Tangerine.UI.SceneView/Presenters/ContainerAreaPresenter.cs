@@ -88,7 +88,7 @@ namespace Tangerine.UI.SceneView
 						}
 					}
 			));
-			var rh = new RenderChain();
+			var rc = new RenderChain();
 			sceneView.Frame.CompoundPostPresenter.Push(
 				new DelegatePresenter<Widget>(
 					(w) => {
@@ -99,10 +99,10 @@ namespace Tangerine.UI.SceneView
 										(Document.Current.RootNode.AsWidget.Size - widget.Size) / 2) *
 										Document.Current.RootNode.AsWidget.LocalToWorldTransform;
 									widget.Scale = SceneView.Instance.Scene.Scale;
-									DefaultRenderChainBuilder.Instance.AddToRenderChain(widget, rh);
+									widget.RenderChainBuilder.AddToRenderChain(rc);
 								}
 							}
-							rh.RenderAndClear();
+							rc.RenderAndClear();
 						}
 						w.PrepareRendererState();
 						var size = Document.Current.RootNode.AsWidget.Size / 2;

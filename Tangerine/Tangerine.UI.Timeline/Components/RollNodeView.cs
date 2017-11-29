@@ -194,7 +194,7 @@ namespace Tangerine.UI.Timeline.Components
 			if (animators.Count == 0)
 				return AnimationState.None;
 			int enabled = 0;
-			foreach (var a in animators.AsArray) {
+			foreach (var a in animators) {
 				if (a.Enabled)
 					enabled++;
 			}

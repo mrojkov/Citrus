@@ -133,9 +133,9 @@ namespace Lime
 			IKStopper = true;
 		}
 
-
-		protected override void SelfLateUpdate(float delta)
+		public override void Update(float delta)
 		{
+			base.Update(delta);
 			if (Index > 0 && Parent != null) {
 				BoneArray.Entry e;
 				e.Joint = Position;
@@ -162,11 +162,14 @@ namespace Lime
 				} else
 					e.RelativeTransform = Matrix32.Identity;
 				Parent.AsWidget.BoneArray[Index] = e;
-				Parent.PropagateDirtyFlags(DirtyFlags.Transform);
+				Parent.PropagateDirtyFlags(DirtyFlags.GlobalTransform);
+				for (var child = Parent.FirstChild; child != null; child = child.NextSibling) {
+					child.DirtyMask |= DirtyFlags.LocalTransform | DirtyFlags.ParentBoundingRect;
+				}
 			}
 		}
 
-		protected internal override void AddToRenderChain(RenderChain chain)
+		public override void AddToRenderChain(RenderChain chain)
 		{
 		}
 

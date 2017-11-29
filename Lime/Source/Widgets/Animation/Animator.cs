@@ -1,11 +1,13 @@
 using System;
+using System.Collections.Generic;
 using Yuzu;
 
 namespace Lime
 {
 	public interface IAnimator : IDisposable
 	{
-		IAnimable Owner { get; }
+		IAnimable Owner { get; set; }
+		IAnimator Next { get; set; }
 
 		void Bind(IAnimable owner);
 
@@ -25,23 +27,40 @@ namespace Lime
 
 		void Apply(double time);
 
-		IKeyframeCollection ReadonlyKeys { get; }
+		void ResetCache();
 
-		IKeyframeCollection Keys { get; }
+		IKeyframeList ReadonlyKeys { get; }
+
+		IKeyframeList Keys { get; }
 
 		object UserData { get; set; }
 
 		Type GetValueType();
 	}
 
+	public interface IKeyframeList : IList<IKeyframe>
+	{
+		IKeyframe CreateKeyframe();
+
+		void Add(int frame, object value, KeyFunction function = KeyFunction.Linear);
+		void AddOrdered(int frame, object value, KeyFunction function = KeyFunction.Linear);
+		void AddOrdered(IKeyframe keyframe);
+
+		int Version { get; }
+	}
+
 	public class Animator<T> : IAnimator
 	{
-		public IAnimable Owner { get; private set; }
+		public IAnimable Owner { get; set; }
+		public IAnimator Next { get; set; }
 
-		private int currentKey = 0;
+		private double minTime;
+		private double maxTime;
+		private KeyFunction function;
+		private int keyIndex;
+		protected T Value1, Value2, Value3, Value4;
 
 		public bool IsTriggerable { get; set; }
-
 		public bool Enabled { get; set; } = true;
 
 		[YuzuMember]
@@ -50,7 +69,7 @@ namespace Lime
 		public Type GetValueType() { return typeof(T); }
 
 		[YuzuMember]
-		public KeyframeCollection<T> ReadonlyKeys { get; private set; }
+		public TypedKeyframeList<T> ReadonlyKeys { get; private set; }
 
 		[YuzuMember]
 		public string AnimationId { get; set; }
@@ -59,7 +78,7 @@ namespace Lime
 
 		public Animator()
 		{
-			ReadonlyKeys = new KeyframeCollection<T>();
+			ReadonlyKeys = new TypedKeyframeList<T>();
 			ReadonlyKeys.AddRef();
 		}
 
@@ -68,9 +87,10 @@ namespace Lime
 			ReadonlyKeys.Release();
 		}
 
-		public KeyframeCollection<T> Keys
+		public TypedKeyframeList<T> Keys
 		{
-			get {
+			get
+			{
 				if (ReadonlyKeys.RefCount > 1) {
 					ReadonlyKeys.Release();
 					ReadonlyKeys = ReadonlyKeys.Clone();
@@ -80,33 +100,39 @@ namespace Lime
 			}
 		}
 
-		IKeyframeCollection proxyKeys;
-		IKeyframeCollection IAnimator.Keys {
-			get {
+		IKeyframeList boxedKeys;
+		IKeyframeList IAnimator.Keys
+		{
+			get
+			{
 				if (ReadonlyKeys.RefCount > 1) {
-					proxyKeys = null;
+					boxedKeys = null;
 				}
-				if (proxyKeys == null) {
-					proxyKeys = new KeyframeCollectionProxy<T>(Keys);
+				if (boxedKeys == null) {
+					boxedKeys = new BoxedKeyframeList<T>(Keys);
 				}
-				return proxyKeys;
+				return boxedKeys;
 			}
 		}
 
-		IKeyframeCollection IAnimator.ReadonlyKeys {
-			get {
-				if (proxyKeys == null) {
-					proxyKeys = new KeyframeCollectionProxy<T>(ReadonlyKeys);
+		IKeyframeList IAnimator.ReadonlyKeys
+		{
+			get
+			{
+				if (boxedKeys == null) {
+					boxedKeys = new BoxedKeyframeList<T>(ReadonlyKeys);
 				}
-				return proxyKeys;
+				return boxedKeys;
 			}
 		}
 
 		public IAnimator Clone()
 		{
 			var clone = (Animator<T>)MemberwiseClone();
-			clone.proxyKeys = null;
-			proxyKeys = null;
+			clone.Owner = null;
+			clone.Next = null;
+			clone.boxedKeys = null;
+			boxedKeys = null;
 			ReadonlyKeys.AddRef();
 			return clone;
 		}
@@ -117,7 +143,7 @@ namespace Lime
 
 		public void Bind(IAnimable owner)
 		{
-			this.Owner = owner;
+			Owner = owner;
 			var p = AnimationUtils.GetProperty(owner.GetType(), TargetProperty);
 			IsTriggerable = p.Triggerable;
 			var mi = p.Info.GetSetMethod();
@@ -127,19 +153,12 @@ namespace Lime
 			Setter = (SetterDelegate)Delegate.CreateDelegate(typeof(SetterDelegate), owner, mi);
 		}
 
-		protected virtual T Interpolate(float t, Keyframe<T> a, Keyframe<T> b)
-		{
-			return a.Value;
-		}
-
-		protected virtual T Interpolate(float t, Keyframe<T> a, Keyframe<T> b, Keyframe<T> c, Keyframe<T> d)
-		{
-			return Interpolate(t, b, c);
-		}
+		protected virtual T InterpolateLinear(float t) => Value2;
+		protected virtual T InterpolateSplined(float t) => InterpolateLinear(t);
 
 		public void Clear()
 		{
-			currentKey = 0;
+			keyIndex = 0;
 			Keys.Clear();
 		}
 
@@ -147,7 +166,7 @@ namespace Lime
 		{
 			if (ReadonlyKeys.Count > 0 && Enabled) {
 				// This function relies on currentKey value. Therefore Apply(time) must be called before.
-				if (ReadonlyKeys[currentKey].Frame == frame) {
+				if (ReadonlyKeys[keyIndex].Frame == frame) {
 					Owner.OnTrigger(TargetProperty, animationTimeCorrection);
 				}
 			}
@@ -155,142 +174,156 @@ namespace Lime
 
 		public void Apply(double time)
 		{
-			if (Enabled && ReadonlyKeys.Count > 0) {
+			if (Enabled) {
 				Setter(CalcValue(time));
 			}
 		}
 
+		public void ResetCache()
+		{
+			minTime = maxTime = 0;
+		}
+
 		public T CalcValue(double time)
 		{
+			if (time < minTime || time >= maxTime) {
+				CacheInterpolationParameters(time);
+			}
+			if (function == KeyFunction.Steep) {
+				return Value2;
+			}
+			var t = (float)((time - minTime) / (maxTime - minTime));
+			if (function == KeyFunction.Linear) {
+				return InterpolateLinear(t);
+			} else {
+				return InterpolateSplined(t);
+			}
+		}
+
+		private void CacheInterpolationParameters(double time)
+		{
 			int count = ReadonlyKeys.Count;
-			if (currentKey >= count) {
-				currentKey = count - 1;
+			if (count == 0) {
+				Value2 = default(T);
+				minTime = -float.MaxValue;
+				maxTime = float.MaxValue;
+				function = KeyFunction.Steep;
+				return;
+			}
+			var i = keyIndex;
+			if (i >= count) {
+				i = count - 1;
 			}
 			int frame = AnimationUtils.SecondsToFrames(time);
-			// find rightmost key on the left from given frame
-			while (currentKey < count - 1 && frame > ReadonlyKeys[currentKey].Frame)
-				currentKey++;
-			while (currentKey >= 0 && frame < ReadonlyKeys[currentKey].Frame)
-				currentKey--;
-			if (currentKey < 0) {
-				currentKey = 0;
-				return ReadonlyKeys[0].Value;
+			// find rightmost key on the left from the given frame
+			while (i < count - 1 && frame > ReadonlyKeys[i].Frame) {
+				i++;
 			}
-			if (currentKey == count - 1) {
-				return ReadonlyKeys[count - 1].Value;
+			while (i >= 0 && frame < ReadonlyKeys[i].Frame) {
+				i--;
 			}
-			int i = currentKey;
-			var key1 = ReadonlyKeys[i];
-			var function = key1.Function;
-			if (function == KeyFunction.Steep || !IsInterpolable()) {
-				return key1.Value;
+			keyIndex = i;
+			int minFrame, maxFrame;
+			if (i < 0) {
+				keyIndex = 0;
+				maxFrame = ReadonlyKeys[0].Frame;
+				minFrame = int.MinValue;
+				Value2 = ReadonlyKeys[0].Value;
+				function = KeyFunction.Steep;
+			} else if (i == count - 1) {
+				minFrame = ReadonlyKeys[i].Frame;
+				maxFrame = int.MaxValue;
+				Value2 = ReadonlyKeys[i].Value;
+				function = KeyFunction.Steep;
+			} else {
+				var key1 = ReadonlyKeys[i];
+				var key2 = ReadonlyKeys[i + 1];
+				minFrame = key1.Frame;
+				maxFrame = key2.Frame;
+				Value2 = key1.Value;
+				Value3 = key2.Value;
+				function = key1.Function;
+				if (function == KeyFunction.Spline) {
+					Value1 = ReadonlyKeys[i < 1 ? 0 : i - 1].Value;
+					Value4 = ReadonlyKeys[i + 1 >= count - 1 ? count - 1 : i + 2].Value;
+				} else if (function == KeyFunction.ClosedSpline) {
+					Value1 = ReadonlyKeys[i < 1 ? count - 2 : i - 1].Value;
+					Value4 = ReadonlyKeys[i + 1 >= count - 1 ? 1 : i + 2].Value;
+				}
 			}
-			var key2 = ReadonlyKeys[i + 1];
-			var t = (float)(time * AnimationUtils.FramesPerSecond - key1.Frame) / (key2.Frame - key1.Frame);
-			if (function == KeyFunction.Linear) {
-				return Interpolate(t, key1, key2);
-			} else if (function == KeyFunction.Spline) {
-				var key0 = ReadonlyKeys[i < 1 ? 0 : i - 1];
-				var key3 = ReadonlyKeys[i + 1 >= count - 1 ? count - 1 : i + 2];
-				return Interpolate(t, key0, key1, key2, key3);
-			} else { // KeyFunction.ClosedSpline
-				var key0 = ReadonlyKeys[i < 1 ? count - 2 : i - 1];
-				var key3 = ReadonlyKeys[i + 1 >= count - 1 ? 1 : i + 2];
-				return Interpolate(t, key0, key1, key2, key3);
-			}
+			minTime = minFrame * AnimationUtils.SecondsPerFrame;
+			maxTime = maxFrame * AnimationUtils.SecondsPerFrame;
 		}
 
-		public int Duration {
-			get {
-				if (ReadonlyKeys.Count == 0)
-					return 0;
-				return ReadonlyKeys[ReadonlyKeys.Count - 1].Frame;
-			}
-		}
-
-		protected virtual bool IsInterpolable() => false;
+		public int Duration => (ReadonlyKeys.Count == 0) ? 0 : ReadonlyKeys[ReadonlyKeys.Count - 1].Frame;
 	}
 
 	public class Vector2Animator : Animator<Vector2>
 	{
-		protected override bool IsInterpolable() => true;
-
-		protected override Vector2 Interpolate(float t, Keyframe<Vector2> a, Keyframe<Vector2> b)
+		protected override Vector2 InterpolateLinear(float t)
 		{
 			Vector2 r;
-			r.X = a.Value.X + (b.Value.X - a.Value.X) * t;
-			r.Y = a.Value.Y + (b.Value.Y - a.Value.Y) * t;
+			r.X = Value2.X + (Value3.X - Value2.X) * t;
+			r.Y = Value2.Y + (Value3.Y - Value2.Y) * t;
 			return r;
 		}
 
-		protected override Vector2 Interpolate(float t, Keyframe<Vector2> a, Keyframe<Vector2> b, Keyframe<Vector2> c, Keyframe<Vector2> d)
+		protected override Vector2 InterpolateSplined(float t)
 		{
-			return Mathf.CatmullRomSpline(t, a.Value, b.Value, c.Value, d.Value);
+			return new Vector2(
+				Mathf.CatmullRomSpline(t, Value1.X, Value2.X, Value3.X, Value4.X),
+				Mathf.CatmullRomSpline(t, Value1.Y, Value2.Y, Value3.Y, Value4.Y)
+			);
 		}
 	}
 
 	public class Vector3Animator : Animator<Vector3>
 	{
-		protected override bool IsInterpolable() => true;
-
-		protected override Vector3 Interpolate(float t, Keyframe<Vector3> a, Keyframe<Vector3> b)
+		protected override Vector3 InterpolateLinear(float t)
 		{
-			return Vector3.Lerp(t, a.Value, b.Value);
+			return Vector3.Lerp(t, Value2, Value3);
 		}
 
-		protected override Vector3 Interpolate(float t, Keyframe<Vector3> a, Keyframe<Vector3> b, Keyframe<Vector3> c, Keyframe<Vector3> d)
+		protected override Vector3 InterpolateSplined(float t)
 		{
-			return Mathf.CatmullRomSpline(t, a.Value, b.Value, c.Value, d.Value);
+			return Mathf.CatmullRomSpline(t, Value1, Value2, Value3, Value4);
 		}
 	}
 
 	public class NumericAnimator : Animator<float>
 	{
-		protected override bool IsInterpolable() => true;
-
-		protected override float Interpolate(float t, Keyframe<float> a, Keyframe<float> b)
+		protected override float InterpolateLinear(float t)
 		{
-			return t * (b.Value - a.Value) + a.Value;
+			return t * (Value3 - Value2) + Value2;
 		}
 
-		protected override float Interpolate(float t, Keyframe<float> a, Keyframe<float> b, Keyframe<float> c, Keyframe<float> d)
+		protected override float InterpolateSplined(float t)
 		{
-			return Mathf.CatmullRomSpline(t, a.Value, b.Value, c.Value, d.Value);
+			return Mathf.CatmullRomSpline(t, Value1, Value2, Value3, Value4);
 		}
 	}
 
 	public class Color4Animator : Animator<Color4>
 	{
-		protected override bool IsInterpolable() => true;
-
-		protected override Color4 Interpolate(float t, Keyframe<Color4> a, Keyframe<Color4> b)
+		protected override Color4 InterpolateLinear(float t)
 		{
-			return Color4.Lerp(t, a.Value, b.Value);
+			return Color4.Lerp(t, Value2, Value3);
 		}
 	}
 
 	public class QuaternionAnimator : Animator<Quaternion>
 	{
-		protected override bool IsInterpolable() => true;
-
-		protected override Quaternion Interpolate(float t, Keyframe<Quaternion> a, Keyframe<Quaternion> b)
+		protected override Quaternion InterpolateLinear(float t)
 		{
-			return Quaternion.Slerp(a.Value, b.Value, t);
+			return Quaternion.Slerp(Value2, Value3, t);
 		}
 	}
 
 	public class Matrix44Animator : Animator<Matrix44>
 	{
-		protected override bool IsInterpolable() => true;
-
-		protected override Matrix44 Interpolate(float t, Keyframe<Matrix44> a, Keyframe<Matrix44> b)
+		protected override Matrix44 InterpolateLinear(float t)
 		{
-			return Matrix44.Lerp(a.Value, b.Value, t);
-		}
-
-		protected override Matrix44 Interpolate(float t, Keyframe<Matrix44> a, Keyframe<Matrix44> b, Keyframe<Matrix44> c, Keyframe<Matrix44> d)
-		{
-			return Matrix44.Lerp(b.Value, c.Value, t);
+			return Matrix44.Lerp(Value2, Value3, t);
 		}
 	}
 }

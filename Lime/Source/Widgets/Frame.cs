@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
 using Yuzu;
 
@@ -60,15 +59,13 @@ namespace Lime
 			PropagateDirtyFlags();
 		}
 
-		internal protected override bool IsRenderedToTexture()
-		{
-			return (base.IsRenderedToTexture() || renderTarget != RenderTarget.None);
-		}
+		internal protected override bool IsRenderedToTexture() => renderTarget != RenderTarget.None;
 
 		public override void Render()
 		{
 			if (renderTexture != null) {
 				EnsureRenderChain();
+				renderChain.ClipRegion = new Rectangle(0, 0, Width, Height);
 				RenderToTexture(renderTexture, renderChain);
 				if (GetTangerineFlag(TangerineFlags.DisplayContent)) {
 					RenderWithScissorTest();
@@ -94,8 +91,9 @@ namespace Lime
 			Renderer.ScissorRectangle = rect;
 			try {
 				EnsureRenderChain();
+				renderChain.ClipRegion = CalcGlobalBoundingRect();
 				foreach (var node in Nodes) {
-					node.RenderChainBuilder?.AddToRenderChain(node, renderChain);
+					node.RenderChainBuilder?.AddToRenderChain(renderChain);
 				}
 				renderChain.RenderAndClear();
 			} finally {
@@ -115,8 +113,8 @@ namespace Lime
 					}
 					EnsureRenderChain();
 					try {
-						foreach (var node in Nodes) {
-							node.RenderChainBuilder?.AddToRenderChain(node, renderChain);
+						for (var node = FirstChild; node != null; node = node.NextSibling) {
+							node.RenderChainBuilder?.AddToRenderChain(renderChain);
 						}
 						if (renderChain.HitTest(ref args)) {
 							return true;
@@ -134,9 +132,7 @@ namespace Lime
 
 		private void EnsureRenderChain()
 		{
-			if (renderChain == null) {
-				renderChain = new RenderChain();
-			}
+			renderChain = renderChain ?? new RenderChain();
 		}
 
 		private bool IntersectRectangles(WindowRect a, WindowRect b, out WindowRect r)
@@ -151,24 +147,29 @@ namespace Lime
 			return (WindowRect)aabb;
 		}
 
-		internal protected override void AddToRenderChain(RenderChain chain)
+		public override void AddToRenderChain(RenderChain chain)
 		{
-			if (!GloballyVisible || ClipChildren == ClipMethod.NoRender) {
+			if (!GloballyVisible || ClipChildren == ClipMethod.NoRender || !ClipRegionTest(chain.ClipRegion)) {
 				return;
 			}
 			if (renderTexture != null || ClipChildren == ClipMethod.ScissorTest) {
-				AddSelfToRenderChain(chain);
+				AddSelfToRenderChain(chain, Layer);
 				if (GetTangerineFlag(TangerineFlags.DisplayContent) && ClipChildren != ClipMethod.ScissorTest) {
-					base.AddToRenderChain(chain);
+					AddSelfAndChildrenToRenderChain(chain, Layer);
 				}
-			} else if (Layer == 0 && Presenter != null && PostPresenter == null) {
+			} else if (Layer == 0) {
 				// 90% calls should go here.
-				for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
-					node.RenderChainBuilder?.AddToRenderChain(node, chain);
+				if (PostPresenter != null) {
+					chain.Add(this, PostPresenter);
 				}
-				chain.Add(this, Presenter);
+				for (var node = FirstChild; node != null; node = node.NextSibling) {
+					node.RenderChainBuilder?.AddToRenderChain(chain);
+				}
+				if (Presenter != null) {
+					chain.Add(this, Presenter);
+				}
 			} else {
-				base.AddToRenderChain(chain);
+				AddSelfAndChildrenToRenderChain(chain, Layer);
 			}
 		}
 

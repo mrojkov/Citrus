@@ -10,36 +10,47 @@ namespace Lime
 	[YuzuCompact]
 	public struct Rectangle : IEquatable<Rectangle>
 	{
-		/// <summary>
-		/// Left-top corner of this rectangle.
-		/// </summary>
 		[YuzuMember("0")]
-		public Vector2 A;
+		public float AX;
 
-		/// <summary>
-		/// Right-bottom corner of this rectangle.
-		/// </summary>
-		/// <remarks>Rectangle doesn't contain this point.</remarks>
 		[YuzuMember("1")]
-		public Vector2 B;
+		public float AY;
+
+		[YuzuMember("2")]
+		public float BX;
+
+		[YuzuMember("3")]
+		public float BY;
 
 		/// <summary>
 		/// Returns a rectangle with both corners in 0, 0.
 		/// </summary>
 		public static readonly Rectangle Empty = new Rectangle();
 
+		/// <summary>
+		/// Left-top corner of this rectangle.
+		/// </summary>
+		public Vector2 A { get { return new Vector2(AX, AY); } set { AX = value.X; AY = value.Y; } }
+
+		/// <summary>
+		/// Right-bottom corner of this rectangle.
+		/// </summary>
+		public Vector2 B { get { return new Vector2(BX, BY); } set { BX = value.X; BY = value.Y; } }
+
 		public Rectangle(float left, float top, float right, float bottom)
 		{
-			A.X = left;
-			A.Y = top;
-			B.X = right;
-			B.Y = bottom;
+			AX = left;
+			AY = top;
+			BX = right;
+			BY = bottom;
 		}
 
 		public Rectangle(Vector2 a, Vector2 b)
 		{
-			A = a;
-			B = b;
+			AX = a.X;
+			AY = a.Y;
+			BX = b.X;
+			BY = b.Y;
 		}
 
 		public static explicit operator IntRectangle(Rectangle value)
@@ -69,23 +80,23 @@ namespace Lime
 
 		public float Width
 		{
-			get { return B.X - A.X; }
-			set { B.X = A.X + value; }
+			get { return BX - AX; }
+			set { BX = AX + value; }
 		}
 
 		public float Height
 		{
-			get { return B.Y - A.Y; }
-			set { B.Y = A.Y + value; }
+			get { return BY - AY; }
+			set { BY = AY + value; }
 		}
 
-		public float Left { get { return A.X; } set { A.X = value; } }
+		public float Left { get { return AX; } set { AX = value; } }
 
-		public float Top { get { return A.Y; } set { A.Y = value; } }
+		public float Top { get { return AY; } set { AY = value; } }
 
-		public float Right { get { return B.X; } set { B.X = value; } }
+		public float Right { get { return BX; } set { BX = value; } }
 
-		public float Bottom { get { return B.Y; } set { B.Y = value; } }
+		public float Bottom { get { return BY; } set { BY = value; } }
 
 		public Vector2 Center { get { return (A + B) / 2; } }
 
@@ -104,12 +115,12 @@ namespace Lime
 			{
 				var rect = this;
 				if (Width < 0) {
-					rect.A.X = B.X;
-					rect.B.X = A.X;
+					rect.AX = BX;
+					rect.BX = AX;
 				}
 				if (Height < 0) {
-					rect.A.Y = B.Y;
-					rect.B.Y = A.Y;
+					rect.AY = BY;
+					rect.BY = AY;
 				}
 				return rect;
 			}
@@ -117,7 +128,7 @@ namespace Lime
 
 		public bool Contains(Vector2 value)
 		{
-			return A.X < B.X ? CheckContains(value, A, B) : CheckContains(value, B, A);
+			return AX < BX ? CheckContains(value, A, B) : CheckContains(value, B, A);
 		}
 
 		private static bool CheckContains(Vector2 value, Vector2 a, Vector2 b)
@@ -129,9 +140,7 @@ namespace Lime
 			}
 		}
 
-		public Vector2 Size {
-			get { return B - A; }
-		}
+		public Vector2 Size => B - A;
 
 		/// <summary>
 		/// Creates a new <see cref="Rectangle"/> that contains
@@ -139,10 +148,10 @@ namespace Lime
 		/// </summary>
 		public static Rectangle Intersect(Rectangle value1, Rectangle value2)
 		{
-			var x0 = Math.Max(value1.A.X, value2.A.X);
-			var x1 = Math.Min(value1.B.X, value2.B.X);
-			var y0 = Math.Max(value1.A.Y, value2.A.Y);
-			var y1 = Math.Min(value1.B.Y, value2.B.Y);
+			var x0 = Math.Max(value1.AX, value2.AX);
+			var x1 = Math.Min(value1.BX, value2.BX);
+			var y0 = Math.Max(value1.AY, value2.AY);
+			var y1 = Math.Min(value1.BY, value2.BY);
 			return x1 >= x0 && y1 >= y0 ? new Rectangle(x0, y0, x1, y1) : Empty;
 		}
 
@@ -197,7 +206,7 @@ namespace Lime
 		/// </summary>
 		public override string ToString()
 		{
-			return string.Format("{0}, {1}, {2}, {3}", A.X, A.Y, B.X, B.Y);
+			return string.Format("{0}, {1}, {2}, {3}", AX, AY, BX, BY);
 		}
 
 		public override int GetHashCode()
@@ -217,9 +226,9 @@ namespace Lime
 		{
 			return new Quadrangle {
 				V1 = A,
-				V2 = new Vector2(B.X, A.Y),
+				V2 = new Vector2(BX, AY),
 				V3 = B,
-				V4 = new Vector2(A.X, B.Y)
+				V4 = new Vector2(AX, BY)
 			};
 		}
 	}

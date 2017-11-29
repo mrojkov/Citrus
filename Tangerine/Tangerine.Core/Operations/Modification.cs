@@ -108,11 +108,13 @@ namespace Tangerine.Core.Operations
 				var kf = op.Animator.Keys.FirstOrDefault(k => k.Frame == op.Frame);
 				op.Save(new Backup { Keyframe = kf });
 				op.Animator.Keys.Remove(kf);
+				op.Animator.ResetCache();
 			}
 
 			protected override void InternalUndo(RemoveKeyframe op)
 			{
 				op.Animator.Keys.AddOrdered(op.Restore<Backup>().Keyframe);
+				op.Animator.ResetCache();
 			}
 		}
 	}
@@ -162,6 +164,7 @@ namespace Tangerine.Core.Operations
 					Keyframe = animator.Keys.FirstOrDefault(k => k.Frame == op.Keyframe.Frame)
 				});
 				animator.Keys.AddOrdered(op.Keyframe);
+				animator.ResetCache();
 			}
 
 			protected override void InternalUndo(SetKeyframe op)
@@ -176,6 +179,7 @@ namespace Tangerine.Core.Operations
 				if (!b.AnimatorExists) {
 					op.Animable.Animators.Remove(b.Animator);
 				}
+				b.Animator.ResetCache();
 			}
 		}
 	}

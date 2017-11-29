@@ -111,9 +111,9 @@ namespace Tangerine.UI
 		private void CheckErrors()
 		{
 			if (new HashSet<string>(attachment.Animations.Select(a => a.Name)).Count != attachment.Animations.Count ||
-				attachment.Animations.Any(a => a.Name == source.Animations.DefaultAnimation.Id)
+				attachment.Animations.Any(a => a.Name == source.DefaultAnimation.Id)
 			) {
-				throw new Lime.Exception("Animations have simmilar names");
+				throw new Lime.Exception("Animations have the same names");
 			}
 			var defaultAnimation = attachment.Animations.FirstOrDefault(a => a.Name == Model3DAttachment.DefaultAnimationName);
 		}

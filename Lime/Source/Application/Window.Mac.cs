@@ -23,6 +23,9 @@ namespace Lime
 
 		public NSGameView View { get; private set; }
 
+		// This line only suppresses warning: "Window.Current: a name can be simplified".
+		public new static IWindow Current => CommonWindow.Current;
+
 		public string Title
 		{
 			get { return window.Title; }

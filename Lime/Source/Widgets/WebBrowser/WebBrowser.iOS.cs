@@ -92,7 +92,7 @@ namespace Lime
 			get { return new SizeF(aabbInDeviceSpace.Width, aabbInDeviceSpace.Height); }
 		}
 
-		protected override void SelfUpdate(float delta)
+		public override void Update(float delta)
 		{
 			if (webView == null) {
 				return;
@@ -103,6 +103,7 @@ namespace Lime
 			if (activityIndicator != null) {
 				activityIndicator.Center = ActivityIndicatorPosition;
 			}
+			base.Update(delta);
 		}
 
 		public override void Dispose()

@@ -99,13 +99,20 @@ namespace Lime
 			layout[8].UV = new Rectangle(tx2, ty1, tx3, ty2);
 			for (int i = 0; i < 9; i++) {
 				if (flipX) {
-					layout[i].Rect.A.X = -layout[i].Rect.A.X;
-					layout[i].Rect.B.X = -layout[i].Rect.B.X;
+					layout[i].Rect.AX = -layout[i].Rect.AX;
+					layout[i].Rect.BX = -layout[i].Rect.BX;
 				}
 				if (flipY) {
-					layout[i].Rect.A.Y = -layout[i].Rect.A.Y;
-					layout[i].Rect.B.Y = -layout[i].Rect.B.Y;
+					layout[i].Rect.AY = -layout[i].Rect.AY;
+					layout[i].Rect.BY = -layout[i].Rect.BY;
 				}
+			}
+		}
+
+		public override void AddToRenderChain(RenderChain chain)
+		{
+			if (GloballyVisible && ClipRegionTest(chain.ClipRegion)) {
+				AddSelfAndChildrenToRenderChain(chain, Layer);
 			}
 		}
 
@@ -134,19 +141,19 @@ namespace Lime
 		bool PartHitTest(Part part, Vector2 point)
 		{
 			point = LocalToWorldTransform.CalcInversed().TransformVector(point);
-			if (part.Rect.B.X < part.Rect.A.X) {
-				part.Rect.A.X = -part.Rect.A.X;
-				part.Rect.B.X = -part.Rect.B.X;
+			if (part.Rect.BX < part.Rect.AX) {
+				part.Rect.AX = -part.Rect.AX;
+				part.Rect.BX = -part.Rect.BX;
 				point.X = -point.X;
 			}
-			if (part.Rect.B.Y < part.Rect.A.Y) {
-				part.Rect.A.Y = -part.Rect.A.Y;
-				part.Rect.B.Y = -part.Rect.B.Y;
+			if (part.Rect.BY < part.Rect.AY) {
+				part.Rect.AY = -part.Rect.AY;
+				part.Rect.BY = -part.Rect.BY;
 				point.Y = -point.Y;
 			}
-			if (point.X >= part.Rect.A.X && point.Y >= part.Rect.A.Y && point.X < part.Rect.B.X && point.Y < part.Rect.B.Y) {
-				float uf = (point.X - part.Rect.A.X) / part.Rect.Width * part.UV.Width + part.UV.A.X;
-				float vf = (point.Y - part.Rect.A.Y) / part.Rect.Height * part.UV.Height + part.UV.A.Y;
+			if (point.X >= part.Rect.AX && point.Y >= part.Rect.AY && point.X < part.Rect.BX && point.Y < part.Rect.BY) {
+				float uf = (point.X - part.Rect.AX) / part.Rect.Width * part.UV.Width + part.UV.AX;
+				float vf = (point.Y - part.Rect.AY) / part.Rect.Height * part.UV.Height + part.UV.AY;
 				int ui = (int)(Texture.ImageSize.Width * uf);
 				int vi = (int)(Texture.ImageSize.Height * vf);
 				return !Texture.IsTransparentPixel(ui, vi);

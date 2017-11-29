@@ -73,15 +73,23 @@ namespace Lime
 			return false;
 		}
 
-		internal protected override void AddToRenderChain(RenderChain chain)
+		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (Enabled) {
 				IImageCombinerArg arg1, arg2;
 				if (GetArgs(out arg1, out arg2)) {
 					arg1.SkipRender();
 					arg2.SkipRender();
+					var widget1 = arg1 as Widget;
+					var widget2 = arg2 as Widget;
+					if (
+						widget1 != null && !widget1.ClipRegionTest(chain.ClipRegion) || 
+						widget2 != null && !widget2.ClipRegionTest(chain.ClipRegion)
+					) {
+						return;
+					}
 				}
-				AddSelfToRenderChain(chain);
+				AddSelfToRenderChain(chain, Layer);
 			}
 		}
 

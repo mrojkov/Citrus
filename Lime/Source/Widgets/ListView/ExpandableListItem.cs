@@ -72,7 +72,7 @@ namespace Lime
 		private void StackWidgets(Widget container)
 		{
 			float pos = 0;
-			for (var node = container.Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
+			for (var node = container.FirstChild; node != null; node = node.NextSibling) {
 				var widget = node.AsWidget;
 				if (widget != null && widget.Visible) {
 					ListView.SetProjectedPosition(widget, pos);

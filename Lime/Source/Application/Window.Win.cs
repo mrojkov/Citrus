@@ -11,6 +11,9 @@ namespace Lime
 {
 	public class Window : CommonWindow, IWindow
 	{
+		// This line only suppresses warning: "Window.Current: a name can be simplified".
+		public new static IWindow Current => CommonWindow.Current;
+
 		// We must perform no more than single render per update.
 		// So we defer Invalidate() calls until next Update().
 		private enum RenderingState

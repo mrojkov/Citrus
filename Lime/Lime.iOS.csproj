@@ -131,11 +131,6 @@
     <Compile Include="Source\Graphics\OpenGL\Shader.cs" />
     <Compile Include="Source\Graphics\OpenGL\ShaderProgram.cs" />
     <Compile Include="Source\Graphics\OpenGL\XamarinAdapter.cs" />
-    <Compile Include="Source\Widgets\Animation\AnimationUtils.cs" />
-    <Compile Include="Source\Widgets\Animation\Animator.cs" />
-    <Compile Include="Source\Widgets\Animation\AnimatorRegistry.cs" />
-    <Compile Include="Source\Widgets\Animation\Keyframe.cs" />
-    <Compile Include="Source\Widgets\Animation\KeyframeCollection.cs" />
     <Compile Include="Source\Input\Key.cs" />
     <Compile Include="Source\Widgets\WidgetDebugView.cs" />
     <Compile Include="Source\Widgets\WidgetInput.cs" />
@@ -184,12 +179,9 @@
     <Compile Include="Source\Audio\Unity\PlatformAudioSystem.cs" />
     <Compile Include="Source\Types\BitSet32.cs" />
     <Compile Include="Source\Input\SoftKeyboard.cs" />
-    <Compile Include="Source\Widgets\Animation\AnimationEngine.cs" />
     <Compile Include="Source\Widgets\Layout\AnchorLayout.cs" />
     <Compile Include="Source\Widgets\Layout\Layout.cs" />
     <Compile Include="Source\Widgets\Layout\TableLayout.cs" />
-    <Compile Include="Source\Widgets\Animation\Animation.cs" />
-    <Compile Include="Source\Widgets\Animation\AnimationList.cs" />
     <Compile Include="Source\Types\Quaternion.cs" />
     <Compile Include="Source\Types\BoundingSphere.cs" />
     <Compile Include="Source\Types\ContainmentType.cs" />
@@ -333,8 +325,6 @@
     <Compile Include="Source\Application\FileSystemWatcher\FileSystemWatcher.Mac.cs" />
     <Compile Include="Source\Application\FileSystemWatcher\FileSystemWatcher.Win.cs" />
     <Compile Include="Source\Application\FileSystemWatcher\IFileSystemWatcher.cs" />
-    <Compile Include="Source\Widgets\Animation\AnimationBlender.cs" />
-    <Compile Include="Source\Widgets\Animation\BlendAnimationEngine.cs" />
     <Compile Include="Source\Widgets\IRenderChainBuilder.cs" />
     <Compile Include="Source\Widgets\Theme\Theme.cs" />
     <Compile Include="Source\Widgets\Theme\ThemedButton.cs" />
@@ -373,7 +363,19 @@
     <Compile Include="Source\Widgets\Gestures\Gesture.cs" />
     <Compile Include="Source\Widgets\Gestures\GestureManager.cs" />
     <Compile Include="Source\Widgets\MarkerList.cs" />
-    <Compile Include="Source\Widgets\Animation\AnimatorList.cs" />
+    <Compile Include="Source\Widgets\Animation\TypedKeyframeList.cs" />
+    <Compile Include="Source\Widgets\Animation\Keyframe.cs" />
+    <Compile Include="Source\Widgets\Animation\BoxedKeyframeList.cs" />
+    <Compile Include="Source\Widgets\Animation\BlendAnimationEngine.cs" />
+    <Compile Include="Source\Widgets\Animation\AnimatorRegistry.cs" />
+    <Compile Include="Source\Widgets\Animation\AnimatorCollection.cs" />
+    <Compile Include="Source\Widgets\Animation\Animator.cs" />
+    <Compile Include="Source\Widgets\Animation\AnimationUtils.cs" />
+    <Compile Include="Source\Widgets\Animation\AnimationEngine.cs" />
+    <Compile Include="Source\Widgets\Animation\AnimationCollection.cs" />
+    <Compile Include="Source\Widgets\Animation\AnimationBlender.cs" />
+    <Compile Include="Source\Widgets\Animation\Animation.cs" />
+    <Compile Include="Source\Optimizations\BoundingRectCalculator.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />
@@ -389,6 +391,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Source\Widgets\Theme\" />
+    <Folder Include="Source\Widgets\Animation\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>

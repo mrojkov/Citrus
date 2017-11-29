@@ -47,8 +47,7 @@ namespace Lime
 							depthTextureSize = 2048;
 							break;
 					}
-
-					viewport?.InvalidateMaterials();
+					Viewport?.InvalidateMaterials();
 					shadowMapQuality = value;
 					depthBufferRenderer = null;
 					recalcViewProjection = true;
@@ -190,7 +189,7 @@ namespace Lime
 		{
 			if (shadowMappingEnabled) {
 				if (depthBufferRenderer == null) {
-					depthBufferRenderer = new DepthBufferRenderer(viewport, depthTextureSize);
+					depthBufferRenderer = new DepthBufferRenderer(Viewport, depthTextureSize);
 				}
 
 				if (recalcViewProjection) {

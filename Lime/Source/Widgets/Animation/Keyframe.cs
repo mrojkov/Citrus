@@ -45,41 +45,39 @@ namespace Lime
 		public KeyFunction Function { get; set; }
 
 		[YuzuMember]
+		// Field, not property makes deserialization faster.
 		public T Value;
 
 		object IKeyframe.Value
 		{
-			get { return (object)this.Value; }
-			set { this.Value = (T)value; }
+			get { return Value; }
+			set { Value = (T)value; }
 		}
 
 		public Keyframe() { }
 
 		public Keyframe(int frame, T value, KeyFunction function)
 		{
-			this.Frame = frame;
-			this.Value = value;
-			this.Function = function;
+			Frame = frame;
+			Value = value;
+			Function = function;
 		}
 
 		public Keyframe(int frame, T value)
 		{
-			this.Frame = frame;
-			this.Value = value;
+			Frame = frame;
+			Value = value;
 		}
 
 		public Keyframe<T> Clone()
 		{
-			return new Keyframe<T>() {
+			return new Keyframe<T> {
 				Frame = Frame,
 				Function = Function,
 				Value = Value
 			};
 		}
 
-		IKeyframe IKeyframe.Clone()
-		{
-			return Clone();
-		}
+		IKeyframe IKeyframe.Clone() => Clone();
 	}
 }

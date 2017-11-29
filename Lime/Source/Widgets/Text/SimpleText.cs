@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Yuzu;
 
@@ -206,6 +206,13 @@ namespace Lime
 			TrimWhitespaces = true;
 			Text = "";
 			SpriteListElementHandler = ShaderPrograms.ColorfulTextShaderProgram.HandleSimpleTextSprite;
+		}
+
+		public override void AddToRenderChain(RenderChain chain)
+		{
+			if (GloballyVisible && ClipRegionTest(chain.ClipRegion)) {
+				AddSelfAndChildrenToRenderChain(chain, Layer);
+			}
 		}
 
 		void IText.Submit()

@@ -1,4 +1,4 @@
-﻿using Yuzu;
+using Yuzu;
 
 namespace Lime
 {
@@ -99,7 +99,13 @@ namespace Lime
 
 		public Matrix44 View
 		{
-			get { RecalcDirtyGlobals(); return view; }
+			get
+			{
+				if (CleanDirtyFlags(DirtyFlags.GlobalTransform)) {
+					RecalcGlobalTransform();
+				}
+				return view;
+			}
 		}
 
 		public Matrix44 Projection
@@ -128,12 +134,10 @@ namespace Lime
 			}
 		}
 
-		protected override void RecalcDirtyGlobalsUsingParents()
+		protected override void RecalcGlobalTransform()
 		{
-			base.RecalcDirtyGlobalsUsingParents();
-			if ((DirtyMask & DirtyFlags.Transform) != 0) {
-				view = globalTransform.CalcInverted();
-			}
+			base.RecalcGlobalTransform();
+			view = globalTransform.CalcInverted();
 		}
 	}
 

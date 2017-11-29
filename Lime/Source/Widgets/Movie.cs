@@ -58,16 +58,17 @@ namespace Lime
 
 		Matrix32 IImageCombinerArg.UVTransform { get { return Matrix32.Identity; } }
 
-		internal protected override void AddToRenderChain(RenderChain chain)
+		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (GloballyVisible && !skipRender && textureInitialized) {
-				AddSelfToRenderChain(chain);
+				AddSelfToRenderChain(chain, Layer);
 			}
 			skipRender = false;
 		}
 
-		protected override void SelfUpdate(float delta)
+		public override void Update(float delta)
 		{
+			base.Update(delta);
 			movieTexture.Looped = Looped;
 			movieTexture.Update(delta);
 		}

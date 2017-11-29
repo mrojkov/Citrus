@@ -98,12 +98,13 @@ namespace Lime
 			return !sound.IsStopped;
 		}
 
-		protected override void SelfUpdate(float delta)
+		public override void Update(float delta)
 		{
+			base.Update(delta);
 			sound.Bump();
 		}
 
-		protected internal override void AddToRenderChain(RenderChain chain)
+		public override void AddToRenderChain(RenderChain chain)
 		{
 		}
 

@@ -12,11 +12,26 @@ namespace Lime
 		private Vector3 position;
 		private bool visible;
 		private Color4 color;
+		private Viewport3D viewport;
 
 		protected Matrix44 globalTransform;
 		protected bool globallyVisible;
 		protected Color4 globalColor;
-		protected Viewport3D viewport;
+
+		public Viewport3D Viewport
+		{
+			get
+			{
+				if (viewport == null) {
+					var p = Parent;
+					while (p != null && !(p is Viewport3D)) {
+						p = p.Parent;
+					}
+					viewport = p as Viewport3D;
+				}
+				return viewport;
+			}
+		}
 
 		[YuzuMember]
 		[TangerineKeyframeColor(2)]
@@ -40,7 +55,7 @@ namespace Lime
 			set
 			{
 				scale = value;
-				PropagateDirtyFlags(DirtyFlags.Transform);
+				PropagateDirtyFlags(DirtyFlags.GlobalTransform);
 			}
 		}
 
@@ -52,7 +67,7 @@ namespace Lime
 			set
 			{
 				rotation = value;
-				PropagateDirtyFlags(DirtyFlags.Transform);
+				PropagateDirtyFlags(DirtyFlags.GlobalTransform);
 			}
 		}
 
@@ -64,7 +79,7 @@ namespace Lime
 			set
 			{
 				position = value;
-				PropagateDirtyFlags(DirtyFlags.Transform);
+				PropagateDirtyFlags(DirtyFlags.GlobalTransform);
 			}
 		}
 
@@ -83,9 +98,75 @@ namespace Lime
 		[YuzuMember]
 		public bool Opaque { get; set; }
 
-		public Matrix44 GlobalTransform { get { RecalcDirtyGlobals(); return globalTransform; } }
-		public bool GloballyVisible { get { RecalcDirtyGlobals(); return globallyVisible; } }
-		public Color4 GlobalColor { get { RecalcDirtyGlobals(); return globalColor; } }
+		public Matrix44 GlobalTransform
+		{
+			get
+			{
+				if (CleanDirtyFlags(DirtyFlags.GlobalTransform)) {
+					RecalcGlobalTransform();
+				}
+				return globalTransform;
+			}
+		}
+
+		protected virtual void RecalcGlobalTransform()
+		{
+			if (Parent?.AsNode3D != null) {
+				globalTransform = CalcLocalTransform() * Parent.AsNode3D.GlobalTransform;
+			} else {
+				globalTransform = CalcLocalTransform();
+			}
+		}
+
+		public bool GloballyVisible
+		{
+			get
+			{
+				if (CleanDirtyFlags(DirtyFlags.Visible)) {
+					RecalcGloballyVisible();
+				}
+				return globallyVisible;
+			}
+		}
+
+		private void RecalcGloballyVisible()
+		{
+			globallyVisible = Visible;
+			if (Application.IsTangerine) {
+				globallyVisible |= GetTangerineFlag(TangerineFlags.Shown);
+				globallyVisible &= !GetTangerineFlag(TangerineFlags.Hidden | TangerineFlags.HiddenOnExposition);
+			}
+			if (Parent != null) {
+				if (Parent.AsWidget != null) {
+					globallyVisible &= Parent.AsWidget.GloballyVisible;
+				} else if (Parent.AsNode3D != null) {
+					globallyVisible &= Parent.AsNode3D.GloballyVisible;
+				}
+			}
+		}
+
+		public Color4 GlobalColor
+		{
+			get
+			{
+				if (CleanDirtyFlags(DirtyFlags.Color)) {
+					RecalcGlobalColor();
+				}
+				return globalColor;
+			}
+		}
+
+		private void RecalcGlobalColor()
+		{
+			globalColor = color;
+			if (Parent != null) {
+				if (Parent.AsWidget != null) {
+					globalColor *= Parent.AsWidget.GlobalColor;
+				} else if (Parent.AsNode3D != null) {
+					globalColor *= Parent.AsNode3D.GlobalColor;
+				}
+			}
+		}
 
 		public Node3D()
 		{
@@ -97,43 +178,9 @@ namespace Lime
 			color = Color4.White;
 		}
 
-		protected override void Awake()
-		{
-			base.Awake();
-			viewport = GetViewport();
-		}
-
 		public virtual float CalcDistanceToCamera(Camera3D camera)
 		{
 			return camera.View.TransformVector(GlobalTransform.Translation).Z;
-		}
-
-		protected override void RecalcDirtyGlobalsUsingParents()
-		{
-			base.RecalcDirtyGlobalsUsingParents();
-			if (IsDirty(DirtyFlags.Transform)) {
-				globalTransform = CalcLocalTransform();
-				if (Parent != null && Parent.AsNode3D != null) {
-					globalTransform *= Parent.AsNode3D.GlobalTransform;
-				}
-			}
-			if (IsDirty(DirtyFlags.Visible | DirtyFlags.Color | DirtyFlags.TangerineFlags)) {
-				globallyVisible = Visible;
-				globalColor = color;
-				if (Application.IsTangerine) {
-					globallyVisible |= GetTangerineFlag(TangerineFlags.Shown);
-					globallyVisible &= !GetTangerineFlag(TangerineFlags.Hidden | TangerineFlags.HiddenOnExposition);
-				}
-				if (Parent != null) {
-					if (Parent.AsWidget != null) {
-						globallyVisible &= Parent.AsWidget.GloballyVisible;
-						globalColor *= Parent.AsWidget.GlobalColor;
-					} else if (Parent.AsNode3D != null) {
-						globallyVisible &= Parent.AsNode3D.GloballyVisible;
-						globalColor *= Parent.AsNode3D.GlobalColor;
-					}
-				}
-			}
 		}
 
 		public Matrix44 CalcLocalTransform()
@@ -152,16 +199,7 @@ namespace Lime
 		public void SetLocalTransform(Matrix44 transform)
 		{
 			transform.Decompose(out scale, out rotation, out position);
-			PropagateDirtyFlags(DirtyFlags.Transform);
-		}
-
-		public Viewport3D GetViewport()
-		{
-			Node p = Parent;
-			while (p != null && !(p is Viewport3D)) {
-				p = p.Parent;
-			}
-			return p as Viewport3D;
+			PropagateDirtyFlags(DirtyFlags.GlobalTransform);
 		}
 
 		public Model3D FindModel()
@@ -191,6 +229,7 @@ namespace Lime
 			var clone = base.Clone() as Node3D;
 			clone.AsNode3D = clone;
 			clone.Opaque = Opaque;
+			clone.viewport = null;
 			return clone;
 		}
 
@@ -204,17 +243,17 @@ namespace Lime
 			return GlobalTransform * node.GlobalTransform.CalcInverted();
 		}
 
-		internal protected override void AddToRenderChain(RenderChain chain)
+		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (GloballyVisible) {
-				AddChildrenToRenderChain(chain);
+				AddSelfAndChildrenToRenderChain(chain, Layer);
 			}
 		}
 
 		protected override void OnParentChanged(Node oldParent)
 		{
 			base.OnParentChanged(oldParent);
-			viewport = GetViewport();
+			viewport = null;
 		}
 	}
 }

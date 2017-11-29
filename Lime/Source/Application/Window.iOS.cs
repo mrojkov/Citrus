@@ -13,6 +13,9 @@ namespace Lime
 	{
 		private readonly Display display;
 
+		// This line only suppresses warning: "Window.Current: a name can be simplified".
+		public new static IWindow Current => CommonWindow.Current;
+
 		private UIWindow uiWindow;
 		private FPSCounter fpsCounter = new FPSCounter();
 

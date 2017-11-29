@@ -6,14 +6,14 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-
+using System.Runtime.CompilerServices;
 using Yuzu;
 
 namespace Lime
 {
 	public interface IAnimable
 	{
-		AnimatorList Animators { get; }
+		AnimatorCollection Animators { get; }
 		void OnTrigger(string property, double animationTimeCorrection = 0);
 	}
 
@@ -137,7 +137,7 @@ namespace Lime
 	/// Scene tree element.
 	/// </summary>
 	[DebuggerTypeProxy(typeof(NodeDebugView))]
-	public abstract class Node : IDisposable, IAnimable, IFolderItem, IFolderContext
+	public abstract class Node : IDisposable, IAnimable, IFolderItem, IFolderContext, IRenderChainBuilder
 	{
 		[Flags]
 		protected internal enum DirtyFlags
@@ -145,9 +145,12 @@ namespace Lime
 			None = 0,
 			Visible = 1 << 0,
 			Color = 1 << 1,
-			Transform = 1 << 2,
-			LayoutManager = 1 << 3,
-			TangerineFlags = 1 << 4,
+			Shader = 1 << 2,
+			Blending = 1 << 3,
+			LayoutManager = 1 << 4,
+			LocalTransform = 1 << 5,
+			GlobalTransform = 1 << 6,
+			ParentBoundingRect = 1 << 7,
 			All = ~None
 		}
 
@@ -235,7 +238,7 @@ namespace Lime
 			{
 				if (tangerineFlags != value) {
 					tangerineFlags = value;
-					PropagateDirtyFlags(DirtyFlags.TangerineFlags);
+					PropagateDirtyFlags(DirtyFlags.Visible);
 				}
 			}
 		}
@@ -260,8 +263,6 @@ namespace Lime
 
 		public Node3D AsNode3D { get; internal set; }
 
-		public IRenderChainBuilder RenderChainBuilder { get; set; }
-
 		/// <summary>
 		/// The presenter used for rendering and hit-testing the node.
 		/// TODO: Add Add/RemovePresenter methods. Remove CompoundPresenter property and Presenter setter.
@@ -280,9 +281,35 @@ namespace Lime
 			(PostPresenter as CompoundPresenter) ?? (CompoundPresenter)(PostPresenter = new CompoundPresenter(PostPresenter));
 
 		/// <summary>
-		/// Gets or sets cached reference to the next node in the NodeList. Used for fast tree traverse within Update() method.
+		/// Indicates whether the node is awake. Node gets awake on the first update.
+		/// </summary>
+		public bool IsAwake { get; protected set; }
+
+		internal int RunningAnimationsCount;
+
+		/// <summary>
+		/// Gets the cached reference to the first animation in the animation collection.
+		/// </summary>
+		public Animation FirstAnimation { get; internal set; }
+
+		/// <summary>
+		/// Gets the cached reference to the first children node. 
+		/// Use it for fast iteration through nodes collection in a performance-critical code.
+		/// </summary>
+		public Node FirstChild { get; internal set; }
+
+		/// <summary>
+		/// Gets the cached reference to the next node in the NodeList. 
+		/// Use it for fast iteration through nodes collection in a performance-critical code.
 		/// </summary>
 		public Node NextSibling { get; internal set; }
+
+		/// <summary>
+		/// Animation speed multiplier.
+		/// </summary>
+		public float AnimationSpeed { get; set; }
+
+		public IRenderChainBuilder RenderChainBuilder { get; set; }
 
 		/// <summary>
 		/// Gets or sets Z-order (the rendering order).
@@ -300,7 +327,7 @@ namespace Lime
 		/// Collections of Animators.
 		/// </summary>
 		[YuzuMember]
-		public AnimatorList Animators { get; private set; }
+		public AnimatorCollection Animators { get; private set; }
 
 		/// <summary>
 		/// Child nodes.
@@ -342,10 +369,19 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Returns first animation in animation list
-		/// (or creates an empty animation if list is empty).
+		/// Returns the first animation in the animation collection
+		/// or creates an animation if the collection is empty.
 		/// </summary>
-		public Animation DefaultAnimation => Animations.DefaultAnimation;
+		public Animation DefaultAnimation
+		{
+			get
+			{
+				if (FirstAnimation == null) {
+					Animations.Add(new Animation());
+				}
+				return FirstAnimation;
+			}
+		}
 
 		/// <summary>
 		/// Custom data. Can be set via Tangerine (this way it will contain path to external scene).
@@ -368,10 +404,10 @@ namespace Lime
 
 		[YuzuMember]
 		[YuzuSerializeIf(nameof(NeedSerializeAnimations))]
-		public AnimationList Animations { get; private set; }
+		public AnimationCollection Animations { get; private set; }
 
 		public bool NeedSerializeAnimations() =>
-			Animations.Count > 1 || (Animations.Count == 1 && (Animations[0].Id != null || Animations[0].Markers.Count > 0));
+			Animations.Count > 1 || (Animations.Count == 1 && (FirstAnimation.Id != null || FirstAnimation.Markers.Count > 0));
 
 		[YuzuMember]
 		public List<Folder.Descriptor> Folders { get; set; }
@@ -386,11 +422,6 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Animation speed multiplier.
-		/// </summary>
-		public float AnimationSpeed { get; set; }
-
-		/// <summary>
 		/// Custom data. Can only be set programmatically.
 		/// </summary>
 		public object UserData { get; set; }
@@ -398,30 +429,39 @@ namespace Lime
 		/// <summary>
 		/// TODO: Add summary
 		/// </summary>
-		protected DirtyFlags DirtyMask = DirtyFlags.All;
+		internal protected DirtyFlags DirtyMask = DirtyFlags.All;
 
 		/// <summary>
 		/// TODO: Add summary
 		/// </summary>
 		protected bool IsDirty(DirtyFlags mask) { return (DirtyMask & mask) != 0; }
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		protected bool CleanDirtyFlags(DirtyFlags mask)
+		{
+			if ((DirtyMask & mask) != 0) {
+				DirtyMask &= ~mask;
+				return true;
+			}
+			return false;
+		}
+
 		public bool HitTestTarget;
 
 		public static int CreatedCount = 0;
 		public static int FinalizedCount = 0;
 
-		public bool IsAwoken;
 		public Action<Node> Awoken;
 
-		public Node()
+		protected Node()
 		{
 			AnimationSpeed = 1;
 			Components = new NodeComponentCollection(this);
-			Animators = new AnimatorList(this);
-			Animations = new AnimationList(this);
+			Animators = new AnimatorCollection(this);
+			Animations = new AnimationCollection(this);
 			Nodes = new NodeList(this);
 			Presenter = DefaultPresenter.Instance;
-			RenderChainBuilder = DefaultRenderChainBuilder.Instance;
+			RenderChainBuilder = this;
 			++CreatedCount;
 		}
 
@@ -433,7 +473,7 @@ namespace Lime
 
 		public virtual void Dispose()
 		{
-			for (var n = Nodes.FirstOrNull(); n != null; n = n.NextSibling) {
+			for (var n = FirstChild; n != null; n = n.NextSibling) {
 				n.Dispose();
 			}
 			Nodes.Clear();
@@ -448,33 +488,18 @@ namespace Lime
 			if ((DirtyMask & mask) == mask)
 				return;
 			Window.Current?.Invalidate();
+			PropagateDirtyFlagsHelper(mask);
+		}
+
+		private void PropagateDirtyFlagsHelper(DirtyFlags mask)
+		{
 			DirtyMask |= mask;
-			for (var n = Nodes.FirstOrNull(); n != null; n = n.NextSibling) {
+			for (var n = FirstChild; n != null; n = n.NextSibling) {
 				if ((n.DirtyMask & mask) != mask) {
-					n.PropagateDirtyFlags(mask);
+					n.PropagateDirtyFlagsHelper(mask);
 				}
 			}
 		}
-
-		/// <summary>
-		/// TODO: Add summary
-		/// </summary>
-		protected void RecalcDirtyGlobals()
-		{
-			if (DirtyMask == DirtyFlags.None) {
-				return;
-			}
-			if (Parent != null && Parent.DirtyMask != DirtyFlags.None) {
-				Parent.RecalcDirtyGlobals();
-			}
-			RecalcDirtyGlobalsUsingParents();
-			DirtyMask = DirtyFlags.None;
-		}
-
-		/// <summary>
-		/// TODO: Add summary
-		/// </summary>
-		protected virtual void RecalcDirtyGlobalsUsingParents() { }
 
 #if LIME_COUNT_NODES
 		~Node() {
@@ -543,16 +568,18 @@ namespace Lime
 			var clone = (Node)MemberwiseClone();
 			++CreatedCount;
 			clone.Parent = null;
+			clone.FirstAnimation = null;
+			clone.FirstChild = null;
 			clone.NextSibling = null;
 			clone.gestures = null;
 			clone.AsWidget = clone as Widget;
 			clone.Animations = Animations.Clone(clone);
-			clone.Animators = AnimatorList.SharedClone(clone, Animators);
+			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
 			clone.Nodes = Nodes.Clone(clone);
 			clone.Components = Components.Clone(clone);
-			clone.IsAwoken = false;
+			clone.IsAwake = false;
 			if (RenderChainBuilder != null) {
-				clone.RenderChainBuilder = RenderChainBuilder.Clone();
+				clone.RenderChainBuilder = RenderChainBuilder.Clone(clone);
 			}
 			if (Presenter != null) {
 				clone.Presenter = Presenter.Clone();
@@ -612,40 +639,18 @@ namespace Lime
 		/// <param name="delta">Time delta since last Update.</param>
 		public virtual void Update(float delta)
 		{
-#if PROFILE
-			var watch = System.Diagnostics.Stopwatch.StartNew();
-#endif
-			if (!IsAwoken) {
-				Awoken?.Invoke(this);
-				Awake();
-				IsAwoken = true;
+			if (!IsAwake) {
+				RaiseAwake();
 			}
 			if (delta > Application.MaxDelta) {
-#if PROFILE
-				watch.Stop();
-				NodeProfiler.RegisterUpdate(this, watch.ElapsedTicks);
-#endif
 				SafeUpdate(delta);
 			} else {
 				AdvanceAnimation(delta);
-				SelfUpdate(delta);
-#if PROFILE
-				watch.Stop();
-#endif
-				for (var node = Nodes.FirstOrNull(); node != null;) {
+				for (var node = FirstChild; node != null;) {
 					var next = node.NextSibling;
 					node.Update(node.AnimationSpeed * delta);
 					node = next;
 				}
-#if PROFILE
-				watch.Start();
-#endif
-				SelfLateUpdate(delta);
-
-#if PROFILE
-				watch.Stop();
-				NodeProfiler.RegisterUpdate(this, watch.ElapsedTicks);
-#endif
 			}
 		}
 
@@ -659,25 +664,20 @@ namespace Lime
 			} while (remainDelta > 0f);
 		}
 
-		/// <summary>
-		/// Awake is called on the first node update, before changing node state.
-		/// </summary>
-		protected virtual void Awake()
+		protected void RaiseAwake()
 		{
+			IsAwake = true;
 			foreach (var c in Components) {
 				c.Awake();
 			}
+			Awake();
+			Awoken?.Invoke(this);
 		}
 
 		/// <summary>
-		/// Called before updating child nodes.
+		/// Awake is called on the first node update, before changing node state.
 		/// </summary>
-		protected virtual void SelfUpdate(float delta) { }
-
-		/// <summary>
-		/// Called after updating child nodes.
-		/// </summary>
-		protected virtual void SelfLateUpdate(float delta) { }
+		protected virtual void Awake() { }
 
 		public virtual void Render() { }
 
@@ -686,39 +686,45 @@ namespace Lime
 		/// This includes children Nodes as well as this Node itself. i.e. if you want Render()
 		/// of this node to be called you should invoke AddSelfToRenderChain in AddToRenderChain override.
 		/// </summary>
-		internal protected abstract void AddToRenderChain(RenderChain chain);
+		public abstract void AddToRenderChain(RenderChain chain);
 
-		protected void AddChildrenToRenderChain(RenderChain chain)
+		IRenderChainBuilder IRenderChainBuilder.Clone(Node newOwner) => newOwner;
+
+		protected void AddSelfAndChildrenToRenderChain(RenderChain chain, int layer)
 		{
-			var savedLayer = chain.CurrentLayer;
-			if (Layer != 0) {
-				chain.CurrentLayer = Layer;
+			if (layer == 0) {
+				if (PostPresenter != null) {
+					chain.Add(this, PostPresenter);
+				}
+				for (var node = FirstChild; node != null; node = node.NextSibling) {
+					node.RenderChainBuilder?.AddToRenderChain(chain);
+				}
+				if (Presenter != null) {
+					chain.Add(this, Presenter);
+				}
+			} else {
+				var savedLayer = chain.CurrentLayer;
+				chain.CurrentLayer = layer;
+				AddSelfAndChildrenToRenderChain(chain, 0);
+				chain.CurrentLayer = savedLayer;
 			}
-			if (PostPresenter != null) {
-				chain.Add(this, PostPresenter);
-			}
-			for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
-				node.RenderChainBuilder?.AddToRenderChain(node, chain);
-			}
-			if (Presenter != null) {
-				chain.Add(this, Presenter);
-			}
-			chain.CurrentLayer = savedLayer;
 		}
 
-		protected void AddSelfToRenderChain(RenderChain chain)
+		protected void AddSelfToRenderChain(RenderChain chain, int layer)
 		{
-			var savedLayer = chain.CurrentLayer;
-			if (Layer != 0) {
-				chain.CurrentLayer = Layer;
+			if (layer == 0) {
+				if (PostPresenter != null) {
+					chain.Add(this, PostPresenter);
+				}
+				if (Presenter != null) {
+					chain.Add(this, Presenter);
+				}
+			} else {
+				var savedLayer = chain.CurrentLayer;
+				chain.CurrentLayer = layer;
+				AddSelfToRenderChain(chain, 0);
+				chain.CurrentLayer = savedLayer;
 			}
-			if (PostPresenter != null) {
-				chain.Add(this, PostPresenter);
-			}
-			if (Presenter != null) {
-				chain.Add(this, Presenter);
-			}
-			chain.CurrentLayer = savedLayer;
 		}
 
 		/// <summary>
@@ -977,7 +983,7 @@ namespace Lime
 			queue.Enqueue(this);
 			while (queue.Count > 0) {
 				var parent = queue.Dequeue();
-				var child = parent.Nodes.FirstOrNull();
+				var child = parent.FirstChild;
 				for (; child != null; child = child.NextSibling) {
 					if (child.Id == id) {
 						queue.Clear();
@@ -995,10 +1001,9 @@ namespace Lime
 		/// <param name="delta">Time delta (in seconds).</param>
 		public void AdvanceAnimation(float delta)
 		{
-			for (var i = 0; i < Animations.Count; i++) {
-				var a = Animations[i];
-				if (a.IsRunning) {
-					a.Advance(this, delta);
+			if (RunningAnimationsCount > 0) {
+				for (var a = FirstAnimation; a != null; a = a.Next) {
+					a.Advance(delta);
 				}
 			}
 		}
@@ -1094,7 +1099,9 @@ namespace Lime
 				((Widget)content).Size = (this as Widget).Size;
 			}
 			Animations.Clear();
-			Animations.AddRange(content.Animations);
+			var animations = content.Animations.ToList();
+			content.Animations.Clear();
+			Animations.AddRange(animations);
 			if ((content is Viewport3D) && (this is Node3D) && (content.Nodes.Count > 0)) {
 				// Handle a special case: the 3d scene is wrapped up with a Viewport3D.
 				var node = content.Nodes[0];
@@ -1108,7 +1115,7 @@ namespace Lime
 				Nodes.AddRange(nodes);
 			}
 
-			RenderChainBuilder = content.RenderChainBuilder?.Clone();
+			RenderChainBuilder = content.RenderChainBuilder?.Clone(this);
 			Presenter = content.Presenter?.Clone();
 			PostPresenter = content.PostPresenter?.Clone();
 			Components = content.Components.Clone(this);
@@ -1205,7 +1212,7 @@ namespace Lime
 					if (current == null) {
 						current = root;
 					}
-					var node = current.Nodes.FirstOrNull();
+					var node = current.FirstChild;
 					if (node != null) {
 						current = node;
 						return true;

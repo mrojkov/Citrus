@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -179,8 +179,6 @@
     <Compile Include="Source\Widgets\3D\ShadowMapping\DepthBufferProgram.cs" />
     <Compile Include="Source\Widgets\3D\ShadowMapping\DepthBufferRenderer.cs" />
     <Compile Include="Source\Widgets\3D\Spline3D.cs" />
-    <Compile Include="Source\Widgets\Animation\Animation.cs" />
-    <Compile Include="Source\Widgets\Animation\AnimationList.cs" />
     <Compile Include="Source\Widgets\DropDownList.cs" />
     <Compile Include="Source\Widgets\Editor.cs" />
     <Compile Include="Source\Graphics\RenderBatch.cs" />
@@ -280,10 +278,6 @@
     <Compile Include="Source\AssetBundle\UnpackedAssetBundle.cs" />
     <Compile Include="Source\Widgets\Tasks\TaskList.cs" />
     <Compile Include="Source\Widgets\Tasks\Task.cs" />
-    <Compile Include="Source\Widgets\Animation\AnimationUtils.cs" />
-    <Compile Include="Source\Widgets\Animation\Animator.cs" />
-    <Compile Include="Source\Widgets\Animation\AnimatorRegistry.cs" />
-    <Compile Include="Source\Widgets\Animation\Keyframe.cs" />
     <Compile Include="Source\Widgets\Audio.cs" />
     <Compile Include="Source\Widgets\Bone.cs" />
     <Compile Include="Source\Widgets\BoneArray.cs" />
@@ -293,7 +287,6 @@
     <Compile Include="Source\Widgets\Frame.cs" />
     <Compile Include="Source\Widgets\Image.cs" />
     <Compile Include="Source\Widgets\ImageCombiner.cs" />
-    <Compile Include="Source\Widgets\Animation\KeyframeCollection.cs" />
     <Compile Include="Source\Widgets\LinearLayout.cs" />
     <Compile Include="Source\Widgets\Marker.cs" />
     <Compile Include="Source\Widgets\MarkerList.cs" />
@@ -341,7 +334,6 @@
     <Compile Include="Source\Application\OpenTK.Xamarin.iOS\iPhoneOSGameView.cs" />
     <Compile Include="Source\Application\OpenTK.Xamarin.iOS\iPhoneOSGraphicsContext.cs" />
     <Compile Include="Source\Application\OpenTK.Xamarin.iOS\Utilities.iPhone.cs" />
-    <Compile Include="Source\Widgets\Animation\AnimationEngine.cs" />
     <Compile Include="Source\Widgets\Layout\AnchorLayout.cs" />
     <Compile Include="Source\Widgets\Layout\Layout.cs" />
     <Compile Include="Source\Widgets\Layout\TableLayout.cs" />
@@ -390,8 +382,6 @@
     <Compile Include="Source\ComponentCollection.cs" />
     <Compile Include="Source\Widgets\NodeComponentCollection.cs" />
     <Compile Include="Source\Widgets\3D\SplineGear3D.cs" />
-    <Compile Include="Source\Widgets\Animation\AnimationBlender.cs" />
-    <Compile Include="Source\Widgets\Animation\BlendAnimationEngine.cs" />
     <Compile Include="Source\Graphics\Bitmap.Apple.cs" />
     <Compile Include="Source\Widgets\Theme\Theme.cs" />
     <Compile Include="Source\Widgets\Theme\ThemedButton.cs" />
@@ -420,7 +410,19 @@
     <Compile Include="Source\Widgets\Gestures\DragGesture.cs" />
     <Compile Include="Source\Widgets\Gestures\Gesture.cs" />
     <Compile Include="Source\Widgets\Gestures\GestureManager.cs" />
-    <Compile Include="Source\Widgets\Animation\AnimatorList.cs" />
+    <Compile Include="Source\Widgets\Animation\TypedKeyframeList.cs" />
+    <Compile Include="Source\Widgets\Animation\Keyframe.cs" />
+    <Compile Include="Source\Widgets\Animation\BoxedKeyframeList.cs" />
+    <Compile Include="Source\Widgets\Animation\BlendAnimationEngine.cs" />
+    <Compile Include="Source\Widgets\Animation\AnimatorRegistry.cs" />
+    <Compile Include="Source\Widgets\Animation\AnimatorCollection.cs" />
+    <Compile Include="Source\Widgets\Animation\Animator.cs" />
+    <Compile Include="Source\Widgets\Animation\AnimationUtils.cs" />
+    <Compile Include="Source\Widgets\Animation\AnimationEngine.cs" />
+    <Compile Include="Source\Widgets\Animation\AnimationCollection.cs" />
+    <Compile Include="Source\Widgets\Animation\AnimationBlender.cs" />
+    <Compile Include="Source\Widgets\Animation\Animation.cs" />
+    <Compile Include="Source\Optimizations\BoundingRectCalculator.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\3rdParty\OpenAL\OpenAL32.dll">
@@ -456,6 +458,9 @@
       <Project>{ddd2dfe9-ced2-4cea-adf0-5a6865865a46}</Project>
       <Name>Yuzu</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Source\Widgets\Animation\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

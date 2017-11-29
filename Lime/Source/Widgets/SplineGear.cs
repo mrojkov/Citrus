@@ -29,8 +29,9 @@ namespace Lime
 			return clone;
 		}
 
-		protected override void SelfLateUpdate(float delta)
+		public override void Update(float delta)
 		{
+			base.Update(delta);
 			if (Parent == null) {
 				return;
 			}
@@ -43,7 +44,7 @@ namespace Lime
 			}
 		}
 
-		protected internal override void AddToRenderChain(RenderChain chain)
+		public override void AddToRenderChain(RenderChain chain)
 		{
 		}
 	}
