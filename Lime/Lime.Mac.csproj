@@ -322,6 +322,7 @@
     <Compile Include="Source\Widgets\Animation\AnimationCollection.cs" />
     <Compile Include="Source\Widgets\Animation\TypedKeyframeList.cs" />
     <Compile Include="Source\Widgets\Animation\BoxedKeyframeList.cs" />
+    <Compile Include="Source\Optimizations\BoundingRectCalculator.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

@@ -119,7 +119,6 @@
     <Compile Include="Source\Widgets\Animation\Animator.cs" />
     <Compile Include="Source\Widgets\Animation\AnimatorRegistry.cs" />
     <Compile Include="Source\Widgets\Animation\Keyframe.cs" />
-    <Compile Include="Source\Widgets\Animation\KeyframeCollection.cs" />
     <Compile Include="Source\Widgets\EditorUtils.cs" />
     <Compile Include="Source\Widgets\Text\TextParser.cs" />
     <Compile Include="Source\Widgets\Text\TextRenderer.cs" />
@@ -208,7 +207,6 @@
     <Compile Include="Source\Types\Quaternion.cs" />
     <Compile Include="Source\Types\Ray.cs" />
     <Compile Include="Source\Widgets\Animation\Animation.cs" />
-    <Compile Include="Source\Widgets\Animation\AnimationList.cs" />
     <Compile Include="Source\Application\IWindow.cs" />
     <Compile Include="Source\Application\WindowOptions.cs" />
     <Compile Include="Source\Application\FPSCounter.cs" />
@@ -370,7 +368,11 @@
     <Compile Include="Source\Widgets\Gestures\Gesture.cs" />
     <Compile Include="Source\Widgets\Gestures\GestureManager.cs" />
     <Compile Include="Source\Widgets\MarkerList.cs" />
-    <Compile Include="Source\Widgets\Animation\AnimatorList.cs" />
+    <Compile Include="Source\Optimizations\BoundingRectCalculator.cs" />
+    <Compile Include="Source\Widgets\Animation\AnimationCollection.cs" />
+    <Compile Include="Source\Widgets\Animation\AnimatorCollection.cs" />
+    <Compile Include="Source\Widgets\Animation\BoxedKeyframeList.cs" />
+    <Compile Include="Source\Widgets\Animation\TypedKeyframeList.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Android.csproj">
