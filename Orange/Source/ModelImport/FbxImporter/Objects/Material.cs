@@ -24,9 +24,9 @@ namespace Orange.FbxImporter
 				var matPtr = FbxNodeSerializeMaterial(NativePtr);
 				if (matPtr != IntPtr.Zero) {
 					var material = matPtr.To<Texture>();
-					Path = material.texturePath;
+					Path = material.texturePath.ToCharArray();
 					Name = material.Name;
-					var color = material.colorDiffuse;
+					var color = material.colorDiffuse.ToStruct<Vec4> ();
 					DiffuseColor = color.toLimeColor();
 				}
 			}
@@ -64,13 +64,14 @@ namespace Orange.FbxImporter
 
 		#region MarshalingStructures
 
-		[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+		[StructLayout(LayoutKind.Sequential)]
 		public class Texture
 		{
-			public Vec4 colorDiffuse;
+			public IntPtr texturePath;
 
-			public string texturePath;
+			public IntPtr colorDiffuse;
 
+			[MarshalAs(UnmanagedType.LPStr)]
 			public string Name;
 		}
 

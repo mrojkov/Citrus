@@ -15,29 +15,26 @@ namespace Orange.FbxImporter
 		public enum FbxNodeType
 		{
 			NONE,
+			UNKNOWN,
 			MESH,
 			CAMERA
 		};
 
-		public static NodeAttribute GetFromNode(IntPtr ptr)
+		public static NodeAttribute GetFromNode(IntPtr ptr, int idx)
 		{
-			var attribute = FbxNodeGetAttribute(ptr);
+			var attribute = FbxNodeGetAttribute(ptr, idx);
 			if (attribute == IntPtr.Zero) {
-				return Empty;
+				return NodeAttribute.Empty;
 			}
-			switch (FbxNodeGetAttributeType(ptr)) {
+			switch (FbxNodeGetAttributeType(ptr, idx)) {
+				case FbxNodeType.NONE:
+					return Empty;
+				case FbxNodeType.UNKNOWN:
+					return Empty;
 				case FbxNodeType.MESH:
-					var meshAttribute = MeshAttribute.FromSubmesh(attribute);
-					var count = FbxNodeGetAttributeCount(ptr);
-					for (int i = 1; i < count; i++) {
-						meshAttribute = MeshAttribute.Combine(
-							meshAttribute,
-							MeshAttribute.FromSubmesh(FbxNodeGetAttribute(ptr, i)));
-					}
-					return meshAttribute;
+					return new MeshAttribute(attribute);
 				case FbxNodeType.CAMERA:
 					return new CameraAttribute(attribute);
-				case FbxNodeType.NONE:
 				default:
 					return Empty;
 			}
@@ -46,13 +43,10 @@ namespace Orange.FbxImporter
 		#region Pinvokes
 
 		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern FbxNodeType FbxNodeGetAttributeType(IntPtr node, int idx = 0);
+		public static extern FbxNodeType FbxNodeGetAttributeType(IntPtr node, int idx);
 
 		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr FbxNodeGetAttribute(IntPtr node, int idx = 0);
-
-		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern int FbxNodeGetAttributeCount(IntPtr node);
+		public static extern IntPtr FbxNodeGetAttribute(IntPtr node, int idx);
 
 		#endregion
 	}

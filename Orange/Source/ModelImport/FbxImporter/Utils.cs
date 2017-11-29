@@ -90,16 +90,17 @@ namespace Orange.FbxImporter
 
 		public static T[] ToStructArray<T>(this IntPtr ptr, int size)
 		{
-			T[] result = new T[size];
 			if (ptr != IntPtr.Zero) {
+				T[] result = new T[size];
 				var strucSize = Marshal.SizeOf(typeof(T));
 				for (int i = 0; i < size; i++) {
 					var structPtr = new IntPtr(ptr.ToInt64() + strucSize * i);
 					result[i] = (T)Marshal.PtrToStructure(structPtr, typeof(T));
 				}
-
+				Utils.ReleaseNative(ptr);
+				return result;
 			}
-			return result;
+			return null;
 		}
 
 		public static string ToCharArray(this IntPtr ptr)
