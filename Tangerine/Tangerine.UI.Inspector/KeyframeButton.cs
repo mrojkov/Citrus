@@ -76,7 +76,7 @@ namespace Tangerine.UI.Inspector
 
 				if (!hasKey && value) {
 					var propValue = new Property(animable, editorParams.PropertyName).Getter();
-					var keyFunction = animator.Keys.LastOrDefault(k => k.Frame < currentFrame)?.Function ?? KeyFunction.Linear;
+					var keyFunction = animator?.Keys.LastOrDefault(k => k.Frame < currentFrame)?.Function ?? KeyFunction.Linear;
 					IKeyframe keyframe = Keyframe.CreateForType(editorParams.PropertyInfo.PropertyType, currentFrame, propValue, keyFunction);
 
 					Core.Operations.SetKeyframe.Perform(animable, editorParams.PropertyName, Document.Current.AnimationId, keyframe);
