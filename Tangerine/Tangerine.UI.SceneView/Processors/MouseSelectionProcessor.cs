@@ -173,7 +173,7 @@ namespace Tangerine.UI.SceneView
 			Vector2 CalcPositionInSceneViewSpace(SplinePoint3D splinePoint)
 			{
 				var spline = (Spline3D)splinePoint.Parent;
-				var viewport = spline.GetViewport();
+				var viewport = spline.Viewport;
 				var viewportToScene = viewport.CalcTransitionToSpaceOf(SceneView.Instance.Scene);
 				return (Vector2)viewport.WorldToViewportPoint(splinePoint.Position * spline.GlobalTransform) * viewportToScene;
 			}

@@ -40,7 +40,7 @@ namespace Tangerine.UI.SceneView
 
 		bool HitTestControlPoint(Spline3D spline, Vector3 pointInSplineCoordinates)
 		{
-			var viewport = spline.GetViewport();
+			var viewport = spline.Viewport;
 			var viewportToScene = viewport.CalcTransitionToSpaceOf(SceneView.Instance.Scene);
 			var screenPoint = (Vector2)viewport.WorldToViewportPoint(pointInSplineCoordinates * spline.GlobalTransform) * viewportToScene;
 			return SceneView.Instance.HitTestControlPoint(screenPoint);
@@ -53,7 +53,7 @@ namespace Tangerine.UI.SceneView
 			var offsets = new Vector3?[points.Count()];
 			try {
 				var spline = (Spline3D)Document.Current.Container;
-				var viewport = spline.GetViewport();
+				var viewport = spline.Viewport;	
 				var initialMouse = input.MousePosition;
 				var dragDirection = DragDirection.Any;
 				while (input.IsMousePressed()) {
@@ -100,7 +100,7 @@ namespace Tangerine.UI.SceneView
 			Vector3? posCorrection = null;
 			try {
 				var spline = (Spline3D)Document.Current.Container;
-				var viewport = spline.GetViewport();
+				var viewport = spline.Viewport;
 				var plane = CalcPlane(spline, point.Position + GetTangent(point, tangentIndex));
 				var tangentsAreEqual = (point.TangentA + point.TangentB).Length < 0.1f;
 				while (input.IsMousePressed()) {

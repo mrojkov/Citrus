@@ -34,7 +34,7 @@ namespace Tangerine.UI.SceneView
 						yield break;
 					}
 					var spline = (Spline3D)Document.Current.Container;
-					var vp = spline.GetViewport();
+					var vp = spline.Viewport;
 					var ray = vp.ScreenPointToRay(SceneView.Instance.Input.MousePosition);
 					var xyPlane = new Plane(new Vector3(0, 0, 1), 0).Transform(spline.GlobalTransform);
 					var d = ray.Intersects(xyPlane);
