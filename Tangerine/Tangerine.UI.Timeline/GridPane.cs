@@ -75,7 +75,12 @@ namespace Tangerine.UI.Timeline
 		private void RenderInvolvedFrames()
 		{
 			foreach (var row in Document.Current.Rows) {
-				var nodeRow = row.Components.Get<Core.Components.NodeRow>().Node;
+				var nodeRow = row.Components.Get<Core.Components.NodeRow>()?.Node;
+
+				if (nodeRow == null) {
+					continue;
+				}
+
 				int lastFrameIndex = 0;
 
 				foreach (var animator in nodeRow.Animators) {
