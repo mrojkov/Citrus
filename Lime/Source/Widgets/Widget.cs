@@ -969,9 +969,6 @@ namespace Lime
 
 		public bool ClipRegionTest(Rectangle clipRegion)
 		{
-			// TODO: Temporary disabled
-			return true;
-
 			var r = CalcGlobalBoundingRect();
 			return
 				r.BX >= clipRegion.AX && r.BY >= clipRegion.AY &&
