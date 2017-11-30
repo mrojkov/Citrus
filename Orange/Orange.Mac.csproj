@@ -144,7 +144,6 @@
     <Compile Include="Source\Actions\OptimizePNG.cs" />
     <Compile Include="Source\HotStudioExport\HotSceneExporter.cs" />
     <Compile Include="Source\Toolbox\CustomFileEnumerator.cs" />
-    <Compile Include="Source\Actions\ConvertLevelsToNewFormat.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Orange.Mac.userprefs">

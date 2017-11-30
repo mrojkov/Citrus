@@ -85,6 +85,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\App.config" />
@@ -93,6 +94,7 @@
   <ItemGroup />
   <ItemGroup>
     <Content Include="..\Orange.ico" />
+    <EmbeddedResource Include="Resources\Orange.ico" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Main.GUI.cs" />

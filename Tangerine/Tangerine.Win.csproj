@@ -36,6 +36,9 @@
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Resources\Icons\icon.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -271,5 +274,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Icons\Tools\Folded.png" />
     <EmbeddedResource Include="Resources\Icons\Tools\Unfolded.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="icon.ico" />
+    <EmbeddedResource Include="Resources\Icons\icon.ico" />
   </ItemGroup>
 </Project>
