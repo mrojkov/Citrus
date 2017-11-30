@@ -65,7 +65,8 @@ namespace Lime
 		{
 			if (renderTexture != null) {
 				EnsureRenderChain();
-				renderChain.ClipRegion = new Rectangle(0, 0, Width, Height);
+				// TODO: Implement clipping, for now disable it.
+				renderChain.ClipRegion = RenderChain.DefaultClipRegion;
 				RenderToTexture(renderTexture, renderChain);
 				if (GetTangerineFlag(TangerineFlags.DisplayContent)) {
 					RenderWithScissorTest();
