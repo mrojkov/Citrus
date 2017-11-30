@@ -165,6 +165,15 @@ namespace Lime
 			return false;
 		}
 
+		public bool Remove(string propertyName, string animationId = null)
+		{
+			IAnimator animator;
+			if (TryFind(propertyName, out animator, animationId)) {
+				return Remove(animator);
+			}
+			return false;
+		}
+
 		public int GetOverallDuration()
 		{
 			int val = 0;
