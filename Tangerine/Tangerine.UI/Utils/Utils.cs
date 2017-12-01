@@ -37,9 +37,28 @@ namespace Tangerine.UI
 			return (value / step).Round() * step;
 		}
 
+		public static void ApplyTransformationToWidgetsGroupOobb(Widget sceneWidget, IList<Widget> widgetsInParentSpace,
+			Vector2 pivotInSceneSpace, bool oobbInFirstWidgetSpace,
+			Vector2 curMousePosInSceneSpace, Vector2 prevMousePosSceneSpace,
+			Func<Vector2, Vector2, Matrix32> onCalcTransformationFromOriginalVectorInOobbSpaceAndDeformedVectorInOobbSpace)
+		{
+			if (widgetsInParentSpace.Count == 0) return;
+
+			Matrix32 fromSceneToParentSpace = sceneWidget.CalcTransitionToSpaceOf(widgetsInParentSpace[0].ParentWidget);
+
+			ApplyTransformationToWidgetsGroupOobb(
+				widgetsInParentSpace, 
+				pivotInSceneSpace * fromSceneToParentSpace,
+				oobbInFirstWidgetSpace,
+				curMousePosInSceneSpace * fromSceneToParentSpace,
+				prevMousePosSceneSpace * fromSceneToParentSpace, 
+				onCalcTransformationFromOriginalVectorInOobbSpaceAndDeformedVectorInOobbSpace
+			);
+		}
+
 		public static void ApplyTransformationToWidgetsGroupOobb(IList<Widget> widgetsInParentSpace,
 			Vector2 pivotInParentSpace, bool oobbInFirstWidgetSpace,
-			Vector2 curMousePos, Vector2 prevMousePos,
+			Vector2 curMousePosInParentSpace, Vector2 prevMousePosInParentSpace,
 			Func<Vector2, Vector2, Matrix32> onCalcTransformationFromOriginalVectorInOobbSpaceAndDeformedVectorInOobbSpace)
 		{
 			if (widgetsInParentSpace.Count == 0) return;
@@ -53,21 +72,21 @@ namespace Tangerine.UI
 			}
 
 			ApplyTransformationToWidgetsGroupOobb(
-				widgetsInParentSpace, widgetsInParentSpace[0].ParentWidget, originalOobbToParentSpace, curMousePos, prevMousePos,
+				widgetsInParentSpace, widgetsInParentSpace[0].ParentWidget, originalOobbToParentSpace, curMousePosInParentSpace, prevMousePosInParentSpace,
 				onCalcTransformationFromOriginalVectorInOobbSpaceAndDeformedVectorInOobbSpace
 			);
 		}
 
 		public static void ApplyTransformationToWidgetsGroupOobb(IEnumerable<Widget> widgetsInParentSpace,
 			Widget parentWidget, Matrix32 oobbInParentSpace,
-			Vector2 curMousePos, Vector2 prevMousePos,
+			Vector2 curMousePosInParentSpace, Vector2 prevMousePosInParentSpace,
 			Func<Vector2, Vector2, Matrix32> onCalcTransformationFromOriginalVectorInOobbSpaceAndDeformedVectorInOobbSpace)
 		{
 			Vector2 pivotInParentSpace = oobbInParentSpace.T;
 
 			Vector2 pivotInOobbSpace = pivotInParentSpace;
-			Vector2 controlPointInOobbSpace = prevMousePos;
-			Vector2 targetPointInOobbSpace = curMousePos;
+			Vector2 controlPointInOobbSpace = prevMousePosInParentSpace;
+			Vector2 targetPointInOobbSpace = curMousePosInParentSpace;
 
 			Matrix32 transformationFromParentToOobb = oobbInParentSpace.CalcInversed();
 			pivotInOobbSpace = pivotInOobbSpace * transformationFromParentToOobb;

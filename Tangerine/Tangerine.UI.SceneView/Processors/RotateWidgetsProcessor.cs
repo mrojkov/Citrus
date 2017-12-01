@@ -14,7 +14,7 @@ namespace Tangerine.UI.SceneView
 			while (true) {
 				Quadrangle hull;
 				Vector2 pivot;
-				var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>();
+				IEnumerable<Widget> widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>();
 				if (Utils.CalcHullAndPivot(widgets, sv.Scene, out hull, out pivot)) {
 					for (int i = 0; i < 4; i++) {
 						if (sv.HitTestControlPoint(hull[i])) {
@@ -54,6 +54,7 @@ namespace Tangerine.UI.SceneView
 			bool discret)
 		{
 			Utils.ApplyTransformationToWidgetsGroupOobb(
+				sv.Scene,
 				widgets, pivotPoint, false, curMousePos, prevMousePos,
 				(originalVectorInOobbSpace, deformedVectorInOobbSpace) => {
 

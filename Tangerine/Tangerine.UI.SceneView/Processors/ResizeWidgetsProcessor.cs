@@ -165,6 +165,7 @@ namespace Tangerine.UI.SceneView
 			Vector2 curMousePos, Vector2 prevMousePos, bool proportional)
 		{
 			Utils.ApplyTransformationToWidgetsGroupOobb(
+				sv.Scene,
 				widgets, originalHull[LookupPivotIndex[controlPointIndex] / 2], hullInFirstWidgetSpace, curMousePos, prevMousePos,
 				(originalVectorInOobbSpace, deformedVectorInOobbSpace) => {
 					Vector2 deformationScaleInOobbSpace =
