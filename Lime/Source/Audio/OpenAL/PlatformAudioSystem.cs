@@ -81,6 +81,14 @@ namespace Lime
 			interruptionNotification = AVAudioSession.Notifications.ObserveInterruption((sender, args) => {
 				if (args.InterruptionType == AVAudioSessionInterruptionType.Began) {
 					AVAudioSession.SharedInstance().SetActive(false);
+					// OpenALMob can not continue after session interruption, so destroy context here.
+					if (context != null) {
+						foreach (var c in channels) {
+							c.DisposeOpenALResources();
+						}
+						context.Dispose();
+						context = null;
+					}
 					Active = false;
 				} else if (args.InterruptionType == AVAudioSessionInterruptionType.Ended) {
 					// Do not restore the audio session here, because incoming call screen is still visible. Defer it until the first update.
@@ -124,10 +132,9 @@ namespace Lime
 #endif
 			set
 			{
-				if (Active == value) {
-					return;
+				if (Active != value) {
+					SetActive(value);
 				}
-				SetActive(value);
 			}
 		}
 
@@ -152,15 +159,9 @@ namespace Lime
 		private static void SetActive(bool value)
 		{
 			if (value) {
-				if (context != null) {
-					context.MakeCurrent();
-					context.Process();
-				}
+				context?.MakeCurrent();
 			} else {
 				Alc.MakeContextCurrent(IntPtr.Zero);
-				if (context != null) {
-					context.Suspend();
-				}
 			}
 		}
 #else
@@ -233,7 +234,10 @@ namespace Lime
 			if (audioSessionInterruptionEnded) {
 				audioSessionInterruptionEnded = false;
 				AVAudioSession.SharedInstance().SetActive(true);
-				Active = true;
+				context = new AudioContext();
+				foreach (var c in channels) {
+					c.CreateOpenALResources();
+				}
 			}
 #endif
 			if (streamingThread == null) {
@@ -410,9 +414,9 @@ namespace Lime
 
 		public unsafe AudioContext()
 		{
-			IntPtr device = Alc.OpenDevice(null);
+			var device = Alc.OpenDevice(null);
 			handle = Alc.CreateContext(device, (int*)null);
-			Alc.MakeContextCurrent(handle);
+			MakeCurrent();
 		}
 
 		public void MakeCurrent()

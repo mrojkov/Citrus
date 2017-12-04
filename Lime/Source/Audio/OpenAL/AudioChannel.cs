@@ -24,7 +24,7 @@ namespace Lime
 		private readonly object streamingSync = new object();
 		private volatile bool streaming;
 
-		private readonly int source;
+		private int source;
 		private float volume = 1;
 		private float pitch = 1;
 		private float pan = 0;
@@ -87,6 +87,11 @@ namespace Lime
 			Sound = null;
 			this.Id = index;
 			decodedData = Marshal.AllocHGlobal(BufferSize);
+			CreateOpenALResources();
+		}
+
+		public void CreateOpenALResources()
+		{
 			using (new PlatformAudioSystem.ErrorChecker()) {
 				allBuffers = new List<int>();
 				for (int i = 0; i < NumBuffers; i++) {
@@ -95,6 +100,18 @@ namespace Lime
 				source = AL.GenSource();
 			}
 			processedBuffers = new Stack<int>(allBuffers);
+			SetPan(Pan);
+			SetVolume(Volume);
+			SetPitch(Pitch);
+		}
+
+		public void DisposeOpenALResources()
+		{
+			AL.SourceStop(source);
+			AL.DeleteSource(source);
+			foreach (var bid in allBuffers) {
+				AL.DeleteBuffer(bid);
+			}
 		}
 		
 		public void Dispose()
@@ -105,16 +122,15 @@ namespace Lime
 			if (decoder != null) {
 				decoder.Dispose();
 			}
-			AL.SourceStop(source);
-			AL.DeleteSource(source);
-			foreach (var bid in allBuffers) {
-				AL.DeleteBuffer(bid);
-			}
+			DisposeOpenALResources();
 			Marshal.FreeHGlobal(decodedData);
 		}
 
 		private void SetPan(float value)
 		{
+			if (!AudioSystem.Active) {
+				return;
+			}
 			pan = value.Clamp(-1, 1);
 			var sourcePosition = Vector2.CosSinRough(pan * Mathf.HalfPi);
 			using (new PlatformAudioSystem.ErrorChecker()) {
