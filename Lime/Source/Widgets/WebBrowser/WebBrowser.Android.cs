@@ -86,8 +86,9 @@ namespace Lime
 			webView.SetBackgroundColor(color);
 		}
 
-		protected override void SelfUpdate(float delta)
+		public override void Update(float delta)
 		{
+			base.Update(delta);
 			if (webView == null) {
 				return;
 			}
