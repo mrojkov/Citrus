@@ -32,40 +32,11 @@ namespace Lime
 		unsafe static extern void AlcDeviceResumeSoft(IntPtr device);
 #endif
 
-		public struct ErrorChecker : IDisposable
-		{
-			string comment;
-			bool throwException;
-
-			public ErrorChecker(string comment = null, bool throwException = true)
-			{
-				this.comment = comment;
-				this.throwException = throwException;
-				// Clear current error
-				AL.GetError();
-			}
-
-			void IDisposable.Dispose()
-			{
-				var error = AL.GetError();
-				if (error != ALError.NoError) {
-					string message = "OpenAL error: " + AL.GetErrorString(error);
-					if (comment != null) {
-						message += string.Format(" ({0})", comment);
-					}
-					if (throwException) {
-						throw new Exception(message);
-					} else {
-						Logger.Write(message);
-					}
-				}
-			}
-		}
-
 		static readonly List<AudioChannel> channels = new List<AudioChannel>();
 		static AudioContext context;
 		static Thread streamingThread = null;
 		static volatile bool shouldTerminateThread;
+		static readonly AudioCache cache = new AudioCache();
 #if iOS
 		static NSObject interruptionNotification;
 		static bool audioSessionInterruptionEnded;
@@ -108,12 +79,8 @@ namespace Lime
 #endif
 			var err = AL.GetError();
 			if (err == ALError.NoError) {
-				// iOS dislike to mix stereo and mono buffers on one audio source, so separate them
-				for (int i = 0; i < options.NumStereoChannels; i++) {
-					channels.Add(new AudioChannel(i, AudioFormat.Stereo16));
-				}
-				for (int i = 0; i < options.NumMonoChannels; i++) {
-					channels.Add(new AudioChannel(i, AudioFormat.Mono16));
+				for (int i = 0; i < options.NumChannels; i++) {
+					channels.Add(new AudioChannel(i));
 				}
 			}
 			if (options.DecodeAudioInSeparateThread) {
@@ -314,12 +281,7 @@ namespace Lime
 			}
 		}
 
-		delegate AudioChannel ChannelSelector(AudioFormat format);
-
-		static readonly AudioCache cache = new AudioCache();
-
-		private static Sound LoadSoundToChannel(
-			ChannelSelector channelSelector, string path, bool looping, bool paused, float fadeinTime)
+		private static Sound LoadSoundToChannel(AudioChannel channel, string path, bool looping, bool paused, float fadeinTime)
 		{
 			if (context == null) {
 				return new Sound();
@@ -334,7 +296,6 @@ namespace Lime
 				return sound;
 			}
 			var decoder = AudioDecoderFactory.CreateDecoder(stream);
-			var channel = channelSelector(decoder.GetFormat());
 			if (channel == null || !channel.Play(sound, decoder, looping, paused, fadeinTime)) {
 				decoder.Dispose();
 				return sound;
@@ -343,9 +304,8 @@ namespace Lime
 			return sound;
 		}
 
-		private static AudioChannel AllocateChannel(float priority, AudioFormat format)
+		private static AudioChannel AllocateChannel(float priority)
 		{
-			var channels = PlatformAudioSystem.channels.Where(c => c.AudioFormat == format).ToList();
 			channels.Sort((a, b) => {
 				if (a.Priority != b.Priority) {
 					return Mathf.Sign(a.Priority - b.Priority);
@@ -388,22 +348,49 @@ namespace Lime
 			float pan = 0f,
 			float pitch = 1f)
 		{
-			ChannelSelector channelSelector = (format) => {
-				var channel = AllocateChannel(priority, format);
-				if (channel != null) {
-					if (channel.Sound != null) {
-						channel.Sound.Channel = NullAudioChannel.Instance;
+			var channel = AllocateChannel(priority);
+			if (channel == null) {
+				return new Sound();
+			}
+			if (channel.Sound != null) {
+				channel.Sound.Channel = NullAudioChannel.Instance;
+			}
+			channel.Group = group;
+			channel.Priority = priority;
+			channel.Volume = volume;
+			channel.Pitch = pitch;
+			channel.Pan = pan;
+			return LoadSoundToChannel(channel, path, looping, paused, fadeinTime);
+		}
+
+		public struct ErrorChecker : IDisposable
+		{
+			string comment;
+			bool throwException;
+
+			public ErrorChecker(string comment = null, bool throwException = true)
+			{
+				this.comment = comment;
+				this.throwException = throwException;
+				// Clear current error
+				AL.GetError();
+			}
+
+			void IDisposable.Dispose()
+			{
+				var error = AL.GetError();
+				if (error != ALError.NoError) {
+					string message = "OpenAL error: " + AL.GetErrorString(error);
+					if (comment != null) {
+						message += string.Format(" ({0})", comment);
 					}
-					channel.Group = group;
-					channel.Priority = priority;
-					channel.Volume = volume;
-					channel.Pitch = pitch;
-					channel.Pan = pan;
+					if (throwException) {
+						throw new Exception(message);
+					} else {
+						Logger.Write(message);
+					}
 				}
-				return channel;
-			};
-			var sound = LoadSoundToChannel(channelSelector, path, looping, paused, fadeinTime);
-			return sound;
+			}
 		}
 	}
 

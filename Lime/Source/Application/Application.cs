@@ -49,8 +49,7 @@ namespace Lime
 	public class ApplicationOptions
 	{
 		public bool DecodeAudioInSeparateThread = false;
-		public int NumStereoChannels = 8;
-		public int NumMonoChannels = 16;
+		public int NumChannels = 24;
 #if MAC
 		public RenderingBackend RenderingBackend = RenderingBackend.OpenGL;
 #else

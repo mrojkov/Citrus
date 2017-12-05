@@ -79,11 +79,8 @@ namespace Lime
 
 		public string SamplePath { get; set; }
 
-		public AudioFormat AudioFormat { get; private set; }
-
-		public AudioChannel(int index, AudioFormat format)
+		public AudioChannel(int index)
 		{
-			AudioFormat = format;
 			Sound = null;
 			this.Id = index;
 			decodedData = Marshal.AllocHGlobal(BufferSize);
