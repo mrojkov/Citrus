@@ -17,6 +17,7 @@ namespace Orange
 		private ThemedTextView textView;
 		private TextWriter textWriter;
 		private CheckBoxWithLabel updateVcs;
+		private Button goButton;
 		private Button abortButton;
 
 		public OrangeInterface()
@@ -143,12 +144,13 @@ namespace Orange
 			actionPicker.Index = 0;
 			container.AddNode(actionPicker);
 
-			var go = new ThemedButton("Go");
-			go.Clicked += () => Execute((Func<string>) actionPicker.Value);
-			container.AddNode(go);
+			goButton = new ThemedButton("Go");
+			goButton.Clicked += () => Execute((Func<string>) actionPicker.Value);
+			container.AddNode(goButton);
 
 			abortButton = new ThemedButton("Abort") {
-				Enabled = false
+				Enabled = false,
+				Visible = false
 			};
 			abortButton.Clicked += () => AssetCooker.CancelCook();
 			container.AddNode(abortButton);
@@ -222,6 +224,9 @@ namespace Orange
 
 		private void EnableControls(bool value)
 		{
+			goButton.Visible = value;
+			abortButton.Visible = !value;
+
 			if (value) {
 				abortButton.Input.DerestrictScope();
 			}
