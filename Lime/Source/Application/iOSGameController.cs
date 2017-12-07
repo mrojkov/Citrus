@@ -34,6 +34,11 @@ namespace Lime
 
 		public new GameView View { get { return (GameView)base.View; } }
 
+		public override void ViewWillTransitionToSize(CoreGraphics.CGSize toSize, IUIViewControllerTransitionCoordinator coordinator)
+		{
+			View.SetNeedsLayout();
+		}
+
 		internal static void ResetDeviceOrientation(DeviceOrientation supportedOrientation)
 		{
 			switch (supportedOrientation) {
@@ -143,7 +148,7 @@ namespace Lime
 			softKeyboard.Height = 0;
 			softKeyboard.Visible = false;
 		}
-		 
+
 		public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations()
 		{
 			if (LockDeviceOrientation && Application.CurrentDeviceOrientation != 0) {
@@ -216,11 +221,6 @@ namespace Lime
 			base.WillRotate(toInterfaceOrientation, duration);
 		}
 
-		public override void DidRotate(UIInterfaceOrientation fromInterfaceOrientation)
-		{
-			base.DidRotate(fromInterfaceOrientation);
-		}
-
 		private Vector2 prevSize;
 
 		public override void ViewWillLayoutSubviews()
@@ -232,9 +232,6 @@ namespace Lime
 		{
 			// Handle resize here (not in WillRotate) because in WillRotate we don't know
 			// the resulting screen resolution.
-			if (prevSize == Window.Current.ClientSize) {
-				return;
-			}
 			var toOrientation = ConvertInterfaceOrientation(this.InterfaceOrientation);
 			var deviceRotated = toOrientation != Application.CurrentDeviceOrientation;
 			Application.CurrentDeviceOrientation = toOrientation;
