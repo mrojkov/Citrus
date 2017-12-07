@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -28,7 +28,7 @@ namespace Orange.FbxImporter
 				throw new FbxAtributeImportException(Type);
 			}
 			var cam = native.ToStruct<Camera>();
-			Name = cam.name.ToCharArray();
+			Name = cam.name;
 			FieldOfView = cam.fieldOfView;
 			AspectRatio = cam.aspectRatio;
 			NearClipPlane = cam.clipPlaneNear;
@@ -44,10 +44,10 @@ namespace Orange.FbxImporter
 
 		#region MarshalingStructures
 
-		[StructLayout(LayoutKind.Sequential)]
+		[StructLayout(LayoutKind.Sequential, CharSet = ImportConfig.Charset)]
 		private class Camera
 		{
-			public IntPtr name;
+			public string name;
 
 			[MarshalAs(UnmanagedType.R4)]
 			public float fieldOfView;

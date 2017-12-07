@@ -1,6 +1,7 @@
 ﻿using Lime;
 using System;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace Orange.FbxImporter
 {
@@ -23,17 +24,18 @@ namespace Orange.FbxImporter
 			} else {
 				var matPtr = FbxNodeSerializeMaterial(NativePtr);
 				if (matPtr != IntPtr.Zero) {
-					var material = matPtr.To<Texture>();
-					Path = material.texturePath.ToCharArray();
-					Name = material.Name;
-					var color = material.colorDiffuse.ToStruct<Vec4> ();
+					var material = matPtr.ToStruct<Texture>();
+					//var test = Encoding.ASCII.GetString(Encoding.Unicode.GetBytes(material.texturePath));
+					Path = material.texturePath;
+					Name = material.name;
+					var color = material.colorDiffuse;
 					DiffuseColor = color.toLimeColor();
 				}
 			}
-			
+
 		}
 
-		public CommonMaterial ToLime(string path) 
+		public CommonMaterial ToLime(string path)
 		{
 			var res = new CommonMaterial();
 			res.Name = Name;
@@ -64,18 +66,17 @@ namespace Orange.FbxImporter
 
 		#region MarshalingStructures
 
-		[StructLayout(LayoutKind.Sequential)]
+		[StructLayout(LayoutKind.Sequential, CharSet = ImportConfig.Charset)]
 		public class Texture
 		{
-			public IntPtr texturePath;
+			public string texturePath;
 
-			public IntPtr colorDiffuse;
+			public string name;
 
-			[MarshalAs(UnmanagedType.LPStr)]
-			public string Name;
+			public Vec4 colorDiffuse;
 		}
 
-		
+
 		#endregion
 	}
 }

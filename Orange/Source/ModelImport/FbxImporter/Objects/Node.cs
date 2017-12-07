@@ -8,7 +8,7 @@ namespace Orange.FbxImporter
 {
 	public class Node : FbxObject
 	{
-		public NodeAttribute[] Attributes { get; private set; } = new NodeAttribute[1] { NodeAttribute.Empty };
+		public NodeAttribute Attribute { get; private set; } = NodeAttribute.Empty;
 
 		public List<Node> Children { get; } = new List<Node>();
 
@@ -21,27 +21,21 @@ namespace Orange.FbxImporter
 		public Node(IntPtr ptr) : base (ptr)
 		{
 			var nodeCount = FbxNodeGetChildCount(NativePtr);
-			var attribCount = FbxNodeGetAttributeCount(NativePtr);
 			var materialsCount = FbxNodeGetMaterialCount(NativePtr);
 
-			Name = Marshal.PtrToStringAnsi(FbxNodeGetName(NativePtr));
+			Name = FbxNodeGetName(NativePtr).PtrToString();
 			Materials = new Material[materialsCount];
 			for (int i = 0; i < materialsCount; i++) {
 				Materials[i] = new Material(FbxNodeGetMaterial(NativePtr, i));
 			}
 
-			if (attribCount > 0) {
-				Attributes = new NodeAttribute[attribCount];
-				for (int i = 0; i < attribCount; i++) {
-					Attributes[i] = NodeAttribute.GetFromNode(NativePtr, i);
-				}
-			}
+			Attribute = NodeAttribute.GetFromNode(NativePtr);
 
 			for (int i = 0; i < nodeCount; i++) {
 				Children.Add(new Node(FbxNodeGetChildNode(NativePtr, i)));
 			}
 
-			LocalTranform =  FbxNodeGetLocalTransform(NativePtr).To<Mat4x4>().ToLime();
+			LocalTranform =  FbxNodeGetLocalTransform(NativePtr).ToStruct<Mat4x4>().ToLime();
 		}
 
 		#region PInvokes
@@ -58,11 +52,8 @@ namespace Orange.FbxImporter
 		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
 		public static extern IntPtr FbxNodeGetLocalTransform(IntPtr node);
 
-		[DllImport(ImportConfig.LibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr FbxNodeGetName(IntPtr node);
-
 		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern int FbxNodeGetAttributeCount(IntPtr node);
+		public static extern IntPtr FbxNodeGetName(IntPtr node);
 
 		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
 		public static extern int FbxNodeGetMaterialCount(IntPtr node);
