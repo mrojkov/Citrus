@@ -135,16 +135,21 @@ namespace Orange
 		{
 			foreach (var animation in scene.Animations.Animations) {
 				var n = Model.TryFind<Node3D>(animation.Key);
-				(n.Animators["Scale", animation.MarkerId] as Animator<Vector3>).Keys.AddRange(
-					Vector3KeyReducer.Default.Reduce(animation.scaleKeys));
-				var rotAnimator = n.Animators["Rotation", animation.MarkerId] as Animator<Quaternion>;
-				rotAnimator.Keys.AddRange(
-					QuaternionKeyReducer.Default.Reduce(animation.rotationKeys));
-				if (n is Camera3D) {
-					CorrectCameraAnimationKeys(rotAnimator.Keys);
+				var scaleKeys = Vector3KeyReducer.Default.Reduce(animation.scaleKeys);
+				if (scaleKeys.Count != 0) {
+					(n.Animators["Scale", animation.MarkerId] as Animator<Vector3>).Keys.AddRange(scaleKeys);
 				}
-				(n.Animators["Position", animation.MarkerId] as Animator<Vector3>).Keys.AddRange(
-					Vector3KeyReducer.Default.Reduce(animation.positionKeys));
+				var rotKeys = QuaternionKeyReducer.Default.Reduce(animation.rotationKeys);
+				if (rotKeys.Count != 0) {
+					if (n is Camera3D) {
+						CorrectCameraAnimationKeys(rotKeys);
+					}
+					(n.Animators["Rotation", animation.MarkerId] as Animator<Quaternion>).Keys.AddRange(rotKeys);
+				}
+				var posKeys = Vector3KeyReducer.Default.Reduce(animation.positionKeys);
+				if (posKeys.Count != 0) {
+					(n.Animators["Position", animation.MarkerId] as Animator<Vector3>).Keys.AddRange(posKeys);
+				}
 				if (!Model.Animations.Any(a => a.Id == animation.MarkerId)) {
 					Model.Animations.Add(new Lime.Animation {
 						Id = animation.MarkerId,
