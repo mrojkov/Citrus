@@ -184,6 +184,39 @@ namespace Tangerine.Core.Operations
 		}
 	}
 
+	public class SetAnimator : Operation
+	{
+		public readonly IAnimator Animator;
+		public readonly IAnimable Animable;
+
+		public override bool IsChangingDocument => true;
+
+		public static void Perform(IAnimable animable, IAnimator animator)
+		{
+			Document.Current.History.Perform(new SetAnimator(animable, animator));
+		}
+
+		private SetAnimator(IAnimable animable, IAnimator animator)
+		{
+			Animable = animable;
+			Animator = animator;
+		}
+
+		public class Processor : OperationProcessor<SetAnimator>
+		{
+
+			protected override void InternalRedo(SetAnimator op)
+			{
+				op.Animable.Animators.Add(op.Animator);
+			}
+
+			protected override void InternalUndo(SetAnimator op)
+			{
+				op.Animable.Animators.Remove(op.Animator);
+			}
+		}
+	}
+
 	public class InsertFolderItem : Operation
 	{
 		public readonly Node Container;
