@@ -1,5 +1,5 @@
 ﻿#region MIT License
-/*Copyright (c) 2012-2013, 2015 Robert Rouhani <robert.rouhani@gmail.com>
+/*Copyright (c) 2012-2013, 2015-2016 Robert Rouhani <robert.rouhani@gmail.com>
 
 SharpFont based on Tao.FreeType, Copyright (c) 2003-2007 Tao Framework Team
 
@@ -48,6 +48,22 @@ namespace SharpFont
 		#endregion
 
 		#region Constructors
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="FTSize"/> class.
+		/// </summary>
+		/// <param name="parent">The parent face.</param>
+		public FTSize(Face parent)
+		{
+			IntPtr reference;
+			Error err = FT.FT_New_Size(parent.Reference, out reference);
+
+			if (err != Error.Ok)
+				throw new FreeTypeException(err);
+
+			Reference = reference;
+			userAlloc = true;
+		}
 
 		internal FTSize(IntPtr reference, bool userAlloc, Face parentFace)
 		{
@@ -113,6 +129,31 @@ namespace SharpFont
 		}
 
 		/// <summary>
+		/// Gets or sets a typeless pointer, which is unused by the FreeType library or any of its drivers. It can be used by
+		/// client applications to link their own data to each size object.
+		/// </summary>
+		[Obsolete("Use the Tag property and Disposed event instead.")]
+		public Generic Generic
+		{
+			get
+			{
+				if (disposed)
+					throw new ObjectDisposedException("Generic", "Cannot access a disposed object.");
+
+				return new Generic(rec.generic);
+			}
+
+			set
+			{
+				if (disposed)
+					throw new ObjectDisposedException("Generic", "Cannot access a disposed object.");
+
+				value.WriteToUnmanagedMemory(PInvokeHelper.AbsoluteOffsetOf<SizeRec>(Reference, "generic"));
+				Reference = reference; //update rec.
+			}
+		}
+
+		/// <summary>
 		/// Gets metrics for this size object. This field is read-only.
 		/// </summary>
 		public SizeMetrics Metrics
@@ -127,9 +168,13 @@ namespace SharpFont
 		}
 
 		/// <summary>
-		/// Gets or sets ser data to identify this instance. Ignored by both FreeType and SharpFont.
+		/// Gets or sets an object used to identify this instance of <see cref="FTSize"/>. This object will not be
+		/// modified or accessed internally.
 		/// </summary>
-		/// <remarks>This is a replacement for FT_Generic in FreeType.</remarks>
+		/// <remarks>
+		/// This is a replacement for FT_Generic in FreeType. If you are retrieving the same object multiple times
+		/// from functions, this object will not appear in new copies.
+		/// </remarks>
 		public object Tag { get; set; }
 
 		internal IntPtr Reference
@@ -156,6 +201,29 @@ namespace SharpFont
 
 		#region Public Methods
 
+		/// <summary><para>
+		/// Even though it is possible to create several size objects for a given face (see
+		/// <see cref="SharpFont.Face.NewSize"/> for details), functions like <see cref="SharpFont.Face.LoadGlyph"/> or
+		/// <see cref="SharpFont.Face.LoadChar"/> only use the one which has been activated last to determine the
+		/// ‘current character pixel size’.
+		/// </para><para>
+		/// This function can be used to ‘activate’ a previously created size object.
+		/// </para></summary>
+		/// <remarks>
+		/// If ‘face’ is the size's parent face object, this function changes the value of ‘face->size’ to the input
+		/// size handle.
+		/// </remarks>
+		public void Activate()
+		{
+			if (disposed)
+				throw new ObjectDisposedException("Activate", "Cannot access a disposed object.");
+
+			Error err = FT.FT_Activate_Size(Reference);
+
+			if (err != Error.Ok)
+				throw new FreeTypeException(err);
+		}
+
 		/// <summary>
 		/// Diposes the FTSize.
 		/// </summary>
@@ -178,10 +246,7 @@ namespace SharpFont
 				//only dispose the user allocated sizes that are not duplicates.
 				if (userAlloc && !duplicate)
 				{
-					Error err = FT.FT_Done_Size(reference);
-
-					if (err != Error.Ok)
-						throw new FreeTypeException(err);
+					FT.FT_Done_Size(reference);
 				}
 
 				// removes itself from the parent Face, with a check to prevent this from happening when Face is
@@ -191,6 +256,7 @@ namespace SharpFont
 					parentFace.RemoveChildSize(this);
 
 				reference = IntPtr.Zero;
+				rec = new SizeRec();
 
 				EventHandler handler = Disposed;
 				if (handler != null)

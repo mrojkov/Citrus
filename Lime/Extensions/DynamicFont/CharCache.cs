@@ -48,6 +48,7 @@ namespace Lime
 			// We add 1px left and right padding to each char on the texture and also to the UV
 			// so that chars will be blurred correctly after stretching or drawing to float position.
 			// And we compensate this padding by ACWidth, so that the text will take the same space.
+			// See "texture bleeding"
 			const int padding = 1;
 
 			// Space between characters on the texture
@@ -73,6 +74,7 @@ namespace Lime
 				ACWidths = glyph.ACWidths - Vector2.One * padding,
 				Width = paddedGlyphWidth,
 				Height = fontHeight,
+				RgbIntensity = glyph.RgbIntensity,
 				KerningPairs = glyph.KerningPairs,
 				TextureIndex = textureIndex,
 				VerticalOffset = Math.Min(0, glyph.VerticalOffset)
@@ -114,19 +116,31 @@ namespace Lime
 			var srcPixels = glyph.Pixels;
 			if (srcPixels == null)
 				return; // Invisible glyph
-			var si = 0;
-			var color = Color4.White;
+
+			int si;
+			Color4 color = Color4.Black;
 			var dstPixels = texture.Data;
-			// Sometimes glyph.VerticalOffset could be negative for symbols with diacritics and this results the symbols
-			// get overlapped or run out of the texture bounds. We shift the glyph down and increase the current line
-			// height to fix the issue. Also we store the shift amount in FontChar.VerticalOffset property.
-			for (int i = 0; i < glyph.Height - Math.Min(0, glyph.VerticalOffset); i++) {
-				if (glyph.VerticalOffset + i < 0) {
-					continue;
-				}
-				var di = (position.Y + glyph.VerticalOffset + i) * texture.ImageSize.Width + position.X;
-				for (int j = glyph.Width; j > 0; j--) {
-					color.A = srcPixels[si++];
+			int bytesPerPixel = glyph.RgbIntensity ? 3 : 1;
+
+			for (int i = 0; i < glyph.Height; i++) {
+				// Sometimes glyph.VerticalOffset could be negative for symbols with diacritics and this results the symbols
+				// get overlapped or run out of the texture bounds. We shift the glyph down and increase the current line
+				// height to fix the issue. Also we store the shift amount in FontChar.VerticalOffset property.
+				int verticalOffsetCorrection = -Math.Min(0, glyph.VerticalOffset);
+
+				var di = (position.Y + glyph.VerticalOffset + i + verticalOffsetCorrection) * texture.ImageSize.Width + position.X;
+				for (int j = 0; j < glyph.Width; j++) {
+					si = i * glyph.Pitch + j * bytesPerPixel;
+					if (glyph.RgbIntensity) {
+						color.A = 255;
+						color.R = srcPixels[si];
+						color.G = srcPixels[si + 1];
+						color.B = srcPixels[si + 2];
+					} else {
+						color = Color4.White;
+						color.A = srcPixels[si];
+					}
+
 					dstPixels[di++] = color;
 				}
 			}
@@ -144,7 +158,7 @@ namespace Lime
 				ImageSize = SurfaceSize = size;
 				Data = new Color4[size.Width * size.Height];
 				for (int i = 0; i < size.Width * size.Height; i++) {
-					Data[i] = Color4.White;
+					Data[i] = Color4.Black;
 					Data[i].A = 0;
 				}
 			}

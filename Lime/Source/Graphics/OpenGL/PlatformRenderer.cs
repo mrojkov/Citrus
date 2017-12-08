@@ -243,6 +243,12 @@ namespace Lime
 						GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
 					}
 					break;
+				case Blending.LcdTextFirstPass:
+					GL.BlendFunc(BlendingFactorSrc.Zero, BlendingFactorDest.OneMinusSrcColor);
+					break;
+				case Blending.LcdTextSecondPass:
+					GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
+					break;
 				case Blending.Add:
 				case Blending.Glow:
 					if (premultipliedAlphaMode) {

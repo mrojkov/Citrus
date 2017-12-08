@@ -89,7 +89,31 @@ namespace SharpFont
 				return rec.y_ppem;
 			}
 		}
-			
+
+		/// <summary>
+		/// Gets a 16.16 fractional scaling value used to convert horizontal metrics from font units to 26.6 fractional
+		/// pixels. Only relevant for scalable font formats.
+		/// </summary>
+		public Fixed16Dot16 ScaleX
+		{
+			get
+			{
+				return Fixed16Dot16.FromRawValue((int)rec.x_scale);
+			}
+		}
+
+		/// <summary>
+		/// Gets a 16.16 fractional scaling value used to convert vertical metrics from font units to 26.6 fractional
+		/// pixels. Only relevant for scalable font formats.
+		/// </summary>
+		public Fixed16Dot16 ScaleY
+		{
+			get
+			{
+				return Fixed16Dot16.FromRawValue((int)rec.y_scale);
+			}
+		}
+
 		/// <summary>
 		/// Gets the ascender in 26.6 fractional pixels.
 		/// </summary>

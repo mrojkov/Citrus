@@ -16,7 +16,9 @@ namespace Lime
 		Modulate,
 		Burn,
 		Darken,
-		Opaque
+		Opaque,
+		LcdTextFirstPass,
+		LcdTextSecondPass,
 	}
 
 	public enum ShaderId
@@ -382,6 +384,8 @@ namespace Lime
 			var chars = new SpriteList.CharDef[j];
 			j = 0;
 
+			List<Sprite> forLcdSecondPass = null;
+
 			FontChar prevChar = null;
 			float savedX = position.X;
 			for (int i = 0; i < length; i++) {
@@ -421,7 +425,26 @@ namespace Lime
 					}
 				}
 				if (list == null) {
-					DrawSprite(fontChar.Texture, color, roundPos, size, fontChar.UV0, fontChar.UV1);
+					if (fontChar.RgbIntensity) {
+						Blending wasBlending = Blending;
+						Blending = Blending.LcdTextFirstPass;
+						DrawSprite(fontChar.Texture, Color4.White, roundPos, size, fontChar.UV0, fontChar.UV1);
+
+						if (forLcdSecondPass == null) {
+							forLcdSecondPass = new List<Sprite>();
+						}
+						forLcdSecondPass.Add(new Sprite {
+							Texture1 = fontChar.Texture,
+							Color = color,
+							Position = roundPos,
+							Size = size,
+							UV0 = fontChar.UV0,
+							UV1 = fontChar.UV1
+						});
+						Blending = wasBlending;
+					} else {
+						DrawSprite(fontChar.Texture, color, roundPos, size, fontChar.UV0, fontChar.UV1);
+					}
 				} else {
 					chars[j].FontChar = fontChar;
 					chars[j].Position = roundPos;
@@ -430,6 +453,16 @@ namespace Lime
 				position.X += scale * (fontChar.Width + fontChar.ACWidths.Y);
 				prevChar = fontChar;
 			}
+
+			if (forLcdSecondPass != null) {
+				Blending wasBlending = Blending;
+				Blending = Blending.LcdTextFirstPass;
+				foreach (Sprite sprite in forLcdSecondPass) {
+					DrawSprite(sprite.Texture1, sprite.Color, sprite.Position, sprite.Size, sprite.UV0, sprite.UV1);
+				}
+				Blending = wasBlending;
+			}
+
 			if (list != null)
 				list.Add(font, color, fontHeight, chars, tag);
 		}
@@ -654,14 +687,16 @@ namespace Lime
 					batchLength < batchedSprites.Length &&
 					s.Texture1 == batchedSprites[0].Texture1 &&
 					s.Texture2 == batchedSprites[0].Texture2 &&
+					s.Blending == batchedSprites[0].Blending &&
 					s.ShaderProgram == batchedSprites[0].ShaderProgram
 				) {
 					batchedSprites[batchLength++] = s;
 					continue;
 				}
 				bool customShader = batchedSprites[0].ShaderProgram != null;
+				Blending blending = batchedSprites[0].Blending == null ? Blending : batchedSprites[0].Blending.Value;
 				var batch = CurrentRenderList.GetBatch(
-					batchedSprites[0].Texture1, batchedSprites[0].Texture2, Blending, customShader ? ShaderId.Custom : Shader,
+					batchedSprites[0].Texture1, batchedSprites[0].Texture2, blending, customShader ? ShaderId.Custom : Shader,
 					customShader ? batchedSprites[0].ShaderProgram : CustomShaderProgram, 4 * batchLength, 6 * batchLength);
 				int v = batch.LastVertex;
 				int i = batch.LastIndex;
@@ -672,8 +707,8 @@ namespace Lime
 				var uvRect = batchedSprites[0].Texture1.AtlasUVRect;
 				for (int j = 0; j < batchLength; j++) {
 					var sprite = batchedSprites[j];
-					var effectiveColor = color * sprite.Color;
-					if (Renderer.PremultipliedAlphaMode && color.A != 255) {
+					var effectiveColor = sprite.ForceOverrideColor ? sprite.Color : color * sprite.Color;
+					if (!sprite.ForceOverrideColor && Renderer.PremultipliedAlphaMode && color.A != 255) {
 						effectiveColor = Color4.PremulAlpha(effectiveColor);
 					}
 					indices[i++] = (ushort)(v + 1);

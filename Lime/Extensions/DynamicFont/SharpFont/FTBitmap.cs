@@ -1,5 +1,5 @@
 ﻿#region MIT License
-/*Copyright (c) 2012-2013, 2015 Robert Rouhani <robert.rouhani@gmail.com>
+/*Copyright (c) 2012-2013, 2015-2016 Robert Rouhani <robert.rouhani@gmail.com>
 
 SharpFont based on Tao.FreeType, Copyright (c) 2003-2007 Tao Framework Team
 
@@ -43,16 +43,43 @@ namespace SharpFont
 
 		private IntPtr reference;
 		private BitmapRec rec;
+
+		private Library library;
+
 		private bool disposed;
+
+		//If the bitmap was generated with FT_Bitmap_New.
+		private bool user;
 
 		#endregion
 
 		#region Constructors
 
-		internal FTBitmap(IntPtr reference, BitmapRec bmpInt)
+		/// <summary>
+		/// Initializes a new instance of the <see cref="FTBitmap"/> class.
+		/// </summary>
+		/// <param name="library">The parent <see cref="Library"/>.</param>
+		public FTBitmap(Library library)
+		{
+			IntPtr bitmapRef = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(BitmapRec)));
+			FT.FT_Bitmap_New(bitmapRef);
+			Reference = bitmapRef;
+
+			this.library = library;
+			this.user = true;
+		}
+
+		internal FTBitmap(IntPtr reference, Library library)
+		{
+			Reference = reference;
+			this.library = library;
+		}
+
+		internal FTBitmap(IntPtr reference, BitmapRec bmpInt, Library library)
 		{
 			this.reference = reference;
 			this.rec = bmpInt;
+			this.library = library;
 		}
 
 		/// <summary>
@@ -176,6 +203,36 @@ namespace SharpFont
 		}
 
 		/// <summary>
+		/// Gets how the palette is stored. This field is intended for paletted pixel modes.
+		/// </summary>
+		[Obsolete("Not used currently.")]
+		public byte PaletteMode
+		{
+			get
+			{
+				if (disposed)
+					throw new ObjectDisposedException("FTBitmap", "Cannot access a disposed object.");
+
+				return rec.palette_mode;
+			}
+		}
+
+		/// <summary>
+		/// Gets a typeless pointer to the bitmap palette; this field is intended for paletted pixel modes.
+		/// </summary>
+		[Obsolete("Not used currently.")]
+		public IntPtr Palette
+		{
+			get
+			{
+				if (disposed)
+					throw new ObjectDisposedException("FTBitmap", "Cannot access a disposed object.");
+
+				return rec.palette;
+			}
+		}
+
+		/// <summary>
 		/// Gets the <see cref="FTBitmap"/>'s buffer as a byte array.
 		/// </summary>
 		public byte[] BufferData
@@ -186,8 +243,8 @@ namespace SharpFont
 					throw new ObjectDisposedException("FTBitmap", "Cannot access a disposed object.");
 
 				//TODO deal with negative pitch
-				var data = new byte[rec.rows * rec.pitch];
-				if (data.Length != 0) {
+				byte[] data = new byte[rec.rows * rec.pitch];
+				if (data.Length != 0) { 
 					Marshal.Copy(rec.buffer, data, 0, data.Length);
 				}
 				return data;
@@ -218,6 +275,98 @@ namespace SharpFont
 
 		#region Methods
 
+		/// <summary>
+		/// Copy a bitmap into another one.
+		/// </summary>
+		/// <param name="library">A handle to a library object.</param>
+		/// <returns>A handle to the target bitmap.</returns>
+		public FTBitmap Copy(Library library)
+		{
+			if (disposed)
+				throw new ObjectDisposedException("FTBitmap", "Cannot access a disposed object.");
+
+			if (library == null)
+				throw new ArgumentNullException("library");
+
+			FTBitmap newBitmap = new FTBitmap(library);
+			IntPtr bmpRef = newBitmap.reference;
+			Error err = FT.FT_Bitmap_Copy(library.Reference, Reference, bmpRef);
+			newBitmap.Reference = bmpRef;
+
+			if (err != Error.Ok)
+				throw new FreeTypeException(err);
+
+			return newBitmap;
+		}
+
+		/// <summary>
+		/// Embolden a bitmap. The new bitmap will be about ‘xStrength’ pixels wider and ‘yStrength’ pixels higher. The
+		/// left and bottom borders are kept unchanged.
+		/// </summary>
+		/// <remarks><para>
+		/// The current implementation restricts ‘xStrength’ to be less than or equal to 8 if bitmap is of pixel_mode
+		/// <see cref="SharpFont.PixelMode.Mono"/>.
+		/// </para><para>
+		/// If you want to embolden the bitmap owned by a <see cref="GlyphSlot"/>, you should call
+		/// <see cref="GlyphSlot.OwnBitmap"/> on the slot first.
+		/// </para></remarks>
+		/// <param name="library">A handle to a library object.</param>
+		/// <param name="xStrength">
+		/// How strong the glyph is emboldened horizontally. Expressed in 26.6 pixel format.
+		/// </param>
+		/// <param name="yStrength">
+		/// How strong the glyph is emboldened vertically. Expressed in 26.6 pixel format.
+		/// </param>
+		public void Embolden(Library library, Fixed26Dot6 xStrength, Fixed26Dot6 yStrength)
+		{
+			if (disposed)
+				throw new ObjectDisposedException("FTBitmap", "Cannot access a disposed object.");
+
+			if (library == null)
+				throw new ArgumentNullException("library");
+
+			Error err = FT.FT_Bitmap_Embolden(library.Reference, Reference, (IntPtr)xStrength.Value, (IntPtr)yStrength.Value);
+
+			if (err != Error.Ok)
+				throw new FreeTypeException(err);
+		}
+
+		/// <summary>
+		/// Convert a bitmap object with depth 1bpp, 2bpp, 4bpp, or 8bpp to a bitmap object with depth 8bpp, making the
+		/// number of used bytes per line (a.k.a. the ‘pitch’) a multiple of ‘alignment’.
+		/// </summary>
+		/// <remarks><para>
+		/// It is possible to call <see cref="Convert"/> multiple times without calling
+		/// <see cref="Dispose()"/> (the memory is simply reallocated).
+		/// </para><para>
+		/// Use <see cref="Dispose()"/> to finally remove the bitmap object.
+		/// </para><para>
+		/// The ‘library’ argument is taken to have access to FreeType's memory handling functions.
+		/// </para></remarks>
+		/// <param name="library">A handle to a library object.</param>
+		/// <param name="alignment">
+		/// The pitch of the bitmap is a multiple of this parameter. Common values are 1, 2, or 4.
+		/// </param>
+		/// <returns>The target bitmap.</returns>
+		public FTBitmap Convert(Library library, int alignment)
+		{
+			if (disposed)
+				throw new ObjectDisposedException("FTBitmap", "Cannot access a disposed object.");
+
+			if (library == null)
+				throw new ArgumentNullException("library");
+
+			FTBitmap newBitmap = new FTBitmap(library);
+			IntPtr bmpRef = newBitmap.reference;
+			Error err = FT.FT_Bitmap_Convert(library.Reference, Reference, bmpRef, alignment);
+			newBitmap.Reference = bmpRef;
+
+			if (err != Error.Ok)
+				throw new FreeTypeException(err);
+
+			return newBitmap;
+		}
+
 		#region IDisposable
 
 		/// <summary>
@@ -235,7 +384,14 @@ namespace SharpFont
 			{
 				disposed = true;
 
+				if (user)
+				{
+					FT.FT_Bitmap_Done(library.Reference, reference);
+					Marshal.FreeHGlobal(reference);
+				}
+
 				reference = IntPtr.Zero;
+				library = null;
 			}
 		}
 

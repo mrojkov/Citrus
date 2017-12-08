@@ -1,5 +1,5 @@
 ﻿#region MIT License
-/*Copyright (c) 2012-2013, 2015 Robert Rouhani <robert.rouhani@gmail.com>
+/*Copyright (c) 2012-2013, 2015-2016 Robert Rouhani <robert.rouhani@gmail.com>
 
 SharpFont based on Tao.FreeType, Copyright (c) 2003-2007 Tao Framework Team
 
@@ -23,6 +23,7 @@ SOFTWARE.*/
 #endregion
 
 using System;
+using System.Runtime.InteropServices;
 using SharpFont.Internal;
 
 namespace SharpFont
@@ -50,36 +51,36 @@ namespace SharpFont
 	/// <code>
 	/// FT_Pos  origin_x	   = 0;
 	///	FT_Pos  prev_rsb_delta = 0;
-	///
-	///
+	/// 
+	/// 
 	///	for all glyphs do
 	///	&lt;compute kern between current and previous glyph and add it to
 	///		`origin_x'&gt;
-	///
+	/// 
 	///	&lt;load glyph with `FT_Load_Glyph'&gt;
-	///
+	/// 
 	/// if ( prev_rsb_delta - face-&gt;glyph-&gt;lsb_delta &gt;= 32 )
 	/// 	origin_x -= 64;
 	/// else if ( prev_rsb_delta - face->glyph-&gt;lsb_delta &lt; -32 )
 	/// 	origin_x += 64;
-	///
+	/// 
 	/// prev_rsb_delta = face-&gt;glyph->rsb_delta;
-	///
+	/// 
 	/// &lt;save glyph image, or render glyph, or ...&gt;
-	///
+	/// 
 	/// origin_x += face-&gt;glyph-&gt;advance.x;
-	/// endfor
+	/// endfor  
 	/// </code>
 	/// </example>
 	public sealed class GlyphSlot
 	{
 		#region Fields
-		private readonly Face parentFace;
-		private readonly Library parentLibrary;
 
 		private IntPtr reference;
 		private GlyphSlotRec rec;
 
+		private Face parentFace;
+		private Library parentLibrary;
 
 		#endregion
 
@@ -131,6 +132,19 @@ namespace SharpFont
 			}
 		}
 
+		/// <summary>
+		/// Gets a typeless pointer which is unused by the FreeType library or any of its drivers. It can be used by
+		/// client applications to link their own data to each glyph slot object.
+		/// </summary>
+		[Obsolete("Use the Tag property, Dispose callback not handled currently.")]
+		public Generic Generic
+		{
+			get
+			{
+				return new Generic(rec.generic);
+			}
+		}
+
 		/// <summary><para>
 		/// Gets the metrics of the last loaded glyph in the slot. The returned values depend on the last load flags
 		/// (see the <see cref="SharpFont.Face.LoadGlyph"/> API function) and can be expressed either in 26.6
@@ -143,6 +157,32 @@ namespace SharpFont
 			get
 			{
 				return new GlyphMetrics(rec.metrics);
+			}
+		}
+
+		/// <summary>
+		/// Gets the advance width of the unhinted glyph. Its value is expressed in 16.16 fractional pixels, unless
+		/// <see cref="LoadFlags.LinearDesign"/> is set when loading the glyph. This field can be important to perform
+		/// correct WYSIWYG layout. Only relevant for outline glyphs.
+		/// </summary>
+		public Fixed16Dot16 LinearHorizontalAdvance
+		{
+			get
+			{
+				return Fixed16Dot16.FromRawValue((int)rec.linearHoriAdvance);
+			}
+		}
+
+		/// <summary>
+		/// Gets the advance height of the unhinted glyph. Its value is expressed in 16.16 fractional pixels, unless
+		/// <see cref="LoadFlags.LinearDesign"/> is set when loading the glyph. This field can be important to perform
+		/// correct WYSIWYG layout. Only relevant for outline glyphs.
+		/// </summary>
+		public Fixed16Dot16 LinearVerticalAdvance
+		{
+			get
+			{
+				return Fixed16Dot16.FromRawValue((int)rec.linearVertAdvance);
 			}
 		}
 
@@ -183,7 +223,7 @@ namespace SharpFont
 		{
 			get
 			{
-				return new FTBitmap(PInvokeHelper.AbsoluteOffsetOf<GlyphSlotRec>(Reference, "bitmap"), rec.bitmap);
+				return new FTBitmap(PInvokeHelper.AbsoluteOffsetOf<GlyphSlotRec>(Reference, "bitmap"), rec.bitmap, parentLibrary);
 			}
 		}
 
@@ -212,6 +252,19 @@ namespace SharpFont
 		}
 
 		/// <summary>
+		/// Gets the outline descriptor for the current glyph image if its format is <see cref="GlyphFormat.Outline"/>.
+		/// Once a glyph is loaded, ‘outline’ can be transformed, distorted, embolded, etc. However, it must not be
+		/// freed.
+		/// </summary>
+		public Outline Outline
+		{
+			get
+			{
+				return new Outline(PInvokeHelper.AbsoluteOffsetOf<GlyphSlotRec>(Reference, "outline"), rec.outline);
+			}
+		}
+
+		/// <summary>
 		/// Gets the number of subglyphs in a composite glyph. This field is only valid for the composite glyph format
 		/// that should normally only be loaded with the <see cref="LoadFlags.NoRecurse"/> flag. For now this is
 		/// internal to FreeType.
@@ -222,6 +275,31 @@ namespace SharpFont
 			get
 			{
 				return rec.num_subglyphs;
+			}
+		}
+
+		/// <summary>
+		/// Gets an array of subglyph descriptors for composite glyphs. There are ‘num_subglyphs’ elements in there.
+		/// Currently internal to FreeType.
+		/// </summary>
+		public SubGlyph[] Subglyphs
+		{
+			get
+			{
+				int count = (int)SubglyphsCount;
+
+				if (count == 0)
+					return null;
+
+				SubGlyph[] subglyphs = new SubGlyph[count];
+				IntPtr array = rec.subglyphs;
+
+				for (int i = 0; i < count; i++)
+				{
+					subglyphs[i] = new SubGlyph((IntPtr)(array.ToInt64() + IntPtr.Size * i));
+				}
+
+				return subglyphs;
 			}
 		}
 
@@ -273,6 +351,16 @@ namespace SharpFont
 		}
 
 		/// <summary>
+		/// Gets or sets an object used to identify this instance of <see cref="GlyphSlot"/>. This object will not be
+		/// modified or accessed internally.
+		/// </summary>
+		/// <remarks>
+		/// This is a replacement for FT_Generic in FreeType. If you are retrieving the same object multiple times
+		/// from functions, this object will not appear in new copies.
+		/// </remarks>
+		public object Tag { get; set; }
+
+		/// <summary>
 		/// Gets other data. Really wicked formats can use this pointer to present their own glyph image to client
 		/// applications. Note that the application needs to know about the image format.
 		/// </summary>
@@ -313,9 +401,71 @@ namespace SharpFont
 		{
 			Error err = FT.FT_Render_Glyph(Reference, mode);
 
-			if (err != Error.Ok) {
+			if (err != Error.Ok)
 				throw new FreeTypeException(err);
-			}
+		}
+
+		/// <summary>
+		/// Retrieve a description of a given subglyph. Only use it if <see cref="GlyphSlot.Format"/> is
+		/// <see cref="GlyphFormat.Composite"/>; an error is returned otherwise.
+		/// </summary>
+		/// <remarks>
+		/// The values of ‘*p_arg1’, ‘*p_arg2’, and ‘*p_transform’ must be interpreted depending on the flags returned
+		/// in ‘*p_flags’. See the TrueType specification for details.
+		/// </remarks>
+		/// <param name="subIndex">
+		/// The index of the subglyph. Must be less than <see cref="GlyphSlot.SubglyphsCount"/>.
+		/// </param>
+		/// <param name="index">The glyph index of the subglyph.</param>
+		/// <param name="flags">The subglyph flags, see <see cref="SubGlyphFlags"/>.</param>
+		/// <param name="arg1">The subglyph's first argument (if any).</param>
+		/// <param name="arg2">The subglyph's second argument (if any).</param>
+		/// <param name="transform">The subglyph transformation (if any).</param>
+		[CLSCompliant(false)]
+		public void GetSubGlyphInfo(uint subIndex, out int index, out SubGlyphFlags flags, out int arg1, out int arg2, out FTMatrix transform)
+		{
+			Error err = FT.FT_Get_SubGlyph_Info(Reference, subIndex, out index, out flags, out arg1, out arg2, out transform);
+
+			if (err != Error.Ok)
+				throw new FreeTypeException(err);
+		}
+
+		#endregion
+
+		#region Glyph Management
+
+		/// <summary>
+		/// A function used to extract a glyph image from a slot. Note that the created <see cref="Glyph"/> object must
+		/// be released with <see cref="Glyph.Dispose()"/>.
+		/// </summary>
+		/// <returns>A handle to the glyph object.</returns>
+		public Glyph GetGlyph()
+		{
+			IntPtr glyphRef;
+			Error err = FT.FT_Get_Glyph(Reference, out glyphRef);
+
+			if (err != Error.Ok)
+				throw new FreeTypeException(err);
+
+			return new Glyph(glyphRef, Library);
+		}
+
+		#endregion
+
+		#region Bitmap Handling
+
+		/// <summary>
+		/// Make sure that a glyph slot owns ‘slot->bitmap’.
+		/// </summary>
+		/// <remarks>
+		/// This function is to be used in combination with <see cref="FTBitmap.Embolden"/>.
+		/// </remarks>
+		public void OwnBitmap()
+		{
+			Error err = FT.FT_GlyphSlot_Own_Bitmap(Reference);
+
+			if (err != Error.Ok)
+				throw new FreeTypeException(err);
 		}
 
 		#endregion

@@ -125,26 +125,30 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (5 == fd.OurIndex) {
-				result.TextureIndex = d.Reader.ReadInt32();
+				result.RgbIntensity = d.Reader.ReadBoolean();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (6 == fd.OurIndex) {
+				result.TextureIndex = d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (7 == fd.OurIndex) {
 				dg.EnsureClassDef(typeof(global::Lime.Vector2));
 				result.UV0.X = d.Reader.ReadSingle();
 				result.UV0.Y = d.Reader.ReadSingle();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (7 == fd.OurIndex) {
+			if (8 == fd.OurIndex) {
 				dg.EnsureClassDef(typeof(global::Lime.Vector2));
 				result.UV1.X = d.Reader.ReadSingle();
 				result.UV1.Y = d.Reader.ReadSingle();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (8 == fd.OurIndex) {
+			if (9 == fd.OurIndex) {
 				result.VerticalOffset = d.Reader.ReadInt32();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (9 == fd.OurIndex) {
+			if (10 == fd.OurIndex) {
 				result.Width = d.Reader.ReadSingle();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}

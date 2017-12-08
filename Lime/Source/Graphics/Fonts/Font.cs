@@ -167,6 +167,11 @@ namespace Lime
 		[YuzuMember]
 		public float Height;
 		/// <summary>
+		/// TrueType channels intensity ot grayscale
+		/// </summary>
+		[YuzuMember]
+		public bool RgbIntensity = false;
+		/// <summary>
 		/// Contains the A and C spacing of the character.
 		/// The A spacing is the distance to add to the current position before drawing the character glyph.
 		/// The C spacing is the distance to add to the current position to provide white space to the right of the character glyph.

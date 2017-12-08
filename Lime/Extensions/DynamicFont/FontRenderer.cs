@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Drawing;
 using SharpFont;
+using SharpFont.TrueType;
 
 namespace Lime
 {
@@ -10,8 +11,10 @@ namespace Lime
 		public class Glyph
 		{
 			public byte[] Pixels;
+			public bool RgbIntensity;
 			public Vector2 ACWidths;
 			public int VerticalOffset;
+			public int Pitch;
 			public int Width;
 			public int Height;
 			public List<KerningPair> KerningPairs;
@@ -26,11 +29,24 @@ namespace Lime
 		private Face face;
 		private Library library;
 		private int lastHeight;
+		private bool lcdSupported;
 
 		public FontRenderer(byte[] fontData)
 		{
 			library = new Library();
-			face = library.NewMemoryFace(fontData, faceIndex: 0);
+			face = library.NewMemoryFace(fontData, 0);
+#if SUBPIXEL_TEXT
+			lcdSupported = true;
+			try {
+				// can not use any other filtration to achive a windows like look, 
+				// becouse filtering creates wrong spacing between chars, and no visible way to correct it
+				library.SetLcdFilter(LcdFilter.None);
+			} catch (FreeTypeException) {
+				lcdSupported = false;
+			}
+#else
+			lcdSupported = false;
+#endif
 		}
 
 		private static float CalcPixelSize(Face face, int height)
@@ -51,7 +67,7 @@ namespace Lime
 		{
 			if (lastHeight != height) {
 				lastHeight = height;
-				var pixelSize = (uint)Math.Abs(CalcPixelSize(face, height).Round());
+				var pixelSize = (uint) Math.Abs(CalcPixelSize(face, height).Round());
 				face.SetPixelSizes(pixelSize, pixelSize);
 			}
 
@@ -60,26 +76,23 @@ namespace Lime
 				return null;
 			}
 
-			face.LoadGlyph(glyphIndex, LoadFlags.Default, LoadTarget.Normal);
+			face.LoadGlyph(glyphIndex, LoadFlags.Default, lcdSupported ? LoadTarget.Lcd : LoadTarget.Normal);
+			face.Glyph.RenderGlyph(lcdSupported ? RenderMode.Lcd : RenderMode.Normal);
+			FTBitmap bitmap = face.Glyph.Bitmap;
 
-			face.Glyph.RenderGlyph(RenderMode.Normal);
-			var bitmap = face.Glyph.Bitmap;
-			if (bitmap.PixelMode != PixelMode.Gray) {
-				throw new System.Exception("Invalid pixel mode: " + bitmap.PixelMode);
-			}
-			if (bitmap.Pitch != bitmap.Width) {
-				throw new System.Exception("Bitmap pitch doesn't match its width");
-			}
 			var verticalOffset = height - face.Glyph.BitmapTop + face.Size.Metrics.Descender.Round();
-			var bearingX = (float)face.Glyph.Metrics.HorizontalBearingX;
+			var bearingX = (float) face.Glyph.Metrics.HorizontalBearingX;
+			bool rgbIntensity = bitmap.PixelMode == PixelMode.Lcd || bitmap.PixelMode == PixelMode.VerticalLcd;
 			var glyph = new Glyph {
 				Pixels = bitmap.BufferData,
-				Width = bitmap.Width,
+				RgbIntensity = rgbIntensity,
+				Pitch = bitmap.Pitch,
+				Width = rgbIntensity ? bitmap.Width / 3 : bitmap.Width,
 				Height = bitmap.Rows,
 				VerticalOffset = verticalOffset,
 				ACWidths = new Vector2(
 					bearingX,
-					(float)face.Glyph.Metrics.HorizontalAdvance - (float)face.Glyph.Metrics.Width - bearingX
+					(float) face.Glyph.Metrics.HorizontalAdvance - (float) face.Glyph.Metrics.Width - bearingX
 				),
 			};
 			// Iterate through kerning pairs

@@ -49,6 +49,11 @@ namespace SharpFont
 
 		#region Constructors
 
+		internal GlyphMetrics(IntPtr reference)
+		{
+			Reference = reference;
+		}
+
 		internal GlyphMetrics(GlyphMetricsRec glyphMetInt)
 		{
 			this.rec = glyphMetInt;

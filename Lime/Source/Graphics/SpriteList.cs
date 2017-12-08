@@ -16,6 +16,12 @@ namespace Lime
 		public Vector2 Position;
 		public Vector2 Size;
 		public ShaderProgram ShaderProgram;
+		/// <summary>
+		/// Sets specific blending mode for that sprite, it is used to batch two pass lcd text rendering,
+		/// but not like with Darken
+		/// </summary>
+		public Blending? Blending;
+		public bool ForceOverrideColor;
 	}
 
 	public class SpriteList
@@ -65,25 +71,64 @@ namespace Lime
 
 			public void AddToList(List<Sprite> sprites)
 			{
-				foreach (var cd in CharDefs) {
-					var ch = cd.FontChar;
+				bool hasRgbIntensity = false;
+				foreach (CharDef cd in CharDefs) {
+					FontChar ch = cd.FontChar;
 					if (Index >= buffer.Length) {
 						Array.Resize(ref buffer, (int)(buffer.Length * 1.5));
 					}
-					if (buffer[Index] == null)
-						buffer[Index] = new Sprite();
-					var s = buffer[Index];
+
+					if (buffer[Index] == null) buffer[Index] = new Sprite();
+
+					Sprite s = buffer[Index];
 					Index++;
 					s.Tag = Tag;
 					s.Texture1 = ch.Texture;
 					s.Texture2 = null;
-					s.Color = Color;
 					s.Position = cd.Position;
 					s.Size = cd.Size(FontHeight);
 					s.UV0 = ch.UV0;
 					s.UV1 = ch.UV1;
 					s.ShaderProgram = null;
+					if (cd.FontChar.RgbIntensity) {
+						hasRgbIntensity = true;
+						s.Color = Color4.White;
+						s.ForceOverrideColor = true;
+						s.Blending = Blending.LcdTextFirstPass;
+					} else {
+						s.Color = Color;
+						s.ForceOverrideColor = false;
+						s.Blending = null;
+					}
 					sprites.Add(s);
+				}
+
+				if (hasRgbIntensity) {
+					foreach (CharDef cd in CharDefs) {
+						if (!cd.FontChar.RgbIntensity) continue;
+
+						FontChar ch = cd.FontChar;
+						if (Index >= buffer.Length) {
+							Array.Resize(ref buffer, (int) (buffer.Length * 1.5));
+						}
+
+						if (buffer[Index] == null) buffer[Index] = new Sprite();
+
+						Sprite s = buffer[Index];
+						Index++;
+						s.Tag = Tag;
+						s.Texture1 = ch.Texture;
+						s.Texture2 = null;
+						s.Color = Color;
+						s.ForceOverrideColor = false;
+						s.Position = cd.Position;
+						s.Size = cd.Size(FontHeight);
+						s.UV0 = ch.UV0;
+						s.UV1 = ch.UV1;
+						s.ShaderProgram = null;
+						s.Blending = Blending.LcdTextSecondPass;
+						sprites.Add(s);
+					}
 				}
 			}
 
