@@ -519,7 +519,12 @@ namespace Tangerine.UI
 		{
 			checkBox = new ThemedCheckBox { LayoutCell = new LayoutCell(Alignment.LeftCenter) };
 			ContainerWidget.AddNode(checkBox);
-			checkBox.Changed += args => SetProperty(args.Value);
+			checkBox.Changed += args => {
+				if (args.ChangedByUser)
+				{
+					SetProperty(args.Value);
+				}
+			};
 			checkBox.AddChangeWatcher(CoalescedPropertyValue(), v => checkBox.Checked = v);
 		}
 
