@@ -1075,7 +1075,7 @@ namespace Lime
 			}
 			if (instance is Model3D) {
 				var attachment = new Model3DAttachmentParser().Parse(path);
-				attachment?.ApplyOnInstance((Model3D)instance);
+				attachment?.Apply((Model3D)instance);
 			}
 			return instance;
 		}
