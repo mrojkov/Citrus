@@ -7,10 +7,10 @@ namespace Orange
 {
 	public static class RunTangerineAction
 	{
-		[Export(nameof(OrangePlugin.MenuItems))]
+		[Export(nameof(OrangePlugin.MenuItemsWithErrorDetails))]
 		[ExportMetadata("Label", "Run Tangerine")]
 		[ExportMetadata("Priority", 2)]
-		public static void RunTangerine()
+		public static string RunTangerine()
 		{
 			var path = Uri.UnescapeDataString((new Uri(Assembly.GetExecutingAssembly().CodeBase)).AbsolutePath);
 			while (!string.Equals(Path.GetFileName(path), "Citrus", StringComparison.CurrentCultureIgnoreCase)) {
@@ -40,6 +40,9 @@ namespace Orange
 				p.StartInfo.EnvironmentVariables.Add("PATH", "/usr/bin");
 #endif
 				p.Start();
+				return null;
+			} else {
+				return "Build system has returned error";
 			}
 		}
 	}

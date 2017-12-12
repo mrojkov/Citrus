@@ -32,7 +32,6 @@ namespace Orange
 			}
 
 			if (!builder.Build()) {
-				Console.WriteLine("BUILD FAILED");
 				UserInterface.Instance.ExitWithErrorIfPossible();
 				return false;
 			}

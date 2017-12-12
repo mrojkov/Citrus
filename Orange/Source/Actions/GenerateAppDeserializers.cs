@@ -6,11 +6,11 @@ using System.Text;
 
 namespace Orange
 {
-	static partial class Actions
+	public static partial class Actions
 	{
-		[Export(nameof(OrangePlugin.MenuItems))]
+		[Export(nameof(OrangePlugin.MenuItemsWithErrorDetails))]
 		[ExportMetadata("Label", "Generate Yuzu Deserializers For Application Types")]
-		public static void GenerateYuzuDeserializersForApp()
+		public static string GenerateYuzuDeserializersForApp()
 		{
 			AssetCooker.CookForActivePlatform();
 #if WIN
@@ -18,7 +18,7 @@ namespace Orange
 #elif MAC
 			if (!BuildGame(Orange.TargetPlatform.Mac)) {
 #endif
-				return;
+				return "Can not BuildGame";
 			}
 #if WIN
 			var builder = new SolutionBuilder(TargetPlatform.Win);
@@ -27,8 +27,7 @@ namespace Orange
 #endif
 			int exitCode = builder.Run("--GenerateYuzuDeserializers");
 			if (exitCode != 0) {
-				Console.WriteLine("Application terminated with exit code {0}", exitCode);
-				return;
+				return $"Application terminated with exit code {exitCode}";
 			}
 			string app = builder.GetApplicationPath();
 			string dir = System.IO.Path.GetDirectoryName(app);
@@ -40,8 +39,9 @@ namespace Orange
 		Lime.Serialization.GenerateDeserializers(""OceanDeserializers.cs"", ""OceanDeserializers"", GetSerializationTypes());
 		return;
 	}");
-				return;
+				return "";
 			}
+			return null;
 			// TODO: write location of generated file
 		}
 	}

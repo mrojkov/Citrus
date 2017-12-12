@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Orange.Source;
 
 namespace Orange
 {
@@ -69,18 +70,19 @@ namespace Orange
 			if (commandObj == null) {
 				Console.WriteLine("Unknown command: '{0}'", command);
 				WriteHelpAndExit();
+				return;
 			}
-			if (DoesNeedSvnUpdate()) {
-				var builder = new SolutionBuilder(The.Workspace.ActivePlatform, The.Workspace.CustomSolution);
-				builder.SvnUpdate();
-			}
-			The.Workspace.AssetFiles.Rescan();
-			commandObj.Action();
+
+			OrangeActionsHelper.ExecuteOrangeActionInstantly(commandObj.Action, () => {
+				}, () => {
+				}, DoesNeedSvnUpdate,
+				null
+			);
 		}
 
 		private static void WriteHelpAndExit()
 		{
-			Console.WriteLine("Orange.CLI citrus_project --platform:[desktop|ios|android|uc] --command:command [--autoupdate]");
+			Console.WriteLine("Orange.CLI citrus_project --target:[Win|Mac|ios|android|uc] --command:command [--autoupdate]");
 			var commands = The.MenuController.GetVisibleAndSortedItems();
 			if (commands.Count > 0) {
 				Console.WriteLine("Available commands are:");

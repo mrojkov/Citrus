@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using Lime;
+using Orange.Source;
 
 namespace Orange
 {
@@ -165,61 +166,16 @@ namespace Orange
 
 		private IEnumerator<object> ExecuteTask(Func<string> action)
 		{
-			var startTime = DateTime.Now;
-			The.Workspace.Save();
-			EnableControls(false);
-			string executonResultReadable = "Build Failed! Unknown Error.";
-			try {
+			yield return OrangeActionsHelper.ExecuteOrangeAction(action, () => {
+				The.Workspace.Save();
+				EnableControls(false);
 				textView.Clear();
-				var updateCompleted = true;
-				if (DoesNeedSvnUpdate()) {
-					var builder = new SolutionBuilder(The.Workspace.ActivePlatform, The.Workspace.CustomSolution);
-					yield return Task.ExecuteAsync(() => {
-						updateCompleted = SafeExecute(builder.SvnUpdate);
-						if (!updateCompleted) executonResultReadable = "Build Failed! Can not update a repository.";
-					});
-				}
-
-				if (!updateCompleted) yield break;
-
-				The.Workspace?.AssetFiles?.Rescan();
-				executonResultReadable = "Done.";
-				yield return Task.ExecuteAsync(() => {
-					string errorDetails = SafeExecuteWithErrorDetails(action);
-					if (errorDetails != null) {
-						if (errorDetails.Length > 0) {
-							textWriter.WriteLine(errorDetails);
-						}
-						executonResultReadable = "Build Failed!";
-					}
-				});
-			} finally {
-				textWriter.WriteLine(executonResultReadable);
+			}, () => {
 				EnableControls(true);
-				ShowTimeStatistics(startTime);
 				The.UI.ScrollLogToEnd();
-			}
-		}
-
-		private bool SafeExecute(Action action)
-		{
-			try {
-				action();
-			}
-			catch (System.Exception ex) {
-				textWriter.WriteLine(ex);
-				return false;
-			}
-			return true;
-		}
-
-		private string SafeExecuteWithErrorDetails(Func<string> action)
-		{
-			try {
-				return action();
-			} catch (System.Exception ex) {
-				return ex.ToString();
-			}
+			}, DoesNeedSvnUpdate,
+				Task.ExecuteAsync
+			);
 		}
 
 		private void EnableControls(bool value)
@@ -233,11 +189,6 @@ namespace Orange
 			else {
 				abortButton.Input.RestrictScope();
 			}
-		}
-
-		private void ShowTimeStatistics(DateTime startTime)
-		{
-			Console.WriteLine(@"Elapsed time {0:hh\:mm\:ss}", DateTime.Now - startTime);
 		}
 
 		public override void OnWorkspaceOpened()

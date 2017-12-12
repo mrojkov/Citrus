@@ -8,9 +8,9 @@ namespace Kill3.OrangePlugin
 {
 	public static class UpdateXCodeProject
 	{
-		[Export(nameof(Orange.OrangePlugin.MenuItems))]
+		[Export(nameof(Orange.OrangePlugin.MenuItemsWithErrorDetails))]
 		[ExportMetadata("Label", "Update XCode Project")]
-		public static void UpdateXCodeProjectAction()
+		public static string UpdateXCodeProjectAction()
 		{
 			if (The.Workspace.ProjectJson.GetValue<bool>("XCodeProject/DoSvnUpdate")) {
 				Subversion.Update(GetXCodeProjectFolder());
@@ -19,8 +19,7 @@ namespace Kill3.OrangePlugin
 			var builder = new Orange.SolutionBuilder(TargetPlatform.iOS);
 			var output = new StringBuilder();
 			builder.Clean();
-			if (builder.Build(output))
-			{
+			if (builder.Build(output)) {
 				The.UI.ScrollLogToEnd();
 				string allText = output.ToString();
 				foreach (var line in allText.Split('\n')) {
@@ -35,10 +34,12 @@ namespace Kill3.OrangePlugin
 				}
 			} else {
 				UserInterface.Instance.ExitWithErrorIfPossible();
+				return "Build system has returned error";
 			}
 			if (The.Workspace.ProjectJson.GetValue<bool>("XCodeProject/DoSvnCommit")) {
 				Subversion.Commit(GetXCodeProjectFolder(), "");
 			}
+			return null;
 		}
 
 		static void CopyDSYM(string appPath, string dstDirectory)
