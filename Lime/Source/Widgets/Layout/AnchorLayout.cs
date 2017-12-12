@@ -67,11 +67,13 @@ namespace Lime
 				foreach (var key in animator.Keys) {
 					key.Value += positionDelta;
 				}
+				animator.ResetCache();
 			}
 			if (widget.Animators.TryFind("Size", out animator)) {
 				foreach (var key in animator.Keys) {
 					key.Value += sizeDelta;
 				}
+				animator.ResetCache();
 			}
 		}
 	}
