@@ -83,7 +83,8 @@ namespace Lime
 
 		public override bool Equals(object obj)
 		{
-			return obj is Keyframe<T> keyframe &&
+			var keyframe = obj as Keyframe<T>;
+			return keyframe != null &&
 				   Frame == keyframe.Frame &&
 				   Function == keyframe.Function &&
 				   EqualityComparer<T>.Default.Equals(Value, keyframe.Value);
