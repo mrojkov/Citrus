@@ -43,7 +43,7 @@ namespace Lime
 			internal set
 			{
 				if (value == null) {
-					IsRunning = false;
+					isRunning = false;
 				}
 				owner = value;
 			}
