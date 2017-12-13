@@ -285,7 +285,7 @@ namespace Lime
 		/// </summary>
 		public bool IsAwake { get; protected set; }
 
-		internal int RunningAnimationsCount;
+		internal int RunningAnimationCount;
 
 		/// <summary>
 		/// Gets the cached reference to the first animation in the animation collection.
@@ -479,7 +479,17 @@ namespace Lime
 			Nodes.Clear();
 			Animators.Dispose();
 		}
-
+		
+		internal void RefreshRunningAnimationCount()
+		{
+			RunningAnimationCount = 0;
+			for (var a = FirstAnimation; a != null; a = a.Next) {
+				if (a.IsRunning) {
+					RunningAnimationCount++;
+				}
+			}
+		}
+		
 		/// <summary>
 		/// Propagates dirty flags to all descendants by provided mask.
 		/// </summary>
@@ -1001,7 +1011,7 @@ namespace Lime
 		/// <param name="delta">Time delta (in seconds).</param>
 		public void AdvanceAnimation(float delta)
 		{
-			if (RunningAnimationsCount > 0) {
+			if (RunningAnimationCount > 0) {
 				for (var a = FirstAnimation; a != null; a = a.Next) {
 					a.Advance(delta);
 				}

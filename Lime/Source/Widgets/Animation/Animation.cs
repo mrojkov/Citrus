@@ -5,7 +5,6 @@ namespace Lime
 {
 	public class Animation : ICloneable
 	{
-		private Node owner;
 		private bool isRunning;
 		internal Animation Next;
 		internal double TimeInternal;
@@ -37,17 +36,7 @@ namespace Lime
 			set { Time = AnimationUtils.FramesToSeconds(value); }
 		}
 
-		public Node Owner
-		{
-			get { return owner; }
-			internal set
-			{
-				if (value == null) {
-					isRunning = false;
-				}
-				owner = value;
-			}
-		}
+		public Node Owner { get; internal set; }
 
 		public bool IsRunning
 		{
@@ -56,11 +45,7 @@ namespace Lime
 			{
 				if (isRunning != value) {
 					isRunning = value;
-					if (value) {
-						Owner.RunningAnimationsCount++;
-					} else {
-						Owner.RunningAnimationsCount--;
-					}
+					Owner?.RefreshRunningAnimationCount();
 				}
 			}
 		}
@@ -98,11 +83,9 @@ namespace Lime
 			AnimationEngine.ApplyAnimators(this, invokeTriggers);
 		}
 
-		internal void OnStopped()
+		internal void RaiseStopped()
 		{
-			if (Stopped != null) {
-				Stopped();
-			}
+			Stopped?.Invoke();
 		}
 
 		public Animation Clone()

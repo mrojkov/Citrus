@@ -79,7 +79,7 @@ namespace Lime
 				}
 				ApplyAnimators(animation, invokeTriggers: true, animationTimeCorrection: previousTime - frameTime);
 				if (!animation.IsRunning) {
-					animation.OnStopped();
+					animation.RaiseStopped();
 				}
 			}
 		}

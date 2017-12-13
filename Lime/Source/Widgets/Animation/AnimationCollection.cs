@@ -89,6 +89,7 @@ namespace Lime
 				a.Next = item;
 			}
 			Count++;
+			owner.RefreshRunningAnimationCount();
 		}
 
 		public void AddRange(IEnumerable<Animation> collection)
@@ -108,6 +109,7 @@ namespace Lime
 			}
 			owner.FirstAnimation = null;
 			Count = 0;
+			owner.RefreshRunningAnimationCount();
 		}
 
 		public bool Contains(Animation item)
@@ -127,7 +129,7 @@ namespace Lime
 				array[i++] = a;
 			}
 		}
-
+		
 		public bool Remove(Animation item)
 		{
 			if (item.Owner != owner) {
@@ -144,6 +146,7 @@ namespace Lime
 					a.Owner = null;
 					a.Next = null;
 					Count--;
+					owner.RefreshRunningAnimationCount();
 					return true;
 				}
 				prev = a;
