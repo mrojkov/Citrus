@@ -476,6 +476,10 @@ namespace Orange
 					default: throw new InvalidOperationException("Can't use Silhuette shader with blending other than Alpha");
 				}
 			}
+			if (shader == ShaderId.InversedSilhuette || shader == ShaderId.VisibleMaskSilhouette || shader == ShaderId.Sum || shader == ShaderId.Subtract) {
+				
+				throw new InvalidOperationException($"Can't use {shader.ToString()} shader in Scene");
+			}
 			return 1;
 		}
 
