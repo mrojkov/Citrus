@@ -132,8 +132,32 @@ namespace Lime
 			}
 		}
 
-		static readonly Vector2[] coords = new Vector2[8];
-		static readonly Vector2[] stencil = new Vector2[4];
+		private void GenerateNewPoligon(Vector2[] arg1, Vector2[] arg2, Vector2[] outCoords)
+		{
+			float minX = float.MaxValue;
+			float minY = float.MaxValue; ;
+			float maxX = float.MinValue; ;
+			float maxY = float.MinValue; ;
+			for (int i = 0; i < 4; i++) {
+				minX = Mathf.Min(minX, Mathf.Min(arg1[i].X, arg2[i].X));
+				minY = Mathf.Min(minY, Mathf.Min(arg1[i].Y, arg2[i].Y));
+				maxX = Mathf.Max(maxX, Mathf.Max(arg1[i].X, arg2[i].X));
+				maxY = Mathf.Max(maxY, Mathf.Max(arg1[i].Y, arg2[i].Y));
+			}
+			outCoords[0].X = minX;
+			outCoords[0].Y = minY;
+			outCoords[1].X = maxX;
+			outCoords[1].Y = minY;
+			outCoords[2].X = maxX;
+			outCoords[2].Y = maxY;
+			outCoords[3].X = minX;
+			outCoords[3].Y = maxY;
+		}
+
+		static readonly Vector2[] coords1 = new Vector2[4];
+		static readonly Vector2[] coords2 = new Vector2[4];
+		static readonly Vector2[] cropCoords = new Vector2[8];
+		static readonly Vector2[] newPoligonCoords = new Vector2[4];
 		static readonly Vertex[] vertices = new Vertex[8];
 		static readonly Vector2[] rect = new Vector2[4] {
 			new Vector2(0, 0),
@@ -148,33 +172,76 @@ namespace Lime
 			Matrix32 transform2 = Matrix32.Scaling(arg2.Size) * arg2.CalcLocalToParentTransform();
 			// source rectangle
 			int numCoords = 4;
-			for (int i = 0; i < 4; i++)
-				coords[i] = rect[i] * transform1;
-			for (int i = 0; i < 4; i++)
-				stencil[i] = rect[i] * transform2;
-			bool clockwiseOrder = AreVectorsClockwiseOrdered(stencil[0], stencil[1], stencil[2]);
-			// clip invisible parts
 			for (int i = 0; i < 4; i++) {
-				int j = (i < 3) ? i + 1 : 0;
-				Vector2 v1 = clockwiseOrder ? stencil[j] : stencil[i];
-				Vector2 v2 = clockwiseOrder ? stencil[i] : stencil[j];
-				ClipPolygonByLine(coords, ref numCoords, v1, v2);
+				coords1[i] = rect[i] * transform1;
+				cropCoords[i] = coords1[i];
 			}
-			if (numCoords < 3)
-				return;
+			for (int i = 0; i < 4; i++)
+				coords2[i] = rect[i] * transform2;
+			
+
 			// Эти матрицы переводят координаты вершин изображения в текстурные координаты.
 			Matrix32 uvTransform1 = transform1.CalcInversed();
 			Matrix32 uvTransform2 = transform2.CalcInversed();
 			ITexture texture1 = arg1.GetTexture();
 			ITexture texture2 = arg2.GetTexture();
 			Color4 color = arg1.Color * arg2.Color * Parent.AsWidget.GlobalColor;
-			for (int i = 0; i < numCoords; i++) {
-				vertices[i].Pos = coords[i];
-				vertices[i].Color = color;
-				vertices[i].UV1 = coords[i] * uvTransform1 * arg1.UVTransform;
-				vertices[i].UV2 = coords[i] * uvTransform2 * arg2.UVTransform;
+
+
+
+
+			if (Shader == ShaderId.Silhuette || Shader == ShaderId.Inherited) {
+
+				bool clockwiseOrder = AreVectorsClockwiseOrdered(coords2[0], coords2[1], coords2[2]);
+
+				// clip invisible parts
+				for (int i = 0; i < 4; i++) {
+					int j = (i < 3) ? i + 1 : 0;
+					Vector2 v1 = clockwiseOrder ? coords2[j] : coords2[i];
+					Vector2 v2 = clockwiseOrder ? coords2[i] : coords2[j];
+					ClipPolygonByLine(cropCoords, ref numCoords, v1, v2);
+				}
+
+				if (numCoords < 3)
+					return;
+				for (int i = 0; i < numCoords; i++) {
+					vertices[i].Pos = cropCoords[i];
+					vertices[i].Color = color;
+					vertices[i].UV1 = cropCoords[i] * uvTransform1 * arg1.UVTransform;
+					vertices[i].UV2 = cropCoords[i] * uvTransform2 * arg2.UVTransform;
+				}
+				Renderer.DrawTriangleFan(texture1, texture2, vertices, numCoords);
+			}else if (Shader == ShaderId.InversedSilhuette) { 
+				for (int i = 0; i < 4; i++) {
+					vertices[i].Pos = coords1[i];
+					vertices[i].Color = color;
+					vertices[i].UV1 = coords1[i] * uvTransform1 * arg1.UVTransform;
+					vertices[i].UV2 = coords1[i] * uvTransform2 * arg2.UVTransform;
+				}
+
+				Renderer.DrawTriangleFan(texture1, texture2, vertices, 4);
+			}else if (Shader == ShaderId.VisibleMaskSilhouette) {
+				for (int i = 0; i < 4; i++){
+					vertices[i].Pos = coords2[i];
+					vertices[i].Color = color;
+					vertices[i].UV1 = coords2[i] * uvTransform1 * arg1.UVTransform;
+					vertices[i].UV2 = coords2[i] * uvTransform2 * arg2.UVTransform;
+				}
+
+				Renderer.DrawTriangleFan(texture1, texture2, vertices, 4);
+			}else if (Shader == ShaderId.Sum || Shader == ShaderId.Subtract) {
+				GenerateNewPoligon(coords1, coords2, newPoligonCoords);
+
+				for (int i = 0; i < 4; i++) {
+					vertices[i].Pos = newPoligonCoords[i];
+					vertices[i].Color = color;
+					vertices[i].UV1 = newPoligonCoords[i] * uvTransform1 * arg1.UVTransform;
+					vertices[i].UV2 = newPoligonCoords[i] * uvTransform2 * arg2.UVTransform;
+				}
+
+				Renderer.DrawTriangleFan(texture1, texture2, vertices, 4);
 			}
-			Renderer.DrawTriangleFan(texture1, texture2, vertices, numCoords);
+
 		}
 
 		public override void Render()

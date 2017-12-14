@@ -28,7 +28,9 @@ namespace Lime
 		Diffuse,
 		Silhuette,
 		InversedSilhuette,
-
+		VisibleMaskSilhouette,
+		Sum,
+		Subtract,
 		[TangerineIgnore]
 		Custom,
 	}
