@@ -108,14 +108,6 @@ namespace Lime
 			silhuetteBlendingProgram = CreateShaderProgram(oneTextureVertexShader, silhouetteFragmentShader);
 			twoTexturesSilhuetteBlendingProgram = CreateShaderProgram(twoTexturesVertexShader, twoTexturesSilhouetteFragmentShader);
 			inversedSilhuetteBlendingProgram = CreateShaderProgram(oneTextureVertexShader, inversedSilhouetteFragmentShader);
-			twoInversedSilhuetteBlendingProgram = CreateShaderProgram(twoTexturesVertexShader, twoInversedSilhouetteFragmentShader);
-			oneVisibleMaskSilhouetteProgram = CreateShaderProgram(oneTextureVertexShader, oneVisibleMaskSilhouetteFragmentShader);
-			twoVisibleMaskSilhouetteProgram = CreateShaderProgram(twoTexturesVertexShader, twoVisibleMaskSilhouetteFragmentShader);
-			oneVisibleMaskSilhouetteProgram = CreateShaderProgram(oneTextureVertexShader, oneVisibleMaskSilhouetteFragmentShader);
-			twoSumProgram = CreateShaderProgram(twoTexturesVertexShader, twoSumFragmentShader);
-			oneSumProgram = CreateShaderProgram(oneTextureVertexShader, oneSumFragmentShader);
-			twoSubtractProgram = CreateShaderProgram(twoTexturesVertexShader, twoSubtractFragmentShader);
-			oneSubtractProgram = CreateShaderProgram(oneTextureVertexShader, oneSubtractFragmentShader);
 		}
 
 		public ShaderProgram GetShaderProgram(ShaderId shader, int numTextures, ShaderOptions options)
@@ -137,34 +129,8 @@ namespace Lime
 				} else if (numTextures == 2) {
 					return twoTexturesSilhuetteBlendingProgram;
 				}
-			} else if (shader == ShaderId.InversedSilhuette) {
-				if (numTextures == 1){
-					return inversedSilhuetteBlendingProgram;
-				}
-				else if (numTextures == 2){
-					return twoInversedSilhuetteBlendingProgram;
-				}
-			}else if (shader == ShaderId.VisibleMaskSilhouette){
-				if (numTextures == 1){
-					return oneVisibleMaskSilhouetteProgram;
-				}
-				else if (numTextures == 2){
-					return twoVisibleMaskSilhouetteProgram;
-				}
-			}else if (shader == ShaderId.Sum) {
-				if (numTextures == 1) {
-					return oneSumProgram;
-				}
-				else if (numTextures == 2) {
-					return twoSumProgram;
-				}
-			}else if (shader == ShaderId.Subtract) {
-				if (numTextures == 1) {
-					return oneSubtractProgram;
-				}
-				else if (numTextures == 2) {
-					return twoSubtractProgram;
-				}
+			} else if (shader == ShaderId.InversedSilhuette && numTextures == 1) {
+				return inversedSilhuetteBlendingProgram;
 			}
 			return colorOnlyBlendingProgram;
 		}
@@ -282,102 +248,12 @@ namespace Lime
 				gl_FragColor = color * vec4(1.0, 1.0, 1.0, 1.0 - texture2D(tex1, texCoords).a);
 			}";
 
-		readonly string twoInversedSilhouetteFragmentShader = @"
-			varying lowp vec4 color;
-			varying lowp vec2 texCoords1;
-			varying lowp vec2 texCoords2;
-			uniform lowp sampler2D tex1;
-			uniform lowp sampler2D tex2;
-			void main()
-			{
-				gl_FragColor = lerp(texture2D(tex1, texCoords1) * color, texture2D(tex1, texCoords1) * color * vec4(1.0, 1.0, 1.0, 1.0 - texture2D(tex2, texCoords2).a), min(step(0.0,texCoords2.x) - step(1.0,texCoords2.x), step(0.0,texCoords2.y)-step(1.0,texCoords2.y)) );
-			}";
-
-		readonly string oneVisibleMaskSilhouetteFragmentShader = @"
-			varying lowp vec4 color;
-			varying lowp vec2 texCoords;
-			uniform lowp sampler2D tex1;
-			void main()
-			{
-				gl_FragColor = color * texture2D(tex1, texCoords);
-			}";
-
-		readonly string twoVisibleMaskSilhouetteFragmentShader = @"
-			varying lowp vec4 color;
-			varying lowp vec2 texCoords1;
-			varying lowp vec2 texCoords2;
-			uniform lowp sampler2D tex1;
-			uniform lowp sampler2D tex2;
-			void main()
-			{
-				lowp vec4 t1 = texture2D(tex1, texCoords1);
-				lowp vec4 t2 = texture2D(tex2, texCoords2);
-
-				gl_FragColor = lerp(texture2D(tex2, texCoords2) * color, color * vec4(t2.rgb * (1.0 - t1.a) + t1.rgb * t1.a,t2.a), min(step(0.0,texCoords1.x) - step(1.0,texCoords1.x), step(0.0,texCoords1.y)-step(1.0,texCoords1.y)) );
-
-			}";
-		readonly string oneSumFragmentShader = @"
-			varying lowp vec4 color;
-			varying lowp vec2 texCoords;
-			uniform lowp sampler2D tex1;
-			void main()
-			{
-				gl_FragColor = color * texture2D(tex1, texCoords);
-			}";
-		readonly string twoSumFragmentShader = @"
-			varying lowp vec4 color;
-			varying lowp vec2 texCoords1;
-			varying lowp vec2 texCoords2;
-			uniform lowp sampler2D tex1;
-			uniform lowp sampler2D tex2;
-			void main()
-			{
-				lowp float k1 = min(step(0.0,texCoords1.x) - step(1.0,texCoords1.x), step(0.0,texCoords1.y)-step(1.0,texCoords1.y));
-				lowp float k2 = min(step(0.0,texCoords2.x) - step(1.0,texCoords2.x), step(0.0,texCoords2.y)-step(1.0,texCoords2.y));
-
-				lowp vec4 t1 = texture2D(tex1, texCoords1);
-				lowp vec4 t2 = texture2D(tex2, texCoords2);
-
-				gl_FragColor = vec4(lerp(t1.rgb*k1,t1.rgb*k1*t1.a,step(k1,k2)) + lerp(t2.rgb*k2,t2.rgb*k2*t2.a,step(k2,k1)), t1.a*k1+t2.a*k2)* color;
-			}";
-		readonly string oneSubtractFragmentShader = @"
-			varying lowp vec4 color;
-			varying lowp vec2 texCoords;
-			uniform lowp sampler2D tex1;
-			void main()
-			{
-				gl_FragColor = color * texture2D(tex1, texCoords);
-			}";
-		readonly string twoSubtractFragmentShader = @"
-			varying lowp vec4 color;
-			varying lowp vec2 texCoords1;
-			varying lowp vec2 texCoords2;
-			uniform lowp sampler2D tex1;
-			uniform lowp sampler2D tex2;
-			void main()
-			{
-				lowp float k1 = min(step(0.0,texCoords1.x) - step(1.0,texCoords1.x), step(0.0,texCoords1.y)-step(1.0,texCoords1.y));
-				lowp float k2 = min(step(0.0,texCoords2.x) - step(1.0,texCoords2.x), step(0.0,texCoords2.y)-step(1.0,texCoords2.y));
-
-				lowp vec4 t1 = texture2D(tex1, texCoords1);
-				lowp vec4 t2 = texture2D(tex2, texCoords2);
-
-				gl_FragColor = vec4(lerp(t1.rgb*k1,t1.rgb*k1*t1.a,step(k1,k2)) - lerp(-1.0*t2.rgb*k2,t2.rgb*k2*t2.a,step(k2,k1)), t1.a*k1 - lerp(-1.0*t2.a*k2,t2.a*k2,step(k2,k1)))* color;
-			}";
-
 		private readonly CustomShaderProgram colorOnlyBlendingProgram;
 		private readonly CustomShaderProgram oneTextureBlengingProgram;
 		private readonly CustomShaderProgram twoTexturesBlengingProgram;
 		private readonly CustomShaderProgram silhuetteBlendingProgram;
 		private readonly CustomShaderProgram twoTexturesSilhuetteBlendingProgram;
 		private readonly CustomShaderProgram inversedSilhuetteBlendingProgram;
-		private readonly CustomShaderProgram twoInversedSilhuetteBlendingProgram;
-		private readonly CustomShaderProgram oneVisibleMaskSilhouetteProgram;
-		private readonly CustomShaderProgram twoVisibleMaskSilhouetteProgram;
-		private readonly CustomShaderProgram oneSumProgram;
-		private readonly CustomShaderProgram twoSumProgram;
-		private readonly CustomShaderProgram oneSubtractProgram;
-		private readonly CustomShaderProgram twoSubtractProgram;
 
 		private static CustomShaderProgram CreateShaderProgram(string vertexShader, string fragmentShader)
 		{
