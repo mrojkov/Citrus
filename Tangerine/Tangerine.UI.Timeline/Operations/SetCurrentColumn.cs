@@ -68,15 +68,26 @@ namespace Tangerine.UI.Timeline.Operations
 
 			static void FastForwardToFrame(Node node, int frame)
 			{
-				var forwardDelta = AnimationUtils.SecondsPerFrame * (frame - node.AnimationFrame);
+				// Try to decrease error in node.AnimationTime by call node.Update several times
+				const float OptimalDelta = 10;
+				float forwardDelta;
+				do {
+					forwardDelta = CalcDeltaToFrame(node, frame);
+					var delta = Mathf.Min(forwardDelta, OptimalDelta);
+					node.Update(delta);
+				} while (forwardDelta > OptimalDelta);
+			}
+
+			static float CalcDeltaToFrame(Node node, int frame)
+			{
+				var forwardDelta = AnimationUtils.SecondsPerFrame * frame - node.AnimationTime;
 				// Make sure that animation engine will invoke triggers on last frame
-				forwardDelta += 0.000001;
+				forwardDelta += 0.00001;
 				// Hack: CompatibilityAnimationEngine workaround
 				if (Document.Current.Format == DocumentFormat.Scene) {
 					forwardDelta *= 2f;
 				}
-				node.Update((float)forwardDelta);
-				node.AnimationFrame = frame;
+				return (float)forwardDelta;
 			}
 
 			static void SetTimeRecursive(Node node, double time)
