@@ -41,6 +41,7 @@ namespace Tangerine.UI.SceneView
 				var transform = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
 				var transformInversed = transform.CalcInversed();
 				int index = 0;
+				var dragDelta = Vector2.Zero;
 				while (sv.Input.IsMousePressed()) {
 					var snapEnabled = sv.Input.IsKeyPressed(Key.Alt);
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
@@ -60,7 +61,7 @@ namespace Tangerine.UI.SceneView
 						}
 					}
 					var b = bone.Parent.AsWidget.BoneArray[bone.BaseIndex];
-					var dragDelta = sv.MousePosition * transform - iniMousePos * transform;
+					dragDelta = sv.MousePosition * transform - iniMousePos * transform;
 					var position = bone.WorldToLocalTransform *
 						(entry.Joint - b.Tip + (index != 0 && index != bone.Index && snapEnabled ? items[index].Tip - entry.Joint : dragDelta));
 					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.Position), position);
@@ -68,8 +69,8 @@ namespace Tangerine.UI.SceneView
 					bone.Parent.Update(0);
 					yield return null;
 				}
-				if (index != 0 && index != bone.Index && sv.Input.IsKeyPressed(Key.Alt)) {
-					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.Position), Vector2.Zero);
+				if (index != bone.Index && sv.Input.IsKeyPressed(Key.Alt)) {
+					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.Position), index == 0 ? entry.Joint + dragDelta : Vector2.Zero);
 					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.BaseIndex), index);
 					Core.Operations.SortBonesInChain.Perform(bone);
 				}
