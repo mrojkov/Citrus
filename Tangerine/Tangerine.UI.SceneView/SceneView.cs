@@ -42,7 +42,8 @@ namespace Tangerine.UI.SceneView
 			h.Connect(SceneViewCommands.DragRightFast, () => DragNodes(new Vector2(5, 0)));
 			h.Connect(SceneViewCommands.Duplicate, DuplicateNodes);
 			h.Connect(SceneViewCommands.DisplayBones, new DisplayBones());
-			h.Connect(SceneViewCommands.BindBones, BindBones);
+			h.Connect(SceneViewCommands.TieWidgetsWithBones, TieWidgetsWithBones);
+			h.Connect(SceneViewCommands.UntieWidgetsFromBones, UntieWidgetsFromBones);
 			h.Connect(SceneViewCommands.ToggleDisplayRuler, new DisplayRuler());
 			h.Connect(SceneViewCommands.SaveCurrentRuler, new SaveRuler());
 		}
@@ -88,7 +89,7 @@ namespace Tangerine.UI.SceneView
 			Document.Current.History.EndTransaction();
 		}
 
-		private static void BindBones()
+		private static void TieWidgetsWithBones()
 		{
 			var bones = Document.Current.SelectedNodes().Editable().OfType<Bone>().ToList();
 			var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>().ToList();
@@ -120,6 +121,43 @@ namespace Tangerine.UI.SceneView
 				}
 			} finally {
 				Document.Current.History.EndTransaction();
+			}
+		}
+
+		private static void UntieWidgetsFromBones()
+		{
+			var bones = Document.Current.SelectedNodes().Editable().OfType<Bone>().ToList();
+			var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>().ToList();
+			if (widgets.Count == 0) {
+				return;
+			}
+			foreach (var widget in widgets) {
+				if (widget is DistortionMesh) {
+					var mesh = widget as DistortionMesh;
+					foreach (PointObject point in mesh.Nodes) {
+						UntieBones(point, nameof(PointObject.SkinningWeights), bones);
+					}
+				} else {
+					UntieBones(widget, nameof(Widget.SkinningWeights), bones);
+				}
+			}
+		}
+
+		private static void UntieBones(object obj, string propName, List<Bone> bones)
+		{
+			var originSkinningWeights = (SkinningWeights)obj.GetType().GetProperty(propName).GetValue(obj);
+			var indices = new List<int>();
+			for (int i = 0; i < 4; i++) {
+				if (bones.Any(b => b.Index == originSkinningWeights[i].Index)) {
+					indices.Add(i);
+				}
+			}
+			if (indices.Count != 0) {
+				var skinningWeights = new SkinningWeights();
+				for (int i = 0; i < 4; i++) {
+					skinningWeights[i] = indices.Contains(i) ? new BoneWeight() : originSkinningWeights[i];
+				}
+				Core.Operations.SetProperty.Perform(obj, propName, skinningWeights);
 			}
 		}
 
