@@ -32,89 +32,6 @@ using Lime;
 
 namespace RainbowDash
 {
-	public class RoundedRectangle : Widget
-	{
-		public float CornerRadius = 25;
-		public Color4 InnerColor = Color4.White;
-		public Color4 OuterColor = Color4.Black;
-
-		private Polyline outerFrame = new Polyline();
-		private Polyline innerFrame = new Polyline();
-		private Image innerRect = new Image();
-
-		public RoundedRectangle()
-		{
-			this.AddNode(innerRect);
-			this.AddNode(innerFrame);
-			this.AddNode(outerFrame);
-		}
-
-		protected override void SelfUpdate(float delta)
-		{
-			SetupInnerRect();
-			SetupBorder(outerFrame, Width, Height, CornerRadius, -2);
-			SetupBorder(innerFrame, Width, Height, CornerRadius, 0);
-			innerFrame.Color = InnerColor;
-			outerFrame.Color = OuterColor;
-		}
-
-		private void SetupInnerRect()
-		{
-			innerRect.Shader = ShaderId.Silhuette;
-			innerRect.Position = CornerRadius * Vector2.One;
-			innerRect.Size = Size - 2 * CornerRadius * Vector2.One;
-			innerRect.Color = InnerColor;
-		}
-
-		private static void SetupBorder(Polyline border, float width, float height,
-			float cornerRadius, float padding)
-		{
-			padding += cornerRadius;
-			border.Thickness = cornerRadius * 2;
-			border.Points = new List<Vector2> {
-				new Vector2(padding, padding),
-				new Vector2(width - padding, padding),
-				new Vector2(width - padding, height - padding),
-				new Vector2(padding, height - padding),
-				new Vector2(padding, padding)
-			};
-		}
-	}
-
-
-	public class FillLayout : CommonLayout, ILayout
-	{
-		public FillLayout()
-		{
-			DebugRectangles = new List<Rectangle>();
-		}
-
-		public override void OnSizeChanged(Widget widget, Vector2 sizeDelta)
-		{
-			InvalidateArrangement(widget);
-		}
-
-		public override void ArrangeChildren(Widget widget)
-		{
-			ArrangementValid = true;
-			var widgets = GetChildren(widget);
-			if (widgets.Count == 0) {
-				return;
-			}
-			foreach (var w in widgets) {
-				w.Size = widget.Size;
-				var align = (w.LayoutCell ?? LayoutCell.Default).Alignment;
-				LayoutWidgetWithinCell(w, Vector2.Zero, widget.Size, align, DebugRectangles);
-			}
-			DebugRectangles.Clear();
-		}
-
-		public override void MeasureSizeConstraints(Widget widget)
-		{
-			ConstraintsValid = true;
-		}
-	}
-
 	public class Helper
 	{
 		public static string TrimTextForId(string text)
@@ -152,7 +69,7 @@ namespace RainbowDash
 			size.X = Mathf.Clamp(extent.Width + Margin, MinSize, float.PositiveInfinity);
 			size.Y = Mathf.Clamp(extent.Height + Margin, MinSize, float.PositiveInfinity);
 			b.MinSize = size;
-			b.MaxSize = new Vector2(float.PositiveInfinity, float.PositiveInfinity);
+			b.MaxSize = Vector2.PositiveInfinity;
 			b.Layout.InvalidateConstraintsAndArrangement(b);
 		}
 
@@ -160,7 +77,7 @@ namespace RainbowDash
 		{
 			textColor = textColor ?? Color4.Black;
 			var textPresenter = b["TextPresenter"] as RichText;
-			(textPresenter.Nodes[0] as TextStyle).TextColor = textColor.Value;
+			//(textPresenter.Nodes[0] as TextStyle).TextColor = textColor.Value;
 			var bg = b["bg"];
 			var aBg = bg.Animators["Color"];
 			b.Markers.Add(new Marker("Normal", 0, MarkerAction.Stop));
@@ -294,7 +211,6 @@ namespace RainbowDash
 				b.Text = item.Text;
 				Helper.UpdateButtonSizeConstraints(b);
 			}
-			b.Draggable = true;
 			b.Clicked = () => {
 				item.Action();
 				Menu.Hide();
@@ -315,10 +231,12 @@ namespace RainbowDash
 		private readonly Dictionary<string, Button> cheatButtons = new Dictionary<string, Button>();
 		private readonly Frame topContainer;
 		private readonly Widget worldContainer;
-		private ListView listView;
+		private ScrollView listView;
 		private int nextColorIndex;
+		public Widget Root { get { return topContainer; } }
 
 		public event Action Hidden;
+		public bool IsShown { get { return instance != null; } }
 
 		public void RegisterCheatButton(string id, Button button)
 		{
@@ -349,10 +267,12 @@ namespace RainbowDash
 				Size = container.Size - Vector2.One * 80
 			};
 			var listContainer = (Frame)topContainer.Clone();
-			var back = new RoundedRectangle {
+			var back = new Widget {
 				Anchors = Anchors.LeftRightTopBottom,
 				Size = topContainer.Size + Vector2.One * 20,
-				Shader = ShaderId.Silhuette
+				Shader = ShaderId.Silhuette,
+				Color = Color4.DarkGray,
+				Presenter = new WidgetFlatFillPresenter(Color4.Gray.Transparentify(0.3f))
 			};
 			topContainer.Layer = layer;
 			var w = new Widget() { Layout = new VBoxLayout(), Size = topContainer.Size, Anchors = Anchors.LeftRightTopBottom };
@@ -361,7 +281,21 @@ namespace RainbowDash
 			topContainer.AddNode(w);
 			topContainer.AddNode(back);
 			back.CenterOnParent();
-			listView = new ListView(listContainer);
+			listView = new ScrollView(listContainer);
+			listView.Content.Layout = new VBoxLayout();
+			topContainer.LateTasks.Add(ExitTask);
+			topContainer.SetFocus();
+		}
+
+		private IEnumerator<object> ExitTask()
+		{
+			var input = topContainer.Input;
+			while (true) {
+				if (input.WasKeyPressed(Key.Escape)) {
+					Hide();
+				}
+				yield return null;
+			}
 		}
 
 		public void Show()
@@ -434,12 +368,11 @@ namespace RainbowDash
 			itemPanel.Id = Helper.TrimTextForId(text);
 			var arrow = foldButton["arrow"] as RichText;
 			Helper.DecorateButton(foldButton, NiceColors.AccentColor(nextColorIndex), NiceColors.DarkTextColor(nextColorIndex));
-			(arrow.Nodes[0] as TextStyle).TextColor = NiceColors.DarkTextColor(nextColorIndex);
+			//(arrow.Nodes[0] as TextStyle).TextColor = NiceColors.DarkTextColor(nextColorIndex);
 			section.Id = AddNode(foldButton, itemPanel);
-			foldButton.Draggable = true;
 			foldButton.Clicked = () => { Fold(section.Id, !itemPanel.Visible); };
-			listView.Add(foldButton);
-			listView.Add(itemPanel);
+			listView.Content.AddNode(foldButton);
+			listView.Content.AddNode(itemPanel);
 			nextColorIndex++;
 			return section;
 		}
@@ -453,7 +386,7 @@ namespace RainbowDash
 				Id = foldButtons.Count
 			};
 			AddNode(null, itemPanel);
-			listView.Add(itemPanel);
+			listView.Content.AddNode(itemPanel);
 			nextColorIndex++;
 			return section;
 		}
@@ -483,8 +416,7 @@ namespace RainbowDash
 		public void Hide()
 		{
 			instance = null;
-			topContainer.Unlink();
-			topContainer.Input.DerestrictScope();
+			topContainer.UnlinkAndDispose();
 			if (Hidden != null) {
 				Hidden();
 			}
@@ -508,16 +440,18 @@ namespace RainbowDash
 			const int SpaceAfter = -32;
 			const float Height = 75.0f;
 #endif
-			var b = new Button() {
+			var b = new Button {
 				Text = text,
-				Height = Height
+				Height = Height,
+				MinHeight = Height
 			};
-			var textPresenter = new RichText() {
+			var textPresenter = new RichText {
 				Id = "TextPresenter",
 				Nodes = {
-					new TextStyle() {
+					new TextStyle {
+						Font = new SerializableFont("Text"),
 						Size = FontSize,
-						TextColor = Color4.Black,
+						Tag = "1",
 						SpaceAfter = SpaceAfter
 					}
 				},
@@ -525,19 +459,20 @@ namespace RainbowDash
 				HAlignment = HAlignment.Left,
 				VAlignment = VAlignment.Center
 			};
-			var bg = new Image() {
+			var bg = new Image {
 				Id = "bg",
 				Shader = ShaderId.Silhuette,
 				Height = Height,
 				Anchors = Anchors.LeftRightTopBottom,
 				Color = Color4.White
 			};
-			var arrow = new RichText() {
+			var arrow = new RichText {
 				Id = "arrow",
 				Nodes = {
-					new TextStyle() {
+					new TextStyle {
+						Font = new SerializableFont("Text"),
+						Tag = "1",
 						Size = FontSize,
-						TextColor = Color4.Black
 					}
 				},
 				Height = Height,
@@ -546,7 +481,7 @@ namespace RainbowDash
 				MinWidth = Height,
 				MaxWidth = Height
 			};
-			var padding = new Image() {
+			var padding = new Image {
 				Id = "padding",
 				MinWidth = 0,
 				MaxWidth = 0,
@@ -576,27 +511,24 @@ namespace RainbowDash
 			const int SpaceAfter = -32;
 #endif
 			var b = new Button {
-				LayoutCell = new LayoutCell() {
-					Stretch = new Vector2(1.0f, 1.0f)
-				},
-				Layout = new FillLayout()
+				LayoutCell = new LayoutCell(),
+				Layout = new StackLayout(),
 			};
-			var textPresenter = new RichText() {
+			var textPresenter = new RichText {
 				Id = "TextPresenter",
 				WordSplitAllowed = false,
 				Nodes = {
-					new TextStyle() {
+					new TextStyle {
+						Font = new SerializableFont("Text"),
+						Tag = "1",
 						Size = FontSize,
-						TextColor = Color4.Black,
 						SpaceAfter = SpaceAfter
 					}
 				},
 				HAlignment = HAlignment.Center,
 				VAlignment = VAlignment.Center
 			};
-			var bg = new RoundedRectangle() {
-				CornerRadius = 10,
-				OuterColor = Color4.Gray,
+			var bg = new Image {
 				Id = "bg",
 				Shader = ShaderId.Silhuette,
 				Color = Color4.White
@@ -642,7 +574,6 @@ namespace RainbowDash
 			w.AddNode(btnFoldAll);
 			w.AddNode(btnUnfoldAll);
 			w.AddNode(btnClose);
-			btnClose.Draggable = true;
 			btnClose.Clicked = Hide;
 			Action<bool> fold = (foldOrUnfold) => {
 				for (var i = 0; i < foldButtons.Count; i++) {
@@ -656,9 +587,7 @@ namespace RainbowDash
 					}
 				}
 			};
-			btnFoldAll.Draggable = true;
 			btnFoldAll.Clicked = () => { fold(false); };
-			btnUnfoldAll.Draggable = true;
 			btnUnfoldAll.Clicked = () => { fold(true); };
 			return w;
 		}

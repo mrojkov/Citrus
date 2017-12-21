@@ -25,7 +25,7 @@ namespace EmptyProject.Application
 			World = CreateWorld();
 
 			AppData.Load();
-			AssetBundle.Instance = CreateAssetBundle();
+			AssetBundle.Current = CreateAssetBundle();
 			Profile.Instance = new Profile();
 
 			LoadFonts();
@@ -77,12 +77,12 @@ namespace EmptyProject.Application
 			}
 #endif
 
-			if (!AssetBundle.Instance.FileExists(fileName)) {
+			if (!AssetBundle.Current.FileExists(fileName)) {
 				return;
 			}
 
 			Localization.Dictionary.Clear();
-			using (var stream = AssetBundle.Instance.OpenFile(fileName)) {
+			using (var stream = AssetBundle.Current.OpenFile(fileName)) {
 				Localization.Dictionary.ReadFromStream(new LocalizationDictionaryTextSerializer(), stream);
 			}
 		}
@@ -117,7 +117,6 @@ namespace EmptyProject.Application
 				if (Cheats.IsKeyPressed(Key.Tilde)) {
 					speedMultiplier = 0.1f;
 				}
-				Lime.Debug.BreakOnButtonClick = The.Window.Input.IsKeyPressed(Key.Alt);
 
 				delta *= speedMultiplier;
 				The.World.Update(delta);
