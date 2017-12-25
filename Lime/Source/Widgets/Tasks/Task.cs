@@ -224,5 +224,11 @@ namespace Lime
 				yield return null;
 			}
 		}
+
+		public static IEnumerator<object> Delay(float time, Action action)
+		{
+			yield return time;
+			action();
+		}
 	}
 }
