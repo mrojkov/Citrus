@@ -156,6 +156,7 @@ namespace Tangerine
 				typeof(Spline),
 				typeof(SplinePoint),
 				typeof(SplineGear),
+				typeof(Slider),
 				typeof(ImageCombiner),
 				typeof(Viewport3D),
 				typeof(Camera3D),
