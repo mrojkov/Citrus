@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Lime
 {
-	public class StackLayout : CommonLayout, ILayout
+	public class StackLayout : CommonLayout
 	{
 		public bool HorizontallySizeable { get; set; }
 		public bool VerticallySizeable { get; set; }

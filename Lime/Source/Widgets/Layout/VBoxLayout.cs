@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Lime
 {
-	public class VBoxLayout : CommonLayout, ILayout
+	public class VBoxLayout : CommonLayout
 	{
 		public float Spacing { get; set; }
 		public LayoutCell DefaultCell { get; set; }

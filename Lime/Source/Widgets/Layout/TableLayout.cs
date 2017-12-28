@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Lime
 {
-	public class TableLayout : CommonLayout, ILayout
+	public class TableLayout : CommonLayout
 	{
 		public int RowCount { get; set; }
 		public int ColCount { get; set; }

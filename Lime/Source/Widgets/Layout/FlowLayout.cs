@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Lime
 {
-	public class FlowLayout : CommonLayout, ILayout
+	public class FlowLayout : CommonLayout
 	{
 		private readonly List<int> splitIndices = new List<int>();
 		public float Spacing { get; set; }
@@ -23,7 +23,7 @@ namespace Lime
 			return splitIndices[row + 1] - splitIndices[row];
 		}
 
-		public override void OnSizeChanged(Widget widget, Vector2 sizeDelta)
+		protected override void OnSizeChanged(Widget widget, Vector2 sizeDelta)
 		{
 			InvalidateConstraintsAndArrangement(widget);
 		}

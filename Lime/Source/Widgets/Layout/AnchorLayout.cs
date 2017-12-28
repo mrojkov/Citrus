@@ -2,11 +2,11 @@
 
 namespace Lime
 {
-	public class AnchorLayout : CommonLayout, ILayout
+	public class AnchorLayout : CommonLayout
 	{
 		public static readonly ILayout Instance = new AnchorLayout();
 
-		public override void OnSizeChanged(Widget widget, Vector2 sizeDelta)
+		protected override void OnSizeChanged(Widget widget, Vector2 sizeDelta)
 		{
 			for (var child = widget.FirstChild; child != null; child = child.NextSibling) {
 				if (child.AsWidget != null) {
