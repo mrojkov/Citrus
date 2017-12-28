@@ -175,6 +175,7 @@ namespace Orange
 				{ typeof(Spline), new NodeWriter { ActorClass = "Hot::Spline", Writer = n => WriteWidgetProperties((Spline)n) } },
 				{ typeof(SplinePoint), new NodeWriter { ActorClass = "Hot::SplinePoint", Writer = n => WriteSplinePointProperties((SplinePoint)n) } },
 				{ typeof(DistortionMesh), new NodeWriter { ActorClass = "Hot::DistortionMesh", Writer = n => WriteDistortionMeshProperties((DistortionMesh)n) } },
+				{ typeof(Slider), new NodeWriter {ActorClass = "Hot::Slider", Writer = n => WriteSliderProperties((Slider)n) } },
 				{ typeof(DistortionMeshPoint), new NodeWriter { ActorClass = "Hot::MeshPoint", Writer = n => WriteDistortionMeshPointProperties((DistortionMeshPoint)n) } },
 				{ typeof(PointObject), new NodeWriter { ActorClass = "Hot::PointObject", Writer = null } },
 				{ typeof(SimpleText), new NodeWriter { ActorClass = "Hot::Text", Writer = n => WriteSimpleTextProperties((SimpleText)n) } },
@@ -186,6 +187,15 @@ namespace Orange
 				{ typeof(FolderEnd), new NodeWriter { ActorClass = "Hot::FolderEnd", Writer = n => WriteNodeProperties(n) } },
 				{ typeof(Bone), new NodeWriter { ActorClass = "Hot::Bone", Writer = n => WriteBoneProperties((Bone)n) } },
 			};
+		}
+
+		private void WriteSliderProperties(Slider slider)
+		{
+			WriteWidgetProperties(slider);
+			WriteProperty("RangeMin", slider.RangeMin, 0);
+			WriteProperty("RangeMax", slider.RangeMax, 100);
+			WriteProperty("Value", slider.Value, 0);
+			WriteProperty("Step", slider.Step, 0);
 		}
 
 		private void ReorderBonesRecursive(Widget widget)
