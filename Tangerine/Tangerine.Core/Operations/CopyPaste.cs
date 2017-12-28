@@ -112,8 +112,13 @@ namespace Tangerine.Core.Operations
 				Debug.Write(e);
 				return false;
 			}
-			var folderLocation = Row.GetFolderItemLocation(location.ParentRow.Rows[location.Index]);
-			folderLocation.Index++;
+			FolderItemLocation folderLocation;
+			if (location.ParentRow.Rows.Count > 0) {
+				folderLocation = Row.GetFolderItemLocation(location.ParentRow.Rows[location.Index]);
+				folderLocation.Index++;
+			} else {
+				folderLocation = new FolderItemLocation { Index = 0, Folder = location.ParentRow.Components.Get<FolderRow>().Folder };
+			}
 			if (!folderLocation.Folder.Expanded) {
 				SetProperty.Perform(folderLocation.Folder, nameof(Folder.Expanded), true);
 			}
