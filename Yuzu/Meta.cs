@@ -69,6 +69,9 @@ namespace Yuzu.Metadata
 		public bool AllowReadingFromAncestor;
 		public Surrogate Surrogate;
 
+		public readonly YuzuMigrateOnDeserializationException MigrateOnDeserializationException;
+		public List<ValidationItem> MigrateOnDeserializationValidation;
+
 		public Dictionary<string, Item> TagToItem = new Dictionary<string, Item>();
 		public Func<object, YuzuUnknownStorage> GetUnknownStorage;
 
@@ -224,6 +227,16 @@ namespace Yuzu.Metadata
 			BeforeSerialization.MaybeAdd(m, Options.BeforeSerializationAttribute);
 			AfterDeserialization.MaybeAdd(m, Options.AfterDeserializationAttribute);
 			Surrogate.ProcessMethod(m);
+
+			YuzuMigrateOnDeserializationValidation migrateOnDeserializationValidation = m.GetCustomAttribute<YuzuMigrateOnDeserializationValidation>();
+			if (migrateOnDeserializationValidation != null && m.ReturnType == typeof(bool)) {
+				if (migrateOnDeserializationValidation.NewerVersionType != Type) throw Error(
+					"Wrong NewerVersionType ({0}) for YuzuMigrateOnDeserializationValidation, must be such as object Type ({1})",
+					migrateOnDeserializationValidation.NewerVersionType, Type);
+
+				if (MigrateOnDeserializationValidation == null) MigrateOnDeserializationValidation = new List<ValidationItem>();
+				MigrateOnDeserializationValidation.Add(new ValidationItem(migrateOnDeserializationValidation, m));
+			}
 		}
 
 		private void ExploreType(Type t)
@@ -339,6 +352,16 @@ namespace Yuzu.Metadata
 						t.BaseType.Name, Items.Count, ancestorMeta.Items.Count);
 			}
 
+			YuzuMigrateOnDeserializationException yuzuMigration = t.GetCustomAttribute<YuzuMigrateOnDeserializationException>();
+			if (yuzuMigration != null) {
+				if (yuzuMigration.NewerVersionType != t) throw Error(
+					"Wrong NewerVersionType ({0}) for YuzuMigrateOnDeserializationException, must be such as object Type ({1})",
+					yuzuMigration.NewerVersionType, t);
+
+				MigrateOnDeserializationException = yuzuMigration;
+			}
+
+
 		}
 
 		public static Meta Get(Type t, CommonOptions options)
@@ -410,6 +433,25 @@ namespace Yuzu.Metadata
 			}
 			return result;
 		}
+
+		public class ValidationItem
+		{
+			public readonly YuzuMigrateOnDeserializationValidation Attr;
+			private MethodInfo MethodInfo;
+
+			public ValidationItem(YuzuMigrateOnDeserializationValidation attr, MethodInfo methodInfo)
+			{
+				Attr = attr;
+				MethodInfo = methodInfo;
+			}
+
+			public bool Invoke(object obj)
+			{
+				return (bool) MethodInfo.Invoke(obj, null);
+			}
+
+		}
+
 	}
 
 }

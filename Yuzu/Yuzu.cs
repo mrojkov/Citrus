@@ -1,11 +1,126 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 
 namespace Yuzu
 {
+	/// <summary>
+	/// Marks how to migrate if Deserialization failed, then will be taken previousVersionTypeSurrogate and deserialized into it.
+	/// Beware: carefully use it with user sensitive data (game progress), because whole user's accumulated data can be lost with broken game release.
+	/// 
+	/// <code>
+	/// class WasClass { // previous version of class structure
+	///		string field;
+	/// }
+	/// 
+	/// [YuzuMigrateOnDeserializationException(typeof(NewClassWithExceptionOnDeserialization), typeof(SurrogateClass), true]
+	/// class NewClassWithExceptionOnDeserialization { // now version of class structure
+	///		int field;
+	/// }
+	/// 
+	/// class SurrogateClass : IYuzuMigrationSurrogateOf&lt;NewClassWithExceptionOnDeserialization> {
+	///		string field;
+	/// 
+	///		void ApplyToNewerVersion(NewClassWithExceptionOnDeserialization newerInstance) {
+	///			newerInstance.field = int.Parse(field);
+	///		}
+	/// }
+	/// </code>
+	/// </summary>
+	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false)]
+	public class YuzuMigrateOnDeserializationException : YuzuMigration
+	{
+		public YuzuMigrateOnDeserializationException(Type newerVersionType, Type previousVersionTypeSurrogate,
+			bool recreateIfAllowed) : base(newerVersionType, previousVersionTypeSurrogate, recreateIfAllowed) { }
+	}
+
+	/// <summary>
+	/// Marks method (must return bool) that checks successfully deserialized object for validity or can initiate migration chain.
+	/// For example, one array filed has been removed from class, but we need to remap that array into new structure. Then we can 
+	/// return false from attributed method and set recreateIfAllowed = false, and now previousVersionTypeSurrogate can store old array field,
+	/// and then will apply that field into new structured object. 
+	/// Notice: YuzuMigrateOnDeserializationValidation can be chained.
+	/// 
+	/// <code>
+	/// class WasClass { // previous version of class structure
+	///		int[] removedArray;
+	///		int permField;
+	/// }
+	/// 
+	/// class NewClass { // now version of class structure
+	///		int permField;
+	/// 
+	///		int val0;
+	///		int val1;
+	///		int val2;
+	/// 
+	///		[YuzuMigrateOnDeserializationValidation(typeof(NewClass), typeof(SurrogateClass), false]
+	///		bool check() {
+	///			return val0 == 0;
+	///		}
+	/// }
+	/// 
+	/// class SurrogateClass : IYuzuMigrationSurrogateOf&lt;newClass> {
+	///		int[] removedArray;
+	/// 
+	///		void ApplyToNewerVersion(NewClass newerInstance) {
+	///			newerInstance.val0 = removedArray[0];
+	///			newerInstance.val1 = removedArray[1];
+	///			newerInstance.val2 = removedArray[2];
+	///		}
+	/// }
+	/// </code>
+	/// </summary>
+	[AttributeUsage(AttributeTargets.Method, Inherited = false)]
+	public class YuzuMigrateOnDeserializationValidation : YuzuMigration
+	{
+		public YuzuMigrateOnDeserializationValidation(Type newerVersionType, Type previousVersionTypeSurrogate, bool recreateIfAllowed) : base(newerVersionType, previousVersionTypeSurrogate, recreateIfAllowed) { }
+	}
+
+	public class YuzuMigration : Attribute
+	{
+
+		public readonly bool RecreateIfAllowed;
+		public readonly Type NewerVersionType;
+		public readonly Type PreviousVersionTypeSurrogate;
+		public readonly MethodInfo MethodInfoApplyToNewer;
+
+		protected YuzuMigration(Type newerVersionType, Type previousVersionTypeSurrogate, bool recreateIfAllowed)
+		{
+			RecreateIfAllowed = recreateIfAllowed;
+			PreviousVersionTypeSurrogate = previousVersionTypeSurrogate;
+			NewerVersionType = newerVersionType;
+
+			Type foundInterfaceType = previousVersionTypeSurrogate.GetInterface("IYuzuMigrationSurrogateOf`1");
+			if (foundInterfaceType == null) {
+				throw new YuzuException("YuzuMigration requires previousVersionTypeSurrogate that inherits IYuzuMigrationSurrogateOf, income " + previousVersionTypeSurrogate);
+			}
+			if (!foundInterfaceType.GetGenericArguments().Contains(newerVersionType)) {
+				throw new YuzuException("YuzuMigration requires Type of previousVersionTypeSurrogate that cpntains generic of newerVersionType");
+			}
+
+			try {
+				MethodInfoApplyToNewer = previousVersionTypeSurrogate.GetMethod("ApplyToNewerVersion", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+			} catch (Exception) {
+				MethodInfoApplyToNewer = null;
+			}
+
+			if (MethodInfoApplyToNewer == null) {
+				throw new YuzuException("YuzuMigration requires Type that contains method ApplyToNewerVersion with parameter of newerVersionType");
+			}
+		}
+
+	}
+
+	public interface IYuzuMigrationSurrogateOf<T>
+	{
+		void ApplyToNewerVersion(T newerInstance);
+	}
+
 	public class YuzuField : Attribute
 	{
 		public readonly string Alias;

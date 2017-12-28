@@ -71,7 +71,7 @@ namespace Yuzu.Json
 				name = GetNextName(first: false);
 			}
 			return name == "" ? obj :
-				MakeDeserializer(TypeSerializer.Serialize(obj.GetType())).ReadFields(obj, name);
+				MakeDeserializer(TypeSerializer.Serialize(obj.GetType())).ReadFields(obj, name, false);
 		}
 
 		public override object FromReaderInt()
@@ -85,9 +85,9 @@ namespace Yuzu.Json
 			KillBuf();
 			var ch = RequireBracketOrNull();
 			if (ch == 'n') return default(T);
-			if (ch == '[') return (T)ReadFieldsCompact(new T());
+			if (ch == '[') return (T)ReadFieldsCompact(new T(), true);
 			var name = GetNextName(true);
-			if (name != JsonOptions.ClassTag) return (T)ReadFields(new T(), name);
+			if (name != JsonOptions.ClassTag) return (T)ReadFields(new T(), name, true);
 			var typeName = RequireUnescapedString();
 			return (T)MaybeReadObject(typeName, GetNextName(first: false));
 		}
