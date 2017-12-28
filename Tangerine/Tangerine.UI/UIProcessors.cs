@@ -8,19 +8,24 @@ namespace Tangerine.UI
 {
 	public static class UIProcessors
 	{
-		public static IEnumerator<object> PickColorProcessor(Action<Color4> setter)
+		public static IEnumerator<object> PickColorProcessor(Widget widget, Action<Color4> setter)
 		{
-			var root = WidgetContext.Current.Root;
+			var input = CommonWindow.Current.Input;
 			Document.Current.History.BeginTransaction();
+			var drag = new DragGesture();
+			widget.Gestures.Add(drag);
 			yield return null;
 			while (true) {
-				Utils.ChangeCursorIfDefault(Cursors.Pipette);
-				if (root.Input.IsMousePressed()) {
-					setter(ColorPicker.PickAtCursor());
-				} else if (root.Input.WasMouseReleased()) {
+				if (drag.WasBegan()) {
+					input.ConsumeKey(Key.Mouse0);
+					WidgetContext.Current.Root.Input.ConsumeKey(Key.Mouse0);
+					while (!drag.WasEnded()) {
+						Utils.ChangeCursorIfDefault(Cursors.Pipette);
+						setter(ColorPicker.PickAtCursor());
+						yield return null;
+					}
 					Utils.ChangeCursorIfDefault(MouseCursor.Default);
 					Document.Current.History.EndTransaction();
-					yield break;
 				}
 				yield return null;
 			}

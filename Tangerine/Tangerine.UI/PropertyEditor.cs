@@ -586,7 +586,6 @@ namespace Tangerine.UI
 		public Color4PropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
 			ColorBoxButton colorBox;
-			ToolbarButton pipette;
 			var panel = new ColorPickerPanel();
 			var currentColor = CoalescedPropertyValue(Color4.White).DistinctUntilChanged();
 			ContainerWidget.AddNode(new Widget {
@@ -595,12 +594,7 @@ namespace Tangerine.UI
 					(editor = editorParams.EditBoxFactory()),
 					new HSpacer(4),
 					(colorBox = new ColorBoxButton(currentColor)),
-					(pipette = new ToolbarButton {
-						Highlightable = true,
-						Texture = IconPool.GetTexture("Tools.Pipette"),
-						Clicked = () => WidgetContext.Current.Root.Tasks.Add(
-							UIProcessors.PickColorProcessor(v => SetProperty(v)))
-					}),
+					CreatePipetteButton(),
 				}
 			});
 			ExpandableContent.AddNode(panel.Widget);
@@ -620,6 +614,16 @@ namespace Tangerine.UI
 				}
 			};
 			editor.Tasks.Add(currentColorString.Consume(v => editor.Text = v));
+		}
+
+
+		private Node CreatePipetteButton()
+		{
+			var button = new ToolbarButton {
+				Texture = IconPool.GetTexture("Tools.Pipette"),
+			};
+			button.Tasks.Add(UIProcessors.PickColorProcessor(button, v => SetProperty(v)));
+			return button;
 		}
 
 		public override void SetFocus() => editor.SetFocus();
