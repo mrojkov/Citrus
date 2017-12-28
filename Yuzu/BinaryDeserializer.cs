@@ -125,8 +125,13 @@ namespace Yuzu.Binary
 		{
 			var rf = ReadValueFunc(typeof(T));
 			var count = Reader.ReadInt32();
-			for (int i = 0; i < count; ++i)
-				list.Add((T)rf());
+			for (int i = 0; i < count; ++i) {
+				object t = rf();
+
+				if (IsSkipForUnknownData<T>(t)) continue;
+
+				list.Add((T) t);
+			}
 		}
 
 		protected I ReadCollection<I, E>() where I : class, ICollection<E>, new()
@@ -136,8 +141,13 @@ namespace Yuzu.Binary
 				return null;
 			var list = new I();
 			var rf = ReadValueFunc(typeof(E));
-			for (int i = 0; i < count; ++i)
-				list.Add((E)rf());
+			for (int i = 0; i < count; ++i) {
+				object e = rf();
+				
+				if (IsSkipForUnknownData<E>(e)) continue;
+
+				list.Add((E) e);
+			}
 			return list;
 		}
 
@@ -147,8 +157,13 @@ namespace Yuzu.Binary
 			if (count == -1) return null;
 			var list = new List<T>();
 			var rf = ReadValueFunc(typeof(T));
-			for (int i = 0; i < count; ++i)
-				list.Add((T)rf());
+			for (int i = 0; i < count; ++i) {
+				object t = rf();
+
+				if (IsSkipForUnknownData<T>(t)) continue;
+				
+				list.Add((T) t);
+			}
 			return list;
 		}
 
@@ -168,8 +183,14 @@ namespace Yuzu.Binary
 			var rk = ReadValueFunc(typeof(K));
 			var rv = ReadValueFunc(typeof(V));
 			var count = Reader.ReadInt32();
-			for (int i = 0; i < count; ++i)
-				dict.Add((K)rk(), (V)rv());
+			for (int i = 0; i < count; ++i) {
+				object k = rk();
+				object v = rv();
+
+				if (IsSkipForUnknownData<V>(v)) continue;
+
+				dict.Add((K) k, (V) v);
+			}
 		}
 
 		protected Dictionary<K, V> ReadDictionary<K, V>()
@@ -180,8 +201,14 @@ namespace Yuzu.Binary
 			var dict = new Dictionary<K, V>();
 			var rk = ReadValueFunc(typeof(K));
 			var rv = ReadValueFunc(typeof(V));
-			for (int i = 0; i < count; ++i)
-				dict.Add((K)rk(), (V)rv());
+			for (int i = 0; i < count; ++i) {
+				object k = rk();
+				object v = rv();
+
+				if (IsSkipForUnknownData<V>(v)) continue;
+
+				dict.Add((K) k, (V) v);
+			}
 			return dict;
 		}
 
@@ -192,9 +219,24 @@ namespace Yuzu.Binary
 				return null;
 			var rf = ReadValueFunc(typeof(T));
 			var array = new T[count];
-			for (int i = 0; i < count; ++i)
-				array[i] = (T)rf();
+			for (int i = 0; i < count; ++i) {
+				object t = rf();
+				
+				if (IsSkipForUnknownData<T>(t)) continue;
+
+				array[i] = (T) t;
+			}
 			return array;
+		}
+
+		/// <summary>
+		/// skip for unknown type, becouse it is skip reading
+		// fixes bug to skip absent collections in new data structure
+		/// </summary>
+		private static bool IsSkipForUnknownData<T>(object t)
+		{
+			if (typeof(T) == typeof(Record) && !(t is Record)) return true;
+			return false;
 		}
 
 		protected Action<T> ReadAction<T>() { return GetAction<T>(Reader.ReadString()); }
