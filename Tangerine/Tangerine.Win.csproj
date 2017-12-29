@@ -277,6 +277,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="icon.ico" />
+    <EmbeddedResource Include="Resources\Icons\SceneView\Dash.png" />
     <EmbeddedResource Include="Resources\Icons\icon.ico" />
   </ItemGroup>
 </Project>

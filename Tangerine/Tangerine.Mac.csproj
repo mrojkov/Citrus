@@ -251,6 +251,7 @@
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.PolylinePoint.png" />
     <EmbeddedResource Include="Resources\Icons\Tools\Folded.png" />
     <EmbeddedResource Include="Resources\Icons\Tools\Unfolded.png" />
+    <EmbeddedResource Include="Resources\Icons\SceneView\Dash.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PreferencesDialog\" />

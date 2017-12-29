@@ -85,6 +85,10 @@ namespace Tangerine
 				new PropertyEditorParams(pane.Content, Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>(), nameof(UI.SceneView.UserPreferences.EnableChessBackground), "Chess background"));
 			tmp.ContainerWidget.AddChangeWatcher(
 				() => Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>().EnableChessBackground, (v) => Application.InvalidateWindows());
+			tmp = new BooleanPropertyEditor(
+				new PropertyEditorParams(pane.Content, Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>(), nameof(UI.SceneView.UserPreferences.DrawFrameBorder), "Draw frame border"));
+			tmp.ContainerWidget.AddChangeWatcher(
+				() => Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>().DrawFrameBorder, (v) => Application.InvalidateWindows());
 			CreateColorPropertyEditor(
 				nameof(UI.SceneView.UserPreferences.BackgroundColorA),
 				"Background color A",

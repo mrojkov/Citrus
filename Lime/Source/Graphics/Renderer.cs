@@ -973,6 +973,11 @@ namespace Lime
 			var dir = (b - a).Normalized;
 			var l = (b - a).Length;
 			var n = new Vector2(-dir.Y, dir.X) * size / 2;
+			//Round position to avoid flickering
+			a.X = (int)a.X;
+			a.Y = (int)a.Y;
+			b.X = (int)b.X;
+			b.Y = (int)b.Y;
 			Vertex[] vertices = {
 				new Vertex {
 					Pos = a - n,
