@@ -7,8 +7,6 @@ namespace Lime
 {
 	public interface ILayout
 	{
-		event Action<Vector2> SizeChanged;
-
 		List<Rectangle> DebugRectangles { get; }
 
 		bool ConstraintsValid { get; }
@@ -21,10 +19,8 @@ namespace Lime
 		void ArrangeChildren(Widget widget);
 	}
 
-	public class CommonLayout : ILayout
+	public class CommonLayout
 	{
-		public event Action<Vector2> SizeChanged;
-
 		public object Tag;
 		public List<Rectangle> DebugRectangles { get; protected set; }
 
@@ -56,12 +52,10 @@ namespace Lime
 			}
 		}
 
-		void ILayout.OnSizeChanged(Widget widget, Vector2 sizeDelta)
+		public virtual void OnSizeChanged(Widget widget, Vector2 sizeDelta)
 		{
-			OnSizeChanged(widget, sizeDelta);
-
-			var handler = SizeChanged;
-			handler?.Invoke(sizeDelta);
+			// Size changing could only affect children arrangement, not the widget's size constraints.
+			InvalidateArrangement(widget);
 		}
 
 		public virtual void MeasureSizeConstraints(Widget widget) { }
@@ -69,12 +63,6 @@ namespace Lime
 		public virtual void ArrangeChildren(Widget widget) { }
 
 #region protected methods
-		protected virtual void OnSizeChanged(Widget widget, Vector2 sizeDelta)
-		{
-			// Size changing could only affect children arrangement, not the widget's size constraints.
-			InvalidateArrangement(widget);
-		}
-
 		protected List<Widget> GetChildren(Widget widget)
 		{
 			return widget.Nodes.OfType<Widget>().Where(

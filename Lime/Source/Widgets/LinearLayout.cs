@@ -5,7 +5,7 @@ namespace Lime
 	// TODO: Get rid of the class, use Widget.Layout technology instead.
 	public class LinearLayout : Node
 	{
-		class LayoutHandler : CommonLayout
+		class LayoutHandler : CommonLayout, ILayout
 		{
 			private LinearLayout layoutData;
 
@@ -14,7 +14,7 @@ namespace Lime
 				this.layoutData = layoutNode;
 			}
 
-			protected override void OnSizeChanged(Widget widget, Vector2 sizeDelta)
+			public override void OnSizeChanged(Widget widget, Vector2 sizeDelta)
 			{
 				if (layoutData.Horizontal) {
 					UpdateForHorizontalOrientation(widget);

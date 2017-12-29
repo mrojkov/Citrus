@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Lime
 {
-	public class HBoxLayout : CommonLayout
+	public class HBoxLayout : CommonLayout, ILayout
 	{
 		public float Spacing { get; set; }
 		public LayoutCell CellDefaults { get; set; }

@@ -410,7 +410,7 @@ namespace Lime
 			Down = 1
 		}
 
-		protected class Layout : CommonLayout
+		protected class Layout : CommonLayout, ILayout
 		{
 			readonly Widget content;
 			protected readonly ScrollDirection direction;
