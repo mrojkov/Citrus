@@ -25,11 +25,17 @@ namespace Tangerine.UI.SceneView
 			if (widgets.Count == 0) {
 				return;
 			}
-			// Render node icons.
+			// Render boreder and icon for widgets.
 			var iconSize = new Vector2(16, 16);
 			foreach (var widget in widgets) {
 				var t = NodeIconPool.GetTexture(widget.GetType());
-				var p = widget.CalcPositionInSpaceOf(canvas);
+				var h = widget.CalcHullInSpaceOf(canvas);
+				var p = (h.V1 + h.V3) / 2;
+				for (int i = 0; i < 4; i++) {
+					var a = h[i];
+					var b = h[(i + 1) % 4];
+					Renderer.DrawLine(a, b, ColorTheme.Current.SceneView.SelectedWidget, 1);
+				}
 				Renderer.DrawSprite(t, Color4.White, p - iconSize / 2, iconSize, Vector2.Zero, Vector2.One);
 			}
 			Quadrangle hull;
