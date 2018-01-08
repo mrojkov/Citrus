@@ -25,7 +25,7 @@ namespace Lime
 
 		public override string Text
 		{
-			get { return Items.ElementAtOrDefault(Index)?.Text ?? (string)userValue; }
+			get { return Items.ElementAtOrDefault(Index)?.Text ?? userValue?.ToString(); }
 			set
 			{
 				var item = Items.FirstOrDefault(i => i.Text == value);
