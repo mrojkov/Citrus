@@ -476,18 +476,5 @@ namespace Lime
 				6 * t * oneMinusT * p2 +
 				3 * t2 * p3;
 		}
-
-		private static readonly HashSet<Type> NumericTypes = new HashSet<Type>
-		{
-			typeof(int),  typeof(double),  typeof(decimal),
-			typeof(long), typeof(short),   typeof(sbyte),
-			typeof(byte), typeof(ulong),   typeof(ushort),
-			typeof(uint), typeof(float)
-		};
-
-		public static bool IsNumber(this object source)
-		{
-			return NumericTypes.Contains(source.GetType());
-		}
 	}
 }
