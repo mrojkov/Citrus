@@ -15,17 +15,23 @@ namespace Tangerine.UI.SceneView
 		private readonly SceneView sv;
 
 		private const string DashTexturePath = "Tangerine.Resources.Icons.SceneView.Round.png";
+		private readonly Texture2D dashTexture;
 
 		public BonePresenter(SceneView sceneView)
 		{
 			sv = sceneView;
 			sceneView.Frame.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(Render));
+			dashTexture = new Texture2D();
+			dashTexture.LoadImage(new Bitmap(new EmbeddedResource(DashTexturePath, "Tangerine").GetResourceStream()));
+			dashTexture.TextureParams = new TextureParams {
+				WrapMode = TextureWrapMode.Repeat,
+				MinMagFilter = TextureFilter.Linear
+			};
 		}
 
 
 		void Render(Widget canvas)
 		{
-
 			if (Document.Current.Container.IsRunning || Document.Current.ExpositionMode) {
 				return;
 			}
@@ -91,12 +97,6 @@ namespace Tangerine.UI.SceneView
 			// Draw parent link
 			if (bone.BaseIndex != 0) {
 				var p = bone.Parent.AsWidget.BoneArray[bone.BaseIndex].Tip * t;
-				var dashTexture = new Texture2D();
-				dashTexture.LoadImage(new Bitmap(new EmbeddedResource(DashTexturePath, "Tangerine").GetResourceStream()));
-				dashTexture.TextureParams = new TextureParams {
-					WrapMode = TextureWrapMode.Repeat,
-					MinMagFilter = TextureFilter.Nearest
-				};
 				Renderer.DrawDashedLine(dashTexture, p, hull.V1 * t, ColorTheme.Current.SceneView.BoneOutline);
 			}
 			if (selected) {
