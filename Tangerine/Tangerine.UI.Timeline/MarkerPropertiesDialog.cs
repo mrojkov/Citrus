@@ -23,9 +23,14 @@ namespace Tangerine.UI.Timeline
 			Button cancelButton;
 			DropDownList actionSelector;
 			EditBox markerIdEditor;
-			EditBox jumpToEditor;
+			ThemedDropDownList jumpToSelector;
 			Result result;
 			var window = new Window(new WindowOptions { FixedSize = true, Title = "Marker properties", Visible = false, Style = WindowStyle.Dialog });
+			jumpToSelector = new ThemedDropDownList();
+			foreach (var m in Document.Current.Container.Markers) {
+				jumpToSelector.Items.Add(new ThemedDropDownList.Item(m.Id, m));
+			}
+			jumpToSelector.Text = marker.JumpTo;
 			var rootWidget = new ThemedInvalidableWindowWidget(window) {
 				LayoutBasedWindowSize = true,
 				Padding = new Thickness(8),
@@ -55,7 +60,7 @@ namespace Tangerine.UI.Timeline
 								Value = marker.Action
 							}),
 							new ThemedSimpleText("Jump to"),
-							(jumpToEditor = new ThemedEditBox { Text = marker.JumpTo }),
+							jumpToSelector,
 						}
 					},
 					(buttonsPanel = new Widget {
@@ -93,7 +98,7 @@ namespace Tangerine.UI.Timeline
 			if (result == Result.Ok) {
 				marker.Id = markerIdEditor.Text;
 				marker.Action = (MarkerAction)actionSelector.Value;
-				marker.JumpTo = jumpToEditor.Text;
+				marker.JumpTo = jumpToSelector.Text;
 			}
 			return result;
 		}
