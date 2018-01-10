@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2020
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orange.Mac", "Orange.Mac.csproj", "{4B2BDD5A-2AAE-46AE-AA1A-8C9308BAA50D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lemon.Mac", "..\Lemon\Lemon.Mac.csproj", "{BB697671-700C-455D-B8EE-66A6B122B949}"
@@ -14,6 +16,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yuzu.Mac", "..\Yuzu\Yuzu.Mac.csproj", "{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicFont.Mac", "..\Lime\Extensions\DynamicFont\DynamicFont.Mac.csproj", "{B5F74505-80BB-4373-B194-219D743C1FA0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orange.Mac.CLI", "Orange.CLI\Orange.Mac.CLI.csproj", "{5F39EAEF-F894-4B59-8B52-788444A7A88E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +37,10 @@ Global
 		{DC16EEBF-404D-4610-B87A-15B57464D707}.Debug|x86.Build.0 = Debug|Any CPU
 		{DC16EEBF-404D-4610-B87A-15B57464D707}.Release|x86.ActiveCfg = Release|Any CPU
 		{DC16EEBF-404D-4610-B87A-15B57464D707}.Release|x86.Build.0 = Release|Any CPU
+		{BC6D9E62-E83E-4FD6-ACA3-F3A5EBD1F1E2}.Debug|x86.ActiveCfg = Debug|x86
+		{BC6D9E62-E83E-4FD6-ACA3-F3A5EBD1F1E2}.Debug|x86.Build.0 = Debug|x86
+		{BC6D9E62-E83E-4FD6-ACA3-F3A5EBD1F1E2}.Release|x86.ActiveCfg = Release|x86
+		{BC6D9E62-E83E-4FD6-ACA3-F3A5EBD1F1E2}.Release|x86.Build.0 = Release|x86
 		{56D2F029-2E73-4CF9-80C7-6175A9DBCFFE}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{56D2F029-2E73-4CF9-80C7-6175A9DBCFFE}.Debug|x86.Build.0 = Debug|Any CPU
 		{56D2F029-2E73-4CF9-80C7-6175A9DBCFFE}.Release|x86.ActiveCfg = Release|Any CPU
@@ -45,14 +53,20 @@ Global
 		{B5F74505-80BB-4373-B194-219D743C1FA0}.Debug|x86.Build.0 = Debug.SubpixelText|Any CPU
 		{B5F74505-80BB-4373-B194-219D743C1FA0}.Release|x86.ActiveCfg = Release.SubpixelText|Any CPU
 		{B5F74505-80BB-4373-B194-219D743C1FA0}.Release|x86.Build.0 = Release.SubpixelText|Any CPU
-		{BC6D9E62-E83E-4FD6-ACA3-F3A5EBD1F1E2}.Debug|x86.ActiveCfg = Debug|x86
-		{BC6D9E62-E83E-4FD6-ACA3-F3A5EBD1F1E2}.Debug|x86.Build.0 = Debug|x86
-		{BC6D9E62-E83E-4FD6-ACA3-F3A5EBD1F1E2}.Release|x86.ActiveCfg = Release|x86
-		{BC6D9E62-E83E-4FD6-ACA3-F3A5EBD1F1E2}.Release|x86.Build.0 = Release|x86
+		{5F39EAEF-F894-4B59-8B52-788444A7A88E}.Debug|x86.ActiveCfg = Debug|x86
+		{5F39EAEF-F894-4B59-8B52-788444A7A88E}.Debug|x86.Build.0 = Debug|x86
+		{5F39EAEF-F894-4B59-8B52-788444A7A88E}.Release|x86.ActiveCfg = Release|x86
+		{5F39EAEF-F894-4B59-8B52-788444A7A88E}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C603CDCE-F7EA-4E61-A02A-8096BB3C051D}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
-		$0.TextStylePolicy = $1
+		$0.TextStylePolicy = $7
 		$1.FileWidth = 120
 		$1.EolMarker = Windows
 		$1.inheritsSet = null
@@ -85,18 +99,15 @@ Global
 		$2.SpacingAfterMethodDeclarationName = True
 		$2.SpaceAfterMethodCallName = True
 		$2.SpaceBeforeOpenSquareBracket = True
-		$0.TextStylePolicy = $3
 		$3.EolMarker = Windows
 		$3.scope = text/plain
 		$3.IndentWidth = 8
 		$3.FileWidth = 80
 		$3.TabWidth = 8
-		$0.TextStylePolicy = $4
 		$4.inheritsSet = null
 		$4.scope = text/x-csrc
 		$0.StandardHeader = $5
 		$0.DotNetNamingPolicy = $6
-		$0.TextStylePolicy = $7
 		$7.inheritsSet = null
 		$7.scope = application/xml
 		$0.XmlFormattingPolicy = $8

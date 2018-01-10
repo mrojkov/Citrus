@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{BC6D9E62-E83E-4FD6-ACA3-F3A5EBD1F1E2}</ProjectGuid>
+    <ProjectGuid>{5F39EAEF-F894-4B59-8B52-788444A7A88E}</ProjectGuid>
     <ProjectTypeGuids>{A3F8F2AB-B479-4A4A-A458-A89E7DC349F1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Exe</OutputType>
     <RootNamespace>Orange.GUI</RootNamespace>
@@ -31,14 +31,17 @@
     <UseRefCounting>true</UseRefCounting>
     <Profiling>true</Profiling>
     <PlatformTarget>x86</PlatformTarget>
-    <HttpClientHandler></HttpClientHandler>
-    <LinkMode></LinkMode>
+    <HttpClientHandler>
+    </HttpClientHandler>
+    <LinkMode>
+    </LinkMode>
     <XamMacArch>x86_64</XamMacArch>
     <PackageSigningKey>3rd Party Mac Developer Installer</PackageSigningKey>
     <I18n>west</I18n>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <DebugType></DebugType>
+    <DebugType>
+    </DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\bin\Mac\Release</OutputPath>
     <DefineConstants>__UNIFIED__;MAC</DefineConstants>
@@ -52,7 +55,8 @@
     <UseRefCounting>true</UseRefCounting>
     <LinkMode>None</LinkMode>
     <PlatformTarget>x86</PlatformTarget>
-    <HttpClientHandler></HttpClientHandler>
+    <HttpClientHandler>
+    </HttpClientHandler>
     <XamMacArch>i386</XamMacArch>
     <I18n>west</I18n>
     <MonoBundlingExtraArgs>--registrar:dynamic</MonoBundlingExtraArgs>
