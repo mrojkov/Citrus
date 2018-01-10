@@ -74,7 +74,6 @@
     <Compile Include="Processors\ShiftClickProcessor.cs" />
     <Compile Include="Presenters\SelectedWidgetsPresenter.cs" />
     <Compile Include="Presenters\ContainerAreaPresenter.cs" />
-    <Compile Include="Presenters\PointObjectPresenter.cs" />
     <Compile Include="Processors\DragPointObjectsProcessor.cs" />
     <Compile Include="PreviewAnimationHandler.cs" />
     <Compile Include="Processors\Bones\ChangeBoneRadiusProcessor.cs" />
@@ -82,7 +81,7 @@
     <Compile Include="Presenters\SplinePresenter.cs" />
     <Compile Include="Processors\CreatePointObjectProcessor.cs" />
     <Compile Include="Processors\ActivateOnMouseOverProcessor.cs" />
-    <Compile Include="Presenters\PointObjectsSelectionPresenter.cs" />
+    <Compile Include="Presenters\PointObjectsPresenter.cs" />
     <Compile Include="Presenters\SplinePointPresenter.cs" />
     <Compile Include="Processors\DragSplineTangentsProcessor.cs" />
     <Compile Include="Presenters\TranslationGizmoPresenter.cs" />

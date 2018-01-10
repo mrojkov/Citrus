@@ -32,7 +32,6 @@ namespace Tangerine.UI.SceneView
 						if (j + 1 <= mesh.NumCols) {
 							Renderer.DrawLine(p, mesh.GetPoint(i, j + 1).CalcPositionInSpaceOf(canvas), ColorTheme.Current.SceneView.DistortionMeshOutline);
 						}
-						Renderer.DrawRound(p, 3, 10, ColorTheme.Current.SceneView.PointObject);
 					}
 				}
 			}

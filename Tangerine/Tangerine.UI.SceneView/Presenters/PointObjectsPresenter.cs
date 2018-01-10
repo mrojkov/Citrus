@@ -7,11 +7,11 @@ using System.Collections.Generic;
 
 namespace Tangerine.UI.SceneView
 {
-	class PointObjectsSelectionPresenter
+	class PointObjectsPresenter
 	{
 		private readonly SceneView sv;
 
-		public PointObjectsSelectionPresenter(SceneView sceneView)
+		public PointObjectsPresenter(SceneView sceneView)
 		{
 			sv = sceneView;
 			sceneView.Frame.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(Render));
@@ -30,8 +30,12 @@ namespace Tangerine.UI.SceneView
 			var t = Document.Current.Container.AsWidget.CalcTransitionToSpaceOf(canvas);
 
 			var selectedPointObjects = Document.Current.SelectedNodes().Editable().OfType<PointObject>().ToList();
+			var pointObjects = Document.Current.Container.Nodes.OfType<PointObject>().Except(selectedPointObjects).ToList();
+			foreach (var po in pointObjects) {
+				DrawPointObject(po.TransformedPosition * t, ColorTheme.Current.SceneView.PointObject);
+			}
 			foreach (var po in selectedPointObjects) {
-				DrawPointObject(po.TransformedPosition * t);
+				DrawPointObject(po.TransformedPosition * t, ColorTheme.Current.SceneView.Selection);
 			}
 			if (selectedPointObjects.Count == 0)
 				return;
@@ -84,9 +88,9 @@ namespace Tangerine.UI.SceneView
 			Vector2.Down
 		};
 
-		void DrawPointObject(Vector2 position)
+		void DrawPointObject(Vector2 position, Color4 color)
 		{
-			Renderer.DrawRound(position, 4, 10, ColorTheme.Current.SceneView.Selection);
+			Renderer.DrawRound(position, 4, 10, color);
 		}
 
 		void DrawStretchMark(Vector2 position)

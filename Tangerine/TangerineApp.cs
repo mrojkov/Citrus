@@ -117,14 +117,12 @@ namespace Tangerine
 			Project.Tasks = dockManager.MainWindowWidget.Tasks;
 			Document.NodeDecorators.AddFor<Spline>(n => n.CompoundPostPresenter.Add(new UI.SceneView.SplinePresenter()));
 			Document.NodeDecorators.AddFor<Viewport3D>(n => n.CompoundPostPresenter.Add(new UI.SceneView.Spline3DPresenter()));
-			Document.NodeDecorators.AddFor<SplinePoint>(n => n.CompoundPostPresenter.Add(new UI.SceneView.SplinePointPresenter()));
 			Document.NodeDecorators.AddFor<Widget>(n => {
 				if (n.AsWidget.SkinningWeights == null) {
 					n.AsWidget.SkinningWeights = new SkinningWeights();
 				}
 			});
 			Document.NodeDecorators.AddFor<PointObject>(n => {
-				n.CompoundPostPresenter.Add(new UI.SceneView.PointObjectPresenter());
 				if ((n as PointObject).SkinningWeights == null) {
 					(n as PointObject).SkinningWeights = new SkinningWeights();
 				}

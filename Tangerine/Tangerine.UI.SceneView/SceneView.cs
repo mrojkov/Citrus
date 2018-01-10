@@ -400,7 +400,8 @@ namespace Tangerine.UI.SceneView
 			new ContainerAreaPresenter(this);
 			new TransparentWidgetsPresenter(this);
 			new SelectedWidgetsPresenter(this);
-			new PointObjectsSelectionPresenter(this);
+			new PointObjectsPresenter(this);
+			new SplinePointPresenter(this);
 			new TranslationGizmoPresenter(this);
 			new BonePresenter(this);
 			new BoneAsistantPresenter(this);
