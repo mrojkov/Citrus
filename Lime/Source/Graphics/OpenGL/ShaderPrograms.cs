@@ -149,13 +149,13 @@ namespace Lime
 			uniform highp float morphKoeff;
 			void main()
 			{
-				$ifdef VertexAnimation
+				#ifdef VertexAnimation
 					gl_Position = matProjection * (globalTransform * vec4((1.0 - morphKoeff) * inPos + morphKoeff * inPos2));
 					color = ((1.0 - morphKoeff) * inColor + morphKoeff * inColor2) * globalColor;
-				$else
+				#else
 					gl_Position = matProjection * inPos;
 					color = inColor;
-				$endif
+				#endif
 				texCoords = inTexCoords1;
 			}";
 
@@ -175,13 +175,13 @@ namespace Lime
 			uniform highp float morphKoeff;
 			void main()
 			{
-				$ifdef VertexAnimation
+				#ifdef VertexAnimation
 					gl_Position = matProjection * (globalTransform * vec4((1.0 - morphKoeff) * inPos + morphKoeff * inPos2));
 					color = ((1.0 - morphKoeff) * inColor + morphKoeff * inColor2) * globalColor;
-				$else
+				#else
 					gl_Position = matProjection * inPos;
 					color = inColor;
-				$endif
+				#endif
 				texCoords1 = inTexCoords1;
 				texCoords2 = inTexCoords2;
 			}";
@@ -200,9 +200,9 @@ namespace Lime
 			void main()
 			{
 				gl_FragColor = color * texture2D(tex1, texCoords);
-				$ifdef PremultiplyAlpha
+				#ifdef PremultiplyAlpha
 					gl_FragColor.rgb *= gl_FragColor.a;
-				$endif
+				#endif
 			}";
 
 		readonly string twoTexturesFragmentShader = @"
@@ -214,9 +214,9 @@ namespace Lime
 			void main()
 			{
 				gl_FragColor = color * texture2D(tex1, texCoords1) * texture2D(tex2, texCoords2);
-				$ifdef PremultiplyAlpha
+				#ifdef PremultiplyAlpha
 					gl_FragColor.rgb *= gl_FragColor.a;
-				$endif
+				#endif
 			}";
 
 		readonly string silhouetteFragmentShader = @"
@@ -257,9 +257,6 @@ namespace Lime
 
 		private static CustomShaderProgram CreateShaderProgram(string vertexShader, string fragmentShader)
 		{
-			// #ifdef - breaks Unity3D compiler
-			vertexShader = vertexShader.Replace('$', '#');
-			fragmentShader = fragmentShader.Replace('$', '#');
 			return new CustomShaderProgram(vertexShader, fragmentShader, Attributes.GetLocations(), GetSamplers());
 		}
 
@@ -304,7 +301,7 @@ namespace Lime
 				texCoords2 = inTexCoords2;
 			}";
 
-			private static string fragmentShaderText = $@"
+			private static string fragmentShaderText = @"
 			varying lowp vec4 color;
 			varying lowp vec2 texCoords1;
 			varying lowp vec2 texCoords2;
@@ -312,11 +309,11 @@ namespace Lime
 			uniform lowp sampler2D tex2;
 			uniform lowp float colorIndex;
 			void main()
-			{{
+			{
 				lowp vec4 t1 = texture2D(tex1, texCoords1);
 				lowp vec4 t2 = texture2D(tex2, vec2(t1.x, colorIndex));
 				gl_FragColor = color * vec4(t2.rgb, t1.a * t2.a);
-			}}";
+			}";
 
 			public ColorfulTextShaderProgram()
 				: base(GetShaders(), ShaderPrograms.Attributes.GetLocations(), ShaderPrograms.GetSamplers())
@@ -347,9 +344,9 @@ namespace Lime
 			private static IEnumerable<Shader> GetShaders()
 			{
 				return new Shader[] {
-				new VertexShader(vertexShaderText.Replace('$', '#')),
-				new FragmentShader(fragmentShaderText.Replace('$', '#'))
-			};
+					new VertexShader(vertexShaderText),
+					new FragmentShader(fragmentShaderText)
+				};
 			}
 
 			public const int GradientMapTextureSize = 256;
