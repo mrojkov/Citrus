@@ -85,6 +85,7 @@ namespace Tangerine.Core.Operations
 	{
 		public readonly int Frame;
 		public readonly IAnimator Animator;
+		public readonly IAnimable Owner;
 
 		public override bool IsChangingDocument => true;
 
@@ -97,6 +98,7 @@ namespace Tangerine.Core.Operations
 		{
 			Frame = frame;
 			Animator = animator;
+			Owner = Animator.Owner;
 		}
 
 		public class Processor : OperationProcessor<RemoveKeyframe>
@@ -108,11 +110,18 @@ namespace Tangerine.Core.Operations
 				var kf = op.Animator.Keys.FirstOrDefault(k => k.Frame == op.Frame);
 				op.Save(new Backup { Keyframe = kf });
 				op.Animator.Keys.Remove(kf);
-				op.Animator.ResetCache();
+				if (op.Animator.Keys.Count == 0) {
+					op.Owner.Animators.Remove(op.Animator);
+				} else {
+					op.Animator.ResetCache();
+				}
 			}
 
 			protected override void InternalUndo(RemoveKeyframe op)
 			{
+				if (op.Animator.Owner == null) {
+					op.Owner.Animators.Add(op.Animator);
+				}
 				op.Animator.Keys.AddOrdered(op.Restore<Backup>().Keyframe);
 				op.Animator.ResetCache();
 			}
