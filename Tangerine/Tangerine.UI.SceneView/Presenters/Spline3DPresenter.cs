@@ -13,7 +13,7 @@ namespace Tangerine.UI.SceneView
 
 		protected override void InternalRender(Viewport3D viewport)
 		{
-			if (Document.Current.Container.IsRunning) {
+			if (Document.Current.PreviewAnimation) {
 				return;
 			}
 			foreach (var spline in viewport.Descendants.OfType<Spline3D>()) {

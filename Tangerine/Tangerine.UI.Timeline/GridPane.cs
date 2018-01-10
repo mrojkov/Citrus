@@ -145,7 +145,7 @@ namespace Tangerine.UI.Timeline
 			ContentWidget.PrepareRendererState();
 			Renderer.DrawLine(
 				x, 0, x, ContentWidget.Height - 1,
-				Document.Current.Container.IsRunning ? 
+				Document.Current.PreviewAnimation ? 
 				ColorTheme.Current.TimelineRuler.RunningCursor : 
 				ColorTheme.Current.TimelineRuler.Cursor);
 		}

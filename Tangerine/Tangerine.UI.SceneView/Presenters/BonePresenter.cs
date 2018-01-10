@@ -32,7 +32,7 @@ namespace Tangerine.UI.SceneView
 
 		void Render(Widget canvas)
 		{
-			if (Document.Current.Container.IsRunning || Document.Current.ExpositionMode) {
+			if (Document.Current.PreviewAnimation || Document.Current.ExpositionMode) {
 				return;
 			}
 			canvas.PrepareRendererState();

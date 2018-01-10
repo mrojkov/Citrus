@@ -15,7 +15,7 @@ namespace Tangerine.UI.SceneView
 		{
 			if (
 				Core.Document.Current.ExpositionMode ||
-				Core.Document.Current.Container.IsRunning
+				Core.Document.Current.PreviewAnimation
 			) {
 				return;
 			}

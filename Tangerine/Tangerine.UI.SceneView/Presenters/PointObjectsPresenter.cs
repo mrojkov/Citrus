@@ -21,7 +21,7 @@ namespace Tangerine.UI.SceneView
 		{
 			if (
 				Document.Current.ExpositionMode ||
-				Document.Current.Container.IsRunning ||
+				Document.Current.PreviewAnimation ||
 				!Document.Current.Container.Nodes.Any(i => i is PointObject)
 			) {
 				return;
