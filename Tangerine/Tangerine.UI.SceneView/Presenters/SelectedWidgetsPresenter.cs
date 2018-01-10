@@ -30,12 +30,12 @@ namespace Tangerine.UI.SceneView
 			foreach (var widget in widgets) {
 				var t = NodeIconPool.GetTexture(widget.GetType());
 				var h = widget.CalcHullInSpaceOf(canvas);
-				var p = (h.V1 + h.V3) / 2;
 				for (int i = 0; i < 4; i++) {
 					var a = h[i];
 					var b = h[(i + 1) % 4];
 					Renderer.DrawLine(a, b, ColorTheme.Current.SceneView.SelectedWidget, 1);
 				}
+				var p = widget.CalcPositionInSpaceOf(canvas);
 				Renderer.DrawSprite(t, Color4.White, p - iconSize / 2, iconSize, Vector2.Zero, Vector2.One);
 			}
 			Quadrangle hull;
