@@ -37,7 +37,7 @@ namespace Lime
 
 	public class DefaultAnimationEngine : AnimationEngine
 	{
-		public static readonly DefaultAnimationEngine Instance = new DefaultAnimationEngine();
+		public static DefaultAnimationEngine Instance = new DefaultAnimationEngine();
 
 		public override bool TryRunAnimation(Animation animation, string markerId, double animationTimeCorrection = 0)
 		{
@@ -84,7 +84,7 @@ namespace Lime
 			}
 		}
 
-		private static double? GetNextMarkerOrTriggerTime(Animation animation, int nextFrame)
+		protected double? GetNextMarkerOrTriggerTime(Animation animation, int nextFrame)
 		{
 			int? nextMarkerOrTriggerFrame = null;
 			foreach (var marker in animation.Markers) {
@@ -114,7 +114,7 @@ namespace Lime
 			return nextMarkerOrTriggerFrame * AnimationUtils.SecondsPerFrame;
 		}
 
-		private void ProcessMarker(Animation animation, Marker marker)
+		protected void ProcessMarker(Animation animation, Marker marker)
 		{
 			if ((animation.Owner.TangerineFlags & TangerineFlags.IgnoreMarkers) != 0) {
 				return;
@@ -156,6 +156,38 @@ namespace Lime
 				}
 				if (animation.Id != null) {
 					ApplyAnimators(child, animation, invokeTriggers);
+				}
+			}
+		}
+	}
+
+	public class FastForwardAnimationEngine : DefaultAnimationEngine
+	{
+		public override void AdvanceAnimation(Animation animation, float delta)
+		{
+			var previousTime = animation.TimeInternal;
+			var currentTime = previousTime + delta;
+			animation.TimeInternal = currentTime;
+			if (!animation.NextMarkerOrTriggerTime.HasValue) {
+				var frameIndex = AnimationUtils.SecondsToFrames(currentTime);
+				var frameTime = AnimationUtils.SecondsPerFrame * frameIndex;
+				var stepOverFrame = previousTime <= frameTime && frameTime <= currentTime;
+				animation.NextMarkerOrTriggerTime = GetNextMarkerOrTriggerTime(animation, frameIndex + (stepOverFrame ? 0 : 1));
+			}
+
+			if (!animation.NextMarkerOrTriggerTime.HasValue || currentTime <= animation.NextMarkerOrTriggerTime.Value) {
+				// do nothing
+			} else {
+				var frameTime = animation.NextMarkerOrTriggerTime.Value;
+				var frameIndex = AnimationUtils.SecondsToFrames(frameTime);
+				animation.NextMarkerOrTriggerTime = null;
+				var currentMarker = animation.Markers.GetByFrame(frameIndex);
+				if (currentMarker != null) {
+					ProcessMarker(animation, currentMarker);
+				}
+				ApplyAnimators(animation, invokeTriggers: true, animationTimeCorrection: previousTime - frameTime);
+				if (!animation.IsRunning) {
+					animation.RaiseStopped();
 				}
 			}
 		}
