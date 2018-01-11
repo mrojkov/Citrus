@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Yuzu;
 
 namespace Lime
@@ -80,23 +79,5 @@ namespace Lime
 		}
 
 		IKeyframe IKeyframe.Clone() => Clone();
-
-		public override bool Equals(object obj)
-		{
-			var keyframe = obj as Keyframe<T>;
-			return keyframe != null &&
-				   Frame == keyframe.Frame &&
-				   Function == keyframe.Function &&
-				   EqualityComparer<T>.Default.Equals(Value, keyframe.Value);
-		}
-
-		public override int GetHashCode()
-		{
-			var hashCode = 384731617;
-			hashCode = hashCode * -1521134295 + Frame.GetHashCode();
-			hashCode = hashCode * -1521134295 + Function.GetHashCode();
-			hashCode = hashCode * -1521134295 + EqualityComparer<T>.Default.GetHashCode(Value);
-			return hashCode;
-		}
 	}
 }
