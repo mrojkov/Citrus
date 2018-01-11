@@ -55,7 +55,7 @@ namespace Tangerine.UI.SceneView
 						startStates[i].Restore(widgets[i]);
 					}
 					if (sv.Input.IsKeyPressed(Key.Control)) {
-						RescaleWidgets(hull, widgets.Count <= 1, widgets, controlPointIndex, sv.MousePosition, mouseStartPos,
+						RescaleWidgets(hull, widgets.Count <= 1, pivot, widgets, controlPointIndex, sv.MousePosition, mouseStartPos,
 							proportional);
 					} else {
 						foreach (Widget widget in widgets) {
@@ -161,12 +161,12 @@ namespace Tangerine.UI.SceneView
 			Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Size), size);
 		}
 
-		void RescaleWidgets(Quadrangle originalHull, bool hullInFirstWidgetSpace, List<Widget> widgets, int controlPointIndex,
+		void RescaleWidgets(Quadrangle originalHull, bool hullInFirstWidgetSpace, Vector2 hullsPivotPoint, List<Widget> widgets, int controlPointIndex,
 			Vector2 curMousePos, Vector2 prevMousePos, bool proportional)
 		{
 			Utils.ApplyTransformationToWidgetsGroupOobb(
 				sv.Scene,
-				widgets, originalHull[LookupPivotIndex[controlPointIndex] / 2], hullInFirstWidgetSpace, curMousePos, prevMousePos,
+				widgets, hullsPivotPoint, hullInFirstWidgetSpace, curMousePos, prevMousePos,
 				(originalVectorInOobbSpace, deformedVectorInOobbSpace) => {
 					Vector2 deformationScaleInOobbSpace =
 							new Vector2(
