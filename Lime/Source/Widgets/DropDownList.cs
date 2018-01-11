@@ -129,11 +129,13 @@ namespace Lime
 #endif
 		}
 
-		private void SetIndex(int t, bool changedByUser = false)
+		private void SetIndex(int index, bool changedByUser = false)
 		{
-			index = t;
-			RefreshTextWidget();
-			RaiseChanged(changedByUser);
+			if (this.index != index) {
+				this.index = index;
+				RefreshTextWidget();
+				RaiseChanged(changedByUser);
+			}
 		}
 
 		protected void RaiseChanged(bool changedByUser = false)

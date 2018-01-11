@@ -55,9 +55,11 @@ namespace Lime
 
 		private void SetChecked(bool @checked, bool changedByUser = false)
 		{
-			this.@checked = @checked;
-			RiseChanged(changedByUser);
-			Window.Current.Invalidate();
+			if (this.@checked != @checked) {
+				this.@checked = @checked;
+				RiseChanged(changedByUser);
+				Window.Current.Invalidate();
+			}
 		}
 
 		protected void RiseChanged(bool changedByUser = false)
