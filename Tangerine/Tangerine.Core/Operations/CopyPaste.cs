@@ -90,6 +90,10 @@ namespace Tangerine.Core.Operations
 			if (!string.IsNullOrEmpty(data)) {
 				Perform(data, loc);
 			}
+
+			foreach (var node in Document.Current.SelectedNodes()) {
+				Document.Current.RefreshExternalScenes(node);
+			}
 		}
 
 		public static bool CanPaste(string data, RowLocation location)

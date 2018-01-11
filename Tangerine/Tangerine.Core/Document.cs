@@ -228,7 +228,7 @@ namespace Tangerine.Core
 
 		public void RefreshExternalScenes() => RefreshExternalScenes(RootNode);
 
-		void RefreshExternalScenes(Node node)
+		public void RefreshExternalScenes(Node node)
 		{
 			if (!string.IsNullOrEmpty(node.ContentsPath)) {
 				var doc = Project.Current.Documents.FirstOrDefault(i => i.Path == node.ContentsPath);
