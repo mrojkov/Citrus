@@ -8,15 +8,28 @@ namespace Tangerine
 	public class UserPreferences : Component
 	{
 		[YuzuRequired]
-		public UI.DockManager.State DockState = new UI.DockManager.State();
+		public UI.DockManager.State DockState;
 
 		[YuzuRequired]
-		public readonly List<string> RecentProjects = new List<string>();
+		public readonly List<string> RecentProjects;
 
 		[YuzuRequired]
 		public ColorThemeEnum Theme { get; set; }
 
 		[YuzuRequired]
-		public Vector2 DefaultSceneDimensions { get; set; } = new Vector2(1024, 768);
+		public Vector2 DefaultSceneDimensions { get; set; }
+
+		public UserPreferences()
+		{
+			DockState = new UI.DockManager.State();
+			RecentProjects = new List<string>();
+			ResetToDefaults();
+		}
+
+		internal void ResetToDefaults()
+		{
+			Theme = ColorThemeEnum.Light;
+			DefaultSceneDimensions = new Vector2(1024, 768);
+		}
 	}
 }

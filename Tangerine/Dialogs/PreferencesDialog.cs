@@ -13,6 +13,7 @@ namespace Tangerine
 		readonly WindowWidget rootWidget;
 		readonly Button okButton;
 		readonly Button cancelButton;
+		readonly Button resetButton;
 		readonly ColorThemeEnum theme;
 		readonly Frame Frame;
 		readonly TabbedWidget Content;
@@ -42,8 +43,10 @@ namespace Tangerine
 					Content,
 					new Widget {
 						Layout = new HBoxLayout { Spacing = 8 },
-						LayoutCell = new LayoutCell(Alignment.RightCenter),
+						LayoutCell = new LayoutCell(Alignment.LeftCenter),
 						Nodes = {
+							(resetButton = new ThemedButton { Text = "Reset To Defaults", MinMaxWidth = 150f }),
+							new Widget { MinMaxHeight = 0 },
 							(okButton = new ThemedButton { Text = "Ok" }),
 							(cancelButton = new ThemedButton { Text = "Cancel" }),
 						}
@@ -57,6 +60,11 @@ namespace Tangerine
 				}
 				Core.UserPreferences.Instance.Save();
 			};
+			resetButton.Clicked += () => {
+				if (new AlertDialog($"Are you sure you want to reset to defaults?", "Yes", "Cancel").Show() == 0) {
+					ResetToDefaults();
+				}
+			};
 			cancelButton.Clicked += () => {
 				window.Close();
 				Core.UserPreferences.Instance.Load();
@@ -69,6 +77,13 @@ namespace Tangerine
 				}
 			});
 			okButton.SetFocus();
+		}
+
+		private static void ResetToDefaults()
+		{
+			Core.UserPreferences.Instance.Get<UserPreferences>().ResetToDefaults();
+			Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>().ResetToDefaults();
+			Core.UserPreferences.Instance.Get<UI.Timeline.UserPreferences>().ResetToDefaults();
 		}
 
 		private Widget CreateColorsPane()
@@ -129,7 +144,6 @@ namespace Tangerine
 				});
 			tmp.ContainerWidget.AddChangeWatcher(
 				new Property<Color4>(source, targetProperty), (v) => Application.InvalidateWindows());
-
 		}
 
 		Widget CreateGeneralPane()

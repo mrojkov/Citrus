@@ -14,15 +14,30 @@ namespace Tangerine.UI.Timeline
 		public bool AnimationMode { get; set; }
 
 		[YuzuRequired]
-		public float ColWidth { get; set; } = 15;
+		public float ColWidth { get; set; }
 
 		[YuzuRequired]
-		public bool EditCurves { get; set; } = true;
+		public bool EditCurves { get; set; }
 
 		[YuzuRequired]
-		public List<float> TimelineVSplitterStretches = new List<float>();
+		public List<float> TimelineVSplitterStretches;
 
 		[YuzuRequired]
-		public List<float> TimelineHSplitterStretches = new List<float>();
+		public List<float> TimelineHSplitterStretches;
+
+		public UserPreferences()
+		{
+			ResetToDefaults();
+		}
+
+		public void ResetToDefaults()
+		{
+			ColWidth = 15;
+			EditCurves = true;
+			AutoKeyframes = false;
+			AnimationMode = false;
+			TimelineVSplitterStretches = new List<float>();
+			TimelineHSplitterStretches = new List<float>();
+		}
 	}
 }
