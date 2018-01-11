@@ -232,11 +232,11 @@ namespace Tangerine.UI
 
 			public void Restore(Widget widget)
 			{
-				widget.Position = Position;
-				widget.Rotation = Rotation;
-				widget.Scale = Scale;
-				widget.Size = Size;
-				widget.Pivot = Pivot;
+				SetAnimableProperty.Perform(widget, nameof(Widget.Position), Position);
+				SetAnimableProperty.Perform(widget, nameof(Widget.Rotation), Rotation);
+				SetAnimableProperty.Perform(widget, nameof(Widget.Scale), Scale);
+				SetAnimableProperty.Perform(widget, nameof(Widget.Size), Size);
+				SetAnimableProperty.Perform(widget, nameof(Widget.Pivot), Pivot);
 			}
 		}
 
