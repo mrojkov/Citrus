@@ -246,6 +246,8 @@ namespace Tangerine.UI.SceneView
 				public void Dispose()
 				{
 					originalWidget.SetTangerineFlag(TangerineFlags.HiddenOnExposition, false);
+					// Dispose cloned object to preserve keyframes identity in the original node. See Animator.Dispose().
+					exposedWidget.UnlinkAndDispose();
 				}
 
 				public void Morph(float morphKoeff)
