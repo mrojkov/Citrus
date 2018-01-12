@@ -483,7 +483,7 @@ namespace Yuzu.Json
 							ReadIntoDictionary(result.Fields);
 						return result;
 					}
-					return ReadFields(Activator.CreateInstance(t), GetNextName(first: false), true);
+					return ReadFields(Activator.CreateInstance(t), GetNextName(first: false));
 				case '[':
 					return ReadList<object>();
 				default:
@@ -671,150 +671,96 @@ namespace Yuzu.Json
 			return cmp;
 		}
 
-		protected virtual object ReadFields(object obj, string name, bool allowRecreate)
+		protected virtual object ReadFields(object obj, string name)
 		{
 			var meta = Meta.Get(obj.GetType(), Options);
-			object savedPosition = SavePosition();
-			string savedName = name;
+			objStack.Push(obj);
 			try {
-				objStack.Push(obj);
-				try {
-					// Optimization: duplicate loop to extract options check.
-					if (JsonOptions.Unordered) {
-						var storage = !Options.AllowUnknownFields || meta.GetUnknownStorage == null ?
-							NullYuzuUnknownStorage.Instance : meta.GetUnknownStorage(obj);
-						storage.Clear();
-						while (name != "") {
-							Meta.Item yi;
-							if (!meta.TagToItem.TryGetValue(name, out yi)) {
-								if (!Options.AllowUnknownFields)
-									throw Error("Unknown field '{0}'", name);
-								storage.Add(name, ReadAnyObject());
-								name = GetNextName(false);
-								continue;
-							}
-							if (yi.SetValue != null)
-								yi.SetValue(obj, ReadValueFunc(yi.Type)());
-							else
-								MergeValueFunc(yi.Type)(yi.GetValue(obj));
+				// Optimization: duplicate loop to extract options check.
+				if (JsonOptions.Unordered) {
+					var storage = !Options.AllowUnknownFields || meta.GetUnknownStorage == null ?
+						NullYuzuUnknownStorage.Instance : meta.GetUnknownStorage(obj);
+					storage.Clear();
+					while (name != "") {
+						Meta.Item yi;
+						if (!meta.TagToItem.TryGetValue(name, out yi)) {
+							if (!Options.AllowUnknownFields)
+								throw Error("Unknown field '{0}'", name);
+							storage.Add(name, ReadAnyObject());
 							name = GetNextName(false);
+							continue;
 						}
-					}
-					else if (Options.AllowUnknownFields) {
-						var storage = meta.GetUnknownStorage == null ?
-							NullYuzuUnknownStorage.Instance : meta.GetUnknownStorage(obj);
-						storage.Clear();
-						foreach (var yi in meta.Items) {
-							if (ReadUnknownFields(storage, yi.Tag(Options), ref name) != 0) {
-								if (!yi.IsOptional)
-									throw Error("Expected field '{0}', but found '{1}'", yi.NameTagged(Options), name);
-								continue;
-							}
-							if (yi.SetValue != null)
-								yi.SetValue(obj, ReadValueFunc(yi.Type)());
-							else
-								MergeValueFunc(yi.Type)(yi.GetValue(obj));
-							name = GetNextName(false);
-						}
-						ReadUnknownFieldsTail(storage, name);
-					}
-					else {
-						foreach (var yi in meta.Items) {
-							if (yi.Tag(Options) != name) {
-								if (!yi.IsOptional)
-									throw Error("Expected field '{0}', but found '{1}'", yi.NameTagged(Options), name);
-								continue;
-							}
-							if (yi.SetValue != null)
-								yi.SetValue(obj, ReadValueFunc(yi.Type)());
-							else
-								MergeValueFunc(yi.Type)(yi.GetValue(obj));
-							name = GetNextName(false);
-						}
+						if (yi.SetValue != null)
+							yi.SetValue(obj, ReadValueFunc(yi.Type)());
+						else
+							MergeValueFunc(yi.Type)(yi.GetValue(obj));
+						name = GetNextName(false);
 					}
 				}
-				finally {
-					objStack.Pop();
-				}
-				meta.AfterDeserialization.Run(obj);
-
-			} catch (Exception) {
-				if (meta.MigrateOnDeserializationException == null || savedPosition == null) throw;
-
-				obj = ApplyYuzuMigration(meta.MigrateOnDeserializationException, meta.Type, obj, savedPosition, allowRecreate, 
-					surrogate => ReadFields(surrogate, savedName, true));
-			}
-			
-			obj = ApplyYuzuMigrateOnDeserializationValidation(obj, allowRecreate, meta, savedPosition, surrogate => ReadFields(surrogate, savedName, true));
-			
-			return obj;
-		}
-
-		protected virtual object ReadFieldsCompact(object obj, bool allowRecreate)
-		{
-			var meta = Meta.Get(obj.GetType(), Options);
-			object savedPosition = SavePosition();
-			try {
-				if (!meta.IsCompact) {
-					if (meta.Surrogate.FuncFrom == null)
-						throw Error("Attempt to read non-compact type '{0}' from compact format", obj.GetType().Name);
-					return meta.Surrogate.FuncFrom(
-						ReadFieldsCompact(Activator.CreateInstance(meta.Surrogate.SurrogateType), true));
-				}
-				bool isFirst = true;
-				objStack.Push(obj);
-				try {
+				else if (Options.AllowUnknownFields) {
+					var storage = meta.GetUnknownStorage == null ?
+						NullYuzuUnknownStorage.Instance : meta.GetUnknownStorage(obj);
+					storage.Clear();
 					foreach (var yi in meta.Items) {
-						if (!isFirst)
-							Require(',');
-						isFirst = false;
-						yi.SetValue(obj, ReadValueFunc(yi.Type)());
+						if (ReadUnknownFields(storage, yi.Tag(Options), ref name) != 0) {
+							if (!yi.IsOptional)
+								throw Error("Expected field '{0}', but found '{1}'", yi.NameTagged(Options), name);
+							continue;
+						}
+						if (yi.SetValue != null)
+							yi.SetValue(obj, ReadValueFunc(yi.Type)());
+						else
+							MergeValueFunc(yi.Type)(yi.GetValue(obj));
+						name = GetNextName(false);
 					}
+					ReadUnknownFieldsTail(storage, name);
 				}
-				finally {
-					objStack.Pop();
-				}
-				Require(']');
-				meta.AfterDeserialization.Run(obj);
-
-			} catch (Exception) {
-				if (meta.MigrateOnDeserializationException == null || savedPosition == null) throw;
-
-				obj = ApplyYuzuMigration(meta.MigrateOnDeserializationException, meta.Type, obj, savedPosition, allowRecreate, 
-					surrogate => ReadFieldsCompact(surrogate, true));
-			}
-
-			obj = ApplyYuzuMigrateOnDeserializationValidation(obj, allowRecreate, meta, savedPosition, surrogate => ReadFieldsCompact(surrogate, true));
-
-			return obj;
-		}
-
-		private object ApplyYuzuMigrateOnDeserializationValidation(object obj, bool allowRecreate, Meta meta,
-			object savedPosition, Func<object, object> readFieldsAction)
-		{
-			if (meta.MigrateOnDeserializationValidation != null && savedPosition != null) {
-				foreach (Meta.ValidationItem validationItem in meta.MigrateOnDeserializationValidation) {
-					if (!validationItem.Invoke(obj)) {
-						obj = ApplyYuzuMigration(validationItem.Attr, meta.Type, obj, savedPosition, allowRecreate,
-							readFieldsAction);
+				else {
+					foreach (var yi in meta.Items) {
+						if (yi.Tag(Options) != name) {
+							if (!yi.IsOptional)
+								throw Error("Expected field '{0}', but found '{1}'", yi.NameTagged(Options), name);
+							continue;
+						}
+						if (yi.SetValue != null)
+							yi.SetValue(obj, ReadValueFunc(yi.Type)());
+						else
+							MergeValueFunc(yi.Type)(yi.GetValue(obj));
+						name = GetNextName(false);
 					}
 				}
 			}
+			finally {
+				objStack.Pop();
+			}
+			meta.AfterDeserialization.Run(obj);
 			return obj;
 		}
 
-		private object ApplyYuzuMigration(YuzuMigration yuzuMigration, Type resultType, object obj, object savedPosition, bool allowRecreate, Func<object, object> readFieldsAction)
+		protected virtual object ReadFieldsCompact(object obj)
 		{
-			RestorePosition(savedPosition);
-
-			object surrogate = Activator.CreateInstance(yuzuMigration.PreviousVersionTypeSurrogate);
-			if (allowRecreate && yuzuMigration.RecreateIfAllowed) {
-				obj = Activator.CreateInstance(resultType);
+			var meta = Meta.Get(obj.GetType(), Options);
+			if (!meta.IsCompact) {
+				if (meta.Surrogate.FuncFrom == null)
+					throw Error("Attempt to read non-compact type '{0}' from compact format", obj.GetType().Name);
+				return meta.Surrogate.FuncFrom(
+					ReadFieldsCompact(Activator.CreateInstance(meta.Surrogate.SurrogateType)));
 			}
-
-			surrogate = readFieldsAction(surrogate);
-
-			yuzuMigration.MethodInfoApplyToNewer.Invoke(surrogate, new[] {obj});
+			bool isFirst = true;
+			objStack.Push(obj);
+			try {
+				foreach (var yi in meta.Items) {
+					if (!isFirst)
+						Require(',');
+					isFirst = false;
+					yi.SetValue(obj, ReadValueFunc(yi.Type)());
+				}
+			}
+			finally {
+				objStack.Pop();
+			}
+			Require(']');
+			meta.AfterDeserialization.Run(obj);
 			return obj;
 		}
 
@@ -849,15 +795,15 @@ namespace Yuzu.Json
 				case '{':
 					var name = GetNextName(first: true);
 					if (name != JsonOptions.ClassTag)
-						return (T)ReadFields(new T(), name, true);
+						return (T)ReadFields(new T(), name);
 					var typeName = RequireUnescapedString();
 					var t = FindType(typeName);
 					if (typeof(T).IsAssignableFrom(t))
-						return (T)ReadFields(Activator.CreateInstance(t), GetNextName(first: false), true);
+						return (T)ReadFields(Activator.CreateInstance(t), GetNextName(first: false));
 					return (T)GetSurrogate<T>(t).FuncFrom(
-						ReadFields(Activator.CreateInstance(t), GetNextName(first: false), true));
+						ReadFields(Activator.CreateInstance(t), GetNextName(first: false)));
 				case '[':
-					return (T)ReadFieldsCompact(new T(), true);
+					return (T)ReadFieldsCompact(new T());
 				case '"':
 					PutBack(ch);
 					return (T)GetSurrogate<T>(typeof(string)).FuncFrom(RequireString());
@@ -880,15 +826,15 @@ namespace Yuzu.Json
 				case '{':
 					var name = GetNextName(first: true);
 					if (name != JsonOptions.ClassTag) {
-						ReadFields(obj, name, false);
+						ReadFields(obj, name);
 					}
 					else {
 						CheckExpectedType(RequireUnescapedString(), typeof(T));
-						ReadFields(obj, GetNextName(first: false), false);
+						ReadFields(obj, GetNextName(first: false));
 					}
 					return;
 				case '[':
-					ReadFieldsCompact(obj, false);
+					ReadFieldsCompact(obj);
 					return;
 				default:
 					throw new YuzuAssert();
@@ -904,7 +850,7 @@ namespace Yuzu.Json
 			var t = FindType(typeName);
 			if (!typeof(T).IsAssignableFrom(t))
 				throw Error("Expected interface '{0}', but got '{1}'", typeof(T).Name, typeName);
-			return (T)ReadFields(Activator.CreateInstance(t), GetNextName(first: false), true);
+			return (T)ReadFields(Activator.CreateInstance(t), GetNextName(first: false));
 		}
 
 		private object ReadStruct<T>() where T : new()
@@ -914,11 +860,11 @@ namespace Yuzu.Json
 				case '{':
 					var name = GetNextName(first: true);
 					if (name != JsonOptions.ClassTag)
-						return ReadFields(obj, name, true);
+						return ReadFields(obj, name);
 					CheckExpectedType(RequireUnescapedString(), typeof(T));
-					return ReadFields(obj, GetNextName(first: false), true);
+					return ReadFields(obj, GetNextName(first: false));
 				case '[':
-					return ReadFieldsCompact(obj, true);
+					return ReadFieldsCompact(obj);
 				default:
 					throw new YuzuAssert();
 			}
@@ -943,9 +889,9 @@ namespace Yuzu.Json
 					}
 					var name = GetNextName(first: true);
 					if (name != JsonOptions.ClassTag)
-						return ReadFields(obj, name, false);
+						return ReadFields(obj, name);
 					CheckExpectedType(RequireUnescapedString(), expectedType);
-					return ReadFields(obj, GetNextName(first: false), false);
+					return ReadFields(obj, GetNextName(first: false));
 				case '[':
 					var icoll = Utils.GetICollection(expectedType);
 					if (icoll != null) {
@@ -953,7 +899,7 @@ namespace Yuzu.Json
 						m.Invoke(this, new object[] { obj });
 						return obj;
 					}
-					return ReadFieldsCompact(obj, false);
+					return ReadFieldsCompact(obj);
 				default:
 					throw new YuzuAssert();
 			}

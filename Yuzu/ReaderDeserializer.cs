@@ -121,25 +121,5 @@ namespace Yuzu.Deserializer
 				throw Error("Unknown action '{0}'", name);
 			return (Action<T>)Delegate.CreateDelegate(typeof(Action<T>), obj, m);
 		}
-
-		/// <summary>
-		/// Saves current deserializer state to restore it later.
-		/// </summary>
-		/// <returns>Deserializer state or null if save is not supported</returns>
-		protected virtual object SavePosition()
-		{
-			if (!Reader.BaseStream.CanSeek) return null;
-			return Reader.BaseStream.Position;
-		}
-
-		/// <summary>
-		/// Applies previously saved state
-		/// </summary>
-		protected virtual void RestorePosition(object position)
-		{
-			if (position == null || !Reader.BaseStream.CanSeek) return;
-			Reader.BaseStream.Position = (long) position;
-		}
-		
 	}
 }

@@ -242,29 +242,22 @@ namespace Yuzu.Binary
 		protected Action<T> ReadAction<T>() { return GetAction<T>(Reader.ReadString()); }
 
 		// Zeroth element corresponds to 'null'.
-		// Second Param is SavedPosition in stream since which ClassDef can be read again
-		private List<KeyValuePair<ReaderClassDef, object>> classDefsWithPositions = new List<KeyValuePair<ReaderClassDef, object>> { new KeyValuePair<ReaderClassDef, object>(new ReaderClassDef(), null) };
-
-		// classId -> surrogateType -> classDef
-		private readonly Dictionary<int, Dictionary<Type, ReaderClassDef>> classDefForSurrogateType = new Dictionary<int, Dictionary<Type, ReaderClassDef>>();
+		private List<ReaderClassDef> classDefs = new List<ReaderClassDef> { new ReaderClassDef() };
 
 		protected virtual void PrepareReaders(ReaderClassDef def)
 		{
 			def.ReadFields = ReadFields;
 		}
 
-		public void ClearClassIds() { classDefsWithPositions = new List<KeyValuePair<ReaderClassDef, object>> { new KeyValuePair<ReaderClassDef, object>(new ReaderClassDef(), null) }; }
+		public void ClearClassIds() { classDefs = new List<ReaderClassDef> { new ReaderClassDef() }; }
 
 		private ReaderClassDef GetClassDefUnknown(string typeName)
 		{
-			short classId = (short) classDefsWithPositions.Count;
-			object savedPosition = SavePosition();
-
 			var result = new ReaderClassDef {
 				Meta = Meta.Unknown,
 				Make = (bd, def) => {
 					var obj = new YuzuUnknownBinary { ClassTag = typeName, Def = def };
-					obj = (YuzuUnknownBinary) ReadObjectFieldsWithMigrationCheck(classId, def, obj, true, true);
+					ReadFields(bd, def, obj);
 					return obj;
 				},
 			};
@@ -278,7 +271,7 @@ namespace Yuzu.Binary
 					ReadFunc = obj => ((YuzuUnknown)obj).Fields[theirName] = rf()
 				});
 			}
-			classDefsWithPositions.Add(new KeyValuePair<ReaderClassDef, object>(result, savedPosition));
+			classDefs.Add(result);
 			return result;
 		}
 
@@ -295,58 +288,17 @@ namespace Yuzu.Binary
 			def.Fields.Add(fd);
 		}
 
-		private ReaderClassDef GetClassDef(short classId, Type forSurrogateType = null)
+		private ReaderClassDef GetClassDef(short classId)
 		{
-			if (forSurrogateType != null) {
-				Dictionary<Type, ReaderClassDef> defsByType;
-				ReaderClassDef def;
-				if (classDefForSurrogateType.TryGetValue(classId, out defsByType) &&
-					defsByType.TryGetValue(forSurrogateType, out def)) return def;
-
-				GetClassDef(classId);
-
-				object storedPosition = classDefsWithPositions[classId].Value;
-				if (storedPosition == null) {
-					throw Error("Cannot use class surrogate for not seekable stream {0}", forSurrogateType);
-				}
-
-				object wasPosition = SavePosition();
-				RestorePosition(storedPosition);
-
-				ReaderClassDef classDef = ReadClassDef(forSurrogateType, TypeSerializer.Serialize(forSurrogateType));
-				if (defsByType == null) {
-					defsByType = new Dictionary<Type, ReaderClassDef>();
-					classDefForSurrogateType[classId] = defsByType;
-				}
-				defsByType[forSurrogateType] = classDef;
-
-				RestorePosition(wasPosition);
-
-				return classDef;
-			}
-
-			if (classId < classDefsWithPositions.Count) {
-				return classDefsWithPositions[classId].Key;
-			}
-			if (classId > classDefsWithPositions.Count)
+			if (classId < classDefs.Count)
+				return classDefs[classId];
+			if (classId > classDefs.Count)
 				throw Error("Bad classId: {0}", classId);
 			var typeName = Reader.ReadString();
 			var classType = TypeSerializer.Deserialize(typeName);
 			if (classType == null)
 				return GetClassDefUnknown(typeName);
-
-			object savedPosition = SavePosition();
-
-			ReaderClassDef result = ReadClassDef(classType, typeName);
-
-			classDefsWithPositions.Add(new KeyValuePair<ReaderClassDef, object>(result, savedPosition));
-
-			return result;
-		}
-
-		private ReaderClassDef ReadClassDef(Type classType, string typeName)
-		{
-			ReaderClassDef result = new ReaderClassDef {Meta = Meta.Get(classType, Options)};
+			var result = new ReaderClassDef { Meta = Meta.Get(classType, Options) };
 			PrepareReaders(result);
 			var ourCount = result.Meta.Items.Count;
 			var theirCount = Reader.ReadInt16();
@@ -362,23 +314,23 @@ namespace Yuzu.Binary
 					if (!yi.IsOptional)
 						throw Error("Missing required field {0} for class {1}", ourName, typeName);
 					ourIndex += 1;
-				} else if (cmp > 0) {
+				}
+				else if (cmp > 0) {
 					AddUnknownFieldDef(result, theirName, typeName);
 					theirIndex += 1;
 					theirName = "";
-				} else {
+				}
+				else {
 					if (!ReadCompatibleType(yi.Type))
 						throw Error(
 							"Incompatible type for field {0}, expected {1}", ourName, yi.Type.Name);
 					var fieldDef = new ReaderClassDef.FieldDef {
-						Name = theirName,
-						OurIndex = ourIndex + 1,
-						Type = yi.Type
-					};
+						Name = theirName, OurIndex = ourIndex + 1, Type = yi.Type };
 					if (yi.SetValue != null) {
 						var rf = ReadValueFunc(yi.Type);
 						fieldDef.ReadFunc = obj => yi.SetValue(obj, rf());
-					} else {
+					}
+					else {
 						var mf = MergeValueFunc(yi.Type);
 						fieldDef.ReadFunc = obj => mf(yi.GetValue(obj));
 					}
@@ -400,6 +352,7 @@ namespace Yuzu.Binary
 				AddUnknownFieldDef(result, theirName, typeName);
 				theirName = "";
 			}
+			classDefs.Add(result);
 			return result;
 		}
 
@@ -451,14 +404,14 @@ namespace Yuzu.Binary
 				(!Meta.Get(expectedType, Options).AllowReadingFromAncestor || expectedType.BaseType != def.Meta.Type)
 			)
 				throw Error("Unable to read type {0} into {1}", def.Meta.Type, expectedType);
-			ReadObjectFieldsWithMigrationCheck(classId, def, obj, false);
+			def.ReadFields(this, def, obj);
 		}
 
 		protected void ReadIntoObjectUnchecked<T>(object obj)
 		{
 			var classId = Reader.ReadInt16();
 			var def = GetClassDef(classId);
-			ReadObjectFieldsWithMigrationCheck(classId, def, obj, false);
+			def.ReadFields(this, def, obj);
 		}
 
 		protected object ReadObject<T>() where T : class
@@ -472,8 +425,8 @@ namespace Yuzu.Binary
 			if (def.Make != null)
 				return def.Make(this, def);
 			var result = Activator.CreateInstance(def.Meta.Type);
-
-			return ReadObjectFieldsWithMigrationCheck(classId, def, result, true);
+			def.ReadFields(this, def, result);
+			return result;
 		}
 
 		protected object ReadObjectUnchecked<T>() where T : class
@@ -485,7 +438,8 @@ namespace Yuzu.Binary
 			if (def.Make != null)
 				return def.Make(this, def);
 			var result = Activator.CreateInstance(def.Meta.Type);
-			return ReadObjectFieldsWithMigrationCheck(classId, def, result, true);
+			def.ReadFields(this, def, result);
+			return result;
 		}
 
 		protected void EnsureClassDef(Type t)
@@ -506,7 +460,8 @@ namespace Yuzu.Binary
 			if (def.Make != null)
 				return def.Make(this, def);
 			var result = Activator.CreateInstance(def.Meta.Type);
-			return ReadObjectFieldsWithMigrationCheck(classId, def, result, true);
+			def.ReadFields(this, def, result);
+			return result;
 		}
 
 		protected void ReadIntoStruct<T>(ref T s) where T : struct
@@ -522,7 +477,7 @@ namespace Yuzu.Binary
 				return;
 			}
 			var result = Activator.CreateInstance(def.Meta.Type);
-			result = ReadObjectFieldsWithMigrationCheck(classId, def, result, true);
+			def.ReadFields(this, def, result);
 			s = (T)result;
 		}
 
@@ -535,51 +490,7 @@ namespace Yuzu.Binary
 			if (def.Make != null)
 				return def.Make(this, def);
 			var result = Activator.CreateInstance(def.Meta.Type);
-			result = ReadObjectFieldsWithMigrationCheck(classId, def, result, true);
-			return result;
-		}
-
-		private object ReadObjectFieldsWithMigrationCheck(short classId, ReaderClassDef def, object result, bool allowRecreate, bool readFieldsDirect = false)
-		{
-			object savedPosition = SavePosition();
-			try {
-				if (readFieldsDirect) {
-					ReadFields(this, def, result);
-				} else {
-					def.ReadFields(this, def, result);
-				}
-			} catch (Exception) {
-				if (def.Meta.MigrateOnDeserializationException == null || savedPosition == null) throw;
-
-				result = ApplyYuzuMigration(def.Meta.MigrateOnDeserializationException, classId, def.Meta.Type, result, savedPosition, allowRecreate);
-			}
-
-			if (def.Meta.MigrateOnDeserializationValidation != null && savedPosition != null) {
-				foreach (Meta.ValidationItem validationItem in def.Meta.MigrateOnDeserializationValidation) {
-					if (!validationItem.Invoke(result)) {
-						result = ApplyYuzuMigration(validationItem.Attr, classId, def.Meta.Type, result, savedPosition, allowRecreate);
-					}
-				}
-			}
-
-			return result;
-		}
-
-		private object ApplyYuzuMigration(YuzuMigration yuzuMigration, short classId, Type resultType, object result, object savedPosition, bool allowRecreate)
-		{
-			if (savedPosition == null) return result;
-
-			RestorePosition(savedPosition);
-
-			object surrogate = Activator.CreateInstance(yuzuMigration.PreviousVersionTypeSurrogate);
-			if (allowRecreate && yuzuMigration.RecreateIfAllowed) {
-				result = Activator.CreateInstance(resultType);
-			}
-
-			ReaderClassDef defSurrogate = GetClassDef(classId, yuzuMigration.PreviousVersionTypeSurrogate);
-			surrogate = ReadObjectFieldsWithMigrationCheck(classId, defSurrogate, surrogate, true);
-
-			yuzuMigration.MethodInfoApplyToNewer.Invoke(surrogate, new[] {result});
+			def.ReadFields(this, def, result);
 			return result;
 		}
 
@@ -722,21 +633,6 @@ namespace Yuzu.Binary
 		{
 			if (!IsValidSignature())
 				throw Error("Signature not found");
-		}
-
-		protected override object SavePosition()
-		{
-			object savePosition = base.SavePosition();
-			if (savePosition == null) return null;
-			return new[] {savePosition, new List<KeyValuePair<ReaderClassDef, object>>(classDefsWithPositions)};
-		}
-
-		protected override void RestorePosition(object position)
-		{
-			if (position == null) return;
-			base.RestorePosition(((object[])position)[0]);
-			classDefsWithPositions.Clear();
-			classDefsWithPositions.AddRange((List<KeyValuePair<ReaderClassDef, object>>)((object[])position)[1]);
 		}
 
 	}
