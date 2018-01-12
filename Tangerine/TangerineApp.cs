@@ -81,7 +81,8 @@ namespace Tangerine
 			};
 			Project.DocumentReloadConfirmation += doc => {
 				var alert = new AlertDialog($"The file '{doc.Path}' has been changed outside of Tangerine.\nDo you want to keep your changes, or reload the file from disk?", "Keep", "Reload");
-				return alert.Show() == 0 || alert.Show() == -1 ? false : true;
+				var res = alert.Show();
+				return res == 0 || res == -1 ? false : true;
 			};
 
 			Project.CookingOfModifiedAssetsStarted += () => {
