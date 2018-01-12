@@ -157,15 +157,34 @@ namespace Tangerine.UI.Timeline
 
 		public void RenderSelection(Widget widget, IntVector2 offset)
 		{
+			Vector2 a, b;
+			if (GetSelection(widget, offset, out a, out b)) {
+				Renderer.DrawRect(a, b, ColorTheme.Current.TimelineGrid.Selection);
+				Renderer.DrawRectOutline(a, b, ColorTheme.Current.TimelineGrid.SelectionBorder);
+			}
+		}
+
+		private bool GetSelection(Widget widget, IntVector2 offset, out Vector2 leftTop, out Vector2 rightBottom)
+		{
 			widget.PrepareRendererState();
+			leftTop = Vector2.One * float.MaxValue;
+			rightBottom = Vector2.One * float.MinValue;
+			var anyRow = false;
 			foreach (var row in Document.Current.Rows) {
 				var s = row.Components.GetOrAdd<Components.GridSpanListComponent>().Spans;
 				foreach (var i in s.GetNonOverlappedSpans()) {
+					anyRow = true;
 					var a = CellToGridCoordinates(new IntVector2(i.A, row.Index) + offset);
 					var b = CellToGridCoordinates(new IntVector2(i.B, row.Index + 1) + offset);
-					Renderer.DrawRect(a, b, ColorTheme.Current.TimelineGrid.Selection);
+					if (a.X < leftTop.X || a.Y < leftTop.Y) {
+						leftTop = a;
+					}
+					if (b.X > rightBottom.X || b.Y > rightBottom.Y) {
+						rightBottom = b;
+					}
 				}
 			}
+			return anyRow;
 		}
 
 		public Vector2 CellToGridCoordinates(IntVector2 cell)

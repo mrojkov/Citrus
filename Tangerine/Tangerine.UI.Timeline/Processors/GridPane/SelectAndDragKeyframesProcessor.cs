@@ -151,7 +151,10 @@ namespace Tangerine.UI.Timeline
 		void RenderSelectionRect(Widget widget)
 		{
 			widget.PrepareRendererState();
-			Renderer.DrawRect(grid.CellToGridCoordinates(rect.A), grid.CellToGridCoordinates(rect.B), ColorTheme.Current.TimelineGrid.Selection);
+			var a = grid.CellToGridCoordinates(rect.A);
+			var b = grid.CellToGridCoordinates(rect.B);
+			Renderer.DrawRect(a, b, ColorTheme.Current.TimelineGrid.Selection);
+			Renderer.DrawRectOutline(a, b, ColorTheme.Current.TimelineGrid.SelectionBorder);
 		}
 	}
 }
