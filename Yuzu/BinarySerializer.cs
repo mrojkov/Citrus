@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 using Yuzu.Metadata;
 using Yuzu.Util;
@@ -102,27 +103,35 @@ namespace Yuzu.Binary
 				writer.Write((byte)RoughType.Int);
 				return;
 			}
-			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
-				writer.Write((byte)RoughType.Mapping);
-				var g = t.GetGenericArguments();
-				WriteRoughType(g[0]);
-				WriteRoughType(g[1]);
-				return;
-			}
-			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>)) {
-				writer.Write((byte)RoughType.Nullable);
-				WriteRoughType(t.GetGenericArguments()[0]);
-				return;
+			if (t.IsGenericType) {
+				var g = t.GetGenericTypeDefinition();
+				if (g == typeof(Dictionary<,>)) {
+					writer.Write((byte)RoughType.Mapping);
+					var a = t.GetGenericArguments();
+					WriteRoughType(a[0]);
+					WriteRoughType(a[1]);
+					return;
+				}
+				if (g == typeof(Nullable<>)) {
+					writer.Write((byte)RoughType.Nullable);
+					WriteRoughType(t.GetGenericArguments()[0]);
+					return;
+				}
+				if (g == typeof(IEnumerable<>)) {
+					writer.Write((byte)RoughType.Sequence);
+					WriteRoughType(t.GetGenericArguments()[0]);
+					return;
+				}
 			}
 			if (t.IsArray) {
 				writer.Write((byte)RoughType.Sequence);
 				WriteRoughType(t.GetElementType());
 				return;
 			}
-			var icoll = Utils.GetICollection(t);
-			if (icoll != null) {
+			var ienum = Utils.GetIEnumerable(t);
+			if (ienum != null) {
 				writer.Write((byte)RoughType.Sequence);
-				WriteRoughType(icoll.GetGenericArguments()[0]);
+				WriteRoughType(ienum.GetGenericArguments()[0]);
 				return;
 			}
 			if (t.IsRecord()) {
@@ -172,6 +181,18 @@ namespace Yuzu.Binary
 				wf(a);
 		}
 
+		private void WriteIEnumerable<T>(IEnumerable<T> list, Action<object> wf)
+		{
+			if (list == null) {
+				writer.Write(-1);
+				return;
+			}
+			writer.Write(list.Count());
+			foreach (var a in list)
+				wf(a);
+		}
+
+		// Duplicate WriteIEnumerable to optimize Count.
 		private void WriteCollection<T>(ICollection<T> list, Action<object> wf)
 		{
 			if (list == null) {
@@ -475,6 +496,13 @@ namespace Yuzu.Binary
 			}
 		}
 
+		private Action<object> MakeWriteIEnumerable(Type t)
+		{
+			var wf = GetWriteFunc(t.GetGenericArguments()[0]);
+			var m = Utils.GetPrivateCovariantGeneric(GetType(), nameof(WriteIEnumerable), t);
+			return obj => m.Invoke(this, new object[] { obj, wf });
+		}
+
 		private Action<object> MakeWriteFunc(Type t)
 		{
 			if (t.IsEnum) 
@@ -482,12 +510,11 @@ namespace Yuzu.Binary
 			if (t.IsGenericType) {
 				var g = t.GetGenericTypeDefinition();
 				if (g == typeof(Dictionary<,>)) {
-					var m = Utils.GetPrivateCovariantGenericAll(GetType(), "WriteDictionary", t);
+					var m = Utils.GetPrivateCovariantGenericAll(GetType(), nameof(WriteDictionary), t);
 					return obj => m.Invoke(this, new object[] { obj });
 				}
-				if (g == typeof(Action<>)) {
+				if (g == typeof(Action<>))
 					return WriteAction;
-				}
 				if (g == typeof(Nullable<>)) {
 					var w = GetWriteFunc(t.GetGenericArguments()[0]);
 					return obj => {
@@ -496,23 +523,31 @@ namespace Yuzu.Binary
 							w(obj);
 					};
 				}
+				if (g == typeof(IEnumerable<>))
+					return MakeWriteIEnumerable(t);
 			}
 			if (t.IsArray) {
 				var wf = GetWriteFunc(t.GetElementType());
-				var m = Utils.GetPrivateCovariantGeneric(GetType(), "WriteArray", t);
+				var m = Utils.GetPrivateCovariantGeneric(GetType(), nameof(WriteArray), t);
 				return obj => m.Invoke(this, new object[] { obj, wf });
 			}
-			var icoll = Utils.GetICollection(t);
-			if (icoll != null) {
-				Meta.Get(t, Options); // Check for serializable fields.
-				var wf = GetWriteFunc(icoll.GetGenericArguments()[0]);
-				if (Utils.GetICollectionNG(t) != null)
-					return obj => WriteCollectionNG(obj, wf);
-				var m = Utils.GetPrivateCovariantGeneric(GetType(), "WriteCollection", icoll);
-				return obj => m.Invoke(this, new object[] { obj, wf });
+			var meta = Meta.Get(t, Options);
+			{
+				var icoll = Utils.GetICollection(t);
+				if (icoll != null) {
+					var wf = GetWriteFunc(icoll.GetGenericArguments()[0]);
+					if (Utils.GetICollectionNG(t) != null)
+						return obj => WriteCollectionNG(obj, wf);
+					var m = Utils.GetPrivateCovariantGeneric(GetType(), nameof(WriteCollection), icoll);
+					return obj => m.Invoke(this, new object[] { obj, wf });
+				}
+			}
+			{
+				var ienum = Utils.GetIEnumerable(t);
+				if (ienum != null)
+					return MakeWriteIEnumerable(ienum);
 			}
 			if (Utils.IsStruct(t) || t.IsClass || t.IsInterface) {
-				var meta = Meta.Get(t, Options);
 				if (meta.IsCompact) return WriteObjectCompact;
 				if (meta.GetUnknownStorage == null) return WriteObject;
 				return WriteObjectUnknown;

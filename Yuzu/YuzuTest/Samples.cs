@@ -499,6 +499,12 @@ namespace YuzuTest
 		public SampleCollection<int> B = new SampleCollection<int>();
 	}
 
+	public class SampleIEnumerable
+	{
+		[YuzuRequired]
+		public IEnumerable<int> L = new int[] { 1, 2, 3 };
+	}
+
 	public class SampleBefore
 	{
 		[YuzuRequired]

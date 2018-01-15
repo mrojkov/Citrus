@@ -538,6 +538,20 @@ namespace YuzuTest.Binary
 		}
 
 		[TestMethod]
+		public void TestIEnumerable()
+		{
+			var bs = new BinarySerializer();
+
+			var v0 = new SampleIEnumerable();
+			var result0 = bs.ToBytes(v0);
+			Assert.AreEqual(
+				"20 01 00 " + XS(typeof(SampleIEnumerable)) + " 01 00 " +
+				XS("L", RoughType.Sequence) + " " + XS(RoughType.Int) +
+				" 01 00 03 00 00 00 01 00 00 00 02 00 00 00 03 00 00 00 00 00",
+				XS(result0));
+		}
+
+		[TestMethod]
 		public void TestTopLevelList()
 		{
 			var bs = new BinarySerializer();

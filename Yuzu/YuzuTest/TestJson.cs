@@ -494,6 +494,22 @@ namespace YuzuTest.Json
 		}
 
 		[TestMethod]
+		public void TestIEnumerable()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			var jd = new JsonDeserializer();
+
+			var v0 = new SampleIEnumerable();
+			var result0 = js.ToString(v0);
+			Assert.AreEqual(
+				"{\n" +
+					"\"L\":[\n1,\n2,\n3\n]\n" +
+				"}",
+				result0);
+		}
+
+		[TestMethod]
 		public void TestTopLevelList()
 		{
 			var js = new JsonSerializer();

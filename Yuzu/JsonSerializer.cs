@@ -251,32 +251,31 @@ namespace Yuzu.Json
 				WriteEscapedString(t.ToString(JsonOptions.TimeSpanFormat, CultureInfo.InvariantCulture));
 		}
 
-		private void WriteCollection<T>(object obj)
+		private void WriteIEnumerable<T>(object obj)
 		{
 			if (obj == null) {
 				writer.Write(nullBytes);
 				return;
 			}
-			var list = (ICollection<T>)obj;
+			var list = (IEnumerable<T>)obj;
 			var wf = GetWriteFunc(typeof(T));
 			writer.Write((byte)'[');
-			if (list.Count > 0) {
-				try {
-					depth += 1;
-					var isFirst = true;
-					foreach (var elem in list) {
-						if (!isFirst)
-							writer.Write((byte)',');
-						isFirst = false;
-						WriteFieldSeparator();
-						WriteIndent();
-						wf(elem);
-					}
+			try {
+				depth += 1;
+				var isFirst = true;
+				foreach (var elem in list) {
+					if (!isFirst)
+						writer.Write((byte)',');
+					isFirst = false;
 					WriteFieldSeparator();
+					WriteIndent();
+					wf(elem);
 				}
-				finally {
-					depth -= 1;
-				}
+				if (!isFirst)
+					WriteFieldSeparator();
+			}
+			finally {
+				depth -= 1;
 			}
 			WriteIndent();
 			writer.Write((byte)']');
@@ -364,7 +363,8 @@ namespace Yuzu.Json
 					WriteObject(obj, null);
 				else
 					surrogateWriter(sg.FuncTo(obj));
-			} else
+			}
+			else
 				GetWriteFunc(t)(obj);
 		}
 
@@ -526,7 +526,7 @@ namespace Yuzu.Json
 			if (t.IsGenericType) {
 				var g = t.GetGenericTypeDefinition();
 				if (g == typeof(Dictionary<,>))
-					return MakeDelegate(Utils.GetPrivateCovariantGenericAll(GetType(), "WriteDictionary", t));
+					return MakeDelegate(Utils.GetPrivateCovariantGenericAll(GetType(), nameof(WriteDictionary), t));
 				if (g == typeof(Action<>)) {
 					return WriteAction;
 				}
@@ -534,13 +534,15 @@ namespace Yuzu.Json
 					var w = GetWriteFunc(t.GetGenericArguments()[0]);
 					return obj => WriteNullable(obj, w);
 				}
+				if (g == typeof(IEnumerable<>))
+					return MakeDelegate(Utils.GetPrivateCovariantGeneric(GetType(), nameof(WriteIEnumerable), t));
 			}
 			if (t.IsArray)
-				return MakeDelegate(Utils.GetPrivateCovariantGeneric(GetType(), "WriteArray", t));
-			var icoll = Utils.GetICollection(t);
-			if (icoll != null) {
+				return MakeDelegate(Utils.GetPrivateCovariantGeneric(GetType(), nameof(WriteArray), t));
+			var ienum = Utils.GetIEnumerable(t);
+			if (ienum != null) {
 				Meta.Get(t, Options); // Check for serializable fields.
-				return MakeDelegate(Utils.GetPrivateCovariantGeneric(GetType(), "WriteCollection", icoll));
+				return MakeDelegate(Utils.GetPrivateCovariantGeneric(GetType(), nameof(WriteIEnumerable), ienum));
 			}
 			if (t.IsSubclassOf(typeof(YuzuUnknown)))
 				return WriteUnknown;
