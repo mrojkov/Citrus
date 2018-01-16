@@ -998,16 +998,21 @@ namespace YuzuTest.Binary
 		[TestMethod]
 		public void TestObject()
 		{
+			var bs = new BinarySerializer();
 			var bd = new BinaryDeserializer();
-			var w = new SampleObj();
-			var buf =  SX(
+
+			var v1 = new SampleObj { F = 123.4f };
+			var result1 = bs.ToBytes(v1);
+			Assert.AreEqual(
 				"20 01 00 " + XS(typeof(SampleObj)) + " 01 00 " + XS("F", RoughType.Any) +
-				" 01 00 " + XS(RoughType.Float) + " CD CC F6 42 00 00");
-			bd.FromBytes(w, buf);
-			Assert.AreEqual(123.4f, w.F);
+				" 01 00 " + XS(RoughType.Float) + " CD CC F6 42 00 00", XS(result1));
+
+			var w = new SampleObj();
+			bd.FromBytes(w, result1);
+			Assert.AreEqual(v1.F, w.F);
 			var wg = new SampleObj();
-			(new BinaryDeserializerGen()).FromBytes(wg, buf);
-			Assert.AreEqual(123.4f, wg.F);
+			(new BinaryDeserializerGen()).FromBytes(wg, result1);
+			Assert.AreEqual(v1.F, wg.F);
 
 			bd.FromBytes(w, SX("20 01 00 01 00 21 02 03 00 00 00 01 02 03 00 00"));
 			CollectionAssert.AreEqual(new byte[] { 1, 2, 3 }, (List<byte>)w.F);
