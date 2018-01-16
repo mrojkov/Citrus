@@ -532,12 +532,6 @@ namespace Yuzu.Json
 			return mergerCache[t] = MakeMergerFunc(t);
 		}
 
-		public Func<object> MakeDelegate(MethodInfo m) =>
-			(Func<object>)Delegate.CreateDelegate(typeof(Func<object>), this, m);
-
-		public Action<object> MakeDelegateAction(MethodInfo m) =>
-			(Action<object>)Delegate.CreateDelegate(typeof(Action<object>), this, m);
-
 		private Func<object> MakeReaderFunc(Type t)
 		{
 			if (t == typeof(int))
