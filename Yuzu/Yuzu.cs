@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 
 namespace Yuzu
@@ -291,6 +292,13 @@ namespace Yuzu
 		public abstract string ToString(object obj);
 		public abstract byte[] ToBytes(object obj);
 		public abstract void ToStream(object obj, Stream target);
+
+		protected Action<object> MakeDelegateAction(MethodInfo m) =>
+			(Action<object>)Delegate.CreateDelegate(typeof(Action<object>), this, m);
+
+		protected Action<object, Action<object>> MakeDelegateActionAction(MethodInfo m) =>
+			(Action<object, Action<object>>)
+				Delegate.CreateDelegate(typeof(Action<object, Action<object>>), this, m);
 	}
 
 	public abstract class AbstractWriterSerializer: AbstractSerializer

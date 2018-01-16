@@ -141,12 +141,13 @@ namespace Yuzu.Binary
 			throw new NotImplementedException();
 		}
 
-		private void WriteDictionary<K, V>(Dictionary<K, V> dict)
+		private void WriteDictionary<K, V>(object obj)
 		{
-			if (dict == null) {
+			if (obj == null) {
 				writer.Write(-1);
 				return;
 			}
+			var dict = (Dictionary<K, V>)obj;
 			writer.Write(dict.Count);
 			var wk = GetWriteFunc(typeof(K));
 			var wv = GetWriteFunc(typeof(V));
@@ -170,37 +171,40 @@ namespace Yuzu.Binary
 			writer.Write(a.Method.Name);
 		}
 
-		private void WriteArray<T>(T[] arr, Action<object> wf)
+		private void WriteArray<T>(object obj, Action<object> wf)
 		{
-			if (arr == null) {
+			if (obj == null) {
 				writer.Write(-1);
 				return;
 			}
+			var arr = (T[])obj;
 			writer.Write(arr.Length);
 			foreach (var a in arr)
 				wf(a);
 		}
 
-		private void WriteIEnumerable<T>(IEnumerable<T> list, Action<object> wf)
+		private void WriteIEnumerable<T>(object list, Action<object> wf)
 		{
 			if (list == null) {
 				writer.Write(-1);
 				return;
 			}
-			writer.Write(list.Count());
-			foreach (var a in list)
+			var ienum = (IEnumerable<T>)list;
+			writer.Write(ienum.Count());
+			foreach (var a in ienum)
 				wf(a);
 		}
 
 		// Duplicate WriteIEnumerable to optimize Count.
-		private void WriteCollection<T>(ICollection<T> list, Action<object> wf)
+		private void WriteCollection<T>(object list, Action<object> wf)
 		{
 			if (list == null) {
 				writer.Write(-1);
 				return;
 			}
-			writer.Write(list.Count);
-			foreach (var a in list)
+			var icoll = (ICollection<T>)list;
+			writer.Write(icoll.Count);
+			foreach (var a in icoll)
 				wf(a);
 		}
 
@@ -500,7 +504,8 @@ namespace Yuzu.Binary
 		{
 			var wf = GetWriteFunc(t.GetGenericArguments()[0]);
 			var m = Utils.GetPrivateCovariantGeneric(GetType(), nameof(WriteIEnumerable), t);
-			return obj => m.Invoke(this, new object[] { obj, wf });
+			var d = MakeDelegateActionAction(m);
+			return obj => d(obj, wf);
 		}
 
 		private Action<object> MakeWriteFunc(Type t)
@@ -511,7 +516,7 @@ namespace Yuzu.Binary
 				var g = t.GetGenericTypeDefinition();
 				if (g == typeof(Dictionary<,>)) {
 					var m = Utils.GetPrivateCovariantGenericAll(GetType(), nameof(WriteDictionary), t);
-					return obj => m.Invoke(this, new object[] { obj });
+					return MakeDelegateAction(m);
 				}
 				if (g == typeof(Action<>))
 					return WriteAction;
@@ -529,7 +534,8 @@ namespace Yuzu.Binary
 			if (t.IsArray) {
 				var wf = GetWriteFunc(t.GetElementType());
 				var m = Utils.GetPrivateCovariantGeneric(GetType(), nameof(WriteArray), t);
-				return obj => m.Invoke(this, new object[] { obj, wf });
+				var d = MakeDelegateActionAction(m);
+				return obj => d(obj, wf);
 			}
 			var meta = Meta.Get(t, Options);
 			{
@@ -539,7 +545,8 @@ namespace Yuzu.Binary
 					if (Utils.GetICollectionNG(t) != null)
 						return obj => WriteCollectionNG(obj, wf);
 					var m = Utils.GetPrivateCovariantGeneric(GetType(), nameof(WriteCollection), icoll);
-					return obj => m.Invoke(this, new object[] { obj, wf });
+					var d = MakeDelegateActionAction(m);
+					return obj => d(obj, wf);
 				}
 			}
 			{
