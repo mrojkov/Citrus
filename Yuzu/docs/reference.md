@@ -3,6 +3,7 @@
   * [Item attributes](#item-attributes)
   * [Method attributes](#method-attributes)
   * [Class attributes](#class-attributes)
+  * [Options](#options)
 
 ## Item attributes
 
@@ -94,3 +95,36 @@ Can be substituted by changing `MetaOptions.AllowReadingFromAncestorAttribute`.
 Denotes that during serializarion, `writeAlias` is used instead of class name, and during deserialization any of the given read aliases plus original class name is can be used for this class. All read aliases must be globally unique between all classes. Is the single-argument form is used, it defined both write alias and  a single read alias.
 
 Can be substituted by changing `MetaOptions.AliasAttribute`.
+
+## Options
+
+Options common for all formats. Note that this is a struct, not a class, and has value semantics.
+
+#### `Meta`
+
+Contains attribute classes.
+Change them to use different attributes, such as `Serializable` or `ProtoContract`.
+Note that this field is a reference,
+so it is usually better to create a new `MetaOptions` object instead of assigning directly to its fields.
+
+#### `TagMode`
+
+Experimental. Do not use.
+
+#### `AllowUnknownFields`
+
+Controls what happens when unknown field is encountered during deserialization.
+If `true`, it is either ignored or stored in `YuzuUnknownStorage`.
+Otherwise an exception is thrown. Default value is `false`.
+
+#### `AllowEmptyTypes`
+
+Controls what happens when a class without serializable fields is encountered during serialization or deserialization.
+If `true`, it is ignored.
+Otherwise an exception is thrown. Default value is `false`.
+
+#### `ReportErrorPosition`
+
+If `true`, a source stream position is included in error messages during deserialization.
+Default value is `false`.
+
