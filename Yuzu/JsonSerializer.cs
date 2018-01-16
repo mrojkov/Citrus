@@ -426,7 +426,7 @@ namespace Yuzu.Json
 			return r != Meta.FoundNonPrimitive && r <= JsonOptions.MaxOnelineFields;
 		}
 
-		public Action<object> MakeDelegate(MethodInfo m)
+		private Action<object> MakeDelegate(MethodInfo m)
 		{
 			return (Action<object>)Delegate.CreateDelegate(typeof(Action<object>), this, m);
 		}

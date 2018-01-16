@@ -1617,6 +1617,11 @@ namespace YuzuTest.Json
 				"{\"class\":\"YuzuTest.SampleInterfaceField, YuzuTest\",\"I\":{\"class\":\"YuzuTest.Sample1, YuzuTest\"}}"),
 				"ISample");
 
+			XAssert.Throws<YuzuException>(() => jd.FromString(
+				"{\"class\":\"YuzuTest.SampleList, YuzuTest\",\"E\":[5, 4, 3]}"), "5");
+			XAssert.Throws<YuzuException>(() => jd.FromString(
+				"{\"class\":\"YuzuTest.SampleDict, YuzuTest\",\"a\":1,\"b\":7}"), "7");
+
 			jd.Options.ReportErrorPosition = true;
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "      z"), "7");
 			jd.Options.ReportErrorPosition = false;
