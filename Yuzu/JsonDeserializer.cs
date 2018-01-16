@@ -279,25 +279,14 @@ namespace Yuzu.Json
 			return sb.ToString();
 		}
 
-		protected double RequireDouble()
-		{
-			return Double.Parse(ParseFloat(), CultureInfo.InvariantCulture);
-		}
+		protected double RequireDouble() => Double.Parse(ParseFloat(), CultureInfo.InvariantCulture);
 
-		protected float RequireSingle()
-		{
-			return Single.Parse(ParseFloat(), CultureInfo.InvariantCulture);
-		}
+		protected float RequireSingle() => Single.Parse(ParseFloat(), CultureInfo.InvariantCulture);
 
-		protected decimal RequireDecimal()
-		{
-			return Decimal.Parse(ParseFloat(), CultureInfo.InvariantCulture);
-		}
+		protected decimal RequireDecimal() => Decimal.Parse(ParseFloat(), CultureInfo.InvariantCulture);
 
-		protected decimal RequireDecimalAsString()
-		{
-			return Decimal.Parse(RequireUnescapedString(), CultureInfo.InvariantCulture);
-		}
+		protected decimal RequireDecimalAsString() =>
+			Decimal.Parse(RequireUnescapedString(), CultureInfo.InvariantCulture);
 
 		protected DateTime RequireDateTime()
 		{
@@ -497,23 +486,23 @@ namespace Yuzu.Json
 		}
 
 		// Optimization: Avoid creating trivial closures.
-		private object RequireIntObj() { return RequireInt(); }
-		private object RequireUIntObj() { return RequireUInt(); }
-		private object RequireLongObj() { return RequireLong(); }
-		private object RequireULongObj() { return RequireULong(); }
-		private object RequireShortObj() { return checked((short)RequireInt()); }
-		private object RequireUShortObj() { return checked((ushort)RequireUInt()); }
-		private object RequireSByteObj() { return checked((sbyte)RequireInt()); }
-		private object RequireByteObj() { return checked((byte)RequireInt()); }
-		private object RequireCharObj() { return RequireChar(); }
-		private object RequireStringObj() { return RequireString(); }
-		private object RequireBoolObj() { return RequireBool(); }
-		private object RequireSingleObj() { return RequireSingle(); }
-		private object RequireDoubleObj() { return RequireDouble(); }
-		private object RequireDecimalObj() { return RequireDecimal(); }
-		private object RequireDecimalAsStringObj() { return RequireDecimalAsString(); }
-		private object RequireDateTimeObj() { return RequireDateTime(); }
-		private object RequireTimeSpanObj() { return RequireTimeSpan(); }
+		private object RequireIntObj() => RequireInt();
+		private object RequireUIntObj() => RequireUInt();
+		private object RequireLongObj() => RequireLong();
+		private object RequireULongObj() => RequireULong();
+		private object RequireShortObj() => checked((short)RequireInt());
+		private object RequireUShortObj() => checked((ushort)RequireUInt());
+		private object RequireSByteObj() => checked((sbyte)RequireInt());
+		private object RequireByteObj() => checked((byte)RequireInt());
+		private object RequireCharObj() => RequireChar();
+		private object RequireStringObj() => RequireString();
+		private object RequireBoolObj() => RequireBool();
+		private object RequireSingleObj() => RequireSingle();
+		private object RequireDoubleObj() => RequireDouble();
+		private object RequireDecimalObj() => RequireDecimal();
+		private object RequireDecimalAsStringObj() => RequireDecimalAsString();
+		private object RequireDateTimeObj() => RequireDateTime();
+		private object RequireTimeSpanObj() => RequireTimeSpan();
 
 		private Dictionary<Type, Func<object>> readerCache = new Dictionary<Type, Func<object>>();
 		private Dictionary<Type, Action<object>> mergerCache = new Dictionary<Type, Action<object>>();
@@ -543,10 +532,8 @@ namespace Yuzu.Json
 			return mergerCache[t] = MakeMergerFunc(t);
 		}
 
-		public Func<object> MakeDelegate(MethodInfo m)
-		{
-			return (Func<object>)Delegate.CreateDelegate(typeof(Func<object>), this, m);
-		}
+		public Func<object> MakeDelegate(MethodInfo m) =>
+			(Func<object>)Delegate.CreateDelegate(typeof(Func<object>), this, m);
 
 		public Action<object> MakeDelegateAction(MethodInfo m) =>
 			(Action<object>)Delegate.CreateDelegate(typeof(Action<object>), this, m);
@@ -873,7 +860,7 @@ namespace Yuzu.Json
 			}
 		}
 
-		public override object FromReaderInt() { return ReadAnyObject(); }
+		public override object FromReaderInt() => ReadAnyObject();
 
 		public override object FromReaderInt(object obj)
 		{
@@ -908,6 +895,6 @@ namespace Yuzu.Json
 			}
 		}
 
-		public override T FromReaderInt<T>() { return (T)ReadValueFunc(typeof(T))(); }
+		public override T FromReaderInt<T>() => (T)ReadValueFunc(typeof(T))();
 	}
 }
