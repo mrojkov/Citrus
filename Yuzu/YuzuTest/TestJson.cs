@@ -1607,6 +1607,28 @@ namespace YuzuTest.Json
 		}
 
 		[TestMethod]
+		public void TestComments()
+		{
+			var jd = new JsonDeserializer();
+			jd.JsonOptions.Comments = true;
+
+			var s1 =
+				"//a\n{//b \"class\"c d\n\"class\":\"YuzuTest.SampleList, YuzuTest\"" +
+				"//x\n, //\n\"E\"://y\n[ //\n\"p\"// \n,///\n\"//\"//\n] }//z";
+			var result1 = jd.FromString<SampleList>(s1);
+			Assert.AreEqual(2, result1.E.Count);
+			Assert.AreEqual("p", result1.E[0]);
+			Assert.AreEqual("//", result1.E[1]);
+			var result1g = (SampleList)SampleList_JsonDeserializer.Instance.FromString(s1);
+			Assert.AreEqual(2, result1g.E.Count);
+			Assert.AreEqual("p", result1g.E[0]);
+			Assert.AreEqual("//", result1g.E[1]);
+
+			var result2 = jd.FromString("// adsf dsaf as\n5\n//abc\n");
+			Assert.AreEqual(5.0, result2);
+		}
+
+		[TestMethod]
 		public void TestErrors()
 		{
 			var js = new JsonSerializer();
@@ -1651,6 +1673,11 @@ namespace YuzuTest.Json
 				List<int> list = new List<int>();
 				XAssert.Throws<YuzuException>(() => jd.FromString(list, "[\"a\"]"), "'\"'");
 			}
+
+			XAssert.Throws<YuzuException>(() => jd.FromString("{//\n5}"), "'/'");
+			jd.JsonOptions.Comments = true;
+			XAssert.Throws<YuzuException>(() => jd.FromString("{/}"), "'/'");
+			jd.JsonOptions.Comments = false;
 
 			jd.Options.ReportErrorPosition = true;
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "      z"), "7");

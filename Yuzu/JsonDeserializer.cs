@@ -44,24 +44,59 @@ namespace Yuzu.Json
 		private char SkipSpaces()
 		{
 			char ch = Next();
-			while (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r')
-				ch = Reader.ReadChar();
+			if (JsonOptions.Comments)
+				while (true) {
+					if (ch == '/') {
+						ch = Reader.ReadChar();
+						if (ch != '/')
+							throw Error("Expected '/', but found '{0}'", ch);
+						do {
+							ch = Reader.ReadChar();
+						} while (ch != '\n') ;
+					}
+					else if (ch != ' ' && ch != '\t' && ch != '\n' && ch != '\r')
+						break;
+					ch = Reader.ReadChar();
+				}
+			else
+				while (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r')
+					ch = Reader.ReadChar();
 			return ch;
 		}
 
+		// Return \0 instead of throwing on EOF.
 		protected char SkipSpacesCarefully()
 		{
 			if (buf.HasValue)
 				throw new YuzuAssert();
-			while (true) {
-				var v = Reader.PeekChar();
-				if (v < 0)
-					return '\0';
-				var ch = (char)v;
-				if (ch != ' ' && ch != '\t' && ch != '\n' && ch != '\r')
-					return ch;
-				Reader.ReadChar();
-			}
+			if (JsonOptions.Comments)
+				while (true) {
+					var v = Reader.PeekChar();
+					if (v == '/') {
+						Reader.ReadChar();
+						v = Reader.PeekChar();
+						// Unable to look ahead 2 chars, so disallow lone slash.
+						if (v != '/')
+							throw Error("Expected '/', but found '{0}'",
+								v > 0 ? ((char)v).ToString() : "EOF");
+						do {
+							Reader.ReadChar();
+							v = Reader.PeekChar();
+							if (v < 0)
+								return '\0';
+						} while (v != '\n');
+					}
+					if (v != ' ' && v != '\t' && v != '\n' && v != '\r')
+						return (char)v;
+					Reader.ReadChar();
+				}
+			else
+				while (true) {
+					var v = Reader.PeekChar();
+					if (v != ' ' && v != '\t' && v != '\n' && v != '\r')
+						return v < 0 ? '\0' : (char)v;
+					Reader.ReadChar();
+				}
 		}
 
 		protected char Require(params char[] chars)

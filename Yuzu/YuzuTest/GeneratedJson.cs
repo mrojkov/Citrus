@@ -21,6 +21,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -69,6 +70,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -117,6 +119,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -169,6 +172,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -214,6 +218,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -258,6 +263,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -308,6 +314,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -352,6 +359,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = true;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -407,6 +415,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -451,6 +460,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -512,6 +522,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -601,6 +612,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -646,6 +658,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -695,6 +708,7 @@ namespace YuzuGen.System.Collections.Generic
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -756,6 +770,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -811,6 +826,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -881,6 +897,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -925,6 +942,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -972,6 +990,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -1019,6 +1038,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -1085,6 +1105,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -1142,6 +1163,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -1189,6 +1211,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -1236,6 +1259,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -1302,6 +1326,7 @@ namespace YuzuGen.System.Collections.Generic
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -1374,6 +1399,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -1429,6 +1455,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -1485,6 +1512,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -1537,6 +1565,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -1582,6 +1611,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -1646,6 +1676,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -1710,6 +1741,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -1751,6 +1783,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -1795,6 +1828,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -1839,6 +1873,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -1886,6 +1921,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -1927,6 +1963,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -1971,6 +2008,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -2028,6 +2066,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -2085,6 +2124,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -2154,6 +2194,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -2211,6 +2252,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -2258,6 +2300,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -2329,6 +2372,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -2378,6 +2422,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -2426,6 +2471,7 @@ namespace YuzuGen.System.Collections.Generic
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -2487,6 +2533,7 @@ namespace YuzuGen.YuzuTestAssembly
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -2532,6 +2579,7 @@ namespace YuzuGen.YuzuTestAssembly
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -2585,6 +2633,7 @@ namespace YuzuGen.YuzuTest2
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.DecimalAsString = false;
+			JsonOptions.Comments = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";

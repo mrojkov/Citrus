@@ -43,6 +43,9 @@ namespace Yuzu.Json
 		public bool DecimalAsString { get { return decimalAsString; } set { decimalAsString = value; generation++; } }
 
 		public bool Unordered = false;
+
+		private bool comments = false;
+		public bool Comments { get { return comments; } set { comments = value; generation++; } }
 	};
 
 	public class JsonSerializer : AbstractWriterSerializer
