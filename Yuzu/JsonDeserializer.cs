@@ -364,6 +364,8 @@ namespace Yuzu.Json
 			} while (Require(']', ',') == ',');
 		}
 
+		protected void ReadIntoCollectionNG<T>(object list) => ReadIntoCollection((ICollection<T>)list);
+
 		protected List<T> ReadList<T>()
 		{
 			if (RequireOrNull('['))
@@ -403,6 +405,8 @@ namespace Yuzu.Json
 				dict.Add((K)rk(key), (V)rf());
 			} while (Require('}', ',') == ',');
 		}
+
+		protected void ReadIntoDictionaryNG<K, V>(object dict) => ReadIntoDictionary((IDictionary<K, V>)dict);
 
 		protected Dictionary<K, V> ReadDictionary<K, V>()
 		{
@@ -544,6 +548,9 @@ namespace Yuzu.Json
 			return (Func<object>)Delegate.CreateDelegate(typeof(Func<object>), this, m);
 		}
 
+		public Action<object> MakeDelegateAction(MethodInfo m) =>
+			(Action<object>)Delegate.CreateDelegate(typeof(Action<object>), this, m);
+
 		private Func<object> MakeReaderFunc(Type t)
 		{
 			if (t == typeof(int))
@@ -603,17 +610,17 @@ namespace Yuzu.Json
 			}
 			if (t.IsArray) {
 				var n = JsonOptions.ArrayLengthPrefix ? nameof(ReadArrayWithLengthPrefix) : nameof(ReadArray);
-				var m = Utils.GetPrivateCovariantGeneric(GetType(), n, t);
-				return () => m.Invoke(this, new object[] { });
+				return MakeDelegate(Utils.GetPrivateCovariantGeneric(GetType(), n, t));
 			}
 			var icoll = Utils.GetICollection(t);
 			if (icoll != null) {
-				var m = Utils.GetPrivateCovariantGeneric(GetType(), nameof(ReadIntoCollection), icoll);
+				var m = Utils.GetPrivateCovariantGeneric(GetType(), nameof(ReadIntoCollectionNG), icoll);
+				var d = MakeDelegateAction(m);
 				return () => {
 					if (RequireOrNull('['))
 						return null;
 					var list = Activator.CreateInstance(t);
-					m.Invoke(this, new object[] { list });
+					d(list);
 					return list;
 				};
 			}
@@ -631,17 +638,19 @@ namespace Yuzu.Json
 		private Action<object> MakeMergerFunc(Type t)
 		{
 			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
-				var m = Utils.GetPrivateCovariantGenericAll(GetType(), nameof(ReadIntoDictionary), t);
-				return obj => { Require('{'); m.Invoke(this, new object[] { obj }); };
+				var m = Utils.GetPrivateCovariantGenericAll(GetType(), nameof(ReadIntoDictionaryNG), t);
+				var d = MakeDelegateAction(m);
+				return obj => { Require('{'); d(obj); };
 			}
 			var icoll = Utils.GetICollection(t);
 			if (icoll != null) {
-				var m = Utils.GetPrivateCovariantGeneric(GetType(), nameof(ReadIntoCollection), icoll);
-				return obj => { Require('['); m.Invoke(this, new object[] { obj }); };
+				var m = Utils.GetPrivateCovariantGeneric(GetType(), nameof(ReadIntoCollectionNG), icoll);
+				var d = MakeDelegateAction(m);
+				return obj => { Require('['); d(obj); };
 			}
 			if ((t.IsClass || t.IsInterface) && t != typeof(object)) {
 				var m = Utils.GetPrivateGeneric(GetType(), nameof(ReadIntoObject), t);
-				return (Action<object>)Delegate.CreateDelegate(typeof(Action<object>), this, m);
+				return MakeDelegateAction(m);
 			}
 			throw Error("Unable to merge field of type {0}", t.Name);
 		}
@@ -877,8 +886,8 @@ namespace Yuzu.Json
 					return null;
 				case '{':
 					if (expectedType.IsGenericType && expectedType.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
-						var m = Utils.GetPrivateCovariantGenericAll(GetType(), nameof(ReadIntoDictionary), expectedType);
-						m.Invoke(this, new object[] { obj });
+						var m = Utils.GetPrivateCovariantGenericAll(GetType(), nameof(ReadIntoDictionaryNG), expectedType);
+						MakeDelegateAction(m)(obj);
 						return obj;
 					}
 					var name = GetNextName(first: true);
@@ -889,8 +898,8 @@ namespace Yuzu.Json
 				case '[':
 					var icoll = Utils.GetICollection(expectedType);
 					if (icoll != null) {
-						var m = Utils.GetPrivateCovariantGeneric(GetType(), nameof(ReadIntoCollection), icoll);
-						m.Invoke(this, new object[] { obj });
+						var m = Utils.GetPrivateCovariantGeneric(GetType(), nameof(ReadIntoCollectionNG), icoll);
+						MakeDelegateAction(m)(obj);
 						return obj;
 					}
 					return ReadFieldsCompact(obj);

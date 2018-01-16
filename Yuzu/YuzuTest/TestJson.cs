@@ -1647,6 +1647,11 @@ namespace YuzuTest.Json
 			XAssert.Throws<YuzuException>(() => jd.FromString(
 				"{\"class\":\"YuzuTest.SampleDict, YuzuTest\",\"a\":1,\"b\":7}"), "7");
 
+			{
+				List<int> list = new List<int>();
+				XAssert.Throws<YuzuException>(() => jd.FromString(list, "[\"a\"]"), "'\"'");
+			}
+
 			jd.Options.ReportErrorPosition = true;
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "      z"), "7");
 			jd.Options.ReportErrorPosition = false;
