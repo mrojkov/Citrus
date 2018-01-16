@@ -477,7 +477,7 @@ namespace Yuzu.Json
 						return any;
 					}
 					var typeName = RequireUnescapedString();
-					var t = TypeSerializer.Deserialize(typeName);
+					var t = Meta.GetTypeByReadAlias(typeName, Options) ?? TypeSerializer.Deserialize(typeName);
 					if (t == null) {
 						var result = new YuzuUnknown { ClassTag = typeName };
 						if (Require(',', '}') == ',')

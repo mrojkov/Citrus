@@ -614,9 +614,12 @@ namespace Yuzu.Json
 			try {
 				depth += 1;
 				var isFirst = true;
-				if (expectedType != actualType || objStack.Count == 1 && JsonOptions.SaveRootClass) {
+				if (
+					expectedType != actualType || objStack.Count == 1 && JsonOptions.SaveRootClass ||
+					meta.WriteAlias != null
+				) {
 					WriteName(JsonOptions.ClassTag, ref isFirst);
-					WriteUnescapedString(TypeSerializer.Serialize(actualType));
+					WriteUnescapedString(meta.WriteAlias ?? TypeSerializer.Serialize(actualType));
 				}
 				var storage = meta.GetUnknownStorage == null ? null : meta.GetUnknownStorage(obj);
 				// Duplicate code to optimize fast-path without unknown storage.
