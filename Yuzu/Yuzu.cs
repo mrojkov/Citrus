@@ -32,6 +32,22 @@ namespace Yuzu
 		public YuzuMember(string alias) : base(alias) { }
 	}
 
+	public class YuzuAlias : Attribute
+	{
+		public readonly string[] ReadAliases;
+		public readonly string WriteAlias;
+		public YuzuAlias(string alias) : base()
+		{
+			ReadAliases = new string[] { alias };
+			WriteAlias = alias;
+		}
+		public YuzuAlias(string[] read = null, string write = null) : base()
+		{
+			ReadAliases = read;
+			WriteAlias = write;
+		}
+	}
+
 	public abstract class YuzuSerializeCondition : Attribute
 	{
 		public abstract bool Check(object obj, object field);
@@ -175,6 +191,7 @@ namespace Yuzu
 		public Type AllAttribute = typeof(YuzuAll);
 		public Type ExcludeAttribute = typeof(YuzuExclude);
 		public Type AllowReadingFromAncestorAttribute = typeof(YuzuAllowReadingFromAncestor);
+		public Type AliasAttribute = typeof(YuzuAlias);
 
 		public Type SurrogateIfAttribute = typeof(YuzuSurrogateIf);
 		public Type ToSurrogateAttribute = typeof(YuzuToSurrogate);
@@ -186,6 +203,8 @@ namespace Yuzu
 		public Func<Attribute, YuzuItemKind> GetItemKind = attr => (attr as YuzuMust).Kind;
 		public Func<Attribute, Tuple<YuzuItemOptionality, YuzuItemKind>> GetItemOptionalityAndKind =
 			attr => Tuple.Create((attr as YuzuAll).Optionality, (attr as YuzuAll).Kind);
+		public Func<Attribute, IEnumerable<string>> GetReadAliases = attr => (attr as YuzuAlias).ReadAliases;
+		public Func<Attribute, string> GetWriteAlias = attr => (attr as YuzuAlias).WriteAlias;
 	}
 
 	public struct CommonOptions

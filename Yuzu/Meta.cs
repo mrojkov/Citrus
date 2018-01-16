@@ -11,6 +11,8 @@ namespace Yuzu.Metadata
 	{
 		private static Dictionary<Tuple<Type, CommonOptions>, Meta> cache =
 			new Dictionary<Tuple<Type, CommonOptions>, Meta>();
+		private static Dictionary<CommonOptions, Dictionary<string, Type>> readAliasCache =
+			new Dictionary<CommonOptions, Dictionary<string, Type>>();
 
 		public class Item : IComparable<Item>
 		{
@@ -68,6 +70,7 @@ namespace Yuzu.Metadata
 		public YuzuItemOptionality AllOptionality = YuzuItemOptionality.None;
 		public bool AllowReadingFromAncestor;
 		public Surrogate Surrogate;
+		public string WriteAlias;
 
 		public Dictionary<string, Item> TagToItem = new Dictionary<string, Item>();
 		public Func<object, YuzuUnknownStorage> GetUnknownStorage;
@@ -339,6 +342,28 @@ namespace Yuzu.Metadata
 						t.BaseType.Name, Items.Count, ancestorMeta.Items.Count);
 			}
 
+			var alias = t.GetCustomAttribute_Compat(Options.AliasAttribute, false);
+			if (alias != null) {
+				var aliases = Options.GetReadAliases(alias);
+				if (aliases != null) {
+					Dictionary<string, Type> readAliases;
+					if (!readAliasCache.TryGetValue(options, out readAliases)) {
+						readAliases = new Dictionary<string, Type>();
+						readAliasCache.Add(options, readAliases);
+					}
+					foreach (var a in aliases)
+						try {
+							if (String.IsNullOrWhiteSpace(a))
+								throw Error("Empty read alias");
+							readAliases.Add(a, t);
+						} catch (ArgumentException) {
+							throw Error("Duplicate read alias '{0}'", a);
+						}
+				}
+				WriteAlias = Options.GetWriteAlias(alias);
+				if (WriteAlias != null && WriteAlias == "")
+					throw Error("Empty write alias");
+			}
 		}
 
 		public static Meta Get(Type t, CommonOptions options)
@@ -349,6 +374,15 @@ namespace Yuzu.Metadata
 			meta = new Meta(t, options);
 			cache.Add(Tuple.Create(t, options), meta);
 			return meta;
+		}
+
+		public static Type GetTypeByReadAlias(string alias, CommonOptions options)
+		{
+			Dictionary<string, Type> readAliases;
+			if (!readAliasCache.TryGetValue(options, out readAliases))
+				return null;
+			Type result;
+			return readAliases.TryGetValue(alias, out result) ? result : null;
 		}
 
 		internal static Meta Unknown = new Meta(typeof(YuzuUnknown));

@@ -366,7 +366,7 @@ namespace Yuzu.Binary
 				else
 					PrepareClassDefFieldsUnknown(result);
 			}
-			WriteClassDefFields(result, TypeSerializer.Serialize(result.Meta.Type));
+			WriteClassDefFields(result, result.Meta.WriteAlias ?? TypeSerializer.Serialize(result.Meta.Type));
 			return result;
 		}
 

@@ -137,7 +137,7 @@ namespace YuzuTest.Metadata
 		}
 
 		[YuzuAllowReadingFromAncestor]
-		internal class Sample1Bad: Sample1
+		internal class Sample1Bad : Sample1
 		{
 			[YuzuMember]
 			public int F1 = 0;
@@ -238,5 +238,28 @@ namespace YuzuTest.Metadata
 			Meta.Get(typeof(SampleSurrogateColor), opt2);
 			XAssert.Throws<YuzuException>(() => Meta.Get(typeof(ToSurrogateChain), opt2), "chain");
 		}
+
+		[YuzuAlias(read: new string[] { "Dup", "Dup" })]
+		internal class DuplicateReadAlias
+		{
+			[YuzuRequired]
+			public int X;
+		}
+
+		[YuzuAlias("")]
+		internal class EmptyReadAlias
+		{
+			[YuzuRequired]
+			public int X;
+		}
+
+		[TestMethod]
+		public void TestAlias()
+		{
+			var opt = new CommonOptions();
+			XAssert.Throws<YuzuException>(() => Meta.Get(typeof(DuplicateReadAlias), opt), "Dup");
+			XAssert.Throws<YuzuException>(() => Meta.Get(typeof(EmptyReadAlias), opt), "Empty");
+		}
 	}
+
 }

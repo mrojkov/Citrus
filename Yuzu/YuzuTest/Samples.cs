@@ -708,6 +708,20 @@ namespace YuzuTest
 		public List<S> A = new List<S>();
 	}
 
+	[YuzuAlias("DifferentName")]
+	public class SampleAlias
+	{
+		[YuzuRequired]
+		public int X;
+	}
+
+	[YuzuAlias(read: new string[] { "Name1", "Name2" })]
+	public class SampleAliasMany
+	{
+		[YuzuRequired]
+		public int X;
+	}
+
 	public class Bad1
 	{
 		[YuzuRequired]
