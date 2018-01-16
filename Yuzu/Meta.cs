@@ -95,17 +95,17 @@ namespace Yuzu.Metadata
 
 		private static Action<object, object> BuildSetter(MethodInfo m)
 		{
-			var helper = typeof(Meta).GetMethod(
-				"SetterGenericHelper", BindingFlags.Static | BindingFlags.NonPublic).MakeGenericMethod(
-				m.DeclaringType, m.GetParameters()[0].ParameterType);
+			var helper = typeof(Meta).
+				GetMethod(nameof(SetterGenericHelper), BindingFlags.Static | BindingFlags.NonPublic).
+				MakeGenericMethod(m.DeclaringType, m.GetParameters()[0].ParameterType);
 			return (Action<object, object>)helper.Invoke(null, new object[] { m });
 		}
 
 		private static Func<object, object> BuildGetter(MethodInfo m)
 		{
-			var helper = typeof(Meta).GetMethod(
-				"GetterGenericHelper", BindingFlags.Static | BindingFlags.NonPublic).MakeGenericMethod(
-				m.DeclaringType, m.ReturnType);
+			var helper = typeof(Meta).
+				GetMethod(nameof(GetterGenericHelper), BindingFlags.Static | BindingFlags.NonPublic).
+				MakeGenericMethod(m.DeclaringType, m.ReturnType);
 			return (Func<object, object>)helper.Invoke(null, new object[] { m });
 		}
 #endif
@@ -113,11 +113,11 @@ namespace Yuzu.Metadata
 		private struct ItemAttrs
 		{
 			private Attribute[] attrs;
-			public Attribute Optional { get { return attrs[0]; } }
-			public Attribute Required { get { return attrs[1]; } }
-			public Attribute Member { get { return attrs[2]; } }
+			public Attribute Optional => attrs[0];
+			public Attribute Required => attrs[1];
+			public Attribute Member => attrs[2];
 			public int Count;
-			public Attribute Any() { return Optional ?? Required ?? Member; }
+			public Attribute Any() => Optional ?? Required ?? Member;
 
 			public ItemAttrs(MemberInfo m, MetaOptions options, YuzuItemOptionality opt)
 			{
@@ -135,10 +135,8 @@ namespace Yuzu.Metadata
 			}
 		}
 
-		private bool IsNonEmptyCollection<T>(object obj, object value)
-		{
-			return value == null || ((ICollection<T>)value).Count > 0;
-		}
+		private bool IsNonEmptyCollection<T>(object obj, object value) =>
+			value == null || ((ICollection<T>)value).Count > 0;
 
 		private void AddItem(MemberInfo m, bool must, bool all)
 		{
@@ -211,7 +209,7 @@ namespace Yuzu.Metadata
 				var icoll = Utils.GetICollection(item.Type);
 				if (d != null && icoll != null) {
 					var mi = Utils.GetPrivateGeneric(
-						GetType(), "IsNonEmptyCollection", icoll.GetGenericArguments()[0]);
+						GetType(), nameof(IsNonEmptyCollection), icoll.GetGenericArguments()[0]);
 					item.SerializeIf =
 						(Func<object, object, bool>)
 						Delegate.CreateDelegate(typeof(Func<object, object, bool>), this, mi);
@@ -387,10 +385,8 @@ namespace Yuzu.Metadata
 
 		internal static Meta Unknown = new Meta(typeof(YuzuUnknown));
 
-		private YuzuException Error(string format, params object[] args)
-		{
-			return new YuzuException("In type '" + Type.FullName + "': " + String.Format(format, args));
-		}
+		private YuzuException Error(string format, params object[] args) =>
+			new YuzuException("In type '" + Type.FullName + "': " + String.Format(format, args));
 
 		private static bool HasItems(Type t, MetaOptions options)
 		{
