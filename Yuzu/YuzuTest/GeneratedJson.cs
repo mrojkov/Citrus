@@ -2363,6 +2363,50 @@ namespace YuzuGen.YuzuTest
 		}
 	}
 
+	class SampleAliasMany_JsonDeserializer : JsonDeserializerGenBase
+	{
+		public static new SampleAliasMany_JsonDeserializer Instance = new SampleAliasMany_JsonDeserializer();
+
+		public SampleAliasMany_JsonDeserializer()
+		{
+			Options.AllowUnknownFields = false;
+			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
+			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
+			JsonOptions.IgnoreCompact = false;
+			JsonOptions.Int64AsString = false;
+			JsonOptions.DecimalAsString = false;
+			JsonOptions.FieldSeparator = "\n";
+			JsonOptions.Indent = "\t";
+			JsonOptions.ClassTag = "class";
+			JsonOptions.ArrayLengthPrefix = false;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
+			JsonOptions.Unordered = false;
+		}
+
+		public override object FromReaderInt()
+		{
+			return FromReaderTyped<global::YuzuTest.SampleAliasMany>(Reader);
+		}
+
+		public override object FromReaderIntPartial(string name)
+		{
+			return ReadFields(new global::YuzuTest.SampleAliasMany(), name);
+		}
+
+		protected override object ReadFields(object obj, string name)
+		{
+			var result = (global::YuzuTest.SampleAliasMany)obj;
+			if ("X" != name) throw new YuzuException("X!=" + name);
+			result.X = RequireInt();
+			name = GetNextName(false);
+			return result;
+		}
+	}
+
 }
 
 namespace YuzuGen.System.Collections.Generic

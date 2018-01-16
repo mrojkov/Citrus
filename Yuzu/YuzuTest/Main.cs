@@ -134,6 +134,7 @@ namespace YuzuTest
 				jd.Generate<SampleAfter2>();
 				jd.Generate<SampleMerge>();
 				jd.Generate<SampleAssemblyDerivedR>();
+				jd.Generate<SampleAliasMany>();
 				jd.Generate<List<YuzuTestAssembly.SampleAssemblyBase>>();
 				jd.Generate<YuzuTestAssembly.SampleAssemblyBase>();
 				jd.Generate<YuzuTestAssembly.SampleAssemblyDerivedQ>();
@@ -181,6 +182,7 @@ namespace YuzuTest
 				bd.Generate<SampleAoS.S>();
 				bd.Generate<SampleAoS>();
 				bd.Generate<SampleStructWithProps>();
+				bd.Generate<SampleAliasMany>();
 				bd.Generate<YuzuTestAssembly.SampleAssemblyBase>();
 				bd.Generate<YuzuTestAssembly.SampleAssemblyDerivedQ>();
 				bd.Generate<YuzuTest2.SampleNamespace>();

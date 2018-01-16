@@ -1518,6 +1518,7 @@ namespace YuzuTest.Binary
 		{
 			var bs = new BinarySerializer();
 			var bd = new BinaryDeserializer();
+			var bdg = new BinaryDeserializerGen();
 
 			var v1 = new SampleAlias { X = 77 };
 			var result1 = bs.ToBytes(v1);
@@ -1542,6 +1543,12 @@ namespace YuzuTest.Binary
 				" 01 00 4C 00 00 00 00 00"
 			));
 			Assert.AreEqual(v2.X, w2n1.X);
+
+			var w2n2 = bdg.FromBytes<SampleAliasMany>(SX(
+				"20 01 00 " + XS("Name2") + " 01 00 " + XS("X", RoughType.Int) +
+				" 01 00 4C 00 00 00 00 00"
+			));
+			Assert.AreEqual(v2.X, w2n2.X);
 		}
 
 		[TestMethod]

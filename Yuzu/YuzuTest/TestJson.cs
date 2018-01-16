@@ -1601,6 +1601,9 @@ namespace YuzuTest.Json
 			Assert.AreEqual("{ \"X\":76 }", result2);
 			var w2n1 = jd.FromString<SampleAliasMany>("{ \"class\":\"Name1\", \"X\":76 }");
 			Assert.AreEqual(v2.X, w2n1.X);
+			var w2n2 = (SampleAliasMany)SampleAliasMany_JsonDeserializer.Instance.FromString(
+				"{ \"class\":\"Name2\", \"X\":76 }");
+			Assert.AreEqual(v2.X, w2n2.X);
 		}
 
 		[TestMethod]
