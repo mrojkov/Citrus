@@ -295,7 +295,7 @@ namespace Yuzu.Binary
 			if (classId > classDefs.Count)
 				throw Error("Bad classId: {0}", classId);
 			var typeName = Reader.ReadString();
-			var classType = TypeSerializer.Deserialize(typeName);
+			var classType = Meta.GetTypeByReadAlias(typeName, Options) ?? TypeSerializer.Deserialize(typeName);
 			if (classType == null)
 				return GetClassDefUnknown(typeName);
 			var result = new ReaderClassDef { Meta = Meta.Get(classType, Options) };
