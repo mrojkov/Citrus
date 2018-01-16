@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.IO;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -240,10 +241,30 @@ namespace Yuzu
 		}
 	}
 
-	public class YuzuUnknown
+	public class YuzuUnknown: DynamicObject
 	{
 		public string ClassTag;
 		public SortedDictionary<string, object> Fields = new SortedDictionary<string, object>();
+
+		public static dynamic Dyn(object obj)
+		{
+			if (obj is IReadOnlyDictionary<string, object>) {
+				var u = new YuzuUnknown();
+				foreach (var p in obj as IReadOnlyDictionary<string, object>)
+					u.Fields.Add(p.Key, p.Value);
+				return u;
+			}
+			return obj;
+		}
+
+		public override bool TryGetMember(GetMemberBinder binder, out object result) =>
+			Fields.TryGetValue(binder.Name, out result);
+
+		public override bool TrySetMember(SetMemberBinder binder, object value)
+		{
+			Fields[binder.Name] = value;
+			return true;
+		}
 	}
 
 	public class YuzuUnknownStorage
