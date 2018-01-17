@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Reflection;
 using System.Text;
 
 using Yuzu.Deserializer;
@@ -278,25 +279,14 @@ namespace Yuzu.Json
 			return sb.ToString();
 		}
 
-		protected double RequireDouble()
-		{
-			return Double.Parse(ParseFloat(), CultureInfo.InvariantCulture);
-		}
+		protected double RequireDouble() => Double.Parse(ParseFloat(), CultureInfo.InvariantCulture);
 
-		protected float RequireSingle()
-		{
-			return Single.Parse(ParseFloat(), CultureInfo.InvariantCulture);
-		}
+		protected float RequireSingle() => Single.Parse(ParseFloat(), CultureInfo.InvariantCulture);
 
-		protected decimal RequireDecimal()
-		{
-			return Decimal.Parse(ParseFloat(), CultureInfo.InvariantCulture);
-		}
+		protected decimal RequireDecimal() => Decimal.Parse(ParseFloat(), CultureInfo.InvariantCulture);
 
-		protected decimal RequireDecimalAsString()
-		{
-			return Decimal.Parse(RequireUnescapedString(), CultureInfo.InvariantCulture);
-		}
+		protected decimal RequireDecimalAsString() =>
+			Decimal.Parse(RequireUnescapedString(), CultureInfo.InvariantCulture);
 
 		protected DateTime RequireDateTime()
 		{
@@ -363,6 +353,8 @@ namespace Yuzu.Json
 			} while (Require(']', ',') == ',');
 		}
 
+		protected void ReadIntoCollectionNG<T>(object list) => ReadIntoCollection((ICollection<T>)list);
+
 		protected List<T> ReadList<T>()
 		{
 			if (RequireOrNull('['))
@@ -402,6 +394,8 @@ namespace Yuzu.Json
 				dict.Add((K)rk(key), (V)rf());
 			} while (Require('}', ',') == ',');
 		}
+
+		protected void ReadIntoDictionaryNG<K, V>(object dict) => ReadIntoDictionary((IDictionary<K, V>)dict);
 
 		protected Dictionary<K, V> ReadDictionary<K, V>()
 		{
@@ -476,7 +470,7 @@ namespace Yuzu.Json
 						return any;
 					}
 					var typeName = RequireUnescapedString();
-					var t = TypeSerializer.Deserialize(typeName);
+					var t = Meta.GetTypeByReadAlias(typeName, Options) ?? TypeSerializer.Deserialize(typeName);
 					if (t == null) {
 						var result = new YuzuUnknown { ClassTag = typeName };
 						if (Require(',', '}') == ',')
@@ -492,23 +486,23 @@ namespace Yuzu.Json
 		}
 
 		// Optimization: Avoid creating trivial closures.
-		private object RequireIntObj() { return RequireInt(); }
-		private object RequireUIntObj() { return RequireUInt(); }
-		private object RequireLongObj() { return RequireLong(); }
-		private object RequireULongObj() { return RequireULong(); }
-		private object RequireShortObj() { return checked((short)RequireInt()); }
-		private object RequireUShortObj() { return checked((ushort)RequireUInt()); }
-		private object RequireSByteObj() { return checked((sbyte)RequireInt()); }
-		private object RequireByteObj() { return checked((byte)RequireInt()); }
-		private object RequireCharObj() { return RequireChar(); }
-		private object RequireStringObj() { return RequireString(); }
-		private object RequireBoolObj() { return RequireBool(); }
-		private object RequireSingleObj() { return RequireSingle(); }
-		private object RequireDoubleObj() { return RequireDouble(); }
-		private object RequireDecimalObj() { return RequireDecimal(); }
-		private object RequireDecimalAsStringObj() { return RequireDecimalAsString(); }
-		private object RequireDateTimeObj() { return RequireDateTime(); }
-		private object RequireTimeSpanObj() { return RequireTimeSpan(); }
+		private object RequireIntObj() => RequireInt();
+		private object RequireUIntObj() => RequireUInt();
+		private object RequireLongObj() => RequireLong();
+		private object RequireULongObj() => RequireULong();
+		private object RequireShortObj() => checked((short)RequireInt());
+		private object RequireUShortObj() => checked((ushort)RequireUInt());
+		private object RequireSByteObj() => checked((sbyte)RequireInt());
+		private object RequireByteObj() => checked((byte)RequireInt());
+		private object RequireCharObj() => RequireChar();
+		private object RequireStringObj() => RequireString();
+		private object RequireBoolObj() => RequireBool();
+		private object RequireSingleObj() => RequireSingle();
+		private object RequireDoubleObj() => RequireDouble();
+		private object RequireDecimalObj() => RequireDecimal();
+		private object RequireDecimalAsStringObj() => RequireDecimalAsString();
+		private object RequireDateTimeObj() => RequireDateTime();
+		private object RequireTimeSpanObj() => RequireTimeSpan();
 
 		private Dictionary<Type, Func<object>> readerCache = new Dictionary<Type, Func<object>>();
 		private Dictionary<Type, Action<object>> mergerCache = new Dictionary<Type, Action<object>>();
@@ -584,70 +578,60 @@ namespace Yuzu.Json
 			}
 			if (t.IsGenericType) {
 				var g = t.GetGenericTypeDefinition();
-				if (g == typeof(List<>)) {
-					var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadList", t);
-					return () => m.Invoke(this, Utils.ZeroObjects);
-				}
-				if (g == typeof(Dictionary<,>)) {
-					var m = Utils.GetPrivateCovariantGenericAll(GetType(), "ReadDictionary", t);
-					return () => m.Invoke(this, Utils.ZeroObjects);
-				}
-				if (g == typeof(Action<>)) {
-					var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadAction", t);
-					return () => m.Invoke(this, Utils.ZeroObjects);
-				}
+				if (g == typeof(List<>))
+					return MakeDelegate(Utils.GetPrivateCovariantGeneric(GetType(), nameof(ReadList), t));
+				if (g == typeof(Dictionary<,>))
+					return MakeDelegate(Utils.GetPrivateCovariantGenericAll(GetType(), nameof(ReadDictionary), t));
+				if (g == typeof(Action<>))
+					return MakeDelegate(Utils.GetPrivateCovariantGeneric(GetType(), nameof(ReadAction), t));
 				if (g == typeof(Nullable<>)) {
 					var r = ReadValueFunc(t.GetGenericArguments()[0]);
 					return () => ReadNullable(r);
 				}
 			}
 			if (t.IsArray) {
-				var n = JsonOptions.ArrayLengthPrefix ? "ReadArrayWithLengthPrefix" : "ReadArray";
-				var m = Utils.GetPrivateCovariantGeneric(GetType(), n, t);
-				return () => m.Invoke(this, new object[] { });
+				var n = JsonOptions.ArrayLengthPrefix ? nameof(ReadArrayWithLengthPrefix) : nameof(ReadArray);
+				return MakeDelegate(Utils.GetPrivateCovariantGeneric(GetType(), n, t));
 			}
 			var icoll = Utils.GetICollection(t);
 			if (icoll != null) {
-				var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadIntoCollection", icoll);
+				var m = Utils.GetPrivateCovariantGeneric(GetType(), nameof(ReadIntoCollectionNG), icoll);
+				var d = MakeDelegateAction(m);
 				return () => {
 					if (RequireOrNull('['))
 						return null;
 					var list = Activator.CreateInstance(t);
-					m.Invoke(this, new object[] { list });
+					d(list);
 					return list;
 				};
 			}
 			if (t == typeof(object))
 				return ReadAnyObject;
-			if (t.IsClass && !t.IsAbstract) {
-				var m = Utils.GetPrivateGeneric(GetType(), "ReadObject", t);
-				return (Func<object>)Delegate.CreateDelegate(typeof(Func<object>), this, m);
-			}
-			if (t.IsInterface || t.IsAbstract) {
-				var m = Utils.GetPrivateGeneric(GetType(), "ReadInterface", t);
-				return (Func<object>)Delegate.CreateDelegate(typeof(Func<object>), this, m);
-			}
-			if (Utils.IsStruct(t)) {
-				var m = Utils.GetPrivateGeneric(GetType(), "ReadStruct", t);
-				return (Func<object>)Delegate.CreateDelegate(typeof(Func<object>), this, m);
-			}
+			if (t.IsClass && !t.IsAbstract)
+				return MakeDelegate(Utils.GetPrivateGeneric(GetType(), nameof(ReadObject), t));
+			if (t.IsInterface || t.IsAbstract)
+				return MakeDelegate(Utils.GetPrivateGeneric(GetType(), nameof(ReadInterface), t));
+			if (Utils.IsStruct(t))
+				return MakeDelegate(Utils.GetPrivateGeneric(GetType(), nameof(ReadStruct), t));
 			throw new NotImplementedException(t.Name);
 		}
 
 		private Action<object> MakeMergerFunc(Type t)
 		{
 			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
-				var m = Utils.GetPrivateCovariantGenericAll(GetType(), "ReadIntoDictionary", t);
-				return obj => { Require('{'); m.Invoke(this, new object[] { obj }); };
+				var m = Utils.GetPrivateCovariantGenericAll(GetType(), nameof(ReadIntoDictionaryNG), t);
+				var d = MakeDelegateAction(m);
+				return obj => { Require('{'); d(obj); };
 			}
 			var icoll = Utils.GetICollection(t);
 			if (icoll != null) {
-				var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadIntoCollection", icoll);
-				return obj => { Require('['); m.Invoke(this, new object[] { obj }); };
+				var m = Utils.GetPrivateCovariantGeneric(GetType(), nameof(ReadIntoCollectionNG), icoll);
+				var d = MakeDelegateAction(m);
+				return obj => { Require('['); d(obj); };
 			}
 			if ((t.IsClass || t.IsInterface) && t != typeof(object)) {
-				var m = Utils.GetPrivateGeneric(GetType(), "ReadIntoObject", t);
-				return (Action<object>)Delegate.CreateDelegate(typeof(Action<object>), this, m);
+				var m = Utils.GetPrivateGeneric(GetType(), nameof(ReadIntoObject), t);
+				return MakeDelegateAction(m);
 			}
 			throw Error("Unable to merge field of type {0}", t.Name);
 		}
@@ -870,7 +854,7 @@ namespace Yuzu.Json
 			}
 		}
 
-		public override object FromReaderInt() { return ReadAnyObject(); }
+		public override object FromReaderInt() => ReadAnyObject();
 
 		public override object FromReaderInt(object obj)
 		{
@@ -883,8 +867,8 @@ namespace Yuzu.Json
 					return null;
 				case '{':
 					if (expectedType.IsGenericType && expectedType.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
-						var m = Utils.GetPrivateCovariantGenericAll(GetType(), "ReadIntoDictionary", expectedType);
-						m.Invoke(this, new object[] { obj });
+						var m = Utils.GetPrivateCovariantGenericAll(GetType(), nameof(ReadIntoDictionaryNG), expectedType);
+						MakeDelegateAction(m)(obj);
 						return obj;
 					}
 					var name = GetNextName(first: true);
@@ -895,8 +879,8 @@ namespace Yuzu.Json
 				case '[':
 					var icoll = Utils.GetICollection(expectedType);
 					if (icoll != null) {
-						var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadIntoCollection", icoll);
-						m.Invoke(this, new object[] { obj });
+						var m = Utils.GetPrivateCovariantGeneric(GetType(), nameof(ReadIntoCollectionNG), icoll);
+						MakeDelegateAction(m)(obj);
 						return obj;
 					}
 					return ReadFieldsCompact(obj);
@@ -905,6 +889,6 @@ namespace Yuzu.Json
 			}
 		}
 
-		public override T FromReaderInt<T>() { return (T)ReadValueFunc(typeof(T))(); }
+		public override T FromReaderInt<T>() => (T)ReadValueFunc(typeof(T))();
 	}
 }

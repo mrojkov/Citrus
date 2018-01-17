@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 
 namespace Yuzu
@@ -30,6 +31,22 @@ namespace Yuzu
 	{
 		public YuzuMember() : base(null) { }
 		public YuzuMember(string alias) : base(alias) { }
+	}
+
+	public class YuzuAlias : Attribute
+	{
+		public readonly string[] ReadAliases;
+		public readonly string WriteAlias;
+		public YuzuAlias(string alias) : base()
+		{
+			ReadAliases = new string[] { alias };
+			WriteAlias = alias;
+		}
+		public YuzuAlias(string[] read = null, string write = null) : base()
+		{
+			ReadAliases = read;
+			WriteAlias = write;
+		}
 	}
 
 	public abstract class YuzuSerializeCondition : Attribute
@@ -175,6 +192,7 @@ namespace Yuzu
 		public Type AllAttribute = typeof(YuzuAll);
 		public Type ExcludeAttribute = typeof(YuzuExclude);
 		public Type AllowReadingFromAncestorAttribute = typeof(YuzuAllowReadingFromAncestor);
+		public Type AliasAttribute = typeof(YuzuAlias);
 
 		public Type SurrogateIfAttribute = typeof(YuzuSurrogateIf);
 		public Type ToSurrogateAttribute = typeof(YuzuToSurrogate);
@@ -186,6 +204,8 @@ namespace Yuzu
 		public Func<Attribute, YuzuItemKind> GetItemKind = attr => (attr as YuzuMust).Kind;
 		public Func<Attribute, Tuple<YuzuItemOptionality, YuzuItemKind>> GetItemOptionalityAndKind =
 			attr => Tuple.Create((attr as YuzuAll).Optionality, (attr as YuzuAll).Kind);
+		public Func<Attribute, IEnumerable<string>> GetReadAliases = attr => (attr as YuzuAlias).ReadAliases;
+		public Func<Attribute, string> GetWriteAlias = attr => (attr as YuzuAlias).WriteAlias;
 	}
 
 	public struct CommonOptions
@@ -272,6 +292,13 @@ namespace Yuzu
 		public abstract string ToString(object obj);
 		public abstract byte[] ToBytes(object obj);
 		public abstract void ToStream(object obj, Stream target);
+
+		protected Action<object> MakeDelegateAction(MethodInfo m) =>
+			(Action<object>)Delegate.CreateDelegate(typeof(Action<object>), this, m);
+
+		protected Action<object, Action<object>> MakeDelegateActionAction(MethodInfo m) =>
+			(Action<object, Action<object>>)
+				Delegate.CreateDelegate(typeof(Action<object, Action<object>>), this, m);
 	}
 
 	public abstract class AbstractWriterSerializer: AbstractSerializer

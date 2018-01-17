@@ -538,6 +538,20 @@ namespace YuzuTest.Binary
 		}
 
 		[TestMethod]
+		public void TestIEnumerable()
+		{
+			var bs = new BinarySerializer();
+
+			var v0 = new SampleIEnumerable();
+			var result0 = bs.ToBytes(v0);
+			Assert.AreEqual(
+				"20 01 00 " + XS(typeof(SampleIEnumerable)) + " 01 00 " +
+				XS("L", RoughType.Sequence) + " " + XS(RoughType.Int) +
+				" 01 00 03 00 00 00 01 00 00 00 02 00 00 00 03 00 00 00 00 00",
+				XS(result0));
+		}
+
+		[TestMethod]
 		public void TestTopLevelList()
 		{
 			var bs = new BinarySerializer();
@@ -763,6 +777,13 @@ namespace YuzuTest.Binary
 			Assert.AreEqual(expected.B.Y, actual.B.Y);
 		}
 
+		private void AssertEqualSampleStructWithProps(SampleStructWithProps expected, SampleStructWithProps actual)
+		{
+			Assert.AreEqual(expected.A, actual.A);
+			Assert.AreEqual(expected.P.X, actual.P.X);
+			Assert.AreEqual(expected.P.Y, actual.P.Y);
+		}
+
 		[TestMethod]
 		public void TestStruct()
 		{
@@ -802,14 +823,26 @@ namespace YuzuTest.Binary
 				" 25 00 00 00 02 00 09 00 00 00 01 00 00 00",
 				XS(result2));
 			var w2 = bd.FromBytes<SampleStructWithProps>(result2);
-			Assert.AreEqual(v2.A, w2.A);
-			Assert.AreEqual(v2.P.X, w2.P.X);
-			Assert.AreEqual(v2.P.Y, w2.P.Y);
+			AssertEqualSampleStructWithProps(v2, w2);
 
 			var w2g = bdg.FromBytes<SampleStructWithProps>(result2);
-			Assert.AreEqual(v2.A, w2.A);
-			Assert.AreEqual(v2.P.X, w2.P.X);
-			Assert.AreEqual(v2.P.Y, w2.P.Y);
+			AssertEqualSampleStructWithProps(v2, w2g);
+
+			var v3 = new SampleStructWithProps[2] {
+				new SampleStructWithProps { A = 41, P = new SamplePoint { X = 19, Y = 1 } },
+				new SampleStructWithProps { A = 42, P = new SamplePoint { X = 18, Y = 2 } },
+			};
+
+			var result3 = bs.ToBytes(v3);
+			Assert.AreEqual(
+				"21 20 02 00 00 00" +
+				" 03 00 29 00 00 00 02 00 13 00 00 00 01 00 00 00" +
+				" 03 00 2A 00 00 00 02 00 12 00 00 00 02 00 00 00",
+				XS(result3));
+			var w3 = bd.FromBytes<SampleStructWithProps[]> (result3);
+			Assert.AreEqual(v3.Length, w3.Length);
+			AssertEqualSampleStructWithProps(v3[0], w3[0]);
+			AssertEqualSampleStructWithProps(v3[1], w3[1]);
 		}
 
 		[TestMethod]
@@ -1481,6 +1514,44 @@ namespace YuzuTest.Binary
 		}
 
 		[TestMethod]
+		public void TestClassAlias()
+		{
+			var bs = new BinarySerializer();
+			var bd = new BinaryDeserializer();
+			var bdg = new BinaryDeserializerGen();
+
+			var v1 = new SampleAlias { X = 77 };
+			var result1 = bs.ToBytes(v1);
+			Assert.AreEqual(
+				"20 01 00 " + XS("DifferentName") + " 01 00 " + XS("X", RoughType.Int) +
+				" 01 00 4D 00 00 00 00 00",
+				XS(result1));
+			var w1 = bd.FromBytes<SampleAlias>(result1);
+			Assert.AreEqual(v1.X, w1.X);
+
+			var v2 = new SampleAliasMany { X = 76 };
+			var result2 = bs.ToBytes(v2);
+			Assert.AreEqual(
+				"\n20 02 00 " + XS(typeof(SampleAliasMany)) + " 01 00 " + XS("X", RoughType.Int) +
+				" 01 00 4C 00 00 00 00 00",
+				"\n" + XS(result2));
+			var w2 = bd.FromBytes<SampleAliasMany>(result2);
+			Assert.AreEqual(v2.X, w2.X);
+
+			var w2n1 = bd.FromBytes<SampleAliasMany>(SX(
+				"20 03 00 " + XS("Name1") + " 01 00 " + XS("X", RoughType.Int) +
+				" 01 00 4C 00 00 00 00 00"
+			));
+			Assert.AreEqual(v2.X, w2n1.X);
+
+			var w2n2 = bdg.FromBytes<SampleAliasMany>(SX(
+				"20 01 00 " + XS("Name2") + " 01 00 " + XS("X", RoughType.Int) +
+				" 01 00 4C 00 00 00 00 00"
+			));
+			Assert.AreEqual(v2.X, w2n2.X);
+		}
+
+		[TestMethod]
 		public void TestErrors()
 		{
 			var bd = new BinaryDeserializer();
@@ -1524,6 +1595,16 @@ namespace YuzuTest.Binary
 			XAssert.Throws<YuzuException>(() => bd.FromBytes(w, SX(
 				"20 03 00 " + XS(typeof(Sample1)) + " 00 01 " + XS("X", RoughType.String) + " 00 00"
 			)), "Int32");
+
+			XAssert.Throws<YuzuException>(() => bd.FromBytes(SX(
+				"20 03 00 " + XS(typeof(SampleList)) + " 01 00 " + XS("E", RoughType.String) + " 01 00" +
+				" 21 05 00 00 00 00 00 00"
+			)), "List");
+			XAssert.Throws<YuzuException>(() => bd.FromBytes(SX(
+				"20 03 00 " + XS(typeof(SampleList)) + " 01 00 " + XS("E", RoughType.Sequence) + " 05 01 00" +
+				" 00 00 00 00 00 00"
+			)), "List");
+
 		}
 	}
 }

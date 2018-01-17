@@ -1,5 +1,9 @@
 # User-specific files
+bin
+obj
 *.suo
+*.vsp
+*.psess
 *.user
 *.userosscache
 *.sln.docstates

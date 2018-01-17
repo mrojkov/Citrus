@@ -14,29 +14,26 @@ namespace Yuzu.Binary
 
 		public BinarySerializeOptions BinaryOptions = new BinarySerializeOptions();
 
-		public BinaryDeserializer()
-		{
-			InitReaders();
-		}
+		public BinaryDeserializer() { InitReaders(); }
 
 		public override void Initialize() {}
 
-		private object ReadSByte() { return Reader.ReadSByte(); }
-		private object ReadByte() { return Reader.ReadByte(); }
-		private object ReadShort() { return Reader.ReadInt16(); }
-		private object ReadUShort() { return Reader.ReadUInt16(); }
-		private object ReadInt() { return Reader.ReadInt32(); }
-		private object ReadUInt() { return Reader.ReadUInt32(); }
-		private object ReadLong() { return Reader.ReadInt64(); }
-		private object ReadULong() { return Reader.ReadUInt64(); }
-		private object ReadBool() { return Reader.ReadBoolean(); }
-		private object ReadChar() { return Reader.ReadChar(); }
-		private object ReadFloat() { return Reader.ReadSingle(); }
-		private object ReadDouble() { return Reader.ReadDouble(); }
-		private object ReadDecimal() { return Reader.ReadDecimal(); }
+		private object ReadSByte() => Reader.ReadSByte();
+		private object ReadByte() => Reader.ReadByte();
+		private object ReadShort() => Reader.ReadInt16();
+		private object ReadUShort() => Reader.ReadUInt16();
+		private object ReadInt() => Reader.ReadInt32();
+		private object ReadUInt() => Reader.ReadUInt32();
+		private object ReadLong() => Reader.ReadInt64();
+		private object ReadULong() => Reader.ReadUInt64();
+		private object ReadBool() => Reader.ReadBoolean();
+		private object ReadChar() => Reader.ReadChar();
+		private object ReadFloat() => Reader.ReadSingle();
+		private object ReadDouble() => Reader.ReadDouble();
+		private object ReadDecimal() => Reader.ReadDecimal();
 
-		private DateTime ReadDateTime() { return DateTime.FromBinary(Reader.ReadInt64()); }
-		private TimeSpan ReadTimeSpan() { return new TimeSpan(Reader.ReadInt64()); }
+		private DateTime ReadDateTime() => DateTime.FromBinary(Reader.ReadInt64());
+		private TimeSpan ReadTimeSpan() => new TimeSpan(Reader.ReadInt64());
 
 		private object ReadString()
 		{
@@ -118,8 +115,8 @@ namespace Yuzu.Binary
 			readerCache[typeof(Record)] = ReadObject<object>;
 		}
 
-		private object ReadDateTimeObj() { return ReadDateTime(); }
-		private object ReadTimeSpanObj() { return ReadTimeSpan(); }
+		private object ReadDateTimeObj() => ReadDateTime();
+		private object ReadTimeSpanObj() => ReadTimeSpan();
 
 		protected void ReadIntoCollection<T>(ICollection<T> list)
 		{
@@ -133,6 +130,8 @@ namespace Yuzu.Binary
 				list.Add((T) t);
 			}
 		}
+
+		protected void ReadIntoCollectionNG<T>(object list) => ReadIntoCollection((ICollection<T>)list);
 
 		protected I ReadCollection<I, E>() where I : class, ICollection<E>, new()
 		{
@@ -193,6 +192,8 @@ namespace Yuzu.Binary
 			}
 		}
 
+		protected void ReadIntoDictionaryNG<K, V>(object dict) => ReadIntoDictionary((Dictionary<K, V>)dict);
+
 		protected Dictionary<K, V> ReadDictionary<K, V>()
 		{
 			var count = Reader.ReadInt32();
@@ -239,17 +240,14 @@ namespace Yuzu.Binary
 			return false;
 		}
 
-		protected Action<T> ReadAction<T>() { return GetAction<T>(Reader.ReadString()); }
+		protected Action<T> ReadAction<T>() => GetAction<T>(Reader.ReadString());
 
 		// Zeroth element corresponds to 'null'.
 		private List<ReaderClassDef> classDefs = new List<ReaderClassDef> { new ReaderClassDef() };
 
-		protected virtual void PrepareReaders(ReaderClassDef def)
-		{
-			def.ReadFields = ReadFields;
-		}
+		protected virtual void PrepareReaders(ReaderClassDef def) => def.ReadFields = ReadFields;
 
-		public void ClearClassIds() { classDefs = new List<ReaderClassDef> { new ReaderClassDef() }; }
+		public void ClearClassIds() => classDefs = new List<ReaderClassDef> { new ReaderClassDef() };
 
 		private ReaderClassDef GetClassDefUnknown(string typeName)
 		{
@@ -295,7 +293,7 @@ namespace Yuzu.Binary
 			if (classId > classDefs.Count)
 				throw Error("Bad classId: {0}", classId);
 			var typeName = Reader.ReadString();
-			var classType = TypeSerializer.Deserialize(typeName);
+			var classType = Meta.GetTypeByReadAlias(typeName, Options) ?? TypeSerializer.Deserialize(typeName);
 			if (classType == null)
 				return GetClassDefUnknown(typeName);
 			var result = new ReaderClassDef { Meta = Meta.Get(classType, Options) };
@@ -519,63 +517,47 @@ namespace Yuzu.Binary
 				return () => Enum.ToObject(t, ReadInt());
 			if (t.IsGenericType) {
 				var g = t.GetGenericTypeDefinition();
-				if (g == typeof(List<>)) {
-					if (t.GetGenericArguments()[0] == typeof(Record))
-						return ReadListRecord;
-					var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadList", t);
-					return () => m.Invoke(this, Utils.ZeroObjects);
-				}
-				if (g == typeof(Dictionary<,>)) {
+				if (g == typeof(List<>))
+					return t.GetGenericArguments()[0] == typeof(Record) ?
+						ReadListRecord :
+						MakeDelegate(Utils.GetPrivateCovariantGeneric(GetType(), nameof(ReadList), t));
+				if (g == typeof(Dictionary<,>))
 					// FIXME: Check for Record, similar to List case above.
-					var m = Utils.GetPrivateCovariantGenericAll(GetType(), "ReadDictionary", t);
-					return () => m.Invoke(this, Utils.ZeroObjects);
-				}
-				if (g == typeof(Action<>)) {
-					var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadAction", t);
-					return () => m.Invoke(this, Utils.ZeroObjects);
-				}
+					return MakeDelegate(
+						Utils.GetPrivateCovariantGenericAll(GetType(), nameof(ReadDictionary), t));
+				if (g == typeof(Action<>))
+					return MakeDelegate(Utils.GetPrivateCovariantGeneric(GetType(), nameof(ReadAction), t));
 				if (g == typeof(Nullable<>)) {
 					var r = ReadValueFunc(t.GetGenericArguments()[0]);
 					return () => Reader.ReadBoolean() ? null : r();
 				}
 			}
-			if (t.IsArray) {
-				var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadArray", t);
-				return () => m.Invoke(this, Utils.ZeroObjects);
-			}
+			if (t.IsArray)
+				return MakeDelegate(Utils.GetPrivateCovariantGeneric(GetType(), nameof(ReadArray), t));
 			var icoll = Utils.GetICollection(t);
 			if (icoll != null) {
 				var elemType = icoll.GetGenericArguments()[0];
-				var m = GetType().GetMethod("ReadCollection", BindingFlags.Instance | BindingFlags.NonPublic).
-					MakeGenericMethod(t, elemType);
-				return () => m.Invoke(this, Utils.ZeroObjects);
+				var m = GetType().GetMethod(nameof(ReadCollection), BindingFlags.Instance | BindingFlags.NonPublic);
+				return MakeDelegate(m.MakeGenericMethod(t, elemType));
 			}
-			if (t.IsClass || t.IsInterface) {
-				var m = Utils.GetPrivateGeneric(GetType(), "ReadObject", t);
-				return (Func<object>)Delegate.CreateDelegate(typeof(Func<object>), this, m);
-			}
-			if (Utils.IsStruct(t)) {
-				var m = Utils.GetPrivateGeneric(GetType(), "ReadStruct", t);
-				return (Func<object>)Delegate.CreateDelegate(typeof(Func<object>), this, m);
-			}
+			if (t.IsClass || t.IsInterface)
+				return MakeDelegate(Utils.GetPrivateGeneric(GetType(), nameof(ReadObject), t));
+			if (Utils.IsStruct(t))
+				return MakeDelegate(Utils.GetPrivateGeneric(GetType(), nameof(ReadStruct), t));
 			throw new NotImplementedException(t.Name);
 		}
 
 		private Action<object> MakeMergerFunc(Type t)
 		{
-			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
-				var m = Utils.GetPrivateCovariantGenericAll(GetType(), "ReadIntoDictionary", t);
-				return obj => { m.Invoke(this, new object[] { obj }); };
-			}
+			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+				return MakeDelegateAction(
+					Utils.GetPrivateCovariantGenericAll(GetType(), nameof(ReadIntoDictionaryNG), t));
 			var icoll = Utils.GetICollection(t);
-			if (icoll != null) {
-				var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadIntoCollection", icoll);
-				return obj => { m.Invoke(this, new object[] { obj }); };
-			}
-			if ((t.IsClass || t.IsInterface || Utils.IsStruct(t)) && t != typeof(object)) {
-				var m = Utils.GetPrivateGeneric(GetType(), "ReadIntoObject", t);
-				return (Action<object>)Delegate.CreateDelegate(typeof(Action<object>), this, m);
-			}
+			if (icoll != null)
+				return MakeDelegateAction(
+					Utils.GetPrivateCovariantGeneric(GetType(), nameof(ReadIntoCollectionNG), icoll));
+			if ((t.IsClass || t.IsInterface || Utils.IsStruct(t)) && t != typeof(object))
+				return MakeDelegateAction(Utils.GetPrivateGeneric(GetType(), nameof(ReadIntoObject), t));
 			throw Error("Unable to merge field of type {0}", t.Name);
 		}
 

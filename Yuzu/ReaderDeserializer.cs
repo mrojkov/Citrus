@@ -93,7 +93,7 @@ namespace Yuzu.Deserializer
 
 		protected Type FindType(string typeName)
 		{
-			var t = TypeSerializer.Deserialize(typeName);
+			var t = Meta.GetTypeByReadAlias(typeName, Options) ?? TypeSerializer.Deserialize(typeName);
 			if (t == null)
 				throw Error("Unknown type '{0}'", typeName);
 			return t;
@@ -121,5 +121,12 @@ namespace Yuzu.Deserializer
 				throw Error("Unknown action '{0}'", name);
 			return (Action<T>)Delegate.CreateDelegate(typeof(Action<T>), obj, m);
 		}
+
+		protected Func<object> MakeDelegate(MethodInfo m) =>
+			(Func<object>)Delegate.CreateDelegate(typeof(Func<object>), this, m);
+
+		protected Action<object> MakeDelegateAction(MethodInfo m) =>
+			(Action<object>)Delegate.CreateDelegate(typeof(Action<object>), this, m);
+
 	}
 }

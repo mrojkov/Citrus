@@ -499,6 +499,12 @@ namespace YuzuTest
 		public SampleCollection<int> B = new SampleCollection<int>();
 	}
 
+	public class SampleIEnumerable
+	{
+		[YuzuRequired]
+		public IEnumerable<int> L = new int[] { 1, 2, 3 };
+	}
+
 	public class SampleBefore
 	{
 		[YuzuRequired]
@@ -700,6 +706,20 @@ namespace YuzuTest
 		[YuzuRequired]
 		[ProtoMember(1)]
 		public List<S> A = new List<S>();
+	}
+
+	[YuzuAlias("DifferentName")]
+	public class SampleAlias
+	{
+		[YuzuRequired]
+		public int X;
+	}
+
+	[YuzuAlias(read: new string[] { "Name1", "Name2" })]
+	public class SampleAliasMany
+	{
+		[YuzuRequired]
+		public int X;
 	}
 
 	public class Bad1

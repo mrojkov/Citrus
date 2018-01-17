@@ -74,7 +74,7 @@
     <Compile Include="TestProtobuf.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Yuzu\Yuzu.csproj">
+    <ProjectReference Include="..\Yuzu.csproj">
       <Project>{ddd2dfe9-ced2-4cea-adf0-5a6865865a46}</Project>
       <Name>Yuzu</Name>
     </ProjectReference>

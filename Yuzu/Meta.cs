@@ -11,6 +11,8 @@ namespace Yuzu.Metadata
 	{
 		private static Dictionary<Tuple<Type, CommonOptions>, Meta> cache =
 			new Dictionary<Tuple<Type, CommonOptions>, Meta>();
+		private static Dictionary<CommonOptions, Dictionary<string, Type>> readAliasCache =
+			new Dictionary<CommonOptions, Dictionary<string, Type>>();
 
 		public class Item : IComparable<Item>
 		{
@@ -68,6 +70,7 @@ namespace Yuzu.Metadata
 		public YuzuItemOptionality AllOptionality = YuzuItemOptionality.None;
 		public bool AllowReadingFromAncestor;
 		public Surrogate Surrogate;
+		public string WriteAlias;
 
 		public Dictionary<string, Item> TagToItem = new Dictionary<string, Item>();
 		public Func<object, YuzuUnknownStorage> GetUnknownStorage;
@@ -92,17 +95,17 @@ namespace Yuzu.Metadata
 
 		private static Action<object, object> BuildSetter(MethodInfo m)
 		{
-			var helper = typeof(Meta).GetMethod(
-				"SetterGenericHelper", BindingFlags.Static | BindingFlags.NonPublic).MakeGenericMethod(
-				m.DeclaringType, m.GetParameters()[0].ParameterType);
+			var helper = typeof(Meta).
+				GetMethod(nameof(SetterGenericHelper), BindingFlags.Static | BindingFlags.NonPublic).
+				MakeGenericMethod(m.DeclaringType, m.GetParameters()[0].ParameterType);
 			return (Action<object, object>)helper.Invoke(null, new object[] { m });
 		}
 
 		private static Func<object, object> BuildGetter(MethodInfo m)
 		{
-			var helper = typeof(Meta).GetMethod(
-				"GetterGenericHelper", BindingFlags.Static | BindingFlags.NonPublic).MakeGenericMethod(
-				m.DeclaringType, m.ReturnType);
+			var helper = typeof(Meta).
+				GetMethod(nameof(GetterGenericHelper), BindingFlags.Static | BindingFlags.NonPublic).
+				MakeGenericMethod(m.DeclaringType, m.ReturnType);
 			return (Func<object, object>)helper.Invoke(null, new object[] { m });
 		}
 #endif
@@ -110,11 +113,11 @@ namespace Yuzu.Metadata
 		private struct ItemAttrs
 		{
 			private Attribute[] attrs;
-			public Attribute Optional { get { return attrs[0]; } }
-			public Attribute Required { get { return attrs[1]; } }
-			public Attribute Member { get { return attrs[2]; } }
+			public Attribute Optional => attrs[0];
+			public Attribute Required => attrs[1];
+			public Attribute Member => attrs[2];
 			public int Count;
-			public Attribute Any() { return Optional ?? Required ?? Member; }
+			public Attribute Any() => Optional ?? Required ?? Member;
 
 			public ItemAttrs(MemberInfo m, MetaOptions options, YuzuItemOptionality opt)
 			{
@@ -132,10 +135,8 @@ namespace Yuzu.Metadata
 			}
 		}
 
-		private bool IsNonEmptyCollection<T>(object obj, object value)
-		{
-			return value == null || ((ICollection<T>)value).Count > 0;
-		}
+		private bool IsNonEmptyCollection<T>(object obj, object value) =>
+			value == null || ((ICollection<T>)value).Count > 0;
 
 		private void AddItem(MemberInfo m, bool must, bool all)
 		{
@@ -208,7 +209,7 @@ namespace Yuzu.Metadata
 				var icoll = Utils.GetICollection(item.Type);
 				if (d != null && icoll != null) {
 					var mi = Utils.GetPrivateGeneric(
-						GetType(), "IsNonEmptyCollection", icoll.GetGenericArguments()[0]);
+						GetType(), nameof(IsNonEmptyCollection), icoll.GetGenericArguments()[0]);
 					item.SerializeIf =
 						(Func<object, object, bool>)
 						Delegate.CreateDelegate(typeof(Func<object, object, bool>), this, mi);
@@ -339,6 +340,28 @@ namespace Yuzu.Metadata
 						t.BaseType.Name, Items.Count, ancestorMeta.Items.Count);
 			}
 
+			var alias = t.GetCustomAttribute_Compat(Options.AliasAttribute, false);
+			if (alias != null) {
+				var aliases = Options.GetReadAliases(alias);
+				if (aliases != null) {
+					Dictionary<string, Type> readAliases;
+					if (!readAliasCache.TryGetValue(options, out readAliases)) {
+						readAliases = new Dictionary<string, Type>();
+						readAliasCache.Add(options, readAliases);
+					}
+					foreach (var a in aliases)
+						try {
+							if (String.IsNullOrWhiteSpace(a))
+								throw Error("Empty read alias");
+							readAliases.Add(a, t);
+						} catch (ArgumentException) {
+							throw Error("Duplicate read alias '{0}'", a);
+						}
+				}
+				WriteAlias = Options.GetWriteAlias(alias);
+				if (WriteAlias != null && WriteAlias == "")
+					throw Error("Empty write alias");
+			}
 		}
 
 		public static Meta Get(Type t, CommonOptions options)
@@ -351,12 +374,19 @@ namespace Yuzu.Metadata
 			return meta;
 		}
 
+		public static Type GetTypeByReadAlias(string alias, CommonOptions options)
+		{
+			Dictionary<string, Type> readAliases;
+			if (!readAliasCache.TryGetValue(options, out readAliases))
+				return null;
+			Type result;
+			return readAliases.TryGetValue(alias, out result) ? result : null;
+		}
+
 		internal static Meta Unknown = new Meta(typeof(YuzuUnknown));
 
-		private YuzuException Error(string format, params object[] args)
-		{
-			return new YuzuException("In type '" + Type.FullName + "': " + String.Format(format, args));
-		}
+		private YuzuException Error(string format, params object[] args) =>
+			new YuzuException("In type '" + Type.FullName + "': " + String.Format(format, args));
 
 		private static bool HasItems(Type t, MetaOptions options)
 		{

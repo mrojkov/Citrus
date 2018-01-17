@@ -494,6 +494,22 @@ namespace YuzuTest.Json
 		}
 
 		[TestMethod]
+		public void TestIEnumerable()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			var jd = new JsonDeserializer();
+
+			var v0 = new SampleIEnumerable();
+			var result0 = js.ToString(v0);
+			Assert.AreEqual(
+				"{\n" +
+					"\"L\":[\n1,\n2,\n3\n]\n" +
+				"}",
+				result0);
+		}
+
+		[TestMethod]
 		public void TestTopLevelList()
 		{
 			var js = new JsonSerializer();
@@ -1566,6 +1582,31 @@ namespace YuzuTest.Json
 		}
 
 		[TestMethod]
+		public void TestClassAlias()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			js.JsonOptions.FieldSeparator = " ";
+			var jd = new JsonDeserializer();
+
+			var v1 = new SampleAlias { X = 77 };
+			var result1 = js.ToString(v1);
+			Assert.AreEqual("{ \"class\":\"DifferentName\", \"X\":77 }", result1);
+			var w1 = new SampleAlias();
+			jd.FromString(w1, result1);
+			Assert.AreEqual(v1.X, w1.X);
+
+			var v2 = new SampleAliasMany { X = 76 };
+			var result2 = js.ToString(v2);
+			Assert.AreEqual("{ \"X\":76 }", result2);
+			var w2n1 = jd.FromString<SampleAliasMany>("{ \"class\":\"Name1\", \"X\":76 }");
+			Assert.AreEqual(v2.X, w2n1.X);
+			var w2n2 = (SampleAliasMany)SampleAliasMany_JsonDeserializer.Instance.FromString(
+				"{ \"class\":\"Name2\", \"X\":76 }");
+			Assert.AreEqual(v2.X, w2n2.X);
+		}
+
+		[TestMethod]
 		public void TestErrors()
 		{
 			var js = new JsonSerializer();
@@ -1600,6 +1641,16 @@ namespace YuzuTest.Json
 			XAssert.Throws<YuzuException>(() => jd.FromString(
 				"{\"class\":\"YuzuTest.SampleInterfaceField, YuzuTest\",\"I\":{\"class\":\"YuzuTest.Sample1, YuzuTest\"}}"),
 				"ISample");
+
+			XAssert.Throws<YuzuException>(() => jd.FromString(
+				"{\"class\":\"YuzuTest.SampleList, YuzuTest\",\"E\":[5, 4, 3]}"), "5");
+			XAssert.Throws<YuzuException>(() => jd.FromString(
+				"{\"class\":\"YuzuTest.SampleDict, YuzuTest\",\"a\":1,\"b\":7}"), "7");
+
+			{
+				List<int> list = new List<int>();
+				XAssert.Throws<YuzuException>(() => jd.FromString(list, "[\"a\"]"), "'\"'");
+			}
 
 			jd.Options.ReportErrorPosition = true;
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "      z"), "7");
