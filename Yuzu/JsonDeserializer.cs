@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Reflection;
 using System.Text;
 
 using Yuzu.Deserializer;
@@ -477,7 +476,7 @@ namespace Yuzu.Json
 						return any;
 					}
 					var typeName = RequireUnescapedString();
-					var t = Meta.GetTypeByReadAlias(typeName, Options) ?? TypeSerializer.Deserialize(typeName);
+					var t = TypeSerializer.Deserialize(typeName);
 					if (t == null) {
 						var result = new YuzuUnknown { ClassTag = typeName };
 						if (Require(',', '}') == ',')
@@ -539,11 +538,6 @@ namespace Yuzu.Json
 			return mergerCache[t] = MakeMergerFunc(t);
 		}
 
-		public Func<object> MakeDelegate(MethodInfo m)
-		{
-			return (Func<object>)Delegate.CreateDelegate(typeof(Func<object>), this, m);
-		}
-
 		private Func<object> MakeReaderFunc(Type t)
 		{
 			if (t == typeof(int))
@@ -590,12 +584,18 @@ namespace Yuzu.Json
 			}
 			if (t.IsGenericType) {
 				var g = t.GetGenericTypeDefinition();
-				if (g == typeof(List<>))
-					return MakeDelegate(Utils.GetPrivateCovariantGeneric(GetType(), "ReadList", t));
-				if (g == typeof(Dictionary<,>))
-					return MakeDelegate(Utils.GetPrivateCovariantGenericAll(GetType(), "ReadDictionary", t));
-				if (g == typeof(Action<>))
-					return MakeDelegate(Utils.GetPrivateCovariantGeneric(GetType(), "ReadAction", t));
+				if (g == typeof(List<>)) {
+					var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadList", t);
+					return () => m.Invoke(this, Utils.ZeroObjects);
+				}
+				if (g == typeof(Dictionary<,>)) {
+					var m = Utils.GetPrivateCovariantGenericAll(GetType(), "ReadDictionary", t);
+					return () => m.Invoke(this, Utils.ZeroObjects);
+				}
+				if (g == typeof(Action<>)) {
+					var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadAction", t);
+					return () => m.Invoke(this, Utils.ZeroObjects);
+				}
 				if (g == typeof(Nullable<>)) {
 					var r = ReadValueFunc(t.GetGenericArguments()[0]);
 					return () => ReadNullable(r);
@@ -619,12 +619,18 @@ namespace Yuzu.Json
 			}
 			if (t == typeof(object))
 				return ReadAnyObject;
-			if (t.IsClass && !t.IsAbstract)
-				return MakeDelegate(Utils.GetPrivateGeneric(GetType(), "ReadObject", t));
-			if (t.IsInterface || t.IsAbstract)
-				return MakeDelegate(Utils.GetPrivateGeneric(GetType(), "ReadInterface", t));
-			if (Utils.IsStruct(t))
-				return MakeDelegate(Utils.GetPrivateGeneric(GetType(), "ReadStruct", t));
+			if (t.IsClass && !t.IsAbstract) {
+				var m = Utils.GetPrivateGeneric(GetType(), "ReadObject", t);
+				return (Func<object>)Delegate.CreateDelegate(typeof(Func<object>), this, m);
+			}
+			if (t.IsInterface || t.IsAbstract) {
+				var m = Utils.GetPrivateGeneric(GetType(), "ReadInterface", t);
+				return (Func<object>)Delegate.CreateDelegate(typeof(Func<object>), this, m);
+			}
+			if (Utils.IsStruct(t)) {
+				var m = Utils.GetPrivateGeneric(GetType(), "ReadStruct", t);
+				return (Func<object>)Delegate.CreateDelegate(typeof(Func<object>), this, m);
+			}
 			throw new NotImplementedException(t.Name);
 		}
 

@@ -54,18 +54,9 @@ namespace Yuzu.Util
 		{
 			try {
 				return t.GetInterface("ICollection`1");
-			} catch (AmbiguousMatchException) {
-				throw new YuzuException("Multiple ICollection interfaces for type " + t.Name);
-			}
-		}
-
-		public static Type GetIEnumerable(Type t)
-		{
-			try {
-				return t.GetInterface("IEnumerable`1");
 			}
 			catch (AmbiguousMatchException) {
-				throw new YuzuException("Multiple GetIEnumerable interfaces for type " + t.Name);
+				throw new YuzuException("Multiple ICollection interfaces for type " + t.Name);
 			}
 		}
 

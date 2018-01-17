@@ -93,7 +93,7 @@ namespace Yuzu.Deserializer
 
 		protected Type FindType(string typeName)
 		{
-			var t = Meta.GetTypeByReadAlias(typeName, Options) ?? TypeSerializer.Deserialize(typeName);
+			var t = TypeSerializer.Deserialize(typeName);
 			if (t == null)
 				throw Error("Unknown type '{0}'", typeName);
 			return t;
