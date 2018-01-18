@@ -1342,16 +1342,11 @@ namespace Lime
 
 		public void CenterOnParent()
 		{
-			Position = GetCenterOnParent();
-			Pivot = Vector2.Half;
-		}
-
-		public Vector2 GetCenterOnParent()
-		{
 			if (Parent == null) {
 				throw new Lime.Exception("Parent must not be null");
 			}
-			return Parent.AsWidget.Size * 0.5f;
+			Position = Parent.AsWidget.Size * 0.5f;
+			Pivot = Vector2.Half;
 		}
 
 		public Matrix32 CalcTransitionToSpaceOf(Widget container)
