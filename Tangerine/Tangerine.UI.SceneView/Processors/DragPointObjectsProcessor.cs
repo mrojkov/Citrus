@@ -43,6 +43,8 @@ namespace Tangerine.UI.SceneView
 				var positions = pobjects.Select(i => i.TransformedPosition).ToList();
 				var uvs = pobjects.OfType<DistortionMeshPoint>().Select(i => i.UV).ToList();
 				while (sv.Input.IsMousePressed()) {
+					Document.Current.History.RevertActiveTransaction();
+
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					var curMousePos = sv.MousePosition;
 					var shiftPressed = sv.Input.IsKeyPressed(Key.Shift);

@@ -44,6 +44,8 @@ namespace Tangerine.UI.SceneView
 						Document.Current.History.BeginTransaction();
 						try {
 							while (input.IsMousePressed()) {
+								Document.Current.History.RevertActiveTransaction();
+
 								ray = vp.ScreenPointToRay(SceneView.Instance.Input.MousePosition);
 								d = ray.Intersects(xyPlane);
 								if (d.HasValue) {

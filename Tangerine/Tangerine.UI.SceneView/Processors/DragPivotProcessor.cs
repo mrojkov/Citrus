@@ -48,6 +48,8 @@ namespace Tangerine.UI.SceneView
 				Vector2 iniPivot;
 				Utils.CalcHullAndPivot(widgets, sv.Scene, out hull, out iniPivot);
 				while (sv.Input.IsMousePressed()) {
+					Document.Current.History.RevertActiveTransaction();
+
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					var curMousePos = sv.MousePosition;
 					var shiftPressed = sv.Input.IsKeyPressed(Key.Shift);

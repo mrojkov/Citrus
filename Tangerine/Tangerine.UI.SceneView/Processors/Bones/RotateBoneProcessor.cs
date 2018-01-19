@@ -39,6 +39,8 @@ namespace Tangerine.UI.SceneView
 				var mousePos = sv.MousePosition;
 				var initRotation = bone.Rotation;
 				while (sv.Input.IsMousePressed()) {
+					Document.Current.History.RevertActiveTransaction();
+
 					var t = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
 					Utils.ChangeCursorIfDefault(Cursors.Rotate);
 					var a = mousePos * t - entry.Joint;

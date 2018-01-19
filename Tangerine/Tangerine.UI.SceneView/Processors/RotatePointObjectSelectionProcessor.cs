@@ -51,33 +51,30 @@ namespace Tangerine.UI.SceneView
 				var t = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
 				var center = (bounds.V1 + bounds.V3) / 2;
 				var size = Document.Current.Container.AsWidget.Size;
-				var scale = Document.Current.Container.AsWidget.Scale;
-				var mousePosPrev = (sv.MousePosition * t - center * size) / size;
+				var mousePosInitial = (sv.MousePosition * t - center * size) / size;
 				var rotation = 0f;
-				var prevAngle = rotation;
 				while (sv.Input.IsMousePressed()) {
+					Document.Current.History.RevertActiveTransaction();
+
 					if (!sv.Components.Contains<PointObjectSelectionComponent>()) {
 						sv.Components.Add(new PointObjectSelectionComponent {
 							СurrentBounds = bounds,
 						});
 					}
 					Utils.ChangeCursorIfDefault(Cursors.Rotate);
-					var a = mousePosPrev;
 					var b = (sv.MousePosition * t - center * size) / size;
-					mousePosPrev = b;
 					var angle = 0f;
-					if (a.Length > Mathf.ZeroTolerance && b.Length > Mathf.ZeroTolerance) {
-						angle = Mathf.Wrap180(b.Atan2Deg - a.Atan2Deg);
-						rotation += angle;
+					if (mousePosInitial.Length > Mathf.ZeroTolerance && b.Length > Mathf.ZeroTolerance) {
+						angle = Mathf.Wrap180(b.Atan2Deg - mousePosInitial.Atan2Deg);
+						rotation = angle;
 					}
 					if (Math.Abs(angle) > Mathf.ZeroTolerance) {
-						var roundedAngle = Utils.RoundTo(rotation, 15);
-						var effectiveAngle = sv.Input.IsKeyPressed(Key.Shift) ? roundedAngle - prevAngle : angle;
-						prevAngle = roundedAngle;
+						var effectiveAngle = sv.Input.IsKeyPressed(Key.Shift) ? Utils.RoundTo(rotation, 15) : angle;
+						Quadrangle newBounds = new Quadrangle();
 						for (int i = 0; i < 4; i++) {
-							bounds[i] = Vector2.RotateDeg(bounds[i] - center, effectiveAngle) + center;
+							newBounds[i] = Vector2.RotateDeg(bounds[i] - center, effectiveAngle) + center;
 						}
-						sv.Components.Get<PointObjectSelectionComponent>().СurrentBounds = bounds;
+						sv.Components.Get<PointObjectSelectionComponent>().СurrentBounds = newBounds;
 						for (var i = 0; i < points.Count; i++) {
 							var offset = center - points[i].Offset / size;
 							var position = Vector2.RotateDeg((points[i].Position - offset), effectiveAngle) + offset;

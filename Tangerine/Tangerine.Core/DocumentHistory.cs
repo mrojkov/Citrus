@@ -37,8 +37,13 @@ namespace Tangerine.Core
 			transactionCounter--;
 		}
 
-		public void RevertLastTransaction()
+		/// <summary>
+		/// Reverts operations created between BeginTransaction and EndTransaction, use it before EndTransaction
+		/// </summary>
+		public void RevertActiveTransaction()
 		{
+			// revert only "new" operations between BeginTransaction and EndTransaction
+			if (transactionCounter == 0 || headPos <= 0 || operations[headPos - 1].BatchId != transactionBatchId) return;
 			Undo();
 			operations.RemoveRange(headPos, operations.Count - headPos);
 		}

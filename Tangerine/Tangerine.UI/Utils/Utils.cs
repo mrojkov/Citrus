@@ -213,32 +213,5 @@ namespace Tangerine.UI
 			}
 		}
 
-		public class WidgetState
-		{
-			Vector2 Position { get; }
-			Vector2 Scale { get; }
-			float Rotation { get; }
-			Vector2 Size { get; }
-			Vector2 Pivot { get; }
-
-			public WidgetState(Widget widget)
-			{
-				Position = widget.Position;
-				Rotation = widget.Rotation;
-				Scale = widget.Scale;
-				Size = widget.Size;
-				Pivot = widget.Pivot;
-			}
-
-			public void Restore(Widget widget)
-			{
-				SetAnimableProperty.Perform(widget, nameof(Widget.Position), Position);
-				SetAnimableProperty.Perform(widget, nameof(Widget.Rotation), Rotation);
-				SetAnimableProperty.Perform(widget, nameof(Widget.Scale), Scale);
-				SetAnimableProperty.Perform(widget, nameof(Widget.Size), Size);
-				SetAnimableProperty.Perform(widget, nameof(Widget.Pivot), Pivot);
-			}
-		}
-
 	}
 }

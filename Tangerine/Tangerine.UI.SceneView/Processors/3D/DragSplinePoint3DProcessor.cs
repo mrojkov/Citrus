@@ -57,6 +57,8 @@ namespace Tangerine.UI.SceneView
 				var initialMouse = input.MousePosition;
 				var dragDirection = DragDirection.Any;
 				while (input.IsMousePressed()) {
+					Document.Current.History.RevertActiveTransaction();
+
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					var currentMouse = input.MousePosition;
 					var shiftPressed = input.IsKeyPressed(Key.Shift);
@@ -104,6 +106,8 @@ namespace Tangerine.UI.SceneView
 				var plane = CalcPlane(spline, point.Position + GetTangent(point, tangentIndex));
 				var tangentsAreEqual = (point.TangentA + point.TangentB).Length < 0.1f;
 				while (input.IsMousePressed()) {
+					Document.Current.History.RevertActiveTransaction();
+
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					var ray = viewport.ScreenPointToRay(input.MousePosition);
 					var distance = ray.Intersects(plane);

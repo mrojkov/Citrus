@@ -81,6 +81,8 @@ namespace Tangerine.UI.SceneView
 				initialPointsPosition = points.Select(w => w.Position).ToList();
 				initialPointsBounds = Utils.CalcAABB(points);
 				while (sv.Input.IsMousePressed()) {
+					Document.Current.History.RevertActiveTransaction();
+
 					Utils.ChangeCursorIfDefault(cursor);
 					RescaleHelper(
 						points,

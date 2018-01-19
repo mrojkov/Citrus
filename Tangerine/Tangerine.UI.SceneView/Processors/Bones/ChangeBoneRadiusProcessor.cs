@@ -41,6 +41,8 @@ namespace Tangerine.UI.SceneView
 				var initEffectiveRadius = bone.EffectiveRadius;
 				var initFadeoutZone = bone.FadeoutZone;
 				while (sv.Input.IsMousePressed()) {
+					Document.Current.History.RevertActiveTransaction();
+					
 					Utils.ChangeCursorIfDefault(MouseCursor.SizeNS);
 					var dragDelta = sv.MousePosition - iniMousePos;
 					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.EffectiveRadius), initEffectiveRadius + dragDelta.X);

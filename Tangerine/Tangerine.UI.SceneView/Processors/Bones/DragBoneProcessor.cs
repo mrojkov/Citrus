@@ -43,6 +43,8 @@ namespace Tangerine.UI.SceneView
 				int index = 0;
 				var dragDelta = Vector2.Zero;
 				while (sv.Input.IsMousePressed()) {
+					Document.Current.History.RevertActiveTransaction();
+
 					var snapEnabled = sv.Input.IsKeyPressed(Key.Alt);
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					var items = Document.Current.Container.AsWidget.BoneArray.items;

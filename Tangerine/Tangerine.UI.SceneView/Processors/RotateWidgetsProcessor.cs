@@ -35,13 +35,14 @@ namespace Tangerine.UI.SceneView
 			try {
 				var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>().ToList();
 				var mouseStartPos = sv.MousePosition;
-				var startStates = widgets.Select(w => new Utils.WidgetState(w)).ToList();
+
 				while (sv.Input.IsMousePressed()) {
 					Utils.ChangeCursorIfDefault(Cursors.Rotate);
-					for (int i = 0; i < widgets.Count; i++) {
-						startStates[i].Restore(widgets[i]);
-					}
+
+					Document.Current.History.RevertActiveTransaction();
+					
 					RotateWidgets(pivot, widgets, sv.MousePosition, mouseStartPos, sv.Input.IsKeyPressed(Key.Shift));
+
 					yield return null;
 				}
 			} finally {

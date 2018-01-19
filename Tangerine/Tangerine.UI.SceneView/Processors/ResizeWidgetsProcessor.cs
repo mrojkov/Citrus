@@ -46,14 +46,13 @@ namespace Tangerine.UI.SceneView
 			try {
 				var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>().ToList();
 				var mouseStartPos = sv.MousePosition;
-				var startStates = widgets.Select(w => new Utils.WidgetState(w)).ToList();
 
 				while (sv.Input.IsMousePressed()) {
+					Document.Current.History.RevertActiveTransaction();
+
 					Utils.ChangeCursorIfDefault(cursor);
 					var proportional = sv.Input.IsKeyPressed(Key.Shift);
-					for (int i = 0; i < widgets.Count; i++) {
-						startStates[i].Restore(widgets[i]);
-					}
+
 					if (sv.Input.IsKeyPressed(Key.Control)) {
 						RescaleWidgets(hull, widgets.Count <= 1, pivot, widgets, controlPointIndex, sv.MousePosition, mouseStartPos,
 							proportional);
@@ -62,6 +61,7 @@ namespace Tangerine.UI.SceneView
 							ResizeWidget(widget, controlPointIndex, sv.MousePosition, mouseStartPos, proportional);
 						}
 					}
+
 					yield return null;
 				}
 			} finally {

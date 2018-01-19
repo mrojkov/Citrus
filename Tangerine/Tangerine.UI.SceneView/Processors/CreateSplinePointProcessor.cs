@@ -41,6 +41,8 @@ namespace Tangerine.UI.SceneView
 						Core.Operations.SetProperty.Perform(currentPoint, nameof(PointObject.Position), pos);
 						Document.Current.History.BeginTransaction();
 						while (sv.Input.IsMousePressed()) {
+							Document.Current.History.RevertActiveTransaction();
+							
 							var dir = (sv.MousePosition * t - currentPoint.TransformedPosition) / SplinePointPresenter.TangentWeightRatio;
 							Core.Operations.SetProperty.Perform(currentPoint, nameof(SplinePoint.TangentAngle), dir.Atan2Deg);
 							Core.Operations.SetProperty.Perform(currentPoint, nameof(SplinePoint.TangentWeight), dir.Length);

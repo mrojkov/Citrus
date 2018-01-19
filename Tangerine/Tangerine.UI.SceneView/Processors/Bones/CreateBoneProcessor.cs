@@ -25,6 +25,8 @@ namespace Tangerine.UI.SceneView
 		IEnumerator<object> CreateBoneTask()
 		{
 			while (true) {
+				Bone bone = null;
+
 				var transform = Document.Current.Container.AsWidget.CalcTransitionToSpaceOf(sv.Scene);
 				if (sv.InputArea.IsMouseOver()) {
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
@@ -44,30 +46,37 @@ namespace Tangerine.UI.SceneView
 
 				Window.Current.Invalidate();
 				CreateNodeRequestComponent.Consume<Node>(sv.Components);
-				var bone = default(Bone);
 				if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {
+
+					Widget container = (Widget) Document.Current.Container;
+					int boneIndex;
+					if (!container.BoneArray.Equals(default(BoneArray))) {
+						boneIndex = container.BoneArray.items.Length + 1;
+					} else {
+						boneIndex = 1;
+					}
+					Matrix32 t = sv.Scene.CalcTransitionToSpaceOf(container);
+					Vector2 initPosition = sv.MousePosition * t;
+
+					Vector2 pos = Vector2.Zero;
+					if (index == 0 && container.Width.Abs() > Mathf.ZeroTolerance && container.Height.Abs() > Mathf.ZeroTolerance) {
+						pos = initPosition;
+					}
+
+					Document.Current.History.BeginTransaction();
 					try {
-						bone = (Bone)Core.Operations.CreateNode.Perform(typeof(Bone));
-						var container = (Widget)Document.Current.Container;
-						if (!container.BoneArray.Equals(default(BoneArray))) {
-							bone.Index = container.BoneArray.items.Length + 1;
-						} else {
-							bone.Index = 1;
-						}
-						var t = sv.Scene.CalcTransitionToSpaceOf(container);
-						var pos = Vector2.Zero;
-						if (index == 0 && container.Width.Abs() > Mathf.ZeroTolerance && container.Height.Abs() > Mathf.ZeroTolerance) {
-							pos = sv.MousePosition * t;
-						}
-						Core.Operations.SetProperty.Perform(bone, nameof(Bone.Position), pos);
-						Core.Operations.SetProperty.Perform(bone, nameof(Bone.BaseIndex), index);
-						Core.Operations.SelectNode.Perform(bone);
-						Document.Current.History.BeginTransaction();
-						if (bone.BaseIndex != 0) {
-							Core.Operations.SortBonesInChain.Perform(bone);
-						}
-						var initPosition = sv.MousePosition * t;
 						while (sv.Input.IsMousePressed()) {
+							Document.Current.History.RevertActiveTransaction();
+
+							bone = (Bone) Core.Operations.CreateNode.Perform(typeof(Bone));
+							bone.Index = boneIndex;
+							Core.Operations.SetProperty.Perform(bone, nameof(Bone.Position), pos);
+							Core.Operations.SetProperty.Perform(bone, nameof(Bone.BaseIndex), index);
+							Core.Operations.SelectNode.Perform(bone);
+							if (bone.BaseIndex != 0) {
+								Core.Operations.SortBonesInChain.Perform(bone);
+							}
+
 							var dir = (sv.MousePosition * t - initPosition).Snap(Vector2.Zero);
 							var angle = dir.Atan2Deg;
 							if (index != 0) {
@@ -79,14 +88,23 @@ namespace Tangerine.UI.SceneView
 							yield return null;
 						}
 					} finally {
-						SceneView.Instance.Components.Remove<CreateBoneHelper>();
+						// do not create zero bone
+						if (bone != null && bone.Length == 0) {
+							Document.Current.History.RevertActiveTransaction();
+							// must set length to zero to exectue "break;" later 
+							bone.Length = 0;
+						}
+
 						Document.Current.History.EndTransaction();
+						SceneView.Instance.Components.Remove<CreateBoneHelper>();
 					}
 				}
-				if (bone != null && bone?.Length == 0) {
-					Document.Current.History.RevertLastTransaction();
+
+				// turn off creation if was only click without drag (zero length bone)
+				if (bone != null && bone.Length == 0) {
 					break;
 				}
+
 				if (sv.Input.WasMousePressed(1)) {
 					break;
 				}
