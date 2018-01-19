@@ -299,6 +299,9 @@ namespace Orange
 			case "VAlign":
 				text.VAlignment = (VAlignment)lexer.ParseInt();
 				break;
+			case "LetterSpacing":
+				text.LetterSpacing = lexer.ParseFloat();
+				break;
 			default:
 				ParseGraphicProperty(node, name);
 				break;
@@ -871,6 +874,9 @@ namespace Orange
 				break;
 			case "ShadowOffset":
 				style.ShadowOffset = lexer.ParseVector2();
+				break;
+			case "LetterSpacing":
+				style.LetterSpacing = lexer.ParseFloat();
 				break;
 			default:
 				ParseActorProperty(node, name);

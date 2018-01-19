@@ -24,7 +24,7 @@ namespace Orange
 		public override void AddToRenderChain(RenderChain chain) { }
 	}
 
-	public class FolderEnd : Node 
+	public class FolderEnd : Node
 	{
 		public override void AddToRenderChain(RenderChain chain) { }
 	}
@@ -665,6 +665,7 @@ namespace Orange
 			WriteProperty("TextColor", node.TextColor, new Color4(0));
 			WriteProperty("HAlign", (int)node.HAlignment, (int)HAlignment.Left);
 			WriteProperty("VAlign", (int)node.VAlignment, (int)VAlignment.Top);
+			WriteProperty("LetterSpacing", node.LetterSpacing, 0f);
 		}
 
 		void WriteRichTextProperties(RichText node)
@@ -689,6 +690,7 @@ namespace Orange
 			WriteProperty("TextColor", node.TextColor, Color4.White);
 			WriteProperty("ShadowColor", node.ShadowColor, Color4.Black);
 			WriteProperty("ShadowOffset", node.ShadowOffset, Vector2.One);
+			WriteProperty("LetterSpacing", node.LetterSpacing, 0f);
 		}
 
 		void WriteNineGridProperties(NineGrid node)
