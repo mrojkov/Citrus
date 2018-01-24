@@ -82,7 +82,12 @@ namespace Orange
 
 		private static void WriteHelpAndExit()
 		{
-			Console.WriteLine("Orange.CLI citrus_project --target:[Win|Mac|ios|android|uc] --command:command [--autoupdate]");
+			Console.WriteLine($"Orange.CLI citrus_project" +
+			                  $" --target:[Win|Mac|ios|android|uc]" +
+			                  $" --command:command" +
+			                  $" [--autoupdate]" +
+			                  $" [{Actions.ConsoleCommandPassArguments}:\"--statfile:<statistics.tsv> --testscript:<testscript.txt>\"]"
+			);
 			var commands = The.MenuController.GetVisibleAndSortedItems();
 			if (commands.Count > 0) {
 				Console.WriteLine("Available commands are:");
