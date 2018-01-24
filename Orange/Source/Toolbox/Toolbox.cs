@@ -24,7 +24,7 @@ namespace Orange
 		{
 			var args = System.Environment.GetCommandLineArgs();
 			foreach (var arg in args) {
-				var x = arg.Split(':');
+				var x = arg.Split(new[] {':'}, 2);
 				if (x.Length == 2 && x[0] == name) {
 					return x[1];
 				}

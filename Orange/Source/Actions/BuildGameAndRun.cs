@@ -5,6 +5,9 @@ namespace Orange
 {
 	public static partial class Actions
 	{
+
+		public const string ConsoleCommandPassArguments = "--passargs";
+
 		[Export(nameof(OrangePlugin.MenuItemsWithErrorDetails))]
 		[ExportMetadata("Label", "Build & Run")]
 		[ExportMetadata("Priority", 0)]
@@ -47,7 +50,8 @@ namespace Orange
 		{
 			var builder = new SolutionBuilder(platform, customSolution);
 			string arguments = PluginLoader.GetCommandLineArguments();
-			int exitCode = builder.Run(arguments);
+			string passArguments = Toolbox.GetCommandLineArg(ConsoleCommandPassArguments);
+			int exitCode = builder.Run(string.Join(" ", arguments, passArguments));
 			if (exitCode != 0) {
 				Console.WriteLine("Application terminated with exit code {0}", exitCode);
 				return false;
