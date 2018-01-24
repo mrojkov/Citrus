@@ -1294,30 +1294,9 @@ namespace Lime
 		/// <returns></returns>
 		public Bitmap ToBitmap()
 		{
-			return ToBitmap(Width, Height);
-		}
-
-		/// <summary>
-		/// Renders the widget with all descendants into new instance of <see cref="Bitmap">
-		/// </summary>
-		/// <param name="size">Desired size of bitmap</param>
-		/// <returns></returns>
-		public Bitmap ToBitmap(Size size)
-		{
-			return ToBitmap(size.Width, size.Height);
-		}
-
-		/// <summary>
-		/// Renders the widget with all descendants into new instance of <see cref="Bitmap">
-		/// </summary>
-		/// <param name="width">Desired width of bitmap</param>
-		/// <param name="height">Desired height of bitmap</param>
-		/// <returns></returns>
-		public Bitmap ToBitmap(float width, float height)
-		{
 			var pixelScale = Window.Current.PixelScale;
-			var scaledWidth = (int)(width * pixelScale);
-			var scaledHeight = (int)(height * pixelScale);
+			var scaledWidth = (int)(Width * pixelScale);
+			var scaledHeight = (int)(Height * pixelScale);
 			var savedScale = Scale;
 			var savedPosition = Position;
 			var savedPivot = Pivot;
