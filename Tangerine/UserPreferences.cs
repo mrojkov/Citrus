@@ -19,6 +19,12 @@ namespace Tangerine
 		[YuzuRequired]
 		public Vector2 DefaultSceneDimensions { get; set; }
 
+		/// <summary>
+		/// Autosave delay in seconds
+		/// </summary>
+		[YuzuRequired]
+		public int AutosaveDelay { get; set; }
+
 		public UserPreferences()
 		{
 			DockState = new UI.DockManager.State();
@@ -30,6 +36,7 @@ namespace Tangerine
 		{
 			Theme = ColorThemeEnum.Light;
 			DefaultSceneDimensions = new Vector2(1024, 768);
+			AutosaveDelay = 600;
 		}
 	}
 }

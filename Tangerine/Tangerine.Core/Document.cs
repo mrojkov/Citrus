@@ -165,7 +165,7 @@ namespace Tangerine.Core
 			modificationTime = DateTime.UtcNow;
 		}
 
-		static DocumentFormat ResolveFormat(string path)
+		public static DocumentFormat ResolveFormat(string path)
 		{
 			if (AssetExists(path, "scene")) {
 				return DocumentFormat.Scene;
@@ -290,7 +290,12 @@ namespace Tangerine.Core
 			SetModificationTimeToNow();
 		}
 
-		public static void WriteNodeToFile(string path, DocumentFormat format, Node node)
+		public void SaveTo(string path, FileAttributes attributes = 0)
+		{
+			WriteNodeToFile(path, Format, RootNode, attributes);
+		}
+
+		public static void WriteNodeToFile(string path, DocumentFormat format, Node node, FileAttributes attributes = 0)
 		{
 			// Save the document into memory at first to avoid a torn file in the case of a serialization error.
 			var ms = new MemoryStream();
@@ -304,10 +309,12 @@ namespace Tangerine.Core
 				}
 			}
 			var fullPath = Project.Current.GetSystemPath(path, GetFileExtension(format));
-			using (var fs = new FileStream(fullPath, FileMode.Create)) {
+			using (var fs = new FileStream(fullPath, FileMode.OpenOrCreate)) {
 				var a = ms.ToArray();
 				fs.Write(a, 0, a.Length);
 			}
+			var FileInfo = new FileInfo(fullPath);
+			FileInfo.Attributes |= attributes;
 		}
 
 		public static Node CreateCloneForSerialization(Node node)

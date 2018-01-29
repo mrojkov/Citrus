@@ -160,6 +160,8 @@ namespace Tangerine
 				new PropertyEditorParams(pane.Content, Core.UserPreferences.Instance.Get<UI.Timeline.UserPreferences>(), nameof(UI.Timeline.UserPreferences.AutoKeyframes), "Automatic keyframes"));
 			new BooleanPropertyEditor(
 				new PropertyEditorParams(pane.Content, Core.UserPreferences.Instance.Get<UI.Timeline.UserPreferences>(), nameof(UI.Timeline.UserPreferences.AnimationMode), "Animation mode"));
+			new IntPropertyEditor(
+				new PropertyEditorParams(pane.Content, Core.UserPreferences.Instance.Get<Tangerine.UserPreferences>(), nameof(Tangerine.UserPreferences.AutosaveDelay), "Autosave delay"));
 			var boneWidthPropertyEditor = new FloatPropertyEditor(
 				new PropertyEditorParams(pane.Content, Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>(), nameof(UI.SceneView.UserPreferences.DefaultBoneWidth), "Bone Width"));
 			boneWidthPropertyEditor.ContainerWidget.AddChangeWatcher(

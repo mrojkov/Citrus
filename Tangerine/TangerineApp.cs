@@ -85,6 +85,11 @@ namespace Tangerine
 				return res == 0 || res == -1 ? false : true;
 			};
 
+			Project.TempFileLoadConfirmation += path => {
+				var alert = new AlertDialog($"Do you want to load autosaved version of '{path}'?", "Yes", "No");
+				return alert.Show() == 0;
+			};
+
 			Project.CookingOfModifiedAssetsStarted += () => {
 				cookingOfModifiedAssetsDialog = new ModalOperationDialog(() => Project.CookingOfModifiedAssetsStatus, "Cooking of modified assets");
 				cookingOfModifiedAssetsDialog.Show();
@@ -116,6 +121,7 @@ namespace Tangerine
 				AlertDialog.Show("Can't open a document outside the project directory");
 			};
 			Project.Tasks = dockManager.MainWindowWidget.Tasks;
+			Project.Tasks.Add(new AutosaveProcessor(() => Core.UserPreferences.Instance.Get<UserPreferences>().AutosaveDelay));
 			Document.NodeDecorators.AddFor<Spline>(n => n.CompoundPostPresenter.Add(new UI.SceneView.SplinePresenter()));
 			Document.NodeDecorators.AddFor<Viewport3D>(n => n.CompoundPostPresenter.Add(new UI.SceneView.Spline3DPresenter()));
 			Document.NodeDecorators.AddFor<Widget>(n => {

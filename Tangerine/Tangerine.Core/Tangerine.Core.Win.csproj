@@ -40,6 +40,7 @@
     <Folder Include="Resources\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AutosaveProcessor.cs" />
     <Compile Include="ClassAttributes.cs" />
     <Compile Include="Components.cs" />
     <Compile Include="HotSerialization.cs" />

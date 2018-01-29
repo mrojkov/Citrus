@@ -28,6 +28,8 @@ namespace Tangerine.Core
 
 		public delegate bool DocumentReloadConfirmationDelegate(Document document);
 		public static DocumentReloadConfirmationDelegate DocumentReloadConfirmation;
+		public delegate bool TempFileLoadConfirmationDelegate(string path);
+		public static TempFileLoadConfirmationDelegate TempFileLoadConfirmation;
 		public delegate void CookingOfModifiedAssetsStartedDelegate();
 		public static CookingOfModifiedAssetsStartedDelegate CookingOfModifiedAssetsStarted;
 		public delegate void CookingOfModifiedAssetsEndedDelegate();
@@ -207,18 +209,44 @@ namespace Tangerine.Core
 
 			var doc = Documents.FirstOrDefault(i => i.Path == localPath);
 			if (doc == null) {
-				doc = new Document(localPath);
+				var tmpFile = AutosaveProcessor.GetTemporalFilePath(localPath);
+				string systemPath;
+				if (GetSystemPath(tmpFile, out systemPath) && TempFileLoadConfirmation.Invoke(localPath)) {
+					doc = new Document(tmpFile);
+					doc.SaveAs(localPath);
+				} else {
+					doc = new Document(localPath);
+				}
+				if (systemPath != null) {
+					File.Delete(systemPath);
+				}
 				documents.Add(doc);
 			}
 			doc.MakeCurrent();
 			return doc;
 		}
 
+		public bool GetSystemPath(string localPath, out string systemPath)
+		{
+			systemPath = null;
+			foreach (var ext in Document.AllowedFileTypes) {
+				systemPath = GetSystemPath(localPath, ext);
+				if (File.Exists(systemPath)) {
+					return true;
+				}
+			}
+			return false;
+		}
+
 		public bool CloseDocument(Document doc)
 		{
 			int currentIndex = documents.IndexOf(Document.Current);
+			string systemPath;
 			if (doc.Close()) {
 				documents.Remove(doc);
+				if (GetSystemPath(AutosaveProcessor.GetTemporalFilePath(doc.Path), out systemPath)) {
+					File.Delete(systemPath);
+				}
 				if (doc == Document.Current) {
 					if (documents.Count > 0) {
 						documents[currentIndex.Min(Documents.Count - 1)].MakeCurrent();
