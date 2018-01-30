@@ -129,6 +129,7 @@ namespace Lime
 		ColorBit1 = 256,
 		ColorBit2 = 512,
 		ColorBit3 = 1024,
+		SceneNode = 2048
 	}
 
 	public delegate void UpdateHandler(float delta);

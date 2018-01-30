@@ -321,6 +321,7 @@ namespace Tangerine.Core
 		{
 			var clone = node.Clone();
 			Action<Node> f = (n) => {
+				n.SetTangerineFlag(TangerineFlags.SceneNode, false);
 				n.AnimationFrame = 0;
 				if (n.Folders != null && n.Folders.Count == 0) {
 					n.Folders = null;

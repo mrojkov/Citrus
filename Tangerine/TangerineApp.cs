@@ -135,6 +135,8 @@ namespace Tangerine
 				}
 			});
 
+			Document.NodeDecorators.AddFor<Node>(n => n.SetTangerineFlag(TangerineFlags.SceneNode, true));
+
 			dockManager.MainWindowWidget.Updated += delta => Document.Current?.History.NextBatch();
 			DocumentHistory.Processors.AddRange(new IOperationProcessor[] {
 				new Core.Operations.SelectRow.Processor(),
