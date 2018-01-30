@@ -794,12 +794,18 @@ namespace Tangerine.UI
 			foreach (var i in items) {
 				selector.Items.Add(i);
 			}
+			selector.Text = GetFontName(CoalescedPropertyValue().GetValue());
 			selector.Changed += a => {
 				SetProperty(new SerializableFont((string)a.Value));
 			};
 			selector.AddChangeWatcher(CoalescedPropertyValue(), i => {
-				selector.Text = string.IsNullOrEmpty(i?.Name) ? "Default" : i.Name;
+				selector.Text = GetFontName(i);
 			});
+		}
+
+		private static string GetFontName(SerializableFont i)
+		{
+			return string.IsNullOrEmpty(i?.Name) ? "Default" : i.Name;
 		}
 
 		public override void SetFocus() => selector.SetFocus();
