@@ -84,6 +84,7 @@ namespace Tangerine
 			AppUserPreferences.Instance.ResetToDefaults();
 			UI.SceneView.SceneUserPreferences.Instance.ResetToDefaults();
 			UI.Timeline.TimelineUserPreferences.Instance.ResetToDefaults();
+			Core.CoreUserPreferences.Instance.ResetToDefaults();
 		}
 
 		private Widget CreateColorsPane()
@@ -157,7 +158,7 @@ namespace Tangerine
 			new Vector2PropertyEditor(
 				new PropertyEditorParams(pane.Content, Tangerine.AppUserPreferences.Instance, nameof(Tangerine.AppUserPreferences.DefaultSceneDimensions), "Default scene dimensions"));
 			new BooleanPropertyEditor(
-				new PropertyEditorParams(pane.Content, UI.Timeline.TimelineUserPreferences.Instance, nameof(UI.Timeline.TimelineUserPreferences.AutoKeyframes), "Automatic keyframes"));
+				new PropertyEditorParams(pane.Content, CoreUserPreferences.Instance, nameof(CoreUserPreferences.AutoKeyframes), "Automatic keyframes"));
 			new BooleanPropertyEditor(
 				new PropertyEditorParams(pane.Content, UI.Timeline.TimelineUserPreferences.Instance, nameof(UI.Timeline.TimelineUserPreferences.AnimationMode), "Animation mode"));
 			new IntPropertyEditor(

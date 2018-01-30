@@ -28,12 +28,13 @@ namespace Tangerine
 			Application.IsTangerine = true;
 			Serialization.DeserializerBuilders.Insert(0, DeserializeHotStudioAssets);
 
-			if (!Core.UserPreferences.Initialize()) {
-				Core.UserPreferences.Instance.Clear();
-				Core.UserPreferences.Instance.Add(new AppUserPreferences());
-				Core.UserPreferences.Instance.Add(new UI.SceneView.SceneUserPreferences());
-				Core.UserPreferences.Instance.Add(new UI.Timeline.TimelineUserPreferences());
-				Core.UserPreferences.Instance.Add(new UI.FilesystemView.FilesystemUserPreferences());
+			if (!UserPreferences.Initialize()) {
+				UserPreferences.Instance.Clear();
+				UserPreferences.Instance.Add(new AppUserPreferences());
+				UserPreferences.Instance.Add(new UI.SceneView.SceneUserPreferences());
+				UserPreferences.Instance.Add(new UI.Timeline.TimelineUserPreferences());
+				UserPreferences.Instance.Add(new UI.FilesystemView.FilesystemUserPreferences());
+				UserPreferences.Instance.Add(new CoreUserPreferences());
 			}
 			SetColorTheme(AppUserPreferences.Instance.Theme);
 
