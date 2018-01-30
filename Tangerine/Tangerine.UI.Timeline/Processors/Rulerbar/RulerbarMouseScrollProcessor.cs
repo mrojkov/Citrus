@@ -17,6 +17,7 @@ namespace Tangerine.UI.Timeline
 			while (true) {
 				if (input.WasMousePressed()) {
 					Document.Current.History.BeginTransaction();
+					Operations.SetCurrentColumn.Processor.CacheAnimationsStates = true;
 					try {
 						int initialCol = CalcColumn(input.LocalMousePosition.X);
 						var marker = Document.Current.Container.Markers.FirstOrDefault(m => m.Frame == initialCol);
@@ -42,6 +43,7 @@ namespace Tangerine.UI.Timeline
 						}
 					} finally {
 						timeline.Ruler.MeasuredFrameDistance = 0;
+						Operations.SetCurrentColumn.Processor.CacheAnimationsStates = false;
 						Document.Current.History.EndTransaction();
 					}
 				}
@@ -77,5 +79,5 @@ namespace Tangerine.UI.Timeline
 		{
 			return ((mouseX + timeline.Offset.X) / TimelineMetrics.ColWidth).Floor().Max(0);
 		}
-	}	
+	}
 }
