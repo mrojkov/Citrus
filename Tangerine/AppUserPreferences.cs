@@ -5,7 +5,7 @@ using Yuzu;
 
 namespace Tangerine
 {
-	public class UserPreferences : Component
+	public class AppUserPreferences : Component
 	{
 		[YuzuRequired]
 		public UI.DockManager.State DockState;
@@ -25,7 +25,7 @@ namespace Tangerine
 		[YuzuRequired]
 		public int AutosaveDelay { get; set; }
 
-		public UserPreferences()
+		public AppUserPreferences()
 		{
 			DockState = new UI.DockManager.State();
 			RecentProjects = new List<string>();
@@ -38,5 +38,7 @@ namespace Tangerine
 			DefaultSceneDimensions = new Vector2(1024, 768);
 			AutosaveDelay = 600;
 		}
+
+		public static AppUserPreferences Instance => Core.UserPreferences.Instance.Get<AppUserPreferences>();
 	}
 }

@@ -5,7 +5,7 @@ using Yuzu;
 
 namespace Tangerine.UI.FilesystemView
 {
-	public class UserPreferences : Component
+	public class FilesystemUserPreferences : Component
 	{
 		[YuzuRequired]
 		public Dictionary<string, ViewNode> ViewRootPerProjectFile = new Dictionary<string, ViewNode>();
@@ -25,5 +25,7 @@ namespace Tangerine.UI.FilesystemView
 				ViewRootPerProjectFile[Project.Current.CitprojPath ?? ""] = value;
 			}
 		}
+
+		public static FilesystemUserPreferences Instance => Core.UserPreferences.Instance.Get<FilesystemUserPreferences>();
 	}
 }

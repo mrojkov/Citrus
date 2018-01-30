@@ -33,7 +33,7 @@ namespace Tangerine.UI.Timeline
 			};
 		}
 
-		UserPreferences UserPreferences => Core.UserPreferences.Instance.Get<UserPreferences>();
+		TimelineUserPreferences UserPreferences => TimelineUserPreferences.Instance;
 
 		ToolbarButton CreateAnimationModeButton()
 		{

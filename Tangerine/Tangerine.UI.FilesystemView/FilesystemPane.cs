@@ -33,7 +33,7 @@ namespace Tangerine.UI.FilesystemView
 		{
 			// TODO: clear references from user preferences tree to widgets from tree disposed
 			rootWidget?.UnlinkAndDispose();
-			var up = Core.UserPreferences.Instance.Get<UserPreferences>();
+			var up = FilesystemUserPreferences.Instance;
 			var q = new Queue<ViewNode>();
 			q.Enqueue(up.ViewRoot);
 			while (q.Count != 0) {
@@ -89,7 +89,7 @@ namespace Tangerine.UI.FilesystemView
 			if (vn.Parent == null) {
 				// Root node, need to replace on in UserPreferences
 				Splitter s = type.MakeSplitter();
-				var up = Core.UserPreferences.Instance.Get<UserPreferences>();
+				var up = FilesystemUserPreferences.Instance;
 				var sn = new SplitterNode {
 					Widget = s,
 					Type = type
@@ -170,7 +170,7 @@ namespace Tangerine.UI.FilesystemView
 					var ovn = sn.Children.First();
 					if (sn.Parent == null) {
 						// Root => update up
-						var up = Core.UserPreferences.Instance.Get<UserPreferences>();
+						var up = FilesystemUserPreferences.Instance;
 						up.ViewRoot = ovn;
 						ovn.Parent = null;
 						ovn.Widget.Unlink();

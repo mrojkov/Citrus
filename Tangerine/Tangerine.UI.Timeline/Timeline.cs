@@ -97,11 +97,11 @@ namespace Tangerine.UI.Timeline
 		{
 			RootWidget.Layout = new StackLayout();
 			RootWidget.AddNode(new ThemedVSplitter {
-				Stretches = Splitter.GetStretchesList(Core.UserPreferences.Instance.Get<UserPreferences>().TimelineVSplitterStretches, 0.5f, 1),
+				Stretches = Splitter.GetStretchesList(TimelineUserPreferences.Instance.TimelineVSplitterStretches, 0.5f, 1),
 				Nodes = {
 					Overview.RootWidget,
 					new ThemedHSplitter {
-						Stretches = Splitter.GetStretchesList(Core.UserPreferences.Instance.Get<UserPreferences>().TimelineHSplitterStretches, 0.3f, 1),
+						Stretches = Splitter.GetStretchesList(TimelineUserPreferences.Instance.TimelineHSplitterStretches, 0.3f, 1),
 						Nodes = {
 							new Widget {
 								Layout = new VBoxLayout(),
@@ -166,11 +166,11 @@ namespace Tangerine.UI.Timeline
 
 		ITaskProvider ShowCurveEditorTask()
 		{
-			var editCurvesProp = new Property<bool>(() => Core.UserPreferences.Instance.Get<UserPreferences>().EditCurves);
+			var editCurvesProp = new Property<bool>(() => TimelineUserPreferences.Instance.EditCurves);
 			return new Property<Row>(FirstSelectedRow).Coalesce(editCurvesProp).WhenChanged(t => {
 				var row = t.Item1;
-				var showCurves = 
-					Core.UserPreferences.Instance.Get<UserPreferences>().EditCurves &&
+				var showCurves =
+					TimelineUserPreferences.Instance.EditCurves &&
 					row != null && CurveEditorPane.CanEditRow(row);
 				CurveEditor.RootWidget.Visible = showCurves;
 				Grid.RootWidget.Visible = !showCurves;

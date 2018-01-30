@@ -30,12 +30,12 @@ namespace Tangerine
 
 			if (!Core.UserPreferences.Initialize()) {
 				Core.UserPreferences.Instance.Clear();
-				Core.UserPreferences.Instance.Add(new UserPreferences());
-				Core.UserPreferences.Instance.Add(new UI.SceneView.UserPreferences());
-				Core.UserPreferences.Instance.Add(new UI.Timeline.UserPreferences());
-				Core.UserPreferences.Instance.Add(new UI.FilesystemView.UserPreferences());
+				Core.UserPreferences.Instance.Add(new AppUserPreferences());
+				Core.UserPreferences.Instance.Add(new UI.SceneView.SceneUserPreferences());
+				Core.UserPreferences.Instance.Add(new UI.Timeline.TimelineUserPreferences());
+				Core.UserPreferences.Instance.Add(new UI.FilesystemView.FilesystemUserPreferences());
 			}
-			SetColorTheme(Core.UserPreferences.Instance.Get<UserPreferences>().Theme);
+			SetColorTheme(AppUserPreferences.Instance.Theme);
 
 			LoadFont();
 			DockManager.Initialize(new Vector2(1024, 768), TangerineMenu.PadsMenu);
@@ -49,7 +49,7 @@ namespace Tangerine
 
 			Application.Exiting += () => Project.Current.Close();
 			Application.Exited += () => {
-				Core.UserPreferences.Instance.Get<UserPreferences>().DockState = DockManager.Instance.ExportState();
+				AppUserPreferences.Instance.DockState = DockManager.Instance.ExportState();
 				Core.UserPreferences.Instance.Save();
 			};
 
@@ -69,7 +69,7 @@ namespace Tangerine
 			DockManagerInitialState = dockManager.ExportState();
 			var documentViewContainer = InitializeDocumentArea(dockManager);
 
-			dockManager.ImportState(Core.UserPreferences.Instance.Get<UserPreferences>().DockState);
+			dockManager.ImportState(AppUserPreferences.Instance.DockState);
 			Document.CloseConfirmation += doc => {
 				var alert = new AlertDialog($"Save the changes to document '{doc.Path}' before closing?", "Yes", "No", "Cancel");
 				switch (alert.Show()) {
@@ -121,7 +121,7 @@ namespace Tangerine
 				AlertDialog.Show("Can't open a document outside the project directory");
 			};
 			Project.Tasks = dockManager.MainWindowWidget.Tasks;
-			Project.Tasks.Add(new AutosaveProcessor(() => Core.UserPreferences.Instance.Get<UserPreferences>().AutosaveDelay));
+			Project.Tasks.Add(new AutosaveProcessor(() => AppUserPreferences.Instance.AutosaveDelay));
 			Document.NodeDecorators.AddFor<Spline>(n => n.CompoundPostPresenter.Add(new UI.SceneView.SplinePresenter()));
 			Document.NodeDecorators.AddFor<Viewport3D>(n => n.CompoundPostPresenter.Add(new UI.SceneView.Spline3DPresenter()));
 			Document.NodeDecorators.AddFor<Widget>(n => {
@@ -178,7 +178,7 @@ namespace Tangerine
 					});
 				}
 			};
-			var proj = Core.UserPreferences.Instance.Get<UserPreferences>().RecentProjects.FirstOrDefault();
+			var proj = AppUserPreferences.Instance.RecentProjects.FirstOrDefault();
 			if (proj != null) {
 				new Project(proj).Open();
 			}

@@ -7,8 +7,8 @@ namespace Tangerine.UI
 		public const float RollIndentation = 25;
 		public static float ColWidth
 		{
-			get { return Core.UserPreferences.Instance.Get<UserPreferences>().ColWidth; }
-			set { Core.UserPreferences.Instance.Get<UserPreferences>().ColWidth = value; }
+			get { return TimelineUserPreferences.Instance.ColWidth; }
+			set { TimelineUserPreferences.Instance.ColWidth = value; }
 		}
 		public const float DefaultRowHeight = 25;
 		public const float RowSpacing = 1;

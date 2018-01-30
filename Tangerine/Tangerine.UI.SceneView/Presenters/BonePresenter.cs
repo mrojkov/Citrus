@@ -10,7 +10,7 @@ namespace Tangerine.UI.SceneView
 {
 	public class BonePresenter : CustomPresenter<Frame>
 	{
-		public static float TipWidth => Core.UserPreferences.Instance.Get<UserPreferences>().DefaultBoneWidth;
+		public static float TipWidth => SceneUserPreferences.Instance.DefaultBoneWidth;
 
 		private readonly SceneView sv;
 
