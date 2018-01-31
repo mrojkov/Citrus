@@ -30,6 +30,32 @@ namespace Lime
 #endif
 		}
 
+		/// <summary>
+		/// Opens the system file manager and selects a file or folder
+		/// </summary>
+		/// <param name="path">Absolute path to the file or folder</param>
+		public static void ShowInFileManager(string path)
+		{
+			System.Diagnostics.ProcessStartInfo startInfo =
+				new System.Diagnostics.ProcessStartInfo();
+#if WIN
+			startInfo.FileName = "explorer.exe";
+			startInfo.Arguments = $"/select, \"{path}\"";
+#elif MAC
+			string appleScript = 
+				"'tell application \"Finder\"\n" +
+				"activate\n" +
+				$"make new Finder window to (POSIX file \"{path}\")\n" +
+				"end tell'";
+
+			startInfo.FileName = "osascript";
+			startInfo.Arguments = $"-e {appleScript}";
+#else
+			throw new System.NotImplementedException();
+#endif
+			System.Diagnostics.Process.Start(startInfo);
+		}
+
 		public static string GetDataDirectory(string appName)
 		{
 			return GetDataDirectory(null, appName, "1.0");
