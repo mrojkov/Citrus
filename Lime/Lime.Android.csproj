@@ -145,6 +145,7 @@
     <Compile Include="Source\Widgets\Spline.cs" />
     <Compile Include="Source\Widgets\SplineGear.cs" />
     <Compile Include="Source\Widgets\SplinePoint.cs" />
+    <Compile Include="Source\Widgets\VideoPlayer\VideoPlayer.Android.cs" />
     <Compile Include="Source\Widgets\Widget.cs" />
     <Compile Include="Source\Widgets\WidgetDebugView.cs" />
     <Compile Include="Source\Widgets\WidgetInput.cs" />
