@@ -59,6 +59,7 @@
     <Compile Include="MainMenu\WindowMenu.cs" />
     <Compile Include="OrangeInterface.cs" />
     <Compile Include="DisplayResolutions.cs" />
+    <Compile Include="OrangePluginUIBuidler.cs" />
     <Compile Include="TangerineApp.cs" />
     <Compile Include="Main.Win.cs" />
     <Compile Include="TangerineMenu.cs" />

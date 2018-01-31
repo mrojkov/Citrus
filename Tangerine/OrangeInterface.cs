@@ -33,7 +33,7 @@ namespace Tangerine
 
 		public override IPluginUIBuilder GetPluginUIBuilder()
 		{
-			return null;
+			return new OrangePluginUIBuidler();
 		}
 
 		public override void CreatePluginUI(IPluginUIBuilder builder) { }
