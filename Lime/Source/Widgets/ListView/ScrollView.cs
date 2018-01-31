@@ -27,21 +27,14 @@ namespace Lime
 		public ScrollDirection ScrollDirection { get; private set; }
 		private WheelScrollState wheelScrollState;
 		public bool ScrollWhenContentFits = true;
-		private float? lastFrameRotation = null;
-		private Vector2? lastScrollAxis = null;
 		private DragGesture dragGesture;
 		private Vector2 ScrollAxis
 		{
 			get
 			{
-				if (lastFrameRotation != Frame.Rotation) {
-					lastFrameRotation = Frame.Rotation;
-					lastScrollAxis = ScrollDirection == ScrollDirection.Horizontal
-						? new Vector2(1.0f, 0.0f)
-						: new Vector2(0.0f, 1.0f);
-					lastScrollAxis = Vector2.RotateDegRough(lastScrollAxis.Value, Frame.Rotation);
-				}
-				return lastScrollAxis.Value;
+				return ScrollDirection == ScrollDirection.Horizontal ? 
+					Frame.LocalToWorldTransform.U.Normalized : 
+					Frame.LocalToWorldTransform.V.Normalized;
 			}
 		}
 		public bool ExclusiveDrag { get { return dragGesture.Exclusive; } set { dragGesture.Exclusive = value; } }
