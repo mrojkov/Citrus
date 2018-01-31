@@ -456,7 +456,7 @@ namespace Lime
 
 			if (forLcdSecondPass != null) {
 				Blending wasBlending = Blending;
-				Blending = Blending.LcdTextFirstPass;
+				Blending = Blending.LcdTextSecondPass;
 				foreach (Sprite sprite in forLcdSecondPass) {
 					DrawSprite(sprite.Texture1, sprite.Color, sprite.Position, sprite.Size, sprite.UV0, sprite.UV1);
 				}
