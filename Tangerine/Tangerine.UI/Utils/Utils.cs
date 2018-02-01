@@ -219,5 +219,31 @@ namespace Tangerine.UI
 			}
 		}
 
+		public static void SetAnimatorAndInitialKeyframeIfNeed(IAnimable animable, params string[] properties)
+		{
+			var frame = Document.Current.AnimationFrame;
+			Document.Current.AnimationFrame = 0;
+			IAnimator animator;
+			foreach (var propName in properties) {
+				if (!animable.Animators.TryFind(propName, out animator, Document.Current.AnimationId)) {
+					var propValue = animable.GetType().GetProperty(propName).GetValue(animable);
+					SetProperty.Perform(animable, propName, propValue);
+					var type = animable.GetType().GetProperty(propName).PropertyType;
+					animator = AnimatorRegistry.Instance.CreateAnimator(type);
+					animator.TargetProperty = propName;
+					animator.AnimationId = Document.Current.AnimationId;
+					SetAnimator.Perform(animable, animator);
+					SetAnimableProperty.Perform(animable, propName, propValue);
+				}
+			}
+			Document.Current.AnimationFrame = frame;
+		}
+
+		public static void SetAnimatorAndInitialKeyframeIfNeed(IEnumerable<IAnimable> animables, params string[] properties)
+		{
+			foreach (var animable in animables) {
+				SetAnimatorAndInitialKeyframeIfNeed(animable, properties);
+			}
+		}
 	}
 }

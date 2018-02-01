@@ -55,7 +55,9 @@ namespace Tangerine.UI.SceneView
 				var rotation = 0f;
 				while (sv.Input.IsMousePressed()) {
 					Document.Current.History.RevertActiveTransaction();
-
+					if (CoreUserPreferences.Instance.AutoKeyframes) {
+						Utils.SetAnimatorAndInitialKeyframeIfNeed(points.Cast<IAnimable>(), nameof(PointObject.Position));
+					}
 					if (!sv.Components.Contains<PointObjectSelectionComponent>()) {
 						sv.Components.Add(new PointObjectSelectionComponent {
 							СurrentBounds = bounds,

@@ -40,8 +40,6 @@ namespace Tangerine.UI.SceneView
 				var iniMousePos = sv.MousePosition;
 				var transform = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
 				var dragDirection = DragDirection.Any;
-				var positions = pobjects.Select(i => i.TransformedPosition).ToList();
-				var uvs = pobjects.OfType<DistortionMeshPoint>().Select(i => i.UV).ToList();
 				while (sv.Input.IsMousePressed()) {
 					Document.Current.History.RevertActiveTransaction();
 
@@ -68,9 +66,16 @@ namespace Tangerine.UI.SceneView
 								parent.Size.X != 0 &&
 								parent.Size.Y != 0
 							) {
-								SetPosition(pobjects[i], (positions[i] + dragDelta - pobjects[i].Offset) / parent.Size);
+								if (CoreUserPreferences.Instance.AutoKeyframes) {
+									Utils.SetAnimatorAndInitialKeyframeIfNeed(pobjects[i], nameof(PointObject.Position));
+								}
+								SetPosition(pobjects[i], (pobjects[i].TransformedPosition + dragDelta - pobjects[i].Offset) / parent.Size);
 								if (sv.Input.IsKeyPressed(Key.Control) && pobjects[i] is DistortionMeshPoint) {
-									SetUV(pobjects[i], uvs[i] + dragDelta / parent.Size);
+									if (CoreUserPreferences.Instance.AutoKeyframes) {
+										Utils.SetAnimatorAndInitialKeyframeIfNeed(pobjects[i], nameof(DistortionMeshPoint.UV));
+									}
+									var p = pobjects[i] as DistortionMeshPoint;
+									SetUV(p, p.UV + dragDelta / parent.Size);
 								}
 							}
 						}
@@ -83,7 +88,7 @@ namespace Tangerine.UI.SceneView
 			}
 		}
 
-		private void SetUV(PointObject pointObject, Vector2 value)
+		private void SetUV(DistortionMeshPoint pointObject, Vector2 value)
 		{
 			Core.Operations.SetAnimableProperty.Perform(pointObject, nameof(DistortionMeshPoint.UV), value);
 		}

@@ -38,11 +38,11 @@ namespace Tangerine.UI.SceneView
 
 				while (sv.Input.IsMousePressed()) {
 					Utils.ChangeCursorIfDefault(Cursors.Rotate);
-
 					Document.Current.History.RevertActiveTransaction();
-					
+					if (CoreUserPreferences.Instance.AutoKeyframes) {
+						Utils.SetAnimatorAndInitialKeyframeIfNeed(widgets.Cast<IAnimable>(), nameof(Widget.Position), nameof(Widget.Rotation));
+					}
 					RotateWidgets(pivot, widgets, sv.MousePosition, mouseStartPos, sv.Input.IsKeyPressed(Key.Shift));
-
 					yield return null;
 				}
 			} finally {

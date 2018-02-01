@@ -49,13 +49,14 @@ namespace Tangerine.UI.SceneView
 				var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>().ToList();
 				var transform = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
 				var dragDirection = DragDirection.Any;
-				var positions = widgets.Select(i => i.Position).ToList();
 				Quadrangle hull;
 				Vector2 pivot;
 				Utils.CalcHullAndPivot(widgets, Document.Current.Container.AsWidget, out hull, out pivot);
 				while (sv.Input.IsMousePressed()) {
 					Document.Current.History.RevertActiveTransaction();
-
+					if (CoreUserPreferences.Instance.AutoKeyframes) {
+						Utils.SetAnimatorAndInitialKeyframeIfNeed(widgets.Cast<IAnimable>(), nameof(Widget.Position));
+					}
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					var curMousePos = sv.MousePosition;
 					var shiftPressed = sv.Input.IsKeyPressed(Key.Shift);
@@ -74,7 +75,7 @@ namespace Tangerine.UI.SceneView
 					dragDelta = dragDelta.Snap(Vector2.Zero);
 					var lines = GetRulerLines();
 					if (dragDelta != Vector2.Zero) {
-						SnapPoints(widgets, positions, dragDelta, lines, hull);
+						SnapPoints(widgets, dragDelta, lines, hull);
 					}
 					yield return null;
 				}
@@ -84,7 +85,7 @@ namespace Tangerine.UI.SceneView
 			}
 		}
 
-		private static void SnapPoints(List<Widget> widgets, List<Vector2> positions, Vector2 dragDelta, List<RulerLine> lines, Quadrangle hull)
+		private static void SnapPoints(List<Widget> widgets, Vector2 dragDelta, List<RulerLine> lines, Quadrangle hull)
 		{
 			if (SceneViewCommands.SnapWidgetBorderToRuler.Checked) {
 				var delta = Vector2.Zero;
@@ -94,7 +95,7 @@ namespace Tangerine.UI.SceneView
 				dragDelta += delta;
 			}
 			for (int i = 0; i < widgets.Count; i++) {
-				var pos = positions[i] + dragDelta;
+				var pos = widgets[i].Position + dragDelta;
 				if (SceneViewCommands.SnapWidgetPivotToRuler.Checked) {
 					pos = SnapPointToLines(pos, lines);
 				}

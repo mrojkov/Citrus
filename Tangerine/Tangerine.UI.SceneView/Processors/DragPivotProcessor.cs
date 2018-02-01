@@ -42,14 +42,14 @@ namespace Tangerine.UI.SceneView
 				var iniMousePos = sv.MousePosition;
 				var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>().ToList();
 				var dragDirection = DragDirection.Any;
-				var positions = widgets.Select(i => i.Position).ToList();
-				var pivots = widgets.Select(i => i.Pivot).ToList();
 				Quadrangle hull;
 				Vector2 iniPivot;
 				Utils.CalcHullAndPivot(widgets, sv.Scene, out hull, out iniPivot);
 				while (sv.Input.IsMousePressed()) {
 					Document.Current.History.RevertActiveTransaction();
-
+					if (CoreUserPreferences.Instance.AutoKeyframes) {
+						Utils.SetAnimatorAndInitialKeyframeIfNeed(widgets.Cast<IAnimable>(), nameof(PointObject.Position), nameof(Widget.Pivot));
+					}
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					var curMousePos = sv.MousePosition;
 					var shiftPressed = sv.Input.IsKeyPressed(Key.Shift);
@@ -73,8 +73,8 @@ namespace Tangerine.UI.SceneView
 						var deltaPos = Vector2.RotateDeg(dragDelta * widget.Scale, widget.Rotation);
 						deltaPivot = deltaPivot.Snap(Vector2.Zero);
 						if (deltaPivot != Vector2.Zero) {
-							Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Pivot), pivots[i] + deltaPivot);
-							Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), positions[i] + deltaPos.Snap(Vector2.Zero));
+							Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Pivot), widget.Pivot + deltaPivot);
+							Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), widget.Position + deltaPos.Snap(Vector2.Zero));
 						}
 					}
 					yield return null;
