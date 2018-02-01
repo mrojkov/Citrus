@@ -37,6 +37,19 @@ namespace Lime
 
 		private AudioTrack audio;
 
+		private long currentPosition = 0;
+
+		private class AudioSample
+		{
+			public byte[] Buffer;
+			public long PresentationTime;
+			public int Size;
+		}
+
+		private Queue<AudioSample> audioQueue = new Queue<AudioSample>();
+		private ManualResetEvent checkAudioQueue = new ManualResetEvent(false);
+		private ManualResetEvent checkVideoQueue = new ManualResetEvent(false);
+
 		public Decoder(string path, Surface surface)
 		{
 			extractor = new MediaExtractor();
@@ -81,11 +94,22 @@ namespace Lime
 					var sampleSize = extractor.ReadSampleData(inputBuffer, 0);
 					if (sampleSize > 0) {
 						codec.QueueInputBuffer(inputIndex, 0, sampleSize, extractor.SampleTime, MediaCodecBufferFlags.None);
-					} else {
+					}
+					if (!extractor.Advance() || sampleSize == 0) {
 						codec.QueueInputBuffer(inputIndex, 0, 0, 0, MediaCodecBufferFlags.EndOfStream);
 						hasInput = false;
 					}
-					extractor.Advance();
+				}
+			}
+		}
+
+		private void SignEndOfStream(MediaCodec codec, ref bool hasInput)
+		{
+			if (hasInput) {
+				var inputIndex = codec.DequeueInputBuffer(10000);
+				if (inputIndex >= 0) {
+					codec.QueueInputBuffer(inputIndex, 0, 0, 0, MediaCodecBufferFlags.EndOfStream);
+					hasInput = false;
 				}
 			}
 		}
@@ -106,8 +130,13 @@ namespace Lime
 						} else if (trackIndex == audioTrack) {
 							ExtractAndQueueSample(extractor, audioCodec, ref hasAudioInput);
 						}
+					} else {
+						SignEndOfStream(videoCodec, ref hasVideoInput);
+						SignEndOfStream(audioCodec, ref hasAudioInput);
+						Debug.Write("trackIndex <= -1");
 					}
 				}
+				Debug.Write("queueTask: end");
 			});
 
 
@@ -117,6 +146,11 @@ namespace Lime
 				while (!eosReceived) {
 					var outIndex = videoCodec.DequeueOutputBuffer(info, 10000);
 					if (outIndex >= 0) {
+						var pt = info.PresentationTimeUs;
+						while (currentPosition < pt) {
+							checkVideoQueue.WaitOne();
+							checkVideoQueue.Reset();
+						}
 						videoCodec.ReleaseOutputBuffer(outIndex, true);
 						TextureIsDirty = true;
 					}
@@ -127,6 +161,7 @@ namespace Lime
 				}
 			});
 
+			var hasMoreItemsInQueue = new ManualResetEvent(false);
 			var processAudio = System.Threading.Tasks.Task.Run(() => {
 				var eosReceived = false;
 				var info = new BufferInfo();
@@ -135,7 +170,15 @@ namespace Lime
 					if (outIndex >= 0) {
 						var buffer = audioCodec.GetOutputBuffer(outIndex);
 						var numChannels = audioFormat.GetInteger(MediaFormat.KeyChannelCount);
-						audio.Write(buffer, info.Size, WriteMode.Blocking);
+						var array = new byte[buffer.Remaining()];
+						buffer.Get(array);
+						audioQueue.Enqueue(new AudioSample() {
+							Buffer = array,
+							Size = info.Size,
+							PresentationTime = info.PresentationTimeUs
+						});
+						//audio.Write(buffer.Duplicate(), info.Size, WriteMode.NonBlocking);
+						hasMoreItemsInQueue.Set();
 						audioCodec.ReleaseOutputBuffer(outIndex, false);
 					}
 
@@ -145,10 +188,39 @@ namespace Lime
 				}
 			});
 
-			await System.Threading.Tasks.Task.WhenAll(queueTask, processVideo, processVideo);
+			var cancelationSource = new CancellationTokenSource();
+			var cancelationToken = cancelationSource.Token;
+			var audioDequeueTask = System.Threading.Tasks.Task.Run(() => {
+				while (true) {
+					cancelationToken.ThrowIfCancellationRequested();
+					hasMoreItemsInQueue.WaitOne();
+					hasMoreItemsInQueue.Reset();
+					while (audioQueue.Count > 0) {
+						var audioSample = audioQueue.Dequeue();
+						var pt = audioSample.PresentationTime / 1000000f;
+						while (currentPosition < pt) {
+							cancelationToken.ThrowIfCancellationRequested();
+							checkAudioQueue.WaitOne();
+							checkAudioQueue.Reset();
+						}
+						audio.Write(audioSample.Buffer, 0, audioSample.Size);
+					}
+				}
+			}, cancelationToken);
 
+			await System.Threading.Tasks.Task.WhenAll(queueTask, processVideo, processVideo);
+			cancelationSource.Cancel();
+			checkAudioQueue.Set();
+			hasMoreItemsInQueue.Set();
 			videoCodec?.Stop();
 			audioCodec?.Stop();
+		}
+
+		public void Update(float delta)
+		{
+			currentPosition += (long)(delta * 1000000);
+			checkAudioQueue.Set();
+			checkVideoQueue.Set();
 		}
 
 		public void Dispose()
@@ -321,7 +393,6 @@ namespace Lime
 	{
 		private Decoder decoder;
 		private SurfaceTextureRenderer renderer;
-
 		private RenderTexture texture;
 		
 		public VideoPlayer(Widget parentWidget)
@@ -335,6 +406,7 @@ namespace Lime
 		{
 			base.Update(delta);
 			var volume = AudioSystem.GetGroupVolume(AudioChannelGroup.Music);
+			decoder.Update(delta);
 			if (decoder.TextureIsDirty) {
 				decoder.TextureIsDirty = false;
 				renderer.Render(Texture);
@@ -366,6 +438,14 @@ namespace Lime
 
 		public override void Dispose()
 		{
+			if (decoder != null) {
+				decoder.Dispose();
+				decoder = null;
+			}
+			if (texture != null) {
+				texture.Dispose();
+				texture = null;
+			}
 			base.Dispose();
 		}
 	}
