@@ -44,7 +44,7 @@ namespace Orange
 				value = ((SerializableFont)value).Name;
 			}
 			if (value is string) {
-				value = ((string)value).Replace("\\", "\\\\").Replace("\n", "\\n");
+				value = ((string)value).Replace("\\", "\\\\").Replace("\n", "\\n").Replace("\"", "\\\"").Replace("\'", "\\\'");
 				return $"\"{value}\"";
 			}
 			if (
