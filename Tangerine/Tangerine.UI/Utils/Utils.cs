@@ -125,9 +125,15 @@ namespace Tangerine.UI
 
 				Transform2 widgetResultTransform = widget.CalcApplicableTransfrom2(deformedWidgetToParentSpace);
 
-				SetAnimableProperty.Perform(widget, nameof(Widget.Position), widgetResultTransform.Translation);
-				SetAnimableProperty.Perform(widget, nameof(Widget.Rotation), widgetResultTransform.Rotation);
-				SetAnimableProperty.Perform(widget, nameof(Widget.Scale), widgetResultTransform.Scale);
+				if ((widget.Position - widgetResultTransform.Translation).Length > Mathf.ZeroTolerance) {
+					SetAnimableProperty.Perform(widget, nameof(Widget.Position), widgetResultTransform.Translation);
+				}
+				if (Mathf.Abs(widget.Rotation - widgetResultTransform.Rotation) > Mathf.ZeroTolerance) {
+					SetAnimableProperty.Perform(widget, nameof(Widget.Rotation), widgetResultTransform.Rotation);
+				}
+				if ((widget.Scale - widgetResultTransform.Scale).Length > Mathf.ZeroTolerance) {
+					SetAnimableProperty.Perform(widget, nameof(Widget.Scale), widgetResultTransform.Scale);
+				}
 			}
 		}
 
