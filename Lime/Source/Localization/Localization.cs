@@ -100,21 +100,28 @@ namespace Lime
 
 		private static string GetStringHelper(string key)
 		{
-			if (key == "")
+			if (key == "") {
 				return key;
+			}
 			if (key.Length >= 2 && key[0] == '[' && key[1] == ']') {
 				key = key.Substring(2);
 			}
 			string text;
-			if (Dictionary.TryGetText(key, out text))
+			if (Dictionary.TryGetText(key, out text)) {
 				return text;
+			}
 			// Leave selector in debug build to help translators identify string from the UI.
 #if DEBUG
 			return key;
 #else
-			if (key[0] != '[')
+			if (key.Length > 0 && key[0] != '[') {
 				return key;
-			return key.Substring(key.IndexOf(']') + 1);
+			}
+			int index = key.IndexOf(']');
+			if (index != -1) {
+				return key.Substring(+1);
+			}
+			return key;
 #endif
 		}
 	}
