@@ -222,8 +222,10 @@ namespace Lime
 
 		private static bool IsRotationEnabled()
 		{
-			var settingCode = Android.Provider.Settings.System.GetInt(Android.App.Application.Context.ContentResolver,
-				Android.Provider.Settings.System.AccelerometerRotation);
+			var settingCode = Android.Provider.Settings.System.GetInt(
+				Android.App.Application.Context.ContentResolver,
+				Android.Provider.Settings.System.AccelerometerRotation,
+				def: 0);
 			return settingCode == 1;
 		}
 
