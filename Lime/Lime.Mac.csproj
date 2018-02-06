@@ -372,6 +372,9 @@
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingRenderChainBuilder.cs" />
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingRenderObject.cs" />
     <Compile Include="Source\Widgets\Materials\SoftLightMaterial.cs" />
+    <Compile Include="Source\Widgets\VideoPlayer\VideoPlayer.Android.cs" />
+    <Compile Include="Source\Widgets\VideoPlayer\VideoPlayer.cs" />
+    <Compile Include="Source\Widgets\VideoPlayer\VideoPlayer.iOS.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

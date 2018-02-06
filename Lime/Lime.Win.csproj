@@ -494,6 +494,9 @@
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingComponent.cs" />
     <Compile Include="Source\Widgets\Materials\PresenterComponent.cs" />
     <Compile Include="Source\Widgets\Materials\BloomMaterial.cs" />
+    <Compile Include="Source\Widgets\VideoPlayer\VideoPlayer.Android.cs" />
+    <Compile Include="Source\Widgets\VideoPlayer\VideoPlayer.cs" />
+    <Compile Include="Source\Widgets\VideoPlayer\VideoPlayer.iOS.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\3rdParty\OpenAL\OpenAL32.dll">
