@@ -17,7 +17,7 @@ namespace Launcher
 
 		private bool ReadArgument(string arg)
 		{
-			var parts = arg.Split(':');
+			var parts = arg.Split(new[] {':'}, 2);
 			var first = parts[0].ToLower();
 			switch (first) {
 				case "help":
@@ -35,6 +35,9 @@ namespace Launcher
 				case "run":
 					ExecutablePath = parts[1];
 					return true;
+				case "runargs":
+					ExecutableArgs = parts[1];
+					return true;
 				default:
 					return false;
 			}
@@ -46,5 +49,6 @@ namespace Launcher
 		public bool ShowHelp { get; private set; }
 		public string SolutionPath { get; private set; }
 		public string ExecutablePath { get; private set; }
+		public string ExecutableArgs { get; private set; }
 	}
 }
