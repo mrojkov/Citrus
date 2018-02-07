@@ -31,7 +31,9 @@ namespace Orange
 			if (args.Length < 3) {
 				WriteHelpAndExit();
 			}
-			OpenWorkspace(args);
+			if (!args[1].StartsWith("-")) {
+				OpenWorkspace(args);
+			}
 			RunCommand(Toolbox.GetCommandLineArg("--command"));
 		}
 
