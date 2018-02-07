@@ -497,6 +497,10 @@
     <Compile Include="Source\Widgets\VideoPlayer\VideoPlayer.Android.cs" />
     <Compile Include="Source\Widgets\VideoPlayer\VideoPlayer.cs" />
     <Compile Include="Source\Widgets\VideoPlayer\VideoPlayer.iOS.cs" />
+    <Compile Include="Source\Widgets\VideoPlayer.cs" />
+    <Compile Include="Source\Widgets\VideoDecoder\VideoDecoder.Android.cs" />
+    <Compile Include="Source\Widgets\VideoDecoder\VideoDecoder.cs" />
+    <Compile Include="Source\Widgets\VideoDecoder\VideoDecoder.iOS.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\3rdParty\OpenAL\OpenAL32.dll">

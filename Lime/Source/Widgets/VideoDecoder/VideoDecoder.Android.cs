@@ -19,23 +19,17 @@ using static Android.Media.MediaCodec;
 
 namespace Lime
 {
-	public class Decoder : IDisposable
+	public class VideoDecoder : IDisposable
 	{
-		private enum State
-		{
-			Initialized,
-			Started,
-			Stoped,
-			Paused,
-			Finished
-		}
-
-		private State state;
 		public int Width => videoFormat.GetInteger(MediaFormat.KeyWidth);
 		public int Height => videoFormat.GetInteger(MediaFormat.KeyHeight);
-		public bool TextureIsDirty = false;
+		public bool HasNewTexture = false;
 		public bool Looped = false;
+		public ITexture Texture => texture;
 
+		private SurfaceTextureRenderer renderer;
+		private RenderTexture texture;
+		private long currentPosition = 0;
 		private MediaExtractor extractor;
 
 		private MediaCodec videoCodec;
@@ -45,10 +39,7 @@ namespace Lime
 		private MediaCodec audioCodec;
 		private MediaFormat audioFormat;
 		private int audioTrack = -1;
-
 		private AudioTrack audio;
-
-		private long currentPosition = 0;
 
 		private class AudioSample
 		{
@@ -60,16 +51,25 @@ namespace Lime
 		private Queue<AudioSample> audioQueue = new Queue<AudioSample>();
 		private ManualResetEvent checkAudioQueue = new ManualResetEvent(false);
 		private ManualResetEvent checkVideoQueue = new ManualResetEvent(false);
-
 		private CancellationTokenSource stopDecodeCancelationTokenSource = new CancellationTokenSource();
-		private Surface surface;
 
-		public Decoder(string path, Surface surface)
+		private State state;
+
+		private enum State
 		{
+			Initialized,
+			Started,
+			Stoped,
+			Paused,
+			Finished
+		}
+
+		public VideoDecoder(string path)
+		{
+			
 			state = State.Initialized;
 			extractor = new MediaExtractor();
 			extractor.SetDataSource(path);
-			this.surface = surface;
 			for (int i = 0; i < extractor.TrackCount; ++i) {
 				var format = extractor.GetTrackFormat(i);
 				var mime = format.GetString(MediaFormat.KeyMime);
@@ -77,8 +77,10 @@ namespace Lime
 					videoFormat = format;
 					videoTrack = i;
 					videoCodec = MediaCodec.CreateDecoderByType(mime);
-					videoCodec.Configure(videoFormat, surface, null, MediaCodecConfigFlags.None);
+					renderer = new SurfaceTextureRenderer();
+					videoCodec.Configure(videoFormat, renderer.Surface, null, MediaCodecConfigFlags.None);
 					extractor.SelectTrack(i);
+					texture = new RenderTexture(Width, Height);
 					continue;
 				}
 				if (mime.StartsWith("audio/")) {
@@ -87,12 +89,12 @@ namespace Lime
 					audioCodec = MediaCodec.CreateDecoderByType(mime);
 					audioCodec.Configure(audioFormat, null, null, MediaCodecConfigFlags.None);
 					extractor.SelectTrack(i);
-					var bufferSize = AudioTrack.GetMinBufferSize(44100, ChannelOut.Stereo, Android.Media.Encoding.Pcm16bit);
+					var bufferSize = AudioTrack.GetMinBufferSize(44100, ChannelOut.Stereo, global::Android.Media.Encoding.Pcm16bit);
 					audio = new AudioTrack(
-						Android.Media.Stream.Music,
+						global::Android.Media.Stream.Music,
 						44100,
 						ChannelOut.Stereo,
-						Android.Media.Encoding.Pcm16bit,
+						global::Android.Media.Encoding.Pcm16bit,
 						bufferSize,
 						AudioTrackMode.Stream
 					);
@@ -162,8 +164,8 @@ namespace Lime
 				if (state == State.Finished) {
 					currentPosition = 0;
 					extractor.SeekTo(0, MediaExtractorSeekTo.ClosestSync);
-					videoCodec.Configure(videoFormat, surface, null, MediaCodecConfigFlags.None);
-					audioCodec.Configure(audioFormat, null, null, MediaCodecConfigFlags.None);
+					videoCodec?.Configure(videoFormat, renderer.Surface, null, MediaCodecConfigFlags.None);
+					audioCodec?.Configure(audioFormat, null, null, MediaCodecConfigFlags.None);
 				}
 				
 				if (state == State.Finished ||
@@ -199,7 +201,7 @@ namespace Lime
 
 				var processVideo = System.Threading.Tasks.Task.Run(() => {
 					var info = new BufferInfo();
-					var eosReceived = false;
+					var eosReceived = videoCodec == null;
 					while (!eosReceived) {
 						stopDecodeCancelationToken.ThrowIfCancellationRequested();
 						var outIndex = videoCodec.DequeueOutputBuffer(info, 10000);
@@ -214,7 +216,7 @@ namespace Lime
 								stopDecodeCancelationToken.ThrowIfCancellationRequested();
 							}
 							videoCodec.ReleaseOutputBuffer(outIndex, true);
-							TextureIsDirty = true;
+							HasNewTexture = true;
 						}
 
 						if (info.Flags.HasFlag(MediaCodecBufferFlags.EndOfStream)) {
@@ -225,7 +227,7 @@ namespace Lime
 
 				
 				var processAudio = System.Threading.Tasks.Task.Run(() => {
-					var eosReceived = false;
+					var eosReceived = audioCodec == null;
 					var info = new BufferInfo();
 					while (!eosReceived) {
 						stopDecodeCancelationToken.ThrowIfCancellationRequested();
@@ -276,8 +278,8 @@ namespace Lime
 			state = State.Stoped;
 			currentPosition = 0;
 			extractor.SeekTo(0, MediaExtractorSeekTo.ClosestSync);
-			audioCodec.Flush();
-			videoCodec.Flush();
+			audioCodec?.Flush();
+			videoCodec?.Flush();
 		}
 
 		public void Pause()
@@ -297,6 +299,14 @@ namespace Lime
 				currentPosition += (long)(delta * 1000000);
 				checkAudioQueue.Set();
 				checkVideoQueue.Set();
+			}
+		}
+
+		public void UpdateTexture()
+		{
+			if (HasNewTexture) {
+				HasNewTexture = false;
+				renderer.Render(Texture);
 			}
 		}
 
@@ -320,13 +330,13 @@ namespace Lime
 			extractor.Dispose();
 			extractor = null;
 		}
-	}
 
-	public class SurfaceTextureRenderer {
-
-		private class SurfaceTextureProgram : ShaderProgram
+		private class SurfaceTextureRenderer
 		{
-			private const string VertexShader = @"
+
+			private class SurfaceTextureProgram : ShaderProgram
+			{
+				private const string VertexShader = @"
 				uniform mat4 matProjection;
 				attribute vec4 a_Position;
 				attribute vec4 a_UV;
@@ -338,7 +348,7 @@ namespace Lime
 				}
 			";
 
-			private const string FragmentShader = "#extension GL_OES_EGL_image_external : require" + @"
+				private const string FragmentShader = "#extension GL_OES_EGL_image_external : require" + @"
 				
 				precision mediump float;
 				varying vec2 v_UV;
@@ -349,56 +359,56 @@ namespace Lime
 				}
 			";
 
-			private const int TextureStage = 0;
+				private const int TextureStage = 0;
 
-			public SurfaceTextureProgram(): base(GetShaders(), GetAttribLocations(), GetSamplers())
-			{
-			}
+				public SurfaceTextureProgram() : base(GetShaders(), GetAttribLocations(), GetSamplers())
+				{
+				}
 
-			private static Shader[] GetShaders()
-			{
-				return new Shader[] {
+				private static Shader[] GetShaders()
+				{
+					return new Shader[] {
 					new VertexShader(VertexShader),
 					new FragmentShader(FragmentShader)
 				};
-			}
+				}
 
-			private static AttribLocation[] GetAttribLocations()
-			{
-				return new AttribLocation[] {
+				private static AttribLocation[] GetAttribLocations()
+				{
+					return new AttribLocation[] {
 					new AttribLocation { Name = "a_Position", Index = ShaderPrograms.Attributes.Pos1 },
 					new AttribLocation { Name = "a_UV", Index = ShaderPrograms.Attributes.UV1 }
 				};
-			}
+				}
 
-			private static Sampler[] GetSamplers()
-			{
-				return new Sampler[] {
+				private static Sampler[] GetSamplers()
+				{
+					return new Sampler[] {
 					new Sampler { Name = "u_Texture", Stage = TextureStage }
 				};
+				}
 			}
-		}
 
-		private SurfaceTextureProgram program;
-		private Mesh mesh;
+			private SurfaceTextureProgram program;
+			private Mesh mesh;
 
-		private uint surfaceTextureId;
-		private SurfaceTexture surfaceTexture;
-		public Surface Surface { get; private set; }
+			private uint surfaceTextureId;
+			private SurfaceTexture surfaceTexture;
+			public Surface Surface { get; private set; }
 
-		//https://developer.android.com/reference/android/graphics/SurfaceTexture.html
-		private const TextureTarget TextureTarget = (TextureTarget)All.TextureExternalOes; //<- IMPORTANT for surface texture!!!
+			//https://developer.android.com/reference/android/graphics/SurfaceTexture.html
+			private const TextureTarget TextureTarget = (TextureTarget)All.TextureExternalOes; //<- IMPORTANT for surface texture!!!
 
-		public SurfaceTextureRenderer()
-		{
-			program = new SurfaceTextureProgram();
-			mesh = new Mesh() {
-				IndexBuffer = new IndexBuffer {
-					Data = new ushort[] {
+			public SurfaceTextureRenderer()
+			{
+				program = new SurfaceTextureProgram();
+				mesh = new Mesh() {
+					IndexBuffer = new IndexBuffer {
+						Data = new ushort[] {
 						0, 1, 2, 2, 3, 0
 					},
-				},
-				VertexBuffers = new [] {
+					},
+					VertexBuffers = new[] {
 					new VertexBuffer<Vector2> {
 						Data = new Vector2 [] {
 							new Vector2 (-1,  1),
@@ -416,127 +426,64 @@ namespace Lime
 						},
 					}
 				},
-				Attributes = new [] {
+					Attributes = new[] {
 					new [] { ShaderPrograms.Attributes.Pos1 },
 					new [] { ShaderPrograms.Attributes.UV1 }
 				}
-			};
-			CreateSurface();
-		}
-
-		private void PushTexture()
-		{
-			PlatformRenderer.PushTexture(0, 0);
-			PlatformRenderer.CheckErrors();
-			GL.BindTexture(TextureTarget, surfaceTextureId);
-		}
-
-		private void PopTexture()
-		{
-			GL.BindTexture(TextureTarget, 0);
-			PlatformRenderer.PopTexture(0);
-		}
-
-		private void CreateSurface()
-		{
-			surfaceTextureId = (uint)GL.GenTexture();
-			PushTexture();
-			GL.TexParameter(TextureTarget, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
-			GL.TexParameter(TextureTarget, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
-			GL.TexParameter(TextureTarget, TextureParameterName.TextureWrapS, (int)OpenTK.Graphics.ES20.TextureWrapMode.ClampToEdge);
-			GL.TexParameter(TextureTarget, TextureParameterName.TextureWrapT, (int)OpenTK.Graphics.ES20.TextureWrapMode.ClampToEdge);
-			surfaceTexture = new SurfaceTexture((int)surfaceTextureId);
-			Surface = new Surface(surfaceTexture);
-			PopTexture();
-		}
-
-		public void Render(ITexture target)
-		{
-			if (target != null) {
-				var savedViewport = Renderer.Viewport;
-				Renderer.Viewport = new WindowRect { X = 0, Y = 0, Width = target.ImageSize.Width, Height = target.ImageSize.Height };
-				target.SetAsRenderTarget();
-				Render();
-				target.RestoreRenderTarget();
-				Renderer.Viewport = savedViewport;
-			} else {
-				Render();
+				};
+				CreateSurface();
 			}
-		}
 
-		public void Render()
-		{
-			
-			surfaceTexture.UpdateTexImage();
-			PushTexture();
-			program.Use();
-			PlatformRenderer.DrawTriangles(mesh, 0, mesh.IndexBuffer.Data.Length);
-			PopTexture();
-			
-		}
-	}
-
-	public class VideoPlayer : Image
-	{
-		private Decoder decoder;
-		private SurfaceTextureRenderer renderer;
-		private RenderTexture texture;
-
-		public bool Looped { get => decoder.Looped; set => decoder.Looped = value; }
-
-
-		public VideoPlayer(Widget parentWidget)
-		{
-			parentWidget.Nodes.Add(this);
-			Size = parentWidget.Size;
-			Anchors = Anchors.LeftRight | Anchors.TopBottom;
-		}
-
-		public override void Update(float delta)
-		{
-			base.Update(delta);
-			var volume = AudioSystem.GetGroupVolume(AudioChannelGroup.Music);
-			decoder.Update(delta);
-			if (decoder.TextureIsDirty) {
-				decoder.TextureIsDirty = false;
-				renderer.Render(Texture);
+			private void PushTexture()
+			{
+				PlatformRenderer.PushTexture(0, 0);
+				PlatformRenderer.CheckErrors();
+				GL.BindTexture(TextureTarget, surfaceTextureId);
 			}
-		}
 
-		public void InitPlayer(string sourcePath)
-		{
-			renderer = new SurfaceTextureRenderer();
-			decoder = new Decoder(sourcePath, renderer.Surface);
-			texture = new RenderTexture(decoder.Width, decoder.Height);
-			Texture = texture;
-		}
-
-		public void Start()
-		{
-			decoder.Start();
-		}
-
-		public void Pause()
-		{
-			decoder.Pause();
-		}
-
-		public void Stop()
-		{
-			decoder.Stop();
-		}
-
-		public override void Dispose()
-		{
-			if (decoder != null) {
-				decoder.Dispose();
-				decoder = null;
+			private void PopTexture()
+			{
+				GL.BindTexture(TextureTarget, 0);
+				PlatformRenderer.PopTexture(0);
 			}
-			if (texture != null) {
-				texture.Dispose();
-				texture = null;
+
+			private void CreateSurface()
+			{
+				surfaceTextureId = (uint)GL.GenTexture();
+				PushTexture();
+				GL.TexParameter(TextureTarget, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
+				GL.TexParameter(TextureTarget, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+				GL.TexParameter(TextureTarget, TextureParameterName.TextureWrapS, (int)OpenTK.Graphics.ES20.TextureWrapMode.ClampToEdge);
+				GL.TexParameter(TextureTarget, TextureParameterName.TextureWrapT, (int)OpenTK.Graphics.ES20.TextureWrapMode.ClampToEdge);
+				surfaceTexture = new SurfaceTexture((int)surfaceTextureId);
+				Surface = new Surface(surfaceTexture);
+				PopTexture();
 			}
-			base.Dispose();
+
+			public void Render(ITexture target)
+			{
+				if (target != null) {
+					var savedViewport = Renderer.Viewport;
+					Renderer.Viewport = new WindowRect { X = 0, Y = 0, Width = target.ImageSize.Width, Height = target.ImageSize.Height };
+					target.SetAsRenderTarget();
+					Render();
+					target.RestoreRenderTarget();
+					Renderer.Viewport = savedViewport;
+				} else {
+					Render();
+				}
+			}
+
+			public void Render()
+			{
+
+				surfaceTexture.UpdateTexImage();
+				PushTexture();
+				program.Use();
+				PlatformRenderer.DrawTriangles(mesh, 0, mesh.IndexBuffer.Data.Length);
+				PopTexture();
+
+			}
 		}
 	}
 }

@@ -1,5 +1,4 @@
-﻿#if !ANDROID && !iOS
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,40 +8,51 @@ namespace Lime
 {
 	public class VideoPlayer : Image
 	{
-		public bool Looped { get; set; }
+		public bool Looped { get { return decoder.Looped; } set { decoder.Looped = value; } }
+		private VideoDecoder decoder;
 		public VideoPlayer (Widget parentWidget)
 		{
 			parentWidget.Nodes.Add (this);
 			Size = parentWidget.Size;
 			Anchors = Anchors.LeftRight | Anchors.TopBottom;
-			Texture = new Texture2D();
 		}
 
 		public override void Update (float delta)
 		{
 			base.Update (delta);
+			decoder.Update(delta);
+			decoder.UpdateTexture();
 		}
 
 		public void InitPlayer (string sourcePath)
 		{
+			decoder = new VideoDecoder(sourcePath);
+			Texture = decoder.Texture;
 		}
 
 		public void Start ()
 		{
+			decoder.Start();
 		}
 
 		public void Pause ()
 		{
+			decoder.Pause();
 		}
 
 		public void Stop ()
 		{
+			decoder.Stop();
 		}
 
 		public override void Dispose ()
 		{
+			if (decoder != null) {
+				decoder.Dispose();
+				decoder = null;
+			}
+			Texture = null;
 			base.Dispose ();
 		}
 	}
 }
-#endif

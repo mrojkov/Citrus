@@ -12,19 +12,27 @@ using System.Threading;
 
 namespace Lime
 {
-	public class Decoder : IDisposable
+	public class VideoDecoder : IDisposable
 	{
-		AVAsset asset;
-		AVPlayerItem playerItem;
-		AVPlayer player;
-		AVPlayerItemVideoOutput videoOutput;
-		double currentPosition;
-		public float Width { get; private set; }
-		public float Height { get; private set; }
-		public double Duration;
-		ManualResetEvent checkVideoEvent;
-		CVPixelBuffer currentPixelBuffer;
-		object locker = new object();
+		public bool Looped;
+		public double Duration { get; private set; }
+		public int Width { get; private set; }
+		public int Height { get; private set; }
+		public bool HasNewTexture { get; private set; }
+		public ITexture Texture { get => texture; }
+
+		private Texture2D texture;
+
+		private double currentPosition;
+		private AVPlayerItem playerItem;
+		private AVPlayer player;
+		private AVPlayerItemVideoOutput videoOutput;
+		private ManualResetEvent checkVideoEvent;
+		private CVPixelBuffer currentPixelBuffer;
+
+		private object locker = new object();
+		private CancellationTokenSource stopDecodeCancelationTokenSource = new CancellationTokenSource();
+		private State state = State.Initialized;
 
 		private enum State
 		{
@@ -35,14 +43,9 @@ namespace Lime
 			Finished
 		};
 
-		private State state = State.Initialized;
-
-		public bool Looped { get; set; }
-
-		private CancellationTokenSource stopDecodeCancelationTokenSource = new CancellationTokenSource();
-
-		public Decoder(string path)
+		public VideoDecoder(string path)
 		{
+			texture = new Texture2D();
 			playerItem = AVPlayerItem.FromUrl(NSUrl.FromString(path));
 			NSNotificationCenter.DefaultCenter.AddObserver(AVPlayerItem.DidPlayToEndTimeNotification, (notification) => {
 				state = State.Finished;
@@ -60,11 +63,11 @@ namespace Lime
 				PixelFormatType = CoreVideo.CVPixelFormatType.CV32BGRA,
 			});
 			playerItem.AddOutput(videoOutput);
-			asset = playerItem.Asset;
+			var asset = playerItem.Asset;
 			var videoTracks = asset.GetTracks(AVMediaTypes.Video);
 			var size = videoTracks[0].NaturalSize;
-			Width = (float)size.Width;
-			Height = (float)size.Height;
+			Width = (int)size.Width;
+			Height = (int)size.Height;
 			Duration = asset.Duration.Seconds;
 			currentPosition = 0;
 			checkVideoEvent = new ManualResetEvent(false);
@@ -85,7 +88,6 @@ namespace Lime
 				stopDecodeCancelationTokenSource = new CancellationTokenSource();
 				var stopDecodeCancelationToken = stopDecodeCancelationTokenSource.Token;
 				player.Play();
-				player.Volume = 1.0f;
 				state = State.Started;
 				var workTask = System.Threading.Tasks.Task.Run(() => {
 					while (true) {
@@ -109,6 +111,7 @@ namespace Lime
 								currentPixelBuffer = null;
 							}
 							currentPixelBuffer = pixelBuffer;
+							HasNewTexture = true;
 						}
 					};
 				}, stopDecodeCancelationToken);
@@ -152,71 +155,48 @@ namespace Lime
 			}
 		}
 
-		public void UpdateTexture(Texture2D texture)
+		public void UpdateTexture()
 		{
-			lock (locker) {
-				if (currentPixelBuffer != null) {
+			if (HasNewTexture) {
+				HasNewTexture = false;
+				lock (locker) {
 					var pb = currentPixelBuffer;
-					currentPixelBuffer = null;
-					pb.Lock(CVPixelBufferLock.None);
-					var addr = pb.BaseAddress;
-					texture.LoadImage(addr, (int)Width, (int)Height, (PixelFormat)All.Bgra);
-					pb.Unlock(CVPixelBufferLock.None);
-					pb.Dispose();
+					if (pb != null) {
+						pb.Lock(CVPixelBufferLock.None);
+						var addr = pb.BaseAddress;
+						texture.LoadImage(addr, Width, Height, (PixelFormat)All.Bgra);
+						pb.Unlock(CVPixelBufferLock.None);
+					}
 				}
 			}
 		}
 
 		public void Dispose()
 		{
-
-		}
-	}
-
-	public class VideoPlayer : Image
-	{
-		public bool Looped { get => decoder.Looped ; set { decoder.Looped = value;  } }
-		private Decoder decoder;
-		public VideoPlayer (Widget parentWidget)
-		{
-			parentWidget.Nodes.Add (this);
-			Size = parentWidget.Size;
-			Anchors = Anchors.LeftRight | Anchors.TopBottom;
-			Texture = new Texture2D();
-		}
-
-		public override void Update (float delta)
-		{
-			base.Update (delta);
-			decoder.Update(delta);
-			decoder.UpdateTexture((Texture2D)Texture);
-		}
-
-		public void InitPlayer (string sourcePath)
-		{
-			decoder = new Decoder(sourcePath);
-		}
-
-		public void Start ()
-		{
-			decoder.Start();
-		}
-
-		public void Pause ()
-		{
-			decoder.Pause();
-		}
-
-		public void Stop ()
-		{
-			decoder.Stop();
-		}
-
-		public override void Dispose ()
-		{
-			decoder.Dispose();
-			decoder = null;
-			base.Dispose ();
+			Pause();
+			if (player != null) {
+				player.Dispose();
+				player = null;
+			}
+			if (videoOutput != null) {
+				videoOutput.Dispose();
+				videoOutput = null;
+			}
+			if (playerItem != null) {
+				playerItem.Dispose();
+				playerItem = null;
+			}
+			lock (locker) {
+				if (currentPixelBuffer != null) {
+					currentPixelBuffer.Dispose();
+					currentPixelBuffer = null;
+				}
+			}
+			if (texture != null) {
+				texture.Dispose();
+				texture = null;
+			}
+			HasNewTexture = false;
 		}
 	}
 }
