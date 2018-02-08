@@ -38,10 +38,11 @@ namespace Lime
 			}
 		}
 
-		private UITextView textView;
+		private CustomUITextView textView;
 		private UITouch[] activeTouches = new UITouch[Input.MaxTouches];
 		private float screenScale;
 		private Input input;
+		private string pendingTextInput = string.Empty;
 
 		public Vector2 ClientSize { get; private set; }
 		public bool DisableUpdateAndRender;
@@ -53,7 +54,7 @@ namespace Lime
 			LayerRetainsBacking = false;
 			LayerColorFormat = EAGLColorFormat.RGB565;
 			MultipleTouchEnabled = true;
-			textView = new UIKit.UITextView();
+			textView = new CustomUITextView(this);
 			textView.Delegate = new TextViewDelegate(input);
 			textView.AutocorrectionType = UITextAutocorrectionType.No;
 			textView.AutocapitalizationType = UITextAutocapitalizationType.None;
@@ -147,18 +148,9 @@ namespace Lime
 			return iPhoneOSGameView.GetLayerClass();
 		}
 
-		string prevText;
-
-		public void ChangeSoftKeyboardText(string text)
-		{
-			prevText = text;
-			textView.Text = text;
-		}
-
-		public void ShowSoftKeyboard(bool show, string text)
+		public void ShowSoftKeyboard(bool show)
 		{
 			if (show != textView.IsFirstResponder) {
-				ChangeSoftKeyboardText(text);
 				if (show) {
 					textView.BecomeFirstResponder();
 				} else {
@@ -225,26 +217,30 @@ namespace Lime
 			ProcessTextInput();
 		}
 
-		private int prevTextLength = -1;
-
 		private void ProcessTextInput()
 		{
-			var textLength = textView.Text.Length;
-			if (textLength != prevTextLength) {
-				prevTextLength = textLength;
-				textView.SelectedRange = new NSRange(textLength, 0);
+			input.TextInput = pendingTextInput;
+			pendingTextInput = string.Empty;
+		}
+
+		private class CustomUITextView : UITextView
+		{
+			private readonly GameView view;
+
+			public CustomUITextView(GameView view)
+			{
+				this.view = view;
 			}
-			input.TextInput = null;
-			var currText = textView.Text ?? "";
-			prevText = prevText ?? "";
-			if (currText.Length > prevText.Length) {
-				input.TextInput = currText.Substring(prevText.Length);
-			} else {
-				for (int i = 0; i < prevText.Length - currText.Length; i++) {
-					input.TextInput += '\b';
-				}
+
+			public override void InsertText(string text)
+			{
+				view.pendingTextInput += text;
 			}
-			prevText = currText;
+
+			public override void DeleteBackward()
+			{
+				view.pendingTextInput += '\b';
+			}
 		}
 	}
 }

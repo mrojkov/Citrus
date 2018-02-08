@@ -40,7 +40,7 @@ namespace Lime
 		public event Action Shown;
 		public event Action Hidden;
 
-		public void Show(bool show, string text)
+		public void Show(bool show)
 		{
 			if (show) {
 				gameView.Focusable = true;
@@ -52,10 +52,6 @@ namespace Lime
 				gameView.FocusableInTouchMode = false;
 				imm.HideSoftInputFromWindow(gameView.WindowToken, 0);
 			}
-		}
-
-		public void ChangeText(string text)
-		{
 		}
 
 		void OnHeightChanged()
