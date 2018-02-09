@@ -28,7 +28,6 @@ namespace Lime
 			Application.SoftKeyboard = softKeyboard;
 			UIAccelerometer.SharedAccelerometer.UpdateInterval = 0.05;
 			UIAccelerometer.SharedAccelerometer.Acceleration += OnAcceleration;
-			Application.CurrentDeviceOrientation = ConvertInterfaceOrientation(InterfaceOrientation);
 			Application.SupportedDeviceOrientationsChanged += ResetDeviceOrientation;
 		}
 
@@ -200,19 +199,22 @@ namespace Lime
 			}
 		}
 
-		DeviceOrientation ConvertInterfaceOrientation(UIInterfaceOrientation orientation)
+		DeviceOrientation ConvertInterfaceOrientation(Vector2 size, UIInterfaceOrientation orientation)
 		{
+			// system orientation may not reflect real state if the game is under a window
+			// which can not be rotated (for example FB login page), so prefer size over orientation.
+			var isPortrait = size.Y > size.X;
 			switch (orientation) {
-			case UIInterfaceOrientation.LandscapeLeft:
-				return DeviceOrientation.LandscapeLeft;
-			case UIInterfaceOrientation.LandscapeRight:
-				return DeviceOrientation.LandscapeRight;
-			case UIInterfaceOrientation.Portrait:
-				return DeviceOrientation.Portrait;
-			case UIInterfaceOrientation.PortraitUpsideDown:
-				return DeviceOrientation.PortraitUpsideDown;
-			default:
-				throw new ArgumentException("Wrong interface orientation");
+				case UIInterfaceOrientation.LandscapeLeft:
+					return isPortrait ? DeviceOrientation.Portrait : DeviceOrientation.LandscapeLeft;
+				case UIInterfaceOrientation.LandscapeRight:
+					return isPortrait ? DeviceOrientation.Portrait : DeviceOrientation.LandscapeRight;
+				case UIInterfaceOrientation.Portrait:
+					return !isPortrait ? DeviceOrientation.LandscapeLeft : DeviceOrientation.Portrait;
+				case UIInterfaceOrientation.PortraitUpsideDown:
+					return !isPortrait ? DeviceOrientation.LandscapeLeft : DeviceOrientation.PortraitUpsideDown;
+				default:
+					throw new ArgumentException("Wrong interface orientation");
 			}
 		}
 
@@ -232,19 +234,15 @@ namespace Lime
 		{
 			// Handle resize here (not in WillRotate) because in WillRotate we don't know
 			// the resulting screen resolution.
-			var toOrientation = ConvertInterfaceOrientation(this.InterfaceOrientation);
+			var toOrientation = ConvertInterfaceOrientation(Window.Current.ClientSize, InterfaceOrientation);
 			var deviceRotated = toOrientation != Application.CurrentDeviceOrientation;
-			var currentSize = Window.Current.ClientSize;
-			var isRotatedBySize =
-				prevSize.Y > prevSize.X && currentSize.Y <= currentSize.X ||
-				prevSize.Y <= prevSize.X && currentSize.Y > currentSize.X;
 			Application.CurrentDeviceOrientation = toOrientation;
 			// The texture stages get invalidated after device rotation. Rebind textures to fix it.
 			PlatformRenderer.RebindTextures();
 			// Vertex array objects also get invalidated.
 			Mesh.InvalidateVertexArrayObjects();
 			if (OnResize != null) {
-				OnResize(this, new ResizeEventArgs { DeviceRotated = deviceRotated || isRotatedBySize });
+				OnResize(this, new ResizeEventArgs { DeviceRotated = deviceRotated });
 			}
 		}
 
