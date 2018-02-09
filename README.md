@@ -1,5 +1,9 @@
 # Citrus
+
 ![](Orange/Logo.png)
+
+Copyright (C) Forest LLC, 2017
+See LICENSE.
 
 ## Cooking Rules
 
