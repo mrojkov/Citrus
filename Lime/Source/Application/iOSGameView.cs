@@ -60,6 +60,42 @@ namespace Lime
 			screenScale = (float)UIScreen.MainScreen.Scale;
 			this.Add(textView);
 			RefreshWindowSize();
+
+			Initialize3DTouchOnTheLeftSideWorkaround();
+		}
+
+		/// <summary>
+		/// This solves the issue when swipes from the left side of a display with 3D Touch enabled work awkwardly.
+		/// A guy from stackoverflow proposed a workaround
+		/// https://stackoverflow.com/questions/39998489/touchesbegan-delay-on-left-hand-side-of-the-display
+		/// </summary>
+		private void Initialize3DTouchOnTheLeftSideWorkaround()
+		{
+			System.Action<UILongPressGestureRecognizer> handler = (recognizer) => {
+				// If touch is registered with TouchesBegan do nothing, 
+				// otherwise register Key.Mouse0 as pressed or not depending on the gesture state
+				if (activeTouches[0] == null) {
+					switch (recognizer.State) {
+						case UIGestureRecognizerState.Began:
+							var pt = recognizer.LocationInView(this);
+							input.MousePosition = new Vector2((float)pt.X, (float)pt.Y) * input.ScreenToWorldTransform;
+							input.SetKeyState(Key.Mouse0, true);
+							break;
+						case UIGestureRecognizerState.Ended:
+						case UIGestureRecognizerState.Cancelled:
+							input.SetKeyState(Key.Mouse0, false);
+							break;
+					}
+				}
+			};
+
+			// Create Long Press gesture recognizer and make it not to interfere with TouchesBegan (usual way to detect touches)
+			var gestureRecognizer = new UILongPressGestureRecognizer(handler) {
+				DelaysTouchesBegan = false,
+				MinimumPressDuration = 0,
+				CancelsTouchesInView = false
+			};
+			AddGestureRecognizer(gestureRecognizer);
 		}
 
 		public override void LayoutSubviews()
