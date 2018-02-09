@@ -267,14 +267,9 @@ namespace Lime
 				}
 			}
 
-			public void Show(bool show, string text)
+			public void Show(bool show)
 			{
-				view.ShowSoftKeyboard(show, text);
-			}
-
-			public void ChangeText(string text)
-			{
-				view.ChangeSoftKeyboardText(text);
+				view.ShowSoftKeyboard(show);
 			}
 
 			public bool Visible { get; internal set; }

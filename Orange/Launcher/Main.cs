@@ -28,7 +28,8 @@ namespace Launcher
 
 			builder = new Builder {
 				SolutionPath = Args.SolutionPath,
-				ExecutablePath = Args.ExecutablePath
+				ExecutablePath = Args.ExecutablePath,
+				ExecutableArgs = Args.ExecutableArgs
 			};
 
 			if (Args.ConsoleMode) {
@@ -79,7 +80,7 @@ namespace Launcher
 		{
 			builder.OnBuildStatusChange += Console.WriteLine;
 			builder.OnBuildFail += () => Environment.Exit(1);
-			builder.Start(RunExecutable);
+			builder.Start(RunExecutable).Wait();
 		}
 	}
 }

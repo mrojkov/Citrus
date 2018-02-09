@@ -36,13 +36,7 @@ namespace Lime
 		/// Показывает или прячет клавиатуру
 		/// </summary>
 		/// <param name="show">true, чтобы показать; false, чтобы спрятать</param>
-		/// <param name="text">Набранный текст в поле ввода</param>
-		void Show(bool show, string text);
-
-		/// <summary>
-		/// Изменяет текст в поле ввода
-		/// </summary>
-		void ChangeText(string text);
+		void Show(bool show);
 	}
 
 	internal class DummySoftKeyboard : ISoftKeyboard
@@ -51,14 +45,13 @@ namespace Lime
 		public float Height { get { return 0; } }
 		public event Action Shown;
 		public event Action Hidden;
-		public void Show(bool show, string text)
+		public void Show(bool show)
 		{
 			if (show)
 				Shown?.Invoke();
 			else
 				Hidden?.Invoke();
 		}
-		public void ChangeText(string text) { }
 		public bool Supported { get { return false; } }
 	}
 }

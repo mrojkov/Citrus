@@ -125,7 +125,7 @@ namespace Lime
 		{
 			// we override this function to hide keyboard when app is stopped.
 			base.ClearFocus();
-			androidSoftKeyboard.Show(false, string.Empty);
+			androidSoftKeyboard.Show(false);
 		}
 
 		protected override void OnLayout(bool changed, int left, int top, int right, int bottom)

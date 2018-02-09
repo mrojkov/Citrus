@@ -13,6 +13,7 @@ namespace Launcher
 
 		public string SolutionPath;
 		public string ExecutablePath;
+		public string ExecutableArgs;
 
 		public event Action<string> OnBuildStatusChange;
 		public event Action OnBuildFail;
@@ -22,7 +23,8 @@ namespace Launcher
 		{
 			var process = new Process {
 				StartInfo = {
-					FileName = ExecutablePath ?? DefaultExecutablePath
+					FileName = ExecutablePath ?? DefaultExecutablePath,
+					Arguments = ExecutableArgs
 				}
 			};
 			process.Start();
