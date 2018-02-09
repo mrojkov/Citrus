@@ -28,6 +28,7 @@ namespace Tangerine.Core
 
 		public void BeginTransaction()
 		{
+			NextBatch();
 			transactionCounter++;
 			transactionBatchId = currentBatchId;
 		}
