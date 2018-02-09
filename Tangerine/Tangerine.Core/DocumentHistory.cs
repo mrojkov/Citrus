@@ -28,6 +28,7 @@ namespace Tangerine.Core
 
 		public void BeginTransaction()
 		{
+			// increase batch index to recognize two transactions on the same frame as different (for RevertActiveTransaction)
 			NextBatch();
 			transactionCounter++;
 			transactionBatchId = currentBatchId;
