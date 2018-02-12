@@ -81,10 +81,12 @@ namespace Lime
 							var pt = recognizer.LocationInView(this);
 							input.MousePosition = new Vector2((float)pt.X, (float)pt.Y) * input.ScreenToWorldTransform;
 							input.SetKeyState(Key.Mouse0, true);
+							input.SetKeyState(Key.Touch0, true);
 							break;
 						case UIGestureRecognizerState.Ended:
 						case UIGestureRecognizerState.Cancelled:
 							input.SetKeyState(Key.Mouse0, false);
+							input.SetKeyState(Key.Touch0, false);
 							break;
 					}
 				}
