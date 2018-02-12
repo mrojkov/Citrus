@@ -63,22 +63,6 @@ namespace Lime
 			shaderProgram = null;
 		}
 
-		public static ShaderProgram GetShaderProgram(ShaderId value, ShaderProgram customShaderProgram, ShaderOptions options = ShaderOptions.None)
-		{
-			int numTextures = textures[1] != 0 ? 2 : (textures[0] != 0 ? 1 : 0);
-			if (!premultipliedAlphaMode && (blending == Blending.Burn || blending == Blending.Darken)) {
-				options |= ShaderOptions.PremultiplyAlpha;
-			}
-			return value == ShaderId.Custom ? customShaderProgram : ShaderPrograms.Instance.GetShaderProgram(value, numTextures, options);
-		}
-
-		public static ShaderProgram SetShader(ShaderId value, ShaderProgram customShaderProgram, ShaderOptions options = ShaderOptions.None)
-		{
-			var program = GetShaderProgram(value, customShaderProgram, options);
-			SetShaderProgram(program);
-			return program;
-		}
-
 		public static void SetShaderProgram(ShaderProgram program)
 		{
 			if (shaderProgram != program) {
@@ -102,7 +86,7 @@ namespace Lime
 			premultipliedAlphaMode = false;
 			shaderProgram = null;
 			SetBlending(Blending.Inherited);
-			SetShader(ShaderId.Diffuse, null);
+			SetShaderProgram(ShaderPrograms.Instance.GetShaderProgram(ShaderId.Diffuse, 0, ShaderOptions.None));
 			Clear(ClearTarget.All, 0, 0, 0, 0);
 			CheckErrors();
 		}
@@ -227,12 +211,12 @@ namespace Lime
 			CheckErrors();
 		}
 
-		public static void SetBlending(Blending value)
+		public static void SetBlending(Blending value, bool premultipliedAlpha = false)
 		{
-			if (value == blending && premultipliedAlphaMode == Renderer.PremultipliedAlphaMode) {
+			if (value == blending && premultipliedAlphaMode == premultipliedAlpha) {
 				return;
 			}
-			premultipliedAlphaMode = Renderer.PremultipliedAlphaMode;
+			premultipliedAlphaMode = premultipliedAlpha;
 			blending = value;
 			switch (blending) {
 				case Blending.Inherited:

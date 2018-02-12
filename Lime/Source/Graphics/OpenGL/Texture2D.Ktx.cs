@@ -18,6 +18,8 @@ namespace Lime
 		static bool etc2Checked;
 		static bool etc2Supported;
 
+		public ITexture AtlasTexture => this;
+		
 		private void InitWithKTXTexture(BinaryReader reader)
 		{
 			var identifier = reader.ReadBytes(12);

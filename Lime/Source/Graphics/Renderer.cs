@@ -121,7 +121,6 @@ namespace Lime
 		public static ShaderProgram CustomShaderProgram;
 		public static Matrix32 Transform1;
 		public static int RenderCycle { get; private set; }
-		public static bool PremultipliedAlphaMode;
 		public static int DrawCalls = 0;
 		public static int PolyCount3d = 0;
 		public static readonly RenderList MainRenderList = new RenderList();
@@ -367,10 +366,19 @@ namespace Lime
 			}
 			return size;
 		}
-
+		
+		static SpriteList staticSpriteList = new SpriteList();
+		
+		public static void DrawTextLine(IFont font, Vector2 position, string text, Color4 color, float fontHeight, int start, int length, float letterSpacing)
+		{
+			DrawTextLine(font, position, text, color, fontHeight, start, length, letterSpacing, staticSpriteList);
+			staticSpriteList.Render(Color4.White, Blending, Shader);
+			staticSpriteList.Clear();
+		}
+		
 		public static void DrawTextLine(
 			IFont font, Vector2 position, string text, Color4 color, float fontHeight, int start, int length, float letterSpacing,
-			SpriteList list = null, Action<int, Vector2, Vector2> onDrawChar = null, int tag = -1)
+			SpriteList list, Action<int, Vector2, Vector2> onDrawChar = null, int tag = -1)
 		{
 			int j = 0;
 			if (list != null) {
@@ -383,17 +391,12 @@ namespace Lime
 			// Use array instead of list to reduce memory consumption.
 			var chars = new SpriteList.CharDef[j];
 			j = 0;
-
-			List<Sprite> forLcdSecondPass = null;
-
 			FontChar prevChar = null;
 			float savedX = position.X;
 			for (int i = 0; i < length; i++) {
 				char ch = text[i + start];
 				if (ch == '\n') {
-					if (onDrawChar != null) {
-						onDrawChar(i, position, Vector2.Down * fontHeight);
-					}
+					onDrawChar?.Invoke(i, position, Vector2.Down * fontHeight);
 					position.X = savedX;
 					position.Y += fontHeight;
 					prevChar = null;
@@ -403,9 +406,7 @@ namespace Lime
 				}
 				FontChar fontChar = font.Chars.Get(ch, fontHeight);
 				if (fontChar == FontChar.Null) {
-					if (onDrawChar != null) {
-						onDrawChar(i, position, Vector2.Down * fontHeight);
-					}
+					onDrawChar?.Invoke(i, position, Vector2.Down * fontHeight);
 					continue;
 				}
 				float scale = fontChar.Height != 0.0f ? fontHeight / fontChar.Height : 0.0f;
@@ -415,76 +416,50 @@ namespace Lime
 				Vector2 roundPos;
 				if (font.RoundCoordinates) {
 					roundPos = new Vector2(position.X.Round(), position.Y.Round() + fontChar.VerticalOffset);
-					if (onDrawChar != null) {
-						onDrawChar(i, new Vector2((position.X - xDelta).Round(), position.Y.Round()), size);
-					}
+					onDrawChar?.Invoke(i, new Vector2((position.X - xDelta).Round(), position.Y.Round()), size);
 				} else {
 					roundPos = new Vector2(position.X, position.Y + fontChar.VerticalOffset);
-					if (onDrawChar != null) {
-						onDrawChar(i, new Vector2(position.X - xDelta, position.Y), size);
-					}
+					onDrawChar?.Invoke(i, new Vector2(position.X - xDelta, position.Y), size);
 				}
-				if (list == null) {
-					if (fontChar.RgbIntensity) {
-						Blending wasBlending = Blending;
-						Blending = Blending.LcdTextFirstPass;
-						DrawSprite(fontChar.Texture, Color4.White, roundPos, size, fontChar.UV0, fontChar.UV1);
-
-						if (forLcdSecondPass == null) {
-							forLcdSecondPass = new List<Sprite>();
-						}
-						forLcdSecondPass.Add(new Sprite {
-							Texture1 = fontChar.Texture,
-							Color = color,
-							Position = roundPos,
-							Size = size,
-							UV0 = fontChar.UV0,
-							UV1 = fontChar.UV1
-						});
-						Blending = wasBlending;
-					} else {
-						DrawSprite(fontChar.Texture, color, roundPos, size, fontChar.UV0, fontChar.UV1);
-					}
-				} else {
-					chars[j].FontChar = fontChar;
-					chars[j].Position = roundPos;
-					++j;
-				}
+				chars[j].FontChar = fontChar;
+				chars[j].Position = roundPos;
+				++j;
 				position.X += scale * (fontChar.Width + fontChar.ACWidths.Y);
 				prevChar = fontChar;
 			}
-
-			if (forLcdSecondPass != null) {
-				Blending wasBlending = Blending;
-				Blending = Blending.LcdTextSecondPass;
-				foreach (Sprite sprite in forLcdSecondPass) {
-					DrawSprite(sprite.Texture1, sprite.Color, sprite.Position, sprite.Size, sprite.UV0, sprite.UV1);
-				}
-				Blending = wasBlending;
-			}
-
-			if (list != null)
-				list.Add(font, color, fontHeight, chars, tag);
+			list.Add(font, color, fontHeight, chars, tag);
 		}
-
-		public static void DrawTriangleFan(ITexture texture, Vertex[] vertices, int numVertices)
+		
+		public static void DrawTriangleFan(Vertex[] vertices, int numVertices)
 		{
-			DrawTriangleFan(texture, null, vertices, numVertices);
+			DrawTriangleFan(WidgetMaterial.Diffuse, vertices, numVertices);
 		}
-
+		
+		public static void DrawTriangleFan(ITexture texture1, Vertex[] vertices, int numVertices)
+		{
+			DrawTriangleFan(texture1, null, vertices, numVertices);
+		}
+		
 		public static void DrawTriangleFan(ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
 		{
-			if (Blending == Blending.Glow) {
-				Blending = Blending.Alpha;
-				DrawTriangleFan(texture1, texture2, vertices, numVertices);
-				Blending = Blending.Glow;
+			var material = WidgetMaterial.GetInstance(Blending, Shader, CustomShaderProgram, texture1, texture2);
+			var batch = DrawTriangleFanHelper(material, vertices, numVertices);
+			var vd = batch.VertexBuffer.Data;
+			for (int i = 0; i < numVertices; i++) {
+				var t = batch.LastVertex - numVertices + i;
+				texture1?.TransformUVCoordinatesToAtlasSpace(ref vd[t].UV1);
+				texture2?.TransformUVCoordinatesToAtlasSpace(ref vd[t].UV2);
 			}
-			if (Blending == Blending.Darken) {
-				Blending = Blending.Alpha;
-				DrawTriangleFan(texture1, texture2, vertices, numVertices);
-				Blending = Blending.Darken;
-			}
-			var batch = DrawTrianglesHelper(texture1, texture2, vertices, numVertices);
+		}
+		
+		public static void DrawTriangleFan(IMaterial material, Vertex[] vertices, int numVertices)
+		{
+			DrawTriangleFanHelper(material, vertices, numVertices);
+		}
+
+		private static RenderBatch DrawTriangleFanHelper(IMaterial material, Vertex[] vertices, int numVertices)
+		{
+			var batch = DrawTrianglesHelper(material, vertices, numVertices);
 			var baseVertex = batch.LastVertex;
 			int j = batch.LastIndex;
 			var indices = batch.IndexBuffer.Data;
@@ -496,21 +471,39 @@ namespace Lime
 			}
 			batch.IndexBuffer.Dirty = true;
 			batch.LastVertex += numVertices;
+			return batch;
+		}
+		
+		public static void DrawTriangleStrip(Vertex[] vertices, int numVertices)
+		{
+			DrawTriangleStrip(WidgetMaterial.Diffuse, vertices, numVertices);
 		}
 
+		public static void DrawTriangleStrip(ITexture texture1, Vertex[] vertices, int numVertices)
+		{
+			DrawTriangleStrip(texture1, null, vertices, numVertices);
+		}
+		
 		public static void DrawTriangleStrip(ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
 		{
-			if (Blending == Blending.Glow) {
-				Blending = Blending.Alpha;
-				DrawTriangleStrip(texture1, texture2, vertices, numVertices);
-				Blending = Blending.Glow;
+			var material = WidgetMaterial.GetInstance(Blending, Shader, CustomShaderProgram, texture1, texture2);
+			var batch = DrawTriangleStripHelper(material, vertices, numVertices);
+			var vd = batch.VertexBuffer.Data;
+			for (int i = 0; i < numVertices; i++) {
+				var t = batch.LastVertex - numVertices + i;
+				texture1?.TransformUVCoordinatesToAtlasSpace(ref vd[t].UV1);
+				texture2?.TransformUVCoordinatesToAtlasSpace(ref vd[t].UV2);
 			}
-			if (Blending == Blending.Darken) {
-				Blending = Blending.Alpha;
-				DrawTriangleStrip(texture1, texture2, vertices, numVertices);
-				Blending = Blending.Darken;
-			}
-			var batch = DrawTrianglesHelper(texture1, texture2, vertices, numVertices);
+		}
+		
+		public static void DrawTriangleStrip(IMaterial material, Vertex[] vertices, int numVertices)
+		{
+			DrawTriangleStripHelper(material, vertices, numVertices);
+		}
+		
+		private static RenderBatch DrawTriangleStripHelper(IMaterial material, Vertex[] vertices, int numVertices)
+		{
+			var batch = DrawTrianglesHelper(material, vertices, numVertices);
 			var vertex = batch.LastVertex;
 			int j = batch.LastIndex;
 			var indices = batch.IndexBuffer.Data;
@@ -523,68 +516,52 @@ namespace Lime
 			}
 			batch.IndexBuffer.Dirty = true;
 			batch.LastVertex += numVertices;
+			return batch;
 		}
 
-		private static RenderBatch DrawTrianglesHelper(ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
+		private static RenderBatch DrawTrianglesHelper(IMaterial material, Vertex[] vertices, int numVertices)
 		{
-			var batch = CurrentRenderList.GetBatch(texture1, texture2, Blending, Shader, CustomShaderProgram, numVertices, (numVertices - 2) * 3);
+			var batch = CurrentRenderList.GetBatch(material, numVertices, (numVertices - 2) * 3);
 			var transform = GetEffectiveTransform();
 			var vd = batch.VertexBuffer.Data;
 			batch.VertexBuffer.Dirty = true;
 			int j = batch.LastVertex;
-			for (int i = 0; i < numVertices; i++) {
+			for (int i = 0; i < numVertices; i++, j++) {
 				var v = vertices[i];
-				if (PremultipliedAlphaMode && v.Color.A != 255) {
-					v.Color = Color4.PremulAlpha(v.Color);
-				}
-				vd[j].Color = v.Color;
-				vd[j].Pos = transform * v.Pos;
-				if (texture1 != null) {
-					var uv1 = v.UV1;
-					texture1.TransformUVCoordinatesToAtlasSpace(ref uv1);
-					vd[j].UV1 = uv1;
-				}
-				if (texture2 != null) {
-					var uv2 = v.UV2;
-					texture2.TransformUVCoordinatesToAtlasSpace(ref uv2);
-					vd[j].UV2 = uv2;
-				}
-				j++;
+				v.Pos = transform * v.Pos;
+				vd[j] = v;
 			}
 			return batch;
 		}
-
-		public static void DrawSprite(ITexture texture, Color4 color, Vector2 position, Vector2 size, Vector2 uv0, Vector2 uv1)
+		
+		public static void DrawSprite(ITexture texture1, Color4 color, Vector2 position, Vector2 size, Vector2 uv0, Vector2 uv1)
 		{
-			DrawSprite(texture, null, color, position, size, uv0, uv1);
+			var material = WidgetMaterial.GetInstance(Blending, Shader, CustomShaderProgram, texture1, null);
+			texture1?.TransformUVCoordinatesToAtlasSpace(ref uv0);
+			texture1?.TransformUVCoordinatesToAtlasSpace(ref uv1);
+			DrawSprite(material, color, position, size, uv0, uv1, Vector2.Zero, Vector2.Zero);
 		}
-
+		
 		public static void DrawSprite(ITexture texture1, ITexture texture2, Color4 color, Vector2 position, Vector2 size, Vector2 uv0, Vector2 uv1)
 		{
-			Vector2 uv0tex2 = uv0;
-			Vector2 uv1tex2 = uv1;
-			if (Blending == Blending.Glow) {
-				Blending = Blending.Alpha;
-				DrawSprite(texture1, texture2, color, position, size, uv0, uv1);
-				Blending = Blending.Glow;
-			}
-			if (Blending == Blending.Darken) {
-				Blending = Blending.Alpha;
-				DrawSprite(texture1, texture2, color, position, size, uv0, uv1);
-				Blending = Blending.Darken;
-			}
-			var batch = CurrentRenderList.GetBatch(texture1, texture2, Blending, Shader, CustomShaderProgram, 4, 6);
-			if (PremultipliedAlphaMode && color.A != 255) {
-				color = Color4.PremulAlpha(color);
-			}
-			if (texture1 != null) {
-				texture1.TransformUVCoordinatesToAtlasSpace(ref uv0);
-				texture1.TransformUVCoordinatesToAtlasSpace(ref uv1);
-			}
-			if (texture2 != null) {
-				texture2.TransformUVCoordinatesToAtlasSpace(ref uv0tex2);
-				texture2.TransformUVCoordinatesToAtlasSpace(ref uv1tex2);
-			}
+			var material = WidgetMaterial.GetInstance(Blending, Shader, CustomShaderProgram, texture1, texture2);
+			var uv0t2 = uv0;
+			var uv1t2 = uv1;
+			texture2?.TransformUVCoordinatesToAtlasSpace(ref uv0t2);
+			texture2?.TransformUVCoordinatesToAtlasSpace(ref uv1t2);
+			texture1?.TransformUVCoordinatesToAtlasSpace(ref uv0);
+			texture1?.TransformUVCoordinatesToAtlasSpace(ref uv1);
+			DrawSprite(material, color, position, size, uv0, uv1, uv0t2, uv1t2);
+		}
+	
+		public static void DrawSprite(IMaterial material, Color4 color, Vector2 position, Vector2 size, Vector2 uv0, Vector2 uv1)
+		{
+			DrawSprite(material, color, position, size, uv0, uv1, Vector2.Zero, Vector2.Zero);
+		}
+
+		public static void DrawSprite(IMaterial material, Color4 color, Vector2 position, Vector2 size, Vector2 uv0t1, Vector2 uv1t1, Vector2 uv0t2, Vector2 uv1t2)
+		{
+			var batch = CurrentRenderList.GetBatch(material, 4, 6);
 			batch.VertexBuffer.Dirty = true;
 			batch.IndexBuffer.Dirty = true;
 			int v = batch.LastVertex;
@@ -614,20 +591,20 @@ namespace Lime
 			var vertices = batch.VertexBuffer.Data;
 			vertices[v].Pos = new Vector2 { X = x0ux + y0vx + matrix.TX, Y = x0uy + y0vy + matrix.TY };
 			vertices[v].Color = color;
-			vertices[v].UV1 = uv0;
-			vertices[v++].UV2 = uv0tex2;
+			vertices[v].UV1 = uv0t1;
+			vertices[v++].UV2 = uv0t2;
 			vertices[v].Pos = new Vector2 { X = x1ux + y0vx + matrix.TX, Y = x1uy + y0vy + matrix.TY };
 			vertices[v].Color = color;
-			vertices[v].UV1 = new Vector2 { X = uv1.X, Y = uv0.Y };
-			vertices[v++].UV2 = new Vector2 { X = uv1tex2.X, Y = uv0tex2.Y };
+			vertices[v].UV1 = new Vector2 { X = uv1t1.X, Y = uv0t1.Y };
+			vertices[v++].UV2 = new Vector2 { X = uv1t2.X, Y = uv0t2.Y };
 			vertices[v].Pos = new Vector2 { X = x0ux + y1vx + matrix.TX, Y = x0uy + y1vy + matrix.TY };
 			vertices[v].Color = color;
-			vertices[v].UV1 = new Vector2 { X = uv0.X, Y = uv1.Y };
-			vertices[v++].UV2 = new Vector2 { X = uv0tex2.X, Y = uv1tex2.Y };
+			vertices[v].UV1 = new Vector2 { X = uv0t1.X, Y = uv1t1.Y };
+			vertices[v++].UV2 = new Vector2 { X = uv0t2.X, Y = uv1t2.Y };
 			vertices[v].Pos = new Vector2 { X = x1ux + y1vx + matrix.TX, Y = x1uy + y1vy + matrix.TY };
 			vertices[v].Color = color;
-			vertices[v].UV1 = uv1;
-			vertices[v].UV2 = uv1tex2;
+			vertices[v].UV1 = uv1t1;
+			vertices[v].UV2 = uv1t2;
 		}
 
 		private static Matrix32 GetEffectiveTransform()
@@ -659,16 +636,6 @@ namespace Lime
 
 		public static void DrawSpriteList(List<Sprite> spriteList, Color4 color)
 		{
-			if (Blending == Blending.Glow) {
-				Blending = Blending.Alpha;
-				DrawSpriteList(spriteList, color);
-				Blending = Blending.Glow;
-			}
-			if (Blending == Blending.Darken) {
-				Blending = Blending.Alpha;
-				DrawSpriteList(spriteList, color);
-				Blending = Blending.Darken;
-			}
 			var matrix = GetEffectiveTransform();
 			int batchLength = 0;
 			var clipRect = scissorTestEnabled ? CalcLocalScissorAABB(matrix) : new Rectangle();
@@ -682,47 +649,27 @@ namespace Lime
 						continue;
 					}
 				}
-				if (
-					batchLength == 0 ||
-					batchLength < batchedSprites.Length &&
-					s.Texture1 == batchedSprites[0].Texture1 &&
-					s.Texture2 == batchedSprites[0].Texture2 &&
-					s.Blending == batchedSprites[0].Blending &&
-					s.ShaderProgram == batchedSprites[0].ShaderProgram
-				) {
+				if (batchLength == 0 || batchLength < batchedSprites.Length && s.Material == batchedSprites[0].Material) {
 					batchedSprites[batchLength++] = s;
 					continue;
 				}
-				bool customShader = batchedSprites[0].ShaderProgram != null;
-				Blending blending = batchedSprites[0].Blending == null ? Blending : batchedSprites[0].Blending.Value;
-				var batch = CurrentRenderList.GetBatch(
-					batchedSprites[0].Texture1, batchedSprites[0].Texture2, blending, customShader ? ShaderId.Custom : Shader,
-					customShader ? batchedSprites[0].ShaderProgram : CustomShaderProgram, 4 * batchLength, 6 * batchLength);
+				var material = batchedSprites[0].Material;
+				var batch = CurrentRenderList.GetBatch(material, 4 * batchLength, 6 * batchLength);
 				int v = batch.LastVertex;
 				int i = batch.LastIndex;
 				batch.VertexBuffer.Dirty = true;
 				batch.IndexBuffer.Dirty = true;
 				var indices = batch.IndexBuffer.Data;
 				var vertices = batch.VertexBuffer.Data;
-				var uvRect = batchedSprites[0].Texture1.AtlasUVRect;
 				for (int j = 0; j < batchLength; j++) {
 					var sprite = batchedSprites[j];
-					var effectiveColor = sprite.ForceOverrideColor ? sprite.Color : color * sprite.Color;
-					if (!sprite.ForceOverrideColor && Renderer.PremultipliedAlphaMode && color.A != 255) {
-						effectiveColor = Color4.PremulAlpha(effectiveColor);
-					}
+					var effectiveColor = color * sprite.Color;
 					indices[i++] = (ushort)(v + 1);
 					indices[i++] = (ushort)v;
 					indices[i++] = (ushort)(v + 2);
 					indices[i++] = (ushort)(v + 2);
 					indices[i++] = (ushort)(v + 3);
 					indices[i++] = (ushort)(v + 1);
-					var uv0 = sprite.UV0;
-					var uv1 = sprite.UV1;
-					uv0.X = uvRect.A.X + (uvRect.B.X - uvRect.A.X) * uv0.X;
-					uv0.Y = uvRect.A.Y + (uvRect.B.Y - uvRect.A.Y) * uv0.Y;
-					uv1.X = uvRect.A.X + (uvRect.B.X - uvRect.A.X) * uv1.X;
-					uv1.Y = uvRect.A.Y + (uvRect.B.Y - uvRect.A.Y) * uv1.Y;
 					float x0 = sprite.Position.X;
 					float y0 = sprite.Position.Y;
 					float x1 = sprite.Position.X + sprite.Size.X;
@@ -735,6 +682,8 @@ namespace Lime
 					float x1uy = x1 * matrix.UY;
 					float y1vx = y1 * matrix.VX;
 					float y1vy = y1 * matrix.VY;
+					var uv0 = sprite.UV0;
+					var uv1 = sprite.UV1;
 					vertices[v].Pos = new Vector2 { X = x0ux + y0vx + matrix.TX, Y = x0uy + y0vy + matrix.TY };
 					vertices[v].Color = effectiveColor;
 					vertices[v++].UV1 = uv0;
@@ -794,7 +743,7 @@ namespace Lime
 			DrawLine(new Vector2(x0, y0), new Vector2(x1, y1), color, thickness, cap);
 		}
 
-		static Vertex[] v = new Vertex[4];
+		static Vertex[] staticVertices = new Vertex[4];
 
 		public static void DrawLine(Vector2 a, Vector2 b, Color4 color, float thickness = 1, LineCap cap = LineCap.Butt)
 		{
@@ -803,17 +752,17 @@ namespace Lime
 			}
 			var d = (b - a).Normalized * thickness * 0.5f;
 			Vector2 n = GetVectorNormal(d);
-			v[0] = new Vertex { Pos = a - n, Color = color };
-			v[1] = new Vertex { Pos = b - n, Color = color };
-			v[2] = new Vertex { Pos = b + n, Color = color };
-			v[3] = new Vertex { Pos = a + n, Color = color };
+			staticVertices[0] = new Vertex { Pos = a - n, Color = color };
+			staticVertices[1] = new Vertex { Pos = b - n, Color = color };
+			staticVertices[2] = new Vertex { Pos = b + n, Color = color };
+			staticVertices[3] = new Vertex { Pos = a + n, Color = color };
 			if (cap == LineCap.Square) {
-				v[0].Pos -= d;
-				v[1].Pos += d;
-				v[2].Pos += d;
-				v[3].Pos -= d;
+				staticVertices[0].Pos -= d;
+				staticVertices[1].Pos += d;
+				staticVertices[2].Pos += d;
+				staticVertices[3].Pos -= d;
 			}
-			Renderer.DrawTriangleFan(null, null, v, 4);
+			DrawTriangleFan(WidgetMaterial.Diffuse, staticVertices, 4);
 		}
 
 		static Vector2 GetVectorNormal(Vector2 v)
@@ -823,11 +772,11 @@ namespace Lime
 
 		public static void DrawRect(Vector2 a, Vector2 b, Color4 color)
 		{
-			v[0] = new Vertex { Pos = a, Color = color };
-			v[1] = new Vertex { Pos = new Vector2(b.X, a.Y), Color = color };
-			v[2] = new Vertex { Pos = b, Color = color };
-			v[3] = new Vertex { Pos = new Vector2(a.X, b.Y), Color = color };
-			Renderer.DrawTriangleFan(null, null, v, 4);
+			staticVertices[0] = new Vertex { Pos = a, Color = color };
+			staticVertices[1] = new Vertex { Pos = new Vector2(b.X, a.Y), Color = color };
+			staticVertices[2] = new Vertex { Pos = b, Color = color };
+			staticVertices[3] = new Vertex { Pos = new Vector2(a.X, b.Y), Color = color };
+			DrawTriangleFan(WidgetMaterial.Diffuse, staticVertices, 4);
 		}
 
 		public static void DrawRect(float x0, float y0, float x1, float y1, Color4 color)
@@ -873,12 +822,12 @@ namespace Lime
 		/// <summary>
 		/// Draws the quadrangle
 		/// </summary>
-		public static void DrawQuadrangle(Quadrangle q, Color4 color, float thickness = 1)
+		public static void DrawQuadrangle(Quadrangle q, Color4 color)
 		{
 			for (int i = 0; i < 4; i++) {
-				v[i] = new Vertex { Pos = q[i], Color = color };
+				staticVertices[i] = new Vertex { Pos = q[i], Color = color };
 			}
-			Renderer.DrawTriangleFan(null, null, v, 4);
+			DrawTriangleFan(staticVertices, 4);
 		}
 
 		/// <summary>
@@ -891,11 +840,11 @@ namespace Lime
 
 		public static void DrawVerticalGradientRect(Vector2 a, Vector2 b, ColorGradient gradient)
 		{
-			v[0] = new Vertex { Pos = a, Color = gradient.A };
-			v[1] = new Vertex { Pos = new Vector2(b.X, a.Y), Color = gradient.A };
-			v[2] = new Vertex { Pos = b, Color = gradient.B };
-			v[3] = new Vertex { Pos = new Vector2(a.X, b.Y), Color = gradient.B };
-			Renderer.DrawTriangleFan(null, null, v, 4);
+			staticVertices[0] = new Vertex { Pos = a, Color = gradient.A };
+			staticVertices[1] = new Vertex { Pos = new Vector2(b.X, a.Y), Color = gradient.A };
+			staticVertices[2] = new Vertex { Pos = b, Color = gradient.B };
+			staticVertices[3] = new Vertex { Pos = new Vector2(a.X, b.Y), Color = gradient.B };
+			DrawTriangleFan(WidgetMaterial.Diffuse, staticVertices, 4);
 		}
 
 		public static void DrawVerticalGradientRect(float x0, float y0, float x1, float y1, ColorGradient gradient)
@@ -910,11 +859,11 @@ namespace Lime
 
 		public static void DrawHorizontalGradientRect(Vector2 a, Vector2 b, ColorGradient gradient)
 		{
-			v[0] = new Vertex { Pos = a, Color = gradient.A };
-			v[1] = new Vertex { Pos = new Vector2(b.X, a.Y), Color = gradient.B };
-			v[2] = new Vertex { Pos = b, Color = gradient.B };
-			v[3] = new Vertex { Pos = new Vector2(a.X, b.Y), Color = gradient.A };
-			Renderer.DrawTriangleFan(null, null, v, 4);
+			staticVertices[0] = new Vertex { Pos = a, Color = gradient.A };
+			staticVertices[1] = new Vertex { Pos = new Vector2(b.X, a.Y), Color = gradient.B };
+			staticVertices[2] = new Vertex { Pos = b, Color = gradient.B };
+			staticVertices[3] = new Vertex { Pos = new Vector2(a.X, b.Y), Color = gradient.A };
+			DrawTriangleFan(WidgetMaterial.Diffuse, staticVertices, 4);
 		}
 
 		public static void DrawHorizontalGradientRect(float x0, float y0, float x1, float y1, ColorGradient gradient)
@@ -939,21 +888,21 @@ namespace Lime
 
 		public static void DrawRound(Vector2 center, float radius, int numSegments, Color4 innerColor, Color4 outerColor)
 		{
-			if (v.Length < numSegments + 1) {
-				v = new Vertex[numSegments + 1];
+			if (staticVertices.Length < numSegments + 1) {
+				staticVertices = new Vertex[numSegments + 1];
 			}
-			v[0] = new Vertex { Pos = center, Color = innerColor };
+			staticVertices[0] = new Vertex { Pos = center, Color = innerColor };
 			for (int i = 0; i < numSegments; i++) {
-				v[i + 1].Pos = Vector2.CosSin(i * Mathf.TwoPi / (numSegments - 1)) * radius + center;
-				v[i + 1].Color = outerColor;
+				staticVertices[i + 1].Pos = Vector2.CosSin(i * Mathf.TwoPi / (numSegments - 1)) * radius + center;
+				staticVertices[i + 1].Color = outerColor;
 			}
-			DrawTriangleFan(null, v, numSegments + 1);
+			DrawTriangleFan(staticVertices, numSegments + 1);
 		}
 
 		public static void DrawCircle(Vector2 center, float radius, int numSegments, Color4 color)
 		{
-			if (v.Length < numSegments + 1) {
-				v = new Vertex[numSegments + 1];
+			if (staticVertices.Length < numSegments + 1) {
+				staticVertices = new Vertex[numSegments + 1];
 			}
 			var prevPos = Vector2.CosSin(0) * radius + center;
 			for (int i = 0; i < numSegments; i++) {
@@ -968,16 +917,11 @@ namespace Lime
 			DrawRound(center, radius, numSegments, color, color);
 		}
 
-		public static void DrawDashedLine(ITexture texture, Vector2 a, Vector2 b, Color4 color, float size = 8)
+		public static void DrawDashedLine(ITexture notUsed, Vector2 a, Vector2 b, Color4 color, float size = 8)
 		{
 			var dir = (b - a).Normalized;
 			var l = (b - a).Length;
 			var n = new Vector2(-dir.Y, dir.X) * size / 2;
-			//Round position to avoid flickering
-			a.X = (int)a.X;
-			a.Y = (int)a.Y;
-			b.X = (int)b.X;
-			b.Y = (int)b.Y;
 			Vertex[] vertices = {
 				new Vertex {
 					Pos = a - n,
@@ -1000,7 +944,7 @@ namespace Lime
 					Color = color,
 				}
 			};
-			Renderer.DrawTriangleFan(texture, vertices, vertices.Length);
+			DrawTriangleFan(WidgetMaterial.Diffuse, vertices, vertices.Length);
 		}
 	}
 }

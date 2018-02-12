@@ -9,34 +9,19 @@ namespace Lime
 
 		public bool Empty { get { return lastBatch == null; } }
 
-		public RenderBatch GetBatch(ITexture texture1, ITexture texture2, Blending blending, ShaderId shader, ShaderProgram customShaderProgram, int vertexCount, int indexCount)
+		public RenderBatch GetBatch(IMaterial material, int vertexCount, int indexCount)
 		{
 			bool needMesh = lastBatch == null || 
 				lastBatch.LastVertex + vertexCount > RenderBatch.VertexBufferCapacity ||
 				lastBatch.LastIndex + indexCount > RenderBatch.IndexBufferCapacity;
-			if (!needMesh &&
-				(GetTextureHandle(lastBatch.Texture1) == GetTextureHandle(texture1)) &&
-				(GetTextureHandle(lastBatch.Texture2) == GetTextureHandle(texture2)) &&
-				lastBatch.Blending == blending &&
-				lastBatch.Shader == shader &&
-				lastBatch.CustomShaderProgram == customShaderProgram)
-			{
+			if (!needMesh && lastBatch.Material == material && material.PassCount == 1) {
 				return lastBatch;
 			}
 			var batch = RenderBatch.Acquire(needMesh ? null : lastBatch);
-			batch.Texture1 = texture1;
-			batch.Texture2 = texture2;
-			batch.Blending = blending;
-			batch.Shader = shader;
-			batch.CustomShaderProgram = customShaderProgram;
+			batch.Material = material;
 			Batches.Add(batch);
 			lastBatch = batch;
 			return batch;
-		}
-
-		private static uint GetTextureHandle(ITexture texture)
-		{
-			return texture == null ? 0 : texture.GetHandle();
 		}
 
 		public void Render()

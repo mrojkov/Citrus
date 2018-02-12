@@ -20,6 +20,8 @@ namespace Lime
 			}
 		}
 
+		public int PassCount => 1;
+
 		private bool skinEnabled = false;
 		private DepthBufferProgram program;
 		private Matrix44[] boneTransforms;
@@ -29,8 +31,8 @@ namespace Lime
 		{
 			ColorFactor = Color4.White;
 		}
-
-		public void Apply()
+		
+		public void Apply(int pass)
 		{
 			PlatformRenderer.SetBlending(Blending.Alpha);
 			PrepareShaderProgram();
@@ -42,7 +44,7 @@ namespace Lime
 
 			program.LoadMatrix(program.LightWorldViewProjUniformId, Renderer.FixupWVP(Renderer.World * ViewProjection));
 		}
-
+		
 		private void PrepareShaderProgram()
 		{
 			if (program != null) {

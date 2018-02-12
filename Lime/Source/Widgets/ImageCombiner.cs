@@ -135,14 +135,14 @@ namespace Lime
 		static readonly Vector2[] coords = new Vector2[8];
 		static readonly Vector2[] stencil = new Vector2[4];
 		static readonly Vertex[] vertices = new Vertex[8];
-		static readonly Vector2[] rect = new Vector2[4] {
+		static readonly Vector2[] rect = {
 			new Vector2(0, 0),
 			new Vector2(1, 0),
 			new Vector2(1, 1),
 			new Vector2(0, 1)
 		};
 
-		private void RenderHelper(IImageCombinerArg arg1, IImageCombinerArg arg2)
+		private void RenderHelper(IImageCombinerArg arg1, IImageCombinerArg arg2, IMaterial material, ITexture texture1, ITexture texture2)
 		{
 			Matrix32 transform1 = Matrix32.Scaling(arg1.Size) * arg1.CalcLocalToParentTransform();
 			Matrix32 transform2 = Matrix32.Scaling(arg2.Size) * arg2.CalcLocalToParentTransform();
@@ -165,16 +165,18 @@ namespace Lime
 			// Эти матрицы переводят координаты вершин изображения в текстурные координаты.
 			Matrix32 uvTransform1 = transform1.CalcInversed();
 			Matrix32 uvTransform2 = transform2.CalcInversed();
-			ITexture texture1 = arg1.GetTexture();
-			ITexture texture2 = arg2.GetTexture();
 			Color4 color = arg1.Color * arg2.Color * Parent.AsWidget.GlobalColor;
 			for (int i = 0; i < numCoords; i++) {
 				vertices[i].Pos = coords[i];
 				vertices[i].Color = color;
-				vertices[i].UV1 = coords[i] * uvTransform1 * arg1.UVTransform;
-				vertices[i].UV2 = coords[i] * uvTransform2 * arg2.UVTransform;
+				var uv1 = coords[i] * uvTransform1 * arg1.UVTransform;
+				var uv2 = coords[i] * uvTransform2 * arg2.UVTransform;
+				texture1?.TransformUVCoordinatesToAtlasSpace(ref uv1);
+				texture2?.TransformUVCoordinatesToAtlasSpace(ref uv2);
+				vertices[i].UV1 = uv1;
+				vertices[i].UV2 = uv2;
 			}
-			Renderer.DrawTriangleFan(texture1, texture2, vertices, numCoords);
+			Renderer.DrawTriangleFan(material, vertices, numCoords);
 		}
 
 		public override void Render()
@@ -189,24 +191,23 @@ namespace Lime
 			if (!arg1.GloballyVisible || !arg2.GloballyVisible) {
 				return;
 			}
-			if (arg1.GetTexture() == null || arg2.GetTexture() == null) {
+			var texture1 = arg1.GetTexture();
+			var texture2 = arg2.GetTexture();
+			if (texture1 == null || texture2 == null) {
 				return;
 			}
 			Renderer.Transform1 = Parent.AsWidget.LocalToWorldTransform;
-			Renderer.Blending = Blending == Blending.Inherited ? Parent.AsWidget.GlobalBlending : Blending;
+			var blending = Blending == Blending.Inherited ? Parent.AsWidget.GlobalBlending : Blending;
 			var shader = Shader == ShaderId.Inherited ? Parent.AsWidget.GlobalShader : Shader;
 			if (arg2.Shader == ShaderId.Silhuette) {
-				Renderer.Shader = ShaderId.Silhuette;
+				shader = ShaderId.Silhuette;
 			} else if (arg1.Shader == ShaderId.Silhuette) {
-				Renderer.Shader = ShaderId.Silhuette;
+				shader = ShaderId.Silhuette;
 				Toolbox.Swap(ref arg1, ref arg2);
-			} else {
-				Renderer.Shader = shader;
+				Toolbox.Swap(ref texture1, ref texture2);
 			}
-			if (Renderer.Shader == ShaderId.Custom) {
-				Renderer.CustomShaderProgram = CustomShaderProgram;
-			}
-			RenderHelper(arg1, arg2);
+			var material = WidgetMaterial.GetInstance(blending, shader, CustomShaderProgram, texture1, texture2);
+			RenderHelper(arg1, arg2, material, texture1, texture2);
 		}
 	}
 }

@@ -733,47 +733,43 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.ColorFactor = (global::Lime.Color4)dg.ReadStruct<global::Lime.Color4>();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (3 == fd.OurIndex) {
 				result.DiffuseColor = (global::Lime.Color4)dg.ReadStruct<global::Lime.Color4>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (4 == fd.OurIndex) {
+			if (3 == fd.OurIndex) {
 				result.DiffuseTexture = (global::Lime.ITexture)dg.ReadObject<global::Lime.ITexture>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (5 == fd.OurIndex) {
+			if (4 == fd.OurIndex) {
 				result.FogColor = (global::Lime.Color4)dg.ReadStruct<global::Lime.Color4>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (6 == fd.OurIndex) {
+			if (5 == fd.OurIndex) {
 				result.FogDensity = d.Reader.ReadSingle();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (7 == fd.OurIndex) {
+			if (6 == fd.OurIndex) {
 				result.FogEnd = d.Reader.ReadSingle();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (8 == fd.OurIndex) {
+			if (7 == fd.OurIndex) {
 				result.FogMode = (global::Lime.FogMode)d.Reader.ReadInt32();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (9 == fd.OurIndex) {
+			if (8 == fd.OurIndex) {
 				result.FogStart = d.Reader.ReadSingle();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (10 == fd.OurIndex) {
+			if (9 == fd.OurIndex) {
 				result.Name = d.Reader.ReadString();
 				if (result.Name == "" && d.Reader.ReadBoolean()) result.Name = null;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (11 == fd.OurIndex) {
+			if (10 == fd.OurIndex) {
 				result.ProcessLightning = d.Reader.ReadBoolean();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (12 == fd.OurIndex) {
+			if (11 == fd.OurIndex) {
 				result.SkinEnabled = d.Reader.ReadBoolean();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}

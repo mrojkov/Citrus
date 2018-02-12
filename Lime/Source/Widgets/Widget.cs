@@ -612,6 +612,7 @@ namespace Lime
 			} else {
 				globalBlending = Blending;
 			}
+			DiscardMaterial();
 		}
 
 		/// <summary>
@@ -637,7 +638,10 @@ namespace Lime
 			} else {
 				globalShader = Shader;
 			}
+			DiscardMaterial();
 		}
+		
+		protected virtual void DiscardMaterial() { }
 
 		/// <summary>
 		/// Indicates whether the widget is actually visible.

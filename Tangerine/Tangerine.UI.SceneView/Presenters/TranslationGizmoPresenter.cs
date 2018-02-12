@@ -64,9 +64,7 @@ namespace Tangerine.UI.SceneView
 			Renderer.Flush();
 			Renderer.World = CalcGizmoTransform(node.GlobalTransform, 100);
 			Renderer.CullMode = CullMode.CullClockwise;
-			PlatformRenderer.SetTexture(null, 0);
-			PlatformRenderer.SetTexture(null, 1);
-			PlatformRenderer.SetShader(ShaderId.Diffuse, null);
+			WidgetMaterial.Diffuse.Apply(0);
 			PlatformRenderer.DrawTriangles(gizmo, 0, gizmo.IndexBuffer.Data.Length);
 		}
 

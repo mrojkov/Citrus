@@ -8,34 +8,164 @@ namespace Lime
 	public class Sprite
 	{
 		public int Tag;
-		public ITexture Texture1;
-		public ITexture Texture2;
+		public IMaterial Material;
 		public Color4 Color;
 		public Vector2 UV0;
 		public Vector2 UV1;
 		public Vector2 Position;
 		public Vector2 Size;
-		public ShaderProgram ShaderProgram;
-		/// <summary>
-		/// Sets specific blending mode for that sprite, it is used to batch two pass lcd text rendering,
-		/// but not like with Darken
-		/// </summary>
-		public Blending? Blending;
-		public bool ForceOverrideColor;
+		
+		public interface IMaterialProvider
+		{
+			IMaterial GetMaterial(ITexture texture, int tag);
+		}
+		
+		public class DefaultMaterialProvider : IMaterialProvider
+		{
+			public static readonly DefaultMaterialProvider Instance = new DefaultMaterialProvider();
+
+			private Blending blending;
+			private ShaderId shader;
+			private ITexture texture;
+			private IMaterial material;
+			
+			public void Init(Blending blending, ShaderId shader)
+			{
+				this.blending = blending;
+				this.shader = shader;
+				texture = null;
+				material = null;
+			}
+			
+			public IMaterial GetMaterial(ITexture texture, int tag)
+			{
+				if (texture != this.texture) {
+					this.texture = texture;
+					material = WidgetMaterial.GetInstance(blending, shader, null, texture);
+				}
+				return material;
+			}
+		}
+		
+		public class LcdFontMaterialProvider : IMaterialProvider
+		{
+			public static readonly LcdFontMaterialProvider Instance = new LcdFontMaterialProvider();
+
+			private ITexture texture;
+			private IMaterial material;
+			private readonly Dictionary<ITexture, IMaterial> materials = new Dictionary<ITexture, IMaterial>();
+			
+			public void Init()
+			{
+				texture = null;
+				material = null;
+			}
+			
+			public IMaterial GetMaterial(ITexture texture, int tag)
+			{
+				if (texture != this.texture) {
+					this.texture = texture;
+					if (!materials.TryGetValue(texture, out material)) {
+						material = new LcdFontMaterial(texture);
+						materials.Add(texture, material);
+					}
+				}
+				return material;
+			}
+		}
+		
+		public class LcdFontMaterial : IMaterial
+		{
+			private static string vs = @"
+				attribute vec4 inPos;
+				attribute vec4 inColor;
+				attribute vec2 inTexCoords1;
+				varying lowp vec4 color;
+				varying lowp vec2 texCoords1;
+				uniform mat4 matProjection;
+				void main()
+				{
+					gl_Position = matProjection * inPos;
+					color = inColor;
+					texCoords1 = inTexCoords1;
+				}";
+
+			private static string fsPass1 = @"
+				varying lowp vec2 texCoords1;
+				uniform lowp sampler2D tex1;
+				void main()
+				{
+					gl_FragColor = texture2D(tex1, texCoords1);
+				}";
+
+			private static string fsPass2 = @"
+				varying lowp vec2 texCoords1;
+				varying lowp vec4 color;
+				uniform lowp sampler2D tex1;
+				void main()
+				{
+					gl_FragColor = color * texture2D(tex1, texCoords1);
+				}";
+		
+			public static readonly ShaderProgram shaderProgramPass1;
+			public static readonly ShaderProgram shaderProgramPass2;
+			
+			public readonly ITexture Texture;
+			
+			public int PassCount => 2;
+			
+			static LcdFontMaterial()
+			{
+				shaderProgramPass1 = new ShaderProgram(
+					new Shader[] { new VertexShader(vs), new FragmentShader(fsPass1) }, 
+					ShaderPrograms.Attributes.GetLocations(), ShaderPrograms.GetSamplers());
+					
+				shaderProgramPass2 = new ShaderProgram(
+					new Shader[] { new VertexShader(vs), new FragmentShader(fsPass2) }, 
+					ShaderPrograms.Attributes.GetLocations(), ShaderPrograms.GetSamplers());
+			}
+			
+			public LcdFontMaterial(ITexture texture)
+			{
+				Texture = texture;
+			}
+					
+			public IMaterial Clone() => (WidgetMaterial)MemberwiseClone();
+			
+			public void Apply(int pass)
+			{
+				PlatformRenderer.SetTexture(Texture, 0);
+				PlatformRenderer.SetTexture(null, 1);
+				if (pass == 0) {
+					PlatformRenderer.SetBlending(Blending.LcdTextFirstPass, false);
+					PlatformRenderer.SetShaderProgram(shaderProgramPass1);
+				} else {
+					PlatformRenderer.SetBlending(Blending.LcdTextSecondPass, false);
+					PlatformRenderer.SetShaderProgram(shaderProgramPass2);
+				}
+			}
+			
+			public void Invalidate() { }
+		}
 	}
 
 	public class SpriteList
 	{
+		private List<ISpriteWrapper> items = new List<ISpriteWrapper>();
+
 		private interface ISpriteWrapper
 		{
-			void AddToList(List<Sprite> sprites);
+			void AddToList(List<Sprite> sprites, Sprite.IMaterialProvider materialProvider);
 			bool HitTest(Vector2 point, out int tag);
 		}
 
 		private class NormalSprite : Sprite, ISpriteWrapper
 		{
-			public void AddToList(List<Sprite> sprites)
+			public ITexture Texture;
+
+			public void AddToList(List<Sprite> sprites, Sprite.IMaterialProvider provider)
 			{
+				Material = provider.GetMaterial(Texture, Tag);
 				sprites.Add(this);
 			}
 
@@ -67,69 +197,37 @@ namespace Lime
 			public float FontHeight;
 			public CharDef[] CharDefs;
 			private static Sprite[] buffer = new Sprite[50];
-			public static int Index = 0;
+			public static int Index;
 
-			public void AddToList(List<Sprite> sprites)
+			public void AddToList(List<Sprite> sprites, Sprite.IMaterialProvider provider)
 			{
-				bool hasRgbIntensity = false;
 				foreach (CharDef cd in CharDefs) {
-					FontChar ch = cd.FontChar;
-					if (Index >= buffer.Length) {
-						Array.Resize(ref buffer, (int)(buffer.Length * 1.5));
-					}
-
-					if (buffer[Index] == null) buffer[Index] = new Sprite();
-
-					Sprite s = buffer[Index];
-					Index++;
+					var s = GetNextSprite();
 					s.Tag = Tag;
-					s.Texture1 = ch.Texture;
-					s.Texture2 = null;
 					s.Position = cd.Position;
 					s.Size = cd.Size(FontHeight);
-					s.UV0 = ch.UV0;
-					s.UV1 = ch.UV1;
-					s.ShaderProgram = null;
+					s.UV0 = cd.FontChar.UV0;
+					s.UV1 = cd.FontChar.UV1;
+					var texture = cd.FontChar.Texture;
+					texture.TransformUVCoordinatesToAtlasSpace(ref s.UV0);
+					texture.TransformUVCoordinatesToAtlasSpace(ref s.UV1);
+					s.Color = Color;
 					if (cd.FontChar.RgbIntensity) {
-						hasRgbIntensity = true;
-						s.Color = Color4.White;
-						s.ForceOverrideColor = true;
-						s.Blending = Blending.LcdTextFirstPass;
+						s.Material = Sprite.LcdFontMaterialProvider.Instance.GetMaterial(texture, Tag);
 					} else {
-						s.Color = Color;
-						s.ForceOverrideColor = false;
-						s.Blending = null;
+						s.Material = provider.GetMaterial(texture, Tag);
 					}
 					sprites.Add(s);
 				}
-
-				if (hasRgbIntensity) {
-					foreach (CharDef cd in CharDefs) {
-						if (!cd.FontChar.RgbIntensity) continue;
-
-						FontChar ch = cd.FontChar;
-						if (Index >= buffer.Length) {
-							Array.Resize(ref buffer, (int) (buffer.Length * 1.5));
-						}
-
-						if (buffer[Index] == null) buffer[Index] = new Sprite();
-
-						Sprite s = buffer[Index];
-						Index++;
-						s.Tag = Tag;
-						s.Texture1 = ch.Texture;
-						s.Texture2 = null;
-						s.Color = Color;
-						s.ForceOverrideColor = false;
-						s.Position = cd.Position;
-						s.Size = cd.Size(FontHeight);
-						s.UV0 = ch.UV0;
-						s.UV1 = ch.UV1;
-						s.ShaderProgram = null;
-						s.Blending = Blending.LcdTextSecondPass;
-						sprites.Add(s);
-					}
+			}
+			
+			private Sprite GetNextSprite()
+			{
+				if (Index >= buffer.Length) {
+					Array.Resize(ref buffer, (int)(buffer.Length * 1.5));
 				}
+				if (buffer[Index] == null) buffer[Index] = new Sprite();
+				return buffer[Index++];
 			}
 
 			public bool HitTest(Vector2 point, out int tag)
@@ -147,18 +245,18 @@ namespace Lime
 			}
 		}
 
-		private List<ISpriteWrapper> items = new List<ISpriteWrapper>();
-
 		public void Add(
-			ITexture texture, Color4 color, Vector2 position, Vector2 size, Vector2 UV0, Vector2 UV1, int tag)
+			ITexture texture, Color4 color, Vector2 position, Vector2 size, Vector2 uv0, Vector2 uv1, int tag)
 		{
-			items.Add(new NormalSprite() {
-				Texture1 = texture,
+			texture.TransformUVCoordinatesToAtlasSpace(ref uv0);
+			texture.TransformUVCoordinatesToAtlasSpace(ref uv1);
+			items.Add(new NormalSprite {
+				Texture = texture,
 				Color = color,
 				Position = position,
 				Size = size,
-				UV0 = UV0,
-				UV1 = UV1,
+				UV0 = uv0,
+				UV1 = uv1,
 				Tag = tag,
 			});
 		}
@@ -173,32 +271,26 @@ namespace Lime
 				Tag = tag,
 			});
 		}
-
-		public void Render()
+		
+		public void Clear()
 		{
-			Render(Color4.White);
+			items.Clear();
 		}
-
+		
 		private static List<Sprite> sprites = new List<Sprite>();
 
-		public void Render(Color4 color)
+		public void Render(Color4 color, Blending blending, ShaderId shader)
 		{
-			TextSprite.Index = 0;
-			foreach (var w in items) {
-				w.AddToList(sprites);
-			}
-			Renderer.DrawSpriteList(sprites, color);
-			sprites.Clear();
+			Sprite.DefaultMaterialProvider.Instance.Init(blending, shader);
+			Sprite.LcdFontMaterialProvider.Instance.Init();
+			Render(color, Sprite.DefaultMaterialProvider.Instance);
 		}
 
-		public void Render(Color4 color, Action<Sprite> spritePostProcessor)
+		public void Render(Color4 color, Sprite.IMaterialProvider materialProvider)
 		{
 			TextSprite.Index = 0;
 			foreach (var w in items) {
-				w.AddToList(sprites);
-			}
-			foreach (var s in sprites) {
-				spritePostProcessor(s);
+				w.AddToList(sprites, materialProvider);
 			}
 			Renderer.DrawSpriteList(sprites, color);
 			sprites.Clear();

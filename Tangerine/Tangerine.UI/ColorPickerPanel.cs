@@ -108,7 +108,7 @@ namespace Tangerine.UI
 						Pos = Radius * (Vector2.CosSin(t * Mathf.TwoPi) + Vector2.One)
 					};
 				}
-				Renderer.DrawTriangleFan(null, triangleFan, triangleFan.Length);
+				Renderer.DrawTriangleFan(triangleFan, triangleFan.Length);
 			}
 
 			IEnumerator<object> SelectTask()

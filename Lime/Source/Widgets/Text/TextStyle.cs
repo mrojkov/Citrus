@@ -16,8 +16,7 @@ namespace Lime
 		private Vector2 shadowOffset;
 		private Color4 textColor;
 		private Color4 shadowColor;
-		public ShaderProgram ShaderProgram;
-		internal int PalleteIndex = -1;
+		internal int PaletteIndex = -1;
 		private float letterSpacing;
 		public static TextStyle Default = new TextStyle();
 
@@ -196,10 +195,10 @@ namespace Lime
 
 		protected override void OnTagChanged()
 		{
-			ShaderProgram = null;
-			if (!int.TryParse(Tag, out PalleteIndex)) {
-				PalleteIndex = -1;
+			if (!int.TryParse(Tag, out PaletteIndex)) {
+				PaletteIndex = -1;
 			}
+			(Parent as RichText)?.Invalidate();
 		}
 
 		public override void AddToRenderChain(RenderChain chain)

@@ -96,6 +96,15 @@ namespace Lime
 				return texture.SurfaceSize;
 			}
 		}
+		
+		public ITexture AtlasTexture {
+			get {
+				if (texture == null) {
+					texture = LoadTexture();
+				}
+				return texture.AtlasTexture;
+			}
+		}
 
 		public Rectangle AtlasUVRect {
 			get {

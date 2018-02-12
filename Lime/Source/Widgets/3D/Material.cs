@@ -1,10 +1,12 @@
-﻿namespace Lime
+﻿using System;
+
+namespace Lime
 {
 	public interface IMaterial
 	{
-		Color4 ColorFactor { get; set; }
+		int PassCount { get; }
+		void Apply(int pass);
 		IMaterial Clone();
-		void Apply();
 		void Invalidate();
 	}
 

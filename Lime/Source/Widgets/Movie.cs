@@ -75,18 +75,8 @@ namespace Lime
 
 		public override void Render()
 		{
-			var pam = Renderer.PremultipliedAlphaMode;
-			try {
-				Renderer.Flush();
-				Renderer.PremultipliedAlphaMode = false;
-				Renderer.Blending = GlobalBlending;
-				Renderer.Shader = GlobalShader;
-				Renderer.Transform1 = LocalToWorldTransform;
-				Renderer.DrawSprite(movieTexture, GlobalColor, Vector2.Zero, Size, Vector2.Zero, Vector2.One);
-				Renderer.Flush();
-			} finally {
-				Renderer.PremultipliedAlphaMode = pam;
-			}
+			PrepareRendererState();
+			Renderer.DrawSprite(movieTexture, GlobalColor, Vector2.Zero, Size, Vector2.Zero, Vector2.One);
 		}
 
 		public override void OnTrigger(string property, double animationTimeCorrection = 0)

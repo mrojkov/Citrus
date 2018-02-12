@@ -50,7 +50,7 @@ namespace Lime
 				for (int i = 0; i < vertices.Length; i++) {
 					vertices[i].Color = color * tint;
 				}
-				Renderer.DrawTriangleFan(null, vertices, vertices.Length);
+				Renderer.DrawTriangleFan(vertices, vertices.Length);
 			}
 		}
 

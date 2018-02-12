@@ -15,7 +15,7 @@ namespace Lime
 	/// <summary>
 	/// Represents 2D texture
 	/// </summary>
-	public partial class Texture2D : CommonTexture, ITexture, IGLObject
+	public partial class Texture2D : CommonTexture, ITexture, IWidgetMaterialListHolder, IGLObject
 	{
 		#region TextureReloader
 		abstract class TextureReloader
@@ -89,6 +89,8 @@ namespace Lime
 			get { throw new NotSupportedException(); }
 			set { throw new NotSupportedException(); }
 		}
+		
+		WidgetMaterialList IWidgetMaterialListHolder.WidgetMaterials { get; } = new WidgetMaterialList();
 
 		public Rectangle AtlasUVRect { get { return uvRect; } }
 

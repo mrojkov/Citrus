@@ -29,9 +29,6 @@ namespace Lime
 		public Color4 DiffuseColor { get; set; }
 
 		[YuzuMember]
-		public Color4 ColorFactor { get; set; }
-
-		[YuzuMember]
 		public Color4 FogColor { get; set; }
 
 		[YuzuMember]
@@ -114,7 +111,6 @@ namespace Lime
 		public CommonMaterial()
 		{
 			DiffuseColor = Color4.White;
-			ColorFactor = Color4.White;
 			FogColor = Color4.White;
 			Blending = Blending.Alpha;
 		}
@@ -130,13 +126,15 @@ namespace Lime
 			this.boneCount = boneCount;
 		}
 
-		public void Apply()
+		public int PassCount => 1;
+
+		public void Apply(int pass)
 		{
 			PlatformRenderer.SetBlending(Blending);
 			PrepareShaderProgram();
 			program.Use();
 			program.LoadMatrix(program.WorldViewProjUniformId, Renderer.FixupWVP(Renderer.WorldViewProjection));
-			program.LoadColor(program.DiffuseColorUniformId, DiffuseColor * ColorFactor);
+			program.LoadColor(program.DiffuseColorUniformId, DiffuseColor);
 			program.LoadMatrix(program.WorldUniformId, Renderer.World);
 
 			if (processLightning && lightSource != null) {
@@ -209,7 +207,6 @@ namespace Lime
 			return new CommonMaterial {
 				Name = Name,
 				DiffuseColor = DiffuseColor,
-				ColorFactor = ColorFactor,
 				FogMode = FogMode,
 				FogColor = FogColor,
 				FogStart = FogStart,

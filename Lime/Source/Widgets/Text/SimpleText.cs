@@ -21,9 +21,7 @@ namespace Lime
 		private TextOverflowMode overflowMode;
 		private bool wordSplitAllowed;
 		private TextProcessorDelegate textProcessor;
-		public Action<SimpleText, Sprite> SpriteListElementHandler;
-		internal int PalleteIndex = -1;
-		public ShaderProgram ShaderProgram;
+		internal int PaletteIndex = -1;
 		private float letterSpacing;
 
 		public event TextProcessorDelegate TextProcessor
@@ -205,7 +203,6 @@ namespace Lime
 			Localizable = true;
 			TrimWhitespaces = true;
 			Text = "";
-			SpriteListElementHandler = ShaderPrograms.ColorfulTextShaderProgram.HandleSimpleTextSprite;
 		}
 
 		public override void AddToRenderChain(RenderChain chain)
@@ -235,37 +232,32 @@ namespace Lime
 
 		protected override void OnTagChanged()
 		{
-			ShaderProgram = null;
-			if (!int.TryParse(Tag, out PalleteIndex)) {
-				PalleteIndex = -1;
+			if (!int.TryParse(Tag, out PaletteIndex)) {
+				PaletteIndex = -1;
 			}
+			Invalidate();
 		}
 
-		private bool InvertPaletteIndex()
+		protected override void DiscardMaterial()
 		{
-			if (PalleteIndex == -1) {
-				return false;
-			}
-			PalleteIndex = ShaderPrograms.ColorfulTextShaderProgram.GradientMapTextureSize - PalleteIndex - 1;
-			ShaderProgram = null;
-			return true;
+			Invalidate();
 		}
-
-		private Action<Sprite> spritePostProcessor;
 
 		public override void Render()
 		{
+			var blending = GlobalBlending;
+			var shader = GlobalShader;
 			PrepareSpriteListAndSyncCaret();
 			Renderer.Transform1 = LocalToWorldTransform;
-			Renderer.Blending = GlobalBlending;
-			Renderer.Shader = GlobalShader;
-			if (spritePostProcessor == null) {
-				spritePostProcessor = sprite => SpriteListElementHandler?.Invoke(this, sprite);
-			}
-			spriteList.Render(GlobalColor * textColor, spritePostProcessor);
-			if (InvertPaletteIndex()) {
-				spriteList.Render(GlobalColor * textColor, spritePostProcessor);
-				InvertPaletteIndex();
+			var effectiveColor = GlobalColor * textColor;
+			if (PaletteIndex < 0) {
+				spriteList.Render(effectiveColor, blending, shader);
+			} else {
+				ColorfulMaterialProvider.Instance.Init(blending, PaletteIndex);
+				spriteList.Render(effectiveColor, ColorfulMaterialProvider.Instance);
+				ColorfulMaterialProvider.Instance.Init(
+					blending, ShaderPrograms.ColorfulTextShaderProgram.GradientMapTextureSize - PaletteIndex - 1);
+				spriteList.Render(effectiveColor, ColorfulMaterialProvider.Instance);	
 			}
 		}
 
@@ -505,6 +497,36 @@ namespace Lime
 			var clone = base.Clone() as SimpleText;
 			clone.Caret = clone.Caret.Clone();
 			return clone;
+		}
+				
+		private class ColorfulMaterialProvider : Sprite.IMaterialProvider
+		{
+			public static readonly ColorfulMaterialProvider Instance = new ColorfulMaterialProvider();
+
+			private Blending blending;
+			private ITexture texture;
+			private int paletteIndex;
+			private IMaterial material;
+			
+			public void Init(Blending blending, int paletteIndex)
+			{
+				this.blending = blending;
+				this.paletteIndex = paletteIndex;
+				texture = null;
+				material = null;
+			}
+			
+			public IMaterial GetMaterial(ITexture texture, int tag)
+			{
+				if (texture != this.texture) {
+					this.texture = texture;
+					var shaderProg = ShaderPrograms.ColorfulTextShaderProgram.GetShaderProgram(paletteIndex);
+					material = WidgetMaterial.GetInstance(
+						blending, shaderProg, texture, 
+						ShaderPrograms.ColorfulTextShaderProgram.GradientRampTexture);
+				}
+				return material;
+			}
 		}
 	}
 }

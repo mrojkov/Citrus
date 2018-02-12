@@ -20,7 +20,7 @@ namespace Lime
 		RGB565
 	}
 
-	public class RenderTexture : CommonTexture, ITexture, IGLObject
+	public class RenderTexture : CommonTexture, ITexture, IWidgetMaterialListHolder, IGLObject
 	{
 		private uint handle;
 		private uint framebuffer;
@@ -36,6 +36,8 @@ namespace Lime
 			GL.TexParameter(TextureTarget.Texture2D, name, value);
 			PlatformRenderer.PopTexture(0);
 		}
+		
+		WidgetMaterialList IWidgetMaterialListHolder.WidgetMaterials { get; } = new WidgetMaterialList();
 
 		private TextureParams textureParams = TextureParams.Default;
 		public TextureParams TextureParams
@@ -128,6 +130,8 @@ namespace Lime
 		public Size SurfaceSize {
 			get { return size; }
 		}
+
+		public ITexture AtlasTexture => this;
 
 		public Rectangle AtlasUVRect {
 			get { return uvRect; }

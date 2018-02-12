@@ -109,6 +109,12 @@ namespace Lime
 			twoTexturesSilhuetteBlendingProgram = CreateShaderProgram(twoTexturesVertexShader, twoTexturesSilhouetteFragmentShader);
 			inversedSilhuetteBlendingProgram = CreateShaderProgram(oneTextureVertexShader, inversedSilhouetteFragmentShader);
 		}
+		
+		public ShaderProgram GetShaderProgram(ShaderId shader, ITexture texture1, ITexture texture2, ShaderOptions options)
+		{
+			int numTextures = texture2 != null ? 2 : (texture1 != null ? 1 : 0);
+			return GetShaderProgram(shader, numTextures, options);
+		}
 
 		public ShaderProgram GetShaderProgram(ShaderId shader, int numTextures, ShaderOptions options)
 		{
@@ -273,9 +279,8 @@ namespace Lime
 		/// </summary>
 		/// <remarks>
 		/// To apply this shader you need:
-		/// 1. Non-ETC1 font texture.
-		/// 2. Data/gradient_map.png file with size of 256x256 and ARGB8 compression.
-		/// 3. Use <see cref="Node.Tag"/> field of <see cref="SimpleText"/> or <see cref="TextStyle"/>
+		/// 1. Data/gradient_map.png file with size of 256x256 and ARGB8 compression.
+		/// 2. Use <see cref="Node.Tag"/> field of <see cref="SimpleText"/> or <see cref="TextStyle"/>
 		///    to specify color row from this file.
 		/// </remarks>
 		public class ColorfulTextShaderProgram : ShaderProgram
@@ -352,47 +357,16 @@ namespace Lime
 			public const int GradientMapTextureSize = 256;
 
 			private static ITexture fontGradientTexture;
-			private static readonly List<ColorfulTextShaderProgram> cachedShaderPrograms = new List<ColorfulTextShaderProgram>();
-			private static ColorfulTextShaderProgram GetShaderProgram(int styleIndex)
+			private static readonly ColorfulTextShaderProgram[] cachedShaderPrograms = new ColorfulTextShaderProgram[GradientMapTextureSize];
+			public static ColorfulTextShaderProgram GetShaderProgram(int styleIndex)
 			{
-				if (cachedShaderPrograms.Count <= styleIndex) {
-					for (int i = 0; i <= styleIndex; i++) {
-						if (i < cachedShaderPrograms.Count) {
-							continue;
-						}
-						cachedShaderPrograms.Add(new ColorfulTextShaderProgram { ColorIndex = (i * 2 + 1) / (GradientMapTextureSize * 2.0f) });
-					}
+				if (cachedShaderPrograms[styleIndex] == null) {
+					cachedShaderPrograms[styleIndex] = new ColorfulTextShaderProgram { ColorIndex = (styleIndex * 2 + 1) / (GradientMapTextureSize * 2.0f) };
 				}
 				return cachedShaderPrograms[styleIndex];
 			}
-			private static ITexture GradientRampTexture => fontGradientTexture = fontGradientTexture ?? new SerializableTexture("Fonts/gradient_map");
-
-			public static void HandleSimpleTextSprite(SimpleText text, Sprite sprite)
-			{
-				if (text.ShaderProgram != null) {
-					sprite.ShaderProgram = text.ShaderProgram;
-					sprite.Texture2 = GradientRampTexture;
-					return;
-				}
-				if (text.PalleteIndex != -1) {
-					text.ShaderProgram = sprite.ShaderProgram = GetShaderProgram(text.PalleteIndex);
-					sprite.Texture2 = GradientRampTexture;
-				}
-			}
-
-			public static void HandleRichTextSprite(RichText text, Sprite sprite)
-			{
-				var style = text.Renderer.Styles[sprite.Tag];
-				if (style.ShaderProgram != null) {
-					sprite.ShaderProgram = style.ShaderProgram;
-					sprite.Texture2 = GradientRampTexture;
-					return;
-				}
-				if (style.PalleteIndex != -1) {
-					style.ShaderProgram = sprite.ShaderProgram = GetShaderProgram(style.PalleteIndex);
-					sprite.Texture2 = GradientRampTexture;
-				}
-			}
+			
+			public static ITexture GradientRampTexture => fontGradientTexture = fontGradientTexture ?? new SerializableTexture("Fonts/gradient_map");
 		}
 	}
 }

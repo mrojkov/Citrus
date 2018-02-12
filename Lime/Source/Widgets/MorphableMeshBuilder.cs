@@ -153,18 +153,19 @@ namespace Lime
 					int currentIndex = 0;
 					foreach (var batch in renderList.Batches) {
 						CopyPosColorData(batch.VertexBuffer.Data, morphTarget.PosColorBuffer.Data, currentVertex, batch.LastVertex);
-						if (isFirstTimeStamp) {
-							var mbatch = new MorphableMesh.RenderBatch {
-								Texture = batch.Texture1,
-								Blending = batch.Blending,
-								Shader = batch.Shader,
-								StartIndex = batch.StartIndex + currentIndex,
-								IndexCount = batch.LastIndex - batch.StartIndex,
-							};
-							mesh.Batches.Add(mbatch);
-							CopyUV1Data(batch.VertexBuffer.Data, mesh.UVBuffer.Data, currentVertex, batch.LastVertex);
-							CopyIndices(batch.IndexBuffer.Data, mesh.IndexBuffer.Data, currentIndex, batch.LastIndex, (ushort)currentVertex);
-						}
+						throw new NotImplementedException();
+						//if (isFirstTimeStamp) {
+						//	var mbatch = new MorphableMesh.RenderBatch {
+						//		Texture = batch.Texture1,
+						//		Blending = batch.Blending,
+						//		Shader = batch.Shader,
+						//		StartIndex = batch.StartIndex + currentIndex,
+						//		IndexCount = batch.LastIndex - batch.StartIndex,
+						//	};
+						//	mesh.Batches.Add(mbatch);
+						//	CopyUV1Data(batch.VertexBuffer.Data, mesh.UVBuffer.Data, currentVertex, batch.LastVertex);
+						//	CopyIndices(batch.IndexBuffer.Data, mesh.IndexBuffer.Data, currentIndex, batch.LastIndex, (ushort)currentVertex);
+						//}
 						currentVertex += batch.LastVertex;
 						currentIndex += batch.LastIndex;
 					}

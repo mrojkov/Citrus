@@ -13,11 +13,7 @@ namespace Lime
 		private IMesh mesh;
 		private bool ownsMesh;
 
-		public Blending Blending;
-		public ShaderId Shader;
-		public ShaderProgram CustomShaderProgram;
-		public ITexture Texture1;
-		public ITexture Texture2;
+		public IMaterial Material;
 		public int LastVertex;
 		public int StartIndex;
 		public int LastIndex;
@@ -27,10 +23,7 @@ namespace Lime
 
 		private void Clear()
 		{
-			Texture1 = Texture2 = null;
-			Blending = Blending.None;
-			Shader = ShaderId.None;
-			CustomShaderProgram = null;
+			Material = null;
 			StartIndex = LastIndex = LastVertex = 0;
 			if (mesh != null) {
 				if (ownsMesh) {
@@ -43,11 +36,10 @@ namespace Lime
 
 		public void Render()
 		{
-			PlatformRenderer.SetTexture(Texture1, 0);
-			PlatformRenderer.SetTexture(Texture2, 1);
-			PlatformRenderer.SetBlending(Blending);
-			PlatformRenderer.SetShader(Shader, CustomShaderProgram);
-			PlatformRenderer.DrawTriangles(mesh, StartIndex, LastIndex - StartIndex);
+			for (int i = 0; i < Material.PassCount; i++) {
+				Material.Apply(i);
+				PlatformRenderer.DrawTriangles(mesh, StartIndex, LastIndex - StartIndex);
+			}
 		}
 
 		public static RenderBatch Acquire(RenderBatch origin)

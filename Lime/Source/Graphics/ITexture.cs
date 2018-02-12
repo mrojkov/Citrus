@@ -90,6 +90,7 @@ namespace Lime
 		Size ImageSize { get; }
 		Size SurfaceSize { get; }
 		Rectangle AtlasUVRect { get; }
+		ITexture AtlasTexture { get; }
 
 		void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv);
 		uint GetHandle();

@@ -125,8 +125,6 @@ namespace Lime
 						skin.SetBones(sharedBoneTransforms, sm.Bones.Count);
 					}
 				}
-				sm.Material.ColorFactor = GlobalColor;
-
 				var lightningMaterial = sm.Material as IMaterialLightning;
 				if (lightningMaterial != null) {
 					lightningMaterial.ProcessLightning = lightningEnabled;
@@ -140,9 +138,10 @@ namespace Lime
 					shadowMaterial.RecieveShadows = shadowsEnabled && RecieveShadow;
 				}
 
-				sm.Material.Apply();
-				
-				PlatformRenderer.DrawTriangles(sm.Mesh, 0, sm.Mesh.IndexBuffer.Data.Length);
+				for (int i = 0; i < sm.Material.PassCount; i++) {
+					sm.Material.Apply(i);
+					PlatformRenderer.DrawTriangles(sm.Mesh, 0, sm.Mesh.IndexBuffer.Data.Length);
+				}
 				Renderer.PolyCount3d += sm.Mesh.IndexBuffer.Data.Length / 3;
 			}
 		}
@@ -297,9 +296,10 @@ namespace Lime
 					skin.SkinEnabled = false;
 				}
 
-				sm.Material.Apply();
-
-				PlatformRenderer.DrawTriangles(sm.Mesh, 0, sm.Mesh.IndexBuffer.Data.Length);
+				for (int i = 0; i < sm.Material.PassCount; i++) {
+					sm.Material.Apply(i);
+					PlatformRenderer.DrawTriangles(sm.Mesh, 0, sm.Mesh.IndexBuffer.Data.Length);
+				}
 				Renderer.PolyCount3d += sm.Mesh.IndexBuffer.Data.Length / 3;
 
 				sm.Material = def;

@@ -4,8 +4,9 @@ namespace Lime
 {
 	public class Image : Widget, IImageCombinerArg
 	{
-		bool skipRender;
+		private bool skipRender;
 		private ITexture texture;
+		private IMaterial material;
 
 		[YuzuMember]
 		[YuzuSerializeIf(nameof(IsNotRenderTexture))]
@@ -16,9 +17,15 @@ namespace Lime
 			{
 				if (texture != value) {
 					texture = value;
+					DiscardMaterial();
 					Window.Current?.Invalidate();
 				}
 			}
+		}
+
+		protected override void DiscardMaterial()
+		{
+			material = null;
 		}
 
 		[YuzuMember]
@@ -108,8 +115,17 @@ namespace Lime
 
 		public override void Render()
 		{
-			PrepareRendererState();
-			Renderer.DrawSprite(Texture, GlobalColor, ContentPosition, ContentSize, UV0, UV1);
+			var blending = GlobalBlending;
+			var shader = GlobalShader;
+			if (material == null) {
+				material = WidgetMaterial.GetInstance(blending, shader, null, Texture);
+			}
+			Renderer.Transform1 = LocalToWorldTransform;
+			var uv0 = UV0;
+			var uv1 = UV1;
+			texture.TransformUVCoordinatesToAtlasSpace(ref uv0);
+			texture.TransformUVCoordinatesToAtlasSpace(ref uv1);
+			Renderer.DrawSprite(material, GlobalColor, ContentPosition, ContentSize, uv0, uv1, Vector2.Zero, Vector2.Zero);
 		}
 
 		public bool IsNotRenderTexture()

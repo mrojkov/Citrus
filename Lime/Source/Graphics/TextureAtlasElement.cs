@@ -42,23 +42,23 @@ namespace Lime
 			}
 		}
 
-		private ITexture atlasTexture;
+		public ITexture AtlasTexture { get; private set; }
 		public Rectangle AtlasUVRect { get; private set; }
 		public Size ImageSize { get; private set; }
 
 		public TextureAtlasElement(Params @params)
 		{
-			atlasTexture = TexturePool.Instance.GetTexture(@params.AtlasPath);
+			AtlasTexture = TexturePool.Instance.GetTexture(@params.AtlasPath);
 			AtlasUVRect = new Rectangle(
-				(Vector2)@params.AtlasRect.A / (Vector2)atlasTexture.SurfaceSize,
-				(Vector2)@params.AtlasRect.B / (Vector2)atlasTexture.SurfaceSize
+				(Vector2)@params.AtlasRect.A / (Vector2)AtlasTexture.SurfaceSize,
+				(Vector2)@params.AtlasRect.B / (Vector2)AtlasTexture.SurfaceSize
 			);
 			ImageSize = (Size)@params.AtlasRect.Size;
 		}
 
 		public Size SurfaceSize
 		{
-			get { return atlasTexture.SurfaceSize; }
+			get { return AtlasTexture.SurfaceSize; }
 		}
 
 		public void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv)
@@ -75,7 +75,7 @@ namespace Lime
 
 		public uint GetHandle()
 		{
-			return atlasTexture.GetHandle();
+			return AtlasTexture.GetHandle();
 		}
 
 #if UNITY
@@ -97,12 +97,12 @@ namespace Lime
 
 		public bool IsTransparentPixel(int x, int y)
 		{
-			var size = (Size)(AtlasUVRect.Size * (Vector2)atlasTexture.SurfaceSize);
+			var size = (Size)(AtlasUVRect.Size * (Vector2)AtlasTexture.SurfaceSize);
 			if (x < 0 || y < 0 || x >= size.Width || y >= size.Height) {
 				return false;
 			}
-			var offset = (IntVector2)(AtlasUVRect.A * (Vector2)atlasTexture.SurfaceSize);
-			return atlasTexture.IsTransparentPixel(x + offset.X, y + offset.Y);
+			var offset = (IntVector2)(AtlasUVRect.A * (Vector2)AtlasTexture.SurfaceSize);
+			return AtlasTexture.IsTransparentPixel(x + offset.X, y + offset.Y);
 		}
 
 		public void Discard() { }
@@ -114,7 +114,7 @@ namespace Lime
 
 		public bool IsStubTexture
 		{
-			get { return atlasTexture.IsStubTexture; }
+			get { return AtlasTexture.IsStubTexture; }
 		}
 
 		public string SerializationPath
@@ -125,8 +125,8 @@ namespace Lime
 
 		public TextureParams TextureParams
 		{
-			get { return atlasTexture.TextureParams;}
-			set { atlasTexture.TextureParams = value; }
+			get { return AtlasTexture.TextureParams;}
+			set { AtlasTexture.TextureParams = value; }
 		}
 	}
 }
