@@ -309,6 +309,7 @@
     <Compile Include="Source\Widgets\Text\TextRenderer.cs" />
     <Compile Include="Source\Widgets\Text\TextParser.cs" />
     <Compile Include="Source\Widgets\TiledImage.cs" />
+    <Compile Include="Source\Widgets\VideoDecoder\VideoDecoder.Win.cs" />
     <Compile Include="Source\Widgets\VSplitter.cs" />
     <Compile Include="Source\Widgets\WebBrowser\IWebBrowserImplementation.cs" />
     <Compile Include="Source\Widgets\WebBrowser\WebBrowser.Win.cs" />
@@ -531,6 +532,10 @@
     <ProjectReference Include="..\Lemon\Lemon.Win.csproj">
       <Project>{538e41e4-725c-4521-bcf3-a5591a1a3afd}</Project>
       <Name>Lemon.Win</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MFDecoder\MFDecoder.vcxproj">
+      <Project>{f24b3ae4-832b-41ff-800c-447e4e35f851}</Project>
+      <Name>MFDecoder</Name>
     </ProjectReference>
     <ProjectReference Include="..\Yuzu\Yuzu.Win.csproj">
       <Project>{ddd2dfe9-ced2-4cea-adf0-5a6865865a46}</Project>

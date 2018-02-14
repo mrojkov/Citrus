@@ -1,4 +1,4 @@
-﻿#if !ANDROID && !iOS
+﻿#if !ANDROID && !iOS && !WIN
 using System;
 using System.Collections.Generic;
 using System.Linq;
