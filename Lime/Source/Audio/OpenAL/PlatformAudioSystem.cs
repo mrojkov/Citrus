@@ -1,6 +1,7 @@
 #if OPENAL
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 #if ANDROID
 using System.Runtime.InteropServices;
@@ -355,6 +356,57 @@ namespace Lime
 			channel.Pitch = parameters.Pitch;
 			channel.Pan = parameters.Pan;
 			return LoadSoundToChannel(channel, parameters, fadeinTime);
+		}
+
+		public static Sound Play(
+			Stream stream,
+			AudioChannelGroup group,
+			float priority = 0.5f,
+			float fadeinTime = 0f,
+			bool paused = false,
+			float volume = 1f,
+			float pan = 0f,
+			float pitch = 1f
+		)
+		{
+			var channel = GetAudioChannel(group, priority, volume, pan, pitch);
+			if (channel == null) {
+				return new Sound();
+			}
+			if (context == null) {
+				return new Sound();
+			}
+			var sound = new Sound();
+			var decoder = new PcmDecoder(stream);
+			if (channel == null || !channel.Play(sound, decoder, false, paused, fadeinTime)) {
+				decoder.Dispose();
+				return sound;
+			}
+			channel.SamplePath = "";
+			return sound;
+		}
+
+		private static AudioChannel GetAudioChannel(
+			AudioChannelGroup group,
+			float priority = 0.5f,
+			float volume = 1f,
+			float pan = 0f,
+			float pitch = 1f
+		)
+		{
+			var channel = AllocateChannel(priority);
+			if (channel == null) {
+				return null;
+			}
+			if (channel.Sound != null) {
+				channel.Sound.Channel = NullAudioChannel.Instance;
+			}
+			channel.Group = group;
+			channel.Priority = priority;
+			channel.Volume = volume;
+			channel.Pitch = pitch;
+			channel.Pan = pan;
+			return channel;
 		}
 
 		public struct ErrorChecker : IDisposable

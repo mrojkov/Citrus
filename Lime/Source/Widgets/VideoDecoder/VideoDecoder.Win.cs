@@ -2,6 +2,7 @@
 using MFDecoder;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -10,6 +11,88 @@ using System.Threading.Tasks;
 
 namespace Lime
 {
+	public class ReadWriteStream : Stream
+	{
+		private readonly MemoryStream stream;
+		private readonly object locker = new object();
+
+		public ReadWriteStream()
+		{
+			stream = new MemoryStream();
+		}
+
+		public override bool CanRead => true;
+
+		public override bool CanSeek => false;
+
+		public override bool CanWrite => true;
+
+		public override long Length => stream.Length;
+
+		public override long Position { get => readPosition; set => throw new NotImplementedException(); }
+
+		private long readPosition;
+		private long writePosition;
+
+		public override void Flush()
+		{
+			lock (locker) {
+				stream.Flush();
+			}
+		}
+
+		public override int Read(byte[] buffer, int offset, int count)
+		{
+			lock (locker) {
+				stream.Position = readPosition;
+				int read = stream.Read(buffer, offset, count);
+				readPosition = stream.Position;
+				return read;
+			}
+		}
+
+		public override long Seek(long offset, SeekOrigin origin)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override void SetLength(long value)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override void Write(byte[] buffer, int offset, int count)
+		{
+			lock (locker) {
+				stream.Position = writePosition;
+				stream.Write(buffer, offset, count);
+				writePosition = stream.Position;
+			}
+		}
+	}
+
+	public class AudioPlayer
+	{
+		private ReadWriteStream stream;
+		private long writePosition = 0;
+		private Sound sound;
+		public AudioPlayer()
+		{
+			stream = new ReadWriteStream();
+			sound = PlatformAudioSystem.Play(stream, AudioChannelGroup.Music);
+		}
+
+		public void Bump()
+		{
+			sound.Bump();
+		}
+
+		public void Write(byte[] pcm)
+		{
+			stream.Write(pcm, 0, pcm.Length);
+		}
+	}
+
 	public class VideoDecoder : IDisposable
 	{
 		public int Width => width;
@@ -22,6 +105,8 @@ namespace Lime
 		private RenderTexture texture;
 		private static YUVtoRGBProgram program;
 		private static Mesh mesh;
+
+		private AudioPlayer audioPlayer;
 
 		private MFDecoder.Decoder decoder;
 		private int width;
@@ -112,6 +197,7 @@ namespace Lime
 					}
 				};
 			}
+			audioPlayer = new AudioPlayer();
 		}
 
 		public async System.Threading.Tasks.Task Start()
@@ -197,6 +283,9 @@ namespace Lime
 								token.ThrowIfCancellationRequested();
 							}
 							//currentVideoSample = sample;
+							if (!sample.IsEos) {
+								audioPlayer.Write(sample.Data);
+							}
 							checkQueue.Set();
 						}
 					}
@@ -244,6 +333,7 @@ namespace Lime
 				currentPosition += (long)(delta * 10000000);
 				checkAudio.Set();
 				checkVideo.Set();
+				audioPlayer.Bump();
 			}
 		}
 

@@ -205,6 +205,7 @@
     <Compile Include="Source\Audio\OpenAL\AudioChannel.cs" />
     <Compile Include="Source\Audio\OpenAL\AudioDecoder.cs" />
     <Compile Include="Source\Audio\OpenAL\OggDecoder.cs" />
+    <Compile Include="Source\Audio\OpenAL\PcmDecoder.cs" />
     <Compile Include="Source\Audio\OpenAL\PlatformAudioSystem.cs" />
     <Compile Include="Source\Audio\OpenAL\WaveIMA4Decoder.cs" />
     <Compile Include="Source\EnumExtensions.cs" />

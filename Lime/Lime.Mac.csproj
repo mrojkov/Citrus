@@ -379,6 +379,8 @@
     <Compile Include="Source\Widgets\VideoDecoder\VideoDecoder.Android.cs" />
     <Compile Include="Source\Widgets\VideoDecoder\VideoDecoder.cs" />
     <Compile Include="Source\Widgets\VideoDecoder\VideoDecoder.iOS.cs" />
+    <Compile Include="Source\Audio\OpenAL\PcmDecoder.cs" />
+    <Compile Include="Source\Widgets\VideoDecoder\VideoDecoder.Win.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
