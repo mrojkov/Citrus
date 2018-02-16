@@ -143,6 +143,10 @@
       <HintPath>$(SolutionDir)\packages\Microsoft.WindowsAPICodePack.Shell.1.1.0\lib\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="MFDecoder, Version=1.0.6621.19204, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\MFDecoder\MFDecoder.dll</HintPath>
+    </Reference>
     <Reference Include="OpenTK.GLControl">
       <HintPath>..\3rdParty\OpenTK\OpenTK.GLControl.dll</HintPath>
     </Reference>
@@ -533,10 +537,6 @@
     <ProjectReference Include="..\Lemon\Lemon.Win.csproj">
       <Project>{538e41e4-725c-4521-bcf3-a5591a1a3afd}</Project>
       <Name>Lemon.Win</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\MFDecoder\MFDecoder.vcxproj">
-      <Project>{f24b3ae4-832b-41ff-800c-447e4e35f851}</Project>
-      <Name>MFDecoder</Name>
     </ProjectReference>
     <ProjectReference Include="..\Yuzu\Yuzu.Win.csproj">
       <Project>{ddd2dfe9-ced2-4cea-adf0-5a6865865a46}</Project>

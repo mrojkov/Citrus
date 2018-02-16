@@ -29,7 +29,10 @@ namespace Lime
 
 		public override long Length => stream.Length;
 
-		public override long Position { get => readPosition; set => throw new NotImplementedException(); }
+		public override long Position {
+			get { return readPosition; }
+			set { throw new NotImplementedException(); }
+		}
 
 		private long readPosition;
 		private long writePosition;
