@@ -86,7 +86,7 @@ namespace Lime.Platform
 			{
 				lock (sync) {
 					if (defaultMode == null) {
-						defaultMode = new GraphicsMode(32, 24, 0, 0, 0, 2);
+						defaultMode = new GraphicsMode(32, 24, 8, 0, 0, 2);
 					}
 					return defaultMode;
 				}

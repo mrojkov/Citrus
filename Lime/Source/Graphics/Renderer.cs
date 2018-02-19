@@ -46,13 +46,26 @@ namespace Lime
 		CullClockwise,
 		CullCounterClockwise
 	}
+	
+	[Flags]
+	public enum ColorMask
+	{
+		None = 0,
+		Red = 1,
+		Green = 2,
+		Blue = 4,
+		Alpha = 8,
+		All = Red | Green | Blue | Alpha
+	}
 
+	[Flags]
 	public enum ClearTarget
 	{
 		None = 0,
-		ColorBuffer = 1 << 0,
-		DepthBuffer = 1 << 1,
-		All = ColorBuffer | DepthBuffer
+		ColorBuffer = 1,
+		DepthBuffer = 2,
+		StencilBuffer = 4,
+		All = ColorBuffer | DepthBuffer | StencilBuffer
 	}
 
 	public struct WindowRect : IEquatable<WindowRect>
@@ -113,8 +126,10 @@ namespace Lime
 		private static bool scissorTestEnabled = false;
 		private static bool zTestEnabled = false;
 		private static bool zWriteEnabled = true;
+		private static ColorMask colorWriteEnabled = ColorMask.All;
 		private static bool Transform2Active;
 		private static CullMode cullMode;
+		private static StencilParams stencilParams;
 
 		public static Blending Blending;
 		public static ShaderId Shader;
@@ -228,6 +243,19 @@ namespace Lime
 				PlatformRenderer.EnableScissorTest(value);
 			}
 		}
+		
+		public static StencilParams StencilParams
+		{
+			get { return stencilParams; }
+			set
+			{
+				if (!stencilParams.Equals(value)) {
+					stencilParams = value;
+					MainRenderList.Flush();
+					PlatformRenderer.SetStencilParams(value);
+				}
+			}
+		}
 
 		public static WindowRect Viewport
 		{
@@ -264,6 +292,20 @@ namespace Lime
 				}
 			}
 		}
+
+		public static ColorMask ColorWriteEnabled
+		{
+			get { return colorWriteEnabled; }
+			set
+			{
+				if (colorWriteEnabled != value) {
+					Flush();
+					colorWriteEnabled = value;
+					PlatformRenderer.EnableColorWrite(value);
+				}
+			}
+		}
+
 
 		public static CullMode CullMode
 		{

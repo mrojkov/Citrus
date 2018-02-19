@@ -3,14 +3,88 @@ using System;
 
 #if iOS || ANDROID || WIN
 using OpenTK.Graphics.ES20;
+using GLStencilOp = OpenTK.Graphics.ES20.StencilOp;
 #else
 using OpenTK.Graphics.OpenGL;
+using GLStencilOp = OpenTK.Graphics.OpenGL.StencilOp;
 #endif
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace Lime
 {
+	public enum StencilFunc : byte
+	{
+		Never,
+		Less,
+		Equal,
+		LEqual,
+		Greater,
+		NotEqual,
+		GEqual,
+		Always
+	}
+	
+	public enum StencilOp : byte
+	{
+		Zero,
+		Invert,
+		Keep,
+		Replace,
+		Incr,
+		Decr,
+		IncrWrap,
+		DecrWrap
+	}
+	
+	[StructLayout(LayoutKind.Explicit)]
+	public struct StencilParams : IEquatable<StencilParams>
+	{
+		[FieldOffset(0)]
+		public bool EnableTest;
+		
+		[FieldOffset(1)]
+		public byte ReferenceValue;
+		
+		[FieldOffset(2)]
+		public byte ReadMask;
+		
+		[FieldOffset(3)]
+		public byte WriteMask;
+		
+		[FieldOffset(4)]
+		public StencilFunc Comp;
+		
+		[FieldOffset(5)]
+		public StencilOp Pass;
+		
+		[FieldOffset(6)]
+		public StencilOp Fail;
+		
+		[FieldOffset(7)]
+		public StencilOp ZFail;
+		
+		[FieldOffset(0)]
+		private ulong raw;
+		
+		public static StencilParams Default = new StencilParams {
+			raw = 0,
+			EnableTest = false,
+			ReferenceValue = 0,
+			ReadMask = 255,
+			WriteMask = 255,
+			Comp = StencilFunc.Always,
+			Pass = StencilOp.Keep,
+			Fail = StencilOp.Keep,
+			ZFail = StencilOp.Keep
+		};
+		
+		public bool Equals(StencilParams other)
+		{
+			return raw == other.raw;
+		}
+	}	
+
 	public unsafe static class PlatformRenderer
 	{
 		public static uint CurrentFramebuffer { get; private set; }
@@ -113,7 +187,44 @@ namespace Lime
 			if ((targets & ClearTarget.DepthBuffer) != 0) {
 				clearBufferMask |= ClearBufferMask.DepthBufferBit;
 			}
+			if ((targets & ClearTarget.StencilBuffer) != 0) {
+				clearBufferMask |= ClearBufferMask.StencilBufferBit;
+			}
 			GL.Clear(clearBufferMask);
+		}
+		
+		private static GLStencilOp[] stencilOpMap = {
+			GLStencilOp.Zero,
+			GLStencilOp.Invert,
+			GLStencilOp.Keep,
+			GLStencilOp.Replace,
+			GLStencilOp.Incr,
+			GLStencilOp.Decr,
+			GLStencilOp.IncrWrap,
+			GLStencilOp.DecrWrap
+		};
+		
+		private static StencilFunction[] stencilFuncMap = {
+			StencilFunction.Never,
+			StencilFunction.Less,
+			StencilFunction.Equal,
+			StencilFunction.Lequal,
+			StencilFunction.Greater,
+			StencilFunction.Notequal,
+			StencilFunction.Gequal,
+			StencilFunction.Always
+		};
+		
+		public unsafe static void SetStencilParams(StencilParams p)
+		{
+			if (p.EnableTest) {
+				GL.Enable(EnableCap.StencilTest);
+			} else {
+				GL.Disable(EnableCap.StencilTest);
+			}
+			GL.StencilOp(stencilOpMap[(int)p.Fail], stencilOpMap[(int)p.ZFail], stencilOpMap[(int)p.Pass]);
+			GL.StencilFunc(stencilFuncMap[(int)p.Comp], p.ReferenceValue, p.ReadMask);
+			GL.StencilMask(p.WriteMask);
 		}
 
 		public static void SetTexture(ITexture texture, int stage)
@@ -208,6 +319,14 @@ namespace Lime
 		public static void EnableZWrite(bool value)
 		{
 			GL.DepthMask(value);
+			CheckErrors();
+		}
+		
+		public static void EnableColorWrite(ColorMask mask)
+		{
+			GL.ColorMask(
+				(mask & ColorMask.Red) != 0, (mask & ColorMask.Green) != 0,
+				(mask & ColorMask.Blue) != 0, (mask & ColorMask.Alpha) != 0);
 			CheckErrors();
 		}
 
