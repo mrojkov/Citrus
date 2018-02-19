@@ -20,21 +20,24 @@ namespace Lime
 	{
 		None,
 		ScissorTest,
+		StencilTest,
 		NoRender,
 	}
 
 	[AllowedChildrenTypes(typeof(Node))]
 	public class Frame : Widget, IImageCombinerArg
 	{
+		private RenderTarget renderTarget;
+		private ITexture renderTexture;
+		
+		[YuzuMember]
 		public ClipMethod ClipChildren { get; set; }
 
 		public Widget ClipByWidget { get; set; }
 
-		RenderTarget renderTarget;
-		ITexture renderTexture;
-
 		[YuzuMember]
-		public RenderTarget RenderTarget {
+		public RenderTarget RenderTarget
+		{
 			get { return renderTarget; }
 			set { SetRenderTarget(value); }
 		}
@@ -73,6 +76,8 @@ namespace Lime
 				}
 			} else if (ClipChildren == ClipMethod.ScissorTest) {
 				RenderWithScissorTest();
+			} else if (ClipChildren == ClipMethod.StencilTest) {
+				RenderWithStencilTest();
 			}
 		}
 
@@ -103,12 +108,43 @@ namespace Lime
 			}
 		}
 
+		private void RenderWithStencilTest()
+		{
+			var savedStencilParams = Renderer.StencilParams;
+			try {
+				// Draw mask into stencil buffer
+				var sp = StencilParams.Default;
+				sp.EnableTest = true;
+				sp.Comp = StencilFunc.Always;
+				sp.ReferenceValue = 1;
+				sp.Pass = StencilOp.Replace;
+				Renderer.StencilParams = sp;
+				Renderer.Clear(ClearTarget.StencilBuffer);
+				Renderer.ColorWriteEnabled = ColorMask.None;
+				var widget = ClipByWidget ?? this;
+				Renderer.Transform1 = widget.LocalToWorldTransform;
+				Renderer.DrawRect(widget.ContentPosition, widget.ContentSize, Color4.White);
+				Renderer.ColorWriteEnabled = ColorMask.All;
+				// Draw the frame content
+				sp.Comp = StencilFunc.Equal;
+				Renderer.StencilParams = sp;
+				EnsureRenderChain();
+				foreach (var node in Nodes) {
+					node.RenderChainBuilder?.AddToRenderChain(renderChain);
+				}
+				renderChain.RenderAndClear();
+			} finally {
+				Renderer.StencilParams = savedStencilParams;
+			}
+		}
+
 		internal protected override bool PartialHitTest(ref HitTestArgs args)
 		{
 			switch (ClipChildren) {
 				case ClipMethod.None:
 					return base.PartialHitTest(ref args);
 				case ClipMethod.ScissorTest:
+				case ClipMethod.StencilTest:
 					if (!(ClipByWidget ?? this).BoundingRectHitTest(args.Point)) {
 						return false;
 					}
@@ -153,7 +189,7 @@ namespace Lime
 			if (!GloballyVisible || ClipChildren == ClipMethod.NoRender || !ClipRegionTest(chain.ClipRegion)) {
 				return;
 			}
-			if (renderTexture != null || ClipChildren == ClipMethod.ScissorTest) {
+			if (renderTexture != null || ClipChildren == ClipMethod.ScissorTest || ClipChildren == ClipMethod.StencilTest) {
 				AddSelfToRenderChain(chain, Layer);
 				if (GetTangerineFlag(TangerineFlags.DisplayContent) && ClipChildren != ClipMethod.ScissorTest) {
 					AddSelfAndChildrenToRenderChain(chain, Layer);
