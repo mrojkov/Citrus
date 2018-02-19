@@ -1,18 +1,14 @@
 ﻿using Lime;
-using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Tangerine.Core;
 
 namespace Tangerine.UI
 {
 	public class TabbedWidget : Widget
 	{
-		protected Frame Frame { get; }
-		protected TabBar TabBar { get; }
+		protected Frame ContentContainer { get; private set; }
+		protected List<Widget> Contents { get; } = new List<Widget>();
+		public TabBar TabBar { get; protected set; }
 
 		private int activeTabIndex;
 		public int ActiveTabIndex
@@ -28,31 +24,47 @@ namespace Tangerine.UI
 			}
 		}
 
+		public bool AllowReordering
+		{
+			get { return TabBar.AllowReordering; }
+			set { TabBar.AllowReordering = value; }
+		}
+
 		public TabbedWidget()
 		{
-			Frame = new ThemedFrame {
-				Padding = new Thickness(8),
+			ContentContainer = new ThemedFrame {
 				LayoutCell = new LayoutCell { StretchY = float.MaxValue },
 				Layout = new StackLayout(),
 			};
 			TabBar = new ThemedTabBar();
+			TabBar.OnReorder += TabBar_OnReorder;
 			Layout = new VBoxLayout();
 			Nodes.Add(TabBar);
-			Nodes.Add(Frame);
-			Nodes.Add(new Widget { MinHeight = 8 });
+			Nodes.Add(ContentContainer);
 		}
 
-		public void AddTab(string name, Widget content, bool IsActive = false)
+		private void TabBar_OnReorder(TabBar.ReorderEventArgs args)
 		{
-			var newTab = new ThemedTab {
+			var tab = Contents[args.OldIndex];
+			Contents.Remove(tab);
+			Contents.Insert(args.NewIndex, tab);
+		}
+
+		public void AddTab(string name, Widget content, bool isActive = false, bool canClose = false)
+		{
+			var tab = new ThemedTab {
 				Text = name,
-				Active = IsActive
+				Closable = canClose
 			};
+			AddTab(tab, content, isActive);
+		}
+
+		public void AddTab(Tab newTab, Widget content, bool isActive = false)
+		{
 			TabBar.Nodes.Add(newTab);
+			Contents.Add(content);
 			newTab.Clicked += () => ActivateTab(newTab);
-			content.Visible = false;
-			Frame.Nodes.Add(content);
-			if (IsActive) {
+			if (isActive) {
 				ActivateTab(newTab);
 			}
 		}
@@ -66,16 +78,27 @@ namespace Tangerine.UI
 		public void ActivateTab(int index)
 		{
 			var tab = TabBar.Nodes[index] as Tab;
-			for (int i = 0; i < TabBar.Nodes.Count; i++) {
-				Frame.Nodes[i].AsWidget.Visible = i == index;
-			}
 			TabBar.ActivateTab(tab);
+			ContentContainer.Nodes.Clear();
+			ContentContainer.Nodes.Add(Contents[index]);
 		}
 
 		public void RemoveAt(int index)
 		{
 			TabBar.Nodes.RemoveAt(index);
-			Frame.Nodes.RemoveAt(index);
+			Contents.RemoveAt(index);
+		}
+
+		internal Tab GetById(string tabId)
+		{
+			return TabBar.Nodes.OfType<Tab>().FirstOrDefault(t => t.Text == tabId);
+		}
+
+		internal int IndexOf(Tab tab)
+		{
+			if (TabBar.Nodes.Contains(tab))
+				return TabBar.Nodes.IndexOf(tab);
+			return -1;
 		}
 	}
 }

@@ -44,9 +44,7 @@ namespace Lime
 			closeButton = TryFind<Widget>("CloseButton");
 			if (closeButton != null) {
 				closeButton.Clicked += () => {
-					if (Closing != null) {
-						Closing();
-					}
+					Closing?.Invoke();
 				};
 			}
 			RefreshPresentation();
@@ -59,9 +57,7 @@ namespace Lime
 				closeButton.Visible = Closable;
 			}
 			if (Input.WasMousePressed() && IsMouseOver()) {
-				if (Clicked != null) {
-					Clicked();
-				}
+				Clicked?.Invoke();
 			}
 			textPresentersFeeder.Update();
 		}
@@ -69,11 +65,86 @@ namespace Lime
 
 	public class TabBar : Widget
 	{
+		private readonly DragGesture gesture;
+
+		public bool AllowReordering { get; set; } = false;
+
+		public event Action<ReorderEventArgs> OnReorder;
+
 		public void ActivateTab(Tab tab)
 		{
 			foreach (var t in Nodes.OfType<Tab>()) {
 				t.Active = t == tab;
 			}
+		}
+
+		public TabBar()
+		{
+			gesture = new DragGesture(direction: DragDirection.Horizontal);
+			Gestures.Add(gesture);
+			Tasks.Add(DragTabProcessor());
+		}
+
+		private IEnumerator<object> DragTabProcessor()
+		{
+			while (true) {
+				if (AllowReordering) {
+					Tab tab;
+					if (TryGetTabUnderMouse(out tab) && gesture.WasBegan()) {
+						while (!gesture.WasEnded()) {
+							Tab tabUnderMouse;
+							if (TryGetTabUnderMouse(out tabUnderMouse)) {
+								Swap(tab, tabUnderMouse);
+							}
+							yield return null;
+						}
+					}
+				}
+				yield return null;
+			}
+		}
+
+		private void Swap(Tab first, Tab second)
+		{
+			if (first == second || second == null) {
+				return;
+			}
+			var tabs = Nodes.OfType<Tab>().ToList();
+			var firstIdx = Nodes.IndexOf(first);
+			var secondIdx = Nodes.IndexOf(second);
+			if (firstIdx < secondIdx) {
+				Reorder(first, secondIdx);
+			} else {
+				Reorder(second, firstIdx);
+			}
+			OnReorder?.Invoke(new ReorderEventArgs {
+				OldIndex = tabs.IndexOf(first),
+				NewIndex = tabs.IndexOf(second)
+			});
+		}
+
+		private void Reorder(Tab tab, int secondIdx)
+		{
+			Nodes.Remove(tab);
+			Nodes.Insert(secondIdx, tab);
+		}
+
+		private bool TryGetTabUnderMouse(out Tab tab)
+		{
+			foreach (var node in Nodes) {
+				if (node.AsWidget.BoundingRectHitTest(Input.MousePosition)) {
+					tab = node as Tab;
+					return true;
+				}
+			}
+			tab = null;
+			return false;
+		}
+
+		public class ReorderEventArgs
+		{
+			public int OldIndex { get; set; }
+			public int NewIndex { get; set; }
 		}
 	}
 }
