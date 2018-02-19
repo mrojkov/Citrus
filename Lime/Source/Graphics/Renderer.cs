@@ -959,11 +959,11 @@ namespace Lime
 			DrawRound(center, radius, numSegments, color, color);
 		}
 
-		public static void DrawDashedLine(ITexture notUsed, Vector2 a, Vector2 b, Color4 color, float size = 8)
+		public static void DrawDashedLine(ITexture texture, Vector2 a, Vector2 b, Color4 color, float size = 8)
 		{
 			var dir = (b - a).Normalized;
 			var l = (b - a).Length;
-			var n = new Vector2(-dir.Y, dir.X) * size / 2;
+			var n = GetVectorNormal(dir) * size / 2;
 			Vertex[] vertices = {
 				new Vertex {
 					Pos = a - n,
@@ -986,7 +986,7 @@ namespace Lime
 					Color = color,
 				}
 			};
-			DrawTriangleFan(WidgetMaterial.Diffuse, vertices, vertices.Length);
+			DrawTriangleFan(WidgetMaterial.GetInstance(Blending.None, ShaderId.Diffuse, texture1: texture), vertices, vertices.Length);
 		}
 	}
 }
