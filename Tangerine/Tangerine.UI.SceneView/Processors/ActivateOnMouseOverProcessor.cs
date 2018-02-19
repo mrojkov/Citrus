@@ -10,7 +10,7 @@ namespace Tangerine.UI.SceneView
 		public IEnumerator<object> Task()
 		{
 			while (true) {
-				if (SceneView.Instance.InputArea.IsMouseOverThisOrDescendant()) {
+				if (SceneView.Instance.InputArea.IsMouseOverThisOrDescendant() && !WindowDragBehaviour.IsActive) {
 					var isMouseOverWindow = false;
 					if (!Window.Current.Active) {
 						var hoveredWindow = Application.Windows.OfType<Window>().FirstOrDefault(w => w.Active);
