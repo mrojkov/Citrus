@@ -6,6 +6,8 @@ namespace Tangerine
 {
 	public class OrangeInterface : Orange.UserInterface
 	{
+		public OrangePluginUIBuidler PluginUIBuilder;
+
 		public override bool AskConfirmation(string text)
 		{
 			throw new NotImplementedException();
@@ -33,7 +35,8 @@ namespace Tangerine
 
 		public override IPluginUIBuilder GetPluginUIBuilder()
 		{
-			return new OrangePluginUIBuidler();
+			PluginUIBuilder = new OrangePluginUIBuidler();
+			return PluginUIBuilder;
 		}
 
 		public override void CreatePluginUI(IPluginUIBuilder builder) { }

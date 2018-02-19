@@ -134,7 +134,8 @@ namespace Tangerine
 					GenericCommands.PreviousDocument
 				}),
 				new Command("Orange", new Menu {
-					OrangeCommands.Run
+					OrangeCommands.Run,
+					OrangeCommands.OptionsDialog
 				}),
 		};
 			var nodeTypes = new[] {

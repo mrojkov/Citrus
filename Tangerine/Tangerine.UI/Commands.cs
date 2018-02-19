@@ -150,5 +150,6 @@ namespace Tangerine.UI
 	public static class OrangeCommands
 	{
 		public static readonly ICommand Run = new Command("Run", new Shortcut(Key.F9));
+		public static readonly ICommand OptionsDialog = new Command("Build options", new Shortcut(Modifiers.Control, Key.F9));
 	}
 }
