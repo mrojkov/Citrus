@@ -196,7 +196,7 @@ namespace Lime
 
 		private static OpenTK.GLControl CreateGLControl()
 		{
-			return new GLControl(OpenTK.Graphics.GraphicsMode.Default, 2, 0,
+			return new GLControl(new GraphicsMode(32, 16, 8), 2, 0,
 				Application.RenderingBackend == RenderingBackend.OpenGL ?
 				OpenTK.Graphics.GraphicsContextFlags.Default :
 				OpenTK.Graphics.GraphicsContextFlags.Embedded
