@@ -38,6 +38,7 @@ namespace Tangerine.UI.Inspector
 			AddEditor(typeof(Blending), c => new EnumPropertyEditor<Blending>(c));
 			AddEditor(typeof(ShaderId), c => new EnumPropertyEditor<ShaderId>(c));
 			AddEditor(typeof(RenderTarget), c => new RenderTargetPropertyEditor(c));
+			AddEditor(typeof(ClipMethod), c => new EnumPropertyEditor<ClipMethod>(c));
 			AddEditor(typeof(CameraProjectionMode), c => new EnumPropertyEditor<CameraProjectionMode>(c));
 			AddEditor(c => {
 				return
