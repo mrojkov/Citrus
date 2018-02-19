@@ -44,6 +44,7 @@ namespace Lime
 			PassCount = Blending == Blending.Glow || Blending == Blending.Darken ? 2 : 1;
 			Texture1 = texture1;
 			Texture2 = texture2;
+			PremulAlpha = premulAlpha;
 		}
 		
 		public IMaterial Clone() => (WidgetMaterial)MemberwiseClone();
