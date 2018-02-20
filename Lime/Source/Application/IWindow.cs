@@ -94,6 +94,11 @@ namespace Lime
 		WindowState State { get; set; }
 
 		/// <summary>
+		/// Gets or sets the window behavior to be resizable or not.
+		/// </summary>
+		bool FixedSize { get; set; }
+
+		/// <summary>
 		/// Gets or sets the fullscreen window state.
 		/// </summary>
 		bool Fullscreen { get; set; }

@@ -30,6 +30,7 @@ namespace Lime
 		public Input Input { get { return ActivityDelegate.Instance.Input; } }
 		public MouseCursor Cursor { get; set; }
 		public WindowState State { get { return WindowState.Fullscreen; } set {} }
+		public bool FixedSize { get { return true; } set {} }
 		public Vector2 ClientPosition { get { return Vector2.Zero; } set {} }
 		public Vector2 DecoratedPosition { get { return Vector2.Zero; } set {} }
 		public Vector2 ClientSize

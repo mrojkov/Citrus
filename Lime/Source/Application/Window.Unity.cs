@@ -25,6 +25,7 @@ namespace Lime
 			get { return Fullscreen ? WindowState.Fullscreen : WindowState.Normal; }
 			set {}
 		}
+		public bool FixedSize { get { return true; } set {} }
 		public IntVector2 ClientPosition { get { return IntVector2.Zero; } set {} }
 		public IntVector2 DecoratedPosition { get { return IntVector2.Zero; } set {} }
 		public Size ClientSize { get { return new Size(UnityEngine.Screen.width, UnityEngine.Screen.height); } set {} }

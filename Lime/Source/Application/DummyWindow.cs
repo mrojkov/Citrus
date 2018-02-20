@@ -9,6 +9,7 @@ namespace Lime
 		public bool Active { get; set; }
 		public string Title { get; set; }
 		public WindowState State { get; set; }
+		public bool FixedSize { get; set; }
 		public bool Fullscreen { get; set; }
 		public Vector2 ClientPosition { get; set; }
 		public Vector2 ClientSize { get; set; }

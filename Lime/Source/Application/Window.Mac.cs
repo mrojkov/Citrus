@@ -133,6 +133,19 @@ namespace Lime
 			}
 		}
 
+		public bool FixedSize
+		{
+			get
+			{
+				return !window.StyleMask.HasFlag(NSWindowStyle.Resizable); 
+			}
+
+			set
+			{
+				// todo ATkachev make set resizable or not
+			}
+		}
+
 		public bool Fullscreen
 		{
 			get { return State == WindowState.Fullscreen; }

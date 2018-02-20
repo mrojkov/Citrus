@@ -76,6 +76,28 @@ namespace Lime
 			}
 		}
 
+		public bool FixedSize
+		{
+			get
+			{
+				return borderStyle != FormBorderStyle.Sizable; 
+			}
+
+			set
+			{
+				if (value && borderStyle == FormBorderStyle.Sizable) {
+					borderStyle = FormBorderStyle.FixedSingle;
+				} else if (!value && borderStyle == FormBorderStyle.FixedSingle) {
+					borderStyle = FormBorderStyle.Sizable;
+				}
+
+				if (form.FormBorderStyle != FormBorderStyle.None) {
+					form.FormBorderStyle = borderStyle;
+				}
+				form.MaximizeBox = !FixedSize;
+			}
+		}
+
 		public bool Fullscreen
 		{
 			get

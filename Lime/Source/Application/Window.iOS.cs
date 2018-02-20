@@ -25,6 +25,7 @@ namespace Lime
 		public bool Active { get; private set; }
 		public string Title { get; set; }
 		public WindowState State { get { return WindowState.Fullscreen; } set {} }
+		public bool FixedSize { get { return true; } set {} }
 		public bool Fullscreen { get { return true; } set {} }
 		public Vector2 ClientPosition { get { return Vector2.Zero; } set {} }
 		public Vector2 ClientSize
