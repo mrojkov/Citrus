@@ -135,14 +135,21 @@ namespace Lime
 
 		public bool FixedSize
 		{
-			get
-			{
-				return !window.StyleMask.HasFlag(NSWindowStyle.Resizable); 
-			}
-
+			get { return !window.StyleMask.HasFlag(NSWindowStyle.Resizable) || shouldFixFullscreen; }
 			set
 			{
-				// todo ATkachev make set resizable or not
+				if (value && !FixedSize) {
+					if (State == WindowState.Fullscreen) {
+						shouldFixFullscreen = true;
+					} else {
+						window.StyleMask &= ~NSWindowStyle.Resizable;
+					}
+				} else if (!value && FixedSize) {
+					window.StyleMask |= NSWindowStyle.Resizable;
+					if (State == WindowState.Fullscreen) {
+						shouldFixFullscreen = false;
+					}
+				}
 			}
 		}
 
