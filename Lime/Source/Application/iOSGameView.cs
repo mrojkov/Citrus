@@ -1,6 +1,7 @@
 #if iOS
 using CoreAnimation;
 using Foundation;
+using System.Linq;
 using ObjCRuntime;
 using OpenGLES;
 using UIKit;
@@ -93,13 +94,16 @@ namespace Lime
 			};
 
 			// Create Long Press gesture recognizer and make it not to interfere with TouchesBegan (usual way to detect touches)
-			var gestureRecognizer = new UILongPressGestureRecognizer(handler) {
+			gestureRecognizer = new UILongPressGestureRecognizer(handler) {
 				DelaysTouchesBegan = false,
 				MinimumPressDuration = 0,
 				CancelsTouchesInView = false
 			};
 			AddGestureRecognizer(gestureRecognizer);
 		}
+
+		private UILongPressGestureRecognizer gestureRecognizer;
+		private bool gestureRecognizerRemoved = false;
 
 		public override void LayoutSubviews()
 		{
@@ -253,6 +257,22 @@ namespace Lime
 		{
 			base.OnUpdateFrame(e);
 			ProcessTextInput();
+			WatchForActiveSubviewToToggleGestureRecognizer();
+		}
+
+		private void WatchForActiveSubviewToToggleGestureRecognizer() {
+			var lastView = this.Subviews.Last();
+			if (lastView != textView) {
+				if (!gestureRecognizerRemoved) {
+					gestureRecognizerRemoved = true;
+					RemoveGestureRecognizer(gestureRecognizer);
+				}
+			} else {
+				if (gestureRecognizerRemoved) {
+					gestureRecognizerRemoved = false;
+					AddGestureRecognizer(gestureRecognizer);
+				}
+			}
 		}
 
 		private void ProcessTextInput()
