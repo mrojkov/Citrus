@@ -98,6 +98,7 @@ namespace Lime
 				MinimumPressDuration = 0,
 				CancelsTouchesInView = false
 			};
+			gestureRecognizer.ShouldReceiveTouch += (recognizer, touch) => touch.View == this;
 			AddGestureRecognizer(gestureRecognizer);
 		}
 
