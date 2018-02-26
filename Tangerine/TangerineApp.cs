@@ -208,8 +208,8 @@ namespace Tangerine
 			public override void Process(IOperation op)
 			{
 				var doc = Document.Current;
-				doc.RootNode.Update(0);
 				doc.Container.AnimationFrame = doc.Container.AnimationFrame;
+				doc.RootNode.Update(0);
 			}
 		}
 
