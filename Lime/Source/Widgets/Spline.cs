@@ -96,6 +96,26 @@ namespace Lime
 			return Nodes.Count > 0 ? GetPoint(segmentCount % Nodes.Count).Position * Size : Vector2.Zero;
 		}
 
+		public Vector2 CalcNormal(float lengthFromBeginnning)
+		{
+			float segStart = 0;
+			var segmentCount = GetSegmentCount();
+			for (int i = 0; i < segmentCount; i++) {
+				var start = GetPoint(i);
+				var end = GetPoint(i + 1);
+				if (lengthFromBeginnning < 0)
+					return start.Position * Size;
+
+				float segLength = ((end.Position - start.Position) * Size).Length;
+				if (segStart <= lengthFromBeginnning && lengthFromBeginnning < segStart + segLength) {
+					return InterpolateNormal(start, end, (lengthFromBeginnning - segStart) / segLength);
+				}
+				segStart += segLength;
+			}
+
+			return Nodes.Count > 0 ? GetPoint(segmentCount % Nodes.Count).Position * Size : Vector2.Zero;
+		}
+
 		public IEnumerable<Vector2> CalcPoints(float step)
 		{
 			float segStart = 0;
@@ -137,10 +157,30 @@ namespace Lime
 			}
 		}
 
+		private Vector2 InterpolateNormal(SplinePoint v1, SplinePoint v2, float t)
+		{
+			if (!v1.Straight) {
+				Vector2 p1 = v1.Position * Size;
+				Vector2 p2 = v2.Position * Size;
+				float len = (p2 - p1).Length;
+				float ta1 = v1.TangentAngle * Mathf.DegToRad;
+				float ta2 = v2.TangentAngle * Mathf.DegToRad;
+				Vector2 t1 = Vector2.CosSinRough(ta1);
+				Vector2 t2 = Vector2.CosSinRough(ta2);
+				t1 *= len * v1.TangentWeight;
+				t2 *= len * v2.TangentWeight;
+				return Mathf.HermiteSplineNormal(t, p1, t1, p2, t2);
+			} else {
+				Vector2 p1 = v1.Position * Size;
+				Vector2 p2 = v2.Position * Size;
+				return p1 + t * (p2 - p1);
+			}
+		}
+
 		public float CalcSplineLengthToNearestPoint(Vector2 point)
 		{
 			float length = 0;
-			
+
 			float minDistance = float.MaxValue;
 			float offset = 0;
 			var segmentCount = GetSegmentCount();
