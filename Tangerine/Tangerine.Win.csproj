@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Dialogs\DeleteRulerDialog.cs" />
+    <Compile Include="Dialogs\OrangePluginOptionsDialog.cs" />
     <Compile Include="Dialogs\PreferencesDialog.cs" />
     <Compile Include="MainMenu\CreateMenu.cs" />
     <Compile Include="MainMenu\EditMenu.cs" />
@@ -59,6 +60,7 @@
     <Compile Include="MainMenu\WindowMenu.cs" />
     <Compile Include="OrangeInterface.cs" />
     <Compile Include="DisplayResolutions.cs" />
+    <Compile Include="OrangePluginUIBuidler.cs" />
     <Compile Include="TangerineApp.cs" />
     <Compile Include="Main.Win.cs" />
     <Compile Include="TangerineMenu.cs" />
