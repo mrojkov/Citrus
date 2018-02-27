@@ -169,7 +169,7 @@ namespace Lime
 				Vector2 t2 = Vector2.CosSinRough(ta2);
 				t1 *= len * v1.TangentWeight;
 				t2 *= len * v2.TangentWeight;
-				return Mathf.HermiteSplineNormal(t, p1, t1, p2, t2);
+				return Mathf.HermiteSplineDerivative(t, p1, t1, p2, t2);
 			} else {
 				Vector2 p1 = v1.Position * Size;
 				Vector2 p2 = v2.Position * Size;
