@@ -114,11 +114,42 @@ namespace Tangerine.UI.Timeline
 		{
 			public void Show()
 			{
-				new Menu {
+				var menu = new Menu {
 					TimelineCommands.CopyMarkers,
 					TimelineCommands.PasteMarkers,
 					TimelineCommands.DeleteMarkers
-				}.Popup();
+				};
+				var frameUnderMouse = Timeline.Instance.Grid.CellUnderMouse().X;
+				var marker = Document.Current.Container.Markers.FirstOrDefault(m => m.Frame == frameUnderMouse);
+				menu.Add(Command.MenuSeparator);
+				if (marker != null) {
+					menu.Add(new Command("Copy Marker", () => {
+						var stream = new System.IO.MemoryStream();
+						Serialization.WriteObject(Document.Current.Path, stream, marker, Serialization.Format.JSON);
+						Clipboard.Text = System.Text.Encoding.UTF8.GetString(stream.ToArray());
+					}));
+				}
+				menu.Add(new Command("Paste Marker", () => {
+					try {
+						var text = Clipboard.Text;
+						var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(text));
+						var m = Serialization.ReadObject<Marker>(Document.Current.Path, stream);
+						m.Frame = frameUnderMouse;
+						Document.Current.History.BeginTransaction();
+						Core.Operations.SetMarker.Perform(Document.Current.Container.DefaultAnimation.Markers, m);
+						Document.Current.History.EndTransaction();
+					} catch (System.Exception e) {
+						Debug.Write(e);
+					}
+				}));
+				if (marker != null) {
+					menu.Add(new Command("Delete Marker", () => {
+						Document.Current.History.BeginTransaction();
+						Core.Operations.DeleteMarker.Perform(Document.Current.Container.Markers, marker);
+						Document.Current.History.EndTransaction();
+					}));
+				}
+				menu.Popup();
 			}
 		}
 	}
