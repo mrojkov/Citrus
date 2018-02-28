@@ -20,7 +20,7 @@ namespace Tangerine
 		{
 			if (Project.Current.Close()) {
 				new Project(fileName).Open();
-				var prefs = Core.UserPreferences.Instance.Get<UserPreferences>();
+				var prefs = AppUserPreferences.Instance;
 				prefs.RecentProjects.Remove(fileName);
 				prefs.RecentProjects.Insert(0, fileName);
 				Core.UserPreferences.Instance.Save();

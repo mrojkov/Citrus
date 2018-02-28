@@ -87,6 +87,7 @@
     <Compile Include="UserPreferences.cs" />
     <Compile Include="HotSerialization.cs" />
     <Compile Include="AutosaveProcessor.cs" />
+    <Compile Include="CoreUserPreferences.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

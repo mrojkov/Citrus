@@ -11,7 +11,6 @@ namespace Tangerine.UI.SceneView
 	public class RescalePointObjectSelectionProcessor : ITaskProvider
 	{
 		private SceneView sv => SceneView.Instance;
-		private List<Vector2> initialPointsPosition;
 		private Quadrangle initialPointsBounds;
 		private Vector2 initialMousePosition;
 
@@ -78,11 +77,12 @@ namespace Tangerine.UI.SceneView
 			try {
 				Utils.ChangeCursorIfDefault(cursor);
 				initialMousePosition = sv.MousePosition;
-				initialPointsPosition = points.Select(w => w.Position).ToList();
 				initialPointsBounds = Utils.CalcAABB(points);
 				while (sv.Input.IsMousePressed()) {
 					Document.Current.History.RevertActiveTransaction();
-
+					if (CoreUserPreferences.Instance.AutoKeyframes) {
+						Utils.SetAnimatorAndInitialKeyframeIfNeed(points.Cast<IAnimable>(), nameof(PointObject.Position));
+					}
 					Utils.ChangeCursorIfDefault(cursor);
 					RescaleHelper(
 						points,
@@ -136,8 +136,8 @@ namespace Tangerine.UI.SceneView
 				}
 			}
 			for (var i = 0; i < points.Count; i++) {
-				var deltaPos = basisInversed * initialPointsPosition[i] * deltaSize * basis - Vector2.Zero * basis;
-				Core.Operations.SetAnimableProperty.Perform(points[i], nameof(PointObject.Position), initialPointsPosition[i] + deltaPos);
+				var deltaPos = basisInversed * points[i].Position * deltaSize * basis - Vector2.Zero * basis;
+				Core.Operations.SetAnimableProperty.Perform(points[i], nameof(PointObject.Position), points[i].Position + deltaPos);
 			}
 		}
 	}

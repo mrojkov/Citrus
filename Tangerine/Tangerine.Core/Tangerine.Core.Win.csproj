@@ -43,6 +43,7 @@
     <Compile Include="AutosaveProcessor.cs" />
     <Compile Include="ClassAttributes.cs" />
     <Compile Include="Components.cs" />
+    <Compile Include="CoreUserPreferences.cs" />
     <Compile Include="HotSerialization.cs" />
     <Compile Include="IDataflow.cs" />
     <Compile Include="ITaskProvider.cs" />

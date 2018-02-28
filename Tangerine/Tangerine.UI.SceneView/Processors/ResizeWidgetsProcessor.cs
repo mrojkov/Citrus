@@ -54,9 +54,15 @@ namespace Tangerine.UI.SceneView
 					var proportional = sv.Input.IsKeyPressed(Key.Shift);
 
 					if (sv.Input.IsKeyPressed(Key.Control)) {
+						if (CoreUserPreferences.Instance.AutoKeyframes) {
+							Utils.SetAnimatorAndInitialKeyframeIfNeed(widgets.Cast<IAnimable>(), nameof(Widget.Position), nameof(Widget.Scale));
+						}
 						RescaleWidgets(hull, widgets.Count <= 1, pivot, widgets, controlPointIndex, sv.MousePosition, mouseStartPos,
 							proportional);
 					} else {
+						if (CoreUserPreferences.Instance.AutoKeyframes) {
+							Utils.SetAnimatorAndInitialKeyframeIfNeed(widgets.Cast<IAnimable>(), nameof(Widget.Position), nameof(Widget.Size));
+						}
 						foreach (Widget widget in widgets) {
 							ResizeWidget(widget, controlPointIndex, sv.MousePosition, mouseStartPos, proportional);
 						}

@@ -20,7 +20,7 @@ namespace Tangerine
 
 		public PreferencesDialog()
 		{
-			theme = Core.UserPreferences.Instance.Get<UserPreferences>().Theme;
+			theme = AppUserPreferences.Instance.Theme;
 			window = new Window(new WindowOptions {
 				ClientSize = new Vector2(600, 400),
 				FixedSize = false,
@@ -55,7 +55,7 @@ namespace Tangerine
 			};
 			okButton.Clicked += () => {
 				window.Close();
-				if (theme != Core.UserPreferences.Instance.Get<UserPreferences>().Theme) {
+				if (theme != AppUserPreferences.Instance.Theme) {
 					AlertDialog.Show("The color theme change will take effect next time you run Tangerine.");
 				}
 				Core.UserPreferences.Instance.Save();
@@ -81,9 +81,10 @@ namespace Tangerine
 
 		private static void ResetToDefaults()
 		{
-			Core.UserPreferences.Instance.Get<UserPreferences>().ResetToDefaults();
-			Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>().ResetToDefaults();
-			Core.UserPreferences.Instance.Get<UI.Timeline.UserPreferences>().ResetToDefaults();
+			AppUserPreferences.Instance.ResetToDefaults();
+			UI.SceneView.SceneUserPreferences.Instance.ResetToDefaults();
+			UI.Timeline.TimelineUserPreferences.Instance.ResetToDefaults();
+			Core.CoreUserPreferences.Instance.ResetToDefaults();
 		}
 
 		private Widget CreateColorsPane()
@@ -95,37 +96,37 @@ namespace Tangerine
 			};
 			pane.Content.Layout = new VBoxLayout { Spacing = 4 };
 			new EnumPropertyEditor<ColorThemeEnum>(
-			new PropertyEditorParams(pane.Content, Core.UserPreferences.Instance.Get<Tangerine.UserPreferences>(), nameof(Tangerine.UserPreferences.Theme), "User interface theme"));
+			new PropertyEditorParams(pane.Content, AppUserPreferences.Instance, nameof(Tangerine.AppUserPreferences.Theme), "User interface theme"));
 			var tmp = new BooleanPropertyEditor(
-				new PropertyEditorParams(pane.Content, Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>(), nameof(UI.SceneView.UserPreferences.EnableChessBackground), "Chess background"));
+				new PropertyEditorParams(pane.Content, UI.SceneView.SceneUserPreferences.Instance, nameof(UI.SceneView.SceneUserPreferences.EnableChessBackground), "Chess background"));
 			tmp.ContainerWidget.AddChangeWatcher(
-				() => Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>().EnableChessBackground, (v) => Application.InvalidateWindows());
+				() => UI.SceneView.SceneUserPreferences.Instance.EnableChessBackground, (v) => Application.InvalidateWindows());
 			tmp = new BooleanPropertyEditor(
-				new PropertyEditorParams(pane.Content, Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>(), nameof(UI.SceneView.UserPreferences.DrawFrameBorder), "Draw frame border"));
+				new PropertyEditorParams(pane.Content, UI.SceneView.SceneUserPreferences.Instance, nameof(UI.SceneView.SceneUserPreferences.DrawFrameBorder), "Draw frame border"));
 			tmp.ContainerWidget.AddChangeWatcher(
-				() => Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>().DrawFrameBorder, (v) => Application.InvalidateWindows());
+				() => UI.SceneView.SceneUserPreferences.Instance.DrawFrameBorder, (v) => Application.InvalidateWindows());
 			CreateColorPropertyEditor(
-				nameof(UI.SceneView.UserPreferences.BackgroundColorA),
+				nameof(UI.SceneView.SceneUserPreferences.BackgroundColorA),
 				"Background color A",
-				Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>(),
+				Core.UserPreferences.Instance.Get<UI.SceneView.SceneUserPreferences>(),
 				() => ColorTheme.Current.SceneView.BackgroundColorA,
 				pane);
 			CreateColorPropertyEditor(
-				nameof(UI.SceneView.UserPreferences.BackgroundColorB),
+				nameof(UI.SceneView.SceneUserPreferences.BackgroundColorB),
 				"Background color B",
-				Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>(),
+				Core.UserPreferences.Instance.Get<UI.SceneView.SceneUserPreferences>(),
 				() => ColorTheme.Current.SceneView.BackgroundColorB,
 				pane);
 			CreateColorPropertyEditor(
-				nameof(UI.SceneView.UserPreferences.RootWidgetOverlayColor),
+				nameof(UI.SceneView.SceneUserPreferences.RootWidgetOverlayColor),
 				"Root overlay color",
-				Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>(),
+				Core.UserPreferences.Instance.Get<UI.SceneView.SceneUserPreferences>(),
 				() => ColorTheme.Current.SceneView.RootWidgetOverlayColor,
 				pane);
 			CreateColorPropertyEditor(
-				nameof(UI.SceneView.UserPreferences.AnimationPreviewBackground),
+				nameof(UI.SceneView.SceneUserPreferences.AnimationPreviewBackground),
 				"Animation preview background",
-				Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>(),
+				Core.UserPreferences.Instance.Get<UI.SceneView.SceneUserPreferences>(),
 				() => Color4.Black.Transparentify(0.6f),
 				pane);
 			return pane;
@@ -155,17 +156,17 @@ namespace Tangerine
 			};
 			pane.Content.Layout = new VBoxLayout { Spacing = 4 };
 			new Vector2PropertyEditor(
-				new PropertyEditorParams(pane.Content, Core.UserPreferences.Instance.Get<Tangerine.UserPreferences>(), nameof(Tangerine.UserPreferences.DefaultSceneDimensions), "Default scene dimensions"));
+				new PropertyEditorParams(pane.Content, Tangerine.AppUserPreferences.Instance, nameof(Tangerine.AppUserPreferences.DefaultSceneDimensions), "Default scene dimensions"));
 			new BooleanPropertyEditor(
-				new PropertyEditorParams(pane.Content, Core.UserPreferences.Instance.Get<UI.Timeline.UserPreferences>(), nameof(UI.Timeline.UserPreferences.AutoKeyframes), "Automatic keyframes"));
+				new PropertyEditorParams(pane.Content, CoreUserPreferences.Instance, nameof(CoreUserPreferences.AutoKeyframes), "Automatic keyframes"));
 			new BooleanPropertyEditor(
-				new PropertyEditorParams(pane.Content, Core.UserPreferences.Instance.Get<UI.Timeline.UserPreferences>(), nameof(UI.Timeline.UserPreferences.AnimationMode), "Animation mode"));
+				new PropertyEditorParams(pane.Content, UI.Timeline.TimelineUserPreferences.Instance, nameof(UI.Timeline.TimelineUserPreferences.AnimationMode), "Animation mode"));
 			new IntPropertyEditor(
-				new PropertyEditorParams(pane.Content, Core.UserPreferences.Instance.Get<Tangerine.UserPreferences>(), nameof(Tangerine.UserPreferences.AutosaveDelay), "Autosave delay"));
+				new PropertyEditorParams(pane.Content, Tangerine.AppUserPreferences.Instance, nameof(Tangerine.AppUserPreferences.AutosaveDelay), "Autosave delay"));
 			var boneWidthPropertyEditor = new FloatPropertyEditor(
-				new PropertyEditorParams(pane.Content, Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>(), nameof(UI.SceneView.UserPreferences.DefaultBoneWidth), "Bone Width"));
+				new PropertyEditorParams(pane.Content, UI.SceneView.SceneUserPreferences.Instance, nameof(UI.SceneView.SceneUserPreferences.DefaultBoneWidth), "Bone Width"));
 			boneWidthPropertyEditor.ContainerWidget.AddChangeWatcher(
-				() => Core.UserPreferences.Instance.Get<UI.SceneView.UserPreferences>().DefaultBoneWidth, (v) => Application.InvalidateWindows());
+				() => UI.SceneView.SceneUserPreferences.Instance.DefaultBoneWidth, (v) => Application.InvalidateWindows());
 			return pane;
 		}
 	}

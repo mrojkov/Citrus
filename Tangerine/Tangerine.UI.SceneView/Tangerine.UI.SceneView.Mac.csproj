@@ -88,7 +88,6 @@
     <Compile Include="Presenters\Spline3DPresenter.cs" />
     <Compile Include="Processors\CreateSplinePoint3DProcessor.cs" />
     <Compile Include="Processors\3D\DragSplinePoint3DProcessor.cs" />
-    <Compile Include="UserPreferences.cs" />
     <Compile Include="Processors\RescalePointObjectSelectionProcessor.cs" />
     <Compile Include="Processors\RotatePointObjectSelectionProcessor.cs" />
     <Compile Include="Presenters\Bone3DPresenter.cs" />
@@ -96,6 +95,7 @@
     <Compile Include="Presenters\TransparentWidgetsPresenter.cs" />
     <Compile Include="Presenters\FrameBorderPresenter.cs" />
     <Compile Include="Widgets\Ruler.cs" />
+    <Compile Include="SceneUserPreferences.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Mac.csproj">

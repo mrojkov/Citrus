@@ -44,7 +44,9 @@ namespace Tangerine.UI.SceneView
 				var matrix = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container as Widget);
 				while (sv.Input.IsMousePressed()) {
 					Document.Current.History.RevertActiveTransaction();
-
+					if (CoreUserPreferences.Instance.AutoKeyframes) {
+						Utils.SetAnimatorAndInitialKeyframeIfNeed(point, nameof(SplinePoint.TangentAngle), nameof(SplinePoint.TangentWeight));
+					}
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					var curMousePos = sv.MousePosition;
 					if ((curMousePos - iniMousePos).Snap(Vector2.Zero) != Vector2.Zero) {

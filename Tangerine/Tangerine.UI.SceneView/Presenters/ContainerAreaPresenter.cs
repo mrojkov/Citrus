@@ -9,9 +9,9 @@ namespace Tangerine.UI.SceneView
 	public class ContainerAreaPresenter
 	{
 		private const float ChessCellSize = 50;
-		private Color4 Color1 => Core.UserPreferences.Instance.Get<UserPreferences>().BackgroundColorA;
-		private Color4 Color2 => Core.UserPreferences.Instance.Get<UserPreferences>().BackgroundColorB;
-		private Color4 RootWidgetBackgroundColor => Core.UserPreferences.Instance.Get<UserPreferences>().RootWidgetOverlayColor;
+		private Color4 Color1 => SceneUserPreferences.Instance.BackgroundColorA;
+		private Color4 Color2 => SceneUserPreferences.Instance.BackgroundColorB;
+		private Color4 RootWidgetBackgroundColor => SceneUserPreferences.Instance.RootWidgetOverlayColor;
 		private const string PlayTexturePath = "Tangerine.Resources.Icons.SceneView.Play.png";
 
 		public ContainerAreaPresenter(SceneView sceneView)
@@ -21,16 +21,16 @@ namespace Tangerine.UI.SceneView
 
 			playButtonTexture.LoadImage(new Bitmap(new EmbeddedResource(PlayTexturePath, "Tangerine").GetResourceStream()));
 			sceneView.Frame.AddChangeWatcher(
-				() => Core.UserPreferences.Instance.Get<UserPreferences>().BackgroundColorA,
+				() => SceneUserPreferences.Instance.BackgroundColorA,
 				(v) => backgroundTexture = PrepareChessTexture(v, Color2));
 			sceneView.Frame.AddChangeWatcher(
-				() => Core.UserPreferences.Instance.Get<UserPreferences>().BackgroundColorB,
+				() => SceneUserPreferences.Instance.BackgroundColorB,
 				(v) => backgroundTexture = PrepareChessTexture(Color1, v));
 			sceneView.Scene.CompoundPresenter.Push(new DelegatePresenter<Widget>(w => {
 				var ctr = SceneView.Instance.Frame;
 				if (ctr != null) {
 					ctr.PrepareRendererState();
-					if (Core.UserPreferences.Instance.Get<UserPreferences>().EnableChessBackground) {
+					if (SceneUserPreferences.Instance.EnableChessBackground) {
 						var ratio = ChessCellSize * sceneView.Scene.Scale;
 						Renderer.DrawSprite(
 							backgroundTexture,
@@ -46,7 +46,7 @@ namespace Tangerine.UI.SceneView
 						Renderer.DrawRect(
 							Vector2.Zero,
 							ctr.Size,
-							Core.UserPreferences.Instance.Get<UserPreferences>().AnimationPreviewBackground);
+							SceneUserPreferences.Instance.AnimationPreviewBackground);
 					} else {
 						var root = Core.Document.Current.RootNode as Widget;
 						Renderer.Transform1 = root.LocalToWorldTransform;

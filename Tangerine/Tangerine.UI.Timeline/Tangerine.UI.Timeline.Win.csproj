@@ -91,7 +91,7 @@
     <Compile Include="Processors\Rulerbar\RulerbarMouseScrollProcessor.cs" />
     <Compile Include="CommandBindings.cs" />
     <Compile Include="Components\RowView.cs" />
-    <Compile Include="UserPreferences.cs" />
+    <Compile Include="TimelineUserPreferences.cs" />
     <Compile Include="Utils\TimelineMetrics.cs" />
     <Compile Include="Operations\DeselectGridSpan.cs" />
     <Compile Include="Components\GridAudioView.cs" />

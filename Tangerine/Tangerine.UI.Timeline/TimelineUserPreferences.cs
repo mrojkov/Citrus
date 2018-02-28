@@ -5,11 +5,8 @@ using Yuzu;
 
 namespace Tangerine.UI.Timeline
 {
-	public class UserPreferences : Component
+	public class TimelineUserPreferences : Component
 	{
-		[YuzuRequired]
-		public bool AutoKeyframes { get; set; }
-
 		[YuzuRequired]
 		public bool AnimationMode { get; set; }
 
@@ -25,7 +22,7 @@ namespace Tangerine.UI.Timeline
 		[YuzuRequired]
 		public List<float> TimelineHSplitterStretches;
 
-		public UserPreferences()
+		public TimelineUserPreferences()
 		{
 			ResetToDefaults();
 		}
@@ -34,10 +31,11 @@ namespace Tangerine.UI.Timeline
 		{
 			ColWidth = 15;
 			EditCurves = true;
-			AutoKeyframes = false;
 			AnimationMode = false;
 			TimelineVSplitterStretches = new List<float>();
 			TimelineHSplitterStretches = new List<float>();
 		}
+
+		public static TimelineUserPreferences Instance => Core.UserPreferences.Instance.Get<TimelineUserPreferences>();
 	}
 }

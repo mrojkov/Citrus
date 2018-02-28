@@ -31,7 +31,7 @@ namespace Tangerine.UI.SceneView
 			canvas.PrepareRendererState();
 			if (!Document.Current.PreviewAnimation &&
 				!Document.Current.ExpositionMode &&
-				Core.UserPreferences.Instance.Get<UserPreferences>().DrawFrameBorder
+				SceneUserPreferences.Instance.DrawFrameBorder
 			) {
 				var frames = Document.Current.Container.Nodes
 					.OfType<Frame>()

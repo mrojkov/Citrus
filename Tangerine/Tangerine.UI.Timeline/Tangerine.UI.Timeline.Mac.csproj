@@ -97,7 +97,6 @@
     <Compile Include="CommandBindings.cs" />
     <Compile Include="Components\RowView.cs" />
     <Compile Include="Utils\TimelineMetrics.cs" />
-    <Compile Include="UserPreferences.cs" />
     <Compile Include="Operations\DeselectGridSpan.cs" />
     <Compile Include="Components\GridAudioView.cs" />
     <Compile Include="CurveEditorPane.cs" />
@@ -107,6 +106,7 @@
     <Compile Include="Processors\CurveEditor\SelectCurveKey.cs" />
     <Compile Include="Curve.cs" />
     <Compile Include="AnimatorAdapter.cs" />
+    <Compile Include="TimelineUserPreferences.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tangerine.Core\Tangerine.Core.Mac.csproj">

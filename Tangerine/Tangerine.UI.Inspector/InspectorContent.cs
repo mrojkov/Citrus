@@ -103,7 +103,7 @@ namespace Tangerine.UI.Inspector
 				}
 				var context = new PropertyEditorParams(widget, objects, type, property.Name) {
 					NumericEditBoxFactory = () => new TransactionalNumericEditBox(),
-					PropertySetter = Core.Operations.SetAnimableProperty.Perform,
+					PropertySetter = SetAnimableProperty,
 					DefaultValueGetter = () => {
 						var ctr = type.GetConstructor(new Type[] {});
 						if (ctr != null) {
@@ -144,6 +144,14 @@ namespace Tangerine.UI.Inspector
 					}
 				}
 			}
+		}
+
+		private void SetAnimableProperty(object obj, string propertyName, object value)
+		{
+			if (CoreUserPreferences.Instance.AutoKeyframes) {
+				Utils.SetAnimatorAndInitialKeyframeIfNeed((IAnimable)obj, propertyName);
+			}
+			Core.Operations.SetAnimableProperty.Perform(obj, propertyName, value);
 		}
 
 		private void AddGroupHeader(string text)

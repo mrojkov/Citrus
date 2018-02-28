@@ -123,7 +123,7 @@ namespace Tangerine.UI.Timeline.Operations
 				Audio.GloballyEnable = false;
 				try {
 					var doc = Document.Current;
-					if (Core.UserPreferences.Instance.Get<UserPreferences>().AnimationMode && doc.AnimationFrame != value) {
+					if (TimelineUserPreferences.Instance.AnimationMode && doc.AnimationFrame != value) {
 						node.SetTangerineFlag(TangerineFlags.IgnoreMarkers, true);
 						var cacheFrame = node.Components.Get<AnimationsStatesComponent>()?.Column;
 						if (cacheFrame.HasValue && (cacheFrame.Value > value || value > cacheFrame.Value + OptimalRollbackForCacheAnimationsStates * 2)) {
