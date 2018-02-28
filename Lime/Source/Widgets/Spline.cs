@@ -76,6 +76,26 @@ namespace Lime
 			return length;
 		}
 
+		private static List<Vector2> GaussLengendreCoefficients = new List<Vector2> {
+			new Vector2( 0.0f, 0.5688889f ),
+			new Vector2( -0.5384693f, 0.47862867f ),
+			new Vector2( 0.5384693f, 0.47862867f ),
+			new Vector2( -0.90617985f, 0.23692688f ),
+			new Vector2( 0.90617985f, 0.23692688f ),
+		};
+
+		public float CalcLengthUsingGaussLegendreQuadrature()
+		{
+			float length = 0.0f;
+			var n = GetSegmentCount();
+			for (int i = 0; i < n; i++) {
+				foreach (var glc in GaussLengendreCoefficients) {
+					length += InterpolateDerivative(GetPoint(i), GetPoint(i + 1), 0.5f * (1.0f + glc.X)).Length * glc.Y;
+				}
+			}
+			return length * 0.5f;
+		}
+
 		public Vector2 CalcPoint(float lengthFromBeginnning)
 		{
 			float segStart = 0;
@@ -108,7 +128,7 @@ namespace Lime
 
 				float segLength = ((end.Position - start.Position) * Size).Length;
 				if (segStart <= lengthFromBeginnning && lengthFromBeginnning < segStart + segLength) {
-					return InterpolateNormal(start, end, (lengthFromBeginnning - segStart) / segLength);
+					return InterpolateDerivative(start, end, (lengthFromBeginnning - segStart) / segLength);
 				}
 				segStart += segLength;
 			}
@@ -157,7 +177,7 @@ namespace Lime
 			}
 		}
 
-		private Vector2 InterpolateNormal(SplinePoint v1, SplinePoint v2, float t)
+		private Vector2 InterpolateDerivative(SplinePoint v1, SplinePoint v2, float t)
 		{
 			if (!v1.Straight) {
 				Vector2 p1 = v1.Position * Size;
