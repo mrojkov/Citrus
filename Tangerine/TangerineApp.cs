@@ -437,14 +437,34 @@ namespace Tangerine
 			h.Connect(Command.Redo, () => Document.Current.History.Redo(), () => Document.Current?.History.CanRedo() ?? false);
 			h.Connect(OrangeCommands.Run, () => WidgetContext.Current.Root.Tasks.Add(OrangeTask));
 			h.Connect(OrangeCommands.OptionsDialog, () => new OrangePluginOptionsDialog());
-			h.Connect(SceneViewCommands.SnapWidgetBorderToRuler, new ToggleDisplayCommandHandler());
-			h.Connect(SceneViewCommands.SnapWidgetPivotToRuler, new ToggleDisplayCommandHandler());
+			h.Connect(SceneViewCommands.SnapWidgetBorderToRuler, new SnapWidgetBorderCommandHandler());
+			h.Connect(SceneViewCommands.SnapWidgetPivotToRuler, new SnapWidgetPivotCommandHandler());
 			h.Connect(SceneViewCommands.DeleteRulers, new DeleteRulers());
 		}
 
 		private static bool IsCopyPasteAllowedForSelection()
 		{
 			return Document.Current?.TopLevelSelectedRows().Any(row => row.IsCopyPasteAllowed()) ?? false;
+		}
+
+		private class SnapWidgetPivotCommandHandler : DocumentCommandHandler
+		{
+			public override bool GetChecked() => UI.SceneView.SceneUserPreferences.Instance.SnapWidgetPivotToRuler;
+			public override void Execute()
+			{
+				var prefs = UI.SceneView.SceneUserPreferences.Instance;
+				prefs.SnapWidgetPivotToRuler = !prefs.SnapWidgetPivotToRuler;
+			}
+		}
+
+		private class SnapWidgetBorderCommandHandler : DocumentCommandHandler
+		{
+			public override bool GetChecked() => UI.SceneView.SceneUserPreferences.Instance.SnapWidgetBorderToRuler;
+			public override void Execute()
+			{
+				var prefs = UI.SceneView.SceneUserPreferences.Instance;
+				prefs.SnapWidgetBorderToRuler = !prefs.SnapWidgetBorderToRuler;
+			}
 		}
 
 		private IEnumerator<object> OrangeTask()

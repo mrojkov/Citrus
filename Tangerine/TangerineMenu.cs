@@ -181,7 +181,6 @@ namespace Tangerine
 
 		public static void OnProjectChanged(Project proj)
 		{
-			Command command;
 			foreach (var item in overlaysMenu) {
 				CommandHandlerList.Global.Disconnect(item);
 			}
@@ -192,13 +191,7 @@ namespace Tangerine
 			rulerMenu.Clear();
 			if (proj == Project.Null)
 				return;
-			foreach (var overlayPair in proj.Overlays) {
-				overlayPair.Value.Components.Add(new UI.SceneView.NodeCommandComponent {
-					Command = (command = new Command(overlayPair.Key))
-				});
-				overlaysMenu.Add(command);
-				CommandHandlerList.Global.Connect(command, new OverlayToggleCommandHandler());
-			}
+			AddOverlaysCommands(proj.Overlays);
 			AddRulersCommands(proj.Rulers);
 			AddRulersCommands(proj.DefaultRulers);
 			RebuildRulerMenu();
@@ -251,6 +244,18 @@ namespace Tangerine
 			}
 		}
 
+		private static void AddOverlaysCommands(Dictionary<string, Widget> overlays)
+		{
+			Command command;
+			foreach (var overlayPair in overlays) {
+				overlayPair.Value.Components.Add(new UI.SceneView.NodeCommandComponent {
+					Command = (command = new Command(overlayPair.Key))
+				});
+				overlaysMenu.Add(command);
+				CommandHandlerList.Global.Connect(command, new OverlayToggleCommandHandler(overlayPair.Key));
+			}
+		}
+
 		private static void AddRulersCommands(IList rulers)
 		{
 			if (rulers == null)
@@ -260,7 +265,6 @@ namespace Tangerine
 				ruler.GetComponents().Add(new UI.SceneView.CommandComponent {
 					Command = (c = new Command(ruler.Name))
 				});
-				CommandHandlerList.Global.Connect(c, new OverlayToggleCommandHandler());
 			}
 		}
 
@@ -283,15 +287,51 @@ namespace Tangerine
 			localizationCommand.Enabled = localizationMenu.Count > 0;
 		}
 
-		private class OverlayToggleCommandHandler : ToggleDisplayCommandHandler
+		private class OverlayToggleCommandHandler : DocumentCommandHandler
 		{
-			public override void RefreshCommand(ICommand command)
+			public string overlayName;
+
+			public override bool GetChecked() => UI.SceneView.SceneUserPreferences.Instance
+				.DisplayedOverlays.Contains(overlayName);
+
+			public OverlayToggleCommandHandler(string overlayName)
 			{
-				var checkedState = command.Checked;
-				base.RefreshCommand(command);
-				if (command.Checked != checkedState) {
-					CommonWindow.Current.Invalidate();
+				this.overlayName = overlayName;
+			}
+
+			public override void Execute()
+			{
+				var prefs = UI.SceneView.SceneUserPreferences.Instance;
+				if (prefs.DisplayedOverlays.Contains(overlayName)) {
+					prefs.DisplayedOverlays.Remove(overlayName);
+				} else {
+					prefs.DisplayedOverlays.Add(overlayName);
 				}
+				Application.InvalidateWindows();
+			}
+		}
+
+		private class RulerToggleCommandHandler : DocumentCommandHandler
+		{
+			private string rulerName;
+
+			public override bool GetChecked() => UI.SceneView.SceneUserPreferences.Instance
+				.DisplayedRulers.Contains(rulerName);
+
+			public RulerToggleCommandHandler(string rulerName)
+			{
+				this.rulerName = rulerName;
+			}
+
+			public override void Execute()
+			{
+				var prefs = UI.SceneView.SceneUserPreferences.Instance;
+				if (prefs.DisplayedRulers.Contains(rulerName)) {
+					prefs.DisplayedRulers.Remove(rulerName);
+				} else {
+					prefs.DisplayedRulers.Add(rulerName);
+				}
+				Application.InvalidateWindows();
 			}
 		}
 	}

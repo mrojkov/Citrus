@@ -71,11 +71,13 @@ namespace Tangerine.UI.SceneView
 			}
 		}
 
-		private class DisplayRuler : ToggleDisplayCommandHandler
+		private class DisplayRuler : DocumentCommandHandler
 		{
+			public override bool GetChecked() => SceneUserPreferences.Instance.RulerVisible;
+
 			public override void Execute()
 			{
-				Visible = Ruler.ToggleDisplay();
+				SceneUserPreferences.Instance.RulerVisible = !SceneUserPreferences.Instance.RulerVisible;
 			}
 		}
 
@@ -180,18 +182,14 @@ namespace Tangerine.UI.SceneView
 		}
 
 
-		private class DisplayBones : ToggleDisplayCommandHandler
+		private class DisplayBones : DocumentCommandHandler
 		{
+			public override bool GetChecked() => SceneUserPreferences.Instance.Bones3DVisible;
+
 			public override void Execute()
 			{
-				var postPresenter = Instance.Frame.CompoundPostPresenter;
-				if (Visible) {
-					postPresenter.Remove(Bone3DPresenter.Presenter);
-				} else {
-					postPresenter.Add(Bone3DPresenter.Presenter);
-				}
+				SceneUserPreferences.Instance.Bones3DVisible = !SceneUserPreferences.Instance.Bones3DVisible;
 				CommonWindow.Current.Invalidate();
-				base.Execute();
 			}
 		}
 
@@ -453,6 +451,7 @@ namespace Tangerine.UI.SceneView
 
 		void CreatePresenters()
 		{
+			new Bone3DPresenter(this);
 			new ContainerAreaPresenter(this);
 			new WidgetsPivotMarkPresenter(this);
 			new SelectedWidgetsPresenter(this);

@@ -10,12 +10,14 @@ namespace Tangerine.UI.SceneView
 {
 	class Bone3DPresenter : CustomPresenter<Node3D>
 	{
-
-		public static DelegatePresenter<Widget> Presenter = new DelegatePresenter<Widget>(RenderSelection);
+		public Bone3DPresenter(SceneView sceneView)
+		{
+			sceneView.Frame.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(RenderSelection));
+		}
 
 		private static void RenderSelection(Widget canvas)
 		{
-			if (Document.Current.ExpositionMode) {
+			if (Document.Current.ExpositionMode || !SceneUserPreferences.Instance.Bones3DVisible) {
 				return;
 			}
 			canvas.PrepareRendererState();

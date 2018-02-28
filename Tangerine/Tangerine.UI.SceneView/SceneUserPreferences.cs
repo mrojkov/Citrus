@@ -1,5 +1,6 @@
-using System;
+using System.Collections.Generic;
 using Lime;
+using Tangerine.Core;
 using Yuzu;
 
 namespace Tangerine.UI.SceneView
@@ -33,6 +34,24 @@ namespace Tangerine.UI.SceneView
 		[YuzuOptional]
 		public bool DisplayPivotsForInvisibleWidgets { get; set; }
 
+		[YuzuRequired]
+		public bool RulerVisible { get; set; }
+
+		[YuzuRequired]
+		public bool Bones3DVisible { get; set; }
+
+		[YuzuRequired]
+		public List<string> DisplayedRulers { get; set; } = new List<string>();
+
+		[YuzuRequired]
+		public List<string> DisplayedOverlays { get; set; } = new List<string>();
+
+		[YuzuRequired]
+		public bool SnapWidgetBorderToRuler { get; set; }
+
+		[YuzuRequired]
+		public bool SnapWidgetPivotToRuler { get; set; }
+
 		public SceneUserPreferences()
 		{
 			ResetToDefaults();
@@ -49,6 +68,12 @@ namespace Tangerine.UI.SceneView
 			DrawFrameBorder = false;
 			DisplayPivotsForAllWidgets = true;
 			DisplayPivotsForInvisibleWidgets = false;
+			RulerVisible = false;
+			Bones3DVisible = false;
+			SnapWidgetBorderToRuler = false;
+			SnapWidgetPivotToRuler = false;
+			DisplayedRulers.Clear();
+			DisplayedOverlays.Clear();
 		}
 
 		public static SceneUserPreferences Instance => Core.UserPreferences.Instance.Get<SceneUserPreferences>();
