@@ -56,13 +56,13 @@ namespace Lime
 		private float CalcSegmentLengthAccurate(SplinePoint point1, SplinePoint point2, int approximateCount)
 		{
 			float length = 0;
-			Vector2 prevPosition = point1.Position;
+			Vector2 prevPosition = point1.Position * Size;
 			for (int i = 1; i < approximateCount; i++) {
 				Vector2 curPosition = Interpolate(point1, point2, (float)(i) / approximateCount);
 				length += (curPosition - prevPosition).Length;
 				prevPosition = curPosition;
 			}
-			length += (point2.Position - prevPosition).Length;
+			length += (point2.Position * Size - prevPosition).Length;
 			return length;
 		}
 
