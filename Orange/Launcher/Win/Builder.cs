@@ -1,4 +1,5 @@
-﻿using System;
+using Microsoft.Win32;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -9,8 +10,9 @@ namespace Launcher
 	{
 		protected override bool AreRequirementsMet()
 		{
-			if (File.Exists(BuilderPath))
+			if (BuilderPath != null)
 				return true;
+
 			Process.Start(@"https://www.microsoft.com/en-us/download/details.aspx?id=48159");
 			SetFailedBuildStatus("Please install Microsoft Build Tools 2015");
 			return false;
@@ -31,6 +33,25 @@ namespace Launcher
 
 		protected override string DefaultExecutablePath => Path.Combine(Environment.CurrentDirectory, @"bin\Win\Release\Orange.GUI.exe");
 
-		protected override string BuilderPath => @"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe";
+		protected override string BuilderPath => GetMSBuildPath();
+
+		private string GetMSBuildPath()
+		{
+			var visualStudioRegistryPath = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\Microsoft\VisualStudio\SxS\VS7");
+			if (visualStudioRegistryPath != null) {
+				var vsPath = visualStudioRegistryPath.GetValue("15.0", string.Empty) as string;
+				var msBuild15Path = Path.Combine(vsPath, "MSBuild", "15.0", "Bin", "MSBuild.exe");
+				if (File.Exists(msBuild15Path)) {
+					return msBuild15Path;
+				}
+			}
+
+			var msBuild14Path = Path.Combine(@"C:\Program Files (x86)\MSBuild\14.0\Bin\", "MSBuild.exe");
+			if (File.Exists(msBuild14Path)) {
+				return msBuild14Path;
+			}
+
+			return null;
+		}
 	}
 }
