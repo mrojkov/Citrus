@@ -2,6 +2,7 @@
 using System.Linq;
 using Lime;
 using Tangerine.Core;
+using Tangerine.Core.Operations;
 
 namespace Tangerine.UI.SceneView
 {
@@ -36,13 +37,16 @@ namespace Tangerine.UI.SceneView
 				var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>().ToList();
 				var mouseStartPos = sv.MousePosition;
 
+				float accumAngle = 0;
+				float prevAngle = 0;
+
 				while (sv.Input.IsMousePressed()) {
 					Utils.ChangeCursorIfDefault(Cursors.Rotate);
 					Document.Current.History.RevertActiveTransaction();
 					if (CoreUserPreferences.Instance.AutoKeyframes) {
-						Utils.SetAnimatorAndInitialKeyframeIfNeed(widgets.Cast<IAnimable>(), nameof(Widget.Position), nameof(Widget.Rotation));
+						Utils.SetAnimatorAndInitialKeyframeIfNeed(widgets, nameof(Widget.Position), nameof(Widget.Rotation));
 					}
-					RotateWidgets(pivot, widgets, sv.MousePosition, mouseStartPos, sv.Input.IsKeyPressed(Key.Shift));
+					RotateWidgets(pivot, widgets, sv.MousePosition, mouseStartPos, sv.Input.IsKeyPressed(Key.Shift), ref accumAngle, ref prevAngle);
 					yield return null;
 				}
 			} finally {
@@ -52,8 +56,11 @@ namespace Tangerine.UI.SceneView
 		}
 
 		private void RotateWidgets(Vector2 pivotPoint, List<Widget> widgets, Vector2 curMousePos, Vector2 prevMousePos,
-			bool discret)
+			bool discret, ref float accumAngle, ref float prevAngle)
 		{
+			List<KeyValuePair<Widget, float>> wasRotations = widgets.Select(widget => new KeyValuePair<Widget, float>(widget, widget.Rotation)).ToList();
+
+			float rotationRes = prevAngle;
 			Utils.ApplyTransformationToWidgetsGroupOobb(
 				sv.Scene,
 				widgets, pivotPoint, false, curMousePos, prevMousePos,
@@ -68,9 +75,29 @@ namespace Tangerine.UI.SceneView
 					if (discret) {
 						rotation = Utils.RoundTo(rotation, 15);
 					}
+
+					rotationRes = rotation;
+					
 					return Matrix32.Rotation(rotation * Mathf.DegToRad);
 				}
 			);
+
+			// accumulate rotation, each visual turn of widget will increase it's angle on 360,
+			// without that code angle will be allways [-180; 180)
+			rotationRes %= 360;
+			if (rotationRes < 0) rotationRes+= 360;
+			
+			float rotationDelta = rotationRes - prevAngle;
+			if (rotationDelta < -180) rotationDelta += 360;
+			if (rotationDelta > 180) rotationDelta -= 360;
+			
+			prevAngle = rotationRes;
+
+			accumAngle += rotationDelta;
+
+			foreach (KeyValuePair<Widget,float> wasRotation in wasRotations) {
+				SetAnimableProperty.Perform(wasRotation.Key, nameof(Widget.Rotation), wasRotation.Value + accumAngle);
+			}
 		}
 
 	}
