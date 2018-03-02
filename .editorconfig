@@ -1,0 +1,42 @@
+[*.cs]
+
+// cap_symbols
+
+dotnet_naming_rule.symbols_must_be_capitalized.symbols = cap_symbols
+dotnet_naming_rule.symbols_must_be_capitalized.style = cap_symbols_style
+dotnet_naming_symbols.cap_symbols.applicable_kinds = class,struct,interface,enum,property,method,event,delegate,field
+dotnet_naming_symbols.cap_symbols.applicable_accessibilities = public,internal
+dotnet_naming_style.cap_symbols_style.capitalization = pascal_case
+
+// non_cap_symbols
+
+dotnet_naming_rule.symbols_must_not_be_capitalized.symbols = non_cap_symbols
+dotnet_naming_rule.symbols_must_not_be_capitalized.style = non_cap_symbols_style
+dotnet_naming_symbols.non_cap_symbols.applicable_kinds = field,parameter
+dotnet_naming_symbols.non_cap_symbols.applicable_accessibilities = private,protected
+dotnet_naming_style.non_cap_symbols_style.capitalization = camel_case
+
+// const_cap
+
+dotnet_naming_rule.constants_must_be_capitalized.symbols = const_cap
+dotnet_naming_rule.constants_must_be_capitalized.style = const_cap_style
+dotnet_naming_symbols.const_cap.applicable_kinds = *
+dotnet_naming_symbols.const_cap.applicable_accessibilities = *
+dotnet_naming_symbols.const_cap.required_modifiers = const
+dotnet_naming_style.const_cap_style.capitalization = pascal_case
+
+// interface_i_prefix
+
+dotnet_naming_rule.interfaces_must_be_prefixed_with_i.symbols = interface_i_prefix
+dotnet_naming_rule.interfaces_must_be_prefixed_with_i.style = interface_i_prefix_style
+dotnet_naming_symbols.interface_i_prefix.applicable_kinds = interface
+dotnet_naming_symbols.interface_i_prefix.applicable_accessibilities = *
+dotnet_naming_style.interface_i_prefix_style.required_prefix = I
+
+indent_style = tab
+csharp_new_line_before_open_brace = types,methods,properties
+end_of_line = crlf
+tab_width = 4
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
