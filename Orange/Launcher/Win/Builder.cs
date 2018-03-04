@@ -37,6 +37,11 @@ namespace Launcher
 
 		private string GetMSBuildPath()
 		{
+			var msBuild14Path = Path.Combine(@"C:\Program Files (x86)\MSBuild\14.0\Bin\", "MSBuild.exe");
+			if (File.Exists(msBuild14Path)) {
+				return msBuild14Path;
+			}
+
 			var visualStudioRegistryPath = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\Microsoft\VisualStudio\SxS\VS7");
 			if (visualStudioRegistryPath != null) {
 				var vsPath = visualStudioRegistryPath.GetValue("15.0", string.Empty) as string;
@@ -44,11 +49,6 @@ namespace Launcher
 				if (File.Exists(msBuild15Path)) {
 					return msBuild15Path;
 				}
-			}
-
-			var msBuild14Path = Path.Combine(@"C:\Program Files (x86)\MSBuild\14.0\Bin\", "MSBuild.exe");
-			if (File.Exists(msBuild14Path)) {
-				return msBuild14Path;
 			}
 
 			return null;
