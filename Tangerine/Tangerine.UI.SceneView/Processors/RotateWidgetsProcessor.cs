@@ -84,8 +84,7 @@ namespace Tangerine.UI.SceneView
 
 			// accumulate rotation, each visual turn of widget will increase it's angle on 360,
 			// without that code angle will be allways [-180; 180)
-			rotationRes %= 360;
-			if (rotationRes < 0) rotationRes+= 360;
+			rotationRes = rotationRes.NormalizeRotation();
 			
 			float rotationDelta = rotationRes - prevAngle;
 			if (rotationDelta < -180) rotationDelta += 360;

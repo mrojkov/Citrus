@@ -125,11 +125,16 @@ namespace Tangerine.UI
 
 				Transform2 widgetResultTransform = widget.CalcApplicableTransfrom2(deformedWidgetToParentSpace);
 
+				float rotationDelta = widget.Rotation.NormalizeRotation() - widgetResultTransform.Rotation.NormalizeRotation();
+				// rotationDelta
+				if (rotationDelta < -180) rotationDelta += 360;
+				if (rotationDelta > 180) rotationDelta -= 360;
+
 				if ((widget.Position - widgetResultTransform.Translation).Length > Mathf.ZeroTolerance) {
 					SetAnimableProperty.Perform(widget, nameof(Widget.Position), widgetResultTransform.Translation);
 				}
-				if (Mathf.Abs(widget.Rotation - widgetResultTransform.Rotation) > Mathf.ZeroTolerance) {
-					SetAnimableProperty.Perform(widget, nameof(Widget.Rotation), widgetResultTransform.Rotation);
+				if (Mathf.Abs(rotationDelta) > Mathf.ZeroTolerance) {
+					SetAnimableProperty.Perform(widget, nameof(Widget.Rotation), widget.Rotation + rotationDelta);
 				}
 				if ((widget.Scale - widgetResultTransform.Scale).Length > Mathf.ZeroTolerance) {
 					SetAnimableProperty.Perform(widget, nameof(Widget.Scale), widgetResultTransform.Scale);
@@ -137,6 +142,13 @@ namespace Tangerine.UI
 			}
 		}
 
+		public static float NormalizeRotation(this float rotationGrad)
+		{
+			rotationGrad %= 360;
+			if (rotationGrad < 0) rotationGrad += 360;
+			return rotationGrad;
+		}
+		
 		public static bool CalcHullAndPivot(IEnumerable<Widget> widgets, Widget canvas, out Quadrangle hull, out Vector2 pivot)
 		{
 			Widget first = null;
