@@ -125,11 +125,9 @@ namespace Tangerine.UI
 
 				Transform2 widgetResultTransform = widget.CalcApplicableTransfrom2(deformedWidgetToParentSpace);
 
-				float rotationDelta = widget.Rotation.NormalizeRotation() - widgetResultTransform.Rotation.NormalizeRotation();
 				// correct rotation delta, to prevent wrong values if new angle 0 and previous is 359,
 				// then rotationDelta must be 1
-				if (rotationDelta < -180) rotationDelta += 360;
-				if (rotationDelta > 180) rotationDelta -= 360;
+				float rotationDelta = (widget.Rotation - widgetResultTransform.Rotation).NormalizeRotation();
 
 				if ((widget.Position - widgetResultTransform.Translation).Length > Mathf.ZeroTolerance) {
 					SetAnimableProperty.Perform(widget, nameof(Widget.Position), widgetResultTransform.Translation);
@@ -146,7 +144,8 @@ namespace Tangerine.UI
 		public static float NormalizeRotation(this float rotationGrad)
 		{
 			rotationGrad %= 360;
-			if (rotationGrad < 0) rotationGrad += 360;
+			if (rotationGrad < -180) rotationGrad += 360;
+			if (rotationGrad >= 180) rotationGrad -= 360;
 			return rotationGrad;
 		}
 		
