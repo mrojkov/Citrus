@@ -281,19 +281,13 @@ namespace Tangerine.UI.SceneView
 			var widgetPos = MousePosition * Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
 			Document.Current.History.BeginTransaction();
 			try {
+				List<string> pendingImages = new List<string>();
 				foreach (var file in files) {
 					try {
 						string assetPath, assetType;
 						if (Utils.ExtractAssetPathOrShowAlert(file, out assetPath, out assetType)) {
 							if (assetType == ".png") {
-								var menu = new Menu() {
-									ImageDropCommands.AsImage,
-									ImageDropCommands.AsDistortionMesh,
-									ImageDropCommands.AsNineGrid,
-									ImageDropCommands.AsParticleModifier,
-								};
-								ImageDropCommands.AssetPath = assetPath;
-								menu.Popup();
+								pendingImages.Add(assetPath);
 							} else if (assetType == ".ogg") {
 								var node = Core.Operations.CreateNode.Perform(typeof(Audio));
 								var sample = new SerializableSample(assetPath);
@@ -321,6 +315,17 @@ namespace Tangerine.UI.SceneView
 						AlertDialog.Show(e.Message);
 					}
 				}
+
+				if (pendingImages.Count > 0) {
+					var menu = new Menu() {
+						ImageDropCommands.AsImage,
+						ImageDropCommands.AsDistortionMesh,
+						ImageDropCommands.AsNineGrid,
+						ImageDropCommands.AsParticleModifier,
+					};
+					ImageDropCommands.AssetPaths = pendingImages;
+					menu.Popup();
+				}
 			} finally {
 				Document.Current.History.EndTransaction();
 			}
@@ -340,7 +345,7 @@ namespace Tangerine.UI.SceneView
 				{ AsParticleModifier, typeof(ParticleModifier) },
 			};
 
-			public static string AssetPath;
+			public static List<string> AssetPaths;
 		}
 
 		private void HandleDropImage(float dt)
@@ -349,13 +354,16 @@ namespace Tangerine.UI.SceneView
 				if (kv.Key.WasIssued()) {
 					kv.Key.Consume();
 					Document.Current.History.BeginTransaction();
-					var node = Core.Operations.CreateNode.Perform(kv.Value);
-					var widgetPos = MousePosition * Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
-					var texture = new SerializableTexture(ImageDropCommands.AssetPath);
-					Core.Operations.SetProperty.Perform(node, nameof(Widget.Texture), texture);
-					Core.Operations.SetProperty.Perform(node, nameof(Widget.Position), widgetPos);
-					Core.Operations.SetProperty.Perform(node, nameof(Widget.Pivot), Vector2.Half);
-					Core.Operations.SetProperty.Perform(node, nameof(Widget.Size), (Vector2)texture.ImageSize);
+					foreach (string assetPath in ImageDropCommands.AssetPaths) {
+						var node = Core.Operations.CreateNode.Perform(kv.Value);
+						var widgetPos = MousePosition * Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
+						var texture = new SerializableTexture(assetPath);
+						Core.Operations.SetProperty.Perform(node, nameof(Widget.Texture), texture);
+						Core.Operations.SetProperty.Perform(node, nameof(Widget.Position), widgetPos);
+						Core.Operations.SetProperty.Perform(node, nameof(Widget.Pivot), Vector2.Half);
+						Core.Operations.SetProperty.Perform(node, nameof(Widget.Size), (Vector2)texture.ImageSize);
+						Core.Operations.SetProperty.Perform(node, nameof(Widget.Id), Path.GetFileNameWithoutExtension(assetPath));
+					}
 					Document.Current.History.EndTransaction();
 				} else {
 					kv.Key.Consume();
