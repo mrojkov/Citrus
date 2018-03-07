@@ -3,6 +3,7 @@ using System.ComponentModel.Composition;
 using System.IO;
 using Orange;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Kill3.OrangePlugin
 {
@@ -101,17 +102,14 @@ namespace Kill3.OrangePlugin
 
 		private static string GetGeneratedAppPath(string mtouch)
 		{
-			string[] args = mtouch.Trim().Split(' ');
-			string x;
-			var dev = Array.IndexOf(args, "-dev");
-			if (dev >= 0) {
-				x = args[dev + 1];
-				x = x.Substring(1, x.Length - 2);
+			var pattern = @"(?<q1>""?)-{1,2}dev[ =](?<q2>""?)(?<path>.*?)(\k<q2>)(\k<q1>)( |$)";
+			var match = Regex.Match(mtouch, pattern);
+
+			if (match.Success) {
+				return match.Groups["path"].Value;
 			} else {
-				dev = Array.IndexOf(args, "--dev");
-				x = args[dev + 1];
+				throw new Exception("Failed to parse mtouch args for app path");
 			}
-			return x;
 		}
 
 		static void GenerateUnsignedBinary(string mtouch)
