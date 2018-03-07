@@ -37,7 +37,7 @@ namespace Lime
 			return GetInstance(blending, shaderProgram, texture1, texture2, premulAlpha);
 		}
 
-		internal WidgetMaterial(Blending blending, ShaderProgram shaderProgram, ITexture texture1, ITexture texture2, bool premulAlpha)
+		public WidgetMaterial(Blending blending, ShaderProgram shaderProgram, ITexture texture1, ITexture texture2, bool premulAlpha)
 		{
 			ShaderProgram = shaderProgram;
 			Blending = blending;
