@@ -127,7 +127,7 @@ namespace Tangerine.UI
 
 				// correct rotation delta, to prevent wrong values if new angle 0 and previous is 359,
 				// then rotationDelta must be 1
-				float rotationDelta = (widget.Rotation - widgetResultTransform.Rotation).NormalizeRotation();
+				float rotationDelta = Mathf.Wrap180(widget.Rotation - widgetResultTransform.Rotation);
 
 				if ((widget.Position - widgetResultTransform.Translation).Length > Mathf.ZeroTolerance) {
 					SetAnimableProperty.Perform(widget, nameof(Widget.Position), widgetResultTransform.Translation);
@@ -141,14 +141,6 @@ namespace Tangerine.UI
 			}
 		}
 
-		public static float NormalizeRotation(this float rotationGrad)
-		{
-			rotationGrad %= 360;
-			if (rotationGrad < -180) rotationGrad += 360;
-			if (rotationGrad >= 180) rotationGrad -= 360;
-			return rotationGrad;
-		}
-		
 		public static bool CalcHullAndPivot(IEnumerable<Widget> widgets, Widget canvas, out Quadrangle hull, out Vector2 pivot)
 		{
 			Widget first = null;

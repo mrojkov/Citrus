@@ -106,13 +106,11 @@ namespace Lime
 
 		public static float Wrap180(float angle)
 		{
-			if (angle > 180) {
-				return angle - 2 * (float)Math.Floor(angle * (1.0f / 180.0f)) * 180.0f;
+			angle = (angle + 180) % 360;
+			if (angle < 0) {
+				angle += 360;
 			}
-			if (angle < -180) {
-				return angle - 2 * (float)Math.Ceiling(angle * (1.0f / 180.0f)) * 180.0f;
-			}
-			return angle;
+			return angle - 180;
 		}
 
 		public static float Sqr(float x)
