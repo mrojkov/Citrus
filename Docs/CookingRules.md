@@ -1,11 +1,4 @@
-# Citrus
-
-![](Orange/Logo.png)
-
-Copyright (C) Forest LLC, 2017
-See LICENSE.
-
-## Cooking Rules
+# Cooking Rules
 
 Asset cooking options are set and propagated using cooking rules files. Cooking rules files could be named in two ways:
 1. `#CookingRules.txt`
@@ -16,7 +9,7 @@ In first case cooking rules are applied to all files and directories in current 
 In second case cooking rules are only applied to specified asset file.
 Cooking rules only override concrete rule lines specified.
 
-### Format
+## Format
 
 grammar:
 
@@ -68,7 +61,7 @@ Rule10 Value
 
 There's a list of default targets, which are Win, Mac, iOS, Android and Unity. Other targets are listed in `.citproj` project file.
 
-### Rules
+## Rules
 
 'TextureAtlas'
 'MipMaps'
