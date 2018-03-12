@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>e72754d5-6df7-42f1-9e14-0ef4d1491621</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>EmptyProject.Game</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Application\AppData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Application\Application.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Application\Display.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Application\DisplayInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Application\DisplayInfo.Desktop.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Application\DisplayInfo.Mobile.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Application\SoundManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Debug\Cheats.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Debug\RainbowDash.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dialogs\AlertDialog.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dialogs\Confirmation.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dialogs\Dialog.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dialogs\DialogManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dialogs\GameScreen.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dialogs\MainMenu.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dialogs\Options.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dialogs\ScreenCrossfade.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dialogs\SplashScreen.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Layers.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Logger.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Profile.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)The.cs" />
+  </ItemGroup>
+</Project>

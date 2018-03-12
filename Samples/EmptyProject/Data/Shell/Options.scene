@@ -1,0 +1,770 @@
+"Hot::Scene" {
+	Size [ 1024.00000 768.00000 ]
+	Anchors 15
+	Actors [
+		"Hot::Scene" {
+			Name "Win"
+			Position [ 512.00000 384.00000 ]
+			Scale [ 0.04586 1.00000 ]
+			Pivot [ 0.50000 0.50000 ]
+			Size [ 768.00000 768.00000 ]
+			Color 0x00FFFFFF
+			Anchors 48
+			Animators [
+				"Hot::TypedAnimator<Hot::Color>" {
+					Property "Color@Hot::Graphic"
+					Frames [ 0 3 11 15 ]
+					Attributes [ 0 0 0 0 ]
+					Keys [ 0x00FFFFFF 0xFFFFFFFF 0xFFFFFFFF 0x00FFFFFF ]
+				}
+				"Hot::TypedAnimator<Hot::Vector2>" {
+					Property "Scale@Hot::Graphic"
+					Frames [ 0 3 5 11 15 ]
+					Attributes [ 0 0 0 0 0 ]
+					Keys [ [ 0.04586 1.00000 ] [ 1.00000 1.13575 ] [ 1.00000 1.00000 ] [ 1.00000 1.00000 ] [ 1.00000 0.04586 ] ]
+				}
+			]
+			Actors [
+				"Hot::Button" {
+					Name "@BtnOk"
+					Source "Buttons\\BtnOk.scene"
+					Position [ 555.00000 531.00000 ]
+					Scale [ 0.50000 0.50000 ]
+					Pivot [ 0.50000 0.50000 ]
+					Size [ 256.00000 256.00000 ]
+				}
+				"Hot::Text" {
+					Name "Title"
+					Position [ 388.00000 167.00000 ]
+					Pivot [ 0.50000 0.50000 ]
+					Size [ 462.00000 60.00000 ]
+					FontName "Default"
+					FontSize 66.00000
+					LineIndent -9.00000
+					Text "Options"
+					TextColor 0xFFFEFB00
+					HAlign 1
+					VAlign 1
+				}
+				"Hot::Image" {
+					Name "Line01"
+					Position [ 390.00000 206.00000 ]
+					Scale [ 0.59184 0.59184 ]
+					Pivot [ 0.50000 1.00000 ]
+					Size [ 794.56079 8.00000 ]
+					Color 0xB99D9D9D
+					TexturePath "Windows\\Line02.png"
+				}
+				"Hot::Image" {
+					Name "BarSm"
+					Position [ 389.00000 169.00000 ]
+					Scale [ 0.96947 1.00000 ]
+					Pivot [ 0.50000 0.50000 ]
+					Size [ 485.21146 60.00000 ]
+					Color 0xFFB8E94F
+					TexturePath "Windows\\BarSm.png"
+				}
+				"Hot::Scene" {
+					Name ">[CheckGroup]MusicGroup"
+					Position [ 250.00000 251.00000 ]
+					Pivot [ 0.50000 0.50000 ]
+					Size [ 58.43292 58.43292 ]
+					Actors [
+						"Hot::Scene" {
+							Name "@Check"
+							Position [ 29.21643 32.21643 ]
+							Scale [ 0.88060 0.88060 ]
+							Pivot [ 0.50000 0.50000 ]
+							Size [ 47.39130 47.10146 ]
+							Actors [
+								"Hot::Image" {
+									Name "BulletCheck"
+									Position [ 25.00000 23.00000 ]
+									Scale [ 0.37530 0.37530 ]
+									Pivot [ 0.40171 0.66091 ]
+									Size [ 104.00000 90.00000 ]
+									Color 0x00FFFFFF
+									TexturePath "Buttons\\BulletCheck.png"
+									Animators [
+										"Hot::TypedAnimator<Hot::Color>" {
+											Property "Color@Hot::Graphic"
+											Frames [ 0 3 5 20 23 25 ]
+											Attributes [ 0 0 0 0 0 0 ]
+											Keys [ 0x00FFFFFF 0xFFFFFFFF 0xFFFFFFFF 0xFFFFFFFF 0xFFFFFFFF 0x00FFFFFF ]
+										}
+										"Hot::TypedAnimator<Hot::Vector2>" {
+											Property "Scale@Hot::Graphic"
+											Frames [ 0 3 5 20 23 25 ]
+											Attributes [ 0 0 0 0 0 0 ]
+											Keys [ [ 0.37530 0.37530 ] [ 1.01449 1.01449 ] [ 0.78261 0.78261 ] [ 0.78261 0.78261 ] [ 1.01449 1.01449 ] [ 0.37530 0.37530 ] ]
+										}
+									]
+								}
+							]
+							Markers [
+								"Hot::Marker" {
+									Name "Check"
+								}
+								"Hot::Marker" {
+									Name "Checked"
+									Frame 5
+									Command 1
+								}
+								"Hot::Marker" {
+									Name "Uncheck"
+									Frame 20
+								}
+								"Hot::Marker" {
+									Name "Unchecked"
+									Frame 25
+									Command 1
+								}
+							]
+						}
+						"Hot::Text" {
+							Name "Text"
+							Position [ 66.00000 29.00000 ]
+							Pivot [ 0.00000 0.50000 ]
+							Size [ 197.33325 55.00000 ]
+							Color 0xFF814D1B
+							FontName "Default"
+							FontSize 41.00000
+							LineIndent -14.00000
+							Text "Music"
+							TextColor 0xFFFFFFFF
+							VAlign 1
+						}
+						"Hot::Button" {
+							Name "@BtnCheck"
+							Trigger "Init"
+							Position [ 114.00000 29.00000 ]
+							Pivot [ 0.50000 0.50000 ]
+							Size [ 226.00000 58.00000 ]
+							Anchors 15
+							Actors [
+								"Hot::NineGrid" {
+									Name "NineGrid2"
+									Position [ 29.21646 29.21646 ]
+									Scale [ 1.12371 1.12371 ]
+									Pivot [ 0.50000 0.50000 ]
+									Size [ 52.00000 52.00000 ]
+									Color 0xFF419224
+									TexturePath "Buttons\\BulletMicroFrame.png"
+									LeftOffset 0.40000
+									TopOffset 0.40000
+									RightOffset 0.40000
+									BottomOffset 0.40000
+									Animators [
+										"Hot::TypedAnimator<Hot::Vector2>" {
+											Property "Scale@Hot::Graphic"
+											Frames [ 19 20 21 23 ]
+											Attributes [ 0 0 0 0 ]
+											Keys [ [ 1.12371 1.12371 ] [ 0.98909 0.82834 ] [ 0.98909 0.82834 ] [ 1.12371 1.12371 ] ]
+										}
+									]
+								}
+							]
+							Markers [
+								"Hot::Marker" {
+									Name "Init"
+									Command 1
+								}
+								"Hot::Marker" {
+									Name "Normal"
+									Frame 5
+								}
+								"Hot::Marker" {
+									Frame 10
+									Command 1
+								}
+								"Hot::Marker" {
+									Name "Focus"
+									Frame 12
+								}
+								"Hot::Marker" {
+									Frame 17
+									Command 1
+								}
+								"Hot::Marker" {
+									Name "Press"
+									Frame 19
+								}
+								"Hot::Marker" {
+									Frame 20
+									Command 1
+								}
+								"Hot::Marker" {
+									Name "Release"
+									Frame 21
+								}
+								"Hot::Marker" {
+									Frame 23
+									Command 1
+								}
+								"Hot::Marker" {
+									Name "Disable"
+									Frame 27
+									Command 1
+								}
+							]
+						}
+					]
+				}
+				"Hot::Scene" {
+					Name ">[CheckGroup]SoundGroup"
+					Position [ 250.00000 320.00000 ]
+					Pivot [ 0.50000 0.50000 ]
+					Size [ 58.43292 58.43292 ]
+					Actors [
+						"Hot::Scene" {
+							Name "@Check"
+							Position [ 29.21643 32.21643 ]
+							Scale [ 0.88060 0.88060 ]
+							Pivot [ 0.50000 0.50000 ]
+							Size [ 47.39130 47.10146 ]
+							Actors [
+								"Hot::Image" {
+									Name "BulletCheck"
+									Position [ 25.00000 23.00000 ]
+									Scale [ 0.37530 0.37530 ]
+									Pivot [ 0.40171 0.66091 ]
+									Size [ 104.00000 90.00000 ]
+									Color 0x00FFFFFF
+									TexturePath "Buttons\\BulletCheck.png"
+									Animators [
+										"Hot::TypedAnimator<Hot::Color>" {
+											Property "Color@Hot::Graphic"
+											Frames [ 0 3 5 20 23 25 ]
+											Attributes [ 0 0 0 0 0 0 ]
+											Keys [ 0x00FFFFFF 0xFFFFFFFF 0xFFFFFFFF 0xFFFFFFFF 0xFFFFFFFF 0x00FFFFFF ]
+										}
+										"Hot::TypedAnimator<Hot::Vector2>" {
+											Property "Scale@Hot::Graphic"
+											Frames [ 0 3 5 20 23 25 ]
+											Attributes [ 0 0 0 0 0 0 ]
+											Keys [ [ 0.37530 0.37530 ] [ 1.01449 1.01449 ] [ 0.78261 0.78261 ] [ 0.78261 0.78261 ] [ 1.01449 1.01449 ] [ 0.37530 0.37530 ] ]
+										}
+									]
+								}
+							]
+							Markers [
+								"Hot::Marker" {
+									Name "Check"
+								}
+								"Hot::Marker" {
+									Name "Checked"
+									Frame 5
+									Command 1
+								}
+								"Hot::Marker" {
+									Name "Uncheck"
+									Frame 20
+								}
+								"Hot::Marker" {
+									Name "Unchecked"
+									Frame 25
+									Command 1
+								}
+							]
+						}
+						"Hot::Text" {
+							Name "Text"
+							Position [ 66.00000 29.00000 ]
+							Pivot [ 0.00000 0.50000 ]
+							Size [ 197.33325 55.00000 ]
+							Color 0xFF814D1B
+							FontName "Default"
+							FontSize 41.00000
+							LineIndent -14.00000
+							Text "Sound"
+							TextColor 0xFFFFFFFF
+							VAlign 1
+						}
+						"Hot::Button" {
+							Name "@BtnCheck"
+							Trigger "Init"
+							Position [ 114.00000 29.00000 ]
+							Pivot [ 0.50000 0.50000 ]
+							Size [ 226.00000 58.00000 ]
+							Anchors 15
+							Actors [
+								"Hot::NineGrid" {
+									Name "NineGrid2"
+									Position [ 29.21646 29.21646 ]
+									Scale [ 1.12371 1.12371 ]
+									Pivot [ 0.50000 0.50000 ]
+									Size [ 52.00000 52.00000 ]
+									Color 0xFF419224
+									TexturePath "Buttons\\BulletMicroFrame.png"
+									LeftOffset 0.40000
+									TopOffset 0.40000
+									RightOffset 0.40000
+									BottomOffset 0.40000
+									Animators [
+										"Hot::TypedAnimator<Hot::Vector2>" {
+											Property "Scale@Hot::Graphic"
+											Frames [ 19 20 21 23 ]
+											Attributes [ 0 0 0 0 ]
+											Keys [ [ 1.12371 1.12371 ] [ 0.98909 0.82834 ] [ 0.98909 0.82834 ] [ 1.12371 1.12371 ] ]
+										}
+									]
+								}
+							]
+							Markers [
+								"Hot::Marker" {
+									Name "Init"
+									Command 1
+								}
+								"Hot::Marker" {
+									Name "Normal"
+									Frame 5
+								}
+								"Hot::Marker" {
+									Frame 10
+									Command 1
+								}
+								"Hot::Marker" {
+									Name "Focus"
+									Frame 12
+								}
+								"Hot::Marker" {
+									Frame 17
+									Command 1
+								}
+								"Hot::Marker" {
+									Name "Press"
+									Frame 19
+								}
+								"Hot::Marker" {
+									Frame 20
+									Command 1
+								}
+								"Hot::Marker" {
+									Name "Release"
+									Frame 21
+								}
+								"Hot::Marker" {
+									Frame 23
+									Command 1
+								}
+								"Hot::Marker" {
+									Name "Disable"
+									Frame 27
+									Command 1
+								}
+							]
+						}
+					]
+				}
+				"Hot::Scene" {
+					Name ">[CheckGroup]VoiceGroup"
+					Position [ 250.00000 389.00000 ]
+					Pivot [ 0.50000 0.50000 ]
+					Size [ 58.43292 58.43292 ]
+					Actors [
+						"Hot::Scene" {
+							Name "@Check"
+							Position [ 29.21643 32.21643 ]
+							Scale [ 0.88060 0.88060 ]
+							Pivot [ 0.50000 0.50000 ]
+							Size [ 47.39130 47.10146 ]
+							Actors [
+								"Hot::Image" {
+									Name "BulletCheck"
+									Position [ 25.00000 23.00000 ]
+									Scale [ 0.37530 0.37530 ]
+									Pivot [ 0.40171 0.66091 ]
+									Size [ 104.00000 90.00000 ]
+									Color 0x00FFFFFF
+									TexturePath "Buttons\\BulletCheck.png"
+									Animators [
+										"Hot::TypedAnimator<Hot::Color>" {
+											Property "Color@Hot::Graphic"
+											Frames [ 0 3 5 20 23 25 ]
+											Attributes [ 0 0 0 0 0 0 ]
+											Keys [ 0x00FFFFFF 0xFFFFFFFF 0xFFFFFFFF 0xFFFFFFFF 0xFFFFFFFF 0x00FFFFFF ]
+										}
+										"Hot::TypedAnimator<Hot::Vector2>" {
+											Property "Scale@Hot::Graphic"
+											Frames [ 0 3 5 20 23 25 ]
+											Attributes [ 0 0 0 0 0 0 ]
+											Keys [ [ 0.37530 0.37530 ] [ 1.01449 1.01449 ] [ 0.78261 0.78261 ] [ 0.78261 0.78261 ] [ 1.01449 1.01449 ] [ 0.37530 0.37530 ] ]
+										}
+									]
+								}
+							]
+							Markers [
+								"Hot::Marker" {
+									Name "Check"
+								}
+								"Hot::Marker" {
+									Name "Checked"
+									Frame 5
+									Command 1
+								}
+								"Hot::Marker" {
+									Name "Uncheck"
+									Frame 20
+								}
+								"Hot::Marker" {
+									Name "Unchecked"
+									Frame 25
+									Command 1
+								}
+							]
+						}
+						"Hot::Text" {
+							Name "Text"
+							Position [ 66.00000 29.00000 ]
+							Pivot [ 0.00000 0.50000 ]
+							Size [ 197.33325 55.00000 ]
+							Color 0xFF814D1B
+							FontName "Default"
+							FontSize 41.00000
+							LineIndent -14.00000
+							Text "Voice"
+							TextColor 0xFFFFFFFF
+							VAlign 1
+						}
+						"Hot::Button" {
+							Name "@BtnCheck"
+							Trigger "Init"
+							Position [ 114.00000 29.00000 ]
+							Pivot [ 0.50000 0.50000 ]
+							Size [ 226.00000 58.00000 ]
+							Anchors 15
+							Actors [
+								"Hot::NineGrid" {
+									Name "NineGrid2"
+									Position [ 29.21646 29.21646 ]
+									Scale [ 1.12371 1.12371 ]
+									Pivot [ 0.50000 0.50000 ]
+									Size [ 52.00000 52.00000 ]
+									Color 0xFF419224
+									TexturePath "Buttons\\BulletMicroFrame.png"
+									LeftOffset 0.40000
+									TopOffset 0.40000
+									RightOffset 0.40000
+									BottomOffset 0.40000
+									Animators [
+										"Hot::TypedAnimator<Hot::Vector2>" {
+											Property "Scale@Hot::Graphic"
+											Frames [ 19 20 21 23 ]
+											Attributes [ 0 0 0 0 ]
+											Keys [ [ 1.12371 1.12371 ] [ 0.98909 0.82834 ] [ 0.98909 0.82834 ] [ 1.12371 1.12371 ] ]
+										}
+									]
+								}
+							]
+							Markers [
+								"Hot::Marker" {
+									Name "Init"
+									Command 1
+								}
+								"Hot::Marker" {
+									Name "Normal"
+									Frame 5
+								}
+								"Hot::Marker" {
+									Frame 10
+									Command 1
+								}
+								"Hot::Marker" {
+									Name "Focus"
+									Frame 12
+								}
+								"Hot::Marker" {
+									Frame 17
+									Command 1
+								}
+								"Hot::Marker" {
+									Name "Press"
+									Frame 19
+								}
+								"Hot::Marker" {
+									Frame 20
+									Command 1
+								}
+								"Hot::Marker" {
+									Name "Release"
+									Frame 21
+								}
+								"Hot::Marker" {
+									Frame 23
+									Command 1
+								}
+								"Hot::Marker" {
+									Name "Disable"
+									Frame 27
+									Command 1
+								}
+							]
+						}
+					]
+				}
+				"Hot::Scene" {
+					Name ">[CheckGroup]FullScreenGroup"
+					Position [ 250.00000 458.00000 ]
+					Pivot [ 0.50000 0.50000 ]
+					Size [ 58.43292 58.43292 ]
+					Actors [
+						"Hot::Scene" {
+							Name "@Check"
+							Position [ 29.21643 32.21643 ]
+							Scale [ 0.88060 0.88060 ]
+							Pivot [ 0.50000 0.50000 ]
+							Size [ 47.39130 47.10146 ]
+							Actors [
+								"Hot::Image" {
+									Name "BulletCheck"
+									Position [ 25.00000 23.00000 ]
+									Scale [ 0.37530 0.37530 ]
+									Pivot [ 0.40171 0.66091 ]
+									Size [ 104.00000 90.00000 ]
+									Color 0x00FFFFFF
+									TexturePath "Buttons\\BulletCheck.png"
+									Animators [
+										"Hot::TypedAnimator<Hot::Color>" {
+											Property "Color@Hot::Graphic"
+											Frames [ 0 3 5 20 23 25 ]
+											Attributes [ 0 0 0 0 0 0 ]
+											Keys [ 0x00FFFFFF 0xFFFFFFFF 0xFFFFFFFF 0xFFFFFFFF 0xFFFFFFFF 0x00FFFFFF ]
+										}
+										"Hot::TypedAnimator<Hot::Vector2>" {
+											Property "Scale@Hot::Graphic"
+											Frames [ 0 3 5 20 23 25 ]
+											Attributes [ 0 0 0 0 0 0 ]
+											Keys [ [ 0.37530 0.37530 ] [ 1.01449 1.01449 ] [ 0.78261 0.78261 ] [ 0.78261 0.78261 ] [ 1.01449 1.01449 ] [ 0.37530 0.37530 ] ]
+										}
+									]
+								}
+							]
+							Markers [
+								"Hot::Marker" {
+									Name "Check"
+								}
+								"Hot::Marker" {
+									Name "Checked"
+									Frame 5
+									Command 1
+								}
+								"Hot::Marker" {
+									Name "Uncheck"
+									Frame 20
+								}
+								"Hot::Marker" {
+									Name "Unchecked"
+									Frame 25
+									Command 1
+								}
+							]
+						}
+						"Hot::Text" {
+							Name "Text"
+							Position [ 66.00000 29.00000 ]
+							Pivot [ 0.00000 0.50000 ]
+							Size [ 197.33325 55.00000 ]
+							Color 0xFF814D1B
+							FontName "Default"
+							FontSize 41.00000
+							LineIndent -14.00000
+							Text "Full Screen"
+							TextColor 0xFFFFFFFF
+							VAlign 1
+						}
+						"Hot::Button" {
+							Name "@BtnCheck"
+							Trigger "Init"
+							Position [ 114.00000 29.00000 ]
+							Pivot [ 0.50000 0.50000 ]
+							Size [ 226.00000 58.00000 ]
+							Anchors 15
+							Actors [
+								"Hot::NineGrid" {
+									Name "NineGrid2"
+									Position [ 29.21646 29.21646 ]
+									Scale [ 1.12371 1.12371 ]
+									Pivot [ 0.50000 0.50000 ]
+									Size [ 52.00000 52.00000 ]
+									Color 0xFF419224
+									TexturePath "Buttons\\BulletMicroFrame.png"
+									LeftOffset 0.40000
+									TopOffset 0.40000
+									RightOffset 0.40000
+									BottomOffset 0.40000
+									Animators [
+										"Hot::TypedAnimator<Hot::Vector2>" {
+											Property "Scale@Hot::Graphic"
+											Frames [ 19 20 21 23 ]
+											Attributes [ 0 0 0 0 ]
+											Keys [ [ 1.12371 1.12371 ] [ 0.98909 0.82834 ] [ 0.98909 0.82834 ] [ 1.12371 1.12371 ] ]
+										}
+									]
+								}
+							]
+							Markers [
+								"Hot::Marker" {
+									Name "Init"
+									Command 1
+								}
+								"Hot::Marker" {
+									Name "Normal"
+									Frame 5
+								}
+								"Hot::Marker" {
+									Frame 10
+									Command 1
+								}
+								"Hot::Marker" {
+									Name "Focus"
+									Frame 12
+								}
+								"Hot::Marker" {
+									Frame 17
+									Command 1
+								}
+								"Hot::Marker" {
+									Name "Press"
+									Frame 19
+								}
+								"Hot::Marker" {
+									Frame 20
+									Command 1
+								}
+								"Hot::Marker" {
+									Name "Release"
+									Frame 21
+								}
+								"Hot::Marker" {
+									Frame 23
+									Command 1
+								}
+								"Hot::Marker" {
+									Name "Disable"
+									Frame 27
+									Command 1
+								}
+							]
+						}
+					]
+				}
+				"Hot::Image" {
+					Name "WinSmall"
+					Position [ 389.00000 371.00000 ]
+					Pivot [ 0.50000 0.50000 ]
+					Size [ 512.00000 512.00000 ]
+					TexturePath "Windows\\WinSmall.png"
+				}
+			]
+		}
+		"Hot::Image" {
+			Name "Shade"
+			Position [ 512.00000 384.00000 ]
+			Pivot [ 0.50000 0.50000 ]
+			Size [ 1556.00000 1366.00000 ]
+			Color 0x00329BCC
+			BlendMode 7
+			Anchors 48
+			Animators [
+				"Hot::TypedAnimator<Hot::Color>" {
+					Property "Color@Hot::Graphic"
+					Frames [ 0 3 11 15 ]
+					Attributes [ 0 0 0 0 ]
+					Keys [ 0x00329BCC 0xC8329BCC 0xC8329BCC 0x00329BCC ]
+				}
+			]
+		}
+	]
+	Markers [
+		"Hot::Marker" {
+			Name "Show"
+		}
+		"Hot::Marker" {
+			Frame 5
+			Command 1
+		}
+		"Hot::Marker" {
+			Name "Hide"
+			Frame 11
+		}
+		"Hot::Marker" {
+			Frame 15
+			Command 1
+		}
+	]
+}
+{8069CDD4-F02F-4981-A3CB-A0BAD4018D00}
+/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRof
+Hh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwh
+MjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAAR
+CABwAJYDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAA
+AgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkK
+FhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWG
+h4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl
+5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREA
+AgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYk
+NOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOE
+hYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk
+5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDgaKKK9M8UK6Dw5p9hqFvdreWl3KyMhSS1
+ViwznIOAR6dRn3rn67PwQ5Sy1LaSDui6H/ermxdZ0KMqi6GtGKlOzHy+GtI85DFba15Y++Gg
+Yk8HGPk4+bb+GabPoWltZSEafqSXQMhQQxPtbJYoDuB6Db6d/rXRedJ/fb86TzZP77fnXgf2
+9L+T8Tr9hE85/sTVf+gddf8Afpv8KP7E1T/oHXX/AH6b/CvRvNf++351as08yKZ8GWVSoSMs
+QOc5Y89Bj9aJ8Rciu4fiJYSLdrnn2kaI5vGGp6de/ZzGwBSJ8q3YjFbj+GvD4HyprTHPTyG9
+D/seuPyPtXXS2tsoLtcMquTs2y8cccDkkbs8+neny2dqu9FkYPuO1TOMkDtnoOoPOelc74oi
+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
+7H2fUp0UUV7pxBRRRQB//9k=
+ 

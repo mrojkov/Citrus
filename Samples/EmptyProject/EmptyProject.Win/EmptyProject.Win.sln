@@ -1,0 +1,100 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lime.Win", "..\..\Citrus\Lime\Lime.Win.csproj", "{FC2DE6C9-641A-4230-8D29-EA4035CD8708}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lemon.Win", "..\..\Citrus\Lemon\Lemon.Win.csproj", "{538E41E4-725C-4521-BCF3-A5591A1A3AFD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmptyProject.Win", "EmptyProject.Win.csproj", "{87884330-1A04-4008-9D2F-05585F4C7E05}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yuzu", "..\..\Citrus\Yuzu\Yuzu.csproj", "{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicFont.Win", "..\..\Citrus\Lime\Extensions\DynamicFont\DynamicFont.Win.csproj", "{FE8512BC-7A55-425C-8BC1-AD4D9785CF12}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "EmptyProject.Game", "..\EmptyProject.Game\EmptyProject.Game.shproj", "{E72754D5-6DF7-42F1-9E14-0EF4D1491621}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmptyProject.GeneratedScenes.Win", "..\EmptyProject.GeneratedScenes\EmptyProject.GeneratedScenes.Win.csproj", "{6270D842-8DB1-47E0-8168-FB8D03D405FF}"
+EndProject
+Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		..\EmptyProject.Game\EmptyProject.Game.projitems*{87884330-1a04-4008-9d2f-05585f4c7e05}*SharedItemsImports = 4
+		..\EmptyProject.Game\EmptyProject.Game.projitems*{e72754d5-6df7-42f1-9e14-0ef4d1491621}*SharedItemsImports = 13
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FC2DE6C9-641A-4230-8D29-EA4035CD8708}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC2DE6C9-641A-4230-8D29-EA4035CD8708}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC2DE6C9-641A-4230-8D29-EA4035CD8708}.Debug|x86.ActiveCfg = Debug|x86
+		{FC2DE6C9-641A-4230-8D29-EA4035CD8708}.Debug|x86.Build.0 = Debug|x86
+		{FC2DE6C9-641A-4230-8D29-EA4035CD8708}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC2DE6C9-641A-4230-8D29-EA4035CD8708}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC2DE6C9-641A-4230-8D29-EA4035CD8708}.Release|x86.ActiveCfg = Release|x86
+		{FC2DE6C9-641A-4230-8D29-EA4035CD8708}.Release|x86.Build.0 = Release|x86
+		{538E41E4-725C-4521-BCF3-A5591A1A3AFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{538E41E4-725C-4521-BCF3-A5591A1A3AFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{538E41E4-725C-4521-BCF3-A5591A1A3AFD}.Debug|x86.ActiveCfg = Debug|x86
+		{538E41E4-725C-4521-BCF3-A5591A1A3AFD}.Debug|x86.Build.0 = Debug|x86
+		{538E41E4-725C-4521-BCF3-A5591A1A3AFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{538E41E4-725C-4521-BCF3-A5591A1A3AFD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{538E41E4-725C-4521-BCF3-A5591A1A3AFD}.Release|x86.ActiveCfg = Release|x86
+		{538E41E4-725C-4521-BCF3-A5591A1A3AFD}.Release|x86.Build.0 = Release|x86
+		{87884330-1A04-4008-9D2F-05585F4C7E05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87884330-1A04-4008-9D2F-05585F4C7E05}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87884330-1A04-4008-9D2F-05585F4C7E05}.Debug|x86.ActiveCfg = Debug|x86
+		{87884330-1A04-4008-9D2F-05585F4C7E05}.Debug|x86.Build.0 = Debug|x86
+		{87884330-1A04-4008-9D2F-05585F4C7E05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87884330-1A04-4008-9D2F-05585F4C7E05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{87884330-1A04-4008-9D2F-05585F4C7E05}.Release|x86.ActiveCfg = Release|x86
+		{87884330-1A04-4008-9D2F-05585F4C7E05}.Release|x86.Build.0 = Release|x86
+		{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}.Debug|x86.Build.0 = Debug|Any CPU
+		{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}.Release|x86.ActiveCfg = Release|Any CPU
+		{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}.Release|x86.Build.0 = Release|Any CPU
+		{FE8512BC-7A55-425C-8BC1-AD4D9785CF12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE8512BC-7A55-425C-8BC1-AD4D9785CF12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE8512BC-7A55-425C-8BC1-AD4D9785CF12}.Debug|x86.ActiveCfg = Debug|x86
+		{FE8512BC-7A55-425C-8BC1-AD4D9785CF12}.Debug|x86.Build.0 = Debug|x86
+		{FE8512BC-7A55-425C-8BC1-AD4D9785CF12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE8512BC-7A55-425C-8BC1-AD4D9785CF12}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE8512BC-7A55-425C-8BC1-AD4D9785CF12}.Release|x86.ActiveCfg = Release|x86
+		{FE8512BC-7A55-425C-8BC1-AD4D9785CF12}.Release|x86.Build.0 = Release|x86
+		{6270D842-8DB1-47E0-8168-FB8D03D405FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6270D842-8DB1-47E0-8168-FB8D03D405FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6270D842-8DB1-47E0-8168-FB8D03D405FF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6270D842-8DB1-47E0-8168-FB8D03D405FF}.Debug|x86.Build.0 = Debug|Any CPU
+		{6270D842-8DB1-47E0-8168-FB8D03D405FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6270D842-8DB1-47E0-8168-FB8D03D405FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6270D842-8DB1-47E0-8168-FB8D03D405FF}.Release|x86.ActiveCfg = Release|Any CPU
+		{6270D842-8DB1-47E0-8168-FB8D03D405FF}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		        StartupItem = EmptyProject.Win.csproj
+		        Policies = $0
+		        $0.TextStylePolicy = $1
+		        $1.FileWidth = 120
+		        $1.TabsToSpaces = False
+		        $1.inheritsSet = VisualStudio
+		        $1.inheritsScope = text/plain
+		        $1.scope = text/x-csharp
+		        $0.CSharpFormattingPolicy = $2
+		        $2.inheritsSet = Mono
+		        $2.inheritsScope = text/x-csharp
+		        $2.scope = text/x-csharp
+		        $1.DirectoryNamespaceAssociation = None
+		        $1.ResourceNamePolicy = FileFormatDefault
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,79 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmptyProject.Android", "EmptyProject.Android.csproj", "{46B5FF2E-5ED1-42FE-A557-2CDB3C485291}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lime.Android", "..\..\Citrus\Lime\Lime.Android.csproj", "{72E2DDBB-C320-4356-89EC-BDED6036D29B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lemon.Android", "..\..\Citrus\Lemon\Lemon.Android.csproj", "{B4435A5F-51DA-42BA-9315-61691A5F58AC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assets.Android", "Assets\Assets.Android.csproj", "{1C601E58-2EF5-462E-86CB-B7443A410FC5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yuzu.Android", "..\..\Citrus\Yuzu\Yuzu.Android.csproj", "{CF150772-5F4A-453C-91BD-D52901174B4E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicFont.Android", "..\..\Citrus\Lime\Extensions\DynamicFont\DynamicFont.Android.csproj", "{B305434E-2233-4F9E-9815-577DF6F9A737}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "EmptyProject.Game", "..\EmptyProject.Game\EmptyProject.Game.shproj", "{E72754D5-6DF7-42F1-9E14-0EF4D1491621}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmptyProject.GeneratedScenes.Android", "..\EmptyProject.GeneratedScenes\EmptyProject.GeneratedScenes.Android.csproj", "{CF150772-5F4A-453C-91BD-D52911174B4E}"
+EndProject
+Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		..\EmptyProject.Game\EmptyProject.Game.projitems*{46b5ff2e-5ed1-42fe-a557-2cdb3c485291}*SharedItemsImports = 4
+		..\EmptyProject.Game\EmptyProject.Game.projitems*{e72754d5-6df7-42f1-9e14-0ef4d1491621}*SharedItemsImports = 13
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{46B5FF2E-5ED1-42FE-A557-2CDB3C485291}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46B5FF2E-5ED1-42FE-A557-2CDB3C485291}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46B5FF2E-5ED1-42FE-A557-2CDB3C485291}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{46B5FF2E-5ED1-42FE-A557-2CDB3C485291}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46B5FF2E-5ED1-42FE-A557-2CDB3C485291}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46B5FF2E-5ED1-42FE-A557-2CDB3C485291}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{72E2DDBB-C320-4356-89EC-BDED6036D29B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72E2DDBB-C320-4356-89EC-BDED6036D29B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72E2DDBB-C320-4356-89EC-BDED6036D29B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72E2DDBB-C320-4356-89EC-BDED6036D29B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4435A5F-51DA-42BA-9315-61691A5F58AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4435A5F-51DA-42BA-9315-61691A5F58AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4435A5F-51DA-42BA-9315-61691A5F58AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4435A5F-51DA-42BA-9315-61691A5F58AC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C601E58-2EF5-462E-86CB-B7443A410FC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C601E58-2EF5-462E-86CB-B7443A410FC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C601E58-2EF5-462E-86CB-B7443A410FC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C601E58-2EF5-462E-86CB-B7443A410FC5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF150772-5F4A-453C-91BD-D52901174B4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF150772-5F4A-453C-91BD-D52901174B4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF150772-5F4A-453C-91BD-D52901174B4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF150772-5F4A-453C-91BD-D52901174B4E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B305434E-2233-4F9E-9815-577DF6F9A737}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B305434E-2233-4F9E-9815-577DF6F9A737}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B305434E-2233-4F9E-9815-577DF6F9A737}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B305434E-2233-4F9E-9815-577DF6F9A737}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF150772-5F4A-453C-91BD-D52911174B4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF150772-5F4A-453C-91BD-D52911174B4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF150772-5F4A-453C-91BD-D52911174B4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF150772-5F4A-453C-91BD-D52911174B4E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		Policies = $0
+		$0.TextStylePolicy = $1
+		$1.FileWidth = 120
+		$1.TabsToSpaces = False
+		$1.inheritsSet = VisualStudio
+		$1.inheritsScope = text/plain
+		$1.scope = text/x-csharp
+		$0.CSharpFormattingPolicy = $2
+		$2.inheritsSet = Mono
+		$2.inheritsScope = text/x-csharp
+		$2.scope = text/x-csharp
+	EndGlobalSection
+EndGlobal

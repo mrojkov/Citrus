@@ -1,0 +1,1584 @@
+"Hot::Font" {
+	Characters [
+		"Hot::FontChar" {
+			CharCode 48
+			TexPosition [ 0 2 ]
+			TexSize [ 23 50 ]
+			ACWidths [ 3 3 ]
+		}
+		"Hot::FontChar" {
+			CharCode 49
+			TexPosition [ 23 2 ]
+			TexSize [ 23 50 ]
+			ACWidths [ 3 3 ]
+		}
+		"Hot::FontChar" {
+			CharCode 50
+			TexPosition [ 46 2 ]
+			TexSize [ 23 50 ]
+			ACWidths [ 2 4 ]
+		}
+		"Hot::FontChar" {
+			CharCode 51
+			TexPosition [ 69 2 ]
+			TexSize [ 24 50 ]
+			ACWidths [ 2 3 ]
+		}
+		"Hot::FontChar" {
+			CharCode 52
+			TexPosition [ 93 2 ]
+			TexSize [ 21 50 ]
+			ACWidths [ 3 5 ]
+		}
+		"Hot::FontChar" {
+			CharCode 53
+			TexPosition [ 114 2 ]
+			TexSize [ 23 50 ]
+			ACWidths [ 2 4 ]
+		}
+		"Hot::FontChar" {
+			CharCode 54
+			TexPosition [ 137 2 ]
+			TexSize [ 24 50 ]
+			ACWidths [ 3 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 55
+			TexPosition [ 161 2 ]
+			TexSize [ 23 50 ]
+			ACWidths [ 2 4 ]
+		}
+		"Hot::FontChar" {
+			CharCode 56
+			TexPosition [ 184 2 ]
+			TexSize [ 22 50 ]
+			ACWidths [ 3 4 ]
+		}
+		"Hot::FontChar" {
+			CharCode 57
+			TexPosition [ 206 2 ]
+			TexSize [ 22 50 ]
+			ACWidths [ 4 3 ]
+		}
+		"Hot::FontChar" {
+			CharCode 65
+			TexPosition [ 228 2 ]
+			TexSize [ 35 50 ]
+			ACWidths [ -3 -3 ]
+		}
+		"Hot::FontChar" {
+			CharCode 66
+			TexPosition [ 263 2 ]
+			TexSize [ 28 50 ]
+			ACWidths [ 0 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 67
+			TexPosition [ 291 2 ]
+			TexSize [ 27 50 ]
+			ACWidths [ 1 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 68
+			TexPosition [ 318 2 ]
+			TexSize [ 28 50 ]
+			ACWidths [ 1 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 69
+			TexPosition [ 346 2 ]
+			TexSize [ 27 50 ]
+			ACWidths [ 0 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 70
+			TexPosition [ 373 2 ]
+			TexSize [ 27 50 ]
+			ACWidths [ 2 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 71
+			TexPosition [ 400 2 ]
+			TexSize [ 28 50 ]
+			ACWidths [ 1 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 72
+			TexPosition [ 428 2 ]
+			TexSize [ 29 50 ]
+			ACWidths [ 0 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 73
+			TexPosition [ 457 2 ]
+			TexSize [ 22 50 ]
+			ACWidths [ 3 4 ]
+		}
+		"Hot::FontChar" {
+			CharCode 74
+			TexPosition [ 479 2 ]
+			TexSize [ 28 50 ]
+			ACWidths [ 2 -1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 75
+			TexPosition [ 507 2 ]
+			TexSize [ 30 50 ]
+			ACWidths [ 0 -1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 76
+			TexPosition [ 537 2 ]
+			TexSize [ 27 50 ]
+			ACWidths [ 1 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 77
+			TexPosition [ 564 2 ]
+			TexSize [ 34 50 ]
+			ACWidths [ -3 -2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 78
+			TexPosition [ 0 56 ]
+			TexSize [ 31 50 ]
+			ACWidths [ -1 -1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 79
+			TexPosition [ 31 56 ]
+			TexSize [ 28 50 ]
+			ACWidths [ 1 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 80
+			TexPosition [ 59 56 ]
+			TexSize [ 26 50 ]
+			ACWidths [ 2 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 81
+			TexPosition [ 85 56 ]
+			TexSize [ 29 50 ]
+			ACWidths [ 1 -1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 82
+			TexPosition [ 114 56 ]
+			TexSize [ 30 50 ]
+			ACWidths [ 0 -1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 83
+			TexPosition [ 144 56 ]
+			TexSize [ 24 50 ]
+			ACWidths [ 2 3 ]
+		}
+		"Hot::FontChar" {
+			CharCode 84
+			TexPosition [ 168 56 ]
+			TexSize [ 26 50 ]
+			ACWidths [ 1 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 85
+			TexPosition [ 194 56 ]
+			TexSize [ 31 50 ]
+			ACWidths [ -1 -1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 86
+			TexPosition [ 225 56 ]
+			TexSize [ 34 50 ]
+			ACWidths [ -3 -2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 87
+			TexPosition [ 259 56 ]
+			TexSize [ 31 50 ]
+			ACWidths [ -1 -1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 88
+			TexPosition [ 290 56 ]
+			TexSize [ 30 50 ]
+			ACWidths [ -1 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 89
+			TexPosition [ 320 56 ]
+			TexSize [ 28 50 ]
+			ACWidths [ 1 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 90
+			TexPosition [ 348 56 ]
+			TexSize [ 23 50 ]
+			ACWidths [ 3 3 ]
+		}
+		"Hot::FontChar" {
+			CharCode 97
+			TexPosition [ 371 56 ]
+			TexSize [ 27 50 ]
+			ACWidths [ 1 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 98
+			TexPosition [ 398 56 ]
+			TexSize [ 29 50 ]
+			ACWidths [ -1 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 99
+			TexPosition [ 427 56 ]
+			TexSize [ 26 50 ]
+			ACWidths [ 2 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 100
+			TexPosition [ 453 56 ]
+			TexSize [ 29 50 ]
+			ACWidths [ 1 -1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 101
+			TexPosition [ 482 56 ]
+			TexSize [ 26 50 ]
+			ACWidths [ 1 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 102
+			TexPosition [ 508 56 ]
+			TexSize [ 25 50 ]
+			ACWidths [ 3 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 103
+			TexPosition [ 533 56 ]
+			TexSize [ 28 50 ]
+			ACWidths [ 1 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 104
+			TexPosition [ 561 56 ]
+			TexSize [ 29 50 ]
+			ACWidths [ 0 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 105
+			TexPosition [ 0 110 ]
+			TexSize [ 24 50 ]
+			ACWidths [ 2 3 ]
+		}
+		"Hot::FontChar" {
+			CharCode 106
+			TexPosition [ 24 110 ]
+			TexSize [ 19 50 ]
+			ACWidths [ 2 8 ]
+		}
+		"Hot::FontChar" {
+			CharCode 107
+			TexPosition [ 43 110 ]
+			TexSize [ 27 50 ]
+			ACWidths [ 2 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 108
+			TexPosition [ 70 110 ]
+			TexSize [ 24 50 ]
+			ACWidths [ 2 3 ]
+		}
+		"Hot::FontChar" {
+			CharCode 109
+			TexPosition [ 94 110 ]
+			TexSize [ 34 50 ]
+			ACWidths [ -3 -2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 110
+			TexPosition [ 128 110 ]
+			TexSize [ 29 50 ]
+			ACWidths [ 0 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 111
+			TexPosition [ 157 110 ]
+			TexSize [ 26 50 ]
+			ACWidths [ 1 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 112
+			TexPosition [ 183 110 ]
+			TexSize [ 29 50 ]
+			ACWidths [ -1 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 113
+			TexPosition [ 212 110 ]
+			TexSize [ 29 50 ]
+			ACWidths [ 1 -1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 114
+			TexPosition [ 241 110 ]
+			TexSize [ 26 50 ]
+			ACWidths [ 2 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 115
+			TexPosition [ 267 110 ]
+			TexSize [ 23 50 ]
+			ACWidths [ 3 3 ]
+		}
+		"Hot::FontChar" {
+			CharCode 116
+			TexPosition [ 290 110 ]
+			TexSize [ 26 50 ]
+			ACWidths [ 1 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 117
+			TexPosition [ 316 110 ]
+			TexSize [ 29 50 ]
+			ACWidths [ 0 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 118
+			TexPosition [ 345 110 ]
+			TexSize [ 31 50 ]
+			ACWidths [ -1 -1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 119
+			TexPosition [ 376 110 ]
+			TexSize [ 32 50 ]
+			ACWidths [ -2 -1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 120
+			TexPosition [ 408 110 ]
+			TexSize [ 28 50 ]
+			ACWidths [ 0 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 121
+			TexPosition [ 436 110 ]
+			TexSize [ 29 50 ]
+			ACWidths [ 1 -1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 122
+			TexPosition [ 465 110 ]
+			TexSize [ 24 50 ]
+			ACWidths [ 2 3 ]
+		}
+		"Hot::FontChar" {
+			CharCode 33
+			TexPosition [ 489 110 ]
+			TexSize [ 10 50 ]
+			ACWidths [ 9 10 ]
+		}
+		"Hot::FontChar" {
+			CharCode 34
+			TexPosition [ 499 110 ]
+			TexSize [ 20 50 ]
+			ACWidths [ 5 4 ]
+		}
+		"Hot::FontChar" {
+			CharCode 35
+			TexPosition [ 519 110 ]
+			TexSize [ 25 50 ]
+			ACWidths [ 2 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 36
+			TexPosition [ 544 110 ]
+			TexSize [ 22 50 ]
+			ACWidths [ 3 4 ]
+		}
+		"Hot::FontChar" {
+			CharCode 37
+			TexPosition [ 566 110 ]
+			TexSize [ 24 50 ]
+			ACWidths [ 2 3 ]
+		}
+		"Hot::FontChar" {
+			CharCode 38
+			TexPosition [ 0 164 ]
+			TexSize [ 22 50 ]
+			ACWidths [ 4 3 ]
+		}
+		"Hot::FontChar" {
+			CharCode 710
+			TexPosition [ 22 164 ]
+			TexSize [ 17 50 ]
+			ACWidths [ 5 7 ]
+		}
+		"Hot::FontChar" {
+			CharCode 8216
+			TexPosition [ 39 164 ]
+			TexSize [ 14 50 ]
+			ACWidths [ 10 5 ]
+		}
+		"Hot::FontChar" {
+			CharCode 8217
+			TexPosition [ 53 164 ]
+			TexSize [ 14 50 ]
+			ACWidths [ 5 10 ]
+		}
+		"Hot::FontChar" {
+			CharCode 8220
+			TexPosition [ 67 164 ]
+			TexSize [ 24 50 ]
+			ACWidths [ 2 3 ]
+		}
+		"Hot::FontChar" {
+			CharCode 8221
+			TexPosition [ 91 164 ]
+			TexSize [ 24 50 ]
+			ACWidths [ 3 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 180
+			TexPosition [ 115 164 ]
+			TexSize [ 12 50 ]
+			ACWidths [ 8 9 ]
+		}
+		"Hot::FontChar" {
+			CharCode 732
+			TexPosition [ 127 164 ]
+			TexSize [ 19 50 ]
+			ACWidths [ 5 5 ]
+		}
+		"Hot::FontChar" {
+			CharCode 96
+			TexPosition [ 146 164 ]
+			TexSize [ 12 50 ]
+			ACWidths [ 8 9 ]
+		}
+		"Hot::FontChar" {
+			CharCode 39
+			TexPosition [ 158 164 ]
+			TexSize [ 11 50 ]
+			ACWidths [ 9 9 ]
+		}
+		"Hot::FontChar" {
+			CharCode 8222
+			TexPosition [ 169 164 ]
+			TexSize [ 24 50 ]
+			ACWidths [ 3 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 40
+			TexPosition [ 193 164 ]
+			TexSize [ 11 50 ]
+			ACWidths [ 12 6 ]
+		}
+		"Hot::FontChar" {
+			CharCode 41
+			TexPosition [ 204 164 ]
+			TexSize [ 11 50 ]
+			ACWidths [ 6 12 ]
+		}
+		"Hot::FontChar" {
+			CharCode 8211
+			TexPosition [ 215 164 ]
+			TexSize [ 26 50 ]
+			ACWidths [ 1 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 8212
+			TexPosition [ 241 164 ]
+			TexSize [ 34 50 ]
+			ACWidths [ -3 -2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 42
+			TexPosition [ 275 164 ]
+			TexSize [ 22 50 ]
+			ACWidths [ 3 4 ]
+		}
+		"Hot::FontChar" {
+			CharCode 43
+			TexPosition [ 297 164 ]
+			TexSize [ 26 50 ]
+			ACWidths [ 1 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 45
+			TexPosition [ 323 164 ]
+			TexSize [ 25 50 ]
+			ACWidths [ 2 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 247
+			TexPosition [ 348 164 ]
+			TexSize [ 26 50 ]
+			ACWidths [ 1 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 126
+			TexPosition [ 374 164 ]
+			TexSize [ 25 50 ]
+			ACWidths [ 2 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 44
+			TexPosition [ 399 164 ]
+			TexSize [ 14 50 ]
+			ACWidths [ 5 10 ]
+		}
+		"Hot::FontChar" {
+			CharCode 46
+			TexPosition [ 413 164 ]
+			TexSize [ 11 50 ]
+			ACWidths [ 8 10 ]
+		}
+		"Hot::FontChar" {
+			CharCode 8230
+			TexPosition [ 424 164 ]
+			TexSize [ 29 50 ]
+			ACWidths [ 0 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 47
+			TexPosition [ 453 164 ]
+			TexSize [ 24 50 ]
+			ACWidths [ 2 3 ]
+		}
+		"Hot::FontChar" {
+			CharCode 58
+			TexPosition [ 477 164 ]
+			TexSize [ 11 50 ]
+			ACWidths [ 8 10 ]
+		}
+		"Hot::FontChar" {
+			CharCode 59
+			TexPosition [ 488 164 ]
+			TexSize [ 14 50 ]
+			ACWidths [ 6 9 ]
+		}
+		"Hot::FontChar" {
+			CharCode 60
+			TexPosition [ 502 164 ]
+			TexSize [ 27 50 ]
+			ACWidths [ 0 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 62
+			TexPosition [ 529 164 ]
+			TexSize [ 27 50 ]
+			ACWidths [ 1 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 61
+			TexPosition [ 556 164 ]
+			TexSize [ 28 50 ]
+			ACWidths [ 0 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 63
+			TexPosition [ 0 218 ]
+			TexSize [ 21 50 ]
+			ACWidths [ 4 4 ]
+		}
+		"Hot::FontChar" {
+			CharCode 64
+			TexPosition [ 21 218 ]
+			TexSize [ 23 50 ]
+			ACWidths [ 3 3 ]
+		}
+		"Hot::FontChar" {
+			CharCode 91
+			TexPosition [ 44 218 ]
+			TexSize [ 12 50 ]
+			ACWidths [ 11 6 ]
+		}
+		"Hot::FontChar" {
+			CharCode 93
+			TexPosition [ 56 218 ]
+			TexSize [ 12 50 ]
+			ACWidths [ 5 12 ]
+		}
+		"Hot::FontChar" {
+			CharCode 92
+			TexPosition [ 68 218 ]
+			TexSize [ 24 50 ]
+			ACWidths [ 2 3 ]
+		}
+		"Hot::FontChar" {
+			CharCode 94
+			TexPosition [ 92 218 ]
+			TexSize [ 23 50 ]
+			ACWidths [ 3 3 ]
+		}
+		"Hot::FontChar" {
+			CharCode 95
+			TexPosition [ 115 218 ]
+			TexSize [ 33 50 ]
+			ACWidths [ -2 -2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 175
+			TexPosition [ 148 218 ]
+			TexSize [ 34 50 ]
+			ACWidths [ -3 -2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 123
+			TexPosition [ 182 218 ]
+			TexSize [ 14 50 ]
+			ACWidths [ 7 8 ]
+		}
+		"Hot::FontChar" {
+			CharCode 125
+			TexPosition [ 196 218 ]
+			TexSize [ 14 50 ]
+			ACWidths [ 7 8 ]
+		}
+		"Hot::FontChar" {
+			CharCode 124
+			TexPosition [ 210 218 ]
+			TexSize [ 6 50 ]
+			ACWidths [ 11 12 ]
+		}
+		"Hot::FontChar" {
+			CharCode 8364
+			TexPosition [ 216 218 ]
+			TexSize [ 30 50 ]
+			ACWidths [ -2 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 8218
+			TexPosition [ 246 218 ]
+			TexSize [ 14 50 ]
+			ACWidths [ 5 10 ]
+		}
+		"Hot::FontChar" {
+			CharCode 402
+			TexPosition [ 260 218 ]
+			TexSize [ 26 50 ]
+			ACWidths [ 1 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 8249
+			TexPosition [ 286 218 ]
+			TexSize [ 17 50 ]
+			ACWidths [ 0 12 ]
+		}
+		"Hot::FontChar" {
+			CharCode 8250
+			TexPosition [ 303 218 ]
+			TexSize [ 17 50 ]
+			ACWidths [ 12 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 8226
+			TexPosition [ 320 218 ]
+			TexSize [ 16 50 ]
+			ACWidths [ 7 6 ]
+		}
+		"Hot::FontChar" {
+			CharCode 167
+			TexPosition [ 336 218 ]
+			TexSize [ 26 50 ]
+			ACWidths [ 1 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 171
+			TexPosition [ 362 218 ]
+			TexSize [ 28 50 ]
+			ACWidths [ 0 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 187
+			TexPosition [ 390 218 ]
+			TexSize [ 28 50 ]
+			ACWidths [ 1 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 169
+			TexPosition [ 418 218 ]
+			TexSize [ 33 50 ]
+			ACWidths [ -2 -2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 174
+			TexPosition [ 451 218 ]
+			TexSize [ 33 50 ]
+			ACWidths [ -2 -2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 8482
+			TexPosition [ 484 218 ]
+			TexSize [ 34 50 ]
+			ACWidths [ -3 -2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 168
+			TexPosition [ 518 218 ]
+			TexSize [ 18 50 ]
+			ACWidths [ 5 6 ]
+		}
+		"Hot::FontChar" {
+			CharCode 176
+			TexPosition [ 536 218 ]
+			TexSize [ 17 50 ]
+			ACWidths [ 6 6 ]
+		}
+		"Hot::FontChar" {
+			CharCode 191
+			TexPosition [ 553 218 ]
+			TexSize [ 20 50 ]
+			ACWidths [ 4 5 ]
+		}
+		"Hot::FontChar" {
+			CharCode 192
+			TexPosition [ 573 218 ]
+			TexSize [ 35 50 ]
+			ACWidths [ -3 -3 ]
+		}
+		"Hot::FontChar" {
+			CharCode 193
+			TexPosition [ 0 272 ]
+			TexSize [ 35 50 ]
+			ACWidths [ -3 -3 ]
+		}
+		"Hot::FontChar" {
+			CharCode 194
+			TexPosition [ 35 272 ]
+			TexSize [ 35 50 ]
+			ACWidths [ -3 -3 ]
+		}
+		"Hot::FontChar" {
+			CharCode 195
+			TexPosition [ 70 272 ]
+			TexSize [ 35 50 ]
+			ACWidths [ -3 -3 ]
+		}
+		"Hot::FontChar" {
+			CharCode 196
+			TexPosition [ 105 272 ]
+			TexSize [ 35 50 ]
+			ACWidths [ -3 -3 ]
+		}
+		"Hot::FontChar" {
+			CharCode 197
+			TexPosition [ 140 272 ]
+			TexSize [ 35 50 ]
+			ACWidths [ -3 -3 ]
+		}
+		"Hot::FontChar" {
+			CharCode 198
+			TexPosition [ 175 272 ]
+			TexSize [ 32 50 ]
+			ACWidths [ -2 -1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 199
+			TexPosition [ 207 272 ]
+			TexSize [ 27 50 ]
+			ACWidths [ 1 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 200
+			TexPosition [ 234 272 ]
+			TexSize [ 27 50 ]
+			ACWidths [ 0 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 201
+			TexPosition [ 261 272 ]
+			TexSize [ 27 50 ]
+			ACWidths [ 0 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 202
+			TexPosition [ 288 272 ]
+			TexSize [ 27 50 ]
+			ACWidths [ 0 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 203
+			TexPosition [ 315 272 ]
+			TexSize [ 27 50 ]
+			ACWidths [ 0 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 204
+			TexPosition [ 342 272 ]
+			TexSize [ 22 50 ]
+			ACWidths [ 3 4 ]
+		}
+		"Hot::FontChar" {
+			CharCode 205
+			TexPosition [ 364 272 ]
+			TexSize [ 22 50 ]
+			ACWidths [ 3 4 ]
+		}
+		"Hot::FontChar" {
+			CharCode 206
+			TexPosition [ 386 272 ]
+			TexSize [ 22 50 ]
+			ACWidths [ 3 4 ]
+		}
+		"Hot::FontChar" {
+			CharCode 207
+			TexPosition [ 408 272 ]
+			TexSize [ 22 50 ]
+			ACWidths [ 3 4 ]
+		}
+		"Hot::FontChar" {
+			CharCode 208
+			TexPosition [ 430 272 ]
+			TexSize [ 29 50 ]
+			ACWidths [ 0 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 209
+			TexPosition [ 459 272 ]
+			TexSize [ 31 50 ]
+			ACWidths [ -1 -1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 210
+			TexPosition [ 490 272 ]
+			TexSize [ 28 50 ]
+			ACWidths [ 1 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 211
+			TexPosition [ 518 272 ]
+			TexSize [ 28 50 ]
+			ACWidths [ 1 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 212
+			TexPosition [ 546 272 ]
+			TexSize [ 28 50 ]
+			ACWidths [ 1 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 213
+			TexPosition [ 574 272 ]
+			TexSize [ 28 50 ]
+			ACWidths [ 1 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 214
+			TexPosition [ 0 326 ]
+			TexSize [ 28 50 ]
+			ACWidths [ 1 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 216
+			TexPosition [ 28 326 ]
+			TexSize [ 30 50 ]
+			ACWidths [ -1 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 217
+			TexPosition [ 58 326 ]
+			TexSize [ 31 50 ]
+			ACWidths [ -1 -1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 218
+			TexPosition [ 89 326 ]
+			TexSize [ 31 50 ]
+			ACWidths [ -1 -1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 219
+			TexPosition [ 120 326 ]
+			TexSize [ 31 50 ]
+			ACWidths [ -1 -1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 220
+			TexPosition [ 151 326 ]
+			TexSize [ 31 50 ]
+			ACWidths [ -1 -1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 221
+			TexPosition [ 182 326 ]
+			TexSize [ 28 50 ]
+			ACWidths [ 1 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 222
+			TexPosition [ 210 326 ]
+			TexSize [ 26 50 ]
+			ACWidths [ 2 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 223
+			TexPosition [ 236 326 ]
+			TexSize [ 26 50 ]
+			ACWidths [ 0 3 ]
+		}
+		"Hot::FontChar" {
+			CharCode 224
+			TexPosition [ 262 326 ]
+			TexSize [ 27 50 ]
+			ACWidths [ 1 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 225
+			TexPosition [ 289 326 ]
+			TexSize [ 27 50 ]
+			ACWidths [ 1 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 226
+			TexPosition [ 316 326 ]
+			TexSize [ 27 50 ]
+			ACWidths [ 1 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 227
+			TexPosition [ 343 326 ]
+			TexSize [ 27 50 ]
+			ACWidths [ 1 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 228
+			TexPosition [ 370 326 ]
+			TexSize [ 27 50 ]
+			ACWidths [ 1 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 229
+			TexPosition [ 397 326 ]
+			TexSize [ 27 50 ]
+			ACWidths [ 1 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 230
+			TexPosition [ 424 326 ]
+			TexSize [ 32 50 ]
+			ACWidths [ -2 -1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 231
+			TexPosition [ 456 326 ]
+			TexSize [ 26 50 ]
+			ACWidths [ 2 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 232
+			TexPosition [ 482 326 ]
+			TexSize [ 26 50 ]
+			ACWidths [ 1 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 233
+			TexPosition [ 508 326 ]
+			TexSize [ 26 50 ]
+			ACWidths [ 1 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 234
+			TexPosition [ 534 326 ]
+			TexSize [ 26 50 ]
+			ACWidths [ 1 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 235
+			TexPosition [ 560 326 ]
+			TexSize [ 26 50 ]
+			ACWidths [ 1 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 236
+			TexPosition [ 0 380 ]
+			TexSize [ 24 50 ]
+			ACWidths [ 2 3 ]
+		}
+		"Hot::FontChar" {
+			CharCode 237
+			TexPosition [ 24 380 ]
+			TexSize [ 24 50 ]
+			ACWidths [ 2 3 ]
+		}
+		"Hot::FontChar" {
+			CharCode 238
+			TexPosition [ 48 380 ]
+			TexSize [ 24 50 ]
+			ACWidths [ 2 3 ]
+		}
+		"Hot::FontChar" {
+			CharCode 239
+			TexPosition [ 72 380 ]
+			TexSize [ 24 50 ]
+			ACWidths [ 2 3 ]
+		}
+		"Hot::FontChar" {
+			CharCode 240
+			TexPosition [ 96 380 ]
+			TexSize [ 26 50 ]
+			ACWidths [ 1 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 241
+			TexPosition [ 122 380 ]
+			TexSize [ 29 50 ]
+			ACWidths [ 0 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 242
+			TexPosition [ 151 380 ]
+			TexSize [ 26 50 ]
+			ACWidths [ 1 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 243
+			TexPosition [ 177 380 ]
+			TexSize [ 26 50 ]
+			ACWidths [ 1 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 244
+			TexPosition [ 203 380 ]
+			TexSize [ 26 50 ]
+			ACWidths [ 1 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 245
+			TexPosition [ 229 380 ]
+			TexSize [ 26 50 ]
+			ACWidths [ 1 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 246
+			TexPosition [ 255 380 ]
+			TexSize [ 26 50 ]
+			ACWidths [ 1 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 248
+			TexPosition [ 281 380 ]
+			TexSize [ 29 50 ]
+			ACWidths [ 0 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 249
+			TexPosition [ 310 380 ]
+			TexSize [ 29 50 ]
+			ACWidths [ 0 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 250
+			TexPosition [ 339 380 ]
+			TexSize [ 29 50 ]
+			ACWidths [ 0 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 251
+			TexPosition [ 368 380 ]
+			TexSize [ 29 50 ]
+			ACWidths [ 0 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 252
+			TexPosition [ 397 380 ]
+			TexSize [ 29 50 ]
+			ACWidths [ 0 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 253
+			TexPosition [ 426 380 ]
+			TexSize [ 29 50 ]
+			ACWidths [ 1 -1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 254
+			TexPosition [ 455 380 ]
+			TexSize [ 29 50 ]
+			ACWidths [ -1 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 255
+			TexPosition [ 484 380 ]
+			TexSize [ 29 50 ]
+			ACWidths [ 1 -1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 353
+			TexPosition [ 513 380 ]
+			TexSize [ 23 50 ]
+			ACWidths [ 3 3 ]
+		}
+		"Hot::FontChar" {
+			CharCode 339
+			TexPosition [ 536 380 ]
+			TexSize [ 32 50 ]
+			ACWidths [ -2 -1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 382
+			TexPosition [ 568 380 ]
+			TexSize [ 24 50 ]
+			ACWidths [ 2 3 ]
+		}
+		"Hot::FontChar" {
+			CharCode 376
+			TexPosition [ 0 434 ]
+			TexSize [ 28 50 ]
+			ACWidths [ 1 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 338
+			TexPosition [ 28 434 ]
+			TexSize [ 32 50 ]
+			ACWidths [ -2 -1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 381
+			TexPosition [ 60 434 ]
+			TexSize [ 23 50 ]
+			ACWidths [ 3 3 ]
+		}
+		"Hot::FontChar" {
+			CharCode 352
+			TexPosition [ 83 434 ]
+			TexSize [ 24 50 ]
+			ACWidths [ 2 3 ]
+		}
+		"Hot::FontChar" {
+			CharCode 161
+			TexPosition [ 107 434 ]
+			TexSize [ 10 50 ]
+			ACWidths [ 9 10 ]
+		}
+		"Hot::FontChar" {
+			CharCode 162
+			TexPosition [ 117 434 ]
+			TexSize [ 21 50 ]
+			ACWidths [ 4 4 ]
+		}
+		"Hot::FontChar" {
+			CharCode 163
+			TexPosition [ 138 434 ]
+			TexSize [ 25 50 ]
+			ACWidths [ 1 3 ]
+		}
+		"Hot::FontChar" {
+			CharCode 164
+			TexPosition [ 163 434 ]
+			TexSize [ 24 50 ]
+			ACWidths [ 3 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 165
+			TexPosition [ 187 434 ]
+			TexSize [ 28 50 ]
+			ACWidths [ 0 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 181
+			TexPosition [ 215 434 ]
+			TexSize [ 29 50 ]
+			ACWidths [ 0 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 182
+			TexPosition [ 244 434 ]
+			TexSize [ 26 50 ]
+			ACWidths [ 2 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 32
+			TexPosition [ 270 434 ]
+			TexSize [ 5 50 ]
+			ACWidths [ -2 26 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1040
+			TexPosition [ 275 434 ]
+			TexSize [ 35 50 ]
+			ACWidths [ -3 -3 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1041
+			TexPosition [ 310 434 ]
+			TexSize [ 28 50 ]
+			ACWidths [ 0 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1042
+			TexPosition [ 338 434 ]
+			TexSize [ 28 50 ]
+			ACWidths [ 0 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1043
+			TexPosition [ 366 434 ]
+			TexSize [ 29 50 ]
+			ACWidths [ 0 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1044
+			TexPosition [ 395 434 ]
+			TexSize [ 30 50 ]
+			ACWidths [ -1 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1045
+			TexPosition [ 425 434 ]
+			TexSize [ 27 50 ]
+			ACWidths [ 0 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1046
+			TexPosition [ 452 434 ]
+			TexSize [ 34 50 ]
+			ACWidths [ -3 -2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1047
+			TexPosition [ 486 434 ]
+			TexSize [ 27 50 ]
+			ACWidths [ 1 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1048
+			TexPosition [ 513 434 ]
+			TexSize [ 31 50 ]
+			ACWidths [ -1 -1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1049
+			TexPosition [ 544 434 ]
+			TexSize [ 31 50 ]
+			ACWidths [ -1 -1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1050
+			TexPosition [ 575 434 ]
+			TexSize [ 30 50 ]
+			ACWidths [ 1 -2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1051
+			TexPosition [ 0 488 ]
+			TexSize [ 31 50 ]
+			ACWidths [ -2 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1052
+			TexPosition [ 31 488 ]
+			TexSize [ 34 50 ]
+			ACWidths [ -3 -2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1053
+			TexPosition [ 65 488 ]
+			TexSize [ 29 50 ]
+			ACWidths [ 0 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1054
+			TexPosition [ 94 488 ]
+			TexSize [ 28 50 ]
+			ACWidths [ 1 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1055
+			TexPosition [ 122 488 ]
+			TexSize [ 29 50 ]
+			ACWidths [ 0 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1056
+			TexPosition [ 151 488 ]
+			TexSize [ 26 50 ]
+			ACWidths [ 2 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1057
+			TexPosition [ 177 488 ]
+			TexSize [ 27 50 ]
+			ACWidths [ 1 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1058
+			TexPosition [ 204 488 ]
+			TexSize [ 26 50 ]
+			ACWidths [ 1 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1059
+			TexPosition [ 230 488 ]
+			TexSize [ 33 50 ]
+			ACWidths [ -2 -2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1060
+			TexPosition [ 263 488 ]
+			TexSize [ 28 50 ]
+			ACWidths [ 1 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1061
+			TexPosition [ 291 488 ]
+			TexSize [ 30 50 ]
+			ACWidths [ -1 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1064
+			TexPosition [ 321 488 ]
+			TexSize [ 34 50 ]
+			ACWidths [ -3 -2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1065
+			TexPosition [ 355 488 ]
+			TexSize [ 34 50 ]
+			ACWidths [ -3 -2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1063
+			TexPosition [ 389 488 ]
+			TexSize [ 29 50 ]
+			ACWidths [ -1 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1062
+			TexPosition [ 418 488 ]
+			TexSize [ 29 50 ]
+			ACWidths [ 0 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1066
+			TexPosition [ 447 488 ]
+			TexSize [ 32 50 ]
+			ACWidths [ -2 -1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1068
+			TexPosition [ 479 488 ]
+			TexSize [ 28 50 ]
+			ACWidths [ 0 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1067
+			TexPosition [ 507 488 ]
+			TexSize [ 32 50 ]
+			ACWidths [ -2 -1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1069
+			TexPosition [ 539 488 ]
+			TexSize [ 28 50 ]
+			ACWidths [ 1 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1070
+			TexPosition [ 567 488 ]
+			TexSize [ 34 50 ]
+			ACWidths [ -3 -2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1071
+			TexPosition [ 0 542 ]
+			TexSize [ 30 50 ]
+			ACWidths [ -1 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1072
+			TexPosition [ 30 542 ]
+			TexSize [ 27 50 ]
+			ACWidths [ 1 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1073
+			TexPosition [ 57 542 ]
+			TexSize [ 27 50 ]
+			ACWidths [ 1 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1074
+			TexPosition [ 84 542 ]
+			TexSize [ 26 50 ]
+			ACWidths [ 1 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1075
+			TexPosition [ 110 542 ]
+			TexSize [ 26 50 ]
+			ACWidths [ 2 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1076
+			TexPosition [ 136 542 ]
+			TexSize [ 29 50 ]
+			ACWidths [ 0 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1077
+			TexPosition [ 165 542 ]
+			TexSize [ 26 50 ]
+			ACWidths [ 1 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1078
+			TexPosition [ 191 542 ]
+			TexSize [ 32 50 ]
+			ACWidths [ -2 -1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1079
+			TexPosition [ 223 542 ]
+			TexSize [ 27 50 ]
+			ACWidths [ 1 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1080
+			TexPosition [ 250 542 ]
+			TexSize [ 30 50 ]
+			ACWidths [ -1 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1081
+			TexPosition [ 280 542 ]
+			TexSize [ 30 50 ]
+			ACWidths [ -1 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1082
+			TexPosition [ 310 542 ]
+			TexSize [ 29 50 ]
+			ACWidths [ 1 -1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1083
+			TexPosition [ 339 542 ]
+			TexSize [ 30 50 ]
+			ACWidths [ -1 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1084
+			TexPosition [ 369 542 ]
+			TexSize [ 35 50 ]
+			ACWidths [ -3 -3 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1085
+			TexPosition [ 404 542 ]
+			TexSize [ 29 50 ]
+			ACWidths [ 0 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1086
+			TexPosition [ 433 542 ]
+			TexSize [ 26 50 ]
+			ACWidths [ 1 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1087
+			TexPosition [ 459 542 ]
+			TexSize [ 29 50 ]
+			ACWidths [ 0 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1088
+			TexPosition [ 488 542 ]
+			TexSize [ 29 50 ]
+			ACWidths [ -1 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1089
+			TexPosition [ 517 542 ]
+			TexSize [ 26 50 ]
+			ACWidths [ 2 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1090
+			TexPosition [ 543 542 ]
+			TexSize [ 26 50 ]
+			ACWidths [ 1 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1091
+			TexPosition [ 569 542 ]
+			TexSize [ 31 50 ]
+			ACWidths [ -1 -1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1092
+			TexPosition [ 0 596 ]
+			TexSize [ 28 50 ]
+			ACWidths [ 0 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1093
+			TexPosition [ 28 596 ]
+			TexSize [ 28 50 ]
+			ACWidths [ 0 1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1096
+			TexPosition [ 56 596 ]
+			TexSize [ 30 50 ]
+			ACWidths [ -1 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1097
+			TexPosition [ 86 596 ]
+			TexSize [ 31 50 ]
+			ACWidths [ -1 -1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1095
+			TexPosition [ 117 596 ]
+			TexSize [ 29 50 ]
+			ACWidths [ 0 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1094
+			TexPosition [ 146 596 ]
+			TexSize [ 29 50 ]
+			ACWidths [ 0 0 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1098
+			TexPosition [ 175 596 ]
+			TexSize [ 30 50 ]
+			ACWidths [ 0 -1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1100
+			TexPosition [ 205 596 ]
+			TexSize [ 23 50 ]
+			ACWidths [ 2 4 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1099
+			TexPosition [ 228 596 ]
+			TexSize [ 32 50 ]
+			ACWidths [ -1 -2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1101
+			TexPosition [ 260 596 ]
+			TexSize [ 26 50 ]
+			ACWidths [ 1 2 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1102
+			TexPosition [ 286 596 ]
+			TexSize [ 32 50 ]
+			ACWidths [ -2 -1 ]
+		}
+		"Hot::FontChar" {
+			CharCode 1103
+			TexPosition [ 318 596 ]
+			TexSize [ 28 50 ]
+			ACWidths [ 1 0 ]
+		}
+	]
+	Pairs [
+	]
+}

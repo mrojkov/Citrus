@@ -1,0 +1,62 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmptyProject.Mac", "EmptyProject.Mac.csproj", "{6AC2E264-44BC-4508-B819-CA4B0CBA764B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lime.Mac", "..\..\Citrus\Lime\Lime.Mac.csproj", "{DC16EEBF-404D-4610-B87A-15B57464D707}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lemon.Mac", "..\..\Citrus\Lemon\Lemon.Mac.csproj", "{BB697671-700C-455D-B8EE-66A6B122B949}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "EmptyProject.Game", "..\EmptyProject.Game\EmptyProject.Game.shproj", "{E72754D5-6DF7-42F1-9E14-0EF4D1491621}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yuzu.Mac", "..\..\Citrus\Yuzu\Yuzu.Mac.csproj", "{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmptyProject.GeneratedScenes.Mac", "..\EmptyProject.GeneratedScenes\EmptyProject.GeneratedScenes.Mac.csproj", "{1EE9C6F3-E8D7-4FF8-9420-2B4C9CF9B66D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicFont.Mac", "..\..\Citrus\Lime\Extensions\DynamicFont\DynamicFont.Mac.csproj", "{B5F74505-80BB-4373-B194-219D743C1FA0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6AC2E264-44BC-4508-B819-CA4B0CBA764B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AC2E264-44BC-4508-B819-CA4B0CBA764B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AC2E264-44BC-4508-B819-CA4B0CBA764B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AC2E264-44BC-4508-B819-CA4B0CBA764B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB697671-700C-455D-B8EE-66A6B122B949}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB697671-700C-455D-B8EE-66A6B122B949}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB697671-700C-455D-B8EE-66A6B122B949}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB697671-700C-455D-B8EE-66A6B122B949}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC16EEBF-404D-4610-B87A-15B57464D707}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC16EEBF-404D-4610-B87A-15B57464D707}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC16EEBF-404D-4610-B87A-15B57464D707}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC16EEBF-404D-4610-B87A-15B57464D707}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1EE9C6F3-E8D7-4FF8-9420-2B4C9CF9B66D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1EE9C6F3-E8D7-4FF8-9420-2B4C9CF9B66D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1EE9C6F3-E8D7-4FF8-9420-2B4C9CF9B66D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1EE9C6F3-E8D7-4FF8-9420-2B4C9CF9B66D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5F74505-80BB-4373-B194-219D743C1FA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5F74505-80BB-4373-B194-219D743C1FA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5F74505-80BB-4373-B194-219D743C1FA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5F74505-80BB-4373-B194-219D743C1FA0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		Policies = $0
+		$0.TextStylePolicy = $1
+		$1.FileWidth = 120
+		$1.TabsToSpaces = False
+		$1.inheritsSet = VisualStudio
+		$1.inheritsScope = text/plain
+		$1.scope = text/x-csharp
+		$0.CSharpFormattingPolicy = $2
+		$2.inheritsSet = Mono
+		$2.inheritsScope = text/x-csharp
+		$2.scope = text/x-csharp
+	EndGlobalSection
+EndGlobal
