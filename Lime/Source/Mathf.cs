@@ -378,6 +378,13 @@ namespace Lime
 				HermiteSpline(t, p0.Y, m0.Y, p1.Y, m1.Y));
 		}
 
+		public static Vector2 HermiteSplineDerivative(float t, Vector2 p0, Vector2 m0, Vector2 p1, Vector2 m1)
+		{
+			return new Vector2(
+				HermiteSplineDerivative(t, p0.X, m0.X, p1.X, m1.X),
+				HermiteSplineDerivative(t, p0.Y, m0.Y, p1.Y, m1.Y));
+		}
+
 		public static Vector3 HermiteSpline(float t, Vector3 p0, Vector3 m0, Vector3 p1, Vector3 m1)
 		{
 			return new Vector3(
@@ -392,6 +399,15 @@ namespace Lime
 			float t3 = t2 * t;
 			return (2.0f * t3 - 3.0f * t2 + 1.0f) * p0 + (t3 - 2.0f * t2 + t) * m0 +
 				(-2.0f * t3 + 3.0f * t2) * p1 + (t3 - t2) * m1;
+		}
+
+		public static float HermiteSplineDerivative(float t, float p0, float m0, float p1, float m1)
+		{
+			float t2 = t * t;
+			return (6 * t2 - 6 * t) * p0 +
+				(3 * t2 - 4 * t + 1) * m0 +
+				(-6 * t2 + 6 * t) * p1 +
+				(3 * t2 - 2 * t) * m1;
 		}
 
 		public static Vector2 CatmullRomSpline(float t, Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3)

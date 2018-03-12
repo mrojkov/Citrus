@@ -38,7 +38,7 @@ namespace Lime
 			var spline = Spline;
 			var widget = Widget;
 			if (spline != null && widget != null) {
-				var length = spline.CalcLengthRough();
+				var length = spline.CalcPolylineLength();
 				var point = spline.CalcPoint(SplineOffset * length);
 				widget.Position = spline.CalcLocalToParentTransform().TransformVector(point);
 			}

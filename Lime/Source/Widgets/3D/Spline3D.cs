@@ -43,13 +43,14 @@ namespace Lime
 		private float CalcSegmentLengthAccurate(SplinePoint3D a, SplinePoint3D b, int approximateCount)
 		{
 			var length = 0f;
-			var prevPosition = a.Position;
+			var transform = GlobalTransform;
+			var prevPosition = transform.TransformVector(a.Position);
 			for (int i = 1; i < approximateCount; i++) {
 				var currentPosition = Interpolate((float)i / approximateCount, a, b).Translation;
 				length += (currentPosition - prevPosition).Length;
 				prevPosition = currentPosition;
 			}
-			length += (b.Position - prevPosition).Length;
+			length += (transform.TransformVector(b.Position) - prevPosition).Length;
 			return length;
 		}
 
