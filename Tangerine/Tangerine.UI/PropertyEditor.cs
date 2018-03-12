@@ -839,7 +839,14 @@ namespace Tangerine.UI
 			var newTrigger = (string)args.Value;
 			var currentTriggers = CoalescedPropertyValue().GetValue();
 			if (string.IsNullOrWhiteSpace(currentTriggers) || args.Index < 0) {
-				SetProperty(newTrigger);
+				// keep exist and remove absent triggers after hand input
+				HashSet<string> availableTriggers = new HashSet<string>(comboBox.Items.Select(item => item.Text));
+				string setTrigger = string.Join(",", newTrigger.Split(',').Select(el => el.Trim()).Where(el => availableTriggers.Contains(el)));
+				
+				SetProperty(setTrigger.Length == 0 ? null : setTrigger);
+				if (setTrigger != newTrigger) {
+					comboBox.Text = setTrigger;
+				}
 				return;
 			}
 			var triggers = new List<string>();
