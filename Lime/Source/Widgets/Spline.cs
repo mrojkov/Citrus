@@ -21,7 +21,11 @@ namespace Lime
 			return (SplinePoint)Nodes[index % Nodes.Count];
 		}
 
-		public float CalcLengthRough()
+		/// <summary>
+		/// Calculate length of a polyline comprised of spline points.
+		/// Takes spline closedness into account.
+		/// </summary>
+		public float CalcPolylineLength()
 		{
 			float length = 0;
 			var segmentCount = GetSegmentCount();
@@ -66,6 +70,9 @@ namespace Lime
 			return length;
 		}
 
+		/// <summary>
+		/// Calculate approximated length of a spline by approximating each subspline with "approximateCount" segments.
+		/// </summary>
 		public float CalcLengthAccurate(int approximateCount)
 		{
 			float length = 0;
@@ -76,12 +83,13 @@ namespace Lime
 			return length;
 		}
 
-		private static List<Vector2> GaussLengendreCoefficients = new List<Vector2> {
-			new Vector2( 0.0f, 0.5688889f ),
-			new Vector2( -0.5384693f, 0.47862867f ),
-			new Vector2( 0.5384693f, 0.47862867f ),
-			new Vector2( -0.90617985f, 0.23692688f ),
-			new Vector2( 0.90617985f, 0.23692688f ),
+		// https://pomax.github.io/bezierinfo/legendre-gauss.html
+		private static List<Vector2> GaussLegendreCoefficients = new List<Vector2> {
+			new Vector2(0.0f, 0.5688889f),
+			new Vector2(-0.5384693f, 0.47862867f),
+			new Vector2(0.5384693f, 0.47862867f),
+			new Vector2(-0.90617985f, 0.23692688f),
+			new Vector2(0.90617985f, 0.23692688f),
 		};
 
 		public float CalcLengthUsingGaussLegendreQuadrature()
@@ -89,26 +97,83 @@ namespace Lime
 			float length = 0.0f;
 			var n = GetSegmentCount();
 			for (int i = 0; i < n; i++) {
-				foreach (var glc in GaussLengendreCoefficients) {
-					length += InterpolateDerivative(GetPoint(i), GetPoint(i + 1), 0.5f * (1.0f + glc.X)).Length * glc.Y;
-				}
+				length += CalcSegmentLengthUsingGaussLegendreQuadrature(GetPoint(i), GetPoint(i + 1));
 			}
-			return length * 0.5f;
+			return length;
 		}
 
-		public Vector2 CalcPoint(float lengthFromBeginnning)
+		private float CalcSegmentLengthUsingGaussLegendreQuadrature(SplinePoint p0, SplinePoint p1, float param = 1.0f)
+		{
+			float length = 0.0f;
+			foreach (var glc in GaussLegendreCoefficients) {
+				length += InterpolateDerivative(p0, p1, param * 0.5f * (1.0f + glc.X)).Length * glc.Y;
+			}
+			return length * 0.5f * param;
+		}
+
+		// TODO: try Newton method
+		public float CalcParamForLength(float length)
+		{
+			int i = 0;
+			while (i < GetSegmentCount()) {
+				var l = CalcSegmentLengthUsingGaussLegendreQuadrature(GetPoint(i), GetPoint(i + 1));
+				if (length - l < 0.0f) {
+					break;
+				}
+				length -= l;
+				i++;
+			}
+			{
+				float segmentLength = CalcSegmentLengthUsingGaussLegendreQuadrature(GetPoint(i), GetPoint(i + 1));
+				float param = Mathf.Clamp(length / segmentLength, 0.0f, 1.0f);
+				float l = CalcSegmentLengthUsingGaussLegendreQuadrature(GetPoint(i), GetPoint(i + 1), param);
+				float min = 0.0f;
+				float max = 1.0f;
+				int iteration = 0;
+				while (Mathf.Abs(length - l) > 0.5f) {
+					iteration++;
+					if (iteration > 20) {
+						break;
+					}
+					if (l - length < 0.0f) {
+						min = param;
+					} else {
+						max = param;
+					}
+					param = min + (max - min) * 0.5f;
+					l = CalcSegmentLengthUsingGaussLegendreQuadrature(GetPoint(i), GetPoint(i + 1), param);
+				}
+				return i + param;
+			}
+		}
+
+		// 1 for each spline segment, disregarding it's length completely
+		// this way we've got a handy way to get an index
+		public Vector2 CalcPointViaParameter(float parameter)
+		{
+			int index = (int)System.Math.Truncate(parameter);
+			return Interpolate(GetPoint(index), GetPoint(index + 1), parameter - index);
+		}
+
+		public Vector2 CalcDerivativeViaParameter(float parameter)
+		{
+			int index = (int)System.Math.Truncate(parameter);
+			return InterpolateDerivative(GetPoint(index), GetPoint(index + 1), parameter - index);
+		}
+
+		public Vector2 CalcPoint(float polylineLengthFromBeginning)
 		{
 			float segStart = 0;
 			var segmentCount = GetSegmentCount();
 			for (int i = 0; i < segmentCount; i++) {
 				var start = GetPoint(i);
 				var end = GetPoint(i + 1);
-				if (lengthFromBeginnning < 0)
+				if (polylineLengthFromBeginning < 0)
 					return start.Position * Size;
 
 				float segLength = ((end.Position - start.Position) * Size).Length;
-				if (segStart <= lengthFromBeginnning && lengthFromBeginnning < segStart + segLength) {
-					return Interpolate(start, end, (lengthFromBeginnning - segStart) / segLength);
+				if (segStart <= polylineLengthFromBeginning && polylineLengthFromBeginning < segStart + segLength) {
+					return Interpolate(start, end, (polylineLengthFromBeginning - segStart) / segLength);
 				}
 				segStart += segLength;
 			}
@@ -116,19 +181,19 @@ namespace Lime
 			return Nodes.Count > 0 ? GetPoint(segmentCount % Nodes.Count).Position * Size : Vector2.Zero;
 		}
 
-		public Vector2 CalcNormal(float lengthFromBeginnning)
+		public Vector2 CalcDerivative(float polylineLengthFromBeginning)
 		{
 			float segStart = 0;
 			var segmentCount = GetSegmentCount();
 			for (int i = 0; i < segmentCount; i++) {
 				var start = GetPoint(i);
 				var end = GetPoint(i + 1);
-				if (lengthFromBeginnning < 0)
+				if (polylineLengthFromBeginning < 0)
 					return start.Position * Size;
 
 				float segLength = ((end.Position - start.Position) * Size).Length;
-				if (segStart <= lengthFromBeginnning && lengthFromBeginnning < segStart + segLength) {
-					return InterpolateDerivative(start, end, (lengthFromBeginnning - segStart) / segLength);
+				if (segStart <= polylineLengthFromBeginning && polylineLengthFromBeginning < segStart + segLength) {
+					return InterpolateDerivative(start, end, (polylineLengthFromBeginning - segStart) / segLength);
 				}
 				segStart += segLength;
 			}

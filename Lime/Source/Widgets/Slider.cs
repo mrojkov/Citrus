@@ -154,7 +154,7 @@ namespace Lime
 				return;
 			}
 			var t = (Value - RangeMin) / (RangeMax - RangeMin);
-			var pos = Rail.CalcPoint(t * Rail.CalcLengthRough());
+			var pos = Rail.CalcPoint(t * Rail.CalcPolylineLength());
 			Thumb.Position = Rail.CalcTransitionToSpaceOf(this) * pos;
 		}
 
@@ -179,7 +179,7 @@ namespace Lime
 			if (Rail == null) {
 				return;
 			}
-			float railLength = Rail.CalcLengthRough();
+			float railLength = Rail.CalcPolylineLength();
 			if (railLength <= 0) {
 				return;
 			}
