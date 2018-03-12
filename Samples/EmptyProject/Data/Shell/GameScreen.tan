@@ -1,0 +1,60 @@
+{
+	"class":"Lime.Frame, Lime",
+	"Anchors":15,
+	"Color":[4294967295],
+	"Nodes":[
+		{
+			"class":"Lime.Frame, Lime",
+			"Color":[4294967295],
+			"Id":"Scene1",
+			"Nodes":[			],
+			"Pivot":[0.5,0.5],
+			"Position":[512,384],
+			"Size":[1024,768]
+		},
+		{
+			"class":"Lime.SimpleText, Lime",
+			"Anchors":20,
+			"Color":[4294967295],
+			"Font":{
+				"Name":"Default"
+			},
+			"FontHeight":45,
+			"HAlignment":1,
+			"Id":"Text1",
+			"Nodes":[			],
+			"Pivot":[0.5,0.5],
+			"Position":[512,65.50003],
+			"Size":[378,50],
+			"Text":"Game Screen",
+			"VAlignment":1
+		},
+		{
+			"class":"Lime.Button, Lime",
+			"Anchors":6,
+			"Color":[4294967295],
+			"ContentsPath":"/Shell/Buttons/BtnXRed",
+			"Id":"@BtnExit",
+			"Nodes":[			],
+			"Pivot":[0.5,0.5],
+			"Position":[946,80],
+			"Scale":[0.5,0.5],
+			"Size":[256,256]
+		},
+		{
+			"class":"Lime.Image, Lime",
+			"Anchors":48,
+			"Color":[4294967295],
+			"Id":"bg",
+			"Nodes":[			],
+			"Pivot":[0.5,0.5],
+			"Position":[512,384],
+			"Size":[1366,1366],
+			"Texture":{
+				"class":"Lime.SerializableTexture, Lime",
+				"SerializationPath":"/Shell/Windows/PatternedBG"
+			}
+		}
+	],
+	"Size":[1024,768]
+}

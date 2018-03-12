@@ -1,0 +1,60 @@
+{
+	"class":"Lime.Frame, Lime",
+	"Anchors":15,
+	"Animations":[
+		{
+			"Markers":[
+				{
+					"Id":"Start"
+				},
+				{
+					"Action":1,
+					"Frame":44,
+					"Id":"Done"
+				}
+			]
+		}
+	],
+	"Color":[4294967295],
+	"Id":"@",
+	"Nodes":[
+		{
+			"class":"Lime.Image, Lime",
+			"Anchors":48,
+			"Animators":[
+				{
+					"class":"Lime.Color4Animator, Lime",
+					"ReadonlyKeys":[
+						{
+							"Value":[4278190080]
+						},
+						{
+							"Frame":8,
+							"Value":[4294967295]
+						},
+						{
+							"Frame":36,
+							"Value":[4294967295]
+						},
+						{
+							"Frame":44,
+							"Value":[4278190080]
+						}
+					],
+					"TargetProperty":"Color"
+				}
+			],
+			"Color":[4278190080],
+			"Id":"GameForest",
+			"Nodes":[			],
+			"Pivot":[0.5,0.5],
+			"Position":[512,384],
+			"Size":[1366,1366],
+			"Texture":{
+				"class":"Lime.SerializableTexture, Lime",
+				"SerializationPath":"/Shell/Splash/GameForest"
+			}
+		}
+	],
+	"Size":[1024,768]
+}

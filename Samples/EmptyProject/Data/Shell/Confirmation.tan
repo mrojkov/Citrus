@@ -1,0 +1,182 @@
+{
+	"class":"Lime.Frame, Lime",
+	"Anchors":15,
+	"Animations":[
+		{
+			"Markers":[
+				{
+					"Id":"Hide"
+				},
+				{
+					"Action":1,
+					"Frame":10
+				},
+				{
+					"Frame":20,
+					"Id":"Show"
+				},
+				{
+					"Action":1,
+					"Frame":30
+				}
+			]
+		}
+	],
+	"Color":[4294967295],
+	"Nodes":[
+		{
+			"class":"Lime.Frame, Lime",
+			"Anchors":48,
+			"Animators":[
+				{
+					"class":"Lime.Color4Animator, Lime",
+					"ReadonlyKeys":[
+						{
+							"Value":[4294967295]
+						},
+						{
+							"Frame":10,
+							"Value":[16777215]
+						},
+						{
+							"Frame":20,
+							"Value":[16777215]
+						},
+						{
+							"Frame":30,
+							"Value":[4294967295]
+						}
+					],
+					"TargetProperty":"Color"
+				},
+				{
+					"class":"Lime.Vector2Animator, Lime",
+					"ReadonlyKeys":[
+						{
+							"Value":[1,1]
+						},
+						{
+							"Frame":10,
+							"Value":[1.15,1.15]
+						},
+						{
+							"Frame":20,
+							"Value":[1.15,1.15]
+						},
+						{
+							"Frame":30,
+							"Value":[1,1]
+						}
+					],
+					"TargetProperty":"Scale"
+				}
+			],
+			"Color":[4294967295],
+			"Id":"Dialog",
+			"Nodes":[
+				{
+					"class":"Lime.Button, Lime",
+					"Color":[4294967295],
+					"ContentsPath":"/Shell/Buttons/BtnXRed",
+					"Id":"@BtnCancel",
+					"Nodes":[					],
+					"Pivot":[0.5,0.5],
+					"Position":[579,-40],
+					"Scale":[0.4,0.4],
+					"Size":[256,256]
+				},
+				{
+					"class":"Lime.RichText, Lime",
+					"Color":[4294967295],
+					"HAlignment":1,
+					"Id":"@Title",
+					"Nodes":[
+						{
+							"class":"Lime.TextStyle, Lime",
+							"Font":{
+								"Name":"Default"
+							},
+							"Id":"Default",
+							"Nodes":[							],
+							"Size":54,
+							"SpaceAfter":-12,
+							"TextColor":[4278205774]
+						}
+					],
+					"Pivot":[0.5,0.5],
+					"Position":[278.3333,165],
+					"Size":[552.6666,329],
+					"Text":"Some text goes here...",
+					"VAlignment":1
+				},
+				{
+					"class":"Lime.Button, Lime",
+					"Color":[4294967295],
+					"ContentsPath":"/Shell/Buttons/BtnOk",
+					"Id":"@BtnOk",
+					"Nodes":[					],
+					"Pivot":[0.5,0.5],
+					"Position":[456,429],
+					"Scale":[0.67254,0.67254],
+					"Size":[256,256]
+				},
+				{
+					"class":"Lime.Image, Lime",
+					"Color":[4294967295],
+					"Id":"WinSmall",
+					"Nodes":[					],
+					"Pivot":[0.5,0.5],
+					"Position":[277.49994,191],
+					"Scale":[1.32558,1.06349],
+					"Size":[512,512],
+					"Texture":{
+						"class":"Lime.SerializableTexture, Lime",
+						"SerializationPath":"/Shell/Windows/WinSmall"
+					}
+				}
+			],
+			"Pivot":[0.5,0.5],
+			"Position":[512,384],
+			"Size":[555,382]
+		},
+		{
+			"class":"Lime.Image, Lime",
+			"Anchors":15,
+			"Animators":[
+				{
+					"class":"Lime.Color4Animator, Lime",
+					"ReadonlyKeys":[
+						{
+							"Value":[3368852274]
+						},
+						{
+							"Frame":10,
+							"Value":[13409074]
+						},
+						{
+							"Frame":20,
+							"Value":[13409074]
+						},
+						{
+							"Frame":30,
+							"Value":[3368852274]
+						}
+					],
+					"TargetProperty":"Color"
+				}
+			],
+			"Blending":2,
+			"Color":[3368852274],
+			"Id":"Shade",
+			"Nodes":[			],
+			"Pivot":[0.5,0.5],
+			"Position":[512,384],
+			"Shader":3,
+			"Size":[1024,768],
+			"Texture":{
+				"class":"Lime.SerializableTexture, Lime"
+			}
+		}
+	],
+	"Size":[1024,768]
+}
