@@ -311,6 +311,43 @@ namespace Tangerine
 							menu.Popup();
 						}
 					};
+					
+					DragGesture dragGesture = new DragGesture();
+					tab.Gestures.Add(dragGesture);
+					dragGesture.Changed += () => {
+						int index = -1;
+						foreach (Tab tabEl in tabBar.Nodes.OfType<Tab>()) {
+							index++;
+							if (tabEl == tab) {
+								continue;
+							}
+
+							Vector2 localMousePosition = tabEl.LocalMousePosition();
+
+							if (!(localMousePosition.X >= 0 && localMousePosition.Y >= 0 && 
+								localMousePosition.X < tabEl.Width && localMousePosition.Y < tabEl.Height)) {
+								continue;
+							}
+							
+							bool toPrevious = localMousePosition.X < tabEl.Width / 2;
+
+							Project.Current.ReorderDocument(doc, toPrevious ? index : (index + 1));
+
+							int wasIndex = tabBar.Nodes.IndexOf(tab);
+							int toIndex = tabBar.Nodes.IndexOf(tabEl);
+
+							if (wasIndex < 0 || toIndex < 0) {
+								RebuildTabs(tabBar);
+								break;
+							}
+
+							if (!toPrevious) toIndex++;
+							
+							tabBar.Nodes.Remove(tab);
+							tabBar.Nodes.Insert(toIndex <= wasIndex ? toIndex : toIndex - 1, tab);
+							break;
+						}
+					};
 					tabBar.AddNode(tab);
 				}
 				tabBar.AddNode(new Widget { LayoutCell = new LayoutCell { StretchX = 0 } });

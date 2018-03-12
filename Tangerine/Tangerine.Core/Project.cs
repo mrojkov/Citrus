@@ -320,6 +320,14 @@ namespace Tangerine.Core
 			savedCurrent?.MakeCurrent();
 		}
 
+		public void ReorderDocument(Document doc, int toIndex)
+		{
+			int wasIndex = documents.IndexOf(doc);
+			if (wasIndex < 0) return;
+			documents.Remove(doc);
+			documents.Insert(toIndex <= wasIndex ? toIndex : toIndex - 1, doc);
+		}
+		
 		public void RevertDocument(Document doc)
 		{
 			ReloadDocument(doc);
