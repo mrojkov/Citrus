@@ -63,7 +63,7 @@
     <Compile Include="Scenes\Main\Options.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Citrus\Lime\Lime.Android.csproj">
+    <ProjectReference Include="..\..\..\Lime\Lime.Android.csproj">
       <Project>{72E2DDBB-C320-4356-89EC-BDED6036D29B}</Project>
       <Name>Lime.Android</Name>
     </ProjectReference>

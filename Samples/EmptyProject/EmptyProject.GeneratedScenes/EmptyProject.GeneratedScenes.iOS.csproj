@@ -48,7 +48,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\..\Citrus\Lime\Lime.iOS.csproj">
+    <ProjectReference Include="..\..\..\Lime\Lime.iOS.csproj">
       <Project>{9CFD3A2F-7DA5-420E-B475-44749DC61485}</Project>
       <Name>Lime.iOS</Name>
     </ProjectReference>

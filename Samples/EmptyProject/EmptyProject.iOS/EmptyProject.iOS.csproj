@@ -89,11 +89,11 @@
   <Import Project="..\EmptyProject.Game\EmptyProject.Game.projitems" Label="Shared" Condition="Exists('..\EmptyProject.Game\EmptyProject.Game.projitems')" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\..\Citrus\Lemon\Lemon.iOS.csproj">
+    <ProjectReference Include="..\..\..\Lemon\Lemon.iOS.csproj">
       <Project>{C4795CBE-B192-4E53-8140-7310FBD206DD}</Project>
       <Name>Lemon.iOS</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Citrus\Lime\Lime.iOS.csproj">
+    <ProjectReference Include="..\..\..\Lime\Lime.iOS.csproj">
       <Project>{9CFD3A2F-7DA5-420E-B475-44749DC61485}</Project>
       <Name>Lime.iOS</Name>
     </ProjectReference>
@@ -101,11 +101,11 @@
       <Project>{DF52C768-5E17-4A26-AD77-4BDD41A2224C}</Project>
       <Name>EmptyProject.GeneratedScenes.iOS</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Citrus\Yuzu\Yuzu.iOS.csproj">
+    <ProjectReference Include="..\..\..\Yuzu\Yuzu.iOS.csproj">
       <Project>{DF52C768-5E17-4A26-AD77-4BDD31A2224C}</Project>
       <Name>Yuzu.iOS</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Citrus\Lime\Extensions\DynamicFont\DynamicFont.iOS.csproj">
+    <ProjectReference Include="..\..\..\Lime\Extensions\DynamicFont\DynamicFont.iOS.csproj">
       <Project>{B956A746-3D0C-4378-926B-8A776846FFFA}</Project>
       <Name>DynamicFont.iOS</Name>
     </ProjectReference>
