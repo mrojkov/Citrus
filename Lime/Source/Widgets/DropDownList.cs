@@ -199,7 +199,7 @@ namespace Lime
 				userValue = text;
 				Index = -1;
 			}
-			RaiseChanged();
+			RaiseChanged(true);
 		}
 
 		protected override bool ShouldHandleSpacebar() => false;
