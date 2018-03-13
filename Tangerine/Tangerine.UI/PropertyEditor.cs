@@ -899,17 +899,20 @@ namespace Tangerine.UI
 
 			public bool Equals(string x, string y)
 			{
+				string xMarker;
+				string yMarker;
 				string xAnimation;
 				string yAnimation;
-				SplitTrigger(x, out _, out xAnimation);
-				SplitTrigger(y, out _, out yAnimation);
+				SplitTrigger(x, out xMarker, out xAnimation);
+				SplitTrigger(y, out yMarker, out yAnimation);
 				return xAnimation == yAnimation;
 			}
 
 			public int GetHashCode(string obj)
 			{
+				string marker;
 				string animation;
-				SplitTrigger(obj, out _, out animation);
+				SplitTrigger(obj, out marker, out animation);
 				return animation == null ? 0 : animation.GetHashCode();
 			}
 		}
