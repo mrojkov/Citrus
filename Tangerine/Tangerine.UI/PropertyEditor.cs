@@ -841,7 +841,14 @@ namespace Tangerine.UI
 			if (string.IsNullOrWhiteSpace(currentTriggers) || args.Index < 0) {
 				// keep exist and remove absent triggers after hand input
 				HashSet<string> availableTriggers = new HashSet<string>(comboBox.Items.Select(item => item.Text));
-				string setTrigger = string.Join(",", newTrigger.Split(',').Select(el => el.Trim()).Where(el => availableTriggers.Contains(el)));
+				string setTrigger = string.Join(
+					",",
+					newTrigger.
+						Split(',').
+						Select(el => el.Trim()).
+						Where(el => availableTriggers.Contains(el)).
+						Distinct(new TriggerStringComparer())
+				);
 				
 				SetProperty(setTrigger.Length == 0 ? null : setTrigger);
 				if (setTrigger != newTrigger) {
@@ -886,6 +893,27 @@ namespace Tangerine.UI
 		}
 
 		public override void SetFocus() => comboBox.SetFocus();
+
+		private class TriggerStringComparer : IEqualityComparer<string>
+		{
+
+			public bool Equals(string x, string y)
+			{
+				string xAnimation;
+				string yAnimation;
+				SplitTrigger(x, out _, out xAnimation);
+				SplitTrigger(y, out _, out yAnimation);
+				return xAnimation == yAnimation;
+			}
+
+			public int GetHashCode(string obj)
+			{
+				string animation;
+				SplitTrigger(obj, out _, out animation);
+				return animation == null ? 0 : animation.GetHashCode();
+			}
+		}
+	
 	}
 
 	public class AnchorsPropertyEditor : CommonPropertyEditor<Anchors>
