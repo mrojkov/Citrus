@@ -74,7 +74,7 @@ namespace Orange
 			case TargetPlatform.Unity:
 				return "Unity";
 			default:
-				throw new Lime.Exception("Invalid target platform");
+				throw new InvalidOperationException("Invalid target platform");
 			}
 		}
 

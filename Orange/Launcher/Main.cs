@@ -7,6 +7,19 @@ using System.Windows.Forms;
 using AppKit;
 #endif
 
+namespace Orange
+{
+	public class UserInterface
+	{
+		public void ProcessPendingEvents() { }
+		public static UserInterface Instance = new UserInterface();
+	}
+	public static class The
+	{
+		public static UserInterface UI { get { return UserInterface.Instance; } }
+	}
+}
+
 namespace Launcher
 {
 	internal static class MainClass

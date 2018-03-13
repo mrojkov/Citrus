@@ -30,6 +30,15 @@ namespace Launcher
 			process.Start();
 		}
 
+		private void RestoreNuget()
+		{
+#if WIN
+			Orange.Nuget.Restore(Path.Combine(CalcCitrusDirectory(), "Orange/Orange.Win.sln"));
+#elif MAC
+			Orange.Nuget.Restore(Path.Combine(CalcCitrusDirectory(), "Orange/Orange.Mac.sln"));
+#endif
+		}
+
 		private void SynchronizeAllProjects()
 		{
 			var citrus = CalcCitrusDirectory();
@@ -52,6 +61,7 @@ namespace Launcher
 		{
 			var task = new Task(() => {
 				try {
+					RestoreNuget();
 					SynchronizeAllProjects();
 					BuildAndRun(runExecutable);
 				} catch (Exception e) {
