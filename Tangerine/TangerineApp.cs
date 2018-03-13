@@ -329,9 +329,7 @@ namespace Tangerine
 								continue;
 							}
 							
-							bool toPrevious = localMousePosition.X < tabEl.Width / 2;
-
-							Project.Current.ReorderDocument(doc, toPrevious ? index : (index + 1));
+							Project.Current.ReorderDocument(doc, index);
 
 							int wasIndex = tabBar.Nodes.IndexOf(tab);
 							int toIndex = tabBar.Nodes.IndexOf(tabEl);
@@ -341,10 +339,8 @@ namespace Tangerine
 								break;
 							}
 
-							if (!toPrevious) toIndex++;
-							
 							tabBar.Nodes.Remove(tab);
-							tabBar.Nodes.Insert(toIndex <= wasIndex ? toIndex : toIndex - 1, tab);
+							tabBar.Nodes.Insert(toIndex, tab);
 							break;
 						}
 					};

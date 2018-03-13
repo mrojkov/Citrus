@@ -325,7 +325,7 @@ namespace Tangerine.Core
 			int wasIndex = documents.IndexOf(doc);
 			if (wasIndex < 0) return;
 			documents.Remove(doc);
-			documents.Insert(toIndex <= wasIndex ? toIndex : toIndex - 1, doc);
+			documents.Insert(toIndex, doc);
 		}
 		
 		public void RevertDocument(Document doc)
