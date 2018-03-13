@@ -28,5 +28,7 @@ namespace Tangerine.UI
 
 		public static MouseCursor Rotate { get; } = CreateCursorFromEmbededResource("Cursors.Rotate", new IntVector2(8, 8));
 		public static MouseCursor Pipette { get; } = CreateCursorFromEmbededResource("Icons.Tools.Pipette", new IntVector2(0, 23));
+		public static MouseCursor DragHandClosed { get; } = CreateCursorFromEmbededResource("Cursors.DragHandClosed", new IntVector2(11, 1));
+		public static MouseCursor DragHandOpen { get; } = CreateCursorFromEmbededResource("Cursors.DragHandOpen", new IntVector2(11, 8));
 	}
 }

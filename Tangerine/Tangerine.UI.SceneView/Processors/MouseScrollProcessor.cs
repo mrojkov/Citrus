@@ -14,12 +14,18 @@ namespace Tangerine.UI.SceneView
 		{
 			var prevPos = sv.Input.MousePosition;
 			while (true) {
+
+				if (sv.Input.IsKeyPressed(Key.Space) && sv.InputArea.IsMouseOver()) {
+					Utils.ChangeCursorIfDefault(Cursors.DragHandOpen);
+				}
+				
 				if (sv.Input.WasMousePressed(0) && CommonWindow.Current.Input.IsKeyPressed(Key.Space) || sv.Input.WasMousePressed(2)) {
 					var initialMouse = sv.Input.MousePosition;
 					var initialPosition = sv.Scene.Position;
 					sv.Input.ConsumeKey(Key.Mouse0);
 					sv.Input.ConsumeKey(Key.Mouse2);
 					while (sv.Input.IsMousePressed(0) || sv.Input.IsMousePressed(2)) {
+						Utils.ChangeCursorIfDefault(Cursors.DragHandClosed);
 						sv.Scene.Position = (sv.Input.MousePosition - initialMouse) + initialPosition;
 						yield return null;
 					}
