@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -101,6 +101,7 @@
     <Compile Include="Source\Actions\ExtractTangerineScenes.cs" />
     <Compile Include="Source\Actions\AnalyzeResources.cs" />
     <Compile Include="Source\Actions\GenerateLimeDeserializers.cs" />
+    <Compile Include="Source\Actions\NewProject.cs" />
     <Compile Include="Source\Actions\OptimizePNG.cs" />
     <Compile Include="Source\Actions\RebuildGame.cs" />
     <Compile Include="Source\Actions\GenerateAppDeserializers.cs" />
