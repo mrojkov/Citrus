@@ -309,7 +309,9 @@ namespace Tangerine.Core
 				}
 			}
 			var fullPath = Project.Current.GetSystemPath(path, GetFileExtension(format));
-			using (var fs = new FileStream(fullPath, FileMode.OpenOrCreate)) {
+
+			FileMode fileModeForHiddenFile = File.Exists(fullPath) ? FileMode.Truncate : FileMode.Create;
+			using (var fs = new FileStream(fullPath, fileModeForHiddenFile)) {
 				var a = ms.ToArray();
 				fs.Write(a, 0, a.Length);
 			}
