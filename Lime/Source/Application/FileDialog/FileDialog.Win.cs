@@ -2,6 +2,7 @@
 using System.Text;
 using System.Linq;
 using WinForms = System.Windows.Forms;
+using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace Lime
 {
@@ -41,7 +42,7 @@ namespace Lime
 		public FileDialogMode Mode { get; set; }
 
 		/// <summary>
-		/// Gets or sets the dialog's initial directory. 
+		/// Gets or sets the dialog's initial directory.
 		/// </summary>
 		public string InitialDirectory { get; set; }
 
@@ -87,10 +88,13 @@ namespace Lime
 
 		private bool ShowFolderBrowserDialog()
 		{
-			using (var folderBrowserDialog = new WinForms.FolderBrowserDialog()) {
-				folderBrowserDialog.ShowNewFolderButton = CanCreateDirectories;
-				if (folderBrowserDialog.ShowDialog() == WinForms.DialogResult.OK) {
-					FileName = folderBrowserDialog.SelectedPath;
+			using (var folderBrowserDialog = new CommonOpenFileDialog()) {
+				folderBrowserDialog.IsFolderPicker = true;
+				if (InitialDirectory != null) {
+					folderBrowserDialog.InitialDirectory = InitialDirectory;
+				}
+				if (folderBrowserDialog.ShowDialog() == CommonFileDialogResult.Ok) {
+					FileName = folderBrowserDialog.FileName;
 					FileNames = new[] { FileName };
 					return true;
 				}
