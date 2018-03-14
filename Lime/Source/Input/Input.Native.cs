@@ -285,7 +285,6 @@ namespace Lime
 		internal void ClearKeyState()
 		{
 			for (int k = 0; k < Key.Count; k++) {
-				if (((Key)k).IsMouseKey()) continue;
 				keys[k].CurrentState = false;
 				keys[k].Repeated = false;
 			}

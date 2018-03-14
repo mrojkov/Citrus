@@ -130,7 +130,7 @@ namespace Tangerine.UI
 						Renderer.DrawRect(dockSiteRect.A + Vector2.One, dockSiteRect.B - Vector2.One, ColorTheme.Current.Docking.DragRectagleOutline.Transparentify(0.8f));
 					}
 				});
-				var input = panel.TitleWidget.Input;
+				var input = CommonWindow.Current.Input;
 				const float dockSiteWidth = 0.25f;
 				var dockSiteRects = new Rectangle[4] {
 					new Rectangle(Vector2.Zero, new Vector2(dockSiteWidth, 1)),
@@ -160,6 +160,7 @@ namespace Tangerine.UI
 					if (dockSite == DockSite.None) {
 						if (thumbWindow == null) {
 							thumbWindow = new ThumbnalWindow(panel.Title);
+							input.Simulator.SetKeyState(Key.Mouse0, true);
 						}
 					} else {
 						mainWindow.Invalidate();
