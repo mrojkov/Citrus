@@ -741,10 +741,22 @@ namespace Orange
 					"Unable to copy pixels. Source image runs out of the bounds of destination image.");
 			}
 			var srcPixels = source.GetPixels();
-			for (int y = 0; y < source.Height; y++) {
-				int sourceRowsOffset = y * source.Width;
-				int dstRowsOffset = (y + dstY) * dstWidth;
-				Array.Copy(srcPixels, sourceRowsOffset, dstPixels, dstX + dstRowsOffset, source.Width);
+			// Make 1-pixel border around image by duplicating image edges
+			for (int y = -1; y <= source.Height; y++) {
+				int dstRow = y + dstY;
+				if (dstRow < 0 || dstRow >= dstHeight) {
+					continue;
+				}
+				int srcRow = y.Clamp(0, source.Height - 1);
+				int srcOffset = srcRow * source.Width;
+				int dstOffset = (y + dstY) * dstWidth + dstX;
+				Array.Copy(srcPixels, srcOffset, dstPixels, dstOffset, source.Width);
+				if (dstX > 0) {
+					dstPixels[dstOffset - 1] = srcPixels[srcOffset];
+				}
+				if (dstX + source.Width < dstWidth) {
+					dstPixels[dstOffset + source.Width] = srcPixels[srcOffset + source.Width - 1];
+				}
 			}
 		}
 
