@@ -119,7 +119,7 @@ namespace Lime
 			if (errCode == ErrorCode.NoError)
 				return;
 			string errors = "";
-			while (errCode != ErrorCode.NoError) {
+			do {
 				if (errors != "")
 					errors += ", ";
 				errors += errCode.ToString();
@@ -128,7 +128,7 @@ namespace Lime
 #else
 				errCode = GL.GetError();
 #endif
-			}
+			} while (errCode != ErrorCode.NoError && errCode != ErrorCode.InvalidOperation);
 			throw new Exception("OpenGL error(s): " + errors);
 		}
 
