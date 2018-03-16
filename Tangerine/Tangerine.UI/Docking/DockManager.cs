@@ -28,6 +28,7 @@ namespace Tangerine.UI
 				ClientSize = windowSize,
 				FixedSize = false,
 				Title = "Tangerine",
+				MacWindowTabbingMode = MacWindowTabbingMode.Disallowed,
 #if WIN
 				Icon = new System.Drawing.Icon(new EmbeddedResource(AppIconPath, "Tangerine").GetResourceStream()),
 #endif // WIN
@@ -298,6 +299,7 @@ namespace Tangerine.UI
 		{
 			var window = new Window(new WindowOptions {
 				FixedSize = false,
+				MacWindowTabbingMode = MacWindowTabbingMode.Disallowed,
 #if WIN
 				Icon = new System.Drawing.Icon(new EmbeddedResource(AppIconPath, "Tangerine").GetResourceStream()),
 #endif
