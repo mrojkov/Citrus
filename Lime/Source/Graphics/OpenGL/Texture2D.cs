@@ -230,27 +230,24 @@ namespace Lime
 		public void LoadImage(Color4[] pixels, int width, int height)
 		{
 			reloader = new TexturePixelArrayReloader(pixels, width, height);
-			var pinnedArray = GCHandle.Alloc(pixels, GCHandleType.Pinned);
-			var pointer = pinnedArray.AddrOfPinnedObject();
-			LoadImage(pointer, width, height);
-			pinnedArray.Free();
-		}
 
-		public void LoadImage(IntPtr pixels, int width, int height)
-		{
-			if (!Application.CurrentThread.IsMain()) {
-				throw new InvalidOperationException();
-			}
-			PrepareOpenGLTexture();
-			PlatformRenderer.PushTexture(handle, 0);
-			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
 			MemoryUsed = 4 * width * height;
-			PlatformRenderer.PopTexture(0);
-			PlatformRenderer.CheckErrors();
-
 			ImageSize = new Size(width, height);
 			SurfaceSize = ImageSize;
 			uvRect = new Rectangle(0, 0, 1, 1);
+			
+			Window.Current.InvokeOnRendering(() => {
+				var pinnedArray = GCHandle.Alloc(pixels, GCHandleType.Pinned);
+				var pointer = pinnedArray.AddrOfPinnedObject();
+				
+				PrepareOpenGLTexture();
+				PlatformRenderer.PushTexture(handle, 0);
+				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, pointer);
+				PlatformRenderer.PopTexture(0);
+				PlatformRenderer.CheckErrors();
+				
+				pinnedArray.Free();
+			});
 		}
 
 		/// <summary>
