@@ -183,16 +183,14 @@ namespace Tangerine.UI.SceneView
 									? 1
 									: deformedVectorInOobbSpace.Y / originalVectorInOobbSpace.Y
 							);
-					if (proportional) {
-						deformationScaleInOobbSpace.X = (deformationScaleInOobbSpace.X + deformationScaleInOobbSpace.Y) / 2;
-						deformationScaleInOobbSpace.Y = deformationScaleInOobbSpace.X;
-					}
-
+					
 					if (!LookupInvolvedAxes[controlPointIndex][0]) {
 						deformationScaleInOobbSpace.X = proportional ? deformationScaleInOobbSpace.Y : 1;
-					}
-					if (!LookupInvolvedAxes[controlPointIndex][1]) {
+					} else if (!LookupInvolvedAxes[controlPointIndex][1]) {
 						deformationScaleInOobbSpace.Y = proportional ? deformationScaleInOobbSpace.X : 1;
+					} else if (proportional) {
+						deformationScaleInOobbSpace.X = (deformationScaleInOobbSpace.X + deformationScaleInOobbSpace.Y) / 2;
+						deformationScaleInOobbSpace.Y = deformationScaleInOobbSpace.X;
 					}
 
 					return Matrix32.Scaling(deformationScaleInOobbSpace);
