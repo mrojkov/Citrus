@@ -120,7 +120,7 @@ namespace Orange
 				var m = match as Match;
 				var shouldIgnore = !string.IsNullOrEmpty(m.Groups["ignore"].Value);
 				var s = m.Groups["string"].Value;
-				if (!shouldIgnore && HasAlphabeticCharacters(s) && IsStringStartsWithBrackets(s)) {
+				if (!shouldIgnore && HasAlphabeticCharacters(s) && IsCorrectTaggedString(s)) {
 					AddToDictionary(s, context);
 				}
 			}
@@ -144,9 +144,9 @@ namespace Orange
 			return file;	
 		}
 
-		private static bool IsStringStartsWithBrackets(string str)
+		private static bool IsCorrectTaggedString(string str)
 		{
-			return Regex.Match(str, @"^\[.*\](.*)$").Success;
+			return Regex.Match(str, @"^\[.*\](.+)$").Success;
 		}
 
 		private void AddToDictionary(string key, string context)
