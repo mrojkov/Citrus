@@ -35,7 +35,7 @@ namespace Tangerine.UI.Timeline
 			} else if (r == MarkerPropertiesDialog.Result.Delete) {
 				Core.Operations.DeleteMarker.Perform(Document.Current.Container.DefaultAnimation.Markers, marker);
 			}
-			// to prevent RulerbarMouseScroll
+			// To prevent RulerbarMouseScroll.
 			RootWidget.Input.ConsumeKey(Key.Mouse0);
 		}
 

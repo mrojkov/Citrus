@@ -331,10 +331,10 @@ namespace Tangerine
 							
 							Project.Current.ReorderDocument(doc, index);
 
-							int wasIndex = tabBar.Nodes.IndexOf(tab);
+							int previousIndex = tabBar.Nodes.IndexOf(tab);
 							int toIndex = tabBar.Nodes.IndexOf(tabEl);
 
-							if (wasIndex < 0 || toIndex < 0) {
+							if (previousIndex < 0 || toIndex < 0) {
 								RebuildTabs(tabBar);
 								break;
 							}

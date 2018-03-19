@@ -322,8 +322,8 @@ namespace Tangerine.Core
 
 		public void ReorderDocument(Document doc, int toIndex)
 		{
-			int wasIndex = documents.IndexOf(doc);
-			if (wasIndex < 0) return;
+			int previousIndex = documents.IndexOf(doc);
+			if (previousIndex < 0) return;
 			documents.Remove(doc);
 			documents.Insert(toIndex, doc);
 		}
