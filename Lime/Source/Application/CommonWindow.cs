@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace Lime
 {
@@ -26,6 +27,16 @@ namespace Lime
 		public virtual bool VSync { get; set; }
 
 		public event Action<System.Exception> UnhandledExceptionOnUpdate;
+
+		private static readonly object PendingActionsOnRenderingLock = new object();
+		private static Action pendingActionsOnRendering;
+
+		private readonly ThreadLocal<bool> isRenderingPhase = new ThreadLocal<bool>(() => false);
+
+		public bool IsRenderingPhase
+		{
+			get { return isRenderingPhase.Value; }
+		}
 
 		protected CommonWindow()
 		{
@@ -59,7 +70,13 @@ namespace Lime
 		protected void RaiseRendering()
 		{
 			using (Context.Activate().Scoped()) {
-				Rendering?.Invoke();
+				isRenderingPhase.Value = true;
+				try {
+					NofityPendingActionsOnRendering();
+					Rendering?.Invoke();
+				} finally {
+					isRenderingPhase.Value = false;
+				}
 			}
 		}
 
@@ -124,5 +141,27 @@ namespace Lime
 				VisibleChanging?.Invoke(value, modal);
 			}
 		}
+
+		public void InvokeOnRendering(Action action)
+		{
+			if (isRenderingPhase.Value) {
+				action?.Invoke();
+			} else {
+				lock (PendingActionsOnRenderingLock) {
+					pendingActionsOnRendering += action;
+				}
+			}
+		}
+
+		private void NofityPendingActionsOnRendering()
+		{
+			Action usePendingActionsOnRendering;
+			lock (PendingActionsOnRenderingLock) {
+				usePendingActionsOnRendering = pendingActionsOnRendering;
+				pendingActionsOnRendering = null;
+			}
+			usePendingActionsOnRendering?.Invoke();
+		}
+
 	}
 }

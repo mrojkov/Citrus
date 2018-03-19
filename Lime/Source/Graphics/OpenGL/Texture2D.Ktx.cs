@@ -110,7 +110,7 @@ namespace Lime
 				pixelWidth /= 2;
 				pixelHeight /= 2;
 			}
-			Application.InvokeOnMainThread(glCommands);
+			Window.Current.InvokeOnRendering(glCommands);
 		}
 	}
 }

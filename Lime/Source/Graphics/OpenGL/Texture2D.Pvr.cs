@@ -161,7 +161,7 @@ namespace Lime
 				width /= 2;
 				height /= 2;
 			}
-			Application.InvokeOnMainThread(glCommands);
+			Window.Current.InvokeOnRendering(glCommands);
 		}
 	}
 }

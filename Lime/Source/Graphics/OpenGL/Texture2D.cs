@@ -259,7 +259,7 @@ namespace Lime
 		/// </summary>
 		public void LoadSubImage(Color4[] pixels, int x, int y, int width, int height)
 		{
-			Application.InvokeOnMainThread(() => {
+			Window.Current.InvokeOnRendering(() => {
 				PrepareOpenGLTexture();
 				PlatformRenderer.PushTexture(handle, 0);
 				GL.TexSubImage2D(TextureTarget.Texture2D, 0, x, y, width, height,
@@ -298,7 +298,7 @@ namespace Lime
 			MemoryUsed = 0;
 			if (handle != 0) {
 				var capturedHandle = handle;
-				Application.InvokeOnMainThread(() => {
+				Window.Current.InvokeOnRendering(() => {
 					GL.DeleteTextures(1, new uint[] { capturedHandle });
 					PlatformRenderer.InvalidateTexture(capturedHandle);
 				});
@@ -315,7 +315,7 @@ namespace Lime
 
 		private void Reload()
 		{
-			Application.InvokeOnMainThread(() => {
+			Window.Current.InvokeOnRendering(() => {
 				if (reloader != null) {
 					reloader.Reload(this);
 				} else {

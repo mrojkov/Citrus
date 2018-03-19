@@ -268,6 +268,17 @@ namespace Lime
 		/// </summary>
 		event Action<System.Exception> UnhandledExceptionOnUpdate;
 
+		/// <summary>
+		/// Indicates is this window in rendering phase.
+		/// </summary>
+		bool IsRenderingPhase { get; }
+		
+		/// <summary>
+		/// Executes an action at the rendering phase.
+		/// </summary>
+		/// <param name="action"></param>
+		void InvokeOnRendering(Action action);
+		
 		bool VSync { get; set; }
 	}
 }

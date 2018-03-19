@@ -146,7 +146,7 @@ namespace Lime
 			MemoryUsed = 0;
 			if (framebuffer != 0) {
 				var h = framebuffer;
-				Application.InvokeOnMainThread(() => {
+				Window.Current.InvokeOnRendering(() => {
 					GL.DeleteFramebuffers(1, new uint[] { h });
 					PlatformRenderer.CheckErrors();
 				});
@@ -154,7 +154,7 @@ namespace Lime
 			}
 			if (handle != 0) {
 				var h = handle;
-				Application.InvokeOnMainThread(() => {
+				Window.Current.InvokeOnRendering(() => {
 					GL.DeleteTextures(1, new uint[] { h });
 					PlatformRenderer.CheckErrors();
 					PlatformRenderer.InvalidateTexture(h);
@@ -168,7 +168,7 @@ namespace Lime
 		{
 			var h = renderBuffer;
 			if (h != 0) {
-				Application.InvokeOnMainThread(() => {
+				Window.Current.InvokeOnRendering(() => {
 					GL.DeleteRenderbuffers(1, new uint[] { h });
 				});
 			}

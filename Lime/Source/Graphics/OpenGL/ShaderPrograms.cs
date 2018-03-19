@@ -340,7 +340,7 @@ namespace Lime
 			protected override void InitializeUniformIds()
 			{
 				base.InitializeUniformIds();
-				Lime.Application.InvokeOnMainThread(() => {
+				Window.Current.InvokeOnRendering(() => {
 					androidHackUniformId = GetUniformId("androidHack");
 					colorIndexUniformId = GetUniformId("colorIndex");
 				});

@@ -24,7 +24,7 @@ namespace Lime
 				for (int i = 0; i < 128; i++)
 					for (int j = 0; j < 128; j++)
 						pixels[i * 128 + j] = (((i + (j & ~7)) & 8) == 0) ? Color4.Blue : Color4.White;
-				Application.InvokeOnMainThread(() =>
+				Window.Current.InvokeOnRendering(() =>
 					LoadImage(pixels, 128, 128)
 				);
 			}

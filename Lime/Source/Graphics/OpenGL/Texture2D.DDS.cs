@@ -90,7 +90,7 @@ namespace Lime
 				width /= 2;
 				height /= 2;
 			}
-			Application.InvokeOnMainThread(glCommands);
+			Window.Current.InvokeOnRendering(glCommands);
 		}
 
 		private void ReadRGBAImage(ref Action glCommands, BinaryReader reader, int level, int width, int height, int pitch)

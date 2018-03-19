@@ -132,7 +132,7 @@ namespace Lime
 		{
 			if (vaoHandle != 0) {
 				uint capturedVaoHandle = vaoHandle;
-				Application.InvokeOnMainThread(() => {
+				Window.Current.InvokeOnRendering(() => {
 					#if !MAC && !MONOMAC
 					if (OpenTK.Graphics.GraphicsContext.CurrentContext == null)
 						return;
