@@ -113,15 +113,20 @@ namespace Orange
 		private void ProcessSourceFile(string file)
 		{
 			const string quotedStringPattern =
-				@"(?<ignore>@)?""(?<string>[^""\\]*(?:\\.[^""\\]*)*)""";
+				@"(?<prefix>[@$])?""(?<string>[^""\\]*(?:\\.[^""\\]*)*)""";
 			var code = File.ReadAllText(file, Encoding.Default);
 			var context = GetContext(file);
 			foreach (var match in Regex.Matches(code, quotedStringPattern)) {
 				var m = match as Match;
-				var shouldIgnore = !string.IsNullOrEmpty(m.Groups["ignore"].Value);
+				var prefix = m.Groups["prefix"].Value;
 				var s = m.Groups["string"].Value;
-				if (!shouldIgnore && HasAlphabeticCharacters(s) && IsCorrectTaggedString(s)) {
-					AddToDictionary(s, context);
+				if (HasAlphabeticCharacters(s) && IsCorrectTaggedString(s)) {
+					if (string.IsNullOrEmpty(prefix)) {
+						AddToDictionary(s, context);
+					} else {
+						var type = prefix == "@" ? "verbatim" : "interpolated";
+						Logger.Write($"WARNING: Ignoring {type} string: {s}");
+					}
 				}
 			}
 		}
