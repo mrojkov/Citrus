@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -113,7 +113,7 @@ namespace Orange
 		private void ProcessSourceFile(string file)
 		{
 			const string quotedStringPattern =
-				@"(?<ignore>Localization.Ignore\()?""(?<string>[^""\\]*(?:\\.[^""\\]*)*)""";
+				@"(?<ignore>@)?""(?<string>[^""\\]*(?:\\.[^""\\]*)*)""";
 			var code = File.ReadAllText(file, Encoding.Default);
 			var context = GetContext(file);
 			foreach (var match in Regex.Matches(code, quotedStringPattern)) {

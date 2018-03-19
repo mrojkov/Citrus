@@ -69,15 +69,6 @@ namespace Lime
 			}
 		}
 
-		/// <summary>
-		/// Used to mark a tagged string to be ignored in Orange's DictionaryExtractor
-		/// </summary>
-		/// <param name="str">A tagged string to be ignored</param>
-		public static string Ignore(string str)
-		{
-			return str;
-		}
-
 		private static string GetStringForNumericKey(string taggedString)
 		{
 			if (taggedString[0] == '[') {
