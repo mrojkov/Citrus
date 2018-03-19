@@ -84,7 +84,9 @@ namespace Orange
 
 		private void ExtractTexts()
 		{
-			var sourceFiles = new FileEnumerator(The.Workspace.ProjectDirectory);
+			var sourceFiles = new FileEnumerator(The.Workspace.ProjectDirectory) {
+				EnumerationFilter = (f) => !f.Path.Contains("/bin/") && !f.Path.Contains("/obj/"),
+			};
 			using (new DirectoryChanger(The.Workspace.ProjectDirectory)) {
 				var files = sourceFiles.Enumerate(".cs");
 				foreach (var fileInfo in files) {
