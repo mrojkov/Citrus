@@ -112,12 +112,15 @@ namespace Orange
 
 		private void ProcessSourceFile(string file)
 		{
-			const string quotedStringPattern = @"""([^""\\]*(?:\\.[^""\\]*)*)""";
+			const string quotedStringPattern =
+				@"(?<ignore>Localization.Ignore\()?""(?<string>[^""\\]*(?:\\.[^""\\]*)*)""";
 			var code = File.ReadAllText(file, Encoding.Default);
 			var context = GetContext(file);
 			foreach (var match in Regex.Matches(code, quotedStringPattern)) {
-				var s = ((Match)match).Groups[1].Value;
-				if (HasAlphabeticCharacters(s) && IsStringStartsWithBrackets(s)) {
+				var m = match as Match;
+				var shouldIgnore = !string.IsNullOrEmpty(m.Groups["ignore"].Value);
+				var s = m.Groups["string"].Value;
+				if (!shouldIgnore && HasAlphabeticCharacters(s) && IsStringStartsWithBrackets(s)) {
 					AddToDictionary(s, context);
 				}
 			}
