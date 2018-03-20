@@ -31,13 +31,15 @@ namespace Tangerine.UI.Timeline
 							timeline.Globals.Remove<HasKeyframeRequest>();
 							var isInMultiselectMode = input.IsKeyPressed(Key.Control);
 							var isSelectRangeMode = input.IsKeyPressed(Key.Shift);
-							if (r.Result && !isInMultiselectMode) {
-								yield return DragKeyframeTask(initialCell);
-							} else if (isSelectRangeMode) {
+
+							if (isSelectRangeMode) {
 								yield return SelectRangeTask(lastSelectedCell, initialCell);
-							} else {
+							} else if (!r.Result || isInMultiselectMode) {
 								yield return SelectTask(initialCell);
+							} else {
+								yield return DragSingleKeyframeTask(initialCell);
 							}
+							
 							lastSelectedCell = initialCell;
 						}
 					}
@@ -102,7 +104,7 @@ namespace Tangerine.UI.Timeline
 			}
 		}
 
-		private IEnumerator<object> DragKeyframeTask(IntVector2 cell)
+		private IEnumerator<object> DragSingleKeyframeTask(IntVector2 cell)
 		{
 			Core.Operations.ClearRowSelection.Perform();
 			Operations.ClearGridSelection.Perform();
