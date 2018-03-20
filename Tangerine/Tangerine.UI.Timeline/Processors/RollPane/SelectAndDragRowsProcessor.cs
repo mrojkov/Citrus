@@ -91,7 +91,7 @@ namespace Tangerine.UI.Timeline
 			var rows = enumeratedSelectedRows.ToList();
 			foreach (var elem in rows) {
 				Probers.Any(p => p.Probe(elem.Key, dragLocation));
-				if (elem.Value > dragLocation.Index) dragLocation.Index++;
+				if (elem.Value >= dragLocation.Index) dragLocation.Index++;
 			}
 		}
 
