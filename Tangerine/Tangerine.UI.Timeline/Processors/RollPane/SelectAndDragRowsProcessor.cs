@@ -71,7 +71,6 @@ namespace Tangerine.UI.Timeline
 			Action<Widget> a = _ => RenderDragCursor(dragLocation);
 			roll.OnRenderOverlay += a;
 			var input = roll.RootWidget.Input;
-			RowLocation initialLocation = MouseToRowLocation(input.MousePosition);
 			while (input.IsMousePressed()) {
 				dragLocation = MouseToRowLocation(input.MousePosition);
 				CommonWindow.Current.Invalidate();
@@ -79,18 +78,20 @@ namespace Tangerine.UI.Timeline
 			}
 			roll.OnRenderOverlay -= a;
 			CommonWindow.Current.Invalidate();
-			DragRows(initialLocation, dragLocation);
+			DragRows(dragLocation);
 		}
 
-		static void DragRows(RowLocation initialLocation, RowLocation dragLocation)
+		static void DragRows(RowLocation dragLocation)
 		{
-			IEnumerable<Row> enumeratedSelectedRows = Document.Current.TopLevelSelectedRows();
-			if (initialLocation.Index >= dragLocation.Index && initialLocation.ParentRow == dragLocation.ParentRow) {
-				enumeratedSelectedRows = enumeratedSelectedRows.Reverse();
-			}
+			List<Row> parentRowRows = dragLocation.ParentRow.Rows;
+
+			IEnumerable<KeyValuePair<Row, int>> enumeratedSelectedRows = Document.Current.TopLevelSelectedRows()
+				.Select(row => new KeyValuePair<Row, int>(row, parentRowRows.IndexOf(row)));
+			
 			var rows = enumeratedSelectedRows.ToList();
 			foreach (var elem in rows) {
-				Probers.Any(p => p.Probe(elem, dragLocation));
+				Probers.Any(p => p.Probe(elem.Key, dragLocation));
+				if (elem.Value > dragLocation.Index) dragLocation.Index++;
 			}
 		}
 
