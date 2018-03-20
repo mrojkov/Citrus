@@ -209,7 +209,7 @@ namespace Tangerine.UI
 
 		void HandleException(System.Exception e)
 		{
-			AlertDialog.Show(e.Message);
+			AlertDialog.Show(e.Message + "\n" + e.StackTrace);
 		}
 
 		void ClosePanelWindow(DockPanel panel)
