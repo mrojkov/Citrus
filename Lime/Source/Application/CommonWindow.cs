@@ -31,11 +31,12 @@ namespace Lime
 		private static readonly object PendingActionsOnRenderingLock = new object();
 		private static Action pendingActionsOnRendering;
 
-		private readonly ThreadLocal<bool> isRenderingPhase = new ThreadLocal<bool>(() => false);
+		[ThreadStatic]
+		private static bool isRenderingPhase;
 
 		public bool IsRenderingPhase
 		{
-			get { return isRenderingPhase.Value; }
+			get { return isRenderingPhase; }
 		}
 
 		protected CommonWindow()
@@ -70,12 +71,12 @@ namespace Lime
 		protected void RaiseRendering()
 		{
 			using (Context.Activate().Scoped()) {
-				isRenderingPhase.Value = true;
+				isRenderingPhase = true;
 				try {
 					NofityPendingActionsOnRendering();
 					Rendering?.Invoke();
 				} finally {
-					isRenderingPhase.Value = false;
+					isRenderingPhase = false;
 				}
 			}
 		}
@@ -144,7 +145,7 @@ namespace Lime
 
 		public void InvokeOnRendering(Action action)
 		{
-			if (isRenderingPhase.Value) {
+			if (isRenderingPhase) {
 				action?.Invoke();
 			} else {
 				lock (PendingActionsOnRenderingLock) {
