@@ -32,10 +32,8 @@ namespace Tangerine.UI
 
 		public TabbedWidget()
 		{
-			ContentContainer = new ThemedFrame {
-				LayoutCell = new LayoutCell { StretchY = float.MaxValue },
-				Layout = new StackLayout(),
-			};
+			ContentContainer = new ThemedFrame();
+			ContentContainer.ClipChildren = ClipMethod.ScissorTest;
 			TabBar = new ThemedTabBar();
 			TabBar.OnReorder += TabBar_OnReorder;
 			Layout = new VBoxLayout();
@@ -81,6 +79,7 @@ namespace Tangerine.UI
 			TabBar.ActivateTab(tab);
 			ContentContainer.Nodes.Clear();
 			ContentContainer.Nodes.Add(Contents[index]);
+			Contents[index].ExpandToContainerWithAnchors();
 		}
 
 		public void RemoveAt(int index)
