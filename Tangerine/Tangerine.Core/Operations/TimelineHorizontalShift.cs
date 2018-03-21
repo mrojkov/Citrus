@@ -31,12 +31,14 @@ namespace Tangerine.Core.Operations
 						var keys = op.Direction > 0 ? animator.ReadonlyKeys.Reverse() : animator.ReadonlyKeys;
 						foreach (var k in keys.ToList()) {
 							if (k.Frame >= op.Column) {
-								RemoveKeyframe.Perform(animator, k.Frame);
 								var k1 = k.Clone();
 								k1.Frame += op.Direction.Sign();
 								if (op.Direction > 0 || k.Frame > op.Column) {
 									SetKeyframe.Perform(animator, k1);
 								}
+								// Order is importent. RemoveKeyframe must be after SetKeyframe,
+								// to prevent animator clean up if all keys were removed.
+								RemoveKeyframe.Perform(animator, k.Frame);
 							}
 						}
 					}
