@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -34,13 +34,16 @@
     <LinkMode>SdkOnly</LinkMode>
     <TlsProvider>Default</TlsProvider>
     <PackageSigningKey>Developer ID Installer</PackageSigningKey>
-    <CodeSignEntitlements></CodeSignEntitlements>
-    <CodeSignResourceRules></CodeSignResourceRules>
+    <CodeSignEntitlements>
+    </CodeSignEntitlements>
+    <CodeSignResourceRules>
+    </CodeSignResourceRules>
     <EnableSGenConc>true</EnableSGenConc>
     <AOTMode>None</AOTMode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType></DebugType>
+    <DebugType>
+    </DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
     <DefineConstants>__UNIFIED__;MAC</DefineConstants>
@@ -272,5 +275,9 @@
       <Kind>Dynamic</Kind>
       <SmartLink>False</SmartLink>
     </NativeReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Cursors\DragHandClosed.png" />
+    <EmbeddedResource Include="Resources\Cursors\DragHandOpen.png" />
   </ItemGroup>
 </Project>
