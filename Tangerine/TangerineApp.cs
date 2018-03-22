@@ -280,7 +280,7 @@ namespace Tangerine
 				if (tabBar.IsMouseOverThisOrDescendant()) {
 					foreach (var path in obj) {
 						if (path.EndsWith(".scene") || path.EndsWith(".tan")) {
-							Project.Current.OpenDocument(path);
+							Project.Current.OpenDocument(path, true);
 						}
 					}
 				}
