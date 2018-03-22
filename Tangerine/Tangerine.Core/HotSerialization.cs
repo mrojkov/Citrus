@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using System.Linq;
+using System.Runtime.ExceptionServices;
 using Lime;
 using Orange;
 
@@ -62,7 +64,22 @@ namespace Tangerine.Core
 
 		public override void ToStream(object obj, Stream target)
 		{
-			new HotSceneExporter().Export(target, (Node)obj, new EditorStateNodeThumbnailProvider());
+			HotSceneExporter hotSceneExporter = new HotSceneExporter();
+			try {
+				hotSceneExporter.Export(target, (Node)obj, new EditorStateNodeThumbnailProvider());
+			} catch (System.Exception e) {
+				InvalidOperationException invalidOperationException = new InvalidOperationException(
+					e.Message + " for node " +
+					string.Join(
+						" in ",
+						hotSceneExporter.EnumerateWriteNodesStack()
+							.Select(node => "'" + (string.IsNullOrEmpty(node.Id) ? "Root" : node.Id) + "'")
+					),
+					e
+				);
+				ExceptionDispatchInfo exceptionDispatchInfo = ExceptionDispatchInfo.Capture(invalidOperationException);
+				exceptionDispatchInfo.Throw();
+			}
 		}
 	}
 

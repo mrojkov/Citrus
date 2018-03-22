@@ -157,6 +157,11 @@ namespace Orange
 
 		Dictionary<Type, NodeWriter> nodeWriters;
 
+		/// <summary>
+		/// Serves to understand on which node Exception has happened.
+		/// </summary>
+		private Stack<Node> writeNodesStack = new Stack<Node>();
+		
 		public HotSceneExporter()
 		{
 			nodeWriters = new Dictionary<Type, NodeWriter> {
@@ -297,6 +302,8 @@ namespace Orange
 
 		void Write(Node node)
 		{
+			writeNodesStack.Push(node);
+			
 			NodeWriter w;
 			if (!nodeWriters.TryGetValue(node.GetType(), out w)) {
 				throw new InvalidOperationException($"Unknown node type: {node.GetType()}");
@@ -325,6 +332,8 @@ namespace Orange
 				writer.EndCollection();
 			}
 			writer.EndStruct();
+			
+			writeNodesStack.Pop();
 		}
 
 		void WriteMarker(Marker marker)
@@ -731,5 +740,11 @@ namespace Orange
 			WriteProperty("RefRotation", node.RefRotation, 0f);
 			WriteProperty("RefLength", node.RefLength, 0f);
 		}
+
+		public IEnumerable<Node> EnumerateWriteNodesStack()
+		{
+			return writeNodesStack;
+		}
+		
 	}
 }
