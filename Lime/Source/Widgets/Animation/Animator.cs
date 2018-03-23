@@ -174,7 +174,8 @@ namespace Lime
 
 		public void Apply(double time)
 		{
-			if (Enabled) {
+			// Apply only if Animator has Keys, because otherwise it sets value to 0.
+			if (Enabled && Keys.Count > 0) {
 				Setter(CalcValue(time));
 			}
 		}
