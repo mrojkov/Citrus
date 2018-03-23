@@ -50,9 +50,6 @@ namespace Tangerine.UI.Timeline
 								continue;
 							}
 							processedKeys.Add(k);
-							if (removeOriginals) {
-								operations.Insert(0, () => Core.Operations.RemoveKeyframe.Perform(a, k.Frame));
-							}
 							var destRow = row.Index + offset.Y;
 							if (!CheckRowRange(destRow)) {
 								continue;
@@ -66,6 +63,11 @@ namespace Tangerine.UI.Timeline
 								var k1 = k.Clone();
 								k1.Frame += offset.X;
 								operations.Add(() => Core.Operations.SetKeyframe.Perform(destNode, a.TargetProperty, Document.Current.AnimationId, k1));
+							}
+							// Order is importent. RemoveKeyframe must be after SetKeyframe,
+							// to prevent animator clean up if all keys were removed.
+							if (removeOriginals) {
+								operations.Add(() => Core.Operations.RemoveKeyframe.Perform(a, k.Frame));
 							}
 						}
 					}
