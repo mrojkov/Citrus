@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace Lime
 {
@@ -34,7 +34,7 @@ namespace Lime
 			if ((widget.Anchors & Anchors.CenterH) != 0) {
 				xDelta = parentWidthDelta * 0.5f;
 			} else if ((widget.Anchors & Anchors.Left) != 0 && (widget.Anchors & Anchors.Right) != 0) {
-				widthDelta = parentWidthDelta / widget.Scale.X;
+				widthDelta = parentWidthDelta;
 				xDelta = parentWidthDelta * widget.Pivot.X;
 			} else if ((widget.Anchors & Anchors.Right) != 0) {
 				xDelta = parentWidthDelta;
@@ -48,7 +48,7 @@ namespace Lime
 			if ((widget.Anchors & Anchors.CenterV) != 0) {
 				yDelta = parentHeightDelta * 0.5f;
 			} else if ((widget.Anchors & Anchors.Top) != 0 && (widget.Anchors & Anchors.Bottom) != 0) {
-				heightDelta = parentHeightDelta / widget.Scale.Y;
+				heightDelta = parentHeightDelta;
 				yDelta = parentHeightDelta * widget.Pivot.Y;
 			} else if ((widget.Anchors & Anchors.Bottom) != 0) {
 				yDelta = parentHeightDelta;
