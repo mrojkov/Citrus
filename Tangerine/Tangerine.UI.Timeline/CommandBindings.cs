@@ -83,7 +83,7 @@ namespace Tangerine.UI.Timeline
 						continue;
 					}
 					var property = row.Components.Get<PropertyRow>()?.Animator.TargetProperty;
-					foreach (var a in node.Animators) {
+					foreach (var a in node.Animators.ToList()) {
 						if (property != null && a.TargetProperty != property) {
 							continue;
 						}
