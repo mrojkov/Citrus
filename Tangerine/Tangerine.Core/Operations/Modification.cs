@@ -166,9 +166,10 @@ namespace Tangerine.Core.Operations
 
 			protected override void InternalRedo(SetKeyframe op)
 			{
+				bool animatorExists = op.Animable.Animators.Any(a => a.TargetProperty == op.PropertyName && a.AnimationId == op.AnimationId);
 				var animator = op.Animable.Animators[op.PropertyName, op.AnimationId];
 				op.Save(new Backup {
-					AnimatorExists = op.Animable.Animators.Any(a => a.TargetProperty == op.PropertyName && a.AnimationId == op.AnimationId),
+					AnimatorExists = animatorExists,
 					Animator = animator,
 					Keyframe = animator.Keys.FirstOrDefault(k => k.Frame == op.Keyframe.Frame)
 				});
@@ -185,7 +186,7 @@ namespace Tangerine.Core.Operations
 				if (b.Keyframe != null) {
 					b.Animator.Keys.AddOrdered(b.Keyframe);
 				}
-				if (!b.AnimatorExists) {
+				if (!b.AnimatorExists || b.Animator.Keys.Count == 0) {
 					op.Animable.Animators.Remove(b.Animator);
 				}
 				b.Animator.ResetCache();
