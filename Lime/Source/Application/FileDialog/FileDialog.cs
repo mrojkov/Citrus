@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Lime
 {
@@ -62,6 +62,11 @@ namespace Lime
 		/// Gets or sets the dialog's initial directory. 
 		/// </summary>
 		string InitialDirectory { get; set; }
+
+		/// <summary>
+		/// Gets or sets initial file name.
+		/// </summary>
+		string InitialFileName { get; set; }
 
 		/// <summary>
 		/// Shows dialog.

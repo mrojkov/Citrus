@@ -1,4 +1,4 @@
-﻿#if MAC || MONOMAC
+#if MAC || MONOMAC
 using System;
 using System.Linq;
 #if MAC
@@ -18,6 +18,7 @@ namespace Lime
 		public string[] FileNames { get; private set; }
 		public string[] AllowedFileTypes { get; set; }
 		public string InitialDirectory { get; set; }
+		public string InitialFileName { get; set; }
 
 		public bool RunModal()
 		{
@@ -32,6 +33,7 @@ namespace Lime
 						nsPanel.AllowedFileTypes = AllowedFileTypes;
 					}
 					nsPanel.CanCreateDirectories = CanCreateDirectories;
+					nsPanel.NameFieldLabel = InitialFileName ?? System.String.Empty;
 					if (nsPanel.RunModal() == (int)NSPanelButtonType.Ok) {
 						FileName = nsPanel.Url.Path;
 						FileNames = new[] { FileName };
@@ -50,6 +52,7 @@ namespace Lime
 					nsPanel.CanChooseFiles = Mode == FileDialogMode.Open;
 					nsPanel.CanChooseDirectories = !nsPanel.CanChooseFiles;
 					nsPanel.CanCreateDirectories = CanCreateDirectories;
+					nsPanel.NameFieldLabel = InitialFileName ?? System.String.Empty;
 					if (nsPanel.RunModal() == (int)NSPanelButtonType.Ok) {
 						FileName = nsPanel.Url.Path;
 						FileNames = nsPanel.Urls.Select(i => i.Path).ToArray();

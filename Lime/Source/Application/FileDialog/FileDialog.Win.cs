@@ -1,4 +1,4 @@
-﻿#if WIN
+#if WIN
 using System.Text;
 using System.Linq;
 using WinForms = System.Windows.Forms;
@@ -45,6 +45,11 @@ namespace Lime
 		/// Gets or sets the dialog's initial directory.
 		/// </summary>
 		public string InitialDirectory { get; set; }
+
+		/// <summary>
+		/// Gets or sets initial file name showed in file dialog.
+		/// </summary>
+		public string InitialFileName { get; set; }
 
 		/// <summary>
 		/// Shows dialog.
@@ -108,6 +113,7 @@ namespace Lime
 				SetFilter(openFileDialog);
 				openFileDialog.RestoreDirectory = true;
 				openFileDialog.Multiselect = AllowsMultipleSelection;
+				openFileDialog.FileName = InitialFileName ?? System.String.Empty;
 				return ShowFileDialog(openFileDialog);
 			}
 		}
@@ -117,6 +123,7 @@ namespace Lime
 			using (var saveFileDialog = new WinForms.SaveFileDialog()) {
 				SetFilter(saveFileDialog);
 				saveFileDialog.RestoreDirectory = true;
+				saveFileDialog.FileName = InitialFileName ?? System.String.Empty;
 				return ShowFileDialog(saveFileDialog);
 			}
 		}
