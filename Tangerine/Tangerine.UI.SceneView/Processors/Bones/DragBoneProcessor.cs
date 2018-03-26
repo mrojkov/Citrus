@@ -66,14 +66,14 @@ namespace Tangerine.UI.SceneView
 					dragDelta = sv.MousePosition * transform - iniMousePos * transform;
 					var position = bone.WorldToLocalTransform *
 						(entry.Joint - b.Tip + (index != 0 && index != bone.Index && snapEnabled ? items[index].Tip - entry.Joint : dragDelta));
-					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.Position), position);
+					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.Position), position, CoreUserPreferences.Instance.AutoKeyframes);
 
 					bone.Parent.Update(0);
 					yield return null;
 				}
 				if (index != bone.Index && sv.Input.IsKeyPressed(Key.Alt)) {
-					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.Position), index == 0 ? entry.Joint + dragDelta : Vector2.Zero);
-					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.BaseIndex), index);
+					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.Position), index == 0 ? entry.Joint + dragDelta : Vector2.Zero, CoreUserPreferences.Instance.AutoKeyframes);
+					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.BaseIndex), index, CoreUserPreferences.Instance.AutoKeyframes);
 					Core.Operations.SortBonesInChain.Perform(bone);
 				}
 			} finally {
@@ -103,14 +103,14 @@ namespace Tangerine.UI.SceneView
 							angle = Vector2.AngleDeg(prentDir, dir);
 						}
 						if (!sv.Input.IsKeyPressed(Key.Alt)) {
-							Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.Rotation), angle);
+							Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.Rotation), angle, CoreUserPreferences.Instance.AutoKeyframes);
 						}
-						Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.Length), dir.Length);
+						Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.Length), dir.Length, CoreUserPreferences.Instance.AutoKeyframes);
 					} else {
 						var dragDelta = sv.MousePosition * transform - iniMousePos * transform;
 						var boneChain = IKSolver.SolveFor(bone, entry.Tip + dragDelta);
 						foreach (var pair in boneChain) {
-							Core.Operations.SetAnimableProperty.Perform(pair.Item1, nameof(Bone.Rotation), pair.Item2);
+							Core.Operations.SetAnimableProperty.Perform(pair.Item1, nameof(Bone.Rotation), pair.Item2, CoreUserPreferences.Instance.AutoKeyframes);
 						}
 					}
 					bone.Parent.Update(0);

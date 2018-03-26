@@ -55,9 +55,6 @@ namespace Tangerine.UI.SceneView
 				var rotation = 0f;
 				while (sv.Input.IsMousePressed()) {
 					Document.Current.History.RevertActiveTransaction();
-					if (CoreUserPreferences.Instance.AutoKeyframes) {
-						Utils.SetAnimatorAndInitialKeyframeIfNeed(points.Cast<IAnimable>(), nameof(PointObject.Position));
-					}
 					if (!sv.Components.Contains<PointObjectSelectionComponent>()) {
 						sv.Components.Add(new PointObjectSelectionComponent {
 							СurrentBounds = bounds,
@@ -80,12 +77,14 @@ namespace Tangerine.UI.SceneView
 						for (var i = 0; i < points.Count; i++) {
 							var offset = center - points[i].Offset / size;
 							var position = Vector2.RotateDeg((points[i].Position - offset), effectiveAngle) + offset;
-							Core.Operations.SetAnimableProperty.Perform(points[i], nameof(PointObject.Position), position);
+							Core.Operations.SetAnimableProperty.Perform(points[i], nameof(PointObject.Position), position, CoreUserPreferences.Instance.AutoKeyframes);
 							if (points[i] is SplinePoint) {
 								Core.Operations.SetAnimableProperty.Perform(
 									points[i],
 									nameof(SplinePoint.TangentAngle),
-									(points[i] as SplinePoint).TangentAngle - effectiveAngle);
+									(points[i] as SplinePoint).TangentAngle - effectiveAngle,
+									CoreUserPreferences.Instance.AutoKeyframes
+								);
 							}
 						}
 					}

@@ -43,9 +43,6 @@ namespace Tangerine.UI.SceneView
 				while (sv.Input.IsMousePressed()) {
 					Utils.ChangeCursorIfDefault(Cursors.Rotate);
 					Document.Current.History.RevertActiveTransaction();
-					if (CoreUserPreferences.Instance.AutoKeyframes) {
-						Utils.SetAnimatorAndInitialKeyframeIfNeed(widgets, nameof(Widget.Position), nameof(Widget.Rotation));
-					}
 					RotateWidgets(pivot, widgets, sv.MousePosition, mouseStartPos, sv.Input.IsKeyPressed(Key.Shift), ref accumAngle, ref prevAngle);
 					yield return null;
 				}
@@ -91,7 +88,7 @@ namespace Tangerine.UI.SceneView
 			accumAngle += rotationDelta;
 
 			foreach (KeyValuePair<Widget,float> wasRotation in wasRotations) {
-				SetAnimableProperty.Perform(wasRotation.Key, nameof(Widget.Rotation), wasRotation.Value + accumAngle);
+				SetAnimableProperty.Perform(wasRotation.Key, nameof(Widget.Rotation), wasRotation.Value + accumAngle, CoreUserPreferences.Instance.AutoKeyframes);
 			}
 		}
 

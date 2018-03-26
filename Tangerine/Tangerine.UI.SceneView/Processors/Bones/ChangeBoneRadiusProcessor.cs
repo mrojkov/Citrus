@@ -45,8 +45,8 @@ namespace Tangerine.UI.SceneView
 					
 					Utils.ChangeCursorIfDefault(MouseCursor.SizeNS);
 					var dragDelta = sv.MousePosition - iniMousePos;
-					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.EffectiveRadius), initEffectiveRadius + dragDelta.X);
-					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.FadeoutZone), initFadeoutZone + dragDelta.Y);
+					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.EffectiveRadius), initEffectiveRadius + dragDelta.X, CoreUserPreferences.Instance.AutoKeyframes);
+					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.FadeoutZone), initFadeoutZone + dragDelta.Y, CoreUserPreferences.Instance.AutoKeyframes);
 					yield return null;
 				}
 			} finally {

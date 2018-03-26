@@ -84,7 +84,7 @@ namespace Tangerine.UI.SceneView
 						if (distance.HasValue) {
 							var pos = (ray.Position + ray.Direction * distance.Value) * spline.GlobalTransform.CalcInverted();
 							offsets[i] = offsets[i] ?? p.Position - pos;
-							Core.Operations.SetAnimableProperty.Perform(p, nameof(SplinePoint3D.Position), pos + offsets[i].Value);
+							Core.Operations.SetAnimableProperty.Perform(p, nameof(SplinePoint3D.Position), pos + offsets[i].Value, CoreUserPreferences.Instance.AutoKeyframes);
 							i++;
 						}
 					}
@@ -114,9 +114,9 @@ namespace Tangerine.UI.SceneView
 					if (distance.HasValue) {
 						var pos = (ray.Position + ray.Direction * distance.Value) * spline.GlobalTransform.CalcInverted() - point.Position;
 						posCorrection = posCorrection ?? GetTangent(point, tangentIndex) - pos;
-						Core.Operations.SetAnimableProperty.Perform(point, GetTangentPropertyName(tangentIndex), pos + posCorrection.Value);
+						Core.Operations.SetAnimableProperty.Perform(point, GetTangentPropertyName(tangentIndex), pos + posCorrection.Value, CoreUserPreferences.Instance.AutoKeyframes);
 						if (input.IsKeyPressed(Key.Shift) ^ tangentsAreEqual) {
-							Core.Operations.SetAnimableProperty.Perform(point, GetTangentPropertyName(1 - tangentIndex), -(pos + posCorrection.Value));
+							Core.Operations.SetAnimableProperty.Perform(point, GetTangentPropertyName(1 - tangentIndex), -(pos + posCorrection.Value), CoreUserPreferences.Instance.AutoKeyframes);
 						}
 					}
 					yield return null;

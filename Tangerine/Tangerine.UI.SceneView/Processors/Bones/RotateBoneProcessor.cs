@@ -49,7 +49,7 @@ namespace Tangerine.UI.SceneView
 					if (a.Length > Mathf.ZeroTolerance && b.Length > Mathf.ZeroTolerance) {
 						rotation += Mathf.Wrap180(b.Atan2Deg - a.Atan2Deg);
 					}
-					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.Rotation), initRotation + rotation);
+					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.Rotation), initRotation + rotation, CoreUserPreferences.Instance.AutoKeyframes);
 					bone.Parent.Update(0);
 					yield return null;
 				}

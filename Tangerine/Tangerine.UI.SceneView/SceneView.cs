@@ -105,19 +105,19 @@ namespace Tangerine.UI.SceneView
 						var mesh = widget as DistortionMesh;
 						foreach (PointObject point in mesh.Nodes) {
 							Core.Operations.SetAnimableProperty.Perform(point, nameof(PointObject.SkinningWeights),
-								CalcSkinningWeight(point.CalcPositionInSpaceOf(widget.ParentWidget), bones));
+								CalcSkinningWeight(point.CalcPositionInSpaceOf(widget.ParentWidget), bones), CoreUserPreferences.Instance.AutoKeyframes);
 						}
 					} else {
 						Core.Operations.SetAnimableProperty.Perform(widget, nameof(PointObject.SkinningWeights),
-							CalcSkinningWeight(widget.Position, bones));
+							CalcSkinningWeight(widget.Position, bones), CoreUserPreferences.Instance.AutoKeyframes);
 					}
 				}
 				foreach (var bone in bones)
 				{
 					var entry = bone.Parent.AsWidget.BoneArray[bone.Index];
-					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.RefPosition), entry.Joint);
-					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.RefLength), entry.Length);
-					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.RefRotation), entry.Rotation);
+					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.RefPosition), entry.Joint, CoreUserPreferences.Instance.AutoKeyframes);
+					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.RefLength), entry.Length, CoreUserPreferences.Instance.AutoKeyframes);
+					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.RefRotation), entry.Rotation, CoreUserPreferences.Instance.AutoKeyframes);
 				}
 			} finally {
 				Document.Current.History.EndTransaction();
@@ -206,7 +206,7 @@ namespace Tangerine.UI.SceneView
 				var transform = containerWidget.CalcTransitionToSpaceOf(Instance.Scene).CalcInversed();
 				var dragDelta = transform * delta - transform * Vector2.Zero;
 				foreach (var widget in Document.Current.SelectedNodes().Editable().OfType<Widget>()) {
-					Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), widget.Position + dragDelta);
+					Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), widget.Position + dragDelta, CoreUserPreferences.Instance.AutoKeyframes);
 				}
 			}
 		}
@@ -214,14 +214,14 @@ namespace Tangerine.UI.SceneView
 		static void DragNodes3D(Vector2 delta)
 		{
 			foreach (var node3D in Document.Current.SelectedNodes().Editable().OfType<Node3D>()) {
-				Core.Operations.SetAnimableProperty.Perform(node3D, nameof(Widget.Position), node3D.Position + (Vector3)delta / 100);
+				Core.Operations.SetAnimableProperty.Perform(node3D, nameof(Widget.Position), node3D.Position + (Vector3)delta / 100, CoreUserPreferences.Instance.AutoKeyframes);
 			}
 		}
 
 		static void DragSplinePoints3D(Vector2 delta)
 		{
 			foreach (var point in Document.Current.SelectedNodes().Editable().OfType<SplinePoint3D>()) {
-				Core.Operations.SetAnimableProperty.Perform(point, nameof(Widget.Position), point.Position + (Vector3)delta / 100);
+				Core.Operations.SetAnimableProperty.Perform(point, nameof(Widget.Position), point.Position + (Vector3)delta / 100, CoreUserPreferences.Instance.AutoKeyframes);
 			}
 		}
 

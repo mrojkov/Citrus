@@ -130,13 +130,13 @@ namespace Tangerine.UI
 				float rotationDelta = Mathf.Wrap180(widget.Rotation - widgetResultTransform.Rotation);
 
 				if ((widget.Position - widgetResultTransform.Translation).Length > Mathf.ZeroTolerance) {
-					SetAnimableProperty.Perform(widget, nameof(Widget.Position), widgetResultTransform.Translation);
+					SetAnimableProperty.Perform(widget, nameof(Widget.Position), widgetResultTransform.Translation, CoreUserPreferences.Instance.AutoKeyframes);
 				}
 				if (Mathf.Abs(rotationDelta) > Mathf.ZeroTolerance) {
-					SetAnimableProperty.Perform(widget, nameof(Widget.Rotation), widget.Rotation + rotationDelta);
+					SetAnimableProperty.Perform(widget, nameof(Widget.Rotation), widget.Rotation + rotationDelta, CoreUserPreferences.Instance.AutoKeyframes);
 				}
 				if ((widget.Scale - widgetResultTransform.Scale).Length > Mathf.ZeroTolerance) {
-					SetAnimableProperty.Perform(widget, nameof(Widget.Scale), widgetResultTransform.Scale);
+					SetAnimableProperty.Perform(widget, nameof(Widget.Scale), widgetResultTransform.Scale, CoreUserPreferences.Instance.AutoKeyframes);
 				}
 			}
 		}
@@ -223,31 +223,5 @@ namespace Tangerine.UI
 			}
 		}
 
-		public static void SetAnimatorAndInitialKeyframeIfNeed(IAnimable animable, params string[] properties)
-		{
-			var frame = Document.Current.AnimationFrame;
-			Document.Current.AnimationFrame = 0;
-			IAnimator animator;
-			foreach (var propName in properties) {
-				if (!animable.Animators.TryFind(propName, out animator, Document.Current.AnimationId)) {
-					var propValue = animable.GetType().GetProperty(propName).GetValue(animable);
-					SetProperty.Perform(animable, propName, propValue);
-					var type = animable.GetType().GetProperty(propName).PropertyType;
-					animator = AnimatorRegistry.Instance.CreateAnimator(type);
-					animator.TargetProperty = propName;
-					animator.AnimationId = Document.Current.AnimationId;
-					SetAnimator.Perform(animable, animator);
-					SetAnimableProperty.Perform(animable, propName, propValue);
-				}
-			}
-			Document.Current.AnimationFrame = frame;
-		}
-
-		public static void SetAnimatorAndInitialKeyframeIfNeed(IEnumerable<IAnimable> animables, params string[] properties)
-		{
-			foreach (var animable in animables) {
-				SetAnimatorAndInitialKeyframeIfNeed(animable, properties);
-			}
-		}
 	}
 }

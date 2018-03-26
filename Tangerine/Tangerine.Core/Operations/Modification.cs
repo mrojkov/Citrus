@@ -47,36 +47,32 @@ namespace Tangerine.Core.Operations
 
 	public class SetAnimableProperty
 	{
-		public static void Perform(object @object, string propertyName, object value)
+		public static void Perform(object @object, string propertyName, object value, bool createAnimatorIfNeeded, bool createInitialKeyframeForNewAnimator = true)
 		{
 			SetProperty.Perform(@object, propertyName, value);
 			IAnimator animator;
 			var animable = @object as IAnimable;
-			if (animable != null && animable.Animators.TryFind(propertyName, out animator, Document.Current.AnimationId)) {
+			if (animable != null && (animable.Animators.TryFind(propertyName, out animator, Document.Current.AnimationId) || createAnimatorIfNeeded)) {
+				
+				if (animator == null && createInitialKeyframeForNewAnimator) {
+					var frame = Document.Current.AnimationFrame;
+					Document.Current.AnimationFrame = 0;
+
+					var propertyValue = animable.GetType().GetProperty(propertyName).GetValue(animable);
+					Perform(animable, propertyName, propertyValue, true, false);
+					
+					Document.Current.AnimationFrame = frame;
+				}
+				
 				var type = animable.GetType().GetProperty(propertyName).PropertyType;
 				var key =
-					animator.ReadonlyKeys.FirstOrDefault(i => i.Frame == Document.Current.AnimationFrame)?.Clone() ??
+					animator?.ReadonlyKeys.FirstOrDefault(i => i.Frame == Document.Current.AnimationFrame)?.Clone() ??
 					Keyframe.CreateForType(type);
 				key.Frame = Document.Current.AnimationFrame;
-				key.Function = animator.Keys.LastOrDefault(k => k.Frame < key.Frame)?.Function ?? KeyFunction.Linear;
+				key.Function = animator?.Keys.LastOrDefault(k => k.Frame < key.Frame)?.Function ?? KeyFunction.Linear;
 				key.Value = value;
 				SetKeyframe.Perform(animable, propertyName, Document.Current.AnimationId, key);
-			}
-		}
-	}
-
-	public class SetAnimablePropertyWhenNeeded
-	{
-		public static void Perform(object obj, string propertyName, object value)
-		{
-			var animable = obj as IAnimable;
-			IAnimator animator;
-			if (animable != null && animable.Animators.TryFind(propertyName, out animator, Document.Current.AnimationId) &&
-				animator.ReadonlyKeys.Count > 0) {
-				SetAnimableProperty.Perform(obj, propertyName, value);
-
-			} else {
-				SetProperty.Perform(obj, propertyName, value);
+				
 			}
 		}
 	}
@@ -190,39 +186,6 @@ namespace Tangerine.Core.Operations
 					op.Animable.Animators.Remove(b.Animator);
 				}
 				b.Animator.ResetCache();
-			}
-		}
-	}
-
-	public class SetAnimator : Operation
-	{
-		public readonly IAnimator Animator;
-		public readonly IAnimable Animable;
-
-		public override bool IsChangingDocument => true;
-
-		public static void Perform(IAnimable animable, IAnimator animator)
-		{
-			Document.Current.History.Perform(new SetAnimator(animable, animator));
-		}
-
-		private SetAnimator(IAnimable animable, IAnimator animator)
-		{
-			Animable = animable;
-			Animator = animator;
-		}
-
-		public class Processor : OperationProcessor<SetAnimator>
-		{
-
-			protected override void InternalRedo(SetAnimator op)
-			{
-				op.Animable.Animators.Add(op.Animator);
-			}
-
-			protected override void InternalUndo(SetAnimator op)
-			{
-				op.Animable.Animators.Remove(op.Animator);
 			}
 		}
 	}

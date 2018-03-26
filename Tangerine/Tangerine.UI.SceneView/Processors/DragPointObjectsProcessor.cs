@@ -66,14 +66,8 @@ namespace Tangerine.UI.SceneView
 								parent.Size.X != 0 &&
 								parent.Size.Y != 0
 							) {
-								if (CoreUserPreferences.Instance.AutoKeyframes) {
-									Utils.SetAnimatorAndInitialKeyframeIfNeed(pobjects[i], nameof(PointObject.Position));
-								}
 								SetPosition(pobjects[i], (pobjects[i].TransformedPosition + dragDelta - pobjects[i].Offset) / parent.Size);
 								if (sv.Input.IsKeyPressed(Key.Control) && pobjects[i] is DistortionMeshPoint) {
-									if (CoreUserPreferences.Instance.AutoKeyframes) {
-										Utils.SetAnimatorAndInitialKeyframeIfNeed(pobjects[i], nameof(DistortionMeshPoint.UV));
-									}
 									var p = pobjects[i] as DistortionMeshPoint;
 									SetUV(p, p.UV + dragDelta / parent.Size);
 								}
@@ -90,12 +84,12 @@ namespace Tangerine.UI.SceneView
 
 		private void SetUV(DistortionMeshPoint pointObject, Vector2 value)
 		{
-			Core.Operations.SetAnimableProperty.Perform(pointObject, nameof(DistortionMeshPoint.UV), value);
+			Core.Operations.SetAnimableProperty.Perform(pointObject, nameof(DistortionMeshPoint.UV), value, CoreUserPreferences.Instance.AutoKeyframes);
 		}
 
 		public static void SetPosition(PointObject po, Vector2 value)
 		{
-			Core.Operations.SetAnimableProperty.Perform(po, nameof(PointObject.Position), value);
+			Core.Operations.SetAnimableProperty.Perform(po, nameof(PointObject.Position), value, CoreUserPreferences.Instance.AutoKeyframes);
 		}
 	}
 }

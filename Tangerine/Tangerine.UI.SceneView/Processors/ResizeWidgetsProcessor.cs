@@ -54,15 +54,9 @@ namespace Tangerine.UI.SceneView
 					var proportional = sv.Input.IsKeyPressed(Key.Shift);
 
 					if (sv.Input.IsKeyPressed(Key.Control)) {
-						if (CoreUserPreferences.Instance.AutoKeyframes) {
-							Utils.SetAnimatorAndInitialKeyframeIfNeed(widgets.Cast<IAnimable>(), nameof(Widget.Position), nameof(Widget.Scale));
-						}
 						RescaleWidgets(hull, widgets.Count <= 1, pivot, widgets, controlPointIndex, sv.MousePosition, mouseStartPos,
 							proportional);
 					} else {
-						if (CoreUserPreferences.Instance.AutoKeyframes) {
-							Utils.SetAnimatorAndInitialKeyframeIfNeed(widgets.Cast<IAnimable>(), nameof(Widget.Position), nameof(Widget.Size));
-						}
 						foreach (Widget widget in widgets) {
 							ResizeWidget(widget, controlPointIndex, sv.MousePosition, mouseStartPos, proportional);
 						}
@@ -163,8 +157,8 @@ namespace Tangerine.UI.SceneView
 
 			var position = widget.Position +
 					Vector2.RotateDeg(deltaPosition + widget.Pivot * deltaSize, widget.Rotation).Snap(Vector2.Zero);
-			Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), position);
-			Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Size), size);
+			Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), position, CoreUserPreferences.Instance.AutoKeyframes);
+			Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Size), size, CoreUserPreferences.Instance.AutoKeyframes);
 		}
 
 		void RescaleWidgets(Quadrangle originalHull, bool hullInFirstWidgetSpace, Vector2 hullsPivotPoint, List<Widget> widgets, int controlPointIndex,

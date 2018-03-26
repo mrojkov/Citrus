@@ -80,9 +80,6 @@ namespace Tangerine.UI.SceneView
 				initialPointsBounds = Utils.CalcAABB(points);
 				while (sv.Input.IsMousePressed()) {
 					Document.Current.History.RevertActiveTransaction();
-					if (CoreUserPreferences.Instance.AutoKeyframes) {
-						Utils.SetAnimatorAndInitialKeyframeIfNeed(points.Cast<IAnimable>(), nameof(PointObject.Position));
-					}
 					Utils.ChangeCursorIfDefault(cursor);
 					RescaleHelper(
 						points,
@@ -137,7 +134,7 @@ namespace Tangerine.UI.SceneView
 			}
 			for (var i = 0; i < points.Count; i++) {
 				var deltaPos = basisInversed * points[i].Position * deltaSize * basis - Vector2.Zero * basis;
-				Core.Operations.SetAnimableProperty.Perform(points[i], nameof(PointObject.Position), points[i].Position + deltaPos);
+				Core.Operations.SetAnimableProperty.Perform(points[i], nameof(PointObject.Position), points[i].Position + deltaPos, CoreUserPreferences.Instance.AutoKeyframes);
 			}
 		}
 	}

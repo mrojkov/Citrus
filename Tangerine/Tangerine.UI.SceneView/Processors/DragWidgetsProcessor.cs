@@ -54,9 +54,6 @@ namespace Tangerine.UI.SceneView
 				Utils.CalcHullAndPivot(widgets, Document.Current.Container.AsWidget, out hull, out pivot);
 				while (sv.Input.IsMousePressed()) {
 					Document.Current.History.RevertActiveTransaction();
-					if (CoreUserPreferences.Instance.AutoKeyframes) {
-						Utils.SetAnimatorAndInitialKeyframeIfNeed(widgets.Cast<IAnimable>(), nameof(Widget.Position));
-					}
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					var curMousePos = sv.MousePosition;
 					var shiftPressed = sv.Input.IsKeyPressed(Key.Shift);
@@ -99,7 +96,7 @@ namespace Tangerine.UI.SceneView
 				if (SceneViewCommands.SnapWidgetPivotToRuler.Checked) {
 					pos = SnapPointToLines(pos, lines);
 				}
-				Core.Operations.SetAnimableProperty.Perform(widgets[i], nameof(Widget.Position), pos);
+				Core.Operations.SetAnimableProperty.Perform(widgets[i], nameof(Widget.Position), pos, CoreUserPreferences.Instance.AutoKeyframes);
 			}
 		}
 

@@ -44,9 +44,6 @@ namespace Tangerine.UI.SceneView
 				var matrix = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container as Widget);
 				while (sv.Input.IsMousePressed()) {
 					Document.Current.History.RevertActiveTransaction();
-					if (CoreUserPreferences.Instance.AutoKeyframes) {
-						Utils.SetAnimatorAndInitialKeyframeIfNeed(point, nameof(SplinePoint.TangentAngle), nameof(SplinePoint.TangentWeight));
-					}
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					var curMousePos = sv.MousePosition;
 					if ((curMousePos - iniMousePos).Snap(Vector2.Zero) != Vector2.Zero) {
@@ -54,8 +51,8 @@ namespace Tangerine.UI.SceneView
 						var o = point.TransformedPosition;
 						var angle = (index == 0 ? o - p : p - o).Atan2Deg;
 						var weight = (p - o).Length / SplinePointPresenter.TangentWeightRatio;
-						Core.Operations.SetAnimableProperty.Perform(point, nameof(SplinePoint.TangentAngle), angle);
-						Core.Operations.SetAnimableProperty.Perform(point, nameof(SplinePoint.TangentWeight), weight);
+						Core.Operations.SetAnimableProperty.Perform(point, nameof(SplinePoint.TangentAngle), angle, CoreUserPreferences.Instance.AutoKeyframes);
+						Core.Operations.SetAnimableProperty.Perform(point, nameof(SplinePoint.TangentWeight), weight, CoreUserPreferences.Instance.AutoKeyframes);
 					}
 					yield return null;
 				}

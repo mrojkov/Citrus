@@ -148,10 +148,7 @@ namespace Tangerine.UI.Inspector
 
 		private void SetAnimableProperty(object obj, string propertyName, object value)
 		{
-			if (CoreUserPreferences.Instance.AutoKeyframes) {
-				Utils.SetAnimatorAndInitialKeyframeIfNeed((IAnimable)obj, propertyName);
-			}
-			Core.Operations.SetAnimableProperty.Perform(obj, propertyName, value);
+			Core.Operations.SetAnimableProperty.Perform(obj, propertyName, value, CoreUserPreferences.Instance.AutoKeyframes);
 		}
 
 		private void AddGroupHeader(string text)
