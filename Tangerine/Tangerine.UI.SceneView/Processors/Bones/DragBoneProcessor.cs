@@ -1,4 +1,5 @@
-﻿using Lime;
+﻿using System;
+using Lime;
 using System.Collections.Generic;
 using System.Linq;
 using Tangerine.Core;
@@ -91,6 +92,9 @@ namespace Tangerine.UI.SceneView
 			try {
 				var iniMousePos = sv.MousePosition;
 				var transform = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
+				
+				Dictionary<Bone, AccumulativeRotationHelper> accumulativeRotationsHelpersByBones = new Dictionary<Bone, AccumulativeRotationHelper>();
+
 				while (sv.Input.IsMousePressed()) {
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					if (sv.Input.IsKeyPressed(Key.Control)) {
@@ -103,14 +107,20 @@ namespace Tangerine.UI.SceneView
 							angle = Vector2.AngleDeg(prentDir, dir);
 						}
 						if (!sv.Input.IsKeyPressed(Key.Alt)) {
-							Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.Rotation), angle, CoreUserPreferences.Instance.AutoKeyframes);
+							Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.Rotation), 
+								GetRotationByBone(accumulativeRotationsHelpersByBones, bone, angle), 
+								CoreUserPreferences.Instance.AutoKeyframes
+							);
 						}
 						Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.Length), dir.Length, CoreUserPreferences.Instance.AutoKeyframes);
 					} else {
 						var dragDelta = sv.MousePosition * transform - iniMousePos * transform;
 						var boneChain = IKSolver.SolveFor(bone, entry.Tip + dragDelta);
-						foreach (var pair in boneChain) {
-							Core.Operations.SetAnimableProperty.Perform(pair.Item1, nameof(Bone.Rotation), pair.Item2, CoreUserPreferences.Instance.AutoKeyframes);
+						foreach (Tuple<Bone, float> pair in boneChain) {
+							Core.Operations.SetAnimableProperty.Perform(pair.Item1, nameof(Bone.Rotation),
+								GetRotationByBone(accumulativeRotationsHelpersByBones, pair.Item1, pair.Item2), 
+								CoreUserPreferences.Instance.AutoKeyframes
+							);
 						}
 					}
 					bone.Parent.Update(0);
@@ -122,5 +132,17 @@ namespace Tangerine.UI.SceneView
 				Window.Current.Invalidate();
 			}
 		}
+
+		private static float GetRotationByBone(IDictionary<Bone, AccumulativeRotationHelper> accumulativeRotationsHelpersByBones, Bone bone, float rotation)
+		{
+			if (!accumulativeRotationsHelpersByBones.ContainsKey(bone)) {
+				accumulativeRotationsHelpersByBones[bone] = new AccumulativeRotationHelper(bone.Rotation, rotation);
+			}
+			AccumulativeRotationHelper accumulativeRotationHelper = accumulativeRotationsHelpersByBones[bone];
+			accumulativeRotationHelper.ProvideRotation(rotation);
+			return accumulativeRotationHelper.Rotation;
+		}
+
 	}
+
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Lime;
 using Tangerine.Core;
@@ -37,13 +38,15 @@ namespace Tangerine.UI.SceneView
 				var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>().ToList();
 				var mouseStartPos = sv.MousePosition;
 
-				float accumAngle = 0;
-				float prevAngle = 0;
-
+				List<Tuple<Widget, AccumulativeRotationHelper>> accumulateRotationHelpers =
+					widgets.Select(widget =>
+						new Tuple<Widget, AccumulativeRotationHelper>(widget, new AccumulativeRotationHelper(widget.Rotation, 0))
+					).ToList();
+				
 				while (sv.Input.IsMousePressed()) {
 					Utils.ChangeCursorIfDefault(Cursors.Rotate);
 					Document.Current.History.RevertActiveTransaction();
-					RotateWidgets(pivot, widgets, sv.MousePosition, mouseStartPos, sv.Input.IsKeyPressed(Key.Shift), ref accumAngle, ref prevAngle);
+					RotateWidgets(pivot, widgets, sv.MousePosition, mouseStartPos, sv.Input.IsKeyPressed(Key.Shift), accumulateRotationHelpers);
 					yield return null;
 				}
 			} finally {
@@ -53,11 +56,8 @@ namespace Tangerine.UI.SceneView
 		}
 
 		private void RotateWidgets(Vector2 pivotPoint, List<Widget> widgets, Vector2 curMousePos, Vector2 prevMousePos,
-			bool discret, ref float accumAngle, ref float prevAngle)
+			bool discret, List<Tuple<Widget, AccumulativeRotationHelper>> accumulativeRotationHelpers)
 		{
-			List<KeyValuePair<Widget, float>> wasRotations = widgets.Select(widget => new KeyValuePair<Widget, float>(widget, widget.Rotation)).ToList();
-
-			float rotationRes = prevAngle;
 			Utils.ApplyTransformationToWidgetsGroupOobb(
 				sv.Scene,
 				widgets, pivotPoint, false, curMousePos, prevMousePos,
@@ -73,22 +73,17 @@ namespace Tangerine.UI.SceneView
 						rotation = Utils.RoundTo(rotation, 15);
 					}
 
-					rotationRes = rotation;
-					
+					foreach (Tuple<Widget, AccumulativeRotationHelper> tuple in accumulativeRotationHelpers) {
+						tuple.Item2.ProvideRotation(rotation);
+					}
+
 					return Matrix32.Rotation(rotation * Mathf.DegToRad);
 				}
 			);
 
-			// accumulate rotation, each visual turn of widget will increase it's angle on 360,
-			// without that code angle will be allways [-180; 180)
-			rotationRes = Mathf.Wrap180(rotationRes);
-			float rotationDelta = Mathf.Wrap180(rotationRes - prevAngle);
-			prevAngle = rotationRes;
-
-			accumAngle += rotationDelta;
-
-			foreach (KeyValuePair<Widget,float> wasRotation in wasRotations) {
-				SetAnimableProperty.Perform(wasRotation.Key, nameof(Widget.Rotation), wasRotation.Value + accumAngle, CoreUserPreferences.Instance.AutoKeyframes);
+			foreach (Tuple<Widget, AccumulativeRotationHelper> tuple in accumulativeRotationHelpers) {
+				SetAnimableProperty.Perform(tuple.Item1, nameof(Widget.Rotation), tuple.Item2.Rotation,
+					CoreUserPreferences.Instance.AutoKeyframes);
 			}
 		}
 
