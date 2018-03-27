@@ -230,5 +230,16 @@ namespace Lime
 			yield return time;
 			action();
 		}
+
+		/// <summary>
+		///  Wait while predicate is true before executing an action.
+		/// </summary>
+		public static IEnumerator<object> Delay(Func<bool> predicate, Action action)
+		{
+			while (predicate()) {
+				yield return null;
+			}
+			action();
+		}
 	}
 }
