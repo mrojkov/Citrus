@@ -31,7 +31,11 @@ namespace Tangerine.Core
 				foreach (var document in Project.Current.Documents) {
 					if (document.IsModified) {
 						var path = GetTemporalFilePath(document.Path);
-						document.SaveTo(path, System.IO.FileAttributes.Hidden);
+						try {
+							document.SaveTo(path, FileAttributes.Hidden);
+						} catch (Exception e) {
+							Console.WriteLine("Error on autosave document '{0}':\n{1}", document.Path, e);
+						}
 					}
 				}
 			}
