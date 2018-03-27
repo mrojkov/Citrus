@@ -332,6 +332,11 @@ namespace Lime
 			return GetDescriptor(path).CookingRulesSHA1;
 		}
 
+		public override int GetFileSize(string path)
+		{
+			return GetDescriptor(path).Length;
+		}
+
 		public override void DeleteFile(string path)
 		{
 			path = AssetPath.CorrectSlashes(path);

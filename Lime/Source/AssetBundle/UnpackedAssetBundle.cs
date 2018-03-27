@@ -29,6 +29,11 @@ namespace Lime
 #endif
 		}
 
+		public override int GetFileSize(string path)
+		{
+			return (int)(new FileInfo(path).Length);
+		}
+
 		public override byte[] GetCookingRulesSHA1(string path)
 		{
 			throw new NotImplementedException();

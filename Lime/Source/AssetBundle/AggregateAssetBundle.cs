@@ -57,6 +57,16 @@ namespace Lime
 			throw new InvalidOperationException($"Path {path} not found in aggregate asset bundle.");
 		}
 
+		public override int GetFileSize(string path)
+		{
+			foreach (var bundle in bundles) {
+				if (bundle.FileExists(path)) {
+					return bundle.GetFileSize(path);
+				}
+			}
+			throw new InvalidOperationException($"Path {path} not found in aggregate asset bundle.");
+		}
+
 		public override void DeleteFile(string path)
 		{
 			throw new InvalidOperationException("Not supported by aggregate asset bundle.");

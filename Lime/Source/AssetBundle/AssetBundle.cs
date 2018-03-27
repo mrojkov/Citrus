@@ -62,6 +62,7 @@ namespace Lime
 
 		public abstract DateTime GetFileLastWriteTime(string path);
 		public abstract byte[] GetCookingRulesSHA1(string path);
+		public abstract int GetFileSize(string path);
 
 		public abstract void DeleteFile(string path);
 		public abstract bool FileExists(string path);
