@@ -16,7 +16,7 @@ namespace Tangerine.Core
 
 		public static string GetTemporalFilePath(string path)
 		{
-			return Path.Combine(Path.GetDirectoryName(path), Prefix + Path.GetFileName(path));
+			return Path.Combine(Lime.Environment.GetDataDirectory("Tangerine"), Prefix + Path.GetFileName(path));
 		}
 
 		public AutosaveProcessor(Func<int> delayGetter)
