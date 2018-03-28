@@ -11,27 +11,8 @@ namespace Lime
 {
 	public sealed class TexturePool
 	{
-		private class StubTexture : Texture2D
-		{
-			public override bool IsStubTexture
-			{
-				get { return true; }
-			}
 
-			public StubTexture()
-			{
-				var pixels = new Color4[128 * 128];
-				for (int i = 0; i < 128; i++)
-					for (int j = 0; j < 128; j++)
-						pixels[i * 128 + j] = (((i + (j & ~7)) & 8) == 0) ? Color4.Blue : Color4.White;
-				Window.Current.InvokeOnRendering(() =>
-					LoadImage(pixels, 128, 128)
-				);
-			}
-		}
-
-		public delegate void TextureMissingDelegate(string path);
-		public static event TextureMissingDelegate TextureMissing;
+		public static event Texture2D.TextureMissingDelegate TextureMissing;
 
 #if UNITY
 		private readonly Dictionary<string, WeakReference> textures = new Dictionary<string, WeakReference>();
@@ -101,39 +82,21 @@ namespace Lime
 
 		private static ITexture CreateTexture(string path)
 		{
+			ITexture texture;
+			
 			if (string.IsNullOrEmpty(path)) {
-				return new StubTexture();
+				texture = new Texture2D();
+				((Texture2D) texture).LoadStubImage();
+				return texture;
 			}
-			var texture = TryCreateRenderTarget(path) ??
-				TryLoadTextureAtlasPart(path + ".atlasPart") ??
-#if iOS || ANDROID
-				TryLoadImage(path + ".pvr") ??
-				TryLoadImage(path + ".jpg");
-#else
-				TryLoadImage(path + ".dds") ??
-				TryLoadImage(path + ".pvr") ??
-				TryLoadImage(path + ".jpg") ??
-				TryLoadImage(path + ".png");
-#endif
+			
+			texture = TryCreateRenderTarget(path) ?? TryLoadTextureAtlasPart(path + ".atlasPart");
+			
 			if (texture == null) {
-				Console.WriteLine("Missing texture '{0}'", path);
-				if (TextureMissing != null) {
-					TextureMissing(path);
-				}
-				texture = new StubTexture();
+				texture = new Texture2D();
+				((Texture2D) texture).LoadImage(path, TextureMissing);
 			}
-			return texture;
-		}
-
-		private static ITexture TryLoadImage(string path)
-		{
-			if (!AssetBundle.Current.FileExists(path)) {
-				return null;
-			}
-			var texture = new Texture2D();
-			texture.LoadTextureParams(path);
-			texture.LoadImage(path);
-			AudioSystem.Update();
+			
 			return texture;
 		}
 

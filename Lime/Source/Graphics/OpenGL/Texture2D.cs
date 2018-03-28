@@ -23,6 +23,14 @@ namespace Lime
 			public abstract void Reload(Texture2D texture);
 		}
 
+		class TextureStubReloader : TextureReloader
+		{
+			public override void Reload(Texture2D texture)
+			{
+				texture.LoadStubImage();
+			}
+		}
+
 		class TextureBundleReloader : TextureReloader
 		{
 			public string path;
@@ -34,7 +42,6 @@ namespace Lime
 
 			public override void Reload(Texture2D texture)
 			{
-				texture.LoadTextureParams(path);
 				texture.LoadImage(path);
 			}
 		}
@@ -76,6 +83,16 @@ namespace Lime
 		}
 		#endregion
 
+		public delegate void TextureMissingDelegate(string path);
+
+		private static readonly string[] AffordableTextureFileExtensions = {
+#if iOS || ANDROID
+			"pvr", "jpg"
+#else
+			"dds", "pvr", "jpg", "png"
+#endif
+		};
+		
 		private uint handle;
 		public OpacityMask OpacityMask { get; private set; }
 		public Size ImageSize { get; protected set; }
@@ -96,7 +113,7 @@ namespace Lime
 
 		public void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv) { }
 
-		public virtual bool IsStubTexture { get { return false; } }
+		public bool IsStubTexture { get; private set; }
 
 		private void SetTextureParameter(TextureParameterName name, int value)
 		{
@@ -132,7 +149,7 @@ namespace Lime
 			GLObjectRegistry.Instance.Add(this);
 		}
 
-		public void LoadTextureParams(string path)
+		private void LoadTextureParams(string path)
 		{
 			var textureParamsPath = Path.ChangeExtension(path, ".texture");
 			if (AssetBundle.Current.FileExists(textureParamsPath)) {
@@ -144,20 +161,70 @@ namespace Lime
 			}
 		}
 
-		public void LoadImage(string path)
+		public void LoadImage(string path, TextureMissingDelegate onTextureMissing = null)
 		{
-			using (var stream = AssetBundle.Current.OpenFileLocalized(path)) {
-				LoadImageHelper(stream, createReloader: false);
+			IsStubTexture = false;
+
+			try {
+				foreach (string textureFileExtension in AffordableTextureFileExtensions) {
+					string tryPath = Path.ChangeExtension(path, textureFileExtension);
+					if (!AssetBundle.Current.FileExists(tryPath)) {
+						continue;
+					}
+
+					Stream stream;
+					try {
+						stream = AssetBundle.Current.OpenFileLocalized(tryPath);
+					} catch (Exception e) {
+						Console.WriteLine("Can not open file '{0}':\n{1}", path, e);
+						continue;
+					}
+				
+					using (stream) {
+						LoadImageHelper(stream, createReloader: false);
+					}
+				
+					LoadTextureParams(path);
+
+					var maskPath = Path.ChangeExtension(path, ".mask");
+					if (AssetBundle.Current.FileExists(maskPath)) {
+						OpacityMask = new OpacityMask(maskPath);
+					}
+				
+					// Update audio buffers if the audio system performs in the main thread.
+					AudioSystem.Update();
+
+					return;
+				}
+
+				Console.WriteLine("Missing texture '{0}'", path);
+				onTextureMissing?.Invoke(path);
+				LoadStubImage();
+			} finally {
+				reloader = new TextureBundleReloader(path);
 			}
-			reloader = new TextureBundleReloader(path);
-			var maskPath = Path.ChangeExtension(path, ".mask");
-			if (AssetBundle.Current.FileExists(maskPath)) {
-				OpacityMask = new OpacityMask(maskPath);
-			}
+		}
+
+		internal void LoadStubImage()
+		{
+			TextureParams = TextureParams.Default;
+			OpacityMask = null;
+
+			var pixels = new Color4[128 * 128];
+			for (int i = 0; i < 128; i++)
+				for (int j = 0; j < 128; j++)
+					pixels[i * 128 + j] = (((i + (j & ~7)) & 8) == 0) ? Color4.Blue : Color4.White;
+
+			LoadImage(pixels, 128, 128);
+			
+			IsStubTexture = true;
+			reloader = new TextureStubReloader();
 		}
 
 		public void LoadImage(byte[] data)
 		{
+			IsStubTexture = false;
+			
 			using (var stream = new MemoryStream(data)) {
 				LoadImage(stream);
 			}
@@ -165,11 +232,15 @@ namespace Lime
 
 		public void LoadImage(Stream stream)
 		{
+			IsStubTexture = false;
+
 			LoadImageHelper(stream, createReloader: true);
 		}
 
 		public void LoadImage(Bitmap bitmap)
 		{
+			IsStubTexture = false;
+
 			LoadImage(bitmap.GetPixels(), bitmap.Width, bitmap.Height);
 		}
 
@@ -229,6 +300,8 @@ namespace Lime
 		/// </summary>
 		public void LoadImage(Color4[] pixels, int width, int height)
 		{
+			IsStubTexture = false;
+			
 			reloader = new TexturePixelArrayReloader(pixels, width, height);
 
 			MemoryUsed = 4 * width * height;
@@ -256,6 +329,8 @@ namespace Lime
 		/// </summary>
 		public void LoadSubImage(Color4[] pixels, int x, int y, int width, int height)
 		{
+			IsStubTexture = false;
+			
 			Window.Current.InvokeOnRendering(() => {
 				PrepareOpenGLTexture();
 				PlatformRenderer.PushTexture(handle, 0);
