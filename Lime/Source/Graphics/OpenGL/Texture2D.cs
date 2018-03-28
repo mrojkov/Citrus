@@ -87,9 +87,9 @@ namespace Lime
 
 		private static readonly string[] AffordableTextureFileExtensions = {
 #if iOS || ANDROID
-			"pvr", "jpg"
+			".pvr", ".jpg"
 #else
-			"dds", "pvr", "jpg", "png"
+			".dds", ".pvr", ".jpg", ".png"
 #endif
 		};
 		
@@ -151,7 +151,7 @@ namespace Lime
 
 		private void LoadTextureParams(string path)
 		{
-			var textureParamsPath = Path.ChangeExtension(path, ".texture");
+			var textureParamsPath = path + ".texture";
 			if (AssetBundle.Current.FileExists(textureParamsPath)) {
 				using (var stream = AssetBundle.Current.OpenFile(textureParamsPath)) {
 					TextureParams = Serialization.ReadObject<TextureParams>(textureParamsPath, stream);
@@ -167,7 +167,7 @@ namespace Lime
 
 			try {
 				foreach (string textureFileExtension in AffordableTextureFileExtensions) {
-					string tryPath = Path.ChangeExtension(path, textureFileExtension);
+					string tryPath = path + textureFileExtension;
 					if (!AssetBundle.Current.FileExists(tryPath)) {
 						continue;
 					}
@@ -186,7 +186,7 @@ namespace Lime
 				
 					LoadTextureParams(path);
 
-					var maskPath = Path.ChangeExtension(path, ".mask");
+					var maskPath = path + ".mask";
 					if (AssetBundle.Current.FileExists(maskPath)) {
 						OpacityMask = new OpacityMask(maskPath);
 					}
