@@ -96,6 +96,7 @@
     <Compile Include="Presenters\FrameBorderPresenter.cs" />
     <Compile Include="Widgets\Ruler.cs" />
     <Compile Include="SceneUserPreferences.cs" />
+    <Compile Include="Utils\AccumulativeRotationHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Mac.csproj">
