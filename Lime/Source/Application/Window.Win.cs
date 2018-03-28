@@ -1,4 +1,4 @@
-﻿ #if WIN
+ #if WIN
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -80,7 +80,7 @@ namespace Lime
 		{
 			get
 			{
-				return borderStyle != FormBorderStyle.Sizable; 
+				return borderStyle != FormBorderStyle.Sizable;
 			}
 
 			set
@@ -154,6 +154,12 @@ namespace Lime
 		{
 			var sp = LimeToSD.ConvertToPoint(wp, PixelScale);
 			return new Point(sp.X + glControl.Left, sp.Y + glControl.Top);
+		}
+
+		public Vector2 WorldToWindowVector(Vector2 wp)
+		{
+			var sp = LimeToSD.ConvertToPoint(wp, PixelScale);
+			return new Vector2(sp.X + glControl.Left, sp.Y + glControl.Top);
 		}
 
 		FPSCounter fpsCounter = new FPSCounter();
