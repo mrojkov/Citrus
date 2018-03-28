@@ -21,7 +21,12 @@ namespace Tangerine.UI.FilesystemView
 			if (path.IsNullOrWhiteSpace()) {
 				return TexturePool.Instance.GetTexture(null);
 			}
-			FileAttributes attr = File.GetAttributes(path);
+			FileAttributes attr;
+			try {
+				attr = File.GetAttributes(path);
+			} catch (System.Exception) {
+				return TexturePool.Instance.GetTexture(null);
+			}
 			bool isDirectory = (attr & FileAttributes.Directory) == FileAttributes.Directory;
 			if (isDirectory && directoryTexture != null) {
 				return directoryTexture;
