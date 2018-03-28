@@ -164,30 +164,30 @@ namespace Tangerine.UI.SceneView
 		void RescaleWidgets(Quadrangle originalHull, bool hullInFirstWidgetSpace, Vector2 hullsPivotPoint, List<Widget> widgets, int controlPointIndex,
 			Vector2 curMousePos, Vector2 prevMousePos, bool proportional)
 		{
-			Utils.ApplyTransformationToWidgetsGroupOobb(
+			Utils.ApplyTransformationToWidgetsGroupObb(
 				sv.Scene,
 				widgets, hullsPivotPoint, hullInFirstWidgetSpace, curMousePos, prevMousePos,
-				(originalVectorInOobbSpace, deformedVectorInOobbSpace) => {
-					Vector2 deformationScaleInOobbSpace =
+				(originalVectorInObbSpace, deformedVectorInObbSpace) => {
+					Vector2 deformationScaleInObbSpace =
 							new Vector2(
-								Math.Abs(originalVectorInOobbSpace.X) < Mathf.ZeroTolerance
+								Math.Abs(originalVectorInObbSpace.X) < Mathf.ZeroTolerance
 									? 1
-									: deformedVectorInOobbSpace.X / originalVectorInOobbSpace.X,
-								Math.Abs(originalVectorInOobbSpace.Y) < Mathf.ZeroTolerance
+									: deformedVectorInObbSpace.X / originalVectorInObbSpace.X,
+								Math.Abs(originalVectorInObbSpace.Y) < Mathf.ZeroTolerance
 									? 1
-									: deformedVectorInOobbSpace.Y / originalVectorInOobbSpace.Y
+									: deformedVectorInObbSpace.Y / originalVectorInObbSpace.Y
 							);
 					
 					if (!LookupInvolvedAxes[controlPointIndex][0]) {
-						deformationScaleInOobbSpace.X = proportional ? deformationScaleInOobbSpace.Y : 1;
+						deformationScaleInObbSpace.X = proportional ? deformationScaleInObbSpace.Y : 1;
 					} else if (!LookupInvolvedAxes[controlPointIndex][1]) {
-						deformationScaleInOobbSpace.Y = proportional ? deformationScaleInOobbSpace.X : 1;
+						deformationScaleInObbSpace.Y = proportional ? deformationScaleInObbSpace.X : 1;
 					} else if (proportional) {
-						deformationScaleInOobbSpace.X = (deformationScaleInOobbSpace.X + deformationScaleInOobbSpace.Y) / 2;
-						deformationScaleInOobbSpace.Y = deformationScaleInOobbSpace.X;
+						deformationScaleInObbSpace.X = (deformationScaleInObbSpace.X + deformationScaleInObbSpace.Y) / 2;
+						deformationScaleInObbSpace.Y = deformationScaleInObbSpace.X;
 					}
 
-					return Matrix32.Scaling(deformationScaleInOobbSpace);
+					return Matrix32.Scaling(deformationScaleInObbSpace);
 				}
 			);
 		}

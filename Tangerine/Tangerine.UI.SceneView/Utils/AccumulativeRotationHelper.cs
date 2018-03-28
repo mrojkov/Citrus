@@ -20,7 +20,7 @@ namespace Tangerine.UI.SceneView
 			get { return rotationInitial + rotationAccumulated; }
 		}
 
-		public void ProvideRotation(float rotation)
+		public void Rotate(float rotation)
 		{
 			rotation = Mathf.Wrap180(rotation);
 			

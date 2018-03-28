@@ -10,6 +10,8 @@ namespace Tangerine.UI
 {
 	public static class Utils
 	{
+		public delegate Matrix32 CalculateTransformationDelegate(Vector2 fromOriginalVectorInObbSpace, Vector2 toDeformedVectorInObbSpace);
+		
 		public static IEnumerable<T> Editable<T>(this IEnumerable<T> nodes) where T : Node
 		{
 			return nodes.Where(n => !n.GetTangerineFlag(TangerineFlags.Locked) && !n.GetTangerineFlag(TangerineFlags.Hidden));
@@ -37,96 +39,95 @@ namespace Tangerine.UI
 			return (value / step).Round() * step;
 		}
 
-		public static void ApplyTransformationToWidgetsGroupOobb(Widget sceneWidget, IList<Widget> widgetsInParentSpace,
-			Vector2 pivotInSceneSpace, bool oobbInFirstWidgetSpace,
-			Vector2 curMousePosInSceneSpace, Vector2 prevMousePosSceneSpace,
-			Func<Vector2, Vector2, Matrix32> onCalcTransformationFromOriginalVectorInOobbSpaceAndDeformedVectorInOobbSpace)
+		public static void ApplyTransformationToWidgetsGroupObb(Widget sceneWidget, IList<Widget> widgetsInParentSpace,
+			Vector2 pivotInSceneSpace, bool obbInFirstWidgetSpace,
+			Vector2 currentMousePosInSceneSpace, Vector2 previousMousePosSceneSpace,
+			CalculateTransformationDelegate onCalculateTransformation)
 		{
 			if (widgetsInParentSpace.Count == 0) return;
 
 			Matrix32 fromSceneToParentSpace = sceneWidget.CalcTransitionToSpaceOf(widgetsInParentSpace[0].ParentWidget);
 
-			ApplyTransformationToWidgetsGroupOobb(
+			ApplyTransformationToWidgetsGroupObb(
 				widgetsInParentSpace, 
 				pivotInSceneSpace * fromSceneToParentSpace,
-				oobbInFirstWidgetSpace,
-				curMousePosInSceneSpace * fromSceneToParentSpace,
-				prevMousePosSceneSpace * fromSceneToParentSpace, 
-				onCalcTransformationFromOriginalVectorInOobbSpaceAndDeformedVectorInOobbSpace
+				obbInFirstWidgetSpace,
+				currentMousePosInSceneSpace * fromSceneToParentSpace,
+				previousMousePosSceneSpace * fromSceneToParentSpace, 
+				onCalculateTransformation
 			);
 		}
 
-		public static void ApplyTransformationToWidgetsGroupOobb(IList<Widget> widgetsInParentSpace,
-			Vector2 pivotInParentSpace, bool oobbInFirstWidgetSpace,
-			Vector2 curMousePosInParentSpace, Vector2 prevMousePosInParentSpace,
-			Func<Vector2, Vector2, Matrix32> onCalcTransformationFromOriginalVectorInOobbSpaceAndDeformedVectorInOobbSpace)
+		public static void ApplyTransformationToWidgetsGroupObb(IList<Widget> widgetsInParentSpace,
+			Vector2 pivotInParentSpace, bool obbInFirstWidgetSpace,
+			Vector2 currentMousePosInParentSpace, Vector2 previousMousePosInParentSpace,
+			CalculateTransformationDelegate onCalculateTransformation)
 		{
 			if (widgetsInParentSpace.Count == 0) return;
 
-			Matrix32 originalOobbToParentSpace = Matrix32.Translation(pivotInParentSpace);
-			if (oobbInFirstWidgetSpace) {
+			Matrix32 originalObbToParentSpace = Matrix32.Translation(pivotInParentSpace);
+			if (obbInFirstWidgetSpace) {
 				Matrix32 firstWidgetToParentSpace = widgetsInParentSpace[0].CalcLocalToParentTransform();
 
-				originalOobbToParentSpace = firstWidgetToParentSpace *
+				originalObbToParentSpace = firstWidgetToParentSpace *
 						Matrix32.Translation(firstWidgetToParentSpace.T).CalcInversed() * Matrix32.Translation(pivotInParentSpace);
 			}
 
-			ApplyTransformationToWidgetsGroupOobb(
-				widgetsInParentSpace, widgetsInParentSpace[0].ParentWidget, originalOobbToParentSpace, curMousePosInParentSpace, prevMousePosInParentSpace,
-				onCalcTransformationFromOriginalVectorInOobbSpaceAndDeformedVectorInOobbSpace
+			ApplyTransformationToWidgetsGroupObb(
+				widgetsInParentSpace, widgetsInParentSpace[0].ParentWidget, originalObbToParentSpace, 
+				currentMousePosInParentSpace, previousMousePosInParentSpace, onCalculateTransformation
 			);
 		}
 
-		public static void ApplyTransformationToWidgetsGroupOobb(IEnumerable<Widget> widgetsInParentSpace,
-			Widget parentWidget, Matrix32 oobbInParentSpace,
-			Vector2 curMousePosInParentSpace, Vector2 prevMousePosInParentSpace,
-			Func<Vector2, Vector2, Matrix32> onCalcTransformationFromOriginalVectorInOobbSpaceAndDeformedVectorInOobbSpace)
+		public static void ApplyTransformationToWidgetsGroupObb(IEnumerable<Widget> widgetsInParentSpace,
+			Widget parentWidget, Matrix32 obbInParentSpace,
+			Vector2 currentMousePosInParentSpace, Vector2 previousMousePosInParentSpace,
+			CalculateTransformationDelegate onCalculateTransformation)
 		{
-			Vector2 pivotInParentSpace = oobbInParentSpace.T;
+			Vector2 pivotInParentSpace = obbInParentSpace.T;
 
-			Vector2 pivotInOobbSpace = pivotInParentSpace;
-			Vector2 controlPointInOobbSpace = prevMousePosInParentSpace;
-			Vector2 targetPointInOobbSpace = curMousePosInParentSpace;
+			Vector2 pivotInObbSpace = pivotInParentSpace;
+			Vector2 controlPointInObbSpace = previousMousePosInParentSpace;
+			Vector2 targetPointInObbSpace = currentMousePosInParentSpace;
 
-			Matrix32 transformationFromParentToOobb = oobbInParentSpace.CalcInversed();
-			pivotInOobbSpace = pivotInOobbSpace * transformationFromParentToOobb;
-			controlPointInOobbSpace = controlPointInOobbSpace * transformationFromParentToOobb;
-			targetPointInOobbSpace = targetPointInOobbSpace * transformationFromParentToOobb;
+			Matrix32 transformationFromParentToObb = obbInParentSpace.CalcInversed();
+			pivotInObbSpace = pivotInObbSpace * transformationFromParentToObb;
+			controlPointInObbSpace = controlPointInObbSpace * transformationFromParentToObb;
+			targetPointInObbSpace = targetPointInObbSpace * transformationFromParentToObb;
 
-			Vector2 originalVectorInOobbSpace = controlPointInOobbSpace - pivotInOobbSpace;
-			Vector2 deformedVectorInOobbSpace = targetPointInOobbSpace - pivotInOobbSpace;
+			Vector2 originalVectorInObbSpace = controlPointInObbSpace - pivotInObbSpace;
+			Vector2 deformedVectorInObbSpace = targetPointInObbSpace - pivotInObbSpace;
 
 			// calculate transformation from original vector to deformed vector
-			Matrix32 deformationInOobbSpace =
-					onCalcTransformationFromOriginalVectorInOobbSpaceAndDeformedVectorInOobbSpace(originalVectorInOobbSpace,
-						deformedVectorInOobbSpace);
+			Matrix32 deformationInObbSpace =
+					onCalculateTransformation(originalVectorInObbSpace,
+						deformedVectorInObbSpace);
 
-			ApplyTransformationToWidgetsGroupOobb(
-				widgetsInParentSpace, parentWidget, oobbInParentSpace, deformationInOobbSpace
+			ApplyTransformationToWidgetsGroupObb(
+				widgetsInParentSpace, parentWidget, obbInParentSpace, deformationInObbSpace
 			);
 		}
 
-		public static void ApplyTransformationToWidgetsGroupOobb(IEnumerable<Widget> widgetsInParentSpace,
-			Widget parentWidget, Matrix32 oobbInParentSpace, Matrix32 oobbTransformation)
+		public static void ApplyTransformationToWidgetsGroupObb(IEnumerable<Widget> widgetsInParentSpace,
+			Widget parentWidget, Matrix32 obbInParentSpace, Matrix32 obbTransformation)
 		{
-
-			Matrix32 originalOobbToWorldSpace = oobbInParentSpace * parentWidget.LocalToWorldTransform;
+			Matrix32 originalObbToWorldSpace = obbInParentSpace * parentWidget.LocalToWorldTransform;
 
 			foreach (Widget widget in widgetsInParentSpace) {
-				Matrix32 widgetToOriginalOobbSpace = widget.LocalToWorldTransform * originalOobbToWorldSpace.CalcInversed();
+				Matrix32 widgetToOriginalObbSpace = widget.LocalToWorldTransform * originalObbToWorldSpace.CalcInversed();
 
-				// calculate new oobb transformation in world space
-				Matrix32 deformedOobbToWorldSpace = oobbTransformation * originalOobbToWorldSpace;
+				// Calculate the new obb transformation in the world space.
+				Matrix32 deformedObbToWorldSpace = obbTransformation * originalObbToWorldSpace;
 
-				Matrix32 deformedWidgetToWorldSpace = widgetToOriginalOobbSpace * deformedOobbToWorldSpace;
+				Matrix32 deformedWidgetToWorldSpace = widgetToOriginalObbSpace * deformedObbToWorldSpace;
 
 				Matrix32 deformedWidgetToParentSpace =
 						deformedWidgetToWorldSpace * widget.ParentWidget.LocalToWorldTransform.CalcInversed();
 
 				Transform2 widgetResultTransform = widget.CalcApplicableTransfrom2(deformedWidgetToParentSpace);
 
-				// correct rotation delta, to prevent wrong values if new angle 0 and previous is 359,
-				// then rotationDelta must be 1
+				// Correct a rotation delta, to prevent wrong values if a new angle 0 and previous is 359,
+				// then rotationDelta must be 1.
 				float rotationDelta = Mathf.Wrap180(widget.Rotation - widgetResultTransform.Rotation);
 
 				if ((widget.Position - widgetResultTransform.Translation).Length > Mathf.ZeroTolerance) {

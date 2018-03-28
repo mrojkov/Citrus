@@ -56,25 +56,25 @@ namespace Tangerine.UI.SceneView
 		}
 
 		private void RotateWidgets(Vector2 pivotPoint, List<Widget> widgets, Vector2 curMousePos, Vector2 prevMousePos,
-			bool discret, List<Tuple<Widget, AccumulativeRotationHelper>> accumulativeRotationHelpers)
+			bool snapped, List<Tuple<Widget, AccumulativeRotationHelper>> accumulativeRotationHelpers)
 		{
-			Utils.ApplyTransformationToWidgetsGroupOobb(
+			Utils.ApplyTransformationToWidgetsGroupObb(
 				sv.Scene,
 				widgets, pivotPoint, false, curMousePos, prevMousePos,
-				(originalVectorInOobbSpace, deformedVectorInOobbSpace) => {
+				(originalVectorInObbSpace, deformedVectorInObbSpace) => {
 
 					float rotation = 0;
-					if (originalVectorInOobbSpace.Length > Mathf.ZeroTolerance &&
-						deformedVectorInOobbSpace.Length > Mathf.ZeroTolerance) {
-						rotation = Mathf.Wrap180(deformedVectorInOobbSpace.Atan2Deg - originalVectorInOobbSpace.Atan2Deg);
+					if (originalVectorInObbSpace.Length > Mathf.ZeroTolerance &&
+						deformedVectorInObbSpace.Length > Mathf.ZeroTolerance) {
+						rotation = Mathf.Wrap180(deformedVectorInObbSpace.Atan2Deg - originalVectorInObbSpace.Atan2Deg);
 					}
 
-					if (discret) {
+					if (snapped) {
 						rotation = Utils.RoundTo(rotation, 15);
 					}
 
 					foreach (Tuple<Widget, AccumulativeRotationHelper> tuple in accumulativeRotationHelpers) {
-						tuple.Item2.ProvideRotation(rotation);
+						tuple.Item2.Rotate(rotation);
 					}
 
 					return Matrix32.Rotation(rotation * Mathf.DegToRad);

@@ -105,6 +105,7 @@
     <Compile Include="Processors\3D\DragSplinePoint3DProcessor.cs" />
     <Compile Include="SceneUserPreferences.cs" />
     <Compile Include="Processors\ActivateOnMouseOverProcessor.cs" />
+    <Compile Include="Utils\AccumulativeRotationHelper.cs" />
     <Compile Include="Widgets\Ruler.cs" />
   </ItemGroup>
   <ItemGroup>

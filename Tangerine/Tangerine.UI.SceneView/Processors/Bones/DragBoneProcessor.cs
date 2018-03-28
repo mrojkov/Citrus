@@ -139,7 +139,7 @@ namespace Tangerine.UI.SceneView
 				accumulativeRotationsHelpersByBones[bone] = new AccumulativeRotationHelper(bone.Rotation, rotation);
 			}
 			AccumulativeRotationHelper accumulativeRotationHelper = accumulativeRotationsHelpersByBones[bone];
-			accumulativeRotationHelper.ProvideRotation(rotation);
+			accumulativeRotationHelper.Rotate(rotation);
 			return accumulativeRotationHelper.Rotation;
 		}
 
