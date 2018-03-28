@@ -47,9 +47,18 @@ namespace Tangerine.UI.SceneView
 			for (int i = 0; i < 4; i++) {
 				var a = hull[i];
 				var b = hull[(i + 1) % 4];
-				Renderer.DrawLine(a, b, color, 1);
+				Renderer.DrawLine(a, b, color);
 				DrawStretchMark(a);
-				DrawStretchMark((a + b) / 2);
+
+				if (i < 2) {
+					var c = hull[(i + 2) % 4];
+					var d = hull[(i + 3) % 4];
+					var abCenter = (a + b) * 0.5f;
+					var cdCenter = (c + d) * 0.5f;
+					Renderer.DrawLine(abCenter, cdCenter, color);
+					DrawStretchMark(abCenter);
+					DrawStretchMark(cdCenter);
+				}
 			}
 			// Render multi-pivot mark.
 			if (widgets.Count > 1) {
