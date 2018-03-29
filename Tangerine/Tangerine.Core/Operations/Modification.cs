@@ -162,20 +162,32 @@ namespace Tangerine.Core.Operations
 
 			protected override void InternalRedo(SetKeyframe op)
 			{
-				bool animatorExists = op.Animable.Animators.Any(a => a.TargetProperty == op.PropertyName && a.AnimationId == op.AnimationId);
-				var animator = op.Animable.Animators[op.PropertyName, op.AnimationId];
-				op.Save(new Backup {
-					AnimatorExists = animatorExists,
-					Animator = animator,
-					Keyframe = animator.Keys.FirstOrDefault(k => k.Frame == op.Keyframe.Frame)
-				});
+				Backup backup;
+				IAnimator animator;
+				
+				if (!op.Find(out backup)) {
+					bool animatorExists =
+						op.Animable.Animators.Any(a => a.TargetProperty == op.PropertyName && a.AnimationId == op.AnimationId);
+					animator = op.Animable.Animators[op.PropertyName, op.AnimationId];
+					op.Save(new Backup {
+						AnimatorExists = animatorExists,
+						Animator = animator,
+						Keyframe = animator.Keys.FirstOrDefault(k => k.Frame == op.Keyframe.Frame)
+					});
+				} else {
+					animator = backup.Animator;
+					if (!backup.AnimatorExists) {
+						op.Animable.Animators.Add(animator);
+					}					
+				}
+				
 				animator.Keys.AddOrdered(op.Keyframe);
 				animator.ResetCache();
 			}
 
 			protected override void InternalUndo(SetKeyframe op)
 			{
-				var b = op.Restore<Backup>();
+				var b = op.Peek<Backup>();
 				if (!b.Animator.Keys.Remove(op.Keyframe)) {
 					throw new InvalidOperationException();
 				}

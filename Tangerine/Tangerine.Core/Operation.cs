@@ -33,6 +33,27 @@ namespace Tangerine.Core
 			}
 			throw new InvalidOperationException();
 		}
+
+		public T Peek<T>()
+		{
+			T res;
+			if (!Find(out res)) {
+				throw new InvalidOperationException();
+			}
+			return res;
+		}
+
+		public bool Find<T>(out T result)
+		{
+			foreach (var i in backup) {
+				if (i is T) {
+					result = (T) i;
+					return true;
+				}
+			}
+			result = default(T);
+			return false;
+		}
 	}
 
 	public interface IOperationProcessor
