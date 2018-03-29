@@ -32,9 +32,6 @@ namespace Tangerine.UI.FilesystemView
 				return directoryTexture;
 			}
 			var ext = Path.GetExtension(path);
-			if (ext == null) {
-				return TexturePool.Instance.GetTexture(null);
-			}
 			if (textureCache.ContainsKey(ext)) {
 				return textureCache[ext];
 			}
