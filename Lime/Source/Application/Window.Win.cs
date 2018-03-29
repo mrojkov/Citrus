@@ -150,13 +150,7 @@ namespace Lime
 			set { form.MaximumSize = LimeToSD.ConvertToSize(value, PixelScale); }
 		}
 
-		public Point WorldToWindow(Vector2 wp)
-		{
-			var sp = LimeToSD.ConvertToPoint(wp, PixelScale);
-			return new Point(sp.X + glControl.Left, sp.Y + glControl.Top);
-		}
-
-		public Vector2 WorldToWindowVector(Vector2 wp)
+		public Vector2 WorldToWindow(Vector2 wp)
 		{
 			var sp = LimeToSD.ConvertToPoint(wp, PixelScale);
 			return new Vector2(sp.X + glControl.Left, sp.Y + glControl.Top);

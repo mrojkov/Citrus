@@ -16,7 +16,7 @@ namespace Tangerine.UI.SceneView
 						var hoveredWindow = Application.Windows.OfType<Window>().FirstOrDefault(w => w.Active);
 						if (hoveredWindow != null) {
 							// Don't set focus on SceneView when another Tangerine's window is hovered
-							var mousePositionPoint = hoveredWindow.WorldToWindowVector(hoveredWindow.Input.MousePosition);
+							var mousePositionPoint = hoveredWindow.WorldToWindow(hoveredWindow.Input.MousePosition);
 							var borderWidth = (hoveredWindow.DecoratedSize.X - hoveredWindow.ClientSize.X) * 0.5f;
 							var titleBarHeight = hoveredWindow.DecoratedSize.Y - hoveredWindow.ClientSize.Y - borderWidth * 2f;
 							var windowRectangle = new Rectangle(new Vector2(-borderWidth, -titleBarHeight - borderWidth), hoveredWindow.ClientSize + new Vector2(borderWidth));

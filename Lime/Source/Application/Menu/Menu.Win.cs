@@ -1,4 +1,4 @@
-﻿#if WIN
+#if WIN
 using System;
 using System.Windows.Forms;
 using System.Collections.Generic;
@@ -119,7 +119,8 @@ namespace Lime
 			Refresh();
 			var w = Window.Current as Window;
 			w.Input.ClearKeyState();
-			NativeContextMenu.Show(w.Form, w.WorldToWindow(w.Input.MousePosition));
+			var mp = w.WorldToWindow(w.Input.MousePosition);
+			NativeContextMenu.Show(w.Form, new System.Drawing.Point(mp.X.Round(), mp.Y.Round()));
 		}
 
 		public void Popup(IWindow window, Vector2 position, float minimumWidth, ICommand command)
@@ -136,7 +137,8 @@ namespace Lime
 					ni.Select();
 				}
 			}
-			NativeContextMenu.Show(window.Form, (window as Window).WorldToWindow(position));
+			var mp = ((Window)window).WorldToWindow(position);
+			NativeContextMenu.Show(window.Form, new System.Drawing.Point(mp.X.Round(), mp.Y.Round()));
 		}
 	}
 
