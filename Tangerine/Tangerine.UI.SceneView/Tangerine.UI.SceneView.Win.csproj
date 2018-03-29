@@ -74,7 +74,7 @@
     <Compile Include="Presenters\Bone3DPresenter.cs" />
     <Compile Include="Presenters\SplinePointPresenter.cs" />
     <Compile Include="Presenters\SplinePresenter.cs" />
-    <Compile Include="Presenters\TransparentWidgetsPresenter.cs" />
+    <Compile Include="Presenters\WidgetsPivotMarkPresenter.cs" />
     <Compile Include="PreviewAnimationHandler.cs" />
     <Compile Include="Processors\Bones\ChangeBoneRadiusProcessor.cs" />
     <Compile Include="Processors\Bones\CreateBoneProcessor.cs" />

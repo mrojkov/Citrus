@@ -406,7 +406,7 @@ namespace Tangerine.UI.SceneView
 		void CreatePresenters()
 		{
 			new ContainerAreaPresenter(this);
-			new TransparentWidgetsPresenter(this);
+			new WidgetsPivotMarkPresenter(this);
 			new SelectedWidgetsPresenter(this);
 			new PointObjectsPresenter(this);
 			new SplinePointPresenter(this);

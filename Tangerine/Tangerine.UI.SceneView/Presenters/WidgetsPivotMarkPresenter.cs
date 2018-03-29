@@ -1,17 +1,16 @@
-﻿using System;
 using System.Linq;
 using Lime;
 
 namespace Tangerine.UI.SceneView
 {
-	class TransparentWidgetsPresenter
+	class WidgetsPivotMarkPresenter
 	{
-		public TransparentWidgetsPresenter(SceneView sceneView)
+		public WidgetsPivotMarkPresenter(SceneView sceneView)
 		{
-			sceneView.Frame.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(RenderTransparentWidgetPivots));
+			sceneView.Frame.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(RenderWidgetsPivotMark));
 		}
 
-		private void RenderTransparentWidgetPivots(Widget canvas)
+		private void RenderWidgetsPivotMark(Widget canvas)
 		{
 			if (
 				Core.Document.Current.ExpositionMode ||
@@ -21,7 +20,7 @@ namespace Tangerine.UI.SceneView
 			}
 			canvas.PrepareRendererState();
 			var widgets = Core.Document.Current.Container.Nodes.Editable().
-				OfType<Widget>().Where(w => w.Color.A == 0).ToList();
+				OfType<Widget>().ToList();
 			if (widgets.Count == 0) {
 				return;
 			}
