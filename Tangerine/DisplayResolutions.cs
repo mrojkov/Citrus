@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Tangerine.Core;
+using Tangerine.Core.Operations;
 
 namespace Tangerine
 {
@@ -31,9 +32,12 @@ namespace Tangerine
 		public static void SetResolution(ResolutionInfo resolution)
 		{
 			Document.Current.History.BeginTransaction();
-			Core.Operations.SetProperty.Perform(Document.Current.RootNode, nameof(Widget.Size), resolution.Size);
-			SetMarker(Document.Current.RootNode, resolution.MarkerId);
-			Document.Current.History.EndTransaction();
+			try {
+				SetProperty.Perform(Document.Current.RootNode, nameof(Widget.Size), resolution.Size);
+				SetMarker(Document.Current.RootNode, resolution.MarkerId);
+			} finally {
+				Document.Current.History.EndTransaction();
+			}
 		}
 	}
 

@@ -85,8 +85,8 @@ namespace Tangerine.UI.SceneView
 				Paste.Perform();
 			} finally {
 				Clipboard.Text = text;
+				Document.Current.History.EndTransaction();
 			}
-			Document.Current.History.EndTransaction();
 		}
 
 		private static void TieWidgetsWithBones()
@@ -354,17 +354,20 @@ namespace Tangerine.UI.SceneView
 				if (kv.Key.WasIssued()) {
 					kv.Key.Consume();
 					Document.Current.History.BeginTransaction();
-					foreach (string assetPath in ImageDropCommands.AssetPaths) {
-						var node = Core.Operations.CreateNode.Perform(kv.Value);
-						var widgetPos = MousePosition * Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
-						var texture = new SerializableTexture(assetPath);
-						Core.Operations.SetProperty.Perform(node, nameof(Widget.Texture), texture);
-						Core.Operations.SetProperty.Perform(node, nameof(Widget.Position), widgetPos);
-						Core.Operations.SetProperty.Perform(node, nameof(Widget.Pivot), Vector2.Half);
-						Core.Operations.SetProperty.Perform(node, nameof(Widget.Size), (Vector2)texture.ImageSize);
-						Core.Operations.SetProperty.Perform(node, nameof(Widget.Id), Path.GetFileNameWithoutExtension(assetPath));
+					try {
+						foreach (string assetPath in ImageDropCommands.AssetPaths) {
+							var node = Core.Operations.CreateNode.Perform(kv.Value);
+							var widgetPos = MousePosition * Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
+							var texture = new SerializableTexture(assetPath);
+							SetProperty.Perform(node, nameof(Widget.Texture), texture);
+							SetProperty.Perform(node, nameof(Widget.Position), widgetPos);
+							SetProperty.Perform(node, nameof(Widget.Pivot), Vector2.Half);
+							SetProperty.Perform(node, nameof(Widget.Size), (Vector2)texture.ImageSize);
+							SetProperty.Perform(node, nameof(Widget.Id), Path.GetFileNameWithoutExtension(assetPath));
+						}
+					} finally {
+						Document.Current.History.EndTransaction();
 					}
-					Document.Current.History.EndTransaction();
 				} else {
 					kv.Key.Consume();
 				}

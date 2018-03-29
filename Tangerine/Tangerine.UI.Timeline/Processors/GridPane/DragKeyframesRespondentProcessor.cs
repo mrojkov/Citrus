@@ -74,10 +74,13 @@ namespace Tangerine.UI.Timeline
 				}
 			}
 			Document.Current.History.BeginTransaction();
-			foreach (var o in operations) {
-				o();
+			try {
+				foreach (var o in operations) {
+					o();
+				}
+			} finally {
+				Document.Current.History.EndTransaction();
 			}
-			Document.Current.History.EndTransaction();
 		}
 
 		static bool CheckRowRange(int row)

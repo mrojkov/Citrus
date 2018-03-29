@@ -3,6 +3,7 @@ using System.Linq;
 using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Components;
+using Tangerine.Core.Operations;
 using Tangerine.UI.Timeline.Components;
 
 namespace Tangerine.UI.Timeline
@@ -126,29 +127,36 @@ namespace Tangerine.UI.Timeline
 		private static void InsertFrame()
 		{
 			Document.Current.History.BeginTransaction();
-			WithKeyframes((k, a) => Core.Operations.SetProperty.Perform(k, nameof(IKeyframe.Frame), k.Frame + 1));
-			WithMarkers(m => Core.Operations.SetProperty.Perform(m, nameof(Marker.Frame), m.Frame + 1));
-			Document.Current.History.EndTransaction();
+			try {
+				WithKeyframes((k, a) => SetProperty.Perform(k, nameof(IKeyframe.Frame), k.Frame + 1));
+				WithMarkers(m => SetProperty.Perform(m, nameof(Marker.Frame), m.Frame + 1));
+			} finally {
+				Document.Current.History.EndTransaction();
+			}
 		}
 
 		private static void DeleteFrame()
 		{
 			Document.Current.History.BeginTransaction();
-			WithKeyframes((k, a) => {
-				if (k.Frame != Document.Current.AnimationFrame) {
-					Core.Operations.SetProperty.Perform(k, nameof(IKeyframe.Frame), k.Frame - 1);
-				} else {
-					Core.Operations.RemoveKeyframe.Perform(a, k.Frame);
-				}
-			});
-			WithMarkers(m => {
-				if (m.Frame != Document.Current.AnimationFrame) {
-					Core.Operations.SetProperty.Perform(m, nameof(Marker.Frame), m.Frame - 1);
-				} else {
-					Core.Operations.DeleteMarker.Perform(Document.Current.Container.Markers, m);
-				}
-			});
-			Document.Current.History.EndTransaction();
+			try {
+				WithKeyframes((k, a) => {
+					if (k.Frame != Document.Current.AnimationFrame) {
+						SetProperty.Perform(k, nameof(IKeyframe.Frame), k.Frame - 1);
+					} else {
+						RemoveKeyframe.Perform(a, k.Frame);
+					}
+				});
+				WithMarkers(m => {
+					if (m.Frame != Document.Current.AnimationFrame) {
+						SetProperty.Perform(m, nameof(Marker.Frame), m.Frame - 1);
+					} else {
+						Core.Operations.DeleteMarker.Perform(Document.Current.Container.Markers, m);
+					}
+				});
+
+			} finally {
+				Document.Current.History.EndTransaction();
+			}
 		}
 
 		static void AdvanceCurrentColumn(int stride)

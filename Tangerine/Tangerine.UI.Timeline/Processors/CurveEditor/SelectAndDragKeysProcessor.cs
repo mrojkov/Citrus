@@ -23,25 +23,29 @@ namespace Tangerine.UI.Timeline
 				if (widget.IsMouseOver() && input.WasKeyPressed(Key.Mouse0)) {
 					input.ConsumeKey(Key.Mouse0);
 					Document.Current.History.BeginTransaction();
-					var initialMousePos = curveEditor.ContentWidget.LocalMousePosition();
-					var currentMousePos = initialMousePos;
-					var rectanglePresenter = new DelegatePresenter<Widget>(w => {
-						w.PrepareRendererState();
-						Renderer.DrawRectOutline(initialMousePos, currentMousePos, ColorTheme.Current.TimelineCurveEditor.Selection);
-					});
-					curveEditor.ContentWidget.CompoundPostPresenter.Add(rectanglePresenter);
-					while (input.IsMousePressed()) {
-						currentMousePos = curveEditor.ContentWidget.LocalMousePosition();
-						var rect = new Rectangle(initialMousePos, currentMousePos);
-						foreach (var c in curveEditor.Curves) {
-							SelectKeysWithinRectangle(c, rect);
+					try {
+						var initialMousePos = curveEditor.ContentWidget.LocalMousePosition();
+						var currentMousePos = initialMousePos;
+						var rectanglePresenter = new DelegatePresenter<Widget>(w => {
+							w.PrepareRendererState();
+							Renderer.DrawRectOutline(initialMousePos, currentMousePos, ColorTheme.Current.TimelineCurveEditor.Selection);
+						});
+						curveEditor.ContentWidget.CompoundPostPresenter.Add(rectanglePresenter);
+						while (input.IsMousePressed()) {
+							currentMousePos = curveEditor.ContentWidget.LocalMousePosition();
+							var rect = new Rectangle(initialMousePos, currentMousePos);
+							foreach (var c in curveEditor.Curves) {
+								SelectKeysWithinRectangle(c, rect);
+							}
+							Window.Current.Invalidate();
+							yield return null;
 						}
+						curveEditor.ContentWidget.CompoundPostPresenter.Remove(rectanglePresenter);
 						Window.Current.Invalidate();
-						yield return null;
+
+					} finally {
+						Document.Current.History.EndTransaction();
 					}
-					curveEditor.ContentWidget.CompoundPostPresenter.Remove(rectanglePresenter);
-					Window.Current.Invalidate();
-					Document.Current.History.EndTransaction();
 				}
 				yield return null;
 			}

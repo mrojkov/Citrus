@@ -1,6 +1,7 @@
 using System.Linq;
 using Lime;
 using Tangerine.Core;
+using Tangerine.Core.Operations;
 
 namespace Tangerine.UI.Timeline
 {
@@ -137,8 +138,11 @@ namespace Tangerine.UI.Timeline
 						var m = Serialization.ReadObject<Marker>(Document.Current.Path, stream);
 						m.Frame = frameUnderMouse;
 						Document.Current.History.BeginTransaction();
-						Core.Operations.SetMarker.Perform(Document.Current.Container.DefaultAnimation.Markers, m);
-						Document.Current.History.EndTransaction();
+						try {
+							SetMarker.Perform(Document.Current.Container.DefaultAnimation.Markers, m);
+						} finally {
+							Document.Current.History.EndTransaction();
+						}
 					} catch (System.Exception e) {
 						Debug.Write(e);
 					}
@@ -146,8 +150,11 @@ namespace Tangerine.UI.Timeline
 				if (marker != null) {
 					menu.Add(new Command("Delete Marker", () => {
 						Document.Current.History.BeginTransaction();
-						Core.Operations.DeleteMarker.Perform(Document.Current.Container.Markers, marker);
-						Document.Current.History.EndTransaction();
+						try {
+							DeleteMarker.Perform(Document.Current.Container.Markers, marker);
+						} finally {
+							Document.Current.History.EndTransaction();
+						}
 					}));
 				}
 				menu.Popup();
