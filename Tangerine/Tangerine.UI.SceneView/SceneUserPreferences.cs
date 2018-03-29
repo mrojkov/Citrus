@@ -27,6 +27,9 @@ namespace Tangerine.UI.SceneView
 		[YuzuRequired]
 		public bool DrawFrameBorder { get; set; }
 
+		[YuzuOptional]
+		public bool DisplayPivotsForAllWidgets { get; set; }
+
 		public SceneUserPreferences()
 		{
 			ResetToDefaults();
@@ -41,6 +44,7 @@ namespace Tangerine.UI.SceneView
 			RootWidgetOverlayColor = ColorTheme.Current.SceneView.RootWidgetOverlayColor;
 			AnimationPreviewBackground = Color4.Black.Transparentify(0.6f);
 			DrawFrameBorder = false;
+			DisplayPivotsForAllWidgets = true;
 		}
 
 		public static SceneUserPreferences Instance => Core.UserPreferences.Instance.Get<SceneUserPreferences>();

@@ -1,10 +1,12 @@
 using System.Linq;
+using System.Collections.Generic;
 using Lime;
 
 namespace Tangerine.UI.SceneView
 {
 	class WidgetsPivotMarkPresenter
 	{
+		
 		public WidgetsPivotMarkPresenter(SceneView sceneView)
 		{
 			sceneView.Frame.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(RenderWidgetsPivotMark));
@@ -19,8 +21,12 @@ namespace Tangerine.UI.SceneView
 				return;
 			}
 			canvas.PrepareRendererState();
-			var widgets = Core.Document.Current.Container.Nodes.Editable().
-				OfType<Widget>().ToList();
+			List<Widget> widgets;
+			if (SceneUserPreferences.Instance.DisplayPivotsForAllWidgets) {
+				widgets = Core.Document.Current.Container.Nodes.Editable().OfType<Widget>().ToList();
+			} else {
+				widgets = Core.Document.Current.Container.Nodes.Editable().OfType<Widget>().Where(w => w.Color.A == 0).ToList();
+			}
 			if (widgets.Count == 0) {
 				return;
 			}

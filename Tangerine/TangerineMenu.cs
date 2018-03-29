@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Lime;
 using Tangerine.Core;
-using Tangerine.Core.Operations;
 using Tangerine.UI;
 using Task = Lime.Task;
 
@@ -123,6 +118,7 @@ namespace Tangerine
 					new Command("Pads", PadsMenu),
 					new Command("Resolution", resolution),
 					SceneViewCommands.DisplayBones,
+					SceneViewCommands.DisplayPivotsForAllWidgets,
 					Command.MenuSeparator,
 					new Command("Overlays", overlaysMenu),
 					new Command("Rulers", rulerMenu),
