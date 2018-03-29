@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -66,6 +66,9 @@ namespace Lime
 		{
 			ITexture texture;
 			WeakReference r;
+			if (path == null) {
+				path = string.Empty;
+			}
 			if (!textures.TryGetValue(path, out r)) {
 				texture = CreateTexture(path);
 				textures[path] = new WeakReference(texture);
