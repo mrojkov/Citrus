@@ -92,6 +92,10 @@
       <HintPath>..\Orange\packages\Microsoft.WindowsAPICodePack.Shell.1.1.0\lib\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="OculusWrap, Version=2.3.2.1, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\3rdParty\VR\OculusWrap.dll</HintPath>
+    </Reference>
     <Reference Include="OpenTK.GLControl">
       <HintPath>..\3rdParty\OpenTK\OpenTK.GLControl.dll</HintPath>
     </Reference>
@@ -139,6 +143,10 @@
     <Compile Include="Source\Application\MouseCursor\MouseCursor.Win.cs" />
     <Compile Include="Source\Application\MouseCursor\MouseCursor.Null.cs" />
     <Compile Include="Source\Widgets\3D\ICamera.cs" />
+    <Compile Include="Source\Application\Oculus\OvrExcepton.cs" />
+    <Compile Include="Source\Application\Oculus\OvrProvider.cs" />
+    <Compile Include="Source\Application\Oculus\OvrExtensions.cs" />
+    <Compile Include="Source\Widgets\3D\StereoCamera.cs" />
     <Compile Include="Source\Application\RenderingBackend.cs" />
     <Compile Include="Source\Application\Window.Android.cs" />
     <Compile Include="Source\Application\Window.iOS.cs" />
@@ -165,6 +173,8 @@
     <Compile Include="Source\Graphics\OpenGL\Etc2Decoder.cs" />
     <Compile Include="Source\Graphics\OpenGL\IGLObject.cs" />
     <Compile Include="Source\Graphics\OpenGL\Mesh.cs" />
+    <Compile Include="Source\Graphics\OpenGL\OculusTexture.cs" />
+    <Compile Include="Source\Graphics\OpenGL\OculusTextureSwapChain.cs" />
     <Compile Include="Source\Graphics\OpenGL\Texture2D.Ktx.cs" />
     <Compile Include="Source\Input\Shortcut.cs" />
     <Compile Include="Source\Input\SoftKeyboard.cs" />
