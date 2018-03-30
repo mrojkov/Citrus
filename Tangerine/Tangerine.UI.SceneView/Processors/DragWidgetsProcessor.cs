@@ -66,30 +66,26 @@ namespace Tangerine.UI.SceneView
 					Vector2 mouseDelta = curMousePos - initialMousePos;
 					mouseDelta = mouseDelta.Snap(Vector2.Zero);
 
-					if (mouseDelta != Vector2.Zero) {
-						var lines = GetRulerLines();
+					if (
+						mouseDelta != Vector2.Zero &&
+						(SceneViewCommands.SnapWidgetPivotToRuler.Checked || SceneViewCommands.SnapWidgetBorderToRuler.Checked)
+					) {
+						List<RulerLine> lines = GetRulerLines();
 
-						if (SceneViewCommands.SnapWidgetPivotToRuler.Checked || SceneViewCommands.SnapWidgetBorderToRuler.Checked) {
-							foreach (Widget widget in widgets) {
-								Matrix32 transformationFromWidgetToScene = widget.CalcTransitionToSpaceOf(sv.Scene);
-								List<Vector2> points = new List<Vector2>();
+						foreach (Widget widget in widgets) {
+							List<Vector2> points = new List<Vector2>();
 
-								if (SceneViewCommands.SnapWidgetPivotToRuler.Checked) {
-									points.Add(widget.Pivot * widget.Size);
-								}
+							if (SceneViewCommands.SnapWidgetPivotToRuler.Checked) {
+								points.Add(widget.CalcPositionInSpaceOf(sv.Scene));
+							}
+							if (SceneViewCommands.SnapWidgetBorderToRuler.Checked) {
+								points.AddRange(widget.CalcHullInSpaceOf(sv.Scene));
+							}
 
-								if (SceneViewCommands.SnapWidgetBorderToRuler.Checked) {
-									points.Add(Vector2.Zero * widget.Size);
-									points.Add(Vector2.One * widget.Size);
-									points.Add(Vector2.Right * widget.Size);
-									points.Add(Vector2.Down * widget.Size);
-								}
-
-								foreach (Vector2 point in points) {
-									Vector2 pointMoved = transformationFromWidgetToScene * point + mouseDelta;
-									Vector2 pointsSnapped = SnapPointToLines(pointMoved, lines);
-									mouseDelta += pointsSnapped - pointMoved; 
-								}
+							foreach (Vector2 point in points) {
+								Vector2 pointMoved = point + mouseDelta;
+								Vector2 pointsSnapped = SnapPointToLines(pointMoved, lines);
+								mouseDelta += pointsSnapped - pointMoved;
 							}
 						}
 					}
