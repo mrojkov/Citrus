@@ -130,7 +130,8 @@ namespace Tangerine.UI
 				// then rotationDelta must be 1.
 				float rotationDelta = Mathf.Wrap180(widget.Rotation - widgetResultTransform.Rotation);
 
-				if ((widget.Position - widgetResultTransform.Translation).Length > Mathf.ZeroTolerance) {
+				// The position is less prone to fluctuations than other properties.
+				if ((widget.Position - widgetResultTransform.Translation).Length > 15e-5f) {
 					SetAnimableProperty.Perform(widget, nameof(Widget.Position), widgetResultTransform.Translation, CoreUserPreferences.Instance.AutoKeyframes);
 				}
 				if (Mathf.Abs(rotationDelta) > Mathf.ZeroTolerance) {
