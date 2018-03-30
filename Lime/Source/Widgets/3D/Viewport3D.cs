@@ -166,6 +166,7 @@ namespace Lime
 			var oldZWriteEnabled = Renderer.ZWriteEnabled;
 			var oldCullMode = Renderer.CullMode;
 			Renderer.Flush();
+			Renderer.Clear(ClearTarget.DepthBuffer);
 			Renderer.View = Camera.View;
 			Renderer.Projection = TransformProjection(Renderer.Projection);
 			Renderer.ZTestEnabled = true;
