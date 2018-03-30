@@ -1,8 +1,10 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Lime
 {
-	public struct Quadrangle
+	public struct Quadrangle : IEnumerable<Vector2>
 	{
 		public Vector2 V1;
 		public Vector2 V2;
@@ -108,6 +110,19 @@ namespace Lime
 				inside &= GeometryUtils.CalcPointHalfPlane(point, a, b) * sign > 0;
 			}
 			return inside;
+		}
+
+		public IEnumerator<Vector2> GetEnumerator()
+		{
+			yield return V1;
+			yield return V2;
+			yield return V3;
+			yield return V4;
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
 		}
 	}
 }
