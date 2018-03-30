@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
@@ -34,20 +33,12 @@ namespace Tangerine.UI.SceneView
 			Any, Horizontal, Vertical
 		}
 
-		private static readonly Vector2[] directions = {
-			-Vector2.Half,
-			new Vector2(-0.5f, 0.5f),
-			Vector2.Half,
-			new Vector2(0.5f, -0.5f),
-		};
-
 		IEnumerator<object> Drag()
 		{
 			Document.Current.History.BeginTransaction();
 			try {
-				var iniMousePos = sv.MousePosition;
+				var initialMousePos = sv.MousePosition;
 				var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>().ToList();
-				var transform = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
 				var dragDirection = DragDirection.Any;
 				Quadrangle hull;
 				Vector2 pivot;
@@ -57,46 +48,65 @@ namespace Tangerine.UI.SceneView
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					var curMousePos = sv.MousePosition;
 					var shiftPressed = sv.Input.IsKeyPressed(Key.Shift);
-					if (shiftPressed && dragDirection != DragDirection.Any) {
-						if (dragDirection == DragDirection.Horizontal) {
-							curMousePos.Y = iniMousePos.Y;
-						} else if (dragDirection == DragDirection.Vertical) {
-							curMousePos.X = iniMousePos.X;
+					if (shiftPressed) {
+						if (dragDirection != DragDirection.Any) {
+							if (dragDirection == DragDirection.Horizontal) {
+								curMousePos.Y = initialMousePos.Y;
+							} else if (dragDirection == DragDirection.Vertical) {
+								curMousePos.X = initialMousePos.X;
+							}
+						} else if ((curMousePos - initialMousePos).Length > 5 / sv.Scene.Scale.X) {
+							var d = curMousePos - initialMousePos;
+							dragDirection = d.X.Abs() > d.Y.Abs() ? DragDirection.Horizontal : DragDirection.Vertical;
+						}
+					} else {
+						dragDirection = DragDirection.Any;
+					}
+
+					Vector2 mouseDelta = curMousePos - initialMousePos;
+					mouseDelta = mouseDelta.Snap(Vector2.Zero);
+
+					if (mouseDelta != Vector2.Zero) {
+						var lines = GetRulerLines();
+
+						if (SceneViewCommands.SnapWidgetPivotToRuler.Checked || SceneViewCommands.SnapWidgetBorderToRuler.Checked) {
+							foreach (Widget widget in widgets) {
+								Matrix32 transformationFromWidgetToScene = widget.CalcTransitionToSpaceOf(sv.Scene);
+								List<Vector2> points = new List<Vector2>();
+
+								if (SceneViewCommands.SnapWidgetPivotToRuler.Checked) {
+									points.Add(widget.Pivot * widget.Size);
+								}
+
+								if (SceneViewCommands.SnapWidgetBorderToRuler.Checked) {
+									points.Add(Vector2.Zero * widget.Size);
+									points.Add(Vector2.One * widget.Size);
+									points.Add(Vector2.Right * widget.Size);
+									points.Add(Vector2.Down * widget.Size);
+								}
+
+								foreach (Vector2 point in points) {
+									Vector2 pointMoved = transformationFromWidgetToScene * point + mouseDelta;
+									Vector2 pointsSnapped = SnapPointToLines(pointMoved, lines);
+									mouseDelta += pointsSnapped - pointMoved; 
+								}
+							}
 						}
 					}
-					var dragDelta = curMousePos * transform - iniMousePos * transform;
-					if (shiftPressed && dragDirection == DragDirection.Any && (curMousePos - iniMousePos).Length > 5 / sv.Scene.Scale.X) {
-						var d = curMousePos - iniMousePos;
-						dragDirection = d.X.Abs() > d.Y.Abs() ? DragDirection.Horizontal : DragDirection.Vertical;
-					}
-					dragDelta = dragDelta.Snap(Vector2.Zero);
-					var lines = GetRulerLines();
-					if (dragDelta != Vector2.Zero) {
-						SnapPoints(widgets, dragDelta, lines, hull);
-					}
+
+					Utils.ApplyTransformationToWidgetsGroupObb(
+						sv.Scene,
+						widgets, pivot, widgets.Count <= 1, initialMousePos + mouseDelta, initialMousePos,
+						(originalVectorInObbSpace, deformedVectorInObbSpace) => {
+							return Matrix32.Translation((deformedVectorInObbSpace - originalVectorInObbSpace).Snap(Vector2.Zero));
+						}
+					);
+					
 					yield return null;
 				}
 			} finally {
 				sv.Input.ConsumeKey(Key.Mouse0);
 				Document.Current.History.EndTransaction();
-			}
-		}
-
-		private static void SnapPoints(List<Widget> widgets, Vector2 dragDelta, List<RulerLine> lines, Quadrangle hull)
-		{
-			if (SceneViewCommands.SnapWidgetBorderToRuler.Checked) {
-				var delta = Vector2.Zero;
-				for (var j = 0; j < 4; j += 2) {
-					delta += SnapPointToLines(hull[j] + dragDelta, lines) - (hull[j] + dragDelta);
-				}
-				dragDelta += delta;
-			}
-			for (int i = 0; i < widgets.Count; i++) {
-				var pos = widgets[i].Position + dragDelta;
-				if (SceneViewCommands.SnapWidgetPivotToRuler.Checked) {
-					pos = SnapPointToLines(pos, lines);
-				}
-				Core.Operations.SetAnimableProperty.Perform(widgets[i], nameof(Widget.Position), pos, CoreUserPreferences.Instance.AutoKeyframes);
 			}
 		}
 

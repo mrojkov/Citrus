@@ -1068,10 +1068,16 @@ namespace Lime
 
 		public Transform2 CalcApplicableTransfrom2(Matrix32 fromLocalToParentTransform)
 		{
-			// take pivot into account
+			// Take pivot into account.
 			fromLocalToParentTransform = Matrix32.Translation(-Pivot * Size).CalcInversed() * fromLocalToParentTransform;
-			// TODO Apply SkinningWeights
-			// extract simple transformations from matrix
+			
+			// Take SkinningWeights into account.
+			if (SkinningWeights != null && Parent?.AsWidget != null) {
+				fromLocalToParentTransform = fromLocalToParentTransform * 
+					Parent.AsWidget.BoneArray.GetCumulativeRelativeTransform(SkinningWeights).CalcInversed();
+			}
+
+			// Extract simple transformations from matrix.
 			return fromLocalToParentTransform.ToTransform2();
 		}
 

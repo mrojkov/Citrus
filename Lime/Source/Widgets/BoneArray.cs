@@ -75,6 +75,17 @@ namespace Lime
 			return result;
 		}
 
+		public Matrix32 GetCumulativeRelativeTransform(SkinningWeights weights)
+		{
+			Matrix32 skinningMatrix = new Matrix32();
+
+			skinningMatrix.T = ApplySkinningToVector(Vector2.Zero, weights);
+			skinningMatrix.U = ApplySkinningToVector(Vector2.Right, weights) - skinningMatrix.T;
+			skinningMatrix.V = ApplySkinningToVector(Vector2.Down, weights) - skinningMatrix.T;
+				
+			return skinningMatrix;
+		}
+
 		[YuzuMember]
 		public Entry[] items;
 	}
