@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using OpenTK;
 
 namespace Lime
 {
@@ -13,6 +14,11 @@ namespace Lime
 		public float KeyRepeatDelay = 0.2f;
 		public float KeyRepeatInterval = 0.03f;
 		public bool Changed { get; private set; }
+		public Vector2 LeftStick { get; internal set; }
+		public Vector2 RightStick { get; internal set; }
+		public float LeftTrigger { get; internal set; }
+		public float RightTrigger { get; internal set; }
+		public int ActiveGamepadDeviceIndex { get; internal set; }
 
 		private struct KeyEvent
 		{

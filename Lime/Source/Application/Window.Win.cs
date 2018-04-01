@@ -539,12 +539,68 @@ namespace Lime
 			RaiseUpdating(delta);
 			AudioSystem.Update();
 			Input.CopyKeysState();
+			UpdateGamepadKeyStates();
 			Input.ProcessPendingKeyEvents(delta);
 			Input.TextInput = null;
 			if (renderingState == RenderingState.RenderDeferred) {
 				Invalidate();
 			}
 			renderingState = RenderingState.Updated;
+		}
+
+		private void UpdateGamepadKeyStates()
+		{
+			var i = Input.ActiveGamepadDeviceIndex;
+			if (!IsXInputController(OpenTK.Input.GamePad.GetName(i))) {
+				i = 0;
+				// Search for any XInput controller
+				while (true) {
+					var name = OpenTK.Input.GamePad.GetName(i);
+					// Break when reached empty controller or XInput controller.
+					// Empty controller will be reached only after mounted controllers.
+					// It have default key/trigger/stick states, so we can use it to set defaults.
+					if ((string.IsNullOrEmpty(name) || IsXInputController(name))) {
+						break;
+					}
+					i++;
+				}
+			}
+			UpdateGamepadKeyStates(i);
+		}
+
+		private bool IsXInputController(string name) => name == "XInput Controller";
+
+		private void UpdateGamepadKeyStates(int deviceIndex)
+		{
+			Input.ActiveGamepadDeviceIndex = deviceIndex;
+			var state = OpenTK.Input.GamePad.GetState(deviceIndex);
+			UpdateGamepadKeyState(Key.GamepadA, state.Buttons.A);
+			UpdateGamepadKeyState(Key.GamepadB, state.Buttons.B);
+			UpdateGamepadKeyState(Key.GamepadX, state.Buttons.X);
+			UpdateGamepadKeyState(Key.GamepadY, state.Buttons.Y);
+			UpdateGamepadKeyState(Key.GamepadBack, state.Buttons.Back);
+			UpdateGamepadKeyState(Key.GamepadBigButton, state.Buttons.BigButton);
+			UpdateGamepadKeyState(Key.GamepadLeftShoulder, state.Buttons.LeftShoulder);
+			UpdateGamepadKeyState(Key.GamepadRightShoulder, state.Buttons.RightShoulder);
+			UpdateGamepadKeyState(Key.GamepadStart, state.Buttons.Start);
+			UpdateGamepadKeyState(Key.GamepadRightStick, state.Buttons.RightStick);
+			UpdateGamepadKeyState(Key.GamepadLeftStick, state.Buttons.LeftStick);
+			UpdateGamepadKeyState(Key.GamepadUp, state.DPad.Up);
+			UpdateGamepadKeyState(Key.GamepadDown, state.DPad.Down);
+			UpdateGamepadKeyState(Key.GamepadLeft, state.DPad.Left);
+			UpdateGamepadKeyState(Key.GamepadRight, state.DPad.Right);
+			Input.LeftStick = new Vector2(state.ThumbSticks.Left.X, state.ThumbSticks.Left.Y);
+			Input.RightStick = new Vector2(state.ThumbSticks.Right.X, state.ThumbSticks.Right.Y);
+			Input.LeftTrigger = state.Triggers.Left;
+			Input.RightTrigger = state.Triggers.Right;
+		}
+
+		private void UpdateGamepadKeyState(Key key, OpenTK.Input.ButtonState state)
+		{
+			var newState = state == OpenTK.Input.ButtonState.Pressed;
+			if (Input.IsKeyPressed(key) != newState) {
+				Input.SetKeyState(key, newState);
+			}
 		}
 
 		private static Key TranslateKey(Keys key)

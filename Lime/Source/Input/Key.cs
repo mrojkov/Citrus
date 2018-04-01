@@ -244,6 +244,24 @@ namespace Lime
 		public static readonly Key DismissSoftKeyboard = New();
 #endregion
 
+#region Gamepad
+		public static readonly Key GamepadA = New();
+		public static readonly Key GamepadB = New();
+		public static readonly Key GamepadBack = New();
+		public static readonly Key GamepadBigButton = New();
+		public static readonly Key GamepadLeftShoulder = New();
+		public static readonly Key GamepadRightShoulder = New();
+		public static readonly Key GamepadRightStick = New();
+		public static readonly Key GamepadLeftStick = New();
+		public static readonly Key GamepadStart = New();
+		public static readonly Key GamepadX = New();
+		public static readonly Key GamepadY = New();
+		public static readonly Key GamepadDown = New();
+		public static readonly Key GamepadLeft = New();
+		public static readonly Key GamepadRight = New();
+		public static readonly Key GamepadUp = New();
+#endregion
+
 		public static readonly Key LastNormal = Count - 1;
 	}
 }
