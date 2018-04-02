@@ -175,7 +175,7 @@ namespace Lime
 					Stream stream;
 					try {
 						stream = AssetBundle.Current.OpenFileLocalized(tryPath);
-					} catch (Exception e) {
+					} catch (System.Exception e) {
 						Console.WriteLine("Can not open file '{0}':\n{1}", path, e);
 						continue;
 					}
