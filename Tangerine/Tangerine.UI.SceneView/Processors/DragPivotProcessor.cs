@@ -93,7 +93,8 @@ namespace Tangerine.UI.SceneView
 					md = d;
 				}
 			}
-			var r = ((hull[0] - hull[2]).Length / 20) / sv.Scene.Scale.X;
+			const float SnapDistance = 12;
+			var r = Mathf.Min(SnapDistance / sv.Scene.Scale.X, (hull[0] - hull[2]).Length * 0.25f);
 			if (md < r) {
 				return mp + correction;
 			}
