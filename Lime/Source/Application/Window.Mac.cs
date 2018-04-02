@@ -99,6 +99,11 @@ namespace Lime
 			set { window.MaxSize = new CGSize(value.X.Round(), value.Y.Round()); }
 		}
 
+		public Vector2 WorldToWindow (Vector2 wp)
+		{
+			return new Vector2(wp.X.Round() + (float)window.Frame.X, wp.Y.Round() + (float)window.Frame.X);
+		}
+
 		public bool Active
 		{
 			get { return window.IsKeyWindow; }
