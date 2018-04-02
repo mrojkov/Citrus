@@ -1,5 +1,6 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Lime;
 using Tangerine.Core;
 using Tangerine.UI;
@@ -15,6 +16,8 @@ namespace Tangerine
 		private static IMenu resolution;
 		private static List<ICommand> imported = new List<ICommand>();
 		private static IMenu create;
+		private static Menu localizationMenu;
+		private static Command localizationCommand;
 
 		static TangerineMenu()
 		{
@@ -124,6 +127,9 @@ namespace Tangerine
 					new Command("Rulers", rulerMenu),
 					SceneViewCommands.SnapWidgetBorderToRuler,
 					SceneViewCommands.SnapWidgetPivotToRuler,
+					(localizationCommand = new Command("Localization", localizationMenu = new Menu()) {
+						Enabled = false
+					})
 				})),
 				new Command("Window", new Menu {
 					GenericCommands.NextDocument,
@@ -133,7 +139,7 @@ namespace Tangerine
 					OrangeCommands.Run,
 					OrangeCommands.OptionsDialog
 				}),
-		};
+			};
 			var nodeTypes = new[] {
 				typeof(Frame),
 				typeof(Button),
@@ -198,6 +204,7 @@ namespace Tangerine
 			AddRulersCommands(proj.DefaultRulers);
 			RebuildRulerMenu();
 			proj.Rulers.CollectionChanged += Rulers_CollectionChanged;
+			RebuildLocalizationMenu();
 		}
 
 		private static void RebuildRulerMenu()
@@ -256,6 +263,25 @@ namespace Tangerine
 				});
 				CommandHandlerList.Global.Connect(c, new OverlayToggleCommandHandler());
 			}
+		}
+
+		private static void RebuildLocalizationMenu()
+		{
+			foreach (var item in localizationMenu) {
+				CommandHandlerList.Global.Disconnect(item);
+			}
+			localizationMenu.Clear();
+			ProjectLocalization.Drop();
+			foreach (var locale in ProjectLocalization.GetLocales()) {
+				var command = new Command(locale.Code);
+				var commandHandler = new ProjectLocalization(locale);
+				CommandHandlerList.Global.Connect(command, commandHandler);
+				localizationMenu.Add(command);
+				if (ProjectLocalization.Current == null) {
+					commandHandler.Execute();
+				}
+			}
+			localizationCommand.Enabled = localizationMenu.Count > 0;
 		}
 
 		private class OverlayToggleCommandHandler : ToggleDisplayCommandHandler
