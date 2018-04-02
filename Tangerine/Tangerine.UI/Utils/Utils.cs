@@ -65,18 +65,27 @@ namespace Tangerine.UI
 		{
 			if (widgetsInParentSpace.Count == 0) return;
 
-			Matrix32 originalObbToParentSpace = Matrix32.Translation(pivotInParentSpace);
-			if (obbInFirstWidgetSpace) {
-				Matrix32 firstWidgetToParentSpace = widgetsInParentSpace[0].CalcLocalToParentTransform();
-
-				originalObbToParentSpace = firstWidgetToParentSpace *
+				Matrix32 originalObbToParentSpace = Matrix32.Translation(pivotInParentSpace);
+				if (obbInFirstWidgetSpace) {
+					WidgetZeroScalePreserver zeroScalePreserver = new WidgetZeroScalePreserver(widgetsInParentSpace[0]);
+					zeroScalePreserver.Store();
+					
+					Matrix32 firstWidgetToParentSpace;
+					try {
+						firstWidgetToParentSpace = widgetsInParentSpace[0].CalcLocalToParentTransform();
+					} finally {
+						zeroScalePreserver.Restore();
+					}
+					
+					originalObbToParentSpace = firstWidgetToParentSpace *
 						Matrix32.Translation(firstWidgetToParentSpace.T).CalcInversed() * Matrix32.Translation(pivotInParentSpace);
-			}
+				}
 
-			ApplyTransformationToWidgetsGroupObb(
-				widgetsInParentSpace, widgetsInParentSpace[0].ParentWidget, originalObbToParentSpace, 
-				currentMousePosInParentSpace, previousMousePosInParentSpace, onCalculateTransformation
-			);
+				ApplyTransformationToWidgetsGroupObb(
+					widgetsInParentSpace, widgetsInParentSpace[0].ParentWidget, originalObbToParentSpace, 
+					currentMousePosInParentSpace, previousMousePosInParentSpace, onCalculateTransformation
+				);
+
 		}
 
 		public static void ApplyTransformationToWidgetsGroupObb(IEnumerable<Widget> widgetsInParentSpace,
@@ -90,6 +99,8 @@ namespace Tangerine.UI
 			Vector2 controlPointInObbSpace = previousMousePosInParentSpace;
 			Vector2 targetPointInObbSpace = currentMousePosInParentSpace;
 
+			if (Math.Abs(obbInParentSpace.CalcDeterminant()) < Mathf.ZeroTolerance) return;
+			
 			Matrix32 transformationFromParentToObb = obbInParentSpace.CalcInversed();
 			pivotInObbSpace = pivotInObbSpace * transformationFromParentToObb;
 			controlPointInObbSpace = controlPointInObbSpace * transformationFromParentToObb;
@@ -113,32 +124,48 @@ namespace Tangerine.UI
 		{
 			Matrix32 originalObbToWorldSpace = obbInParentSpace * parentWidget.LocalToWorldTransform;
 
+			if (Math.Abs(originalObbToWorldSpace.CalcDeterminant()) < Mathf.ZeroTolerance) return;
+			
 			foreach (Widget widget in widgetsInParentSpace) {
-				Matrix32 widgetToOriginalObbSpace = widget.LocalToWorldTransform * originalObbToWorldSpace.CalcInversed();
+				WidgetZeroScalePreserver zeroScalePreserver = new WidgetZeroScalePreserver(widget);
+				zeroScalePreserver.Store();
+				try {
 
-				// Calculate the new obb transformation in the world space.
-				Matrix32 deformedObbToWorldSpace = obbTransformation * originalObbToWorldSpace;
+					Matrix32 widgetToOriginalObbSpace = widget.LocalToWorldTransform * originalObbToWorldSpace.CalcInversed();
 
-				Matrix32 deformedWidgetToWorldSpace = widgetToOriginalObbSpace * deformedObbToWorldSpace;
+					// Calculate the new obb transformation in the world space.
+					Matrix32 deformedObbToWorldSpace = obbTransformation * originalObbToWorldSpace;
 
-				Matrix32 deformedWidgetToParentSpace =
+					Matrix32 deformedWidgetToWorldSpace = widgetToOriginalObbSpace * deformedObbToWorldSpace;
+
+					if (Math.Abs(widget.ParentWidget.LocalToWorldTransform.CalcDeterminant()) < Mathf.ZeroTolerance) continue;
+					
+					Matrix32 deformedWidgetToParentSpace =
 						deformedWidgetToWorldSpace * widget.ParentWidget.LocalToWorldTransform.CalcInversed();
 
-				Transform2 widgetResultTransform = widget.ExtractTransform2(deformedWidgetToParentSpace);
+					Transform2 widgetResultTransform = widget.ExtractTransform2(deformedWidgetToParentSpace);
 
-				// Correct a rotation delta, to prevent wrong values if a new angle 0 and previous is 359,
-				// then rotationDelta must be 1.
-				float rotationDelta = Mathf.Wrap180(widget.Rotation - widgetResultTransform.Rotation);
+					// Correct a rotation delta, to prevent wrong values if a new angle 0 and previous is 359,
+					// then rotationDelta must be 1.
+					float rotationDelta = Mathf.Wrap180(widget.Rotation - widgetResultTransform.Rotation);
 
-				// The position is less prone to fluctuations than other properties.
-				if ((widget.Position - widgetResultTransform.Translation).Length > 15e-5f) {
-					SetAnimableProperty.Perform(widget, nameof(Widget.Position), widgetResultTransform.Translation, CoreUserPreferences.Instance.AutoKeyframes);
-				}
-				if (Mathf.Abs(rotationDelta) > Mathf.ZeroTolerance) {
-					SetAnimableProperty.Perform(widget, nameof(Widget.Rotation), widget.Rotation + rotationDelta, CoreUserPreferences.Instance.AutoKeyframes);
-				}
-				if ((widget.Scale - widgetResultTransform.Scale).Length > Mathf.ZeroTolerance) {
-					SetAnimableProperty.Perform(widget, nameof(Widget.Scale), widgetResultTransform.Scale, CoreUserPreferences.Instance.AutoKeyframes);
+					// The position is less prone to fluctuations than other properties.
+					if ((widget.Position - widgetResultTransform.Translation).Length > 15e-5f) {
+						SetAnimableProperty.Perform(widget, nameof(Widget.Position), widgetResultTransform.Translation, CoreUserPreferences.Instance.AutoKeyframes);
+					}
+					if (Mathf.Abs(rotationDelta) > Mathf.ZeroTolerance) {
+						SetAnimableProperty.Perform(widget, nameof(Widget.Rotation), widget.Rotation + rotationDelta, CoreUserPreferences.Instance.AutoKeyframes);
+					}
+					if ((widget.Scale - widgetResultTransform.Scale).Length > Mathf.ZeroTolerance) {
+						widgetResultTransform.Scale = zeroScalePreserver.AdjustToScale(widgetResultTransform.Scale);
+
+						zeroScalePreserver.Restore();
+
+						SetAnimableProperty.Perform(widget, nameof(Widget.Scale), widgetResultTransform.Scale, CoreUserPreferences.Instance.AutoKeyframes);
+					}
+					
+				} finally {
+					zeroScalePreserver.Restore();
 				}
 			}
 		}
@@ -238,6 +265,53 @@ namespace Tangerine.UI
 				return true;
 			}
 		}
+		
+		private class WidgetZeroScalePreserver
+		{
 
+			private readonly Widget widget;
+			private float? savedScaleX;
+			private float? savedScaleY;
+
+			internal WidgetZeroScalePreserver(Widget widget)
+			{
+				this.widget = widget;
+			}
+
+			internal Vector2 AdjustToScale(Vector2 scale)
+			{
+				if (savedScaleX == null && savedScaleY == null) return scale;
+
+				return new Vector2(savedScaleX ?? scale.X, savedScaleY ?? scale.Y);
+			}
+			
+			internal void Store()
+			{
+				Restore();
+
+				if (Math.Abs(widget.Scale.X) < Mathf.ZeroTolerance) {
+					savedScaleX = widget.Scale.X;
+					widget.Scale = new Vector2(1, widget.Scale.Y);
+				}
+				if (Math.Abs(widget.Scale.Y) < Mathf.ZeroTolerance) {
+					savedScaleY = widget.Scale.Y;
+					widget.Scale = new Vector2(widget.Scale.X, 1);
+				}
+			}
+
+			internal void Restore()
+			{
+				if (widget != null && savedScaleX != null) {
+					widget.Scale = new Vector2(savedScaleX.Value, widget.Scale.Y);
+				}
+				if (widget != null && savedScaleY != null) {
+					widget.Scale = new Vector2(widget.Scale.X, savedScaleY.Value);
+				}
+				savedScaleX = null;
+				savedScaleY = null;
+			}
+
+		}
+		
 	}
 }
