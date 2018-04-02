@@ -827,7 +827,7 @@ namespace Lime
 		/// <typeparam name="T">Type of sought-for node.</typeparam>
 		/// <param name="path">Id or path of Node. Path can be incomplete
 		/// (i.e. for path Root/Human/Head/Eye Human or Head can be ommited).</param>
-		public T Find<T>(string path) where T : Node
+		public T Find<T>(string path) where T : class
 		{
 			T result = TryFindNode(path) as T;
 			if (result == null) {
@@ -844,7 +844,7 @@ namespace Lime
 		/// <typeparam name="T">Type of sought-for node.</typeparam>
 		/// <param name="format">Id or path of Node. Path can be incomplete
 		/// (i.e. for path Root/Human/Head/Eye Human or Head can be ommited).</param>
-		public T Find<T>(string format, params object[] args) where T : Node
+		public T Find<T>(string format, params object[] args) where T : class
 		{
 			return Find<T>(string.Format(format, args));
 		}
@@ -857,7 +857,7 @@ namespace Lime
 		/// <typeparam name="T">Type of sought-for node.</typeparam>
 		/// <param name="path">Id or path of Node. Path can be incomplete
 		/// (i.e. for path Root/Human/Head/Eye Human or Head can be ommited).</param>
-		public bool TryFind<T>(string path, out T node) where T : Node
+		public bool TryFind<T>(string path, out T node) where T : class
 		{
 			node = TryFindNode(path) as T;
 			return node != null;
@@ -871,7 +871,7 @@ namespace Lime
 		/// <typeparam name="T">Type of sought-for node.</typeparam>
 		/// <param name="path">Id or path of Node. Path can be incomplete
 		/// (i.e. for path Root/Human/Head/Eye Human or Head can be ommited).</param>
-		public T TryFind<T>(string path) where T : Node
+		public T TryFind<T>(string path) where T : class
 		{
 			return TryFindNode(path) as T;
 		}
@@ -884,7 +884,7 @@ namespace Lime
 		/// <typeparam name="T">Type of sought-for node.</typeparam>
 		/// <param name="format">Id or path of Node. Path can be incomplete
 		/// (i.e. for path Root/Human/Head/Eye Human or Head can be ommited).</param>
-		public T TryFind<T>(string format, params object[] args) where T : Node
+		public T TryFind<T>(string format, params object[] args) where T : class
 		{
 			return TryFind<T>(string.Format(format, args));
 		}
@@ -898,7 +898,7 @@ namespace Lime
 		/// (i.e. for path Root/Human/Head/Eye Human or Head can be ommited).</param>
 		public Node FindNode(string path)
 		{
-			var node = TryFindNode(path);
+			var node = TryFindNode(path) as Node;
 			if (node == null) {
 				throw new Lime.Exception("'{0}' not found for '{1}'", path, ToString());
 			}

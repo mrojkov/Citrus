@@ -6,7 +6,7 @@ namespace Lime
 	/// <summary>
 	/// A node reference is used for referencing to a node within a serialized scene by the node Id.
 	/// </summary>
-	public class NodeReference<T> where T: Node
+	public class NodeReference<T> where T : class
 	{
 		private string id;
 		private Node cachedRoot;
