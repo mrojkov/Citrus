@@ -155,7 +155,7 @@ namespace Lime
 
 		bool Viewport3D.IZSorterParams.Opaque => false;
 
-		float Viewport3D.IZSorterParams.CalcDistanceToCamera(Camera3D camera)
+		float Viewport3D.IZSorterParams.CalcDistanceToCamera(ICamera camera)
 		{
 			return camera.View.TransformVector(CalcGlobalPosition()).Z;
 		}

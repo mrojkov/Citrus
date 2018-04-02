@@ -1330,7 +1330,7 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (6 == fd.OurIndex) {
-				result.CameraRef = (global::Lime.NodeReference<global::Lime.Camera3D>)dg.ReadObject<global::Lime.NodeReference<global::Lime.Camera3D>>();
+				result.CameraRef = (global::Lime.NodeReference<global::Lime.ICamera>)dg.ReadObject<global::Lime.NodeReference<global::Lime.ICamera>>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (7 == fd.OurIndex) {
@@ -6365,9 +6365,9 @@ namespace GeneratedDeserializersBIN
 			return result;
 		}
 
-		private static void Read_Lime__NodeReference_Camera3D(BinaryDeserializer d, ReaderClassDef def, object obj)
+		private static void Read_Lime__NodeReference_ICamera(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
-			var result = (global::Lime.NodeReference<global::Lime.Camera3D>)obj;
+			var result = (global::Lime.NodeReference<global::Lime.ICamera>)obj;
 			var dg = (BinaryDeserializerGen)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
@@ -6379,10 +6379,10 @@ namespace GeneratedDeserializersBIN
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
 		}
 
-		private static object Make_Lime__NodeReference_Camera3D(BinaryDeserializer d, ReaderClassDef def)
+		private static object Make_Lime__NodeReference_ICamera(BinaryDeserializer d, ReaderClassDef def)
 		{
-			var result = new global::Lime.NodeReference<global::Lime.Camera3D>();
-			Read_Lime__NodeReference_Camera3D(d, def, result);
+			var result = new global::Lime.NodeReference<global::Lime.ICamera>();
+			Read_Lime__NodeReference_ICamera(d, def, result);
 			return result;
 		}
 
@@ -6477,7 +6477,7 @@ namespace GeneratedDeserializersBIN
 			readCache[typeof(global::Lime.SerializableTexture)] = Read_Lime__SerializableTexture;
 			readCache[typeof(global::Lime.NodeReference<global::Lime.Widget>)] = Read_Lime__NodeReference_Widget;
 			readCache[typeof(global::Lime.NodeReference<global::Lime.Spline>)] = Read_Lime__NodeReference_Spline;
-			readCache[typeof(global::Lime.NodeReference<global::Lime.Camera3D>)] = Read_Lime__NodeReference_Camera3D;
+			readCache[typeof(global::Lime.NodeReference<global::Lime.ICamera>)] = Read_Lime__NodeReference_ICamera;
 			makeCache[typeof(global::Lime.Font)] = Make_Lime__Font;
 			makeCache[typeof(global::Lime.SerializableSample)] = Make_Lime__SerializableSample;
 			makeCache[typeof(global::Lime.KerningPair)] = Make_Lime__KerningPair;
@@ -6591,7 +6591,7 @@ namespace GeneratedDeserializersBIN
 			makeCache[typeof(global::Lime.SerializableTexture)] = Make_Lime__SerializableTexture;
 			makeCache[typeof(global::Lime.NodeReference<global::Lime.Widget>)] = Make_Lime__NodeReference_Widget;
 			makeCache[typeof(global::Lime.NodeReference<global::Lime.Spline>)] = Make_Lime__NodeReference_Spline;
-			makeCache[typeof(global::Lime.NodeReference<global::Lime.Camera3D>)] = Make_Lime__NodeReference_Camera3D;
+			makeCache[typeof(global::Lime.NodeReference<global::Lime.ICamera>)] = Make_Lime__NodeReference_ICamera;
 		}
 	}
 }

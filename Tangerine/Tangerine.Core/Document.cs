@@ -147,7 +147,7 @@ namespace Tangerine.Core
 				OrthographicSize = 1.0f
 			};
 			vp.AddNode(camera);
-			vp.CameraRef = new NodeReference<Camera3D>(camera.Id);
+			vp.CameraRef = new NodeReference<ICamera>(camera.Id);
 			return vp;
 		}
 

@@ -69,7 +69,7 @@
 		public Viewport3DProjector(Viewport3D viewport)
 		{
 			Viewport = viewport;
-			viewProjection = Viewport.Camera.ViewProjection;
+			viewProjection = Viewport.Camera.View * Viewport.Camera.Projection;
 			halfSize = Viewport.Size * Vector2.Half;
 		}
 

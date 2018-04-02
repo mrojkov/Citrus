@@ -193,7 +193,7 @@ namespace Lime
 			return hit;
 		}
 
-		public override float CalcDistanceToCamera(Camera3D camera)
+		public override float CalcDistanceToCamera(ICamera camera)
 		{
 			return camera.View.TransformVector(GlobalCenter).Z;
 		}

@@ -138,6 +138,7 @@
     <Compile Include="Source\Application\MouseCursor\MouseCursor.Mac.cs" />
     <Compile Include="Source\Application\MouseCursor\MouseCursor.Win.cs" />
     <Compile Include="Source\Application\MouseCursor\MouseCursor.Null.cs" />
+    <Compile Include="Source\Widgets\3D\ICamera.cs" />
     <Compile Include="Source\Application\RenderingBackend.cs" />
     <Compile Include="Source\Application\Window.Android.cs" />
     <Compile Include="Source\Application\Window.iOS.cs" />

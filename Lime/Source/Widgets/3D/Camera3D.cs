@@ -2,7 +2,7 @@ using Yuzu;
 
 namespace Lime
 {
-	public class Camera3D : Node3D
+	public class Camera3D : Node3D, ICamera
 	{
 		private CameraProjectionMode projectionMode = CameraProjectionMode.Perspective;
 		private float fieldOfView;

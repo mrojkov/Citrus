@@ -39,7 +39,7 @@ namespace Lime
 			Nodes.Add(root);
 		}
 
-		public override float CalcDistanceToCamera(Camera3D camera)
+		public override float CalcDistanceToCamera(ICamera camera)
 		{
 			if (Widget == null) {
 				return 0f;

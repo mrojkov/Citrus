@@ -349,7 +349,7 @@ namespace Lime
 
 				jd.Generate<NodeReference<Widget>>();
 				jd.Generate<NodeReference<Spline>>();
-				jd.Generate<NodeReference<Camera3D>>();
+				jd.Generate<NodeReference<ICamera>>();
 
 				jd.GenerateFooter();
 				sw.Flush();

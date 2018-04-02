@@ -71,7 +71,7 @@ namespace Tangerine.UI.SceneView
 		Matrix44 CalcGizmoTransform(Matrix44 modelGlobalTransform, float gizmoRadiusInPixels)
 		{
 			var viewport = GetCurrentViewport3D();
-			var camera = viewport.Camera;
+			var camera = viewport.Camera as Camera3D;
 			Vector3 scale, translation;
 			Quaternion rotation;
 			modelGlobalTransform.Decompose(out scale, out rotation, out translation);

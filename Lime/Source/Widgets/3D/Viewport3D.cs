@@ -21,7 +21,7 @@ namespace Lime
 	{
 		public interface IZSorterParams
 		{
-			float CalcDistanceToCamera(Camera3D camera);
+			float CalcDistanceToCamera(ICamera camera);
 			bool Opaque { get; }
 		}
 		
@@ -31,12 +31,12 @@ namespace Lime
 		private RenderChain renderChain = new RenderChain();
 
 		[YuzuMember]
-		public NodeReference<Camera3D> CameraRef { get; set; }
+		public NodeReference<ICamera> CameraRef { get; set; }
 
 		[YuzuMember]
 		public NodeReference<LightSource> LightSourceRef { get; set; }
 
-		public Camera3D Camera => CameraRef?.GetNode(this);
+		public ICamera Camera => CameraRef?.GetNode(this);
 		public LightSource LightSource => LightSourceRef?.GetNode(this);
 
 #if DEBUG
@@ -87,7 +87,7 @@ namespace Lime
 				OrthographicSize = 1.0f
 			};
 			Nodes.Add(camera);
-			CameraRef = new NodeReference<Camera3D>(camera.Id);
+			CameraRef = new NodeReference<ICamera>(camera.Id);
 		}
 
 		protected override void OnSizeChanged(Vector2 sizeDelta)
@@ -98,8 +98,8 @@ namespace Lime
 
 		private void AdjustCameraAspectRatio()
 		{
-			if (Camera != null) {
-				Camera.AspectRatio = Width / Height;
+			if (Camera != null && Camera is Camera3D) {
+				((Camera3D)Camera).AspectRatio = Width / Height;
 			}
 		}
 
@@ -251,7 +251,7 @@ namespace Lime
 
 		public Vector3 WorldToViewportPoint(Vector3 pt)
 		{
-			pt = Camera.ViewProjection.ProjectVector(pt) * new Vector3(1, -1, 1);
+			pt = (Camera.View * Camera.Projection).ProjectVector(pt) * new Vector3(1, -1, 1);
 			var xy = ((Vector2)pt + Vector2.One) * Size * Vector2.Half;
 			var z = Camera.Projection.CalcInverted().ProjectVector(pt).Z;
 			return new Vector3(xy, z);
@@ -265,7 +265,7 @@ namespace Lime
 
 		public Vector3 ViewportToWorldPoint(Vector3 pt)
 		{
-			return Camera.ViewProjection.CalcInverted().ProjectVector(ViewportToNDCPoint(pt));
+			return (Camera.View * Camera.Projection).CalcInverted().ProjectVector(ViewportToNDCPoint(pt));
 		}
 
 		public Ray ScreenPointToRay(Vector2 pt)
@@ -287,7 +287,7 @@ namespace Lime
 		public Ray ViewportPointToRay(Vector3 pt)
 		{
 			var xy = (Vector2)pt;
-			var invViewProj = Camera.ViewProjection.CalcInverted();
+			var invViewProj = (Camera.View * Camera.Projection).CalcInverted();
 			var a = invViewProj.ProjectVector(ViewportToNDCPoint(pt));
 			var b = invViewProj.ProjectVector(ViewportToNDCPoint(new Vector3(xy, Camera.FarClipPlane)));
 			return new Ray {

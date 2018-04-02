@@ -178,7 +178,7 @@ namespace Lime
 			color = Color4.White;
 		}
 
-		public virtual float CalcDistanceToCamera(Camera3D camera)
+		public virtual float CalcDistanceToCamera(ICamera camera)
 		{
 			return camera.View.TransformVector(GlobalTransform.Translation).Z;
 		}

@@ -326,6 +326,7 @@
     <Compile Include="Source\Audio\OpenAL\ALMOB\OpenAL.cs" />
     <Compile Include="Source\Audio\OpenAL\ALMOB\OpenALC.cs" />
     <Compile Include="Source\Widgets\WidgetMaterial.cs" />
+    <Compile Include="Source\Widgets\3D\ICamera.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
