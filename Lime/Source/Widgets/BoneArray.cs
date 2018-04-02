@@ -75,7 +75,7 @@ namespace Lime
 			return result;
 		}
 
-		public Matrix32 GetCumulativeRelativeTransform(SkinningWeights weights)
+		public Matrix32 CalcWeightedRelativeTransform(SkinningWeights weights)
 		{
 			Matrix32 skinningMatrix = new Matrix32();
 

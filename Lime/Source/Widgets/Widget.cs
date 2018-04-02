@@ -55,6 +55,18 @@ namespace Lime
 		private WidgetInput input;
 		private TaskList tasks;
 		private TaskList lateTasks;
+		/// <summary>
+		/// <code>
+		/// Transition matrix from the local basis to the parent basis:
+		/// MT(-pivot * size) * MS(scale) * MR(rotation) * MT(position) * M(bones)
+		/// , where:
+		/// MT(-pivot * size) - translation matrix of the pivot point,
+		/// MS(scale) - scaling matrix of local transformation,
+		/// MR(rotation) - rotation matrix of local transformation,
+		/// MT(position) - translation matrix of local transformation,
+		/// M(bones) - weighted transition matrix from the local basis of connected bones to the parent basis.
+		/// </code>
+		/// </summary>
 		private Matrix32 localToParentTransform;
 		private Matrix32 localToWorldTransform;
 		private Rectangle boundingRect;
@@ -989,6 +1001,14 @@ namespace Lime
 
 		private void RecalcLocalToParentTransform()
 		{
+			// This is an optimized version (after profiling) of the code:
+			// localToParentTransform =
+			// Matrix32.Translation(-Pivot * Size) *
+			// Matrix32.Scaling(Scale) *
+			// Matrix32.Rotation(Rotation) *
+			// Matrix32.Translation(Position) *
+			// BoneArray.CalcWeightedRelativeTransform(SkinningWeights);
+			
 			var centerX = size.X * pivot.X;
 			var centerY = size.Y * pivot.Y;
 			if (rotation == 0 && SkinningWeights == null) {
@@ -1064,21 +1084,6 @@ namespace Lime
 				ParentWidget.boundingRect = r;
 				ParentWidget.ExpandParentBoundingRect();
 			}
-		}
-
-		public Transform2 CalcApplicableTransfrom2(Matrix32 fromLocalToParentTransform)
-		{
-			// Take pivot into account.
-			fromLocalToParentTransform = Matrix32.Translation(-Pivot * Size).CalcInversed() * fromLocalToParentTransform;
-			
-			// Take SkinningWeights into account.
-			if (SkinningWeights != null && Parent?.AsWidget != null) {
-				fromLocalToParentTransform = fromLocalToParentTransform * 
-					Parent.AsWidget.BoneArray.GetCumulativeRelativeTransform(SkinningWeights).CalcInversed();
-			}
-
-			// Extract simple transformations from matrix.
-			return fromLocalToParentTransform.ToTransform2();
 		}
 
 		/// <summary>

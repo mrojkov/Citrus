@@ -124,7 +124,7 @@ namespace Tangerine.UI
 				Matrix32 deformedWidgetToParentSpace =
 						deformedWidgetToWorldSpace * widget.ParentWidget.LocalToWorldTransform.CalcInversed();
 
-				Transform2 widgetResultTransform = widget.CalcApplicableTransfrom2(deformedWidgetToParentSpace);
+				Transform2 widgetResultTransform = widget.ExtractTransform2(deformedWidgetToParentSpace);
 
 				// Correct a rotation delta, to prevent wrong values if a new angle 0 and previous is 359,
 				// then rotationDelta must be 1.
@@ -141,6 +141,20 @@ namespace Tangerine.UI
 					SetAnimableProperty.Perform(widget, nameof(Widget.Scale), widgetResultTransform.Scale, CoreUserPreferences.Instance.AutoKeyframes);
 				}
 			}
+		}
+
+		private static Transform2 ExtractTransform2(this Widget widget, Matrix32 localToParentTransform)
+		{
+			// Take pivot into account.
+			localToParentTransform = Matrix32.Translation(-widget.Pivot * widget.Size).CalcInversed() * localToParentTransform;
+			
+			// Take SkinningWeights into account.
+			if (widget.SkinningWeights != null && widget.Parent?.AsWidget != null) {
+				localToParentTransform = localToParentTransform * widget.Parent.AsWidget.BoneArray.CalcWeightedRelativeTransform(widget.SkinningWeights).CalcInversed();
+			}
+
+			// Extract simple transformations from matrix.
+			return localToParentTransform.ToTransform2();
 		}
 
 		public static bool CalcHullAndPivot(IEnumerable<Widget> widgets, Widget canvas, out Quadrangle hull, out Vector2 pivot)
