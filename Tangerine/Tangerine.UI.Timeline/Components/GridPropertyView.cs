@@ -35,7 +35,7 @@ namespace Tangerine.UI.Timeline.Components
 			for (int i = 0; i < animator.ReadonlyKeys.Count; i++) {
 				var key = animator.ReadonlyKeys[i];
 				Renderer.Transform1 =
-					Matrix32.Rotation(Mathf.Pi / 4) * 
+					Matrix32.RotationRough(Mathf.Pi / 4) * 
 					Matrix32.Translation((key.Frame + 0.5f) * TimelineMetrics.ColWidth + 0.5f, widget.Height / 2 + 0.5f) *
 					baseTransform;
 				var v = TimelineMetrics.ColWidth / 3 * Vector2.One;

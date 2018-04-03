@@ -82,11 +82,25 @@ namespace Lime
 		}
 
 		/// <summary>
+		/// Returns rough rotation matrix.
+		/// </summary>
+		public static Matrix32 RotationRough(float radians)
+		{
+			var cs = Vector2.CosSinRough(radians);
+			return new Matrix32 {
+				UX = cs.X,
+				UY = cs.Y,
+				VX = -cs.Y,
+				VY = cs.X
+			};
+		}
+
+		/// <summary>
 		/// Returns rotation matrix.
 		/// </summary>
 		public static Matrix32 Rotation(float radians)
 		{
-			var cs = Vector2.CosSinRough(radians);
+			var cs = Vector2.CosSin(radians);
 			return new Matrix32 {
 				UX = cs.X,
 				UY = cs.Y,
@@ -139,12 +153,31 @@ namespace Lime
 		/// <param name="rotation">Rotation (in radians).</param>
 		public static Matrix32 Transformation(Vector2 center, Vector2 scaling, float rotation, Vector2 translation)
 		{
-			var cs = Vector2.CosSinRough(rotation);
+			return Transformation(center, scaling, Vector2.CosSin(rotation), translation);
+		}
+
+		/// <summary>
+		/// Returns the rough transformation matrix.
+		/// </summary>
+		/// <param name="center">Center of rotation and scaling.</param>
+		/// <param name="rotation">Rotation (in radians).</param>
+		public static Matrix32 TransformationRough(Vector2 center, Vector2 scaling, float rotation, Vector2 translation)
+		{
+			return Transformation(center, scaling, Vector2.CosSinRough(rotation), translation);
+		}
+
+		/// <summary>
+		/// Returns the transformation matrix.
+		/// </summary>
+		/// <param name="center">Center of rotation and scaling.</param>
+		/// <param name="direction">Unit vector of abscissa.</param>
+		private static Matrix32 Transformation(Vector2 center, Vector2 scaling, Vector2 direction, Vector2 translation)
+		{
 			var m = new Matrix32();
-			m.UX = scaling.X * cs.X;
-			m.UY = scaling.X * cs.Y;
-			m.VX = -scaling.Y * cs.Y;
-			m.VY = scaling.Y * cs.X;
+			m.UX = scaling.X * direction.X;
+			m.UY = scaling.X * direction.Y;
+			m.VX = -scaling.Y * direction.Y;
+			m.VY = scaling.Y * direction.X;
 			m.TX = -center.X * m.UX - center.Y * m.VX + center.X + translation.X;
 			m.TY = -center.X * m.UY - center.Y * m.VY + center.Y + translation.Y;
 			return m;
