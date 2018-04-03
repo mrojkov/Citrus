@@ -26,6 +26,10 @@ namespace Tangerine.UI.Timeline
 			ThemedDropDownList jumpToSelector;
 			Result result;
 			var window = new Window(new WindowOptions { FixedSize = true, Title = "Marker properties", Visible = false, Style = WindowStyle.Dialog });
+			Action<Result> closeWithResult = (r) => {
+				result = r;
+				window.Close();
+			};
 			jumpToSelector = new ThemedDropDownList();
 			foreach (var m in Document.Current.Container.Markers) {
 				jumpToSelector.Items.Add(new ThemedDropDownList.Item(m.Id, m));
@@ -41,8 +45,8 @@ namespace Tangerine.UI.Timeline
 							ColCount = 2,
 							RowCount = 3,
 							Spacing = 8,
-							ColDefaults = { 
-								new LayoutCell(Alignment.RightCenter, 0.5f, 0), 
+							ColDefaults = {
+								new LayoutCell(Alignment.RightCenter, 0.5f, 0),
 								new LayoutCell(Alignment.LeftCenter, 1, 0)
 							}
 						},
@@ -76,10 +80,7 @@ namespace Tangerine.UI.Timeline
 			if (canDelete) {
 				deleteButton = new ThemedButton("Delete");
 				buttonsPanel.AddNode(deleteButton);
-				deleteButton.Clicked += () => {
-					result = Result.Delete;
-					window.Close();
-				};
+				deleteButton.Clicked += () => closeWithResult(Result.Delete);
 			}
 			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
 			rootWidget.LateTasks.Add(new KeyPressHandler(Key.Escape,
@@ -87,12 +88,10 @@ namespace Tangerine.UI.Timeline
 					input.ConsumeKey(key);
 					window.Close();
 				}));
-			okButton.Clicked += () => {
-				result = Result.Ok;
-				window.Close();
-			};
+			markerIdEditor.SetFocus();
+			markerIdEditor.Editor.Submitted += () => closeWithResult(Result.Ok);
+			okButton.Clicked += () => closeWithResult(Result.Ok);
 			cancelButton.Clicked += window.Close;
-			okButton.SetFocus();
 			result = Result.Cancel;
 			window.ShowModal();
 			if (result == Result.Ok) {

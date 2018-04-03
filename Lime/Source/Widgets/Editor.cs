@@ -25,6 +25,8 @@ namespace Lime
 		public ICaretPosition CaretPos { get; } = new CaretPosition();
 		public ICaretPosition SelectionStart { get; } = new CaretPosition();
 		public ICaretPosition SelectionEnd { get; } = new CaretPosition();
+		public event Action Submitted;
+		public event Action Canceled;
 
 		public struct UndoItem : IEquatable<UndoItem>
 		{
@@ -389,6 +391,7 @@ namespace Lime
 						HideSelection();
 						Cmds.Submit.Consume();
 						FocusableWidget.RevokeFocus();
+						Submitted?.Invoke();
 					}
 				}
 				if (Cmds.Cancel.WasIssued() && IsTextReadable) {
@@ -398,6 +401,7 @@ namespace Lime
 					History.Clear();
 					Cmds.Cancel.Consume();
 					FocusableWidget.RevokeFocus();
+					Canceled?.Invoke();
 				}
 				if (!Command.SelectAll.IsConsumed()) {
 					Command.SelectAll.Enabled = true;
