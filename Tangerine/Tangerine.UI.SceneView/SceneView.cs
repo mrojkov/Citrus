@@ -297,7 +297,7 @@ namespace Tangerine.UI.SceneView
 			}
 			if (!Window.Current.Active) {
 				Window.Current.Activate();
-				SceneView.Instance.InputArea.SetFocus();
+				InputArea.SetFocus();
 			}
 			var widgetPos = MousePosition * Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
 			Document.Current.History.BeginTransaction();
