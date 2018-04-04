@@ -167,7 +167,7 @@ namespace Tangerine.UI.SceneView
 			Utils.ApplyTransformationToWidgetsGroupObb(
 				sv.Scene,
 				widgets, hullsPivotPoint, hullInFirstWidgetSpace, curMousePos, prevMousePos,
-				(originalVectorInObbSpace, deformedVectorInObbSpace) => {
+				(Vector2 originalVectorInObbSpace, Vector2 deformedVectorInObbSpace, out bool invertX, out bool invertY) => {
 					Vector2 deformationScaleInObbSpace =
 							new Vector2(
 								Math.Abs(originalVectorInObbSpace.X) < Mathf.ZeroTolerance
@@ -187,6 +187,9 @@ namespace Tangerine.UI.SceneView
 						deformationScaleInObbSpace.Y = deformationScaleInObbSpace.X;
 					}
 
+					invertX = deformationScaleInObbSpace.X < 0;
+					invertY = deformationScaleInObbSpace.Y < 0;
+					
 					return Matrix32.Scaling(deformationScaleInObbSpace);
 				}
 			);

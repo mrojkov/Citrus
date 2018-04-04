@@ -93,7 +93,9 @@ namespace Tangerine.UI.SceneView
 					Utils.ApplyTransformationToWidgetsGroupObb(
 						sv.Scene,
 						widgets, pivot, widgets.Count <= 1, initialMousePos + mouseDelta, initialMousePos,
-						(originalVectorInObbSpace, deformedVectorInObbSpace) => {
+						(Vector2 originalVectorInObbSpace, Vector2 deformedVectorInObbSpace, out bool invertX, out bool invertY) => {
+							invertX = false;
+							invertY = false;
 							return Matrix32.Translation((deformedVectorInObbSpace - originalVectorInObbSpace).Snap(Vector2.Zero));
 						}
 					);

@@ -10,7 +10,7 @@ namespace Tangerine.UI
 {
 	public static class Utils
 	{
-		public delegate Matrix32 CalculateTransformationDelegate(Vector2 fromOriginalVectorInObbSpace, Vector2 toDeformedVectorInObbSpace);
+		public delegate Matrix32 CalculateTransformationDelegate(Vector2 fromOriginalVectorInObbSpace, Vector2 toDeformedVectorInObbSpace, out bool invertX, out bool invertY);
 		
 		public static IEnumerable<T> Editable<T>(this IEnumerable<T> nodes) where T : Node
 		{
@@ -110,17 +110,19 @@ namespace Tangerine.UI
 			Vector2 deformedVectorInObbSpace = targetPointInObbSpace - pivotInObbSpace;
 
 			// calculate transformation from original vector to deformed vector
+			bool invertX;
+			bool invertY;
 			Matrix32 deformationInObbSpace =
 					onCalculateTransformation(originalVectorInObbSpace,
-						deformedVectorInObbSpace);
+						deformedVectorInObbSpace, out invertX, out invertY);
 
 			ApplyTransformationToWidgetsGroupObb(
-				widgetsInParentSpace, parentWidget, obbInParentSpace, deformationInObbSpace
+				widgetsInParentSpace, parentWidget, obbInParentSpace, deformationInObbSpace, invertX, invertY
 			);
 		}
 
 		public static void ApplyTransformationToWidgetsGroupObb(IEnumerable<Widget> widgetsInParentSpace,
-			Widget parentWidget, Matrix32 obbInParentSpace, Matrix32 obbTransformation)
+			Widget parentWidget, Matrix32 obbInParentSpace, Matrix32 obbTransformation, bool invertX, bool invertY)
 		{
 			Matrix32 originalObbToWorldSpace = obbInParentSpace * parentWidget.LocalToWorldTransform;
 
@@ -143,7 +145,7 @@ namespace Tangerine.UI
 					Matrix32 deformedWidgetToParentSpace =
 						deformedWidgetToWorldSpace * widget.ParentWidget.LocalToWorldTransform.CalcInversed();
 
-					Transform2 widgetResultTransform = widget.ExtractTransform2(deformedWidgetToParentSpace);
+					Transform2 widgetResultTransform = widget.ExtractTransform2(deformedWidgetToParentSpace, invertX, invertY);
 
 					// Correct a rotation delta, to prevent wrong values if a new angle 0 and previous is 359,
 					// then rotationDelta must be 1.
@@ -170,7 +172,7 @@ namespace Tangerine.UI
 			}
 		}
 
-		private static Transform2 ExtractTransform2(this Widget widget, Matrix32 localToParentTransform)
+		private static Transform2 ExtractTransform2(this Widget widget, Matrix32 localToParentTransform, bool invertX, bool invertY)
 		{
 			// Take pivot into account.
 			localToParentTransform = Matrix32.Translation(-widget.Pivot * widget.Size).CalcInversed() * localToParentTransform;
@@ -181,7 +183,39 @@ namespace Tangerine.UI
 			}
 
 			// Extract simple transformations from matrix.
-			return localToParentTransform.ToTransform2();
+			bool reqNegX = widget.Scale.X < 0;
+			bool reqNegY = widget.Scale.Y < 0;
+			if (invertX) reqNegX = !reqNegX;
+			if (invertY) reqNegY = !reqNegY;
+			return localToParentTransform.ToTransform2(reqNegX, reqNegY);
+		}
+
+		private static Transform2 ToTransform2(this Matrix32 matrix, bool isRequiredScaleXNegative, bool isRequiredScaleYNegative)
+		{
+			var vSign = Math.Sign(Vector2.CrossProduct(matrix.U, matrix.V));
+
+			if (!isRequiredScaleXNegative) {
+				return new Transform2 {
+					Translation = matrix.T,
+					Scale = new Vector2(matrix.U.Length, matrix.V.Length * vSign),
+					Rotation = matrix.U.Atan2Deg
+				};
+			} 
+			
+			if ((isRequiredScaleYNegative && vSign < 0) || (!isRequiredScaleYNegative && vSign > 0)) {
+				return new Transform2 {
+					Translation = matrix.T,
+					Scale = new Vector2(-matrix.U.Length, matrix.V.Length * vSign),
+					Rotation = matrix.U.Atan2Deg
+				};
+			}
+
+			return new Transform2 {
+				Translation = matrix.T,
+				Scale = new Vector2(-matrix.U.Length, -matrix.V.Length * vSign),
+				Rotation = (-matrix.U).Atan2Deg
+			};
+			
 		}
 
 		public static bool CalcHullAndPivot(IEnumerable<Widget> widgets, Widget canvas, out Quadrangle hull, out Vector2 pivot)
