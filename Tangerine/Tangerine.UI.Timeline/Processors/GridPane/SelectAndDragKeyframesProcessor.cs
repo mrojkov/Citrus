@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
@@ -7,7 +6,7 @@ using Tangerine.UI.Timeline.Components;
 
 namespace Tangerine.UI.Timeline
 {
-	public class SelectAndDragKeyframesProcessor : Core.ITaskProvider
+	public class SelectAndDragKeyframesProcessor : ITaskProvider
 	{
 		IntRectangle rect;
 
@@ -36,11 +35,11 @@ namespace Tangerine.UI.Timeline
 								yield return SelectRangeTask(lastSelectedCell, initialCell);
 							} else if (!r.Result || isInMultiselectMode) {
 								yield return SelectTask(initialCell);
+								lastSelectedCell = initialCell;
 							} else {
 								yield return DragSingleKeyframeTask(initialCell);
+								lastSelectedCell = initialCell;
 							}
-							
-							lastSelectedCell = initialCell;
 						}
 					}
 				}
