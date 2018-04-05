@@ -116,6 +116,18 @@
     <Compile Include="..\Source\Toolbox\IFileEnumerator.cs">
       <Link>IFileEnumerator.cs</Link>
     </Compile>
+    <Compile Include="..\Source\Nuget\Nuget.cs">
+      <Link>Mac\Nuget.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Toolbox\Toolbox.cs">
+      <Link>Mac\Toolbox.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\TargetPlatform.cs">
+      <Link>Mac\TargetPlatform.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Toolbox\Process.cs">
+      <Link>Mac\Process.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="Mac\MainWindow.xib" />

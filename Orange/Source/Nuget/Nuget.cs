@@ -18,12 +18,7 @@ namespace Orange
 			nugetPath = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Win", "nuget.exe");
 #endif
 			if (!File.Exists(nugetPath)) {
-				var citrusDirectory = Toolbox.CalcCitrusDirectory();
-#if MAC
-				nugetPath = Path.Combine(citrusDirectory, "Orange", "Toolchain.Mac", "nuget.exe");
-#else
-				nugetPath = Path.Combine(citrusDirectory, "Orange", "Toolchain.Win", "nuget.exe");
-#endif
+				nugetPath = Path.Combine(Toolbox.CalcCitrusDirectory(), "Orange", "Toolchain.Win", "nuget.exe");
 			}
 
 			if (!File.Exists(nugetPath)) {
