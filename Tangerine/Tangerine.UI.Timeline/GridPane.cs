@@ -35,14 +35,14 @@ namespace Tangerine.UI.Timeline
 				PostPresenter = new DelegatePresenter<Widget>(w => OnPostRender(w))
 			};
 			RootWidget.AddNode(ContentWidget);
-			RootWidget.AddChangeWatcher(() => RootWidget.Size, 
+			RootWidget.AddChangeWatcher(() => RootWidget.Size,
 				// Some document operation processors (e.g. ColumnCountUpdater) require up-to-date timeline dimensions.
 				_ => Core.Operations.Dummy.Perform());
-			OnPostRender += RenderCursor;
 			OnPostRender += RenderSelection;
+			OnPostRender += RenderCursor;
 			RootWidget.Tasks.Add(HandleRightClickTask);
 		}
-		
+
 		IEnumerator<object> HandleRightClickTask()
 		{
 			while (true) {
@@ -145,8 +145,8 @@ namespace Tangerine.UI.Timeline
 			ContentWidget.PrepareRendererState();
 			Renderer.DrawLine(
 				x, 0, x, ContentWidget.Height - 1,
-				Document.Current.PreviewAnimation ? 
-				ColorTheme.Current.TimelineRuler.RunningCursor : 
+				Document.Current.PreviewAnimation ?
+				ColorTheme.Current.TimelineRuler.RunningCursor :
 				ColorTheme.Current.TimelineRuler.Cursor);
 		}
 
@@ -157,34 +157,71 @@ namespace Tangerine.UI.Timeline
 
 		public void RenderSelection(Widget widget, IntVector2 offset)
 		{
-			Vector2 a, b;
-			if (GetSelection(widget, offset, out a, out b)) {
-				Renderer.DrawRect(a, b, ColorTheme.Current.TimelineGrid.Selection);
-				Renderer.DrawRectOutline(a, b, ColorTheme.Current.TimelineGrid.SelectionBorder);
-			}
-		}
-
-		private bool GetSelection(Widget widget, IntVector2 offset, out Vector2 leftTop, out Vector2 rightBottom)
-		{
 			widget.PrepareRendererState();
-			leftTop = Vector2.One * float.MaxValue;
-			rightBottom = Vector2.One * float.MinValue;
-			var anyRow = false;
+			var gridSpans = new List<Components.GridSpanList>();
 			foreach (var row in Document.Current.Rows) {
-				var s = row.Components.GetOrAdd<Components.GridSpanListComponent>().Spans;
-				foreach (var i in s.GetNonOverlappedSpans()) {
-					anyRow = true;
-					var a = CellToGridCoordinates(new IntVector2(i.A, row.Index) + offset);
-					var b = CellToGridCoordinates(new IntVector2(i.B, row.Index + 1) + offset);
-					if (a.X < leftTop.X || a.Y < leftTop.Y) {
-						leftTop = a;
-					}
-					if (b.X > rightBottom.X || b.Y > rightBottom.Y) {
-						rightBottom = b;
+				gridSpans.Add(row.Components.GetOrAdd<Components.GridSpanListComponent>().Spans.GetNonOverlappedSpans());
+			}
+
+			for (var row = 0; row < Document.Current.Rows.Count; row++) {
+				var spans = gridSpans[row];
+				var gridWidgetBottom = Document.Current.Rows[row].GridWidget().Bottom();
+				int? lastColumn = null;
+				var topSpans = row > 0 ? gridSpans[row - 1].GetEnumerator() : (IEnumerator<Components.GridSpan>)null;
+				var bottomSpans = row + 1 < Document.Current.Rows.Count ? gridSpans[row + 1].GetEnumerator() : (IEnumerator<Components.GridSpan>)null;
+				Components.GridSpan? topSpan = null;
+				Components.GridSpan? bottomSpan = null;
+				for (var i = 0; i < spans.Count; i++) {
+					var span = spans[i];
+					var isLastSpan = i + 1 == spans.Count;
+					for (var column = span.A; column < span.B; column++) {
+						var absentLeftCell = !lastColumn.HasValue || column - 1 > lastColumn.Value;
+						if (topSpans != null && (!topSpan.HasValue || column >= topSpan.Value.B)) {
+							do {
+								if (!topSpans.MoveNext()) {
+									topSpans = null;
+									topSpan = null;
+									break;
+								}
+								topSpan = topSpans.Current;
+							} while (column >= topSpan.Value.B);
+						}
+						var absentTopCell = !topSpan.HasValue || column < topSpan.Value.A;
+						var absentRightCell = column + 1 == span.B && (isLastSpan || column + 1 < spans[i + 1].A);
+						if (bottomSpans != null && (!bottomSpan.HasValue || column >= bottomSpan.Value.B)) {
+							do {
+								if (!bottomSpans.MoveNext()) {
+									bottomSpans = null;
+									bottomSpan = null;
+									break;
+								}
+								bottomSpan = bottomSpans.Current;
+							} while (column >= bottomSpan.Value.B);
+						}
+						var absentBottomCell = !bottomSpan.HasValue || column < bottomSpan.Value.A;
+						lastColumn = column;
+
+						var a = CellToGridCoordinates(new IntVector2(column, row) + offset);
+						var b = CellToGridCoordinates(new IntVector2(column + 1, row + 1) + offset);
+						a = new Vector2(a.X + 1.5f, a.Y + 0.5f);
+						b = new Vector2(b.X - 0.5f, gridWidgetBottom - 0.5f);
+						Renderer.DrawRect(a + Vector2.Up * 0.5f, b + new Vector2(1f + (absentRightCell ? 0 : 1), (absentBottomCell ? 0 : 1)), ColorTheme.Current.TimelineGrid.Selection);
+						if (absentLeftCell) {
+							Renderer.DrawLine(a.X, a.Y - (absentTopCell ? 0 : 1), a.X, b.Y + (absentBottomCell ? 0 : 1), ColorTheme.Current.TimelineGrid.SelectionBorder, cap: LineCap.Square);
+						}
+						if (absentTopCell) {
+							Renderer.DrawLine(a.X - (absentLeftCell ? 0 : 1), a.Y, b.X + (absentRightCell ? 0 : 1), a.Y, ColorTheme.Current.TimelineGrid.SelectionBorder, cap: LineCap.Square);
+						}
+						if (absentRightCell) {
+							Renderer.DrawLine(b.X, a.Y - (absentTopCell ? 0 : 1), b.X, b.Y + (absentBottomCell ? 0 : 1), ColorTheme.Current.TimelineGrid.SelectionBorder, cap: LineCap.Square);
+						}
+						if (absentBottomCell) {
+							Renderer.DrawLine(a.X - (absentLeftCell ? 0 : 1), b.Y, b.X + (absentRightCell ? 0 : 1), b.Y, ColorTheme.Current.TimelineGrid.SelectionBorder, cap: LineCap.Square);
+						}
 					}
 				}
+				topSpans = spans.GetEnumerator();
 			}
-			return anyRow;
 		}
 
 		public Vector2 CellToGridCoordinates(IntVector2 cell)
