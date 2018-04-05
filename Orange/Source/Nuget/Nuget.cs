@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace Orange
 {
@@ -13,9 +14,21 @@ namespace Orange
 		{
 #if MAC
 			nugetPath = Path.Combine(Toolbox.GetApplicationDirectory(), "nuget.exe");
-#else 
+#else
 			nugetPath = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Win", "nuget.exe");
 #endif
+			if (!File.Exists(nugetPath)) {
+				var citrusDirectory = Toolbox.CalcCitrusDirectory();
+#if MAC
+				nugetPath = Path.Combine(citrusDirectory, "Orange", "Toolchain.Mac", "nuget.exe");
+#else
+				nugetPath = Path.Combine(citrusDirectory, "Orange", "Toolchain.Win", "nuget.exe");
+#endif
+			}
+
+			if (!File.Exists(nugetPath)) {
+				throw new InvalidOperationException($"Can't find nuget.exe.");
+			}
 #if MAC
 			var chmodResult = Process.Start("chmod", $"+x {nugetPath}");
 			monoPath = Toolbox.GetMonoPath();

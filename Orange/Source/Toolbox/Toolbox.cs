@@ -54,6 +54,18 @@ namespace Orange
 			return dir;
 		}
 
+		public static string CalcCitrusDirectory()
+		{
+			var path = Uri.UnescapeDataString((new Uri(Assembly.GetExecutingAssembly().CodeBase)).AbsolutePath);
+			while (!string.Equals(Path.GetFileName(path), "Citrus", StringComparison.CurrentCultureIgnoreCase)) {
+				path = Path.GetDirectoryName(path);
+				if (string.IsNullOrEmpty(path)) {
+					throw new InvalidOperationException("Can't find Orange directory.");
+				}
+			}
+			return path;
+		}
+
 		public static string GetMonoPath()
 		{
 			return "/Library/Frameworks/Mono.framework/Versions/Current/bin/mono";
