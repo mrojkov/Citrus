@@ -14,7 +14,7 @@ namespace Tangerine.UI.SceneView.ComplexTransforms
 	{
 
 		public delegate Matrix32d CalculateTransformationDelegate(Vector2d fromOriginalVectorInObbSpace,
-			Vector2d toDeformedVectorInObbSpace);
+			Vector2d toDeformedVectorInObbSpace, out double obbTransformationRotationDeg);
 
 		public static void ApplyTransformationToWidgetsGroupObb(Widget sceneWidget, IList<Widget> widgetsInParentSpace,
 			Vector2 pivotInSceneSpace, bool obbInFirstWidgetSpace,
@@ -96,18 +96,20 @@ namespace Tangerine.UI.SceneView.ComplexTransforms
 			Vector2d originalVectorInObbSpace = controlPointInObbSpace;
 			Vector2d deformedVectorInObbSpace = targetPointInObbSpace;
 
+			double obbTransformationRotationDeg;
 			Matrix32d deformationInObbSpace = onCalculateTransformation(
 				originalVectorInObbSpace,
-				deformedVectorInObbSpace
+				deformedVectorInObbSpace,
+				out obbTransformationRotationDeg
 			);
 
 			ApplyTransformationToWidgetsGroupObb(
-				widgetsInParentSpace, obbInParentSpace, deformationInObbSpace
+				widgetsInParentSpace, obbInParentSpace, deformationInObbSpace, obbTransformationRotationDeg
 			);
 		}
 
 		public static void ApplyTransformationToWidgetsGroupObb(IEnumerable<Widget> widgetsInParentSpace,
-			Matrix32d obbInParentSpace, Matrix32d obbTransformation)
+			Matrix32d obbInParentSpace, Matrix32d obbTransformation, double obbTransformationRotationDeg)
 		{
 			Matrix32d originalObbToParentSpace = obbInParentSpace;
 
@@ -126,7 +128,8 @@ namespace Tangerine.UI.SceneView.ComplexTransforms
 
 					Matrix32d deformedWidgetToParentSpace = widgetToOriginalObbSpace * deformedObbToParentSpace;
 
-					Transform2d widgetResultTransform = widget.ExtractTransform2Double(deformedWidgetToParentSpace);
+					Transform2d widgetResultTransform = widget.ExtractTransform2Double(deformedWidgetToParentSpace,
+						widget.Rotation + obbTransformationRotationDeg);
 
 					// Correct a rotation delta, to prevent wrong values if a new angle 0 and previous is 359,
 					// then rotationDelta must be 1.
@@ -212,7 +215,8 @@ namespace Tangerine.UI.SceneView.ComplexTransforms
 			return localToParentTransform * parentWidget.CalcEffectiveTransformToTopWidgetDouble(untilWidget);
 		}
 
-		private static Transform2d ExtractTransform2Double(this Widget widget, Matrix32d localToParentTransform)
+		private static Transform2d ExtractTransform2Double(this Widget widget, Matrix32d localToParentTransform,
+			double preferedRotationDeg)
 		{
 			// Take pivot into account.
 			localToParentTransform = Matrix32d.Translation(-(Vector2d) (widget.Pivot * widget.Size)).CalcInversed() *
@@ -226,7 +230,44 @@ namespace Tangerine.UI.SceneView.ComplexTransforms
 			}
 
 			// Extract simple transformations from matrix.
-			return localToParentTransform.ToTransform2();
+			return localToParentTransform.ToTransform2Double(preferedRotationDeg);
+		}
+
+		private static Transform2d ToTransform2Double(this Matrix32d matrix, double preferedRotationDeg)
+		{
+			Matrix32d matrixWithoutRotation = matrix * Matrix32d.Rotation(-preferedRotationDeg * Math.PI / 180.0);
+			int directionClock = Math.Sign(Vector2d.CrossProduct(matrixWithoutRotation.U, matrixWithoutRotation.V));
+
+			Vector2d direction = matrixWithoutRotation.U.Normalized + matrixWithoutRotation.V.Normalized;
+			Vector2d directionU = direction * Matrix32d.Rotation(-directionClock * Math.PI / 4);
+			Vector2d directionV = direction * Matrix32d.Rotation(directionClock * Math.PI / 4);
+
+			bool isRequiredScaleXNegative = directionU.X < 0;
+			bool isRequiredScaleYNegative = directionV.Y < 0;
+
+			var vSign = Math.Sign(Vector2d.CrossProduct(matrix.U, matrix.V));
+
+			if (!isRequiredScaleXNegative) {
+				return new Transform2d {
+					Translation = matrix.T,
+					Scale = new Vector2d(matrix.U.Length, matrix.V.Length * vSign),
+					Rotation = matrix.U.Atan2Deg
+				};
+			}
+
+			if ((isRequiredScaleYNegative && vSign < 0) || (!isRequiredScaleYNegative && vSign > 0)) {
+				return new Transform2d {
+					Translation = matrix.T,
+					Scale = new Vector2d(-matrix.U.Length, matrix.V.Length * vSign),
+					Rotation = matrix.U.Atan2Deg
+				};
+			}
+
+			return new Transform2d {
+				Translation = matrix.T,
+				Scale = new Vector2d(-matrix.U.Length, -matrix.V.Length * vSign),
+				Rotation = (-matrix.U).Atan2Deg
+			};
 		}
 
 		public static Vector2d Snap(this Vector2d value, Vector2d origin, double distanceTolerance = 0.001f)

@@ -168,7 +168,7 @@ namespace Tangerine.UI.SceneView
 			ComplexTransformationsHelper.ApplyTransformationToWidgetsGroupObb(
 				sv.Scene,
 				widgets, hullsPivotPoint, hullInFirstWidgetSpace, curMousePos, prevMousePos,
-				(originalVectorInObbSpace, deformedVectorInObbSpace) => {
+				(Vector2d originalVectorInObbSpace, Vector2d deformedVectorInObbSpace, out double obbTransformationRotationDeg) => {
 					Vector2d deformationScaleInObbSpace =
 							new Vector2d(
 								Math.Abs(originalVectorInObbSpace.X) < Mathf.ZeroTolerance
@@ -188,6 +188,7 @@ namespace Tangerine.UI.SceneView
 						deformationScaleInObbSpace.Y = deformationScaleInObbSpace.X;
 					}
 
+					obbTransformationRotationDeg = 0;
 					return Matrix32d.Scaling(deformationScaleInObbSpace);
 				}
 			);

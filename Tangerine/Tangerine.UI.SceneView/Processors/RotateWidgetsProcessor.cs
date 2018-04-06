@@ -62,7 +62,7 @@ namespace Tangerine.UI.SceneView
 			ComplexTransformationsHelper.ApplyTransformationToWidgetsGroupObb(
 				sv.Scene,
 				widgets, pivotPoint, widgets.Count <= 1, curMousePos, prevMousePos,
-				(originalVectorInObbSpace, deformedVectorInObbSpace) => {
+				(Vector2d originalVectorInObbSpace, Vector2d deformedVectorInObbSpace, out double obbTransformationRotationDeg) => {
 
 					double rotation = 0;
 					if (originalVectorInObbSpace.Length > Mathf.ZeroTolerance &&
@@ -78,6 +78,7 @@ namespace Tangerine.UI.SceneView
 						tuple.Item2.Rotate((float) rotation);
 					}
 
+					obbTransformationRotationDeg = rotation;
 					return Matrix32d.Rotation(rotation * Math.PI / 180.0);
 				}
 			);

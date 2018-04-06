@@ -94,7 +94,8 @@ namespace Tangerine.UI.SceneView
 					ComplexTransformationsHelper.ApplyTransformationToWidgetsGroupObb(
 						sv.Scene,
 						widgets, pivot, widgets.Count <= 1, initialMousePos + mouseDelta, initialMousePos,
-						(originalVectorInObbSpace, deformedVectorInObbSpace) => {
+						(Vector2d originalVectorInObbSpace, Vector2d deformedVectorInObbSpace, out double obbTransformationRotationDeg) => {
+							obbTransformationRotationDeg = 0;
 							return Matrix32d.Translation((deformedVectorInObbSpace - originalVectorInObbSpace).Snap(Vector2d.Zero));
 						}
 					);
