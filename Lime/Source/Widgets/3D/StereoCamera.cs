@@ -72,24 +72,24 @@
 			}
 		}
 
-		public Matrix44 Projection => activeComponent.Projection;
+		public Matrix44 Projection => activeEye.Projection;
 
-		public Matrix44 View => (activeComponent.View.CalcInverted() * GlobalTransform).CalcInverted();
+		public Matrix44 View => (activeEye.View.CalcInverted() * GlobalTransform).CalcInverted();
 
 		public StereoCameraEye LeftEye;
 
 		public StereoCameraEye RightEye;
 
-		private StereoCameraEye activeComponent;
+		private StereoCameraEye activeEye;
 
-		public void SetActive(int index)
+		public void SetCurrentEye(int index)
 		{
 			switch (index) {
 				case 0:
-					activeComponent = LeftEye;
+					activeEye = LeftEye;
 					break;
 				case 1:
-					activeComponent = RightEye;
+					activeEye = RightEye;
 					break;
 			}
 		}
@@ -98,7 +98,7 @@
 		{
 			LeftEye = new StereoCameraEye();
 			RightEye = new StereoCameraEye();
-			activeComponent = LeftEye;
+			activeEye = LeftEye;
 		}
 	}
 

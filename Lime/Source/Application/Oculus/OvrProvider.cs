@@ -157,7 +157,7 @@ namespace Lime.Oculus
 				GetEyePoses(out sensorSampleTime, out eyeRenderPoses);
 				Renderer.Viewport = new WindowRect { X = 0, Y = 0, Size = textureSize };
 				for (int eyeIndex = 0; eyeIndex < 2; eyeIndex++) {
-					stereoCamera?.SetActive(eyeIndex);
+					stereoCamera?.SetCurrentEye(eyeIndex);
 					eyeRenderTexture[eyeIndex].SetAsRenderTarget();
 					widget.RenderChainBuilder?.AddToRenderChain(renderChain);
 					widget.RenderToTexture(eyeRenderTexture[eyeIndex].CurrentTexture, renderChain);
