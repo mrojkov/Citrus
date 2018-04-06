@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
+using Lime.Oculus;
 using OpenTK.Graphics;
 using WinFormsCloseReason = System.Windows.Forms.CloseReason;
 
@@ -319,6 +320,9 @@ namespace Lime
 				Form.StartPosition = FormStartPosition.CenterParent;
 			}
 			Application.Windows.Add(this);
+			if (Application.VirtualRealitySupported) {
+				OvrProvider.Instance.Initialize();
+			}
 		}
 
 		public override bool VSync
@@ -374,6 +378,9 @@ namespace Lime
 
 		private void OnClosed(object sender, FormClosedEventArgs e)
 		{
+			if (Application.VirtualRealitySupported) {
+				OvrProvider.Instance.DisposeResources();
+			}
 			RaiseClosed();
 			Application.Windows.Remove(this);
 			if (this == Application.MainWindow) {

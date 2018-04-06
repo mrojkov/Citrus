@@ -7,25 +7,19 @@ namespace Lime.Oculus
 {
 	public class OvrProvider
 	{
+		public bool Initialized { get; private set; }
+		public Hmd Hmd { get; private set; }
+		public OculusMirrorTexture MirrorTexture { get; private set; }
+		private static readonly Vector2 WindowSize = new Vector2(1080, 1600);
+		private uint frameIndex = 0;
 		private Wrap Wrap;
 		private RenderChain renderChain;
 		private OculusWrap.LayerEyeFov LayerFov;
 		private Layers Layers = new Layers();
-		private uint frameIndex = 0;
-		private double sensorSampleTime;
 		private Posef[] eyeRenderPoses;
-		public Hmd Hmd;
-		public IntVector2 TextureSize { get; private set; }
-		public OculusTextureSwapChain[] EyeRenderTexture { get; private set; }
-		public StereoCamera StereoCamera { get; private set; }
-		public Viewport3D Viewport;
-
-		private OvrProvider() { }
-
-		~OvrProvider()
-		{
-			ReleaseResources();
-		}
+		private OculusTextureSwapChain[] eyeRenderTexture;
+		private StereoCamera stereoCamera;
+		private IntVector2 textureSize;
 
 		private static OvrProvider instance;
 		public static OvrProvider Instance
@@ -39,23 +33,38 @@ namespace Lime.Oculus
 			}
 		}
 
-		public void SetupViewportAndCamera(Viewport3D vp, StereoCamera camera)
+		private OvrProvider() { }
+
+		~OvrProvider()
 		{
-			StereoCamera = camera;
-			StereoCamera.LeftEye.ViewProjCalculator = CreateViewProjectionCalculator(0);
-			StereoCamera.RightEye.ViewProjCalculator = CreateViewProjectionCalculator(1);
-			Viewport = vp;
+			DisposeResources();
+		}
+
+		public void SetCurrentCamera(StereoCamera camera)
+		{
+			stereoCamera = camera;
+			stereoCamera.LeftEye.ViewProjCalculator = CreateViewProjectionCalculator(0);
+			stereoCamera.RightEye.ViewProjCalculator = CreateViewProjectionCalculator(1);
 		}
 
 		private IViewProjectionCalculator CreateViewProjectionCalculator(int eyeIndex)
 		{
 			return new GenericViewProjectionCalculator(
-				(near, far) => GetProjection(eyeIndex, near, far),
-				() => GetView(eyeIndex));
+				(near, far) => Wrap.Matrix4f_Projection(Hmd.DefaultEyeFov[eyeIndex], near, far, ProjectionModifier.None).ToLime().Transpose(),
+				() => {
+					if (eyeRenderPoses != null) {
+						var poses = eyeRenderPoses.Select(p => p.ToLime()).ToArray();
+						return (Matrix44.CreateRotation(poses[eyeIndex].Orientation) *
+							Matrix44.CreateTranslation(poses[eyeIndex].Position)).CalcInverted();
+					} else {
+						return Matrix44.Identity;
+					}
+				});
 		}
 
-		public void Initialize()
+		internal void Initialize()
 		{
+			if (Initialized) return;
 			Wrap = new Wrap();
 			// Define initialization parameters
 			InitParams initializationParameters = new InitParams();
@@ -82,47 +91,47 @@ namespace Lime.Oculus
 			}
 			try {
 				LayerFov = Layers.AddLayerEyeFov();
-				EyeRenderTexture = new OculusTextureSwapChain[2];
+				eyeRenderTexture = new OculusTextureSwapChain[2];
 				for (int i = 0; i < 2; i++) {
 					var eyeType = (EyeType)i;
-					TextureSize = Hmd.GetFovTextureSize(eyeType, Hmd.DefaultEyeFov[i], 1).ToLime();
-					EyeRenderTexture[i] = new OculusTextureSwapChain(this, TextureSize, eyeType);
+					textureSize = Hmd.GetFovTextureSize(eyeType, Hmd.DefaultEyeFov[i], 1).ToLime();
+					eyeRenderTexture[i] = new OculusTextureSwapChain(this, textureSize, eyeType);
 				}
 				LayerFov.Header.Type = LayerType.EyeFov;
 				var result = Hmd.SetTrackingOriginType(TrackingOrigin.FloorLevel);
-				WriteErrorDetails(result, "Failed to set tracking origin type.");
+				CheckError(result, "Failed to set tracking origin type.");
 				renderChain = new RenderChain();
+				Initialized = true;
 			} catch {
-				ReleaseResources();
+				DisposeResources();
 				throw;
 			}
 		}
 
-		public void ReleaseResources()
+		public void InitializeMirrorTexture(Size size)
+		{
+			MirrorTexture?.Dispose();
+			MirrorTexture = new OculusMirrorTexture(size);
+		}
+
+		internal void DisposeResources()
 		{
 			Layers?.Dispose();
 			for (int eyeIndex = 0; eyeIndex < 2; ++eyeIndex) {
-				EyeRenderTexture[eyeIndex]?.Dispose();
+				eyeRenderTexture[eyeIndex]?.Dispose();
 			}
 			Hmd?.Dispose();
 			Wrap?.Dispose();
+			Initialized = false;
 		}
 
-		public void WriteErrorDetails(Result result, string message)
+		internal void CheckError(Result result, string message)
 		{
 			if (result >= Result.Success)
 				return;
-
-			// Retrieve the error message from the last occurring error.
 			var errorInformation = Wrap.GetLastError();
-
 			var formattedMessage = string.Format("{0}. \nMessage: {1} (Error code={2})", message, errorInformation.ErrorString, errorInformation.Result);
 			throw new OvrExcepton(formattedMessage);
-		}
-
-		public Matrix44 GetProjection(int eyeIndex, float near, float far)
-		{
-			return Wrap.Matrix4f_Projection(Hmd.DefaultEyeFov[eyeIndex], near, far, ProjectionModifier.None).ToLime().Transpose();
 		}
 
 		internal void GetEyePoses(out double sensorSampleTime, out Posef[] eyeRenderPoses)
@@ -135,28 +144,30 @@ namespace Lime.Oculus
 			eyeRenderPoses = new Posef[2];
 			Vector3f[] hmdToEyeOffsets = { eyeRenderDesc[0].HmdToEyeOffset, eyeRenderDesc[1].HmdToEyeOffset };
 
-			// Keeping sensorSampleTime as close to ovr_GetTrackingState as possible - fed into the layer
 			Hmd.GetEyePoses(frameIndex, true, hmdToEyeOffsets, ref eyeRenderPoses, out sensorSampleTime);
 		}
 
-		public void Render(Widget widget)
+		public void Render(WindowWidget widget)
 		{
-			if (EyeRenderTexture == null) return;
+			if (eyeRenderTexture == null) return;
+			var oldSize = widget.Size;
+			widget.Size = WindowSize;
 			try {
+				double sensorSampleTime;
 				GetEyePoses(out sensorSampleTime, out eyeRenderPoses);
+				Renderer.Viewport = new WindowRect { X = 0, Y = 0, Size = textureSize };
 				for (int eyeIndex = 0; eyeIndex < 2; eyeIndex++) {
-					Renderer.Viewport = new WindowRect { X = 0, Y = 0, Size = TextureSize };
-					StereoCamera?.SetActive(eyeIndex);
-					EyeRenderTexture[eyeIndex].SetAsRenderTarget();
+					stereoCamera?.SetActive(eyeIndex);
+					eyeRenderTexture[eyeIndex].SetAsRenderTarget();
 					widget.RenderChainBuilder?.AddToRenderChain(renderChain);
-					widget.RenderToTexture(EyeRenderTexture[eyeIndex].CurrentTexture, renderChain);
-					EyeRenderTexture[eyeIndex].Commit();
+					widget.RenderToTexture(eyeRenderTexture[eyeIndex].CurrentTexture, renderChain);
+					eyeRenderTexture[eyeIndex].Commit();
 				}
 
 				for (int eyeIndex = 0; eyeIndex < 2; eyeIndex++) {
-					LayerFov.ColorTexture[eyeIndex] = EyeRenderTexture[eyeIndex].TextureChain.TextureSwapChainPtr;
+					LayerFov.ColorTexture[eyeIndex] = eyeRenderTexture[eyeIndex].TextureChain.TextureSwapChainPtr;
 					LayerFov.Viewport[eyeIndex].Position = new Vector2i(0, 0);
-					var size = EyeRenderTexture[eyeIndex].Size;
+					var size = eyeRenderTexture[eyeIndex].Size;
 					LayerFov.Viewport[eyeIndex].Size = new Sizei(size.X, size.Y);
 					LayerFov.Fov[eyeIndex] = Hmd.DefaultEyeFov[eyeIndex];
 					LayerFov.RenderPose[eyeIndex] = eyeRenderPoses[eyeIndex];
@@ -164,27 +175,17 @@ namespace Lime.Oculus
 				}
 
 				var result = Hmd.SubmitFrame(frameIndex, Layers);
-				WriteErrorDetails(result, "Unable to submit frame.");
+				CheckError(result, "Unable to submit frame.");
 				var sessionStatus = new SessionStatus();
 				Hmd.GetSessionStatus(ref sessionStatus);
 				if (sessionStatus.ShouldQuit == 1)
 					throw new OvrExcepton("SessionStatus: ShouldQuit.");
 				frameIndex++;
 			} catch {
-				ReleaseResources();
+				DisposeResources();
 				throw;
-			}
-		}
-
-		public Matrix44 GetView(int eyeIndex)
-		{
-			if (eyeRenderPoses != null) {
-				var poses = eyeRenderPoses.Select(p => p.ToLime()).ToArray();
-				var tState = Hmd.GetTrackingState(sensorSampleTime, true);
-				return (Matrix44.CreateRotation(poses[eyeIndex].Orientation) *
-					Matrix44.CreateTranslation(poses[eyeIndex].Position)).CalcInverted();
-			} else {
-				return Matrix44.Identity;
+			} finally {
+				widget.Size = oldSize;
 			}
 		}
 

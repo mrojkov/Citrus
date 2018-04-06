@@ -30,7 +30,7 @@ namespace Lime.Oculus
 		{
 			if (TextureChain != null) {
 				var result = TextureChain.Commit();
-				provider.WriteErrorDetails(result, "Unable to commit texture chain");
+				provider.CheckError(result, "Unable to commit texture chain");
 			}
 		}
 
@@ -49,16 +49,16 @@ namespace Lime.Oculus
 				StaticImage = 0,
 			};
 			var result = provider.Hmd.CreateTextureSwapChainGL(desc, out TextureChain);
-			provider.WriteErrorDetails(result, "Unable to create texture swap chain");
+			provider.CheckError(result, "Unable to create texture swap chain");
 			var length = 0;
 			result = TextureChain.GetLength(out length);
-			provider.WriteErrorDetails(result, "Unable to retrive texture swap chain length");
+			provider.CheckError(result, "Unable to retrive texture swap chain length");
 			textures = new OculusTexture[length];
 			if (result >= Result.Success) {
 				for (int i = 0; i < length; ++i) {
 					uint chainTexId;
 					result = TextureChain.GetBufferGL(i, out chainTexId);
-					provider.WriteErrorDetails(result, "Unable to retrive OpenGL texture from chain");
+					provider.CheckError(result, "Unable to retrive OpenGL texture from chain");
 					textures[i] = new OculusTexture(size.X, size.Y, chainTexId);
 				}
 			}

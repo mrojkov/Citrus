@@ -22,14 +22,13 @@ namespace Lime.Oculus
 			mirrorTextureDescription.Height = size.Height;
 			mirrorTextureDescription.MiscFlags = OVRTypes.TextureMiscFlags.None;
 
-			// Create the texture used to display the rendered result on the computer monitor.
 			OVRTypes.Result result;
 			result = OvrProvider.Instance.Hmd.CreateMirrorTextureGL(mirrorTextureDescription, out mirrorTexture);
-			OvrProvider.Instance.WriteErrorDetails(result, "Failed to create mirror texture.");
+			OvrProvider.Instance.CheckError(result, "Failed to create mirror texture.");
 
 			uint texId;
 			result = mirrorTexture.GetBufferGL(out texId);
-			OvrProvider.Instance.WriteErrorDetails(result, "Failed to retrieve the texture from the created mirror texture buffer.");
+			OvrProvider.Instance.CheckError(result, "Failed to retrieve the texture from the created mirror texture buffer.");
 
 			var mirrorFbo = new uint[1];
 			GL.GenFramebuffers(1, mirrorFbo);
@@ -46,7 +45,6 @@ namespace Lime.Oculus
 
 		public void CopyTo(uint framebufferId, int width, int height)
 		{
-			// Copy mirror data from mirror texture provided by OVR to the target framebuffer.
 			var oldFramebuffer = PlatformRenderer.CurrentFramebuffer;
 			GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, fbo);
 			GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, PlatformRenderer.DefaultFramebuffer);

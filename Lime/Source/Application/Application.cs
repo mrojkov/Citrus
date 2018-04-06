@@ -55,11 +55,14 @@ namespace Lime
 #else
 		public RenderingBackend RenderingBackend = RenderingBackend.ES20;
 #endif
+
+		public bool VirtualRealitySupported = false;
 	}
 
 	public static class Application
 	{
 		public static event Action<DeviceOrientation> SupportedDeviceOrientationsChanged;
+		public static bool VirtualRealitySupported = false;
 		public static readonly List<IWindow> Windows = new List<IWindow>();
 		public static bool IsTangerine;
 
@@ -240,6 +243,7 @@ namespace Lime
 			UIApplication.SharedApplication.StatusBarHidden = true;
 			UIApplication.SharedApplication.IdleTimerDisabled = !IsAllowedGoingToSleepMode();
 #endif
+			VirtualRealitySupported = options.VirtualRealitySupported;
 		}
 #if !UNITY
 		public static void DiscardOpenGLObjects()
