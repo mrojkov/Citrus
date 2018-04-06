@@ -61,6 +61,12 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ComplexTransforms\ComplexTransformationsHelper.cs" />
+    <Compile Include="ComplexTransforms\Mathd.cs" />
+    <Compile Include="ComplexTransforms\Matrix32d.cs" />
+    <Compile Include="ComplexTransforms\Transform2d.cs" />
+    <Compile Include="ComplexTransforms\Vector2d.cs" />
+    <Compile Include="ComplexTransforms\WidgetZeroScalePreserver.cs" />
     <Compile Include="Components\CommandComponent.cs" />
     <Compile Include="Components\PointObjectSelectionComponent.cs" />
     <Compile Include="IKSolver.cs" />

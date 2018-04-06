@@ -4,6 +4,7 @@ using System.Linq;
 using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Operations;
+using Tangerine.UI.SceneView.ComplexTransforms;
 
 namespace Tangerine.UI.SceneView
 {
@@ -58,28 +59,26 @@ namespace Tangerine.UI.SceneView
 		private void RotateWidgets(Vector2 pivotPoint, List<Widget> widgets, Vector2 curMousePos, Vector2 prevMousePos,
 			bool snapped, List<Tuple<Widget, AccumulativeRotationHelper>> accumulativeRotationHelpers)
 		{
-			Utils.ApplyTransformationToWidgetsGroupObb(
+			ComplexTransformationsHelper.ApplyTransformationToWidgetsGroupObb(
 				sv.Scene,
-				widgets, pivotPoint, false, curMousePos, prevMousePos,
-				(Vector2 originalVectorInObbSpace, Vector2 deformedVectorInObbSpace, out bool invertX, out bool invertY) => {
-					invertX = false;
-					invertY = false;
-					
-					float rotation = 0;
+				widgets, pivotPoint, widgets.Count <= 1, curMousePos, prevMousePos,
+				(originalVectorInObbSpace, deformedVectorInObbSpace) => {
+
+					double rotation = 0;
 					if (originalVectorInObbSpace.Length > Mathf.ZeroTolerance &&
 						deformedVectorInObbSpace.Length > Mathf.ZeroTolerance) {
-						rotation = Mathf.Wrap180(deformedVectorInObbSpace.Atan2Deg - originalVectorInObbSpace.Atan2Deg);
+						rotation = Mathd.Wrap180(deformedVectorInObbSpace.Atan2Deg - originalVectorInObbSpace.Atan2Deg);
 					}
 
 					if (snapped) {
-						rotation = Utils.RoundTo(rotation, 15);
+						rotation = ComplexTransformationsHelper.RoundTo(rotation, 15);
 					}
 
 					foreach (Tuple<Widget, AccumulativeRotationHelper> tuple in accumulativeRotationHelpers) {
-						tuple.Item2.Rotate(rotation);
+						tuple.Item2.Rotate((float) rotation);
 					}
 
-					return Matrix32.Rotation(rotation * Mathf.DegToRad);
+					return Matrix32d.Rotation(rotation * Math.PI / 180.0);
 				}
 			);
 

@@ -282,7 +282,14 @@ namespace Lime
 				System.Diagnostics.Debug.Assert(IsNumber(value));
 				if (rotation != value) {
 					rotation = value;
-					direction = Vector2.CosSinRough(Mathf.DegToRad * value);
+					// For the tangerine we need a maximally accurate math,
+					// to prevent flicker of widgets position, rotation and scale
+					// on "click on pivot".
+					if (Application.IsTangerine) {
+						direction = Vector2.CosSin(Mathf.DegToRad * value);
+					} else {
+						direction = Vector2.CosSinRough(Mathf.DegToRad * value);
+					}
 					DirtyMask |= DirtyFlags.LocalTransform | DirtyFlags.ParentBoundingRect;
 					PropagateDirtyFlags(DirtyFlags.GlobalTransform);
 				}
@@ -1001,14 +1008,22 @@ namespace Lime
 
 		private void RecalcLocalToParentTransform()
 		{
+			// WARNING: Synchronize this code with ComplexTransformationsHelper.CalcLocalToParentTransformDouble
+			// after changes.
 			// This is an optimized version (after profiling) of the code:
 			// localToParentTransform =
-			// Matrix32.Translation(-Pivot * Size) *
-			// Matrix32.Scaling(Scale) *
-			// Matrix32.Rotation(Rotation) *
-			// Matrix32.Translation(Position) *
-			// BoneArray.CalcWeightedRelativeTransform(SkinningWeights);
-			
+			// 	Matrix32.Translation(-Pivot * Size) *
+			// 				Matrix32.Transformation(
+			// 		Vector2.Zero,
+			// 		Scale,
+			// 		Rotation * Mathf.DegToRad,
+			// 		Position
+			// 	);
+			// if (SkinningWeights != null && Parent?.AsWidget != null) {
+			// 	localToParentTransform = localToParentTransform *
+			// 		Parent.AsWidget.BoneArray.CalcWeightedRelativeTransform(SkinningWeights);
+			// }
+
 			var centerX = size.X * pivot.X;
 			var centerY = size.Y * pivot.Y;
 			if (rotation == 0 && SkinningWeights == null) {

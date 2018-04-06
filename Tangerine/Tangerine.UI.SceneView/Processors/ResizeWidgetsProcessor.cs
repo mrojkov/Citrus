@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
+using Tangerine.UI.SceneView.ComplexTransforms;
 
 namespace Tangerine.UI.SceneView
 {
@@ -164,12 +165,12 @@ namespace Tangerine.UI.SceneView
 		void RescaleWidgets(Quadrangle originalHull, bool hullInFirstWidgetSpace, Vector2 hullsPivotPoint, List<Widget> widgets, int controlPointIndex,
 			Vector2 curMousePos, Vector2 prevMousePos, bool proportional)
 		{
-			Utils.ApplyTransformationToWidgetsGroupObb(
+			ComplexTransformationsHelper.ApplyTransformationToWidgetsGroupObb(
 				sv.Scene,
 				widgets, hullsPivotPoint, hullInFirstWidgetSpace, curMousePos, prevMousePos,
-				(Vector2 originalVectorInObbSpace, Vector2 deformedVectorInObbSpace, out bool invertX, out bool invertY) => {
-					Vector2 deformationScaleInObbSpace =
-							new Vector2(
+				(originalVectorInObbSpace, deformedVectorInObbSpace) => {
+					Vector2d deformationScaleInObbSpace =
+							new Vector2d(
 								Math.Abs(originalVectorInObbSpace.X) < Mathf.ZeroTolerance
 									? 1
 									: deformedVectorInObbSpace.X / originalVectorInObbSpace.X,
@@ -187,10 +188,7 @@ namespace Tangerine.UI.SceneView
 						deformationScaleInObbSpace.Y = deformationScaleInObbSpace.X;
 					}
 
-					invertX = deformationScaleInObbSpace.X < 0;
-					invertY = deformationScaleInObbSpace.Y < 0;
-					
-					return Matrix32.Scaling(deformationScaleInObbSpace);
+					return Matrix32d.Scaling(deformationScaleInObbSpace);
 				}
 			);
 		}

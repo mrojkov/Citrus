@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
+using Tangerine.UI.SceneView.ComplexTransforms;
 
 namespace Tangerine.UI.SceneView
 {
@@ -90,13 +91,11 @@ namespace Tangerine.UI.SceneView
 						}
 					}
 
-					Utils.ApplyTransformationToWidgetsGroupObb(
+					ComplexTransformationsHelper.ApplyTransformationToWidgetsGroupObb(
 						sv.Scene,
 						widgets, pivot, widgets.Count <= 1, initialMousePos + mouseDelta, initialMousePos,
-						(Vector2 originalVectorInObbSpace, Vector2 deformedVectorInObbSpace, out bool invertX, out bool invertY) => {
-							invertX = false;
-							invertY = false;
-							return Matrix32.Translation((deformedVectorInObbSpace - originalVectorInObbSpace).Snap(Vector2.Zero));
+						(originalVectorInObbSpace, deformedVectorInObbSpace) => {
+							return Matrix32d.Translation((deformedVectorInObbSpace - originalVectorInObbSpace).Snap(Vector2d.Zero));
 						}
 					);
 					
