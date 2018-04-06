@@ -71,16 +71,6 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Images.xcassets\AppIcons.appiconset\Contents.json" />
     <EmbeddedResource Include="Resources\SegoeUIRegular.ttf" />
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Node3D.png" />
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.WidgetAdapter3D.png" />
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Spline3D.png" />
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.SplinePoint3D.png" />
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.SplineGear3D.png" />
-    <EmbeddedResource Include="Resources\Icons\Timeline\AnimationDisabled.png" />
-    <EmbeddedResource Include="Resources\Icons\Timeline\AnimationEnabled.png" />
-    <EmbeddedResource Include="Resources\Icons\Timeline\AnimationPartiallyEnabled.png" />
-    <EmbeddedResource Include="Resources\Icons\Timeline\Empty.png" />
-    <EmbeddedResource Include="Resources\Icons\Timeline\Curve.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Win.csproj">
@@ -130,69 +120,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Audio.png" />
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Bone.png" />
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Button.png" />
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Checkbox.png" />
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.DistortionMesh.png" />
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.EditBox.png" />
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.EmitterShapePoint.png" />
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Frame.png" />
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Image.png" />
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.ModelView.png" />
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Movie.png" />
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.NineGrid.png" />
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.ParticleEmitter.png" />
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.ParticlesMagnet.png" />
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.RadioButton.png" />
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.RichText.png" />
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.SimpleText.png" />
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Slider.png" />
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Spline.png" />
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.SplinePoint.png" />
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.TextPresenter.png" />
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.TextStyle.png" />
-    <EmbeddedResource Include="Resources\Icons\Nodes\Unknown.png" />
-    <EmbeddedResource Include="Resources\Icons\Timeline\Collapsed.png" />
-    <EmbeddedResource Include="Resources\Icons\Timeline\Cross.png" />
-    <EmbeddedResource Include="Resources\Icons\Timeline\Dot.png" />
-    <EmbeddedResource Include="Resources\Icons\Timeline\EnterContainer.png" />
-    <EmbeddedResource Include="Resources\Icons\Timeline\ExitContainer.png" />
-    <EmbeddedResource Include="Resources\Icons\Timeline\Expanded.png" />
-    <EmbeddedResource Include="Resources\Icons\Timeline\Eye.png" />
-    <EmbeddedResource Include="Resources\Icons\Timeline\Interpolation\ClosedSpline.png" />
-    <EmbeddedResource Include="Resources\Icons\Timeline\Interpolation\ClosedSplineGrayed.png" />
-    <EmbeddedResource Include="Resources\Icons\Timeline\Interpolation\Linear.png" />
-    <EmbeddedResource Include="Resources\Icons\Timeline\Interpolation\LinearGrayed.png" />
-    <EmbeddedResource Include="Resources\Icons\Timeline\Interpolation\None.png" />
-    <EmbeddedResource Include="Resources\Icons\Timeline\Interpolation\NoneGrayed.png" />
-    <EmbeddedResource Include="Resources\Icons\Timeline\Interpolation\Spline.png" />
-    <EmbeddedResource Include="Resources\Icons\Timeline\Interpolation\SplineGrayed.png" />
-    <EmbeddedResource Include="Resources\Icons\Timeline\Lock.png" />
-    <EmbeddedResource Include="Resources\Icons\Tools\AlignBottom.png" />
-    <EmbeddedResource Include="Resources\Icons\Tools\AlignCentersHorizontally.png" />
-    <EmbeddedResource Include="Resources\Icons\Tools\AlignCentersVertically.png" />
-    <EmbeddedResource Include="Resources\Icons\Tools\AlignLeft.png" />
-    <EmbeddedResource Include="Resources\Icons\Tools\AlignRight.png" />
-    <EmbeddedResource Include="Resources\Icons\Tools\AlignTop.png" />
-    <EmbeddedResource Include="Resources\Icons\Tools\CenterH.png" />
-    <EmbeddedResource Include="Resources\Icons\Tools\CenterV.png" />
-    <EmbeddedResource Include="Resources\Icons\Tools\CreateAttributesFile.png" />
-    <EmbeddedResource Include="Resources\Icons\Tools\FitToContainer.png" />
-    <EmbeddedResource Include="Resources\Icons\Tools\FitToContent.png" />
-    <EmbeddedResource Include="Resources\Icons\Tools\FlipH.png" />
-    <EmbeddedResource Include="Resources\Icons\Tools\FlipV.png" />
-    <EmbeddedResource Include="Resources\Icons\Tools\NewFolder.png" />
-    <EmbeddedResource Include="Resources\Icons\Tools\OverdrawRatio.png" />
-    <EmbeddedResource Include="Resources\Icons\Tools\OverdrawVisualization.png" />
-    <EmbeddedResource Include="Resources\Icons\Tools\Refresh.png" />
-    <EmbeddedResource Include="Resources\Icons\Tools\RestoreOriginalSize.png" />
-    <EmbeddedResource Include="Resources\Icons\Tools\SetUnitScale.png" />
-    <EmbeddedResource Include="Resources\Icons\Tools\SetZeroRotation.png" />
-    <EmbeddedResource Include="Resources\Icons\Tools\SplitHorizontal.png" />
-    <EmbeddedResource Include="Resources\Icons\Tools\SplitVertical.png" />
-    <EmbeddedResource Include="Resources\Icons\Tools\ToolsCenterView.png" />
-    <EmbeddedResource Include="Resources\Icons\Tools\ToolsResetZoom.png" />
     <EmbeddedResource Include="Resources\Images.xcassets\AppIcons.appiconset\AppIcon-128%402x.png" />
     <EmbeddedResource Include="Resources\Images.xcassets\AppIcons.appiconset\AppIcon-128.png" />
     <EmbeddedResource Include="Resources\Images.xcassets\AppIcons.appiconset\AppIcon-16%402x.png" />
@@ -208,80 +135,218 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Icons\Timeline\AnimationMode.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Icons\Timeline\Key.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Icons\Tools\Root.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.ImageCombiner.png" />
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.ParticleModifier.png" />
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.SplineGear.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Model3D.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Camera3D.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Viewport3D.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Icons\Filesystem\Cross.png" />
-    <EmbeddedResource Include="Resources\Icons\Filesystem\Plus.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Icons\Filesystem\ArrowRight.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Icons\Filesystem\ArrowLeft.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Icons\Filesystem\Preview.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Icons\Filesystem\CookingRules.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Icons\Filesystem\Home.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Icons\Filesystem\ArrowUp.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Icons\Filesystem\Close.png" />
-    <EmbeddedResource Include="Resources\Icons\Filesystem\SplitH.png" />
-    <EmbeddedResource Include="Resources\Icons\Filesystem\SplitV.png" />
     <EmbeddedResource Include="Resources\Cursors\Rotate.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Icons\SceneView\Round.png" />
-    <EmbeddedResource Include="Resources\Icons\Timeline\minus.png" />
-    <EmbeddedResource Include="Resources\Icons\Timeline\plus.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Icons\Tools\Pipette.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Icons\SceneView\Play.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Polyline.png" />
-    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.PolylinePoint.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Icons\Tools\Folded.png" />
-    <EmbeddedResource Include="Resources\Icons\Tools\Unfolded.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="icon.ico" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Filesystem\ArrowLeft.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Filesystem\ArrowRight.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Filesystem\ArrowUp.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Filesystem\Close.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Filesystem\CookingRules.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Filesystem\Cross.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Filesystem\Home.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Filesystem\Plus.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Filesystem\Preview.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Filesystem\SplitH.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Filesystem\SplitV.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.Audio.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.Bone.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.Button.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.Camera3D.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.Checkbox.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.DistortionMesh.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.EditBox.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.EmitterShapePoint.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.Frame.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.Image.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.ImageCombiner.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.Model3D.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.ModelView.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.Movie.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.NineGrid.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.Node3D.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.ParticleEmitter.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.ParticleModifier.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.ParticlesMagnet.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.Polyline.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.PolylinePoint.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.RadioButton.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.RichText.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.SimpleText.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.Slider.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.Spline.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.Spline3D.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.SplineGear.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.SplineGear3D.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.SplinePoint.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.SplinePoint3D.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.TextPresenter.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.TextStyle.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.Viewport3D.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.WidgetAdapter3D.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Unknown.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\SceneView\Dash.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\SceneView\Play.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\SceneView\Round.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Timeline\AnimationDisabled.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Timeline\AnimationEnabled.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Timeline\AnimationMode.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Timeline\AnimationPartiallyEnabled.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Timeline\Collapsed.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Timeline\Cross.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Timeline\Curve.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Timeline\Dot.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Timeline\Empty.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Timeline\EnterContainer.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Timeline\ExitContainer.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Timeline\Expanded.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Timeline\Eye.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Timeline\Interpolation\ClosedSpline.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Timeline\Interpolation\ClosedSplineGrayed.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Timeline\Interpolation\Linear.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Timeline\Interpolation\LinearGrayed.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Timeline\Interpolation\None.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Timeline\Interpolation\NoneGrayed.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Timeline\Interpolation\Spline.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Timeline\Interpolation\SplineGrayed.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Timeline\Key.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Timeline\Lock.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Timeline\minus.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Timeline\plus.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\AlignBottom.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\AlignCentersHorizontally.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\AlignCentersVertically.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\AlignLeft.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\AlignRight.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\AlignTop.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\CenterH.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\CenterV.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\CreateAttributesFile.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\FitToContainer.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\FitToContent.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\FlipH.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\FlipV.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\Folded.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\NewFolder.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\OverdrawRatio.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\OverdrawVisualization.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\Pipette.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\Refresh.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\RestoreOriginalSize.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\Root.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\SetUnitScale.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\SetZeroRotation.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\SplitHorizontal.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\SplitVertical.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\ToolsCenterView.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\ToolsResetZoom.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\Unfolded.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Filesystem\ArrowLeft.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Filesystem\ArrowRight.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Filesystem\ArrowUp.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Filesystem\Close.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Filesystem\CookingRules.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Filesystem\Cross.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Filesystem\Home.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Filesystem\Plus.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Filesystem\Preview.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Filesystem\SplitH.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Filesystem\SplitV.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.Audio.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.Bone.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.Button.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.Camera3D.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.Checkbox.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.DistortionMesh.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.EditBox.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.EmitterShapePoint.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.Frame.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.Image.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.ImageCombiner.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.Model3D.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.ModelView.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.Movie.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.NineGrid.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.Node3D.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.ParticleEmitter.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.ParticleModifier.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.ParticlesMagnet.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.Polyline.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.PolylinePoint.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.RadioButton.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.RichText.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.SimpleText.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.Slider.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.Spline.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.Spline3D.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.SplineGear.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.SplineGear3D.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.SplinePoint.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.SplinePoint3D.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.TextPresenter.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.TextStyle.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.Viewport3D.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.WidgetAdapter3D.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Unknown.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\SceneView\Dash.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\SceneView\Play.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\SceneView\Round.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Timeline\AnimationDisabled.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Timeline\AnimationEnabled.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Timeline\AnimationMode.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Timeline\AnimationPartiallyEnabled.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Timeline\Collapsed.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Timeline\Cross.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Timeline\Curve.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Timeline\Dot.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Timeline\Empty.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Timeline\EnterContainer.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Timeline\ExitContainer.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Timeline\Expanded.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Timeline\Eye.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Timeline\Interpolation\ClosedSpline.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Timeline\Interpolation\ClosedSplineGrayed.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Timeline\Interpolation\Linear.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Timeline\Interpolation\LinearGrayed.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Timeline\Interpolation\None.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Timeline\Interpolation\NoneGrayed.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Timeline\Interpolation\Spline.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Timeline\Interpolation\SplineGrayed.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Timeline\Key.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Timeline\Lock.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Timeline\minus.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Timeline\plus.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\AlignBottom.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\AlignCentersHorizontally.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\AlignCentersVertically.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\AlignLeft.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\AlignRight.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\AlignTop.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\CenterH.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\CenterV.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\CreateAttributesFile.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\FitToContainer.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\FitToContent.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\FlipH.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\FlipV.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\Folded.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\NewFolder.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\OverdrawRatio.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\OverdrawVisualization.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\Pipette.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\Refresh.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\RestoreOriginalSize.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\Root.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\SetUnitScale.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\SetZeroRotation.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\SplitHorizontal.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\SplitVertical.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\ToolsCenterView.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\ToolsResetZoom.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\Unfolded.png" />
     <EmbeddedResource Include="Resources\Cursors\DragHandClosed.png" />
     <EmbeddedResource Include="Resources\Cursors\DragHandOpen.png" />
-    <EmbeddedResource Include="Resources\Icons\SceneView\Dash.png" />
     <EmbeddedResource Include="Resources\Icons\icon.ico" />
   </ItemGroup>
 </Project>

@@ -1,9 +1,7 @@
-﻿using Lime;
+using Lime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Tangerine.Core;
 
 namespace Tangerine.UI.SceneView
@@ -13,17 +11,15 @@ namespace Tangerine.UI.SceneView
 		public static float TipWidth => SceneUserPreferences.Instance.DefaultBoneWidth;
 
 		private readonly SceneView sv;
-
-		private const string DashTexturePath = "Tangerine.Resources.Icons.SceneView.Round.png";
-		private readonly Texture2D dashTexture;
+		private readonly Texture2D roundTexture;
 
 		public BonePresenter(SceneView sceneView)
 		{
 			sv = sceneView;
 			sceneView.Frame.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(Render));
-			dashTexture = new Texture2D();
-			dashTexture.LoadImage(new Bitmap(new EmbeddedResource(DashTexturePath, "Tangerine").GetResourceStream()));
-			dashTexture.TextureParams = new TextureParams {
+			roundTexture = new Texture2D();
+			roundTexture.LoadImage(new Bitmap(new EmbeddedResource(Theme.Textures.RoundPath, "Tangerine").GetResourceStream()));
+			roundTexture.TextureParams = new TextureParams {
 				WrapMode = TextureWrapMode.Repeat,
 				MinMagFilter = TextureFilter.Linear
 			};
@@ -97,7 +93,7 @@ namespace Tangerine.UI.SceneView
 			// Draw parent link
 			if (bone.BaseIndex != 0) {
 				var p = bone.Parent.AsWidget.BoneArray[bone.BaseIndex].Tip * t;
-				Renderer.DrawDashedLine(dashTexture, p, hull.V1 * t, ColorTheme.Current.SceneView.BoneOutline);
+				Renderer.DrawDashedLine(roundTexture, p, hull.V1 * t, ColorTheme.Current.SceneView.BoneOutline);
 			}
 			if (selected) {
 				var dir = hull.V3 - hull.V1;

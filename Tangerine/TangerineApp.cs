@@ -200,6 +200,7 @@ namespace Tangerine
 
 		void SetColorTheme(ColorThemeEnum theme)
 		{
+			Theme.Textures = theme == ColorThemeEnum.Light ? Theme.TextureTheme.CreateLightTheme() : Theme.TextureTheme.CreateDarkTheme();
 			Theme.Colors = theme == ColorThemeEnum.Light ? Theme.ColorTheme.CreateLightTheme() : Theme.ColorTheme.CreateDarkTheme();
 			ColorTheme.Current = theme == ColorThemeEnum.Light ? ColorTheme.CreateLightTheme() : ColorTheme.CreateDarkTheme();
 		}
@@ -310,7 +311,7 @@ namespace Tangerine
 							menu.Popup();
 						}
 					};
-					
+
 					DragGesture dragGesture = new DragGesture();
 					tab.Gestures.Add(dragGesture);
 					dragGesture.Changed += () => {
@@ -323,11 +324,11 @@ namespace Tangerine
 
 							Vector2 localMousePosition = tabEl.LocalMousePosition();
 
-							if (!(localMousePosition.X >= 0 && localMousePosition.Y >= 0 && 
+							if (!(localMousePosition.X >= 0 && localMousePosition.Y >= 0 &&
 								localMousePosition.X < tabEl.Width && localMousePosition.Y < tabEl.Height)) {
 								continue;
 							}
-							
+
 							Project.Current.ReorderDocument(doc, index);
 
 							int previousIndex = tabBar.Nodes.IndexOf(tab);

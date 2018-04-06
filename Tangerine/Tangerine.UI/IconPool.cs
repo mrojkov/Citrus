@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Lime;
 
@@ -7,7 +7,7 @@ namespace Tangerine.UI
 	public static class IconPool
 	{
 		private static readonly Dictionary<string, ITexture> icons = new Dictionary<string, ITexture>();
-		
+
 		public static ITexture GetTexture(string id, string defaultId = null)
 		{
 			ITexture icon;
@@ -26,7 +26,7 @@ namespace Tangerine.UI
 
 		private static ITexture CreateTexture(string id, string defaultId = null)
 		{
-			var path = $"Tangerine.Resources.Icons.{id}.png";
+			var path = Theme.Textures.NodeIconPath(id);
 			var png = new EmbeddedResource(path, "Tangerine").GetResourceStream();
 			if (png == null) {
 				if (defaultId != null) {

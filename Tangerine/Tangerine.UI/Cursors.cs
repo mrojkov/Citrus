@@ -1,18 +1,12 @@
-﻿using Lime;
+using Lime;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Tangerine.UI
 {
 	public static class Cursors
 	{
-
-		private static Bitmap GetBitmapFromEmbededResource(string id)
+		private static Bitmap GetBitmapFromEmbededResource(string path)
 		{
-			var path = $"Tangerine.Resources.{id}.png";
 			var png = new EmbeddedResource(path, "Tangerine").GetResourceStream();
 			if (png == null) {
 				throw new ArgumentException($"Icon '{path}' doesn't exist");
@@ -20,15 +14,15 @@ namespace Tangerine.UI
 			return new Bitmap(png);
 		}
 
-		private static MouseCursor CreateCursorFromEmbededResource(string name, IntVector2 hotSpot)
+		private static MouseCursor CreateCursorFromEmbededResource(string path, IntVector2 hotSpot)
 		{
-			var icon = GetBitmapFromEmbededResource(name);
+			var icon = GetBitmapFromEmbededResource(path);
 			return new MouseCursor(icon, hotSpot);
 		}
 
-		public static MouseCursor Rotate { get; } = CreateCursorFromEmbededResource("Cursors.Rotate", new IntVector2(8, 8));
-		public static MouseCursor Pipette { get; } = CreateCursorFromEmbededResource("Icons.Tools.Pipette", new IntVector2(0, 23));
-		public static MouseCursor DragHandClosed { get; } = CreateCursorFromEmbededResource("Cursors.DragHandClosed", new IntVector2(11, 1));
-		public static MouseCursor DragHandOpen { get; } = CreateCursorFromEmbededResource("Cursors.DragHandOpen", new IntVector2(11, 8));
+		public static MouseCursor Rotate { get; } = CreateCursorFromEmbededResource(Theme.Textures.CursorRotatePath, new IntVector2(8, 8));
+		public static MouseCursor Pipette { get; } = CreateCursorFromEmbededResource(Theme.Textures.CursorPipettePath, new IntVector2(0, 23));
+		public static MouseCursor DragHandClosed { get; } = CreateCursorFromEmbededResource(Theme.Textures.CursorDragHandClosedPath, new IntVector2(11, 1));
+		public static MouseCursor DragHandOpen { get; } = CreateCursorFromEmbededResource(Theme.Textures.CursorDragHandOpenPath, new IntVector2(11, 8));
 	}
 }

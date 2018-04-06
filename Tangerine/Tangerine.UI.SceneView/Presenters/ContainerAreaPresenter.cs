@@ -1,6 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Timers;
 using Lime;
 using Tangerine.Core;
 
@@ -12,14 +9,13 @@ namespace Tangerine.UI.SceneView
 		private Color4 Color1 => SceneUserPreferences.Instance.BackgroundColorA;
 		private Color4 Color2 => SceneUserPreferences.Instance.BackgroundColorB;
 		private Color4 RootWidgetBackgroundColor => SceneUserPreferences.Instance.RootWidgetOverlayColor;
-		private const string PlayTexturePath = "Tangerine.Resources.Icons.SceneView.Play.png";
 
 		public ContainerAreaPresenter(SceneView sceneView)
 		{
 			var backgroundTexture = PrepareChessTexture(Color1, Color2);
 			var playButtonTexture = new Texture2D();
 
-			playButtonTexture.LoadImage(new Bitmap(new EmbeddedResource(PlayTexturePath, "Tangerine").GetResourceStream()));
+			playButtonTexture.LoadImage(new Bitmap(new EmbeddedResource(Theme.Textures.PlayPath, "Tangerine").GetResourceStream()));
 			sceneView.Frame.AddChangeWatcher(
 				() => SceneUserPreferences.Instance.BackgroundColorA,
 				(v) => backgroundTexture = PrepareChessTexture(v, Color2));
