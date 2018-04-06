@@ -4,9 +4,10 @@ using OpenTK.Graphics.OpenGL;
 using FramebufferSlot = OpenTK.Graphics.OpenGL.FramebufferAttachment;
 using RenderbufferInternalFormat = OpenTK.Graphics.OpenGL.RenderbufferStorage;
 using System.Collections.Generic;
+using OculusWrap;
+using Lime.Oculus;
 
-
-namespace Lime
+namespace Lime.Oculus
 {
 	public class OculusTexture : CommonTexture, ITexture, IGLObject
 	{
