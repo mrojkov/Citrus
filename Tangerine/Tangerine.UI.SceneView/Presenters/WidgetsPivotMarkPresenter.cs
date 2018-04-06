@@ -4,9 +4,8 @@ using Lime;
 
 namespace Tangerine.UI.SceneView
 {
-	class WidgetsPivotMarkPresenter
+	public class WidgetsPivotMarkPresenter
 	{
-		
 		public WidgetsPivotMarkPresenter(SceneView sceneView)
 		{
 			sceneView.Frame.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(RenderWidgetsPivotMark));
@@ -20,22 +19,26 @@ namespace Tangerine.UI.SceneView
 			) {
 				return;
 			}
-			canvas.PrepareRendererState();
-			List<Widget> widgets;
-			if (SceneUserPreferences.Instance.DisplayPivotsForAllWidgets) {
-				widgets = Core.Document.Current.Container.Nodes.Editable().OfType<Widget>().ToList();
-			} else {
-				widgets = Core.Document.Current.Container.Nodes.Editable().OfType<Widget>().Where(w => w.Color.A == 0).ToList();
-			}
+			var widgets = WidgetsWithDisplayedPivot().ToList();
 			if (widgets.Count == 0) {
 				return;
 			}
+			canvas.PrepareRendererState();
 			var iconSize = new Vector2(16, 16);
 			foreach (var widget in widgets) {
 				var t = NodeIconPool.GetTexture(widget.GetType());
 				var p = widget.CalcPositionInSpaceOf(canvas);
 				Renderer.DrawSprite(t, Color4.White, p - iconSize / 2, iconSize, Vector2.Zero, Vector2.One);
 			}
+		}
+
+		public static IEnumerable<Widget> WidgetsWithDisplayedPivot()
+		{
+			var widgets = Core.Document.Current.Container.Nodes.Editable().OfType<Widget>();
+			if (!SceneUserPreferences.Instance.DisplayPivotsForAllWidgets) {
+				widgets = widgets.Where(w => w.Color.A == 0);
+			}
+			return widgets;
 		}
 	}
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using Lime;
@@ -47,11 +47,24 @@ namespace Tangerine.UI.SceneView
 							var controlPressed = SceneView.Instance.Input.IsKeyPressed(Key.Control);
 							if (!controlPressed)
 								Core.Operations.ClearRowSelection.Perform();
-							foreach (var node in Document.Current.Container.Nodes.Editable()) {
-								if (Probe(node, rect.A)) {
-									Core.Operations.SelectNode.Perform(node, !controlPressed || !Document.Current.SelectedNodes().Contains(node));
+							Node selectedNode = null;
+							foreach (var widget in WidgetsPivotMarkPresenter.WidgetsWithDisplayedPivot()) {
+								var pos = widget.CalcPositionInSpaceOf(SceneView.Instance.Scene);
+								if (SceneView.Instance.HitTestControlPoint(pos)) {
+									selectedNode = widget;
 									break;
 								}
+							}
+							if (selectedNode == null) {
+								foreach (var node in Document.Current.Container.Nodes.Editable()) {
+									if (Probe(node, rect.A)) {
+										selectedNode = node;
+										break;
+									}
+								}
+							}
+							if (selectedNode != null) {
+								Core.Operations.SelectNode.Perform(selectedNode, !controlPressed || !Document.Current.SelectedNodes().Contains(selectedNode));
 							}
 						}
 						sceneView.Frame.CompoundPostPresenter.Remove(presenter);
