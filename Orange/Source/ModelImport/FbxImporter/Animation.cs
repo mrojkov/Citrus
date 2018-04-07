@@ -1,64 +1,66 @@
-﻿using Lime;
+using Lime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+#pragma warning disable 649
 
 namespace Orange.FbxImporter
 {
 	public class AnimationData
 	{
-		public List<Keyframe<Vector3>> positionKeys { get; set; }
+		public List<Keyframe<Vector3>> PositionKeys { get; set; }
 
-		public List<Keyframe<Vector3>> scaleKeys { get; set; }
+		public List<Keyframe<Vector3>> ScaleKeys { get; set; }
 
-		public List<Keyframe<Quaternion>> rotationKeys { get; set; }
+		public List<Keyframe<Quaternion>> RotationKeys { get; set; }
 
-		public string Key { get; set; }
+		public string AnimationKey { get; set; }
 
 		public string MarkerId { get; set; }
 	}
 
-	public class Animation
+	public class SceneAnimations
 	{
-		public List<FbxImporter.AnimationData> Animations = new List<FbxImporter.AnimationData>();
+		public List<AnimationData> List = new List<AnimationData>();
 
-		public string Name { get; private set; }
-
-		public Animation(IntPtr scene)
+		public SceneAnimations(IntPtr scene)
 		{
-			var id = FbxSceneGetAnimations(scene);
-			if (id != IntPtr.Zero) {
-				var animation = id.ToStruct<AnimationWrapper>();
-				if (animation.count == 0)
-					return;
-				var stacks = animation.stacks.FromArrayOfPointersToStructArrayUnsafe<AnimationStack>(animation.count);
-				for (int i = 0; i < animation.count; i++) {
-					var layers = stacks[i].layers.FromArrayOfPointersToStructArrayUnsafe<AnimationLayer>(stacks[i].count);
-					for (int j = 0; j < stacks[i].count; j++) {
-						if (layers[j].count == 0)
-							continue;
-						var animations = layers[j].nodes.FromArrayOfPointersToStructArrayUnsafe<KeyframeCollection>(layers[j].count);
-						for (int k = 0; k < layers[j].count; k++) {
-							var data = new FbxImporter.AnimationData();
-							Animations.Add(data);
-							data.MarkerId = stacks[i].name;
-							data.Key = animations[k].id;
-							data.positionKeys = animations[k].positionKeys.keyframes
-								.FromArrayOfPointersToStructArrayUnsafe<AnimationKeyframe>(animations[k].positionKeys.count)
-								.Select(key => new Keyframe<Vector3>(AnimationUtils.SecondsToFrames(key.time), key.data.ToStruct<Vec3>().toLime()))
-								.ToList();
+			var animationStacksPointer = FbxSceneGetAnimations(scene);
+			if (animationStacksPointer == IntPtr.Zero) return;
+			var strct = animationStacksPointer.ToStruct<SizedArray>();
+			var animationStacks = strct.GetData<AnimationStack>();
+			if (animationStacks.Length == 0)
+				return;
+			for (var stackIndex = 0; stackIndex < animationStacks.Length; stackIndex++) {
+				var layers = animationStacks[stackIndex].Layers.ToStruct<SizedArray>().GetData<AnimationLayer>();
+				if (layers.Length == 0)
+					continue;
+				for (var layerIndex = 0; layerIndex < layers.Length; layerIndex++) {
+					var animations = layers[layerIndex].Animations.ToStruct<SizedArray>().GetData<Animation>();
+					for (var animationIndex = 0; animationIndex < animations.Length; animationIndex++) {
+						var data = new FbxImporter.AnimationData();
+						List.Add(data);
+						// Set animationStack as MarkerId name
+						data.MarkerId = animationStacks[stackIndex].Name;
+						data.AnimationKey = animations[animationIndex].Id;
+						data.PositionKeys = animations[animationIndex].PositionKeys
+							.ToStruct<SizedArray>()
+							.GetData<Keyframe>()
+							.Select(key => new Keyframe<Vector3>(AnimationUtils.SecondsToFrames(key.Time), key.Data.ToStruct<Vec3>().ToLime()))
+							.ToList();
 
-							data.rotationKeys = animations[k].rotationKeys.keyframes
-								.FromArrayOfPointersToStructArrayUnsafe<AnimationKeyframe>(animations[k].rotationKeys.count)
-								.Select(key => new Keyframe<Quaternion>(AnimationUtils.SecondsToFrames(key.time), key.data.ToStruct<Vec4>().toLimeQuaternion()))
-								.ToList();
+						data.RotationKeys = animations[animationIndex].RotationKeys
+							.ToStruct<SizedArray>()
+							.GetData<Keyframe>()
+							.Select(key => new Keyframe<Quaternion>(AnimationUtils.SecondsToFrames(key.Time), key.Data.ToStruct<Vec4>().toLimeQuaternion()))
+							.ToList();
 
-							data.scaleKeys = animations[k].scaleKeys.keyframes
-								.FromArrayOfPointersToStructArrayUnsafe<AnimationKeyframe>(animations[k].scaleKeys.count)
-								.Select(key => new Keyframe<Vector3>(AnimationUtils.SecondsToFrames(key.time), key.data.ToStruct<Vec3>().toLime()))
-								.ToList();
-						}
+						data.ScaleKeys = animations[animationIndex].ScaleKeys
+							.ToStruct<SizedArray>()
+							.GetData<Keyframe>()
+							.Select(key => new Keyframe<Vector3>(AnimationUtils.SecondsToFrames(key.Time), key.Data.ToStruct<Vec3>().ToLime()))
+							.ToList();
 					}
 				}
 			}
@@ -73,65 +75,43 @@ namespace Orange.FbxImporter
 
 		#region MarshalingStructures
 
-		[StructLayout(LayoutKind.Sequential)]
-		private class AnimationWrapper
-		{
-			[MarshalAs(UnmanagedType.I4)]
-			public int count;
-
-			public IntPtr stacks;
-		}
-
 		[StructLayout(LayoutKind.Sequential, CharSet = ImportConfig.Charset)]
 		private class AnimationStack
 		{
-			[MarshalAs(UnmanagedType.I4)]
-			public int count;
+			public string Name;
 
-			public string name;
-
-			public IntPtr layers;
+			public IntPtr Layers;
 		}
 
 		[StructLayout(LayoutKind.Sequential, CharSet = ImportConfig.Charset)]
 		private class AnimationLayer
 		{
-			[MarshalAs(UnmanagedType.I4)]
-			public int count;
+			public string Name;
 
-			public string name;
-
-			public IntPtr nodes;
+			public IntPtr Animations;
 		}
 
 		[StructLayout(LayoutKind.Sequential, CharSet = ImportConfig.Charset)]
-		private class KeyframeCollection
+		private class Animation
 		{
-			public string id;
+			public string Id;
 
-			public AnimationKeyframeSet positionKeys;
+			public IntPtr PositionKeys;
 
-			public AnimationKeyframeSet scaleKeys;
+			public IntPtr ScaleKeys;
 
-			public AnimationKeyframeSet rotationKeys;
+			public IntPtr RotationKeys;
 		}
 
 		[StructLayout(LayoutKind.Sequential)]
-		private class AnimationKeyframeSet
+		private class Keyframe
 		{
-			[MarshalAs(UnmanagedType.I4)]
-			public int count;
+			public double Time;
 
-			public IntPtr keyframes;
-		}
-
-		[StructLayout(LayoutKind.Sequential)]
-		private class AnimationKeyframe
-		{
-			public double time;
-			public IntPtr data;
+			public IntPtr Data;
 		}
 
 		#endregion
 	}
+#pragma warning restore 649
 }

@@ -79,7 +79,7 @@ namespace Orange
 
 	public class ParticularCookingRules : ICookingRules
 	{
-		// NOTE: function `Override` uses the fact that rule name being parsed matches the field name
+		// NOTE: function `Override` uses the fact that rule Name being parsed matches the field Name
 		// for all fields marked with `YuzuRequired`. So don't rename them or do so with cautiousness.
 		// e.g. don't rename `Bundle` to `Bundles`
 
@@ -601,7 +601,7 @@ namespace Orange
 					string atlasName = "#" + Lime.AssetPath.GetDirectoryName(path).Replace('/', '#');
 					if (string.IsNullOrEmpty(atlasName)) {
 						throw new Lime.Exception(
-							"Atlas directory is empty. Choose another atlas name");
+							"Atlas directory is empty. Choose another atlas Name");
 					}
 					rules.TextureAtlas = atlasName;
 					break;

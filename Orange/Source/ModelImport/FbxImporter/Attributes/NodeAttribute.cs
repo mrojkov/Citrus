@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 
 namespace Orange.FbxImporter
@@ -7,16 +7,16 @@ namespace Orange.FbxImporter
 	{
 		public static NodeAttribute Empty = new NodeAttribute(IntPtr.Zero);
 
-		public virtual FbxNodeType Type { get; } = FbxNodeType.NONE;
+		public virtual FbxNodeType Type { get; } = FbxNodeType.None;
 
 		protected NodeAttribute(IntPtr ptr) : base(ptr)
 		{ }
 
 		public enum FbxNodeType
 		{
-			NONE,
-			MESH,
-			CAMERA
+			None,
+			Mesh,
+			Camera
 		};
 
 		public static NodeAttribute GetFromNode(IntPtr ptr)
@@ -26,18 +26,17 @@ namespace Orange.FbxImporter
 				return Empty;
 			}
 			switch (FbxNodeGetAttributeType(ptr)) {
-				case FbxNodeType.MESH:
+				case FbxNodeType.Mesh:
 					var meshAttribute = MeshAttribute.FromSubmesh(attribute);
 					var count = FbxNodeGetAttributeCount(ptr);
-					for (int i = 1; i < count; i++) {
+					for (var i = 1; i < count; i++) {
 						meshAttribute = MeshAttribute.Combine(
 							meshAttribute,
 							MeshAttribute.FromSubmesh(FbxNodeGetAttribute(ptr, i)));
 					}
 					return meshAttribute;
-				case FbxNodeType.CAMERA:
+				case FbxNodeType.Camera:
 					return new CameraAttribute(attribute);
-				case FbxNodeType.NONE:
 				default:
 					return Empty;
 			}

@@ -1,7 +1,6 @@
-﻿using Lime;
+using Lime;
 using System;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace Orange.FbxImporter
 {
@@ -11,11 +10,11 @@ namespace Orange.FbxImporter
 			Name = "Default",
 		};
 
-		public string Path { get; private set; }
+		public string Path { get;}
 
-		public string Name { get; private set; }
+		public string Name { get; }
 
-		public Color4 DiffuseColor { get; private set; }
+		public Color4 DiffuseColor { get; }
 
 		public Material(IntPtr ptr) : base(ptr)
 		{
@@ -23,30 +22,26 @@ namespace Orange.FbxImporter
 				DiffuseColor = Color4.White;
 			} else {
 				var matPtr = FbxNodeSerializeMaterial(NativePtr);
-				if (matPtr != IntPtr.Zero) {
-					var material = matPtr.ToStruct<Texture>();
-					//var test = Encoding.ASCII.GetString(Encoding.Unicode.GetBytes(material.texturePath));
-					Path = material.texturePath;
-					Name = material.name;
-					var color = material.colorDiffuse;
-					DiffuseColor = color.toLimeColor();
-				}
+				if (matPtr == IntPtr.Zero) return;
+				var material = matPtr.ToStruct<Texture>();
+				Path = material.TexturePath;
+				Name = material.Name;
+				var color = material.ColorDiffuse;
+				DiffuseColor = color.ToLimeColor();
 			}
 
 		}
 
 		public CommonMaterial ToLime(string path)
 		{
-			var res = new CommonMaterial();
-			res.Name = Name;
+			var material = new CommonMaterial {
+				Name = Name
+			};
 			if (!string.IsNullOrEmpty(Path)) {
-				res.DiffuseTexture = CreateSerializableTexture(path);
+				material.DiffuseTexture = CreateSerializableTexture(path);
 			}
-			if (DiffuseColor != null) {
-				res.DiffuseColor = DiffuseColor;
-			}
-
-			return res;
+			material.DiffuseColor = DiffuseColor;
+			return material;
 		}
 
 		private SerializableTexture CreateSerializableTexture(string root)
@@ -58,7 +53,6 @@ namespace Orange.FbxImporter
 
 		#region Pinvokes
 
-		//Get non native material
 		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
 		public static extern IntPtr FbxNodeSerializeMaterial(IntPtr node);
 
@@ -69,13 +63,12 @@ namespace Orange.FbxImporter
 		[StructLayout(LayoutKind.Sequential, CharSet = ImportConfig.Charset)]
 		public class Texture
 		{
-			public string texturePath;
+			public string TexturePath;
 
-			public string name;
+			public string Name;
 
-			public Vec4 colorDiffuse;
+			public Vec4 ColorDiffuse;
 		}
-
 
 		#endregion
 	}

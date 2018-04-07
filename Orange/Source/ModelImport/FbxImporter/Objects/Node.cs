@@ -1,4 +1,4 @@
-﻿using Lime;
+using Lime;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -8,15 +8,15 @@ namespace Orange.FbxImporter
 {
 	public class Node : FbxObject
 	{
-		public NodeAttribute Attribute { get; private set; } = NodeAttribute.Empty;
+		public NodeAttribute Attribute { get; }
 
 		public List<Node> Children { get; } = new List<Node>();
 
-		public Material[] Materials { get; private set; }
+		public Material[] Materials { get; }
 
-		public Matrix44 LocalTranform { get; private set; }
+		public Matrix44 LocalTranform { get; }
 
-		public string Name { get; private set; }
+		public string Name { get; }
 
 		public Node(IntPtr ptr) : base (ptr)
 		{

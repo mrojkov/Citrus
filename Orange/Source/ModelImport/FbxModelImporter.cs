@@ -1,4 +1,4 @@
-﻿using Lime;
+using Lime;
 using Orange.FbxImporter;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,7 +37,7 @@ namespace Orange
 			if (root == null)
 				return null;
 			switch (root.Attribute.Type) {
-				case NodeAttribute.FbxNodeType.MESH:
+				case NodeAttribute.FbxNodeType.Mesh:
 					var meshAttribute = root.Attribute as MeshAttribute;
 					var mesh = new Mesh3D { Id = root.Name };
 					foreach (var submesh in meshAttribute.Submeshes) {
@@ -53,7 +53,7 @@ namespace Orange
 						mesh.RecalcCenter();
 					}
 					break;
-				case NodeAttribute.FbxNodeType.CAMERA:
+				case NodeAttribute.FbxNodeType.Camera:
 					var cam = root.Attribute as CameraAttribute;
 					node = new Camera3D {
 						Id = root.Name,
@@ -133,20 +133,20 @@ namespace Orange
 
 		private void ImportAnimations(Scene scene)
 		{
-			foreach (var animation in scene.Animations.Animations) {
-				var n = Model.TryFind<Node3D>(animation.Key);
-				var scaleKeys = Vector3KeyReducer.Default.Reduce(animation.scaleKeys);
+			foreach (var animation in scene.Animations.List) {
+				var n = Model.TryFind<Node3D>(animation.AnimationKey);
+				var scaleKeys = Vector3KeyReducer.Default.Reduce(animation.ScaleKeys);
 				if (scaleKeys.Count != 0) {
 					(n.Animators["Scale", animation.MarkerId] as Animator<Vector3>).Keys.AddRange(scaleKeys);
 				}
-				var rotKeys = QuaternionKeyReducer.Default.Reduce(animation.rotationKeys);
+				var rotKeys = QuaternionKeyReducer.Default.Reduce(animation.RotationKeys);
 				if (rotKeys.Count != 0) {
 					if (n is Camera3D) {
 						CorrectCameraAnimationKeys(rotKeys);
 					}
 					(n.Animators["Rotation", animation.MarkerId] as Animator<Quaternion>).Keys.AddRange(rotKeys);
 				}
-				var posKeys = Vector3KeyReducer.Default.Reduce(animation.positionKeys);
+				var posKeys = Vector3KeyReducer.Default.Reduce(animation.PositionKeys);
 				if (posKeys.Count != 0) {
 					(n.Animators["Position", animation.MarkerId] as Animator<Vector3>).Keys.AddRange(posKeys);
 				}

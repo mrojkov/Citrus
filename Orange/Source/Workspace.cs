@@ -186,7 +186,7 @@ namespace Orange
 				return (TargetPlatform)Enum.Parse(typeof(TargetPlatform), name, true);
 			}
 			catch (ArgumentException) {
-				throw new Lime.Exception("Uknown sub target platform name: {0}", name);
+				throw new Lime.Exception("Uknown sub target platform Name: {0}", name);
 			}
 		}
 	}

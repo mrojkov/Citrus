@@ -26,7 +26,7 @@ namespace Orange
 				if (dlg.RunModal()) {
 					var projectName = Path.GetFileName(dlg.FileName);
 					var newProjectApplicationName = String.Join(" ", Regex.Split(projectName, @"(?<!^)(?=[A-Z])"));
-					Console.WriteLine($"New project name is \"{projectName}\"");
+					Console.WriteLine($"New project Name is \"{projectName}\"");
 					HashSet<string> textfileExtensions = new HashSet<string> { ".cs", ".xml", ".csproj", ".sln", ".citproj", ".projitems", ".shproj", ".txt", ".plist", ".strings" };
 					using (var dc = new DirectoryChanger($"{citrusPath}/Samples/EmptyProject/")) {
 						var fe = new FileEnumerator(".");

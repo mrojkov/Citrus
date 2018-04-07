@@ -1,4 +1,5 @@
-﻿using Lime;
+﻿using System;
+using Lime;
 using System.Linq;
 using System.Runtime.InteropServices;
 
@@ -46,29 +47,58 @@ namespace Orange.FbxImporter
 		}
 	}
 
-	public static class VectorExtensions
+	[StructLayout(LayoutKind.Sequential)]
+	public class SizedArray
 	{
+		public uint Size;
+
+		public IntPtr Array;
+	}
+
+	public static class FbxExtensions
+	{
+		public static T[] GetData<T>(this SizedArray sizedArray)
+		{
+			if (typeof(T) == typeof(int)) {
+				return (T[])Convert.ChangeType(sizedArray.Array.ToIntArray((int)sizedArray.Size), typeof(T[]));
+			}
+
+			if (typeof(T) == typeof(double)) {
+				return (T[])Convert.ChangeType(sizedArray.Array.ToFloatArray((int)sizedArray.Size), typeof(T[]));
+			}
+
+			if (typeof(T) == typeof(float)) {
+				return (T[])Convert.ChangeType(sizedArray.Array.ToDoubleArray((int)sizedArray.Size), typeof(T[]));
+			}
+
+			if (typeof(T).IsClass) {
+				return sizedArray.Array.ToStructArray<T>((int)sizedArray.Size);
+			}
+
+			return null;
+		}
+
 		public static Quaternion toLimeQuaternion(this Vec4 vector)
 		{
 			return new Quaternion(vector.V1, vector.V2, vector.V3, vector.V4);
 		}
 
-		public static Color4 toLimeColor(this Vec4 vector)
+		public static Color4 ToLimeColor(this Vec4 vector)
 		{
 			return Color4.FromFloats(vector.V1, vector.V2, vector.V3, vector.V4);
 		}
 
-		public static Vector4 toLime(this Vec4 vector)
+		public static Vector4 ToLime(this Vec4 vector)
 		{
 			return new Vector4(vector.V1, vector.V2, vector.V3, vector.V4);
 		}
 
-		public static Vector3 toLime(this Vec3 vector)
+		public static Vector3 ToLime(this Vec3 vector)
 		{
 			return new Vector3(vector.V1, vector.V2, vector.V3);
 		}
 
-		public static Vector2 toLime(this Vec2 vector)
+		public static Vector2 ToLime(this Vec2 vector)
 		{
 			return new Vector2(vector.V1, vector.V2);
 		}
