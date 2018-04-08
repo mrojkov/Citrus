@@ -997,7 +997,7 @@ namespace Orange
 			var sourceAssetBundle = new UnpackedAssetBundle(The.Workspace.AssetsDirectory);
 			SyncUpdated(".fbx", ".model", (srcPath, dstPath) => {
 				var compression = cookingRulesMap[srcPath].ModelCompression;
-				var model = new FbxModelImporter(srcPath, The.Workspace.ActivePlatform).Model;
+				var model = new FbxModelImporter(srcPath, The.Workspace.ActiveTarget, cookingRulesMap).Model;
 				// Create .model file for tangerine.
 				Serialization.WriteObjectToBundle(sourceAssetBundle, dstPath, model, Serialization.Format.Binary, ".model", AssetAttributes.None, cookingRulesMap[srcPath].SHA1);
 				AssetAttributes assetAttributes;

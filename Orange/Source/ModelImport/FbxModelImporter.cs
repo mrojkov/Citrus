@@ -15,13 +15,16 @@ namespace Orange
 		private readonly static Quaternion CameraPostRotation = Quaternion.CreateFromEulerAngles(Vector3.UnitY * -Mathf.Pi / 2);
 		private string path;
 		private Manager manager;
-		private TargetPlatform platform;
+		private Target target;
+		private readonly Dictionary<string, CookingRules> cookingRulesMap;
+
 		public Model3D Model { get; private set; }
 
-		public FbxModelImporter(string path, TargetPlatform platform)
+		public FbxModelImporter(string path, Target target, Dictionary<string, CookingRules> cookingRulesMap)
 		{
-			this.platform = platform;
+			this.target = target;
 			this.path = path;
+			this.cookingRulesMap = cookingRulesMap;
 			manager = Manager.Create();
 			var scene = manager.LoadScene(path);
 			Model = new Model3D();
@@ -43,7 +46,7 @@ namespace Orange
 					foreach (var submesh in meshAttribute.Submeshes) {
 						mesh.Submeshes.Add(ImportSubmesh(submesh, root));
 					}
-					if (platform == TargetPlatform.Unity) {
+					if (target.Platform == TargetPlatform.Unity) {
 						mesh.CullMode = CullMode.CullCounterClockwise;
 					}
 					node = mesh;
@@ -103,7 +106,7 @@ namespace Orange
 			};
 
 			sm.Material = meshAttribute.MaterialIndex != -1 ?
-				node.Materials[meshAttribute.MaterialIndex].ToLime(path) : Material.Default;
+				CreateLimeMaterial(node.Materials[meshAttribute.MaterialIndex], path, target) : Material.Default;
 
 			if (meshAttribute.Bones.Length > 0) {
 				foreach (var bone in meshAttribute.Bones) {
@@ -112,6 +115,41 @@ namespace Orange
 				}
 			}
 			return sm;
+		}
+
+		public CommonMaterial CreateLimeMaterial(Material material, string modelPath, Target target)
+		{
+			var commonMaterial = new CommonMaterial {
+				Name = material.Name
+			};
+			if (!string.IsNullOrEmpty(material.Path)) {
+				var tex = CreateSerializableTexture(modelPath, material.Path);
+				commonMaterial.DiffuseTexture = tex;
+				var rulesPath = tex.SerializationPath + ".png";
+
+				// TODO: implement U and V wrapping modes separately for cooking rules.
+				// Set "Repeat" wrpap mode if wrap mode of any of the components is set as "Repeat".
+				var mode = material.WrapModeU == TextureWrapMode.Repeat || material.WrapModeV == TextureWrapMode.Repeat ?
+						TextureWrapMode.Repeat : TextureWrapMode.Clamp;
+				if (cookingRulesMap.ContainsKey(rulesPath)) {
+					var cookingRules = cookingRulesMap[rulesPath] = cookingRulesMap[rulesPath].InheritClone();
+					if (cookingRules.CommonRules.WrapMode != mode) {
+						cookingRules.CommonRules.WrapMode = mode;
+						cookingRules.SourceFilename = rulesPath + ".txt";
+						cookingRules.CommonRules.Override(nameof(ParticularCookingRules.WrapMode));
+						cookingRules.DeduceEffectiveRules(target);
+						cookingRules.Save();
+					}
+				}
+			}
+			commonMaterial.DiffuseColor = material.DiffuseColor;
+			return commonMaterial;
+		}
+
+		private SerializableTexture CreateSerializableTexture(string root, string texturePath)
+		{
+			return new SerializableTexture(Toolbox.ToUnixSlashes(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(root),
+				System.IO.Path.GetFileNameWithoutExtension(Toolbox.ToUnixSlashes(texturePath)))));
 		}
 
 		private Matrix44 CorrectCameraTransform(Matrix44 origin)

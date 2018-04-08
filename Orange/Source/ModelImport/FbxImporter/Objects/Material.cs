@@ -14,6 +14,10 @@ namespace Orange.FbxImporter
 
 		public string Name { get; }
 
+		public Lime.TextureWrapMode WrapModeU { get; }
+
+		public Lime.TextureWrapMode WrapModeV { get; }
+
 		public Color4 DiffuseColor { get; }
 
 		public Material(IntPtr ptr) : base(ptr)
@@ -26,28 +30,11 @@ namespace Orange.FbxImporter
 				var material = matPtr.ToStruct<Texture>();
 				Path = material.TexturePath;
 				Name = material.Name;
+				WrapModeU = (Lime.TextureWrapMode)material.WrapModeU;
+				WrapModeV = (Lime.TextureWrapMode)material.WrapModeV;
 				DiffuseColor = material.ColorDiffuse.ToLimeColor();
 			}
 
-		}
-
-		public CommonMaterial ToLime(string path)
-		{
-			var material = new CommonMaterial {
-				Name = Name
-			};
-			if (!string.IsNullOrEmpty(Path)) {
-				material.DiffuseTexture = CreateSerializableTexture(path);
-			}
-			material.DiffuseColor = DiffuseColor;
-			return material;
-		}
-
-		private SerializableTexture CreateSerializableTexture(string root)
-		{
-			var texturePath = Toolbox.ToUnixSlashes(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(root),
-				System.IO.Path.GetFileNameWithoutExtension(Toolbox.ToUnixSlashes(Path))));
-			return new SerializableTexture(texturePath);
 		}
 
 		#region Pinvokes
@@ -59,9 +46,19 @@ namespace Orange.FbxImporter
 
 		#region MarshalingStructures
 
-		[StructLayout(LayoutKind.Sequential, CharSet = ImportConfig.Charset)]
-		public class Texture
+		private enum TextureWrapMode
 		{
+			Clamp,
+			Repeat
+		}
+
+		[StructLayout(LayoutKind.Sequential, CharSet = ImportConfig.Charset)]
+		private class Texture
+		{
+			public TextureWrapMode WrapModeU;
+
+			public TextureWrapMode WrapModeV;
+
 			public string TexturePath;
 
 			public string Name;
