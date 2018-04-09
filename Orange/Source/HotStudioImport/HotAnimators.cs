@@ -174,6 +174,9 @@ namespace Orange
 					case "TextColor":
 						propertyName = "TextColor";
 						break;
+					case "LineIndent":
+						propertyName = "Spacing";
+						break;
 					}
 					switch (propertyName + '@' + className) {
 					case "ShadowColor@Hot::Text":
