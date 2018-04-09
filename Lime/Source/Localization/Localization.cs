@@ -18,6 +18,7 @@ namespace Lime
 		/// </summary>
 		public static bool UseNumericKeys { get { return useNumericKeys; } set { useNumericKeys = value; } }
 
+		public static bool DebugKeys { get; set; }
 		/// <summary>
 		/// Текущий словарь локализации
 		/// </summary>
@@ -87,11 +88,14 @@ namespace Lime
 					if (closeBrackedPos > 1) {
 						var key = taggedString.Substring(1, closeBrackedPos - 1);
 						if (Dictionary.TryGetText(key, out text)) {
+							if (DebugKeys) {
+								text = "#[" + key + "]" + text;
+							}
 							return text;
 						}
 					}
 					// key/value pair not defined or key is empty ("[]" case).
-					text = taggedString.Substring(closeBrackedPos + 1);
+					text = DebugKeys ? "#" + taggedString : taggedString.Substring(closeBrackedPos + 1);
 					return text;
 				}
 			}
