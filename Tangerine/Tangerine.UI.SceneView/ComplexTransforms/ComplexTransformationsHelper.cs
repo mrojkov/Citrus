@@ -230,11 +230,13 @@ namespace Tangerine.UI.SceneView.ComplexTransforms
 			}
 
 			// Extract simple transformations from matrix.
-			return localToParentTransform.ToTransform2Double(preferedRotationDeg);
+			return localToParentTransform.ToTransform2Double(preferedRotationDeg, (Vector2d) widget.Scale);
 		}
 
-		private static Transform2d ToTransform2Double(this Matrix32d matrix, double preferedRotationDeg)
+		private static Transform2d ToTransform2Double(this Matrix32d matrix, double preferedRotationDeg,
+			Vector2d originalScale)
 		{
+			// Calculate the required signs of the scale axes, excluding rotation from the deformation matrix.   
 			Matrix32d matrixWithoutRotation = matrix * Matrix32d.Rotation(-preferedRotationDeg * Math.PI / 180.0);
 			int directionClock = Math.Sign(Vector2d.CrossProduct(matrixWithoutRotation.U, matrixWithoutRotation.V));
 
@@ -247,26 +249,39 @@ namespace Tangerine.UI.SceneView.ComplexTransforms
 
 			var vSign = Math.Sign(Vector2d.CrossProduct(matrix.U, matrix.V));
 
-			if (!isRequiredScaleXNegative) {
-				return new Transform2d {
-					Translation = matrix.T,
-					Scale = new Vector2d(matrix.U.Length, matrix.V.Length * vSign),
-					Rotation = matrix.U.Atan2Deg
-				};
-			}
+			Vector2d originalScaleAbs = new Vector2d(Math.Abs(originalScale.X), Math.Abs(originalScale.Y));
 
-			if ((isRequiredScaleYNegative && vSign < 0) || (!isRequiredScaleYNegative && vSign > 0)) {
-				return new Transform2d {
-					Translation = matrix.T,
-					Scale = new Vector2d(-matrix.U.Length, matrix.V.Length * vSign),
-					Rotation = matrix.U.Atan2Deg
-				};
+			Vector2d useMatrixU = isRequiredScaleXNegative ? -matrix.U : matrix.U;
+			Vector2d useMatrixV = isRequiredScaleXNegative ? -matrix.V : matrix.V;
+			int useMatrixUSign = isRequiredScaleXNegative ? -1 : 1;
+			int useMatrixVSign = isRequiredScaleXNegative ? -1 : 1;
+
+			double rotation;
+			if (Math.Abs(Vector2d.DotProduct(useMatrixU, useMatrixV)) < 1e-5) {
+				rotation = useMatrixU.Atan2Deg;
+			} else {
+				// Calculate the correct rotation, for deformed not-perpendicular UV axes.
+				// Naive realisation as atg(U.X/V.X) or atg(V.Y/U.Y). 
+				// To keep an original widget rotation.
+				if (Math.Abs(useMatrixU.X) + Math.Abs(useMatrixV.X) > Math.Abs(useMatrixU.Y) + Math.Abs(useMatrixV.Y)) {
+					if (originalScaleAbs.X > originalScaleAbs.Y) {
+						rotation = new Vector2d(useMatrixU.X * originalScaleAbs.Y / originalScaleAbs.X, -useMatrixV.X * vSign).Atan2Deg;
+					} else {
+						rotation = new Vector2d(useMatrixU.X, -useMatrixV.X * vSign * originalScaleAbs.X / originalScaleAbs.Y).Atan2Deg;
+					}
+				} else {
+					if (originalScaleAbs.Y > originalScaleAbs.X) {
+						rotation = new Vector2d(useMatrixV.Y * vSign * originalScaleAbs.X / originalScaleAbs.Y, useMatrixU.Y).Atan2Deg;
+					} else {
+						rotation = new Vector2d(useMatrixV.Y * vSign, useMatrixU.Y * originalScaleAbs.Y / originalScaleAbs.X).Atan2Deg;
+					}
+				}
 			}
 
 			return new Transform2d {
 				Translation = matrix.T,
-				Scale = new Vector2d(-matrix.U.Length, -matrix.V.Length * vSign),
-				Rotation = (-matrix.U).Atan2Deg
+				Scale = new Vector2d(useMatrixUSign * useMatrixU.Length, useMatrixVSign * useMatrixV.Length * vSign),
+				Rotation = rotation
 			};
 		}
 
