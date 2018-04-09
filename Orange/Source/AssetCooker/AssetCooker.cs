@@ -182,7 +182,12 @@ namespace Orange
 			var bundlePath = The.Workspace.GetBundlePath(bundleName);
 
 			// Create directory for bundle if it placed in subdirectory
-			Directory.CreateDirectory(Path.GetDirectoryName(bundlePath));
+			try {
+				Directory.CreateDirectory(Path.GetDirectoryName(bundlePath));
+			} catch (System.Exception e) {
+				Debug.Write("Failed to create directory: {0} {1}", Path.GetDirectoryName(bundlePath));
+				throw;
+			}
 
 			return new PackedAssetBundle(bundlePath, AssetBundleFlags.Writable);
 		}
@@ -461,11 +466,27 @@ namespace Orange
 		public class AtlasItem
 		{
 			public string Path;
-			public Bitmap Bitmap;
 			public IntRectangle AtlasRect;
 			public bool Allocated;
 			public CookingRules CookingRules;
 			public string SourceExtension;
+			public BitmapInfo BitmapInfo;
+		}
+
+		public class BitmapInfo
+		{
+			public int Width;
+			public int Height;
+			public bool HasAlpha;
+
+			public static BitmapInfo FromBitmap(Bitmap bitmap)
+			{
+				return new BitmapInfo() {
+					Width = bitmap.Width,
+					Height = bitmap.Height,
+					HasAlpha = bitmap.HasAlpha
+				};
+			}
 		}
 
 		public static string GetAtlasPath(string atlasChain, int index)
@@ -473,6 +494,23 @@ namespace Orange
 			var path = AssetPath.Combine(
 				"Atlases" + atlasesPostfix, atlasChain + '.' + index.ToString("000") + GetPlatformTextureExtension());
 			return path;
+		}
+
+		static Bitmap OpenAtlasItemBitmap(AtlasItem item)
+		{
+			var srcTexturePath = AssetPath.Combine(The.Workspace.AssetsDirectory, Path.ChangeExtension(item.Path, item.SourceExtension));
+			Bitmap bitmap;
+			using (var stream = File.OpenRead(srcTexturePath)) {
+				bitmap = new Bitmap(stream);
+			}
+			if (ShouldDownscale(bitmap, item.CookingRules)) {
+				var newBitmap = DownscaleTexture(bitmap, srcTexturePath, item.CookingRules);
+				bitmap.Dispose();
+				bitmap = newBitmap;
+			}
+			// Ensure that no image exceeded maxAtlasSize limit
+			DownscaleTextureToFitAtlas(ref bitmap, srcTexturePath);
+			return bitmap;
 		}
 
 		static void BuildAtlasChain(string atlasChain)
@@ -492,22 +530,15 @@ namespace Orange
 			foreach (var fileInfo in The.Workspace.AssetFiles.Enumerate(".png")) {
 				var cookingRules = cookingRulesMap[fileInfo.Path];
 				if (cookingRules.TextureAtlas == atlasChain) {
-					var srcTexturePath = AssetPath.Combine(The.Workspace.AssetsDirectory, fileInfo.Path);
-					Bitmap bitmap;
-					using (var stream = File.OpenRead(srcTexturePath)) {
-						bitmap = new Bitmap(stream);
-					}
-					if (ShouldDownscale(bitmap, cookingRules)) {
-						bitmap = DownscaleTexture(bitmap, srcTexturePath, cookingRules);
-					}
-					// Ensure that no image exceeded maxAtlasSize limit
-					DownscaleTextureToFitAtlas(ref bitmap, srcTexturePath);
+
 					var item = new AtlasItem {
 						Path = Path.ChangeExtension(fileInfo.Path, ".atlasPart"),
-						Bitmap = bitmap,
 						CookingRules = cookingRules,
 						SourceExtension = Path.GetExtension(fileInfo.Path)
 					};
+					using (var bitmap = OpenAtlasItemBitmap(item)) {
+						item.BitmapInfo = BitmapInfo.FromBitmap(bitmap);
+					}
 					var k = cookingRules.AtlasPacker;
 					if (!string.IsNullOrEmpty(k) && k != "Default") {
 						List<AtlasItem> l;
@@ -537,9 +568,6 @@ namespace Orange
 					} else {
 						initialAtlasId = PackItemsToAtlas(atlasChain, kv.Value, kv.Key, initialAtlasId, false);
 					}
-					foreach (var item in kv.Value) {
-						item.Bitmap.Dispose();
-					}
 				}
 			}
 			var packers = PluginLoader.CurrentPlugin.AtlasPackers.ToDictionary(i => i.Metadata.Id, i => i.Value);
@@ -556,8 +584,8 @@ namespace Orange
 		{
 			// Sort images in descending size order
 			items.Sort((x, y) => {
-				var a = Math.Max(x.Bitmap.Width, x.Bitmap.Height);
-				var b = Math.Max(y.Bitmap.Width, y.Bitmap.Height);
+				var a = Math.Max(x.BitmapInfo.Width, x.BitmapInfo.Height);
+				var b = Math.Max(y.BitmapInfo.Width, y.BitmapInfo.Height);
 				return b - a;
 			});
 
@@ -571,7 +599,7 @@ namespace Orange
 				int minItemsLeft = Int32.MaxValue;
 
 				// TODO: Fix for non-square atlases
-				var maxTextureSize = items.Max(item => Math.Max(item.Bitmap.Height, item.Bitmap.Width));
+				var maxTextureSize = items.Max(item => Math.Max(item.BitmapInfo.Height, item.BitmapInfo.Width));
 				var minAtlasSize = Math.Max(64, CalcUpperPowerOfTwo(maxTextureSize));
 
 				foreach (var size in EnumerateAtlasSizes(squareAtlas: squareAtlas, minSize: minAtlasSize)) {
@@ -611,11 +639,6 @@ namespace Orange
 				}
 				PackItemsToAtlas(items, bestSize, out bestPackRate);
 				CopyAllocatedItemsToAtlas(items, atlasChain, atlasId, bestSize);
-				foreach (var x in items) {
-					if (x.Allocated) {
-						x.Bitmap.Dispose();
-					}
-				}
 				items.RemoveAll(x => x.Allocated);
 				atlasId++;
 			}
@@ -661,7 +684,7 @@ namespace Orange
 			var a = new RectAllocator(new Size(size.Width + 2, size.Height + 2));
 			AtlasItem firstAllocatedItem = null;
 			foreach (var item in items) {
-				var sz = new Size(item.Bitmap.Width + 2, item.Bitmap.Height + 2);
+				var sz = new Size(item.BitmapInfo.Width + 2, item.BitmapInfo.Height + 2);
 				if (firstAllocatedItem == null || AreAtlasItemsCompatible(items, firstAllocatedItem, item)) {
 					if (a.Allocate(sz, out item.AtlasRect)) {
 						item.Allocated = true;
@@ -697,7 +720,7 @@ namespace Orange
 			switch (Platform) {
 				case TargetPlatform.Android:
 				case TargetPlatform.iOS:
-					return item1.CookingRules.PVRFormat == item2.CookingRules.PVRFormat && item1.Bitmap.HasAlpha == item2.Bitmap.HasAlpha;
+					return item1.CookingRules.PVRFormat == item2.CookingRules.PVRFormat && item1.BitmapInfo.HasAlpha == item2.BitmapInfo.HasAlpha;
 				case TargetPlatform.Win:
 				case TargetPlatform.Mac:
 					return item1.CookingRules.DDSFormat == item2.CookingRules.DDSFormat;
@@ -713,7 +736,9 @@ namespace Orange
 			var atlasPath = GetAtlasPath(atlasChain, atlasId);
 			var atlasPixels = new Color4[size.Width * size.Height];
 			foreach (var item in items.Where(i => i.Allocated)) {
-				CopyPixels(item.Bitmap, atlasPixels, item.AtlasRect.A.X, item.AtlasRect.A.Y, size.Width, size.Height);
+				using (var bitmap = OpenAtlasItemBitmap(item)) {
+					CopyPixels(bitmap, atlasPixels, item.AtlasRect.A.X, item.AtlasRect.A.Y, size.Width, size.Height);
+				}
 				var atlasPart = new TextureAtlasElement.Params();
 				atlasPart.AtlasRect = item.AtlasRect;
 				atlasPart.AtlasRect.B -= new IntVector2(2, 2);
@@ -1022,7 +1047,7 @@ namespace Orange
 				try {
 					File.Delete(backupPath);
 				} catch (System.Exception e) {
-					Console.WriteLine(e);
+					Console.WriteLine("Failed to delete backupFile: {0} {1}", backupPath, e);
 				}
 			}
 			bundleBackupFiles.Clear();
