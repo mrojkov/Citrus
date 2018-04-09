@@ -215,6 +215,7 @@ namespace Lime
 			// Use '.' as decimal separator.
 			var culture = System.Globalization.CultureInfo.InvariantCulture;
 			System.Threading.Thread.CurrentThread.CurrentCulture = culture;
+			System.Globalization.CultureInfo.DefaultThreadCurrentCulture = culture;
 			AudioSystem.Initialize(options);
 #if WIN
 #if DEBUG
