@@ -87,11 +87,11 @@ namespace Orange
 			}
 		}
 
-		public static void Cook(TargetPlatform platform)
+		public static void Cook(TargetPlatform platform, List<string> bundles = null)
 		{
 			AssetCooker.Platform = platform;
 			cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, The.Workspace.ActiveTarget);
-			CookBundles();
+			CookBundles(bundles: bundles);
 		}
 
 		public static void CookCustomAssets(TargetPlatform platform, List<string> assets)
@@ -113,12 +113,12 @@ namespace Orange
 			AssetCooker.cookingProfile = defaultCookingProfile;
 		}
 
-		private static void CookBundles(bool requiredCookCode = true)
+		private static void CookBundles(bool requiredCookCode = true, List<string> bundles = null)
 		{
 			var extraBundles = new HashSet<string>();
 			foreach (var dictionaryItem in cookingRulesMap) {
 				foreach (var bundle in dictionaryItem.Value.Bundles) {
-					if (bundle != CookingRulesBuilder.MainBundleName) {
+					if (bundle != CookingRulesBuilder.MainBundleName && (bundles == null || bundles.Contains(bundle))) {
 						extraBundles.Add(bundle);
 					}
 				}

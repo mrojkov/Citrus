@@ -167,6 +167,7 @@
     <Compile Include="Source\Toolbox\FontBuilder.cs" />
     <Compile Include="Source\Toolbox\CustomFileEnumerator.cs" />
     <Compile Include="Source\OrangeActionsHelper.cs" />
+    <Compile Include="Source\Actions\CookMainBundle.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\3rdParty\FbxSdk\FbxSdk.dll">

@@ -146,6 +146,7 @@
     <Compile Include="Source\Toolbox\CustomFileEnumerator.cs" />
     <Compile Include="Source\OrangeActionsHelper.cs" />
     <Compile Include="Source\Actions\NewProject.cs" />
+    <Compile Include="Source\Actions\CookMainBundle.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Orange.Mac.userprefs">
