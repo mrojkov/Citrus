@@ -591,77 +591,82 @@ namespace Orange
 
 		private static void ParseRule(ParticularCookingRules rules, IReadOnlyList<string> words, string path)
 		{
-			switch (words[0]) {
-			case "TextureAtlas":
-				switch (words[1]) {
-				case "None":
-					rules.TextureAtlas = null;
-					break;
-				case DirectoryNameToken:
-					string atlasName = "#" + Lime.AssetPath.GetDirectoryName(path).Replace('/', '#');
-					if (string.IsNullOrEmpty(atlasName)) {
-						throw new Lime.Exception(
-							"Atlas directory is empty. Choose another atlas name");
+			try {
+				switch (words[0]) {
+				case "TextureAtlas":
+					switch (words[1]) {
+					case "None":
+						rules.TextureAtlas = null;
+						break;
+					case DirectoryNameToken:
+						string atlasName = "#" + Lime.AssetPath.GetDirectoryName(path).Replace('/', '#');
+						if (string.IsNullOrEmpty(atlasName)) {
+							throw new Lime.Exception(
+								"Atlas directory is empty. Choose another atlas name");
+						}
+						rules.TextureAtlas = atlasName;
+						break;
+					default:
+						rules.TextureAtlas = words[1];
+						break;
 					}
-					rules.TextureAtlas = atlasName;
+					break;
+				case "MipMaps":
+					rules.MipMaps = ParseBool(words[1]);
+					break;
+				case "HighQualityCompression":
+					rules.HighQualityCompression = ParseBool(words[1]);
+					break;
+				case "PVRFormat":
+					rules.PVRFormat = ParsePVRFormat(words[1]);
+					break;
+				case "DDSFormat":
+					rules.DDSFormat = ParseDDSFormat(words[1]);
+					break;
+				case "Bundles":
+					rules.Bundles = new string[words.Count - 1];
+					for (var i = 0; i < rules.Bundles.Length; i++) {
+						rules.Bundles[i] = ParseBundle(words[i + 1]);
+					}
+					break;
+				case "Ignore":
+					rules.Ignore = ParseBool(words[1]);
+					break;
+				case "ADPCMLimit":
+					rules.ADPCMLimit = int.Parse(words[1]);
+					break;
+				case "TextureScaleFactor":
+					rules.TextureScaleFactor = float.Parse(words[1]);
+					break;
+				case "AtlasOptimization":
+					rules.AtlasOptimization = ParseAtlasOptimization(words[1]);
+					break;
+				case "AtlasPacker":
+					rules.AtlasPacker = words[1];
+					break;
+				case "ModelCompression":
+					rules.ModelCompression = ParseModelCompression(words[1]);
+					break;
+				case "CustomRule":
+					rules.CustomRule = words[1];
+					break;
+				case "WrapMode":
+					rules.WrapMode = ParseWrapMode(words[1]);
+					break;
+				case "MinFilter":
+					rules.MinFilter = ParseTextureFilter(words[1]);
+					break;
+				case "MagFilter":
+					rules.MagFilter = ParseTextureFilter(words[1]);
 					break;
 				default:
-					rules.TextureAtlas = words[1];
-					break;
+					throw new Lime.Exception("Unknown attribute {0}", words[0]);
 				}
-				break;
-			case "MipMaps":
-				rules.MipMaps = ParseBool(words[1]);
-				break;
-			case "HighQualityCompression":
-				rules.HighQualityCompression = ParseBool(words[1]);
-				break;
-			case "PVRFormat":
-				rules.PVRFormat = ParsePVRFormat(words[1]);
-				break;
-			case "DDSFormat":
-				rules.DDSFormat = ParseDDSFormat(words[1]);
-				break;
-			case "Bundles":
-				rules.Bundles = new string[words.Count - 1];
-				for (var i = 0; i < rules.Bundles.Length; i++) {
-					rules.Bundles[i] = ParseBundle(words[i + 1]);
-				}
-				break;
-			case "Ignore":
-				rules.Ignore = ParseBool(words[1]);
-				break;
-			case "ADPCMLimit":
-				rules.ADPCMLimit = int.Parse(words[1]);
-				break;
-			case "TextureScaleFactor":
-				rules.TextureScaleFactor = float.Parse(words[1]);
-				break;
-			case "AtlasOptimization":
-				rules.AtlasOptimization = ParseAtlasOptimization(words[1]);
-				break;
-			case "AtlasPacker":
-				rules.AtlasPacker = words[1];
-				break;
-			case "ModelCompression":
-				rules.ModelCompression = ParseModelCompression(words[1]);
-				break;
-			case "CustomRule":
-				rules.CustomRule = words[1];
-				break;
-			case "WrapMode":
-				rules.WrapMode = ParseWrapMode(words[1]);
-				break;
-			case "MinFilter":
-				rules.MinFilter = ParseTextureFilter(words[1]);
-				break;
-			case "MagFilter":
-				rules.MagFilter = ParseTextureFilter(words[1]);
-				break;
-			default:
-				throw new Lime.Exception("Unknown attribute {0}", words[0]);
+				rules.Override(words[0]);
+			} catch (System.Exception e) {
+				Debug.Write("Failed to parse cooking rules: {0} {1} {2}", string.Join(",", words), path, e);
+				throw;
 			}
-			rules.Override(words[0]);
 		}
 
 		private static TextureFilter ParseTextureFilter(string value)
