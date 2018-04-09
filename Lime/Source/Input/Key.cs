@@ -207,9 +207,26 @@ namespace Lime
 		public static readonly Key Period = New();
 		public static readonly Key Slash = New();
 		public static readonly Key BackSlash = New();
-#endregion
 
-#region Mouse
+		public static readonly Key Keypad0 = New();
+		public static readonly Key Keypad1 = New();
+		public static readonly Key Keypad2 = New();
+		public static readonly Key Keypad3 = New();
+		public static readonly Key Keypad4 = New();
+		public static readonly Key Keypad5 = New();
+		public static readonly Key Keypad6 = New();
+		public static readonly Key Keypad7 = New();
+		public static readonly Key Keypad8 = New();
+		public static readonly Key Keypad9 = New();
+		public static readonly Key KeypadMultiply = New();
+		public static readonly Key KeypadPlus = New();
+		public static readonly Key KeypadMinus = New();
+		public static readonly Key KeypadDecimal = New();
+		public static readonly Key KeypadDivide = New();
+
+		#endregion
+
+		#region Mouse
 		/// <summary>
 		/// Left mouse button
 		/// </summary>

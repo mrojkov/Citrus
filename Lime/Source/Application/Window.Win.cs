@@ -708,6 +708,37 @@ namespace Lime
 					return Key.Period;
 				case Keys.Oemcomma:
 					return Key.Comma;
+				case Keys.NumPad0:
+					return Key.Keypad0;
+				case Keys.NumPad1:
+					return Key.Keypad1;
+				case Keys.NumPad2:
+					return Key.Keypad2;
+				case Keys.NumPad3:
+					return Key.Keypad3;
+				case Keys.NumPad4:
+					return Key.Keypad4;
+				case Keys.NumPad5:
+					return Key.Keypad5;
+				case Keys.NumPad6:
+					return Key.Keypad6;
+				case Keys.NumPad7:
+					return Key.Keypad7;
+				case Keys.NumPad8:
+					return Key.Keypad8;
+				case Keys.NumPad9:
+					return Key.Keypad9;
+				case Keys.Multiply:
+					return Key.KeypadMultiply;
+				case Keys.Add:
+					return Key.KeypadPlus;
+				case Keys.Decimal:
+					return Key.KeypadDecimal;
+				case Keys.Subtract:
+					return Key.KeypadMinus;
+				case Keys.Divide:
+					return Key.KeypadDivide;
+
 				default:
 					return Key.Unknown;
 			}
