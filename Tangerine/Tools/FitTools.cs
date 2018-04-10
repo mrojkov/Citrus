@@ -1,4 +1,3 @@
-﻿using System;
 using System.Linq;
 using Lime;
 using Tangerine.UI;
@@ -9,9 +8,16 @@ namespace Tangerine
 	{
 		public override void Execute()
 		{
-			foreach (var widget in Core.Document.Current.SelectedNodes().Editable().OfType<Widget>()) {
-				var originalSize = widget.Texture == null ? Widget.DefaultWidgetSize : (Vector2)widget.Texture.ImageSize;
-				Core.Operations.SetProperty.Perform(widget, nameof(Widget.Size), originalSize);
+			foreach (var node in Core.Document.Current.SelectedNodes().Editable()) {
+				if (node is Widget) {
+					var widget = node as Widget;
+					var originalSize = widget.Texture == null ? Widget.DefaultWidgetSize : (Vector2)widget.Texture.ImageSize;
+					Core.Operations.SetProperty.Perform(node, nameof(Widget.Size), originalSize);
+				} else if (node is ParticleModifier) {
+					var particleModifier = node as ParticleModifier;
+					var originalSize = particleModifier.Texture == null ? Widget.DefaultWidgetSize : (Vector2)particleModifier.Texture.ImageSize;
+					Core.Operations.SetProperty.Perform(node, nameof(ParticleModifier.Size), originalSize);
+				}
 			}
 		}
 	}
