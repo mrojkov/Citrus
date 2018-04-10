@@ -181,6 +181,8 @@ namespace Lime
 
 		public static int CalcBundleCheckSum(string bundlePath)
 		{
+			// "Modified FNV with good avalanche behavior and uniform distribution with larger hash sizes."
+			// see http://papa.bretmulvey.com/post/124027987928/hash-functions for algo
 			using (var stream = new FileStream(bundlePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
 				var data = new byte[16 * 1024];
 				int size = stream.Read(data, 0, data.Length);
