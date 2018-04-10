@@ -75,7 +75,7 @@ namespace Lime
 
 		public override void AddToRenderChain(RenderChain chain)
 		{
-			if (Enabled) {
+			if (Enabled && !(Application.IsTangerine && GetTangerineFlag(TangerineFlags.Hidden))) {
 				IImageCombinerArg arg1, arg2;
 				if (GetArgs(out arg1, out arg2)) {
 					arg1.SkipRender();
