@@ -17,7 +17,7 @@ namespace Orange.Source
 
 		public override int Execute(StringBuilder output = null)
 		{
-			return Process.Start(BuilderPath, string.Format("\"{0}\" {1}", SlnPath, Args), output: output);
+			return Process.Start($"cmd", $"/C \"set BUILDING_WITH_ORANGE=true & \"{BuilderPath}\" \"{SlnPath}\" {Args}\"", output: output);
 		}
 
 		protected override void DecorateBuild()
