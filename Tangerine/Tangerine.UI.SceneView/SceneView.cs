@@ -307,13 +307,14 @@ namespace Tangerine.UI.SceneView
 					try {
 						string assetPath, assetType;
 						if (Utils.ExtractAssetPathOrShowAlert(file, out assetPath, out assetType)) {
+							var fileName = Path.GetFileNameWithoutExtension(assetPath);
 							if (assetType == ".png") {
 								pendingImages.Add(assetPath);
 							} else if (assetType == ".ogg") {
 								var node = Core.Operations.CreateNode.Perform(typeof(Audio));
 								var sample = new SerializableSample(assetPath);
 								Core.Operations.SetProperty.Perform(node, nameof(Audio.Sample), sample);
-								Core.Operations.SetProperty.Perform(node, nameof(Node.Id), Path.GetFileNameWithoutExtension(assetPath));
+								Core.Operations.SetProperty.Perform(node, nameof(Node.Id), fileName);
 								Core.Operations.SetProperty.Perform(node, nameof(Audio.Volume), 1);
 								var key = new Keyframe<AudioAction> {
 									Frame = Document.Current.AnimationFrame,
@@ -324,6 +325,7 @@ namespace Tangerine.UI.SceneView
 								var scene = Node.CreateFromAssetBundle(assetPath);
 								var node = Core.Operations.CreateNode.Perform(scene.GetType());
 								Core.Operations.SetProperty.Perform(node, nameof(Widget.ContentsPath), assetPath);
+								Core.Operations.SetProperty.Perform(node, nameof(Node.Id), fileName);
 								if (scene is Widget) {
 									Core.Operations.SetProperty.Perform(node, nameof(Widget.Position), widgetPos);
 									Core.Operations.SetProperty.Perform(node, nameof(Widget.Pivot), Vector2.Half);
