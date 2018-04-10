@@ -54,14 +54,17 @@ namespace Tangerine.UI.SceneView
 					Utils.ChangeCursorIfDefault(cursor);
 					var proportional = sv.Input.IsKeyPressed(Key.Shift);
 
-					if (sv.Input.IsKeyPressed(Key.Control)) {
-						RescaleWidgets(hull, widgets.Count <= 1, pivot, widgets, controlPointIndex, sv.MousePosition, mouseStartPos,
-							proportional);
-					} else {
-						foreach (Widget widget in widgets) {
-							ResizeWidget(widget, controlPointIndex, sv.MousePosition, mouseStartPos, proportional);
-						}
-					}
+					RescaleWidgets(widgets.Count <= 1,
+						sv.Input.IsKeyPressed(Key.Control)
+							? (widgets.Count <= 1 ? (Vector2?) null : pivot)
+							: hull[LookupPivotIndex[controlPointIndex] / 2],
+						widgets,
+						controlPointIndex,
+						sv.MousePosition,
+						mouseStartPos,
+						proportional,
+						!sv.Input.IsKeyPressed(Key.Control)
+					);
 
 					yield return null;
 				}
@@ -86,99 +89,24 @@ namespace Tangerine.UI.SceneView
 			new[] {true, false},
 		};
 
-		readonly Vector2[] directionLookup = {
-			new Vector2(-1, -1),
-			new Vector2(0, -1),
-			new Vector2(1, -1),
-			new Vector2(1, 0),
-			new Vector2(1, 1),
-			new Vector2(0, 1),
-			new Vector2(-1, 1),
-			new Vector2(-1, 0),
-		};
-
-		readonly Vector2[] positionLookup = {
-			new Vector2(1, 1),
-			new Vector2(0, 1),
-			new Vector2(0, 1),
-			new Vector2(0, 0),
-			new Vector2(0, 0),
-			new Vector2(0, 0),
-			new Vector2(1, 0),
-			new Vector2(1, 0),
-		};
-
-		void ResizeWidget(Widget widget, int controlPointIndex, Vector2 curMousePos, Vector2 prevMousePos, bool proportional)
-		{
-			var mouseDelta = curMousePos - prevMousePos;
-			var transform = sv.Scene.CalcTransitionToSpaceOf(widget.ParentWidget);
-			var transformedMouseDelta = Vector2.RotateDeg(mouseDelta * transform - Vector2.Zero * transform, -widget.Rotation);
-			var deltaSize = transformedMouseDelta * directionLookup[controlPointIndex];
-			var deltaPosition = transformedMouseDelta * positionLookup[controlPointIndex];
-			var avSize = 0.5f * (deltaSize.X + deltaSize.Y);
-			var avPos = 0.5f * (deltaPosition.Y + deltaPosition.X);
-			if (proportional) {
-				switch (controlPointIndex) {
-					case 0:
-					case 4:
-						deltaSize.X = avSize;
-						deltaSize.Y = avSize;
-						deltaPosition.X = avPos;
-						deltaPosition.Y = avPos;
-						break;
-					case 2:
-						deltaSize.X = avSize;
-						deltaSize.Y = avSize;
-						deltaPosition.Y = -avSize;
-						break;
-					case 1:
-					case 5:
-						deltaSize.X = deltaSize.Y;
-						deltaPosition.X = deltaPosition.Y;
-						break;
-					case 6:
-						deltaSize.X = avSize;
-						deltaSize.Y = avSize;
-						deltaPosition.X = -avSize;
-						break;
-					case 3:
-					case 7:
-						deltaSize.Y = deltaSize.X;
-						break;
-				}
-			}
-
-			var size = widget.Size + (deltaSize / widget.Scale).Snap(Vector2.Zero);
-			if (float.IsInfinity(size.X)) {
-				size.X = size.X.Sign() * Mathf.ZeroTolerance;
-			}
-			if (float.IsInfinity(size.Y)) {
-				size.Y = size.Y.Sign() * Mathf.ZeroTolerance;
-			}
-
-			var position = widget.Position +
-					Vector2.RotateDeg(deltaPosition + widget.Pivot * deltaSize, widget.Rotation).Snap(Vector2.Zero);
-			Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), position, CoreUserPreferences.Instance.AutoKeyframes);
-			Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Size), size, CoreUserPreferences.Instance.AutoKeyframes);
-		}
-
-		void RescaleWidgets(Quadrangle originalHull, bool hullInFirstWidgetSpace, Vector2 hullsPivotPoint, List<Widget> widgets, int controlPointIndex,
-			Vector2 curMousePos, Vector2 prevMousePos, bool proportional)
+		void RescaleWidgets(bool hullInFirstWidgetSpace, Vector2? pivotPoint, List<Widget> widgets, int controlPointIndex,
+			Vector2 curMousePos, Vector2 prevMousePos, bool proportional, bool convertScaleToSize)
 		{
 			ComplexTransformationsHelper.ApplyTransformationToWidgetsGroupObb(
 				sv.Scene,
-				widgets, hullsPivotPoint, hullInFirstWidgetSpace, curMousePos, prevMousePos,
+				widgets, pivotPoint, hullInFirstWidgetSpace, curMousePos, prevMousePos,
+				convertScaleToSize,
 				(Vector2d originalVectorInObbSpace, Vector2d deformedVectorInObbSpace, out double obbTransformationRotationDeg) => {
 					Vector2d deformationScaleInObbSpace =
-							new Vector2d(
-								Math.Abs(originalVectorInObbSpace.X) < Mathf.ZeroTolerance
-									? 1
-									: deformedVectorInObbSpace.X / originalVectorInObbSpace.X,
-								Math.Abs(originalVectorInObbSpace.Y) < Mathf.ZeroTolerance
-									? 1
-									: deformedVectorInObbSpace.Y / originalVectorInObbSpace.Y
-							);
-					
+						new Vector2d(
+							Math.Abs(originalVectorInObbSpace.X) < Mathf.ZeroTolerance
+								? 1
+								: deformedVectorInObbSpace.X / originalVectorInObbSpace.X,
+							Math.Abs(originalVectorInObbSpace.Y) < Mathf.ZeroTolerance
+								? 1
+								: deformedVectorInObbSpace.Y / originalVectorInObbSpace.Y
+						);
+
 					if (!LookupInvolvedAxes[controlPointIndex][0]) {
 						deformationScaleInObbSpace.X = proportional ? deformationScaleInObbSpace.Y : 1;
 					} else if (!LookupInvolvedAxes[controlPointIndex][1]) {

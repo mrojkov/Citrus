@@ -61,7 +61,10 @@ namespace Tangerine.UI.SceneView
 		{
 			ComplexTransformationsHelper.ApplyTransformationToWidgetsGroupObb(
 				sv.Scene,
-				widgets, pivotPoint, widgets.Count <= 1, curMousePos, prevMousePos,
+				widgets,
+				widgets.Count <= 1 ? (Vector2?) null : pivotPoint, widgets.Count <= 1, 
+				curMousePos, prevMousePos,
+				false,
 				(Vector2d originalVectorInObbSpace, Vector2d deformedVectorInObbSpace, out double obbTransformationRotationDeg) => {
 
 					double rotation = 0;

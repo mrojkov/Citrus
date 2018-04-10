@@ -17,9 +17,9 @@ namespace Tangerine.UI.SceneView.ComplexTransforms
 			Vector2d toDeformedVectorInObbSpace, out double obbTransformationRotationDeg);
 
 		public static void ApplyTransformationToWidgetsGroupObb(Widget sceneWidget, IList<Widget> widgetsInParentSpace,
-			Vector2 pivotInSceneSpace, bool obbInFirstWidgetSpace,
+			Vector2? overridePivotInSceneSpace, bool obbInFirstWidgetSpace,
 			Vector2 currentMousePosInSceneSpace, Vector2 previousMousePosSceneSpace,
-			CalculateTransformationDelegate onCalculateTransformation)
+			bool convertScaleToSize, CalculateTransformationDelegate onCalculateTransformation)
 		{
 			if (widgetsInParentSpace.Count == 0) return;
 
@@ -28,39 +28,47 @@ namespace Tangerine.UI.SceneView.ComplexTransforms
 
 			ApplyTransformationToWidgetsGroupObb(
 				widgetsInParentSpace,
-				(Vector2d) pivotInSceneSpace * fromSceneToParentSpace,
+				overridePivotInSceneSpace == null
+					? (Vector2d?) null
+					: ((Vector2d) overridePivotInSceneSpace.Value * fromSceneToParentSpace),
 				obbInFirstWidgetSpace,
 				(Vector2d) currentMousePosInSceneSpace * fromSceneToParentSpace,
 				(Vector2d) previousMousePosSceneSpace * fromSceneToParentSpace,
-				onCalculateTransformation
-			);
+				convertScaleToSize, onCalculateTransformation);
 		}
 
 		public static void ApplyTransformationToWidgetsGroupObb(IList<Widget> widgetsInParentSpace,
-			Vector2d pivotInParentSpace, bool obbInFirstWidgetSpace,
+			Vector2d? overridePivotInParentSpace, bool obbInFirstWidgetSpace,
 			Vector2d currentMousePosInParentSpace, Vector2d previousMousePosInParentSpace,
-			CalculateTransformationDelegate onCalculateTransformation)
+			bool convertScaleToSize, CalculateTransformationDelegate onCalculateTransformation)
 		{
 			if (widgetsInParentSpace.Count == 0) return;
 
 			// Importent. Try to correct the pivot point to the closest pivot of one of widgets.
-			if (!obbInFirstWidgetSpace) {
+			if (overridePivotInParentSpace != null) {
 				foreach (Widget widget in widgetsInParentSpace) {
-					double length = ((Vector2d) widget.Position - pivotInParentSpace).Length;
+					double length = ((Vector2d) widget.Position - overridePivotInParentSpace.Value).Length;
 					if (length <= 1e-3) {
-						pivotInParentSpace = (Vector2d) widget.Position;
+						overridePivotInParentSpace = (Vector2d) widget.Position;
 						break;
 					}
 				}
 			}
 
-			Matrix32d originalObbToParentSpace = Matrix32d.Translation(pivotInParentSpace);
-			if (obbInFirstWidgetSpace) {
+			Matrix32d originalObbToParentSpace;
+			if (!obbInFirstWidgetSpace) {
+				originalObbToParentSpace =
+					Matrix32d.Translation(overridePivotInParentSpace ?? (Vector2d) widgetsInParentSpace[0].Position);
+			} else {
 				Widget widgetFirst = widgetsInParentSpace[0];
 
 				WidgetZeroScalePreserver zeroScalePreserver = new WidgetZeroScalePreserver(widgetFirst);
 				zeroScalePreserver.Store();
 
+				// Nullify Pivot and Scale, to simplify transformation matrix from M = mT' * mR * mS * mT, to M = mR * mT,
+				// to be able to use it with complex transformation by user (U = uT' uR * uS * uT), as
+				// dM = U * M, instead of we must make dM = mT' * uR * mR * uS * mS * uT * mT,
+				// and now if mT' = 1 and mS = 1 and uT = 1 it is reduced to dM = uT' * uS * uR * mR * mT = U * M.
 				Matrix32d firstWidgetToParentSpace;
 				Vector2 savedPivot = widgetFirst.Pivot;
 				Vector2 savedScale = widgetFirst.Scale;
@@ -68,6 +76,9 @@ namespace Tangerine.UI.SceneView.ComplexTransforms
 				widgetFirst.Scale = Vector2.One;
 				try {
 					firstWidgetToParentSpace = widgetFirst.CalcLocalToParentTransformDouble();
+					if (overridePivotInParentSpace != null) {
+						firstWidgetToParentSpace.T = overridePivotInParentSpace.Value;
+					}
 				} finally {
 					widgetFirst.Pivot = savedPivot;
 					widgetFirst.Scale = savedScale;
@@ -79,13 +90,13 @@ namespace Tangerine.UI.SceneView.ComplexTransforms
 
 			ApplyTransformationToWidgetsGroupObb(
 				widgetsInParentSpace, originalObbToParentSpace,
-				currentMousePosInParentSpace, previousMousePosInParentSpace, onCalculateTransformation
-			);
+				currentMousePosInParentSpace, previousMousePosInParentSpace,
+				convertScaleToSize, onCalculateTransformation);
 		}
 
 		public static void ApplyTransformationToWidgetsGroupObb(IEnumerable<Widget> widgetsInParentSpace,
 			Matrix32d obbInParentSpace, Vector2d currentMousePosInParentSpace, Vector2d previousMousePosInParentSpace,
-			CalculateTransformationDelegate onCalculateTransformation)
+			bool convertScaleToSize, CalculateTransformationDelegate onCalculateTransformation)
 		{
 			if (Math.Abs(obbInParentSpace.CalcDeterminant()) < Mathf.ZeroTolerance) return;
 
@@ -104,12 +115,14 @@ namespace Tangerine.UI.SceneView.ComplexTransforms
 			);
 
 			ApplyTransformationToWidgetsGroupObb(
-				widgetsInParentSpace, obbInParentSpace, deformationInObbSpace, obbTransformationRotationDeg
+				widgetsInParentSpace, obbInParentSpace, deformationInObbSpace, obbTransformationRotationDeg,
+				convertScaleToSize
 			);
 		}
 
 		public static void ApplyTransformationToWidgetsGroupObb(IEnumerable<Widget> widgetsInParentSpace,
-			Matrix32d obbInParentSpace, Matrix32d obbTransformation, double obbTransformationRotationDeg)
+			Matrix32d obbInParentSpace, Matrix32d obbTransformation, double obbTransformationRotationDeg,
+			bool convertScaleToSize)
 		{
 			Matrix32d originalObbToParentSpace = obbInParentSpace;
 
@@ -152,8 +165,18 @@ namespace Tangerine.UI.SceneView.ComplexTransforms
 
 						zeroScalePreserver.Restore();
 
-						SetAnimableProperty.Perform(widget, nameof(Widget.Scale), useScale,
-							CoreUserPreferences.Instance.AutoKeyframes);
+						if (!convertScaleToSize) {
+							SetAnimableProperty.Perform(widget, nameof(Widget.Scale), useScale,
+								CoreUserPreferences.Instance.AutoKeyframes);
+						} else {
+							Vector2 useSize = new Vector2(
+								Math.Abs(widget.Scale.X) < 1e-5 ? widget.Size.X : widget.Size.X * Math.Abs(useScale.X / widget.Scale.X),
+								Math.Abs(widget.Scale.Y) < 1e-5 ? widget.Size.Y : widget.Size.Y * Math.Abs(useScale.Y / widget.Scale.Y)
+							);
+							SetAnimableProperty.Perform(widget, nameof(Widget.Size), useSize,
+								CoreUserPreferences.Instance.AutoKeyframes);
+						}
+
 					}
 
 					bool needChangePositionX = Math.Abs(widget.Position.X - widgetResultTransform.Translation.X) > 1e-5 &&

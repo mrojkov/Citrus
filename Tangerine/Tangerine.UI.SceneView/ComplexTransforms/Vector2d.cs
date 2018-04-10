@@ -411,8 +411,5 @@ namespace Lime
 			return vector;
 		}
 
-		private static Vector2d[] sinTable0;
-		private static Vector2d[] sinTable1;
-
 	}
 }
