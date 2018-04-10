@@ -165,12 +165,13 @@ namespace Tangerine.UI.Timeline
 
 			for (var row = 0; row < Document.Current.Rows.Count; row++) {
 				var spans = gridSpans[row];
-				var gridWidgetBottom = Document.Current.Rows[row].GridWidget().Bottom();
 				int? lastColumn = null;
 				var topSpans = row > 0 ? gridSpans[row - 1].GetEnumerator() : (IEnumerator<Components.GridSpan>)null;
 				var bottomSpans = row + 1 < Document.Current.Rows.Count ? gridSpans[row + 1].GetEnumerator() : (IEnumerator<Components.GridSpan>)null;
 				Components.GridSpan? topSpan = null;
 				Components.GridSpan? bottomSpan = null;
+				var offsetRow = row + offset.Y;
+				var gridWidgetBottom = (0 <= offsetRow && offsetRow < Document.Current.Rows.Count) ? (float?)Document.Current.Rows[offsetRow].GridWidget().Bottom() : null;
 				for (var i = 0; i < spans.Count; i++) {
 					var span = spans[i];
 					var isLastSpan = i + 1 == spans.Count;
@@ -204,7 +205,7 @@ namespace Tangerine.UI.Timeline
 						var a = CellToGridCoordinates(new IntVector2(column, row) + offset);
 						var b = CellToGridCoordinates(new IntVector2(column + 1, row + 1) + offset);
 						a = new Vector2(a.X + 1.5f, a.Y + 0.5f);
-						b = new Vector2(b.X - 0.5f, gridWidgetBottom - 0.5f);
+						b = new Vector2(b.X - 0.5f, (gridWidgetBottom ?? b.Y) - 0.5f);
 						Renderer.DrawRect(a + Vector2.Up * 0.5f, b + new Vector2(1f + (absentRightCell ? 0 : 1), (absentBottomCell ? 0 : 1)), ColorTheme.Current.TimelineGrid.Selection);
 						if (absentLeftCell) {
 							Renderer.DrawLine(a.X, a.Y - (absentTopCell ? 0 : 1), a.X, b.Y + (absentBottomCell ? 0 : 1), ColorTheme.Current.TimelineGrid.SelectionBorder, cap: LineCap.Square);
