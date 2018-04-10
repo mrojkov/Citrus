@@ -7,7 +7,7 @@ namespace Orange
 	{
 		string Directory { get; }
 		Predicate<FileInfo> EnumerationFilter { get; set; }
-		List<FileInfo> Enumerate(string extension = null);
+		IEnumerable<FileInfo> Enumerate(string extension = null);
 		void Rescan();
 	}
 }

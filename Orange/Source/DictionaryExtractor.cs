@@ -94,8 +94,7 @@ namespace Orange
 				}
 			}
 			using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
-				var files = The.Workspace.AssetFiles.Enumerate(".scene");
-				files.AddRange(The.Workspace.AssetFiles.Enumerate(".tan"));
+				var files = The.Workspace.AssetFiles.Enumerate(".scene").Concat(The.Workspace.AssetFiles.Enumerate(".tan"));
 				foreach (var fileInfo in files) {
 					// First of all scan lines like this: "[]..."
 					ProcessSourceFile(fileInfo.Path);
@@ -148,7 +147,7 @@ namespace Orange
 
 		private string GetContext(string file)
 		{
-			return file;	
+			return file;
 		}
 
 		private static bool IsCorrectTaggedString(string str)
@@ -167,7 +166,7 @@ namespace Orange
 				}
 				AddToDictionaryHelper(Unescape(key), value, context);
 			} else {
-				// The line has no [] prefix, but still should be localized. 
+				// The line has no [] prefix, but still should be localized.
 				// E.g. most of texts in scene files.
 				AddToDictionaryHelper(Unescape(key), Unescape(key), context);
 			}

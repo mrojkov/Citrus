@@ -81,14 +81,13 @@ namespace Tangerine.UI.FilesystemView
 			}
 		}
 
-		public List<Orange.FileInfo> Enumerate(string extension = null)
+		public IEnumerable<Orange.FileInfo> Enumerate(string extension = null)
 		{
 			if (extension == null && EnumerationFilter == null) {
 				return files;
 			}
-			return files.Where(file => extension == null || Path.GetExtension(file.Path) == extension)
-				.Where(file => EnumerationFilter == null || EnumerationFilter(file))
-				.ToList();
+			return files.Where(file => extension == null || file.Path.EndsWith(extension))
+				.Where(file => EnumerationFilter == null || EnumerationFilter(file));
 		}
 	}
 }
