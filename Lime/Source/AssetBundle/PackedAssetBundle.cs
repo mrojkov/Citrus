@@ -135,18 +135,19 @@ namespace Lime
 
 	public class PackedAssetBundle : AssetBundle
 	{
-		readonly Stack<Stream> streamPool = new Stack<Stream>();
+		private readonly Stack<Stream> streamPool = new Stack<Stream>();
 		const int Signature = 0x13AF;
-		int indexOffset;
-		readonly BinaryReader reader;
-		readonly BinaryWriter writer;
-		readonly Stream stream;
-		AssetBundleFlags flags;
+		private int indexOffset;
+		private readonly BinaryReader reader;
+		private readonly BinaryWriter writer;
+		private readonly Stream stream;
+		private AssetBundleFlags flags;
 		internal Dictionary <string, AssetDescriptor> index = new Dictionary<string, AssetDescriptor>();
-		readonly List<AssetDescriptor> trash = new List<AssetDescriptor>();
-		readonly System.Reflection.Assembly resourcesAssembly;
-
+		private readonly List<AssetDescriptor> trash = new List<AssetDescriptor>();
+		private readonly System.Reflection.Assembly resourcesAssembly;
+		private bool wasModified { get; set; }
 		public string Path { get; private set; }
+		public event Action OnModifying;
 
 		PackedAssetBundle() {}
 
@@ -217,7 +218,8 @@ namespace Lime
 					return true;
 				}
 				var reader = new BinaryReader(stream);
-				reader.ReadInt32(); // Bundle signature
+				// Bundle signature
+				reader.ReadInt32();
 				int storedCheckSum = reader.ReadInt32();
 				int actualCheckSum = CalcBundleCheckSum(bundlePath);
 				return storedCheckSum != actualCheckSum;
@@ -255,6 +257,10 @@ namespace Lime
 
 		public void CleanupBundle()
 		{
+			if (trash.Count == 0) {
+				// return early to avoid modifying Date Modified of bundle file with stream.SetLength
+				return;
+			}
 			trash.Sort((x, y) => {
 				return x.Offset - y.Offset; });
 			int moveDelta = 0;
@@ -282,15 +288,19 @@ namespace Lime
 		{
 			base.Dispose();
 			if (writer != null) {
-				CleanupBundle();
-				WriteIndexTable();
-				RefreshBundleCheckSum(Path);
+				if (wasModified) {
+					CleanupBundle();
+					WriteIndexTable();
+					RefreshBundleCheckSum(Path);
+				}
 				writer.Close();
 			}
-			if (reader != null)
+			if (reader != null) {
 				reader.Close();
-			if (stream != null)
+			}
+			if (stream != null) {
 				stream.Close();
+			}
 			index.Clear();
 			while (streamPool.Count > 0) {
 				streamPool.Pop().Dispose();
@@ -339,10 +349,12 @@ namespace Lime
 
 		public override void DeleteFile(string path)
 		{
+			OnModifying?.Invoke();
 			path = AssetPath.CorrectSlashes(path);
 			var desc = GetDescriptor(path);
 			index.Remove(path);
 			trash.Add(desc);
+			wasModified = true;
 		}
 
 		public override bool FileExists(string path)
@@ -357,12 +369,15 @@ namespace Lime
 
 		public override void SetAttributes(string path, AssetAttributes attributes)
 		{
+			OnModifying?.Invoke();
 			var desc = GetDescriptor(path);
 			index[AssetPath.CorrectSlashes(path)] = desc;
+			wasModified = true;
 		}
 
 		public override void ImportFile(string path, Stream stream, int reserve, string sourceExtension, AssetAttributes attributes, byte[] cookingRulesSHA1)
 		{
+			OnModifying?.Invoke();
 			AssetDescriptor d;
 			if ((attributes & AssetAttributes.Zipped) != 0) {
 				stream = CompressAssetStream(stream, attributes);
@@ -404,6 +419,7 @@ namespace Lime
 				this.stream.Write(zeroBytes, 0, zeroBytes.Length);
 				this.stream.Flush();
 			}
+			wasModified = true;
 		}
 
 		private static Stream CompressAssetStream(Stream stream, AssetAttributes attributes)
