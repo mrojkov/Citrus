@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.IO;
 using System.Collections.Generic;
@@ -161,7 +161,7 @@ namespace Orange
 		/// Serves to understand on which node Exception has happened.
 		/// </summary>
 		private Stack<Node> writeNodesStack = new Stack<Node>();
-		
+
 		public HotSceneExporter()
 		{
 			nodeWriters = new Dictionary<Type, NodeWriter> {
@@ -303,7 +303,7 @@ namespace Orange
 		void Write(Node node)
 		{
 			writeNodesStack.Push(node);
-			
+
 			NodeWriter w;
 			if (!nodeWriters.TryGetValue(node.GetType(), out w)) {
 				throw new InvalidOperationException($"Unknown node type: {node.GetType()}");
@@ -332,7 +332,7 @@ namespace Orange
 				writer.EndCollection();
 			}
 			writer.EndStruct();
-			
+
 			writeNodesStack.Pop();
 		}
 
@@ -374,6 +374,8 @@ namespace Orange
 					writer.WriteLine("Keys [ " + string.Join(" ",
 						animator.ReadonlyKeys.Select((b, i) =>
 							GetHotStudioBlending((Blending)b.Value, shaderAnimator.ReadonlyKeys[i].Value).ToString())) + " ]");
+				} else if (animator is Animator<string>) {
+					writer.WriteLine("Keys [ " + string.Join(" ", animator.ReadonlyKeys.Select(i => ObjectToString(i.Value ?? string.Empty))) + " ]");
 				} else {
 					writer.WriteLine("Keys [ " + string.Join(" ", animator.ReadonlyKeys.Select(i => ObjectToString(i.Value))) + " ]");
 				}
@@ -745,6 +747,6 @@ namespace Orange
 		{
 			return writeNodesStack;
 		}
-		
+
 	}
 }
