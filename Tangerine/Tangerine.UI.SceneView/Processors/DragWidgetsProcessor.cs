@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
-using Tangerine.UI.SceneView.ComplexTransforms;
+using Tangerine.UI.SceneView.WidgetTransforms;
 
 namespace Tangerine.UI.SceneView
 {
@@ -91,7 +91,7 @@ namespace Tangerine.UI.SceneView
 						}
 					}
 
-					ComplexTransformationsHelper.ApplyTransformationToWidgetsGroupObb(
+					WidgetTransformsHelper.ApplyTransformationToWidgetsGroupObb(
 						sv.Scene,
 						widgets, widgets.Count <= 1 ? (Vector2?) null : pivot, widgets.Count <= 1, initialMousePos + mouseDelta,
 						initialMousePos,

@@ -4,7 +4,7 @@ using System.Linq;
 using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Operations;
-using Tangerine.UI.SceneView.ComplexTransforms;
+using Tangerine.UI.SceneView.WidgetTransforms;
 
 namespace Tangerine.UI.SceneView
 {
@@ -59,7 +59,7 @@ namespace Tangerine.UI.SceneView
 		private void RotateWidgets(Vector2 pivotPoint, List<Widget> widgets, Vector2 curMousePos, Vector2 prevMousePos,
 			bool snapped, List<Tuple<Widget, AccumulativeRotationHelper>> accumulativeRotationHelpers)
 		{
-			ComplexTransformationsHelper.ApplyTransformationToWidgetsGroupObb(
+			WidgetTransformsHelper.ApplyTransformationToWidgetsGroupObb(
 				sv.Scene,
 				widgets,
 				widgets.Count <= 1 ? (Vector2?) null : pivotPoint, widgets.Count <= 1, 
@@ -74,7 +74,7 @@ namespace Tangerine.UI.SceneView
 					}
 
 					if (snapped) {
-						rotation = ComplexTransformationsHelper.RoundTo(rotation, 15);
+						rotation = WidgetTransformsHelper.RoundTo(rotation, 15);
 					}
 
 					foreach (Tuple<Widget, AccumulativeRotationHelper> tuple in accumulativeRotationHelpers) {

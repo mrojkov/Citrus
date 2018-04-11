@@ -1,6 +1,4 @@
-using System;
-
-namespace Lime
+namespace Tangerine.UI.SceneView.WidgetTransforms
 {
 	public static class Mathd
 	{

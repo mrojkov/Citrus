@@ -4,13 +4,13 @@ using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Operations;
 
-namespace Tangerine.UI.SceneView.ComplexTransforms
+namespace Tangerine.UI.SceneView.WidgetTransforms
 {
 	/// <summary>
 	/// All this code is serves to increase ACCURACY of mathematical transformations.
 	/// That is why it is uses double numbers and a calculation of optimal transition matrices.
 	/// </summary>
-	public static class ComplexTransformationsHelper
+	public static class WidgetTransformsHelper
 	{
 
 		public delegate Matrix32d CalculateTransformationDelegate(Vector2d fromOriginalVectorInObbSpace,

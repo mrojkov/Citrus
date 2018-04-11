@@ -1,4 +1,6 @@
-namespace Lime
+using Lime;
+
+namespace Tangerine.UI.SceneView.WidgetTransforms
 {
 	public struct Transform2d
 	{

@@ -2,9 +2,10 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using Lime;
 using Yuzu;
 
-namespace Lime
+namespace Tangerine.UI.SceneView.WidgetTransforms
 {
 	/// <summary>
 	/// Representation of 2D vectors and points.

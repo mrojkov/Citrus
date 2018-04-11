@@ -1,7 +1,7 @@
 ﻿using System;
 using Lime;
 
-namespace Tangerine.UI.SceneView.ComplexTransforms
+namespace Tangerine.UI.SceneView.WidgetTransforms
 {
 	public class WidgetZeroScalePreserver
 	{

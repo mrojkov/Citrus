@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
-using Tangerine.UI.SceneView.ComplexTransforms;
+using Tangerine.UI.SceneView.WidgetTransforms;
 
 namespace Tangerine.UI.SceneView
 {
@@ -92,7 +92,7 @@ namespace Tangerine.UI.SceneView
 		void RescaleWidgets(bool hullInFirstWidgetSpace, Vector2? pivotPoint, List<Widget> widgets, int controlPointIndex,
 			Vector2 curMousePos, Vector2 prevMousePos, bool proportional, bool convertScaleToSize)
 		{
-			ComplexTransformationsHelper.ApplyTransformationToWidgetsGroupObb(
+			WidgetTransformsHelper.ApplyTransformationToWidgetsGroupObb(
 				sv.Scene,
 				widgets, pivotPoint, hullInFirstWidgetSpace, curMousePos, prevMousePos,
 				convertScaleToSize,
