@@ -511,7 +511,7 @@ namespace Orange
 		{
 			WriteProperty("Name", node.Id, null);
 			WriteProperty("Source", RestorePath(node.ContentsPath, ".scene"), null);
-			WriteProperty("Attributes", (int)node.TangerineFlags, 0);
+			WriteProperty("Attributes", (int)node.TangerineFlags & 7, 0);
 			WriteProperty("Trigger", node.Trigger, string.Empty);
 			WriteProperty("Tag", node.Tag, string.Empty);
 		}
