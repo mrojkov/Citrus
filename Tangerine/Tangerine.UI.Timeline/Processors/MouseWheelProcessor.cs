@@ -52,7 +52,7 @@ namespace Tangerine.UI.Timeline
 				var prevColWidth = TimelineMetrics.ColWidth;
 				TimelineMetrics.ColWidth = (TimelineMetrics.ColWidth + delta).Clamp(5, 30);
 				if (prevColWidth != TimelineMetrics.ColWidth) {
-					var mp = timeline.Grid.RootWidget.Input.LocalMousePosition.X + Timeline.Instance.Offset.X;
+					var mp = timeline.Grid.RootWidget.LocalMousePosition().X + Timeline.Instance.Offset.X;
 					Timeline.Instance.OffsetX += (mp / prevColWidth) * delta;
 					Core.Operations.Dummy.Perform();
 				}

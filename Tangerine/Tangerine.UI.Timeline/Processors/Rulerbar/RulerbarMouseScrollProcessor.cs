@@ -19,11 +19,11 @@ namespace Tangerine.UI.Timeline
 					Document.Current.History.BeginTransaction();
 					Operations.SetCurrentColumn.Processor.CacheAnimationsStates = true;
 					try {
-						int initialCol = CalcColumn(input.LocalMousePosition.X);
+						int initialCol = CalcColumn(rulerWidget.LocalMousePosition().X);
 						var marker = Document.Current.Container.Markers.FirstOrDefault(m => m.Frame == initialCol);
 						while (input.IsMousePressed()) {
 							var cw = TimelineMetrics.ColWidth;
-							var mp = input.LocalMousePosition.X;
+							var mp = rulerWidget.LocalMousePosition().X;
 							if (mp > rulerWidget.Width - cw / 2) {
 								timeline.OffsetX += cw;
 							} else if (mp < cw / 2) {

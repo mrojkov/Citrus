@@ -62,7 +62,7 @@ namespace Tangerine.UI
 			}
 			if (key == Key.Mouse0) {
 				scrollView.SetFocus();
-				selectedIndex = (resultPane.Input.LocalMousePosition.Y / rowHeight).Floor().Clamp(0, results.Count - 1);
+				selectedIndex = (resultPane.LocalMousePosition().Y / rowHeight).Floor().Clamp(0, results.Count - 1);
 			} else if (key == Cmds.Down) {
 				selectedIndex++;
 			} else if (key == Cmds.Up) {

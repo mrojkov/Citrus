@@ -34,7 +34,7 @@ namespace Tangerine.UI.Timeline
 			if (d < 0.1f && zoomIn || d > 100000 && !zoomIn) {
 				return;
 			}
-			var v = curveEditor.CoordToValue(curveEditor.MainAreaWidget.Input.LocalMousePosition.Y);
+			var v = curveEditor.CoordToValue(curveEditor.MainAreaWidget.LocalMousePosition().Y);
 			var k = zoomIn ? 0.9f : 1.1f;
 			curveEditor.MinValue = (curveEditor.MinValue - v) * k + v;
 			curveEditor.MaxValue = (curveEditor.MaxValue - v) * k + v;

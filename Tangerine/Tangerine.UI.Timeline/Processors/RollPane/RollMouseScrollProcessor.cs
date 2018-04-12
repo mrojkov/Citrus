@@ -10,18 +10,18 @@ namespace Tangerine.UI.Timeline
 
 		public IEnumerator<object> Task()
 		{
-			var input = timeline.Roll.RootWidget.Input;
+			var rollWidget = timeline.Roll.RootWidget;
 			bool wasPressed = false; 
 			while (true) {
-				if (input.IsMousePressed()) {
+				if (rollWidget.Input.IsMousePressed()) {
 					// To allow click on EnterButton when row is partly visible.
 					if (!wasPressed) {
 						yield return 0.2;
 					}
 					var s = TimelineMetrics.DefaultRowHeight;
-					if (input.LocalMousePosition.Y > timeline.Roll.RootWidget.Height - s / 2) {
+					if (rollWidget.LocalMousePosition().Y > timeline.Roll.RootWidget.Height - s / 2) {
 						timeline.OffsetY += s;
-					} else if (input.LocalMousePosition.Y < s / 2) {
+					} else if (rollWidget.LocalMousePosition().Y < s / 2) {
 						timeline.OffsetY -= s;
 					}
 					Window.Current.Invalidate();

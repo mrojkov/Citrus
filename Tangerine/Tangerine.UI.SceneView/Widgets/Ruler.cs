@@ -142,26 +142,26 @@ namespace Tangerine.UI.SceneView
 			while (true) {
 				var rect = new Rectangle(Vector2.Zero, widget.Size);
 				var hull = rect.ToQuadrangle();
-				if ((rect.Contains(widget.Input.LocalMousePosition))) {
+				if ((rect.Contains(widget.LocalMousePosition()))) {
 					if (widget.Input.WasMousePressed()) {
 						var line = GetLineUnderMouse(widget, lineOrientation);
 						if (line != null) {
 							SceneView.Instance.Components.Add(new LineSelectionComponent { Line = line });
 							while (widget.Input.IsMousePressed()) {
-								line.Val = cntr.Input.LocalMousePosition - cntr.Size / 2;
+								line.Val = cntr.LocalMousePosition() - cntr.Size / 2;
 								Window.Current.Invalidate();
 								yield return null;
 							}
 						} else {
 							line = new Line {
-								Val = cntr.Input.LocalMousePosition - cntr.Size / 2,
+								Val = cntr.LocalMousePosition() - cntr.Size / 2,
 								Orientation = lineOrientation
 							};
 							SceneView.Instance.Components.Add(new LineSelectionComponent { Line = line });
 							Lines.Add(line);
 							yield return null;
 							while (widget.Input.IsMousePressed()) {
-								line.Val = cntr.Input.LocalMousePosition - cntr.Size / 2;
+								line.Val = cntr.LocalMousePosition() - cntr.Size / 2;
 								Window.Current.Invalidate();
 								yield return null;
 							}
@@ -197,10 +197,10 @@ namespace Tangerine.UI.SceneView
 
 		private static Line GetLineUnderMouse(Widget widget, Orientation orientation)
 		{
-			var mPos = cntr.Input.LocalMousePosition;
+			var mPos = cntr.LocalMousePosition();
 			var rect = new Rectangle(Vector2.Zero, widget.Size);
 			var dir = orientation == Orientation.Vertical ? Vector2.Right : Vector2.Down;
-			if (!rect.Contains(widget.Input.LocalMousePosition))
+			if (!rect.Contains(widget.LocalMousePosition()))
 				return null;
 			return Lines.FirstOrDefault(line => line.Orientation == orientation &&
 				((line.Val + cntr.Size / 2) * dir - mPos * dir).Length <= 6f);
