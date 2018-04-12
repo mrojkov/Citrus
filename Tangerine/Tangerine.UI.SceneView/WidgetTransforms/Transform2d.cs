@@ -1,4 +1,4 @@
-using Lime;
+using System;
 
 namespace Tangerine.UI.SceneView.WidgetTransforms
 {
@@ -8,12 +8,19 @@ namespace Tangerine.UI.SceneView.WidgetTransforms
 		public Vector2d Scale;
 		public double Rotation;
 
+		public Transform2d(Vector2d translation, Vector2d scale, double rotation)
+		{
+			Translation = translation;
+			Scale = scale;
+			Rotation = rotation;
+		}
+
 		public Matrix32d ToMatrix32()
 		{
-			var v = Vector2d.CosSin(Rotation * Mathf.DegToRad) * Scale;
+			var v = Vector2d.CosSin(Rotation * Math.PI / 180.0);
 			return new Matrix32d {
-				U = v.X * new Vector2d(1, 0) + v.Y * new Vector2d(0, 1),
-				V = v.X * new Vector2d(0, 1) - v.Y * new Vector2d(1, 0),
+				U = new Vector2d(v.X, v.Y) * Scale.X,
+				V = new Vector2d(-v.Y, v.X) * Scale.Y,
 				T = Translation
 			};
 		}

@@ -65,7 +65,7 @@ namespace Tangerine.UI.SceneView
 				widgets.Count <= 1 ? (Vector2?) null : pivotPoint, widgets.Count <= 1, 
 				curMousePos, prevMousePos,
 				false,
-				(Vector2d originalVectorInObbSpace, Vector2d deformedVectorInObbSpace, out double obbTransformationRotationDeg) => {
+				(originalVectorInObbSpace, deformedVectorInObbSpace) => {
 
 					double rotation = 0;
 					if (originalVectorInObbSpace.Length > Mathf.ZeroTolerance &&
@@ -81,8 +81,7 @@ namespace Tangerine.UI.SceneView
 						tuple.Item2.Rotate((float) rotation);
 					}
 
-					obbTransformationRotationDeg = rotation;
-					return Matrix32d.Rotation(rotation * Math.PI / 180.0);
+					return new Transform2d(Vector2d.Zero, Vector2d.One, rotation);
 				}
 			);
 

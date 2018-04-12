@@ -12,9 +12,10 @@ namespace Tangerine.UI.SceneView.WidgetTransforms
 	/// </summary>
 	public static class WidgetTransformsHelper
 	{
+		private const double FloatSignificantDelta = 1e-5;
 
-		public delegate Matrix32d CalculateTransformationDelegate(Vector2d fromOriginalVectorInObbSpace,
-			Vector2d toDeformedVectorInObbSpace, out double obbTransformationRotationDeg);
+		public delegate Transform2d CalculateTransformationDelegate(Vector2d originalVectorInObbSpace,
+			Vector2d deformedVectorInObbSpace);
 
 		public static void ApplyTransformationToWidgetsGroupObb(Widget sceneWidget, IList<Widget> widgetsInParentSpace,
 			Vector2? overridePivotInSceneSpace, bool obbInFirstWidgetSpace,
@@ -107,26 +108,23 @@ namespace Tangerine.UI.SceneView.WidgetTransforms
 			Vector2d originalVectorInObbSpace = controlPointInObbSpace;
 			Vector2d deformedVectorInObbSpace = targetPointInObbSpace;
 
-			double obbTransformationRotationDeg;
-			Matrix32d deformationInObbSpace = onCalculateTransformation(
-				originalVectorInObbSpace,
-				deformedVectorInObbSpace,
-				out obbTransformationRotationDeg
+			Transform2d obbTransformation = onCalculateTransformation(
+				originalVectorInObbSpace, deformedVectorInObbSpace
 			);
 
 			ApplyTransformationToWidgetsGroupObb(
-				widgetsInParentSpace, obbInParentSpace, deformationInObbSpace, obbTransformationRotationDeg,
-				convertScaleToSize
+				widgetsInParentSpace, obbInParentSpace, obbTransformation, convertScaleToSize
 			);
 		}
 
 		public static void ApplyTransformationToWidgetsGroupObb(IEnumerable<Widget> widgetsInParentSpace,
-			Matrix32d obbInParentSpace, Matrix32d obbTransformation, double obbTransformationRotationDeg,
-			bool convertScaleToSize)
+			Matrix32d obbInParentSpace, Transform2d obbTransformation, bool convertScaleToSize)
 		{
 			Matrix32d originalObbToParentSpace = obbInParentSpace;
 
 			if (Math.Abs(originalObbToParentSpace.CalcDeterminant()) < Mathf.ZeroTolerance) return;
+
+			Matrix32d obbTransformationMatrix = obbTransformation.ToMatrix32();
 
 			foreach (Widget widget in widgetsInParentSpace) {
 				WidgetZeroScalePreserver zeroScalePreserver = new WidgetZeroScalePreserver(widget);
@@ -137,24 +135,20 @@ namespace Tangerine.UI.SceneView.WidgetTransforms
 					Matrix32d widgetToOriginalObbSpace = widgetToParentSpace * originalObbToParentSpace.CalcInversed();
 
 					// Calculate the new obb transformation in the parent space.
-					Matrix32d deformedObbToParentSpace = obbTransformation * originalObbToParentSpace;
+					Matrix32d deformedObbToParentSpace = obbTransformationMatrix * originalObbToParentSpace;
 
 					Matrix32d deformedWidgetToParentSpace = widgetToOriginalObbSpace * deformedObbToParentSpace;
 
 					Transform2d widgetResultTransform = widget.ExtractTransform2Double(deformedWidgetToParentSpace,
-						widget.Rotation + obbTransformationRotationDeg);
+						widget.Rotation + obbTransformation.Rotation);
 
 					// Correct a rotation delta, to prevent wrong values if a new angle 0 and previous is 359,
 					// then rotationDelta must be 1.
 					double rotationDelta = Mathd.Wrap180(widgetResultTransform.Rotation - widget.Rotation);
 
 					// Reduce an influence of small transformations (Scale, Position, Rotation).
-					bool needChangeScaleX = Math.Abs(widget.Scale.X - widgetResultTransform.Scale.X) > 1e-5 &&
-						Math.Abs(widget.Scale.X - widgetResultTransform.Scale.X) /
-						Math.Max(1e-5, Math.Abs((double) widget.Scale.X)) > 1e-5;
-					bool needChangeScaleY = Math.Abs(widget.Scale.Y - widgetResultTransform.Scale.Y) > 1e-5 &&
-						Math.Abs(widget.Scale.Y - widgetResultTransform.Scale.Y) /
-						Math.Max(1e-5, Math.Abs((double) widget.Scale.Y)) > 1e-5;
+					bool needChangeScaleX = IsSignificantChangeOfValue(widget.Scale.X, widgetResultTransform.Scale.X);
+					bool needChangeScaleY = IsSignificantChangeOfValue(widget.Scale.Y, widgetResultTransform.Scale.Y);
 
 					if (needChangeScaleX || needChangeScaleY) {
 						Vector2 useScale = new Vector2(
@@ -170,8 +164,12 @@ namespace Tangerine.UI.SceneView.WidgetTransforms
 								CoreUserPreferences.Instance.AutoKeyframes);
 						} else {
 							Vector2 useSize = new Vector2(
-								Math.Abs(widget.Scale.X) < 1e-5 ? widget.Size.X : widget.Size.X * Math.Abs(useScale.X / widget.Scale.X),
-								Math.Abs(widget.Scale.Y) < 1e-5 ? widget.Size.Y : widget.Size.Y * Math.Abs(useScale.Y / widget.Scale.Y)
+								Math.Abs(widget.Scale.X) < FloatSignificantDelta
+									? widget.Size.X
+									: widget.Size.X * Math.Abs(useScale.X / widget.Scale.X),
+								Math.Abs(widget.Scale.Y) < FloatSignificantDelta
+									? widget.Size.Y
+									: widget.Size.Y * Math.Abs(useScale.Y / widget.Scale.Y)
 							);
 							SetAnimableProperty.Perform(widget, nameof(Widget.Size), useSize,
 								CoreUserPreferences.Instance.AutoKeyframes);
@@ -179,12 +177,8 @@ namespace Tangerine.UI.SceneView.WidgetTransforms
 
 					}
 
-					bool needChangePositionX = Math.Abs(widget.Position.X - widgetResultTransform.Translation.X) > 1e-5 &&
-						Math.Abs(widget.Position.X - widgetResultTransform.Translation.X) /
-						Math.Max(1e-5, Math.Abs((double) widget.Position.X)) > 1e-5;
-					bool needChangePositionY = Math.Abs(widget.Position.Y - widgetResultTransform.Translation.Y) > 1e-5 &&
-						Math.Abs(widget.Position.Y - widgetResultTransform.Translation.Y) /
-						Math.Max(1e-5, Math.Abs((double) widget.Position.Y)) > 1e-5;
+					bool needChangePositionX = IsSignificantChangeOfValue(widget.Position.X, widgetResultTransform.Translation.X);
+					bool needChangePositionY = IsSignificantChangeOfValue(widget.Position.Y, widgetResultTransform.Translation.Y);
 
 					if (needChangePositionX || needChangePositionY) {
 						SetAnimableProperty.Perform(widget, nameof(Widget.Position),
@@ -195,10 +189,7 @@ namespace Tangerine.UI.SceneView.WidgetTransforms
 							CoreUserPreferences.Instance.AutoKeyframes);
 					}
 
-					if (
-						Math.Abs(rotationDelta) > 1e-5 &&
-						Math.Abs(rotationDelta) / Math.Max(1e-5, Math.Abs((double) widget.Rotation)) > 1e-5
-					) {
+					if (IsSignificantChangeByDelta(widget.Rotation, rotationDelta)) {
 						SetAnimableProperty.Perform(widget, nameof(Widget.Rotation), (float) (widget.Rotation + rotationDelta),
 							CoreUserPreferences.Instance.AutoKeyframes);
 					}
@@ -207,6 +198,17 @@ namespace Tangerine.UI.SceneView.WidgetTransforms
 					zeroScalePreserver.Restore();
 				}
 			}
+		}
+
+		private static bool IsSignificantChangeOfValue(double valuePrevious, double valueCurrent)
+		{
+			return IsSignificantChangeByDelta(valuePrevious, valuePrevious - valueCurrent);
+		}
+
+		private static bool IsSignificantChangeByDelta(double valuePrevious, double valueDelta)
+		{
+			return Math.Abs(valueDelta) > FloatSignificantDelta &&
+				Math.Abs(valueDelta) / Math.Max(FloatSignificantDelta, Math.Abs(valuePrevious)) > FloatSignificantDelta;
 		}
 
 		private static Matrix32d CalcLocalToParentTransformDouble(this Widget widget)
@@ -280,7 +282,7 @@ namespace Tangerine.UI.SceneView.WidgetTransforms
 			int useMatrixVSign = isRequiredScaleXNegative ? -1 : 1;
 
 			double rotation;
-			if (Math.Abs(Vector2d.DotProduct(useMatrixU, useMatrixV)) < 1e-5) {
+			if (Math.Abs(Vector2d.DotProduct(useMatrixU, useMatrixV)) < FloatSignificantDelta) {
 				rotation = useMatrixU.Atan2Deg;
 			} else {
 				// Calculate the correct rotation, for deformed not-perpendicular UV axes.

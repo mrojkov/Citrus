@@ -96,7 +96,7 @@ namespace Tangerine.UI.SceneView
 				sv.Scene,
 				widgets, pivotPoint, hullInFirstWidgetSpace, curMousePos, prevMousePos,
 				convertScaleToSize,
-				(Vector2d originalVectorInObbSpace, Vector2d deformedVectorInObbSpace, out double obbTransformationRotationDeg) => {
+				(originalVectorInObbSpace, deformedVectorInObbSpace) => {
 					Vector2d deformationScaleInObbSpace =
 						new Vector2d(
 							Math.Abs(originalVectorInObbSpace.X) < Mathf.ZeroTolerance
@@ -116,8 +116,7 @@ namespace Tangerine.UI.SceneView
 						deformationScaleInObbSpace.Y = deformationScaleInObbSpace.X;
 					}
 
-					obbTransformationRotationDeg = 0;
-					return Matrix32d.Scaling(deformationScaleInObbSpace);
+					return new Transform2d(Vector2d.Zero, deformationScaleInObbSpace, 0); 
 				}
 			);
 		}
