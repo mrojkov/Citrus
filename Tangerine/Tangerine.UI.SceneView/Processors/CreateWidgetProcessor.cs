@@ -11,18 +11,18 @@ namespace Tangerine.UI.SceneView
 
 		public IEnumerator<object> Task()
 		{
+			Type nodeTypeActive = null;
 			while (true) {
-				Type nodeType = null;
-				if (CreateNodeRequestComponent.Consume<Widget>(sv.Components, out nodeType)) {
-					yield return CreateWidgetTask(nodeType);
+				Type nodeTypeIncome;
+				if (CreateNodeRequestComponent.Consume<Widget>(sv.Components, out nodeTypeIncome)) {
+					nodeTypeActive = nodeTypeIncome;
 				}
-				yield return null;
-			}
-		}
 
-		IEnumerator<object> CreateWidgetTask(Type nodeType)
-		{
-			while (true) {
+				if (nodeTypeActive == null) {
+					yield return null;
+					continue;
+				}
+
 				if (sv.InputArea.IsMouseOver()) {
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 				}
@@ -46,18 +46,20 @@ namespace Tangerine.UI.SceneView
 					}
 					sv.Frame.CompoundPostPresenter.Remove(presenter);
 					try {
-						var widget = (Widget)Core.Operations.CreateNode.Perform(nodeType);
+						var widget = (Widget) Core.Operations.CreateNode.Perform(nodeTypeActive);
 						Core.Operations.SetProperty.Perform(widget, nameof(Widget.Size), rect.B - rect.A);
 						Core.Operations.SetProperty.Perform(widget, nameof(Widget.Position), rect.A + widget.Size / 2);
 						Core.Operations.SetProperty.Perform(widget, nameof(Widget.Pivot), Vector2.Half);
 					} catch (InvalidOperationException e) {
 						AlertDialog.Show(e.Message);
 					}
-					break;
+
+					nodeTypeActive = null;
+					Utils.ChangeCursorIfDefault(MouseCursor.Default);
 				}
+
 				yield return null;
 			}
-			Utils.ChangeCursorIfDefault(MouseCursor.Default);
 		}
 
 		static void DrawRectOutline(Vector2 a, Vector2 b, Matrix32 t)
