@@ -26,13 +26,12 @@ namespace Tangerine.UI
 
 		private static ITexture CreateTexture(string id, string defaultId = null)
 		{
-			var path = Theme.Textures.NodeIconPath(id);
-			var png = new EmbeddedResource(path, "Tangerine").GetResourceStream();
+            var png = new ThemedconResource(id, "Tangerine").GetResourceStream();
 			if (png == null) {
 				if (defaultId != null) {
 					return CreateTexture(defaultId);
 				}
-				throw new ArgumentException($"Icon '{path}' doesn't exist");
+				throw new ArgumentException($"Icon '{id}' doesn't exist");
 			}
 			using (var bmp = new Bitmap(png)) {
 				var texture = new Texture2D();

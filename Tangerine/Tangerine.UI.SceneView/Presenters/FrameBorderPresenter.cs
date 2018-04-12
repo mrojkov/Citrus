@@ -14,7 +14,7 @@ namespace Tangerine.UI.SceneView
 			this.sv = sceneView;
 			sceneView.Frame.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(Render));
 			DashTexture = new Texture2D();
-			DashTexture.LoadImage(new Bitmap(new EmbeddedResource(Theme.Textures.DashPath, "Tangerine").GetResourceStream()));
+            DashTexture.LoadImage(new Bitmap(new ThemedconResource("SceneView.Dash", "Tangerine").GetResourceStream()));
 			DashTexture.TextureParams = new TextureParams {
 				WrapMode = TextureWrapMode.Repeat,
 				MinMagFilter = TextureFilter.Nearest

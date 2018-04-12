@@ -155,7 +155,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\SegoeUIRegular.ttf" />
-    <EmbeddedResource Include="Resources\Cursors\Rotate.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Filesystem\ArrowLeft.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Filesystem\ArrowRight.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Filesystem\ArrowUp.png" />
@@ -362,6 +361,12 @@
     <EmbeddedResource Include="Resources\Icons\Light\Tools\ToolsCenterView.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Tools\ToolsResetZoom.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Tools\Unfolded.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Cursors\DragHandClosed.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Cursors\DragHandOpen.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Cursors\Rotate.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Cursors\DragHandClosed.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Cursors\DragHandOpen.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Cursors\Rotate.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PreferencesDialog\" />
@@ -378,9 +383,5 @@
       <Kind>Dynamic</Kind>
       <SmartLink>False</SmartLink>
     </NativeReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Cursors\DragHandClosed.png" />
-    <EmbeddedResource Include="Resources\Cursors\DragHandOpen.png" />
   </ItemGroup>
 </Project>

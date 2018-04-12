@@ -5,11 +5,11 @@ namespace Tangerine.UI
 {
 	public static class Cursors
 	{
-		private static Bitmap GetBitmapFromEmbededResource(string path)
+		private static Bitmap GetBitmapFromEmbededResource(string resourceId)
 		{
-			var png = new EmbeddedResource(path, "Tangerine").GetResourceStream();
+            var png = new ThemedconResource(resourceId, "Tangerine").GetResourceStream();
 			if (png == null) {
-				throw new ArgumentException($"Icon '{path}' doesn't exist");
+				throw new ArgumentException($"Icon '{resourceId}' doesn't exist");
 			}
 			return new Bitmap(png);
 		}
@@ -20,9 +20,9 @@ namespace Tangerine.UI
 			return new MouseCursor(icon, hotSpot);
 		}
 
-		public static MouseCursor Rotate { get; } = CreateCursorFromEmbededResource(Theme.Textures.CursorRotatePath, new IntVector2(8, 8));
-		public static MouseCursor Pipette { get; } = CreateCursorFromEmbededResource(Theme.Textures.CursorPipettePath, new IntVector2(0, 23));
-		public static MouseCursor DragHandClosed { get; } = CreateCursorFromEmbededResource(Theme.Textures.CursorDragHandClosedPath, new IntVector2(11, 1));
-		public static MouseCursor DragHandOpen { get; } = CreateCursorFromEmbededResource(Theme.Textures.CursorDragHandOpenPath, new IntVector2(11, 8));
+		public static MouseCursor Rotate { get; } = CreateCursorFromEmbededResource("Cursors.Rotate", new IntVector2(8, 8));
+		public static MouseCursor Pipette { get; } = CreateCursorFromEmbededResource("Tools.Pipette", new IntVector2(0, 23));
+		public static MouseCursor DragHandClosed { get; } = CreateCursorFromEmbededResource("Cursors.DragHandClosed", new IntVector2(11, 1));
+		public static MouseCursor DragHandOpen { get; } = CreateCursorFromEmbededResource("Cursors.DragHandOpen", new IntVector2(11, 8));
 	}
 }

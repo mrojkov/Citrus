@@ -135,10 +135,13 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Cursors\Rotate.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="icon.ico" />
+    <EmbeddedResource Include="Resources\Icons\Light\Cursors\Rotate.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Cursors\DragHandOpen.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Cursors\DragHandClosed.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Cursors\Rotate.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Cursors\DragHandOpen.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Cursors\DragHandClosed.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Filesystem\ArrowLeft.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Filesystem\ArrowRight.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Filesystem\ArrowUp.png" />
@@ -345,8 +348,6 @@
     <EmbeddedResource Include="Resources\Icons\Light\Tools\ToolsCenterView.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Tools\ToolsResetZoom.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Tools\Unfolded.png" />
-    <EmbeddedResource Include="Resources\Cursors\DragHandClosed.png" />
-    <EmbeddedResource Include="Resources\Cursors\DragHandOpen.png" />
     <EmbeddedResource Include="Resources\Icons\icon.ico" />
   </ItemGroup>
 </Project>

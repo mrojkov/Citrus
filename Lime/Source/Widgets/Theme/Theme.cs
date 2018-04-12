@@ -19,37 +19,6 @@ namespace Lime
 			public static readonly Thickness ControlsPadding = new Thickness(2);
 		}
 
-		public class TextureTheme
-		{
-			private string nodeIconPathFormat;
-			public string RoundPath;
-			public string PlayPath;
-			public string DashPath;
-			public string CursorRotatePath;
-			public string CursorPipettePath;
-			public string CursorDragHandClosedPath;
-			public string CursorDragHandOpenPath;
-
-			public string NodeIconPath(string nodeId) => string.Format(nodeIconPathFormat, nodeId);
-
-			public static TextureTheme CreateDarkTheme() => CreateTheme("Dark");
-			public static TextureTheme CreateLightTheme() => CreateTheme("Light");
-
-			private static TextureTheme CreateTheme(string theme)
-			{
-				return new TextureTheme {
-					nodeIconPathFormat = $"Tangerine.Resources.Icons.{theme}.{{0}}.png",
-					RoundPath = $"Tangerine.Resources.Icons.{theme}.SceneView.Round.png",
-					PlayPath = $"Tangerine.Resources.Icons.{theme}.SceneView.Play.png",
-					DashPath = $"Tangerine.Resources.Icons.{theme}.SceneView.Dash.png",
-					CursorRotatePath = "Tangerine.Resources.Cursors.Rotate.png",
-					CursorPipettePath = $"Tangerine.Resources.Icons.{theme}.Tools.Pipette.png",
-					CursorDragHandClosedPath = "Tangerine.Resources.Cursors.DragHandClosed.png",
-					CursorDragHandOpenPath = "Tangerine.Resources.Cursors.DragHandOpen.png",
-				};
-			}
-		}
-
 		public class ColorTheme
 		{
 			public Color4 BlackText;
@@ -157,7 +126,6 @@ namespace Lime
 			}
 		}
 
-		public static TextureTheme Textures = TextureTheme.CreateLightTheme();
 		public static ColorTheme Colors = ColorTheme.CreateLightTheme();
 
 		public class KeyboardFocusBorderPresenter : CustomPresenter

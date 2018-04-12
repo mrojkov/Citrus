@@ -18,7 +18,7 @@ namespace Tangerine.UI.SceneView
 			sv = sceneView;
 			sceneView.Frame.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(Render));
 			roundTexture = new Texture2D();
-			roundTexture.LoadImage(new Bitmap(new EmbeddedResource(Theme.Textures.RoundPath, "Tangerine").GetResourceStream()));
+            roundTexture.LoadImage(new Bitmap(new ThemedconResource("SceneView.Round", "Tangerine").GetResourceStream()));
 			roundTexture.TextureParams = new TextureParams {
 				WrapMode = TextureWrapMode.Repeat,
 				MinMagFilter = TextureFilter.Linear

@@ -62,7 +62,6 @@
     <Compile Include="Dialogs\ModalOperationDialog.cs" />
     <Compile Include="Dialogs\SaveRulerDialog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="EmbeddedResource.cs" />
     <Compile Include="IconPool.cs" />
     <Compile Include="Utils\KeyframePalette.cs" />
     <Compile Include="Utils\HSpacer.cs" />
@@ -88,6 +87,8 @@
     <Compile Include="Dialogs\AttachmentDialog.cs" />
     <Compile Include="WidgetFactoryComponent.cs" />
     <Compile Include="Widgets\ThemedButtons.cs" />
+    <Compile Include="EmbeddedResources\ThemedconResource.cs" />
+    <Compile Include="EmbeddedResources\EmbeddedResource.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

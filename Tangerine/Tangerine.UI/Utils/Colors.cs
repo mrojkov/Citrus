@@ -1,4 +1,3 @@
-using System;
 using Lime;
 
 namespace Tangerine.UI
@@ -110,6 +109,7 @@ namespace Tangerine.UI
 			public Color4 StripeBackground2;
 		}
 
+		public string Description;
 		public Theme.ColorTheme Basic;
 		public ToolbarColors Toolbar;
 		public SceneViewColors SceneView;
@@ -215,6 +215,7 @@ namespace Tangerine.UI
 				StripeBackground2 = Theme.Colors.GrayBackground.Lighten(0.05f),
 			};
 			return new ColorTheme {
+				Description = "Dark",
 				Basic = Theme.Colors,
 				Toolbar = toolbar,
 				SceneView = sceneView,
@@ -320,6 +321,7 @@ namespace Tangerine.UI
 				StripeBackground2 = Theme.Colors.GrayBackground.Darken(0.05f),
 			};
 			return new ColorTheme {
+				Description = "Light",
 				Basic = Theme.Colors,
 				Toolbar = toolbar,
 				SceneView = sceneView,

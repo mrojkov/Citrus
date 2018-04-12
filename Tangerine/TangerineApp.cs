@@ -200,7 +200,6 @@ namespace Tangerine
 
 		void SetColorTheme(ColorThemeEnum theme)
 		{
-			Theme.Textures = theme == ColorThemeEnum.Light ? Theme.TextureTheme.CreateLightTheme() : Theme.TextureTheme.CreateDarkTheme();
 			Theme.Colors = theme == ColorThemeEnum.Light ? Theme.ColorTheme.CreateLightTheme() : Theme.ColorTheme.CreateDarkTheme();
 			ColorTheme.Current = theme == ColorThemeEnum.Light ? ColorTheme.CreateLightTheme() : ColorTheme.CreateDarkTheme();
 		}

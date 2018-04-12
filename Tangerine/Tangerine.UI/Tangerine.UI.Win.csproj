@@ -52,11 +52,12 @@
     <Compile Include="Dialogs\SaveRulerDialog.cs" />
     <Compile Include="Dialogs\AlertDialog.cs" />
     <Compile Include="Dialogs\AttachmentDialog.cs" />
+    <Compile Include="EmbeddedResources\EmbeddedIconResource.cs" />
     <Compile Include="IconPool.cs" />
     <Compile Include="NodeIconPool.cs" />
     <Compile Include="UIProcessors.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="EmbeddedResource.cs" />
+    <Compile Include="EmbeddedResources\EmbeddedResource.cs" />
     <Compile Include="SearchPanel\SearchPanel.cs" />
     <Compile Include="TabbedWidget.cs" />
     <Compile Include="Toolbar.cs" />
