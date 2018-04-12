@@ -52,7 +52,7 @@
     <Compile Include="Dialogs\SaveRulerDialog.cs" />
     <Compile Include="Dialogs\AlertDialog.cs" />
     <Compile Include="Dialogs\AttachmentDialog.cs" />
-    <Compile Include="EmbeddedResources\EmbeddedIconResource.cs" />
+    <Compile Include="EmbeddedResources\ThemedconResource.cs" />
     <Compile Include="IconPool.cs" />
     <Compile Include="NodeIconPool.cs" />
     <Compile Include="UIProcessors.cs" />
