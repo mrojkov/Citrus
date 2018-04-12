@@ -689,7 +689,7 @@ namespace Lime
 				}
 			}
 			if (Application.IsTangerine) {
-				globallyVisible |= GetTangerineFlag(TangerineFlags.Shown);
+				globallyVisible |= GetTangerineFlag(TangerineFlags.Shown | TangerineFlags.DisplayContent);
 				globallyVisible &= !GetTangerineFlag(TangerineFlags.Hidden | TangerineFlags.HiddenOnExposition);
 			}
 		}
