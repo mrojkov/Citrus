@@ -97,6 +97,12 @@
     <Compile Include="SceneUserPreferences.cs" />
     <Compile Include="Utils\AccumulativeRotationHelper.cs" />
     <Compile Include="Presenters\WidgetsPivotMarkPresenter.cs" />
+    <Compile Include="WidgetTransforms\Mathd.cs" />
+    <Compile Include="WidgetTransforms\Matrix32d.cs" />
+    <Compile Include="WidgetTransforms\Transform2d.cs" />
+    <Compile Include="WidgetTransforms\Vector2d.cs" />
+    <Compile Include="WidgetTransforms\WidgetTransformsHelper.cs" />
+    <Compile Include="WidgetTransforms\WidgetZeroScalePreserver.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Mac.csproj">
