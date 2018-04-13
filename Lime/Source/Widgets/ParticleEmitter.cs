@@ -912,7 +912,7 @@ namespace Lime
 			aspectRatio = Mathf.Sqrt(scale.X / scale.Y);
 			zoom = scale.Y * aspectRatio;
 		}
-		
+
 		// ReSharper disable once UnusedMember.Local
 		private void BuildForTangerine()
 		{
