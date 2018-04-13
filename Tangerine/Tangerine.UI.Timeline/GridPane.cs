@@ -48,8 +48,8 @@ namespace Tangerine.UI.Timeline
 			while (true) {
 				if (RootWidget.Input.WasMouseReleased(1)) {
 					new Menu {
-						TimelineCommands.InsertFrame,
-						TimelineCommands.DeleteFrame,
+						GenericCommands.InsertTimelineColumn,
+						GenericCommands.RemoveTimelineColumn,
 					}.Popup();
 				}
 				yield return null;

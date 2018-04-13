@@ -30,8 +30,6 @@ namespace Tangerine.UI.Timeline
 			h.Connect(TimelineCommands.FastScrollLeft, () => AdvanceCurrentColumn(-10), Document.HasCurrent);
 			h.Connect(TimelineCommands.FastScrollRight, () => AdvanceCurrentColumn(10), Document.HasCurrent);
 			h.Connect(TimelineCommands.DeleteKeyframes, RemoveKeyframes, Document.HasCurrent);
-			h.Connect(TimelineCommands.InsertFrame, InsertFrame, Document.HasCurrent);
-			h.Connect(TimelineCommands.DeleteFrame, DeleteFrame, Document.HasCurrent);
 			h.Connect(TimelineCommands.CreateMarkerPlay, () => CreateMarker(MarkerAction.Play), Document.HasCurrent);
 			h.Connect(TimelineCommands.CreateMarkerStop, () => CreateMarker(MarkerAction.Stop), Document.HasCurrent);
 			h.Connect(TimelineCommands.CreateMarkerJump, () => CreateMarker(MarkerAction.Jump), Document.HasCurrent);
@@ -93,69 +91,6 @@ namespace Tangerine.UI.Timeline
 						}
 					}
 				}
-			}
-		}
-
-		private static void WithKeyframes(Action<IKeyframe, IAnimator> action)
-		{
-			foreach (var row in Document.Current.Rows) {
-				var node = row.Components.Get<NodeRow>()?.Node ?? row.Components.Get<PropertyRow>()?.Node;
-				if (node == null) {
-					continue;
-				}
-				var property = row.Components.Get<PropertyRow>()?.Animator.TargetProperty;
-				foreach (var a in node.Animators) {
-					if (property != null && a.TargetProperty != property) {
-						continue;
-					}
-					var keys = a.Keys.Where(k => k.Frame >= Document.Current.AnimationFrame).ToList();
-					foreach (var k in keys) {
-						action(k, a);
-					}
-				}
-			}
-		}
-
-		private static void WithMarkers(Action<Marker> action)
-		{
-			var markers = Document.Current.Container.Markers.Where(m => m.Frame >= Document.Current.AnimationFrame).ToList();
-			foreach (var marker in markers) {
-				action(marker);
-			}
-		}
-
-		private static void InsertFrame()
-		{
-			Document.Current.History.BeginTransaction();
-			try {
-				WithKeyframes((k, a) => SetProperty.Perform(k, nameof(IKeyframe.Frame), k.Frame + 1));
-				WithMarkers(m => SetProperty.Perform(m, nameof(Marker.Frame), m.Frame + 1));
-			} finally {
-				Document.Current.History.EndTransaction();
-			}
-		}
-
-		private static void DeleteFrame()
-		{
-			Document.Current.History.BeginTransaction();
-			try {
-				WithKeyframes((k, a) => {
-					if (k.Frame != Document.Current.AnimationFrame) {
-						SetProperty.Perform(k, nameof(IKeyframe.Frame), k.Frame - 1);
-					} else {
-						RemoveKeyframe.Perform(a, k.Frame);
-					}
-				});
-				WithMarkers(m => {
-					if (m.Frame != Document.Current.AnimationFrame) {
-						SetProperty.Perform(m, nameof(Marker.Frame), m.Frame - 1);
-					} else {
-						Core.Operations.DeleteMarker.Perform(Document.Current.Container.Markers, m);
-					}
-				});
-
-			} finally {
-				Document.Current.History.EndTransaction();
 			}
 		}
 

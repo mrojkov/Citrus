@@ -17,8 +17,6 @@ namespace Tangerine.UI
 		public static readonly ICommand ExitNode = new Command(new Shortcut(Key.BackSpace));
 		public static readonly ICommand RenameRow = new Command(new Shortcut(Key.F2));
 		public static readonly ICommand DeleteKeyframes = new Command("Delete Selected Keyframes", new Shortcut(Modifiers.Shift, Key.Delete));
-		public static readonly ICommand InsertFrame = new Command("Insert Frame", new Shortcut(Modifiers.Command, Key.EqualsSign));
-		public static readonly ICommand DeleteFrame = new Command("Delete Frame", new Shortcut(Modifiers.Command, Key.Minus));
 		public static readonly ICommand CreateMarkerPlay = new Command("Create Play Marker", new Shortcut(Modifiers.Alt, Key.Number1));
 		public static readonly ICommand CreateMarkerStop = new Command("Create Stop Marker", new Shortcut(Modifiers.Alt, Key.Number2));
 		public static readonly ICommand CreateMarkerJump = new Command("Create Jump Marker", new Shortcut(Modifiers.Alt, Key.Number3));
@@ -43,11 +41,11 @@ namespace Tangerine.UI
 		public static readonly ICommand UpgradeDocumentFormat = new Command("Upgrade Document Format (.tan)");
 		public static readonly ICommand OpenProject = new Command("Open Project...", new Shortcut(Modifiers.Command | Modifiers.Shift, Key.O));
 		public static readonly ICommand PreferencesDialog = new Command("Preferences...", new Shortcut(Modifiers.Command, Key.P));
-		public static readonly ICommand CloseDocument = new Command("Close Document", new Shortcut(Modifiers.Command, Key.W));
+		public static readonly ICommand CloseDocument = new Command("Close Document");
 		public static readonly ICommand Group = new Command("Group", new Shortcut(Modifiers.Command, Key.G));
 		public static readonly ICommand Ungroup = new Command("Ungroup", new Shortcut(Modifiers.Command | Modifiers.Shift, Key.G));
-		public static readonly ICommand InsertTimelineColumn = new Command("Insert Timeline Column", new Shortcut(Modifiers.Command, Key.E));
-		public static readonly ICommand RemoveTimelineColumn = new Command("Remove Timeline Column", new Shortcut(Modifiers.Command | Modifiers.Shift, Key.E));
+		public static readonly ICommand InsertTimelineColumn = new Command("Insert Timeline Column", new Shortcut(Modifiers.Command, Key.Q));
+		public static readonly ICommand RemoveTimelineColumn = new Command("Remove Timeline Column", new Shortcut(Modifiers.Command, Key.W));
 		public static readonly ICommand NextDocument = new Command("Next Document", new Shortcut(Modifiers.Control, Key.Tab));
 		public static readonly ICommand PreviousDocument = new Command("Previous Document", new Shortcut(Modifiers.Control | Modifiers.Shift, Key.Tab));
 #if MAC
