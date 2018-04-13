@@ -49,6 +49,7 @@ namespace Lime
 	[AllowedParentTypes(typeof(ParticleEmitter))]
 	public class EmitterShapePoint : PointObject { }
 
+	[TangerineNodeBuilder("BuildForTangerine")]
 	[AllowedChildrenTypes(typeof(ParticlesMagnet), typeof(ParticleModifier), typeof(EmitterShapePoint))]
 	public partial class ParticleEmitter : Widget
 	{
@@ -910,6 +911,14 @@ namespace Lime
 			}
 			aspectRatio = Mathf.Sqrt(scale.X / scale.Y);
 			zoom = scale.Y * aspectRatio;
+		}
+		
+		// ReSharper disable once UnusedMember.Local
+		private void BuildForTangerine()
+		{
+			Nodes.Add(new ParticleModifier() {
+				Id = "ParticleModifier"
+			});
 		}
 	}
 }
