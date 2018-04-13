@@ -524,6 +524,22 @@ namespace Orange
 					HasAlpha = bitmap.HasAlpha
 				};
 			}
+
+			public static BitmapInfo FromFile(string file)
+			{
+				int width;
+				int height;
+				bool hasAlpha;
+				if (TextureConverterUtils.GetPngFileInfo(file, out width, out height, out hasAlpha, false)) {
+					return new BitmapInfo() {
+						Width = width,
+						Height = height,
+						HasAlpha = hasAlpha
+					};
+				}
+				Debug.Write("Failed to read image info {0}", file);
+				return null;
+			}
 		}
 
 		public static string GetAtlasPath(string atlasChain, int index)
@@ -533,20 +549,26 @@ namespace Orange
 			return path;
 		}
 
-		static Bitmap OpenAtlasItemBitmap(AtlasItem item)
+		static Bitmap OpenAtlasItemBitmapAndRescaleIfNeeded(AtlasItem item)
 		{
 			var srcTexturePath = AssetPath.Combine(The.Workspace.AssetsDirectory, Path.ChangeExtension(item.Path, item.SourceExtension));
 			Bitmap bitmap;
 			using (var stream = File.OpenRead(srcTexturePath)) {
 				bitmap = new Bitmap(stream);
 			}
-			if (ShouldDownscale(bitmap, item.CookingRules)) {
-				var newBitmap = DownscaleTexture(bitmap, srcTexturePath, item.CookingRules);
+			if (item.BitmapInfo == null) {
+				if (ShouldDownscale(bitmap, item.CookingRules)) {
+					var newBitmap = DownscaleTexture(bitmap, srcTexturePath, item.CookingRules);
+					bitmap.Dispose();
+					bitmap = newBitmap;
+				}
+				// Ensure that no image exceeded maxAtlasSize limit
+				DownscaleTextureToFitAtlas(ref bitmap, srcTexturePath);
+			} else if (bitmap.Width != item.BitmapInfo.Width || bitmap.Height != item.BitmapInfo.Height) {
+				var newBitmap = bitmap.Rescale(item.BitmapInfo.Width, item.BitmapInfo.Height);
 				bitmap.Dispose();
 				bitmap = newBitmap;
 			}
-			// Ensure that no image exceeded maxAtlasSize limit
-			DownscaleTextureToFitAtlas(ref bitmap, srcTexturePath);
 			return bitmap;
 		}
 
@@ -573,8 +595,19 @@ namespace Orange
 						CookingRules = cookingRules,
 						SourceExtension = Path.GetExtension(fileInfo.Path)
 					};
-					using (var bitmap = OpenAtlasItemBitmap(item)) {
-						item.BitmapInfo = BitmapInfo.FromBitmap(bitmap);
+					var bitmapInfo = BitmapInfo.FromFile(fileInfo.Path);
+					if (bitmapInfo == null) {
+						using (var bitmap = OpenAtlasItemBitmapAndRescaleIfNeeded(item)) {
+							item.BitmapInfo = BitmapInfo.FromBitmap(bitmap);
+						}
+					} else {
+						var srcTexturePath = AssetPath.Combine(The.Workspace.AssetsDirectory, Path.ChangeExtension(item.Path, item.SourceExtension));
+						if (ShouldDownscale(bitmapInfo, item.CookingRules)) {
+							DownscaleTextureInfo(bitmapInfo, srcTexturePath, item.CookingRules);
+						}
+						// Ensure that no image exceeded maxAtlasSize limit
+						DownscaleTextureToFitAtlas(bitmapInfo, srcTexturePath);
+						item.BitmapInfo = bitmapInfo;
 					}
 					var k = cookingRules.AtlasPacker;
 					if (!string.IsNullOrEmpty(k) && k != "Default") {
@@ -773,7 +806,7 @@ namespace Orange
 			var atlasPath = GetAtlasPath(atlasChain, atlasId);
 			var atlasPixels = new Color4[size.Width * size.Height];
 			foreach (var item in items.Where(i => i.Allocated)) {
-				using (var bitmap = OpenAtlasItemBitmap(item)) {
+				using (var bitmap = OpenAtlasItemBitmapAndRescaleIfNeeded(item)) {
 					CopyPixels(bitmap, atlasPixels, item.AtlasRect.A.X, item.AtlasRect.A.Y, size.Width, size.Height);
 				}
 				var atlasPart = new TextureAtlasElement.Params();
@@ -899,48 +932,96 @@ namespace Orange
 
 		private static void DownscaleTextureToFitAtlas(ref Bitmap bitmap, string path)
 		{
+			int newWidth;
+			int newHeight;
+			if (DownscaleTextureToFitAtlasHelper(bitmap.Width, bitmap.Height, path, out newWidth, out newHeight)) {
+				var scaledBitmap = bitmap.Rescale(newWidth, newHeight);
+				bitmap.Dispose();
+				bitmap = scaledBitmap;
+				
+			}
+		}
+
+		private static void DownscaleTextureToFitAtlas(BitmapInfo textureInfo, string path)
+		{
+			int newWidth;
+			int newHeight;
+			if (DownscaleTextureToFitAtlasHelper(textureInfo.Width, textureInfo.Height, path, out newWidth, out newHeight)) {
+				textureInfo.Width = newWidth;
+				textureInfo.Height = newHeight;
+			}
+		}
+
+		private static bool DownscaleTextureToFitAtlasHelper(int width, int height, string path, out int newWidth, out int newHeight)
+		{
 			var maxWidth = GetMaxAtlasSize().Width;
 			var maxHeight = GetMaxAtlasSize().Height;
-			if (bitmap.Width <= maxWidth && bitmap.Height <= maxHeight) {
-				return;
+			if (width <= maxWidth && height <= maxHeight) {
+				newWidth = 0;
+				newHeight = 0;
+				return false;
 			}
-			var newWidth = Math.Min(bitmap.Width, maxWidth);
-			var newHeight = Math.Min(bitmap.Height, maxHeight);
-			var scaledBitmap = bitmap.Rescale(newWidth, newHeight);
-			bitmap.Dispose();
-			bitmap = scaledBitmap;
+			newWidth = Math.Min(width, maxWidth);
+			newHeight = Math.Min(height, maxHeight);
 			Console.WriteLine($"WARNING: '{path}' downscaled to {newWidth}x{newHeight}");
+			return true;
 		}
 
 		private static bool ShouldDownscale(Bitmap texture, CookingRules rules)
 		{
+			return ShouldDownscaleHelper(texture.Width, texture.Height, rules);
+		}
+
+		private static bool ShouldDownscale(BitmapInfo textureInfo, CookingRules rules)
+		{
+			return ShouldDownscaleHelper(textureInfo.Width, textureInfo.Height, rules);
+		}
+
+		private static bool ShouldDownscaleHelper(int width, int height, CookingRules rules)
+		{
 			if (rules.TextureScaleFactor != 1.0f) {
 				int scaleThreshold = Platform == TargetPlatform.Android ? 32 : 256;
-				if (texture.Width > scaleThreshold || texture.Height > scaleThreshold) {
+				if (width > scaleThreshold || height > scaleThreshold) {
 					return true;
 				}
 			}
 			return false;
 		}
 
-		private static Bitmap DownscaleTexture(Bitmap texture, string path, CookingRules rules)
+		private static void DownscaleTextureHelper(int width, int height, string path, CookingRules rules, out int newWidth, out int newHeight)
 		{
 			int MaxSize = GetMaxAtlasSize().Width;
 			int scaleThreshold = Platform == TargetPlatform.Android ? 32 : 256;
 			var ratio = rules.TextureScaleFactor;
-			if (texture.Width > MaxSize || texture.Height > MaxSize) {
-				var max = (float) Math.Max(texture.Width, texture.Height);
+			if (width > MaxSize || height > MaxSize) {
+				var max = (float)Math.Max(width, height);
 				ratio *= MaxSize / max;
 			}
-			int newWidth = texture.Width;
-			int newHeight = texture.Height;
-			if (texture.Width > scaleThreshold) {
-				newWidth = Math.Min((texture.Width * ratio).Round(), MaxSize);
+			newWidth = width;
+			newHeight = height;
+			if (width > scaleThreshold) {
+				newWidth = Math.Min((width * ratio).Round(), MaxSize);
 			}
-			if (texture.Height > scaleThreshold) {
-				newHeight = Math.Min((texture.Height * ratio).Round(), MaxSize);
+			if (height > scaleThreshold) {
+				newHeight = Math.Min((height * ratio).Round(), MaxSize);
 			}
 			Console.WriteLine("{0} downscaled to {1}x{2}", path, newWidth, newHeight);
+		}
+
+		private static void DownscaleTextureInfo(BitmapInfo textureInfo, string path, CookingRules rules)
+		{
+			int newHeight;
+			int newWidth;
+			DownscaleTextureHelper(textureInfo.Width, textureInfo.Height, path, rules, out newWidth, out newHeight);
+			textureInfo.Height = newHeight;
+			textureInfo.Width = newWidth;
+		}
+
+		private static Bitmap DownscaleTexture(Bitmap texture, string path, CookingRules rules)
+		{
+			int newHeight;
+			int newWidth;
+			DownscaleTextureHelper(texture.Width, texture.Height, path, rules, out newWidth, out newHeight);
 			return texture.Rescale(newWidth, newHeight);
 		}
 
