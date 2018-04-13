@@ -120,6 +120,7 @@ namespace Tangerine
 					new Command("Resolution", resolution),
 					SceneViewCommands.DisplayBones,
 					SceneViewCommands.DisplayPivotsForAllWidgets,
+					SceneViewCommands.DisplayPivotsForInvisibleWidgets,
 					Command.MenuSeparator,
 					new Command("Overlays", overlaysMenu),
 					new Command("Rulers", rulerMenu),

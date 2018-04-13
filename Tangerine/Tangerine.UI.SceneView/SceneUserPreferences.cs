@@ -30,6 +30,9 @@ namespace Tangerine.UI.SceneView
 		[YuzuOptional]
 		public bool DisplayPivotsForAllWidgets { get; set; }
 
+		[YuzuOptional]
+		public bool DisplayPivotsForInvisibleWidgets { get; set; }
+
 		public SceneUserPreferences()
 		{
 			ResetToDefaults();
@@ -45,6 +48,7 @@ namespace Tangerine.UI.SceneView
 			AnimationPreviewBackground = Color4.Black.Transparentify(0.6f);
 			DrawFrameBorder = false;
 			DisplayPivotsForAllWidgets = true;
+			DisplayPivotsForInvisibleWidgets = false;
 		}
 
 		public static SceneUserPreferences Instance => Core.UserPreferences.Instance.Get<SceneUserPreferences>();

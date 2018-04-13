@@ -43,6 +43,7 @@ namespace Tangerine.UI.SceneView
 			h.Connect(SceneViewCommands.Duplicate, DuplicateNodes);
 			h.Connect(SceneViewCommands.DisplayBones, new DisplayBones());
 			h.Connect(SceneViewCommands.DisplayPivotsForAllWidgets, new DisplayPivotsForAllWidgets());
+			h.Connect(SceneViewCommands.DisplayPivotsForInvisibleWidgets, new DisplayPivotsForInvisibleWidgets());
 			h.Connect(SceneViewCommands.TieWidgetsWithBones, TieWidgetsWithBones);
 			h.Connect(SceneViewCommands.UntieWidgetsFromBones, UntieWidgetsFromBones);
 			h.Connect(SceneViewCommands.ToggleDisplayRuler, new DisplayRuler());
@@ -201,12 +202,24 @@ namespace Tangerine.UI.SceneView
 				CommonWindow.Current.Invalidate();
 			}
 
-
 			public override bool GetChecked()
 			{
 				return SceneUserPreferences.Instance.DisplayPivotsForAllWidgets;
 			}
+		}
 
+		private class DisplayPivotsForInvisibleWidgets : DocumentCommandHandler
+		{
+			public override void Execute()
+			{
+				SceneUserPreferences.Instance.DisplayPivotsForInvisibleWidgets = !SceneUserPreferences.Instance.DisplayPivotsForInvisibleWidgets;
+				CommonWindow.Current.Invalidate();
+			}
+
+			public override bool GetChecked()
+			{
+				return SceneUserPreferences.Instance.DisplayPivotsForInvisibleWidgets;
+			}
 		}
 
 		static void DragNodes(Vector2 delta)

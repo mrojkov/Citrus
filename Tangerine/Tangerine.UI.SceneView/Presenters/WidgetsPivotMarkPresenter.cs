@@ -34,9 +34,16 @@ namespace Tangerine.UI.SceneView
 
 		public static IEnumerable<Widget> WidgetsWithDisplayedPivot()
 		{
+			if (
+				!SceneUserPreferences.Instance.DisplayPivotsForAllWidgets &&
+				!SceneUserPreferences.Instance.DisplayPivotsForInvisibleWidgets
+			) {
+				return Enumerable.Empty<Widget>();
+			}
+
 			var widgets = Core.Document.Current.Container.Nodes.Editable().OfType<Widget>();
 			if (!SceneUserPreferences.Instance.DisplayPivotsForAllWidgets) {
-				widgets = widgets.Where(w => w.Color.A == 0);
+				widgets = widgets.Where(w => w.Color.A == 0 || !w.Visible);
 			}
 			return widgets;
 		}
