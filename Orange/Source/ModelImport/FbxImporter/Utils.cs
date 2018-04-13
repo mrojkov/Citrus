@@ -29,7 +29,7 @@ namespace Orange.FbxImporter
 		public static int[] ToIntArray(this IntPtr ptr, int size)
 		{
 			try {
-				int[] result = new int[size];
+				var result = new int[size];
 				if (size == 0)
 					return result;
 				Marshal.Copy(ptr, result, 0, size);
@@ -43,7 +43,7 @@ namespace Orange.FbxImporter
 		public static float[] ToFloatArray(this IntPtr ptr, int size)
 		{
 			try {
-				float[] result = new float[size];
+				var result = new float[size];
 				if (size == 0)
 					return new float[0];
 				Marshal.Copy(ptr, result, 0, size);
@@ -56,7 +56,7 @@ namespace Orange.FbxImporter
 		public static double[] ToDoubleArray(this IntPtr ptr, int size)
 		{
 			try {
-				double[] result = new double[size];
+				var result = new double[size];
 				if (size == 0)
 					return result;
 				Marshal.Copy(ptr, result, 0, size);
@@ -69,18 +69,16 @@ namespace Orange.FbxImporter
 		public static T[] FromArrayOfPointersToStructArrayUnsafe<T>(this IntPtr ptr, int size)
 		{
 			try {
-				if (ptr != IntPtr.Zero) {
-					T[] result = new T[size];
-					var pointer = ptr;
-					for (int i = 0; i < size; i++) {
-						var structPtr = Marshal.ReadIntPtr(pointer);
-						result[i] = structPtr == IntPtr.Zero ? default(T) : (T)Marshal.PtrToStructure(structPtr, typeof(T));
-						Utils.ReleaseNative(structPtr);
-						pointer += IntPtr.Size;
-					}
-					return result;
+				if (ptr == IntPtr.Zero) return null;
+				var result = new T[size];
+				var pointer = ptr;
+				for (var i = 0; i < size; i++) {
+					var structPtr = Marshal.ReadIntPtr(pointer);
+					result[i] = structPtr == IntPtr.Zero ? default(T) : (T)Marshal.PtrToStructure(structPtr, typeof(T));
+					Utils.ReleaseNative(structPtr);
+					pointer += IntPtr.Size;
 				}
-				return null;
+				return result;
 			} finally {
 				Utils.ReleaseNative(ptr);
 			}
@@ -89,14 +87,13 @@ namespace Orange.FbxImporter
 		public static T[] ToStructArray<T>(this IntPtr ptr, int size)
 		{
 			try {
-				T[] result = new T[size];
+				var result = new T[size];
 				var tmpPtr = ptr;
-				if (ptr != IntPtr.Zero) {
-					var structSize = Marshal.SizeOf(typeof(T));
-					for (int i = 0; i < size; i++) {
-						result[i] = (T)Marshal.PtrToStructure(tmpPtr, typeof(T));
-						tmpPtr += structSize;
-					}
+				if (ptr == IntPtr.Zero) return result;
+				var structSize = Marshal.SizeOf(typeof(T));
+				for (var i = 0; i < size; i++) {
+					result[i] = (T)Marshal.PtrToStructure(tmpPtr, typeof(T));
+					tmpPtr += structSize;
 				}
 				return result;
 			} finally {

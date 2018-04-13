@@ -1,25 +1,21 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Orange.FbxImporter
 {
 	public class CameraAttribute : NodeAttribute
 	{
-		public override FbxNodeType Type { get; } = FbxNodeType.CAMERA;
+		public override FbxNodeType Type { get; } = FbxNodeType.Camera;
 
-		public string Name { get; private set; }
+		public string Name { get; }
 
-		public float FieldOfView { get; private set; }
+		public float FieldOfView { get; }
 
-		public float AspectRatio { get; private set; }
+		public float AspectRatio { get; }
 
-		public float NearClipPlane { get; private set; }
+		public float NearClipPlane { get; }
 
-		public float FarClipPlane { get; private set; }
+		public float FarClipPlane { get; }
 
 		public CameraAttribute(IntPtr ptr) : base(ptr)
 		{
@@ -38,7 +34,7 @@ namespace Orange.FbxImporter
 		#region Pinvokes
 
 		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr FbxNodeGetCameraAttribute(IntPtr node);
+		private static extern IntPtr FbxNodeGetCameraAttribute(IntPtr node);
 
 		#endregion
 

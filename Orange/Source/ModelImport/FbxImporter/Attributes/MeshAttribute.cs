@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
+using System.Linq;
 using Lime;
 
 namespace Orange.FbxImporter
@@ -12,21 +13,128 @@ namespace Orange.FbxImporter
 		public string Name { get; set; }
 	}
 
+	public class Submesh
+	{
+		public int[] Indices { get; set; }
+
+		public int MaterialIndex { get; set; }
+
+		public Vector3[] Normals { get; set; }
+
+		public Mesh3D.Vertex[] Vertices { get; set; }
+
+		public Bone[] Bones { get; set; }
+	}
+
 	public class MeshAttribute : NodeAttribute
 	{
+		private const float NoWeight = -1;
+
 		public List<Submesh> Submeshes { get; private set; } = new List<Submesh>();
 
-		public override FbxNodeType Type { get; } = FbxNodeType.MESH;
+		public override FbxNodeType Type { get; } = FbxNodeType.Mesh;
 
-		public MeshAttribute() : base(IntPtr.Zero)
+		private MeshAttribute() : base(IntPtr.Zero)
 		{
 		}
 
-		public static MeshAttribute FromSubmesh(IntPtr submeshPtr)
+		public MeshAttribute(IntPtr ptr) : base(ptr)
 		{
-			return new MeshAttribute {
-				Submeshes = { new Submesh(submeshPtr) }
-			};
+			Submeshes = ImportSubmeshes(ptr);
+		}
+
+		private static List<Submesh> ImportSubmeshes(IntPtr ptr)
+		{
+			var list = new List<Submesh>();
+			var mesh = FbxNodeGetMeshAttribute(ptr, true);
+			var indices = mesh.Vertices.ToStruct<SizedArray>().GetData<int>();
+			var controlPoints = mesh.Points.ToStruct<SizedArray>().GetData<Vec3>();
+			var weights = mesh.Weigths.ToStruct<SizedArray>().GetData<WeightData>();
+			var boneData = mesh.Bones.ToStruct<SizedArray>().GetData<BoneData>();
+			var colorsContainer = mesh.Colors.ToStruct<Element>();
+			var normalsContainer = mesh.Normals.ToStruct<Element>();
+			var uvContainer = mesh.UV.ToStruct<Element>();
+			var colors = colorsContainer.GetData<Vec4>();
+			var normals = normalsContainer.GetData<Vec3>();
+			var uv = uvContainer.GetData<Vec2>();
+
+			var size = ushort.MaxValue;
+			var count = indices.Length / size;
+			var bones = new Bone[boneData.Length];
+
+			for (var i = 0; i < boneData.Length; i++) {
+				bones[i] = new Bone {
+					Name = boneData[i].Name,
+					Offset = boneData[i].OffsetMatrix.ToStruct<Mat4x4>().ToLime()
+				};
+			}
+
+			for (var i = 0; i <= count; i++) {
+				var newSize = i == count ? indices.Length - (size * count) : size;
+
+				var submesh = new Submesh {
+					MaterialIndex = mesh.MaterialIndex,
+					Indices = new int[newSize],
+					Vertices = new Mesh3D.Vertex[newSize],
+					Normals = new Vector3[newSize],
+					Bones = bones.ToArray(),
+				};
+
+				for (var j = 0; j < submesh.Vertices.Length; j++) {
+					var index = i * size + j;
+					var controlPointIndex = indices[index];
+					var controlPoint = controlPoints[controlPointIndex];
+					submesh.Indices[j] = j;
+					submesh.Vertices[j].Pos = controlPoint.ToLime();
+					if (colorsContainer.Size != 0 && colorsContainer.Mode != ReferenceMode.None) {
+						submesh.Vertices[j].Color = colorsContainer.Mode == ReferenceMode.ControlPoint ?
+							colors[controlPointIndex].ToLimeColor() : colors[index].ToLimeColor();
+					} else {
+						submesh.Vertices[j].Color = Color4.White;
+					}
+
+					if (normalsContainer.Size != 0 && normalsContainer.Mode != ReferenceMode.None) {
+						submesh.Vertices[j].Normal = normalsContainer.Mode == ReferenceMode.ControlPoint ?
+							normals[controlPointIndex].ToLime() : normals[index].ToLime();
+					}
+
+					if (uvContainer.Size != 0 && uvContainer.Mode != ReferenceMode.None) {
+						submesh.Vertices[j].UV1 = normalsContainer.Mode == ReferenceMode.ControlPoint ?
+							uv[controlPointIndex].ToLime() : uv[index].ToLime();
+						submesh.Vertices[j].UV1.Y = 1 - submesh.Vertices[j].UV1.Y;
+					}
+
+					if (weights.Length == 0) continue;
+					byte idx;
+					float weight;
+					var weightData = weights[controlPointIndex];
+					for (var k = 0; k < ImportConfig.BoneLimit; k++) {
+						if (weightData.Weights[k] == NoWeight) continue;
+						idx = weightData.Indices[k];
+						weight = weightData.Weights[k];
+						switch (k) {
+							case 0:
+								submesh.Vertices[j].BlendIndices.Index0 = idx;
+								submesh.Vertices[j].BlendWeights.Weight0 = weight;
+								break;
+							case 1:
+								submesh.Vertices[j].BlendIndices.Index1 = idx;
+								submesh.Vertices[j].BlendWeights.Weight1 = weight;
+								break;
+							case 2:
+								submesh.Vertices[j].BlendIndices.Index2 = idx;
+								submesh.Vertices[j].BlendWeights.Weight2 = weight;
+								break;
+							case 3:
+								submesh.Vertices[j].BlendIndices.Index3 = idx;
+								submesh.Vertices[j].BlendWeights.Weight3 = weight;
+								break;
+						}
+					}
+				}
+				list.Add(submesh);
+			}
+			return list;
 		}
 
 		public static MeshAttribute Combine(MeshAttribute meshAttribute1, MeshAttribute meshAttribute2)
@@ -38,128 +146,53 @@ namespace Orange.FbxImporter
 				Submeshes = sm
 			};
 		}
-	}
-
-	public class Submesh : NodeAttribute
-	{
-		public int[] Indices { get; set; }
-
-		public int MaterialIndex { get; set; }
-
-		public Mesh3D.Vertex[] Vertices { get; set; }
-
-		public Bone[] Bones { get; set; }
-
-		public Submesh(IntPtr ptr) : base(ptr)
-		{
-			var native = FbxNodeGetMeshAttribute(NativePtr, true);
-			if (native == IntPtr.Zero) {
-				throw new FbxAtributeImportException(Type);
-			}
-			var mesh = native.ToStruct<MeshData>();
-			var colors = mesh.colors.ToStructArray<Vec4>(mesh.verticesCount);
-			var verices = mesh.points.ToStructArray<Vec3>(mesh.verticesCount);
-
-			var uv = mesh.uvCoords.ToStructArray<Vec2>(mesh.verticesCount);
-			var weights = mesh.weights.ToStructArray<WeightData>(mesh.verticesCount);
-			var bones = mesh.bones.FromArrayOfPointersToStructArrayUnsafe<BoneData>(mesh.boneCount);
-			var normals = mesh.normals.ToStructArray<Vec3>(mesh.verticesCount);
-
-			Indices = mesh.vertices.ToIntArray(mesh.verticesCount);
-			MaterialIndex = mesh.materialIndex;
-			Vertices = new Mesh3D.Vertex[mesh.verticesCount];
-			Bones = new Bone[mesh.boneCount];
-
-			for (int i = 0; i < mesh.boneCount; i++) {
-				Bones[i] = new Bone();
-				Bones[i].Name = bones[i].name;
-				Bones[i].Offset = bones[i].offset.ToStruct<Mat4x4>().ToLime();
-			}
-
-			for (var i = 0; i < mesh.verticesCount; i++) {
-				var vertex =
-				Vertices[i].Pos = verices[i].toLime();
-				Vertices[i].Color = colors != null ? colors[i].toLimeColor() : Color4.White;
-				Vertices[i].UV1 = uv[i].toLime();
-				Vertices[i].Normal = normals[i].toLime();
-
-				byte index;
-				float weight;
-
-				for (int j = 0; j < ImportConfig.BoneLimit; j++) {
-					if (weights[i].Weights[j] != -1) {
-						index = weights[i].Indices[j];
-						weight = weights[i].Weights[j];
-						switch (j) {
-							case 0:
-								Vertices[i].BlendIndices.Index0 = index;
-								Vertices[i].BlendWeights.Weight0 = weight;
-								break;
-							case 1:
-								Vertices[i].BlendIndices.Index1 = index;
-								Vertices[i].BlendWeights.Weight1 = weight;
-								break;
-							case 2:
-								Vertices[i].BlendIndices.Index2 = index;
-								Vertices[i].BlendWeights.Weight2 = weight;
-								break;
-							case 3:
-								Vertices[i].BlendIndices.Index3 = index;
-								Vertices[i].BlendWeights.Weight3 = weight;
-								break;
-							default:
-								break;
-						}
-					}
-				}
-			}
-		}
 
 		#region Pinvokes
 
 		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr FbxNodeGetMeshAttribute(IntPtr node, bool IsLimitBoneWeights);
+		private static extern MeshData FbxNodeGetMeshAttribute(IntPtr node, bool limitBoneWeights);
 
 		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr FbxNodeGetMeshMaterial(IntPtr pMesh, int idx);
+		private static extern IntPtr FbxNodeGetMeshMaterial(IntPtr pMesh, int idx);
 
 		#endregion
 
 		#region MarshalingStructures
 
+		private enum ReferenceMode
+		{
+			None,
+			ControlPoint,
+			PolygonVertex
+		}
+
 		[StructLayout(LayoutKind.Sequential)]
 		private class MeshData
 		{
-			public IntPtr vertices;
+			public IntPtr Vertices;
 
-			public IntPtr points;
+			public IntPtr Points;
 
-			public IntPtr colors;
+			public IntPtr Weigths;
 
-			public IntPtr uvCoords;
+			public IntPtr Colors;
 
-			public IntPtr normals;
+			public IntPtr UV;
 
-			public IntPtr weights;
+			public IntPtr Normals;
 
-			public IntPtr bones;
-
-			[MarshalAs(UnmanagedType.I4)]
-			public int materialIndex;
+			public IntPtr Bones;
 
 			[MarshalAs(UnmanagedType.I4)]
-			public int verticesCount;
-
-			[MarshalAs(UnmanagedType.I4)]
-			public int boneCount;
+			public int MaterialIndex;
 		}
 
 		[StructLayout(LayoutKind.Sequential, CharSet = ImportConfig.Charset)]
 		private class BoneData
 		{
-			public string name;
+			public string Name;
 
-			public IntPtr offset;
+			public IntPtr OffsetMatrix;
 		}
 
 		[StructLayout(LayoutKind.Sequential)]
@@ -170,6 +203,12 @@ namespace Orange.FbxImporter
 
 			[MarshalAs(UnmanagedType.ByValArray, SizeConst = ImportConfig.BoneLimit)]
 			public float[] Weights;
+		}
+
+		[StructLayout(LayoutKind.Sequential)]
+		private class Element : SizedArray
+		{
+			public ReferenceMode Mode;
 		}
 
 		#endregion
