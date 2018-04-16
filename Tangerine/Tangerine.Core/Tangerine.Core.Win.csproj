@@ -44,6 +44,7 @@
     <Compile Include="ClassAttributes.cs" />
     <Compile Include="Components.cs" />
     <Compile Include="CoreUserPreferences.cs" />
+    <Compile Include="Document.Animation.cs" />
     <Compile Include="HotSerialization.cs" />
     <Compile Include="IDataflow.cs" />
     <Compile Include="ITaskProvider.cs" />

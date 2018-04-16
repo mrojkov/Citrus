@@ -160,7 +160,7 @@ namespace Tangerine
 			new BooleanPropertyEditor(
 				new PropertyEditorParams(pane.Content, CoreUserPreferences.Instance, nameof(CoreUserPreferences.AutoKeyframes), "Automatic keyframes"));
 			new BooleanPropertyEditor(
-				new PropertyEditorParams(pane.Content, UI.Timeline.TimelineUserPreferences.Instance, nameof(UI.Timeline.TimelineUserPreferences.AnimationMode), "Animation mode"));
+				new PropertyEditorParams(pane.Content, CoreUserPreferences.Instance, nameof(CoreUserPreferences.AnimationMode), "Animation mode"));
 			new IntPropertyEditor(
 				new PropertyEditorParams(pane.Content, Tangerine.AppUserPreferences.Instance, nameof(Tangerine.AppUserPreferences.AutosaveDelay), "Autosave delay"));
 			var boneWidthPropertyEditor = new FloatPropertyEditor(

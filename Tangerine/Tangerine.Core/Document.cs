@@ -20,7 +20,7 @@ namespace Tangerine.Core
 		Model
 	}
 
-	public sealed class Document
+	public sealed partial class Document
 	{
 		public enum CloseAction
 		{

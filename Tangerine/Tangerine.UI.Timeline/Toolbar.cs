@@ -39,8 +39,8 @@ namespace Tangerine.UI.Timeline
 		ToolbarButton CreateAnimationModeButton()
 		{
 			var button = new ToolbarButton(IconPool.GetTexture("Timeline.AnimationMode")) { Tip = "Animation mode" };
-			button.AddChangeWatcher(() => UserPreferences.AnimationMode, i => button.Checked = i);
-			button.Clicked += () => UserPreferences.AnimationMode = !UserPreferences.AnimationMode;
+			button.AddChangeWatcher(() => CoreUserPreferences.AnimationMode, i => button.Checked = i);
+			button.Clicked += () => CoreUserPreferences.AnimationMode = !CoreUserPreferences.AnimationMode;
 			return button;
 		}
 

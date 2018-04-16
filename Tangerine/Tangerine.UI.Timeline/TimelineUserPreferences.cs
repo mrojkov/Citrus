@@ -8,9 +8,6 @@ namespace Tangerine.UI.Timeline
 	public class TimelineUserPreferences : Component
 	{
 		[YuzuRequired]
-		public bool AnimationMode { get; set; }
-
-		[YuzuRequired]
 		public float ColWidth { get; set; }
 
 		[YuzuRequired]
@@ -31,7 +28,6 @@ namespace Tangerine.UI.Timeline
 		{
 			ColWidth = 15;
 			EditCurves = true;
-			AnimationMode = false;
 			TimelineVSplitterStretches = new List<float>();
 			TimelineHSplitterStretches = new List<float>();
 		}

@@ -8,6 +8,9 @@ namespace Tangerine.Core
 		[YuzuRequired]
 		public bool AutoKeyframes { get; set; }
 
+		[YuzuRequired]
+		public bool AnimationMode { get; set; }
+
 		public CoreUserPreferences()
 		{
 			ResetToDefaults();
@@ -16,6 +19,7 @@ namespace Tangerine.Core
 		public void ResetToDefaults()
 		{
 			AutoKeyframes = false;
+			AnimationMode = false;
 		}
 
 		public static CoreUserPreferences Instance => UserPreferences.Instance.Get<CoreUserPreferences>();

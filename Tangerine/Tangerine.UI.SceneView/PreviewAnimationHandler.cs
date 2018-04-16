@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using Lime;
+﻿using Lime;
+using Tangerine.Core;
 
 namespace Tangerine.UI.SceneView
 {
@@ -12,8 +11,7 @@ namespace Tangerine.UI.SceneView
 			if (doc.PreviewAnimation) {
 				doc.PreviewAnimation = false;
 				StopAnimationRecursive(doc.PreviewAnimationContainer);
-				doc.PreviewAnimationContainer.AnimationFrame = doc.PreviewAnimationBegin;
-				doc.Container.Update(0);
+				Document.SetCurrentFrameToNode(doc.PreviewAnimationBegin, doc.Container, CoreUserPreferences.Instance.AnimationMode);
 			} else {
 				doc.PreviewAnimation = true;
 				doc.Container.IsRunning = doc.PreviewAnimation;
