@@ -1,4 +1,3 @@
-﻿using System;
 using System.IO;
 using Lime;
 using Tangerine.Core;
@@ -125,7 +124,8 @@ namespace Tangerine
 			var dlg = new FileDialog {
 				AllowedFileTypes = new string[] { Document.Current.GetFileExtension() },
 				Mode = FileDialogMode.Save,
-				InitialDirectory = Project.Current.GetSystemDirectory(Document.Current.Path)
+				InitialDirectory = Project.Current.GetSystemDirectory(Document.Current.Path),
+				InitialFileName = Path.GetFileNameWithoutExtension(Document.Current.Path)
 			};
 			if (dlg.RunModal()) {
 				string assetPath;
