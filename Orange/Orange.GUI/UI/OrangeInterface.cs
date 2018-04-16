@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -29,7 +29,7 @@ namespace Orange
 				FixedSize = false,
 				Title = "Orange",
 #if WIN
-      Icon = new System.Drawing.Icon(new EmbeddedResource("Orange.GUI.Resources.Orange.ico", "Orange.GUI").GetResourceStream()),
+	  Icon = new System.Drawing.Icon(new EmbeddedResource("Orange.GUI.Resources.Orange.ico", "Orange.GUI").GetResourceStream()),
 #endif // WIN
 		});
 			window.Closed += The.Workspace.Save;
@@ -270,6 +270,8 @@ namespace Orange
 		{
 			config.UpdateBeforeBuild = DoesNeedSvnUpdate();
 			config.ActiveTargetIndex = platformPicker.Index;
+			config.ClientPosition = window.ClientPosition;
+			config.ClientSize = window.ClientSize;
 		}
 
 		public override void LoadFromWorkspaceConfig(WorkspaceConfig config)
@@ -281,6 +283,12 @@ namespace Orange
 			platformPicker.Index = newIndex;
 			updateVcs.CheckBox.Checked = config.UpdateBeforeBuild;
 			projectPicker.ChosenFile = config.CitrusProject;
+			if (config.ClientPosition != Vector2.Zero) {
+				window.ClientPosition = config.ClientPosition;
+			}
+			if (config.ClientSize != Vector2.Zero) {
+				window.ClientSize = config.ClientSize;
+			}
 		}
 
 		private class TextViewWriter : TextWriter

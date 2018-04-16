@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Yuzu;
+using Lime;
 
 namespace Orange
 {
@@ -15,10 +16,21 @@ namespace Orange
 		[YuzuMember]
 		public bool UpdateBeforeBuild;
 
+		[YuzuMember]
+		public Vector2 ClientSize;
+
+		[YuzuMember]
+		public Vector2 ClientPosition;
+
+		public static string GetDataPath()
+		{
+			var name = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
+			return Lime.Environment.GetDataDirectory("Game Forest", name, "1.0");
+		}
+
 		private static string GetConfigPath()
 		{
-			var basePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-			var configPath = Path.Combine(basePath, System.Reflection.Assembly.GetExecutingAssembly().GetName().Name + ".config");
+			var configPath = Path.Combine(GetDataPath(), ".config");
 			return configPath;
 		}
 
