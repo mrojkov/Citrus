@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 
 namespace Launcher
 {
@@ -97,8 +98,7 @@ namespace Launcher
 					RunExecutable();
 				}
 				OnBuildSuccess?.Invoke();
-			}
-			else {
+			} else {
 				if (!areFailedDetailsSet) {
 					SetFailedBuildStatus("Send this text to our developers.");
 				}
@@ -112,8 +112,26 @@ namespace Launcher
 			// which results in invalid Lime.iOS assembly (missing classes, etc.).
 			// Solution: remove obj folder after Orange build (and before, just in case).
 			var path = Path.Combine(citrusDirectory, "Lime", "obj");
-			if (Directory.Exists(path))
+			if (Directory.Exists(path)) {
+				// https://stackoverflow.com/a/1703799
+				foreach (var dir in Directory.EnumerateDirectories(path)) {
+					ForceDeleteDirectory(dir);
+				}
+				ForceDeleteDirectory(path);
+			}
+		}
+
+		private static void ForceDeleteDirectory(string path)
+		{
+			try {
 				Directory.Delete(path, true);
+			} catch (IOException) {
+				Thread.Sleep(100);
+				Directory.Delete(path, true);
+			} catch (UnauthorizedAccessException) {
+				Thread.Sleep(100);
+				Directory.Delete(path, true);
+			}
 		}
 
 		private bool Build(string solutionPath)
