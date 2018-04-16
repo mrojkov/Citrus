@@ -353,12 +353,12 @@ namespace Tangerine.UI.SceneView
 				}
 
 				if (pendingImages.Count > 0) {
-					var menu = new Menu() {
-						ImageDropCommands.AsImage,
-						ImageDropCommands.AsDistortionMesh,
-						ImageDropCommands.AsNineGrid,
-						ImageDropCommands.AsParticleModifier,
-					};
+					var menu = new Menu();
+					foreach (var kv in ImageDropCommands.Commands) {
+						if (NodeCompositionValidator.Validate(Document.Current.Container.GetType(), kv.Value)) {
+							menu.Add(kv.Key);
+						}
+					}
 					ImageDropCommands.AssetPaths = pendingImages;
 					menu.Popup();
 				}
@@ -391,15 +391,23 @@ namespace Tangerine.UI.SceneView
 					kv.Key.Consume();
 					Document.Current.History.BeginTransaction();
 					try {
-						foreach (string assetPath in ImageDropCommands.AssetPaths) {
+						foreach (var assetPath in ImageDropCommands.AssetPaths) {
 							var node = Core.Operations.CreateNode.Perform(kv.Value);
-							var widgetPos = MousePosition * Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
 							var texture = new SerializableTexture(assetPath);
-							SetProperty.Perform(node, nameof(Widget.Texture), texture);
-							SetProperty.Perform(node, nameof(Widget.Position), widgetPos);
-							SetProperty.Perform(node, nameof(Widget.Pivot), Vector2.Half);
-							SetProperty.Perform(node, nameof(Widget.Size), (Vector2)texture.ImageSize);
-							SetProperty.Perform(node, nameof(Widget.Id), Path.GetFileNameWithoutExtension(assetPath));
+							var nodeSize = (Vector2)texture.ImageSize;
+							var nodeId = Path.GetFileNameWithoutExtension(assetPath);
+							if (node is Widget) {
+								var widgetPos = MousePosition * Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
+								SetProperty.Perform(node, nameof(Widget.Texture), texture);
+								SetProperty.Perform(node, nameof(Widget.Position), widgetPos);
+								SetProperty.Perform(node, nameof(Widget.Pivot), Vector2.Half);
+								SetProperty.Perform(node, nameof(Widget.Size), nodeSize);
+								SetProperty.Perform(node, nameof(Widget.Id), nodeId);
+							} else if (node is ParticleModifier) {
+								SetProperty.Perform(node, nameof(ParticleModifier.Texture), texture);
+								SetProperty.Perform(node, nameof(ParticleModifier.Size), nodeSize);
+								SetProperty.Perform(node, nameof(ParticleModifier.Id), nodeId);
+							}
 						}
 					} finally {
 						Document.Current.History.EndTransaction();
