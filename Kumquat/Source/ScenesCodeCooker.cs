@@ -101,8 +101,8 @@ namespace Kumquat
 				var useful =
 					parsedFramesTree.ParsedNodes.Count > 0 ||
 					parsedFramesTree.InnerClasses.Count > 0 ||
-					(id != null && id.StartsWith("@"));
-				if (!useful && !referringScenes.ContainsKey(k)) {
+					(id != null && (id.StartsWith("@") || id.StartsWith(">")));
+				if (!useful) {
 					continue;
 				}
 				var bundleName = sceneToBundleMap[kv.Item1];
