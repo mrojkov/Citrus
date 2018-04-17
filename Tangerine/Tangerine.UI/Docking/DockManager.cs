@@ -234,6 +234,7 @@ namespace Tangerine.UI.Docking
 		private void CreateWidgetForPanelGroup(Splitter container, TabBarPlacement panelGroup, float stretch, int insertAt)
 		{
 			var tabbedWidget = new TabbedWidget { LayoutCell = new LayoutCell { StretchY = 0 }, AllowReordering = true };
+			tabbedWidget.FocusScope = new KeyboardFocusScope(tabbedWidget);
 			foreach (var panel in panelGroup.Placements.Select(p => Model.Panels.First(pan => pan.Id == p.Id))) {
 				panel.ContentWidget.Unlink();
 				if (Model.FindPanelPlacement(panel.Id).Hidden) {
