@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Globalization;
 using Lime;
 using System.Reflection;
 using System.IO;
@@ -35,7 +36,7 @@ namespace Orange
 							Console.WriteLine($"Copying: {f.Path} => {targetPath}");
 							Directory.CreateDirectory(Path.GetDirectoryName(targetPath));
 							System.IO.File.Copy(f.Path, targetPath);
-							if (textfileExtensions.Contains(Path.GetExtension(targetPath))) {
+							if (textfileExtensions.Contains(Path.GetExtension(targetPath).ToLower(CultureInfo.InvariantCulture))) {
 								string text = File.ReadAllText(targetPath);
 								text = text.Replace("EmptyProject", projectName);
 								text = text.Replace("Empty Project", newProjectApplicationName);

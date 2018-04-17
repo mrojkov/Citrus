@@ -31,7 +31,7 @@ namespace Orange
 			var cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, The.Workspace.ActiveTarget);
 			AssetBundle.Current = new PackedAssetBundle(The.Workspace.GetBundlePath(CookingRulesBuilder.MainBundleName));
 			foreach (var i in cookingRulesMap) {
-				if (i.Key.EndsWith(".png")) {
+				if (i.Key.EndsWith(".png", StringComparison.OrdinalIgnoreCase)) {
 					if (i.Value.TextureAtlas == null && i.Value.PVRFormat != PVRFormat.PVRTC4 && i.Value.PVRFormat != PVRFormat.PVRTC4_Forced) {
 						suspiciousTexturesReport.Add(string.Format("{0}: {1}, atlas: none",
 							i.Key, i.Value.PVRFormat));

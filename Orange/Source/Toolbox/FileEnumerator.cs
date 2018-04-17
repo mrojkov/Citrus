@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -44,7 +44,7 @@ namespace Orange
 				return files;
 			}
 			return files
-				.Where(file => extension == null || file.Path.EndsWith(extension))
+				.Where(file => extension == null || file.Path.EndsWith(extension, StringComparison.OrdinalIgnoreCase))
 				.Where(file => EnumerationFilter == null || EnumerationFilter(file));
 		}
 	}

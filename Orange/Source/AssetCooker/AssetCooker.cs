@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.IO;
 using System.Collections.Generic;
+using System.Globalization;
 using Lime;
 
 namespace Orange
@@ -58,7 +59,8 @@ namespace Orange
 
 		static string GetOriginalAssetExtension(string path)
 		{
-			switch (Path.GetExtension(path)) {
+			var ext = Path.GetExtension(path).ToLower(CultureInfo.InvariantCulture);
+			switch (ext) {
 			case ".dds":
 			case ".pvr":
 			case ".atlasPart":
@@ -70,7 +72,7 @@ namespace Orange
 			case ".model":
 				return ".fbx";
 			default:
-				return Path.GetExtension(path);
+				return ext;
 			}
 		}
 
@@ -212,7 +214,7 @@ namespace Orange
 
 			public IEnumerable<FileInfo> Enumerate(string extension = null)
 			{
-				return files.Where(file => extension == null || file.Path.EndsWith(extension));
+				return files.Where(file => extension == null || file.Path.EndsWith(extension, StringComparison.OrdinalIgnoreCase));
 			}
 
 			public void Rescan()
@@ -306,7 +308,7 @@ namespace Orange
 		private static void DeleteOrphanedTextureParams()
 		{
 			foreach (var path in AssetBundle.EnumerateFiles()) {
-				if (Path.GetExtension(path) == ".texture") {
+				if (path.EndsWith(".texture", StringComparison.OrdinalIgnoreCase)) {
 					var origImageFile = Path.ChangeExtension(path, GetPlatformTextureExtension());
 					if (!AssetBundle.FileExists(origImageFile)) {
 						DeleteFileFromBundle(path);
@@ -318,7 +320,7 @@ namespace Orange
 		private static void DeleteOrphanedMasks()
 		{
 			foreach (var maskPath in AssetBundle.EnumerateFiles()) {
-				if (Path.GetExtension(maskPath) == ".mask") {
+				if (maskPath.EndsWith(".mask", StringComparison.OrdinalIgnoreCase)) {
 					var origImageFile = Path.ChangeExtension(maskPath, GetPlatformTextureExtension());
 					if (!AssetBundle.FileExists(origImageFile)) {
 						DeleteFileFromBundle(maskPath);
@@ -443,7 +445,11 @@ namespace Orange
 				}
 				// Ignore atlas parts and masks
 				var ext = Path.GetExtension(path);
-				if (ext == ".atlasPart" || ext == ".mask" || ext == ".texture") {
+				if (
+					path.EndsWith(".atlasPart", StringComparison.OrdinalIgnoreCase) ||
+					path.EndsWith(".mask", StringComparison.OrdinalIgnoreCase) ||
+					path.EndsWith(".texture", StringComparison.OrdinalIgnoreCase)
+				) {
 					continue;
 				}
 				var assetPath = Path.ChangeExtension(path, GetOriginalAssetExtension(path));
@@ -946,7 +952,7 @@ namespace Orange
 			var atlasChainsToRebuild = new HashSet<string>();
 			// Figure out atlas chains to rebuild
 			foreach (var atlasPartPath in AssetBundle.EnumerateFiles()) {
-				if (Path.GetExtension(atlasPartPath) != ".atlasPart")
+				if (!atlasPartPath.EndsWith(".atlasPart", StringComparison.OrdinalIgnoreCase))
 					continue;
 
 				// If atlas part has been outdated we should rebuild full atlas chain
@@ -1051,7 +1057,7 @@ namespace Orange
 
 		private static bool TryRestoreBackup(string backupFilePath)
 		{
-			if (!Path.GetExtension(backupFilePath).Equals(".bak")) {
+			if (!backupFilePath.EndsWith(".bak", StringComparison.OrdinalIgnoreCase)) {
 				return false;
 			}
 

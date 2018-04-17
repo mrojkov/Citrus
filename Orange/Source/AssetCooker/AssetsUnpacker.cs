@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -62,7 +62,7 @@ namespace Orange
 				Console.WriteLine("Extracting tangerine scenes into \"{0}\"", outputDirectory);
 				using (new DirectoryChanger(outputDirectory)) {
 					foreach (string asset in AssetBundle.Current.EnumerateFiles()) {
-						if (Path.GetExtension(asset) == ".scene") {
+						if (asset.EndsWith(".scene", StringComparison.OrdinalIgnoreCase)) {
 							using (var stream = AssetBundle.Current.OpenFile(asset)) {
 								var	outputPath = Path.ChangeExtension(asset, ".tan");
 								Console.WriteLine("> " + outputPath);

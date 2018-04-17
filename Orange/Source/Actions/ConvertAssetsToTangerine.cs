@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
@@ -25,13 +25,13 @@ namespace Orange
 					var dstDir = Path.GetDirectoryName(dstPath);
 					var srcPath = path;
 					Directory.CreateDirectory(dstDir);
-					if (path.EndsWith(".scene")) {
+					if (path.EndsWith(".scene", StringComparison.OrdinalIgnoreCase)) {
 						using (Stream stream = new FileStream(srcPath, FileMode.Open)) {
 							var node = new HotSceneImporter(false, srcPath).Import(stream, null, null);
 							dstPath = Path.ChangeExtension(dstPath, "tan");
 							Serialization.WriteObjectToFile(dstPath, node, Serialization.Format.JSON);
 						}
-					} else if (path.EndsWith(".fnt")) {
+					} else if (path.EndsWith(".fnt", StringComparison.OrdinalIgnoreCase)) {
 						dstPath = Path.ChangeExtension(dstPath, "tft");
 						var importer = new HotFontImporter(false);
 						var dstRelativePath = Path.ChangeExtension(srcPath, "tft");
