@@ -44,6 +44,7 @@ namespace Kumquat
 
 		private static void RetryUntilSuccessDeleteDirectory(string path)
 		{
+			int maxRetryCount = 32;
 			while (true) {
 				try {
 					Directory.Delete(path, true);
@@ -53,11 +54,16 @@ namespace Kumquat
 					Console.WriteLine($"Failed to delete {path}");
 				}
 				System.Threading.Thread.Sleep(100);
+				maxRetryCount--;
+				if (maxRetryCount == 0) {
+					throw new InvalidOperationException($"Unable to remove directory \"{path}\"");
+				}
 			}
 		}
 
 		private static void RetryUntilSuccessCreateDirectory(string path)
 		{
+			int maxRetryCount = 32;
 			while (true) {
 				try {
 					Directory.CreateDirectory(path);
