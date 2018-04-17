@@ -32,14 +32,22 @@ namespace Orange
 			SaveDictionary(result, path);
 		}
 
-		private void MergeDictionaries(LocalizationDictionary current, LocalizationDictionary modified)
+		private static void MergeDictionaries(LocalizationDictionary current, LocalizationDictionary modified)
 		{
-			int added = 0, deleted = 0;
+			int added = 0, deleted = 0, updated = 0;
 			foreach (var key in modified.Keys.ToList()) {
 				if (!current.ContainsKey(key)) {
 					Logger.Write("+ " + key);
 					added++;
 					current[key] = modified[key];
+				} else {
+					var currentEntry = current[key];
+					var newEntry = modified[key];
+					if (currentEntry.Context != newEntry.Context) {
+						Logger.Write("Context updated for: " + key);
+						updated++;
+						currentEntry.Context = newEntry.Context;
+					}
 				}
 			}
 			foreach (var key in current.Keys.ToList()) {
@@ -49,7 +57,8 @@ namespace Orange
 					current.Remove(key);
 				}
 			}
-			Logger.Write("Added {0}\nDeleted {1}", added, deleted);
+
+			Logger.Write("Added {0}\nDeleted {1}\nContext updated {2}", added, deleted, updated);
 		}
 
 		private static void SaveDictionary(LocalizationDictionary dictionary, string path)
@@ -106,7 +115,7 @@ namespace Orange
 			}
 		}
 
-		private bool ShouldLocalizeOnlyTaggedSceneTexts()
+		private static bool ShouldLocalizeOnlyTaggedSceneTexts()
 		{
 			return The.Workspace.ProjectJson.GetValue("LocalizeOnlyTaggedSceneTexts", false);
 		}
