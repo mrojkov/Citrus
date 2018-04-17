@@ -1,13 +1,35 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Yuzu;
 using Lime;
 
 namespace Kumquat
 {
+	public class SceneRecord
+	{
+		[YuzuMember]
+		public string Bundle;
+
+		[YuzuMember]
+		public DateTime DateModified;
+
+		[YuzuMember]
+		public List<string> ReferringScenes = new List<string>();
+	}
+
+	public class CodeCookerCache
+	{
+		[YuzuMember]
+		public Dictionary<string, SceneRecord> SceneFiles = new Dictionary<string, SceneRecord>();
+
+		[YuzuMember]
+		public Dictionary<string, List<string>> CommonPartToReferredScenes = new Dictionary<string, List<string>>();
+	}
+
 	public class ScenesCodeCooker
 	{
 		private static readonly string[] scenesExtensions = { ".scene", ".tan", ".model" };
@@ -15,28 +37,39 @@ namespace Kumquat
 		private readonly string directory;
 		private readonly string projectName;
 		private readonly Dictionary<string, string> sceneToBundleMap;
-		private readonly Dictionary<string, Node> scenes;
+		private readonly Dictionary<string, Node> scenesForProcessing;
 		public readonly string SceneCodeTemplate;
 		public readonly string FrameCodeTemplate;
 		public readonly string NodeCodeTemplate;
 		private string currentCookingScene;
 		private readonly Dictionary<string, List<ParsedFramesTree>> commonParts = new Dictionary<string, List<ParsedFramesTree>>();
+		private readonly Dictionary<string, HashSet<string>> commonPartsScenes = new Dictionary<string, HashSet<string>>();
 		private readonly Dictionary<string, List<string>> referringScenes = new Dictionary<string, List<string>>();
+		private readonly Dictionary<string, string> externalSceneToOriginalScenePath = new Dictionary<string, string>();
+		private readonly List<string> allScenes;
+		private readonly List<string> modifiedScenes;
 		private readonly string mainBundleName;
+		private readonly CodeCookerCache codeCookerCache;
 
 		public ScenesCodeCooker(
 			string directory,
 			string projectName,
 			string mainBundleName,
 			Dictionary<string, string> sceneToBundleMap,
-			Dictionary<string, Node> scenes
+			Dictionary<string, Node> scenesForProcessing,
+			List<string> allScenes,
+			List<string> modifiedScenes,
+			CodeCookerCache codeCookerCache
 		)
 		{
 			this.directory = directory;
 			this.projectName = projectName;
 			this.mainBundleName = mainBundleName;
 			this.sceneToBundleMap = sceneToBundleMap;
-			this.scenes = scenes;
+			this.scenesForProcessing = scenesForProcessing;
+			this.allScenes = allScenes;
+			this.modifiedScenes = modifiedScenes;
+			this.codeCookerCache = codeCookerCache;
 			SceneCodeTemplate = GetEmbeddedResource("SceneFile.txt");
 			FrameCodeTemplate = GetEmbeddedResource("ParsedFrame.txt");
 			NodeCodeTemplate = GetEmbeddedResource("ParsedNode.txt");
@@ -73,22 +106,28 @@ namespace Kumquat
 					Console.WriteLine($"Failed to create {path}");
 				}
 				System.Threading.Thread.Sleep(100);
+				maxRetryCount--;
+				if (maxRetryCount == 0) {
+					throw new InvalidOperationException($"Unable to create directory \"{path}\"");
+				}
 			}
 		}
 
 		public void Start()
 		{
-			Console.WriteLine("Generating scenes code for {0} scenes...", scenes.Count);
+			Console.WriteLine("Generating scenes code for {0} scenes...", scenesForProcessing.Count);
 			var generatedScenesPath = $"{directory}/{projectName}.GeneratedScenes";
 			if (!Directory.Exists(generatedScenesPath)) {
 				GenerateProjectFiles(generatedScenesPath);
 			}
 			var scenesPath = $@"{directory}/{projectName}.GeneratedScenes/Scenes";
-			if (Directory.Exists(scenesPath)) {
-				RetryUntilSuccessDeleteDirectory(scenesPath);
+			RemoveOrphanedGeneratedCodeItems();
+			RemoveUpdatingCommonPartsFromCache();
+			foreach (var scenePath in allScenes) {
+				externalSceneToOriginalScenePath.Add(Path.ChangeExtension(scenePath, null), scenePath);
 			}
 			var sceneToFrameTree = new List<Tuple<string, ParsedFramesTree>>();
-			foreach (var scene in scenes) {
+			foreach (var scene in scenesForProcessing) {
 				var bundleName = sceneToBundleMap[scene.Key];
 				var bundleSourcePath = $"{scenesPath}/{bundleName}";
 				if (!Directory.Exists(bundleSourcePath)) {
@@ -103,23 +142,131 @@ namespace Kumquat
 				currentCookingScene = kv.Item1;
 				var k = Path.ChangeExtension(kv.Item1, null);
 				k = AssetPath.CorrectSlashes(k);
-				var id = scenes[kv.Item1].Id;
+				var id = scenesForProcessing[kv.Item1].Id;
+				var bundleName = sceneToBundleMap[kv.Item1];
+				var bundleSourcePath = $"{scenesPath}/{bundleName}";
+				var generatedCodePath = bundleSourcePath + "/" + parsedFramesTree.ClassName + ".cs";
 				var useful =
 					parsedFramesTree.ParsedNodes.Count > 0 ||
 					parsedFramesTree.InnerClasses.Count > 0 ||
 					(id != null && (id.StartsWith("@") || id.StartsWith(">")));
 				if (!useful) {
+					if (File.Exists(generatedCodePath)) {
+						File.Delete(generatedCodePath);
+					}
 					continue;
 				}
-				var bundleName = sceneToBundleMap[kv.Item1];
-				var bundleSourcePath = $"{scenesPath}/{bundleName}";
 				var code = parsedFramesTree.GenerateCode(this);
 				code = code.Replace("<%PROJECT_NAME%>", projectName);
 				code = code.Replace("<%NAMESPACE%>", GetBundleNamespace(bundleName));
 				code = new CodeFormatter(code).FormattedCode;
-				File.WriteAllText(bundleSourcePath + "/" + parsedFramesTree.ClassName + ".cs", code);
+				File.WriteAllText(generatedCodePath, code);
+			}
+			UpdateCache();
+			// Collect not loaded scenes which are also contains common parts affected by actually modified and referred to them scenes
+			// Because we need those to correctly update common parts. i.e. to calc common parts you need all of common parts referrers
+			List<string> reprocessScenes = new List<string>();
+			foreach (var kv in codeCookerCache.CommonPartToReferredScenes) {
+				if (commonParts.ContainsKey(kv.Key)) {
+					foreach (var scene in kv.Value) {
+						if (!modifiedScenes.Contains(scene)) {
+							reprocessScenes.Add(scene);
+						}
+					}
+				}
+			}
+			foreach (var scene in reprocessScenes) {
+				GenerateParsedFramesTree(scene, Node.CreateFromAssetBundle(scene));
 			}
 			GenerateCommonParts(scenesPath);
+			UpdateCommonPartsCache();
+		}
+
+		private void UpdateCommonPartsCache()
+		{
+			foreach (var kv in commonPartsScenes) {
+				List<string> commonPartsFrom;
+				if (!codeCookerCache.CommonPartToReferredScenes.ContainsKey(kv.Key)) {
+					codeCookerCache.CommonPartToReferredScenes.Add(kv.Key, new List<string>());
+				}
+				commonPartsFrom = codeCookerCache.CommonPartToReferredScenes[kv.Key];
+				// O(N^2) is okay here until we'll have really lots of common parts in different scenes
+				foreach (var scenePath in kv.Value) {
+					if (!commonPartsFrom.Contains(scenePath)) {
+						commonPartsFrom.Add(scenePath);
+					}
+				}
+			}
+		}
+
+		private void UpdateCache()
+		{
+			foreach (var kv in referringScenes) {
+				if (!externalSceneToOriginalScenePath.ContainsKey(kv.Key)) {
+					continue;
+				}
+				var key = externalSceneToOriginalScenePath[kv.Key];
+				if (codeCookerCache.SceneFiles.ContainsKey(key)) {
+					codeCookerCache.SceneFiles.Remove(key);
+				}
+				codeCookerCache.SceneFiles.Add(key, new SceneRecord {
+					Bundle = sceneToBundleMap[key],
+					DateModified = AssetBundle.Current.GetFileLastWriteTime(key).ToUniversalTime(),
+					ReferringScenes = kv.Value.Select(path => externalSceneToOriginalScenePath[Path.ChangeExtension(path, null)]).ToList()
+				});
+			}
+		}
+
+		private void RemoveUpdatingCommonPartsFromCache()
+		{
+			foreach (var scenePath in modifiedScenes) {
+				foreach (var kv in codeCookerCache.CommonPartToReferredScenes) {
+					var scenesToRemove = new List<string>();
+					foreach (var path in kv.Value) {
+						if (scenePath == path) {
+							scenesToRemove.Add(path);
+						}
+					}
+					foreach (var path in scenesToRemove) {
+						kv.Value.Remove(path);
+					}
+				}
+			}
+		}
+
+		private void RemoveOrphanedGeneratedCodeItems()
+		{
+			var scenesPath = $@"{directory}/{projectName}.GeneratedScenes/Scenes";
+			var scenesToDelete = new List<string>();
+			var allScenesSet = new HashSet<string>(allScenes);
+			foreach (var scenePath in codeCookerCache.SceneFiles.Keys) {
+				if (!allScenesSet.Contains(scenePath)) {
+					scenesToDelete.Add(scenePath);
+				}
+			}
+			foreach (var scenePath in scenesToDelete) {
+				var bundleName = codeCookerCache.SceneFiles[scenePath].Bundle;
+				var bundleSourcePath = $"{scenesPath}/{bundleName}";
+				var filename = Path.GetFileNameWithoutExtension(scenePath);
+				string name;
+				string baseClassName;
+				ParseCommonName(filename, out name, out baseClassName);
+				File.Delete($"{bundleSourcePath}/{name}.cs");
+				codeCookerCache.SceneFiles.Remove(scenePath);
+				var commonPartsToRemove = new List<string>();
+				foreach (var kv in codeCookerCache.CommonPartToReferredScenes) {
+					if (kv.Value.Contains(scenePath)) {
+						kv.Value.Remove(scenePath);
+						if (kv.Value.Count() == 0) {
+							commonPartsToRemove.Add(kv.Key);
+						}
+					}
+				}
+				foreach (var commonPart in commonPartsToRemove) {
+					File.Delete($"{scenesPath}/Common/{commonPart}.cs");
+					codeCookerCache.CommonPartToReferredScenes.Remove(commonPart);
+				}
+			}
 		}
 
 		private void GenerateProjectFiles(string generatedScenesPath)
@@ -199,11 +346,11 @@ namespace Kumquat
 					}
 				}
 			};
-			var code = $"using Lime;\n namespace {(GetBundleNamespace(mainBundleName))}.Common\n{{\n" +
-			           $"<%GEN%>\n" +
-			           $"}}\n";
-
-			var roots = new List<ParsedFramesTree>();
+			var codeHeader = $"using Lime;\n namespace {(GetBundleNamespace(mainBundleName))}.Common\n{{\n" +
+			                 $"<%GEN%>\n" +
+			                 $"}}\n";
+			var commonDirectory = $"{scenesPath}/Common";
+			RetryUntilSuccessCreateDirectory(commonDirectory);
 			foreach (var kv in commonParts) {
 				var root = new ParsedFramesTree {
 					ClassName = kv.Key,
@@ -256,16 +403,13 @@ namespace Kumquat
 						}
 					}
 				}
-				if (root.InnerClasses.Count != 0 || root.ParsedNodes.Count != 0) {
-					roots.Add(root);
+				if (root.InnerClasses.Count != 0 || root.ParsedNodes.Count != 0 || root.ParsedNode.Markers.Count != 0) {
+					var code = codeHeader.Replace("<%GEN%>", root.GenerateCode(this, false) + "\n<%GEN%>");
+					code = code.Replace("<%GEN%>", "");
+					code = new CodeFormatter(code).FormattedCode;
+					File.WriteAllText($"{commonDirectory}/{kv.Key}.cs", code);
 				}
 			}
-			foreach (var r in roots) {
-				code = code.Replace("<%GEN%>", r.GenerateCode(this, false) + "\n<%GEN%>");
-			}
-			code = code.Replace("<%GEN%>", "");
-			code = new CodeFormatter(code).FormattedCode;
-			File.WriteAllText($"{scenesPath}/{(mainBundleName)}/Common.cs", code);
 		}
 
 		public string GetFullTypeOf(ParsedFramesTree parsedFramesTree)
@@ -378,6 +522,11 @@ namespace Kumquat
 					commonParts.Add(baseName, new List<ParsedFramesTree>());
 				}
 				commonParts[baseName].Add(parsedFramesTree);
+				if (!commonPartsScenes.ContainsKey(baseName )) {
+					commonPartsScenes.Add(baseName, new HashSet<string>());
+				}
+				// Root node tag is always full path to asset, see Node.CreateFromAssetBundle
+				commonPartsScenes[baseName].Add(node.GetRoot().Tag);
 			}
 
 			var nodesToParse = new List<Node>();

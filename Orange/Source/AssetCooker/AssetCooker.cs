@@ -135,10 +135,10 @@ namespace Orange
 				}
 				extraBundles.Add(CookingRulesBuilder.MainBundleName);
 
-				var extraBundlesList = extraBundles.ToList();
+				var extraBundlesList = extraBundles.Reverse().ToList();
 				PluginLoader.AfterBundlesCooked(extraBundlesList);
 				if (requiredCookCode) {
-					CodeCooker.Cook(extraBundlesList);
+					CodeCooker.Cook(cookingRulesMap, extraBundlesList);
 				}
 			} catch (OperationCanceledException e) {
 				Console.WriteLine(e.Message);

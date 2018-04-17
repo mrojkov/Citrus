@@ -10,46 +10,121 @@ namespace Orange
 {
 	public static class CodeCooker
 	{
-		private static readonly string[] scenesExtensions = { ".scene", ".tan", ".model" };
-
-		public static void Cook(IReadOnlyCollection<string> bundles)
+		public static void Cook(Dictionary<string, CookingRules> assetToCookingRules, List<string> allBundles)
 		{
-			var assetBundles = new Dictionary<string, PackedAssetBundle>(bundles.Count);
-			foreach (var bundleName in bundles) {
-				assetBundles.Add(bundleName, new PackedAssetBundle(The.Workspace.GetBundlePath(bundleName)));
-			}
+			var cache = LoadCodeCookerCache();
+			var scenesToCook = new List<string>();
+			var visitedScenes = new HashSet<string>();
+			var usedBundles = new HashSet<string>();
+			var sceneToBundleMap = new Dictionary<string, string>();
+			var allScenes = new List<string>();
+			var modifiedScenes = new List<string>();
 
-			try {
-				AssetBundle.Current = new AggregateAssetBundle(assetBundles.Values.Cast<AssetBundle>().ToArray());
-
-				Func<string, bool> filter = (path) => scenesExtensions.Contains(Path.GetExtension(path));
-				var scenes = new Dictionary<string, Node>();
-				var sceneToBundleMap = new Dictionary<string, string>();
-				foreach (var bundle in assetBundles) {
-					var bundleScenesFiles = bundle.Value
-						.EnumerateFiles()
-						.Where(filter)
-						.ToList();
-
-					foreach (var sceneFile in bundleScenesFiles) {
-						scenes.Add(sceneFile, Node.CreateFromAssetBundle(sceneFile));
-						sceneToBundleMap.Add(sceneFile, bundle.Key);
+			using (var dc = new DirectoryChanger(The.Workspace.AssetsDirectory)) {
+				foreach (var kv in assetToCookingRules) {
+					var scenePath = kv.Key;
+					if (
+						scenePath.EndsWith(".scene", StringComparison.OrdinalIgnoreCase) ||
+						scenePath.EndsWith(".tan", StringComparison.OrdinalIgnoreCase) ||
+						scenePath.EndsWith(".model", StringComparison.OrdinalIgnoreCase)
+					) {
+						allScenes.Add(scenePath);
+						sceneToBundleMap.Add(scenePath, kv.Value.Bundles.First());
+						var dateModified = File.GetLastWriteTime(scenePath).ToUniversalTime();
+						if (!cache.SceneFiles.ContainsKey(scenePath)) {
+							modifiedScenes.Add(scenePath);
+							scenesToCook.Add(scenePath);
+							var bundles = assetToCookingRules[scenePath].Bundles;
+							foreach (var bundle in bundles) {
+								usedBundles.Add(bundle);
+							}
+							cache.SceneFiles.Add(scenePath, new SceneRecord {
+								Bundle = bundles.First(),
+								DateModified = dateModified
+							});
+						} else {
+							var cacheRecord = cache.SceneFiles[kv.Key];
+							if (dateModified > cacheRecord.DateModified) {
+								var queue = new Queue<string>();
+								if (!visitedScenes.Contains(scenePath)) {
+									queue.Enqueue(scenePath);
+								}
+								while (queue.Count != 0) {
+									var scene = queue.Dequeue();
+									scenesToCook.Add(scene);
+									var bundles = assetToCookingRules[scene].Bundles;
+									foreach (var bundle in bundles) {
+										usedBundles.Add(bundle);
+									}
+									foreach (var referringScene in cache.SceneFiles[scene].ReferringScenes) {
+										if (!visitedScenes.Contains(referringScene)) {
+											visitedScenes.Add(referringScene);
+											queue.Enqueue(referringScene);
+										}
+									}
+								}
+								cache.SceneFiles[scenePath].DateModified = dateModified;
+								modifiedScenes.Add(scenePath);
+							}
+						}
 					}
 				}
-
-				if (scenes.Count == 0) {
-					return;
+			}
+			try {
+				// Don't return early even if there's nothing modified since there may be stuff to delete
+				// Also, don't bother with loading ony usedBundles for now, just load all of them
+				AssetBundle.Current = new AggregateAssetBundle(allBundles.Select(bundleName => new PackedAssetBundle(The.Workspace.GetBundlePath(bundleName))).ToArray());
+				var loadedScenes = new Dictionary<string, Node>();
+				foreach (var scene in scenesToCook) {
+					loadedScenes.Add(scene, Node.CreateFromAssetBundle(scene));
 				}
 				new ScenesCodeCooker(
 					The.Workspace.ProjectDirectory,
 					The.Workspace.Title,
 					CookingRulesBuilder.MainBundleName,
 					sceneToBundleMap,
-					scenes
+					loadedScenes,
+					allScenes,
+					modifiedScenes,
+					cache
 				).Start();
+				SaveCodeCookerCache(cache);
 			} finally {
 				AssetBundle.Current.Dispose();
 				AssetBundle.Current = null;
+			}
+		}
+
+		public static string GetCodeCachePath()
+		{
+			var name = string.Join("_", The.Workspace.ProjectFile.Split(new string[] { "\\", "/", ":" }, StringSplitOptions.RemoveEmptyEntries)).ToLower(CultureInfo.InvariantCulture);
+			return Path.Combine(WorkspaceConfig.GetDataPath(), name, "code_cooker_cache.json");
+		}
+
+		public static CodeCookerCache LoadCodeCookerCache()
+		{
+			var codeCachePath = GetCodeCachePath();
+			if (!File.Exists(codeCachePath)) {
+				return new CodeCookerCache();
+			} else {
+				try {
+					using (FileStream stream = new FileStream(codeCachePath, FileMode.Open, FileAccess.Read, FileShare.None)) {
+						var jd = new Yuzu.Json.JsonDeserializer();
+						return (CodeCookerCache)jd.FromStream(new CodeCookerCache(), stream);
+					}
+				} catch {
+					return new CodeCookerCache();
+				}
+			}
+		}
+
+		public static void SaveCodeCookerCache(CodeCookerCache codeCookerCache)
+		{
+			var codeCookerCachePath = GetCodeCachePath();
+			Directory.CreateDirectory(Path.GetDirectoryName(codeCookerCachePath));
+			using (FileStream stream = new FileStream(codeCookerCachePath, FileMode.Create, FileAccess.Write, FileShare.None)) {
+				var js = new Yuzu.Json.JsonSerializer();
+				js.ToStream(codeCookerCache, stream);
 			}
 		}
 	}
