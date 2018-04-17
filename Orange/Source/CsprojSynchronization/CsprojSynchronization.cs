@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,6 +9,56 @@ namespace Orange
 {
 	public static class CsprojSynchronization
 	{
+		private class FilteredFileEnumerator : IFileEnumerator
+		{
+			public string Directory { get; }
+			public Predicate<FileInfo> EnumerationFilter { get; set; }
+			readonly List<FileInfo> files = new List<FileInfo>();
+
+			public FilteredFileEnumerator(string directory)
+			{
+				Directory = directory;
+				Rescan();
+			}
+
+			public void Rescan()
+			{
+				files.Clear();
+				var dirInfo = new DirectoryInfo(Directory);
+				var queue = new Queue<DirectoryInfo>();
+				queue.Enqueue(new DirectoryInfo(Directory));
+				while (queue.Count != 0) {
+					var rootDirectoryInfo = queue.Dequeue();
+					foreach (var fileInfo in rootDirectoryInfo.GetFiles()) {
+						var file = fileInfo.FullName;
+						file = file.Remove(0, dirInfo.FullName.Length + 1);
+						file = CsprojSynchronization.ToUnixSlashes(file);
+						files.Add(new FileInfo { Path = file, LastWriteTime = fileInfo.LastWriteTime });
+					}
+					foreach (var directoryInfo in rootDirectoryInfo.GetDirectories()) {
+						if (directoryInfo.Name == ".svn") continue;
+						if (directoryInfo.Name == ".git") continue;
+						if (directoryInfo.Name == ".vs") continue;
+						if (directoryInfo.Name == "bin") continue;
+						if (directoryInfo.Name == "obj") continue;
+						if (directoryInfo.Name == "Resources") continue;
+						if (directoryInfo.FullName.StartsWith(The.Workspace.ProjectDirectory + "\\Data")) continue;
+						queue.Enqueue(directoryInfo);
+					}
+				}
+			}
+
+			public IEnumerable<FileInfo> Enumerate(string extension = null)
+			{
+				if (extension == null && EnumerationFilter == null) {
+					return files;
+				}
+				return files
+					.Where(file => extension == null || file.Path.EndsWith(extension, StringComparison.OrdinalIgnoreCase))
+					.Where(file => EnumerationFilter == null || EnumerationFilter(file));
+			}
+		}
+
 		private static string ToWindowsSlashes(string path)
 		{
 			return path.Replace('/', '\\');
@@ -48,7 +98,7 @@ namespace Orange
 			var itemGroups = doc["Project"].EnumerateElements("ItemGroup").ToArray();
 			// It is assumed that the second <ItemGroup> tag contains compile items
 			var compileItems = itemGroups[1];
-			foreach (var file in new FileEnumerator(".").Enumerate(".cs")) {
+			foreach (var file in new FilteredFileEnumerator(".").Enumerate(".cs")) {
 				var path = ToWindowsSlashes(file.Path);
 				if (Path.GetFileName(path).StartsWith("TemporaryGeneratedFile")) {
 					continue;
