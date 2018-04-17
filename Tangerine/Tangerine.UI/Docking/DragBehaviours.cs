@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Lime;
 
-namespace Tangerine.UI
+namespace Tangerine.UI.Docking
 {
 	public class WindowDragBehaviour
 	{

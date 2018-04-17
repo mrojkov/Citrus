@@ -1,6 +1,6 @@
 ﻿using Lime;
 
-namespace Tangerine.UI
+namespace Tangerine.UI.Docking
 {
 	public class DockingPresenter : DelegatePresenter<Widget>
 	{

@@ -5,7 +5,7 @@ using Lime;
 using Tangerine.Core;
 using Yuzu;
 
-namespace Tangerine.UI
+namespace Tangerine.UI.Docking
 {
 	public class DockManager
 	{

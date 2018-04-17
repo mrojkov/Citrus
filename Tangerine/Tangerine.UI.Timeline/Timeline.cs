@@ -3,6 +3,7 @@ using System.Linq;
 using Lime;
 using Tangerine.Core;
 using System.Collections.Generic;
+using Tangerine.UI.Docking;
 using Tangerine.UI.Timeline.Components;
 
 namespace Tangerine.UI.Timeline

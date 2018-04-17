@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Lime;
 using Tangerine.Core;
+using Tangerine.UI.Docking;
 
 namespace Tangerine.UI.FilesystemView
 {

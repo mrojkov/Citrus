@@ -30,13 +30,13 @@ namespace Tangerine.UI.Inspector
 		{
 			Instance = this;
 			PanelWidget.PushNode(RootWidget);
-			DockManager.Instance.FilesDropped += OnFilesDropped;
+			Docking.DockManager.Instance.FilesDropped += OnFilesDropped;
 		}
 
 		public void Detach()
 		{
 			Instance = null;
-			DockManager.Instance.FilesDropped -= OnFilesDropped;
+			Docking.DockManager.Instance.FilesDropped -= OnFilesDropped;
 			RootWidget.Unlink();
 		}
 

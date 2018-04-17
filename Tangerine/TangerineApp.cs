@@ -5,6 +5,7 @@ using System.Linq;
 using Lime;
 using Tangerine.Core;
 using Tangerine.UI;
+using Tangerine.UI.Docking;
 
 namespace Tangerine
 {

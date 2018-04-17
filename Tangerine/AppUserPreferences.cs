@@ -8,7 +8,7 @@ namespace Tangerine
 	public class AppUserPreferences : Component
 	{
 		[YuzuRequired]
-		public UI.DockManager.State DockState;
+		public UI.Docking.DockManager.State DockState;
 
 		[YuzuRequired]
 		public readonly List<string> RecentProjects;
@@ -27,7 +27,7 @@ namespace Tangerine
 
 		public AppUserPreferences()
 		{
-			DockState = new UI.DockManager.State();
+			DockState = new UI.Docking.DockManager.State();
 			RecentProjects = new List<string>();
 			ResetToDefaults();
 		}

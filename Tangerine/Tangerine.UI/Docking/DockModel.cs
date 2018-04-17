@@ -5,7 +5,7 @@ using System.Linq;
 using Lime;
 using Yuzu;
 
-namespace Tangerine.UI
+namespace Tangerine.UI.Docking
 {
 	public enum DockSite
 	{
