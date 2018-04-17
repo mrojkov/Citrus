@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Components;
+using Tangerine.Core.Operations;
 using Tangerine.UI.Timeline.Components;
 
 namespace Tangerine.UI.Timeline
@@ -66,6 +67,9 @@ namespace Tangerine.UI.Timeline
 							if (k.Frame + offset.X >= 0) {
 								var k1 = k.Clone();
 								k1.Frame += offset.X;
+								// The same logic is used to create keyframes as everywhere, but extended by setting
+								// all parameters from a particular keyframe. Yes, this creates some overhead.
+								operations.Add(() => SetAnimableProperty.Perform(destNode, a.TargetProperty, k1.Value, true, true, k1.Frame));
 								operations.Add(() => Core.Operations.SetKeyframe.Perform(destNode, a.TargetProperty, Document.Current.AnimationId, k1));
 							}
 							// Order is importent. RemoveKeyframe must be after SetKeyframe,

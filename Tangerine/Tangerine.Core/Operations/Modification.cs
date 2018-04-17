@@ -47,7 +47,7 @@ namespace Tangerine.Core.Operations
 
 	public class SetAnimableProperty
 	{
-		public static void Perform(object @object, string propertyName, object value, bool createAnimatorIfNeeded, bool createInitialKeyframeForNewAnimator = true)
+		public static void Perform(object @object, string propertyName, object value, bool createAnimatorIfNeeded, bool createInitialKeyframeForNewAnimator = true, int atFrame = -1)
 		{
 			SetProperty.Perform(@object, propertyName, value);
 			IAnimator animator;
@@ -55,15 +55,16 @@ namespace Tangerine.Core.Operations
 			if (animable != null && (animable.Animators.TryFind(propertyName, out animator, Document.Current.AnimationId) || createAnimatorIfNeeded)) {
 				
 				if (animator == null && createInitialKeyframeForNewAnimator) {
-					var frame = Document.Current.AnimationFrame;
-					Document.Current.AnimationFrame = 0;
-
 					var propertyValue = animable.GetType().GetProperty(propertyName).GetValue(animable);
-					Perform(animable, propertyName, propertyValue, true, false);
-					
-					Document.Current.AnimationFrame = frame;
+					Perform(animable, propertyName, propertyValue, true, false, 0);
 				}
-				
+
+				int savedFrame = -1;
+				if (atFrame >= 0 && Document.Current.AnimationFrame != atFrame) {
+					savedFrame = Document.Current.AnimationFrame;
+					Document.Current.AnimationFrame = atFrame;
+				}
+
 				var type = animable.GetType().GetProperty(propertyName).PropertyType;
 				var key =
 					animator?.ReadonlyKeys.FirstOrDefault(i => i.Frame == Document.Current.AnimationFrame)?.Clone() ??
@@ -72,7 +73,11 @@ namespace Tangerine.Core.Operations
 				key.Function = animator?.Keys.LastOrDefault(k => k.Frame <= key.Frame)?.Function ?? KeyFunction.Linear;
 				key.Value = value;
 				SetKeyframe.Perform(animable, propertyName, Document.Current.AnimationId, key);
-				
+
+				if (savedFrame >= 0) {
+					Document.Current.AnimationFrame = savedFrame;
+				}
+
 			}
 		}
 	}
