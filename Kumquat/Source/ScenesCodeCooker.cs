@@ -75,7 +75,7 @@ namespace Kumquat
 			NodeCodeTemplate = GetEmbeddedResource("ParsedNode.txt");
 		}
 
-		private static void RetryUntilSuccessDeleteDirectory(string path)
+		public static void RetryUntilSuccessDeleteDirectory(string path)
 		{
 			int maxRetryCount = 32;
 			while (true) {
