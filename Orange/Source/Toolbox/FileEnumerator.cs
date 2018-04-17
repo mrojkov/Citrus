@@ -48,4 +48,55 @@ namespace Orange
 				.Where(file => EnumerationFilter == null || EnumerationFilter(file));
 		}
 	}
+
+	/// <summary>
+	/// File enumerator optimized for scaning large data sets with some unwanted sub-directories
+	/// </summary>
+	public class ScanOptimizedFileEnumerator : IFileEnumerator
+	{
+		private readonly Predicate<DirectoryInfo> scanFilter;
+		private readonly List<FileInfo> files = new List<FileInfo>();
+
+		public ScanOptimizedFileEnumerator(string directory, Predicate<DirectoryInfo> scanFilter)
+		{
+			this.scanFilter = scanFilter;
+			Directory = directory;
+			Rescan();
+		}
+
+		public string Directory { get; }
+		public Predicate<FileInfo> EnumerationFilter { get; set; }
+
+		public void Rescan()
+		{
+			files.Clear();
+			var dirInfo = new DirectoryInfo(Directory);
+			var queue = new Queue<DirectoryInfo>();
+			queue.Enqueue(new DirectoryInfo(Directory));
+			while (queue.Count != 0) {
+				var rootDirectoryInfo = queue.Dequeue();
+				foreach (var fileInfo in rootDirectoryInfo.EnumerateFiles()) {
+					var file = fileInfo.FullName;
+					file = file.Remove(0, dirInfo.FullName.Length + 1);
+					file = CsprojSynchronization.ToUnixSlashes(file);
+					files.Add(new FileInfo { Path = file, LastWriteTime = fileInfo.LastWriteTime });
+				}
+				foreach (var directoryInfo in rootDirectoryInfo.EnumerateDirectories()) {
+					if (scanFilter(directoryInfo)) {
+						queue.Enqueue(directoryInfo);
+					}
+				}
+			}
+		}
+
+		public IEnumerable<FileInfo> Enumerate(string extension = null)
+		{
+			if (extension == null && EnumerationFilter == null) {
+				return files;
+			}
+			return files
+				.Where(file => extension == null || file.Path.EndsWith(extension, StringComparison.OrdinalIgnoreCase))
+				.Where(file => EnumerationFilter == null || EnumerationFilter(file));
+		}
+	}
 }

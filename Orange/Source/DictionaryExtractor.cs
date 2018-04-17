@@ -93,7 +93,15 @@ namespace Orange
 
 		private void ExtractTexts()
 		{
-			var sourceFiles = new FileEnumerator(The.Workspace.ProjectDirectory) {
+			Predicate<DirectoryInfo> scanFilter = (directoryInfo) => {
+				if (directoryInfo.Name == "bin") return false;
+				if (directoryInfo.Name == "obj") return false;
+				if (directoryInfo.Name == ".svn") return false;
+				if (directoryInfo.Name == ".git") return false;
+				if (directoryInfo.Name == ".vs") return false;
+				return true;
+			};
+			var sourceFiles = new ScanOptimizedFileEnumerator(The.Workspace.ProjectDirectory, scanFilter) {
 				EnumerationFilter = (f) => !f.Path.Contains("/bin/") && !f.Path.Contains("/obj/"),
 			};
 			using (new DirectoryChanger(The.Workspace.ProjectDirectory)) {
