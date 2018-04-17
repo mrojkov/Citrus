@@ -107,7 +107,9 @@ namespace Orange
 			if (!File.Exists(codeCachePath)) {
 				// Clean Generated Scenes folder of legacy files if there's no cache
 				var scenesPath = $@"{The.Workspace.ProjectDirectory}/{The.Workspace.Title}.GeneratedScenes/Scenes";
-				ScenesCodeCooker.RetryUntilSuccessDeleteDirectory(scenesPath);
+				if (Directory.Exists(scenesPath)) {
+					ScenesCodeCooker.RetryUntilSuccessDeleteDirectory(scenesPath);
+				}
 				return new CodeCookerCache();
 			} else {
 				try {
