@@ -158,6 +158,8 @@ namespace Tangerine
 				new UI.Timeline.Operations.ShiftGridSelection.Processor(),
 				new UI.Timeline.Operations.SetCurrentColumn.Processor(),
 				new UI.Timeline.Operations.SelectCurveKey.Processor(),
+				new TriggersValidatorOnSetProperty(),
+				new TriggersValidatorOnSetKeyframe(),
 				new UpdateNodesAndApplyAnimatorsProcessor(),
 				new RowsSynchronizer(),
 			});

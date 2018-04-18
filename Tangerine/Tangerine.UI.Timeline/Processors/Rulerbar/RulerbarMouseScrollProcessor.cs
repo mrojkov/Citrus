@@ -70,9 +70,9 @@ namespace Tangerine.UI.Timeline
 				return;
 			}
 			// Delete and add marker again, because we want to maintain the markers order.
-			Core.Operations.DeleteMarker.Perform(Document.Current.Container.Markers, marker);
+			Core.Operations.DeleteMarker.Perform(Document.Current.Container, marker, false);
 			Core.Operations.SetProperty.Perform(marker, "Frame", destColumn);
-			Core.Operations.SetMarker.Perform(Document.Current.Container.Markers, marker);
+			Core.Operations.SetMarker.Perform(Document.Current.Container, marker, true);
 		}
 
 		public static int CalcColumn(float mouseX)

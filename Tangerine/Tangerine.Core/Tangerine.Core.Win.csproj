@@ -68,6 +68,7 @@
     <Compile Include="Row.cs" />
     <Compile Include="RowsSynchronizer.cs" />
     <Compile Include="Operation.cs" />
+    <Compile Include="TriggersValidation.cs" />
     <Compile Include="UserPreferences.cs" />
     <Compile Include="VersionedCollection.cs" />
     <Compile Include="WidgetExtensions.cs" />

@@ -32,9 +32,9 @@ namespace Tangerine.UI.Timeline
 			var newMarker = marker?.Clone() ?? new Marker { Frame = timeline.CurrentColumn };
 			var r = new MarkerPropertiesDialog().Show(newMarker, canDelete: marker != null);
 			if (r == MarkerPropertiesDialog.Result.Ok) {
-				Core.Operations.SetMarker.Perform(Document.Current.Container.DefaultAnimation.Markers, newMarker);
+				Core.Operations.SetMarker.Perform(Document.Current.Container, newMarker, true);
 			} else if (r == MarkerPropertiesDialog.Result.Delete) {
-				Core.Operations.DeleteMarker.Perform(Document.Current.Container.DefaultAnimation.Markers, marker);
+				Core.Operations.DeleteMarker.Perform(Document.Current.Container, marker, true);
 			}
 			// To prevent RulerbarMouseScroll.
 			RootWidget.Input.ConsumeKey(Key.Mouse0);
@@ -139,7 +139,7 @@ namespace Tangerine.UI.Timeline
 				m.Frame = frameUnderMouse;
 				Document.Current.History.BeginTransaction();
 				try {
-					SetMarker.Perform(Document.Current.Container.DefaultAnimation.Markers, m);
+					SetMarker.Perform(Document.Current.Container, m, true);
 				} finally {
 					Document.Current.History.EndTransaction();
 				}
@@ -152,7 +152,7 @@ namespace Tangerine.UI.Timeline
 		{
 			Document.Current.History.BeginTransaction();
 			try {
-				Core.Operations.DeleteMarker.Perform(Document.Current.Container.Markers, marker);
+				Core.Operations.DeleteMarker.Perform(Document.Current.Container, marker, true);
 			} finally {
 				Document.Current.History.EndTransaction();
 			}
@@ -188,7 +188,7 @@ namespace Tangerine.UI.Timeline
 				var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(text));
 				var frame = Serialization.ReadObject<Frame>(Document.Current.Path, stream);
 				foreach (var marker in frame.Markers) {
-					SetMarker.Perform(Document.Current.Container.DefaultAnimation.Markers, marker);
+					SetMarker.Perform(Document.Current.Container, marker, true);
 				}
 			} catch (System.Exception e) {
 				Debug.Write(e);
@@ -199,7 +199,7 @@ namespace Tangerine.UI.Timeline
 		{
 			var timeline = Timeline.Instance;
 			foreach (var marker in Document.Current.Container.Markers.ToList()) {
-				Core.Operations.DeleteMarker.Perform(Document.Current.Container.DefaultAnimation.Markers, marker);
+				Core.Operations.DeleteMarker.Perform(Document.Current.Container, marker, true);
 			}
 		}
 

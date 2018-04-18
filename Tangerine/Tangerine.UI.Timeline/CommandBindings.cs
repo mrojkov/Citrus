@@ -110,7 +110,7 @@ namespace Tangerine.UI.Timeline
 				action,
 				action == MarkerAction.Jump && nearestMarker != null ? nearestMarker.Id : ""
 			);
-			Core.Operations.SetMarker.Perform(Document.Current.Container.DefaultAnimation.Markers, newMarker);
+			Core.Operations.SetMarker.Perform(Document.Current.Container, newMarker, true);
 		}
 
 		static void DeleteMarker()
@@ -118,7 +118,7 @@ namespace Tangerine.UI.Timeline
 			var timeline = Timeline.Instance;
 			var marker = Document.Current.Container.Markers.FirstOrDefault(i => i.Frame == timeline.CurrentColumn);
 			if (marker != null) {
-				Core.Operations.DeleteMarker.Perform(Document.Current.Container.DefaultAnimation.Markers, marker);
+				Core.Operations.DeleteMarker.Perform(Document.Current.Container, marker, true);
 			}
 		}
 	}

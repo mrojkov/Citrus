@@ -49,11 +49,13 @@ namespace Tangerine.Core.Operations
 				}
 				foreach (var m in markers) {
 					if (m.Frame >= op.Column) {
-						DeleteMarker.Perform(container.Markers, m);
 						var m1 = m.Clone();
 						m1.Frame += op.Direction.Sign();
-						if (op.Direction > 0 || m.Frame > op.Column) {
-							SetMarker.Perform(container.Markers, m1);
+						bool isReSet = op.Direction > 0 || m.Frame > op.Column;
+
+						DeleteMarker.Perform(container, m, !isReSet);
+						if (isReSet) {
+							SetMarker.Perform(container, m1, false);
 						}
 					}
 				}

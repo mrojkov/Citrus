@@ -353,38 +353,60 @@ namespace Tangerine.Core.Operations
 
 	public class SetMarker : Operation
 	{
-		public readonly MarkerList List;
-		public readonly Marker Marker;
+		private readonly Node container;
+		private readonly Marker marker;
+		private readonly bool removeDependencies;
 
 		public override bool IsChangingDocument => true;
 
-		public static void Perform(MarkerList list, Marker marker)
+		public static void Perform(Node container, Marker marker, bool removeDependencies)
 		{
-			Document.Current.History.Perform(new SetMarker(list, marker));
+			Document.Current.History.Perform(new SetMarker(container, marker, removeDependencies));
 		}
 
-		private SetMarker(MarkerList list, Marker marker)
+		private SetMarker(Node container, Marker marker, bool removeDependencies)
 		{
-			List = list;
-			Marker = marker;
+			this.container = container;
+			this.marker = marker;
+			this.removeDependencies = removeDependencies;
 		}
 
 		public class Processor : OperationProcessor<SetMarker>
 		{
-			class Backup { public Marker Marker; }
+			class Backup
+			{
+				public Marker Marker;
+				public string SavedJumpTo;
+			}
 
 			protected override void InternalRedo(SetMarker op)
 			{
-				op.Save(new Backup { Marker = op.List.FirstOrDefault(i => i.Frame == op.Marker.Frame) });
-				op.List.AddOrdered(op.Marker);
+				Backup backup = new Backup {
+					Marker = op.container.Markers.FirstOrDefault(i => i.Frame == op.marker.Frame)
+				};
+
+				op.Save(backup);
+				op.container.Markers.AddOrdered(op.marker);
+
+				if (op.removeDependencies) {
+					backup.SavedJumpTo = op.marker.JumpTo;
+					if (op.marker.Action == MarkerAction.Jump &&
+						op.container.Markers.All(markerEl => markerEl.Id != op.marker.JumpTo)) {
+						op.marker.JumpTo = "";
+					}
+				}
 			}
 
 			protected override void InternalUndo(SetMarker op)
 			{
-				op.List.Remove(op.Marker);
+				op.container.Markers.Remove(op.marker);
 				var b = op.Restore<Backup>();
 				if (b.Marker != null) {
-					op.List.AddOrdered(b.Marker);
+					op.container.Markers.AddOrdered(b.Marker);
+				}
+
+				if (op.removeDependencies) {
+					op.marker.JumpTo = b.SavedJumpTo;
 				}
 			}
 		}
@@ -392,33 +414,102 @@ namespace Tangerine.Core.Operations
 
 	public class DeleteMarker : Operation
 	{
-		public readonly MarkerList List;
-		public readonly Marker Marker;
+		private readonly Node container;
+		private readonly Marker marker;
+		private readonly bool removeDependencies;
 
 		public override bool IsChangingDocument => true;
 
-		public static void Perform(MarkerList list, Marker marker)
+		public static void Perform(Node container, Marker marker, bool removeDependencies)
 		{
-			Document.Current.History.Perform(new DeleteMarker(list, marker));
+			Document.Current.History.Perform(new DeleteMarker(container, marker, removeDependencies));
+
+			if (removeDependencies) {
+				Animator<string> triggerAnimator;
+				if (container.Animators.TryFind(nameof(container.Trigger), out triggerAnimator)) {
+					foreach (Keyframe<string> keyframe in triggerAnimator.ReadonlyKeys.ToList()) {
+						string newTrigger;
+						if (TryRemoveMarkerFromTrigger(marker.Id, keyframe.Value, out newTrigger)) {
+							SetAnimableProperty.Perform(
+								container, nameof(container.Trigger), newTrigger,
+								false, false, keyframe.Frame
+							);
+						}
+					}
+				}
+			}
 		}
 
-		private DeleteMarker(MarkerList list, Marker marker)
+		private DeleteMarker(Node container, Marker marker, bool removeDependencies)
 		{
-			List = list;
-			Marker = marker;
+			this.container = container;
+			this.marker = marker;
+			this.removeDependencies = removeDependencies;
+		}
+
+		private static bool TryRemoveMarkerFromTrigger(string markerId, string trigger, out string newTrigger)
+		{
+			newTrigger = trigger;
+			TriggersValidation.Trigger triggerParsed = TriggersValidation.Trigger.TryParse(trigger);
+			if (triggerParsed.Elements.RemoveAll(element => element.MarkerId == markerId) == 0) {
+				return false;
+			}
+			newTrigger = triggerParsed.Compose();
+			return true;
 		}
 
 		public class Processor : OperationProcessor<DeleteMarker>
 		{
+			private class Backup
+			{
+				internal readonly string Trigger;
+				internal readonly List<Marker> RemovedJumpToMarkers;
+
+				public Backup(string trigger, List<Marker> removedJumpToMarkers)
+				{
+					Trigger = trigger;
+					RemovedJumpToMarkers = removedJumpToMarkers;
+				}
+			}
+
 			protected override void InternalRedo(DeleteMarker op)
 			{
-				op.List.Remove(op.Marker);
+				op.container.Markers.Remove(op.marker);
+
+				if (op.removeDependencies) {
+					if (op.container.Trigger != null) {
+						string newTrigger;
+						TryRemoveMarkerFromTrigger(op.marker.Id, op.container.Trigger, out newTrigger);
+						op.container.Trigger = newTrigger;
+					}
+
+					List<Marker> removedJumpToMarkers = new List<Marker>();
+					foreach (Marker marker in op.container.Markers) {
+						if (marker.Action == MarkerAction.Jump && marker.JumpTo == op.marker.Id) {
+							removedJumpToMarkers.Add(marker);
+						}
+					}
+					foreach (Marker marker in removedJumpToMarkers) {
+						removedJumpToMarkers.Remove(marker);
+					}
+					op.Save(new Backup(op.container.Trigger, removedJumpToMarkers));
+				}
 			}
 
 			protected override void InternalUndo(DeleteMarker op)
 			{
-				op.List.AddOrdered(op.Marker);
+				op.container.Markers.AddOrdered(op.marker);
+
+				Backup backup;
+				if (op.Find(out backup)) {
+					backup = op.Restore<Backup>();
+					op.container.Trigger = backup.Trigger;
+					foreach (Marker marker in backup.RemovedJumpToMarkers) {
+						op.container.Markers.AddOrdered(marker);
+					}
+				}
 			}
+
 		}
 	}
 
