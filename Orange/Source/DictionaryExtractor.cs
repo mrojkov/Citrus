@@ -101,9 +101,7 @@ namespace Orange
 				if (directoryInfo.Name == ".vs") return false;
 				return true;
 			};
-			var sourceFiles = new ScanOptimizedFileEnumerator(The.Workspace.ProjectDirectory, scanFilter) {
-				EnumerationFilter = (f) => !f.Path.Contains("/bin/") && !f.Path.Contains("/obj/"),
-			};
+			var sourceFiles = new ScanOptimizedFileEnumerator(The.Workspace.ProjectDirectory, scanFilter);
 			using (new DirectoryChanger(The.Workspace.ProjectDirectory)) {
 				var files = sourceFiles.Enumerate(".cs");
 				foreach (var fileInfo in files) {

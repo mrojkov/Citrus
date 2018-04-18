@@ -61,15 +61,22 @@ namespace Orange
 
 			foreach (var target in The.Workspace.Targets) {
 				var platform = target.Platform;
-				var limeProj = The.Workspace.GetLimeCsprojFilePath(platform);
+				var limeProj = CsprojSynchronization.ToUnixSlashes(The.Workspace.GetLimeCsprojFilePath(platform));
 				CsprojSynchronization.SynchronizeProject(limeProj);
-				var dirInfo = new System.IO.DirectoryInfo(The.Workspace.ProjectDirectory);
-				foreach (var fileInfo in dirInfo.GetFiles("*" + The.Workspace.GetPlatformSuffix(platform) + ".csproj", SearchOption.AllDirectories)) {
-					CsprojSynchronization.SynchronizeProject(fileInfo.FullName);
-				}
-				if (target.ProjectPath != null) {
-					foreach (var targetCsprojFile in dirInfo.GetFiles(Path.GetFileName(target.ProjectPath), SearchOption.AllDirectories)) {
-						CsprojSynchronization.SynchronizeProject(targetCsprojFile.FullName);
+				using (new DirectoryChanger(The.Workspace.ProjectDirectory)) {
+					var dirInfo = new System.IO.DirectoryInfo(The.Workspace.ProjectDirectory);
+					var fileEnumerator = new ScanOptimizedFileEnumerator(
+						The.Workspace.ProjectDirectory,
+						CsprojSynchronization.SkipUnwantedDirectoriesPredicate,
+						cutDirectoryPrefix: false
+					);
+					foreach (var fileInfo in fileEnumerator.Enumerate(The.Workspace.GetPlatformSuffix(platform) + ".csproj")) {
+						CsprojSynchronization.SynchronizeProject(fileInfo.Path);
+					};
+					if (target.ProjectPath != null) {
+						foreach (var targetCsprojFile in fileEnumerator.Enumerate(Path.GetFileName(target.ProjectPath))) {
+							CsprojSynchronization.SynchronizeProject(targetCsprojFile.Path);
+						}
 					}
 				}
 			}

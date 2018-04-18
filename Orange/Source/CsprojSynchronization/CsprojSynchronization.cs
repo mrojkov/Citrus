@@ -9,6 +9,16 @@ namespace Orange
 {
 	public static class CsprojSynchronization
 	{
+		public static Predicate<DirectoryInfo> SkipUnwantedDirectoriesPredicate = directoryInfo => {
+			if (directoryInfo.Name == "bin") return false;
+			if (directoryInfo.Name == "obj") return false;
+			if (directoryInfo.Name == ".svn") return false;
+			if (directoryInfo.Name == ".git") return false;
+			if (directoryInfo.Name == ".vs") return false;
+			if (directoryInfo.Name == "Resources") return false;
+			if (directoryInfo.FullName.StartsWith(The.Workspace.ProjectDirectory + "\\Data")) return false;
+			return true;
+		};
 		private static string ToWindowsSlashes(string path)
 		{
 			return path.Replace('/', '\\');
@@ -48,17 +58,7 @@ namespace Orange
 			var itemGroups = doc["Project"].EnumerateElements("ItemGroup").ToArray();
 			// It is assumed that the second <ItemGroup> tag contains compile items
 			var compileItems = itemGroups[1];
-			Predicate<DirectoryInfo> scanFilter = (directoryInfo) => {
-				if (directoryInfo.Name == "bin") return false;
-				if (directoryInfo.Name == "obj") return false;
-				if (directoryInfo.Name == ".svn") return false;
-				if (directoryInfo.Name == ".git") return false;
-				if (directoryInfo.Name == ".vs") return false;
-				if (directoryInfo.Name == "Resources") return false;
-				if (directoryInfo.FullName.StartsWith(The.Workspace.ProjectDirectory + "\\Data")) return false;
-				return true;
-			};
-			foreach (var file in new ScanOptimizedFileEnumerator(".", scanFilter).Enumerate(".cs")) {
+			foreach (var file in new ScanOptimizedFileEnumerator(".", SkipUnwantedDirectoriesPredicate).Enumerate(".cs")) {
 				var path = ToWindowsSlashes(file.Path);
 				if (Path.GetFileName(path).StartsWith("TemporaryGeneratedFile")) {
 					continue;

@@ -56,10 +56,12 @@ namespace Orange
 	{
 		private readonly Predicate<DirectoryInfo> scanFilter;
 		private readonly List<FileInfo> files = new List<FileInfo>();
+		private readonly bool cutDirectoryPrefix = true;
 
-		public ScanOptimizedFileEnumerator(string directory, Predicate<DirectoryInfo> scanFilter)
+		public ScanOptimizedFileEnumerator(string directory, Predicate<DirectoryInfo> scanFilter, bool cutDirectoryPrefix = true)
 		{
 			this.scanFilter = scanFilter;
+			this.cutDirectoryPrefix = cutDirectoryPrefix;
 			Directory = directory;
 			Rescan();
 		}
@@ -77,7 +79,9 @@ namespace Orange
 				var rootDirectoryInfo = queue.Dequeue();
 				foreach (var fileInfo in rootDirectoryInfo.EnumerateFiles()) {
 					var file = fileInfo.FullName;
-					file = file.Remove(0, dirInfo.FullName.Length + 1);
+					if (cutDirectoryPrefix) {
+						file = file.Remove(0, dirInfo.FullName.Length + 1);
+					}
 					file = CsprojSynchronization.ToUnixSlashes(file);
 					files.Add(new FileInfo { Path = file, LastWriteTime = fileInfo.LastWriteTime });
 				}
