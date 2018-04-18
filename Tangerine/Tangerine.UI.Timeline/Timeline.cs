@@ -19,7 +19,7 @@ namespace Tangerine.UI.Timeline
 		public readonly CurveEditorPane CurveEditor;
 		public readonly RollPane Roll;
 		public readonly Widget PanelWidget;
-		public readonly DockPanel Panel;
+		public readonly Panel Panel;
 		public readonly Widget RootWidget;
 
 		private Vector2 offset;
@@ -57,7 +57,7 @@ namespace Tangerine.UI.Timeline
 			};
 		}
 
-		public Timeline(DockPanel panel)
+		public Timeline(Panel panel)
 		{
 			Panel = panel;
 			PanelWidget = panel.ContentWidget;

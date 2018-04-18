@@ -7,7 +7,7 @@ namespace Tangerine.UI.Docking
 {
 	public class WindowDragBehaviour
 	{
-		private static DockingModel AppPlacement => DockingModel.Instance;
+		private static DockHierarchy AppPlacement => DockHierarchy.Instance;
 		private DockSite requestedSite;
 		private PanelPlacement requestedPlacement;
 		private Vector2 positionOffset;
@@ -100,14 +100,14 @@ namespace Tangerine.UI.Docking
 
 		private static void InvalidateWindows()
 		{
-			foreach (var win in AppPlacement.VisibleWindows) {
+			foreach (var win in AppPlacement.VisibleWindowPlacements) {
 				win.WindowWidget.Window.Invalidate();
 			}
 		}
 
 		private static void ResetDockComponents()
 		{
-			foreach (var win in AppPlacement.VisibleWindows) {
+			foreach (var win in AppPlacement.VisibleWindowPlacements) {
 				win.WindowWidget.Components.Get<RequestedDockingComponent>().Bounds = null;
 			}
 		}
@@ -148,12 +148,12 @@ namespace Tangerine.UI.Docking
 		private readonly Widget inputWidget;
 		private Vector2 LocalMousePosition => inputWidget.Parent.AsWidget.LocalMousePosition();
 		private const float Offset = 30;
-		private readonly DockPanel panel;
+		private readonly Panel panel;
 		private readonly WidgetInput input;
 
 		public event Action<Vector2, Vector2> OnUndock;
 
-		public PanelDragBehaviour(Widget inputWidget, DockPanel panel)
+		public PanelDragBehaviour(Widget inputWidget, Panel panel)
 		{
 			this.panel = panel;
 			this.inputWidget = inputWidget;

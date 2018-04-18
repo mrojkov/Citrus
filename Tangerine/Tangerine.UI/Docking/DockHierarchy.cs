@@ -41,28 +41,28 @@ namespace Tangerine.UI.Docking
 		}
 	}
 
-	public class DockingModel
+	public class DockHierarchy
 	{
-		public WindowPlacement MainWindow => Placements.First();
+		public WindowPlacement MainWindow => WindowPlacements.First();
 
-		public readonly List<DockPanel> Panels = new List<DockPanel>();
+		public readonly List<Panel> Panels = new List<Panel>();
 
 		[YuzuMember]
-		public readonly List<WindowPlacement> Placements = new List<WindowPlacement>();
+		public readonly List<WindowPlacement> WindowPlacements = new List<WindowPlacement>();
 
-		public IEnumerable<WindowPlacement> VisibleWindows => Placements.Where(p => p.WindowWidget != null);
+		public IEnumerable<WindowPlacement> VisibleWindowPlacements => WindowPlacements.Where(p => p.WindowWidget != null);
 
-		private static DockingModel instance;
-		public static DockingModel Instance => instance ?? (instance = new DockingModel());
+		private static DockHierarchy instance;
+		public static DockHierarchy Instance => instance ?? (instance = new DockHierarchy());
 
-		private DockingModel() { }
+		private DockHierarchy() { }
 
 		public void Initialize(WindowPlacement main)
 		{
-			Placements.Add(main);
+			WindowPlacements.Add(main);
 		}
 
-		public PanelPlacement AddPanel(DockPanel panel, Placement targetPlacement, DockSite site, float stretch)
+		public PanelPlacement AddPanel(Panel panel, Placement targetPlacement, DockSite site, float stretch)
 		{
 			var placement = new PanelPlacement { Id = panel.Id, Title = panel.Title };
 			DockPanelTo(placement, targetPlacement, site, stretch);
@@ -70,7 +70,7 @@ namespace Tangerine.UI.Docking
 			return placement;
 		}
 
-		public PanelPlacement AppendPanelToPlacement(DockPanel panel, SplitPlacement target)
+		public PanelPlacement AppendPanelToPlacement(Panel panel, SplitPlacement target)
 		{
 			var placement = new PanelPlacement { Id = panel.Id, Title = panel.Title };
 			if (target.FirstChild == null) {
@@ -126,7 +126,7 @@ namespace Tangerine.UI.Docking
 
 		public bool IsPanelSingleInWindow(string id) => FindPanelPlacement(id).Root.DescendantPanels().Count() == 1;
 
-		public void AddWindow(WindowPlacement placement) => Placements.Add(placement);
+		public void AddWindow(WindowPlacement placement) => WindowPlacements.Add(placement);
 
 		public void HideWindowPanels(WindowPlacement windowPlacement)
 		{
@@ -134,12 +134,12 @@ namespace Tangerine.UI.Docking
 			windowPlacement.WindowWidget = null;
 		}
 
-		public void RemoveWindow(WindowPlacement placement) => Placements.Remove(placement);
+		public void RemoveWindow(WindowPlacement placement) => WindowPlacements.Remove(placement);
 
 		public PanelPlacement FindPanelPlacement(string id)
 		{
 			PanelPlacement result = null;
-			foreach (var p in Placements) {
+			foreach (var p in WindowPlacements) {
 				if ((result = p.Root.FindPanelPlacement(id)) != null) {
 					break;
 				}
@@ -149,7 +149,7 @@ namespace Tangerine.UI.Docking
 
 		public WindowPlacement GetWindowByPlacement(Placement target)
 		{
-			foreach (var p in Placements) {
+			foreach (var p in WindowPlacements) {
 				if (target.IsDescendantOf(p.Root)) {
 					return p;
 				}
@@ -179,9 +179,7 @@ namespace Tangerine.UI.Docking
 
 		public abstract bool AnyVisiblePanel();
 
-		public virtual void RemoveRedundantNodes()
-		{
-		}
+		public virtual void RemoveRedundantNodes() { }
 
 		public virtual Vector2 CalcGlobalSize()
 		{
@@ -231,7 +229,7 @@ namespace Tangerine.UI.Docking
 		}
 	}
 
-	public class WindowPlacement
+	public class WindowPlacement : SplitPlacement
 	{
 		[YuzuMember]
 		public Vector2 Position;
@@ -240,20 +238,18 @@ namespace Tangerine.UI.Docking
 		public Vector2 Size;
 
 		[YuzuMember]
-		public SplitPlacement Root;
-
-		[YuzuMember]
 		public WindowState State;
 
 		public WindowWidget WindowWidget;
 
-		public WindowPlacement Clone()
+		public override Placement Clone()
 		{
 			return new WindowPlacement {
 				Position = Position,
 				Size = Size,
 				State = State,
-				Root = (SplitPlacement)Root.Clone()
+				FirstChild = FirstChild?.Clone(),
+				SecondChild = SecondChild?.Clone(),
 			};
 		}
 	}
@@ -271,9 +267,7 @@ namespace Tangerine.UI.Docking
 
 		public override IEnumerable<PanelPlacement> DescendantPanels() => new PanelPlacement[] { };
 
-		public override void RemovePlacement(Placement placement)
-		{
-		}
+		public override void RemovePlacement(Placement placement) { }
 
 		public override PanelPlacement FindPanelPlacement(string id) => id == Title ? this : null;
 
@@ -601,7 +595,7 @@ namespace Tangerine.UI.Docking
 		public Rectangle? Bounds { get; set; }
 	}
 
-	public class DockPanel
+	public class Panel
 	{
 		public bool IsUndockable { get; private set; }
 		public readonly Widget ContentWidget;
@@ -609,7 +603,7 @@ namespace Tangerine.UI.Docking
 
 		public string Title;
 
-		public DockPanel(string id, string title = null, bool undockable = true)
+		public Panel(string id, string title = null, bool undockable = true)
 		{
 			Id = id;
 			Title = title ?? id;

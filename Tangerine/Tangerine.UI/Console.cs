@@ -37,24 +37,24 @@ namespace Tangerine.UI
 
 		public static Console Instance { get; private set; }
 
-		private DockPanel dockPanel;
+		private Panel panel;
 		public readonly Widget RootWidget;
 		private ThemedTextView textView;
 		private TextWriter textWriter;
 
-		public Console(DockPanel dockPanel)
+		public Console(Panel panel)
 		{
 			if (Instance != null) {
 				throw new InvalidOperationException();
 			}
 			Instance = this;
-			this.dockPanel = dockPanel;
+			this.panel = panel;
 			RootWidget = new Widget {
 				Layout = new VBoxLayout {
 					Spacing = 6
 				}
 			};
-			dockPanel.ContentWidget.AddNode(RootWidget);
+			panel.ContentWidget.AddNode(RootWidget);
 			RootWidget.AddNode(CreateTextView());
 		}
 
@@ -89,7 +89,7 @@ namespace Tangerine.UI
 
 		public void Show()
 		{
-			DockManager.Instance.ShowPanel(dockPanel);
+			DockManager.Instance.ShowPanel(panel);
 		}
 	}
 }

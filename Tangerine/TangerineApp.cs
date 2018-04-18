@@ -57,16 +57,16 @@ namespace Tangerine
 				Core.UserPreferences.Instance.Save();
 			};
 
-			var timelinePanel = new DockPanel("Timeline");
-			var inspectorPanel = new DockPanel("Inspector");
-			var searchPanel = new DockPanel("Search");
-			var filesystemPanel = new DockPanel("Filesystem");
-			var consolePanel = new DockPanel("Console");
-			var documentPanel = new DockPanel(DockManager.DocumentAreaId, undockable: false);
+			var timelinePanel = new Panel("Timeline");
+			var inspectorPanel = new Panel("Inspector");
+			var searchPanel = new Panel("Search");
+			var filesystemPanel = new Panel("Filesystem");
+			var consolePanel = new Panel("Console");
+			var documentPanel = new Panel(DockManager.DocumentAreaId, undockable: false);
 			new UI.Console(consolePanel);
 
 			var dockManager = DockManager.Instance;
-			var root = dockManager.Model.Placements.First().Root;
+			var root = dockManager.Model.WindowPlacements.First();
 			var documentPlacement = dockManager.AppendPanelTo(documentPanel, root);
 			dockManager.AddPanel(timelinePanel, documentPlacement, DockSite.Top, 0.4f);
 			dockManager.AddPanel(inspectorPanel, documentPlacement, DockSite.Left, 0.3f);

@@ -89,7 +89,7 @@
     <Compile Include="EmbeddedResources\ThemedconResource.cs" />
     <Compile Include="EmbeddedResources\EmbeddedResource.cs" />
     <Compile Include="Docking\DragBehaviours.cs" />
-    <Compile Include="Docking\DockModel.cs" />
+    <Compile Include="Docking\DockHierarchy.cs" />
     <Compile Include="Docking\DockPresenter.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />

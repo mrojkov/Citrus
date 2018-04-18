@@ -4,9 +4,7 @@ namespace Tangerine.UI.Docking
 {
 	public class DockingPresenter : DelegatePresenter<Widget>
 	{
-		public DockingPresenter() : base(Render)
-		{
-		}
+		public DockingPresenter() : base(Render) { }
 
 		private static void Render(Widget widget)
 		{

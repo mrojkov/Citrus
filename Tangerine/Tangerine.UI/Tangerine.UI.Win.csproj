@@ -53,7 +53,7 @@
     <Compile Include="Dialogs\AlertDialog.cs" />
     <Compile Include="Dialogs\AttachmentDialog.cs" />
     <Compile Include="EmbeddedResources\ThemedconResource.cs" />
-    <Compile Include="Docking\DockModel.cs" />
+    <Compile Include="Docking\DockHierarchy.cs" />
     <Compile Include="Docking\DockPresenter.cs" />
     <Compile Include="Docking\DragBehaviours.cs" />
     <Compile Include="IconPool.cs" />
