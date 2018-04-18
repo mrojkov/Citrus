@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Lime;
 using Tangerine.Core;
@@ -78,7 +78,6 @@ namespace Tangerine.UI.Timeline
 		{
 			var button = new ToolbarButton(IconPool.GetTexture("Tools.NewFolder")) { Tip = "Create folder" };
 			button.Clicked += () => {
-				var doc = Document.Current;
 				var newFolder = new Folder { Id = "Folder" };
 				Core.Operations.InsertFolderItem.Perform(newFolder);
 				Core.Operations.ClearRowSelection.Perform();
@@ -99,13 +98,14 @@ namespace Tangerine.UI.Timeline
 		{
 			var button = new ToolbarButton(IconPool.GetTexture("Timeline.Eye")) { Tip = "Show widgets" };
 			button.Clicked += () => {
+				var nodes = !RootWidget.Input.IsKeyPressed(Key.Shift) ? Document.Current.Container.Nodes.ToList() : Document.Current.SelectedNodes().ToList();
 				var visibility = NodeVisibility.Hidden;
-				if (Document.Current.Container.Nodes.All(i => i.EditorState().Visibility == NodeVisibility.Hidden)) {
+				if (nodes.All(i => i.EditorState().Visibility == NodeVisibility.Hidden)) {
 					visibility = NodeVisibility.Shown;
-				} else if (Document.Current.Container.Nodes.All(i => i.EditorState().Visibility == NodeVisibility.Shown)) {
+				} else if (nodes.All(i => i.EditorState().Visibility == NodeVisibility.Shown)) {
 					visibility = NodeVisibility.Default;
 				}
-				foreach (var node in Document.Current.Container.Nodes) {
+				foreach (var node in nodes) {
 					Core.Operations.SetProperty.Perform(node.EditorState(), nameof(NodeEditorState.Visibility), visibility);
 				}
 			};
@@ -116,8 +116,9 @@ namespace Tangerine.UI.Timeline
 		{
 			var button = new ToolbarButton(IconPool.GetTexture("Timeline.Lock")) { Tip = "Lock widgets" };
 			button.Clicked += () => {
-				var locked = Document.Current.Container.Nodes.All(i => !i.EditorState().Locked);
-				foreach (var node in Document.Current.Container.Nodes) {
+				var nodes = !RootWidget.Input.IsKeyPressed(Key.Shift) ? Document.Current.Container.Nodes.ToList() : Document.Current.SelectedNodes().ToList();
+				var locked = nodes.All(i => !i.EditorState().Locked);
+				foreach (var node in nodes) {
 					Core.Operations.SetProperty.Perform(node.EditorState(), nameof(NodeEditorState.Locked), locked);
 				}
 			};
@@ -128,8 +129,9 @@ namespace Tangerine.UI.Timeline
 		{
 			var button = new ToolbarButton(IconPool.GetTexture("Timeline.AnimationEnabled")) { Tip = "Lock animation" };
 			button.Clicked += () => {
-				var enable = !Document.Current.Container.Nodes.All(IsAnimationEnabled);
-				foreach (var node in Document.Current.Container.Nodes) {
+				var nodes = !RootWidget.Input.IsKeyPressed(Key.Shift) ? Document.Current.Container.Nodes.ToList() : Document.Current.SelectedNodes().ToList();
+				var enable = !nodes.All(IsAnimationEnabled);
+				foreach (var node in nodes) {
 					foreach (var animator in node.Animators) {
 						Core.Operations.SetProperty.Perform(animator, nameof(IAnimator.Enabled), enable);
 					}
