@@ -1,8 +1,5 @@
-using System;
-using System.Linq;
 using Lime;
 using Tangerine.Core;
-using System.Collections.Generic;
 using Tangerine.UI;
 
 namespace Tangerine
@@ -19,7 +16,7 @@ namespace Tangerine
 			container.AddChangeWatcher(() => Version, _ => Rebuild());
 		}
 
-		void Rebuild()
+		public void Rebuild()
 		{
 			widget.Nodes.Clear();
 			foreach (var c in this) {

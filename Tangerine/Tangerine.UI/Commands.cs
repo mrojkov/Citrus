@@ -28,7 +28,7 @@ namespace Tangerine.UI
 
 	public static class InspectorCommands
 	{
-		public static readonly ICommand InspectRootNodeCommand = new Command("Inspect root node") { Icon = IconPool.GetTexture("Tools.Root") };
+		public static readonly ICommand InspectRootNodeCommand = new Command("Inspect root node");
 	}
 
 	public static class GenericCommands

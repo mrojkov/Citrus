@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
@@ -104,6 +104,7 @@ namespace Tangerine.Core
 		public int PreviewAnimationBegin { get; set; }
 		public Node PreviewAnimationContainer { get; set; }
 		public bool ExpositionMode { get; set; }
+		public bool InspectRootNode { get; set; }
 
 		public string AnimationId { get; set; }
 

@@ -61,6 +61,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Presenters\InspectRootNodePresenter.cs" />
     <Compile Include="WidgetTransforms\WidgetTransformsHelper.cs" />
     <Compile Include="WidgetTransforms\Mathd.cs" />
     <Compile Include="WidgetTransforms\Matrix32d.cs" />
