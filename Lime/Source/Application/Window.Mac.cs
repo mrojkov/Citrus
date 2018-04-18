@@ -387,7 +387,7 @@ namespace Lime
 
 		public void Close()
 		{
-			window.Close();
+			window.PerformClose(window);
 			if (modal) {
 				NSApplication.SharedApplication.StopModal();
 			}
