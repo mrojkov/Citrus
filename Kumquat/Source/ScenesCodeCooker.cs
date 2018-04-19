@@ -28,6 +28,9 @@ namespace Kumquat
 
 		[YuzuMember]
 		public Dictionary<string, List<string>> CommonPartToReferredScenes = new Dictionary<string, List<string>>();
+
+		[YuzuMember]
+		public Dictionary<string, DateTime> GeneratedProjectFileToModificationDate = new Dictionary<string, DateTime>();
 	}
 
 	public class ScenesCodeCooker

@@ -114,10 +114,26 @@ namespace Orange
 				return new CodeCookerCache();
 			} else {
 				try {
+					CodeCookerCache cache;
 					using (FileStream stream = new FileStream(codeCachePath, FileMode.Open, FileAccess.Read, FileShare.None)) {
 						var jd = new Yuzu.Json.JsonDeserializer();
-						return (CodeCookerCache)jd.FromStream(new CodeCookerCache(), stream);
+						cache = (CodeCookerCache)jd.FromStream(new CodeCookerCache(), stream);
 					}
+					using (new DirectoryChanger(The.Workspace.ProjectDirectory)) {
+						var projectName = The.Workspace.Title;
+						foreach (var platform in Enum.GetValues(typeof(TargetPlatform))) {
+							var platformName = Enum.GetName(typeof(TargetPlatform), platform);
+							var projectPath = $"{projectName}.GeneratedScenes/{projectName}.GeneratedScenes.{platformName}.csproj";
+							if (File.Exists(projectPath)) {
+								var projectFilesCache = cache.GeneratedProjectFileToModificationDate;
+								if (!projectFilesCache.ContainsKey(projectPath) || File.GetLastWriteTime(projectPath) > projectFilesCache[projectPath]) {
+									// Consider cache inconsistent if generated project files were modified from outside
+									return new CodeCookerCache();
+								}
+							}
+						}
+					}
+					return cache;
 				} catch {
 					return new CodeCookerCache();
 				}
@@ -126,6 +142,18 @@ namespace Orange
 
 		public static void SaveCodeCookerCache(CodeCookerCache codeCookerCache)
 		{
+			codeCookerCache.GeneratedProjectFileToModificationDate.Clear();
+			using (new DirectoryChanger(The.Workspace.ProjectDirectory)) {
+				var projectName = The.Workspace.Title;
+				foreach (var platform in Enum.GetValues(typeof(TargetPlatform))) {
+					var platformName = Enum.GetName(typeof(TargetPlatform), platform);
+					var projectPath = $"{projectName}.GeneratedScenes/{projectName}.GeneratedScenes.{platformName}.csproj";
+					if (File.Exists(projectPath)) {
+						CsprojSynchronization.SynchronizeProject(projectPath);
+						codeCookerCache.GeneratedProjectFileToModificationDate.Add(projectPath, File.GetLastWriteTime(projectPath));
+					}
+				}
+			}
 			var codeCookerCachePath = GetCodeCachePath();
 			Directory.CreateDirectory(Path.GetDirectoryName(codeCookerCachePath));
 			using (FileStream stream = new FileStream(codeCookerCachePath, FileMode.Create, FileAccess.Write, FileShare.None)) {
