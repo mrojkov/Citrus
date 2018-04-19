@@ -48,6 +48,7 @@ namespace Orange
 								var queue = new Queue<string>();
 								if (!visitedScenes.Contains(scenePath)) {
 									queue.Enqueue(scenePath);
+									visitedScenes.Add(scenePath);
 								}
 								while (queue.Count != 0) {
 									var scene = queue.Dequeue();
