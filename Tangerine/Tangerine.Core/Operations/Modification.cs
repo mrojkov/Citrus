@@ -65,19 +65,20 @@ namespace Tangerine.Core.Operations
 					Document.Current.AnimationFrame = atFrame;
 				}
 
-				var type = animable.GetType().GetProperty(propertyName).PropertyType;
-				var key =
-					animator?.ReadonlyKeys.FirstOrDefault(i => i.Frame == Document.Current.AnimationFrame)?.Clone() ??
+				try {
+					var type = animable.GetType().GetProperty(propertyName).PropertyType;
+					var key =
+						animator?.ReadonlyKeys.FirstOrDefault(i => i.Frame == Document.Current.AnimationFrame)?.Clone() ??
 					Keyframe.CreateForType(type);
 				key.Frame = Document.Current.AnimationFrame;
-				key.Function = animator?.Keys.LastOrDefault(k => k.Frame <= key.Frame)?.Function ?? KeyFunction.Linear;
-				key.Value = value;
-				SetKeyframe.Perform(animable, propertyName, Document.Current.AnimationId, key);
-
-				if (savedFrame >= 0) {
-					Document.Current.AnimationFrame = savedFrame;
+					key.Function = animator?.Keys.LastOrDefault(k => k.Frame <= key.Frame)?.Function ?? KeyFunction.Linear;
+					key.Value = value;
+					SetKeyframe.Perform(animable, propertyName, Document.Current.AnimationId, key);
+				} finally {
+					if (savedFrame >= 0) {
+						Document.Current.AnimationFrame = savedFrame;
+					}
 				}
-
 			}
 		}
 	}
@@ -373,16 +374,18 @@ namespace Tangerine.Core.Operations
 
 		public class Processor : OperationProcessor<SetMarker>
 		{
-			class Backup
+			private class Backup
 			{
-				public Marker Marker;
-				public string SavedJumpTo;
+				internal Marker Marker;
+				internal string SavedJumpTo;
+				internal bool RenamedInTriggers;
 			}
 
 			protected override void InternalRedo(SetMarker op)
 			{
-				Backup backup = new Backup {
-					Marker = op.container.Markers.FirstOrDefault(i => i.Frame == op.marker.Frame)
+				var previousMarker = op.container.Markers.FirstOrDefault(i => i.Frame == op.marker.Frame);
+				var backup = new Backup {
+					Marker = previousMarker
 				};
 
 				op.Save(backup);
@@ -393,6 +396,14 @@ namespace Tangerine.Core.Operations
 					if (op.marker.Action == MarkerAction.Jump &&
 						op.container.Markers.All(markerEl => markerEl.Id != op.marker.JumpTo)) {
 						op.marker.JumpTo = "";
+					}
+
+					// Detect if a previous marker id is unique then rename it in triggers and markers.
+					if (previousMarker != null && previousMarker.Id != op.marker.Id &&
+						op.container.Markers.All(markerEl => markerEl.Id != previousMarker.Id)) {
+						backup.RenamedInTriggers = true;
+
+						ApplyMarkerRename(op, previousMarker, op.marker);
 					}
 				}
 			}
@@ -407,6 +418,35 @@ namespace Tangerine.Core.Operations
 
 				if (op.removeDependencies) {
 					op.marker.JumpTo = b.SavedJumpTo;
+				}
+
+				if (b.RenamedInTriggers) {
+					ApplyMarkerRename(op, op.marker, b.Marker);
+				}
+			}
+
+			private static void ApplyMarkerRename(SetMarker op, Marker fromMarker, Marker toMarker)
+			{
+				string newTrigger;
+				if (TriggersValidation.TryRenameMarkerInTrigger(fromMarker.Id, toMarker.Id,
+					op.container.Trigger, out newTrigger)) {
+					op.container.Trigger = newTrigger;
+				}
+
+				Animator<string> triggerAnimator;
+				if (op.container.Animators.TryFind(nameof(Node.Trigger), out triggerAnimator)) {
+					foreach (var keyframe in triggerAnimator.ReadonlyKeys.ToList()) {
+						if (TriggersValidation.TryRenameMarkerInTrigger(fromMarker.Id, toMarker.Id,
+							keyframe.Value, out newTrigger)) {
+							keyframe.Value = newTrigger;
+						}
+					}
+				}
+
+				foreach (var marker in op.container.Markers) {
+					if (marker.Action == MarkerAction.Jump && marker.JumpTo == fromMarker.Id) {
+						marker.JumpTo = toMarker.Id;
+					}
 				}
 			}
 		}
@@ -426,12 +466,12 @@ namespace Tangerine.Core.Operations
 
 			if (removeDependencies) {
 				Animator<string> triggerAnimator;
-				if (container.Animators.TryFind(nameof(container.Trigger), out triggerAnimator)) {
-					foreach (Keyframe<string> keyframe in triggerAnimator.ReadonlyKeys.ToList()) {
+				if (container.Animators.TryFind(nameof(Node.Trigger), out triggerAnimator)) {
+					foreach (var keyframe in triggerAnimator.ReadonlyKeys.ToList()) {
 						string newTrigger;
-						if (TryRemoveMarkerFromTrigger(marker.Id, keyframe.Value, out newTrigger)) {
+						if (TriggersValidation.TryRemoveMarkerFromTrigger(marker.Id, keyframe.Value, out newTrigger)) {
 							SetAnimableProperty.Perform(
-								container, nameof(container.Trigger), newTrigger,
+								container, nameof(Node.Trigger), newTrigger,
 								false, false, keyframe.Frame
 							);
 						}
@@ -445,17 +485,6 @@ namespace Tangerine.Core.Operations
 			this.container = container;
 			this.marker = marker;
 			this.removeDependencies = removeDependencies;
-		}
-
-		private static bool TryRemoveMarkerFromTrigger(string markerId, string trigger, out string newTrigger)
-		{
-			newTrigger = trigger;
-			TriggersValidation.Trigger triggerParsed = TriggersValidation.Trigger.TryParse(trigger);
-			if (triggerParsed.Elements.RemoveAll(element => element.MarkerId == markerId) == 0) {
-				return false;
-			}
-			newTrigger = triggerParsed.Compose();
-			return true;
 		}
 
 		public class Processor : OperationProcessor<DeleteMarker>
@@ -477,22 +506,23 @@ namespace Tangerine.Core.Operations
 				op.container.Markers.Remove(op.marker);
 
 				if (op.removeDependencies) {
-					if (op.container.Trigger != null) {
-						string newTrigger;
-						TryRemoveMarkerFromTrigger(op.marker.Id, op.container.Trigger, out newTrigger);
-						op.container.Trigger = newTrigger;
+					var removedJumpToMarkers = new List<Marker>();
+					for (int i = op.container.Markers.Count - 1; i >= 0; i--) {
+						var marker = op.container.Markers[i];
+						if (marker.Action != MarkerAction.Jump || marker.JumpTo != op.marker.Id) {
+							continue;
+						}
+						removedJumpToMarkers.Add(marker);
+						op.container.Markers.RemoveAt(i);
 					}
 
-					List<Marker> removedJumpToMarkers = new List<Marker>();
-					foreach (Marker marker in op.container.Markers) {
-						if (marker.Action == MarkerAction.Jump && marker.JumpTo == op.marker.Id) {
-							removedJumpToMarkers.Add(marker);
-						}
-					}
-					foreach (Marker marker in removedJumpToMarkers) {
-						removedJumpToMarkers.Remove(marker);
-					}
 					op.Save(new Backup(op.container.Trigger, removedJumpToMarkers));
+
+					if (op.container.Trigger != null) {
+						string newTrigger;
+						TriggersValidation.TryRemoveMarkerFromTrigger(op.marker.Id, op.container.Trigger, out newTrigger);
+						op.container.Trigger = newTrigger;
+					}
 				}
 			}
 
@@ -504,7 +534,7 @@ namespace Tangerine.Core.Operations
 				if (op.Find(out backup)) {
 					backup = op.Restore<Backup>();
 					op.container.Trigger = backup.Trigger;
-					foreach (Marker marker in backup.RemovedJumpToMarkers) {
+					foreach (var marker in backup.RemovedJumpToMarkers) {
 						op.container.Markers.AddOrdered(marker);
 					}
 				}

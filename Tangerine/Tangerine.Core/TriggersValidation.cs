@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Lime;
@@ -69,9 +70,9 @@ namespace Tangerine.Core
 				return false;
 			}
 
-			Node node = (Node) container;
+			var node = (Node) container;
 
-			TriggersValidation.Trigger trigger = TriggersValidation.Trigger.TryParse((string) triggerValue);
+			var trigger = TriggersValidation.Trigger.TryParse((string) triggerValue);
 			if (trigger.Elements.RemoveAll(element => node.Markers.All(marker => marker.Id != element.MarkerId)) == 0) {
 				return false;
 			}
@@ -85,6 +86,40 @@ namespace Tangerine.Core
 
 	public static class TriggersValidation
 	{
+
+		public static bool TryRemoveMarkerFromTrigger(string markerId, string trigger, out string newTrigger)
+		{
+			newTrigger = trigger;
+			var triggerParsed = Trigger.TryParse(trigger);
+			if (triggerParsed == null || triggerParsed.Elements.RemoveAll(element => element.MarkerId == markerId) == 0) {
+				return false;
+			}
+			newTrigger = triggerParsed.Compose();
+			return true;
+		}
+
+		public static bool TryRenameMarkerInTrigger(string searchMarkerId, string replaceMarkerId, string trigger, out string newTrigger)
+		{
+			newTrigger = trigger;
+			var triggerParsed = Trigger.TryParse(trigger);
+			if (triggerParsed == null) {
+				return false;
+			}
+			bool changed = false;
+			foreach (var element in triggerParsed.Elements) {
+				if (element.MarkerId == searchMarkerId) {
+					element.MarkerId = replaceMarkerId;
+					changed = true;
+				}
+			}
+			if (!changed) {
+				return false;
+			}
+
+			newTrigger = triggerParsed.Compose();
+			return true;
+		}
+
 		public class Trigger
 		{
 
@@ -127,13 +162,14 @@ namespace Tangerine.Core
 					value.Split(',').
 						Select(el => {
 							string elTrimmed = el.Trim();
-							string[] arr = elTrimmed.Split(new char[] {'@'}, 2);
+							var arr = elTrimmed.Split(new char[] {'@'}, 2);
 							return new Element(arr[0], arr.Length > 1 ? arr[1] : null);
 						})
 				);
 			}
 
 		}
+
 	}
 
 }
