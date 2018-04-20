@@ -208,6 +208,7 @@ namespace Lime
 				return DoExiting() ? NSApplicationTerminateReply.Now : NSApplicationTerminateReply.Cancel;
 			};
 			NSApplication.SharedApplication.WillTerminate += (sender, e) => DoExited();
+			NSApplication.SharedApplication.ApplicationShouldHandleReopen = (sender, hasVisibleWindows) => hasVisibleWindows;
 #endif
 			options = options ?? new ApplicationOptions();
 			RenderingBackend = options.RenderingBackend;
