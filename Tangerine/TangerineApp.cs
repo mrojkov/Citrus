@@ -17,12 +17,12 @@ namespace Tangerine
 
 		private ModalOperationDialog cookingOfModifiedAssetsDialog;
 
-		public static void Initialize()
+		public static void Initialize(string[] args)
 		{
-			Instance = new TangerineApp();
+			Instance = new TangerineApp(args);
 		}
 
-		private TangerineApp()
+		private TangerineApp(string[] args)
 		{
 			Orange.UserInterface.Instance = new OrangeInterface();
 			WidgetInput.AcceptMouseBeyondWidgetByDefault = false;
@@ -190,7 +190,13 @@ namespace Tangerine
 			};
 			var proj = AppUserPreferences.Instance.RecentProjects.FirstOrDefault();
 			if (proj != null) {
-				new Project(proj).Open();
+				var project = new Project(proj);
+				project.Open();
+				foreach (var arg in args) {
+					if (File.Exists(arg)) {
+						project.OpenDocument(arg, pathIsGlobal: true);
+					}
+				}
 			}
 			WidgetContext.Current.Root.AddChangeWatcher(() => Project.Current, project => TangerineMenu.OnProjectChanged(project));
 			new UI.FilesystemView.FilesystemPane(filesystemPanel);
