@@ -128,6 +128,10 @@ namespace Tangerine.Core
 						FastForwardToFrame(node, frameIndex);
 						StopAnimationRecursive(node);
 						node.SetTangerineFlag(TangerineFlags.IgnoreMarkers, false);
+
+						// Force update to reset Animation.NextMarkerOrTriggerTime for parents.
+						doc.Container.AnimationFrame = doc.Container.AnimationFrame;
+						doc.RootNode.Update(0);
 					} else {
 						node.AnimationFrame = frameIndex;
 						node.Update(0);
