@@ -37,6 +37,13 @@ namespace Tangerine
 				UserPreferences.Instance.Add(new UI.FilesystemView.FilesystemUserPreferences());
 				UserPreferences.Instance.Add(new CoreUserPreferences());
 			}
+#if WIN
+			TangerineSingleInstanceKeeper.Initialize(args);
+			TangerineSingleInstanceKeeper.AnotherInstanceArgsRecieved += OpenDocumentsFromArgs;
+			Application.Exited += () => {
+				TangerineSingleInstanceKeeper.Instance.ReleaseInstance();
+			};
+#endif
 			SetColorTheme(AppUserPreferences.Instance.Theme);
 
 			LoadFont();
@@ -190,13 +197,8 @@ namespace Tangerine
 			};
 			var proj = AppUserPreferences.Instance.RecentProjects.FirstOrDefault();
 			if (proj != null) {
-				var project = new Project(proj);
-				project.Open();
-				foreach (var arg in args) {
-					if (File.Exists(arg)) {
-						project.OpenDocument(arg, pathIsGlobal: true);
-					}
-				}
+				new Project(proj).Open();
+				OpenDocumentsFromArgs(args);
 			}
 			WidgetContext.Current.Root.AddChangeWatcher(() => Project.Current, project => TangerineMenu.OnProjectChanged(project));
 			new UI.FilesystemView.FilesystemPane(filesystemPanel);
@@ -460,6 +462,15 @@ namespace Tangerine
 				Core.Operations.Paste.Perform();
 			} catch (InvalidOperationException e) {
 				AlertDialog.Show(e.Message);
+			}
+		}
+
+		static void OpenDocumentsFromArgs(string[] args)
+		{
+			foreach (var arg in args) {
+				if (File.Exists(arg)) {
+					Project.Current?.OpenDocument(arg, pathIsGlobal: true);
+				}
 			}
 		}
 	}

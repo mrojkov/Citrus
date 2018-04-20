@@ -10,7 +10,7 @@ namespace Tangerine
 		static void Main(string[] args)
 		{
 			Lime.Application.Initialize();
-			NSApplication.SharedApplication.DidFinishLaunching += (sender, e) => TangerineApp.Initialize();
+            NSApplication.SharedApplication.DidFinishLaunching += (sender, e) => TangerineApp.Initialize(args);
 			Lime.Application.Run();
 		}
 	}
