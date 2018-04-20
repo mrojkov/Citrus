@@ -376,7 +376,7 @@ namespace Tangerine.UI.Docking
 
 		private void HandleException(System.Exception e)
 		{
-			AlertDialog.Show(e.Message);
+			AlertDialog.Show(e.Message + "\n" + e.StackTrace);
 		}
 
 		private void CloseWindow(IWindow window)

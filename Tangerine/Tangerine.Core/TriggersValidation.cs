@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Lime;
@@ -107,10 +106,9 @@ namespace Tangerine.Core
 			}
 			bool changed = false;
 			foreach (var element in triggerParsed.Elements) {
-				if (element.MarkerId == searchMarkerId) {
-					element.MarkerId = replaceMarkerId;
-					changed = true;
-				}
+				if (element.MarkerId != searchMarkerId) continue;
+				element.MarkerId = replaceMarkerId;
+				changed = true;
 			}
 			if (!changed) {
 				return false;
@@ -126,7 +124,7 @@ namespace Tangerine.Core
 			public class Element
 			{
 				public string MarkerId;
-				public string AnimationId;
+				public readonly string AnimationId;
 
 				public Element(string markerId, string animationId)
 				{
@@ -162,7 +160,7 @@ namespace Tangerine.Core
 					value.Split(',').
 						Select(el => {
 							string elTrimmed = el.Trim();
-							var arr = elTrimmed.Split(new char[] {'@'}, 2);
+							var arr = elTrimmed.Split(new[] {'@'}, 2);
 							return new Element(arr[0], arr.Length > 1 ? arr[1] : null);
 						})
 				);
