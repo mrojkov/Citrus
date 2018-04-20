@@ -8,6 +8,13 @@ namespace Lime
 		Borderless
 	}
 
+	public enum MacWindowTabbingMode
+	{
+		Automatic,
+		Preferred,
+		Disallowed
+	}
+
 	public class WindowOptions
 	{
 		public int? Screen = null;
@@ -15,6 +22,7 @@ namespace Lime
 		public bool FixedSize = true;
 		public bool Centered = true;
 		public WindowStyle Style = WindowStyle.Regular;
+		public MacWindowTabbingMode MacWindowTabbingMode = MacWindowTabbingMode.Automatic;
 		public Vector2 ClientSize = new Vector2(800, 600);
 		public Vector2 MinimumDecoratedSize;
 		public Vector2 MaximumDecoratedSize;

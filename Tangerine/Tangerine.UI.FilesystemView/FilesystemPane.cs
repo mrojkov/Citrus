@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Lime;
 using Tangerine.Core;
+using Tangerine.UI.Docking;
 
 namespace Tangerine.UI.FilesystemView
 {
@@ -14,14 +15,14 @@ namespace Tangerine.UI.FilesystemView
 		public static FilesystemPane Instance;
 		private Widget dockPanelWidget;
 		private Widget rootWidget;
-		private DockPanel dockPanel;
+		private Panel panel;
 		private List<FilesystemView> views = new List<FilesystemView>();
 
-		public FilesystemPane(DockPanel dockPanel)
+		public FilesystemPane(Panel panel)
 		{
 			Instance = this;
-			this.dockPanel = dockPanel;
-			dockPanelWidget = dockPanel.ContentWidget;
+			this.panel = panel;
+			dockPanelWidget = panel.ContentWidget;
 			dockPanelWidget.AddChangeWatcher(() => Core.Project.Current.CitprojPath, (path) => {
 				Initialize();
 			});
@@ -204,7 +205,7 @@ namespace Tangerine.UI.FilesystemView
 				dockPanelWidget.Update(0);
 			}
 			var view = views.First();
-			DockManager.Instance.ShowPanel(dockPanel);
+			DockManager.Instance.ShowPanel(panel);
 			var path = FilesystemCommands.NavigateTo.UserData as string;
 			var dir = Path.GetDirectoryName(path);
 			view.GoTo(dir);

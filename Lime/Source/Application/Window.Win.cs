@@ -412,7 +412,14 @@ namespace Lime
 
 		private void OnMove(object sender, EventArgs e)
 		{
-			RaiseMoved();
+			bool hasBeenMinimized, hasBeenRestored;
+			HasWindowStateChanged(out hasBeenMinimized, out hasBeenRestored);
+
+			// We should ignore this event after minimize or restore.
+			// Calling to RaiseMoved() after minimize can lead to various bugs because window position is negative
+			if (!hasBeenRestored && !hasBeenMinimized) {
+				RaiseMoved();
+			}
 		}
 
 		private void OnActivated(object sender, EventArgs e)
@@ -435,8 +442,8 @@ namespace Lime
 
 		private void OnResize(object sender, EventArgs e)
 		{
-			bool hasBeenMinimized = prevWindowState != WindowState.Minimized && State == WindowState.Minimized;
-			bool hasBeenRestored = prevWindowState == WindowState.Minimized && State != WindowState.Minimized;
+			bool hasBeenMinimized, hasBeenRestored;
+			HasWindowStateChanged(out hasBeenMinimized, out hasBeenRestored);
 			prevWindowState = State;
 
 			// This will produce extra invokes, but will keep "active" flag in consistant state when minimizing app by
@@ -453,6 +460,12 @@ namespace Lime
 			if (!hasBeenRestored && !hasBeenMinimized) {
 				RaiseResized(deviceRotated: false);
 			}
+		}
+
+		private void HasWindowStateChanged(out bool hasBeenMinimized, out bool hasBeenRestored)
+		{
+			hasBeenMinimized = prevWindowState != WindowState.Minimized && State == WindowState.Minimized;
+			hasBeenRestored = prevWindowState == WindowState.Minimized && State != WindowState.Minimized;
 		}
 
 		private void OnMouseDown(object sender, MouseEventArgs e)

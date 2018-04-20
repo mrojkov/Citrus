@@ -5,6 +5,7 @@ using System.Linq;
 using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Operations;
+using Tangerine.UI.Docking;
 
 namespace Tangerine.UI.SceneView
 {

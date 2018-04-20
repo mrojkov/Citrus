@@ -4,6 +4,7 @@ using System.Linq;
 using Lime;
 using Tangerine.Core;
 using Tangerine.UI;
+using Tangerine.UI.Docking;
 
 namespace Tangerine
 {
@@ -11,7 +12,8 @@ namespace Tangerine
 	{
 		public override void Execute()
 		{
-			DockManager.Instance.ImportState(TangerineApp.Instance.DockManagerInitialState, resizeMainWindow: false);
+			DockManager.Instance.ImportState(TangerineApp.Instance.DockManagerInitialState.Clone(), resizeMainWindow: false);
+			DockManager.Instance.Refresh();
 		}
 	}
 

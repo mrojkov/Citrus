@@ -53,6 +53,9 @@
     <Compile Include="Dialogs\AlertDialog.cs" />
     <Compile Include="Dialogs\AttachmentDialog.cs" />
     <Compile Include="EmbeddedResources\ThemedconResource.cs" />
+    <Compile Include="Docking\DockHierarchy.cs" />
+    <Compile Include="Docking\DockPresenter.cs" />
+    <Compile Include="Docking\DragBehaviours.cs" />
     <Compile Include="IconPool.cs" />
     <Compile Include="NodeIconPool.cs" />
     <Compile Include="UIProcessors.cs" />
@@ -65,7 +68,6 @@
     <Compile Include="Utils\HSpacer.cs" />
     <Compile Include="Utils\Colors.cs" />
     <Compile Include="Docking\DockManager.cs" />
-    <Compile Include="Docking\DockPanel.cs" />
     <Compile Include="Utils\KeyframePalette.cs" />
     <Compile Include="Utils\Metrics.cs" />
     <Compile Include="Utils\Utils.cs" />

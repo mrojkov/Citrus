@@ -5,6 +5,7 @@ using System.Linq;
 using Lime;
 using Tangerine.Core;
 using Tangerine.UI;
+using Tangerine.UI.Docking;
 
 namespace Tangerine
 {
@@ -42,6 +43,8 @@ namespace Tangerine
 			DockManager.Initialize(new Vector2(1024, 768), TangerineMenu.PadsMenu);
 			TangerineMenu.Create();
 			var mainWidget = DockManager.Instance.MainWindowWidget;
+			mainWidget.Components.Add(new RequestedDockingComponent());
+			mainWidget.CompoundPostPresenter.Add(new DockingPresenter());
 			mainWidget.Window.AllowDropFiles = true;
 			mainWidget.AddChangeWatcher(() => Project.Current, _ => {
 				SetupMainWindowTitle(mainWidget);
@@ -54,23 +57,27 @@ namespace Tangerine
 				Core.UserPreferences.Instance.Save();
 			};
 
-			var timelinePanel = new DockPanel("Timeline");
-			var inspectorPanel = new DockPanel("Inspector");
-			var searchPanel = new DockPanel("Search");
-			var filesystemPanel = new DockPanel("Filesystem");
-			var consolePanel = new DockPanel("Console");
+			var timelinePanel = new Panel("Timeline");
+			var inspectorPanel = new Panel("Inspector");
+			var searchPanel = new Panel("Search");
+			var filesystemPanel = new Panel("Filesystem");
+			var consolePanel = new Panel("Console");
+			var documentPanel = new Panel(DockManager.DocumentAreaId, undockable: false);
 			new UI.Console(consolePanel);
 
 			var dockManager = DockManager.Instance;
-			dockManager.AddPanel(timelinePanel, DockSite.Top, new Vector2(800, 300));
-			dockManager.AddPanel(inspectorPanel, DockSite.Left, new Vector2(300, 700));
-			dockManager.AddPanel(searchPanel, DockSite.Right, new Vector2(300, 700));
-			dockManager.AddPanel(filesystemPanel, DockSite.Right, new Vector2(300, 700));
-			dockManager.AddPanel(consolePanel, DockSite.Bottom, new Vector2(800, 200));
+			var root = dockManager.Model.WindowPlacements.First();
+			var documentPlacement = dockManager.AppendPanelTo(documentPanel, root);
+			dockManager.AddPanel(timelinePanel, documentPlacement, DockSite.Top, 0.4f);
+			dockManager.AddPanel(inspectorPanel, documentPlacement, DockSite.Left, 0.3f);
+			dockManager.AddPanel(searchPanel, documentPlacement, DockSite.Right, 0.3f);
+			dockManager.AddPanel(filesystemPanel, documentPlacement, DockSite.Right, 0.3f);
+			dockManager.AddPanel(consolePanel, documentPlacement, DockSite.Bottom, 0.3f);
 			DockManagerInitialState = dockManager.ExportState();
 			var documentViewContainer = InitializeDocumentArea(dockManager);
-
+			documentPanel.ContentWidget.Nodes.Add(dockManager.DocumentArea);
 			dockManager.ImportState(AppUserPreferences.Instance.DockState);
+			dockManager.Refresh();
 			Document.CloseConfirmation += doc => {
 				var alert = new AlertDialog($"Save the changes to document '{doc.Path}' before closing?", "Yes", "No", "Cancel");
 				switch (alert.Show()) {

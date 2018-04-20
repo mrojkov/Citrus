@@ -259,6 +259,7 @@ namespace Lime
 				style |= NSWindowStyle.Resizable;
 			}
 			window = new NSWindow(rect, style, NSBackingStore.Buffered, false);
+			window.TabbingMode = (NSWindowTabbingMode)options.MacWindowTabbingMode;
 
 			var contentRect = window.ContentRectFor(rect);
 			titleBarHeight = ((RectangleF)rect).Height - (float)contentRect.Height;
@@ -386,7 +387,7 @@ namespace Lime
 
 		public void Close()
 		{
-			window.Close();
+			window.PerformClose(window);
 			if (modal) {
 				NSApplication.SharedApplication.StopModal();
 			}
