@@ -196,6 +196,9 @@ namespace Tangerine.UI.Timeline
 		public void EnsureRowVisible(Row row)
 		{
 			var gw = row.RollWidget();
+			if (gw == null) {
+				return;
+			}
 			if (gw.Bottom() > Offset.Y + Roll.RootWidget.Height) {
 				OffsetY = gw.Bottom() - Roll.RootWidget.Height;
 			}
