@@ -17,12 +17,12 @@ namespace Tangerine
 
 		private ModalOperationDialog cookingOfModifiedAssetsDialog;
 
-		public static void Initialize()
+		public static void Initialize(string[] args)
 		{
-			Instance = new TangerineApp();
+			Instance = new TangerineApp(args);
 		}
 
-		private TangerineApp()
+		private TangerineApp(string[] args)
 		{
 			Orange.UserInterface.Instance = new OrangeInterface();
 			WidgetInput.AcceptMouseBeyondWidgetByDefault = false;
@@ -37,6 +37,13 @@ namespace Tangerine
 				UserPreferences.Instance.Add(new UI.FilesystemView.FilesystemUserPreferences());
 				UserPreferences.Instance.Add(new CoreUserPreferences());
 			}
+#if WIN
+			TangerineSingleInstanceKeeper.Initialize(args);
+			TangerineSingleInstanceKeeper.AnotherInstanceArgsRecieved += OpenDocumentsFromArgs;
+			Application.Exited += () => {
+				TangerineSingleInstanceKeeper.Instance.ReleaseInstance();
+			};
+#endif
 			SetColorTheme(AppUserPreferences.Instance.Theme);
 
 			LoadFont();
@@ -191,6 +198,7 @@ namespace Tangerine
 			var proj = AppUserPreferences.Instance.RecentProjects.FirstOrDefault();
 			if (proj != null) {
 				new Project(proj).Open();
+				OpenDocumentsFromArgs(args);
 			}
 			WidgetContext.Current.Root.AddChangeWatcher(() => Project.Current, project => TangerineMenu.OnProjectChanged(project));
 			new UI.FilesystemView.FilesystemPane(filesystemPanel);
@@ -454,6 +462,15 @@ namespace Tangerine
 				Core.Operations.Paste.Perform();
 			} catch (InvalidOperationException e) {
 				AlertDialog.Show(e.Message);
+			}
+		}
+
+		static void OpenDocumentsFromArgs(string[] args)
+		{
+			foreach (var arg in args) {
+				if (File.Exists(arg)) {
+					Project.Current?.OpenDocument(arg, pathIsGlobal: true);
+				}
 			}
 		}
 	}

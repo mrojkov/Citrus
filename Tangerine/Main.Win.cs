@@ -1,4 +1,4 @@
-﻿#if WIN
+#if WIN
 using System;
 using System.Collections.Generic;
 using Lime;
@@ -15,7 +15,7 @@ namespace Tangerine
 			Lime.Application.Initialize(new ApplicationOptions {
 				RenderingBackend = RenderingBackend.OpenGL
 			});
-			TangerineApp.Initialize();
+			TangerineApp.Initialize(args);
 			Lime.Application.Run();
 		}
 	}

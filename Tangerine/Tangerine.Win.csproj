@@ -64,6 +64,7 @@
     <Compile Include="TangerineApp.cs" />
     <Compile Include="Main.Win.cs" />
     <Compile Include="TangerineMenu.cs" />
+    <Compile Include="TangerineSingleInstanceKeeper.cs" />
     <Compile Include="Tools\AlignTools.cs" />
     <Compile Include="Tools\FitTools.cs" />
     <Compile Include="AppUserPreferences.cs" />
