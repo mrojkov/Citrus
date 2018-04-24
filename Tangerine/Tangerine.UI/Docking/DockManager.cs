@@ -394,7 +394,6 @@ namespace Tangerine.UI.Docking
 			var state = new State();
 			foreach (var p in Model.WindowPlacements) {
 				state.WindowPlacements.Add(p.Clone() as WindowPlacement);
-				p.State = p.WindowWidget.Window.State;
 			}
 			return state;
 		}
