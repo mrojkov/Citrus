@@ -270,8 +270,10 @@ namespace Orange
 		{
 			config.UpdateBeforeBuild = DoesNeedSvnUpdate();
 			config.ActiveTargetIndex = platformPicker.Index;
-			config.ClientPosition = window.ClientPosition;
-			config.ClientSize = window.ClientSize;
+			if (window.State != WindowState.Minimized) {
+				config.ClientPosition = window.ClientPosition;
+				config.ClientSize = window.ClientSize;
+			}
 		}
 
 		public override void LoadFromWorkspaceConfig(WorkspaceConfig config)
@@ -283,6 +285,12 @@ namespace Orange
 			platformPicker.Index = newIndex;
 			updateVcs.CheckBox.Checked = config.UpdateBeforeBuild;
 			projectPicker.ChosenFile = config.CitrusProject;
+			if (config.ClientPosition.X < 0) {
+				config.ClientPosition.X = 0;
+			}
+			if (config.ClientPosition.Y < 0) {
+				config.ClientPosition.Y = 0;
+			}
 			if (config.ClientPosition != Vector2.Zero) {
 				window.ClientPosition = config.ClientPosition;
 			}
