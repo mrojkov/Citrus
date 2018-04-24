@@ -463,6 +463,7 @@ namespace Tangerine.UI.SceneView
 			new BoneAsistantPresenter(this);
 			new DistortionMeshPresenter(this);
 			new FrameBorderPresenter(this);
+			new InspectRootNodePresenter(this);
 		}
 
 		public void CreateNode(Type nodeType)

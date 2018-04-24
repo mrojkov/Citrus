@@ -250,7 +250,6 @@
     <EmbeddedResource Include="Resources\Icons\Dark\Tools\Pipette.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Tools\Refresh.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Tools\RestoreOriginalSize.png" />
-    <EmbeddedResource Include="Resources\Icons\Dark\Tools\Root.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Tools\SetUnitScale.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Tools\SetZeroRotation.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Tools\SplitHorizontal.png" />
@@ -353,7 +352,6 @@
     <EmbeddedResource Include="Resources\Icons\Light\Tools\Pipette.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Tools\Refresh.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Tools\RestoreOriginalSize.png" />
-    <EmbeddedResource Include="Resources\Icons\Light\Tools\Root.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Tools\SetUnitScale.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Tools\SetZeroRotation.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Tools\SplitHorizontal.png" />
@@ -367,6 +365,12 @@
     <EmbeddedResource Include="Resources\Icons\Light\Cursors\DragHandClosed.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Cursors\DragHandOpen.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Cursors\Rotate.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\InspectRootActivated.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\InspectRootDeactivated.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\InspectRootActivated.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\InspectRootDeactivated.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\SceneView\InspectingRoot.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\SceneView\InspectingRoot.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PreferencesDialog\" />

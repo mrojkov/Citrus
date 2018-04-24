@@ -78,8 +78,11 @@ namespace Tangerine.UI.SceneView
 								Renderer.DrawSprite(
 									playButtonTexture,
 									Color4.White,
-									new Vector2(10),
-									new Vector2(35), Vector2.Zero, Vector2.One);
+									Vector2.Zero,
+									(Vector2)playButtonTexture.ImageSize,
+									Vector2.Zero,
+									Vector2.One
+								);
 							}
 						}
 					}

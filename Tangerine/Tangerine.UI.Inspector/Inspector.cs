@@ -1,6 +1,4 @@
-using System;
 using Lime;
-using System.Linq;
 using Tangerine.Core;
 using System.Collections.Generic;
 
@@ -10,6 +8,9 @@ namespace Tangerine.UI.Inspector
 
 	public class Inspector : IDocumentView
 	{
+		private static readonly ITexture inspectRootActivatedTexture;
+		private static readonly ITexture inspectRootDeactivatedTexture;
+
 		private InspectorContent content;
 		private readonly Widget contentWidget;
 
@@ -19,11 +20,16 @@ namespace Tangerine.UI.Inspector
 		public readonly ThemedScrollView RootWidget;
 		public readonly Toolbar Toolbar;
 		public readonly List<object> Objects;
-		public bool InspectRootNode { get; set; }
+
+		static Inspector()
+		{
+			inspectRootActivatedTexture = IconPool.GetTexture("Tools.InspectRootActivated");
+			inspectRootDeactivatedTexture = IconPool.GetTexture("Tools.InspectRootDeactivated");
+		}
 
 		public static void RegisterGlobalCommands()
 		{
-			CommandHandlerList.Global.Connect(InspectorCommands.InspectRootNodeCommand, () => Instance.InspectRootNode = !Instance.InspectRootNode);
+			CommandHandlerList.Global.Connect(InspectorCommands.InspectRootNodeCommand, () => Document.Current.InspectRootNode = !Document.Current.InspectRootNode);
 		}
 
 		public void Attach()
@@ -67,7 +73,7 @@ namespace Tangerine.UI.Inspector
 		void CreateWatchersToRebuild()
 		{
 			RootWidget.AddChangeWatcher(() => CalcSelectedRowsHashcode(), _ => Rebuild());
-			RootWidget.AddChangeWatcher(() => InspectRootNode, _ => Rebuild());
+			RootWidget.AddChangeWatcher(() => Document.Current.InspectRootNode, _ => Rebuild());
 		}
 
 		int CalcSelectedRowsHashcode()
@@ -82,7 +88,9 @@ namespace Tangerine.UI.Inspector
 
 		void Rebuild()
 		{
-			content.BuildForObjects(InspectRootNode ? new Node[] { Document.Current.RootNode } : Document.Current.SelectedNodes());
+			content.BuildForObjects(Document.Current.InspectRootNode ? new Node[] { Document.Current.RootNode } : Document.Current.SelectedNodes());
+			InspectorCommands.InspectRootNodeCommand.Icon = Document.Current.InspectRootNode ? inspectRootActivatedTexture : inspectRootDeactivatedTexture;
+			Toolbar.Rebuild();
 		}
 	}
 }

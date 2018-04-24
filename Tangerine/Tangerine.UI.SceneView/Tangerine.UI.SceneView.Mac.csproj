@@ -103,6 +103,7 @@
     <Compile Include="WidgetTransforms\Vector2d.cs" />
     <Compile Include="WidgetTransforms\WidgetTransformsHelper.cs" />
     <Compile Include="WidgetTransforms\WidgetZeroScalePreserver.cs" />
+    <Compile Include="Presenters\InspectRootNodePresenter.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Mac.csproj">
