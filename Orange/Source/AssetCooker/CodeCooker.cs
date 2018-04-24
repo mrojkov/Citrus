@@ -90,6 +90,13 @@ namespace Orange
 					cache
 				).Start();
 				SaveCodeCookerCache(cache);
+				foreach (var kv in cache.CommonPartToReferredScenes) {
+					foreach (var scene in kv.Value) {
+						if (scene == null) {
+							throw new InvalidOperationException("ВНИМАНИЕ!!! Был обнаружен редкий баг, в данный момент находящийся в стадии отлова. Сообщите Ротанову Д.");
+						}
+					}
+				}
 			} finally {
 				AssetBundle.Current.Dispose();
 				AssetBundle.Current = null;
