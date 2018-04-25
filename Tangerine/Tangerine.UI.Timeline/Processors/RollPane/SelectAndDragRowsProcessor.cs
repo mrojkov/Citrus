@@ -67,8 +67,12 @@ namespace Tangerine.UI.Timeline
 		static IEnumerator<object> DragTask()
 		{
 			var roll = Timeline.Instance.Roll;
-			var dragLocation = new RowLocation(Document.Current.RowTree, 0);
-			Action<Widget> a = _ => RenderDragCursor(dragLocation);
+			RowLocation? dragLocation = new RowLocation(Document.Current.RowTree, 0);
+			Action<Widget> a = _ => {
+				if (dragLocation != null) {
+					RenderDragCursor(dragLocation.Value);
+				}
+			};
 			roll.OnRenderOverlay += a;
 			var input = roll.RootWidget.Input;
 			while (input.IsMousePressed()) {
@@ -78,7 +82,9 @@ namespace Tangerine.UI.Timeline
 			}
 			roll.OnRenderOverlay -= a;
 			CommonWindow.Current.Invalidate();
-			DragRows(dragLocation);
+			if (dragLocation != null) {
+				DragRows(dragLocation.Value);
+			}
 		}
 
 		static void DragRows(RowLocation dragLocation)
@@ -111,6 +117,21 @@ namespace Tangerine.UI.Timeline
 			Renderer.DrawRect(
 				new Vector2(TimelineMetrics.RollIndentation * CalcIndentation(pr), y - 1),
 				new Vector2(Timeline.Instance.Roll.ContentWidget.Width, y + 1), ColorTheme.Current.TimelineRoll.DragCursor);
+
+			for (var p = pr; p != null; p = p.Parent) {
+				var parentWidget = p.GridWidget();
+				if (parentWidget == null) {
+					continue;
+				}
+
+				Renderer.DrawRect(
+					parentWidget.Left(),
+					parentWidget.Top(),
+					parentWidget.Right(),
+					parentWidget.Bottom(),
+					ColorTheme.Current.TimelineRoll.DragTarget
+				);
+			}
 		}
 
 		static int CalcIndentation(Row row)
@@ -150,24 +171,42 @@ namespace Tangerine.UI.Timeline
 			return doc.Rows[doc.Rows.Count - 1];
 		}
 
-		static RowLocation MouseToRowLocation(Vector2 position)
+		static RowLocation? MouseToRowLocation(Vector2 position)
 		{
 			position -= Timeline.Instance.Roll.ContentWidget.GlobalPosition;
 			if (position.Y <= 0) {
 				return new RowLocation(Document.Current.RowTree, 0);
 			}
-			foreach (var row in Document.Current.Rows) {
+			for (int i = 0; i < Document.Current.Rows.Count; i++) {
+				var row = Document.Current.Rows[i];
 				var gw = row.GridWidget();
 				if (position.Y >= gw.Top() && position.Y < gw.Bottom() + TimelineMetrics.RowSpacing) {
-					var index = row.Parent.Rows.IndexOf(row);
-					if (position.Y < gw.Y + gw.Height * 0.5f) {
+					int index = row.Parent.Rows.IndexOf(row);
+
+					var rowNext = i < Document.Current.Rows.Count ? Document.Current.Rows[i + 1] : null;
+					int rowNextIndex = rowNext?.Parent.Rows.IndexOf(rowNext) ?? -1;
+
+					bool allowedDropPrev = row.Parent.CanHaveChildren;
+					bool allowedDropNext = row.Parent.CanHaveChildren && (row.Parent == rowNext || rowNext == null);
+					bool allowedDropPrevForNext = !allowedDropNext && rowNext != null && rowNext.Parent.CanHaveChildren;
+					bool allowedDropIn = row.CanHaveChildren;
+
+					if (allowedDropPrev && position.Y < gw.Y + gw.Height * (
+						(allowedDropNext || allowedDropPrevForNext) && allowedDropIn
+							? 0.25f
+							: allowedDropNext || allowedDropPrevForNext || allowedDropIn
+								? 0.5f
+								: 1f
+					)) {
 						return new RowLocation(row.Parent, index);
-					} else if (row.Rows.Count > 0) {
+					} else if (allowedDropIn && position.Y < gw.Y + gw.Height * (allowedDropNext || allowedDropPrevForNext ? 0.75f : 1f)) {
 						return new RowLocation(row, 0);
-					} else if (position.Y < gw.Y + gw.Height * 0.75f && row.CanHaveChildren) {
-						return new RowLocation(row, 0);
-					} else {
+					} else if (allowedDropNext) {
 						return new RowLocation(row.Parent, index + 1);
+					} else if (allowedDropPrevForNext) {
+						return new RowLocation(rowNext.Parent, rowNextIndex);
+					} else {
+						return null;
 					}
 				}
 			}

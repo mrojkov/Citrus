@@ -84,6 +84,7 @@ namespace Tangerine.UI
 			public Color4 Lines;
 			public Color4 GrayedLabel;
 			public Color4 DragCursor;
+			public Color4 DragTarget;
 			public Color4 BlueMark;
 			public Color4 RedMark;
 			public Color4 GreenMark;
@@ -194,6 +195,7 @@ namespace Tangerine.UI
 				Lines = timelineGrid.Lines,
 				GrayedLabel = Theme.Colors.BlackText.Darken(0.5f),
 				DragCursor = new Color4(254, 170, 24),
+				DragTarget = new Color4(254, 170, 24, 20),
 				BlueMark = new Color4(0, 255, 255).Darken(0.15f),
 				RedMark = Color4.Red.Darken(0.15f),
 				GreenMark = Color4.Green.Darken(0.15f),
@@ -300,6 +302,7 @@ namespace Tangerine.UI
 				Lines = timelineGrid.Lines,
 				GrayedLabel = Theme.Colors.BlackText.Lighten(0.5f),
 				DragCursor = Color4.Black,
+				DragTarget = new Color4(0, 0, 0, 20),
 				BlueMark = new Color4(0, 255, 255),
 				RedMark = Color4.Red,
 				GreenMark = Color4.Green,

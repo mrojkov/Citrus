@@ -87,7 +87,6 @@ namespace Tangerine.Core
 			var row = Document.Current.GetRowForObject(node);
 			if (!row.Components.Contains<NodeRow>()) {
 				row.Components.Add(new NodeRow(node));
-				row.CanHaveChildren = true;
 			}
 			AddRow(parent, row);
 			return row;
