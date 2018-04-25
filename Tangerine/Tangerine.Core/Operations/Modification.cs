@@ -104,7 +104,7 @@ namespace Tangerine.Core.Operations
 			IAnimator animator;
 			var animable = @object as IAnimable;
 			if (animable != null && animable.Animators.TryFind(propertyName, out animator, Document.Current.AnimationId)) {
-				foreach (var keyframe in animator.ReadonlyKeys) {
+				foreach (var keyframe in animator.ReadonlyKeys.ToList()) {
 					if (!(keyframe.Value is T)) continue;
 
 					T processedValue;
