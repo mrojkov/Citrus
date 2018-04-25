@@ -1084,6 +1084,12 @@ namespace Lime
 			}
 		}
 
+		[YuzuBeforeSerialization]
+		public void CleanUnwantedComponents()
+		{
+			Components.Remove<AssetBundlePathComponent>();
+		}
+
 		public static Node CreateFromAssetBundle(string path, Node instance = null)
 		{
 			if (scenesBeingLoaded == null) {
