@@ -118,10 +118,14 @@ namespace Tangerine.Core
 			fsWatcher.Created += HandleFileSystemWatcherEvent;
 			fsWatcher.Deleted += HandleFileSystemWatcherEvent;
 			fsWatcher.Renamed += HandleFileSystemWatcherEvent;
-			var files = Directory.EnumerateFiles(Path.Combine(Project.Current.AssetsDirectory, "Overlays"))
-				.Where(file => Path.GetExtension(file) == ".tan" || Path.GetExtension(file) == ".scene");
-			foreach (var file in files) {
-				Project.Current.Overlays.Add(Path.GetFileNameWithoutExtension(file), new Frame(file));
+			try {
+				var files = Directory.EnumerateFiles(Path.Combine(Project.Current.AssetsDirectory, "Overlays"))
+					.Where(file => Path.GetExtension(file) == ".tan" || Path.GetExtension(file) == ".scene");
+				foreach (var file in files) {
+					Project.Current.Overlays.Add(Path.GetFileNameWithoutExtension(file), new Frame(file));
+				}
+			} catch (DirectoryNotFoundException e) {
+				Debug.Write("Failed to load Overlays: directory not found");
 			}
 		}
 
@@ -327,7 +331,7 @@ namespace Tangerine.Core
 			documents.Remove(doc);
 			documents.Insert(toIndex, doc);
 		}
-		
+
 		public void RevertDocument(Document doc)
 		{
 			ReloadDocument(doc);
