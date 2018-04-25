@@ -89,7 +89,6 @@ namespace Orange
 					modifiedScenes,
 					cache
 				).Start();
-				SaveCodeCookerCache(cache);
 				foreach (var kv in cache.CommonPartToReferredScenes) {
 					foreach (var scene in kv.Value) {
 						if (scene == null) {
@@ -97,6 +96,7 @@ namespace Orange
 						}
 					}
 				}
+				SaveCodeCookerCache(cache);
 			} finally {
 				AssetBundle.Current.Dispose();
 				AssetBundle.Current = null;
