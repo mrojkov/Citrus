@@ -214,7 +214,12 @@ namespace Lime
 		{
 			var frame = (Frame)(new Frame(path).Nodes[0]);
 			frame.Unlink();
-			frame.Components.Add(new Node.AssetBundlePathComponent(path));
+			var pathComponent = frame.Components.Get<AssetBundlePathComponent>();
+			if (pathComponent == null) {
+				frame.Components.Add(new AssetBundlePathComponent(path));
+			} else {
+				pathComponent.Path = path;
+			}
 			return frame;
 		}
 

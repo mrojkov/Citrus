@@ -1069,14 +1069,18 @@ namespace Lime
 		/// </summary>
 		public class AssetBundlePathComponent : NodeComponent
 		{
-			private string path;
+			public string Path;
+			public AssetBundlePathComponent()
+			{
+
+			}
 			public AssetBundlePathComponent(string path)
 			{
-				this.path = path;
+				this.Path = path;
 			}
 			public override string ToString()
 			{
-				return path;
+				return Path;
 			}
 		}
 
@@ -1098,7 +1102,13 @@ namespace Lime
 					instance = Serialization.ReadObject<Node>(fullPath, stream, instance);
 				}
 				instance.LoadExternalScenes();
-				instance.Components.Add(new AssetBundlePathComponent(fullPath));
+				var pathComponent = instance.Components.Get<AssetBundlePathComponent>();
+				if (pathComponent == null) {
+					instance.Components.Add(new AssetBundlePathComponent(fullPath));
+				}
+				else {
+					pathComponent.Path = fullPath;
+				}
 			} finally {
 				scenesBeingLoaded.Remove(fullPath);
 			}
