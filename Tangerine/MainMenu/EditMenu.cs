@@ -10,7 +10,7 @@ namespace Tangerine
 	{
 		public override void Execute()
 		{
-			var nodes = Document.Current?.SelectedNodes().Editable().Where(IsValidNode).ToList();
+			var nodes = Document.Current?.SelectedNodes().Where(IsValidNode).ToList();
 			Rectangle aabb;
 			if (!UI.Utils.CalcAABB(nodes, (Widget)Document.Current.Container, out aabb)) {
 				return;
@@ -51,7 +51,7 @@ namespace Tangerine
 			}
 		}
 
-		public override bool GetEnabled() => Document.Current.SelectedNodes().Editable().Any(IsValidNode);
+		public override bool GetEnabled() => Document.Current.SelectedNodes().Any(IsValidNode);
 
 		public static bool IsValidNode(Node node) => (node is Widget) || (node is Bone) || (node is Audio) || (node is ImageCombiner);
 	}
@@ -60,7 +60,7 @@ namespace Tangerine
 	{
 		public override void Execute()
 		{
-			var groups = Document.Current?.SelectedNodes().Editable().OfType<Frame>().ToList();
+			var groups = Document.Current?.SelectedNodes().OfType<Frame>().ToList();
 			if (groups.Count == 0) {
 				return;
 			}
@@ -87,7 +87,7 @@ namespace Tangerine
 			}
 		}
 
-		public override bool GetEnabled() => Core.Document.Current.SelectedNodes().Editable().Any(i => i is Frame);
+		public override bool GetEnabled() => Core.Document.Current.SelectedNodes().Any(i => i is Frame);
 	}
 
 	public class InsertTimelineColumn : DocumentCommandHandler
