@@ -294,13 +294,13 @@ namespace Lime
 		public Animation FirstAnimation { get; internal set; }
 
 		/// <summary>
-		/// Gets the cached reference to the first children node. 
+		/// Gets the cached reference to the first children node.
 		/// Use it for fast iteration through nodes collection in a performance-critical code.
 		/// </summary>
 		public Node FirstChild { get; internal set; }
 
 		/// <summary>
-		/// Gets the cached reference to the next node in the NodeList. 
+		/// Gets the cached reference to the next node in the NodeList.
 		/// Use it for fast iteration through nodes collection in a performance-critical code.
 		/// </summary>
 		public Node NextSibling { get; internal set; }
@@ -480,7 +480,7 @@ namespace Lime
 			Nodes.Clear();
 			Animators.Dispose();
 		}
-		
+
 		internal void RefreshRunningAnimationCount()
 		{
 			RunningAnimationCount = 0;
@@ -490,7 +490,7 @@ namespace Lime
 				}
 			}
 		}
-		
+
 		/// <summary>
 		/// Propagates dirty flags to all descendants by provided mask.
 		/// </summary>
@@ -624,6 +624,10 @@ namespace Lime
 				r += string.IsNullOrEmpty(p.Id) ? p.GetType().Name : string.Format("'{0}'", p.Id);
 				if (!string.IsNullOrEmpty(p.Tag)) {
 					r += string.Format(" ({0})", p.Tag);
+				}
+				var bundlePath = Components.Get<Node.AssetBundlePathComponent>();
+				if (bundlePath != null) {
+					r += string.Format(" ({0})", bundlePath);
 				}
 			}
 			return r;
@@ -1060,6 +1064,22 @@ namespace Lime
 		[ThreadStatic]
 		public static Action<string> SceneLoading;
 
+		/// <summary>
+		/// For each root node of deserialized node hierarchy this component will be added and set to path in asset bundle.
+		/// </summary>
+		public class AssetBundlePathComponent : NodeComponent
+		{
+			private string path;
+			public AssetBundlePathComponent(string path)
+			{
+				this.path = path;
+			}
+			public override string ToString()
+			{
+				return path;
+			}
+		}
+
 		public static Node CreateFromAssetBundle(string path, Node instance = null)
 		{
 			if (scenesBeingLoaded == null) {
@@ -1078,9 +1098,7 @@ namespace Lime
 					instance = Serialization.ReadObject<Node>(fullPath, stream, instance);
 				}
 				instance.LoadExternalScenes();
-				if (!Application.IsTangerine) {
-					instance.Tag = fullPath;
-				}
+				instance.Components.Add(new AssetBundlePathComponent(fullPath));
 			} finally {
 				scenesBeingLoaded.Remove(fullPath);
 			}

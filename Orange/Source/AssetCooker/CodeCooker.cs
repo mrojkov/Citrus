@@ -89,13 +89,6 @@ namespace Orange
 					modifiedScenes,
 					cache
 				).Start();
-				foreach (var kv in cache.CommonPartToReferredScenes) {
-					foreach (var scene in kv.Value) {
-						if (scene == null) {
-							throw new InvalidOperationException("ВНИМАНИЕ!!! Был обнаружен редкий баг, в данный момент находящийся в стадии отлова. Сообщите Ротанову Д.");
-						}
-					}
-				}
 				SaveCodeCookerCache(cache);
 			} finally {
 				AssetBundle.Current.Dispose();

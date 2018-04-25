@@ -29,7 +29,7 @@ namespace Lime
 	{
 		private RenderTarget renderTarget;
 		private ITexture renderTexture;
-		
+
 		[YuzuMember]
 		public ClipMethod ClipChildren { get; set; }
 
@@ -214,9 +214,7 @@ namespace Lime
 		{
 			var frame = (Frame)(new Frame(path).Nodes[0]);
 			frame.Unlink();
-			if (!Application.IsTangerine) {
-				frame.Tag = path;
-			}
+			frame.Components.Add(new Node.AssetBundlePathComponent(path));
 			return frame;
 		}
 

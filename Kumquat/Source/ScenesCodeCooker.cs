@@ -528,8 +528,11 @@ namespace Kumquat
 				if (!commonPartsScenes.ContainsKey(baseName )) {
 					commonPartsScenes.Add(baseName, new HashSet<string>());
 				}
-				// Root node tag is always full path to asset, see Node.CreateFromAssetBundle
-				commonPartsScenes[baseName].Add(node.GetRoot().Tag);
+				var path = node.GetRoot().Components.Get<Node.AssetBundlePathComponent>();
+				if (path == null) {
+					throw new InvalidOperationException($"Asset path not specified via Node.AssetBundlePathComponent for {name}, {baseName}");
+				}
+				commonPartsScenes[baseName].Add(path.ToString());
 			}
 
 			var nodesToParse = new List<Node>();

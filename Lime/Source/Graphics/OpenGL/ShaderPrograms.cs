@@ -109,7 +109,7 @@ namespace Lime
 			twoTexturesSilhuetteBlendingProgram = CreateShaderProgram(twoTexturesVertexShader, twoTexturesSilhouetteFragmentShader);
 			inversedSilhuetteBlendingProgram = CreateShaderProgram(oneTextureVertexShader, inversedSilhouetteFragmentShader);
 		}
-		
+
 		public ShaderProgram GetShaderProgram(ShaderId shader, ITexture texture1, ITexture texture2, ShaderOptions options)
 		{
 			int numTextures = texture2 != null ? 2 : (texture1 != null ? 1 : 0);
@@ -365,7 +365,7 @@ namespace Lime
 				}
 				return cachedShaderPrograms[styleIndex];
 			}
-			
+
 			public static ITexture GradientRampTexture => fontGradientTexture = fontGradientTexture ?? new SerializableTexture("Fonts/gradient_map");
 		}
 	}
