@@ -187,7 +187,7 @@ namespace Tangerine.UI.Timeline
 					int rowNextIndex = rowNext?.Parent.Rows.IndexOf(rowNext) ?? -1;
 
 					bool allowedDropPrev = row.Parent.CanHaveChildren;
-					bool allowedDropNext = row.Parent.CanHaveChildren && (row.Parent == rowNext || rowNext == null);
+					bool allowedDropNext = row.Parent.CanHaveChildren && (rowNext == null || CalcIndentation(rowNext) <= CalcIndentation(row));
 					bool allowedDropPrevForNext = !allowedDropNext && rowNext != null && rowNext.Parent.CanHaveChildren;
 					bool allowedDropIn = row.CanHaveChildren;
 
