@@ -183,7 +183,7 @@ namespace Tangerine.UI.Timeline
 				if (position.Y >= gw.Top() && position.Y < gw.Bottom() + TimelineMetrics.RowSpacing) {
 					int index = row.Parent.Rows.IndexOf(row);
 
-					var rowNext = i < Document.Current.Rows.Count ? Document.Current.Rows[i + 1] : null;
+					var rowNext = i < Document.Current.Rows.Count - 1 ? Document.Current.Rows[i + 1] : null;
 					int rowNextIndex = rowNext?.Parent.Rows.IndexOf(rowNext) ?? -1;
 
 					bool allowedDropPrev = row.Parent.CanHaveChildren;
