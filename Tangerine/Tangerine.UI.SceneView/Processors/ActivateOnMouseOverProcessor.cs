@@ -21,13 +21,12 @@ namespace Tangerine.UI.SceneView
 							var titleBarHeight = hoveredWindow.DecoratedSize.Y - hoveredWindow.ClientSize.Y - borderWidth * 2f;
 							var windowRectangle = new Rectangle(new Vector2(-borderWidth, -titleBarHeight - borderWidth), hoveredWindow.ClientSize + new Vector2(borderWidth));
 							isMouseOverWindow = windowRectangle.Contains(mousePositionPoint);
-
 							if (!isMouseOverWindow) {
 								Window.Current.Activate();
 							}
 						}
 					}
-					if (!isMouseOverWindow) {
+					if (!isMouseOverWindow && !(Widget.Focused is CommonEditBox)) {
 						SceneView.Instance.InputArea.SetFocus();
 					}
 				}
