@@ -433,6 +433,10 @@ namespace Tangerine.Core
 					decorator(descendant);
 				}
 			}
+
+			foreach (var child in node.Nodes) {
+				Decorate(child);
+			}
 		}
 
 		public class NodeDecoratorList : List<Action<Node>>
