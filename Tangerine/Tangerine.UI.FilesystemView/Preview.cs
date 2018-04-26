@@ -205,7 +205,9 @@ namespace Tangerine.UI.FilesystemView
 					if (extension == ".png" || extension == ".jpg") {
 						try {
 							var texture = new Texture2D();
-							texture.LoadImage(filename);
+							using (var stream = new FileStream(filename, FileMode.Open)) {
+								texture.LoadImage(stream);
+							}
 							return texture;
 						} catch {
 							return LoadFileAsRawBitmap(filename);
