@@ -74,6 +74,11 @@ namespace Lime.Platform
 			swapInterval = true;
 		}
 
+		public override bool AcceptsFirstMouse(NSEvent theEvent)
+		{
+			return true;
+		}
+
 		public override void UpdateTrackingAreas()
 		{
 			if (trackingArea != null) {
