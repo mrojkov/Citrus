@@ -1,11 +1,15 @@
 using System;
 using System.IO;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using McMaster.Extensions.CommandLineUtils;
 #if WIN
 using System.Windows.Forms;
+using System.Runtime.InteropServices;
 #elif MAC
 using AppKit;
-#endif
+#endif // WIN
 
 namespace Orange
 {
@@ -24,47 +28,97 @@ namespace Launcher
 {
 	internal static class MainClass
 	{
+#if WIN
+		[DllImport("kernel32.dll", SetLastError = true)]
+		private static extern bool AttachConsole(int dwProcessId);
+		[DllImport("kernel32.dll", SetLastError = true)]
+		private static extern IntPtr GetStdHandle(StandardHandle nStdHandle);
+		[DllImport("kernel32.dll", SetLastError = true)]
+		private static extern bool SetStdHandle(StandardHandle nStdHandle, IntPtr handle);
+		[DllImport("kernel32.dll", SetLastError = true)]
+		private static extern FileType GetFileType(IntPtr handle);
+		[DllImport("kernel32.dll", SetLastError = true)]
+		private static extern bool FreeConsole();
+
+		private enum StandardHandle : uint
+		{
+			Input = unchecked((uint)-10),
+			Output = unchecked((uint)-11),
+			Error = unchecked((uint)-12)
+		}
+
+		private enum FileType : uint
+		{
+			Unknown = 0x0000,
+			Disk = 0x0001,
+			Char = 0x0002,
+			Pipe = 0x0003
+		}
+
+		private static bool IsRedirected(IntPtr handle)
+		{
+			FileType fileType = GetFileType(handle);
+			return (fileType == FileType.Disk) || (fileType == FileType.Pipe);
+		}
+
+		public static void Redirect()
+		{
+			bool errorRedirected = IsRedirected(GetStdHandle(StandardHandle.Error));
+			AttachConsole(-1);
+			if (!errorRedirected) {
+				SetStdHandle(StandardHandle.Error, GetStdHandle(StandardHandle.Output));
+			}
+		}
+#endif // WIN
+
 		private static CommonBuilder builder;
 
 		[STAThread]
-		public static void Main(string[] args)
+		public static int Main(string[] args)
 		{
-			Args = new CommandLineArguments(args);
-			if (!Args.AreArgumentsValid) {
-				Console.WriteLine("Invalid arguments. Use -help to list possible arguments.");
-				return;
-			}
-			if (Args.ShowHelp) {
-				ShowHelp();
-				return;
-			}
+#if WIN
+			Redirect();
+#endif // WIN
+#if MAC
+			args = args.Where(s => !s.StartsWith("-psn")).ToArray();
+#endif // MAC
+			var cli = new CommandLineApplication();
+			cli.Name = "Orange";
+			cli.HelpOption("-h --help");
+			var optionConsole = cli.Option<bool>("-c --console", "Console mode.", CommandOptionType.NoValue);
+			var optionJustBuild = cli.Option<bool>("-j --justbuild", "Build project without running executable.", CommandOptionType.NoValue);
+			var optionBuildProjectPath = cli.Option<string>("-b --build <PROJECT_PATH>", "Project path, default: \"Orange/Orange.%Platform%.sln\".", CommandOptionType.SingleValue);
+			var optionRunProjectPath = cli.Option<string>("-r --run <EXECUTABLE_PATH>", "Executable path, default: \"Orange/bin/%Platform%/Release/%PlatformExecutable%\".", CommandOptionType.SingleValue);
+			var optionRunArgs = cli.Option<string>("-a --runargs <ARGUMENTS>", "Args to pass to executable.", CommandOptionType.SingleValue);
 
-			builder = new Builder {
-				SolutionPath = Args.SolutionPath,
-				ExecutablePath = Args.ExecutablePath,
-				ExecutableArgs = Args.ExecutableArgs
-			};
+			cli.OnExecute(() =>
+			{
+				RunExecutable = !optionJustBuild.HasValue();
+				builder = new Builder {
+					SolutionPath = optionBuildProjectPath.ParsedValue,
+					ExecutablePath = optionRunProjectPath.ParsedValue,
+					ExecutableArgs = optionRunArgs.ParsedValue
+				};
 
-			if (Args.ConsoleMode) {
-				StartConsoleMode();
+				if (optionConsole.HasValue()) {
+					StartConsoleMode();
+				} else {
+					StartUIMode(args);
+				}
+				return 0;
+			});
+
+			try {
+				cli.Execute(args);
+			} catch (CommandParsingException e) {
+				Console.WriteLine(e.Message);
+				return 1;
 			}
-			else {
-				StartUIMode(args);
-			}
+			FreeConsole();
+			return 0;
 		}
 
-		private static CommandLineArguments Args { get; set; }
-
-		private static void ShowHelp()
-		{
-			Console.WriteLine("-help: show this text.");
-			Console.WriteLine("-console: console mode.");
-			Console.WriteLine("-justbuild: build project without running executable.");
-			Console.WriteLine("-build: project path, default: \"Orange/Orange.%Platform%.sln\".");
-			Console.WriteLine("-run: executable path, default: \"Orange/bin/%Platform%/Release/%PlatformExecutable%\".");
-		}
-
-		private static bool RunExecutable => !Args.JustBuild;
+		private static bool RunExecutable;
 
 #if WIN
 		private static void StartUIMode(string[] args)
