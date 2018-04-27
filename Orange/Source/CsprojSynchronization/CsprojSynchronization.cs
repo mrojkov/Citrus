@@ -10,14 +10,12 @@ namespace Orange
 	public static class CsprojSynchronization
 	{
 		public static Predicate<DirectoryInfo> SkipUnwantedDirectoriesPredicate = directoryInfo => {
-			if (directoryInfo.Name == "bin") return false;
-			if (directoryInfo.Name == "obj") return false;
-			if (directoryInfo.Name == ".svn") return false;
-			if (directoryInfo.Name == ".git") return false;
-			if (directoryInfo.Name == ".vs") return false;
-			if (directoryInfo.Name == "Resources") return false;
-			if (directoryInfo.FullName.StartsWith(The.Workspace.ProjectDirectory + "\\Data")) return false;
-			return true;
+			return directoryInfo.Name != "bin" &&
+				directoryInfo.Name != "obj" &&
+				directoryInfo.Name != ".svn" &&
+				directoryInfo.Name != ".git" &&
+				directoryInfo.Name != ".vs" &&
+				directoryInfo.Name != "Resources";
 		};
 		private static string ToWindowsSlashes(string path)
 		{
