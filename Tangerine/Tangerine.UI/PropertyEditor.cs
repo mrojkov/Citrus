@@ -1099,4 +1099,29 @@ namespace Tangerine.UI
 			Selector.Items[7].Text += LargeTexDesc;
 		}
 	}
+
+	public class BlendingPropertyEditor : EnumPropertyEditor<Blending>
+	{
+
+		private static readonly Dictionary<string, string> blendingToPhotoshopAnalog = new Dictionary<string, string> {
+			{Blending.Alpha.ToString(), "aka \"Normal\""},
+			{Blending.Add.ToString(), "aka \"Linear Dodge\""},
+			{Blending.Glow.ToString(), "aka \"Normal\" with Brightness"},
+			{Blending.Modulate.ToString(), "aka \"Multiply\" without Transparency"},
+			{Blending.Burn.ToString(), "aka \"Multiply\""},
+			{Blending.Darken.ToString(), "aka \"Normal\" with Darkness"},
+			{Blending.Opaque.ToString(), "aka \"Normal\" without Transparency"},
+		};
+
+		public BlendingPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
+		{
+			foreach (var item in Selector.Items) {
+				string photoshopAnalog;
+				if (blendingToPhotoshopAnalog.TryGetValue(item.Text, out photoshopAnalog)) {
+					item.Text += $" ({photoshopAnalog})";
+				}
+			}
+		}
+
+	}
 }
