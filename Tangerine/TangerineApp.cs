@@ -463,10 +463,13 @@ namespace Tangerine
 
 		static void Paste()
 		{
+			Document.Current.History.BeginTransaction();
 			try {
 				Core.Operations.Paste.Perform();
 			} catch (InvalidOperationException e) {
 				AlertDialog.Show(e.Message);
+			} finally {
+				Document.Current.History.EndTransaction();
 			}
 		}
 
