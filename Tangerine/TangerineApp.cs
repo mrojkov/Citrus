@@ -424,10 +424,10 @@ namespace Tangerine
 			h.Connect(Tools.FitToContent, new FitToContent());
 			h.Connect(Tools.FlipX, new FlipX());
 			h.Connect(Tools.FlipY, new FlipY());
-			h.Connect(Command.Copy, Core.Operations.Copy.CopyToClipboard, () => Document.Current?.SelectedRows().Any() ?? false);
-			h.Connect(Command.Cut, Core.Operations.Cut.Perform, () => Document.Current?.SelectedRows().Any() ?? false);
+			h.Connect(Command.Copy, Core.Operations.Copy.CopyToClipboard, IsCopyPastAllowedForSelection);
+			h.Connect(Command.Cut, Core.Operations.Cut.Perform, IsCopyPastAllowedForSelection);
 			h.Connect(Command.Paste, Paste, Document.HasCurrent);
-			h.Connect(Command.Delete, Core.Operations.Delete.Perform, () => Document.Current?.SelectedRows().Any() ?? false);
+			h.Connect(Command.Delete, Core.Operations.Delete.Perform, IsCopyPastAllowedForSelection);
 			h.Connect(Command.SelectAll, () => {
 				foreach (var row in Document.Current.Rows) {
 					Core.Operations.SelectRow.Perform(row, true);
@@ -440,6 +440,11 @@ namespace Tangerine
 			h.Connect(SceneViewCommands.SnapWidgetBorderToRuler, new ToggleDisplayCommandHandler());
 			h.Connect(SceneViewCommands.SnapWidgetPivotToRuler, new ToggleDisplayCommandHandler());
 			h.Connect(SceneViewCommands.DeleteRulers, new DeleteRulers());
+		}
+
+		private static bool IsCopyPastAllowedForSelection()
+		{
+			return Document.Current?.TopLevelSelectedRows().Any(row => row.IsCopyPastAllowed()) ?? false;
 		}
 
 		private IEnumerator<object> OrangeTask()

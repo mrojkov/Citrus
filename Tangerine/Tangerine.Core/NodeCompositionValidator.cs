@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Reflection;
 using Lime;
 
 namespace Tangerine.Core
@@ -42,6 +43,11 @@ namespace Tangerine.Core
 				}
 			}
 			return false;
+		}
+
+		public static bool IsCopyPastAllowed(Type type)
+		{
+			return type.GetCustomAttribute<TangerineForbidCopyPasteAttribute>(false) == null;
 		}
 	}
 }

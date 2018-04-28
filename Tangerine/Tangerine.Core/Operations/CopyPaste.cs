@@ -4,6 +4,7 @@ using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Components;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace Tangerine.Core.Operations
 {
@@ -28,6 +29,9 @@ namespace Tangerine.Core.Operations
 		{
 			var frame = new Frame();
 			foreach (var row in Document.Current.TopLevelSelectedRows()) {
+				if (!row.IsCopyPastAllowed()) {
+					continue;
+				}
 				var bone = row.Components.Get<BoneRow>()?.Bone;
 				if (bone != null) {
 					var c = (Bone)Document.CreateCloneForSerialization(bone);
@@ -126,7 +130,10 @@ namespace Tangerine.Core.Operations
 			if (!folderLocation.Folder.Expanded) {
 				SetProperty.Perform(folderLocation.Folder, nameof(Folder.Expanded), true);
 			}
-			var items = frame.RootFolder().Items.ToList();
+			var items = frame.RootFolder().Items.Where(item => NodeCompositionValidator.IsCopyPastAllowed(item.GetType())).ToList();
+			if (items.Count == 0) {
+				return true;
+			}
 			foreach (var n in items.OfType<Node>()) {
 				Document.Current.Decorate(n);
 			}
@@ -182,6 +189,9 @@ namespace Tangerine.Core.Operations
 		public static void Perform()
 		{
 			foreach (var row in Document.Current.TopLevelSelectedRows().ToList()) {
+				if (!row.IsCopyPastAllowed()) {
+					continue;
+				}
 				var item = Row.GetFolderItem(row);
 				if (item != null) {
 					UnlinkFolderItem.Perform(Document.Current.Container, item);

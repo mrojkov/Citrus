@@ -27,6 +27,11 @@ namespace Tangerine.Core
 		public readonly List<Row> Rows = new List<Row>();
 		public readonly ComponentCollection<Component> Components = new ComponentCollection<Component>();
 
+		public bool IsCopyPastAllowed()
+		{
+			return Components.Get<NodeRow>()?.Node?.IsCopyPastAllowed() ?? true;
+		}
+
 		public static FolderItemLocation GetFolderItemLocation(Row r)
 		{
 			var fi = GetFolderItem(r);
