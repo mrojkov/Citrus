@@ -176,7 +176,7 @@ namespace Launcher
 			builder.OnBuildSuccess += Application.Exit;
 			Console.SetOut(mainForm.LogWriter);
 			Console.SetError(mainForm.LogWriter);
-			builder.Start(RunExecutable);
+			builder.Start();
 			mainForm.Show();
 			Application.Run();
 		}
