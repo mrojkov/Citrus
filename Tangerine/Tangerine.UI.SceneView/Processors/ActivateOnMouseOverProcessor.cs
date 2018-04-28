@@ -10,28 +10,36 @@ namespace Tangerine.UI.SceneView
 		public IEnumerator<object> Task()
 		{
 			while (true) {
-				if (SceneView.Instance.InputArea.IsMouseOverThisOrDescendant() && !Docking.WindowDragBehaviour.IsActive) {
+				if (
+					SceneView.Instance.InputArea.IsMouseOverThisOrDescendant() && 
+					!Docking.WindowDragBehaviour.IsActive && 
+					!(Widget.Focused is CommonEditBox))
+				{
 					var isMouseOverWindow = false;
 					if (!Window.Current.Active) {
-						var hoveredWindow = Application.Windows.OfType<Window>().FirstOrDefault(w => w.Active);
-						if (hoveredWindow != null) {
-							// Don't set focus on SceneView when another Tangerine's window is hovered
-							var mousePositionPoint = hoveredWindow.WorldToWindow(hoveredWindow.Input.MousePosition);
-							var borderWidth = (hoveredWindow.DecoratedSize.X - hoveredWindow.ClientSize.X) * 0.5f;
-							var titleBarHeight = hoveredWindow.DecoratedSize.Y - hoveredWindow.ClientSize.Y - borderWidth * 2f;
-							var windowRectangle = new Rectangle(new Vector2(-borderWidth, -titleBarHeight - borderWidth), hoveredWindow.ClientSize + new Vector2(borderWidth));
-							isMouseOverWindow = windowRectangle.Contains(mousePositionPoint);
-							if (!isMouseOverWindow) {
+						var activeWindow = Application.Windows.FirstOrDefault(w => w.Active);
+						if (activeWindow != null) {
+							// Don't give focus to SceneView if mouse is upon another Tangerine's window.
+							var activeWindowRect = CalcWidowRectangleWithTitleAndBorder(activeWindow);
+							var mousePosition = ((Window)activeWindow).WorldToWindow(activeWindow.Input.MousePosition);
+							isMouseOverWindow = activeWindowRect.Contains(mousePosition);
+							if (!isMouseOverWindow)
 								Window.Current.Activate();
-							}
 						}
 					}
-					if (!isMouseOverWindow && !(Widget.Focused is CommonEditBox)) {
+					if (!isMouseOverWindow) {
 						SceneView.Instance.InputArea.SetFocus();
 					}
 				}
 				yield return null;
 			}
+		}
+
+		private static Rectangle CalcWidowRectangleWithTitleAndBorder(IWindow window)
+		{
+			var borderWidth = (window.DecoratedSize.X - window.ClientSize.X) * 0.5f;
+			var titleBarHeight = window.DecoratedSize.Y - window.ClientSize.Y - borderWidth * 2f;
+			return new Rectangle(new Vector2(-borderWidth, -titleBarHeight - borderWidth), window.ClientSize + new Vector2(borderWidth));
 		}
 	}
 }
