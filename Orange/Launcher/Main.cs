@@ -1,5 +1,6 @@
 using System;
 using McMaster.Extensions.CommandLineUtils;
+using System.Linq;
 #if WIN
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
@@ -142,8 +143,8 @@ namespace Launcher
 					return 0;
 				}
 #endif // WIN
-				RunExecutable = !optionJustBuild.HasValue();
 				builder = new Builder {
+					NeedRunExecutable = !optionJustBuild.HasValue(),
 					SolutionPath = optionBuildProjectPath.ParsedValue,
 					ExecutablePath = optionRunProjectPath.ParsedValue,
 					ExecutableArgs = optionRunArgs.ParsedValue
@@ -166,8 +167,6 @@ namespace Launcher
 			return 0;
 		}
 
-		private static bool RunExecutable;
-
 #if WIN
 		private static void StartUIMode(string[] args)
 		{
@@ -185,7 +184,6 @@ namespace Launcher
 		private static void StartUIMode(string[] args)
 		{
 			AppDelegate.Builder = builder;
-			AppDelegate.Args = Args;
 			NSApplication.Init();
 			NSApplication.Main(args);
 		}
@@ -195,7 +193,7 @@ namespace Launcher
 		{
 			builder.OnBuildStatusChange += Console.WriteLine;
 			builder.OnBuildFail += () => Environment.Exit(1);
-			builder.Start(RunExecutable).Wait();
+			builder.Start().Wait();
 		}
 	}
 }

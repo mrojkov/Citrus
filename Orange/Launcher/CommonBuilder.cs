@@ -11,7 +11,7 @@ namespace Launcher
 	internal abstract class CommonBuilder
 	{
 		private bool areFailedDetailsSet;
-
+		public bool NeedRunExecutable = true;
 		public string SolutionPath;
 		public string ExecutablePath;
 		public string ExecutableArgs;
@@ -58,13 +58,13 @@ namespace Launcher
 			Orange.CsprojSynchronization.SynchronizeProject($"{citrus}/Orange/Orange.GUI/Orange.Mac.GUI.csproj");
 		}
 
-		public Task Start(bool runExecutable)
+		public Task Start()
 		{
 			var task = new Task(() => {
 				try {
 					RestoreNuget();
 					SynchronizeAllProjects();
-					BuildAndRun(runExecutable);
+					BuildAndRun();
 				} catch (Exception e) {
 					Console.WriteLine(e.Message);
 					OnBuildFail?.Invoke();
@@ -86,7 +86,7 @@ namespace Launcher
 			return path;
 		}
 
-		private void BuildAndRun(bool runExecutable)
+		private void BuildAndRun()
 		{
 			var citrusDirectory = CalcCitrusDirectory();
 			Environment.CurrentDirectory = Path.Combine(citrusDirectory, "Orange");
@@ -94,7 +94,7 @@ namespace Launcher
 			OnBuildStatusChange?.Invoke("Building");
 			if (AreRequirementsMet() && Build(SolutionPath ?? DefaultSolutionPath)) {
 				ClearObjFolder(citrusDirectory);
-				if (runExecutable) {
+				if (NeedRunExecutable) {
 					RunExecutable();
 				}
 				OnBuildSuccess?.Invoke();
