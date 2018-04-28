@@ -104,6 +104,7 @@ namespace Launcher
 		[STAThread]
 		public static int Main(string[] args)
 		{
+			var originalArgs = args;
 #if MAC
 			args = args.Where(s => !s.StartsWith("-psn")).ToArray();
 #endif // MAC
@@ -153,7 +154,9 @@ namespace Launcher
 				if (optionConsole.HasValue()) {
 					StartConsoleMode();
 				} else {
-					StartUIMode(args);
+					// OS X passes `-psn_<number>` to process when start from Finder, so we cut it for
+					// cli parser, but pass original args to OS X's NSApplication.Main
+					StartUIMode(originalArgs);
 				}
 				return 0;
 			});
