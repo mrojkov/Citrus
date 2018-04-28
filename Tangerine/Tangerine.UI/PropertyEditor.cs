@@ -1102,7 +1102,6 @@ namespace Tangerine.UI
 
 	public class BlendingPropertyEditor : EnumPropertyEditor<Blending>
 	{
-
 		private static readonly Dictionary<string, string> blendingToPhotoshopAnalog = new Dictionary<string, string> {
 			{Blending.Alpha.ToString(), "Normal"},
 			{Blending.Add.ToString(), "Linear Dodge"},
@@ -1122,6 +1121,5 @@ namespace Tangerine.UI
 				}
 			}
 		}
-
 	}
 }
