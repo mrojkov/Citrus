@@ -272,6 +272,13 @@ namespace Lime
 			}
 		}
 
+		public static void StopAll()
+		{
+			foreach (var channel in channels) {
+				channel.Stop();
+			}
+		}
+
 		public static void StopGroup(AudioChannelGroup group, float fadeoutTime)
 		{
 			foreach (var channel in channels) {

@@ -12,6 +12,7 @@ namespace Tangerine.UI.SceneView
 				doc.PreviewAnimation = false;
 				StopAnimationRecursive(doc.PreviewAnimationContainer);
 				Document.SetCurrentFrameToNode(doc.PreviewAnimationBegin, doc.Container, CoreUserPreferences.Instance.AnimationMode);
+				AudioSystem.StopAll();
 			} else {
 				doc.PreviewAnimation = true;
 				doc.Container.IsRunning = doc.PreviewAnimation;

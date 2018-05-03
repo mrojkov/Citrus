@@ -58,6 +58,11 @@ namespace Lime
 		{
 			PlatformAudioSystem.BumpAll();
 		}
+		
+		public static void StopAll()
+		{
+			PlatformAudioSystem.StopAll();
+		}
 
 		public static void StopGroup(AudioChannelGroup group, float fadeoutTime = 0)
 		{
