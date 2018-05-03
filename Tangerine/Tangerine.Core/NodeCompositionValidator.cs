@@ -45,7 +45,7 @@ namespace Tangerine.Core
 			return false;
 		}
 
-		public static bool IsCopyPastAllowed(Type type)
+		public static bool IsCopyPasteAllowed(Type type)
 		{
 			return type.GetCustomAttribute<TangerineForbidCopyPasteAttribute>(false) == null;
 		}

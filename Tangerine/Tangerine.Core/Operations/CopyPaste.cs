@@ -29,7 +29,7 @@ namespace Tangerine.Core.Operations
 		{
 			var frame = new Frame();
 			foreach (var row in Document.Current.TopLevelSelectedRows()) {
-				if (!row.IsCopyPastAllowed()) {
+				if (!row.IsCopyPasteAllowed()) {
 					continue;
 				}
 				var bone = row.Components.Get<BoneRow>()?.Bone;
@@ -130,7 +130,7 @@ namespace Tangerine.Core.Operations
 			if (!folderLocation.Folder.Expanded) {
 				SetProperty.Perform(folderLocation.Folder, nameof(Folder.Expanded), true);
 			}
-			var items = frame.RootFolder().Items.Where(item => NodeCompositionValidator.IsCopyPastAllowed(item.GetType())).ToList();
+			var items = frame.RootFolder().Items.Where(item => NodeCompositionValidator.IsCopyPasteAllowed(item.GetType())).ToList();
 			if (items.Count == 0) {
 				return true;
 			}
@@ -189,7 +189,7 @@ namespace Tangerine.Core.Operations
 		public static void Perform()
 		{
 			foreach (var row in Document.Current.TopLevelSelectedRows().ToList()) {
-				if (!row.IsCopyPastAllowed()) {
+				if (!row.IsCopyPasteAllowed()) {
 					continue;
 				}
 				var item = Row.GetFolderItem(row);

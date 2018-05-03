@@ -41,7 +41,7 @@ namespace Tangerine.UI.SceneView
 			h.Connect(SceneViewCommands.DragDownFast, () => DragNodes(new Vector2(0, 5)));
 			h.Connect(SceneViewCommands.DragLeftFast, () => DragNodes(new Vector2(-5, 0)));
 			h.Connect(SceneViewCommands.DragRightFast, () => DragNodes(new Vector2(5, 0)));
-			h.Connect(SceneViewCommands.Duplicate, DuplicateNodes, () => Document.Current?.TopLevelSelectedRows().Any(row => row.IsCopyPastAllowed()) ?? false);
+			h.Connect(SceneViewCommands.Duplicate, DuplicateNodes, () => Document.Current?.TopLevelSelectedRows().Any(row => row.IsCopyPasteAllowed()) ?? false);
 			h.Connect(SceneViewCommands.DisplayBones, new DisplayBones());
 			h.Connect(SceneViewCommands.DisplayPivotsForAllWidgets, new DisplayPivotsForAllWidgets());
 			h.Connect(SceneViewCommands.DisplayPivotsForInvisibleWidgets, new DisplayPivotsForInvisibleWidgets());

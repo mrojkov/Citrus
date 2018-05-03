@@ -70,9 +70,9 @@ namespace Tangerine.Core
 			EditorState(node).RootFolder.SyncDescriptorsAndNodes(node);
 		}
 
-		public static bool IsCopyPastAllowed(this Node node)
+		public static bool IsCopyPasteAllowed(this Node node)
 		{
-			return NodeCompositionValidator.IsCopyPastAllowed(node.GetType());
+			return NodeCompositionValidator.IsCopyPasteAllowed(node.GetType());
 		}
 	}
 }
