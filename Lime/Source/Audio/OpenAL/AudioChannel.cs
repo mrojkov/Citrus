@@ -31,7 +31,7 @@ namespace Lime
 		private bool looping;
 		private float fadeVolume;
 		private float fadeSpeed;
-		private volatile int lastBumpedRenderCycle;
+		private volatile int updatesSinceLastBump;
 		private List<int> allBuffers;
 		private Stack<int> processedBuffers;
 
@@ -51,7 +51,7 @@ namespace Lime
 			get { return volume; }
 			set { SetVolume(value); }
 		}
-
+	
 		public AudioChannelState State
 		{
 			get
@@ -258,7 +258,7 @@ namespace Lime
 
 		public void Bump()
 		{
-			lastBumpedRenderCycle = Renderer.RenderCycle;
+			updatesSinceLastBump = 0;
 		}
 
 		public void Update(float delta)
@@ -284,9 +284,10 @@ namespace Lime
 					Stop();
 				}
 				Volume = volume;
-			} else if (streaming && Sound != null && Sound.IsBumpable && Renderer.RenderCycle - lastBumpedRenderCycle > 3) {
+			} else if (streaming && Sound != null && Sound.IsBumpable && updatesSinceLastBump > 3) {
 				Stop(0.1f);
 			}
+			updatesSinceLastBump++;
 		}
 
 		void QueueBuffers()
