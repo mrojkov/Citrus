@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 
 namespace Tangerine.Core
 {
@@ -37,9 +36,6 @@ namespace Tangerine.Core
 
 		public void EndTransaction()
 		{
-			if (Marshal.GetExceptionCode() != 0) {
-				RevertActiveTransaction();
-			}
 			transactionCounter--;
 		}
 
