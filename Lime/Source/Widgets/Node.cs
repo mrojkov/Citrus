@@ -124,14 +124,20 @@ namespace Lime
 		Hidden = 1,
 		Locked = 2,
 		Shown = 4,
+		[TangerineIgnore]
 		PropertiesExpanded = 8,
+		[TangerineIgnore]
 		ChildrenExpanded = 16,
+		[TangerineIgnore]
 		HiddenOnExposition = 32,
+		[TangerineIgnore]
 		IgnoreMarkers = 64,
+		[TangerineIgnore]
 		DisplayContent = 128,
 		ColorBit1 = 256,
 		ColorBit2 = 512,
 		ColorBit3 = 1024,
+		[TangerineIgnore]
 		SceneNode = 2048
 	}
 

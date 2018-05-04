@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using System.Reflection;
 using Lime;
 using Tangerine.Core.Components;
 
@@ -30,6 +31,8 @@ namespace Tangerine.Core
 		}
 
 		public static readonly string[] AllowedFileTypes = { "scene", "tan", "model" };
+
+		private static readonly TangerineFlags[] ignoredTangerineFlags;
 
 		readonly string defaultPath = "Untitled";
 		readonly Vector2 defaultSceneSize = new Vector2(1024, 768);
@@ -107,6 +110,18 @@ namespace Tangerine.Core
 		public bool InspectRootNode { get; set; }
 
 		public string AnimationId { get; set; }
+
+		static Document()
+		{
+			var tmpList = new List<TangerineFlags>();
+			foreach (Enum value in Enum.GetValues(typeof(TangerineFlags))) {
+				var memberInfo = typeof(TangerineFlags).GetMember(value.ToString())[0];
+				if (memberInfo.GetCustomAttribute<TangerineIgnoreAttribute>(false) != null) {
+					tmpList.Add((TangerineFlags) value);
+				}
+			}
+			ignoredTangerineFlags = tmpList.ToArray();
+		}
 
 		public Document()
 		{
@@ -324,7 +339,9 @@ namespace Tangerine.Core
 		{
 			var clone = node.Clone();
 			Action<Node> f = (n) => {
-				n.SetTangerineFlag(TangerineFlags.SceneNode, false);
+				foreach (var tangerineFlag in ignoredTangerineFlags) {
+					n.SetTangerineFlag(tangerineFlag, false);
+				}
 				n.AnimationFrame = 0;
 				if (n.Folders != null && n.Folders.Count == 0) {
 					n.Folders = null;
