@@ -29,7 +29,7 @@ namespace Tangerine
 				LayoutCell = new LayoutCell { StretchY = float.MaxValue },
 				Layout = new StackLayout(),
 			};
-			var collection = new ObservableCollection<RulerData>(Project.Current.Rulers);
+			var collection = new ObservableCollection<Ruler>(ProjectUserPreferences.Instance.Rulers);
 			ThemedScrollView Container;
 			rootWidget = new ThemedInvalidableWindowWidget(window) {
 				Padding = new Thickness(8),
@@ -54,19 +54,19 @@ namespace Tangerine
 				Layout = new VBoxLayout(),
 			};
 			Container.Content.AddNode(list);
-			list.Components.Add(new WidgetFactoryComponent<RulerData>((w) => new RulerRowView(w, collection), collection));
 
+			list.Components.Add(new WidgetFactoryComponent<Ruler>((w) => new RulerRowView(w, collection), collection));
 			okButton.Clicked += () => {
 				window.Close();
-				Core.UserPreferences.Instance.Save();
-				var temp = Project.Current.Rulers.ToList();
-				foreach (var overlay in temp.Except(collection)) {
-					Project.Current.RemoveRuler(overlay);
+				var temp = ProjectUserPreferences.Instance.Rulers.ToList();
+				foreach (var ruler in temp.Except(collection)) {
+					ProjectUserPreferences.Instance.Rulers.Remove(ruler);
 				}
+				Core.UserPreferences.Instance.Save();
+				Application.InvalidateWindows();
 			};
 			cancelButton.Clicked += () => {
 				window.Close();
-				Core.UserPreferences.Instance.Load();
 			};
 			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
 			rootWidget.LateTasks.AddLoop(() => {
@@ -92,20 +92,20 @@ namespace Tangerine
 					}
 				});
 
-			public RulerRowView(RulerData overlay, IList<RulerData> overlays) : base()
+			public RulerRowView(Ruler ruler, IList<Ruler> Rulers) : base()
 			{
 				Layout = new HBoxLayout();
 				Nodes.Add(Label = new ThemedSimpleText {
 					Padding = new Thickness { Left = 10 },
 				});
-				this.AddChangeWatcher(() => overlay.Name, (name) => Label.Text = name);
+				this.AddChangeWatcher(() => ruler.Name, (name) => Label.Text = name);
 				Nodes.Add(new Widget());
 				Nodes.Add(deleteButton = new ThemedDeleteButton {
 					Anchors = Anchors.Right,
 					LayoutCell = new LayoutCell(Alignment.LeftTop)
 				});
 				CompoundPresenter.Add(StripePresenter);
-				deleteButton.Clicked = () => overlays.Remove(overlay);
+				deleteButton.Clicked = () => Rulers.Remove(ruler);
 				MinMaxHeight = 20;
 			}
 		}

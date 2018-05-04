@@ -9,6 +9,8 @@ namespace Tangerine.UI.SceneView
 	public class DragWidgetsProcessor : ITaskProvider
 	{
 		SceneView sv => SceneView.Instance;
+		static ProjectUserPreferences Preferences => ProjectUserPreferences.Instance;
+		private static float Threshold = 10f;
 
 		public IEnumerator<object> Task()
 		{
@@ -71,7 +73,7 @@ namespace Tangerine.UI.SceneView
 						mouseDelta != Vector2.Zero &&
 						(SceneViewCommands.SnapWidgetPivotToRuler.Checked || SceneViewCommands.SnapWidgetBorderToRuler.Checked)
 					) {
-						List<RulerLine> lines = GetRulerLines();
+						List<Ruler> rulers = GetRulers();
 
 						foreach (Widget widget in widgets) {
 							List<Vector2> points = new List<Vector2>();
@@ -85,22 +87,22 @@ namespace Tangerine.UI.SceneView
 
 							foreach (Vector2 point in points) {
 								Vector2 pointMoved = point + mouseDelta;
-								Vector2 pointsSnapped = SnapPointToLines(pointMoved, lines);
-								mouseDelta += pointsSnapped - pointMoved;
+								Vector2 pointSnapped = SnapPointToRulers(pointMoved, rulers);
+								mouseDelta += pointSnapped - pointMoved;
 							}
 						}
 					}
 
 					WidgetTransformsHelper.ApplyTransformationToWidgetsGroupObb(
 						sv.Scene,
-						widgets, widgets.Count <= 1 ? (Vector2?) null : pivot, widgets.Count <= 1, initialMousePos + mouseDelta,
+						widgets, widgets.Count <= 1 ? (Vector2?)null : pivot, widgets.Count <= 1, initialMousePos + mouseDelta,
 						initialMousePos,
 						false,
 						(originalVectorInObbSpace, deformedVectorInObbSpace) => new Transform2d(
 							(deformedVectorInObbSpace - originalVectorInObbSpace).Snap(Vector2d.Zero),
 							Vector2d.One, 0
 						));
-					
+
 					yield return null;
 				}
 			} finally {
@@ -109,51 +111,61 @@ namespace Tangerine.UI.SceneView
 			}
 		}
 
-		private static List<RulerLine> GetRulerLines()
+		private static List<Ruler> GetRulers()
 		{
-			var lines = new List<RulerLine>();
-			foreach (var line in Ruler.Lines) {
-				lines.Add(line.ToRulerLine());
+			var sets = new List<Ruler>();
+			if (Preferences.RulerVisible) {
+				sets.Add(Preferences.ActiveRuler);
 			}
-			foreach (var ruler in Project.Current.Rulers) {
-				if (ruler.GetComponents().Get<CommandComponent>().Command.Checked) {
-					lines.AddRange(ruler.Lines);
-				}
-			}
-			foreach (var ruler in Project.Current.DefaultRulers) {
-				if (ruler.GetComponents().Get<CommandComponent>().Command.Checked) {
-					lines.AddRange(ruler.Lines);
-				}
-			}
-			return lines;
+			sets.AddRange(Preferences.Rulers.Where(r => r.Components.Get<CommandComponent>().Command.Checked));
+			sets.AddRange(Preferences.DefaultRulers.Where(r => r.Components.Get<CommandComponent>().Command.Checked));
+			return sets;
 		}
 
-		private static RulerLine GetRulerLine(Vector2 pos, List<RulerLine> lines, bool isVertical)
+		private static Vector2 LineToVector(RulerLine line, bool anchorToRoot)
 		{
-			var t = Document.Current.Container.AsWidget.CalcTransitionToSpaceOf(Document.Current.RootNode.AsWidget);
-			return lines.FirstOrDefault(l => {
-				if (l.IsVertical != isVertical)
-					return false;
-				var mask = l.IsVertical ? Vector2.Right : Vector2.Down;
-				return (pos * t * mask - (l.ToVector2() + Document.Current.RootNode.AsWidget.Size * mask / 2)).Length < 15;
-			});
+			var mask = line.RulerOrientation == RulerOrientation.Vertical ? Vector2.Right : Vector2.Down;
+			if (anchorToRoot) {
+				return line.GetClosestPointToOrigin() + Document.Current.RootNode.AsWidget.Size * mask / 2;
+			}
+
+			return line.GetClosestPointToOrigin();
 		}
 
-		private static Vector2 SnapPointToLines(Vector2 point, List<RulerLine> lines)
+		private static Vector2 SnapPointToRulers(Vector2 point, List<Ruler> rulers)
 		{
-			point = SnapPointToLine(point, GetRulerLine(point, lines, true));
-			return SnapPointToLine(point, GetRulerLine(point, lines, false));
+			var p1 = SnapPointToRulers(point, rulers, RulerOrientation.Vertical);
+			var p2 = SnapPointToRulers(point, rulers, RulerOrientation.Horizontal);
+			return new Vector2(p1.X, p2.Y);
 		}
 
-		private static Vector2 SnapPointToLine(Vector2 point, RulerLine line)
+		private static Vector2 SnapPointToRulers(Vector2 point, List<Ruler> rulers, RulerOrientation orientationFilter)
 		{
-			if (line != null) {
-				var t = Document.Current.Container.AsWidget.CalcTransitionToSpaceOf(Document.Current.RootNode.AsWidget);
-				var mask = line.IsVertical ? Vector2.Right : Vector2.Down;
-				return (point * t * (Vector2.One - mask) +
-					(line.ToVector2() + Document.Current.RootNode.AsWidget.Size * mask / 2)) * t.CalcInversed();
+			Vector2 snappedPoint;
+			if (TrySnapPoint(point, rulers, orientationFilter, out snappedPoint)) {
+				return snappedPoint * Document.Current.RootNode.AsWidget.CalcTransitionToSpaceOf(SceneView.Instance.Scene);
 			}
 			return point;
+		}
+
+		private static bool TrySnapPoint(Vector2 pos, List<Ruler> rulers, RulerOrientation orientationFilter, out Vector2 snappedPoint)
+		{
+			var sceneZoom = SceneView.Instance.Scene.Scale.X;
+			foreach (var ruler in rulers) {
+				foreach (var line in ruler.Lines) {
+					if (line.RulerOrientation != orientationFilter)
+						continue;
+					var mask = orientationFilter == RulerOrientation.Vertical ? Vector2.Right : Vector2.Down;
+					var transformedPosition = pos * SceneView.Instance.Scene.CalcTransitionToSpaceOf(Document.Current.RootNode.AsWidget);
+					var lineVector = LineToVector(line, ruler.AnchorToRoot);
+					if ((transformedPosition * mask - lineVector).Length < Threshold / sceneZoom) {
+						snappedPoint = transformedPosition * (Vector2.One - mask) + lineVector;
+						return true;
+					}
+				}
+			}
+			snappedPoint = default(Vector2);
+			return false;
 		}
 	}
 }

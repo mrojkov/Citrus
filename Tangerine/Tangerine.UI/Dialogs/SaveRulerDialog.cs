@@ -7,16 +7,19 @@ namespace Tangerine.UI
 {
 	public class SaveRulerDialog
 	{
-		readonly Window window;
-		readonly WindowWidget rootWidget;
-		readonly Widget buttonsPanel;
-		readonly EditBox EditBox;
-		string result;
+		private readonly Window window;
+		private readonly WindowWidget rootWidget;
+		private readonly Widget buttonsPanel;
+		private readonly EditBox EditBox;
+		private readonly CheckBox CheckBox;
+		private bool result;
 		private readonly ThemedButton okButton;
 		private readonly ThemedButton cancelButton;
+		private readonly Ruler ruler;
 
-		public SaveRulerDialog()
+		public SaveRulerDialog(Ruler ruler)
 		{
+			this.ruler = ruler;
 			window = new Window(new WindowOptions {
 				FixedSize = true,
 				Title = "Save Ruler",
@@ -31,7 +34,7 @@ namespace Tangerine.UI
 					new Widget {
 						Layout = new TableLayout {
 							ColCount = 2,
-							RowCount = 1,
+							RowCount = 2,
 							Spacing = 8,
 							ColDefaults = {
 								new LayoutCell(Alignment.RightCenter, 0.5f, 0),
@@ -39,8 +42,10 @@ namespace Tangerine.UI
 							}
 						},
 						Nodes = {
-							new ThemedSimpleText("Enter ruler name"),
+							new ThemedSimpleText("Ruler name"),
 							(EditBox = new ThemedEditBox()),
+							new ThemedSimpleText("Anchor to root"),
+							(CheckBox = new ThemedCheckBox())
 						}
 					},
 					(buttonsPanel = new Widget {
@@ -56,14 +61,16 @@ namespace Tangerine.UI
 			cancelButton.Clicked += window.Close;
 			okButton.AddChangeWatcher(() => EditBox.Text, (text) => okButton.Enabled = !string.IsNullOrEmpty(text));
 			okButton.Clicked += () => {
-				result = EditBox.Text;
+				ruler.Name = EditBox.Text;
+				ruler.AnchorToRoot = CheckBox.Checked;
+				result = true;
 				window.Close();
 			};
 			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
 			EditBox.SetFocus();
 		}
 
-		public string Show()
+		public bool Show()
 		{
 			window.ShowModal();
 			return result;

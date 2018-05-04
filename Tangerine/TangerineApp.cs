@@ -6,6 +6,7 @@ using Lime;
 using Tangerine.Core;
 using Tangerine.UI;
 using Tangerine.UI.Docking;
+using Tangerine.UI.SceneView;
 
 namespace Tangerine
 {

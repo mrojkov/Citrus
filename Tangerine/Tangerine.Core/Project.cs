@@ -38,58 +38,23 @@ namespace Tangerine.Core
 		public static OpenFileOutsideProjectAttemptDelegate OpenFileOutsideProjectAttempt;
 		public static volatile string CookingOfModifiedAssetsStatus;
 		public static TaskList Tasks { get; set; }
-		public ObservableCollection<RulerData> Rulers { get; } = new ObservableCollection<RulerData>();
 		public Dictionary<string, Widget> Overlays { get; } = new Dictionary<string, Widget>();
-		public List<RulerData> DefaultRulers { get; } = new List<RulerData>();
+		public ProjectUserPreferences UserPreferences { get; private set; } = new ProjectUserPreferences();
 
 		private Project() { }
 
 		public Project(string citprojPath)
 		{
 			CitprojPath = citprojPath;
-			AddDefaultRulers();
 			UserprefsPath = Path.ChangeExtension(citprojPath, ".userprefs");
 			AssetsDirectory = Path.Combine(Path.GetDirectoryName(CitprojPath), "Data");
 			if (!Directory.Exists(AssetsDirectory)) {
 				throw new InvalidOperationException($"Assets directory {AssetsDirectory} doesn't exist.");
 			}
 			Orange.The.Workspace.Open(citprojPath);
-			foreach (var ruler in Orange.The.Workspace.ProjectJson.GetArray("Rulers", new RulerData[0])) {
-				Rulers.Add(ruler);
-			}
 			UpdateTextureParams();
 		}
 
-
-		private void AddDefaultRulers()
-		{
-			var l1 = new RulerLine { Value = -384 };
-			var l2 = new RulerLine { Value = 384 };
-			var ruler = new RulerData { Name = "1152x768 (3:2)" };
-			ruler.Lines.Add(new RulerLine { IsVertical = true, Value = -576 });
-			ruler.Lines.Add(new RulerLine { IsVertical = true, Value = 576 });
-			ruler.Lines.Add(l1);
-			ruler.Lines.Add(l2);
-			DefaultRulers.Add(ruler);
-			ruler = new RulerData { Name = "1024x768 (3:4)" };
-			ruler.Lines.Add(new RulerLine { IsVertical = true, Value = -512 });
-			ruler.Lines.Add(new RulerLine { IsVertical = true, Value = 512 });
-			ruler.Lines.Add(l1);
-			ruler.Lines.Add(l2);
-			DefaultRulers.Add(ruler);
-			ruler = new RulerData { Name = "1366x768 (16:9)" };
-			ruler.Lines.Add(new RulerLine { IsVertical = true, Value = -683 });
-			ruler.Lines.Add(new RulerLine { IsVertical = true, Value = 683 });
-			ruler.Lines.Add(l1);
-			ruler.Lines.Add(l2);
-			DefaultRulers.Add(ruler);
-			ruler = new RulerData { Name = "1579x768" };
-			ruler.Lines.Add(new RulerLine { IsVertical = true, Value = -790 });
-			ruler.Lines.Add(new RulerLine { IsVertical = true, Value = 790 });
-			ruler.Lines.Add(l1);
-			ruler.Lines.Add(l2);
-			DefaultRulers.Add(ruler);
-		}
 		public void Open()
 		{
 			if (Current != Null) {
@@ -99,15 +64,15 @@ namespace Tangerine.Core
 			AssetBundle.Current = new UnpackedAssetBundle(AssetsDirectory);
 			if (File.Exists(UserprefsPath)) {
 				try {
-					var userprefs = Serialization.ReadObjectFromFile<Userprefs>(UserprefsPath);
-					foreach (var path in userprefs.Documents) {
+					UserPreferences = Serialization.ReadObjectFromFile<ProjectUserPreferences>(UserprefsPath);
+					foreach (var path in UserPreferences.Documents) {
 						try {
 							OpenDocument(path);
 						} catch (System.Exception e) {
 							Debug.Write($"Failed to open document '{path}': {e.Message}");
 						}
 					}
-					var currentDoc = documents.FirstOrDefault(d => d.Path == userprefs.CurrentDocument) ?? documents.FirstOrDefault();
+					var currentDoc = documents.FirstOrDefault(d => d.Path == UserPreferences.CurrentDocument) ?? documents.FirstOrDefault();
 					Document.SetCurrent(currentDoc);
 				} catch (System.Exception e) {
 					Debug.Write($"Failed to load the project user preferences: {e}");
@@ -129,21 +94,6 @@ namespace Tangerine.Core
 			}
 		}
 
-
-		public void AddRuler(RulerData ruler)
-		{
-			Orange.The.Workspace.ProjectJson.AddToArray("Rulers", ruler);
-			Rulers.Add(ruler);
-			Orange.The.Workspace.SaveCurrentProject();
-		}
-
-		public void RemoveRuler(RulerData ruler)
-		{
-			Orange.The.Workspace.ProjectJson.RemoveFromArray("Rulers", ruler);
-			Rulers.Remove(ruler);
-			Orange.The.Workspace.SaveCurrentProject();
-		}
-
 		public bool Close()
 		{
 			if (Current != this) {
@@ -154,18 +104,8 @@ namespace Tangerine.Core
 			}
 			fsWatcher?.Dispose();
 			fsWatcher = null;
-			var userprefs = new Userprefs();
-			if (Document.Current != null) {
-				userprefs.CurrentDocument = Document.Current.Path;
-			}
-			foreach (var doc in documents.ToList()) {
-				if (!CloseDocument(doc)) {
-					return false;
-				}
-				userprefs.Documents.Add(doc.Path);
-			}
 			try {
-				Serialization.WriteObjectToFile(UserprefsPath, userprefs, Serialization.Format.JSON);
+				Serialization.WriteObjectToFile(UserprefsPath, UserPreferences, Serialization.Format.JSON);
 			} catch (System.Exception) { }
 			AssetBundle.Current = null;
 			Current = Null;
@@ -225,6 +165,9 @@ namespace Tangerine.Core
 					File.Delete(systemPath);
 				}
 				documents.Add(doc);
+				if (!UserPreferences.Documents.Contains(doc.Path)) {
+					UserPreferences.Documents.Add(doc.Path);
+				}
 			}
 			doc.MakeCurrent();
 			return doc;
@@ -248,6 +191,7 @@ namespace Tangerine.Core
 			string systemPath;
 			if (doc.Close()) {
 				documents.Remove(doc);
+				UserPreferences.Documents.Remove(doc.Path);
 				if (GetSystemPath(AutosaveProcessor.GetTemporalFilePath(doc.Path), out systemPath)) {
 					File.Delete(systemPath);
 				}
@@ -330,6 +274,8 @@ namespace Tangerine.Core
 			if (previousIndex < 0) return;
 			documents.Remove(doc);
 			documents.Insert(toIndex, doc);
+			UserPreferences.Documents.Remove(doc.Path);
+			UserPreferences.Documents.Insert(toIndex, doc.Path);
 		}
 
 		public void RevertDocument(Document doc)
@@ -393,15 +339,6 @@ namespace Tangerine.Core
 			}
 		}
 
-		public class Userprefs
-		{
-			[YuzuMember]
-			public readonly List<string> Documents = new List<string>();
-
-			[YuzuMember]
-			public string CurrentDocument;
-		}
-
 		private void UpdateTextureParams()
 		{
 			var rules = Orange.CookingRulesBuilder.Build(Orange.The.Workspace.AssetFiles, null);
@@ -424,26 +361,6 @@ namespace Tangerine.Core
 					File.Delete(Path.Combine(AssetsDirectory, path));
 				}
 			}
-		}
-	}
-
-	public class RulerData
-	{
-		public string Name { get; set; }
-		public List<RulerLine> Lines { get; set; } = new List<RulerLine>();
-		private ComponentCollection<Component> components = new ComponentCollection<Component>();
-		// Use method instead of property to avoid aut-serialization via Newtonsoft.Json
-		public ComponentCollection<Component> GetComponents() => components;
-	}
-
-	public class RulerLine
-	{
-		public float Value { get; set; }
-		public bool IsVertical { get; set; }
-
-		public Vector2 ToVector2()
-		{
-			return IsVertical ? new Vector2(Value, 0) : new Vector2(0, Value);
 		}
 	}
 }

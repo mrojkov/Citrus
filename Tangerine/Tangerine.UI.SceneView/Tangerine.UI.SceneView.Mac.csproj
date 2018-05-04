@@ -93,7 +93,7 @@
     <Compile Include="Presenters\Bone3DPresenter.cs" />
     <Compile Include="Presenters\DistortionMeshPresenter.cs" />
     <Compile Include="Presenters\FrameBorderPresenter.cs" />
-    <Compile Include="Widgets\Ruler.cs" />
+    <Compile Include="Processors\RulerProcessor.cs" />
     <Compile Include="SceneUserPreferences.cs" />
     <Compile Include="Utils\AccumulativeRotationHelper.cs" />
     <Compile Include="Presenters\WidgetsPivotMarkPresenter.cs" />
@@ -104,6 +104,7 @@
     <Compile Include="WidgetTransforms\WidgetTransformsHelper.cs" />
     <Compile Include="WidgetTransforms\WidgetZeroScalePreserver.cs" />
     <Compile Include="Presenters\InspectRootNodePresenter.cs" />
+    <Compile Include="Widgets\RulersWidget.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Mac.csproj">

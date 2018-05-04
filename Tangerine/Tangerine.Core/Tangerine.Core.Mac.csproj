@@ -90,6 +90,8 @@
     <Compile Include="AutosaveProcessor.cs" />
     <Compile Include="CoreUserPreferences.cs" />
     <Compile Include="TriggersValidation.cs" />
+    <Compile Include="ProjectUserPreferences.cs" />
+    <Compile Include="Ruler.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

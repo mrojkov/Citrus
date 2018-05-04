@@ -4,6 +4,7 @@ using System.Linq;
 using Lime;
 using Tangerine.Core;
 using Tangerine.UI;
+using Tangerine.UI.SceneView;
 using Task = Lime.Task;
 
 namespace Tangerine
@@ -185,17 +186,13 @@ namespace Tangerine
 				CommandHandlerList.Global.Disconnect(item);
 			}
 			overlaysMenu.Clear();
-			foreach (var item in rulerMenu) {
-				CommandHandlerList.Global.Disconnect(item);
-			}
-			rulerMenu.Clear();
 			if (proj == Project.Null)
 				return;
-			AddOverlaysCommands(proj.Overlays);
-			AddRulersCommands(proj.Rulers);
-			AddRulersCommands(proj.DefaultRulers);
+			proj.UserPreferences.Rulers.CollectionChanged += OnRulersCollectionChanged;
+			AddRulersCommands(proj.UserPreferences.DefaultRulers);
+			AddRulersCommands(proj.UserPreferences.Rulers);
 			RebuildRulerMenu();
-			proj.Rulers.CollectionChanged += Rulers_CollectionChanged;
+			AddOverlaysCommands(proj.Overlays);
 			RebuildLocalizationMenu();
 		}
 
@@ -206,65 +203,66 @@ namespace Tangerine
 			rulerMenu.Add(SceneViewCommands.SaveCurrentRuler);
 			rulerMenu.Add(SceneViewCommands.DeleteRulers);
 			rulerMenu.Add(Command.MenuSeparator);
-			foreach (var ruler in Project.Current.DefaultRulers) {
-				rulerMenu.Add(ruler.GetComponents().Get<UI.SceneView.CommandComponent>().Command);
+			foreach (var ruler in ProjectUserPreferences.Instance.DefaultRulers) {
+				rulerMenu.Add(ruler.Components.Get<CommandComponent>().Command);
 			}
-			if (Project.Current.Rulers.Count > 0) {
+			if (ProjectUserPreferences.Instance.Rulers.Count > 0) {
 				rulerMenu.Add(Command.MenuSeparator);
 			}
-			foreach (var ruler in Project.Current.Rulers) {
-				rulerMenu.Add(ruler.GetComponents().Get<UI.SceneView.CommandComponent>().Command);
+			foreach (var ruler in ProjectUserPreferences.Instance.Rulers) {
+				rulerMenu.Add(ruler.Components.Get<CommandComponent>().Command);
 			}
 		}
 
-		private static void Rulers_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+		public static void OnRulersCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 		{
-			WidgetContext.Current.Root.LateTasks.Add(RulerColectionChangedTask(e.NewItems, e.OldItems));
+			// Invoke handler at the next update to avoid collection changed exceptions while 
+			// command handler iterates the commands list.
+			UpdateHandler handler = null;
+			handler = delta => {
+				AddRulersCommands(e.NewItems, true);
+				RemoveRulersCommands(e.OldItems);
+				RebuildRulerMenu();
+				UI.Docking.DockManager.Instance.MainWindowWidget.Updated -= handler;
+			};
+			UI.Docking.DockManager.Instance.MainWindowWidget.Updated += handler;
 		}
 
-		private static IEnumerator<object> RulerColectionChangedTask(IList newItems, IList oldItems)
-		{
-			AddRulersCommands(newItems);
-			RemoveRulersCommands(oldItems);
-			if (newItems != null) {
-				foreach (RulerData ruler in newItems) {
-					ruler.GetComponents().Get<UI.SceneView.CommandComponent>().Command.Issue();
-				}
-			}
-			RebuildRulerMenu();
-			yield return null;
-		}
-
-		private static void RemoveRulersCommands(IList rulers)
+		public static void AddRulersCommands(IEnumerable rulers, bool issueCommands = false)
 		{
 			if (rulers == null)
 				return;
-			foreach (RulerData ruler in rulers) {
-				CommandHandlerList.Global.Disconnect(ruler.GetComponents().Get<UI.SceneView.CommandComponent>().Command);
+			foreach (Ruler ruler in rulers) {
+				Command c;
+				ruler.Components.Add(new CommandComponent {
+					Command = (c = new Command(ruler.Name))
+				});
+				CommandHandlerList.Global.Connect(c, new RulerToggleCommandHandler(ruler.Name));
+				if (issueCommands) {
+					c.Issue();
+				}
+			}
+		}
+
+		public static void RemoveRulersCommands(IEnumerable rulers)
+		{
+			if (rulers == null)
+				return;
+			foreach (Ruler ruler in rulers) {
+				CommandHandlerList.Global.Disconnect(ruler.Components.Get<CommandComponent>().Command);
+				ProjectUserPreferences.Instance.DisplayedRulers.Remove(ruler.Name);
 			}
 		}
 
 		private static void AddOverlaysCommands(Dictionary<string, Widget> overlays)
 		{
-			Command command;
 			foreach (var overlayPair in overlays) {
-				overlayPair.Value.Components.Add(new UI.SceneView.NodeCommandComponent {
+				Command command;
+				overlayPair.Value.Components.Add(new NodeCommandComponent {
 					Command = (command = new Command(overlayPair.Key))
 				});
 				overlaysMenu.Add(command);
 				CommandHandlerList.Global.Connect(command, new OverlayToggleCommandHandler(overlayPair.Key));
-			}
-		}
-
-		private static void AddRulersCommands(IList rulers)
-		{
-			if (rulers == null)
-				return;
-			foreach (RulerData ruler in rulers) {
-				Command c;
-				ruler.GetComponents().Add(new UI.SceneView.CommandComponent {
-					Command = (c = new Command(ruler.Name))
-				});
 			}
 		}
 
@@ -289,9 +287,9 @@ namespace Tangerine
 
 		private class OverlayToggleCommandHandler : DocumentCommandHandler
 		{
-			public string overlayName;
+			private readonly string overlayName;
 
-			public override bool GetChecked() => UI.SceneView.SceneUserPreferences.Instance
+			public override bool GetChecked() => ProjectUserPreferences.Instance
 				.DisplayedOverlays.Contains(overlayName);
 
 			public OverlayToggleCommandHandler(string overlayName)
@@ -301,7 +299,7 @@ namespace Tangerine
 
 			public override void Execute()
 			{
-				var prefs = UI.SceneView.SceneUserPreferences.Instance;
+				var prefs = ProjectUserPreferences.Instance;
 				if (prefs.DisplayedOverlays.Contains(overlayName)) {
 					prefs.DisplayedOverlays.Remove(overlayName);
 				} else {
@@ -313,9 +311,9 @@ namespace Tangerine
 
 		private class RulerToggleCommandHandler : DocumentCommandHandler
 		{
-			private string rulerName;
+			private readonly string rulerName;
 
-			public override bool GetChecked() => UI.SceneView.SceneUserPreferences.Instance
+			public override bool GetChecked() => ProjectUserPreferences.Instance
 				.DisplayedRulers.Contains(rulerName);
 
 			public RulerToggleCommandHandler(string rulerName)
@@ -325,7 +323,7 @@ namespace Tangerine
 
 			public override void Execute()
 			{
-				var prefs = UI.SceneView.SceneUserPreferences.Instance;
+				var prefs = ProjectUserPreferences.Instance;
 				if (prefs.DisplayedRulers.Contains(rulerName)) {
 					prefs.DisplayedRulers.Remove(rulerName);
 				} else {
