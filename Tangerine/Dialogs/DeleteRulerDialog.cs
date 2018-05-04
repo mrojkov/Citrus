@@ -5,37 +5,30 @@ using System.Linq;
 using Lime;
 using Tangerine.UI;
 using Tangerine.Core;
+using Tangerine.UI.SceneView;
 
 namespace Tangerine
 {
 	public class DeleteRulerDialog
 	{
-		readonly Window window;
-		readonly WindowWidget rootWidget;
-		readonly Button okButton;
-		readonly Button cancelButton;
-		readonly Frame Frame;
+		private const float RowHeight = 20f;
 
 		public DeleteRulerDialog()
 		{
-			window = new Window(new WindowOptions {
-				ClientSize = new Vector2(300, 150),
-				FixedSize = true,
-				Title = "Rulers",
-				MinimumDecoratedSize = new Vector2(200, 100)
+			Button cancelButton;
+			Button okButton;
+			var window = new Window(new WindowOptions {
+				Title = "Delete Rulers",
+				Style = WindowStyle.Dialog,
+				ClientSize = new Vector2(300, 200),
 			});
-			Frame = new ThemedFrame {
-				Padding = new Thickness(8),
-				LayoutCell = new LayoutCell { StretchY = float.MaxValue },
-				Layout = new StackLayout(),
-			};
 			var collection = new ObservableCollection<Ruler>(ProjectUserPreferences.Instance.Rulers);
-			ThemedScrollView Container;
-			rootWidget = new ThemedInvalidableWindowWidget(window) {
+			ThemedScrollView container;
+			WindowWidget rootWidget = new ThemedInvalidableWindowWidget(window) {
 				Padding = new Thickness(8),
 				Layout = new VBoxLayout(),
 				Nodes = {
-					(Container = new ThemedScrollView {
+					(container = new ThemedScrollView {
 						Padding = new Thickness { Right = 10 },
 					}),
 					new Widget {
@@ -49,13 +42,41 @@ namespace Tangerine
 					}
 				}
 			};
-			Container.Content.Layout = new VBoxLayout { Spacing = 4 };
+			container.CompoundPresenter.Add(new DelegatePresenter<Widget>(
+			w => {
+				if (w.Parent == null) return;
+				var listView = (ThemedScrollView)w;
+				w.PrepareRendererState();
+				var i = (int)(listView.ScrollPosition / RowHeight);
+				var start = 0f;
+				while (true) {
+					float height;
+					if (start == 0f) {
+						height = RowHeight - listView.ScrollPosition % RowHeight;
+					} else {
+						height = start + RowHeight <= w.Size.Y ? RowHeight : w.Size.Y - start;
+					}
+					var color = i % 2 == 0
+						? ColorTheme.Current.Inspector.StripeBackground2
+						: ColorTheme.Current.Inspector.StripeBackground1;
+					Renderer.DrawRect(new Vector2(0, start), new Vector2(w.Size.X, start + height), color);
+					start += height;
+					i++;
+					if (start >= w.Size.Y) {
+						break;
+					}
+				}
+
+			}));
+			container.Content.Layout = new VBoxLayout { Spacing = 4 };
 			var list = new Widget {
 				Layout = new VBoxLayout(),
 			};
-			Container.Content.AddNode(list);
-
-			list.Components.Add(new WidgetFactoryComponent<Ruler>((w) => new RulerRowView(w, collection), collection));
+			container.Content.AddNode(list);
+			list.Components.Add(new WidgetFactoryComponent<Ruler>(ruler => new RulerRowView(ruler, () => {
+				collection.Remove(ruler);
+				container.ScrollPosition = container.ScrollPosition > RowHeight ? container.ScrollPosition - RowHeight : 0;
+			}), collection));
 			okButton.Clicked += () => {
 				window.Close();
 				var temp = ProjectUserPreferences.Instance.Rulers.ToList();
@@ -65,14 +86,12 @@ namespace Tangerine
 				Core.UserPreferences.Instance.Save();
 				Application.InvalidateWindows();
 			};
-			cancelButton.Clicked += () => {
-				window.Close();
-			};
+			cancelButton.Clicked += () => window.Close();
 			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
 			rootWidget.LateTasks.AddLoop(() => {
 				if (rootWidget.Input.ConsumeKeyPress(Key.Escape)) {
 					window.Close();
-					Core.UserPreferences.Instance.Load();
+					UserPreferences.Instance.Load();
 				}
 			});
 			okButton.SetFocus();
@@ -80,33 +99,22 @@ namespace Tangerine
 
 		internal class RulerRowView : Widget
 		{
-			private ThemedSimpleText Label;
-			private ThemedDeleteButton deleteButton;
-			private static IPresenter StripePresenter = new DelegatePresenter<Widget>(
-				w => {
-					if (w.Parent != null) {
-						var i = w.Parent.AsWidget.Nodes.IndexOf(w);
-						w.PrepareRendererState();
-						Renderer.DrawRect(Vector2.Zero, w.Size,
-							i % 2 == 0 ? ColorTheme.Current.Inspector.StripeBackground2 : ColorTheme.Current.Inspector.StripeBackground1);
-					}
-				});
-
-			public RulerRowView(Ruler ruler, IList<Ruler> Rulers) : base()
+			public RulerRowView(Ruler ruler, Action onDelete)
 			{
+				ThemedDeleteButton deleteButton;
+				ThemedSimpleText label;
 				Layout = new HBoxLayout();
-				Nodes.Add(Label = new ThemedSimpleText {
+				Nodes.Add(label = new ThemedSimpleText {
 					Padding = new Thickness { Left = 10 },
 				});
-				this.AddChangeWatcher(() => ruler.Name, (name) => Label.Text = name);
+				this.AddChangeWatcher(() => ruler.Name, (name) => label.Text = name);
 				Nodes.Add(new Widget());
 				Nodes.Add(deleteButton = new ThemedDeleteButton {
 					Anchors = Anchors.Right,
 					LayoutCell = new LayoutCell(Alignment.LeftTop)
 				});
-				CompoundPresenter.Add(StripePresenter);
-				deleteButton.Clicked = () => Rulers.Remove(ruler);
-				MinMaxHeight = 20;
+				deleteButton.Clicked = onDelete;
+				MinMaxHeight = RowHeight;
 			}
 		}
 	}

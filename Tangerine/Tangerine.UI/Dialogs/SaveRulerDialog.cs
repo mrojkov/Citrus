@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using Lime;
+﻿using Lime;
 using Tangerine.Core;
 
 namespace Tangerine.UI
@@ -8,25 +6,20 @@ namespace Tangerine.UI
 	public class SaveRulerDialog
 	{
 		private readonly Window window;
-		private readonly WindowWidget rootWidget;
-		private readonly Widget buttonsPanel;
-		private readonly EditBox EditBox;
-		private readonly CheckBox CheckBox;
 		private bool result;
-		private readonly ThemedButton okButton;
-		private readonly ThemedButton cancelButton;
-		private readonly Ruler ruler;
 
 		public SaveRulerDialog(Ruler ruler)
 		{
-			this.ruler = ruler;
+			ThemedButton cancelButton;
+			ThemedButton okButton;
+			CheckBox checkBox;
+			EditBox editBox;
 			window = new Window(new WindowOptions {
-				FixedSize = true,
 				Title = "Save Ruler",
 				Visible = false,
 				Style = WindowStyle.Dialog,
 			});
-			rootWidget = new ThemedInvalidableWindowWidget(window) {
+			WindowWidget rootWidget = new ThemedInvalidableWindowWidget(window) {
 				LayoutBasedWindowSize = true,
 				Padding = new Thickness(8),
 				Layout = new VBoxLayout { Spacing = 16 },
@@ -43,31 +36,31 @@ namespace Tangerine.UI
 						},
 						Nodes = {
 							new ThemedSimpleText("Ruler name"),
-							(EditBox = new ThemedEditBox()),
+							(editBox = new ThemedEditBox { MinWidth = 150}),
 							new ThemedSimpleText("Anchor to root"),
-							(CheckBox = new ThemedCheckBox())
+							(checkBox = new ThemedCheckBox())
 						}
 					},
-					(buttonsPanel = new Widget {
+					new Widget {
 						Layout = new HBoxLayout { Spacing = 8 },
 						LayoutCell = new LayoutCell(Alignment.RightCenter),
 						Nodes = {
 							(okButton = new ThemedButton("Ok")),
 							(cancelButton = new ThemedButton("Cancel")),
 						}
-					})
+					}
 				}
 			};
 			cancelButton.Clicked += window.Close;
-			okButton.AddChangeWatcher(() => EditBox.Text, (text) => okButton.Enabled = !string.IsNullOrEmpty(text));
+			okButton.AddChangeWatcher(() => editBox.Text, (text) => okButton.Enabled = !string.IsNullOrEmpty(text));
 			okButton.Clicked += () => {
-				ruler.Name = EditBox.Text;
-				ruler.AnchorToRoot = CheckBox.Checked;
+				ruler.Name = editBox.Text;
+				ruler.AnchorToRoot = checkBox.Checked;
 				result = true;
 				window.Close();
 			};
 			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
-			EditBox.SetFocus();
+			editBox.SetFocus();
 		}
 
 		public bool Show()
