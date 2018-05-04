@@ -224,16 +224,20 @@ namespace Lime
 			// Create a depth renderbuffer
 			GL.GenRenderbuffers(1, out depthRenderBuffer);
 			GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, depthRenderBuffer);
-			
+
 			// Allocate storage for the new renderbuffer
-			GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, RenderbufferInternalFormat.DepthComponent16, 
+			GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, (RenderbufferInternalFormat)All.Depth24Stencil8Oes,
 				(int)(Size.Width * screenScale), (int)(Size.Height * screenScale));
-			
+
 			// Attach the renderbuffer to the framebuffer's depth attachment point
 			GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferSlot.DepthAttachment, RenderbufferTarget.Renderbuffer, depthRenderBuffer);
-			
+		  	// Attach the renderbuffer to the framebuffer's stencil attachment point
+		  	GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferSlot.StencilAttachment, RenderbufferTarget.Renderbuffer, depthRenderBuffer);
+
+			GL.ClearStencil(0);
 			GL.ClearDepth(1.0f); // Depth Buffer Setup
-			GL.DepthFunc(DepthFunction.Lequal); // The Type Of Depth Test To Do				
+
+			GL.DepthFunc(DepthFunction.Lequal); // The Type Of Depth Test To Do
 		}
 		
 		protected override void DeleteBuffers()

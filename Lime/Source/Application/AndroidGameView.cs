@@ -186,6 +186,8 @@ namespace Lime
 			// the default GraphicsMode that is set consists of (16, 16, 0, 0, 2, false)
 			try {
 				Debug.Write("Creating framebuffer with default settings");
+				// Enable stencil buffer
+				GraphicsMode = new AndroidGraphicsMode(16, 16, 8, 0, 2, false);
 				base.CreateFrameBuffer();
 				return;
 			} catch (Exception ex) {
