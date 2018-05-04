@@ -15,7 +15,10 @@ namespace Tangerine.UI.SceneView
 		public IEnumerator<object> Task()
 		{
 			while (true) {
-				if (ProjectUserPreferences.Instance.RulerVisible) {
+				if (ProjectUserPreferences.Instance.RulerVisible &&
+					!Document.Current.ExpositionMode &&
+					!Document.Current.PreviewAnimation
+				) {
 					var line = GetLineUnderMouse();
 					if (line != null) {
 						Utils.ChangeCursorIfDefault(line.RulerOrientation == RulerOrientation.Horizontal ? MouseCursor.SizeNS : MouseCursor.SizeWE);

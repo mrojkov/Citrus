@@ -60,7 +60,10 @@ namespace Tangerine.UI.SceneView
 		{
 			while (true) {
 				var rect = new Rectangle(Vector2.Zero, widget.Size);
-				if ((rect.Contains(widget.LocalMousePosition()))) {
+				if (rect.Contains(widget.LocalMousePosition()) &&
+					!Document.Current.PreviewAnimation &&
+					!Document.Current.ExpositionMode
+				) {
 					if (widget.Input.WasMousePressed()) {
 						var line = new RulerLine(container.LocalMousePosition(), lineRulerOrientation);
 						Ruler.Lines.Add(line);
@@ -184,7 +187,7 @@ namespace Tangerine.UI.SceneView
 
 			protected override void InternalRender(Widget canvas)
 			{
-				if (Document.Current.PreviewAnimation || Document.Current.ExpositionMode || !ProjectUserPreferences.Instance.RulerVisible)
+				if (Document.Current.ExpositionMode || !ProjectUserPreferences.Instance.RulerVisible)
 					return;
 				var containerHull = Document.Current.RootNode.AsWidget.CalcHullInSpaceOf(canvas);
 				canvas.PrepareRendererState();

@@ -75,10 +75,14 @@ namespace Tangerine.UI.SceneView
 							var ctr = SceneView.Instance.Frame;
 							if (ctr != null) {
 								ctr.PrepareRendererState();
+								var pos = Vector2.Zero;
+								if (ProjectUserPreferences.Instance.RulerVisible) {
+									pos += Vector2.One * RulersWidget.RulerHeight;
+								}
 								Renderer.DrawSprite(
 									playButtonTexture,
 									Color4.White,
-									Vector2.Zero,
+									pos,
 									(Vector2)playButtonTexture.ImageSize,
 									Vector2.Zero,
 									Vector2.One
@@ -105,16 +109,16 @@ namespace Tangerine.UI.SceneView
 								}
 							}
 							renderChain.RenderAndClear();
-						}
-						w.PrepareRendererState();
-						foreach (var ruler in ProjectUserPreferences.Instance.Rulers) {
-							if (ProjectUserPreferences.Instance.DisplayedRulers.Contains(ruler.Name)) {
-								DrawRuler(ruler, w);
+							w.PrepareRendererState();
+							foreach (var ruler in ProjectUserPreferences.Instance.Rulers) {
+								if (ProjectUserPreferences.Instance.DisplayedRulers.Contains(ruler.Name)) {
+									DrawRuler(ruler, w);
+								}
 							}
-						}
-						foreach (var ruler in ProjectUserPreferences.Instance.DefaultRulers) {
-							if (ProjectUserPreferences.Instance.DisplayedRulers.Contains(ruler.Name)) {
-								DrawRuler(ruler, w);
+							foreach (var ruler in ProjectUserPreferences.Instance.DefaultRulers) {
+								if (ProjectUserPreferences.Instance.DisplayedRulers.Contains(ruler.Name)) {
+									DrawRuler(ruler, w);
+								}
 							}
 						}
 					}));
