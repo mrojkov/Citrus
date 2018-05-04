@@ -6,7 +6,6 @@ using Lime;
 using Tangerine.Core;
 using Tangerine.UI;
 using Tangerine.UI.Docking;
-using Tangerine.UI.SceneView;
 
 namespace Tangerine
 {
@@ -399,7 +398,7 @@ namespace Tangerine
 			h.Connect(GenericCommands.CloseDocument, new FileClose());
 			h.Connect(GenericCommands.Quit, Application.Exit);
 			h.Connect(GenericCommands.PreferencesDialog, () => new PreferencesDialog());
-			h.Connect(SceneViewCommands.DeleteRulers, new DeleteRulers());
+			h.Connect(SceneViewCommands.ManageRulers, new ManageRulers());
 			h.Connect(GenericCommands.Group, new GroupNodes());
 			h.Connect(GenericCommands.Ungroup, new UngroupNodes());
 			h.Connect(GenericCommands.InsertTimelineColumn, new InsertTimelineColumn());
@@ -440,7 +439,7 @@ namespace Tangerine
 			h.Connect(OrangeCommands.OptionsDialog, () => new OrangePluginOptionsDialog());
 			h.Connect(SceneViewCommands.SnapWidgetBorderToRuler, new SnapWidgetBorderCommandHandler());
 			h.Connect(SceneViewCommands.SnapWidgetPivotToRuler, new SnapWidgetPivotCommandHandler());
-			h.Connect(SceneViewCommands.DeleteRulers, new DeleteRulers());
+			h.Connect(SceneViewCommands.ManageRulers, new ManageRulers());
 		}
 
 		private static bool IsCopyPasteAllowedForSelection()

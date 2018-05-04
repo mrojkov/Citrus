@@ -201,7 +201,7 @@ namespace Tangerine
 			rulerMenu.Clear();
 			rulerMenu.Add(SceneViewCommands.ToggleDisplayRuler);
 			rulerMenu.Add(SceneViewCommands.SaveCurrentRuler);
-			rulerMenu.Add(SceneViewCommands.DeleteRulers);
+			rulerMenu.Add(SceneViewCommands.ManageRulers);
 			rulerMenu.Add(Command.MenuSeparator);
 			foreach (var ruler in ProjectUserPreferences.Instance.DefaultRulers) {
 				rulerMenu.Add(ruler.Components.Get<CommandComponent>().Command);
@@ -251,6 +251,7 @@ namespace Tangerine
 			foreach (Ruler ruler in rulers) {
 				CommandHandlerList.Global.Disconnect(ruler.Components.Get<CommandComponent>().Command);
 				ProjectUserPreferences.Instance.DisplayedRulers.Remove(ruler.Name);
+				ruler.Components.Clear();
 			}
 		}
 

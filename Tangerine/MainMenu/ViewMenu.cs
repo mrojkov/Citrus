@@ -5,7 +5,6 @@ using Lime;
 using Tangerine.Core;
 using Tangerine.UI;
 using Tangerine.UI.Docking;
-using Tangerine.UI.SceneView;
 
 namespace Tangerine
 {
@@ -18,7 +17,7 @@ namespace Tangerine
 		}
 	}
 
-	public class DeleteRulers : DocumentCommandHandler
+	public class ManageRulers : DocumentCommandHandler
 	{
 		public override bool GetEnabled()
 		{
@@ -27,7 +26,7 @@ namespace Tangerine
 
 		public override void Execute()
 		{
-			new DeleteRulerDialog();
+			new ManageRulersDialog();
 		}
 	}
 
