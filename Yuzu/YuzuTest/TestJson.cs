@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -1641,6 +1642,31 @@ namespace YuzuTest.Json
 
 			var result2 = jd.FromString("// adsf dsaf as\n5\n//abc\n");
 			Assert.AreEqual(5.0, result2);
+		}
+
+		[TestMethod]
+		public void TestBOM()
+		{
+			var jd = new JsonDeserializer();
+			jd.JsonOptions.BOM = true;
+
+			var s1 = "{\"X\":7,\"Y\":\"привет\"}";
+			var m = new MemoryStream();
+			m.Write(new byte[] { 0xEF, 0xBB, 0xBF }, 0, 3);
+			var b = Encoding.UTF8.GetBytes(s1);
+			m.Write(b, 0, b.Length);
+
+			m.Position = 0;
+			var w1 = jd.FromStream<Sample1>(m);
+
+			Assert.AreEqual(7, w1.X);
+			Assert.AreEqual("привет", w1.Y);
+
+			m.GetBuffer()[8] += 1; // 7 -> 8
+			m.Position = 3;
+			var w2 = jd.FromStream<Sample1>(m);
+			Assert.AreEqual(8, w2.X);
+			Assert.AreEqual("привет", w2.Y);
 		}
 
 		[TestMethod]

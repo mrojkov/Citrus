@@ -29,6 +29,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -78,6 +79,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -127,6 +129,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -180,6 +183,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -226,6 +230,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -271,6 +276,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -322,6 +328,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -367,6 +374,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -423,6 +431,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -468,6 +477,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -530,6 +540,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -620,6 +631,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -666,6 +678,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -716,6 +729,7 @@ namespace YuzuGen.System.Collections.Generic
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -778,6 +792,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -834,6 +849,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -905,6 +921,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -950,6 +967,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -998,6 +1016,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -1046,6 +1065,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -1113,6 +1133,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -1171,6 +1192,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -1219,6 +1241,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -1267,6 +1290,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -1334,6 +1358,7 @@ namespace YuzuGen.System.Collections.Generic
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -1407,6 +1432,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -1463,6 +1489,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -1520,6 +1547,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -1573,6 +1601,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -1619,6 +1648,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -1684,6 +1714,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -1749,6 +1780,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -1791,6 +1823,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -1836,6 +1869,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -1881,6 +1915,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -1929,6 +1964,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -1971,6 +2007,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -2016,6 +2053,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -2074,6 +2112,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -2132,6 +2171,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -2202,6 +2242,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -2260,6 +2301,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -2308,6 +2350,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -2380,6 +2423,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -2430,6 +2474,7 @@ namespace YuzuGen.YuzuTest
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -2479,6 +2524,7 @@ namespace YuzuGen.System.Collections.Generic
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -2541,6 +2587,7 @@ namespace YuzuGen.YuzuTestAssembly
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -2587,6 +2634,7 @@ namespace YuzuGen.YuzuTestAssembly
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()
@@ -2641,6 +2689,7 @@ namespace YuzuGen.YuzuTest2
 			JsonOptions.DateFormat = "O";
 			JsonOptions.TimeSpanFormat = "c";
 			JsonOptions.Unordered = false;
+			JsonOptions.BOM = false;
 		}
 
 		public override object FromReaderInt()

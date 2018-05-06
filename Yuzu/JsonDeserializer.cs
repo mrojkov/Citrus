@@ -16,7 +16,12 @@ namespace Yuzu.Json
 
 		private char? buf;
 
-		public override void Initialize() { buf = null; }
+		public override void Initialize()
+		{
+			buf = null;
+			if (JsonOptions.BOM && Reader.PeekChar() == '\uFEFF')
+				Reader.ReadChar();
+		}
 
 		private char Next()
 		{

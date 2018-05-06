@@ -46,6 +46,8 @@ namespace Yuzu.Json
 
 		private bool comments = false;
 		public bool Comments { get { return comments; } set { comments = value; generation++; } }
+
+		public bool BOM = false;
 	};
 
 	public class JsonSerializer : AbstractWriterSerializer
