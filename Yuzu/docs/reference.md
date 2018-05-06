@@ -4,6 +4,7 @@
   * [Method attributes](#method-attributes)
   * [Class attributes](#class-attributes)
   * [Options](#options)
+  * [JsonOptions](#json-options)
 
 ## Item attributes
 
@@ -92,7 +93,7 @@ Normally, an item of structured type can be deserialized if the serialized item 
 Can be substituted by changing `MetaOptions.AllowReadingFromAncestorAttribute`.
 
 #### `[YuzuAlias("alias")]` or `[YuzuAlias(read: readAliasList, write: writeAlias)]`
-Denotes that during serializarion, `writeAlias` is used instead of class name, and during deserialization any of the given read aliases plus original class name is can be used for this class. All read aliases must be globally unique between all classes. Is the single-argument form is used, it defined both write alias and  a single read alias.
+Denotes that during serializarion, `writeAlias` is used instead of class name, and during deserialization any of the given read aliases plus original class name can be used for this class. All read aliases must be globally unique between all classes. If the single-argument form is used, it defines both write alias and  a single read alias.
 
 Can be substituted by changing `MetaOptions.AliasAttribute`.
 
@@ -128,3 +129,82 @@ Otherwise an exception is thrown. Default value is `false`.
 If `true`, a source stream position is included in error messages during deserialization.
 Default value is `false`.
 
+## JSON options
+
+#### `FieldSeparator`
+
+String inserted after every object field, list item, opening `[` and `{`.
+Default value is `\n`.
+
+#### `Indent`
+
+String inserted several times in front of every object field and list item.
+Number of insertions is equal to the nesting depth.
+Default value is `\t`.
+
+#### `ClassTag`
+
+Name of the system field used to serialize object type. Should not be set to any acceptable C# identifier to avoid conflicts.
+Default value is `class`.
+
+#### `MaxOnelineFields`
+
+If `[YuzuCompact]` type contains only primitive fields, and their number is no more than `MaxOnelineFields`, `FieldSeparator` and `Indent` strings are not inserted around fields.
+Default value is `0`.
+
+#### `EnumAsString`
+
+Controls the format of enumeration values.
+If `true`, enumeration values are serialized as strings, allowing to add elements without breaking compatibility.
+Otherwise enumeration values are serialized as integers, allowing to rename elements without breaking compatibility.
+Default value is `false`.
+
+#### `ArrayLengthPrefix`
+
+Controls the format of arrays.
+If `true`, array length is serialized before array items, allowing to preallocate memory during deserialization.
+Default value is `false`.
+
+#### `IgnoreCompact`
+
+Globally controls `[YuzuCompact]` attribute. If `true`, `[YuzuCompact]` attribute has no effect.
+Default value is `false`.
+
+#### `DateFormat`
+
+Controls the format of date values. Note that not all formats guarantee roundrtip due to possible information loss and culture differences.
+Default value is `"O"`, which does guarantee roundrtip.
+
+#### `TimeSpanFormat`
+
+Controls the format of timespan values. Note that not all formats guarantee roundrtip due to possible information loss and culture differences.
+Default value is `"c"`, which does guarantee roundrtip.
+
+#### `Int64AsString`
+
+Controls the format of 64-bit integer (`long`) values.
+If `true`, 64-bit integers are serialized as strings, which provides compatibility with JSON standard.
+Default value is `false`.
+
+#### `DecimalAsString`
+
+Controls the format of `decimal` values.
+If `true`, `decimal` values are serialized as strings, which provides compatibility with JSON standard.
+Default value is `false`.
+
+#### `Unordered`
+
+Controls ordering of object fields.
+If `false`, fields are serialized in alphabetical order of their names (or write aliases, if provided). Same ordering is also required on deserialization.
+If `true`, fields may be deserializad in any order, and serialization order is undefined.
+Note that `Unordered` mode does not guarantee text-data-text roundtrip and is not supported by generated deserializers.
+Default value is `false`.
+
+#### `Comments`
+If `true`, single-line comments starting with double slash (`//`) are accepted during deserialization.
+Comments are ignored and not preserved on roundtrip.
+Default value is `false`.
+
+#### `BOM`
+If `true`, UTF-8 byte order mark (bytes `EF BB BF`) is allowed before the first byte of input stream during deserialization.
+Default value is `false`.
