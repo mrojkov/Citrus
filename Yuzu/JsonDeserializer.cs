@@ -699,6 +699,7 @@ namespace Yuzu.Json
 					var storage = !Options.AllowUnknownFields || meta.GetUnknownStorage == null ?
 						NullYuzuUnknownStorage.Instance : meta.GetUnknownStorage(obj);
 					storage.Clear();
+					int requiredCountActiual = 0;
 					while (name != "") {
 						Meta.Item yi;
 						if (!meta.TagToItem.TryGetValue(name, out yi)) {
@@ -708,12 +709,18 @@ namespace Yuzu.Json
 							name = GetNextName(false);
 							continue;
 						}
+						if (!yi.IsOptional)
+							requiredCountActiual += 1;
 						if (yi.SetValue != null)
 							yi.SetValue(obj, ReadValueFunc(yi.Type)());
 						else
 							MergeValueFunc(yi.Type)(yi.GetValue(obj));
 						name = GetNextName(false);
 					}
+					if (requiredCountActiual != meta.RequiredCount)
+						throw Error(
+							"Expected {0} required field(s), but found {1}",
+							meta.RequiredCount, requiredCountActiual);
 				}
 				else if (Options.AllowUnknownFields) {
 					var storage = meta.GetUnknownStorage == null ?

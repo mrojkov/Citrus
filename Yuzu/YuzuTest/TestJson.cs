@@ -1694,6 +1694,11 @@ namespace YuzuTest.Json
 			XAssert.Throws<YuzuException>(() => jd.FromString("{/}"), "'/'");
 			jd.JsonOptions.Comments = false;
 
+			jd.JsonOptions.Unordered = true;
+			XAssert.Throws<YuzuException>(() => jd.FromString("{\"class\": \"YuzuTest.SampleBase, YuzuTest\"}"), "1");
+			jd.JsonOptions.Unordered = false;
+			XAssert.Throws<YuzuException>(() => jd.FromString("{\"class\": \"YuzuTest.SampleBase, YuzuTest\"}"), "FBase");
+
 			jd.Options.ReportErrorPosition = true;
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "      z"), "7");
 			jd.Options.ReportErrorPosition = false;

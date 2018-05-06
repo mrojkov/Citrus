@@ -71,6 +71,7 @@ namespace Yuzu.Metadata
 		public bool AllowReadingFromAncestor;
 		public Surrogate Surrogate;
 		public string WriteAlias;
+		public int RequiredCount { get; private set; }
 
 		public Dictionary<string, Item> TagToItem = new Dictionary<string, Item>();
 		public Func<object, YuzuUnknownStorage> GetUnknownStorage;
@@ -156,6 +157,8 @@ namespace Yuzu.Metadata
 				SerializeIf = serializeIf != null ? Options.GetSerializeCondition(serializeIf) : null,
 				Name = m.Name,
 			};
+			if (!item.IsOptional)
+				RequiredCount += 1;
 			var merge = m.IsDefined(Options.MergeAttribute, false);
 
 			switch (m.MemberType) {
