@@ -5,6 +5,7 @@
   * [Class attributes](#class-attributes)
   * [Options](#options)
   * [JsonOptions](#json-options)
+  * [BinarySerializeOptions](#binaryserializeoptions)
 
 ## Item attributes
 
@@ -207,4 +208,16 @@ Default value is `false`.
 
 #### `BOM`
 If `true`, UTF-8 byte order mark (bytes `EF BB BF`) is allowed before the first byte of input stream during deserialization.
+Default value is `false`.
+
+## `BinarySerializeOptions`
+
+#### `Signature`
+
+Byte prefix used to detect binary serialization format and version.
+Default value is `YB01`.
+
+#### `AutoSignature`
+
+If `true`, `Signature` must be present in front of every serialized stream, or an error will be thrown.
 Default value is `false`.
