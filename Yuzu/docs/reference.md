@@ -12,30 +12,30 @@
 Item attributes can be applied to either a public field or a public readable property.
 The item is considered for serialization and deserialization if it is annotated with exacty one of (`[YuzuRequired]`, `[YuzuOptional]` and `[YuzuMember]`) attributes.
 
-#### `[YuzuRequired]` or  `[YuzuRequired("alias")]`
+#### `[YuzuRequired]` or `[YuzuRequired("alias")]`
 Denotes required item. This item is always serialized. An exception is thrown if the item is absent during deserialization. If `alias` is provided, it is used instead of the item name both for serialization and deserialization.
 Mutually exclusive with `[YuzuOptional]` and `[YuzuMember]`.
 
-Can be substituted by changing `MetaOptions.RequiredAttribute`.
+Can be substituted by changing `MetaOptions.RequiredAttribute` and/or `MetaOptions.GetAlias`.
 
-#### `[YuzuOptional]` or  `[YuzuOptional("alias")]`
+#### `[YuzuOptional]` or `[YuzuOptional("alias")]`
 Denotes optional item. This item may be omitted during serialization by using `YuzuSerializeIf` attribute. If the item is absent during deserialization, its value in the target object is left unchanged. If `alias` is provided, it is used instead of the item name both for serialization and deserialization.
 Mutually exclusive with `[YuzuRequired]` and `[YuzuMember]`.
 
-Can be substituted by changing `MetaOptions.OptionalAttribute`.
+Can be substituted by changing `MetaOptions.OptionalAttribute` and/or `MetaOptions.GetAlias`.
 
-#### `[YuzuMember]` or  `[YuzuMember("alias")]`
+#### `[YuzuMember]` or `[YuzuMember("alias")]`
 Denotes optional item with the default falue. Immediately before serialization of the scalar item, item value is compared with the default value of the item's type. If the item is `ICollection`, it is checked for emptiness instead. If the item is absent during deserialization, its value in the target object is left unchanged.
 If `alias` is provided, it is used instead of the item name both for serialization and deserialization.
 Mutually exclusive with `[YuzuRequired]` and `[YuzuOptional]`.
 
-Can be substituted by changing `MetaOptions.MemberAttribute`.
+Can be substituted by changing `MetaOptions.MemberAttribute` and/or `MetaOptions.GetAlias`.
 
 #### `[YuzuSerializeIf(nameof(conditionFunc))]`
 #### `public bool conditionFunc() { ... }`
 Denotes serialization condition. Can only be applied to `YuzuOptional` item. The argument must be a name of boolean function without arguments, member of the current class. Immediately before serialization of the item, this function is called. If the function returns `true`, the item is serialized, otherwise the item is omitted.
 
-Can be substituted by changing `MetaOptions.SerializeIfAttribute`.
+Can be substituted by changing `MetaOptions.SerializeIfAttribute` and/or `MetaOptions.GetSerializeCondition`.
 
 #### `[YuzuDefault(defValue)]`
 Denotes default value for serialization. Can only be applied to `YuzuOptional` item. Immediately before serialization of the item, item value is compared with `defValue`. If they are equal, the item is omitted, otherwise the item is serialized.
@@ -90,12 +90,12 @@ Can be substituted by changing `MetaOptions.CompactAttribute`.
 #### `[YuzuMust]` or `[YuzuMust(itemKind)]`
 Denotes that all items must be serialized. Exception is thrown if at least one public item lacks serialization attribute. If present, `itemKind` argument limits the requirement to either just fields (`YuzuItemKind.Field`) or just properties (`YuzuItemKind.Property`).
 
-Can be substituted by changing `MetaOptions.MustAttribute`.
+Can be substituted by changing `MetaOptions.MustAttribute` and/or `MetaOptions.GetItemKind`.
 
 #### `[YuzuAll]` or `[YuzuAll(optionality, itemKind)]`
 Denotes that all public items are serialized by default, even if not annotated by serialization attribute. Some items can be excluded by using `YuzuExclude` attrubute. If present, `optionality` argument indicates the level of optionality (`YuzuItemOptionality.Optional`, `YuzuItemOptionality.Required` or `YuzuItemOptionality.Member`) applied to the items by default. Annotating an item with `[YuzuRequired]`, `[YuzuOptional]` or `[YuzuMember]` attribute overrides default given by `YuzuAll`. If present, `itemKind` argument limits the default serialization to either fields (`YuzuItemKind.Field`) or properties (`YuzuItemKind.Property`). Using both `YuzuAll` and `YuzuMust` simultaneously prohibits `YuzuExclude`.
 
-Can be substituted by changing `MetaOptions.AllAttribute`.
+Can be substituted by changing `MetaOptions.AllAttribute`, and/or `MetaOptions.GetItemOptionalityAndKind`.
 
 #### `[YuzuAllowReadingFromAncestor]`
 Normally, an item of structured type can be deserialized if the serialized item is of the same class or descendant class. This attribute allows deserializing from ancestor class, as long as all fields not present in the ancestor are optional. It is NOT recommended to use this attribute.
@@ -105,7 +105,7 @@ Can be substituted by changing `MetaOptions.AllowReadingFromAncestorAttribute`.
 #### `[YuzuAlias("alias")]` or `[YuzuAlias(read: readAliasList, write: writeAlias)]`
 Denotes that during serializarion, `writeAlias` is used instead of class name, and during deserialization any of the given read aliases plus original class name can be used for this class. All read aliases must be globally unique between all classes. If the single-argument form is used, it defines both write alias and  a single read alias.
 
-Can be substituted by changing `MetaOptions.AliasAttribute`.
+Can be substituted by changing `MetaOptions.AliasAttribute`, `MetaOptions.ReadAliases` and/or `MetaOptions.WriteAlias`.
 
 ## Options
 
