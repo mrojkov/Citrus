@@ -53,7 +53,7 @@ namespace YuzuTest
 		public int X { get; set; }
 
 		[YuzuOptional]
-		[YuzuSerializeIf("SaveYIf")]
+		[YuzuSerializeIf(nameof(SaveYIf))]
 		public string Y { get; set; }
 
 		public bool SaveYIf()
@@ -453,6 +453,13 @@ namespace YuzuTest
 		public bool Remove(T item) { return impl.Remove(item); }
 		IEnumerator<T> IEnumerable<T>.GetEnumerator() { return impl.GetEnumerator(); }
 		IEnumerator IEnumerable.GetEnumerator() { return impl.GetEnumerator(); }
+
+		public int Filter = 0;
+		[YuzuSerializeItemIf]
+		public bool SaveItemIf(int index, object item) =>
+			Filter == 1 ? index % 2 == 0 :
+			Filter == 2 ? (int)item % 2 == 0 :
+			true;
 	}
 
 	public class SampleExplicitCollection<T> : ICollection<T>

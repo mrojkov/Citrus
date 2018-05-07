@@ -230,7 +230,11 @@ namespace Yuzu.Json
 				WriteEscapedString(t.ToString(JsonOptions.TimeSpanFormat, CultureInfo.InvariantCulture));
 		}
 
-		private void WriteIEnumerable<T>(object obj)
+		private bool CondTrue(object obj, int index, object item) => true;
+
+		private void WriteIEnumerable<T>(object obj) => WriteIEnumerableConditional<T>(obj, CondTrue);
+
+		private void WriteIEnumerableConditional<T>(object obj, Func<object, int, object, bool> condition)
 		{
 			if (obj == null) {
 				writer.Write(nullBytes);
@@ -242,7 +246,11 @@ namespace Yuzu.Json
 			try {
 				depth += 1;
 				var isFirst = true;
+				int index = -1;
 				foreach (var elem in list) {
+					index += 1;
+					if (!condition(obj, index, elem))
+						continue;
 					if (!isFirst)
 						writer.Write((byte)',');
 					isFirst = false;
@@ -514,7 +522,13 @@ namespace Yuzu.Json
 				return MakeDelegateAction(Utils.GetPrivateCovariantGeneric(GetType(), nameof(WriteArray), t));
 			var ienum = Utils.GetIEnumerable(t);
 			if (ienum != null) {
-				Meta.Get(t, Options); // Check for serializable fields.
+				var meta = Meta.Get(t, Options); // Check for serializable fields.
+				if (meta.SerializeItemIf != null) {
+					var m = Utils.GetPrivateCovariantGeneric(
+						GetType(), nameof(WriteIEnumerableConditional), ienum);
+					var d = MakeDelegateParam<Func<object, int, object, bool>>(m);
+					return obj => d(obj, meta.SerializeItemIf);
+				}
 				return MakeDelegateAction(
 					Utils.GetPrivateCovariantGeneric(GetType(), nameof(WriteIEnumerable), ienum));
 			}

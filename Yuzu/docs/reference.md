@@ -31,7 +31,7 @@ Mutually exclusive with `[YuzuRequired]` and `[YuzuOptional]`.
 
 Can be substituted by changing `MetaOptions.MemberAttribute`.
 
-#### `[YuzuSerializeIf("conditionFunc")]`
+#### `[YuzuSerializeIf(nameof(conditionFunc))]`
 #### `public bool conditionFunc() { ... }`
 Denotes serialization condition. Can only be applied to `YuzuOptional` item. The argument must be a name of boolean function without arguments, member of the current class. Immediately before serialization of the item, this function is called. If the function returns `true`, the item is serialized, otherwise the item is omitted.
 
@@ -69,6 +69,15 @@ Can be substituted by changing `MetaOptions.BeforeSerializationAttribute`.
 Denotes a `void` method without arguments, which will be called immediately after this object is deserialized. If there are several `[YuzuAfterDeserialization]` methods, first methods from the parent class are called, then methods  of the current class are called in the order of source code definition. This order is opposite of `[YuzuBeforeSerialization]`.
 
 Can be substituted by changing `MetaOptions.YuzuAfterDeserializationAttribute`.
+
+#### `[YuzuSerializeItemIf]`
+#### `public bool conditionFunc(int index, object item) { ... }`
+Denotes serialization condition for collection items. Can only be applied to method of a class implementing `IEnumerable`.
+Method must be a boolean function accepting integer and object arguments.
+Immediately before serialization of each collection item, this function is called.
+If the function returns `true`, the item is serialized, otherwise the item is omitted.
+
+Can be substituted by changing `MetaOptions.SerializeItemIfAttribute`.
 
 ## Class attributes
 

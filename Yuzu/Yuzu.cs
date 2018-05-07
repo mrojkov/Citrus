@@ -75,6 +75,19 @@ namespace Yuzu
 		}
 	}
 
+	public class YuzuSerializeItemIf : Attribute
+	{
+		internal static Func<object, int, object, bool> MakeChecker(MethodInfo m)
+		{
+			var pObj = Expression.Parameter(typeof(object));
+			var pIndex = Expression.Parameter(typeof(int));
+			var pItem = Expression.Parameter(typeof(object));
+			var e = Expression.Call(Expression.Convert(pObj, m.DeclaringType), m, pIndex, pItem);
+			return Expression.Lambda<Func<object, int, object, bool>>(
+				e, pObj, pIndex, pItem).Compile();
+		}
+	}
+
 	public class YuzuDefault : YuzuSerializeCondition
 	{
 		public readonly object Value;
@@ -186,6 +199,7 @@ namespace Yuzu
 		public Type MemberAttribute = typeof(YuzuMember);
 		public Type CompactAttribute = typeof(YuzuCompact);
 		public Type SerializeIfAttribute = typeof(YuzuSerializeCondition);
+		public Type SerializeItemIfAttribute = typeof(YuzuSerializeItemIf);
 		public Type BeforeSerializationAttribute = typeof(YuzuBeforeSerialization);
 		public Type AfterDeserializationAttribute = typeof(YuzuAfterDeserialization);
 		public Type MergeAttribute = typeof(YuzuMerge);
@@ -319,6 +333,10 @@ namespace Yuzu
 
 		protected Action<object, TParam> MakeDelegateParam<TParam>(MethodInfo m) =>
 			(Action<object, TParam>)Delegate.CreateDelegate(typeof(Action<object, TParam>), this, m);
+
+		protected Action<object, TParam1, TParam2> MakeDelegateParam2<TParam1, TParam2>(MethodInfo m) =>
+			(Action<object, TParam1, TParam2>)
+				Delegate.CreateDelegate(typeof(Action<object, TParam1, TParam2>), this, m);
 
 	}
 

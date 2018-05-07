@@ -52,6 +52,7 @@ namespace Yuzu.Util
 
 		public static Type GetICollection(Type t)
 		{
+			if (t.Name == "ICollection`1") return t;
 			try {
 				return t.GetInterface("ICollection`1");
 			} catch (AmbiguousMatchException) {
@@ -80,10 +81,10 @@ namespace Yuzu.Util
 			}
 		}
 
-		public static MethodInfo GetPrivateGeneric(Type callerType, string name, Type parameter)
+		public static MethodInfo GetPrivateGeneric(Type callerType, string name, params Type[] parameters)
 		{
 			return callerType.GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic).
-				MakeGenericMethod(parameter);
+				MakeGenericMethod(parameters);
 		}
 
 		public static MethodInfo GetPrivateCovariantGeneric(Type callerType, string name, Type container)

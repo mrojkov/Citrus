@@ -495,6 +495,19 @@ namespace YuzuTest.Json
 		}
 
 		[TestMethod]
+		public void TestSerializeItemIf()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			var v1 = new SampleCollection<int> { 5, 2, 4, 1 };
+			Assert.AreEqual("[\n5,\n2,\n4,\n1\n]", js.ToString(v1));
+			v1.Filter = 1;
+			Assert.AreEqual("[\n5,\n4\n]", js.ToString(v1));
+			v1.Filter = 2;
+			Assert.AreEqual("[\n2,\n4\n]", js.ToString(v1));
+		}
+
+		[TestMethod]
 		public void TestIEnumerable()
 		{
 			var js = new JsonSerializer();

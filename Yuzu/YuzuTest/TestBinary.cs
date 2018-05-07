@@ -538,6 +538,20 @@ namespace YuzuTest.Binary
 		}
 
 		[TestMethod]
+		public void TestSerializeItemIf()
+		{
+			var bs = new BinarySerializer();
+			var v1 = new SampleCollection<int> { 5, 2, 4, 1 };
+			Assert.AreEqual(
+				"21 05 04 00 00 00 05 00 00 00 02 00 00 00 04 00 00 00 01 00 00 00",
+				XS(bs.ToBytes(v1)));
+			v1.Filter = 1;
+			Assert.AreEqual("21 05 02 00 00 00 05 00 00 00 04 00 00 00", XS(bs.ToBytes(v1)));
+			v1.Filter = 2;
+			Assert.AreEqual("21 05 02 00 00 00 02 00 00 00 04 00 00 00", XS(bs.ToBytes(v1)));
+		}
+
+		[TestMethod]
 		public void TestIEnumerable()
 		{
 			var bs = new BinarySerializer();

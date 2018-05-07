@@ -191,6 +191,21 @@ namespace Yuzu.Binary
 				wf(a);
 		}
 
+		private void WriteIEnumerableIf<T>(object list, Action<object> wf, Func<object, int, object, bool> cond)
+		{
+			if (list == null) {
+				writer.Write(-1);
+				return;
+			}
+			var ienum = (IEnumerable<T>)list;
+			int index = 0;
+			writer.Write(ienum.Count(a => cond(list, index++, a)));
+			index = 0;
+			foreach (var a in ienum)
+				if (cond(list, index++, a))
+					wf(a);
+		}
+
 		// Duplicate WriteIEnumerable to optimize Count.
 		private void WriteCollection<T>(object list, Action<object> wf)
 		{
@@ -532,6 +547,14 @@ namespace Yuzu.Binary
 				return obj => d(obj, wf);
 			}
 			var meta = Meta.Get(t, Options);
+			if (meta.SerializeItemIf != null) {
+				// Two passes are required anyway, so it is useless to optimize Count.
+				var ienum = Utils.GetIEnumerable(t);
+				var wf = GetWriteFunc(ienum.GetGenericArguments()[0]);
+				var m = Utils.GetPrivateCovariantGeneric(GetType(), nameof(WriteIEnumerableIf), ienum);
+				var d = MakeDelegateParam2<Action<object>, Func<object, int, object, bool>>(m);
+				return obj => d(obj, wf, meta.SerializeItemIf);
+			}
 			{
 				var icoll = Utils.GetICollection(t);
 				if (icoll != null) {
