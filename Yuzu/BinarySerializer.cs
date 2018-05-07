@@ -519,6 +519,13 @@ namespace Yuzu.Binary
 			return obj => d(obj, wf);
 		}
 
+		private Action<object> MakeObjectWriteFunc(Meta meta)
+		{
+			if (meta.IsCompact) return WriteObjectCompact;
+			if (meta.GetUnknownStorage == null) return WriteObject;
+			return WriteObjectUnknown;
+		}
+
 		private Action<object> MakeWriteFunc(Type t)
 		{
 			if (t.IsEnum)
@@ -572,9 +579,19 @@ namespace Yuzu.Binary
 					return MakeWriteIEnumerable(ienum);
 			}
 			if (Utils.IsStruct(t) || t.IsClass || t.IsInterface) {
-				if (meta.IsCompact) return WriteObjectCompact;
-				if (meta.GetUnknownStorage == null) return WriteObject;
-				return WriteObjectUnknown;
+				Action<object> normalWrite = MakeObjectWriteFunc(meta);
+				var sg = meta.Surrogate;
+				if (sg.SurrogateType == null || sg.FuncTo == null)
+					return normalWrite;
+				var sw = GetWriteFunc(sg.SurrogateType);
+				if (sg.FuncIf == null)
+					return obj => sw(sg.FuncTo(obj));
+				return obj => {
+					if (sg.FuncIf(obj))
+						sw(sg.FuncTo(obj));
+					else
+						normalWrite(obj);
+				};
 			}
 			throw new NotImplementedException(t.Name);
 		}
