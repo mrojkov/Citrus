@@ -29,7 +29,8 @@ namespace Yuzu.Binary
 		protected void WriteDateTime(object obj) { writer.Write(((DateTime)obj).ToBinary()); }
 		protected void WriteTimeSpan(object obj) { writer.Write(((TimeSpan)obj).Ticks); }
 
-		protected void WriteString(object obj) {
+		protected void WriteString(object obj)
+		{
 			if (obj == null) {
 				writer.Write("");
 				writer.Write(true);
@@ -114,11 +115,6 @@ namespace Yuzu.Binary
 				}
 				if (g == typeof(Nullable<>)) {
 					writer.Write((byte)RoughType.Nullable);
-					WriteRoughType(t.GetGenericArguments()[0]);
-					return;
-				}
-				if (g == typeof(IEnumerable<>)) {
-					writer.Write((byte)RoughType.Sequence);
 					WriteRoughType(t.GetGenericArguments()[0]);
 					return;
 				}
@@ -510,7 +506,7 @@ namespace Yuzu.Binary
 
 		private Action<object> MakeWriteFunc(Type t)
 		{
-			if (t.IsEnum) 
+			if (t.IsEnum)
 				return WriteInt;
 			if (t.IsGenericType) {
 				var g = t.GetGenericTypeDefinition();
@@ -528,8 +524,6 @@ namespace Yuzu.Binary
 							w(obj);
 					};
 				}
-				if (g == typeof(IEnumerable<>))
-					return MakeWriteIEnumerable(t);
 			}
 			if (t.IsArray) {
 				var wf = GetWriteFunc(t.GetElementType());

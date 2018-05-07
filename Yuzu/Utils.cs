@@ -61,6 +61,7 @@ namespace Yuzu.Util
 
 		public static Type GetIEnumerable(Type t)
 		{
+			if (t.Name == "IEnumerable`1") return t;
 			try {
 				return t.GetInterface("IEnumerable`1");
 			}

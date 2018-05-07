@@ -511,8 +511,6 @@ namespace Yuzu.Json
 					var w = GetWriteFunc(t.GetGenericArguments()[0]);
 					return obj => WriteNullable(obj, w);
 				}
-				if (g == typeof(IEnumerable<>))
-					return MakeDelegate(Utils.GetPrivateCovariantGeneric(GetType(), nameof(WriteIEnumerable), t));
 			}
 			if (t.IsArray)
 				return MakeDelegate(Utils.GetPrivateCovariantGeneric(GetType(), nameof(WriteArray), t));
