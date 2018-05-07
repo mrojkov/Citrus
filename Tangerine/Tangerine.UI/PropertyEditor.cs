@@ -601,8 +601,8 @@ namespace Tangerine.UI
 			panel.Widget.Padding.Right = 12;
 			panel.Widget.Tasks.Add(currentColor.Consume(v => panel.Color = v));
 			panel.Changed += () => SetProperty(panel.Color);
-			panel.DragStarted += Document.Current.History.BeginTransaction;
-			panel.DragEnded += Document.Current.History.EndTransaction;
+			panel.DragStarted += () => Document.Current?.History.BeginTransaction();
+			panel.DragEnded += () => Document.Current?.History.EndTransaction();
 			colorBox.Clicked += () => Expanded = !Expanded;
 			var currentColorString = currentColor.Select(i => i.ToString(Color4.StringPresentation.Dec));
 			editor.Submitted += text => {
