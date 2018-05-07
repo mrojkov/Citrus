@@ -251,7 +251,7 @@ namespace Lime
 			if (options.Style == WindowStyle.Borderless) {
 				style = NSWindowStyle.Borderless;
 			} else if (options.Style == WindowStyle.Dialog) {
-				style = NSWindowStyle.Titled;
+				style = NSWindowStyle.Titled | NSWindowStyle.Closable;
 			} else {
 				style = NSWindowStyle.Titled | NSWindowStyle.Closable | NSWindowStyle.Miniaturizable;
 			}
@@ -260,6 +260,10 @@ namespace Lime
 			}
 			window = new NSWindow(rect, style, NSBackingStore.Buffered, false);
 			window.TabbingMode = (NSWindowTabbingMode)options.MacWindowTabbingMode;
+			if (options.Style == WindowStyle.Dialog) {
+				window.StandardWindowButton(NSWindowButton.MiniaturizeButton).Hidden = true;
+				window.StandardWindowButton(NSWindowButton.ZoomButton).Hidden = true;
+			}
 
 			var contentRect = window.ContentRectFor(rect);
 			titleBarHeight = ((RectangleF)rect).Height - (float)contentRect.Height;
@@ -327,8 +331,7 @@ namespace Lime
 		{
 			if (Application.MainWindow == this) {
 				CloseMainWindow();
-			}
-			else {
+			} else {
 				CloseWindow();
 			}
 		}
@@ -357,6 +360,9 @@ namespace Lime
 			View.Stop();
 			Application.Windows.Remove(this);
 			closed = true;
+			if (modal) {
+				NSApplication.SharedApplication.StopModal();
+			}
 		}
 
 		// Reverse by convention - Window.Win behave like this.
@@ -388,9 +394,6 @@ namespace Lime
 		public void Close()
 		{
 			window.PerformClose(window);
-			if (modal) {
-				NSApplication.SharedApplication.StopModal();
-			}
 		}
 
 		public void ShowModal()
