@@ -500,7 +500,7 @@ namespace Yuzu.Binary
 		{
 			var wf = GetWriteFunc(t.GetGenericArguments()[0]);
 			var m = Utils.GetPrivateCovariantGeneric(GetType(), nameof(WriteIEnumerable), t);
-			var d = MakeDelegateActionAction(m);
+			var d = MakeDelegateParam<Action<object>>(m);
 			return obj => d(obj, wf);
 		}
 
@@ -528,7 +528,7 @@ namespace Yuzu.Binary
 			if (t.IsArray) {
 				var wf = GetWriteFunc(t.GetElementType());
 				var m = Utils.GetPrivateCovariantGeneric(GetType(), nameof(WriteArray), t);
-				var d = MakeDelegateActionAction(m);
+				var d = MakeDelegateParam<Action<object>>(m);
 				return obj => d(obj, wf);
 			}
 			var meta = Meta.Get(t, Options);
@@ -539,7 +539,7 @@ namespace Yuzu.Binary
 					if (Utils.GetICollectionNG(t) != null)
 						return obj => WriteCollectionNG(obj, wf);
 					var m = Utils.GetPrivateCovariantGeneric(GetType(), nameof(WriteCollection), icoll);
-					var d = MakeDelegateActionAction(m);
+					var d = MakeDelegateParam<Action<object>>(m);
 					return obj => d(obj, wf);
 				}
 			}

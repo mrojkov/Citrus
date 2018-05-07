@@ -317,9 +317,9 @@ namespace Yuzu
 		protected Action<object> MakeDelegateAction(MethodInfo m) =>
 			(Action<object>)Delegate.CreateDelegate(typeof(Action<object>), this, m);
 
-		protected Action<object, Action<object>> MakeDelegateActionAction(MethodInfo m) =>
-			(Action<object, Action<object>>)
-				Delegate.CreateDelegate(typeof(Action<object, Action<object>>), this, m);
+		protected Action<object, TParam> MakeDelegateParam<TParam>(MethodInfo m) =>
+			(Action<object, TParam>)Delegate.CreateDelegate(typeof(Action<object, TParam>), this, m);
+
 	}
 
 	public abstract class AbstractWriterSerializer: AbstractSerializer
