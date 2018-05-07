@@ -405,9 +405,6 @@ namespace Yuzu.Json
 			return r != Meta.FoundNonPrimitive && r <= JsonOptions.MaxOnelineFields;
 		}
 
-		private Action<object> MakeDelegate(MethodInfo m) =>
-			(Action<object>)Delegate.CreateDelegate(typeof(Action<object>), this, m);
-
 		private Dictionary<Type, Action<object>> writerCache = new Dictionary<Type, Action<object>>();
 		private int jsonOptionsGeneration = 0;
 
@@ -503,7 +500,8 @@ namespace Yuzu.Json
 			if (t.IsGenericType) {
 				var g = t.GetGenericTypeDefinition();
 				if (g == typeof(Dictionary<,>))
-					return MakeDelegate(Utils.GetPrivateCovariantGenericAll(GetType(), nameof(WriteDictionary), t));
+					return MakeDelegateAction(
+						Utils.GetPrivateCovariantGenericAll(GetType(), nameof(WriteDictionary), t));
 				if (g == typeof(Action<>)) {
 					return WriteAction;
 				}
@@ -513,11 +511,12 @@ namespace Yuzu.Json
 				}
 			}
 			if (t.IsArray)
-				return MakeDelegate(Utils.GetPrivateCovariantGeneric(GetType(), nameof(WriteArray), t));
+				return MakeDelegateAction(Utils.GetPrivateCovariantGeneric(GetType(), nameof(WriteArray), t));
 			var ienum = Utils.GetIEnumerable(t);
 			if (ienum != null) {
 				Meta.Get(t, Options); // Check for serializable fields.
-				return MakeDelegate(Utils.GetPrivateCovariantGeneric(GetType(), nameof(WriteIEnumerable), ienum));
+				return MakeDelegateAction(
+					Utils.GetPrivateCovariantGeneric(GetType(), nameof(WriteIEnumerable), ienum));
 			}
 			if (t.IsSubclassOf(typeof(YuzuUnknown)))
 				return WriteUnknown;
