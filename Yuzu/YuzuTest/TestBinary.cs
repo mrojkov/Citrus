@@ -538,6 +538,20 @@ namespace YuzuTest.Binary
 		}
 
 		[TestMethod]
+		public void TestSerializeItemIf()
+		{
+			var bs = new BinarySerializer();
+			var v1 = new SampleCollection<int> { 5, 2, 4, 1 };
+			Assert.AreEqual(
+				"21 05 04 00 00 00 05 00 00 00 02 00 00 00 04 00 00 00 01 00 00 00",
+				XS(bs.ToBytes(v1)));
+			v1.Filter = 1;
+			Assert.AreEqual("21 05 02 00 00 00 05 00 00 00 04 00 00 00", XS(bs.ToBytes(v1)));
+			v1.Filter = 2;
+			Assert.AreEqual("21 05 02 00 00 00 02 00 00 00 04 00 00 00", XS(bs.ToBytes(v1)));
+		}
+
+		[TestMethod]
 		public void TestIEnumerable()
 		{
 			var bs = new BinarySerializer();
@@ -998,19 +1012,28 @@ namespace YuzuTest.Binary
 		[TestMethod]
 		public void TestObject()
 		{
+			var bs = new BinarySerializer();
 			var bd = new BinaryDeserializer();
-			var w = new SampleObj();
-			var buf =  SX(
-				"20 01 00 " + XS(typeof(SampleObj)) + " 01 00 " + XS("F", RoughType.Any) +
-				" 01 00 " + XS(RoughType.Float) + " CD CC F6 42 00 00");
-			bd.FromBytes(w, buf);
-			Assert.AreEqual(123.4f, w.F);
-			var wg = new SampleObj();
-			(new BinaryDeserializerGen()).FromBytes(wg, buf);
-			Assert.AreEqual(123.4f, wg.F);
 
-			bd.FromBytes(w, SX("20 01 00 01 00 21 02 03 00 00 00 01 02 03 00 00"));
+			var v1 = new SampleObj { F = 123.4f };
+			var result1 = bs.ToBytes(v1);
+			Assert.AreEqual(
+				"20 01 00 " + XS(typeof(SampleObj)) + " 01 00 " + XS("F", RoughType.Any) +
+				" 01 00 " + XS(RoughType.Float) + " CD CC F6 42 00 00", XS(result1));
+
+			var w = new SampleObj();
+			bd.FromBytes(w, result1);
+			Assert.AreEqual(v1.F, w.F);
+			var wg = new SampleObj();
+			(new BinaryDeserializerGen()).FromBytes(wg, result1);
+			Assert.AreEqual(v1.F, wg.F);
+
+			var bin1 = SX("20 01 00 01 00 21 02 03 00 00 00 01 02 03 00 00");
+			bd.FromBytes(w, bin1);
 			CollectionAssert.AreEqual(new byte[] { 1, 2, 3 }, (List<byte>)w.F);
+			dynamic d1 = YuzuUnknown.Dyn(bd.FromBytes(bin1));
+			CollectionAssert.AreEqual(new byte[] { 1, 2, 3 }, d1.F);
+
 			bd.FromBytes(w, SX(
 				"20 01 00 01 00 22 10 03 02 00 00 00 " +
 				XS("a") + " 01 00 " + XS("b") + " 02 00 00 00"));
@@ -1027,7 +1050,6 @@ namespace YuzuTest.Binary
 
 			Assert.AreEqual((short)266, bd.FromBytes<object>(SX("03 0A 01")));
 
-			var bs = new BinarySerializer();
 			Assert.AreEqual(
 				"21 11 02 00 00 00 10 " + XS("q") + " 21 05 01 00 00 00 01 00 00 00",
 				XS(bs.ToBytes(new List<object> { "q", new List<int> { 1 } })));
@@ -1453,6 +1475,7 @@ namespace YuzuTest.Binary
 		{
 			var bs = new BinarySerializer();
 			var bd = new BinaryDeserializer();
+			var bd1 = new BinaryDeserializer();
 			var data1 = SX(
 				"20 01 00 " + XS("NewType1") + " 02 00 " + XS("a", RoughType.Int, "b", RoughType.String) +
 				" 01 00 07 07 00 00 00 00");
@@ -1461,6 +1484,10 @@ namespace YuzuTest.Binary
 			Assert.AreEqual(1, w1.Fields.Count);
 			Assert.AreEqual(7*256 + 7, w1.Fields["a"]);
 			CollectionAssert.AreEqual(data1, bs.ToBytes(w1));
+			dynamic d1 = bd1.FromBytes(data1);
+			Assert.AreEqual("NewType1", d1.ClassTag);
+			Assert.AreEqual(1, d1.Fields.Count);
+			Assert.AreEqual(7 * 256 + 7, d1.a);
 
 			var data2 = SX("20 01 00 02 00 " + XS("qwe") + " 00 00");
 			var w2 = (YuzuUnknown)bd.FromBytes(data2);

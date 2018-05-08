@@ -94,7 +94,9 @@ namespace YuzuTest
 				jd.Generate<SampleDecimal>();
 				jd.Generate<SampleNullable>();
 				jd.Generate<SampleBool>();
+				jd.JsonOptions.Comments = true;
 				jd.Generate<SampleList>();
+				jd.JsonOptions.Comments = false;
 				jd.Generate<SampleObj>();
 				jd.Generate<SampleDict>();
 				jd.Generate<SampleDictKeys>();

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Reflection;
 using System.Text;
 
 using Yuzu.Deserializer;
@@ -17,7 +16,12 @@ namespace Yuzu.Json
 
 		private char? buf;
 
-		public override void Initialize() { buf = null; }
+		public override void Initialize()
+		{
+			buf = null;
+			if (JsonOptions.BOM && Reader.PeekChar() == '\uFEFF')
+				Reader.ReadChar();
+		}
 
 		private char Next()
 		{
@@ -44,24 +48,59 @@ namespace Yuzu.Json
 		private char SkipSpaces()
 		{
 			char ch = Next();
-			while (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r')
-				ch = Reader.ReadChar();
+			if (JsonOptions.Comments)
+				while (true) {
+					if (ch == '/') {
+						ch = Reader.ReadChar();
+						if (ch != '/')
+							throw Error("Expected '/', but found '{0}'", ch);
+						do {
+							ch = Reader.ReadChar();
+						} while (ch != '\n') ;
+					}
+					else if (ch != ' ' && ch != '\t' && ch != '\n' && ch != '\r')
+						break;
+					ch = Reader.ReadChar();
+				}
+			else
+				while (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r')
+					ch = Reader.ReadChar();
 			return ch;
 		}
 
+		// Return \0 instead of throwing on EOF.
 		protected char SkipSpacesCarefully()
 		{
 			if (buf.HasValue)
 				throw new YuzuAssert();
-			while (true) {
-				var v = Reader.PeekChar();
-				if (v < 0)
-					return '\0';
-				var ch = (char)v;
-				if (ch != ' ' && ch != '\t' && ch != '\n' && ch != '\r')
-					return ch;
-				Reader.ReadChar();
-			}
+			if (JsonOptions.Comments)
+				while (true) {
+					var v = Reader.PeekChar();
+					if (v == '/') {
+						Reader.ReadChar();
+						v = Reader.PeekChar();
+						// Unable to look ahead 2 chars, so disallow lone slash.
+						if (v != '/')
+							throw Error("Expected '/', but found '{0}'",
+								v > 0 ? ((char)v).ToString() : "EOF");
+						do {
+							Reader.ReadChar();
+							v = Reader.PeekChar();
+							if (v < 0)
+								return '\0';
+						} while (v != '\n');
+					}
+					if (v != ' ' && v != '\t' && v != '\n' && v != '\r')
+						return (char)v;
+					Reader.ReadChar();
+				}
+			else
+				while (true) {
+					var v = Reader.PeekChar();
+					if (v != ' ' && v != '\t' && v != '\n' && v != '\r')
+						return v < 0 ? '\0' : (char)v;
+					Reader.ReadChar();
+				}
 		}
 
 		protected char Require(params char[] chars)
@@ -665,6 +704,7 @@ namespace Yuzu.Json
 					var storage = !Options.AllowUnknownFields || meta.GetUnknownStorage == null ?
 						NullYuzuUnknownStorage.Instance : meta.GetUnknownStorage(obj);
 					storage.Clear();
+					int requiredCountActiual = 0;
 					while (name != "") {
 						Meta.Item yi;
 						if (!meta.TagToItem.TryGetValue(name, out yi)) {
@@ -674,12 +714,18 @@ namespace Yuzu.Json
 							name = GetNextName(false);
 							continue;
 						}
+						if (!yi.IsOptional)
+							requiredCountActiual += 1;
 						if (yi.SetValue != null)
 							yi.SetValue(obj, ReadValueFunc(yi.Type)());
 						else
 							MergeValueFunc(yi.Type)(yi.GetValue(obj));
 						name = GetNextName(false);
 					}
+					if (requiredCountActiual != meta.RequiredCount)
+						throw Error(
+							"Expected {0} required field(s), but found {1}",
+							meta.RequiredCount, requiredCountActiual);
 				}
 				else if (Options.AllowUnknownFields) {
 					var storage = meta.GetUnknownStorage == null ?

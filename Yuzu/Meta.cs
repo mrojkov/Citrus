@@ -71,6 +71,8 @@ namespace Yuzu.Metadata
 		public bool AllowReadingFromAncestor;
 		public Surrogate Surrogate;
 		public string WriteAlias;
+		public int RequiredCount { get; private set; }
+		public Func<object, int, object, bool> SerializeItemIf;
 
 		public Dictionary<string, Item> TagToItem = new Dictionary<string, Item>();
 		public Func<object, YuzuUnknownStorage> GetUnknownStorage;
@@ -156,6 +158,8 @@ namespace Yuzu.Metadata
 				SerializeIf = serializeIf != null ? Options.GetSerializeCondition(serializeIf) : null,
 				Name = m.Name,
 			};
+			if (!item.IsOptional)
+				RequiredCount += 1;
 			var merge = m.IsDefined(Options.MergeAttribute, false);
 
 			switch (m.MemberType) {
@@ -222,6 +226,13 @@ namespace Yuzu.Metadata
 
 		private void AddMethod(MethodInfo m)
 		{
+			if (m.IsDefined(Options.SerializeItemIfAttribute, false)) {
+				if (SerializeItemIf != null)
+					throw Error("Duplicate SerializeItemIf");
+				if (Utils.GetIEnumerable(Type) == null)
+					throw Error("SerializeItemIf may only be used inside of IEnumerable");
+				SerializeItemIf = YuzuSerializeItemIf.MakeChecker(m);
+			}
 			BeforeSerialization.MaybeAdd(m, Options.BeforeSerializationAttribute);
 			AfterDeserialization.MaybeAdd(m, Options.AfterDeserializationAttribute);
 			Surrogate.ProcessMethod(m);
@@ -310,6 +321,7 @@ namespace Yuzu.Metadata
 				Surrogate.SurrogateType == null
 			)
 				throw Error("No serializable fields");
+
 			Items.Sort();
 			Item prev = null;
 			foreach (var i in Items) {

@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Collections.Generic;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using ProtoBuf;
 
@@ -260,6 +261,31 @@ namespace YuzuTest.Metadata
 			XAssert.Throws<YuzuException>(() => Meta.Get(typeof(DuplicateReadAlias), opt), "Dup");
 			XAssert.Throws<YuzuException>(() => Meta.Get(typeof(EmptyReadAlias), opt), "Empty");
 		}
+
+		internal class SampleItemIfScalar
+		{
+			[YuzuMember]
+			public int X = 1;
+			[YuzuSerializeItemIf]
+			public bool Func() => true;
+		}
+
+		internal class SampleItemIfDup: List<int>
+		{
+			[YuzuSerializeItemIf]
+			public bool Func1(int index, object item) => true;
+			[YuzuSerializeItemIf]
+			public bool Func2(int index, object item) => true;
+		}
+
+		[TestMethod]
+		public void TestSerializeItemIfErrors()
+		{
+			var opt = new CommonOptions();
+			XAssert.Throws<YuzuException>(() => Meta.Get(typeof(SampleItemIfScalar), opt), "IEnumerable");
+			XAssert.Throws<YuzuException>(() => Meta.Get(typeof(SampleItemIfDup), opt), "Duplicate");
+		}
+
 	}
 
 }

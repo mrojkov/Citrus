@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -491,6 +492,19 @@ namespace YuzuTest.Json
 			var w3g = (SampleConcreteCollection)
 				SampleConcreteCollection_JsonDeserializer.Instance.FromString(result3);
 			CollectionAssert.AreEqual(v3.ToList(), w3g.ToList());
+		}
+
+		[TestMethod]
+		public void TestSerializeItemIf()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			var v1 = new SampleCollection<int> { 5, 2, 4, 1 };
+			Assert.AreEqual("[\n5,\n2,\n4,\n1\n]", js.ToString(v1));
+			v1.Filter = 1;
+			Assert.AreEqual("[\n5,\n4\n]", js.ToString(v1));
+			v1.Filter = 2;
+			Assert.AreEqual("[\n2,\n4\n]", js.ToString(v1));
 		}
 
 		[TestMethod]
@@ -995,12 +1009,16 @@ namespace YuzuTest.Json
 			CollectionAssert.AreEqual(
 				new object[] { 1.0, 2.0, 3.0 },
 				(List<object>)((Dictionary<string,object>)d)["F"]);
+			dynamic d1 = YuzuUnknown.Dyn(d);
+			CollectionAssert.AreEqual(new object[] { 1.0, 2.0, 3.0 }, (List<object>)d1.F);
 
 			d = jd.FromString("{ \"F\": {\"class\": \"YuzuTest.SampleObj, YuzuTest\", \"F\": null } }");
 			Assert.AreEqual(typeof(Dictionary<string, object>), d.GetType());
 			var f = ((Dictionary<string, object>)d)["F"];
 			Assert.IsInstanceOfType(f, typeof(SampleObj));
 			Assert.AreEqual(null, ((SampleObj)f).F);
+			d1 = YuzuUnknown.Dyn(d);
+			Assert.AreEqual(null, d1.F.F);
 
 			var js = new JsonSerializer();
 			js.JsonOptions.Indent = "";
@@ -1400,16 +1418,27 @@ namespace YuzuTest.Json
 			var jd = new JsonDeserializer();
 			jd.JsonOptions.Unordered = true;
 
-			var w1 = (YuzuUnknown)jd.FromString<object>("{\"class\":\"NewType1\"}");
+			var s1 = "{\"class\":\"NewType1\"}";
+			var w1 = (YuzuUnknown)jd.FromString<object>(s1);
 			Assert.AreEqual("NewType1", w1.ClassTag);
 			Assert.AreEqual(0, w1.Fields.Count);
 			Assert.AreEqual("{\"class\":\"NewType1\"}", js.ToString(w1));
+			dynamic d1 = jd.FromString(s1);
+			Assert.AreEqual("NewType1", d1.ClassTag);
+			Assert.AreEqual(0, d1.Fields.Count);
+			Assert.AreEqual("{\"class\":\"NewType1\"}", js.ToString(d1));
 
-			var w2 = (YuzuUnknown)jd.FromString<object>("{\"class\":\"NewType2\", \"b\":\"qqq\", \"a\":1}");
+			var s2 = "{\"class\":\"NewType2\", \"b\":\"qqq\", \"a\":1}";
+			var w2 = (YuzuUnknown)jd.FromString<object>(s2);
 			Assert.AreEqual(2, w2.Fields.Count);
 			Assert.AreEqual(1.0, w2.Fields["a"]);
 			Assert.AreEqual("qqq", w2.Fields["b"]);
 			Assert.AreEqual("{\"class\":\"NewType2\",\"a\":1,\"b\":\"qqq\"}", js.ToString(w2));
+			dynamic d2 = jd.FromString(s2);
+			Assert.AreEqual(2, d2.Fields.Count);
+			Assert.AreEqual(1.0, d2.a);
+			Assert.AreEqual("qqq", d2.b);
+			Assert.AreEqual("{\"class\":\"NewType2\",\"a\":1,\"b\":\"qqq\"}", js.ToString(d2));
 
 			jd.Options.AllowUnknownFields = true;
 			var w3 = jd.FromString<SampleBool>("{\"B\":true, \"a\": {\"class\":\"NewType3\"}}");
@@ -1607,6 +1636,53 @@ namespace YuzuTest.Json
 		}
 
 		[TestMethod]
+		public void TestComments()
+		{
+			var jd = new JsonDeserializer();
+			jd.JsonOptions.Comments = true;
+
+			var s1 =
+				"//a\n{//b \"class\"c d\n\"class\":\"YuzuTest.SampleList, YuzuTest\"" +
+				"//x\n, //\n\"E\"://y\n[ //\n\"p\"// \n,///\n\"//\"//\n] }//z";
+			var result1 = jd.FromString<SampleList>(s1);
+			Assert.AreEqual(2, result1.E.Count);
+			Assert.AreEqual("p", result1.E[0]);
+			Assert.AreEqual("//", result1.E[1]);
+			var result1g = (SampleList)SampleList_JsonDeserializer.Instance.FromString(s1);
+			Assert.AreEqual(2, result1g.E.Count);
+			Assert.AreEqual("p", result1g.E[0]);
+			Assert.AreEqual("//", result1g.E[1]);
+
+			var result2 = jd.FromString("// adsf dsaf as\n5\n//abc\n");
+			Assert.AreEqual(5.0, result2);
+		}
+
+		[TestMethod]
+		public void TestBOM()
+		{
+			var jd = new JsonDeserializer();
+			jd.JsonOptions.BOM = true;
+
+			var s1 = "{\"X\":7,\"Y\":\"привет\"}";
+			var m = new MemoryStream();
+			m.Write(new byte[] { 0xEF, 0xBB, 0xBF }, 0, 3);
+			var b = Encoding.UTF8.GetBytes(s1);
+			m.Write(b, 0, b.Length);
+
+			m.Position = 0;
+			var w1 = jd.FromStream<Sample1>(m);
+
+			Assert.AreEqual(7, w1.X);
+			Assert.AreEqual("привет", w1.Y);
+
+			m.GetBuffer()[8] += 1; // 7 -> 8
+			m.Position = 3;
+			var w2 = jd.FromStream<Sample1>(m);
+			Assert.AreEqual(8, w2.X);
+			Assert.AreEqual("привет", w2.Y);
+		}
+
+		[TestMethod]
 		public void TestErrors()
 		{
 			var js = new JsonSerializer();
@@ -1651,6 +1727,16 @@ namespace YuzuTest.Json
 				List<int> list = new List<int>();
 				XAssert.Throws<YuzuException>(() => jd.FromString(list, "[\"a\"]"), "'\"'");
 			}
+
+			XAssert.Throws<YuzuException>(() => jd.FromString("{//\n5}"), "'/'");
+			jd.JsonOptions.Comments = true;
+			XAssert.Throws<YuzuException>(() => jd.FromString("{/}"), "'/'");
+			jd.JsonOptions.Comments = false;
+
+			jd.JsonOptions.Unordered = true;
+			XAssert.Throws<YuzuException>(() => jd.FromString("{\"class\": \"YuzuTest.SampleBase, YuzuTest\"}"), "1");
+			jd.JsonOptions.Unordered = false;
+			XAssert.Throws<YuzuException>(() => jd.FromString("{\"class\": \"YuzuTest.SampleBase, YuzuTest\"}"), "FBase");
 
 			jd.Options.ReportErrorPosition = true;
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "      z"), "7");

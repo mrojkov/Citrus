@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.IO;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -71,6 +72,19 @@ namespace Yuzu
 				checker = Expression.Lambda<Func<object, bool>>(e, p).Compile();
 			}
 			return checker(obj);
+		}
+	}
+
+	public class YuzuSerializeItemIf : Attribute
+	{
+		internal static Func<object, int, object, bool> MakeChecker(MethodInfo m)
+		{
+			var pObj = Expression.Parameter(typeof(object));
+			var pIndex = Expression.Parameter(typeof(int));
+			var pItem = Expression.Parameter(typeof(object));
+			var e = Expression.Call(Expression.Convert(pObj, m.DeclaringType), m, pIndex, pItem);
+			return Expression.Lambda<Func<object, int, object, bool>>(
+				e, pObj, pIndex, pItem).Compile();
 		}
 	}
 
@@ -185,6 +199,7 @@ namespace Yuzu
 		public Type MemberAttribute = typeof(YuzuMember);
 		public Type CompactAttribute = typeof(YuzuCompact);
 		public Type SerializeIfAttribute = typeof(YuzuSerializeCondition);
+		public Type SerializeItemIfAttribute = typeof(YuzuSerializeItemIf);
 		public Type BeforeSerializationAttribute = typeof(YuzuBeforeSerialization);
 		public Type AfterDeserializationAttribute = typeof(YuzuAfterDeserialization);
 		public Type MergeAttribute = typeof(YuzuMerge);
@@ -240,10 +255,30 @@ namespace Yuzu
 		}
 	}
 
-	public class YuzuUnknown
+	public class YuzuUnknown: DynamicObject
 	{
 		public string ClassTag;
 		public SortedDictionary<string, object> Fields = new SortedDictionary<string, object>();
+
+		public static dynamic Dyn(object obj)
+		{
+			if (obj is IReadOnlyDictionary<string, object>) {
+				var u = new YuzuUnknown();
+				foreach (var p in obj as IReadOnlyDictionary<string, object>)
+					u.Fields.Add(p.Key, p.Value);
+				return u;
+			}
+			return obj;
+		}
+
+		public override bool TryGetMember(GetMemberBinder binder, out object result) =>
+			Fields.TryGetValue(binder.Name, out result);
+
+		public override bool TrySetMember(SetMemberBinder binder, object value)
+		{
+			Fields[binder.Name] = value;
+			return true;
+		}
 	}
 
 	public class YuzuUnknownStorage
@@ -296,9 +331,13 @@ namespace Yuzu
 		protected Action<object> MakeDelegateAction(MethodInfo m) =>
 			(Action<object>)Delegate.CreateDelegate(typeof(Action<object>), this, m);
 
-		protected Action<object, Action<object>> MakeDelegateActionAction(MethodInfo m) =>
-			(Action<object, Action<object>>)
-				Delegate.CreateDelegate(typeof(Action<object, Action<object>>), this, m);
+		protected Action<object, TParam> MakeDelegateParam<TParam>(MethodInfo m) =>
+			(Action<object, TParam>)Delegate.CreateDelegate(typeof(Action<object, TParam>), this, m);
+
+		protected Action<object, TParam1, TParam2> MakeDelegateParam2<TParam1, TParam2>(MethodInfo m) =>
+			(Action<object, TParam1, TParam2>)
+				Delegate.CreateDelegate(typeof(Action<object, TParam1, TParam2>), this, m);
+
 	}
 
 	public abstract class AbstractWriterSerializer: AbstractSerializer

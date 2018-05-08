@@ -29,7 +29,8 @@ namespace Yuzu.Binary
 		protected void WriteDateTime(object obj) { writer.Write(((DateTime)obj).ToBinary()); }
 		protected void WriteTimeSpan(object obj) { writer.Write(((TimeSpan)obj).Ticks); }
 
-		protected void WriteString(object obj) {
+		protected void WriteString(object obj)
+		{
 			if (obj == null) {
 				writer.Write("");
 				writer.Write(true);
@@ -117,11 +118,6 @@ namespace Yuzu.Binary
 					WriteRoughType(t.GetGenericArguments()[0]);
 					return;
 				}
-				if (g == typeof(IEnumerable<>)) {
-					writer.Write((byte)RoughType.Sequence);
-					WriteRoughType(t.GetGenericArguments()[0]);
-					return;
-				}
 			}
 			if (t.IsArray) {
 				writer.Write((byte)RoughType.Sequence);
@@ -193,6 +189,21 @@ namespace Yuzu.Binary
 			writer.Write(ienum.Count());
 			foreach (var a in ienum)
 				wf(a);
+		}
+
+		private void WriteIEnumerableIf<T>(object list, Action<object> wf, Func<object, int, object, bool> cond)
+		{
+			if (list == null) {
+				writer.Write(-1);
+				return;
+			}
+			var ienum = (IEnumerable<T>)list;
+			int index = 0;
+			writer.Write(ienum.Count(a => cond(list, index++, a)));
+			index = 0;
+			foreach (var a in ienum)
+				if (cond(list, index++, a))
+					wf(a);
 		}
 
 		// Duplicate WriteIEnumerable to optimize Count.
@@ -504,13 +515,13 @@ namespace Yuzu.Binary
 		{
 			var wf = GetWriteFunc(t.GetGenericArguments()[0]);
 			var m = Utils.GetPrivateCovariantGeneric(GetType(), nameof(WriteIEnumerable), t);
-			var d = MakeDelegateActionAction(m);
+			var d = MakeDelegateParam<Action<object>>(m);
 			return obj => d(obj, wf);
 		}
 
 		private Action<object> MakeWriteFunc(Type t)
 		{
-			if (t.IsEnum) 
+			if (t.IsEnum)
 				return WriteInt;
 			if (t.IsGenericType) {
 				var g = t.GetGenericTypeDefinition();
@@ -528,16 +539,22 @@ namespace Yuzu.Binary
 							w(obj);
 					};
 				}
-				if (g == typeof(IEnumerable<>))
-					return MakeWriteIEnumerable(t);
 			}
 			if (t.IsArray) {
 				var wf = GetWriteFunc(t.GetElementType());
 				var m = Utils.GetPrivateCovariantGeneric(GetType(), nameof(WriteArray), t);
-				var d = MakeDelegateActionAction(m);
+				var d = MakeDelegateParam<Action<object>>(m);
 				return obj => d(obj, wf);
 			}
 			var meta = Meta.Get(t, Options);
+			if (meta.SerializeItemIf != null) {
+				// Two passes are required anyway, so it is useless to optimize Count.
+				var ienum = Utils.GetIEnumerable(t);
+				var wf = GetWriteFunc(ienum.GetGenericArguments()[0]);
+				var m = Utils.GetPrivateCovariantGeneric(GetType(), nameof(WriteIEnumerableIf), ienum);
+				var d = MakeDelegateParam2<Action<object>, Func<object, int, object, bool>>(m);
+				return obj => d(obj, wf, meta.SerializeItemIf);
+			}
 			{
 				var icoll = Utils.GetICollection(t);
 				if (icoll != null) {
@@ -545,7 +562,7 @@ namespace Yuzu.Binary
 					if (Utils.GetICollectionNG(t) != null)
 						return obj => WriteCollectionNG(obj, wf);
 					var m = Utils.GetPrivateCovariantGeneric(GetType(), nameof(WriteCollection), icoll);
-					var d = MakeDelegateActionAction(m);
+					var d = MakeDelegateParam<Action<object>>(m);
 					return obj => d(obj, wf);
 				}
 			}
