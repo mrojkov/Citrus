@@ -190,10 +190,13 @@ namespace Launcher
 			NSApplication.Init();
 			NSApplication.Main(args);
 		}
-#endif
+#endif // WIN
 
 		private static void StartConsoleMode()
 		{
+#if MAC
+			NSApplication.Init();
+#endif // MAC
 			builder.OnBuildStatusChange += Console.WriteLine;
 			builder.OnBuildFail += () => Environment.Exit(1);
 			builder.Start().Wait();
