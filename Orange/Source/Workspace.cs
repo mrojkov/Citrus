@@ -1,7 +1,5 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
 using Newtonsoft.Json.Linq;
 
@@ -104,6 +102,12 @@ namespace Orange
 				PluginLoader.ScanForPlugins(!string.IsNullOrWhiteSpace(pluginName)
 					? Path.Combine(Path.GetDirectoryName(file), pluginName)
 					: file);
+				if (defaultCsprojSynchronizationSkipUnwantedDirectoriesPredicate == null) {
+					defaultCsprojSynchronizationSkipUnwantedDirectoriesPredicate = CsprojSynchronization.SkipUnwantedDirectoriesPredicate;
+				}
+				CsprojSynchronization.SkipUnwantedDirectoriesPredicate = (di) => {
+					return defaultCsprojSynchronizationSkipUnwantedDirectoriesPredicate(di) && !di.FullName.StartsWith(AssetsDirectory, StringComparison.OrdinalIgnoreCase);
+				};
 				AssetFiles = new FileEnumerator(AssetsDirectory);
 				The.UI.OnWorkspaceOpened();
 			}
@@ -114,6 +118,8 @@ namespace Orange
 
 		// Preserving default targets references just in case since they're used as keys in cooking rules for target
 		private static List<Target> defaultTargets;
+		private Predicate<DirectoryInfo> defaultCsprojSynchronizationSkipUnwantedDirectoriesPredicate;
+
 		private void FillDefaultTargets()
 		{
 			if (defaultTargets == null) {

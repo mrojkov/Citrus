@@ -1,11 +1,12 @@
 using System;
-using System.IO;
-using System.Threading.Tasks;
+using McMaster.Extensions.CommandLineUtils;
+using System.Linq;
 #if WIN
 using System.Windows.Forms;
+using System.Runtime.InteropServices;
 #elif MAC
 using AppKit;
-#endif
+#endif // WIN
 
 namespace Orange
 {
@@ -24,47 +25,150 @@ namespace Launcher
 {
 	internal static class MainClass
 	{
+#if WIN
+		[StructLayout(LayoutKind.Sequential)]
+		internal struct PROCESS_INFORMATION
+		{
+			public IntPtr hProcess;
+			public IntPtr hThread;
+			public int dwProcessId;
+			public int dwThreadId;
+		}
+
+		[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+		public struct STARTUPINFO
+		{
+			public Int32 cb;
+			public string lpReserved;
+			public string lpDesktop;
+			public string lpTitle;
+			public Int32 dwX;
+			public Int32 dwY;
+			public Int32 dwXSize;
+			public Int32 dwYSize;
+			public Int32 dwXCountChars;
+			public Int32 dwYCountChars;
+			public Int32 dwFillAttribute;
+			public Int32 dwFlags;
+			public Int16 wShowWindow;
+			public Int16 cbReserved2;
+			public IntPtr lpReserved2;
+			public IntPtr hStdInput;
+			public IntPtr hStdOutput;
+			public IntPtr hStdError;
+		}
+
+		[DllImport("kernel32.dll", SetLastError = true)]
+		private static extern IntPtr GetStdHandle(StandardHandle nStdHandle);
+		[DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+		static extern IntPtr GetCommandLineW();
+		[DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+		static extern bool CreateProcessW(
+			IntPtr lpApplicationName,
+			IntPtr lpCommandLine,
+			IntPtr lpProcessAttributes,
+			IntPtr lpThreadAttributes,
+			bool bInheritHandles,
+			uint dwCreationFlags,
+			IntPtr lpEnvironment,
+			IntPtr lpCurrentDirectory,
+			[In] ref STARTUPINFO lpStartupInfo,
+			out PROCESS_INFORMATION lpProcessInformation);
+
+
+		const int SW_HIDE = 0;
+		const int SW_SHOW = 5;
+
+		private enum StandardHandle : uint
+		{
+			Input = unchecked((uint)-10),
+			Output = unchecked((uint)-11),
+			Error = unchecked((uint)-12)
+		}
+
+		const int STARTF_USESHOWWINDOW = 0x00000001;
+		const int STARTF_USESIZE = 0x00000002;
+		const int STARTF_USEPOSITION = 0x00000004;
+		const int STARTF_USECOUNTCHARS = 0x00000008;
+		const int STARTF_USEFILLATTRIBUTE = 0x00000010;
+		const int STARTF_RUNFULLSCREEN = 0x00000020;  // ignored for non-x86 platforms
+		const int STARTF_FORCEONFEEDBACK = 0x00000040;
+		const int STARTF_FORCEOFFFEEDBACK = 0x00000080;
+		const int STARTF_USESTDHANDLES = 0x00000100;
+
+		private static IntPtr INVALID_HANDLE_VALUE = new IntPtr(-1);
+#endif // WIN
+
 		private static CommonBuilder builder;
 
 		[STAThread]
-		public static void Main(string[] args)
+		public static int Main(string[] args)
 		{
-			Args = new CommandLineArguments(args);
-			if (!Args.AreArgumentsValid) {
-				Console.WriteLine("Invalid arguments. Use -help to list possible arguments.");
-				return;
-			}
-			if (Args.ShowHelp) {
-				ShowHelp();
-				return;
-			}
+			var originalArgs = args;
+#if MAC
+			args = args.Where(s => !s.StartsWith("-psn")).ToArray();
+#endif // MAC
+			var cli = new CommandLineApplication();
+			cli.Name = "Orange";
+			cli.Description = "Orange Launcher";
+			cli.HelpOption("-h --help");
+			var optionConsole = cli.Option<bool>("-c --console", "Console mode.", CommandOptionType.NoValue);
+			var optionJustBuild = cli.Option<bool>("-j --justbuild", "Build project without running executable.", CommandOptionType.NoValue);
+			var optionBuildProjectPath = cli.Option<string>("-b --build <PROJECT_PATH>", "Project path, default: \"Orange/Orange.%Platform%.sln\".", CommandOptionType.SingleValue);
+			var optionRunProjectPath = cli.Option<string>("-r --run <EXECUTABLE_PATH>", "Executable path, default: \"Orange/bin/%Platform%/Release/%PlatformExecutable%\".", CommandOptionType.SingleValue);
+			var optionRunArgs = cli.Option<string>("-a --runargs <ARGUMENTS>", "Args to pass to executable.", CommandOptionType.SingleValue);
 
-			builder = new Builder {
-				SolutionPath = Args.SolutionPath,
-				ExecutablePath = Args.ExecutablePath,
-				ExecutableArgs = Args.ExecutableArgs
-			};
+			cli.OnExecute(() => {
+#if WIN
+				var stdoutHandle = GetStdHandle(StandardHandle.Output);
+				if (args.Length == 0 && stdoutHandle != INVALID_HANDLE_VALUE) {
+					PROCESS_INFORMATION pi = new PROCESS_INFORMATION();
+					STARTUPINFO si = new STARTUPINFO();
+					si.cb = Marshal.SizeOf(si);
+					si.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
+					si.wShowWindow = SW_SHOW;
+					si.hStdOutput = INVALID_HANDLE_VALUE;
+					si.hStdInput = INVALID_HANDLE_VALUE;
+					si.hStdError = INVALID_HANDLE_VALUE;
+					CreateProcessW(IntPtr.Zero,
+						GetCommandLineW(),
+						IntPtr.Zero,
+						IntPtr.Zero,
+						true,
+						0x00000008, // DETACHED_PROCESS
+						IntPtr.Zero,
+						IntPtr.Zero,
+						ref si,
+						out pi
+					);
+					return 0;
+				}
+#endif // WIN
+				builder = new Builder {
+					NeedRunExecutable = !optionJustBuild.HasValue(),
+					SolutionPath = optionBuildProjectPath.ParsedValue,
+					ExecutablePath = optionRunProjectPath.ParsedValue,
+					ExecutableArgs = optionRunArgs.ParsedValue
+				};
 
-			if (Args.ConsoleMode) {
-				StartConsoleMode();
+				if (optionConsole.HasValue()) {
+					StartConsoleMode();
+				} else {
+					// OS X passes `-psn_<number>` to process when start from Finder, so we cut it for
+					// cli parser, but pass original args to OS X's NSApplication.Main
+					StartUIMode(originalArgs);
+				}
+				return 0;
+			});
+
+			try {
+				cli.Execute(args);
+			} catch (CommandParsingException e) {
+				Console.WriteLine(e.Message);
+				return 1;
 			}
-			else {
-				StartUIMode(args);
-			}
+			return 0;
 		}
-
-		private static CommandLineArguments Args { get; set; }
-
-		private static void ShowHelp()
-		{
-			Console.WriteLine("-help: show this text.");
-			Console.WriteLine("-console: console mode.");
-			Console.WriteLine("-justbuild: build project without running executable.");
-			Console.WriteLine("-build: project path, default: \"Orange/Orange.%Platform%.sln\".");
-			Console.WriteLine("-run: executable path, default: \"Orange/bin/%Platform%/Release/%PlatformExecutable%\".");
-		}
-
-		private static bool RunExecutable => !Args.JustBuild;
 
 #if WIN
 		private static void StartUIMode(string[] args)
@@ -75,7 +179,7 @@ namespace Launcher
 			builder.OnBuildSuccess += Application.Exit;
 			Console.SetOut(mainForm.LogWriter);
 			Console.SetError(mainForm.LogWriter);
-			builder.Start(RunExecutable);
+			builder.Start();
 			mainForm.Show();
 			Application.Run();
 		}
@@ -83,17 +187,19 @@ namespace Launcher
 		private static void StartUIMode(string[] args)
 		{
 			AppDelegate.Builder = builder;
-			AppDelegate.Args = Args;
 			NSApplication.Init();
 			NSApplication.Main(args);
 		}
-#endif
+#endif // WIN
 
 		private static void StartConsoleMode()
 		{
+#if MAC
+			NSApplication.Init();
+#endif // MAC
 			builder.OnBuildStatusChange += Console.WriteLine;
 			builder.OnBuildFail += () => Environment.Exit(1);
-			builder.Start(RunExecutable).Wait();
+			builder.Start().Wait();
 		}
 	}
 }

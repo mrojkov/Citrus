@@ -59,6 +59,9 @@
     <Reference Include="System.Core" />
     <Reference Include="Xamarin.Mac" />
     <Reference Include="System.Xml" />
+    <Reference Include="McMaster.Extensions.CommandLineUtils">
+      <HintPath>packages\McMaster.Extensions.CommandLineUtils.2.2.1\lib\netstandard2.0\McMaster.Extensions.CommandLineUtils.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ImageAsset Include="Resources\Images.xcassets\AppIcons.appiconset\Contents.json" />
@@ -75,6 +78,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Mac\AppDelegate.cs" />
@@ -98,7 +102,6 @@
       <DependentUpon>LoggingWindowController.cs</DependentUpon>
     </Compile>
     <Compile Include="Main.cs" />
-    <Compile Include="CommandLineArguments.cs" />
     <Compile Include="CommonBuilder.cs" />
     <Compile Include="Mac\Builder.cs" />
     <Compile Include="Win\LogWriter.cs">
