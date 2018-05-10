@@ -65,18 +65,10 @@ namespace Tangerine.UI.SceneView
 					!Document.Current.ExpositionMode
 				) {
 					if (widget.Input.WasMousePressed()) {
-						var line = new RulerLine(container.LocalMousePosition(), lineRulerOrientation);
-						Ruler.Lines.Add(line);
-						yield return null;
-						SceneView.Instance.Components.Add(new LineSelectionComponent { Line = line });
-						while (widget.Input.IsMousePressed()) {
-							line.MakePassingThroughPoint(container.LocalMousePosition());
-							Window.Current.Invalidate();
-							yield return null;
-						}
-						SceneView.Instance.Components.Remove<LineSelectionComponent>();
+						SceneView.Instance.Components.Add(new CreateLineRequestComponent {
+							Orientation = lineRulerOrientation,
+						});
 					}
-					Window.Current.Invalidate();
 				}
 				yield return null;
 			}
@@ -270,5 +262,10 @@ namespace Tangerine.UI.SceneView
 	public class LineSelectionComponent : Component
 	{
 		public RulerLine Line { get; set; }
+	}
+
+	public class CreateLineRequestComponent : Component
+	{
+		public RulerOrientation Orientation { get; set; }
 	}
 }

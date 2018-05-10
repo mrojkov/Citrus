@@ -439,6 +439,7 @@ namespace Tangerine
 			h.Connect(OrangeCommands.OptionsDialog, () => new OrangePluginOptionsDialog());
 			h.Connect(SceneViewCommands.SnapWidgetBorderToRuler, new SnapWidgetBorderCommandHandler());
 			h.Connect(SceneViewCommands.SnapWidgetPivotToRuler, new SnapWidgetPivotCommandHandler());
+			h.Connect(SceneViewCommands.SnapRulerLinesToWidgets, new SnapRulerLinesToWidgetCommandHandler());
 			h.Connect(SceneViewCommands.ManageRulers, new ManageRulers());
 		}
 
@@ -464,6 +465,16 @@ namespace Tangerine
 			{
 				var prefs = UI.SceneView.SceneUserPreferences.Instance;
 				prefs.SnapWidgetBorderToRuler = !prefs.SnapWidgetBorderToRuler;
+			}
+		}
+
+		private class SnapRulerLinesToWidgetCommandHandler : DocumentCommandHandler
+		{
+			public override bool GetChecked() => UI.SceneView.SceneUserPreferences.Instance.SnapRulerLinesToWidgets;
+			public override void Execute()
+			{
+				var prefs = UI.SceneView.SceneUserPreferences.Instance;
+				prefs.SnapRulerLinesToWidgets = !prefs.SnapRulerLinesToWidgets;
 			}
 		}
 

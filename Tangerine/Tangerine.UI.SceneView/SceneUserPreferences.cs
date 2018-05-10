@@ -43,6 +43,9 @@ namespace Tangerine.UI.SceneView
 		[YuzuRequired]
 		public bool SnapWidgetPivotToRuler { get; set; }
 
+		[YuzuRequired]
+		public bool SnapRulerLinesToWidgets { get; set; }
+
 		public SceneUserPreferences()
 		{
 			ResetToDefaults();
@@ -60,6 +63,7 @@ namespace Tangerine.UI.SceneView
 			DisplayPivotsForAllWidgets = true;
 			DisplayPivotsForInvisibleWidgets = false;
 			Bones3DVisible = false;
+			SnapRulerLinesToWidgets = false;
 			SnapWidgetBorderToRuler = false;
 			SnapWidgetPivotToRuler = false;
 		}

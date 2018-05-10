@@ -127,6 +127,7 @@ namespace Tangerine
 					new Command("Rulers", rulerMenu),
 					SceneViewCommands.SnapWidgetBorderToRuler,
 					SceneViewCommands.SnapWidgetPivotToRuler,
+					SceneViewCommands.SnapRulerLinesToWidgets,
 					(localizationCommand = new Command("Localization", localizationMenu = new Menu()) {
 						Enabled = false
 					})

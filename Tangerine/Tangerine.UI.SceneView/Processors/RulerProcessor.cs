@@ -11,6 +11,7 @@ namespace Tangerine.UI.SceneView
 		private const float Threshold = 5f;
 		private static SceneView sceneView => SceneView.Instance;
 		private static Widget container => Document.Current.RootNode.AsWidget;
+		private static Ruler Ruler => ProjectUserPreferences.Instance.ActiveRuler;
 
 		public IEnumerator<object> Task()
 		{
@@ -19,23 +20,33 @@ namespace Tangerine.UI.SceneView
 					!Document.Current.ExpositionMode &&
 					!Document.Current.PreviewAnimation
 				) {
-					var line = GetLineUnderMouse();
+					RulerLine line;
+					bool lineCaptured;
+					var hulls = Document.Current.Container.Nodes.OfType<Widget>().Editable()
+						.Select(w => w.CalcHullInSpaceOf(container)).ToList();
+					if (lineCaptured = SceneView.Instance.Components.Contains<CreateLineRequestComponent>()) {
+						var comp = SceneView.Instance.Components.Get<CreateLineRequestComponent>();
+						line = new RulerLine(Vector2.Zero, comp.Orientation);
+						SnapLineToNearestPoint(line, hulls);
+						if (IsRulerContainLine(line.Value, line.RulerOrientation)) {
+							line = GetLineUnderMouse();
+						}
+						SceneView.Instance.Components.Remove<CreateLineRequestComponent>();
+					} else {
+						line = GetLineUnderMouse();
+					}
 					if (line != null) {
 						Utils.ChangeCursorIfDefault(line.RulerOrientation == RulerOrientation.Horizontal ? MouseCursor.SizeNS : MouseCursor.SizeWE);
-						if (sceneView.Input.ConsumeKeyPress(Key.Mouse0)) {
+						if (sceneView.Input.ConsumeKeyPress(Key.Mouse0) || lineCaptured) {
 							SceneView.Instance.Components.GetOrAdd<LineSelectionComponent>().Line = line;
+							Window.Current.Invalidate();
+							Ruler.Lines.Remove(line);
 							while (Window.Current.Input.IsMousePressed()) {
-								var mousePos = container.LocalMousePosition();
-								var step = 1f;
-								if (sceneView.Input.IsKeyPressed(Key.Shift)) {
-									step = (float)Math.Truncate(RulersWidget.CalculateEffectiveStep()) /
-										  (RulersWidget.SegmentsTesselation * (1 << (RulersWidget.SegmentLevelsCount - 1)));
-								}
-								var pos = new Vector2(Utils.RoundTo(mousePos.X, step), Utils.RoundTo(mousePos.Y, step));
-								line.MakePassingThroughPoint(pos);
-								Window.Current.Invalidate();
+								SnapLineToNearestPoint(line, hulls);
 								yield return null;
 							}
+							Ruler.Lines.Add(line);
+							Window.Current.Invalidate();
 							SceneView.Instance.Components.Remove<LineSelectionComponent>();
 						} else if (Window.Current.Input.WasMouseReleased(1)) {
 							ProjectUserPreferences.Instance.ActiveRuler.Lines.Remove(line);
@@ -47,11 +58,44 @@ namespace Tangerine.UI.SceneView
 			}
 		}
 
+		public static bool IsRulerContainLine(float value, RulerOrientation orientation) =>
+			Ruler.Lines.Any(l => l.RulerOrientation == orientation && Math.Abs(l.Value - value) < Mathf.ZeroTolerance);
+
+		private static void SnapLineToNearestPoint(RulerLine line, IEnumerable<Quadrangle> hulls)
+		{
+			var step = 1f;
+			var mousePos = container.LocalMousePosition();
+			if (!sceneView.Input.IsKeyPressed(Key.Shift)) {
+				step = (float)Math.Truncate(RulersWidget.CalculateEffectiveStep()) / RulersWidget.Tesselation;
+			}
+			var curValue = new Vector2(Utils.RoundTo(mousePos.X, step), Utils.RoundTo(mousePos.Y, step));
+
+			if (SceneViewCommands.SnapRulerLinesToWidgets.Checked) {
+				var mask = line.RulerOrientation.GetDirection();
+				foreach (var hull in hulls) {
+					for (int i = 0; i < 4; i++) {
+						if (((hull[i] - mousePos) * mask).Length < ((mousePos - curValue) * mask).Length &&
+							!IsRulerContainLine(line.RulerOrientation.GetComponentFor(hull[i]), line.RulerOrientation)
+						) {
+							line.MakePassingThroughPoint(hull[i]);
+							Window.Current.Invalidate();
+							return;
+						}
+					}
+				}
+			}
+
+			if (!IsRulerContainLine(line.RulerOrientation.GetComponentFor(curValue), line.RulerOrientation)) {
+				line.MakePassingThroughPoint(curValue);
+				Window.Current.Invalidate();
+			}
+		}
+
 		private RulerLine GetLineUnderMouse()
 		{
 			var pos = SceneView.Instance.Scene.LocalMousePosition();
 			return ProjectUserPreferences.Instance.ActiveRuler.Lines.FirstOrDefault(line => {
-				var mask = line.RulerOrientation == RulerOrientation.Vertical ? Vector2.Right : Vector2.Down;
+				var mask = line.RulerOrientation.GetDirection();
 				return ((line.GetClosestPointToOrigin() - pos) * mask).Length <= Threshold / sceneView.Scene.Scale.X;
 			});
 		}
