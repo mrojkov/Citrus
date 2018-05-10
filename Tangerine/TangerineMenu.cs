@@ -201,6 +201,7 @@ namespace Tangerine
 		{
 			rulerMenu.Clear();
 			rulerMenu.Add(SceneViewCommands.ToggleDisplayRuler);
+			rulerMenu.Add(SceneViewCommands.ClearActiveRuler);
 			rulerMenu.Add(SceneViewCommands.SaveCurrentRuler);
 			rulerMenu.Add(SceneViewCommands.ManageRulers);
 			rulerMenu.Add(Command.MenuSeparator);

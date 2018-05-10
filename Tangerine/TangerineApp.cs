@@ -440,12 +440,20 @@ namespace Tangerine
 			h.Connect(SceneViewCommands.SnapWidgetBorderToRuler, new SnapWidgetBorderCommandHandler());
 			h.Connect(SceneViewCommands.SnapWidgetPivotToRuler, new SnapWidgetPivotCommandHandler());
 			h.Connect(SceneViewCommands.SnapRulerLinesToWidgets, new SnapRulerLinesToWidgetCommandHandler());
+			h.Connect(SceneViewCommands.ClearActiveRuler, ClearActiveRuler);
 			h.Connect(SceneViewCommands.ManageRulers, new ManageRulers());
 		}
 
 		private static bool IsCopyPasteAllowedForSelection()
 		{
 			return Document.Current?.TopLevelSelectedRows().Any(row => row.IsCopyPasteAllowed()) ?? false;
+		}
+
+		private void ClearActiveRuler()
+		{
+			if (new AlertDialog("Are you sure you want to clear active ruler?", "Yes", "No").Show() == 0) {
+				ProjectUserPreferences.Instance.ActiveRuler.Lines.Clear();
+			}
 		}
 
 		private class SnapWidgetPivotCommandHandler : DocumentCommandHandler
