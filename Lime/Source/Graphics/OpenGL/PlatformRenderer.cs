@@ -817,6 +817,11 @@ namespace Lime
 					lastStencilState.Enable = stencilState.Enable;
 				}
 				if (force || stencilState.Enable) {
+					if (force || stencilState.WriteMask != lastStencilState.WriteMask) {
+						GL.StencilMask(stencilState.WriteMask);
+						CheckErrors();
+						lastStencilState.WriteMask = stencilState.WriteMask;
+					}
 					if (force ||
 						stencilState.FrontFaceDepthFail != lastStencilState.FrontFaceDepthFail ||
 						stencilState.FrontFaceFail != lastStencilState.FrontFaceFail ||
