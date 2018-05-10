@@ -22,6 +22,10 @@ namespace Lime
 
 		public int PassCount => 1;
 
+		private ShaderParams[] shaderParamsArray;
+		private ShaderParams shaderParams;
+		private ShaderParamKeys shaderParamKeys;
+
 		private bool skinEnabled = false;
 		private DepthBufferProgram program;
 		private Matrix44[] boneTransforms;
@@ -30,19 +34,21 @@ namespace Lime
 		public DepthBuffer()
 		{
 			ColorFactor = Color4.White;
+			shaderParams = new ShaderParams();
+			shaderParamKeys = new ShaderParamKeys(shaderParams);
+			shaderParamsArray = new[] { Renderer.GlobalShaderParams, shaderParams };
 		}
-		
+
 		public void Apply(int pass)
 		{
-			PlatformRenderer.SetBlending(Blending.Alpha);
 			PrepareShaderProgram();
-			program.Use();
-
+			shaderParams.Set(shaderParamKeys.LightWorldViewProj, Renderer.FixupWVP(Renderer.World * ViewProjection));
 			if (skinEnabled) {
-				program.LoadMatrixArray(program.BonesUniformId, boneTransforms, boneCount);
+				shaderParams.Set(shaderParamKeys.Bones, boneTransforms, boneCount);
 			}
-
-			program.LoadMatrix(program.LightWorldViewProjUniformId, Renderer.FixupWVP(Renderer.World * ViewProjection));
+			PlatformRenderer.SetBlendState(Blending.Alpha.GetBlendState());
+			PlatformRenderer.SetShaderProgram(program);
+			PlatformRenderer.SetShaderParams(shaderParamsArray);
 		}
 		
 		private void PrepareShaderProgram()
@@ -50,7 +56,6 @@ namespace Lime
 			if (program != null) {
 				return;
 			}
-
 			program = new DepthBufferProgram(skinEnabled);
 		}
 
@@ -70,6 +75,18 @@ namespace Lime
 		{
 			this.boneTransforms = boneTransforms;
 			this.boneCount = boneCount;
+		}
+
+		private class ShaderParamKeys
+		{
+			public readonly ShaderParamKey<Matrix44> Bones;
+			public readonly ShaderParamKey<Matrix44> LightWorldViewProj;
+
+			public ShaderParamKeys(ShaderParams parameters)
+			{
+				Bones = parameters.GetParamKey<Matrix44>("u_Bones");
+				LightWorldViewProj = parameters.GetParamKey<Matrix44>("u_LightWorldViewProj");
+			}
 		}
 	}
 }

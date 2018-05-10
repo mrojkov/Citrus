@@ -14,7 +14,7 @@ namespace Lime
 	public class LightSource : Node3D
 	{
 		public IntVector2 ShadowMapSize
-		{ get { return lightViewport.Size; } }
+		{ get { return lightViewport.Bounds.Size; } }
 
 		public ITexture ShadowMap
 		{ get { return depthBufferRenderer?.Texture ?? null; } }
@@ -51,10 +51,7 @@ namespace Lime
 					shadowMapQuality = value;
 					depthBufferRenderer = null;
 					recalcViewProjection = true;
-					lightViewport = new WindowRect() {
-						Width = depthTextureSize,
-						Height = depthTextureSize
-					};
+					lightViewport = new Viewport(0, 0, depthTextureSize, depthTextureSize);
 				}
 			}
 		}
@@ -172,7 +169,7 @@ namespace Lime
 		private Matrix44 lightView;
 		private Matrix44 lightProjection;
 		private Matrix44 lightViewProjection;
-		private WindowRect lightViewport;
+		private Viewport lightViewport;
 		private float intensity = 1.0f;
 		private float ambient = 0.05f;
 		private float strength = 1f;

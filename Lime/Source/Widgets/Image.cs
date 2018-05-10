@@ -34,6 +34,8 @@ namespace Lime
 		[YuzuMember]
 		public Vector2 UV1 { get; set; }
 
+		public IMaterial CustomMaterial { get; set; }
+
 		public Image()
 		{
 			Presenter = DefaultPresenter.Instance;
@@ -118,14 +120,10 @@ namespace Lime
 			var blending = GlobalBlending;
 			var shader = GlobalShader;
 			if (material == null) {
-				material = WidgetMaterial.GetInstance(blending, shader, null, Texture);
+				material = WidgetMaterial.GetInstance(blending, shader, 1);
 			}
 			Renderer.Transform1 = LocalToWorldTransform;
-			var uv0 = UV0;
-			var uv1 = UV1;
-			texture.TransformUVCoordinatesToAtlasSpace(ref uv0);
-			texture.TransformUVCoordinatesToAtlasSpace(ref uv1);
-			Renderer.DrawSprite(material, GlobalColor, ContentPosition, ContentSize, uv0, uv1, Vector2.Zero, Vector2.Zero);
+			Renderer.DrawSprite(texture, null, CustomMaterial ?? material, GlobalColor, ContentPosition, ContentSize, UV0, UV1, Vector2.Zero, Vector2.Zero);
 		}
 
 		public bool IsNotRenderTexture()

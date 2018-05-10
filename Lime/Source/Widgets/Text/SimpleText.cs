@@ -503,30 +503,14 @@ namespace Lime
 		{
 			public static readonly ColorfulMaterialProvider Instance = new ColorfulMaterialProvider();
 
-			private Blending blending;
-			private ITexture texture;
-			private int paletteIndex;
 			private IMaterial material;
 			
 			public void Init(Blending blending, int paletteIndex)
 			{
-				this.blending = blending;
-				this.paletteIndex = paletteIndex;
-				texture = null;
-				material = null;
+				material = ColorfulTextMaterial.GetInstance(blending, paletteIndex);
 			}
-			
-			public IMaterial GetMaterial(ITexture texture, int tag)
-			{
-				if (texture != this.texture) {
-					this.texture = texture;
-					var shaderProg = ShaderPrograms.ColorfulTextShaderProgram.GetShaderProgram(paletteIndex);
-					material = WidgetMaterial.GetInstance(
-						blending, shaderProg, texture, 
-						ShaderPrograms.ColorfulTextShaderProgram.GradientRampTexture);
-				}
-				return material;
-			}
+
+			public IMaterial GetMaterial(int tag) => material;
 		}
 	}
 }

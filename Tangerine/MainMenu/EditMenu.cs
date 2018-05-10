@@ -110,17 +110,17 @@ namespace Tangerine
 	{
 		public override void Execute()
 		{
-			var nodes = Document.Current?.SelectedNodes().Editable().ToList();
-			var container = Document.Current.Container;
-			Core.Operations.ClearRowSelection.Perform();
-			foreach (var node in nodes) {
-				var clone = node.Clone();
-				var loc = container.RootFolder().Find(node);
-				Core.Operations.UnlinkFolderItem.Perform(container, node);
-				Core.Operations.InsertFolderItem.Perform(container, loc, clone);
-				new MorphableMeshBuilder().BuildNodeContents(clone, MorphableMeshBuilder.Options.None);
-				Core.Operations.SelectNode.Perform(clone);
-			}
+			//var nodes = Document.Current?.SelectedNodes().Editable().ToList();
+			//var container = Document.Current.Container;
+			//Core.Operations.ClearRowSelection.Perform();
+			//foreach (var node in nodes) {
+			//	var clone = node.Clone();
+			//	var loc = container.RootFolder().Find(node);
+			//	Core.Operations.UnlinkFolderItem.Perform(container, node);
+			//	Core.Operations.InsertFolderItem.Perform(container, loc, clone);
+			//	new MorphableMeshBuilder().BuildNodeContents(clone, MorphableMeshBuilder.Options.None);
+			//	Core.Operations.SelectNode.Perform(clone);
+			//}
 		}
 	}
 

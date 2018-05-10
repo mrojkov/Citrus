@@ -254,99 +254,63 @@ namespace GeneratedDeserializersBIN
 			return result;
 		}
 
-		private static void Read_Lime__Mesh(BinaryDeserializer d, ReaderClassDef def, object obj)
+		private static void Read_Lime__Mesh_Mesh3D__Vertex(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
-			var result = (global::Lime.Mesh)obj;
+			var result = (global::Lime.Mesh<global::Lime.Mesh3D.Vertex>)obj;
 			var dg = (BinaryDeserializerGen)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
-				result.IndexBuffer = (global::Lime.IIndexBuffer)dg.ReadObject<global::Lime.IIndexBuffer>();
+				result.AttributeLocations = (global::System.Int32[])null;
+				var tmp1 = d.Reader.ReadInt32();
+				if (tmp1 >= 0) {
+					var tmp2 = new global::System.Int32[tmp1];
+					for(tmp1 = 0; tmp1 < tmp2.Length; ++tmp1) {
+						tmp2[tmp1] = d.Reader.ReadInt32();
+					}
+					result.AttributeLocations = tmp2;
+				}
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.VertexBuffers = (global::Lime.IVertexBuffer[])null;
-				var tmp1 = d.Reader.ReadInt32();
-				if (tmp1 >= 0) {
-					var tmp2 = new global::Lime.IVertexBuffer[tmp1];
-					for(tmp1 = 0; tmp1 < tmp2.Length; ++tmp1) {
-						tmp2[tmp1] = (global::Lime.IVertexBuffer)dg.ReadObject<global::Lime.IVertexBuffer>();
+				result.DirtyFlags = (global::Lime.MeshDirtyFlags)d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (3 == fd.OurIndex) {
+				result.Indices = (global::System.UInt16[])null;
+				var tmp3 = d.Reader.ReadInt32();
+				if (tmp3 >= 0) {
+					var tmp4 = new global::System.UInt16[tmp3];
+					for(tmp3 = 0; tmp3 < tmp4.Length; ++tmp3) {
+						tmp4[tmp3] = d.Reader.ReadUInt16();
 					}
-					result.VertexBuffers = tmp2;
+					result.Indices = tmp4;
+				}
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (4 == fd.OurIndex) {
+				result.Topology = (global::Lime.PrimitiveTopology)d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (5 == fd.OurIndex) {
+				result.Vertices = (global::Lime.Mesh3D.Vertex[])null;
+				var tmp5 = d.Reader.ReadInt32();
+				if (tmp5 >= 0) {
+					var tmp6 = new global::Lime.Mesh3D.Vertex[tmp5];
+					for(tmp5 = 0; tmp5 < tmp6.Length; ++tmp5) {
+						tmp6[tmp5] = (global::Lime.Mesh3D.Vertex)dg.ReadStruct<global::Lime.Mesh3D.Vertex>();
+					}
+					result.Vertices = tmp6;
 				}
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
 		}
 
-		private static object Make_Lime__Mesh(BinaryDeserializer d, ReaderClassDef def)
+		private static object Make_Lime__Mesh_Mesh3D__Vertex(BinaryDeserializer d, ReaderClassDef def)
 		{
-			var result = new global::Lime.Mesh();
-			Read_Lime__Mesh(d, def, result);
-			return result;
-		}
-
-		private static void Read_Lime__VertexBuffer_Mesh3D__Vertex(BinaryDeserializer d, ReaderClassDef def, object obj)
-		{
-			var result = (global::Lime.VertexBuffer<global::Lime.Mesh3D.Vertex>)obj;
-			var dg = (BinaryDeserializerGen)d;
-			ReaderClassDef.FieldDef fd;
-			fd = def.Fields[d.Reader.ReadInt16()];
-			if (1 == fd.OurIndex) {
-				result.Data = (global::Lime.Mesh3D.Vertex[])null;
-				var tmp1 = d.Reader.ReadInt32();
-				if (tmp1 >= 0) {
-					var tmp2 = new global::Lime.Mesh3D.Vertex[tmp1];
-					for(tmp1 = 0; tmp1 < tmp2.Length; ++tmp1) {
-						tmp2[tmp1] = (global::Lime.Mesh3D.Vertex)dg.ReadStruct<global::Lime.Mesh3D.Vertex>();
-					}
-					result.Data = tmp2;
-				}
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (2 == fd.OurIndex) {
-				result.Dynamic = d.Reader.ReadBoolean();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
-		}
-
-		private static object Make_Lime__VertexBuffer_Mesh3D__Vertex(BinaryDeserializer d, ReaderClassDef def)
-		{
-			var result = new global::Lime.VertexBuffer<global::Lime.Mesh3D.Vertex>();
-			Read_Lime__VertexBuffer_Mesh3D__Vertex(d, def, result);
-			return result;
-		}
-
-		private static void Read_Lime__IndexBuffer(BinaryDeserializer d, ReaderClassDef def, object obj)
-		{
-			var result = (global::Lime.IndexBuffer)obj;
-			var dg = (BinaryDeserializerGen)d;
-			ReaderClassDef.FieldDef fd;
-			fd = def.Fields[d.Reader.ReadInt16()];
-			if (1 == fd.OurIndex) {
-				result.Data = (global::System.UInt16[])null;
-				var tmp1 = d.Reader.ReadInt32();
-				if (tmp1 >= 0) {
-					var tmp2 = new global::System.UInt16[tmp1];
-					for(tmp1 = 0; tmp1 < tmp2.Length; ++tmp1) {
-						tmp2[tmp1] = d.Reader.ReadUInt16();
-					}
-					result.Data = tmp2;
-				}
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (2 == fd.OurIndex) {
-				result.Dynamic = d.Reader.ReadBoolean();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
-		}
-
-		private static object Make_Lime__IndexBuffer(BinaryDeserializer d, ReaderClassDef def)
-		{
-			var result = new global::Lime.IndexBuffer();
-			Read_Lime__IndexBuffer(d, def, result);
+			var result = new global::Lime.Mesh<global::Lime.Mesh3D.Vertex>();
+			Read_Lime__Mesh_Mesh3D__Vertex(d, def, result);
 			return result;
 		}
 
@@ -948,11 +912,10 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (4 == fd.OurIndex) {
-				result.Mesh = (global::Lime.IMesh)dg.ReadObject<global::Lime.IMesh>();
+				result.Mesh = (global::Lime.Mesh<global::Lime.Mesh3D.Vertex>)dg.ReadObject<global::Lime.Mesh<global::Lime.Mesh3D.Vertex>>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
-			result.AfterDeserialization();
 		}
 
 		private static object Make_Lime__Submesh3D(BinaryDeserializer d, ReaderClassDef def)
@@ -6392,9 +6355,7 @@ namespace GeneratedDeserializersBIN
 			readCache[typeof(global::Lime.SerializableSample)] = Read_Lime__SerializableSample;
 			readCache[typeof(global::Lime.FontChar)] = Read_Lime__FontChar;
 			readCache[typeof(global::Lime.SerializableFont)] = Read_Lime__SerializableFont;
-			readCache[typeof(global::Lime.Mesh)] = Read_Lime__Mesh;
-			readCache[typeof(global::Lime.VertexBuffer<global::Lime.Mesh3D.Vertex>)] = Read_Lime__VertexBuffer_Mesh3D__Vertex;
-			readCache[typeof(global::Lime.IndexBuffer)] = Read_Lime__IndexBuffer;
+			readCache[typeof(global::Lime.Mesh<global::Lime.Mesh3D.Vertex>)] = Read_Lime__Mesh_Mesh3D__Vertex;
 			readCache[typeof(global::Lime.Camera3D)] = Read_Lime__Camera3D;
 			readCache[typeof(global::Lime.CommonMaterial)] = Read_Lime__CommonMaterial;
 			readCache[typeof(global::Lime.Mesh3D)] = Read_Lime__Mesh3D;
@@ -6486,9 +6447,7 @@ namespace GeneratedDeserializersBIN
 			makeCache[typeof(global::Lime.Mesh3D.BlendIndices)] = Make_Lime__Mesh3D__BlendIndices;
 			makeCache[typeof(global::Lime.Mesh3D.BlendWeights)] = Make_Lime__Mesh3D__BlendWeights;
 			makeCache[typeof(global::Lime.Mesh3D.Vertex)] = Make_Lime__Mesh3D__Vertex;
-			makeCache[typeof(global::Lime.Mesh)] = Make_Lime__Mesh;
-			makeCache[typeof(global::Lime.VertexBuffer<global::Lime.Mesh3D.Vertex>)] = Make_Lime__VertexBuffer_Mesh3D__Vertex;
-			makeCache[typeof(global::Lime.IndexBuffer)] = Make_Lime__IndexBuffer;
+			makeCache[typeof(global::Lime.Mesh<global::Lime.Mesh3D.Vertex>)] = Make_Lime__Mesh_Mesh3D__Vertex;
 			makeCache[typeof(global::Lime.TextureAtlasElement.Params)] = Make_Lime__TextureAtlasElement__Params;
 			makeCache[typeof(global::Lime.BitSet32)] = Make_Lime__BitSet32;
 			makeCache[typeof(global::Lime.BoundingSphere)] = Make_Lime__BoundingSphere;

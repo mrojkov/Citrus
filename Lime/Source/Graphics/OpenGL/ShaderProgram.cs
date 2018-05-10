@@ -9,6 +9,12 @@ using OpenTK.Graphics.ES20;
 using OpenTK.Graphics.OpenGL;
 #endif
 
+#if ANDROID
+using GetProgramParameterName = OpenTK.Graphics.ES20.ProgramParameter;
+#elif iOS
+using GetProgramParameterName = OpenTK.Graphics.ES20.All;
+#endif
+
 #pragma warning disable 0618
 
 namespace Lime
@@ -28,12 +34,14 @@ namespace Lime
 		}
 
 		private int handle;
-		public int ProjectionMatrixUniformId { get; private set; }
-		private Dictionary<string, int> uniformIds = new Dictionary<string, int>();
 		private List<Shader> shaders = new List<Shader>();
 		private List<AttribLocation> attribLocations;
 		private List<Sampler> samplers;
 
+		private ShaderParam[] paramsToSync;
+		private BoundShaderParam[] boundParams;
+		private Uniform[] uniforms;
+		
 		public ShaderProgram(IEnumerable<Shader> shaders, IEnumerable<AttribLocation> attribLocations, IEnumerable<Sampler> samplers)
 		{
 			this.shaders = new List<Shader>(shaders);
@@ -50,11 +58,17 @@ namespace Lime
 				GL.AttachShader(handle, shader.GetHandle());
 			}
 			foreach (var i in attribLocations) {
-				BindAttribLocation(i.Index, i.Name);
+				GL.BindAttribLocation(handle, i.Index, i.Name);
 			}
 			Link();
+			uniforms = ReflectUniforms().OrderBy(i => i.SortingKey).ToArray();
+			paramsToSync = new ShaderParam[uniforms.Length];
+			boundParams = new BoundShaderParam[uniforms.Length];
+			GL.UseProgram(handle);
+			PlatformRenderer.CheckErrors();
 			foreach (var i in samplers) {
-				BindSampler(i.Name, i.Stage);
+				GL.Uniform1(GL.GetUniformLocation(handle, i.Name), i.Stage);
+				PlatformRenderer.CheckErrors();
 			}
 		}
 
@@ -83,11 +97,6 @@ namespace Lime
 			}
 		}
 
-		private void BindAttribLocation(int index, string name)
-		{
-			GL.BindAttribLocation(handle, index, name);
-		}
-
 		private void Link()
 		{
 			GL.LinkProgram(handle);
@@ -98,24 +107,7 @@ namespace Lime
 				Logger.Write("Shader program link log:\n{0}", infoLog);
 				throw new Lime.Exception(infoLog.ToString());
 			}
-			InitializeUniformIds();
 			PlatformRenderer.CheckErrors();
-		}
-
-		protected virtual void InitializeUniformIds()
-		{
-			ProjectionMatrixUniformId = GetUniformId("matProjection");
-		}
-
-		public int GetUniformId(string name)
-		{
-			int id;
-			if (uniformIds.TryGetValue(name, out id)) {
-				return id;
-			}
-			id = GL.GetUniformLocation(handle, name);
-			uniformIds[name] = id;
-			return id;
 		}
 
 		private string GetLinkLog()
@@ -132,118 +124,205 @@ namespace Lime
 			return "";
 		}
 
-		public void Use()
+		internal int GetHandle()
 		{
 			if (handle == 0) {
 				Create();
 			}
-			GL.UseProgram(handle);
-			LoadUniformValues();
+			return handle;
 		}
 
-		protected virtual void LoadUniformValues()
+		internal unsafe void SyncParams(ShaderParams[] paramsArray, int count)
 		{
-		}
-
-		public void LoadMatrix(int uniformId, Matrix44 matrix)
-		{
-			unsafe {
-				float* p = (float*)&matrix;
-				GL.UniformMatrix4(uniformId, 1, false, p);
+			Array.Clear(paramsToSync, 0, paramsToSync.Length);
+			for (var i = count - 1; i >= 0; i--) {
+				var @params = paramsArray[i];
+				var k = 0;
+				for (var j = 0; j < uniforms.Length; j++) {
+					if (paramsToSync[j] != null) {
+						continue;
+					}
+					var uniformReflections = uniforms[j];
+					while (k < @params.Count && uniformReflections.SortingKey > @params.SortingKeys[k]) {
+						k++;
+					}
+					if (k == @params.Count) {
+						break;
+					}
+					if (uniformReflections.SortingKey == @params.SortingKeys[k]) {
+						paramsToSync[j] = @params.Params[k];
+					}
+				}
+			}
+			for (var i = 0; i < paramsToSync.Length; i++) {
+				var param = paramsToSync[i];
+				if (param == null) {
+					continue;
+				}
+				if (param == boundParams[i].Param &&
+					param.Version == boundParams[i].Version
+				) {
+					continue;
+				}
+				var uniform = uniforms[i];
+				switch (uniform.Type) {
+					case ActiveUniformType.Float:
+						SyncFloat(uniform.Location, (ShaderParam<float>)param);
+						break;
+					case ActiveUniformType.FloatVec2:
+						SyncFloatVector2(uniform.Location, (ShaderParam<Vector2>)param);
+						break;
+					case ActiveUniformType.FloatVec3:
+						SyncFloatVector3(uniform.Location, (ShaderParam<Vector3>)param);
+						break;
+					case ActiveUniformType.FloatVec4:
+						SyncFloatVector4(uniform.Location, (ShaderParam<Vector4>)param);
+						break;
+					case ActiveUniformType.FloatMat4:
+						SyncFloatMatrix4x4(uniform.Location, (ShaderParam<Matrix44>)param);
+						break;
+					case ActiveUniformType.Bool:
+					case ActiveUniformType.Int:
+						SyncInt(uniform.Location, (ShaderParam<int>)param);
+						break;
+					case ActiveUniformType.BoolVec2:
+					case ActiveUniformType.IntVec2:
+						SyncIntVector2(uniform.Location, (ShaderParam<IntVector2>)param);
+						break;
+				}
+				boundParams[i] = new BoundShaderParam {
+					Param = param,
+					Version = param.Version
+				};
 			}
 		}
 
-		public void LoadMatrixArray(int uniformId, Matrix44[] matrices)
+		private unsafe void SyncFloat(int location, ShaderParam<float> param)
 		{
-			LoadMatrixArray(uniformId, matrices, matrices.Length);
+			fixed (float* dataPtr = param.Data) {
+				GL.Uniform1(location, param.Count, dataPtr);
+				PlatformRenderer.CheckErrors();
+			}
 		}
 
-		public void LoadMatrixArray(int uniformId, Matrix44[] matrices, int count)
+		private unsafe void SyncFloatVector2(int location, ShaderParam<Vector2> param)
 		{
-			unsafe {
-				fixed (Matrix44* p = matrices) {
-					GL.UniformMatrix4(uniformId, count, false, (float*)p);
+			fixed (Vector2* dataPtr = param.Data) {
+				GL.Uniform2(location, param.Count, (float*)dataPtr);
+				PlatformRenderer.CheckErrors();
+			}
+		}
+
+		private unsafe void SyncFloatVector3(int location, ShaderParam<Vector3> parameter)
+		{
+			fixed (Vector3* dataPtr = parameter.Data) {
+				GL.Uniform3(location, parameter.Count, (float*)dataPtr);
+				PlatformRenderer.CheckErrors();
+			}
+		}
+
+		private unsafe void SyncFloatVector4(int location, ShaderParam<Vector4> param)
+		{
+			fixed (Vector4* dataPtr = param.Data) {
+				GL.Uniform4(location, param.Count, (float*)dataPtr);
+				PlatformRenderer.CheckErrors();
+			}
+		}
+
+		private unsafe void SyncFloatMatrix4x4(int location, ShaderParam<Matrix44> param)
+		{
+			fixed (Matrix44* dataPtr = param.Data) {
+				GL.UniformMatrix4(location, param.Count, false, (float*)dataPtr);
+				PlatformRenderer.CheckErrors();
+			}
+		}
+
+		private unsafe void SyncInt(int location, ShaderParam<int> param)
+		{
+			fixed (int* dataPtr = param.Data) {
+				GL.Uniform1(location, param.Count, dataPtr);
+				PlatformRenderer.CheckErrors();
+			}
+		}
+
+		private unsafe void SyncIntVector2(int location, ShaderParam<IntVector2> param)
+		{
+			fixed (IntVector2* dataPtr = param.Data) {
+				GL.Uniform2(location, param.Count, (int*)dataPtr);
+				PlatformRenderer.CheckErrors();
+			}
+		}
+
+		private IEnumerable<Uniform> ReflectUniforms()
+		{
+			int count, maxNameLength;
+			GL.GetProgram(handle, GetProgramParameterName.ActiveUniforms, out count);
+			GL.GetProgram(handle, GetProgramParameterName.ActiveUniformMaxLength, out maxNameLength);
+			var sb = new StringBuilder(maxNameLength);
+			for (var i = 0; i < count; i++) {
+				sb.Clear();
+				int size, nameLength;
+				ActiveUniformType type;
+				GL.GetActiveUniform(handle, i, maxNameLength, out nameLength, out size, out type, sb);
+				var name = AdjustUniformName(sb.ToString());
+				if (type != ActiveUniformType.Sampler2D &&
+					type != ActiveUniformType.SamplerCube
+				) {
+					yield return new Uniform {
+						Type = type,
+						SortingKey = GetSortingKey(name, type),
+						Location = GL.GetUniformLocation(handle, name)
+					};
 				}
 			}
 		}
 
-		public void LoadFloat(int uniformId, float value)
+		private static int GetSortingKey(string name, ActiveUniformType type)
 		{
-			GL.Uniform1(uniformId, value);
-		}
-
-		public void LoadInteger(int uniformId, int value)
-		{
-			GL.Uniform1(uniformId, value);
-		}
-
-		public void LoadBoolean(int uniformId, bool value)
-		{
-			GL.Uniform1(uniformId, value ? 1 : 0);
-		}
-
-		public void LoadVector2(int uniformId, Vector2 vector)
-		{
-			GL.Uniform2(uniformId, vector.X, vector.Y);
-		}
-
-		public void LoadVector2Array(int uniformId, Vector2[] vectors)
-		{
-			unsafe
-			{
-				fixed (Vector2* p = vectors) {
-					GL.Uniform2(uniformId, vectors.Length, (float*)p);
-				}
+			switch (type) {
+				case ActiveUniformType.Bool:
+				case ActiveUniformType.Int:
+					return ShaderParams.GetSortingKey(name, typeof(int));
+				case ActiveUniformType.BoolVec2:
+				case ActiveUniformType.IntVec2:
+					return ShaderParams.GetSortingKey(name, typeof(IntVector2));
+				case ActiveUniformType.Float:
+					return ShaderParams.GetSortingKey(name, typeof(float));
+				case ActiveUniformType.FloatVec2:
+					return ShaderParams.GetSortingKey(name, typeof(Vector2));
+				case ActiveUniformType.FloatVec3:
+					return ShaderParams.GetSortingKey(name, typeof(Vector3));
+				case ActiveUniformType.FloatVec4:
+					return ShaderParams.GetSortingKey(name, typeof(Vector4));
+				case ActiveUniformType.FloatMat4:
+					return ShaderParams.GetSortingKey(name, typeof(Matrix44));
+				default:
+					throw new NotSupportedException();
 			}
 		}
 
-		public void LoadVector2Array(int uniformId, Vector2[] vectors, int length)
+		private static string AdjustUniformName(string name)
 		{
-			unsafe
-			{
-				fixed (Vector2* p = vectors) {
-					GL.Uniform2(uniformId, length, (float*)p);
-				}
+			var arraySign = name.IndexOf('[');
+			if (arraySign >= 0) {
+				name = name.Remove(arraySign);
 			}
-		}
-
-		public void LoadFloatArray(int uniformId, float[] value)
-		{
-			GL.Uniform1(uniformId, value.Length, value);
-		}
-
-		public void LoadFloatArray(int uniformId, float[] value, int length)
-		{
-			GL.Uniform1(uniformId, length, value);
-		}
-
-		public void LoadVector3(int uniformId, Vector3 vector)
-		{
-			GL.Uniform3(uniformId, vector.X, vector.Y, vector.Z);
-		}
-
-		public void LoadVector4(int uniformId, Vector4 vector)
-		{
-			GL.Uniform4(uniformId, vector.X, vector.Y, vector.Z, vector.W);
-		}
-
-		public void LoadColor(int uniformId, Color4 color)
-		{
-#if !MAC && !MONOMAC
-			GL.Uniform4(uniformId, new OpenTK.Graphics.Color4(color.R, color.G, color.B, color.A));
-#elif MAC
-			GL.Uniform4(uniformId, color.R / 255f, color.G / 255f, color.B / 255f, color.A / 255f);
-#elif MONOMAC
-			GL.Uniform4(uniformId, new MonoMac.OpenGL.Vector4(color.R, color.G, color.B, color.A));
-#endif
-		}
-
-		private void BindSampler(string name, int stage)
-		{
-			Use();
-			GL.Uniform1(GL.GetUniformLocation(handle, name), stage);
-			PlatformRenderer.CheckErrors();
+			return name;
 		}
 	}
+
+	internal struct Uniform
+	{
+		public ActiveUniformType Type;
+		public int SortingKey;
+		public int Location;
+	}
+
+	internal struct BoundShaderParam
+	{
+		public ShaderParam Param;
+		public int Version;
+	}
 }
+
 #endif

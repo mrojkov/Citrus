@@ -28,9 +28,6 @@ namespace Lime
 		Diffuse,
 		Silhuette,
 		InversedSilhuette,
-
-		[TangerineIgnore]
-		Custom,
 	}
 
 	public enum LineCap
@@ -38,34 +35,6 @@ namespace Lime
 		Butt,
 		Round,
 		Square
-	}
-
-	public enum CullMode
-	{
-		None,
-		CullClockwise,
-		CullCounterClockwise
-	}
-	
-	[Flags]
-	public enum ColorMask
-	{
-		None = 0,
-		Red = 1,
-		Green = 2,
-		Blue = 4,
-		Alpha = 8,
-		All = Red | Green | Blue | Alpha
-	}
-
-	[Flags]
-	public enum ClearTarget
-	{
-		None = 0,
-		ColorBuffer = 1,
-		DepthBuffer = 2,
-		StencilBuffer = 4,
-		All = ColorBuffer | DepthBuffer | StencilBuffer
 	}
 
 	public struct WindowRect : IEquatable<WindowRect>
@@ -92,6 +61,16 @@ namespace Lime
 			return new IntRectangle(r.X, r.Y, r.X + r.Width, r.Y + r.Height);
 		}
 
+		public static bool operator ==(WindowRect lhs, WindowRect rhs)
+		{
+			return lhs.Equals(rhs);
+		}
+
+		public static bool operator !=(WindowRect lhs, WindowRect rhs)
+		{
+			return !lhs.Equals(rhs);
+		}
+
 		public bool Equals(WindowRect other)
 		{
 			return X == other.X && Y == other.Y && Width == other.Width && Height == other.Height;
@@ -109,6 +88,8 @@ namespace Lime
 
 	public static class Renderer
 	{
+		private static ShaderParamKey<Matrix44> projectionParamKey;
+
 		private static Matrix44 world = Matrix44.Identity;
 		private static Matrix44 view = Matrix44.Identity;
 		private static Matrix44 proj = Matrix44.Identity;
@@ -121,28 +102,29 @@ namespace Lime
 		private static bool viewProjDirty = true;
 
 		private static Matrix32 transform2 = Matrix32.Identity;
-		private static WindowRect viewport;
-		private static WindowRect scissorRectangle = new WindowRect();
-		private static bool scissorTestEnabled = false;
-		private static bool zTestEnabled = false;
-		private static bool zWriteEnabled = true;
-		private static ColorMask colorWriteEnabled = ColorMask.All;
+		private static Viewport viewport;
+		private static ColorWriteMask colorWriteEnabled = ColorWriteMask.All;
 		private static bool Transform2Active;
 		private static CullMode cullMode;
-		private static StencilParams stencilParams;
+		private static DepthState depthState;
+		private static StencilState stencilState;
+		private static ScissorState scissorState;
 
 		public static Blending Blending;
 		public static ShaderId Shader;
-		public static ShaderProgram CustomShaderProgram;
 		public static Matrix32 Transform1;
 		public static int RenderCycle { get; private set; }
-		public static int DrawCalls = 0;
 		public static int PolyCount3d = 0;
 		public static readonly RenderList MainRenderList = new RenderList();
 		public static RenderList CurrentRenderList;
 #if ANDROID
 		public static bool AmazonBindTextureWorkaround;
 #endif
+
+		public static int DrawCalls => PlatformRenderer.DrawCount;
+
+		public static readonly ShaderParams GlobalShaderParams = new ShaderParams();
+
 		public static Matrix44 World
 		{
 			get { return world; }
@@ -150,7 +132,6 @@ namespace Lime
 			{
 				world = value;
 				worldViewDirty = worldViewProjDirty = true;
-				PlatformRenderer.InvalidateShaderProgram();
 			}
 		}
 
@@ -161,7 +142,6 @@ namespace Lime
 			{
 				view = value;
 				viewProjDirty = worldViewDirty = worldViewProjDirty = true;
-				PlatformRenderer.InvalidateShaderProgram();
 			}
 		}
 
@@ -172,7 +152,8 @@ namespace Lime
 			{
 				proj = value;
 				viewProjDirty = worldViewProjDirty = true;
-				PlatformRenderer.InvalidateShaderProgram();
+				Flush();
+				GlobalShaderParams.Set(projectionParamKey, FixupWVP(proj));
 			}
 		}
 
@@ -222,90 +203,61 @@ namespace Lime
 			}
 		}
 
-		public static WindowRect ScissorRectangle
+		public static ScissorState ScissorState
 		{
-			get { return scissorRectangle; }
+			get { return scissorState; }
 			set
 			{
 				MainRenderList.Flush();
-				scissorRectangle = value;
-				PlatformRenderer.SetScissorRectangle(value);
-			}
-		}
-
-		public static bool ScissorTestEnabled
-		{
-			get { return scissorTestEnabled; }
-			set
-			{
-				MainRenderList.Flush();
-				scissorTestEnabled = value;
-				PlatformRenderer.EnableScissorTest(value);
+				scissorState = value;
+				PlatformRenderer.SetScissorState(value);
 			}
 		}
 		
-		public static StencilParams StencilParams
+		public static StencilState StencilState
 		{
-			get { return stencilParams; }
+			get { return stencilState; }
 			set
 			{
-				if (!stencilParams.Equals(value)) {
-					stencilParams = value;
-					MainRenderList.Flush();
-					PlatformRenderer.SetStencilParams(value);
-				}
+				MainRenderList.Flush();
+				stencilState = value;
+				PlatformRenderer.SetStencilState(value);
 			}
 		}
 
-		public static WindowRect Viewport
+		public static Viewport Viewport
 		{
 			get { return viewport; }
 			set
 			{
+				MainRenderList.Flush();
 				viewport = value;
 				PlatformRenderer.SetViewport(value);
 			}
 		}
 
-		public static bool ZTestEnabled
+		public static DepthState DepthState
 		{
-			get { return zTestEnabled; }
+			get { return depthState; }
 			set
 			{
-				if (zTestEnabled != value) {
-					Flush();
-					zTestEnabled = value;
-					PlatformRenderer.EnableZTest(value);
-				}
+				MainRenderList.Flush();
+				depthState = value;
+				PlatformRenderer.SetDepthState(depthState);
 			}
 		}
 
-		public static bool ZWriteEnabled
-		{
-			get { return zWriteEnabled; }
-			set
-			{
-				if (zWriteEnabled != value) {
-					Flush();
-					zWriteEnabled = value;
-					PlatformRenderer.EnableZWrite(value);
-				}
-			}
-		}
-
-		public static ColorMask ColorWriteEnabled
+		public static ColorWriteMask ColorWriteEnabled
 		{
 			get { return colorWriteEnabled; }
-			set
-			{
+			set {
 				if (colorWriteEnabled != value) {
 					Flush();
 					colorWriteEnabled = value;
-					PlatformRenderer.EnableColorWrite(value);
+					PlatformRenderer.SetColorWriteMask(value);
 				}
 			}
 		}
-
 
 		public static CullMode CullMode
 		{
@@ -318,6 +270,12 @@ namespace Lime
 					PlatformRenderer.SetCullMode(cullMode);
 				}
 			}
+		}
+
+		static Renderer()
+		{
+			projectionParamKey = GlobalShaderParams.GetParamKey<Matrix44>("matProjection");
+			PlatformRenderer.RenderTargetChanged += OnRenderTargetChanged;
 		}
 
 		public static void SetOrthogonalProjection(Vector2 leftTop, Vector2 rightBottom)
@@ -333,7 +291,6 @@ namespace Lime
 		public static void BeginFrame()
 		{
 			PlatformRenderer.BeginFrame();
-			DrawCalls = 0;
 			PolyCount3d = 0;
 			Blending = Blending.None;
 			Shader = ShaderId.None;
@@ -474,7 +431,7 @@ namespace Lime
 		
 		public static void DrawTriangleFan(Vertex[] vertices, int numVertices)
 		{
-			DrawTriangleFan(WidgetMaterial.Diffuse, vertices, numVertices);
+			DrawTriangleFan(null, null, WidgetMaterial.Diffuse, vertices, numVertices);
 		}
 		
 		public static void DrawTriangleFan(ITexture texture1, Vertex[] vertices, int numVertices)
@@ -484,71 +441,49 @@ namespace Lime
 		
 		public static void DrawTriangleFan(ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
 		{
-			var material = WidgetMaterial.GetInstance(Blending, Shader, CustomShaderProgram, texture1, texture2);
-			var batch = DrawTriangleFanHelper(material, vertices, numVertices);
-			var vd = batch.VertexBuffer.Data;
-			for (int i = 0; i < numVertices; i++) {
-				var t = batch.LastVertex - numVertices + i;
-				texture1?.TransformUVCoordinatesToAtlasSpace(ref vd[t].UV1);
-				texture2?.TransformUVCoordinatesToAtlasSpace(ref vd[t].UV2);
-			}
-		}
-		
-		public static void DrawTriangleFan(IMaterial material, Vertex[] vertices, int numVertices)
-		{
-			DrawTriangleFanHelper(material, vertices, numVertices);
+			var material = GetMaterial(GetNumTextures(texture1, texture2));
+			DrawTriangleFan(texture1, texture2, material, vertices, numVertices);
 		}
 
-		private static RenderBatch DrawTriangleFanHelper(IMaterial material, Vertex[] vertices, int numVertices)
+		public static RenderBatch<Vertex> DrawTriangleFan(ITexture texture1, ITexture texture2, IMaterial material, Vertex[] vertices, int numVertices)
 		{
-			var batch = DrawTrianglesHelper(material, vertices, numVertices);
+			var batch = DrawTrianglesHelper(texture1, texture2, material, vertices, numVertices);
 			var baseVertex = batch.LastVertex;
 			int j = batch.LastIndex;
-			var indices = batch.IndexBuffer.Data;
+			var indices = batch.Mesh.Indices;
 			for (int i = 1; i <= numVertices - 2; i++) {
 				indices[j++] = (ushort)(baseVertex);
 				indices[j++] = (ushort)(baseVertex + i);
 				indices[j++] = (ushort)(baseVertex + i + 1);
 				batch.LastIndex += 3;
 			}
-			batch.IndexBuffer.Dirty = true;
+			batch.Mesh.DirtyFlags |= MeshDirtyFlags.Indices;
 			batch.LastVertex += numVertices;
 			return batch;
 		}
 		
 		public static void DrawTriangleStrip(Vertex[] vertices, int numVertices)
 		{
-			DrawTriangleStrip(WidgetMaterial.Diffuse, vertices, numVertices);
+			DrawTriangleStrip(null, null, WidgetMaterial.Diffuse, vertices, numVertices);
 		}
 
 		public static void DrawTriangleStrip(ITexture texture1, Vertex[] vertices, int numVertices)
 		{
 			DrawTriangleStrip(texture1, null, vertices, numVertices);
 		}
-		
+
 		public static void DrawTriangleStrip(ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
 		{
-			var material = WidgetMaterial.GetInstance(Blending, Shader, CustomShaderProgram, texture1, texture2);
-			var batch = DrawTriangleStripHelper(material, vertices, numVertices);
-			var vd = batch.VertexBuffer.Data;
-			for (int i = 0; i < numVertices; i++) {
-				var t = batch.LastVertex - numVertices + i;
-				texture1?.TransformUVCoordinatesToAtlasSpace(ref vd[t].UV1);
-				texture2?.TransformUVCoordinatesToAtlasSpace(ref vd[t].UV2);
-			}
+			var material = GetMaterial(GetNumTextures(texture1, texture2));
+			DrawTriangleStrip(texture1, texture2, material, vertices, numVertices);
 		}
 		
-		public static void DrawTriangleStrip(IMaterial material, Vertex[] vertices, int numVertices)
+		public static RenderBatch<Vertex> DrawTriangleStrip(ITexture texture1, ITexture texture2, IMaterial material, Vertex[] vertices, int numVertices)
 		{
-			DrawTriangleStripHelper(material, vertices, numVertices);
-		}
-		
-		private static RenderBatch DrawTriangleStripHelper(IMaterial material, Vertex[] vertices, int numVertices)
-		{
-			var batch = DrawTrianglesHelper(material, vertices, numVertices);
+			var batch = DrawTrianglesHelper(texture1, texture2, material, vertices, numVertices);
 			var vertex = batch.LastVertex;
 			int j = batch.LastIndex;
-			var indices = batch.IndexBuffer.Data;
+			var indices = batch.Mesh.Indices;
 			for (int i = 0; i < numVertices - 2; i++) {
 				indices[j++] = (ushort)vertex;
 				indices[j++] = (ushort)(vertex + 1);
@@ -556,21 +491,23 @@ namespace Lime
 				vertex++;
 				batch.LastIndex += 3;
 			}
-			batch.IndexBuffer.Dirty = true;
 			batch.LastVertex += numVertices;
+			batch.Mesh.DirtyFlags |= MeshDirtyFlags.Indices;
 			return batch;
 		}
 
-		private static RenderBatch DrawTrianglesHelper(IMaterial material, Vertex[] vertices, int numVertices)
+		private static RenderBatch<Vertex> DrawTrianglesHelper(ITexture texture1, ITexture texture2, IMaterial material, Vertex[] vertices, int numVertices)
 		{
-			var batch = CurrentRenderList.GetBatch(material, numVertices, (numVertices - 2) * 3);
+			var batch = CurrentRenderList.GetBatch<Vertex>(texture1, texture2, material, numVertices, (numVertices - 2) * 3);
 			var transform = GetEffectiveTransform();
-			var vd = batch.VertexBuffer.Data;
-			batch.VertexBuffer.Dirty = true;
+			var vd = batch.Mesh.Vertices;
+			batch.Mesh.DirtyFlags |= MeshDirtyFlags.Vertices;
 			int j = batch.LastVertex;
 			for (int i = 0; i < numVertices; i++, j++) {
 				var v = vertices[i];
 				v.Pos = transform * v.Pos;
+				texture1?.TransformUVCoordinatesToAtlasSpace(ref v.UV1);
+				texture2?.TransformUVCoordinatesToAtlasSpace(ref v.UV2);
 				vd[j] = v;
 			}
 			return batch;
@@ -578,39 +515,33 @@ namespace Lime
 		
 		public static void DrawSprite(ITexture texture1, Color4 color, Vector2 position, Vector2 size, Vector2 uv0, Vector2 uv1)
 		{
-			var material = WidgetMaterial.GetInstance(Blending, Shader, CustomShaderProgram, texture1, null);
-			texture1?.TransformUVCoordinatesToAtlasSpace(ref uv0);
-			texture1?.TransformUVCoordinatesToAtlasSpace(ref uv1);
-			DrawSprite(material, color, position, size, uv0, uv1, Vector2.Zero, Vector2.Zero);
+			DrawSprite(texture1, null, color, position, size, uv0, uv1, Vector2.Zero, Vector2.Zero);
 		}
 		
 		public static void DrawSprite(ITexture texture1, ITexture texture2, Color4 color, Vector2 position, Vector2 size, Vector2 uv0, Vector2 uv1)
 		{
-			var material = WidgetMaterial.GetInstance(Blending, Shader, CustomShaderProgram, texture1, texture2);
-			var uv0t2 = uv0;
-			var uv1t2 = uv1;
-			texture2?.TransformUVCoordinatesToAtlasSpace(ref uv0t2);
-			texture2?.TransformUVCoordinatesToAtlasSpace(ref uv1t2);
-			texture1?.TransformUVCoordinatesToAtlasSpace(ref uv0);
-			texture1?.TransformUVCoordinatesToAtlasSpace(ref uv1);
-			DrawSprite(material, color, position, size, uv0, uv1, uv0t2, uv1t2);
-		}
-	
-		public static void DrawSprite(IMaterial material, Color4 color, Vector2 position, Vector2 size, Vector2 uv0, Vector2 uv1)
-		{
-			DrawSprite(material, color, position, size, uv0, uv1, Vector2.Zero, Vector2.Zero);
+			DrawSprite(texture1, texture2, color, position, size, uv0, uv1, uv0, uv1);
 		}
 
-		public static void DrawSprite(IMaterial material, Color4 color, Vector2 position, Vector2 size, Vector2 uv0t1, Vector2 uv1t1, Vector2 uv0t2, Vector2 uv1t2)
+		public static void DrawSprite(ITexture texture1, ITexture texture2, Color4 color, Vector2 position, Vector2 size, Vector2 uv0t1, Vector2 uv1t1, Vector2 uv0t2, Vector2 uv1t2)
 		{
-			var batch = CurrentRenderList.GetBatch(material, 4, 6);
-			batch.VertexBuffer.Dirty = true;
-			batch.IndexBuffer.Dirty = true;
+			var material = GetMaterial(GetNumTextures(texture1, texture2));
+			DrawSprite(texture1, texture2, material, color, position, size, uv0t1, uv1t1, uv0t2, uv1t2);
+		}
+
+        public static void DrawSprite(ITexture texture1, ITexture texture2, IMaterial material, Color4 color, Vector2 position, Vector2 size, Vector2 uv0t1, Vector2 uv1t1, Vector2 uv0t2, Vector2 uv1t2)
+		{
+			texture1?.TransformUVCoordinatesToAtlasSpace(ref uv0t1);
+			texture1?.TransformUVCoordinatesToAtlasSpace(ref uv1t1);
+			texture2?.TransformUVCoordinatesToAtlasSpace(ref uv0t2);
+			texture2?.TransformUVCoordinatesToAtlasSpace(ref uv1t2);
+			var batch = CurrentRenderList.GetBatch<Vertex>(texture1, texture2, material, 4, 6);
+			batch.Mesh.DirtyFlags |= MeshDirtyFlags.VerticesIndices;
 			int v = batch.LastVertex;
 			int i = batch.LastIndex;
 			batch.LastIndex += 6;
 			batch.LastVertex += 4;
-			var indices = batch.IndexBuffer.Data;
+			var indices = batch.Mesh.Indices;
 			indices[i++] = (ushort)(v + 1);
 			indices[i++] = (ushort)v;
 			indices[i++] = (ushort)(v + 2);
@@ -630,7 +561,7 @@ namespace Lime
 			float x1uy = x1 * matrix.UY;
 			float y1vx = y1 * matrix.VX;
 			float y1vy = y1 * matrix.VY;
-			var vertices = batch.VertexBuffer.Data;
+			var vertices = batch.Mesh.Vertices;
 			vertices[v].Pos = new Vector2 { X = x0ux + y0vx + matrix.TX, Y = x0uy + y0vy + matrix.TY };
 			vertices[v].Color = color;
 			vertices[v].UV1 = uv0t1;
@@ -658,19 +589,24 @@ namespace Lime
 			}
 		}
 
-		public static void Clear(float r, float g, float b, float a)
+		public static void Clear(Color4 color)
 		{
-			Clear(ClearTarget.All, r, g, b, a);
+			Clear(ClearOptions.All, color);
 		}
 
-		public static void Clear(ClearTarget targets)
+		public static void Clear(ClearOptions options)
 		{
-			Clear(targets, 0, 0, 0, 0);
+			Clear(options, Color4.Black);
 		}
 
-		public static void Clear(ClearTarget targets, float r, float g, float b, float a)
+		public static void Clear(ClearOptions options, Color4 color)
 		{
-			PlatformRenderer.Clear(targets, r, g, b, a);
+			PlatformRenderer.Clear(options, color);
+		}
+
+		public static void Clear(ClearOptions options, Color4 color, float depth, byte stencil)
+		{
+			PlatformRenderer.Clear(options, color, depth, stencil);
 		}
 
 		private static Sprite[] batchedSprites = new Sprite[20];
@@ -680,10 +616,10 @@ namespace Lime
 		{
 			var matrix = GetEffectiveTransform();
 			int batchLength = 0;
-			var clipRect = scissorTestEnabled ? CalcLocalScissorAABB(matrix) : new Rectangle();
+			var clipRect = scissorState.Enable ? CalcLocalScissorAABB(matrix) : new Rectangle();
 			for (int t = 0; t <= spriteList.Count; t++) {
 				var s = (t == spriteList.Count) ? sentinelSprite : spriteList[t];
-				if (scissorTestEnabled && s != sentinelSprite) {
+				if (scissorState.Enable && s != sentinelSprite) {
 					if (s.Position.X + s.Size.X < clipRect.A.X ||
 						s.Position.X > clipRect.B.X ||
 						s.Position.Y + s.Size.Y < clipRect.A.Y ||
@@ -691,18 +627,18 @@ namespace Lime
 						continue;
 					}
 				}
-				if (batchLength == 0 || batchLength < batchedSprites.Length && s.Material == batchedSprites[0].Material) {
+				if (batchLength == 0 || batchLength < batchedSprites.Length && s.Texture == batchedSprites[0].Texture && s.Material == batchedSprites[0].Material) {
 					batchedSprites[batchLength++] = s;
 					continue;
 				}
+				var texture = batchedSprites[0].Texture;
 				var material = batchedSprites[0].Material;
-				var batch = CurrentRenderList.GetBatch(material, 4 * batchLength, 6 * batchLength);
+				var batch = CurrentRenderList.GetBatch<Vertex>(texture, null, material, 4 * batchLength, 6 * batchLength);
 				int v = batch.LastVertex;
 				int i = batch.LastIndex;
-				batch.VertexBuffer.Dirty = true;
-				batch.IndexBuffer.Dirty = true;
-				var indices = batch.IndexBuffer.Data;
-				var vertices = batch.VertexBuffer.Data;
+				batch.Mesh.DirtyFlags |= MeshDirtyFlags.VerticesIndices;
+				var indices = batch.Mesh.Indices;
+				var vertices = batch.Mesh.Vertices;
 				for (int j = 0; j < batchLength; j++) {
 					var sprite = batchedSprites[j];
 					var effectiveColor = color * sprite.Color;
@@ -753,7 +689,7 @@ namespace Lime
 				A = new Vector2(viewport.X, viewport.Y),
 				B = new Vector2(viewport.X + viewport.Width, viewport.Y + viewport.Height)
 			};
-			var r = (Rectangle)(IntRectangle)scissorRectangle;
+			var r = (Rectangle)(IntRectangle)scissorState.Bounds;
 			var scissorRect = new Rectangle {
 				A = (r.A - vp.A) / vp.Size,
 				B = (r.B - vp.A) / vp.Size
@@ -804,7 +740,7 @@ namespace Lime
 				staticVertices[2].Pos += d;
 				staticVertices[3].Pos -= d;
 			}
-			DrawTriangleFan(WidgetMaterial.Diffuse, staticVertices, 4);
+			DrawTriangleFan(null, null, WidgetMaterial.Diffuse, staticVertices, 4);
 		}
 
 		static Vector2 GetVectorNormal(Vector2 v)
@@ -818,7 +754,7 @@ namespace Lime
 			staticVertices[1] = new Vertex { Pos = new Vector2(b.X, a.Y), Color = color };
 			staticVertices[2] = new Vertex { Pos = b, Color = color };
 			staticVertices[3] = new Vertex { Pos = new Vector2(a.X, b.Y), Color = color };
-			DrawTriangleFan(WidgetMaterial.Diffuse, staticVertices, 4);
+			DrawTriangleFan(null, null, WidgetMaterial.Diffuse, staticVertices, 4);
 		}
 
 		public static void DrawRect(float x0, float y0, float x1, float y1, Color4 color)
@@ -886,7 +822,7 @@ namespace Lime
 			staticVertices[1] = new Vertex { Pos = new Vector2(b.X, a.Y), Color = gradient.A };
 			staticVertices[2] = new Vertex { Pos = b, Color = gradient.B };
 			staticVertices[3] = new Vertex { Pos = new Vector2(a.X, b.Y), Color = gradient.B };
-			DrawTriangleFan(WidgetMaterial.Diffuse, staticVertices, 4);
+			DrawTriangleFan(null, null, WidgetMaterial.Diffuse, staticVertices, 4);
 		}
 
 		public static void DrawVerticalGradientRect(float x0, float y0, float x1, float y1, ColorGradient gradient)
@@ -905,7 +841,7 @@ namespace Lime
 			staticVertices[1] = new Vertex { Pos = new Vector2(b.X, a.Y), Color = gradient.B };
 			staticVertices[2] = new Vertex { Pos = b, Color = gradient.B };
 			staticVertices[3] = new Vertex { Pos = new Vector2(a.X, b.Y), Color = gradient.A };
-			DrawTriangleFan(WidgetMaterial.Diffuse, staticVertices, 4);
+			DrawTriangleFan(null, null, WidgetMaterial.Diffuse, staticVertices, 4);
 		}
 
 		public static void DrawHorizontalGradientRect(float x0, float y0, float x1, float y1, ColorGradient gradient)
@@ -916,11 +852,6 @@ namespace Lime
 		public static void DrawHorizontalGradientRect(Vector2 a, Vector2 b, Color4 topColor, Color4 bottomColor)
 		{
 			DrawVerticalGradientRect(a, b, new ColorGradient(topColor, bottomColor));
-		}
-
-		public static Matrix44 FixupWVP(Matrix44 projection)
-		{
-			return PlatformRenderer.FixupWVP(projection);
 		}
 
 		public static void DrawVerticalGradientRect(float x0, float y0, float x1, float y1, Color4 topColor, Color4 bottomColor)
@@ -986,7 +917,30 @@ namespace Lime
 					Color = color,
 				}
 			};
-			DrawTriangleFan(WidgetMaterial.GetInstance(Blending.None, ShaderId.Diffuse, texture1: texture), vertices, vertices.Length);
+			DrawTriangleFan(texture, null, WidgetMaterial.GetInstance(Blending.None, ShaderId.Diffuse, texture != null ? 1 : 0), vertices, vertices.Length);
+		}
+
+		private static int GetNumTextures(ITexture texture1, ITexture texture2)
+		{
+			return texture1 != null ? texture2 != null ? 2 : 1 : 0;
+		}
+
+		private static WidgetMaterial GetMaterial(int numTextures)
+		{
+			return WidgetMaterial.GetInstance(Blending, Shader, numTextures);
+		}
+
+		private static void OnRenderTargetChanged()
+		{
+			GlobalShaderParams.Set(projectionParamKey, FixupWVP(proj));
+		}
+
+		public static Matrix44 FixupWVP(Matrix44 projection)
+		{
+			if (PlatformRenderer.OffscreenRendering) {
+				projection *= Matrix44.CreateScale(new Vector3(1, -1, 1));
+			}
+			return projection;
 		}
 	}
 }

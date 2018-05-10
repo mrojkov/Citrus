@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -160,11 +160,16 @@
     <Compile Include="Source\Graphics\Fonts\CompoundFont.cs" />
     <Compile Include="Source\Graphics\Fonts\Font.cs" />
     <Compile Include="Source\Graphics\Fonts\SerializableFont.cs" />
+    <Compile Include="Source\Graphics\GraphicsExtensions.cs" />
     <Compile Include="Source\Graphics\IMesh.cs" />
+    <Compile Include="Source\Graphics\OpenGL\Buffer.cs" />
     <Compile Include="Source\Graphics\OpenGL\Etc2Decoder.cs" />
+    <Compile Include="Source\Graphics\OpenGL\GLExtensions.cs" />
     <Compile Include="Source\Graphics\OpenGL\IGLObject.cs" />
     <Compile Include="Source\Graphics\OpenGL\Mesh.cs" />
+    <Compile Include="Source\Graphics\OpenGL\ShaderParams.cs" />
     <Compile Include="Source\Graphics\OpenGL\Texture2D.Ktx.cs" />
+    <Compile Include="Source\Graphics\VertexInputLayout.cs" />
     <Compile Include="Source\Input\Shortcut.cs" />
     <Compile Include="Source\Input\SoftKeyboard.cs" />
     <Compile Include="Source\Profilers\NodeProfiler.cs" />

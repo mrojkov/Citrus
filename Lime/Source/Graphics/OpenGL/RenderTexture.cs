@@ -20,7 +20,7 @@ namespace Lime
 		RGB565
 	}
 
-	public class RenderTexture : CommonTexture, ITexture, IWidgetMaterialListHolder, IGLObject
+	public class RenderTexture : CommonTexture, ITexture, IGLObject
 	{
 		private uint handle;
 		private uint framebuffer;
@@ -32,12 +32,11 @@ namespace Lime
 
 		private void SetTextureParameter(TextureParameterName name, int value)
 		{
-			PlatformRenderer.PushTexture(handle, 0);
+			GL.ActiveTexture(TextureUnit.Texture0);
+			GL.BindTexture(TextureTarget.Texture2D, handle);
 			GL.TexParameter(TextureTarget.Texture2D, name, value);
-			PlatformRenderer.PopTexture(0);
+			PlatformRenderer.MarkTextureSlotAsDirty(0);
 		}
-		
-		WidgetMaterialList IWidgetMaterialListHolder.WidgetMaterials { get; } = new WidgetMaterialList();
 
 		private TextureParams textureParams = TextureParams.Default;
 		public TextureParams TextureParams
@@ -80,7 +79,8 @@ namespace Lime
 			framebuffer = t[0];
 			GL.GenTextures(1, t);
 			handle = t[0];
-			PlatformRenderer.PushTexture(handle, 0);
+			GL.ActiveTexture(TextureUnit.Texture0);
+			GL.BindTexture(TextureTarget.Texture2D, handle);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, textureParams.MinFilter.ToInt());
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, textureParams.MagFilter.ToInt());
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, textureParams.WrapModeU.ToInt());
@@ -106,8 +106,8 @@ namespace Lime
 			if ((int)GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer) != (int)FramebufferErrorCode.FramebufferComplete)
 				throw new Exception("Failed to create render texture. Framebuffer is incomplete.");
 			AttachRenderBuffer(FramebufferSlot.DepthAttachment, RenderbufferInternalFormat.DepthComponent16, out depthBuffer);
-			Renderer.Clear(0, 0, 0, 0);
-			PlatformRenderer.PopTexture(0);
+			Renderer.Clear(Color4.Black);
+			PlatformRenderer.MarkTextureSlotAsDirty(0);
 			PlatformRenderer.BindFramebuffer(oldFramebuffer);
 			PlatformRenderer.CheckErrors();
 		}
@@ -157,7 +157,6 @@ namespace Lime
 				Window.Current.InvokeOnRendering(() => {
 					GL.DeleteTextures(1, new uint[] { h });
 					PlatformRenderer.CheckErrors();
-					PlatformRenderer.InvalidateTexture(h);
 				});
 				handle = 0;
 			}

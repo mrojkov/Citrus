@@ -113,6 +113,10 @@ namespace Lime
 			DiffuseColor = Color4.White;
 			FogColor = Color4.White;
 			Blending = Blending.Alpha;
+
+			shaderParams = new ShaderParams();
+			shaderParamKeys = new ShaderParamKeys(shaderParams);
+			shaderParamsArray = new[] { Renderer.GlobalShaderParams, shaderParams };
 		}
 
 		public void SetLightData(LightSource data)
@@ -128,48 +132,40 @@ namespace Lime
 
 		public int PassCount => 1;
 
+
+		private ShaderParams[] shaderParamsArray;
+		private ShaderParams shaderParams;
+		private ShaderParamKeys shaderParamKeys;
+
 		public void Apply(int pass)
 		{
-			PlatformRenderer.SetBlending(Blending);
+			var lightWVP = Renderer.World * lightSource.ViewProjection * Matrix44.CreateScale(new Vector3(1, -1, 1));
 			PrepareShaderProgram();
-			program.Use();
-			program.LoadMatrix(program.WorldViewProjUniformId, Renderer.FixupWVP(Renderer.WorldViewProjection));
-			program.LoadColor(program.DiffuseColorUniformId, DiffuseColor);
-			program.LoadMatrix(program.WorldUniformId, Renderer.World);
-
-			if (processLightning && lightSource != null) {
-				program.LoadColor(program.LightColorUniformId, lightSource.Color);
-				program.LoadVector3(program.LightDirectionUniformId, lightSource.Position.Normalized);
-				program.LoadFloat(program.LightIntensityUniformId, lightSource.Intensity);
-				program.LoadFloat(program.LightStrengthUniformId, lightSource.Strength);
-				program.LoadFloat(program.AmbientLightUniformId, lightSource.Ambient);
-
-				if (recieveShadows) {
-					var lightWVP = Renderer.World * lightSource.ViewProjection * Matrix44.CreateScale(new Vector3(1, -1, 1));
-					program.LoadMatrix(program.LightWorldViewProjectionUniformId, lightWVP);
-					program.LoadColor(program.ShadowColorUniformId, lightSource.ShadowColor);
-					PlatformRenderer.SetTexture(lightSource.ShadowMap, CommonMaterialProgram.ShadowMapTextureStage);
-				}
-			}
-
+            shaderParams.Set(shaderParamKeys.World, Renderer.World);
+			shaderParams.Set(shaderParamKeys.WorldView, Renderer.WorldView);
+			shaderParams.Set(shaderParamKeys.WorldViewProj, Renderer.WorldViewProjection);
+			shaderParams.Set(shaderParamKeys.DiffuseColor, DiffuseColor.ToVector4());
+			shaderParams.Set(shaderParamKeys.LightColor, lightSource.Color.ToVector4());
+			shaderParams.Set(shaderParamKeys.LightDirection, lightSource.Position.Normalized);
+			shaderParams.Set(shaderParamKeys.LightIntensity, lightSource.Intensity);
+			shaderParams.Set(shaderParamKeys.LightStrength, lightSource.Strength);
+			shaderParams.Set(shaderParamKeys.LightAmbient, lightSource.Ambient);
+			shaderParams.Set(shaderParamKeys.LightWorldViewProj, lightWVP);
+			shaderParams.Set(shaderParamKeys.ShadowColor, lightSource.ShadowColor.ToVector4());
+			shaderParams.Set(shaderParamKeys.FogColor, FogColor.ToVector4());
+			shaderParams.Set(shaderParamKeys.FogStart, FogStart);
+			shaderParams.Set(shaderParamKeys.FogEnd, FogEnd);
+			shaderParams.Set(shaderParamKeys.FogDensity, FogDensity);
 			if (skinEnabled) {
-				program.LoadMatrixArray(program.BonesUniformId, boneTransforms, boneCount);
+				shaderParams.Set(shaderParamKeys.Bones, boneTransforms, boneCount);
 			}
+			PlatformRenderer.SetBlendState(Blending.GetBlendState());
+			PlatformRenderer.SetTextureLegacy(CommonMaterialProgram.ShadowMapTextureStage, lightSource.ShadowMap);
+			PlatformRenderer.SetTextureLegacy(CommonMaterialProgram.DiffuseTextureStage, diffuseTexture);
+			PlatformRenderer.SetShaderProgram(program);
+			PlatformRenderer.SetShaderParams(shaderParamsArray);
+			PlatformRenderer.SetShaderProgram(program);
 
-			if (fogMode != FogMode.None) {
-				program.LoadMatrix(program.WorldViewUniformId, Renderer.WorldView);
-				program.LoadColor(program.FogColorUniformId, FogColor);
-				if (fogMode == FogMode.Linear) {
-					program.LoadFloat(program.FogStartUniformId, FogStart);
-					program.LoadFloat(program.FogEndUniformId, FogEnd);
-				} else {
-					program.LoadFloat(program.FogDensityUniformId, FogDensity);
-				}
-			}
-
-			if (diffuseTexture != null) {
-				PlatformRenderer.SetTexture(diffuseTexture, CommonMaterialProgram.DiffuseTextureStage);
-			}
 		}
 
 		private void PrepareShaderProgram()
@@ -218,6 +214,46 @@ namespace Lime
 				ProcessLightning = ProcessLightning,
 				RecieveShadows = RecieveShadows
 			};
+		}
+
+		private class ShaderParamKeys
+		{
+			public readonly ShaderParamKey<Matrix44> WorldViewProj;
+			public readonly ShaderParamKey<Matrix44> WorldView;
+			public readonly ShaderParamKey<Matrix44> World;
+			public readonly ShaderParamKey<Vector4> DiffuseColor;
+			public readonly ShaderParamKey<Vector4> LightColor;
+			public readonly ShaderParamKey<Vector3> LightDirection;
+			public readonly ShaderParamKey<float> LightIntensity;
+			public readonly ShaderParamKey<float> LightStrength;
+			public readonly ShaderParamKey<float> LightAmbient;
+			public readonly ShaderParamKey<Matrix44> LightWorldViewProj;
+			public readonly ShaderParamKey<Vector4> ShadowColor;
+			public readonly ShaderParamKey<Matrix44> Bones;
+			public readonly ShaderParamKey<Vector4> FogColor;
+			public readonly ShaderParamKey<float> FogStart;
+			public readonly ShaderParamKey<float> FogEnd;
+			public readonly ShaderParamKey<float> FogDensity;
+
+			public ShaderParamKeys(ShaderParams parameters)
+			{
+				WorldViewProj = parameters.GetParamKey<Matrix44>("u_WorldViewProj");
+				WorldView = parameters.GetParamKey<Matrix44>("u_WorldView");
+				World = parameters.GetParamKey<Matrix44>("u_World");
+				DiffuseColor = parameters.GetParamKey<Vector4>("u_DiffuseColor");
+				LightColor = parameters.GetParamKey<Vector4>("u_LightColor");
+				LightDirection = parameters.GetParamKey<Vector3>("u_LightDirection");
+				LightIntensity = parameters.GetParamKey<float>("u_LightIntensity");
+				LightStrength = parameters.GetParamKey<float>("u_LightStrength");
+				LightAmbient = parameters.GetParamKey<float>("u_AmbientLight");
+				LightWorldViewProj = parameters.GetParamKey<Matrix44>("u_LightWorldViewProjection");
+				ShadowColor = parameters.GetParamKey<Vector4>("u_ShadowColor");
+				Bones = parameters.GetParamKey<Matrix44>("u_Bones");
+				FogColor = parameters.GetParamKey<Vector4>("u_FogColor");
+				FogStart = parameters.GetParamKey<float>("u_FogStart");
+				FogEnd = parameters.GetParamKey<float>("u_FogStart");
+				FogDensity = parameters.GetParamKey<float>("u_FogDensity");
+			}
 		}
 	}
 }

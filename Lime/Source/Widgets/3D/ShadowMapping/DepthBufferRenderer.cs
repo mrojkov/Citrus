@@ -34,24 +34,23 @@ namespace Lime
 			this.depthmat = new DepthBuffer();
 		}
 
-		public void Render(Matrix44 lightView, Matrix44 lightViewProjection, WindowRect lightViewport)
+		public void Render(Matrix44 lightView, Matrix44 lightViewProjection, Viewport lightViewport)
 		{
 			depthmat.ViewProjection = lightViewProjection;
 			map.SetAsRenderTarget();
 
-			Renderer.Clear(1.0f, 1.0f, 1.0f, 1.0f);
+			Renderer.Clear(Color4.White);
 
 			var oldViewport = Renderer.Viewport;
 			var oldWorld = Renderer.World;
 			var oldView = Renderer.View;
 			var oldProj = Renderer.Projection;
-			var oldZTestEnabled = Renderer.ZTestEnabled;
-			var oldZWriteEnabled = Renderer.ZWriteEnabled;
+			var oldDepthState = Renderer.DepthState;
 			var oldCullMode = Renderer.CullMode;
 
 			Renderer.Flush();
 			Renderer.Viewport = lightViewport;
-			Renderer.ZTestEnabled = true;
+			Renderer.DepthState = DepthState.DepthReadWrite;
 
 			var list = new List<RenderItem>();
 			var chain = new RenderChain();
@@ -84,8 +83,7 @@ namespace Lime
 			Renderer.Viewport = oldViewport;
 			Renderer.View = oldView;
 			Renderer.Projection = oldProj;
-			Renderer.ZTestEnabled = oldZTestEnabled;
-			Renderer.ZWriteEnabled = oldZWriteEnabled;
+			Renderer.DepthState = oldDepthState;
 			Renderer.CullMode = oldCullMode;
 
 			map.RestoreRenderTarget();
