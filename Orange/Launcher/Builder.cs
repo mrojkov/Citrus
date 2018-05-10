@@ -11,6 +11,24 @@ namespace Launcher
 {
 	public class Builder
 	{
+		private string citrusDirectory;
+		private string CitrusDirectory
+		{
+			get {
+				if (string.IsNullOrEmpty(citrusDirectory)) {
+					var path = Uri.UnescapeDataString((new Uri(Assembly.GetExecutingAssembly().CodeBase)).AbsolutePath);
+					while (!string.Equals(Path.GetFileName(path), "Citrus", StringComparison.CurrentCultureIgnoreCase)) {
+						path = Path.GetDirectoryName(path);
+						if (string.IsNullOrEmpty(path)) {
+							SetFailedBuildStatus("Cannot find Orange directory");
+						}
+					}
+					citrusDirectory = path;
+				}
+				return citrusDirectory;
+			}
+		}
+		private string OrangeDirectory { get { return Path.Combine(CitrusDirectory, "Orange"); } }
 		private bool areFailedDetailsSet;
 		public bool NeedRunExecutable = true;
 		public string SolutionPath;
@@ -25,7 +43,7 @@ namespace Launcher
 		{
 			var process = new Process {
 				StartInfo = {
-					FileName = ExecutablePath ?? defaultExecutablePath,
+					FileName = ExecutablePath ?? DefaultExecutablePath,
 					Arguments = ExecutableArgs
 				}
 			};
@@ -35,28 +53,27 @@ namespace Launcher
 		private void RestoreNuget()
 		{
 #if WIN
-			Orange.Nuget.Restore(Path.Combine(CalcCitrusDirectory(), "Orange/Orange.Win.sln"));
+			Orange.Nuget.Restore(Path.Combine(OrangeDirectory, "Orange.Win.sln"));
 #elif MAC
-			Orange.Nuget.Restore(Path.Combine(CalcCitrusDirectory(), "Orange/Orange.Mac.sln"));
+			Orange.Nuget.Restore(Path.Combine(OrangeDirectory, "Orange.Mac.sln"));
 #endif
 		}
 
 		private void SynchronizeAllProjects()
 		{
-			var citrus = CalcCitrusDirectory();
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrus}/Yuzu/Yuzu.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrus}/Yuzu/Yuzu.Mac.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrus}/Lime/Lime.Win.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrus}/Lime/Lime.Mac.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrus}/Lime/Lime.MonoMac.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrus}/Kumquat/Kumquat.Win.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrus}/Kumquat/Kumquat.Mac.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrus}/Orange/Orange.Win.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrus}/Orange/Orange.Mac.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrus}/Orange/Orange.CLI/Orange.Win.CLI.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrus}/Orange/Orange.CLI/Orange.Mac.CLI.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrus}/Orange/Orange.GUI/Orange.Win.GUI.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrus}/Orange/Orange.GUI/Orange.Mac.GUI.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{CitrusDirectory}/Yuzu/Yuzu.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{CitrusDirectory}/Yuzu/Yuzu.Mac.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{CitrusDirectory}/Lime/Lime.Win.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{CitrusDirectory}/Lime/Lime.Mac.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{CitrusDirectory}/Lime/Lime.MonoMac.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{CitrusDirectory}/Kumquat/Kumquat.Win.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{CitrusDirectory}/Kumquat/Kumquat.Mac.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{CitrusDirectory}/Orange/Orange.Win.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{CitrusDirectory}/Orange/Orange.Mac.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{CitrusDirectory}/Orange/Orange.CLI/Orange.Win.CLI.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{CitrusDirectory}/Orange/Orange.CLI/Orange.Mac.CLI.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{CitrusDirectory}/Orange/Orange.GUI/Orange.Win.GUI.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{CitrusDirectory}/Orange/Orange.GUI/Orange.Mac.GUI.csproj");
 		}
 
 		public Task Start()
@@ -75,25 +92,12 @@ namespace Launcher
 			return task;
 		}
 
-		private string CalcCitrusDirectory()
-		{
-			var path = Uri.UnescapeDataString((new Uri(Assembly.GetExecutingAssembly().CodeBase)).AbsolutePath);
-			while (!string.Equals(Path.GetFileName(path), "Citrus", StringComparison.CurrentCultureIgnoreCase)) {
-				path = Path.GetDirectoryName(path);
-				if (string.IsNullOrEmpty(path)) {
-					SetFailedBuildStatus("Cannot find Orange directory");
-				}
-			}
-			return path;
-		}
-
 		private void BuildAndRun()
 		{
-			var citrusDirectory = CalcCitrusDirectory();
-			Environment.CurrentDirectory = Path.Combine(citrusDirectory, "Orange");
+			Environment.CurrentDirectory = OrangeDirectory;
 			ClearObjFolder(citrusDirectory);
 			OnBuildStatusChange?.Invoke("Building");
-			if (AreRequirementsMet() && Build(SolutionPath ?? defaultSolutionPath)) {
+			if (AreRequirementsMet() && Build(SolutionPath ?? DefaultSolutionPath)) {
 				ClearObjFolder(citrusDirectory);
 				if (NeedRunExecutable) {
 					RunExecutable();
@@ -169,12 +173,16 @@ namespace Launcher
 
 		private bool AreRequirementsMet()
 		{
+#if WIN
 			if (builderPath != null)
 				return true;
 
 			Process.Start(@"https://www.microsoft.com/en-us/download/details.aspx?id=48159");
 			SetFailedBuildStatus("Please install Microsoft Build Tools 2015");
 			return false;
+#else
+			return true;
+#endif // WIN
 		}
 
 		private void DecorateBuildProcess(Process process, string solutionPath)
@@ -198,18 +206,18 @@ namespace Launcher
 			areFailedDetailsSet = true;
 		}
 
-		private string defaultSolutionPath =
+		private string DefaultSolutionPath =>
 #if WIN
-			Path.Combine(Environment.CurrentDirectory, "Orange.Win.sln");
+			Path.Combine(OrangeDirectory, "Orange.Win.sln");
 #elif MAC
-			Path.Combine(Environment.CurrentDirectory, "Orange.Mac.sln");
+			Path.Combine(OrangeDirectory, "Orange.Mac.sln");
 #endif // WIN
 
-		private string defaultExecutablePath =
+		private string DefaultExecutablePath =>
 #if WIN
-			Path.Combine(Environment.CurrentDirectory, @"bin\Win\Release\Orange.GUI.exe");
+			Path.Combine(OrangeDirectory, @"bin\Win\Release\Orange.GUI.exe");
 #elif MAC
-			Path.Combine (Environment.CurrentDirectory, @"bin/Mac/Release/Orange.GUI.app/Contents/MacOS/Orange.GUI");
+			Path.Combine(OrangeDirectory, @"bin/Mac/Release/Orange.GUI.app/Contents/MacOS/Orange.GUI");
 #endif // WIN
 
 #if WIN
@@ -241,7 +249,7 @@ namespace Launcher
 				var mdtool = "/Applications/Xamarin Studio.app/Contents/MacOS/mdtool";
 				var vstool = "/Applications/Visual Studio.app/Contents/MacOS/vstool";
 
-				if (File.Exists (mdtool)) {
+				if (File.Exists(mdtool)) {
 					return mdtool;
 				} else {
 					return vstool;

@@ -102,8 +102,6 @@
       <DependentUpon>LoggingWindowController.cs</DependentUpon>
     </Compile>
     <Compile Include="Main.cs" />
-    <Compile Include="CommonBuilder.cs" />
-    <Compile Include="Mac\Builder.cs" />
     <Compile Include="Win\LogWriter.cs">
       <Link>LogWriter.cs</Link>
     </Compile>
@@ -131,6 +129,7 @@
     <Compile Include="..\Source\Toolbox\Process.cs">
       <Link>Mac\Process.cs</Link>
     </Compile>
+    <Compile Include="Builder.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="Mac\MainWindow.xib" />

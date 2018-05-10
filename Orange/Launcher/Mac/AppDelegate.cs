@@ -5,7 +5,7 @@ namespace Launcher
 {
 	internal partial class AppDelegate : NSApplicationDelegate
 	{
-		public static CommonBuilder Builder;
+		public static Builder Builder;
 		MainWindowController mainWindowController;
 
 		public AppDelegate()
