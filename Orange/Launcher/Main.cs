@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using McMaster.Extensions.CommandLineUtils;
 using System.Linq;
 #if WIN
@@ -115,7 +116,7 @@ namespace Launcher
 			var optionConsole = cli.Option<bool>("-c --console", "Console mode.", CommandOptionType.NoValue);
 			var optionJustBuild = cli.Option<bool>("-j --justbuild", "Build project without running executable.", CommandOptionType.NoValue);
 			var optionBuildProjectPath = cli.Option<string>("-b --build <PROJECT_PATH>", "Project path, default: \"Orange/Orange.%Platform%.sln\".", CommandOptionType.SingleValue);
-			var optionRunProjectPath = cli.Option<string>("-r --run <EXECUTABLE_PATH>", "Executable path, default: \"Orange/bin/%Platform%/Release/%PlatformExecutable%\".", CommandOptionType.SingleValue);
+			var optionExecutablePath = cli.Option<string>("-r --run <EXECUTABLE_PATH>", "Executable path, default: \"Orange/bin/%Platform%/Release/%PlatformExecutable%\".", CommandOptionType.SingleValue);
 			var optionRunArgs = cli.Option<string>("-a --runargs <ARGUMENTS>", "Args to pass to executable.", CommandOptionType.SingleValue);
 
 			cli.OnExecute(() => {
@@ -144,10 +145,18 @@ namespace Launcher
 					return 0;
 				}
 #endif // WIN
+				string solutionPath = null;
+				string executablePath = null;
+				if (optionBuildProjectPath.HasValue()) {
+					solutionPath = Path.Combine(Environment.CurrentDirectory, optionBuildProjectPath.ParsedValue);
+				}
+				if (optionExecutablePath.HasValue()) {
+					executablePath = Path.Combine(Environment.CurrentDirectory, optionExecutablePath.ParsedValue);
+				}
 				builder = new Builder {
 					NeedRunExecutable = !optionJustBuild.HasValue(),
-					SolutionPath = optionBuildProjectPath.ParsedValue,
-					ExecutablePath = optionRunProjectPath.ParsedValue,
+					SolutionPath = solutionPath,
+					ExecutablePath = executablePath,
 					ExecutableArgs = optionRunArgs.ParsedValue
 				};
 
