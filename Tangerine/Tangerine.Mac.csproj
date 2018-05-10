@@ -154,7 +154,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\SegoeUIRegular.ttf" />
     <EmbeddedResource Include="Resources\Icons\Dark\Filesystem\ArrowLeft.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Filesystem\ArrowRight.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Filesystem\ArrowUp.png" />
@@ -371,6 +370,7 @@
     <EmbeddedResource Include="Resources\Icons\Light\Tools\InspectRootDeactivated.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\SceneView\InspectingRoot.png" />
     <EmbeddedResource Include="Resources\Icons\Light\SceneView\InspectingRoot.png" />
+    <EmbeddedResource Include="Resources\Arial.ttf" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PreferencesDialog\" />

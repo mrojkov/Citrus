@@ -376,7 +376,7 @@ namespace Tangerine
 
 		static void LoadFont()
 		{
-			var fontData = new EmbeddedResource("Tangerine.Resources.SegoeUIRegular.ttf", "Tangerine").GetResourceBytes();
+			var fontData = new EmbeddedResource("Tangerine.Resources.Arial.ttf", "Tangerine").GetResourceBytes();
 			var font = new DynamicFont(fontData);
 			FontPool.Instance.AddFont("Default", font);
 		}
