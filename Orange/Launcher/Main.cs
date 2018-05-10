@@ -99,7 +99,7 @@ namespace Launcher
 		private static IntPtr INVALID_HANDLE_VALUE = new IntPtr(-1);
 #endif // WIN
 
-		private static CommonBuilder builder;
+		private static Builder builder;
 
 		[STAThread]
 		public static int Main(string[] args)

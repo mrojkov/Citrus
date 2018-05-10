@@ -85,8 +85,7 @@
     <Compile Include="..\Source\Toolbox\Toolbox.cs">
       <Link>Toolbox.cs</Link>
     </Compile>
-    <Compile Include="Win\Builder.cs" />
-    <Compile Include="CommonBuilder.cs" />
+    <Compile Include="Builder.cs" />
     <Compile Include="Win\LoggingForm.cs">
       <SubType>Form</SubType>
     </Compile>

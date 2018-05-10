@@ -2,13 +2,14 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.IO;
-using System.Linq;
+using Microsoft.Win32;
+using System.Text;
 using System.Reflection;
 using System.Threading;
 
 namespace Launcher
 {
-	internal abstract class CommonBuilder
+	public class Builder
 	{
 		private bool areFailedDetailsSet;
 		public bool NeedRunExecutable = true;
@@ -24,7 +25,7 @@ namespace Launcher
 		{
 			var process = new Process {
 				StartInfo = {
-					FileName = ExecutablePath ?? DefaultExecutablePath,
+					FileName = ExecutablePath ?? defaultExecutablePath,
 					Arguments = ExecutableArgs
 				}
 			};
@@ -92,7 +93,7 @@ namespace Launcher
 			Environment.CurrentDirectory = Path.Combine(citrusDirectory, "Orange");
 			ClearObjFolder(citrusDirectory);
 			OnBuildStatusChange?.Invoke("Building");
-			if (AreRequirementsMet() && Build(SolutionPath ?? DefaultSolutionPath)) {
+			if (AreRequirementsMet() && Build(SolutionPath ?? defaultSolutionPath)) {
 				ClearObjFolder(citrusDirectory);
 				if (NeedRunExecutable) {
 					RunExecutable();
@@ -138,7 +139,7 @@ namespace Launcher
 		{
 			var process = new Process {
 				StartInfo = {
-					FileName = BuilderPath,
+					FileName = builderPath,
 					UseShellExecute = false,
 					CreateNoWindow = true,
 					RedirectStandardOutput = true,
@@ -166,18 +167,87 @@ namespace Launcher
 			}
 		}
 
-		protected virtual bool AreRequirementsMet() => true;
+		private bool AreRequirementsMet()
+		{
+			if (builderPath != null)
+				return true;
 
-		protected virtual void DecorateBuildProcess(Process process, string solutionPath) { }
+			Process.Start(@"https://www.microsoft.com/en-us/download/details.aspx?id=48159");
+			SetFailedBuildStatus("Please install Microsoft Build Tools 2015");
+			return false;
+		}
 
-		protected void SetFailedBuildStatus(string details)
+		private void DecorateBuildProcess(Process process, string solutionPath)
+		{
+#if WIN
+			process.StartInfo.Arguments =
+				$"\"{solutionPath}\" /t:Build /p:Configuration=Release /p:Platform=x86 /verbosity:minimal";
+			var cp = Encoding.Default.CodePage;
+			if (cp == 1251)
+				cp = 866;
+			process.StartInfo.StandardOutputEncoding = Encoding.GetEncoding(cp);
+			process.StartInfo.StandardErrorEncoding = Encoding.GetEncoding(cp);
+#elif MAC
+			process.StartInfo.Arguments = $"build \"{solutionPath}\" -t:Build -c:Release|x86";
+#endif // WIN
+		}
+
+		private void SetFailedBuildStatus(string details)
 		{
 			OnBuildStatusChange?.Invoke($"Build failed. {details}");
 			areFailedDetailsSet = true;
 		}
 
-		protected abstract string DefaultSolutionPath { get; }
-		protected abstract string DefaultExecutablePath { get; }
-		protected abstract string BuilderPath { get; }
-	}
+		private string defaultSolutionPath =
+#if WIN
+			Path.Combine(Environment.CurrentDirectory, "Orange.Win.sln");
+#elif MAC
+			Path.Combine(Environment.CurrentDirectory, "Orange.Mac.sln");
+#endif // WIN
+
+		private string defaultExecutablePath =
+#if WIN
+			Path.Combine(Environment.CurrentDirectory, @"bin\Win\Release\Orange.GUI.exe");
+#elif MAC
+			Path.Combine (Environment.CurrentDirectory, @"bin/Mac/Release/Orange.GUI.app/Contents/MacOS/Orange.GUI");
+#endif // WIN
+
+#if WIN
+		private string builderPath
+		{
+			get {
+				var msBuild14Path = Path.Combine(@"C:\Program Files (x86)\MSBuild\14.0\Bin\", "MSBuild.exe");
+				if (File.Exists(msBuild14Path)) {
+					return msBuild14Path;
+				}
+
+				var visualStudioRegistryPath =
+					Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\Microsoft\VisualStudio\SxS\VS7");
+				if (visualStudioRegistryPath != null) {
+					var vsPath = visualStudioRegistryPath.GetValue("15.0", string.Empty) as string;
+					var msBuild15Path = Path.Combine(vsPath, "MSBuild", "15.0", "Bin", "MSBuild.exe");
+					if (File.Exists(msBuild15Path)) {
+						return msBuild15Path;
+					}
+				}
+
+				return null;
+			}
+		}
+#elif MAC
+		private string builderPath
+		{
+				get {
+				var mdtool = "/Applications/Xamarin Studio.app/Contents/MacOS/mdtool";
+				var vstool = "/Applications/Visual Studio.app/Contents/MacOS/vstool";
+
+				if (File.Exists (mdtool)) {
+					return mdtool;
+				} else {
+					return vstool;
+				}
+			}
+		}
+#endif // WIN
+}
 }
