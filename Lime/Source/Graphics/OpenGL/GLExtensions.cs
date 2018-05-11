@@ -9,7 +9,7 @@ using OpenTK.Graphics.OpenGL;
 using GLStencilOp = OpenTK.Graphics.OpenGL.StencilOp;
 #endif
 
-#if ANDROID
+#if iOS || ANDROID
 using PrimitiveType = OpenTK.Graphics.ES20.BeginMode;
 #elif MAC || MONOMAC
 using PrimitiveType = OpenTK.Graphics.OpenGL.BeginMode;

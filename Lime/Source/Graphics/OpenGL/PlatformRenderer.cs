@@ -9,7 +9,7 @@ using OpenTK.Graphics.OpenGL;
 using GLStencilOp = OpenTK.Graphics.OpenGL.StencilOp;
 #endif
 
-#if ANDROID
+#if iOS || ANDROID
 using StencilOpFace = OpenTK.Graphics.ES20.CullFaceMode;
 using StencilFuncFace = OpenTK.Graphics.ES20.CullFaceMode;
 #elif MAC || MONOMAC
@@ -423,6 +423,11 @@ namespace Lime
 		internal static void MarkTextureSlotAsDirty(int slot)
 		{
 			texturesDirtyMask |= 1 << slot;
+		}
+
+		internal static void MarkAllTextureSlotsAsDirty()
+		{
+			texturesDirtyMask = ~0;
 		}
 
 		public static void SetVertexInputLayout(VertexInputLayout layout)

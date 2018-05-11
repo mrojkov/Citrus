@@ -93,9 +93,10 @@ namespace Lime
 				case PVRFormat.PVRTC_4_RGBA: {
 					var buffer = ReadTextureData(reader, width * height * 4 / 8);
 					glCommands += () => {
-						PlatformRenderer.PushTexture(handle, 0);
+						GL.ActiveTexture(TextureUnit.Texture0);
+						GL.BindTexture(TextureTarget.Texture2D, handle);
 						GL.CompressedTexImage2D(All.Texture2D, mipLevel, All.CompressedRgbaPvrtc4Bppv1Img, width2, height2, 0, buffer.Length, buffer);
-						PlatformRenderer.PopTexture(0);
+						PlatformRenderer.MarkTextureSlotAsDirty(0);
 						PlatformRenderer.CheckErrors();
 					};
 					break;
@@ -106,9 +107,10 @@ namespace Lime
 					}				
 					var buffer = ReadTextureData(reader, width * height * 2 / 8);
 					glCommands += () => {
-						PlatformRenderer.PushTexture(handle, 0);
+						GL.ActiveTexture(TextureUnit.Texture0);
+						GL.BindTexture(TextureTarget.Texture2D, handle);
 						GL.CompressedTexImage2D(All.Texture2D, mipLevel, All.CompressedRgbaPvrtc2Bppv1Img, width2, height2, 0, buffer.Length, buffer);
-						PlatformRenderer.PopTexture(0);
+						PlatformRenderer.MarkTextureSlotAsDirty(0);
 						PlatformRenderer.CheckErrors();
 					};
 					break;

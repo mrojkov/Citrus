@@ -46,11 +46,6 @@ namespace Lime
 		public const BufferUsage StaticDraw = BufferUsage.StaticDraw;
 	}
 
-	static class PrimitiveType
-	{
-		public const BeginMode Triangles = BeginMode.Triangles;
-	}
-
 /*
 	static class VertexAttribPointerType
 	{

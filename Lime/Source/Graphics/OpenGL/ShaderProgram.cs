@@ -9,10 +9,8 @@ using OpenTK.Graphics.ES20;
 using OpenTK.Graphics.OpenGL;
 #endif
 
-#if ANDROID
+#if iOS || ANDROID
 using GetProgramParameterName = OpenTK.Graphics.ES20.ProgramParameter;
-#elif iOS
-using GetProgramParameterName = OpenTK.Graphics.ES20.All;
 #elif MAC || MONOMAC
 using GetProgramParameterName = OpenTK.Graphics.OpenGL.ProgramParameter;
 #endif
