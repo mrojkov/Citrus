@@ -279,6 +279,8 @@ namespace Lime
 		private static int maxVertexBufferSlots;
 		private static int maxTextureSlots;
 
+		private static VertexInputLayout defaultVertexInputLayout = VertexInputLayout.New(new VertexInputElement[0]);
+
 		private static Viewport viewport = Viewport.Default;
 		private static Viewport lastViewport;
 		private static bool viewportDirty;
@@ -432,6 +434,7 @@ namespace Lime
 
 		public static void SetVertexInputLayout(VertexInputLayout layout)
 		{
+			layout = layout ?? defaultVertexInputLayout;
 			if (vertexInputLayout != layout) {
 				vertexInputLayout = layout;
 				vertexAttribsDirty = true;
@@ -678,7 +681,7 @@ namespace Lime
 			GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 			CheckErrors();
 			Array.Clear(vertexBufferViews, 0, vertexBufferViews.Length);
-			vertexInputLayout = null;
+			vertexInputLayout = defaultVertexInputLayout;
 			vertexAttribsDirty = false;
 		}
 
@@ -979,11 +982,12 @@ namespace Lime
 				if (texturesDirtyMask == 0)
 					break;
 			}
+			texturesDirtyMask = 0;
 		}
 
 		private static void ApplyVertexAttribs(int baseVertex)
 		{
-			var attribMask = vertexInputLayout != null ? vertexInputLayout.AttribMask : vertexInputLayout.AttribMask;
+			var attribMask = vertexInputLayout.AttribMask;
 			if (attribMask != lastVertexAttribMask) {
 				for (var i = 0; i < maxVertexAttribs; i++) {
 					var bit = 1 << i;
@@ -999,7 +1003,7 @@ namespace Lime
 						break;
 				}
 			}
-			if ((vertexAttribsDirty || baseVertex != lastBaseVertex) && vertexInputLayout != null) {
+			if (vertexAttribsDirty || baseVertex != lastBaseVertex) {
 				VertexBuffer lastBuffer = null;
 				foreach (var element in vertexInputLayout.Elements) {
 					var view = vertexBufferViews[element.Slot];
@@ -1014,7 +1018,6 @@ namespace Lime
 						element.Attribute, format.NumberOfElements, format.Type,
 						format.Normalized, element.Stride, new IntPtr(offset));
 					CheckErrors();
-					attribMask |= 1 << element.Attribute;
 				}
 				lastBaseVertex = baseVertex;
 				vertexAttribsDirty = false;
@@ -1051,7 +1054,7 @@ namespace Lime
 				shaderProgram.SyncParams(shaderParamsArray, shaderParamsArrayCount);
 		}
 
-		public static void BindFramebuffer(uint framebuffer)
+		internal static void BindFramebuffer(uint framebuffer)
 		{
 			CurrentFramebuffer = framebuffer;
 			GL.BindFramebuffer(FramebufferTarget.Framebuffer, framebuffer);
@@ -1059,7 +1062,7 @@ namespace Lime
 			RenderTargetChanged?.Invoke();
 		}
 
-		public static void PreDraw(int baseVertex)
+		private static void PreDraw(int baseVertex)
 		{
 			ApplyState(force: false);
 			ApplyTextures();
@@ -1089,13 +1092,13 @@ namespace Lime
 		}
 	}
 
-	public struct VertexBufferView
+	internal struct VertexBufferView
 	{
 		public VertexBuffer Buffer;
 		public int Offset;
 	}
 
-	public struct IndexBufferView
+	internal struct IndexBufferView
 	{
 		public IndexBuffer Buffer;
 		public IndexFormat Format;
