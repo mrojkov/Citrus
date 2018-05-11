@@ -37,31 +37,31 @@ namespace Lime
 		{
 			switch (value) {
 				case Blend.One:
-					return BlendingFactorSrc.One;
+					return (BlendingFactorSrc)All.One;
 				case Blend.Zero:
-					return BlendingFactorSrc.Zero;
+					return (BlendingFactorSrc)All.Zero;
 				case Blend.Factor:
-					return BlendingFactorSrc.ConstantColor;
+					return (BlendingFactorSrc)All.ConstantColor;
 				case Blend.SrcColor:
-					return BlendingFactorSrc.SrcColor;
+					return (BlendingFactorSrc)All.SrcColor;
 				case Blend.SrcAlpha:
-					return BlendingFactorSrc.SrcAlpha;
+					return (BlendingFactorSrc)All.SrcAlpha;
 				case Blend.SrcAlphaSaturation:
-					return BlendingFactorSrc.SrcAlphaSaturate;
+					return (BlendingFactorSrc)All.SrcAlphaSaturate;
 				case Blend.DstColor:
-					return BlendingFactorSrc.DstColor;
+					return (BlendingFactorSrc)All.DstColor;
 				case Blend.DstAlpha:
-					return BlendingFactorSrc.DstAlpha;
+					return (BlendingFactorSrc)All.DstAlpha;
 				case Blend.InverseFactor:
-					return BlendingFactorSrc.OneMinusConstantColor;
+					return (BlendingFactorSrc)All.OneMinusConstantColor;
 				case Blend.InverseSrcColor:
-					return BlendingFactorSrc.OneMinusSrcColor;
+					return (BlendingFactorSrc)All.OneMinusSrcColor;
 				case Blend.InverseSrcAlpha:
-					return BlendingFactorSrc.OneMinusSrcAlpha;
+					return (BlendingFactorSrc)All.OneMinusSrcAlpha;
 				case Blend.InverseDstColor:
-					return BlendingFactorSrc.OneMinusDstColor;
+					return (BlendingFactorSrc)All.OneMinusDstColor;
 				case Blend.InverseDstAlpha:
-					return BlendingFactorSrc.OneMinusDstAlpha;
+					return (BlendingFactorSrc)All.OneMinusDstAlpha;
 				default:
 					throw new NotSupportedException();
 			}
@@ -71,31 +71,31 @@ namespace Lime
 		{
 			switch (value) {
 				case Blend.One:
-					return BlendingFactorDest.One;
+					return (BlendingFactorDest)All.One;
 				case Blend.Zero:
-					return BlendingFactorDest.Zero;
+					return (BlendingFactorDest)All.Zero;
 				case Blend.Factor:
-					return BlendingFactorDest.ConstantColor;
+					return (BlendingFactorDest)All.ConstantColor;
 				case Blend.SrcColor:
-					return BlendingFactorDest.SrcColor;
+					return (BlendingFactorDest)All.SrcColor;
 				case Blend.SrcAlpha:
-					return BlendingFactorDest.SrcAlpha;
+					return (BlendingFactorDest)All.SrcAlpha;
 				case Blend.SrcAlphaSaturation:
-					return BlendingFactorDest.SrcAlphaSaturate;
+					return (BlendingFactorDest)All.SrcAlphaSaturate;
 				case Blend.DstColor:
-					return BlendingFactorDest.DstColor;
+					return (BlendingFactorDest)All.DstColor;
 				case Blend.DstAlpha:
-					return BlendingFactorDest.DstAlpha;
+					return (BlendingFactorDest)All.DstAlpha;
 				case Blend.InverseFactor:
-					return BlendingFactorDest.OneMinusConstantColor;
+					return (BlendingFactorDest)All.OneMinusConstantColor;
 				case Blend.InverseSrcColor:
-					return BlendingFactorDest.OneMinusSrcColor;
+					return (BlendingFactorDest)All.OneMinusSrcColor;
 				case Blend.InverseSrcAlpha:
-					return BlendingFactorDest.OneMinusSrcAlpha;
+					return (BlendingFactorDest)All.OneMinusSrcAlpha;
 				case Blend.InverseDstColor:
-					return BlendingFactorDest.OneMinusDstColor;
+					return (BlendingFactorDest)All.OneMinusDstColor;
 				case Blend.InverseDstAlpha:
-					return BlendingFactorDest.OneMinusDstAlpha;
+					return (BlendingFactorDest)All.OneMinusDstAlpha;
 				default:
 					throw new NotSupportedException();
 			}

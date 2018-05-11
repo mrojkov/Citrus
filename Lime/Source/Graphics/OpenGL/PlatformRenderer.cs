@@ -10,7 +10,14 @@ using GLStencilOp = OpenTK.Graphics.OpenGL.StencilOp;
 #endif
 
 #if ANDROID
-using StencilFace = OpenTK.Graphics.ES20.CullFaceMode;
+using StencilOpFace = OpenTK.Graphics.ES20.CullFaceMode;
+using StencilFuncFace = OpenTK.Graphics.ES20.CullFaceMode;
+#elif MAC || MONOMAC
+using StencilOpFace = OpenTK.Graphics.OpenGL.StencilFace;
+using StencilFuncFace = OpenTK.Graphics.OpenGL.Version20;
+#else
+using StencilOpFace = OpenTK.Graphics.ES20.StencilFace;
+using StencilFuncFace = OpenTK.Graphics.ES20.StencilFace;
 #endif
 
 using System.Collections.Generic;
@@ -827,7 +834,7 @@ namespace Lime
 						stencilState.FrontFaceFail != lastStencilState.FrontFaceFail ||
 						stencilState.FrontFacePass != lastStencilState.FrontFacePass
 					) {
-						GL.StencilOpSeparate(StencilFace.Front,
+						GL.StencilOpSeparate((StencilOpFace)All.Front,
 							stencilState.FrontFaceFail.ToGLStencilOp(),
 							stencilState.FrontFaceDepthFail.ToGLStencilOp(),
 							stencilState.FrontFacePass.ToGLStencilOp());
@@ -841,7 +848,7 @@ namespace Lime
 						stencilState.BackFaceFail != lastStencilState.BackFaceFail ||
 						stencilState.BackFacePass != lastStencilState.BackFacePass
 					) {
-						GL.StencilOpSeparate(StencilFace.Back,
+						GL.StencilOpSeparate((StencilOpFace)All.Back,
 							stencilState.BackFaceFail.ToGLStencilOp(),
 							stencilState.BackFaceDepthFail.ToGLStencilOp(),
 							stencilState.BackFacePass.ToGLStencilOp());
@@ -855,7 +862,7 @@ namespace Lime
 						stencilState.ReferenceValue != lastStencilState.ReferenceValue ||
 						stencilState.ReadMask != lastStencilState.ReadMask
 					) {
-						GL.StencilFuncSeparate(StencilFace.Front,
+						GL.StencilFuncSeparate((StencilFuncFace)All.Front,
 							stencilState.FrontFaceComparison.ToGLStencilFunction(),
 							stencilState.ReferenceValue,
 							stencilState.ReadMask);
@@ -867,7 +874,7 @@ namespace Lime
 						stencilState.ReferenceValue != lastStencilState.ReferenceValue ||
 						stencilState.ReadMask != lastStencilState.ReadMask
 					) {
-						GL.StencilFuncSeparate(StencilFace.Back,
+						GL.StencilFuncSeparate((StencilFuncFace)All.Back,
 							stencilState.BackFaceComparison.ToGLStencilFunction(),
 							stencilState.ReferenceValue,
 							stencilState.ReadMask);

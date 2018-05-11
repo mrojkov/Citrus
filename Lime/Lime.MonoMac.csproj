@@ -326,6 +326,11 @@
     <Compile Include="Source\Audio\OpenAL\ALMOB\OpenAL.cs" />
     <Compile Include="Source\Audio\OpenAL\ALMOB\OpenALC.cs" />
     <Compile Include="Source\Widgets\WidgetMaterial.cs" />
+    <Compile Include="Source\Graphics\GraphicsExtensions.cs" />
+    <Compile Include="Source\Graphics\VertexInputLayout.cs" />
+    <Compile Include="Source\Graphics\OpenGL\Buffer.cs" />
+    <Compile Include="Source\Graphics\OpenGL\GLExtensions.cs" />
+    <Compile Include="Source\Graphics\OpenGL\ShaderParams.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

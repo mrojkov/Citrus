@@ -13,6 +13,8 @@ using OpenTK.Graphics.OpenGL;
 using GetProgramParameterName = OpenTK.Graphics.ES20.ProgramParameter;
 #elif iOS
 using GetProgramParameterName = OpenTK.Graphics.ES20.All;
+#elif MAC || MONOMAC
+using GetProgramParameterName = OpenTK.Graphics.OpenGL.ProgramParameter;
 #endif
 
 #pragma warning disable 0618
