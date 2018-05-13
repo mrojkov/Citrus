@@ -1,4 +1,4 @@
-﻿#if ANDROID
+#if ANDROID
 using System;
 using Android.Views.InputMethods;
 
@@ -51,6 +51,8 @@ namespace Lime
 				gameView.Focusable = false;
 				gameView.FocusableInTouchMode = false;
 				imm.HideSoftInputFromWindow(gameView.WindowToken, 0);
+				// HACK: This will reset UI flags back to values defined in OnWindowFocusChanged
+				ActivityDelegate.Instance.Activity.OnWindowFocusChanged(true);
 			}
 		}
 
