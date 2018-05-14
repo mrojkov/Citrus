@@ -96,7 +96,7 @@ namespace Lime
 		{
 			Presenter = DefaultPresenter.Instance;
 			Submeshes = new Submesh3DCollection(this);
-			CullMode = CullMode.CullClockwise;
+			CullMode = CullMode.Front;
 		}
 
 		public override void Render()
@@ -140,9 +140,9 @@ namespace Lime
 
 				for (int i = 0; i < sm.Material.PassCount; i++) {
 					sm.Material.Apply(i);
-					PlatformRenderer.DrawTriangles(sm.Mesh, 0, sm.Mesh.IndexBuffer.Data.Length);
+					sm.Mesh.DrawIndexed(0, sm.Mesh.Indices.Length);
 				}
-				Renderer.PolyCount3d += sm.Mesh.IndexBuffer.Data.Length / 3;
+				Renderer.PolyCount3d += sm.Mesh.Indices.Length / 3;
 			}
 		}
 
@@ -181,7 +181,7 @@ namespace Lime
 			distance = float.MaxValue;
 			ray = ray.Transform(GlobalTransform.CalcInverted());
 			foreach (var submesh in Submeshes) {
-				var vertices = ((IVertexBuffer<Vertex>)submesh.Mesh.VertexBuffers[0]).Data;
+				var vertices = submesh.Mesh.Vertices;
 				for (int i = 0; i <= vertices.Length - 3; i += 3) {
 					var d = ray.IntersectsTriangle(vertices[i].Pos, vertices[i + 1].Pos, vertices[i + 2].Pos);
 					if (d != null && d.Value < distance) {
@@ -217,8 +217,7 @@ namespace Lime
 		private IEnumerable<Vector3> GetVertexPositions()
 		{
 			foreach (var sm in Submeshes) {
-				var vertices = ((IVertexBuffer<Vertex>)sm.Mesh.VertexBuffers[0]).Data;
-				foreach (var v in vertices) {
+				foreach (var v in sm.Mesh.Vertices) {
 					yield return v.Pos;
 				}
 			}
@@ -298,9 +297,9 @@ namespace Lime
 
 				for (int i = 0; i < sm.Material.PassCount; i++) {
 					sm.Material.Apply(i);
-					PlatformRenderer.DrawTriangles(sm.Mesh, 0, sm.Mesh.IndexBuffer.Data.Length);
+					sm.Mesh.DrawIndexed(0, sm.Mesh.Indices.Length);
 				}
-				Renderer.PolyCount3d += sm.Mesh.IndexBuffer.Data.Length / 3;
+				Renderer.PolyCount3d += sm.Mesh.Indices.Length / 3;
 
 				sm.Material = def;
 			}
@@ -313,7 +312,7 @@ namespace Lime
 		public IMaterial Material = new CommonMaterial();
 
 		[YuzuMember]
-		public IMesh Mesh { get; set; }
+		public Mesh<Mesh3D.Vertex> Mesh { get; set; }
 
 		[YuzuMember]
 		public List<Matrix44> BoneBindPoses { get; private set; }
@@ -329,19 +328,6 @@ namespace Lime
 			BoneBindPoses = new List<Matrix44>();
 			BoneNames = new List<string>();
 			Bones = new List<Node3D>();
-		}
-
-		[YuzuAfterDeserialization]
-		public void AfterDeserialization()
-		{
-			Mesh.Attributes = new[] { new[] {
-				ShaderPrograms.Attributes.Pos1,
-				ShaderPrograms.Attributes.Color1,
-				ShaderPrograms.Attributes.UV1,
-				ShaderPrograms.Attributes.BlendIndices,
-				ShaderPrograms.Attributes.BlendWeights,
-				ShaderPrograms.Attributes.Normal,
-			} };
 		}
 
 		public void RebuildSkeleton()

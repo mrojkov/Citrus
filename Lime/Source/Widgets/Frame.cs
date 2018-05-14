@@ -85,16 +85,14 @@ namespace Lime
 
 		private void RenderWithScissorTest()
 		{
-			var savedScissorTest = Renderer.ScissorTestEnabled;
-			var savedScissorRect = Renderer.ScissorRectangle;
 			var rect = CalculateScissorRectangle(ClipByWidget ?? this);
-			if (savedScissorTest) {
-				if (!IntersectRectangles(rect, savedScissorRect, out rect)) {
+			var savedScissorState = Renderer.ScissorState;
+			if (savedScissorState.Enable) {
+				if (!IntersectRectangles(rect, savedScissorState.Bounds, out rect)) {
 					return;
 				}
 			}
-			Renderer.ScissorTestEnabled = true;
-			Renderer.ScissorRectangle = rect;
+			Renderer.ScissorState = new ScissorState(rect);
 			try {
 				EnsureRenderChain();
 				renderChain.ClipRegion = CalcGlobalBoundingRect();
@@ -103,38 +101,37 @@ namespace Lime
 				}
 				renderChain.RenderAndClear();
 			} finally {
-				Renderer.ScissorTestEnabled = savedScissorTest;
-				Renderer.ScissorRectangle = savedScissorRect;
+				Renderer.ScissorState = savedScissorState;
 			}
 		}
 
 		private void RenderWithStencilTest()
 		{
-			var savedStencilParams = Renderer.StencilParams;
+			var savedStencilParams = Renderer.StencilState;
 			try {
 				// Draw mask into stencil buffer
-				var sp = StencilParams.Default;
-				sp.EnableTest = true;
-				sp.Comp = StencilFunc.Always;
+				var sp = StencilState.Default;
+				sp.Enable = true;
+				sp.Comparison = CompareFunc.Always;
 				sp.ReferenceValue = 1;
 				sp.Pass = StencilOp.Replace;
-				Renderer.StencilParams = sp;
-				Renderer.Clear(ClearTarget.StencilBuffer);
-				Renderer.ColorWriteEnabled = ColorMask.None;
+				Renderer.StencilState = sp;
+				Renderer.Clear(ClearOptions.StencilBuffer);
+				Renderer.ColorWriteEnabled = ColorWriteMask.None;
 				var widget = ClipByWidget ?? this;
 				Renderer.Transform1 = widget.LocalToWorldTransform;
 				Renderer.DrawRect(widget.ContentPosition, widget.ContentSize, Color4.White);
-				Renderer.ColorWriteEnabled = ColorMask.All;
+				Renderer.ColorWriteEnabled = ColorWriteMask.All;
 				// Draw the frame content
-				sp.Comp = StencilFunc.Equal;
-				Renderer.StencilParams = sp;
+				sp.Comparison = CompareFunc.Equal;
+				Renderer.StencilState = sp;
 				EnsureRenderChain();
 				foreach (var node in Nodes) {
 					node.RenderChainBuilder?.AddToRenderChain(renderChain);
 				}
 				renderChain.RenderAndClear();
 			} finally {
-				Renderer.StencilParams = savedStencilParams;
+				Renderer.StencilState = savedStencilParams;
 			}
 		}
 
@@ -180,7 +177,7 @@ namespace Lime
 
 		private WindowRect CalculateScissorRectangle(Widget widget)
 		{
-			var aabb = widget.CalcAABBInViewportSpace(Renderer.Viewport, Renderer.WorldViewProjection);
+			var aabb = widget.CalcAABBInViewportSpace(Renderer.Viewport.Bounds, Renderer.WorldViewProjection);
 			return (WindowRect)aabb;
 		}
 

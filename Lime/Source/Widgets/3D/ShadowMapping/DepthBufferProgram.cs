@@ -47,18 +47,9 @@
 			}
 		";
 
-		public int BonesUniformId;
-		public int LightWorldViewProjUniformId;
-
 		public DepthBufferProgram(bool skinEnabled)
 			: base(GetShaders(skinEnabled), GetAttribLocations(), new Sampler[0])
 		{ }
-
-		protected override void InitializeUniformIds()
-		{
-			BonesUniformId = GetUniformId("u_Bones");
-			LightWorldViewProjUniformId = GetUniformId("u_LightWorldViewProj");
-		}
 
 		private static Shader[] GetShaders(bool skinEnabled)
 		{

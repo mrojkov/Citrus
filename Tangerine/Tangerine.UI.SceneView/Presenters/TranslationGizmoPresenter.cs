@@ -32,12 +32,11 @@ namespace Tangerine.UI.SceneView
 			var oldWorld = Renderer.World;
 			var oldView = Renderer.View;
 			var oldProj = Renderer.Projection;
-			var oldZTestEnabled = Renderer.ZTestEnabled;
-			var oldZWriteEnabled = Renderer.ZWriteEnabled;
+			var oldDepthState = Renderer.DepthState;
 			Renderer.View = vp.Camera.View;
 			Renderer.Projection = vp.TransformProjection(Renderer.Projection);
-			Renderer.ZTestEnabled = true;
-			Renderer.Clear(ClearTarget.DepthBuffer);
+			Renderer.DepthState = DepthState.DepthReadWrite;
+			Renderer.Clear(ClearOptions.DepthBuffer);
 			foreach (var node in nodes) {
 				RenderGizmo(node);
 			}
@@ -45,8 +44,7 @@ namespace Tangerine.UI.SceneView
 			Renderer.View = oldView;
 			Renderer.Projection = oldProj;
 			Renderer.CullMode = oldCullMode;
-			Renderer.ZTestEnabled = oldZTestEnabled;
-			Renderer.ZWriteEnabled = oldZWriteEnabled;
+			Renderer.DepthState = oldDepthState;
 		}
 
 		Viewport3D GetCurrentViewport3D()
@@ -63,9 +61,9 @@ namespace Tangerine.UI.SceneView
 		{
 			Renderer.Flush();
 			Renderer.World = CalcGizmoTransform(node.GlobalTransform, 100);
-			Renderer.CullMode = CullMode.CullClockwise;
+			Renderer.CullMode = CullMode.Front;
 			WidgetMaterial.Diffuse.Apply(0);
-			PlatformRenderer.DrawTriangles(gizmo, 0, gizmo.IndexBuffer.Data.Length);
+			gizmo.DrawIndexed(0, gizmo.Indices.Length);
 		}
 
 		Matrix44 CalcGizmoTransform(Matrix44 modelGlobalTransform, float gizmoRadiusInPixels)
@@ -81,33 +79,33 @@ namespace Tangerine.UI.SceneView
 			return Matrix44.CreateRotation(rotation) * Matrix44.CreateScale(s, s, s) * Matrix44.CreateTranslation(translation);
 		}
 
-		static IMesh gizmo = CreateTranslationGizmo();
+		static Mesh<VertexPositionColor> gizmo = CreateTranslationGizmo();
 
-		static IMesh CreateTranslationGizmo()
+		static Mesh<VertexPositionColor> CreateTranslationGizmo()
 		{
 			var axisX = CreateArrow(Matrix44.CreateRotationZ(-Mathf.HalfPi), Color4.Red);
 			var axisY = CreateArrow(Matrix44.Identity, Color4.Green);
 			var axisZ = CreateArrow(Matrix44.CreateRotationX(Mathf.HalfPi), Color4.Blue);
-			return Mesh.Combine<Mesh.PositionColor>(axisX, axisY, axisZ);
+			return MeshUtils.Combine(axisX, axisY, axisZ);
 		}
 
-		static IMesh CreateArrow(Matrix44 matrix, Color4 color)
+		static Mesh<VertexPositionColor> CreateArrow(Matrix44 matrix, Color4 color)
 		{
 			const float tipHeight = 0.25f;
 			const float tipRadius = 0.06f;
 			const float poleRadius = 0.01f;
-			var tip = Mesh.CreateCone(tipHeight, tipRadius, 20, color);
+			var tip = MeshUtils.CreateCone(tipHeight, tipRadius, 20, color);
 			TransformMesh(tip, Matrix44.CreateTranslation(0, 1 - tipHeight, 0));
-			var pole = Mesh.CreateCylinder(1 - tipHeight - 0.1f, poleRadius, 6, color);
+			var pole = MeshUtils.CreateCylinder(1 - tipHeight - 0.1f, poleRadius, 6, color);
 			TransformMesh(pole, Matrix44.CreateTranslation(0, 0.1f, 0));
-			var arrow = Mesh.Combine<Mesh.PositionColor>(tip, pole);
+			var arrow = MeshUtils.Combine(tip, pole);
 			TransformMesh(arrow, matrix);
 			return arrow;
 		}
 
-		static void TransformMesh(IMesh mesh, Matrix44 matrix)
+		static void TransformMesh(Mesh<VertexPositionColor> mesh, Matrix44 matrix)
 		{
-			Mesh.TransformVertices(mesh, (ref Mesh.PositionColor v) => v.Position = matrix.TransformVector(v.Position));
+			MeshUtils.TransformVertices(mesh, (ref VertexPositionColor v) => v.Position = matrix.TransformVector(v.Position));
 		}
 	}
 }

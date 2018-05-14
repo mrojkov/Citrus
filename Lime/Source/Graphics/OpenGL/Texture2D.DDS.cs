@@ -100,10 +100,11 @@ namespace Lime
 			}
 			var buffer = ReadTextureData(reader, pitch * height);
 			glCommands += () => {
-				PlatformRenderer.PushTexture(handle, 0);
+				GL.ActiveTexture(TextureUnit.Texture0);
+				GL.BindTexture(TextureTarget.Texture2D, handle);
 				GL.TexImage2D(TextureTarget.Texture2D, level, PixelInternalFormat.Rgba, width, height, 0,
 					PixelFormat.Rgba, PixelType.UnsignedByte, buffer);
-				PlatformRenderer.PopTexture(0);
+				PlatformRenderer.MarkTextureSlotAsDirty(0);
 				PlatformRenderer.CheckErrors();
 			};
 		}
@@ -126,9 +127,10 @@ namespace Lime
 			}
 			var buffer = ReadTextureData(reader, linearSize);
 			glCommands += () => {
-				PlatformRenderer.PushTexture(handle, 0);
+				GL.ActiveTexture(TextureUnit.Texture0);
+				GL.BindTexture(TextureTarget.Texture2D, handle);
 				GL.CompressedTexImage2D(TextureTarget.Texture2D, level, pif, width, height, 0, buffer.Length, buffer);
-				PlatformRenderer.PopTexture(0);
+				PlatformRenderer.MarkTextureSlotAsDirty(0);
 				PlatformRenderer.CheckErrors();
 			};
 		}

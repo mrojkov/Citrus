@@ -124,7 +124,7 @@ namespace Lime
 
 		public virtual void RenderAll()
 		{
-			Renderer.Viewport = GetViewport();
+			Renderer.Viewport = new Viewport(GetViewport());
 			renderChain.Render();
 		}
 

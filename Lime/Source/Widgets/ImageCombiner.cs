@@ -43,7 +43,7 @@ namespace Lime
 		[YuzuMember]
 		public ShaderId Shader { get; set; }
 
-		public ShaderProgram CustomShaderProgram;
+		public IMaterial CustomMaterial { get; set; }
 
 		public ImageCombiner()
 		{
@@ -171,12 +171,10 @@ namespace Lime
 				vertices[i].Color = color;
 				var uv1 = coords[i] * uvTransform1 * arg1.UVTransform;
 				var uv2 = coords[i] * uvTransform2 * arg2.UVTransform;
-				texture1?.TransformUVCoordinatesToAtlasSpace(ref uv1);
-				texture2?.TransformUVCoordinatesToAtlasSpace(ref uv2);
 				vertices[i].UV1 = uv1;
 				vertices[i].UV2 = uv2;
 			}
-			Renderer.DrawTriangleFan(material, vertices, numCoords);
+			Renderer.DrawTriangleFan(texture1, texture2, material, vertices, numCoords);
 		}
 
 		public override void Render()
@@ -206,7 +204,8 @@ namespace Lime
 				Toolbox.Swap(ref arg1, ref arg2);
 				Toolbox.Swap(ref texture1, ref texture2);
 			}
-			var material = WidgetMaterial.GetInstance(blending, shader, CustomShaderProgram, texture1, texture2);
+
+			var material = CustomMaterial ?? WidgetMaterial.GetInstance(blending, shader, WidgetMaterial.GetNumTextures(texture1, texture2));
 			RenderHelper(arg1, arg2, material, texture1, texture2);
 		}
 	}

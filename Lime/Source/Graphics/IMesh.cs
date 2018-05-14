@@ -5,41 +5,18 @@ namespace Lime
 {
 	public interface IMesh
 	{
-		[YuzuMember]
-		IIndexBuffer IndexBuffer { get; set; }
-
-		[YuzuMember]
-		IVertexBuffer[] VertexBuffers { get; set; }
-
-		// FIXME: Yuzu doesn't support jagged arrays for now
-		// [YuzuMember]
-		int[][] Attributes { get; set; }
-		
 		IMesh ShallowClone();
-	}
-	
-	public interface IVertexBuffer : IDisposable
-	{
-		[YuzuMember]
-		bool Dynamic { get; set; }
-		
-		bool Dirty { get; set; }
+		void Draw(int startVertex, int vertexCount);
+		void DrawIndexed(int startIndex, int indexCount, int baseVertex = 0);
 	}
 
-	public interface IVertexBuffer<T> : IVertexBuffer where T : struct
+	public enum MeshDirtyFlags
 	{
-		[YuzuMember]
-		T[] Data { get; set; }
-	}
-	
-	public interface IIndexBuffer : IDisposable
-	{
-		[YuzuMember]
-		bool Dynamic { get; set; }
-
-		[YuzuMember]
-		ushort[] Data { get; set; }
-
-		bool Dirty { get; set; }
+		None = 0,
+		Vertices = 1 << 0,
+		Indices = 1 << 1,
+		AttributeLocations = 1 << 2,
+		VerticesIndices = Vertices | Indices,
+		All = Vertices | Indices | AttributeLocations,
 	}
 }

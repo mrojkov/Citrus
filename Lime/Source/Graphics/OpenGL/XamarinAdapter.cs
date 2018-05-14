@@ -22,20 +22,9 @@ namespace Lime
 		public const BufferUsage StaticDraw = BufferUsage.StaticDraw;
 	}
 
-	static class PrimitiveType
-	{
-		public const BeginMode Triangles = BeginMode.Triangles;
-	}
-
 	static class FramebufferAttachment
 	{
 		public const FramebufferSlot ColorAttachment0 = FramebufferSlot.ColorAttachment0;
-	}
-
-	static class GetProgramParameterName
-	{
-		public const ProgramParameter LinkStatus = ProgramParameter.LinkStatus;
-		public const ProgramParameter InfoLogLength = ProgramParameter.InfoLogLength;
 	}
 
 	static class GenerateMipmapTarget
@@ -55,11 +44,6 @@ namespace Lime
 	{
 		public const BufferUsage DynamicDraw = BufferUsage.DynamicDraw;
 		public const BufferUsage StaticDraw = BufferUsage.StaticDraw;
-	}
-
-	static class PrimitiveType
-	{
-		public const BeginMode Triangles = BeginMode.Triangles;
 	}
 
 /*
@@ -168,12 +152,6 @@ namespace Lime
 	static class ShaderParameter
 	{
 		public const All CompileStatus = All.CompileStatus;
-		public const All InfoLogLength = All.InfoLogLength;
-	}
-
-	static class GetProgramParameterName
-	{
-		public const All LinkStatus = All.LinkStatus;
 		public const All InfoLogLength = All.InfoLogLength;
 	}
 

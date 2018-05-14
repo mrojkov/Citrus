@@ -257,9 +257,7 @@ namespace Lime
 			var deviceRotated = toOrientation != Application.CurrentDeviceOrientation;
 			Application.CurrentDeviceOrientation = toOrientation;
 			// The texture stages get invalidated after device rotation. Rebind textures to fix it.
-			PlatformRenderer.RebindTextures();
-			// Vertex array objects also get invalidated.
-			Mesh.InvalidateVertexArrayObjects();
+			PlatformRenderer.MarkAllTextureSlotsAsDirty();
 			if (OnResize != null) {
 				OnResize(this, new ResizeEventArgs { DeviceRotated = deviceRotated });
 			}

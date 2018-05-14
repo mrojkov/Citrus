@@ -162,14 +162,12 @@ namespace Lime
 			var oldWorld = Renderer.World;
 			var oldView = Renderer.View;
 			var oldProj = Renderer.Projection;
-			var oldZTestEnabled = Renderer.ZTestEnabled;
-			var oldZWriteEnabled = Renderer.ZWriteEnabled;
+			var oldDepthState = Renderer.DepthState;
 			var oldCullMode = Renderer.CullMode;
 			Renderer.Flush();
-			Renderer.Clear(ClearTarget.DepthBuffer);
+			Renderer.Clear(ClearOptions.DepthBuffer);
 			Renderer.View = Camera.View;
 			Renderer.Projection = TransformProjection(Renderer.Projection);
-			Renderer.ZTestEnabled = true;
 			for (var i = 0; i < RenderChain.LayerCount; i++) {
 				var layer = renderChain.Layers[i];
 				if (layer == null || layer.Count == 0) {
@@ -187,18 +185,17 @@ namespace Lime
 						Distance = p.CalcDistanceToCamera(Camera)
 					});
 				}
-				Renderer.ZWriteEnabled = true;
+				Renderer.DepthState = DepthState.DepthReadWrite;
 				SortAndFlushList(opaqueList, RenderOrderComparers.FrontToBack);
-				Renderer.ZWriteEnabled = false;
+				Renderer.DepthState = DepthState.DepthRead;
 				SortAndFlushList(transparentList, RenderOrderComparers.BackToFront);
 			}
 			renderChain.Clear();
-			Renderer.Clear(ClearTarget.DepthBuffer);
+			Renderer.Clear(ClearOptions.DepthBuffer);
 			Renderer.World = oldWorld;
 			Renderer.View = oldView;
 			Renderer.Projection = oldProj;
-			Renderer.ZTestEnabled = oldZTestEnabled;
-			Renderer.ZWriteEnabled = oldZWriteEnabled;
+			Renderer.DepthState = oldDepthState;
 			Renderer.CullMode = oldCullMode;
 		}
 

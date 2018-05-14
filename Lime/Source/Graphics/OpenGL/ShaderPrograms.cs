@@ -320,31 +320,19 @@ namespace Lime
 				gl_FragColor = color * vec4(t2.rgb, t1.a * t2.a);
 			}";
 
+			private static ColorfulTextShaderProgram instance;
+
+			public static ColorfulTextShaderProgram GetInstance()
+			{
+				if (instance == null) {
+					instance = new ColorfulTextShaderProgram();
+				}
+				return instance;
+			}
+
 			public ColorfulTextShaderProgram()
-				: base(GetShaders(), ShaderPrograms.Attributes.GetLocations(), ShaderPrograms.GetSamplers())
+				: base(GetShaders(), Attributes.GetLocations(), GetSamplers())
 			{ }
-
-			protected override void LoadUniformValues()
-			{
-				base.LoadUniformValues();
-				LoadBoolean(androidHackUniformId, AndroidHack);
-				LoadFloat(colorIndexUniformId, ColorIndex);
-			}
-
-			private int androidHackUniformId;
-			private int colorIndexUniformId;
-
-			public bool AndroidHack { get; set; }
-			public float ColorIndex { get; set; }
-
-			protected override void InitializeUniformIds()
-			{
-				base.InitializeUniformIds();
-				Window.Current.InvokeOnRendering(() => {
-					androidHackUniformId = GetUniformId("androidHack");
-					colorIndexUniformId = GetUniformId("colorIndex");
-				});
-			}
 
 			private static IEnumerable<Shader> GetShaders()
 			{
@@ -356,15 +344,12 @@ namespace Lime
 
 			public const int GradientMapTextureSize = 256;
 
-			private static ITexture fontGradientTexture;
-			private static readonly ColorfulTextShaderProgram[] cachedShaderPrograms = new ColorfulTextShaderProgram[GradientMapTextureSize];
-			public static ColorfulTextShaderProgram GetShaderProgram(int styleIndex)
+			public static float StyleIndexToColorIndex(int styleIndex)
 			{
-				if (cachedShaderPrograms[styleIndex] == null) {
-					cachedShaderPrograms[styleIndex] = new ColorfulTextShaderProgram { ColorIndex = (styleIndex * 2 + 1) / (GradientMapTextureSize * 2.0f) };
-				}
-				return cachedShaderPrograms[styleIndex];
+				return (styleIndex * 2 + 1) / (GradientMapTextureSize * 2.0f);
 			}
+
+			private static ITexture fontGradientTexture;
 
 			public static ITexture GradientRampTexture => fontGradientTexture = fontGradientTexture ?? new SerializableTexture("Fonts/gradient_map");
 		}

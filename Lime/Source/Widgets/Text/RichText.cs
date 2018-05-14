@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Lime.Text;
 using Yuzu;
 
@@ -340,7 +341,6 @@ namespace Lime
 
 			private ShaderId shader;
 			private Blending blending;
-			private ITexture texture;
 			private IMaterial material;
 			private TextRenderer textRenderer;
 			private int paletteIndex;
@@ -350,27 +350,22 @@ namespace Lime
 				this.blending = blending;
 				this.shader = shader;
 				this.textRenderer = textRenderer;
-				texture = null;
 				material = null;
 			}
 			
-			public IMaterial GetMaterial(ITexture texture, int tag)
+			public IMaterial GetMaterial(int tag)
 			{
 				var style = textRenderer.Styles[tag];
-				if (texture != this.texture || paletteIndex != style.PaletteIndex) {
-					this.texture = texture;
-					this.paletteIndex = style.PaletteIndex;
+				if (material == null || paletteIndex != style.PaletteIndex) {
+					paletteIndex = style.PaletteIndex;
 					if (paletteIndex < 0) {
-						material = WidgetMaterial.GetInstance(blending, shader, null, texture);
+						material = WidgetMaterial.GetInstance(blending, shader, 1);
 					} else {
-						var shaderProg = ShaderPrograms.ColorfulTextShaderProgram.GetShaderProgram(paletteIndex);
-						material = WidgetMaterial.GetInstance(
-							blending, shaderProg, texture, 
-							ShaderPrograms.ColorfulTextShaderProgram.GradientRampTexture);
+						material = ColorfulTextMaterial.GetInstance(blending, paletteIndex);
 					}
 				}
 				return material;
 			}
-		}		
+		}
 	}
 }

@@ -47,7 +47,7 @@ namespace Orange
 						mesh.Submeshes.Add(ImportSubmesh(submesh, root));
 					}
 					if (target.Platform == TargetPlatform.Unity) {
-						mesh.CullMode = CullMode.CullCounterClockwise;
+						mesh.CullMode = CullMode.Back;
 					}
 					node = mesh;
 					if (mesh.Submeshes.Count != 0) {
@@ -88,21 +88,17 @@ namespace Orange
 		private Submesh3D ImportSubmesh(Submesh meshAttribute, FbxImporter.Node node)
 		{
 			var sm = new Submesh3D();
-			sm.Mesh = new Mesh {
-				VertexBuffers = new[] {
-					new VertexBuffer<Mesh3D.Vertex> {
-						Data = meshAttribute.Vertices,
-					},
-				},
-				IndexBuffer = new IndexBuffer { Data = meshAttribute.Indices.Select(index => checked((ushort)index)).ToArray() },
-				Attributes = new[] { new[] {
+			sm.Mesh = new Mesh<Mesh3D.Vertex> {
+				Vertices = meshAttribute.Vertices,
+				Indices = meshAttribute.Indices.Select(index => checked((ushort)index)).ToArray(),
+				AttributeLocations = new[] {
 					ShaderPrograms.Attributes.Pos1,
 					ShaderPrograms.Attributes.Color1,
 					ShaderPrograms.Attributes.UV1,
 					ShaderPrograms.Attributes.BlendIndices,
 					ShaderPrograms.Attributes.BlendWeights,
 					ShaderPrograms.Attributes.Normal
-				}}
+				}
 			};
 
 			sm.Material = meshAttribute.MaterialIndex != -1 ?

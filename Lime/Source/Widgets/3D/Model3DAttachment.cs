@@ -81,11 +81,11 @@ namespace Lime
 				node.Position *= sf;
 				if (node is Mesh3D) {
 					foreach (var submesh in (node as Mesh3D).Submeshes) {
-						foreach (VertexBuffer<Mesh3D.Vertex> vb in submesh.Mesh.VertexBuffers) {
-							for (var i = 0; i < vb.Data.Length; i++) {
-								vb.Data[i].Pos *= sf;
-							}
-						};
+						var vertices = submesh.Mesh.Vertices;
+						for (var i = 0; i < vertices.Length; i++) {
+							vertices[i].Pos *= sf;
+						}
+						submesh.Mesh.DirtyFlags |= MeshDirtyFlags.Vertices;
 						for (int i = 0; i < submesh.BoneBindPoses.Count; i++) {
 							submesh.BoneBindPoses[i].Decompose(out scale, out rotation, out tranlation);
 							tranlation *= sf;
@@ -402,10 +402,10 @@ namespace Lime
 									meshOption.CullMode = CullMode.None;
 									break;
 								case "CullClockwise":
-									meshOption.CullMode = CullMode.CullClockwise;
+									meshOption.CullMode = CullMode.Front;
 									break;
 								case "CullCounterClockwise":
-									meshOption.CullMode = CullMode.CullCounterClockwise;
+									meshOption.CullMode = CullMode.Back;
 									break;
 							}
 						}
@@ -526,10 +526,10 @@ namespace Lime
 					case CullMode.None:
 						meshOptionFormat.CullMode = "None";
 						break;
-					case CullMode.CullClockwise:
+					case CullMode.Front:
 						meshOptionFormat.CullMode = "CullClockwise";
 						break;
-					case CullMode.CullCounterClockwise:
+					case CullMode.Back:
 						meshOptionFormat.CullMode = "CullCounterClockwise";
 						break;
 				}

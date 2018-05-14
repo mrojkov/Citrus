@@ -174,51 +174,12 @@
 			}
 		";
 
-		public int WorldUniformId;
-		public int WorldViewUniformId;
-		public int WorldViewProjUniformId;
-		public int DiffuseColorUniformId;
-		public int OpacityUniformId;
-		public int BonesUniformId;
-		public int FogColorUniformId;
-		public int FogStartUniformId;
-		public int FogEndUniformId;
-		public int FogDensityUniformId;
-		public int LightColorUniformId;
-		public int LightDirectionUniformId;
-		public int LightIntensityUniformId;
-		public int LightWorldViewProjectionUniformId;
-		public int LightStrengthUniformId;
-		public int AmbientLightUniformId;
-		public int ShadowColorUniformId;
-
 		public const int DiffuseTextureStage = 0;
 		public const int ShadowMapTextureStage = 1;
 
 		public CommonMaterialProgram(CommonMaterialProgramSpec spec)
 			: base(GetShaders(spec), GetAttribLocations(), GetSamplers(spec))
 		{ }
-
-		protected override void InitializeUniformIds()
-		{
-			WorldUniformId = GetUniformId("u_World");
-			WorldViewUniformId = GetUniformId("u_WorldView");
-			WorldViewProjUniformId = GetUniformId("u_WorldViewProj");
-			DiffuseColorUniformId = GetUniformId("u_DiffuseColor");
-			OpacityUniformId = GetUniformId("u_Opacity");
-			BonesUniformId = GetUniformId("u_Bones");
-			FogColorUniformId = GetUniformId("u_FogColor");
-			FogStartUniformId = GetUniformId("u_FogStart");
-			FogEndUniformId = GetUniformId("u_FogEnd");
-			FogDensityUniformId = GetUniformId("u_FogDensity");
-			LightColorUniformId = GetUniformId("u_LightColor");
-			LightDirectionUniformId = GetUniformId("u_LightDirection");
-			LightIntensityUniformId = GetUniformId("u_LightIntensity");
-			LightWorldViewProjectionUniformId = GetUniformId("u_LightWorldViewProjection");
-			LightStrengthUniformId = GetUniformId("u_LightStrength");
-			AmbientLightUniformId = GetUniformId("u_AmbientLight");
-			ShadowColorUniformId = GetUniformId("u_ShadowColor");
-		}
 
 		private static Shader[] GetShaders(CommonMaterialProgramSpec spec)
 		{

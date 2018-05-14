@@ -4,24 +4,34 @@ namespace Lime
 {
 	public class RenderList
 	{
-		public readonly List<RenderBatch> Batches = new List<RenderBatch>();
-		private RenderBatch lastBatch;
+		public readonly List<IRenderBatch> Batches = new List<IRenderBatch>();
+		private IRenderBatch lastBatch;
 
 		public bool Empty { get { return lastBatch == null; } }
 
-		public RenderBatch GetBatch(IMaterial material, int vertexCount, int indexCount)
+		public RenderBatch<TVertex> GetBatch<TVertex>(ITexture texture1, ITexture texture2, IMaterial material, int vertexCount, int indexCount)
+			where TVertex : struct
 		{
-			bool needMesh = lastBatch == null || 
-				lastBatch.LastVertex + vertexCount > RenderBatch.VertexBufferCapacity ||
-				lastBatch.LastIndex + indexCount > RenderBatch.IndexBufferCapacity;
-			if (!needMesh && lastBatch.Material == material && material.PassCount == 1) {
-				return lastBatch;
+			var atlas1 = texture1?.AtlasTexture;
+			var atlas2 = texture2?.AtlasTexture;
+			var typedLastBatch = lastBatch as RenderBatch<TVertex>;
+			var needMesh = typedLastBatch == null ||
+				typedLastBatch.LastVertex + vertexCount > RenderBatchLimits.MaxVertices ||
+				typedLastBatch.LastIndex + indexCount > RenderBatchLimits.MaxIndices;
+			if (needMesh ||
+				typedLastBatch.Texture1 != atlas1 ||
+				typedLastBatch.Texture2 != atlas2 ||
+				typedLastBatch.Material != material ||
+				typedLastBatch.Material.PassCount != 1
+			) {
+				typedLastBatch = RenderBatch<TVertex>.Acquire(needMesh ? null : typedLastBatch);
+				typedLastBatch.Texture1 = atlas1;
+				typedLastBatch.Texture2 = atlas2;
+				typedLastBatch.Material = material;
+				Batches.Add(typedLastBatch);
+				lastBatch = typedLastBatch;
 			}
-			var batch = RenderBatch.Acquire(needMesh ? null : lastBatch);
-			batch.Material = material;
-			Batches.Add(batch);
-			lastBatch = batch;
-			return batch;
+			return typedLastBatch;
 		}
 
 		public void Render()

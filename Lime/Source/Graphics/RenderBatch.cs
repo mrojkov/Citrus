@@ -3,59 +3,75 @@ using System.Collections.Generic;
 
 namespace Lime
 {
-	public class RenderBatch
+	public interface IRenderBatch
 	{
-		public const int VertexBufferCapacity = 400;
-		public const int IndexBufferCapacity = 600;
+		int LastVertex { get; set; }
+		int StartIndex { get; set; }
+		int LastIndex { get; set; }
+		ITexture Texture1 { get; set; }
+		ITexture Texture2 { get; set; }
+		IMaterial Material { get; set; }
+		void Render();
+		void Release();
+	}
 
-		private static Stack<RenderBatch> batchPool = new Stack<RenderBatch>();
-		private static Stack<IMesh> meshPool = new Stack<IMesh>();
-		private IMesh mesh;
+	public static class RenderBatchLimits
+	{
+		public const int MaxVertices = 400;
+		public const int MaxIndices = 600;
+	}
+
+	public class RenderBatch<TVertex> : IRenderBatch where TVertex : struct
+	{
+		private static Stack<RenderBatch<TVertex>> batchPool = new Stack<RenderBatch<TVertex>>();
+		private static Stack<Mesh<TVertex>> meshPool = new Stack<Mesh<TVertex>>();
 		private bool ownsMesh;
 
-		public IMaterial Material;
-		public int LastVertex;
-		public int StartIndex;
-		public int LastIndex;
-
-		public IVertexBuffer<Vertex> VertexBuffer { get; private set; }
-		public IIndexBuffer IndexBuffer { get; private set; }
+		public ITexture Texture1 { get; set; }
+		public ITexture Texture2 { get; set; }
+		public IMaterial Material { get; set; }
+		public int LastVertex { get; set; }
+		public int StartIndex { get; set; }
+		public int LastIndex { get; set; }
+		public Mesh<TVertex> Mesh { get; set; }
 
 		private void Clear()
 		{
+			Texture1 = null;
+			Texture2 = null;
 			Material = null;
 			StartIndex = LastIndex = LastVertex = 0;
-			if (mesh != null) {
+			if (Mesh != null) {
 				if (ownsMesh) {
-					ReleaseMesh(mesh);
+					ReleaseMesh(Mesh);
 				}
-				mesh = null;
+				Mesh = null;
 			}
 			ownsMesh = false;
 		}
 
 		public void Render()
 		{
+			PlatformRenderer.SetTexture(0, Texture1);
+			PlatformRenderer.SetTexture(1, Texture2);
 			for (int i = 0; i < Material.PassCount; i++) {
 				Material.Apply(i);
-				PlatformRenderer.DrawTriangles(mesh, StartIndex, LastIndex - StartIndex);
+				Mesh.DrawIndexed(StartIndex, LastIndex - StartIndex);
 			}
 		}
 
-		public static RenderBatch Acquire(RenderBatch origin)
+		public static RenderBatch<TVertex> Acquire(RenderBatch<TVertex> origin)
 		{
-			var batch = batchPool.Count == 0 ? new RenderBatch() : batchPool.Pop();
+			var batch = batchPool.Count == 0 ? new RenderBatch<TVertex>() : batchPool.Pop();
 			if (origin != null) {
-				batch.mesh = origin.mesh;
+				batch.Mesh = origin.Mesh;
 				batch.StartIndex = origin.LastIndex;
 				batch.LastVertex = origin.LastVertex;
 				batch.LastIndex = origin.LastIndex;
 			} else {
 				batch.ownsMesh = true;
-				batch.mesh = AcquireMesh();
+				batch.Mesh = AcquireMesh();
 			}
-			batch.VertexBuffer = (IVertexBuffer<Vertex>)batch.mesh.VertexBuffers[0];
-			batch.IndexBuffer = batch.mesh.IndexBuffer;
 			return batch;
 		}
 
@@ -65,29 +81,25 @@ namespace Lime
 			batchPool.Push(this);
 		}
 
-		private static IMesh AcquireMesh()
+		private static Mesh<TVertex> AcquireMesh()
 		{
 			if (meshPool.Count == 0) {
-				var vao = new Mesh {
-					IndexBuffer = new IndexBuffer { Data = new ushort[IndexBufferCapacity], Dynamic = true },
-					VertexBuffers = new[] {
-						new VertexBuffer<Vertex> { Data = new Vertex[VertexBufferCapacity], Dynamic = true }
-					},
-					Attributes = new[] { 
-						new int[] {
-							ShaderPrograms.Attributes.Pos1,
-							ShaderPrograms.Attributes.Color1,
-							ShaderPrograms.Attributes.UV1,
-							ShaderPrograms.Attributes.UV2
-						}
+				var mesh = new Mesh<TVertex> {
+					Vertices = new TVertex[RenderBatchLimits.MaxVertices],
+					Indices = new ushort[RenderBatchLimits.MaxIndices],
+					AttributeLocations = new int[] {
+						ShaderPrograms.Attributes.Pos1,
+						ShaderPrograms.Attributes.Color1,
+						ShaderPrograms.Attributes.UV1,
+						ShaderPrograms.Attributes.UV2
 					}
 				};
-				return vao;
+				return mesh;
 			}
 			return meshPool.Pop();
 		}
 
-		private static void ReleaseMesh(IMesh item)
+		private static void ReleaseMesh(Mesh<TVertex> item)
 		{
 			meshPool.Push(item);
 		}

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Linq;
 using System.IO;
 
@@ -103,6 +104,52 @@ namespace Lime
 		{
 			TValue value;
 			return d.TryGetValue(key, out value) ? value : defaultValue;
+		}
+
+		internal static int SizeOf<T>() => SizeOfCache<T>.Value;
+
+		private static class SizeOfCache<T>
+		{
+			public static readonly int Value = Marshal.SizeOf(typeof(T));
+		}
+	}
+
+	public class ArrayEqualityComparer<T> : IEqualityComparer<T[]>
+	{
+		public static readonly ArrayEqualityComparer<T> Default = new ArrayEqualityComparer<T>(EqualityComparer<T>.Default);
+
+		private IEqualityComparer<T> elementComparer;
+
+		public ArrayEqualityComparer(IEqualityComparer<T> elementComparer)
+		{
+			this.elementComparer = elementComparer;
+		}
+
+		public bool Equals(T[] x, T[] y)
+		{
+			if (x == y) {
+				return true;
+			}
+			if (x == null || y == null || x.Length != y.Length) {
+				return false;
+			}
+			for (var i = 0; i < x.Length; i++) {
+				if (!elementComparer.Equals(x[i], y[i])) {
+					return false;
+				}
+			}
+			return true;
+		}
+
+		public int GetHashCode(T[] x)
+		{
+			unchecked {
+				var hash = x.Length;
+				for (var i = 0; i < x.Length; i++) {
+					hash = (hash * 397) ^ elementComparer.GetHashCode(x[i]);
+				}
+				return hash;
+			}
 		}
 	}
 }

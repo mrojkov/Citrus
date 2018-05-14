@@ -17,8 +17,6 @@ namespace Lime
 
 		static bool etc2Checked;
 		static bool etc2Supported;
-
-		public ITexture AtlasTexture => this;
 		
 		private void InitWithKTXTexture(BinaryReader reader)
 		{
@@ -81,7 +79,8 @@ namespace Lime
 							}
 							Debug.Write(etc2Supported ? "ETC2 textures supported." : "ETC2 textures not supported.");
 						}
-						PlatformRenderer.PushTexture(handle, 0);
+						GL.ActiveTexture(TextureUnit.Texture0);
+						GL.BindTexture(TextureTarget.Texture2D, handle);
 						const int etc1Rgb8Oes = 36196;
 						if (etc2Supported || (Application.Platform == PlatformId.Android && glInternalFormat == etc1Rgb8Oes)) {
 							GL.CompressedTexImage2D(
@@ -93,17 +92,18 @@ namespace Lime
 							GL.TexImage2D(TextureTarget.Texture2D, mipLevel, PixelInternalFormat.Rgba, width, height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, rgba8Data);
 							Marshal.FreeHGlobal(rgba8Data);
 						}
-						PlatformRenderer.PopTexture(0);
+						PlatformRenderer.MarkTextureSlotAsDirty(0);
 						PlatformRenderer.CheckErrors();
 					};
 				} else {
 					var data = ReadTextureData(reader, dataLength);
 					glCommands += () => {
-						PlatformRenderer.PushTexture(handle, 0);
+						GL.ActiveTexture(TextureUnit.Texture0);
+						GL.BindTexture(TextureTarget.Texture2D, handle);
 						GL.TexImage2D(
 							TextureTarget.Texture2D, mipLevel, (PixelInternalFormat)glInternalFormat, 
 							width, height, 0, (PixelFormat)glFormat, (PixelType)glType, data);
-						PlatformRenderer.PopTexture(0);
+						PlatformRenderer.MarkTextureSlotAsDirty(0);
 						PlatformRenderer.CheckErrors();
 					};
 				}

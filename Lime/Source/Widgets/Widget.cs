@@ -1276,27 +1276,23 @@ namespace Lime
 		public void RenderToTexture(ITexture texture, RenderChain renderChain, bool clearRenderTarget = true)
 		{
 			if (Width > 0 && Height > 0) {
-				var scissorTest = Renderer.ScissorTestEnabled;
-				if (scissorTest) {
-					Renderer.ScissorTestEnabled = false;
-				}
+				var savedScissorState = Renderer.ScissorState;
 				texture.SetAsRenderTarget();
 				var savedViewport = Renderer.Viewport;
 				var savedWorld = Renderer.World;
 				var savedView = Renderer.View;
 				var savedProj = Renderer.Projection;
-				var savedZTestEnabled = Renderer.ZTestEnabled;
-				var savedZWriteEnabled = Renderer.ZWriteEnabled;
+				var savedDepthState = Renderer.DepthState;
 				var savedCullMode = Renderer.CullMode;
 				var savedTransform2 = Renderer.Transform2;
-				Renderer.Viewport = new WindowRect { X = 0, Y = 0, Width = texture.ImageSize.Width, Height = texture.ImageSize.Height };
+				Renderer.ScissorState = ScissorState.ScissorDisabled;
+				Renderer.Viewport = new Viewport(0, 0, texture.ImageSize.Width, texture.ImageSize.Height);
 				if (clearRenderTarget) {
-					Renderer.Clear(0, 0, 0, 0);
+					Renderer.Clear(new Color4(0, 0, 0, 0));
 				}
 				Renderer.World = Renderer.View = Matrix44.Identity;
 				Renderer.SetOrthogonalProjection(0, 0, Width, Height);
-				Renderer.ZTestEnabled = false;
-				Renderer.ZWriteEnabled = true;
+				Renderer.DepthState = DepthState.DepthDisabled;
 				Renderer.CullMode = CullMode.None;
 				Renderer.Transform2 = LocalToWorldTransform.CalcInversed();
 				for (var node = FirstChild; node != null; node = node.NextSibling) {
@@ -1309,11 +1305,8 @@ namespace Lime
 				Renderer.World = savedWorld;
 				Renderer.View = savedView;
 				Renderer.Projection = savedProj;
-				if (scissorTest) {
-					Renderer.ScissorTestEnabled = true;
-				}
-				Renderer.ZTestEnabled = savedZTestEnabled;
-				Renderer.ZWriteEnabled = savedZWriteEnabled;
+				Renderer.ScissorState = savedScissorState;
+				Renderer.DepthState = savedDepthState;
 				Renderer.CullMode = savedCullMode;
 			}
 		}

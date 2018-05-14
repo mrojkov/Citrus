@@ -8,6 +8,7 @@ namespace Lime
 	public class Sprite
 	{
 		public int Tag;
+		public ITexture Texture;
 		public IMaterial Material;
 		public Color4 Color;
 		public Vector2 UV0;
@@ -17,32 +18,22 @@ namespace Lime
 		
 		public interface IMaterialProvider
 		{
-			IMaterial GetMaterial(ITexture texture, int tag);
+			IMaterial GetMaterial(int tag);
 		}
 		
 		public class DefaultMaterialProvider : IMaterialProvider
 		{
 			public static readonly DefaultMaterialProvider Instance = new DefaultMaterialProvider();
 
-			private Blending blending;
-			private ShaderId shader;
-			private ITexture texture;
 			private IMaterial material;
 			
 			public void Init(Blending blending, ShaderId shader)
 			{
-				this.blending = blending;
-				this.shader = shader;
-				texture = null;
-				material = null;
+				material = WidgetMaterial.GetInstance(blending, shader, 1);
 			}
 			
-			public IMaterial GetMaterial(ITexture texture, int tag)
+			public IMaterial GetMaterial(int tag)
 			{
-				if (texture != this.texture) {
-					this.texture = texture;
-					material = WidgetMaterial.GetInstance(blending, shader, null, texture);
-				}
 				return material;
 			}
 		}
@@ -51,31 +42,16 @@ namespace Lime
 		{
 			public static readonly LcdFontMaterialProvider Instance = new LcdFontMaterialProvider();
 
-			private ITexture texture;
-			private IMaterial material;
-			private readonly Dictionary<ITexture, IMaterial> materials = new Dictionary<ITexture, IMaterial>();
-			
-			public void Init()
+			public IMaterial GetMaterial(int tag)
 			{
-				texture = null;
-				material = null;
-			}
-			
-			public IMaterial GetMaterial(ITexture texture, int tag)
-			{
-				if (texture != this.texture) {
-					this.texture = texture;
-					if (!materials.TryGetValue(texture, out material)) {
-						material = new LcdFontMaterial(texture);
-						materials.Add(texture, material);
-					}
-				}
-				return material;
+				return LcdFontMaterial.Instance;
 			}
 		}
 		
 		public class LcdFontMaterial : IMaterial
 		{
+			public static readonly LcdFontMaterial Instance = new LcdFontMaterial();
+
 			private static string vs = @"
 				attribute vec4 inPos;
 				attribute vec4 inColor;
@@ -106,41 +82,34 @@ namespace Lime
 				{
 					gl_FragColor = color * texture2D(tex1, texCoords1);
 				}";
-		
-			public static readonly ShaderProgram shaderProgramPass1;
-			public static readonly ShaderProgram shaderProgramPass2;
-			
-			public readonly ITexture Texture;
-			
+
+			private ShaderProgram shaderProgramPass1;
+			private ShaderProgram shaderProgramPass2;
+
 			public int PassCount => 2;
-			
-			static LcdFontMaterial()
-			{
-				shaderProgramPass1 = new ShaderProgram(
-					new Shader[] { new VertexShader(vs), new FragmentShader(fsPass1) }, 
-					ShaderPrograms.Attributes.GetLocations(), ShaderPrograms.GetSamplers());
-					
-				shaderProgramPass2 = new ShaderProgram(
-					new Shader[] { new VertexShader(vs), new FragmentShader(fsPass2) }, 
-					ShaderPrograms.Attributes.GetLocations(), ShaderPrograms.GetSamplers());
-			}
-			
-			public LcdFontMaterial(ITexture texture)
-			{
-				Texture = texture;
-			}
-					
-			public IMaterial Clone() => (WidgetMaterial)MemberwiseClone();
+
+			private LcdFontMaterial()
+			{ }
+
+			public IMaterial Clone() => Instance;
 			
 			public void Apply(int pass)
 			{
-				PlatformRenderer.SetTexture(Texture, 0);
-				PlatformRenderer.SetTexture(null, 1);
 				if (pass == 0) {
-					PlatformRenderer.SetBlending(Blending.LcdTextFirstPass, false);
+					if (shaderProgramPass1 == null) {
+						shaderProgramPass1 = new ShaderProgram(
+							new Shader[] { new VertexShader(vs), new FragmentShader(fsPass1) },
+							ShaderPrograms.Attributes.GetLocations(), ShaderPrograms.GetSamplers());
+					}
+					PlatformRenderer.SetBlendState(Blending.LcdTextFirstPass.GetBlendState());
 					PlatformRenderer.SetShaderProgram(shaderProgramPass1);
 				} else {
-					PlatformRenderer.SetBlending(Blending.LcdTextSecondPass, false);
+					if (shaderProgramPass2 == null) {
+						shaderProgramPass2 = new ShaderProgram(
+							new Shader[] { new VertexShader(vs), new FragmentShader(fsPass2) },
+							ShaderPrograms.Attributes.GetLocations(), ShaderPrograms.GetSamplers());
+					}
+					PlatformRenderer.SetBlendState(Blending.LcdTextSecondPass.GetBlendState());
 					PlatformRenderer.SetShaderProgram(shaderProgramPass2);
 				}
 			}
@@ -161,11 +130,9 @@ namespace Lime
 
 		private class NormalSprite : Sprite, ISpriteWrapper
 		{
-			public ITexture Texture;
-
-			public void AddToList(List<Sprite> sprites, Sprite.IMaterialProvider provider)
+			public void AddToList(List<Sprite> sprites, IMaterialProvider provider)
 			{
-				Material = provider.GetMaterial(Texture, Tag);
+				Material = provider.GetMaterial(Tag);
 				sprites.Add(this);
 			}
 
@@ -208,14 +175,14 @@ namespace Lime
 					s.Size = cd.Size(FontHeight);
 					s.UV0 = cd.FontChar.UV0;
 					s.UV1 = cd.FontChar.UV1;
-					var texture = cd.FontChar.Texture;
-					texture.TransformUVCoordinatesToAtlasSpace(ref s.UV0);
-					texture.TransformUVCoordinatesToAtlasSpace(ref s.UV1);
+					s.Texture = cd.FontChar.Texture;
+					s.Texture.TransformUVCoordinatesToAtlasSpace(ref s.UV0);
+					s.Texture.TransformUVCoordinatesToAtlasSpace(ref s.UV1);
 					s.Color = Color;
 					if (cd.FontChar.RgbIntensity) {
-						s.Material = Sprite.LcdFontMaterialProvider.Instance.GetMaterial(texture, Tag);
+						s.Material = Sprite.LcdFontMaterialProvider.Instance.GetMaterial(Tag);
 					} else {
-						s.Material = provider.GetMaterial(texture, Tag);
+						s.Material = provider.GetMaterial(Tag);
 					}
 					sprites.Add(s);
 				}
@@ -282,7 +249,6 @@ namespace Lime
 		public void Render(Color4 color, Blending blending, ShaderId shader)
 		{
 			Sprite.DefaultMaterialProvider.Instance.Init(blending, shader);
-			Sprite.LcdFontMaterialProvider.Instance.Init();
 			Render(color, Sprite.DefaultMaterialProvider.Instance);
 		}
 

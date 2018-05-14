@@ -231,6 +231,11 @@ namespace Lime
 			return lhs.ABGR != rhs.ABGR;
 		}
 
+		public Vector4 ToVector4()
+		{
+			return new Vector4(R / 255f, G / 255f, B / 255f, A / 255f);
+		}
+
 		public enum StringPresentation
 		{
 			Hex,

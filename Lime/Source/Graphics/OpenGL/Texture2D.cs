@@ -15,7 +15,7 @@ namespace Lime
 	/// <summary>
 	/// Represents 2D texture
 	/// </summary>
-	public partial class Texture2D : CommonTexture, ITexture, IWidgetMaterialListHolder, IGLObject
+	public partial class Texture2D : CommonTexture, ITexture, IGLObject
 	{
 		#region TextureReloader
 		abstract class TextureReloader
@@ -101,13 +101,13 @@ namespace Lime
 		private TextureReloader reloader;
 		private int usedOnRenderCycle;
 
+		public ITexture AtlasTexture => this;
+
 		public virtual string SerializationPath
 		{
 			get { throw new NotSupportedException(); }
 			set { throw new NotSupportedException(); }
 		}
-		
-		WidgetMaterialList IWidgetMaterialListHolder.WidgetMaterials { get; } = new WidgetMaterialList();
 
 		public Rectangle AtlasUVRect { get { return uvRect; } }
 
@@ -120,9 +120,10 @@ namespace Lime
 			if (handle == 0) {
 				return;
 			}
-			PlatformRenderer.PushTexture(handle, 0);
+			GL.ActiveTexture(TextureUnit.Texture0);
+			GL.BindTexture(TextureTarget.Texture2D, handle);
 			GL.TexParameter(TextureTarget.Texture2D, name, value);
-			PlatformRenderer.PopTexture(0);
+			PlatformRenderer.MarkTextureSlotAsDirty(0);
 		}
 
 		private TextureParams textureParams = TextureParams.Default;
@@ -286,12 +287,13 @@ namespace Lime
 				GL.GenTextures(1, t);
 				handle = (uint)t[0];
 			}
-			PlatformRenderer.PushTexture(handle, 0);
+			GL.ActiveTexture(TextureUnit.Texture0);
+			GL.BindTexture(TextureTarget.Texture2D, handle);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, textureParams.MinFilter.ToInt());
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, textureParams.MagFilter.ToInt());
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, textureParams.WrapModeU.ToInt());
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, textureParams.WrapModeV.ToInt());
-			PlatformRenderer.PopTexture(0);
+			PlatformRenderer.MarkTextureSlotAsDirty(0);
 			PlatformRenderer.CheckErrors();
 		}
 
@@ -314,9 +316,10 @@ namespace Lime
 				var pointer = pinnedArray.AddrOfPinnedObject();
 				
 				PrepareOpenGLTexture();
-				PlatformRenderer.PushTexture(handle, 0);
+				GL.ActiveTexture(TextureUnit.Texture0);
+				GL.BindTexture(TextureTarget.Texture2D, handle);
 				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, pointer);
-				PlatformRenderer.PopTexture(0);
+				PlatformRenderer.MarkTextureSlotAsDirty(0);
 				PlatformRenderer.CheckErrors();
 				
 				pinnedArray.Free();
@@ -333,11 +336,12 @@ namespace Lime
 			
 			Window.Current.InvokeOnRendering(() => {
 				PrepareOpenGLTexture();
-				PlatformRenderer.PushTexture(handle, 0);
+				GL.ActiveTexture(TextureUnit.Texture0);
+				GL.BindTexture(TextureTarget.Texture2D, handle);
 				GL.TexSubImage2D(TextureTarget.Texture2D, 0, x, y, width, height,
 					PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
 				PlatformRenderer.CheckErrors();
-				PlatformRenderer.PopTexture(0);
+				PlatformRenderer.MarkTextureSlotAsDirty(0);
 			});
 		}
 
@@ -372,7 +376,6 @@ namespace Lime
 				var capturedHandle = handle;
 				Window.Current.InvokeOnRendering(() => {
 					GL.DeleteTextures(1, new uint[] { capturedHandle });
-					PlatformRenderer.InvalidateTexture(capturedHandle);
 				});
 				handle = 0;
 			}

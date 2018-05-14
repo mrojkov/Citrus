@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 #if iOS || ANDROID || WIN
 using OpenTK.Graphics.ES30;
@@ -10,138 +11,188 @@ using Yuzu;
 
 namespace Lime
 {
-	public partial class Mesh : IMesh, IDisposable, IGLObject
+	public partial class Mesh<T> : IMesh, IGLObject, IDisposable where T : struct
 	{
 		private bool disposed;
-		private uint vaoHandle;
-		private static bool vaoSupported;
-		private static bool vaoChecked;
-		private static int currentContext;
 
-#if iOS
-		internal const string OpenGLLibrary = ObjCRuntime.Constants.OpenGLESLibrary;
-#elif MAC
-		internal const string OpenGLLibrary = ObjCRuntime.Constants.OpenGLLibrary;
-#elif ANDROID
-		internal const string OpenGLLibrary = "libGLESv2.dll";
-#elif MONOMAC
-		internal const string OpenGLLibrary = "/System/Library/Frameworks/OpenGL.framework/OpenGL";
-#elif WIN
-		internal const string OpenGLLibrary = "opengl32.dll";
-#endif
+		[YuzuMember]
+		public int[] AttributeLocations;
 
-		[DllImport(OpenGLLibrary, EntryPoint = "glGenVertexArrays", ExactSpelling = true)]
-		private extern unsafe static void glGenVertexArrays(uint n, uint *arrays);
+		[YuzuMember]
+		public T[] Vertices;
 
-		[DllImport(OpenGLLibrary, EntryPoint = "glDeleteVertexArrays", ExactSpelling = true)]
-		private extern unsafe static void glDeleteVertexArrays(uint n, uint *arrays);
+		[YuzuMember]
+		public ushort[] Indices;
 
-		[DllImport(OpenGLLibrary, EntryPoint = "glBindVertexArray", ExactSpelling = true)]
-		private extern static void glBindVertexArray(uint array);
+		[YuzuMember]
+		public PrimitiveTopology Topology = PrimitiveTopology.TriangleList;
 
-		public IIndexBuffer IndexBuffer { get; set; }
-		public IVertexBuffer[] VertexBuffers { get; set; }
-		public int[][] Attributes { get; set; }
-		
-		private int context;
-		private IGLVertexBuffer[] glVertexBuffers;
-		private IGLIndexBuffer glIndexBuffer;
-		
-		internal static void InvalidateVertexArrayObjects()
-		{
-			currentContext++;
-		}
+		[YuzuMember]
+		public MeshDirtyFlags DirtyFlags = MeshDirtyFlags.All;
 
-		public Mesh()
-		{
-#if WIN || MAC || MONOMAC
-			var requiredVaoCheck = !vaoChecked && !(CommonWindow.Current != null && CommonWindow.Current is DummyWindow);
-#else
-			var requiredVaoCheck = !vaoChecked;
-#endif
-			if (requiredVaoCheck) {
-				vaoChecked = true;
-				var ext = GL.GetString(StringName.Extensions);
-				vaoSupported = ext?.Contains("OES_vertex_array_object") ?? false;
-				Debug.Write(vaoSupported ? "VAO supported." : "VAO not supported.");
-			}
-			GLObjectRegistry.Instance.Add(this);
-		}
-		
-		public IMesh ShallowClone()
-		{
-			return (IMesh)MemberwiseClone();
-		}
-
-		private unsafe void AllocateVAOHandle()
-		{
-			fixed (uint* p = &vaoHandle) {
-				glGenVertexArrays(1, p);
-			}
-		}
+		private VertexInputLayout inputLayout;
+		private VertexBuffer vertexBuffer;
+		private IndexBuffer indexBuffer;
 
 		~Mesh()
 		{
 			Dispose();
 		}
-		
-		internal void Bind()
-		{
-			if (glIndexBuffer == null) {
-				glIndexBuffer = (IGLIndexBuffer)IndexBuffer;
-				glVertexBuffers = new IGLVertexBuffer[VertexBuffers.Length];
-				for (int i = 0; i < VertexBuffers.Length; i++) {
-					glVertexBuffers[i] = (IGLVertexBuffer)VertexBuffers[i];
-				}
-			}
-			if (vaoSupported) {
-				if (vaoHandle == 0 || context != currentContext) {
-					context = currentContext;
-					AllocateVAOHandle();
-					glBindVertexArray(vaoHandle);
-					int i = 0;
-					foreach (var vb in glVertexBuffers) {
-						vb.SetAttribPointers(Attributes[i++]);
-					}
-				}
-				glBindVertexArray(vaoHandle);
-				foreach (var vb in glVertexBuffers) {
-					vb.BufferData();
-				}
-				glIndexBuffer.BufferData();
-			} else {
-				int i = 0;
-				foreach (var vb in glVertexBuffers) {
-					vb.SetAttribPointers(Attributes[i++]);
-					vb.BufferData();
-				}
-				glIndexBuffer.BufferData();
-			}
-		}
 
 		public void Dispose()
 		{
 			if (!disposed) {
-				Discard();
+				if (vertexBuffer != null) {
+					vertexBuffer.Dispose();
+					vertexBuffer = null;
+				}
+				if (indexBuffer != null) {
+					indexBuffer.Dispose();
+					indexBuffer = null;
+				}
 				disposed = true;
 			}
 			GC.SuppressFinalize(this);
 		}
 
-		public unsafe void Discard()
+		public void Discard()
 		{
-			if (vaoHandle != 0) {
-				uint capturedVaoHandle = vaoHandle;
-				Window.Current.InvokeOnRendering(() => {
-					#if !MAC && !MONOMAC
-					if (OpenTK.Graphics.GraphicsContext.CurrentContext == null)
-						return;
-					#endif
-					uint h = capturedVaoHandle;
-					glDeleteVertexArrays(1, &h);
-				});
-				vaoHandle = 0;
+			if (vertexBuffer != null) {
+				vertexBuffer.Discard();
 			}
+			if (indexBuffer != null) {
+				indexBuffer.Discard();
+			}
+			DirtyFlags = MeshDirtyFlags.All;
+		}
+
+		public Mesh<T> ShallowClone()
+		{
+			return (Mesh<T>)MemberwiseClone();
+		}
+
+		IMesh IMesh.ShallowClone() => ShallowClone();
+
+		public void Draw(int startVertex, int vertexCount)
+		{
+			PreDraw();
+			PlatformRenderer.Draw(Topology, startVertex, vertexCount);
+		}
+
+		public void DrawIndexed(int startIndex, int indexCount, int baseVertex = 0)
+		{
+			PreDraw();
+			PlatformRenderer.DrawIndexed(Topology, startIndex, indexCount, baseVertex);
+		}
+
+		private void PreDraw()
+		{
+			UpdateBuffers();
+			UpdateInputLayout();
+			PlatformRenderer.SetVertexInputLayout(inputLayout);
+			PlatformRenderer.SetVertexBuffer(0, vertexBuffer, 0);
+			PlatformRenderer.SetIndexBuffer(indexBuffer, 0, IndexFormat.Index16Bits);
+		}
+
+		private void UpdateBuffers()
+		{
+			if ((DirtyFlags & MeshDirtyFlags.Vertices) != 0) {
+				if (vertexBuffer == null) {
+					vertexBuffer = new VertexBuffer(true);
+				}
+				vertexBuffer.SetData(Vertices, Vertices?.Length ?? 0);
+				DirtyFlags &= ~MeshDirtyFlags.Vertices;
+			}
+			if ((DirtyFlags & MeshDirtyFlags.Indices) != 0) {
+				if (indexBuffer == null) {
+					indexBuffer = new IndexBuffer(true);
+				}
+				indexBuffer.SetData(Indices, Indices?.Length ?? 0);
+				DirtyFlags &= ~MeshDirtyFlags.Indices;
+			}
+		}
+
+		private void UpdateInputLayout()
+		{
+			if (inputLayout == null || (DirtyFlags & MeshDirtyFlags.AttributeLocations) != 0) {
+				var elements = new List<VertexInputElement>();
+				var stride = Toolbox.SizeOf<T>();
+				foreach (var elementDescription in GetElementDescriptions()) {
+					elements.Add(new VertexInputElement {
+						Slot = 0,
+						Attribute = AttributeLocations[elements.Count],
+						Stride = stride,
+						Offset = elementDescription.Offset,
+						Format = elementDescription.Format,
+					});
+				}
+				inputLayout = VertexInputLayout.New(elements.ToArray());
+				DirtyFlags &= ~MeshDirtyFlags.AttributeLocations;
+			}
+		}
+
+		[ThreadStatic]
+		private static ElementDescription[] elementDescriptions;
+
+		private static ElementDescription[] GetElementDescriptions()
+		{
+			if (elementDescriptions == null) {
+				elementDescriptions = GetElementDescriptionsFromReflection().ToArray();
+			}
+			return elementDescriptions;
+		}
+
+		private static IEnumerable<ElementDescription> GetElementDescriptionsFromReflection()
+		{
+			int offset = 0;
+			var result = GetElementDescription(typeof(T), ref offset);
+			if (result != null) {
+				yield return result;
+				yield break;
+			}
+			foreach (var field in typeof(T).GetFields()) {
+				var attrs = field.GetCustomAttributes(typeof(FieldOffsetAttribute), false);
+				if (attrs.Length > 0) {
+					offset = (attrs[0] as FieldOffsetAttribute).Value;
+				}
+				result = GetElementDescription(field.FieldType, ref offset);
+				if (result != null) {
+					yield return result;
+				} else {
+					throw new InvalidOperationException();
+				}
+			}
+		}
+
+		private static ElementDescription GetElementDescription(Type type, ref int offset)
+		{
+			ElementDescription result = null;
+			if (type == typeof(float)) {
+				result = new ElementDescription { Format = VertexInputElementFormat.Float1, Offset = offset };
+				offset += 4;
+			} else if (type == typeof(Vector2)) {
+				result = new ElementDescription { Format = VertexInputElementFormat.Float2, Offset = offset };
+				offset += 8;
+			} else if (type == typeof(Vector3)) {
+				result = new ElementDescription { Format = VertexInputElementFormat.Float3, Offset = offset };
+				offset += 12;
+			} else if (type == typeof(Color4)) {
+				result = new ElementDescription { Format = VertexInputElementFormat.UByte4Norm, Offset = offset };
+				offset += 4;
+			} else if (type == typeof(Mesh3D.BlendIndices)) {
+				result = new ElementDescription { Format = VertexInputElementFormat.UByte4, Offset = offset };
+				offset += 4;
+			} else if (type == typeof(Mesh3D.BlendWeights)) {
+				result = new ElementDescription { Format = VertexInputElementFormat.Float4, Offset = offset };
+				offset += 16;
+			}
+			return result;
+		}
+
+		private class ElementDescription
+		{
+			public VertexInputElementFormat Format;
+			public int Offset;
 		}
 	}
 }
