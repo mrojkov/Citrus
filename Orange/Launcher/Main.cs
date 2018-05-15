@@ -132,44 +132,66 @@ namespace Launcher
 				var winBundlePath = releaseCommand.Option<string>("-w --win-bundle <WINDOWS_BUNDLE_PATH>", "Path to windows bundle of Citrus.", CommandOptionType.SingleValue);
 				winBundlePath.IsRequired();
 				var macBundlePath = releaseCommand.Option<string>("-m --mac-bundle <MAC_BUNDLE_PATH>", "Path to MAC OS bundle of Citrus.", CommandOptionType.SingleValue);
-				macBundlePath.IsRequired();
+				// TODO: uncomment when mac bundle teamcity chain is done
+				//macBundlePath.IsRequired();
+				var buildNumberOption = releaseCommand.Option<string>("-n --build-number <BUILD_NUMBER>", "Build number.", CommandOptionType.SingleValue);
+				buildNumberOption.IsRequired();
 				releaseCommand.OnExecute(async () => {
 #if MAC
 					NSApplication.Init();
 #endif // MAC
+					Console.WriteLine($"Build version: {buildNumberOption.ParsedValue}");
+
+					CitrusVersion citrusVersionWin = null;
+					var citrusDirectory = Toolbox.CalcCitrusDirectory();
+
+					using (var winZipFile = ZipFile.Open(Path.Combine(citrusDirectory, winBundlePath.ParsedValue), ZipArchiveMode.Update)) {
+						var citrusVersionEntryWin = winZipFile.GetEntry(CitrusVersion.Filename);
+						var yjd = new Yuzu.Json.JsonDeserializer();
+						using (var stream = citrusVersionEntryWin.Open()) {
+							citrusVersionWin = yjd.FromStream<CitrusVersion>(stream);
+						}
+						citrusVersionWin.IsStandalone = true;
+						citrusVersionWin.BuildNumber = buildNumberOption.ParsedValue;
+						// TODO: fill in checksums for each file?
+						citrusVersionEntryWin.Delete();
+						citrusVersionEntryWin = winZipFile.CreateEntry(CitrusVersion.Filename);
+						var yjs = new Yuzu.Json.JsonSerializer();
+						using (var stream = citrusVersionEntryWin.Open()) {
+							yjs.ToStream(citrusVersionWin, stream);
+						}
+					}
 					var client = new GitHubClient(new ProductHeaderValue(githubUserOption.ParsedValue));
 					var basicAuth = new Credentials(githubUserOption.ParsedValue, githubPasswordOption.ParsedValue);
 					client.Credentials = basicAuth;
-					var release = new NewRelease("v1.0.0") {
-						Name = "Test Release Name",
-						Body = "#Header \n\n body text",
+					var tagName = $"gh_{citrusVersionWin.Version}_{citrusVersionWin.BuildNumber}";
+					var release = new NewRelease(tagName) {
+						Name = "Automated release",
+						Body = "Automated release",
 						Draft = false,
-						Prerelease = false
+						Prerelease = false,
 					};
 					var result = await client.Repository.Release.Create("mrojkov", "Citrus", release);
 					Console.WriteLine("Created release id {0}", result.Id);
-					var releases = await client.Repository.Release.GetAll("mrojkov", "Citrus");
-					var latest = releases[0];
-					Console.WriteLine(
-						"The latest release is tagged at {0} and is named {1}",
-						latest.TagName,
-						latest.Name);
-
-					var archiveContents = File.OpenRead(Path.Combine("temp_apth_here", "release.zip"));
+					// TODO: abort upload if nothing changed
+					//var releases = await client.Repository.Release.GetAll("mrojkov", "Citrus");
+					var latest = result;// releases[0];
+					var archiveContents = File.OpenRead(Path.Combine(citrusDirectory, winBundlePath.ParsedValue));
 					var assetUpload = new ReleaseAssetUpload() {
-						FileName = "mrelease.zip",
+						FileName = $"citrus_win_{tagName}.zip",
 						ContentType = "application/zip",
 						RawData = archiveContents
 					};
 					var asset = await client.Repository.Release.UploadAsset(latest, assetUpload);
+					Console.WriteLine("Done uploading asset");
 				});
 			});
 
 			cli.Command("bundle", (bundleCommand) => {
 				bundleCommand.HelpOption("-h --help");
 				bundleCommand.Description = "Build Tangerine, Orange and bundle them together into zip.";
-				var tempOption = bundleCommand.Option<string>("-t --temp-directory <DIRECTORY_PATH>", "Temporary directory.", CommandOptionType.SingleValue);
-				var outputOption = bundleCommand.Option<string>("-o --output <OUTPUT_DIRECTORY>", "Output directory.", CommandOptionType.SingleValue);
+				var tempOption = bundleCommand.Option<string>("-t --temp-directory <DIRECTORY_PATH>", "Temporary directory. If specified path is not full it becomes relative to Citrus directory.", CommandOptionType.SingleValue);
+				var outputOption = bundleCommand.Option<string>("-o --output <OUTPUT_PATH>", "Output path including bundle name (e.g. bundle_win.zip). If specified path is not full it becomes relative to Citrus directory.", CommandOptionType.SingleValue);
 				bundleCommand.OnExecute(() => {
 #if MAC
 					NSApplication.Init();
@@ -190,26 +212,46 @@ namespace Launcher
 					var orangeFiles = new FileEnumerator(orangeBinDir);
 					var tangerineFiles = new FileEnumerator(tangerineBinDir);
 
+					var platformSuffix =
+#if WIN
+						"win";
+#elif MAC
+						"mac";
+#endif
 					var tempPath = tempOption.HasValue() ? tempOption.ParsedValue : Path.Combine(builder.CitrusDirectory, "launcher_temp");
-					var outputPath = outputOption.HasValue() ? outputOption.ParsedValue : Path.Combine(builder.CitrusDirectory, "launcher_output");
+					var outputPath = outputOption.HasValue()
+						? Path.Combine(builder.CitrusDirectory, outputOption.ParsedValue)
+						: Path.Combine(builder.CitrusDirectory, "launcher_output", $"bundle_{platformSuffix}.zip");
+					var outputDirectory = Path.GetDirectoryName(outputPath);
 					if (Directory.Exists(tempPath)) {
 						Directory.Delete(tempPath, true);
 					}
-					if (Directory.Exists(outputPath)) {
-						Directory.Delete(outputPath, true);
+					if (Directory.Exists(outputDirectory)) {
+						Directory.Delete(outputDirectory, true);
 					}
 					Directory.CreateDirectory(tempPath);
-					Directory.CreateDirectory(outputPath);
+					Directory.CreateDirectory(outputDirectory);
+					Console.WriteLine($"Temporary Directory is {tempPath}");
+					Console.WriteLine($"Output Path is {outputPath}");
+					Console.WriteLine("Begin copying artifacts to temporary directory");
 					foreach (var fi in orangeFiles.Enumerate()) {
-						Directory.CreateDirectory(Path.GetDirectoryName(Path.Combine(tempPath, fi.Path)));
-						File.Copy(Path.Combine(orangeBinDir, fi.Path), Path.Combine(tempPath, fi.Path));
+						var srcPath = Path.Combine(orangeBinDir, fi.Path);
+						var dstPath = Path.Combine(tempPath, fi.Path);
+						Directory.CreateDirectory(Path.GetDirectoryName(dstPath));
+						File.Copy(srcPath, dstPath);
+						Console.WriteLine($"Copying {srcPath} => {dstPath}");
 					}
 					foreach (var fi in tangerineFiles.Enumerate()) {
-						Directory.CreateDirectory(Path.GetDirectoryName(Path.Combine(tempPath, fi.Path)));
-						File.Copy(Path.Combine(tangerineBinDir, fi.Path), Path.Combine(tempPath, fi.Path), true);
+						var srcPath = Path.Combine(tangerineBinDir, fi.Path);
+						var dstPath = Path.Combine(tempPath, fi.Path);
+						Directory.CreateDirectory(Path.GetDirectoryName(dstPath));
+						File.Copy(srcPath, dstPath, true);
+						Console.WriteLine($"Copying {srcPath} => {dstPath}");
 					}
 					File.Copy(Path.Combine(builder.CitrusDirectory, Orange.CitrusVersion.Filename), Path.Combine(tempPath, Orange.CitrusVersion.Filename));
-					ZipFile.CreateFromDirectory(tempPath, Path.Combine(outputPath, "bundle.zip"), CompressionLevel.Optimal, false);
+					Console.WriteLine($"Begin zipping archive.");
+					ZipFile.CreateFromDirectory(tempPath, outputPath, CompressionLevel.Optimal, false);
+					Console.WriteLine("Done.");
 				});
 			});
 

@@ -14,6 +14,6 @@ namespace Orange
 		public string BuildNumber { get; set; }
 
 		[YuzuMember]
-		bool IsStandalone { get; set; }
+		public bool IsStandalone { get; set; }
 	}
 }
