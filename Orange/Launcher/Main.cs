@@ -208,6 +208,7 @@ namespace Launcher
 						Directory.CreateDirectory(Path.GetDirectoryName(Path.Combine(tempPath, fi.Path)));
 						File.Copy(Path.Combine(tangerineBinDir, fi.Path), Path.Combine(tempPath, fi.Path), true);
 					}
+					File.Copy(Path.Combine(builder.CitrusDirectory, Orange.CitrusVersion.Filename), Path.Combine(tempPath, Orange.CitrusVersion.Filename));
 					ZipFile.CreateFromDirectory(tempPath, Path.Combine(outputPath, "bundle.zip"), CompressionLevel.Optimal, false);
 				});
 			});
