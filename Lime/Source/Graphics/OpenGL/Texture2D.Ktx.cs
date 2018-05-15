@@ -1,4 +1,4 @@
-﻿#if OPENGL
+#if OPENGL
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -13,7 +13,7 @@ namespace Lime
 {
 	public partial class Texture2D : CommonTexture, ITexture
 	{
-		const UInt32 KTXMagic = 0x58544BAB;
+		public const UInt32 KTXMagic = 0x58544BAB;
 
 		static bool etc2Checked;
 		static bool etc2Supported;

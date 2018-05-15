@@ -40,18 +40,37 @@ namespace Orange
 				using (new DirectoryChanger(outputDirectory)) {
 					foreach (string asset in AssetBundle.Current.EnumerateFiles()) {
 						using (var stream = AssetBundle.Current.OpenFile(asset)) {
-							Console.WriteLine("> " + asset);
-							string assetDirectory = Path.GetDirectoryName(asset);
-							if (assetDirectory != "") {
-								Directory.CreateDirectory(assetDirectory);
-							}
-							using (var file = new FileStream(asset, FileMode.Create)) {
-								stream.CopyTo(file);
+							using (var streamCopy = new MemoryStream()) {
+								stream.CopyTo(streamCopy);
+								var assetPath = ChangeExtensionIfKtx(streamCopy, asset);
+								Console.WriteLine("> " + assetPath);
+								var assetDirectory = Path.GetDirectoryName(assetPath);
+								if (assetDirectory != "") {
+									Directory.CreateDirectory(assetDirectory);
+								}
+								using (var file = new FileStream(assetPath, FileMode.Create)) {
+									streamCopy.CopyTo(file);
+								}
 							}
 						}
 					}
 				}
 			}
+		}
+
+		private static string ChangeExtensionIfKtx(Stream stream, string assetPath)
+		{
+			if (assetPath.EndsWith(".pvr") && The.Workspace.ActivePlatform == TargetPlatform.Android) {
+				using (var reader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: true)) {
+					stream.Seek(0, SeekOrigin.Begin);
+					var sign = reader.ReadInt32();
+					stream.Seek(0, SeekOrigin.Begin);
+					if (sign == Texture2D.KTXMagic) {
+						assetPath = Path.ChangeExtension(assetPath, ".ktx");
+					}
+				}
+			}
+			return assetPath;
 		}
 
 		public static void UnpackTangerineScenes()
