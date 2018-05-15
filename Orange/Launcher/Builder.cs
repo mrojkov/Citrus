@@ -20,7 +20,7 @@ namespace Launcher
 					while (!string.Equals(Path.GetFileName(path), "Citrus", StringComparison.CurrentCultureIgnoreCase)) {
 						path = Path.GetDirectoryName(path);
 						if (string.IsNullOrEmpty(path)) {
-							SetFailedBuildStatus("Cannot find Orange directory");
+							throw new InvalidOperationException("Cannot find Orange directory");
 						}
 					}
 					citrusDirectory = path;
@@ -29,7 +29,6 @@ namespace Launcher
 			}
 		}
 		private string OrangeDirectory { get { return Path.Combine(CitrusDirectory, "Orange"); } }
-		private bool areFailedDetailsSet;
 		public bool NeedRunExecutable = true;
 		public string SolutionPath;
 		public string ExecutablePath;
@@ -85,7 +84,7 @@ namespace Launcher
 					BuildAndRun();
 				} catch (Exception e) {
 					Console.WriteLine(e.Message);
-					OnBuildFail?.Invoke();
+					SetFailedBuildStatus("");
 				}
 			});
 			task.Start();
@@ -95,19 +94,14 @@ namespace Launcher
 		private void BuildAndRun()
 		{
 			Environment.CurrentDirectory = OrangeDirectory;
-			ClearObjFolder(citrusDirectory);
+			ClearObjFolder(CitrusDirectory);
 			OnBuildStatusChange?.Invoke("Building");
 			if (AreRequirementsMet() && Build(SolutionPath ?? DefaultSolutionPath)) {
-				ClearObjFolder(citrusDirectory);
+				ClearObjFolder(CitrusDirectory);
 				if (NeedRunExecutable) {
 					RunExecutable();
 				}
 				OnBuildSuccess?.Invoke();
-			} else {
-				if (!areFailedDetailsSet) {
-					SetFailedBuildStatus("Send this text to our developers.");
-				}
-				OnBuildFail?.Invoke();
 			}
 		}
 
@@ -159,7 +153,11 @@ namespace Launcher
 			while (!process.HasExited) {
 				process.WaitForExit(50);
 			}
-			return process.ExitCode == 0;
+			bool result = process.ExitCode == 0;
+			if (!result) {
+				SetFailedBuildStatus($"Process exited with code {process.ExitCode}");
+			}
+			return result;
 		}
 
 		private void Builder_OnDataReceived(object sender, DataReceivedEventArgs args)
@@ -174,9 +172,9 @@ namespace Launcher
 		private bool AreRequirementsMet()
 		{
 #if WIN
-			if (builderPath != null)
+			if (builderPath != null) {
 				return true;
-
+			}
 			Process.Start(@"https://www.microsoft.com/en-us/download/details.aspx?id=48159");
 			SetFailedBuildStatus("Please install Microsoft Build Tools 2015");
 			return false;
@@ -200,10 +198,13 @@ namespace Launcher
 #endif // WIN
 		}
 
-		private void SetFailedBuildStatus(string details)
+		private void SetFailedBuildStatus(string details = null)
 		{
+			if (string.IsNullOrEmpty(details)) {
+				details = "Send this text to our developers.";
+			}
 			OnBuildStatusChange?.Invoke($"Build failed. {details}");
-			areFailedDetailsSet = true;
+			OnBuildFail?.Invoke();
 		}
 
 		private string DefaultSolutionPath =>
