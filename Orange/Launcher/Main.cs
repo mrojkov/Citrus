@@ -1,9 +1,12 @@
 using System;
 using System.IO;
+using System.IO.Compression;
 using McMaster.Extensions.CommandLineUtils;
 using System.Linq;
+using Octokit;
+using Orange;
+using Application = System.Windows.Forms.Application;
 #if WIN
-using System.Windows.Forms;
 using System.Runtime.InteropServices;
 #elif MAC
 using AppKit;
@@ -118,6 +121,96 @@ namespace Launcher
 			var optionBuildProjectPath = cli.Option<string>("-b --build <PROJECT_PATH>", "Project path, default: \"Orange/Orange.%Platform%.sln\".", CommandOptionType.SingleValue);
 			var optionExecutablePath = cli.Option<string>("-r --run <EXECUTABLE_PATH>", "Executable path, default: \"Orange/bin/%Platform%/Release/%PlatformExecutable%\".", CommandOptionType.SingleValue);
 			var optionRunArgs = cli.Option<string>("-a --runargs <ARGUMENTS>", "Args to pass to executable.", CommandOptionType.SingleValue);
+
+			cli.Command("release", (releaseCommand) => {
+				releaseCommand.HelpOption("-h --help");
+				releaseCommand.Description = "Release provided Citrus bundle on github.";
+				var githubUserOption = releaseCommand.Option<string>("-u --user <GITHUB_USER_NAME>", "github user name", CommandOptionType.SingleValue);
+				githubUserOption.IsRequired();
+				var githubPasswordOption = releaseCommand.Option<string>("-p --password <GITHUB_PASSWORD>", "github password", CommandOptionType.SingleValue);
+				githubPasswordOption.IsRequired();
+				var winBundlePath = releaseCommand.Option<string>("-w --win-bundle <WINDOWS_BUNDLE_PATH>", "Path to windows bundle of Citrus.", CommandOptionType.SingleValue);
+				winBundlePath.IsRequired();
+				var macBundlePath = releaseCommand.Option<string>("-m --mac-bundle <MAC_BUNDLE_PATH>", "Path to MAC OS bundle of Citrus.", CommandOptionType.SingleValue);
+				macBundlePath.IsRequired();
+				releaseCommand.OnExecute(async () => {
+#if MAC
+					NSApplication.Init();
+#endif // MAC
+					var client = new GitHubClient(new ProductHeaderValue(githubUserOption.ParsedValue));
+					var basicAuth = new Credentials(githubUserOption.ParsedValue, githubPasswordOption.ParsedValue);
+					client.Credentials = basicAuth;
+					var release = new NewRelease("v1.0.0") {
+						Name = "Test Release Name",
+						Body = "#Header \n\n body text",
+						Draft = false,
+						Prerelease = false
+					};
+					var result = await client.Repository.Release.Create("mrojkov", "Citrus", release);
+					Console.WriteLine("Created release id {0}", result.Id);
+					var releases = await client.Repository.Release.GetAll("mrojkov", "Citrus");
+					var latest = releases[0];
+					Console.WriteLine(
+						"The latest release is tagged at {0} and is named {1}",
+						latest.TagName,
+						latest.Name);
+
+					var archiveContents = File.OpenRead(Path.Combine("temp_apth_here", "release.zip"));
+					var assetUpload = new ReleaseAssetUpload() {
+						FileName = "mrelease.zip",
+						ContentType = "application/zip",
+						RawData = archiveContents
+					};
+					var asset = await client.Repository.Release.UploadAsset(latest, assetUpload);
+				});
+			});
+
+			cli.Command("bundle", (bundleCommand) => {
+				bundleCommand.HelpOption("-h --help");
+				bundleCommand.Description = "Build Tangerine, Orange and bundle them together into zip.";
+				var tempOption = bundleCommand.Option<string>("-t --temp-directory <DIRECTORY_PATH>", "Temporary directory.", CommandOptionType.SingleValue);
+				var outputOption = bundleCommand.Option<string>("-o --output <OUTPUT_DIRECTORY>", "Output directory.", CommandOptionType.SingleValue);
+				bundleCommand.OnExecute(() => {
+#if MAC
+					NSApplication.Init();
+#endif // MAC
+					builder = new Builder { NeedRunExecutable = false };
+					builder.OnBuildStatusChange += Console.WriteLine;
+					builder.OnBuildFail += () => Environment.Exit(1);
+					builder.Start().Wait();
+					var tangerineBuilder = new Builder {
+						SolutionPath = Path.Combine(builder.CitrusDirectory, "Tangerine", "Tangerine.Win.sln"),
+						NeedRunExecutable = false
+					};
+					tangerineBuilder.OnBuildStatusChange += Console.WriteLine;
+					tangerineBuilder.OnBuildFail += () => Environment.Exit(1);
+					tangerineBuilder.Start().Wait();
+					var orangeBinDir = Path.Combine(builder.CitrusDirectory, "Orange", "bin", "win", "Release");
+					var tangerineBinDir = Path.Combine(builder.CitrusDirectory, "Tangerine", "bin", "Release");
+					var orangeFiles = new FileEnumerator(orangeBinDir);
+					var tangerineFiles = new FileEnumerator(tangerineBinDir);
+
+					var tempPath = tempOption.HasValue() ? tempOption.ParsedValue : Path.Combine(builder.CitrusDirectory, "launcher_temp");
+					var outputPath = outputOption.HasValue() ? outputOption.ParsedValue : Path.Combine(builder.CitrusDirectory, "launcher_output");
+					if (Directory.Exists(tempPath)) {
+						Directory.Delete(tempPath, true);
+					}
+					if (Directory.Exists(outputPath)) {
+						Directory.Delete(outputPath, true);
+					}
+					Directory.CreateDirectory(tempPath);
+					Directory.CreateDirectory(outputPath);
+					foreach (var fi in orangeFiles.Enumerate()) {
+						Directory.CreateDirectory(Path.GetDirectoryName(Path.Combine(tempPath, fi.Path)));
+						File.Copy(Path.Combine(orangeBinDir, fi.Path), Path.Combine(tempPath, fi.Path));
+					}
+					foreach (var fi in tangerineFiles.Enumerate()) {
+						Directory.CreateDirectory(Path.GetDirectoryName(Path.Combine(tempPath, fi.Path)));
+						File.Copy(Path.Combine(tangerineBinDir, fi.Path), Path.Combine(tempPath, fi.Path), true);
+					}
+					ZipFile.CreateFromDirectory(tempPath, Path.Combine(outputPath, "bundle.zip"), CompressionLevel.Optimal, false);
+				});
+			});
 
 			cli.OnExecute(() => {
 #if WIN

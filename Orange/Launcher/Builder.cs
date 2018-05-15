@@ -12,7 +12,7 @@ namespace Launcher
 	public class Builder
 	{
 		private string citrusDirectory;
-		private string CitrusDirectory
+		public string CitrusDirectory
 		{
 			get {
 				if (string.IsNullOrEmpty(citrusDirectory)) {
