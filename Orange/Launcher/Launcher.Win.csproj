@@ -61,6 +61,9 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\Source\CitrusVersion.cs">
+      <Link>CitrusVersion.cs</Link>
+    </Compile>
     <Compile Include="..\Source\CsprojSynchronization\CsprojSynchronization.cs">
       <Link>CsprojSynchronization.cs</Link>
     </Compile>
@@ -86,7 +89,6 @@
       <Link>Toolbox.cs</Link>
     </Compile>
     <Compile Include="Builder.cs" />
-    <Compile Include="CitrusVersion.cs" />
     <Compile Include="Win\LoggingForm.cs">
       <SubType>Form</SubType>
     </Compile>

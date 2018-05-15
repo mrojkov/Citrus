@@ -16,14 +16,7 @@ namespace Launcher
 		{
 			get {
 				if (string.IsNullOrEmpty(citrusDirectory)) {
-					var path = Uri.UnescapeDataString((new Uri(Assembly.GetExecutingAssembly().CodeBase)).AbsolutePath);
-					while (!File.Exists(Path.Combine(path, CitrusVersion.Filename))) {
-						path = Path.GetDirectoryName(path);
-						if (string.IsNullOrEmpty(path)) {
-							throw new InvalidOperationException("Cannot find Orange directory");
-						}
-					}
-					citrusDirectory = path;
+					citrusDirectory = Orange.Toolbox.CalcCitrusDirectory();
 				}
 				return citrusDirectory;
 			}

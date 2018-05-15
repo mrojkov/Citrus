@@ -1,7 +1,7 @@
 using System;
 using Yuzu;
 
-namespace Launcher
+namespace Orange
 {
 	class CitrusVersion
 	{

@@ -57,7 +57,7 @@ namespace Orange
 		public static string CalcCitrusDirectory()
 		{
 			var path = Uri.UnescapeDataString((new Uri(Assembly.GetExecutingAssembly().CodeBase)).AbsolutePath);
-			while (!string.Equals(Path.GetFileName(path), "Citrus", StringComparison.CurrentCultureIgnoreCase)) {
+			while (!File.Exists(Path.Combine(path, CitrusVersion.Filename))) {
 				path = Path.GetDirectoryName(path);
 				if (string.IsNullOrEmpty(path)) {
 					throw new InvalidOperationException("Can't find Orange directory.");
