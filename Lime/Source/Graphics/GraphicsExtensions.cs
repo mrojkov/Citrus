@@ -30,6 +30,7 @@ namespace Lime
 		{
 			var bs = BlendState.Default;
 			switch (blending) {
+				case Blending.None:
 				case Blending.Inherited:
 				case Blending.Alpha:
 					bs.SrcBlend = alphaPremul ? Blend.One : Blend.SrcAlpha;

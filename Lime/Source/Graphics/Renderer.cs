@@ -917,7 +917,7 @@ namespace Lime
 					Color = color,
 				}
 			};
-			DrawTriangleFan(texture, null, WidgetMaterial.GetInstance(Blending.None, ShaderId.Diffuse, texture != null ? 1 : 0), vertices, vertices.Length);
+			DrawTriangleFan(texture, null, WidgetMaterial.GetInstance(Blending.Alpha, ShaderId.Diffuse, texture != null ? 1 : 0), vertices, vertices.Length);
 		}
 
 		private static int GetNumTextures(ITexture texture1, ITexture texture2)
