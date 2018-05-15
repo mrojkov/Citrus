@@ -86,6 +86,7 @@
       <Link>Toolbox.cs</Link>
     </Compile>
     <Compile Include="Builder.cs" />
+    <Compile Include="CitrusVersion.cs" />
     <Compile Include="Win\LoggingForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -144,6 +145,12 @@
       <Link>nuget.exe</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Yuzu\Yuzu.csproj">
+      <Project>{ddd2dfe9-ced2-4cea-adf0-5a6865865a46}</Project>
+      <Name>Yuzu</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
