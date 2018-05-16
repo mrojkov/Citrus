@@ -394,7 +394,7 @@ namespace Lime
 
 					if (v < texCoords2.y)
 						gl_FragColor.a *= v / texCoords2.y;
-					else if (v - 1.0 - texCoords2.y)
+					else if (v > 1.0 - texCoords2.y)
 						gl_FragColor.a *= (1.0 - v) / texCoords2.y;
 				}";
 
