@@ -5,7 +5,6 @@ using McMaster.Extensions.CommandLineUtils;
 using System.Linq;
 using Octokit;
 using Orange;
-using Application = System.Windows.Forms.Application;
 #if WIN
 using System.Runtime.InteropServices;
 #elif MAC

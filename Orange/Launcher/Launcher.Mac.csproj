@@ -62,6 +62,11 @@
     <Reference Include="McMaster.Extensions.CommandLineUtils">
       <HintPath>packages\McMaster.Extensions.CommandLineUtils.2.2.1\lib\netstandard2.0\McMaster.Extensions.CommandLineUtils.dll</HintPath>
     </Reference>
+    <Reference Include="Octokit">
+      <HintPath>packages\Octokit.0.29.0\lib\net45\Octokit.dll</HintPath>
+    </Reference>
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
   </ItemGroup>
   <ItemGroup>
     <ImageAsset Include="Resources\Images.xcassets\AppIcons.appiconset\Contents.json" />
@@ -130,6 +135,9 @@
       <Link>Mac\Process.cs</Link>
     </Compile>
     <Compile Include="Builder.cs" />
+    <Compile Include="..\Source\CitrusVersion.cs">
+      <Link>CitrusVersion.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="Mac\MainWindow.xib" />
@@ -142,5 +150,11 @@
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\Logo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Yuzu\Yuzu.Mac.csproj">
+      <Project>{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}</Project>
+      <Name>Yuzu.Mac</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>

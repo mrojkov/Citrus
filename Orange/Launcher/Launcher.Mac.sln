@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Launcher.Mac", "Launcher.Mac.csproj", "{6B5204B6-00C2-481C-92DB-D58648552F86}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yuzu.Mac", "..\..\Yuzu\Yuzu.Mac.csproj", "{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -13,6 +15,10 @@ Global
 		{6B5204B6-00C2-481C-92DB-D58648552F86}.Release|x86.ActiveCfg = Release|Any CPU
 		{6B5204B6-00C2-481C-92DB-D58648552F86}.Debug|x86.Build.0 = Debug|Any CPU
 		{6B5204B6-00C2-481C-92DB-D58648552F86}.Release|x86.Build.0 = Release|Any CPU
+		{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}.Debug|x86.Build.0 = Debug|Any CPU
+		{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}.Release|x86.ActiveCfg = Release|Any CPU
+		{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
