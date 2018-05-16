@@ -382,7 +382,7 @@ namespace Lime
 				{
 					int segment = (int)texCoords1.x;
 					gl_FragColor = color;
-					gl_FragColor.a *= 1.0 - (float)(segment & 1);
+					gl_FragColor.a *= 1.0 - mod(segment, 2);
 					
 					lowp float u = texCoords1.x - (float)segment;
 					lowp float v = texCoords1.y;
