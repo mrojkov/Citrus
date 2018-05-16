@@ -196,16 +196,18 @@ namespace Lime
 			}
 			Renderer.Transform1 = Parent.AsWidget.LocalToWorldTransform;
 			var blending = Blending == Blending.Inherited ? Parent.AsWidget.GlobalBlending : Blending;
-			var shader = Shader == ShaderId.Inherited ? Parent.AsWidget.GlobalShader : Shader;
-			if (arg2.Shader == ShaderId.Silhuette) {
-				shader = ShaderId.Silhuette;
-			} else if (arg1.Shader == ShaderId.Silhuette) {
-				shader = ShaderId.Silhuette;
-				Toolbox.Swap(ref arg1, ref arg2);
-				Toolbox.Swap(ref texture1, ref texture2);
+			var material = CustomMaterial;
+			if (material == null) {
+				var shader = Shader == ShaderId.Inherited ? Parent.AsWidget.GlobalShader : Shader;
+				if (arg2.Shader == ShaderId.Silhuette) {
+					shader = ShaderId.Silhuette;
+				} else if (arg1.Shader == ShaderId.Silhuette) {
+					shader = ShaderId.Silhuette;
+					Toolbox.Swap(ref arg1, ref arg2);
+					Toolbox.Swap(ref texture1, ref texture2);
+				}
+				material = WidgetMaterial.GetInstance(blending, shader, WidgetMaterial.GetNumTextures(texture1, texture2));
 			}
-
-			var material = CustomMaterial ?? WidgetMaterial.GetInstance(blending, shader, WidgetMaterial.GetNumTextures(texture1, texture2));
 			RenderHelper(arg1, arg2, material, texture1, texture2);
 		}
 	}
