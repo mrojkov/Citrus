@@ -42,6 +42,7 @@ namespace Orange
 						using (var stream = AssetBundle.Current.OpenFile(asset)) {
 							using (var streamCopy = new MemoryStream()) {
 								stream.CopyTo(streamCopy);
+								streamCopy.Seek(0, SeekOrigin.Begin);
 								var assetPath = ChangeExtensionIfKtx(streamCopy, asset);
 								Console.WriteLine("> " + assetPath);
 								var assetDirectory = Path.GetDirectoryName(assetPath);
@@ -62,7 +63,6 @@ namespace Orange
 		{
 			if (assetPath.EndsWith(".pvr") && The.Workspace.ActivePlatform == TargetPlatform.Android) {
 				using (var reader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: true)) {
-					stream.Seek(0, SeekOrigin.Begin);
 					var sign = reader.ReadInt32();
 					stream.Seek(0, SeekOrigin.Begin);
 					if (sign == Texture2D.KTXMagic) {
