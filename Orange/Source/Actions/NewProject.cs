@@ -18,7 +18,7 @@ namespace Orange
 		public static void NewProjectAction()
 		{
 			Application.InvokeOnMainThread(() => {
-				var citrusPath = CalcCitrusDirectory();
+				var citrusPath = Toolbox.CalcCitrusDirectory();
 				var dlg = new FileDialog {
 					InitialDirectory = citrusPath,
 					AllowedFileTypes = new string[] { "" },
@@ -51,18 +51,6 @@ namespace Orange
 					}
 				}
 			});
-		}
-
-		private static string CalcCitrusDirectory()
-		{
-			var path = Uri.UnescapeDataString((new Uri(Assembly.GetExecutingAssembly().CodeBase)).AbsolutePath);
-			while (!string.Equals(Path.GetFileName(path), "Citrus", StringComparison.CurrentCultureIgnoreCase)) {
-				path = Path.GetDirectoryName(path);
-				if (string.IsNullOrEmpty(path)) {
-
-				}
-			}
-			return path;
 		}
 	}
 }

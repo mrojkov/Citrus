@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Reflection;
@@ -12,11 +12,7 @@ namespace Orange
 		[ExportMetadata("Priority", 2)]
 		public static string RunTangerine()
 		{
-			var path = Uri.UnescapeDataString((new Uri(Assembly.GetExecutingAssembly().CodeBase)).AbsolutePath);
-			while (!string.Equals(Path.GetFileName(path), "Citrus", StringComparison.CurrentCultureIgnoreCase)) {
-				path = Path.GetDirectoryName(path);
-			}
-			path = Path.Combine(path, "Tangerine");
+			var path = Path.Combine(Toolbox.CalcCitrusDirectory(), "Tangerine");
 
 #if WIN
 			var buildSystem = new Source.MSBuild(path, "Tangerine", TargetPlatform.Win);
