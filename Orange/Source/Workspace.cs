@@ -20,6 +20,7 @@ namespace Orange
 
 		public Workspace()
 		{
+			Orange.Updater.CheckForUpdates();
 			Targets = new List<Target>();
 			FillDefaultTargets();
 		}
