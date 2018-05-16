@@ -362,8 +362,8 @@ namespace Lime
 				attribute vec2 inTexCoords1;
 				attribute vec2 inTexCoords2;
 				varying lowp vec4 color;
-				varying highp vec2 texCoords1;
-				varying highp vec2 texCoords2;
+				varying lowp vec2 texCoords1;
+				varying lowp vec2 texCoords2;
 				uniform mat4 matProjection;
 				void main()
 				{
@@ -375,7 +375,7 @@ namespace Lime
 
 			private const string fragmentShaderText = @"
 				varying lowp vec4 color;
-				varying highp vec2 texCoords1;
+				varying lowp vec2 texCoords1;
 				varying lowp vec2 texCoords2;
 				uniform lowp sampler2D tex1;
 				void main()
