@@ -353,6 +353,73 @@ namespace Lime
 
 			public static ITexture GradientRampTexture => fontGradientTexture = fontGradientTexture ?? new SerializableTexture("Fonts/gradient_map");
 		}
+
+		public class DashedLineShaderProgram : ShaderProgram
+		{
+			private const string vertexShaderText = @"
+				attribute vec4 inPos;
+				attribute vec4 inColor;
+				attribute vec2 inTexCoords1;
+				attribute vec2 inTexCoords2;
+				varying lowp vec4 color;
+				varying highp vec2 texCoords1;
+				varying highp vec2 texCoords2;
+				uniform mat4 matProjection;
+				void main()
+				{
+					gl_Position = matProjection * inPos;
+					color = inColor;
+					texCoords1 = inTexCoords1;
+					texCoords2 = inTexCoords2;
+				}";
+
+			private const string fragmentShaderText = @"
+				varying lowp vec4 color;
+				varying highp vec2 texCoords1;
+				varying lowp vec2 texCoords2;
+				uniform lowp sampler2D tex1;
+				void main()
+				{
+					int segment = (int)texCoords1.x;
+					gl_FragColor = color;
+					gl_FragColor.a *= 1.0 - (float)(segment & 1);
+					
+					lowp float u = texCoords1.x - (float)segment;
+					lowp float v = texCoords1.y;
+					
+					if (u < texCoords2.x)
+						gl_FragColor.a *= u / texCoords2.x;
+					else if (u > 1.0 - texCoords2.x)
+						gl_FragColor.a *= (1.0 - u) / texCoords2.x;
+
+					if (v < texCoords2.y)
+						gl_FragColor.a *= v / texCoords2.y;
+					else if (v - 1.0 - texCoords2.y)
+						gl_FragColor.a *= (1.0 - v) / texCoords2.y;
+				}";
+
+			private static DashedLineShaderProgram instance;
+
+			private DashedLineShaderProgram()
+				: base(GetShaders(), Attributes.GetLocations(), GetSamplers())
+			{ }
+
+			private static IEnumerable<Shader> GetShaders()
+			{
+				return new Shader[] {
+					new VertexShader(vertexShaderText),
+					new FragmentShader(fragmentShaderText)
+				};
+			}
+
+			public static DashedLineShaderProgram GetInstance()
+			{
+				if (instance == null) {
+					instance = new DashedLineShaderProgram();
+				}
+				return instance;
+			}
+		}
 	}
 }
 #endif

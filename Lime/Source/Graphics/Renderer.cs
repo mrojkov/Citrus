@@ -890,34 +890,41 @@ namespace Lime
 			DrawRound(center, radius, numSegments, color, color);
 		}
 
-		public static void DrawDashedLine(ITexture texture, Vector2 a, Vector2 b, Color4 color, float size = 8)
+		public static void DrawDashedLine(Vector2 a, Vector2 b, Color4 color, Vector2 dashSize)
 		{
+			const float feather = 1.0f;
+			dashSize += Vector2.One * feather;
 			var dir = (b - a).Normalized;
 			var l = (b - a).Length;
-			var n = GetVectorNormal(dir) * size / 2;
+			var n = GetVectorNormal(dir) * (dashSize.Y / 2);
+			var uv2 = new Vector2(feather / dashSize.X, feather / dashSize.Y);
 			Vertex[] vertices = {
 				new Vertex {
 					Pos = a - n,
-					UV1 = Vector2.Zero,
+					UV1 = new Vector2(0, 1),
+					UV2 = uv2,
 					Color = color,
 				},
 				new Vertex {
 					Pos = a + n,
-					UV1 = new Vector2(0, 1),
+					UV1 = new Vector2(0, 0),
+					UV2 = uv2,
 					Color = color,
 				},
 				new Vertex {
 					Pos = b + n,
-					UV1 = new Vector2(l / size, 1),
+					UV1 = new Vector2(l / dashSize.X, 0),
+					UV2 = uv2,
 					Color = color,
 				},
 				new Vertex {
 					Pos = b - n,
-					UV1 = new Vector2(l / size, 0),
+					UV1 = new Vector2(l / dashSize.X, 1),
+					UV2 = uv2,
 					Color = color,
 				}
 			};
-			DrawTriangleFan(texture, null, WidgetMaterial.GetInstance(Blending.Alpha, ShaderId.Diffuse, texture != null ? 1 : 0), vertices, vertices.Length);
+			DrawTriangleFan(null, null, DashedLineMaterial.Instance, vertices, vertices.Length);
 		}
 
 		private static int GetNumTextures(ITexture texture1, ITexture texture2)
@@ -942,5 +949,25 @@ namespace Lime
 			}
 			return projection;
 		}
+	}
+
+	public class DashedLineMaterial : IMaterial
+	{
+		public int PassCount => 1;
+
+		public static readonly DashedLineMaterial Instance = new DashedLineMaterial();
+
+		private ShaderParams[] shaderParamsArray = new[] { Renderer.GlobalShaderParams };
+
+		public void Apply(int pass)
+		{
+			PlatformRenderer.SetBlendState(Blending.Alpha.GetBlendState());
+			PlatformRenderer.SetShaderParams(shaderParamsArray);
+			PlatformRenderer.SetShaderProgram(ShaderPrograms.DashedLineShaderProgram.GetInstance());
+		}
+
+		public IMaterial Clone() => this;
+
+		public void Invalidate() { }
 	}
 }

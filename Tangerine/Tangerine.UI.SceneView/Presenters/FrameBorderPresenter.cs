@@ -38,7 +38,7 @@ namespace Tangerine.UI.SceneView
 					for (var i = 0; i < 4; i++) {
 						var a = hull[i];
 						var b = hull[(i + 1) % 4];
-						Renderer.DrawDashedLine(DashTexture, a, b, Color4.Gray, 6f);
+						Renderer.DrawDashedLine(a, b, Color4.Gray, new Vector2(12, 6));
 					}
 				}
 			}
