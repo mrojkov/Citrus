@@ -146,18 +146,16 @@ namespace Launcher
 
 					using (var winZipFile = ZipFile.Open(Path.Combine(citrusDirectory, winBundlePath.ParsedValue), ZipArchiveMode.Update)) {
 						var citrusVersionEntryWin = winZipFile.GetEntry(CitrusVersion.Filename);
-						var yjd = new Yuzu.Json.JsonDeserializer();
 						using (var stream = citrusVersionEntryWin.Open()) {
-							citrusVersionWin = yjd.FromStream<CitrusVersion>(stream);
+							citrusVersionWin = CitrusVersion.Load(stream);
 						}
 						citrusVersionWin.IsStandalone = true;
 						citrusVersionWin.BuildNumber = buildNumberOption.ParsedValue;
 						// TODO: fill in checksums for each file?
 						citrusVersionEntryWin.Delete();
 						citrusVersionEntryWin = winZipFile.CreateEntry(CitrusVersion.Filename);
-						var yjs = new Yuzu.Json.JsonSerializer();
 						using (var stream = citrusVersionEntryWin.Open()) {
-							yjs.ToStream(citrusVersionWin, stream);
+							CitrusVersion.Save(citrusVersionWin, stream);
 						}
 					}
 					var client = new GitHubClient(new ProductHeaderValue(githubUserOption.ParsedValue));
@@ -320,12 +318,12 @@ namespace Launcher
 			var mainForm = new MainForm();
 			builder.OnBuildStatusChange += mainForm.SetBuildStatus;
 			builder.OnBuildFail += mainForm.ShowLog;
-			builder.OnBuildSuccess += Application.Exit;
+			builder.OnBuildSuccess += System.Windows.Forms.Application.Exit;
 			Console.SetOut(mainForm.LogWriter);
 			Console.SetError(mainForm.LogWriter);
 			builder.Start();
 			mainForm.Show();
-			Application.Run();
+			System.Windows.Forms.Application.Run();
 		}
 #elif MAC
 		private static void StartUIMode(string[] args)

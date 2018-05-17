@@ -9,19 +9,28 @@ namespace Orange
 	{
 		public const string Filename = "citrus_version.json";
 
+		public static CitrusVersion Load(Stream stream) {
+			var yjd = new JsonDeserializer { JsonOptions = new JsonSerializeOptions() { Unordered = true } };
+			return yjd.FromStream<CitrusVersion>(stream);
+		}
+
+		public static void Save(CitrusVersion citrusVersion, Stream stream)
+		{
+			var yjs = new JsonSerializer();
+			yjs.ToStream(citrusVersion, stream);
+		}
+
 		public static CitrusVersion Load()
 		{
-			var yjd = new JsonDeserializer { JsonOptions = new JsonSerializeOptions() { Unordered = true } };
 			using (var stream = File.Open(Path.Combine(Toolbox.CalcCitrusDirectory(), Filename), FileMode.Open)) {
-				return yjd.FromStream<CitrusVersion>(stream);
+				return Load(stream);
 			}
 		}
 
 		public static void Save(CitrusVersion citrusVersion)
 		{
-			var yjs = new JsonSerializer();
 			using (var stream = File.Open(Path.Combine(Toolbox.CalcCitrusDirectory(), Filename), FileMode.Open)) {
-				yjs.ToStream(citrusVersion, stream);
+				Save(citrusVersion, stream);
 			}
 		}
 
