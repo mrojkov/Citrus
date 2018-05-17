@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Yuzu;
+using Yuzu.Json;
 
 namespace Orange
 {
@@ -10,7 +11,7 @@ namespace Orange
 
 		public static CitrusVersion Load()
 		{
-			var yjd = new Yuzu.Json.JsonDeserializer();
+			var yjd = new JsonDeserializer { JsonOptions = new JsonSerializeOptions() { Unordered = true } };
 			using (var stream = File.Open(Path.Combine(Toolbox.CalcCitrusDirectory(), Filename), FileMode.Open)) {
 				return yjd.FromStream<CitrusVersion>(stream);
 			}
@@ -18,7 +19,7 @@ namespace Orange
 
 		public static void Save(CitrusVersion citrusVersion)
 		{
-			var yjs = new Yuzu.Json.JsonSerializer();
+			var yjs = new JsonSerializer();
 			using (var stream = File.Open(Path.Combine(Toolbox.CalcCitrusDirectory(), Filename), FileMode.Open)) {
 				yjs.ToStream(citrusVersion, stream);
 			}
