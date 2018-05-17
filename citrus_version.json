@@ -1,5 +1,5 @@
 {
   "Version": "1.0.0",
   "BuildNumber": "0",
-  "IsStandalone": true
+  "IsStandalone": false,
 }
