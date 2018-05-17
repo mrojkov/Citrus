@@ -102,11 +102,7 @@
     <Compile Include="Processors\CurveEditor\SelectCurveKey.cs" />
     <Compile Include="Processors\CurveEditor\VerticalZoomProcessor.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Commands\" />
-    <Folder Include="Components\Model\" />
-    <Folder Include="Components\Presentation\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Win.csproj">
       <Project>{fc2de6c9-641a-4230-8d29-ea4035cd8708}</Project>

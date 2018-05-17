@@ -372,12 +372,7 @@
     <EmbeddedResource Include="Resources\Icons\Light\SceneView\InspectingRoot.png" />
     <EmbeddedResource Include="Resources\Arial.ttf" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="PreferencesDialog\" />
-    <Folder Include="MainMenu\" />
-    <Folder Include="Tools\" />
-    <Folder Include="Resources\Cursors\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <NativeReference Include="..\3rdParty\FreeType\libfreetype6.dylib">
       <Kind>Dynamic</Kind>
