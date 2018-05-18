@@ -179,7 +179,8 @@ namespace Launcher
 					var assetUpload = new ReleaseAssetUpload() {
 						FileName = $"citrus_win_{tagName}.zip",
 						ContentType = "application/zip",
-						RawData = archiveContents
+						RawData = archiveContents,
+						Timeout = TimeSpan.FromMinutes(10),
 					};
 					var asset = await client.Repository.Release.UploadAsset(latest, assetUpload);
 
@@ -187,7 +188,8 @@ namespace Launcher
 					assetUpload = new ReleaseAssetUpload() {
 						FileName = $"citrus_mac_{tagName}.zip",
 						ContentType = "application/zip",
-						RawData = archiveContents
+						RawData = archiveContents,
+						Timeout = TimeSpan.FromMinutes(10),
 					};
 					asset = await client.Repository.Release.UploadAsset(latest, assetUpload);
 					Console.WriteLine("Done uploading asset");
