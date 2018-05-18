@@ -5,6 +5,7 @@ using McMaster.Extensions.CommandLineUtils;
 using System.Linq;
 using Octokit;
 using Orange;
+using FileMode = System.IO.FileMode;
 #if WIN
 using System.Runtime.InteropServices;
 #elif MAC
@@ -142,24 +143,6 @@ namespace Launcher
 
 					CitrusVersion citrusVersion = null;
 					var citrusDirectory = Toolbox.CalcCitrusDirectory();
-					var bundleFiles = new string[] { winBundlePath.ParsedValue, macBundlePath.ParsedValue };
-
-					foreach (var bundlePath in bundleFiles) {
-						using (var zipFile = ZipFile.Open(Path.Combine(citrusDirectory, bundlePath), ZipArchiveMode.Update)) {
-							var citrusVersionEntry = zipFile.GetEntry(CitrusVersion.Filename);
-							using (var stream = citrusVersionEntry.Open()) {
-								citrusVersion = CitrusVersion.Load(stream);
-							}
-							citrusVersion.IsStandalone = true;
-							citrusVersion.BuildNumber = buildNumberOption.ParsedValue;
-							// TODO: fill in checksums for each file?
-							citrusVersionEntry.Delete();
-							citrusVersionEntry = zipFile.CreateEntry(CitrusVersion.Filename);
-							using (var stream = citrusVersionEntry.Open()) {
-								CitrusVersion.Save(citrusVersion, stream);
-							}
-						}
-					}
 					var client = new GitHubClient(new ProductHeaderValue(githubUserOption.ParsedValue));
 					var basicAuth = new Credentials(githubUserOption.ParsedValue, githubPasswordOption.ParsedValue);
 					client.Credentials = basicAuth;
@@ -201,6 +184,8 @@ namespace Launcher
 				bundleCommand.Description = "Build Tangerine, Orange and bundle them together into zip.";
 				var tempOption = bundleCommand.Option<string>("-t --temp-directory <DIRECTORY_PATH>", "Temporary directory. If specified path is not full it becomes relative to Citrus directory.", CommandOptionType.SingleValue);
 				var outputOption = bundleCommand.Option<string>("-o --output <OUTPUT_PATH>", "Output path including bundle name (e.g. bundle_win.zip). If specified path is not full it becomes relative to Citrus directory.", CommandOptionType.SingleValue);
+				var buildNumberOption = bundleCommand.Option<string>("-n --build-number <BUILD_NUMBER>", "Build number.", CommandOptionType.SingleValue);
+				buildNumberOption.IsRequired();
 				bundleCommand.OnExecute(() => {
 #if MAC
 					NSApplication.Init();
@@ -281,7 +266,16 @@ namespace Launcher
 					process.Start();
 					process.WaitForExit();
 #endif // WIN
-					File.Copy(Path.Combine(builder.CitrusDirectory, Orange.CitrusVersion.Filename), Path.Combine(tempPath, Orange.CitrusVersion.Filename));
+					CitrusVersion citrusVersion = null;
+					using (var stream = File.Open(Path.Combine(builder.CitrusDirectory, Orange.CitrusVersion.Filename), FileMode.Open)) {
+						citrusVersion = CitrusVersion.Load(stream);
+						citrusVersion.IsStandalone = true;
+						citrusVersion.BuildNumber = buildNumberOption.ParsedValue;
+						// TODO: fill in checksums for each file?
+					}
+					using (var stream = File.Open(Path.Combine(tempPath, Orange.CitrusVersion.Filename), FileMode.CreateNew)) {
+						CitrusVersion.Save(citrusVersion, stream);
+					}
 					Console.WriteLine($"Begin zipping archive.");
 					ZipFile.CreateFromDirectory(tempPath, outputPath, CompressionLevel.Optimal, false);
 					Console.WriteLine("Done.");
