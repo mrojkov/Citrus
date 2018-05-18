@@ -20,7 +20,6 @@ namespace Orange
 
 		public Workspace()
 		{
-			Orange.Updater.CheckForUpdates();
 			Targets = new List<Target>();
 			FillDefaultTargets();
 		}
@@ -79,6 +78,11 @@ namespace Orange
 			var config = WorkspaceConfig.Load();
 			Open(config.CitrusProject);
 			The.UI.LoadFromWorkspaceConfig(config);
+			var citrusVersion = CitrusVersion.Load();
+			if (citrusVersion.IsStandalone) {
+				Console.WriteLine($"Welcome to Citrus. Version {citrusVersion.Version}, build number: {citrusVersion.BuildNumber}");
+			}
+			Orange.Updater.CheckForUpdates();
 		}
 
 		public void Save()
