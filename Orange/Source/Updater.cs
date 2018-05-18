@@ -43,27 +43,46 @@ namespace Orange
 						continue;
 					}
 					File.Create(updatingFlagPath).Dispose();
-					Console.WriteLine($"oh wow, you had a {tagName} version and new {latest.TagName} version is available! Downloading update!");
-					// TODO: select corresponding asset for OS
-					var response = await client.Connection.Get<object>(new Uri(latest.Assets.First().Url), new Dictionary<string, string>(), "application/octet-stream");
-					var zipFileBytes = response.Body as byte[];
-					using (var compressedFileStream = new MemoryStream()) {
-						compressedFileStream.Write(zipFileBytes, 0, zipFileBytes.Length);
-						using (var zipArchive = new ZipArchive(compressedFileStream, ZipArchiveMode.Read, false)) {
-							var tempPath = Path.Combine(exePath, "previous-release");
-							if (Directory.Exists(tempPath)) {
-								Directory.Delete(tempPath, true);
+					try {
+						Console.WriteLine($"oh wow, you had a {tagName} version and new {latest.TagName} version is available! Downloading update!");
+						// TODO: select corresponding asset for OS
+						var platformString =
+#if WIN
+						"win";
+#elif MAC
+						"mac";
+#endif // WIN
+						string platformAssetUrl = null;
+						foreach (var asset in latest.Assets) {
+							if (asset.Name.StartsWith($"citrus_{platformString}", StringComparison.OrdinalIgnoreCase)) {
+								platformAssetUrl = latest.Assets.First().Url;
 							}
-							Directory.CreateDirectory(tempPath);
-							foreach (var fi in new FileEnumerator(exePath).Enumerate()) {
-								var dstPath = Path.Combine(tempPath, fi.Path);
-								Directory.CreateDirectory(Path.GetDirectoryName(dstPath));
-								File.Move(Path.Combine(exePath, fi.Path), dstPath);
-							}
-							zipArchive.ExtractToDirectory(exePath);
-							File.Delete(updatingFlagPath);
-							Console.WriteLine("Update finished! Please restart");
 						}
+						if (platformAssetUrl == null) {
+							Console.WriteLine($"Update error: can't find release asset corresponding to platform {platformString}");
+							continue;
+						}
+						var response = await client.Connection.Get<object>(new Uri(platformAssetUrl), new Dictionary<string, string>(), "application/octet-stream");
+						var zipFileBytes = response.Body as byte[];
+						using (var compressedFileStream = new MemoryStream()) {
+							compressedFileStream.Write(zipFileBytes, 0, zipFileBytes.Length);
+							using (var zipArchive = new ZipArchive(compressedFileStream, ZipArchiveMode.Read, false)) {
+								var tempPath = Path.Combine(exePath, "previous-release");
+								if (Directory.Exists(tempPath)) {
+									Directory.Delete(tempPath, true);
+								}
+								Directory.CreateDirectory(tempPath);
+								foreach (var fi in new FileEnumerator(exePath).Enumerate()) {
+									var dstPath = Path.Combine(tempPath, fi.Path);
+									Directory.CreateDirectory(Path.GetDirectoryName(dstPath));
+									File.Move(Path.Combine(exePath, fi.Path), dstPath);
+								}
+								zipArchive.ExtractToDirectory(exePath);
+								Console.WriteLine("Update finished! Please restart");
+							}
+						}
+					} finally {
+						File.Delete(updatingFlagPath);
 					}
 				}
 			});

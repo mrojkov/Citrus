@@ -131,8 +131,7 @@ namespace Launcher
 				var winBundlePath = releaseCommand.Option<string>("-w --win-bundle <WINDOWS_BUNDLE_PATH>", "Path to windows bundle of Citrus.", CommandOptionType.SingleValue);
 				winBundlePath.IsRequired();
 				var macBundlePath = releaseCommand.Option<string>("-m --mac-bundle <MAC_BUNDLE_PATH>", "Path to MAC OS bundle of Citrus.", CommandOptionType.SingleValue);
-				// TODO: uncomment when mac bundle teamcity chain is done
-				//macBundlePath.IsRequired();
+				macBundlePath.IsRequired();
 				var buildNumberOption = releaseCommand.Option<string>("-n --build-number <BUILD_NUMBER>", "Build number.", CommandOptionType.SingleValue);
 				buildNumberOption.IsRequired();
 				releaseCommand.OnExecute(async () => {
@@ -141,27 +140,30 @@ namespace Launcher
 #endif // MAC
 					Console.WriteLine($"Build version: {buildNumberOption.ParsedValue}");
 
-					CitrusVersion citrusVersionWin = null;
+					CitrusVersion citrusVersion = null;
 					var citrusDirectory = Toolbox.CalcCitrusDirectory();
+					var bundleFiles = new string[] { winBundlePath.ParsedValue, macBundlePath.ParsedValue };
 
-					using (var winZipFile = ZipFile.Open(Path.Combine(citrusDirectory, winBundlePath.ParsedValue), ZipArchiveMode.Update)) {
-						var citrusVersionEntryWin = winZipFile.GetEntry(CitrusVersion.Filename);
-						using (var stream = citrusVersionEntryWin.Open()) {
-							citrusVersionWin = CitrusVersion.Load(stream);
-						}
-						citrusVersionWin.IsStandalone = true;
-						citrusVersionWin.BuildNumber = buildNumberOption.ParsedValue;
-						// TODO: fill in checksums for each file?
-						citrusVersionEntryWin.Delete();
-						citrusVersionEntryWin = winZipFile.CreateEntry(CitrusVersion.Filename);
-						using (var stream = citrusVersionEntryWin.Open()) {
-							CitrusVersion.Save(citrusVersionWin, stream);
+					foreach (var bundlePath in bundleFiles) {
+						using (var zipFile = ZipFile.Open(Path.Combine(citrusDirectory, bundlePath), ZipArchiveMode.Update)) {
+							var citrusVersionEntry = zipFile.GetEntry(CitrusVersion.Filename);
+							using (var stream = citrusVersionEntry.Open()) {
+								citrusVersion = CitrusVersion.Load(stream);
+							}
+							citrusVersion.IsStandalone = true;
+							citrusVersion.BuildNumber = buildNumberOption.ParsedValue;
+							// TODO: fill in checksums for each file?
+							citrusVersionEntry.Delete();
+							citrusVersionEntry = zipFile.CreateEntry(CitrusVersion.Filename);
+							using (var stream = citrusVersionEntry.Open()) {
+								CitrusVersion.Save(citrusVersion, stream);
+							}
 						}
 					}
 					var client = new GitHubClient(new ProductHeaderValue(githubUserOption.ParsedValue));
 					var basicAuth = new Credentials(githubUserOption.ParsedValue, githubPasswordOption.ParsedValue);
 					client.Credentials = basicAuth;
-					var tagName = $"gh_{citrusVersionWin.Version}_{citrusVersionWin.BuildNumber}";
+					var tagName = $"gh_{citrusVersion.Version}_{citrusVersion.BuildNumber}";
 					var release = new NewRelease(tagName) {
 						Name = "Automated release",
 						Body = "Automated release",
@@ -172,7 +174,7 @@ namespace Launcher
 					Console.WriteLine("Created release id {0}", result.Id);
 					// TODO: abort upload if nothing changed
 					//var releases = await client.Repository.Release.GetAll("mrojkov", "Citrus");
-					var latest = result;// releases[0];
+					var latest = result;
 					var archiveContents = File.OpenRead(Path.Combine(citrusDirectory, winBundlePath.ParsedValue));
 					var assetUpload = new ReleaseAssetUpload() {
 						FileName = $"citrus_win_{tagName}.zip",
@@ -180,6 +182,14 @@ namespace Launcher
 						RawData = archiveContents
 					};
 					var asset = await client.Repository.Release.UploadAsset(latest, assetUpload);
+
+					archiveContents = File.OpenRead(Path.Combine(citrusDirectory, macBundlePath.ParsedValue));
+					assetUpload = new ReleaseAssetUpload() {
+						FileName = $"citrus_mac_{tagName}.zip",
+						ContentType = "application/zip",
+						RawData = archiveContents
+					};
+					asset = await client.Repository.Release.UploadAsset(latest, assetUpload);
 					Console.WriteLine("Done uploading asset");
 				});
 			});
