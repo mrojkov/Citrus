@@ -24,9 +24,12 @@ namespace Orange
 				foreach (var kv in assetToCookingRules) {
 					var scenePath = kv.Key;
 					if (
-						scenePath.EndsWith(".scene", StringComparison.OrdinalIgnoreCase) ||
-						scenePath.EndsWith(".tan", StringComparison.OrdinalIgnoreCase) ||
-						scenePath.EndsWith(".model", StringComparison.OrdinalIgnoreCase)
+						(
+							scenePath.EndsWith(".scene", StringComparison.OrdinalIgnoreCase) ||
+							scenePath.EndsWith(".tan", StringComparison.OrdinalIgnoreCase) ||
+							scenePath.EndsWith(".model", StringComparison.OrdinalIgnoreCase)
+						) &&
+							!kv.Value.Ignore
 					) {
 						allScenes.Add(scenePath);
 						sceneToBundleMap.Add(scenePath, kv.Value.Bundles.First());
