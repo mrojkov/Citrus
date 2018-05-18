@@ -193,28 +193,33 @@ namespace Launcher
 #if MAC
 					NSApplication.Init();
 #endif // MAC
-					builder = new Builder { NeedRunExecutable = false };
-					builder.OnBuildStatusChange += Console.WriteLine;
-					builder.OnBuildFail += () => Environment.Exit(1);
-					builder.Start().Wait();
-					var tangerineBuilder = new Builder {
-						SolutionPath = Path.Combine(builder.CitrusDirectory, "Tangerine", "Tangerine.Win.sln"),
-						NeedRunExecutable = false
-					};
-					tangerineBuilder.OnBuildStatusChange += Console.WriteLine;
-					tangerineBuilder.OnBuildFail += () => Environment.Exit(1);
-					tangerineBuilder.Start().Wait();
-					var orangeBinDir = Path.Combine(builder.CitrusDirectory, "Orange", "bin", "win", "Release");
-					var tangerineBinDir = Path.Combine(builder.CitrusDirectory, "Tangerine", "bin", "Release");
-					var orangeFiles = new FileEnumerator(orangeBinDir);
-					var tangerineFiles = new FileEnumerator(tangerineBinDir);
-
 					var platformSuffix =
 #if WIN
 						"win";
 #elif MAC
 						"mac";
-#endif
+#endif // WIN
+					builder = new Builder { NeedRunExecutable = false };
+					builder.OnBuildStatusChange += Console.WriteLine;
+					builder.OnBuildFail += () => Environment.Exit(1);
+					builder.Start().Wait();
+					var tangerineBuilder = new Builder {
+#if WIN
+						SolutionPath = Path.Combine(builder.CitrusDirectory, "Tangerine", "Tangerine.Win.sln"),
+#elif MAC
+						SolutionPath = Path.Combine(builder.CitrusDirectory, "Tangerine", "Tangerine.Mac.sln"),
+#endif // WIN
+						NeedRunExecutable = false
+					};
+					tangerineBuilder.OnBuildStatusChange += Console.WriteLine;
+					tangerineBuilder.OnBuildFail += () => Environment.Exit(1);
+					tangerineBuilder.Start().Wait();
+					var orangeBinDir = Path.Combine(builder.CitrusDirectory, "Orange", "bin", platformSuffix, "Release");
+					var tangerineBinDir = Path.Combine(builder.CitrusDirectory, "Tangerine", "bin", "Release");
+					var orangeFiles = new FileEnumerator(orangeBinDir);
+					var tangerineFiles = new FileEnumerator(tangerineBinDir);
+
+
 					var tempPath = tempOption.HasValue() ? tempOption.ParsedValue : Path.Combine(builder.CitrusDirectory, "launcher_temp");
 					var outputPath = outputOption.HasValue()
 						? Path.Combine(builder.CitrusDirectory, outputOption.ParsedValue)
@@ -231,6 +236,7 @@ namespace Launcher
 					Console.WriteLine($"Temporary Directory is {tempPath}");
 					Console.WriteLine($"Output Path is {outputPath}");
 					Console.WriteLine("Begin copying artifacts to temporary directory");
+#if WIN
 					foreach (var fi in orangeFiles.Enumerate()) {
 						var srcPath = Path.Combine(orangeBinDir, fi.Path);
 						var dstPath = Path.Combine(tempPath, fi.Path);
@@ -245,6 +251,24 @@ namespace Launcher
 						File.Copy(srcPath, dstPath, true);
 						Console.WriteLine($"Copying {srcPath} => {dstPath}");
 					}
+#elif MAC
+					var process = new System.Diagnostics.Process {
+						StartInfo = {
+							FileName = "cp",
+							Arguments = $"-R {Path.Combine(orangeBinDir, "Orange.GUI.app")} {tempPath}"
+						}
+					};
+					process.Start();
+					process.WaitForExit();
+					process = new System.Diagnostics.Process {
+						StartInfo = {
+							FileName = "cp",
+							Arguments = $"-R {Path.Combine(tangerineBinDir, "Tangerine.app")} {tempPath}"
+						}
+					};
+					process.Start();
+					process.WaitForExit();
+#endif // WIN
 					File.Copy(Path.Combine(builder.CitrusDirectory, Orange.CitrusVersion.Filename), Path.Combine(tempPath, Orange.CitrusVersion.Filename));
 					Console.WriteLine($"Begin zipping archive.");
 					ZipFile.CreateFromDirectory(tempPath, outputPath, CompressionLevel.Optimal, false);

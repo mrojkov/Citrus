@@ -39,6 +39,7 @@
     <CodeSignResourceRules>
     </CodeSignResourceRules>
     <EnableSGenConc>true</EnableSGenConc>
+    <EnableCodeSigning>false</EnableCodeSigning>
     <AOTMode>None</AOTMode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -57,7 +58,7 @@
     <IncludeMonoRuntime>true</IncludeMonoRuntime>
     <CreatePackage>false</CreatePackage>
     <CodeSigningKey>Developer ID Application</CodeSigningKey>
-    <EnableCodeSigning>true</EnableCodeSigning>
+    <EnableCodeSigning>false</EnableCodeSigning>
     <EnablePackageSigning>false</EnablePackageSigning>
     <HttpClientHandler>HttpClientHandler</HttpClientHandler>
     <XamMacArch>i386</XamMacArch>
