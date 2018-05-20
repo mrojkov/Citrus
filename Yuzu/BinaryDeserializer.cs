@@ -305,6 +305,36 @@ namespace Yuzu.Binary
 			}
 		}
 
+		private void InitClassDefUnordered(ReaderClassDef def, string typeName)
+		{
+			var theirCount = Reader.ReadInt16();
+			int ourIndex = 0, requiredCountActiual = 0;
+			for (int theirIndex = 0; theirIndex < theirCount; ++theirIndex) {
+				var theirName = Reader.ReadString();
+				Meta.Item yi = null;
+				if (def.Meta.TagToItem.TryGetValue(theirName, out yi)) {
+					if (!ReadCompatibleType(yi.Type))
+						throw Error(
+							"Incompatible type for field {0}, expected {1}", theirName, yi.Type.Name);
+					def.Fields.Add(new ReaderClassDef.FieldDef {
+						Name = theirName,
+						OurIndex = def.Meta.Items.IndexOf(yi) + 1,
+						Type = yi.Type,
+						ReadFunc = MakeReadOrMergeFunc(yi),
+					});
+					ourIndex += 1;
+					if (!yi.IsOptional)
+						requiredCountActiual += 1;
+				}
+				else
+					AddUnknownFieldDef(def, theirName, typeName);
+			}
+			if (requiredCountActiual != def.Meta.RequiredCount)
+				throw Error(
+					"Expected {0} required field(s), but found {1}",
+					def.Meta.RequiredCount, requiredCountActiual);
+		}
+
 		private ReaderClassDef GetClassDef(short classId)
 		{
 			if (classId < classDefs.Count)
@@ -317,7 +347,10 @@ namespace Yuzu.Binary
 				return GetClassDefUnknown(typeName);
 			var result = new ReaderClassDef { Meta = Meta.Get(classType, Options) };
 			PrepareReaders(result);
-			InitClassDef(result, typeName);
+			if (BinaryOptions.Unordered)
+				InitClassDefUnordered(result, typeName);
+			else
+				InitClassDef(result, typeName);
 			classDefs.Add(result);
 			return result;
 		}

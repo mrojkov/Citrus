@@ -10,6 +10,7 @@ namespace Yuzu.Binary
 	{
 		public byte[] Signature = new byte[] { (byte)'Y', (byte)'B', (byte)'0', (byte)'1' };
 		public bool AutoSignature = false;
+		public bool Unordered = false;
 	}
 
 	// These values are part of format.
