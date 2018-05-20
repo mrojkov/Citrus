@@ -1696,13 +1696,14 @@ namespace YuzuTest.Json
 			var w = new Sample1();
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{}"), "X");
 			XAssert.Throws<YuzuException>(() => jd.FromString("{null:1}"), "'n'");
-			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"X\" }"), ":");
+			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"X\" }"), "':'");
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "nn"), "'u'");
-			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"X\":1, \"Y\": \"\\z\" }"), "z");
+			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"X\":1, \"Y\": \"\\z\" }"), "'z'");
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"X\":1, \"Y\": \"\\uQ\" }"), "Q");
 			XAssert.Throws<YuzuException>(() => jd.FromString(new SampleBool(), "{ \"B\": 1 }"), "1");
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ ,}"), ",");
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"Y\": \"q\" }"), "'X'");
+			XAssert.Throws<YuzuException>(() => jd.FromString<SampleMemberI>("{ \"Z\": 1 }"), "'Z'");
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "[]"), "'Sample1'");
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"class\": \"Q\" }"), "'Q'");
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"class\": \"YuzuTest.Sample2, YuzuTest\" }"), ".Sample2");
