@@ -15,7 +15,7 @@ namespace Tangerine.UI.SceneView
 			var backgroundTexture = PrepareChessTexture(Color1, Color2);
 			var playButtonTexture = new Texture2D();
 
-            playButtonTexture.LoadImage(new Bitmap(new ThemedconResource("SceneView.Play", "Tangerine").GetResourceStream()));
+			playButtonTexture.LoadImage(new Bitmap(new ThemedconResource("SceneView.Play", "Tangerine").GetResourceStream()));
 			sceneView.Frame.AddChangeWatcher(
 				() => SceneUserPreferences.Instance.BackgroundColorA,
 				(v) => backgroundTexture = PrepareChessTexture(v, Color2));
@@ -75,10 +75,14 @@ namespace Tangerine.UI.SceneView
 							var ctr = SceneView.Instance.Frame;
 							if (ctr != null) {
 								ctr.PrepareRendererState();
+								var pos = Vector2.Zero;
+								if (ProjectUserPreferences.Instance.RulerVisible) {
+									pos += Vector2.One * RulersWidget.RulerHeight;
+								}
 								Renderer.DrawSprite(
 									playButtonTexture,
 									Color4.White,
-									Vector2.Zero,
+									pos,
 									(Vector2)playButtonTexture.ImageSize,
 									Vector2.Zero,
 									Vector2.One
@@ -87,46 +91,49 @@ namespace Tangerine.UI.SceneView
 						}
 					}
 			));
-			var rc = new RenderChain();
+			var renderChain = new RenderChain();
 			sceneView.Frame.CompoundPostPresenter.Push(
 				new DelegatePresenter<Widget>(
 					(w) => {
 						if (!Document.Current.ExpositionMode) {
-							foreach (var widget in Project.Current.Overlays.Values) {
-								if (widget.Components.Get<NodeCommandComponent>()?.Command.Checked ?? false) {
-									widget.Position = (Document.Current.RootNode.AsWidget.Position +
-										(Document.Current.RootNode.AsWidget.Size - widget.Size) / 2) *
-										Document.Current.RootNode.AsWidget.LocalToWorldTransform;
-									widget.Scale = SceneView.Instance.Scene.Scale;
-									widget.RenderChainBuilder.AddToRenderChain(rc);
+							foreach (var pair in Project.Current.Overlays) {
+								var widget = pair.Value;
+								if (ProjectUserPreferences.Instance.DisplayedOverlays.Contains(pair.Key)) {
+									if (widget.Components.Get<NodeCommandComponent>()?.Command.Checked ?? false) {
+										widget.Position = (Document.Current.RootNode.AsWidget.Position +
+											(Document.Current.RootNode.AsWidget.Size - widget.Size) / 2) *
+											Document.Current.RootNode.AsWidget.LocalToWorldTransform;
+										widget.Scale = SceneView.Instance.Scene.Scale;
+										widget.RenderChainBuilder.AddToRenderChain(renderChain);
+									}
 								}
 							}
-							rc.RenderAndClear();
-						}
-						w.PrepareRendererState();
-						var size = Document.Current.RootNode.AsWidget.Size / 2;
-						foreach (var ruler in Project.Current.Rulers) {
-							if (ruler.GetComponents().Get<CommandComponent>()?.Command.Checked ?? false) {
-								DrawRuler(ruler, size, w);
+							renderChain.RenderAndClear();
+							w.PrepareRendererState();
+							foreach (var ruler in ProjectUserPreferences.Instance.Rulers) {
+								if (ProjectUserPreferences.Instance.DisplayedRulers.Contains(ruler.Name)) {
+									DrawRuler(ruler, w);
+								}
 							}
-						}
-						foreach (var ruler in Project.Current.DefaultRulers) {
-							if (ruler.GetComponents().Get<CommandComponent>()?.Command.Checked ?? false) {
-								DrawRuler(ruler, size, w);
+							foreach (var ruler in ProjectUserPreferences.Instance.DefaultRulers) {
+								if (ProjectUserPreferences.Instance.DisplayedRulers.Contains(ruler.Name)) {
+									DrawRuler(ruler, w);
+								}
 							}
 						}
 					}));
 		}
 
-		private void DrawRuler(RulerData ruler, Vector2 size, Widget root)
+		private void DrawRuler(Ruler ruler, Widget root)
 		{
 			var t = Document.Current.RootNode.AsWidget.CalcTransitionToSpaceOf(root);
+			var size = Document.Current.RootNode.AsWidget.Size / 2;
 			foreach (var line in ruler.Lines) {
-				if (line.IsVertical) {
-					var val = (new Vector2(line.Value + size.X, 0) * t).X;
+				if (line.RulerOrientation == RulerOrientation.Vertical) {
+					var val = (new Vector2(line.Value + (ruler.AnchorToRoot ? size.X : 0), 0) * t).X;
 					Renderer.DrawLine(new Vector2(val, 0), new Vector2(val, root.Size.Y), ColorTheme.Current.SceneView.Ruler);
 				} else {
-					var val = (new Vector2(0, line.Value + size.Y) * t).Y;
+					var val = (new Vector2(0, line.Value + (ruler.AnchorToRoot ? size.Y : 0)) * t).Y;
 					Renderer.DrawLine(new Vector2(0, val), new Vector2(root.Size.X, val), ColorTheme.Current.SceneView.Ruler);
 				}
 			}

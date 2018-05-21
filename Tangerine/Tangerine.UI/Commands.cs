@@ -79,9 +79,11 @@ namespace Tangerine.UI
 		public static readonly ICommand Duplicate = new Command("Duplicate", new Shortcut(Modifiers.Command, Key.D));
 		public static readonly ICommand ToggleDisplayRuler = new Command("Toggle Dispaly", new Shortcut(Modifiers.Command | Modifiers.Alt, Key.R));
 		public static readonly ICommand SaveCurrentRuler = new Command("Save Ruler");
+		public static readonly ICommand ClearActiveRuler = new Command("Clear Active Ruler");
 		public static readonly ICommand SnapWidgetPivotToRuler = new Command("Snap Widget Pivot To Ruler");
 		public static readonly ICommand SnapWidgetBorderToRuler = new Command("Snap Widget To Ruler");
-		public static readonly ICommand DeleteRulers = new Command("Delete Rulers");
+		public static readonly ICommand SnapRulerLinesToWidgets = new Command("Snap Ruler Lines To Widgets");
+		public static readonly ICommand ManageRulers = new Command("Manage Rulers");
 	}
 
 	public static class Tools

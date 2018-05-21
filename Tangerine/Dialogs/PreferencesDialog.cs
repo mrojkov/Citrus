@@ -17,6 +17,12 @@ namespace Tangerine
 		readonly ColorThemeEnum theme;
 		readonly Frame Frame;
 		readonly TabbedWidget Content;
+		private static readonly Thickness contentPadding = new Thickness {
+			Left = 10,
+			Top = 10,
+			Bottom = 10,
+			Right = 15,
+		};
 
 		public PreferencesDialog()
 		{
@@ -44,6 +50,7 @@ namespace Tangerine
 					new Widget {
 						Layout = new HBoxLayout { Spacing = 8 },
 						LayoutCell = new LayoutCell(Alignment.LeftCenter),
+						Padding = new Thickness { Top = 5 },
 						Nodes = {
 							(resetButton = new ThemedButton { Text = "Reset To Defaults", MinMaxWidth = 150f }),
 							new Widget { MinMaxHeight = 0 },
@@ -89,12 +96,9 @@ namespace Tangerine
 
 		private Widget CreateColorsPane()
 		{
-			var pane = new ThemedScrollView {
-				Padding = new Thickness {
-					Right = 15,
-				},
-			};
+			var pane = new ThemedScrollView();
 			pane.Content.Layout = new VBoxLayout { Spacing = 4 };
+			pane.Content.Padding = contentPadding;
 			new EnumPropertyEditor<ColorThemeEnum>(
 			new PropertyEditorParams(pane.Content, AppUserPreferences.Instance, nameof(Tangerine.AppUserPreferences.Theme), "User interface theme"));
 			var tmp = new BooleanPropertyEditor(
@@ -149,12 +153,9 @@ namespace Tangerine
 
 		Widget CreateGeneralPane()
 		{
-			var pane = new ThemedScrollView {
-				Padding = new Thickness {
-					Right = 15,
-				},
-			};
+			var pane = new ThemedScrollView();
 			pane.Content.Layout = new VBoxLayout { Spacing = 4 };
+			pane.Content.Padding = contentPadding;
 			new Vector2PropertyEditor(
 				new PropertyEditorParams(pane.Content, Tangerine.AppUserPreferences.Instance, nameof(Tangerine.AppUserPreferences.DefaultSceneDimensions), "Default scene dimensions"));
 			new BooleanPropertyEditor(

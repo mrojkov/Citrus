@@ -219,6 +219,7 @@ namespace Tangerine.Core
 				Current?.DetachViews();
 				Current = doc;
 				doc?.AttachViews();
+				ProjectUserPreferences.Instance.CurrentDocument = doc?.Path;
 			}
 		}
 

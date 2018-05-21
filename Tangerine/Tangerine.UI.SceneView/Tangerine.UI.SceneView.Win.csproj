@@ -96,6 +96,7 @@
     <Compile Include="Processors\DragSplineTangentsProcessor.cs" />
     <Compile Include="Processors\RescalePointObjectSelectionProcessor.cs" />
     <Compile Include="Processors\RotatePointObjectSelectionProcessor.cs" />
+    <Compile Include="Processors\RulerProcessor.cs" />
     <Compile Include="Processors\ShiftClickProcessor.cs" />
     <Compile Include="SceneView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -113,7 +114,7 @@
     <Compile Include="SceneUserPreferences.cs" />
     <Compile Include="Processors\ActivateOnMouseOverProcessor.cs" />
     <Compile Include="Utils\AccumulativeRotationHelper.cs" />
-    <Compile Include="Widgets\Ruler.cs" />
+    <Compile Include="Widgets\RulersWidget.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Win.csproj">

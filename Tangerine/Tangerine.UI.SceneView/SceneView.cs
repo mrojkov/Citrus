@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -20,6 +20,7 @@ namespace Tangerine.UI.SceneView
 		public WidgetInput Input => InputArea.Input;
 		// Container for the document root node.
 		public readonly SceneWidget Scene;
+		public static readonly RulersWidget RulersWidget = new RulersWidget();
 		/// <summary>
 		/// Gets the mouse position in the scene coordinates.
 		/// </summary>
@@ -41,7 +42,7 @@ namespace Tangerine.UI.SceneView
 			h.Connect(SceneViewCommands.DragDownFast, () => DragNodes(new Vector2(0, 5)));
 			h.Connect(SceneViewCommands.DragLeftFast, () => DragNodes(new Vector2(-5, 0)));
 			h.Connect(SceneViewCommands.DragRightFast, () => DragNodes(new Vector2(5, 0)));
-			h.Connect(SceneViewCommands.Duplicate, DuplicateNodes, () => Document.Current?.TopLevelSelectedRows().Any(row => row.IsCopyPasteAllowed()) ?? false);
+			h.Connect(SceneViewCommands.Duplicate, DuplicateNodes);
 			h.Connect(SceneViewCommands.DisplayBones, new DisplayBones());
 			h.Connect(SceneViewCommands.DisplayPivotsForAllWidgets, new DisplayPivotsForAllWidgets());
 			h.Connect(SceneViewCommands.DisplayPivotsForInvisibleWidgets, new DisplayPivotsForInvisibleWidgets());
@@ -49,34 +50,6 @@ namespace Tangerine.UI.SceneView
 			h.Connect(SceneViewCommands.UntieWidgetsFromBones, UntieWidgetsFromBones);
 			h.Connect(SceneViewCommands.ToggleDisplayRuler, new DisplayRuler());
 			h.Connect(SceneViewCommands.SaveCurrentRuler, new SaveRuler());
-		}
-
-		private class SaveRuler : DocumentCommandHandler
-		{
-			public override bool GetEnabled()
-			{
-				return SceneViewCommands.ToggleDisplayRuler.Checked && UI.SceneView.Ruler.Lines.Count > 0;
-			}
-
-			public override void Execute()
-			{
-				var ruler = Ruler.GetRulerData();
-				ruler.Name = new SaveRulerDialog().Show();
-				if (Project.Current.Rulers.Any(o => o.Name == ruler.Name)) {
-					new AlertDialog("Ruler with exact name already exist").Show();
-				} else {
-					Project.Current.AddRuler(ruler);
-					Ruler.Clear();
-				}
-			}
-		}
-
-		private class DisplayRuler : ToggleDisplayCommandHandler
-		{
-			public override void Execute()
-			{
-				Visible = Ruler.ToggleDisplay();
-			}
 		}
 
 		private static void DuplicateNodes()
@@ -100,10 +73,8 @@ namespace Tangerine.UI.SceneView
 				return;
 			}
 			Document.Current.History.BeginTransaction();
-			try
-			{
-				foreach (var widget in widgets)
-				{
+			try {
+				foreach (var widget in widgets) {
 					if (widget is DistortionMesh) {
 						var mesh = widget as DistortionMesh;
 						foreach (PointObject point in mesh.Nodes) {
@@ -115,8 +86,7 @@ namespace Tangerine.UI.SceneView
 							CalcSkinningWeight(widget.Position, bones), CoreUserPreferences.Instance.AutoKeyframes);
 					}
 				}
-				foreach (var bone in bones)
-				{
+				foreach (var bone in bones) {
 					var entry = bone.Parent.AsWidget.BoneArray[bone.Index];
 					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.RefPosition), entry.Joint, CoreUserPreferences.Instance.AutoKeyframes);
 					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.RefLength), entry.Length, CoreUserPreferences.Instance.AutoKeyframes);
@@ -179,50 +149,6 @@ namespace Tangerine.UI.SceneView
 			return skinningWeights;
 		}
 
-
-		private class DisplayBones : ToggleDisplayCommandHandler
-		{
-			public override void Execute()
-			{
-				var postPresenter = Instance.Frame.CompoundPostPresenter;
-				if (Visible) {
-					postPresenter.Remove(Bone3DPresenter.Presenter);
-				} else {
-					postPresenter.Add(Bone3DPresenter.Presenter);
-				}
-				CommonWindow.Current.Invalidate();
-				base.Execute();
-			}
-		}
-
-		private class DisplayPivotsForAllWidgets : DocumentCommandHandler
-		{
-			public override void Execute()
-			{
-				SceneUserPreferences.Instance.DisplayPivotsForAllWidgets = !SceneUserPreferences.Instance.DisplayPivotsForAllWidgets;
-				CommonWindow.Current.Invalidate();
-			}
-
-			public override bool GetChecked()
-			{
-				return SceneUserPreferences.Instance.DisplayPivotsForAllWidgets;
-			}
-		}
-
-		private class DisplayPivotsForInvisibleWidgets : DocumentCommandHandler
-		{
-			public override void Execute()
-			{
-				SceneUserPreferences.Instance.DisplayPivotsForInvisibleWidgets = !SceneUserPreferences.Instance.DisplayPivotsForInvisibleWidgets;
-				CommonWindow.Current.Invalidate();
-			}
-
-			public override bool GetChecked()
-			{
-				return SceneUserPreferences.Instance.DisplayPivotsForInvisibleWidgets;
-			}
-		}
-
 		static void DragNodes(Vector2 delta)
 		{
 			DragWidgets(delta);
@@ -277,6 +203,7 @@ namespace Tangerine.UI.SceneView
 		public void Attach()
 		{
 			Instance = this;
+			Panel.AddNode(RulersWidget);
 			Panel.AddNode(Frame);
 			DockManager.Instance.FilesDropped += DropFiles;
 		}
@@ -286,6 +213,7 @@ namespace Tangerine.UI.SceneView
 			DockManager.Instance.FilesDropped -= DropFiles;
 			Instance = null;
 			Frame.Unlink();
+			RulersWidget.Unlink();
 		}
 
 		/// <summary>
@@ -445,6 +373,7 @@ namespace Tangerine.UI.SceneView
 				new RescalePointObjectSelectionProcessor(),
 				new RotatePointObjectSelectionProcessor(),
 				new RotateWidgetsProcessor(),
+				new RulerProcessor(),
 				new MouseSelectionProcessor(),
 				new ShiftClickProcessor(),
 				new PreviewAnimationProcessor()
@@ -453,6 +382,7 @@ namespace Tangerine.UI.SceneView
 
 		void CreatePresenters()
 		{
+			new Bone3DPresenter(this);
 			new ContainerAreaPresenter(this);
 			new WidgetsPivotMarkPresenter(this);
 			new SelectedWidgetsPresenter(this);
@@ -485,13 +415,92 @@ namespace Tangerine.UI.SceneView
 				}
 			}
 		}
+
+		private class SaveRuler : DocumentCommandHandler
+		{
+			public override bool GetEnabled()
+			{
+				return SceneViewCommands.ToggleDisplayRuler.Checked &&
+					   ProjectUserPreferences.Instance.ActiveRuler.Lines.Count > 0;
+			}
+
+			public override void Execute()
+			{
+				var ruler = ProjectUserPreferences.Instance.ActiveRuler;
+				if (!new SaveRulerDialog(ruler).Show()) {
+					return;
+				}
+				if (ProjectUserPreferences.Instance.Rulers.Any(o => o.Name == ruler.Name)) {
+					new AlertDialog("Ruler with exact name already exist").Show();
+					ruler.Name = string.Empty;
+					ruler.AnchorToRoot = false;
+				} else {
+					if (ruler.AnchorToRoot) {
+						var size = Document.Current.Container.AsWidget.Size / 2;
+						foreach (var l in ruler.Lines) {
+							l.Value -= (l.RulerOrientation == RulerOrientation.Horizontal ? size.Y : size.X);
+						}
+					}
+					ProjectUserPreferences.Instance.SaveActiveRuler();
+				}
+			}
+		}
+
+		private class DisplayRuler : DocumentCommandHandler
+		{
+			public override bool GetChecked() => ProjectUserPreferences.Instance.RulerVisible;
+
+			public override void Execute()
+			{
+				ProjectUserPreferences.Instance.RulerVisible = !ProjectUserPreferences.Instance.RulerVisible;
+			}
+		}
+
+		private class DisplayBones : DocumentCommandHandler
+		{
+			public override bool GetChecked() => SceneUserPreferences.Instance.Bones3DVisible;
+
+			public override void Execute()
+			{
+				SceneUserPreferences.Instance.Bones3DVisible = !SceneUserPreferences.Instance.Bones3DVisible;
+				CommonWindow.Current.Invalidate();
+			}
+		}
+
+		private class DisplayPivotsForAllWidgets : DocumentCommandHandler
+		{
+			public override void Execute()
+			{
+				SceneUserPreferences.Instance.DisplayPivotsForAllWidgets = !SceneUserPreferences.Instance.DisplayPivotsForAllWidgets;
+				CommonWindow.Current.Invalidate();
+			}
+
+			public override bool GetChecked()
+			{
+				return SceneUserPreferences.Instance.DisplayPivotsForAllWidgets;
+			}
+		}
+
+		private class DisplayPivotsForInvisibleWidgets : DocumentCommandHandler
+		{
+			public override void Execute()
+			{
+				SceneUserPreferences.Instance.DisplayPivotsForInvisibleWidgets = !SceneUserPreferences.Instance.DisplayPivotsForInvisibleWidgets;
+				CommonWindow.Current.Invalidate();
+			}
+
+			public override bool GetChecked()
+			{
+				return SceneUserPreferences.Instance.DisplayPivotsForInvisibleWidgets;
+			}
+		}
 	}
 
 	public class CreateNodeRequestComponent : Component
 	{
 		public Type NodeType { get; set; }
 
-		public static bool Consume<T>(ComponentCollection<Component> components, out Type nodeType) where T: Node
+		public static bool Consume<T>(ComponentCollection<Component> components, out Type nodeType) where T : Node
 		{
 			var c = components.Get<CreateNodeRequestComponent>();
 			if (c != null && (c.NodeType.IsSubclassOf(typeof(T)) || c.NodeType == typeof(T))) {
@@ -503,7 +512,7 @@ namespace Tangerine.UI.SceneView
 			return false;
 		}
 
-		public static bool Consume<T>(ComponentCollection<Component> components) where T: Node
+		public static bool Consume<T>(ComponentCollection<Component> components) where T : Node
 		{
 			Type type;
 			return Consume<T>(components, out type);

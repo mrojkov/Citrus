@@ -12,19 +12,6 @@ namespace Tangerine.UI
 		}
 
 		public virtual bool GetEnabled() => true;
-
 		public virtual bool GetChecked() => false;
-	}
-
-	public class ToggleDisplayCommandHandler : DocumentCommandHandler
-	{
-
-		protected bool Visible { get; set; }
-
-		public override bool GetChecked() => Visible;
-		public override void Execute()
-		{
-			Visible = !Visible;
-		}
 	}
 }

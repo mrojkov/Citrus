@@ -17,16 +17,16 @@ namespace Tangerine
 		}
 	}
 
-	public class DeleteRulers : DocumentCommandHandler
+	public class ManageRulers : DocumentCommandHandler
 	{
 		public override bool GetEnabled()
 		{
-			return Project.Current.Rulers.Count > 0;
+			return ProjectUserPreferences.Instance.Rulers.Count > 0;
 		}
 
 		public override void Execute()
 		{
-			new DeleteRulerDialog();
+			new ManageRulersDialog();
 		}
 	}
 

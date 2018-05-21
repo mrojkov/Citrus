@@ -89,7 +89,7 @@
     <None Include="Info.plist" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Dialogs\DeleteRulerDialog.cs" />
+    <Compile Include="Dialogs\ManageRulersDialog.cs" />
     <Compile Include="Dialogs\PreferencesDialog.cs" />
     <Compile Include="TangerineApp.cs" />
     <Compile Include="Main.Mac.cs" />
@@ -372,6 +372,8 @@
     <EmbeddedResource Include="Resources\Icons\Dark\SceneView\InspectingRoot.png" />
     <EmbeddedResource Include="Resources\Icons\Light\SceneView\InspectingRoot.png" />
     <EmbeddedResource Include="Resources\Arial.ttf" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\Edit.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\Edit.png" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

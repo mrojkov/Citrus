@@ -59,6 +59,7 @@
     <Compile Include="Operations\SyncFolderDescriptorsProcessor.cs" />
     <Compile Include="Operations\TimelineHorizontalShift.cs" />
     <Compile Include="Project.cs" />
+    <Compile Include="ProjectUserPreferences.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DocumentHistory.cs" />
     <Compile Include="Document.cs" />
@@ -68,6 +69,7 @@
     <Compile Include="Row.cs" />
     <Compile Include="RowsSynchronizer.cs" />
     <Compile Include="Operation.cs" />
+    <Compile Include="Ruler.cs" />
     <Compile Include="TriggersValidation.cs" />
     <Compile Include="UserPreferences.cs" />
     <Compile Include="VersionedCollection.cs" />

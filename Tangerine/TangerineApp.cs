@@ -398,7 +398,7 @@ namespace Tangerine
 			h.Connect(GenericCommands.CloseDocument, new FileClose());
 			h.Connect(GenericCommands.Quit, Application.Exit);
 			h.Connect(GenericCommands.PreferencesDialog, () => new PreferencesDialog());
-			h.Connect(SceneViewCommands.DeleteRulers, new DeleteRulers());
+			h.Connect(SceneViewCommands.ManageRulers, new ManageRulers());
 			h.Connect(GenericCommands.Group, new GroupNodes());
 			h.Connect(GenericCommands.Ungroup, new UngroupNodes());
 			h.Connect(GenericCommands.InsertTimelineColumn, new InsertTimelineColumn());
@@ -437,14 +437,53 @@ namespace Tangerine
 			h.Connect(Command.Redo, () => Document.Current.History.Redo(), () => Document.Current?.History.CanRedo() ?? false);
 			h.Connect(OrangeCommands.Run, () => WidgetContext.Current.Root.Tasks.Add(OrangeTask));
 			h.Connect(OrangeCommands.OptionsDialog, () => new OrangePluginOptionsDialog());
-			h.Connect(SceneViewCommands.SnapWidgetBorderToRuler, new ToggleDisplayCommandHandler());
-			h.Connect(SceneViewCommands.SnapWidgetPivotToRuler, new ToggleDisplayCommandHandler());
-			h.Connect(SceneViewCommands.DeleteRulers, new DeleteRulers());
+			h.Connect(SceneViewCommands.SnapWidgetBorderToRuler, new SnapWidgetBorderCommandHandler());
+			h.Connect(SceneViewCommands.SnapWidgetPivotToRuler, new SnapWidgetPivotCommandHandler());
+			h.Connect(SceneViewCommands.SnapRulerLinesToWidgets, new SnapRulerLinesToWidgetCommandHandler());
+			h.Connect(SceneViewCommands.ClearActiveRuler, ClearActiveRuler);
+			h.Connect(SceneViewCommands.ManageRulers, new ManageRulers());
 		}
 
 		private static bool IsCopyPasteAllowedForSelection()
 		{
 			return Document.Current?.TopLevelSelectedRows().Any(row => row.IsCopyPasteAllowed()) ?? false;
+		}
+
+		private void ClearActiveRuler()
+		{
+			if (new AlertDialog("Are you sure you want to clear active ruler?", "Yes", "No").Show() == 0) {
+				ProjectUserPreferences.Instance.ActiveRuler.Lines.Clear();
+			}
+		}
+
+		private class SnapWidgetPivotCommandHandler : DocumentCommandHandler
+		{
+			public override bool GetChecked() => UI.SceneView.SceneUserPreferences.Instance.SnapWidgetPivotToRuler;
+			public override void Execute()
+			{
+				var prefs = UI.SceneView.SceneUserPreferences.Instance;
+				prefs.SnapWidgetPivotToRuler = !prefs.SnapWidgetPivotToRuler;
+			}
+		}
+
+		private class SnapWidgetBorderCommandHandler : DocumentCommandHandler
+		{
+			public override bool GetChecked() => UI.SceneView.SceneUserPreferences.Instance.SnapWidgetBorderToRuler;
+			public override void Execute()
+			{
+				var prefs = UI.SceneView.SceneUserPreferences.Instance;
+				prefs.SnapWidgetBorderToRuler = !prefs.SnapWidgetBorderToRuler;
+			}
+		}
+
+		private class SnapRulerLinesToWidgetCommandHandler : DocumentCommandHandler
+		{
+			public override bool GetChecked() => UI.SceneView.SceneUserPreferences.Instance.SnapRulerLinesToWidgets;
+			public override void Execute()
+			{
+				var prefs = UI.SceneView.SceneUserPreferences.Instance;
+				prefs.SnapRulerLinesToWidgets = !prefs.SnapRulerLinesToWidgets;
+			}
 		}
 
 		private IEnumerator<object> OrangeTask()
