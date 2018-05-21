@@ -62,10 +62,10 @@
     <Reference Include="Xamarin.Mac" />
     <Reference Include="System.Xml" />
     <Reference Include="McMaster.Extensions.CommandLineUtils">
-      <HintPath>packages\McMaster.Extensions.CommandLineUtils.2.2.1\lib\netstandard2.0\McMaster.Extensions.CommandLineUtils.dll</HintPath>
+      <HintPath>$(SolutionDir)packages\McMaster.Extensions.CommandLineUtils.2.2.1\lib\netstandard2.0\McMaster.Extensions.CommandLineUtils.dll</HintPath>
     </Reference>
     <Reference Include="Octokit">
-      <HintPath>packages\Octokit.0.29.0\lib\net45\Octokit.dll</HintPath>
+      <HintPath>$(SolutionDir)packages\Octokit.0.29.0\lib\net45\Octokit.dll</HintPath>
     </Reference>
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.IO.Compression.FileSystem" />
