@@ -73,7 +73,7 @@
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="Octokit">
-      <HintPath>packages\Octokit.0.29.0\lib\net45\Octokit.dll</HintPath>
+      <HintPath>$(SolutionDir)packages\Octokit.0.29.0\lib\net45\Octokit.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

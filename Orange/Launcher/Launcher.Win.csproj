@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Launcher</RootNamespace>
-    <AssemblyName>Orange</AssemblyName>
+    <AssemblyName>Launcher</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -42,7 +42,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\bin\Win\Debug</OutputPath>
+    <OutputPath>bin\Win\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;WIN</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
@@ -51,7 +51,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>..\bin\Win\Release</OutputPath>
+    <OutputPath>bin\Win\Release\</OutputPath>
     <DefineConstants>TRACE;WIN</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
@@ -111,10 +111,10 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="McMaster.Extensions.CommandLineUtils, Version=2.2.1.0, Culture=neutral, PublicKeyToken=6f71cb76b82f055d, processorArchitecture=MSIL">
-      <HintPath>packages\McMaster.Extensions.CommandLineUtils.2.2.1\lib\net45\McMaster.Extensions.CommandLineUtils.dll</HintPath>
+      <HintPath>$(SolutionDir)packages\McMaster.Extensions.CommandLineUtils.2.2.1\lib\net45\McMaster.Extensions.CommandLineUtils.dll</HintPath>
     </Reference>
     <Reference Include="Octokit, Version=0.29.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\Octokit.0.29.0\lib\net45\Octokit.dll</HintPath>
+      <HintPath>$(SolutionDir)packages\Octokit.0.29.0\lib\net45\Octokit.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -156,7 +156,7 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
