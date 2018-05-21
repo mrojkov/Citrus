@@ -225,7 +225,7 @@ namespace Launcher
 #if WIN
 						SolutionPath = Path.Combine(citrusDirectory, "Tangerine", "Tangerine.Win.sln"),
 #elif MAC
-						SolutionPath = Path.Combine(builder.CitrusDirectory, "Tangerine", "Tangerine.Mac.sln"),
+						SolutionPath = Path.Combine(citrusDirectory, "Tangerine", "Tangerine.Mac.sln"),
 #endif // WIN
 						NeedRunExecutable = false
 					};
@@ -379,7 +379,7 @@ namespace Launcher
 #elif MAC
 		private static void StartUIMode(string[] args)
 		{
-			AppDelegate.Builder = builder;
+			AppDelegate.Builder = orangeBuilder;
 			NSApplication.Init();
 			NSApplication.Main(args);
 		}
