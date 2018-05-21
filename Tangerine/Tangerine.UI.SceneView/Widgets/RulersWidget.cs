@@ -210,17 +210,18 @@ namespace Tangerine.UI.SceneView
 					if (GetVectorComponentForOrientation(a, rulerData.RulerOrientation) - rulerData.Offset >= 0) {
 						Renderer.DrawLine(a, b, ColorTheme.Current.SceneView.RulerTextColor);
 						if (strokeValue != null) {
-							var text = ((int)(j * strokeValue.Value)).ToString();
+							var lengthMarkerText = ((int)(j * strokeValue.Value)).ToString();
 							var oldTransform = Renderer.Transform1;
-							var textLength = Renderer.MeasureTextLine(text, fontHeight, letterspacing);
+							var textLength = Renderer.MeasureTextLine(lengthMarkerText, fontHeight, letterspacing);
 							if (rulerData.RulerOrientation == RulerOrientation.Vertical) {
 								Renderer.Transform1 = Matrix32.Rotation(-Mathf.HalfPi) * Renderer.Transform1;
 								textOffset = Vector2.Down * (5 + textLength.X);
 							} else {
 								textOffset = Vector2.Right * 5;
 							}
-							Renderer.Transform1 *= Matrix32.Translation(a + textOffset);
-							Renderer.DrawTextLine(Vector2.Zero, text, fontHeight, ColorTheme.Current.SceneView.RulerTextColor, letterspacing);
+							var lengthMarkerPosition = a + textOffset;
+							Renderer.Transform1 *= Matrix32.Translation(lengthMarkerPosition.X.Round(), lengthMarkerPosition.Y.Round());
+							Renderer.DrawTextLine(Vector2.Zero, lengthMarkerText, fontHeight, ColorTheme.Current.SceneView.RulerTextColor, letterspacing);
 							Renderer.Transform1 = oldTransform;
 						}
 					}
