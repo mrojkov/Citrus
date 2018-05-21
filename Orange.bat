@@ -1,1 +1,1 @@
-start Orange/bin/Win/Release/Orange.exe
+start Orange/Launcher/bin/Win/Release/Launcher.exe

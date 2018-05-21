@@ -1,1 +1,1 @@
-start Orange\bin\Win\Release\Orange.exe -b Tangerine\Tangerine.Win.sln -r Tangerine\bin\Release\Tangerine.exe
+start Orange\Launcher\bin\Win\Release\Launcher.exe -b Tangerine\Tangerine.Win.sln -r Tangerine\bin\Release\Tangerine.exe

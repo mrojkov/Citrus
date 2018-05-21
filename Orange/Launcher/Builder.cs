@@ -12,16 +12,6 @@ namespace Launcher
 	public class Builder
 	{
 		private string citrusDirectory;
-		public string CitrusDirectory
-		{
-			get {
-				if (string.IsNullOrEmpty(citrusDirectory)) {
-					citrusDirectory = Orange.Toolbox.CalcCitrusDirectory();
-				}
-				return citrusDirectory;
-			}
-		}
-		private string OrangeDirectory { get { return Path.Combine(CitrusDirectory, "Orange"); } }
 		public bool NeedRunExecutable = true;
 		public string SolutionPath;
 		public string ExecutablePath;
@@ -31,11 +21,16 @@ namespace Launcher
 		public event Action OnBuildFail;
 		public event Action OnBuildSuccess;
 
+		public Builder(string citrusDirectory)
+		{
+			this.citrusDirectory = citrusDirectory;
+		}
+
 		private void RunExecutable()
 		{
 			var process = new Process {
 				StartInfo = {
-					FileName = ExecutablePath ?? DefaultExecutablePath,
+					FileName = ExecutablePath,
 					Arguments = ExecutableArgs
 				}
 			};
@@ -44,28 +39,24 @@ namespace Launcher
 
 		private void RestoreNuget()
 		{
-#if WIN
-			Orange.Nuget.Restore(Path.Combine(OrangeDirectory, "Orange.Win.sln"));
-#elif MAC
-			Orange.Nuget.Restore(Path.Combine(OrangeDirectory, "Orange.Mac.sln"));
-#endif
+			Orange.Nuget.Restore(SolutionPath);
 		}
 
 		private void SynchronizeAllProjects()
 		{
-			Orange.CsprojSynchronization.SynchronizeProject($"{CitrusDirectory}/Yuzu/Yuzu.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{CitrusDirectory}/Yuzu/Yuzu.Mac.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{CitrusDirectory}/Lime/Lime.Win.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{CitrusDirectory}/Lime/Lime.Mac.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{CitrusDirectory}/Lime/Lime.MonoMac.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{CitrusDirectory}/Kumquat/Kumquat.Win.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{CitrusDirectory}/Kumquat/Kumquat.Mac.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{CitrusDirectory}/Orange/Orange.Win.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{CitrusDirectory}/Orange/Orange.Mac.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{CitrusDirectory}/Orange/Orange.CLI/Orange.Win.CLI.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{CitrusDirectory}/Orange/Orange.CLI/Orange.Mac.CLI.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{CitrusDirectory}/Orange/Orange.GUI/Orange.Win.GUI.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{CitrusDirectory}/Orange/Orange.GUI/Orange.Mac.GUI.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Yuzu/Yuzu.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Yuzu/Yuzu.Mac.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Lime/Lime.Win.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Lime/Lime.Mac.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Lime/Lime.MonoMac.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Kumquat/Kumquat.Win.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Kumquat/Kumquat.Mac.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Orange/Orange.Win.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Orange/Orange.Mac.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Orange/Orange.CLI/Orange.Win.CLI.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Orange/Orange.CLI/Orange.Mac.CLI.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Orange/Orange.GUI/Orange.Win.GUI.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Orange/Orange.GUI/Orange.Mac.GUI.csproj");
 		}
 
 		public Task Start()
@@ -86,11 +77,11 @@ namespace Launcher
 
 		private void BuildAndRun()
 		{
-			Environment.CurrentDirectory = OrangeDirectory;
-			ClearObjFolder(CitrusDirectory);
+			Environment.CurrentDirectory = Path.GetDirectoryName(SolutionPath);
+			ClearObjFolder(citrusDirectory);
 			OnBuildStatusChange?.Invoke("Building");
-			if (AreRequirementsMet() && Build(SolutionPath ?? DefaultSolutionPath)) {
-				ClearObjFolder(CitrusDirectory);
+			if (AreRequirementsMet() && Build(SolutionPath)) {
+				ClearObjFolder(citrusDirectory);
 				if (NeedRunExecutable) {
 					RunExecutable();
 				}
@@ -199,20 +190,6 @@ namespace Launcher
 			OnBuildStatusChange?.Invoke($"Build failed. {details}");
 			OnBuildFail?.Invoke();
 		}
-
-		private string DefaultSolutionPath =>
-#if WIN
-			Path.Combine(OrangeDirectory, "Orange.Win.sln");
-#elif MAC
-			Path.Combine(OrangeDirectory, "Orange.Mac.sln");
-#endif // WIN
-
-		private string DefaultExecutablePath =>
-#if WIN
-			Path.Combine(OrangeDirectory, @"bin\Win\Release\Orange.GUI.exe");
-#elif MAC
-			Path.Combine(OrangeDirectory, @"bin/Mac/Release/Orange.GUI.app/Contents/MacOS/Orange.GUI");
-#endif // WIN
 
 #if WIN
 		private string builderPath

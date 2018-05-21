@@ -103,7 +103,24 @@ namespace Launcher
 		private static IntPtr INVALID_HANDLE_VALUE = new IntPtr(-1);
 #endif // WIN
 
-		private static Builder builder;
+		private static Builder orangeBuilder;
+
+		private static string OrangeSolutionPath =>
+#if WIN
+			Path.Combine(OrangeDirectory, "Orange.Win.sln");
+#elif MAC
+			Path.Combine(OrangeDirectory, "Orange.Mac.sln");
+#endif // WIN
+
+		private static string OrangeExecutablePath =>
+#if WIN
+			Path.Combine(OrangeDirectory, @"bin\Win\Release\Orange.GUI.exe");
+#elif MAC
+			Path.Combine(OrangeDirectory, @"bin/Mac/Release/Orange.GUI.app/Contents/MacOS/Orange.GUI");
+#endif // WIN
+		private static string OrangeDirectory { get { return Path.Combine(citrusDirectory, "Orange"); } }
+
+		private static string citrusDirectory = Orange.Toolbox.CalcCitrusDirectory();
 
 		[STAThread]
 		public static int Main(string[] args)
@@ -196,13 +213,17 @@ namespace Launcher
 #elif MAC
 						"mac";
 #endif // WIN
-					builder = new Builder { NeedRunExecutable = false };
-					builder.OnBuildStatusChange += Console.WriteLine;
-					builder.OnBuildFail += () => Environment.Exit(1);
-					builder.Start().Wait();
-					var tangerineBuilder = new Builder {
+					orangeBuilder = new Builder(citrusDirectory) {
+						NeedRunExecutable = false,
+						SolutionPath = OrangeSolutionPath,
+						ExecutablePath = OrangeExecutablePath,
+					};
+					orangeBuilder.OnBuildStatusChange += Console.WriteLine;
+					orangeBuilder.OnBuildFail += () => Environment.Exit(1);
+					orangeBuilder.Start().Wait();
+					var tangerineBuilder = new Builder(citrusDirectory) {
 #if WIN
-						SolutionPath = Path.Combine(builder.CitrusDirectory, "Tangerine", "Tangerine.Win.sln"),
+						SolutionPath = Path.Combine(citrusDirectory, "Tangerine", "Tangerine.Win.sln"),
 #elif MAC
 						SolutionPath = Path.Combine(builder.CitrusDirectory, "Tangerine", "Tangerine.Mac.sln"),
 #endif // WIN
@@ -211,16 +232,16 @@ namespace Launcher
 					tangerineBuilder.OnBuildStatusChange += Console.WriteLine;
 					tangerineBuilder.OnBuildFail += () => Environment.Exit(1);
 					tangerineBuilder.Start().Wait();
-					var orangeBinDir = Path.Combine(builder.CitrusDirectory, "Orange", "bin", platformSuffix, "Release");
-					var tangerineBinDir = Path.Combine(builder.CitrusDirectory, "Tangerine", "bin", "Release");
+					var orangeBinDir = Path.Combine(citrusDirectory, "Orange", "bin", platformSuffix, "Release");
+					var tangerineBinDir = Path.Combine(citrusDirectory, "Tangerine", "bin", "Release");
 					var orangeFiles = new FileEnumerator(orangeBinDir);
 					var tangerineFiles = new FileEnumerator(tangerineBinDir);
 
 
-					var tempPath = tempOption.HasValue() ? tempOption.ParsedValue : Path.Combine(builder.CitrusDirectory, "launcher_temp");
+					var tempPath = tempOption.HasValue() ? tempOption.ParsedValue : Path.Combine(citrusDirectory, "launcher_temp");
 					var outputPath = outputOption.HasValue()
-						? Path.Combine(builder.CitrusDirectory, outputOption.ParsedValue)
-						: Path.Combine(builder.CitrusDirectory, "launcher_output", $"bundle_{platformSuffix}.zip");
+						? Path.Combine(citrusDirectory, outputOption.ParsedValue)
+						: Path.Combine(citrusDirectory, "launcher_output", $"bundle_{platformSuffix}.zip");
 					var outputDirectory = Path.GetDirectoryName(outputPath);
 					if (Directory.Exists(tempPath)) {
 						Directory.Delete(tempPath, true);
@@ -267,7 +288,7 @@ namespace Launcher
 					process.WaitForExit();
 #endif // WIN
 					CitrusVersion citrusVersion = null;
-					using (var stream = File.Open(Path.Combine(builder.CitrusDirectory, Orange.CitrusVersion.Filename), FileMode.Open)) {
+					using (var stream = File.Open(Path.Combine(citrusDirectory, Orange.CitrusVersion.Filename), FileMode.Open)) {
 						citrusVersion = CitrusVersion.Load(stream);
 						citrusVersion.IsStandalone = true;
 						citrusVersion.BuildNumber = buildNumberOption.ParsedValue;
@@ -308,15 +329,15 @@ namespace Launcher
 					return 0;
 				}
 #endif // WIN
-				string solutionPath = null;
-				string executablePath = null;
+				string solutionPath = OrangeSolutionPath;
+				string executablePath = OrangeExecutablePath;
 				if (optionBuildProjectPath.HasValue()) {
 					solutionPath = Path.Combine(Environment.CurrentDirectory, optionBuildProjectPath.ParsedValue);
 				}
 				if (optionExecutablePath.HasValue()) {
 					executablePath = Path.Combine(Environment.CurrentDirectory, optionExecutablePath.ParsedValue);
 				}
-				builder = new Builder {
+				orangeBuilder = new Builder(citrusDirectory) {
 					NeedRunExecutable = !optionJustBuild.HasValue(),
 					SolutionPath = solutionPath,
 					ExecutablePath = executablePath,
@@ -346,12 +367,12 @@ namespace Launcher
 		private static void StartUIMode(string[] args)
 		{
 			var mainForm = new MainForm();
-			builder.OnBuildStatusChange += mainForm.SetBuildStatus;
-			builder.OnBuildFail += mainForm.ShowLog;
-			builder.OnBuildSuccess += System.Windows.Forms.Application.Exit;
+			orangeBuilder.OnBuildStatusChange += mainForm.SetBuildStatus;
+			orangeBuilder.OnBuildFail += mainForm.ShowLog;
+			orangeBuilder.OnBuildSuccess += System.Windows.Forms.Application.Exit;
 			Console.SetOut(mainForm.LogWriter);
 			Console.SetError(mainForm.LogWriter);
-			builder.Start();
+			orangeBuilder.Start();
 			mainForm.Show();
 			System.Windows.Forms.Application.Run();
 		}
@@ -369,9 +390,9 @@ namespace Launcher
 #if MAC
 			NSApplication.Init();
 #endif // MAC
-			builder.OnBuildStatusChange += Console.WriteLine;
-			builder.OnBuildFail += () => Environment.Exit(1);
-			builder.Start().Wait();
+			orangeBuilder.OnBuildStatusChange += Console.WriteLine;
+			orangeBuilder.OnBuildFail += () => Environment.Exit(1);
+			orangeBuilder.Start().Wait();
 		}
 	}
 }
