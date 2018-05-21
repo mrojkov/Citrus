@@ -19,6 +19,11 @@ namespace Lime
 			bundles.Add(bundle);
 		}
 
+		public void Detach(AssetBundle bundle)
+		{
+			bundles.Remove(bundle);
+		}
+
 		public override Stream OpenFile(string path)
 		{
 			foreach (var bundle in bundles) {
