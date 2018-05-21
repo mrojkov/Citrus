@@ -104,6 +104,11 @@ namespace Tangerine.Core
 			}
 			fsWatcher?.Dispose();
 			fsWatcher = null;
+			foreach (var doc in documents.ToList()) {
+				if (!CloseDocument(doc)) {
+					return false;
+				}
+			}
 			try {
 				Serialization.WriteObjectToFile(UserprefsPath, UserPreferences, Serialization.Format.JSON);
 			} catch (System.Exception) { }
