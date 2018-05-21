@@ -376,8 +376,12 @@ namespace Tangerine
 
 		static void LoadFont()
 		{
-			var fontData = new EmbeddedResource("Tangerine.Resources.Arial.ttf", "Tangerine").GetResourceBytes();
+			var fontData = new EmbeddedResource("Tangerine.Resources.SegoeUI.ttf", "Tangerine").GetResourceBytes();
 			var font = new DynamicFont(fontData);
+			// Workaround. DynamicFont incorrectly applies fontHeight when rasterizing the font,
+			// so the visual font height for the same fontHeight will be different for different ttf files.
+			// This workaround returns the magic number for the specific current SegoeUINormal font.
+			font.SetFontHeightResolver(fontHeight => 21);
 			FontPool.Instance.AddFont("Default", font);
 		}
 

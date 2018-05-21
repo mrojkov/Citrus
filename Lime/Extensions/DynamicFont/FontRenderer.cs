@@ -29,6 +29,13 @@ namespace Lime
 		private Library library;
 		private int lastHeight;
 		private bool lcdSupported;
+		/// <summary>
+		/// Workaround. DynamicFont incorrectly applies fontHeight when rasterizing the font,
+		/// so the visual font height for the same fontHeight will be different for different ttf files.
+		/// This function returns corrected font height for the specific current ttf file.
+		/// The result should be selected manually.
+		/// </summary>
+		private Func<int, int> fontHeightResolver;
 
 		public FontRenderer(byte[] fontData)
 		{
@@ -59,6 +66,14 @@ namespace Lime
 			return pixelSize;
 		}
 
+		public void SetFontHeightResolver(Func<int, int> fontHeightResolver)
+		{
+			if (lastHeight != 0) {
+				throw new InvalidOperationException("Can not set fontHeightResolver after Render was called");
+			}
+			this.fontHeightResolver = fontHeightResolver;
+		}
+
 		/// <summary>
 		/// Renders a glyph with a given height, measured as a distance between two text lines in the device pixels.</param>
 		/// </summary>
@@ -66,7 +81,9 @@ namespace Lime
 		{
 			if (lastHeight != height) {
 				lastHeight = height;
-				var pixelSize = (uint) Math.Abs(CalcPixelSize(face, height).Round());
+				var pixelSize = (uint) Math.Abs(
+					CalcPixelSize(face, fontHeightResolver?.Invoke(height) ?? height).Round()
+				);
 				face.SetPixelSizes(pixelSize, pixelSize);
 			}
 

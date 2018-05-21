@@ -371,7 +371,7 @@
     <EmbeddedResource Include="Resources\Icons\Light\Tools\InspectRootDeactivated.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\SceneView\InspectingRoot.png" />
     <EmbeddedResource Include="Resources\Icons\Light\SceneView\InspectingRoot.png" />
-    <EmbeddedResource Include="Resources\Arial.ttf" />
+    <EmbeddedResource Include="Resources\SegoeUI.ttf" />
     <EmbeddedResource Include="Resources\Icons\Light\Tools\Edit.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Tools\Edit.png" />
   </ItemGroup>
