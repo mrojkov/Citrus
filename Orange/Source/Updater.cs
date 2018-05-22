@@ -96,8 +96,8 @@ namespace Orange
 						};
 						process.Start();
 						process.WaitForExit();
-						Console.WriteLine("Update finished! Please restart");
 #endif // MAC
+						Console.WriteLine("Update finished! Please restart");
 					} finally {
 						File.Delete(updatingFlagPath);
 					}
