@@ -55,7 +55,7 @@ namespace Orange
 						string platformAssetUrl = null;
 						foreach (var asset in latest.Assets) {
 							if (asset.Name.StartsWith($"citrus_{platformString}", StringComparison.OrdinalIgnoreCase)) {
-								platformAssetUrl = latest.Assets.First().Url;
+								platformAssetUrl = asset.Url;
 							}
 						}
 						if (platformAssetUrl == null) {
