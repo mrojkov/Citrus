@@ -160,7 +160,18 @@ namespace Launcher
 
 					CitrusVersion citrusVersion = null;
 					var citrusDirectory = Toolbox.CalcCitrusDirectory();
+
+					var bundlePath = winBundlePath.ParsedValue;
+					using (var zipFile = ZipFile.Open(Path.Combine(citrusDirectory, bundlePath), ZipArchiveMode.Read)) {
+						var citrusVersionEntry = zipFile.GetEntry(CitrusVersion.Filename);
+						using (var stream = citrusVersionEntry.Open()) {
+							citrusVersion = CitrusVersion.Load(stream);
+						}
+					}
+					citrusVersion.BuildNumber = buildNumberOption.ParsedValue;
+
 					var client = new GitHubClient(new ProductHeaderValue(githubUserOption.ParsedValue));
+					client.SetRequestTimeout(TimeSpan.FromMinutes(10));
 					var basicAuth = new Credentials(githubUserOption.ParsedValue, githubPasswordOption.ParsedValue);
 					client.Credentials = basicAuth;
 					var tagName = $"gh_{citrusVersion.Version}_{citrusVersion.BuildNumber}";
