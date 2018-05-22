@@ -281,10 +281,12 @@ namespace Launcher
 						Console.WriteLine($"Copying {srcPath} => {dstPath}");
 					}
 #elif MAC
+					var orangeGuiAppPath = Path.Combine(orangeBinDir, "Orange.GUI.app");
+					var tangerineAppPath = Path.Combine(tangerineBinDir, "Tangerine.app");
 					var process = new System.Diagnostics.Process {
 						StartInfo = {
 							FileName = "cp",
-							Arguments = $"-R {Path.Combine(orangeBinDir, "Orange.GUI.app")} {tempPath}"
+							Arguments = $"-R {orangeGuiAppPath} {tempPath}"
 						}
 					};
 					process.Start();
@@ -292,7 +294,7 @@ namespace Launcher
 					process = new System.Diagnostics.Process {
 						StartInfo = {
 							FileName = "cp",
-							Arguments = $"-R {Path.Combine(tangerineBinDir, "Tangerine.app")} {tempPath}"
+							Arguments = $"-R {tangerineAppPath} {tempPath}"
 						}
 					};
 					process.Start();
@@ -309,7 +311,24 @@ namespace Launcher
 						CitrusVersion.Save(citrusVersion, stream);
 					}
 					Console.WriteLine($"Begin zipping archive.");
+#if WIN
 					ZipFile.CreateFromDirectory(tempPath, outputPath, CompressionLevel.Optimal, false);
+#elif MAC
+					var tarPath = Path.Combine(outputDirectory, "bundle.tar");
+					process = new System.Diagnostics.Process {
+						StartInfo = {
+							FileName = "tar",
+							Arguments = $"-cvpf {tarPath} Tangerine.app Orange.GUI.app {CitrusVersion.Filename}",
+							WorkingDirectory = $"{tempPath}",
+						}
+					};
+					process.Start();
+					process.WaitForExit();
+					using (FileStream stream = new FileStream(outputPath, FileMode.Create))
+					using (ZipArchive zipArchive = new ZipArchive(stream, ZipArchiveMode.Create)) {
+						zipArchive.CreateEntryFromFile(tarPath, "bundle.tar");
+					}
+#endif // WIN
 					Console.WriteLine("Done.");
 				});
 			});

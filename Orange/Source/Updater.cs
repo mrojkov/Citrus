@@ -38,6 +38,9 @@ namespace Orange
 						continue;
 					}
 					var exePath = Path.GetDirectoryName(Uri.UnescapeDataString((new Uri(Assembly.GetExecutingAssembly().CodeBase)).AbsolutePath));
+#if MAC
+					exePath = Path.Combine(exePath, "..", "..", "..");
+#endif // MAC
 					var updatingFlagPath = Path.Combine(exePath, "UPDATING");
 					if (File.Exists(updatingFlagPath)) {
 						continue;
@@ -73,14 +76,28 @@ namespace Orange
 								}
 								Directory.CreateDirectory(tempPath);
 								foreach (var fi in new FileEnumerator(exePath).Enumerate()) {
+									if (fi.Path == "UPDATING") {
+										continue;
+									}
 									var dstPath = Path.Combine(tempPath, fi.Path);
 									Directory.CreateDirectory(Path.GetDirectoryName(dstPath));
 									File.Move(Path.Combine(exePath, fi.Path), dstPath);
 								}
 								zipArchive.ExtractToDirectory(exePath);
-								Console.WriteLine("Update finished! Please restart");
 							}
 						}
+#if MAC
+						var process = new System.Diagnostics.Process {
+							StartInfo = new System.Diagnostics.ProcessStartInfo {
+								FileName = "tar",
+								WorkingDirectory = exePath,
+								Arguments = "-xvf bundle.tar"
+							}
+						};
+						process.Start();
+						process.WaitForExit();
+						Console.WriteLine("Update finished! Please restart");
+#endif // MAC
 					} finally {
 						File.Delete(updatingFlagPath);
 					}
