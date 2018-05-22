@@ -87,6 +87,7 @@
     <Compile Include="Docking\DragBehaviours.cs" />
     <Compile Include="Docking\DockHierarchy.cs" />
     <Compile Include="Docking\DockPresenter.cs" />
+    <Compile Include="Utils\FilesDropHandler.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>
