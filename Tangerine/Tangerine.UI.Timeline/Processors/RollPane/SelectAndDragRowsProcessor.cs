@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using Lime;
@@ -93,7 +93,7 @@ namespace Tangerine.UI.Timeline
 
 			IEnumerable<KeyValuePair<Row, int>> enumeratedSelectedRows = Document.Current.TopLevelSelectedRows()
 				.Select(row => new KeyValuePair<Row, int>(row, parentRowRows.IndexOf(row)));
-			
+
 			var rows = enumeratedSelectedRows.ToList();
 			foreach (var elem in rows) {
 				Probers.Any(p => p.Probe(elem.Key, dragLocation));
@@ -171,7 +171,7 @@ namespace Tangerine.UI.Timeline
 			return doc.Rows[doc.Rows.Count - 1];
 		}
 
-		static RowLocation? MouseToRowLocation(Vector2 position)
+		public static RowLocation? MouseToRowLocation(Vector2 position)
 		{
 			position -= Timeline.Instance.Roll.ContentWidget.GlobalPosition;
 			if (position.Y <= 0) {

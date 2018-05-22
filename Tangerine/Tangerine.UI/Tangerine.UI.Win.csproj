@@ -61,6 +61,7 @@
     <Compile Include="TabbedWidget.cs" />
     <Compile Include="Toolbar.cs" />
     <Compile Include="ToolbarButton.cs" />
+    <Compile Include="Utils\FilesDropHandler.cs" />
     <Compile Include="Utils\HSpacer.cs" />
     <Compile Include="Utils\Colors.cs" />
     <Compile Include="Docking\DockManager.cs" />

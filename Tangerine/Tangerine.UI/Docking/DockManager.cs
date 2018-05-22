@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using Lime;
@@ -9,17 +9,19 @@ namespace Tangerine.UI.Docking
 {
 	public class DockManager
 	{
+		private const string AppIconPath = @"Tangerine.Resources.Icons.icon.ico";
 		public const string DocumentAreaId = "DocumentArea";
 
-		public DockHierarchy Model => DockHierarchy.Instance;
 		private readonly IMenu padsMenu;
+		private readonly List<FilesDropHandler> filesDropHandlers = new List<FilesDropHandler>();
+
+		public static DockManager Instance { get; private set; }
+
 		public readonly Widget ToolbarArea;
 		public readonly Widget DocumentArea;
 		public readonly WindowWidget MainWindowWidget;
-		public static DockManager Instance { get; private set; }
-
+		public DockHierarchy Model => DockHierarchy.Instance;
 		public event Action<IEnumerable<string>> FilesDropped;
-		private const string AppIconPath = @"Tangerine.Resources.Icons.icon.ico";
 
 		private DockManager(Vector2 windowSize, IMenu padsMenu)
 		{
@@ -90,7 +92,25 @@ namespace Tangerine.UI.Docking
 		private void SetDropHandler(IWindow window)
 		{
 			window.AllowDropFiles = true;
-			window.FilesDropped += files => FilesDropped?.Invoke(files);
+			window.FilesDropped += OnFilesDropped;
+			window.Updating += FilesDropHandlersUpdate;
+		}
+
+		private void OnFilesDropped(IEnumerable<string> files)
+		{
+			FilesDropped?.Invoke(files);
+			foreach (var filesDropHandler in filesDropHandlers) {
+				if (filesDropHandler.TryToHandle(files)) {
+					break;
+				}
+			}
+		}
+
+		private void FilesDropHandlersUpdate(float delta)
+		{
+			foreach (var filesDropHandler in filesDropHandlers) {
+				filesDropHandler.HandleDropImage();
+			}
 		}
 
 		public PanelPlacement AddPanel(Panel panel, Placement targetPlacement, DockSite site, float stretch)
@@ -373,6 +393,9 @@ namespace Tangerine.UI.Docking
 				RefreshWindow(placement);
 			}
 		}
+
+		public void AddFilesDropHandler(FilesDropHandler filesDropHandler) => filesDropHandlers.Add(filesDropHandler);
+		public void RemoveFilesDropHandler(FilesDropHandler filesDropHandler) => filesDropHandlers.Remove(filesDropHandler);
 
 		private void HandleException(System.Exception e)
 		{

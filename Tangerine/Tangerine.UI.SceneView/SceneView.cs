@@ -1,6 +1,5 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Lime;
 using Tangerine.Core;
@@ -11,6 +10,9 @@ namespace Tangerine.UI.SceneView
 {
 	public class SceneView : IDocumentView
 	{
+		private readonly FilesDropHandler filesDropHandler;
+		private Vector2 mousePositionOnFilesDrop;
+
 		// Given panel.
 		public readonly Widget Panel;
 		// Widget which is a direct child of the panel.
@@ -24,7 +26,7 @@ namespace Tangerine.UI.SceneView
 		/// <summary>
 		/// Gets the mouse position in the scene coordinates.
 		/// </summary>
-		public Vector2 MousePosition => Scene.Input.LocalMousePosition;
+		public Vector2 MousePosition => Scene.LocalMousePosition();
 
 		public ComponentCollection<Component> Components = new ComponentCollection<Component>();
 
@@ -198,7 +200,25 @@ namespace Tangerine.UI.SceneView
 			CreateComponents();
 			CreateProcessors();
 			CreatePresenters();
-			panelWidget.Updated += HandleDropImage;
+			filesDropHandler = new FilesDropHandler(InputArea);
+			filesDropHandler.Handling += FilesDropOnHandling;
+			filesDropHandler.NodeCreated += FilesDropOnNodeCreated;
+		}
+
+		private void FilesDropOnHandling()
+		{
+			if (!Window.Current.Active) {
+				Window.Current.Activate();
+				InputArea.SetFocus();
+			}
+			mousePositionOnFilesDrop = MousePosition * Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
+		}
+
+		private void FilesDropOnNodeCreated(Node node)
+		{
+			if (node is Widget) {
+				SetProperty.Perform(node, nameof(Widget.Position), mousePositionOnFilesDrop);
+			}
 		}
 
 		public void Attach()
@@ -206,12 +226,12 @@ namespace Tangerine.UI.SceneView
 			Instance = this;
 			Panel.AddNode(RulersWidget);
 			Panel.AddNode(Frame);
-			DockManager.Instance.FilesDropped += DropFiles;
+			DockManager.Instance.AddFilesDropHandler(filesDropHandler);
 		}
 
 		public void Detach()
 		{
-			DockManager.Instance.FilesDropped -= DropFiles;
+			DockManager.Instance.RemoveFilesDropHandler(filesDropHandler);
 			Instance = null;
 			Frame.Unlink();
 			RulersWidget.Unlink();
@@ -231,121 +251,6 @@ namespace Tangerine.UI.SceneView
 		public bool HitTestResizeControlPoint(Vector2 controlPoint)
 		{
 			return HitTestControlPoint(controlPoint, 6);
-		}
-
-		void DropFiles(IEnumerable<string> files)
-		{
-			if (!InputArea.IsMouseOverThisOrDescendant()) {
-				return;
-			}
-			if (!Window.Current.Active) {
-				Window.Current.Activate();
-				InputArea.SetFocus();
-			}
-			var widgetPos = MousePosition * Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
-			Document.Current.History.BeginTransaction();
-			try {
-				List<string> pendingImages = new List<string>();
-				foreach (var file in files) {
-					try {
-						string assetPath, assetType;
-						if (Utils.ExtractAssetPathOrShowAlert(file, out assetPath, out assetType)) {
-							var fileName = Path.GetFileNameWithoutExtension(assetPath);
-							if (assetType == ".png") {
-								pendingImages.Add(assetPath);
-							} else if (assetType == ".ogg") {
-								var node = Core.Operations.CreateNode.Perform(typeof(Audio));
-								var sample = new SerializableSample(assetPath);
-								Core.Operations.SetProperty.Perform(node, nameof(Audio.Sample), sample);
-								Core.Operations.SetProperty.Perform(node, nameof(Node.Id), fileName);
-								Core.Operations.SetProperty.Perform(node, nameof(Audio.Volume), 1);
-								var key = new Keyframe<AudioAction> {
-									Frame = Document.Current.AnimationFrame,
-									Value = AudioAction.Play
-								};
-								Core.Operations.SetKeyframe.Perform(node, nameof(Audio.Action), Document.Current.AnimationId, key);
-							} else if (assetType == ".tan" || assetType == ".model" || assetType == ".scene") {
-								var scene = Node.CreateFromAssetBundle(assetPath);
-								var node = Core.Operations.CreateNode.Perform(scene.GetType());
-								Core.Operations.SetProperty.Perform(node, nameof(Widget.ContentsPath), assetPath);
-								Core.Operations.SetProperty.Perform(node, nameof(Node.Id), fileName);
-								if (scene is Widget) {
-									Core.Operations.SetProperty.Perform(node, nameof(Widget.Position), widgetPos);
-									Core.Operations.SetProperty.Perform(node, nameof(Widget.Pivot), Vector2.Half);
-									Core.Operations.SetProperty.Perform(node, nameof(Widget.Size), ((Widget)scene).Size);
-								}
-								node.LoadExternalScenes();
-							}
-						}
-					} catch (System.Exception e) {
-						AlertDialog.Show(e.Message);
-					}
-				}
-
-				if (pendingImages.Count > 0) {
-					var menu = new Menu();
-					foreach (var kv in ImageDropCommands.Commands) {
-						if (NodeCompositionValidator.Validate(Document.Current.Container.GetType(), kv.Value)) {
-							menu.Add(kv.Key);
-						}
-					}
-					ImageDropCommands.AssetPaths = pendingImages;
-					menu.Popup();
-				}
-			} finally {
-				Document.Current.History.EndTransaction();
-			}
-		}
-
-		private static class ImageDropCommands
-		{
-			public static readonly ICommand AsImage = new Command("Create Image");
-			public static readonly ICommand AsDistortionMesh = new Command("Create Distortion Mesh");
-			public static readonly ICommand AsNineGrid = new Command("Create Nine Grid");
-			public static readonly ICommand AsParticleModifier = new Command("Create Particle Modifier");
-
-			public static readonly Dictionary<ICommand, Type> Commands = new Dictionary<ICommand, Type> {
-				{ AsImage, typeof(Image) },
-				{ AsDistortionMesh, typeof(DistortionMesh) },
-				{ AsNineGrid, typeof(NineGrid) },
-				{ AsParticleModifier, typeof(ParticleModifier) },
-			};
-
-			public static List<string> AssetPaths;
-		}
-
-		private void HandleDropImage(float dt)
-		{
-			foreach (var kv in ImageDropCommands.Commands) {
-				if (kv.Key.WasIssued()) {
-					kv.Key.Consume();
-					Document.Current.History.BeginTransaction();
-					try {
-						foreach (var assetPath in ImageDropCommands.AssetPaths) {
-							var node = Core.Operations.CreateNode.Perform(kv.Value);
-							var texture = new SerializableTexture(assetPath);
-							var nodeSize = (Vector2)texture.ImageSize;
-							var nodeId = Path.GetFileNameWithoutExtension(assetPath);
-							if (node is Widget) {
-								var widgetPos = MousePosition * Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
-								SetProperty.Perform(node, nameof(Widget.Texture), texture);
-								SetProperty.Perform(node, nameof(Widget.Position), widgetPos);
-								SetProperty.Perform(node, nameof(Widget.Pivot), Vector2.Half);
-								SetProperty.Perform(node, nameof(Widget.Size), nodeSize);
-								SetProperty.Perform(node, nameof(Widget.Id), nodeId);
-							} else if (node is ParticleModifier) {
-								SetProperty.Perform(node, nameof(ParticleModifier.Texture), texture);
-								SetProperty.Perform(node, nameof(ParticleModifier.Size), nodeSize);
-								SetProperty.Perform(node, nameof(ParticleModifier.Id), nodeId);
-							}
-						}
-					} finally {
-						Document.Current.History.EndTransaction();
-					}
-				} else {
-					kv.Key.Consume();
-				}
-			}
 		}
 
 		void CreateComponents() { }

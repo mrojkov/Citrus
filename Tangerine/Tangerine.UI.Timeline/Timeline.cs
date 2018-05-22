@@ -21,6 +21,7 @@ namespace Tangerine.UI.Timeline
 		public readonly Widget PanelWidget;
 		public readonly Panel Panel;
 		public readonly Widget RootWidget;
+		public readonly FilesDropHandler FilesDropHandler;
 
 		private Vector2 offset;
 		public Vector2 Offset
@@ -59,6 +60,9 @@ namespace Tangerine.UI.Timeline
 
 		public Timeline(Panel panel)
 		{
+			RootWidget = new Widget();
+			FilesDropHandler = new FilesDropHandler(RootWidget);
+			FilesDropHandler.Handling += FilesDropOnHandling;
 			Panel = panel;
 			PanelWidget = panel.ContentWidget;
 			Toolbar = new Toolbar();
@@ -67,7 +71,6 @@ namespace Tangerine.UI.Timeline
 			Grid = new GridPane(this);
 			CurveEditor = new CurveEditorPane(this);
 			Roll = new RollPane();
-			RootWidget = new Widget();
 			CreateProcessors();
 			InitializeWidgets();
 		}
@@ -77,20 +80,20 @@ namespace Tangerine.UI.Timeline
 			Instance = this;
 			PanelWidget.PushNode(RootWidget);
 			RootWidget.SetFocus();
-			DockManager.Instance.FilesDropped += DropFiles;
+			DockManager.Instance.AddFilesDropHandler(FilesDropHandler);
 		}
 
 		public void Detach()
 		{
-			DockManager.Instance.FilesDropped -= DropFiles;
+			DockManager.Instance.RemoveFilesDropHandler(FilesDropHandler);
 			Instance = null;
 			RootWidget.Unlink();
 		}
 
-		void DropFiles(IEnumerable<string> files)
+		private static void FilesDropOnHandling()
 		{
-			if (RootWidget.IsMouseOverThisOrDescendant()) {
-				Grid.TryDropFiles(files);
+			if (!Window.Current.Active) {
+				Window.Current.Activate();
 			}
 		}
 

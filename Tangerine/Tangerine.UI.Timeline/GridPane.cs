@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.IO;
 using Lime;
 using Tangerine.Core;
 
@@ -9,6 +10,9 @@ namespace Tangerine.UI.Timeline
 	public class GridPane
 	{
 		readonly Timeline timeline;
+		IntVector2 cellUnderMouseOnFilesDrop;
+		RowLocation? rowLocationUnderMouseOnFilesDrop;
+		int animateTextureCellOffset;
 
 		public readonly Widget RootWidget;
 		public readonly Widget ContentWidget;
@@ -41,6 +45,9 @@ namespace Tangerine.UI.Timeline
 			OnPostRender += RenderSelection;
 			OnPostRender += RenderCursor;
 			RootWidget.Tasks.Add(HandleRightClickTask);
+			timeline.FilesDropHandler.Handling += FilesDropOnHandling;
+			timeline.FilesDropHandler.NodeCreating += FilesDropOnNodeCreating;
+			timeline.FilesDropHandler.NodeCreated += FilesDropOnNodeCreated;
 		}
 
 		IEnumerator<object> HandleRightClickTask()
@@ -237,37 +244,76 @@ namespace Tangerine.UI.Timeline
 			return new Vector2(col * TimelineMetrics.ColWidth, y);
 		}
 
-		public void TryDropFiles(IEnumerable<string> files)
+		private void FilesDropOnHandling()
 		{
-			if (!RootWidget.IsMouseOverThisOrDescendant() || Document.Current.Rows.Count == 0) {
+			animateTextureCellOffset = 0;
+			cellUnderMouseOnFilesDrop = CellUnderMouse(RootWidget.Input.MousePosition - ContentWidget.GlobalPosition);
+			rowLocationUnderMouseOnFilesDrop = SelectAndDragRowsProcessor.MouseToRowLocation(RootWidget.Input.MousePosition);
+		}
+
+		private void FilesDropOnNodeCreating(FilesDropHandler.NodeCreatingEventArgs nodeCreatingEventArgs)
+		{
+			var nodeUnderMouse = WidgetContext.Current.NodeUnderMouse;
+			if (nodeUnderMouse == null || !nodeUnderMouse.SameOrDescendantOf(RootWidget)) {
 				return;
 			}
-			var cell = CellUnderMouse();
-			var widget = Document.Current.Rows[cell.Y].Components.Get<Core.Components.NodeRow>()?.Node as Widget;
-			if (widget == null) {
-				return;
-			}
-			Document.Current.History.BeginTransaction();
-			try {
-				foreach (var file in files) {
-					string assetPath, assetType;
-					if (Utils.ExtractAssetPathOrShowAlert(file, out assetPath, out assetType) && assetType == ".png") {
-						var key = new Keyframe<ITexture> {
-							Frame = cell.X,
-							Value = new SerializableTexture(assetPath)
-						};
-						Core.Operations.SetKeyframe.Perform(widget, nameof(Widget.Texture), Document.Current.AnimationId, key);
-						cell.X++;
+
+			switch (nodeCreatingEventArgs.AssetType) {
+				case ".png": {
+					if (Document.Current.Rows.Count == 0) {
+						return;
 					}
+					var widget = Document.Current.Rows[cellUnderMouseOnFilesDrop.Y].Components.Get<Core.Components.NodeRow>()?.Node as Widget;
+					if (widget == null) {
+						return;
+					}
+
+					nodeCreatingEventArgs.Cancel = true;
+					var key = new Keyframe<ITexture> {
+						Frame = cellUnderMouseOnFilesDrop.X + animateTextureCellOffset,
+						Value = new SerializableTexture(nodeCreatingEventArgs.AssetPath)
+					};
+					Core.Operations.SetKeyframe.Perform(widget, nameof(Widget.Texture), Document.Current.AnimationId, key);
+					animateTextureCellOffset++;
+					break;
 				}
-			} finally {
-				Document.Current.History.EndTransaction();
+				case ".ogg": {
+					nodeCreatingEventArgs.Cancel = true;
+					var fileName = Path.GetFileNameWithoutExtension(nodeCreatingEventArgs.AssetPath);
+					var node = Core.Operations.CreateNode.Perform(typeof(Audio));
+					var sample = new SerializableSample(nodeCreatingEventArgs.AssetPath);
+					Core.Operations.SetProperty.Perform(node, nameof(Audio.Sample), sample);
+					Core.Operations.SetProperty.Perform(node, nameof(Node.Id), fileName);
+					Core.Operations.SetProperty.Perform(node, nameof(Audio.Volume), 1);
+					var key = new Keyframe<AudioAction> {
+						Frame = cellUnderMouseOnFilesDrop.X,
+						Value = AudioAction.Play
+					};
+					Core.Operations.SetKeyframe.Perform(node, nameof(Audio.Action), Document.Current.AnimationId, key);
+					timeline.FilesDropHandler.OnNodeCreated(node);
+					break;
+				}
 			}
 		}
 
-		public IntVector2 CellUnderMouse()
+		private void FilesDropOnNodeCreated(Node node)
 		{
-			var mousePos = RootWidget.Input.MousePosition - ContentWidget.GlobalPosition;
+			if (!rowLocationUnderMouseOnFilesDrop.HasValue) {
+				return;
+			}
+			var location = rowLocationUnderMouseOnFilesDrop.Value;
+			var row = Document.Current.Rows.FirstOrDefault(r => r.Components.Get<Core.Components.NodeRow>()?.Node == node);
+			if (row != null) {
+				if (location.Index >= row.Index) {
+					location.Index++;
+				}
+				SelectAndDragRowsProcessor.Probers.Any(p => p.Probe(row, location));
+			}
+		}
+
+		public IntVector2 CellUnderMouse(Vector2? position = null)
+		{
+			var mousePos = position ?? RootWidget.Input.MousePosition - ContentWidget.GlobalPosition;
 			var r = new IntVector2((int)(mousePos.X / TimelineMetrics.ColWidth), 0);
 			if (mousePos.Y >= ContentSize.Y) {
 				r.Y = Math.Max(0, Document.Current.Rows.Count - 1);
