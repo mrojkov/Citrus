@@ -35,7 +35,8 @@ namespace Tangerine.UI.SceneView
 		public static void RegisterGlobalCommands()
 		{
 			var h = CommandHandlerList.Global;
-			h.Connect(SceneViewCommands.PreviewAnimation, new PreviewAnimationHandler());
+			h.Connect(SceneViewCommands.PreviewAnimation, new PreviewAnimationHandler(false));
+			h.Connect(SceneViewCommands.PreviewAnimationWithTriggeringOfMarkers, new PreviewAnimationHandler(true));
 			h.Connect(SceneViewCommands.DragUp, () => DragNodes(new Vector2(0, -1)));
 			h.Connect(SceneViewCommands.DragDown, () => DragNodes(new Vector2(0, 1)));
 			h.Connect(SceneViewCommands.DragLeft, () => DragNodes(new Vector2(-1, 0)));

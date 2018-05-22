@@ -63,6 +63,7 @@ namespace Tangerine.UI
 	public static class SceneViewCommands
 	{
 		public static readonly ICommand PreviewAnimation = new Command(new Shortcut(Key.F5));
+		public static readonly ICommand PreviewAnimationWithTriggeringOfMarkers = new Command(new Shortcut(Modifiers.Control, Key.F5));
 		public static readonly ICommand DragRight = new Command(new Shortcut(Key.D));
 		public static readonly ICommand DragLeft = new Command(new Shortcut(Key.A));
 		public static readonly ICommand DragUp = new Command(new Shortcut(Key.W));

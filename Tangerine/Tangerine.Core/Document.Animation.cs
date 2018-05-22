@@ -16,6 +16,15 @@ namespace Tangerine.Core
 			CurrentFrameSetter.SetCurrentFrameToNode(frameIndex, node, animationMode);
 		}
 
+		public static void FastForwardToFrame(Node node, int frameIndex)
+		{
+			node.SetTangerineFlag(TangerineFlags.IgnoreMarkers, true);
+			try {
+				CurrentFrameSetter.FastForwardToFrame(node, frameIndex);
+			} finally {
+				node.SetTangerineFlag(TangerineFlags.IgnoreMarkers, false);
+			}
+		}
 
 		private static class CurrentFrameSetter
 		{
@@ -142,7 +151,7 @@ namespace Tangerine.Core
 				}
 			}
 
-			static void FastForwardToFrame(Node node, int frame)
+			internal static void FastForwardToFrame(Node node, int frame)
 			{
 				// Try to decrease error in node.AnimationTime by call node.Update several times
 				const float OptimalDelta = 10;
