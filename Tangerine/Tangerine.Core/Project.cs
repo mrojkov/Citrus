@@ -104,7 +104,9 @@ namespace Tangerine.Core
 			}
 			fsWatcher?.Dispose();
 			fsWatcher = null;
+			UserPreferences.Documents.Clear();
 			foreach (var doc in documents.ToList()) {
+				UserPreferences.Documents.Add(doc.Path);
 				if (!CloseDocument(doc)) {
 					return false;
 				}
@@ -170,9 +172,6 @@ namespace Tangerine.Core
 					File.Delete(systemPath);
 				}
 				documents.Add(doc);
-				if (!UserPreferences.Documents.Contains(doc.Path)) {
-					UserPreferences.Documents.Add(doc.Path);
-				}
 			}
 			doc.MakeCurrent();
 			return doc;
@@ -196,7 +195,6 @@ namespace Tangerine.Core
 			string systemPath;
 			if (doc.Close()) {
 				documents.Remove(doc);
-				UserPreferences.Documents.Remove(doc.Path);
 				if (GetSystemPath(AutosaveProcessor.GetTemporalFilePath(doc.Path), out systemPath)) {
 					File.Delete(systemPath);
 				}
