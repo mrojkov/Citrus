@@ -310,7 +310,6 @@ namespace Lime
 #endif
 			window.CollectionBehavior = NSWindowCollectionBehavior.FullScreenPrimary;
 			window.ContentView = View;
-			window.ReleasedWhenClosed = true;
 			View.Update += Update;
 			View.RenderFrame += HandleRenderFrame;
 			View.FilesDropped += RaiseFilesDropped;
@@ -359,6 +358,9 @@ namespace Lime
 			RaiseClosed();
 			View.Stop();
 			Application.Windows.Remove(this);
+			// ReleasedWhenClosed = true caused native crashes, so dispose window manually
+			// TODO: check the right way to dispose window and its resources (e.g. WindowController)
+			window.Dispose();
 			closed = true;
 			if (modal) {
 				NSApplication.SharedApplication.StopModal();
