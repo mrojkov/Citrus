@@ -380,11 +380,11 @@ namespace Lime
 				uniform lowp sampler2D tex1;
 				void main()
 				{
-					int segment = (int)texCoords1.x;
+					int segment = int(texCoords1.x);
 					gl_FragColor = color;
-					gl_FragColor.a *= 1.0 - mod(segment, 2);
+					gl_FragColor.a *= 1.0 - mod(float(segment), 2.0);
 					
-					lowp float u = texCoords1.x - (float)segment;
+					lowp float u = texCoords1.x - float(segment);
 					lowp float v = texCoords1.y;
 					
 					if (u < texCoords2.x)
