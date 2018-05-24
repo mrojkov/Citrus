@@ -286,6 +286,97 @@ namespace Yuzu.Binary
 			def.Fields.Add(fd);
 		}
 
+		private Action<object> MakeReadOrMergeFunc(Meta.Item yi)
+		{
+			if (yi.SetValue != null) {
+				var rf = ReadValueFunc(yi.Type);
+				return obj => yi.SetValue(obj, rf());
+			}
+			else {
+				var mf = MergeValueFunc(yi.Type);
+				return obj => mf(yi.GetValue(obj));
+			}
+		}
+
+		private void InitClassDef(ReaderClassDef def, string typeName)
+		{
+			var ourCount = def.Meta.Items.Count;
+			var theirCount = Reader.ReadInt16();
+			int ourIndex = 0, theirIndex = 0;
+			var theirName = "";
+			while (ourIndex < ourCount && theirIndex < theirCount) {
+				var yi = def.Meta.Items[ourIndex];
+				var ourName = yi.Tag(Options);
+				if (theirName == "")
+					theirName = Reader.ReadString();
+				var cmp = String.CompareOrdinal(ourName, theirName);
+				if (cmp < 0) {
+					if (!yi.IsOptional)
+						throw Error("Missing required field {0} for class {1}", ourName, typeName);
+					ourIndex += 1;
+				}
+				else if (cmp > 0) {
+					AddUnknownFieldDef(def, theirName, typeName);
+					theirIndex += 1;
+					theirName = "";
+				}
+				else {
+					if (!ReadCompatibleType(yi.Type))
+						throw Error(
+							"Incompatible type for field {0}, expected {1}", ourName, yi.Type.Name);
+					def.Fields.Add(new ReaderClassDef.FieldDef {
+						Name = theirName, OurIndex = ourIndex + 1, Type = yi.Type,
+						ReadFunc = MakeReadOrMergeFunc(yi),
+					});
+					ourIndex += 1;
+					theirIndex += 1;
+					theirName = "";
+				}
+			}
+			for (; ourIndex < ourCount; ++ourIndex) {
+				var yi = def.Meta.Items[ourIndex];
+				var ourName = yi.Tag(Options);
+				if (!yi.IsOptional)
+					throw Error("Missing required field {0} for class {1}", ourName, typeName);
+			}
+			for (; theirIndex < theirCount; ++theirIndex) {
+				if (theirName == "")
+					theirName = Reader.ReadString();
+				AddUnknownFieldDef(def, theirName, typeName);
+				theirName = "";
+			}
+		}
+
+		private void InitClassDefUnordered(ReaderClassDef def, string typeName)
+		{
+			var theirCount = Reader.ReadInt16();
+			int ourIndex = 0, requiredCountActiual = 0;
+			for (int theirIndex = 0; theirIndex < theirCount; ++theirIndex) {
+				var theirName = Reader.ReadString();
+				Meta.Item yi = null;
+				if (def.Meta.TagToItem.TryGetValue(theirName, out yi)) {
+					if (!ReadCompatibleType(yi.Type))
+						throw Error(
+							"Incompatible type for field {0}, expected {1}", theirName, yi.Type.Name);
+					def.Fields.Add(new ReaderClassDef.FieldDef {
+						Name = theirName,
+						OurIndex = def.Meta.Items.IndexOf(yi) + 1,
+						Type = yi.Type,
+						ReadFunc = MakeReadOrMergeFunc(yi),
+					});
+					ourIndex += 1;
+					if (!yi.IsOptional)
+						requiredCountActiual += 1;
+				}
+				else
+					AddUnknownFieldDef(def, theirName, typeName);
+			}
+			if (requiredCountActiual != def.Meta.RequiredCount)
+				throw Error(
+					"Expected {0} required field(s), but found {1}",
+					def.Meta.RequiredCount, requiredCountActiual);
+		}
+
 		private ReaderClassDef GetClassDef(short classId)
 		{
 			if (classId < classDefs.Count)
@@ -298,58 +389,10 @@ namespace Yuzu.Binary
 				return GetClassDefUnknown(typeName);
 			var result = new ReaderClassDef { Meta = Meta.Get(classType, Options) };
 			PrepareReaders(result);
-			var ourCount = result.Meta.Items.Count;
-			var theirCount = Reader.ReadInt16();
-			int ourIndex = 0, theirIndex = 0;
-			var theirName = "";
-			while (ourIndex < ourCount && theirIndex < theirCount) {
-				var yi = result.Meta.Items[ourIndex];
-				var ourName = yi.Tag(Options);
-				if (theirName == "")
-					theirName = Reader.ReadString();
-				var cmp = String.CompareOrdinal(ourName, theirName);
-				if (cmp < 0) {
-					if (!yi.IsOptional)
-						throw Error("Missing required field {0} for class {1}", ourName, typeName);
-					ourIndex += 1;
-				}
-				else if (cmp > 0) {
-					AddUnknownFieldDef(result, theirName, typeName);
-					theirIndex += 1;
-					theirName = "";
-				}
-				else {
-					if (!ReadCompatibleType(yi.Type))
-						throw Error(
-							"Incompatible type for field {0}, expected {1}", ourName, yi.Type.Name);
-					var fieldDef = new ReaderClassDef.FieldDef {
-						Name = theirName, OurIndex = ourIndex + 1, Type = yi.Type };
-					if (yi.SetValue != null) {
-						var rf = ReadValueFunc(yi.Type);
-						fieldDef.ReadFunc = obj => yi.SetValue(obj, rf());
-					}
-					else {
-						var mf = MergeValueFunc(yi.Type);
-						fieldDef.ReadFunc = obj => mf(yi.GetValue(obj));
-					}
-					result.Fields.Add(fieldDef);
-					ourIndex += 1;
-					theirIndex += 1;
-					theirName = "";
-				}
-			}
-			for (; ourIndex < ourCount; ++ourIndex) {
-				var yi = result.Meta.Items[ourIndex];
-				var ourName = yi.Tag(Options);
-				if (!yi.IsOptional)
-					throw Error("Missing required field {0} for class {1}", ourName, typeName);
-			}
-			for (; theirIndex < theirCount; ++theirIndex) {
-				if (theirName == "")
-					theirName = Reader.ReadString();
-				AddUnknownFieldDef(result, theirName, typeName);
-				theirName = "";
-			}
+			if (BinaryOptions.Unordered)
+				InitClassDefUnordered(result, typeName);
+			else
+				InitClassDef(result, typeName);
 			classDefs.Add(result);
 			return result;
 		}

@@ -9,6 +9,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Yuzu;
 using Yuzu.Binary;
+using Yuzu.Metadata;
 using Yuzu.Unsafe;
 using YuzuGenBin;
 using YuzuTestAssembly;
@@ -401,6 +402,40 @@ namespace YuzuTest.Binary
 				XS("F2", RoughType.Int, "P2", RoughType.Int) +
 				" 01 00 00 00 00 00 02 00 00 00 00 00 03 00 00 00 00 00 04 00 00 00 00 00 00 00",
 				XS(result));
+
+			var bd = new BinaryDeserializer();
+			bd.Options.AllowUnknownFields = true;
+
+			var v1 = new SampleOrder { StarterPackOfferEndTime = 11, StartGoldInitialized = true };
+			bs.ClearClassIds();
+			var result1 = bs.ToBytes(v1);
+			Assert.AreEqual(
+				"20 01 00 " + XS("SampleOrder") + " 02 00 " +
+				XS("StartGoldInitialized", RoughType.Bool) + " " +
+				XS("StarterPackOfferEndTime", RoughType.Int) +
+				" 01 00 01 02 00 0B 00 00 00 00 00", XS(result1));
+
+			Meta.Get(typeof(SampleOrderExt), bd.Options);
+			var v2 = bd.FromBytes<SampleOrderExt>(result1);
+			Assert.AreEqual(11, v2.StarterPackOfferEndTime);
+			Assert.IsTrue(v2.StartGoldInitialized);
+		}
+
+		[TestMethod]
+		public void TestUnordered()
+		{
+			var bd = new BinaryDeserializer();
+			bd.Options.AllowUnknownFields = true;
+			bd.BinaryOptions.Unordered = true;
+
+			var v1 = bd.FromBytes<SampleOrder>(SX(
+				"20 01 00 " + XS("SampleOrder") + " 02 00 " +
+				XS("StarterPackOfferEndTime", RoughType.Int) + " " +
+				XS("StartGoldInitialized", RoughType.Bool) +
+				" 01 00 0B 00 00 00 02 00 01 00 00"
+			));
+			Assert.AreEqual(11, v1.StarterPackOfferEndTime);
+			Assert.IsTrue(v1.StartGoldInitialized);
 		}
 
 		[TestMethod]
@@ -958,7 +993,7 @@ namespace YuzuTest.Binary
 			var bd = new BinaryDeserializer();
 			var bdg = new BinaryDeserializerGen();
 
-			var v1 = new Sample1 { X = 6, Y = "ttt" };
+			/*var v1 = new Sample1 { X = 6, Y = "ttt" };
 			var result1 = bs.ToBytes(v1);
 			Assert.AreEqual(
 				"20 01 00 " + XS(typeof(Sample1)) + " 02 00 " +
@@ -994,7 +1029,7 @@ namespace YuzuTest.Binary
 			Assert.AreEqual(3, w3.A);
 			Assert.AreEqual("z", w3.B);
 			Assert.AreEqual(new SamplePoint { X = 7, Y = 2 }, w3.P);
-
+			*/
 			var result4 = SX(
 				"20 01 00 " + XS(typeof(SampleDefault)) + " 02 00 " +
 				XS("A", RoughType.Int, "P", RoughType.Record) + " 01 00 05 00 00 00 " +
@@ -1518,6 +1553,40 @@ namespace YuzuTest.Binary
 			var bd = new BinaryDeserializer();
 			bd.FromBytes(w1, result1);
 			Assert.AreEqual(v1.X, w1.X);
+		}
+
+		[TestMethod]
+		public void TestSurrogateStr()
+		{
+			return;
+			var bs = new BinarySerializer();
+			var bd = new BinaryDeserializer();
+
+			var result2 = bs.ToBytes(new object());
+
+			var v1 = new SampleSurrogateColor { R = 255, G = 0, B = 161 };
+			var result1 = bs.ToBytes(v1);
+			Assert.AreEqual(XS(RoughType.String) + " " + XS("#FF00A1"), XS(result1));
+			/*
+			var w1 = jd.FromString<SampleSurrogateColor>(result1);
+			Assert.AreEqual(v1.R, w1.R);
+			Assert.AreEqual(v1.G, w1.G);
+			Assert.AreEqual(v1.B, w1.B);
+
+			var v2 = new SampleSurrogateColorIf { R = 77, G = 88, B = 99 };
+			Assert.AreEqual("[\n99,\n88,\n77\n]", js.ToString(v2));
+
+			var v3 = new SampleSurrogateColorIfDerived { R = 55, G = 66, B = 77 };
+			Assert.AreEqual("556677", js.ToString(v3));
+
+			SampleSurrogateColorIf.S = true;
+			Assert.AreEqual("778899", js.ToString(v2));
+			// RequireInt fails at EOF, so add trailing space.
+			var w2 = jd.FromString<SampleSurrogateColorIfDerived>("778899 ");
+			Assert.AreEqual(v2.R, w2.R);
+			Assert.AreEqual(v2.G, w2.G);
+			Assert.AreEqual(v2.B, w2.B);
+			*/
 		}
 
 		[TestMethod]

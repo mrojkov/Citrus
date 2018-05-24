@@ -38,7 +38,7 @@ namespace Yuzu.Metadata
 			public FieldInfo FieldInfo;
 			public PropertyInfo PropInfo;
 
-			public int CompareTo(Item yi) { return Alias.CompareTo(yi.Alias); }
+			public int CompareTo(Item yi) { return string.CompareOrdinal(Alias, yi.Alias); }
 
 			public string Tag(CommonOptions options)
 			{

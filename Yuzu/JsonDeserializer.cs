@@ -758,6 +758,8 @@ namespace Yuzu.Json
 							MergeValueFunc(yi.Type)(yi.GetValue(obj));
 						name = GetNextName(false);
 					}
+					if (name != "")
+						throw Error("Unknown field '{0}'", name);
 				}
 			}
 			finally {

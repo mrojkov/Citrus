@@ -8,6 +8,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Yuzu;
 using Yuzu.Json;
+using Yuzu.Metadata;
 using YuzuTestAssembly;
 using YuzuGen.YuzuTest;
 
@@ -46,16 +47,6 @@ namespace YuzuTest.Json
 			v1.X = int.MinValue;
 			jd.FromString(v2, js.ToString(v1));
 			Assert.AreEqual(v1.X, v2.X);
-		}
-
-		[TestMethod]
-		public void TestUnordered()
-		{
-			var jd = new JsonDeserializer();
-			jd.JsonOptions.Unordered = true;
-			var v = jd.FromString<Sample1>("{\n\"Y\":\"test\",\n\"X\":345\n}");
-			Assert.AreEqual(345, v.X);
-			Assert.AreEqual("test", v.Y);
 		}
 
 		[TestMethod]
@@ -365,6 +356,30 @@ namespace YuzuTest.Json
 			js.JsonOptions.Indent = "";
 			var result = js.ToString(new SampleMethodOrder());
 			Assert.AreEqual("{\n\"F1\":0,\n\"P1\":0,\n\"F2\":0,\n\"P2\":0\n}", result);
+
+			var jd = new JsonDeserializer();
+			jd.Options.AllowUnknownFields = true;
+
+			var v1 = new SampleOrder { StarterPackOfferEndTime = 11, StartGoldInitialized = true };
+			var result1 = js.ToString(v1);
+			Assert.AreEqual(
+				"{\n\"class\":\"SampleOrder\",\n" +
+				"\"StartGoldInitialized\":true,\n\"StarterPackOfferEndTime\":11\n}",
+				result1);
+
+			Meta.Get(typeof(SampleOrderExt), jd.Options);
+			var v2 = jd.FromString<SampleOrderExt>(result1);
+			Assert.AreEqual(11, v2.StarterPackOfferEndTime);
+		}
+
+		[TestMethod]
+		public void TestUnordered()
+		{
+			var jd = new JsonDeserializer();
+			jd.JsonOptions.Unordered = true;
+			var v = jd.FromString<Sample1>("{\n\"Y\":\"test\",\n\"X\":345\n}");
+			Assert.AreEqual(345, v.X);
+			Assert.AreEqual("test", v.Y);
 		}
 
 		[TestMethod]
@@ -1696,13 +1711,14 @@ namespace YuzuTest.Json
 			var w = new Sample1();
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{}"), "X");
 			XAssert.Throws<YuzuException>(() => jd.FromString("{null:1}"), "'n'");
-			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"X\" }"), ":");
+			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"X\" }"), "':'");
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "nn"), "'u'");
-			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"X\":1, \"Y\": \"\\z\" }"), "z");
+			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"X\":1, \"Y\": \"\\z\" }"), "'z'");
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"X\":1, \"Y\": \"\\uQ\" }"), "Q");
 			XAssert.Throws<YuzuException>(() => jd.FromString(new SampleBool(), "{ \"B\": 1 }"), "1");
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ ,}"), ",");
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"Y\": \"q\" }"), "'X'");
+			XAssert.Throws<YuzuException>(() => jd.FromString<SampleMemberI>("{ \"Z\": 1 }"), "'Z'");
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "[]"), "'Sample1'");
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"class\": \"Q\" }"), "'Q'");
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"class\": \"YuzuTest.Sample2, YuzuTest\" }"), ".Sample2");
