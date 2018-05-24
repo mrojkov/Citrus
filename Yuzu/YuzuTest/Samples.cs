@@ -578,6 +578,23 @@ namespace YuzuTest
 		public string R = "R";
 	}
 
+	[YuzuAlias("SampleOrder")]
+	class SampleOrder
+	{
+		[YuzuMember]
+		public int StarterPackOfferEndTime;
+		[YuzuMember]
+		public bool StartGoldInitialized;
+	}
+
+	[YuzuAlias("SampleOrder")]
+	class SampleOrderExt : SampleOrder
+	{
+		[YuzuMember]
+		public bool StarterPackOffered;
+	}
+
+
 	public class SampleUnknown
 	{
 		[YuzuMember]
