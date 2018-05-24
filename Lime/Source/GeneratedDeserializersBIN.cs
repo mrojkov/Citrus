@@ -3383,12 +3383,12 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (9 == fd.OurIndex) {
-				result.Id = d.Reader.ReadString();
-				if (result.Id == "" && d.Reader.ReadBoolean()) result.Id = null;
+				result.IKStopper = d.Reader.ReadBoolean();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (10 == fd.OurIndex) {
-				result.IKStopper = d.Reader.ReadBoolean();
+				result.Id = d.Reader.ReadString();
+				if (result.Id == "" && d.Reader.ReadBoolean()) result.Id = null;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (11 == fd.OurIndex) {
