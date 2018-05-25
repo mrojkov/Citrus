@@ -220,10 +220,10 @@ namespace Launcher
 				var mdtool = "/Applications/Xamarin Studio.app/Contents/MacOS/mdtool";
 				var vstool = "/Applications/Visual Studio.app/Contents/MacOS/vstool";
 
-				if (File.Exists(mdtool)) {
-					return mdtool;
-				} else {
+				if (File.Exists(vstool)) {
 					return vstool;
+				} else {
+					return mdtool;
 				}
 			}
 		}

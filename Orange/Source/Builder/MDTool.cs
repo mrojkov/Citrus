@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Text;
 
@@ -10,13 +10,13 @@ namespace Orange.Source
 			: base(projectDirectory, projectName, platform, customSolution)
 		{
 #if MAC
-			BuilderPath = "/Applications/Xamarin Studio.app/Contents/MacOS/mdtool";
+			BuilderPath = "/Applications/Visual Studio.app/Contents/MacOS/vstool";
 			if (!File.Exists (BuilderPath)) {
 				// WARNING: to fix error:
 				// "Error while trying to load the project '': The type initializer for 'Xamarin.Player.Remote.PlayerDeviceManager' threw an exception"
 				// disable Extension "Xamarine Live Player" in Visual Studio Extensions list
 				// @see https://bugzilla.xamarin.com/show_bug.cgi?id=60151
-				BuilderPath = "/Applications/Visual Studio.app/Contents/MacOS/vstool";
+				BuilderPath = "/Applications/Xamarin Studio.app/Contents/MacOS/mdtool";
 				if (!File.Exists (BuilderPath)) {
 					throw new System.Exception (@"Please install Visual Studio or Xamarin Studio: https://www.visualstudio.com/ru/downloads/");
 				}
