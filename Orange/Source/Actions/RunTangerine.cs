@@ -13,7 +13,7 @@ namespace Orange
 		public static string RunTangerine()
 		{
 			var path = Path.Combine(Toolbox.CalcCitrusDirectory(), "Tangerine");
-
+			Nuget.Restore(path);
 #if WIN
 			var buildSystem = new Source.MSBuild(path, "Tangerine", TargetPlatform.Win);
 			buildSystem.Configuration = "Release";
