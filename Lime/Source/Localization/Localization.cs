@@ -104,7 +104,7 @@ namespace Lime
 
 		private static string GetStringHelper(string key)
 		{
-			if (key == "") {
+			if (key.Length == 0 || key[0] != '[') {
 				return key;
 			}
 			if (key.Length >= 2 && key[0] == '[' && key[1] == ']') {
