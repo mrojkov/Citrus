@@ -10,7 +10,7 @@ namespace Orange
 {
 	public static class CodeCooker
 	{
-		public static void Cook(Dictionary<string, CookingRules> assetToCookingRules, List<string> allBundles)
+		public static void Cook(Dictionary<string, CookingRules> assetToCookingRules, List<string> cookingBundles)
 		{
 			var cache = LoadCodeCookerCache();
 			var scenesToCook = new List<string>();
@@ -23,13 +23,21 @@ namespace Orange
 			using (var dc = new DirectoryChanger(The.Workspace.AssetsDirectory)) {
 				foreach (var kv in assetToCookingRules) {
 					var scenePath = kv.Key;
+					bool presentInCookingBundles = false;
+					foreach (var bundle in kv.Value.Bundles) {
+						if (cookingBundles.Contains(bundle)) {
+							presentInCookingBundles = true;
+							break;
+						}
+					}
 					if (
 						(
 							scenePath.EndsWith(".scene", StringComparison.OrdinalIgnoreCase) ||
 							scenePath.EndsWith(".tan", StringComparison.OrdinalIgnoreCase) ||
 							scenePath.EndsWith(".model", StringComparison.OrdinalIgnoreCase)
 						) &&
-							!kv.Value.Ignore
+							!kv.Value.Ignore &&
+							presentInCookingBundles
 					) {
 						allScenes.Add(scenePath);
 						sceneToBundleMap.Add(scenePath, kv.Value.Bundles.First());
@@ -77,7 +85,7 @@ namespace Orange
 			try {
 				// Don't return early even if there's nothing modified since there may be stuff to delete
 				// Also, don't bother with loading ony usedBundles for now, just load all of them
-				AssetBundle.Current = new AggregateAssetBundle(allBundles.Select(bundleName => new PackedAssetBundle(The.Workspace.GetBundlePath(bundleName))).ToArray());
+				AssetBundle.Current = new AggregateAssetBundle(cookingBundles.Select(bundleName => new PackedAssetBundle(The.Workspace.GetBundlePath(bundleName))).ToArray());
 				var loadedScenes = new Dictionary<string, Node>();
 				foreach (var scene in scenesToCook) {
 					loadedScenes.Add(scene, Node.CreateFromAssetBundle(scene));
