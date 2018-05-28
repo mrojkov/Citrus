@@ -329,6 +329,7 @@ namespace Lime
 
 		/// <summary>
 		/// Collections of Components.
+		/// If node component class don't need to be serialized mark it with <see cref="NodeComponentDontSerializeAttribute">.
 		/// </summary>
 		[YuzuMember]
 		public NodeComponentCollection Components { get; private set; }
@@ -1076,6 +1077,7 @@ namespace Lime
 		/// <summary>
 		/// For each root node of deserialized node hierarchy this component will be added and set to path in asset bundle.
 		/// </summary>
+		[NodeComponentDontSerialize]
 		public class AssetBundlePathComponent : NodeComponent
 		{
 			public string Path;
@@ -1091,12 +1093,6 @@ namespace Lime
 			{
 				return Path;
 			}
-		}
-
-		[YuzuBeforeSerialization]
-		public void CleanUnwantedComponents()
-		{
-			Components.Remove<AssetBundlePathComponent>();
 		}
 
 		public static Node CreateFromAssetBundle(string path, Node instance = null)
@@ -1117,13 +1113,7 @@ namespace Lime
 					instance = Serialization.ReadObject<Node>(fullPath, stream, instance);
 				}
 				instance.LoadExternalScenes();
-				var pathComponent = instance.Components.Get<AssetBundlePathComponent>();
-				if (pathComponent == null) {
-					instance.Components.Add(new AssetBundlePathComponent(fullPath));
-				}
-				else {
-					pathComponent.Path = fullPath;
-				}
+				instance.Components.Add(new AssetBundlePathComponent(fullPath));
 			} finally {
 				scenesBeingLoaded.Remove(fullPath);
 			}

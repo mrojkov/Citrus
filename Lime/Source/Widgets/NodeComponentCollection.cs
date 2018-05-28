@@ -1,7 +1,13 @@
 using System;
+using System.Linq;
+using System.Reflection;
 
 namespace Lime
 {
+	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
+	public sealed class NodeComponentDontSerializeAttribute : Attribute
+	{ }
+
 	public class NodeComponent : Component
 	{
 		private Node owner;
@@ -79,6 +85,12 @@ namespace Lime
 				}
 			}
 			base.Clear();
+		}
+
+		[Yuzu.YuzuSerializeItemIf]
+		private bool SerializeItemIf(int index, Object component)
+		{
+			return !component.GetType().IsDefined(typeof(NodeComponentDontSerializeAttribute), true);
 		}
 	}
 }
