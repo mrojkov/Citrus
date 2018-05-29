@@ -81,7 +81,7 @@ namespace Orange
 			if (citrusVersion.IsStandalone) {
 				Console.WriteLine($"Welcome to Citrus. Version {citrusVersion.Version}, build number: {citrusVersion.BuildNumber}");
 			}
-			Orange.Updater.CheckForUpdates();
+			Updater.CheckForUpdates();
 		}
 
 		public void Save()

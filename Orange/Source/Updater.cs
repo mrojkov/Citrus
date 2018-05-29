@@ -4,12 +4,13 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
+using Lime;
 using Octokit;
+using Task = System.Threading.Tasks.Task;
 
 namespace Orange
 {
-	static class Updater
+	public static class Updater
 	{
 		private static GitHubClient client = new GitHubClient(new ProductHeaderValue("mrojkov-citrus-auto-updater"));
 		private static bool firstUpdate = true;
@@ -103,6 +104,63 @@ namespace Orange
 					}
 				}
 			});
+		}
+
+		public static async void ShowUpdaterWindow()
+		{
+			var window = new Window(new WindowOptions {
+				Style = WindowStyle.Dialog,
+				Visible = false,
+				FixedSize = false,
+			});
+			ThemedScrollView scrollView;
+			var windowWidget = new ThemedInvalidableWindowWidget(window) {
+				Id = "MainWindow",
+				Layout = new HBoxLayout {
+					Spacing = 6
+				},
+				Padding = new Thickness(6),
+				Size = window.ClientSize,
+				Nodes = {
+					new Widget {
+						Layout = new VBoxLayout {
+							Spacing = 6,
+						},
+						Nodes = {
+							(scrollView = new ThemedScrollView() {
+							}),
+							new ThemedFrame {
+								Padding = new Thickness(10),
+								Layout = new HBoxLayout(),
+								LayoutCell = new LayoutCell {
+									StretchY = 0,
+								},
+								Nodes = {
+									new ThemedButton("&Close"),
+									new Widget { LayoutCell = new LayoutCell { StretchX = float.MaxValue } }
+								}
+							}
+						}
+					}
+				}
+			};
+			scrollView.Behaviour.Content.Padding = new Thickness(4);
+			scrollView.Behaviour.Content.Layout = new VBoxLayout();
+#pragma warning disable 4014
+			client.Repository.Release.GetAll("mrojkov", "Citrus").ContinueWith((releases) => {
+#pragma warning restore 4014
+				foreach (var release in releases.Result) {
+					scrollView.Content.AddNode(new Widget {
+						Layout = new HBoxLayout(),
+						Nodes = {
+							new ThemedSimpleText(release.TagName),
+							new ThemedSimpleText(release.Name),
+							new ThemedSimpleText(release.Body),
+						},
+					});
+				}
+			});
+			window.ShowModal();
 		}
 	}
 }
