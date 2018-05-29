@@ -12,12 +12,15 @@ namespace Tangerine.UI.Timeline.Operations
 
 		public static void Perform(int column, Node container)
 		{
+			if (Document.Current.PreviewAnimation) {
+				Document.Current.TogglePreviewAnimation(CoreUserPreferences.Instance.AnimationMode, false);
+			}
 			Document.Current.History.Perform(new SetCurrentColumn(column, container));
 		}
 
 		public static void Perform(int column)
 		{
-			Document.Current.History.Perform(new SetCurrentColumn(column, Document.Current.Container));
+			Perform(column, Document.Current.Container);
 		}
 
 		private SetCurrentColumn(int column, Node node)

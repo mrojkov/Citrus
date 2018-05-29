@@ -16,7 +16,7 @@ namespace Tangerine.Core
 			CurrentFrameSetter.SetCurrentFrameToNode(frameIndex, node, animationMode);
 		}
 
-		public static void FastForwardToFrame(Node node, int frameIndex)
+		private static void FastForwardToFrame(Node node, int frameIndex)
 		{
 			node.SetTangerineFlag(TangerineFlags.IgnoreMarkers, true);
 			try {
@@ -24,6 +24,32 @@ namespace Tangerine.Core
 			} finally {
 				node.SetTangerineFlag(TangerineFlags.IgnoreMarkers, false);
 			}
+		}
+
+		public void TogglePreviewAnimation(bool animationMode, bool triggerMarkersBeforeCurrentFrame)
+		{
+			if (PreviewAnimation) {
+				PreviewAnimation = false;
+				CurrentFrameSetter.StopAnimationRecursive(PreviewAnimationContainer);
+				CurrentFrameSetter.SetTimeRecursive(PreviewAnimationContainer, 0);
+				SetCurrentFrameToNode(
+					PreviewAnimationBegin, Container, animationMode
+				);
+				AudioSystem.StopAll();
+			} else {
+				int savedAnimationFrame = Container.AnimationFrame;
+				PreviewAnimation = true;
+				if (triggerMarkersBeforeCurrentFrame) {
+					SetCurrentFrameToNode(0, Container, true);
+				}
+				Container.IsRunning = PreviewAnimation;
+				if (triggerMarkersBeforeCurrentFrame) {
+					FastForwardToFrame(Container, savedAnimationFrame);
+				}
+				PreviewAnimationBegin = savedAnimationFrame;
+				PreviewAnimationContainer = Container;
+			}
+			Application.InvalidateWindows();
 		}
 
 		private static class CurrentFrameSetter
@@ -175,7 +201,7 @@ namespace Tangerine.Core
 				return (float) forwardDelta;
 			}
 
-			static void SetTimeRecursive(Node node, double time)
+			internal static void SetTimeRecursive(Node node, double time)
 			{
 				foreach (var animation in node.Animations) {
 					animation.Time = time;
@@ -185,7 +211,7 @@ namespace Tangerine.Core
 				}
 			}
 
-			static void StopAnimationRecursive(Node node)
+			internal static void StopAnimationRecursive(Node node)
 			{
 				foreach (var animation in node.Animations) {
 					animation.IsRunning = false;
