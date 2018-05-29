@@ -332,6 +332,13 @@ namespace Lime
 			}
 		}
 
+		public static void InvokeOnMainThreadBeginning(Action action)
+		{
+			lock (scheduledActionsSync) {
+				scheduledActions += action;
+			}
+		}
+
 		/// <summary>
 		/// Gets the current platform
 		/// </summary>
