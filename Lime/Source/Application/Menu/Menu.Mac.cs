@@ -1,4 +1,4 @@
-﻿#if MAC
+#if MAC
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -134,10 +134,11 @@ namespace Lime
 				if (commandVersion == Command.Version) {
 					return;
 				}
+				var title = Command.Text.Replace("&", string.Empty);
 				commandVersion = Command.Version;
 				NativeMenuItem.Hidden = !Command.Visible;
 				NativeMenuItem.Enabled = Command.Enabled;
-				NativeMenuItem.Title = Command.Text;
+				NativeMenuItem.Title = title;
 				NativeMenuItem.State = Command.Checked ? NSCellStateValue.On : NSCellStateValue.Off;
 				if (Command.Shortcut.Main != Key.Unknown) {
 					NativeMenuItem.KeyEquivalent = GetKeyEquivalent(Command.Shortcut.Main);
@@ -148,7 +149,7 @@ namespace Lime
 				}
 				if (Command.Menu != null) {
 					var nativeSubmenu = ((Menu)Command.Menu).NativeMenu;
-					nativeSubmenu.Title = Command.Text;
+					nativeSubmenu.Title = title;
 					NativeMenuItem.Submenu = nativeSubmenu;
 				} else {
 					NativeMenuItem.Submenu = null;
