@@ -12,12 +12,25 @@ namespace Orange
 		[ExportMetadata("Priority", 0)]
 		public static string BuildAndRunAction()
 		{
+			return BuildAndRun("Release");
+		}
+
+		[Export(nameof(OrangePlugin.MenuItemsWithErrorDetails))]
+		[ExportMetadata("Label", "Build & Run Editor only")]
+		[ExportMetadata("Priority", 1)]
+		public static string BuildAndRunEditorAction()
+		{
+			return BuildAndRun("Release.Editor");
+		}
+
+		public static string BuildAndRun(string configuration)
+		{
 			AssetCooker.CookForActivePlatform();
-			if (!BuildGame()) {
+			if (!BuildGame(The.Workspace.ActivePlatform, The.Workspace.CustomSolution, configuration)) {
 				return "Can not BuildGame";
 			}
 			The.UI.ScrollLogToEnd();
-			RunGame();
+			RunGame(The.Workspace.ActivePlatform, The.Workspace.CustomSolution, configuration);
 			return null;
 		}
 
