@@ -1,9 +1,9 @@
 using System;
 using System.ComponentModel.Composition;
 using System.IO;
-using Orange;
 using System.Text;
 using System.Text.RegularExpressions;
+using Orange;
 
 namespace Kill3.OrangePlugin
 {
@@ -17,7 +17,10 @@ namespace Kill3.OrangePlugin
 				Subversion.Update(GetXCodeProjectFolder());
 			}
 			AssetCooker.Cook(TargetPlatform.iOS);
-			var builder = new Orange.SolutionBuilder(TargetPlatform.iOS);
+			var solutionPath = Path.Combine(
+				The.Workspace.ProjectDirectory, The.Workspace.Title + $".iOS.sln");
+
+			var builder = new SolutionBuilder(TargetPlatform.iOS, solutionPath);
 			var output = new StringBuilder();
 			builder.Clean();
 			if (builder.Build(output)) {

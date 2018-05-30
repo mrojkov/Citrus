@@ -26,10 +26,7 @@ namespace Orange
 
 		public string GetPlatformSuffix(TargetPlatform? platform = null)
 		{
-			if (platform == null) {
-				platform = ActivePlatform;
-			}
-			return "." + Toolbox.GetTargetPlatformString(platform.Value);
+			return "." + Toolbox.GetTargetPlatformString(platform ?? ActivePlatform);
 		}
 
 		/// <summary>
@@ -37,9 +34,11 @@ namespace Orange
 		/// </summary>
 		public string GetSolutionFilePath()
 		{
-			var path = Path.Combine(The.Workspace.ProjectDirectory, The.Workspace.Title + GetPlatformSuffix(),
-				The.Workspace.Title + GetPlatformSuffix() + ".sln");
-			return path;
+			string platformProjectName = The.Workspace.Title + GetPlatformSuffix();
+			return Path.Combine(
+				The.Workspace.ProjectDirectory,
+				platformProjectName,
+				platformProjectName + ".sln");
 		}
 
 		/// <summary>
@@ -63,13 +62,13 @@ namespace Orange
 
 		public static readonly Workspace Instance = new Workspace();
 
-		public TargetPlatform ActivePlatform => The.UI.GetActiveTarget().Platform;
+		public TargetPlatform ActivePlatform => ActiveTarget.Platform;
 
 		public Target ActiveTarget => The.UI.GetActiveTarget();
 
-		public string CustomSolution => The.UI.GetActiveTarget() == null ? null : The.UI.GetActiveTarget().ProjectPath;
+		public string CustomSolution => ActiveTarget?.ProjectPath;
 
-		public bool CleanBeforeBuild => The.UI.GetActiveTarget() != null && The.UI.GetActiveTarget().CleanBeforeBuild;
+		public bool CleanBeforeBuild => (ActiveTarget?.CleanBeforeBuild == true);
 
 		public JObject JObject { get; private set; }
 

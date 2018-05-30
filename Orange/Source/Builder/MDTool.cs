@@ -6,39 +6,42 @@ namespace Orange.Source
 {
 	class MDTool: BuildSystem
 	{
-		public MDTool(string projectDirectory, string projectName, TargetPlatform platform, string customSolution = null)
-			: base(projectDirectory, projectName, platform, customSolution)
+		private readonly string builderPath;
+
+
+		public MDTool(TargetPlatform platform, string solutionPath, string configuration)
+			: base(platform, solutionPath, configuration)
 		{
 #if MAC
-			BuilderPath = "/Applications/Visual Studio.app/Contents/MacOS/vstool";
-			if (!File.Exists (BuilderPath)) {
+			builderPath = "/Applications/Visual Studio.app/Contents/MacOS/vstool";
+			if (!File.Exists(builderPath)) {
 				// WARNING: to fix error:
 				// "Error while trying to load the project '': The type initializer for 'Xamarin.Player.Remote.PlayerDeviceManager' threw an exception"
 				// disable Extension "Xamarine Live Player" in Visual Studio Extensions list
 				// @see https://bugzilla.xamarin.com/show_bug.cgi?id=60151
-				BuilderPath = "/Applications/Xamarin Studio.app/Contents/MacOS/mdtool";
-				if (!File.Exists (BuilderPath)) {
-					throw new System.Exception (@"Please install Visual Studio or Xamarin Studio: https://www.visualstudio.com/ru/downloads/");
+				builderPath = "/Applications/Xamarin Studio.app/Contents/MacOS/mdtool";
+				if (!File.Exists(builderPath)) {
+					throw new System.Exception(@"Please install Visual Studio or Xamarin Studio: https://www.visualstudio.com/ru/downloads/");
 				}
 			}
 #elif WIN
-			BuilderPath = @"C:\Program Files(x86)\MonoDevelop\bin\mdtool.exe";
+			builderPath = @"C:\Program Files(x86)\MonoDevelop\bin\mdtool.exe";
 #endif
 		}
 
-		public override int Execute(StringBuilder output = null)
+		protected override int Execute(StringBuilder output)
 		{
-			return Process.Start(BuilderPath, string.Format("build \"{0}\" {1}", SlnPath, Args), output: output);
+			return Process.Start(builderPath, $"build \"{SolutionPath}\" {Args}", output: output);
 		}
 
 		protected override void DecorateBuild()
 		{
-			Args += " -t:Build";
+			AddArgument("-t:Build");
 		}
 
 		protected override void DecorateClean()
 		{
-			Args += " -t:Clean";
+			AddArgument("-t:Clean");
 		}
 
 		protected override void DecorateConfiguration()
@@ -49,22 +52,19 @@ namespace Orange.Source
 					platformSpecification = "|iPhone";
 					break;
 				}
+				// Need to research strange behaviour due to this string
+				// platformSpecification = "|x86";
 				case TargetPlatform.Win:
-				case TargetPlatform.Mac: {
-					// Need to research strange behaviour due to this string
-					//platformSpecification = "|x86";
-					platformSpecification = "";
-					break;
-				}
-			case TargetPlatform.Android: {
-					platformSpecification = "";
+				case TargetPlatform.Mac:
+				case TargetPlatform.Android: {
+					platformSpecification = string.Empty;
 					break;
 				}
 				default: {
 					throw new NotSupportedException();
 				}
 			}
-			Args += string.Format(" -c:\"{0}{1}\"", Configuration, platformSpecification);
+			AddArgument($"-c:\"{Configuration}{platformSpecification}\"");
 		}
 	}
 }

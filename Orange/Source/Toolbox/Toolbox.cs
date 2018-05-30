@@ -8,8 +8,6 @@ namespace Orange
 {
 	public static class Toolbox
 	{
-		private static string monoPath;
-
 		public static string ToWindowsSlashes(string path)
 		{
 			return path.Replace('/', '\\');
@@ -40,7 +38,7 @@ namespace Orange
 
 		public static string GetApplicationDirectory()
 		{
-			var assemblyPath = System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase;
+			var assemblyPath = Assembly.GetExecutingAssembly().GetName().CodeBase;
 #if MAC
 			if (assemblyPath.StartsWith("file:")) {
 				assemblyPath = assemblyPath.Remove(0, 5);
@@ -50,8 +48,7 @@ namespace Orange
 				assemblyPath = assemblyPath.Remove(0, 8);
 			}
 #endif
-			var dir = System.IO.Path.GetDirectoryName(assemblyPath);
-			return dir;
+			return Path.GetDirectoryName(assemblyPath);
 		}
 
 		public static string CalcCitrusDirectory()
@@ -73,20 +70,17 @@ namespace Orange
 
 		public static string GetTargetPlatformString(TargetPlatform platform)
 		{
-			switch(platform)
-			{
-			case TargetPlatform.Win:
-				return "Win";
-			case TargetPlatform.Mac:
-				return "Mac";
-			case TargetPlatform.iOS:
-				return "iOS";
-			case TargetPlatform.Android:
-				return "Android";
-			case TargetPlatform.Unity:
-				return "Unity";
-			default:
-				throw new InvalidOperationException("Invalid target platform");
+			switch (platform) {
+				case TargetPlatform.Win:
+				case TargetPlatform.Mac:
+				case TargetPlatform.iOS:
+				case TargetPlatform.Android:
+				case TargetPlatform.Unity: {
+					return platform.ToString();
+				}
+				default: {
+					throw new InvalidOperationException("Invalid target platform");
+				}
 			}
 		}
 
