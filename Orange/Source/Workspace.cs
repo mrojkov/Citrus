@@ -32,9 +32,9 @@ namespace Orange
 		/// <summary>
 		/// Returns solution path. E.g: Zx3.Win/Zx3.Win.sln
 		/// </summary>
-		public string GetSolutionFilePath()
+		public string GetSolutionFilePath(TargetPlatform? platform)
 		{
-			string platformProjectName = The.Workspace.Title + GetPlatformSuffix();
+			string platformProjectName = The.Workspace.Title + GetPlatformSuffix(platform);
 			return Path.Combine(
 				The.Workspace.ProjectDirectory,
 				platformProjectName,
