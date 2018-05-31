@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -161,15 +161,11 @@ namespace Lime
 		/// </summary>
 		public static IEnumerator<object> ExecuteAsync(Action action)
 		{
-#if UNITY
-			throw new NotImplementedException();
-#else
 			var t = new System.Threading.Tasks.Task(action);
 			t.Start();
 			while (!t.IsCompleted && !t.IsCanceled && !t.IsFaulted) {
 				yield return null;
 			}
-#endif
 		}
 
 		/// <summary>

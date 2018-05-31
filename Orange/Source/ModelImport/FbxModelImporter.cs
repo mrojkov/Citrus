@@ -46,9 +46,6 @@ namespace Orange
 					foreach (var submesh in meshAttribute.Submeshes) {
 						mesh.Submeshes.Add(ImportSubmesh(submesh, root));
 					}
-					if (target.Platform == TargetPlatform.Unity) {
-						mesh.CullMode = CullMode.Back;
-					}
 					node = mesh;
 					if (mesh.Submeshes.Count != 0) {
 						mesh.SetLocalTransform(root.LocalTranform);

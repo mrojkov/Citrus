@@ -5,7 +5,6 @@ namespace Orange
 		Win,
 		Mac,
 		iOS,
-		Android,
-		Unity,
+		Android
 	}
 }

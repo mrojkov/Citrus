@@ -324,13 +324,12 @@ namespace Lime
 
 		private static Stream DecompressAssetStream(AssetStream stream, AssetAttributes attributes)
 		{
-#if !UNITY
 			if ((attributes & AssetAttributes.ZippedDeflate) != 0) {
 				return new DeflateStream(stream, CompressionMode.Decompress);
-			} else if ((attributes & AssetAttributes.ZippedLZMA) != 0){
+			}
+			if ((attributes & AssetAttributes.ZippedLZMA) != 0) {
 				return new LzmaDecompressionStream(stream);
 			}
-#endif
 			throw new NotImplementedException();
 		}
 
@@ -437,14 +436,12 @@ namespace Lime
 
 		private static Stream CreateCompressionStream(Stream stream, AssetAttributes attributes)
 		{
-#if !UNITY
 			if ((attributes & AssetAttributes.ZippedDeflate) != 0) {
 				return new DeflateStream(stream, CompressionMode.Compress, leaveOpen: true);
 			}
 			if ((attributes & AssetAttributes.ZippedLZMA) != 0) {
 				return new LzmaCompressionStream(stream, leaveOpen: true);
 			}
-#endif
 			throw new NotImplementedException();
 		}
 

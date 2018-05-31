@@ -82,8 +82,6 @@ namespace Orange
 				case TargetPlatform.iOS:
 				case TargetPlatform.Android:
 					return ".pvr";
-				case TargetPlatform.Unity:
-					return ".png";
 				default:
 					return ".dds";
 			}
@@ -176,20 +174,11 @@ namespace Orange
 
 		private static AssetBundle CreateBundle(string bundleName)
 		{
-			if (Platform == TargetPlatform.Unity) {
-				var path = The.Workspace.GetUnityProjectDirectory();
-				path = bundleName == CookingRulesBuilder.MainBundleName ?
-					Path.Combine(path, "Assets", "Resources") :
-					Path.Combine(path, "Assets", "Bundles", bundleName);
-				Directory.CreateDirectory(path);
-				return new UnityAssetBundle(path);
-			}
 			var bundlePath = The.Workspace.GetBundlePath(bundleName);
-
 			// Create directory for bundle if it placed in subdirectory
 			try {
 				Directory.CreateDirectory(Path.GetDirectoryName(bundlePath));
-			} catch (System.Exception e) {
+			} catch (System.Exception) {
 				Debug.Write("Failed to create directory: {0} {1}", Path.GetDirectoryName(bundlePath));
 				throw;
 			}
@@ -341,10 +330,6 @@ namespace Orange
 		private static void SyncSounds()
 		{
 			const string sourceExtension = ".ogg";
-			if (Platform == TargetPlatform.Unity) {
-				SyncRawAssets(sourceExtension);
-				return;
-			}
 			SyncUpdated(sourceExtension, ".sound", (srcPath, dstPath) => {
 				using (var stream = new FileStream(srcPath, FileMode.Open)) {
 					// All sounds below 100kb size (can be changed with cooking rules) are converted
@@ -414,20 +399,15 @@ namespace Orange
 					// No need to cache this texture since it is a part of texture atlas.
 					return false;
 				}
-				if (Platform == TargetPlatform.Unity) {
-					AssetBundle.ImportFile(srcPath, dstPath, 0, ".png", AssetAttributes.None, cookingRulesMap[srcPath].SHA1);
-				}
-				else {
-					using (var stream = File.OpenRead(srcPath)) {
-						var bitmap = new Bitmap(stream);
-						if (ShouldDownscale(bitmap, rules)) {
-							var scaledBitmap = DownscaleTexture(bitmap, srcPath, rules);
-							bitmap.Dispose();
-							bitmap = scaledBitmap;
-						}
-						ImportTexture(dstPath, bitmap, rules, rules.SHA1);
+				using (var stream = File.OpenRead(srcPath)) {
+					var bitmap = new Bitmap(stream);
+					if (ShouldDownscale(bitmap, rules)) {
+						var scaledBitmap = DownscaleTexture(bitmap, srcPath, rules);
 						bitmap.Dispose();
+						bitmap = scaledBitmap;
 					}
+					ImportTexture(dstPath, bitmap, rules, rules.SHA1);
+					bitmap.Dispose();
 				}
 				return true;
 			});
@@ -794,8 +774,6 @@ namespace Orange
 				case TargetPlatform.Win:
 				case TargetPlatform.Mac:
 					return item1.CookingRules.DDSFormat == item2.CookingRules.DDSFormat;
-				case TargetPlatform.Unity:
-					return true;
 				default:
 					throw new ArgumentException();
 			}

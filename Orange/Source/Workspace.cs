@@ -184,11 +184,6 @@ namespace Orange
 			}
 		}
 
-		public string GetUnityProjectDirectory()
-		{
-			return Path.Combine(ProjectDirectory, Title + ".Unity");
-		}
-
 		private static TargetPlatform GetPlaformByName(string name)
 		{
 			try {

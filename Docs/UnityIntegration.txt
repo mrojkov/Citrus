@@ -1,9 +1,0 @@
-1) Запускается Unity. Создается новый проект [ProjectName].Unity в Main папке игры.
-2) Создается главная сцена игры (скажем MainScene.unity)
-3) Orange'ем собираются ассеты. На выходе получаются две папки: /Assets/Resources - сюда попадают ассеты из главного бандла,
-и папка Assets/Bundles/ с ассетами для скачиваемых бандлов.
-4) В папку Assets/Scripts делается checkout <ProjectName>.Game
-5) В папку Assets/Plugins/Lime делается checkout Lime и прикладывается protobuf-net.dll (собранный из исходников в конфигурации Unity)
-6) В Assets/Editor копируется скрипт BundleBuilder, он создает пункт меню "Assets/Build Asset Bundles" в Unity Editor.
-7) В Unity Editor -> Edit -> Project Settings -> Editor включить режим Version Control "Visible Meta Files". В этом режиме для каждого ассета создается отдельный .meta файл в котором задаются параметры его конвертации.
-8) На главную камеру навешивается скрипт UnityMain.cs

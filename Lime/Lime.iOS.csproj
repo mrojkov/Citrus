@@ -112,11 +112,7 @@
     <Compile Include="Source\Graphics\OpenGL\Texture2D.DDS.cs" />
     <Compile Include="Source\Graphics\OpenGL\Texture2D.Pvr.cs" />
     <Compile Include="Source\Graphics\OpenGL\Texture2D.cs" />
-    <Compile Include="Source\Graphics\Unity\MaterialFactory.cs" />
-    <Compile Include="Source\Graphics\Unity\RenderTexture.cs" />
-    <Compile Include="Source\Graphics\Unity\Texture2D.cs" />
     <Compile Include="Source\Input\Input.Native.cs" />
-    <Compile Include="Source\Input\Input.Unity.cs" />
     <Compile Include="Source\Graphics\TexturePool.cs" />
     <Compile Include="Source\Graphics\MovieTexture.cs" />
     <Compile Include="Source\Widgets\Movie.cs" />
@@ -164,10 +160,8 @@
     <Compile Include="Source\Graphics\TextureAtlasElement.cs" />
     <Compile Include="Source\Graphics\OpenGL\IGLObject.cs" />
     <Compile Include="Source\Application\AndroidActivityDelegate.cs" />
-    <Compile Include="Source\Graphics\Bitmap.Unity.cs" />
     <Compile Include="Source\Graphics\RenderBatch.cs" />
     <Compile Include="Source\Graphics\RenderList.cs" />
-    <Compile Include="Source\Graphics\Unity\PlatformRenderer.cs" />
     <Compile Include="Source\Audio\IAudioChannel.cs" />
     <Compile Include="Source\Audio\OpenAL\AudioCache.cs" />
     <Compile Include="Source\Audio\OpenAL\AudioChannel.cs" />
@@ -175,8 +169,6 @@
     <Compile Include="Source\Audio\OpenAL\OggDecoder.cs" />
     <Compile Include="Source\Audio\OpenAL\PlatformAudioSystem.cs" />
     <Compile Include="Source\Audio\OpenAL\WaveIMA4Decoder.cs" />
-    <Compile Include="Source\Audio\Unity\AudioChannel.cs" />
-    <Compile Include="Source\Audio\Unity\PlatformAudioSystem.cs" />
     <Compile Include="Source\Types\BitSet32.cs" />
     <Compile Include="Source\Input\SoftKeyboard.cs" />
     <Compile Include="Source\Widgets\Layout\AnchorLayout.cs" />
@@ -232,9 +224,6 @@
     <Compile Include="Source\Widgets\Text\SimpleText.cs" />
     <Compile Include="Source\Widgets\Text\TextLineSplitter.cs" />
     <Compile Include="Source\Widgets\Text\TextStyle.cs" />
-    <Compile Include="Source\Application\UnityApplicationDelegate.cs" />
-    <Compile Include="Source\Application\Window.Unity.cs" />
-    <Compile Include="Source\Application\Clipboard\Clipboard.Unity.cs" />
     <Compile Include="Source\Graphics\Fonts\Font.cs" />
     <Compile Include="Source\Graphics\Fonts\SerializableFont.cs" />
     <Compile Include="Source\Application\AndroidSoftKeyboard.cs" />
@@ -268,8 +257,6 @@
     <Compile Include="Source\Graphics\Bitmap.Apple.cs" />
     <Compile Include="Source\EnumExtensions.cs" />
     <Compile Include="Source\GeometryUtils.cs" />
-    <Compile Include="Source\Graphics\Unity\MovieTexture.cs" />
-    <Compile Include="Source\Graphics\Unity\PlatformGeometryBuffer.cs" />
     <Compile Include="Source\Types\Plane.cs" />
     <Compile Include="Source\Types\Vector4.cs" />
     <Compile Include="Source\Widgets\3D\Camera3D.cs" />
@@ -312,8 +299,6 @@
     <Compile Include="Source\AssetBundle\AggregateAssetBundle.cs" />
     <Compile Include="Source\AssetBundle\AssetBundle.cs" />
     <Compile Include="Source\AssetBundle\PackedAssetBundle.cs" />
-    <Compile Include="Source\AssetBundle\UnityAssetBundle.cs" />
-    <Compile Include="Source\AssetBundle\UnityDownloadableBundle.cs" />
     <Compile Include="Source\AssetBundle\UnpackedAssetBundle.cs" />
     <Compile Include="Source\Widgets\3D\Model3DAttachment.cs" />
     <Compile Include="Source\Widgets\NodeReference.cs" />

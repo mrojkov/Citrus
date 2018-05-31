@@ -1,8 +1,4 @@
-#if !UNITY
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
 
 namespace Lime
@@ -11,10 +7,8 @@ namespace Lime
 	{
 		Stream rgbStream;
 		Stream alphaStream;
-#if !UNITY
 		OgvDecoder rgbDecoder;
 		OgvDecoder alphaDecoder;
-#endif
 		Color4[] pixels;
 		double gameTime;
 		double videoTime;
@@ -38,8 +32,6 @@ namespace Lime
 
 		private void Open()
 		{
-#if UNITY
-#else
 			if (Path == null) {
 				throw new ArgumentException();
 			}
@@ -56,7 +48,6 @@ namespace Lime
 			this.ImageSize = rgbDecoder.FrameSize;
 			this.SurfaceSize = ImageSize;
 			pixels = new Color4[ImageSize.Width * ImageSize.Height];
-#endif
 		}
 
 		public void Play()
@@ -83,8 +74,6 @@ namespace Lime
 
 		public void Stop()
 		{
-#if UNITY
-#else
 			Stopped = true;
 			videoTime = 0;
 			gameTime = 0;
@@ -104,13 +93,10 @@ namespace Lime
 				alphaStream.Dispose();
 				alphaStream = null;
 			}
-#endif
 		}
 
 		public void Update(float delta)
 		{
-#if UNITY
-#else
 			if (Paused || Stopped) {
 				return;
 			}
@@ -139,7 +125,6 @@ namespace Lime
 				alphaDecoder.FillTextureAlpha(pixels, ImageSize.Width, ImageSize.Height);
 			}
 			LoadImage(pixels, ImageSize.Width, ImageSize.Height);
-#endif
 		}
 
 		public void Restart()
@@ -149,4 +134,3 @@ namespace Lime
 		}
 	}
 }
-#endif

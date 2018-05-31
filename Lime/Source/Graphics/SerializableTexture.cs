@@ -1,6 +1,3 @@
-using System.Collections;
-using System.IO;
-using System.Collections.Generic;
 using System;
 
 namespace Lime
@@ -132,16 +129,6 @@ namespace Lime
 		}
 
 		public void Discard() { }
-
-#if UNITY
-		public UnityEngine.Texture GetUnityTexture()
-		{
-			if (texture == null) {
-				texture = LoadTexture();
-			}
-			return texture.GetUnityTexture();
-		}
-#endif
 
 		public void SetAsRenderTarget()
 		{

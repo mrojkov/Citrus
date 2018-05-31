@@ -156,7 +156,6 @@
     <Compile Include="Source\AssetCooker\TextureConverterUtils.cs" />
     <Compile Include="Source\AssetCooker\RectAllocator.cs" />
     <Compile Include="Source\AssetCooker\TextureConverter.cs" />
-    <Compile Include="Source\AssetCooker\UnityAssetBundle.cs" />
     <Compile Include="Source\AssetCooker\WaveIMA4Converter.cs" />
     <Compile Include="Source\DictionaryExtractor.cs" />
     <Compile Include="Source\Toolbox\DirectoryChanger.cs" />
