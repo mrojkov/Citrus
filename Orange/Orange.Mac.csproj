@@ -154,6 +154,7 @@
     <Compile Include="Source\Actions\CookMainBundle.cs" />
     <Compile Include="Source\CitrusVersion.cs" />
     <Compile Include="Source\Updater.cs" />
+    <Compile Include="Source\Builder\BuildConfiguration.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Orange.Mac.userprefs">

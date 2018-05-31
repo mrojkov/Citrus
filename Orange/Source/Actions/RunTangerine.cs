@@ -18,12 +18,12 @@ namespace Orange
 			var solutionBuilder = new SolutionBuilder(
 				TargetPlatform.Win,
 				Path.Combine(projectDirectory, projectName + ".Win.sln"),
-				"Release");
+				BuildConfiguration.Release);
 #elif MAC
 			var solutionBuilder = new SolutionBuilder(
 				TargetPlatform.Mac,
 				Path.Combine(projectDirectory, projectName + ".Mac.sln"),
-				"Debug"); // RELEASE requires code signing, use debug for a while.
+				BuildConfiguration.Debug); // RELEASE requires code signing, use debug for a while.
 #endif
 			if (!solutionBuilder.Build()) {
 				return "Build system has returned error";
@@ -31,10 +31,17 @@ namespace Orange
 
 			var p = new System.Diagnostics.Process();
 #if WIN
-			p.StartInfo.FileName = Path.Combine(projectDirectory, "bin/Release/Tangerine.exe");
+			p.StartInfo.FileName = Path.Combine(
+				projectDirectory,
+				"bin",
+				BuildConfiguration.Release,
+				"Tangerine.exe");
 #elif MAC
 			p.StartInfo.FileName = Path.Combine(
-				projectDirectory, "bin/Debug/Tangerine.app/Contents/MacOS/Tangerine");
+				projectDirectory,
+				"bin",
+				BuildConfiguration.Debug,
+				"Tangerine.app/Contents/MacOS/Tangerine");
 			p.StartInfo.UseShellExecute = false;
 			p.StartInfo.EnvironmentVariables.Clear();
 			p.StartInfo.EnvironmentVariables.Add("PATH", "/usr/bin");

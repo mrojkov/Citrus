@@ -117,6 +117,7 @@
     <Compile Include="Source\Actions\UpdateXCodeProject.cs" />
     <Compile Include="Source\AssetCooker\CodeCooker.cs" />
     <Compile Include="Source\AssetCooker\OpacityMaskCreator.cs" />
+    <Compile Include="Source\Builder\BuildConfiguration.cs" />
     <Compile Include="Source\Builder\BuildSystem.cs" />
     <Compile Include="Source\Builder\MSBuild.cs" />
     <Compile Include="Source\Builder\MDTool.cs" />

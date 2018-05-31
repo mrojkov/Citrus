@@ -30,7 +30,7 @@ namespace Orange.Source
 			arguments = new List<string>();
 			Platform = platform;
 			SolutionPath = solutionPath ?? The.Workspace.GetSolutionFilePath();
-			Configuration = configuration ?? "Release";
+			Configuration = configuration ?? BuildConfiguration.Release;
 		}
 
 		public int Execute(BuildAction buildAction, StringBuilder output = null)

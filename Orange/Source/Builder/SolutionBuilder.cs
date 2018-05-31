@@ -16,7 +16,7 @@ namespace Orange
 
 
 		public SolutionBuilder(
-			TargetPlatform platform, string solutionPath, string configuration = "Release")
+			TargetPlatform platform, string solutionPath, string configuration = BuildConfiguration.Release)
 		{
 #if WIN
 			buildSystem = new MSBuild(platform, solutionPath, configuration);

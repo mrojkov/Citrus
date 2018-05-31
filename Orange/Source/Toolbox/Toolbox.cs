@@ -8,6 +8,8 @@ namespace Orange
 {
 	public static class Toolbox
 	{
+		private static readonly char[] CmdArgumentDelimiters = { ':' };
+
 		public static string ToWindowsSlashes(string path)
 		{
 			return path.Replace('/', '\\');
@@ -20,11 +22,10 @@ namespace Orange
 
 		public static string GetCommandLineArg(string name)
 		{
-			var args = System.Environment.GetCommandLineArgs();
-			foreach (var arg in args) {
-				var x = arg.Split(new[] {':'}, 2);
-				if (x.Length == 2 && x[0] == name) {
-					return x[1];
+			foreach (var argument in Environment.GetCommandLineArgs()) {
+				var parts = argument.Split(CmdArgumentDelimiters, 2);
+				if (parts.Length == 2 && parts[0].Equals(name)) {
+					return parts[1];
 				}
 			}
 			return null;
@@ -32,8 +33,7 @@ namespace Orange
 
 		public static bool GetCommandLineFlag(string name)
 		{
-			var args = System.Environment.GetCommandLineArgs();
-			return Array.IndexOf(args, name) >= 0;
+			return Array.IndexOf(Environment.GetCommandLineArgs(), name) >= 0;
 		}
 
 		public static string GetApplicationDirectory()
@@ -68,22 +68,6 @@ namespace Orange
 			return "/Library/Frameworks/Mono.framework/Versions/Current/bin/mono";
 		}
 
-		public static string GetTargetPlatformString(TargetPlatform platform)
-		{
-			switch (platform) {
-				case TargetPlatform.Win:
-				case TargetPlatform.Mac:
-				case TargetPlatform.iOS:
-				case TargetPlatform.Android:
-				case TargetPlatform.Unity: {
-					return platform.ToString();
-				}
-				default: {
-					throw new InvalidOperationException("Invalid target platform");
-				}
-			}
-		}
-
 		public static IEnumerable<MethodInfo> GetAllMethodsWithAttribute(this Assembly assembly, Type attributeType)
 		{
 			foreach (var type in assembly.GetTypes()) {
@@ -98,9 +82,8 @@ namespace Orange
 
 		public static string GetTempFilePathWithExtension(string extension)
 		{
-			var path = Path.GetTempPath();
 			var fileName = Guid.NewGuid().ToString() + extension;
-			return Path.Combine(path, fileName);
+			return Path.Combine(Path.GetTempPath(), fileName);
 		}
 
 		public static string GetRelativePath(string path, string basePath)

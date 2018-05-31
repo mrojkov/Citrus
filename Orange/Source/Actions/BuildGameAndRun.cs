@@ -12,15 +12,7 @@ namespace Orange
 		[ExportMetadata("Priority", 0)]
 		public static string BuildAndRunAction()
 		{
-			return BuildAndRun("Release");
-		}
-
-		[Export(nameof(OrangePlugin.MenuItemsWithErrorDetails))]
-		[ExportMetadata("Label", "Build & Run Editor only")]
-		[ExportMetadata("Priority", 1)]
-		public static string BuildAndRunEditorAction()
-		{
-			return BuildAndRun("Release.Editor");
+			return BuildAndRun(BuildConfiguration.Release);
 		}
 
 		public static string BuildAndRun(string configuration)
@@ -36,7 +28,10 @@ namespace Orange
 
 		public static bool BuildGame()
 		{
-			return BuildGame(The.Workspace.ActivePlatform, The.Workspace.CustomSolution, "Release");
+			return BuildGame(
+				The.Workspace.ActivePlatform,
+				The.Workspace.CustomSolution,
+				BuildConfiguration.Release);
 		}
 
 		public static bool BuildGame(
@@ -55,7 +50,10 @@ namespace Orange
 
 		public static void RunGame()
 		{
-			RunGame(The.Workspace.ActivePlatform, The.Workspace.CustomSolution, "Release");
+			RunGame(
+				The.Workspace.ActivePlatform,
+				The.Workspace.CustomSolution,
+				BuildConfiguration.Release);
 		}
 
 		public static bool RunGame(

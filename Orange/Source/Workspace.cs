@@ -26,7 +26,7 @@ namespace Orange
 
 		public string GetPlatformSuffix(TargetPlatform? platform = null)
 		{
-			return "." + Toolbox.GetTargetPlatformString(platform ?? ActivePlatform);
+			return "." + (platform?.ToString() ?? ActivePlatform.ToString());
 		}
 
 		/// <summary>
@@ -167,7 +167,7 @@ namespace Orange
 
 		public string GetMainBundlePath(TargetPlatform platform)
 		{
-			return Path.ChangeExtension(AssetsDirectory, Toolbox.GetTargetPlatformString(platform));
+			return Path.ChangeExtension(AssetsDirectory, platform.ToString());
 		}
 
 		public string GetBundlePath(string bundleName)
@@ -180,7 +180,7 @@ namespace Orange
 			if (bundleName == CookingRulesBuilder.MainBundleName) {
 				return The.Workspace.GetMainBundlePath(platform);
 			} else {
-				return Path.Combine(Path.GetDirectoryName(AssetsDirectory), bundleName + "." + Toolbox.GetTargetPlatformString(platform));
+				return Path.Combine(Path.GetDirectoryName(AssetsDirectory), bundleName + GetPlatformSuffix(platform));
 			}
 		}
 
@@ -192,10 +192,9 @@ namespace Orange
 		private static TargetPlatform GetPlaformByName(string name)
 		{
 			try {
-				return (TargetPlatform)Enum.Parse(typeof(TargetPlatform), name, true);
-			}
-			catch (ArgumentException) {
-				throw new Lime.Exception("Uknown sub target platform name: {0}", name);
+				return (TargetPlatform) Enum.Parse(typeof(TargetPlatform), name, true);
+			} catch (ArgumentException) {
+				throw new Lime.Exception($"Unknown sub-target platform name: {name}");
 			}
 		}
 	}
