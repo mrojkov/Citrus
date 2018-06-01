@@ -976,7 +976,7 @@ namespace Lime
 				var texture = textures[i];
 				GL.ActiveTexture(TextureUnit.Texture0 + i);
 				CheckErrors();
-				GL.BindTexture(TextureTarget.Texture2D, texture != null ? texture.GetHandle() : 0);
+				GL.BindTexture(TextureTarget.Texture2D, texture != null && !texture.IsDisposed ? texture.GetHandle() : 0);
 				CheckErrors();
 				texturesDirtyMask &= ~bit;
 				if (texturesDirtyMask == 0)
@@ -987,28 +987,17 @@ namespace Lime
 
 		private static void ApplyVertexAttribs(int baseVertex)
 		{
-			var attribMask = vertexInputLayout.AttribMask;
-			if (attribMask != lastVertexAttribMask) {
-				for (var i = 0; i < maxVertexAttribs; i++) {
-					var bit = 1 << i;
-					if ((attribMask & bit) == (lastVertexAttribMask & bit))
-						continue;
-					if ((attribMask & bit) != 0)
-						GL.EnableVertexAttribArray(i);
-					else
-						GL.DisableVertexAttribArray(i);
-					CheckErrors();
-					lastVertexAttribMask ^= bit;
-					if (attribMask == lastVertexAttribMask)
-						break;
-				}
-			}
+			var attribMask = 0;
 			if (vertexAttribsDirty || baseVertex != lastBaseVertex) {
 				VertexBuffer lastBuffer = null;
 				foreach (var element in vertexInputLayout.Elements) {
 					var view = vertexBufferViews[element.Slot];
-					if (view.Buffer != lastBuffer) {
-						GL.BindBuffer(BufferTarget.ArrayBuffer, view.Buffer.GetHandle());
+					var buffer = view.Buffer;
+					if (buffer == null || buffer.IsDisposed) {
+						continue;
+					}
+					if (buffer != lastBuffer) {
+						GL.BindBuffer(BufferTarget.ArrayBuffer, buffer.GetHandle());
 						CheckErrors();
 						lastBuffer = view.Buffer;
 					}
@@ -1018,6 +1007,22 @@ namespace Lime
 						element.Attribute, format.NumberOfElements, format.Type,
 						format.Normalized, element.Stride, new IntPtr(offset));
 					CheckErrors();
+					attribMask |= 1 << element.Attribute;
+				}
+				if (attribMask != lastVertexAttribMask) {
+					for (var i = 0; i < maxVertexAttribs; i++) {
+						var bit = 1 << i;
+						if ((attribMask & bit) == (lastVertexAttribMask & bit))
+							continue;
+						if ((attribMask & bit) != 0)
+							GL.EnableVertexAttribArray(i);
+						else
+							GL.DisableVertexAttribArray(i);
+						CheckErrors();
+						lastVertexAttribMask ^= bit;
+						if (attribMask == lastVertexAttribMask)
+							break;
+					}
 				}
 				lastBaseVertex = baseVertex;
 				vertexAttribsDirty = false;
@@ -1028,7 +1033,7 @@ namespace Lime
 		{
 			if (indexBufferDirty) {
 				var buffer = indexBufferView.Buffer;
-				if (buffer != null) {
+				if (buffer != null && !buffer.IsDisposed) {
 					GL.BindBuffer(BufferTarget.ElementArrayBuffer, buffer.GetHandle());
 					CheckErrors();
 				}

@@ -91,6 +91,7 @@ namespace Lime
 		Size SurfaceSize { get; }
 		Rectangle AtlasUVRect { get; }
 		ITexture AtlasTexture { get; }
+		bool IsDisposed { get; }
 
 		void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv);
 		uint GetHandle();
@@ -119,7 +120,7 @@ namespace Lime
 		Color4[] GetPixels();
 	}
 
-	public class CommonTexture : IDisposable
+	public class CommonTexture
 	{
 		public static int TotalMemoryUsed { get; private set; }
 
@@ -127,6 +128,8 @@ namespace Lime
 		{
 			get { return TotalMemoryUsed / (1024 * 1024); }
 		}
+
+		public bool IsDisposed { get; private set; }
 
 		private int memoryUsed;
 
@@ -147,6 +150,7 @@ namespace Lime
 		public virtual void Dispose()
 		{
 			MemoryUsed = 0;
+			IsDisposed = true;
 		}
 	}
 }

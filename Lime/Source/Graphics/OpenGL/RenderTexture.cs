@@ -71,6 +71,9 @@ namespace Lime
 
 		private void CreateTexture()
 		{
+			if (IsDisposed) {
+				throw new ObjectDisposedException(GetType().Name);
+			}
 			if (!Application.CurrentThread.IsMain()) {
 				throw new Lime.Exception("Attempt to create a RenderTexture not from the main thread");
 			}

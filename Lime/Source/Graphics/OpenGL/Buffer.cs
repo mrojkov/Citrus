@@ -1,4 +1,4 @@
-﻿#if OPENGL
+#if OPENGL
 using System;
 #if iOS || ANDROID || WIN
 using OpenTK.Graphics.ES20;
@@ -12,7 +12,9 @@ namespace Lime
 	{
 		private uint handle;
 		private BufferTarget target;
+
 		public bool Dynamic { get; private set; }
+		public bool IsDisposed { get; private set; }
 
 		internal Buffer(BufferTarget target, bool dynamic)
 		{
@@ -34,6 +36,9 @@ namespace Lime
 
 		private void CreateIfRequired()
 		{
+			if (IsDisposed) {
+				throw new ObjectDisposedException(GetType().Name);
+			}
 			if (handle == 0) {
 				var handles = new uint[1];
 				GL.GenBuffers(1, handles);
@@ -56,6 +61,7 @@ namespace Lime
 		public void Dispose()
 		{
 			Discard();
+			IsDisposed = true;
 			GC.SuppressFinalize(this);
 		}
 

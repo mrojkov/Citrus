@@ -362,6 +362,9 @@ namespace Lime
 		/// <returns></returns>
 		public virtual uint GetHandle()
 		{
+			if (IsDisposed) {
+				throw new ObjectDisposedException(GetType().Name);
+			}
 			if (handle == 0) {
 				Reload();
 			}
