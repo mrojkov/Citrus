@@ -243,9 +243,9 @@ namespace Yuzu.Json
 			var list = (IEnumerable<T>)obj;
 			var wf = GetWriteFunc(typeof(T));
 			writer.Write((byte)'[');
+			var isFirst = true;
 			try {
 				depth += 1;
-				var isFirst = true;
 				int index = -1;
 				foreach (var elem in list) {
 					index += 1;
@@ -264,7 +264,8 @@ namespace Yuzu.Json
 			finally {
 				depth -= 1;
 			}
-			WriteIndent();
+			if (!isFirst)
+				WriteIndent();
 			writer.Write((byte)']');
 		}
 
@@ -295,8 +296,8 @@ namespace Yuzu.Json
 				finally {
 					depth -= 1;
 				}
+				WriteIndent();
 			}
-			WriteIndent();
 			writer.Write((byte)'}');
 		}
 
@@ -330,8 +331,8 @@ namespace Yuzu.Json
 				finally {
 					depth -= 1;
 				}
+				WriteIndent();
 			}
-			WriteIndent();
 			writer.Write((byte)']');
 		}
 

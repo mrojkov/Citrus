@@ -513,13 +513,21 @@ namespace YuzuTest.Json
 		public void TestSerializeItemIf()
 		{
 			var js = new JsonSerializer();
-			js.JsonOptions.Indent = "";
+			js.JsonOptions.Indent = "~";
 			var v1 = new SampleCollection<int> { 5, 2, 4, 1 };
-			Assert.AreEqual("[\n5,\n2,\n4,\n1\n]", js.ToString(v1));
+			Assert.AreEqual("[\n~5,\n~2,\n~4,\n~1\n]", js.ToString(v1));
 			v1.Filter = 1;
-			Assert.AreEqual("[\n5,\n4\n]", js.ToString(v1));
+			Assert.AreEqual("[\n~5,\n~4\n]", js.ToString(v1));
 			v1.Filter = 2;
-			Assert.AreEqual("[\n2,\n4\n]", js.ToString(v1));
+			Assert.AreEqual("[\n~2,\n~4\n]", js.ToString(v1));
+			v1.Filter = 3;
+			Assert.AreEqual("[]", js.ToString(v1));
+
+			var v2 = new SampleWithCollection();
+			v2.B.Add(5);
+			Assert.AreEqual("{\n~\"A\":[],\n~\"B\":[\n~~5\n~]\n}", js.ToString(v2));
+			v2.B.Filter = 3;
+			Assert.AreEqual("{\n~\"A\":[],\n~\"B\":[]\n}", js.ToString(v2));
 		}
 
 		[TestMethod]

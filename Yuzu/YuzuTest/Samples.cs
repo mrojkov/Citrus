@@ -459,6 +459,7 @@ namespace YuzuTest
 		public bool SaveItemIf(int index, object item) =>
 			Filter == 1 ? index % 2 == 0 :
 			Filter == 2 ? (int)item % 2 == 0 :
+			Filter == 3 ? false :
 			true;
 	}
 
