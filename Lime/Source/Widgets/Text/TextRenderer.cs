@@ -383,7 +383,7 @@ namespace Lime.Text
 					}
 				}
 
-				if (isLongerThanWidth && isTextOrBullet && x > 0 && !fittedWords[i - 1].IsNbsp) {
+				if (isLongerThanWidth && isTextOrBullet && x > 0 && !fittedWords[i - 1].IsNbsp && t[word.Start] != ' ') {
 					x = word.Width;
 					word.X = 0;
 					word.LineBreak = true;
