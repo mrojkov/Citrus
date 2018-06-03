@@ -30,8 +30,14 @@ namespace Tangerine.UI.SceneView
 				}
 				CreateNodeRequestComponent.Consume<Node>(sv.Components);
 				if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {
-					try {
-						var currentPoint = (PointObject)Core.Operations.CreateNode.Perform(typeof(SplinePoint), aboveSelected: false);
+					using (Document.Current.History.BeginTransaction()) {
+						PointObject currentPoint;
+						try {
+							currentPoint = (PointObject)Core.Operations.CreateNode.Perform(typeof(SplinePoint), aboveSelected: false);
+						} catch (InvalidOperationException e) {
+							AlertDialog.Show(e.Message);
+							yield break;
+						}
 						var container = (Widget)Document.Current.Container;
 						var t = sv.Scene.CalcTransitionToSpaceOf(container);
 						var pos = Vector2.Zero;
@@ -39,17 +45,16 @@ namespace Tangerine.UI.SceneView
 							pos = sv.MousePosition * t / container.Size;
 						}
 						Core.Operations.SetProperty.Perform(currentPoint, nameof(PointObject.Position), pos);
-						Document.Current.History.BeginTransaction();
+						Document.Current.History.SetRollbackPoint();
 						while (sv.Input.IsMousePressed()) {
-							Document.Current.History.RevertActiveTransaction();
+							Document.Current.History.RollbackTransaction();
 							
 							var dir = (sv.MousePosition * t - currentPoint.TransformedPosition) / SplinePointPresenter.TangentWeightRatio;
 							Core.Operations.SetProperty.Perform(currentPoint, nameof(SplinePoint.TangentAngle), dir.Atan2Deg);
 							Core.Operations.SetProperty.Perform(currentPoint, nameof(SplinePoint.TangentWeight), dir.Length);
 							yield return null;
 						}
-					} finally {
-						Document.Current.History.EndTransaction();
+						Document.Current.History.CommitTransaction();
 					}
 				}
 				if (sv.Input.WasMousePressed(1)) {

@@ -43,13 +43,12 @@ namespace Tangerine.UI.SceneView
 		IEnumerator<object> Resize(Quadrangle hull, int controlPointIndex, Vector2 pivot)
 		{
 			var cursor = WidgetContext.Current.MouseCursor;
-			Document.Current.History.BeginTransaction();
-			try {
+			using (Document.Current.History.BeginTransaction()) {
 				var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>().ToList();
 				var mouseStartPos = sv.MousePosition;
 
 				while (sv.Input.IsMousePressed()) {
-					Document.Current.History.RevertActiveTransaction();
+					Document.Current.History.RollbackTransaction();
 
 					Utils.ChangeCursorIfDefault(cursor);
 					var proportional = sv.Input.IsKeyPressed(Key.Shift);
@@ -68,9 +67,8 @@ namespace Tangerine.UI.SceneView
 
 					yield return null;
 				}
-			} finally {
 				sv.Input.ConsumeKey(Key.Mouse0);
-				Document.Current.History.EndTransaction();
+				Document.Current.History.CommitTransaction();
 			}
 		}
 

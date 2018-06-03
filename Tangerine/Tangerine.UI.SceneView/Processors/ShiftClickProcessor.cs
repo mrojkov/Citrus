@@ -21,7 +21,7 @@ namespace Tangerine.UI.SceneView
 					(mouseDownPosition - sv.Input.MousePosition).Length < 5
 				) {
 					sv.Input.ConsumeKey(Key.Mouse0);
-					HandleClick(sv);
+					Core.Document.Current.History.DoTransaction(() => HandleClick(sv));
 				}
 				yield return null;
 			}

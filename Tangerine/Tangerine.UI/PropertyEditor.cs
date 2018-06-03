@@ -272,9 +272,11 @@ namespace Tangerine.UI
 
 		protected void SetProperty(object value)
 		{
-			foreach (var o in EditorParams.Objects) {
-				EditorParams.PropertySetter(o, EditorParams.PropertyName, value);
-			}
+			Document.Current.History.DoTransactionMaybeNested(() => {
+				foreach (var o in EditorParams.Objects) {
+					EditorParams.PropertySetter(o, EditorParams.PropertyName, value);
+				}
+			});
 		}
 	}
 
@@ -305,11 +307,13 @@ namespace Tangerine.UI
 		{
 			float newValue;
 			if (float.TryParse(editor.Text, out newValue)) {
-				foreach (var obj in editorParams.Objects) {
-					var current = new Property<Vector2>(obj, editorParams.PropertyName).Value;
-					current[component] = newValue;
-					editorParams.PropertySetter(obj, editorParams.PropertyName, current);
-				}
+				Document.Current.History.DoTransactionMaybeNested(() => {
+					foreach (var obj in editorParams.Objects) {
+						var current = new Property<Vector2>(obj, editorParams.PropertyName).Value;
+						current[component] = newValue;
+						editorParams.PropertySetter(obj, editorParams.PropertyName, current);
+					}
+				});
 			} else {
 				editor.Text = currentValue.ToString();
 			}
@@ -347,11 +351,13 @@ namespace Tangerine.UI
 		{
 			float newValue;
 			if (float.TryParse(editor.Text, out newValue)) {
-				foreach (var obj in editorParams.Objects) {
-					var current = new Property<Vector3>(obj, editorParams.PropertyName).Value;
-					current[component] = newValue;
-					editorParams.PropertySetter(obj, editorParams.PropertyName, current);
-				}
+				Document.Current.History.DoTransactionMaybeNested(() => {
+					foreach (var obj in editorParams.Objects) {
+						var current = new Property<Vector3>(obj, editorParams.PropertyName).Value;
+						current[component] = newValue;
+						editorParams.PropertySetter(obj, editorParams.PropertyName, current);
+					}
+				});
 			} else {
 				editor.Text = currentValue.ToString();
 			}
@@ -392,12 +398,14 @@ namespace Tangerine.UI
 		{
 			float newValue;
 			if (float.TryParse(editor.Text, out newValue)) {
-				foreach (var obj in editorParams.Objects) {
-					var current = new Property<Quaternion>(obj, editorParams.PropertyName).Value.ToEulerAngles();
-					current[component] = newValue * Mathf.DegToRad;
-					editorParams.PropertySetter(obj, editorParams.PropertyName,
-						Quaternion.CreateFromEulerAngles(current));
-				}
+				Document.Current.History.DoTransactionMaybeNested(() => {
+					foreach (var obj in editorParams.Objects) {
+						var current = new Property<Quaternion>(obj, editorParams.PropertyName).Value.ToEulerAngles();
+						current[component] = newValue * Mathf.DegToRad;
+						editorParams.PropertySetter(obj, editorParams.PropertyName,
+							Quaternion.CreateFromEulerAngles(current));
+					}
+				});
 			} else {
 				editor.Text = RoundAngle(currentValue.ToEulerAngles()[component] * Mathf.RadToDeg).ToString();
 			}
@@ -431,15 +439,17 @@ namespace Tangerine.UI
 		{
 			float newValue;
 			if (float.TryParse(editor.Text, out newValue)) {
-				foreach (var obj in editorParams.Objects) {
-					var current = new Property<NumericRange>(obj, editorParams.PropertyName).Value;
-					if (component == 0) {
-						current.Median = newValue;
-					} else {
-						current.Dispersion = newValue;
+				Document.Current.History.DoTransactionMaybeNested(() => {
+					foreach (var obj in editorParams.Objects) {
+						var current = new Property<NumericRange>(obj, editorParams.PropertyName).Value;
+						if (component == 0) {
+							current.Median = newValue;
+						} else {
+							current.Dispersion = newValue;
+						}
+						editorParams.PropertySetter(obj, editorParams.PropertyName, current);
 					}
-					editorParams.PropertySetter(obj, editorParams.PropertyName, current);
-				}
+				});
 			} else {
 				editor.Text = currentValue.ToString();
 			}
@@ -602,7 +612,10 @@ namespace Tangerine.UI
 			panel.Widget.Tasks.Add(currentColor.Consume(v => panel.Color = v));
 			panel.Changed += () => SetProperty(panel.Color);
 			panel.DragStarted += () => Document.Current?.History.BeginTransaction();
-			panel.DragEnded += () => Document.Current?.History.EndTransaction();
+			panel.DragEnded += () => {
+				Document.Current?.History.CommitTransaction();
+				Document.Current?.History.EndTransaction();
+			};
 			colorBox.Clicked += () => Expanded = !Expanded;
 			var currentColorString = currentColor.Select(i => i.ToString(Color4.StringPresentation.Dec));
 			editor.Submitted += text => {
@@ -1051,14 +1064,16 @@ namespace Tangerine.UI
 		{
 			float newValue;
 			if (float.TryParse(editor.Text, out newValue)) {
-				foreach (var obj in editorParams.Objects) {
-					var prop = new Property<SkinningWeights>(obj, editorParams.PropertyName).Value.Clone();
-					prop[idx] = new BoneWeight {
-						Index = (int)newValue,
-						Weight = prop[idx].Weight
-					};
-					editorParams.PropertySetter(obj, editorParams.PropertyName, prop);
-				}
+				Document.Current.History.DoTransactionMaybeNested(() => {
+					foreach (var obj in editorParams.Objects) {
+						var prop = new Property<SkinningWeights>(obj, editorParams.PropertyName).Value.Clone();
+						prop[idx] = new BoneWeight {
+							Index = (int)newValue,
+							Weight = prop[idx].Weight
+						};
+						editorParams.PropertySetter(obj, editorParams.PropertyName, prop);
+					}
+				});
 			} else {
 				editor.Text = sw[idx].Index.ToString();
 			}
@@ -1068,14 +1083,16 @@ namespace Tangerine.UI
 		{
 			float newValue;
 			if (float.TryParse(editor.Text, out newValue)) {
-				foreach (var obj in editorParams.Objects) {
-					var prop = new Property<SkinningWeights>(obj, editorParams.PropertyName).Value.Clone();
-					prop[idx] = new BoneWeight {
-						Index = prop[idx].Index,
-						Weight = newValue
-					};
-					editorParams.PropertySetter(obj, editorParams.PropertyName, prop);
-				}
+				Document.Current.History.DoTransactionMaybeNested(() => {
+					foreach (var obj in editorParams.Objects) {
+						var prop = new Property<SkinningWeights>(obj, editorParams.PropertyName).Value.Clone();
+						prop[idx] = new BoneWeight {
+							Index = prop[idx].Index,
+							Weight = newValue
+						};
+						editorParams.PropertySetter(obj, editorParams.PropertyName, prop);
+					}
+				});
 			} else {
 				editor.Text = sw[idx].Weight.ToString();
 			}

@@ -19,28 +19,31 @@ namespace Tangerine.UI.Timeline
 			var input = grid.RootWidget.Input;
 			while (true) {
 				if (input.WasMousePressed()) {
-					var initialCell = grid.CellUnderMouse();
-					if (initialCell.Y < Document.Current.Rows.Count) {
-						if (IsCellSelected(initialCell)) {
-							yield return DragSelectionTask(initialCell);
-						} else {
-							var r = new HasKeyframeRequest(initialCell);
-							timeline.Globals.Add(r);
-							yield return null;
-							timeline.Globals.Remove<HasKeyframeRequest>();
-							var isInMultiselectMode = input.IsKeyPressed(Key.Control);
-							var isSelectRangeMode = input.IsKeyPressed(Key.Shift);
-
-							if (isSelectRangeMode) {
-								yield return SelectRangeTask(lastSelectedCell, initialCell);
-							} else if (!r.Result || isInMultiselectMode) {
-								yield return SelectTask(initialCell);
-								lastSelectedCell = initialCell;
+					using (Document.Current.History.BeginTransaction()) {
+						var initialCell = grid.CellUnderMouse();
+						if (initialCell.Y < Document.Current.Rows.Count) {
+							if (IsCellSelected(initialCell)) {
+								yield return DragSelectionTask(initialCell);
 							} else {
-								yield return DragSingleKeyframeTask(initialCell);
-								lastSelectedCell = initialCell;
+								var r = new HasKeyframeRequest(initialCell);
+								timeline.Globals.Add(r);
+								yield return null;
+								timeline.Globals.Remove<HasKeyframeRequest>();
+								var isInMultiselectMode = input.IsKeyPressed(Key.Control);
+								var isSelectRangeMode = input.IsKeyPressed(Key.Shift);
+	
+								if (isSelectRangeMode) {
+									yield return SelectRangeTask(lastSelectedCell, initialCell);
+								} else if (!r.Result || isInMultiselectMode) {
+									yield return SelectTask(initialCell);
+									lastSelectedCell = initialCell;
+								} else {
+									yield return DragSingleKeyframeTask(initialCell);
+									lastSelectedCell = initialCell;
+								}
 							}
 						}
+						Document.Current.History.CommitTransaction();
 					}
 				}
 				yield return null;

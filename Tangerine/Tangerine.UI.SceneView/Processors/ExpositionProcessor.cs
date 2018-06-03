@@ -207,12 +207,16 @@ namespace Tangerine.UI.SceneView
 							label.Visible = true;
 							if (clickArea.Input.WasMousePressed()) {
 								if (!input.IsKeyPressed(MultiSelectKey)) {
-									Core.Operations.ClearRowSelection.Perform();
-									Core.Operations.SelectNode.Perform(widget);
+									Document.Current.History.DoTransaction(() => {
+										Core.Operations.ClearRowSelection.Perform();
+										Core.Operations.SelectNode.Perform(widget);
+									});
 									Closed = true;
 								} else {
 									var isSelected = Document.Current.SelectedNodes().Contains(widget);
-									Core.Operations.SelectNode.Perform(widget, !isSelected);
+									Document.Current.History.DoTransaction(() => {
+										Core.Operations.SelectNode.Perform(widget, !isSelected);
+									});
 								}
 							}
 						} else {

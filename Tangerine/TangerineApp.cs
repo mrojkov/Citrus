@@ -10,7 +10,7 @@ using Tangerine.UI.Docking;
 namespace Tangerine
 {
 	public class TangerineApp
-	{
+	{	
 		public static TangerineApp Instance { get; private set; }
 		public readonly Dictionary<string, Toolbar> Toolbars = new Dictionary<string, Toolbar>();
 		public readonly DockManager.State DockManagerInitialState;
@@ -47,6 +47,7 @@ namespace Tangerine
 			SetColorTheme(AppUserPreferences.Instance.Theme);
 
 			LoadFont();
+
 			DockManager.Initialize(new Vector2(1024, 768), TangerineMenu.PadsMenu);
 			TangerineMenu.Create();
 			var mainWidget = DockManager.Instance.MainWindowWidget;
@@ -151,8 +152,29 @@ namespace Tangerine
 			});
 
 			Document.NodeDecorators.AddFor<Node>(n => n.SetTangerineFlag(TangerineFlags.SceneNode, true));
-
-			dockManager.MainWindowWidget.Updated += delta => Document.Current?.History.NextBatch();
+			dockManager.UnhandledExceptionOccurred += e => {
+				AlertDialog.Show(e.Message + "\n" + e.StackTrace);
+				if (Document.Current != null) {
+					if (Document.Current.History.IsTransactionActive) {
+						Document.Current.History.RollbackTransactionFromBeginning();
+					}
+					var closeConfirmation = Document.CloseConfirmation;
+					try {
+						Document.CloseConfirmation = doc => {
+							var alert = new AlertDialog($"Save the changes to document '{doc.Path}' before closing?", "Yes", "No");
+							switch (alert.Show()) {
+								case 0: return Document.CloseAction.SaveChanges;
+								default: return Document.CloseAction.DiscardChanges;
+							}
+						};
+						var path = Document.Current.Path;
+						Project.Current.CloseDocument(Document.Current);
+						Project.Current.OpenDocument(path);
+					} catch (System.Exception) {
+						Document.CloseConfirmation = closeConfirmation;
+					}
+				}
+			};
 			DocumentHistory.Processors.AddRange(new IOperationProcessor[] {
 				new Core.Operations.SelectRow.Processor(),
 				new Core.Operations.SetProperty.Processor(),
@@ -428,23 +450,23 @@ namespace Tangerine
 			h.Connect(Tools.FitToContent, new FitToContent());
 			h.Connect(Tools.FlipX, new FlipX());
 			h.Connect(Tools.FlipY, new FlipY());
-			h.Connect(Command.Copy, Core.Operations.Copy.CopyToClipboard, IsCopyPasteAllowedForSelection);
-			h.Connect(Command.Cut, Core.Operations.Cut.Perform, IsCopyPasteAllowedForSelection);
-			h.Connect(Command.Paste, Paste, Document.HasCurrent);
-			h.Connect(Command.Delete, Core.Operations.Delete.Perform, IsCopyPasteAllowedForSelection);
-			h.Connect(Command.SelectAll, () => {
+			h.Connect(Command.Copy, new DocumentDelegateCommandHandler(Core.Operations.Copy.CopyToClipboard, IsCopyPasteAllowedForSelection));
+			h.Connect(Command.Cut, new DocumentDelegateCommandHandler(Core.Operations.Cut.Perform, IsCopyPasteAllowedForSelection));
+			h.Connect(Command.Paste, new DocumentDelegateCommandHandler(Paste, Document.HasCurrent));
+			h.Connect(Command.Delete, new DocumentDelegateCommandHandler(Core.Operations.Delete.Perform, IsCopyPasteAllowedForSelection));
+			h.Connect(Command.SelectAll, new DocumentDelegateCommandHandler(() => {
 				foreach (var row in Document.Current.Rows) {
 					Core.Operations.SelectRow.Perform(row, true);
 				}
-			}, () => Document.Current?.Rows.Count > 0);
+			}, () => Document.Current?.Rows.Count > 0));
 			h.Connect(Command.Undo, () => Document.Current.History.Undo(), () => Document.Current?.History.CanUndo() ?? false);
 			h.Connect(Command.Redo, () => Document.Current.History.Redo(), () => Document.Current?.History.CanRedo() ?? false);
-			h.Connect(OrangeCommands.Run, () => WidgetContext.Current.Root.Tasks.Add(OrangeTask));
-			h.Connect(OrangeCommands.OptionsDialog, () => new OrangePluginOptionsDialog());
+			h.Connect(OrangeCommands.Run, new DocumentDelegateCommandHandler(() => WidgetContext.Current.Root.Tasks.Add(OrangeTask)));
+			h.Connect(OrangeCommands.OptionsDialog, new DocumentDelegateCommandHandler(() => new OrangePluginOptionsDialog()));
 			h.Connect(SceneViewCommands.SnapWidgetBorderToRuler, new SnapWidgetBorderCommandHandler());
 			h.Connect(SceneViewCommands.SnapWidgetPivotToRuler, new SnapWidgetPivotCommandHandler());
 			h.Connect(SceneViewCommands.SnapRulerLinesToWidgets, new SnapRulerLinesToWidgetCommandHandler());
-			h.Connect(SceneViewCommands.ClearActiveRuler, ClearActiveRuler);
+			h.Connect(SceneViewCommands.ClearActiveRuler, new DocumentDelegateCommandHandler(ClearActiveRuler));
 			h.Connect(SceneViewCommands.ManageRulers, new ManageRulers());
 		}
 
@@ -463,7 +485,7 @@ namespace Tangerine
 		private class SnapWidgetPivotCommandHandler : DocumentCommandHandler
 		{
 			public override bool GetChecked() => UI.SceneView.SceneUserPreferences.Instance.SnapWidgetPivotToRuler;
-			public override void Execute()
+			public override void ExecuteTransaction()
 			{
 				var prefs = UI.SceneView.SceneUserPreferences.Instance;
 				prefs.SnapWidgetPivotToRuler = !prefs.SnapWidgetPivotToRuler;
@@ -473,7 +495,7 @@ namespace Tangerine
 		private class SnapWidgetBorderCommandHandler : DocumentCommandHandler
 		{
 			public override bool GetChecked() => UI.SceneView.SceneUserPreferences.Instance.SnapWidgetBorderToRuler;
-			public override void Execute()
+			public override void ExecuteTransaction()
 			{
 				var prefs = UI.SceneView.SceneUserPreferences.Instance;
 				prefs.SnapWidgetBorderToRuler = !prefs.SnapWidgetBorderToRuler;
@@ -483,7 +505,7 @@ namespace Tangerine
 		private class SnapRulerLinesToWidgetCommandHandler : DocumentCommandHandler
 		{
 			public override bool GetChecked() => UI.SceneView.SceneUserPreferences.Instance.SnapRulerLinesToWidgets;
-			public override void Execute()
+			public override void ExecuteTransaction()
 			{
 				var prefs = UI.SceneView.SceneUserPreferences.Instance;
 				prefs.SnapRulerLinesToWidgets = !prefs.SnapRulerLinesToWidgets;
@@ -506,13 +528,11 @@ namespace Tangerine
 
 		static void Paste()
 		{
-			Document.Current.History.BeginTransaction();
 			try {
 				Core.Operations.Paste.Perform();
 			} catch (InvalidOperationException e) {
+				Document.Current.History.RollbackTransaction();	
 				AlertDialog.Show(e.Message);
-			} finally {
-				Document.Current.History.EndTransaction();
 			}
 		}
 

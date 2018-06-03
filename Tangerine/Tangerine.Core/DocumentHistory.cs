@@ -1,121 +1,209 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Lime;
 
 namespace Tangerine.Core
 {
 	public class DocumentHistory
 	{
-		private int transactionCounter;
-		private long currentBatchId;
-		private long transactionBatchId;
+		public static readonly ProcessorList Processors = new ProcessorList();
 		private readonly List<IOperation> operations = new List<IOperation>();
-		private int headPos;
-		private int savePos;
-
-		public static readonly List<IOperationProcessor> Processors = new List<IOperationProcessor>();
-
-		public bool CanUndo() => headPos > 0;
-		public bool CanRedo() => headPos < operations.Count;
+		private readonly List<IOperation> operationStash = new List<IOperation>();
+		private int transactionId;
+		private int saveIndex;
+		private int headIndex;
+		private int stashHeadIndex;
+		private int transactionStartIndex = -1;
+		private int transactionRollbackPointIndex = -1;
+		private bool transactionCommited;
+		
+		public bool CanUndo() => !IsTransactionActive && headIndex > 0;
+		public bool CanRedo() => !IsTransactionActive && (headIndex < operations.Count || operationStash.Count > 0);
 		public bool IsDocumentModified { get; private set; }
-
-		public event Action Changed;
-
-		public void NextBatch()
+		public bool IsTransactionActive => transactionStartIndex != -1;
+		
+		public IDisposable BeginTransaction()
 		{
-			currentBatchId++;
+			if (IsTransactionActive) {
+				throw new InvalidOperationException("Nested transactions aren't allowed");
+			}
+			transactionId++;
+			transactionStartIndex = headIndex;
+			transactionRollbackPointIndex = headIndex;
+			transactionCommited = false;
+			return new Disposable { OnDispose = EndTransaction };
 		}
-
-		public void BeginTransaction()
+		
+		public void SetRollbackPoint()
 		{
-			// increase batch index to recognize two transactions on the same frame as different (for RevertActiveTransaction)
-			NextBatch();
-			transactionCounter++;
-			transactionBatchId = currentBatchId;
+			transactionRollbackPointIndex = headIndex;
 		}
-
+		
+		private class Disposable : IDisposable
+		{
+			public Action OnDispose;
+			
+			public void Dispose() => OnDispose?.Invoke();
+		}
+		
 		public void EndTransaction()
 		{
-			transactionCounter--;
+			if (!IsTransactionActive) {
+				throw new InvalidOperationException("Transaction wasn't began");
+			}
+			if (!transactionCommited) {
+				RollbackTransactionFromBeginning();
+			}
+			transactionStartIndex = -1;
 		}
-
-		/// <summary>
-		/// Reverts operations created between BeginTransaction and EndTransaction, use it before EndTransaction
-		/// </summary>
-		public void RevertActiveTransaction()
+		
+		public void DoTransaction(Action block)
 		{
-			// revert only "new" operations between BeginTransaction and EndTransaction
-			if (transactionCounter == 0 || headPos <= 0 || operations[headPos - 1].BatchId != transactionBatchId) return;
-			Undo();
-			operations.RemoveRange(headPos, operations.Count - headPos);
+			using (BeginTransaction()) {
+				block();
+				CommitTransaction();
+			}
+		}
+		
+		public void DoTransactionMaybeNested(Action block)
+		{
+			if (IsTransactionActive) {
+				block();
+			} else {
+				using (BeginTransaction()) {
+					block();
+					CommitTransaction();
+				}
+			}
+		}
+		
+		public void CommitTransaction()
+		{
+			transactionCommited = true;
+		}
+		
+		public void RollbackTransactionFromBeginning()
+		{
+			RollbackTransactionFromIndex(transactionStartIndex);
+		}
+		
+		public void RollbackTransaction()
+		{
+			RollbackTransactionFromIndex(transactionRollbackPointIndex);
 		}
 
+		private void RollbackTransactionFromIndex(int index)
+		{
+			if (transactionCommited) {
+				throw new InvalidOperationException("Can't rollback committed transaction");
+			}
+			if (headIndex != index) {
+				for (; headIndex > index; headIndex--) {
+					Processors.Undo(operations[headIndex - 1]);
+				}
+				operations.RemoveRange(headIndex, operations.Count - headIndex);
+				OnChange();
+			}
+		}
+		
 		public void Perform(IOperation operation)
 		{
-			operation.BatchId = (transactionCounter > 0) ? transactionBatchId : currentBatchId;
-			if (savePos > headPos) {
-				savePos = -1;
+			if (!IsTransactionActive) {
+				throw new InvalidOperationException("Can't perform an operation outside a transaction block");
 			}
-			operations.RemoveRange(headPos, operations.Count - headPos);
+			operation.TransactionId = transactionId;
+			if (saveIndex > headIndex) {
+				saveIndex = -1;
+			}
+			if (headIndex < operations.Count) {
+				// Save current history tail just in case we redo it further.
+				operationStash.Clear();
+				stashHeadIndex = headIndex;
+				var tail = operations.GetRange(headIndex, operations.Count - headIndex);
+				if (tail.Any(i => i.IsChangingDocument)) {
+					operationStash.AddRange(tail);
+				}
+				operations.RemoveRange(headIndex, operations.Count - headIndex);
+			}
 			operations.Add(operation);
-			headPos = operations.Count;
-			foreach (var p in Processors) {
-				p.Do(operation);
-			}
+			headIndex = operations.Count;
+			Processors.Do(operation);
 			OnChange();
 		}
-
+		
 		public void Undo()
 		{
 			if (!CanUndo()) {
 				return;
 			}
-			long batchId = 0;
-			for (; headPos > 0; headPos--) {
-				var o = operations[headPos - 1];
-				if (o.IsChangingDocument && batchId == 0) {
-					batchId = o.BatchId;
+			int bid = 0;
+			for (; headIndex > 0; headIndex--) {
+				var o = operations[headIndex - 1];
+				if (o.IsChangingDocument && bid == 0) {
+					bid = o.TransactionId;
 				}
-				if (batchId > 0 && batchId != o.BatchId) {
+				if (bid > 0 && bid != o.TransactionId) {
 					break;
 				}
-				foreach (var p in Processors) {
-					p.Undo(o);
-				}
+				Processors.Undo(o);
 			}
 			OnChange();
 		}
-		
+
 		public void Redo()
 		{
 			if (!CanRedo()) {
 				return;
 			}
-			long batchId = 0;
-			for (; headPos < operations.Count; headPos++) {
-				var o = operations[headPos];
-				if (o.IsChangingDocument && batchId == 0) {
-					batchId = o.BatchId;
+			var tail = operations.GetRange(headIndex, operations.Count - headIndex);
+			if (tail.Any(i => i.IsChangingDocument)) {
+				// Current history tail has modifying operations, so no need in stashed operations.
+				operationStash.Clear();
+			}
+			if (operationStash.Count > 0) {
+				for (int i = headIndex; i > stashHeadIndex; i--) {
+					Processors.Undo(operations[i - 1]);
 				}
-				if (batchId > 0 && batchId != o.BatchId) {
+				operations.RemoveRange(headIndex, operations.Count - headIndex);
+				operations.AddRange(operationStash);
+				operationStash.Clear();
+			}
+			int bid = 0;
+			for (; headIndex < operations.Count; headIndex++) {
+				var o = operations[headIndex];
+				if (o.IsChangingDocument && bid == 0) {
+					bid = o.TransactionId;
+				}
+				if (bid > 0 && bid != o.TransactionId) {
 					break;
 				}
-				foreach (var p in Processors) {
-					p.Redo(o);
-				}
+				Processors.Redo(o);
 			}
 			OnChange();
 		}
-
+		
+		public void AddSavePoint()
+		{
+			for (saveIndex = headIndex; saveIndex > 0; saveIndex--) {
+				if (operations[saveIndex - 1].IsChangingDocument) {
+					break;
+				}
+			}
+			RefreshModifiedStatus();
+		}
+		
+		void OnChange()
+		{
+			RefreshModifiedStatus();
+			Application.InvalidateWindows();
+		}
+		
 		void RefreshModifiedStatus()
 		{
-			if (savePos < 0) {
-				IsDocumentModified = true;
-				return;
-			}
-			IsDocumentModified = savePos <= headPos ?
-				IsChangingOperationWithinRange(savePos, headPos) :
-				IsChangingOperationWithinRange(headPos, savePos);
+			IsDocumentModified = saveIndex < 0 || (saveIndex <= headIndex ? 
+				IsChangingOperationWithinRange(saveIndex, headIndex) : 
+				IsChangingOperationWithinRange(headIndex, saveIndex));
 		}
 
 		private bool IsChangingOperationWithinRange(int start, int end)
@@ -126,22 +214,36 @@ namespace Tangerine.Core
 			}
 			return false;
 		}
-
-		public void AddSavePoint()
+		
+		public interface ITransaction : IDisposable
 		{
-			for (savePos = headPos; savePos > 0; savePos--) {
-				if (operations[savePos - 1].IsChangingDocument) {
-					break;
-				}
-			}
-			RefreshModifiedStatus();
+			void Commit();
+			void CommitAndDispose();
+			void Rollback();
 		}
 
-		void OnChange()
-		{
-			RefreshModifiedStatus();
-			Lime.Application.InvalidateWindows();
-			Changed?.Invoke();
+		public class ProcessorList : List<IOperationProcessor> 
+		{					
+			public void Do(IOperation operation)
+			{
+				foreach (var p in this) {
+					p.Do(operation);
+				}
+			}
+
+			public void Undo(IOperation operation)
+			{
+				foreach (var p in this) {
+					p.Undo(operation);
+				}
+			}
+						
+			public void Redo(IOperation operation)
+			{
+				foreach (var p in this) {
+					p.Redo(operation);
+				}
+			}
 		}
 	}
 }

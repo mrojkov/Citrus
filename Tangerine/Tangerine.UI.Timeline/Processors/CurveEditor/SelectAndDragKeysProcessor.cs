@@ -22,8 +22,7 @@ namespace Tangerine.UI.Timeline
 			while (true) {
 				if (widget.IsMouseOver() && input.WasKeyPressed(Key.Mouse0)) {
 					input.ConsumeKey(Key.Mouse0);
-					Document.Current.History.BeginTransaction();
-					try {
+					using (Document.Current.History.BeginTransaction()) {
 						var initialMousePos = curveEditor.ContentWidget.LocalMousePosition();
 						var currentMousePos = initialMousePos;
 						var rectanglePresenter = new DelegatePresenter<Widget>(w => {
@@ -42,9 +41,7 @@ namespace Tangerine.UI.Timeline
 						}
 						curveEditor.ContentWidget.CompoundPostPresenter.Remove(rectanglePresenter);
 						Window.Current.Invalidate();
-
-					} finally {
-						Document.Current.History.EndTransaction();
+						Document.Current.History.CommitTransaction();
 					}
 				}
 				yield return null;

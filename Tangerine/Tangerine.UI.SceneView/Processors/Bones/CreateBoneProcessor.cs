@@ -62,20 +62,23 @@ namespace Tangerine.UI.SceneView
 					if (index == 0 && container.Width.Abs() > Mathf.ZeroTolerance && container.Height.Abs() > Mathf.ZeroTolerance) {
 						pos = initPosition;
 					}
-
-					Document.Current.History.BeginTransaction();
-					try {
-						while (sv.Input.IsMousePressed()) {
-							Document.Current.History.RevertActiveTransaction();
-
+					using (Document.Current.History.BeginTransaction()) {
+						try {
 							bone = (Bone) Core.Operations.CreateNode.Perform(typeof(Bone));
-							bone.Index = boneIndex;
-							Core.Operations.SetProperty.Perform(bone, nameof(Bone.Position), pos);
-							Core.Operations.SetProperty.Perform(bone, nameof(Bone.BaseIndex), index);
-							Core.Operations.SelectNode.Perform(bone);
-							if (bone.BaseIndex != 0) {
-								Core.Operations.SortBonesInChain.Perform(bone);
-							}
+						} catch (InvalidOperationException e) {
+							AlertDialog.Show(e.Message);
+							break;
+						}
+						bone.Index = boneIndex;
+						Core.Operations.SetProperty.Perform(bone, nameof(Bone.Position), pos);
+						Core.Operations.SetProperty.Perform(bone, nameof(Bone.BaseIndex), index);
+						Core.Operations.SelectNode.Perform(bone);
+						if (bone.BaseIndex != 0) {
+							Core.Operations.SortBonesInChain.Perform(bone);
+						}
+						Document.Current.History.SetRollbackPoint();
+						while (sv.Input.IsMousePressed()) {
+							Document.Current.History.RollbackTransaction();
 
 							var dir = (sv.MousePosition * t - initPosition).Snap(Vector2.Zero);
 							var angle = dir.Atan2Deg;
@@ -87,24 +90,20 @@ namespace Tangerine.UI.SceneView
 							Core.Operations.SetProperty.Perform(bone, nameof(Bone.Length), dir.Length);
 							yield return null;
 						}
-					} finally {
 						// do not create zero bone
 						if (bone != null && bone.Length == 0) {
-							Document.Current.History.RevertActiveTransaction();
+							Document.Current.History.RollbackTransactionFromBeginning();
 							// must set length to zero to exectue "break;" later 
 							bone.Length = 0;
 						}
-
-						Document.Current.History.EndTransaction();
-						SceneView.Instance.Components.Remove<CreateBoneHelper>();
+						Document.Current.History.CommitTransaction();
 					}
+					SceneView.Instance.Components.Remove<CreateBoneHelper>();
 				}
-
 				// turn off creation if was only click without drag (zero length bone)
 				if (bone != null && bone.Length == 0) {
 					break;
 				}
-
 				if (sv.Input.WasMousePressed(1)) {
 					break;
 				}

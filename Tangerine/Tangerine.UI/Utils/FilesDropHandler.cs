@@ -71,8 +71,7 @@ namespace Tangerine.UI
 		private void Handle(IEnumerable<string> files)
 		{
 			Handling?.Invoke();
-			Document.Current.History.BeginTransaction();
-			try {
+			using (Document.Current.History.BeginTransaction()) {
 				pendingImages = new List<string>();
 				foreach (var file in files) {
 					try {
@@ -136,8 +135,7 @@ namespace Tangerine.UI
 					}
 					menu.Popup();
 				}
-			} finally {
-				Document.Current.History.EndTransaction();
+				Document.Current.History.CommitTransaction();	
 			}
 		}
 
@@ -146,8 +144,7 @@ namespace Tangerine.UI
 			foreach (var kv in imageDropCommands.Commands) {
 				if (pendingImages != null && kv.Key.WasIssued()) {
 					kv.Key.Consume();
-					Document.Current.History.BeginTransaction();
-					try {
+					using (Document.Current.History.BeginTransaction()) {
 						foreach (var assetPath in pendingImages) {
 							var node = CreateNode.Perform(kv.Value);
 							var texture = new SerializableTexture(assetPath);
@@ -165,8 +162,7 @@ namespace Tangerine.UI
 							}
 							OnNodeCreated(node);
 						}
-					} finally {
-						Document.Current.History.EndTransaction();
+						Document.Current.History.CommitTransaction();
 						pendingImages = null;
 					}
 				} else {

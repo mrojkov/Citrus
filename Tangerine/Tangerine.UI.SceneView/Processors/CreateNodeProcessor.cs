@@ -13,7 +13,9 @@ namespace Tangerine.UI.SceneView
 				Type type;
 				if (CreateNodeRequestComponent.Consume<Node>(SceneView.Instance.Components, out type)) {
 					try {
-						Core.Operations.CreateNode.Perform(type);
+						Document.Current.History.DoTransaction(() => {
+							Core.Operations.CreateNode.Perform(type);
+						});
 					} catch (InvalidOperationException e) {
 						AlertDialog.Show(e.Message);
 					}

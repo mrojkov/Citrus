@@ -35,13 +35,12 @@ namespace Tangerine.UI.SceneView
 
 		IEnumerator<object> Drag(List<PointObject> pobjects)
 		{
-			Document.Current.History.BeginTransaction();
-			try {
+			using (Document.Current.History.BeginTransaction()) {
 				var iniMousePos = sv.MousePosition;
 				var transform = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
 				var dragDirection = DragDirection.Any;
 				while (sv.Input.IsMousePressed()) {
-					Document.Current.History.RevertActiveTransaction();
+					Document.Current.History.RollbackTransaction();
 
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					var curMousePos = sv.MousePosition;
@@ -76,9 +75,8 @@ namespace Tangerine.UI.SceneView
 					}
 					yield return null;
 				}
-			} finally {
 				sv.Input.ConsumeKey(Key.Mouse0);
-				Document.Current.History.EndTransaction();
+				Document.Current.History.CommitTransaction();
 			}
 		}
 

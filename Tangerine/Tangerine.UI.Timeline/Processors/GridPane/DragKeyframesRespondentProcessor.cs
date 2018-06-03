@@ -17,9 +17,11 @@ namespace Tangerine.UI.Timeline
 			while (true) {
 				var r = g.Get<DragKeyframesRequest>();
 				if (r != null) {
-					DragKeys(r.Offset, r.RemoveOriginals);
-					ShiftSelection(r.Offset);
-					g.Remove<DragKeyframesRequest>();
+					Document.Current.History.DoTransaction(() => {
+						DragKeys(r.Offset, r.RemoveOriginals);
+						ShiftSelection(r.Offset);
+						g.Remove<DragKeyframesRequest>();
+					});
 				}
 				yield return null;
 			}
@@ -81,13 +83,8 @@ namespace Tangerine.UI.Timeline
 					}
 				}
 			}
-			Document.Current.History.BeginTransaction();
-			try {
-				foreach (var o in operations) {
-					o();
-				}
-			} finally {
-				Document.Current.History.EndTransaction();
+			foreach (var o in operations) {
+				o();
 			}
 		}
 

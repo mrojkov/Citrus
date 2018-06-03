@@ -31,8 +31,7 @@ namespace Tangerine.UI.SceneView
 						Renderer.DrawRectOutline(rect.A * t, rect.B * t, ColorTheme.Current.SceneView.MouseSelection);
 					});
 					sceneView.Frame.CompoundPostPresenter.Add(presenter);
-					Document.Current.History.BeginTransaction();
-					try {
+					using (Document.Current.History.BeginTransaction()) {
 						var clicked = true;
 						var selectedNodes = Document.Current.SelectedNodes().Editable().ToList();
 						while (input.IsMousePressed()) {
@@ -69,9 +68,8 @@ namespace Tangerine.UI.SceneView
 						}
 						sceneView.Frame.CompoundPostPresenter.Remove(presenter);
 						CommonWindow.Current.Invalidate();
-					} finally {
 						input.ConsumeKey(Key.Mouse0);
-						Document.Current.History.EndTransaction();
+						Document.Current.History.CommitTransaction();
 					}
 				}
 				yield return null;

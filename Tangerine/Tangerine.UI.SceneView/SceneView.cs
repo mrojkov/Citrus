@@ -34,38 +34,45 @@ namespace Tangerine.UI.SceneView
 
 		public static void RegisterGlobalCommands()
 		{
-			var h = CommandHandlerList.Global;
-			h.Connect(SceneViewCommands.PreviewAnimation, new PreviewAnimationHandler(false));
-			h.Connect(SceneViewCommands.PreviewAnimationWithTriggeringOfMarkers, new PreviewAnimationHandler(true));
-			h.Connect(SceneViewCommands.DragUp, () => DragNodes(new Vector2(0, -1)));
-			h.Connect(SceneViewCommands.DragDown, () => DragNodes(new Vector2(0, 1)));
-			h.Connect(SceneViewCommands.DragLeft, () => DragNodes(new Vector2(-1, 0)));
-			h.Connect(SceneViewCommands.DragRight, () => DragNodes(new Vector2(1, 0)));
-			h.Connect(SceneViewCommands.DragUpFast, () => DragNodes(new Vector2(0, -5)));
-			h.Connect(SceneViewCommands.DragDownFast, () => DragNodes(new Vector2(0, 5)));
-			h.Connect(SceneViewCommands.DragLeftFast, () => DragNodes(new Vector2(-5, 0)));
-			h.Connect(SceneViewCommands.DragRightFast, () => DragNodes(new Vector2(5, 0)));
-			h.Connect(SceneViewCommands.Duplicate, DuplicateNodes,
+			ConnectCommand(SceneViewCommands.PreviewAnimation, new PreviewAnimationHandler(false));
+			ConnectCommand(SceneViewCommands.PreviewAnimationWithTriggeringOfMarkers, new PreviewAnimationHandler(true));
+			ConnectCommand(SceneViewCommands.DragUp, () => DragNodes(new Vector2(0, -1)));
+			ConnectCommand(SceneViewCommands.DragDown, () => DragNodes(new Vector2(0, 1)));
+			ConnectCommand(SceneViewCommands.DragLeft, () => DragNodes(new Vector2(-1, 0)));
+			ConnectCommand(SceneViewCommands.DragRight, () => DragNodes(new Vector2(1, 0)));
+			ConnectCommand(SceneViewCommands.DragUpFast, () => DragNodes(new Vector2(0, -5)));
+			ConnectCommand(SceneViewCommands.DragDownFast, () => DragNodes(new Vector2(0, 5)));
+			ConnectCommand(SceneViewCommands.DragLeftFast, () => DragNodes(new Vector2(-5, 0)));
+			ConnectCommand(SceneViewCommands.DragRightFast, () => DragNodes(new Vector2(5, 0)));
+			ConnectCommand(SceneViewCommands.Duplicate, DuplicateNodes,
 				() => Document.Current?.TopLevelSelectedRows().Any(row => row.IsCopyPasteAllowed()) ?? false);
-			h.Connect(SceneViewCommands.DisplayBones, new DisplayBones());
-			h.Connect(SceneViewCommands.DisplayPivotsForAllWidgets, new DisplayPivotsForAllWidgets());
-			h.Connect(SceneViewCommands.DisplayPivotsForInvisibleWidgets, new DisplayPivotsForInvisibleWidgets());
-			h.Connect(SceneViewCommands.TieWidgetsWithBones, TieWidgetsWithBones);
-			h.Connect(SceneViewCommands.UntieWidgetsFromBones, UntieWidgetsFromBones);
-			h.Connect(SceneViewCommands.ToggleDisplayRuler, new DisplayRuler());
-			h.Connect(SceneViewCommands.SaveCurrentRuler, new SaveRuler());
+			ConnectCommand(SceneViewCommands.DisplayBones, new DisplayBones());
+			ConnectCommand(SceneViewCommands.DisplayPivotsForAllWidgets, new DisplayPivotsForAllWidgets());
+			ConnectCommand(SceneViewCommands.DisplayPivotsForInvisibleWidgets, new DisplayPivotsForInvisibleWidgets());
+			ConnectCommand(SceneViewCommands.TieWidgetsWithBones, TieWidgetsWithBones);
+			ConnectCommand(SceneViewCommands.UntieWidgetsFromBones, UntieWidgetsFromBones);
+			ConnectCommand(SceneViewCommands.ToggleDisplayRuler, new DisplayRuler());
+			ConnectCommand(SceneViewCommands.SaveCurrentRuler, new SaveRuler());
+		}
+		
+		private static void ConnectCommand(ICommand command, DocumentCommandHandler handler)
+		{
+			CommandHandlerList.Global.Connect(command, handler);
+		}
+		
+		private static void ConnectCommand(ICommand command, Action action, Func<bool> enableChecker = null)
+		{
+			CommandHandlerList.Global.Connect(command, new DocumentDelegateCommandHandler(action, enableChecker));
 		}
 
 		private static void DuplicateNodes()
 		{
-			Document.Current.History.BeginTransaction();
 			var text = Clipboard.Text;
 			try {
 				Copy.CopyToClipboard();
 				Paste.Perform();
 			} finally {
 				Clipboard.Text = text;
-				Document.Current.History.EndTransaction();
 			}
 		}
 
@@ -76,28 +83,23 @@ namespace Tangerine.UI.SceneView
 			if (widgets.Count == 0) {
 				return;
 			}
-			Document.Current.History.BeginTransaction();
-			try {
-				foreach (var widget in widgets) {
-					if (widget is DistortionMesh) {
-						var mesh = widget as DistortionMesh;
-						foreach (PointObject point in mesh.Nodes) {
-							Core.Operations.SetAnimableProperty.Perform(point, nameof(PointObject.SkinningWeights),
-								CalcSkinningWeight(point.CalcPositionInSpaceOf(widget.ParentWidget), bones), CoreUserPreferences.Instance.AutoKeyframes);
-						}
-					} else {
-						Core.Operations.SetAnimableProperty.Perform(widget, nameof(PointObject.SkinningWeights),
-							CalcSkinningWeight(widget.Position, bones), CoreUserPreferences.Instance.AutoKeyframes);
+			foreach (var widget in widgets) {
+				if (widget is DistortionMesh) {
+					var mesh = widget as DistortionMesh;
+					foreach (PointObject point in mesh.Nodes) {
+						SetAnimableProperty.Perform(point, nameof(PointObject.SkinningWeights),
+							CalcSkinningWeight(point.CalcPositionInSpaceOf(widget.ParentWidget), bones), CoreUserPreferences.Instance.AutoKeyframes);
 					}
+				} else {
+					SetAnimableProperty.Perform(widget, nameof(PointObject.SkinningWeights),
+						CalcSkinningWeight(widget.Position, bones), CoreUserPreferences.Instance.AutoKeyframes);
 				}
-				foreach (var bone in bones) {
-					var entry = bone.Parent.AsWidget.BoneArray[bone.Index];
-					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.RefPosition), entry.Joint, CoreUserPreferences.Instance.AutoKeyframes);
-					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.RefLength), entry.Length, CoreUserPreferences.Instance.AutoKeyframes);
-					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.RefRotation), entry.Rotation, CoreUserPreferences.Instance.AutoKeyframes);
-				}
-			} finally {
-				Document.Current.History.EndTransaction();
+			}
+			foreach (var bone in bones) {
+				var entry = bone.Parent.AsWidget.BoneArray[bone.Index];
+				SetAnimableProperty.Perform(bone, nameof(Bone.RefPosition), entry.Joint, CoreUserPreferences.Instance.AutoKeyframes);
+				SetAnimableProperty.Perform(bone, nameof(Bone.RefLength), entry.Length, CoreUserPreferences.Instance.AutoKeyframes);
+				SetAnimableProperty.Perform(bone, nameof(Bone.RefRotation), entry.Rotation, CoreUserPreferences.Instance.AutoKeyframes);
 			}
 		}
 
@@ -331,7 +333,7 @@ namespace Tangerine.UI.SceneView
 					   ProjectUserPreferences.Instance.ActiveRuler.Lines.Count > 0;
 			}
 
-			public override void Execute()
+			public override void ExecuteTransaction()
 			{
 				var ruler = ProjectUserPreferences.Instance.ActiveRuler;
 				if (!new SaveRulerDialog(ruler).Show()) {
@@ -357,7 +359,7 @@ namespace Tangerine.UI.SceneView
 		{
 			public override bool GetChecked() => ProjectUserPreferences.Instance.RulerVisible;
 
-			public override void Execute()
+			public override void ExecuteTransaction()
 			{
 				ProjectUserPreferences.Instance.RulerVisible = !ProjectUserPreferences.Instance.RulerVisible;
 			}
@@ -367,7 +369,7 @@ namespace Tangerine.UI.SceneView
 		{
 			public override bool GetChecked() => SceneUserPreferences.Instance.Bones3DVisible;
 
-			public override void Execute()
+			public override void ExecuteTransaction()
 			{
 				SceneUserPreferences.Instance.Bones3DVisible = !SceneUserPreferences.Instance.Bones3DVisible;
 				CommonWindow.Current.Invalidate();
@@ -376,7 +378,7 @@ namespace Tangerine.UI.SceneView
 
 		private class DisplayPivotsForAllWidgets : DocumentCommandHandler
 		{
-			public override void Execute()
+			public override void ExecuteTransaction()
 			{
 				SceneUserPreferences.Instance.DisplayPivotsForAllWidgets = !SceneUserPreferences.Instance.DisplayPivotsForAllWidgets;
 				CommonWindow.Current.Invalidate();
@@ -390,7 +392,7 @@ namespace Tangerine.UI.SceneView
 
 		private class DisplayPivotsForInvisibleWidgets : DocumentCommandHandler
 		{
-			public override void Execute()
+			public override void ExecuteTransaction()
 			{
 				SceneUserPreferences.Instance.DisplayPivotsForInvisibleWidgets = !SceneUserPreferences.Instance.DisplayPivotsForInvisibleWidgets;
 				CommonWindow.Current.Invalidate();

@@ -77,19 +77,19 @@ namespace Tangerine.UI.Timeline
 		ToolbarButton CreateNewFolderButton()
 		{
 			var button = new ToolbarButton(IconPool.GetTexture("Tools.NewFolder")) { Tip = "Create folder" };
-			button.Clicked += () => {
+			button.AddTransactionClickHandler(() => {
 				var newFolder = new Folder { Id = "Folder" };
 				Core.Operations.InsertFolderItem.Perform(newFolder);
 				Core.Operations.ClearRowSelection.Perform();
 				Core.Operations.SelectRow.Perform(Document.Current.GetRowForObject(newFolder));
-			};
+			});
 			return button;
 		}
 
 		ToolbarButton CreateExitButton()
 		{
 			var button = new ToolbarButton(IconPool.GetTexture("Timeline.ExitContainer")) { Tip = "Exit current container (backspace)" };
-			button.Clicked += Core.Operations.LeaveNode.Perform;
+			button.AddTransactionClickHandler(Core.Operations.LeaveNode.Perform);
 			button.Updating += _ => button.Enabled = Core.Operations.LeaveNode.IsAllowed();
 			return button;
 		}
@@ -97,7 +97,7 @@ namespace Tangerine.UI.Timeline
 		ToolbarButton CreateEyeButton()
 		{
 			var button = new ToolbarButton(IconPool.GetTexture("Timeline.Eye")) { Tip = "Show widgets" };
-			button.Clicked += () => {
+			button.AddTransactionClickHandler(() => {
 				var nodes = !RootWidget.Input.IsKeyPressed(Key.Shift) ? Document.Current.Container.Nodes.ToList() : Document.Current.SelectedNodes().ToList();
 				var visibility = NodeVisibility.Hidden;
 				if (nodes.All(i => i.EditorState().Visibility == NodeVisibility.Hidden)) {
@@ -108,27 +108,27 @@ namespace Tangerine.UI.Timeline
 				foreach (var node in nodes) {
 					Core.Operations.SetProperty.Perform(node.EditorState(), nameof(NodeEditorState.Visibility), visibility);
 				}
-			};
+			});
 			return button;
 		}
 
 		ToolbarButton CreateLockButton()
 		{
 			var button = new ToolbarButton(IconPool.GetTexture("Timeline.Lock")) { Tip = "Lock widgets" };
-			button.Clicked += () => {
+			button.AddTransactionClickHandler(() => {
 				var nodes = !RootWidget.Input.IsKeyPressed(Key.Shift) ? Document.Current.Container.Nodes.ToList() : Document.Current.SelectedNodes().ToList();
 				var locked = nodes.All(i => !i.EditorState().Locked);
 				foreach (var node in nodes) {
 					Core.Operations.SetProperty.Perform(node.EditorState(), nameof(NodeEditorState.Locked), locked);
 				}
-			};
+			});
 			return button;
 		}
 
 		ToolbarButton CreateLockAnimationButton()
 		{
 			var button = new ToolbarButton(IconPool.GetTexture("Timeline.AnimationEnabled")) { Tip = "Lock animation" };
-			button.Clicked += () => {
+			button.AddTransactionClickHandler(() => {
 				var nodes = !RootWidget.Input.IsKeyPressed(Key.Shift) ? Document.Current.Container.Nodes.ToList() : Document.Current.SelectedNodes().ToList();
 				var enable = !nodes.All(IsAnimationEnabled);
 				foreach (var node in nodes) {
@@ -136,7 +136,7 @@ namespace Tangerine.UI.Timeline
 						Core.Operations.SetProperty.Perform(animator, nameof(IAnimator.Enabled), enable);
 					}
 				}
-			};
+			});
 			return button;
 		}
 

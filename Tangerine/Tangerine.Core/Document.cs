@@ -236,9 +236,12 @@ namespace Tangerine.Core
 		private void SelectFirstRowIfNoneSelected()
 		{
 			if (!SelectedRows().Any()) {
-				Operations.Dummy.Perform();
-				if (Rows.Count > 0) {
-					Operations.SelectRow.Perform(Rows[0]);
+				using (History.BeginTransaction()) {
+					Operations.Dummy.Perform();
+					if (Rows.Count > 0) {
+						Operations.SelectRow.Perform(Rows[0]);
+					}
+					History.CommitTransaction();
 				}
 			}
 		}

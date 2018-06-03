@@ -9,7 +9,7 @@ namespace Tangerine
 {
 	public class CenterHorizontally : DocumentCommandHandler
 	{
-		public override void Execute()
+		public override void ExecuteTransaction()
 		{
 			Rectangle aabb;
 			var container = (Widget)Core.Document.Current.Container;
@@ -37,7 +37,7 @@ namespace Tangerine
 
 	public class CenterVertically : DocumentCommandHandler
 	{
-		public override void Execute()
+		public override void ExecuteTransaction()
 		{
 			Rectangle aabb;
 			var container = (Widget)Core.Document.Current.Container;
@@ -65,7 +65,7 @@ namespace Tangerine
 
 	public class AlignCentersHorizontally : DocumentCommandHandler
 	{
-		public override void Execute()
+		public override void ExecuteTransaction()
 		{
 			Rectangle aabb;
 			var container = (Widget)Core.Document.Current.Container;
@@ -92,7 +92,7 @@ namespace Tangerine
 
 	public class AlignCentersVertically : DocumentCommandHandler
 	{
-		public override void Execute()
+		public override void ExecuteTransaction()
 		{
 			Rectangle aabb;
 			var container = (Widget)Core.Document.Current.Container;
@@ -119,7 +119,7 @@ namespace Tangerine
 
 	public class AlignTop : DocumentCommandHandler
 	{
-		public override void Execute()
+		public override void ExecuteTransaction()
 		{
 			Rectangle aabb;
 			var container = (Widget)Core.Document.Current.Container;
@@ -146,7 +146,7 @@ namespace Tangerine
 
 	public class AlignBottom : DocumentCommandHandler
 	{
-		public override void Execute()
+		public override void ExecuteTransaction()
 		{
 			Rectangle aabb;
 			var container = (Widget)Core.Document.Current.Container;
@@ -173,7 +173,7 @@ namespace Tangerine
 
 	public class AlignLeft : DocumentCommandHandler
 	{
-		public override void Execute()
+		public override void ExecuteTransaction()
 		{
 			Rectangle aabb;
 			var container = (Widget)Core.Document.Current.Container;
@@ -200,7 +200,7 @@ namespace Tangerine
 
 	public class AlignRight : DocumentCommandHandler
 	{
-		public override void Execute()
+		public override void ExecuteTransaction()
 		{
 			Rectangle aabb;
 			var container = (Widget)Core.Document.Current.Container;

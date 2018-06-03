@@ -26,16 +26,18 @@ namespace Tangerine.UI.Timeline
 
 		void RootWidget_DoubleClick(WidgetInput input, Key key)
 		{
-			var timeline = Timeline.Instance;
-			var marker = Document.Current.Container.Markers.FirstOrDefault(
-				i => i.Frame == timeline.CurrentColumn);
-			var newMarker = marker?.Clone() ?? new Marker { Frame = timeline.CurrentColumn };
-			var r = new MarkerPropertiesDialog().Show(newMarker, canDelete: marker != null);
-			if (r == MarkerPropertiesDialog.Result.Ok) {
-				Core.Operations.SetMarker.Perform(Document.Current.Container, newMarker, true);
-			} else if (r == MarkerPropertiesDialog.Result.Delete) {
-				Core.Operations.DeleteMarker.Perform(Document.Current.Container, marker, true);
-			}
+			Document.Current.History.DoTransaction(() => {
+				var timeline = Timeline.Instance;
+				var marker = Document.Current.Container.Markers.FirstOrDefault(
+					i => i.Frame == timeline.CurrentColumn);
+				var newMarker = marker?.Clone() ?? new Marker { Frame = timeline.CurrentColumn };
+				var r = new MarkerPropertiesDialog().Show(newMarker, canDelete: marker != null);
+				if (r == MarkerPropertiesDialog.Result.Ok) {
+					Core.Operations.SetMarker.Perform(Document.Current.Container, newMarker, true);
+				} else if (r == MarkerPropertiesDialog.Result.Delete) {
+					Core.Operations.DeleteMarker.Perform(Document.Current.Container, marker, true);
+				}
+			});
 			// To prevent RulerbarMouseScroll.
 			RootWidget.Input.ConsumeKey(Key.Mouse0);
 		}
@@ -137,12 +139,9 @@ namespace Tangerine.UI.Timeline
 				var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(text));
 				var m = Serialization.ReadObject<Marker>(Document.Current.Path, stream);
 				m.Frame = frameUnderMouse;
-				Document.Current.History.BeginTransaction();
-				try {
+				Document.Current.History.DoTransaction(() => {
 					SetMarker.Perform(Document.Current.Container, m, true);
-				} finally {
-					Document.Current.History.EndTransaction();
-				}
+				});
 			} catch (System.Exception e) {
 				Debug.Write(e);
 			}
@@ -150,12 +149,9 @@ namespace Tangerine.UI.Timeline
 
 		private static void DeleteMarker(Marker marker)
 		{
-			Document.Current.History.BeginTransaction();
-			try {
+			Document.Current.History.DoTransaction(() => {
 				Core.Operations.DeleteMarker.Perform(Document.Current.Container, marker, true);
-			} finally {
-				Document.Current.History.EndTransaction();
-			}
+			});
 		}
 
 		public static void CopyMarkers()
@@ -184,12 +180,14 @@ namespace Tangerine.UI.Timeline
 		public static void PasteMarkers()
 		{
 			try {
-				var text = Clipboard.Text;
-				var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(text));
-				var frame = Serialization.ReadObject<Frame>(Document.Current.Path, stream);
-				foreach (var marker in frame.Markers) {
-					SetMarker.Perform(Document.Current.Container, marker, true);
-				}
+				Document.Current.History.DoTransaction(() => {
+					var text = Clipboard.Text;
+					var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(text));
+					var frame = Serialization.ReadObject<Frame>(Document.Current.Path, stream);
+					foreach (var marker in frame.Markers) {
+						SetMarker.Perform(Document.Current.Container, marker, true);
+					}
+				});
 			} catch (System.Exception e) {
 				Debug.Write(e);
 			}
@@ -197,10 +195,12 @@ namespace Tangerine.UI.Timeline
 
 		public static void DeleteMarkers()
 		{
-			var timeline = Timeline.Instance;
-			foreach (var marker in Document.Current.Container.Markers.ToList()) {
-				Core.Operations.DeleteMarker.Perform(Document.Current.Container, marker, true);
-			}
+			Document.Current.History.DoTransaction(() => {
+				var timeline = Timeline.Instance;
+				foreach (var marker in Document.Current.Container.Markers.ToList()) {
+					Core.Operations.DeleteMarker.Perform(Document.Current.Container, marker, true);
+				}
+			});
 		}
 
 		class ContextMenu

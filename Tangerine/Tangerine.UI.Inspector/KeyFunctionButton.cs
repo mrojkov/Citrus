@@ -54,7 +54,9 @@ namespace Tangerine.UI.Inspector
 					}
 				}
 				if (button.WasClicked()) {
-					SetKeyFunction(NextKeyFunction(v.GetValueOrDefault()));
+					Document.Current.History.DoTransaction(() => {
+						SetKeyFunction(NextKeyFunction(v.GetValueOrDefault()));
+					});
 				}
 				yield return null;
 			}

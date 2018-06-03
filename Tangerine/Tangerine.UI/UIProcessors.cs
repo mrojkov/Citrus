@@ -16,8 +16,7 @@ namespace Tangerine.UI
 			yield return null;
 			while (true) {
 				if (drag.WasBegan()) {
-					Document.Current.History.BeginTransaction();
-					try {
+					using (Document.Current.History.BeginTransaction()) {
 						input.ConsumeKey(Key.Mouse0);
 						WidgetContext.Current.Root.Input.ConsumeKey(Key.Mouse0);
 						while (!drag.WasEnded()) {
@@ -26,9 +25,7 @@ namespace Tangerine.UI
 							yield return null;
 						}
 						Utils.ChangeCursorIfDefault(MouseCursor.Default);
-
-					} finally {
-						Document.Current.History.EndTransaction();
+						Document.Current.History.CommitTransaction();
 					}
 				}
 				yield return null;

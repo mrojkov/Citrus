@@ -12,31 +12,35 @@ namespace Tangerine.UI.Timeline
 	{
 		public static void Bind()
 		{
-			var h = CommandHandlerList.Global;
-			h.Connect(TimelineCommands.EnterNode, () => {
+			ConnectCommand(TimelineCommands.EnterNode, () => {
 				var node = Document.Current.SelectedNodes().FirstOrDefault();
 				if (node != null) {
-					Core.Operations.EnterNode.Perform(node);
+					EnterNode.Perform(node);
 				}
 			}, Document.HasCurrent);
-			h.Connect(TimelineCommands.RenameRow, () => RenameCurrentRow(), Document.HasCurrent);
-			h.Connect(TimelineCommands.ExitNode, Core.Operations.LeaveNode.Perform, Document.HasCurrent);
-			h.Connect(TimelineCommands.ScrollUp, () => SelectRow(-1, false), Document.HasCurrent);
-			h.Connect(TimelineCommands.ScrollDown, () => SelectRow(1, false), Document.HasCurrent);
-			h.Connect(TimelineCommands.SelectUp, () => SelectRow(-1, true), Document.HasCurrent);
-			h.Connect(TimelineCommands.SelectDown, () => SelectRow(1, true), Document.HasCurrent);
-			h.Connect(TimelineCommands.ScrollLeft, () => AdvanceCurrentColumn(-1), Document.HasCurrent);
-			h.Connect(TimelineCommands.ScrollRight, () => AdvanceCurrentColumn(1), Document.HasCurrent);
-			h.Connect(TimelineCommands.FastScrollLeft, () => AdvanceCurrentColumn(-10), Document.HasCurrent);
-			h.Connect(TimelineCommands.FastScrollRight, () => AdvanceCurrentColumn(10), Document.HasCurrent);
-			h.Connect(TimelineCommands.DeleteKeyframes, RemoveKeyframes, Document.HasCurrent);
-			h.Connect(TimelineCommands.CreateMarkerPlay, () => CreateMarker(MarkerAction.Play), Document.HasCurrent);
-			h.Connect(TimelineCommands.CreateMarkerStop, () => CreateMarker(MarkerAction.Stop), Document.HasCurrent);
-			h.Connect(TimelineCommands.CreateMarkerJump, () => CreateMarker(MarkerAction.Jump), Document.HasCurrent);
-			h.Connect(TimelineCommands.DeleteMarker, DeleteMarker, Document.HasCurrent);
-			h.Connect(TimelineCommands.CopyMarkers, Rulerbar.CopyMarkers, Document.HasCurrent);
-			h.Connect(TimelineCommands.PasteMarkers, Rulerbar.PasteMarkers, Document.HasCurrent);
-			h.Connect(TimelineCommands.DeleteMarkers, Rulerbar.DeleteMarkers, Document.HasCurrent);
+			ConnectCommand(TimelineCommands.RenameRow, RenameCurrentRow);
+			ConnectCommand(TimelineCommands.ExitNode, LeaveNode.Perform);
+			ConnectCommand(TimelineCommands.ScrollUp, () => SelectRow(-1, false));
+			ConnectCommand(TimelineCommands.ScrollDown, () => SelectRow(1, false));
+			ConnectCommand(TimelineCommands.SelectUp, () => SelectRow(-1, true));
+			ConnectCommand(TimelineCommands.SelectDown, () => SelectRow(1, true));
+			ConnectCommand(TimelineCommands.ScrollLeft, () => AdvanceCurrentColumn(-1));
+			ConnectCommand(TimelineCommands.ScrollRight, () => AdvanceCurrentColumn(1));
+			ConnectCommand(TimelineCommands.FastScrollLeft, () => AdvanceCurrentColumn(-10));
+			ConnectCommand(TimelineCommands.FastScrollRight, () => AdvanceCurrentColumn(10));
+			ConnectCommand(TimelineCommands.DeleteKeyframes, RemoveKeyframes);
+			ConnectCommand(TimelineCommands.CreateMarkerPlay, () => CreateMarker(MarkerAction.Play));
+			ConnectCommand(TimelineCommands.CreateMarkerStop, () => CreateMarker(MarkerAction.Stop));
+			ConnectCommand(TimelineCommands.CreateMarkerJump, () => CreateMarker(MarkerAction.Jump));
+			ConnectCommand(TimelineCommands.DeleteMarker, DeleteMarker);
+			ConnectCommand(TimelineCommands.CopyMarkers, Rulerbar.CopyMarkers);
+			ConnectCommand(TimelineCommands.PasteMarkers, Rulerbar.PasteMarkers);
+			ConnectCommand(TimelineCommands.DeleteMarkers, Rulerbar.DeleteMarkers);
+		}
+		
+		private static void ConnectCommand(ICommand command, Action action, Func<bool> enableChecker = null)
+		{
+			CommandHandlerList.Global.Connect(command, new DocumentDelegateCommandHandler(action, enableChecker));
 		}
 
 		static void RenameCurrentRow()
@@ -110,7 +114,7 @@ namespace Tangerine.UI.Timeline
 				action,
 				action == MarkerAction.Jump && nearestMarker != null ? nearestMarker.Id : ""
 			);
-			Core.Operations.SetMarker.Perform(Document.Current.Container, newMarker, true);
+			SetMarker.Perform(Document.Current.Container, newMarker, true);
 		}
 
 		static void DeleteMarker()
