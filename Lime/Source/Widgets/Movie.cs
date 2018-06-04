@@ -119,11 +119,6 @@ namespace Lime
 			textureInitialized = true;
 		}
 
-		public override void Dispose()
-		{
-			movieTexture.Dispose();
-		}
-
 		public bool IsPlaying()
 		{
 			return (movieTexture != null) && /*!movieTexture.Stopped &&*/ !movieTexture.Paused;

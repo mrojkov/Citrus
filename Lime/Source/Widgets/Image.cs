@@ -73,9 +73,6 @@ namespace Lime
 
 		public override void Dispose()
 		{
-			if (Texture != null) {
-				Texture.Dispose();
-			}
 			base.Dispose();
 		}
 
