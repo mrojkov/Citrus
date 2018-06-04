@@ -46,7 +46,7 @@ namespace Orange.FbxImporter
 		private static List<Submesh> ImportSubmeshes(IntPtr ptr)
 		{
 			var list = new List<Submesh>();
-			var mesh = FbxNodeGetMeshAttribute(ptr, true);
+			var mesh = FbxNodeGetMeshAttribute(ptr, WindingOrder.CW, true);
 			var indices = mesh.Vertices.ToStruct<SizedArray>().GetData<int>();
 			var controlPoints = mesh.Points.ToStruct<SizedArray>().GetData<Vec3>();
 			var weights = mesh.Weigths.ToStruct<SizedArray>().GetData<WeightData>();
@@ -150,7 +150,7 @@ namespace Orange.FbxImporter
 		#region Pinvokes
 
 		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
-		private static extern MeshData FbxNodeGetMeshAttribute(IntPtr node, bool limitBoneWeights);
+		private static extern MeshData FbxNodeGetMeshAttribute(IntPtr node, WindingOrder preferedWindingOrder, bool limitBoneWeights);
 
 		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
 		private static extern IntPtr FbxNodeGetMeshMaterial(IntPtr pMesh, int idx);
@@ -164,6 +164,12 @@ namespace Orange.FbxImporter
 			None,
 			ControlPoint,
 			PolygonVertex
+		}
+
+		private enum WindingOrder
+		{
+			CCW,
+			CW
 		}
 
 		[StructLayout(LayoutKind.Sequential)]
