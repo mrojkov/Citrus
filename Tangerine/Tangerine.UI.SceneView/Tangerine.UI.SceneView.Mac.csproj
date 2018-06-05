@@ -105,6 +105,8 @@
     <Compile Include="WidgetTransforms\WidgetZeroScalePreserver.cs" />
     <Compile Include="Presenters\InspectRootNodePresenter.cs" />
     <Compile Include="Widgets\RulersWidget.cs" />
+    <Compile Include="ResolutionHandlers.cs" />
+    <Compile Include="Processors\ResolutionPreviewProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Mac.csproj">

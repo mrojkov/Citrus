@@ -122,6 +122,33 @@ namespace Tangerine.UI.SceneView
 							}
 						}
 					}));
+			sceneView.Scene.CompoundPostPresenter.Push(
+				new DelegatePresenter<Widget>(
+					(w) => {
+						if (!Document.Current.ResolutionPreview.Enable) {
+							return;
+						}
+						var ctr = SceneView.Instance.Frame;
+						var rootNode = Document.Current.RootNode as Widget;
+						if (ctr == null || rootNode == null) {
+							return;
+						}
+						ctr.PrepareRendererState();
+						var aabb = rootNode.CalcAABBInSpaceOf(ctr);
+						var rectangles = new[] {
+							new Rectangle(Vector2.Zero, new Vector2(aabb.Left, ctr.Height)).Normalized,
+							new Rectangle(new Vector2(aabb.Left, 0), new Vector2(aabb.Right, aabb.Top)).Normalized,
+							new Rectangle(new Vector2(aabb.Right, 0), ctr.Size).Normalized,
+							new Rectangle(new Vector2(aabb.Left, aabb.Bottom), new Vector2(aabb.Right, ctr.Height)).Normalized
+						};
+						foreach (var rectangle in rectangles) {
+							Renderer.DrawRect(rectangle.A, rectangle.B, ColorTheme.Current.SceneView.ResolutionPreviewOuterSpace);
+						}
+						const float FontHeight = 16;
+						var resolutionDescription = Document.Current.ResolutionPreview.Preset.GetDescription(Document.Current.ResolutionPreview.IsPortrait);
+						Renderer.DrawTextLine(aabb.Left, aabb.Top - FontHeight - 2, resolutionDescription, FontHeight, ColorTheme.Current.SceneView.ResolutionPreviewText, 0);
+					}
+			));
 		}
 
 		private void DrawRuler(Ruler ruler, Widget root)

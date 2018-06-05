@@ -1,25 +1,26 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Orange
 {
 	public class Json
 	{
-		private readonly JObject obj;
 		private readonly string sourcePath;
 
-		public Json(JObject obj, string sourcePath = null)
-		{
-			this.obj = obj;
-			this.sourcePath = sourcePath;
-		}
+		public JObject JObject { get; }
+		public dynamic AsDynamic { get; }
 
-		public object this[string path]
+		public object this[string path] => GetValue<object>(path);
+
+		public Json(string sourcePath)
 		{
-			get { return GetValue<object>(path); }
+			this.sourcePath = sourcePath;
+			var json = File.ReadAllText(sourcePath);
+			JObject = JObject.Parse(json);
+			AsDynamic = JsonConvert.DeserializeObject(json);
 		}
 
 		public T[] GetArray<T>(string path, T[] @default = null)
@@ -55,7 +56,7 @@ namespace Orange
 
 		private IEnumerable<JToken> GetPathTokens(string path)
 		{
-			var json = obj;
+			var json = JObject;
 			foreach (var element in path.Split('/')) {
 				if (json == null)
 					throw new Lime.Exception("{0} is not defined in {1}", path, sourcePath);
@@ -72,10 +73,10 @@ namespace Orange
 		{
 			if (name == null)
 				return;
-			var array = obj.GetValue(name) as JArray;
+			var array = JObject.GetValue(name) as JArray;
 			if (array == null) {
 				array = new JArray();
-				obj.Add(name, array);
+				JObject.Add(name, array);
 			}
 			array.Add(JObject.FromObject(target));
 		}
@@ -84,7 +85,7 @@ namespace Orange
 		{
 			if (name == null)
 				return;
-			var array = obj.GetValue(name) as JArray;
+			var array = JObject.GetValue(name) as JArray;
 			var targetJson = JObject.FromObject(target);
 			if (array != null) {
 				array.Remove(array.FirstOrDefault(v => v.ToString() == targetJson.ToString()));
@@ -93,7 +94,7 @@ namespace Orange
 
 		public void RewriteOrigin()
 		{
-			File.WriteAllText(sourcePath, obj.ToString());
+			File.WriteAllText(sourcePath, JObject.ToString());
 		}
 	}
 }

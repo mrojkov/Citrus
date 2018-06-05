@@ -39,6 +39,7 @@ namespace Tangerine.Core
 		public static volatile string CookingOfModifiedAssetsStatus;
 		public static TaskList Tasks { get; set; }
 		public Dictionary<string, Widget> Overlays { get; } = new Dictionary<string, Widget>();
+		public ProjectPreferences Preferences { get; private set; } = new ProjectPreferences();
 		public ProjectUserPreferences UserPreferences { get; private set; } = new ProjectUserPreferences();
 
 		private Project() { }
@@ -62,6 +63,8 @@ namespace Tangerine.Core
 			}
 			Current = this;
 			AssetBundle.Current = new UnpackedAssetBundle(AssetsDirectory);
+			Preferences = new ProjectPreferences();
+			Preferences.Initialize();
 			if (File.Exists(UserprefsPath)) {
 				try {
 					UserPreferences = Serialization.ReadObjectFromFile<ProjectUserPreferences>(UserprefsPath);
