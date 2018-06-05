@@ -12,7 +12,9 @@ namespace Tangerine.UI.SceneView
 
 		public static bool Enabled
 		{
-			get => Document.Current.ResolutionPreview.Enable;
+			get {
+				return Document.Current.ResolutionPreview.Enable;
+			}
 			set {
 				if (!Document.Current.ResolutionPreview.Enable && value) {
 					Document.Current.Saving += DocumentOnSaving;
