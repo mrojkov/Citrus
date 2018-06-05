@@ -37,6 +37,9 @@ namespace Tangerine.UI.SceneView
 			var h = CommandHandlerList.Global;
 			h.Connect(SceneViewCommands.PreviewAnimation, new PreviewAnimationHandler(false));
 			h.Connect(SceneViewCommands.PreviewAnimationWithTriggeringOfMarkers, new PreviewAnimationHandler(true));
+			h.Connect(SceneViewCommands.ResolutionChanger, new ResolutionChangerHandler());
+			h.Connect(SceneViewCommands.ResolutionReverceChanger, new ResolutionChangerHandler(isReverse: true));
+			h.Connect(SceneViewCommands.ResolutionOrientation, new ResolutionOrientationHandler());
 			h.Connect(SceneViewCommands.DragUp, () => DragNodes(new Vector2(0, -1)));
 			h.Connect(SceneViewCommands.DragDown, () => DragNodes(new Vector2(0, 1)));
 			h.Connect(SceneViewCommands.DragLeft, () => DragNodes(new Vector2(-1, 0)));
@@ -283,7 +286,8 @@ namespace Tangerine.UI.SceneView
 				new RulerProcessor(),
 				new MouseSelectionProcessor(),
 				new ShiftClickProcessor(),
-				new PreviewAnimationProcessor()
+				new PreviewAnimationProcessor(),
+				new ResolutionPreviewProcessor()
 			);
 		}
 

@@ -138,8 +138,7 @@ namespace Orange
 
 		private void ReadProject(string file)
 		{
-			JObject = JObject.Parse(File.ReadAllText(file));
-			ProjectJson = new Json(JObject, file);
+			ProjectJson = new Json(file);
 			Title = ProjectJson["Title"] as string;
 			Targets = new List<Target>();
 			FillDefaultTargets();

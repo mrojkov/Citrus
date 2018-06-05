@@ -128,6 +128,9 @@ namespace Tangerine
 					SceneViewCommands.SnapWidgetBorderToRuler,
 					SceneViewCommands.SnapWidgetPivotToRuler,
 					SceneViewCommands.SnapRulerLinesToWidgets,
+					SceneViewCommands.ResolutionChanger,
+					SceneViewCommands.ResolutionReverceChanger,
+					SceneViewCommands.ResolutionOrientation,
 					(localizationCommand = new Command("Localization", localizationMenu = new Menu()) {
 						Enabled = false
 					})
@@ -218,7 +221,7 @@ namespace Tangerine
 
 		public static void OnRulersCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 		{
-			// Invoke handler at the next update to avoid collection changed exceptions while 
+			// Invoke handler at the next update to avoid collection changed exceptions while
 			// command handler iterates the commands list.
 			UpdateHandler handler = null;
 			handler = delta => {

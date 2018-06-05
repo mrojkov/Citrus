@@ -51,6 +51,7 @@ namespace Tangerine.Core
 
 		public readonly DocumentHistory History = new DocumentHistory();
 		public bool IsModified => History.IsDocumentModified;
+		public event Action<Document> Saving;
 
 		/// <summary>
 		/// The list of Tangerine node decorators.
@@ -107,8 +108,8 @@ namespace Tangerine.Core
 		public int PreviewAnimationBegin { get; set; }
 		public Node PreviewAnimationContainer { get; set; }
 		public bool ExpositionMode { get; set; }
+		public ResolutionPreview ResolutionPreview { get; set; } = new ResolutionPreview();
 		public bool InspectRootNode { get; set; }
-
 		public string AnimationId { get; set; }
 
 		static Document()
@@ -301,6 +302,7 @@ namespace Tangerine.Core
 
 		public void SaveAs(string path)
 		{
+			Saving?.Invoke(this);
 			History.AddSavePoint();
 			Path = path;
 			WriteNodeToFile(path, Format, RootNode);

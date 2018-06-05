@@ -43,6 +43,8 @@ namespace Tangerine.UI
 			public Color4 SelectedWidget;
 			public Color4 RulerBackground;
 			public Color4 RulerTextColor;
+			public Color4 ResolutionPreviewOuterSpace;
+			public Color4 ResolutionPreviewText;
 		}
 
 		public class TimelineGridColors
@@ -166,7 +168,9 @@ namespace Tangerine.UI
 				Ruler = new Color4(0, 255, 255),
 				SelectedWidget = new Color4(0, 255, 255),
 				RulerBackground = Color4.DarkGray,
-				RulerTextColor = Color4.Gray.Lighten(0.4f)
+				RulerTextColor = Color4.Gray.Lighten(0.4f),
+				ResolutionPreviewOuterSpace = new Color4(7, 7, 7, 220),
+				ResolutionPreviewText = new Color4(204, 204, 204)
 			};
 			var timelineGrid = new TimelineGridColors {
 				PropertyRowBackground = Color4.White.Transparentify(0.95f),
@@ -277,6 +281,8 @@ namespace Tangerine.UI
 				SelectedWidget = new Color4(0, 255, 255),
 				RulerBackground = new Color4(168, 166, 168),
 				RulerTextColor = Color4.Black,
+				ResolutionPreviewOuterSpace = new Color4(7, 7, 7, 220),
+				ResolutionPreviewText = new Color4(204, 204, 204)
 			};
 			var timelineGrid = new TimelineGridColors {
 				PropertyRowBackground = Color4.Black.Transparentify(0.95f),
