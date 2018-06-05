@@ -50,6 +50,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Xamarin.Mac" />
+    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
@@ -92,6 +93,8 @@
     <Compile Include="TriggersValidation.cs" />
     <Compile Include="ProjectUserPreferences.cs" />
     <Compile Include="Ruler.cs" />
+    <Compile Include="ProjectPreferences.cs" />
+    <Compile Include="ResolutionPreview.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>
