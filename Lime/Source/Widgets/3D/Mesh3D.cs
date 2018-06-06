@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -346,7 +346,7 @@ namespace Lime
 		public Submesh3D Clone()
 		{
 			var clone = new Submesh3D();
-			clone.Mesh = Mesh.ShallowClone();
+			clone.Mesh = Mesh;
 			clone.BoneNames = new List<string>(BoneNames);
 			clone.BoneBindPoses = new List<Matrix44>(BoneBindPoses);
 			clone.Material = Material.Clone();
