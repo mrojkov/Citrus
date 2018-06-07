@@ -116,17 +116,15 @@ namespace Tangerine.Core
 				return;
 			}
 			var documentChanged = false;
-			int transactionEnd = GetTransactionEnd();
-			while (currentIndex < transactionEnd) {
-				var b = IsChangingOperationWithinRange(currentIndex, transactionEnd);
+			for (int e = GetTransactionEnd(); currentIndex < e; e = GetTransactionEnd()) {
+				var b = IsChangingOperationWithinRange(currentIndex, e);
 				if (b && documentChanged) {
 					break;
 				}
 				documentChanged |= b;
-				for (; currentIndex < transactionEnd; currentIndex++) {
+				for (; currentIndex < e; currentIndex++) {
 					Processors.Invert(operations[currentIndex]);
 				}
-				transactionEnd = GetTransactionEnd();
 			}
 			OnChange();
 		}
