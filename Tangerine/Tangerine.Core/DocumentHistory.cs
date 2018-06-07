@@ -9,17 +9,15 @@ namespace Tangerine.Core
 	{
 		public static readonly ProcessorList Processors = new ProcessorList();
 		private readonly List<IOperation> operations = new List<IOperation>();
-		private readonly List<IOperation> operationStash = new List<IOperation>();
 		private int transactionId;
 		private int saveIndex;
 		private int headIndex;
-		private int stashHeadIndex;
 		private int transactionStartIndex = -1;
 		private int transactionRollbackPointIndex = -1;
 		private bool transactionCommited;
 		
 		public bool CanUndo() => !IsTransactionActive && headIndex > 0;
-		public bool CanRedo() => !IsTransactionActive && (headIndex < operations.Count || operationStash.Count > 0);
+		public bool CanRedo() => !IsTransactionActive && headIndex < operations.Count;
 		public bool IsDocumentModified { get; private set; }
 		public bool IsTransactionActive => transactionStartIndex != -1;
 		
@@ -100,7 +98,7 @@ namespace Tangerine.Core
 			}
 			if (headIndex != index) {
 				for (; headIndex > index; headIndex--) {
-					Processors.Undo(operations[headIndex - 1]);
+					Processors.UndoOrRedo(operations[headIndex - 1]);
 				}
 				operations.RemoveRange(headIndex, operations.Count - headIndex);
 				OnChange();
@@ -110,28 +108,28 @@ namespace Tangerine.Core
 		public void Perform(IOperation operation)
 		{
 			if (!IsTransactionActive) {
-				throw new InvalidOperationException("Can't perform an operation outside a transaction block");
+				throw new InvalidOperationException("Can't perform an operation outside a transaction");
 			}
 			operation.TransactionId = transactionId;
 			if (saveIndex > headIndex) {
 				saveIndex = -1;
 			}
-			if (headIndex < operations.Count) {
-				// Save current history tail just in case we redo it further.
-				operationStash.Clear();
-				stashHeadIndex = headIndex;
-				var tail = operations.GetRange(headIndex, operations.Count - headIndex);
-				if (tail.Any(i => i.IsChangingDocument)) {
-					operationStash.AddRange(tail);
-				}
+			if (headIndex == operations.Count) {
+				operations.Add(operation);
+				headIndex++;
+			} else if (operation.IsChangingDocument) {
 				operations.RemoveRange(headIndex, operations.Count - headIndex);
+				operations.Add(operation);
+				headIndex = operations.Count;
+			} else {
+				operations.Insert(headIndex, operation);
+				operations.Insert(headIndex + 1, operation);
+				headIndex++;
 			}
-			operations.Add(operation);
-			headIndex = operations.Count;
 			Processors.Do(operation);
 			OnChange();
 		}
-		
+				
 		public void Undo()
 		{
 			if (!CanUndo()) {
@@ -139,14 +137,14 @@ namespace Tangerine.Core
 			}
 			int tid = 0;
 			for (; headIndex > 0; headIndex--) {
-				var o = operations[headIndex - 1];
-				if (o.IsChangingDocument && tid == 0) {
-					tid = o.TransactionId;
+				var i = operations[headIndex - 1];
+				if (i.IsChangingDocument && tid == 0) {
+					tid = i.TransactionId;
 				}
-				if (tid > 0 && tid != o.TransactionId) {
+				if (tid > 0 && tid != i.TransactionId) {
 					break;
 				}
-				Processors.Undo(o);
+				Processors.UndoOrRedo(i);
 			}
 			OnChange();
 		}
@@ -156,29 +154,16 @@ namespace Tangerine.Core
 			if (!CanRedo()) {
 				return;
 			}
-			var tail = operations.GetRange(headIndex, operations.Count - headIndex);
-			if (tail.Any(i => i.IsChangingDocument)) {
-				// Current history tail has modifying operations, so no need in stashed operations.
-				operationStash.Clear();
-			}
-			if (operationStash.Count > 0) {
-				for (int i = headIndex; i > stashHeadIndex; i--) {
-					Processors.Undo(operations[i - 1]);
-				}
-				operations.RemoveRange(headIndex, operations.Count - headIndex);
-				operations.AddRange(operationStash);
-				operationStash.Clear();
-			}
-			int bid = 0;
+			int tid = 0;
 			for (; headIndex < operations.Count; headIndex++) {
 				var o = operations[headIndex];
-				if (o.IsChangingDocument && bid == 0) {
-					bid = o.TransactionId;
+				if (o.IsChangingDocument && tid == 0) {
+					tid = o.TransactionId;
 				}
-				if (bid > 0 && bid != o.TransactionId) {
+				if (tid > 0 && tid != o.TransactionId) {
 					break;
 				}
-				Processors.Redo(o);
+				Processors.UndoOrRedo(o);
 			}
 			OnChange();
 		}
@@ -222,20 +207,19 @@ namespace Tangerine.Core
 				foreach (var p in this) {
 					p.Do(operation);
 				}
+				operation.Performed = true;
 			}
 
-			public void Undo(IOperation operation)
+			public void UndoOrRedo(IOperation operation)
 			{
 				foreach (var p in this) {
-					p.Undo(operation);
+					if (operation.Performed) {
+						p.Undo(operation);
+					} else {
+						p.Redo(operation);
+					}
 				}
-			}
-						
-			public void Redo(IOperation operation)
-			{
-				foreach (var p in this) {
-					p.Redo(operation);
-				}
+				operation.Performed = !operation.Performed;
 			}
 		}
 	}

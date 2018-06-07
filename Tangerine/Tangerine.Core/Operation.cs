@@ -9,12 +9,14 @@ namespace Tangerine.Core
 	{
 		int TransactionId { get; set; }
 		bool IsChangingDocument { get; }
+		bool Performed { get; set; }
 	}
 
 	public abstract class Operation : IOperation
 	{
 		public int TransactionId { get; set; }
 		public abstract bool IsChangingDocument { get; }
+		public bool Performed { get; set; }
 
 		readonly List<object> backup = new List<object>();
 
