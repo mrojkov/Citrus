@@ -115,18 +115,30 @@ namespace Tangerine.Core
 			if (!CanRedo()) {
 				return;
 			}
-			int tid = 0;
-			for (; currentIndex < operations.Count; currentIndex++) {
-				var o = operations[currentIndex];
-				if (o.IsChangingDocument && tid == 0) {
-					tid = o.TransactionId;
-				}
-				if (tid > 0 && tid != o.TransactionId) {
+			var documentChanged = false;
+			int transactionEnd = GetTransactionEnd();
+			while (currentIndex < transactionEnd) {
+				var b = IsChangingOperationWithinRange(currentIndex, transactionEnd);
+				if (b && documentChanged) {
 					break;
 				}
-				Processors.Invert(o);
+				documentChanged |= b;
+				for (; currentIndex < transactionEnd; currentIndex++) {
+					Processors.Invert(operations[currentIndex]);
+				}
+				transactionEnd = GetTransactionEnd();
 			}
 			OnChange();
+		}
+		
+		private int GetTransactionEnd()
+		{
+			for (int i = currentIndex; i < operations.Count; i++) {
+				if (operations[i].TransactionId != operations[currentIndex].TransactionId) {
+					return i;
+				}
+			}
+			return operations.Count;
 		}
 		
 		public void AddSavePoint()
@@ -151,7 +163,7 @@ namespace Tangerine.Core
 				IsChangingOperationWithinRange(saveIndex, currentIndex) : 
 				IsChangingOperationWithinRange(currentIndex, saveIndex));
 		}
-
+		
 		private bool IsChangingOperationWithinRange(int start, int end)
 		{
 			for (int i = start; i < end; i++) {
