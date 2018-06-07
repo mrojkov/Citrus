@@ -1,4 +1,3 @@
-#if !UNITY
 using System;
 using System.Text;
 
@@ -77,5 +76,3 @@ namespace Lime
 		}
 	}
 }
-
-#endif

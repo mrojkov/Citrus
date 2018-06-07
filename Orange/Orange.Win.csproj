@@ -117,6 +117,7 @@
     <Compile Include="Source\Actions\UpdateXCodeProject.cs" />
     <Compile Include="Source\AssetCooker\CodeCooker.cs" />
     <Compile Include="Source\AssetCooker\OpacityMaskCreator.cs" />
+    <Compile Include="Source\Builder\BuildConfiguration.cs" />
     <Compile Include="Source\Builder\BuildSystem.cs" />
     <Compile Include="Source\Builder\MSBuild.cs" />
     <Compile Include="Source\Builder\MDTool.cs" />
@@ -155,7 +156,6 @@
     <Compile Include="Source\AssetCooker\TextureConverterUtils.cs" />
     <Compile Include="Source\AssetCooker\RectAllocator.cs" />
     <Compile Include="Source\AssetCooker\TextureConverter.cs" />
-    <Compile Include="Source\AssetCooker\UnityAssetBundle.cs" />
     <Compile Include="Source\AssetCooker\WaveIMA4Converter.cs" />
     <Compile Include="Source\DictionaryExtractor.cs" />
     <Compile Include="Source\Toolbox\DirectoryChanger.cs" />

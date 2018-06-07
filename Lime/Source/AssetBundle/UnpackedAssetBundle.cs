@@ -12,7 +12,7 @@ namespace Lime
 
 		public UnpackedAssetBundle(string baseDirectory)
 		{
-			this.BaseDirectory = baseDirectory;
+			BaseDirectory = baseDirectory;
 		}
 
 		public override Stream OpenFile(string path)
@@ -22,11 +22,7 @@ namespace Lime
 
 		public override DateTime GetFileLastWriteTime(string path)
 		{
-#if UNITY
-			throw new NotImplementedException();
-#else
 			return File.GetLastWriteTime(Path.Combine(BaseDirectory, path));
-#endif
 		}
 
 		public override int GetFileSize(string path)
@@ -51,23 +47,16 @@ namespace Lime
 
 		public override void ImportFile(string path, Stream stream, int reserve, string sourceExtension, AssetAttributes attributes, byte[] cookingRulesSHA1)
 		{
-#if UNITY
-			throw new NotImplementedException();
-#else
 			stream.Seek(0, SeekOrigin.Begin);
 			var bytes = new byte[stream.Length];
 			stream.Read(bytes, 0, bytes.Length);
 			var dir = Path.Combine(BaseDirectory, Path.GetDirectoryName(path));
 			Directory.CreateDirectory(dir);
 			File.WriteAllBytes(Path.Combine(BaseDirectory, path), bytes);
-#endif
 		}
 
 		public override IEnumerable<string> EnumerateFiles(string path = null)
 		{
-#if UNITY
-			throw new NotImplementedException();
-#else
 			var baseDirectory = BaseDirectory;
 			if (path != null) {
 				baseDirectory = Path.Combine(baseDirectory, path);
@@ -79,7 +68,6 @@ namespace Lime
 				relativePath = Uri.UnescapeDataString(relativePath);
 				yield return relativePath;
 			}
-#endif
 		}
 	}
 }

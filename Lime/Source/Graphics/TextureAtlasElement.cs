@@ -1,5 +1,4 @@
 using System;
-using System.Deployment.Internal;
 using Yuzu;
 
 namespace Lime
@@ -77,13 +76,6 @@ namespace Lime
 		{
 			return AtlasTexture.GetHandle();
 		}
-
-#if UNITY
-		public UnityEngine.Texture GetUnityTexture()
-		{
-			return atlasTexture.GetUnityTexture();
-		}
-#endif
 
 		public void SetAsRenderTarget()
 		{

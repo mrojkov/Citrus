@@ -145,7 +145,6 @@
     <Compile Include="Source\Application\Window.Win.cs" />
     <Compile Include="Source\Application\WindowOptions.cs" />
     <Compile Include="Source\AssetBundle\AggregateAssetBundle.cs" />
-    <Compile Include="Source\AssetBundle\UnityAssetBundle.cs" />
     <Compile Include="Source\Audio\IAudioChannel.cs" />
     <Compile Include="Source\Audio\OpenAL\AudioCache.cs" />
     <Compile Include="Source\Audio\OpenAL\AudioChannel.cs" />
@@ -153,7 +152,6 @@
     <Compile Include="Source\Audio\OpenAL\OggDecoder.cs" />
     <Compile Include="Source\Audio\OpenAL\PlatformAudioSystem.cs" />
     <Compile Include="Source\Audio\OpenAL\WaveIMA4Decoder.cs" />
-    <Compile Include="Source\Audio\Unity\AudioChannel.cs" />
     <Compile Include="Source\EnumExtensions.cs" />
     <Compile Include="Source\GeneratedDeserializersBIN.cs" />
     <Compile Include="Source\Graphics\Fonts\CharMap.cs" />
@@ -210,11 +208,7 @@
     <Compile Include="Source\Graphics\Renderer.cs" />
     <Compile Include="Source\Graphics\SpriteList.cs" />
     <Compile Include="Source\Graphics\TexturePool.cs" />
-    <Compile Include="Source\Graphics\Unity\MaterialFactory.cs" />
-    <Compile Include="Source\Graphics\Unity\RenderTexture.cs" />
-    <Compile Include="Source\Graphics\Unity\Texture2D.cs" />
     <Compile Include="Source\Input\Input.Native.cs" />
-    <Compile Include="Source\Input\Input.Unity.cs" />
     <Compile Include="Source\Localization\LocalizationDictionary.cs" />
     <Compile Include="Source\Localization\LocalizationDictionaryTextSerializer.cs" />
     <Compile Include="Source\Version.cs" />
@@ -330,11 +324,6 @@
     <Compile Include="Source\Widgets\WebBrowser\WebBrowser.Mac.cs" />
     <Compile Include="Source\Graphics\Bitmap.Android.cs" />
     <Compile Include="Source\Widgets\WebBrowser\WebBrowser.Android.cs" />
-    <Compile Include="Source\Graphics\Bitmap.Unity.cs" />
-    <Compile Include="Source\Graphics\Unity\PlatformGeometryBuffer.cs" />
-    <Compile Include="Source\Graphics\Unity\PlatformRenderer.cs" />
-    <Compile Include="Source\Audio\Unity\PlatformAudioSystem.cs" />
-    <Compile Include="Source\AssetBundle\UnityDownloadableBundle.cs" />
     <Compile Include="Source\Types\BitSet32.cs" />
     <Compile Include="Source\Application\AndroidActivityDelegate.cs" />
     <Compile Include="Source\Application\AndroidGameView.cs" />
@@ -365,9 +354,6 @@
     <Compile Include="Source\Application\Mac\Audio\AudioDeviceException.cs" />
     <Compile Include="Source\Application\Mac\Audio\AudioException.cs" />
     <Compile Include="Source\Application\Mac\Audio\AudioValueException.cs" />
-    <Compile Include="Source\Application\UnityApplicationDelegate.cs" />
-    <Compile Include="Source\Application\Window.Unity.cs" />
-    <Compile Include="Source\Application\Clipboard\Clipboard.Unity.cs" />
     <Compile Include="Source\Application\AndroidSoftKeyboard.cs" />
     <Compile Include="Source\Application\Context.cs" />
     <Compile Include="Source\Application\Menu\Menu.cs" />
@@ -380,7 +366,6 @@
     <Compile Include="Source\Widgets\Layout\LayoutManager.cs" />
     <Compile Include="Source\Widgets\Layout\LinearAllocator.cs" />
     <Compile Include="Source\Widgets\Layout\VBoxLayout.cs" />
-    <Compile Include="Source\Graphics\Unity\MovieTexture.cs" />
     <Compile Include="Source\Types\MonoMac\CG.cs" />
     <Compile Include="Source\Widgets\Layout\StackLayout.cs" />
     <Compile Include="Source\Application\MouseCursor\IStockCursors.cs" />

@@ -7,8 +7,6 @@ using NativeBitmap = System.Drawing.Bitmap;
 using NativeBitmap = CoreGraphics.CGImage;
 #elif ANDROID
 using NativeBitmap = Android.Graphics.Bitmap;
-#elif UNITY
-using NativeBitmap = UnityEngine.Texture2D;
 #endif
 
 namespace Lime

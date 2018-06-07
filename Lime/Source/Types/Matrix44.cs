@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Yuzu;
 
 namespace Lime
@@ -1118,29 +1118,5 @@ namespace Lime
 				Z = Vector3.DotProduct(at, Backward) > 0f ? scale.Z : -scale.Z
 			};
 		}
-
-#if UNITY
-		public static explicit operator UnityEngine.Matrix4x4(Matrix44 m)
-		{
-			var r = new UnityEngine.Matrix4x4();
-			r.m00 = m.M11;
-			r.m01 = m.M21;
-			r.m02 = m.M31;
-			r.m03 = m.M41;
-			r.m10 = m.M12;
-			r.m11 = m.M22;
-			r.m12 = m.M32;
-			r.m13 = m.M42;
-			r.m20 = m.M13;
-			r.m21 = m.M23;
-			r.m22 = m.M33;
-			r.m23 = m.M43;
-			r.m30 = m.M14;
-			r.m31 = m.M24;
-			r.m32 = m.M34;
-			r.m33 = m.M44;
-			return r;
-		}
-#endif
 	}
 }

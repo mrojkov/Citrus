@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Lime
 {
@@ -15,14 +12,12 @@ namespace Lime
 		public static readonly bool NoAudio = CheckFlag("--NoAudio");
 		public static readonly bool NoMusic = CheckFlag("--NoMusic");
 		public static readonly bool Debug = CheckFlag("--Debug");
+
 		public static string[] Get()
 		{
-#if UNITY_WEB
-			return new string[] {};
-#else
 			return System.Environment.GetCommandLineArgs();
-#endif
 		}
+
 		public static bool CheckFlag(string name)
 		{
 			return Array.IndexOf(Get(), name) >= 0;

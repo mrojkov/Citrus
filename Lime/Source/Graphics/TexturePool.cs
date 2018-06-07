@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
-#if !UNITY
 using System.Collections.Concurrent;
-#endif
 
 namespace Lime
 {
@@ -14,11 +12,8 @@ namespace Lime
 
 		public static event Texture2D.TextureMissingDelegate TextureMissing;
 
-#if UNITY
-		private readonly Dictionary<string, WeakReference> textures = new Dictionary<string, WeakReference>();
-#else
 		private readonly ConcurrentDictionary<string, WeakReference> textures = new ConcurrentDictionary<string, WeakReference>();
-#endif
+
 		public readonly static TexturePool Instance = new TexturePool();
 
 		private TexturePool() {}

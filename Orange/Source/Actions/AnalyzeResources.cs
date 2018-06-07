@@ -146,8 +146,7 @@ namespace Orange
 				}
 				var reportList = new List<string>();
 				foreach (var rpr in requestedPaths) {
-					string pattern = String.Format(@".*[/\\](.*)\.{0}",
-						Orange.Toolbox.GetTargetPlatformString(The.Workspace.ActivePlatform));
+					string pattern = String.Format(@".*[/\\](.*)\.{0}", The.Workspace.ActivePlatform.ToString());
 					string bundle = "";
 					foreach (Match m in Regex.Matches(rpr.bundle, pattern, RegexOptions.IgnoreCase)) {
 						bundle = m.Groups[1].Value;

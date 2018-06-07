@@ -23,8 +23,6 @@ namespace Lime
 			var uri = Android.Net.Uri.Parse(url);
 			var intent = new Intent(Intent.ActionView, uri);
 			ActivityDelegate.Instance.Activity.StartActivity(intent);
-#elif UNITY_WEBPLAYER
-			throw new NotImplementedException();
 #else
 			System.Diagnostics.Process.Start(url);
 #endif
@@ -68,27 +66,20 @@ namespace Lime
 
 		public static string GetDataDirectory(string companyName, string appName, string appVersion)
 		{
-#if UNITY
-			return UnityEngine.Application.persistentDataPath;
-#else
 #if iOS
-			string path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal);
-			return path;
-#elif MAC
+			return System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal);
+#else
+#if MAC
 			string path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal);
 #else
 			string path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData);
-#endif
-#if !iOS
-			if (string.IsNullOrEmpty(companyName)) {
-				path = Path.Combine(path, appName, appVersion);
-			} else {
-				path = Path.Combine(path, companyName, appName, appVersion);
-			}
+#endif // !MAC
+			path = string.IsNullOrEmpty(companyName)
+				? Path.Combine(path, appName, appVersion)
+				: Path.Combine(path, companyName, appName, appVersion);
 			Directory.CreateDirectory(path);
 			return path;
-#endif
-#endif
+#endif // !iOS
 		}
 
 		public static string GetDownloadableContentDirectory(string appName)
@@ -98,9 +89,6 @@ namespace Lime
 
 		public static string GetDownloadableContentDirectory(string companyName, string appName, string appVersion)
 		{
-#if UNITY
-			return UnityEngine.Application.persistentDataPath;
-#else
 #if iOS
 			string path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal);
 			path = Path.Combine(Path.GetDirectoryName(path), "Library", "DLC");
@@ -110,7 +98,6 @@ namespace Lime
 #endif
 			Directory.CreateDirectory(path);
 			return path;
-#endif
 		}
 
 		public static Vector2 GetDesktopSize()
@@ -118,9 +105,6 @@ namespace Lime
 #if iOS
 			UIScreen screen = UIScreen.MainScreen;
 			return new Vector2((float)screen.Bounds.Width, (float)screen.Bounds.Height);
-#elif UNITY
-			var r = UnityEngine.Screen.currentResolution;
-			return new Vector2(r.width, r.height);
 #elif ANDROID
 			var s = ActivityDelegate.Instance.GameView.Size;
 			return new Vector2(s.Width, s.Height);

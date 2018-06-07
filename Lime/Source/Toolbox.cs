@@ -8,42 +8,10 @@ namespace Lime
 {
 	public static class Toolbox
 	{
-#if UNITY
-		public static void CopyTo(this Stream source, Stream destination)
-		{
-			var bufferSize = 32768;
-			byte[] buffer = new byte[bufferSize];
-			int read;
-			while ((read = source.Read(buffer, 0, buffer.Length)) > 0) {
-				destination.Write(buffer, 0, read);
-			}
-		}
-
-		public static bool IsNullOrWhiteSpace(this string value)
-		{
-			if (value == null || value.Length == 0) {
-				return true;
-			}
-			for (int i = 0; i < value.Length; i++) {
-				char c = value[i];
-				if (!char.IsWhiteSpace(c)) {
-					return false;
-				}
-			}
-			return true;
-		}
-
-		public static void Restart(this System.Diagnostics.Stopwatch stopwatch)
-		{
-			stopwatch.Reset();
-			stopwatch.Start();
-		}
-#else
 		public static bool IsNullOrWhiteSpace(this string value)
 		{
 			return string.IsNullOrWhiteSpace(value);
 		}
-#endif
 
 		public static void Swap<T>(ref T lhs, ref T rhs)
 		{

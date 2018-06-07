@@ -42,8 +42,7 @@ namespace Lime
 		iOS,
 		Android,
 		Mac,
-		Win,
-		Unity
+		Win
 	}
 
 	public class ApplicationOptions
@@ -109,7 +108,7 @@ namespace Lime
 		/// <summary>
 		/// Gets the current device orientation. On desktop platforms it is always DeviceOrientation.LandscapeLeft.
 		/// </summary>
-#if WIN || MAC || UNITY
+#if WIN || MAC
 		public static DeviceOrientation CurrentDeviceOrientation => DeviceOrientation.LandscapeLeft;
 #else
 		public static DeviceOrientation CurrentDeviceOrientation { get; internal set; }
@@ -243,12 +242,12 @@ namespace Lime
 			UIApplication.SharedApplication.IdleTimerDisabled = !IsAllowedGoingToSleepMode();
 #endif
 		}
-#if !UNITY
+
 		public static void DiscardOpenGLObjects()
 		{
 			GLObjectRegistry.Instance.DiscardObjects();
 		}
-#endif
+
 #if iOS
 		private static bool IsAllowedGoingToSleepMode()
 		{
@@ -321,14 +320,10 @@ namespace Lime
 			if (CurrentThread.IsMain()) {
 				action();
 			} else {
-#if UNITY
-				throw new NotImplementedException();
-#else
 				// Now we use unified way on iOS and PC platform
 				lock (scheduledActionsSync) {
 					scheduledActions += action;
 				}
-#endif
 			}
 		}
 
@@ -353,8 +348,6 @@ namespace Lime
 				return PlatformId.Android;
 #elif MAC || MONOMAC
 				return PlatformId.Mac;
-#elif UNITY
-				return PlatformId.Unity;
 #else
 				throw new Lime.Exception("Unknown platform");
 #endif
@@ -375,8 +368,6 @@ namespace Lime
 #elif ANDROID || iOS
 			// Android: There is no way to terminate an android application.
 			// The only way is to finish each its activity one by one.
-#elif UNITY
-			UnityEngine.Application.Quit();
 #endif
 		}
 

@@ -1,51 +1,73 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 
 namespace Orange.Source
 {
+	public enum BuildAction
+	{
+		Clean,
+		Build
+	}
+
 	abstract class BuildSystem
 	{
-		protected string BuilderPath = "";
-		protected string SlnPath;
-		protected string Args = "";
-		protected TargetPlatform Platform;
-		public string Configuration;
+		private List<string> arguments;
 
-		public BuildSystem(string projectDirectory, string projectName, TargetPlatform platform, string customSolution)
+		public TargetPlatform Platform { get; }
+		public string SolutionPath { get; }
+		public string Configuration { get; }
+
+		protected string Args => string.Join(" ", arguments);
+
+		public string BinariesDirectory => Path.Combine(
+			Path.GetDirectoryName(SolutionPath), "bin", Configuration);
+
+
+		public BuildSystem(TargetPlatform platform, string solutionPath, string configuration)
 		{
+			arguments = new List<string>();
 			Platform = platform;
-
-			if (customSolution != null)
-				SlnPath = Path.Combine(projectDirectory, customSolution);
-			else
-				SlnPath = Path.Combine(projectDirectory, projectName + "." + Toolbox.GetTargetPlatformString(platform) + ".sln");
+			SolutionPath = solutionPath ?? The.Workspace.GetSolutionFilePath();
+			Configuration = configuration ?? BuildConfiguration.Release;
 		}
 
-		public string ReleaseBinariesDirectory
+		public int Execute(BuildAction buildAction, StringBuilder output = null)
 		{
-			get { return Path.Combine(Path.GetDirectoryName(SlnPath), "bin", "Release"); }
+			arguments.Clear();
+			switch (buildAction) {
+				case BuildAction.Clean: {
+					PrepareForClean();
+					return Execute(output);
+				}
+				case BuildAction.Build: {
+					PrepareForBuild();
+					return Execute(output);
+				}
+				default: {
+					throw new InvalidOperationException($"Unknown {nameof(buildAction)}: {buildAction}");
+				}
+			}
 		}
 
-		public string DebugBinariesDirectory
-		{
-			get { return Path.Combine(Path.GetDirectoryName(SlnPath), "bin", "Debug"); }
-		}
-
-		public abstract int Execute(StringBuilder output = null);
 		protected abstract void DecorateBuild();
 		protected abstract void DecorateClean();
 		protected abstract void DecorateConfiguration();
+		protected abstract int Execute(StringBuilder output);
 
-		public void PrepareForBuild()
+		protected void AddArgument(string argument)
+		{
+			arguments.Add(argument);
+		}
+
+		private void PrepareForBuild()
 		{
 			DecorateBuild();
 			DecorateConfiguration();
 		}
 
-		public void PrepareForClean()
+		private void PrepareForClean()
 		{
 			DecorateClean();
 			DecorateConfiguration();

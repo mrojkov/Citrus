@@ -25,7 +25,6 @@ target_name: one of
     'Mac'
     'iOS'
     'Android'
-    'Unity'
     <user_defined_in_citproj_file>
 
 rule_name: one of
@@ -59,7 +58,7 @@ Rule10 Value
 ...
 ```
 
-There's a list of default targets, which are Win, Mac, iOS, Android and Unity. Other targets are listed in `.citproj` project file.
+There's a list of default targets, which are Win, Mac, iOS and Android. Other targets are listed in `.citproj` project file.
 
 ## Rules
 

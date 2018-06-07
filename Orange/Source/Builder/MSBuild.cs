@@ -1,43 +1,48 @@
-using Microsoft.Win32;
 using System.IO;
 using System.Text;
+using Microsoft.Win32;
 
 namespace Orange.Source
 {
-	class MSBuild: BuildSystem
+	class MSBuild : BuildSystem
 	{
-		public MSBuild(string projectDirectory, string projectName, TargetPlatform platform, string customSolution = null)
-			: base(projectDirectory, projectName, platform, customSolution)
+		private readonly string builderPath;
+
+
+		public MSBuild(TargetPlatform platform, string solutionPath, string configuration)
+			: base(platform, solutionPath, configuration)
 		{
-			if (!TryGetMSBuildPath(out BuilderPath)) {
+			if (!TryGetMSBuildPath(out builderPath)) {
 				System.Diagnostics.Process.Start(@"https://www.microsoft.com/en-us/download/details.aspx?id=48159");
 				throw new System.Exception(@"Please install Microsoft Build Tools 2015: https://www.microsoft.com/en-us/download/details.aspx?id=48159");
 			}
 		}
 
-		public override int Execute(StringBuilder output = null)
+		protected override int Execute(StringBuilder output)
 		{
-			return Process.Start($"cmd", $"/C \"set BUILDING_WITH_ORANGE=true & \"{BuilderPath}\" \"{SlnPath}\" {Args}\"", output: output);
+			return Process.Start($"cmd", $"/C \"set BUILDING_WITH_ORANGE=true & \"{builderPath}\" \"{SolutionPath}\" {Args}\"", output: output);
 		}
 
 		protected override void DecorateBuild()
 		{
-			Args += " /verbosity:minimal";
-			if (Platform == TargetPlatform.Android)
-				Args += " /t:PackageForAndroid /t:SignAndroidPackage";
+			AddArgument("/verbosity:minimal");
+			if (Platform == TargetPlatform.Android) {
+				AddArgument("/t:PackageForAndroid");
+				AddArgument("/t:SignAndroidPackage");
+			}
 		}
 
 		protected override void DecorateClean()
 		{
-			Args += "/t:Clean";
+			AddArgument("/t:Clean");
 		}
 
 		protected override void DecorateConfiguration()
 		{
-			Args += " /p:Configuration=" + Configuration;
+			AddArgument("/p:Configuration=" + Configuration);
 		}
 
-		private bool TryGetMSBuildPath(out string path)
+		private static bool TryGetMSBuildPath(out string path)
 		{
 			// MSBuild from path obtained with RuntimeEnvironment.GetRuntimeDirectory() is unable to compile C#6.0
 			var msBuild14Path = Path.Combine(@"C:\Program Files (x86)\MSBuild\14.0\Bin\", "MSBuild.exe");

@@ -106,9 +106,9 @@ namespace Orange
 		{
 			var pluginRoot = Path.ChangeExtension(citrusProjectFile, ".OrangePlugin");
 #if DEBUG
-			var pluginConfiguration = "Debug";
+			var pluginConfiguration = BuildConfiguration.Debug;
 #else
-			var pluginConfiguration = "Release";
+			var pluginConfiguration = BuildConfiguration.Release;
 #endif
 			CurrentPluginDirectory = Path.Combine(pluginRoot, "bin", pluginConfiguration);
 			CurrentPlugin?.Finalize?.Invoke();

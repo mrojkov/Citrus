@@ -105,9 +105,6 @@ namespace Lime
 
 		int MemoryUsed { get; }
 		TextureParams TextureParams { get; set; }
-#if UNITY
-		UnityEngine.Texture GetUnityTexture();
-#endif
 
 		/// <summary>
 		/// Unloads the texture from memory, frees OpenGL resources.

@@ -8,7 +8,7 @@ namespace Orange
 {
 	public static class Toolbox
 	{
-		private static string monoPath;
+		private static readonly char[] CmdArgumentDelimiters = { ':' };
 
 		public static string ToWindowsSlashes(string path)
 		{
@@ -22,11 +22,10 @@ namespace Orange
 
 		public static string GetCommandLineArg(string name)
 		{
-			var args = System.Environment.GetCommandLineArgs();
-			foreach (var arg in args) {
-				var x = arg.Split(new[] {':'}, 2);
-				if (x.Length == 2 && x[0] == name) {
-					return x[1];
+			foreach (var argument in Environment.GetCommandLineArgs()) {
+				var parts = argument.Split(CmdArgumentDelimiters, 2);
+				if (parts.Length == 2 && parts[0].Equals(name)) {
+					return parts[1];
 				}
 			}
 			return null;
@@ -34,13 +33,12 @@ namespace Orange
 
 		public static bool GetCommandLineFlag(string name)
 		{
-			var args = System.Environment.GetCommandLineArgs();
-			return Array.IndexOf(args, name) >= 0;
+			return Array.IndexOf(Environment.GetCommandLineArgs(), name) >= 0;
 		}
 
 		public static string GetApplicationDirectory()
 		{
-			var assemblyPath = System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase;
+			var assemblyPath = Assembly.GetExecutingAssembly().GetName().CodeBase;
 #if MAC
 			if (assemblyPath.StartsWith("file:")) {
 				assemblyPath = assemblyPath.Remove(0, 5);
@@ -50,8 +48,7 @@ namespace Orange
 				assemblyPath = assemblyPath.Remove(0, 8);
 			}
 #endif
-			var dir = System.IO.Path.GetDirectoryName(assemblyPath);
-			return dir;
+			return Path.GetDirectoryName(assemblyPath);
 		}
 
 		public static string CalcCitrusDirectory()
@@ -71,25 +68,6 @@ namespace Orange
 			return "/Library/Frameworks/Mono.framework/Versions/Current/bin/mono";
 		}
 
-		public static string GetTargetPlatformString(TargetPlatform platform)
-		{
-			switch(platform)
-			{
-			case TargetPlatform.Win:
-				return "Win";
-			case TargetPlatform.Mac:
-				return "Mac";
-			case TargetPlatform.iOS:
-				return "iOS";
-			case TargetPlatform.Android:
-				return "Android";
-			case TargetPlatform.Unity:
-				return "Unity";
-			default:
-				throw new InvalidOperationException("Invalid target platform");
-			}
-		}
-
 		public static IEnumerable<MethodInfo> GetAllMethodsWithAttribute(this Assembly assembly, Type attributeType)
 		{
 			foreach (var type in assembly.GetTypes()) {
@@ -104,9 +82,8 @@ namespace Orange
 
 		public static string GetTempFilePathWithExtension(string extension)
 		{
-			var path = Path.GetTempPath();
 			var fileName = Guid.NewGuid().ToString() + extension;
-			return Path.Combine(path, fileName);
+			return Path.Combine(Path.GetTempPath(), fileName);
 		}
 
 		public static string GetRelativePath(string path, string basePath)

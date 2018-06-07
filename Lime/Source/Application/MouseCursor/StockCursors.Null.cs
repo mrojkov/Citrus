@@ -1,4 +1,4 @@
-﻿#if ANDROID || iOS || UNITY
+#if ANDROID || iOS
 namespace Lime
 {
 	internal class StockCursors: IStockCursors

@@ -26,20 +26,19 @@ namespace Orange
 
 		public string GetPlatformSuffix(TargetPlatform? platform = null)
 		{
-			if (platform == null) {
-				platform = ActivePlatform;
-			}
-			return "." + Toolbox.GetTargetPlatformString(platform.Value);
+			return "." + (platform?.ToString() ?? ActivePlatform.ToString());
 		}
 
 		/// <summary>
 		/// Returns solution path. E.g: Zx3.Win/Zx3.Win.sln
 		/// </summary>
-		public string GetSolutionFilePath()
+		public string GetSolutionFilePath(TargetPlatform? platform = null)
 		{
-			var path = Path.Combine(The.Workspace.ProjectDirectory, The.Workspace.Title + GetPlatformSuffix(),
-				The.Workspace.Title + GetPlatformSuffix() + ".sln");
-			return path;
+			string platformProjectName = The.Workspace.Title + GetPlatformSuffix(platform);
+			return Path.Combine(
+				The.Workspace.ProjectDirectory,
+				platformProjectName,
+				platformProjectName + ".sln");
 		}
 
 		/// <summary>
@@ -63,13 +62,13 @@ namespace Orange
 
 		public static readonly Workspace Instance = new Workspace();
 
-		public TargetPlatform ActivePlatform => The.UI.GetActiveTarget().Platform;
+		public TargetPlatform ActivePlatform => ActiveTarget.Platform;
 
 		public Target ActiveTarget => The.UI.GetActiveTarget();
 
-		public string CustomSolution => The.UI.GetActiveTarget() == null ? null : The.UI.GetActiveTarget().ProjectPath;
+		public string CustomSolution => ActiveTarget?.ProjectPath;
 
-		public bool CleanBeforeBuild => The.UI.GetActiveTarget() != null && The.UI.GetActiveTarget().CleanBeforeBuild;
+		public bool CleanBeforeBuild => (ActiveTarget?.CleanBeforeBuild == true);
 
 		public JObject JObject { get; private set; }
 
@@ -168,7 +167,7 @@ namespace Orange
 
 		public string GetMainBundlePath(TargetPlatform platform)
 		{
-			return Path.ChangeExtension(AssetsDirectory, Toolbox.GetTargetPlatformString(platform));
+			return Path.ChangeExtension(AssetsDirectory, platform.ToString());
 		}
 
 		public string GetBundlePath(string bundleName)
@@ -181,22 +180,16 @@ namespace Orange
 			if (bundleName == CookingRulesBuilder.MainBundleName) {
 				return The.Workspace.GetMainBundlePath(platform);
 			} else {
-				return Path.Combine(Path.GetDirectoryName(AssetsDirectory), bundleName + "." + Toolbox.GetTargetPlatformString(platform));
+				return Path.Combine(Path.GetDirectoryName(AssetsDirectory), bundleName + GetPlatformSuffix(platform));
 			}
-		}
-
-		public string GetUnityProjectDirectory()
-		{
-			return Path.Combine(ProjectDirectory, Title + ".Unity");
 		}
 
 		private static TargetPlatform GetPlaformByName(string name)
 		{
 			try {
-				return (TargetPlatform)Enum.Parse(typeof(TargetPlatform), name, true);
-			}
-			catch (ArgumentException) {
-				throw new Lime.Exception("Uknown sub target platform name: {0}", name);
+				return (TargetPlatform) Enum.Parse(typeof(TargetPlatform), name, true);
+			} catch (ArgumentException) {
+				throw new Lime.Exception($"Unknown sub-target platform name: {name}");
 			}
 		}
 	}
