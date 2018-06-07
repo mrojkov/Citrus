@@ -172,7 +172,7 @@ namespace Tangerine
 						var path = Document.Current.Path;
 						Project.Current.CloseDocument(Document.Current);
 						Project.Current.OpenDocument(path);
-					} catch (System.Exception) {
+					} finally {
 						Document.CloseConfirmation = closeConfirmation;
 					}
 				}
