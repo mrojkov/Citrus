@@ -327,7 +327,7 @@ namespace Lime
 			}
 		}
 
-		public static void InvokeOnMainThreadBeginning(Action action)
+		public static void InvokeOnNextUpdate(Action action)
 		{
 			lock (scheduledActionsSync) {
 				scheduledActions += action;
