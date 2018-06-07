@@ -84,7 +84,7 @@ namespace Tangerine.Core
 				currentIndex = operations.Count;
 			} else {
 				operations.Insert(currentIndex, operation);
-				operations.Insert(currentIndex + 1, operation);
+				operations.Insert(currentIndex, operation);
 				currentIndex++;
 			}
 			Processors.Do(operation);
