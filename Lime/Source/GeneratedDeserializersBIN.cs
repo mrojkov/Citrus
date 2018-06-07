@@ -273,10 +273,6 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.DirtyFlags = (global::Lime.MeshDirtyFlags)d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (3 == fd.OurIndex) {
 				result.Indices = (global::System.UInt16[])null;
 				var tmp3 = d.Reader.ReadInt32();
 				if (tmp3 >= 0) {
@@ -288,11 +284,11 @@ namespace GeneratedDeserializersBIN
 				}
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (4 == fd.OurIndex) {
+			if (3 == fd.OurIndex) {
 				result.Topology = (global::Lime.PrimitiveTopology)d.Reader.ReadInt32();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (5 == fd.OurIndex) {
+			if (4 == fd.OurIndex) {
 				result.Vertices = (global::Lime.Mesh3D.Vertex[])null;
 				var tmp5 = d.Reader.ReadInt32();
 				if (tmp5 >= 0) {
