@@ -50,10 +50,10 @@ namespace Tangerine.Core
 		public void EndTransaction()
 		{
 			if (!IsTransactionActive) {
-				throw new InvalidOperationException("Transaction wasn't began");
+				throw new InvalidOperationException("Transaction didn't begin");
 			}
 			if (!transactionCommited) {
-				RollbackTransactionFromBeginning();
+				RollbackTransactionToStart();
 			}
 			transactionStartIndex = -1;
 		}
@@ -66,7 +66,7 @@ namespace Tangerine.Core
 			}
 		}
 		
-		public void DoTransactionMaybeNested(Action block)
+		public void DoTransactionPermitNested(Action block)
 		{
 			if (IsTransactionActive) {
 				block();
@@ -83,17 +83,17 @@ namespace Tangerine.Core
 			transactionCommited = true;
 		}
 		
-		public void RollbackTransactionFromBeginning()
+		public void RollbackTransactionToStart()
 		{
-			RollbackTransactionFromIndex(transactionStartIndex);
+			RollbackTransactionToIndex(transactionStartIndex);
 		}
 		
 		public void RollbackTransaction()
 		{
-			RollbackTransactionFromIndex(transactionRollbackPointIndex);
+			RollbackTransactionToIndex(transactionRollbackPointIndex);
 		}
 
-		private void RollbackTransactionFromIndex(int index)
+		private void RollbackTransactionToIndex(int index)
 		{
 			if (transactionCommited) {
 				throw new InvalidOperationException("Can't rollback committed transaction");
@@ -137,13 +137,13 @@ namespace Tangerine.Core
 			if (!CanUndo()) {
 				return;
 			}
-			int bid = 0;
+			int tid = 0;
 			for (; headIndex > 0; headIndex--) {
 				var o = operations[headIndex - 1];
-				if (o.IsChangingDocument && bid == 0) {
-					bid = o.TransactionId;
+				if (o.IsChangingDocument && tid == 0) {
+					tid = o.TransactionId;
 				}
-				if (bid > 0 && bid != o.TransactionId) {
+				if (tid > 0 && tid != o.TransactionId) {
 					break;
 				}
 				Processors.Undo(o);
@@ -215,13 +215,6 @@ namespace Tangerine.Core
 			return false;
 		}
 		
-		public interface ITransaction : IDisposable
-		{
-			void Commit();
-			void CommitAndDispose();
-			void Rollback();
-		}
-
 		public class ProcessorList : List<IOperationProcessor> 
 		{					
 			public void Do(IOperation operation)

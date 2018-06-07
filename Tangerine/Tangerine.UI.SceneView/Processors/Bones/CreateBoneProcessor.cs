@@ -92,7 +92,7 @@ namespace Tangerine.UI.SceneView
 						}
 						// do not create zero bone
 						if (bone != null && bone.Length == 0) {
-							Document.Current.History.RollbackTransactionFromBeginning();
+							Document.Current.History.RollbackTransactionToStart();
 							// must set length to zero to exectue "break;" later 
 							bone.Length = 0;
 						}

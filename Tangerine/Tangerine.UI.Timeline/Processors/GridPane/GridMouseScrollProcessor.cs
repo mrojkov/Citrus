@@ -21,7 +21,7 @@ namespace Tangerine.UI.Timeline
 					} else if (p.X < cw / 2) {
 						timeline.OffsetX = Math.Max(0, timeline.OffsetX - cw);
 					}
-					Core.Document.Current.History.DoTransactionMaybeNested(() => {
+					Core.Document.Current.History.DoTransactionPermitNested(() => {
 						Operations.SetCurrentColumn.Perform(RulerbarMouseScrollProcessor.CalcColumn(p.X));
 					});
 					var rh = TimelineMetrics.DefaultRowHeight;

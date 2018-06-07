@@ -272,7 +272,7 @@ namespace Tangerine.UI
 
 		protected void SetProperty(object value)
 		{
-			Document.Current.History.DoTransactionMaybeNested(() => {
+			Document.Current.History.DoTransactionPermitNested(() => {
 				foreach (var o in EditorParams.Objects) {
 					EditorParams.PropertySetter(o, EditorParams.PropertyName, value);
 				}
@@ -307,7 +307,7 @@ namespace Tangerine.UI
 		{
 			float newValue;
 			if (float.TryParse(editor.Text, out newValue)) {
-				Document.Current.History.DoTransactionMaybeNested(() => {
+				Document.Current.History.DoTransactionPermitNested(() => {
 					foreach (var obj in editorParams.Objects) {
 						var current = new Property<Vector2>(obj, editorParams.PropertyName).Value;
 						current[component] = newValue;
@@ -351,7 +351,7 @@ namespace Tangerine.UI
 		{
 			float newValue;
 			if (float.TryParse(editor.Text, out newValue)) {
-				Document.Current.History.DoTransactionMaybeNested(() => {
+				Document.Current.History.DoTransactionPermitNested(() => {
 					foreach (var obj in editorParams.Objects) {
 						var current = new Property<Vector3>(obj, editorParams.PropertyName).Value;
 						current[component] = newValue;
@@ -398,7 +398,7 @@ namespace Tangerine.UI
 		{
 			float newValue;
 			if (float.TryParse(editor.Text, out newValue)) {
-				Document.Current.History.DoTransactionMaybeNested(() => {
+				Document.Current.History.DoTransactionPermitNested(() => {
 					foreach (var obj in editorParams.Objects) {
 						var current = new Property<Quaternion>(obj, editorParams.PropertyName).Value.ToEulerAngles();
 						current[component] = newValue * Mathf.DegToRad;
@@ -439,7 +439,7 @@ namespace Tangerine.UI
 		{
 			float newValue;
 			if (float.TryParse(editor.Text, out newValue)) {
-				Document.Current.History.DoTransactionMaybeNested(() => {
+				Document.Current.History.DoTransactionPermitNested(() => {
 					foreach (var obj in editorParams.Objects) {
 						var current = new Property<NumericRange>(obj, editorParams.PropertyName).Value;
 						if (component == 0) {
@@ -1064,7 +1064,7 @@ namespace Tangerine.UI
 		{
 			float newValue;
 			if (float.TryParse(editor.Text, out newValue)) {
-				Document.Current.History.DoTransactionMaybeNested(() => {
+				Document.Current.History.DoTransactionPermitNested(() => {
 					foreach (var obj in editorParams.Objects) {
 						var prop = new Property<SkinningWeights>(obj, editorParams.PropertyName).Value.Clone();
 						prop[idx] = new BoneWeight {
@@ -1083,7 +1083,7 @@ namespace Tangerine.UI
 		{
 			float newValue;
 			if (float.TryParse(editor.Text, out newValue)) {
-				Document.Current.History.DoTransactionMaybeNested(() => {
+				Document.Current.History.DoTransactionPermitNested(() => {
 					foreach (var obj in editorParams.Objects) {
 						var prop = new Property<SkinningWeights>(obj, editorParams.PropertyName).Value.Clone();
 						prop[idx] = new BoneWeight {
