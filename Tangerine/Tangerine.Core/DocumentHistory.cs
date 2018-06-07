@@ -59,7 +59,7 @@ namespace Tangerine.Core
 			var index = transactionStartIndices.Peek();
 			if (currentIndex != index) {
 				for (; currentIndex > index; currentIndex--) {
-					Processors.UndoOrRedo(operations[currentIndex - 1]);
+					Processors.Invert(operations[currentIndex - 1]);
 				}
 				operations.RemoveRange(currentIndex, operations.Count - currentIndex);
 				OnChange();
@@ -98,14 +98,14 @@ namespace Tangerine.Core
 			}
 			int tid = 0;
 			for (; currentIndex > 0; currentIndex--) {
-				var i = operations[currentIndex - 1];
-				if (i.IsChangingDocument && tid == 0) {
-					tid = i.TransactionId;
+				var o = operations[currentIndex - 1];
+				if (o.IsChangingDocument && tid == 0) {
+					tid = o.TransactionId;
 				}
-				if (tid > 0 && tid != i.TransactionId) {
+				if (tid > 0 && tid != o.TransactionId) {
 					break;
 				}
-				Processors.UndoOrRedo(i);
+				Processors.Invert(o);
 			}
 			OnChange();
 		}
@@ -124,7 +124,7 @@ namespace Tangerine.Core
 				if (tid > 0 && tid != o.TransactionId) {
 					break;
 				}
-				Processors.UndoOrRedo(o);
+				Processors.Invert(o);
 			}
 			OnChange();
 		}
@@ -171,7 +171,7 @@ namespace Tangerine.Core
 				operation.Performed = true;
 			}
 
-			public void UndoOrRedo(IOperation operation)
+			public void Invert(IOperation operation)
 			{
 				foreach (var p in this) {
 					if (operation.Performed) {
