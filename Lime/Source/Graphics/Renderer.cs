@@ -132,6 +132,7 @@ namespace Lime
 			{
 				world = value;
 				worldViewDirty = worldViewProjDirty = true;
+				FlushWVPMatrix();
 			}
 		}
 
@@ -142,6 +143,7 @@ namespace Lime
 			{
 				view = value;
 				viewProjDirty = worldViewDirty = worldViewProjDirty = true;
+				FlushWVPMatrix();
 			}
 		}
 
@@ -153,7 +155,7 @@ namespace Lime
 				proj = value;
 				viewProjDirty = worldViewProjDirty = true;
 				Flush();
-				GlobalShaderParams.Set(projectionParamKey, FixupWVP(proj));
+				FlushWVPMatrix();
 			}
 		}
 
@@ -939,7 +941,7 @@ namespace Lime
 
 		private static void OnRenderTargetChanged()
 		{
-			GlobalShaderParams.Set(projectionParamKey, FixupWVP(proj));
+			FlushWVPMatrix();
 		}
 
 		public static Matrix44 FixupWVP(Matrix44 projection)
@@ -948,6 +950,11 @@ namespace Lime
 				projection *= Matrix44.CreateScale(new Vector3(1, -1, 1));
 			}
 			return projection;
+		}
+
+		private static void FlushWVPMatrix()
+		{
+			GlobalShaderParams.Set(projectionParamKey, FixupWVP(WorldViewProjection));
 		}
 	}
 
