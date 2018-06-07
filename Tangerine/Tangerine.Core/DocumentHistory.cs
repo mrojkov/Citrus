@@ -99,7 +99,7 @@ namespace Tangerine.Core
 			var documentChanged = false;
 			var s = GetTransactionStartIndex();
 			while (currentIndex > 0 && !documentChanged) {
-				documentChanged |= IsChangingOperationWithinRange(s, currentIndex);
+				documentChanged |= AnyChangingOperationWithinRange(s, currentIndex);
 				for (; currentIndex > s; currentIndex--) {
 					Processors.Invert(operations[currentIndex - 1]);
 				}
@@ -116,7 +116,7 @@ namespace Tangerine.Core
 			var documentChanged = false;
 			var e = GetTransactionEndIndex();
 			while (currentIndex < e) {
-				var b = IsChangingOperationWithinRange(currentIndex, e);
+				var b = AnyChangingOperationWithinRange(currentIndex, e);
 				if (b && documentChanged) {
 					break;
 				}
@@ -129,7 +129,7 @@ namespace Tangerine.Core
 			OnChange();
 		}
 		
-		private int GetTransactionStartIndex()
+		int GetTransactionStartIndex()
 		{
 			for (int i = currentIndex; i > 0; i--) {
 				if (operations[i - 1].TransactionId != operations[currentIndex - 1].TransactionId) {
@@ -139,7 +139,7 @@ namespace Tangerine.Core
 			return 0;
 		}
 
-		private int GetTransactionEndIndex()
+		int GetTransactionEndIndex()
 		{
 			for (int i = currentIndex; i < operations.Count; i++) {
 				if (operations[i].TransactionId != operations[currentIndex].TransactionId) {
@@ -168,11 +168,11 @@ namespace Tangerine.Core
 		void RefreshModifiedStatus()
 		{
 			IsDocumentModified = saveIndex < 0 || (saveIndex <= currentIndex ? 
-				IsChangingOperationWithinRange(saveIndex, currentIndex) : 
-				IsChangingOperationWithinRange(currentIndex, saveIndex));
+				AnyChangingOperationWithinRange(saveIndex, currentIndex) : 
+				AnyChangingOperationWithinRange(currentIndex, saveIndex));
 		}
 		
-		private bool IsChangingOperationWithinRange(int start, int end)
+		bool AnyChangingOperationWithinRange(int start, int end)
 		{
 			for (int i = start; i < end; i++) {
 				if (operations[i].IsChangingDocument)
