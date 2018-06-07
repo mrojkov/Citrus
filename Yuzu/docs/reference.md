@@ -230,3 +230,9 @@ Default value is `YB01`.
 
 If `true`, `Signature` must be present in front of every serialized stream, or an error will be thrown.
 Default value is `false`.
+
+#### `Unordered`
+
+If `true`, deserialization accepts fields in arbitrary order.
+This mode is slow and not supported by generated deseriializers. Use for compatibility only.
+Default value is `false`.
