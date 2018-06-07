@@ -68,6 +68,8 @@ namespace Tangerine.Core
 		/// </summary>
 		public DocumentFormat Format { get; set; }
 
+		public Node RootNodeUnwrapped { get; private set; }
+
 		/// <summary>
 		/// Gets the root node for the current document.
 		/// </summary>
@@ -138,7 +140,8 @@ namespace Tangerine.Core
 			try {
 				Path = path;
 				Format = ResolveFormat(path);
-				RootNode = Node.CreateFromAssetBundle(path);
+				RootNodeUnwrapped = Node.CreateFromAssetBundle(path);
+				RootNode = RootNodeUnwrapped;
 				SetModificationTimeToNow();
 				if (RootNode is Node3D) {
 					RootNode = WrapNodeWithViewport3D(RootNode);
@@ -305,13 +308,13 @@ namespace Tangerine.Core
 			Saving?.Invoke(this);
 			History.AddSavePoint();
 			Path = path;
-			WriteNodeToFile(path, Format, RootNode);
+			WriteNodeToFile(path, Format, RootNodeUnwrapped);
 			SetModificationTimeToNow();
 		}
 
 		public void SaveTo(string path, FileAttributes attributes = 0)
 		{
-			WriteNodeToFile(path, Format, RootNode, attributes);
+			WriteNodeToFile(path, Format, RootNodeUnwrapped, attributes);
 		}
 
 		public static void WriteNodeToFile(string path, DocumentFormat format, Node node, FileAttributes attributes = 0)
