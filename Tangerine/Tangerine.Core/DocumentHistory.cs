@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Lime;
 
 namespace Tangerine.Core
@@ -8,34 +7,24 @@ namespace Tangerine.Core
 	public class DocumentHistory
 	{
 		public static readonly ProcessorList Processors = new ProcessorList();
+		private readonly Stack<int> transactionStartIndices = new Stack<int>();
 		private readonly List<IOperation> operations = new List<IOperation>();
 		private int transactionId;
 		private int saveIndex;
 		private int currentIndex;
-		private int transactionStartIndex = -1;
-		private int transactionRollbackPointIndex = -1;
-		private bool transactionCommited;
 		
 		public bool CanUndo() => !IsTransactionActive && currentIndex > 0;
 		public bool CanRedo() => !IsTransactionActive && currentIndex < operations.Count;
 		public bool IsDocumentModified { get; private set; }
-		public bool IsTransactionActive => transactionStartIndex != -1;
+		public bool IsTransactionActive => transactionStartIndices.Count > 0;
 		
 		public IDisposable BeginTransaction()
 		{
-			if (IsTransactionActive) {
-				throw new InvalidOperationException("Nested transactions aren't allowed");
+			if (transactionStartIndices.Count == 0) {
+				transactionId++;
 			}
-			transactionId++;
-			transactionStartIndex = currentIndex;
-			transactionRollbackPointIndex = currentIndex;
-			transactionCommited = false;
+			transactionStartIndices.Push(currentIndex);
 			return new Disposable { OnDispose = EndTransaction };
-		}
-		
-		public void SetRollbackPoint()
-		{
-			transactionRollbackPointIndex = currentIndex;
 		}
 		
 		private class Disposable : IDisposable
@@ -47,13 +36,8 @@ namespace Tangerine.Core
 		
 		public void EndTransaction()
 		{
-			if (!IsTransactionActive) {
-				throw new InvalidOperationException("Transaction didn't begin");
-			}
-			if (!transactionCommited) {
-				RollbackTransactionToStart();
-			}
-			transactionStartIndex = -1;
+			RollbackTransaction();
+			transactionStartIndices.Pop();
 		}
 		
 		public void DoTransaction(Action block)
@@ -64,38 +48,15 @@ namespace Tangerine.Core
 			}
 		}
 		
-		public void DoTransactionPermitNested(Action block)
-		{
-			if (IsTransactionActive) {
-				block();
-			} else {
-				using (BeginTransaction()) {
-					block();
-					CommitTransaction();
-				}
-			}
-		}
-		
 		public void CommitTransaction()
 		{
-			transactionCommited = true;
-		}
-		
-		public void RollbackTransactionToStart()
-		{
-			RollbackTransactionToIndex(transactionStartIndex);
+			transactionStartIndices.Pop();
+			transactionStartIndices.Push(currentIndex);
 		}
 		
 		public void RollbackTransaction()
 		{
-			RollbackTransactionToIndex(transactionRollbackPointIndex);
-		}
-
-		private void RollbackTransactionToIndex(int index)
-		{
-			if (transactionCommited) {
-				throw new InvalidOperationException("Can't rollback committed transaction");
-			}
+			var index = transactionStartIndices.Peek();
 			if (currentIndex != index) {
 				for (; currentIndex > index; currentIndex--) {
 					Processors.UndoOrRedo(operations[currentIndex - 1]);

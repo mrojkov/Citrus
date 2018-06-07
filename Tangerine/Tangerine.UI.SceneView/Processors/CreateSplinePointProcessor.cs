@@ -45,14 +45,16 @@ namespace Tangerine.UI.SceneView
 							pos = sv.MousePosition * t / container.Size;
 						}
 						Core.Operations.SetProperty.Perform(currentPoint, nameof(PointObject.Position), pos);
-						Document.Current.History.SetRollbackPoint();
-						while (sv.Input.IsMousePressed()) {
-							Document.Current.History.RollbackTransaction();
-							
-							var dir = (sv.MousePosition * t - currentPoint.TransformedPosition) / SplinePointPresenter.TangentWeightRatio;
-							Core.Operations.SetProperty.Perform(currentPoint, nameof(SplinePoint.TangentAngle), dir.Atan2Deg);
-							Core.Operations.SetProperty.Perform(currentPoint, nameof(SplinePoint.TangentWeight), dir.Length);
-							yield return null;
+						using (Document.Current.History.BeginTransaction()) {
+							while (sv.Input.IsMousePressed()) {
+								Document.Current.History.RollbackTransaction();
+								
+								var dir = (sv.MousePosition * t - currentPoint.TransformedPosition) / SplinePointPresenter.TangentWeightRatio;
+								Core.Operations.SetProperty.Perform(currentPoint, nameof(SplinePoint.TangentAngle), dir.Atan2Deg);
+								Core.Operations.SetProperty.Perform(currentPoint, nameof(SplinePoint.TangentWeight), dir.Length);
+								yield return null;
+							}
+							Document.Current.History.CommitTransaction();
 						}
 						Document.Current.History.CommitTransaction();
 					}

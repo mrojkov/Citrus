@@ -76,23 +76,25 @@ namespace Tangerine.UI.SceneView
 						if (bone.BaseIndex != 0) {
 							Core.Operations.SortBonesInChain.Perform(bone);
 						}
-						Document.Current.History.SetRollbackPoint();
-						while (sv.Input.IsMousePressed()) {
-							Document.Current.History.RollbackTransaction();
-
-							var dir = (sv.MousePosition * t - initPosition).Snap(Vector2.Zero);
-							var angle = dir.Atan2Deg;
-							if (index != 0) {
-								var prentDir = items[index].Tip - items[index].Joint;
-								angle = Vector2.AngleDeg(prentDir, dir);
+						using (Document.Current.History.BeginTransaction()) {
+							while (sv.Input.IsMousePressed()) {
+								Document.Current.History.RollbackTransaction();
+	
+								var dir = (sv.MousePosition * t - initPosition).Snap(Vector2.Zero);
+								var angle = dir.Atan2Deg;
+								if (index != 0) {
+									var prentDir = items[index].Tip - items[index].Joint;
+									angle = Vector2.AngleDeg(prentDir, dir);
+								}
+								Core.Operations.SetProperty.Perform(bone, nameof(Bone.Rotation), angle);
+								Core.Operations.SetProperty.Perform(bone, nameof(Bone.Length), dir.Length);
+								yield return null;
 							}
-							Core.Operations.SetProperty.Perform(bone, nameof(Bone.Rotation), angle);
-							Core.Operations.SetProperty.Perform(bone, nameof(Bone.Length), dir.Length);
-							yield return null;
+							Document.Current.History.CommitTransaction();
 						}
 						// do not create zero bone
 						if (bone != null && bone.Length == 0) {
-							Document.Current.History.RollbackTransactionToStart();
+							Document.Current.History.RollbackTransaction();
 							// must set length to zero to exectue "break;" later 
 							bone.Length = 0;
 						}

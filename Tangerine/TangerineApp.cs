@@ -156,7 +156,9 @@ namespace Tangerine
 				AlertDialog.Show(e.Message + "\n" + e.StackTrace);
 				if (Document.Current != null) {
 					if (Document.Current.History.IsTransactionActive) {
-						Document.Current.History.RollbackTransactionToStart();
+						while (Document.Current.History.IsTransactionActive) {
+							Document.Current.History.EndTransaction();
+						}
 					}
 					var closeConfirmation = Document.CloseConfirmation;
 					try {

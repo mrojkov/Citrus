@@ -8,7 +8,7 @@ namespace Tangerine.Core.Operations
 
 		public static void Perform()
 		{
-			Document.Current.History.DoTransactionPermitNested(() => Document.Current.History.Perform(new Dummy()));
+			Document.Current.History.DoTransaction(() => Document.Current.History.Perform(new Dummy()));
 		}
 
 		private Dummy() { }
