@@ -11,13 +11,13 @@ namespace Tangerine.Core
 		private readonly List<IOperation> operations = new List<IOperation>();
 		private int transactionId;
 		private int saveIndex;
-		private int headIndex;
+		private int currentIndex;
 		private int transactionStartIndex = -1;
 		private int transactionRollbackPointIndex = -1;
 		private bool transactionCommited;
 		
-		public bool CanUndo() => !IsTransactionActive && headIndex > 0;
-		public bool CanRedo() => !IsTransactionActive && headIndex < operations.Count;
+		public bool CanUndo() => !IsTransactionActive && currentIndex > 0;
+		public bool CanRedo() => !IsTransactionActive && currentIndex < operations.Count;
 		public bool IsDocumentModified { get; private set; }
 		public bool IsTransactionActive => transactionStartIndex != -1;
 		
@@ -27,15 +27,15 @@ namespace Tangerine.Core
 				throw new InvalidOperationException("Nested transactions aren't allowed");
 			}
 			transactionId++;
-			transactionStartIndex = headIndex;
-			transactionRollbackPointIndex = headIndex;
+			transactionStartIndex = currentIndex;
+			transactionRollbackPointIndex = currentIndex;
 			transactionCommited = false;
 			return new Disposable { OnDispose = EndTransaction };
 		}
 		
 		public void SetRollbackPoint()
 		{
-			transactionRollbackPointIndex = headIndex;
+			transactionRollbackPointIndex = currentIndex;
 		}
 		
 		private class Disposable : IDisposable
@@ -96,11 +96,11 @@ namespace Tangerine.Core
 			if (transactionCommited) {
 				throw new InvalidOperationException("Can't rollback committed transaction");
 			}
-			if (headIndex != index) {
-				for (; headIndex > index; headIndex--) {
-					Processors.UndoOrRedo(operations[headIndex - 1]);
+			if (currentIndex != index) {
+				for (; currentIndex > index; currentIndex--) {
+					Processors.UndoOrRedo(operations[currentIndex - 1]);
 				}
-				operations.RemoveRange(headIndex, operations.Count - headIndex);
+				operations.RemoveRange(currentIndex, operations.Count - currentIndex);
 				OnChange();
 			}
 		}
@@ -111,20 +111,20 @@ namespace Tangerine.Core
 				throw new InvalidOperationException("Can't perform an operation outside a transaction");
 			}
 			operation.TransactionId = transactionId;
-			if (saveIndex > headIndex) {
+			if (saveIndex > currentIndex) {
 				saveIndex = -1;
 			}
-			if (headIndex == operations.Count) {
+			if (currentIndex == operations.Count) {
 				operations.Add(operation);
-				headIndex++;
+				currentIndex++;
 			} else if (operation.IsChangingDocument) {
-				operations.RemoveRange(headIndex, operations.Count - headIndex);
+				operations.RemoveRange(currentIndex, operations.Count - currentIndex);
 				operations.Add(operation);
-				headIndex = operations.Count;
+				currentIndex = operations.Count;
 			} else {
-				operations.Insert(headIndex, operation);
-				operations.Insert(headIndex + 1, operation);
-				headIndex++;
+				operations.Insert(currentIndex, operation);
+				operations.Insert(currentIndex + 1, operation);
+				currentIndex++;
 			}
 			Processors.Do(operation);
 			OnChange();
@@ -136,8 +136,8 @@ namespace Tangerine.Core
 				return;
 			}
 			int tid = 0;
-			for (; headIndex > 0; headIndex--) {
-				var i = operations[headIndex - 1];
+			for (; currentIndex > 0; currentIndex--) {
+				var i = operations[currentIndex - 1];
 				if (i.IsChangingDocument && tid == 0) {
 					tid = i.TransactionId;
 				}
@@ -155,8 +155,8 @@ namespace Tangerine.Core
 				return;
 			}
 			int tid = 0;
-			for (; headIndex < operations.Count; headIndex++) {
-				var o = operations[headIndex];
+			for (; currentIndex < operations.Count; currentIndex++) {
+				var o = operations[currentIndex];
 				if (o.IsChangingDocument && tid == 0) {
 					tid = o.TransactionId;
 				}
@@ -170,7 +170,7 @@ namespace Tangerine.Core
 		
 		public void AddSavePoint()
 		{
-			for (saveIndex = headIndex; saveIndex > 0; saveIndex--) {
+			for (saveIndex = currentIndex; saveIndex > 0; saveIndex--) {
 				if (operations[saveIndex - 1].IsChangingDocument) {
 					break;
 				}
@@ -186,9 +186,9 @@ namespace Tangerine.Core
 		
 		void RefreshModifiedStatus()
 		{
-			IsDocumentModified = saveIndex < 0 || (saveIndex <= headIndex ? 
-				IsChangingOperationWithinRange(saveIndex, headIndex) : 
-				IsChangingOperationWithinRange(headIndex, saveIndex));
+			IsDocumentModified = saveIndex < 0 || (saveIndex <= currentIndex ? 
+				IsChangingOperationWithinRange(saveIndex, currentIndex) : 
+				IsChangingOperationWithinRange(currentIndex, saveIndex));
 		}
 
 		private bool IsChangingOperationWithinRange(int start, int end)
