@@ -96,16 +96,14 @@ namespace Tangerine.Core
 			if (!CanUndo()) {
 				return;
 			}
-			int tid = 0;
-			for (; currentIndex > 0; currentIndex--) {
-				var o = operations[currentIndex - 1];
-				if (o.IsChangingDocument && tid == 0) {
-					tid = o.TransactionId;
+			var documentChanged = false;
+			var s = GetTransactionStartIndex();
+			while (currentIndex > 0 && !documentChanged) {
+				documentChanged |= IsChangingOperationWithinRange(s, currentIndex);
+				for (; currentIndex > s; currentIndex--) {
+					Processors.Invert(operations[currentIndex - 1]);
 				}
-				if (tid > 0 && tid != o.TransactionId) {
-					break;
-				}
-				Processors.Invert(o);
+				s = GetTransactionStartIndex();
 			}
 			OnChange();
 		}
@@ -116,7 +114,8 @@ namespace Tangerine.Core
 				return;
 			}
 			var documentChanged = false;
-			for (int e = GetTransactionEnd(); currentIndex < e; e = GetTransactionEnd()) {
+			var e = GetTransactionEndIndex();
+			while (currentIndex < e) {
 				var b = IsChangingOperationWithinRange(currentIndex, e);
 				if (b && documentChanged) {
 					break;
@@ -125,11 +124,22 @@ namespace Tangerine.Core
 				for (; currentIndex < e; currentIndex++) {
 					Processors.Invert(operations[currentIndex]);
 				}
+				e = GetTransactionEndIndex();
 			}
 			OnChange();
 		}
 		
-		private int GetTransactionEnd()
+		private int GetTransactionStartIndex()
+		{
+			for (int i = currentIndex; i > 0; i--) {
+				if (operations[i - 1].TransactionId != operations[currentIndex - 1].TransactionId) {
+					return i;
+				}
+			}
+			return 0;
+		}
+
+		private int GetTransactionEndIndex()
 		{
 			for (int i = currentIndex; i < operations.Count; i++) {
 				if (operations[i].TransactionId != operations[currentIndex].TransactionId) {
