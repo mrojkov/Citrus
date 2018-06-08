@@ -13,9 +13,10 @@ namespace Tangerine.UI
 
 		sealed public override void Execute()
 		{
-			using (Core.Document.Current.History.BeginTransaction()) {
+			var history = Core.Document.Current.History;
+			using (history.BeginTransaction()) {
 				ExecuteTransaction();
-				Core.Document.Current.History.CommitTransaction();
+				history.CommitTransaction();
 			}
 		}
 		
