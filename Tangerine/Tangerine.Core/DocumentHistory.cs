@@ -71,7 +71,6 @@ namespace Tangerine.Core
 			if (!IsTransactionActive) {
 				throw new InvalidOperationException("Can't perform an operation outside a transaction");
 			}
-			Processors.Do(operation);
 			operation.TransactionId = transactionId;
 			if (saveIndex > currentIndex) {
 				saveIndex = -1;
@@ -88,6 +87,7 @@ namespace Tangerine.Core
 				operations.Insert(currentIndex, operation);
 				currentIndex++;
 			}
+			Processors.Do(operation);
 			OnChange();
 		}
 				
