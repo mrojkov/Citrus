@@ -12,7 +12,7 @@ namespace Tangerine.UI
 	{
 		IPropertyEditorParams EditorParams { get; }
 		Widget ContainerWidget { get; }
-		void SetFocus();
+		SimpleText PropertyLabel { get; }
 		void DropFiles(IEnumerable<string> files);
 	}
 
@@ -248,8 +248,6 @@ namespace Tangerine.UI
 
 		public virtual void DropFiles(IEnumerable<string> files) { }
 
-		public virtual void SetFocus() { }
-
 		protected IDataflowProvider<T> CoalescedPropertyValue(T defaultValue = default(T))
 		{
 			IDataflowProvider<T> provider = null;
@@ -299,8 +297,6 @@ namespace Tangerine.UI
 			editorY.AddChangeWatcher(currentY, v => editorY.Text = v.ToString());
 		}
 
-		public override void SetFocus() => editorX.SetFocus();
-
 		void SetComponent(IPropertyEditorParams editorParams, int component, CommonEditBox editor, float currentValue)
 		{
 			float newValue;
@@ -340,8 +336,6 @@ namespace Tangerine.UI
 			editorY.AddChangeWatcher(currentY, v => editorY.Text = v.ToString());
 			editorZ.AddChangeWatcher(currentZ, v => editorZ.Text = v.ToString());
 		}
-
-		public override void SetFocus() => editorX.SetFocus();
 
 		void SetComponent(IPropertyEditorParams editorParams, int component, NumericEditBox editor, float currentValue)
 		{
@@ -384,8 +378,6 @@ namespace Tangerine.UI
 			});
 		}
 
-		public override void SetFocus() => editorX.SetFocus();
-
 		float RoundAngle(float value) => (value * 1000f).Round() / 1000f;
 
 		void SetComponent(IPropertyEditorParams editorParams, int component, NumericEditBox editor, Quaternion currentValue)
@@ -425,8 +417,6 @@ namespace Tangerine.UI
 			dispEditor.AddChangeWatcher(currentDisp, v => dispEditor.Text = v.ToString());
 		}
 
-		public override void SetFocus() => medEditor.SetFocus();
-
 		void SetComponent(IPropertyEditorParams editorParams, int component, NumericEditBox editor, float currentValue)
 		{
 			float newValue;
@@ -464,8 +454,6 @@ namespace Tangerine.UI
 			};
 			editor.AddChangeWatcher(CoalescedPropertyValue(), v => editor.Text = v?.Id);
 		}
-
-		public override void SetFocus() => editor.SetFocus();
 	}
 
 	public class StringPropertyEditor : CommonPropertyEditor<string>
@@ -483,7 +471,6 @@ namespace Tangerine.UI
 			editor.Submitted += SetProperty;
 			editor.AddChangeWatcher(CoalescedPropertyValue(), v => editor.Text = v);
 		}
-		public override void SetFocus() => editor.SetFocus();
 	}
 
 	public class EnumPropertyEditor<T> : CommonPropertyEditor<T>
@@ -507,8 +494,6 @@ namespace Tangerine.UI
 			};
 			Selector.AddChangeWatcher(CoalescedPropertyValue(), v => Selector.Value = v);
 		}
-
-		public override void SetFocus() => Selector.SetFocus();
 	}
 
 	public class BooleanPropertyEditor : CommonPropertyEditor<bool>
@@ -527,8 +512,6 @@ namespace Tangerine.UI
 			};
 			checkBox.AddChangeWatcher(CoalescedPropertyValue(), v => checkBox.Checked = v);
 		}
-
-		public override void SetFocus() => checkBox.SetFocus();
 	}
 
 	public class FloatPropertyEditor : CommonPropertyEditor<float>
@@ -550,8 +533,6 @@ namespace Tangerine.UI
 			};
 			editor.AddChangeWatcher(current, v => editor.Text = v.ToString());
 		}
-
-		public override void SetFocus() => editor.SetFocus();
 	}
 
 	public class IntPropertyEditor : CommonPropertyEditor<int>
@@ -575,8 +556,6 @@ namespace Tangerine.UI
 			};
 			editor.AddChangeWatcher(current, v => editor.Text = v.ToString());
 		}
-
-		public override void SetFocus() => editor.SetFocus();
 	}
 
 	public class Color4PropertyEditor : ExpandablePropertyEditor<Color4>
@@ -625,8 +604,6 @@ namespace Tangerine.UI
 			button.Tasks.Add(UIProcessors.PickColorProcessor(button, v => SetProperty(v)));
 			return button;
 		}
-
-		public override void SetFocus() => editor.SetFocus();
 
 		class ColorBoxButton : Button
 		{
@@ -713,8 +690,6 @@ namespace Tangerine.UI
 			} catch (System.Exception) { }
 		}
 
-		public override void SetFocus() => editor.SetFocus();
-
 		protected abstract void AssignAsset(string path);
 	}
 
@@ -747,8 +722,6 @@ namespace Tangerine.UI
 				$"RenderTexture ({v.ImageSize.Width}x{v.ImageSize.Height})"
 			);
 		}
-
-		public override void SetFocus() => editor.SetFocus();
 	}
 
 	public class AudioSamplePropertyEditor : FilePropertyEditor<SerializableSample>
@@ -807,8 +780,6 @@ namespace Tangerine.UI
 		{
 			return string.IsNullOrEmpty(i?.Name) ? "Default" : i.Name;
 		}
-
-		public override void SetFocus() => selector.SetFocus();
 	}
 
 	public class TriggerPropertyEditor : CommonPropertyEditor<string>
@@ -891,8 +862,6 @@ namespace Tangerine.UI
 				animationId = t[1];
 			}
 		}
-
-		public override void SetFocus() => comboBox.SetFocus();
 
 		private class TriggerStringComparer : IEqualityComparer<string>
 		{
@@ -977,8 +946,6 @@ namespace Tangerine.UI
 			return x;
 		}
 
-		public override void SetFocus() => firstButton.SetFocus();
-
 		class AnchorButton : ToolbarButton
 		{
 			protected override void GetColors(State state, out Color4 bgColor, out Color4 borderColor)
@@ -1044,8 +1011,6 @@ namespace Tangerine.UI
 			indexEditors[idx].AddChangeWatcher(provider, v => indexEditors[idx].Text = v[idx].Index.ToString());
 			weigthsEditors[idx].AddChangeWatcher(provider, v => weigthsEditors[idx].Text = v[idx].Weight.ToString());
 		}
-
-		public override void SetFocus() => indexEditors[0].SetFocus();
 
 		private void SetIndexValue(IPropertyEditorParams editorParams, int idx, CommonEditBox editor, SkinningWeights sw)
 		{

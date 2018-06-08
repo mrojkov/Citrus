@@ -192,8 +192,8 @@ namespace Tangerine.UI.Inspector
 					LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0),
 					KeyColor = KeyframePalette.Colors[editor.EditorParams.TangerineAttribute.ColorIndex],
 				};
-				keyFunctionButton.Clicked += editor.SetFocus;
-				keyframeButton.Clicked += editor.SetFocus;
+				keyFunctionButton.Clicked += editor.PropertyLabel.SetFocus;
+				keyframeButton.Clicked += editor.PropertyLabel.SetFocus;
 				ctr.Nodes.Insert(index++, keyFunctionButton);
 				ctr.Nodes.Insert(index++, keyframeButton);
 				ctr.Nodes.Insert(index, new HSpacer(4));
