@@ -155,10 +155,8 @@ namespace Tangerine
 			dockManager.UnhandledExceptionOccurred += e => {
 				AlertDialog.Show(e.Message + "\n" + e.StackTrace);
 				if (Document.Current != null) {
-					if (Document.Current.History.IsTransactionActive) {
-						while (Document.Current.History.IsTransactionActive) {
-							Document.Current.History.EndTransaction();
-						}
+					while (Document.Current.History.IsTransactionActive) {
+						Document.Current.History.EndTransaction();
 					}
 					var closeConfirmation = Document.CloseConfirmation;
 					try {
