@@ -33,9 +33,10 @@ namespace Tangerine.Core
 		public static void AddTransactionClickHandler(this Button button, Action clicked)
 		{
 			button.Clicked += () => {
-				using (Document.Current.History.BeginTransaction()) {
+				var history = Document.Current.History;
+				using (history.BeginTransaction()) {
 					clicked();
-					Document.Current.History.CommitTransaction();
+					history.CommitTransaction();
 				}
 			};
 		}
