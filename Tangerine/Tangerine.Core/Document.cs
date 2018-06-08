@@ -130,7 +130,7 @@ namespace Tangerine.Core
 		{
 			Format = DocumentFormat.Scene;
 			Path = defaultPath;
-			Container = RootNode = new Frame { Size = defaultSceneSize };
+			Container = RootNodeUnwrapped = RootNode = new Frame { Size = defaultSceneSize };
 			RootNode.DefaultAnimation.AnimationEngine = new Orange.CompatibilityAnimationEngine();
 			SetModificationTimeToNow();
 		}
