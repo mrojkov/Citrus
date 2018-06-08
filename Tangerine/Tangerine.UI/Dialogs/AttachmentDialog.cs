@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -333,6 +333,13 @@ namespace Tangerine.UI
 						nameof(Model3DAttachment.MeshOption.CullMode)) { ShowLabel = false });
 				cullModePropEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.EditorWidth;
 
+				var opaquePropEditor = new BooleanPropertyEditor(
+					new PropertyEditorParams(
+						Header,
+						mesh,
+						nameof(Model3DAttachment.MeshOption.Opaque)) { ShowLabel = false });
+				opaquePropEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.ControlWidth;
+
 				var hitPropEditor = new BooleanPropertyEditor(
 					new PropertyEditorParams(
 						Header,
@@ -357,6 +364,10 @@ namespace Tangerine.UI
 						new ThemedSimpleText {
 							Text = "Cull Mode",
 							MinMaxWidth = AttachmentMetrics.EditorWidth,
+						},
+						new ThemedSimpleText {
+							Text = "Opaque",
+							MinMaxWidth = AttachmentMetrics.ControlWidth,
 						},
 						new ThemedSimpleText {
 							Text = "Hit Test Target",

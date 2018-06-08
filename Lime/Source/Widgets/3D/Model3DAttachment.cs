@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -22,6 +22,7 @@ namespace Lime
 			public string Id { get; set; }
 			public bool HitTestTarget { get; set; }
 			public CullMode CullMode { get; set; }
+			public bool Opaque { get; set; }
 		}
 
 		public class Animation
@@ -129,6 +130,7 @@ namespace Lime
 						mesh.HitTestTarget = true;
 						mesh.SkipRender = true;
 					}
+					mesh.Opaque = meshOption.Opaque;
 					mesh.CullMode = meshOption.CullMode;
 					break;
 				}
@@ -284,6 +286,9 @@ namespace Lime
 			public bool HitTestTarget = false;
 
 			[YuzuMember]
+			public bool Opaque = false;
+
+			[YuzuMember]
 			public string CullMode = null;
 		}
 
@@ -392,9 +397,10 @@ namespace Lime
 				};
 				if (modelAttachmentFormat.MeshOptions != null) {
 					foreach (var meshOptionFormat in modelAttachmentFormat.MeshOptions) {
-						var meshOption = new Model3DAttachment.MeshOption() {
+						var meshOption = new Model3DAttachment.MeshOption {
 							Id = meshOptionFormat.Key,
-							HitTestTarget = meshOptionFormat.Value.HitTestTarget
+							HitTestTarget = meshOptionFormat.Value.HitTestTarget,
+							Opaque = meshOptionFormat.Value.Opaque
 						};
 						if (!string.IsNullOrEmpty(meshOptionFormat.Value.CullMode)) {
 							switch (meshOptionFormat.Value.CullMode) {
@@ -521,6 +527,7 @@ namespace Lime
 			foreach (var meshOption in attachment.MeshOptions) {
 				var meshOptionFormat = new MeshOptionFormat {
 					HitTestTarget = meshOption.HitTestTarget,
+					Opaque = meshOption.Opaque
 				};
 				switch (meshOption.CullMode) {
 					case CullMode.None:
