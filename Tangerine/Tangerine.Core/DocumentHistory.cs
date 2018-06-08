@@ -69,7 +69,7 @@ namespace Tangerine.Core
 		public void Perform(IOperation operation)
 		{
 			if (!IsTransactionActive) {
-				throw new InvalidOperationException("Can't perform an operation outside a transaction");
+				throw new InvalidOperationException("Can't perform an operation outside the transaction");
 			}
 			operation.TransactionId = transactionId;
 			if (saveIndex > currentIndex) {
@@ -96,8 +96,8 @@ namespace Tangerine.Core
 			if (!CanUndo()) {
 				return;
 			}
-			var documentChanged = false;
-			var s = GetTransactionStartIndex();
+			bool documentChanged = false;
+			int s = GetTransactionStartIndex();
 			while (currentIndex > 0 && !documentChanged) {
 				documentChanged |= AnyChangingOperationWithinRange(s, currentIndex);
 				for (; currentIndex > s; currentIndex--) {
@@ -113,10 +113,10 @@ namespace Tangerine.Core
 			if (!CanRedo()) {
 				return;
 			}
-			var documentChanged = false;
-			var e = GetTransactionEndIndex();
+			bool documentChanged = false;
+			int e = GetTransactionEndIndex();
 			while (currentIndex < e) {
-				var b = AnyChangingOperationWithinRange(currentIndex, e);
+				bool b = AnyChangingOperationWithinRange(currentIndex, e);
 				if (b && documentChanged) {
 					break;
 				}
@@ -129,7 +129,7 @@ namespace Tangerine.Core
 			OnChange();
 		}
 		
-		int GetTransactionStartIndex()
+		private int GetTransactionStartIndex()
 		{
 			for (int i = currentIndex; i > 0; i--) {
 				if (operations[i - 1].TransactionId != operations[currentIndex - 1].TransactionId) {
@@ -139,7 +139,7 @@ namespace Tangerine.Core
 			return 0;
 		}
 
-		int GetTransactionEndIndex()
+		private int GetTransactionEndIndex()
 		{
 			for (int i = currentIndex; i < operations.Count; i++) {
 				if (operations[i].TransactionId != operations[currentIndex].TransactionId) {
@@ -159,20 +159,20 @@ namespace Tangerine.Core
 			RefreshModifiedStatus();
 		}
 		
-		void OnChange()
+		private void OnChange()
 		{
 			RefreshModifiedStatus();
 			Application.InvalidateWindows();
 		}
 		
-		void RefreshModifiedStatus()
+		private void RefreshModifiedStatus()
 		{
 			IsDocumentModified = saveIndex < 0 || (saveIndex <= currentIndex ? 
 				AnyChangingOperationWithinRange(saveIndex, currentIndex) : 
 				AnyChangingOperationWithinRange(currentIndex, saveIndex));
 		}
 		
-		bool AnyChangingOperationWithinRange(int start, int end)
+		private bool AnyChangingOperationWithinRange(int start, int end)
 		{
 			for (int i = start; i < end; i++) {
 				if (operations[i].IsChangingDocument)
