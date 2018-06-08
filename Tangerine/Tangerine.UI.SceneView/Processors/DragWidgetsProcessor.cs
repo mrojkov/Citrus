@@ -22,7 +22,7 @@ namespace Tangerine.UI.SceneView
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {
 						if (sv.Input.IsKeyPressed(Key.Alt)) {
-							sv.DuplicateSelectedNodes();
+							Document.Current.History.DoTransaction(sv.DuplicateSelectedNodes);
 						}
 						yield return Drag();
 					}
