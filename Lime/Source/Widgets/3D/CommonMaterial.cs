@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -143,6 +143,7 @@ namespace Lime
             shaderParams.Set(shaderParamKeys.World, Renderer.World);
 			shaderParams.Set(shaderParamKeys.WorldView, Renderer.WorldView);
 			shaderParams.Set(shaderParamKeys.WorldViewProj, Renderer.WorldViewProjection);
+			shaderParams.Set(shaderParamKeys.ColorFactor, Renderer.ColorFactor.ToVector4());
 			shaderParams.Set(shaderParamKeys.DiffuseColor, DiffuseColor.ToVector4());
 			if (processLightning) {
 				shaderParams.Set(shaderParamKeys.LightColor, lightSource.Color.ToVector4());
@@ -223,6 +224,7 @@ namespace Lime
 			public readonly ShaderParamKey<Matrix44> WorldViewProj;
 			public readonly ShaderParamKey<Matrix44> WorldView;
 			public readonly ShaderParamKey<Matrix44> World;
+			public readonly ShaderParamKey<Vector4> ColorFactor;
 			public readonly ShaderParamKey<Vector4> DiffuseColor;
 			public readonly ShaderParamKey<Vector4> LightColor;
 			public readonly ShaderParamKey<Vector3> LightDirection;
@@ -242,6 +244,7 @@ namespace Lime
 				WorldViewProj = parameters.GetParamKey<Matrix44>("u_WorldViewProj");
 				WorldView = parameters.GetParamKey<Matrix44>("u_WorldView");
 				World = parameters.GetParamKey<Matrix44>("u_World");
+				ColorFactor = parameters.GetParamKey<Vector4>("u_ColorFactor");
 				DiffuseColor = parameters.GetParamKey<Vector4>("u_DiffuseColor");
 				LightColor = parameters.GetParamKey<Vector4>("u_LightColor");
 				LightDirection = parameters.GetParamKey<Vector3>("u_LightDirection");

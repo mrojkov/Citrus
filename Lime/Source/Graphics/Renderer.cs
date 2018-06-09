@@ -89,6 +89,7 @@ namespace Lime
 	public static class Renderer
 	{
 		private static ShaderParamKey<Matrix44> projectionParamKey;
+		private static ShaderParamKey<Vector4> colorFactorParamKey;
 
 		private static Matrix44 world = Matrix44.Identity;
 		private static Matrix44 view = Matrix44.Identity;
@@ -109,6 +110,7 @@ namespace Lime
 		private static DepthState depthState;
 		private static StencilState stencilState;
 		private static ScissorState scissorState;
+		private static Color4 colorFactor;
 
 		public static Blending Blending;
 		public static ShaderId Shader;
@@ -274,10 +276,24 @@ namespace Lime
 			}
 		}
 
+		public static Color4 ColorFactor
+		{
+			get { return colorFactor; }
+			set
+			{
+				if (colorFactor != value) {
+					colorFactor = value;
+					GlobalShaderParams.Set(colorFactorParamKey, colorFactor.ToVector4());
+				}
+			}
+		}
+
 		static Renderer()
 		{
 			projectionParamKey = GlobalShaderParams.GetParamKey<Matrix44>("matProjection");
+			colorFactorParamKey = GlobalShaderParams.GetParamKey<Vector4>("colorFactor");
 			PlatformRenderer.RenderTargetChanged += OnRenderTargetChanged;
+			ColorFactor = Color4.White;
 		}
 
 		public static void SetOrthogonalProjection(Vector2 leftTop, Vector2 rightBottom)

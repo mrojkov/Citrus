@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Lime
@@ -7,9 +7,10 @@ namespace Lime
 	{
 		private static Dictionary<ShaderParamSortingKeyInfo, int> orderKeyLookup = new Dictionary<ShaderParamSortingKeyInfo, int>();
 
-		internal int Count => Params.Count;
+		internal int Count => Items.Count;
 		internal List<int> SortingKeys = new List<int>();
-		internal List<ShaderParam> Params = new List<ShaderParam>();
+		internal List<int> ItemIndices = new List<int>();
+		internal List<ShaderParam> Items = new List<ShaderParam>();
 
 		internal static int GetSortingKey(string name, Type type)
 		{
@@ -32,9 +33,10 @@ namespace Lime
 			if (index < 0) {
 				index = ~index;
 				SortingKeys.Insert(index, sortingKey);
-				Params.Insert(index, null);
+				ItemIndices.Insert(index, Items.Count);
+				Items.Add(null);
 			}
-			return new ShaderParamKey<T> { Name = name, Index = index };
+			return new ShaderParamKey<T> { Name = name, Index = ItemIndices[index] };
 		}
 
 		public void Set<T>(ShaderParamKey<T> key, T value)
@@ -59,10 +61,10 @@ namespace Lime
 
 		private ShaderParam<T> GetParameter<T>(ShaderParamKey<T> key, int capacity)
 		{
-			var p = Params[key.Index] as ShaderParam<T>;
+			var p = Items[key.Index] as ShaderParam<T>;
 			if (p == null || p.Data.Length < capacity) {
 				p = new ShaderParam<T>(capacity) { Name = key.Name };
-				Params[key.Index] = p;
+				Items[key.Index] = p;
 			}
 			return p;
 		}

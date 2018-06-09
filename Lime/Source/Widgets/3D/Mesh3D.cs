@@ -105,9 +105,10 @@ namespace Lime
 				return;
 			}
 			
-			bool lightningEnabled = ProcessLightning && Viewport != null && Viewport.LightSource != null && Viewport.LightSource.Visible;
-			bool shadowsEnabled = lightningEnabled && Viewport.LightSource.ShadowMappingEnabled;
-
+			var lightningEnabled = ProcessLightning && Viewport != null && Viewport.LightSource != null && Viewport.LightSource.Visible;
+			var shadowsEnabled = lightningEnabled && Viewport.LightSource.ShadowMappingEnabled;
+			var oldColorFactor = Renderer.ColorFactor;
+			Renderer.ColorFactor = GlobalColor;
 			Renderer.World = GlobalTransform;
 			Renderer.CullMode = CullMode;
 			var invWorld = GlobalTransform.CalcInverted();
@@ -144,6 +145,7 @@ namespace Lime
 				}
 				Renderer.PolyCount3d += sm.Mesh.Indices.Length / 3;
 			}
+			Renderer.ColorFactor = oldColorFactor;
 		}
 
 		internal protected override bool PartialHitTest (ref HitTestArgs args)

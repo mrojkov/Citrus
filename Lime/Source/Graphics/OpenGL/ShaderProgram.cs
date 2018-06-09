@@ -150,7 +150,7 @@ namespace Lime
 						break;
 					}
 					if (uniformReflections.SortingKey == @params.SortingKeys[k]) {
-						paramsToSync[j] = @params.Params[k];
+						paramsToSync[j] = @params.Items[@params.ItemIndices[k]];
 					}
 				}
 			}

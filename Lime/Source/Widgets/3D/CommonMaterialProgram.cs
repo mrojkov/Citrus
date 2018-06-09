@@ -1,4 +1,4 @@
-﻿namespace Lime
+namespace Lime
 {
 	internal class CommonMaterialProgram : ShaderProgram
 	{
@@ -25,6 +25,7 @@
 			uniform float u_FogDensity;
 			#endif
 
+			uniform vec4 u_ColorFactor;
 			uniform mat4 u_World;
 			uniform mat4 u_WorldView;
 			uniform mat4 u_WorldViewProj;
@@ -46,7 +47,7 @@
 					u_Bones[int(a_BlendIndices.w)] * a_BlendWeights.w;
 				position = skinTransform * position;
 			#endif
-				v_Color = a_Color;
+				v_Color = a_Color * u_ColorFactor;
 				v_UV = a_UV;
 			#ifdef FOG_ENABLED
 				vec4 viewPos = u_WorldView * position;
