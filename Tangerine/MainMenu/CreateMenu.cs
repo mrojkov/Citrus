@@ -14,7 +14,7 @@ namespace Tangerine
 			this.type = type;
 		}
 
-		public override void Execute()
+		public override void ExecuteTransaction()
 		{
 			UI.SceneView.SceneView.Instance?.CreateNode(type);
 		}

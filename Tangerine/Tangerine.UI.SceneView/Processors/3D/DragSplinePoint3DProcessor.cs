@@ -49,15 +49,14 @@ namespace Tangerine.UI.SceneView
 		IEnumerator<object> DragPoints(IEnumerable<SplinePoint3D> points)
 		{
 			var input = SceneView.Instance.Input;
-			Document.Current.History.BeginTransaction();
 			var offsets = new Vector3?[points.Count()];
-			try {
+			using (Document.Current.History.BeginTransaction()) {
 				var spline = (Spline3D)Document.Current.Container;
 				var viewport = spline.Viewport;	
 				var initialMouse = input.MousePosition;
 				var dragDirection = DragDirection.Any;
 				while (input.IsMousePressed()) {
-					Document.Current.History.RevertActiveTransaction();
+					Document.Current.History.RollbackTransaction();
 
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					var currentMouse = input.MousePosition;
@@ -90,23 +89,21 @@ namespace Tangerine.UI.SceneView
 					}
 					yield return null;
 				}
-			} finally {
-				Document.Current.History.EndTransaction();
+				Document.Current.History.CommitTransaction();
 			}
 		}
 
 		IEnumerator<object> DragTangent(SplinePoint3D point, int tangentIndex)
 		{
-			var input = SceneView.Instance.Input;
-			Document.Current.History.BeginTransaction();
+			var input = SceneView.Instance.Input;			
 			Vector3? posCorrection = null;
-			try {
+			using (Document.Current.History.BeginTransaction()) {
 				var spline = (Spline3D)Document.Current.Container;
 				var viewport = spline.Viewport;
 				var plane = CalcPlane(spline, point.Position + GetTangent(point, tangentIndex));
 				var tangentsAreEqual = (point.TangentA + point.TangentB).Length < 0.1f;
 				while (input.IsMousePressed()) {
-					Document.Current.History.RevertActiveTransaction();
+					Document.Current.History.RollbackTransaction();
 
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					var ray = viewport.ScreenPointToRay(input.MousePosition);
@@ -121,8 +118,7 @@ namespace Tangerine.UI.SceneView
 					}
 					yield return null;
 				}
-			} finally {
-				Document.Current.History.EndTransaction();
+				Document.Current.History.CommitTransaction();	
 			}
 		}
 

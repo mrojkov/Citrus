@@ -33,13 +33,12 @@ namespace Tangerine.UI.SceneView
 
 		IEnumerator<object> Rotate(Bone bone, BoneArray.Entry entry)
 		{
-			Document.Current.History.BeginTransaction();
-			try {
+			using (Document.Current.History.BeginTransaction()) {
 				float rotation = 0;
 				var mousePos = sv.MousePosition;
 				var initRotation = bone.Rotation;
 				while (sv.Input.IsMousePressed()) {
-					Document.Current.History.RevertActiveTransaction();
+					Document.Current.History.RollbackTransaction();
 
 					var t = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
 					Utils.ChangeCursorIfDefault(Cursors.Rotate);
@@ -54,9 +53,8 @@ namespace Tangerine.UI.SceneView
 					yield return null;
 				}
 				yield return null;
-			} finally {
 				sv.Input.ConsumeKey(Key.Mouse0);
-				Document.Current.History.EndTransaction();
+				Document.Current.History.CommitTransaction();
 			}
 			yield return null;
 		}

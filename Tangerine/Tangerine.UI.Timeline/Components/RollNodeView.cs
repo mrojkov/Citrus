@@ -86,17 +86,21 @@ namespace Tangerine.UI.Timeline.Components
 			editBox.Visible = false;
 			widget.Gestures.Add(new ClickGesture(1, ShowPropertyContextMenu));
 			widget.Gestures.Add(new DoubleClickGesture(() => {
-				var labelExtent = label.MeasureUncutText();
-				if (label.LocalMousePosition().X < labelExtent.X) {
-					Rename();
-				} else {
-					Core.Operations.EnterNode.Perform(nodeData.Node);
-				}
+				Document.Current.History.DoTransaction(() => {
+					var labelExtent = label.MeasureUncutText();
+					if (label.LocalMousePosition().X < labelExtent.X) {
+						Rename();
+					} else {
+						Core.Operations.EnterNode.Perform(nodeData.Node);
+					}
+				});
 			}));
 			nodeIcon.Gestures.Add(new DoubleClickGesture(() => {
-				Core.Operations.ClearRowSelection.Perform();
-				Core.Operations.SelectRow.Perform(row);
-				Rename();
+				Document.Current.History.DoTransaction(() => {
+					Core.Operations.ClearRowSelection.Perform();
+					Core.Operations.SelectRow.Perform(row);
+					Rename();
+				});
 			}));
 		}
 
@@ -122,7 +126,7 @@ namespace Tangerine.UI.Timeline.Components
 				Texture = IconPool.GetTexture("Timeline.EnterContainer"),
 				Highlightable = false
 			};
-			button.Clicked += () => Core.Operations.EnterNode.Perform(nodeData.Node);
+			button.AddTransactionClickHandler(() => Core.Operations.EnterNode.Perform(nodeData.Node));
 			return button;
 		}
 
@@ -138,9 +142,9 @@ namespace Tangerine.UI.Timeline.Components
 				}
 				button.Texture = IconPool.GetTexture(texture);
 			});
-			button.Clicked += () => {
-				Core.Operations.SetProperty.Perform(nodeData, nameof(NodeRow.Visibility), (NodeVisibility)(((int)nodeData.Visibility + 1) % 3));
-			};
+			button.AddTransactionClickHandler(
+				() => Core.Operations.SetProperty.Perform(nodeData, nameof(NodeRow.Visibility), (NodeVisibility)(((int)nodeData.Visibility + 1) % 3))
+			);
 			return button;
 		}
 
@@ -151,7 +155,7 @@ namespace Tangerine.UI.Timeline.Components
 				() => nodeData.Locked,
 				i => button.Texture = IconPool.GetTexture(i ? "Timeline.Lock" : "Timeline.Dot")
 			);
-			button.Clicked += () => Core.Operations.SetProperty.Perform(nodeData, nameof(NodeRow.Locked), !nodeData.Locked);
+			button.AddTransactionClickHandler(() => Core.Operations.SetProperty.Perform(nodeData, nameof(NodeRow.Locked), !nodeData.Locked));
 			return button;
 		}
 
@@ -171,12 +175,12 @@ namespace Tangerine.UI.Timeline.Components
 					button.Texture = IconPool.GetTexture(texture);
 				}
 			);
-			button.Clicked += () => {
+			button.AddTransactionClickHandler(() => {
 				var enabled = GetAnimationState(nodeData.Node) == AnimationState.Enabled;
 				foreach (var a in nodeData.Node.Animators) {
 					Core.Operations.SetProperty.Perform(a, nameof(IAnimator.Enabled), !enabled);
 				}
-			};
+			});
 			return button;
 		}
 
@@ -213,9 +217,9 @@ namespace Tangerine.UI.Timeline.Components
 				() => nodeData.Expanded,
 				i => button.Texture = IconPool.GetTexture(i ? "Timeline.Expanded" : "Timeline.Collapsed")
 			);
-			button.Clicked += () => {
+			button.AddTransactionClickHandler(() => {
 				Core.Operations.SetProperty.Perform(nodeData, nameof(NodeRow.Expanded), !nodeData.Expanded);
-			};
+			});
 			return button;
 		}
 
@@ -248,7 +252,9 @@ namespace Tangerine.UI.Timeline.Components
 			editBox.Visible = false;
 			label.Visible = true;
 			if (editBox.Text != initialText) {
-				Core.Operations.SetProperty.Perform(nodeData.Node, "Id", editBox.Text);
+				Document.Current.History.DoTransaction(() => {
+					Core.Operations.SetProperty.Perform(nodeData.Node, "Id", editBox.Text);
+				});
 			}
 		}
 

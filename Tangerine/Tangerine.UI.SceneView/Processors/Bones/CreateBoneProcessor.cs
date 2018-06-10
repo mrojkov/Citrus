@@ -62,49 +62,50 @@ namespace Tangerine.UI.SceneView
 					if (index == 0 && container.Width.Abs() > Mathf.ZeroTolerance && container.Height.Abs() > Mathf.ZeroTolerance) {
 						pos = initPosition;
 					}
-
-					Document.Current.History.BeginTransaction();
-					try {
-						while (sv.Input.IsMousePressed()) {
-							Document.Current.History.RevertActiveTransaction();
-
+					using (Document.Current.History.BeginTransaction()) {
+						try {
 							bone = (Bone) Core.Operations.CreateNode.Perform(typeof(Bone));
-							bone.Index = boneIndex;
-							Core.Operations.SetProperty.Perform(bone, nameof(Bone.Position), pos);
-							Core.Operations.SetProperty.Perform(bone, nameof(Bone.BaseIndex), index);
-							Core.Operations.SelectNode.Perform(bone);
-							if (bone.BaseIndex != 0) {
-								Core.Operations.SortBonesInChain.Perform(bone);
-							}
-
-							var dir = (sv.MousePosition * t - initPosition).Snap(Vector2.Zero);
-							var angle = dir.Atan2Deg;
-							if (index != 0) {
-								var prentDir = items[index].Tip - items[index].Joint;
-								angle = Vector2.AngleDeg(prentDir, dir);
-							}
-							Core.Operations.SetProperty.Perform(bone, nameof(Bone.Rotation), angle);
-							Core.Operations.SetProperty.Perform(bone, nameof(Bone.Length), dir.Length);
-							yield return null;
+						} catch (InvalidOperationException e) {
+							AlertDialog.Show(e.Message);
+							break;
 						}
-					} finally {
+						bone.Index = boneIndex;
+						Core.Operations.SetProperty.Perform(bone, nameof(Bone.Position), pos);
+						Core.Operations.SetProperty.Perform(bone, nameof(Bone.BaseIndex), index);
+						Core.Operations.SelectNode.Perform(bone);
+						if (bone.BaseIndex != 0) {
+							Core.Operations.SortBonesInChain.Perform(bone);
+						}
+						using (Document.Current.History.BeginTransaction()) {
+							while (sv.Input.IsMousePressed()) {
+								Document.Current.History.RollbackTransaction();
+	
+								var dir = (sv.MousePosition * t - initPosition).Snap(Vector2.Zero);
+								var angle = dir.Atan2Deg;
+								if (index != 0) {
+									var prentDir = items[index].Tip - items[index].Joint;
+									angle = Vector2.AngleDeg(prentDir, dir);
+								}
+								Core.Operations.SetProperty.Perform(bone, nameof(Bone.Rotation), angle);
+								Core.Operations.SetProperty.Perform(bone, nameof(Bone.Length), dir.Length);
+								yield return null;
+							}
+							Document.Current.History.CommitTransaction();
+						}
 						// do not create zero bone
 						if (bone != null && bone.Length == 0) {
-							Document.Current.History.RevertActiveTransaction();
+							Document.Current.History.RollbackTransaction();
 							// must set length to zero to exectue "break;" later 
 							bone.Length = 0;
 						}
-
-						Document.Current.History.EndTransaction();
-						SceneView.Instance.Components.Remove<CreateBoneHelper>();
+						Document.Current.History.CommitTransaction();
 					}
+					SceneView.Instance.Components.Remove<CreateBoneHelper>();
 				}
-
 				// turn off creation if was only click without drag (zero length bone)
 				if (bone != null && bone.Length == 0) {
 					break;
 				}
-
 				if (sv.Input.WasMousePressed(1)) {
 					break;
 				}

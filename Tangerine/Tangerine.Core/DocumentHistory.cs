@@ -1,124 +1,178 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using Lime;
 
 namespace Tangerine.Core
 {
 	public class DocumentHistory
 	{
-		private int transactionCounter;
-		private long currentBatchId;
-		private long transactionBatchId;
+		public static readonly ProcessorList Processors = new ProcessorList();
+		private readonly Stack<int> transactionStartIndices = new Stack<int>();
 		private readonly List<IOperation> operations = new List<IOperation>();
-		private int headPos;
-		private int savePos;
-
-		public static readonly List<IOperationProcessor> Processors = new List<IOperationProcessor>();
-
-		public bool CanUndo() => headPos > 0;
-		public bool CanRedo() => headPos < operations.Count;
+		private int transactionId;
+		private int saveIndex;
+		private int currentIndex;
+		
+		public bool CanUndo() => !IsTransactionActive && currentIndex > 0;
+		public bool CanRedo() => !IsTransactionActive && currentIndex < operations.Count;
 		public bool IsDocumentModified { get; private set; }
-
-		public event Action Changed;
-
-		public void NextBatch()
+		public bool IsTransactionActive => transactionStartIndices.Count > 0;
+		
+		public IDisposable BeginTransaction()
 		{
-			currentBatchId++;
+			if (transactionStartIndices.Count == 0) {
+				transactionId++;
+			}
+			transactionStartIndices.Push(currentIndex);
+			return new Disposable { OnDispose = EndTransaction };
 		}
-
-		public void BeginTransaction()
+		
+		private class Disposable : IDisposable
 		{
-			// increase batch index to recognize two transactions on the same frame as different (for RevertActiveTransaction)
-			NextBatch();
-			transactionCounter++;
-			transactionBatchId = currentBatchId;
+			public Action OnDispose;
+			
+			public void Dispose() => OnDispose?.Invoke();
 		}
-
+		
 		public void EndTransaction()
 		{
-			transactionCounter--;
+			RollbackTransaction();
+			transactionStartIndices.Pop();
 		}
-
-		/// <summary>
-		/// Reverts operations created between BeginTransaction and EndTransaction, use it before EndTransaction
-		/// </summary>
-		public void RevertActiveTransaction()
+		
+		public void DoTransaction(Action block)
 		{
-			// revert only "new" operations between BeginTransaction and EndTransaction
-			if (transactionCounter == 0 || headPos <= 0 || operations[headPos - 1].BatchId != transactionBatchId) return;
-			Undo();
-			operations.RemoveRange(headPos, operations.Count - headPos);
+			using (BeginTransaction()) {
+				block();
+				CommitTransaction();
+			}
 		}
-
+		
+		public void CommitTransaction()
+		{
+			transactionStartIndices.Pop();
+			transactionStartIndices.Push(currentIndex);
+		}
+		
+		public void RollbackTransaction()
+		{
+			var index = transactionStartIndices.Peek();
+			if (currentIndex != index) {
+				for (; currentIndex > index; currentIndex--) {
+					Processors.Invert(operations[currentIndex - 1]);
+				}
+				operations.RemoveRange(currentIndex, operations.Count - currentIndex);
+				OnChange();
+			}
+		}
+		
 		public void Perform(IOperation operation)
 		{
-			operation.BatchId = (transactionCounter > 0) ? transactionBatchId : currentBatchId;
-			if (savePos > headPos) {
-				savePos = -1;
+			if (!IsTransactionActive) {
+				throw new InvalidOperationException("Can't perform an operation outside the transaction");
 			}
-			operations.RemoveRange(headPos, operations.Count - headPos);
-			operations.Add(operation);
-			headPos = operations.Count;
-			foreach (var p in Processors) {
-				p.Do(operation);
+			operation.TransactionId = transactionId;
+			if (saveIndex > currentIndex) {
+				saveIndex = -1;
 			}
+			if (currentIndex == operations.Count) {
+				operations.Add(operation);
+				currentIndex++;
+			} else if (operation.IsChangingDocument) {
+				operations.RemoveRange(currentIndex, operations.Count - currentIndex);
+				operations.Add(operation);
+				currentIndex = operations.Count;
+			} else {
+				operations.Insert(currentIndex, operation);
+				operations.Insert(currentIndex, operation);
+				currentIndex++;
+			}
+			Processors.Do(operation);
 			OnChange();
 		}
-
+				
 		public void Undo()
 		{
 			if (!CanUndo()) {
 				return;
 			}
-			long batchId = 0;
-			for (; headPos > 0; headPos--) {
-				var o = operations[headPos - 1];
-				if (o.IsChangingDocument && batchId == 0) {
-					batchId = o.BatchId;
+			bool documentChanged = false;
+			int s = GetTransactionStartIndex();
+			while (currentIndex > 0 && !documentChanged) {
+				documentChanged |= AnyChangingOperationWithinRange(s, currentIndex);
+				for (; currentIndex > s; currentIndex--) {
+					Processors.Invert(operations[currentIndex - 1]);
 				}
-				if (batchId > 0 && batchId != o.BatchId) {
-					break;
-				}
-				foreach (var p in Processors) {
-					p.Undo(o);
-				}
+				s = GetTransactionStartIndex();
 			}
 			OnChange();
 		}
-		
+
 		public void Redo()
 		{
 			if (!CanRedo()) {
 				return;
 			}
-			long batchId = 0;
-			for (; headPos < operations.Count; headPos++) {
-				var o = operations[headPos];
-				if (o.IsChangingDocument && batchId == 0) {
-					batchId = o.BatchId;
-				}
-				if (batchId > 0 && batchId != o.BatchId) {
+			bool documentChanged = false;
+			int e = GetTransactionEndIndex();
+			while (currentIndex < e) {
+				bool b = AnyChangingOperationWithinRange(currentIndex, e);
+				if (b && documentChanged) {
 					break;
 				}
-				foreach (var p in Processors) {
-					p.Redo(o);
+				documentChanged |= b;
+				for (; currentIndex < e; currentIndex++) {
+					Processors.Invert(operations[currentIndex]);
 				}
+				e = GetTransactionEndIndex();
 			}
 			OnChange();
 		}
-
-		void RefreshModifiedStatus()
+		
+		private int GetTransactionStartIndex()
 		{
-			if (savePos < 0) {
-				IsDocumentModified = true;
-				return;
+			for (int i = currentIndex; i > 0; i--) {
+				if (operations[i - 1].TransactionId != operations[currentIndex - 1].TransactionId) {
+					return i;
+				}
 			}
-			IsDocumentModified = savePos <= headPos ?
-				IsChangingOperationWithinRange(savePos, headPos) :
-				IsChangingOperationWithinRange(headPos, savePos);
+			return 0;
 		}
 
-		private bool IsChangingOperationWithinRange(int start, int end)
+		private int GetTransactionEndIndex()
+		{
+			for (int i = currentIndex; i < operations.Count; i++) {
+				if (operations[i].TransactionId != operations[currentIndex].TransactionId) {
+					return i;
+				}
+			}
+			return operations.Count;
+		}
+		
+		public void AddSavePoint()
+		{
+			for (saveIndex = currentIndex; saveIndex > 0; saveIndex--) {
+				if (operations[saveIndex - 1].IsChangingDocument) {
+					break;
+				}
+			}
+			RefreshModifiedStatus();
+		}
+		
+		private void OnChange()
+		{
+			RefreshModifiedStatus();
+			Application.InvalidateWindows();
+		}
+		
+		private void RefreshModifiedStatus()
+		{
+			IsDocumentModified = saveIndex < 0 || (saveIndex <= currentIndex ? 
+				AnyChangingOperationWithinRange(saveIndex, currentIndex) : 
+				AnyChangingOperationWithinRange(currentIndex, saveIndex));
+		}
+		
+		private bool AnyChangingOperationWithinRange(int start, int end)
 		{
 			for (int i = start; i < end; i++) {
 				if (operations[i].IsChangingDocument)
@@ -126,22 +180,28 @@ namespace Tangerine.Core
 			}
 			return false;
 		}
-
-		public void AddSavePoint()
-		{
-			for (savePos = headPos; savePos > 0; savePos--) {
-				if (operations[savePos - 1].IsChangingDocument) {
-					break;
+		
+		public class ProcessorList : List<IOperationProcessor> 
+		{					
+			public void Do(IOperation operation)
+			{
+				foreach (var p in this) {
+					p.Do(operation);
 				}
+				operation.Performed = true;
 			}
-			RefreshModifiedStatus();
-		}
 
-		void OnChange()
-		{
-			RefreshModifiedStatus();
-			Lime.Application.InvalidateWindows();
-			Changed?.Invoke();
+			public void Invert(IOperation operation)
+			{
+				foreach (var p in this) {
+					if (operation.Performed) {
+						p.Undo(operation);
+					} else {
+						p.Redo(operation);
+					}
+				}
+				operation.Performed = !operation.Performed;
+			}
 		}
 	}
 }

@@ -38,9 +38,9 @@
     </CodeSignEntitlements>
     <CodeSignResourceRules>
     </CodeSignResourceRules>
-    <EnableSGenConc>true</EnableSGenConc>
     <EnableCodeSigning>false</EnableCodeSigning>
     <AOTMode>None</AOTMode>
+    <EnableSGenConc>true</EnableSGenConc>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>
@@ -51,7 +51,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
-    <LinkMode>SdkOnly</LinkMode>
+    <LinkMode>None</LinkMode>
     <Profiling>false</Profiling>
     <UseRefCounting>true</UseRefCounting>
     <UseSGen>true</UseSGen>

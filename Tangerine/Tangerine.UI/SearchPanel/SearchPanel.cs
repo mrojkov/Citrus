@@ -70,7 +70,7 @@ namespace Tangerine.UI
 			} else if (key == Cmds.Cancel) {
 				scrollView.RevokeFocus();
 			} else if (key == Cmds.Enter || key == Key.Mouse0DoubleClick) {
-				NavigateToItem(selectedIndex);
+				Document.Current.History.DoTransaction(() => NavigateToItem(selectedIndex));
 			} else {
 				return;
 			}

@@ -69,7 +69,7 @@ namespace Tangerine
 			Document.PathSelector += SelectPath;
 		}
 
-		public override void Execute()
+		public override void ExecuteTransaction()
 		{
 			try {
 				Document.Current.Save();
@@ -104,7 +104,7 @@ namespace Tangerine
 
 	public class FileRevert : DocumentCommandHandler
 	{
-		public override void Execute()
+		public override void ExecuteTransaction()
 		{
 			if (new AlertDialog($"Are you sure you want to revert \"{Document.Current.Path}\"?", "Yes", "Cancel").Show() == 0) {
 				Project.Current.RevertDocument(Document.Current);
@@ -114,7 +114,7 @@ namespace Tangerine
 
 	public class FileSaveAs : DocumentCommandHandler
 	{
-		public override void Execute()
+		public override void ExecuteTransaction()
 		{
 			SaveAs();
 		}
@@ -144,7 +144,7 @@ namespace Tangerine
 
 	public class FileClose : DocumentCommandHandler
 	{
-		public override void Execute()
+		public override void ExecuteTransaction()
 		{
 			if (Document.Current != null) {
 				Project.Current.CloseDocument(Document.Current);
@@ -159,7 +159,7 @@ namespace Tangerine
 			return Document.Current.Format == DocumentFormat.Scene;
 		}
 
-		public override void Execute()
+		public override void ExecuteTransaction()
 		{
 			try {
 				AssetBundle.Current.DeleteFile(Path.ChangeExtension(Document.Current.Path, "scene"));

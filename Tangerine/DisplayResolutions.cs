@@ -31,12 +31,10 @@ namespace Tangerine
 
 		public static void SetResolution(ResolutionInfo resolution)
 		{
-			Document.Current.History.BeginTransaction();
-			try {
+			using (Document.Current.History.BeginTransaction()) {
 				SetProperty.Perform(Document.Current.RootNode, nameof(Widget.Size), resolution.Size);
 				SetMarker(Document.Current.RootNode, resolution.MarkerId);
-			} finally {
-				Document.Current.History.EndTransaction();
+				Document.Current.History.CommitTransaction();	
 			}
 		}
 	}

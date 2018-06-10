@@ -8,7 +8,7 @@ namespace Tangerine
 {
 	public class GroupNodes : DocumentCommandHandler
 	{
-		public override void Execute()
+		public override void ExecuteTransaction()
 		{
 			var nodes = Document.Current?.SelectedNodes().Where(IsValidNode).ToList();
 			Rectangle aabb;
@@ -17,7 +17,13 @@ namespace Tangerine
 			}
 			var container = Document.Current.Container;
 			var loc = container.RootFolder().Find(nodes[0]);
-			var group = (Frame)Core.Operations.CreateNode.Perform(container, loc, typeof(Frame));
+			Frame group;
+			try {
+				group = (Frame)Core.Operations.CreateNode.Perform(container, loc, typeof(Frame));
+			} catch (InvalidOperationException e) {
+				AlertDialog.Show(e.Message);
+				return;
+			}
 			group.Id = nodes[0].Id + "Group";
 			group.Pivot = Vector2.Half;
 			group.Position = aabb.Center;
@@ -58,7 +64,7 @@ namespace Tangerine
 
 	public class UngroupNodes : DocumentCommandHandler
 	{
-		public override void Execute()
+		public override void ExecuteTransaction()
 		{
 			var groups = Document.Current?.SelectedNodes().OfType<Frame>().ToList();
 			if (groups.Count == 0) {
@@ -92,7 +98,7 @@ namespace Tangerine
 
 	public class InsertTimelineColumn : DocumentCommandHandler
 	{
-		public override void Execute()
+		public override void ExecuteTransaction()
 		{
 			Core.Operations.TimelineHorizontalShift.Perform(UI.Timeline.Timeline.Instance.CurrentColumn, 1);
 		}
@@ -100,7 +106,7 @@ namespace Tangerine
 
 	public class RemoveTimelineColumn : DocumentCommandHandler
 	{
-		public override void Execute()
+		public override void ExecuteTransaction()
 		{
 			Core.Operations.TimelineHorizontalShift.Perform(UI.Timeline.Timeline.Instance.CurrentColumn, -1);
 		}
@@ -108,7 +114,7 @@ namespace Tangerine
 
 	public class GroupContentsToMorphableMeshes : DocumentCommandHandler
 	{
-		public override void Execute()
+		public override void ExecuteTransaction()
 		{
 			//var nodes = Document.Current?.SelectedNodes().Editable().ToList();
 			//var container = Document.Current.Container;
@@ -126,7 +132,7 @@ namespace Tangerine
 
 	public class ExportScene : DocumentCommandHandler
 	{
-		public override void Execute()
+		public override void ExecuteTransaction()
 		{
 			var nodes = Document.Current?.SelectedNodes().Editable().ToList();
 			var container = Document.Current.Container;
@@ -161,7 +167,7 @@ namespace Tangerine
 
 	public class UpsampleAnimationTwice : DocumentCommandHandler
 	{
-		public override void Execute()
+		public override void ExecuteTransaction()
 		{
 			UpsampleNodeAnimation(Document.Current.RootNode);
 		}

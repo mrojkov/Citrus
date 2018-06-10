@@ -38,12 +38,11 @@ namespace Tangerine.UI.SceneView
 
 		IEnumerator<object> Drag(SplinePoint point, int index)
 		{
-			Document.Current.History.BeginTransaction();
-			try {
+			using (Document.Current.History.BeginTransaction()) {
 				var iniMousePos = sv.MousePosition;
 				var matrix = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container as Widget);
 				while (sv.Input.IsMousePressed()) {
-					Document.Current.History.RevertActiveTransaction();
+					Document.Current.History.RollbackTransaction();
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					var curMousePos = sv.MousePosition;
 					if ((curMousePos - iniMousePos).Snap(Vector2.Zero) != Vector2.Zero) {
@@ -56,8 +55,7 @@ namespace Tangerine.UI.SceneView
 					}
 					yield return null;
 				}
-			} finally {
-				Document.Current.History.EndTransaction();
+				Document.Current.History.CommitTransaction();	
 			}
 		}
 	}

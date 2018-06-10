@@ -24,7 +24,7 @@ namespace Tangerine
 			return ProjectUserPreferences.Instance.Rulers.Count > 0;
 		}
 
-		public override void Execute()
+		public override void ExecuteTransaction()
 		{
 			new ManageRulersDialog();
 		}

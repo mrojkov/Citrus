@@ -35,16 +35,14 @@ namespace Tangerine.UI.SceneView
 
 		private IEnumerator<object> Drag(Bone bone, BoneArray.Entry entry)
 		{
-			Document.Current.History.BeginTransaction();
-
-			try {
+			using (Document.Current.History.BeginTransaction()) {
 				var iniMousePos = sv.MousePosition;
 				var transform = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
 				var transformInversed = transform.CalcInversed();
 				int index = 0;
 				var dragDelta = Vector2.Zero;
 				while (sv.Input.IsMousePressed()) {
-					Document.Current.History.RevertActiveTransaction();
+					Document.Current.History.RollbackTransaction();
 
 					var snapEnabled = sv.Input.IsKeyPressed(Key.Alt);
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
@@ -77,23 +75,20 @@ namespace Tangerine.UI.SceneView
 					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.BaseIndex), index, CoreUserPreferences.Instance.AutoKeyframes);
 					Core.Operations.SortBonesInChain.Perform(bone);
 				}
-			} finally {
 				SceneView.Instance.Components.Remove<CreateBoneHelper>();
 				sv.Input.ConsumeKey(Key.Mouse0);
-				Document.Current.History.EndTransaction();
 				Window.Current.Invalidate();
+				Document.Current.History.CommitTransaction();
 			}
 		}
 
 		private IEnumerator<object> DragTip(Bone bone, BoneArray.Entry entry)
 		{
-			Document.Current.History.BeginTransaction();
-
-			try {
+			using (Document.Current.History.BeginTransaction()) {
 				var iniMousePos = sv.MousePosition;
 				var transform = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
 				
-				Dictionary<Bone, AccumulativeRotationHelper> accumulativeRotationsHelpersByBones = new Dictionary<Bone, AccumulativeRotationHelper>();
+				var accumulativeRotationsHelpersByBones = new Dictionary<Bone, AccumulativeRotationHelper>();
 
 				while (sv.Input.IsMousePressed()) {
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
@@ -126,10 +121,9 @@ namespace Tangerine.UI.SceneView
 					bone.Parent.Update(0);
 					yield return null;
 				}
-			} finally {
 				sv.Input.ConsumeKey(Key.Mouse0);
-				Document.Current.History.EndTransaction();
 				Window.Current.Invalidate();
+				Document.Current.History.CommitTransaction();
 			}
 		}
 

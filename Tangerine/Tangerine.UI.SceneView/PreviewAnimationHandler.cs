@@ -12,7 +12,7 @@ namespace Tangerine.UI.SceneView
 			this.triggerMarkersBeforeCurrentFrame = triggerMarkersBeforeCurrentFrame;
 		}
 
-		public override void Execute()
+		public override void ExecuteTransaction()
 		{
 			Document.Current.TogglePreviewAnimation(CoreUserPreferences.Instance.AnimationMode, triggerMarkersBeforeCurrentFrame);
 		}

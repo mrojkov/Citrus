@@ -34,8 +34,7 @@ namespace Tangerine.UI.SceneView
 
 		private IEnumerator<object> Rotate(Vector2 pivot)
 		{
-			Document.Current.History.BeginTransaction();
-			try {
+			using (Document.Current.History.BeginTransaction()) {
 				var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>().ToList();
 				var mouseStartPos = sv.MousePosition;
 
@@ -46,14 +45,13 @@ namespace Tangerine.UI.SceneView
 				
 				while (sv.Input.IsMousePressed()) {
 					Utils.ChangeCursorIfDefault(Cursors.Rotate);
-					Document.Current.History.RevertActiveTransaction();
+					Document.Current.History.RollbackTransaction();
 					RotateWidgets(pivot, widgets, sv.MousePosition, mouseStartPos, sv.Input.IsKeyPressed(Key.Shift), accumulateRotationHelpers);
 					yield return null;
 				}
-			} finally {
-				sv.Input.ConsumeKey(Key.Mouse0);
-				Document.Current.History.EndTransaction();
+				Document.Current.History.CommitTransaction();
 			}
+			sv.Input.ConsumeKey(Key.Mouse0);
 		}
 
 		private void RotateWidgets(Vector2 pivotPoint, List<Widget> widgets, Vector2 curMousePos, Vector2 prevMousePos,

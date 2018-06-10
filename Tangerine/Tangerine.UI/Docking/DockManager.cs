@@ -22,6 +22,7 @@ namespace Tangerine.UI.Docking
 		public readonly WindowWidget MainWindowWidget;
 		public DockHierarchy Model => DockHierarchy.Instance;
 		public event Action<IEnumerable<string>> FilesDropped;
+		public event Action<System.Exception> UnhandledExceptionOccurred;
 
 		private DockManager(Vector2 windowSize, IMenu padsMenu)
 		{
@@ -35,7 +36,7 @@ namespace Tangerine.UI.Docking
 				Icon = new System.Drawing.Icon(new EmbeddedResource(AppIconPath, "Tangerine").GetResourceStream()),
 #endif // WIN
 			});
-			window.UnhandledExceptionOnUpdate += HandleException;
+			window.UnhandledExceptionOnUpdate += e => UnhandledExceptionOccurred?.Invoke(e);
 			SetDropHandler(window);
 			MainWindowWidget = new ThemedInvalidableWindowWidget(window) {
 				Id = "MainWindow",
@@ -323,7 +324,7 @@ namespace Tangerine.UI.Docking
 				Icon = new System.Drawing.Icon(new EmbeddedResource(AppIconPath, "Tangerine").GetResourceStream()),
 #endif
 			});
-			window.UnhandledExceptionOnUpdate += HandleException;
+			window.UnhandledExceptionOnUpdate += e => UnhandledExceptionOccurred?.Invoke(e);
 			SetDropHandler(window);
 			window.Closing += reason => {
 				if (reason == CloseReason.MainWindowClosing) {
@@ -396,11 +397,6 @@ namespace Tangerine.UI.Docking
 
 		public void AddFilesDropHandler(FilesDropHandler filesDropHandler) => filesDropHandlers.Add(filesDropHandler);
 		public void RemoveFilesDropHandler(FilesDropHandler filesDropHandler) => filesDropHandlers.Remove(filesDropHandler);
-
-		private void HandleException(System.Exception e)
-		{
-			AlertDialog.Show(e.Message + "\n" + e.StackTrace);
-		}
 
 		private void CloseWindow(IWindow window)
 		{

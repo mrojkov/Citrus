@@ -41,10 +41,9 @@ namespace Tangerine.UI.SceneView
 					if (d.HasValue) {
 						var pos = (ray.Position + ray.Direction * d.Value) * spline.GlobalTransform.CalcInverted();
 						Core.Operations.SetProperty.Perform(point, nameof(SplinePoint3D.Position), pos);
-						Document.Current.History.BeginTransaction();
-						try {
+						using (Document.Current.History.BeginTransaction()) {
 							while (input.IsMousePressed()) {
-								Document.Current.History.RevertActiveTransaction();
+								Document.Current.History.RollbackTransaction();
 
 								ray = vp.ScreenPointToRay(SceneView.Instance.Input.MousePosition);
 								d = ray.Intersects(xyPlane);
@@ -55,12 +54,11 @@ namespace Tangerine.UI.SceneView
 								}
 								yield return null;
 							}
-						} finally {
 							if (point.TangentA.Length < 0.01f) {
 								Core.Operations.SetProperty.Perform(point, nameof(SplinePoint3D.TangentA), new Vector3(1, 0, 0));
 								Core.Operations.SetProperty.Perform(point, nameof(SplinePoint3D.TangentB), new Vector3(-1, 0, 0));
 							}
-							Document.Current.History.EndTransaction();
+							Document.Current.History.CommitTransaction();
 						}
 					}
 				}

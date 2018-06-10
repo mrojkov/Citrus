@@ -7,14 +7,16 @@ namespace Tangerine.Core
 {
 	public interface IOperation
 	{
-		long BatchId { get; set; }
+		int TransactionId { get; set; }
 		bool IsChangingDocument { get; }
+		bool Performed { get; set; }
 	}
 
 	public abstract class Operation : IOperation
 	{
-		public long BatchId { get; set; }
+		public int TransactionId { get; set; }
 		public abstract bool IsChangingDocument { get; }
+		public bool Performed { get; set; }
 
 		readonly List<object> backup = new List<object>();
 

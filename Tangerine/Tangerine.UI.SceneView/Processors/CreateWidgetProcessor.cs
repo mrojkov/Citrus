@@ -46,10 +46,12 @@ namespace Tangerine.UI.SceneView
 					}
 					sv.Frame.CompoundPostPresenter.Remove(presenter);
 					try {
-						var widget = (Widget) Core.Operations.CreateNode.Perform(nodeTypeActive);
-						Core.Operations.SetProperty.Perform(widget, nameof(Widget.Size), rect.B - rect.A);
-						Core.Operations.SetProperty.Perform(widget, nameof(Widget.Position), rect.A + widget.Size / 2);
-						Core.Operations.SetProperty.Perform(widget, nameof(Widget.Pivot), Vector2.Half);
+						Document.Current.History.DoTransaction(() => {
+							var widget = (Widget) Core.Operations.CreateNode.Perform(nodeTypeActive);
+							Core.Operations.SetProperty.Perform(widget, nameof(Widget.Size), rect.B - rect.A);
+							Core.Operations.SetProperty.Perform(widget, nameof(Widget.Position), rect.A + widget.Size / 2);
+							Core.Operations.SetProperty.Perform(widget, nameof(Widget.Pivot), Vector2.Half);
+						});
 					} catch (InvalidOperationException e) {
 						AlertDialog.Show(e.Message);
 					}

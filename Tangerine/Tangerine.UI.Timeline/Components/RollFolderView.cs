@@ -69,7 +69,7 @@ namespace Tangerine.UI.Timeline.Components
 		{
 			var button = new ToolbarButton { Highlightable = false };
 			button.Texture = IconPool.GetTexture("Timeline.Eye");
-			button.Clicked += () => {
+			button.AddTransactionClickHandler(() => {
 				var visibility = NodeVisibility.Hidden;
 				if (InnerNodes(folder).All(i => i.EditorState().Visibility == NodeVisibility.Hidden)) {
 					visibility = NodeVisibility.Shown;
@@ -79,7 +79,7 @@ namespace Tangerine.UI.Timeline.Components
 				foreach (var node in InnerNodes(folder)) {
 					Core.Operations.SetProperty.Perform(node.EditorState(), nameof(NodeEditorState.Visibility), visibility);
 				}
-			};
+			});
 			return button;
 		}
 
@@ -87,12 +87,12 @@ namespace Tangerine.UI.Timeline.Components
 		{
 			var button = new ToolbarButton { Highlightable = false };
 			button.Texture = IconPool.GetTexture("Timeline.Lock");
-			button.Clicked += () => {
+			button.AddTransactionClickHandler(() => {
 				var locked = InnerNodes(folder).All(i => !i.EditorState().Locked);
 				foreach (var node in InnerNodes(folder)) {
 					Core.Operations.SetProperty.Perform(node.EditorState(), nameof(NodeEditorState.Locked), locked);
 				}
-			};
+			});
 			return button;
 		}
 
@@ -121,7 +121,7 @@ namespace Tangerine.UI.Timeline.Components
 				() => folder.Items.Count != 0,
 				i => button.Visible = folder.Items.Count != 0
 			);
-			button.Clicked += () => Core.Operations.SetProperty.Perform(folder, nameof(Folder.Expanded), !folder.Expanded);
+			button.AddTransactionClickHandler(() => Core.Operations.SetProperty.Perform(folder, nameof(Folder.Expanded), !folder.Expanded));
 			return button;
 		}
 
@@ -137,8 +137,10 @@ namespace Tangerine.UI.Timeline.Components
 		{
 			while (true) {
 				if (nodeIcon.Input.WasKeyPressed(Key.Mouse0DoubleClick)) {
-					Core.Operations.ClearRowSelection.Perform();
-					Core.Operations.SelectRow.Perform(row);
+					Document.Current.History.DoTransaction(() => {
+						Core.Operations.ClearRowSelection.Perform();
+						Core.Operations.SelectRow.Perform(row);
+					});
 					Rename();
 				}
 				yield return null;
@@ -166,7 +168,9 @@ namespace Tangerine.UI.Timeline.Components
 			editBox.Visible = false;
 			label.Visible = true;
 			if (editBox.Text != initialText) {
-				Core.Operations.SetProperty.Perform(folder, "Id", editBox.Text);
+				Document.Current.History.DoTransaction(() => {
+					Core.Operations.SetProperty.Perform(folder, "Id", editBox.Text);
+				});
 			}
 		}
 	}

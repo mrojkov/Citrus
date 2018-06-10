@@ -53,7 +53,9 @@ namespace Tangerine.UI.Inspector
 					button.Checked = @checked;
 				}
 				if (button.WasClicked()) {
-					SetKeyframe(!hasKeyframe.Value);
+					Document.Current.History.DoTransaction(() => {
+						SetKeyframe(!hasKeyframe.Value);
+					});
 				}
 				yield return null;
 			}
@@ -78,7 +80,6 @@ namespace Tangerine.UI.Inspector
 					var propValue = new Property(animable, editorParams.PropertyName).Getter();
 					var keyFunction = animator?.Keys.LastOrDefault(k => k.Frame <= currentFrame)?.Function ?? KeyFunction.Linear;
 					IKeyframe keyframe = Keyframe.CreateForType(editorParams.PropertyInfo.PropertyType, currentFrame, propValue, keyFunction);
-
 					Core.Operations.SetKeyframe.Perform(animable, editorParams.PropertyName, Document.Current.AnimationId, keyframe);
 				}
 			}

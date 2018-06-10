@@ -13,7 +13,7 @@ namespace Tangerine
 			return !Document.Current.ExpositionMode;
 		}
 
-		public override void Execute()
+		public override void ExecuteTransaction()
 		{
 			Project.Current.NextDocument();
 		}
@@ -27,7 +27,7 @@ namespace Tangerine
 			return !Document.Current.ExpositionMode;
 		}
 
-		public override void Execute()
+		public override void ExecuteTransaction()
 		{
 			Project.Current.PreviousDocument();
 		}

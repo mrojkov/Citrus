@@ -16,9 +16,8 @@ namespace Tangerine.UI.Timeline
 			var input = rulerWidget.Input;
 			while (true) {
 				if (input.WasMousePressed()) {
-					Document.Current.History.BeginTransaction();
 					Operations.SetCurrentColumn.Processor.CacheAnimationsStates = true;
-					try {
+					using (Document.Current.History.BeginTransaction()) {
 						int initialCol = CalcColumn(rulerWidget.LocalMousePosition().X);
 						var marker = Document.Current.Container.Markers.FirstOrDefault(m => m.Frame == initialCol);
 						while (input.IsMousePressed()) {
@@ -41,10 +40,9 @@ namespace Tangerine.UI.Timeline
 							Window.Current.Invalidate();
 							yield return null;
 						}
-					} finally {
 						timeline.Ruler.MeasuredFrameDistance = 0;
 						Operations.SetCurrentColumn.Processor.CacheAnimationsStates = false;
-						Document.Current.History.EndTransaction();
+						Document.Current.History.CommitTransaction();
 					}
 				}
 				yield return null;

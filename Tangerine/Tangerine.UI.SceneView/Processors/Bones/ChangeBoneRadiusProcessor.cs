@@ -35,13 +35,12 @@ namespace Tangerine.UI.SceneView
 
 		private IEnumerator<object> Resize(Bone bone)
 		{
-			Document.Current.History.BeginTransaction();
-			try {
+			using (Document.Current.History.BeginTransaction()) {
 				var iniMousePos = sv.MousePosition;
 				var initEffectiveRadius = bone.EffectiveRadius;
 				var initFadeoutZone = bone.FadeoutZone;
 				while (sv.Input.IsMousePressed()) {
-					Document.Current.History.RevertActiveTransaction();
+					Document.Current.History.RollbackTransaction();
 					
 					Utils.ChangeCursorIfDefault(MouseCursor.SizeNS);
 					var dragDelta = sv.MousePosition - iniMousePos;
@@ -49,9 +48,8 @@ namespace Tangerine.UI.SceneView
 					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.FadeoutZone), initFadeoutZone + dragDelta.Y, CoreUserPreferences.Instance.AutoKeyframes);
 					yield return null;
 				}
-			} finally {
 				sv.Input.ConsumeKey(Key.Mouse0);
-				Document.Current.History.EndTransaction();
+				Document.Current.History.CommitTransaction();
 			}
 		}
 	}

@@ -27,7 +27,7 @@ namespace Tangerine.UI.SceneView
 
 		public override bool GetChecked() => Enabled;
 
-		public override void Execute() => Execute(Document.Current, !Enabled);
+		public override void ExecuteTransaction() => Execute(Document.Current, !Enabled);
 
 		public static void Execute(Document document, bool enable)
 		{
@@ -100,7 +100,7 @@ namespace Tangerine.UI.SceneView
 			this.isReverse = isReverse;
 		}
 
-		public override void Execute()
+		public override void ExecuteTransaction()
 		{
 			var document = Document.Current;
 			var rootNode = document.RootNode as Widget;
@@ -127,7 +127,7 @@ namespace Tangerine.UI.SceneView
 	{
 		private static ProjectPreferences Preferences => ProjectPreferences.Instance;
 
-		public override void Execute()
+		public override void ExecuteTransaction()
 		{
 			var document = Document.Current;
 			var rootNode = document.RootNode as Widget;

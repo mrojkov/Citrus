@@ -22,7 +22,7 @@ namespace Tangerine.UI.SceneView
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {
 						if (sv.Input.IsKeyPressed(Key.Alt)) {
-							sv.DuplicateSelectedNodes();
+							Document.Current.History.DoTransaction(sv.DuplicateSelectedNodes);
 						}
 						yield return Drag();
 					}
@@ -38,8 +38,7 @@ namespace Tangerine.UI.SceneView
 
 		IEnumerator<object> Drag()
 		{
-			Document.Current.History.BeginTransaction();
-			try {
+			using (Document.Current.History.BeginTransaction()) {
 				var initialMousePos = sv.MousePosition;
 				var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>().ToList();
 				var dragDirection = DragDirection.Any;
@@ -47,7 +46,7 @@ namespace Tangerine.UI.SceneView
 				Vector2 pivot;
 				Utils.CalcHullAndPivot(widgets, Document.Current.Container.AsWidget, out hull, out pivot);
 				while (sv.Input.IsMousePressed()) {
-					Document.Current.History.RevertActiveTransaction();
+					Document.Current.History.RollbackTransaction();
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					var curMousePos = sv.MousePosition;
 					var shiftPressed = sv.Input.IsKeyPressed(Key.Shift);
@@ -73,10 +72,10 @@ namespace Tangerine.UI.SceneView
 						mouseDelta != Vector2.Zero &&
 						(SceneViewCommands.SnapWidgetPivotToRuler.Checked || SceneViewCommands.SnapWidgetBorderToRuler.Checked)
 					) {
-						List<Ruler> rulers = GetRulers();
+						var rulers = GetRulers();
 
 						foreach (Widget widget in widgets) {
-							List<Vector2> points = new List<Vector2>();
+							var points = new List<Vector2>();
 
 							if (SceneViewCommands.SnapWidgetPivotToRuler.Checked) {
 								points.Add(widget.CalcPositionInSpaceOf(sv.Scene));
@@ -105,9 +104,8 @@ namespace Tangerine.UI.SceneView
 
 					yield return null;
 				}
-			} finally {
+				Document.Current.History.CommitTransaction();
 				sv.Input.ConsumeKey(Key.Mouse0);
-				Document.Current.History.EndTransaction();
 			}
 		}
 

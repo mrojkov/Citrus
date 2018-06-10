@@ -35,18 +35,26 @@ namespace Tangerine.UI.Timeline
 				if (input.IsKeyPressed(Key.Shift)) {
 					if (Document.Current.SelectedRows().Any()) {
 						var firstRow = Document.Current.SelectedRows().FirstOrDefault();
-						ClearRowSelection.Perform();
-						SelectRowRange.Perform(firstRow, row);
+						Document.Current.History.DoTransaction(() => {
+							ClearRowSelection.Perform();
+							SelectRowRange.Perform(firstRow, row);
+						});
 					} else {
-						ClearRowSelection.Perform();
-						SelectRow.Perform(row);
+						Document.Current.History.DoTransaction(() => {
+							ClearRowSelection.Perform();
+							SelectRow.Perform(row);
+						});
 					}
 				} else if (input.IsKeyPressed(Key.Control)) {
-					SelectRow.Perform(row, !row.Selected);
+					Document.Current.History.DoTransaction(() => {
+						SelectRow.Perform(row, !row.Selected);
+					});
 				} else {
 					if (!row.Selected) {
-						ClearRowSelection.Perform();
-						SelectRow.Perform(row);
+						Document.Current.History.DoTransaction(() => {
+							ClearRowSelection.Perform();
+							SelectRow.Perform(row);
+						});
 					}
 					while (
 						input.IsMousePressed() &&
@@ -57,8 +65,10 @@ namespace Tangerine.UI.Timeline
 					if (input.IsMousePressed()) {
 						yield return DragTask();
 					} else {
-						ClearRowSelection.Perform();
-						SelectRow.Perform(row);
+						Document.Current.History.DoTransaction(() => {
+							ClearRowSelection.Perform();
+							SelectRow.Perform(row);
+						});
 					}
 				}
 			}
@@ -95,10 +105,12 @@ namespace Tangerine.UI.Timeline
 				.Select(row => new KeyValuePair<Row, int>(row, parentRowRows.IndexOf(row)));
 
 			var rows = enumeratedSelectedRows.ToList();
-			foreach (var elem in rows) {
-				Probers.Any(p => p.Probe(elem.Key, dragLocation));
-				if (elem.Value >= dragLocation.Index) dragLocation.Index++;
-			}
+			Document.Current.History.DoTransaction(() => {	
+				foreach (var elem in rows) {
+					Probers.Any(p => p.Probe(elem.Key, dragLocation));
+					if (elem.Value >= dragLocation.Index) dragLocation.Index++;
+				}
+			});
 		}
 
 		static void RenderDragCursor(RowLocation rowLocation)

@@ -46,15 +46,14 @@ namespace Tangerine.UI.SceneView
 
 		IEnumerator<object> Rotate(Quadrangle bounds, List<PointObject> points)
 		{
-			Document.Current.History.BeginTransaction();
-			try {
+			using (Document.Current.History.BeginTransaction()) {
 				var t = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
 				var center = (bounds.V1 + bounds.V3) / 2;
 				var size = Document.Current.Container.AsWidget.Size;
 				var mousePosInitial = (sv.MousePosition * t - center * size) / size;
 				var rotation = 0f;
 				while (sv.Input.IsMousePressed()) {
-					Document.Current.History.RevertActiveTransaction();
+					Document.Current.History.RollbackTransaction();
 					if (!sv.Components.Contains<PointObjectSelectionComponent>()) {
 						sv.Components.Add(new PointObjectSelectionComponent {
 							СurrentBounds = bounds,
@@ -91,11 +90,10 @@ namespace Tangerine.UI.SceneView
 
 					yield return null;
 				}
-			} finally {
 				sv.Input.ConsumeKey(Key.Mouse0);
-				Document.Current.History.EndTransaction();
 				sv.Components.Remove<PointObjectSelectionComponent>();
 				Window.Current.Invalidate();
+				Document.Current.History.CommitTransaction();
 			}
 		}
 	}

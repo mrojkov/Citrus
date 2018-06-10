@@ -303,7 +303,7 @@ namespace Tangerine
 				this.overlayName = overlayName;
 			}
 
-			public override void Execute()
+			public override void ExecuteTransaction()
 			{
 				var prefs = ProjectUserPreferences.Instance;
 				if (prefs.DisplayedOverlays.Contains(overlayName)) {
@@ -327,7 +327,7 @@ namespace Tangerine
 				this.rulerName = rulerName;
 			}
 
-			public override void Execute()
+			public override void ExecuteTransaction()
 			{
 				var prefs = ProjectUserPreferences.Instance;
 				if (prefs.DisplayedRulers.Contains(rulerName)) {

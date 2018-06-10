@@ -215,7 +215,10 @@ namespace Tangerine.UI.Inspector
 			public TransactionalNumericEditBox()
 			{
 				BeginSpin += () => Document.Current.History.BeginTransaction();
-				EndSpin += () => Document.Current.History.EndTransaction();
+				EndSpin += () => {
+					Document.Current.History.CommitTransaction();
+					Document.Current.History.EndTransaction();
+				};
 			}
 		}
 	}

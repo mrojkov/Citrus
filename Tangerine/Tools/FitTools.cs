@@ -6,7 +6,7 @@ namespace Tangerine
 {
 	public class RestoreOriginalSize : DocumentCommandHandler
 	{
-		public override void Execute()
+		public override void ExecuteTransaction()
 		{
 			foreach (var node in Core.Document.Current.SelectedNodes().Editable()) {
 				if (node is Widget) {
@@ -24,7 +24,7 @@ namespace Tangerine
 
 	public class ResetScale : DocumentCommandHandler
 	{
-		public override void Execute()
+		public override void ExecuteTransaction()
 		{
 			foreach (var widget in Core.Document.Current.SelectedNodes().Editable().OfType<Widget>()) {
 				Core.Operations.SetProperty.Perform(widget, nameof(Widget.Scale), Vector2.One);
@@ -34,7 +34,7 @@ namespace Tangerine
 
 	public class ResetRotation : DocumentCommandHandler
 	{
-		public override void Execute()
+		public override void ExecuteTransaction()
 		{
 			foreach (var widget in Core.Document.Current.SelectedNodes().Editable().OfType<Widget>()) {
 				Core.Operations.SetProperty.Perform(widget, nameof(Widget.Rotation), 0);
@@ -44,7 +44,7 @@ namespace Tangerine
 
 	public class FlipX : DocumentCommandHandler
 	{
-		public override void Execute()
+		public override void ExecuteTransaction()
 		{
 			foreach (var widget in Core.Document.Current.SelectedNodes().Editable().OfType<Widget>()) {
 				var s = widget.Scale;
@@ -56,7 +56,7 @@ namespace Tangerine
 
 	public class FlipY : DocumentCommandHandler
 	{
-		public override void Execute()
+		public override void ExecuteTransaction()
 		{
 			foreach (var widget in Core.Document.Current.SelectedNodes().Editable().OfType<Widget>()) {
 				var s = widget.Scale;
@@ -68,7 +68,7 @@ namespace Tangerine
 
 	public class FitToContainer : DocumentCommandHandler
 	{
-		public override void Execute()
+		public override void ExecuteTransaction()
 		{
 			var container = (Widget)Core.Document.Current.Container;
 			foreach (var widget in Core.Document.Current.SelectedNodes().Editable().OfType<Widget>()) {
@@ -83,7 +83,7 @@ namespace Tangerine
 
 	public class FitToContent : DocumentCommandHandler
 	{
-		public override void Execute()
+		public override void ExecuteTransaction()
 		{
 			var container = (Widget)Core.Document.Current.Container;
 			var nodes = Core.Document.Current.SelectedNodes().Editable();
