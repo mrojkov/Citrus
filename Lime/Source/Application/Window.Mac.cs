@@ -413,7 +413,7 @@ namespace Lime
 			RaiseVisibleChanging(false, true);
 		}
 
-		private void HandleRenderFrame()
+		internal void HandleRenderFrame()
 		{
 			if (invalidated) {
 				fpsCounter.Refresh();
