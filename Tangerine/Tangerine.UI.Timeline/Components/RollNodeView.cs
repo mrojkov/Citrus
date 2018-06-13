@@ -272,6 +272,10 @@ namespace Tangerine.UI.Timeline.Components
 
 		void ShowPropertyContextMenu()
 		{
+			Document.Current.History.DoTransaction(() => {
+				Core.Operations.ClearRowSelection.Perform();
+				Core.Operations.SelectRow.Perform(row);
+			});
 			Menu submenu;
 			var menu = new Menu {
 				new Command("Color mark",
@@ -302,8 +306,9 @@ namespace Tangerine.UI.Timeline.Components
 		{
 			return new Command(title, 
 				() => {
-					Document.Current.History.DoTransaction(
-						() => Core.Operations.SetProperty.Perform(nodeData.Node.EditorState(), nameof(NodeEditorState.ColorIndex), index));
+					Document.Current.History.DoTransaction(() => {
+						Core.Operations.SetProperty.Perform(nodeData.Node.EditorState(), nameof(NodeEditorState.ColorIndex), index);
+					});
 				}) { Checked = nodeData.Node.EditorState().ColorIndex == index };
 		}
 	}
