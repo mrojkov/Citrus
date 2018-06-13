@@ -57,6 +57,7 @@ namespace Tangerine.UI.Timeline
 					new Menu {
 						GenericCommands.InsertTimelineColumn,
 						GenericCommands.RemoveTimelineColumn,
+						TimelineCommands.DeleteKeyframes
 					}.Popup();
 				}
 				yield return null;
