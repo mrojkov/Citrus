@@ -38,12 +38,16 @@ namespace Tangerine.UI.Timeline
 				() => boneData.HaveChildren,
 				i => button.Visible = i);
 			button.Clicked += () => {
-				Core.Operations.SetProperty.Perform(boneData, nameof(BoneRow.ChildrenExpanded), !boneData.ChildrenExpanded);
-				if (button.Input.IsKeyPressed(Key.Control)) {
-					ExpandChildrenRecursively(
+				using (Document.Current.History.BeginTransaction()) {
+					Core.Operations.SetProperty.Perform(boneData, nameof(BoneRow.ChildrenExpanded), !boneData.ChildrenExpanded);
+					if (button.Input.IsKeyPressed(Key.Control)) {
+						ExpandChildrenRecursively(
 						boneData.Bone,
-						boneData.Bone.Parent.AsWidget.Nodes.OfType<Bone>().ToList(),
-						boneData.ChildrenExpanded);
+							boneData.Bone.Parent.AsWidget.Nodes.OfType<Bone>().ToList(),
+							boneData.ChildrenExpanded);
+					}
+
+					Document.Current.History.CommitTransaction();
 				}
 			};
 			return button;
