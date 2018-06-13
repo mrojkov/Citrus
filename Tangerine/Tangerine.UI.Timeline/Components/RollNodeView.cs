@@ -22,6 +22,17 @@ namespace Tangerine.UI.Timeline.Components
 		protected readonly ToolbarButton lockAnimationButton;
 		protected readonly Widget indentSpacer;
 
+		private static readonly Color4[] ColorMarks = {
+			Color4.Transparent,
+			ColorTheme.Current.TimelineRoll.RedMark,
+			ColorTheme.Current.TimelineRoll.OrangeMark,
+			ColorTheme.Current.TimelineRoll.YellowMark,
+			ColorTheme.Current.TimelineRoll.BlueMark,
+			ColorTheme.Current.TimelineRoll.GreenMark,
+			ColorTheme.Current.TimelineRoll.VioletMark,
+			ColorTheme.Current.TimelineRoll.GrayMark,
+		};
+
 		public RollNodeView(Row row)
 		{
 			this.row = row;
@@ -49,8 +60,9 @@ namespace Tangerine.UI.Timeline.Components
 				widget.PrepareRendererState();
 				var a = new Vector2(0, -4);
 				var b = widget.Size + new Vector2(0, 3);
-				Renderer.DrawRect(a, b, nodeData.Node.GetColor());
-				if (nodeData.Node.GetColorIndex() != 0) {
+				int colorIndex = nodeData.Node.EditorState().ColorIndex;
+				Renderer.DrawRect(a, b, ColorMarks[colorIndex]);
+				if (colorIndex != 0) {
 					Renderer.DrawRectOutline(a, b, ColorTheme.Current.TimelineRoll.Lines);
 				}
 			}));
@@ -264,14 +276,14 @@ namespace Tangerine.UI.Timeline.Components
 			var menu = new Menu {
 				new Command("Color mark",
 					(submenu = new Menu {
-						CreateColorCommand("No Color", 0),
-						CreateColorCommand("Red", 1),
-						CreateColorCommand("Orange", 2),
-						CreateColorCommand("Yellow", 3),
-						CreateColorCommand("Blue", 4),
-						CreateColorCommand("Green", 5),
-						CreateColorCommand("Violet", 6),
-						CreateColorCommand("Gray", 7),
+						CreateSetColorMarkCommand("No Color", 0),
+						CreateSetColorMarkCommand("Red", 1),
+						CreateSetColorMarkCommand("Orange", 2),
+						CreateSetColorMarkCommand("Yellow", 3),
+						CreateSetColorMarkCommand("Blue", 4),
+						CreateSetColorMarkCommand("Green", 5),
+						CreateSetColorMarkCommand("Violet", 6),
+						CreateSetColorMarkCommand("Gray", 7),
 				}))
 			};
 			if (nodeData.Node is Model3D && nodeData.Node.ContentsPath != null) {
@@ -286,46 +298,13 @@ namespace Tangerine.UI.Timeline.Components
 			new AttachmentDialog(nodeData.Node as Model3D);
 		}
 
-		private ICommand CreateColorCommand(string title, int index)
+		private ICommand CreateSetColorMarkCommand(string title, int index)
 		{
-			return new Command(title, () => nodeData.Node.SetColorIndex((uint)index)) {
-				Checked = nodeData.Node.GetColorIndex() == index
-			};
-		}
-	}
-
-	public static class NodeExtensions
-	{
-		private static readonly Color4[] Colors = {
-				Color4.Transparent,
-				ColorTheme.Current.TimelineRoll.RedMark,
-				ColorTheme.Current.TimelineRoll.OrangeMark,
-				ColorTheme.Current.TimelineRoll.YellowMark,
-				ColorTheme.Current.TimelineRoll.BlueMark,
-				ColorTheme.Current.TimelineRoll.GreenMark,
-				ColorTheme.Current.TimelineRoll.VioletMark,
-				ColorTheme.Current.TimelineRoll.GrayMark,
-			};
-
-		public static uint GetColorIndex(this Node node)
-		{
-			uint index = 0;
-			index = (index | Convert.ToUInt32(node.GetTangerineFlag(TangerineFlags.ColorBit3))) << 1;
-			index = (index | Convert.ToUInt32(node.GetTangerineFlag(TangerineFlags.ColorBit2))) << 1;
-			index = index | Convert.ToUInt32(node.GetTangerineFlag(TangerineFlags.ColorBit1));
-			return index;
-		}
-
-		public static void SetColorIndex(this Node node, uint index)
-		{
-			node.SetTangerineFlag(TangerineFlags.ColorBit1, (index & 1) == 1);
-			node.SetTangerineFlag(TangerineFlags.ColorBit2, ((index >>= 1) & 1) == 1);
-			node.SetTangerineFlag(TangerineFlags.ColorBit3, ((index >>= 1) & 1) == 1);
-		}
-
-		public static Color4 GetColor(this Node node)
-		{
-			return Colors[node.GetColorIndex()];
+			return new Command(title, 
+				() => {
+					Document.Current.History.DoTransaction(
+						() => Core.Operations.SetProperty.Perform(nodeData.Node.EditorState(), nameof(NodeEditorState.ColorIndex), index));
+				}) { Checked = nodeData.Node.EditorState().ColorIndex == index };
 		}
 	}
 }

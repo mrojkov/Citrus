@@ -35,6 +35,22 @@ namespace Tangerine.Core
 		public bool PropertiesExpanded { get { return node.GetTangerineFlag(TangerineFlags.PropertiesExpanded); } set { node.SetTangerineFlag(TangerineFlags.PropertiesExpanded, value); } }
 		public bool ChildrenExpanded { get { return node.GetTangerineFlag(TangerineFlags.ChildrenExpanded); } set { node.SetTangerineFlag(TangerineFlags.ChildrenExpanded, value); } }
 
+		public int ColorIndex
+		{
+			get
+			{
+				return
+					(node.GetTangerineFlag(TangerineFlags.ColorBit1) ? 1 : 0) |
+					(node.GetTangerineFlag(TangerineFlags.ColorBit2) ? 2 : 0) |
+					(node.GetTangerineFlag(TangerineFlags.ColorBit3) ? 4 : 0);
+			}
+			set
+			{
+				node.SetTangerineFlag(TangerineFlags.ColorBit1, (value & 1) == 1);
+				node.SetTangerineFlag(TangerineFlags.ColorBit2, ((value >>= 1) & 1) == 1);
+				node.SetTangerineFlag(TangerineFlags.ColorBit3, ((value >>= 1) & 1) == 1);
+			}
+		}
 
 		Folder rootFolder;
 		public Folder RootFolder => rootFolder ?? (rootFolder = Folder.BuildTree(node));
