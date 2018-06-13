@@ -28,14 +28,18 @@ namespace Tangerine.UI.Timeline
 							} else if (mp < cw / 2) {
 								timeline.OffsetX = Math.Max(0, timeline.OffsetX - cw);
 							}
+							int selectedColumn = CalcColumn(mp);
+
+							Document.Current.History.RollbackTransaction();
+
 							if (input.IsKeyPressed(Key.Control) && !input.WasMousePressed()) {
 								if (input.IsKeyPressed(Key.Shift)) {
-									ShiftTimeline(CalcColumn(mp));
+									ShiftTimeline(selectedColumn);
 								} else if (marker != null) {
-									DragMarker(marker, CalcColumn(mp));
+									DragMarker(marker, selectedColumn);
 								}
 							}
-							Operations.SetCurrentColumn.Perform(CalcColumn(mp));
+							Operations.SetCurrentColumn.Perform(selectedColumn);
 							timeline.Ruler.MeasuredFrameDistance = timeline.CurrentColumn - initialCol;
 							Window.Current.Invalidate();
 							yield return null;
