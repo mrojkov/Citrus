@@ -10,7 +10,6 @@ namespace Lime
 		private float aspectRatio;
 		private float nearClipPlane;
 		private float farClipPlane;
-		private Matrix44 view;
 		private Matrix44 projection;
 		private bool projectionDirty;
 
@@ -99,13 +98,7 @@ namespace Lime
 
 		public Matrix44 View
 		{
-			get
-			{
-				if (CleanDirtyFlags(DirtyFlags.GlobalTransform)) {
-					RecalcGlobalTransform();
-				}
-				return view;
-			}
+			get { return GlobalTransformInverse; }
 		}
 
 		public Matrix44 Projection
@@ -132,12 +125,6 @@ namespace Lime
 				}
 				return projection;
 			}
-		}
-
-		protected override void RecalcGlobalTransform()
-		{
-			base.RecalcGlobalTransform();
-			view = globalTransform.CalcInverted();
 		}
 	}
 

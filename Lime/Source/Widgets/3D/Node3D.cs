@@ -14,7 +14,9 @@ namespace Lime
 		private Color4 color;
 		private Viewport3D viewport;
 
+		protected Matrix44 localTransform;
 		protected Matrix44 globalTransform;
+		protected Matrix44 globalTransformInverse;
 		protected bool globallyVisible;
 		protected Color4 globalColor;
 
@@ -55,7 +57,7 @@ namespace Lime
 			set
 			{
 				scale = value;
-				PropagateDirtyFlags(DirtyFlags.GlobalTransform);
+				OnTransformChanged();
 			}
 		}
 
@@ -67,7 +69,7 @@ namespace Lime
 			set
 			{
 				rotation = value;
-				PropagateDirtyFlags(DirtyFlags.GlobalTransform);
+				OnTransformChanged();
 			}
 		}
 
@@ -79,7 +81,7 @@ namespace Lime
 			set
 			{
 				position = value;
-				PropagateDirtyFlags(DirtyFlags.GlobalTransform);
+				OnTransformChanged();
 			}
 		}
 
@@ -98,6 +100,25 @@ namespace Lime
 		[YuzuMember]
 		public bool Opaque { get; set; }
 
+		public Matrix44 LocalTransform
+		{
+			get
+			{
+				if (CleanDirtyFlags(DirtyFlags.LocalTransform)) {
+					RecalcLocalTransform();
+				}
+				return localTransform;
+			}
+		}
+
+		private void RecalcLocalTransform()
+		{
+			localTransform =
+				Matrix44.CreateScale(scale) *
+				Matrix44.CreateRotation(rotation) *
+				Matrix44.CreateTranslation(position);
+		}
+
 		public Matrix44 GlobalTransform
 		{
 			get
@@ -109,13 +130,28 @@ namespace Lime
 			}
 		}
 
-		protected virtual void RecalcGlobalTransform()
+		private void RecalcGlobalTransform()
 		{
+			globalTransform = LocalTransform;
 			if (Parent?.AsNode3D != null) {
-				globalTransform = CalcLocalTransform() * Parent.AsNode3D.GlobalTransform;
-			} else {
-				globalTransform = CalcLocalTransform();
+				globalTransform *= Parent.AsNode3D.GlobalTransform;
 			}
+		}
+
+		public Matrix44 GlobalTransformInverse
+		{
+			get
+			{
+				if (CleanDirtyFlags(DirtyFlags.GlobalTransformInverse)) {
+					RecalcGlobalTransformInverse();
+				}
+				return globalTransformInverse;
+			}
+		}
+
+		private void RecalcGlobalTransformInverse()
+		{
+			globalTransformInverse = GlobalTransform.CalcInverted();
 		}
 
 		public bool GloballyVisible
@@ -183,23 +219,32 @@ namespace Lime
 			return camera.View.TransformVector(GlobalTransform.Translation).Z;
 		}
 
-		public Matrix44 CalcLocalTransform()
-		{
-			return Matrix44.CreateScale(scale) * Matrix44.CreateRotation(rotation) * Matrix44.CreateTranslation(position);
-		}
-
 		public void SetGlobalTransform(Matrix44 transform)
 		{
-			if (Parent != null && Parent.AsNode3D != null) {
-				transform *= Parent.AsNode3D.GlobalTransform.CalcInverted();
+			if (Parent?.AsNode3D != null) {
+				SetLocalTransform(transform * Parent.AsNode3D.GlobalTransformInverse);
+			} else {
+				SetLocalTransform(transform);
 			}
-			SetLocalTransform(transform);
+			globalTransform = transform;
+			DirtyMask &= ~DirtyFlags.GlobalTransform;
+		}
+
+		public void SetGlobalTransformInverse(Matrix44 transform)
+		{
+			SetGlobalTransform(transform.CalcInverted());
+			globalTransformInverse = transform;
+			DirtyMask &= ~DirtyFlags.GlobalTransformInverse;
 		}
 
 		public void SetLocalTransform(Matrix44 transform)
 		{
-			transform.Decompose(out scale, out rotation, out position);
-			PropagateDirtyFlags(DirtyFlags.GlobalTransform);
+			localTransform = transform;
+			localTransform.Decompose(out scale, out rotation, out position);
+			PropagateDirtyFlags(
+				DirtyFlags.GlobalTransform |
+				DirtyFlags.GlobalTransformInverse);
+			DirtyMask &= ~DirtyFlags.LocalTransform;
 		}
 
 		public Model3D FindModel()
@@ -233,14 +278,9 @@ namespace Lime
 			return clone;
 		}
 
-		public Matrix44 CalcTransformInSpaceOf(Camera3D camera)
-		{
-			return GlobalTransform * camera.View;
-		}
-
 		public Matrix44 CalcTransformInSpaceOf(Node3D node)
 		{
-			return GlobalTransform * node.GlobalTransform.CalcInverted();
+			return GlobalTransform * node.GlobalTransformInverse;
 		}
 
 		public override void AddToRenderChain(RenderChain chain)
@@ -254,6 +294,14 @@ namespace Lime
 		{
 			base.OnParentChanged(oldParent);
 			viewport = null;
+		}
+
+		private void OnTransformChanged()
+		{
+			DirtyMask |= DirtyFlags.LocalTransform;
+			PropagateDirtyFlags(
+				DirtyFlags.GlobalTransform |
+				DirtyFlags.GlobalTransformInverse);
 		}
 	}
 }

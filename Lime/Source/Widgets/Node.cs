@@ -160,7 +160,8 @@ namespace Lime
 			LayoutManager = 1 << 4,
 			LocalTransform = 1 << 5,
 			GlobalTransform = 1 << 6,
-			ParentBoundingRect = 1 << 7,
+			GlobalTransformInverse = 1 << 7,
+			ParentBoundingRect = 1 << 8,
 			All = ~None
 		}
 

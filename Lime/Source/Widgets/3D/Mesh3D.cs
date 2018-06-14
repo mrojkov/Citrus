@@ -181,7 +181,7 @@ namespace Lime
 		{
 			var hit = false;
 			distance = float.MaxValue;
-			ray = ray.Transform(GlobalTransform.CalcInverted());
+			ray = ray.Transform(GlobalTransformInverse);
 			foreach (var submesh in Submeshes) {
 				var vertices = submesh.Mesh.Vertices;
 				for (int i = 0; i <= vertices.Length - 3; i += 3) {
@@ -274,7 +274,7 @@ namespace Lime
 			Renderer.World = GlobalTransform;
 			Renderer.CullMode = CullMode;
 
-			var invWorld = GlobalTransform.CalcInverted();
+			var invWorld = GlobalTransformInverse;
 
 			foreach (var sm in Submeshes) {
 				var def = sm.Material;

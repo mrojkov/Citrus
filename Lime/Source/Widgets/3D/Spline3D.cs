@@ -56,7 +56,7 @@ namespace Lime
 
 		public Matrix44 CalcPointTransformInSpaceOf(float amount, Node3D node)
 		{
-			return CalcPointTransform(amount) * node.GlobalTransform.CalcInverted();
+			return CalcPointTransform(amount) * node.GlobalTransformInverse;
 		}
 
 		public Matrix44 CalcPointTransform(float amount)

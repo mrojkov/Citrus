@@ -1,4 +1,4 @@
-﻿
+
 namespace Lime
 {
 	[TangerineNodeBuilder("BuildForTangerine")]
@@ -87,7 +87,7 @@ namespace Lime
 			if (distance.HasValue && distance <= args.Distance) {
 				var oldPoint = args.Point;
 				try {
-					args.Point = (Vector2)GlobalTransform.CalcInverted().TransformVector(ray.Position + ray.Direction * distance.Value) * new Vector2(1, -1);
+					args.Point = (Vector2)GlobalTransformInverse.TransformVector(ray.Position + ray.Direction * distance.Value) * new Vector2(1, -1);
 					Widget.RenderChainBuilder?.AddToRenderChain(renderChain);
 					if (renderChain.HitTest(ref args)) {
 						args.Distance = distance.Value;
