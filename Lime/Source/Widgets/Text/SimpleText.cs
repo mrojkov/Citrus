@@ -24,6 +24,14 @@ namespace Lime
 		internal int PaletteIndex = -1;
 		private float letterSpacing;
 
+		public enum RenderingMode
+		{
+			Common,
+			OnePassWithoutOutline,
+			OnePassWithOutline,
+			TwoPasses
+		}
+
 		public event TextProcessorDelegate TextProcessor
 		{
 			add
@@ -175,6 +183,7 @@ namespace Lime
 		}
 
 		public bool ForceUncutText { get; set; }
+		public RenderingMode RenderMode{ get; set; }
 
 		public override Vector2 EffectiveMinSize =>
 			Vector2.Max(MeasuredMinSize, ForceUncutText ? Vector2.Max(MinSize, MeasureUncutText() + Padding) : MinSize);
@@ -203,6 +212,7 @@ namespace Lime
 			Localizable = true;
 			TrimWhitespaces = true;
 			Text = "";
+			RenderMode = RenderingMode.TwoPasses;
 		}
 
 		public override void AddToRenderChain(RenderChain chain)
@@ -250,14 +260,19 @@ namespace Lime
 			PrepareSpriteListAndSyncCaret();
 			Renderer.Transform1 = LocalToWorldTransform;
 			var effectiveColor = GlobalColor * textColor;
-			if (PaletteIndex < 0) {
+			if (PaletteIndex < 0 || RenderMode == RenderingMode.Common) {
 				spriteList.Render(effectiveColor, blending, shader);
 			} else {
-				ColorfulMaterialProvider.Instance.Init(blending, PaletteIndex);
-				spriteList.Render(effectiveColor, ColorfulMaterialProvider.Instance);
-				ColorfulMaterialProvider.Instance.Init(
-					blending, ShaderPrograms.ColorfulTextShaderProgram.GradientMapTextureSize - PaletteIndex - 1);
-				spriteList.Render(effectiveColor, ColorfulMaterialProvider.Instance);	
+				if (RenderMode == RenderingMode.OnePassWithOutline || RenderMode == RenderingMode.TwoPasses) {
+					ColorfulMaterialProvider.Instance.Init(blending, PaletteIndex);
+					spriteList.Render(effectiveColor, ColorfulMaterialProvider.Instance);
+				}
+
+				if (RenderMode == RenderingMode.OnePassWithoutOutline || RenderMode == RenderingMode.TwoPasses) {
+					ColorfulMaterialProvider.Instance.Init(
+							blending, ShaderPrograms.ColorfulTextShaderProgram.GradientMapTextureSize - PaletteIndex - 1);
+					spriteList.Render(effectiveColor, ColorfulMaterialProvider.Instance);
+				}
 			}
 		}
 
