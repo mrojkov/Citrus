@@ -230,7 +230,7 @@ namespace Tangerine.UI.Timeline.Components
 				i => button.Texture = IconPool.GetTexture(i ? "Timeline.Expanded" : "Timeline.Collapsed")
 			);
 			button.AddTransactionClickHandler(() => {
-				Core.Operations.SetProperty.Perform(nodeData, nameof(NodeRow.Expanded), !nodeData.Expanded);
+				Core.Operations.SetProperty.Perform(nodeData, nameof(NodeRow.Expanded), !nodeData.Expanded, isChangingDocument: false);
 			});
 			return button;
 		}

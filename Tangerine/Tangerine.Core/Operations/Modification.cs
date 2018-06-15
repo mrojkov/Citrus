@@ -9,22 +9,25 @@ namespace Tangerine.Core.Operations
 {
 	public class SetProperty : Operation
 	{
+		private bool isChangingDocument;
+		
 		public readonly object Obj;
 		public readonly object Value;
 		public readonly PropertyInfo Property;
 
-		public override bool IsChangingDocument => true;
+		public override bool IsChangingDocument => isChangingDocument;
 
-		public static void Perform(object obj, string propertyName, object value)
+		public static void Perform(object obj, string propertyName, object value, bool isChangingDocument = true)
 		{
-			Document.Current.History.Perform(new SetProperty(obj, propertyName, value));
+			Document.Current.History.Perform(new SetProperty(obj, propertyName, value, isChangingDocument));
 		}
 
-		protected SetProperty(object obj, string propertyName, object value)
+		protected SetProperty(object obj, string propertyName, object value, bool isChangingDocument)
 		{
 			Obj = obj;
 			Value = value;
 			Property = obj.GetType().GetProperty(propertyName);
+			this.isChangingDocument = isChangingDocument;
 		}
 
 		public class Processor : OperationProcessor<SetProperty>
