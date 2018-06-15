@@ -17,13 +17,7 @@ namespace Lime
 			varying vec4 v_Color;
 			varying vec2 v_UV;
 			varying vec3 v_Normal;
-
-			#ifdef FOG_ENABLED
-			varying float v_FogFactor;
-			uniform float u_FogStart;
-			uniform float u_FogEnd;
-			uniform float u_FogDensity;
-			#endif
+			varying vec4 v_ViewPos;
 
 			uniform vec4 u_ColorFactor;
 			uniform mat4 u_World;
@@ -49,18 +43,6 @@ namespace Lime
 			#endif
 				v_Color = a_Color * u_ColorFactor;
 				v_UV = a_UV;
-			#ifdef FOG_ENABLED
-				vec4 viewPos = u_WorldView * position;
-				float d = abs(viewPos.z);
-			#if defined(FOG_LINEAR)
-				v_FogFactor = (d - u_FogStart) / (u_FogEnd - u_FogStart);
-			#elif defined(FOG_EXP)
-				v_FogFactor = 1.0 - 1.0 / exp(d * u_FogDensity);
-			#elif defined(FOG_EXP_SQUARED)
-				v_FogFactor = 1.0 - 1.0 / exp((d * u_FogDensity) * (d * u_FogDensity));
-			#endif
-				v_FogFactor = clamp(v_FogFactor, 0.0, 1.0);
-			#endif
 
 			#ifdef RECIEVE_SHADOWS
 				v_ShadowCoord = u_LightWorldViewProjection * position;
@@ -68,6 +50,7 @@ namespace Lime
 				
 				gl_Position = u_WorldViewProj * position;
 				v_Normal = mat3(u_World[0].xyz, u_World[1].xyz, u_World[2].xyz) * a_Normal.xyz;
+				v_ViewPos = u_WorldView * position;
 			}
 		";
 
@@ -79,9 +62,12 @@ namespace Lime
 			varying vec4 v_Color;
 			varying vec2 v_UV;
 			varying vec3 v_Normal;
-
+			varying vec4 v_ViewPos;
+			
 			#ifdef FOG_ENABLED
-			varying float v_FogFactor;
+			uniform float u_FogStart;
+			uniform float u_FogEnd;
+			uniform float u_FogDensity;
 			uniform vec4 u_FogColor;
 			#endif
 
@@ -137,7 +123,16 @@ namespace Lime
 				color.rgba *= texture2D(u_DiffuseTexture, v_UV).rgba;
 			#endif
 			#ifdef FOG_ENABLED
-				color.rgb = mix(color.rgb, u_FogColor.rgb, v_FogFactor);
+				float d = abs(v_ViewPos.z);
+			#if defined(FOG_LINEAR)
+				float fogFactor = (d - u_FogStart) / (u_FogEnd - u_FogStart);
+			#elif defined(FOG_EXP)
+				float fogFactor = 1.0 - 1.0 / exp(d * u_FogDensity);
+			#elif defined(FOG_EXP_SQUARED)
+				float fogFactor = 1.0 - 1.0 / exp((d * u_FogDensity) * (d * u_FogDensity));
+			#endif
+				fogFactor = clamp(fogFactor, 0.0, 1.0);
+				color.rgb = mix(color.rgb, u_FogColor.rgb, fogFactor);
 			#endif
 				
 			#ifdef LIGHTNING_ENABLED

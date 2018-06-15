@@ -256,7 +256,7 @@ namespace Lime
 				Bones = parameters.GetParamKey<Matrix44>("u_Bones");
 				FogColor = parameters.GetParamKey<Vector4>("u_FogColor");
 				FogStart = parameters.GetParamKey<float>("u_FogStart");
-				FogEnd = parameters.GetParamKey<float>("u_FogStart");
+				FogEnd = parameters.GetParamKey<float>("u_FogEnd");
 				FogDensity = parameters.GetParamKey<float>("u_FogDensity");
 			}
 		}
