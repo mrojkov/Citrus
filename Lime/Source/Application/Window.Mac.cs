@@ -104,6 +104,8 @@ namespace Lime
 			return new Vector2(wp.X.Round() + (float)window.Frame.X, wp.Y.Round() + (float)window.Frame.X);
 		}
 
+		public Vector2 MousePosition { get; private set; }
+
 		public bool Active
 		{
 			get { return window.IsKeyWindow; }
@@ -205,11 +207,10 @@ namespace Lime
 		[Obsolete("Use FPS property instead", true)]
 		public float CalcFPS() { return fpsCounter.FPS; }
 
-		public Input Input { get; private set; }
+		public Input Input => Input.Instance;
 
 		public Window(WindowOptions options)
 		{
-			Input = new Input();
 			fpsCounter = new FPSCounter();
 			CreateNativeWindow(options);
 			if (Application.MainWindow == null) {
@@ -300,7 +301,6 @@ namespace Lime
 				RaiseActivated();
 			};
 			window.DidResignKey += (sender, e) => {
-				Input.ClearKeyState();
 				RaiseDeactivated();
 			};
 			window.DidMove += HandleMove;
@@ -402,6 +402,11 @@ namespace Lime
 			window.PerformClose(window);
 		}
 
+		public Vector2 GetTouchPosition(int index)
+		{
+			return Input.GetScreenTouchPosition(index);
+		}
+
 		public void ShowModal()
 		{
 			if (Visible) {
@@ -446,17 +451,24 @@ namespace Lime
 			delta = Mathf.Clamp(delta, 0, Application.MaxDelta);
 			// Refresh mouse position on every frame to make HitTest work properly if mouse is outside of the window.
 			RefreshMousePosition();
-			Input.ProcessPendingKeyEvents(delta);
 			RaiseUpdating(delta);
 			AudioSystem.Update();
-			Input.TextInput = null;
-			Input.CopyKeysState();
+			if (Active) {
+				Input.CopyKeysState();
+				Input.ProcessPendingKeyEvents(delta);
+				Input.TextInput = null;
+			}
+			if (Application.Windows.All(window => !window.Active)) {
+				Input.ClearKeyState();
+			}
 		}
 
 		private void RefreshMousePosition()
 		{
+			Input.ScreenMousePosition = new Vector2((float) NSEvent.CurrentMouseLocation.X, (float) NSEvent.CurrentMouseLocation.Y);
+			Input.SetScreenTouchPosition(0, Input.ScreenMousePosition);
 			var p = window.MouseLocationOutsideOfEventStream;
-			Input.MousePosition = new Vector2((float)p.X, (float)(NSGameView.Frame.Height - p.Y)) * Input.ScreenToWorldTransform;
+			MousePosition = new Vector2((float)p.X, (float)(NSGameView.Frame.Height - p.Y));
 		}
 
 		private void RaiseFilesDropped(IEnumerable<string> files)
