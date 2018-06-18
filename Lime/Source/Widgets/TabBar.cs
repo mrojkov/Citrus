@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Collections.Generic;
 
@@ -55,6 +55,11 @@ namespace Lime
 			base.Update(delta);
 			if (closeButton != null) {
 				closeButton.Visible = Closable;
+			}
+			if (Input.WasKeyPressed(Key.Mouse2)) {
+				if (AsWidget.BoundingRectHitTest(Input.MousePosition)) {
+					Closing?.Invoke();
+				}
 			}
 			if (Input.WasMousePressed() && IsMouseOver()) {
 				Clicked?.Invoke();
