@@ -841,6 +841,9 @@ namespace Lime
 
 		internal static void SetFocus(Widget value)
 		{
+			if (Focused == value) {
+				return;
+			}
 			// Grisha: invoke on main thread to make it possible to focus widgets not from main thread
 			Application.InvokeOnMainThread(() => {
 				if (value != null && value is IText) {
@@ -849,9 +852,9 @@ namespace Lime
 					Application.SoftKeyboard.Show(false);
 				}
 			});
-
-			if (Focused == value) {
-				return;
+			var ww = value.GetRoot() as WindowWidget;
+			if (ww != null && !ww.Window.Active) {
+				ww.Window.Activate();
 			}
 			Focused = value;
 			Application.InvalidateWindows();
