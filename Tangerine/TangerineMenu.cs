@@ -20,11 +20,6 @@ namespace Tangerine
 		private static Menu localizationMenu;
 		private static Command localizationCommand;
 
-		private static Menu recentDocumentsMenu;
-		private static Command recentDocumentsCommand;
-		private static Menu recentProjectsMenu;
-		private static Command recentProjectsCommand;
-
 		static TangerineMenu()
 		{
 			PadsMenu = new Menu();
@@ -75,9 +70,9 @@ namespace Tangerine
 					GenericCommands.New,
 					Command.MenuSeparator,
 					GenericCommands.Open,
-					(recentDocumentsCommand = new Command("Recent Documents", recentDocumentsMenu = new Menu())),
+					GenericCommands.RecentDocuments,
 					GenericCommands.OpenProject,
-					(recentProjectsCommand = new Command("Recent Projects", recentProjectsMenu = new Menu())),
+					GenericCommands.RecentProjects,
 					Command.MenuSeparator,
 					GenericCommands.Save,
 					GenericCommands.SaveAs,
@@ -298,36 +293,38 @@ namespace Tangerine
 			localizationCommand.Enabled = localizationMenu.Count > 0;
 		}
 
-		public static void RebuildRecentDocumentsMenu(LinkedList<string> recentDocuments)
+		public static void RebuildRecentDocumentsMenu()
 		{
-			recentDocumentsMenu = new Menu();
+			var recentDocuments = AppUserPreferences.Instance.RecentDocuments;
+			var menu = new Menu();
 			int counter = 1;
 			foreach (var i in recentDocuments) {
-				string name = counter.ToString() + ". " + System.IO.Path.GetFileName(i) +
-					" (" + System.IO.Path.GetDirectoryName(i) + ")";
-				recentDocumentsMenu.Add(new Command(name, delegate { Project.Current.OpenDocument(i, true); }));
-				counter++;
+				string name = System.String.Format("{0}. {1} ({2})",
+					counter++, System.IO.Path.GetFileName(i), System.IO.Path.GetDirectoryName(i));
+				menu.Add(new Command(name, delegate {
+					Project.Current.OpenDocument(i, true);
+				}));
 			}
-			recentDocumentsCommand.Menu = recentDocumentsMenu;
-			recentDocumentsCommand.Enabled = recentDocuments.Count > 0;
+			GenericCommands.RecentDocuments.Menu = menu;
+			GenericCommands.RecentDocuments.Enabled = recentDocuments.Count > 0;
 		}
 
-		public static void RebuildRecentProjectsMenu(List<string> recentProjects)
+		public static void RebuildRecentProjectsMenu()
 		{
-			recentProjectsMenu = new Menu();
+			var recentProjects = AppUserPreferences.Instance.RecentProjects;
+			var menu = new Menu();
 			int counter = 1;
 			foreach (var i in recentProjects) {
-				string name = counter.ToString() + ". " + System.IO.Path.GetFileName(i) +
-					" (" + System.IO.Path.GetDirectoryName(i) + ")";
-
-				recentProjectsMenu.Add(new Command(name, delegate {
-					if (Project.Current.Close()) new Project(i).Open();
+				string name = System.String.Format("{0}. {1} ({2})",
+					counter++, System.IO.Path.GetFileName(i), System.IO.Path.GetDirectoryName(i));
+				menu.Add(new Command(name, delegate {
+					if (Project.Current.Close()) {
+						new Project(i).Open();
+					}
 				}));
-
-				counter++;
 			}
-			recentProjectsCommand.Menu = recentProjectsMenu;
-			recentProjectsCommand.Enabled = recentProjects.Count > 0;
+			GenericCommands.RecentProjects.Menu = menu;
+			GenericCommands.RecentProjects.Enabled = recentProjects.Count > 0;
 		}
 
 		private class OverlayToggleCommandHandler : DocumentCommandHandler
