@@ -852,7 +852,7 @@ namespace Lime
 					Application.SoftKeyboard.Show(false);
 				}
 			});
-			var ww = value.GetRoot() as WindowWidget;
+			var ww = value?.GetRoot() as WindowWidget;
 			if (ww != null && !ww.Window.Active) {
 				ww.Window.Activate();
 			}
