@@ -27,6 +27,8 @@ namespace Lime
 		public event Action Changed;
 		public bool Enabled;
 
+		private bool isDragActive;
+
 		private float value;
 		private Widget thumb;
 		private DragGesture dragGestureThumb;
@@ -95,19 +97,19 @@ namespace Lime
 			if (Enabled && RangeMax > RangeMin) {
 				if (dragGestureThumb.WasRecognized()) {
 					activeDragGesture = dragGestureThumb;
-					StartDrag();
+					TryStartDrag();
 					draggingJustBegun = true;
 				} else {
 					if (clickGesture.WasBegan()) {
-						StartDrag();
+						TryStartDrag();
 						SetValueFromCurrentMousePosition(false);
 					}
 					if (clickGesture.WasRecognizedOrCanceled() && !dragGestureSlider.WasRecognized()) {
-						Release();
+						TryEndDrag();
 					}
 					if (dragGestureSlider.WasRecognized()) {
 						activeDragGesture = dragGestureSlider;
-						StartDrag();
+						TryStartDrag();
 						dragInitialDelta = 0;
 						dragInitialOffset = (Value - RangeMin) / (RangeMax - RangeMin);
 						draggingJustBegun = false;
@@ -115,7 +117,7 @@ namespace Lime
 				}
 			}
 			if (activeDragGesture?.WasEnded() ?? false) {
-				Release();
+				TryEndDrag();
 			}
 			if (Enabled && (activeDragGesture?.IsChanging() ?? false)) {
 				SetValueFromCurrentMousePosition(draggingJustBegun);
@@ -124,13 +126,12 @@ namespace Lime
 			RefreshThumbPosition();
 		}
 
-		private void RaiseDragEnded()
+		private void TryStartDrag()
 		{
-			DragEnded?.Invoke();
-		}
-
-		private void StartDrag()
-		{
+			if (isDragActive) {
+				return;
+			}
+			isDragActive = true;
 			RunThumbAnimation("Press");
 			DragStarted?.Invoke();
 		}
@@ -158,9 +159,13 @@ namespace Lime
 			Thumb.Position = Rail.CalcTransitionToSpaceOf(this) * pos;
 		}
 
-		private void Release()
+		private void TryEndDrag()
 		{
-			RaiseDragEnded();
+			if (!isDragActive) {
+				return;
+			}
+			isDragActive = false;
+			DragEnded?.Invoke();
 			RunThumbAnimation("Normal");
 		}
 
