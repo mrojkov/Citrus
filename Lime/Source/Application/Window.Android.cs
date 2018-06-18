@@ -61,6 +61,13 @@ namespace Lime
 			get; private set;
 		}
 
+		public Vector2 MousePosition
+		{
+			get {
+				return Input.ScreenMousePosition;
+			}
+		}
+
 		public Window(WindowOptions options)
 		{
 			if (Application.MainWindow != null) {
@@ -89,6 +96,11 @@ namespace Lime
 			};
 
 			PixelScale = Resources.System.DisplayMetrics.Density;
+		}
+
+		public Vector2 GetTouchPosition(int index)
+		{
+			return Input.GetScreenTouchPosition(index);
 		}
 
 		public void Center() {}

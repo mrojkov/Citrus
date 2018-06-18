@@ -58,6 +58,13 @@ namespace Lime
 			get { return (float)UIScreen.MainScreen.Scale; }
 		}
 
+		public Vector2 MousePosition
+		{
+			get {
+				return Input.ScreenMousePosition;
+			}
+		}
+
 		public Window()
 			: this(new WindowOptions())
 		{
@@ -110,6 +117,11 @@ namespace Lime
 		public IDisplay Display
 		{
 			get { return display; }
+		}
+
+		public Vector2 GetTouchPosition(int index)
+		{
+			return Input.GetScreenTouchPosition(index);
 		}
 
 		public void Center() { }
