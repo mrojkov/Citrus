@@ -20,6 +20,11 @@ namespace Tangerine
 		private static Menu localizationMenu;
 		private static Command localizationCommand;
 
+		private static Menu recentDocumentsMenu;
+		private static Command recentDocumentsCommand;
+		private static Menu recentProjectsMenu;
+		private static Command recentProjectsCommand;
+
 		static TangerineMenu()
 		{
 			PadsMenu = new Menu();
@@ -70,7 +75,9 @@ namespace Tangerine
 					GenericCommands.New,
 					Command.MenuSeparator,
 					GenericCommands.Open,
+					(recentDocumentsCommand = new Command("Recent Documents", recentDocumentsMenu = new Menu())),
 					GenericCommands.OpenProject,
+					(recentProjectsCommand = new Command("Recent Projects", recentProjectsMenu = new Menu())),
 					Command.MenuSeparator,
 					GenericCommands.Save,
 					GenericCommands.SaveAs,
@@ -289,6 +296,38 @@ namespace Tangerine
 				}
 			}
 			localizationCommand.Enabled = localizationMenu.Count > 0;
+		}
+
+		public static void RebuildRecentDocumentsMenu(LinkedList<string> recentDocuments)
+		{
+			recentDocumentsMenu = new Menu();
+			int counter = 1;
+			foreach (var i in recentDocuments) {
+				string name = counter.ToString() + ". " + System.IO.Path.GetFileName(i) +
+					" (" + System.IO.Path.GetDirectoryName(i) + ")";
+				recentDocumentsMenu.Add(new Command(name, delegate { Project.Current.OpenDocument(i, true); }));
+				counter++;
+			}
+			recentDocumentsCommand.Menu = recentDocumentsMenu;
+			recentDocumentsCommand.Enabled = recentDocuments.Count > 0;
+		}
+
+		public static void RebuildRecentProjectsMenu(List<string> recentProjects)
+		{
+			recentProjectsMenu = new Menu();
+			int counter = 1;
+			foreach (var i in recentProjects) {
+				string name = counter.ToString() + ". " + System.IO.Path.GetFileName(i) +
+					" (" + System.IO.Path.GetDirectoryName(i) + ")";
+
+				recentProjectsMenu.Add(new Command(name, delegate {
+					if (Project.Current.Close()) new Project(i).Open();
+				}));
+
+				counter++;
+			}
+			recentProjectsCommand.Menu = recentProjectsMenu;
+			recentProjectsCommand.Enabled = recentProjects.Count > 0;
 		}
 
 		private class OverlayToggleCommandHandler : DocumentCommandHandler

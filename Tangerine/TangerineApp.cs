@@ -225,6 +225,11 @@ namespace Tangerine
 			WidgetContext.Current.Root.AddChangeWatcher(() => Project.Current, project => TangerineMenu.OnProjectChanged(project));
 			new UI.FilesystemView.FilesystemPane(filesystemPanel);
 			RegisterGlobalCommands();
+
+			Document.RecentDocumentAdded += TangerineMenu.RebuildRecentDocumentsMenu;
+			TangerineMenu.RebuildRecentDocumentsMenu(Document.RecentDocuments);
+
+			TangerineMenu.RebuildRecentProjectsMenu(AppUserPreferences.Instance.RecentProjects);
 		}
 
 		void SetupMainWindowTitle(WindowWidget windowWidget)

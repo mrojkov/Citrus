@@ -23,6 +23,7 @@ namespace Tangerine
 				prefs.RecentProjects.Remove(fileName);
 				prefs.RecentProjects.Insert(0, fileName);
 				Core.UserPreferences.Instance.Save();
+				TangerineMenu.RebuildRecentProjectsMenu(prefs.RecentProjects);
 			}
 		}
 	}

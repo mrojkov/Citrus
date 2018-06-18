@@ -53,6 +53,12 @@ namespace Tangerine.Core
 		public bool IsModified => History.IsDocumentModified;
 		public event Action<Document> Saving;
 
+		public static LinkedList<String> RecentDocuments { get; private set; } = new LinkedList<String>();
+		public static Int16 RecentDocumentsCount { get; private set; } = 5;
+
+		public delegate void RecentDocumentAddedDelegate(LinkedList<string> recentDocuments);
+		public static event RecentDocumentAddedDelegate RecentDocumentAdded;
+
 		/// <summary>
 		/// The list of Tangerine node decorators.
 		/// </summary>
@@ -224,7 +230,20 @@ namespace Tangerine.Core
 				Current = doc;
 				doc?.AttachViews();
 				ProjectUserPreferences.Instance.CurrentDocument = doc?.Path;
+				if (doc != null && doc.Path != doc.defaultPath)
+					AddRecentDocument(doc);
 			}
+		}
+		
+		public static void AddRecentDocument(Document doc)
+		{
+			string systemPath;
+			Project.Current.GetSystemPath(doc.Path, out systemPath);
+			RecentDocuments.Remove(systemPath);
+			RecentDocuments.AddFirst(systemPath);
+			if (RecentDocuments.Count + 1 > RecentDocumentsCount)
+				RecentDocuments.RemoveLast();
+			RecentDocumentAdded?.Invoke(RecentDocuments);
 		}
 
 		void AttachViews()
@@ -313,6 +332,7 @@ namespace Tangerine.Core
 			Path = path;
 			WriteNodeToFile(path, Format, RootNodeUnwrapped);
 			SetModificationTimeToNow();
+			AddRecentDocument(this);
 		}
 
 		public void SaveTo(string path, FileAttributes attributes = 0)
