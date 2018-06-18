@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using OpenTK.Graphics;
 using WinFormsCloseReason = System.Windows.Forms.CloseReason;
@@ -32,7 +33,8 @@ namespace Lime
 		private bool isInvalidated;
 		private bool vSync;
 
-		public Input Input { get; private set; }
+		public Input Input => Input.Instance;
+
 		public bool Active => active;
 		public Form Form => form;
 
@@ -156,6 +158,23 @@ namespace Lime
 			return new Vector2(sp.X + glControl.Left, sp.Y + glControl.Top);
 		}
 
+		private Vector2 lastScreenMousePosition = new Vector2(-1, -1);
+		private Vector2 calculatedMousePosition = new Vector2(-1, -1);
+
+		public Vector2 MousePosition
+		{
+			get {
+				if (lastScreenMousePosition != Input.ScreenMousePosition) {
+					lastScreenMousePosition = Input.ScreenMousePosition;
+					calculatedMousePosition = SDToLime.Convert(
+						glControl.PointToClient(new Point((int) Input.ScreenMousePosition.X, (int) Input.ScreenMousePosition.Y)),
+						PixelScale
+					);
+				}
+				return calculatedMousePosition;
+			}
+		}
+
 		FPSCounter fpsCounter = new FPSCounter();
 		public float FPS { get { return fpsCounter.FPS; } }
 
@@ -244,7 +263,6 @@ namespace Lime
 				// ES20 doesn't allow multiple contexts for now, because of a bug in OpenTK
 				throw new Lime.Exception("Attempt to create a second window for ES20 rendering backend. Use OpenGL backend instead.");
 			}
-			Input = new Input();
 			form = new Form();
 			using (var graphics = form.CreateGraphics()) {
 				PixelScale = CalcPixelScale(graphics.DpiX);
@@ -347,6 +365,11 @@ namespace Lime
 			}
 		}
 
+		public Vector2 GetTouchPosition(int index)
+		{
+			return Input.GetScreenTouchPosition(index);
+		}
+
 		public void ShowModal()
 		{
 			RaiseVisibleChanging(true, true);
@@ -442,7 +465,6 @@ namespace Lime
 		private void OnDeactivate(object sender, EventArgs e)
 		{
 			if (active) {
-				Input.ClearKeyState();
 				active = false;
 				RaiseDeactivated();
 			}
@@ -514,9 +536,8 @@ namespace Lime
 				return;
 			}
 			lastMousePosition = Control.MousePosition;
-			var position = SDToLime.Convert(glControl.PointToClient(Control.MousePosition), PixelScale);
-			Input.MousePosition = position * Input.ScreenToWorldTransform;
-			Input.SetTouchPosition(0, Input.MousePosition);
+			Input.ScreenMousePosition = new Vector2(lastMousePosition.X, lastMousePosition.Y);
+			Input.SetScreenTouchPosition(0, Input.ScreenMousePosition);
 		}
 
 		private void OnTick(object sender, EventArgs e)
@@ -581,9 +602,14 @@ namespace Lime
 			RefreshMousePosition();
 			RaiseUpdating(delta);
 			AudioSystem.Update();
-			Input.CopyKeysState();
-			Input.ProcessPendingKeyEvents(delta);
-			Input.TextInput = null;
+			if (active) {
+				Input.CopyKeysState();
+				Input.ProcessPendingKeyEvents(delta);
+				Input.TextInput = null;
+			}
+			if (Application.Windows.All(window => !window.Active)) {
+				Input.ClearKeyState();
+			}
 			if (renderingState == RenderingState.RenderDeferred) {
 				Invalidate();
 			}

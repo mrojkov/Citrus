@@ -399,7 +399,7 @@ namespace Tangerine.UI.FilesystemView
 				}
 				break;
 			case DragState.WaitingForDragging:
-				if ((dragStartPosition - Window.Current.Input.MousePosition).Length > 5.0f) {
+				if ((dragStartPosition - Window.Current.MousePosition).Length > 5.0f) {
 					dragState = DragState.Dragging;
 					CommonWindow.Current.DragFiles(selection.ToArray());
 				}
@@ -487,7 +487,7 @@ namespace Tangerine.UI.FilesystemView
 				} else {
 					if (selection.Contains(path)) {
 						dragState = DragState.WaitingForDragging;
-						dragStartPosition = Window.Current.Input.MousePosition;
+						dragStartPosition = Window.Current.MousePosition;
 						lastKeyboardSelectedFilesystemItem = fsItem;
 					} else {
 						if (!fsItem.IsMouseOver()) {
@@ -499,7 +499,7 @@ namespace Tangerine.UI.FilesystemView
 								selection.Select(path);
 							}
 							dragState = DragState.WaitingForDragging;
-							dragStartPosition = Window.Current.Input.MousePosition;
+							dragStartPosition = Window.Current.MousePosition;
 							lastKeyboardSelectedFilesystemItem = fsItem;
 						}
 					}

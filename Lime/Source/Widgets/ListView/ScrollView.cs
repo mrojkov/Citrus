@@ -48,6 +48,7 @@ namespace Lime
 
 		// TODO: Use WidgetInput instead
 		private Input Input => Window.Current.Input;
+		private Vector2 MousePosition => Window.Current.MousePosition;
 
 		public float ContentLength
 		{
@@ -311,7 +312,7 @@ namespace Lime
 			float realScrollPosition = ScrollPosition;
 			wheelScrollState = WheelScrollState.Stop;
 			while (dragGesture.IsChanging()) {
-				var newMouseProjectedPosition = ProjectToScrollAxisWithFrameRotation(Input.MousePosition);
+				var newMouseProjectedPosition = ProjectToScrollAxisWithFrameRotation(MousePosition);
 				realScrollPosition += mouseProjectedPosition - newMouseProjectedPosition;
 				// Round scrolling position to prevent blurring
 				ScrollPosition = ClampScrollPositionWithinBounceZone(realScrollPosition).Round();

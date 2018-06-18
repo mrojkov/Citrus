@@ -7,6 +7,9 @@ namespace Lime
 {
 	public class Input
 	{
+
+		public static readonly Input Instance = new Input();
+
 		public const int MaxTouches = 4;
 		public float KeyRepeatDelay = 0.2f;
 		public float KeyRepeatInterval = 0.03f;
@@ -18,9 +21,9 @@ namespace Lime
 			public bool State;
 		}
 
-		public InputSimulator Simulator;
+		public readonly InputSimulator Simulator;
 
-		private readonly Vector2[] touchPositions = new Vector2[MaxTouches];
+		private readonly Vector2[] screenTouchPositions = new Vector2[MaxTouches];
 		private readonly List<KeyEvent> keyEventQueue = new List<KeyEvent>();
 
 		private struct KeyState
@@ -34,14 +37,9 @@ namespace Lime
 		private readonly KeyState[] keys = new KeyState[Key.MaxCount];
 
 		/// <summary>
-		/// The matrix describes transition from pixels to virtual coordinates.
+		/// The current mouse position in screen coordinates. (read only)
 		/// </summary>
-		public Matrix32 ScreenToWorldTransform = Matrix32.Identity;
-
-		/// <summary>
-		/// The current mouse position in virtual coordinates. (read only)
-		/// </summary>
-		public Vector2 MousePosition { get; internal set; }
+		public Vector2 ScreenMousePosition { get; internal set; }
 
 		/// <summary>
 		/// Indicates how much the mouse wheel was moved
@@ -176,14 +174,14 @@ namespace Lime
 			return IsKeyPressed(Key.Touch0 + index);
 		}
 
-		public Vector2 GetTouchPosition(int index)
+		public Vector2 GetScreenTouchPosition(int index)
 		{
-			return touchPositions[index];
+			return screenTouchPositions[index];
 		}
 
-		internal void SetTouchPosition(int index, Vector2 position)
+		internal void SetScreenTouchPosition(int index, Vector2 position)
 		{
-			touchPositions[index] = position;
+			screenTouchPositions[index] = position;
 		}
 
 		public int GetNumTouches()
@@ -322,9 +320,9 @@ namespace Lime
 				this.input = input;
 			}
 
-			public void SetMousePosition(Vector2 position)
+			public void SetScreenMousePosition(Vector2 position)
 			{
-				input.MousePosition = position;
+				input.ScreenMousePosition = position;
 			}
 
 			public void SetKeyState(Key key, bool value)

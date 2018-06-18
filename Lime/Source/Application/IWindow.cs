@@ -280,5 +280,10 @@ namespace Lime
 		void InvokeOnRendering(Action action);
 		
 		bool VSync { get; set; }
+
+		Vector2 MousePosition { get; }
+
+		Vector2 GetTouchPosition(int index);
+
 	}
 }

@@ -109,7 +109,7 @@ namespace Lime
 				return null;
 			}
 #endif
-			var hitTestArgs = new HitTestArgs(Window.Input.MousePosition);
+			var hitTestArgs = new HitTestArgs(Window.MousePosition);
 			renderChain.HitTest(ref hitTestArgs);
 			var n = hitTestArgs.Node;
 			if (

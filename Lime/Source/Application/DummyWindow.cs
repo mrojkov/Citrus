@@ -52,6 +52,13 @@ namespace Lime
 		{
 			throw new NotImplementedException();
 		}
+
+		public Vector2 MousePosition => Input.ScreenMousePosition;
+
+		public Vector2 GetTouchPosition(int index)
+		{
+			return Input.GetScreenTouchPosition(index);
+		}
 	}
 }
 #endif

@@ -12,6 +12,7 @@ namespace Lime
 	{
 		private Widget widget;
 		private Input windowInput { get { return CommonWindow.Current.Input; } }
+		private Vector2 windowMousePostion { get { return CommonWindow.Current.MousePosition; } }
 		private WidgetContext context { get { return WidgetContext.Current; } }
 
 		public static readonly WidgetStack InputScopeStack = new WidgetStack();
@@ -41,14 +42,14 @@ namespace Lime
 			get { return widget.IsFocused() ? windowInput.TextInput : string.Empty; }
 		}
 
-		public Vector2 MousePosition { get { return windowInput.MousePosition; } }
+		public Vector2 MousePosition { get { return windowMousePostion; } }
 
 		[Obsolete("Use Widget.LocalMousePosition()")]
-		public Vector2 LocalMousePosition { get { return windowInput.MousePosition * widget.LocalToWorldTransform.CalcInversed(); } }
+		public Vector2 LocalMousePosition { get { return windowMousePostion * widget.LocalToWorldTransform.CalcInversed(); } }
 
 		public Vector2 GetTouchPosition(int index)
 		{
-			return windowInput.GetTouchPosition(index);
+			return CommonWindow.Current.GetTouchPosition(index);
 		}
 
 		public int GetNumTouches()

@@ -72,7 +72,7 @@ namespace Tangerine.UI.Docking
 				var winPlacement = DockManager.Instance.Model.GetWindowByPlacement(placement);
 				var requestedDockingComponent = winPlacement.WindowWidget.Components.Get<RequestedDockingComponent>();
 				if (requestedDockingComponent == null) continue;
-				var clientMousePos = winPlacement.WindowWidget.Window.Input.MousePosition;
+				var clientMousePos = winPlacement.WindowWidget.Window.MousePosition;
 				if (!bounds.Contains(clientMousePos)) continue;
 				DockSite site;
 				Rectangle? rect;
