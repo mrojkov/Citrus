@@ -58,10 +58,10 @@ namespace Tangerine.Core
 		{
 			var index = transactionStartIndices.Peek();
 			if (currentIndex != index) {
+				operations.RemoveRange(currentIndex, GetTransactionEndIndex() - currentIndex);
 				for (; currentIndex > index; currentIndex--) {
 					Processors.Invert(operations[currentIndex - 1]);
 				}
-				operations.RemoveRange(currentIndex, GetTransactionEndIndex() - currentIndex);
 				OnChange();
 			}
 		}
