@@ -45,18 +45,16 @@ namespace Tangerine
 
 		public void AddRecentDocument(string path)
 		{
-			var prefs = Instance;
-			Instance.RecentDocuments.Remove(path);
-			prefs.RecentDocuments.Insert(0, path);
+			RecentDocuments.Remove(path);
+			RecentDocuments.Insert(0, path);
 			UserPreferences.Instance.Save();
 			TangerineMenu.RebuildRecentDocumentsMenu();
 		}
 
 		public void AddRecentProject(string path)
 		{
-			var prefs = Instance;
-			Instance.RecentProjects.Remove(path);
-			prefs.RecentProjects.Insert(0, path);
+			RecentProjects.Remove(path);
+			RecentProjects.Insert(0, path);
 			UserPreferences.Instance.Save();
 			TangerineMenu.RebuildRecentProjectsMenu();
 		}
