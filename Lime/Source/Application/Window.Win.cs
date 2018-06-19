@@ -33,7 +33,7 @@ namespace Lime
 		private bool isInvalidated;
 		private bool vSync;
 
-		public Input Input => Input.Instance;
+		public Input Input => Application.Input;
 
 		public bool Active => active;
 		public Form Form => form;
@@ -158,16 +158,16 @@ namespace Lime
 			return new Vector2(sp.X + glControl.Left, sp.Y + glControl.Top);
 		}
 
-		private Vector2 lastScreenMousePosition = new Vector2(-1, -1);
+		private Vector2 lastDesktopMousePosition = new Vector2(-1, -1);
 		private Vector2 calculatedMousePosition = new Vector2(-1, -1);
 
 		public Vector2 MousePosition
 		{
 			get {
-				if (lastScreenMousePosition != Input.ScreenMousePosition) {
-					lastScreenMousePosition = Input.ScreenMousePosition;
+				if (lastDesktopMousePosition != Input.DesktopMousePosition) {
+					lastDesktopMousePosition = Input.DesktopMousePosition;
 					calculatedMousePosition = SDToLime.Convert(
-						glControl.PointToClient(new Point((int) Input.ScreenMousePosition.X, (int) Input.ScreenMousePosition.Y)),
+						glControl.PointToClient(new Point((int) Input.DesktopMousePosition.X, (int) Input.DesktopMousePosition.Y)),
 						PixelScale
 					);
 				}
@@ -367,7 +367,7 @@ namespace Lime
 
 		public Vector2 GetTouchPosition(int index)
 		{
-			return Input.GetScreenTouchPosition(index);
+			return Input.GetDesktopTouchPosition(index);
 		}
 
 		public void ShowModal()
@@ -536,8 +536,8 @@ namespace Lime
 				return;
 			}
 			lastMousePosition = Control.MousePosition;
-			Input.ScreenMousePosition = new Vector2(lastMousePosition.X, lastMousePosition.Y);
-			Input.SetScreenTouchPosition(0, Input.ScreenMousePosition);
+			Input.DesktopMousePosition = new Vector2(lastMousePosition.X, lastMousePosition.Y);
+			Input.SetDesktopTouchPosition(0, Input.DesktopMousePosition);
 		}
 
 		private void OnTick(object sender, EventArgs e)
@@ -600,8 +600,6 @@ namespace Lime
 			}
 			// Refresh mouse position of every frame to make HitTest work properly if mouse is outside of the screen.
 			RefreshMousePosition();
-			RaiseUpdating(delta);
-			AudioSystem.Update();
 			if (active) {
 				Input.CopyKeysState();
 				Input.ProcessPendingKeyEvents(delta);
@@ -610,6 +608,8 @@ namespace Lime
 			if (Application.Windows.All(window => !window.Active)) {
 				Input.ClearKeyState();
 			}
+			RaiseUpdating(delta);
+			AudioSystem.Update();
 			if (renderingState == RenderingState.RenderDeferred) {
 				Invalidate();
 			}

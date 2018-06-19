@@ -7,9 +7,6 @@ namespace Lime
 {
 	public class Input
 	{
-
-		public static readonly Input Instance = new Input();
-
 		public const int MaxTouches = 4;
 		public float KeyRepeatDelay = 0.2f;
 		public float KeyRepeatInterval = 0.03f;
@@ -23,7 +20,7 @@ namespace Lime
 
 		public readonly InputSimulator Simulator;
 
-		private readonly Vector2[] screenTouchPositions = new Vector2[MaxTouches];
+		private readonly Vector2[] desktopTouchPositions = new Vector2[MaxTouches];
 		private readonly List<KeyEvent> keyEventQueue = new List<KeyEvent>();
 
 		private struct KeyState
@@ -37,9 +34,9 @@ namespace Lime
 		private readonly KeyState[] keys = new KeyState[Key.MaxCount];
 
 		/// <summary>
-		/// The current mouse position in screen coordinates. (read only)
+		/// The current mouse position in desktop coordinates. (read only)
 		/// </summary>
-		public Vector2 ScreenMousePosition { get; internal set; }
+		public Vector2 DesktopMousePosition { get; internal set; }
 
 		/// <summary>
 		/// Indicates how much the mouse wheel was moved
@@ -174,14 +171,14 @@ namespace Lime
 			return IsKeyPressed(Key.Touch0 + index);
 		}
 
-		public Vector2 GetScreenTouchPosition(int index)
+		public Vector2 GetDesktopTouchPosition(int index)
 		{
-			return screenTouchPositions[index];
+			return desktopTouchPositions[index];
 		}
 
-		internal void SetScreenTouchPosition(int index, Vector2 position)
+		internal void SetDesktopTouchPosition(int index, Vector2 position)
 		{
-			screenTouchPositions[index] = position;
+			desktopTouchPositions[index] = position;
 		}
 
 		public int GetNumTouches()
@@ -320,9 +317,9 @@ namespace Lime
 				this.input = input;
 			}
 
-			public void SetScreenMousePosition(Vector2 position)
+			public void SetDesktopMousePosition(Vector2 position)
 			{
-				input.ScreenMousePosition = position;
+				input.DesktopMousePosition = position;
 			}
 
 			public void SetKeyState(Key key, bool value)

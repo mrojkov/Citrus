@@ -207,7 +207,7 @@ namespace Lime
 		[Obsolete("Use FPS property instead", true)]
 		public float CalcFPS() { return fpsCounter.FPS; }
 
-		public Input Input => Input.Instance;
+		public Input Input => Application.Input;
 
 		public Window(WindowOptions options)
 		{
@@ -404,7 +404,7 @@ namespace Lime
 
 		public Vector2 GetTouchPosition(int index)
 		{
-			return Input.GetScreenTouchPosition(index);
+			return Input.GetDesktopTouchPosition(index);
 		}
 
 		public void ShowModal()
@@ -451,8 +451,6 @@ namespace Lime
 			delta = Mathf.Clamp(delta, 0, Application.MaxDelta);
 			// Refresh mouse position on every frame to make HitTest work properly if mouse is outside of the window.
 			RefreshMousePosition();
-			RaiseUpdating(delta);
-			AudioSystem.Update();
 			if (Active) {
 				Input.CopyKeysState();
 				Input.ProcessPendingKeyEvents(delta);
@@ -461,12 +459,14 @@ namespace Lime
 			if (Application.Windows.All(window => !window.Active)) {
 				Input.ClearKeyState();
 			}
+			RaiseUpdating(delta);
+			AudioSystem.Update();
 		}
 
 		private void RefreshMousePosition()
 		{
-			Input.ScreenMousePosition = new Vector2((float) NSEvent.CurrentMouseLocation.X, (float) NSEvent.CurrentMouseLocation.Y);
-			Input.SetScreenTouchPosition(0, Input.ScreenMousePosition);
+			Input.DesktopMousePosition = new Vector2((float) NSEvent.CurrentMouseLocation.X, (float) NSEvent.CurrentMouseLocation.Y);
+			Input.SetDesktopTouchPosition(0, Input.DesktopMousePosition);
 			var p = window.MouseLocationOutsideOfEventStream;
 			MousePosition = new Vector2((float)p.X, (float)(NSGameView.Frame.Height - p.Y));
 		}

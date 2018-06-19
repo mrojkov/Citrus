@@ -158,6 +158,11 @@ namespace Lime
 		public static bool IsMain(this Thread thread) => thread == MainThread;
 
 		/// <summary>
+		/// Global Input of whole application.
+		/// </summary>
+		public static readonly Input Input = new Input();
+
+		/// <summary>
 		/// Software (on-screen) keyboard for mobile devices.
 		/// </summary>
 		public static ISoftKeyboard SoftKeyboard { get; internal set; }
