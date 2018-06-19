@@ -12,7 +12,7 @@ using MonoMac.AppKit;
 using Android.App;
 #elif WIN
 using System.Windows.Forms;
-#endif
+#endif // iOS
 
 namespace Lime
 {
@@ -53,7 +53,7 @@ namespace Lime
 		public RenderingBackend RenderingBackend = RenderingBackend.OpenGL;
 #else
 		public RenderingBackend RenderingBackend = RenderingBackend.ES20;
-#endif
+#endif // MAC
 	}
 
 	public static class Application
@@ -75,7 +75,7 @@ namespace Lime
 				mainWindow.Updating += RunScheduledActions;
 #if WIN
 				(mainWindow as Window).SetMenu(mainMenu as Menu);
-#endif
+#endif // WIN
 			}
 		}
 
@@ -112,7 +112,7 @@ namespace Lime
 		public static DeviceOrientation CurrentDeviceOrientation => DeviceOrientation.LandscapeLeft;
 #else
 		public static DeviceOrientation CurrentDeviceOrientation { get; internal set; }
-#endif
+#endif // WIN || MAC
 
 #if MAC
 		[System.Runtime.InteropServices.DllImport(ObjCRuntime.Constants.CoreGraphicsLibrary)]
@@ -135,7 +135,7 @@ namespace Lime
 			get { return Window.Current.Input.MousePosition; }
 			set { }
 		}
-#endif
+#endif // MAC
 
 		// Specifies the highest possible time delta passed to Window.Updating.
 		public const float MaxDelta = 1 / 33.333f;
@@ -182,7 +182,7 @@ namespace Lime
 					if (mainWindow is Window) {
 						(mainWindow as Window).SetMenu(mainMenu as Menu);
 					}
-#endif
+#endif // MAC
 				}
 			}
 		}
@@ -191,7 +191,7 @@ namespace Lime
 #if WIN
 		[System.Runtime.InteropServices.DllImport("user32.dll")]
 		private static extern bool SetProcessDPIAware();
-#endif
+#endif // WIN
 
 		public static event Func<bool> Exiting;
 		public static event Action Exited;
@@ -208,7 +208,7 @@ namespace Lime
 			};
 			NSApplication.SharedApplication.WillTerminate += (sender, e) => DoExited();
 			NSApplication.SharedApplication.ApplicationShouldHandleReopen = (sender, hasVisibleWindows) => hasVisibleWindows;
-#endif
+#endif // MAC
 			options = options ?? new ApplicationOptions();
 			RenderingBackend = options.RenderingBackend;
 			MainThread = Thread.CurrentThread;
@@ -225,7 +225,7 @@ namespace Lime
 			SetGlobalExceptionHandler();
 			System.Windows.Forms.Application.SetUnhandledExceptionMode(
 				System.Windows.Forms.UnhandledExceptionMode.CatchException);
-#endif
+#endif // DEBUG
 			// This function doesn't work on XP, and we don't want to add dpiAware into manifest
 			// because this will require adding into every new project.
 			try {
@@ -240,7 +240,7 @@ namespace Lime
 			System.IO.Directory.SetCurrentDirectory(Foundation.NSBundle.MainBundle.ResourcePath);
 			UIApplication.SharedApplication.StatusBarHidden = true;
 			UIApplication.SharedApplication.IdleTimerDisabled = !IsAllowedGoingToSleepMode();
-#endif
+#endif // WIN
 		}
 
 		public static void DiscardOpenGLObjects()
@@ -254,7 +254,7 @@ namespace Lime
 			var obj = Foundation.NSBundle.MainBundle.ObjectForInfoDictionary("AllowSleepMode");
 			return obj != null && obj.ToString() == "1";
 		}
-#endif
+#endif // iOS
 
 		private static void RunScheduledActions(float delta)
 		{
@@ -297,7 +297,7 @@ namespace Lime
 				}
 #else
 				Console.WriteLine(e.ToString());
-#endif
+#endif // WIN
 			};
 #if WIN
 			// UI-thread exceptions on windows platform
@@ -305,7 +305,7 @@ namespace Lime
 				handler(e.Exception);
 				System.Windows.Forms.Application.Exit();
 			};
-#endif
+#endif // WIN
 			// Any other unhandled exceptions
 			AppDomain.CurrentDomain.UnhandledException += (sender, e) => {
 				handler(e.ExceptionObject);
@@ -350,7 +350,7 @@ namespace Lime
 				return PlatformId.Mac;
 #else
 				throw new Lime.Exception("Unknown platform");
-#endif
+#endif // iOS
 			}
 		}
 
@@ -368,7 +368,7 @@ namespace Lime
 #elif ANDROID || iOS
 			// Android: There is no way to terminate an android application.
 			// The only way is to finish each its activity one by one.
-#endif
+#endif // WIN
 		}
 
 		/// <summary>
@@ -381,12 +381,12 @@ namespace Lime
 			NSApplication.SharedApplication.Run();
 #elif WIN
 			System.Windows.Forms.Application.Run();
-#endif
+#endif // MAC
 		}
 
 #if iOS
 		private static float pixelsPerPoints;
-#endif
+#endif // iOS
 
 		/// <summary>
 		/// Returns the main display's pixel density.
@@ -410,7 +410,7 @@ namespace Lime
 				var dm = Android.Content.Res.Resources.System.DisplayMetrics;
 				return new Vector2(dm.Xdpi, dm.Ydpi);
 			}
-#endif
+#endif // WIN || MAC || MONOMAC
 		}
 	}
 }
