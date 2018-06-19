@@ -177,7 +177,16 @@ namespace Tangerine.Core
 				documents.Add(doc);
 			}
 			doc.MakeCurrent();
+			AddRecentDocument(doc.Path);
 			return doc;
+		}
+
+		public void AddRecentDocument(string path)
+		{
+			UserPreferences.RecentDocuments.Remove(path);
+			UserPreferences.RecentDocuments.Insert(0, path);
+			if (UserPreferences.RecentDocuments.Count > ProjectUserPreferences.RecentDocumentsCount)
+				UserPreferences.RecentDocuments.RemoveAt(UserPreferences.RecentDocuments.Count - 1);
 		}
 
 		public bool GetSystemPath(string localPath, out string systemPath)

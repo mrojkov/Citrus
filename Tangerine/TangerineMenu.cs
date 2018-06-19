@@ -295,15 +295,12 @@ namespace Tangerine
 
 		public static void RebuildRecentDocumentsMenu()
 		{
-			var recentDocuments = AppUserPreferences.Instance.RecentDocuments;
+			var recentDocuments = ProjectUserPreferences.Instance.RecentDocuments;
 			var menu = new Menu();
 			int counter = 1;
 			foreach (var i in recentDocuments) {
-				string name = System.String.Format("{0}. {1} ({2})",
-					counter++, System.IO.Path.GetFileName(i), System.IO.Path.GetDirectoryName(i));
-				menu.Add(new Command(name, delegate {
-					Project.Current.OpenDocument(i, true);
-				}));
+				string name = System.String.Format("{0}. {1}", counter++, i);
+				menu.Add(new Command(name, () => Project.Current.OpenDocument(i) ));
 			}
 			GenericCommands.RecentDocuments.Menu = menu;
 			GenericCommands.RecentDocuments.Enabled = recentDocuments.Count > 0;
@@ -315,11 +312,12 @@ namespace Tangerine
 			var menu = new Menu();
 			int counter = 1;
 			foreach (var i in recentProjects) {
-				string name = System.String.Format("{0}. {1} ({2})",
-					counter++, System.IO.Path.GetFileName(i), System.IO.Path.GetDirectoryName(i));
-				menu.Add(new Command(name, delegate {
+				string name = System.String.Format("{0}. {1} ({2})", counter++, System.IO.Path.GetFileName(i),
+					System.IO.Path.GetDirectoryName(i));
+				menu.Add(new Command(name, () =>  {
 					if (Project.Current.Close()) {
 						new Project(i).Open();
+						FileOpenProject.AddRecentProject(i);
 					}
 				}));
 			}

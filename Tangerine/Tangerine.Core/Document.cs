@@ -313,6 +313,7 @@ namespace Tangerine.Core
 			Path = path;
 			WriteNodeToFile(path, Format, RootNodeUnwrapped);
 			SetModificationTimeToNow();
+			Project.Current.AddRecentDocument(Path);
 		}
 
 		public void SaveTo(string path, FileAttributes attributes = 0)

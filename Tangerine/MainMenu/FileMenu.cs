@@ -19,8 +19,19 @@ namespace Tangerine
 		{
 			if (Project.Current.Close()) {
 				new Project(fileName).Open();
-				AppUserPreferences.Instance.AddRecentProject(fileName);
+				AddRecentProject(fileName);
 			}
+		}
+
+		public static void AddRecentProject(string path)
+		{
+			var prefs = AppUserPreferences.Instance;
+			prefs.RecentProjects.Remove(path);
+			prefs.RecentProjects.Insert(0, path);
+			if (prefs.RecentProjects.Count > AppUserPreferences.RecentProjectsCount) {
+				prefs.RecentProjects.RemoveAt(prefs.RecentProjects.Count - 1);
+			}
+			UserPreferences.Instance.Save();
 		}
 	}
 
@@ -55,7 +66,6 @@ namespace Tangerine
 			}
 			if (dlg.RunModal()) {
 				var document = Project.Current.OpenDocument(dlg.FileName, true);
-				AppUserPreferences.Instance.AddRecentDocument(document.Path);
 			}
 		}
 	}
@@ -71,7 +81,6 @@ namespace Tangerine
 		{
 			try {
 				Document.Current.Save();
-				AppUserPreferences.Instance.AddRecentDocument(Document.Current.Path);
 			} catch (System.Exception e) {
 				ShowErrorMessageBox(e);
 			}
@@ -133,7 +142,6 @@ namespace Tangerine
 				} else {
 					try {
 						Document.Current.SaveAs(assetPath);
-						AppUserPreferences.Instance.AddRecentDocument(Document.Current.Path);
 					} catch (System.Exception e) {
 						FileSave.ShowErrorMessageBox(e);
 					}

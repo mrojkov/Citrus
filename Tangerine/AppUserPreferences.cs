@@ -13,8 +13,7 @@ namespace Tangerine
 		[YuzuRequired]
 		public readonly List<string> RecentProjects;
 
-		[YuzuRequired]
-		public readonly List<string> RecentDocuments;
+		public static int RecentProjectsCount { get; private set; } = 5;
 
 		[YuzuRequired]
 		public ColorThemeEnum Theme { get; set; }
@@ -32,7 +31,6 @@ namespace Tangerine
 		{
 			DockState = new UI.Docking.DockManager.State();
 			RecentProjects = new List<string>();
-			RecentDocuments = new List<string>();
 			ResetToDefaults();
 		}
 
@@ -41,22 +39,6 @@ namespace Tangerine
 			Theme = ColorThemeEnum.Light;
 			DefaultSceneDimensions = new Vector2(1024, 768);
 			AutosaveDelay = 600;
-		}
-
-		public void AddRecentDocument(string path)
-		{
-			RecentDocuments.Remove(path);
-			RecentDocuments.Insert(0, path);
-			UserPreferences.Instance.Save();
-			TangerineMenu.RebuildRecentDocumentsMenu();
-		}
-
-		public void AddRecentProject(string path)
-		{
-			RecentProjects.Remove(path);
-			RecentProjects.Insert(0, path);
-			UserPreferences.Instance.Save();
-			TangerineMenu.RebuildRecentProjectsMenu();
 		}
 
 		public static AppUserPreferences Instance => Core.UserPreferences.Instance.Get<AppUserPreferences>();
