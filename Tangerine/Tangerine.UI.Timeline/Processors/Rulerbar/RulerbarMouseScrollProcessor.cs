@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
+using Tangerine.UI.Timeline.Operations;
 
 namespace Tangerine.UI.Timeline
 {
@@ -21,6 +22,8 @@ namespace Tangerine.UI.Timeline
 						int initialCol = CalcColumn(rulerWidget.LocalMousePosition().X);
 						var marker = Document.Current.Container.Markers.FirstOrDefault(m => m.Frame == initialCol);
 						while (input.IsMousePressed()) {
+							SetCurrentColumn.RollbackHistoryWithoutScrolling();
+
 							var cw = TimelineMetrics.ColWidth;
 							var mp = rulerWidget.LocalMousePosition().X;
 							if (mp > rulerWidget.Width - cw / 2) {
