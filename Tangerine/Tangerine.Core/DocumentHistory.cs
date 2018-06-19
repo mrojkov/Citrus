@@ -61,7 +61,7 @@ namespace Tangerine.Core
 				for (; currentIndex > index; currentIndex--) {
 					Processors.Invert(operations[currentIndex - 1]);
 				}
-				operations.RemoveRange(currentIndex, operations.Count - currentIndex);
+				operations.RemoveRange(currentIndex, GetTransactionEndIndex() - currentIndex);
 				OnChange();
 			}
 		}
