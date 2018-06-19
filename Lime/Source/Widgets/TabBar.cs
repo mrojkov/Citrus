@@ -56,6 +56,9 @@ namespace Lime
 			if (closeButton != null) {
 				closeButton.Visible = Closable;
 			}
+			if (Input.WasKeyPressed(Key.Mouse2) && IsMouseOver()) {
+				Closing?.Invoke();
+			}
 			if (Input.WasMousePressed() && IsMouseOver()) {
 				Clicked?.Invoke();
 			}
