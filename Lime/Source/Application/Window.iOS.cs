@@ -58,7 +58,7 @@ namespace Lime
 			get { return (float)UIScreen.MainScreen.Scale; }
 		}
 
-		public Vector2 MousePosition => Input.DesktopMousePosition;
+		public virtual Vector2 MousePosition => Input.DesktopMousePosition;
 
 		public Window()
 			: this(new WindowOptions())

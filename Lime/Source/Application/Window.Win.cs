@@ -161,7 +161,7 @@ namespace Lime
 		private Vector2 lastDesktopMousePosition = new Vector2(-1, -1);
 		private Vector2 calculatedMousePosition = new Vector2(-1, -1);
 
-		public Vector2 MousePosition
+		public virtual Vector2 MousePosition
 		{
 			get {
 				if (lastDesktopMousePosition != Input.DesktopMousePosition) {

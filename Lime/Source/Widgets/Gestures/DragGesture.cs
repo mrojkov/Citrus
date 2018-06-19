@@ -38,7 +38,7 @@ namespace Lime
 		/// will always be zero if DragDirection is Vertical or Horizontal respectively.
 		/// This fact is used when checking for threshold.
 		/// </summary>
-		protected override Vector2 MousePosition
+		public override Vector2 MousePosition
 		{
 			get
 			{

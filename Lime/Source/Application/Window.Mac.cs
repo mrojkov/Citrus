@@ -104,7 +104,7 @@ namespace Lime
 			return new Vector2(wp.X.Round() + (float)window.Frame.X, wp.Y.Round() + (float)window.Frame.X);
 		}
 
-		public Vector2 MousePosition { get; private set; }
+		public virtual Vector2 MousePosition { get; private set; }
 
 		public bool Active
 		{

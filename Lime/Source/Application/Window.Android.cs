@@ -61,7 +61,7 @@ namespace Lime
 			get; private set;
 		}
 
-		public Vector2 MousePosition => Input.DesktopMousePosition;
+		public virtual Vector2 MousePosition => Input.DesktopMousePosition;
 
 		public Window(WindowOptions options)
 		{
