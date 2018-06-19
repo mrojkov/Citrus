@@ -13,6 +13,7 @@ namespace Tangerine.UI
 		private class TextViewWriter : TextWriter
 		{
 			private readonly ThemedTextView textView;
+			public TextWriter SystemOut;
 
 			public TextViewWriter(ThemedTextView textView)
 			{
@@ -27,6 +28,10 @@ namespace Tangerine.UI
 			public override void Write(string value)
 			{
 				Application.InvokeOnMainThread(() => {
+#if DEBUG
+					System.Diagnostics.Debug.Write(value);
+#endif // DEBUG
+					SystemOut?.Write(value);
 					textView.Append(value);
 				});
 				Application.InvokeOnNextUpdate(textView.ScrollToEnd);
@@ -58,14 +63,20 @@ namespace Tangerine.UI
 			RootWidget.AddNode(CreateTextView());
 		}
 
+		private ICommand commandClear = new Command("Clear");
+
 		private Widget CreateTextView()
 		{
 			textView = new ThemedTextView { SquashDuplicateLines = true };
-			textWriter = new TextViewWriter(textView);
+			textWriter = new TextViewWriter(textView) {
+				SystemOut = System.Console.Out,
+			};
 			System.Console.SetOut(textWriter);
 			System.Console.SetError(textWriter);
 			var menu = new Menu();
 			menu.Add(Command.Copy);
+
+			menu.Add(commandClear);
 			textView.Updated += (dt) => {
 				if (
 					textView.Input.WasKeyPressed(Key.Mouse0) ||
@@ -83,6 +94,14 @@ namespace Tangerine.UI
 				}
 				if (textView.Input.WasKeyPressed(Key.Mouse1)) {
 					menu.Popup();
+				}
+				if (textView.IsFocused() && Command.Copy.WasIssued()) {
+					Command.Copy.Consume();
+					Clipboard.Text = textView.Text;
+				}
+				if (commandClear.WasIssued()) {
+					commandClear.Consume();
+					textView.Clear();
 				}
 				var i = textView.Content.Nodes.Count;
 				// numbers choosen by guess

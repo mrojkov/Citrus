@@ -104,7 +104,7 @@ namespace Orange
 		private Widget CreateTextView()
 		{
 			textView = new ThemedTextView();
-			textWriter = new TextViewWriter(textView);
+			textWriter = new TextViewWriter(textView, Console.Out);
 			Console.SetOut(textWriter);
 			Console.SetError(textWriter);
 			var menu = new Menu();
@@ -302,9 +302,11 @@ namespace Orange
 		private class TextViewWriter : TextWriter
 		{
 			private readonly ThemedTextView textView;
+			private readonly TextWriter consoleOutput;
 
-			public TextViewWriter(ThemedTextView textView)
+			public TextViewWriter(ThemedTextView textView, TextWriter consoleOutput)
 			{
+				this.consoleOutput = consoleOutput;
 				this.textView = textView;
 			}
 
@@ -316,6 +318,10 @@ namespace Orange
 			public override void Write(string value)
 			{
 				Application.InvokeOnMainThread(() => {
+#if DEBUG
+					System.Diagnostics.Debug.Write(value);
+#endif // DEBUG
+					consoleOutput.Write(value);
 					textView.Append(value);
 				});
 				Application.InvokeOnNextUpdate(textView.ScrollToEnd);
