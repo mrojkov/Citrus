@@ -1,4 +1,4 @@
-﻿#if iOS
+#if iOS
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -77,9 +77,9 @@ namespace Lime
 			UIViewController = new GameController(Input);
 			uiWindow.RootViewController = UIViewController;
 			uiWindow.MakeKeyAndVisible();
-			// Run() creates OpenGL context
-			UIView.Run();
 			AppDelegate.Instance.Activated += () => {
+				// Run() creates OpenGL context
+				UIView.Run();
 				UIViewController.LockDeviceOrientation = false;
 				Active = true;
 				AudioSystem.Active = true;
@@ -87,6 +87,7 @@ namespace Lime
 				UIKit.UIViewController.AttemptRotationToDeviceOrientation();
 			};
 			AppDelegate.Instance.Deactivated += () => {
+				UIView.Stop();
 				UIViewController.LockDeviceOrientation = true;
 				AudioSystem.Active = false;
 				RaiseDeactivated();
