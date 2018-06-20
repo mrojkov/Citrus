@@ -225,10 +225,10 @@ namespace Tangerine
 			WidgetContext.Current.Root.AddChangeWatcher(() => Project.Current, project => TangerineMenu.OnProjectChanged(project));
 
 			WidgetContext.Current.Root.AddChangeWatcher(() => ProjectUserPreferences.Instance.RecentDocuments.Count == 0 ?
-			null : ProjectUserPreferences.Instance.RecentDocuments[0], document => TangerineMenu.RebuildRecentDocumentsMenu());
+				null : ProjectUserPreferences.Instance.RecentDocuments[0], document => TangerineMenu.RebuildRecentDocumentsMenu());
 			
 			WidgetContext.Current.Root.AddChangeWatcher(() => AppUserPreferences.Instance.RecentProjects.Count == 0 ?
-			null : AppUserPreferences.Instance.RecentProjects[0], document => TangerineMenu.RebuildRecentProjectsMenu());
+				null : AppUserPreferences.Instance.RecentProjects[0], document => TangerineMenu.RebuildRecentProjectsMenu());
 
 			new UI.FilesystemView.FilesystemPane(filesystemPanel);
 			RegisterGlobalCommands();
