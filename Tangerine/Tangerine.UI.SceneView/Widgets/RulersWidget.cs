@@ -40,8 +40,8 @@ namespace Tangerine.UI.SceneView
 				Width = RulerHeight,
 			};
 
-			topRulerBar.Tasks.Add(CreateLineTask(topRulerBar, RulerOrientation.Vertical));
-			leftRulerBar.Tasks.Add(CreateLineTask(leftRulerBar));
+			topRulerBar.Tasks.Add(CreateLineTask(topRulerBar, RulerOrientation.Horizontal));
+			leftRulerBar.Tasks.Add(CreateLineTask(leftRulerBar, RulerOrientation.Vertical));
 
 			Nodes.Add(leftRulerBar);
 			Nodes.Add(topRulerBar);
