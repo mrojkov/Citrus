@@ -219,7 +219,11 @@ namespace Tangerine.UI.Inspector
 					Document.Current.History.CommitTransaction();
 					Document.Current.History.EndTransaction();
 				};
-				Submitted += s => Document.Current.History.RollbackTransaction();
+				Submitted += s => {
+					if (Document.Current.History.IsTransactionActive) {
+						Document.Current.History.RollbackTransaction();
+					}
+				};
 			}
 		}
 	}

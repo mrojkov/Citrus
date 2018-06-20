@@ -50,15 +50,14 @@ namespace Tangerine.Core
 		
 		public void CommitTransaction()
 		{
+			AssertTransaction();
 			transactionStartIndices.Pop();
 			transactionStartIndices.Push(currentIndex);
 		}
 		
 		public void RollbackTransaction()
 		{
-			if (!IsTransactionActive) {
-				return;
-			}
+			AssertTransaction();
 			var index = transactionStartIndices.Peek();
 			if (currentIndex != index) {
 				operations.RemoveRange(currentIndex, GetTransactionEndIndex() - currentIndex);
@@ -71,9 +70,7 @@ namespace Tangerine.Core
 		
 		public void Perform(IOperation operation)
 		{
-			if (!IsTransactionActive) {
-				throw new InvalidOperationException("Can't perform an operation outside the transaction");
-			}
+			AssertTransaction();
 			operation.TransactionId = transactionId;
 			if (saveIndex > currentIndex) {
 				saveIndex = -1;
@@ -92,6 +89,13 @@ namespace Tangerine.Core
 			}
 			Processors.Do(operation);
 			OnChange();
+		}
+
+		private void AssertTransaction()
+		{
+			if (!IsTransactionActive) {
+				throw new InvalidOperationException("Can't perform an operation, commit or rollback outside the transaction");
+			}
 		}
 				
 		public void Undo()
