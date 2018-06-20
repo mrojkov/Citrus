@@ -11,25 +11,12 @@ namespace Tangerine.UI.SceneView
 		{
 			while (true) {
 				if (
+					!SceneView.Instance.InputArea.IsFocused() &&
 					SceneView.Instance.InputArea.IsMouseOverThisOrDescendant() && 
 					!Docking.WindowDragBehaviour.IsActive && 
 					!(Widget.Focused is CommonEditBox))
 				{
-					var isMouseOverWindow = false;
-					if (!Window.Current.Active) {
-						var activeWindow = Application.Windows.FirstOrDefault(w => w.Active);
-						if (activeWindow != null) {
-							// Don't give focus to SceneView if mouse is upon another Tangerine's window.
-							var activeWindowRect = CalcWidowRectangleWithTitleAndBorder(activeWindow);
-							var mousePosition = ((Window)activeWindow).WorldToWindow(activeWindow.Input.MousePosition);
-							isMouseOverWindow = activeWindowRect.Contains(mousePosition);
-							if (!isMouseOverWindow)
-								Window.Current.Activate();
-						}
-					}
-					if (!isMouseOverWindow) {
-						SceneView.Instance.InputArea.SetFocus();
-					}
+					SceneView.Instance.InputArea.SetFocus();
 				}
 				yield return null;
 			}
