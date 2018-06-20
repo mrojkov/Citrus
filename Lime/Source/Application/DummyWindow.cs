@@ -59,6 +59,11 @@ namespace Lime
 		{
 			return Input.GetDesktopTouchPosition(index);
 		}
+
+		public Vector2 ConvertLocalMousePositionToDesktopMousePosition(Vector2 mousePosition)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }
 #endif

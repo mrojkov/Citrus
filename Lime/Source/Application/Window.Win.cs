@@ -175,6 +175,14 @@ namespace Lime
 			}
 		}
 
+		public virtual Vector2 ConvertLocalMousePositionToDesktopMousePosition(Vector2 mousePosition)
+		{
+			return SDToLime.Convert(
+				glControl.PointToScreen(LimeToSD.ConvertToPoint(mousePosition, PixelScale)),
+				PixelScale
+			);
+		}
+
 		FPSCounter fpsCounter = new FPSCounter();
 		public float FPS { get { return fpsCounter.FPS; } }
 

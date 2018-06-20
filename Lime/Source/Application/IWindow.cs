@@ -285,5 +285,7 @@ namespace Lime
 
 		Vector2 GetTouchPosition(int index);
 
+		Vector2 ConvertLocalMousePositionToDesktopMousePosition(Vector2 mousePosition);
+
 	}
 }
