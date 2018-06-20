@@ -280,8 +280,6 @@ namespace Tangerine.Core
 			if (previousIndex < 0) return;
 			documents.Remove(doc);
 			documents.Insert(toIndex, doc);
-			UserPreferences.Documents.Remove(doc.Path);
-			UserPreferences.Documents.Insert(toIndex, doc.Path);
 		}
 
 		public void RevertDocument(Document doc)
