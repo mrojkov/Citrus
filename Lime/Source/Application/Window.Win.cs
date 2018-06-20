@@ -600,6 +600,8 @@ namespace Lime
 			}
 			// Refresh mouse position of every frame to make HitTest work properly if mouse is outside of the screen.
 			RefreshMousePosition();
+			RaiseUpdating(delta);
+			AudioSystem.Update();
 			if (active) {
 				Input.CopyKeysState();
 				Input.ProcessPendingKeyEvents(delta);
@@ -608,8 +610,6 @@ namespace Lime
 			if (Application.Windows.All(window => !window.Active)) {
 				Input.ClearKeyState();
 			}
-			RaiseUpdating(delta);
-			AudioSystem.Update();
 			if (renderingState == RenderingState.RenderDeferred) {
 				Invalidate();
 			}
