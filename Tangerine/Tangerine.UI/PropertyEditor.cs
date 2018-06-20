@@ -589,7 +589,10 @@ namespace Tangerine.UI
 			ExpandableContent.AddNode(panel.Widget);
 			panel.Widget.Padding.Right = 12;
 			panel.Widget.Tasks.Add(currentColor.Consume(v => panel.Color = v));
-			panel.Changed += () => SetProperty(panel.Color);
+			panel.Changed += () => {
+				Document.Current.History.RollbackTransaction();
+				SetProperty(panel.Color);
+			};
 			panel.DragStarted += () => Document.Current?.History.BeginTransaction();
 			panel.DragEnded += () => {
 				Document.Current?.History.CommitTransaction();
