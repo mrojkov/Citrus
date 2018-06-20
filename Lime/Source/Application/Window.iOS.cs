@@ -60,6 +60,11 @@ namespace Lime
 
 		public virtual Vector2 MousePosition => Input.DesktopMousePosition;
 
+		public virtual Vector2 ConvertLocalMousePositionToDesktopMousePosition(Vector2 mousePosition)
+		{
+			return mousePosition;
+		}
+
 		public Window()
 			: this(new WindowOptions())
 		{
