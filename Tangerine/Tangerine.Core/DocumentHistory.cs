@@ -56,6 +56,9 @@ namespace Tangerine.Core
 		
 		public void RollbackTransaction()
 		{
+			if (!IsTransactionActive) {
+				return;
+			}
 			var index = transactionStartIndices.Peek();
 			if (currentIndex != index) {
 				operations.RemoveRange(currentIndex, GetTransactionEndIndex() - currentIndex);
