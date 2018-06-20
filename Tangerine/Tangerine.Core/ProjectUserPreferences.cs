@@ -31,9 +31,9 @@ namespace Tangerine.Core
 		public ObservableCollection<Ruler> Rulers { get; } = new ObservableCollection<Ruler>();
 		
 		[YuzuRequired]
-		public readonly List<string> RecentDocuments;
+		public readonly List<string> RecentDocuments = new List<string>();
 
-		public static int RecentDocumentsCount { get; private set; } = 5;
+		public const int MaxRecentDocuments = 5;
 
 		public static ProjectUserPreferences Instance => Project.Current.UserPreferences;
 
@@ -41,7 +41,6 @@ namespace Tangerine.Core
 		{
 			RulerVisible = true;
 			InitializeDefaultRulers();
-			RecentDocuments = new List<string>();
 		}
 
 		private void InitializeDefaultRulers()

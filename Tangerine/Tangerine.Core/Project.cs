@@ -185,7 +185,7 @@ namespace Tangerine.Core
 		{
 			UserPreferences.RecentDocuments.Remove(path);
 			UserPreferences.RecentDocuments.Insert(0, path);
-			if (UserPreferences.RecentDocuments.Count > ProjectUserPreferences.RecentDocumentsCount)
+			if (UserPreferences.RecentDocuments.Count > ProjectUserPreferences.MaxRecentDocuments)
 				UserPreferences.RecentDocuments.RemoveAt(UserPreferences.RecentDocuments.Count - 1);
 		}
 
