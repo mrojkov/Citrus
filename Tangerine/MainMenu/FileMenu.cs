@@ -19,11 +19,19 @@ namespace Tangerine
 		{
 			if (Project.Current.Close()) {
 				new Project(fileName).Open();
-				var prefs = AppUserPreferences.Instance;
-				prefs.RecentProjects.Remove(fileName);
-				prefs.RecentProjects.Insert(0, fileName);
-				Core.UserPreferences.Instance.Save();
+				AddRecentProject(fileName);
 			}
+		}
+
+		public static void AddRecentProject(string path)
+		{
+			var prefs = AppUserPreferences.Instance;
+			prefs.RecentProjects.Remove(path);
+			prefs.RecentProjects.Insert(0, path);
+			if (prefs.RecentProjects.Count > AppUserPreferences.RecentProjectsCount) {
+				prefs.RecentProjects.RemoveAt(prefs.RecentProjects.Count - 1);
+			}
+			UserPreferences.Instance.Save();
 		}
 	}
 
@@ -57,7 +65,7 @@ namespace Tangerine
 				dlg.InitialDirectory = Project.Current.GetSystemDirectory(Document.Current.Path);
 			}
 			if (dlg.RunModal()) {
-				Project.Current.OpenDocument(dlg.FileName, true);
+				var document = Project.Current.OpenDocument(dlg.FileName, true);
 			}
 		}
 	}

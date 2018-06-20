@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Yuzu;
 
@@ -29,6 +29,11 @@ namespace Tangerine.Core
 
 		[YuzuRequired]
 		public ObservableCollection<Ruler> Rulers { get; } = new ObservableCollection<Ruler>();
+		
+		[YuzuRequired]
+		public readonly List<string> RecentDocuments = new List<string>();
+
+		public const int MaxRecentDocuments = 5;
 
 		public static ProjectUserPreferences Instance => Project.Current.UserPreferences;
 
@@ -74,5 +79,6 @@ namespace Tangerine.Core
 			ActiveRuler = new Ruler();
 			UserPreferences.Instance.Save();
 		}
+
 	}
 }

@@ -13,6 +13,8 @@ namespace Tangerine
 		[YuzuRequired]
 		public readonly List<string> RecentProjects;
 
+		public static int RecentProjectsCount { get; private set; } = 5;
+
 		[YuzuRequired]
 		public ColorThemeEnum Theme { get; set; }
 
