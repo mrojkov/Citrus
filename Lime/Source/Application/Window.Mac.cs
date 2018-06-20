@@ -303,16 +303,21 @@ namespace Lime
 				Input.ClearKeyState();
 				RaiseDeactivated();
 			};
-#if MAC
 			window.DidMove += HandleMove;
-#else
-			window.DidMoved += HandleMove;
-#endif
 			window.CollectionBehavior = NSWindowCollectionBehavior.FullScreenPrimary;
 			window.ContentView = View;
 			View.Update += Update;
 			View.RenderFrame += HandleRenderFrame;
 			View.FilesDropped += RaiseFilesDropped;
+			View.DidMouseEnter += () => {
+				Application.WindowUnderMouse = this;
+				Debug.Write(this.Title); 
+			};
+			View.DidMouseExit += () => {
+				if (Application.WindowUnderMouse == this) {
+					Application.WindowUnderMouse = null;
+				}
+			};
 		}
 
 		private bool OnShouldClose(NSObject sender)

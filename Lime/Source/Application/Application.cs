@@ -78,6 +78,8 @@ namespace Lime
 #endif // WIN
 			}
 		}
+		
+		public static IWindow WindowUnderMouse { get; internal set; }
 
 		public static void InvalidateWindows()
 		{

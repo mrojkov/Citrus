@@ -37,6 +37,8 @@ namespace Lime.Platform
 		public event Action RenderFrame;
 		public event Action InputChanged;
 		public event Action<IEnumerable<string>> FilesDropped;
+		public event Action DidMouseEnter;
+		public event Action DidMouseExit;
 
 		public bool AllowDropFiles
 		{
@@ -74,6 +76,16 @@ namespace Lime.Platform
 			swapInterval = true;
 		}
 
+		public override void MouseEntered(NSEvent theEvent)
+		{
+			DidMouseEnter?.Invoke();
+		}
+
+		public override void MouseExited(NSEvent theEvent)
+		{
+			DidMouseExit?.Invoke();
+		}
+
 		public override bool AcceptsFirstMouse(NSEvent theEvent)
 		{
 			return true;
@@ -86,7 +98,7 @@ namespace Lime.Platform
 				trackingArea.Dispose();
 			}
 			var viewBounds = this.Bounds;
-			var options = NSTrackingAreaOptions.MouseMoved | NSTrackingAreaOptions.ActiveInKeyWindow | NSTrackingAreaOptions.MouseEnteredAndExited;
+			var options = NSTrackingAreaOptions.ActiveInActiveApp | NSTrackingAreaOptions.MouseEnteredAndExited;
 			trackingArea = new NSTrackingArea(viewBounds, options, this, null);
 			AddTrackingArea(trackingArea);
 		}
