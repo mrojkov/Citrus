@@ -272,6 +272,14 @@ namespace Lime
 			glControl.MouseUp += OnMouseUp;
 			glControl.Resize += OnResize;
 			glControl.MouseWheel += OnMouseWheel;
+			glControl.MouseEnter += (sender, args) => {
+				Application.WindowUnderMouse = this;
+			};
+			glControl.MouseLeave += (sender, args) => {
+				if (Application.WindowUnderMouse == this) {
+					Application.WindowUnderMouse = null;
+				}
+			};
 			form.Move += OnMove;
 			form.Activated += OnActivated;
 			form.Deactivate += OnDeactivate;

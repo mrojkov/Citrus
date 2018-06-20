@@ -311,7 +311,6 @@ namespace Lime
 			View.FilesDropped += RaiseFilesDropped;
 			View.DidMouseEnter += () => {
 				Application.WindowUnderMouse = this;
-				Debug.Write(this.Title); 
 			};
 			View.DidMouseExit += () => {
 				if (Application.WindowUnderMouse == this) {
