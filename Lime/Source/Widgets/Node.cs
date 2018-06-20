@@ -1183,6 +1183,11 @@ namespace Lime
 
 		public bool IsMouseOver()
 		{
+#if WIN || MAC
+			if (Application.WindowUnderMouse != Window.Current) {
+				return false;
+			}
+#endif
 			var context = WidgetContext.Current;
 			if (context.NodeUnderMouse != this) {
 				return false;
@@ -1192,6 +1197,11 @@ namespace Lime
 
 		public bool IsMouseOverThisOrDescendant()
 		{
+#if WIN || MAC
+			if (Application.WindowUnderMouse != Window.Current) {
+				return false;
+			}
+#endif		
 			var context = WidgetContext.Current;
 			var nodeUnderMouse = context.NodeUnderMouse;
 			if (nodeUnderMouse == null || !nodeUnderMouse.SameOrDescendantOf(this)) {
