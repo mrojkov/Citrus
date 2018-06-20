@@ -104,7 +104,30 @@ namespace Lime
 			return new Vector2(wp.X.Round() + (float)window.Frame.X, wp.Y.Round() + (float)window.Frame.X);
 		}
 
-		public virtual Vector2 MousePosition { get; private set; }
+		private Vector2 lastDesktopMousePosition = new Vector2(-1, -1);
+		private Vector2 calculatedMousePosition = new Vector2(-1, -1);
+
+		public virtual Vector2 MousePosition
+		{
+			get {
+				if (lastDesktopMousePosition != Input.DesktopMousePosition) {
+					lastDesktopMousePosition = Input.DesktopMousePosition;
+					calculatedMousePosition = new Vector2 (
+						lastDesktopMousePosition.X - DecoratedPosition.X, 
+						(float)NSGameView.Frame.Height - (lastDesktopMousePosition.Y - DecoratedPosition.Y)
+					);
+				}
+				return calculatedMousePosition;
+			}
+		}
+
+		public virtual Vector2 ConvertLocalMousePositionToDesktopMousePosition(Vector2 mousePosition)
+		{
+			return new Vector2(
+				mousePosition.X + DecoratedPosition.X, 
+				(float)NSGameView.Frame.Height - mousePosition.Y + DecoratedPosition.Y
+			);
+		}
 
 		public bool Active
 		{
@@ -467,8 +490,6 @@ namespace Lime
 		{
 			Input.DesktopMousePosition = new Vector2((float) NSEvent.CurrentMouseLocation.X, (float) NSEvent.CurrentMouseLocation.Y);
 			Input.SetDesktopTouchPosition(0, Input.DesktopMousePosition);
-			var p = window.MouseLocationOutsideOfEventStream;
-			MousePosition = new Vector2((float)p.X, (float)(NSGameView.Frame.Height - p.Y));
 		}
 
 		private void RaiseFilesDropped(IEnumerable<string> files)
