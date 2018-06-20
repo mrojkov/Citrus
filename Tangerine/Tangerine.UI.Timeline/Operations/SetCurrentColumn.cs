@@ -5,7 +5,7 @@ namespace Tangerine.UI.Timeline.Operations
 {
 	public class SetCurrentColumn : Operation
 	{
-		private static bool isScrollFreezed;
+		private static bool isScrollingFrozen;
 
 		protected int Column;
 		protected Node Container;
@@ -27,11 +27,11 @@ namespace Tangerine.UI.Timeline.Operations
 
 		public static void RollbackHistoryWithoutScrolling()
 		{
-			isScrollFreezed = true;
+			isScrollingFrozen = true;
 			try {
 				Document.Current.History.RollbackTransaction();
 			} finally {
-				isScrollFreezed = false;
+				isScrollingFrozen = false;
 			}
 		}
 
@@ -64,7 +64,7 @@ namespace Tangerine.UI.Timeline.Operations
 			void SetColumn(int value, Node node)
 			{
 				Document.SetCurrentFrameToNode(value, node, CoreUserPreferences.Instance.AnimationMode);
-				if (!isScrollFreezed) {
+				if (!isScrollingFrozen) {
 					Timeline.Instance.EnsureColumnVisible(value);
 				}
 			}
