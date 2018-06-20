@@ -223,6 +223,8 @@ namespace Tangerine
 			new UI.FilesystemView.FilesystemPane(filesystemPanel);
 			RegisterGlobalCommands();
 
+			HotkeyEditor.Save();
+			HotkeyEditor.Load();
 		}
 
 		void SetupMainWindowTitle(WindowWidget windowWidget)
@@ -422,7 +424,6 @@ namespace Tangerine
 			h.Connect(GenericCommands.CloseDocument, new FileClose());
 			h.Connect(GenericCommands.Quit, Application.Exit);
 			h.Connect(GenericCommands.PreferencesDialog, () => new PreferencesDialog());
-			h.Connect(SceneViewCommands.ManageRulers, new ManageRulers());
 			h.Connect(GenericCommands.Group, new GroupNodes());
 			h.Connect(GenericCommands.Ungroup, new UngroupNodes());
 			h.Connect(GenericCommands.InsertTimelineColumn, new InsertTimelineColumn());

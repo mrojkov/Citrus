@@ -12,13 +12,18 @@ namespace Lime
 
 	public class CommandHandlerList
 	{
-		struct Item
+		public struct Item
 		{
 			public ICommand Command;
 			public CommandHandler Handler;
 		}
 
 		private readonly List<Item> items = new List<Item>();
+
+		public List<Item> GetItems()
+		{
+			return items;
+		}
 
 		public static readonly CommandHandlerList Global = new CommandHandlerList();
 

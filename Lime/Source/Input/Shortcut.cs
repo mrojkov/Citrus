@@ -44,6 +44,29 @@ namespace Lime
 			Main = main;
 		}
 
+		public Shortcut(string text)
+		{
+			string[] words = text.Split(new char[] { '+' });
+			string key = words[words.Length - 1];
+			Main = Key.GetByName(key);
+			Modifiers = Modifiers.None;
+			for (int i = 0; i != words.Length - 1; ++i) {
+				string word = words[i].ToLower();
+				if (word == "alt")
+					Modifiers = Modifiers | Modifiers.Alt;
+				else if (word == "control" || word == "ctrl")
+					Modifiers = Modifiers | Modifiers.Control;
+				else if (word == "shift")
+					Modifiers = Modifiers | Modifiers.Shift;
+				else if (word == "win")
+					Modifiers = Modifiers | Modifiers.Win;
+				else if (word == "cmd" || word == "command")
+					Modifiers = Modifiers | Modifiers.Command;
+				else
+					throw new ArgumentException("Wrong modifier", word);
+			}
+		}
+
 		public static bool ValidateMainKey(Key key) =>
 			key.IsPrintable() || key.IsTextNavigation() || key.IsTextEditing() || key.IsFunctional() ||
 			key == Key.Escape || key == Key.Tab || key == Key.Menu;
