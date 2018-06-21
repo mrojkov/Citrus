@@ -31,6 +31,7 @@ namespace Tangerine.UI
 		Func<EditBox> EditBoxFactory { get; set; }
 		Func<object> DefaultValueGetter { get; set; }
 		PropertySetterDelegate PropertySetter { get; set; }
+		ITransactionalHistory History { get; set; }
 	}
 
 	// Used to unify generic descendants of ExpandableProperty for type checking
@@ -55,6 +56,7 @@ namespace Tangerine.UI
 		public Func<DropDownList> DropDownListFactory { get; set; }
 		public Func<object> DefaultValueGetter { get; set; }
 		public PropertySetterDelegate PropertySetter { get; set; }
+		public ITransactionalHistory History { get; set; }
 
 		public PropertyEditorParams(Widget inspectorPane, List<object> objects, Type type, string propertyName)
 		{
@@ -202,6 +204,18 @@ namespace Tangerine.UI
 		protected virtual string Serialize(T value) => serializer.ToString(value);
 		protected virtual T Deserialize(string source) => deserializer.FromString<T>(source + ' ');
 
+		protected void DoTransaction(Action block)
+		{
+			if (EditorParams.History != null) {
+				using (EditorParams.History.BeginTransaction()) {
+					block();
+					EditorParams.History.CommitTransaction();
+				}
+			} else {
+				block();
+			}
+		}
+
 		private ICommand resetToDefault = new Command("Reset To Default");
 
 		void ShowPropertyContextMenu()
@@ -270,7 +284,7 @@ namespace Tangerine.UI
 
 		protected void SetProperty(object value)
 		{
-			Document.Current.History.DoTransaction(() => {
+			DoTransaction(() => {
 				foreach (var o in EditorParams.Objects) {
 					EditorParams.PropertySetter(o, EditorParams.PropertyName, value);
 				}
@@ -303,7 +317,7 @@ namespace Tangerine.UI
 		{
 			float newValue;
 			if (float.TryParse(editor.Text, out newValue)) {
-				Document.Current.History.DoTransaction(() => {
+				DoTransaction(() => {
 					foreach (var obj in editorParams.Objects) {
 						var current = new Property<Vector2>(obj, editorParams.PropertyName).Value;
 						current[component] = newValue;
@@ -345,7 +359,7 @@ namespace Tangerine.UI
 		{
 			float newValue;
 			if (float.TryParse(editor.Text, out newValue)) {
-				Document.Current.History.DoTransaction(() => {
+				DoTransaction(() => {
 					foreach (var obj in editorParams.Objects) {
 						var current = new Property<Vector3>(obj, editorParams.PropertyName).Value;
 						current[component] = newValue;
@@ -390,7 +404,7 @@ namespace Tangerine.UI
 		{
 			float newValue;
 			if (float.TryParse(editor.Text, out newValue)) {
-				Document.Current.History.DoTransaction(() => {
+				DoTransaction(() => {
 					foreach (var obj in editorParams.Objects) {
 						var current = new Property<Quaternion>(obj, editorParams.PropertyName).Value.ToEulerAngles();
 						current[component] = newValue * Mathf.DegToRad;
@@ -429,7 +443,7 @@ namespace Tangerine.UI
 		{
 			float newValue;
 			if (float.TryParse(editor.Text, out newValue)) {
-				Document.Current.History.DoTransaction(() => {
+				DoTransaction(() => {
 					foreach (var obj in editorParams.Objects) {
 						var current = new Property<NumericRange>(obj, editorParams.PropertyName).Value;
 						if (component == 0) {
@@ -590,13 +604,13 @@ namespace Tangerine.UI
 			panel.Widget.Padding.Right = 12;
 			panel.Widget.Tasks.Add(currentColor.Consume(v => panel.Color = v));
 			panel.Changed += () => {
-				Document.Current.History.RollbackTransaction();
+				EditorParams.History?.RollbackTransaction();
 				SetProperty(panel.Color);
 			};
-			panel.DragStarted += () => Document.Current?.History.BeginTransaction();
+			panel.DragStarted += () => EditorParams.History?.BeginTransaction();
 			panel.DragEnded += () => {
-				Document.Current?.History.CommitTransaction();
-				Document.Current?.History.EndTransaction();
+				EditorParams.History?.CommitTransaction();
+				EditorParams.History?.EndTransaction();
 			};
 			colorBox.Clicked += () => Expanded = !Expanded;
 			var currentColorString = currentColor.Select(i => i.ToString(Color4.StringPresentation.Dec));
@@ -1034,7 +1048,7 @@ namespace Tangerine.UI
 		{
 			float newValue;
 			if (float.TryParse(editor.Text, out newValue)) {
-				Document.Current.History.DoTransaction(() => {
+				DoTransaction(() => {
 					foreach (var obj in editorParams.Objects) {
 						var prop = new Property<SkinningWeights>(obj, editorParams.PropertyName).Value.Clone();
 						prop[idx] = new BoneWeight {
@@ -1053,7 +1067,7 @@ namespace Tangerine.UI
 		{
 			float newValue;
 			if (float.TryParse(editor.Text, out newValue)) {
-				Document.Current.History.DoTransaction(() => {
+				DoTransaction(() => {
 					foreach (var obj in editorParams.Objects) {
 						var prop = new Property<SkinningWeights>(obj, editorParams.PropertyName).Value.Clone();
 						prop[idx] = new BoneWeight {

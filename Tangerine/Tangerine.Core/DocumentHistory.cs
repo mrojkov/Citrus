@@ -4,7 +4,15 @@ using Lime;
 
 namespace Tangerine.Core
 {
-	public class DocumentHistory
+	public interface ITransactionalHistory
+	{
+		IDisposable BeginTransaction();
+		void RollbackTransaction();
+		void CommitTransaction();
+		void EndTransaction();
+	}
+	
+	public class DocumentHistory : ITransactionalHistory
 	{
 		public static readonly ProcessorList Processors = new ProcessorList();
 		private readonly Stack<int> transactionStartIndices = new Stack<int>();

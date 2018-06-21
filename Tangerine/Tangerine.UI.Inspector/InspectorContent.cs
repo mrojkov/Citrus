@@ -101,8 +101,9 @@ namespace Tangerine.UI.Inspector
 					label.CompoundPresenter.Add(new WidgetFlatFillPresenter(ColorTheme.Current.Inspector.CategoryLabelBackground));
 					widget.AddNode(label);
 				}
-				var context = new PropertyEditorParams(widget, objects, type, property.Name) {
+				var @params = new PropertyEditorParams(widget, objects, type, property.Name) {
 					NumericEditBoxFactory = () => new TransactionalNumericEditBox(),
+					History = Document.Current.History,
 					PropertySetter = SetAnimableProperty,
 					DefaultValueGetter = () => {
 						var ctr = type.GetConstructor(new Type[] {});
@@ -115,11 +116,11 @@ namespace Tangerine.UI.Inspector
 					}
 				};
 
-				if (!editorParams.Keys.Contains(context.Group)) {
-					editorParams.Add(context.Group, new List<PropertyEditorParams>());
+				if (!editorParams.Keys.Contains(@params.Group)) {
+					editorParams.Add(@params.Group, new List<PropertyEditorParams>());
 				}
 
-				editorParams[context.Group].Add(context);
+				editorParams[@params.Group].Add(@params);
 			}
 
 			foreach (var header in editorParams.Keys.OrderBy((s) => s)) {
