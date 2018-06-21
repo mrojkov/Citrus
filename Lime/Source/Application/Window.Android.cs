@@ -69,7 +69,7 @@ namespace Lime
 			get {
 				if (lastDesktopMousePosition != Input.DesktopMousePosition) {
 					lastDesktopMousePosition = Input.DesktopMousePosition;
-					calculatedMousePosition = lastDesktopMousePosition * MousePositionTransform;
+					calculatedMousePosition = lastDesktopMousePosition * MousePositionTransform / PixelScale;
 				}
 				return calculatedMousePosition;
 			}
@@ -77,7 +77,7 @@ namespace Lime
 
 		public Vector2 LocalToDesktop(Vector2 localPosition)
 		{
-			return localPosition * MousePositionTransform.CalcInversed();
+			return localPosition * MousePositionTransform.CalcInversed() * PixelScale;
 		}
 
 		private Matrix32 mousePositionTransform = Matrix32.Identity;
