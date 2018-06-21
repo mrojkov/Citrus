@@ -299,10 +299,10 @@ namespace Lime
 					continue;
 				}
 				e.GetPointerCoords(i, pc);
-				var position = new Vector2(pc.X, pc.Y) * input.ScreenToWorldTransform / Window.Current.PixelScale;
-				input.SetTouchPosition(touchIndex, position);
+				var position = new Vector2(pc.X, pc.Y);
+				input.SetDesktopTouchPosition(touchIndex, position);
 				if (touchIndex == 0) {
-					input.MousePosition = position;
+					input.DesktopMousePosition = position;
 				}
 			}
 		}

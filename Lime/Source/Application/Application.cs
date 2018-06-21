@@ -134,7 +134,7 @@ namespace Lime
 #else
 		public static Vector2 DesktopMousePosition
 		{
-			get { return Window.Current.Input.MousePosition; }
+			get { return Window.Current.MousePosition; }
 			set { }
 		}
 #endif // MAC
@@ -156,6 +156,11 @@ namespace Lime
 		/// Checks whether a thread is the main thread.
 		/// </summary>
 		public static bool IsMain(this Thread thread) => thread == MainThread;
+
+		/// <summary>
+		/// Global Input of whole application.
+		/// </summary>
+		public static readonly Input Input = new Input();
 
 		/// <summary>
 		/// Software (on-screen) keyboard for mobile devices.

@@ -9,6 +9,7 @@ namespace Lime
 	{
 		public Node Owner { get; internal set; }
 		protected Input Input => CommonWindow.Current.Input;
+		public virtual Vector2 MousePosition => CommonWindow.Current.MousePosition;
 
 		internal protected abstract void Cancel();
 		internal protected abstract void Update(IEnumerable<Gesture> gestures);

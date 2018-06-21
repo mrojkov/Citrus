@@ -119,7 +119,7 @@ namespace Lime
 			Refresh();
 			var w = Window.Current as Window;
 			w.Input.ClearKeyState();
-			var mp = w.WorldToWindow(w.Input.MousePosition);
+			var mp = w.WorldToWindow(w.MousePosition);
 			NativeContextMenu.Show(w.Form, new System.Drawing.Point(mp.X.Round(), mp.Y.Round()));
 		}
 

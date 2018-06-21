@@ -104,6 +104,42 @@ namespace Lime
 			return new Vector2(wp.X.Round() + (float)window.Frame.X, wp.Y.Round() + (float)window.Frame.X);
 		}
 
+		private Vector2 lastDesktopMousePosition = new Vector2(-1, -1);
+		private Vector2 calculatedMousePosition = new Vector2(-1, -1);
+
+		public Vector2 MousePosition
+		{
+			get {
+				if (lastDesktopMousePosition != Input.DesktopMousePosition) {
+					lastDesktopMousePosition = Input.DesktopMousePosition;
+					calculatedMousePosition = new Vector2 (
+						lastDesktopMousePosition.X - DecoratedPosition.X, 
+						(float)NSGameView.Frame.Height - (lastDesktopMousePosition.Y - DecoratedPosition.Y)
+					) * MousePositionTransform;
+				}
+				return calculatedMousePosition;
+			}
+		}
+
+		public Vector2 LocalToDesktop(Vector2 localPosition)
+		{
+			localPosition = localPosition * MousePositionTransform.CalcInversed();
+			return new Vector2(
+				localPosition.X + DecoratedPosition.X,
+				(float)NSGameView.Frame.Height - localPosition.Y + DecoratedPosition.Y
+			);
+		}
+
+		private Matrix32 mousePositionTransform = Matrix32.Identity;
+		public Matrix32 MousePositionTransform
+		{
+			get { return mousePositionTransform; }
+			set {
+				mousePositionTransform = value;
+				lastDesktopMousePosition = new Vector2(-1, -1);
+			}
+		}
+
 		public bool Active
 		{
 			get { return window.IsKeyWindow; }
@@ -205,11 +241,10 @@ namespace Lime
 		[Obsolete("Use FPS property instead", true)]
 		public float CalcFPS() { return fpsCounter.FPS; }
 
-		public Input Input { get; private set; }
+		public Input Input => Application.Input;
 
 		public Window(WindowOptions options)
 		{
-			Input = new Input();
 			fpsCounter = new FPSCounter();
 			CreateNativeWindow(options);
 			if (Application.MainWindow == null) {
@@ -300,7 +335,6 @@ namespace Lime
 				RaiseActivated();
 			};
 			window.DidResignKey += (sender, e) => {
-				Input.ClearKeyState();
 				RaiseDeactivated();
 			};
 			window.DidMove += HandleMove;
@@ -402,6 +436,11 @@ namespace Lime
 			window.PerformClose(window);
 		}
 
+		public Vector2 GetTouchPosition(int index)
+		{
+			return Input.GetDesktopTouchPosition(index);
+		}
+
 		public void ShowModal()
 		{
 			if (Visible) {
@@ -446,17 +485,22 @@ namespace Lime
 			delta = Mathf.Clamp(delta, 0, Application.MaxDelta);
 			// Refresh mouse position on every frame to make HitTest work properly if mouse is outside of the window.
 			RefreshMousePosition();
-			Input.ProcessPendingKeyEvents(delta);
 			RaiseUpdating(delta);
 			AudioSystem.Update();
-			Input.TextInput = null;
-			Input.CopyKeysState();
+			if (Active) {
+				Input.CopyKeysState();
+				Input.ProcessPendingKeyEvents(delta);
+				Input.TextInput = null;
+			}
+			if (Application.Windows.All(window => !window.Active)) {
+				Input.ClearKeyState();
+			}
 		}
 
 		private void RefreshMousePosition()
 		{
-			var p = window.MouseLocationOutsideOfEventStream;
-			Input.MousePosition = new Vector2((float)p.X, (float)(NSGameView.Frame.Height - p.Y)) * Input.ScreenToWorldTransform;
+			Input.DesktopMousePosition = new Vector2((float) NSEvent.CurrentMouseLocation.X, (float) NSEvent.CurrentMouseLocation.Y);
+			Input.SetDesktopTouchPosition(0, Input.DesktopMousePosition);
 		}
 
 		private void RaiseFilesDropped(IEnumerable<string> files)

@@ -1177,7 +1177,7 @@ namespace Lime
 		}
 
 		public Vector2 ToLocalMousePosition(Vector2 mousePosition) => mousePosition * LocalToWorldTransform.CalcInversed();
-		public Vector2 LocalMousePosition() => Window.Current.Input.MousePosition * LocalToWorldTransform.CalcInversed();
+		public Vector2 LocalMousePosition() => Window.Current.MousePosition * LocalToWorldTransform.CalcInversed();
 
 		public int GetEffectiveLayer()
 		{

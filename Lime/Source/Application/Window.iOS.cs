@@ -58,6 +58,35 @@ namespace Lime
 			get { return (float)UIScreen.MainScreen.Scale; }
 		}
 
+		private Vector2 lastDesktopMousePosition = new Vector2(-1, -1);
+		private Vector2 calculatedMousePosition = new Vector2(-1, -1);
+
+		public Vector2 MousePosition
+		{
+			get {
+				if (lastDesktopMousePosition != Input.DesktopMousePosition) {
+					lastDesktopMousePosition = Input.DesktopMousePosition;
+					calculatedMousePosition = lastDesktopMousePosition * MousePositionTransform;
+				}
+				return calculatedMousePosition;
+			}
+		}
+
+		public Vector2 LocalToDesktop(Vector2 localPosition)
+		{
+			return localPosition * MousePositionTransform.CalcInversed();
+		}
+
+		private Matrix32 mousePositionTransform = Matrix32.Identity;
+		public Matrix32 MousePositionTransform
+		{
+			get { return mousePositionTransform; }
+			set {
+				mousePositionTransform = value;
+				lastDesktopMousePosition = new Vector2(-1, -1);
+			}
+		}
+
 		public Window()
 			: this(new WindowOptions())
 		{
@@ -110,6 +139,11 @@ namespace Lime
 		public IDisplay Display
 		{
 			get { return display; }
+		}
+
+		public Vector2 GetTouchPosition(int index)
+		{
+			return Input.GetDesktopTouchPosition(index);
 		}
 
 		public void Center() { }

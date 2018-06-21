@@ -61,6 +61,36 @@ namespace Lime
 			get; private set;
 		}
 
+		private Vector2 lastDesktopMousePosition = new Vector2(-1, -1);
+		private Vector2 calculatedMousePosition = new Vector2(-1, -1);
+
+		public Vector2 MousePosition
+		{
+			get {
+				if (lastDesktopMousePosition != Input.DesktopMousePosition) {
+					lastDesktopMousePosition = Input.DesktopMousePosition;
+					calculatedMousePosition = lastDesktopMousePosition * MousePositionTransform / PixelScale;
+				}
+				return calculatedMousePosition;
+			}
+		}
+
+		public Vector2 LocalToDesktop(Vector2 localPosition)
+		{
+			return localPosition * MousePositionTransform.CalcInversed() * PixelScale;
+		}
+
+		private Matrix32 mousePositionTransform = Matrix32.Identity;
+		public Matrix32 MousePositionTransform
+		{
+			get { return mousePositionTransform; }
+			set {
+				mousePositionTransform = value;
+				calculatedTouchPositions = new Vector2?[Input.MaxTouches];
+				lastDesktopMousePosition = new Vector2(-1, -1);
+			}
+		}
+
 		public Window(WindowOptions options)
 		{
 			if (Application.MainWindow != null) {
@@ -89,6 +119,15 @@ namespace Lime
 			};
 
 			PixelScale = Resources.System.DisplayMetrics.Density;
+		}
+
+		private Vector2?[] calculatedTouchPositions = new Vector2?[Input.MaxTouches];
+		public Vector2 GetTouchPosition(int index)
+		{
+			if (calculatedTouchPositions[index] == null) {
+				calculatedTouchPositions[index] = Input.GetDesktopTouchPosition(index) * MousePositionTransform / PixelScale;
+			}
+			return calculatedTouchPositions[index].Value;
 		}
 
 		public void Center() {}
