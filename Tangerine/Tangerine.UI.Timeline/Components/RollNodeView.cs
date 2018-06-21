@@ -273,11 +273,25 @@ namespace Tangerine.UI.Timeline.Components
 		void ShowPropertyContextMenu()
 		{
 			Document.Current.History.DoTransaction(() => {
-				Core.Operations.ClearRowSelection.Perform();
-				Core.Operations.SelectRow.Perform(row);
+				if (!row.Selected) {
+					Core.Operations.ClearRowSelection.Perform();
+					Core.Operations.SelectRow.Perform(row);
+				}
 			});
 			Menu submenu;
 			var menu = new Menu {
+				Command.Cut,
+				Command.Copy,
+				Command.Paste,
+				Command.Delete,
+				Command.MenuSeparator,
+				new Command("Rename", () => {
+					Document.Current.History.DoTransaction(() => {
+						Core.Operations.ClearRowSelection.Perform();
+						Core.Operations.SelectRow.Perform(row);
+						Rename();
+					});
+				}),
 				new Command("Color mark",
 					(submenu = new Menu {
 						CreateSetColorMarkCommand("No Color", 0),
@@ -307,7 +321,9 @@ namespace Tangerine.UI.Timeline.Components
 			return new Command(title, 
 				() => {
 					Document.Current.History.DoTransaction(() => {
-						Core.Operations.SetProperty.Perform(nodeData.Node.EditorState(), nameof(NodeEditorState.ColorIndex), index);
+						foreach (var n in Document.Current.SelectedNodes()) {
+							Core.Operations.SetProperty.Perform(n.EditorState(), nameof(NodeEditorState.ColorIndex), index);
+						}
 					});
 				}) { Checked = nodeData.Node.EditorState().ColorIndex == index };
 		}
