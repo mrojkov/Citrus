@@ -58,11 +58,34 @@ namespace Lime
 			get { return (float)UIScreen.MainScreen.Scale; }
 		}
 
-		public virtual Vector2 MousePosition => Input.DesktopMousePosition;
+		private Vector2 lastDesktopMousePosition = new Vector2(-1, -1);
+		private Vector2 calculatedMousePosition = new Vector2(-1, -1);
 
-		public virtual Vector2 ConvertLocalMousePositionToDesktopMousePosition(Vector2 mousePosition)
+		public Vector2 MousePosition
 		{
-			return mousePosition;
+			get {
+				if (lastDesktopMousePosition != Input.DesktopMousePosition) {
+					isMousePositionTransformDirty = false;
+					lastDesktopMousePosition = Input.DesktopMousePosition;
+					calculatedMousePosition = lastDesktopMousePosition * MousePositionTransform;
+				}
+				return calculatedMousePosition;
+			}
+		}
+
+		public Vector2 LocalToDesktop(Vector2 localPosition)
+		{
+			return localPosition * MousePositionTransform.CalcInversed();
+		}
+
+		private Matrix32 mousePositionTransform = Matrix32.Identity;
+		public Matrix32 MousePositionTransform
+		{
+			get { return mousePositionTransform; }
+			set {
+				mousePositionTransform = value;
+				lastDesktopMousePosition = new Vector2(-1, -1);
+			}
 		}
 
 		public Window()

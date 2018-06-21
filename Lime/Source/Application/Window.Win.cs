@@ -161,7 +161,7 @@ namespace Lime
 		private Vector2 lastDesktopMousePosition = new Vector2(-1, -1);
 		private Vector2 calculatedMousePosition = new Vector2(-1, -1);
 
-		public virtual Vector2 MousePosition
+		public Vector2 MousePosition
 		{
 			get {
 				if (lastDesktopMousePosition != Input.DesktopMousePosition) {
@@ -169,18 +169,28 @@ namespace Lime
 					calculatedMousePosition = SDToLime.Convert(
 						glControl.PointToClient(new Point((int) Input.DesktopMousePosition.X, (int) Input.DesktopMousePosition.Y)),
 						PixelScale
-					);
+					) * MousePositionTransform;
 				}
 				return calculatedMousePosition;
 			}
 		}
 
-		public virtual Vector2 ConvertLocalMousePositionToDesktopMousePosition(Vector2 mousePosition)
+		public Vector2 LocalToDesktop(Vector2 localPosition)
 		{
 			return SDToLime.Convert(
-				glControl.PointToScreen(LimeToSD.ConvertToPoint(mousePosition, PixelScale)),
+				glControl.PointToScreen(LimeToSD.ConvertToPoint(localPosition * MousePositionTransform.CalcInversed(), PixelScale)),
 				PixelScale
 			);
+		}
+
+		private Matrix32 mousePositionTransform = Matrix32.Identity;
+		public Matrix32 MousePositionTransform
+		{
+			get { return mousePositionTransform; }
+			set {
+				mousePositionTransform = value;
+				lastDesktopMousePosition = new Vector2(-1, -1);
+			}
 		}
 
 		FPSCounter fpsCounter = new FPSCounter();

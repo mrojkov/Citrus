@@ -107,7 +107,7 @@ namespace Lime
 		private Vector2 lastDesktopMousePosition = new Vector2(-1, -1);
 		private Vector2 calculatedMousePosition = new Vector2(-1, -1);
 
-		public virtual Vector2 MousePosition
+		public Vector2 MousePosition
 		{
 			get {
 				if (lastDesktopMousePosition != Input.DesktopMousePosition) {
@@ -115,18 +115,29 @@ namespace Lime
 					calculatedMousePosition = new Vector2 (
 						lastDesktopMousePosition.X - DecoratedPosition.X, 
 						(float)NSGameView.Frame.Height - (lastDesktopMousePosition.Y - DecoratedPosition.Y)
-					);
+					) * MousePositionTransform;
 				}
 				return calculatedMousePosition;
 			}
 		}
 
-		public virtual Vector2 ConvertLocalMousePositionToDesktopMousePosition(Vector2 mousePosition)
+		public Vector2 LocalToDesktop(Vector2 localPosition)
 		{
+			localPosition = localPosition * MousePositionTransform.CalcInversed();
 			return new Vector2(
-				mousePosition.X + DecoratedPosition.X, 
-				(float)NSGameView.Frame.Height - mousePosition.Y + DecoratedPosition.Y
+				localPosition.X + DecoratedPosition.X,
+				(float)NSGameView.Frame.Height - localPosition.Y + DecoratedPosition.Y
 			);
+		}
+
+		private Matrix32 mousePositionTransform = Matrix32.Identity;
+		public Matrix32 MousePositionTransform
+		{
+			get { return mousePositionTransform; }
+			set {
+				mousePositionTransform = value;
+				lastDesktopMousePosition = new Vector2(-1, -1);
+			}
 		}
 
 		public bool Active

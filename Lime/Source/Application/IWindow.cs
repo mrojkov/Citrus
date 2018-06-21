@@ -281,11 +281,24 @@ namespace Lime
 		
 		bool VSync { get; set; }
 
+		/// <summary>
+		/// The current mouse position in local coordinates. (read only)
+		/// </summary>
 		Vector2 MousePosition { get; }
 
+		/// <summary>
+		/// The current touch position in local coordinates.
+		/// </summary>
 		Vector2 GetTouchPosition(int index);
 
-		Vector2 ConvertLocalMousePositionToDesktopMousePosition(Vector2 mousePosition);
+		/// <summary>
+		/// Converts local window coordinates into desktop coordinates.
+		/// </summary>
+		Vector2 LocalToDesktop(Vector2 localPosition);
 
+		/// <summary>
+		/// The tansformation applied to the mouse position.
+		/// </summary>
+		Matrix32 MousePositionTransform { get; set; }
 	}
 }
