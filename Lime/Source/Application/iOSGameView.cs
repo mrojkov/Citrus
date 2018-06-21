@@ -79,7 +79,7 @@ namespace Lime
 					switch (recognizer.State) {
 						case UIGestureRecognizerState.Began:
 							var pt = recognizer.LocationInView(this);
-							input.MousePosition = new Vector2((float)pt.X, (float)pt.Y) * input.ScreenToWorldTransform;
+							input.DesktopMousePosition = new Vector2((float)pt.X, (float)pt.Y);
 							input.SetKeyState(Key.Mouse0, true);
 							input.SetKeyState(Key.Touch0, true);
 							break;
@@ -125,13 +125,13 @@ namespace Lime
 				for (int i = 0; i < Input.MaxTouches; i++) {
 					if (activeTouches[i] == null) {
 						var pt = touch.LocationInView(this);
-						var position = new Vector2((float)pt.X, (float)pt.Y) * input.ScreenToWorldTransform;
+						var position = new Vector2((float)pt.X, (float)pt.Y);
 						if (i == 0) {
-							input.MousePosition = position;
+							input.DesktopMousePosition = position;
 							input.SetKeyState(Key.Mouse0, true);
 						}
 						Key key = (Key)((int)Key.Touch0 + i);
-						input.SetTouchPosition(i, position);
+						input.SetDesktopTouchPosition(i, position);
 						activeTouches[i] = touch;
 						input.SetKeyState(key, true);
 						break;
@@ -146,11 +146,11 @@ namespace Lime
 				for (int i = 0; i < Input.MaxTouches; i++) {
 					if (activeTouches[i] == touch) {
 						var pt = touch.LocationInView(this);
-						var position = new Vector2((float)pt.X, (float)pt.Y) * input.ScreenToWorldTransform;
+						var position = new Vector2((float)pt.X, (float)pt.Y);
 						if (i == 0) {
-							input.MousePosition = position;
+							input.DesktopMousePosition = position;
 						}
-						input.SetTouchPosition(i, position);
+						input.SetDesktopTouchPosition(i, position);
 					}
 				}
 			}
@@ -162,15 +162,15 @@ namespace Lime
 				for (int i = 0; i < Input.MaxTouches; i++) {
 					if (activeTouches[i] == touch) {
 						var pt = touch.LocationInView(this);
-						var position = new Vector2((float)pt.X, (float)pt.Y) * input.ScreenToWorldTransform;
+						var position = new Vector2((float)pt.X, (float)pt.Y);
 						if (i == 0) {
 							input.SetKeyState(Key.Mouse0, false);
-							input.MousePosition = position;
+							input.DesktopMousePosition = position;
 						}
 						activeTouches[i] = null;
 						Key key = (Key)((int)Key.Touch0 + i);
 						input.SetKeyState(key, false);
-						input.SetTouchPosition(i, position);
+						input.SetDesktopTouchPosition(i, position);
 					}
 				}
 			}

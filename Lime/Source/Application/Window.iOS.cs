@@ -65,7 +65,6 @@ namespace Lime
 		{
 			get {
 				if (lastDesktopMousePosition != Input.DesktopMousePosition) {
-					isMousePositionTransformDirty = false;
 					lastDesktopMousePosition = Input.DesktopMousePosition;
 					calculatedMousePosition = lastDesktopMousePosition * MousePositionTransform;
 				}
