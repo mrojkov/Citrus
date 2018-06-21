@@ -1,103 +1,77 @@
 using Lime;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
+using Yuzu;
 
 namespace Tangerine
 {
 	public static class HotkeyEditor
 	{
-		public static string Filepath { get; set; } = "keybindings.json";
+		public static string Filepath => Path.Combine(Lime.Environment.GetDataDirectory("Tangerine"), "keybindings");
 
-		public static bool Load(string filepath)
-		{
-			Filepath = filepath;
-			return Load();
-		}
+		private static Dictionary<string, CommandsCategory> categories = new Dictionary<string, CommandsCategory>();
 
-		public static bool Load()
+		public static void InitCommands(System.Type type)
 		{
-			Dictionary<string, ICommand> commands = new Dictionary<string, ICommand>();
-			foreach (var i in CommandHandlerList.Global.GetItems()) {
-				if (i.Command.Text == null || i.Command.Text == "")
-					continue;
-				try {
-					commands.Add(i.Command.Text, i.Command);
-				}
-				catch (System.Exception exception) {
-					System.Console.WriteLine($"\"{i.Command.Text}\" - " + exception.Message);
+			var fields = type.GetFields(BindingFlags.Static | BindingFlags.Public);
+			var category = new CommandsCategory();
+			foreach (var field in fields) {
+				ICommand command = field.GetValue(null) as ICommand;
+				if (command != null) {
+					category.Commands.Add(field.Name, command);
 				}
 			}
+			categories.Add(type.Name, category);
+		}
 
-			Dictionary<string, string> data = new Dictionary<string, string>();
-			var deserializer = Yuzu.Json.JsonDeserializer.Instance;
-			try {
-				using (var stream = File.OpenRead(Filepath)) {
-					data = deserializer.FromStream(data, stream) as Dictionary<string, string>;
-				}
-				System.Console.WriteLine($"Key bindings were successfully loaded from \"{Filepath}\"");
-
-				foreach (var i in data) {
-					ICommand command;
-					if (commands.TryGetValue(i.Key, out command)) {
-						if (i.Value == "") {
-							command.Shortcut = new Shortcut();
-							continue;
+		public static void Load()
+		{
+			var data =
+				Serialization.ReadObjectFromFile<Dictionary<string, Dictionary<string, string>>>(Filepath);
+			foreach (var i in data) {
+				CommandsCategory category;
+				if (categories.TryGetValue(i.Key, out category)) {
+					foreach (var binding in i.Value) {
+						ICommand command;
+						if (category.Commands.TryGetValue(binding.Key, out command)) {
+							Shortcut old = command.Shortcut;
+							try {
+								command.Shortcut = new Shortcut(binding.Value);
+							}
+							catch (System.Exception) {
+								Debug.Write($"Unknown shortcut: {binding.Value}");
+							}
 						}
-						Shortcut old = command.Shortcut;
-						try {
-							command.Shortcut = new Shortcut(i.Value);
-						}
-						catch (System.Exception) {
-							command.Shortcut = old;
-							System.Console.WriteLine($"Wrong shortcut \"{i.Key}\"");
+						else {
+							Debug.Write($"Unknown command: {i.Key}.{binding.Key}");
 						}
 					}
-					else {
-						System.Console.WriteLine($"Unknown command \"{i.Key}\"");
-					}
 				}
-				return true;
-			}
-			catch (System.Exception exception) {
-				System.Console.WriteLine($"Can not load key bindings from \"{Filepath}\": {exception.Message}");
-				return false;
+				else {
+					Debug.Write($"Unknown command category: {i.Key}");
+				}
 			}
 		}
-
-		public static bool Save(string filepath)
+		
+		public static void Save()
 		{
-			Filepath = filepath;
-			return Save();
+			var data = new Dictionary<string, Dictionary<string, string>>();
+			foreach (var category in categories) {
+				var bindings = new Dictionary<string, string>();
+				foreach (var command in category.Value.Commands) {
+					var shortcut = command.Value.Shortcut.ToString();
+					bindings.Add(command.Key, shortcut == "Unknown" ? null : shortcut);
+				}
+				data.Add(category.Key, bindings);
+			}
+			Serialization.WriteObjectToFile(Filepath, data, Serialization.Format.JSON);
 		}
+	}
 
-		public static bool Save()
-		{
-			var commands = CommandHandlerList.Global.GetItems();
-			Dictionary<string, string> data = new Dictionary<string, string>();
-			foreach (var i in commands) {
-				if (i.Command.Text == null || i.Command.Text == "")
-					continue;
-				string shortcut = i.Command.Shortcut.ToString();
-				try {
-					data.Add(i.Command.Text, shortcut == "Unknown" ? "" : shortcut);
-				}
-				catch (System.Exception exception) {
-					System.Console.WriteLine($"\"{i.Command.Text}\" - " + exception.Message);
-				}
-			}
-
-			var serializer = new Yuzu.Json.JsonSerializer();
-			try {
-				using (var stream = File.Create(Filepath)) {
-					serializer.ToStream(data, stream);
-				}
-				System.Console.WriteLine($"Key bindings were successfully saved to \"{Filepath}\"");
-				return true;
-			}
-			catch (System.Exception exception) {
-				System.Console.WriteLine($"Can not save key bindings to \"{Filepath}\": {exception.Message}");
-				return false;
-			}
-		}
+	class CommandsCategory
+	{
+		[YuzuRequired]
+		public Dictionary<string, ICommand> Commands { get; private set; } = new Dictionary<string, ICommand>();
 	}
 }

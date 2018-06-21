@@ -46,10 +46,19 @@ namespace Lime
 
 		public Shortcut(string text)
 		{
+			if (text == null || text == "") {
+				Main = Key.Unknown;
+				Modifiers = Modifiers.None;
+				return;
+			}
+
 			string[] words = text.Split(new char[] { '+' });
 			string key = words[words.Length - 1];
 			Main = Key.GetByName(key);
 			Modifiers = Modifiers.None;
+			if (Main == Key.Unknown) {
+				return;
+			}
 			for (int i = 0; i != words.Length - 1; ++i) {
 				string word = words[i].ToLower();
 				if (word == "alt")
@@ -69,7 +78,7 @@ namespace Lime
 
 		public static bool ValidateMainKey(Key key) =>
 			key.IsPrintable() || key.IsTextNavigation() || key.IsTextEditing() || key.IsFunctional() ||
-			key == Key.Escape || key == Key.Tab || key == Key.Menu;
+			key == Key.Escape || key == Key.Tab || key == Key.Menu || key == Key.Unknown;
 
 		public static implicit operator Shortcut(Key main) => new Shortcut(main);
 

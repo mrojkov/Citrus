@@ -222,9 +222,18 @@ namespace Tangerine
 
 			new UI.FilesystemView.FilesystemPane(filesystemPanel);
 			RegisterGlobalCommands();
-
-			HotkeyEditor.Save();
-			HotkeyEditor.Load();
+			
+			HotkeyEditor.InitCommands(typeof(TimelineCommands));
+			HotkeyEditor.InitCommands(typeof(InspectorCommands));
+			HotkeyEditor.InitCommands(typeof(GenericCommands));
+			HotkeyEditor.InitCommands(typeof(SceneViewCommands));
+			HotkeyEditor.InitCommands(typeof(Tools));
+			HotkeyEditor.InitCommands(typeof(FilesystemCommands));
+			HotkeyEditor.InitCommands(typeof(OrangeCommands));
+			if (File.Exists(HotkeyEditor.Filepath))
+				HotkeyEditor.Load();
+			else
+				HotkeyEditor.Save();
 		}
 
 		void SetupMainWindowTitle(WindowWidget windowWidget)
