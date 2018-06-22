@@ -41,44 +41,72 @@ namespace Tangerine.UI.Timeline.Components
 					keyStrips[key.Frame][colorIndex] = true;
 
 					if (keyStrips[key.Frame] != BitSet32.Empty) {
-						var s = keyStrips[key.Frame];
-						var a = new Vector2(key.Frame * TimelineMetrics.ColWidth + 1, 0);
-						var d = widget.Height;
-						for (int j = 0; j < 32; j++) {
-							if (s[j]) {
-								var b = a + new Vector2(TimelineMetrics.ColWidth - 1, d);
-								switch (key.Function) {
-									case KeyFunction.Linear:
-										var quadrangle = new Quadrangle {
-											V1 = new Vector2(a.X + (b.X - a.X) / 2, a.Y),
-											V2 = new Vector2(b.X, a.Y + (b.Y - a.Y) / 2),
-											V3 = new Vector2(a.X + (b.X - a.X) / 2, b.Y),
-											V4 = new Vector2(a.X, a.Y + (b.Y - a.Y) / 2)
-										};
-										Renderer.DrawQuadrangle(quadrangle, KeyframePalette.Colors[j]);
-										break;
-									case KeyFunction.Steep:
-										var rectSize = (b.X - a.X) / 2;
-										var horizontalOffset = rectSize / 2;
-										var verticalOffset = (b.Y - a.Y - rectSize) / 2;
-										var rectVertexA = new Vector2(a.X + horizontalOffset, a.Y + verticalOffset);
-										var rectVertexB = new Vector2(b.X - horizontalOffset, b.Y - verticalOffset);
-										Renderer.DrawRect(rectVertexA, rectVertexB, KeyframePalette.Colors[j]);
-										break;
-									case KeyFunction.Spline:
-										var circleCenter = new Vector2(a.X + (b.X - a.X) / 2, a.Y + (b.Y - a.Y) / 2);
-										var circleRadius = (b.X - a.X) / 2;
-										Renderer.DrawRound(circleCenter, circleRadius, 32, KeyframePalette.Colors[j]);
-										break;
-									case KeyFunction.ClosedSpline:
-										var roundCenter = new Vector2(a.X + (b.X - a.X) / 2, a.Y + (b.Y - a.Y) / 2);
-										var roundRadius = (b.X - a.X) / 2;
-										Renderer.DrawRound(roundCenter, roundRadius, 32, KeyframePalette.Colors[KeyframePalette.Colors.Count() - j], KeyframePalette.Colors[j]);
-										break;
+						// How many interpolations in the key?
+						var numberOf = 2;
+						var numberOfOnesInKeyStrips = 0;
+						for (int k = 0; k < keyStrips[key.Frame].Count; k++) {
+							if (keyStrips[key.Frame][k] == true) {
+								numberOfOnesInKeyStrips++;
+								if (numberOfOnesInKeyStrips == numberOf + 1) { break; }
+							}
+						}
+						if (numberOfOnesInKeyStrips <= numberOf) {
+							// Draw figures
+							var s = keyStrips[key.Frame];
+							var a = new Vector2(key.Frame * TimelineMetrics.ColWidth + 1, 0);
+							var d = widget.Height;
+							for (int j = 0; j < 32; j++) {
+								if (s[j]) {
+									var b = a + new Vector2(TimelineMetrics.ColWidth - 1, d);
+									switch (key.Function) {
+										case KeyFunction.Linear:
+											var quadrangle = new Quadrangle {
+												V1 = new Vector2(a.X + (b.X - a.X) / 2, a.Y),
+												V2 = new Vector2(b.X, a.Y + (b.Y - a.Y) / 2),
+												V3 = new Vector2(a.X + (b.X - a.X) / 2, b.Y),
+												V4 = new Vector2(a.X, a.Y + (b.Y - a.Y) / 2)
+											};
+											Renderer.DrawQuadrangle(quadrangle, KeyframePalette.Colors[j]);
+											break;
+										case KeyFunction.Steep:
+											var rectSize = (b.X - a.X) / 2;
+											var horizontalOffset = rectSize / 2;
+											var verticalOffset = (b.Y - a.Y - rectSize) / 2;
+											var rectVertexA = new Vector2(a.X + horizontalOffset, a.Y + verticalOffset);
+											var rectVertexB = new Vector2(b.X - horizontalOffset, b.Y - verticalOffset);
+											Renderer.DrawRect(rectVertexA, rectVertexB, KeyframePalette.Colors[j]);
+											break;
+										case KeyFunction.Spline:
+											var circleCenter = new Vector2(a.X + (b.X - a.X) / 2, a.Y + (b.Y - a.Y) / 2);
+											var circleRadius = (b.X - a.X) / 2;
+											Renderer.DrawRound(circleCenter, circleRadius, 32, KeyframePalette.Colors[j]);
+											break;
+										case KeyFunction.ClosedSpline:
+											var roundCenter = new Vector2(a.X + (b.X - a.X) / 2, a.Y + (b.Y - a.Y) / 2);
+											var roundRadius = (b.X - a.X) / 2;
+											Renderer.DrawRound(roundCenter, roundRadius, 32, Color4.Transparent, KeyframePalette.Colors[j]);
+											break;
+									}
 								}
 							}
 						}
-
+						else {
+							// Draw strips
+							var s = keyStrips[i];
+							int c = 0;
+							for (int j = 0; j < 32; j++) {
+								c += s[j] ? 1 : 0;
+							}
+							var a = new Vector2(i * TimelineMetrics.ColWidth + 1, 0);
+							var d = widget.Height / c;
+							for (int j = 0; j < 32; j++) {
+								if (s[j]) {
+									var b = a + new Vector2(TimelineMetrics.ColWidth - 1, d);
+									Renderer.DrawRect(a, b, KeyframePalette.Colors[j]);
+									a.Y += d;
+								}
+							}
+						}
 					}
 				}
 			}
