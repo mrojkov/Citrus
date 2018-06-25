@@ -50,7 +50,7 @@ namespace Tangerine.Core.Operations
 
 	public class SetAnimableProperty
 	{
-		public static void Perform(object @object, string propertyName, object value, bool createAnimatorIfNeeded, bool createInitialKeyframeForNewAnimator = true, int atFrame = -1)
+		public static void Perform(object @object, string propertyName, object value, bool createAnimatorIfNeeded = false, bool createInitialKeyframeForNewAnimator = true, int atFrame = -1)
 		{
 			SetProperty.Perform(@object, propertyName, value);
 			IAnimator animator;
