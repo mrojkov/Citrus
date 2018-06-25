@@ -171,6 +171,11 @@ namespace Lime
 			}
 		}
 
+		public List<Key> GetPressedKeys()
+		{
+			return windowInput.GetPressedKeys();
+		}
+
 		/// <summary>
 		/// Restricts input scope with the current widget and its descendants.
 		/// </summary>

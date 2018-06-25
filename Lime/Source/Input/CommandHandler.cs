@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Lime;
 
@@ -12,18 +12,13 @@ namespace Lime
 
 	public class CommandHandlerList
 	{
-		public struct Item
+		struct Item
 		{
 			public ICommand Command;
 			public CommandHandler Handler;
 		}
 
 		private readonly List<Item> items = new List<Item>();
-
-		public List<Item> GetItems()
-		{
-			return items;
-		}
 
 		public static readonly CommandHandlerList Global = new CommandHandlerList();
 

@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Lime;
 using Tangerine.UI;
 using Tangerine.Core;
+using System;
 
 namespace Tangerine
 {
@@ -24,6 +25,8 @@ namespace Tangerine
 			Right = 15,
 		};
 
+		List<ShortcutBinding> shortcuts = new List<ShortcutBinding>();
+
 		public PreferencesDialog()
 		{
 			theme = AppUserPreferences.Instance.Theme;
@@ -41,6 +44,7 @@ namespace Tangerine
 			Content = new TabbedWidget();
 			Content.AddTab("General", CreateGeneralPane(), true);
 			Content.AddTab("Appearance", CreateColorsPane());
+			Content.AddTab("Keyboard shortcuts", CreateShortcutsPane());
 
 			rootWidget = new ThemedInvalidableWindowWidget(window) {
 				Padding = new Thickness(8),
@@ -66,6 +70,8 @@ namespace Tangerine
 					AlertDialog.Show("The color theme change will take effect next time you run Tangerine.");
 				}
 				Core.UserPreferences.Instance.Save();
+				SaveShortcuts();
+				HotkeyEditor.Save();
 			};
 			resetButton.Clicked += () => {
 				if (new AlertDialog($"Are you sure you want to reset to defaults?", "Yes", "Cancel").Show() == 0) {
@@ -86,12 +92,17 @@ namespace Tangerine
 			okButton.SetFocus();
 		}
 
-		private static void ResetToDefaults()
+		private void ResetToDefaults()
 		{
 			AppUserPreferences.Instance.ResetToDefaults();
 			UI.SceneView.SceneUserPreferences.Instance.ResetToDefaults();
 			UI.Timeline.TimelineUserPreferences.Instance.ResetToDefaults();
 			Core.CoreUserPreferences.Instance.ResetToDefaults();
+			HotkeyEditor.ResetToDefaults();
+			HotkeyEditor.Save();
+			foreach (var binding in shortcuts) {
+				binding.Shortcut = binding.Command.Shortcut;
+			}
 		}
 
 		private Widget CreateColorsPane()
@@ -169,6 +180,65 @@ namespace Tangerine
 			boneWidthPropertyEditor.ContainerWidget.AddChangeWatcher(
 				() => UI.SceneView.SceneUserPreferences.Instance.DefaultBoneWidth, (v) => Application.InvalidateWindows());
 			return pane;
+		}
+
+		Widget CreateShortcutsPane()
+		{
+			window.CommandsEnabled = false;
+			var pane = new ThemedScrollView();
+			pane.Content.Layout = new VBoxLayout { Spacing = 4 };
+			pane.Content.Padding = contentPadding;
+			foreach (var category in HotkeyEditor.Categories) {
+				var expandableContent = new Frame {
+					Padding = new Thickness(30, 0),
+					Layout = new VBoxLayout(),
+					Visible = true
+				};
+				var expandButton = new ThemedExpandButton {
+					Anchors = Anchors.Left,
+					MinMaxSize = Vector2.One * 20f,
+					Expanded = expandableContent.Visible
+				};
+				var title = new ThemedSimpleText {
+					Text = category.Key,
+					VAlignment = VAlignment.Center,
+					LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0)
+				};
+				expandButton.Clicked += () => {
+					expandableContent.Visible = !expandableContent.Visible;
+					expandButton.Expanded = expandableContent.Visible;
+				};
+				pane.Content.AddNode(new Widget() {
+					Padding = new Thickness(4),
+					Layout = new HBoxLayout(),
+					Nodes = { expandButton, title }
+				});
+				pane.Content.AddNode(expandableContent);
+				foreach (var binding in category.Value.Commands) {
+					shortcuts.Add(new ShortcutBinding() {
+						Command = binding.Value,
+						Shortcut = binding.Value.Shortcut
+					});
+					binding.Value.Enabled = false;
+					var text = binding.Value.Text;
+					var editor = new ShortcutPropertyEditor(
+						new PropertyEditorParams(expandableContent, shortcuts.Last(), "Shortcut", string.IsNullOrEmpty(text) ? "{" + binding.Key + "}" : text));
+					editor.PropertyLabel.MinWidth = 300;
+				}
+			}
+			return pane;
+		}
+
+		void SaveShortcuts()
+		{
+			foreach (var binding in shortcuts) {
+				if (binding.Shortcut.Main == Key.Unknown) {
+					binding.Command.Shortcut = new Shortcut();
+				}
+				else {
+					binding.Command.Shortcut = binding.Shortcut;
+				}
+			}
 		}
 	}
 }

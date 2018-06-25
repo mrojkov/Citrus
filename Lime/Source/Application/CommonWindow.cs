@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 
 namespace Lime
@@ -25,6 +25,8 @@ namespace Lime
 		/// Works only on Windows with disabled Timer.
 		/// </summary>
 		public virtual bool VSync { get; set; }
+
+		public bool CommandsEnabled { get; set; } = true;
 
 		public event Action<System.Exception> UnhandledExceptionOnUpdate;
 
@@ -103,7 +105,8 @@ namespace Lime
 				CommandQueue.Instance.IssueCommands();
 				try {
 					Updating?.Invoke(delta);
-					CommandHandlerList.Global.ProcessCommands();
+					if (CommandsEnabled)
+						CommandHandlerList.Global.ProcessCommands();
 				} finally {
 					Application.MainMenu?.Refresh();
 				}

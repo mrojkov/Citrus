@@ -46,7 +46,7 @@ namespace Lime
 
 		public Shortcut(string text)
 		{
-			if (text == null || text == "") {
+			if (String.IsNullOrEmpty(text)) {
 				Main = Key.Unknown;
 				Modifiers = Modifiers.None;
 				return;

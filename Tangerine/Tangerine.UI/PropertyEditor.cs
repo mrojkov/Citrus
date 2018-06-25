@@ -1124,4 +1124,63 @@ namespace Tangerine.UI
 			}
 		}
 	}
+
+	public class ShortcutPropertyEditor : CommonPropertyEditor<Shortcut>
+	{
+		private EditBox editor;
+		private Modifiers modifiers;
+		private Key main;
+
+		public ShortcutPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
+		{
+			editor = editorParams.EditBoxFactory();
+			editor.Updating += Updating;
+			editor.LayoutCell = new LayoutCell(Alignment.Center);
+			editor.AddChangeWatcher(CoalescedPropertyValue(), v => {
+				var text = v.ToString();
+				editor.Text = v.Main != Key.Unknown ? text : text.Replace("Unknown", "");
+			});
+			editor.IsReadOnly = true;
+			editor.TextWidget.Tasks.Clear();
+			editor.TextWidget.Position = new Vector2(0, editor.MinHeight / 2);
+			editor.TextWidget.Padding = new Thickness(5, 0);
+			editor.Gestures.Add(new ClickGesture(() => editor.SetFocus()));
+			editor.Gestures.Add(new ClickGesture(1, () => {
+				main = Key.Unknown;
+				modifiers = Modifiers.None;
+				SetProperty(new Shortcut(modifiers, main));
+			}));
+			editor.AddToNode(ContainerWidget);
+
+			var value = CoalescedPropertyValue().GetValue();
+			main = value.Main;
+			modifiers = value.Modifiers;
+		}
+
+		private void Updating(float dt)
+		{
+			if (!editor.IsFocused())
+				return;
+			var input = editor.Input;
+			if (input.WasKeyPressed(Key.Alt)) {
+				modifiers = modifiers.HasFlag(Modifiers.Alt) ? modifiers & ~Modifiers.Alt : modifiers | Modifiers.Alt;
+			}
+			if (input.WasKeyPressed(Key.Shift)) {
+				modifiers = modifiers.HasFlag(Modifiers.Shift) ? modifiers & ~Modifiers.Shift : modifiers | Modifiers.Shift;
+			}
+			if (input.WasKeyPressed(Key.Control)) {
+				modifiers = modifiers.HasFlag(Modifiers.Control) ? modifiers & ~Modifiers.Control : modifiers | Modifiers.Control;
+			}
+			var keys = input.GetPressedKeys();
+			if (keys.Count == 0)
+				return;
+			foreach (var key in keys) {
+				if (!key.IsModifier() && !key.IsMouseKey()) {
+					main = key;
+					break;
+				}
+			}
+			SetProperty(new Shortcut(modifiers, main));
+		}
+	}
 }
