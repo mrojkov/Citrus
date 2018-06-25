@@ -62,9 +62,9 @@ namespace Tangerine.UI.Timeline.Components
 				() => propRow.Animator.Enabled,
 				i => button.Texture = IconPool.GetTexture(i ? "Timeline.AnimationEnabled" : "Timeline.AnimationDisabled")
 			);
-			button.Clicked += () => {
+			button.AddTransactionClickHandler(() => {
 				Core.Operations.SetProperty.Perform(propRow.Animator, nameof(IAnimator.Enabled), !propRow.Animator.Enabled);
-			};
+			});
 			return button;
 		}
 
