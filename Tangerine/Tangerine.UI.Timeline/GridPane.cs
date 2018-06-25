@@ -84,23 +84,18 @@ namespace Tangerine.UI.Timeline
 		{
 			foreach (var row in Document.Current.Rows) {
 				var nodeRow = row.Components.Get<Core.Components.NodeRow>()?.Node;
-
 				if (nodeRow == null) {
 					continue;
 				}
-
 				int lastFrameIndex = 0;
-
 				foreach (var animator in nodeRow.Animators) {
 					var key = animator.ReadonlyKeys.LastOrDefault();
 					if (key != null && key.Frame > lastFrameIndex) {
 						lastFrameIndex = key.Frame;
 					}
 				}
-
 				if (lastFrameIndex > 0) {
 					var gridWidget = row.GridWidget();
-
 					Renderer.DrawRect(
 						0.0f, gridWidget.Top(), (lastFrameIndex * TimelineMetrics.ColWidth), gridWidget.Bottom(),
 						ColorTheme.Current.TimelineGrid.InvolvedFrames);
@@ -110,39 +105,35 @@ namespace Tangerine.UI.Timeline
 
 		private void RenderVerticalLines()
 		{
-			Vector2 from = new Vector2(0.0f, 1.0f);
-			Vector2 to = new Vector2(0.0f, ContentWidget.Height - 2.0f);
-
+			var a = new Vector2(0.0f, 1.0f);
+			var b = new Vector2(0.0f, ContentWidget.Height - 2.0f);
 			for (int columnIndex = 0; columnIndex <= timeline.ColumnCount; columnIndex++) {
 				if (timeline.IsColumnVisible(columnIndex)) {
-					from.X = to.X = 0.5f + columnIndex * TimelineMetrics.ColWidth;
-					Renderer.DrawLine(from, to, ColorTheme.Current.TimelineGrid.LinesLight);
+					a.X = b.X = 0.5f + columnIndex * TimelineMetrics.ColWidth;
+					Renderer.DrawLine(a, b, ColorTheme.Current.TimelineGrid.LinesLight);
 				}
 			}
 		}
 
 		private void RenderHorizontalLines()
 		{
-			Vector2 from = new Vector2(0.0f, 0.5f);
-			Vector2 to = new Vector2(ContentWidget.Width, 0.5f);
-
-			Renderer.DrawLine(from, to, ColorTheme.Current.TimelineGrid.Lines);
-
+			var a = new Vector2(0.0f, 0.5f);
+			var b = new Vector2(ContentWidget.Width, 0.5f);
+			Renderer.DrawLine(a, b, ColorTheme.Current.TimelineGrid.Lines);
 			foreach (var row in Document.Current.Rows) {
-				from.Y = to.Y = 0.5f + row.GridWidget().Bottom();
-				Renderer.DrawLine(from, to, ColorTheme.Current.TimelineGrid.Lines);
+				a.Y = b.Y = 0.5f + row.GridWidget().Bottom();
+				Renderer.DrawLine(a, b, ColorTheme.Current.TimelineGrid.Lines);
 			}
 		}
 
 		private void RenderMarkersBoundaries()
 		{
-			Vector2 from = new Vector2(0.0f, 1.0f);
-			Vector2 to = new Vector2(0.0f, ContentWidget.Height - 2.0f);
-
+			var a = new Vector2(0.0f, 1.0f);
+			var b = new Vector2(0.0f, ContentWidget.Height - 2.0f);
 			foreach (var marker in Document.Current.Container.Markers) {
 				if (timeline.IsColumnVisible(marker.Frame)) {
-					from.X = to.X = 0.5f + TimelineMetrics.ColWidth * marker.Frame;
-					Renderer.DrawLine(from, to, ColorTheme.Current.TimelineGrid.Lines);
+					a.X = b.X = 0.5f + TimelineMetrics.ColWidth * marker.Frame;
+					Renderer.DrawLine(a, b, ColorTheme.Current.TimelineGrid.Lines);
 				}
 			}
 		}
@@ -184,7 +175,7 @@ namespace Tangerine.UI.Timeline
 					var span = spans[i];
 					var isLastSpan = i + 1 == spans.Count;
 					for (var column = span.A; column < span.B; column++) {
-						var absentLeftCell = !lastColumn.HasValue || column - 1 > lastColumn.Value;
+						var isLeftCellMissing = !lastColumn.HasValue || column - 1 > lastColumn.Value;
 						if (topSpans != null && (!topSpan.HasValue || column >= topSpan.Value.B)) {
 							do {
 								if (!topSpans.MoveNext()) {
@@ -195,8 +186,8 @@ namespace Tangerine.UI.Timeline
 								topSpan = topSpans.Current;
 							} while (column >= topSpan.Value.B);
 						}
-						var absentTopCell = !topSpan.HasValue || column < topSpan.Value.A;
-						var absentRightCell = column + 1 == span.B && (isLastSpan || column + 1 < spans[i + 1].A);
+						var isTopCellMissing = !topSpan.HasValue || column < topSpan.Value.A;
+						var isRightCellMissing = column + 1 == span.B && (isLastSpan || column + 1 < spans[i + 1].A);
 						if (bottomSpans != null && (!bottomSpan.HasValue || column >= bottomSpan.Value.B)) {
 							do {
 								if (!bottomSpans.MoveNext()) {
@@ -207,25 +198,25 @@ namespace Tangerine.UI.Timeline
 								bottomSpan = bottomSpans.Current;
 							} while (column >= bottomSpan.Value.B);
 						}
-						var absentBottomCell = !bottomSpan.HasValue || column < bottomSpan.Value.A;
+						var isBottomCellMissing = !bottomSpan.HasValue || column < bottomSpan.Value.A;
 						lastColumn = column;
 
 						var a = CellToGridCoordinates(new IntVector2(column, row) + offset);
 						var b = CellToGridCoordinates(new IntVector2(column + 1, row + 1) + offset);
 						a = new Vector2(a.X + 1.5f, a.Y + 0.5f);
 						b = new Vector2(b.X - 0.5f, (gridWidgetBottom ?? b.Y) - 0.5f);
-						Renderer.DrawRect(a + Vector2.Up * 0.5f, b + new Vector2(1f + (absentRightCell ? 0 : 1), (absentBottomCell ? 0 : 1)), ColorTheme.Current.TimelineGrid.Selection);
-						if (absentLeftCell) {
-							Renderer.DrawLine(a.X, a.Y - (absentTopCell ? 0 : 1), a.X, b.Y + (absentBottomCell ? 0 : 1), ColorTheme.Current.TimelineGrid.SelectionBorder, cap: LineCap.Square);
+						Renderer.DrawRect(a + Vector2.Up * 0.5f, b + new Vector2(1f + (isRightCellMissing ? 0 : 1), (isBottomCellMissing ? 0 : 1)), ColorTheme.Current.TimelineGrid.Selection);
+						if (isLeftCellMissing) {
+							Renderer.DrawLine(a.X, a.Y - (isTopCellMissing ? 0 : 1), a.X, b.Y + (isBottomCellMissing ? 0 : 1), ColorTheme.Current.TimelineGrid.SelectionBorder, cap: LineCap.Square);
 						}
-						if (absentTopCell) {
-							Renderer.DrawLine(a.X - (absentLeftCell ? 0 : 1), a.Y, b.X + (absentRightCell ? 0 : 1), a.Y, ColorTheme.Current.TimelineGrid.SelectionBorder, cap: LineCap.Square);
+						if (isTopCellMissing) {
+							Renderer.DrawLine(a.X - (isLeftCellMissing ? 0 : 1), a.Y, b.X + (isRightCellMissing ? 0 : 1), a.Y, ColorTheme.Current.TimelineGrid.SelectionBorder, cap: LineCap.Square);
 						}
-						if (absentRightCell) {
-							Renderer.DrawLine(b.X, a.Y - (absentTopCell ? 0 : 1), b.X, b.Y + (absentBottomCell ? 0 : 1), ColorTheme.Current.TimelineGrid.SelectionBorder, cap: LineCap.Square);
+						if (isRightCellMissing) {
+							Renderer.DrawLine(b.X, a.Y - (isTopCellMissing ? 0 : 1), b.X, b.Y + (isBottomCellMissing ? 0 : 1), ColorTheme.Current.TimelineGrid.SelectionBorder, cap: LineCap.Square);
 						}
-						if (absentBottomCell) {
-							Renderer.DrawLine(a.X - (absentLeftCell ? 0 : 1), b.Y, b.X + (absentRightCell ? 0 : 1), b.Y, ColorTheme.Current.TimelineGrid.SelectionBorder, cap: LineCap.Square);
+						if (isBottomCellMissing) {
+							Renderer.DrawLine(a.X - (isLeftCellMissing ? 0 : 1), b.Y, b.X + (isRightCellMissing ? 0 : 1), b.Y, ColorTheme.Current.TimelineGrid.SelectionBorder, cap: LineCap.Square);
 						}
 					}
 				}
