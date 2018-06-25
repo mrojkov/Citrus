@@ -57,7 +57,8 @@ namespace Tangerine.UI
 			public Color4 RunningCursor;
 			public Color4 WaveformColor;
 			public Color4 WaveformBackground;
-			public Color4 InvolvedFrames;
+			public Color4 AnimatedRangeBackground;
+			public Color4 SelectedRowBackground;
 			public Color4 SelectionBorder;
 		}
 
@@ -176,12 +177,13 @@ namespace Tangerine.UI
 				PropertyRowBackground = Color4.White.Transparentify(0.95f),
 				Lines = new Color4(45, 45, 48),
 				LinesLight = new Color4(45, 45, 48).Lighten(0.065f),
-				Selection = Color4.Gray.Transparentify(0.5f),
+				Selection = new Color4(140, 140, 140, 128),
 				Cursor = new Color4(163, 0, 0).Darken(0.15f),
 				RunningCursor = new Color4(0, 163, 0).Darken(0.15f),
 				WaveformColor = new Color4(170, 255, 140),
 				WaveformBackground = new Color4(160, 160, 220, 60),
-				InvolvedFrames = new Color4(85, 85, 85),
+				AnimatedRangeBackground = new Color4(85, 85, 85),
+				SelectedRowBackground = new Color4(100, 100, 100),
 				SelectionBorder = new Color4(0, 255, 255),
 			};
 			var timelineCurveEditor = new TimelineCurveEditorColors {
@@ -287,13 +289,14 @@ namespace Tangerine.UI
 			var timelineGrid = new TimelineGridColors {
 				PropertyRowBackground = Color4.Black.Transparentify(0.95f),
 				Lines = new Color4(160, 160, 160),
-				LinesLight = new Color4(225, 225, 225),
+				LinesLight = new Color4(210, 210, 210),
 				Selection = Color4.Gray.Transparentify(0.7f),
 				Cursor = Color4.Red.Lighten(0.4f),
 				RunningCursor = Color4.Green.Lighten(0.4f),
 				WaveformColor = new Color4(140, 170, 255),
 				WaveformBackground = new Color4(255, 200, 140, 60),
-				InvolvedFrames = new Color4(240, 240, 240),
+				AnimatedRangeBackground = new Color4(240, 240, 240),
+				SelectedRowBackground = new Color4(225, 225, 225),
 				SelectionBorder = new Color4(255, 0, 128),
 			};
 			var timelineCurveEditor = new TimelineCurveEditorColors {

@@ -73,14 +73,15 @@ namespace Tangerine.UI.Timeline
 				ContentWidget.PrepareRendererState();
 				Renderer.DrawRect(Vector2.Zero, ContentWidget.Size, ColorTheme.Current.Basic.WhiteBackground);
 
-				RenderInvolvedFrames();
+				RenderAnimatedRangeBackground();
+				RenderSelectedRowsBackground();
 				RenderVerticalLines();
 				RenderHorizontalLines();
-				RenderMarkersBoundaries();
+				RenderMarkerRulers();
 			}
 		}
-
-		private void RenderInvolvedFrames()
+		
+		private void RenderAnimatedRangeBackground()
 		{
 			foreach (var row in Document.Current.Rows) {
 				var nodeRow = row.Components.Get<Core.Components.NodeRow>()?.Node;
@@ -98,8 +99,18 @@ namespace Tangerine.UI.Timeline
 					var gridWidget = row.GridWidget();
 					Renderer.DrawRect(
 						0.0f, gridWidget.Top(), (lastFrameIndex * TimelineMetrics.ColWidth), gridWidget.Bottom(),
-						ColorTheme.Current.TimelineGrid.InvolvedFrames);
+						ColorTheme.Current.TimelineGrid.AnimatedRangeBackground);
 				}
+			}
+		}
+
+		private void RenderSelectedRowsBackground()
+		{
+			foreach (var row in Document.Current.SelectedRows()) {
+				var gridWidget = row.GridWidget();
+				Renderer.DrawRect(
+					0.0f, gridWidget.Top(), gridWidget.Right(), gridWidget.Bottom(),
+					ColorTheme.Current.TimelineGrid.SelectedRowBackground);
 			}
 		}
 
@@ -126,7 +137,7 @@ namespace Tangerine.UI.Timeline
 			}
 		}
 
-		private void RenderMarkersBoundaries()
+		private void RenderMarkerRulers()
 		{
 			var a = new Vector2(0.0f, 1.0f);
 			var b = new Vector2(0.0f, ContentWidget.Height - 2.0f);
