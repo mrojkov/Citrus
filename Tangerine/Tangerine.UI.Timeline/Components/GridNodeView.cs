@@ -72,12 +72,11 @@ namespace Tangerine.UI.Timeline.Components
 						if (cell.Strips[colorIndex]) break;
 					}
 					DrawFigure(a, b, cell.Func1, KeyframePalette.Colors[colorIndex]);
-				}
-				else if (cell.StripCount == 2) {
-					bool flag = true;
+				} else if (cell.StripCount == 2) {
+					var flag = true;
 					for (int colorIndex = 0; colorIndex < 32; colorIndex++) {
 						if (cell.Strips[colorIndex]) {
-							var b = a + new Vector2(TimelineMetrics.ColWidth - 1, d / 2);
+							var b = a + new Vector2(TimelineMetrics.ColWidth - 1, d);
 							if (flag) {
 								DrawFigure(a, b, cell.Func1, KeyframePalette.Colors[colorIndex]);
 								flag = false;
@@ -89,17 +88,16 @@ namespace Tangerine.UI.Timeline.Components
 							a.Y += d;
 						}
 					}
-					if (flag == false) {
+					if (!flag) {
 						for (int colorIndex = 0; colorIndex < 32; colorIndex++) {
 							if (cell.Strips[colorIndex]) {
-								var b = a + new Vector2(TimelineMetrics.ColWidth - 1, d / 2);
+								var b = a + new Vector2(TimelineMetrics.ColWidth - 1, d);
 								DrawFigure(a, b, cell.Func2, KeyframePalette.Colors[colorIndex]);
 								break;
 							}
 						}
 					}
-				}
-				else {
+				} else {
 					for (int colorIndex = 0; colorIndex < 32; colorIndex++) {
 						if (cell.Strips[colorIndex]) {
 							var b = a + new Vector2(TimelineMetrics.ColWidth - 1, d);
@@ -113,32 +111,52 @@ namespace Tangerine.UI.Timeline.Components
 
 		protected void DrawFigure(Vector2 a, Vector2 b, KeyFunction func, Color4 color)
 		{
+			var segmentWidth = b.X - a.X;
+			var segmentHeight = b.Y - a.Y;
 			switch (func) {
 				case KeyFunction.Linear:
 					var quadrangle = new Quadrangle {
-						V1 = new Vector2(a.X + (b.X - a.X) / 2, a.Y),
-						V2 = new Vector2(b.X, a.Y + (b.Y - a.Y) / 2),
-						V3 = new Vector2(a.X + (b.X - a.X) / 2, b.Y),
-						V4 = new Vector2(a.X, a.Y + (b.Y - a.Y) / 2)
+						V1 = new Vector2(a.X + segmentWidth / 2, a.Y),
+						V2 = new Vector2(b.X, a.Y + segmentHeight / 2),
+						V3 = new Vector2(a.X + segmentWidth / 2, b.Y),
+						V4 = new Vector2(a.X, a.Y + segmentHeight / 2)
 					};
 					Renderer.DrawQuadrangle(quadrangle, color);
 					break;
 				case KeyFunction.Steep:
-					var rectSize = (b.X - a.X) / 2;
-					var horizontalOffset = rectSize / 2;
-					var verticalOffset = (b.Y - a.Y - rectSize) / 2;
+					var rectSize = 0f;
+					var horizontalOffset = 0f;
+					var verticalOffset = 0f;
+					if (segmentWidth < segmentHeight) {
+						rectSize = segmentWidth / 2;
+					} else {
+						rectSize = segmentHeight / 2;
+					}
+
+					horizontalOffset = (segmentWidth - rectSize) / 2;
+					verticalOffset = (segmentHeight - rectSize) / 2;
 					var rectVertexA = new Vector2(a.X + horizontalOffset, a.Y + verticalOffset);
 					var rectVertexB = new Vector2(b.X - horizontalOffset, b.Y - verticalOffset);
 					Renderer.DrawRect(rectVertexA, rectVertexB, color);
 					break;
 				case KeyFunction.Spline:
-					var circleCenter = new Vector2(a.X + (b.X - a.X) / 2, a.Y + (b.Y - a.Y) / 2);
-					var circleRadius = (b.X - a.X) / 3;
+					var circleCenter = new Vector2(a.X + segmentWidth / 2, a.Y + segmentHeight / 2);
+					var circleRadius = 0f;
+					if (segmentWidth < segmentHeight) {
+						circleRadius = circleCenter.X - a.X;
+					} else {
+						circleRadius = circleCenter.Y - a.Y;
+					}
 					Renderer.DrawRound(circleCenter, circleRadius, 16, color);
 					break;
 				case KeyFunction.ClosedSpline:
-					var roundCenter = new Vector2(a.X + (b.X - a.X) / 2, a.Y + (b.Y - a.Y) / 2);
-					var roundRadius = (b.X - a.X) / 3;
+					var roundCenter = new Vector2(a.X + segmentWidth / 2, a.Y + segmentHeight / 2);
+					var roundRadius = 0f;
+					if (segmentWidth < segmentHeight) {
+						roundRadius = roundCenter.X - a.X;
+					} else {
+						roundRadius = roundCenter.Y - a.Y;
+					}
 					Renderer.DrawRound(roundCenter, roundRadius, 16, Color4.Transparent, color);
 					break;
 			}
