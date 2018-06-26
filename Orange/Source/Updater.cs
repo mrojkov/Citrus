@@ -14,6 +14,8 @@ namespace Orange
 	{
 		private static GitHubClient client = new GitHubClient(new ProductHeaderValue("mrojkov-citrus-auto-updater"));
 		private static bool firstUpdate = true;
+		private const string lockFileName = "update_lock";
+		private static string LockPath => Path.Combine(Toolbox.CalcCitrusDirectory(), lockFileName);
 
 		public static async Task CheckForUpdates()
 		{
@@ -24,30 +26,26 @@ namespace Orange
 						await Task.Delay(TimeSpan.FromMinutes(5.0));
 					}
 					firstUpdate = false;
-					var citrusVersion = CitrusVersion.Load();
-					if (!citrusVersion.IsStandalone) {
+					if (IsUpdateLocked()) {
 						continue;
 					}
-					var releases = await client.Repository.Release.GetAll("mrojkov", "Citrus");
-					if (releases.Count == 0) {
-						Console.WriteLine("Self Updater Error: zero releases available");
-						continue;
-					}
-					var latest = releases[0];
-					var tagName = $"gh_{citrusVersion.Version}_{citrusVersion.BuildNumber}";
-					if (tagName == latest.TagName) {
-						continue;
-					}
-					var exePath = Path.GetDirectoryName(Uri.UnescapeDataString((new Uri(Assembly.GetExecutingAssembly().CodeBase)).AbsolutePath));
-#if MAC
-					exePath = Path.Combine(exePath, "..", "..", "..");
-#endif // MAC
-					var updatingFlagPath = Path.Combine(exePath, "UPDATING");
-					if (File.Exists(updatingFlagPath)) {
-						continue;
-					}
-					File.Create(updatingFlagPath).Dispose();
+					LockUpdate();
 					try {
+						var citrusVersion = CitrusVersion.Load();
+						if (!citrusVersion.IsStandalone) {
+							continue;
+						}
+						var releases = await client.Repository.Release.GetAll("mrojkov", "Citrus");
+						if (releases.Count == 0) {
+							Console.WriteLine("Self Updater Error: zero releases available");
+							continue;
+						}
+						var latest = releases[0];
+						var tagName = $"gh_{citrusVersion.Version}_{citrusVersion.BuildNumber}";
+						if (tagName == latest.TagName) {
+							continue;
+						}
+						var citrusDirectory = Toolbox.CalcCitrusDirectory();
 						Console.WriteLine($"oh wow, you had a {tagName} version and new {latest.TagName} version is available! Downloading update!");
 						// TODO: select corresponding asset for OS
 						var platformString =
@@ -71,20 +69,20 @@ namespace Orange
 						using (var compressedFileStream = new MemoryStream()) {
 							compressedFileStream.Write(zipFileBytes, 0, zipFileBytes.Length);
 							using (var zipArchive = new ZipArchive(compressedFileStream, ZipArchiveMode.Read, false)) {
-								var tempPath = Path.Combine(exePath, "previous-release");
+								var tempPath = Path.Combine(citrusDirectory, "previous-release");
 								if (Directory.Exists(tempPath)) {
 									Directory.Delete(tempPath, true);
 								}
 								Directory.CreateDirectory(tempPath);
-								foreach (var fi in new FileEnumerator(exePath).Enumerate()) {
-									if (fi.Path == "UPDATING") {
+								foreach (var fi in new FileEnumerator(citrusDirectory).Enumerate()) {
+									if (fi.Path == lockFileName) {
 										continue;
 									}
 									var dstPath = Path.Combine(tempPath, fi.Path);
 									Directory.CreateDirectory(Path.GetDirectoryName(dstPath));
-									File.Move(Path.Combine(exePath, fi.Path), dstPath);
+									File.Move(Path.Combine(citrusDirectory, fi.Path), dstPath);
 								}
-								zipArchive.ExtractToDirectory(exePath);
+								zipArchive.ExtractToDirectory(citrusDirectory);
 							}
 						}
 #if MAC
@@ -100,10 +98,32 @@ namespace Orange
 #endif // MAC
 						Console.WriteLine("Update finished! Please restart");
 					} finally {
-						File.Delete(updatingFlagPath);
+						File.Delete(LockPath);
 					}
 				}
 			});
+		}
+
+		private static bool IsUpdateLocked()
+		{
+			if (File.Exists(LockPath)) {
+				try {
+					int lockingPid = int.Parse(File.ReadAllText(LockPath));
+					var lockingProcess = System.Diagnostics.Process.GetProcessById(lockingPid);
+					if (lockingProcess != null && !lockingProcess.HasExited) {
+						return true;
+					}
+				} catch {
+					return false;
+				}
+			}
+			return false;
+		}
+
+		private static void LockUpdate()
+		{
+			int pid = System.Diagnostics.Process.GetCurrentProcess().Id;
+			File.WriteAllText(LockPath, pid.ToString());
 		}
 
 		public static async void ShowUpdaterWindow()
