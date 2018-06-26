@@ -81,17 +81,21 @@ namespace Tangerine.UI.Timeline.Components
 							if (flag) {
 								DrawFigure(a, b, cell.Func1, KeyframePalette.Colors[colorIndex]);
 								flag = false;
-								if(cell.Func1 == cell.Func2) {
-									a.Y += d;
-									b = a + new Vector2(TimelineMetrics.ColWidth - 1, d / 2);
-									DrawFigure(a, b, cell.Func2, KeyframePalette.Colors[colorIndex]);
-									break;
-								}
 							} else {
 								DrawFigure(a, b, cell.Func2, KeyframePalette.Colors[colorIndex]);
+								flag = true;
 								break;
 							}
 							a.Y += d;
+						}
+					}
+					if (flag == false) {
+						for (int colorIndex = 0; colorIndex < 32; colorIndex++) {
+							if (cell.Strips[colorIndex]) {
+								var b = a + new Vector2(TimelineMetrics.ColWidth - 1, d / 2);
+								DrawFigure(a, b, cell.Func2, KeyframePalette.Colors[colorIndex]);
+								break;
+							}
 						}
 					}
 				}
