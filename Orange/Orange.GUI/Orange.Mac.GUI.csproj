@@ -54,7 +54,7 @@
     <LinkMode>None</LinkMode>
     <PlatformTarget>x86</PlatformTarget>
     <HttpClientHandler></HttpClientHandler>
-    <XamMacArch>i386</XamMacArch>
+    <XamMacArch>x86_64</XamMacArch>
     <I18n>west</I18n>
     <MonoBundlingExtraArgs>--registrar:dynamic</MonoBundlingExtraArgs>
   </PropertyGroup>
