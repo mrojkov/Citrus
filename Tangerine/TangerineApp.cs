@@ -10,7 +10,7 @@ using Tangerine.UI.Docking;
 namespace Tangerine
 {
 	public class TangerineApp
-	{	
+	{
 		public static TangerineApp Instance { get; private set; }
 		public readonly Dictionary<string, Toolbar> Toolbars = new Dictionary<string, Toolbar>();
 		public readonly DockManager.State DockManagerInitialState;
@@ -226,13 +226,13 @@ namespace Tangerine
 
 			WidgetContext.Current.Root.AddChangeWatcher(() => ProjectUserPreferences.Instance.RecentDocuments.Count == 0 ?
 				null : ProjectUserPreferences.Instance.RecentDocuments[0], document => TangerineMenu.RebuildRecentDocumentsMenu());
-			
+
 			WidgetContext.Current.Root.AddChangeWatcher(() => AppUserPreferences.Instance.RecentProjects.Count == 0 ?
 				null : AppUserPreferences.Instance.RecentProjects[0], document => TangerineMenu.RebuildRecentProjectsMenu());
 
 			new UI.FilesystemView.FilesystemPane(filesystemPanel);
 			RegisterGlobalCommands();
-
+			Orange.Updater.CheckForUpdates();
 		}
 
 		void SetupMainWindowTitle(WindowWidget windowWidget)
@@ -539,7 +539,7 @@ namespace Tangerine
 			try {
 				Core.Operations.Paste.Perform();
 			} catch (InvalidOperationException e) {
-				Document.Current.History.RollbackTransaction();	
+				Document.Current.History.RollbackTransaction();
 				AlertDialog.Show(e.Message);
 			}
 		}
