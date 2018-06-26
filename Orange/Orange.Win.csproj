@@ -177,6 +177,9 @@
     <Compile Include="Source\Actions\CookMainBundle.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Toolchain.Win\zlib1.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="..\3rdParty\FbxSdk\FbxSdk.dll">
       <Link>FbxSdk.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
