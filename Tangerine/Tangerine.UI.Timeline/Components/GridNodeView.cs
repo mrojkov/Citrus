@@ -114,31 +114,33 @@ namespace Tangerine.UI.Timeline.Components
 			var segmentWidth = b.X - a.X;
 			var segmentHeight = b.Y - a.Y;
 			switch (func) {
-				case KeyFunction.Linear:
-					var quadrangle = new Quadrangle {
-						V1 = new Vector2(a.X + segmentWidth / 2, a.Y),
-						V2 = new Vector2(b.X, a.Y + segmentHeight / 2),
-						V3 = new Vector2(a.X + segmentWidth / 2, b.Y),
-						V4 = new Vector2(a.X, a.Y + segmentHeight / 2)
-					};
-					Renderer.DrawQuadrangle(quadrangle, color);
-					break;
-				case KeyFunction.Steep:
-					var rectSize = 0f;
-					var horizontalOffset = 0f;
-					var verticalOffset = 0f;
-					if (segmentWidth < segmentHeight) {
-						rectSize = segmentWidth / 2;
-					} else {
-						rectSize = segmentHeight / 2;
+				case KeyFunction.Linear: {
+						var horizontalOffset = segmentWidth / 4;
+						var verticalOffset = segmentHeight / 4;
+						var quadrangle = new Quadrangle {
+							V1 = new Vector2(a.X + segmentWidth / 2, a.Y + verticalOffset),
+							V2 = new Vector2(b.X - horizontalOffset, a.Y + segmentHeight / 2),
+							V3 = new Vector2(a.X + segmentWidth / 2, b.Y - verticalOffset),
+							V4 = new Vector2(a.X + horizontalOffset, a.Y + segmentHeight / 2)
+						};
+						Renderer.DrawQuadrangle(quadrangle, color);
+						break;
 					}
-
-					horizontalOffset = (segmentWidth - rectSize) / 2;
-					verticalOffset = (segmentHeight - rectSize) / 2;
-					var rectVertexA = new Vector2(a.X + horizontalOffset, a.Y + verticalOffset);
-					var rectVertexB = new Vector2(b.X - horizontalOffset, b.Y - verticalOffset);
-					Renderer.DrawRect(rectVertexA, rectVertexB, color);
-					break;
+				case KeyFunction.Steep: {
+						var rectSize = 0f;
+						if (segmentWidth < segmentHeight) {
+							rectSize = segmentWidth / 2;
+						}
+						else {
+							rectSize = segmentHeight / 2;
+						}
+						var horizontalOffset = (segmentWidth - rectSize) / 2;
+						var verticalOffset = (segmentHeight - rectSize) / 2;
+						var rectVertexA = new Vector2(a.X + horizontalOffset, a.Y + verticalOffset);
+						var rectVertexB = new Vector2(b.X - horizontalOffset, b.Y - verticalOffset);
+						Renderer.DrawRect(rectVertexA, rectVertexB, color);
+						break;
+					}
 				case KeyFunction.Spline:
 					var circleCenter = new Vector2(a.X + segmentWidth / 2, a.Y + segmentHeight / 2);
 					var circleRadius = 0f;
