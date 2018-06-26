@@ -22,93 +22,115 @@ namespace Tangerine.UI.Timeline.Components
 			OverviewWidget.Presenter = new DelegatePresenter<Widget>(Render);
 		}
 
-		static BitSet32[] keyStrips = new BitSet32[0];
+		struct Cell
+		{
+			public BitSet32 Strips;
+			public int StripCount;
+			public KeyFunction Func1;
+			public KeyFunction Func2;
+		}
+
+		static Cell[] cells = new Cell[0];
 
 		protected virtual void Render(Widget widget)
 		{
 			var maxCol = Timeline.Instance.ColumnCount;
 			widget.PrepareRendererState();
-			if (maxCol > keyStrips.Length) {
-				keyStrips = new BitSet32[maxCol];
+			if (maxCol > cells.Length) {
+				cells = new Cell[maxCol];
 			}
 			for (int i = 0; i < maxCol; i++) {
-				keyStrips[i] = BitSet32.Empty;
+				cells[i] = new Cell();
 			}
-			foreach (var animator in node.Animators) {
-				for (int i = 0; i < animator.ReadonlyKeys.Count; i++) {
-					var key = animator.ReadonlyKeys[i];
-					var colorIndex = PropertyAttributes<TangerineKeyframeColorAttribute>.Get(node.GetType(), animator.TargetProperty)?.ColorIndex ?? 0;
-					keyStrips[key.Frame][colorIndex] = true;
-
-					if (keyStrips[key.Frame] != BitSet32.Empty) {
-						// How many interpolations in the key?
-						var numberOf = 2;
-						var numberOfOnesInKeyStrips = 0;
-						for (int k = 0; k < keyStrips[key.Frame].Count; k++) {
-							if (keyStrips[key.Frame][k] == true) {
-								numberOfOnesInKeyStrips++;
-								if (numberOfOnesInKeyStrips == numberOf + 1) { break; }
+			foreach (var a in node.Animators) {
+				for (int j = 0; j < a.ReadonlyKeys.Count; j++) {
+					var key = a.ReadonlyKeys[j];
+					var colorIndex = PropertyAttributes<TangerineKeyframeColorAttribute>.Get(node.GetType(), a.TargetProperty)?.ColorIndex ?? 0;
+					var c = cells[key.Frame];
+					c.Strips[colorIndex] = true;
+					if (c.StripCount == 0) {
+						c.Func1 = key.Function;
+					}
+					else if (c.StripCount == 1) {
+						c.Func2 = key.Function;
+					}
+					c.StripCount++;
+					cells[key.Frame] = c;
+				}
+			}
+			for (int i = 0; i < maxCol; i++) {
+				var cell = cells[i];
+				if (cell.StripCount == 0) {
+					continue;
+				}
+				var a = new Vector2(i * TimelineMetrics.ColWidth + 1, 0);
+				var d = widget.Height / cell.StripCount;
+				if (cell.StripCount == 1) {
+					var b = a + new Vector2(TimelineMetrics.ColWidth - 1, d);
+					int colorIndex;
+					for (colorIndex = 0; colorIndex < 32; colorIndex++) {
+						if (cell.Strips[colorIndex]) break;
+					}
+					DrawFigure(a, b, cell.Func1, KeyframePalette.Colors[colorIndex]);
+				}
+				else if (cell.StripCount == 2) {
+					bool flag = true;
+					for (int colorIndex = 0; colorIndex < 32; colorIndex++) {
+						if (cell.Strips[colorIndex]) {
+							var b = a + new Vector2(TimelineMetrics.ColWidth - 1, d / 2);
+							if (flag) {
+								DrawFigure(a, b, cell.Func1, KeyframePalette.Colors[colorIndex]);
+								flag = false;
+							} else {
+								DrawFigure(a, b, cell.Func2, KeyframePalette.Colors[colorIndex]);
+								break;
 							}
-						}
-						if (numberOfOnesInKeyStrips <= numberOf) {
-							// Draw figures
-							var s = keyStrips[key.Frame];
-							var a = new Vector2(key.Frame * TimelineMetrics.ColWidth + 1, 0);
-							var d = widget.Height;
-							for (int j = 0; j < 32; j++) {
-								if (s[j]) {
-									var b = a + new Vector2(TimelineMetrics.ColWidth - 1, d);
-									switch (key.Function) {
-										case KeyFunction.Linear:
-											var quadrangle = new Quadrangle {
-												V1 = new Vector2(a.X + (b.X - a.X) / 2, a.Y),
-												V2 = new Vector2(b.X, a.Y + (b.Y - a.Y) / 2),
-												V3 = new Vector2(a.X + (b.X - a.X) / 2, b.Y),
-												V4 = new Vector2(a.X, a.Y + (b.Y - a.Y) / 2)
-											};
-											Renderer.DrawQuadrangle(quadrangle, KeyframePalette.Colors[j]);
-											break;
-										case KeyFunction.Steep:
-											var rectSize = (b.X - a.X) / 2;
-											var horizontalOffset = rectSize / 2;
-											var verticalOffset = (b.Y - a.Y - rectSize) / 2;
-											var rectVertexA = new Vector2(a.X + horizontalOffset, a.Y + verticalOffset);
-											var rectVertexB = new Vector2(b.X - horizontalOffset, b.Y - verticalOffset);
-											Renderer.DrawRect(rectVertexA, rectVertexB, KeyframePalette.Colors[j]);
-											break;
-										case KeyFunction.Spline:
-											var circleCenter = new Vector2(a.X + (b.X - a.X) / 2, a.Y + (b.Y - a.Y) / 2);
-											var circleRadius = (b.X - a.X) / 2;
-											Renderer.DrawRound(circleCenter, circleRadius, 32, KeyframePalette.Colors[j]);
-											break;
-										case KeyFunction.ClosedSpline:
-											var roundCenter = new Vector2(a.X + (b.X - a.X) / 2, a.Y + (b.Y - a.Y) / 2);
-											var roundRadius = (b.X - a.X) / 2;
-											Renderer.DrawRound(roundCenter, roundRadius, 32, Color4.Transparent, KeyframePalette.Colors[j]);
-											break;
-									}
-								}
-							}
-						}
-						else {
-							// Draw strips
-							var s = keyStrips[i];
-							int c = 0;
-							for (int j = 0; j < 32; j++) {
-								c += s[j] ? 1 : 0;
-							}
-							var a = new Vector2(i * TimelineMetrics.ColWidth + 1, 0);
-							var d = widget.Height / c;
-							for (int j = 0; j < 32; j++) {
-								if (s[j]) {
-									var b = a + new Vector2(TimelineMetrics.ColWidth - 1, d);
-									Renderer.DrawRect(a, b, KeyframePalette.Colors[j]);
-									a.Y += d;
-								}
-							}
+							a.Y += d;
 						}
 					}
 				}
+				else {
+					for (int colorIndex = 0; colorIndex < 32; colorIndex++) {
+						if (cell.Strips[colorIndex]) {
+							var b = a + new Vector2(TimelineMetrics.ColWidth - 1, d);
+							Renderer.DrawRect(a, b, KeyframePalette.Colors[colorIndex]);
+							a.Y += d;
+						}
+					}
+				}
+			}
+		}
+
+		protected void DrawFigure(Vector2 a, Vector2 b, KeyFunction func, Color4 color)
+		{
+			switch (func) {
+				case KeyFunction.Linear:
+					var quadrangle = new Quadrangle {
+						V1 = new Vector2(a.X + (b.X - a.X) / 2, a.Y),
+						V2 = new Vector2(b.X, a.Y + (b.Y - a.Y) / 2),
+						V3 = new Vector2(a.X + (b.X - a.X) / 2, b.Y),
+						V4 = new Vector2(a.X, a.Y + (b.Y - a.Y) / 2)
+					};
+					Renderer.DrawQuadrangle(quadrangle, color);
+					break;
+				case KeyFunction.Steep:
+					var rectSize = (b.X - a.X) / 2;
+					var horizontalOffset = rectSize / 2;
+					var verticalOffset = (b.Y - a.Y - rectSize) / 2;
+					var rectVertexA = new Vector2(a.X + horizontalOffset, a.Y + verticalOffset);
+					var rectVertexB = new Vector2(b.X - horizontalOffset, b.Y - verticalOffset);
+					Renderer.DrawRect(rectVertexA, rectVertexB, color);
+					break;
+				case KeyFunction.Spline:
+					var circleCenter = new Vector2(a.X + (b.X - a.X) / 2, a.Y + (b.Y - a.Y) / 2);
+					var circleRadius = (b.X - a.X) / 3;
+					Renderer.DrawRound(circleCenter, circleRadius, 16, color);
+					break;
+				case KeyFunction.ClosedSpline:
+					var roundCenter = new Vector2(a.X + (b.X - a.X) / 2, a.Y + (b.Y - a.Y) / 2);
+					var roundRadius = (b.X - a.X) / 3;
+					Renderer.DrawRound(roundCenter, roundRadius, 16, Color4.Transparent, color);
+					break;
 			}
 		}
 	}
