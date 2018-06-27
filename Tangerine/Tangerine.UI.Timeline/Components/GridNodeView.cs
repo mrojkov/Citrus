@@ -73,33 +73,54 @@ namespace Tangerine.UI.Timeline.Components
 					}
 					DrawFigure(a, b, cell.Func1, KeyframePalette.Colors[colorIndex]);
 				} else if (cell.StripCount == 2) {
-					var flag = true;
-					for (int colorIndex = 0; colorIndex < 32; colorIndex++) {
+					var numberOfDrawnStrips = 0;
+					int colorIndex = 0;
+					for (colorIndex = 0; colorIndex < 32; colorIndex++) {
 						if (cell.Strips[colorIndex]) {
 							var b = a + new Vector2(TimelineMetrics.ColWidth - 1, d);
-							if (flag) {
-								DrawFigure(a, b, cell.Func1, KeyframePalette.Colors[colorIndex]);
-								flag = false;
-							} else {
-								DrawFigure(a, b, cell.Func2, KeyframePalette.Colors[colorIndex]);
-								flag = true;
-								break;
-							}
+							DrawFigure(a, b, cell.Func1, KeyframePalette.Colors[colorIndex]);
+							numberOfDrawnStrips++;
 							a.Y += d;
+							break;
 						}
 					}
-					if (!flag) {
-						for (int colorIndex = 0; colorIndex < 32; colorIndex++) {
+					for (colorIndex = colorIndex + 1; colorIndex < 32; colorIndex++) {
+						if (cell.Strips[colorIndex]) {
+							var b = a + new Vector2(TimelineMetrics.ColWidth - 1, d);
+							DrawFigure(a, b, cell.Func2, KeyframePalette.Colors[colorIndex]);
+							numberOfDrawnStrips++;
+							a.Y += d;
+							break;
+						}
+					}
+					if(numberOfDrawnStrips < cell.StripCount) {
+						for (colorIndex = 0; colorIndex < 32; colorIndex++) {
 							if (cell.Strips[colorIndex]) {
 								var b = a + new Vector2(TimelineMetrics.ColWidth - 1, d);
 								DrawFigure(a, b, cell.Func2, KeyframePalette.Colors[colorIndex]);
+								numberOfDrawnStrips++;
+								a.Y += d;
 								break;
 							}
 						}
 					}
 				} else {
+					var numberOfDrawnStrips = 0;
 					for (int colorIndex = 0; colorIndex < 32; colorIndex++) {
 						if (cell.Strips[colorIndex]) {
+							var b = a + new Vector2(TimelineMetrics.ColWidth - 1, d);
+							Renderer.DrawRect(a, b, KeyframePalette.Colors[colorIndex]);
+							a.Y += d;
+							numberOfDrawnStrips++;
+							if (numberOfDrawnStrips == cell.StripCount) break;
+						}
+					}
+					if(numberOfDrawnStrips < cell.StripCount) {
+						int colorIndex;
+						for (colorIndex = 0; colorIndex < 32; colorIndex++) {
+							if (cell.Strips[colorIndex]) break;
+						}
+						for (numberOfDrawnStrips = numberOfDrawnStrips; numberOfDrawnStrips != cell.StripCount; numberOfDrawnStrips++) {
 							var b = a + new Vector2(TimelineMetrics.ColWidth - 1, d);
 							Renderer.DrawRect(a, b, KeyframePalette.Colors[colorIndex]);
 							a.Y += d;
@@ -164,60 +185,5 @@ namespace Tangerine.UI.Timeline.Components
 					break;
 			}
 		}
-
-		//protected void DrawFigure(Vector2 a, Vector2 b, KeyFunction func, Color4 color)
-		//{
-		//	var segmentWidth = b.X - a.X;
-		//	var segmentHeight = b.Y - a.Y;
-		//	switch (func) {
-		//		case KeyFunction.Linear: {
-		//				var horizontalOffset = segmentWidth / 4;
-		//				var verticalOffset = segmentHeight / 4;
-		//				var quadrangle = new Quadrangle {
-		//					V1 = new Vector2(a.X + segmentWidth / 2, a.Y + verticalOffset),
-		//					V2 = new Vector2(b.X - horizontalOffset, a.Y + segmentHeight / 2),
-		//					V3 = new Vector2(a.X + segmentWidth / 2, b.Y - verticalOffset),
-		//					V4 = new Vector2(a.X + horizontalOffset, a.Y + segmentHeight / 2)
-		//				};
-		//				Renderer.DrawQuadrangle(quadrangle, color);
-		//				break;
-		//			}
-		//		case KeyFunction.Steep: {
-		//				var rectSize = 0f;
-		//				if (segmentWidth < segmentHeight) {
-		//					rectSize = segmentWidth / 2;
-		//				}
-		//				else {
-		//					rectSize = segmentHeight / 2;
-		//				}
-		//				var horizontalOffset = (segmentWidth - rectSize) / 2;
-		//				var verticalOffset = (segmentHeight - rectSize) / 2;
-		//				var rectVertexA = new Vector2(a.X + horizontalOffset, a.Y + verticalOffset);
-		//				var rectVertexB = new Vector2(b.X - horizontalOffset, b.Y - verticalOffset);
-		//				Renderer.DrawRect(rectVertexA, rectVertexB, color);
-		//				break;
-		//			}
-		//		case KeyFunction.Spline:
-		//			var circleCenter = new Vector2(a.X + segmentWidth / 2, a.Y + segmentHeight / 2);
-		//			var circleRadius = 0f;
-		//			if (segmentWidth < segmentHeight) {
-		//				circleRadius = circleCenter.X - a.X;
-		//			} else {
-		//				circleRadius = circleCenter.Y - a.Y;
-		//			}
-		//			Renderer.DrawRound(circleCenter, circleRadius, 16, color);
-		//			break;
-		//		case KeyFunction.ClosedSpline:
-		//			var roundCenter = new Vector2(a.X + segmentWidth / 2, a.Y + segmentHeight / 2);
-		//			var roundRadius = 0f;
-		//			if (segmentWidth < segmentHeight) {
-		//				roundRadius = roundCenter.X - a.X;
-		//			} else {
-		//				roundRadius = roundCenter.Y - a.Y;
-		//			}
-		//			Renderer.DrawRound(roundCenter, roundRadius, 16, Color4.Transparent, color);
-		//			break;
-		//	}
-		//}
 	}
 }
