@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Globalization;
 
 namespace Lime
 {
@@ -132,25 +130,27 @@ namespace Lime
 			return Mathf.Lerp(amount, value1, value2);
 		}
 
-		/// <summary>
-		/// Применяет функцию локализации к указаному числу, возвращает результат в виде строки.
-		/// На разных языках числа записываются в разном формате (особенно касается знака, отделяющего целую и дробную часть)
-		/// </summary>
+		private static readonly NumberFormatInfo brFormat = new NumberFormatInfo { NumberGroupSeparator = "." };
+		private static readonly NumberFormatInfo defaultFormat = new NumberFormatInfo { NumberGroupSeparator = " " };
+
 		public static string Localize(this int value)
 		{
-			string result = value.ToString("N0");
-			if (
-				string.IsNullOrEmpty(AssetBundle.CurrentLanguage)
-				|| AssetBundle.CurrentLanguage == "EN"
-				|| AssetBundle.CurrentLanguage == "JP"
-				|| AssetBundle.CurrentLanguage == "KR"
-				|| AssetBundle.CurrentLanguage == "CN"
-			) {
-				return result;
-			} else if (AssetBundle.CurrentLanguage == "BR") {
-				return result.Replace(',', '.'); // заменяем запятые на точки
-			} else {
-				return result.Replace(',', (char)160); // заменяем запятые на неразрывные пробелы
+			if (value > -1000 && value < 1000) {
+				return value.ToString();
+			}
+
+			switch (AssetBundle.CurrentLanguage) {
+				case null:
+				case "":
+				case "EN":
+				case "JP":
+				case "KR":
+				case "CN":
+					return value.ToString("N0");
+				case "BR":
+					return value.ToString("N0", brFormat);
+				default:
+					return value.ToString("N0", defaultFormat);
 			}
 		}
 	}
