@@ -703,7 +703,8 @@ namespace Tangerine.UI
 
 		public override void DropFiles(IEnumerable<string> files)
 		{
-			if (editor.IsMouseOverThisOrDescendant() && files.Any()) {
+			var nodeUnderMouse = WidgetContext.Current.NodeUnderMouse;
+			if (nodeUnderMouse != null && nodeUnderMouse.SameOrDescendantOf(editor) && files.Any()) {
 				SetFilePath(files.First());
 			}
 		}
@@ -852,7 +853,7 @@ namespace Tangerine.UI
 						Where(el => availableTriggers.Contains(el)).
 						Distinct(new TriggerStringComparer())
 				);
-				
+
 				SetProperty(setTrigger.Length == 0 ? null : setTrigger);
 				if (setTrigger != newTrigger) {
 					comboBox.Text = setTrigger;
@@ -917,7 +918,7 @@ namespace Tangerine.UI
 				return animation == null ? 0 : animation.GetHashCode();
 			}
 		}
-	
+
 	}
 
 	public class AnchorsPropertyEditor : CommonPropertyEditor<Anchors>
