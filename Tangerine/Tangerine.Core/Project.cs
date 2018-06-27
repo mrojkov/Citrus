@@ -62,7 +62,7 @@ namespace Tangerine.Core
 				throw new InvalidOperationException();
 			}
 			Current = this;
-			AssetBundle.Current = new UnpackedAssetBundle(AssetsDirectory);
+			AssetBundle.Current = new TangerineAssetBundle(AssetsDirectory);
 			Preferences = new ProjectPreferences();
 			Preferences.Initialize();
 			if (File.Exists(UserprefsPath)) {
@@ -331,7 +331,7 @@ namespace Tangerine.Core
 			} catch (System.Exception e) {
 				Console.WriteLine(e);
 			}
-			AssetBundle.Current = new UnpackedAssetBundle(AssetsDirectory);
+			AssetBundle.Current = new TangerineAssetBundle(AssetsDirectory);
 
 			foreach (var document in Documents) {
 				document.RefreshExternalScenes();

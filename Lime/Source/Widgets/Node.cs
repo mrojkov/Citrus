@@ -1166,7 +1166,7 @@ namespace Lime
 			Components = content.Components.Clone(this);
 		}
 
-		private static readonly string[] sceneExtensions = { ".scene", ".model", ".tan" };
+		private static readonly string[] sceneExtensions = { ".scene", ".t3d", ".tan" };
 
 		/// <summary>
 		/// Returns path to scene if it exists in bundle. Returns null otherwise.

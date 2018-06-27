@@ -69,7 +69,7 @@ namespace Orange
 				return ".png";
 			case ".sound":
 				return ".ogg";
-			case ".model":
+			case ".t3d":
 				return ".fbx";
 			default:
 				return ext;
@@ -916,7 +916,7 @@ namespace Orange
 				var scaledBitmap = bitmap.Rescale(newWidth, newHeight);
 				bitmap.Dispose();
 				bitmap = scaledBitmap;
-				
+
 			}
 		}
 
@@ -1079,12 +1079,9 @@ namespace Orange
 
 		private static void SyncModels()
 		{
-			var sourceAssetBundle = new UnpackedAssetBundle(The.Workspace.AssetsDirectory);
-			SyncUpdated(".fbx", ".model", (srcPath, dstPath) => {
+			SyncUpdated(".fbx", ".t3d", (srcPath, dstPath) => {
 				var compression = cookingRulesMap[srcPath].ModelCompression;
 				var model = new FbxModelImporter(srcPath, The.Workspace.ActiveTarget, cookingRulesMap).Model;
-				// Create .model file for tangerine.
-				Serialization.WriteObjectToBundle(sourceAssetBundle, dstPath, model, Serialization.Format.Binary, ".model", AssetAttributes.None, cookingRulesMap[srcPath].SHA1);
 				AssetAttributes assetAttributes;
 				switch (compression) {
 					case ModelCompression.None:
@@ -1099,7 +1096,7 @@ namespace Orange
 					default:
 						throw new ArgumentOutOfRangeException($"Unknown compression: {compression}");
 				}
-				AssetBundle.ImportFile(dstPath, dstPath, 0, ".model", assetAttributes, cookingRulesMap[srcPath].SHA1);
+				Serialization.WriteObjectToBundle(AssetBundle, dstPath, model, Serialization.Format.Binary, ".t3d", assetAttributes, cookingRulesMap[srcPath].SHA1);
 				return true;
 			});
 		}

@@ -18,7 +18,8 @@ namespace Tangerine.Core
 	{
 		Scene,
 		Tan,
-		Model
+		T3D,
+		Fbx
 	}
 
 	public sealed partial class Document
@@ -30,7 +31,7 @@ namespace Tangerine.Core
 			DiscardChanges
 		}
 
-		public static readonly string[] AllowedFileTypes = { "scene", "tan", "model" };
+		public static readonly string[] AllowedFileTypes = { "scene", "tan", "t3d", "fbx" };
 
 		private static readonly TangerineFlags[] ignoredTangerineFlags;
 
@@ -141,6 +142,9 @@ namespace Tangerine.Core
 				Path = path;
 				Format = ResolveFormat(path);
 				RootNodeUnwrapped = Node.CreateFromAssetBundle(path);
+				if (Format == DocumentFormat.Fbx) {
+					Path = defaultPath;
+				}
 				RootNode = RootNodeUnwrapped;
 				SetModificationTimeToNow();
 				if (RootNode is Node3D) {
@@ -189,21 +193,29 @@ namespace Tangerine.Core
 		{
 			if (AssetExists(path, "scene")) {
 				return DocumentFormat.Scene;
-			} else if (AssetExists(path, "tan")) {
-				return DocumentFormat.Tan;
-			} else if (AssetExists(path, "model")) {
-				return DocumentFormat.Model;
-			} else {
-				throw new FileNotFoundException(path);
 			}
+			if (AssetExists(path, "tan")) {
+				return DocumentFormat.Tan;
+			}
+			if (AssetExists(path, "fbx")) {
+				return DocumentFormat.Fbx;
+			}
+			if (AssetExists(path, "t3d")) {
+				return DocumentFormat.T3D;
+			}
+			throw new FileNotFoundException(path);
 		}
 
 		public static string GetFileExtension(DocumentFormat format)
 		{
 			switch (format) {
-				case DocumentFormat.Model: return "model";
-				case DocumentFormat.Scene: return "scene";
-				case DocumentFormat.Tan: return "tan";
+				case DocumentFormat.Scene:
+					return "scene";
+				case DocumentFormat.Tan:
+					return "tan";
+				case DocumentFormat.T3D:
+				case DocumentFormat.Fbx:
+					return "t3d";
 				default: throw new InvalidOperationException();
 			}
 		}
@@ -257,8 +269,7 @@ namespace Tangerine.Core
 			if (!string.IsNullOrEmpty(node.ContentsPath)) {
 				var doc = Project.Current.Documents.FirstOrDefault(i => i.Path == node.ContentsPath);
 				if (doc != null && doc.IsModified) {
-					var docRootNode = doc.RootNode is Viewport3D ? doc.RootNode.Nodes[0] : doc.RootNode;
-					node.ReplaceContent(docRootNode.Clone());
+					node.ReplaceContent(doc.RootNodeUnwrapped.Clone());
 				} else {
 					node.LoadExternalScenes();
 				}
