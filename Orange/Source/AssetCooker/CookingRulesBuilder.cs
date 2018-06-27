@@ -442,7 +442,7 @@ namespace Orange
 						if (rules.CommonRules.LastChangeTime > fileInfo.LastWriteTime) {
 							try {
 								File.SetLastWriteTime(path, rules.CommonRules.LastChangeTime);
-							} catch (UnauthorizedAccessException e) {
+							} catch (UnauthorizedAccessException) {
 								// In case this is a folder
 							}
 							shouldRescanEnumerator = true;
