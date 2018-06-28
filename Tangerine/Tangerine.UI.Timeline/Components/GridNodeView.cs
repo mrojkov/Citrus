@@ -179,16 +179,10 @@ namespace Tangerine.UI.Timeline.Components
 				case KeyFunction.Spline: {
 						var numSegments = 10;
 						var center = a;
-						var radius = 0f;
-						if (segmentWidth < segmentHeight) {
-							radius = segmentWidth;
-						}
-						else {
-							radius = segmentHeight;
-						}
 						vertices[0] = new Vertex { Pos = center, Color = color };
 						for (int i = 0; i < numSegments; i++) {
-							vertices[i + 1].Pos = Vector2.CosSin(i * Mathf.HalfPi / (numSegments - 1)) * radius + center;
+							vertices[i + 1].Pos.X = (float)Math.Cos(i * Mathf.HalfPi / (numSegments - 1)) * segmentWidth + center.X;
+							vertices[i + 1].Pos.Y = (float)Math.Sin(i * Mathf.HalfPi / (numSegments - 1)) * segmentHeight + center.Y;
 							vertices[i + 1].Color = color;
 						}
 						Renderer.DrawTriangleFan(vertices, numSegments + 1);
