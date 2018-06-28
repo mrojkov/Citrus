@@ -104,40 +104,20 @@ namespace Lime
 			return new Vector2(wp.X.Round() + (float)window.Frame.X, wp.Y.Round() + (float)window.Frame.X);
 		}
 
-		private Vector2 lastDesktopMousePosition = new Vector2(-1, -1);
-		private Vector2 calculatedMousePosition = new Vector2(-1, -1);
-
-		public Vector2 MousePosition
+		public Vector2 DesktopToLocal(Vector2 desktopPosition)
 		{
-			get {
-				if (lastDesktopMousePosition != Input.DesktopMousePosition) {
-					lastDesktopMousePosition = Input.DesktopMousePosition;
-					calculatedMousePosition = new Vector2 (
-						lastDesktopMousePosition.X - DecoratedPosition.X,
-						(float)NSGameView.Frame.Height - (lastDesktopMousePosition.Y - DecoratedPosition.Y)
-					) * MousePositionTransform;
-				}
-				return calculatedMousePosition;
-			}
+			return new Vector2(
+				desktopPosition.X - DecoratedPosition.X,
+				(float)NSGameView.Frame.Height - (desktopPosition.Y - DecoratedPosition.Y)
+			);
 		}
 
 		public Vector2 LocalToDesktop(Vector2 localPosition)
 		{
-			localPosition = localPosition * MousePositionTransform.CalcInversed();
 			return new Vector2(
 				localPosition.X + DecoratedPosition.X,
 				(float)NSGameView.Frame.Height - localPosition.Y + DecoratedPosition.Y
 			);
-		}
-
-		private Matrix32 mousePositionTransform = Matrix32.Identity;
-		public Matrix32 MousePositionTransform
-		{
-			get { return mousePositionTransform; }
-			set {
-				mousePositionTransform = value;
-				lastDesktopMousePosition = new Vector2(-1, -1);
-			}
 		}
 
 		public bool Active
@@ -243,7 +223,7 @@ namespace Lime
 		[Obsolete("Use FPS property instead", true)]
 		public float CalcFPS() { return fpsCounter.FPS; }
 
-		public Input Input => Application.Input;
+		public WindowInput Input { get; private set; }
 
 		public Window(WindowOptions options)
 		{
@@ -253,6 +233,7 @@ namespace Lime
 				Application.MainWindow = this;
 			}
 			Application.Windows.Add(this);
+			Input = new WindowInput (this);
 			ClientSize = options.ClientSize;
 			Title = options.Title;
 			if (options.Visible) {
@@ -283,7 +264,7 @@ namespace Lime
 		private void CreateNativeWindow(WindowOptions options)
 		{
 			var rect = new CGRect(0, 0, options.ClientSize.X, options.ClientSize.Y);
-			View = new NSGameView(Input, rect, Platform.GraphicsMode.Default);
+			View = new NSGameView(Application.Input, rect, Platform.GraphicsMode.Default);
 			NSWindowStyle style;
 			if (options.Style == WindowStyle.Borderless) {
 				style = NSWindowStyle.Borderless;
@@ -438,11 +419,6 @@ namespace Lime
 			window.PerformClose(window);
 		}
 
-		public Vector2 GetTouchPosition(int index)
-		{
-			return Input.GetDesktopTouchPosition(index);
-		}
-
 		public void ShowModal()
 		{
 			if (Visible) {
@@ -501,8 +477,8 @@ namespace Lime
 
 		private void RefreshMousePosition()
 		{
-			Input.DesktopMousePosition = new Vector2((float) NSEvent.CurrentMouseLocation.X, (float) NSEvent.CurrentMouseLocation.Y);
-			Input.SetDesktopTouchPosition(0, Input.DesktopMousePosition);
+			Application.Input.DesktopMousePosition = new Vector2((float) NSEvent.CurrentMouseLocation.X, (float) NSEvent.CurrentMouseLocation.Y);
+			Application.Input.SetDesktopTouchPosition(0, Application.Input.DesktopMousePosition);
 		}
 
 		private void RaiseFilesDropped(IEnumerable<string> files)
