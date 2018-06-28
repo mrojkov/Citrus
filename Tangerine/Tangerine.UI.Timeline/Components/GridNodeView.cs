@@ -50,8 +50,7 @@ namespace Tangerine.UI.Timeline.Components
 					var cell = cells[key.Frame];
 					if (cell.StripCount == 0) {
 						cell.Func1 = key.Function;
-					}
-					else if (cell.StripCount == 1) {
+					} else if (cell.StripCount == 1) {
 						var lastColorIndex = 0;
 						for(int i=0; i< cell.Strips.Count; i++) {
 							if (cell.Strips[i]) {
@@ -61,8 +60,7 @@ namespace Tangerine.UI.Timeline.Components
 						}
 						if(lastColorIndex < colorIndex) {
 							cell.Func2 = key.Function;
-						}
-						else {
+						} else {
 							var a = cell.Func1;
 							cell.Func1 = key.Function;
 							cell.Func2 = a;
@@ -180,7 +178,7 @@ namespace Tangerine.UI.Timeline.Components
 					}
 				case KeyFunction.Spline: {
 						var numSegments = 10;
-						var center = b;
+						var center = a;
 						var radius = 0f;
 						if (segmentWidth < segmentHeight) {
 							radius = segmentWidth;
@@ -190,7 +188,7 @@ namespace Tangerine.UI.Timeline.Components
 						}
 						vertices[0] = new Vertex { Pos = center, Color = color };
 						for (int i = 0; i < numSegments; i++) {
-							vertices[i + 1].Pos = Vector2.CosSin(i * Mathf.HalfPi / (numSegments - 1)) * (-1) * radius + center;
+							vertices[i + 1].Pos = Vector2.CosSin(i * Mathf.HalfPi / (numSegments - 1)) * radius + center;
 							vertices[i + 1].Color = color;
 						}
 						Renderer.DrawTriangleFan(vertices, numSegments + 1);
