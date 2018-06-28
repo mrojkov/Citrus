@@ -223,13 +223,14 @@ namespace Tangerine
 			new UI.FilesystemView.FilesystemPane(filesystemPanel);
 			RegisterGlobalCommands();
 			
-			HotkeyEditor.InitCommands(typeof(TimelineCommands));
-			HotkeyEditor.InitCommands(typeof(InspectorCommands));
-			HotkeyEditor.InitCommands(typeof(GenericCommands));
-			HotkeyEditor.InitCommands(typeof(SceneViewCommands));
-			HotkeyEditor.InitCommands(typeof(Tools));
-			HotkeyEditor.InitCommands(typeof(FilesystemCommands));
-			HotkeyEditor.InitCommands(typeof(OrangeCommands));
+			HotkeyEditor.InitCommands(typeof(GenericCommands), "Generic Commands");
+			HotkeyEditor.InitCommands(typeof(TimelineCommands), "Timeline Commands");
+			HotkeyEditor.InitCommands(typeof(InspectorCommands), "Inspector Commands");
+			HotkeyEditor.InitCommands(typeof(SceneViewCommands), "Scene View Commands");
+			HotkeyEditor.InitCommands(typeof(Tools), "Tools");
+			HotkeyEditor.InitCommands(typeof(FilesystemCommands), "Filesystem Commands");
+			HotkeyEditor.InitCommands(typeof(OrangeCommands), "Orange Commands");
+			HotkeyEditor.ResetToDefaults();
 			if (File.Exists(HotkeyEditor.Filepath))
 				HotkeyEditor.Load();
 			else

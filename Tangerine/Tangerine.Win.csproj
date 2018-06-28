@@ -53,6 +53,7 @@
     <Compile Include="Dialogs\ManageRulersDialog.cs" />
     <Compile Include="Dialogs\OrangePluginOptionsDialog.cs" />
     <Compile Include="Dialogs\PreferencesDialog.cs" />
+    <Compile Include="Dialogs\ScreenKeyboard.cs" />
     <Compile Include="MainMenu\CreateMenu.cs" />
     <Compile Include="MainMenu\EditMenu.cs" />
     <Compile Include="MainMenu\FileMenu.cs" />

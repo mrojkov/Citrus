@@ -1131,6 +1131,8 @@ namespace Tangerine.UI
 		private Modifiers modifiers;
 		private Key main;
 
+		public Action PropertyChanged { get; set; }
+
 		public ShortcutPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
 			editor = editorParams.EditBoxFactory();
@@ -1139,6 +1141,7 @@ namespace Tangerine.UI
 			editor.AddChangeWatcher(CoalescedPropertyValue(), v => {
 				var text = v.ToString();
 				editor.Text = v.Main != Key.Unknown ? text : text.Replace("Unknown", "");
+				PropertyChanged?.Invoke();
 			});
 			editor.IsReadOnly = true;
 			editor.TextWidget.Tasks.Clear();
@@ -1171,8 +1174,8 @@ namespace Tangerine.UI
 			if (input.WasKeyPressed(Key.Control)) {
 				modifiers = modifiers.HasFlag(Modifiers.Control) ? modifiers & ~Modifiers.Control : modifiers | Modifiers.Control;
 			}
-			var keys = input.GetPressedKeys();
-			if (keys.Count == 0)
+			var keys = Key.Enumerate().Where(k => input.WasKeyPressed(k));
+			if (!keys.Any())
 				return;
 			foreach (var key in keys) {
 				if (!key.IsModifier() && !key.IsMouseKey()) {

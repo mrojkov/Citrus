@@ -45,11 +45,11 @@ namespace Lime
 			void SetState(string state);
 		}
 
-		class ButtonPresenter : CustomPresenter, IButtonPresenter
+		public class ButtonPresenter : CustomPresenter, IButtonPresenter
 		{
 			private ColorGradient innerGradient;
 
-			public void SetState(string state)
+			public virtual void SetState(string state)
 			{
 				CommonWindow.Current.Invalidate();
 				switch (state) {

@@ -104,17 +104,6 @@ namespace Lime
 			return keys[key.Code].CurrentState && !keys[key.Code].PreviousState;
 		}
 
-		public List<Key> GetPressedKeys()
-		{
-			var list = new List<Key>();
-			for (int i = 0; i < keys.Length; ++i) {
-				Key key = new Key(i);
-				if (WasKeyPressed(key))
-					list.Add(key);
-			}
-			return list;
-		}
-
 		public void ConsumeKey(Key key)
 		{
 			keys[key].PreviousState = keys[key].CurrentState;

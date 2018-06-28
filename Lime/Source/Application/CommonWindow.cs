@@ -26,8 +26,6 @@ namespace Lime
 		/// </summary>
 		public virtual bool VSync { get; set; }
 
-		public bool CommandsEnabled { get; set; } = true;
-
 		public event Action<System.Exception> UnhandledExceptionOnUpdate;
 
 		private static readonly object PendingActionsOnRenderingLock = new object();
@@ -105,8 +103,7 @@ namespace Lime
 				CommandQueue.Instance.IssueCommands();
 				try {
 					Updating?.Invoke(delta);
-					if (CommandsEnabled)
-						CommandHandlerList.Global.ProcessCommands();
+					CommandHandlerList.Global.ProcessCommands();
 				} finally {
 					Application.MainMenu?.Refresh();
 				}
