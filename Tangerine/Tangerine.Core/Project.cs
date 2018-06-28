@@ -2,8 +2,6 @@ using System;
 using System.Linq;
 using System.IO;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using Yuzu;
 using Lime;
 
 namespace Tangerine.Core
@@ -16,7 +14,6 @@ namespace Tangerine.Core
 		private readonly object aggregateModifiedAssetsTaskTag = new object();
 		private readonly HashSet<string> modifiedAssets = new HashSet<string>();
 
-		private volatile bool isCookingModifiedAssets;
 		private Lime.FileSystemWatcher fsWatcher;
 
 		public static readonly Project Null = new Project();
@@ -30,13 +27,8 @@ namespace Tangerine.Core
 		public static DocumentReloadConfirmationDelegate DocumentReloadConfirmation;
 		public delegate bool TempFileLoadConfirmationDelegate(string path);
 		public static TempFileLoadConfirmationDelegate TempFileLoadConfirmation;
-		public delegate void CookingOfModifiedAssetsStartedDelegate();
-		public static CookingOfModifiedAssetsStartedDelegate CookingOfModifiedAssetsStarted;
-		public delegate void CookingOfModifiedAssetsEndedDelegate();
-		public static CookingOfModifiedAssetsEndedDelegate CookingOfModifiedAssetsEnded;
 		public delegate void OpenFileOutsideProjectAttemptDelegate(string filePath);
 		public static OpenFileOutsideProjectAttemptDelegate OpenFileOutsideProjectAttempt;
-		public static volatile string CookingOfModifiedAssetsStatus;
 		public static TaskList Tasks { get; set; }
 		public Dictionary<string, Widget> Overlays { get; } = new Dictionary<string, Widget>();
 		public ProjectPreferences Preferences { get; private set; } = new ProjectPreferences();
@@ -241,21 +233,23 @@ namespace Tangerine.Core
 
 		public void HandleFileSystemWatcherEvent(string path)
 		{
+			string modifiedAsset = null;
 			if (path.EndsWith(".png")) {
 				TexturePool.Instance.DiscardAllTextures();
 			} else if (path == "#CookingRules.txt" || (path.EndsWith(".png.txt") && File.Exists(Path.ChangeExtension(path, null)))) {
 				UpdateTextureParams();
 				TexturePool.Instance.DiscardAllTextures();
-			} else if (path.EndsWith(".fbx")) {
-				RegisterModifiedAsset(path);
+			} else if (Document.AllowedFileTypes.Any(ext => path.EndsWith($".{ext}"))) {
+				modifiedAsset = path;
 			} else if (path.EndsWith(Model3DAttachment.FileExtension)) {
 				var modelFileName = path.Remove(path.LastIndexOf(Model3DAttachment.FileExtension, StringComparison.InvariantCulture)) + ".fbx";
 				if (File.Exists(modelFileName)) {
-					RegisterModifiedAsset(modelFileName);
+					modifiedAsset = modelFileName;
 				}
 			}
-			ReloadModifiedDocuments();
-			Window.Current.Invalidate();
+			if (!string.IsNullOrEmpty(modifiedAsset)) {
+				RegisterModifiedAsset(modifiedAsset);
+			}
 		}
 
 		public void ReloadModifiedDocuments()
@@ -267,11 +261,30 @@ namespace Tangerine.Core
 					} else {
 						doc.SetModificationTimeToNow();
 					}
+				} else {
+					var requiredToRefreshExternalScenes = false;
+					foreach (var descendant in doc.RootNodeUnwrapped.Descendants) {
+						if (string.IsNullOrEmpty(descendant.ContentsPath)) {
+							continue;
+						}
+						foreach (var modifiedAsset in modifiedAssets) {
+							if (descendant.ContentsPath == modifiedAsset) {
+								requiredToRefreshExternalScenes = true;
+								break;
+							}
+						}
+						if (requiredToRefreshExternalScenes) {
+							doc.RefreshExternalScenes();
+							break;
+						}
+					}
 				}
 			}
+			modifiedAssets.Clear();
+			Window.Current.Invalidate();
 		}
 
-		void ReloadDocument(Document doc)
+		private void ReloadDocument(Document doc)
 		{
 			int index = documents.IndexOf(doc);
 			documents.Remove(doc);
@@ -297,11 +310,12 @@ namespace Tangerine.Core
 
 		private void RegisterModifiedAsset(string path)
 		{
-			path = path.Remove(0, AssetsDirectory.Length + 1);
-			path = Orange.CsprojSynchronization.ToUnixSlashes(path);
-			lock (modifiedAssets) {
-				modifiedAssets.Add(path);
+			string localPath;
+			if (!TryGetAssetPath(path, out localPath)) {
+				return;
 			}
+			localPath = AssetPath.CorrectSlashes(localPath);
+			modifiedAssets.Add(localPath);
 
 			Tasks.StopByTag(aggregateModifiedAssetsTaskTag);
 			Tasks.Add(AggregateModifiedAssetsTask, aggregateModifiedAssetsTaskTag);
@@ -309,46 +323,10 @@ namespace Tangerine.Core
 
 		private IEnumerator<object> AggregateModifiedAssetsTask()
 		{
-			const float AggregationWaitTime = 2f;
+			const float AggregationWaitTime = 0.5f;
 			yield return AggregationWaitTime;
-			yield return Task.WaitWhile(() => isCookingModifiedAssets);
-
-			isCookingModifiedAssets = true;
-			CookingOfModifiedAssetsAsync();
-			CookingOfModifiedAssetsStarted?.Invoke();
-		}
-
-		private async void CookingOfModifiedAssetsAsync()
-		{
-			List<string> assets;
-			lock (modifiedAssets) {
-				assets = modifiedAssets.ToList();
-				modifiedAssets.Clear();
-			}
-
-			try {
-				await System.Threading.Tasks.Task.Run(() => RecookAssets(assets));
-			} catch (System.Exception e) {
-				Console.WriteLine(e);
-			}
-			AssetBundle.Current = new TangerineAssetBundle(AssetsDirectory);
-
-			foreach (var document in Documents) {
-				document.RefreshExternalScenes();
-			}
-
-			CookingOfModifiedAssetsStatus = null;
-			CookingOfModifiedAssetsEnded?.Invoke();
-
-			isCookingModifiedAssets = false;
-		}
-
-		private static void RecookAssets(IEnumerable<string> assets)
-		{
-			foreach (var asset in assets) {
-				CookingOfModifiedAssetsStatus = asset;
-				Orange.AssetCooker.CookCustomAssets(Orange.The.Workspace.ActivePlatform, new List<string> { asset });
-			}
+			yield return Task.WaitWhile(() => Application.Windows.All(window => !window.Active));
+			ReloadModifiedDocuments();
 		}
 
 		private void UpdateTextureParams()
