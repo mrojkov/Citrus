@@ -20,7 +20,7 @@ namespace Lime
 		public static ActivityDelegate Instance { get; private set; }
 
 		private Action gameInitializer;
-		internal Input Input { get; private set; }
+		internal Input Input { get; } = Application.Input;
 
 		public Activity Activity { get; private set; }
 		public GameView GameView { get; private set; }
@@ -48,7 +48,6 @@ namespace Lime
 		{
 			Instance = this;
 			this.gameInitializer = gameInitializer;
-			Input = new Input();
 		}
 
 		public delegate void RequestPermissionsResultHandler(

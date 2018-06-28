@@ -134,7 +134,7 @@ namespace Lime
 #else
 		public static Vector2 DesktopMousePosition
 		{
-			get { return Window.Current.MousePosition; }
+			get { return Window.Current.Input.MousePosition; }
 			set { }
 		}
 #endif // MAC
