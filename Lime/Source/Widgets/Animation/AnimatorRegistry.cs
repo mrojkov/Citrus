@@ -44,6 +44,7 @@ namespace Lime
 			Add(typeof(RenderTarget), typeof(Animator<RenderTarget>));
 			Add(typeof(ClipMethod), typeof(Animator<ClipMethod>));
 			Add(typeof(SerializableSample), typeof(Animator<SerializableSample>));
+			Add(typeof(SerializableFont), typeof(Animator<SerializableFont>));
 			Add(typeof(EmitterShape), typeof(Animator<EmitterShape>));
 			Add(typeof(AudioAction), typeof(Animator<AudioAction>));
 			Add(typeof(MovieAction), typeof(Animator<MovieAction>));
