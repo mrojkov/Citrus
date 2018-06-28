@@ -135,9 +135,9 @@ namespace Lime
 		bool Visible { get; set; }
 
 		/// <summary>
-		/// Gets <see cref="Lime.Input"/> for this window.
+		/// Gets <see cref="Lime.WindowInput"/> for this window.
 		/// </summary>
-		Input Input { get; }
+		WindowInput Input { get; }
 
 		/// <summary>
 		/// Gets current FPS for the window.
@@ -287,23 +287,13 @@ namespace Lime
 		bool VSync { get; set; }
 
 		/// <summary>
-		/// The current mouse position in local coordinates. (read only)
-		/// </summary>
-		Vector2 MousePosition { get; }
-
-		/// <summary>
-		/// The current touch position in local coordinates.
-		/// </summary>
-		Vector2 GetTouchPosition(int index);
-
-		/// <summary>
 		/// Converts local window coordinates into desktop coordinates.
 		/// </summary>
 		Vector2 LocalToDesktop(Vector2 localPosition);
 
 		/// <summary>
-		/// The tansformation applied to the mouse position.
+		/// Converts desktop coordinates into local window coordinates.
 		/// </summary>
-		Matrix32 MousePositionTransform { get; set; }
+		Vector2 DesktopToLocal(Vector2 desktopPosition);
 	}
 }
