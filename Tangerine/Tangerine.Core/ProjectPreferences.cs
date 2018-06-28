@@ -18,9 +18,8 @@ namespace Tangerine.Core
 
 		private void InitializeResolutions()
 		{
-			var projectJson = Orange.The.Workspace.ProjectJson.AsDynamic;
-
-			try {
+			if (Orange.The.Workspace.ProjectJson["ResolutionSettings"] != null) {
+				var projectJson = Orange.The.Workspace.ProjectJson.AsDynamic;
 				var resolutionMarkers = new Dictionary<string, ResolutionMarker>();
 				foreach (var marker in projectJson.ResolutionSettings.Markers) {
 					var name = (string)marker.Name;
@@ -38,7 +37,7 @@ namespace Tangerine.Core
 				}
 				DefaultResolution = resolutions[0];
 				Console.WriteLine("Resolution presets was successfully loaded.");
-			} catch {
+			} else {
 				var resolutionMarkers = new[] { new ResolutionMarker("@Portrait", "@Landscape") };
 				DefaultResolution = new ResolutionPreset("iPad", 1024, 768, resolutionMarkers);
 				resolutions.AddRange(new[] {

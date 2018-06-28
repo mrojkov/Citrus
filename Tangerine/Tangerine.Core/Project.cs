@@ -86,14 +86,13 @@ namespace Tangerine.Core
 			fsWatcher.Created += HandleFileSystemWatcherEvent;
 			fsWatcher.Deleted += HandleFileSystemWatcherEvent;
 			fsWatcher.Renamed += HandleFileSystemWatcherEvent;
-			try {
-				var files = Directory.EnumerateFiles(Path.Combine(Project.Current.AssetsDirectory, "Overlays"))
+			var overlaysPath = Path.Combine(Project.Current.AssetsDirectory, "Overlays");
+			if (Directory.Exists(overlaysPath)) {
+				var files = Directory.EnumerateFiles(overlaysPath)
 					.Where(file => Path.GetExtension(file) == ".tan" || Path.GetExtension(file) == ".scene");
 				foreach (var file in files) {
 					Project.Current.Overlays.Add(Path.GetFileNameWithoutExtension(file), new Frame(file));
 				}
-			} catch (DirectoryNotFoundException e) {
-				Debug.Write("Failed to load Overlays: directory not found");
 			}
 		}
 
