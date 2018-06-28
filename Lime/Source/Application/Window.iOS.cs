@@ -113,6 +113,7 @@ namespace Lime
 			UIView.RenderFrame += OnRenderFrame;
 			UIView.UpdateFrame += OnUpdateFrame;
 			display = new Display(UIScreen.MainScreen);
+			Application.WindowUnderMouse = this;
 		}
 
 		/// <summary>
