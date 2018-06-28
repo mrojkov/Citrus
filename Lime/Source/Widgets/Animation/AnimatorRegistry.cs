@@ -51,6 +51,7 @@ namespace Lime
 			Add(typeof(VAlignment), typeof(Animator<VAlignment>));
 			Add(typeof(Anchors), typeof(Animator<Anchors>));
 			Add(typeof(EmissionType), typeof(Animator<EmissionType>));
+			Add(typeof(TextOverflowMode), typeof(Animator<TextOverflowMode>));
 			Add(typeof(NodeReference<Widget>), typeof(Animator<NodeReference<Widget>>));
 			Add(typeof(NodeReference<Spline>), typeof(Animator<NodeReference<Spline>>));
 			Add(typeof(NodeReference<Node3D>), typeof(Animator<NodeReference<Node3D>>));
