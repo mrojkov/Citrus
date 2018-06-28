@@ -22,7 +22,7 @@ namespace Tangerine.UI.Timeline.Components
 			OverviewWidget.Presenter = new DelegatePresenter<Widget>(Render);
 		}
 
-		struct Cell
+		private struct Cell
 		{
 			public BitSet32 Strips;
 			public int StripCount;
@@ -30,7 +30,7 @@ namespace Tangerine.UI.Timeline.Components
 			public KeyFunction Func2;
 		}
 
-		static Cell[] cells = new Cell[0];
+		private static Cell[] cells = new Cell[0];
 
 		protected virtual void Render(Widget widget)
 		{
@@ -42,22 +42,38 @@ namespace Tangerine.UI.Timeline.Components
 			for (int i = 0; i < maxCol; i++) {
 				cells[i] = new Cell();
 			}
-			foreach (var a in node.Animators) {
-				for (int j = 0; j < a.ReadonlyKeys.Count; j++) {
-					var key = a.ReadonlyKeys[j];
-					var colorIndex = PropertyAttributes<TangerineKeyframeColorAttribute>.Get(node.GetType(), a.TargetProperty)?.ColorIndex ?? 0;
-					var c = cells[key.Frame];
-					c.Strips[colorIndex] = true;
-					if (c.StripCount == 0) {
-						c.Func1 = key.Function;
+			// Data reading in keys
+			foreach (var animator in node.Animators) {
+				for (int j = 0; j < animator.ReadonlyKeys.Count; j++) {
+					var key = animator.ReadonlyKeys[j];
+					var colorIndex = PropertyAttributes<TangerineKeyframeColorAttribute>.Get(node.GetType(), animator.TargetProperty)?.ColorIndex ?? 0;
+					var cell = cells[key.Frame];
+					if (cell.StripCount == 0) {
+						cell.Func1 = key.Function;
 					}
-					else if (c.StripCount == 1) {
-						c.Func2 = key.Function;
+					else if (cell.StripCount == 1) {
+						var lastColorIndex = 0;
+						for(int i=0; i< cell.Strips.Count; i++) {
+							if (cell.Strips[i]) {
+								lastColorIndex = i;
+								break;
+							}
+						}
+						if(lastColorIndex < colorIndex) {
+							cell.Func2 = key.Function;
+						}
+						else {
+							var a = cell.Func1;
+							cell.Func1 = key.Function;
+							cell.Func2 = a;
+						}
 					}
-					c.StripCount++;
-					cells[key.Frame] = c;
+					cell.Strips[colorIndex] = true;
+					cell.StripCount++;
+					cells[key.Frame] = cell;
 				}
 			}
+			// Rendering
 			for (int i = 0; i < maxCol; i++) {
 				var cell = cells[i];
 				if (cell.StripCount == 0) {
@@ -67,15 +83,16 @@ namespace Tangerine.UI.Timeline.Components
 				var d = widget.Height / cell.StripCount;
 				if (cell.StripCount == 1) {
 					var b = a + new Vector2(TimelineMetrics.ColWidth - 1, d);
-					int colorIndex;
-					for (colorIndex = 0; colorIndex < 32; colorIndex++) {
+					var colorIndex = 0;
+					for (colorIndex = 0; colorIndex < cell.Strips.Count; colorIndex++) {
 						if (cell.Strips[colorIndex]) break;
 					}
 					DrawFigure(a, b, cell.Func1, KeyframePalette.Colors[colorIndex]);
 				} else if (cell.StripCount == 2) {
 					var numberOfDrawnStrips = 0;
-					int colorIndex = 0;
-					for (colorIndex = 0; colorIndex < 32; colorIndex++) {
+					var colorIndex = 0;
+					// Draw first figure
+					for (colorIndex = 0; colorIndex < cell.Strips.Count; colorIndex++) {
 						if (cell.Strips[colorIndex]) {
 							var b = a + new Vector2(TimelineMetrics.ColWidth - 1, d);
 							DrawFigure(a, b, cell.Func1, KeyframePalette.Colors[colorIndex]);
@@ -84,7 +101,8 @@ namespace Tangerine.UI.Timeline.Components
 							break;
 						}
 					}
-					for (colorIndex = colorIndex + 1; colorIndex < 32; colorIndex++) {
+					// Draw second figure
+					for (colorIndex = colorIndex + 1; colorIndex < cell.Strips.Count; colorIndex++) {
 						if (cell.Strips[colorIndex]) {
 							var b = a + new Vector2(TimelineMetrics.ColWidth - 1, d);
 							DrawFigure(a, b, cell.Func2, KeyframePalette.Colors[colorIndex]);
@@ -93,8 +111,9 @@ namespace Tangerine.UI.Timeline.Components
 							break;
 						}
 					}
-					if(numberOfDrawnStrips < cell.StripCount) {
-						for (colorIndex = 0; colorIndex < 32; colorIndex++) {
+					// Figures of the same color
+					if (numberOfDrawnStrips < cell.StripCount) {
+						for (colorIndex = 0; colorIndex < cell.Strips.Count; colorIndex++) {
 							if (cell.Strips[colorIndex]) {
 								var b = a + new Vector2(TimelineMetrics.ColWidth - 1, d);
 								DrawFigure(a, b, cell.Func2, KeyframePalette.Colors[colorIndex]);
@@ -105,8 +124,9 @@ namespace Tangerine.UI.Timeline.Components
 						}
 					}
 				} else {
+					// Draw strips
 					var numberOfDrawnStrips = 0;
-					for (int colorIndex = 0; colorIndex < 32; colorIndex++) {
+					for (var colorIndex = 0; colorIndex < cell.Strips.Count; colorIndex++) {
 						if (cell.Strips[colorIndex]) {
 							var b = a + new Vector2(TimelineMetrics.ColWidth - 1, d);
 							Renderer.DrawRect(a, b, KeyframePalette.Colors[colorIndex]);
@@ -115,12 +135,13 @@ namespace Tangerine.UI.Timeline.Components
 							if (numberOfDrawnStrips == cell.StripCount) break;
 						}
 					}
-					if(numberOfDrawnStrips < cell.StripCount) {
+					// Strips of the same color
+					if (numberOfDrawnStrips < cell.StripCount) {
 						int colorIndex;
-						for (colorIndex = 0; colorIndex < 32; colorIndex++) {
+						for (colorIndex = 0; colorIndex < cell.Strips.Count; colorIndex++) {
 							if (cell.Strips[colorIndex]) break;
 						}
-						for (numberOfDrawnStrips = numberOfDrawnStrips; numberOfDrawnStrips != cell.StripCount; numberOfDrawnStrips++) {
+						for (var j = numberOfDrawnStrips; j != cell.StripCount; j++) {
 							var b = a + new Vector2(TimelineMetrics.ColWidth - 1, d);
 							Renderer.DrawRect(a, b, KeyframePalette.Colors[colorIndex]);
 							a.Y += d;
@@ -130,9 +151,9 @@ namespace Tangerine.UI.Timeline.Components
 			}
 		}
 
-		static Vertex[] vertices;
+		private static Vertex[] vertices;
 
-		protected void DrawFigure(Vector2 a, Vector2 b, KeyFunction func, Color4 color)
+		private void DrawFigure(Vector2 a, Vector2 b, KeyFunction func, Color4 color)
 		{
 			var segmentWidth = b.X - a.X;
 			var segmentHeight = b.Y - a.Y;
@@ -148,12 +169,12 @@ namespace Tangerine.UI.Timeline.Components
 					Renderer.DrawTriangleFan(vertices, vertices.Count());
 					break;
 				case KeyFunction.Steep:
-					var rightBigVertexA = new Vector2(a.X + segmentWidth / 2, a.Y + 0.5f);
-					var rightBigVertexB = new Vector2(b.X, b.Y - 0.5f);
-					Renderer.DrawRect(rightBigVertexA, rightBigVertexB, color);
-					var leftSmallVertexA = new Vector2(a.X + 0.5f, a.Y + segmentHeight / 2);
-					var leftSmallVertexB = new Vector2(a.X + segmentWidth / 2, b.Y - 0.5f);
-					Renderer.DrawRect(leftSmallVertexA, leftSmallVertexB, color);
+					var leftSmallRectVertexA = new Vector2(a.X + 0.5f, a.Y + segmentHeight / 2);
+					var leftSmallRectVertexB = new Vector2(a.X + segmentWidth / 2, b.Y - 0.5f);
+					Renderer.DrawRect(leftSmallRectVertexA, leftSmallRectVertexB, color);
+					var rightBigRectVertexA = new Vector2(a.X + segmentWidth / 2, a.Y + 0.5f);
+					var rightBigRectVertexB = new Vector2(b.X, b.Y - 0.5f);
+					Renderer.DrawRect(rightBigRectVertexA, rightBigRectVertexB, color);
 					break;
 				case KeyFunction.Spline:
 					var numSegments = 10;
