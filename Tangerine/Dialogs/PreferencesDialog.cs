@@ -246,23 +246,31 @@ namespace Tangerine
 				}
 			}
 			keyboard.SelectedShortcutChanged = () => {
-				var commands = keyboard.SelectedCommands;
 				selectedShortcutsView.Content.Nodes.Clear();
-				foreach (var command in commands) {
-					var shortcut = new ThemedSimpleText {
-						Text = command.Shortcut.ToString(),
+				var commands = keyboard.SelectedCommands.ToLookup(i => i.Category);
+				foreach (var category in commands) {
+					selectedShortcutsView.Content.AddNode(new ThemedSimpleText {
+						Text = category.Key.Name,
 						VAlignment = VAlignment.Center,
-						LayoutCell = new LayoutCell(Alignment.LeftCenter, 1)
-					};
-					var name = new ThemedSimpleText {
-						Text = command.Name,
-						VAlignment = VAlignment.Center,
-						LayoutCell = new LayoutCell(Alignment.LeftCenter, 2)
-					};
-					selectedShortcutsView.Content.AddNode(new Widget() {
-						Layout = new TableLayout() { Spacing = 4, RowCount = 1, ColCount = 2 },
-						Nodes = { shortcut, name }
+						Color = Theme.Colors.GrayText
 					});
+					foreach (var command in category) {
+						var shortcut = new ThemedSimpleText {
+							Text = command.Shortcut.ToString(),
+							VAlignment = VAlignment.Center,
+							LayoutCell = new LayoutCell(Alignment.LeftCenter, 1)
+						};
+						var name = new ThemedSimpleText {
+							Text = command.Name,
+							VAlignment = VAlignment.Center,
+							LayoutCell = new LayoutCell(Alignment.LeftCenter, 2)
+						};
+						selectedShortcutsView.Content.AddNode(new Widget() {
+							Layout = new TableLayout() { Spacing = 4, RowCount = 1, ColCount = 2 },
+							Nodes = { shortcut, name },
+							Padding = new Thickness(15, 0)
+						});
+					}
 				}
 				selectedShortcutsView.ScrollPosition = allShortcutsView.MinScrollPosition;
 			};

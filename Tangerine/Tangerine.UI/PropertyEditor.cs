@@ -1133,10 +1133,19 @@ namespace Tangerine.UI
 
 		public Action PropertyChanged { get; set; }
 
+		private void SetValue(Shortcut value)
+		{
+			var obj = EditorParams.Objects.FirstOrDefault();
+			if (obj != null) {
+				EditorParams.PropertySetter(obj, EditorParams.PropertyName, value);
+			}
+		}
+
 		public ShortcutPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
 			editor = editorParams.EditBoxFactory();
 			editor.Updating += Updating;
+			editor.Updated += Updated;
 			editor.LayoutCell = new LayoutCell(Alignment.Center);
 			editor.AddChangeWatcher(CoalescedPropertyValue(), v => {
 				var text = v.ToString();
@@ -1151,7 +1160,7 @@ namespace Tangerine.UI
 			editor.Gestures.Add(new ClickGesture(1, () => {
 				main = Key.Unknown;
 				modifiers = Modifiers.None;
-				SetProperty(new Shortcut(modifiers, main));
+				SetValue(new Shortcut(modifiers, main));
 			}));
 			editor.AddToNode(ContainerWidget);
 
@@ -1178,12 +1187,22 @@ namespace Tangerine.UI
 			if (!keys.Any())
 				return;
 			foreach (var key in keys) {
-				if (!key.IsModifier() && !key.IsMouseKey()) {
+				if (!key.IsModifier() && !key.IsMouseKey() && Shortcut.ValidateMainKey(key)) {
 					main = key;
 					break;
 				}
 			}
-			SetProperty(new Shortcut(modifiers, main));
+			SetValue(new Shortcut(modifiers, main));
+		}
+
+		private void Updated(float dt)
+		{
+			if (!editor.IsFocused())
+				return;
+			var input = editor.Input;
+			input.ConsumeKeys(Key.Enumerate().Where(
+				k => input.WasKeyRepeated(k) || input.WasKeyPressed(k) || input.WasKeyReleased(k)));
+			Command.ConsumeRange(Command.Editing);
 		}
 	}
 }

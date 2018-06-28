@@ -15,12 +15,11 @@ namespace Tangerine.Dialogs
 		private IEnumerable<KeyboardButton> FindButtons(Key key) => buttons.Where(i => i.Key == key);
 
 		private bool IsCommandCurrent(CommandInfo info) =>
-			info.Shortcut.Modifiers.HasFlag(modifiers) &&
-			((main == Key.Unknown) ? true : info.Shortcut.Main == main);
+			info.Shortcut.Modifiers.HasFlag(modifiers);
 		
 		private bool IsCommandSelected(CommandInfo info) =>
 			info.Shortcut.Modifiers.HasFlag(modifiers) &&
-			((main == Key.Unknown) ? false : info.Shortcut.Main == main) && info.Category == Category;
+			((main == Key.Unknown) ? false : info.Shortcut.Main == main);
 
 		public IEnumerable<CommandInfo> SelectedCommands { get; private set; }
 
@@ -69,12 +68,12 @@ namespace Tangerine.Dialogs
 		{
 			if (Category == null)
 				return;
-			SelectedCommands = Category.Commands.Where(i => IsCommandSelected(i));
+			bool isGenericCategory = (Category.SystemName == typeof(GenericCommands).Name);
+			SelectedCommands = isGenericCategory ? HotkeyEditor.Commands.Where(i => IsCommandSelected(i)) :
+				HotkeyEditor.Commands.Where(i => IsCommandSelected(i) && i.Category == Category);
 			foreach (var button in buttons) {
 				button.CommandName = null;
 				button.CommandState = KeyboardCommandState.None;
-
-				bool isGenericCategory = (Category.SystemName == typeof(GenericCommands).Name);
 				IEnumerable<CommandInfo> currentCommands = isGenericCategory ?
 					button.Commands.Where(i => IsCommandCurrent(i)) :
 					button.Commands.Where(i => IsCommandCurrent(i) && i.Category == Category);
@@ -128,7 +127,7 @@ namespace Tangerine.Dialogs
 					FindButtons(main).First().State = KeyboardButtonState.None;
 				}
 				var buttons = FindButtons(key);
-				if (buttons.Any()) {
+				if (buttons.Any() && Shortcut.ValidateMainKey(key)) {
 					var newButton = buttons.First();
 					main = key;
 					newButton.State = KeyboardButtonState.Press;
@@ -167,9 +166,9 @@ namespace Tangerine.Dialogs
 				}
 			}
 			var buttons = FindButtons(key);
-			if (buttons.Any()) {
+			if (buttons.Any() && Shortcut.ValidateMainKey(key)) {
 				var newButton = buttons.First();
-				main = key;
+					main = key;
 				newButton.State = KeyboardButtonState.Hold;
 			}
 		}
@@ -477,6 +476,17 @@ namespace Tangerine.Dialogs
 		public bool IsModifier { get; set; } = false;
 		public KeyboardCommandState CommandState { get; set; }
 
+		static private Vertex[] triangleVertices = new Vertex[] {
+			new Vertex(), new Vertex(), new Vertex()
+		};
+
+		public KeyboardButtonPresenter()
+		{
+			for (int i = 0; i < triangleVertices.Length; ++i) {
+				triangleVertices[i].Color = ColorTheme.Current.Keyboard.PanelKeyBackground;
+			}
+		}
+
 		public override void SetState(string state)
 		{
 			CommonWindow.Current.Invalidate();
@@ -498,12 +508,10 @@ namespace Tangerine.Dialogs
 			widget.PrepareRendererState();
 			Color4 backColor = IsModifier ? colors.ModifierBackground : colors.ButtonBackground;
 
-			var triangleVertices = new Vertex[] {
-				new Vertex() { Pos = new Vector2(widget.Width, 0), Color = colors.PanelKeyBackground },
-				new Vertex() { Pos = widget.Size, Color = colors.PanelKeyBackground },
-				new Vertex() { Pos = new Vector2(0, widget.Height), Color = colors.PanelKeyBackground }
-			};
-
+			triangleVertices[0].Pos = new Vector2(widget.Width, 0);
+			triangleVertices[1].Pos = widget.Size;
+			triangleVertices[2].Pos = new Vector2(0, widget.Height);
+			
 			switch (CommandState) {
 				case KeyboardCommandState.None:
 					Renderer.DrawRect(Vector2.Zero, widget.Size, backColor);
@@ -525,6 +533,7 @@ namespace Tangerine.Dialogs
 				default:
 					break;
 			}
+
 			float thickness = borderColor == ColorTheme.Current.Keyboard.SelectedBorder ? 2 : 1;
 			Renderer.DrawRectOutline(Vector2.Zero, widget.Size, borderColor, thickness);
 		}
