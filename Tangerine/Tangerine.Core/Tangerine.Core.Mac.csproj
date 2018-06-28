@@ -95,6 +95,7 @@
     <Compile Include="Ruler.cs" />
     <Compile Include="ProjectPreferences.cs" />
     <Compile Include="ResolutionPreview.cs" />
+    <Compile Include="TangerineAssetBundle.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>
