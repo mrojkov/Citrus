@@ -151,59 +151,64 @@ namespace Tangerine.UI.Timeline.Components
 			}
 		}
 
-		private static Vertex[] vertices;
+		private static Vertex[] vertices = new Vertex[11];
 
 		private void DrawFigure(Vector2 a, Vector2 b, KeyFunction func, Color4 color)
 		{
 			var segmentWidth = b.X - a.X;
 			var segmentHeight = b.Y - a.Y;
 			switch (func) {
-				case KeyFunction.Linear:
-					vertices = new Vertex[3];
-					vertices[0].Pos = new Vector2(a.X, b.Y - 0.5f);
-					vertices[1].Pos = new Vector2(b.X, a.Y);
-					vertices[2].Pos = new Vector2(b.X, b.Y - 0.5f);
-					for(int i = 0; i < vertices.Count(); i++) {
-						vertices[i].Color = color;
+				case KeyFunction.Linear: {
+						var numVertices = 3;
+						vertices[0].Pos = new Vector2(a.X, b.Y - 0.5f);
+						vertices[1].Pos = new Vector2(b.X, a.Y);
+						vertices[2].Pos = new Vector2(b.X, b.Y - 0.5f);
+						for (int i = 0; i < vertices.Count(); i++) {
+							vertices[i].Color = color;
+						}
+						Renderer.DrawTriangleFan(vertices, numVertices);
+						break;
 					}
-					Renderer.DrawTriangleFan(vertices, vertices.Count());
-					break;
-				case KeyFunction.Steep:
-					var leftSmallRectVertexA = new Vector2(a.X + 0.5f, a.Y + segmentHeight / 2);
-					var leftSmallRectVertexB = new Vector2(a.X + segmentWidth / 2, b.Y - 0.5f);
-					Renderer.DrawRect(leftSmallRectVertexA, leftSmallRectVertexB, color);
-					var rightBigRectVertexA = new Vector2(a.X + segmentWidth / 2, a.Y + 0.5f);
-					var rightBigRectVertexB = new Vector2(b.X, b.Y - 0.5f);
-					Renderer.DrawRect(rightBigRectVertexA, rightBigRectVertexB, color);
-					break;
-				case KeyFunction.Spline:
-					var numSegments = 10;
-					var center = b;
-					var radius = 0f;
-					if (segmentWidth < segmentHeight) {
-						radius = segmentWidth;
-					} else {
-						radius = segmentHeight;
+				case KeyFunction.Steep: {
+						var leftSmallRectVertexA = new Vector2(a.X + 0.5f, a.Y + segmentHeight / 2);
+						var leftSmallRectVertexB = new Vector2(a.X + segmentWidth / 2, b.Y - 0.5f);
+						Renderer.DrawRect(leftSmallRectVertexA, leftSmallRectVertexB, color);
+						var rightBigRectVertexA = new Vector2(a.X + segmentWidth / 2, a.Y + 0.5f);
+						var rightBigRectVertexB = new Vector2(b.X, b.Y - 0.5f);
+						Renderer.DrawRect(rightBigRectVertexA, rightBigRectVertexB, color);
+						break;
 					}
-					vertices = new Vertex[numSegments + 1];
-					vertices[0] = new Vertex { Pos = center, Color = color };
-					for (int i = 0; i < numSegments; i++) {
-						vertices[i + 1].Pos = Vector2.CosSin(i * Mathf.HalfPi / (numSegments - 1)) * (-1)* radius + center;
-						vertices[i + 1].Color = color;
+				case KeyFunction.Spline: {
+						var numSegments = 10;
+						var center = b;
+						var radius = 0f;
+						if (segmentWidth < segmentHeight) {
+							radius = segmentWidth;
+						}
+						else {
+							radius = segmentHeight;
+						}
+						vertices[0] = new Vertex { Pos = center, Color = color };
+						for (int i = 0; i < numSegments; i++) {
+							vertices[i + 1].Pos = Vector2.CosSin(i * Mathf.HalfPi / (numSegments - 1)) * (-1) * radius + center;
+							vertices[i + 1].Color = color;
+						}
+						Renderer.DrawTriangleFan(vertices, numSegments + 1);
+						break;
 					}
-					Renderer.DrawTriangleFan(vertices, numSegments + 1);
-					break;
-				case KeyFunction.ClosedSpline:
-					var circleCenter = new Vector2(a.X + segmentWidth / 2, a.Y + segmentHeight / 2);
-					var circleRadius = 0f;
-					if (segmentWidth < segmentHeight) {
-						circleRadius = circleCenter.X - a.X - 0.5f;
+				case KeyFunction.ClosedSpline: {
+						var numSegments = 16;
+						var circleCenter = new Vector2(a.X + segmentWidth / 2, a.Y + segmentHeight / 2);
+						var circleRadius = 0f;
+						if (segmentWidth < segmentHeight) {
+							circleRadius = circleCenter.X - a.X - 0.5f;
+						}
+						else {
+							circleRadius = circleCenter.Y - a.Y - 0.5f;
+						}
+						Renderer.DrawRound(circleCenter, circleRadius, numSegments, color);
+						break;
 					}
-					else {
-						circleRadius = circleCenter.Y - a.Y - 0.5f;
-					}
-					Renderer.DrawRound(circleCenter, circleRadius, 16, color);
-					break;
 			}
 		}
 	}
