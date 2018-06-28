@@ -21,7 +21,7 @@ namespace Lime
 
 		public GameController UIViewController { get; private set; }
 		public GameView UIView { get { return UIViewController.View; } }
-		public Input Input { get; private set; }
+		public WindowInput Input { get; private set; }
 		public bool Active { get; private set; }
 		public string Title { get; set; }
 		public WindowState State { get { return WindowState.Fullscreen; } set {} }
@@ -59,33 +59,14 @@ namespace Lime
 			get { return (float)UIScreen.MainScreen.Scale; }
 		}
 
-		private Vector2 lastDesktopMousePosition = new Vector2(-1, -1);
-		private Vector2 calculatedMousePosition = new Vector2(-1, -1);
-
-		public Vector2 MousePosition
-		{
-			get {
-				if (lastDesktopMousePosition != Input.DesktopMousePosition) {
-					lastDesktopMousePosition = Input.DesktopMousePosition;
-					calculatedMousePosition = lastDesktopMousePosition * MousePositionTransform;
-				}
-				return calculatedMousePosition;
-			}
-		}
-
 		public Vector2 LocalToDesktop(Vector2 localPosition)
 		{
-			return localPosition * MousePositionTransform.CalcInversed();
+			return localPosition;
 		}
 
-		private Matrix32 mousePositionTransform = Matrix32.Identity;
-		public Matrix32 MousePositionTransform
+		public Vector2 DesktopToLocal(Vector2 desktopPosition)
 		{
-			get { return mousePositionTransform; }
-			set {
-				mousePositionTransform = value;
-				lastDesktopMousePosition = new Vector2(-1, -1);
-			}
+			return desktopPosition;
 		}
 
 		public Window()
@@ -100,11 +81,11 @@ namespace Lime
 			}
 			Application.MainWindow = this;
 			Active = true;
-			Input = new Input();
+			Input = new WindowInput(this);
 			uiWindow = new UIWindow(UIScreen.MainScreen.Bounds);
 			// UIApplicationDelegate must has a Window reference. This is an Apple's requirement.
 			AppDelegate.Instance.Window = uiWindow;
-			UIViewController = new GameController(Input);
+			UIViewController = new GameController(Application.Input);
 			uiWindow.RootViewController = UIViewController;
 			uiWindow.MakeKeyAndVisible();
 			AppDelegate.Instance.Activated += () => {
@@ -140,11 +121,6 @@ namespace Lime
 		public IDisplay Display
 		{
 			get { return display; }
-		}
-
-		public Vector2 GetTouchPosition(int index)
-		{
-			return Input.GetDesktopTouchPosition(index);
 		}
 
 		public void Center() { }
