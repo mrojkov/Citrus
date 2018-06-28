@@ -18,7 +18,7 @@ namespace Lime
 		public Vector2 MinimumDecoratedSize { get; set; }
 		public Vector2 MaximumDecoratedSize { get; set; }
 		public bool Visible { get; set; }
-		public Input Input { get; set; } = new Input();
+		public WindowInput Input { get; set; } = new WindowInput(null);
 		public float FPS { get; set; }
 		public IDisplay Display { get; }
 		public float CalcFPS()
@@ -53,26 +53,14 @@ namespace Lime
 			throw new NotImplementedException();
 		}
 
-		public Vector2 MousePosition => Input.DesktopMousePosition;
-
-		public Vector2 GetTouchPosition(int index)
-		{
-			return Input.GetDesktopTouchPosition(index);
-		}
-
 		public Vector2 LocalToDesktop(Vector2 localPosition)
 		{
 			throw new NotImplementedException();
 		}
 
-		public Matrix32 MousePositionTransform { get; set; }
-
-		public float UnclampedDelta
+		public Vector2 DesktopToLocal(Vector2 desktopPosition)
 		{
-			get
-			{
-				throw new NotImplementedException();
-			}
+			throw new NotImplementedException();
 		}
 	}
 }

@@ -38,17 +38,17 @@ namespace Lime
 		/// will always be zero if DragDirection is Vertical or Horizontal respectively.
 		/// This fact is used when checking for threshold.
 		/// </summary>
-		public override Vector2 MousePosition
+		public Vector2 MousePosition
 		{
 			get
 			{
 				switch (Direction) {
 				case DragDirection.Horizontal:
-					return new Vector2(base.MousePosition.X, MousePressPosition.Y);
+					return new Vector2(Input.MousePosition.X, MousePressPosition.Y);
 				case DragDirection.Vertical:
-					return new Vector2(MousePressPosition.X, base.MousePosition.Y);
+					return new Vector2(MousePressPosition.X, Input.MousePosition.Y);
 				case DragDirection.Any:
-					return base.MousePosition;
+					return Input.MousePosition;
 				default:
 					throw new ArgumentOutOfRangeException();
 				}
@@ -103,7 +103,7 @@ namespace Lime
 		{
 			if (state == State.Initial && Input.WasMousePressed(ButtonIndex)) {
 				state = State.Recognizing;
-				MousePressPosition = base.MousePosition;
+				MousePressPosition = Input.MousePosition;
 				began.Raise();
 			}
 			if (state == State.Recognizing) {
@@ -113,12 +113,12 @@ namespace Lime
 				} else if ((MousePosition - MousePressPosition).SqrLength > DragThreshold.Sqr()) {
 					CancelOtherGestures(gestures);
 					state = State.Changing;
-					prevMousePosition = base.MousePosition;
+					prevMousePosition = Input.MousePosition;
 					recognized.Raise();
 				}
 			}
 			if (state == State.Changing) {
-				var curMousePos = base.MousePosition;
+				var curMousePos = Input.MousePosition;
 				if (prevMousePosition != curMousePos) {
 					changed.Raise();
 				}
