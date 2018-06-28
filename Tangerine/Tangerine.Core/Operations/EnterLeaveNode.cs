@@ -23,9 +23,8 @@ namespace Tangerine.Core.Operations
 				OpenExternalScene(container.ContentsPath);
 			} else {
 				ChangeContainer(container, selectFirstNode);
+				SetProperty.Perform(container, nameof(Node.TangerineFlags), container.TangerineFlags | TangerineFlags.DisplayContent, isChangingDocument: false);
 			}
-			container.SetTangerineFlag(TangerineFlags.DisplayContent, true);
-
 			return true;
 		}
 
@@ -52,7 +51,6 @@ namespace Tangerine.Core.Operations
 		public static void Perform()
 		{
 			var doc = Document.Current;
-			doc.Container.SetTangerineFlag(TangerineFlags.DisplayContent, false);
 			if (doc.Container == doc.RootNode) {
 				var path = doc.SceneNavigatedFrom;
 				if (path != null) {
@@ -60,7 +58,8 @@ namespace Tangerine.Core.Operations
 				}
 			} else {
 				var container = doc.Container;
-				EnterNode.Perform(doc.Container.Parent, false);
+				SetProperty.Perform(container, nameof(Node.TangerineFlags), container.TangerineFlags & ~TangerineFlags.DisplayContent, isChangingDocument: false);
+				EnterNode.Perform(container.Parent, false);
 				SelectNode.Perform(container, true);
 			}
 		}
