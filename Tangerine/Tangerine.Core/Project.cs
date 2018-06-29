@@ -215,8 +215,8 @@ namespace Tangerine.Core
 
 		public bool CloseAllDocuments()
 		{
-			for(var doc = documents.Last(); doc != null; doc=documents.Last()) {
-				if (CloseDocument(doc)) {
+			for (int i = documents.Count() - 1; i >= 0 ; i--) {
+				if (CloseDocument(documents[i])) {
 					continue;
 				} else {
 					return false;
