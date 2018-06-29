@@ -151,11 +151,14 @@
 		}
 
 		private Vector2?[] calculatedTouchPositions = new Vector2?[Input.MaxTouches];
+		private readonly Vector2[] lastTouchPositions = new Vector2[Input.MaxTouches];
 
 		public Vector2 GetTouchPosition(int index)
 		{
-			if (calculatedTouchPositions[index] == null) {
-				calculatedTouchPositions[index] = MouseDesktopToLocal(Application.Input.GetDesktopTouchPosition(index));
+			var desktopTouchPosition = Application.Input.GetDesktopTouchPosition(index);
+			if (calculatedTouchPositions[index] == null || lastTouchPositions[index] != desktopTouchPosition) {
+				lastTouchPositions[index] = desktopTouchPosition;
+				calculatedTouchPositions[index] = MouseDesktopToLocal(desktopTouchPosition);
 			}
 			return calculatedTouchPositions[index].Value;
 		}
@@ -195,7 +198,7 @@
 		{
 			Application.Input.SetWheelScrollAmount(delta);
 		}
-		
+
 		private bool ValidateKey(Key key)
 		{
 			if (key >= Key.Mouse0 && key <= Key.Touch3) {
