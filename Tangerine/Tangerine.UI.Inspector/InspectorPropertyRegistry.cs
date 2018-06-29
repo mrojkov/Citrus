@@ -55,6 +55,7 @@ namespace Tangerine.UI.Inspector
 			AddEditor(typeof(MovieAction), c => new EnumPropertyEditor<MovieAction>(c));
 			AddEditor(typeof(EmitterShape), c => new EnumPropertyEditor<EmitterShape>(c));
 			AddEditor(typeof(EmissionType), c => new EnumPropertyEditor<EmissionType>(c));
+			AddEditor(typeof(ParticlesLinkage), c => new EnumPropertyEditor<ParticlesLinkage>(c));
 			AddEditor(typeof(TextOverflowMode), c => new EnumPropertyEditor<TextOverflowMode>(c));
 			AddEditor(typeof(ShadowMapTextureQuality), c => new EnumPropertyEditor<ShadowMapTextureQuality>(c));
 			AddEditor(typeof(NodeReference<Camera3D>), c => new NodeReferencePropertyEditor<Camera3D>(c));

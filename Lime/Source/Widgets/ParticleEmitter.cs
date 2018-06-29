@@ -131,7 +131,7 @@ namespace Lime
 		[YuzuMember]
 		public EmissionType EmissionType { get; set; }
 		[YuzuMember]
-		public ParticlesLinkage ParticlesLinkage;
+		public ParticlesLinkage ParticlesLinkage { get; set; }
 		/// <summary>
 		/// When ParticleLinkage is `Other` this makes sense as name of widget particle emitter is linked to.
 		/// </summary>
