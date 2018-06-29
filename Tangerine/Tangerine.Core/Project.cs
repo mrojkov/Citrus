@@ -213,9 +213,23 @@ namespace Tangerine.Core
 			return false;
 		}
 
+		public bool CloseAllTabs()
+		{
+			if (IsAnyDocumentModified()) {
+				if(CloseDocument(RightModifiedDocument())) {
+					return CloseAllTabs();
+				} else {
+					return false;
+				}
+			} else {
+				return CloseAllDocuments();
+			}
+			
+		}
+
 		public bool CloseAllDocuments()
 		{
-			for (int i = documents.Count() - 1; i >= 0 ; i--) {
+			for (var i = documents.Count() - 1; i >= 0; i--) {
 				if (CloseDocument(documents[i])) {
 					continue;
 				} else {
@@ -223,6 +237,32 @@ namespace Tangerine.Core
 				}
 			}
 			return true;
+		}
+
+		public bool IsAnyDocumentModified()
+		{
+			foreach(var doc in documents) {
+				if (doc.IsModified) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		public Document RightModifiedDocument()
+		{
+			for (var i = documents.Count() - 1; i >= 0; i--) {
+				if (documents[i].IsModified) return documents[i];
+			}
+			return null;
+		}
+
+		public int IndexRightModifiedDocument()
+		{
+			for (var i = documents.Count() - 1; i >= 0; i--) {
+				if (documents[i].IsModified) return i;
+			}
+			return -1;
 		}
 
 		public void NextDocument()

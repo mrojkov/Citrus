@@ -165,7 +165,7 @@ namespace Tangerine
 		public override void ExecuteTransaction()
 		{
 			if (Project.Current.Documents.Count != 0) {
-				Project.Current.CloseAllDocuments();
+				Project.Current.CloseAllTabs();
 			}
 		}
 	}
