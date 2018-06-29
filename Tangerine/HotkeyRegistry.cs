@@ -8,7 +8,7 @@ using Yuzu;
 
 namespace Tangerine
 {
-	public static class HotkeyEditor
+	public static class HotkeyRegistry
 	{
 		public static string Filepath => Path.Combine(Lime.Environment.GetDataDirectory("Tangerine"), "keybindings");
 

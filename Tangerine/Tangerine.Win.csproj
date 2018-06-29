@@ -53,7 +53,7 @@
     <Compile Include="Dialogs\ManageRulersDialog.cs" />
     <Compile Include="Dialogs\OrangePluginOptionsDialog.cs" />
     <Compile Include="Dialogs\PreferencesDialog.cs" />
-    <Compile Include="Dialogs\ScreenKeyboard.cs" />
+    <Compile Include="Dialogs\HotkeyEditor.cs" />
     <Compile Include="MainMenu\CreateMenu.cs" />
     <Compile Include="MainMenu\EditMenu.cs" />
     <Compile Include="MainMenu\FileMenu.cs" />
@@ -62,7 +62,7 @@
     <Compile Include="OrangeInterface.cs" />
     <Compile Include="DisplayResolutions.cs" />
     <Compile Include="OrangePluginUIBuidler.cs" />
-    <Compile Include="HotkeyEditor.cs" />
+    <Compile Include="HotkeyRegistry.cs" />
     <Compile Include="TangerineApp.cs" />
     <Compile Include="Main.Win.cs" />
     <Compile Include="TangerineMenu.cs" />

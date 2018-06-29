@@ -1135,8 +1135,7 @@ namespace Tangerine.UI
 
 		private void SetValue(Shortcut value)
 		{
-			var obj = EditorParams.Objects.FirstOrDefault();
-			if (obj != null) {
+			foreach (var obj in EditorParams.Objects) { 
 				EditorParams.PropertySetter(obj, EditorParams.PropertyName, value);
 			}
 		}

@@ -69,9 +69,10 @@ namespace Tangerine
 					AlertDialog.Show("The color theme change will take effect next time you run Tangerine.");
 				}
 				Core.UserPreferences.Instance.Save();
-				foreach (var info in HotkeyEditor.Commands) {
+				foreach (var info in HotkeyRegistry.Commands) {
 					info.Command.Shortcut = info.Shortcut;
 				}
+				HotkeyRegistry.Save();
 			};
 			resetButton.Clicked += () => {
 				if (new AlertDialog($"Are you sure you want to reset to defaults?", "Yes", "Cancel").Show() == 0) {
@@ -98,7 +99,7 @@ namespace Tangerine
 			UI.SceneView.SceneUserPreferences.Instance.ResetToDefaults();
 			UI.Timeline.TimelineUserPreferences.Instance.ResetToDefaults();
 			Core.CoreUserPreferences.Instance.ResetToDefaults();
-			HotkeyEditor.ResetToDefaults();
+			HotkeyRegistry.ResetToDefaults();
 		}
 
 		private Widget CreateColorsPane()
@@ -180,11 +181,11 @@ namespace Tangerine
 		
 		private Widget CreateKeyboardPane()
 		{
-			var keyboard = new Dialogs.ScreenKeyboard();
-			var pane = new Widget() {
+			var hotkeyEditor = new Dialogs.HotkeyEditor();
+			var pane = new Widget {
 				Layout = new VBoxLayout { Spacing = 10 },
 				Padding = contentPadding,
-				Awoken = node => keyboard.SetFocus()
+				Awoken = node => hotkeyEditor.SetFocus()
 			};
 
 			var label = new ThemedSimpleText("Commands: ") {
@@ -193,24 +194,24 @@ namespace Tangerine
 			};
 			var categoryPicker = new ThemedDropDownList();
 			categoryPicker.TextWidget.Padding = new Thickness(3, 0);
-			pane.AddNode(new Widget() {
-				Layout = new HBoxLayout() { Spacing = 4 },
+			pane.AddNode(new Widget {
+				Layout = new HBoxLayout { Spacing = 4 },
 				Nodes = { label, categoryPicker }
 			});
 
 			var allShortcutsView = new ThemedScrollView();
 			allShortcutsView.Content.Padding = contentPadding;
-			allShortcutsView.Content.Layout = new VBoxLayout() { Spacing = 4 };
+			allShortcutsView.Content.Layout = new VBoxLayout { Spacing = 4 };
 
 			var selectedShortcutsView = new ThemedScrollView();
 			selectedShortcutsView.Content.Padding = contentPadding;
-			selectedShortcutsView.Content.Layout = new VBoxLayout() { Spacing = 4 };
+			selectedShortcutsView.Content.Layout = new VBoxLayout { Spacing = 4 };
 
-			foreach (var category in HotkeyEditor.Categories) {
+			foreach (var category in HotkeyRegistry.Categories) {
 				var expandableContent = new Frame {
 					Padding = new Thickness(15, 0),
-					Layout = new VBoxLayout(),
-					Visible = true
+					Layout = new VBoxLayout { Spacing = 4 },
+					Visible = false
 				};
 				var expandButton = new ThemedExpandButton {
 					Anchors = Anchors.Left,
@@ -226,7 +227,7 @@ namespace Tangerine
 					expandableContent.Visible = !expandableContent.Visible;
 					expandButton.Expanded = expandableContent.Visible;
 				};
-				var header = new Widget() {
+				var header = new Widget {
 					Padding = new Thickness(4),
 					Layout = new HBoxLayout(),
 					Nodes = { expandButton, title }
@@ -240,14 +241,14 @@ namespace Tangerine
 					editor.PropertyLabel.LayoutCell = new LayoutCell(Alignment.LeftCenter, 1);
 					editor.ContainerWidget.LayoutCell = new LayoutCell(Alignment.LeftCenter, 1);
 					editor.PropertyChanged = () => {
-						keyboard.UpdateButtonCommands();
-						keyboard.UpdateShortcuts();
+						hotkeyEditor.UpdateButtonCommands();
+						hotkeyEditor.UpdateShortcuts();
 					};
 				}
 			}
-			keyboard.SelectedShortcutChanged = () => {
+			hotkeyEditor.SelectedShortcutChanged = () => {
 				selectedShortcutsView.Content.Nodes.Clear();
-				var commands = keyboard.SelectedCommands.ToLookup(i => i.Category);
+				var commands = hotkeyEditor.SelectedCommands.ToLookup(i => i.Category);
 				foreach (var category in commands) {
 					selectedShortcutsView.Content.AddNode(new ThemedSimpleText {
 						Text = category.Key.Name,
@@ -265,8 +266,8 @@ namespace Tangerine
 							VAlignment = VAlignment.Center,
 							LayoutCell = new LayoutCell(Alignment.LeftCenter, 2)
 						};
-						selectedShortcutsView.Content.AddNode(new Widget() {
-							Layout = new TableLayout() { Spacing = 4, RowCount = 1, ColCount = 2 },
+						selectedShortcutsView.Content.AddNode(new Widget {
+							Layout = new TableLayout { Spacing = 4, RowCount = 1, ColCount = 2 },
 							Nodes = { shortcut, name },
 							Padding = new Thickness(15, 0)
 						});
@@ -274,47 +275,49 @@ namespace Tangerine
 				}
 				selectedShortcutsView.ScrollPosition = allShortcutsView.MinScrollPosition;
 			};
-			foreach (var category in HotkeyEditor.Categories) {
+			foreach (var category in HotkeyRegistry.Categories) {
 				categoryPicker.Items.Add(new CommonDropDownList.Item(category.Name, category));
 			}
 			categoryPicker.Changed += args => {
-				keyboard.Category = (args.Value as CommandCategory);
-				keyboard.SetFocus();
+				hotkeyEditor.Category = (args.Value as CommandCategory);
+				hotkeyEditor.SetFocus();
 				int index = -1;
 				foreach (var node in allShortcutsView.Content.Nodes.SelectMany(i => i.Nodes)) {
 					var button = node as ThemedExpandButton;
-					if (button == null)
+					if (button == null) {
 						continue;
+					}
 					index++;
 					if (index == args.Index) {
-						float pos = button.ParentWidget.Position.Y;
-						allShortcutsView.ScrollPosition =
-							Mathf.Clamp(pos, allShortcutsView.MinScrollPosition, allShortcutsView.MaxScrollPosition);
+						if (!button.Expanded) {
+							button.Clicked?.Invoke();
+						}
+						allShortcutsView.ScrollPosition = button.ParentWidget.Position.Y;
 						break;
 					}
 				}
 			};
 			categoryPicker.Index = 0;
 
-			pane.AddNode(keyboard);
-			pane.AddNode(new Widget() {
+			pane.AddNode(hotkeyEditor);
+			pane.AddNode(new Widget {
 				Layout = new HBoxLayout { Spacing = 4 },
 				Nodes = {
-					new Widget() {
-						Layout = new VBoxLayout() {Spacing = 4 },
+					new Widget {
+						Layout = new VBoxLayout {Spacing = 4 },
 						Nodes = {
 							new ThemedSimpleText("All commands:") { LayoutCell = new LayoutCell { StretchY = 0 } },
-							new ThemedFrame() {
+							new ThemedFrame {
 								Nodes = { allShortcutsView },
 								Layout = new VBoxLayout()
 							}
 						}
 					},
-					new Widget() {
-						Layout = new VBoxLayout() {Spacing = 4 },
+					new Widget {
+						Layout = new VBoxLayout {Spacing = 4 },
 						Nodes = {
 							new ThemedSimpleText("Selected commands:") { LayoutCell = new LayoutCell { StretchY = 0 } },
-							new ThemedFrame() {
+							new ThemedFrame {
 								Nodes = { selectedShortcutsView },
 								Layout = new VBoxLayout()
 							}

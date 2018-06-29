@@ -9,7 +9,7 @@ using static Lime.ThemedButton;
 
 namespace Tangerine.Dialogs
 {
-	public class ScreenKeyboard : Widget
+	public class HotkeyEditor : Widget
 	{
 		private List<KeyboardButton> buttons = new List<KeyboardButton>();
 		private IEnumerable<KeyboardButton> FindButtons(Key key) => buttons.Where(i => i.Key == key);
@@ -22,6 +22,8 @@ namespace Tangerine.Dialogs
 			((main == Key.Unknown) ? false : info.Shortcut.Main == main);
 
 		public IEnumerable<CommandInfo> SelectedCommands { get; private set; }
+
+		private IEnumerable<ICommand> consumableCommands = HotkeyRegistry.Commands.Select(i => i.Command).Union(Command.Editing);
 
 		private Modifiers modifiers;
 		private Key main;
@@ -37,7 +39,7 @@ namespace Tangerine.Dialogs
 
 		public Action SelectedShortcutChanged { get; set; }
 
-		public ScreenKeyboard()
+		public HotkeyEditor()
 		{
 			BuildKeyboard();
 			Updating += ScreenKeyboard_Updating;
@@ -51,7 +53,7 @@ namespace Tangerine.Dialogs
 			foreach (var button in this.buttons) {
 				button.Commands.Clear();
 			}
-			foreach (var command in HotkeyEditor.Commands) {
+			foreach (var command in HotkeyRegistry.Commands) {
 				var key = command.Shortcut.Main;
 				if (key == Key.Unknown)
 					continue;
@@ -69,8 +71,8 @@ namespace Tangerine.Dialogs
 			if (Category == null)
 				return;
 			bool isGenericCategory = (Category.SystemName == typeof(GenericCommands).Name);
-			SelectedCommands = isGenericCategory ? HotkeyEditor.Commands.Where(i => IsCommandSelected(i)) :
-				HotkeyEditor.Commands.Where(i => IsCommandSelected(i) && i.Category == Category);
+			SelectedCommands = isGenericCategory ? HotkeyRegistry.Commands.Where(i => IsCommandSelected(i)) :
+				HotkeyRegistry.Commands.Where(i => IsCommandSelected(i) && i.Category == Category);
 			foreach (var button in buttons) {
 				button.CommandName = null;
 				button.CommandState = KeyboardCommandState.None;
@@ -201,34 +203,34 @@ namespace Tangerine.Dialogs
 			var input = Input;
 			input.ConsumeKeys(Key.Enumerate().Where(
 				k => input.WasKeyRepeated(k) || input.WasKeyPressed(k) || input.WasKeyReleased(k)));
-			Command.ConsumeRange(Command.Editing);
+			Command.ConsumeRange(consumableCommands);
 		}
 
 
 		private void BuildKeyboard()
 		{
 			Layout = new TableLayout { ColCount = 3, RowCount = 1, Spacing = 20 };
-			var fRow = new Widget() { Layout = new TableLayout { ColCount = 12, RowCount = 1, Spacing = 4 } };
-			var numbersRow = new Widget() { Layout = new TableLayout { ColCount = 14, RowCount = 1, Spacing = 4 } };
-			var firstRow = new Widget() { Layout = new TableLayout { ColCount = 14, RowCount = 1, Spacing = 4 } };
-			var secondRow = new Widget() { Layout = new TableLayout { ColCount = 13, RowCount = 1, Spacing = 4 } };
-			var thirdRow = new Widget() { Layout = new TableLayout { ColCount = 12, RowCount = 1, Spacing = 4 } };
-			var controlsRow = new Widget() { Layout = new TableLayout { ColCount = 7, RowCount = 1, Spacing = 4 } };
+			var fRow = new Widget { Layout = new TableLayout { ColCount = 12, RowCount = 1, Spacing = 4 } };
+			var numbersRow = new Widget { Layout = new TableLayout { ColCount = 14, RowCount = 1, Spacing = 4 } };
+			var firstRow = new Widget { Layout = new TableLayout { ColCount = 14, RowCount = 1, Spacing = 4 } };
+			var secondRow = new Widget { Layout = new TableLayout { ColCount = 13, RowCount = 1, Spacing = 4 } };
+			var thirdRow = new Widget { Layout = new TableLayout { ColCount = 12, RowCount = 1, Spacing = 4 } };
+			var controlsRow = new Widget { Layout = new TableLayout { ColCount = 7, RowCount = 1, Spacing = 4 } };
 
 			var leftPart = new Widget {
-				Layout = new TableLayout() { ColCount = 1, RowCount = 6, Spacing = 4 },
+				Layout = new TableLayout { ColCount = 1, RowCount = 6, Spacing = 4 },
 				Nodes = { fRow, numbersRow, firstRow, secondRow, thirdRow, controlsRow },
-				LayoutCell = new LayoutCell() { StretchX = 15 }
+				LayoutCell = new LayoutCell { StretchX = 15 }
 			};
 
 			var middlePart = new Widget {
-				Layout = new TableLayout() { ColCount = 3, RowCount = 6, Spacing = 4 },
-				LayoutCell = new LayoutCell() { StretchX = 3 }
+				Layout = new TableLayout { ColCount = 3, RowCount = 6, Spacing = 4 },
+				LayoutCell = new LayoutCell { StretchX = 3 }
 			};
 
 			var rightPart = new Widget {
-				Layout = new TableLayout() { ColCount = 4, RowCount = 6, Spacing = 4 },
-				LayoutCell = new LayoutCell() { StretchX = 4 }
+				Layout = new TableLayout { ColCount = 4, RowCount = 6, Spacing = 4 },
+				LayoutCell = new LayoutCell { StretchX = 4 }
 			};
 
 			for (int i = Key.F1.Code; i <= Key.F12.Code; ++i) {
@@ -387,7 +389,7 @@ namespace Tangerine.Dialogs
 
 		private Widget CreateSpace(Widget parent, int rowSpan, int colSpan)
 		{
-			var space = new Widget() {
+			var space = new Widget {
 				MinSize = Vector2.Zero,
 				MaxSize = Vector2.PositiveInfinity,
 				LayoutCell = new LayoutCell { RowSpan = rowSpan, ColSpan = colSpan }
@@ -426,7 +428,7 @@ namespace Tangerine.Dialogs
 			caption.HAlignment = HAlignment.Left;
 			caption.Padding = new Thickness(5, 2);
 			caption.TextColor = ColorTheme.Current.Keyboard.GrayText;
-			commandName = new SimpleText() {
+			commandName = new SimpleText {
 				TextColor = ColorTheme.Current.Keyboard.BlackText,
 				FontHeight = Theme.Metrics.TextHeight,
 				HAlignment = HAlignment.Left,
@@ -476,9 +478,7 @@ namespace Tangerine.Dialogs
 		public bool IsModifier { get; set; } = false;
 		public KeyboardCommandState CommandState { get; set; }
 
-		static private Vertex[] triangleVertices = new Vertex[] {
-			new Vertex(), new Vertex(), new Vertex()
-		};
+		static private Vertex[] triangleVertices = new Vertex[3];
 
 		public KeyboardButtonPresenter()
 		{

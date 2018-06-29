@@ -223,18 +223,17 @@ namespace Tangerine
 			new UI.FilesystemView.FilesystemPane(filesystemPanel);
 			RegisterGlobalCommands();
 			
-			HotkeyEditor.InitCommands(typeof(GenericCommands), "Generic Commands");
-			HotkeyEditor.InitCommands(typeof(TimelineCommands), "Timeline Commands");
-			HotkeyEditor.InitCommands(typeof(InspectorCommands), "Inspector Commands");
-			HotkeyEditor.InitCommands(typeof(SceneViewCommands), "Scene View Commands");
-			HotkeyEditor.InitCommands(typeof(Tools), "Tools");
-			HotkeyEditor.InitCommands(typeof(FilesystemCommands), "Filesystem Commands");
-			HotkeyEditor.InitCommands(typeof(OrangeCommands), "Orange Commands");
-			HotkeyEditor.ResetToDefaults();
-			if (File.Exists(HotkeyEditor.Filepath))
-				HotkeyEditor.Load();
+			HotkeyRegistry.InitCommands(typeof(GenericCommands), "Generic Commands");
+			HotkeyRegistry.InitCommands(typeof(TimelineCommands), "Timeline Commands");
+			HotkeyRegistry.InitCommands(typeof(InspectorCommands), "Inspector Commands");
+			HotkeyRegistry.InitCommands(typeof(SceneViewCommands), "Scene View Commands");
+			HotkeyRegistry.InitCommands(typeof(Tools), "Tools");
+			HotkeyRegistry.InitCommands(typeof(FilesystemCommands), "Filesystem Commands");
+			HotkeyRegistry.InitCommands(typeof(OrangeCommands), "Orange Commands");
+			if (File.Exists(HotkeyRegistry.Filepath))
+				HotkeyRegistry.Load();
 			else
-				HotkeyEditor.Save();
+				HotkeyRegistry.Save();
 		}
 
 		void SetupMainWindowTitle(WindowWidget windowWidget)
