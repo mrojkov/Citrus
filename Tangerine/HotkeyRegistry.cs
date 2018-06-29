@@ -35,6 +35,21 @@ namespace Tangerine
 			}
 			Categories.Add(category);
 		}
+
+		public static void InitCommands(IEnumerable<ICommand> commands, string systemName, string categoryName = null)
+		{
+			var category = new CommandCategory(systemName, categoryName);
+			foreach (var command in commands) {
+				var info = new CommandInfo(command, category, command.Text, command.Text);
+				info.Shortcut = command.Shortcut;
+				category.Commands.Add(info);
+				defaults.Add(new ShortcutBinding {
+					Command = command,
+					Shortcut = command.Shortcut
+				});
+			}
+			Categories.Add(category);
+		}
 		
 		public static void Load()
 		{

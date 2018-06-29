@@ -23,8 +23,6 @@ namespace Tangerine.Dialogs
 
 		public IEnumerable<CommandInfo> SelectedCommands { get; private set; }
 
-		private IEnumerable<ICommand> consumableCommands = HotkeyRegistry.Commands.Select(i => i.Command).Union(Command.Editing);
-
 		private Modifiers modifiers;
 		private Key main;
 
@@ -203,7 +201,7 @@ namespace Tangerine.Dialogs
 			var input = Input;
 			input.ConsumeKeys(Key.Enumerate().Where(
 				k => input.WasKeyRepeated(k) || input.WasKeyPressed(k) || input.WasKeyReleased(k)));
-			Command.ConsumeRange(consumableCommands);
+			Command.ConsumeRange(Command.Editing);
 		}
 
 

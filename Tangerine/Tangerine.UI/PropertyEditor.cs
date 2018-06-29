@@ -1168,30 +1168,37 @@ namespace Tangerine.UI
 			modifiers = value.Modifiers;
 		}
 
+		private void PressModifier(Modifiers modifier, Key key)
+		{
+			var input = editor.Input;
+			if (input.WasKeyPressed(key)) {
+				modifiers |= modifier;
+			}
+			else if (input.WasKeyReleased(key)) {
+				modifiers &= ~modifier;
+			}
+		}
+
 		private void Updating(float dt)
 		{
 			if (!editor.IsFocused())
 				return;
+			PressModifier(Modifiers.Alt, Key.Alt);
+			PressModifier(Modifiers.Shift, Key.Shift);
+			PressModifier(Modifiers.Control, Key.Control);
+			PressModifier(Modifiers.Win, Key.Win);
+
 			var input = editor.Input;
-			if (input.WasKeyPressed(Key.Alt)) {
-				modifiers = modifiers.HasFlag(Modifiers.Alt) ? modifiers & ~Modifiers.Alt : modifiers | Modifiers.Alt;
-			}
-			if (input.WasKeyPressed(Key.Shift)) {
-				modifiers = modifiers.HasFlag(Modifiers.Shift) ? modifiers & ~Modifiers.Shift : modifiers | Modifiers.Shift;
-			}
-			if (input.WasKeyPressed(Key.Control)) {
-				modifiers = modifiers.HasFlag(Modifiers.Control) ? modifiers & ~Modifiers.Control : modifiers | Modifiers.Control;
-			}
 			var keys = Key.Enumerate().Where(k => input.WasKeyPressed(k));
 			if (!keys.Any())
 				return;
 			foreach (var key in keys) {
 				if (!key.IsModifier() && !key.IsMouseKey() && Shortcut.ValidateMainKey(key)) {
 					main = key;
-					break;
+					SetValue(new Shortcut(modifiers, main));
+					return;
 				}
 			}
-			SetValue(new Shortcut(modifiers, main));
 		}
 
 		private void Updated(float dt)

@@ -230,8 +230,10 @@ namespace Tangerine
 			HotkeyRegistry.InitCommands(typeof(Tools), "Tools");
 			HotkeyRegistry.InitCommands(typeof(FilesystemCommands), "Filesystem Commands");
 			HotkeyRegistry.InitCommands(typeof(OrangeCommands), "Orange Commands");
-			if (File.Exists(HotkeyRegistry.Filepath))
+			HotkeyRegistry.InitCommands(Command.Editing, "Editing", "Editing");
+			if (File.Exists(HotkeyRegistry.Filepath)) {
 				HotkeyRegistry.Load();
+			}
 			else
 				HotkeyRegistry.Save();
 		}

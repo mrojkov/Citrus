@@ -25,6 +25,8 @@ namespace Tangerine
 			Right = 15,
 		};
 
+		private bool saved = false;
+
 		public PreferencesDialog()
 		{
 			theme = AppUserPreferences.Instance.Theme;
@@ -62,17 +64,14 @@ namespace Tangerine
 					}
 				}
 			};
-
+			HotkeyRegistry.Save();
 			okButton.Clicked += () => {
+				saved = true;
 				window.Close();
 				if (theme != AppUserPreferences.Instance.Theme) {
 					AlertDialog.Show("The color theme change will take effect next time you run Tangerine.");
 				}
 				Core.UserPreferences.Instance.Save();
-				foreach (var info in HotkeyRegistry.Commands) {
-					info.Command.Shortcut = info.Shortcut;
-				}
-				HotkeyRegistry.Save();
 			};
 			resetButton.Clicked += () => {
 				if (new AlertDialog($"Are you sure you want to reset to defaults?", "Yes", "Cancel").Show() == 0) {
@@ -82,15 +81,33 @@ namespace Tangerine
 			cancelButton.Clicked += () => {
 				window.Close();
 				Core.UserPreferences.Instance.Load();
+				HotkeyRegistry.Load();
 			};
 			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
 			rootWidget.LateTasks.AddLoop(() => {
 				if (rootWidget.Input.ConsumeKeyPress(Key.Escape)) {
 					window.Close();
 					Core.UserPreferences.Instance.Load();
+					HotkeyRegistry.Load();
 				}
 			});
 			okButton.SetFocus();
+
+			window.Closed += () => {
+				if (saved) {
+					foreach (var command in HotkeyRegistry.Commands) {
+						command.Command.Shortcut = command.Shortcut;
+					}
+					HotkeyRegistry.Save();
+				}
+				else {
+					HotkeyRegistry.Load();
+				}
+			};
+
+			foreach (var command in HotkeyRegistry.Commands) {
+				command.Command.Shortcut = new Shortcut(Key.Unknown);
+			}
 		}
 
 		private void ResetToDefaults()
