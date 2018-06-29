@@ -27,7 +27,7 @@ namespace Lime
 		public bool Fullscreen { get { return true; } set {} }
 		public string Title { get; set; }
 		public bool Visible { get { return true; } set {} }
-		public Input Input { get { return ActivityDelegate.Instance.Input; } }
+		public WindowInput Input { get; private set; }
 		public MouseCursor Cursor { get; set; }
 		public WindowState State { get { return WindowState.Fullscreen; } set {} }
 		public bool FixedSize { get { return true; } set {} }
@@ -62,34 +62,14 @@ namespace Lime
 			get; private set;
 		}
 
-		private Vector2 lastDesktopMousePosition = new Vector2(-1, -1);
-		private Vector2 calculatedMousePosition = new Vector2(-1, -1);
-
-		public Vector2 MousePosition
-		{
-			get {
-				if (lastDesktopMousePosition != Input.DesktopMousePosition) {
-					lastDesktopMousePosition = Input.DesktopMousePosition;
-					calculatedMousePosition = lastDesktopMousePosition * MousePositionTransform / PixelScale;
-				}
-				return calculatedMousePosition;
-			}
-		}
-
 		public Vector2 LocalToDesktop(Vector2 localPosition)
 		{
-			return localPosition * MousePositionTransform.CalcInversed() * PixelScale;
+			return localPosition * PixelScale;
 		}
 
-		private Matrix32 mousePositionTransform = Matrix32.Identity;
-		public Matrix32 MousePositionTransform
+		public Vector2 DesktopToLocal(Vector2 desktopPosition)
 		{
-			get { return mousePositionTransform; }
-			set {
-				mousePositionTransform = value;
-				calculatedTouchPositions = new Vector2?[Input.MaxTouches];
-				lastDesktopMousePosition = new Vector2(-1, -1);
-			}
+			return desktopPosition / PixelScale;
 		}
 
 		public Window(WindowOptions options)
@@ -98,6 +78,7 @@ namespace Lime
 				throw new Lime.Exception("Attempt to set Application.MainWindow twice");
 			}
 			Application.MainWindow = this;
+			Input = new WindowInput(this);
 			Active = true;
 			fpsCounter = new FPSCounter();
 			ActivityDelegate.Instance.Paused += activity => {
@@ -122,15 +103,7 @@ namespace Lime
 			};
 
 			PixelScale = Resources.System.DisplayMetrics.Density;
-		}
-
-		private Vector2?[] calculatedTouchPositions = new Vector2?[Input.MaxTouches];
-		public Vector2 GetTouchPosition(int index)
-		{
-			if (calculatedTouchPositions[index] == null) {
-				calculatedTouchPositions[index] = Input.GetDesktopTouchPosition(index) * MousePositionTransform / PixelScale;
-			}
-			return calculatedTouchPositions[index].Value;
+			Application.WindowUnderMouse = this;
 		}
 
 		public void Center() {}

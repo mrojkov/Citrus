@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -69,6 +69,7 @@
     <Compile Include="Source\Application\iOSGameView.cs" />
     <Compile Include="Source\Application\Logger.cs" />
     <Compile Include="Source\Application\Sdl2.cs" />
+    <Compile Include="Source\Application\WindowInput.cs" />
     <Compile Include="Source\Audio\AudioSystem.cs" />
     <Compile Include="Source\Audio\SerializableSample.cs" />
     <Compile Include="Source\Audio\Sound.cs" />

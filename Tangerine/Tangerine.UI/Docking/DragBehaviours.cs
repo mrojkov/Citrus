@@ -14,7 +14,7 @@ namespace Tangerine.UI.Docking
 		private readonly WindowPlacement windowPlacement;
 		private readonly PanelPlacement panelPlacement;
 		public static bool IsActive { get; private set; }
-		public Input Input { get; }
+		public WindowInput Input { get; }
 
 		private WindowDragBehaviour(string panelId)
 		{
@@ -22,7 +22,7 @@ namespace Tangerine.UI.Docking
 			windowPlacement = DockManager.Instance.Model.GetWindowByPlacement(panelPlacement);
 			((WindowWidget)WidgetContext.Current.Root).Tasks.Add(MoveTask());
 			Input = CommonWindow.Current.Input;
-			Input.Simulator.SetKeyState(Key.Mouse0, true);
+			Application.Input.Simulator.SetKeyState(Key.Mouse0, true);
 		}
 
 		private IEnumerator<object> MoveTask()
@@ -72,7 +72,7 @@ namespace Tangerine.UI.Docking
 				var winPlacement = DockManager.Instance.Model.GetWindowByPlacement(placement);
 				var requestedDockingComponent = winPlacement.WindowWidget.Components.Get<RequestedDockingComponent>();
 				if (requestedDockingComponent == null) continue;
-				var clientMousePos = winPlacement.WindowWidget.Window.MousePosition;
+				var clientMousePos = winPlacement.WindowWidget.Window.Input.MousePosition;
 				if (!bounds.Contains(clientMousePos)) continue;
 				DockSite site;
 				Rectangle? rect;

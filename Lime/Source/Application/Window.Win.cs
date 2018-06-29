@@ -33,7 +33,7 @@ namespace Lime
 		private bool isInvalidated;
 		private bool vSync;
 
-		public Input Input => Application.Input;
+		public WindowInput Input { get; private set; }
 
 		public bool Active => active;
 		public Form Form => form;
@@ -158,39 +158,20 @@ namespace Lime
 			return new Vector2(sp.X + glControl.Left, sp.Y + glControl.Top);
 		}
 
-		private Vector2 lastDesktopMousePosition = new Vector2(-1, -1);
-		private Vector2 calculatedMousePosition = new Vector2(-1, -1);
-
-		public Vector2 MousePosition
-		{
-			get {
-				if (lastDesktopMousePosition != Input.DesktopMousePosition) {
-					lastDesktopMousePosition = Input.DesktopMousePosition;
-					calculatedMousePosition = SDToLime.Convert(
-						glControl.PointToClient(new Point((int) Input.DesktopMousePosition.X, (int) Input.DesktopMousePosition.Y)),
-						PixelScale
-					) * MousePositionTransform;
-				}
-				return calculatedMousePosition;
-			}
-		}
-
 		public Vector2 LocalToDesktop(Vector2 localPosition)
 		{
 			return SDToLime.Convert(
-				glControl.PointToScreen(LimeToSD.ConvertToPoint(localPosition * MousePositionTransform.CalcInversed(), PixelScale)),
+				glControl.PointToScreen(LimeToSD.ConvertToPoint(localPosition, PixelScale)),
 				PixelScale
 			);
 		}
 
-		private Matrix32 mousePositionTransform = Matrix32.Identity;
-		public Matrix32 MousePositionTransform
+		public Vector2 DesktopToLocal(Vector2 desktopPosition)
 		{
-			get { return mousePositionTransform; }
-			set {
-				mousePositionTransform = value;
-				lastDesktopMousePosition = new Vector2(-1, -1);
-			}
+			return SDToLime.Convert(
+				glControl.PointToClient(new Point((int) desktopPosition.X, (int) desktopPosition.Y)),
+				PixelScale
+			);
 		}
 
 		public float UnclampedDelta { get; private set; }
@@ -284,6 +265,7 @@ namespace Lime
 				throw new Lime.Exception("Attempt to create a second window for ES20 rendering backend. Use OpenGL backend instead.");
 			}
 			form = new Form();
+			Input  = new WindowInput(this);
 			using (var graphics = form.CreateGraphics()) {
 				PixelScale = CalcPixelScale(graphics.DpiX);
 			}
@@ -383,11 +365,6 @@ namespace Lime
 					glControl.VSync = value;
 				}
 			}
-		}
-
-		public Vector2 GetTouchPosition(int index)
-		{
-			return Input.GetDesktopTouchPosition(index);
 		}
 
 		public void ShowModal()
@@ -556,8 +533,8 @@ namespace Lime
 				return;
 			}
 			lastMousePosition = Control.MousePosition;
-			Input.DesktopMousePosition = new Vector2(lastMousePosition.X, lastMousePosition.Y);
-			Input.SetDesktopTouchPosition(0, Input.DesktopMousePosition);
+			Application.Input.DesktopMousePosition = new Vector2(lastMousePosition.X, lastMousePosition.Y);
+			Application.Input.SetDesktopTouchPosition(0, Application.Input.DesktopMousePosition);
 		}
 
 		private void OnTick(object sender, EventArgs e)

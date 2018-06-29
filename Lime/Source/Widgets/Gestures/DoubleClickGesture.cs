@@ -49,7 +49,7 @@ namespace Lime
 			}
 			if (state == State.Initial && Input.WasMousePressed(ButtonIndex)) {
 				pressTime = DateTime.Now;
-				pressPosition = MousePosition;
+				pressPosition = Input.MousePosition;
 				state = State.FirstPress;
 			}
 			if (state == State.FirstPress && !Input.IsMousePressed(ButtonIndex)) {
@@ -57,7 +57,7 @@ namespace Lime
 			}
 			if (state == State.WaitSecondPress && Input.WasMousePressed(ButtonIndex)) {
 				state = State.Initial;
-				if (Input.GetNumTouches() == 1 && (MousePosition - pressPosition).Length < MaxDistanceBetweenPresses) {
+				if (Input.GetNumTouches() == 1 && (Input.MousePosition - pressPosition).Length < MaxDistanceBetweenPresses) {
 					CancelOtherGestures(gestures);
 					recognized.Raise();
 				}

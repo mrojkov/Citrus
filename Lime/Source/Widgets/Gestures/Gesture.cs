@@ -8,8 +8,7 @@ namespace Lime
 	public abstract class Gesture
 	{
 		public Node Owner { get; internal set; }
-		protected Input Input => CommonWindow.Current.Input;
-		public virtual Vector2 MousePosition => CommonWindow.Current.MousePosition;
+		protected WindowInput Input => CommonWindow.Current.Input;
 
 		internal protected abstract void Cancel();
 		internal protected abstract void Update(IEnumerable<Gesture> gestures);

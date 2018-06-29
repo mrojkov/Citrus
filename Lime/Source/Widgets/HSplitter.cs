@@ -128,7 +128,7 @@ namespace Lime
 				for (int i = 0; i < splitter.Nodes.Count - 1; i++) {
 					var widget = splitter.Nodes[i + 1].AsWidget;
 					var widgetPos = widget.GlobalPosition;
-					var mousePos = Window.Current.MousePosition;
+					var mousePos = Window.Current.Input.MousePosition;
 					if (Mathf.Abs(mousePos.X - (widgetPos.X - splitter.SeparatorWidth * 0.5f)) < splitter.SeparatorActiveAreaWidth * 0.5f) {
 						if (mousePos.Y > widgetPos.Y && mousePos.Y < widgetPos.Y + widget.Height) {
 							SeparatorUnderMouse = i;
