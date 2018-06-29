@@ -249,7 +249,7 @@ namespace Orange
 		{
 			bundleBackupFiles = new List<String>();
 
-			AddStage(RemoveOrphanedModels);
+			AddStage(RemoveDeprecatedModels);
 			AddStage(SyncModels);
 			AddStage(SyncAtlases, CookingProfile.Total);
 			AddStage(SyncDeleted, CookingProfile.Total);
@@ -1058,22 +1058,15 @@ namespace Orange
 			}
 		}
 
-		// Orange used to create .model file for each .fbx file not only in bundle,
-		// but also in asset directory. This way Tangerine could display them.
-		// But no one cared to remove model files when fbx files were removed.
-		// So now when for example code cooker tries to cook .model file (since it's also a scene file) it crashes
-		// since there's no model file in the bundle, because there's no more fbx file.
-		private static void RemoveOrphanedModels()
+		private static void RemoveDeprecatedModels()
 		{
 			foreach (var fileInfo in The.Workspace.AssetFiles.Enumerate(".model")) {
 				var path = fileInfo.Path;
-				if (!File.Exists(Path.ChangeExtension(path, ".fbx"))) {
-					if (cookingRulesMap.ContainsKey(path)) {
-						cookingRulesMap.Remove(path);
-					}
-					Lime.Logger.Write($"Removing orphaned .model file: {path}");
-					File.Delete(path);
+				if (cookingRulesMap.ContainsKey(path)) {
+					cookingRulesMap.Remove(path);
 				}
+				Logger.Write($"Removing deprecated .model file: {path}");
+				File.Delete(path);
 			}
 		}
 
