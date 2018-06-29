@@ -85,6 +85,7 @@ namespace Tangerine
 					Command.MenuSeparator,
 #endif
 					GenericCommands.CloseDocument,
+					GenericCommands.CloseAllTabs,
 #if !MAC
 					GenericCommands.Quit,
 #endif

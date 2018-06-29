@@ -44,6 +44,7 @@ namespace Tangerine.UI
 		public static readonly ICommand RecentProjects = new Command("Recent Projects", new Menu());
 		public static readonly ICommand PreferencesDialog = new Command("Preferences...", new Shortcut(Modifiers.Command, Key.P));
 		public static readonly ICommand CloseDocument = new Command("Close Document");
+		public static readonly ICommand CloseAllTabs = new Command("Close All Tabs");
 		public static readonly ICommand Group = new Command("Group", new Shortcut(Modifiers.Command, Key.G));
 		public static readonly ICommand Ungroup = new Command("Ungroup", new Shortcut(Modifiers.Command | Modifiers.Shift, Key.G));
 		public static readonly ICommand InsertTimelineColumn = new Command("Insert Timeline Column", new Shortcut(Modifiers.Command, Key.Q));

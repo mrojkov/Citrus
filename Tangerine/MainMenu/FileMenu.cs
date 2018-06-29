@@ -160,6 +160,16 @@ namespace Tangerine
 		}
 	}
 
+	public class AllFilesClose : DocumentCommandHandler
+	{
+		public override void ExecuteTransaction()
+		{
+			if (Project.Current.Documents.Count != 0) {
+				Project.Current.CloseAllDocuments();
+			}
+		}
+	}
+
 	public class UpgradeDocumentFormat : DocumentCommandHandler
 	{
 		public override bool GetEnabled()

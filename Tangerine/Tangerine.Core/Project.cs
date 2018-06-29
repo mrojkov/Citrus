@@ -213,6 +213,18 @@ namespace Tangerine.Core
 			return false;
 		}
 
+		public bool CloseAllDocuments()
+		{
+			for(var doc = documents.Last(); doc != null; doc=documents.Last()) {
+				if (CloseDocument(doc)) {
+					continue;
+				} else {
+					return false;
+				}
+			}
+			return true;
+		}
+
 		public void NextDocument()
 		{
 			AdvanceDocument(1);

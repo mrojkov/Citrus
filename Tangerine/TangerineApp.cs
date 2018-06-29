@@ -350,6 +350,7 @@ namespace Tangerine
 						if (tab.Input.WasKeyReleased(Key.Mouse1)) {
 							var menu = new Menu {
 								GenericCommands.CloseDocument,
+								GenericCommands.CloseAllTabs,
 								GenericCommands.Save,
 								FilesystemCommands.NavigateTo,
 								FilesystemCommands.OpenInSystemFileManager,
@@ -433,6 +434,7 @@ namespace Tangerine
 			h.Connect(GenericCommands.Revert, new FileRevert());
 			h.Connect(GenericCommands.UpgradeDocumentFormat, new UpgradeDocumentFormat());
 			h.Connect(GenericCommands.CloseDocument, new FileClose());
+			h.Connect(GenericCommands.CloseAllTabs, new AllFilesClose());
 			h.Connect(GenericCommands.Quit, Application.Exit);
 			h.Connect(GenericCommands.PreferencesDialog, () => new PreferencesDialog());
 			h.Connect(GenericCommands.Group, new GroupNodes());
