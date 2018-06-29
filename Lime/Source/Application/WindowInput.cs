@@ -61,7 +61,7 @@
 		/// <summary>
 		/// Indicates how much the mouse wheel was moved
 		/// </summary>
-		public float WheelScrollAmount => !ownerWindow.Active ? 0 : Application.Input.WheelScrollAmount;
+		public float WheelScrollAmount => (ownerWindow == Application.WindowUnderMouse) ? Application.Input.WheelScrollAmount : 0;
 
 		/// <summary>
 		/// Returns true while the user holds down the key identified by name. Think auto fire.
