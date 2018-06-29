@@ -1,4 +1,4 @@
-﻿#if ANDROID
+#if ANDROID
 using System;
 using System.Collections.Generic;
 
@@ -42,6 +42,7 @@ namespace Lime
 		public Vector2 MinimumDecoratedSize { get { return Vector2.Zero; } set {} }
 		public Vector2 MaximumDecoratedSize { get { return Vector2.Zero; } set {} }
 		public ActivityDelegate ActivityDelegate { get { return ActivityDelegate; } }
+		public float UnclampedDelta { get; private set; }
 		public float FPS { get { return fpsCounter.FPS; } }
 
 		[Obsolete("Use FPS property instead", true)]
@@ -115,7 +116,9 @@ namespace Lime
 				fpsCounter.Refresh();
 			};
 			ActivityDelegate.Instance.GameView.UpdateFrame += (sender, e) => {
-				RaiseUpdating((float)e.Time);
+				UnclampedDelta = (float)e.Time;
+				var delta = Math.Min(UnclampedDelta, Application.MaxDelta);
+				RaiseUpdating(delta);
 			};
 
 			PixelScale = Resources.System.DisplayMetrics.Density;

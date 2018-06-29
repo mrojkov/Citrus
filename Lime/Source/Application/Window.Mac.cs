@@ -113,7 +113,7 @@ namespace Lime
 				if (lastDesktopMousePosition != Input.DesktopMousePosition) {
 					lastDesktopMousePosition = Input.DesktopMousePosition;
 					calculatedMousePosition = new Vector2 (
-						lastDesktopMousePosition.X - DecoratedPosition.X, 
+						lastDesktopMousePosition.X - DecoratedPosition.X,
 						(float)NSGameView.Frame.Height - (lastDesktopMousePosition.Y - DecoratedPosition.Y)
 					) * MousePositionTransform;
 				}
@@ -235,6 +235,8 @@ namespace Lime
 				View.DragFile(filename, new CGRect(), false, NSApplication.SharedApplication.CurrentEvent);
 			}
 		}
+
+		public float UnclampedDelta { get; private set; }
 
 		public float FPS { get { return fpsCounter.FPS; } }
 
@@ -480,9 +482,9 @@ namespace Lime
 
 		private void Update()
 		{
-			var delta = (float)stopwatch.Elapsed.TotalSeconds;
+			UnclampedDelta = (float)stopwatch.Elapsed.TotalSeconds;
 			stopwatch.Restart();
-			delta = Mathf.Clamp(delta, 0, Application.MaxDelta);
+			var delta = Mathf.Clamp(UnclampedDelta, 0, Application.MaxDelta);
 			// Refresh mouse position on every frame to make HitTest work properly if mouse is outside of the window.
 			RefreshMousePosition();
 			RaiseUpdating(delta);

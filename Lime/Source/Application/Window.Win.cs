@@ -193,6 +193,8 @@ namespace Lime
 			}
 		}
 
+		public float UnclampedDelta { get; private set; }
+
 		FPSCounter fpsCounter = new FPSCounter();
 		public float FPS { get { return fpsCounter.FPS; } }
 
@@ -611,7 +613,8 @@ namespace Lime
 			if (!form.Visible || !form.CanFocus) {
 				return;
 			}
-			float delta = Mathf.Clamp((float)stopwatch.Elapsed.TotalSeconds, 0, Application.MaxDelta);
+			UnclampedDelta = (float)stopwatch.Elapsed.TotalSeconds;
+			float delta = Mathf.Clamp(UnclampedDelta, 0, Application.MaxDelta);
 			stopwatch.Restart();
 			if (this == Application.MainWindow && Application.MainMenu != null) {
 				Application.MainMenu.Refresh();

@@ -39,6 +39,7 @@ namespace Lime
 		public Vector2 MaximumDecoratedSize { get { return Vector2.Zero; } set {} }
 		public bool Visible { get { return true; } set {} }
 		public MouseCursor Cursor { get; set; }
+		public float UnclampedDelta { get; private set; }
 		public float FPS { get { return fpsCounter.FPS; } }
 
 		[Obsolete("Use FPS property instead", true)]
@@ -157,7 +158,8 @@ namespace Lime
 			if (!Active || UIViewController.SoftKeyboardBeingShownOrHid) {
 				return;
 			}
-			var delta = (float)Math.Min(e.Time, Application.MaxDelta);
+			UnclampedDelta = (float)e.Time;
+			var delta = Math.Min(UnclampedDelta, Application.MaxDelta);
 			RaiseUpdating(delta);
 			Input.CopyKeysState();
 			Input.ProcessPendingKeyEvents(delta);

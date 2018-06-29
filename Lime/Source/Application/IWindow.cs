@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Lime
@@ -145,6 +145,11 @@ namespace Lime
 		float FPS { get; }
 
 		/// <summary>
+		/// Milliseconds since last update.
+		/// </summary>
+		float UnclampedDelta { get; }
+
+		/// <summary>
 		/// Gets the display device containing the largest portion of this window on desktops
 		/// or the default screen on devices.
 		/// </summary>
@@ -272,13 +277,13 @@ namespace Lime
 		/// Indicates is this window in rendering phase.
 		/// </summary>
 		bool IsRenderingPhase { get; }
-		
+
 		/// <summary>
 		/// Executes an action at the rendering phase.
 		/// </summary>
 		/// <param name="action"></param>
 		void InvokeOnRendering(Action action);
-		
+
 		bool VSync { get; set; }
 
 		/// <summary>

@@ -66,6 +66,14 @@ namespace Lime
 		}
 
 		public Matrix32 MousePositionTransform { get; set; }
+
+		public float UnclampedDelta
+		{
+			get
+			{
+				throw new NotImplementedException();
+			}
+		}
 	}
 }
 #endif
