@@ -19,7 +19,8 @@
 		public Matrix32 MousePositionTransform
 		{
 			get { return mousePositionTransform; }
-			set {
+			set
+			{
 				mousePositionTransform = value;
 				calculatedTouchPositions = new Vector2?[Input.MaxTouches];
 				lastDesktopMousePosition = new Vector2(-1, -1);
@@ -31,7 +32,8 @@
 		/// </summary>
 		public Vector2 MousePosition
 		{
-			get {
+			get
+			{
 				if (lastDesktopMousePosition != Application.Input.DesktopMousePosition) {
 					lastDesktopMousePosition = Application.Input.DesktopMousePosition;
 					calculatedMousePosition = MouseDesktopToLocal(Application.Input.DesktopMousePosition);
@@ -66,7 +68,7 @@
 		/// </summary>
 		public bool IsKeyPressed(Key key)
 		{
-			return ownerWindow.Active && Application.Input.IsKeyPressed(key);
+			return ValidateKey(key) && Application.Input.IsKeyPressed(key);
 		}
 
 		public Modifiers GetModifiers()
@@ -79,7 +81,7 @@
 		/// </summary>
 		public bool WasKeyReleased(Key key)
 		{
-			return ownerWindow.Active && Application.Input.WasKeyReleased(key);
+			return ValidateKey(key) && Application.Input.WasKeyReleased(key);
 		}
 
 		/// <summary>
@@ -87,7 +89,7 @@
 		/// </summary>
 		public bool WasKeyPressed(Key key)
 		{
-			return ownerWindow.Active && Application.Input.WasKeyPressed(key);
+			return ValidateKey(key) && Application.Input.WasKeyPressed(key);
 		}
 
 		public void ConsumeKey(Key key)
@@ -100,52 +102,52 @@
 		/// </summary>
 		public bool WasKeyRepeated(Key key)
 		{
-			return ownerWindow.Active && Application.Input.WasKeyRepeated(key);
+			return ValidateKey(key) && Application.Input.WasKeyRepeated(key);
 		}
 
 		public bool WasMousePressed()
 		{
-			return ownerWindow == Application.WindowUnderMouse && Application.Input.WasMousePressed();
+			return WasKeyPressed(Input.GetMouseButtonByIndex(0));
 		}
 
 		public bool WasMouseReleased()
 		{
-			return ownerWindow == Application.WindowUnderMouse && Application.Input.WasMouseReleased();
+			return WasKeyReleased(Input.GetMouseButtonByIndex(0));
 		}
 
 		public bool IsMousePressed()
 		{
-			return ownerWindow == Application.WindowUnderMouse && Application.Input.IsMousePressed();
+			return IsKeyPressed(Input.GetMouseButtonByIndex(0));
 		}
 
 		public bool WasMousePressed(int button)
 		{
-			return ownerWindow == Application.WindowUnderMouse && Application.Input.WasMousePressed(button);
+			return WasKeyPressed(Input.GetMouseButtonByIndex(button));
 		}
 
 		public bool WasMouseReleased(int button)
 		{
-			return ownerWindow == Application.WindowUnderMouse && Application.Input.WasMouseReleased(button);
+			return WasKeyReleased(Input.GetMouseButtonByIndex(button));
 		}
 
 		public bool IsMousePressed(int button)
 		{
-			return ownerWindow == Application.WindowUnderMouse && Application.Input.IsMousePressed(button);
+			return IsKeyPressed(Input.GetMouseButtonByIndex(button));
 		}
 
 		public bool WasTouchBegan(int index)
 		{
-			return ownerWindow.Active && Application.Input.WasTouchBegan(index);
+			return WasKeyPressed(Input.GetTouchByIndex(index));
 		}
 
 		public bool WasTouchEnded(int index)
 		{
-			return ownerWindow.Active && Application.Input.WasTouchEnded(index);
+			return WasKeyReleased(Input.GetTouchByIndex(index));
 		}
 
 		public bool IsTouching(int index)
 		{
-			return ownerWindow.Active && Application.Input.IsTouching(index);
+			return IsKeyPressed(Input.GetTouchByIndex(index));
 		}
 
 		private Vector2?[] calculatedTouchPositions = new Vector2?[Input.MaxTouches];
@@ -192,6 +194,15 @@
 		internal void SetWheelScrollAmount(float delta)
 		{
 			Application.Input.SetWheelScrollAmount(delta);
+		}
+		
+		private bool ValidateKey(Key key)
+		{
+			if (key >= Key.Mouse0 && key <= Key.Touch3) {
+				return ownerWindow == Application.WindowUnderMouse;
+			} else {
+				return ownerWindow.Active;
+			}
 		}
 	}
 }

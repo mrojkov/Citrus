@@ -224,9 +224,9 @@ namespace Lime
 		public static readonly Key KeypadDecimal = New();
 		public static readonly Key KeypadDivide = New();
 
-		#endregion
+#endregion
 
-		#region Mouse
+#region Mouse
 		/// <summary>
 		/// Left mouse button
 		/// </summary>
@@ -257,9 +257,9 @@ namespace Lime
 		public static readonly Key Touch1 = New();
 		public static readonly Key Touch2 = New();
 		public static readonly Key Touch3 = New();
+#endregion
 
 		public static readonly Key DismissSoftKeyboard = New();
-#endregion
 
 		public static readonly Key LastNormal = Count - 1;
 	}

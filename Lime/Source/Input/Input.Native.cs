@@ -148,11 +148,6 @@ namespace Lime
 			return IsKeyPressed(GetMouseButtonByIndex(button));
 		}
 
-		public bool WasTouchBegan(int index)
-		{
-			return WasKeyPressed(Key.Touch0 + index);
-		}
-
 		public static Key GetMouseButtonByIndex(int button)
 		{
 			if (((uint)button) > 2) {
@@ -161,14 +156,27 @@ namespace Lime
 			return Key.Mouse0 + button;
 		}
 
+		public bool WasTouchBegan(int index)
+		{
+			return WasKeyPressed(GetTouchByIndex(index));
+		}
+
 		public bool WasTouchEnded(int index)
 		{
-			return WasKeyReleased(Key.Touch0 + index);
+			return WasKeyReleased(GetTouchByIndex(index));
 		}
 
 		public bool IsTouching(int index)
 		{
-			return IsKeyPressed(Key.Touch0 + index);
+			return IsKeyPressed(GetTouchByIndex(index));
+		}
+
+		public static Key GetTouchByIndex(int index)
+		{
+			if (((uint)index) >= 4) {
+				throw new ArgumentException();
+			}
+			return Key.Touch0 + index;
 		}
 
 		public Vector2 GetDesktopTouchPosition(int index)
