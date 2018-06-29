@@ -320,6 +320,7 @@
     <Compile Include="Source\Graphics\OpenGL\Buffer.cs" />
     <Compile Include="Source\Graphics\OpenGL\GLExtensions.cs" />
     <Compile Include="Source\Graphics\OpenGL\ShaderParams.cs" />
+    <Compile Include="Source\Application\WindowInput.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

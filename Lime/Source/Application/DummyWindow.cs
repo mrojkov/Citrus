@@ -62,6 +62,14 @@ namespace Lime
 		{
 			throw new NotImplementedException();
 		}
+
+		public float UnclampedDelta
+		{
+			get
+			{
+				throw new NotImplementedException();
+			}
+		}
 	}
 }
 #endif
