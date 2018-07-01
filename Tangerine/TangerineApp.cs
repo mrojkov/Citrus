@@ -233,9 +233,9 @@ namespace Tangerine
 			HotkeyRegistry.InitCommands(Command.Editing, "Editing", "Editing");
 			if (File.Exists(HotkeyRegistry.Filepath)) {
 				HotkeyRegistry.Load();
-			}
-			else
+			} else {
 				HotkeyRegistry.Save();
+			}
 		}
 
 		void SetupMainWindowTitle(WindowWidget windowWidget)

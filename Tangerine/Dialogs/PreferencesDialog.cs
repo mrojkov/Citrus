@@ -99,8 +99,7 @@ namespace Tangerine
 						command.Command.Shortcut = command.Shortcut;
 					}
 					HotkeyRegistry.Save();
-				}
-				else {
+				} else {
 					HotkeyRegistry.Load();
 				}
 			};

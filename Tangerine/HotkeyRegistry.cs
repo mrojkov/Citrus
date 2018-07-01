@@ -69,13 +69,11 @@ namespace Tangerine
 							catch (System.Exception) {
 								Debug.Write($"Unknown shortcut: {binding.Value}");
 							}
-						}
-						else {
+						} else {
 							Debug.Write($"Unknown command: {i.Key}.{binding.Key}");
 						}
 					}
-				}
-				else {
+				} else {
 					Debug.Write($"Unknown command category: {i.Key}");
 				}
 			}

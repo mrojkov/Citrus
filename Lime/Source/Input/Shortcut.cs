@@ -61,18 +61,27 @@ namespace Lime
 			}
 			for (int i = 0; i != words.Length - 1; ++i) {
 				string word = words[i].ToLower();
-				if (word == "alt")
-					Modifiers = Modifiers | Modifiers.Alt;
-				else if (word == "control" || word == "ctrl")
-					Modifiers = Modifiers | Modifiers.Control;
-				else if (word == "shift")
-					Modifiers = Modifiers | Modifiers.Shift;
-				else if (word == "win")
-					Modifiers = Modifiers | Modifiers.Win;
-				else if (word == "cmd" || word == "command")
-					Modifiers = Modifiers | Modifiers.Command;
-				else
-					throw new ArgumentException("Wrong modifier", word);
+				switch (word) {
+					case "alt":
+						Modifiers |= Modifiers.Alt;
+						break;
+					case "control":
+					case "ctrl":
+						Modifiers |= Modifiers.Control;
+						break;
+					case "shift":
+						Modifiers |= Modifiers.Shift;
+						break;
+					case "win":
+						Modifiers |= Modifiers.Win;
+						break;
+					case "cmd":
+					case "command":
+						Modifiers |= Modifiers.Command;
+						break;
+					default:
+						throw new ArgumentException("Wrong modifier", word);
+				}
 			}
 		}
 

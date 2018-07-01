@@ -1173,8 +1173,7 @@ namespace Tangerine.UI
 			var input = editor.Input;
 			if (input.WasKeyPressed(key)) {
 				modifiers |= modifier;
-			}
-			else if (input.WasKeyReleased(key)) {
+			} else if (input.WasKeyReleased(key)) {
 				modifiers &= ~modifier;
 			}
 		}

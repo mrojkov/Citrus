@@ -90,8 +90,7 @@ namespace Tangerine.Dialogs
 				if (hasPanelCommand) {
 					button.CommandState = hasGenericCommand ? KeyboardCommandState.Both :
 						isGenericCategory ? KeyboardCommandState.HalfPanel : KeyboardCommandState.Panel;
-				}
-				else if (hasGenericCommand) {
+				} else if (hasGenericCommand) {
 					button.CommandState = KeyboardCommandState.Generic;
 				}
 
@@ -109,8 +108,7 @@ namespace Tangerine.Dialogs
 				foreach (var button in buttons) {
 					button.State = KeyboardButtonState.Press;
 				}
-			}
-			else if (input.WasKeyReleased(key)) {
+			} else if (input.WasKeyReleased(key)) {
 				modifiers &= ~modifier;
 				var buttons = FindButtons(key);
 				foreach (var button in buttons) {
@@ -133,8 +131,7 @@ namespace Tangerine.Dialogs
 					newButton.State = KeyboardButtonState.Press;
 				}
 
-			}
-			else if (input.WasKeyReleased(key) && key == main) {
+			} else if (input.WasKeyReleased(key) && key == main) {
 				var buttons = FindButtons(key);
 				if (buttons.Any()) {
 					var oldButton = buttons.First();
