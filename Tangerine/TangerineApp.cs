@@ -128,6 +128,7 @@ namespace Tangerine
 			};
 			Project.Tasks = dockManager.MainWindowWidget.Tasks;
 			Project.Tasks.Add(new AutosaveProcessor(() => AppUserPreferences.Instance.AutosaveDelay));
+			new BackupsManager().Activate(Project.Tasks);
 			Document.NodeDecorators.AddFor<Spline>(n => n.CompoundPostPresenter.Add(new UI.SceneView.SplinePresenter()));
 			Document.NodeDecorators.AddFor<Viewport3D>(n => n.CompoundPostPresenter.Add(new UI.SceneView.Spline3DPresenter()));
 			Document.NodeDecorators.AddFor<Widget>(n => {
