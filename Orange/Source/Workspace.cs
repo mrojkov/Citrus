@@ -14,6 +14,7 @@ namespace Orange
 		public IFileEnumerator AssetFiles { get; set; }
 		public Json ProjectJson { get; private set; }
 		public List<Target> Targets { get; private set; }
+		public string TangerineCacheBundle { get; private set; }
 
 		private string dataFolderName;
 		private string pluginName;
@@ -113,6 +114,7 @@ namespace Orange
 					return defaultCsprojSynchronizationSkipUnwantedDirectoriesPredicate(di) && !di.FullName.StartsWith(AssetsDirectory, StringComparison.OrdinalIgnoreCase);
 				};
 				AssetFiles = new FileEnumerator(AssetsDirectory);
+				TangerineCacheBundle = GetTangerineCacheBundlePath();
 				The.UI.OnWorkspaceOpened();
 			}
 			catch (System.Exception e) {
@@ -191,6 +193,15 @@ namespace Orange
 			} catch (ArgumentException) {
 				throw new Lime.Exception($"Unknown sub-target platform name: {name}");
 			}
+		}
+
+		private static string GetTangerineCacheBundlePath()
+		{
+			var name = string
+				.Join("_", The.Workspace.ProjectFile.Split(new[] { "\\", "/", ":" }, StringSplitOptions.RemoveEmptyEntries))
+				.ToLower(System.Globalization.CultureInfo.InvariantCulture);
+			name = Path.ChangeExtension(name, "tancache");
+			return Path.Combine(WorkspaceConfig.GetDataPath(), name);
 		}
 	}
 }
