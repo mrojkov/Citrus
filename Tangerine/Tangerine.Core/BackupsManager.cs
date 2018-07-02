@@ -49,7 +49,9 @@ namespace Tangerine.Core
 						}
 
 						lastKnown = Document.Current;
-						lastKnown.Saving += SaveBackup;
+						if (lastKnown != null) {
+							lastKnown.Saving += SaveBackup;
+						}
 					}
 
 					yield return null;
