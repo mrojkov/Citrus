@@ -75,9 +75,28 @@ namespace Tangerine.UI.Timeline
 
 				RenderAnimatedRangeBackground();
 				RenderSelectedRowsBackground();
+				RenderFramesInSelectedLevel();
 				RenderVerticalLines();
 				RenderHorizontalLines();
 				RenderMarkerRulers();
+			}
+		}
+
+		private void RenderFramesInSelectedLevel()
+		{
+			foreach (var row in Document.Current.Rows) {
+				if (row.Selected) {
+					var nodeRow = row.Components.Get<Core.Components.NodeRow>()?.Node;
+
+					if (nodeRow == null) {
+						continue;
+					}
+					var gridWidget = row.GridWidget();
+
+					Renderer.DrawRect(
+						0.0f, gridWidget.Top(), (Size.Length * TimelineMetrics.ColWidth), gridWidget.Bottom(),
+						ColorTheme.Current.TimelineGrid.Backlight);
+				}
 			}
 		}
 		

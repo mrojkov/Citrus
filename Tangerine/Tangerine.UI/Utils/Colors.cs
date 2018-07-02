@@ -53,6 +53,7 @@ namespace Tangerine.UI
 			public Color4 Lines;
 			public Color4 LinesLight;
 			public Color4 Selection;
+			public Color4 Backlight;
 			public Color4 Cursor;
 			public Color4 RunningCursor;
 			public Color4 WaveformColor;
@@ -191,6 +192,7 @@ namespace Tangerine.UI
 				Lines = new Color4(45, 45, 48),
 				LinesLight = new Color4(45, 45, 48).Lighten(0.065f),
 				Selection = new Color4(140, 140, 140, 128),
+				Backlight = Color4.Gray.Transparentify(0.25f),
 				Cursor = new Color4(163, 0, 0).Darken(0.15f),
 				RunningCursor = new Color4(0, 163, 0).Darken(0.15f),
 				WaveformColor = new Color4(170, 255, 140),
@@ -315,6 +317,7 @@ namespace Tangerine.UI
 				Lines = new Color4(160, 160, 160),
 				LinesLight = new Color4(210, 210, 210),
 				Selection = Color4.Gray.Transparentify(0.7f),
+				Backlight = Color4.Gray.Transparentify(0.75f),
 				Cursor = Color4.Red.Lighten(0.4f),
 				RunningCursor = Color4.Green.Lighten(0.4f),
 				WaveformColor = new Color4(140, 170, 255),
