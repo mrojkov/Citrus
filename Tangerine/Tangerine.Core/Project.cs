@@ -216,7 +216,7 @@ namespace Tangerine.Core
 		public bool CloseAllTabsExceptThis(Document document)
 		{
 			if (IsAnyDocumentModifiedExceptThis(document)) {
-				if (CloseDocument(LeftModifiedDocumentExceptThis(document))) {
+				if (CloseDocument(GetLeftmostModifiedDocumentExceptThis(document))) {
 					return CloseAllTabsExceptThis(document);
 				} else {
 					return false;
@@ -253,7 +253,7 @@ namespace Tangerine.Core
 		public bool CloseAllTabs()
 		{
 			if (IsAnyDocumentModified()) {
-				if(CloseDocument(LeftModifiedDocument())) {
+				if(CloseDocument(GetLeftmostModifiedDocument())) {
 					return CloseAllTabs();
 				} else {
 					return false;
@@ -286,15 +286,17 @@ namespace Tangerine.Core
 			return false;
 		}
 
-		public Document RightModifiedDocument()
+		public Document GetRightmostModifiedDocument()
 		{
 			for (var i = documents.Count() - 1; i >= 0; i--) {
-				if (documents[i].IsModified) return documents[i];
+				if (documents[i].IsModified) {
+					return documents[i];
+				}
 			}
 			return null;
 		}
 
-		public Document RightModifiedDocumentExceptThis(Document document)
+		public Document GetRightmostModifiedDocumentExceptThis(Document document)
 		{
 			for (var i = documents.Count() - 1; i >= 0; i--) {
 				if (documents[i] != document && documents[i].IsModified) return documents[i];
@@ -302,18 +304,22 @@ namespace Tangerine.Core
 			return null;
 		}
 
-		public Document LeftModifiedDocument()
+		public Document GetLeftmostModifiedDocument()
 		{
 			for (var i = 0; i < documents.Count(); i++) {
-				if (documents[i].IsModified) return documents[i];
+				if (documents[i].IsModified) {
+					return documents[i];
+				}
 			}
 			return null;
 		}
 
-		public Document LeftModifiedDocumentExceptThis(Document document)
+		public Document GetLeftmostModifiedDocumentExceptThis(Document document)
 		{
 			for (var i = 0; i < documents.Count(); i++) {
-				if (documents[i] != document && documents[i].IsModified) return documents[i];
+				if (documents[i] != document && documents[i].IsModified) {
+					return documents[i];
+				}
 			}
 			return null;
 		}
