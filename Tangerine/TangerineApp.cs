@@ -348,9 +348,11 @@ namespace Tangerine
 					tab.Closing += () => Project.Current.CloseDocument(doc);
 					tab.Updated += (dt) => {
 						if (tab.Input.WasKeyReleased(Key.Mouse1)) {
+							Document.Clicked = doc;
 							var menu = new Menu {
 								GenericCommands.CloseDocument,
 								GenericCommands.CloseAllTabs,
+								GenericCommands.CloseAllTabsExceptThis,
 								GenericCommands.Save,
 								FilesystemCommands.NavigateTo,
 								FilesystemCommands.OpenInSystemFileManager,
@@ -433,8 +435,11 @@ namespace Tangerine
 			h.Connect(GenericCommands.SaveAs, new FileSaveAs());
 			h.Connect(GenericCommands.Revert, new FileRevert());
 			h.Connect(GenericCommands.UpgradeDocumentFormat, new UpgradeDocumentFormat());
-			h.Connect(GenericCommands.CloseDocument, new FileClose());
+			h.Connect(GenericCommands.CloseCurrentDocument, new CurrentFileClose());
+			h.Connect(GenericCommands.CloseDocument, new ClickedFileClose());
 			h.Connect(GenericCommands.CloseAllTabs, new AllFilesClose());
+			h.Connect(GenericCommands.CloseAllTabsExceptThis, new AllFilesCloseExceptThis());
+			h.Connect(GenericCommands.CloseAllTabsExceptCurrent, new AllFilesCloseExceptCurrent());
 			h.Connect(GenericCommands.Quit, Application.Exit);
 			h.Connect(GenericCommands.PreferencesDialog, () => new PreferencesDialog());
 			h.Connect(GenericCommands.Group, new GroupNodes());

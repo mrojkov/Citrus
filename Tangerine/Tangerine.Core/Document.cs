@@ -49,6 +49,7 @@ namespace Tangerine.Core
 		public static PathSelectorDelegate PathSelector;
 
 		public static Document Current { get; private set; }
+		public static Document Clicked { get; set; }
 
 		public readonly DocumentHistory History = new DocumentHistory();
 		public bool IsModified => History.IsDocumentModified;

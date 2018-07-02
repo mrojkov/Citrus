@@ -150,7 +150,17 @@ namespace Tangerine
 		}
 	}
 
-	public class FileClose : DocumentCommandHandler
+	public class ClickedFileClose : DocumentCommandHandler
+	{
+		public override void ExecuteTransaction()
+		{
+			if (Document.Clicked != null) {
+				Project.Current.CloseDocument(Document.Clicked);
+			}
+		}
+	}
+
+	public class CurrentFileClose : DocumentCommandHandler
 	{
 		public override void ExecuteTransaction()
 		{
@@ -166,6 +176,26 @@ namespace Tangerine
 		{
 			if (Project.Current.Documents.Count != 0) {
 				Project.Current.CloseAllTabs();
+			}
+		}
+	}
+
+	public class AllFilesCloseExceptThis : DocumentCommandHandler
+	{
+		public override void ExecuteTransaction()
+		{
+			if (Project.Current.Documents.Count != 0) {
+				Project.Current.CloseAllDocumentsExceptThis(Document.Clicked);
+			}
+		}
+	}
+
+	public class AllFilesCloseExceptCurrent : DocumentCommandHandler
+	{
+		public override void ExecuteTransaction()
+		{
+			if (Project.Current.Documents.Count != 0) {
+				Project.Current.CloseAllDocumentsExceptThis(Document.Current);
 			}
 		}
 	}
