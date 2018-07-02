@@ -75,8 +75,9 @@ namespace Tangerine
 					GenericCommands.RecentDocuments,
 					GenericCommands.RecentProjects,
 					Command.MenuSeparator,
-					GenericCommands.Save,
+					GenericCommands.SaveCurrent,
 					GenericCommands.SaveAs,
+					GenericCommands.SaveAll,
 					GenericCommands.Revert,
 					GenericCommands.UpgradeDocumentFormat,
 					Command.MenuSeparator,
@@ -84,7 +85,9 @@ namespace Tangerine
 					GenericCommands.PreferencesDialog,
 					Command.MenuSeparator,
 #endif
-					GenericCommands.CloseDocument,
+					GenericCommands.CloseCurrentDocument,
+					GenericCommands.CloseAllTabs,
+					GenericCommands.CloseAllTabsExceptCurrent,
 #if !MAC
 					GenericCommands.Quit,
 #endif

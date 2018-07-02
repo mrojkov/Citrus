@@ -70,9 +70,9 @@ namespace Tangerine
 		}
 	}
 
-	public class FileSave : DocumentCommandHandler
+	public class CurrentFileSave : DocumentCommandHandler
 	{
-		static FileSave()
+		static CurrentFileSave()
 		{
 			Document.PathSelector += SelectPath;
 		}
@@ -110,7 +110,59 @@ namespace Tangerine
 		}
 	}
 
-	public class FileRevert : DocumentCommandHandler
+	public class ClickedFileSave : DocumentCommandHandler
+	{
+		static ClickedFileSave()
+		{
+			Document.PathSelector += SelectPath;
+		}
+
+		public override void ExecuteTransaction()
+		{
+			try {
+				if (Document.Clicked != null) {
+					Document.Clicked.Save();
+				}
+			}
+			catch (System.Exception e) {
+				ShowErrorMessageBox(e);
+			}
+		}
+
+		public static void ShowErrorMessageBox(System.Exception e)
+		{
+			AlertDialog.Show($"Save document error: '{e.Message}'.\nYou may have to upgrade the document format.");
+		}
+
+		public static bool SelectPath(out string path)
+		{
+			var dlg = new FileDialog {
+				AllowedFileTypes = new string[] { Document.Current.GetFileExtension() },
+				Mode = FileDialogMode.Save,
+				InitialDirectory = Project.Current.GetSystemDirectory(Document.Current.Path)
+			};
+			path = null;
+			if (!dlg.RunModal()) {
+				return false;
+			}
+			if (!Project.Current.TryGetAssetPath(dlg.FileName, out path)) {
+				AlertDialog.Show("Can't save the document outside the project directory");
+				return false;
+			}
+			return true;
+		}
+	}
+
+	public class AllFilesSave : DocumentCommandHandler
+	{
+		public override void ExecuteTransaction()
+		{
+			foreach (var doc in Project.Current.Documents)
+				doc.Save();
+		}
+	}
+
+public class FileRevert : DocumentCommandHandler
 	{
 		public override void ExecuteTransaction()
 		{
@@ -143,19 +195,59 @@ namespace Tangerine
 					try {
 						Document.Current.SaveAs(assetPath);
 					} catch (System.Exception e) {
-						FileSave.ShowErrorMessageBox(e);
+						CurrentFileSave.ShowErrorMessageBox(e);
 					}
 				}
 			}
 		}
 	}
 
-	public class FileClose : DocumentCommandHandler
+	public class ClickedFileClose : DocumentCommandHandler
+	{
+		public override void ExecuteTransaction()
+		{
+			if (Document.Clicked != null) {
+				Project.Current.CloseDocument(Document.Clicked);
+			}
+		}
+	}
+
+	public class CurrentFileClose : DocumentCommandHandler
 	{
 		public override void ExecuteTransaction()
 		{
 			if (Document.Current != null) {
 				Project.Current.CloseDocument(Document.Current);
+			}
+		}
+	}
+
+	public class AllFilesClose : DocumentCommandHandler
+	{
+		public override void ExecuteTransaction()
+		{
+			if (Project.Current.Documents.Count != 0) {
+				Project.Current.CloseAllTabs();
+			}
+		}
+	}
+
+	public class AllFilesCloseExceptThis : DocumentCommandHandler
+	{
+		public override void ExecuteTransaction()
+		{
+			if (Project.Current.Documents.Count != 0) {
+				Project.Current.CloseAllDocumentsExceptThis(Document.Clicked);
+			}
+		}
+	}
+
+	public class AllFilesCloseExceptCurrent : DocumentCommandHandler
+	{
+		public override void ExecuteTransaction()
+		{
+			if (Project.Current.Documents.Count != 0) {
+				Project.Current.CloseAllDocumentsExceptThis(Document.Current);
 			}
 		}
 	}
