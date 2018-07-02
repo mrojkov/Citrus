@@ -157,20 +157,23 @@ namespace Tangerine.Core
 			}
 		}
 
-		Viewport3D WrapNodeWithViewport3D(Node node)
+		private static Viewport3D WrapNodeWithViewport3D(Node node)
 		{
 			var vp = new Viewport3D { Width = 1024, Height = 768 };
 			vp.AddNode(node);
-			var camera = new Camera3D {
-				Id = "DefaultCamera",
-				Position = new Vector3(0, 0, 10),
-				FarClipPlane = 1000,
-				NearClipPlane = 0.01f,
-				FieldOfView = 1.0f,
-				AspectRatio = 1.3f,
-				OrthographicSize = 1.0f
-			};
-			vp.AddNode(camera);
+			var camera = node.Descendants.FirstOrDefault(n => n is Camera3D);
+			if (camera == null) {
+				camera = new Camera3D {
+					Id = "DefaultCamera",
+					Position = new Vector3(0, 0, 10),
+					FarClipPlane = 1000,
+					NearClipPlane = 0.01f,
+					FieldOfView = 1.0f,
+					AspectRatio = 1.3f,
+					OrthographicSize = 1.0f
+				};
+				vp.AddNode(camera);
+			}
 			vp.CameraRef = new NodeReference<Camera3D>(camera.Id);
 			return vp;
 		}
