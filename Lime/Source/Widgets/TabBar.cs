@@ -19,6 +19,7 @@ namespace Lime
 		public Tab()
 		{
 			HitTestTarget = true;
+			Gestures.Add(new ClickGesture(2, () => Closing?.Invoke()));
 		}
 
 		public bool Active
@@ -55,9 +56,6 @@ namespace Lime
 			base.Update(delta);
 			if (closeButton != null) {
 				closeButton.Visible = Closable;
-			}
-			if (Input.WasKeyPressed(Key.Mouse2) && IsMouseOver()) {
-				Closing?.Invoke();
 			}
 			if (Input.WasMousePressed() && IsMouseOver()) {
 				Clicked?.Invoke();
