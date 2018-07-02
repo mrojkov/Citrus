@@ -483,6 +483,7 @@ namespace Tangerine
 			h.Connect(Command.Redo, () => Document.Current.History.Redo(), () => Document.Current?.History.CanRedo() ?? false);
 			h.Connect(OrangeCommands.Run, new DocumentDelegateCommandHandler(() => WidgetContext.Current.Root.Tasks.Add(OrangeTask)));
 			h.Connect(OrangeCommands.OptionsDialog, new DocumentDelegateCommandHandler(() => new OrangePluginOptionsDialog()));
+			h.Connect(OrangeCommands.CookGameAssets, new DocumentDelegateCommandHandler(() => WidgetContext.Current.Root.Tasks.Add(CookingTask)));
 			h.Connect(SceneViewCommands.SnapWidgetBorderToRuler, new SnapWidgetBorderCommandHandler());
 			h.Connect(SceneViewCommands.SnapWidgetPivotToRuler, new SnapWidgetPivotCommandHandler());
 			h.Connect(SceneViewCommands.SnapRulerLinesToWidgets, new SnapRulerLinesToWidgetCommandHandler());
@@ -540,6 +541,21 @@ namespace Tangerine
 				try {
 					Orange.Actions.BuildAndRunAction();
 				} catch (System.Exception e) {
+					System.Console.WriteLine(e);
+				}
+			});
+			System.Console.WriteLine("Done.");
+		}
+
+		private IEnumerator<object> CookingTask()
+		{
+			Tangerine.UI.Console.Instance.Show();
+			Orange.The.Workspace?.AssetFiles?.Rescan();
+			yield return Task.ExecuteAsync(() => {
+				try {
+					Orange.AssetCooker.CookForActivePlatform();
+				}
+				catch (System.Exception e) {
 					System.Console.WriteLine(e);
 				}
 			});
