@@ -71,11 +71,6 @@ namespace Lime
 			skipRender = false;
 		}
 
-		public override void Dispose()
-		{
-			base.Dispose();
-		}
-
 		ITexture IImageCombinerArg.GetTexture()
 		{
 			return Texture;
