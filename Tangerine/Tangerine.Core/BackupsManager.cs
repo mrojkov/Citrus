@@ -155,6 +155,7 @@ namespace Tangerine.Core
 
 		private void Savebackup(Document document)
 		{
+			List<Backup> history;
 			string path = GetTemporalPath(document.Path);
 			CreateDirectory(path);
 			try {
@@ -162,7 +163,7 @@ namespace Tangerine.Core
 			} catch (Exception e) {
 				Console.WriteLine("Error on autosave document '{0}':\n{1}", document.Path, e);
 			}
-			FillHistory(path, out var history);
+			FillHistory(path, out history);
 			RemoveBackups(history);
 		}
 
