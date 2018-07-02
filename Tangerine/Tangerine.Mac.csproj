@@ -106,6 +106,8 @@
     <Compile Include="OrangePluginUIBuidler.cs" />
     <Compile Include="Dialogs\OrangePluginOptionsDialog.cs" />
     <Compile Include="AppUserPreferences.cs" />
+    <Compile Include="HotkeyRegistry.cs" />
+    <Compile Include="Dialogs\HotkeyEditor.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

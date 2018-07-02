@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Lime;
 using Tangerine.UI;
 using Tangerine.Core;
+using System;
 
 namespace Tangerine
 {
@@ -24,11 +25,13 @@ namespace Tangerine
 			Right = 15,
 		};
 
+		private bool saved = false;
+
 		public PreferencesDialog()
 		{
 			theme = AppUserPreferences.Instance.Theme;
 			window = new Window(new WindowOptions {
-				ClientSize = new Vector2(600, 400),
+				ClientSize = new Vector2(800, 600),
 				FixedSize = false,
 				Title = "Preferences",
 				MinimumDecoratedSize = new Vector2(400, 300)
@@ -41,6 +44,7 @@ namespace Tangerine
 			Content = new TabbedWidget();
 			Content.AddTab("General", CreateGeneralPane(), true);
 			Content.AddTab("Appearance", CreateColorsPane());
+			Content.AddTab("Keyboard shortcuts", CreateKeyboardPane());
 
 			rootWidget = new ThemedInvalidableWindowWidget(window) {
 				Padding = new Thickness(8),
@@ -60,7 +64,9 @@ namespace Tangerine
 					}
 				}
 			};
+			HotkeyRegistry.Save();
 			okButton.Clicked += () => {
+				saved = true;
 				window.Close();
 				if (theme != AppUserPreferences.Instance.Theme) {
 					AlertDialog.Show("The color theme change will take effect next time you run Tangerine.");
@@ -75,23 +81,41 @@ namespace Tangerine
 			cancelButton.Clicked += () => {
 				window.Close();
 				Core.UserPreferences.Instance.Load();
+				HotkeyRegistry.Load();
 			};
 			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
 			rootWidget.LateTasks.AddLoop(() => {
 				if (rootWidget.Input.ConsumeKeyPress(Key.Escape)) {
 					window.Close();
 					Core.UserPreferences.Instance.Load();
+					HotkeyRegistry.Load();
 				}
 			});
 			okButton.SetFocus();
+
+			window.Closed += () => {
+				if (saved) {
+					foreach (var command in HotkeyRegistry.Commands) {
+						command.Command.Shortcut = command.Shortcut;
+					}
+					HotkeyRegistry.Save();
+				} else {
+					HotkeyRegistry.Load();
+				}
+			};
+
+			foreach (var command in HotkeyRegistry.Commands) {
+				command.Command.Shortcut = new Shortcut(Key.Unknown);
+			}
 		}
 
-		private static void ResetToDefaults()
+		private void ResetToDefaults()
 		{
 			AppUserPreferences.Instance.ResetToDefaults();
 			UI.SceneView.SceneUserPreferences.Instance.ResetToDefaults();
 			UI.Timeline.TimelineUserPreferences.Instance.ResetToDefaults();
 			Core.CoreUserPreferences.Instance.ResetToDefaults();
+			HotkeyRegistry.ResetToDefaults();
 		}
 
 		private Widget CreateColorsPane()
@@ -168,6 +192,156 @@ namespace Tangerine
 				new PropertyEditorParams(pane.Content, UI.SceneView.SceneUserPreferences.Instance, nameof(UI.SceneView.SceneUserPreferences.DefaultBoneWidth), "Bone Width"));
 			boneWidthPropertyEditor.ContainerWidget.AddChangeWatcher(
 				() => UI.SceneView.SceneUserPreferences.Instance.DefaultBoneWidth, (v) => Application.InvalidateWindows());
+			return pane;
+		}
+		
+		private Widget CreateKeyboardPane()
+		{
+			var hotkeyEditor = new Dialogs.HotkeyEditor();
+			var pane = new Widget {
+				Layout = new VBoxLayout { Spacing = 10 },
+				Padding = contentPadding,
+				Awoken = node => hotkeyEditor.SetFocus()
+			};
+
+			var label = new ThemedSimpleText("Commands: ") {
+				VAlignment = VAlignment.Center,
+				LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0)
+			};
+			var categoryPicker = new ThemedDropDownList();
+			categoryPicker.TextWidget.Padding = new Thickness(3, 0);
+			pane.AddNode(new Widget {
+				Layout = new HBoxLayout { Spacing = 4 },
+				Nodes = { label, categoryPicker }
+			});
+
+			var allShortcutsView = new ThemedScrollView();
+			allShortcutsView.Content.Padding = contentPadding;
+			allShortcutsView.Content.Layout = new VBoxLayout { Spacing = 4 };
+
+			var selectedShortcutsView = new ThemedScrollView();
+			selectedShortcutsView.Content.Padding = contentPadding;
+			selectedShortcutsView.Content.Layout = new VBoxLayout { Spacing = 4 };
+
+			foreach (var category in HotkeyRegistry.Categories) {
+				var expandableContent = new Frame {
+					Padding = new Thickness(15, 0),
+					Layout = new VBoxLayout { Spacing = 4 },
+					Visible = false
+				};
+				var expandButton = new ThemedExpandButton {
+					Anchors = Anchors.Left,
+					MinMaxSize = Vector2.One * 20f,
+					Expanded = expandableContent.Visible
+				};
+				var title = new ThemedSimpleText {
+					Text = category.Name,
+					VAlignment = VAlignment.Center,
+					LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0)
+				};
+				expandButton.Clicked += () => {
+					expandableContent.Visible = !expandableContent.Visible;
+					expandButton.Expanded = expandableContent.Visible;
+				};
+				var header = new Widget {
+					Padding = new Thickness(4),
+					Layout = new HBoxLayout(),
+					Nodes = { expandButton, title }
+				};
+				allShortcutsView.Content.AddNode(header);
+				allShortcutsView.Content.AddNode(expandableContent);
+				foreach (var command in category.Commands) {
+					var editor = new ShortcutPropertyEditor(
+						new PropertyEditorParams(expandableContent, command, "Shortcut", command.Name));
+					editor.PropertyLabel.OverflowMode = TextOverflowMode.Ellipsis;
+					editor.PropertyLabel.LayoutCell = new LayoutCell(Alignment.LeftCenter, 1);
+					editor.ContainerWidget.LayoutCell = new LayoutCell(Alignment.LeftCenter, 1);
+					editor.PropertyChanged = () => {
+						hotkeyEditor.UpdateButtonCommands();
+						hotkeyEditor.UpdateShortcuts();
+					};
+				}
+			}
+			hotkeyEditor.SelectedShortcutChanged = () => {
+				selectedShortcutsView.Content.Nodes.Clear();
+				var commands = hotkeyEditor.SelectedCommands.ToLookup(i => i.Category);
+				foreach (var category in commands) {
+					selectedShortcutsView.Content.AddNode(new ThemedSimpleText {
+						Text = category.Key.Name,
+						VAlignment = VAlignment.Center,
+						Color = Theme.Colors.GrayText
+					});
+					foreach (var command in category) {
+						var shortcut = new ThemedSimpleText {
+							Text = command.Shortcut.ToString(),
+							VAlignment = VAlignment.Center,
+							LayoutCell = new LayoutCell(Alignment.LeftCenter, 1)
+						};
+						var name = new ThemedSimpleText {
+							Text = command.Name,
+							VAlignment = VAlignment.Center,
+							LayoutCell = new LayoutCell(Alignment.LeftCenter, 2)
+						};
+						selectedShortcutsView.Content.AddNode(new Widget {
+							Layout = new TableLayout { Spacing = 4, RowCount = 1, ColCount = 2 },
+							Nodes = { shortcut, name },
+							Padding = new Thickness(15, 0)
+						});
+					}
+				}
+				selectedShortcutsView.ScrollPosition = allShortcutsView.MinScrollPosition;
+			};
+			foreach (var category in HotkeyRegistry.Categories) {
+				categoryPicker.Items.Add(new CommonDropDownList.Item(category.Name, category));
+			}
+			categoryPicker.Changed += args => {
+				hotkeyEditor.Category = (args.Value as CommandCategory);
+				hotkeyEditor.SetFocus();
+				int index = -1;
+				foreach (var node in allShortcutsView.Content.Nodes.SelectMany(i => i.Nodes)) {
+					var button = node as ThemedExpandButton;
+					if (button == null) {
+						continue;
+					}
+					index++;
+					if (index == args.Index) {
+						if (!button.Expanded) {
+							button.Clicked?.Invoke();
+						}
+						allShortcutsView.ScrollPosition = button.ParentWidget.Position.Y;
+						break;
+					}
+				}
+			};
+			categoryPicker.Index = 0;
+
+			pane.AddNode(hotkeyEditor);
+			pane.AddNode(new Widget {
+				Layout = new HBoxLayout { Spacing = 4 },
+				Nodes = {
+					new Widget {
+						Layout = new VBoxLayout {Spacing = 4 },
+						Nodes = {
+							new ThemedSimpleText("All commands:") { LayoutCell = new LayoutCell { StretchY = 0 } },
+							new ThemedFrame {
+								Nodes = { allShortcutsView },
+								Layout = new VBoxLayout()
+							}
+						}
+					},
+					new Widget {
+						Layout = new VBoxLayout {Spacing = 4 },
+						Nodes = {
+							new ThemedSimpleText("Selected commands:") { LayoutCell = new LayoutCell { StretchY = 0 } },
+							new ThemedFrame {
+								Nodes = { selectedShortcutsView },
+								Layout = new VBoxLayout()
+							}
+						}
+					}
+				}
+			});
+
 			return pane;
 		}
 	}

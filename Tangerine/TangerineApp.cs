@@ -222,7 +222,20 @@ namespace Tangerine
 
 			new UI.FilesystemView.FilesystemPane(filesystemPanel);
 			RegisterGlobalCommands();
-
+			
+			HotkeyRegistry.InitCommands(typeof(GenericCommands), "Generic Commands");
+			HotkeyRegistry.InitCommands(typeof(TimelineCommands), "Timeline Commands");
+			HotkeyRegistry.InitCommands(typeof(InspectorCommands), "Inspector Commands");
+			HotkeyRegistry.InitCommands(typeof(SceneViewCommands), "Scene View Commands");
+			HotkeyRegistry.InitCommands(typeof(Tools), "Tools");
+			HotkeyRegistry.InitCommands(typeof(FilesystemCommands), "Filesystem Commands");
+			HotkeyRegistry.InitCommands(typeof(OrangeCommands), "Orange Commands");
+			HotkeyRegistry.InitCommands(Command.Editing, "Editing", "Editing");
+			if (File.Exists(HotkeyRegistry.Filepath)) {
+				HotkeyRegistry.Load();
+			} else {
+				HotkeyRegistry.Save();
+			}
 		}
 
 		void SetupMainWindowTitle(WindowWidget windowWidget)
@@ -422,7 +435,6 @@ namespace Tangerine
 			h.Connect(GenericCommands.CloseDocument, new FileClose());
 			h.Connect(GenericCommands.Quit, Application.Exit);
 			h.Connect(GenericCommands.PreferencesDialog, () => new PreferencesDialog());
-			h.Connect(SceneViewCommands.ManageRulers, new ManageRulers());
 			h.Connect(GenericCommands.Group, new GroupNodes());
 			h.Connect(GenericCommands.Ungroup, new UngroupNodes());
 			h.Connect(GenericCommands.InsertTimelineColumn, new InsertTimelineColumn());

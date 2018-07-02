@@ -1124,4 +1124,90 @@ namespace Tangerine.UI
 			}
 		}
 	}
+
+	public class ShortcutPropertyEditor : CommonPropertyEditor<Shortcut>
+	{
+		private EditBox editor;
+		private Modifiers modifiers;
+		private Key main;
+
+		public Action PropertyChanged { get; set; }
+
+		private void SetValue(Shortcut value)
+		{
+			foreach (var obj in EditorParams.Objects) { 
+				EditorParams.PropertySetter(obj, EditorParams.PropertyName, value);
+			}
+		}
+
+		public ShortcutPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
+		{
+			editor = editorParams.EditBoxFactory();
+			editor.Updating += Updating;
+			editor.Updated += Updated;
+			editor.LayoutCell = new LayoutCell(Alignment.Center);
+			editor.AddChangeWatcher(CoalescedPropertyValue(), v => {
+				var text = v.ToString();
+				editor.Text = v.Main != Key.Unknown ? text : text.Replace("Unknown", "");
+				PropertyChanged?.Invoke();
+			});
+			editor.IsReadOnly = true;
+			editor.TextWidget.Tasks.Clear();
+			editor.TextWidget.Position = new Vector2(0, editor.MinHeight / 2);
+			editor.TextWidget.Padding = new Thickness(5, 0);
+			editor.Gestures.Add(new ClickGesture(() => editor.SetFocus()));
+			editor.Gestures.Add(new ClickGesture(1, () => {
+				main = Key.Unknown;
+				modifiers = Modifiers.None;
+				SetValue(new Shortcut(modifiers, main));
+			}));
+			editor.AddToNode(ContainerWidget);
+
+			var value = CoalescedPropertyValue().GetValue();
+			main = value.Main;
+			modifiers = value.Modifiers;
+		}
+
+		private void PressModifier(Modifiers modifier, Key key)
+		{
+			var input = editor.Input;
+			if (input.WasKeyPressed(key)) {
+				modifiers |= modifier;
+			} else if (input.WasKeyReleased(key)) {
+				modifiers &= ~modifier;
+			}
+		}
+
+		private void Updating(float dt)
+		{
+			if (!editor.IsFocused())
+				return;
+			PressModifier(Modifiers.Alt, Key.Alt);
+			PressModifier(Modifiers.Shift, Key.Shift);
+			PressModifier(Modifiers.Control, Key.Control);
+			PressModifier(Modifiers.Win, Key.Win);
+
+			var input = editor.Input;
+			var keys = Key.Enumerate().Where(k => input.WasKeyPressed(k));
+			if (!keys.Any())
+				return;
+			foreach (var key in keys) {
+				if (!key.IsModifier() && !key.IsMouseKey() && Shortcut.ValidateMainKey(key)) {
+					main = key;
+					SetValue(new Shortcut(modifiers, main));
+					return;
+				}
+			}
+		}
+
+		private void Updated(float dt)
+		{
+			if (!editor.IsFocused())
+				return;
+			var input = editor.Input;
+			input.ConsumeKeys(Key.Enumerate().Where(
+				k => input.WasKeyRepeated(k) || input.WasKeyPressed(k) || input.WasKeyReleased(k)));
+			Command.ConsumeRange(Command.Editing);
+		}
+	}
 }

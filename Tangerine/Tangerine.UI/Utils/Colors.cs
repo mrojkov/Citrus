@@ -116,6 +116,18 @@ namespace Tangerine.UI
 			public Color4 StripeBackground2;
 		}
 
+		public class KeyboardColors
+		{
+			public Color4 BlackText;
+			public Color4 GrayText;
+			public Color4 GenericKeyBackground;
+			public Color4 PanelKeyBackground;
+			public Color4 ButtonBackground;
+			public Color4 ModifierBackground;
+			public Color4 SelectedBorder;
+			public Color4 Border;
+		}
+
 		public string Description;
 		public Theme.ColorTheme Basic;
 		public ToolbarColors Toolbar;
@@ -127,6 +139,7 @@ namespace Tangerine.UI
 		public TimelineRollColors TimelineRoll;
 		public DockingColors Docking;
 		public InspectorColors Inspector;
+		public KeyboardColors Keyboard;
 
 		public static ColorTheme Current = CreateLightTheme();
 
@@ -228,6 +241,16 @@ namespace Tangerine.UI
 				StripeBackground1 = Theme.Colors.GrayBackground,
 				StripeBackground2 = Theme.Colors.GrayBackground.Lighten(0.05f),
 			};
+			var keyboard = new KeyboardColors {
+				BlackText = Color4.White,
+				GrayText = Color4.White.Darken(0.2f),
+				GenericKeyBackground = new Color4(115, 75, 195),
+				PanelKeyBackground = new Color4(30, 180, 140),
+				ButtonBackground = new Color4(112, 112, 112),
+				ModifierBackground = new Color4(80, 80, 80),
+				SelectedBorder = new Color4(100, 255, 255),
+				Border = new Color4(32, 32, 32)
+			};
 			return new ColorTheme {
 				Description = "Dark",
 				Basic = Theme.Colors,
@@ -239,7 +262,8 @@ namespace Tangerine.UI
 				TimelineOverview = timelineOverview,
 				TimelineRoll = timelineRoll,
 				Docking = docking,
-				Inspector = inspector
+				Inspector = inspector,
+				Keyboard = keyboard
 			};
 		}
 
@@ -341,6 +365,16 @@ namespace Tangerine.UI
 				StripeBackground1 = Theme.Colors.GrayBackground,
 				StripeBackground2 = Theme.Colors.GrayBackground.Darken(0.05f),
 			};
+			var keyboard = new KeyboardColors {
+				BlackText = Color4.Black,
+				GrayText = Color4.Black.Lighten(0.2f),
+				GenericKeyBackground = new Color4(180, 255, 255),
+				PanelKeyBackground = new Color4(255, 255, 128),
+				ButtonBackground = new Color4(220, 220, 255),
+				ModifierBackground = new Color4(160, 160, 190),
+				SelectedBorder = new Color4(255, 0, 0),
+				Border = new Color4(32, 32, 32)
+			};
 			return new ColorTheme {
 				Description = "Light",
 				Basic = Theme.Colors,
@@ -352,7 +386,8 @@ namespace Tangerine.UI
 				TimelineOverview = timelineOverview,
 				TimelineRoll = timelineRoll,
 				Docking = docking,
-				Inspector = inspector
+				Inspector = inspector,
+				Keyboard = keyboard
 			};
 		}
 	}
