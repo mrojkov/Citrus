@@ -848,14 +848,22 @@ namespace Orange
 		public static void ImportTexture(string path, Bitmap texture, ICookingRules rules, byte[] CookingRulesSHA1)
 		{
 			var textureParamsPath = Path.ChangeExtension(path, ".texture");
+			var textureParams = new TextureParams {
+				WrapMode = rules.WrapMode,
+				MinFilter = rules.MinFilter,
+				MagFilter = rules.MagFilter,
+			};
+			
 			if (!AreTextureParamsDefault(rules)) {
 				UpscaleTextureIfNeeded(ref texture, rules, false);
-				var textureParams = new TextureParams {
-					WrapMode = rules.WrapMode,
-					MinFilter = rules.MinFilter,
-					MagFilter = rules.MagFilter,
-				};
-				Serialization.WriteObjectToBundle(AssetBundle, textureParamsPath, textureParams, Serialization.Format.Binary, ".texture", AssetAttributes.None, null);
+				var isNeedToRewriteTexParams = true;
+				if (AssetBundle.FileExists(textureParamsPath)) {
+					var oldTexParams = Serialization.ReadObject<TextureParams>(textureParamsPath, AssetBundle.OpenFile(textureParamsPath));
+					isNeedToRewriteTexParams = !oldTexParams.Equals(textureParams);
+				}
+				if (isNeedToRewriteTexParams) {
+					Serialization.WriteObjectToBundle(AssetBundle, textureParamsPath, textureParams, Serialization.Format.Binary, ".texture", AssetAttributes.None, null);
+				}
 			} else {
 				if (AssetBundle.FileExists(textureParamsPath)) {
 					DeleteFileFromBundle(textureParamsPath);

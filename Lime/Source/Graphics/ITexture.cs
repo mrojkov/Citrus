@@ -25,7 +25,7 @@ namespace Lime
 		MirroredRepeat,
 	}
 
-	public class TextureParams
+	public class TextureParams : IEquatable<TextureParams>
 	{
 		[YuzuMember]
 		public TextureWrapMode WrapModeU { get; set; } = TextureWrapMode.Clamp;
@@ -53,6 +53,14 @@ namespace Lime
 		}
 
 		public static TextureParams Default = new TextureParams();
+
+		public bool Equals(TextureParams other)
+		{
+			return WrapModeU == other.WrapModeU &&
+				WrapModeV == other.WrapModeV &&
+				MinFilter == other.MinFilter &&
+				MagFilter == other.MagFilter;
+		}
 	}
 
 	internal static class TextureParamsExtensions
