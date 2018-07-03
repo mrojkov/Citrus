@@ -36,6 +36,7 @@ namespace Lime
 			Add(typeof(float), typeof(NumericAnimator));
 			Add(typeof(Color4), typeof(Color4Animator));
 			Add(typeof(string), typeof(Animator<string>));
+			Add(typeof(int), typeof(IntAnimator));
 			Add(typeof(bool), typeof(Animator<bool>));
 			Add(typeof(NumericRange), typeof(Animator<NumericRange>));
 			Add(typeof(Blending), typeof(Animator<Blending>));

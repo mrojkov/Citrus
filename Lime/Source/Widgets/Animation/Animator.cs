@@ -303,6 +303,27 @@ namespace Lime
 		}
 	}
 
+	public class IntAnimator : Animator<int>
+	{
+		protected override int InterpolateLinear(float t)
+		{
+			return Round(t * (Value3 - Value2) + Value2);
+		}
+
+		protected override int InterpolateSplined(float t)
+		{
+			return Round(Mathf.CatmullRomSpline(t, Value1, Value2, Value3, Value4));
+		}
+
+		public int Round(float x)
+		{
+			if (x < 0.5f && x >= -0.5f) {
+				return 0;
+			}
+			return x.Round();
+		}
+	}
+
 	public class Color4Animator : Animator<Color4>
 	{
 		protected override Color4 InterpolateLinear(float t)
