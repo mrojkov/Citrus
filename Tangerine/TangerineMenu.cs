@@ -147,7 +147,8 @@ namespace Tangerine
 				}),
 				new Command("Orange", new Menu {
 					OrangeCommands.Run,
-					OrangeCommands.OptionsDialog
+					OrangeCommands.OptionsDialog,
+					OrangeCommands.CookGameAssets
 				}),
 			};
 			var nodeTypes = new[] {
