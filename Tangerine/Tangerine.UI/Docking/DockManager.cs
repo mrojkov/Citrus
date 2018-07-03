@@ -80,7 +80,7 @@ namespace Tangerine.UI.Docking
 			var windowPlacement = Model.GetWindowByPlacement(placement);
 			placement.Unlink();
 			Model.DockPanelTo(placement, target, site, stretch);
-			if (!windowPlacement.Root.DescendantPanels().Any()) {
+			if (!windowPlacement.Root.GetDescendantPanels().Any()) {
 				Model.RemoveWindow(windowPlacement);
 				CloseWindow(windowPlacement.WindowWidget.Window);
 			} else {
@@ -141,6 +141,55 @@ namespace Tangerine.UI.Docking
 			RefreshWindows();
 		}
 
+		public void ResolveAndRefresh()
+		{
+			ResolveInconsistency();
+			Refresh();
+		}
+
+		private void ResolveInconsistency()
+		{
+			var floatingWindowDefaultSize = new Vector2(200, 300);
+			var descendantPanelsList = GetDescendantPanelPlacements().ToList();
+			// Remove all placements which not refered to existing panels 
+			foreach (var panel in descendantPanelsList.ToList()) {
+				if (!Model.Panels.Any(p => p.Id == panel.Id)) {
+					var windowPlacement = Model.GetWindowByPlacement(panel);
+					windowPlacement.RemovePanel(panel.Id);
+					descendantPanelsList.Remove(panel);
+					windowPlacement.Root.RemoveRedundantNodes();
+					if (!windowPlacement.GetDescendantPanels().Any()) {
+						Model.WindowPlacements.Remove(windowPlacement);
+					}
+				}
+			}
+			foreach (var panel in Model.Panels) {
+				// If there is no placement for panel, create new one in new window and hide.
+				if (!descendantPanelsList.Any(placement => placement.Id == panel.Id)) {
+					var windowPlacement = new WindowPlacement {
+						Position = Model.WindowPlacements[0].Position + Model.WindowPlacements[0].Size / 2 - floatingWindowDefaultSize / 2,
+						Size = floatingWindowDefaultSize
+					};
+					var splitPlacement = new SplitPlacement();
+					splitPlacement.Append(new PanelPlacement {
+						Title = panel.Title,
+						Id = panel.Id,
+						Hidden = true
+					});
+					windowPlacement.Append(splitPlacement);
+					Model.WindowPlacements.Add(windowPlacement);
+				}
+			}
+		}
+
+		public IEnumerable<PanelPlacement> GetDescendantPanelPlacements() {
+			foreach (var windowPlacement in Model.WindowPlacements) {
+				foreach (var panelPlacement in windowPlacement.GetDescendantPanels()) {
+					yield return panelPlacement;
+				}
+			}
+		}
+
 		private void CloseWindowsIfNecessary()
 		{
 			foreach (var window in Model.WindowPlacements) {
@@ -179,8 +228,8 @@ namespace Tangerine.UI.Docking
 			placement.SwitchType(
 				panel => CreatePanelWidget(container, panel, stretch, insertAt),
 				panelGroup => {
-					if (panelGroup.DescendantPanels().Count(p => !p.Hidden) == 1) {
-						CreatePanelWidget(container, panelGroup.DescendantPanels().First(p => !p.Hidden), stretch, insertAt);
+					if (panelGroup.GetDescendantPanels().Count(p => !p.Hidden) == 1) {
+						CreatePanelWidget(container, panelGroup.GetDescendantPanels().First(p => !p.Hidden), stretch, insertAt);
 					} else {
 						CreateTabBarWidget(container, panelGroup, stretch, insertAt);
 					}
@@ -293,7 +342,7 @@ namespace Tangerine.UI.Docking
 				var panelWindow = (WindowWidget)panel.ContentWidget.GetRoot();
 				var placement = Model.FindPanelPlacement(panel.Id);
 				var windowPlacement = Model.GetWindowByPlacement(placement);
-				if (windowPlacement.Root.DescendantPanels().Count(p => !p.Hidden) > 1) {
+				if (windowPlacement.Root.GetDescendantPanels().Count(p => !p.Hidden) > 1) {
 
 					var wrapper = new WindowPlacement {
 						Size = placement.CalcGlobalSize() * panelWindow.Size,
@@ -432,7 +481,7 @@ namespace Tangerine.UI.Docking
 				Model.Panels.Clear();
 				foreach (var windowPlacement in state.WindowPlacements) {
 					Model.WindowPlacements.Add(windowPlacement);
-					foreach (var panelPlacement in windowPlacement.Root.DescendantPanels()) {
+					foreach (var panelPlacement in windowPlacement.Root.GetDescendantPanels()) {
 						var p = savedPanels.FirstOrDefault(i => i.Id == panelPlacement.Title);
 						if (p == null) continue;
 						Model.Panels.Add(p);

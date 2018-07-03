@@ -77,7 +77,7 @@ namespace Tangerine.UI.Docking
 				DockSite site;
 				Rectangle? rect;
 				CalcSiteAndRect(clientMousePos, bounds, out site, out rect);
-				if (placement.Id == windowPlacement.Root.DescendantPanels().First().Id ||
+				if (placement.Id == windowPlacement.Root.GetDescendantPanels().First().Id ||
 					placement.Id == DockManager.DocumentAreaId &&
 					site == DockSite.Fill
 				) {

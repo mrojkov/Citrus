@@ -124,7 +124,7 @@ namespace Tangerine.UI.Docking
 			}
 		}
 
-		public bool IsPanelSingleInWindow(string id) => FindPanelPlacement(id).Root.DescendantPanels().Count() == 1;
+		public bool IsPanelSingleInWindow(string id) => FindPanelPlacement(id).Root.GetDescendantPanels().Count() == 1;
 
 		public void AddWindow(WindowPlacement placement) => WindowPlacements.Add(placement);
 
@@ -167,7 +167,7 @@ namespace Tangerine.UI.Docking
 
 		public Placement Root => Parent?.Root ?? this;
 
-		public abstract IEnumerable<PanelPlacement> DescendantPanels();
+		public abstract IEnumerable<PanelPlacement> GetDescendantPanels();
 
 		public abstract void RemovePlacement(Placement placement);
 
@@ -265,7 +265,7 @@ namespace Tangerine.UI.Docking
 		[YuzuMember]
 		public bool Hidden;
 
-		public override IEnumerable<PanelPlacement> DescendantPanels() => new PanelPlacement[] { };
+		public override IEnumerable<PanelPlacement> GetDescendantPanels() => new PanelPlacement[] { };
 
 		public override void RemovePlacement(Placement placement) { }
 
@@ -385,7 +385,7 @@ namespace Tangerine.UI.Docking
 			Placements = new PanelPlacementList(this);
 		}
 
-		public override IEnumerable<PanelPlacement> DescendantPanels() => Placements;
+		public override IEnumerable<PanelPlacement> GetDescendantPanels() => Placements;
 
 		public override PanelPlacement FindPanelPlacement(string id) => Placements.FirstOrDefault(p => p.Id == id);
 
@@ -477,7 +477,7 @@ namespace Tangerine.UI.Docking
 		}
 
 
-		public override IEnumerable<PanelPlacement> DescendantPanels()
+		public override IEnumerable<PanelPlacement> GetDescendantPanels()
 		{
 			var list = new List<PanelPlacement>();
 			AddDescendantPanels(list, FirstChild);
@@ -493,7 +493,7 @@ namespace Tangerine.UI.Docking
 			if (child is PanelPlacement) {
 				list.Add((PanelPlacement)child);
 			} else {
-				list.AddRange(child.DescendantPanels());
+				list.AddRange(child.GetDescendantPanels());
 			}
 		}
 
