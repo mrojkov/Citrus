@@ -229,7 +229,9 @@ namespace Tangerine.UI.FilesystemView
 		private void HandleOpenInSystemFileManager()
 		{
 			var path = FilesystemCommands.OpenInSystemFileManager.UserData as string;
+#if WIN			
 			path = path.Replace('/', '\\');
+#endif			
 			var extension = Path.GetExtension(path);
 			if (string.IsNullOrEmpty(extension)) {
 				foreach (string f in Directory.GetFiles(Path.GetDirectoryName(path))) {
