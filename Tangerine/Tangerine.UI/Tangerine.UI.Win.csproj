@@ -39,6 +39,7 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Compile Include="HistoryPanel\HistoryPanel.cs" />
     <Compile Include="ColorPicker.Win.cs" />
     <Compile Include="ColorPickerPanel.cs" />
     <Compile Include="Commands.cs" />

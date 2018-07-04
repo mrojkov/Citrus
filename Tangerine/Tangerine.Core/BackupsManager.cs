@@ -8,7 +8,7 @@ namespace Tangerine.Core
 {
 	public class BackupsManager
 	{
-		public class AutosaveBackupProcessor : ITaskProvider
+		private class AutosaveBackupProcessor : ITaskProvider
 		{
 			private readonly BackupsManager backupsManager;
 
@@ -21,74 +21,80 @@ namespace Tangerine.Core
 			{
 				while (true) {
 					yield return PeriodOfConservation;
-					foreach (var document in Project.Current.Documents) {
-						if (document.IsModified) {
-							backupsManager.Savebackup(document);
-						}
-					}
+					backupsManager.SaveModifiedDocuments();
 				}
 			}
 		}
 
-		public class SaveBackupProcessor : ITaskProvider
+		private class SaveBackupProcessor : ITaskProvider
 		{
 			private readonly BackupsManager backupsManager;
-
-			private Document lastKnown;
 
 			public SaveBackupProcessor(BackupsManager backupsManager)
 			{
 				this.backupsManager = backupsManager;
 			}
+
 			public IEnumerator<object> Task()
 			{
 				while (true) {
-					if (lastKnown != Document.Current) {
-						if (lastKnown != null) {
-							lastKnown.Saving -= SaveBackup;
-						}
 
-						lastKnown = Document.Current;
-						if (lastKnown != null) {
-							lastKnown.Saving += SaveBackup;
-						}
-					}
-
+					backupsManager.ProcessCurrentDocumentChanging();
 					yield return null;
 				}
 			}
-
-			private void SaveBackup(Document document)
-			{
-				backupsManager.Savebackup(document);
-			}
 		}
 
-		private static readonly int[] intervalsOfPreservation = {
-				10, 10, 10, 10, 10, 10, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60,
-				60, 60, 60, 1440, 1440, 1440, 1440, 1440, 1440, 1440, 43800, 43800
-		};
-
-		private class Backup : IComparable<Backup>
+		public class Backup : IComparable<Backup>
 		{
+			public Backup(DateTime dateTime, string path)
+			{
+				DateTime = dateTime;
+				Path = path;
+			}
+
 			public int CompareTo(Backup other)
 			{
-				return string.Compare(other.Path, Path, StringComparison.Ordinal);
+				return DateTime.Compare(other.DateTime, DateTime);
 			}
 
 			public DateTime DateTime;
 			public string Path;
 		}
 
+		private static readonly int[] intervalsOfPreservation = {
+			10, 10, 10, 10, 10, 10, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60,
+			60,	60, 60, 60, 1440, 1440, 1440, 1440, 1440, 1440, 1440, 43800, 43800
+		};
+
 		private static int PeriodOfConservation = 60;
+
+		private static BackupsManager instance;
+
+		public static BackupsManager Instance => instance ?? (instance = new BackupsManager());
+
+		private static Document lastKnownDocument;
 
 		private readonly AutosaveBackupProcessor autosaveBackup;
 		private readonly SaveBackupProcessor saveBackup;
 
-		public BackupsManager()
+		enum Mode
+		{
+			Normal,
+			SaveOriginal,
+			Scan
+		}
+
+		public Action BackupSaved;
+
+		private Mode mode;
+		private bool activated;
+
+		private BackupsManager()
 		{
 			autosaveBackup = new AutosaveBackupProcessor(this);
 			saveBackup = new SaveBackupProcessor(this);
+			mode = Mode.Normal;
 		}
 
 		private string GetTemporalPath(string path)
@@ -96,83 +102,154 @@ namespace Tangerine.Core
 			return Path.Combine(Lime.Environment.GetDataDirectory("Tangerine"), Path.GetFileName(path));
 		}
 
-		private void FillHistory(string path, out List<Backup> history)
+		public List<Backup> GetHistory(Document document)
 		{
-			history = new List<Backup>();
-			var files = Directory.GetFiles(path, "*.tan", SearchOption.TopDirectoryOnly);
+			if (Document.Current != null) {
+
+				string path = GetTemporalPath(document.Path);
+				return GetHistory(path);
+			}
+
+			return null;
+		}
+
+		private List<Backup> GetHistory(string path)
+		{
+			if (!Directory.Exists(path)) {
+				return null;
+			}
+
+			var history = new List<Backup>();
+			var files = Directory.GetFiles(path, "*.*", SearchOption.TopDirectoryOnly);
+
 			foreach (string file in files) {
 				string name = Path.GetFileNameWithoutExtension(file);
 				try {
 					var dataTime = DateTime.ParseExact(name, "yyyy-MM-dd-HH-mm-ss",
-							System.Globalization.CultureInfo.InvariantCulture);
-					history.Add(new Backup {DateTime = dataTime, Path = file});
+						System.Globalization.CultureInfo.InvariantCulture);
+					history.Add(new Backup(dataTime, file));
 				} catch (Exception e) {
 					Console.WriteLine("Error file name '{0}':\n{1}", file, e);
 				}
 			}
 
+			return history;
 		}
 
 		private void RemoveBackups(List<Backup> history)
 		{
 			history.Sort();
-			int interval = 0;
-			int indexHistory = 0;
-			int historyCount = history.Count;
+			int intervalIndex = 0;
+			double interval = intervalsOfPreservation[intervalIndex];
 			bool isFirstInterval = true;
-			double dateNow = new TimeSpan(DateTime.Now.Ticks).TotalMinutes;
-			foreach (int intervalOfPreservation in intervalsOfPreservation) {
-				bool isFirstElement = true;
-				interval += intervalOfPreservation;
-				while (indexHistory < historyCount) {
-					double historyTime = new TimeSpan(history[indexHistory].DateTime.Ticks).TotalMinutes;
-					if (dateNow - historyTime <  interval ) {
-						if (!isFirstInterval && !isFirstElement) {
-							File.Delete(history[indexHistory].Path);
+			var dateNow = DateTime.Now;
+
+			for (int i = 0; i < history.Count && intervalIndex < intervalsOfPreservation.Length; i++) {
+				if ((dateNow - history[i].DateTime).TotalMinutes < interval) {
+					if (!isFirstInterval) {
+						if (i + 1 < history.Count && (dateNow - history[i + 1].DateTime).TotalMinutes < interval) {
+							File.Delete(history[i].Path);
 						}
-						indexHistory++;
-						isFirstElement = false;
-					} else {
-						isFirstInterval = false;
-						break;
 					}
-				}
-
-				if (indexHistory >= historyCount - 1) {
-					break;
+				} else {
+					intervalIndex++;
+					interval += intervalsOfPreservation[intervalIndex];
+					isFirstInterval = false;
+					i--;
 				}
 			}
 		}
 
-		private void CreateDirectory(string path)
+		private void SaveBackup(Document document)
 		{
-			if (Directory.Exists(path)) {
-				Console.WriteLine("That path exists already.");
-				return;
-			}
-
-			// Try to create the directory.
-			Directory.CreateDirectory(path);
-		}
-
-		private void Savebackup(Document document)
-		{
-			List<Backup> history;
 			string path = GetTemporalPath(document.Path);
-			CreateDirectory(path);
+			Directory.CreateDirectory(path);
 			try {
-				document.SaveTo(Path.Combine(path, DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")), FileAttributes.Hidden);
+				document.SaveTo(Path.Combine(path, DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")));
 			} catch (Exception e) {
 				Console.WriteLine("Error on autosave document '{0}':\n{1}", document.Path, e);
 			}
-			FillHistory(path, out history);
-			RemoveBackups(history);
+
+			var history = GetHistory(path);
+			if (history != null) {
+				if (!(document == Document.Current && mode == Mode.SaveOriginal)) {
+					RemoveBackups(history);
+				}
+			}
+
+			if (lastKnownDocument == document && mode == Mode.Scan) {
+				mode = Mode.Normal;
+			}
+
+			BackupSaved?.Invoke();
 		}
 
 		public void Activate(TaskList tasks)
 		{
-			tasks.Add(autosaveBackup);
-			tasks.Add(saveBackup);
+			if (activated == false) {
+				activated = true;
+				tasks.Add(autosaveBackup);
+				tasks.Add(saveBackup);
+			}
+		}
+
+		public void SelectBackup(Backup backup)
+		{
+			switch (mode) {
+				case Mode.Normal: {
+					mode = Mode.SaveOriginal;
+					Document.Current.Save();
+					RestoreBackup(backup);
+					mode = Mode.Scan;
+				}
+					break;
+				case Mode.Scan: {
+					RestoreBackup(backup);
+				}
+					break;
+			}
+		}
+
+		private void RestoreBackup(Backup backup)
+		{
+			string localPath = Document.Current.Path;
+			string systemPath;
+			Project.Current.GetSystemPath(Document.Current.Path, out systemPath);
+			Project.Current.CloseDocument(Document.Current);
+			File.Delete(systemPath);
+			File.Copy(backup.Path, systemPath, true);
+			if (lastKnownDocument != null) {
+				lastKnownDocument.Saving -= SaveBackup;
+			}
+
+			lastKnownDocument = Project.Current.OpenDocument(localPath);
+			if (lastKnownDocument != null) {
+				lastKnownDocument.Saving += SaveBackup;
+			}
+		}
+
+		private void ProcessCurrentDocumentChanging()
+		{
+			if (lastKnownDocument != Document.Current) {
+				mode = Mode.Normal;
+				if (lastKnownDocument != null) {
+					lastKnownDocument.Saving -= SaveBackup;
+				}
+
+				lastKnownDocument = Document.Current;
+				if (lastKnownDocument != null) {
+					lastKnownDocument.Saving += SaveBackup;
+				}
+			}
+		}
+
+		private void SaveModifiedDocuments()
+		{
+			foreach (var document in Project.Current.Documents) {
+				if (document.IsModified) {
+					SaveBackup(document);
+				}
+			}
 		}
 	}
 }
