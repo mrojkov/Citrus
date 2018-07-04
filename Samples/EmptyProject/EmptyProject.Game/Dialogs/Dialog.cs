@@ -197,7 +197,7 @@ namespace EmptyProject.Dialogs
 		protected Application.Application App => The.App;
 		protected WindowWidget World => The.World;
 		protected IWindow Window => The.Window;
-		protected Input Input => Window.Input;
+		protected WindowInput Input => Window.Input;
 		protected SoundManager SoundManager => The.SoundManager;
 		protected AppData AppData => The.AppData;
 		protected Profile Profile => The.Profile;

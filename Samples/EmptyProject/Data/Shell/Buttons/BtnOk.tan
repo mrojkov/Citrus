@@ -43,6 +43,8 @@
 		}
 	],
 	"Color":[4294967295],
+	"Components":[],
+	"Id":"@",
 	"Nodes":[
 		{
 			"class":"Lime.Audio, Lime",
@@ -58,7 +60,7 @@
 				}
 			],
 			"Id":"ButtonClick",
-			"Nodes":[			],
+			"Nodes":[],
 			"Sample":{
 				"SerializationPath":"/Audio/Sounds/ButtonClick"
 			},
@@ -134,7 +136,7 @@
 			],
 			"Color":[4294967295],
 			"Id":"Ico",
-			"Nodes":[			],
+			"Nodes":[],
 			"Pivot":[0.51875,0.51875],
 			"Position":[122,134],
 			"Size":[160,160],
@@ -217,7 +219,7 @@
 			],
 			"Color":[4294967295],
 			"Id":"BigRound",
-			"Nodes":[			],
+			"Nodes":[],
 			"Pivot":[0.46947,0.4771],
 			"Position":[126,122],
 			"Size":[262,262],
@@ -254,7 +256,7 @@
 			],
 			"Color":[4294967295],
 			"Id":"RoundFrame",
-			"Nodes":[			],
+			"Nodes":[],
 			"Pivot":[0.5,0.5],
 			"Position":[131,137],
 			"Size":[304,304],

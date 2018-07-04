@@ -11,7 +11,7 @@ namespace EmptyProject.Debug
 		public static bool Enabled { get; set; }
 		public static bool IsDebugInfoVisible { get; set; }
 
-		private static Input Input => The.Window.Input;
+		private static WindowInput Input => The.Window.Input;
 		private static RainbowDash.Menu currentMenu;
 
 		static Cheats()
