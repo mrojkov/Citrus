@@ -306,6 +306,14 @@ namespace Tangerine
 				selectedShortcutsView.ScrollPosition = allShortcutsView.MinScrollPosition;
 			};
 
+			var filterBox = new ThemedEditBox {
+				MaxWidth = 200
+			};
+			filterBox.AddChangeWatcher(() => filterBox.Text, text => {
+				UpdateAllShortcutsView(allShortcutsView, hotkeyEditor, text.ToLower());
+				allShortcutsView.ScrollPosition = allShortcutsView.MinScrollPosition;
+			});
+
 			categoryPicker.Changed += args => {
 				hotkeyEditor.Category = (args.Value as CommandCategory);
 				hotkeyEditor.SetFocus();
@@ -325,11 +333,13 @@ namespace Tangerine
 					}
 				}
 			};
+
 			profilePicker.Changed += args => {
 				var profile = args.Value as HotkeyProfile;
 				if (profile != null) {
 					hotkeyEditor.Profile = profile;
-					UpdateAllShortcutsView(allShortcutsView, hotkeyEditor);
+					filterBox.Text = null;
+					UpdateAllShortcutsView(allShortcutsView, hotkeyEditor, filterBox.Text);
 					deleteButton.Enabled = profile.Name != HotkeyRegistry.DefaultProfileName && profilePicker.Items.Count > 1;
 					categoryPicker.Items.Clear();
 					foreach (var category in profile.Categories) {
@@ -359,12 +369,22 @@ namespace Tangerine
 
 			pane.AddNode(hotkeyEditor);
 			pane.AddNode(new Widget {
-				Layout = new HBoxLayout { Spacing = 4 },
+				Layout = new HBoxLayout { Spacing = 12 },
 				Nodes = {
 					new Widget {
 						Layout = new VBoxLayout {Spacing = 4 },
 						Nodes = {
-							new ThemedSimpleText("All commands:") { LayoutCell = new LayoutCell { StretchY = 0 } },
+							new Widget{
+								Layout = new HBoxLayout {Spacing = 4 },
+								Nodes = {
+									new ThemedSimpleText("Search: ") {
+										VAlignment = VAlignment.Center,
+										LayoutCell = new LayoutCell(Alignment.LeftCenter, 0)
+									},
+									filterBox
+								},
+								LayoutCell = new LayoutCell { StretchY = 0 }
+							},
 							new ThemedFrame {
 								Nodes = { allShortcutsView },
 								Layout = new VBoxLayout()
@@ -387,7 +407,7 @@ namespace Tangerine
 			return pane;
 		}
 
-		private void UpdateAllShortcutsView(ThemedScrollView allShortcutsView, HotkeyEditor hotkeyEditor)
+		private void UpdateAllShortcutsView(ThemedScrollView allShortcutsView, HotkeyEditor hotkeyEditor, string filter)
 		{
 			allShortcutsView.Content.Nodes.Clear();
 			if (hotkeyEditor.Profile == null) {
@@ -397,7 +417,7 @@ namespace Tangerine
 				var expandableContent = new Frame {
 					Padding = new Thickness(15, 0),
 					Layout = new VBoxLayout { Spacing = 4 },
-					Visible = false
+					Visible = true
 				};
 				var expandButton = new ThemedExpandButton {
 					Anchors = Anchors.Left,
@@ -420,11 +440,34 @@ namespace Tangerine
 				};
 				allShortcutsView.Content.AddNode(header);
 				allShortcutsView.Content.AddNode(expandableContent);
-				foreach (var command in category.Commands) {
+				var filteredCommands = String.IsNullOrEmpty(filter) ?
+					category.Commands : category.Commands.Where(i => i.Name.ToLower().Contains(filter));
+				title.Color = filteredCommands.Any() ? Theme.Colors.BlackText : Theme.Colors.GrayText;
+				expandButton.Enabled = filteredCommands.Any();
+				foreach (var command in filteredCommands) {
 					var editor = new ShortcutPropertyEditor(
 						new PropertyEditorParams(expandableContent, command, "Shortcut", command.Name));
 					editor.PropertyLabel.OverflowMode = TextOverflowMode.Ellipsis;
 					editor.PropertyLabel.LayoutCell = new LayoutCell(Alignment.LeftCenter, 1);
+
+					editor.PropertyLabel.CompoundPresenter.RemoveAll(i => i as SelectionPresenter != null);
+					editor.PropertyLabel.Caret = new CaretPosition();
+
+					if (!String.IsNullOrEmpty(filter)) {
+						var mc = new MultiCaretPosition();
+						var start = new CaretPosition { IsVisible = true, WorldPos = new Vector2(1, 1) };
+						var finish = new CaretPosition { IsVisible = true, WorldPos = new Vector2(1, 1) };
+						mc.Add(start);
+						mc.Add(finish);
+						editor.PropertyLabel.Caret = mc;
+						start.TextPos = editor.PropertyLabel.Text.ToLower().IndexOf(filter);
+						finish.TextPos = start.TextPos + filter.Length;
+						new SelectionPresenter(editor.PropertyLabel, start, finish, new SelectionParams() {
+							Color = Theme.Colors.TextSelection,
+							OutlineThickness = 0
+						});
+					}
+
 					editor.ContainerWidget.LayoutCell = new LayoutCell(Alignment.LeftCenter, 1);
 					editor.PropertyChanged = () => {
 						hotkeyEditor.UpdateButtonCommands();

@@ -1174,10 +1174,8 @@ namespace Tangerine.UI
 		private void PressModifier(Modifiers modifier, Key key)
 		{
 			var input = editor.Input;
-			if (input.WasKeyPressed(key)) {
+			if (input.IsKeyPressed(key)) {
 				modifiers |= modifier;
-			} else if (input.WasKeyReleased(key)) {
-				modifiers &= ~modifier;
 			}
 		}
 
@@ -1185,15 +1183,16 @@ namespace Tangerine.UI
 		{
 			if (!editor.IsFocused())
 				return;
-			PressModifier(Modifiers.Alt, Key.Alt);
-			PressModifier(Modifiers.Shift, Key.Shift);
-			PressModifier(Modifiers.Control, Key.Control);
-			PressModifier(Modifiers.Win, Key.Win);
-
 			var input = editor.Input;
 			var keys = Key.Enumerate().Where(k => input.WasKeyPressed(k));
 			if (!keys.Any())
 				return;
+			modifiers = Modifiers.None;
+
+			PressModifier(Modifiers.Alt, Key.Alt);
+			PressModifier(Modifiers.Shift, Key.Shift);
+			PressModifier(Modifiers.Control, Key.Control);
+			PressModifier(Modifiers.Win, Key.Win);
 			foreach (var key in keys) {
 				if (!key.IsModifier() && !key.IsMouseKey() && Shortcut.ValidateMainKey(key)) {
 					main = key;
