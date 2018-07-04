@@ -139,9 +139,9 @@
     <EmbeddedResource Include="Source\CodeTemplates\SceneFile.txt" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Templates\GeneratedScenes.Android.csproj" />
-    <EmbeddedResource Include="Templates\GeneratedScenes.iOS.csproj" />
-    <EmbeddedResource Include="Templates\GeneratedScenes.Win.csproj" />
+    <None Include="Templates\GeneratedScenes.Android.csproj.template" />
+    <None Include="Templates\GeneratedScenes.iOS.csproj.template" />
+    <None Include="Templates\GeneratedScenes.Win.csproj.template" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
