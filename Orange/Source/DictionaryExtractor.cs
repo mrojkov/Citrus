@@ -99,6 +99,7 @@ namespace Orange
 				if (directoryInfo.Name == ".svn") return false;
 				if (directoryInfo.Name == ".git") return false;
 				if (directoryInfo.Name == ".vs") return false;
+				if (directoryInfo.Name == "Citrus") return false;
 				return true;
 			};
 			var sourceFiles = new ScanOptimizedFileEnumerator(The.Workspace.ProjectDirectory, scanFilter);
