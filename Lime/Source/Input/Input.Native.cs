@@ -339,6 +339,7 @@ namespace Lime
 			{
 				input.CopyKeysState();
 				input.ProcessPendingKeyEvents(delta);
+				input.TextInput = null;
 			}
 		}
 	}
