@@ -14,8 +14,7 @@ namespace Tangerine.Dialogs
 		private List<KeyboardButton> buttons = new List<KeyboardButton>();
 		private IEnumerable<KeyboardButton> FindButtons(Key key) => buttons.Where(i => i.Key == key);
 
-		private bool IsCommandCurrent(CommandInfo info) =>
-			info.Shortcut.Modifiers.HasFlag(modifiers);
+		private bool IsCommandCurrent(CommandInfo info) => info.Shortcut.Modifiers.HasFlag(modifiers);
 		
 		private bool IsCommandSelected(CommandInfo info) =>
 			info.Shortcut.Modifiers.HasFlag(modifiers) &&
@@ -25,23 +24,26 @@ namespace Tangerine.Dialogs
 
 		private Modifiers modifiers;
 		private Key main;
-
-		private CommandCategory category;
-		public CommandCategory Category {
-			get { return category; }
-			set {
-				category = value;
-				UpdateShortcuts();
-			}
-		}
+		
+		public CommandCategory Category { get; set; }
+		public HotkeyProfile Profile { get; set; }
 
 		public Action SelectedShortcutChanged { get; set; }
 
 		public HotkeyEditor()
 		{
+			Profile = HotkeyRegistry.CurrentProfile;
 			BuildKeyboard();
 			Updating += ScreenKeyboard_Updating;
 			Updated += ScreenKeyboard_Updated;
+			Core.WidgetExtensions.AddChangeWatcher(this, () => Category, category => {
+				UpdateButtonCommands();
+				UpdateShortcuts();
+			});
+			Core.WidgetExtensions.AddChangeWatcher(this, () => Profile, profile => {
+				UpdateButtonCommands();
+				UpdateShortcuts();
+			});
 			Core.WidgetExtensions.AddChangeWatcher(this, () => modifiers, modifiers => { UpdateShortcuts(); });
 			Core.WidgetExtensions.AddChangeWatcher(this, () => main, main => { UpdateShortcuts(); });
 		}
@@ -51,7 +53,7 @@ namespace Tangerine.Dialogs
 			foreach (var button in this.buttons) {
 				button.Commands.Clear();
 			}
-			foreach (var command in HotkeyRegistry.Commands) {
+			foreach (var command in Profile.Commands) {
 				var key = command.Shortcut.Main;
 				if (key == Key.Unknown)
 					continue;
@@ -66,15 +68,16 @@ namespace Tangerine.Dialogs
 
 		public void UpdateShortcuts()
 		{
-			if (Category == null)
+			if (Category == null) {
 				return;
+			}
 			bool isGenericCategory = (Category.SystemName == typeof(GenericCommands).Name);
-			SelectedCommands = isGenericCategory ? HotkeyRegistry.Commands.Where(i => IsCommandSelected(i)) :
-				HotkeyRegistry.Commands.Where(i => IsCommandSelected(i) && i.Category == Category);
+			SelectedCommands = isGenericCategory ? Profile.Commands.Where(i => IsCommandSelected(i)) :
+				Profile.Commands.Where(i => IsCommandSelected(i) && i.Category == Category);
 			foreach (var button in buttons) {
 				button.CommandName = null;
 				button.CommandState = KeyboardCommandState.None;
-				IEnumerable<CommandInfo> currentCommands = isGenericCategory ?
+				var currentCommands = isGenericCategory ?
 					button.Commands.Where(i => IsCommandCurrent(i)) :
 					button.Commands.Where(i => IsCommandCurrent(i) && i.Category == Category);
 				bool hasGenericCommand = false;
@@ -364,8 +367,9 @@ namespace Tangerine.Dialogs
 			AddNode(rightPart);
 
 			foreach (var button in buttons) {
-				if (!button.Key.IsModifier())
+				if (!button.Key.IsModifier()) {
 					button.Clicked = () => SwitchButton(button.Key);
+				}
 			}
 			UpdateButtonCommands();
 		}

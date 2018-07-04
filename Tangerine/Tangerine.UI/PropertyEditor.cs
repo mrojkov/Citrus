@@ -1135,8 +1135,12 @@ namespace Tangerine.UI
 
 		private void SetValue(Shortcut value)
 		{
-			foreach (var obj in EditorParams.Objects) { 
+			var oldValue = CoalescedPropertyValue().GetValue();
+			foreach (var obj in EditorParams.Objects) {
 				EditorParams.PropertySetter(obj, EditorParams.PropertyName, value);
+			}
+			if (value != oldValue) {
+				PropertyChanged?.Invoke();
 			}
 		}
 
@@ -1149,7 +1153,6 @@ namespace Tangerine.UI
 			editor.AddChangeWatcher(CoalescedPropertyValue(), v => {
 				var text = v.ToString();
 				editor.Text = v.Main != Key.Unknown ? text : text.Replace("Unknown", "");
-				PropertyChanged?.Invoke();
 			});
 			editor.IsReadOnly = true;
 			editor.TextWidget.Tasks.Clear();

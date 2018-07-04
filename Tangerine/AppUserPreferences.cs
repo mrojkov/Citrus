@@ -21,6 +21,9 @@ namespace Tangerine
 		[YuzuRequired]
 		public Vector2 DefaultSceneDimensions { get; set; }
 
+		[YuzuRequired]
+		public string CurrentHotkeyProfile { get; set; }
+
 		/// <summary>
 		/// Autosave delay in seconds
 		/// </summary>
