@@ -18,6 +18,7 @@ namespace Orange
 
 		private string dataFolderName;
 		private string pluginName;
+		private string citrusLocation;
 
 		public Workspace()
 		{
@@ -51,14 +52,26 @@ namespace Orange
 		}
 
 		/// <summary>
-		/// Returns Citrus/Lime project path. It is supposed that Citrus lies beside the game.
+		/// Returns Citrus/Lime project path.
 		/// </summary>
 		public string GetLimeCsprojFilePath(TargetPlatform? platform = null)
 		{
 			if (platform == null) {
 				platform = The.Workspace.ActivePlatform;
 			}
-			return Path.Combine(Path.GetDirectoryName(ProjectDirectory), "Citrus", "Lime", "Lime" + GetPlatformSuffix(platform) + ".csproj");
+			// Now Citrus can either be located beside the game or inside the game directory.
+			// In future projects Citrus location should be specified through "CitrusLocation" in citproj config file
+			var suffix = Path.Combine("Lime", "Lime" + GetPlatformSuffix(platform) + ".csproj");
+			string result;
+			if (!string.IsNullOrEmpty(citrusLocation)) {
+				result = Path.Combine(ProjectDirectory, citrusLocation, suffix);
+			} else {
+				result = Path.Combine(Path.GetDirectoryName(ProjectDirectory), "Citrus", suffix);
+				if (!File.Exists(result)) {
+					result = Path.Combine(ProjectDirectory, "Citrus", suffix);
+				}
+			}
+			return result;
 		}
 
 		public static readonly Workspace Instance = new Workspace();
@@ -145,6 +158,7 @@ namespace Orange
 			FillDefaultTargets();
 			dataFolderName = ProjectJson.GetValue("DataFolderName", "Data");
 			pluginName = ProjectJson.GetValue("Plugin", "");
+			citrusLocation = ProjectJson.GetValue("CitrusLocation", string.Empty);
 
 			foreach (var target in ProjectJson.GetArray("Targets", new Dictionary<string, object>[0])) {
 				var cleanBeforeBuild = false;

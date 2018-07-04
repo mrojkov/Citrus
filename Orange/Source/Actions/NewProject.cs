@@ -73,6 +73,9 @@ namespace Orange
 								var relativeUri = fileUri.MakeRelativeUri(citrusUri);
 								// TODO: apply only to .sln and .csproj file
 								text = text.Replace("..\\..\\..", relativeUri.ToString());
+								if (targetPath.EndsWith(".citproj", StringComparison.OrdinalIgnoreCase)) {
+									text = text.Replace("CitrusLocation: \"..\",", $"CitrusLocation: \"{relativeUri}\",");
+								}
 								File.WriteAllText(targetPath, text);
 							}
 						}
