@@ -80,10 +80,13 @@ namespace Orange
 							}
 						}
 					}
+#if WIN
+// TODO: fix unresponsiveness on mac
 					Git("init");
 					Git("add -A");
 					Git("submodule add https://gitlab.game-forest.com:8888/Common/Citrus.git Citrus");
 					Git("commit -m\"Initial commit.\"");
+#endif // WIN
 				}
 			});
 		}
