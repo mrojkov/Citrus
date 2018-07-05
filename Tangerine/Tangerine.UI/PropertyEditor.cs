@@ -1131,6 +1131,8 @@ namespace Tangerine.UI
 		private Modifiers modifiers;
 		private Key main;
 
+		private WidgetFlatFillPresenter flatFillPresenter;
+
 		public Action PropertyChanged { get; set; }
 
 		private void SetValue(Shortcut value)
@@ -1166,9 +1168,15 @@ namespace Tangerine.UI
 			}));
 			editor.AddToNode(ContainerWidget);
 
+			PropertyLabel.Tasks.Clear();
+			PropertyLabel.Tasks.Add(ManageLabelFocus());
+			ContainerWidget.Tasks.Add(ManageFocusTask());
+
 			var value = CoalescedPropertyValue().GetValue();
 			main = value.Main;
 			modifiers = value.Modifiers;
+			flatFillPresenter = new WidgetFlatFillPresenter(Theme.Colors.GrayBackground);
+			ContainerWidget.CompoundPresenter.Add(flatFillPresenter);
 		}
 
 		private void PressModifier(Modifiers modifier, Key key)
@@ -1176,6 +1184,27 @@ namespace Tangerine.UI
 			var input = editor.Input;
 			if (input.IsKeyPressed(key)) {
 				modifiers |= modifier;
+			}
+		}
+		
+		IEnumerator<object> ManageLabelFocus()
+		{
+			while (true) {
+				if (PropertyLabel.Input.WasMouseReleased()) {
+					PropertyLabel.SetFocus();
+				}
+				yield return null;
+			}
+		}
+
+		IEnumerator<object> ManageFocusTask()
+		{
+			while (true) {
+				if (PropertyLabel.IsFocused()) {
+					editor.SetFocus();
+				}
+				flatFillPresenter.Color = editor.IsFocused() ? Theme.Colors.SelectedBackground : Theme.Colors.GrayBackground;
+				yield return null;
 			}
 		}
 

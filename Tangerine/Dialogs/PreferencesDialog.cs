@@ -270,7 +270,7 @@ namespace Tangerine
 
 			var allShortcutsView = new ThemedScrollView();
 			allShortcutsView.Content.Padding = contentPadding;
-			allShortcutsView.Content.Layout = new VBoxLayout { Spacing = 4 };
+			allShortcutsView.Content.Layout = new VBoxLayout { Spacing = 8 };
 
 			var selectedShortcutsView = new ThemedScrollView();
 			selectedShortcutsView.Content.Padding = contentPadding;
@@ -375,7 +375,7 @@ namespace Tangerine
 						Layout = new VBoxLayout {Spacing = 4 },
 						Nodes = {
 							new Widget{
-								Layout = new HBoxLayout {Spacing = 4 },
+								Layout = new HBoxLayout {Spacing = 8 },
 								Nodes = {
 									new ThemedSimpleText("Search: ") {
 										VAlignment = VAlignment.Center,
@@ -415,7 +415,6 @@ namespace Tangerine
 			}
 			foreach (var category in hotkeyEditor.Profile.Categories) {
 				var expandableContent = new Frame {
-					Padding = new Thickness(15, 0),
 					Layout = new VBoxLayout { Spacing = 4 },
 					Visible = true
 				};
@@ -434,7 +433,6 @@ namespace Tangerine
 					expandButton.Expanded = expandableContent.Visible;
 				};
 				var header = new Widget {
-					Padding = new Thickness(4),
 					Layout = new HBoxLayout(),
 					Nodes = { expandButton, title }
 				};
@@ -449,6 +447,7 @@ namespace Tangerine
 						new PropertyEditorParams(expandableContent, command, "Shortcut", command.Name));
 					editor.PropertyLabel.OverflowMode = TextOverflowMode.Ellipsis;
 					editor.PropertyLabel.LayoutCell = new LayoutCell(Alignment.LeftCenter, 1);
+					editor.PropertyLabel.Padding = new Thickness(expandButton.Width, 0);
 
 					editor.PropertyLabel.CompoundPresenter.RemoveAll(i => i as SelectionPresenter != null);
 					editor.PropertyLabel.Caret = new CaretPosition();
