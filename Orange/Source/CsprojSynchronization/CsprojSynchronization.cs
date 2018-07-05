@@ -15,7 +15,8 @@ namespace Orange
 				directoryInfo.Name != ".svn" &&
 				directoryInfo.Name != ".git" &&
 				directoryInfo.Name != ".vs" &&
-				directoryInfo.Name != "Resources";
+				directoryInfo.Name != "Resources" &&
+				directoryInfo.Name != "Citrus";
 		};
 		private static string ToWindowsSlashes(string path)
 		{

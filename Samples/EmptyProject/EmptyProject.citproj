@@ -1,4 +1,5 @@
 {
 	Title: 'EmptyProject',
+	CitrusLocation: "..",
 	Version: '1.0'
 }

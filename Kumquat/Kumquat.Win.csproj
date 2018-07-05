@@ -131,7 +131,7 @@
     <Compile Include="Source\ParsedFramesTree.cs" />
     <Compile Include="Source\ParsedNode.cs" />
     <Compile Include="Source\ScenesCodeCooker.cs" />
-    <EmbeddedResource Include="Templates\ParsedWidget.cs" />
+    <EmbeddedResource Include="Templates\ParsedWidget.cs.template" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Source\CodeTemplates\ParsedFrame.txt" />
@@ -139,9 +139,9 @@
     <EmbeddedResource Include="Source\CodeTemplates\SceneFile.txt" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Templates\GeneratedScenes.Android.csproj" />
-    <EmbeddedResource Include="Templates\GeneratedScenes.iOS.csproj" />
-    <EmbeddedResource Include="Templates\GeneratedScenes.Win.csproj" />
+    <None Include="Templates\GeneratedScenes.Android.csproj.template" />
+    <None Include="Templates\GeneratedScenes.iOS.csproj.template" />
+    <None Include="Templates\GeneratedScenes.Win.csproj.template" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -276,9 +276,9 @@ namespace Kumquat
 		{
 			Console.WriteLine("Generating generted scenes project files");
 			Directory.CreateDirectory(generatedScenesPath);
-			var projectWin = GetEmbeddedResource("GeneratedScenes.Win.csproj");
-			var projectAndroid = GetEmbeddedResource("GeneratedScenes.Android.csproj");
-			var projectiOS = GetEmbeddedResource("GeneratedScenes.iOS.csproj");
+			var projectWin = GetEmbeddedResource("GeneratedScenes.Win.csproj.template");
+			var projectAndroid = GetEmbeddedResource("GeneratedScenes.Android.csproj.template");
+			var projectiOS = GetEmbeddedResource("GeneratedScenes.iOS.csproj.template");
 			var parsedWidgetSourceCode = GetEmbeddedResource("ParsedWidget.cs");
 			File.WriteAllText($@"{generatedScenesPath}/{projectName}.GeneratedScenes.Win.csproj", projectWin.Replace("<%PROJECT_NAME%>", projectName));
 			File.WriteAllText($@"{generatedScenesPath}/{projectName}.GeneratedScenes.Android.csproj", projectAndroid.Replace("<%PROJECT_NAME%>", projectName));

@@ -15,7 +15,7 @@ namespace Kill3.OrangePlugin
 		{
 			if (The.Workspace.ProjectJson.GetValue<bool>("XCodeProject/DoSvnUpdate")) {
 				Subversion.Update(GetXCodeProjectFolder());
-			} 
+			}
 			AssetCooker.Cook(TargetPlatform.iOS);
 			var solutionPath = The.Workspace.GetSolutionFilePath(TargetPlatform.iOS);
 			var builder = new SolutionBuilder(TargetPlatform.iOS, solutionPath);
