@@ -155,7 +155,7 @@ namespace Tangerine.Core
 					return null;
 				}
 			}
-
+			localPath = AssetPath.CorrectSlashes(localPath);
 			var doc = Documents.FirstOrDefault(i => i.Path == localPath);
 			if (doc == null) {
 				var tmpFile = AutosaveProcessor.GetTemporalFilePath(localPath);
