@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Lime;
 
 namespace Tangerine.UI
@@ -17,6 +17,10 @@ namespace Tangerine.UI
 			new Color4(0xFFFF4040),
 			new Color4(36, 126, 236),
 			new Color4(0xFF808080),
+			new Color4(166, 107, 255),
+			new Color4(249, 102, 255),
+			new Color4(104, 155, 147),
+			new Color4(255, 190, 117),
 		};
 	}
 }

@@ -35,15 +35,19 @@ namespace Lime
 		public Color4 Color { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(11)]
 		public int FirstFrame { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(12)]
 		public int LastFrame { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(13)]
 		public float AnimationFps { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(14)]
 		public bool LoopedAnimation { get; set; }
 
 		ITexture texture = new SerializableTexture();
