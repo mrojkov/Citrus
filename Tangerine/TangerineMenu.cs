@@ -48,6 +48,9 @@ namespace Tangerine
 			}
 			imported.Clear();
 			foreach (var t in Orange.PluginLoader.EnumerateTangerineExportedTypes()) {
+				if (!typeof(Node).IsAssignableFrom(t)) {
+					continue;
+				}
 				var cmd = new Command(t.Name) { Icon = NodeIconPool.GetTexture(t) };
 				CommandHandlerList.Global.Connect(cmd, new CreateNode(t));
 				create.Add(cmd);

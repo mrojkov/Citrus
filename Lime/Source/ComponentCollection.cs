@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -18,7 +18,7 @@ namespace Lime
 					keyMap.Add(type, key);
 				}
 				return key;
-			}	
+			}
 		}
 
 		internal int GetKey() => GetKeyForType(GetType());
@@ -36,6 +36,7 @@ namespace Lime
 
 		public bool Contains(TComponent component) => ContainsKey(component.GetKey());
 		public bool Contains<T>() where T : TComponent => ContainsKey(ComponentKeyResolver<T>.Key);
+		public bool Contains(Type type) => ContainsKey(Component.GetKeyForType(type));
 
 		private bool ContainsKey(int key)
 		{
@@ -51,20 +52,23 @@ namespace Lime
 			return false;
 		}
 
-		public T Get<T>() where T : TComponent
+		private TComponent Get(int key)
 		{
-			var key = ComponentKeyResolver<T>.Key;
 			for (var i = 0; i < buckets.Length; i++) {
 				var b = buckets[(key + i) & (buckets.Length - 1)];
 				if (b.Key == key) {
-					return (T)b.Component;
+					return b.Component;
 				}
 				if (b.Key == 0) {
 					break;
 				}
 			}
-			return default(T);
+			return default(TComponent);
 		}
+
+		public TComponent Get(Type type) => Get(Component.GetKeyForType(type));
+
+		public T Get<T>() where T : TComponent => (T)Get(ComponentKeyResolver<T>.Key);
 
 		public T GetOrAdd<T>() where T : TComponent, new()
 		{
@@ -117,6 +121,12 @@ namespace Lime
 		public bool Remove<T>() where T : TComponent
 		{
 			var c = Get<T>();
+			return c != null && Remove(c);
+		}
+
+		public bool Remove(Type type)
+		{
+			var c = Get(type);
 			return c != null && Remove(c);
 		}
 

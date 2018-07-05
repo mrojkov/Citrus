@@ -179,6 +179,8 @@ namespace Tangerine
 				new Core.Operations.MoveNodes.Processor(),
 				new Core.Operations.SetMarker.Processor(),
 				new Core.Operations.DeleteMarker.Processor(),
+				new Core.Operations.SetComponent.Processor(),
+				new Core.Operations.DeleteComponent.Processor(),
 				new Core.Operations.DistortionMeshProcessor(),
 				new Core.Operations.SyncFolderDescriptorsProcessor(),
 				new Core.Operations.TimelineHorizontalShift.Processor(),

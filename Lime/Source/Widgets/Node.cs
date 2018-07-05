@@ -20,6 +20,9 @@ namespace Lime
 	public sealed class TangerineExportAttribute : Attribute
 	{ }
 
+	public sealed class TangerineHideInInspectorAttribute : Attribute
+	{ }
+
 	/// <summary>
 	/// Denotes a property which can not be animated within Tangerine.
 	/// </summary>
@@ -1079,6 +1082,7 @@ namespace Lime
 		/// For each root node of deserialized node hierarchy this component will be added and set to path in asset bundle.
 		/// </summary>
 		[NodeComponentDontSerialize]
+		[TangerineHideInInspector]
 		public class AssetBundlePathComponent : NodeComponent
 		{
 			public string Path;
@@ -1201,7 +1205,7 @@ namespace Lime
 			if (Application.WindowUnderMouse != Window.Current) {
 				return false;
 			}
-#endif		
+#endif
 			var context = WidgetContext.Current;
 			var nodeUnderMouse = context.NodeUnderMouse;
 			if (nodeUnderMouse == null || !nodeUnderMouse.SameOrDescendantOf(this)) {
