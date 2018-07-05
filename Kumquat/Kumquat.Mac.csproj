@@ -61,10 +61,10 @@
     <Compile Include="Source\ScenesCodeCooker.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Templates\GeneratedScenes.Android.csproj" />
-    <EmbeddedResource Include="Templates\GeneratedScenes.Win.csproj" />
-    <EmbeddedResource Include="Templates\GeneratedScenes.iOS.csproj" />
     <EmbeddedResource Include="Templates\ParsedWidget.cs.template" />
+    <EmbeddedResource Include="Templates\GeneratedScenes.Android.csproj.template" />
+    <EmbeddedResource Include="Templates\GeneratedScenes.Win.csproj.template" />
+    <EmbeddedResource Include="Templates\GeneratedScenes.iOS.csproj.template" />
     <EmbeddedResource Include="Source\CodeTemplates\ParsedFrame.txt" />
     <EmbeddedResource Include="Source\CodeTemplates\ParsedNode.txt" />
     <EmbeddedResource Include="Source\CodeTemplates\SceneFile.txt" />
