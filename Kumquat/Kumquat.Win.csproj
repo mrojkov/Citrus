@@ -131,7 +131,7 @@
     <Compile Include="Source\ParsedFramesTree.cs" />
     <Compile Include="Source\ParsedNode.cs" />
     <Compile Include="Source\ScenesCodeCooker.cs" />
-    <EmbeddedResource Include="Templates\ParsedWidget.cs" />
+    <EmbeddedResource Include="Templates\ParsedWidget.cs.template" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Source\CodeTemplates\ParsedFrame.txt" />
