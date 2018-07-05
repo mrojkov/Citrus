@@ -61,7 +61,7 @@
 		/// <summary>
 		/// Indicates how much the mouse wheel was moved
 		/// </summary>
-		public float WheelScrollAmount => (ownerWindow == Application.WindowUnderMouse) ? Application.Input.WheelScrollAmount : 0;
+		public float WheelScrollAmount => (Application.WindowUnderMouse == null || ownerWindow == Application.WindowUnderMouse) ? Application.Input.WheelScrollAmount : 0;
 
 		/// <summary>
 		/// Returns true while the user holds down the key identified by name. Think auto fire.
@@ -202,7 +202,7 @@
 		private bool ValidateKey(Key key)
 		{
 			if (key >= Key.Mouse0 && key <= Key.Touch3) {
-				return ownerWindow == Application.WindowUnderMouse;
+				return Application.WindowUnderMouse == null || ownerWindow == Application.WindowUnderMouse;
 			} else {
 				return ownerWindow.Active;
 			}

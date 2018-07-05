@@ -1184,7 +1184,7 @@ namespace Lime
 		public bool IsMouseOver()
 		{
 #if WIN || MAC
-			if (Application.WindowUnderMouse != Window.Current) {
+			if (Application.WindowUnderMouse != null && Application.WindowUnderMouse != Window.Current) {
 				return false;
 			}
 #endif
@@ -1198,7 +1198,7 @@ namespace Lime
 		public bool IsMouseOverThisOrDescendant()
 		{
 #if WIN || MAC
-			if (Application.WindowUnderMouse != Window.Current) {
+			if (Application.WindowUnderMouse != null && Application.WindowUnderMouse != Window.Current) {
 				return false;
 			}
 #endif		
