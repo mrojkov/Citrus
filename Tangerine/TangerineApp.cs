@@ -498,7 +498,6 @@ namespace Tangerine
 				defaultProfile.Save();
 			}
 			HotkeyRegistry.Profiles.Add(defaultProfile);
-			//HotkeyRegistry.CurrentProfile = defaultProfile;
 			foreach (string file in Directory.EnumerateFiles(dir)) {
 				string name = Path.GetFileName(file);
 				if (name == HotkeyRegistry.DefaultProfileName) {
@@ -508,9 +507,8 @@ namespace Tangerine
 				profile.Load();
 				HotkeyRegistry.Profiles.Add(profile);
 			}
-			Debug.Write(AppUserPreferences.Instance.CurrentHotkeyProfile);
 			var currentProfile = HotkeyRegistry.Profiles.FirstOrDefault(i => i.Name == AppUserPreferences.Instance.CurrentHotkeyProfile);
-			if (currentProfile!= null) {
+			if (currentProfile != null) {
 				HotkeyRegistry.CurrentProfile = currentProfile;
 			}
 			else {

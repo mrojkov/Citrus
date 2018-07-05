@@ -234,8 +234,7 @@ namespace Tangerine
 					if (HotkeyRegistry.Profiles.Any(i => i.Name == name)) {
 						if (new AlertDialog($"Profile with name \"{name}\" already exists. Do you want to rewrite it?", "Yes", "Cancel").Show() != 0) {
 							return;
-						}
-						else {
+						} else {
 							profilePicker.Items.Remove(profilePicker.Items.First(i => i.Text == name));
 						}
 					}
@@ -296,9 +295,17 @@ namespace Tangerine
 							VAlignment = VAlignment.Center,
 							LayoutCell = new LayoutCell(Alignment.LeftCenter, 2)
 						};
+						var deleteShortcutButton = new ThemedTabCloseButton {
+							LayoutCell = new LayoutCell(Alignment.LeftCenter, 0),
+							Clicked = () => {
+								command.Shortcut = new Shortcut();
+								hotkeyEditor.UpdateButtonCommands();
+								hotkeyEditor.UpdateShortcuts();
+							}
+						};
 						selectedShortcutsView.Content.AddNode(new Widget {
-							Layout = new TableLayout { Spacing = 4, RowCount = 1, ColCount = 2 },
-							Nodes = { shortcut, name },
+							Layout = new TableLayout { Spacing = 4, RowCount = 1, ColCount = 3 },
+							Nodes = { shortcut, name, deleteShortcutButton },
 							Padding = new Thickness(15, 0)
 						});
 					}
@@ -310,7 +317,7 @@ namespace Tangerine
 				MaxWidth = 200
 			};
 			filterBox.AddChangeWatcher(() => filterBox.Text, text => {
-				UpdateAllShortcutsView(allShortcutsView, hotkeyEditor, text.ToLower());
+				UpdateAllShortcutsView(allShortcutsView, selectedShortcutsView, hotkeyEditor, text.ToLower());
 				allShortcutsView.ScrollPosition = allShortcutsView.MinScrollPosition;
 			});
 
@@ -339,7 +346,7 @@ namespace Tangerine
 				if (profile != null) {
 					hotkeyEditor.Profile = profile;
 					filterBox.Text = null;
-					UpdateAllShortcutsView(allShortcutsView, hotkeyEditor, filterBox.Text);
+					UpdateAllShortcutsView(allShortcutsView, selectedShortcutsView, hotkeyEditor, filterBox.Text);
 					deleteButton.Enabled = profile.Name != HotkeyRegistry.DefaultProfileName && profilePicker.Items.Count > 1;
 					categoryPicker.Items.Clear();
 					foreach (var category in profile.Categories) {
@@ -407,7 +414,7 @@ namespace Tangerine
 			return pane;
 		}
 
-		private void UpdateAllShortcutsView(ThemedScrollView allShortcutsView, HotkeyEditor hotkeyEditor, string filter)
+		private void UpdateAllShortcutsView(ThemedScrollView allShortcutsView, ThemedScrollView selectedShortcutsView, HotkeyEditor hotkeyEditor, string filter)
 		{
 			allShortcutsView.Content.Nodes.Clear();
 			if (hotkeyEditor.Profile == null) {
@@ -472,9 +479,48 @@ namespace Tangerine
 						hotkeyEditor.UpdateButtonCommands();
 						hotkeyEditor.UpdateShortcuts();
 					};
+
+					var dragGesture = new DragGesture();
+					editor.ContainerWidget.Gestures.Add(dragGesture);
+					IEnumerator<object> UpdateDragCursor()
+					{
+						while (true) {
+							var nodeUnderMouse = WidgetContext.Current.NodeUnderMouse;
+							bool allowDrop =
+								(nodeUnderMouse == selectedShortcutsView && hotkeyEditor.Main != Key.Unknown) ||
+								(nodeUnderMouse as KeyboardButton != null && !(nodeUnderMouse as KeyboardButton).Key.IsModifier());
+							if (allowDrop) {
+								Utils.ChangeCursorIfDefault(Cursors.DragHandOpen);
+							} else {
+								Utils.ChangeCursorIfDefault(Cursors.DragHandClosed);
+							}
+							yield return null;
+						}
+					}
+					var task = new Task(UpdateDragCursor());
+					dragGesture.Recognized += () => editor.ContainerWidget.LateTasks.Add(task);
+					dragGesture.Ended += () => {
+						editor.ContainerWidget.LateTasks.Remove(task);
+						var nodeUnderMouse = WidgetContext.Current.NodeUnderMouse;
+						if (nodeUnderMouse == selectedShortcutsView && hotkeyEditor.Main != Key.Unknown) {
+							if (hotkeyEditor.Main != Key.Unknown) {
+								command.Shortcut = new Shortcut(hotkeyEditor.Modifiers, hotkeyEditor.Main);
+								hotkeyEditor.UpdateButtonCommands();
+								hotkeyEditor.UpdateShortcuts();
+							}
+						} else if (nodeUnderMouse as KeyboardButton != null) {
+							var button = nodeUnderMouse as KeyboardButton;
+							if (Shortcut.ValidateMainKey(button.Key) && !button.Key.IsModifier()) {
+								command.Shortcut = new Shortcut(hotkeyEditor.Modifiers, button.Key);
+								hotkeyEditor.UpdateButtonCommands();
+								hotkeyEditor.UpdateShortcuts();
+							}
+						}
+					};
 				}
 			}
 		}
+
 
 		private void UpdateProfiles(ThemedDropDownList profilePicker)
 		{

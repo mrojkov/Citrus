@@ -1190,7 +1190,7 @@ namespace Tangerine.UI
 		IEnumerator<object> ManageLabelFocus()
 		{
 			while (true) {
-				if (PropertyLabel.Input.WasMouseReleased()) {
+				if (PropertyLabel.Input.WasMousePressed()) {
 					PropertyLabel.SetFocus();
 				}
 				yield return null;
