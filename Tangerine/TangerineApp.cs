@@ -227,20 +227,7 @@ namespace Tangerine
 
 			new UI.FilesystemView.FilesystemPane(filesystemPanel);
 			RegisterGlobalCommands();
-
-			HotkeyRegistry.InitCommands(typeof(GenericCommands), "Generic Commands");
-			HotkeyRegistry.InitCommands(typeof(TimelineCommands), "Timeline Commands");
-			HotkeyRegistry.InitCommands(typeof(InspectorCommands), "Inspector Commands");
-			HotkeyRegistry.InitCommands(typeof(SceneViewCommands), "Scene View Commands");
-			HotkeyRegistry.InitCommands(typeof(Tools), "Tools");
-			HotkeyRegistry.InitCommands(typeof(FilesystemCommands), "Filesystem Commands");
-			HotkeyRegistry.InitCommands(typeof(OrangeCommands), "Orange Commands");
-			HotkeyRegistry.InitCommands(Command.Editing, "Editing", "Editing");
-			if (File.Exists(HotkeyRegistry.Filepath)) {
-				HotkeyRegistry.Load();
-			} else {
-				HotkeyRegistry.Save();
-			}
+			InitializeHotkeys();
 		}
 
 		void SetupMainWindowTitle(WindowWidget windowWidget)
@@ -493,6 +480,44 @@ namespace Tangerine
 			h.Connect(SceneViewCommands.SnapRulerLinesToWidgets, new SnapRulerLinesToWidgetCommandHandler());
 			h.Connect(SceneViewCommands.ClearActiveRuler, new DocumentDelegateCommandHandler(ClearActiveRuler));
 			h.Connect(SceneViewCommands.ManageRulers, new ManageRulers());
+		}
+
+		private void InitializeHotkeys()
+		{
+			string dir = HotkeyRegistry.ProfilesDirectory;
+			Directory.CreateDirectory(dir);
+			HotkeyRegistry.InitCommands(typeof(GenericCommands), "Generic Commands");
+			HotkeyRegistry.InitCommands(typeof(TimelineCommands), "Timeline Commands");
+			HotkeyRegistry.InitCommands(typeof(InspectorCommands), "Inspector Commands");
+			HotkeyRegistry.InitCommands(typeof(SceneViewCommands), "Scene View Commands");
+			HotkeyRegistry.InitCommands(typeof(Tools), "Tools");
+			HotkeyRegistry.InitCommands(typeof(FilesystemCommands), "Filesystem Commands");
+			HotkeyRegistry.InitCommands(typeof(OrangeCommands), "Orange Commands");
+			HotkeyRegistry.InitCommands(Command.Editing, "Editing", "Editing");
+			var defaultProfile = HotkeyRegistry.CreateProfile(HotkeyRegistry.DefaultProfileName);
+			if (File.Exists(defaultProfile.Filepath)) {
+				defaultProfile.Load();
+			}
+			else {
+				defaultProfile.Save();
+			}
+			HotkeyRegistry.Profiles.Add(defaultProfile);
+			foreach (string file in Directory.EnumerateFiles(dir)) {
+				string name = Path.GetFileName(file);
+				if (name == HotkeyRegistry.DefaultProfileName) {
+					continue;
+				}
+				var profile = HotkeyRegistry.CreateProfile(name);
+				profile.Load();
+				HotkeyRegistry.Profiles.Add(profile);
+			}
+			var currentProfile = HotkeyRegistry.Profiles.FirstOrDefault(i => i.Name == AppUserPreferences.Instance.CurrentHotkeyProfile);
+			if (currentProfile != null) {
+				HotkeyRegistry.CurrentProfile = currentProfile;
+			}
+			else {
+				HotkeyRegistry.CurrentProfile = defaultProfile;
+			}
 		}
 
 		private static bool IsCopyPasteAllowedForSelection()

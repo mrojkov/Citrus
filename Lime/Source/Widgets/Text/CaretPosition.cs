@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Lime
 {
-	internal class CaretPosition : ICaretPosition
+	public class CaretPosition : ICaretPosition
 	{
 		public enum ValidState { None, All, LineCol, WorldPos, TextPos, LineWorldX };
 		public ValidState Valid { get; private set; }
@@ -223,7 +223,7 @@ namespace Lime
 		public void AssignFrom(ICaretPosition c) { }
 	}
 
-	internal class MultiCaretPosition : ICaretPosition
+	public class MultiCaretPosition : ICaretPosition
 	{
 		private List<ICaretPosition> carets = new List<ICaretPosition>();
 

@@ -5,6 +5,8 @@ using Lime;
 using Tangerine.UI;
 using Tangerine.Core;
 using System;
+using System.IO;
+using Tangerine.Dialogs;
 
 namespace Tangerine
 {
@@ -26,6 +28,7 @@ namespace Tangerine
 		};
 
 		private bool saved = false;
+		private HotkeyProfile currentProfile;
 
 		public PreferencesDialog()
 		{
@@ -64,7 +67,7 @@ namespace Tangerine
 					}
 				}
 			};
-			HotkeyRegistry.Save();
+			HotkeyRegistry.CurrentProfile.Save();
 			okButton.Clicked += () => {
 				saved = true;
 				window.Close();
@@ -81,30 +84,31 @@ namespace Tangerine
 			cancelButton.Clicked += () => {
 				window.Close();
 				Core.UserPreferences.Instance.Load();
-				HotkeyRegistry.Load();
 			};
 			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
 			rootWidget.LateTasks.AddLoop(() => {
 				if (rootWidget.Input.ConsumeKeyPress(Key.Escape)) {
 					window.Close();
 					Core.UserPreferences.Instance.Load();
-					HotkeyRegistry.Load();
 				}
 			});
 			okButton.SetFocus();
 
 			window.Closed += () => {
 				if (saved) {
-					foreach (var command in HotkeyRegistry.Commands) {
-						command.Command.Shortcut = command.Shortcut;
+					foreach (var profile in HotkeyRegistry.Profiles) {
+						profile.Save();
 					}
-					HotkeyRegistry.Save();
+					HotkeyRegistry.CurrentProfile = currentProfile;
 				} else {
-					HotkeyRegistry.Load();
+					foreach (var profile in HotkeyRegistry.Profiles) {
+						profile.Load();
+					}
+					HotkeyRegistry.CurrentProfile = HotkeyRegistry.CurrentProfile;
 				}
 			};
 
-			foreach (var command in HotkeyRegistry.Commands) {
+			foreach (var command in HotkeyRegistry.CurrentProfile.Commands) {
 				command.Command.Shortcut = new Shortcut(Key.Unknown);
 			}
 		}
@@ -197,71 +201,80 @@ namespace Tangerine
 		
 		private Widget CreateKeyboardPane()
 		{
-			var hotkeyEditor = new Dialogs.HotkeyEditor();
+			var hotkeyEditor = new HotkeyEditor();
 			var pane = new Widget {
 				Layout = new VBoxLayout { Spacing = 10 },
 				Padding = contentPadding,
 				Awoken = node => hotkeyEditor.SetFocus()
 			};
 
-			var label = new ThemedSimpleText("Commands: ") {
+			var profileLabel = new ThemedSimpleText("Profile: ") {
 				VAlignment = VAlignment.Center,
-				LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0)
+				HAlignment = HAlignment.Right,
+				LayoutCell = new LayoutCell(Alignment.RightCenter, 0)
+			};
+			var profilePicker = new ThemedDropDownList();
+			profilePicker.TextWidget.Padding = new Thickness(3, 0);
+
+			var exportButton = new ThemedButton("Export...");
+			exportButton.Clicked = () => {
+				var dlg = new FileDialog {
+					Mode = FileDialogMode.Save,
+					InitialFileName = currentProfile.Name
+				};
+				if (dlg.RunModal()) {
+					currentProfile.Save(dlg.FileName);
+				}
+			};
+			var importButton = new ThemedButton("Import...");
+			importButton.Clicked = () => {
+				var dlg = new FileDialog { Mode = FileDialogMode.Open };
+				if (dlg.RunModal()) {
+					string name = Path.GetFileName(dlg.FileName);
+					if (HotkeyRegistry.Profiles.Any(i => i.Name == name)) {
+						if (new AlertDialog($"Profile with name \"{name}\" already exists. Do you want to rewrite it?", "Yes", "Cancel").Show() != 0) {
+							return;
+						} else {
+							profilePicker.Items.Remove(profilePicker.Items.First(i => i.Text == name));
+						}
+					}
+					var profile = HotkeyRegistry.CreateProfile(Path.GetFileName(dlg.FileName));
+					profile.Load(dlg.FileName);
+					profile.Save();
+					HotkeyRegistry.Profiles.Add(profile);
+					profilePicker.Items.Add(new CommonDropDownList.Item(profile.Name, profile));
+					profilePicker.Value = profile;
+				}
+			};
+			var deleteButton = new ThemedButton("Delete");
+			deleteButton.Clicked = () => {
+				if (new AlertDialog($"Are you sure you want to delete profile \"{currentProfile.Name}\"?", "Yes", "Cancel").Show() == 0) {
+					currentProfile.Delete();
+					profilePicker.Items.Remove(profilePicker.Items.First(i => i.Value == currentProfile));
+					profilePicker.Index = 0;
+					HotkeyRegistry.CurrentProfile = profilePicker.Value as HotkeyProfile;
+					foreach (var command in HotkeyRegistry.CurrentProfile.Commands) {
+						command.Command.Shortcut = new Shortcut(Key.Unknown);
+					}
+				}
+			};
+			
+			var categoryLabel = new ThemedSimpleText("Commands: ") {
+				VAlignment = VAlignment.Center,
+				HAlignment = HAlignment.Right,
+				LayoutCell = new LayoutCell(Alignment.RightCenter, 0)
 			};
 			var categoryPicker = new ThemedDropDownList();
 			categoryPicker.TextWidget.Padding = new Thickness(3, 0);
-			pane.AddNode(new Widget {
-				Layout = new HBoxLayout { Spacing = 4 },
-				Nodes = { label, categoryPicker }
-			});
 
 			var allShortcutsView = new ThemedScrollView();
 			allShortcutsView.Content.Padding = contentPadding;
-			allShortcutsView.Content.Layout = new VBoxLayout { Spacing = 4 };
+			allShortcutsView.Content.Layout = new VBoxLayout { Spacing = 8 };
 
 			var selectedShortcutsView = new ThemedScrollView();
 			selectedShortcutsView.Content.Padding = contentPadding;
 			selectedShortcutsView.Content.Layout = new VBoxLayout { Spacing = 4 };
 
-			foreach (var category in HotkeyRegistry.Categories) {
-				var expandableContent = new Frame {
-					Padding = new Thickness(15, 0),
-					Layout = new VBoxLayout { Spacing = 4 },
-					Visible = false
-				};
-				var expandButton = new ThemedExpandButton {
-					Anchors = Anchors.Left,
-					MinMaxSize = Vector2.One * 20f,
-					Expanded = expandableContent.Visible
-				};
-				var title = new ThemedSimpleText {
-					Text = category.Name,
-					VAlignment = VAlignment.Center,
-					LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0)
-				};
-				expandButton.Clicked += () => {
-					expandableContent.Visible = !expandableContent.Visible;
-					expandButton.Expanded = expandableContent.Visible;
-				};
-				var header = new Widget {
-					Padding = new Thickness(4),
-					Layout = new HBoxLayout(),
-					Nodes = { expandButton, title }
-				};
-				allShortcutsView.Content.AddNode(header);
-				allShortcutsView.Content.AddNode(expandableContent);
-				foreach (var command in category.Commands) {
-					var editor = new ShortcutPropertyEditor(
-						new PropertyEditorParams(expandableContent, command, "Shortcut", command.Name));
-					editor.PropertyLabel.OverflowMode = TextOverflowMode.Ellipsis;
-					editor.PropertyLabel.LayoutCell = new LayoutCell(Alignment.LeftCenter, 1);
-					editor.ContainerWidget.LayoutCell = new LayoutCell(Alignment.LeftCenter, 1);
-					editor.PropertyChanged = () => {
-						hotkeyEditor.UpdateButtonCommands();
-						hotkeyEditor.UpdateShortcuts();
-					};
-				}
-			}
 			hotkeyEditor.SelectedShortcutChanged = () => {
 				selectedShortcutsView.Content.Nodes.Clear();
 				var commands = hotkeyEditor.SelectedCommands.ToLookup(i => i.Category);
@@ -282,18 +295,32 @@ namespace Tangerine
 							VAlignment = VAlignment.Center,
 							LayoutCell = new LayoutCell(Alignment.LeftCenter, 2)
 						};
+						var deleteShortcutButton = new ThemedTabCloseButton {
+							LayoutCell = new LayoutCell(Alignment.LeftCenter, 0),
+							Clicked = () => {
+								command.Shortcut = new Shortcut();
+								hotkeyEditor.UpdateButtonCommands();
+								hotkeyEditor.UpdateShortcuts();
+							}
+						};
 						selectedShortcutsView.Content.AddNode(new Widget {
-							Layout = new TableLayout { Spacing = 4, RowCount = 1, ColCount = 2 },
-							Nodes = { shortcut, name },
+							Layout = new TableLayout { Spacing = 4, RowCount = 1, ColCount = 3 },
+							Nodes = { shortcut, name, deleteShortcutButton },
 							Padding = new Thickness(15, 0)
 						});
 					}
 				}
 				selectedShortcutsView.ScrollPosition = allShortcutsView.MinScrollPosition;
 			};
-			foreach (var category in HotkeyRegistry.Categories) {
-				categoryPicker.Items.Add(new CommonDropDownList.Item(category.Name, category));
-			}
+
+			var filterBox = new ThemedEditBox {
+				MaxWidth = 200
+			};
+			filterBox.AddChangeWatcher(() => filterBox.Text, text => {
+				UpdateAllShortcutsView(allShortcutsView, selectedShortcutsView, hotkeyEditor, text.ToLower());
+				allShortcutsView.ScrollPosition = allShortcutsView.MinScrollPosition;
+			});
+
 			categoryPicker.Changed += args => {
 				hotkeyEditor.Category = (args.Value as CommandCategory);
 				hotkeyEditor.SetFocus();
@@ -313,16 +340,58 @@ namespace Tangerine
 					}
 				}
 			};
-			categoryPicker.Index = 0;
+
+			profilePicker.Changed += args => {
+				var profile = args.Value as HotkeyProfile;
+				if (profile != null) {
+					hotkeyEditor.Profile = profile;
+					filterBox.Text = null;
+					UpdateAllShortcutsView(allShortcutsView, selectedShortcutsView, hotkeyEditor, filterBox.Text);
+					deleteButton.Enabled = profile.Name != HotkeyRegistry.DefaultProfileName && profilePicker.Items.Count > 1;
+					categoryPicker.Items.Clear();
+					foreach (var category in profile.Categories) {
+						categoryPicker.Items.Add(new CommonDropDownList.Item(category.Name, category));
+					}
+					categoryPicker.Value = null;
+					categoryPicker.Value = profile.Categories.First();
+					currentProfile = profile;
+				}
+			};
+			UpdateProfiles(profilePicker);
+
+			HotkeyRegistry.Reseted = () => UpdateProfiles(profilePicker);
+
+			pane.AddNode(new Widget {
+				Layout = new TableLayout { Spacing = 4, RowCount = 2, ColCount = 3 },
+				Nodes = {
+					profileLabel, profilePicker, 
+					new Widget {
+						Layout = new HBoxLayout { Spacing = 4 },
+						Nodes = { exportButton, importButton, deleteButton }
+					},
+					categoryLabel, categoryPicker
+				},
+				LayoutCell = new LayoutCell { StretchY = 0 }
+			});
 
 			pane.AddNode(hotkeyEditor);
 			pane.AddNode(new Widget {
-				Layout = new HBoxLayout { Spacing = 4 },
+				Layout = new HBoxLayout { Spacing = 12 },
 				Nodes = {
 					new Widget {
 						Layout = new VBoxLayout {Spacing = 4 },
 						Nodes = {
-							new ThemedSimpleText("All commands:") { LayoutCell = new LayoutCell { StretchY = 0 } },
+							new Widget{
+								Layout = new HBoxLayout {Spacing = 8 },
+								Nodes = {
+									new ThemedSimpleText("Search: ") {
+										VAlignment = VAlignment.Center,
+										LayoutCell = new LayoutCell(Alignment.LeftCenter, 0)
+									},
+									filterBox
+								},
+								LayoutCell = new LayoutCell { StretchY = 0 }
+							},
 							new ThemedFrame {
 								Nodes = { allShortcutsView },
 								Layout = new VBoxLayout()
@@ -343,6 +412,123 @@ namespace Tangerine
 			});
 
 			return pane;
+		}
+
+		private void UpdateAllShortcutsView(ThemedScrollView allShortcutsView, ThemedScrollView selectedShortcutsView, HotkeyEditor hotkeyEditor, string filter)
+		{
+			allShortcutsView.Content.Nodes.Clear();
+			if (hotkeyEditor.Profile == null) {
+				return;
+			}
+			foreach (var category in hotkeyEditor.Profile.Categories) {
+				var expandableContent = new Frame {
+					Layout = new VBoxLayout { Spacing = 4 },
+					Visible = true
+				};
+				var expandButton = new ThemedExpandButton {
+					Anchors = Anchors.Left,
+					MinMaxSize = Vector2.One * 20f,
+					Expanded = expandableContent.Visible
+				};
+				var title = new ThemedSimpleText {
+					Text = category.Name,
+					VAlignment = VAlignment.Center,
+					LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0)
+				};
+				expandButton.Clicked += () => {
+					expandableContent.Visible = !expandableContent.Visible;
+					expandButton.Expanded = expandableContent.Visible;
+				};
+				var header = new Widget {
+					Layout = new HBoxLayout(),
+					Nodes = { expandButton, title }
+				};
+				allShortcutsView.Content.AddNode(header);
+				allShortcutsView.Content.AddNode(expandableContent);
+				var filteredCommands = String.IsNullOrEmpty(filter) ?
+					category.Commands : category.Commands.Where(i => i.Name.ToLower().Contains(filter));
+				title.Color = filteredCommands.Any() ? Theme.Colors.BlackText : Theme.Colors.GrayText;
+				expandButton.Enabled = filteredCommands.Any();
+				foreach (var command in filteredCommands) {
+					var editor = new ShortcutPropertyEditor(
+						new PropertyEditorParams(expandableContent, command, "Shortcut", command.Name));
+					editor.PropertyLabel.OverflowMode = TextOverflowMode.Ellipsis;
+					editor.PropertyLabel.LayoutCell = new LayoutCell(Alignment.LeftCenter, 1);
+					editor.PropertyLabel.Padding = new Thickness(expandButton.Width, 0);
+
+					editor.PropertyLabel.CompoundPresenter.RemoveAll(i => i as SelectionPresenter != null);
+					editor.PropertyLabel.Caret = new CaretPosition();
+
+					if (!String.IsNullOrEmpty(filter)) {
+						var mc = new MultiCaretPosition();
+						var start = new CaretPosition { IsVisible = true, WorldPos = new Vector2(1, 1) };
+						var finish = new CaretPosition { IsVisible = true, WorldPos = new Vector2(1, 1) };
+						mc.Add(start);
+						mc.Add(finish);
+						editor.PropertyLabel.Caret = mc;
+						start.TextPos = editor.PropertyLabel.Text.ToLower().IndexOf(filter);
+						finish.TextPos = start.TextPos + filter.Length;
+						new SelectionPresenter(editor.PropertyLabel, start, finish, new SelectionParams() {
+							Color = Theme.Colors.TextSelection,
+							OutlineThickness = 0
+						});
+					}
+
+					editor.ContainerWidget.LayoutCell = new LayoutCell(Alignment.LeftCenter, 1);
+					editor.PropertyChanged = () => {
+						hotkeyEditor.UpdateButtonCommands();
+						hotkeyEditor.UpdateShortcuts();
+					};
+
+					var dragGesture = new DragGesture();
+					editor.ContainerWidget.Gestures.Add(dragGesture);
+					IEnumerator<object> UpdateDragCursor()
+					{
+						while (true) {
+							var nodeUnderMouse = WidgetContext.Current.NodeUnderMouse;
+							bool allowDrop =
+								(nodeUnderMouse == selectedShortcutsView && hotkeyEditor.Main != Key.Unknown) ||
+								(nodeUnderMouse as KeyboardButton != null && !(nodeUnderMouse as KeyboardButton).Key.IsModifier());
+							if (allowDrop) {
+								Utils.ChangeCursorIfDefault(Cursors.DragHandOpen);
+							} else {
+								Utils.ChangeCursorIfDefault(Cursors.DragHandClosed);
+							}
+							yield return null;
+						}
+					}
+					var task = new Task(UpdateDragCursor());
+					dragGesture.Recognized += () => editor.ContainerWidget.LateTasks.Add(task);
+					dragGesture.Ended += () => {
+						editor.ContainerWidget.LateTasks.Remove(task);
+						var nodeUnderMouse = WidgetContext.Current.NodeUnderMouse;
+						if (nodeUnderMouse == selectedShortcutsView && hotkeyEditor.Main != Key.Unknown) {
+							if (hotkeyEditor.Main != Key.Unknown) {
+								command.Shortcut = new Shortcut(hotkeyEditor.Modifiers, hotkeyEditor.Main);
+								hotkeyEditor.UpdateButtonCommands();
+								hotkeyEditor.UpdateShortcuts();
+							}
+						} else if (nodeUnderMouse as KeyboardButton != null) {
+							var button = nodeUnderMouse as KeyboardButton;
+							if (Shortcut.ValidateMainKey(button.Key) && !button.Key.IsModifier()) {
+								command.Shortcut = new Shortcut(hotkeyEditor.Modifiers, button.Key);
+								hotkeyEditor.UpdateButtonCommands();
+								hotkeyEditor.UpdateShortcuts();
+							}
+						}
+					};
+				}
+			}
+		}
+
+
+		private void UpdateProfiles(ThemedDropDownList profilePicker)
+		{
+			profilePicker.Items.Clear();
+			foreach (var profile in HotkeyRegistry.Profiles) {
+				profilePicker.Items.Add(new CommonDropDownList.Item(profile.Name, profile));
+			}
+			profilePicker.Value = HotkeyRegistry.CurrentProfile;
 		}
 	}
 }
