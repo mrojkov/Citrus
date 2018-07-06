@@ -482,22 +482,8 @@ namespace Tangerine
 
 					var dragGesture = new DragGesture();
 					editor.ContainerWidget.Gestures.Add(dragGesture);
-					IEnumerator<object> UpdateDragCursor()
-					{
-						while (true) {
-							var nodeUnderMouse = WidgetContext.Current.NodeUnderMouse;
-							bool allowDrop =
-								(nodeUnderMouse == selectedShortcutsView && hotkeyEditor.Main != Key.Unknown) ||
-								(nodeUnderMouse as KeyboardButton != null && !(nodeUnderMouse as KeyboardButton).Key.IsModifier());
-							if (allowDrop) {
-								Utils.ChangeCursorIfDefault(Cursors.DragHandOpen);
-							} else {
-								Utils.ChangeCursorIfDefault(Cursors.DragHandClosed);
-							}
-							yield return null;
-						}
-					}
-					var task = new Task(UpdateDragCursor());
+
+					var task = new Task(UpdateDragCursor(selectedShortcutsView, hotkeyEditor));
 					dragGesture.Recognized += () => editor.ContainerWidget.LateTasks.Add(task);
 					dragGesture.Ended += () => {
 						editor.ContainerWidget.LateTasks.Remove(task);
@@ -521,6 +507,22 @@ namespace Tangerine
 			}
 		}
 
+		IEnumerator<object> UpdateDragCursor(ThemedScrollView selectedShortcutsView, HotkeyEditor hotkeyEditor)
+		{
+			while (true) {
+				var nodeUnderMouse = WidgetContext.Current.NodeUnderMouse;
+				bool allowDrop =
+					(nodeUnderMouse == selectedShortcutsView && hotkeyEditor.Main != Key.Unknown) ||
+					(nodeUnderMouse as KeyboardButton != null && !(nodeUnderMouse as KeyboardButton).Key.IsModifier());
+				if (allowDrop) {
+					Utils.ChangeCursorIfDefault(Cursors.DragHandOpen);
+				}
+				else {
+					Utils.ChangeCursorIfDefault(Cursors.DragHandClosed);
+				}
+				yield return null;
+			}
+		}
 
 		private void UpdateProfiles(ThemedDropDownList profilePicker)
 		{
