@@ -47,7 +47,7 @@ namespace Lime
 			activeGestures.Clear();
 		}
 
-		private IEnumerable<Gesture> EnumerateGestures(Node node)
+		protected virtual IEnumerable<Gesture> EnumerateGestures(Node node)
 		{
 			var noClickGesturesAnymore = false;
 			while (node != null) {

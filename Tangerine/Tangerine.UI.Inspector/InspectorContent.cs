@@ -209,6 +209,7 @@ namespace Tangerine.UI.Inspector
 				ColorTheme.Current.Inspector.StripeBackground1 :
 				ColorTheme.Current.Inspector.StripeBackground2
 			) { IgnorePadding = true });
+			editor.PropertyLabel.Components.Add(new DocumentationComponent(editor.EditorParams.PropertyName));
 		}
 
 		class TransactionalNumericEditBox : ThemedNumericEditBox

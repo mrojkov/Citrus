@@ -208,7 +208,7 @@ namespace Tangerine
 						new UI.Timeline.Timeline(timelinePanel),
 						new UI.SceneView.SceneView(documentViewContainer),
 						new UI.SearchPanel(searchPanel.ContentWidget),
-						new HistoryPanel(historyPanel.ContentWidget), 
+						new HistoryPanel(historyPanel.ContentWidget),
 					});
 				}
 			};
@@ -228,6 +228,40 @@ namespace Tangerine
 			new UI.FilesystemView.FilesystemPane(filesystemPanel);
 			RegisterGlobalCommands();
 			InitializeHotkeys();
+
+			WidgetContext.Current.GestureManager = new HelpModeGestureManager(WidgetContext.Current);
+			mainWidget.LateTasks.Add(HelpModeTask());
+			DocumentationComponent.Clicked = component => {
+				new HelpDialog(component.Filepath);
+				var manager = WidgetContext.Current.GestureManager as HelpModeGestureManager;
+				if (manager != null) {
+					manager.IsHelpModeOn = false;
+					Debug.Write(WidgetContext.Current.Root.ToString() + ". Help Mode: Off");
+				}
+			};
+			foreach (var str in GetType().Assembly.GetManifestResourceNames()) {
+				Debug.Write(str);
+			}
+
+		}
+
+		IEnumerator<object> HelpModeTask()
+		{
+			while (true) {
+				var manager = WidgetContext.Current.GestureManager as HelpModeGestureManager;
+				if (manager != null && manager.IsHelpModeOn) {
+					var node = WidgetContext.Current.NodeUnderMouse;
+					WidgetContext.Current.MouseCursor = Cursors.DisabledHelp;
+					while (node != null) {
+						if (node.Components.Get<DocumentationComponent>() != null) {
+							WidgetContext.Current.MouseCursor = Cursors.EnabledHelp;
+							break;
+						}
+						node = node.Parent;
+					}
+				}
+				yield return null;
+			}
 		}
 
 		void SetupMainWindowTitle(WindowWidget windowWidget)
@@ -446,6 +480,14 @@ namespace Tangerine
 			h.Connect(GenericCommands.GroupContentsToMorphableMeshes, new GroupContentsToMorphableMeshes());
 			h.Connect(GenericCommands.ExportScene, new ExportScene());
 			h.Connect(GenericCommands.UpsampleAnimationTwice, new UpsampleAnimationTwice());
+			h.Connect(GenericCommands.ViewHelp, () => new HelpDialog());
+			h.Connect(GenericCommands.HelpMode, () => {
+				var manager = WidgetContext.Current.GestureManager as HelpModeGestureManager;
+				if (manager != null) {
+					manager.IsHelpModeOn = !manager.IsHelpModeOn;
+					Debug.Write(WidgetContext.Current.Root.ToString() + ". Help Mode: " + (manager.IsHelpModeOn ? "On" : "Off"));
+				}
+			});
 			h.Connect(Tools.AlignLeft, new AlignLeft());
 			h.Connect(Tools.AlignRight, new AlignRight());
 			h.Connect(Tools.AlignTop, new AlignTop());

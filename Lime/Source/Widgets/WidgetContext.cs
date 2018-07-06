@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -33,7 +33,7 @@ namespace Lime
 		/// </summary>
 		public MouseCursor MouseCursor { get; set; }
 
-		public GestureManager GestureManager { get; internal set; }
+		public GestureManager GestureManager { get; set; }
 
 		public WidgetContext(Widget root) : base("Current")
 		{
