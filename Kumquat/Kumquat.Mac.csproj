@@ -53,6 +53,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
+    <None Include="Templates\GeneratedScenes.Android.csproj.kumquat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Templates\GeneratedScenes.iOS.csproj.kumquat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Templates\GeneratedScenes.Win.csproj.kumquat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Templates\ParsedWidget.cs.kumquat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\CodeFormatter.cs" />
@@ -61,10 +73,6 @@
     <Compile Include="Source\ScenesCodeCooker.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Templates\ParsedWidget.cs.template" />
-    <EmbeddedResource Include="Templates\GeneratedScenes.Android.csproj.template" />
-    <EmbeddedResource Include="Templates\GeneratedScenes.Win.csproj.template" />
-    <EmbeddedResource Include="Templates\GeneratedScenes.iOS.csproj.template" />
     <EmbeddedResource Include="Source\CodeTemplates\ParsedFrame.txt" />
     <EmbeddedResource Include="Source\CodeTemplates\ParsedNode.txt" />
     <EmbeddedResource Include="Source\CodeTemplates\SceneFile.txt" />
@@ -78,6 +86,9 @@
       <Project>{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}</Project>
       <Name>Yuzu.Mac</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Templates\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
 </Project>
