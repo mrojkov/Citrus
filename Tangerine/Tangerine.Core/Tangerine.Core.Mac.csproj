@@ -61,6 +61,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DocumentHistory.cs" />
     <Compile Include="Document.cs" />
+    <Compile Include="DocumentationComponent.cs" />
+    <Compile Include="HelpModeGestureManager.cs" />
     <Compile Include="Operations\Modification.cs" />
     <Compile Include="NodeEditorState.cs" />
     <Compile Include="AnimatorEditorState.cs" />
