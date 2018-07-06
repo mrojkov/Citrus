@@ -1,18 +1,26 @@
+using Lime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace Lime
+namespace Tangerine.UI
 {
 	public class HelpModeGestureManager : GestureManager
 	{
 		public bool IsHelpModeOn { get; set; } = false;
 
+		private readonly Task helpModeTask;
+
 		public HelpModeGestureManager(WidgetContext context) : base(context)
 		{
+			helpModeTask = new Task(HelpModeTask());
+			context.Root.LateTasks.Add(helpModeTask);
+		}
 
+		~HelpModeGestureManager()
+		{
+			context.Root.LateTasks.Remove(helpModeTask);
 		}
 
 		protected override IEnumerable<Gesture> EnumerateGestures(Node node)
@@ -35,6 +43,25 @@ namespace Lime
 					noClickGesturesAnymore |= anyClickGesture;
 				}
 				node = node.Parent;
+			}
+		}
+
+		private IEnumerator<object> HelpModeTask()
+		{
+			while (true) {
+				var manager = WidgetContext.Current.GestureManager as HelpModeGestureManager;
+				if (manager != null && manager.IsHelpModeOn) {
+					var node = WidgetContext.Current.NodeUnderMouse;
+					WidgetContext.Current.MouseCursor = Cursors.DisabledHelp;
+					while (node != null) {
+						if (node.Components.Get<DocumentationComponent>() != null) {
+							WidgetContext.Current.MouseCursor = Cursors.EnabledHelp;
+							break;
+						}
+						node = node.Parent;
+					}
+				}
+				yield return null;
 			}
 		}
 	}

@@ -47,8 +47,6 @@
     <Compile Include="Components.cs" />
     <Compile Include="CoreUserPreferences.cs" />
     <Compile Include="Document.Animation.cs" />
-    <Compile Include="DocumentationComponent.cs" />
-    <Compile Include="HelpModeGestureManager.cs" />
     <Compile Include="HotSerialization.cs" />
     <Compile Include="IDataflow.cs" />
     <Compile Include="ITaskProvider.cs" />

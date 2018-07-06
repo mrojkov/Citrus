@@ -7,7 +7,7 @@ namespace Lime
 {
 	public class GestureManager
 	{
-		private readonly WidgetContext context;
+		protected readonly WidgetContext context;
 		private readonly List<Gesture> activeGestures = new List<Gesture>();
 		private Node activeNode;
 		public int CurrentIteration { get; private set; }

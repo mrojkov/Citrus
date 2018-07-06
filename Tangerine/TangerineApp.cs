@@ -229,39 +229,7 @@ namespace Tangerine
 			RegisterGlobalCommands();
 			InitializeHotkeys();
 
-			WidgetContext.Current.GestureManager = new HelpModeGestureManager(WidgetContext.Current);
-			mainWidget.LateTasks.Add(HelpModeTask());
-			DocumentationComponent.Clicked = component => {
-				new HelpDialog(component.Filepath);
-				var manager = WidgetContext.Current.GestureManager as HelpModeGestureManager;
-				if (manager != null) {
-					manager.IsHelpModeOn = false;
-					Debug.Write(WidgetContext.Current.Root.ToString() + ". Help Mode: Off");
-				}
-			};
-			foreach (var str in GetType().Assembly.GetManifestResourceNames()) {
-				Debug.Write(str);
-			}
-
-		}
-
-		IEnumerator<object> HelpModeTask()
-		{
-			while (true) {
-				var manager = WidgetContext.Current.GestureManager as HelpModeGestureManager;
-				if (manager != null && manager.IsHelpModeOn) {
-					var node = WidgetContext.Current.NodeUnderMouse;
-					WidgetContext.Current.MouseCursor = Cursors.DisabledHelp;
-					while (node != null) {
-						if (node.Components.Get<DocumentationComponent>() != null) {
-							WidgetContext.Current.MouseCursor = Cursors.EnabledHelp;
-							break;
-						}
-						node = node.Parent;
-					}
-				}
-				yield return null;
-			}
+			InitDocumentation();
 		}
 
 		void SetupMainWindowTitle(WindowWidget windowWidget)
@@ -480,12 +448,11 @@ namespace Tangerine
 			h.Connect(GenericCommands.GroupContentsToMorphableMeshes, new GroupContentsToMorphableMeshes());
 			h.Connect(GenericCommands.ExportScene, new ExportScene());
 			h.Connect(GenericCommands.UpsampleAnimationTwice, new UpsampleAnimationTwice());
-			h.Connect(GenericCommands.ViewHelp, () => new HelpDialog());
+			h.Connect(GenericCommands.ViewHelp, () => OpenHelp(new HelpPage(HelpPage.StartPageName)));
 			h.Connect(GenericCommands.HelpMode, () => {
 				var manager = WidgetContext.Current.GestureManager as HelpModeGestureManager;
 				if (manager != null) {
 					manager.IsHelpModeOn = !manager.IsHelpModeOn;
-					Debug.Write(WidgetContext.Current.Root.ToString() + ". Help Mode: " + (manager.IsHelpModeOn ? "On" : "Off"));
 				}
 			});
 			h.Connect(Tools.AlignLeft, new AlignLeft());
@@ -522,6 +489,32 @@ namespace Tangerine
 			h.Connect(SceneViewCommands.SnapRulerLinesToWidgets, new SnapRulerLinesToWidgetCommandHandler());
 			h.Connect(SceneViewCommands.ClearActiveRuler, new DocumentDelegateCommandHandler(ClearActiveRuler));
 			h.Connect(SceneViewCommands.ManageRulers, new ManageRulers());
+		}
+		
+		private void InitDocumentation()
+		{
+			WidgetContext.Current.GestureManager = new HelpModeGestureManager(WidgetContext.Current);
+			DocumentationComponent.Clicked = page => OpenHelp(page);
+			HelpPage.DocumentationDirectory =
+				Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName, "Documentation");
+			Directory.CreateDirectory(HelpPage.UrlDirectory);
+			string startPagePath = Path.Combine(HelpPage.DocumentationDirectory, HelpPage.StartPageName);
+			if (!File.Exists(startPagePath)) {
+				File.WriteAllText(startPagePath, "# This is start page #");
+			}
+			string errorPagePath = Path.Combine(HelpPage.DocumentationDirectory, HelpPage.ErrorPageName);
+			if (!File.Exists(errorPagePath)) {
+				File.WriteAllText(errorPagePath, "# This is error page #");
+			}
+		}
+
+		private void OpenHelp(HelpPage page)
+		{
+			new HelpDialog(page);
+			var manager = WidgetContext.Current.GestureManager as HelpModeGestureManager;
+			if (manager != null) {
+				manager.IsHelpModeOn = false;
+			}
 		}
 
 		private void InitializeHotkeys()
