@@ -493,6 +493,7 @@ namespace Tangerine
 								command.Shortcut = new Shortcut(hotkeyEditor.Modifiers, hotkeyEditor.Main);
 								hotkeyEditor.UpdateButtonCommands();
 								hotkeyEditor.UpdateShortcuts();
+								hotkeyEditor.SetFocus();
 							}
 						} else if (nodeUnderMouse as KeyboardButton != null) {
 							var button = nodeUnderMouse as KeyboardButton;
@@ -500,6 +501,7 @@ namespace Tangerine
 								command.Shortcut = new Shortcut(hotkeyEditor.Modifiers, button.Key);
 								hotkeyEditor.UpdateButtonCommands();
 								hotkeyEditor.UpdateShortcuts();
+								hotkeyEditor.SetFocus();
 							}
 						}
 					};
