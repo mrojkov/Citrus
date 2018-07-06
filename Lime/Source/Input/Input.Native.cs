@@ -335,6 +335,11 @@ namespace Lime
 				input.SetKeyState(key, value);
 			}
 
+			public void SetWindowUnderMouse(IWindow window)
+			{
+				Application.WindowUnderMouse = window;
+			}
+
 			public void OnBetweenFrames(float delta)
 			{
 				input.CopyKeysState();
