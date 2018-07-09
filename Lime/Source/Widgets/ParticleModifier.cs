@@ -61,6 +61,7 @@ namespace Lime
 
 		ITexture texture = new SerializableTexture();
 		[YuzuMember]
+		[TangerineKeyframeColor(27)]
 		public ITexture Texture { get { return texture; } set { texture = value; textures = null; } }
 
 		public ParticleModifier()
