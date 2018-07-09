@@ -495,14 +495,13 @@ namespace Tangerine
 		{
 			WidgetContext.Current.GestureManager = new HelpModeGestureManager(WidgetContext.Current);
 			DocumentationComponent.Clicked = page => OpenHelp(page);
-			HelpPage.DocumentationDirectory =
-				Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName, "Documentation");
-			Directory.CreateDirectory(HelpPage.UrlDirectory);
-			string startPagePath = Path.Combine(HelpPage.DocumentationDirectory, HelpPage.StartPageName);
+			Directory.CreateDirectory(HelpPage.HtmlDocumentationPath);
+			Directory.CreateDirectory(HelpPage.MarkdownDocumentationPath);
+			string startPagePath = Path.Combine(HelpPage.MarkdownDocumentationPath, HelpPage.StartPageName);
 			if (!File.Exists(startPagePath)) {
 				File.WriteAllText(startPagePath, "# This is start page #");
 			}
-			string errorPagePath = Path.Combine(HelpPage.DocumentationDirectory, HelpPage.ErrorPageName);
+			string errorPagePath = Path.Combine(HelpPage.MarkdownDocumentationPath, HelpPage.ErrorPageName);
 			if (!File.Exists(errorPagePath)) {
 				File.WriteAllText(errorPagePath, "# This is error page #");
 			}

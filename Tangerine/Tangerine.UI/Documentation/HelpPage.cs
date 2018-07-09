@@ -14,21 +14,22 @@ namespace Tangerine.UI
 		public readonly string PageFilepath;
 		public readonly string Url;
 
-		public static string DocumentationDirectory { get; set; }
-		public static string UrlDirectory => Lime.Environment.GetPathInsideDataDirectory("Tangerine", "DocumentationCache");
-		public static string StartPageName { get; set; } = "StartPage";
-		public static string ErrorPageName { get; set; } = "ErrorPage";
+		public static string MarkdownDocumentationPath { get; set; } =
+			Path.Combine(Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.FullName, "Documentation");
+		public static string HtmlDocumentationPath { get; set; } =
+			Lime.Environment.GetPathInsideDataDirectory("Tangerine", "DocumentationCache");
+		public static string StartPageName { get; set; } = "StartPage.md";
+		public static string ErrorPageName { get; set; } = "ErrorPage.md";
 		
 		public HelpPage(string pageName)
 		{
 			PageName = pageName;
-			PageFilepath = Path.Combine(DocumentationDirectory, pageName);
+			PageFilepath = Path.Combine(MarkdownDocumentationPath, pageName);
 
 			string hash = GetPageHash();
-			string urlDir = UrlDirectory;
-			Url = Path.Combine(urlDir, pageName + "_" + hash + ".html");
+			Url = Path.Combine(HtmlDocumentationPath, pageName + "_" + hash + ".html");
 			if (!File.Exists(Url)) {
-				var oldHtml = Directory.GetFiles(urlDir).Where(i => 
+				var oldHtml = Directory.GetFiles(HtmlDocumentationPath).Where(i => 
 					Path.GetFileName(i).Substring(0, pageName.Length) == pageName
 				);
 				foreach (var file in oldHtml) {
