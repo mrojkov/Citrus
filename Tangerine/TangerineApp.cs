@@ -208,7 +208,7 @@ namespace Tangerine
 						new UI.Timeline.Timeline(timelinePanel),
 						new UI.SceneView.SceneView(documentViewContainer),
 						new UI.SearchPanel(searchPanel.ContentWidget),
-						new HistoryPanel(historyPanel.ContentWidget), 
+						new HistoryPanel(historyPanel.ContentWidget),
 					});
 				}
 			};
@@ -228,6 +228,8 @@ namespace Tangerine
 			new UI.FilesystemView.FilesystemPane(filesystemPanel);
 			RegisterGlobalCommands();
 			InitializeHotkeys();
+
+			InitDocumentation();
 		}
 
 		void SetupMainWindowTitle(WindowWidget windowWidget)
@@ -446,6 +448,13 @@ namespace Tangerine
 			h.Connect(GenericCommands.GroupContentsToMorphableMeshes, new GroupContentsToMorphableMeshes());
 			h.Connect(GenericCommands.ExportScene, new ExportScene());
 			h.Connect(GenericCommands.UpsampleAnimationTwice, new UpsampleAnimationTwice());
+			h.Connect(GenericCommands.ViewHelp, () => OpenHelp(new HelpPage(HelpPage.StartPageName)));
+			h.Connect(GenericCommands.HelpMode, () => {
+				var manager = WidgetContext.Current.GestureManager as HelpModeGestureManager;
+				if (manager != null) {
+					manager.IsHelpModeOn = !manager.IsHelpModeOn;
+				}
+			});
 			h.Connect(Tools.AlignLeft, new AlignLeft());
 			h.Connect(Tools.AlignRight, new AlignRight());
 			h.Connect(Tools.AlignTop, new AlignTop());
@@ -480,6 +489,31 @@ namespace Tangerine
 			h.Connect(SceneViewCommands.SnapRulerLinesToWidgets, new SnapRulerLinesToWidgetCommandHandler());
 			h.Connect(SceneViewCommands.ClearActiveRuler, new DocumentDelegateCommandHandler(ClearActiveRuler));
 			h.Connect(SceneViewCommands.ManageRulers, new ManageRulers());
+		}
+		
+		private void InitDocumentation()
+		{
+			WidgetContext.Current.GestureManager = new HelpModeGestureManager(WidgetContext.Current);
+			DocumentationComponent.Clicked = page => OpenHelp(page);
+			Directory.CreateDirectory(HelpPage.HtmlDocumentationPath);
+			Directory.CreateDirectory(HelpPage.MarkdownDocumentationPath);
+			string startPagePath = Path.Combine(HelpPage.MarkdownDocumentationPath, HelpPage.StartPageName);
+			if (!File.Exists(startPagePath)) {
+				File.WriteAllText(startPagePath, "# This is start page #");
+			}
+			string errorPagePath = Path.Combine(HelpPage.MarkdownDocumentationPath, HelpPage.ErrorPageName);
+			if (!File.Exists(errorPagePath)) {
+				File.WriteAllText(errorPagePath, "# This is error page #");
+			}
+		}
+
+		private void OpenHelp(HelpPage page)
+		{
+			new HelpDialog(page);
+			var manager = WidgetContext.Current.GestureManager as HelpModeGestureManager;
+			if (manager != null) {
+				manager.IsHelpModeOn = false;
+			}
 		}
 
 		private void InitializeHotkeys()

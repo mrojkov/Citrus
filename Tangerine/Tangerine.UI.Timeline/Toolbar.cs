@@ -41,6 +41,7 @@ namespace Tangerine.UI.Timeline
 			var button = new ToolbarButton(IconPool.GetTexture("Timeline.AnimationMode")) { Tip = "Animation mode" };
 			button.AddChangeWatcher(() => CoreUserPreferences.AnimationMode, i => button.Checked = i);
 			button.Clicked += () => CoreUserPreferences.AnimationMode = !CoreUserPreferences.AnimationMode;
+			button.Components.Add(new DocumentationComponent("AnimationMode.md"));
 			return button;
 		}
 
@@ -49,6 +50,7 @@ namespace Tangerine.UI.Timeline
 			var button = new ToolbarButton(IconPool.GetTexture("Timeline.Curve")) { Tip = "Edit curves" };
 			button.AddChangeWatcher(() => UserPreferences.EditCurves, i => button.Checked = i);
 			button.Clicked += () => UserPreferences.EditCurves = !UserPreferences.EditCurves;
+			button.Components.Add(new DocumentationComponent("EditCurves.md"));
 			return button;
 		}
 
@@ -71,6 +73,7 @@ namespace Tangerine.UI.Timeline
 			var button = new ToolbarButton(IconPool.GetTexture("Timeline.Key")) { Tip = "Automatic keyframes" };
 			button.AddChangeWatcher(() => CoreUserPreferences.AutoKeyframes, i => button.Checked = i);
 			button.Clicked += () => CoreUserPreferences.AutoKeyframes = !CoreUserPreferences.AutoKeyframes;
+			button.Components.Add(new DocumentationComponent("AutomaticKeyframes.md"));
 			return button;
 		}
 
@@ -83,6 +86,7 @@ namespace Tangerine.UI.Timeline
 				Core.Operations.ClearRowSelection.Perform();
 				Core.Operations.SelectRow.Perform(Document.Current.GetRowForObject(newFolder));
 			});
+			button.Components.Add(new DocumentationComponent("CreateFolder.md"));
 			return button;
 		}
 
@@ -91,6 +95,7 @@ namespace Tangerine.UI.Timeline
 			var button = new ToolbarButton(IconPool.GetTexture("Timeline.ExitContainer")) { Tip = "Exit current container (backspace)" };
 			button.AddTransactionClickHandler(Core.Operations.LeaveNode.Perform);
 			button.Updating += _ => button.Enabled = Core.Operations.LeaveNode.IsAllowed();
+			button.Components.Add(new DocumentationComponent("ExitContainer.md"));
 			return button;
 		}
 
@@ -109,6 +114,7 @@ namespace Tangerine.UI.Timeline
 					Core.Operations.SetProperty.Perform(node.EditorState(), nameof(NodeEditorState.Visibility), visibility);
 				}
 			});
+			button.Components.Add(new DocumentationComponent("ShowWidgets.md"));
 			return button;
 		}
 
@@ -122,6 +128,7 @@ namespace Tangerine.UI.Timeline
 					Core.Operations.SetProperty.Perform(node.EditorState(), nameof(NodeEditorState.Locked), locked);
 				}
 			});
+			button.Components.Add(new DocumentationComponent("LockWidgets.md"));
 			return button;
 		}
 
@@ -137,6 +144,7 @@ namespace Tangerine.UI.Timeline
 					}
 				}
 			});
+			button.Components.Add(new DocumentationComponent("LockAnimation.md"));
 			return button;
 		}
 

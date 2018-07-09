@@ -33,12 +33,20 @@
     <DefineConstants>WIN</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CommonMark, Version=0.1.0.0, Culture=neutral, PublicKeyToken=001ef8810438905d, processorArchitecture=MSIL">
+      <HintPath>..\packages\CommonMark.NET.0.15.1\lib\net45\CommonMark.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Documentation\DocumentationComponent.cs" />
+    <Compile Include="Documentation\HelpModeGestureManager.cs" />
+    <Compile Include="Documentation\HelpPage.cs" />
     <Compile Include="HistoryPanel\HistoryPanel.cs" />
     <Compile Include="ColorPicker.Win.cs" />
     <Compile Include="ColorPickerPanel.cs" />

@@ -50,6 +50,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Dialogs\HelpDialog.cs" />
     <Compile Include="Dialogs\ManageRulersDialog.cs" />
     <Compile Include="Dialogs\OrangePluginOptionsDialog.cs" />
     <Compile Include="Dialogs\PreferencesDialog.cs" />
@@ -150,9 +151,13 @@
     <EmbeddedResource Include="Resources\Icons\Light\Cursors\Rotate.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Cursors\DragHandOpen.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Cursors\DragHandClosed.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Cursors\DisabledHelp.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Cursors\EnabledHelp.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Cursors\Rotate.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Cursors\DragHandOpen.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Cursors\DragHandClosed.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Cursors\DisabledHelp.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Cursors\EnabledHelp.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Filesystem\ArrowLeft.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Filesystem\ArrowRight.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Filesystem\ArrowUp.png" />
@@ -358,5 +363,8 @@
     <EmbeddedResource Include="Resources\Icons\Light\Tools\ToolsResetZoom.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Tools\Unfolded.png" />
     <EmbeddedResource Include="Resources\Icons\icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+  <Content Include="Documentation\**" />
   </ItemGroup>
 </Project>

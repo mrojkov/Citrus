@@ -150,6 +150,10 @@ namespace Tangerine
 					OrangeCommands.OptionsDialog,
 					OrangeCommands.CookGameAssets
 				}),
+				new Command("Help", new Menu {
+					GenericCommands.ViewHelp,
+					GenericCommands.HelpMode
+				}),
 			};
 			var nodeTypes = new[] {
 				typeof(Frame),

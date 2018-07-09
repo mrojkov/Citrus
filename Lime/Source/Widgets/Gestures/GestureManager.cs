@@ -7,7 +7,7 @@ namespace Lime
 {
 	public class GestureManager
 	{
-		private readonly WidgetContext context;
+		protected readonly WidgetContext context;
 		private readonly List<Gesture> activeGestures = new List<Gesture>();
 		private Node activeNode;
 		public int CurrentIteration { get; private set; }
@@ -47,7 +47,7 @@ namespace Lime
 			activeGestures.Clear();
 		}
 
-		private IEnumerable<Gesture> EnumerateGestures(Node node)
+		protected virtual IEnumerable<Gesture> EnumerateGestures(Node node)
 		{
 			var noClickGesturesAnymore = false;
 			while (node != null) {
