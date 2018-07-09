@@ -7,21 +7,24 @@ using Yuzu;
 namespace Lime
 {
 	/// <summary>
-	/// Ломаная линия
+	/// Р›РѕРјР°РЅР°СЏ Р»РёРЅРёСЏ
 	/// </summary>
 	[AllowedChildrenTypes(typeof(PolylinePoint))]
 	public class Polyline : Widget
 	{
 		/// <summary>
-		/// Толщина
+		/// РўРѕР»С‰РёРЅР°
 		/// </summary>
 		[YuzuMember]
+		[TangerineKeyframeColor(30)]
 		public float Thickness { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(31)]
 		public bool StaticThickness { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(1)]
 		public bool Closed { get; set; }
 
 		public Polyline()

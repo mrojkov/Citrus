@@ -14,6 +14,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(27)]
 		public Vector2 Position { get { return position; } set { position = value; } }
 
 		public float X { get { return position.X; } set { position.X = value; } }

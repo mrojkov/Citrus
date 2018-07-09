@@ -36,7 +36,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		[TangerineKeyframeColor(2)]
+		[TangerineKeyframeColor(8)]
 		public bool Visible
 		{
 			get { return visible; }
@@ -50,7 +50,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		[TangerineKeyframeColor(5)]
+		[TangerineKeyframeColor(24)]
 		public Vector3 Scale
 		{
 			get { return scale; }
@@ -74,7 +74,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		[TangerineKeyframeColor(4)]
+		[TangerineKeyframeColor(25)]
 		public Vector3 Position
 		{
 			get { return position; }
@@ -86,7 +86,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		[TangerineKeyframeColor(9)]
+		[TangerineKeyframeColor(19)]
 		public Color4 Color
 		{
 			get { return color; }
@@ -98,6 +98,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(21)]
 		public bool Opaque { get; set; }
 
 		public Matrix44 LocalTransform

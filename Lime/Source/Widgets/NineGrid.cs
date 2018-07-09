@@ -5,18 +5,23 @@ namespace Lime
 	public class NineGrid : Widget
 	{
 		[YuzuMember]
+		[TangerineKeyframeColor(14)]
 		public override ITexture Texture { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(15)]
 		public float LeftOffset { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(16)]
 		public float RightOffset { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(17)]
 		public float TopOffset { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(18)]
 		public float BottomOffset { get; set; }
 
 		struct Part

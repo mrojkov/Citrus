@@ -8,30 +8,39 @@ namespace Lime
 	public class ParticleModifier : Node
 	{
 		[YuzuMember]
+		[TangerineKeyframeColor(18)]
 		public Vector2 Size { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(19)]
 		public Vector2 Scale { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(20)]
 		public float Velocity { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(21)]
 		public float Spin { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(22)]
 		public float AngularVelocity { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(23)]
 		public float GravityAmount { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(24)]
 		public float WindAmount { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(25)]
 		public float MagnetAmount { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(26)]
 		public Color4 Color { get; set; }
 
 		[YuzuMember]
@@ -52,6 +61,7 @@ namespace Lime
 
 		ITexture texture = new SerializableTexture();
 		[YuzuMember]
+		[TangerineKeyframeColor(27)]
 		public ITexture Texture { get { return texture; } set { texture = value; textures = null; } }
 
 		public ParticleModifier()

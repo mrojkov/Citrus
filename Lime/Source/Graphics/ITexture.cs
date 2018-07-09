@@ -28,8 +28,10 @@ namespace Lime
 	public class TextureParams : IEquatable<TextureParams>
 	{
 		[YuzuMember]
+		[TangerineKeyframeColor(5)]
 		public TextureWrapMode WrapModeU { get; set; } = TextureWrapMode.Clamp;
 		[YuzuMember]
+		[TangerineKeyframeColor(6)]
 		public TextureWrapMode WrapModeV { get; set; } = TextureWrapMode.Clamp;
 		[YuzuMember]
 		public TextureFilter MinFilter { get; set; } = TextureFilter.Linear;

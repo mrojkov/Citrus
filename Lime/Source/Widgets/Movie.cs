@@ -16,6 +16,7 @@ namespace Lime
 		MovieTexture movieTexture;
 
 		[YuzuMember]
+		[TangerineKeyframeColor(8)]
 		public string Path
 		{
 			get { return Serialization.ShrinkPath(movieTexture.Path); }
@@ -23,10 +24,11 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(7)]
 		public bool Looped { get; set; }
 
 		[Trigger]
-		[TangerineKeyframeColor(1)]
+		[TangerineKeyframeColor(17)]
 		public MovieAction Action { get; set; }
 
 		public Movie()

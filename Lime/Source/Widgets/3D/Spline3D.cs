@@ -12,6 +12,7 @@ namespace Lime
 	public class Spline3D : Node3D
 	{
 		[YuzuMember]
+		[TangerineKeyframeColor(25)]
 		public bool Closed { get; set; }
 
 		public Spline3D()

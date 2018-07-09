@@ -27,6 +27,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(28)]
 		public ITexture ImageTexture {
 			get { return imageTexture; }
 			set
@@ -39,6 +40,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(29)]
 		public Vector2 ImageSize
 		{
 			get { return imageSize; }
@@ -65,6 +67,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(30)]
 		public SerializableFont Font
 		{
 			get { return font; }
@@ -78,6 +81,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(31)]
 		public float Size
 		{
 			get { return size; }
@@ -91,6 +95,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(1)]
 		public float SpaceAfter
 		{
 			get { return spaceAfter; }
@@ -104,6 +109,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(2)]
 		public bool Bold
 		{
 			get { return bold; }
@@ -117,6 +123,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(3)]
 		public bool CastShadow
 		{
 			get { return castShadow; }
@@ -130,6 +137,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(4)]
 		public Vector2 ShadowOffset
 		{
 			get { return shadowOffset; }
@@ -143,6 +151,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(5)]
 		public Color4 TextColor
 		{
 			get { return textColor; }
@@ -156,6 +165,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(6)]
 		public Color4 ShadowColor
 		{
 			get { return shadowColor; }
@@ -169,6 +179,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(7)]
 		public float LetterSpacing
 		{
 			get { return letterSpacing; }

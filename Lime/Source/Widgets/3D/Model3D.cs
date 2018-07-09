@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using Yuzu;
 
 namespace Lime
@@ -6,6 +6,7 @@ namespace Lime
 	public class Model3D : Node3D
 	{
 		[YuzuMember]
+		[TangerineKeyframeColor(19)]
 		public bool LightningEnabled
 		{
 			get
@@ -20,6 +21,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(20)]
 		public bool CastShadow
 		{
 			get
@@ -34,6 +36,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(21)]
 		public bool RecieveShadow
 		{
 			get

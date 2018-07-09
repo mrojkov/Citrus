@@ -10,6 +10,7 @@ namespace Lime
 
 		[YuzuMember]
 		[YuzuSerializeIf(nameof(IsNotRenderTexture))]
+		[TangerineKeyframeColor(15)]
 		public override sealed ITexture Texture
 		{
 			get { return texture; }
@@ -29,9 +30,11 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(16)]
 		public Vector2 UV0 { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(17)]
 		public Vector2 UV1 { get; set; }
 
 		public IMaterial CustomMaterial { get; set; }

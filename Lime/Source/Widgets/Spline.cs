@@ -7,6 +7,7 @@ namespace Lime
 	public class Spline : Widget
 	{
 		[YuzuMember]
+		[TangerineKeyframeColor(22)]
 		public bool Closed { get; set; }
 
 		public Spline()

@@ -47,6 +47,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(29)]
 		public SerializableFont Font
 		{
 			get { return font; }
@@ -60,6 +61,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(30)]
 		public override string Text
 		{
 			get { return text ?? ""; }
@@ -85,6 +87,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(31)]
 		public float FontHeight
 		{
 			get { return fontHeight; }
@@ -98,6 +101,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(1)]
 		public float Spacing
 		{
 			get { return spacing; }
@@ -111,6 +115,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(2)]
 		public HAlignment HAlignment
 		{
 			get { return hAlignment; }
@@ -124,6 +129,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(3)]
 		public VAlignment VAlignment
 		{
 			get { return vAlignment; }
@@ -137,6 +143,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(4)]
 		public TextOverflowMode OverflowMode
 		{
 			get { return overflowMode; }
@@ -150,6 +157,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(5)]
 		public bool WordSplitAllowed
 		{
 			get { return wordSplitAllowed; }
@@ -163,6 +171,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(6)]
 		public Color4 TextColor
 		{
 			get { return textColor; }
@@ -170,6 +179,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(7)]
 		public float LetterSpacing
 		{
 			get { return letterSpacing; }
