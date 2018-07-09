@@ -15,7 +15,6 @@ namespace Tangerine
 		readonly Window window;
 		readonly WindowWidget rootWidget;
 		readonly ColorThemeEnum theme;
-		readonly Frame Frame;
 
 		public HelpDialog(HelpPage page)
 		{
@@ -26,14 +25,10 @@ namespace Tangerine
 				Title = "Help" + (String.IsNullOrEmpty(page.PageName) ? "" : " - " + page.PageName),
 				MinimumDecoratedSize = new Vector2(400, 300)
 			});
-			Frame = new ThemedFrame {
-				Padding = new Thickness(8),
-				LayoutCell = new LayoutCell { StretchY = float.MaxValue },
-				Layout = new StackLayout(),
-			};
 
 			var browser = new WebBrowser();
 			browser.Url = new Uri(page.Url);
+
 			rootWidget = new ThemedInvalidableWindowWidget(window) {
 				Padding = new Thickness(8),
 				Layout = new VBoxLayout(),

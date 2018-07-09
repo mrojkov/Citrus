@@ -209,7 +209,12 @@ namespace Tangerine.UI.Inspector
 				ColorTheme.Current.Inspector.StripeBackground1 :
 				ColorTheme.Current.Inspector.StripeBackground2
 			) { IgnorePadding = true });
-			editor.PropertyLabel.Components.Add(new DocumentationComponent(editor.EditorParams.PropertyName));
+			if (editor.EditorParams.PropertyName == "Position") {
+				editor.ContainerWidget.Components.Add(new DocumentationComponent("Position.md"));
+			}
+			if (editor.EditorParams.PropertyName == "Id") {
+				editor.ContainerWidget.Components.Add(new DocumentationComponent("Id.md"));
+			}
 		}
 
 		class TransactionalNumericEditBox : ThemedNumericEditBox

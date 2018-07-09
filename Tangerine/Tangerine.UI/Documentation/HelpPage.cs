@@ -36,7 +36,7 @@ namespace Tangerine.UI
 					File.Delete(file);
 				}
 				using (StreamReader sr = new StreamReader(PageFilepath))
-				using (StreamWriter sw = new StreamWriter(Url)) {
+				using (StreamWriter sw = new StreamWriter(Url, false, Encoding.UTF8)) {
 					CommonMark.CommonMarkConverter.Convert(sr, sw);
 				}
 			}
