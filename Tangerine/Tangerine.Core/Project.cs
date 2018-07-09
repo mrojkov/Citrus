@@ -138,9 +138,9 @@ namespace Tangerine.Core
 			return Path.GetDirectoryName(GetSystemPath(assetPath, null));
 		}
 
-		public Document NewDocument()
+		public Document NewDocument(DocumentFormat format = DocumentFormat.Scene, Type rootType = null)
 		{
-			var doc = new Document();
+			var doc = new Document(format, rootType);
 			documents.Add(doc);
 			doc.MakeCurrent();
 			return doc;
@@ -265,7 +265,7 @@ namespace Tangerine.Core
 			} else {
 				return CloseAllDocuments();
 			}
-			
+
 		}
 
 		public bool CloseAllDocuments()

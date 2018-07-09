@@ -9,12 +9,12 @@ namespace Tangerine
 {
 	static class TangerineMenu
 	{
+		public static readonly List<ICommand> CreateNodeCommands = new List<ICommand>();
 		public static IMenu PadsMenu;
 		public static Menu overlaysMenu;
 		public static Menu rulerMenu;
 		private static IMenu resolution;
-		private static ICommand customNodesCommand;
-		private static Menu customNodes;
+		private static ICommand customNodes;
 		private static IMenu create;
 		private static Menu localizationMenu;
 		private static Command localizationCommand;
@@ -42,16 +42,28 @@ namespace Tangerine
 
 		public static void RebuildCreateImportedTypeMenu()
 		{
-			customNodes.Clear();
+			var menus = new[] { customNodes.Menu, GenericCommands.NewTanWithCustomRoot.Menu };
+			foreach (var menu in menus) {
+				foreach (var command in menu) {
+					CommandHandlerList.Global.Disconnect(command);
+				}
+			}
+			customNodes.Menu.Clear();
+			GenericCommands.NewTanWithCustomRoot.Menu.Clear();
+
 			foreach (var t in Orange.PluginLoader.EnumerateTangerineExportedTypes()) {
 				if (!typeof(Node).IsAssignableFrom(t)) {
 					continue;
 				}
 				var cmd = new Command(t.Name) { Icon = NodeIconPool.GetTexture(t) };
 				CommandHandlerList.Global.Connect(cmd, new CreateNode(t));
-				customNodes.Add(cmd);
+				customNodes.Menu.Add(cmd);
+				var newFileCmd = new Command(t.Name);
+				CommandHandlerList.Global.Connect(newFileCmd, new FileNew(DocumentFormat.Tan, t));
+				GenericCommands.NewTanWithCustomRoot.Menu.Add(newFileCmd);
 			}
-			customNodesCommand.Enabled = customNodes.Count > 0;
+			customNodes.Enabled = customNodes.Menu.Count > 0;
+			GenericCommands.NewTanWithCustomRoot.Enabled = GenericCommands.NewTanWithCustomRoot.Menu.Count > 0;
 		}
 
 		private static void CreateMainMenu()
@@ -66,7 +78,11 @@ namespace Tangerine
 				}),
 #endif
 				new Command("File", new Menu {
-					GenericCommands.New,
+					new Command("New", new Menu {
+						GenericCommands.NewScene,
+						GenericCommands.NewTan,
+						GenericCommands.NewTanWithCustomRoot,
+					}),
 					Command.MenuSeparator,
 					GenericCommands.Open,
 					GenericCommands.OpenProject,
@@ -154,7 +170,7 @@ namespace Tangerine
 					GenericCommands.HelpMode
 				}),
 			};
-			create.Add(customNodesCommand = new Command("Custom Nodes", customNodes = new Menu()));
+			create.Add(customNodes = new Command("Custom Nodes", new Menu()));
 			var nodeTypes = new[] {
 				typeof(Frame),
 				typeof(Button),
@@ -192,6 +208,7 @@ namespace Tangerine
 				var cmd = new Command(t.Name) { Icon = NodeIconPool.GetTexture(t) };
 				CommandHandlerList.Global.Connect(cmd, new CreateNode(t));
 				create.Add(cmd);
+				CreateNodeCommands.Add(cmd);
 			}
 			Command.Undo.Icon = IconPool.GetTexture("Tools.Undo");
 			Command.Redo.Icon = IconPool.GetTexture("Tools.Redo");

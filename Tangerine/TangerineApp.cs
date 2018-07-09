@@ -200,7 +200,7 @@ namespace Tangerine
 			Toolbars.Add("Editing", new Toolbar(dockManager.ToolbarArea));
 			Toolbars.Add("Create", new Toolbar(dockManager.ToolbarArea));
 			Toolbars.Add("Tools", new Toolbar(dockManager.ToolbarArea));
-			foreach (var c in Application.MainMenu.FindCommand("Create").Menu) {
+			foreach (var c in TangerineMenu.CreateNodeCommands) {
 				Toolbars["Create"].Add(c);
 			}
 			CreateToolsToolbar();
@@ -429,7 +429,8 @@ namespace Tangerine
 			UI.SceneView.SceneView.RegisterGlobalCommands();
 
 			var h = CommandHandlerList.Global;
-			h.Connect(GenericCommands.New, new FileNew());
+			h.Connect(GenericCommands.NewScene, new FileNew());
+			h.Connect(GenericCommands.NewTan, new FileNew(DocumentFormat.Tan));
 			h.Connect(GenericCommands.Open, new FileOpen());
 			h.Connect(GenericCommands.OpenProject, new FileOpenProject());
 			h.Connect(GenericCommands.SaveCurrent, new CurrentFileSave());
