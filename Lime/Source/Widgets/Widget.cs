@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -274,7 +274,7 @@ namespace Lime
 		/// Counter-clockwise rotation of this widget.
 		/// </summary>
 		[YuzuMember]
-		[TangerineKeyframeColor(3)]
+		[TangerineKeyframeColor(20)]
 		public float Rotation {
 			get { return rotation; }
 			set
@@ -420,7 +420,7 @@ namespace Lime
 		/// Hue of this widget. Contents color will be multiplied by it on render.
 		/// </summary>
 		[YuzuMember]
-		[TangerineKeyframeColor(9)]
+		[TangerineKeyframeColor(23)]
 		[YuzuSerializeIf(nameof(IsNotDecorated))]
 		public Color4 Color
 		{
@@ -451,10 +451,11 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(17)]
 		public Anchors Anchors { get; set; }
 
 		[YuzuMember]
-		[TangerineKeyframeColor(10)]
+		[TangerineKeyframeColor(22)]
 		public Blending Blending
 		{
 			get { return blending; }
@@ -468,6 +469,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(18)]
 		public ShaderId Shader
 		{
 			get { return shader; }
@@ -481,7 +483,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		[TangerineKeyframeColor(2)]
+		[TangerineKeyframeColor(26)]
 		public bool Visible
 		{
 			get { return visible; }

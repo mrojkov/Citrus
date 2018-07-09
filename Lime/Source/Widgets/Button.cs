@@ -17,9 +17,11 @@ namespace Lime
 		public BitSet32 EnableMask = BitSet32.Full;
 
 		[YuzuMember]
+		[TangerineKeyframeColor(9)]
 		public override string Text { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(18)]
 		public bool Enabled
 		{
 			get { return EnableMask[0]; }

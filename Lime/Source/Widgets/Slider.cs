@@ -7,12 +7,15 @@ namespace Lime
 	public class Slider : Widget
 	{
 		[YuzuMember]
+		[TangerineKeyframeColor(7)]
 		public float RangeMin { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(8)]
 		public float RangeMax { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(9)]
 		public float Value
 		{
 			get { return value.Clamp(RangeMin, RangeMax); }
@@ -20,6 +23,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(10)]
 		public float Step { get; set; }
 
 		public event Action DragStarted;

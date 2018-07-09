@@ -76,7 +76,7 @@ namespace Lime
 		public Vector2 Position { get; set; }
 
 		[YuzuMember]
-		[TangerineKeyframeColor(1)]
+		[TangerineKeyframeColor(16)]
 		public float Rotation { get; set; }
 
 		[YuzuMember]
@@ -84,6 +84,7 @@ namespace Lime
 		public float Length { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(7)]
 		public bool IKStopper { get; set; }
 
 		[YuzuMember]
@@ -95,18 +96,23 @@ namespace Lime
 		public int BaseIndex { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(8)]
 		public float EffectiveRadius { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(9)]
 		public float FadeoutZone { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(10)]
 		public Vector2 RefPosition { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(11)]
 		public float RefRotation { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(12)]
 		public float RefLength { get; set; }
 
 		public Matrix32 WorldToLocalTransform

@@ -14,6 +14,7 @@ namespace Lime
 		public int NumRows { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(4)]
 		public override ITexture Texture { get; set; }
 
 		public DistortionMesh()

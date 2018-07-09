@@ -31,11 +31,13 @@ namespace Lime
 		private ITexture renderTexture;
 
 		[YuzuMember]
+		[TangerineKeyframeColor(13)]
 		public ClipMethod ClipChildren { get; set; }
 
 		public Widget ClipByWidget { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(14)]
 		public RenderTarget RenderTarget
 		{
 			get { return renderTarget; }

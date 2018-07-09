@@ -31,9 +31,11 @@ namespace Lime
 		private RenderChain renderChain = new RenderChain();
 
 		[YuzuMember]
+		[TangerineKeyframeColor(28)]
 		public NodeReference<Camera3D> CameraRef { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(29)]
 		public NodeReference<LightSource> LightSourceRef { get; set; }
 
 		public Camera3D Camera => CameraRef?.GetNode(this);
@@ -41,11 +43,13 @@ namespace Lime
 
 #if DEBUG
 		[TangerineInspect]
+		[TangerineKeyframeColor(30)]
 		public NodeReference<Image> DebugShadowMapImageRef { get; set; }
 		public Image DebugShadowMapImage => DebugShadowMapImageRef?.GetNode(this.Parent);
 #endif
 
 		[YuzuMember]
+		[TangerineKeyframeColor(31)]
 		public float Frame
 		{
 			get { return frame; }

@@ -15,12 +15,15 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(27)]
 		public EmitterShape Shape { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(28)]
 		public float Attenuation { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(29)]
 		public float Strength { get; set; }
 	}
 

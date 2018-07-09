@@ -21,6 +21,7 @@ namespace Lime
 		private int maxDisplayCharacters = -1;
 
 		[YuzuMember]
+		[TangerineKeyframeColor(12)]
 		public override string Text
 		{
 			get { return text; }
@@ -60,6 +61,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(13)]
 		public HAlignment HAlignment
 		{
 			get { return hAlignment; }
@@ -73,6 +75,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(14)]
 		public VAlignment VAlignment
 		{
 			get { return vAlignment; }
@@ -86,6 +89,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(15)]
 		public TextOverflowMode OverflowMode
 		{
 			get { return overflowMode; }
@@ -99,6 +103,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(16)]
 		public bool WordSplitAllowed { get; set; }
 
 		// TODO

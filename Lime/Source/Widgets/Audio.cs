@@ -15,17 +15,21 @@ namespace Lime
 		Sound sound = new Sound() { IsBumpable = true };
 
 		[YuzuMember]
+		[TangerineKeyframeColor(19)]
 		public SerializableSample Sample { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(20)]
 		public bool Looping { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(21)]
 		public float FadeTime { get; set; }
 
 		private float volume = 0.5f;
 
 		[YuzuMember]
+		[TangerineKeyframeColor(22)]
 		public float Volume
 		{
 			get { return volume; }
@@ -39,6 +43,7 @@ namespace Lime
 		private float pan = 0;
 
 		[YuzuMember]
+		[TangerineKeyframeColor(23)]
 		public float Pan
 		{
 			get { return pan; }
@@ -52,6 +57,7 @@ namespace Lime
 		private float pitch = 1;
 
 		[YuzuMember]
+		[TangerineKeyframeColor(24)]
 		public float Pitch
 		{
 			get { return pitch; }
@@ -63,16 +69,19 @@ namespace Lime
 		}
 
 		[Trigger]
-		[TangerineKeyframeColor(1)]
+		[TangerineKeyframeColor(15)]
 		public AudioAction Action { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(25)]
 		public AudioChannelGroup Group { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(26)]
 		public float Priority { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(27)]
 		public bool Bumpable { get; set; }
 
 		public Audio()

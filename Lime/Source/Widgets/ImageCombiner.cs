@@ -35,12 +35,15 @@ namespace Lime
 	public class ImageCombiner : Node
 	{
 		[YuzuMember]
+		[TangerineKeyframeColor(9)]
 		public bool Enabled { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(10)]
 		public Blending Blending { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(11)]
 		public ShaderId Shader { get; set; }
 
 		public IMaterial CustomMaterial { get; set; }

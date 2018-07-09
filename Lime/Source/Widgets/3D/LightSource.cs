@@ -1,4 +1,4 @@
-﻿using Yuzu;
+using Yuzu;
 
 namespace Lime
 {
@@ -27,6 +27,7 @@ namespace Lime
 
 		[YuzuMember]
 		[TangerineGroup("Shadow")]
+		[TangerineKeyframeColor(23)]
 		public ShadowMapTextureQuality ShadowMapQuality
 		{
 			get { return shadowMapQuality; }
@@ -57,6 +58,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(24)]
 		public new Vector3 Position
 		{
 			get { return base.Position; }
@@ -69,6 +71,7 @@ namespace Lime
 
 		[YuzuMember]
 		[TangerineGroup("Light")]
+		[TangerineKeyframeColor(25)]
 		public float Intensity
 		{
 			get { return intensity; }
@@ -77,6 +80,7 @@ namespace Lime
 
 		[YuzuMember]
 		[TangerineGroup("Light")]
+		[TangerineKeyframeColor(26)]
 		public float Strength
 		{
 			get { return strength; }
@@ -85,6 +89,7 @@ namespace Lime
 
 		[YuzuMember]
 		[TangerineGroup("Light")]
+		[TangerineKeyframeColor(27)]
 		public float Ambient
 		{
 			get { return ambient; }
@@ -93,6 +98,7 @@ namespace Lime
 
 		[YuzuMember]
 		[TangerineGroup("Shadow")]
+		[TangerineKeyframeColor(28)]
 		public bool ShadowMappingEnabled
 		{
 			get { return shadowMappingEnabled; }

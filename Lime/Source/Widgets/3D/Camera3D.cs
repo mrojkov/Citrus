@@ -14,6 +14,7 @@ namespace Lime
 		private bool projectionDirty;
 
 		[YuzuMember]
+		[TangerineKeyframeColor(1)]
 		public float FieldOfView
 		{
 			get { return fieldOfView; }
@@ -27,6 +28,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(2)]
 		public float AspectRatio
 		{
 			get { return aspectRatio; }
@@ -40,6 +42,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(3)]
 		public float NearClipPlane
 		{
 			get { return nearClipPlane; }
@@ -53,6 +56,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(4)]
 		public float FarClipPlane
 		{
 			get { return farClipPlane; }
@@ -66,6 +70,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(5)]
 		public float OrthographicSize
 		{
 			get { return orthographicSize; }
@@ -79,6 +84,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineKeyframeColor(6)]
 		public CameraProjectionMode ProjectionMode
 		{
 			get { return projectionMode; }

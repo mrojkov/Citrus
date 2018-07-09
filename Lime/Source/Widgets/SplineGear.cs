@@ -5,15 +5,18 @@ namespace Lime
 	public class SplineGear : Node
 	{
 		[YuzuMember]
+		[TangerineKeyframeColor(4)]
 		public NodeReference<Widget> WidgetRef { get; set; }
 
 		[YuzuMember]
+		[TangerineKeyframeColor(5)]
 		public NodeReference<Spline> SplineRef { get; set; }
 
 		public Widget Widget => WidgetRef?.GetNode(Parent);
 		public Spline Spline => SplineRef?.GetNode(Parent);
 
 		[YuzuMember]
+		[TangerineKeyframeColor(6)]
 		public float SplineOffset { get; set; }
 
 		public SplineGear()

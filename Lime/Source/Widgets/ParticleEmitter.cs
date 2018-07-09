@@ -125,98 +125,124 @@ namespace Lime
 		/// Particles are generated once and live forever.
 		/// </summary>
 		[YuzuMember]
+		[TangerineKeyframeColor(8)]
 		public bool ImmortalParticles;
 		[YuzuMember]
+		[TangerineKeyframeColor(9)]
 		public EmitterShape Shape { get; set; }
 		[YuzuMember]
+		[TangerineKeyframeColor(10)]
 		public EmissionType EmissionType { get; set; }
 		[YuzuMember]
+		[TangerineKeyframeColor(11)]
 		public ParticlesLinkage ParticlesLinkage { get; set; }
 		/// <summary>
 		/// When ParticleLinkage is `Other` this makes sense as name of widget particle emitter is linked to.
 		/// </summary>
 		[YuzuMember]
+		[TangerineKeyframeColor(12)]
 		public string LinkageWidgetName;
 		/// <summary>
 		/// Number of particles generated per second.
 		/// </summary>
 		[YuzuMember]
+		[TangerineKeyframeColor(13)]
 		public float Number { get; set; }
 		/// <summary>
 		/// Pre simulate TimeShift seconds.
 		/// </summary>
 		[YuzuMember]
+		[TangerineKeyframeColor(14)]
 		public float TimeShift;
 		/// <summary>
 		/// Update: delta *= Speed
 		/// </summary>
 		[YuzuMember]
+		[TangerineKeyframeColor(15)]
 		public float Speed { get; set; }
 		/// <summary>
 		/// Whether particles are oriented along track.
 		/// </summary>
 		[YuzuMember]
+		[TangerineKeyframeColor(16)]
 		public bool AlongPathOrientation { get; set; }
 		/// <summary>
 		/// degrees (0 - right, 90 - down)
 		/// </summary>
 		[YuzuMember]
+		[TangerineKeyframeColor(17)]
 		public NumericRange WindDirection { get; set; }
 		[YuzuMember]
+		[TangerineKeyframeColor(19)]
 		public NumericRange WindAmount { get; set; }
 		/// <summary>
 		/// degrees (0 - right, 90 - down)
 		/// </summary>
 		[YuzuMember]
+		[TangerineKeyframeColor(20)]
 		public NumericRange GravityDirection { get; set; }
 		[YuzuMember]
+		[TangerineKeyframeColor(21)]
 		public NumericRange GravityAmount { get; set; }
 		[YuzuMember]
+		[TangerineKeyframeColor(22)]
 		public NumericRange MagnetAmount { get; set; }
 		/// <summary>
 		/// Rotation angle of generated particles
 		/// </summary>
 		[YuzuMember]
+		[TangerineKeyframeColor(23)]
 		public NumericRange Orientation { get; set; }
 		/// <summary>
 		/// Rotation angle of emitter (degrees, clockwise)
 		/// </summary>
 		[YuzuMember]
+		[TangerineKeyframeColor(24)]
 		public NumericRange Direction { get; set; }
 		/// <summary>
 		/// Particle lifetime in seconds
 		/// </summary>
 		[YuzuMember]
+		[TangerineKeyframeColor(25)]
 		public NumericRange Lifetime { get; set; }
 		/// <summary>
 		/// Scale of generated particles
 		/// </summary>
 		[YuzuMember]
+		[TangerineKeyframeColor(26)]
 		public NumericRange Zoom { get; set; }
 		/// <summary>
 		/// Designates width to height ratio.
 		/// </summary>
 		[YuzuMember]
+		[TangerineKeyframeColor(27)]
 		public NumericRange AspectRatio { get; set; }
 		[YuzuMember]
+		[TangerineKeyframeColor(28)]
 		public NumericRange Velocity { get; set; }
 		/// <summary>
 		/// Angular velocity of particles.
 		/// </summary>
 		[YuzuMember]
+		[TangerineKeyframeColor(29)]
 		public NumericRange Spin { get; set; }
 		/// <summary>
 		/// Angular velocity of emitter (degrees)
 		/// </summary>
 		[YuzuMember]
+		[TangerineKeyframeColor(30)]
 		public NumericRange AngularVelocity { get; set; }
 		[YuzuMember]
+		[TangerineKeyframeColor(31)]
 		public NumericRange RandomMotionRadius { get; set; }
 		[YuzuMember]
+		[TangerineKeyframeColor(1)]
 		public NumericRange RandomMotionSpeed { get; set; }
 		[YuzuMember]
+		[TangerineKeyframeColor(2)]
 		public float RandomMotionAspectRatio { get; set; }
 		[YuzuMember]
+		[TangerineKeyframeColor(3)]
 		public NumericRange RandomMotionRotation { get; set; }
 		private bool firstUpdate = true;
 		/// <summary>

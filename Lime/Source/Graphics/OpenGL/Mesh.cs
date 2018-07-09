@@ -22,6 +22,7 @@ namespace Lime
 		public T[] Vertices;
 
 		[YuzuMember]
+		[TangerineKeyframeColor(21)]
 		public ushort[] Indices;
 
 		[YuzuMember]
