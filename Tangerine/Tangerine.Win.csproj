@@ -140,6 +140,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="icon.ico" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\Revert.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\Revert.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\Redo.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\Undo.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\Redo.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\Undo.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Tools\Edit.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Tools\Edit.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Tools\InspectRootActivated.png" />

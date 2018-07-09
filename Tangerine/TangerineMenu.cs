@@ -193,6 +193,9 @@ namespace Tangerine
 				CommandHandlerList.Global.Connect(cmd, new CreateNode(t));
 				create.Add(cmd);
 			}
+			Command.Undo.Icon = IconPool.GetTexture("Tools.Undo");
+			Command.Redo.Icon = IconPool.GetTexture("Tools.Redo");
+			GenericCommands.Revert.Icon = IconPool.GetTexture("Tools.Revert");
 		}
 
 		public static void OnProjectChanged(Project proj)

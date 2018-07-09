@@ -158,6 +158,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\Revert.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\Revert.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\Redo.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\Undo.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\Redo.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\Undo.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Filesystem\ArrowLeft.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Filesystem\ArrowRight.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Filesystem\ArrowUp.png" />

@@ -195,6 +195,7 @@ namespace Tangerine
 			});
 			DocumentHistory.Processors.AddRange(UI.Timeline.Timeline.GetOperationProcessors());
 
+			Toolbars.Add("Editing", new Toolbar(dockManager.ToolbarArea));
 			Toolbars.Add("Create", new Toolbar(dockManager.ToolbarArea));
 			Toolbars.Add("Tools", new Toolbar(dockManager.ToolbarArea));
 			foreach (var c in Application.MainMenu.FindCommand("Create").Menu) {
@@ -276,6 +277,10 @@ namespace Tangerine
 			tb.Add(Tools.FitToContent);
 			tb.Add(Tools.FlipX);
 			tb.Add(Tools.FlipY);
+			tb = Toolbars["Editing"];
+			tb.Add(Command.Undo);
+			tb.Add(Command.Redo);
+			tb.Add(GenericCommands.Revert);
 		}
 
 		Yuzu.AbstractDeserializer DeserializeHotStudioAssets(string path, System.IO.Stream stream)
