@@ -20,6 +20,7 @@ namespace Tangerine.UI
 			Lime.Environment.GetPathInsideDataDirectory("Tangerine", "DocumentationCache");
 		public static string StartPageName { get; set; } = "StartPage.md";
 		public static string ErrorPageName { get; set; } = "ErrorPage.md";
+		public static string StyleSheetPath { get; set; } = Path.Combine(MarkdownDocumentationPath, "stylesheet.css");
 		
 		public HelpPage(string pageName)
 		{
@@ -35,10 +36,7 @@ namespace Tangerine.UI
 				foreach (var file in oldHtml) {
 					File.Delete(file);
 				}
-				using (StreamReader sr = new StreamReader(PageFilepath))
-				using (StreamWriter sw = new StreamWriter(Url, false, Encoding.UTF8)) {
-					CommonMark.CommonMarkConverter.Convert(sr, sw);
-				}
+				CreateHtml();
 			}
 		}
 
@@ -48,6 +46,19 @@ namespace Tangerine.UI
 			using (var stream = File.OpenRead(PageFilepath)) {
 				var hashed = md5.ComputeHash(stream);
 				return BitConverter.ToInt32(hashed, 0).ToString();
+			}
+		}
+
+		private void CreateHtml()
+		{
+			using (StreamReader sr = new StreamReader(PageFilepath))
+			using (StreamWriter sw = new StreamWriter(Url, false, Encoding.UTF8)) {
+				sw.WriteLine(
+					"<head>" +
+					$"<link rel=\"stylesheet\" type=\"text/css\" href=\"{StyleSheetPath}\">" +
+					"</head>"
+				);
+				CommonMark.CommonMarkConverter.Convert(sr, sw);
 			}
 		}
 	}
