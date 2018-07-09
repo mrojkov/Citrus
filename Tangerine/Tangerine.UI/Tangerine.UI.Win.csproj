@@ -47,7 +47,7 @@
     <Compile Include="Documentation\DocumentationComponent.cs" />
     <Compile Include="Documentation\HelpModeGestureManager.cs" />
     <Compile Include="Documentation\HelpPage.cs" />
-    <Compile Include="HistoryPanel\HistoryPanel.cs" />
+    <Compile Include="BackupHistoryPanel\BackupHistoryPanel.cs" />
     <Compile Include="ColorPicker.Win.cs" />
     <Compile Include="ColorPickerPanel.cs" />
     <Compile Include="Commands.cs" />

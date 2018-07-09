@@ -323,6 +323,7 @@ namespace Tangerine.Core
 
 		public void SaveAs(string path)
 		{
+			Project.RaiseDocumetSaving(this);
 			Saving?.Invoke(this);
 			History.AddSavePoint();
 			Path = path;

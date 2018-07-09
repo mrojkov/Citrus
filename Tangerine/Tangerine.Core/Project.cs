@@ -34,6 +34,9 @@ namespace Tangerine.Core
 		public ProjectPreferences Preferences { get; private set; } = new ProjectPreferences();
 		public ProjectUserPreferences UserPreferences { get; private set; } = new ProjectUserPreferences();
 
+		public static event Action<Document> DocumentSaving;
+		public static event Action<string> Opening;
+
 		private Project() { }
 
 		public Project(string citprojPath)
@@ -50,6 +53,7 @@ namespace Tangerine.Core
 
 		public void Open()
 		{
+			Opening?.Invoke(CitprojPath);
 			if (Current != Null) {
 				throw new InvalidOperationException();
 			}
@@ -462,6 +466,11 @@ namespace Tangerine.Core
 					File.Delete(Path.Combine(AssetsDirectory, path));
 				}
 			}
+		}
+
+		public static void RaiseDocumetSaving(Document document)
+		{
+			DocumentSaving?.Invoke(document);
 		}
 	}
 }

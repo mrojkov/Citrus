@@ -96,7 +96,7 @@
     <Compile Include="ProjectPreferences.cs" />
     <Compile Include="ResolutionPreview.cs" />
     <Compile Include="TangerineAssetBundle.cs" />
-    <Compile Include="BackupsManager.cs" />
+    <Compile Include="BackupManager.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

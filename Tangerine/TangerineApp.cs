@@ -6,7 +6,7 @@ using Lime;
 using Tangerine.Core;
 using Tangerine.UI;
 using Tangerine.UI.Docking;
-using Tangerine.UI.HistoryPanel;
+using Tangerine.UI.BackupHistoryPanel;
 
 namespace Tangerine
 {
@@ -69,7 +69,7 @@ namespace Tangerine
 			var searchPanel = new Panel("Search");
 			var filesystemPanel = new Panel("Filesystem");
 			var consolePanel = new Panel("Console");
-			var historyPanel = new Panel("Backups history");
+			var backupHistoryPanel = new Panel("Backups history");
 			var documentPanel = new Panel(DockManager.DocumentAreaId, undockable: false);
 			new UI.Console(consolePanel);
 
@@ -78,7 +78,7 @@ namespace Tangerine
 			var documentPlacement = dockManager.AppendPanelTo(documentPanel, root);
 			dockManager.AddPanel(timelinePanel, documentPlacement, DockSite.Top, 0.4f);
 			dockManager.AddPanel(inspectorPanel, documentPlacement, DockSite.Left, 0.3f);
-			dockManager.AddPanel(historyPanel, documentPlacement, DockSite.Right, 0.3f);
+			dockManager.AddPanel(backupHistoryPanel, documentPlacement, DockSite.Right, 0.3f);
 			dockManager.AddPanel(searchPanel, documentPlacement, DockSite.Right, 0.3f);
 			dockManager.AddPanel(filesystemPanel, documentPlacement, DockSite.Right, 0.3f);
 			dockManager.AddPanel(consolePanel, documentPlacement, DockSite.Bottom, 0.3f);
@@ -131,7 +131,7 @@ namespace Tangerine
 			};
 			Project.Tasks = dockManager.MainWindowWidget.Tasks;
 			Project.Tasks.Add(new AutosaveProcessor(() => AppUserPreferences.Instance.AutosaveDelay));
-			BackupsManager.Instance.Activate(Project.Tasks);
+			BackupManager.Instance.Activate(Project.Tasks);
 			Document.NodeDecorators.AddFor<Spline>(n => n.CompoundPostPresenter.Add(new UI.SceneView.SplinePresenter()));
 			Document.NodeDecorators.AddFor<Viewport3D>(n => n.CompoundPostPresenter.Add(new UI.SceneView.Spline3DPresenter()));
 			Document.NodeDecorators.AddFor<Widget>(n => {
@@ -208,7 +208,7 @@ namespace Tangerine
 						new UI.Timeline.Timeline(timelinePanel),
 						new UI.SceneView.SceneView(documentViewContainer),
 						new UI.SearchPanel(searchPanel.ContentWidget),
-						new HistoryPanel(historyPanel.ContentWidget),
+						new BackupHistoryPanel(backupHistoryPanel.ContentWidget), 
 					});
 				}
 			};
@@ -490,7 +490,7 @@ namespace Tangerine
 			h.Connect(SceneViewCommands.ClearActiveRuler, new DocumentDelegateCommandHandler(ClearActiveRuler));
 			h.Connect(SceneViewCommands.ManageRulers, new ManageRulers());
 		}
-		
+
 		private void InitDocumentation()
 		{
 			WidgetContext.Current.GestureManager = new HelpModeGestureManager(WidgetContext.Current);

@@ -1,56 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Lime;
 using Exception = System.Exception;
 
 namespace Tangerine.Core
 {
-	public class BackupsManager
+	public class BackupManager
 	{
 		private class AutosaveBackupProcessor : ITaskProvider
 		{
-			private readonly BackupsManager backupsManager;
+			private readonly BackupManager backupManager;
 
-			public AutosaveBackupProcessor(BackupsManager backupsManager)
+			public AutosaveBackupProcessor(BackupManager backupManager)
 			{
-				this.backupsManager = backupsManager;
+				this.backupManager = backupManager;
 			}
 
 			public IEnumerator<object> Task()
 			{
 				while (true) {
-					yield return PeriodOfConservation;
-					backupsManager.SaveModifiedDocuments();
-				}
-			}
-		}
-
-		private class SaveBackupProcessor : ITaskProvider
-		{
-			private readonly BackupsManager backupsManager;
-
-			public SaveBackupProcessor(BackupsManager backupsManager)
-			{
-				this.backupsManager = backupsManager;
-			}
-
-			public IEnumerator<object> Task()
-			{
-				while (true) {
-
-					backupsManager.ProcessCurrentDocumentChanging();
-					yield return null;
+					yield return periodOfConservation;
+					backupManager.SaveModifiedDocuments();
 				}
 			}
 		}
 
 		public class Backup : IComparable<Backup>
 		{
-			public Backup(DateTime dateTime, string path)
+			public Backup(DateTime dateTime, string path, bool isActual)
 			{
 				DateTime = dateTime;
 				Path = path;
+				IsActual = isActual;
 			}
 
 			public int CompareTo(Backup other)
@@ -60,6 +43,7 @@ namespace Tangerine.Core
 
 			public DateTime DateTime;
 			public string Path;
+			public bool IsActual;
 		}
 
 		private static readonly int[] intervalsOfPreservation = {
@@ -67,16 +51,16 @@ namespace Tangerine.Core
 			60,	60, 60, 60, 1440, 1440, 1440, 1440, 1440, 1440, 1440, 43800, 43800
 		};
 
-		private static int PeriodOfConservation = 60;
+		private static int periodOfConservation = 60;
 
-		private static BackupsManager instance;
-
-		public static BackupsManager Instance => instance ?? (instance = new BackupsManager());
+		private static BackupManager instance;
+		public static BackupManager Instance => instance ?? (instance = new BackupManager());
 
 		private static Document lastKnownDocument;
 
 		private readonly AutosaveBackupProcessor autosaveBackup;
-		private readonly SaveBackupProcessor saveBackup;
+
+		private string projectName;
 
 		enum Mode
 		{
@@ -85,29 +69,35 @@ namespace Tangerine.Core
 			Scan
 		}
 
-		public Action BackupSaved;
+		public event Action BackupSaved;
 
 		private Mode mode;
 		private bool activated;
 
-		private BackupsManager()
+		private BackupManager()
 		{
 			autosaveBackup = new AutosaveBackupProcessor(this);
-			saveBackup = new SaveBackupProcessor(this);
 			mode = Mode.Normal;
 		}
 
 		private string GetTemporalPath(string path)
 		{
-			return Path.Combine(Lime.Environment.GetDataDirectory("Tangerine"), Path.GetFileName(path));
+			return Path.Combine(Lime.Environment.GetDataDirectory("Tangerine"), "Backups", projectName, "Data", path);
 		}
 
 		public List<Backup> GetHistory(Document document)
 		{
 			if (Document.Current != null) {
 
-				string path = GetTemporalPath(document.Path);
-				return GetHistory(path);
+				var path = GetTemporalPath(document.Path);
+				var history = GetHistory(path);
+				if (mode != Mode.Normal) {
+					if (history != null) {
+						history.Last().IsActual = true;
+					}
+				}
+
+				return history;
 			}
 
 			return null;
@@ -122,14 +112,14 @@ namespace Tangerine.Core
 			var history = new List<Backup>();
 			var files = Directory.GetFiles(path, "*.*", SearchOption.TopDirectoryOnly);
 
-			foreach (string file in files) {
-				string name = Path.GetFileNameWithoutExtension(file);
+			foreach (var file in files) {
+				var name = Path.GetFileNameWithoutExtension(file);
 				try {
 					var dataTime = DateTime.ParseExact(name, "yyyy-MM-dd-HH-mm-ss",
 						System.Globalization.CultureInfo.InvariantCulture);
-					history.Add(new Backup(dataTime, file));
+					history.Add(new Backup(dataTime, file, false));
 				} catch (Exception e) {
-					Console.WriteLine("Error file name '{0}':\n{1}", file, e);
+					Console.WriteLine($"Invalid file name '{file}':\n{e}");
 				}
 			}
 
@@ -162,12 +152,12 @@ namespace Tangerine.Core
 
 		private void SaveBackup(Document document)
 		{
-			string path = GetTemporalPath(document.Path);
+			var path = GetTemporalPath(document.Path);
 			Directory.CreateDirectory(path);
 			try {
 				document.SaveTo(Path.Combine(path, DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")));
 			} catch (Exception e) {
-				Console.WriteLine("Error on autosave document '{0}':\n{1}", document.Path, e);
+				Console.WriteLine($"Error on autosave document '{document.Path}':\n{e}");
 			}
 
 			var history = GetHistory(path);
@@ -189,7 +179,8 @@ namespace Tangerine.Core
 			if (activated == false) {
 				activated = true;
 				tasks.Add(autosaveBackup);
-				tasks.Add(saveBackup);
+				Project.Opening += OnProjectOpening;
+				Project.DocumentSaving += OnDocumentSaving;
 			}
 		}
 
@@ -202,45 +193,23 @@ namespace Tangerine.Core
 					RestoreBackup(backup);
 					mode = Mode.Scan;
 				}
-					break;
+				break;
 				case Mode.Scan: {
 					RestoreBackup(backup);
 				}
-					break;
+				break;
 			}
 		}
 
 		private void RestoreBackup(Backup backup)
 		{
-			string localPath = Document.Current.Path;
+			var localPath = Document.Current.Path;
 			string systemPath;
 			Project.Current.GetSystemPath(Document.Current.Path, out systemPath);
 			Project.Current.CloseDocument(Document.Current);
 			File.Delete(systemPath);
 			File.Copy(backup.Path, systemPath, true);
-			if (lastKnownDocument != null) {
-				lastKnownDocument.Saving -= SaveBackup;
-			}
-
 			lastKnownDocument = Project.Current.OpenDocument(localPath);
-			if (lastKnownDocument != null) {
-				lastKnownDocument.Saving += SaveBackup;
-			}
-		}
-
-		private void ProcessCurrentDocumentChanging()
-		{
-			if (lastKnownDocument != Document.Current) {
-				mode = Mode.Normal;
-				if (lastKnownDocument != null) {
-					lastKnownDocument.Saving -= SaveBackup;
-				}
-
-				lastKnownDocument = Document.Current;
-				if (lastKnownDocument != null) {
-					lastKnownDocument.Saving += SaveBackup;
-				}
-			}
 		}
 
 		private void SaveModifiedDocuments()
@@ -250,6 +219,20 @@ namespace Tangerine.Core
 					SaveBackup(document);
 				}
 			}
+		}
+
+		private void OnProjectOpening(string path)
+		{
+			projectName = Path.GetFileNameWithoutExtension(path);
+		}
+
+		private void OnDocumentSaving(Document document)
+		{
+			if (lastKnownDocument != null && lastKnownDocument != Document.Current) {
+				mode = Mode.Normal;
+			}
+			lastKnownDocument = Document.Current;
+			SaveBackup(document);
 		}
 	}
 }
