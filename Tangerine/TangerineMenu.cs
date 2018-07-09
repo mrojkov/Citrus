@@ -1,11 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using Lime;
 using Tangerine.Core;
 using Tangerine.UI;
 using Tangerine.UI.SceneView;
-using Task = Lime.Task;
 
 namespace Tangerine
 {
@@ -15,7 +13,8 @@ namespace Tangerine
 		public static Menu overlaysMenu;
 		public static Menu rulerMenu;
 		private static IMenu resolution;
-		private static List<ICommand> imported = new List<ICommand>();
+		private static ICommand customNodesCommand;
+		private static Menu customNodes;
 		private static IMenu create;
 		private static Menu localizationMenu;
 		private static Command localizationCommand;
@@ -43,19 +42,16 @@ namespace Tangerine
 
 		public static void RebuildCreateImportedTypeMenu()
 		{
-			foreach (var c in imported) {
-				create.Remove(c);
-			}
-			imported.Clear();
+			customNodes.Clear();
 			foreach (var t in Orange.PluginLoader.EnumerateTangerineExportedTypes()) {
 				if (!typeof(Node).IsAssignableFrom(t)) {
 					continue;
 				}
 				var cmd = new Command(t.Name) { Icon = NodeIconPool.GetTexture(t) };
 				CommandHandlerList.Global.Connect(cmd, new CreateNode(t));
-				create.Add(cmd);
-				imported.Add(cmd);
+				customNodes.Add(cmd);
 			}
+			customNodesCommand.Enabled = customNodes.Count > 0;
 		}
 
 		private static void CreateMainMenu()
@@ -158,6 +154,7 @@ namespace Tangerine
 					GenericCommands.HelpMode
 				}),
 			};
+			create.Add(customNodesCommand = new Command("Custom Nodes", customNodes = new Menu()));
 			var nodeTypes = new[] {
 				typeof(Frame),
 				typeof(Button),
