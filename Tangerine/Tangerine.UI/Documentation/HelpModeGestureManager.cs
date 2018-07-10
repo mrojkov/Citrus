@@ -8,7 +8,7 @@ namespace Tangerine.UI
 {
 	public class HelpModeGestureManager : GestureManager
 	{
-		public bool IsHelpModeOn { get; set; } = false;
+		public static bool IsHelpModeOn { get; set; } = false;
 
 		private readonly Task helpModeTask;
 
@@ -50,7 +50,7 @@ namespace Tangerine.UI
 		{
 			while (true) {
 				var manager = WidgetContext.Current.GestureManager as HelpModeGestureManager;
-				if (manager != null && manager.IsHelpModeOn) {
+				if (manager != null && IsHelpModeOn) {
 					var node = WidgetContext.Current.NodeUnderMouse;
 					WidgetContext.Current.MouseCursor = Cursors.DisabledHelp;
 					while (node != null) {

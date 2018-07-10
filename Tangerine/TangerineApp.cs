@@ -455,10 +455,7 @@ namespace Tangerine
 			h.Connect(GenericCommands.UpsampleAnimationTwice, new UpsampleAnimationTwice());
 			h.Connect(GenericCommands.ViewHelp, () => OpenHelp(new HelpPage(HelpPage.StartPageName)));
 			h.Connect(GenericCommands.HelpMode, () => {
-				var manager = WidgetContext.Current.GestureManager as HelpModeGestureManager;
-				if (manager != null) {
-					manager.IsHelpModeOn = !manager.IsHelpModeOn;
-				}
+				HelpModeGestureManager.IsHelpModeOn = !HelpModeGestureManager.IsHelpModeOn;
 			});
 			h.Connect(Tools.AlignLeft, new AlignLeft());
 			h.Connect(Tools.AlignRight, new AlignRight());
@@ -515,10 +512,7 @@ namespace Tangerine
 		private void OpenHelp(HelpPage page)
 		{
 			new HelpDialog(page);
-			var manager = WidgetContext.Current.GestureManager as HelpModeGestureManager;
-			if (manager != null) {
-				manager.IsHelpModeOn = false;
-			}
+			HelpModeGestureManager.IsHelpModeOn = false;
 		}
 
 		private void InitializeHotkeys()

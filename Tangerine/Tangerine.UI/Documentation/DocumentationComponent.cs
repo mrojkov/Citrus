@@ -19,7 +19,11 @@ namespace Tangerine.UI
 		public DocumentationComponent(string pageName)
 		{
 			PageName = pageName;
-			helpGesture = new HelpGesture(() => OpenDocumentation());
+			helpGesture = new HelpGesture(() => {
+				if (HelpModeGestureManager.IsHelpModeOn) {
+					OpenDocumentation();
+				}
+			});
 		}
 
 		private void OpenDocumentation()
