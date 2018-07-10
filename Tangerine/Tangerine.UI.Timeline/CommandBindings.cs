@@ -108,13 +108,25 @@ namespace Tangerine.UI.Timeline
 			var timeline = Timeline.Instance;
 			var nearestMarker = Document.Current.Container.Markers.LastOrDefault(
 				m => m.Frame < timeline.CurrentColumn && m.Action == MarkerAction.Play);
+			string markerId = (action == MarkerAction.Play) ? GenerateMarkerId(Document.Current.Container.Markers, "Start") : "";
 			var newMarker = new Marker(
-				action == MarkerAction.Play ? "Start" : "",
+				markerId,
 				timeline.CurrentColumn,
 				action,
 				action == MarkerAction.Jump && nearestMarker != null ? nearestMarker.Id : ""
 			);
 			SetMarker.Perform(Document.Current.Container, newMarker, true);
+		}
+
+		static string GenerateMarkerId(MarkerList markers, string markerId)
+		{
+			int c = 1;
+			string id = markerId;
+			while (markers.Any(i => i.Id == id)) {
+				id = markerId + c;
+				c++;
+			}
+			return id;
 		}
 
 		static void DeleteMarker()
