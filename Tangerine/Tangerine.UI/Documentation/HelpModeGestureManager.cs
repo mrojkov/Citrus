@@ -10,11 +10,10 @@ namespace Tangerine.UI
 	{
 		public static bool IsHelpModeOn { get; set; } = false;
 
-		private readonly Task helpModeTask;
+		private static readonly Task helpModeTask = new Task(HelpModeTask());
 
 		public HelpModeGestureManager(WidgetContext context) : base(context)
 		{
-			helpModeTask = new Task(HelpModeTask());
 			context.Root.LateTasks.Add(helpModeTask);
 		}
 
@@ -46,7 +45,7 @@ namespace Tangerine.UI
 			}
 		}
 
-		private IEnumerator<object> HelpModeTask()
+		private static IEnumerator<object> HelpModeTask()
 		{
 			while (true) {
 				var manager = WidgetContext.Current.GestureManager as HelpModeGestureManager;

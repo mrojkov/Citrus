@@ -507,6 +507,13 @@ namespace Tangerine
 			if (!File.Exists(errorPagePath)) {
 				File.WriteAllText(errorPagePath, "# This is error page #");
 			}
+			foreach (var panel in DockHierarchy.Instance.Panels) {
+				WidgetExtensions.AddChangeLateWatcher(panel.ContentWidget, () => WidgetContext.Current, context => {
+					if (!(context.GestureManager is HelpModeGestureManager)) {
+						context.GestureManager = new HelpModeGestureManager(context);
+					}
+				});
+			}
 		}
 
 		private void OpenHelp(HelpPage page)
