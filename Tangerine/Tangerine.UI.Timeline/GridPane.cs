@@ -55,9 +55,13 @@ namespace Tangerine.UI.Timeline
 			while (true) {
 				if (RootWidget.Input.WasMouseReleased(1)) {
 					new Menu {
+						TimelineCommands.CutKeyframes,
+						TimelineCommands.CopyKeyframes,
+						TimelineCommands.PasteKeyframes,
+						Command.MenuSeparator,
 						GenericCommands.InsertTimelineColumn,
 						GenericCommands.RemoveTimelineColumn,
-						TimelineCommands.DeleteKeyframes
+						TimelineCommands.DeleteKeyframes,
 					}.Popup();
 				}
 				yield return null;
