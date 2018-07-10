@@ -145,22 +145,42 @@ namespace Lime
 			return false;
 		}
 
-		IEnumerator<TComponent> IEnumerable<TComponent>.GetEnumerator()
-		{
-			foreach (var b in buckets) {
-				if (b.Key > 0) {
-					yield return b.Component;
-				}
-			}
-		}
+		IEnumerator<TComponent> IEnumerable<TComponent>.GetEnumerator() => new Enumerator(buckets);
 
-		IEnumerator IEnumerable.GetEnumerator()
+		IEnumerator IEnumerable.GetEnumerator() => new Enumerator(buckets);
+		
+		public Enumerator GetEnumerator() => new Enumerator(buckets);
+		
+		public struct Enumerator : IEnumerator<TComponent>
 		{
-			foreach (var b in buckets) {
-				if (b.Key > 0) {
-					yield return b.Component;
-				}
+			private int index;
+			private Bucket[] buckets;
+
+			public Enumerator(Bucket[] buckets)
+			{
+				index = -1;
+				this.buckets = buckets;
 			}
+
+			public TComponent Current => buckets[index].Component;
+			object IEnumerator.Current => buckets[index].Component;
+
+			public bool MoveNext()
+			{
+				for (index++; index < buckets.Length; index++) {
+					if (buckets[index].Key > 0) {
+						return true;
+					}
+				}
+				return false;
+			}
+
+			public void Reset()
+			{
+				index = -1;
+			}
+
+			public void Dispose() { }
 		}
 
 		public virtual void Clear()
@@ -182,7 +202,7 @@ namespace Lime
 			public static readonly int Key = Component.GetKeyForType(typeof(T));
 		}
 
-		protected struct Bucket
+		public struct Bucket
 		{
 			// Key special values:
 			//  0 - means an empty bucket.
