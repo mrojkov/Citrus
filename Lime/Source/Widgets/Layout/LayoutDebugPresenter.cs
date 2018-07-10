@@ -12,7 +12,7 @@ namespace Lime
 			Color = color;
 			Thickness = thickness;
 		}
-		
+
 		public override void Render(Node node)
 		{
 			var widget = node.AsWidget;
