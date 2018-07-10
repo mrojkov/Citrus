@@ -61,6 +61,8 @@ namespace Orange
 						AspectRatio = cam.AspectRatio,
 						NearClipPlane = cam.NearClipPlane,
 						FarClipPlane = cam.FarClipPlane,
+						ProjectionMode = cam.ProjectionMode,
+						OrthographicSize = cam.OrthoZoom,
 					};
 					node.SetLocalTransform(CorrectCameraTransform(root.LocalTranform));
 					break;

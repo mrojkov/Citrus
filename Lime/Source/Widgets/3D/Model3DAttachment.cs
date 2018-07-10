@@ -100,6 +100,7 @@ namespace Lime
 					var cam = node as Camera3D;
 					cam.NearClipPlane *= ScaleFactor;
 					cam.FarClipPlane *= ScaleFactor;
+					cam.OrthographicSize *= ScaleFactor;
 				}
 				foreach (var animator in node.Animators) {
 					if (animator.TargetProperty == "Position") {

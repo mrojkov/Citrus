@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using Lime;
 
 namespace Orange.FbxImporter
 {
@@ -17,6 +18,10 @@ namespace Orange.FbxImporter
 
 		public float FarClipPlane { get; }
 
+		public float OrthoZoom { get; }
+
+		public CameraProjectionMode ProjectionMode { get; }
+
 		public CameraAttribute(IntPtr ptr) : base(ptr)
 		{
 			var native = FbxNodeGetCameraAttribute(ptr);
@@ -25,10 +30,12 @@ namespace Orange.FbxImporter
 			}
 			var cam = native.ToStruct<Camera>();
 			Name = cam.name;
-			FieldOfView = cam.fieldOfView;
-			AspectRatio = cam.aspectRatio;
-			NearClipPlane = cam.clipPlaneNear;
-			FarClipPlane = cam.clipPlaneFar;
+			FieldOfView = cam.FieldOfView;
+			AspectRatio = cam.AspectRatio;
+			NearClipPlane = cam.ClipPlaneNear;
+			FarClipPlane = cam.ClipPlaneFar;
+			OrthoZoom = cam.OrthoZoom;
+			ProjectionMode = cam.ProjectionMode;
 		}
 
 		#region Pinvokes
@@ -46,16 +53,21 @@ namespace Orange.FbxImporter
 			public string name;
 
 			[MarshalAs(UnmanagedType.R4)]
-			public float fieldOfView;
+			public float FieldOfView;
 
 			[MarshalAs(UnmanagedType.R4)]
-			public float clipPlaneFar;
+			public float ClipPlaneFar;
 
 			[MarshalAs(UnmanagedType.R4)]
-			public float clipPlaneNear;
+			public float ClipPlaneNear;
 
 			[MarshalAs(UnmanagedType.R4)]
-			public float aspectRatio;
+			public float AspectRatio;
+
+			[MarshalAs(UnmanagedType.R4)]
+			public float OrthoZoom;
+
+			public CameraProjectionMode ProjectionMode;
 		}
 
 		#endregion
