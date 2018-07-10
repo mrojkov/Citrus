@@ -80,9 +80,9 @@ namespace Tangerine
 		}
 	}
 
-	public class CurrentFileSave : DocumentCommandHandler
+	public class FileSave : DocumentCommandHandler
 	{
-		static CurrentFileSave()
+		static FileSave()
 		{
 			Document.PathSelector += SelectPath;
 		}
@@ -91,48 +91,6 @@ namespace Tangerine
 		{
 			try {
 				Document.Current.Save();
-			} catch (System.Exception e) {
-				ShowErrorMessageBox(e);
-			}
-		}
-
-		public static void ShowErrorMessageBox(System.Exception e)
-		{
-			AlertDialog.Show($"Save document error: '{e.Message}'.\nYou may have to upgrade the document format.");
-		}
-
-		public static bool SelectPath(out string path)
-		{
-			var dlg = new FileDialog {
-				AllowedFileTypes = new string[] { Document.Current.GetFileExtension() },
-				Mode = FileDialogMode.Save,
-				InitialDirectory = Project.Current.GetSystemDirectory(Document.Current.Path)
-			};
-			path = null;
-			if (!dlg.RunModal()) {
-				return false;
-			}
-			if (!Project.Current.TryGetAssetPath(dlg.FileName, out path)) {
-				AlertDialog.Show("Can't save the document outside the project directory");
-				return false;
-			}
-			return true;
-		}
-	}
-
-	public class ClickedFileSave : DocumentCommandHandler
-	{
-		static ClickedFileSave()
-		{
-			Document.PathSelector += SelectPath;
-		}
-
-		public override void ExecuteTransaction()
-		{
-			try {
-				if (Document.Clicked != null) {
-					Document.Clicked.Save();
-				}
 			}
 			catch (System.Exception e) {
 				ShowErrorMessageBox(e);
@@ -163,7 +121,7 @@ namespace Tangerine
 		}
 	}
 
-	public class AllFilesSave : DocumentCommandHandler
+	public class FileSaveAll : DocumentCommandHandler
 	{
 		public override void ExecuteTransaction()
 		{
@@ -172,7 +130,7 @@ namespace Tangerine
 		}
 	}
 
-public class FileRevert : DocumentCommandHandler
+	public class FileRevert : DocumentCommandHandler
 	{
 		public override void ExecuteTransaction()
 		{
@@ -204,25 +162,16 @@ public class FileRevert : DocumentCommandHandler
 				} else {
 					try {
 						Document.Current.SaveAs(assetPath);
-					} catch (System.Exception e) {
-						CurrentFileSave.ShowErrorMessageBox(e);
+					}
+					catch (System.Exception e) {
+						FileSave.ShowErrorMessageBox(e);
 					}
 				}
 			}
 		}
 	}
 
-	public class ClickedFileClose : DocumentCommandHandler
-	{
-		public override void ExecuteTransaction()
-		{
-			if (Document.Clicked != null) {
-				Project.Current.CloseDocument(Document.Clicked);
-			}
-		}
-	}
-
-	public class CurrentFileClose : DocumentCommandHandler
+	public class FileClose : DocumentCommandHandler
 	{
 		public override void ExecuteTransaction()
 		{
@@ -232,32 +181,22 @@ public class FileRevert : DocumentCommandHandler
 		}
 	}
 
-	public class AllFilesClose : DocumentCommandHandler
+	public class FileCloseAll : DocumentCommandHandler
 	{
 		public override void ExecuteTransaction()
 		{
 			if (Project.Current.Documents.Count != 0) {
-				Project.Current.CloseAllTabs();
+				Project.Current.CloseAllDocuments();
 			}
 		}
 	}
 
-	public class AllFilesCloseExceptThis : DocumentCommandHandler
+	public class FileCloseAllButCurrent : DocumentCommandHandler
 	{
 		public override void ExecuteTransaction()
 		{
 			if (Project.Current.Documents.Count != 0) {
-				Project.Current.CloseAllDocumentsExceptThis(Document.Clicked);
-			}
-		}
-	}
-
-	public class AllFilesCloseExceptCurrent : DocumentCommandHandler
-	{
-		public override void ExecuteTransaction()
-		{
-			if (Project.Current.Documents.Count != 0) {
-				Project.Current.CloseAllDocumentsExceptThis(Document.Current);
+				Project.Current.CloseAllDocumentsButThis(Document.Current);
 			}
 		}
 	}
@@ -277,7 +216,8 @@ public class FileRevert : DocumentCommandHandler
 				RestoreDefaultAnimationEngine(Document.Current.RootNode);
 				new UpsampleAnimationTwice().Execute();
 				Document.Current.Save();
-			} catch (System.Exception e) {
+			}
+			catch (System.Exception e) {
 				AlertDialog.Show($"Upgrade document format error: '{e.Message}'");
 			}
 		}
