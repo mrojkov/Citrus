@@ -115,16 +115,26 @@ namespace Lime
 
 	public class ThemedTabCloseButton : Button
 	{
+		private WidgetFlatFillPresenter fill;
+		private WidgetBoundsPresenter outlineRect;
+
 		public override bool IsNotDecorated() => false;
 
 		public ThemedTabCloseButton()
 		{
 			var presenter = new VectorShapeButtonPresenter(new VectorShape {
-				new VectorShape.Line(0.3f, 0.3f, 0.7f, 0.7f, Color4.White, 0.075f * 1.5f),
-				new VectorShape.Line(0.3f, 0.7f, 0.7f, 0.3f, Color4.White, 0.0751f * 1.5f),
+				new VectorShape.Line(0.1f, 0.3f, 0.5f, 0.7f, Color4.White, 0.075f * 1.5f),
+				new VectorShape.Line(0.1f, 0.7f, 0.5f, 0.3f, Color4.White, 0.0751f * 1.5f),
 			});
-			LayoutCell = new LayoutCell(Alignment.Center, stretchX: 0);
-			Presenter = presenter;
+			
+			//var thick = new Thickness(2, 0);
+			//Padding = thick;
+
+			fill = new WidgetFlatFillPresenter(Theme.Colors.CloseButtonFocusBorderNormal);
+			
+			outlineRect = new WidgetBoundsPresenter(Theme.Colors.CloseButtonOutlineRect);
+
+			LayoutCell = new LayoutCell(Alignment.Center, stretchX: 10);
 			MinMaxSize = Theme.Metrics.CloseButtonSize;
 			DefaultAnimation.AnimationEngine = new AnimationEngineDelegate {
 				OnRunAnimation = (animation, markerId, animationTimeCorrection) => {
@@ -132,8 +142,28 @@ namespace Lime
 					return true;
 				}
 			};
+			CompoundPresenter.Add(presenter);
+			CompoundPresenter.Add(fill);
+			CompoundPostPresenter.Add(outlineRect);
 		}
 
+		public override void Update(float delta)
+		{
+			base.Update(delta);
+			if (IsMouseOver()) {
+				fill.Color = Theme.Colors.CloseButtonFocusBorderHovered;
+			} else {
+				fill.Color = Theme.Colors.CloseButtonFocusBorderNormal;
+			}
+		}
+
+		//public override void Render()
+		//{
+		//	base.Render();
+		//	var a = ContentPosition;
+		//	var b = ContentPosition + ContentSize - Padding.LeftTop;
+		//	Renderer.DrawRectOutline(a, b, Theme.Colors.CloseButtonOutlineRect);
+		//}
 	}
 }
 
