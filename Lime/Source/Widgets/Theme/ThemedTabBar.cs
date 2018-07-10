@@ -126,9 +126,6 @@ namespace Lime
 				new VectorShape.Line(0.1f, 0.3f, 0.5f, 0.7f, Color4.White, 0.075f * 1.5f),
 				new VectorShape.Line(0.1f, 0.7f, 0.5f, 0.3f, Color4.White, 0.0751f * 1.5f),
 			});
-			
-			//var thick = new Thickness(2, 0);
-			//Padding = thick;
 
 			fill = new WidgetFlatFillPresenter(Theme.Colors.CloseButtonFocusBorderNormal);
 			
@@ -156,14 +153,6 @@ namespace Lime
 				fill.Color = Theme.Colors.CloseButtonFocusBorderNormal;
 			}
 		}
-
-		//public override void Render()
-		//{
-		//	base.Render();
-		//	var a = ContentPosition;
-		//	var b = ContentPosition + ContentSize - Padding.LeftTop;
-		//	Renderer.DrawRectOutline(a, b, Theme.Colors.CloseButtonOutlineRect);
-		//}
 	}
 }
 
