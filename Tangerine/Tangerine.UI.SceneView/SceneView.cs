@@ -23,6 +23,7 @@ namespace Tangerine.UI.SceneView
 		// Container for the document root node.
 		public readonly SceneWidget Scene;
 		public static readonly RulersWidget RulersWidget = new RulersWidget();
+		public static readonly ZoomWidget ZoomWidget = new ZoomWidget();
 		/// <summary>
 		/// Gets the mouse position in the scene coordinates.
 		/// </summary>
@@ -230,6 +231,7 @@ namespace Tangerine.UI.SceneView
 		public void Attach()
 		{
 			Instance = this;
+			Panel.AddNode(ZoomWidget);
 			Panel.AddNode(RulersWidget);
 			Panel.AddNode(Frame);
 			DockManager.Instance.AddFilesDropHandler(filesDropHandler);
@@ -241,6 +243,7 @@ namespace Tangerine.UI.SceneView
 			Instance = null;
 			Frame.Unlink();
 			RulersWidget.Unlink();
+			ZoomWidget.Unlink();
 		}
 
 		/// <summary>
