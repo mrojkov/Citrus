@@ -9,6 +9,7 @@ namespace Lime
 	/// <summary>
 	/// Ломаная линия
 	/// </summary>
+	[TangerineRegisterNode(Order = 29)]
 	[AllowedChildrenTypes(typeof(PolylinePoint))]
 	public class Polyline : Widget
 	{
@@ -182,6 +183,7 @@ namespace Lime
 		}
 	}
 
+	[TangerineRegisterNode(Order = 30)]
 	[AllowedParentTypes(typeof(Polyline))]
 	public class PolylinePoint : PointObject
 	{

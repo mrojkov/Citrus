@@ -179,6 +179,8 @@ namespace Tangerine
 				new Core.Operations.MoveNodes.Processor(),
 				new Core.Operations.SetMarker.Processor(),
 				new Core.Operations.DeleteMarker.Processor(),
+				new Core.Operations.SetComponent.Processor(),
+				new Core.Operations.DeleteComponent.Processor(),
 				new Core.Operations.DistortionMeshProcessor(),
 				new Core.Operations.SyncFolderDescriptorsProcessor(),
 				new Core.Operations.TimelineHorizontalShift.Processor(),
@@ -198,9 +200,7 @@ namespace Tangerine
 			Toolbars.Add("Editing", new Toolbar(dockManager.ToolbarArea));
 			Toolbars.Add("Create", new Toolbar(dockManager.ToolbarArea));
 			Toolbars.Add("Tools", new Toolbar(dockManager.ToolbarArea));
-			foreach (var c in Application.MainMenu.FindCommand("Create").Menu) {
-				Toolbars["Create"].Add(c);
-			}
+			RefreshCreateNodeCommands();
 			CreateToolsToolbar();
 			Document.AttachingViews += doc => {
 				if (doc.Views.Count == 0) {
@@ -209,7 +209,7 @@ namespace Tangerine
 						new UI.Timeline.Timeline(timelinePanel),
 						new UI.SceneView.SceneView(documentViewContainer),
 						new UI.SearchPanel(searchPanel.ContentWidget),
-						new BackupHistoryPanel(backupHistoryPanel.ContentWidget), 
+						new BackupHistoryPanel(backupHistoryPanel.ContentWidget),
 					});
 				}
 			};
@@ -256,6 +256,15 @@ namespace Tangerine
 				var doc = Document.Current;
 				doc.Container.AnimationFrame = doc.Container.AnimationFrame;
 				doc.RootNode.Update(0);
+			}
+		}
+
+		public void RefreshCreateNodeCommands()
+		{
+			var createToolbar = Toolbars["Create"];
+			createToolbar.Clear();
+			foreach (var c in TangerineMenu.CreateNodeCommands) {
+				createToolbar.Add(c);
 			}
 		}
 
@@ -427,7 +436,8 @@ namespace Tangerine
 			UI.SceneView.SceneView.RegisterGlobalCommands();
 
 			var h = CommandHandlerList.Global;
-			h.Connect(GenericCommands.New, new FileNew());
+			h.Connect(GenericCommands.NewScene, new FileNew());
+			h.Connect(GenericCommands.NewTan, new FileNew(DocumentFormat.Tan));
 			h.Connect(GenericCommands.Open, new FileOpen());
 			h.Connect(GenericCommands.OpenProject, new FileOpenProject());
 			h.Connect(GenericCommands.SaveCurrent, new CurrentFileSave());

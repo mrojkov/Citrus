@@ -5,6 +5,7 @@ using Yuzu;
 
 namespace Lime
 {
+	[TangerineRegisterNode(CanBeRoot = true, Order = 1)]
 	[TangerineNodeBuilder("BuildForTangerine")]
 	[AllowedChildrenTypes(typeof(Node))]
 	public class Button : Widget

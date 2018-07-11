@@ -3,6 +3,7 @@ using Yuzu;
 
 namespace Lime
 {
+	[TangerineRegisterNode(CanBeRoot = true, Order = 22)]
 	public class Model3D : Node3D
 	{
 		[YuzuMember]

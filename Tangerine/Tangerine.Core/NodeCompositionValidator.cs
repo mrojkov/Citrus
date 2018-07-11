@@ -12,7 +12,7 @@ namespace Tangerine.Core
 			return ValidateChildType(parentType, childType) && ValidateParentType(parentType, childType);
 		}
 
-		static bool ValidateChildType(Type parentType, Type childType)
+		private static bool ValidateChildType(Type parentType, Type childType)
 		{
 			for (var p = parentType; p != null; p = p.BaseType) {
 				var a = ClassAttributes<AllowedChildrenTypes>.Get(p);
@@ -23,7 +23,7 @@ namespace Tangerine.Core
 			return false;
 		}
 
-		static bool ValidateParentType(Type parentType, Type childType)
+		private static bool ValidateParentType(Type parentType, Type childType)
 		{
 			for (var p = childType; p != null; p = p.BaseType) {
 				var a = ClassAttributes<AllowedParentTypes>.Get(p);
@@ -43,6 +43,17 @@ namespace Tangerine.Core
 				}
 			}
 			return false;
+		}
+
+		public static bool ValidateComponentType(Type nodeType, Type componentType)
+		{
+			for (var t = componentType; t != null && t != typeof(NodeComponent); t = t.BaseType) {
+				var a = ClassAttributes<AllowedOwnerTypes>.Get(t);
+				if (a != null) {
+					return a.Types.Any(ownerType => ownerType == nodeType || nodeType.IsSubclassOf(ownerType));
+				}
+			}
+			return true;
 		}
 
 		public static bool IsCopyPasteAllowed(Type type)

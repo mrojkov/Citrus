@@ -32,6 +32,7 @@ namespace Lime
 		Matrix32 UVTransform { get; }
 	}
 
+	[TangerineRegisterNode(Order = 19)]
 	public class ImageCombiner : Node
 	{
 		[YuzuMember]
@@ -86,7 +87,7 @@ namespace Lime
 					var widget1 = arg1 as Widget;
 					var widget2 = arg2 as Widget;
 					if (
-						widget1 != null && !widget1.ClipRegionTest(chain.ClipRegion) || 
+						widget1 != null && !widget1.ClipRegionTest(chain.ClipRegion) ||
 						widget2 != null && !widget2.ClipRegionTest(chain.ClipRegion)
 					) {
 						return;

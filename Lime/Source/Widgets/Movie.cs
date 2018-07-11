@@ -9,6 +9,7 @@ namespace Lime
 		Stop
 	}
 
+	[TangerineRegisterNode(Order = 4)]
 	public sealed class Movie : Widget, IImageCombinerArg
 	{
 		bool skipRender;

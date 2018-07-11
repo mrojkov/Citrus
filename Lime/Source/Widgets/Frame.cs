@@ -24,6 +24,7 @@ namespace Lime
 		NoRender,
 	}
 
+	[TangerineRegisterNode(CanBeRoot = true, Order = 0)]
 	[AllowedChildrenTypes(typeof(Node))]
 	public class Frame : Widget, IImageCombinerArg
 	{

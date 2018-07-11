@@ -2,6 +2,7 @@ using Yuzu;
 
 namespace Lime
 {
+	[TangerineRegisterNode(Order = 13)]
 	public class NineGrid : Widget
 	{
 		[YuzuMember]

@@ -1,6 +1,8 @@
 using Lime;
 using Tangerine.Core;
 using System.Collections.Generic;
+using System.Linq;
+using Tangerine.Core.Components;
 
 namespace Tangerine.UI.Inspector
 {
@@ -11,7 +13,7 @@ namespace Tangerine.UI.Inspector
 		private static readonly ITexture inspectRootActivatedTexture;
 		private static readonly ITexture inspectRootDeactivatedTexture;
 
-		private InspectorContent content;
+		private readonly InspectorContent content;
 		private readonly Widget contentWidget;
 
 		public static Inspector Instance { get; private set; }
@@ -46,7 +48,7 @@ namespace Tangerine.UI.Inspector
 			RootWidget.Unlink();
 		}
 
-		void OnFilesDropped(IEnumerable<string> files) => content.DropFiles(files);
+		private void OnFilesDropped(IEnumerable<string> files) => content.DropFiles(files);
 
 		public Inspector(Widget panelWidget)
 		{
@@ -65,30 +67,37 @@ namespace Tangerine.UI.Inspector
 			SetupToolbar();
 		}
 
-		void SetupToolbar()
+		private void SetupToolbar()
 		{
 			Toolbar.Add(InspectorCommands.InspectRootNodeCommand);
 		}
 
-		void CreateWatchersToRebuild()
+		private void CreateWatchersToRebuild()
 		{
 			RootWidget.AddChangeWatcher(() => CalcSelectedRowsHashcode(), _ => Rebuild());
 			RootWidget.AddChangeWatcher(() => Document.Current.InspectRootNode, _ => Rebuild());
 		}
 
-		int CalcSelectedRowsHashcode()
+		private static int CalcSelectedRowsHashcode()
 		{
-			int r = 0;
+			var r = 0;
 			foreach (var row in Document.Current.Rows) {
-				if (row.Selected)
+				if (row.Selected) {
 					r ^= row.GetHashCode();
+					var node = row.Components.Get<NodeRow>()?.Node;
+					if (node != null) {
+						foreach (var component in node.Components) {
+							r ^= component.GetHashCode();
+						}
+					}
+				}
 			}
 			return r;
 		}
 
-		void Rebuild()
+		private void Rebuild()
 		{
-			content.BuildForObjects(Document.Current.InspectRootNode ? new Node[] { Document.Current.RootNode } : Document.Current.SelectedNodes());
+			content.BuildForObjects(Document.Current.InspectRootNode ? new[] { Document.Current.RootNode } : Document.Current.SelectedNodes().ToArray());
 			InspectorCommands.InspectRootNodeCommand.Icon = Document.Current.InspectRootNode ? inspectRootActivatedTexture : inspectRootDeactivatedTexture;
 			Toolbar.Rebuild();
 		}

@@ -2,6 +2,7 @@ using Yuzu;
 
 namespace Lime
 {
+	[TangerineRegisterNode(Order = 27)]
 	[AllowedParentTypes(typeof(Node3D), typeof(Viewport3D))]
 	public class SplineGear3D : Node
 	{

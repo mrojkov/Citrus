@@ -1,12 +1,23 @@
 using System;
-using System.Linq;
-using System.Reflection;
 
 namespace Lime
 {
+	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+	public sealed class TangerineRegisterComponentAttribute : Attribute { }
+
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
 	public sealed class NodeComponentDontSerializeAttribute : Attribute
 	{ }
+
+	public sealed class AllowedOwnerTypes : Attribute
+	{
+		public Type[] Types;
+
+		public AllowedOwnerTypes(params Type[] types)
+		{
+			Types = types;
+		}
+	}
 
 	public class NodeComponent : Component
 	{

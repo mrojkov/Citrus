@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -216,8 +216,7 @@ namespace Orange
 			foreach (var name in requiredAssemblies()) {
 				var aseembly = AssemblyResolve(null, new ResolveEventArgs(name, null));
 				foreach (var t in aseembly.GetExportedTypes()) {
-					var attr = t.GetCustomAttributes(false).FirstOrDefault(i => i is TangerineExportAttribute);
-					if (attr != null) {
+					if (t.GetCustomAttributes(false).Any(i => i is TangerineRegisterNodeAttribute || i is TangerineRegisterComponentAttribute)) {
 						yield return t;
 					}
 				}

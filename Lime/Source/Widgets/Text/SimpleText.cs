@@ -4,6 +4,7 @@ using Yuzu;
 
 namespace Lime
 {
+	[TangerineRegisterNode(Order = 10)]
 	public class SimpleText : Widget, IText
 	{
 		private SpriteList spriteList;
@@ -523,13 +524,13 @@ namespace Lime
 			clone.Caret = clone.Caret.Clone();
 			return clone;
 		}
-				
+
 		private class ColorfulMaterialProvider : Sprite.IMaterialProvider
 		{
 			public static readonly ColorfulMaterialProvider Instance = new ColorfulMaterialProvider();
 
 			private IMaterial material;
-			
+
 			public void Init(Blending blending, int paletteIndex)
 			{
 				material = ColorfulTextMaterial.GetInstance(blending, paletteIndex);

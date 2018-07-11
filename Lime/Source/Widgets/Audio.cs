@@ -8,6 +8,7 @@ namespace Lime
 		Stop
 	}
 
+	[TangerineRegisterNode(Order = 3)]
 	public class Audio : Node
 	{
 		public static bool GloballyEnable = true;

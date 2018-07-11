@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -18,7 +18,7 @@ namespace Lime
 					keyMap.Add(type, key);
 				}
 				return key;
-			}	
+			}
 		}
 
 		internal int GetKey() => GetKeyForType(GetType());
@@ -36,6 +36,7 @@ namespace Lime
 
 		public bool Contains(TComponent component) => ContainsKey(component.GetKey());
 		public bool Contains<T>() where T : TComponent => ContainsKey(ComponentKeyResolver<T>.Key);
+		public bool Contains(Type type) => ContainsKey(Component.GetKeyForType(type));
 
 		private bool ContainsKey(int key)
 		{
@@ -51,20 +52,23 @@ namespace Lime
 			return false;
 		}
 
-		public T Get<T>() where T : TComponent
+		private TComponent Get(int key)
 		{
-			var key = ComponentKeyResolver<T>.Key;
 			for (var i = 0; i < buckets.Length; i++) {
 				var b = buckets[(key + i) & (buckets.Length - 1)];
 				if (b.Key == key) {
-					return (T)b.Component;
+					return b.Component;
 				}
 				if (b.Key == 0) {
 					break;
 				}
 			}
-			return default(T);
+			return default(TComponent);
 		}
+
+		public TComponent Get(Type type) => Get(Component.GetKeyForType(type));
+
+		public T Get<T>() where T : TComponent => (T)Get(ComponentKeyResolver<T>.Key);
 
 		public T GetOrAdd<T>() where T : TComponent, new()
 		{
@@ -120,6 +124,12 @@ namespace Lime
 			return c != null && Remove(c);
 		}
 
+		public bool Remove(Type type)
+		{
+			var c = Get(type);
+			return c != null && Remove(c);
+		}
+
 		public virtual bool Remove(TComponent component)
 		{
 			var key = component.GetKey();
@@ -135,22 +145,42 @@ namespace Lime
 			return false;
 		}
 
-		IEnumerator<TComponent> IEnumerable<TComponent>.GetEnumerator()
-		{
-			foreach (var b in buckets) {
-				if (b.Key > 0) {
-					yield return b.Component;
-				}
-			}
-		}
+		IEnumerator<TComponent> IEnumerable<TComponent>.GetEnumerator() => new Enumerator(buckets);
 
-		IEnumerator IEnumerable.GetEnumerator()
+		IEnumerator IEnumerable.GetEnumerator() => new Enumerator(buckets);
+		
+		public Enumerator GetEnumerator() => new Enumerator(buckets);
+		
+		public struct Enumerator : IEnumerator<TComponent>
 		{
-			foreach (var b in buckets) {
-				if (b.Key > 0) {
-					yield return b.Component;
-				}
+			private int index;
+			private Bucket[] buckets;
+
+			public Enumerator(Bucket[] buckets)
+			{
+				index = -1;
+				this.buckets = buckets;
 			}
+
+			public TComponent Current => buckets[index].Component;
+			object IEnumerator.Current => buckets[index].Component;
+
+			public bool MoveNext()
+			{
+				for (index++; index < buckets.Length; index++) {
+					if (buckets[index].Key > 0) {
+						return true;
+					}
+				}
+				return false;
+			}
+
+			public void Reset()
+			{
+				index = -1;
+			}
+
+			public void Dispose() { }
 		}
 
 		public virtual void Clear()
@@ -172,7 +202,7 @@ namespace Lime
 			public static readonly int Key = Component.GetKeyForType(typeof(T));
 		}
 
-		protected struct Bucket
+		public struct Bucket
 		{
 			// Key special values:
 			//  0 - means an empty bucket.

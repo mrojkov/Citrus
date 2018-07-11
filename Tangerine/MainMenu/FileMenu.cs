@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using Lime;
 using Tangerine.Core;
@@ -37,6 +38,15 @@ namespace Tangerine
 
 	public class FileNew : CommandHandler
 	{
+		private readonly DocumentFormat format;
+		private readonly Type rootType;
+
+		public FileNew(DocumentFormat format = DocumentFormat.Scene, Type rootType = null)
+		{
+			this.format = format;
+			this.rootType = rootType;
+		}
+
 		public override void RefreshCommand(ICommand command)
 		{
 			command.Enabled = Project.Current != Project.Null;
@@ -44,7 +54,7 @@ namespace Tangerine
 
 		public override void Execute()
 		{
-			Project.Current.NewDocument();
+			Project.Current.NewDocument(format, rootType);
 		}
 	}
 

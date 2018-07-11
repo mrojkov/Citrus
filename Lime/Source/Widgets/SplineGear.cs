@@ -2,6 +2,7 @@ using Yuzu;
 
 namespace Lime
 {
+	[TangerineRegisterNode(Order = 17)]
 	public class SplineGear : Node
 	{
 		[YuzuMember]

@@ -17,8 +17,12 @@ namespace Lime
 		void OnTrigger(string property, double animationTimeCorrection = 0);
 	}
 
-	public sealed class TangerineExportAttribute : Attribute
-	{ }
+	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+	public sealed class TangerineRegisterNodeAttribute : Attribute
+	{
+		public bool CanBeRoot;
+		public int Order = int.MaxValue;
+	}
 
 	/// <summary>
 	/// Denotes a property which can not be animated within Tangerine.
@@ -1201,7 +1205,7 @@ namespace Lime
 			if (Application.WindowUnderMouse != Window.Current) {
 				return false;
 			}
-#endif		
+#endif
 			var context = WidgetContext.Current;
 			var nodeUnderMouse = context.NodeUnderMouse;
 			if (nodeUnderMouse == null || !nodeUnderMouse.SameOrDescendantOf(this)) {

@@ -59,6 +59,10 @@
       <Project>{fc2de6c9-641a-4230-8d29-ea4035cd8708}</Project>
       <Name>Lime.Win</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Orange\Orange.Win.csproj">
+      <Project>{6f0c1a51-492a-4e6e-b302-e212d441ebf3}</Project>
+      <Name>Orange.Win</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Yuzu\Yuzu.csproj">
       <Project>{ddd2dfe9-ced2-4cea-adf0-5a6865865a46}</Project>
       <Name>Yuzu</Name>

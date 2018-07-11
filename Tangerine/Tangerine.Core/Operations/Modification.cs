@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using Lime;
@@ -10,7 +10,7 @@ namespace Tangerine.Core.Operations
 	public class SetProperty : Operation
 	{
 		private bool isChangingDocument;
-		
+
 		public readonly object Obj;
 		public readonly object Value;
 		public readonly PropertyInfo Property;
@@ -56,7 +56,7 @@ namespace Tangerine.Core.Operations
 			IAnimator animator;
 			var animable = @object as IAnimable;
 			if (animable != null && (animable.Animators.TryFind(propertyName, out animator, Document.Current.AnimationId) || createAnimatorIfNeeded)) {
-				
+
 				if (animator == null && createInitialKeyframeForNewAnimator) {
 					var propertyValue = animable.GetType().GetProperty(propertyName).GetValue(animable);
 					Perform(animable, propertyName, propertyValue, true, false, 0);
@@ -208,7 +208,7 @@ namespace Tangerine.Core.Operations
 			{
 				Backup backup;
 				IAnimator animator;
-				
+
 				if (!op.Find(out backup)) {
 					bool animatorExists =
 						op.Animable.Animators.Any(a => a.TargetProperty == op.PropertyName && a.AnimationId == op.AnimationId);
@@ -222,9 +222,9 @@ namespace Tangerine.Core.Operations
 					animator = backup.Animator;
 					if (!backup.AnimatorExists) {
 						op.Animable.Animators.Add(animator);
-					}					
+					}
 				}
-				
+
 				animator.Keys.AddOrdered(op.Keyframe);
 				animator.ResetCache();
 			}
@@ -644,6 +644,51 @@ namespace Tangerine.Core.Operations
 			foreach (var child in tree) {
 				MoveNodes.Perform(child, new FolderItemLocation(loc.Folder, ++loc.Index));
 			}
+		}
+	}
+
+	public class SetComponent : Operation
+	{
+		private readonly Node node;
+		private readonly NodeComponent component;
+
+		public override bool IsChangingDocument => true;
+
+		private SetComponent(Node node, NodeComponent component)
+		{
+			this.node = node;
+			this.component = component;
+		}
+
+		public static void Perform(Node node, NodeComponent component) => Document.Current.History.Perform(new SetComponent(node, component));
+
+		public class Processor : OperationProcessor<SetComponent>
+		{
+			protected override void InternalRedo(SetComponent op) => op.node.Components.Add(op.component);
+			protected override void InternalUndo(SetComponent op) => op.node.Components.Remove(op.component);
+		}
+
+	}
+
+	public class DeleteComponent : Operation
+	{
+		private readonly Node node;
+		private readonly NodeComponent component;
+
+		public override bool IsChangingDocument => true;
+
+		private DeleteComponent(Node node, NodeComponent component)
+		{
+			this.node = node;
+			this.component = component;
+		}
+
+		public static void Perform(Node node, NodeComponent component) => Document.Current.History.Perform(new DeleteComponent(node, component));
+
+		public class Processor : OperationProcessor<DeleteComponent>
+		{
+			protected override void InternalRedo(DeleteComponent op) => op.node.Components.Remove(op.component);
+			protected override void InternalUndo(DeleteComponent op) => op.node.Components.Add(op.component);
 		}
 	}
 }

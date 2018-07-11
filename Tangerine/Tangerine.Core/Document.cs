@@ -128,12 +128,27 @@ namespace Tangerine.Core
 			ignoredTangerineFlags = tmpList.ToArray();
 		}
 
-		public Document()
+		public Document(DocumentFormat format = DocumentFormat.Scene, Type rootType = null)
 		{
-			Format = DocumentFormat.Scene;
+			Format = format;
 			Path = defaultPath;
-			Container = RootNodeUnwrapped = RootNode = new Frame { Size = defaultSceneSize };
-			RootNode.DefaultAnimation.AnimationEngine = new Orange.CompatibilityAnimationEngine();
+			if (rootType == null) {
+				Container = RootNodeUnwrapped = RootNode = new Frame { Size = defaultSceneSize };
+			} else {
+				var constructor = rootType.GetConstructor(Type.EmptyTypes);
+				Container = RootNodeUnwrapped = RootNode = (Node)constructor.Invoke(new object[] { });
+				var widget = RootNode as Widget;
+				if (widget != null) {
+					widget.Size = defaultSceneSize;
+				}
+			}
+			RootNode = RootNodeUnwrapped;
+			SetModificationTimeToNow();
+			if (RootNode is Node3D) {
+				RootNode = WrapNodeWithViewport3D(RootNode);
+			}
+			Decorate(RootNode);
+			Container = RootNode;
 			SetModificationTimeToNow();
 		}
 

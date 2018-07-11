@@ -2,6 +2,7 @@ using Yuzu;
 
 namespace Lime
 {
+	[TangerineRegisterNode(Order = 21)]
 	public class Camera3D : Node3D
 	{
 		private CameraProjectionMode projectionMode = CameraProjectionMode.Perspective;
