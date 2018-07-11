@@ -11,6 +11,7 @@ namespace Lime
 		Ultra
 	}
 
+	[TangerineRegisterNode(Order = 28)]
 	public class LightSource : Node3D
 	{
 		public IntVector2 ShadowMapSize
@@ -206,7 +207,7 @@ namespace Lime
 				depthBufferRenderer.Render(lightView, lightViewProjection, lightViewport);
 			}
 		}
-		
+
 		private bool ShadowMappingDisabled()
 		{
 			return !shadowMappingEnabled;

@@ -150,7 +150,7 @@ namespace Tangerine.UI.Inspector
 			if (node != null) {
 				foreach (var component in node.Components) {
 					var type = component.GetType();
-					if (!type.IsDefined(typeof(TangerineHideInInspectorAttribute), true) && nodes.All(n => n.Components.Contains(type))) {
+					if (type.IsDefined(typeof(TangerineRegisterComponentAttribute), true) && nodes.All(n => n.Components.Contains(type))) {
 						types.Add(type);
 					}
 				}
@@ -234,9 +234,8 @@ namespace Tangerine.UI.Inspector
 
 			var nodesTypes = nodes.Select(n => n.GetType()).ToList();
 			var types = new List<Type>();
-			foreach (var type in Orange.PluginLoader.EnumerateTangerineExportedTypes()) {
+			foreach (var type in Project.Current.RegisteredComponentTypes) {
 				if (
-					typeof(NodeComponent).IsAssignableFrom(type) &&
 					!nodes.All(n => n.Components.Contains(type)) &&
 					nodesTypes.All(t => NodeCompositionValidator.ValidateComponentType(t, type))
 				) {

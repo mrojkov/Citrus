@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.IO;
 using System.Collections.Generic;
+using System.Reflection;
 using Lime;
 
 namespace Tangerine.Core
@@ -13,6 +14,8 @@ namespace Tangerine.Core
 
 		private readonly object aggregateModifiedAssetsTaskTag = new object();
 		private readonly HashSet<string> modifiedAssets = new HashSet<string>();
+		private readonly List<Type> registeredNodeTypes = new List<Type>();
+		private readonly List<Type> registeredComponentTypes = new List<Type>();
 
 		private Lime.FileSystemWatcher fsWatcher;
 
@@ -33,6 +36,8 @@ namespace Tangerine.Core
 		public Dictionary<string, Widget> Overlays { get; } = new Dictionary<string, Widget>();
 		public ProjectPreferences Preferences { get; private set; } = new ProjectPreferences();
 		public ProjectUserPreferences UserPreferences { get; private set; } = new ProjectUserPreferences();
+		public IReadOnlyList<Type> RegisteredNodeTypes => registeredNodeTypes;
+		public IReadOnlyList<Type> RegisteredComponentTypes => registeredComponentTypes;
 
 		public static event Action<Document> DocumentSaving;
 		public static event Action<string> Opening;
@@ -88,6 +93,16 @@ namespace Tangerine.Core
 					.Where(file => Path.GetExtension(file) == ".tan" || Path.GetExtension(file) == ".scene");
 				foreach (var file in files) {
 					Project.Current.Overlays.Add(Path.GetFileNameWithoutExtension(file), new Frame(file));
+				}
+			}
+
+			registeredNodeTypes.AddRange(GetNodesTypesOrdered("Lime"));
+			registeredComponentTypes.AddRange(GetComponentsTypes("Lime"));
+			foreach (var type in Orange.PluginLoader.EnumerateTangerineExportedTypes()) {
+				if (typeof(Node).IsAssignableFrom(type)) {
+					registeredNodeTypes.Add(type);
+				} else if (typeof(NodeComponent).IsAssignableFrom(type)) {
+					registeredComponentTypes.Add(type);
 				}
 			}
 		}
@@ -471,6 +486,31 @@ namespace Tangerine.Core
 		public static void RaiseDocumetSaving(Document document)
 		{
 			DocumentSaving?.Invoke(document);
+		}
+
+		public static IEnumerable<Type> GetNodesTypesOrdered(string assemblyName)
+		{
+			var assembly = AppDomain.CurrentDomain.GetAssemblies().First(a => a.GetName().Name == assemblyName);
+			if (assembly == null) {
+				return new List<Type>();
+			}
+			return assembly
+				.GetTypes()
+				.Where(t => typeof(Node).IsAssignableFrom(t) && t.IsDefined(typeof(TangerineRegisterNodeAttribute)))
+				.ToDictionary(t => t, t => t.GetCustomAttributes(false).OfType<TangerineRegisterNodeAttribute>().First())
+				.OrderBy(kv => kv.Value.Order)
+				.Select(kv => kv.Key);
+		}
+
+		public static IEnumerable<Type> GetComponentsTypes(string assemblyName)
+		{
+			var assembly = AppDomain.CurrentDomain.GetAssemblies().First(a => a.GetName().Name == assemblyName);
+			if (assembly == null) {
+				return new List<Type>();
+			}
+			return assembly
+				.GetTypes()
+				.Where(t => typeof(NodeComponent).IsAssignableFrom(t) && t.IsDefined(typeof(TangerineRegisterComponentAttribute)));
 		}
 	}
 }

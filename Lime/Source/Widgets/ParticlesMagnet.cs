@@ -3,6 +3,7 @@ using Yuzu;
 
 namespace Lime
 {
+	[TangerineRegisterNode(Order = 9)]
 	[AllowedParentTypes(typeof(ParticleEmitter))]
 	public class ParticlesMagnet : Widget
 	{

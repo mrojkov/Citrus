@@ -200,9 +200,7 @@ namespace Tangerine
 			Toolbars.Add("Editing", new Toolbar(dockManager.ToolbarArea));
 			Toolbars.Add("Create", new Toolbar(dockManager.ToolbarArea));
 			Toolbars.Add("Tools", new Toolbar(dockManager.ToolbarArea));
-			foreach (var c in TangerineMenu.CreateNodeCommands) {
-				Toolbars["Create"].Add(c);
-			}
+			RefreshCreateNodeCommands();
 			CreateToolsToolbar();
 			Document.AttachingViews += doc => {
 				if (doc.Views.Count == 0) {
@@ -211,7 +209,7 @@ namespace Tangerine
 						new UI.Timeline.Timeline(timelinePanel),
 						new UI.SceneView.SceneView(documentViewContainer),
 						new UI.SearchPanel(searchPanel.ContentWidget),
-						new BackupHistoryPanel(backupHistoryPanel.ContentWidget), 
+						new BackupHistoryPanel(backupHistoryPanel.ContentWidget),
 					});
 				}
 			};
@@ -258,6 +256,15 @@ namespace Tangerine
 				var doc = Document.Current;
 				doc.Container.AnimationFrame = doc.Container.AnimationFrame;
 				doc.RootNode.Update(0);
+			}
+		}
+
+		public void RefreshCreateNodeCommands()
+		{
+			var createToolbar = Toolbars["Create"];
+			createToolbar.Clear();
+			foreach (var c in TangerineMenu.CreateNodeCommands) {
+				createToolbar.Add(c);
 			}
 		}
 

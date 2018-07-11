@@ -46,9 +46,11 @@ namespace Lime
 		Other
 	}
 
+	[TangerineRegisterNode(Order = 8)]
 	[AllowedParentTypes(typeof(ParticleEmitter))]
 	public class EmitterShapePoint : PointObject { }
 
+	[TangerineRegisterNode(Order = 6)]
 	[TangerineNodeBuilder("BuildForTangerine")]
 	[AllowedChildrenTypes(typeof(ParticlesMagnet), typeof(ParticleModifier), typeof(EmitterShapePoint))]
 	public partial class ParticleEmitter : Widget

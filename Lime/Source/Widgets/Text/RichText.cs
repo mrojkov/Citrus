@@ -5,6 +5,7 @@ using Yuzu;
 
 namespace Lime
 {
+	[TangerineRegisterNode(Order = 11)]
 	[TangerineNodeBuilder("BuildForTangerine")]
 	[AllowedChildrenTypes(typeof(TextStyle))]
 	public class RichText : Widget, IText
@@ -339,7 +340,7 @@ namespace Lime
 				}
 			}
 		}
-		
+
 		private class ColorfulMaterialProvider : Sprite.IMaterialProvider
 		{
 			public static readonly ColorfulMaterialProvider Instance = new ColorfulMaterialProvider();
@@ -349,7 +350,7 @@ namespace Lime
 			private IMaterial material;
 			private TextRenderer textRenderer;
 			private int paletteIndex;
-			
+
 			public void Init(Blending blending, ShaderId shader, TextRenderer textRenderer)
 			{
 				this.blending = blending;
@@ -357,7 +358,7 @@ namespace Lime
 				this.textRenderer = textRenderer;
 				material = null;
 			}
-			
+
 			public IMaterial GetMaterial(int tag)
 			{
 				var style = textRenderer.Styles[tag];

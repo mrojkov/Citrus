@@ -2,6 +2,7 @@ using Yuzu;
 
 namespace Lime
 {
+	[TangerineRegisterNode(Order = 12)]
 	[AllowedParentTypes(typeof(RichText))]
 	public class TextStyle : Node
 	{

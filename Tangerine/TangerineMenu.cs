@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Lime;
 using Tangerine.Core;
 using Tangerine.UI;
@@ -42,28 +44,42 @@ namespace Tangerine
 
 		public static void RebuildCreateImportedTypeMenu()
 		{
-			var menus = new[] { customNodes.Menu, GenericCommands.NewTanWithCustomRoot.Menu };
+			var menus = new[] { customNodes.Menu, GenericCommands.NewTanWithCustomRoot.Menu, create };
 			foreach (var menu in menus) {
 				foreach (var command in menu) {
 					CommandHandlerList.Global.Disconnect(command);
 				}
 			}
+			CreateNodeCommands.Clear();
 			customNodes.Menu.Clear();
 			GenericCommands.NewTanWithCustomRoot.Menu.Clear();
+			create.Clear();
+			create.Add(customNodes = new Command("Custom Nodes", new Menu()));
 
-			foreach (var t in Orange.PluginLoader.EnumerateTangerineExportedTypes()) {
-				if (!typeof(Node).IsAssignableFrom(t)) {
-					continue;
+			foreach (var type in Project.Current.RegisteredNodeTypes) {
+				var cmd = new Command(type.Name) { Icon = NodeIconPool.GetTexture(type) };
+				CommandHandlerList.Global.Connect(cmd, new CreateNode(type));
+				if (type.Namespace == "Lime") {
+					create.Add(cmd);
+					CreateNodeCommands.Add(cmd);
+				} else {
+					customNodes.Menu.Add(cmd);
 				}
-				var cmd = new Command(t.Name) { Icon = NodeIconPool.GetTexture(t) };
-				CommandHandlerList.Global.Connect(cmd, new CreateNode(t));
-				customNodes.Menu.Add(cmd);
-				var newFileCmd = new Command(t.Name);
-				CommandHandlerList.Global.Connect(newFileCmd, new FileNew(DocumentFormat.Tan, t));
-				GenericCommands.NewTanWithCustomRoot.Menu.Add(newFileCmd);
+				if (IsNodeTypeCanBeRoot(type)) {
+					var newFileCmd = new Command(type.Name);
+					var format = typeof(Node3D).IsAssignableFrom(type) ? DocumentFormat.T3D : DocumentFormat.Tan;
+					CommandHandlerList.Global.Connect(newFileCmd, new FileNew(format, type));
+					GenericCommands.NewTanWithCustomRoot.Menu.Add(newFileCmd);
+				}
 			}
 			customNodes.Enabled = customNodes.Menu.Count > 0;
 			GenericCommands.NewTanWithCustomRoot.Enabled = GenericCommands.NewTanWithCustomRoot.Menu.Count > 0;
+			TangerineApp.Instance?.RefreshCreateNodeCommands();
+		}
+
+		private static bool IsNodeTypeCanBeRoot(Type type)
+		{
+			return type.GetCustomAttributes(false).OfType<TangerineRegisterNodeAttribute>().First().CanBeRoot;
 		}
 
 		private static void CreateMainMenu()
@@ -171,40 +187,7 @@ namespace Tangerine
 				}),
 			};
 			create.Add(customNodes = new Command("Custom Nodes", new Menu()));
-			var nodeTypes = new[] {
-				typeof(Frame),
-				typeof(Button),
-				typeof(Image),
-				typeof(Audio),
-				typeof(Movie),
-				typeof(Bone),
-				typeof(ParticleEmitter),
-				typeof(ParticleModifier),
-				typeof(EmitterShapePoint),
-				typeof(ParticlesMagnet),
-				typeof(SimpleText),
-				typeof(RichText),
-				typeof(TextStyle),
-				typeof(NineGrid),
-				typeof(DistortionMesh),
-				typeof(Spline),
-				typeof(SplinePoint),
-				typeof(SplineGear),
-				typeof(Slider),
-				typeof(ImageCombiner),
-				typeof(Viewport3D),
-				typeof(Camera3D),
-				typeof(Model3D),
-				typeof(Node3D),
-				typeof(WidgetAdapter3D),
-				typeof(Spline3D),
-				typeof(SplinePoint3D),
-				typeof(SplineGear3D),
-				typeof(LightSource),
-				typeof(Polyline),
-				typeof(PolylinePoint),
-			};
-			foreach (var t in nodeTypes) {
+			foreach (var t in Project.GetNodesTypesOrdered("Lime")) {
 				var cmd = new Command(t.Name) { Icon = NodeIconPool.GetTexture(t) };
 				CommandHandlerList.Global.Connect(cmd, new CreateNode(t));
 				create.Add(cmd);

@@ -1,6 +1,7 @@
 
 namespace Lime
 {
+	[TangerineRegisterNode(CanBeRoot = true, Order = 24)]
 	[TangerineNodeBuilder("BuildForTangerine")]
 	public class WidgetAdapter3D : Node3D
 	{

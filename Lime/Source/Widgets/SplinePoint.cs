@@ -2,6 +2,7 @@ using Yuzu;
 
 namespace Lime
 {
+	[TangerineRegisterNode(Order = 16)]
 	[AllowedParentTypes(typeof(Spline))]
 	public class SplinePoint : PointObject
 	{

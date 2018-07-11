@@ -69,6 +69,7 @@ namespace Lime
 		}
 	}
 
+	[TangerineRegisterNode(Order = 5)]
 	public class Bone : Node
 	{
 		[YuzuMember]

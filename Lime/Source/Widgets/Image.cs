@@ -2,6 +2,7 @@ using Yuzu;
 
 namespace Lime
 {
+	[TangerineRegisterNode(Order = 2)]
 	public class Image : Widget, IImageCombinerArg
 	{
 		private bool skipRender;

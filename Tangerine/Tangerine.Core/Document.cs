@@ -142,7 +142,13 @@ namespace Tangerine.Core
 					widget.Size = defaultSceneSize;
 				}
 			}
+			RootNode = RootNodeUnwrapped;
+			SetModificationTimeToNow();
+			if (RootNode is Node3D) {
+				RootNode = WrapNodeWithViewport3D(RootNode);
+			}
 			Decorate(RootNode);
+			Container = RootNode;
 			SetModificationTimeToNow();
 		}
 

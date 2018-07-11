@@ -17,11 +17,12 @@ namespace Lime
 		void OnTrigger(string property, double animationTimeCorrection = 0);
 	}
 
-	public sealed class TangerineExportAttribute : Attribute
-	{ }
-
-	public sealed class TangerineHideInInspectorAttribute : Attribute
-	{ }
+	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+	public sealed class TangerineRegisterNodeAttribute : Attribute
+	{
+		public bool CanBeRoot;
+		public int Order = int.MaxValue;
+	}
 
 	/// <summary>
 	/// Denotes a property which can not be animated within Tangerine.
@@ -1082,7 +1083,6 @@ namespace Lime
 		/// For each root node of deserialized node hierarchy this component will be added and set to path in asset bundle.
 		/// </summary>
 		[NodeComponentDontSerialize]
-		[TangerineHideInInspector]
 		public class AssetBundlePathComponent : NodeComponent
 		{
 			public string Path;

@@ -15,6 +15,7 @@ using MonoMac.OpenGL;
 
 namespace Lime
 {
+	[TangerineRegisterNode(CanBeRoot = true, Order = 20)]
 	[TangerineNodeBuilder("BuildForTangerine")]
 	[AllowedChildrenTypes(typeof(Node3D), typeof(SplineGear3D))]
 	public class Viewport3D : Widget
@@ -24,7 +25,7 @@ namespace Lime
 			float CalcDistanceToCamera(Camera3D camera);
 			bool Opaque { get; }
 		}
-		
+
 		private float frame;
 		private List<RenderItem> opaqueList = new List<RenderItem>();
 		private List<RenderItem> transparentList = new List<RenderItem>();

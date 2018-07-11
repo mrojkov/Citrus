@@ -3,6 +3,7 @@ using Yuzu;
 
 namespace Lime
 {
+	[TangerineRegisterNode(Order = 15)]
 	[AllowedChildrenTypes(typeof(SplinePoint))]
 	public class Spline : Widget
 	{
