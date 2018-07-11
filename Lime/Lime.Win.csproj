@@ -219,9 +219,11 @@
     <Compile Include="Source\Widgets\IRenderChainBuilder.cs" />
     <Compile Include="Source\Widgets\KeyboardFocus.cs" />
     <Compile Include="Source\Widgets\Layout\HBoxLayout.cs" />
+    <Compile Include="Source\Widgets\Layout\HFlowLayout.cs" />
     <Compile Include="Source\Widgets\Layout\LayoutDebugPresenter.cs" />
     <Compile Include="Source\Widgets\Layout\FlowLayout.cs" />
     <Compile Include="Source\Widgets\3D\WidgetAdapter3D.cs" />
+    <Compile Include="Source\Widgets\Layout\VFlowLayout.cs" />
     <Compile Include="Source\Widgets\MorphableMesh.cs" />
     <Compile Include="Source\Widgets\MorphableMeshBuilder.cs" />
     <Compile Include="Source\Widgets\NodeReference.cs" />

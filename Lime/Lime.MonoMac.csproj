@@ -321,6 +321,8 @@
     <Compile Include="Source\Graphics\OpenGL\GLExtensions.cs" />
     <Compile Include="Source\Graphics\OpenGL\ShaderParams.cs" />
     <Compile Include="Source\Application\WindowInput.cs" />
+    <Compile Include="Source\Widgets\Layout\HFlowLayout.cs" />
+    <Compile Include="Source\Widgets\Layout\VFlowLayout.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

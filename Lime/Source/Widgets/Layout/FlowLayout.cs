@@ -6,33 +6,53 @@ namespace Lime
 {
 	public class FlowLayout : CommonLayout, ILayout
 	{
+		public enum FlowDirection
+		{
+			LeftToRight,
+			TopToBottom,
+		}
 		private readonly List<int> splitIndices = new List<int>();
 		public float Spacing { get; set; }
 		// TODO: implement for any alignment other than justify or left
 		public HAlignment RowAlignment { get; set; }
 		public VAlignment ColumnAlignment { get; set; }
-		public int direction = 0;
-
-		public FlowLayout()
+		private FlowDirection direction;
+		public FlowDirection Direction
 		{
+			get { return direction; }
+			set
+			{
+				direction = value;
+				ArrangementValid = false;
+				ConstraintsValid = false;
+			}
+		}
+
+		public FlowLayout(FlowDirection direction = FlowDirection.LeftToRight)
+		{
+			this.direction = direction;
 			DebugRectangles = new List<Rectangle>();
 		}
 
 		public int RowCount(int columnIndex)
 		{
-			if (direction == 0) {
+			if (Direction == FlowDirection.LeftToRight) {
 				return splitIndices.Count - 1;
-			} else {
+			} else if (Direction == FlowDirection.TopToBottom) {
 				return splitIndices[columnIndex + 1] - splitIndices[columnIndex];
+			} else {
+				throw new Lime.Exception($"Invalid FlowDirection: {Direction}");
 			}
 		}
 
 		public int ColumnCount(int rowIndex)
 		{
-			if (direction == 0) {
+			if (Direction == FlowDirection.LeftToRight) {
 				return splitIndices[rowIndex + 1] - splitIndices[rowIndex];
-			} else {
+			} else if (Direction == FlowDirection.TopToBottom) {
 				return splitIndices.Count - 1;
+			} else {
+				throw new Lime.Exception($"Invalid FlowDirection: {Direction}");
 			}
 		}
 
@@ -43,7 +63,7 @@ namespace Lime
 
 		public override void ArrangeChildren(Widget widget)
 		{
-			if (direction == 0) {
+			if (Direction == FlowDirection.LeftToRight) {
 				ArrangementValid = true;
 				var widgets = GetChildren(widget);
 				if (widgets.Count == 0) {
@@ -100,7 +120,7 @@ namespace Lime
 					}
 					dy += maxLineHeight + Spacing;
 				}
-			} else {
+			} else if (Direction == FlowDirection.TopToBottom) {
 				ArrangementValid = true;
 				var widgets = GetChildren(widget);
 				if (widgets.Count == 0) {
@@ -157,12 +177,14 @@ namespace Lime
 					}
 					dx += maxLineWidth + Spacing;
 				}
+			} else {
+				throw new Lime.Exception($"Invalid FlowDirection: {Direction}");
 			}
 		}
 
 		public override void MeasureSizeConstraints(Widget widget)
 		{
-			if (direction == 0) {
+			if (Direction == FlowDirection.LeftToRight) {
 				ConstraintsValid = true;
 				var widgets = GetChildren(widget);
 				float paddingH = widget.Padding.Left + widget.Padding.Right;
@@ -200,7 +222,7 @@ namespace Lime
 				}
 				widget.MeasuredMinSize = new Vector2(minWidth, dy);
 				widget.MeasuredMaxSize = new Vector2(float.PositiveInfinity, dy);
-			} else {
+			} else if (Direction == FlowDirection.TopToBottom) {
 				ConstraintsValid = true;
 				var widgets = GetChildren(widget);
 				float paddingV = widget.Padding.Top + widget.Padding.Bottom;
@@ -238,6 +260,8 @@ namespace Lime
 				}
 				widget.MeasuredMinSize = new Vector2(dx, minHeight);
 				widget.MeasuredMaxSize = new Vector2(dx, float.PositiveInfinity);
+			} else {
+				throw new Lime.Exception($"Invalid FlowDirection: {Direction}");
 			}
 		}
 	}
