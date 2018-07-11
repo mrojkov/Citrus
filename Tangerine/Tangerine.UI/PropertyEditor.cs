@@ -190,7 +190,9 @@ namespace Tangerine.UI
 		protected virtual void Copy()
 		{
 			var v = CoalescedPropertyValue().GetValue();
-			Clipboard.Text = Serialize(v);
+			try {
+				Clipboard.Text = Serialize(v);
+			} catch (System.Exception) { }
 		}
 
 		protected virtual void Paste()
