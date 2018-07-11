@@ -718,12 +718,7 @@ namespace Yuzu.Json
 			writer.Write((byte)']');
 		}
 
-		protected override void ToWriter(object obj)
-		{
-			if (obj != null) {
-				GetWriteFunc(obj.GetType())(obj);
-			}
-		}
+		protected override void ToWriter(object obj) => GetWriteFunc(obj.GetType())(obj);
 	}
 
 }
