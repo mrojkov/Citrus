@@ -272,7 +272,9 @@ namespace Tangerine.UI.Docking
 					(closeButton = new ThemedTabCloseButton { LayoutCell = new LayoutCell(Alignment.Center) })
 				},
 					HitTestTarget = true
+
 				};
+				titleWidget.Padding.Right += 5; // Add space between close button and titleWidget right border.
 				titleLabel.AddChangeWatcher(() => panel.Title, text => titleLabel.Text = text);
 				titleWidget.CompoundPresenter.Add(new DelegatePresenter<Widget>(w => {
 					w.PrepareRendererState();

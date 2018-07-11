@@ -44,6 +44,8 @@ namespace Lime
 			public Color4 CloseButtonNormal;
 			public Color4 CloseButtonHovered;
 			public Color4 CloseButtonPressed;
+			public Color4 CloseButtonFocusBorderNormal;
+			public Color4 CloseButtonFocusBorderHovered;
 			public Color4 ScrollbarBackground;
 			public Color4 ScrollbarThumb;
 			public Color4 TextCaret;
@@ -80,6 +82,8 @@ namespace Lime
 					CloseButtonNormal = grayBackground.Lighten(0.6f),
 					CloseButtonHovered = grayBackground.Lighten(0.8f),
 					CloseButtonPressed = grayBackground.Lighten(1),
+					CloseButtonFocusBorderNormal = Color4.Transparent,
+					CloseButtonFocusBorderHovered = Color4.Red.Lighten(0.6f),
 					ScrollbarBackground = new Color4(51, 51, 51),
 					ScrollbarThumb = new Color4(107, 107, 107),
 					TextCaret = new Color4(204, 204, 204),
@@ -117,6 +121,8 @@ namespace Lime
 					CloseButtonNormal = grayBackground.Darken(0.6f),
 					CloseButtonHovered = grayBackground.Darken(0.8f),
 					CloseButtonPressed = grayBackground.Darken(1),
+					CloseButtonFocusBorderNormal = Color4.Transparent,
+					CloseButtonFocusBorderHovered = Color4.Red.Lighten(0.6f),
 					ScrollbarBackground = new Color4(210, 210, 210),
 					ScrollbarThumb = new Color4(120, 120, 120),
 					TextCaret = Color4.Black,

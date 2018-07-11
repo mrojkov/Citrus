@@ -20,6 +20,7 @@ namespace Lime
 		public ThemedTab()
 		{
 			Padding = Theme.Metrics.ControlsPadding;
+			Padding.Right += 5; // Add space between close button and tab right border.
 			MinSize = Theme.Metrics.MinTabSize;
 			MaxSize = Theme.Metrics.MaxTabSize;
 			Size = MinSize;
@@ -115,6 +116,8 @@ namespace Lime
 
 	public class ThemedTabCloseButton : Button
 	{
+		private WidgetFlatFillPresenter fill;
+
 		public override bool IsNotDecorated() => false;
 
 		public ThemedTabCloseButton()
@@ -123,8 +126,8 @@ namespace Lime
 				new VectorShape.Line(0.3f, 0.3f, 0.7f, 0.7f, Color4.White, 0.075f * 1.5f),
 				new VectorShape.Line(0.3f, 0.7f, 0.7f, 0.3f, Color4.White, 0.0751f * 1.5f),
 			});
+			fill = new WidgetFlatFillPresenter(Theme.Colors.CloseButtonFocusBorderNormal);
 			LayoutCell = new LayoutCell(Alignment.Center, stretchX: 0);
-			Presenter = presenter;
 			MinMaxSize = Theme.Metrics.CloseButtonSize;
 			DefaultAnimation.AnimationEngine = new AnimationEngineDelegate {
 				OnRunAnimation = (animation, markerId, animationTimeCorrection) => {
@@ -132,8 +135,19 @@ namespace Lime
 					return true;
 				}
 			};
+			CompoundPresenter.Add(presenter);
+			CompoundPresenter.Add(fill);
 		}
 
+		public override void Update(float delta)
+		{
+			base.Update(delta);
+			if (IsMouseOver()) {
+				fill.Color = Theme.Colors.CloseButtonFocusBorderHovered;
+			} else {
+				fill.Color = Theme.Colors.CloseButtonFocusBorderNormal;
+			}
+		}
 	}
 }
 
