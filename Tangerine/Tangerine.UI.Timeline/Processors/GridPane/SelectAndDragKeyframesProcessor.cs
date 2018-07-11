@@ -81,6 +81,7 @@ namespace Tangerine.UI.Timeline
 			while (input.IsMousePressed()) {
 				time += Lime.Task.Current.Delta;
 				offset = grid.CellUnderMouse() - initialCell;
+				timeline.Ruler.MeasuredFrameDistance = timeline.CurrentColumn - initialCell.X;
 
 				if (!input.IsKeyPressed(Key.Shift)) {
 					offset.Y = 0;
@@ -103,6 +104,7 @@ namespace Tangerine.UI.Timeline
 			Window.Current.Invalidate();
 			if (offset != IntVector2.Zero) {
 				timeline.Globals.Add(new DragKeyframesRequest(offset, !input.IsKeyPressed(Key.Alt)));
+				timeline.Ruler.MeasuredFrameDistance = 0;
 			}
 		}
 
