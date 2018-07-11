@@ -69,7 +69,7 @@ namespace Tangerine.UI.SceneView
 			slider.Updating += delta => {
 				int index = FindNearest(sv.Scene.Scale.X, 0, zoomTable.Count);
 				slider.Value = index;
-				zoomLabel.Text = String.Format("{0:P1}", zoomTable[index]);
+				zoomLabel.Text = (zoomTable[index] * 100f).ToString() + "%";
 			};
 			slider.Changed += () => Zoom();
 			AddNode(new Widget { LayoutCell = new LayoutCell(Alignment.LeftCenter, 1) });
