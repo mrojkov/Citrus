@@ -5,6 +5,7 @@ using Yuzu;
 
 namespace Lime
 {
+	[TangerineNodeBuilder("BuildForTangerine")]
 	[AllowedChildrenTypes(typeof(Node))]
 	public class Button : Widget
 	{
@@ -195,6 +196,16 @@ namespace Lime
 				}
 			}
 #endif
+		}
+
+		private void BuildForTangerine()
+		{
+			int[] markerFrames = { 0, 10, 20, 30, 40};
+			string[] makerIds = { "Normal", "Focus", "Press", "Release", "Disable" };
+			for (var i = 0; i < 5; i++) {
+
+				Markers.Add(new Marker(makerIds[i], markerFrames[i], MarkerAction.Stop));
+			}
 		}
 	}
 
