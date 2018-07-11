@@ -64,6 +64,7 @@
     <Compile Include="Presenters\InspectRootNodePresenter.cs" />
     <Compile Include="Processors\ResolutionPreviewProcessor.cs" />
     <Compile Include="ResolutionHandlers.cs" />
+    <Compile Include="Widgets\ZoomWidget.cs" />
     <Compile Include="WidgetTransforms\WidgetTransformsHelper.cs" />
     <Compile Include="WidgetTransforms\Mathd.cs" />
     <Compile Include="WidgetTransforms\Matrix32d.cs" />

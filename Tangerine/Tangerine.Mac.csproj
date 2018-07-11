@@ -158,6 +158,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Resources\Icons\Light\SceneView\ZoomIn.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\SceneView\ZoomOut.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\SceneView\ZoomIn.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\SceneView\ZoomOut.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Tools\Revert.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Tools\Revert.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Tools\Redo.png" />
@@ -400,6 +404,6 @@
     </NativeReference>
   </ItemGroup>  
   <ItemGroup>
-  <Content Include="Documentation\**" />
+    <Content Include="Documentation\**" />
   </ItemGroup>
 </Project>
