@@ -16,21 +16,11 @@ namespace Lime
 		// TODO: implement for any alignment other than justify or left
 		public HAlignment RowAlignment { get; set; }
 		public VAlignment ColumnAlignment { get; set; }
-		private FlowDirection direction;
-		public FlowDirection Direction
-		{
-			get { return direction; }
-			set
-			{
-				direction = value;
-				ArrangementValid = false;
-				ConstraintsValid = false;
-			}
-		}
+		protected readonly FlowDirection Direction;
 
 		public FlowLayout(FlowDirection direction = FlowDirection.LeftToRight)
 		{
-			this.direction = direction;
+			Direction = direction;
 			DebugRectangles = new List<Rectangle>();
 		}
 
