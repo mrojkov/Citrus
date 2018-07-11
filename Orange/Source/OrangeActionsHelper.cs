@@ -98,6 +98,12 @@ namespace Orange.Source
 		{
 			try {
 				return action();
+			} catch (MSBuildNotFound e) {
+				bool dialogResult = The.UI.AskConfirmation("You need to download and install MSBuild 15.0. Download?");
+				if (dialogResult) {
+					System.Diagnostics.Process.Start(e.DownloadUrl);
+				}
+				return e.ToString();
 			} catch (Exception ex) {
 				return ex.ToString();
 			}
