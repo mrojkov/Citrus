@@ -495,7 +495,6 @@ namespace Tangerine
 
 		private void InitDocumentation()
 		{
-			WidgetContext.Current.GestureManager = new HelpModeGestureManager(WidgetContext.Current);
 			DocumentationComponent.Clicked = page => OpenHelp(page);
 			Directory.CreateDirectory(HelpPage.HtmlDocumentationPath);
 			Directory.CreateDirectory(HelpPage.MarkdownDocumentationPath);
@@ -506,13 +505,6 @@ namespace Tangerine
 			string errorPagePath = Path.Combine(HelpPage.MarkdownDocumentationPath, HelpPage.ErrorPageName);
 			if (!File.Exists(errorPagePath)) {
 				File.WriteAllText(errorPagePath, "# This is error page #");
-			}
-			foreach (var panel in DockHierarchy.Instance.Panels) {
-				WidgetExtensions.AddChangeLateWatcher(panel.ContentWidget, () => WidgetContext.Current, context => {
-					if (!(context.GestureManager is HelpModeGestureManager)) {
-						context.GestureManager = new HelpModeGestureManager(context);
-					}
-				});
 			}
 		}
 

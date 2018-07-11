@@ -14,14 +14,15 @@ namespace Lime
 		protected readonly RenderChain renderChain;
 
 		public IWindow Window { get; private set; }
+		public WidgetContext WidgetContext { get; private set; }
 
 		public WindowWidget(IWindow window)
 		{
-			var widgetContext = new WidgetContext(this);
+			WidgetContext = new WidgetContext(this);
 			Window = window;
-			Window.Context = new CombinedContext(Window.Context, widgetContext);
+			Window.Context = new CombinedContext(Window.Context, WidgetContext);
 			renderChain = new RenderChain();
-			widgetContext.GestureManager = new GestureManager(widgetContext);
+			WidgetContext.GestureManager = new GestureManager(WidgetContext);
 			window.Activated += () => windowActivated = true;
 			LayoutManager = new LayoutManager();
 		}

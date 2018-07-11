@@ -44,6 +44,7 @@ namespace Tangerine.UI.Docking
 				Size = windowSize,
 				RedrawMarkVisible = true
 			};
+			MainWindowWidget.WidgetContext.GestureManager = new HelpModeGestureManager(MainWindowWidget.WidgetContext);
 			ToolbarArea = new Frame {
 				Id = "Toolbar",
 				ClipChildren = ClipMethod.ScissorTest,
@@ -391,6 +392,7 @@ namespace Tangerine.UI.Docking
 			var windowWidget = new ThemedInvalidableWindowWidget(window) {
 				Layout = new StackLayout(),
 			};
+			windowWidget.WidgetContext.GestureManager = new HelpModeGestureManager(windowWidget.WidgetContext);
 			windowWidget.Components.Add(new RequestedDockingComponent());
 			windowWidget.CompoundPostPresenter.Add(new DockingPresenter());
 			windowWidget.AddChangeWatcher(() => windowWidget.Window.State, value => placement.State = value);
