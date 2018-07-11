@@ -128,7 +128,7 @@ namespace Lime
 				new VectorShape.Line(0.3f, 0.7f, 0.7f, 0.3f, Color4.White, 0.0751f * 1.5f),
 			});
 			fill = new WidgetFlatFillPresenter(Theme.Colors.CloseButtonFocusBorderNormal);
-			outlineRect = new WidgetBoundsPresenter(Theme.Colors.CloseButtonOutlineRect);
+			outlineRect = new WidgetBoundsPresenter(Theme.Colors.CloseButtonOutlineRectNormal);
 			LayoutCell = new LayoutCell(Alignment.Center, stretchX: 0);
 			MinMaxSize = Theme.Metrics.CloseButtonSize;
 			DefaultAnimation.AnimationEngine = new AnimationEngineDelegate {
@@ -147,8 +147,10 @@ namespace Lime
 			base.Update(delta);
 			if (IsMouseOver()) {
 				fill.Color = Theme.Colors.CloseButtonFocusBorderHovered;
+				outlineRect.Color = Theme.Colors.CloseButtonOutlineRectHovered;
 			} else {
 				fill.Color = Theme.Colors.CloseButtonFocusBorderNormal;
+				outlineRect.Color = Theme.Colors.CloseButtonOutlineRectNormal;
 			}
 		}
 	}
