@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Lime
@@ -133,6 +133,7 @@ namespace Lime
 	{
 		public Color4 Color { get; set; }
 		public float Thickness { get; set; }
+		public bool IgnorePadding { get; set; }
 
 		public WidgetBoundsPresenter(Color4 color, float thickness = 1)
 		{
@@ -143,7 +144,11 @@ namespace Lime
 		protected override void InternalRender(Widget widget)
 		{
 			widget.PrepareRendererState();
-			Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Color * widget.GlobalColor, Thickness);
+			if (IgnorePadding) {
+				Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Color * widget.GlobalColor, Thickness);
+			} else {
+				Renderer.DrawRectOutline(widget.ContentPosition, widget.ContentSize, Color * widget.GlobalColor, Thickness);
+			}
 		}
 	}
 

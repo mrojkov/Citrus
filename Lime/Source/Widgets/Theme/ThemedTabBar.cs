@@ -20,6 +20,7 @@ namespace Lime
 		public ThemedTab()
 		{
 			Padding = Theme.Metrics.ControlsPadding;
+			Padding.Right += 5; // Add space between close button and tab right border.
 			MinSize = Theme.Metrics.MinTabSize;
 			MaxSize = Theme.Metrics.MaxTabSize;
 			Size = MinSize;
@@ -123,15 +124,12 @@ namespace Lime
 		public ThemedTabCloseButton()
 		{
 			var presenter = new VectorShapeButtonPresenter(new VectorShape {
-				new VectorShape.Line(0.1f, 0.3f, 0.5f, 0.7f, Color4.White, 0.075f * 1.5f),
-				new VectorShape.Line(0.1f, 0.7f, 0.5f, 0.3f, Color4.White, 0.0751f * 1.5f),
+				new VectorShape.Line(0.3f, 0.3f, 0.7f, 0.7f, Color4.White, 0.075f * 1.5f),
+				new VectorShape.Line(0.3f, 0.7f, 0.7f, 0.3f, Color4.White, 0.0751f * 1.5f),
 			});
-
 			fill = new WidgetFlatFillPresenter(Theme.Colors.CloseButtonFocusBorderNormal);
-			
 			outlineRect = new WidgetBoundsPresenter(Theme.Colors.CloseButtonOutlineRect);
-
-			LayoutCell = new LayoutCell(Alignment.Center, stretchX: 10);
+			LayoutCell = new LayoutCell(Alignment.Center, stretchX: 0);
 			MinMaxSize = Theme.Metrics.CloseButtonSize;
 			DefaultAnimation.AnimationEngine = new AnimationEngineDelegate {
 				OnRunAnimation = (animation, markerId, animationTimeCorrection) => {
