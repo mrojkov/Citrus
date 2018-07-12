@@ -724,6 +724,15 @@ namespace Tangerine.UI
 		}
 
 		protected abstract void AssignAsset(string path);
+
+		protected virtual bool IsValid(string path)
+		{
+			var invalidChars = Path.GetInvalidPathChars();
+			if (path.Any(i => invalidChars.Contains(i))) {
+				return false;
+			}
+			return true;
+		}
 	}
 
 	public class TexturePropertyEditor : FilePropertyEditor<ITexture>
@@ -735,7 +744,13 @@ namespace Tangerine.UI
 
 		protected override void AssignAsset(string path)
 		{
-			SetProperty(new SerializableTexture(path));
+			if (IsValid(path)) {
+				SetProperty(new SerializableTexture(path));
+			}
+			else {
+				editor.Text = CoalescedPropertyValue().GetValue().SerializationPath;
+				new AlertDialog($"{EditorParams.PropertyName}: Value is not valid", "Ok").Show();
+			}
 		}
 	}
 
@@ -777,10 +792,13 @@ namespace Tangerine.UI
 			editor.AddChangeWatcher(CoalescedPropertyValue(), v => editor.Text = v);
 		}
 
-		protected bool IsValid(string path)
+		protected override bool IsValid(string path)
 		{
-			var resolvedPath = Node.ResolveScenePath(path);
-			return (resolvedPath != null) ? AssetBundle.Current.FileExists(resolvedPath) : false;
+			if (base.IsValid(path) == true) {
+				var resolvedPath = Node.ResolveScenePath(path);
+				return (resolvedPath != null) ? AssetBundle.Current.FileExists(resolvedPath) : false;
+			}
+			return false;
 		}
 
 		protected override void AssignAsset(string path)
