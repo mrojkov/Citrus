@@ -54,6 +54,17 @@ namespace Tangerine.UI.Timeline
 		{
 			while (true) {
 				if (RootWidget.Input.WasMouseReleased(1)) {
+					var cell = CellUnderMouse();
+					var row = Document.Current.Rows[cell.Y];
+					var spans = row.Components.Get<Components.GridSpanListComponent>()?.Spans;
+					if (!row.Selected || !spans.Any(i => i.Contains(cell.X))) {
+						Document.Current.History.DoTransaction(() => {
+							Core.Operations.ClearRowSelection.Perform();
+							Operations.ClearGridSelection.Perform();
+							Core.Operations.SelectRow.Perform(row);
+							Operations.SelectGridSpan.Perform(cell.Y, cell.X, cell.X + 1);
+						});
+					}
 					new Menu {
 						TimelineCommands.CutKeyframes,
 						TimelineCommands.CopyKeyframes,
