@@ -777,10 +777,21 @@ namespace Tangerine.UI
 			editor.AddChangeWatcher(CoalescedPropertyValue(), v => editor.Text = v);
 		}
 
+		protected bool IsValid(string path)
+		{
+			var resolvedPath = Node.ResolveScenePath(path);
+			return (resolvedPath != null) ? AssetBundle.Current.FileExists(resolvedPath) : false;
+		}
+
 		protected override void AssignAsset(string path)
 		{
-			SetProperty(path);
-			Document.Current.RefreshExternalScenes();
+			if (IsValid(path)) {
+				SetProperty(path);
+				Document.Current.RefreshExternalScenes();
+			} else {
+				editor.Text = CoalescedPropertyValue().GetValue();
+				new AlertDialog($"{EditorParams.PropertyName}: Value is not valid", "Ok").Show();
+			}
 		}
 	}
 
