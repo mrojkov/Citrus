@@ -27,6 +27,8 @@ namespace Tangerine.UI
 		public static readonly ICommand CutKeyframes = new Command("Cut keyframes", new Shortcut(Modifiers.Alt | Modifiers.Control, Key.X));
 		public static readonly ICommand CopyKeyframes = new Command("Copy keyframes", new Shortcut(Modifiers.Alt | Modifiers.Control, Key.C));
 		public static readonly ICommand PasteKeyframes = new Command("Paste keyframes", new Shortcut(Modifiers.Alt | Modifiers.Control, Key.V));
+		public static readonly ICommand MoveDown = new Command("Move down", new Shortcut(Modifiers.Control, Key.LBracket));
+		public static readonly ICommand MoveUp = new Command("Move up", new Shortcut(Modifiers.Control, Key.RBracket));
 	}
 
 	public static class InspectorCommands
