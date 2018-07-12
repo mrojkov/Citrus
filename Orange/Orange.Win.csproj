@@ -113,6 +113,7 @@
     <Compile Include="Source\Actions\RevealCookedAssets.cs" />
     <Compile Include="Source\Actions\BuildGameAndRun.cs" />
     <Compile Include="Source\Actions\RunTangerine.cs" />
+    <Compile Include="Source\Actions\SynchronizeDocumentation.cs" />
     <Compile Include="Source\Actions\UpdateDictionaryTxt.cs" />
     <Compile Include="Source\Actions\UpdateXCodeProject.cs" />
     <Compile Include="Source\AssetCooker\CodeCooker.cs" />

@@ -20,7 +20,7 @@ namespace Tangerine.UI
 		{
 			PageName = pageName;
 			helpGesture = new HelpGesture(() => {
-				if (HelpModeGestureManager.IsHelpModeOn) {
+				if (Documentation.IsHelpModeOn) {
 					OpenDocumentation();
 				}
 			});
@@ -33,9 +33,10 @@ namespace Tangerine.UI
 				page = new HelpPage(PageName);
 			}
 			catch (System.Exception) {
-				page = new HelpPage(HelpPage.ErrorPageName);
+				page = Documentation.ErrorPage;
 			}
 			Clicked?.Invoke(page);
+			Documentation.IsHelpModeOn = !Documentation.IsHelpModeOn;
 		}
 
 		protected override void OnOwnerChanged(Node oldOwner)

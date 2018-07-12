@@ -8,8 +8,6 @@ namespace Tangerine.UI
 {
 	public class HelpModeGestureManager : GestureManager
 	{
-		public static bool IsHelpModeOn { get; set; } = false;
-
 		private static readonly Task helpModeTask = new Task(HelpModeTask());
 
 		public HelpModeGestureManager(WidgetContext context) : base(context)
@@ -24,12 +22,13 @@ namespace Tangerine.UI
 
 		protected override IEnumerable<Gesture> EnumerateGestures(Node node)
 		{
+			bool helpModeOn = Documentation.IsHelpModeOn;
 			var noClickGesturesAnymore = false;
 			while (node != null) {
 				if (node.HasGestures()) {
 					var anyClickGesture = false;
 					foreach (var r in node.Gestures) {
-						if ((!IsHelpModeOn && (r is HelpGesture)) || (IsHelpModeOn && !(r is HelpGesture))) {
+						if ((!helpModeOn && (r is HelpGesture)) || (helpModeOn && !(r is HelpGesture))) {
 							continue;
 						}
 						bool isWrongGesture = r is ClickGesture || r is DoubleClickGesture;
@@ -49,7 +48,7 @@ namespace Tangerine.UI
 		{
 			while (true) {
 				var manager = WidgetContext.Current.GestureManager as HelpModeGestureManager;
-				if (manager != null && IsHelpModeOn) {
+				if (manager != null && Documentation.IsHelpModeOn) {
 					var node = WidgetContext.Current.NodeUnderMouse;
 					WidgetContext.Current.MouseCursor = Cursors.DisabledHelp;
 					while (node != null) {
