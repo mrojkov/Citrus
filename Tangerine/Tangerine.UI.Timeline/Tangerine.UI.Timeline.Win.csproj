@@ -59,6 +59,7 @@
     <Compile Include="CurveEditorPane.cs" />
     <Compile Include="Operations\ClearGridSelection.cs" />
     <Compile Include="Operations\ColumnCountUpdater.cs" />
+    <Compile Include="Operations\CopyPasteKeyframe.cs" />
     <Compile Include="Operations\EnsureCurrentColumnVisibleIfContainerChanged.cs" />
     <Compile Include="Operations\EnsureRowVisibleIfSelected.cs" />
     <Compile Include="Operations\GridWidgetsUpdater.cs" />

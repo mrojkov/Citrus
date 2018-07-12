@@ -86,6 +86,7 @@
     <Compile Include="Components\RollBoneView.cs" />
     <Compile Include="Operations\SelectGridSpan.cs" />
     <Compile Include="Operations\ColumnCountUpdater.cs" />
+    <Compile Include="Operations\CopyPasteKeyframe.cs" />
     <Compile Include="Operations\GridWidgetsUpdater.cs" />
     <Compile Include="Operations\OverviewWidgetsUpdater.cs" />
     <Compile Include="Operations\RollWidgetsUpdater.cs" />
