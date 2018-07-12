@@ -115,7 +115,7 @@ namespace Tangerine.UI.Timeline.Operations
 				foreach (var key in keys) {
 					int rowIndex = startRow + key.Row;
 					int colIndex = startCol + key.Frame;
-					if (rowIndex >= Document.Current.Rows.Count) {
+					if (rowIndex >= Document.Current.Rows.Count || colIndex < 0) {
 						continue;
 					}
 					var animable = Document.Current.Rows[rowIndex].Components.Get<NodeRow>()?.Node as IAnimable;
@@ -147,7 +147,7 @@ namespace Tangerine.UI.Timeline.Operations
 					if (animable == null) {
 						continue;
 					}
-					foreach (var animator in animable.Animators) {
+					foreach (var animator in animable.Animators.ToList()) {
 						foreach (var keyframe in animator.Keys.Where(i => spans.Any(j => j.Contains(i.Frame))).ToList()) {
 							RemoveKeyframe.Perform(animator, keyframe.Frame);
 						}
