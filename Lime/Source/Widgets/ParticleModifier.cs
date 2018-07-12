@@ -41,7 +41,7 @@ namespace Lime
 		public float MagnetAmount { get; set; }
 
 		[YuzuMember]
-		[TangerineKeyframeColor(26)]
+		[TangerineKeyframeColor(9)]
 		public Color4 Color { get; set; }
 
 		[YuzuMember]
