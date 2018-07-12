@@ -37,7 +37,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		[TangerineKeyframeColor(8)]
+		[TangerineKeyframeColor(19)]
 		public bool Visible
 		{
 			get { return visible; }
@@ -63,7 +63,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		[TangerineKeyframeColor(3)]
+		[TangerineKeyframeColor(4)]
 		public Quaternion Rotation
 		{
 			get { return rotation; }
@@ -87,7 +87,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		[TangerineKeyframeColor(19)]
+		[TangerineKeyframeColor(9)]
 		public Color4 Color
 		{
 			get { return color; }

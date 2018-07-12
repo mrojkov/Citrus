@@ -77,7 +77,7 @@ namespace Lime
 		public Vector2 Position { get; set; }
 
 		[YuzuMember]
-		[TangerineKeyframeColor(16)]
+		[TangerineKeyframeColor(2)]
 		public float Rotation { get; set; }
 
 		[YuzuMember]

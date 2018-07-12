@@ -274,7 +274,7 @@ namespace Lime
 		/// Counter-clockwise rotation of this widget.
 		/// </summary>
 		[YuzuMember]
-		[TangerineKeyframeColor(20)]
+		[TangerineKeyframeColor(3)]
 		public float Rotation {
 			get { return rotation; }
 			set
@@ -420,7 +420,7 @@ namespace Lime
 		/// Hue of this widget. Contents color will be multiplied by it on render.
 		/// </summary>
 		[YuzuMember]
-		[TangerineKeyframeColor(23)]
+		[TangerineKeyframeColor(9)]
 		[YuzuSerializeIf(nameof(IsNotDecorated))]
 		public Color4 Color
 		{
@@ -483,7 +483,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		[TangerineKeyframeColor(26)]
+		[TangerineKeyframeColor(19)]
 		public bool Visible
 		{
 			get { return visible; }
