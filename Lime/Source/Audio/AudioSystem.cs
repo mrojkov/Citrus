@@ -2,8 +2,8 @@ namespace Lime
 {
 	public static class AudioSystem
 	{
-		static readonly float[] groupVolumes = new float[3] {1, 1, 1};
-
+		static readonly float[] groupVolumes = { 1, 1, 1 };
+	
 		public static void Initialize(ApplicationOptions options)
 		{
 			PlatformAudioSystem.Initialize(options);
@@ -54,11 +54,6 @@ namespace Lime
 			PlatformAudioSystem.ResumeAll();
 		}
 
-		public static void BumpAll()
-		{
-			PlatformAudioSystem.BumpAll();
-		}
-		
 		public static void StopAll()
 		{
 			PlatformAudioSystem.StopAll();

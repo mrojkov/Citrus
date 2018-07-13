@@ -265,13 +265,6 @@ namespace Lime
 			}
 		}
 
-		public static void BumpAll()
-		{
-			foreach (var channel in channels) {
-				channel.Bump();
-			}
-		}
-
 		public static void StopAll()
 		{
 			foreach (var channel in channels) {

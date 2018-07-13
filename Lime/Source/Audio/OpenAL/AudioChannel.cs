@@ -31,7 +31,6 @@ namespace Lime
 		private bool looping;
 		private float fadeVolume;
 		private float fadeSpeed;
-		private volatile int updatesSinceLastBump;
 		private List<int> allBuffers;
 		private Stack<int> processedBuffers;
 
@@ -182,7 +181,6 @@ namespace Lime
 			if (!AudioSystem.Active) {
 				return;
 			}
-			Bump();
 			if (decoder == null) {
 				throw new InvalidOperationException("Audio decoder is not set");
 			}
@@ -256,11 +254,6 @@ namespace Lime
 			}
 		}
 
-		public void Bump()
-		{
-			updatesSinceLastBump = 0;
-		}
-
 		public void Update(float delta)
 		{
 			if (!AudioSystem.Active) {
@@ -284,10 +277,9 @@ namespace Lime
 					Stop();
 				}
 				Volume = volume;
-			} else if (streaming && Sound != null && Sound.IsBumpable && updatesSinceLastBump > 3) {
+			} else if (streaming && (Sound?.StopChecker() ?? false)) {
 				Stop(0.1f);
 			}
-			updatesSinceLastBump++;
 		}
 
 		void QueueBuffers()

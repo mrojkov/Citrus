@@ -628,7 +628,7 @@ namespace Orange
 			case "Flags":
 				var flags = lexer.ParseInt();
 				audio.Looping = (flags & 4) != 0;
-				audio.Bumpable = (flags & 1) == 0;
+				audio.Continuous = (flags & 1) != 0;
 				break;
 			case "Action":
 				lexer.ParseInt();
