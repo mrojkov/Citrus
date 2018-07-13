@@ -82,81 +82,16 @@ namespace Tangerine.UI.SceneView
 
 		private static void TieWidgetsWithBones()
 		{
-			var bones = Document.Current.SelectedNodes().Editable().OfType<Bone>().ToList();
-			var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>().ToList();
-			if (widgets.Count == 0) {
-				return;
-			}
-			foreach (var widget in widgets) {
-				if (widget is DistortionMesh) {
-					var mesh = widget as DistortionMesh;
-					foreach (PointObject point in mesh.Nodes) {
-						SetAnimableProperty.Perform(point, nameof(PointObject.SkinningWeights),
-							CalcSkinningWeight(point.CalcPositionInSpaceOf(widget.ParentWidget), bones), CoreUserPreferences.Instance.AutoKeyframes);
-					}
-				} else {
-					SetAnimableProperty.Perform(widget, nameof(PointObject.SkinningWeights),
-						CalcSkinningWeight(widget.Position, bones), CoreUserPreferences.Instance.AutoKeyframes);
-				}
-			}
-			foreach (var bone in bones) {
-				var entry = bone.Parent.AsWidget.BoneArray[bone.Index];
-				SetAnimableProperty.Perform(bone, nameof(Bone.RefPosition), entry.Joint, CoreUserPreferences.Instance.AutoKeyframes);
-				SetAnimableProperty.Perform(bone, nameof(Bone.RefLength), entry.Length, CoreUserPreferences.Instance.AutoKeyframes);
-				SetAnimableProperty.Perform(bone, nameof(Bone.RefRotation), entry.Rotation, CoreUserPreferences.Instance.AutoKeyframes);
-			}
+			var bones = Document.Current.SelectedNodes().Editable().OfType<Bone>();
+			var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>();
+			Core.Operations.TieWidgetsWithBones.Perform(bones, widgets);
 		}
 
 		private static void UntieWidgetsFromBones()
 		{
-			var bones = Document.Current.SelectedNodes().Editable().OfType<Bone>().ToList();
-			var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>().ToList();
-			if (widgets.Count == 0) {
-				return;
-			}
-			foreach (var widget in widgets) {
-				if (widget is DistortionMesh) {
-					var mesh = widget as DistortionMesh;
-					foreach (PointObject point in mesh.Nodes) {
-						UntieBones(point, nameof(PointObject.SkinningWeights), bones);
-					}
-				} else {
-					UntieBones(widget, nameof(Widget.SkinningWeights), bones);
-				}
-			}
-		}
-
-		private static void UntieBones(object obj, string propName, List<Bone> bones)
-		{
-			var originSkinningWeights = (SkinningWeights)obj.GetType().GetProperty(propName).GetValue(obj);
-			var indices = new List<int>();
-			for (int i = 0; i < 4; i++) {
-				if (bones.Any(b => b.Index == originSkinningWeights[i].Index)) {
-					indices.Add(i);
-				}
-			}
-			if (indices.Count != 0) {
-				var skinningWeights = new SkinningWeights();
-				for (int i = 0; i < 4; i++) {
-					skinningWeights[i] = indices.Contains(i) ? new BoneWeight() : originSkinningWeights[i];
-				}
-				Core.Operations.SetProperty.Perform(obj, propName, skinningWeights);
-			}
-		}
-
-		private static SkinningWeights CalcSkinningWeight(Vector2 position, List<Bone> bones)
-		{
-			var skinningWeights = new SkinningWeights();
-			var i = 0;
-			while (i < bones.Count && i < 4) {
-				var bone = bones[i];
-				skinningWeights[i] = new BoneWeight {
-					Weight = bone.CalcWeightForPoint(position),
-					Index = bone.Index
-				};
-				i++;
-			}
-			return skinningWeights;
+			var bones = Document.Current.SelectedNodes().Editable().OfType<Bone>();
+			var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>();
+			Core.Operations.UntieWidgetsFromBones.Perform(bones, widgets);
 		}
 
 		static void DragNodes(Vector2 delta)

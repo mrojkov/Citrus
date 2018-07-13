@@ -193,15 +193,18 @@ namespace Tangerine.Core.Operations
 					continue;
 				}
 				var item = Row.GetFolderItem(row);
-				if (item != null) {
-					UnlinkFolderItem.Perform(Document.Current.Container, item);
-				}
-				var root = row.Components.Get<BoneRow>()?.Bone;
-				if (root != null) {
+				var currentBone = row.Components.Get<BoneRow>()?.Bone;
+				if (currentBone != null) {
 					var bones = Document.Current.Container.Nodes.OfType<Bone>().ToList();
-					foreach (var bone in BoneUtils.FindBoneDescendats(root, bones)) {
+					var dependentBones = BoneUtils.FindBoneDescendats(currentBone, bones).ToList();
+					dependentBones.Insert(0, currentBone);
+					UntieWidgetsFromBones.Perform(dependentBones, Document.Current.Container.Nodes.OfType<Widget>());
+					foreach (var bone in dependentBones) {
 						UnlinkFolderItem.Perform(Document.Current.Container, bone);
+						Document.Current.Container.AsWidget.BoneArray[bone.Index] = default(BoneArray.Entry);
 					}
+				} else if (item != null) {
+					UnlinkFolderItem.Perform(Document.Current.Container, item);
 				}
 			}
 		}
