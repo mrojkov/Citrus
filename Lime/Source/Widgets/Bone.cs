@@ -77,7 +77,7 @@ namespace Lime
 		public Vector2 Position { get; set; }
 
 		[YuzuMember]
-		[TangerineKeyframeColor(2)]
+		[TangerineKeyframeColor(1)]
 		public float Rotation { get; set; }
 
 		[YuzuMember]
@@ -105,7 +105,7 @@ namespace Lime
 		public float FadeoutZone { get; set; }
 
 		[YuzuMember]
-		[TangerineKeyframeColor(10)]
+		[TangerineKeyframeColor(13)]
 		public Vector2 RefPosition { get; set; }
 
 		[YuzuMember]
