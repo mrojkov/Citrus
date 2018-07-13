@@ -264,14 +264,9 @@ namespace Tangerine.Core
 					return false;
 				}
 			}
-
-		}
-
-		public bool CloseAllDocuments()
-		{
+			// Close others documents
 			for (var i = documents.Count() - 1; i >= 0; i--) {
-				if (
-					documents[i] != doc &&
+				if (documents[i] != doc &&
 					!CloseDocument(documents[i])
 					) {
 					return false;
