@@ -197,6 +197,7 @@ namespace Tangerine
 			});
 			DocumentHistory.Processors.AddRange(UI.Timeline.Timeline.GetOperationProcessors());
 
+			InitializeHotkeys();
 			Toolbars.Add("Editing", new Toolbar(dockManager.ToolbarArea));
 			Toolbars.Add("Create", new Toolbar(dockManager.ToolbarArea));
 			Toolbars.Add("Tools", new Toolbar(dockManager.ToolbarArea));
@@ -228,7 +229,6 @@ namespace Tangerine
 
 			new UI.FilesystemView.FilesystemPane(filesystemPanel);
 			RegisterGlobalCommands();
-			InitializeHotkeys();
 
 			InitDocumentation();
 		}
@@ -266,6 +266,8 @@ namespace Tangerine
 			foreach (var c in TangerineMenu.CreateNodeCommands) {
 				createToolbar.Add(c);
 			}
+			HotkeyRegistry.InitCommands(TangerineMenu.CreateNodeCommands, "Tools", "Tools");
+			HotkeyRegistry.UpdateProfiles();
 		}
 
 		void CreateToolsToolbar()
