@@ -1,4 +1,4 @@
-﻿#if WIN
+#if WIN
 using System.Windows.Forms;
 
 namespace Lime
@@ -14,6 +14,8 @@ namespace Lime
 			SizeNS = FromWinFormsCursor(Cursors.SizeNS);
 			SizeWE = FromWinFormsCursor(Cursors.SizeWE);
 			SizeAll = FromWinFormsCursor(Cursors.SizeAll);
+			SizeNWSE = FromWinFormsCursor(Cursors.SizeNWSE);
+			SizeNESW = FromWinFormsCursor(Cursors.SizeNESW);
 		}
 
 		private static MouseCursor FromWinFormsCursor(Cursor cursor)
@@ -29,6 +31,8 @@ namespace Lime
 		public MouseCursor SizeNS { get; private set; }
 		public MouseCursor SizeWE { get; private set; }
 		public MouseCursor SizeAll { get; private set; }
+		public MouseCursor SizeNWSE { get; private set; }
+		public MouseCursor SizeNESW { get; private set; }
 	}
 }
 #endif

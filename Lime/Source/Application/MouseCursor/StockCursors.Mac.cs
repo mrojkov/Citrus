@@ -1,4 +1,4 @@
-﻿#if MAC || MONOMAC
+#if MAC || MONOMAC
 using System;
 
 #if MAC
@@ -18,6 +18,9 @@ namespace Lime
 		public MouseCursor SizeNS { get; private set; }
 		public MouseCursor SizeWE { get; private set; }
 		public MouseCursor SizeAll { get; private set; }
+		public MouseCursor SizeNWSE { get; private set; }
+		public MouseCursor SizeNESW { get; private set; }
+
 
 		private static MouseCursor FromNSCursor(NSCursor cursor)
 		{
@@ -32,6 +35,10 @@ namespace Lime
 			IBeam = FromNSCursor(NSCursor.IBeamCursor);
 			SizeNS = FromNSCursor(NSCursor.ResizeUpDownCursor);
 			SizeWE = FromNSCursor(NSCursor.ResizeLeftRightCursor);
+
+			//TODO: Add diagonal cursors
+			SizeNWSE = FromNSCursor(NSCursor.ResizeUpDownCursor);
+			SizeNESW = FromNSCursor(NSCursor.ResizeUpDownCursor);
 		}
 	}
 }

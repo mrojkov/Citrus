@@ -45,6 +45,9 @@ namespace Lime
 		/// </summary>
 		public static MouseCursor SizeWE { get { return cursors.SizeWE; } }
 
+		public static MouseCursor SizeNWSE { get { return cursors.SizeNWSE; } }
+		public static MouseCursor SizeNESW { get { return cursors.SizeNESW; } }
+
 		public static MouseCursor SizeAll { get { return cursors.SizeAll; } }
 	}
 }
