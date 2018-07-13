@@ -277,7 +277,7 @@ namespace Lime
 					Stop();
 				}
 				Volume = volume;
-			} else if (streaming && (Sound?.StopChecker() ?? false)) {
+			} else if (streaming && (Sound?.StopChecker?.Invoke() ?? false)) {
 				Stop(0.1f);
 			}
 		}
