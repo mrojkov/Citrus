@@ -12,10 +12,10 @@ namespace Tangerine
 			var save = new Command("Save", new Save(doc).Execute);
 			var closeAllButThis = new Command("Close All But This", new CloseAllButThis(doc).Execute);
 			var menu = new Menu {
+				save,
 				close,
 				GenericCommands.CloseAll,
 				closeAllButThis,
-				save,
 				FilesystemCommands.NavigateTo,
 				FilesystemCommands.OpenInSystemFileManager,
 			};
