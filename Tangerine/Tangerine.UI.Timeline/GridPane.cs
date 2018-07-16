@@ -54,18 +54,21 @@ namespace Tangerine.UI.Timeline
 		{
 			while (true) {
 				if (RootWidget.Input.WasMouseReleased(1)) {
-					var cell = CellUnderMouse();
-					var row = Document.Current.Rows[cell.Y];
-					var spans = row.Components.Get<Components.GridSpanListComponent>()?.Spans;
-					if (!row.Selected || !spans.Any(i => i.Contains(cell.X))) {
-						Document.Current.History.DoTransaction(() => {
-							Core.Operations.ClearRowSelection.Perform();
-							Operations.ClearGridSelection.Perform();
-							Core.Operations.SelectRow.Perform(row);
-							Operations.SelectGridSpan.Perform(cell.Y, cell.X, cell.X + 1);
-						});
+					bool enabled = Document.Current.Rows.Count > 0;
+					if (enabled) {
+						var cell = CellUnderMouse();
+						var row = Document.Current.Rows[cell.Y];
+						var spans = row.Components.Get<Components.GridSpanListComponent>()?.Spans;
+						if (!row.Selected || !spans.Any(i => i.Contains(cell.X))) {
+							Document.Current.History.DoTransaction(() => {
+								Core.Operations.ClearRowSelection.Perform();
+								Operations.ClearGridSelection.Perform();
+								Core.Operations.SelectRow.Perform(row);
+								Operations.SelectGridSpan.Perform(cell.Y, cell.X, cell.X + 1);
+							});
+						}
 					}
-					new Menu {
+					var menu = new Menu {
 						TimelineCommands.CutKeyframes,
 						TimelineCommands.CopyKeyframes,
 						TimelineCommands.PasteKeyframes,
@@ -73,7 +76,11 @@ namespace Tangerine.UI.Timeline
 						GenericCommands.InsertTimelineColumn,
 						GenericCommands.RemoveTimelineColumn,
 						TimelineCommands.DeleteKeyframes,
-					}.Popup();
+					};
+					foreach (var i in menu) {
+						i.Enabled = enabled;
+					}
+					menu.Popup();
 				}
 				yield return null;
 			}
