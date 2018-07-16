@@ -100,6 +100,7 @@ namespace Tangerine.UI.Inspector
 			content.BuildForObjects(Document.Current.InspectRootNode ? new[] { Document.Current.RootNode } : Document.Current.SelectedNodes().ToArray());
 			InspectorCommands.InspectRootNodeCommand.Icon = Document.Current.InspectRootNode ? inspectRootActivatedTexture : inspectRootDeactivatedTexture;
 			Toolbar.Rebuild();
+			RootWidget.ScrollPosition = RootWidget.MinScrollPosition;
 		}
 	}
 }
