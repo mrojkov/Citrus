@@ -226,6 +226,7 @@
     <Compile Include="Source\Widgets\Layout\VFlowLayout.cs" />
     <Compile Include="Source\Widgets\MorphableMesh.cs" />
     <Compile Include="Source\Widgets\MorphableMeshBuilder.cs" />
+    <Compile Include="Source\Widgets\NodeBehaviours.cs" />
     <Compile Include="Source\Widgets\NodeReference.cs" />
     <Compile Include="Source\Profilers\TasksProfiler.cs" />
     <Compile Include="Source\Widgets\Text\IText.cs" />

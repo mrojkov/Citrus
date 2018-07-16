@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Components;
@@ -42,6 +40,7 @@ namespace Tangerine.UI.Timeline.Components
 					new HSpacer(Theme.Metrics.DefaultToolbarButtonSize.X)
 				},
 			};
+			widget.Components.Add(new AwakeBehavior());
 			widget.CompoundPresenter.Push(new DelegatePresenter<Widget>(RenderBackground));
 		}
 
@@ -79,6 +78,7 @@ namespace Tangerine.UI.Timeline.Components
 		public void Rename() { }
 
 		public Widget Widget => widget;
+		public AwakeBehavior AwakeBehavior => widget.Components.Get<AwakeBehavior>();
 		public float Indentation { set { spacer.MinMaxWidth = value; } }
 	}
 }

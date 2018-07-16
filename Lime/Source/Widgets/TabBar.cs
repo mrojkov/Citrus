@@ -20,6 +20,7 @@ namespace Lime
 		{
 			HitTestTarget = true;
 			Gestures.Add(new ClickGesture(2, () => Closing?.Invoke()));
+			Awoke += Awake;
 		}
 
 		public bool Active
@@ -39,16 +40,17 @@ namespace Lime
 			TryRunAnimation(active ? "Active" : "Normal");
 		}
 
-		protected override void Awake()
+		private static void Awake(Node owner)
 		{
-			textPresentersFeeder = new TextPresentersFeeder(this);
-			closeButton = TryFind<Widget>("CloseButton");
-			if (closeButton != null) {
-				closeButton.Clicked += () => {
-					Closing?.Invoke();
+			var t = (Tab)owner;
+			t.textPresentersFeeder = new TextPresentersFeeder(t);
+			t.closeButton = t.TryFind<Widget>("CloseButton");
+			if (t.closeButton != null) {
+				t.closeButton.Clicked += () => {
+					t.Closing?.Invoke();
 				};
 			}
-			RefreshPresentation();
+			t.RefreshPresentation();
 		}
 
 		public override void Update(float delta)

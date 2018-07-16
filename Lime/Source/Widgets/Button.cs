@@ -36,6 +36,7 @@ namespace Lime
 		{
 			HitTestTarget = true;
 			Input.AcceptMouseBeyondWidget = false;
+			Awoke += Awake;
 		}
 
 		private void SetState(IEnumerator<int> newState)
@@ -56,14 +57,15 @@ namespace Lime
 
 		public override bool WasClicked() => clickGesture?.WasRecognized() ?? false;
 
-		protected override void Awake()
+		private static void Awake(Node owner)
 		{
 			// On the current frame the button contents may not be loaded,
 			// so delay its initialization until the next frame.
-			SetState(InitialState());
-			textPresentersFeeder = new TextPresentersFeeder(this);
-			clickGesture = new ClickGesture();
-			Gestures.Add(clickGesture);
+			var button = (Button)owner;
+			button.SetState(button.InitialState());
+			button.textPresentersFeeder = new TextPresentersFeeder(button);
+			button.clickGesture = new ClickGesture();
+			button.Gestures.Add(button.clickGesture);
 		}
 
 		private IEnumerator<int> NormalState()

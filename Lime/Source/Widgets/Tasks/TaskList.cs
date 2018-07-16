@@ -24,13 +24,13 @@ namespace Lime
 		/// <summary>
 		/// Gets the widget this instance belongs to.
 		/// </summary>
-		public Widget Widget { get; private set; }
+		public Node Node { get; }
 
 		public TaskList() { }
 
-		public TaskList(Widget widget)
+		public TaskList(Node node)
 		{
-			Widget = widget;
+			Node = node;
 		}
 
 		/// <summary>

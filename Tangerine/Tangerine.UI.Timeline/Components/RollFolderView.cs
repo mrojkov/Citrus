@@ -1,4 +1,3 @@
-﻿using System;
 using System.Linq;
 using System.Collections.Generic;
 using Lime;
@@ -56,6 +55,7 @@ namespace Tangerine.UI.Timeline.Components
 					lockButton,
 				},
 			};
+			widget.Components.Add(new AwakeBehavior());
 			label.AddChangeWatcher(() => folder.Id, s => label.Text = folder.Id);
 			widget.CompoundPresenter.Push(new DelegatePresenter<Widget>(RenderBackground));
 			editBox.Visible = false;
@@ -63,6 +63,7 @@ namespace Tangerine.UI.Timeline.Components
 		}
 
 		public Widget Widget => widget;
+		public AwakeBehavior AwakeBehavior => widget.Components.Get<AwakeBehavior>();
 		public float Indentation { set { spacer.MinMaxWidth = value; } }
 
 		ToolbarButton CreateEyeButton()

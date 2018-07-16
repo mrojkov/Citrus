@@ -295,11 +295,6 @@ namespace Lime
 		public CompoundPresenter CompoundPostPresenter =>
 			(PostPresenter as CompoundPresenter) ?? (CompoundPresenter)(PostPresenter = new CompoundPresenter(PostPresenter));
 
-		/// <summary>
-		/// Indicates whether the node is awake. Node gets awake on the first update.
-		/// </summary>
-		public bool IsAwake { get; protected set; }
-
 		internal int RunningAnimationCount;
 
 		/// <summary>
@@ -318,6 +313,43 @@ namespace Lime
 		/// Use it for fast iteration through nodes collection in a performance-critical code.
 		/// </summary>
 		public Node NextSibling { get; internal set; }
+
+		public event Action<Node> Awoke
+		{
+			add { Components.GetOrAdd<AwakeBehavior>().Action += value; }
+			remove { Components.GetOrAdd<AwakeBehavior>().Action -= value; }
+		}
+
+		internal NodeBehavior[] Behaviours = NodeComponentCollection.EmptyBehaviors;
+		internal NodeBehavior[] LateBehaviours = NodeComponentCollection.EmptyBehaviors;
+
+		/// <summary>
+		/// Called before Update.
+		/// </summary>
+		public UpdateHandler Updating
+		{
+			get { return Components.GetOrAdd<UpdateBehaviour>().Updating; }
+			set { Components.GetOrAdd<UpdateBehaviour>().Updating = value; }
+		}
+
+		/// <summary>
+		/// Called after Update.
+		/// </summary>
+		public UpdateHandler Updated
+		{
+			get { return Components.GetOrAdd<UpdatedBehaviour>().Updated; }
+			set { Components.GetOrAdd<UpdatedBehaviour>().Updated = value; }
+		}
+
+		/// <summary>
+		/// Tasks that are called before Update.
+		/// </summary>
+		public TaskList Tasks => Components.GetOrAdd<TasksBehaviour>().Tasks;
+
+		/// <summary>
+		/// Tasks that are called after Update.
+		/// </summary>
+		public TaskList LateTasks => Components.GetOrAdd<LateTasksBehaviour>().Tasks;
 
 		/// <summary>
 		/// Animation speed multiplier.
@@ -467,8 +499,6 @@ namespace Lime
 		public static int CreatedCount = 0;
 		public static int FinalizedCount = 0;
 
-		public Action<Node> Awoken;
-
 		protected Node()
 		{
 			AnimationSpeed = 1;
@@ -489,6 +519,9 @@ namespace Lime
 
 		public virtual void Dispose()
 		{
+			foreach (var component in Components) {
+				component.Dispose();
+			}
 			for (var n = FirstChild; n != null; n = n.NextSibling) {
 				n.Dispose();
 			}
@@ -603,7 +636,6 @@ namespace Lime
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
 			clone.Nodes = Nodes.Clone(clone);
 			clone.Components = Components.Clone(clone);
-			clone.IsAwake = false;
 			if (RenderChainBuilder != null) {
 				clone.RenderChainBuilder = RenderChainBuilder.Clone(clone);
 			}
@@ -669,17 +701,20 @@ namespace Lime
 		/// <param name="delta">Time delta since last Update.</param>
 		public virtual void Update(float delta)
 		{
-			if (!IsAwake) {
-				RaiseAwake();
-			}
 			if (delta > Application.MaxDelta) {
 				SafeUpdate(delta);
 			} else {
+				foreach (var b in Behaviours) {
+					b.Update(delta);
+				}
 				AdvanceAnimation(delta);
 				for (var node = FirstChild; node != null;) {
 					var next = node.NextSibling;
 					node.Update(node.AnimationSpeed * delta);
 					node = next;
+				}
+				foreach (var b in LateBehaviours) {
+					b.LateUpdate(delta);
 				}
 			}
 		}
@@ -693,21 +728,6 @@ namespace Lime
 				remainDelta -= delta;
 			} while (remainDelta > 0f);
 		}
-
-		protected void RaiseAwake()
-		{
-			IsAwake = true;
-			foreach (var c in Components) {
-				c.Awake();
-			}
-			Awake();
-			Awoken?.Invoke(this);
-		}
-
-		/// <summary>
-		/// Awake is called on the first node update, before changing node state.
-		/// </summary>
-		protected virtual void Awake() { }
 
 		public virtual void Render() { }
 

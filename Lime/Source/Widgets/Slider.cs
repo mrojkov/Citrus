@@ -49,19 +49,18 @@ namespace Lime
 			Value = 0;
 			Step = 0;
 			Enabled = true;
+			Awoke += Awake;
 		}
 
-		protected override void Awake()
+		private static void Awake(Node owner)
 		{
-			Thumb?.Gestures.Add(dragGestureThumb = new DragGesture());
-			Gestures.Add(dragGestureSlider = new DragGesture());
-			Gestures.Add(clickGesture = new ClickGesture());
+			var s = (Slider)owner;
+			s.Thumb?.Gestures.Add(s.dragGestureThumb = new DragGesture());
+			s.Gestures.Add(s.dragGestureSlider = new DragGesture());
+			s.Gestures.Add(s.clickGesture = new ClickGesture());
 		}
 
-		public Widget Thumb
-		{
-			get { return thumb ?? MaybeThumb("SliderThumb") ?? MaybeThumb("Thumb"); }
-		}
+		public Widget Thumb => thumb ?? MaybeThumb("SliderThumb") ?? MaybeThumb("Thumb");
 
 		private Widget MaybeThumb(string name)
 		{

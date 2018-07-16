@@ -91,6 +91,7 @@ namespace Tangerine.UI.Timeline.Components
 					lockButton,
 				}
 			};
+			widget.Components.Add(new AwakeBehavior());
 			label.AddChangeWatcher(() => nodeData.Node.Id, s => RefreshLabel());
 			label.AddChangeWatcher(() => IsGrayedLabel(nodeData.Node), s => RefreshLabel());
 			label.AddChangeWatcher(() => nodeData.Node.ContentsPath, s => RefreshLabel());
@@ -117,6 +118,7 @@ namespace Tangerine.UI.Timeline.Components
 		}
 
 		public Widget Widget => widget;
+		public AwakeBehavior AwakeBehavior => widget.Components.Get<AwakeBehavior>();
 		public float Indentation { set { indentSpacer.MinMaxWidth = value; } }
 
 		bool IsGrayedLabel(Node node) => node.AsWidget?.Visible ?? true;
@@ -318,7 +320,7 @@ namespace Tangerine.UI.Timeline.Components
 
 		private ICommand CreateSetColorMarkCommand(string title, int index)
 		{
-			return new Command(title, 
+			return new Command(title,
 				() => {
 					Document.Current.History.DoTransaction(() => {
 						foreach (var n in Document.Current.SelectedNodes()) {

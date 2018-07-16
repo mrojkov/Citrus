@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Lime
@@ -18,14 +18,10 @@ namespace Lime
 		public CheckBox()
 		{
 			Input.AcceptMouseBeyondWidget = false;
+			Awoke += n => n.LateTasks.Add(((CheckBox)n).Loop());
 		}
 
-		protected override void Awake()
-		{
-			LateTasks.Add(Loop());
-		}
-
-		IEnumerator<object> Loop()
+		private IEnumerator<object> Loop()
 		{
 			var button = TryFind<Widget>("Button");
 			while (true) {

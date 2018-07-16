@@ -92,7 +92,7 @@ namespace Lime
 				MinWidth = SpinButtonPresenter.ButtonWidth,
 				PostPresenter = new SpinButtonPresenter(type)
 			};
-			button.Awoken += instance => {
+			button.Awoke += instance => {
 				var dragGesture = new DragGesture();
 				dragGesture.Recognized += () => Tasks.Add(SpinByDragTask(dragGesture));
 				var clickGesture = new ClickGesture(() => {

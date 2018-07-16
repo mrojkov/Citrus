@@ -93,13 +93,14 @@ namespace Tangerine.UI
 					Renderer.DrawRectOutline(Vector2.Zero, Size, borderColor);
 				}
 			}));
+			Awoke += Awake;
 		}
 
-		protected override void Awake()
+		private static void Awake(Node owner)
 		{
-			base.Awake();
-			Tasks.Add(ShowTipWhenMouseHangsOverButtonTask());
-			this.AddChangeWatcher(() => Enabled, _ => Window.Current.Invalidate());
+			var tb = (ToolbarButton)owner;
+			tb.Tasks.Add(tb.ShowTipWhenMouseHangsOverButtonTask());
+			tb.AddChangeWatcher(() => tb.Enabled, _ => Window.Current.Invalidate());
 		}
 
 		private IEnumerator<object> ShowTipWhenMouseHangsOverButtonTask()

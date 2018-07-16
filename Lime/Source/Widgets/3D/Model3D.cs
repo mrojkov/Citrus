@@ -61,10 +61,14 @@ namespace Lime
 			RebuildSkeleton();
 		}
 
-		protected override void Awake()
+		public Model3D()
 		{
-			base.Awake();
-			ResetLightning();
+			Awoke += Awake;
+		}
+
+		private static void Awake(Node owner)
+		{
+			((Model3D)owner).ResetLightning();
 		}
 
 		public override Node Clone()
