@@ -78,31 +78,54 @@ namespace Tangerine
 		public static void InitCommands(Type type, string categoryName = null)
 		{
 			var fields = type.GetFields(BindingFlags.Static | BindingFlags.Public);
-			var category = new CommandCategory(type.Name, categoryName);
+			var category = categories.FirstOrDefault(i => i.SystemName == type.Name);
+			if (category == null) {
+				category = new CommandCategory(type.Name, categoryName);
+				categories.Add(category);
+			}
 			foreach (var field in fields) {
 				ICommand command = field.GetValue(null) as ICommand;
 				if (command != null) {
-					category.Commands.Add(new CommandInfo(command, category, field.Name, command.Text));
-					defaults.Add(new ShortcutBinding {
-						Command = command,
-						Shortcut = command.Shortcut
-					});
+					var commandInfo = new CommandInfo(command, category, field.Name, command.Text);
+					int index = category.Commands.FindIndex(i => i.SystemName == commandInfo.SystemName);
+					if (index == -1) {
+						category.Commands.Add(commandInfo);
+						defaults.Add(new ShortcutBinding {
+							Command = command,
+							Shortcut = command.Shortcut
+						});
+					}
+					else {
+						var oldCommand = category.Commands[index];
+						category.Commands[index] = commandInfo;
+						defaults.RemoveAll(i => i.Command == oldCommand.Command);
+					}
 				}
 			}
-			categories.Add(category);
 		}
 
 		public static void InitCommands(IEnumerable<ICommand> commands, string systemName, string categoryName = null)
 		{
-			var category = new CommandCategory(systemName, categoryName);
-			foreach (var command in commands) {
-				category.Commands.Add(new CommandInfo(command, category, command.Text, command.Text));
-				defaults.Add(new ShortcutBinding {
-					Command = command,
-					Shortcut = command.Shortcut
-				});
+			var category = categories.FirstOrDefault(i => i.SystemName == systemName);
+			if (category == null) {
+				category = new CommandCategory(systemName, categoryName);
+				categories.Add(category);
 			}
-			categories.Add(category);
+			foreach (var command in commands) {
+				var commandInfo = new CommandInfo(command, category, command.Text, command.Text);
+				int index = category.Commands.FindIndex(i => i.SystemName == commandInfo.SystemName);
+				if (index == -1) {
+					category.Commands.Add(commandInfo);
+					defaults.Add(new ShortcutBinding {
+						Command = command,
+						Shortcut = command.Shortcut
+					});
+				} else {
+					var oldCommand = category.Commands[index];
+					category.Commands[index] = commandInfo;
+					defaults.RemoveAll(i => i.Command == oldCommand.Command);
+				}
+			}
 		}
 
 		public static HotkeyProfile CreateProfile(string profileName)
@@ -126,13 +149,26 @@ namespace Tangerine
 			Profiles.Add(currentProfile);
 			Reseted?.Invoke();
 		}
+
+		public static void UpdateProfiles()
+		{
+			string oldCurrentName = CurrentProfile.Name;
+			var newProfiles = new List<HotkeyProfile>();
+			for (int i = 0; i < Profiles.Count; ++i) {
+				var profile = Profiles[i];
+				var newProfile = new HotkeyProfile(categories, profile.Name);
+				newProfile.Load();
+				Profiles[i] = newProfile;
+			}
+			CurrentProfile = Profiles.FirstOrDefault(i => i.Name == oldCurrentName);
+		}
 	}
 
 	public class HotkeyProfile
 	{
 		public string Filepath => Path.Combine(HotkeyRegistry.ProfilesDirectory, Name);
 
-		public IEnumerable<CommandInfo> Commands => Categories.Select(i => i.Commands).SelectMany(j => j);
+		public IEnumerable<CommandInfo> Commands => Categories.SelectMany(i => i.Commands);
 		public readonly List<CommandCategory> Categories;
 
 		public readonly string Name;
