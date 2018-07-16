@@ -551,7 +551,7 @@ namespace Orange
 			WriteNodeProperties(node);
 			WriteProperty("Action", (int)node.Action, (int)AudioAction.Play);
 			WriteProperty("File", node.Sample, null);
-			WriteProperty("Flags", (node.Looping ? 4 : 0) | (node.Bumpable ? 0 : 1), 0);
+			WriteProperty("Flags", (node.Looping ? 4 : 0) | (node.Continuous ? 1 : 0), 0);
 			WriteProperty("Group", node.Group == AudioChannelGroup.Music ? 1 : 0, 0);
 			WriteProperty("Priority", node.Priority, 0.5f);
 			WriteProperty("FadeTime", node.FadeTime, 0f);

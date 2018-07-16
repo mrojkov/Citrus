@@ -7,13 +7,13 @@ namespace Lime
 		Play,
 		Stop
 	}
-
+	
 	[TangerineRegisterNode(Order = 3)]
 	public class Audio : Node
 	{
 		public static bool GloballyEnable = true;
 
-		Sound sound = new Sound() { IsBumpable = true };
+		Sound sound = new Sound();
 
 		[YuzuMember]
 		[TangerineKeyframeColor(19)]
@@ -83,35 +83,33 @@ namespace Lime
 
 		[YuzuMember]
 		[TangerineKeyframeColor(27)]
-		public bool Bumpable { get; set; }
+		public bool Continuous { get; set; }
 
 		public Audio()
 		{
 			RenderChainBuilder = null;
 			Priority = 0.5f;
-			Bumpable = true;
 		}
 
 		public void Play()
 		{
 			sound = Sample.Play(Group, false, 0f, Looping, Priority, Volume, Pan, Pitch);
-			sound.IsBumpable = Bumpable;
+			sound.StopChecker = ShouldStop;
 		}
 
 		public void Stop()
 		{
 			sound.Stop(FadeTime);
 		}
+		
+		private bool ShouldStop()
+		{
+			return !Continuous && (GetRoot() != WidgetContext.Current.Root || !((Parent as Widget)?.GloballyVisible ?? false));
+		}
 
 		public bool IsPlaying()
 		{
 			return !sound.IsStopped;
-		}
-
-		public override void Update(float delta)
-		{
-			base.Update(delta);
-			sound.Bump();
 		}
 
 		public override void AddToRenderChain(RenderChain chain)

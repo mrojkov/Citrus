@@ -3184,10 +3184,6 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
-				result.Bumpable = d.Reader.ReadBoolean();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (4 == fd.OurIndex) {
 				var tmp5 = d.Reader.ReadInt32();
 				if (tmp5 >= 0) {
 					while (--tmp5 >= 0) {
@@ -3197,9 +3193,13 @@ namespace GeneratedDeserializersBIN
 				}
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (5 == fd.OurIndex) {
+			if (4 == fd.OurIndex) {
 				result.ContentsPath = d.Reader.ReadString();
 				if (result.ContentsPath == "" && d.Reader.ReadBoolean()) result.ContentsPath = null;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (5 == fd.OurIndex) {
+				result.Continuous = d.Reader.ReadBoolean();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (6 == fd.OurIndex) {

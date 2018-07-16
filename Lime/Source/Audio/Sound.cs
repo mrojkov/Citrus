@@ -17,7 +17,7 @@ namespace Lime
 
 		public IAudioChannel Channel { get; internal set; }
 
-		public bool IsBumpable { get; set; }
+		public System.Func<bool> StopChecker;
 
 		public bool IsLoading { get; internal set; }
 
@@ -52,8 +52,6 @@ namespace Lime
 			EnsureLoaded();
 			Channel.Stop(fadeoutTime);
 		}
-
-		public void Bump() { Channel.Bump(); }
 
 		private void EnsureLoaded()
 		{

@@ -28,8 +28,6 @@ namespace Lime
 
 		void Resume(float fadeinTime = 0);
 		void Stop(float fadeoutTime = 0);
-
-		void Bump();
 	}
 
 	public class NullAudioChannel : IAudioChannel
@@ -43,7 +41,6 @@ namespace Lime
 		public void Stop(float fadeoutTime = 0) {}
 		public float Volume { get { return 0; } set { } }
 		public float Pitch { get { return 1; } set { } }
-		public void Bump() {}
 		public string SamplePath { get; set; }
 		public Sound Sound { get { return null; } }
 	}
