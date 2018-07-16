@@ -27,7 +27,7 @@ namespace Tangerine.Core.Operations
 			{
 				var container = Document.Current.Container;
 				foreach (var node in container.Nodes) {
-					foreach (var animator in node.Animators.Where(i => i.AnimationId == Document.Current.AnimationId)) {
+					foreach (var animator in node.Animators.Where(i => i.AnimationId == Document.Current.AnimationId).ToList()) {
 						var keys = op.Direction > 0 ? animator.ReadonlyKeys.Reverse() : animator.ReadonlyKeys;
 						foreach (var k in keys.ToList()) {
 							if (k.Frame >= op.Column) {
