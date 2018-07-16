@@ -43,8 +43,7 @@ namespace Tangerine.UI
 		public static readonly ICommand NewTanWithCustomRoot = new Command("New Tan with Custom Root", new Menu());
 		public static readonly ICommand Open = new Command("Open", new Shortcut(Modifiers.Command, Key.O));
 		public static readonly ICommand RecentDocuments = new Command("Recent Documents", new Menu());
-		public static readonly ICommand Save = new Command("Save");
-		public static readonly ICommand SaveCurrent = new Command("Save Current", new Shortcut(Modifiers.Command, Key.S));
+		public static readonly ICommand Save = new Command("Save", new Shortcut(Modifiers.Command, Key.S));
 		public static readonly ICommand SaveAs = new Command("Save As", new Shortcut(Modifiers.Command | Modifiers.Shift, Key.S));
 		public static readonly ICommand SaveAll = new Command("Save All");
 		public static readonly ICommand Revert = new Command("Revert", new Shortcut(Modifiers.Command, Key.R));
@@ -52,11 +51,9 @@ namespace Tangerine.UI
 		public static readonly ICommand OpenProject = new Command("Open Project...", new Shortcut(Modifiers.Command | Modifiers.Shift, Key.O));
 		public static readonly ICommand RecentProjects = new Command("Recent Projects", new Menu());
 		public static readonly ICommand PreferencesDialog = new Command("Preferences...", new Shortcut(Modifiers.Command, Key.P));
-		public static readonly ICommand CloseDocument = new Command("Close Document");
-		public static readonly ICommand CloseCurrentDocument = new Command("Close Current Document");
-		public static readonly ICommand CloseAllTabs = new Command("Close All Tabs");
-		public static readonly ICommand CloseAllTabsExceptThis = new Command("Close All Tabs Except This");
-		public static readonly ICommand CloseAllTabsExceptCurrent = new Command("Close All Tabs Except Current");
+		public static readonly ICommand Close = new Command("Close");
+		public static readonly ICommand CloseAll = new Command("Close All");
+		public static readonly ICommand CloseAllButCurrent = new Command("Close All But Current");
 		public static readonly ICommand Group = new Command("Group", new Shortcut(Modifiers.Command, Key.G));
 		public static readonly ICommand Ungroup = new Command("Ungroup", new Shortcut(Modifiers.Command | Modifiers.Shift, Key.G));
 		public static readonly ICommand InsertTimelineColumn = new Command("Insert Timeline Column", new Shortcut(Modifiers.Command, Key.Q));

@@ -109,6 +109,7 @@
     <Compile Include="AppUserPreferences.cs" />
     <Compile Include="HotkeyRegistry.cs" />
     <Compile Include="Dialogs\HotkeyEditor.cs" />
+    <Compile Include="DocumentTabContextMenu.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

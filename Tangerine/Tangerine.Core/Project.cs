@@ -232,115 +232,41 @@ namespace Tangerine.Core
 			return false;
 		}
 
-		public bool CloseAllTabsExceptThis(Document document)
-		{
-			if (IsAnyDocumentModifiedExceptThis(document)) {
-				if (CloseDocument(GetLeftmostModifiedDocumentExceptThis(document))) {
-					return CloseAllTabsExceptThis(document);
-				} else {
-					return false;
-				}
-			} else {
-				return CloseAllDocumentsExceptThis(document);
-			}
-		}
-
-		public bool CloseAllDocumentsExceptThis(Document document)
-		{
-			for (var i = documents.Count() - 1; i >= 0; i--) {
-				if (documents[i] != document) {
-					if (CloseDocument(documents[i])) {
-						continue;
-					} else {
-						return false;
-					}
-				}
-			}
-			return true;
-		}
-
-		public bool IsAnyDocumentModifiedExceptThis(Document document)
-		{
-			foreach (var doc in documents) {
-				if (doc != document && doc.IsModified) {
-					return true;
-				}
-			}
-			return false;
-		}
-
-		public bool CloseAllTabs()
-		{
-			if (IsAnyDocumentModified()) {
-				if(CloseDocument(GetLeftmostModifiedDocument())) {
-					return CloseAllTabs();
-				} else {
-					return false;
-				}
-			} else {
-				return CloseAllDocuments();
-			}
-
-		}
-
 		public bool CloseAllDocuments()
 		{
+			// Checking and attempting to close modified documents
 			for (var i = documents.Count() - 1; i >= 0; i--) {
-				if (CloseDocument(documents[i])) {
-					continue;
-				} else {
+				if (
+					documents[i].IsModified && !CloseDocument(documents[i])) {
+					return false;
+				}
+			}
+			// Close others documents
+			for (var i = documents.Count() - 1; i >= 0; i--) {
+				if (!CloseDocument(documents[i])) {
 					return false;
 				}
 			}
 			return true;
 		}
 
-		public bool IsAnyDocumentModified()
+		public bool CloseAllDocumentsButThis(Document doc)
 		{
-			foreach(var doc in documents) {
-				if (doc.IsModified) {
-					return true;
-				}
-			}
-			return false;
-		}
-
-		public Document GetRightmostModifiedDocument()
-		{
+			// Checking and attempting to close modified documents
 			for (var i = documents.Count() - 1; i >= 0; i--) {
-				if (documents[i].IsModified) {
-					return documents[i];
+				if (
+					documents[i].IsModified &&
+					documents[i] != doc && !CloseDocument(documents[i])) {
+					return false;
 				}
 			}
-			return null;
-		}
-
-		public Document GetRightmostModifiedDocumentExceptThis(Document document)
-		{
+			// Close others documents
 			for (var i = documents.Count() - 1; i >= 0; i--) {
-				if (documents[i] != document && documents[i].IsModified) return documents[i];
-			}
-			return null;
-		}
-
-		public Document GetLeftmostModifiedDocument()
-		{
-			for (var i = 0; i < documents.Count(); i++) {
-				if (documents[i].IsModified) {
-					return documents[i];
+				if (documents[i] != doc && !CloseDocument(documents[i])) {
+					return false;
 				}
 			}
-			return null;
-		}
-
-		public Document GetLeftmostModifiedDocumentExceptThis(Document document)
-		{
-			for (var i = 0; i < documents.Count(); i++) {
-				if (documents[i] != document && documents[i].IsModified) {
-					return documents[i];
-				}
-			}
-			return null;
+			return true;
 		}
 
 		public void NextDocument()
