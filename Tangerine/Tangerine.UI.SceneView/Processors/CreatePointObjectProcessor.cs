@@ -37,6 +37,12 @@ namespace Tangerine.UI.SceneView
 							if (container.Width.Abs() > Mathf.ZeroTolerance && container.Height.Abs() > Mathf.ZeroTolerance) {
 								pos = sv.MousePosition * t / container.Size;
 							}
+							if (container is ParticleEmitter && currentPoint is EmitterShapePoint) {
+								Core.Operations.SetProperty.Perform(
+									container,
+									nameof(ParticleEmitter.Shape),
+									EmitterShape.Custom);
+							}
 							Core.Operations.SetProperty.Perform(currentPoint, nameof(PointObject.Position), pos);
 						});
 					} catch (InvalidOperationException e) {
