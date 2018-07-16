@@ -131,6 +131,37 @@ namespace Tangerine.UI.FilesystemView
 			}
 		}
 
+		public IEnumerable<string> EnumerateItemsSortedBySize()
+		{
+			foreach (var i in Directory.EnumerateDirectories(CurrentPath).OrderBy(f => f.Length)) {
+				yield return i;
+			}
+			foreach (var i in Directory.EnumerateFiles(CurrentPath).OrderBy(f => f.Length)) {
+				yield return i;
+			}
+		}
+
+		public IEnumerable<string> EnumerateItemsSortedByDate()
+		{
+			foreach (var i in Directory.EnumerateDirectories(CurrentPath).OrderBy(f => new FileInfo(f).LastWriteTime)) {
+				yield return i;
+			}
+			foreach (var i in Directory.EnumerateFiles(CurrentPath).OrderBy(f => new FileInfo(f).LastWriteTime)) {
+				yield return i;
+			}
+		}
+
+		public IEnumerable<string> EnumerateItemsSortedByExtension()
+		{
+			foreach (var i in Directory.EnumerateDirectories(CurrentPath).OrderBy(f => new FileInfo(f).Extension)) {
+				yield return i;
+			}
+			foreach (var i in Directory.EnumerateFiles(CurrentPath).OrderBy(f => new FileInfo(f).Extension)) {
+				yield return i;
+			}
+		}
+
+
 		public void GoTo(string path)
 		{
 			var attr = File.GetAttributes(path);

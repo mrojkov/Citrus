@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -81,6 +81,7 @@ namespace Tangerine.UI.FilesystemView
 			navHystoryIndex = newIndex;
 		}
 
+
 		private void AddToNavHystory(string path)
 		{
 			if (navHystory.Count > 0 && navHystory[navHystoryIndex].Item1 == path) {
@@ -91,6 +92,11 @@ namespace Tangerine.UI.FilesystemView
 			int newIndex = navHystoryIndex + 1;
 			navHystory.RemoveRange(newIndex, navHystory.Count - newIndex - 1);
 			navHystoryIndex = newIndex;
+		}
+
+		public void SortByType(SortType typeSort)
+		{
+			InvalidateView(model.CurrentPath, typeSort);
 		}
 
 		private void InvalidateFSWatcher(string path)
@@ -213,14 +219,38 @@ namespace Tangerine.UI.FilesystemView
 			Window.Current.Invalidate();
 		}
 
-		private void InvalidateView(string path)
+		private void InvalidateView(string path, SortType type)
 		{
+			IEnumerable<string> items;
+			switch (type) {
+				case SortType.ByName:
+					items = model.EnumerateItems();
+					break;
+				case SortType.ByDate:
+					items = model.EnumerateItemsSortedByDate();
+					break;
+				case SortType.ByExtension:
+					items = model.EnumerateItemsSortedByExtension();
+					break;
+				case SortType.BySize:
+					items = model.EnumerateItemsSortedBySize();
+					break;
+				default:
+					items = model.EnumerateItems();
+					break;
+			}
+
 			scrollView.Content.Nodes.Clear();
-			foreach (var item in model.EnumerateItems()) {
+			foreach (var item in items) {
 				var fsItem = new FilesystemItem(item);
 				scrollView.Content.AddNode(fsItem);
 				fsItem.CompoundPresenter.Insert(0, new DelegatePresenter<FilesystemItem>(RenderFSItemSelection));
 			}
+		}
+
+		private void InvalidateView(string path)
+		{
+			InvalidateView(path, SortType.ByName);
 		}
 
 		private void Open(string path)

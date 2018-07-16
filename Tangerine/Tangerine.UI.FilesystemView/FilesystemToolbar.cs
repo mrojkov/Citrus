@@ -3,6 +3,15 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.FilesystemView
 {
+
+	public enum SortType
+	{
+		ByName,
+		BySize,
+		ByDate,
+		ByExtension
+	}
+
 	public class Toolbar : Widget
 	{
 		public Toolbar()
@@ -47,6 +56,7 @@ namespace Tangerine.UI.FilesystemView
 								CreateTogglePreviewButton(),
 								CreateSplitHButton(),
 								CreateSplitVButton(),
+								CreateSortButton(),
 								new Widget {
 									LayoutCell = new LayoutCell { Stretch = new Vector2(9999, 9999)}
 								},
@@ -77,6 +87,24 @@ namespace Tangerine.UI.FilesystemView
 			return new ToolbarButton(IconPool.GetTexture("Filesystem.ArrowLeft")) {
 				Clicked = () => view.GoBackward(),
 			};
+		}
+
+		private Widget CreateSortButton()
+		{
+			ThemedDropDownList list = new ThemedDropDownList() {
+				Items = {
+					new ThemedDropDownList.Item("Sort by Name", SortType.ByName),
+					new ThemedDropDownList.Item("Sort by Extension", SortType.ByExtension),
+					new ThemedDropDownList.Item("Sort by Size", SortType.BySize),
+					new ThemedDropDownList.Item("Sort by Date", SortType.ByDate)
+				}
+			};
+
+			list.Changed += args => {
+				view.SortByType((SortType)args.Value);
+			};
+
+			return list;
 		}
 
 		private Widget CreateGoForwardButton()

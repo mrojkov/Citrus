@@ -1,2 +1,1 @@
-# Error #
-This is error page
+# This is error page #
