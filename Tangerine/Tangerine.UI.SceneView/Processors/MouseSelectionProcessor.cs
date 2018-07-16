@@ -112,12 +112,18 @@ namespace Tangerine.UI.SceneView
 		{
 			protected override bool ProbeInternal(Widget widget, Vector2 point)
 			{
+				if (!(widget.Visible || widget.GloballyVisible)) {
+					return false;
+				}
 				var hull = widget.CalcHullInSpaceOf(SceneView.Instance.Scene);
 				return hull.Contains(point);
 			}
 
 			protected override bool ProbeInternal(Widget widget, Rectangle rectangle)
 			{
+				if (!(widget.Visible || widget.GloballyVisible)) {
+					return false;
+				}
 				var canvas = SceneView.Instance.Scene;
 				var hull = widget.CalcHullInSpaceOf(canvas);
 				for (int i = 0; i < 4; i++) {
