@@ -51,6 +51,7 @@
     <Compile Include="KeyframeButton.cs" />
     <Compile Include="KeyframeDataflow.cs" />
     <Compile Include="KeyFunctionButton.cs" />
+    <Compile Include="KeyFunctionContextMenu.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Inspector.cs" />
   </ItemGroup>

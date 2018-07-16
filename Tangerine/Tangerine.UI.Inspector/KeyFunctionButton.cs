@@ -8,13 +8,25 @@ namespace Tangerine.UI.Inspector
 {
 	class KeyFunctionButton : ToolbarButton
 	{
+
+		private ClickGesture rightClickGesture;
+
+		protected override void Awake()
+		{
+			base.Awake();
+			rightClickGesture = new ClickGesture(1);
+			Gestures.Add(rightClickGesture);
+		}
+
+		public bool WasRightClicked() => rightClickGesture?.WasRecognized() ?? false;
+
 		public void SetKeyFunction(KeyFunction function)
 		{
 			var s = "Timeline.Interpolation." + FunctionToString(function);
 			Texture = IconPool.GetTexture(s);
 		}
 
-		string FunctionToString(KeyFunction function)
+		internal static string FunctionToString(KeyFunction function)
 		{
 			switch (function) {
 				case KeyFunction.Linear:
@@ -29,6 +41,7 @@ namespace Tangerine.UI.Inspector
 					throw new ArgumentException();
 			}
 		}
+
 	}
 
 	class KeyFunctionButtonBinding : ITaskProvider
@@ -53,6 +66,9 @@ namespace Tangerine.UI.Inspector
 						button.SetKeyFunction(v.Value);
 					}
 				}
+				if (button.WasRightClicked()) {
+					KeyFunctionContextMenu.Create(this);
+				}
 				if (button.WasClicked()) {
 					Document.Current.History.DoTransaction(() => {
 						SetKeyFunction(NextKeyFunction(v.GetValueOrDefault()));
@@ -68,7 +84,7 @@ namespace Tangerine.UI.Inspector
 			return (KeyFunction)(((int)value + 1) % count);
 		}
 
-		void SetKeyFunction(KeyFunction value)
+		internal void SetKeyFunction(KeyFunction value)
 		{
 			foreach (var animable in editorParams.Objects.OfType<IAnimable>()) {
 				IAnimator animator;
