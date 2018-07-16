@@ -21,7 +21,8 @@ namespace Tangerine.UI.SceneView
 					for (int i = 0; i < 4; i++) {
 						var a = hull[i];
 						if (sv.HitTestResizeControlPoint(a)) {
-							Utils.ChangeCursorIfDefault(MouseCursor.SizeNS);
+							var cursor = i % 2 == 0 ? MouseCursor.SizeNWSE : MouseCursor.SizeNESW;
+							Utils.ChangeCursorIfDefault(cursor);
 							if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {
 								yield return Resize(hull, i * 2, pivot);
 							}

@@ -1,4 +1,4 @@
-﻿namespace Lime
+namespace Lime
 {
 	internal interface IStockCursors
 	{
@@ -9,5 +9,7 @@
 		MouseCursor SizeNS { get; }
 		MouseCursor SizeWE { get; }
 		MouseCursor SizeAll { get; }
+		MouseCursor SizeNWSE { get; }
+		MouseCursor SizeNESW { get; }
 	}
 }
