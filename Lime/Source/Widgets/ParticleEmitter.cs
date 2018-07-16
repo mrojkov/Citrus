@@ -944,9 +944,17 @@ namespace Lime
 		// ReSharper disable once UnusedMember.Local
 		private void BuildForTangerine()
 		{
-			Nodes.Add(new ParticleModifier() {
+			var defaultModifier = new ParticleModifier() {
 				Id = "ParticleModifier"
-			});
+			};
+			var animator = new Color4Animator() {
+				TargetProperty = "Color"
+			};
+			animator.ReadonlyKeys.Add(0, new Color4(255, 255, 255, 0));
+			animator.ReadonlyKeys.Add(1, new Color4(255, 255, 255, 255));
+			animator.ReadonlyKeys.Add(2, new Color4(255, 255, 255, 0));
+			defaultModifier.Animators.Add(animator);
+			Nodes.Add(defaultModifier);
 		}
 	}
 }
