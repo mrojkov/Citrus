@@ -36,6 +36,8 @@ namespace Tangerine.UI.Timeline
 			ConnectCommand(TimelineCommands.CopyMarkers, Rulerbar.CopyMarkers);
 			ConnectCommand(TimelineCommands.PasteMarkers, Rulerbar.PasteMarkers);
 			ConnectCommand(TimelineCommands.DeleteMarkers, Rulerbar.DeleteMarkers);
+			ConnectCommand(TimelineCommands.MoveDown, MoveNodesDown.Perform);
+			ConnectCommand(TimelineCommands.MoveUp, MoveNodesUp.Perform);
 		}
 		
 		private static void ConnectCommand(ICommand command, Action action, Func<bool> enableChecker = null)

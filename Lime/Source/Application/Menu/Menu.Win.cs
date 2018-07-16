@@ -221,6 +221,8 @@ namespace Lime
 				key == Key.Pause ? Keys.Pause :
 				key == Key.EqualsSign ? Keys.Oemplus :
 				key == Key.Minus ? Keys.OemMinus :
+				key == Key.LBracket ? Keys.OemOpenBrackets :
+				key == Key.RBracket ? Keys.OemCloseBrackets :
 				InvalidKeyExceptionFunc();
 		}
 
