@@ -237,9 +237,7 @@ namespace Tangerine.Core
 			// Checking and attempting to close modified documents
 			for (var i = documents.Count() - 1; i >= 0; i--) {
 				if (
-					documents[i].IsModified &&
-					!CloseDocument(documents[i])
-					) {
+					documents[i].IsModified && !CloseDocument(documents[i])) {
 					return false;
 				}
 			}
@@ -258,17 +256,13 @@ namespace Tangerine.Core
 			for (var i = documents.Count() - 1; i >= 0; i--) {
 				if (
 					documents[i].IsModified &&
-					documents[i] != doc &&
-					!CloseDocument(documents[i])
-					) {
+					documents[i] != doc && !CloseDocument(documents[i])) {
 					return false;
 				}
 			}
 			// Close others documents
 			for (var i = documents.Count() - 1; i >= 0; i--) {
-				if (documents[i] != doc &&
-					!CloseDocument(documents[i])
-					) {
+				if (documents[i] != doc && !CloseDocument(documents[i])) {
 					return false;
 				}
 			}
