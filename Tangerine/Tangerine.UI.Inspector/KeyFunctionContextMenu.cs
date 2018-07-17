@@ -14,7 +14,7 @@ namespace Tangerine.UI.Inspector
 		{
 			var menu = new Menu();
 			foreach (KeyFunction keyFunction in Enum.GetValues(typeof(KeyFunction))) {
-				menu.Add(new Command(KeyFunctionButton.FunctionToString(keyFunction),
+				menu.Add(new Command(Enum.GetName(typeof(KeyFunction), keyFunction),
 					new ChangeKeyFunction(binding, keyFunction).Execute));
 			}
 			menu.Popup();

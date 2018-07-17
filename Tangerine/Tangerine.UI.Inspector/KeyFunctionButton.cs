@@ -26,7 +26,7 @@ namespace Tangerine.UI.Inspector
 			Texture = IconPool.GetTexture(s);
 		}
 
-		internal static string FunctionToString(KeyFunction function)
+		private static string FunctionToString(KeyFunction function)
 		{
 			switch (function) {
 				case KeyFunction.Linear:
