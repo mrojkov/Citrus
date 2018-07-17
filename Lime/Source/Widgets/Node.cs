@@ -1164,6 +1164,22 @@ namespace Lime
 
 		public void ReplaceContent(Node content)
 		{
+			var nodeType = GetType();
+			var contentType = content.GetType();
+			if (nodeType != contentType) {
+				// Handle legacy case: Replace Button content by external Frame
+				if (nodeType == typeof(Button) && contentType == typeof(Frame)) {
+					var assetBundlePathComponent = content.Components.Get<AssetBundlePathComponent>();
+					if (assetBundlePathComponent != null) {
+						Components.Add(assetBundlePathComponent.Clone());
+					}
+				} else {
+					throw new Exception($"Can not replace {nodeType.FullName} content with {contentType.FullName}");
+				}
+			} else {
+				Components = content.Components.Clone(this);
+			}
+
 			if ((content is Widget) && (this is Widget)) {
 				((Widget)content).Size = (this as Widget).Size;
 			}
@@ -1187,7 +1203,6 @@ namespace Lime
 			RenderChainBuilder = content.RenderChainBuilder?.Clone(this);
 			Presenter = content.Presenter?.Clone();
 			PostPresenter = content.PostPresenter?.Clone();
-			Components = content.Components.Clone(this);
 		}
 
 		private static readonly string[] sceneExtensions = { ".scene", ".t3d", ".tan" };
