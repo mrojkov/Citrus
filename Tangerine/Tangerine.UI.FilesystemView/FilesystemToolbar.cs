@@ -12,6 +12,12 @@ namespace Tangerine.UI.FilesystemView
 		Extension
 	}
 
+	public enum OrderType
+	{
+		Ascending,
+		Descending
+	}
+
 	public class Toolbar : Widget
 	{
 		public Toolbar()
@@ -58,6 +64,7 @@ namespace Tangerine.UI.FilesystemView
 								CreateSplitVButton(),
 								CreateSortByText(),
 								CreateSortDropDownList(),
+								CreateSortOrderDropDownList(),
 								new Widget {
 									LayoutCell = new LayoutCell { Stretch = new Vector2(9999, 9999)}
 								},
@@ -115,7 +122,24 @@ namespace Tangerine.UI.FilesystemView
 			};
 
 			list.Changed += args => {
-				view.SortByType((SortType)args.Value);
+				view.SortByType((SortType)args.Value, view.OrderType);
+			};
+
+			return list;
+		}
+
+		private Widget CreateSortOrderDropDownList()
+		{
+			var list = new ThemedDropDownList {
+				Items = {
+					new ThemedDropDownList.Item("Ascending", OrderType.Ascending),
+					new ThemedDropDownList.Item("Descending", OrderType.Descending)
+				},
+				Index = 0
+			};
+
+			list.Changed += args => {
+				view.SortByType(view.SortType, (OrderType)args.Value);
 			};
 
 			return list;
