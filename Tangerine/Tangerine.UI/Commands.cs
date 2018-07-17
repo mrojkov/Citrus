@@ -78,9 +78,9 @@ namespace Tangerine.UI
 	{
 		public static readonly ICommand PreviewAnimation = new Command(new Shortcut(Key.F5));
 		public static readonly ICommand PreviewAnimationWithTriggeringOfMarkers = new Command(new Shortcut(Modifiers.Control, Key.F5));
-		public static readonly ICommand ResolutionChanger = new Command("Preview next resolution", new Shortcut(Key.F11));
-		public static readonly ICommand ResolutionReverceChanger = new Command("Preview previous resolution", new Shortcut(Modifiers.Shift, Key.F11));
-		public static readonly ICommand ResolutionOrientation = new Command("Preview next orientation", new Shortcut(Key.F12));
+		public static readonly ICommand ResolutionChanger = new Command("Preview Next Resolution", new Shortcut(Key.F11));
+		public static readonly ICommand ResolutionReverceChanger = new Command("Preview Previous Resolution", new Shortcut(Modifiers.Shift, Key.F11));
+		public static readonly ICommand ResolutionOrientation = new Command("Preview Next Orientation", new Shortcut(Key.F12));
 		public static readonly ICommand DragRight = new Command(new Shortcut(Key.D));
 		public static readonly ICommand DragLeft = new Command(new Shortcut(Key.A));
 		public static readonly ICommand DragUp = new Command(new Shortcut(Key.W));
