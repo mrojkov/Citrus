@@ -20,6 +20,9 @@ namespace Tangerine
 		readonly ColorThemeEnum theme;
 		readonly Frame Frame;
 		readonly TabbedWidget Content;
+
+		private List<ISaveAfterEdit> editors = new List<ISaveAfterEdit>();
+
 		private static readonly Thickness contentPadding = new Thickness {
 			Left = 10,
 			Top = 10,
@@ -70,6 +73,7 @@ namespace Tangerine
 			HotkeyRegistry.CurrentProfile.Save();
 			okButton.Clicked += () => {
 				saved = true;
+				SaveAfterEdit();
 				window.Close();
 				if (theme != AppUserPreferences.Instance.Theme) {
 					AlertDialog.Show("The color theme change will take effect next time you run Tangerine.");
@@ -177,6 +181,7 @@ namespace Tangerine
 				});
 			tmp.ContainerWidget.AddChangeWatcher(
 				new Property<Color4>(source, targetProperty), (v) => Application.InvalidateWindows());
+			editors.Add(tmp);
 		}
 
 		Widget CreateGeneralPane()
@@ -184,16 +189,20 @@ namespace Tangerine
 			var pane = new ThemedScrollView();
 			pane.Content.Layout = new VBoxLayout { Spacing = 4 };
 			pane.Content.Padding = contentPadding;
-			new Vector2PropertyEditor(
-				new PropertyEditorParams(pane.Content, Tangerine.AppUserPreferences.Instance, nameof(Tangerine.AppUserPreferences.DefaultSceneDimensions), "Default scene dimensions"));
+			editors.Add(
+				new Vector2PropertyEditor(
+					new PropertyEditorParams(pane.Content, Tangerine.AppUserPreferences.Instance, nameof(Tangerine.AppUserPreferences.DefaultSceneDimensions), "Default scene dimensions")));
 			new BooleanPropertyEditor(
 				new PropertyEditorParams(pane.Content, CoreUserPreferences.Instance, nameof(CoreUserPreferences.AutoKeyframes), "Automatic keyframes"));
 			new BooleanPropertyEditor(
 				new PropertyEditorParams(pane.Content, CoreUserPreferences.Instance, nameof(CoreUserPreferences.AnimationMode), "Animation mode"));
-			new IntPropertyEditor(
-				new PropertyEditorParams(pane.Content, Tangerine.AppUserPreferences.Instance, nameof(Tangerine.AppUserPreferences.AutosaveDelay), "Autosave delay"));
-			var boneWidthPropertyEditor = new FloatPropertyEditor(
-				new PropertyEditorParams(pane.Content, UI.SceneView.SceneUserPreferences.Instance, nameof(UI.SceneView.SceneUserPreferences.DefaultBoneWidth), "Bone Width"));
+			editors.Add(
+				new IntPropertyEditor(
+					new PropertyEditorParams(pane.Content, Tangerine.AppUserPreferences.Instance, nameof(Tangerine.AppUserPreferences.AutosaveDelay), "Autosave delay")));
+			var boneWidthPropertyEditor =
+				new FloatPropertyEditor(
+					new PropertyEditorParams(pane.Content, UI.SceneView.SceneUserPreferences.Instance, nameof(UI.SceneView.SceneUserPreferences.DefaultBoneWidth), "Bone Width"));
+
 			boneWidthPropertyEditor.ContainerWidget.AddChangeWatcher(
 				() => UI.SceneView.SceneUserPreferences.Instance.DefaultBoneWidth, (v) => Application.InvalidateWindows());
 			new EnumPropertyEditor<KeyFunction>(
@@ -201,6 +210,11 @@ namespace Tangerine
 			return pane;
 		}
 
+		private void SaveAfterEdit()
+		{
+			editors.ForEach(i => i.SaveAfterEdit());
+		}
+		
 		private Widget CreateKeyboardPane()
 		{
 			var hotkeyEditor = new HotkeyEditor();
