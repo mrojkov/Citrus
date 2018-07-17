@@ -123,40 +123,40 @@ namespace Tangerine.UI.FilesystemView
 
 		public IEnumerable<string> EnumerateItems()
 		{
-			foreach (var i in Directory.EnumerateDirectories(CurrentPath).OrderBy(f => f)) {
-				yield return i;
-			}
-			foreach (var i in Directory.EnumerateFiles(CurrentPath).OrderBy(f => f)) {
-				yield return i;
-			}
+			return EnumerateItems(SortType.Name);
 		}
 
-		public IEnumerable<string> EnumerateItemsSortedBySize()
+		public IEnumerable<string> EnumerateItems(SortType type)
 		{
-			foreach (var i in Directory.EnumerateDirectories(CurrentPath).OrderBy(f => f.Length)) {
-				yield return i;
+			IEnumerable<string> dirs;
+			IEnumerable<string> files;
+			switch (type) {
+				case SortType.Name:
+					dirs = Directory.EnumerateDirectories(CurrentPath).OrderBy(f => f);
+					files = Directory.EnumerateFiles(CurrentPath).OrderBy(f => f);
+					break;
+				case SortType.Date:
+					dirs = Directory.EnumerateDirectories(CurrentPath).OrderBy(f => new FileInfo(f).LastWriteTime);
+					files = Directory.EnumerateFiles(CurrentPath).OrderBy(f => new FileInfo(f).LastWriteTime);
+					break;
+				case SortType.Extension:
+					dirs = Directory.EnumerateDirectories(CurrentPath).OrderBy(f => new FileInfo(f).Extension);
+					files = Directory.EnumerateFiles(CurrentPath).OrderBy(f => new FileInfo(f).Extension);
+					break;
+				case SortType.Size:
+					dirs = Directory.EnumerateDirectories(CurrentPath).OrderBy(f => f.Length);
+					files = Directory.EnumerateFiles(CurrentPath).OrderBy(f => f.Length);
+					break;
+				default:
+					dirs = Directory.EnumerateDirectories(CurrentPath).OrderBy(f => f);
+					files = Directory.EnumerateFiles(CurrentPath).OrderBy(f => f);
+					break;
 			}
-			foreach (var i in Directory.EnumerateFiles(CurrentPath).OrderBy(f => f.Length)) {
-				yield return i;
-			}
-		}
 
-		public IEnumerable<string> EnumerateItemsSortedByDate()
-		{
-			foreach (var i in Directory.EnumerateDirectories(CurrentPath).OrderBy(f => new FileInfo(f).LastWriteTime)) {
+			foreach (var i in dirs) {
 				yield return i;
 			}
-			foreach (var i in Directory.EnumerateFiles(CurrentPath).OrderBy(f => new FileInfo(f).LastWriteTime)) {
-				yield return i;
-			}
-		}
-
-		public IEnumerable<string> EnumerateItemsSortedByExtension()
-		{
-			foreach (var i in Directory.EnumerateDirectories(CurrentPath).OrderBy(f => new FileInfo(f).Extension)) {
-				yield return i;
-			}
-			foreach (var i in Directory.EnumerateFiles(CurrentPath).OrderBy(f => new FileInfo(f).Extension)) {
+			foreach (var i in files) {
 				yield return i;
 			}
 		}

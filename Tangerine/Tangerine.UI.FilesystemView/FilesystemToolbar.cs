@@ -6,10 +6,10 @@ namespace Tangerine.UI.FilesystemView
 
 	public enum SortType
 	{
-		ByName,
-		BySize,
-		ByDate,
-		ByExtension
+		Name,
+		Size,
+		Date,
+		Extension
 	}
 
 	public class Toolbar : Widget
@@ -56,7 +56,8 @@ namespace Tangerine.UI.FilesystemView
 								CreateTogglePreviewButton(),
 								CreateSplitHButton(),
 								CreateSplitVButton(),
-								CreateSortButton(),
+								CreateSortByText(),
+								CreateSortDropDownList(),
 								new Widget {
 									LayoutCell = new LayoutCell { Stretch = new Vector2(9999, 9999)}
 								},
@@ -89,15 +90,28 @@ namespace Tangerine.UI.FilesystemView
 			};
 		}
 
-		private Widget CreateSortButton()
+		private Widget CreateSortByText()
 		{
-			ThemedDropDownList list = new ThemedDropDownList() {
-				Items = {
-					new ThemedDropDownList.Item("Sort by Name", SortType.ByName),
-					new ThemedDropDownList.Item("Sort by Extension", SortType.ByExtension),
-					new ThemedDropDownList.Item("Sort by Size", SortType.BySize),
-					new ThemedDropDownList.Item("Sort by Date", SortType.ByDate)
+			return new ThemedSimpleText {
+				Text = "Sort By ",
+				Padding = new Thickness {
+					Top = 2,
+					Left = 2,
+					Right = 2
 				}
+			};
+		}
+
+		private Widget CreateSortDropDownList()
+		{
+			var list = new ThemedDropDownList() {
+				Items = {
+					new ThemedDropDownList.Item("Name", SortType.Name),
+					new ThemedDropDownList.Item("Extension", SortType.Extension),
+					new ThemedDropDownList.Item("Size", SortType.Size),
+					new ThemedDropDownList.Item("Date", SortType.Date)
+				},
+				Index = 0
 			};
 
 			list.Changed += args => {
