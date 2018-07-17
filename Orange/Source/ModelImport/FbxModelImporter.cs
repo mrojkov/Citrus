@@ -14,7 +14,7 @@ namespace Orange
 		*/
 		private readonly static Quaternion CameraPostRotation = Quaternion.CreateFromEulerAngles(Vector3.UnitY * -Mathf.Pi / 2);
 		private string path;
-		private Manager manager;
+		private FbxManager manager;
 		private Target target;
 		private readonly Dictionary<string, CookingRules> cookingRulesMap;
 
@@ -25,7 +25,7 @@ namespace Orange
 			this.target = target;
 			this.path = path;
 			this.cookingRulesMap = cookingRulesMap;
-			manager = Manager.Create();
+			manager = FbxManager.Create();
 			var scene = manager.LoadScene(path);
 			Model = new Model3D();
 			Model.Nodes.Add(ImportNodes(scene.Root));
@@ -34,14 +34,14 @@ namespace Orange
 			manager.Destroy();
 		}
 
-		private Lime.Node ImportNodes(FbxImporter.Node root, Lime.Node parent = null)
+		private Lime.Node ImportNodes(FbxImporter.FbxNode root, Lime.Node parent = null)
 		{
 			Node3D node = null;
 			if (root == null)
 				return null;
 			switch (root.Attribute.Type) {
-				case NodeAttribute.FbxNodeType.Mesh:
-					var meshAttribute = root.Attribute as MeshAttribute;
+				case FbxNodeAttribute.FbxNodeType.Mesh:
+					var meshAttribute = root.Attribute as FbxMeshAttribute;
 					var mesh = new Mesh3D { Id = root.Name };
 					foreach (var submesh in meshAttribute.Submeshes) {
 						mesh.Submeshes.Add(ImportSubmesh(submesh, root));
@@ -53,8 +53,8 @@ namespace Orange
 						mesh.RecalcCenter();
 					}
 					break;
-				case NodeAttribute.FbxNodeType.Camera:
-					var cam = root.Attribute as CameraAttribute;
+				case FbxNodeAttribute.FbxNodeType.Camera:
+					var cam = root.Attribute as FbxCameraAttribute;
 					node = new Camera3D {
 						Id = root.Name,
 						FieldOfView = cam.FieldOfView * Mathf.DegToRad,
@@ -84,7 +84,7 @@ namespace Orange
 			return node;
 		}
 
-		private Submesh3D ImportSubmesh(Submesh meshAttribute, FbxImporter.Node node)
+		private Submesh3D ImportSubmesh(FbxSubmesh meshAttribute, FbxImporter.FbxNode node)
 		{
 			var sm = new Submesh3D();
 			sm.Mesh = new Mesh<Mesh3D.Vertex> {
@@ -101,7 +101,7 @@ namespace Orange
 			};
 
 			sm.Material = meshAttribute.MaterialIndex != -1 ?
-				CreateLimeMaterial(node.Materials[meshAttribute.MaterialIndex], path, target) : Material.Default;
+				CreateLimeMaterial(node.Materials[meshAttribute.MaterialIndex], path, target) : FbxMaterial.Default;
 
 			if (meshAttribute.Bones.Length > 0) {
 				foreach (var bone in meshAttribute.Bones) {
@@ -112,7 +112,7 @@ namespace Orange
 			return sm;
 		}
 
-		public CommonMaterial CreateLimeMaterial(Material material, string modelPath, Target target)
+		public CommonMaterial CreateLimeMaterial(FbxMaterial material, string modelPath, Target target)
 		{
 			var commonMaterial = new CommonMaterial {
 				Name = material.Name
@@ -164,7 +164,7 @@ namespace Orange
 			}
 		}
 
-		private void ImportAnimations(Scene scene)
+		private void ImportAnimations(FbxScene scene)
 		{
 			foreach (var animation in scene.Animations.List) {
 				var n = Model.TryFind<Node3D>(animation.AnimationKey);

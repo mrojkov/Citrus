@@ -1,15 +1,15 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 
 namespace Orange.FbxImporter
 {
-	public class NodeAttribute : FbxObject
+	public class FbxNodeAttribute : FbxObject
 	{
-		public static NodeAttribute Empty = new NodeAttribute(IntPtr.Zero);
+		public static FbxNodeAttribute Empty = new FbxNodeAttribute(IntPtr.Zero);
 
 		public virtual FbxNodeType Type { get; } = FbxNodeType.None;
 
-		protected NodeAttribute(IntPtr ptr) : base(ptr)
+		protected FbxNodeAttribute(IntPtr ptr) : base(ptr)
 		{ }
 
 		public enum FbxNodeType
@@ -19,7 +19,7 @@ namespace Orange.FbxImporter
 			Camera
 		};
 
-		public static NodeAttribute GetFromNode(IntPtr ptr)
+		public static FbxNodeAttribute GetFromNode(IntPtr ptr)
 		{
 			var attribute = FbxNodeGetAttribute(ptr);
 			if (attribute == IntPtr.Zero) {
@@ -27,14 +27,14 @@ namespace Orange.FbxImporter
 			}
 			switch (FbxNodeGetAttributeType(ptr)) {
 				case FbxNodeType.Mesh:
-					var meshAttribute = new MeshAttribute(attribute);
+					var meshAttribute = new FbxMeshAttribute(attribute);
 					var count = FbxNodeGetAttributeCount(ptr);
 					for (var i = 1; i < count; i++) {
-						meshAttribute = MeshAttribute.Combine(meshAttribute, new MeshAttribute(FbxNodeGetAttribute(ptr, i)));
+						meshAttribute = FbxMeshAttribute.Combine(meshAttribute, new FbxMeshAttribute(FbxNodeGetAttribute(ptr, i)));
 					}
 					return meshAttribute;
 				case FbxNodeType.Camera:
-					return new CameraAttribute(attribute);
+					return new FbxCameraAttribute(attribute);
 				default:
 					return Empty;
 			}

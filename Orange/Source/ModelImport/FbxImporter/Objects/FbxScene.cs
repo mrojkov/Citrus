@@ -1,22 +1,22 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 
 namespace Orange.FbxImporter
 {
-	public class Scene : FbxObject
+	public class FbxScene : FbxObject
 	{
-		public Node Root { get; }
+		public FbxNode Root { get; }
 
-		public SceneAnimations Animations { get; }
+		public FbxSceneAnimations Animations { get; }
 
-		public Scene(IntPtr ptr) : base(ptr)
+		public FbxScene(IntPtr ptr) : base(ptr)
 		{
 			var r = FbxSceneGetRootNode(NativePtr);
 			if (r == IntPtr.Zero) {
 				throw new FbxImportException("An error has occured while parsing root node");
 			}
-			Root = new Node(r);
-			Animations = new SceneAnimations(ptr);
+			Root = new FbxNode(r);
+			Animations = new FbxSceneAnimations(ptr);
 		}
 
 		#region PInvokes

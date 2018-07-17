@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
@@ -6,16 +6,16 @@ using System.Text;
 
 namespace Orange.FbxImporter
 {
-	public class Manager : FbxObject
+	public class FbxManager : FbxObject
 	{
-		private List<Scene> createdScenes = new List<Scene>();
+		private List<FbxScene> createdScenes = new List<FbxScene>();
 
-		public static Manager Create()
+		public static FbxManager Create()
 		{
-			return new Manager(FbxCreateManager());
+			return new FbxManager(FbxCreateManager());
 		}
 
-		private Manager(IntPtr ptr) : base(ptr)
+		private FbxManager(IntPtr ptr) : base(ptr)
 		{
 			if (ptr == IntPtr.Zero) {
 				throw new FbxImportException("An error has occured while initializing FbxSdk manager");
@@ -23,13 +23,13 @@ namespace Orange.FbxImporter
 		}
 
 		[HandleProcessCorruptedStateExceptions]
-		public Scene LoadScene(string fileName)
+		public FbxScene LoadScene(string fileName)
 		{
 			var native = FbxManagerLoadScene(NativePtr, new StringBuilder(fileName));
 			if (native == IntPtr.Zero) {
 				throw new FbxImportException("An error has occured while loading scene");
 			}
-			var scene = new Scene(native);
+			var scene = new FbxScene(native);
 			createdScenes.Add(scene);
 			return scene;
 		}

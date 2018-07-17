@@ -1,37 +1,37 @@
-﻿using Lime;
+using Lime;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace Orange.FbxImporter
 {
-	public class Node : FbxObject
+	public class FbxNode : FbxObject
 	{
-		public NodeAttribute Attribute { get; }
+		public FbxNodeAttribute Attribute { get; }
 
-		public List<Node> Children { get; } = new List<Node>();
+		public List<FbxNode> Children { get; } = new List<FbxNode>();
 
-		public Material[] Materials { get; }
+		public FbxMaterial[] Materials { get; }
 
 		public Matrix44 LocalTranform { get; }
 
 		public string Name { get; }
 
-		public Node(IntPtr ptr) : base(ptr)
+		public FbxNode(IntPtr ptr) : base(ptr)
 		{
 			var nodeCount = FbxNodeGetChildCount(NativePtr);
 			var materialsCount = FbxNodeGetMaterialCount(NativePtr);
 
 			Name = FbxNodeGetName(NativePtr).PtrToString();
-			Materials = new Material[materialsCount];
+			Materials = new FbxMaterial[materialsCount];
 			for (int i = 0; i < materialsCount; i++) {
-				Materials[i] = new Material(FbxNodeGetMaterial(NativePtr, i));
+				Materials[i] = new FbxMaterial(FbxNodeGetMaterial(NativePtr, i));
 			}
 
-			Attribute = NodeAttribute.GetFromNode(NativePtr);
+			Attribute = FbxNodeAttribute.GetFromNode(NativePtr);
 
 			for (int i = 0; i < nodeCount; i++) {
-				Children.Add(new Node(FbxNodeGetChildNode(NativePtr, i)));
+				Children.Add(new FbxNode(FbxNodeGetChildNode(NativePtr, i)));
 			}
 
 			LocalTranform = FbxNodeGetLocalTransform(NativePtr).ToStruct<Mat4x4>().ToLime();

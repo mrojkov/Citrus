@@ -19,11 +19,11 @@ namespace Orange.FbxImporter
 		public string MarkerId { get; set; }
 	}
 
-	public class SceneAnimations
+	public class FbxSceneAnimations
 	{
 		public List<AnimationData> List = new List<AnimationData>();
 
-		public SceneAnimations(IntPtr scene)
+		public FbxSceneAnimations(IntPtr scene)
 		{
 			var animationStacksPointer = FbxSceneGetAnimations(scene);
 			if (animationStacksPointer == IntPtr.Zero) return;

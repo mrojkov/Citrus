@@ -4,7 +4,7 @@ using Lime;
 
 namespace Orange.FbxImporter
 {
-	public class CameraAttribute : NodeAttribute
+	public class FbxCameraAttribute : FbxNodeAttribute
 	{
 		public override FbxNodeType Type { get; } = FbxNodeType.Camera;
 
@@ -22,7 +22,7 @@ namespace Orange.FbxImporter
 
 		public CameraProjectionMode ProjectionMode { get; }
 
-		public CameraAttribute(IntPtr ptr) : base(ptr)
+		public FbxCameraAttribute(IntPtr ptr) : base(ptr)
 		{
 			var native = FbxNodeGetCameraAttribute(ptr);
 			if (native == IntPtr.Zero) {

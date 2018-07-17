@@ -13,7 +13,7 @@ namespace Orange.FbxImporter
 	{
 		private const string messageTemplate = "An error has occured when parsing a node of a type {0} in native library";
 
-		public FbxAtributeImportException(NodeAttribute.FbxNodeType type) : base(string.Format(messageTemplate, type))
+		public FbxAtributeImportException(FbxNodeAttribute.FbxNodeType type) : base(string.Format(messageTemplate, type))
 		{
 
 		}

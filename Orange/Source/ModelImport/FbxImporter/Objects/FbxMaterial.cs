@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace Orange.FbxImporter
 {
-	public class Material : FbxObject
+	public class FbxMaterial : FbxObject
 	{
 		internal static IMaterial Default = new CommonMaterial {
 			Name = "Default",
@@ -20,7 +20,7 @@ namespace Orange.FbxImporter
 
 		public Color4 DiffuseColor { get; }
 
-		public Material(IntPtr ptr) : base(ptr)
+		public FbxMaterial(IntPtr ptr) : base(ptr)
 		{
 			if (ptr == IntPtr.Zero) {
 				DiffuseColor = Color4.White;
