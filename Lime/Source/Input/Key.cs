@@ -243,6 +243,9 @@ namespace Lime
 		public static readonly Key MouseWheelUp = New();
 		public static readonly Key MouseWheelDown = New();
 
+		public static readonly Key MouseBack = New();
+		public static readonly Key MouseForward = New();
+
 		/// <summary>
 		/// The double click with the left mouse button.
 		/// </summary>

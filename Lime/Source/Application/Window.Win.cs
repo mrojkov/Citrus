@@ -511,6 +511,12 @@ namespace Lime
 			} else if (e.Button == MouseButtons.Middle) {
 				Input.SetKeyState(Key.Mouse2, true);
 			}
+			else if (e.Button == MouseButtons.XButton1) {
+				Input.SetKeyState(Key.MouseBack, true);
+			}
+			else if (e.Button == MouseButtons.XButton2) {
+				Input.SetKeyState(Key.MouseForward, true);
+			}
 		}
 
 		private void OnMouseUp(object sender, MouseEventArgs e)
@@ -524,6 +530,12 @@ namespace Lime
 				Input.SetKeyState(Key.Mouse1DoubleClick, false);
 			} else if (e.Button == MouseButtons.Middle) {
 				Input.SetKeyState(Key.Mouse2, false);
+			}
+			else if (e.Button == MouseButtons.XButton1) {
+				Input.SetKeyState(Key.MouseBack, false);
+			}
+			else if (e.Button == MouseButtons.XButton2) {
+				Input.SetKeyState(Key.MouseForward, false);
 			}
 		}
 
