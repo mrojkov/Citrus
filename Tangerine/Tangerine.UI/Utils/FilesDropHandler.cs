@@ -76,7 +76,8 @@ namespace Tangerine.UI
 				foreach (var file in files) {
 					try {
 						string assetPath, assetType;
-						if (!Utils.ExtractAssetPathOrShowAlert(file, out assetPath, out assetType)) {
+						if (!Utils.ExtractAssetPathOrShowAlert(file, out assetPath, out assetType) ||
+							!Utils.AssertCurrentDocument(assetPath, assetType.Substring(1))) {
 							continue;
 						}
 

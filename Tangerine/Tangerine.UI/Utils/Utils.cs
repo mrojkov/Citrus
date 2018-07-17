@@ -105,6 +105,16 @@ namespace Tangerine.UI
 			return aabb.ToQuadrangle();
 		}
 
+		public static bool AssertCurrentDocument(string assetPath, string assetType)
+		{
+			if (assetPath.Equals(Document.Current.Path) &&
+				assetType.Equals(Document.GetFileExtension(Document.Current.Format))) {
+				AlertDialog.Show($"Сycle dependency is not allowed: {assetPath}.{assetType}");
+				return false;
+			}
+			return true;
+		}
+
 		public static bool ExtractAssetPathOrShowAlert(string filePath, out string assetPath, out string assetType)
 		{
 			if (!filePath.StartsWith(Core.Project.Current.AssetsDirectory, StringComparison.CurrentCultureIgnoreCase)) {
