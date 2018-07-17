@@ -186,7 +186,8 @@ namespace Tangerine.UI
 
 			private Result Pick(float x, float y)
 			{
-				ShiftedCoordinates(x, y, out float nx, out float ny);
+				float nx, ny;
+				ShiftedCoordinates(x, y, out nx, out ny);
 				float centerDistance = Mathf.Sqrt(nx * nx + ny * ny);
 				if (centerDistance > OuterRadius) {
 					return new Result { Area = Area.Outside };
@@ -209,10 +210,11 @@ namespace Tangerine.UI
 						if (pick.Area != Area.Outside) {
 							DragStarted?.Invoke();
 							while (Widget.Input.IsMousePressed()) {
+								float nx, ny;
 								ShiftedCoordinates(
 									Widget.Input.MousePosition.X - Widget.GlobalPosition.X,
 									Widget.Input.MousePosition.Y - Widget.GlobalPosition.Y,
-									out float nx, out float ny);
+									out nx, out ny);
 								if (pick.Area == Area.Triangle) {
 									var newPick = PositionToSV(nx, ny, ignoreBounds: true);
 									color.Value = new ColorHSVA {
