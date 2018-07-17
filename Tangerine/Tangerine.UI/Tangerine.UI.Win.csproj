@@ -44,6 +44,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Documentation\Documentation.cs" />
     <Compile Include="Documentation\DocumentationComponent.cs" />
     <Compile Include="Documentation\HelpModeGestureManager.cs" />
     <Compile Include="Documentation\HelpPage.cs" />

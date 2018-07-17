@@ -230,7 +230,8 @@ namespace Tangerine
 			new UI.FilesystemView.FilesystemPane(filesystemPanel);
 			RegisterGlobalCommands();
 
-			InitDocumentation();
+			Documentation.Init();
+			DocumentationComponent.Clicked = page => new HelpDialog(page);
 		}
 
 		void SetupMainWindowTitle(WindowWidget windowWidget)
@@ -450,10 +451,8 @@ namespace Tangerine
 			h.Connect(GenericCommands.GroupContentsToMorphableMeshes, new GroupContentsToMorphableMeshes());
 			h.Connect(GenericCommands.ExportScene, new ExportScene());
 			h.Connect(GenericCommands.UpsampleAnimationTwice, new UpsampleAnimationTwice());
-			h.Connect(GenericCommands.ViewHelp, () => OpenHelp(new HelpPage(HelpPage.StartPageName)));
-			h.Connect(GenericCommands.HelpMode, () => {
-				HelpModeGestureManager.IsHelpModeOn = !HelpModeGestureManager.IsHelpModeOn;
-			});
+			h.Connect(GenericCommands.ViewHelp, () => new HelpDialog(Documentation.StartPage));
+			h.Connect(GenericCommands.HelpMode, () => Documentation.IsHelpModeOn = !Documentation.IsHelpModeOn);
 			h.Connect(Tools.AlignLeft, new AlignLeft());
 			h.Connect(Tools.AlignRight, new AlignRight());
 			h.Connect(Tools.AlignTop, new AlignTop());
@@ -491,27 +490,6 @@ namespace Tangerine
 			h.Connect(TimelineCommands.CutKeyframes, UI.Timeline.Operations.CutKeyframes.Perform);
 			h.Connect(TimelineCommands.CopyKeyframes, UI.Timeline.Operations.CopyKeyframes.Perform);
 			h.Connect(TimelineCommands.PasteKeyframes, UI.Timeline.Operations.PasteKeyframes.Perform);
-		}
-
-		private void InitDocumentation()
-		{
-			DocumentationComponent.Clicked = page => OpenHelp(page);
-			Directory.CreateDirectory(HelpPage.HtmlDocumentationPath);
-			Directory.CreateDirectory(HelpPage.MarkdownDocumentationPath);
-			string startPagePath = Path.Combine(HelpPage.MarkdownDocumentationPath, HelpPage.StartPageName);
-			if (!File.Exists(startPagePath)) {
-				File.WriteAllText(startPagePath, "# This is start page #");
-			}
-			string errorPagePath = Path.Combine(HelpPage.MarkdownDocumentationPath, HelpPage.ErrorPageName);
-			if (!File.Exists(errorPagePath)) {
-				File.WriteAllText(errorPagePath, "# This is error page #");
-			}
-		}
-
-		private void OpenHelp(HelpPage page)
-		{
-			new HelpDialog(page);
-			HelpModeGestureManager.IsHelpModeOn = false;
 		}
 
 		private void InitializeHotkeys()

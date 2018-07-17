@@ -13,24 +13,16 @@ namespace Tangerine.UI
 		public readonly string PageName;
 		public readonly string PageFilepath;
 		public readonly string Url;
-
-		public static string MarkdownDocumentationPath { get; set; } =
-			Path.Combine(Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.FullName, "Documentation");
-		public static string HtmlDocumentationPath { get; set; } =
-			Lime.Environment.GetPathInsideDataDirectory("Tangerine", "DocumentationCache");
-		public static string StartPageName { get; set; } = "StartPage.md";
-		public static string ErrorPageName { get; set; } = "ErrorPage.md";
-		public static string StyleSheetPath { get; set; } = Path.Combine(MarkdownDocumentationPath, "stylesheet.css");
 		
 		public HelpPage(string pageName)
 		{
 			PageName = pageName;
-			PageFilepath = Path.Combine(MarkdownDocumentationPath, pageName);
+			PageFilepath = Documentation.GetPagePath(pageName);
 
 			string hash = GetPageHash();
-			Url = Path.Combine(HtmlDocumentationPath, pageName + "_" + hash + ".html");
+			Url = Path.Combine(Documentation.HtmlDocumentationPath, pageName + "_" + hash + ".html");
 			if (!File.Exists(Url)) {
-				var oldHtml = Directory.GetFiles(HtmlDocumentationPath).Where(i => 
+				var oldHtml = Directory.GetFiles(Documentation.HtmlDocumentationPath).Where(i => 
 					Path.GetFileName(i).Substring(0, pageName.Length) == pageName
 				);
 				foreach (var file in oldHtml) {
@@ -55,7 +47,7 @@ namespace Tangerine.UI
 			using (StreamWriter sw = new StreamWriter(Url, false, Encoding.UTF8)) {
 				sw.WriteLine(
 					"<head>" +
-					$"<link rel=\"stylesheet\" type=\"text/css\" href=\"{StyleSheetPath}\">" +
+					$"<link rel=\"stylesheet\" type=\"text/css\" href=\"{Documentation.StyleSheetPath}\">" +
 					"</head>"
 				);
 				CommonMark.CommonMarkConverter.Convert(sr, sw);
