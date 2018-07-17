@@ -1,12 +1,10 @@
-using System;
-using System.Collections.Generic;
 using Tangerine.Core;
 
 namespace Tangerine.UI.Timeline
 {
 	public class OverviewWidgetsUpdater : SymmetricOperationProcessor
 	{
-		Timeline timeline => Timeline.Instance;
+		private Timeline timeline => Timeline.Instance;
 
 		public override void Process(IOperation op)
 		{
@@ -16,7 +14,7 @@ namespace Tangerine.UI.Timeline
 			AdjustWidths();
 		}
 
-		void AdjustWidths()
+		private static void AdjustWidths()
 		{
 			foreach (var row in Document.Current.Rows) {
 				var gw = row.Components.Get<Components.RowView>().GridRow;
@@ -24,20 +22,21 @@ namespace Tangerine.UI.Timeline
 			}
 		}
 
-		void ResetWidgets()
+		private void ResetWidgets()
 		{
 			var content = timeline.Overview.ContentWidget;
 			content.Nodes.Clear();
 			foreach (var row in Document.Current.Rows) {
-				var widget = row.Components.Get<Components.RowView>().GridRow.OverviewWidget;
-				if (!widget.IsAwake) {
+				var gridRow = row.Components.Get<Components.RowView>().GridRow;
+				var widget = gridRow.OverviewWidget;
+				if (!gridRow.OverviewWidgetAwakeBehavior.IsAwoken) {
 					widget.Update(0);
 				}
 				content.AddNode(widget);
 			}
 		}
 
-		bool AreWidgetsValid()
+		private bool AreWidgetsValid()
 		{
 			var content = timeline.Overview.ContentWidget;
 			if (Document.Current.Rows.Count != content.Nodes.Count) {

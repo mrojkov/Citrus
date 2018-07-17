@@ -52,11 +52,13 @@ namespace Lime
 			ScrollView.Content.AddNode(TextWidget);
 			Layout = new StackLayout();
 			AddNode(ScrollWidget);
+			Awoke += Awake;
 		}
 
-		protected override void Awake()
+		private static void Awake(Node owner)
 		{
-			TextWidget.Submitted += text => Submitted?.Invoke(text);
+			var ceb = (CommonEditBox)owner;
+			ceb.TextWidget.Submitted += text => ceb.Submitted?.Invoke(text);
 		}
 
 		protected void OnSubmit() => Submitted?.Invoke(Text);

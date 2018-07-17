@@ -198,15 +198,15 @@ namespace Tangerine
 				() => UI.SceneView.SceneUserPreferences.Instance.DefaultBoneWidth, (v) => Application.InvalidateWindows());
 			return pane;
 		}
-		
+
 		private Widget CreateKeyboardPane()
 		{
 			var hotkeyEditor = new HotkeyEditor();
 			var pane = new Widget {
 				Layout = new VBoxLayout { Spacing = 10 },
-				Padding = contentPadding,
-				Awoken = node => hotkeyEditor.SetFocus()
+				Padding = contentPadding
 			};
+			pane.Awoke += node => hotkeyEditor.SetFocus();
 
 			var profileLabel = new ThemedSimpleText("Profile: ") {
 				VAlignment = VAlignment.Center,
@@ -258,7 +258,7 @@ namespace Tangerine
 					}
 				}
 			};
-			
+
 			var categoryLabel = new ThemedSimpleText("Commands: ") {
 				VAlignment = VAlignment.Center,
 				HAlignment = HAlignment.Right,
@@ -364,7 +364,7 @@ namespace Tangerine
 			pane.AddNode(new Widget {
 				Layout = new TableLayout { Spacing = 4, RowCount = 2, ColCount = 3 },
 				Nodes = {
-					profileLabel, profilePicker, 
+					profileLabel, profilePicker,
 					new Widget {
 						Layout = new HBoxLayout { Spacing = 4 },
 						Nodes = { exportButton, importButton, deleteButton }

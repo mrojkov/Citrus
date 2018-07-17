@@ -323,6 +323,7 @@
     <Compile Include="Source\Application\WindowInput.cs" />
     <Compile Include="Source\Widgets\Layout\HFlowLayout.cs" />
     <Compile Include="Source\Widgets\Layout\VFlowLayout.cs" />
+    <Compile Include="Source\Widgets\NodeBehaviours.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

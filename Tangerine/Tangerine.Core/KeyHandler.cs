@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Lime;
 
@@ -18,15 +18,18 @@ namespace Tangerine.Core
 		{
 			while (true) {
 				if (Window.Current.Input.Changed) {
-					var input = TaskList.Current.Widget.Input;
-					if (key != Key.Unknown) {
-						if (WasKeyTriggered(input, key)) {
-							OnKey(input, key);
-						}
-					} else {
-						for (var key = Key.Unknown; key < Key.Count; key++) {
+					var widget = TaskList.Current.Node as Widget;
+					if (widget != null) {
+						var input = widget.Input;
+						if (key != Key.Unknown) {
 							if (WasKeyTriggered(input, key)) {
 								OnKey(input, key);
+							}
+						} else {
+							for (var key = Key.Unknown; key < Key.Count; key++) {
+								if (WasKeyTriggered(input, key)) {
+									OnKey(input, key);
+								}
 							}
 						}
 					}

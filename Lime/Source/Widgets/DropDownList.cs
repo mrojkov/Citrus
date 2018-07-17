@@ -55,6 +55,7 @@ namespace Lime
 			Input.AcceptMouseBeyondWidget = false;
 			Items.CollectionChanged += (sender, e) => RefreshTextWidget();
 			HitTestTarget = true;
+			Awoke += owner => owner.Tasks.Add(((CommonDropDownList)owner).Loop());
 		}
 
 		public override Node Clone()
@@ -62,11 +63,6 @@ namespace Lime
 			var clone = (CommonDropDownList)base.Clone();
 			clone.TextWidgetRef = clone.TextWidgetRef?.Clone();
 			return clone;
-		}
-
-		protected override void Awake()
-		{
-			Tasks.Add(Loop());
 		}
 
 		IEnumerator<object> Loop()
@@ -183,10 +179,15 @@ namespace Lime
 
 	public class ComboBox : CommonDropDownList
 	{
-		protected override void Awake()
+		public ComboBox()
 		{
-			((EditBox)TextWidget).Submitted += TextWidget_Submitted;
-			base.Awake();
+			Awoke += Awake;
+		}
+
+		private static void Awake(Node owner)
+		{
+			var cb = (ComboBox)owner;
+			((EditBox)cb.TextWidget).Submitted += cb.TextWidget_Submitted;
 		}
 
 		private void TextWidget_Submitted(string text)

@@ -53,8 +53,6 @@ namespace Lime
 		private Vector2 measuredMinSize;
 		private Vector2 measuredMaxSize = Vector2.PositiveInfinity;
 		private WidgetInput input;
-		private TaskList tasks;
-		private TaskList lateTasks;
 		/// <summary>
 		/// <code>
 		/// Transition matrix from the local basis to the parent basis:
@@ -525,36 +523,6 @@ namespace Lime
 			set { }
 		}
 
-		/// <summary>
-		/// Tasks that are called before Update.
-		/// </summary>
-		public TaskList Tasks
-		{
-			get
-			{
-				if (tasks == null) {
-					tasks = new TaskList(this);
-					Updating += tasks.Update;
-				}
-				return tasks;
-			}
-		}
-
-		/// <summary>
-		/// Tasks that are called after Update.
-		/// </summary>
-		public TaskList LateTasks
-		{
-			get
-			{
-				if (lateTasks == null) {
-					lateTasks = new TaskList(this);
-					Updated += lateTasks.Update;
-				}
-				return lateTasks;
-			}
-		}
-
 		public WidgetInput Input => input ?? (input = new WidgetInput(this));
 
 		public bool HasInput() => input != null;
@@ -661,7 +629,7 @@ namespace Lime
 			}
 			DiscardMaterial();
 		}
-		
+
 		protected virtual void DiscardMaterial() { }
 
 		/// <summary>
@@ -747,16 +715,6 @@ namespace Lime
 
 #endregion
 
-		/// <summary>
-		/// Called before Update.
-		/// </summary>
-		public event UpdateHandler Updating;
-
-		/// <summary>
-		/// Called after Update.
-		/// </summary>
-		public event UpdateHandler Updated;
-
 		public Widget()
 		{
 			Layout = AnchorLayout.Instance;
@@ -775,15 +733,7 @@ namespace Lime
 		/// </summary>
 		public override void Dispose()
 		{
-			if (tasks != null) {
-				tasks.Stop();
-			}
-			if (lateTasks != null) {
-				lateTasks.Stop();
-			}
-			if (input != null) {
-				input.Dispose();
-			}
+			input?.Dispose();
 			base.Dispose();
 		}
 
@@ -909,10 +859,6 @@ namespace Lime
 		{
 			var clone = base.Clone().AsWidget;
 			clone.input = null;
-			clone.tasks = null;
-			clone.lateTasks = null;
-			clone.Updated = null;
-			clone.Updating = null;
 			return clone;
 		}
 
@@ -942,16 +888,15 @@ namespace Lime
 		/// </summary>
 		public override void Update(float delta)
 		{
-			if (!IsAwake) {
-				RaiseAwake();
-			}
 			if (delta > Application.MaxDelta) {
 				SafeUpdate(delta);
 			} else {
 #if PROFILE
 				var watch = System.Diagnostics.Stopwatch.StartNew();
 #endif
-				Updating?.Invoke(delta);
+				foreach (var b in Behaviours) {
+					b.Update(delta);
+				}
 				if (GloballyVisible) {
 					AdvanceAnimation(delta);
 #if PROFILE
@@ -966,7 +911,9 @@ namespace Lime
 					watch.Start();
 #endif
 				}
-				Updated?.Invoke(delta);
+				foreach (var b in LateBehaviours) {
+					b.LateUpdate(delta);
+				}
 				if (CleanDirtyFlags(DirtyFlags.ParentBoundingRect)) {
 					ExpandParentBoundingRect();
 				}

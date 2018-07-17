@@ -1,4 +1,3 @@
-﻿using System;
 using Lime;
 
 namespace Tangerine.UI.Timeline.Components
@@ -12,6 +11,7 @@ namespace Tangerine.UI.Timeline.Components
 	public interface IRollRowView
 	{
 		Widget Widget { get; }
+		AwakeBehavior AwakeBehavior { get; }
 		float Indentation { set; }
 		void Rename();
 	}
@@ -20,5 +20,7 @@ namespace Tangerine.UI.Timeline.Components
 	{
 		Widget GridWidget { get; }
 		Widget OverviewWidget { get; }
+		AwakeBehavior GridWidgetAwakeBehavior { get; }
+		AwakeBehavior OverviewWidgetAwakeBehavior { get; }
 	}
 }
