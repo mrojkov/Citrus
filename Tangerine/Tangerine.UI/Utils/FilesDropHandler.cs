@@ -77,7 +77,7 @@ namespace Tangerine.UI
 					try {
 						string assetPath, assetType;
 						if (!Utils.ExtractAssetPathOrShowAlert(file, out assetPath, out assetType) ||
-							!Utils.AssertCurrentDocument(assetPath, assetType.Substring(1))) {
+							!Utils.AssertCurrentDocument(assetPath, assetType)) {
 							continue;
 						}
 

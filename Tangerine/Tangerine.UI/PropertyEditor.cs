@@ -698,7 +698,8 @@ namespace Tangerine.UI
 		private void SetFilePath(string path)
 		{
 			string asset, type;
-			if (Utils.ExtractAssetPathOrShowAlert(path, out asset, out type)) {
+			if (Utils.ExtractAssetPathOrShowAlert(path, out asset, out type) &&
+				Utils.AssertCurrentDocument(asset, type)) {
 				AssignAsset(AssetPath.CorrectSlashes(asset));
 			}
 		}

@@ -107,9 +107,8 @@ namespace Tangerine.UI
 
 		public static bool AssertCurrentDocument(string assetPath, string assetType)
 		{
-			if (assetPath.Equals(Document.Current.Path) &&
-				assetType.Equals(Document.GetFileExtension(Document.Current.Format))) {
-				AlertDialog.Show($"Сycle dependency is not allowed: {assetPath}.{assetType}");
+			if (assetPath.Equals(Document.Current.Path)) {
+				AlertDialog.Show($"Сycle dependency is not allowed: {assetPath}{assetType}");
 				return false;
 			}
 			return true;
