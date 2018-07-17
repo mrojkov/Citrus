@@ -49,7 +49,7 @@ namespace Tangerine.UI.SceneView
 							Node selectedNode = null;
 							foreach (var widget in WidgetsPivotMarkPresenter.WidgetsWithDisplayedPivot()) {
 								var pos = widget.CalcPositionInSpaceOf(SceneView.Instance.Scene);
-								if (SceneView.Instance.HitTestControlPoint(pos)) {
+								if (widget.GloballyVisible && SceneView.Instance.HitTestControlPoint(pos)) {
 									selectedNode = widget;
 									break;
 								}
