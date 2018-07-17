@@ -1169,6 +1169,7 @@ namespace Lime
 			if (nodeType != contentType) {
 				// Handle legacy case: Replace Button content by external Frame
 				if (nodeType == typeof(Button) && contentType == typeof(Frame)) {
+					Components.Remove(typeof(AssetBundlePathComponent));
 					var assetBundlePathComponent = content.Components.Get<AssetBundlePathComponent>();
 					if (assetBundlePathComponent != null) {
 						Components.Add(assetBundlePathComponent.Clone());

@@ -6,16 +6,20 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.Inspector
 {
-	class KeyFunctionButton : ToolbarButton
+	public class KeyFunctionButton : ToolbarButton
 	{
-
 		private ClickGesture rightClickGesture;
 
-		protected override void Awake()
+		public KeyFunctionButton()
 		{
-			base.Awake();
-			rightClickGesture = new ClickGesture(1);
-			Gestures.Add(rightClickGesture);
+			Awoke += Awake;
+		}
+
+		private static void Awake(Node owner)
+		{
+			var kfb = (KeyFunctionButton)owner;
+			kfb.rightClickGesture = new ClickGesture(1);
+			kfb.Gestures.Add(kfb.rightClickGesture);
 		}
 
 		public bool WasRightClicked() => rightClickGesture?.WasRecognized() ?? false;
