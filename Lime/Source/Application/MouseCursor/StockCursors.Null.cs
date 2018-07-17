@@ -10,6 +10,8 @@ namespace Lime
 		public MouseCursor SizeNS { get { return null; } }
 		public MouseCursor SizeWE { get { return null; } }
 		public MouseCursor SizeAll { get { return null; } }
+		public MouseCursor SizeNWSE { get { return null; } }
+		public MouseCursor SizeNESW { get { return null; } }
 	}
 }
 #endif
