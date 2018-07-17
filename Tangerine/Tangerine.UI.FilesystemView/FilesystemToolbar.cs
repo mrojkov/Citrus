@@ -104,7 +104,7 @@ namespace Tangerine.UI.FilesystemView
 
 		private Widget CreateSortDropDownList()
 		{
-			var list = new ThemedDropDownList() {
+			var list = new ThemedDropDownList {
 				Items = {
 					new ThemedDropDownList.Item("Name", SortType.Name),
 					new ThemedDropDownList.Item("Extension", SortType.Extension),

@@ -128,28 +128,28 @@ namespace Tangerine.UI.FilesystemView
 
 		public IEnumerable<string> EnumerateItems(SortType type)
 		{
-			IEnumerable<string> dirs;
-			IEnumerable<string> files;
+			IEnumerable<string> dirs = Directory.EnumerateDirectories(CurrentPath);
+			IEnumerable<string> files = Directory.EnumerateFiles(CurrentPath);
 			switch (type) {
 				case SortType.Name:
-					dirs = Directory.EnumerateDirectories(CurrentPath).OrderBy(f => f);
-					files = Directory.EnumerateFiles(CurrentPath).OrderBy(f => f);
+					dirs = dirs.OrderBy(f => f);
+					files = files.OrderBy(f => f);
 					break;
 				case SortType.Date:
-					dirs = Directory.EnumerateDirectories(CurrentPath).OrderBy(f => new FileInfo(f).LastWriteTime);
-					files = Directory.EnumerateFiles(CurrentPath).OrderBy(f => new FileInfo(f).LastWriteTime);
+					dirs = dirs.OrderBy(f => new FileInfo(f).LastWriteTime);
+					files = files.OrderBy(f => new FileInfo(f).LastWriteTime);
 					break;
 				case SortType.Extension:
-					dirs = Directory.EnumerateDirectories(CurrentPath).OrderBy(f => new FileInfo(f).Extension);
-					files = Directory.EnumerateFiles(CurrentPath).OrderBy(f => new FileInfo(f).Extension);
+					dirs = dirs.OrderBy(f => new FileInfo(f).Extension);
+					files = files.OrderBy(f => new FileInfo(f).Extension);
 					break;
 				case SortType.Size:
-					dirs = Directory.EnumerateDirectories(CurrentPath).OrderBy(f => f.Length);
-					files = Directory.EnumerateFiles(CurrentPath).OrderBy(f => f.Length);
+					dirs = dirs.OrderBy(f => f.Length);
+					files = files.OrderBy(f => f.Length);
 					break;
 				default:
-					dirs = Directory.EnumerateDirectories(CurrentPath).OrderBy(f => f);
-					files = Directory.EnumerateFiles(CurrentPath).OrderBy(f => f);
+					dirs = dirs.OrderBy(f => f);
+					files = files.OrderBy(f => f);
 					break;
 			}
 
