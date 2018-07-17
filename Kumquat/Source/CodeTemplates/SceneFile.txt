@@ -7,7 +7,9 @@ namespace <%NAMESPACE%>
 {
 	public class <%CLASS_NAME%> : <%CLASS_NAME%><Frame>
 	{
-		public static readonly Frame FrameCache = new Frame(<%SCENE_PATH%>);
+		public const string AssetPath = <%SCENE_PATH%>;
+
+		public static readonly Frame FrameCache = new Frame(AssetPath);
 
 		public <%CLASS_NAME%>() : base(FrameCache.Clone<Node>()) { }
 
