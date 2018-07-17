@@ -82,9 +82,14 @@ namespace Tangerine.UI.SceneView
 
 		private static void TieWidgetsWithBones()
 		{
-			var bones = Document.Current.SelectedNodes().Editable().OfType<Bone>();
-			var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>();
-			Core.Operations.TieWidgetsWithBones.Perform(bones, widgets);
+			try {
+				var bones = Document.Current.SelectedNodes().Editable().OfType<Bone>();
+				var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>();
+				Core.Operations.TieWidgetsWithBones.Perform(bones, widgets);
+			} catch (TieWidgetsWithBonesException e) {
+				Document.Current.History.RollbackTransaction();
+				AlertDialog.Show($"Unable to tie bones with {e.Node.Id} node. There are no empty skinning slots.");
+			}
 		}
 
 		private static void UntieWidgetsFromBones()

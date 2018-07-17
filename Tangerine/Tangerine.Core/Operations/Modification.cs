@@ -796,6 +796,16 @@ namespace Tangerine.Core.Operations
 		}
 	}
 
+	public class TieWidgetsWithBonesException : Lime.Exception
+	{
+		public Node Node { get; set; }
+
+		public TieWidgetsWithBonesException(Node node)
+		{
+			Node = node;
+		}
+	}
+
 	public static class TieWidgetsWithBones
 	{
 		public static void Perform(IEnumerable<Bone> bones, IEnumerable<Widget> widgets)
@@ -809,12 +819,19 @@ namespace Tangerine.Core.Operations
 				if (widget is DistortionMesh) {
 					var mesh = widget as DistortionMesh;
 					foreach (PointObject point in mesh.Nodes) {
+						if (!CanApplyBone(point.SkinningWeights)) {
+							throw new TieWidgetsWithBonesException(point);
+						}
 						SetAnimableProperty.Perform(point, nameof(PointObject.SkinningWeights),
-							CalcSkinningWeight(point.CalcPositionInSpaceOf(widget.ParentWidget), boneList), CoreUserPreferences.Instance.AutoKeyframes);
+							CalcSkinningWeight(point.SkinningWeights, point.CalcPositionInSpaceOf(widget.ParentWidget), boneList), CoreUserPreferences.Instance.AutoKeyframes);
 					}
 				} else {
+					if (!CanApplyBone(widget.SkinningWeights)) {
+						throw new TieWidgetsWithBonesException(widget);
+					}
 					SetAnimableProperty.Perform(widget, nameof(PointObject.SkinningWeights),
-						CalcSkinningWeight(widget.Position, boneList), CoreUserPreferences.Instance.AutoKeyframes);
+						CalcSkinningWeight(widget.SkinningWeights, widget.Position, boneList),
+						CoreUserPreferences.Instance.AutoKeyframes);
 				}
 			}
 			foreach (var bone in bones) {
@@ -823,6 +840,16 @@ namespace Tangerine.Core.Operations
 				SetAnimableProperty.Perform(bone, nameof(Bone.RefLength), entry.Length, CoreUserPreferences.Instance.AutoKeyframes);
 				SetAnimableProperty.Perform(bone, nameof(Bone.RefRotation), entry.Rotation, CoreUserPreferences.Instance.AutoKeyframes);
 			}
+		}
+
+		private static bool CanApplyBone(SkinningWeights skinningWeights)
+		{
+			for (var i = 0; i < 4; i++) {
+				if (skinningWeights[i].Index == 0) {
+					return true;
+				}
+			}
+			return false;
 		}
 
 		private static bool CheckConsistency(IEnumerable<Bone> bones, IEnumerable<Widget> widgets)
@@ -838,19 +865,28 @@ namespace Tangerine.Core.Operations
 			return true;
 		}
 
-		private static SkinningWeights CalcSkinningWeight(Vector2 position, List<Bone> bones)
+		private static SkinningWeights CalcSkinningWeight(SkinningWeights oldSkinningWeights, Vector2 position, List<Bone> bones)
 		{
 			var skinningWeights = new SkinningWeights();
 			var i = 0;
 			var overallWeight = 0f;
-			while (i < bones.Count && i < 4) {
-				var bone = bones[i];
-				skinningWeights[i] = new BoneWeight {
-					Weight = bone.CalcWeightForPoint(position),
-					Index = bone.Index
-				};
+			while (oldSkinningWeights[i].Index != 0) {
+				skinningWeights[i] = oldSkinningWeights[i];
 				overallWeight += skinningWeights[i].Weight;
 				i++;
+			}
+			var j = 0;
+			while (j < bones.Count && i < 4) {
+				var weight = bones[j].CalcWeightForPoint(position);
+				if (Mathf.Abs(weight) > Mathf.ZeroTolerance) {
+					skinningWeights[i] = new BoneWeight {
+						Weight = weight,
+						Index = bones[j].Index
+					};
+					overallWeight += skinningWeights[i].Weight;
+					i++;
+				}
+				j++;
 			}
 			if (overallWeight != 0) {
 				for(i = 0; i < 4; i++) {
