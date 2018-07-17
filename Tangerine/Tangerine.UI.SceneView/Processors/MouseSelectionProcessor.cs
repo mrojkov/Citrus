@@ -112,7 +112,7 @@ namespace Tangerine.UI.SceneView
 		{
 			protected override bool ProbeInternal(Widget widget, Vector2 point)
 			{
-				if (!(widget.Visible || widget.GloballyVisible)) {
+				if (!widget.GloballyVisible) {
 					return false;
 				}
 				var hull = widget.CalcHullInSpaceOf(SceneView.Instance.Scene);
@@ -121,7 +121,7 @@ namespace Tangerine.UI.SceneView
 
 			protected override bool ProbeInternal(Widget widget, Rectangle rectangle)
 			{
-				if (!(widget.Visible || widget.GloballyVisible)) {
+				if (!widget.GloballyVisible) {
 					return false;
 				}
 				var canvas = SceneView.Instance.Scene;

@@ -39,7 +39,7 @@ namespace Tangerine.UI.SceneView
 				return;
 			if (ctr.CalcHullInSpaceOf(sv.Scene).Contains(sv.MousePosition)) {
 				foreach (var widget in ctr.Nodes.Editable().OfType<Widget>()) {
-					if ((widget.Visible || widget.GloballyVisible) && widget.CalcHullInSpaceOf(sv.Scene).Contains(sv.MousePosition)) {
+					if (widget.GloballyVisible && widget.CalcHullInSpaceOf(sv.Scene).Contains(sv.MousePosition)) {
 						Core.Operations.EnterNode.Perform(widget);
 						break;
 					}
