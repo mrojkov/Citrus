@@ -49,7 +49,7 @@ namespace Tangerine.UI.SceneView
 							Node selectedNode = null;
 							foreach (var widget in WidgetsPivotMarkPresenter.WidgetsWithDisplayedPivot()) {
 								var pos = widget.CalcPositionInSpaceOf(SceneView.Instance.Scene);
-								if (SceneView.Instance.HitTestControlPoint(pos)) {
+								if (widget.GloballyVisible && SceneView.Instance.HitTestControlPoint(pos)) {
 									selectedNode = widget;
 									break;
 								}
@@ -112,12 +112,18 @@ namespace Tangerine.UI.SceneView
 		{
 			protected override bool ProbeInternal(Widget widget, Vector2 point)
 			{
+				if (!widget.GloballyVisible) {
+					return false;
+				}
 				var hull = widget.CalcHullInSpaceOf(SceneView.Instance.Scene);
 				return hull.Contains(point);
 			}
 
 			protected override bool ProbeInternal(Widget widget, Rectangle rectangle)
 			{
+				if (!widget.GloballyVisible) {
+					return false;
+				}
 				var canvas = SceneView.Instance.Scene;
 				var hull = widget.CalcHullInSpaceOf(canvas);
 				for (int i = 0; i < 4; i++) {
