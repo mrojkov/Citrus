@@ -99,6 +99,7 @@ namespace Tangerine
 						GenericCommands.NewTan,
 						GenericCommands.NewTanWithCustomRoot,
 					}),
+					GenericCommands.NewProject,
 					Command.MenuSeparator,
 					GenericCommands.Open,
 					GenericCommands.OpenProject,
