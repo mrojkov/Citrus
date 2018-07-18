@@ -1,12 +1,85 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Lime;
 using Tangerine.Core;
 using Tangerine.UI;
+using Tangerine.UI.SceneView;
 
 namespace Tangerine
 {
+
+	public enum AlignObject
+	{
+		Selection,
+		KeyObject,
+		Root
+	}
+
+	public class AlignToHandler : CommandHandler
+	{
+		ICommand command;
+
+		public AlignToHandler(ICommand command)
+		{
+			this.command = command;
+			this.command.Text = AlignToString(AlignPreferences.Instance.AlignObject);
+		}
+
+		private static string AlignToString(AlignObject align)
+		{
+			switch (align) {
+				case AlignObject.Selection:
+					return "Align to Selection";
+				case AlignObject.KeyObject:
+					return "Align to Key Object";
+				case AlignObject.Root:
+					return "Align to Root";
+				default:
+					throw new ArgumentException();
+			}
+		}
+
+		public override void Execute()
+		{
+			AlignObjectContextMenu.Create(command);
+		}
+
+		private static class AlignObjectContextMenu
+		{
+		
+			public static void Create(ICommand command)
+			{
+				var menu = new Menu();
+				foreach (AlignObject alignObject in Enum.GetValues(typeof(AlignObject))) {
+					menu.Add(new Command(AlignToString(alignObject),
+						new ChangeAlignObject(command, alignObject).Execute));
+				}
+				menu.Popup();
+			}
+
+			private class ChangeAlignObject : CommandHandler
+			{
+
+				ICommand command;
+				AlignObject alignObject;
+
+				public ChangeAlignObject(ICommand command, AlignObject alignObject)
+				{
+					this.command = command;
+					this.alignObject = alignObject;
+				}
+
+				public override void Execute()
+				{
+					AlignPreferences.Instance.AlignObject = alignObject;
+					command.Text = AlignToString(alignObject);
+				}
+			}
+
+		}
+	}
+
 	public class CenterHorizontally : DocumentCommandHandler
 	{
 		public override void ExecuteTransaction()
