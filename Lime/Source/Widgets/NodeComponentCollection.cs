@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Lime
 {
@@ -89,10 +90,10 @@ namespace Lime
 			var behaviour = component as NodeBehavior;
 			if (behaviour != null) {
 				var type = behaviour.GetType();
-				if (BehaviourUpdateChecker.IsMethodOverriden(type)) {
+				if (behaviourUpdateChecker.Value.IsMethodOverriden(type)) {
 					owner.Behaviours = InsertBehaviour(owner.Behaviours, behaviour);
 				}
-				if (BehaviourLateUpdateChecker.IsMethodOverriden(type)) {
+				if (behaviourLateUpdateChecker.Value.IsMethodOverriden(type)) {
 					owner.LateBehaviours = InsertBehaviour(owner.LateBehaviours, behaviour);
 				}
 			}
@@ -121,10 +122,10 @@ namespace Lime
 				var behaviour = component as NodeBehavior;
 				if (behaviour != null) {
 					var behaviorType = behaviour.GetType();
-					if (BehaviourUpdateChecker.IsMethodOverriden(behaviorType)) {
+					if (behaviourUpdateChecker.Value.IsMethodOverriden(behaviorType)) {
 						owner.Behaviours = RemoveBehaviour(owner.Behaviours, behaviour);
 					}
-					if (BehaviourLateUpdateChecker.IsMethodOverriden(behaviorType)) {
+					if (behaviourLateUpdateChecker.Value.IsMethodOverriden(behaviorType)) {
 						owner.LateBehaviours = RemoveBehaviour(owner.LateBehaviours, behaviour);
 					}
 				}
@@ -159,17 +160,11 @@ namespace Lime
 			owner.Behaviours = owner.LateBehaviours = EmptyBehaviors;
 		}
 
-		[ThreadStatic]
-		private static OverridenBehaviourMethodChecker behaviourUpdateChecker;
+		private static ThreadLocal<OverridenBehaviourMethodChecker> behaviourUpdateChecker =>
+			new ThreadLocal<OverridenBehaviourMethodChecker>(() => new OverridenBehaviourMethodChecker(nameof(NodeBehavior.Update)));
 
-		private static OverridenBehaviourMethodChecker BehaviourUpdateChecker =>
-			behaviourUpdateChecker ?? (behaviourUpdateChecker = new OverridenBehaviourMethodChecker(nameof(NodeBehavior.Update)));
-
-		[ThreadStatic]
-		private static OverridenBehaviourMethodChecker behaviourLateUpdateChecker;
-
-		private static OverridenBehaviourMethodChecker BehaviourLateUpdateChecker =>
-			behaviourLateUpdateChecker ?? (behaviourLateUpdateChecker = new OverridenBehaviourMethodChecker(nameof(NodeBehavior.LateUpdate)));
+		private static ThreadLocal<OverridenBehaviourMethodChecker> behaviourLateUpdateChecker =>
+			new ThreadLocal<OverridenBehaviourMethodChecker>(() => new OverridenBehaviourMethodChecker(nameof(NodeBehavior.LateUpdate)));
 
 		private class OverridenBehaviourMethodChecker
 		{
