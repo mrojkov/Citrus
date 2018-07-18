@@ -136,8 +136,8 @@ namespace Tangerine.UI.FilesystemView
 		{
 			RootWidget = new Widget() { Id = "FSRoot" };
 			RootWidget.FocusScope = new KeyboardFocusScope(RootWidget);
-			scrollView = new ThemedScrollView {
-				TabTravesable = new TabTraversable()
+			scrollView = new ThemedScrollView(ScrollDirection.Horizontal) {
+						TabTravesable = new TabTraversable(),
 			};
 			// TODO: Display path
 			RootWidget.AddChangeWatcher(() => model.CurrentPath, (path) => toolbar.Path = path.ToString());
@@ -182,7 +182,7 @@ namespace Tangerine.UI.FilesystemView
 		void InitializeWidgets()
 		{
 			RootWidget.AddChangeWatcher(() => selection.Version, Selection_Changed);
-			scrollView.Content.Layout = new FlowLayout { Spacing = 1.0f };
+			scrollView.Content.Layout = new VFlowLayout { Spacing = 1.0f };
 			scrollView.Content.Padding = new Thickness(5.0f);
 			scrollView.Content.CompoundPostPresenter.Insert(0, new DelegatePresenter<Widget>(RenderFilesWidgetRectSelection));
 			scrollView.Updated += ScrollViewUpdated;
