@@ -11,7 +11,7 @@ namespace Tangerine.UI.SceneView
 	public class RescalePointObjectSelectionProcessor : ITaskProvider
 	{
 		private SceneView sv => SceneView.Instance;
-		private Quadrangle initialPointsBounds;
+		private Quadrangle hullNormalized;
 		private Vector2 initialMousePosition;
 
 		public IEnumerator<object> Task()
@@ -19,24 +19,16 @@ namespace Tangerine.UI.SceneView
 			while (true) {
 				var points = Document.Current.SelectedNodes().Editable().OfType<PointObject>().ToList();
 				if (points.Count > 1) {
-					var hull = Utils.CalcAABB(Document.Current.SelectedNodes().Editable().OfType<PointObject>(), true);
-					var t = Document.Current.Container.AsWidget.CalcTransitionToSpaceOf(sv.Scene);
-					var size = Document.Current.Container.AsWidget.Size;
-					var cornerOffset = PointObjectSelectionComponent.cornerOffset;
-					var hullSize = hull[0] - hull[2];
-					var expandedHull = new Quadrangle();
+					Rectangle aabb;
+					Utils.CalcAABB(points, Document.Current.Container.AsWidget, out aabb);
+					var hull = aabb.ToQuadrangle();
+					var hullSize = hull.V3 - hull.V1;
+					hullNormalized = hull * Matrix32.Scaling(Vector2.One / Document.Current.Container.AsWidget.Size);
+					var expandedHullInSceneCoords = PointObjectsPresenter.ExpandAndTranslateToSpaceOf(hull, Document.Current.Container.AsWidget, sv.Frame) *
+						sv.Frame.CalcTransitionToSpaceOf(sv.Scene);
 					for (int i = 0; i < 4; i++) {
-						hull[i] = hull[i] * size * t;
-					}
-					for (int i = 0; i < 4; i++) {
-						var next = (i + 1) % 4;
-						var prev = (i + 3) % 4;
-						var dir1 = hull[i] - hull[next];
-						var dir2 = hull[i] - hull[prev];
-						var corner = (dir1.Normalized + dir2.Normalized);
-						expandedHull[i] = hull[i] + corner * cornerOffset / sv.Scene.Scale;
-						if (hullSize.X != 0 && hullSize.Y != 0) {
-							if (sv.HitTestResizeControlPoint(expandedHull[i])) {
+						if (Mathf.Abs(hullSize.X) > Mathf.ZeroTolerance && Mathf.Abs(hullSize.Y) > Mathf.ZeroTolerance) {
+							if (sv.HitTestResizeControlPoint(expandedHullInSceneCoords[i])) {
 								Utils.ChangeCursorIfDefault(MouseCursor.SizeNS);
 								if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {
 									yield return Rescale(i * 2, MouseCursor.SizeNS, points);
@@ -45,16 +37,18 @@ namespace Tangerine.UI.SceneView
 						}
 					}
 					for (int i = 0; i < 4; i++) {
-						if (hullSize.X == 0 && i % 2 == 1 || hullSize.Y == 0 && i % 2 == 0) {
+						if (Mathf.Abs(hullSize.X) < Mathf.ZeroTolerance && i % 2 == 1 ||
+						    Mathf.Abs(hullSize.Y) < Mathf.ZeroTolerance && i % 2 == 0
+						) {
 							continue;
 						}
-						var a = expandedHull[i];
-						var b = expandedHull[(i + 1) % 4];
+						var a = expandedHullInSceneCoords[i];
+						var b = expandedHullInSceneCoords[(i + 1) % 4];
 						if (sv.HitTestResizeControlPoint((a + b) / 2)) {
 							var cursor = MouseCursor.Default;
-							if (hullSize.X == 0) {
+							if (Mathf.Abs(hullSize.X) < Mathf.ZeroTolerance) {
 								cursor = MouseCursor.SizeNS;
-							} else if (hullSize.Y == 0) {
+							} else if (Mathf.Abs(hullSize.Y) < Mathf.ZeroTolerance) {
 								cursor = MouseCursor.SizeWE;
 							} else {
 								cursor = (b.X - a.X).Abs() > (b.Y - a.Y).Abs() ? MouseCursor.SizeNS : MouseCursor.SizeWE;
@@ -76,7 +70,6 @@ namespace Tangerine.UI.SceneView
 			using (Document.Current.History.BeginTransaction()) {
 				Utils.ChangeCursorIfDefault(cursor);
 				initialMousePosition = sv.MousePosition;
-				initialPointsBounds = Utils.CalcAABB(points);
 				while (sv.Input.IsMousePressed()) {
 					Document.Current.History.RollbackTransaction();
 					Utils.ChangeCursorIfDefault(cursor);
@@ -97,24 +90,26 @@ namespace Tangerine.UI.SceneView
 			var t = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
 			t.T = Vector2.Zero;
 			var transformedMouseDelta = (sv.MousePosition - initialMousePosition) * t / Document.Current.Container.AsWidget.Size;
-			var origin = Vector2.Zero;
+			Vector2 origin;
 			var idx = (controlPointIndex + 4) % 8 / 2;
 			var next = (idx + 1) % 4;
 			var prev = (idx + 3) % 4;
-			var axisX = initialPointsBounds[next] - initialPointsBounds[idx];
-			var axisY = initialPointsBounds[prev] - initialPointsBounds[idx];
+			var axisX = hullNormalized[next] - hullNormalized[idx];
+			var axisY = hullNormalized[prev] - hullNormalized[idx];
 			if (controlPointIndex == 7 || controlPointIndex == 3 || controlPointIndex == 1 || controlPointIndex == 5) {
-				origin = (initialPointsBounds[next] + initialPointsBounds[idx]) / 2;
+				origin = (hullNormalized[next] + hullNormalized[idx]) / 2;
 			} else {
-				origin = initialPointsBounds[idx];
+				origin = hullNormalized[idx];
 			}
+			axisX.Snap(Vector2.Zero);
+			axisY.Snap(Vector2.Zero);
 			if (axisX == Vector2.Zero) {
 				axisX = new Vector2(-axisY.Y, axisY.X);
 			}
 			if (axisY == Vector2.Zero) {
 				axisY = new Vector2(-axisX.Y, axisX.X);
 			}
-			var basis = new Matrix32(axisX, axisY, centerProportional ? (initialPointsBounds.V1 + initialPointsBounds.V3) / 2 : origin);
+			var basis = new Matrix32(axisX, axisY, centerProportional ? (hullNormalized.V1 + hullNormalized.V3) / 2 : origin);
 			var basisInversed = basis.CalcInversed();
 			var deltaSize = basisInversed * transformedMouseDelta - Vector2.Zero * basisInversed;
 			deltaSize = (deltaSize * (controlPointIndex % 2 == 0 ? Vector2.One : Vector2.Down)).Snap(Vector2.Zero);

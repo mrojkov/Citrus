@@ -10,6 +10,7 @@ namespace Tangerine.UI.SceneView
 	class PointObjectsPresenter
 	{
 		private readonly SceneView sv;
+		public static readonly float CornerOffset = 15f;
 
 		public PointObjectsPresenter(SceneView sceneView)
 		{
@@ -39,39 +40,20 @@ namespace Tangerine.UI.SceneView
 			}
 			if (selectedPointObjects.Count == 0)
 				return;
-			var hull = sv.Components.Get<PointObjectSelectionComponent>()?.СurrentBounds ?? Utils.CalcAABB(selectedPointObjects, true);
-			var cornerOffset = PointObjectSelectionComponent.cornerOffset;
-			var size = Document.Current.Container.AsWidget.Size;
-			var corners = new Quadrangle();
 
-			for (int i = 0; i < 4; i++) {
-				hull[i] = hull[i] * size * t;
-				corners[i] = Corners[i] * size * t;
-			}
-
-			var bounds = new Quadrangle();
-			for (int i = 0; i < 4; i++) {
-				var next = (i + 1) % 4;
-				var prev = (i + 3) % 4;
-				var dir1 = hull[i] - hull[next];
-				var dir2 = hull[i] - hull[prev];
-				if (dir1 + dir2 == Vector2.Zero) {
-					dir1 = corners[i] - corners[next];
-					dir2 = corners[i] - corners[prev];
-				}
-				bounds[i] = hull[i] + (dir1.Normalized + dir2.Normalized) * cornerOffset;
-			}
-
+			var bounds = CalcExpandedHullInSpaceOf(selectedPointObjects, canvas);
 			Renderer.DrawQuadrangleOutline(bounds, ColorTheme.Current.SceneView.Selection);
-			var hullSize = (hull[0] - hull[2]);
+			var hullSize = (bounds[0] - bounds[2]);
 			if (selectedPointObjects.Count() > 1) {
-				for (int i = 0; i < 4; i++) {
+				for (var i = 0; i < 4; i++) {
 					var a = bounds[i];
 					var b = bounds[(i + 1) % 4];
-					if (hullSize.X != 0 && hullSize.Y != 0) {
+					if (Mathf.Abs(hullSize.X) > Mathf.ZeroTolerance && Mathf.Abs(hullSize.Y) > Mathf.ZeroTolerance) {
 						DrawStretchMark(a);
 					}
-					if (hullSize.X == 0 && i % 2 == 1 || hullSize.Y == 0 && i % 2 == 0) {
+					if (Mathf.Abs(hullSize.X) < Mathf.ZeroTolerance && i % 2 == 1 ||
+					    Mathf.Abs(hullSize.Y) < Mathf.ZeroTolerance && i % 2 == 0
+					) {
 						continue;
 					}
 					DrawStretchMark((a + b) / 2);
@@ -81,7 +63,39 @@ namespace Tangerine.UI.SceneView
 			}
 		}
 
-		readonly List<Vector2> Corners = new List<Vector2>{
+		public static Quadrangle CalcExpandedHullInSpaceOf(IEnumerable<PointObject> points, Widget destWidget)
+		{
+			Rectangle aabb;
+			Utils.CalcAABB(points, Document.Current.Container.AsWidget, out aabb);
+			return ExpandAndTranslateToSpaceOf(aabb.ToQuadrangle(), Document.Current.Container.AsWidget, destWidget);
+		}
+
+		public static Quadrangle ExpandAndTranslateToSpaceOf(Quadrangle hull, Widget sourceWidget, Widget destWidget)
+		{
+			var t = sourceWidget.CalcTransitionToSpaceOf(destWidget);
+			var size = sourceWidget.Size;
+			var corners = new Quadrangle();
+			for (var i = 0; i < 4; i++) {
+				corners[i] = Corners[i] * size * t;
+				hull[i] *= t;
+			}
+			var bounds = new Quadrangle();
+			for (var i = 0; i < 4; i++) {
+				var next = (i + 1) % 4;
+				var prev = (i + 3) % 4;
+				var dir1 = hull[i] - hull[next];
+				var dir2 = hull[i] - hull[prev];
+				if (dir1 + dir2 == Vector2.Zero) {
+					dir1 = corners[i] - corners[next];
+					dir2 = corners[i] - corners[prev];
+				}
+				bounds[i] = hull[i] + (dir1.Normalized + dir2.Normalized) * CornerOffset;
+			}
+
+			return bounds;
+		}
+
+		public static readonly List<Vector2> Corners = new List<Vector2>{
 			Vector2.Zero,
 			Vector2.Right,
 			Vector2.One,
