@@ -891,6 +891,7 @@ namespace Lime
 		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (
+				Application.IsTangerine ||
 				GloballyVisible && particles.Count > 0 &&
 				(ParticlesLinkage != ParticlesLinkage.Parent || ClipRegionTest(chain.ClipRegion))
 			) {
@@ -940,6 +941,18 @@ namespace Lime
 			}
 			aspectRatio = Mathf.Sqrt(scale.X / scale.Y);
 			zoom = scale.Y * aspectRatio;
+		}
+
+		public void DrawCustomShape(Color4 color, Matrix32 transform)
+		{
+			for (int i = 0; i < cachedShapeTriangles.Count; i += 3) {
+				Vertex[] v = new Vertex[3];
+				for (int j = 0; j < 3; ++j) {
+					v[j].Color = color;
+					v[j].Pos = cachedShapePoints[cachedShapeTriangles[i + j]] * transform;
+				}
+				Renderer.DrawTriangleStrip(v, v.Length);
+			}
 		}
 
 		// ReSharper disable once UnusedMember.Local
