@@ -16,12 +16,14 @@ namespace Tangerine
 			}
 		}
 
-		public static void Execute(string fileName)
+		public static bool Execute(string fileName)
 		{
 			if (Project.Current.Close() && fileName.Length > 0) {
 				new Project(fileName).Open();
 				AddRecentProject(fileName);
+				return true;
 			}
+			return false;
 		}
 
 		public static void AddRecentProject(string path)

@@ -109,7 +109,7 @@ namespace Tangerine
 
 			Project.OpenFileOutsideProjectAttempt += (string filePath) => {
 				var path = filePath.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-				path[0] += '\\';
+				path[0] += Path.DirectorySeparatorChar;
 				string projectFilePath = null;
 				for (int i = path.Length - 2; i >= 0; i--) {
 					var ppp = Path.Combine(path.Take(i + 1).ToArray());
@@ -119,11 +119,12 @@ namespace Tangerine
 						break;
 					}
 				}
-				if (projectFilePath != null && !Project.Current.CitprojPath.Equals(projectFilePath)) {
+				if (projectFilePath != null && Project.Current.CitprojPath != projectFilePath) {
 					var alert = new AlertDialog($"You're trying to open a document outside the project directory. Change the current project to '{Path.GetFileName(projectFilePath)}'?", "Yes", "No");
 					if (alert.Show() == 0) {
-						FileOpenProject.Execute(projectFilePath);
-						Project.Current.OpenDocument(filePath, true);
+						if (FileOpenProject.Execute(projectFilePath)) {
+							Project.Current.OpenDocument(filePath, true);
+						}
 						return;
 					}
 				}
