@@ -137,7 +137,7 @@ namespace Tangerine.UI.FilesystemView
 			RootWidget = new Widget() { Id = "FSRoot" };
 			RootWidget.FocusScope = new KeyboardFocusScope(RootWidget);
 			scrollView = new ThemedScrollView(ScrollDirection.Horizontal) {
-						TabTravesable = new TabTraversable(),
+				TabTravesable = new TabTraversable(),
 			};
 			// TODO: Display path
 			RootWidget.AddChangeWatcher(() => model.CurrentPath, (path) => toolbar.Path = path.ToString());
