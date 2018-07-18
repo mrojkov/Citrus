@@ -119,7 +119,7 @@ namespace Tangerine
 						break;
 					}
 				}
-				if (projectFilePath != null) {
+				if (projectFilePath != null && !Project.Current.CitprojPath.Equals(projectFilePath)) {
 					var alert = new AlertDialog($"You're trying to open a document outside the project directory. Change the current project to '{Path.GetFileName(projectFilePath)}'?", "Yes", "No");
 					if (alert.Show() == 0) {
 						FileOpenProject.Execute(projectFilePath);
@@ -127,7 +127,9 @@ namespace Tangerine
 						return;
 					}
 				}
-				AlertDialog.Show("Can't open a document outside the project directory");
+				else if (projectFilePath == null) {
+					AlertDialog.Show("Can't open a document outside the project directory");
+				}
 			};
 			Project.Tasks = dockManager.MainWindowWidget.Tasks;
 			Project.Tasks.Add(new AutosaveProcessor(() => AppUserPreferences.Instance.AutosaveDelay));
