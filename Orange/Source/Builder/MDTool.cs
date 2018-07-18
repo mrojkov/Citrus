@@ -44,6 +44,11 @@ namespace Orange.Source
 			AddArgument("-t:Clean");
 		}
 
+		protected override void DecorateRestore()
+		{
+			AddArgument("-t:Restore");
+		}
+
 		protected override void DecorateConfiguration()
 		{
 			string platformSpecification;

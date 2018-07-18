@@ -82,6 +82,12 @@ namespace Orange
 			return (buildSystem.Execute(BuildAction.Build, output) == 0);
 		}
 
+		public bool Restore()
+		{
+			Console.WriteLine("------------- Restore Application -------------");
+			return (buildSystem.Execute(BuildAction.Restore) == 0);
+		}
+
 		public bool Clean()
 		{
 			Console.WriteLine("------------- Cleanup Game Application -------------");

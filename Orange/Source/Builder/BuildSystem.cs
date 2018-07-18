@@ -8,6 +8,7 @@ namespace Orange.Source
 	public enum BuildAction
 	{
 		Clean,
+		Restore,
 		Build
 	}
 
@@ -41,6 +42,10 @@ namespace Orange.Source
 					PrepareForClean();
 					return Execute(output);
 				}
+				case BuildAction.Restore: {
+					PrepareForRestore();
+					return Execute(output);
+				}
 				case BuildAction.Build: {
 					PrepareForBuild();
 					return Execute(output);
@@ -53,6 +58,7 @@ namespace Orange.Source
 
 		protected abstract void DecorateBuild();
 		protected abstract void DecorateClean();
+		protected abstract void DecorateRestore();
 		protected abstract void DecorateConfiguration();
 		protected abstract int Execute(StringBuilder output);
 
@@ -64,6 +70,12 @@ namespace Orange.Source
 		private void PrepareForBuild()
 		{
 			DecorateBuild();
+			DecorateConfiguration();
+		}
+
+		private void PrepareForRestore()
+		{
+			DecorateRestore();
 			DecorateConfiguration();
 		}
 

@@ -50,6 +50,11 @@ namespace Orange.Source
 			AddArgument("/t:Clean");
 		}
 
+		protected override void DecorateRestore()
+		{
+			AddArgument("/t:Restore");
+		}
+
 		protected override void DecorateConfiguration()
 		{
 			AddArgument("/p:Configuration=" + Configuration);
