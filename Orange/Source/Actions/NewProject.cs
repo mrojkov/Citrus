@@ -92,7 +92,6 @@ namespace Orange
 				}
 
 			});
-
 			if (projectOpened != null) {
 				projectOpened?.Invoke(newProjectCitprojPath);
 			}
