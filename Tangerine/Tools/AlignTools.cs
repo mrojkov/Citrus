@@ -359,4 +359,84 @@ namespace Tangerine
 		}
 	}
 
+	public abstract class DistributeTool : AlignTool { }
+
+	public class DistributeVertically : DistributeTool
+	{
+		protected override void HandleWidgets(Widget container, IEnumerable<Node> nodes, Rectangle aabb)
+		{
+			var widgets = nodes.Editable().OfType<Widget>().OrderBy(w => w.Position.Y);
+			if (widgets.Count() == 0) {
+				return;
+			}
+			float minY = aabb.Top + widgets.First().CalcAABBInSpaceOf(container).Height / 2;
+			float maxY = aabb.Bottom - widgets.Last().CalcAABBInSpaceOf(container).Height / 2;
+			float step = (maxY - minY) / (widgets.Count() - 1);
+			float Y = minY;
+			foreach (var widget in widgets) {
+				var p = widget.Position;
+				float d = p.Y - Y;
+				if (Mathf.Abs(d) > Mathf.ZeroTolerance) {
+					p.Y -= d;
+					Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), p, false);
+				}
+				Y += step;
+			}
+		}
+
+		protected override void HandlePointObjects(Widget container, IEnumerable<Node> nodes, Rectangle aabb)
+		{
+			var objects = nodes.Editable().OfType<PointObject>().OrderBy(po => po.Position.Y);
+			float step = (aabb.Bottom - aabb.Top) / (objects.Count() - 1);
+			float Y = aabb.Top;
+			foreach (var obj in objects) {
+				var p = obj.Position;
+				if (Mathf.Abs(p.Y - Y) > Mathf.ZeroTolerance) {
+					p.Y = Y;
+					Core.Operations.SetAnimableProperty.Perform(obj, nameof(PointObject.Position), p, false);
+				}
+				Y += step;
+			}
+		}
+	}
+
+	public class DistributeHorizontally : DistributeTool
+	{
+		protected override void HandleWidgets(Widget container, IEnumerable<Node> nodes, Rectangle aabb)
+		{
+			var widgets = nodes.Editable().OfType<Widget>().OrderBy(w => w.Position.X);
+			if (widgets.Count() == 0) {
+				return;
+			}
+			float minX = aabb.Left + widgets.First().CalcAABBInSpaceOf(container).Width / 2;
+			float maxX = aabb.Right - widgets.Last().CalcAABBInSpaceOf(container).Width / 2;
+			float step = (maxX - minX) / (widgets.Count() - 1);
+			float X = minX;
+			foreach (var widget in widgets) {
+				var p = widget.Position;
+				float d = p.X - X;
+				if (Mathf.Abs(d) > Mathf.ZeroTolerance) {
+					p.X -= d;
+					Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), p, false);
+				}
+				X += step;
+			}
+		}
+
+		protected override void HandlePointObjects(Widget container, IEnumerable<Node> nodes, Rectangle aabb)
+		{
+			var objects = nodes.Editable().OfType<PointObject>().OrderBy(po => po.Position.X);
+			float step = (aabb.Right - aabb.Left) / (objects.Count() - 1);
+			float X = aabb.Left;
+			foreach (var obj in objects) {
+				var p = obj.Position;
+				if (Mathf.Abs(p.X - X) > Mathf.ZeroTolerance) {
+					p.X = X;
+					Core.Operations.SetAnimableProperty.Perform(obj, nameof(PointObject.Position), p, false);
+				}
+				X += step;
+			}
+		}
+	}
+
 }
