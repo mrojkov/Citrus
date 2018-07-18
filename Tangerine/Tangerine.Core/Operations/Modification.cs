@@ -898,4 +898,19 @@ namespace Tangerine.Core.Operations
 			return skinningWeights;
 		}
 	}
+
+	public static class PropagateMarkers
+	{
+		public static void Perform(Node node)
+		{
+			foreach (var m in node.Parent.Markers) {
+				SetMarker.Perform(node, m.Clone(), true);
+				SetKeyframe.Perform(node, nameof(Node.Trigger), null, new Keyframe<string> {
+					Frame = m.Frame,
+					Value = m.Id,
+					Function = KeyFunction.Linear
+				});
+			}
+		}
+	}
 }

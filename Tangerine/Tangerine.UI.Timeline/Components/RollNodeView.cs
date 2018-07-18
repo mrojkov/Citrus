@@ -310,6 +310,14 @@ namespace Tangerine.UI.Timeline.Components
 				menu.Insert(0, new Command("Edit Attachment Properties", DisplayAttachmentDialog));
 			}
 
+			if (NodeCompositionValidator.CanHaveChildren(nodeData.Node.GetType())) {
+				menu.Insert(6, new Command("Propagate Markers", () => {
+					Document.Current.History.DoTransaction(() => {
+						Core.Operations.PropagateMarkers.Perform(nodeData.Node);
+					});
+				}));
+			}
+
 			menu.Popup();
 		}
 
