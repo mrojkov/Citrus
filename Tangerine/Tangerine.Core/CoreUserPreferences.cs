@@ -11,6 +11,9 @@ namespace Tangerine.Core
 		[YuzuRequired]
 		public bool AnimationMode { get; set; }
 
+		[YuzuRequired]
+		public KeyFunction DefaultKeyFunction { get; set; }
+
 		public CoreUserPreferences()
 		{
 			ResetToDefaults();
@@ -20,6 +23,7 @@ namespace Tangerine.Core
 		{
 			AutoKeyframes = false;
 			AnimationMode = false;
+			DefaultKeyFunction = KeyFunction.Linear;
 		}
 
 		public static CoreUserPreferences Instance => UserPreferences.Instance.Get<CoreUserPreferences>();

@@ -196,6 +196,8 @@ namespace Tangerine
 				new PropertyEditorParams(pane.Content, UI.SceneView.SceneUserPreferences.Instance, nameof(UI.SceneView.SceneUserPreferences.DefaultBoneWidth), "Bone Width"));
 			boneWidthPropertyEditor.ContainerWidget.AddChangeWatcher(
 				() => UI.SceneView.SceneUserPreferences.Instance.DefaultBoneWidth, (v) => Application.InvalidateWindows());
+			new EnumPropertyEditor<KeyFunction>(
+				new PropertyEditorParams(pane.Content, CoreUserPreferences.Instance, nameof(CoreUserPreferences.DefaultKeyFunction), "Default interpolation"));
 			return pane;
 		}
 
