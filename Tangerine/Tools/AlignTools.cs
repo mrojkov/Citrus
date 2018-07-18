@@ -80,7 +80,19 @@ namespace Tangerine
 		}
 	}
 
-	public class CenterHorizontally : DocumentCommandHandler
+	public abstract class AlignToolHandler : DocumentCommandHandler
+	{
+		protected abstract void HandleWidgets(Widget container, IEnumerable<Node> nodes, Rectangle aabb);
+		protected abstract void HandlePointObjects(Widget container, IEnumerable<Node> nodes, Rectangle aabb);
+
+		protected static Rectangle NormalizedAABB(Rectangle aabb, Widget container)
+		{
+			return new Rectangle(aabb.Left / container.Width, aabb.Top / container.Height,
+				aabb.Right / container.Width, aabb.Bottom / container.Height);
+		}
+	}
+
+	public abstract class CenterTool : AlignToolHandler
 	{
 		public override void ExecuteTransaction()
 		{
@@ -88,213 +100,263 @@ namespace Tangerine
 			var container = (Widget)Core.Document.Current.Container;
 			var nodes = Core.Document.Current.SelectedNodes();
 			if (Utils.CalcAABB(nodes, container, out aabb)) {
-				foreach (var widget in nodes.Editable().OfType<Widget>()) {
-					var p = widget.Position;
-					float d = (container.Width - aabb.Width) / 2 - aabb.A.X;
-					if (Mathf.Abs(d) > Mathf.ZeroTolerance) {
-						p.X += d;
-						Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), p, false);
-					}
+				HandleWidgets(container, nodes, aabb);
+				HandlePointObjects(container, nodes, NormalizedAABB(aabb, container));
+			}
+		}
+	}
+
+	public abstract class AlignTool : AlignToolHandler
+	{
+
+		private void ToSelection()
+		{
+			Rectangle aabb;
+			var container = (Widget)Core.Document.Current.Container;
+			var nodes = Core.Document.Current.SelectedNodes();
+			if (Utils.CalcAABB(nodes, container, out aabb)) {
+				HandleWidgets(container, nodes, aabb);
+				HandlePointObjects(container, nodes, NormalizedAABB(aabb, container));
+			}
+		}
+		private void ToKeyObject()
+		{
+			throw new NotImplementedException();
+		}
+
+		private void ToRoot()
+		{
+			var container = (Widget)Core.Document.Current.Container;
+			var nodes = Core.Document.Current.SelectedNodes();
+			Rectangle aabb = new Rectangle(0, 0, container.Width, container.Height);
+			HandleWidgets(container, nodes, aabb);
+			HandlePointObjects(container, nodes, NormalizedAABB(aabb, container));
+		}
+
+		public override void ExecuteTransaction()
+		{
+			switch (AlignPreferences.Instance.AlignObject) {
+				case AlignObject.Selection:
+					ToSelection();
+					break;
+				case AlignObject.KeyObject:
+					ToKeyObject();
+					break;
+				case AlignObject.Root:
+					ToRoot();
+					break;
+			}
+		}
+	}
+
+	public class CenterHorizontally : CenterTool
+	{
+		protected override void HandleWidgets(Widget container, IEnumerable<Node> nodes, Rectangle aabb)
+		{
+			foreach (var widget in nodes.Editable().OfType<Widget>()) {
+				var p = widget.Position;
+				float d = (container.Width - aabb.Width) / 2 - aabb.A.X;
+				if (Mathf.Abs(d) > Mathf.ZeroTolerance) {
+					p.X += d;
+					Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), p, false);
 				}
-				foreach (var po in nodes.Editable().OfType<PointObject>()) {
-					var p = po.Position;
-					float d = (container.Width - aabb.Width) / 2 - aabb.A.X;
-					if (Mathf.Abs(d) > Mathf.ZeroTolerance) {
-						p.X += d;
-						Core.Operations.SetAnimableProperty.Perform(po, nameof(Widget.Position), p, false);
-					}
+			}
+		}
+
+		protected override void HandlePointObjects(Widget container, IEnumerable<Node> nodes, Rectangle aabb)
+		{
+			foreach (var po in nodes.Editable().OfType<PointObject>()) {
+				var p = po.Position;
+				float d = (1 - aabb.Width) / 2 - aabb.A.X;
+				if (Mathf.Abs(d) > Mathf.ZeroTolerance) {
+					p.X += d;
+					Core.Operations.SetAnimableProperty.Perform(po, nameof(Widget.Position), p, false);
 				}
 			}
 		}
 	}
 
-	public class CenterVertically : DocumentCommandHandler
+	public class CenterVertically : CenterTool
 	{
-		public override void ExecuteTransaction()
+		protected override void HandleWidgets(Widget container, IEnumerable<Node> nodes, Rectangle aabb)
 		{
-			Rectangle aabb;
-			var container = (Widget)Core.Document.Current.Container;
-			var nodes = Core.Document.Current.SelectedNodes();
-			if (Utils.CalcAABB(nodes, container, out aabb)) {
-				foreach (var widget in nodes.Editable().OfType<Widget>()) {
-					var p = widget.Position;
-					float d = (container.Height - aabb.Height) / 2 - aabb.A.Y;
-					if (Mathf.Abs(d) > Mathf.ZeroTolerance) {
-						p.Y += d;
-						Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), p, false);
-					}
+			foreach (var widget in nodes.Editable().OfType<Widget>()) {
+				var p = widget.Position;
+				float d = (container.Height - aabb.Height) / 2 - aabb.A.Y;
+				if (Mathf.Abs(d) > Mathf.ZeroTolerance) {
+					p.Y += d;
+					Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), p, false);
 				}
-				foreach (var po in nodes.Editable().OfType<PointObject>()) {
-					var p = po.Position;
-					float d = (container.Height - aabb.Height) / 2 - aabb.A.Y;
-					if (Mathf.Abs(d) > Mathf.ZeroTolerance) {
-						p.X += d;
-						Core.Operations.SetAnimableProperty.Perform(po, nameof(Widget.Position), p, false);
-					}
+			}
+		}
+
+		protected override void HandlePointObjects(Widget container, IEnumerable<Node> nodes, Rectangle aabb)
+		{
+			foreach (var po in nodes.Editable().OfType<PointObject>()) {
+				var p = po.Position;
+				float d = (1 - aabb.Height) / 2 - aabb.A.Y;
+				if (Mathf.Abs(d) > Mathf.ZeroTolerance) {
+					p.Y += d;
+					Core.Operations.SetAnimableProperty.Perform(po, nameof(Widget.Position), p, false);
 				}
 			}
 		}
 	}
 
-	public class AlignCentersHorizontally : DocumentCommandHandler
+	public class AlignCentersHorizontally : CenterTool
 	{
-		public override void ExecuteTransaction()
+		protected override void HandleWidgets(Widget container, IEnumerable<Node> nodes, Rectangle aabb)
 		{
-			Rectangle aabb;
-			var container = (Widget)Core.Document.Current.Container;
-			var nodes = Core.Document.Current.SelectedNodes();
-			if (Utils.CalcAABB(nodes, container, out aabb)) {
-				foreach (var widget in nodes.Editable().OfType<Widget>()) {
-					var p = widget.Position;
-					float d = aabb.Center.X - widget.CalcAABBInSpaceOf(container).Center.X;
-					if (Mathf.Abs(d) > Mathf.ZeroTolerance) {
-						p.X += d;
-						Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), p, false);
-					}
+			foreach (var widget in nodes.Editable().OfType<Widget>()) {
+				var p = widget.Position;
+				float d = aabb.Center.X - widget.CalcAABBInSpaceOf(container).Center.X;
+				if (Mathf.Abs(d) > Mathf.ZeroTolerance) {
+					p.X += d;
+					Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), p, false);
 				}
-				foreach (var po in nodes.Editable().OfType<PointObject>()) {
-					var p = po.Position;
-					if (Mathf.Abs(aabb.Center.X) > Mathf.ZeroTolerance) {
-						p.X += aabb.Center.X;
-						Core.Operations.SetAnimableProperty.Perform(po, nameof(Widget.Position), p, false);
-					}
+			}
+		}
+
+		protected override void HandlePointObjects(Widget container, IEnumerable<Node> nodes, Rectangle aabb)
+		{
+			foreach (var po in nodes.Editable().OfType<PointObject>()) {
+				var p = po.Position;
+				if (Mathf.Abs(p.X - aabb.Center.X) > Mathf.ZeroTolerance) {
+					p.X = aabb.Center.X;
+					Core.Operations.SetAnimableProperty.Perform(po, nameof(Widget.Position), p, false);
 				}
 			}
 		}
 	}
 
-	public class AlignCentersVertically : DocumentCommandHandler
+	public class AlignCentersVertically : CenterTool
 	{
-		public override void ExecuteTransaction()
+		protected override void HandleWidgets(Widget container, IEnumerable<Node> nodes, Rectangle aabb)
 		{
-			Rectangle aabb;
-			var container = (Widget)Core.Document.Current.Container;
-			var nodes = Core.Document.Current.SelectedNodes();
-			if (Utils.CalcAABB(nodes, container, out aabb)) {
-				foreach (var widget in nodes.Editable().OfType<Widget>()) {
-					var p = widget.Position;
-					float d = aabb.Center.Y - widget.CalcAABBInSpaceOf(container).Center.Y;
-					if (Mathf.Abs(d) > Mathf.ZeroTolerance) {
-						p.Y += d;
-						Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), p, false);
-					}
+			foreach (var widget in nodes.Editable().OfType<Widget>()) {
+				var p = widget.Position;
+				float d = aabb.Center.Y - widget.CalcAABBInSpaceOf(container).Center.Y;
+				if (Mathf.Abs(d) > Mathf.ZeroTolerance) {
+					p.Y += d;
+					Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), p, false);
 				}
-				foreach (var po in nodes.Editable().OfType<PointObject>()) {
-					var p = po.Position;
-					if (Mathf.Abs(aabb.Center.Y) > Mathf.ZeroTolerance) {
-						p.Y += aabb.Center.Y;
-						Core.Operations.SetAnimableProperty.Perform(po, nameof(Widget.Position), p, false);
-					}
+			}
+		}
+
+		protected override void HandlePointObjects(Widget container, IEnumerable<Node> nodes, Rectangle aabb)
+		{
+			foreach (var po in nodes.Editable().OfType<PointObject>()) {
+				var p = po.Position;
+				if (Mathf.Abs(p.Y - aabb.Center.Y) > Mathf.ZeroTolerance) {
+					p.Y = aabb.Center.Y;
+					Core.Operations.SetAnimableProperty.Perform(po, nameof(Widget.Position), p, false);
 				}
 			}
 		}
 	}
 
-	public class AlignTop : DocumentCommandHandler
+	public class AlignTop : AlignTool
 	{
-		public override void ExecuteTransaction()
+		protected override void HandleWidgets(Widget container, IEnumerable<Node> nodes, Rectangle aabb)
 		{
-			Rectangle aabb;
-			var container = (Widget)Core.Document.Current.Container;
-			var nodes = Core.Document.Current.SelectedNodes();
-			if (Utils.CalcAABB(nodes, container, out aabb)) {
-				foreach (var widget in nodes.Editable().OfType<Widget>()) {
-					var p = widget.Position;
-					float d = widget.CalcAABBInSpaceOf(container).Top - aabb.Top;
-					if (Mathf.Abs(d) > Mathf.ZeroTolerance) {
-						p.Y -= d;
-						Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), p, false);
-					}
+			foreach (var widget in nodes.Editable().OfType<Widget>()) {
+				var p = widget.Position;
+				float d = widget.CalcAABBInSpaceOf(container).Top - aabb.Top;
+				if (Mathf.Abs(d) > Mathf.ZeroTolerance) {
+					p.Y -= d;
+					Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), p, false);
 				}
-				foreach (var po in nodes.Editable().OfType<PointObject>()) {
-					var p = po.Position;
-					if (Mathf.Abs(p.Y - aabb.Top) > Mathf.ZeroTolerance) {
-						p.Y = aabb.Top;
-						Core.Operations.SetAnimableProperty.Perform(po, nameof(Widget.Position), p, false);
-					}
+			}
+		}
+
+		protected override void HandlePointObjects(Widget container, IEnumerable<Node> nodes, Rectangle aabb)
+		{
+			foreach (var po in nodes.Editable().OfType<PointObject>()) {
+				var p = po.Position;
+				if (Mathf.Abs(p.Y - aabb.Top) > Mathf.ZeroTolerance) {
+					p.Y = aabb.Top;
+					Core.Operations.SetAnimableProperty.Perform(po, nameof(PointObject.Position), p, false);
 				}
 			}
 		}
 	}
 
-	public class AlignBottom : DocumentCommandHandler
+	public class AlignBottom : AlignTool
 	{
-		public override void ExecuteTransaction()
+		protected override void HandleWidgets(Widget container, IEnumerable<Node> nodes, Rectangle aabb)
 		{
-			Rectangle aabb;
-			var container = (Widget)Core.Document.Current.Container;
-			var nodes = Core.Document.Current.SelectedNodes();
-			if (Utils.CalcAABB(nodes, container, out aabb)) {
-				foreach (var widget in nodes.Editable().OfType<Widget>()) {
-					var p = widget.Position;
-					float d = widget.CalcAABBInSpaceOf(container).Bottom - aabb.Bottom;
-					if (Mathf.Abs(d) > Mathf.ZeroTolerance) {
-						p.Y -= d;
-						Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), p, false);
-					}
+			foreach (var widget in nodes.Editable().OfType<Widget>()) {
+				var p = widget.Position;
+				float d = widget.CalcAABBInSpaceOf(container).Bottom - aabb.Bottom;
+				if (Mathf.Abs(d) > Mathf.ZeroTolerance) {
+					p.Y -= d;
+					Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), p, false);
 				}
-				foreach (var po in nodes.Editable().OfType<PointObject>()) {
-					var p = po.Position;
-					if (Mathf.Abs(p.Y - aabb.Bottom) > Mathf.ZeroTolerance) {
-						p.Y = aabb.Bottom;
-						Core.Operations.SetAnimableProperty.Perform(po, nameof(Widget.Position), p, false);
-					}
+			}
+		}
+
+		protected override void HandlePointObjects(Widget container, IEnumerable<Node> nodes, Rectangle aabb)
+		{
+			foreach (var po in nodes.Editable().OfType<PointObject>()) {
+				var p = po.Position;
+				if (Mathf.Abs(p.Y - aabb.Bottom) > Mathf.ZeroTolerance) {
+					p.Y = aabb.Bottom;
+					Core.Operations.SetAnimableProperty.Perform(po, nameof(Widget.Position), p, false);
 				}
 			}
 		}
 	}
 
-	public class AlignLeft : DocumentCommandHandler
+	public class AlignLeft : AlignTool
 	{
-		public override void ExecuteTransaction()
+		protected override void HandleWidgets(Widget container, IEnumerable<Node> nodes, Rectangle aabb)
 		{
-			Rectangle aabb;
-			var container = (Widget)Core.Document.Current.Container;
-			var nodes = Core.Document.Current.SelectedNodes();
-			if (Utils.CalcAABB(nodes, container, out aabb)) {
-				foreach (var widget in nodes.Editable().OfType<Widget>()) {
-					var p = widget.Position;
-					float d = widget.CalcAABBInSpaceOf(container).Left - aabb.Left;
-					if (Mathf.Abs(d) > Mathf.ZeroTolerance) {
-						p.X -= d;
-						Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), p, false);
-					}
+			foreach (var widget in nodes.Editable().OfType<Widget>()) {
+				var p = widget.Position;
+				float d = widget.CalcAABBInSpaceOf(container).Left - aabb.Left;
+				if (Mathf.Abs(d) > Mathf.ZeroTolerance) {
+					p.X -= d;
+					Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), p, false);
 				}
-				foreach (var po in nodes.Editable().OfType<PointObject>()) {
-					var p = po.Position;
-					if (Mathf.Abs(p.X - aabb.Left) > Mathf.ZeroTolerance) {
-						p.X = aabb.Left;
-						Core.Operations.SetAnimableProperty.Perform(po, nameof(Widget.Position), p, false);
-					}
+			}
+		}
+
+		protected override void HandlePointObjects(Widget container, IEnumerable<Node> nodes, Rectangle aabb)
+		{
+			foreach (var po in nodes.Editable().OfType<PointObject>()) {
+				var p = po.Position;
+				if (Mathf.Abs(p.X - aabb.Left) > Mathf.ZeroTolerance) {
+					p.X = aabb.Left;
+					Core.Operations.SetAnimableProperty.Perform(po, nameof(Widget.Position), p, false);
 				}
 			}
 		}
 	}
 
-	public class AlignRight : DocumentCommandHandler
+	public class AlignRight : AlignTool
 	{
-		public override void ExecuteTransaction()
+		protected override void HandleWidgets(Widget container, IEnumerable<Node> nodes, Rectangle aabb)
 		{
-			Rectangle aabb;
-			var container = (Widget)Core.Document.Current.Container;
-			var nodes = Core.Document.Current.SelectedNodes();
-			if (Utils.CalcAABB(nodes, container, out aabb)) {
-				foreach (var widget in nodes.Editable().OfType<Widget>()) {
-					var p = widget.Position;
-					float d = widget.CalcAABBInSpaceOf(container).Right - aabb.Right;
-					if (Mathf.Abs(d) > Mathf.ZeroTolerance) {
-						p.X -= d;
-						Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), p, false);
-					}
+			foreach (var widget in nodes.Editable().OfType<Widget>()) {
+				var p = widget.Position;
+				float d = widget.CalcAABBInSpaceOf(container).Right - aabb.Right;
+				if (Mathf.Abs(d) > Mathf.ZeroTolerance) {
+					p.X -= d;
+					Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), p, false);
 				}
-				foreach (var po in nodes.Editable().OfType<PointObject>()) {
-					var p = po.Position;
-					if (Mathf.Abs(p.X - aabb.Right) > Mathf.ZeroTolerance) {
-						p.X = aabb.Right;
-						Core.Operations.SetAnimableProperty.Perform(po, nameof(Widget.Position), p, false);
-					}
+			}
+		}
+
+		protected override void HandlePointObjects(Widget container, IEnumerable<Node> nodes, Rectangle aabb)
+		{
+			foreach (var po in nodes.Editable().OfType<PointObject>()) {
+				var p = po.Position;
+				if (Mathf.Abs(p.X - aabb.Right) > Mathf.ZeroTolerance) {
+					p.X = aabb.Right;
+					Core.Operations.SetAnimableProperty.Perform(po, nameof(Widget.Position), p, false);
 				}
 			}
 		}
 	}
+
 }

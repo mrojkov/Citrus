@@ -280,11 +280,11 @@ namespace Tangerine
 			tb.Add(Tools.AlignTop);
 			tb.Add(Tools.AlignRight);
 			tb.Add(Tools.AlignBottom);
+			tb.Add(Tools.AlignTo);
 			tb.Add(Tools.AlignCentersHorizontally);
 			tb.Add(Tools.AlignCentersVertically);
 			tb.Add(Tools.CenterHorizontally);
 			tb.Add(Tools.CenterVertically);
-			tb.Add(Tools.AlignTo);
 			tb.Add(Tools.RestoreOriginalSize);
 			tb.Add(Tools.ResetScale);
 			tb.Add(Tools.ResetRotation);
