@@ -41,7 +41,7 @@ namespace Orange
 		[Export(nameof(OrangePlugin.MenuItems))]
 		[ExportMetadata("Label", "New Project")]
 		[ExportMetadata("Priority", 3)]
-		public static void NewProjectAction(Action<string> openProject = null)
+		public static void NewProjectAction(Action<string> projectOpened = null)
 		{
 			string newProjectCitprojPath = "";
 			Application.InvokeOnMainThread(() => {
@@ -93,8 +93,8 @@ namespace Orange
 
 			});
 
-			if (openProject != null) {
-				openProject(newProjectCitprojPath);
+			if (projectOpened != null) {
+				projectOpened?.Invoke(newProjectCitprojPath);
 			}
 		}
 	}
