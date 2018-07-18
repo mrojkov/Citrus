@@ -338,8 +338,8 @@ namespace Tangerine.Dialogs
 			CreateButton(middlePart, Key.Down);
 			CreateButton(middlePart, Key.Right);
 
-			var mouseSpace = CreateSpace(rightPart, 2, 4);
-			mouseSpace.Layout = new TableLayout { ColCount = 1, RowCount = 2, Spacing = 4 };
+			var mouseSpace = CreateSpace(rightPart, 3, 4);
+			mouseSpace.Layout = new TableLayout { ColCount = 2, RowCount = 1, Spacing = 4 };
 			CreateButton(mouseSpace, Key.MouseBack, "Mouse Back");
 			CreateButton(mouseSpace, Key.MouseForward, "Mouse Forward");
 			CreateButton(rightPart, Key.Keypad7, "7");
