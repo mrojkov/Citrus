@@ -89,10 +89,10 @@ namespace Lime
 			var behaviour = component as NodeBehavior;
 			if (behaviour != null) {
 				var type = behaviour.GetType();
-				if (behaviourUpdateChecker.IsMethodOverriden(type)) {
+				if (BehaviourUpdateChecker.IsMethodOverriden(type)) {
 					owner.Behaviours = InsertBehaviour(owner.Behaviours, behaviour);
 				}
-				if (behaviourLateUpdateChecker.IsMethodOverriden(type)) {
+				if (BehaviourLateUpdateChecker.IsMethodOverriden(type)) {
 					owner.LateBehaviours = InsertBehaviour(owner.LateBehaviours, behaviour);
 				}
 			}
@@ -121,10 +121,10 @@ namespace Lime
 				var behaviour = component as NodeBehavior;
 				if (behaviour != null) {
 					var behaviorType = behaviour.GetType();
-					if (behaviourUpdateChecker.IsMethodOverriden(behaviorType)) {
+					if (BehaviourUpdateChecker.IsMethodOverriden(behaviorType)) {
 						owner.Behaviours = RemoveBehaviour(owner.Behaviours, behaviour);
 					}
-					if (behaviourLateUpdateChecker.IsMethodOverriden(behaviorType)) {
+					if (BehaviourLateUpdateChecker.IsMethodOverriden(behaviorType)) {
 						owner.LateBehaviours = RemoveBehaviour(owner.LateBehaviours, behaviour);
 					}
 				}
@@ -159,8 +159,17 @@ namespace Lime
 			owner.Behaviours = owner.LateBehaviours = EmptyBehaviors;
 		}
 
-		private readonly OverridenBehaviourMethodChecker behaviourUpdateChecker = new OverridenBehaviourMethodChecker(nameof(NodeBehavior.Update));
-		private readonly OverridenBehaviourMethodChecker behaviourLateUpdateChecker = new OverridenBehaviourMethodChecker(nameof(NodeBehavior.LateUpdate));
+		[ThreadStatic]
+		private static OverridenBehaviourMethodChecker behaviourUpdateChecker;
+
+		private static OverridenBehaviourMethodChecker BehaviourUpdateChecker =>
+			behaviourUpdateChecker ?? (behaviourUpdateChecker = new OverridenBehaviourMethodChecker(nameof(NodeBehavior.Update)));
+
+		[ThreadStatic]
+		private static OverridenBehaviourMethodChecker behaviourLateUpdateChecker;
+
+		private static OverridenBehaviourMethodChecker BehaviourLateUpdateChecker =>
+			behaviourLateUpdateChecker ?? (behaviourLateUpdateChecker = new OverridenBehaviourMethodChecker(nameof(NodeBehavior.LateUpdate)));
 
 		private class OverridenBehaviourMethodChecker
 		{
