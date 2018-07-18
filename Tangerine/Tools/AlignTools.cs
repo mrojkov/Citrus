@@ -203,7 +203,7 @@ namespace Tangerine
 		}
 	}
 
-	public class AlignCentersHorizontally : CenterTool
+	public class AlignCentersHorizontally : AlignTool
 	{
 		protected override void HandleWidgets(Widget container, IEnumerable<Node> nodes, Rectangle aabb)
 		{
@@ -229,7 +229,7 @@ namespace Tangerine
 		}
 	}
 
-	public class AlignCentersVertically : CenterTool
+	public class AlignCentersVertically : AlignTool
 	{
 		protected override void HandleWidgets(Widget container, IEnumerable<Node> nodes, Rectangle aabb)
 		{
