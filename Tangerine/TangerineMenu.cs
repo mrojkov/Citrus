@@ -20,6 +20,7 @@ namespace Tangerine
 		private static IMenu create;
 		private static Menu localizationMenu;
 		private static Command localizationCommand;
+		private static Menu layoutMenu;
 
 		static TangerineMenu()
 		{
@@ -155,7 +156,11 @@ namespace Tangerine
 				}),
 				new Command("Create", (create = new Menu())),
 				new Command("View", (viewMenu = new Menu {
-					GenericCommands.DefaultLayout,
+					new Command("Layouts", (layoutMenu = new Menu {
+						GenericCommands.SaveLayout,
+						GenericCommands.LoadLayout,
+						GenericCommands.DefaultLayout,
+					})),
 					new Command("Pads", PadsMenu),
 					new Command("Resolution", resolution),
 					SceneViewCommands.DisplayBones,
