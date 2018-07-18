@@ -42,6 +42,10 @@ namespace Tangerine.UI.SceneView
 							CommonWindow.Current.Invalidate();
 							yield return null;
 						}
+						// Evgenii Polikutin: this covers for the edge case, when no nodes
+						// were selected on click, therefore Inspector.Rebuild() wasn't called.
+						Document.Current.InspectRootNode = false;
+
 						if (clicked) {
 							var controlPressed = SceneView.Instance.Input.IsKeyPressed(Key.Control);
 							if (!controlPressed)
