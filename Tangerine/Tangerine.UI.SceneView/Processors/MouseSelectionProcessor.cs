@@ -42,9 +42,6 @@ namespace Tangerine.UI.SceneView
 							CommonWindow.Current.Invalidate();
 							yield return null;
 						}
-						if (selectedNodes.Count > 0) {
-							Document.Current.InspectRootNode = false;
-						}
 						if (clicked) {
 							var controlPressed = SceneView.Instance.Input.IsKeyPressed(Key.Control);
 							if (!controlPressed)

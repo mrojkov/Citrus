@@ -75,7 +75,7 @@ namespace Tangerine.UI.Inspector
 		private void CreateWatchersToRebuild()
 		{
 			RootWidget.AddChangeLateWatcher(() => CalcSelectedRowsHashcode(), _ => Rebuild());
-			RootWidget.AddChangeWatcher(() => Document.Current.InspectRootNode, _ => Rebuild());
+			RootWidget.AddChangeWatcher(() => Document.Current.InspectRootNode, _ => Rebuild(resetInspectRootNode: false));
 		}
 
 		private static int CalcSelectedRowsHashcode()
@@ -95,12 +95,17 @@ namespace Tangerine.UI.Inspector
 			return r;
 		}
 
-		private void Rebuild()
+		private void Rebuild(bool resetInspectRootNode = true)
 		{
 			content.BuildForObjects(Document.Current.InspectRootNode ? new[] { Document.Current.RootNode } : Document.Current.SelectedNodes().ToArray());
 			InspectorCommands.InspectRootNodeCommand.Icon = Document.Current.InspectRootNode ? inspectRootActivatedTexture : inspectRootDeactivatedTexture;
 			Toolbar.Rebuild();
 			RootWidget.ScrollPosition = RootWidget.MinScrollPosition;
+			// Evgenii Polikutin: "if" used instead of "=" to avoid firing
+			// more Rebuild() events on turning InspectRootNode to true.
+			if (resetInspectRootNode) {
+				Document.Current.InspectRootNode = false;
+			}
 		}
 	}
 }
