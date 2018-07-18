@@ -139,7 +139,7 @@
     <Compile Include="Source\ModelImport\FbxImporter\Attributes\FbxCameraAttribute.cs" />
     <Compile Include="Source\ModelImport\FbxImporter\Attributes\FbxMeshAttribute.cs" />
     <Compile Include="Source\ModelImport\FbxImporter\Attributes\FbxNodeAttribute.cs" />
-    <Compile Include="Source\ModelImport\FbxImporter\Objects\FbxFbxObject.cs" />
+    <Compile Include="Source\ModelImport\FbxImporter\Objects\FbxObject.cs" />
     <Compile Include="Source\ModelImport\FbxImporter\Objects\FbxManager.cs" />
     <Compile Include="Source\ModelImport\FbxImporter\Objects\FbxMaterial.cs" />
     <Compile Include="Source\ModelImport\FbxImporter\Objects\FbxNode.cs" />
