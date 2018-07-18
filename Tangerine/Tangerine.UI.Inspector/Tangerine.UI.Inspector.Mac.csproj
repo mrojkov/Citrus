@@ -60,6 +60,7 @@
     <Compile Include="KeyframeButton.cs" />
     <Compile Include="InspectorContent.cs" />
     <Compile Include="InspectorPropertyRegistry.cs" />
+    <Compile Include="KeyFunctionContextMenu.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tangerine.UI\Tangerine.UI.Mac.csproj">
