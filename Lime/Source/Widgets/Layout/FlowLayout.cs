@@ -29,7 +29,9 @@ namespace Lime
 			if (Direction == FlowDirection.LeftToRight) {
 				return splitIndices.Count - 1;
 			} else if (Direction == FlowDirection.TopToBottom) {
-				return splitIndices[columnIndex + 1] - splitIndices[columnIndex];
+				return splitIndices.Count > 1
+					? splitIndices[columnIndex + 1] - splitIndices[columnIndex]
+					: splitIndices[columnIndex];
 			} else {
 				throw new Lime.Exception($"Invalid FlowDirection: {Direction}");
 			}
@@ -38,7 +40,9 @@ namespace Lime
 		public int ColumnCount(int rowIndex)
 		{
 			if (Direction == FlowDirection.LeftToRight) {
-				return splitIndices[rowIndex + 1] - splitIndices[rowIndex];
+				return splitIndices.Count > 1
+					? splitIndices[rowIndex + 1] - splitIndices[rowIndex]
+					: splitIndices[rowIndex];
 			} else if (Direction == FlowDirection.TopToBottom) {
 				return splitIndices.Count - 1;
 			} else {
