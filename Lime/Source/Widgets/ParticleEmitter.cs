@@ -488,16 +488,14 @@ namespace Lime
 
 		private void RefreshCustomShape()
 		{
-			int pointCount = emitterShapePoints.Count();
-			if (pointCount == 0) {
-				for(int i = 0; i < Nodes.Count; i++) {
-					var node = Nodes[i];
-					if (node is EmitterShapePoint) {
-						emitterShapePoints.Add(node as EmitterShapePoint);
-						pointCount++;
-					}
+			emitterShapePoints.Clear();
+			for (int i = 0; i < Nodes.Count; i++) {
+				var node = Nodes[i];
+				if (node is EmitterShapePoint) {
+					emitterShapePoints.Add(node as EmitterShapePoint);
 				}
 			}
+			int pointCount = emitterShapePoints.Count;
 			if (pointCount < 3) {
 				cachedShapePoints.Clear();
 				cachedShapeTriangles.Clear();
@@ -515,6 +513,9 @@ namespace Lime
 				}
 			} else {
 				changed = true;
+				cachedShapePoints.Clear();
+				cachedShapeTriangles.Clear();
+				cachedShapeTriangleSizes.Clear();
 			}
 			if (!changed) {
 				return;
