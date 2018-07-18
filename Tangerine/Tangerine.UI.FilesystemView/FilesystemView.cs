@@ -140,7 +140,7 @@ namespace Tangerine.UI.FilesystemView
 				TabTravesable = new TabTraversable(),
 			};
 			// TODO: Display path
-			RootWidget.AddChangeWatcher(() => model.CurrentPath, (path) => toolbar.Path = path.ToString());
+			RootWidget.AddChangeWatcher(() => model.CurrentPath, (path) => toolbar.AddressBar.Path = path.ToString());
 			crEditor = new CookingRulesEditor(NavigateAndSelect);
 			crEditor.RootWidget.TabTravesable = new TabTraversable();
 			preview = new Preview();
@@ -251,7 +251,7 @@ namespace Tangerine.UI.FilesystemView
 			InvalidateView(path, sortType, orderType);
 		}
 
-		private void Open(string path)
+		public void Open(string path)
 		{
 			var attr = File.GetAttributes(path);
 			if ((attr & FileAttributes.Directory) == FileAttributes.Directory) {

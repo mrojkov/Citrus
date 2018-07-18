@@ -38,7 +38,7 @@ namespace Tangerine.UI.FilesystemView
 	public class FilesystemToolbar : Toolbar
 	{
 		FilesystemView view;
-		private SimpleText pathText;
+		public AddressBar AddressBar;
 
 		public FilesystemToolbar(FilesystemView view)
 		{
@@ -71,23 +71,10 @@ namespace Tangerine.UI.FilesystemView
 								CreateCloseButton()
 							}
 						},
-						(pathText = new ThemedSimpleText {
-						}),
+						(AddressBar = new AddressBar(view)),
 					}
 				}
 			);
-		}
-
-		public string Path
-		{
-			get
-			{
-				return pathText.Text;
-			}
-			set
-			{
-				pathText.Text = value;
-			}
 		}
 
 		private Widget CreateGoBackwardButton()
