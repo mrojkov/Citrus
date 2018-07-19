@@ -121,71 +121,47 @@ namespace Tangerine.UI.FilesystemView
 			CurrentPath = p.FullName;
 		}
 
-		public IEnumerable<string> EnumerateItems()
-		{
-			return EnumerateItems(SortType.Name, OrderType.Ascending);
-		}
-
 		public IEnumerable<string> EnumerateItems(SortType sortType, OrderType orderType)
 		{
-			IEnumerable<string> dirs = Directory.EnumerateDirectories(CurrentPath);
-			IEnumerable<string> files = Directory.EnumerateFiles(CurrentPath);
+			foreach (var i in SortItems(Directory.EnumerateDirectories(CurrentPath), sortType, orderType)) {
+				yield return i;
+			}
+			foreach (var i in SortItems(Directory.EnumerateFiles(CurrentPath), sortType, orderType)) {
+				yield return i;
+			}
+		}
+		
+		private IEnumerable<string> SortItems(IEnumerable<string> items, SortType sortType, OrderType orderType)
+		{
 			switch (sortType) {
 				case SortType.Name:
 					if (orderType == OrderType.Ascending) {
-						dirs = dirs.OrderBy(f => f);
-						files = files.OrderBy(f => f);
+						return items.OrderBy(f => f);
 					} else {
-						dirs = dirs.OrderByDescending(f => f);
-						files = files.OrderByDescending(f => f);
+						return items.OrderByDescending(f => f);
 					}
-					break;
 				case SortType.Date:
 					if (orderType == OrderType.Ascending) {
-						dirs = dirs.OrderBy(f => new FileInfo(f).LastWriteTime);
-						files = files.OrderBy(f => new FileInfo(f).LastWriteTime);
+						return items.OrderBy(f => new FileInfo(f).LastWriteTime);
 					} else {
-						dirs = dirs.OrderByDescending(f => new FileInfo(f).LastWriteTime);
-						files = files.OrderByDescending(f => new FileInfo(f).LastWriteTime);
+						return items.OrderByDescending(f => new FileInfo(f).LastWriteTime);
 					}
-					break;
 				case SortType.Extension:
 					if (orderType == OrderType.Ascending) {
-						dirs = dirs.OrderBy(f => new FileInfo(f).Extension);
-						files = files.OrderBy(f => new FileInfo(f).Extension);
+						return items.OrderBy(f => new FileInfo(f).Extension);
 					} else {
-						dirs = dirs.OrderByDescending(f => new FileInfo(f).Extension);
-						files = files.OrderByDescending(f => new FileInfo(f).Extension);
+						return items.OrderByDescending(f => new FileInfo(f).Extension);
 					}
-					break;
 				case SortType.Size:
 					if (orderType == OrderType.Ascending) {
-						dirs = dirs.OrderBy(f => f.Length);
-						files = files.OrderBy(f => f.Length);
+						return items.OrderBy(f => f.Length);
 					} else {
-						dirs = dirs.OrderByDescending(f => f.Length);
-						files = files.OrderByDescending(f => f.Length);
+						return items.OrderByDescending(f => f.Length);
 					}
-					break;
 				default:
-					if (orderType == OrderType.Ascending) {
-						dirs = dirs.OrderBy(f => f);
-						files = files.OrderBy(f => f);
-					} else {
-						dirs = dirs.OrderByDescending(f => f);
-						files = files.OrderByDescending(f => f);
-					}
-					break;
-			}
-
-			foreach (var i in dirs) {
-				yield return i;
-			}
-			foreach (var i in files) {
-				yield return i;
+					throw new ArgumentException();
 			}
 		}
-
 
 		public void GoTo(string path)
 		{

@@ -3,7 +3,6 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.FilesystemView
 {
-
 	public enum SortType
 	{
 		Name,
@@ -35,6 +34,7 @@ namespace Tangerine.UI.FilesystemView
 			Renderer.DrawRect(Vector2.Zero, widget.Size, ColorTheme.Current.Toolbar.Background);
 		}
 	}
+	
 	public class FilesystemToolbar : Toolbar
 	{
 		FilesystemView view;
