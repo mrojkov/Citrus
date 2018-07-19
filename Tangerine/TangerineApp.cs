@@ -643,7 +643,11 @@ namespace Tangerine
 		{
 			foreach (var arg in args) {
 				if (File.Exists(arg)) {
-					Project.Current?.OpenDocument(arg, pathIsGlobal: true);
+					if(Project.Current != Project.Null)
+						Project.Current?.OpenDocument(arg, pathIsGlobal: true);
+					else {
+						FileOpenProject.Execute(arg);
+					}
 				}
 			}
 		}
