@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Lime;
 
@@ -51,9 +51,6 @@ namespace Tangerine.UI
 				int j = i;
 				button.Clicked += () => Close(j);
 				buttonsPanel.AddNode(button);
-				if (i == 0) {
-					button.SetFocus();
-				}
 			}
 		}
 

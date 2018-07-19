@@ -253,13 +253,19 @@ namespace Tangerine.UI.FilesystemView
 
 		public void Open(string path)
 		{
-			var attr = File.GetAttributes(path);
-			if ((attr & FileAttributes.Directory) == FileAttributes.Directory) {
-				GoTo(path);
-			} else {
-				if (path.EndsWith(".scene") || path.EndsWith(".tan")) {
-					Project.Current.OpenDocument(path, true);
+			try {
+				var attr = File.GetAttributes(path);
+				if ((attr & FileAttributes.Directory) == FileAttributes.Directory) {
+					GoTo(path);
+				} else {
+					if (path.EndsWith(".scene") || path.EndsWith(".tan")) {
+						Project.Current.OpenDocument(path, true);
+					}
 				}
+			}
+			catch (FileNotFoundException e) {
+				var dialog = new AlertDialog("Tangerine can not find \"" + path + "\".\nCheck the spelling and try again.");
+				dialog.Show();
 			}
 		}
 
