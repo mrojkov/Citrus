@@ -587,6 +587,7 @@ namespace Tangerine.UI
 	public class Color4PropertyEditor : ExpandablePropertyEditor<Color4>
 	{
 		private EditBox editor;
+		private bool colorFromPanel;
 
 		public Color4PropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
@@ -604,9 +605,15 @@ namespace Tangerine.UI
 			});
 			ExpandableContent.AddNode(panel.Widget);
 			panel.Widget.Padding.Right = 12;
-			panel.Widget.Tasks.Add(currentColor.Consume(v => panel.Color = v));
+			panel.Widget.Tasks.Add(currentColor.Consume(v => {
+				if (!colorFromPanel) {
+					panel.Color = v;
+					colorFromPanel = false;
+				}
+			}));
 			panel.Changed += () => {
 				EditorParams.History?.RollbackTransaction();
+				colorFromPanel = true;
 				SetProperty(panel.Color);
 			};
 			panel.DragStarted += () => EditorParams.History?.BeginTransaction();

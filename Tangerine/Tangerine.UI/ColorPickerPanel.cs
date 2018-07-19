@@ -8,12 +8,11 @@ namespace Tangerine.UI
 {
 	public class ColorPickerPanel
 	{
-		readonly Spectrum spectrum;
-		readonly ValueSlider valueSlider;
+		readonly TriangleColorWheel colorWheel;
 		readonly AlphaSlider alphaSlider;
 		public readonly Widget Widget;
 		ColorHSVA colorHSVA;
-	
+
 		public event Action DragStarted;
 		public event Action DragEnded;
 		public event Action Changed;
@@ -27,16 +26,13 @@ namespace Tangerine.UI
 		public ColorPickerPanel()
 		{
 			var colorProperty = new Property<ColorHSVA>(() => colorHSVA, c => colorHSVA = c);
-			spectrum = new Spectrum(colorProperty);
-			spectrum.DragStarted += () => DragStarted?.Invoke();
-			spectrum.Changed += () => Changed?.Invoke();
-			spectrum.DragEnded += () => DragEnded?.Invoke();
-			valueSlider = new ValueSlider(colorProperty);
+			colorWheel = new TriangleColorWheel(colorProperty);
+			colorWheel.DragStarted += () => DragStarted?.Invoke();
+			colorWheel.Changed += () => Changed?.Invoke();
+			colorWheel.DragEnded += () => DragEnded?.Invoke();
 			alphaSlider = new AlphaSlider(colorProperty);
-			SetupSliderDragHandlers(valueSlider.Widget);
 			SetupSliderDragHandlers(alphaSlider.Widget);
-			Widget = new Widget
-			{
+			Widget = new Widget {
 				Padding = new Thickness(8),
 				Layout = new VBoxLayout { Spacing = 8 },
 				Nodes = {
@@ -44,10 +40,9 @@ namespace Tangerine.UI
 						LayoutCell = new LayoutCell(Alignment.Center),
 						Layout = new StackLayout(),
 						Nodes = {
-							spectrum.Widget
+							colorWheel.Widget
 						}
 					},
-					valueSlider.Widget,
 					alphaSlider.Widget,
 				}
 			};
@@ -61,24 +56,29 @@ namespace Tangerine.UI
 			slider.Changed += () => Changed?.Invoke();
 		}
 
-		class Spectrum
+		class TriangleColorWheel
 		{
 			readonly Property<ColorHSVA> color;
-			Vertex[] triangleFan;
 
-			public const float Radius = 100;
+			public const float InnerRadius = 100;
+			public const float OuterRadius = 120;
+			public const float Margin = 1.05f;
 			public readonly Widget Widget;
 
 			public event Action DragStarted;
 			public event Action DragEnded;
 			public event Action Changed;
 
-			public Spectrum(Property<ColorHSVA> color)
+			private const float CenterX = OuterRadius;
+			private const float CenterY = OuterRadius;
+			private const float CursorRadius = (OuterRadius - InnerRadius * Margin) / 2;
+
+			public TriangleColorWheel(Property<ColorHSVA> color)
 			{
 				this.color = color;
 				Widget = new Widget {
 					HitTestTarget = true,
-					MinMaxSize = Radius * 2 * Vector2.One,
+					MinMaxSize = OuterRadius * 2 * Vector2.One,
 					PostPresenter = new DelegatePresenter<Widget>(Render)
 				};
 				Widget.Tasks.Add(SelectTask());
@@ -87,101 +87,160 @@ namespace Tangerine.UI
 			void Render(Widget widget)
 			{
 				widget.PrepareRendererState();
-				DrawSpectrumCircle();
-				DrawCircle();
+				DrawControl();
+				DrawTriangleCursor();
+				DrawWheelCursor();
 			}
 
-			void DrawCircle()
+			void DrawTriangleCursor()
 			{
-				var cursor = Radius * (color.Value.S * Vector2.CosSin(Mathf.DegToRad * color.Value.H) + Vector2.One);
-				Renderer.DrawCircle(cursor, 10, 20, Color4.Black);
+				var cursor = new Vector2(
+					CenterX - InnerRadius * (1 - 3 * color.Value.S * color.Value.V) / 2,
+					CenterY + InnerRadius * Mathf.Sqrt(3) *
+					(color.Value.S * color.Value.V - 2 * color.Value.V + 1) / 2
+				);
+				Renderer.DrawCircle(cursor, CursorRadius, 20, Color4.Black);
 			}
 
-			void DrawSpectrumCircle()
+			void DrawWheelCursor()
 			{
-				triangleFan = triangleFan ?? new Vertex[60];
-				triangleFan[0] = new Vertex { Color = Color4.White.Darken(1 - color.Value.V), Pos = Vector2.One * Radius };
-				for (int i = 0; i < triangleFan.Length - 1; i++) {
-					float t = (float)i / (triangleFan.Length - 2);
-					triangleFan[i + 1] = new Vertex {
-						Color = new ColorHSVA(360 * t, 1, color.Value.V, 1).ToRGBA(),
-						Pos = Radius * (Vector2.CosSin(t * Mathf.TwoPi) + Vector2.One)
-					};
+				var cursor =
+					Vector2.CosSin(color.Value.H * Mathf.DegToRad) *
+					(InnerRadius * Margin + OuterRadius) / 2 +
+					Vector2.One * new Vector2(CenterX, CenterY);
+				Renderer.DrawCircle(cursor, CursorRadius, 20, Color4.Black);
+			}
+
+			void DrawControl()
+			{
+				int size = (int)Math.Floor(OuterRadius * 2);
+				var texture = new Texture2D();
+				Color4[] image = new Color4[size * size];
+				for (int y = 0; y < size; ++y) {
+					for (int x = 0; x < size; ++x) {
+						var pick = Pick(size - x - 1, y);
+						if (pick.Area == Area.Outside) {
+							image[y * size + x] = Color4.Transparent;
+						}
+						else if (pick.Area == Area.Wheel) {
+							image[y * size + x] = new ColorHSVA(pick.H.Value, 1, 1).ToRGBA();
+						}
+						else {
+							image[y * size + x] = new ColorHSVA(color.Value.H, pick.S.Value, pick.V.Value).ToRGBA();
+						}
+					}
 				}
-				Renderer.DrawTriangleFan(triangleFan, triangleFan.Length);
+				texture.LoadImage(image, size, size);
+				Renderer.DrawSprite(texture, Color4.White, Vector2.Zero, Vector2.One * size, new Vector2(1, 0), new Vector2(0, 1));
+			}
+
+			enum Area
+			{
+				Outside,
+				Wheel,
+				Triangle
+			}
+
+			struct Result
+			{
+				public Area Area { get; set; }
+				public float? H { get; set; }
+				public float? S { get; set; }
+				public float? V { get; set; }
+			}
+
+			private void ShiftedCoordinates(float x, float y, out float nx, out float ny)
+			{
+				nx = x - CenterX;
+				ny = y - CenterY;
+			}
+
+			private static Result PositionToHue(float nx, float ny)
+			{
+				float angle = Mathf.Atan2(ny, nx);
+				if (angle < 0) {
+					angle += Mathf.TwoPi;
+				}
+				return new Result { Area = Area.Wheel, H = angle / Mathf.DegToRad };
+			}
+
+			private static Result PositionToSV(float nx, float ny, bool ignoreBounds = false)
+			{
+				float sqrt3 = Mathf.Sqrt(3);
+				float x1 = -ny / InnerRadius;
+				float y1 = -nx / InnerRadius;
+				if (
+					!ignoreBounds && (
+					0 * x1 + 2 * y1 > 1 ||
+					sqrt3 * x1 + (-1) * y1 > 1 ||
+					-sqrt3 * x1 + (-1) * y1 > 1)
+				) {
+					return new Result { Area = Area.Outside };
+				}
+				else {
+					var sat = (1 - 2 * y1) / (sqrt3 * x1 - y1 + 2);
+					var val = (sqrt3 * x1 - y1 + 2) / 3;
+					return new Result { Area = Area.Triangle, S = sat, V = val };
+				}
+			}
+
+			private Result Pick(float x, float y)
+			{
+				float nx, ny;
+				ShiftedCoordinates(x, y, out nx, out ny);
+				float centerDistance = Mathf.Sqrt(nx * nx + ny * ny);
+				if (centerDistance > OuterRadius) {
+					return new Result { Area = Area.Outside };
+				}
+				else if (centerDistance > InnerRadius * Margin) {
+					return PositionToHue(nx, ny);
+				}
+				else {
+					return PositionToSV(nx, ny);
+				}
 			}
 
 			IEnumerator<object> SelectTask()
 			{
 				while (true) {
-					if (Widget.Input.WasMousePressed() && HitTest(Widget.Input.MousePosition)) {
-						DragStarted?.Invoke();
-						while (Widget.Input.IsMousePressed()) {
-							var c = color.Value;
-							PositionToHueSaturation(Widget.Input.MousePosition - Widget.GlobalCenter, out c.H, out c.S);
-							color.Value = c;
-							Window.Current.Invalidate();
-							Changed?.Invoke();
-							yield return null;
+					if (Widget.Input.WasMousePressed()) {
+						var pick = Pick(
+							Widget.Input.MousePosition.X - Widget.GlobalPosition.X,
+							Widget.Input.MousePosition.Y - Widget.GlobalPosition.Y);
+						if (pick.Area != Area.Outside) {
+							DragStarted?.Invoke();
+							while (Widget.Input.IsMousePressed()) {
+								float nx, ny;
+								ShiftedCoordinates(
+									Widget.Input.MousePosition.X - Widget.GlobalPosition.X,
+									Widget.Input.MousePosition.Y - Widget.GlobalPosition.Y,
+									out nx, out ny);
+								if (pick.Area == Area.Triangle) {
+									var newPick = PositionToSV(nx, ny, ignoreBounds: true);
+									color.Value = new ColorHSVA {
+										H = color.Value.H,
+										S = Mathf.Min(Mathf.Max(newPick.S.Value, 0), 1),
+										V = Mathf.Min(Mathf.Max(newPick.V.Value, 0), 1),
+										A = color.Value.A
+									};
+								}
+								else {
+									var newPick = PositionToHue(nx, ny);
+									color.Value = new ColorHSVA {
+										H = Mathf.Min(Mathf.Max(newPick.H.Value, 0), 360),
+										S = color.Value.S,
+										V = color.Value.V,
+										A = color.Value.A
+									};
+								}
+								Window.Current.Invalidate();
+								Changed?.Invoke();
+								yield return null;
+							}
+							DragEnded?.Invoke();
 						}
-						DragEnded?.Invoke();
 					}
 					yield return null;
-				}
-			}
-
-			static void PositionToHueSaturation(Vector2 pos, out float hue, out float saturation)
-			{
-				hue = Mathf.Atan2(pos) * 180 / Mathf.Pi;
-				if (hue < 0) {
-					hue += 360;
-				}
-				saturation = Mathf.Min(1, pos.Length / Radius);
-			}
-
-			bool HitTest(Vector2 pos)
-			{
-				return (pos - Widget.GlobalCenter).Length < Radius;
-			}
-		}
-
-		class ValueSlider
-		{
-			public readonly Slider Widget;
-
-			public ValueSlider(Property<ColorHSVA> color)
-			{
-				Widget = new ThemedSlider { RangeMin = 0, RangeMax = 1 };
-				Widget.Changed += () => {
-					color.Value = new ColorHSVA(color.Value.H, color.Value.S, 1 - Widget.Value, color.Value.A);
-				};
-				Widget.Updating += delta => Widget.Value = 1 - color.Value.V;
-				var presenter = new BackgroundPresenter(color);
-				Widget.CompoundPresenter.Insert(0, presenter);
-			}
-
-			class BackgroundPresenter : CustomPresenter
-			{
-				readonly Property<ColorHSVA> color;
-
-				public BackgroundPresenter(Property<ColorHSVA> color)
-				{
-					this.color = color;
-				}
-
-				public override void Render(Node node)
-				{
-					var widget = node.AsWidget;
-					widget.PrepareRendererState();
-					Renderer.DrawHorizontalGradientRect(Vector2.Zero, widget.Size, GetGradient());
-					Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Theme.Colors.ControlBorder);
-				}
-
-				ColorGradient GetGradient()
-				{
-					return new ColorGradient(
-						new ColorHSVA(color.Value.H, color.Value.S, 1, 1).ToRGBA(),
-						new ColorHSVA(color.Value.H, color.Value.S, 0, 1).ToRGBA());
 				}
 			}
 		}
