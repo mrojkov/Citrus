@@ -142,6 +142,15 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="icon.ico" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\DistributeBottom.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\DistributeCentersHorizontally.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\DistributeCentersVertically.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\DistributeLeft.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\DistributeRight.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\DistributeTop.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\KeyObject.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\Root.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\Selection.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Tools\DistributeBottom.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Tools\DistributeLeft.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Tools\DistributeRight.png" />
