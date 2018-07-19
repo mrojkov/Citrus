@@ -4,11 +4,9 @@ using System.Linq;
 using Lime;
 using Tangerine.Core;
 using Tangerine.UI;
-using Tangerine.UI.SceneView;
 
 namespace Tangerine
 {
-
 	public enum AlignObject
 	{
 		Selection,
@@ -23,10 +21,9 @@ namespace Tangerine
 		public AlignToHandler(ICommand command)
 		{
 			this.command = command;
-			this.command.Text = AlignToString(AlignPreferences.Instance.AlignObject);
 		}
 
-		private static string AlignToString(AlignObject align)
+		public static string AlignToString(AlignObject align)
 		{
 			switch (align) {
 				case AlignObject.Selection:
@@ -40,40 +37,52 @@ namespace Tangerine
 			}
 		}
 
+		public static ITexture AlignToTexture(AlignObject align)
+		{
+			return IconPool.GetTexture($"Tools.{Enum.GetName(typeof(AlignObject), align)}");
+		}
+
+		private void SetTextAndTexture()
+		{
+			var alignObject = AlignPreferences.Instance.AlignObject;
+			command.Text = AlignToString(AlignPreferences.Instance.AlignObject);
+			int index = TangerineApp.Instance.Toolbars["Tools"].IndexOf(Tools.AlignTo);
+			var button = (ToolbarButton)TangerineApp.Instance.Toolbars["Tools"].Widget.Nodes[index];
+			button.Texture = AlignToTexture(alignObject);
+		}
+
 		public override void Execute()
 		{
-			AlignObjectContextMenu.Create(command);
+			AlignObjectContextMenu.Create(this);
 		}
 
 		private static class AlignObjectContextMenu
 		{
-		
-			public static void Create(ICommand command)
+			public static void Create(AlignToHandler alignToHandler)
 			{
 				var menu = new Menu();
 				foreach (AlignObject alignObject in Enum.GetValues(typeof(AlignObject))) {
 					menu.Add(new Command(AlignToString(alignObject),
-						new ChangeAlignObject(command, alignObject).Execute));
+						new ChangeAlignObject(alignObject, alignToHandler).Execute));
 				}
 				menu.Popup();
 			}
 
 			private class ChangeAlignObject : CommandHandler
 			{
+				private readonly AlignObject alignObject;
+				private readonly AlignToHandler alignToHandler;
 
-				ICommand command;
-				AlignObject alignObject;
-
-				public ChangeAlignObject(ICommand command, AlignObject alignObject)
+				public ChangeAlignObject( AlignObject alignObject, AlignToHandler alignToHandler)
 				{
-					this.command = command;
 					this.alignObject = alignObject;
+					this.alignToHandler = alignToHandler;
 				}
 
 				public override void Execute()
 				{
 					AlignPreferences.Instance.AlignObject = alignObject;
-					command.Text = AlignToString(alignObject);
+					alignToHandler.SetTextAndTexture();
 				}
 			}
 
