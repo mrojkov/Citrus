@@ -14,7 +14,7 @@ namespace Tangerine
 		Root
 	}
 
-	public class AlignToHandler : CommandHandler
+	public class AlignToHandler : DocumentCommandHandler
 	{
 		ICommand command;
 
@@ -46,12 +46,10 @@ namespace Tangerine
 		{
 			var alignObject = AlignPreferences.Instance.AlignObject;
 			command.Text = AlignToString(AlignPreferences.Instance.AlignObject);
-			int index = TangerineApp.Instance.Toolbars["Tools"].IndexOf(Tools.AlignTo);
-			var button = (ToolbarButton)TangerineApp.Instance.Toolbars["Tools"].Widget.Nodes[index];
-			button.Texture = AlignToTexture(alignObject);
+			command.Icon = AlignToTexture(alignObject);
 		}
 
-		public override void Execute()
+		public override void ExecuteTransaction()
 		{
 			AlignObjectContextMenu.Create(this);
 		}
