@@ -17,6 +17,59 @@ namespace Tangerine
 		}
 	}
 
+	public class SaveLayout : CommandHandler
+	{
+		private static Yuzu.Json.JsonSerializer serializer = new Yuzu.Json.JsonSerializer();
+
+		public override void Execute()
+		{
+			var dlg = new FileDialog {
+				AllowedFileTypes = new string[] { "layout" },
+				Mode = FileDialogMode.Save
+			};
+			if (dlg.RunModal()) {
+				string path = dlg.FileName;
+				try {
+					var state = DockManager.Instance.ExportState();
+					using (var fileStream = new FileStream(path, FileMode.OpenOrCreate)) {
+						serializer.ToStream(state, fileStream);
+					}
+				}
+				catch (System.Exception e) {
+					AlertDialog.Show(e.Message);
+				}
+			}
+		}
+	}
+
+	public class LoadLayout : CommandHandler
+	{
+		private static Yuzu.Json.JsonDeserializer deserializer = new Yuzu.Json.JsonDeserializer();
+
+		public override void Execute()
+		{
+			var dlg = new FileDialog {
+				AllowedFileTypes = new string[] { "layout" },
+				Mode = FileDialogMode.Open
+			};
+			if (dlg.RunModal()) {
+				string path = dlg.FileName;
+				try {
+					using (var fs = new FileStream(path, FileMode.OpenOrCreate)) {
+						DockManager.State state = deserializer.FromStream(
+							new DockManager.State(), fs
+						) as DockManager.State;
+						DockManager.Instance.ImportState(state);
+						DockManager.Instance.ResolveAndRefresh();
+					}
+				}
+				catch (System.Exception e) {
+					AlertDialog.Show(e.Message);
+				}
+			}
+		}
+	}
+
 	public class ManageRulers : DocumentCommandHandler
 	{
 		public override bool GetEnabled()
