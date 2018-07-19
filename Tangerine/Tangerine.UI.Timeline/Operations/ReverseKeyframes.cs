@@ -43,7 +43,7 @@ namespace Tangerine.UI.Timeline.Operations
 							RemoveKeyframe.Perform(animator, key.Frame);
 						}
 						foreach (var key in saved) {
-							key.Frame = Boundaries.Value.Left + Boundaries.Value.Right - key.Frame - 1;
+							SetProperty.Perform(key, "Frame", Boundaries.Value.Left + Boundaries.Value.Right - key.Frame - 1);
 							SetKeyframe.Perform(animable, animator.TargetProperty, animator.AnimationId, key);
 						}
 					}
