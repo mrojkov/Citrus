@@ -171,7 +171,11 @@ namespace Tangerine.UI.FilesystemView
 
 		private static ITexture GetTexture(string filename)
 		{
-			if (AssetBundle.Current == null) {
+			try {
+				if (AssetBundle.Current == null) {
+					return null;
+				}
+			} catch (Lime.Exception) {
 				return null;
 			}
 			if (Directory.Exists(filename)) {
