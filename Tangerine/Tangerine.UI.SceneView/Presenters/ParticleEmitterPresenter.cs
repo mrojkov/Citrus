@@ -16,6 +16,7 @@ namespace Tangerine.UI.SceneView
 			if (emitter.Shape == EmitterShape.Custom && Document.Current.Container == emitter) {
 				emitter.DrawCustomShape(
 					ColorTheme.Current.SceneView.PointObject.Lighten(0.2f).Transparentify(0.5f),
+					ColorTheme.Current.SceneView.SelectedWidget.Lighten(0.2f).Transparentify(0.5f),
 					emitter.CalcTransitionToSpaceOf(SceneView.Instance.Frame));
 			}
 		}

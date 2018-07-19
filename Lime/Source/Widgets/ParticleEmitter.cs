@@ -944,16 +944,31 @@ namespace Lime
 			zoom = scale.Y * aspectRatio;
 		}
 
-		public void DrawCustomShape(Color4 color, Matrix32 transform)
+		public void DrawCustomShape(Color4 areaColor, Color4 lineColor, Matrix32 transform)
 		{
 			for (int i = 0; i < cachedShapeTriangles.Count; i += 3) {
 				Vertex[] v = new Vertex[3];
 				for (int j = 0; j < 3; ++j) {
-					v[j].Color = color;
+					v[j].Color = areaColor;
 					v[j].Pos = cachedShapePoints[cachedShapeTriangles[i + j]] * transform;
 				}
 				Renderer.DrawTriangleStrip(v, v.Length);
 			}
+			var spacing = new Vector2(3, 2);
+			for (int i = 0; i < cachedShapePoints.Count - 1; ++i) {
+				Renderer.DrawDashedLine(
+					cachedShapePoints[i] * transform,
+					cachedShapePoints[i + 1] * transform,
+					lineColor,
+					spacing
+				);
+			}
+			Renderer.DrawDashedLine(
+				cachedShapePoints.Last() * transform,
+				cachedShapePoints.First() * transform,
+				lineColor,
+				spacing
+			);
 		}
 
 		// ReSharper disable once UnusedMember.Local
