@@ -429,6 +429,7 @@ namespace Tangerine
 			UI.SceneView.SceneView.RegisterGlobalCommands();
 
 			var h = CommandHandlerList.Global;
+			h.Connect(GenericCommands.NewProject, new ProjectNew());
 			h.Connect(GenericCommands.NewScene, new FileNew());
 			h.Connect(GenericCommands.NewTan, new FileNew(DocumentFormat.Tan));
 			h.Connect(GenericCommands.Open, new FileOpen());

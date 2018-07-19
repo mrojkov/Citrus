@@ -41,8 +41,9 @@ namespace Orange
 		[Export(nameof(OrangePlugin.MenuItems))]
 		[ExportMetadata("Label", "New Project")]
 		[ExportMetadata("Priority", 3)]
-		public static void NewProjectAction()
+		public static void NewProjectAction(Action<string> projectOpened = null)
 		{
+			string newProjectCitprojPath = "";
 			Application.InvokeOnMainThread(() => {
 				var citrusPath = Toolbox.CalcCitrusDirectory();
 				var dlg = new FileDialog {
@@ -75,6 +76,7 @@ namespace Orange
 								text = text.Replace("..\\..\\..", relativeUri.ToString());
 								if (targetPath.EndsWith(".citproj", StringComparison.OrdinalIgnoreCase)) {
 									text = text.Replace("CitrusLocation: \"..\",", $"CitrusLocation: \"{relativeUri}\",");
+									newProjectCitprojPath = targetPath;
 								}
 								File.WriteAllText(targetPath, text);
 							}
@@ -88,7 +90,11 @@ namespace Orange
 					Git("commit -m\"Initial commit.\"");
 #endif // WIN
 				}
+
 			});
+			if (projectOpened != null) {
+				projectOpened?.Invoke(newProjectCitprojPath);
+			}
 		}
 	}
 }

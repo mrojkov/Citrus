@@ -36,6 +36,14 @@ namespace Tangerine
 		}
 	}
 
+	public class ProjectNew : CommandHandler
+	{
+		public override void Execute()
+		{
+			Orange.NewProject.NewProjectAction(FileOpenProject.Execute);
+		}
+	}
+
 	public class FileNew : CommandHandler
 	{
 		private readonly DocumentFormat format;
