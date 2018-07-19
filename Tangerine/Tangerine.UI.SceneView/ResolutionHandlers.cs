@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using Lime;
 using Tangerine.Core;
 
@@ -8,85 +7,51 @@ namespace Tangerine.UI.SceneView
 {
 	public class ResolutionPreviewHandler : DocumentCommandHandler
 	{
-		private static ProjectPreferences Preferences => ProjectPreferences.Instance;
+		public override bool GetChecked() => Document.Current.ResolutionPreview.Enabled;
 
-		public static bool Enabled
-		{
-			get {
-				return Document.Current.ResolutionPreview.Enable;
-			}
-			set {
-				if (!Document.Current.ResolutionPreview.Enable && value) {
-					Document.Current.Saving += DocumentOnSaving;
-				} else if (Document.Current.ResolutionPreview.Enable && !value) {
-					Document.Current.Saving -= DocumentOnSaving;
-				}
-				Document.Current.ResolutionPreview.Enable = value;
-			}
-		}
-
-		public override bool GetChecked() => Enabled;
-
-		public override void ExecuteTransaction() => Execute(Document.Current, !Enabled);
+		public override void ExecuteTransaction() => Execute(Document.Current, !Document.Current.ResolutionPreview.Enabled);
 
 		public static void Execute(Document document, bool enable)
 		{
-			var rootNode = document.RootNode as Widget;
-			if (rootNode == null) {
-				Enabled = false;
+			var resolutionPreview = document.ResolutionPreview;
+			resolutionPreview.Enabled = enable;
+			Execute(document, resolutionPreview);
+		}
+
+		public static void Execute(Document document, ResolutionPreview resolutionPreview)
+		{
+			if (!resolutionPreview.Enabled && !document.ResolutionPreview.Enabled) {
+				return;
+			}
+			if (!(document.RootNode is Widget)) {
+				if (document.ResolutionPreview.Enabled) {
+					resolutionPreview.Enabled = false;
+					PerformResolutionPreviewOperation(resolutionPreview);
+				}
 				return;
 			}
 
-			Enabled = enable;
-			if (Enabled) {
-				if (document.ResolutionPreview.Preset == null) {
-					document.ResolutionPreview.Preset = Preferences.Resolutions.First();
+			var requiredSave = true;
+			if (resolutionPreview.Enabled) {
+				if (resolutionPreview.Preset == null) {
+					resolutionPreview.Preset = ProjectPreferences.Instance.Resolutions.First();
 				}
-				ApplyResolutionPreset(rootNode, document.ResolutionPreview.Preset, document.ResolutionPreview.IsPortrait);
 			} else {
-				ApplyResolutionPreset(rootNode, Preferences.Resolutions.First(), isPortrait: false);
+				resolutionPreview.Preset = ProjectPreferences.Instance.Resolutions.First();
+				resolutionPreview.IsPortrait = false;
+				requiredSave = false;
 			}
+			PerformResolutionPreviewOperation(resolutionPreview, requiredSave);
 			Application.InvalidateWindows();
 		}
 
-		private static void ApplyResolutionPreset(Node node, ResolutionPreset resolutionPreset, bool isPortrait)
+		private static void PerformResolutionPreviewOperation(ResolutionPreview resolutionPreview, bool requiredSave = true)
 		{
-			var defaultResolution = ProjectPreferences.Instance.DefaultResolution;
-			Vector2 resolution;
-			if (isPortrait) {
-				resolution = new Vector2(
-					defaultResolution.LandscapeValue.Y,
-					defaultResolution.LandscapeValue.Y * (resolutionPreset.LandscapeValue.X / resolutionPreset.LandscapeValue.Y)
-				);
-			} else {
-				resolution = new Vector2(
-					defaultResolution.LandscapeValue.Y * (resolutionPreset.LandscapeValue.X / resolutionPreset.LandscapeValue.Y),
-					defaultResolution.LandscapeValue.Y
-				);
-			}
-			Core.Operations.SetProperty.Perform(node, nameof(Widget.Size), resolution);
-			ApplyResolutionAnimations(node, resolutionPreset, isPortrait);
-		}
-
-		private static void ApplyResolutionAnimations(Node node, ResolutionPreset resolutionPreset, bool isPortrait)
-		{
-			var animations = resolutionPreset.GetAnimations(isPortrait);
-			ApplyResolutionAnimation(node, animations);
-			foreach (var descendant in node.Descendants) {
-				ApplyResolutionAnimation(descendant, animations);
+			using (Document.Current.History.BeginTransaction()) {
+				ResolutionPreviewOperation.Perform(resolutionPreview, requiredSave);
+				Document.Current.History.CommitTransaction();
 			}
 		}
-
-		private static void ApplyResolutionAnimation(Node node, IEnumerable<string> animations)
-		{
-			foreach (var animation in animations) {
-				if (node.TryRunAnimation(animation)) {
-					break;
-				}
-			}
-		}
-
-		private static void DocumentOnSaving(Document document) => Execute(document, false);
 	}
 
 	public class ResolutionChangerHandler : DocumentCommandHandler
@@ -103,23 +68,24 @@ namespace Tangerine.UI.SceneView
 		public override void ExecuteTransaction()
 		{
 			var document = Document.Current;
-			var rootNode = document.RootNode as Widget;
-			if (rootNode == null) {
-				ResolutionPreviewHandler.Enabled = false;
+			if (!(document.RootNode is Widget)) {
+				ResolutionPreviewHandler.Execute(Document.Current, enable: false);
 				return;
 			}
 
 			var resolutions = Preferences.Resolutions;
-			if (document.ResolutionPreview.Preset == null) {
-				document.ResolutionPreview.IsPortrait = false;
-				document.ResolutionPreview.Preset = !isReverse ? resolutions.First() : resolutions.Last();
+			var resolutionPreview = document.ResolutionPreview;
+			resolutionPreview.Enabled = true;
+			if (resolutionPreview.Preset == null) {
+				resolutionPreview.IsPortrait = false;
+				resolutionPreview.Preset = !isReverse ? resolutions.First() : resolutions.Last();
 			} else {
-				var index = ((List<ResolutionPreset>)resolutions).IndexOf(document.ResolutionPreview.Preset);
-				var shift = ResolutionPreviewHandler.Enabled ? (!isReverse ? 1 : -1) : 0;
+				var index = ((List<ResolutionPreset>)resolutions).IndexOf(resolutionPreview.Preset);
+				var shift = document.ResolutionPreview.Enabled ? (!isReverse ? 1 : -1) : 0;
 				index = Mathf.Wrap(index + shift, 0, resolutions.Count - 1);
-				document.ResolutionPreview.Preset = resolutions[index];
+				resolutionPreview.Preset = resolutions[index];
 			}
-			ResolutionPreviewHandler.Execute(Document.Current, enable: true);
+			ResolutionPreviewHandler.Execute(Document.Current, resolutionPreview);
 		}
 	}
 
@@ -130,19 +96,114 @@ namespace Tangerine.UI.SceneView
 		public override void ExecuteTransaction()
 		{
 			var document = Document.Current;
-			var rootNode = document.RootNode as Widget;
-			if (rootNode == null) {
-				ResolutionPreviewHandler.Enabled = false;
+			if (!(document.RootNode is Widget)) {
+				ResolutionPreviewHandler.Execute(Document.Current, enable: false);
 				return;
 			}
 
-			if (document.ResolutionPreview.Preset == null) {
-				document.ResolutionPreview.IsPortrait = false;
-				document.ResolutionPreview.Preset = Preferences.Resolutions.First();
+			var resolutionPreview = document.ResolutionPreview;
+			resolutionPreview.Enabled = true;
+			if (resolutionPreview.Preset == null) {
+				resolutionPreview.IsPortrait = false;
+				resolutionPreview.Preset = Preferences.Resolutions.First();
 			} else {
-				document.ResolutionPreview.IsPortrait = !document.ResolutionPreview.IsPortrait;
+				resolutionPreview.IsPortrait = !resolutionPreview.IsPortrait;
 			}
-			ResolutionPreviewHandler.Execute(Document.Current, enable: true);
+			ResolutionPreviewHandler.Execute(Document.Current, resolutionPreview);
+		}
+	}
+
+	public class ResolutionPreviewOperation : Operation
+	{
+		private static bool ResolutionPreviewMode
+		{
+			set {
+				var document = Document.Current;
+				if (!document.ResolutionPreview.Enabled && value) {
+					document.Saving += DocumentOnSaving;
+				} else if (document.ResolutionPreview.Enabled && !value) {
+					document.Saving -= DocumentOnSaving;
+				}
+				document.ResolutionPreview = new ResolutionPreview {
+					Enabled = value,
+					Preset = document.ResolutionPreview.Preset,
+					IsPortrait = document.ResolutionPreview.IsPortrait
+				};
+			}
+		}
+
+		private static ResolutionPreview DisabledResolutionPreview => new ResolutionPreview {
+			Enabled = false,
+			Preset = ProjectPreferences.Instance.Resolutions.First(),
+			IsPortrait = false
+		};
+
+		private readonly ResolutionPreview resolutionPreview;
+		private readonly bool requiredSave;
+
+		public override bool IsChangingDocument => false;
+
+		private static void DocumentOnSaving(Document document) => Perform(DisabledResolutionPreview, requiredSave: false);
+
+		public static void Perform(ResolutionPreview resolutionPreview, bool requiredSave = true) =>
+			Document.Current.History.Perform(new ResolutionPreviewOperation(resolutionPreview, requiredSave));
+
+		public ResolutionPreviewOperation(ResolutionPreview resolutionPreview, bool requiredSave)
+		{
+			this.resolutionPreview = resolutionPreview;
+			this.requiredSave = requiredSave;
+		}
+
+		public class Processor : OperationProcessor<ResolutionPreviewOperation>
+		{
+			protected override void InternalRedo(ResolutionPreviewOperation op) => ApplyResolutionPreset(op.resolutionPreview, op.requiredSave);
+			protected override void InternalUndo(ResolutionPreviewOperation op) => ApplyResolutionPreset(DisabledResolutionPreview, requiredSave: false);
+
+			private static void ApplyResolutionPreset(ResolutionPreview resolutionPreview, bool requiredSave)
+			{
+				var rootNode = Document.Current.RootNode as Widget;
+				if (rootNode == null) {
+					return;
+				}
+				ResolutionPreviewMode = resolutionPreview.Enabled;
+				if (requiredSave) {
+					Document.Current.ResolutionPreview = resolutionPreview;
+				}
+
+				var defaultResolution = ProjectPreferences.Instance.DefaultResolution;
+				Vector2 resolution;
+				if (resolutionPreview.IsPortrait) {
+					resolution = new Vector2(
+						defaultResolution.LandscapeValue.Y,
+						defaultResolution.LandscapeValue.Y * (resolutionPreview.Preset.LandscapeValue.X / resolutionPreview.Preset.LandscapeValue.Y)
+					);
+				} else {
+					resolution = new Vector2(
+						defaultResolution.LandscapeValue.Y * (resolutionPreview.Preset.LandscapeValue.X / resolutionPreview.Preset.LandscapeValue.Y),
+						defaultResolution.LandscapeValue.Y
+					);
+				}
+				rootNode.Size = resolution;
+				ApplyResolutionAnimations(rootNode, resolutionPreview.Preset, resolutionPreview.IsPortrait);
+			}
+
+			private static void ApplyResolutionAnimations(Node node, ResolutionPreset resolutionPreset, bool isPortrait)
+			{
+				var animations = resolutionPreset.GetAnimations(isPortrait);
+				ApplyResolutionAnimation(node, animations);
+				foreach (var descendant in node.Descendants) {
+					ApplyResolutionAnimation(descendant, animations);
+				}
+			}
+
+			private static void ApplyResolutionAnimation(Node node, IEnumerable<string> animations)
+			{
+				foreach (var animation in animations) {
+					if (node.TryRunAnimation(animation)) {
+						break;
+					}
+				}
+			}
 		}
 	}
 }

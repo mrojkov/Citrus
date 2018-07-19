@@ -10,7 +10,7 @@ namespace Tangerine.UI.SceneView
 		public IEnumerator<object> Task()
 		{
 			while (true) {
-				if (Core.Document.Current.ResolutionPreview.Enable && SceneView.Input.ConsumeKeyPress(Key.Escape)) {
+				if (Core.Document.Current.ResolutionPreview.Enabled && SceneView.Input.ConsumeKeyPress(Key.Escape)) {
 					ResolutionPreviewHandler.Execute(Core.Document.Current, false);
 				}
 				yield return null;

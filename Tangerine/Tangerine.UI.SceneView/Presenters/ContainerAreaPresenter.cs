@@ -125,7 +125,7 @@ namespace Tangerine.UI.SceneView
 			sceneView.Scene.CompoundPostPresenter.Push(
 				new DelegatePresenter<Widget>(
 					(w) => {
-						if (!Document.Current.ResolutionPreview.Enable) {
+						if (!Document.Current.ResolutionPreview.Enabled) {
 							return;
 						}
 						var ctr = SceneView.Instance.Frame;

@@ -4,11 +4,11 @@ using Lime;
 
 namespace Tangerine.Core
 {
-	public class ResolutionPreview
+	public struct ResolutionPreview
 	{
-		public bool Enable { get; set; }
-		public ResolutionPreset Preset { get; set; }
-		public bool IsPortrait { get; set; }
+		public bool Enabled;
+		public ResolutionPreset Preset;
+		public bool IsPortrait;
 	}
 
 	public class ResolutionPreset
