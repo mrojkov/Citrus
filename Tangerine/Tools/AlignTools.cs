@@ -374,7 +374,7 @@ namespace Tangerine
 	{
 		protected override void HandleWidgets(Widget container, IEnumerable<Node> nodes, Rectangle aabb)
 		{
-			var widgets = nodes.Editable().OfType<Widget>().OrderBy(w => w.Position.Y);
+			var widgets = nodes.Editable().OfType<Widget>().OrderBy(w => w.CalcAABBInSpaceOf(container).Center.Y);
 			if (widgets.Count() == 0) {
 				return;
 			}
@@ -413,7 +413,7 @@ namespace Tangerine
 	{
 		protected override void HandleWidgets(Widget container, IEnumerable<Node> nodes, Rectangle aabb)
 		{
-			var widgets = nodes.Editable().OfType<Widget>().OrderBy(w => w.Position.X);
+			var widgets = nodes.Editable().OfType<Widget>().OrderBy(w => w.CalcAABBInSpaceOf(container).Center.X);
 			if (widgets.Count() == 0) {
 				return;
 			}
@@ -452,7 +452,7 @@ namespace Tangerine
 	{
 		protected override void HandleWidgets(Widget container, IEnumerable<Node> nodes, Rectangle aabb)
 		{
-			var widgets = nodes.Editable().OfType<Widget>().OrderBy(w => w.Left());
+			var widgets = nodes.Editable().OfType<Widget>().OrderBy(w => w.CalcAABBInSpaceOf(container).Left);
 			if (widgets.Count() == 0) {
 				return;
 			}
@@ -491,7 +491,7 @@ namespace Tangerine
 	{
 		protected override void HandleWidgets(Widget container, IEnumerable<Node> nodes, Rectangle aabb)
 		{
-			var widgets = nodes.Editable().OfType<Widget>().OrderBy(w => w.Right());
+			var widgets = nodes.Editable().OfType<Widget>().OrderBy(w => w.CalcAABBInSpaceOf(container).Right);
 			if (widgets.Count() == 0) {
 				return;
 			}
@@ -530,7 +530,7 @@ namespace Tangerine
 	{
 		protected override void HandleWidgets(Widget container, IEnumerable<Node> nodes, Rectangle aabb)
 		{
-			var widgets = nodes.Editable().OfType<Widget>().OrderBy(w => w.Top());
+			var widgets = nodes.Editable().OfType<Widget>().OrderBy(w => w.CalcAABBInSpaceOf(container).Top);
 			if (widgets.Count() == 0) {
 				return;
 			}
@@ -569,7 +569,7 @@ namespace Tangerine
 	{
 		protected override void HandleWidgets(Widget container, IEnumerable<Node> nodes, Rectangle aabb)
 		{
-			var widgets = nodes.Editable().OfType<Widget>().OrderBy(w => w.Bottom());
+			var widgets = nodes.Editable().OfType<Widget>().OrderBy(w => w.CalcAABBInSpaceOf(container).Bottom);
 			if (widgets.Count() == 0) {
 				return;
 			}
@@ -579,7 +579,7 @@ namespace Tangerine
 			float Y = minY;
 			foreach (var widget in widgets) {
 				var p = widget.Position;
-				float d = p.Y - widget.CalcAABBInSpaceOf(container).Height / 2 - Y;
+				float d = p.Y + widget.CalcAABBInSpaceOf(container).Height / 2 - Y;
 				if (Mathf.Abs(d) > Mathf.ZeroTolerance) {
 					p.Y -= d;
 					Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), p, false);
