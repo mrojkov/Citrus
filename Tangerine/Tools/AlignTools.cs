@@ -11,7 +11,8 @@ namespace Tangerine
 	{
 		Selection,
 		KeyObject,
-		Root
+		Root,
+		Parent
 	}
 
 	public class AlignToHandler : DocumentCommandHandler
@@ -32,6 +33,8 @@ namespace Tangerine
 					return "Align to Key Object";
 				case AlignObject.Root:
 					return "Align to Root";
+				case AlignObject.Parent:
+					return "Align to Parent";
 				default:
 					throw new ArgumentException();
 			}
@@ -87,7 +90,7 @@ namespace Tangerine
 		}
 	}
 
-	public abstract class AlignToolHandler : DocumentCommandHandler
+	public abstract class AlignTool : DocumentCommandHandler
 	{
 		protected abstract void HandleWidgets(Widget container, IEnumerable<Node> nodes, Rectangle aabb);
 		protected abstract void HandlePointObjects(Widget container, IEnumerable<Node> nodes, Rectangle aabb);
@@ -97,43 +100,44 @@ namespace Tangerine
 			return new Rectangle(aabb.Left / container.Width, aabb.Top / container.Height,
 				aabb.Right / container.Width, aabb.Bottom / container.Height);
 		}
-	}
 
-	public abstract class CenterTool : AlignToolHandler
-	{
-		public override void ExecuteTransaction()
+		protected virtual void ToSelection()
 		{
-			Rectangle aabb;
 			var container = (Widget)Core.Document.Current.Container;
+			if (container == null) {
+				return;
+			}
 			var nodes = Core.Document.Current.SelectedNodes();
+			Rectangle aabb;
 			if (Utils.CalcAABB(nodes, container, out aabb)) {
 				HandleWidgets(container, nodes, aabb);
 				HandlePointObjects(container, nodes, NormalizedAABB(aabb, container));
 			}
 		}
-	}
 
-	public abstract class AlignTool : AlignToolHandler
-	{
-
-		private void ToSelection()
-		{
-			Rectangle aabb;
-			var container = (Widget)Core.Document.Current.Container;
-			var nodes = Core.Document.Current.SelectedNodes();
-			if (Utils.CalcAABB(nodes, container, out aabb)) {
-				HandleWidgets(container, nodes, aabb);
-				HandlePointObjects(container, nodes, NormalizedAABB(aabb, container));
-			}
-		}
-		private void ToKeyObject()
+		protected virtual void ToKeyObject()
 		{
 			throw new NotImplementedException();
 		}
 
-		private void ToRoot()
+		protected virtual void ToRoot()
+		{
+			var container = (Widget)Core.Document.Current.RootNode;
+			if (container == null) {
+				return;
+			}
+			var nodes = Core.Document.Current.SelectedNodes();
+			Rectangle aabb = new Rectangle(0, 0, container.Width, container.Height);
+			HandleWidgets(container, nodes, aabb);
+			HandlePointObjects(container, nodes, NormalizedAABB(aabb, container));
+		}
+
+		protected virtual void ToParent()
 		{
 			var container = (Widget)Core.Document.Current.Container;
+			if (container == null) {
+				return;
+			}
 			var nodes = Core.Document.Current.SelectedNodes();
 			Rectangle aabb = new Rectangle(0, 0, container.Width, container.Height);
 			HandleWidgets(container, nodes, aabb);
@@ -152,7 +156,53 @@ namespace Tangerine
 				case AlignObject.Root:
 					ToRoot();
 					break;
+				case AlignObject.Parent:
+					ToParent();
+					break;
+				default:
+					throw new ArgumentException();
 			}
+		}
+	}
+
+	public abstract class CenterTool : AlignTool
+	{
+		protected override void ToParent()
+		{
+			var container = (Widget)Core.Document.Current.Container;
+			if (container == null) {
+				return;
+			}
+			var nodes = Core.Document.Current.SelectedNodes();
+			Rectangle aabb;
+			if (Utils.CalcAABB(nodes, container, out aabb)) {
+				HandleWidgets(container, nodes, aabb);
+				HandlePointObjects(container, nodes, NormalizedAABB(aabb, container));
+			}
+		}
+
+		protected override void ToRoot()
+		{
+			var container = (Widget)Core.Document.Current.RootNode;
+			if (container == null) {
+				return;
+			}
+			var nodes = Core.Document.Current.SelectedNodes();
+			Rectangle aabb;
+			if (Utils.CalcAABB(nodes, container, out aabb)) {
+				HandleWidgets(container, nodes, aabb);
+				HandlePointObjects(container, nodes, NormalizedAABB(aabb, container));
+			}
+		}
+
+		protected override void ToKeyObject()
+		{
+			throw new NotImplementedException();
+		}
+
+		protected override void ToSelection()
+		{
+			return;
 		}
 	}
 
