@@ -435,6 +435,7 @@ namespace Tangerine
 			h.Connect(GenericCommands.Open, new FileOpen());
 			h.Connect(GenericCommands.OpenProject, new FileOpenProject());
 			h.Connect(GenericCommands.Save, new FileSave());
+			h.Connect(GenericCommands.CloseProject, new FileCloseProject());
 			h.Connect(GenericCommands.SaveAs, new FileSaveAs());
 			h.Connect(GenericCommands.SaveAll, new FileSaveAll());
 			h.Connect(GenericCommands.Revert, new FileRevert());

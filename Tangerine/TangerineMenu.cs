@@ -103,6 +103,7 @@ namespace Tangerine
 					Command.MenuSeparator,
 					GenericCommands.Open,
 					GenericCommands.OpenProject,
+					GenericCommands.CloseProject,
 					Command.MenuSeparator,
 					GenericCommands.RecentDocuments,
 					GenericCommands.RecentProjects,

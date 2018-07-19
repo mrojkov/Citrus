@@ -36,11 +36,20 @@ namespace Tangerine
 		}
 	}
 
+
 	public class ProjectNew : CommandHandler
 	{
 		public override void Execute()
 		{
 			Orange.NewProject.NewProjectAction(FileOpenProject.Execute);
+		}
+	}	
+
+	public class FileCloseProject : CommandHandler
+	{
+		public override void Execute()
+		{
+			Project.Current.Close();
 		}
 	}
 
