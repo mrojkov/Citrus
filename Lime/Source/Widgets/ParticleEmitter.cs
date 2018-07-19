@@ -513,12 +513,13 @@ namespace Lime
 				}
 			} else {
 				changed = true;
-				cachedShapePoints.Clear();
-				cachedShapeTriangles.Clear();
-				cachedShapeTriangleSizes.Clear();
 			}
 			if (!changed) {
 				return;
+			} else {
+				cachedShapePoints.Clear();
+				cachedShapeTriangles.Clear();
+				cachedShapeTriangleSizes.Clear();
 			}
 			for (int i = 0; i < pointCount; i++) {
 				cachedShapePoints.Add(emitterShapePoints[i].TransformedPosition);
