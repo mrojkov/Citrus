@@ -89,14 +89,18 @@ namespace Tangerine.UI.FilesystemView
 		private Widget CreateGotoCurrentProjectDirectoryButton()
 		{
 			return new ToolbarButton(IconPool.GetTexture("Filesystem.Home")) {
-				Clicked = () => { view.GoTo(Project.Current.AssetsDirectory); }
+				Clicked = () => {
+					if (Project.Current != Project.Null) {
+						view.GoTo(Project.Current.AssetsDirectory); 
+					}
+				}
 			};
 		}
 
 		private Widget CreateUpButton()
 		{
 			return new ToolbarButton(IconPool.GetTexture("Filesystem.ArrowUp")) {
-				Clicked = () => { view.GoUp(); }
+				Clicked = () => view.GoUp()
 			};
 		}
 
