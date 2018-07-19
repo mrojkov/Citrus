@@ -142,6 +142,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="icon.ico" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\DistributeCentersHorizontally.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\DistributeCentersVertically.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Tools\KeyObject.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Tools\Root.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Tools\Selection.png" />
