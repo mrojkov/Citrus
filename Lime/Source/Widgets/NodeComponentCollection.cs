@@ -46,7 +46,7 @@ namespace Lime
 		public virtual NodeComponent Clone()
 		{
 			var clone = (NodeComponent)MemberwiseClone();
-			clone.Owner = null;
+			clone.owner = null;
 			return clone;
 		}
 
