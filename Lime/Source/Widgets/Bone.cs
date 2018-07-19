@@ -120,10 +120,8 @@ namespace Lime
 		[TangerineKeyframeColor(12)]
 		public float RefLength { get; set; }
 
-		public Matrix32 WorldToLocalTransform
+		public Matrix32 CalcLocalToParentWidgetTransform()
 		{
-			get
-			{
 				if (BaseIndex == 0) {
 					return Matrix32.Identity;
 				}
@@ -131,8 +129,7 @@ namespace Lime
 				var l = ClipAboutZero(b.Length);
 				Vector2 u = b.Tip - b.Joint;
 				Vector2 v = new Vector2(-u.Y / l, u.X / l);
-				return new Matrix32(u, v, Vector2.Zero).CalcInversed();
-			}
+				return new Matrix32(u, v, b.Tip);
 		}
 
 		public Bone()
