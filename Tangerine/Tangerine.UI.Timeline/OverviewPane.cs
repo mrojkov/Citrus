@@ -54,6 +54,30 @@ namespace Tangerine.UI.Timeline
 			Renderer.DrawRect(a.X, 0, b.X, a.Y, veilColor);
 			Renderer.DrawRect(a.X, b.Y, b.X, size.Y, veilColor);
 			Renderer.DrawRectOutline(a, b, ColorTheme.Current.TimelineOverview.Border);
+
+			foreach(var m in Document.Current.Container.Markers) {
+				RenderMarker(m);
+			}
+		}
+
+		private void RenderMarker(Marker m)
+		{
+			Renderer.DrawRect((m.Frame * TimelineMetrics.ColWidth) * ContentWidget.Scale.X, 0,
+				m.Frame * TimelineMetrics.ColWidth * ContentWidget.Scale.X + 1, RootWidget.Height, GetMarkerColor(m));
+		}
+
+		Color4 GetMarkerColor(Marker marker)
+		{
+			switch (marker.Action) {
+				case MarkerAction.Jump:
+					return ColorTheme.Current.TimelineRuler.JumpMarker;
+				case MarkerAction.Play:
+					return ColorTheme.Current.TimelineRuler.PlayMarker;
+				case MarkerAction.Stop:
+					return ColorTheme.Current.TimelineRuler.StopMarker;
+				default:
+					return ColorTheme.Current.TimelineRuler.UnknownMarker;
+			}
 		}
 
 		class CustomFrame : Frame
