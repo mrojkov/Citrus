@@ -955,6 +955,9 @@ namespace Lime
 				Renderer.DrawTriangleStrip(v, v.Length);
 			}
 			var spacing = new Vector2(3, 2);
+			if (cachedShapePoints.Count < 3) {
+				return;
+			}
 			for (int i = 0; i < cachedShapePoints.Count - 1; ++i) {
 				Renderer.DrawDashedLine(
 					cachedShapePoints[i] * transform,
