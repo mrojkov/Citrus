@@ -114,7 +114,7 @@ namespace Lime
 			return nextMarkerOrTriggerFrame * AnimationUtils.SecondsPerFrame;
 		}
 
-		protected void ProcessMarker(Animation animation, Marker marker)
+		protected virtual void ProcessMarker(Animation animation, Marker marker)
 		{
 			if ((animation.Owner.TangerineFlags & TangerineFlags.IgnoreMarkers) != 0) {
 				return;

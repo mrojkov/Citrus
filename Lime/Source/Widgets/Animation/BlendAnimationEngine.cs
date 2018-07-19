@@ -1,4 +1,4 @@
-﻿namespace Lime
+namespace Lime
 {
 	public class BlendAnimationEngine : DefaultAnimationEngine
 	{
@@ -30,6 +30,26 @@
 			base.TryRunAnimation(animation, markerId, animationTimeCorrection);
 			Blending(animation);
 			return true;
+		}
+
+		protected override void ProcessMarker(Animation animation, Marker marker)
+		{
+			if ((animation.Owner.TangerineFlags & TangerineFlags.IgnoreMarkers) != 0) {
+				return;
+			}
+			var blender = animation.Owner.Components.Get<AnimationBlender>();
+			if (blender == null || marker.Action != MarkerAction.Jump) {
+				base.ProcessMarker(animation, marker);
+				return;
+			}
+			var gotoMarker = animation.Markers.TryFind(marker.JumpTo);
+			if (gotoMarker != null && gotoMarker != marker) {
+				var delta = animation.Time - AnimationUtils.FramesToSeconds(animation.Frame);
+				animation.TimeInternal = gotoMarker.Time;
+				blender.Attach(animation, gotoMarker.Id, animation.RunningMarkerId);
+				AdvanceAnimation(animation, (float)delta);
+			}
+			marker.CustomAction?.Invoke();
 		}
 
 		private static void Blending(Animation animation, float delta = 0f)

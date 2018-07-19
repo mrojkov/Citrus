@@ -745,10 +745,10 @@ namespace Tangerine.UI
 					if (int.TryParse(text, out newValue)) {
 						SetProperty(new BlendingOption(newValue));
 					} else {
-						editor.Text = current.GetValue().DurationInFrames.ToString();
+						editor.Text = current.GetValue().Frames.ToString();
 					}
 				};
-				editor.AddChangeWatcher(current, v => editor.Text = v?.DurationInFrames.ToString() ?? "0");
+				editor.AddChangeWatcher(current, v => editor.Text = v?.Frames.ToString() ?? "0");
 			}
 		}
 

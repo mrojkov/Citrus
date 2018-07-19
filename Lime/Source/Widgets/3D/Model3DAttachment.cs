@@ -180,7 +180,6 @@ namespace Lime
 				}
 
 				if (animationBlending.Option != null || animationBlending.MarkersOptions.Count > 0) {
-					animation.AnimationEngine = BlendAnimationEngine.Instance;
 					model.Components.GetOrAdd<AnimationBlender>().Options.Add(animation.Id ?? "", animationBlending);
 				}
 			}
@@ -195,7 +194,6 @@ namespace Lime
 					model.CompoundPresenter.Add(effectPresenter);
 
 					if (effect.Blending != null) {
-						effectPresenter.Animation.AnimationEngine = BlendAnimationEngine.Instance;
 						var blender = effectPresenter.Scene.Components.GetOrAdd<AnimationBlender>();
 						var animationBlending = new AnimationBlending() {
 							Option = effect.Blending
@@ -567,17 +565,17 @@ namespace Lime
 					if (animation.MarkersBlendings.Count > 0) {
 						markerFormat.SourceMarkersBlending = new Dictionary<string, int>();
 						foreach (var markerBlending in animation.MarkersBlendings.Where(m => m.DestMarkerId == markerData.Marker.Id)) {
-							markerFormat.SourceMarkersBlending.Add(markerBlending.SourceMarkerId, (int)markerBlending.Blending.DurationInFrames);
+							markerFormat.SourceMarkersBlending.Add(markerBlending.SourceMarkerId, (int)markerBlending.Blending.Frames);
 						}
 					}
 					if (markerData.Blending != null) {
-						markerFormat.Blending = (int)markerData.Blending.DurationInFrames;
+						markerFormat.Blending = (int)markerData.Blending.Frames;
 					}
 					animationFormat.Markers.Add(markerData.Marker.Id, markerFormat);
 				}
 
 				if (animation.Blending != null) {
-					animationFormat.Blending = (int)animation.Blending.DurationInFrames;
+					animationFormat.Blending = (int)animation.Blending.Frames;
 				}
 
 				if (animation.Nodes.Count > 0) {
