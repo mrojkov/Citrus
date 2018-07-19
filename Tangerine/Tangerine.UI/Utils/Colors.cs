@@ -45,6 +45,8 @@ namespace Tangerine.UI
 			public Color4 RulerTextColor;
 			public Color4 ResolutionPreviewOuterSpace;
 			public Color4 ResolutionPreviewText;
+			public Color4 EmitterCustomShape;
+			public Color4 EmitterCustomShapeLine;
 		}
 
 		public class TimelineGridColors
@@ -169,7 +171,7 @@ namespace Tangerine.UI
 				ContainerOuterSpace = Color4.Gray,
 				ContainerInnerSpace = Color4.White,
 				ContainerBorder = Color4.Blue,
-				PointObject = Color4.Gray.Lighten(0.3f),
+				PointObject = Color4.Red.Lighten(0.3f),
 				Bone = new Color4(136, 136, 136, 128),
 				BoneOutline = new Color4(105, 105, 105),
 				BoneEffectiveRadius = Color4.Yellow,
@@ -185,7 +187,9 @@ namespace Tangerine.UI
 				RulerBackground = Color4.DarkGray,
 				RulerTextColor = Color4.Gray.Lighten(0.4f),
 				ResolutionPreviewOuterSpace = new Color4(7, 7, 7, 220),
-				ResolutionPreviewText = new Color4(204, 204, 204)
+				ResolutionPreviewText = new Color4(204, 204, 204),
+				EmitterCustomShape = Color4.Gray.Darken(0.3f).Transparentify(0.5f),
+				EmitterCustomShapeLine = Color4.White.Darken(0.05f)
 			};
 			var timelineGrid = new TimelineGridColors {
 				PropertyRowBackground = Color4.White.Transparentify(0.95f),
@@ -294,7 +298,7 @@ namespace Tangerine.UI
 				ContainerOuterSpace = Color4.Gray,
 				ContainerInnerSpace = Color4.White,
 				ContainerBorder = Color4.Blue,
-				PointObject = Color4.Gray.Lighten(0.2f),
+				PointObject = Color4.Red.Lighten(0.2f),
 				Bone = new Color4(136, 136, 136, 128),
 				BoneOutline = new Color4(105, 105, 105),
 				BoneEffectiveRadius = Color4.Yellow,
@@ -310,7 +314,9 @@ namespace Tangerine.UI
 				RulerBackground = new Color4(168, 166, 168),
 				RulerTextColor = Color4.Black,
 				ResolutionPreviewOuterSpace = new Color4(7, 7, 7, 220),
-				ResolutionPreviewText = new Color4(204, 204, 204)
+				ResolutionPreviewText = new Color4(204, 204, 204),
+				EmitterCustomShape = Color4.Gray.Darken(0.2f).Transparentify(0.5f),
+				EmitterCustomShapeLine = Color4.White
 			};
 			var timelineGrid = new TimelineGridColors {
 				PropertyRowBackground = Color4.Black.Transparentify(0.95f),
