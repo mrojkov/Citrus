@@ -87,7 +87,7 @@ namespace Lime
 
 		public static bool ValidateMainKey(Key key) =>
 			key.IsPrintable() || key.IsTextNavigation() || key.IsTextEditing() || key.IsFunctional() ||
-			key == Key.Escape || key == Key.Tab || key == Key.Menu || key == Key.Unknown;
+			key == Key.Escape || key == Key.Tab || key == Key.Menu || key == Key.Unknown || key == Key.MouseBack || key == Key.MouseForward;
 
 		public static implicit operator Shortcut(Key main) => new Shortcut(main);
 

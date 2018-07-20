@@ -223,7 +223,7 @@ namespace Tangerine.Dialogs
 			};
 
 			var rightPart = new Widget {
-				Layout = new TableLayout { ColCount = 4, RowCount = 6, Spacing = 4 },
+				Layout = new TableLayout { ColCount = 4, RowCount = 7, Spacing = 4 },
 				LayoutCell = new LayoutCell { StretchX = 4 }
 			};
 
@@ -338,8 +338,10 @@ namespace Tangerine.Dialogs
 			CreateButton(middlePart, Key.Down);
 			CreateButton(middlePart, Key.Right);
 
-			CreateSpace(rightPart, 1, 4);
-			CreateSpace(rightPart, 1, 4);
+			var mouseSpace = CreateSpace(rightPart, 3, 4);
+			mouseSpace.Layout = new TableLayout { ColCount = 2, RowCount = 1, Spacing = 4 };
+			CreateButton(mouseSpace, Key.MouseBack, "Mouse Back");
+			CreateButton(mouseSpace, Key.MouseForward, "Mouse Forward");
 			CreateButton(rightPart, Key.Keypad7, "7");
 			CreateButton(rightPart, Key.Keypad8, "8");
 			CreateButton(rightPart, Key.Keypad9, "9");

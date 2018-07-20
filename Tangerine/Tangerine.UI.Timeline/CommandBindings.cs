@@ -12,14 +12,19 @@ namespace Tangerine.UI.Timeline
 	{
 		public static void Bind()
 		{
-			ConnectCommand(TimelineCommands.EnterNode, () => {
+			Action enter = () => {
 				var node = Document.Current.SelectedNodes().FirstOrDefault();
 				if (node != null) {
 					EnterNode.Perform(node);
 				}
-			}, Document.HasCurrent);
+			};
+			ConnectCommand(TimelineCommands.EnterNode, enter, Document.HasCurrent);
+			ConnectCommand(TimelineCommands.EnterNodeAlias, enter, Document.HasCurrent);
+			ConnectCommand(TimelineCommands.EnterNodeMouse, enter, Document.HasCurrent);
 			ConnectCommand(TimelineCommands.RenameRow, RenameCurrentRow);
 			ConnectCommand(TimelineCommands.ExitNode, LeaveNode.Perform);
+			ConnectCommand(TimelineCommands.ExitNodeAlias, LeaveNode.Perform);
+			ConnectCommand(TimelineCommands.ExitNodeMouse, LeaveNode.Perform);
 			ConnectCommand(TimelineCommands.ScrollUp, () => SelectRow(-1, false));
 			ConnectCommand(TimelineCommands.ScrollDown, () => SelectRow(1, false));
 			ConnectCommand(TimelineCommands.SelectUp, () => SelectRow(-1, true));
