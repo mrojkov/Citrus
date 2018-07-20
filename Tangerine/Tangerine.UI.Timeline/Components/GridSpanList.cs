@@ -38,7 +38,7 @@ namespace Tangerine.UI.Timeline.Components
 				) {
 					result[last] = new GridSpan {
 						A = result[last].A,
-						B = span.B
+						B = Math.Max(result[last].B, span.B)
 					};
 				} else {
 					result.Add(span);
