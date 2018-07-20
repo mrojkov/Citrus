@@ -10,13 +10,11 @@ namespace Tangerine.UI.Timeline.Components
 	{
 		public int A;
 		public int B;
-		public bool Inclusive;
 
-		public GridSpan(int a, int b, bool inclusive)
+		public GridSpan(int a, int b)
 		{
 			A = a;
 			B = b;
-			Inclusive = inclusive;
 		}
 
 		public bool Contains(int cell) => cell >= A && cell < B;
@@ -26,10 +24,10 @@ namespace Tangerine.UI.Timeline.Components
 	{
 		public GridSpanList GetNonOverlappedSpans()
 		{
-			if (Count == 0) {
-				return this;
-			}
 			var result = new GridSpanList();
+			if (Count == 0) {
+				return result;
+			}
 			foreach (var span in this.OrderBy(s => s.A)) {
 				int last = result.Count - 1;
 				if (
@@ -49,13 +47,49 @@ namespace Tangerine.UI.Timeline.Components
 
 		public bool IsCellSelected(int cell)
 		{
-			var r = false;
 			foreach (var s in this) {
 				if (s.Contains(cell)) {
-					r = s.Inclusive;
+					return true;
 				}
 			}
-			return r;
+			return false;
+		}
+
+		public void DeselectGridSpan(GridSpan span)
+		{
+			if (span.B - span.A != 1) {
+				throw new NotSupportedException("Deselection of areas, longer than 1, is not supported");
+			} 
+			var result = new GridSpanList();
+			foreach (var s in this) {
+				if (s.B < span.A || s.A >= span.B) {
+					result.Add(s);
+					continue;
+				}
+				if (s.A <= span.A) {
+					result.Add(s.A, span.A);
+				}
+				if (s.B >= span.B) {
+					result.Add(span.B, s.B);
+				}
+			}
+			Clear();
+			AddRange(result);
+		}
+
+		private void Add(int a, int b)
+		{
+			if (a < b) {
+				Add(new GridSpan(a, b));
+			}
+		}
+
+		public void UndoDeselectGridSpan(GridSpan span)
+		{
+			Add(span);
+			var temp = GetNonOverlappedSpans();
+			Clear();
+			AddRange(temp);
 		}
 	}
 

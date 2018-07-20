@@ -22,7 +22,7 @@ namespace Tangerine.UI.Timeline.Operations
 		private SelectGridSpan(int row, int a, int b)
 		{
 			Row = row;
-			Span = new GridSpan(a, b, true);
+			Span = new GridSpan(a, b);
 		}
 
 		public class Processor : OperationProcessor<SelectGridSpan>

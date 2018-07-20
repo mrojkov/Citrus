@@ -21,19 +21,19 @@ namespace Tangerine.UI.Timeline.Operations
 		private DeselectGridSpan(int row, int a, int b)
 		{
 			Row = row;
-			Span = new GridSpan(a, b, false);
+			Span = new GridSpan(a, b);
 		}
 
 		public class Processor : OperationProcessor<DeselectGridSpan>
 		{
 			protected override void InternalRedo(DeselectGridSpan op)
 			{
-				Document.Current.Rows[op.Row].Components.GetOrAdd<GridSpanListComponent>().Spans.Add(op.Span);
+				Document.Current.Rows[op.Row].Components.GetOrAdd<GridSpanListComponent>().Spans.DeselectGridSpan(op.Span);
 			}
 
 			protected override void InternalUndo(DeselectGridSpan op)
 			{
-				Document.Current.Rows[op.Row].Components.GetOrAdd<GridSpanListComponent>().Spans.Remove(op.Span);
+				Document.Current.Rows[op.Row].Components.GetOrAdd<GridSpanListComponent>().Spans.UndoDeselectGridSpan(op.Span);
 			}
 		}
 	}
