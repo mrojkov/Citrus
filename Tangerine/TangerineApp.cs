@@ -339,7 +339,7 @@ namespace Tangerine
 
 			private void DropFiles(IEnumerable<string> obj)
 			{
-				if (tabBar.IsMouseOverThisOrDescendant()) {
+				if (tabBar.IsMouseOverThisOrDescendant() || Document.Current == null) {
 					foreach (var path in obj) {
 						if (path.EndsWith(".scene") || path.EndsWith(".tan")) {
 							Project.Current.OpenDocument(path, true);
