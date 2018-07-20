@@ -82,6 +82,11 @@ namespace Lime
 		///  Any data you need to pass to consumer of the command.
 		/// </summary>
 		object UserData { get; set; }
+
+		/// <summary>
+		/// Gets or sets a value indicating whether the command is selected (e.g. in toolbars).
+		/// </summary>
+		bool Selected { get; set; }
 	}
 
 	public class Command : ICommand
@@ -110,6 +115,8 @@ namespace Lime
 		private bool @checked = false;
 		private bool visible = true;
 		private ITexture icon;
+
+		public bool Selected { get; set; }
 
 		public int Version { get; private set; } = 1;
 

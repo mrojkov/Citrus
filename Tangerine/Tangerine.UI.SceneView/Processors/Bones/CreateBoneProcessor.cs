@@ -11,11 +11,12 @@ namespace Tangerine.UI.SceneView
 	public class CreateBoneProcessor : ITaskProvider
 	{
 		SceneView sv => SceneView.Instance;
+		private ICommand command;
 
 		public IEnumerator<object> Task()
 		{
 			while (true) {
-				if (CreateNodeRequestComponent.Consume<Bone>(SceneView.Instance.Components)) {
+				if (CreateNodeRequestComponent.Consume<Bone>(SceneView.Instance.Components, out command)) {
 					yield return CreateBoneTask();
 				}
 				yield return null;
@@ -24,6 +25,7 @@ namespace Tangerine.UI.SceneView
 
 		IEnumerator<object> CreateBoneTask()
 		{
+			command.Selected = true;
 			while (true) {
 				Bone bone = null;
 
@@ -113,6 +115,7 @@ namespace Tangerine.UI.SceneView
 				yield return null;
 			}
 			SceneView.Instance.Components.Remove<CreateBoneHelper>();
+			((Command)command).Selected = false;
 		}
 	}
 

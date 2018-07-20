@@ -8,12 +8,13 @@ namespace Tangerine.UI.SceneView
 	public class CreatePointObjectProcessor : ITaskProvider
 	{
 		SceneView sv => SceneView.Instance;
+		private ICommand command;
 
 		public IEnumerator<object> Task()
 		{
 			while (true) {
 				Type nodeType;
-				if (CreateNodeRequestComponent.Consume<PointObject>(sv.Components, out nodeType)) {
+				if (CreateNodeRequestComponent.Consume<PointObject>(sv.Components, out nodeType, out command)) {
 					yield return CreatePointObjectTask(nodeType);
 				}
 				yield return null;
@@ -22,6 +23,7 @@ namespace Tangerine.UI.SceneView
 
 		IEnumerator<object> CreatePointObjectTask(Type nodeType)
 		{
+			command.Selected = true;
 			while (true) {
 				if (sv.InputArea.IsMouseOver()) {
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
@@ -55,6 +57,7 @@ namespace Tangerine.UI.SceneView
 				}
 				yield return null;
 			}
+			this.command.Selected = false;
 		}
 	}
 }
