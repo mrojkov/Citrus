@@ -102,7 +102,7 @@ namespace Tangerine.UI.Timeline
 		private void RenderBackgroundAndGrid(Node node)
 		{
 			MainAreaWidget.PrepareRendererState();
-			Renderer.DrawRect(Vector2.Zero, MainAreaWidget.Size, ColorTheme.Current.Basic.WhiteBackground);
+			Renderer.DrawRect(Vector2.Zero, MainAreaWidget.Size, Theme.Colors.WhiteBackground);
 			if (property == null) {
 				return;
 			}
@@ -193,7 +193,7 @@ namespace Tangerine.UI.Timeline
 		{
 			var y = ValueToCoord((float)value);
 			var text = value.ToString();
-			Renderer.DrawTextLine(2, y - 14, text, 14, ColorTheme.Current.Basic.BlackText, 0);
+			Renderer.DrawTextLine(2, y - 14, text, 14, Theme.Colors.BlackText, 0);
 		}
 
 		void RenderCurve(Curve curve)

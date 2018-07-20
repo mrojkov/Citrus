@@ -44,7 +44,10 @@ namespace Tangerine
 				TangerineSingleInstanceKeeper.Instance.ReleaseInstance();
 			};
 #endif
-			SetColorTheme(AppUserPreferences.Instance.Theme);
+			SetColorTheme(
+				AppUserPreferences.Instance.ColorTheme,
+				AppUserPreferences.Instance.LimeColorTheme);
+			Application.InvalidateWindows();
 
 			LoadFont();
 
@@ -292,10 +295,10 @@ namespace Tangerine
 			windowWidget.Window.Title = title;
 		}
 
-		void SetColorTheme(ColorThemeEnum theme)
+		void SetColorTheme(ColorTheme theme, Theme.ColorTheme limeTheme)
 		{
-			Theme.Colors = theme == ColorThemeEnum.Light ? Theme.ColorTheme.CreateLightTheme() : Theme.ColorTheme.CreateDarkTheme();
-			ColorTheme.Current = theme == ColorThemeEnum.Light ? ColorTheme.CreateLightTheme() : ColorTheme.CreateDarkTheme();
+			Theme.Colors = limeTheme;
+			ColorTheme.Current = theme;
 		}
 
 		class UpdateNodesAndApplyAnimatorsProcessor : SymmetricOperationProcessor

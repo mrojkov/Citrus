@@ -18,7 +18,6 @@ namespace Tangerine
 		readonly Button okButton;
 		readonly Button cancelButton;
 		readonly Button resetButton;
-		readonly ColorThemeEnum theme;
 		readonly Frame Frame;
 		readonly TabbedWidget Content;
 
@@ -36,7 +35,6 @@ namespace Tangerine
 
 		public PreferencesDialog()
 		{
-			theme = AppUserPreferences.Instance.Theme;
 			window = new Window(new WindowOptions {
 				ClientSize = new Vector2(800, 600),
 				FixedSize = false,
@@ -51,6 +49,7 @@ namespace Tangerine
 			Content = new TabbedWidget();
 			Content.AddTab("General", CreateGeneralPane(), true);
 			Content.AddTab("Appearance", CreateColorsPane());
+			Content.AddTab("Theme", CreateThemePane());
 			Content.AddTab("Keyboard shortcuts", CreateKeyboardPane());
 
 			rootWidget = new ThemedInvalidableWindowWidget(window) {
@@ -76,9 +75,9 @@ namespace Tangerine
 				saved = true;
 				SaveAfterEdit();
 				window.Close();
-				if (theme != AppUserPreferences.Instance.Theme) {
-					AlertDialog.Show("The color theme change will take effect next time you run Tangerine.");
-				}
+				AlertDialog.Show("Some color theme changes will only take effect after Tangerine restart");
+				AppUserPreferences.Instance.ColorTheme = ColorTheme.Current;
+				AppUserPreferences.Instance.LimeColorTheme = Theme.Colors;
 				NodeDecorationsPanel.Refresh();
 				Core.UserPreferences.Instance.Save();
 			};
@@ -90,6 +89,8 @@ namespace Tangerine
 			cancelButton.Clicked += () => {
 				window.Close();
 				Core.UserPreferences.Instance.Load();
+				ColorTheme.Current = AppUserPreferences.Instance.ColorTheme;
+				Theme.Colors = AppUserPreferences.Instance.LimeColorTheme;
 			};
 			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
 			rootWidget.LateTasks.AddLoop(() => {
@@ -126,6 +127,8 @@ namespace Tangerine
 			UI.Timeline.TimelineUserPreferences.Instance.ResetToDefaults();
 			Core.CoreUserPreferences.Instance.ResetToDefaults();
 			HotkeyRegistry.ResetToDefaults();
+			ColorTheme.Current = ColorTheme.CreateLightTheme();
+			Theme.Colors = Theme.ColorTheme.CreateLightTheme();
 		}
 
 		private Widget CreateColorsPane()
@@ -133,10 +136,6 @@ namespace Tangerine
 			var pane = new ThemedScrollView();
 			pane.Content.Layout = new VBoxLayout { Spacing = 4 };
 			pane.Content.Padding = contentPadding;
-			editors.Add(
-				new EnumPropertyEditor<ColorThemeEnum>(
-					new PropertyEditorParams(pane.Content, AppUserPreferences.Instance, nameof(Tangerine.AppUserPreferences.Theme), "User interface theme"))
-			);
 			var tmp = new BooleanPropertyEditor(
 				new PropertyEditorParams(pane.Content, UI.SceneView.SceneUserPreferences.Instance, nameof(UI.SceneView.SceneUserPreferences.EnableChessBackground), "Chess background"));
 			tmp.ContainerWidget.AddChangeWatcher(
@@ -170,6 +169,38 @@ namespace Tangerine
 				Core.UserPreferences.Instance.Get<UI.SceneView.SceneUserPreferences>(),
 				() => Color4.Black.Transparentify(0.6f),
 				pane);
+			return pane;
+		}
+
+		private Widget CreateThemePane()
+		{
+			var pane = new Widget();
+			pane.Layout = new VBoxLayout { Spacing = 0 };
+			pane.Padding = contentPadding;
+			var themeEditor = new ColorThemeEditor() {
+				Layout = new VBoxLayout { Spacing = 10 },
+				Padding = contentPadding
+			};
+			var loadDarkButton = new ThemedButton("Dark preset") {
+				Clicked = () => {
+					Theme.Colors = Theme.ColorTheme.CreateDarkTheme();
+					ColorTheme.Current = ColorTheme.CreateDarkTheme();
+					Application.InvalidateWindows();
+				}
+			};
+			var loadLightButton = new ThemedButton("Light preset") {
+				Clicked = () => {
+					Theme.Colors = Theme.ColorTheme.CreateLightTheme();
+					ColorTheme.Current = ColorTheme.CreateLightTheme();
+					Application.InvalidateWindows();
+				}
+			};
+			var buttons = new Widget {
+				Layout = new HBoxLayout { Spacing = 4 },
+				Nodes = { loadDarkButton, loadLightButton }
+			};
+			pane.AddNode(buttons);
+			pane.AddNode(themeEditor);
 			return pane;
 		}
 

@@ -36,7 +36,7 @@ namespace Tangerine.UI.FilesystemView
 
 		public Preview()
 		{
-			var t = PrepareChessTexture(ColorTheme.Current.Basic.ZebraColor1.Transparentify(0.5f), ColorTheme.Current.Basic.ZebraColor2);
+			var t = PrepareChessTexture(Theme.Colors.ZebraColor1.Transparentify(0.5f), Theme.Colors.ZebraColor2);
 			const float ChessCellSize = 50;
 			//Color4 Color1 = Core.UserPreferences.Instance.Get<UserPreferences>().BackgroundColorA;
 			//Color4 Color2 = Core.UserPreferences.Instance.Get<UserPreferences>().BackgroundColorB;

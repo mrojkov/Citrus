@@ -14,11 +14,9 @@ namespace Tangerine
 	{
 		readonly Window window;
 		readonly WindowWidget rootWidget;
-		readonly ColorThemeEnum theme;
 
 		public HelpDialog(HelpPage page)
 		{
-			theme = AppUserPreferences.Instance.Theme;
 			window = new Window(new WindowOptions {
 				ClientSize = new Vector2(800, 600),
 				FixedSize = false,

@@ -16,7 +16,10 @@ namespace Tangerine
 		public static int RecentProjectsCount { get; private set; } = 5;
 
 		[YuzuRequired]
-		public ColorThemeEnum Theme { get; set; }
+		public UI.ColorTheme ColorTheme { get; set; }
+
+		[YuzuRequired]
+		public Theme.ColorTheme LimeColorTheme { get; set; }
 
 		[YuzuRequired]
 		public Vector2 DefaultSceneDimensions { get; set; }
@@ -39,7 +42,8 @@ namespace Tangerine
 
 		internal void ResetToDefaults()
 		{
-			Theme = ColorThemeEnum.Light;
+			ColorTheme = UI.ColorTheme.CreateLightTheme();
+			LimeColorTheme = Theme.ColorTheme.CreateLightTheme();
 			DefaultSceneDimensions = new Vector2(1024, 768);
 			AutosaveDelay = 600;
 		}

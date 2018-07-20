@@ -1,6 +1,7 @@
 #if !ANDROID && !iOS
 using System;
 using System.Collections.Generic;
+using Yuzu;
 
 namespace Lime
 {
@@ -21,38 +22,68 @@ namespace Lime
 
 		public class ColorTheme
 		{
-			public Color4 BlackText;
-			public Color4 RedText;
-			public Color4 GrayText;
-			public Color4 WhiteBackground;
-			public Color4 GrayBackground;
-			public Color4 SelectedBackground;
-			public Color4 HoveredBackground;
-			public Color4 ControlBorder;
-			public ColorGradient ButtonDefault;
-			public ColorGradient ButtonHover;
-			public ColorGradient ButtonPress;
-			public ColorGradient ButtonDisable;
-			public ColorGradient ExpandButtonDefault;
-			public ColorGradient ExpandButtonHover;
-			public ColorGradient ExpandButtonPress;
-			public ColorGradient ExpandButtonDisable;
-			public Color4 TabNormal;
-			public Color4 TabActive;
-			public Color4 SeparatorColor;
-			public Color4 KeyboardFocusBorder;
-			public Color4 TextSelection;
-			public Color4 CloseButtonNormal;
-			public Color4 CloseButtonHovered;
-			public Color4 CloseButtonPressed;
-			public Color4 CloseButtonFocusBorderNormal;
-			public Color4 CloseButtonFocusBorderHovered;
-			public Color4 ScrollbarBackground;
-			public Color4 ScrollbarThumb;
-			public Color4 TextCaret;
-			public Color4 ZebraColor1;
-			public Color4 ZebraColor2;
-			public Color4 SelectedBorder;
+			[YuzuRequired]
+			public Color4 BlackText { get; set; }
+			[YuzuRequired]
+			public Color4 GrayText { get; set; }
+			[YuzuRequired]
+			public Color4 WhiteBackground { get; set; }
+			[YuzuRequired]
+			public Color4 GrayBackground { get; set; }
+			[YuzuRequired]
+			public Color4 SelectedBackground { get; set; }
+			[YuzuRequired]
+			public Color4 HoveredBackground { get; set; }
+			[YuzuRequired]
+			public Color4 ControlBorder { get; set; }
+			[YuzuRequired]
+			public ColorGradient ButtonDefault { get; set; }
+			[YuzuRequired]
+			public ColorGradient ButtonHover { get; set; }
+			[YuzuRequired]
+			public ColorGradient ButtonPress { get; set; }
+			[YuzuRequired]
+			public ColorGradient ButtonDisable { get; set; }
+			[YuzuRequired]
+			public ColorGradient ExpandButtonDefault { get; set; }
+			[YuzuRequired]
+			public ColorGradient ExpandButtonHover { get; set; }
+			[YuzuRequired]
+			public ColorGradient ExpandButtonPress { get; set; }
+			[YuzuRequired]
+			public ColorGradient ExpandButtonDisable { get; set; }
+			[YuzuRequired]
+			public Color4 TabNormal { get; set; }
+			[YuzuRequired]
+			public Color4 TabActive { get; set; }
+			[YuzuRequired]
+			public Color4 SeparatorColor { get; set; }
+			[YuzuRequired]
+			public Color4 KeyboardFocusBorder { get; set; }
+			[YuzuRequired]
+			public Color4 TextSelection { get; set; }
+			[YuzuRequired]
+			public Color4 CloseButtonNormal { get; set; }
+			[YuzuRequired]
+			public Color4 CloseButtonHovered { get; set; }
+			[YuzuRequired]
+			public Color4 CloseButtonPressed { get; set; }
+			[YuzuRequired]
+			public Color4 CloseButtonFocusBorderNormal { get; set; }
+			[YuzuRequired]
+			public Color4 CloseButtonFocusBorderHovered { get; set; }
+			[YuzuRequired]
+			public Color4 ScrollbarBackground { get; set; }
+			[YuzuRequired]
+			public Color4 ScrollbarThumb { get; set; }
+			[YuzuRequired]
+			public Color4 TextCaret { get; set; }
+			[YuzuRequired]
+			public Color4 ZebraColor1 { get; set; }
+			[YuzuRequired]
+			public Color4 ZebraColor2 { get; set; }
+			[YuzuRequired]
+			public Color4 SelectedBorder { get; set; }
 
 			public static ColorTheme CreateDarkTheme()
 			{
