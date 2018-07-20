@@ -89,6 +89,13 @@ namespace Tangerine.UI.FilesystemView
 
 	public class Model
 	{
+
+		enum ItemType
+		{
+			File,
+			Dir
+		}
+
 		private string currentPath;
 		public string CurrentPath
 		{
@@ -123,15 +130,15 @@ namespace Tangerine.UI.FilesystemView
 
 		public IEnumerable<string> EnumerateItems(SortType sortType, OrderType orderType)
 		{
-			foreach (var i in SortItems(Directory.EnumerateDirectories(CurrentPath), sortType, orderType)) {
+			foreach (var i in SortItems(Directory.EnumerateDirectories(CurrentPath), sortType, orderType, ItemType.Dir)) {
 				yield return i;
 			}
-			foreach (var i in SortItems(Directory.EnumerateFiles(CurrentPath), sortType, orderType)) {
+			foreach (var i in SortItems(Directory.EnumerateFiles(CurrentPath), sortType, orderType, ItemType.File)) {
 				yield return i;
 			}
 		}
 		
-		private IEnumerable<string> SortItems(IEnumerable<string> items, SortType sortType, OrderType orderType)
+		private IEnumerable<string> SortItems(IEnumerable<string> items, SortType sortType, OrderType orderType, ItemType itemType)
 		{
 			switch (sortType) {
 				case SortType.Name:
@@ -154,9 +161,15 @@ namespace Tangerine.UI.FilesystemView
 					}
 				case SortType.Size:
 					if (orderType == OrderType.Ascending) {
-						return items.OrderBy(f => f.Length);
+						if (itemType == ItemType.Dir)
+							return items.OrderBy( f => f.Length);
+						else
+							return items.OrderBy(f => new FileInfo(f).Length);
 					} else {
-						return items.OrderByDescending(f => f.Length);
+						if (itemType == ItemType.Dir)
+							return items.OrderByDescending(f => f.Length);
+						else
+							return items.OrderByDescending(f => new FileInfo(f).Length);
 					}
 				default:
 					throw new ArgumentException();
