@@ -284,5 +284,17 @@ namespace Lime
 			}
 			return null;
 		}
+
+		public static Bone FindBoneRoot(Bone bone, IEnumerable<Node> nodes)
+		{
+			while (bone.BaseIndex != 0) {
+				var root = nodes.GetBone(bone.BaseIndex);
+				if (root == null) {
+					return bone;
+				}
+				bone = root;
+			}
+			return bone;
+		}
 	}
 }
