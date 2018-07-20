@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Tangerine.Core;
 using Lime;
 
@@ -29,20 +30,19 @@ namespace Tangerine.UI.Timeline.Components
 				return this;
 			}
 			var result = new GridSpanList();
-			var hSpans = new SortedSet<int>();
-			foreach (var r in this) {
-				hSpans.Add(r.A);
-				hSpans.Add(r.B);
-			}
-			int? prevCol = null;
-			foreach (int col in hSpans) {
-				if (prevCol.HasValue) {
-					var cell = (col + prevCol.Value) / 2;
-					if (IsCellSelected(cell)) {
-						result.Add(new GridSpan(prevCol.Value, col, true));
-					}
+			foreach (var span in this.OrderBy(s => s.A)) {
+				int last = result.Count - 1;
+				if (
+					result.Count > 0 &&
+					result[last].B >= span.A
+				) {
+					result[last] = new GridSpan {
+						A = result[last].A,
+						B = span.B
+					};
+				} else {
+					result.Add(span);
 				}
-				prevCol = col;
 			}
 			return result;
 		}
