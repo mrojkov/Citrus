@@ -108,19 +108,9 @@ namespace Tangerine.UI
 							}
 							case ".tan":
 							case ".model":
-							case ".scene": {
-								var scene = Node.CreateFromAssetBundle(assetPath);
-								var node = CreateNode.Perform(scene.GetType());
-								SetProperty.Perform(node, nameof(Widget.ContentsPath), assetPath);
-								SetProperty.Perform(node, nameof(Node.Id), fileName);
-								if (scene is Widget) {
-									SetProperty.Perform(node, nameof(Widget.Pivot), Vector2.Half);
-									SetProperty.Perform(node, nameof(Widget.Size), widget.Size);
-								}
-								OnNodeCreated(node);
-								node.LoadExternalScenes();
+							case ".scene":
+								DropSceneContextMenu.Create(assetPath, assetType, widget.Size, NodeCreated);
 								break;
-							}
 						}
 					} catch (System.Exception e) {
 						AlertDialog.Show(e.Message);
