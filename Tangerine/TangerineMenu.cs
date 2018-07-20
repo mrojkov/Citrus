@@ -86,6 +86,11 @@ namespace Tangerine
 		private static void CreateMainMenu()
 		{
 			Menu viewMenu;
+			var orangeMenu = new Menu();
+			Orange.MenuController.Instance.CreateAssemblyMenuItems();
+			foreach (var menuItem in Orange.MenuController.Instance.GetVisibleAndSortedItems()) {
+				orangeMenu.Add(new Command(menuItem.Label, () => Debug.Write(menuItem.Action())));
+			}
 			Application.MainMenu = new Menu {
 #if MAC
 				new Command("Application", new Menu {
@@ -183,11 +188,7 @@ namespace Tangerine
 					GenericCommands.NextDocument,
 					GenericCommands.PreviousDocument
 				}),
-				new Command("Orange", new Menu {
-					OrangeCommands.Run,
-					OrangeCommands.OptionsDialog,
-					OrangeCommands.CookGameAssets
-				}),
+				new Command("Orange", orangeMenu),
 				new Command("Help", new Menu {
 					GenericCommands.ViewHelp,
 					GenericCommands.HelpMode
