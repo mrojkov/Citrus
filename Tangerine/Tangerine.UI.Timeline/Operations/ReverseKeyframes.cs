@@ -25,6 +25,7 @@ namespace Tangerine.UI.Timeline.Operations
 		{
 			var Boundaries = GetSelectionBoundaries();
 			if (Boundaries == null) {
+				AlertDialog.Show("Can't invert animation in a non-rectangular selection. The selection must be a single rectangle.");
 				return;
 			}
 			for (int i = Boundaries.Value.Top; i <= Boundaries.Value.Bottom; ++i) {
