@@ -518,9 +518,6 @@ namespace Tangerine
 			}, () => Document.Current?.Rows.Count > 0));
 			h.Connect(Command.Undo, () => Document.Current.History.Undo(), () => Document.Current?.History.CanUndo() ?? false);
 			h.Connect(Command.Redo, () => Document.Current.History.Redo(), () => Document.Current?.History.CanRedo() ?? false);
-			h.Connect(OrangeCommands.Run, new OrangeCommandHandler(() => WidgetContext.Current.Root.Tasks.Add(OrangeTask)));
-			h.Connect(OrangeCommands.OptionsDialog, new OrangeCommandHandler(() => new OrangePluginOptionsDialog()));
-			h.Connect(OrangeCommands.CookGameAssets, new OrangeCommandHandler(() => WidgetContext.Current.Root.Tasks.Add(CookingTask)));
 			h.Connect(SceneViewCommands.SnapWidgetBorderToRuler, new SnapWidgetBorderCommandHandler());
 			h.Connect(SceneViewCommands.SnapWidgetPivotToRuler, new SnapWidgetPivotCommandHandler());
 			h.Connect(SceneViewCommands.SnapRulerLinesToWidgets, new SnapRulerLinesToWidgetCommandHandler());
@@ -542,7 +539,6 @@ namespace Tangerine
 			HotkeyRegistry.InitCommands(typeof(SceneViewCommands), "Scene View Commands");
 			HotkeyRegistry.InitCommands(typeof(Tools), "Tools");
 			HotkeyRegistry.InitCommands(typeof(FilesystemCommands), "Filesystem Commands");
-			HotkeyRegistry.InitCommands(typeof(OrangeCommands), "Orange Commands");
 			HotkeyRegistry.InitCommands(Command.Editing, "Editing", "Editing");
 			var defaultProfile = HotkeyRegistry.CreateProfile(HotkeyRegistry.DefaultProfileName);
 			if (File.Exists(defaultProfile.Filepath)) {
@@ -610,35 +606,6 @@ namespace Tangerine
 				var prefs = UI.SceneView.SceneUserPreferences.Instance;
 				prefs.SnapRulerLinesToWidgets = !prefs.SnapRulerLinesToWidgets;
 			}
-		}
-
-		private IEnumerator<object> OrangeTask()
-		{
-			Tangerine.UI.Console.Instance.Show();
-			Orange.The.Workspace?.AssetFiles?.Rescan();
-			yield return Task.ExecuteAsync(() => {
-				try {
-					Orange.Actions.BuildAndRunAction();
-				} catch (System.Exception e) {
-					System.Console.WriteLine(e);
-				}
-			});
-			System.Console.WriteLine("Done.");
-		}
-
-		private IEnumerator<object> CookingTask()
-		{
-			Tangerine.UI.Console.Instance.Show();
-			Orange.The.Workspace?.AssetFiles?.Rescan();
-			yield return Task.ExecuteAsync(() => {
-				try {
-					Orange.AssetCooker.CookForActivePlatform();
-				}
-				catch (System.Exception e) {
-					System.Console.WriteLine(e);
-				}
-			});
-			System.Console.WriteLine("Done.");
 		}
 
 		static void Paste()
