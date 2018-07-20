@@ -377,12 +377,7 @@ namespace Tangerine.UI.Inspector
 				ColorTheme.Current.Inspector.StripeBackground1 :
 				ColorTheme.Current.Inspector.StripeBackground2
 			) { IgnorePadding = true });
-			if (editor.EditorParams.PropertyName == "Position") {
-				editor.ContainerWidget.Components.Add(new DocumentationComponent("Position.md"));
-			}
-			if (editor.EditorParams.PropertyName == "Id") {
-				editor.ContainerWidget.Components.Add(new DocumentationComponent("Id.md"));
-			}
+			editor.ContainerWidget.Components.Add(new DocumentationComponent(editor.EditorParams.PropertyInfo.DeclaringType.Name + "." + editor.EditorParams.PropertyName));
 		}
 
 		private static void DecorateComponentPropertyEditor(IPropertyEditor editor, int row)
