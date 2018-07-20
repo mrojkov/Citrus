@@ -23,7 +23,6 @@ namespace Tangerine.UI.Timeline.Operations
 
 		public static void Perform()
 		{
-			var test = GetTimelineBoundaries();
 			var Boundaries = GetSelectionBoundaries();
 			if (Boundaries == null) {
 				return;
@@ -43,7 +42,7 @@ namespace Tangerine.UI.Timeline.Operations
 							RemoveKeyframe.Perform(animator, key.Frame);
 						}
 						foreach (var key in saved) {
-							SetProperty.Perform(key, "Frame", Boundaries.Value.Left + Boundaries.Value.Right - key.Frame - 1);
+							SetProperty.Perform(key, nameof(IKeyframe.Frame), Boundaries.Value.Left + Boundaries.Value.Right - key.Frame - 1);
 							SetKeyframe.Perform(animable, animator.TargetProperty, animator.AnimationId, key);
 						}
 					}
@@ -51,82 +50,69 @@ namespace Tangerine.UI.Timeline.Operations
 			}
 		}
 
+		private static Boundaries? GetSelectionBoundaries()
+		{
+			var rows = Document.Current.SelectedRows().ToList();
+			if (rows.Count == 0) {
+				return GetTimelineBoundaries();
+			}
+			var span = SingleSpan(
+				rows[0].Components.Get<GridSpanListComponent>()
+				?.Spans.GetNonOverlappedSpans());
+			var index = rows[0].Index;
+			if (span == null) {
+				return null;
+			}
+			for (int i = 1; i < rows.Count; ++i) {
+				var newSpan = SingleSpan(
+					rows[i].Components.Get<GridSpanListComponent>()
+					?.Spans.GetNonOverlappedSpans());
+				if (
+					newSpan == null ||
+					span?.A != newSpan?.A ||
+					span?.B != newSpan?.B ||
+					++index != rows[i].Index
+				) {
+					return null;
+				}
+				span = newSpan;
+			}
+			return new Boundaries {
+				Left = span.Value.A,
+				Right = span.Value.B,
+				Top = rows[0].Index,
+				Bottom = index
+			};
+		}
+
+		private static GridSpan? SingleSpan(GridSpanList spans)
+		{
+			if (spans.Count != 1) {
+				return null;
+			} else {
+				return spans[0];
+			}
+		}
+
 		private static Boundaries? GetTimelineBoundaries()
 		{
-			int left = 0;
 			int right = 0;
-			int top = 0;
-			int bottom = Document.Current.Rows.Last().Index;
 			foreach (var row in Document.Current.Rows) {
 				var animable = row.Components.Get<NodeRow>()?.Node as IAnimable;
 				if (animable == null) {
 					continue;
 				}
 				foreach (var animator in animable.Animators) {
-					foreach (var keyframe in animator.Keys) {
+					foreach (var keyframe in animator.ReadonlyKeys) {
 						right = Math.Max(keyframe.Frame, right);
 					}
 				}
 			}
 			return new Boundaries {
-				Left = left,
+				Left = 0,
 				Right = right,
-				Top = top,
-				Bottom = bottom
-			};
-		}
-
-		private static GridSpan? UniteSpans(GridSpanList spans)
-		{
-			if (!spans.Any()) {
-				return null;
-			}
-			var current = spans.First();
-			foreach (var span in spans.Skip(1)) {
-				if (current.B == span.A) {
-					current.B = span.B;
-				}
-				else {
-					return null;
-				}
-			}
-			return current;
-		}
-
-		private static Boundaries? GetSelectionBoundaries()
-		{
-			if (!Document.Current.SelectedRows().Any()) {
-				return GetTimelineBoundaries();
-			}
-			int prevRowIndex = Document.Current.SelectedRows().First().Index;
-			var spans = Document.Current.Rows[prevRowIndex].Components.Get<GridSpanListComponent>()?.Spans.GetNonOverlappedSpans();
-			var unitedSpan = UniteSpans(spans);
-			if (unitedSpan == null) {
-				return null;
-			}
-			var span = (GridSpan)unitedSpan;
-			int left = span.A;
-			int right = span.B;
-			foreach (var row in Document.Current.SelectedRows().Skip(1)) {
-				if (row.Index != prevRowIndex + 1) {
-					return null;
-				}
-				prevRowIndex = row.Index;
-				spans = Document.Current.Rows[row.Index].Components.Get<GridSpanListComponent>()?.Spans.GetNonOverlappedSpans();
-				unitedSpan = UniteSpans(spans);
-				if (
-					unitedSpan == null ||
-					unitedSpan?.A != left ||
-					unitedSpan?.B != right
-				) {
-					return null;
-				}
-			}
-			return new Boundaries {
-				Left = left,
-				Right = right,
-				Top = Document.Current.SelectedRows().First().Index,
-				Bottom = prevRowIndex
+				Top = 0,
+				Bottom = Document.Current.Rows.Last().Index
 			};
 		}
 	}
