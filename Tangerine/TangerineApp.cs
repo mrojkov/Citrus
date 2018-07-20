@@ -339,11 +339,6 @@ namespace Tangerine
 
 			private void DropFiles(IEnumerable<string> obj)
 			{
-				bool windowSet = false;
-				if (Application.WindowUnderMouse == null) {
-					Application.Input.Simulator.SetWindowUnderMouse(Window.Current);
-					windowSet = true;
-				}
 				if (tabBar.IsMouseOverThisOrDescendant() || Document.Current == null) {
 					foreach (var path in obj) {
 						if (path.EndsWith(".scene") || path.EndsWith(".tan")) {
@@ -351,9 +346,6 @@ namespace Tangerine
 						}
 					}
 				}
-				if (windowSet) {
-					Application.Input.Simulator.SetWindowUnderMouse(null);
-				} 
 			}
 
 			private void RebuildTabs(TabBar tabBar)

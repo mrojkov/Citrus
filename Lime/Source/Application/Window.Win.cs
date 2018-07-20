@@ -888,6 +888,7 @@ namespace Lime
 		{
 			var files = ((string[])e.Data.GetData(DataFormats.FileDrop, false));
 			using (Context.Activate().Scoped()) {
+				Application.WindowUnderMouse = this;
 				FilesDropped?.Invoke(files);
 			}
 		}
