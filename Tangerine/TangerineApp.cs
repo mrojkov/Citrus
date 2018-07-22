@@ -543,7 +543,7 @@ namespace Tangerine
 
 		private static bool IsCopyPasteAllowedForSelection()
 		{
-			return Document.Current?.TopLevelSelectedRows().Any(row => row.IsCopyPasteAllowed()) ?? false;
+			return Document.Current.InspectRootNode || (Document.Current?.TopLevelSelectedRows().Any(row => row.IsCopyPasteAllowed()) ?? false);
 		}
 
 		private void ClearActiveRuler()
