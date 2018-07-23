@@ -23,7 +23,7 @@ namespace Tangerine.UI.SceneView
 
 		IEnumerator<object> CreatePointObjectTask(Type nodeType)
 		{
-			command.Selected = true;
+			command.Checked = true;
 			while (true) {
 				if (sv.InputArea.IsMouseOver()) {
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
@@ -57,7 +57,7 @@ namespace Tangerine.UI.SceneView
 				}
 				yield return null;
 			}
-			this.command.Selected = false;
+			this.command.Checked = false;
 		}
 	}
 }

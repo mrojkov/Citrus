@@ -21,13 +21,13 @@ namespace Tangerine.UI.SceneView
 				ICommand newCommand;
 				if (CreateNodeRequestComponent.Consume<Widget>(sv.Components, out nodeTypeIncome, out newCommand)) {
 					nodeTypeActive = nodeTypeIncome;
-					command.Selected = false;
+					command.Checked = false;
 					command = newCommand;
-					command.Selected = true;
+					command.Checked = true;
 				}
 
 				if (nodeTypeActive == null) {
-					command.Selected = false;
+					command.Checked = false;
 					yield return null;
 					continue;
 				}

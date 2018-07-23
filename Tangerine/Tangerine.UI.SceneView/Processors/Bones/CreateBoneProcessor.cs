@@ -25,7 +25,7 @@ namespace Tangerine.UI.SceneView
 
 		IEnumerator<object> CreateBoneTask()
 		{
-			command.Selected = true;
+			command.Checked = true;
 			while (true) {
 				Bone bone = null;
 
@@ -115,7 +115,7 @@ namespace Tangerine.UI.SceneView
 				yield return null;
 			}
 			SceneView.Instance.Components.Remove<CreateBoneHelper>();
-			((Command)command).Selected = false;
+			command.Checked = false;
 		}
 	}
 

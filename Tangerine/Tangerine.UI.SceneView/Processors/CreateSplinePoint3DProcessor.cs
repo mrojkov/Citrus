@@ -22,7 +22,7 @@ namespace Tangerine.UI.SceneView
 		IEnumerator<object> CreateSplinePoint3DTask()
 		{
 			var input = SceneView.Instance.Input;
-			command.Selected = true;
+			command.Checked = true;
 			while (true) {
 				if (SceneView.Instance.InputArea.IsMouseOver()) {
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
@@ -70,7 +70,7 @@ namespace Tangerine.UI.SceneView
 				}
 				yield return null;
 			}
-			this.command.Selected = false;
+			this.command.Checked = false;
 			Utils.ChangeCursorIfDefault(MouseCursor.Default);
 		}
 	}

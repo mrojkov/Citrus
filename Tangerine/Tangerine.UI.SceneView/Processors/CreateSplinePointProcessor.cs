@@ -25,7 +25,7 @@ namespace Tangerine.UI.SceneView
 
 		IEnumerator<object> CreateSplinePointTask()
 		{
-			command.Selected = true;
+			command.Checked = true;
 			while (true) {
 				if (sv.InputArea.IsMouseOver()) {
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);

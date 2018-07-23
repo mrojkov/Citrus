@@ -20,5 +20,10 @@ namespace Tangerine
 		{
 			UI.SceneView.SceneView.Instance?.CreateNode(type, command);
 		}
+
+		public override bool GetChecked()
+		{
+			return command.Checked;
+		}
 	}
 }
