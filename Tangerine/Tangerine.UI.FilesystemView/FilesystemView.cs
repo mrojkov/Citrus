@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -42,6 +42,22 @@ namespace Tangerine.UI.FilesystemView
 		private Vector2 dragStartPosition;
 		private Vector2 dragEndPosition;
 		private Selection savedSelection;
+
+		private SortType sortType = SortType.Name;
+		public SortType SortType {
+			get
+			{
+				return sortType;
+			}
+		}
+
+		private OrderType orderType = OrderType.Ascending;
+		public OrderType OrderType {
+			get
+			{
+				return orderType;
+			}
+		}
 
 		public void Split(SplitterType type)
 		{
@@ -91,6 +107,13 @@ namespace Tangerine.UI.FilesystemView
 			int newIndex = navHystoryIndex + 1;
 			navHystory.RemoveRange(newIndex, navHystory.Count - newIndex - 1);
 			navHystoryIndex = newIndex;
+		}
+
+		public void SortByType(SortType sortType, OrderType orderType)
+		{
+			this.sortType = sortType;
+			this.orderType = OrderType;
+			InvalidateView(model.CurrentPath, sortType, orderType);
 		}
 
 		private void InvalidateFSWatcher(string path)
@@ -213,14 +236,19 @@ namespace Tangerine.UI.FilesystemView
 			Window.Current.Invalidate();
 		}
 
-		private void InvalidateView(string path)
+		private void InvalidateView(string path, SortType sortType, OrderType orderType)
 		{
 			scrollView.Content.Nodes.Clear();
-			foreach (var item in model.EnumerateItems()) {
+			foreach (var item in model.EnumerateItems(sortType, orderType)) {
 				var fsItem = new FilesystemItem(item);
 				scrollView.Content.AddNode(fsItem);
 				fsItem.CompoundPresenter.Insert(0, new DelegatePresenter<FilesystemItem>(RenderFSItemSelection));
 			}
+		}
+
+		private void InvalidateView(string path)
+		{
+			InvalidateView(path, sortType, orderType);
 		}
 
 		private void Open(string path)

@@ -89,6 +89,13 @@ namespace Tangerine.UI.FilesystemView
 
 	public class Model
 	{
+
+		enum ItemType
+		{
+			File,
+			Dir
+		}
+
 		private string currentPath;
 		public string CurrentPath
 		{
@@ -121,13 +128,51 @@ namespace Tangerine.UI.FilesystemView
 			CurrentPath = p.FullName;
 		}
 
-		public IEnumerable<string> EnumerateItems()
+		public IEnumerable<string> EnumerateItems(SortType sortType, OrderType orderType)
 		{
-			foreach (var i in Directory.EnumerateDirectories(CurrentPath).OrderBy(f => f)) {
+			foreach (var i in SortItems(Directory.EnumerateDirectories(CurrentPath), sortType, orderType, ItemType.Dir)) {
 				yield return i;
 			}
-			foreach (var i in Directory.EnumerateFiles(CurrentPath).OrderBy(f => f)) {
+			foreach (var i in SortItems(Directory.EnumerateFiles(CurrentPath), sortType, orderType, ItemType.File)) {
 				yield return i;
+			}
+		}
+		
+		private IEnumerable<string> SortItems(IEnumerable<string> items, SortType sortType, OrderType orderType, ItemType itemType)
+		{
+			switch (sortType) {
+				case SortType.Name:
+					if (orderType == OrderType.Ascending) {
+						return items.OrderBy(f => f);
+					} else {
+						return items.OrderByDescending(f => f);
+					}
+				case SortType.Date:
+					if (orderType == OrderType.Ascending) {
+						return items.OrderBy(f => new FileInfo(f).LastWriteTime);
+					} else {
+						return items.OrderByDescending(f => new FileInfo(f).LastWriteTime);
+					}
+				case SortType.Extension:
+					if (orderType == OrderType.Ascending) {
+						return items.OrderBy(f => new FileInfo(f).Extension);
+					} else {
+						return items.OrderByDescending(f => new FileInfo(f).Extension);
+					}
+				case SortType.Size:
+					if (orderType == OrderType.Ascending) {
+						if (itemType == ItemType.Dir)
+							return items.OrderBy( f => f.Length);
+						else
+							return items.OrderBy(f => new FileInfo(f).Length);
+					} else {
+						if (itemType == ItemType.Dir)
+							return items.OrderByDescending(f => f.Length);
+						else
+							return items.OrderByDescending(f => new FileInfo(f).Length);
+					}
+				default:
+					throw new ArgumentException();
 			}
 		}
 
