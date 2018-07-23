@@ -21,6 +21,7 @@ namespace Tangerine.UI.Timeline.Components
 		protected readonly ToolbarButton lockButton;
 		protected readonly ToolbarButton lockAnimationButton;
 		protected readonly Widget indentSpacer;
+		protected readonly Image imageCombiner;
 
 		private static readonly Color4[] ColorMarks = {
 			Color4.Transparent,
@@ -68,6 +69,11 @@ namespace Tangerine.UI.Timeline.Components
 			}));
 			expandButtonContainer.Updating += delta =>
 				expandButton.Visible = nodeData.Node.Animators.Count > 0;
+			imageCombiner = new Image(NodeIconPool.GetTexture(typeof(ImageCombiner))) {
+				HitTestTarget = false,
+				MinMaxSize = new Vector2(21, 16),
+				Padding = new Thickness { Left = 5 },
+			};
 			enterButton = NodeCompositionValidator.CanHaveChildren(nodeData.Node.GetType()) ? CreateEnterButton() : null;
 			eyeButton = CreateEyeButton();
 			lockButton = CreateLockButton();
@@ -84,6 +90,7 @@ namespace Tangerine.UI.Timeline.Components
 					new HSpacer(3),
 					label,
 					editBox,
+					imageCombiner,
 					new Widget(),
 					(Widget)enterButton ?? (Widget)new HSpacer(Theme.Metrics.DefaultToolbarButtonSize.X),
 					lockAnimationButton,
@@ -115,6 +122,39 @@ namespace Tangerine.UI.Timeline.Components
 					Rename();
 				});
 			}));
+		}
+
+		public static void UpdateIsImageCombinerArg(Row row)
+		{
+			var view = row.Components.Get<RowView>()?.RollRow as RollNodeView;
+			if (view == null) {
+				return;
+			}
+			view.imageCombiner.Color = IsImageCombinerArg(row) ? Color4.White : Color4.Transparent;
+		}
+
+		private static bool IsImageCombinerArg(Row row)
+		{
+			var arg = row.Components.Get<NodeRow>()?.Node as IImageCombinerArg;
+			if (arg == null) {
+				return false;
+			}
+			var image = arg as Node;
+			if (image == null) {
+				return false;
+			}
+			var index = image.Parent.Nodes.IndexOf(image);
+			var count = image.Parent.Nodes.Count;
+			var result = false;
+			if (count > index + 1 && index > 0) {
+				result |= image.Parent.Nodes[index - 1] is ImageCombiner
+					&& image.Parent.Nodes[index + 1] is IImageCombinerArg;
+			}
+			if (!result && index > 1) {
+				result |= image.Parent.Nodes[index - 1] is IImageCombinerArg
+					&& image.Parent.Nodes[index - 2] is ImageCombiner;
+			}
+			return result;
 		}
 
 		public Widget Widget => widget;
