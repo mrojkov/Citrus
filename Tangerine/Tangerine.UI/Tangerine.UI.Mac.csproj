@@ -99,6 +99,7 @@
     <Compile Include="Utils\FilesDropHandler.cs" />
     <Compile Include="BackupHistoryPanel\BackupHistoryPanel.cs" />
     <Compile Include="Utils\DropSceneContextMenu.cs" />
+    <Compile Include="OrangeCommandHandler.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

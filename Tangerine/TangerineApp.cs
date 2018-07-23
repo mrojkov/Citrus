@@ -485,9 +485,9 @@ namespace Tangerine
 			}, () => Document.Current?.Rows.Count > 0));
 			h.Connect(Command.Undo, () => Document.Current.History.Undo(), () => Document.Current?.History.CanUndo() ?? false);
 			h.Connect(Command.Redo, () => Document.Current.History.Redo(), () => Document.Current?.History.CanRedo() ?? false);
-			h.Connect(OrangeCommands.Run, new DocumentDelegateCommandHandler(() => WidgetContext.Current.Root.Tasks.Add(OrangeTask)));
-			h.Connect(OrangeCommands.OptionsDialog, new DocumentDelegateCommandHandler(() => new OrangePluginOptionsDialog()));
-			h.Connect(OrangeCommands.CookGameAssets, new DocumentDelegateCommandHandler(() => WidgetContext.Current.Root.Tasks.Add(CookingTask)));
+			h.Connect(OrangeCommands.Run, new OrangeCommandHandler(() => WidgetContext.Current.Root.Tasks.Add(OrangeTask)));
+			h.Connect(OrangeCommands.OptionsDialog, new OrangeCommandHandler(() => new OrangePluginOptionsDialog()));
+			h.Connect(OrangeCommands.CookGameAssets, new OrangeCommandHandler(() => WidgetContext.Current.Root.Tasks.Add(CookingTask)));
 			h.Connect(SceneViewCommands.SnapWidgetBorderToRuler, new SnapWidgetBorderCommandHandler());
 			h.Connect(SceneViewCommands.SnapWidgetPivotToRuler, new SnapWidgetPivotCommandHandler());
 			h.Connect(SceneViewCommands.SnapRulerLinesToWidgets, new SnapRulerLinesToWidgetCommandHandler());
