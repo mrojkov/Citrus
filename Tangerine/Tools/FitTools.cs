@@ -46,11 +46,9 @@ namespace Tangerine
 	{
 		public override void ExecuteTransaction()
 		{
-			foreach (var widget in Core.Document.Current.SelectedNodes().Editable().OfType<Widget>()) {
-				var s = widget.Scale;
-				s.X = -s.X;
-				Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Scale), s);
-			}
+			Core.Operations.Flip.Perform(
+				Core.Document.Current.SelectedNodes().Editable(),
+				Core.Document.Current.Container.AsWidget, flipX: true, flipY: false);
 		}
 	}
 
@@ -58,11 +56,9 @@ namespace Tangerine
 	{
 		public override void ExecuteTransaction()
 		{
-			foreach (var widget in Core.Document.Current.SelectedNodes().Editable().OfType<Widget>()) {
-				var s = widget.Scale;
-				s.Y = -s.Y;
-				Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Scale), s);
-			}
+			Core.Operations.Flip.Perform(
+				Core.Document.Current.SelectedNodes().Editable(),
+				Core.Document.Current.Container.AsWidget, flipX: false, flipY: true);
 		}
 	}
 

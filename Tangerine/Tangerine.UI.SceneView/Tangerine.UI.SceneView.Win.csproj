@@ -73,7 +73,6 @@
     <Compile Include="WidgetTransforms\Vector2d.cs" />
     <Compile Include="WidgetTransforms\WidgetZeroScalePreserver.cs" />
     <Compile Include="Components\CommandComponent.cs" />
-    <Compile Include="Components\PointObjectSelectionComponent.cs" />
     <Compile Include="IKSolver.cs" />
     <Compile Include="Presenters\BoneAsistantPresenter.cs" />
     <Compile Include="Presenters\BonePresenter.cs" />

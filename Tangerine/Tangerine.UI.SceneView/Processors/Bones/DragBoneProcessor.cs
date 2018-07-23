@@ -63,7 +63,9 @@ namespace Tangerine.UI.SceneView
 					}
 					var b = bone.Parent.AsWidget.BoneArray[bone.BaseIndex];
 					dragDelta = sv.MousePosition * transform - iniMousePos * transform;
-					var position = bone.WorldToLocalTransform *
+					var parentToLocalTransform = bone.CalcLocalToParentWidgetTransform().CalcInversed();
+					parentToLocalTransform.T = Vector2.Zero;
+					var position = parentToLocalTransform *
 						(entry.Joint - b.Tip + (index != 0 && index != bone.Index && snapEnabled ? items[index].Tip - entry.Joint : dragDelta));
 					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.Position), position, CoreUserPreferences.Instance.AutoKeyframes);
 

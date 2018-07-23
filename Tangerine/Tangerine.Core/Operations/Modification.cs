@@ -898,4 +898,65 @@ namespace Tangerine.Core.Operations
 			return skinningWeights;
 		}
 	}
+
+	public static class PropagateMarkers
+	{
+		public static void Perform(Node node)
+		{
+			foreach (var m in node.Parent.Markers) {
+				SetMarker.Perform(node, m.Clone(), true);
+				SetKeyframe.Perform(node, nameof(Node.Trigger), null, new Keyframe<string> {
+					Frame = m.Frame,
+					Value = m.Id,
+					Function = KeyFunction.Linear
+				});
+			}
+		}
+	}
+
+	public static class Flip
+	{
+		public static void Perform(IEnumerable<Node> nodes, Widget container, bool flipX, bool flipY)
+		{
+			if (!flipX && !flipY) return;
+			foreach (var widget in nodes.OfType<Widget>()) {
+				var s = widget.Scale;
+				if (flipX) {
+					s.X = -s.X;
+				}
+				if (flipY) {
+					s.Y = -s.Y;
+				}
+				SetAnimableProperty.Perform(widget, nameof(Widget.Scale), s);
+			}
+			FlipBones.Perform(nodes, container, flipX, flipY);
+		}
+	}
+
+	public static class FlipBones
+	{
+		public static void Perform(IEnumerable<Node> nodes, Widget container, bool flipX, bool flipY)
+		{
+			if (!flipX && !flipY) return;
+			var roots = new List<Bone>();
+			foreach (var bone in nodes.OfType<Bone>()) {
+				var root = BoneUtils.FindBoneRoot(bone, container.Nodes);
+				if (!roots.Contains(root)) {
+					if (flipX && flipY) {
+						SetAnimableProperty.Perform(root, nameof(Bone.Rotation), root.Rotation + 180);
+					} else {
+						SetAnimableProperty.Perform(root, nameof(Bone.Rotation), (flipY ? 180 : 0) - root.Rotation);
+						SetAnimableProperty.Perform(root, nameof(Bone.Length), -root.Length);
+						var bones = BoneUtils.FindBoneDescendats(root,
+							Document.Current.Container.Nodes.OfType<Bone>());
+						foreach (var childBone in bones) {
+							SetAnimableProperty.Perform(childBone, nameof(Bone.Rotation), -childBone.Rotation);
+							SetAnimableProperty.Perform(childBone, nameof(Bone.Length), -childBone.Length);
+						}
+					}
+					roots.Add(root);
+				}
+			}
+		}
+	}
 }

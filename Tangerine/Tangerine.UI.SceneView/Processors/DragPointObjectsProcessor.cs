@@ -65,7 +65,12 @@ namespace Tangerine.UI.SceneView
 								parent.Size.X != 0 &&
 								parent.Size.Y != 0
 							) {
-								SetPosition(pobjects[i], (pobjects[i].TransformedPosition + dragDelta - pobjects[i].Offset) / parent.Size);
+								var boneArray = parent.ParentWidget.BoneArray;
+								var localToParent = parent.CalcLocalToParentTransform();
+								var skinningRelativeInversedTransform = boneArray.CalcWeightedRelativeTransform(pobjects[i].SkinningWeights).CalcInversed();
+								var newPosition = ((pobjects[i].TransformedPosition + dragDelta) * localToParent
+												   * skinningRelativeInversedTransform * localToParent.CalcInversed() - pobjects[i].Offset) / parent.Size;
+								SetPosition(pobjects[i], newPosition);
 								if (sv.Input.IsKeyPressed(Key.Control) && pobjects[i] is DistortionMeshPoint) {
 									var p = pobjects[i] as DistortionMeshPoint;
 									SetUV(p, p.UV + dragDelta / parent.Size);
