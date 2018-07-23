@@ -342,7 +342,11 @@ namespace Tangerine
 				if (tabBar.IsMouseOverThisOrDescendant() || Document.Current == null) {
 					foreach (var path in obj) {
 						if (path.EndsWith(".scene") || path.EndsWith(".tan")) {
-							Project.Current.OpenDocument(path, true);
+							try {
+								Project.Current.OpenDocument(path, true);
+							} catch (System.InvalidOperationException e) {
+								AlertDialog.Show(e.Message);
+							}
 						}
 					}
 				}
