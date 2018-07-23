@@ -199,7 +199,7 @@ namespace Lime
 					var w = widgets[i];
 					minWidth = Math.Max(minWidth, w.EffectiveMinSize.X);
 					dx += w.EffectiveMinSize.X;
-					if (dx <= widget.Width) {
+					if (dy <= widget.Height) {
 						maxrowdy = Mathf.Max(maxrowdy, w.EffectiveMinSize.Y);
 					}
 					if (w.EffectiveMinSize.X + paddingH > widget.Width && splitIndices.Last() == i) {
@@ -237,7 +237,7 @@ namespace Lime
 					var w = widgets[i];
 					minHeight = Math.Max(minHeight, w.EffectiveMinSize.Y);
 					dy += w.EffectiveMinSize.Y;
-					if (dy <= widget.Height) {
+					if (dx <= widget.Width) {
 						maxColumnDx = Mathf.Max(maxColumnDx, w.EffectiveMinSize.X);
 					}
 					if (w.EffectiveMinSize.Y + paddingV > widget.Height && splitIndices.Last() == i) {
