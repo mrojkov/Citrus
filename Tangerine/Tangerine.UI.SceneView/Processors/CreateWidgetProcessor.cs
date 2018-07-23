@@ -13,6 +13,9 @@ namespace Tangerine.UI.SceneView
 		{
 			Type nodeTypeActive = null;
 			while (true) {
+				if (sv.Input.WasKeyPressed(Key.Escape) || sv.Input.WasMousePressed(1)) {
+					nodeTypeActive = null;
+				}
 				Type nodeTypeIncome;
 				if (CreateNodeRequestComponent.Consume<Widget>(sv.Components, out nodeTypeIncome)) {
 					nodeTypeActive = nodeTypeIncome;
