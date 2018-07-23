@@ -12,6 +12,8 @@ namespace Tangerine
 {
 	public class GroupNodes : DocumentCommandHandler
 	{
+		private const string DefaultAnimationId = "<DefaultAnimationId>";
+
 		public override void ExecuteTransaction()
 		{
 			var selectedNodes = Document.Current.SelectedNodes().Where(IsValidNode).ToList();
@@ -89,15 +91,19 @@ namespace Tangerine
 		private static void SetKeyframes(Dictionary<Node, BoneAnimationData> keyframeDictionary)
 		{
 			foreach (var pair in keyframeDictionary) {
-				SetProperty.Perform(pair.Key, nameof(Bone.Position), pair.Value.CurrentPosition);
-				SetProperty.Perform(pair.Key, nameof(Bone.Rotation), pair.Value.CurrentRotation);
-				foreach (var keyframe in pair.Value.PositionKeyframes) {
-					SetKeyframe.Perform(pair.Key, nameof(Bone.Position), Document.Current.AnimationId, keyframe);
+				if (pair.Value.NoParentKeyframes) {
+					TransformPropertyAndKeyframes(pair.Key, nameof(Bone.Position), pair.Value.PositionTransformer);
+				} else {
+					SetProperty.Perform(pair.Key, nameof(Bone.Position), pair.Value.CurrentPosition);
+					SetProperty.Perform(pair.Key, nameof(Bone.Rotation), pair.Value.CurrentRotation);
+					foreach (var keyframe in pair.Value.PositionKeyframes) {
+						SetKeyframe.Perform(pair.Key, nameof(Bone.Position), Document.Current.AnimationId, keyframe.Value);
+					}
+					foreach (var keyframe in pair.Value.RotationKeyframes) {
+						SetKeyframe.Perform(pair.Key, nameof(Bone.Rotation), Document.Current.AnimationId, keyframe.Value);
+					}
+					SetAnimableProperty.Perform(pair.Key, nameof(Bone.BaseIndex), 0);
 				}
-				foreach (var keyframe in pair.Value.RotationKeyframes) {
-					SetKeyframe.Perform(pair.Key, nameof(Bone.Rotation), Document.Current.AnimationId, keyframe);
-				}
-				SetAnimableProperty.Perform(pair.Key, nameof(Bone.BaseIndex), 0);
 			}
 		}
 
@@ -128,48 +134,74 @@ namespace Tangerine
 				}
 			 };
 			var data = new BoneAnimationData();
-			var frames = new SortedSet<int>();
+			var framesDict = new Dictionary<string, SortedSet<int>>();
 			foreach (var bone in boneChain) {
 				foreach (var a in bone.Animators) {
 					if (a.TargetProperty == nameof(Bone.Position) ||
 						a.TargetProperty == nameof(Bone.Length) ||
 					    a.TargetProperty == nameof(Bone.Rotation)
 					) {
+						var id = a.AnimationId ?? DefaultAnimationId;
+						if (!framesDict.ContainsKey(id)) {
+							framesDict[id] = new SortedSet<int>();
+						}
 						foreach (var k in a.Keys.ToList()) {
-							frames.Add(k.Frame);
+							framesDict[id].Add(k.Frame);
 						}
 					}
 				}
 			}
-			if (boneChain.Count == 0 || frames.Count == 0) {
-				TransformPropertyAndKeyframes(node, nameof(Bone.Position), positionTransformer);
-				return data;
-			}
 			data.CurrentPosition = positionTransformer(GetBonePositionInSpaceOfParent(node));
 			data.CurrentRotation = GetBoneRotationInSpaceOfParent(node);
+
+			if (node.BaseIndex == 0 && (boneChain.Count == 0 || framesDict.Count == 0)) {
+				data.NoParentKeyframes = true;
+				data.PositionTransformer = positionTransformer;
+				return data;
+			}
+
+			var curFrame = parentNode.AnimationFrame;
+			boneChain.Add(node);
+			foreach (var pair in framesDict) {
+				foreach (var frame in pair.Value) {
+					ApplyAnimationAtFrame(pair.Key, frame, boneChain);
+					data.PositionKeyframes.Add(frame, new Keyframe <Vector2> {
+						Frame = frame,
+						Function = KeyFunction.Spline,
+						Value = positionTransformer(GetBonePositionInSpaceOfParent(node))
+					});
+					data.RotationKeyframes.Add(frame, new Keyframe<float> {
+						Frame = frame,
+						Function = KeyFunction.Spline,
+						Value = GetBoneRotationInSpaceOfParent(node)
+					});
+				}
+			}
+
 			foreach (var a in node.Animators) {
-				if (a.TargetProperty == nameof(Bone.Rotation)) {
-					foreach (var k in a.Keys.ToList()) {
-						frames.Add(k.Frame);
+				foreach (var key in a.Keys) {
+					ApplyAnimationAtFrame(a.AnimationId, key.Frame, boneChain);
+					switch (a.TargetProperty) {
+						case nameof(Bone.Position):
+							if (!data.PositionKeyframes.ContainsKey(key.Frame)) {
+								data.PositionKeyframes[key.Frame] = new Keyframe<Vector2>();
+							}
+							data.PositionKeyframes[key.Frame].Frame = key.Frame;
+							data.PositionKeyframes[key.Frame].Function = key.Function;
+							data.PositionKeyframes[key.Frame].Value = positionTransformer(GetBonePositionInSpaceOfParent(node));
+							break;
+						case nameof(Bone.Rotation):
+							if (!data.RotationKeyframes.ContainsKey(key.Frame)) {
+								data.RotationKeyframes[key.Frame] = new Keyframe<float>();
+							}
+							data.RotationKeyframes[key.Frame].Frame = key.Frame;
+							data.RotationKeyframes[key.Frame].Function = key.Function;
+							data.RotationKeyframes[key.Frame].Value = GetBoneRotationInSpaceOfParent(node);
+							break;
 					}
 				}
 			}
-			var curFrame = parentNode.AnimationFrame;
-			boneChain.Add(node);
-			foreach (var frame in frames) {
-				ApplyAnimationAtFrame(boneChain, frame);
-				data.PositionKeyframes.Add(new Keyframe<Vector2> {
-					Frame = frame,
-					Function = KeyFunction.Spline,
-					Value = positionTransformer(GetBonePositionInSpaceOfParent(node))
-				});
-				data.RotationKeyframes.Add(new Keyframe<float> {
-					Frame = frame,
-					Function = KeyFunction.Spline,
-					Value = GetBoneRotationInSpaceOfParent(node)
-				});
-			}
-			ApplyAnimationAtFrame(boneChain, curFrame);
+			ApplyAnimationAtFrame(null, curFrame, boneChain);
 			return data;
 		}
 
@@ -184,11 +216,12 @@ namespace Tangerine
 			return node.Position * node.CalcLocalToParentWidgetTransform();
 		}
 
-		private static void ApplyAnimationAtFrame(IEnumerable<Bone> bones, int frame)
+		private static void ApplyAnimationAtFrame(string animationId, int frame, IEnumerable<Bone> bones)
 		{
+			var id = (animationId == DefaultAnimationId) ? null : animationId;
 			foreach (var node in bones) {
 				node.AnimationFrame = frame;
-				node.Animators.Apply(node.AnimationTime, node.DefaultAnimation.Id);
+				node.Animators.Apply(node.AnimationTime, id);
 				node.Update(0);
 			}
 		}
@@ -199,10 +232,12 @@ namespace Tangerine
 
 		private class BoneAnimationData
 		{
-			public readonly List<Keyframe<Vector2>> PositionKeyframes = new List<Keyframe<Vector2>>();
-			public readonly List<Keyframe<float>> RotationKeyframes = new List<Keyframe<float>>();
+			public readonly Dictionary<int, Keyframe<Vector2>> PositionKeyframes = new Dictionary<int, Keyframe<Vector2>>();
+			public readonly Dictionary<int, Keyframe<float>> RotationKeyframes = new Dictionary<int, Keyframe<float>>();
 			public Vector2 CurrentPosition { get; set; }
 			public float CurrentRotation { get; set; }
+			public bool NoParentKeyframes { get; set; }
+			public Func<Vector2, Vector2> PositionTransformer { get; set; }
 		}
 	}
 
