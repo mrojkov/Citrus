@@ -38,7 +38,7 @@ namespace Tangerine
 			}
 #if WIN
 			TangerineSingleInstanceKeeper.Initialize(args);
-			TangerineSingleInstanceKeeper.AnotherInstanceArgsRecieved += OpenDocumentsFromArgs;
+			TangerineSingleInstanceKeeper.AnotherInstanceArgsRecieved += OpenProjectFromArgs;
 			Application.Exited += () => {
 				TangerineSingleInstanceKeeper.Instance.ReleaseInstance();
 			};
@@ -108,17 +108,7 @@ namespace Tangerine
 			};
 
 			Project.OpenFileOutsideProjectAttempt += (string filePath) => {
-				var path = filePath.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-				path[0] += Path.DirectorySeparatorChar;
-				string projectFilePath = null;
-				for (int i = path.Length - 2; i >= 0; i--) {
-					var ppp = Path.Combine(path.Take(i + 1).ToArray());
-					var projectFileCandidates = Directory.GetFiles(ppp, "*.citproj", SearchOption.TopDirectoryOnly);
-					if (projectFileCandidates.Length > 0) {
-						projectFilePath = projectFileCandidates[0];
-						break;
-					}
-				}
+				string projectFilePath = CalculatePathToCitprojByFilePath(filePath);
 				if (projectFilePath != null && Project.Current.CitprojPath != projectFilePath) {
 					var alert = new AlertDialog($"You're trying to open a document outside the project directory. Change the current project to '{Path.GetFileName(projectFilePath)}'?", "Yes", "No");
 					if (alert.Show() == 0) {
@@ -222,6 +212,8 @@ namespace Tangerine
 			if (proj != null) {
 				new Project(proj).Open();
 				OpenDocumentsFromArgs(args);
+			} else if (args.Length > 0) {
+				OpenProjectFromArgs(args);
 			}
 			WidgetContext.Current.Root.AddChangeWatcher(() => Project.Current, project => TangerineMenu.OnProjectChanged(project));
 
@@ -236,6 +228,31 @@ namespace Tangerine
 
 			Documentation.Init();
 			DocumentationComponent.Clicked = page => new HelpDialog(page);
+		}
+
+		private void OpenProjectFromArgs(string[] args)
+		{
+			string citprojFilePath = CalculatePathToCitprojByFilePath(args[0]);
+			if (Project.Current == Project.Null) {
+				new Project(citprojFilePath).Open();
+			}
+			OpenDocumentsFromArgs(args);
+		}
+
+		private string CalculatePathToCitprojByFilePath(string filePath)
+		{
+			var path = filePath.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+			path[0] += Path.DirectorySeparatorChar;
+
+			for (int i = path.Length - 2; i >= 0; i--) {
+				var ppp = Path.Combine(path.Take(i + 1).ToArray());
+				var projectFileCandidates = Directory.GetFiles(ppp, "*.citproj", SearchOption.TopDirectoryOnly);
+				if (projectFileCandidates.Length > 0) {
+					return projectFileCandidates[0];
+				}
+			}
+
+			return null;
 		}
 
 		void SetupMainWindowTitle(WindowWidget windowWidget)
@@ -643,11 +660,7 @@ namespace Tangerine
 		{
 			foreach (var arg in args) {
 				if (File.Exists(arg)) {
-					if(Project.Current != Project.Null)
-						Project.Current?.OpenDocument(arg, pathIsGlobal: true);
-					else {
-						FileOpenProject.Execute(arg);
-					}
+					Project.Current?.OpenDocument(arg, pathIsGlobal: true);
 				}
 			}
 		}
