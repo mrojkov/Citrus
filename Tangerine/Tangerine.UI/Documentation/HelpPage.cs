@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Tangerine.UI
@@ -23,7 +24,7 @@ namespace Tangerine.UI
 			Url = Path.Combine(Documentation.HtmlDocumentationPath, pageName + "_" + hash + ".html");
 			if (!File.Exists(Url)) {
 				var oldHtml = Directory.GetFiles(Documentation.HtmlDocumentationPath).Where(i => 
-					Path.GetFileName(i).Substring(0, pageName.Length) == pageName
+					Regex.Match(Path.GetFileName(i), @"(.*)\.html$").Groups[1].Value == pageName
 				);
 				foreach (var file in oldHtml) {
 					File.Delete(file);
