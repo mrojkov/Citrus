@@ -50,7 +50,7 @@ namespace Tangerine.UI.SceneView
 						break;
 					}
 				}
-				if (sv.Input.WasMousePressed(1)) {
+				if (sv.Input.WasMousePressed(1) || sv.Input.WasKeyPressed(Key.Escape)) {
 					break;
 				}
 				yield return null;

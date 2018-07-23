@@ -106,7 +106,7 @@ namespace Tangerine.UI.SceneView
 				if (bone != null && bone.Length == 0) {
 					break;
 				}
-				if (sv.Input.WasMousePressed(1)) {
+				if (sv.Input.WasMousePressed(1) || sv.Input.WasKeyPressed(Key.Escape)) {
 					break;
 				}
 
