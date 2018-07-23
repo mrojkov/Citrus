@@ -38,7 +38,7 @@ namespace Tangerine
 			}
 #if WIN
 			TangerineSingleInstanceKeeper.Initialize(args);
-			TangerineSingleInstanceKeeper.AnotherInstanceArgsRecieved += OpenProjectFromArgs;
+			TangerineSingleInstanceKeeper.AnotherInstanceArgsRecieved += OpenDocumentsFromArgs;
 			Application.Exited += () => {
 				TangerineSingleInstanceKeeper.Instance.ReleaseInstance();
 			};
@@ -209,12 +209,11 @@ namespace Tangerine
 				}
 			};
 			var proj = AppUserPreferences.Instance.RecentProjects.FirstOrDefault();
+			proj = null;
 			if (proj != null) {
 				new Project(proj).Open();
-				OpenDocumentsFromArgs(args);
-			} else if (args.Length > 0) {
-				OpenProjectFromArgs(args);
 			}
+			OpenDocumentsFromArgs(args);
 			WidgetContext.Current.Root.AddChangeWatcher(() => Project.Current, project => TangerineMenu.OnProjectChanged(project));
 
 			WidgetContext.Current.Root.AddChangeWatcher(() => ProjectUserPreferences.Instance.RecentDocuments.Count == 0 ?
@@ -230,13 +229,11 @@ namespace Tangerine
 			DocumentationComponent.Clicked = page => new HelpDialog(page);
 		}
 
-		private void OpenProjectFromArgs(string[] args)
+		private void OpenDocumentsFromArgs(string[] args)
 		{
-			if (Project.Current == Project.Null) {
-				var citprojPath = SearhForCitproj(args[0]);
-				new Project(citprojPath).Open();
+			foreach (var arg in args) {
+				Project.Current.OpenDocument(arg, pathIsGlobal: true);
 			}
-			OpenDocumentsFromArgs(args);
 		}
 
 		private string SearhForCitproj(string filePath)
@@ -651,15 +648,6 @@ namespace Tangerine
 			} catch (InvalidOperationException e) {
 				Document.Current.History.RollbackTransaction();
 				AlertDialog.Show(e.Message);
-			}
-		}
-
-		static void OpenDocumentsFromArgs(string[] args)
-		{
-			foreach (var arg in args) {
-				if (File.Exists(arg)) {
-					Project.Current.OpenDocument(arg, pathIsGlobal: true);
-				}
 			}
 		}
 	}

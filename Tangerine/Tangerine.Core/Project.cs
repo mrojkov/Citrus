@@ -165,7 +165,7 @@ namespace Tangerine.Core
 		{
 			string localPath = path;
 			if (pathIsGlobal) {
-				if (!Current.TryGetAssetPath(path, out localPath)) {
+				if (this == Null || !Current.TryGetAssetPath(path, out localPath)) {
 					OpenFileOutsideProjectAttempt(path);
 					return null;
 				}
