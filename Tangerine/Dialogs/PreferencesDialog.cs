@@ -195,9 +195,52 @@ namespace Tangerine
 					Application.InvalidateWindows();
 				}
 			};
+			var saveButton = new ThemedButton("Save theme") {
+				Clicked = () => {
+					var dlg = new FileDialog {
+						AllowedFileTypes = new string[] { "theme" },
+						Mode = FileDialogMode.Save
+					};
+					if (dlg.RunModal()) {
+						string path = dlg.FileName;
+						var serializer = new Yuzu.Json.JsonSerializer();
+						try {
+							var limeTheme = Theme.Colors;
+							var theme = ColorTheme.Current;
+							using (var fileStream = new FileStream(path, FileMode.OpenOrCreate)) {
+								serializer.ToStream(new List<object> { limeTheme, theme }, fileStream);
+							}
+						} catch (System.Exception e) {
+							AlertDialog.Show(e.Message);
+						}
+					}
+				}
+			};
+			var loadButton = new ThemedButton("Load theme") {
+				Clicked = () => {
+					var dlg = new FileDialog {
+						AllowedFileTypes = new string[] { "theme" },
+						Mode = FileDialogMode.Open
+					};
+					if (dlg.RunModal()) {
+						string path = dlg.FileName;
+						var deserializer = new Yuzu.Json.JsonDeserializer();
+						try {
+							using (var fs = new FileStream(path, FileMode.OpenOrCreate)) {
+								var read = deserializer.FromStream(new List<object>(), fs) as List<object>;
+								Theme.Colors = (Theme.ColorTheme)read[0];
+								ColorTheme.Current = (ColorTheme)read[1];
+								Application.InvalidateWindows();
+							}
+						} catch (System.Exception e) {
+							AlertDialog.Show(e.Message);
+						}
+					}
+				}
+			};
 			var buttons = new Widget {
 				Layout = new HBoxLayout { Spacing = 4 },
-				Nodes = { loadDarkButton, loadLightButton }
+				Nodes = { loadDarkButton, loadLightButton, saveButton, loadButton }
 			};
 			pane.AddNode(buttons);
 			pane.AddNode(themeEditor);
