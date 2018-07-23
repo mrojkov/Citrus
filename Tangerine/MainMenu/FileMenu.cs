@@ -18,7 +18,7 @@ namespace Tangerine
 
 		public static void Execute(string fileName)
 		{
-			if (Project.Current.Close()) {
+			if (Project.Current.Close() && fileName.Length > 0) {
 				new Project(fileName).Open();
 				AddRecentProject(fileName);
 			}
