@@ -5,6 +5,7 @@ using System.IO;
 using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Operations;
+using System.Text.RegularExpressions;
 
 namespace Tangerine.UI
 {
@@ -116,18 +117,25 @@ namespace Tangerine.UI
 
 		public static bool ExtractAssetPathOrShowAlert(string filePath, out string assetPath, out string assetType)
 		{
-			if (!filePath.StartsWith(Core.Project.Current.AssetsDirectory, StringComparison.CurrentCultureIgnoreCase)) {
-				AlertDialog.Show($"Asset '{filePath}' outside the project directory");
-				assetPath = null;
-				assetType = null;
-				return false;
-			} else {
-				var localPath = filePath.Substring(Core.Project.Current.AssetsDirectory.Length + 1);
-				assetPath = System.IO.Path.ChangeExtension(AssetPath.CorrectSlashes(localPath), null);
-				assetType = System.IO.Path.GetExtension(localPath).ToLower();
-				return true;
+			string path = AssetPath.CorrectSlashes(filePath);
+			string assetsPath = AssetPath.CorrectSlashes(Core.Project.Current.AssetsDirectory);
+			if (Path.IsPathRooted(path)) {
+				if (!path.StartsWith(assetsPath, StringComparison.CurrentCultureIgnoreCase)) {
+					AlertDialog.Show($"Asset '{filePath}' outside the project directory");
+					assetPath = null;
+					assetType = null;
+					return false;
+				} else {
+					var localPath = path.Substring(assetsPath.Length + 1);
+					assetPath = System.IO.Path.ChangeExtension(localPath, null);
+					assetType = System.IO.Path.GetExtension(localPath).ToLower();
+					return true;
+				}
 			}
-		}
-		
+			var match = Regex.Match(path, @"^(.+)(\..+?)?$");
+			assetPath = match.Groups[1].Value;
+			assetType = match.Groups[2].Value;
+			return true;
+		}		
 	}
 }
