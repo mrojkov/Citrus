@@ -1,6 +1,9 @@
 using System;
 using System.Linq;
+using System.Threading;
+using Lime;
 using Orange;
+using Tangerine.UI;
 
 namespace Tangerine
 {
@@ -10,7 +13,12 @@ namespace Tangerine
 
 		public override bool AskConfirmation(string text)
 		{
-			throw new NotImplementedException();
+			bool? result = null;
+			Application.InvokeOnMainThread(() => result = AlertDialog.Show(text, new string[] { "Yes", "No" }) == 0);
+			while (result == null) {
+				Thread.Sleep(1);
+			}
+			return result.Value;
 		}
 
 		public override bool AskChoice(string text, out bool yes)
@@ -20,7 +28,7 @@ namespace Tangerine
 
 		public override void ShowError(string message)
 		{
-			throw new NotImplementedException();
+			Application.InvokeOnMainThread(() => AlertDialog.Show(message));
 		}
 
 		public override Target GetActiveTarget()

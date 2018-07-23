@@ -86,11 +86,7 @@ namespace Tangerine
 		private static void CreateMainMenu()
 		{
 			Menu viewMenu;
-			var orangeMenu = new Menu();
-			Orange.MenuController.Instance.CreateAssemblyMenuItems();
-			foreach (var menuItem in Orange.MenuController.Instance.GetVisibleAndSortedItems()) {
-				orangeMenu.Add(new Command(menuItem.Label, () => Debug.Write(menuItem.Action())));
-			}
+			Menu orangeMenu = CreateOrangeMenu();
 			Application.MainMenu = new Menu {
 #if MAC
 				new Command("Application", new Menu {
@@ -204,6 +200,23 @@ namespace Tangerine
 			Command.Undo.Icon = IconPool.GetTexture("Tools.Undo");
 			Command.Redo.Icon = IconPool.GetTexture("Tools.Redo");
 			GenericCommands.Revert.Icon = IconPool.GetTexture("Tools.Revert");
+		}
+
+		private static Menu CreateOrangeMenu()
+		{
+			var blacklist = new HashSet<string> { "Run Tangerine" };
+			var orangeMenu = new Menu();
+			Orange.MenuController.Instance.CreateAssemblyMenuItems();
+			foreach (var menuItem in Orange.MenuController.Instance.GetVisibleAndSortedItems()) {
+				if (blacklist.Contains(menuItem.Label)) {
+					continue;
+				}
+				orangeMenu.Add(new Command(menuItem.Label, () => {
+					WidgetContext.Current.Root.Tasks.Add(OrangeTask(() => menuItem.Action()));
+				}));
+			}
+
+			return orangeMenu;
 		}
 
 		public static void OnProjectChanged(Project proj)
@@ -391,6 +404,20 @@ namespace Tangerine
 				}
 				Application.InvalidateWindows();
 			}
+		}
+
+		private static IEnumerator<object> OrangeTask(Action action)
+		{
+			Tangerine.UI.Console.Instance.Show();
+			Orange.The.Workspace?.AssetFiles?.Rescan();
+			yield return Task.ExecuteAsync(() => {
+				try {
+					action();
+				} catch (System.Exception e) {
+					System.Console.WriteLine(e);
+				}
+			});
+			System.Console.WriteLine("Done");
 		}
 	}
 }
