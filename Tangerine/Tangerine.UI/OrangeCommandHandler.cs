@@ -7,15 +7,18 @@ namespace Tangerine.UI
 	{
 		private readonly Action action;
 
-		public OrangeCommandHandler(Action action) {
+		public OrangeCommandHandler(Action action)
+		{
 			this.action = action;
 		}
 
-		public override void Execute() {
+		public override void Execute()
+		{
 			action();
 		}
 
-		public override void RefreshCommand(ICommand command) {
+		public override void RefreshCommand(ICommand command)
+		{
 			command.Enabled = Core.Project.Current != Core.Project.Null;
 		}
 	}
