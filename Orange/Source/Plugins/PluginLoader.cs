@@ -239,8 +239,15 @@ namespace Orange
 			Assembly assembly;
 			if (!resolvedAssemblies.TryGetValue(name, out assembly)) {
 				var dllPath = Path.Combine(CurrentPluginDirectory, name) + ".dll";
-				var readAllBytes = File.ReadAllBytes(dllPath);
-				assembly = Assembly.Load(readAllBytes);
+				var readAllDllBytes = File.ReadAllBytes(dllPath);
+				byte[] readAllPdbBytes = null;
+#if DEBUG
+				var pdbPath = Path.Combine(CurrentPluginDirectory, name) + ".pdb";
+				if (File.Exists(pdbPath)) {
+					readAllPdbBytes = File.ReadAllBytes(pdbPath);
+				}
+#endif
+				assembly = Assembly.Load(readAllDllBytes, readAllPdbBytes);
 				resolvedAssemblies.Add(name, assembly);
 			}
 			return assembly;
