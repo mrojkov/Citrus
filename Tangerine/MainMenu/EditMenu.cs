@@ -309,7 +309,11 @@ namespace Tangerine
 	{
 		public override void ExecuteTransaction()
 		{
-			TimelineHorizontalShift.Perform(UI.Timeline.Timeline.Instance.CurrentColumn, -1);
+			if (UI.Timeline.Timeline.Instance.CurrentColumn == 0) {
+				TimelineHorizontalShift.Perform(UI.Timeline.Timeline.Instance.CurrentColumn, -1);
+			} else {
+				TimelineColumnRemove.Perform(UI.Timeline.Timeline.Instance.CurrentColumn);
+			}
 		}
 	}
 
