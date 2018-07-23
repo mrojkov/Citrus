@@ -362,6 +362,17 @@ namespace Lime
 				"";
 				throw new NotSupportedException();
 #endif
+				if (Application.IsTangerine) {
+					goUp =
+#if WIN
+					"/../../..";
+#elif MAC || MONOMAC
+					"/../../../../../..";
+#else
+					"";
+					throw new NotSupportedException();
+#endif
+				}
 				ms.WriteTo(new FileStream(executablePath + goUp + @"/Lime/Source/GeneratedDeserializersBIN.cs", FileMode.Create));
 			}
 		}
