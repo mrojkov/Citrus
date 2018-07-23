@@ -238,6 +238,10 @@ namespace Tangerine
 					}
 				}
 			};
+			var darkSwitch = new BooleanPropertyEditor(
+				new PropertyEditorParams(pane, ColorTheme.Current, nameof(ColorTheme.IsDark), "Dark icon theme"));
+			darkSwitch.ContainerWidget.AddChangeWatcher(
+				() => ColorTheme.Current.IsDark, (v) => Application.InvalidateWindows());
 			var buttons = new Widget {
 				Layout = new HBoxLayout { Spacing = 4 },
 				Nodes = { loadDarkButton, loadLightButton, saveButton, loadButton }

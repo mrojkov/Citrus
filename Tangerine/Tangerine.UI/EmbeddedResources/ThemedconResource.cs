@@ -15,7 +15,7 @@ namespace Tangerine.UI
 
 		private string GetResourceId(bool themed)
 		{
-			var theme = themed ? $"{ColorTheme.Current.Description}." : string.Empty;
+			var theme = themed ? $"{(ColorTheme.Current.IsDark ? "Dark" : "Light")}." : string.Empty;
             return $"{AssemblyName}.Resources.Icons.{theme}{ResourceId}.png";
 		}
 	}

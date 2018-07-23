@@ -222,8 +222,7 @@ namespace Tangerine.UI
 		}
 
 		[YuzuRequired]
-		public string Description { get; set; }
-		//[YuzuRequired]
+		public bool IsDark { get; set; }
 		public Theme.ColorTheme Basic { get; set; } = Theme.Colors;
 		[YuzuRequired]
 		public ToolbarColors Toolbar { get; set; }
@@ -363,7 +362,7 @@ namespace Tangerine.UI
 				Border = new Color4(32, 32, 32)
 			};
 			return new ColorTheme {
-				Description = "Dark",
+				IsDark = true,
 				Basic = Theme.Colors,
 				Toolbar = toolbar,
 				SceneView = sceneView,
@@ -493,7 +492,7 @@ namespace Tangerine.UI
 				Border = new Color4(32, 32, 32)
 			};
 			return new ColorTheme {
-				Description = "Light",
+				IsDark = false,
 				Basic = Theme.Colors,
 				Toolbar = toolbar,
 				SceneView = sceneView,
