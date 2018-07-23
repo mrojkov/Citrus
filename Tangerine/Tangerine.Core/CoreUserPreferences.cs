@@ -1,4 +1,4 @@
-﻿using Lime;
+using Lime;
 using Yuzu;
 
 namespace Tangerine.Core
@@ -10,6 +10,9 @@ namespace Tangerine.Core
 
 		[YuzuRequired]
 		public bool AnimationMode { get; set; }
+
+		[YuzuRequired]
+		public bool ShowAnimationPath { get; set; }
 
 		[YuzuRequired]
 		public KeyFunction DefaultKeyFunction { get; set; }
