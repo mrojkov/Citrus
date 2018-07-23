@@ -660,7 +660,7 @@ namespace Tangerine
 		{
 			foreach (var arg in args) {
 				if (File.Exists(arg)) {
-					Project.Current?.OpenDocument(arg, pathIsGlobal: true);
+					Project.Current.OpenDocument(arg, pathIsGlobal: true);
 				}
 			}
 		}
