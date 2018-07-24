@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace Tangerine.Core.Operations
 {
-	public static class TimelineColumnRemove {
+	public static class TimelineColumnRemove
+	{
 		public static void Perform(int column)
 		{
 			var container = Document.Current.Container;
