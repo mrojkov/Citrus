@@ -108,26 +108,19 @@ namespace Tangerine
 			};
 
 			Project.OpenFileOutsideProjectAttempt += (string filePath) => {
-				var path = filePath.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-				path[0] += '\\';
-				string projectFilePath = null;
-				for (int i = path.Length - 2; i >= 0; i--) {
-					var ppp = Path.Combine(path.Take(i + 1).ToArray());
-					var projectFileCandidates = Directory.GetFiles(ppp, "*.citproj", SearchOption.TopDirectoryOnly);
-					if (projectFileCandidates.Length > 0) {
-						projectFilePath = projectFileCandidates[0];
-						break;
-					}
-				}
-				if (projectFilePath != null) {
+				var projectFilePath = SearhForCitproj(filePath);
+				if (projectFilePath != null && Project.Current.CitprojPath != projectFilePath) {
 					var alert = new AlertDialog($"You're trying to open a document outside the project directory. Change the current project to '{Path.GetFileName(projectFilePath)}'?", "Yes", "No");
 					if (alert.Show() == 0) {
-						FileOpenProject.Execute(projectFilePath);
-						Project.Current.OpenDocument(filePath, true);
+						if (FileOpenProject.Execute(projectFilePath)) {
+							Project.Current.OpenDocument(filePath, true);
+						}
 						return;
 					}
 				}
-				AlertDialog.Show("Can't open a document outside the project directory");
+				else if (projectFilePath == null) {
+					AlertDialog.Show("Can't open a document outside the project directory");
+				}
 			};
 			Project.Tasks = dockManager.MainWindowWidget.Tasks;
 			Project.Tasks.Add(new AutosaveProcessor(() => AppUserPreferences.Instance.AutosaveDelay));
@@ -216,10 +209,11 @@ namespace Tangerine
 				}
 			};
 			var proj = AppUserPreferences.Instance.RecentProjects.FirstOrDefault();
+			proj = null;
 			if (proj != null) {
 				new Project(proj).Open();
-				OpenDocumentsFromArgs(args);
 			}
+			OpenDocumentsFromArgs(args);
 			WidgetContext.Current.Root.AddChangeWatcher(() => Project.Current, project => TangerineMenu.OnProjectChanged(project));
 
 			WidgetContext.Current.Root.AddChangeWatcher(() => ProjectUserPreferences.Instance.RecentDocuments.Count == 0 ?
@@ -233,6 +227,27 @@ namespace Tangerine
 
 			Documentation.Init();
 			DocumentationComponent.Clicked = page => new HelpDialog(page);
+		}
+
+		private void OpenDocumentsFromArgs(string[] args)
+		{
+			foreach (var arg in args) {
+				Project.Current.OpenDocument(arg, pathIsGlobal: true);
+			}
+		}
+
+		private string SearhForCitproj(string filePath)
+		{
+			var path = filePath.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+			path[0] += Path.DirectorySeparatorChar;
+			for (int i = path.Length - 2; i >= 0; i--) {
+				var ppp = Path.Combine(path.Take(i + 1).ToArray());
+				var projectFileCandidates = Directory.GetFiles(ppp, "*.citproj", SearchOption.TopDirectoryOnly);
+				if (projectFileCandidates.Length > 0) {
+					return projectFileCandidates[0];
+				}
+			}
+			return null;
 		}
 
 		void SetupMainWindowTitle(WindowWidget windowWidget)
@@ -633,15 +648,6 @@ namespace Tangerine
 			} catch (InvalidOperationException e) {
 				Document.Current.History.RollbackTransaction();
 				AlertDialog.Show(e.Message);
-			}
-		}
-
-		static void OpenDocumentsFromArgs(string[] args)
-		{
-			foreach (var arg in args) {
-				if (File.Exists(arg)) {
-					Project.Current?.OpenDocument(arg, pathIsGlobal: true);
-				}
 			}
 		}
 	}
