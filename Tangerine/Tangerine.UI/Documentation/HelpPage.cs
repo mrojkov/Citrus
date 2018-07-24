@@ -51,6 +51,9 @@ namespace Tangerine.UI
 					$"<link rel=\"stylesheet\" type=\"text/css\" href=\"{Documentation.StyleSheetPath}\">" +
 					"</head>"
 				);
+				CommonMark.CommonMarkSettings.Default.OutputDelegate =
+					(doc, output, settings) =>
+					new CustomHtmlFormatter(output, settings).WriteDocument(doc);
 				CommonMark.CommonMarkConverter.Convert(sr, sw);
 			}
 		}
