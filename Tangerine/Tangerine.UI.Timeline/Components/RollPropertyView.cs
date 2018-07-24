@@ -50,7 +50,12 @@ namespace Tangerine.UI.Timeline.Components
 			var s = propRow.Animator.EditorState();
 			button.AddChangeWatcher(() => s.CurvesShown,
 				i => button.Texture = IconPool.GetTexture(i ? "Timeline.Expanded" : "Timeline.Collapsed"));
-			button.Clicked += () => Core.Operations.SetProperty.Perform(s, nameof(AnimatorEditorState.CurvesShown), !s.CurvesShown);
+			button.Clicked += () => {
+				Core.Operations.SetProperty.Perform(s, nameof(AnimatorEditorState.CurvesShown), !s.CurvesShown);
+				if (s.CurvesShown) {
+					Timeline.Instance.EnsureRowChildsVisible(row);
+				}
+			};
 			return button;
 		}
 
