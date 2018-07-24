@@ -647,7 +647,7 @@ namespace Tangerine.UI
 		}
 	}
 
-	public class IntPropertyEditor : CommonPropertyEditor<int>, ISaveAfterEdit
+	public class IntPropertyEditor : CommonPropertyEditor<int>
 	{
 		private EditBox editor;
 
