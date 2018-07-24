@@ -21,7 +21,7 @@ namespace Tangerine.UI.Timeline.Components
 		protected readonly ToolbarButton lockButton;
 		protected readonly ToolbarButton lockAnimationButton;
 		protected readonly Widget indentSpacer;
-		protected readonly Image imageCombiner;
+		protected readonly Image imageCombinerIndicator;
 
 		private static readonly Color4[] ColorMarks = {
 			Color4.Transparent,
@@ -69,12 +69,9 @@ namespace Tangerine.UI.Timeline.Components
 			}));
 			expandButtonContainer.Updating += delta =>
 				expandButton.Visible = nodeData.Node.Animators.Count > 0;
-			imageCombiner = new Image(nodeData.Node.GetType() == typeof(ImageCombiner)
-									? IconPool.GetTexture("Timeline.NoEntry")
-									: NodeIconPool.GetTexture(typeof(ImageCombiner)))
-			{
+			imageCombinerIndicator = new Image {
+				Texture = nodeData.Node is ImageCombiner ? IconPool.GetTexture("Timeline.NoEntry") : NodeIconPool.GetTexture(typeof(ImageCombiner)),
 				Color = Color4.Transparent,
-				HitTestTarget = false,
 				MinMaxSize = new Vector2(21, 16),
 				Padding = new Thickness { Left = 5 },
 			};
@@ -94,7 +91,7 @@ namespace Tangerine.UI.Timeline.Components
 					new HSpacer(3),
 					label,
 					editBox,
-					imageCombiner,
+					imageCombinerIndicator,
 					new Widget(),
 					(Widget)enterButton ?? (Widget)new HSpacer(Theme.Metrics.DefaultToolbarButtonSize.X),
 					lockAnimationButton,
@@ -143,13 +140,13 @@ namespace Tangerine.UI.Timeline.Components
 			IImageCombinerArg arg2;
 			if (combiner.GetArgs(out arg1, out arg2)) {
 				view.label.Color = ColorTheme.Current.Basic.BlackText;
-				view.imageCombiner.Color = Color4.Transparent;
-			}
-			else {
+				view.imageCombinerIndicator.Color = Color4.Transparent;
+			} else {
 				view.label.Color = ColorTheme.Current.Basic.RedText;
-				view.imageCombiner.Color = Color4.White;
+				view.imageCombinerIndicator.Color = Color4.White;
 			}
 		}
+		
 		private static void UpdateIsImageCombinerArg(Row row, RollNodeView view)
 		{
 			var arg = row.Components.Get<NodeRow>()?.Node as IImageCombinerArg;
@@ -171,7 +168,7 @@ namespace Tangerine.UI.Timeline.Components
 				result |= image.Parent.Nodes[index - 1] is IImageCombinerArg
 					&& image.Parent.Nodes[index - 2] is ImageCombiner;
 			}
-			view.imageCombiner.Color = result ? Color4.White : Color4.Transparent;
+			view.imageCombinerIndicator.Color = result ? Color4.White : Color4.Transparent;
 		}
 
 		public Widget Widget => widget;
