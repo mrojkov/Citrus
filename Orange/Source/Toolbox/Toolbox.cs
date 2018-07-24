@@ -3,12 +3,27 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Lime;
+using Environment = System.Environment;
 
 namespace Orange
 {
 	public static class Toolbox
 	{
 		private static readonly char[] CmdArgumentDelimiters = { ':' };
+		private static readonly TangerineFlags[] ignoredTangerineFlags;
+
+		static Toolbox()
+		{
+			var tmpList = new List<TangerineFlags>();
+			foreach (Enum value in Enum.GetValues(typeof(TangerineFlags))) {
+				var memberInfo = typeof(TangerineFlags).GetMember(value.ToString())[0];
+				if (memberInfo.GetCustomAttribute<TangerineIgnoreAttribute>(false) != null) {
+					tmpList.Add((TangerineFlags)value);
+				}
+			}
+			ignoredTangerineFlags = tmpList.ToArray();
+		}
 
 		public static string ToWindowsSlashes(string path)
 		{
@@ -91,6 +106,39 @@ namespace Orange
 			var baseUri = new Uri(Path.GetFullPath(basePath), UriKind.Absolute);
 			var uri = new Uri(Path.GetFullPath(path), UriKind.Absolute);
 			return baseUri.MakeRelativeUri(uri).OriginalString;
+		}
+
+		public static Node CreateCloneForSerialization(Node node)
+		{
+			var clone = node.Clone();
+			Action<Node> f = (n) => {
+				foreach (var tangerineFlag in ignoredTangerineFlags) {
+					n.SetTangerineFlag(tangerineFlag, false);
+				}
+				n.AnimationFrame = 0;
+				if (n.Folders != null && n.Folders.Count == 0) {
+					n.Folders = null;
+				}
+				foreach (var a in n.Animators.ToList()) {
+					if (a.ReadonlyKeys.Count == 0) {
+						n.Animators.Remove(a);
+					}
+				}
+				if (!string.IsNullOrEmpty(n.ContentsPath)) {
+					n.Nodes.Clear();
+					n.Markers.Clear();
+				}
+				if (n.AsWidget?.SkinningWeights?.IsEmpty() ?? false) {
+					n.AsWidget.SkinningWeights = null;
+				} else if ((n as PointObject)?.SkinningWeights?.IsEmpty() ?? false) {
+					(n as PointObject).SkinningWeights = null;
+				}
+			};
+			f(clone);
+			foreach (var n in clone.Descendants) {
+				f(n);
+			}
+			return clone;
 		}
 	}
 }

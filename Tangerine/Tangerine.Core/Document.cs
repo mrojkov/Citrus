@@ -33,8 +33,6 @@ namespace Tangerine.Core
 
 		public static readonly string[] AllowedFileTypes = { "scene", "tan", "t3d", "fbx" };
 
-		private static readonly TangerineFlags[] ignoredTangerineFlags;
-
 		readonly string defaultPath = "Untitled";
 		readonly Vector2 defaultSceneSize = new Vector2(1024, 768);
 
@@ -115,18 +113,6 @@ namespace Tangerine.Core
 		public ResolutionPreview ResolutionPreview { get; set; } = new ResolutionPreview();
 		public bool InspectRootNode { get; set; }
 		public string AnimationId { get; set; }
-
-		static Document()
-		{
-			var tmpList = new List<TangerineFlags>();
-			foreach (Enum value in Enum.GetValues(typeof(TangerineFlags))) {
-				var memberInfo = typeof(TangerineFlags).GetMember(value.ToString())[0];
-				if (memberInfo.GetCustomAttribute<TangerineIgnoreAttribute>(false) != null) {
-					tmpList.Add((TangerineFlags) value);
-				}
-			}
-			ignoredTangerineFlags = tmpList.ToArray();
-		}
 
 		public Document(DocumentFormat format = DocumentFormat.Scene, Type rootType = null)
 		{
@@ -378,35 +364,7 @@ namespace Tangerine.Core
 
 		public static Node CreateCloneForSerialization(Node node)
 		{
-			var clone = node.Clone();
-			Action<Node> f = (n) => {
-				foreach (var tangerineFlag in ignoredTangerineFlags) {
-					n.SetTangerineFlag(tangerineFlag, false);
-				}
-				n.AnimationFrame = 0;
-				if (n.Folders != null && n.Folders.Count == 0) {
-					n.Folders = null;
-				}
-				foreach (var a in n.Animators.ToList()) {
-					if (a.ReadonlyKeys.Count == 0) {
-						n.Animators.Remove(a);
-					}
-				}
-				if (!string.IsNullOrEmpty(n.ContentsPath)) {
-					n.Nodes.Clear();
-					n.Markers.Clear();
-				}
-				if (n.AsWidget?.SkinningWeights?.IsEmpty() ?? false) {
-					n.AsWidget.SkinningWeights = null;
-				} else if ((n as PointObject)?.SkinningWeights?.IsEmpty() ?? false) {
-					(n as PointObject).SkinningWeights = null;
-				}
-			};
-			f(clone);
-			foreach (var n in clone.Descendants) {
-				f(n);
-			}
-			return clone;
+			return Orange.Toolbox.CreateCloneForSerialization(node);
 		}
 
 		public IEnumerable<Row> SelectedRows()
