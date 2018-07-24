@@ -8,8 +8,6 @@ namespace Tangerine
 	{
 		readonly Widget widget;
 
-		public Widget Widget { get => widget; }
-
 		public Toolbar(Widget container)
 		{
 			widget = new Widget();
