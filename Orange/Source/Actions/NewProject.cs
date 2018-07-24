@@ -47,7 +47,7 @@ namespace Orange
 			NewProjectAction(null);
 		}
 
-		public static void NewProjectAction(Action<string> projectOpened)
+		public static void NewProjectAction(Func<string, bool> projectOpened)
 		{
 			Application.InvokeOnMainThread(() => {
 				var citrusPath = Toolbox.CalcCitrusDirectory();
