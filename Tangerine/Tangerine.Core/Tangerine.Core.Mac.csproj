@@ -97,6 +97,7 @@
     <Compile Include="ResolutionPreview.cs" />
     <Compile Include="TangerineAssetBundle.cs" />
     <Compile Include="BackupManager.cs" />
+    <Compile Include="Operations\TimelineColumnRemove.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>
