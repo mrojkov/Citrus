@@ -36,7 +36,7 @@ namespace Tangerine.UI.SceneView
 						if (points.Count < 2) {
 							continue;
 						}
-						var transform = SceneView.Instance.Scene.CalcTransitionToSpaceOf(SceneView.Instance.Frame);
+						var transform = node.Parent.AsWidget.CalcTransitionToSpaceOf(SceneView.Instance.Frame);
 						SceneView.Instance.Frame.PrepareRendererState();
 						for (int i = 0; i < points.Count - 1; ++i) {
 							var approximation = Approximate(points, i, i + 1, keys[i].Function, 10, transform);

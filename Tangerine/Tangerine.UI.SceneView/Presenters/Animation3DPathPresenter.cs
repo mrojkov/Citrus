@@ -37,13 +37,17 @@ namespace Tangerine.UI.SceneView
 						if (points.Count < 2) {
 							continue;
 						}
+						var worldTransform = Matrix44.Identity;
+						if (node.Parent.AsNode3D != null) {
+							worldTransform = node.Parent.AsNode3D.GlobalTransform;
+						}
 						var viewportToSceneFrame = viewport.CalcTransitionToSpaceOf(SceneView.Instance.Frame);
 						SceneView.Instance.Frame.PrepareRendererState();
 						for (int i = 0; i < points.Count - 1; ++i) {
 							var approximation = Approximate(points, i, i + 1, keys[i].Function, 10);
-							var start = (Vector2)viewport.WorldToViewportPoint(approximation[0]) * viewportToSceneFrame;
+							var start = (Vector2)viewport.WorldToViewportPoint(approximation[0] * worldTransform) * viewportToSceneFrame;
 							for (int j = 1; j < approximation.Count; ++j) {
-								var end = (Vector2)viewport.WorldToViewportPoint(approximation[j]) * viewportToSceneFrame;
+								var end = (Vector2)viewport.WorldToViewportPoint(approximation[j] * worldTransform) * viewportToSceneFrame;
 								Renderer.DrawDashedLine(
 									start, end, ColorTheme.Current.SceneView.PointObject, new Vector2(4, 1));
 								start = end;
