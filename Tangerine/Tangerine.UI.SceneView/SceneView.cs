@@ -6,6 +6,7 @@ using Tangerine.Core;
 using Tangerine.Core.Operations;
 using Tangerine.UI.Docking;
 using Tangerine.UI.SceneView.Presenters;
+using Tangerine.UI.SceneView.Processors;
 
 namespace Tangerine.UI.SceneView
 {
@@ -233,7 +234,8 @@ namespace Tangerine.UI.SceneView
 				new MouseSelectionProcessor(),
 				new ShiftClickProcessor(),
 				new PreviewAnimationProcessor(),
-				new ResolutionPreviewProcessor()
+				new ResolutionPreviewProcessor(),
+				new DragNineGridLineProcessor()
 			);
 		}
 

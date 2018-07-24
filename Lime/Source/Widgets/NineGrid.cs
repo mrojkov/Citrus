@@ -174,29 +174,58 @@ namespace Lime
 			}
 			return false;
 		}
-	}
 
-	public class NineGridLine
-	{
-		private readonly int indexA;
-		private readonly int indexB;
-		private readonly NineGrid nineGrid;
-
-		public NineGridLine(int indexA, int indexB, NineGrid nineGrid)
+		private static float DistanceFromPointToLine(Vector2 A, Vector2 B, Vector2 P)
 		{
-			this.indexA = indexA;
-			this.indexB = indexB;
-			this.nineGrid = nineGrid;
+			var a = A.Y - B.Y;
+			var b = B.X - A.X;
+			var c = B.Y * A.X - A.Y * B.X;
+			return Mathf.Abs(P.X * a + P.Y * b + c) / Mathf.Sqrt(a * a + b * b);
 		}
 
-		public void Render(Widget canvas)
+		public bool HitTest(Vector2 point, Widget canvas)
 		{
-			var matrix = nineGrid.CalcTransitionToSpaceOf(canvas);
-			var A = matrix.TransformVector(nineGrid.Parts[indexA].Rect.A);
-			var B = matrix.TransformVector(nineGrid.Parts[indexB].Rect.B);
-			Renderer.DrawLine(A, B, Color4.Red);
+			var matrix = CalcTransitionToSpaceOf(canvas);
+			var A = matrix.TransformVector(new Vector2(0, 0));
+			var B = matrix.TransformVector(new Vector2(Width, 0));
+			var C = matrix.TransformVector(new Vector2(Width, Height));
+			var D = matrix.TransformVector(new Vector2(0, Height));
+			return DistanceFromPointToLine(A, B, point) <= Height
+				&& DistanceFromPointToLine(A, D, point) <= Width
+				&& DistanceFromPointToLine(D, C, point) <= Height
+				&& DistanceFromPointToLine(B, C, point) <= Width;
 		}
 
-	}
+		public class NineGridLine
+		{
+			private readonly int indexA;
+			private readonly int indexB;
+			private readonly NineGrid nineGrid;
+			private Vector2 A => nineGrid.Parts[indexA].Rect.A;
+			private Vector2 B => nineGrid.Parts[indexB].Rect.B;
 
+			public NineGridLine(int indexA, int indexB, NineGrid nineGrid)
+			{
+				this.indexA = indexA;
+				this.indexB = indexB;
+				this.nineGrid = nineGrid;
+			}
+
+			public void Render(Widget canvas)
+			{
+				var matrix = nineGrid.CalcTransitionToSpaceOf(canvas);
+				var A = matrix.TransformVector(this.A);
+				var B = matrix.TransformVector(this.B);
+				Renderer.DrawLine(A, B, Color4.Red);
+			}
+
+			public bool HitTest(Vector2 point, Widget canvas, float radius = 10)
+			{
+				var matrix = nineGrid.CalcTransitionToSpaceOf(canvas);
+				var A = matrix.TransformVector(this.A);
+				var B = matrix.TransformVector(this.B);
+				return NineGrid.DistanceFromPointToLine(A, B, point) <= radius;
+			}
+		}
+	}
 }

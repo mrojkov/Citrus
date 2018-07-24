@@ -66,6 +66,7 @@
     <Compile Include="Presenters\InspectRootNodePresenter.cs" />
     <Compile Include="Presenters\NineGridLinePresenter.cs" />
     <Compile Include="Presenters\ParticleEmitterPresenter.cs" />
+    <Compile Include="Processors\DragNineGridLineProcessor.cs" />
     <Compile Include="Processors\ResolutionPreviewProcessor.cs" />
     <Compile Include="ResolutionHandlers.cs" />
     <Compile Include="Widgets\ZoomWidget.cs" />
