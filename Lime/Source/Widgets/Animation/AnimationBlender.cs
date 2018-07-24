@@ -1,38 +1,170 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using Yuzu;
 
 namespace Lime
 {
-	public class AnimationBlending
-	{
-		public BlendingOption Option;
-		public readonly Dictionary<string, MarkerBlending> MarkersOptions = new Dictionary<string, MarkerBlending>();
-	}
-
-	public class MarkerBlending
-	{
-		public BlendingOption Option;
-		public readonly Dictionary<string, BlendingOption> SourceMarkersOptions = new Dictionary<string, BlendingOption>();
-	}
-
-	public class BlendingOption
-	{
-		public double Duration;
-
-		public double DurationInFrames => AnimationUtils.SecondsToFrames(Duration);
-
-		public BlendingOption() { }
-
-		public BlendingOption(double duration)
-		{
-			Duration = duration;
-		}
-
-		public BlendingOption(int frames) : this(AnimationUtils.FramesToSeconds(frames)) { }
-	}
-
+	[TangerineRegisterComponent]
 	public class AnimationBlender : NodeComponent
 	{
+		private Dictionary<string, BlendingProcess> blendings = new Dictionary<string, BlendingProcess>();
+
+		[YuzuMember]
+		public readonly Dictionary<string, AnimationBlending> Options = new Dictionary<string, AnimationBlending>();
+
+		[TangerineInspect]
+		public double BlendDuration
+		{
+			get {
+				if (Owner == null) {
+					return 0;
+				}
+				AnimationBlending animationBlending;
+				Options.TryGetValue(Owner.DefaultAnimation.Id ?? "", out animationBlending);
+				return animationBlending?.Option.Frames ?? 0;
+			}
+			set {
+				if (Owner == null) {
+					throw new InvalidOperationException();
+				}
+				var animationId = Owner.DefaultAnimation.Id ?? "";
+				AnimationBlending animationBlending;
+				if (!Options.TryGetValue(animationId, out animationBlending)) {
+					animationBlending = new AnimationBlending {
+						Option = new BlendingOption()
+					};
+					Options.Add(animationId, animationBlending);
+				}
+				animationBlending.Option.Frames = value;
+			}
+		}
+
+		protected override void OnOwnerChanged(Node oldOwner)
+		{
+			if (oldOwner != null) {
+				foreach (var animation in oldOwner.Animations) {
+					animation.AnimationEngine = DefaultAnimationEngine.Instance;
+				}
+			}
+			if (Owner != null) {
+				foreach (var animation in Owner.Animations) {
+					animation.AnimationEngine = BlendAnimationEngine.Instance;
+				}
+			}
+		}
+
+		public void Attach(Animation animation, string markerId, string sourceMarkerId = null)
+		{
+			blendings.Remove(animation.Id ?? "");
+
+			BlendingOption blendingOption = null;
+			AnimationBlending animationBlending;
+			Options.TryGetValue(animation.Id ?? "", out animationBlending);
+			if (animationBlending != null) {
+				if (animationBlending.Option != null) {
+					blendingOption = animationBlending.Option;
+				}
+
+				MarkerBlending markerBlending;
+				animationBlending.MarkersOptions.TryGetValue(markerId, out markerBlending);
+				if (markerBlending != null) {
+					if (markerBlending.Option != null) {
+						blendingOption = markerBlending.Option;
+					}
+					if (!string.IsNullOrEmpty(sourceMarkerId)) {
+						BlendingOption sourceMarkerBlending;
+						markerBlending.SourceMarkersOptions.TryGetValue(sourceMarkerId, out sourceMarkerBlending);
+						if (sourceMarkerBlending != null) {
+							blendingOption = sourceMarkerBlending;
+						}
+					}
+				}
+			}
+			if (blendingOption == null) {
+				return;
+			}
+
+			var blending = new BlendingProcess(Owner, animation, blendingOption.Duration);
+			if (blending.HasNodes) {
+				blendings.Add(animation.Id ?? "", blending);
+			}
+		}
+
+		public void UpdateWantedState(Animation animation)
+		{
+			BlendingProcess blending;
+			blendings.TryGetValue(animation.Id ?? "", out blending);
+			blending?.SaveWantedState();
+		}
+
+		public void Update(Animation animation, float delta)
+		{
+			BlendingProcess blending;
+			blendings.TryGetValue(animation.Id ?? "", out blending);
+			if (blending == null) {
+				return;
+			}
+
+			blending.Update(delta);
+			if (blending.WasFinished) {
+				blendings.Remove(animation.Id ?? "");
+			}
+		}
+
+		public override NodeComponent Clone()
+		{
+			var clone = (AnimationBlender)base.Clone();
+			clone.blendings = new Dictionary<string, BlendingProcess>();
+			return clone;
+		}
+
+		private class BlendingProcess
+		{
+			private readonly double duration;
+			private readonly List<NodeState> nodeStates = new List<NodeState>();
+			private float time;
+
+			public bool HasNodes => nodeStates.Count > 0;
+			public bool WasFinished => time >= duration;
+
+			public BlendingProcess(Node node, Animation animation, double duration)
+			{
+				this.duration = duration;
+
+				foreach (var descendant in node.Descendants) {
+					var nodeState = NodeState.TryGetState(descendant, animation);
+					if (nodeState != null) {
+						nodeStates.Add(nodeState);
+					}
+				}
+			}
+
+			public void SaveWantedState()
+			{
+				if (WasFinished) {
+					return;
+				}
+
+				foreach (var nodeState in nodeStates) {
+					nodeState.SaveWantedState();
+				}
+			}
+
+			public void Update(float delta)
+			{
+				time += delta;
+				if (WasFinished) {
+					return;
+				}
+
+				var factor = (float)(time / duration);
+				foreach (var nodeState in nodeStates) {
+					nodeState.Blend(factor);
+				}
+			}
+		}
+
 		private abstract class NodeState
 		{
 			public static NodeState TryGetState(Node node, Animation animation)
@@ -53,7 +185,6 @@ namespace Lime
 				if (bone != null) {
 					return BoneState.TryGetState(bone, animation);
 				}
-
 				return null;
 			}
 
@@ -292,121 +423,47 @@ namespace Lime
 				bone.Rotation = Interpolate2DRotation(factor, rotation, wantedRotation);
 			}
 		}
+	}
 
-		private class BlendingProcess
+	public class AnimationBlending
+	{
+		[YuzuMember]
+		public BlendingOption Option;
+
+		[YuzuMember]
+		public readonly Dictionary<string, MarkerBlending> MarkersOptions = new Dictionary<string, MarkerBlending>();
+	}
+
+	public class MarkerBlending
+	{
+		[YuzuMember]
+		public BlendingOption Option;
+
+		[YuzuMember]
+		public readonly Dictionary<string, BlendingOption> SourceMarkersOptions = new Dictionary<string, BlendingOption>();
+	}
+
+	public class BlendingOption
+	{
+		[YuzuMember]
+		public double Duration { get; set; }
+
+		public double Frames
 		{
-			private readonly double duration;
-			private readonly List<NodeState> nodeStates = new List<NodeState>();
-			private float time;
-
-			public bool HasNodes => nodeStates.Count > 0;
-			public bool WasFinished => time >= duration;
-
-			public BlendingProcess(Node node, Animation animation, double duration)
-			{
-				this.duration = duration;
-
-				foreach (var descendant in node.Descendants) {
-					var nodeState = NodeState.TryGetState(descendant, animation);
-					if (nodeState != null) {
-						nodeStates.Add(nodeState);
-					}
-				}
-			}
-
-			public void SaveWantedState()
-			{
-				if (WasFinished) {
-					return;
-				}
-
-				for (var i = 0; i < nodeStates.Count; i++) {
-					nodeStates[i].SaveWantedState();
-				}
-			}
-
-			public void Update(float delta)
-			{
-				time += delta;
-				if (WasFinished) {
-					return;
-				}
-
-				var factor = (float)(time / duration);
-				for (var i = 0; i < nodeStates.Count; i++) {
-					nodeStates[i].Blend(factor);
-				}
-			}
+			get { return AnimationUtils.SecondsToFrames(Duration); }
+			set { Duration = value * AnimationUtils.SecondsPerFrame; }
 		}
 
-		private Dictionary<string, BlendingProcess> blendings = new Dictionary<string, BlendingProcess>();
+		public BlendingOption() { }
 
-		public readonly Dictionary<string, AnimationBlending> Options = new Dictionary<string, AnimationBlending>();
-
-		public void Attach(Animation animation, string markerId, string sourceMarkerId = null)
+		public BlendingOption(double duration)
 		{
-			blendings.Remove(animation.Id ?? "");
-
-			BlendingOption blendingOption = null;
-			AnimationBlending animationBlending;
-			Options.TryGetValue(animation.Id ?? "", out animationBlending);
-			if (animationBlending != null) {
-				if (animationBlending.Option != null) {
-					blendingOption = animationBlending.Option;
-				}
-
-				MarkerBlending markerBlending;
-				animationBlending.MarkersOptions.TryGetValue(markerId, out markerBlending);
-				if (markerBlending != null) {
-					if (markerBlending.Option != null) {
-						blendingOption = markerBlending.Option;
-					}
-					if (!string.IsNullOrEmpty(sourceMarkerId)) {
-						BlendingOption sourceMarkerBlending;
-						markerBlending.SourceMarkersOptions.TryGetValue(sourceMarkerId, out sourceMarkerBlending);
-						if (sourceMarkerBlending != null) {
-							blendingOption = sourceMarkerBlending;
-						}
-					}
-				}
-			}
-			if (blendingOption == null) {
-				return;
-			}
-
-			var blending = new BlendingProcess(Owner, animation, blendingOption.Duration);
-			if (blending.HasNodes) {
-				blendings.Add(animation.Id ?? "", blending);
-			}
+			Duration = duration;
 		}
 
-		public void UpdateWantedState(Animation animation)
+		public BlendingOption(int frames)
 		{
-			BlendingProcess blending;
-			blendings.TryGetValue(animation.Id ?? "", out blending);
-			blending?.SaveWantedState();
-		}
-
-		public void Update(Animation animation, float delta)
-		{
-			BlendingProcess blending;
-			blendings.TryGetValue(animation.Id ?? "", out blending);
-			if (blending == null) {
-				return;
-			}
-
-			blending.Update(delta);
-			if (blending.WasFinished) {
-				blendings.Remove(animation.Id ?? "");
-			}
-		}
-
-		public override NodeComponent Clone()
-		{
-			var clone = (AnimationBlender)base.Clone();
-			clone.Owner = null;
-			clone.blendings = new Dictionary<string, BlendingProcess>();
-			return clone;
+			Frames = frames;
 		}
 	}
 }

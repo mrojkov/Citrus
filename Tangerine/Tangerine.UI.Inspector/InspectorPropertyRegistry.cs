@@ -31,6 +31,7 @@ namespace Tangerine.UI.Inspector
 			AddEditor(c => c.PropertyName == "Text", c => new StringPropertyEditor(c, multiline: true));
 			AddEditor(typeof(string), c => new StringPropertyEditor(c));
 			AddEditor(typeof(float), c => new FloatPropertyEditor(c));
+			AddEditor(typeof(double), c => new DoublePropertyEditor(c));
 			AddEditor(typeof(bool), c => new BooleanPropertyEditor(c));
 			AddEditor(typeof(int), c => new IntPropertyEditor(c));
 			AddEditor(typeof(Color4), c => new Color4PropertyEditor(c));

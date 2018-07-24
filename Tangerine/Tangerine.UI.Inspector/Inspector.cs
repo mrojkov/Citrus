@@ -74,20 +74,27 @@ namespace Tangerine.UI.Inspector
 
 		private void CreateWatchersToRebuild()
 		{
-			RootWidget.AddChangeLateWatcher(() => CalcSelectedRowsHashcode(), _ => Rebuild());
-			RootWidget.AddChangeWatcher(() => Document.Current.InspectRootNode, _ => Rebuild(resetInspectRootNode: false));
+			RootWidget.AddChangeLateWatcher(CalcSelectedRowsHashcode, _ => Rebuild());
 		}
 
 		private static int CalcSelectedRowsHashcode()
 		{
 			var r = 0;
-			foreach (var row in Document.Current.Rows) {
-				if (row.Selected) {
-					r ^= row.GetHashCode();
-					var node = row.Components.Get<NodeRow>()?.Node;
-					if (node != null) {
-						foreach (var component in node.Components) {
-							r ^= component.GetHashCode();
+			if (Document.Current.InspectRootNode) {
+				var rootNode = Document.Current.RootNode;
+				r ^= rootNode.GetHashCode();
+				foreach (var component in rootNode.Components) {
+					r ^= component.GetHashCode();
+				}
+			} else {
+				foreach (var row in Document.Current.Rows) {
+					if (row.Selected) {
+						r ^= row.GetHashCode();
+						var node = row.Components.Get<NodeRow>()?.Node;
+						if (node != null) {
+							foreach (var component in node.Components) {
+								r ^= component.GetHashCode();
+							}
 						}
 					}
 				}
@@ -95,17 +102,12 @@ namespace Tangerine.UI.Inspector
 			return r;
 		}
 
-		private void Rebuild(bool resetInspectRootNode = true)
+		private void Rebuild()
 		{
 			content.BuildForObjects(Document.Current.InspectRootNode ? new[] { Document.Current.RootNode } : Document.Current.SelectedNodes().ToArray());
 			InspectorCommands.InspectRootNodeCommand.Icon = Document.Current.InspectRootNode ? inspectRootActivatedTexture : inspectRootDeactivatedTexture;
 			Toolbar.Rebuild();
 			RootWidget.ScrollPosition = RootWidget.MinScrollPosition;
-			// Evgenii Polikutin: "if" used instead of "=" to avoid firing
-			// more Rebuild() events on turning InspectRootNode to true.
-			if (resetInspectRootNode) {
-				Document.Current.InspectRootNode = false;
-			}
 		}
 	}
 }
