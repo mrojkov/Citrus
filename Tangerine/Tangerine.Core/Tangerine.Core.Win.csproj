@@ -59,6 +59,7 @@
     <Compile Include="Operations\SelectRow.cs" />
     <Compile Include="Operations\SelectRowRange.cs" />
     <Compile Include="Operations\SyncFolderDescriptorsProcessor.cs" />
+    <Compile Include="Operations\TimelineColumnRemove.cs" />
     <Compile Include="Operations\TimelineHorizontalShift.cs" />
     <Compile Include="Project.cs" />
     <Compile Include="ProjectPreferences.cs" />

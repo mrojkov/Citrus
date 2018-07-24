@@ -184,7 +184,6 @@ namespace Tangerine
 				new Core.Operations.DeleteComponent.Processor(),
 				new Core.Operations.DistortionMeshProcessor(),
 				new Core.Operations.SyncFolderDescriptorsProcessor(),
-				new Core.Operations.TimelineHorizontalShift.Processor(),
 				new UI.SceneView.ResolutionPreviewOperation.Processor(),
 				new UI.Timeline.Operations.SelectGridSpan.Processor(),
 				new UI.Timeline.Operations.DeselectGridSpan.Processor(),

@@ -4,65 +4,44 @@ using Lime;
 
 namespace Tangerine.Core.Operations
 {
-	public class TimelineHorizontalShift : Operation
+	public static class TimelineHorizontalShift
 	{
-		public readonly int Column;
-		public readonly int Direction;
-		public override bool IsChangingDocument => true;
-
 		public static void Perform(int column, int direction)
 		{
-			Document.Current.History.Perform(new TimelineHorizontalShift(column, direction));
-		}
-
-		private TimelineHorizontalShift(int column, int direction)
-		{
-			Column = column;
-			Direction = direction;
-		}
-
-		public class Processor : OperationProcessor<TimelineHorizontalShift>
-		{
-			protected override void InternalDo(TimelineHorizontalShift op)
-			{
-				var container = Document.Current.Container;
-				foreach (var node in container.Nodes) {
-					foreach (var animator in node.Animators.Where(i => i.AnimationId == Document.Current.AnimationId).ToList()) {
-						var keys = op.Direction > 0 ? animator.ReadonlyKeys.Reverse() : animator.ReadonlyKeys;
-						foreach (var k in keys.ToList()) {
-							if (k.Frame >= op.Column) {
-								var k1 = k.Clone();
-								k1.Frame += op.Direction.Sign();
-								if (op.Direction > 0 || k.Frame > op.Column) {
-									SetKeyframe.Perform(animator, k1);
-								}
-								// Order is importent. RemoveKeyframe must be after SetKeyframe,
-								// to prevent animator clean up if all keys were removed.
-								RemoveKeyframe.Perform(animator, k.Frame);
+			var container = Document.Current.Container;
+			foreach (var node in container.Nodes) {
+				foreach (var animator in node.Animators.Where(i => i.AnimationId == Document.Current.AnimationId).ToList()) {
+					var keys = direction > 0 ? animator.ReadonlyKeys.Reverse() : animator.ReadonlyKeys;
+					foreach (var k in keys.ToList()) {
+						if (k.Frame >= column) {
+							var k1 = k.Clone();
+							k1.Frame += direction.Sign();
+							if (direction > 0 || k.Frame > column) {
+								SetKeyframe.Perform(animator, k1);
 							}
-						}
-					}
-				}
-				var markers = container.Markers.ToList();
-				if (op.Direction > 0) {
-					markers.Reverse();
-				}
-				foreach (var m in markers) {
-					if (m.Frame >= op.Column) {
-						var m1 = m.Clone();
-						m1.Frame += op.Direction.Sign();
-						bool isReSet = op.Direction > 0 || m.Frame > op.Column;
-
-						DeleteMarker.Perform(container, m, !isReSet);
-						if (isReSet) {
-							SetMarker.Perform(container, m1, false);
+							// Order is importent. RemoveKeyframe must be after SetKeyframe,
+							// to prevent animator clean up if all keys were removed.
+							RemoveKeyframe.Perform(animator, k.Frame);
 						}
 					}
 				}
 			}
+			var markers = container.Markers.ToList();
+			if (direction > 0) {
+				markers.Reverse();
+			}
+			foreach (var m in markers) {
+				if (m.Frame >= column) {
+					var m1 = m.Clone();
+					m1.Frame += direction.Sign();
+					bool isReSet = direction > 0 || m.Frame > column;
 
-			protected override void InternalRedo(TimelineHorizontalShift op) { }
-			protected override void InternalUndo(TimelineHorizontalShift op) { }
+					DeleteMarker.Perform(container, m, !isReSet);
+					if (isReSet) {
+						SetMarker.Perform(container, m1, false);
+					}
+				}
+			}
 		}
 	}
 }
