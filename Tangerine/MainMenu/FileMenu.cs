@@ -78,7 +78,7 @@ namespace Tangerine
 
 		public override void Execute()
 		{
-			if (Document.Current.History.IsTransactionActive) {
+			if (Document.Current != null && Document.Current.History.IsTransactionActive) {
 				return;
 			}
 			Project.Current.NewDocument(format, rootType);
