@@ -33,6 +33,7 @@ namespace Tangerine.UI
 		public static readonly ICommand PasteKeyframes = new Command("Paste keyframes", new Shortcut(Modifiers.Alt | Modifiers.Control, Key.V));
 		public static readonly ICommand MoveDown = new Command("Move down", new Shortcut(Modifiers.Control, Key.LBracket));
 		public static readonly ICommand MoveUp = new Command("Move up", new Shortcut(Modifiers.Control, Key.RBracket));
+		public static readonly ICommand ReverseKeyframes = new Command("Reverse keyframes");
 	}
 
 	public static class InspectorCommands

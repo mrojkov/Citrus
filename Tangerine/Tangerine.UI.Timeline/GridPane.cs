@@ -73,6 +73,8 @@ namespace Tangerine.UI.Timeline
 						TimelineCommands.CopyKeyframes,
 						TimelineCommands.PasteKeyframes,
 						Command.MenuSeparator,
+						TimelineCommands.ReverseKeyframes,
+						Command.MenuSeparator,
 						GenericCommands.InsertTimelineColumn,
 						GenericCommands.RemoveTimelineColumn,
 						TimelineCommands.DeleteKeyframes,
