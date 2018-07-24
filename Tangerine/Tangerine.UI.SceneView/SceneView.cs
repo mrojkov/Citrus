@@ -5,6 +5,7 @@ using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Operations;
 using Tangerine.UI.Docking;
+using Tangerine.UI.SceneView.Presenters;
 
 namespace Tangerine.UI.SceneView
 {
@@ -250,6 +251,7 @@ namespace Tangerine.UI.SceneView
 			new DistortionMeshPresenter(this);
 			new FrameBorderPresenter(this);
 			new InspectRootNodePresenter(this);
+			new NineGridLinePresenter(this);
 		}
 
 		public void CreateNode(Type nodeType, ICommand command)

@@ -1,3 +1,4 @@
+using System;
 using Yuzu;
 
 namespace Lime
@@ -25,7 +26,7 @@ namespace Lime
 		[TangerineKeyframeColor(18)]
 		public float BottomOffset { get; set; }
 
-		struct Part
+		public struct Part
 		{
 			public Rectangle Rect;
 			public Rectangle UV;
@@ -33,11 +34,18 @@ namespace Lime
 
 		Part[] layout = new Part[9];
 
+		public Part[] Parts => layout;
+		public NineGridLine[] Lines { get; } = new NineGridLine[4];
+
 		public NineGrid()
 		{
 			Presenter = DefaultPresenter.Instance;
 			HitTestMethod = HitTestMethod.Contents;
 			Texture = new SerializableTexture();
+			Lines[0] = new NineGridLine(5, 2, this);
+			Lines[1] = new NineGridLine(1 ,6, this);
+			Lines[2] = new NineGridLine(7, 1, this);
+			Lines[3] = new NineGridLine(2, 8, this);
 		}
 
 		void BuildLayout(Part[] layout)
@@ -167,4 +175,28 @@ namespace Lime
 			return false;
 		}
 	}
+
+	public class NineGridLine
+	{
+		private readonly int indexA;
+		private readonly int indexB;
+		private readonly NineGrid nineGrid;
+
+		public NineGridLine(int indexA, int indexB, NineGrid nineGrid)
+		{
+			this.indexA = indexA;
+			this.indexB = indexB;
+			this.nineGrid = nineGrid;
+		}
+
+		public void Render(Widget canvas)
+		{
+			var matrix = nineGrid.CalcTransitionToSpaceOf(canvas);
+			var A = matrix.TransformVector(nineGrid.Parts[indexA].Rect.A);
+			var B = matrix.TransformVector(nineGrid.Parts[indexB].Rect.B);
+			Renderer.DrawLine(A, B, Color4.Red);
+		}
+
+	}
+
 }
