@@ -23,6 +23,7 @@ namespace Tangerine
 				var b = new ToolbarButton(c.Icon ?? new SerializableTexture());
 				b.Clicked += () => CommandQueue.Instance.Add((Command)c);
 				b.Updating += _ => {
+					b.Texture = c.Icon;
 					b.Enabled = c.Enabled;
 					b.Tip = c.Text;
 				};

@@ -123,6 +123,13 @@ namespace Tangerine.UI
 		public static readonly ICommand CenterVertically = new Command("Center Vertically") { Icon = IconPool.GetTexture("Tools.CenterV") };
 		public static readonly ICommand AlignCentersHorizontally = new Command("Align Centers Horizontally") { Icon = IconPool.GetTexture("Tools.AlignCentersHorizontally") };
 		public static readonly ICommand AlignCentersVertically = new Command("Align Centers Vertically") { Icon = IconPool.GetTexture("Tools.AlignCentersVertically") };
+		public static readonly ICommand DistributeLeft = new Command("Distribute Left") { Icon = IconPool.GetTexture("Tools.DistributeLeft") };
+		public static readonly ICommand DistributeHorizontally = new Command("Distribute Horizontally") { Icon = IconPool.GetTexture("Tools.DistributeCentersHorizontally") };
+		public static readonly ICommand DistributeRight = new Command("Distribute Right") { Icon = IconPool.GetTexture("Tools.DistributeRight") };
+		public static readonly ICommand DistributeTop = new Command("Distribute Top") { Icon = IconPool.GetTexture("Tools.DistributeTop") };
+		public static readonly ICommand DistributeVertically = new Command("Distribute Verticaly") { Icon = IconPool.GetTexture("Tools.DistributeCentersVertically") };
+		public static readonly ICommand DistributeBottom = new Command("Distribute Bottom") { Icon = IconPool.GetTexture("Tools.DistributeBottom") };
+		public static readonly ICommand AlignTo = new Command("Align To Selection") { Icon = IconPool.GetTexture("Tools.Selection") };
 		public static readonly ICommand RestoreOriginalSize = new Command("Restore Original Size") { Icon = IconPool.GetTexture("Tools.RestoreOriginalSize") };
 		public static readonly ICommand ResetScale = new Command("Reset Scale") { Icon = IconPool.GetTexture("Tools.SetUnitScale") };
 		public static readonly ICommand ResetRotation = new Command("Reset Rotation") { Icon = IconPool.GetTexture("Tools.SetZeroRotation") };
