@@ -54,7 +54,11 @@ namespace Tangerine.Core.Operations
 			if (doc.Container == doc.RootNode) {
 				var path = doc.SceneNavigatedFrom;
 				if (path != null) {
-					Project.Current.Documents.FirstOrDefault(i => i.Path == path)?.MakeCurrent();
+					var document = Project.Current.Documents.FirstOrDefault(i => i.Path == path);
+					if (document == null) {
+						document = Project.Current.OpenDocument(path);
+					}
+					document.MakeCurrent();
 				}
 			} else {
 				var container = doc.Container;
