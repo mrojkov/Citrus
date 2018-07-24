@@ -128,6 +128,7 @@ namespace Tangerine
 			BackupManager.Instance.Activate(Project.Tasks);
 			Document.NodeDecorators.AddFor<Spline>(n => n.CompoundPostPresenter.Add(new UI.SceneView.SplinePresenter()));
 			Document.NodeDecorators.AddFor<Viewport3D>(n => n.CompoundPostPresenter.Add(new UI.SceneView.Spline3DPresenter()));
+			Document.NodeDecorators.AddFor<Viewport3D>(n => n.CompoundPostPresenter.Add(new UI.SceneView.Animation3DPathPresenter()));
 			Document.NodeDecorators.AddFor<Widget>(n => {
 				if (n.AsWidget.SkinningWeights == null) {
 					n.AsWidget.SkinningWeights = new SkinningWeights();
@@ -164,7 +165,7 @@ namespace Tangerine
 				}
 			};
 			Document.NodeDecorators.AddFor<ParticleEmitter>(n => n.CompoundPostPresenter.Add(new UI.SceneView.ParticleEmitterPresenter()));
-			Document.NodeDecorators.Add(n => n.CompoundPostPresenter.Add(new UI.SceneView.AnimationPathPresenter()));
+			Document.NodeDecorators.Add(n => n.CompoundPostPresenter.Add(new UI.SceneView.Animation2DPathPresenter()));
 			DocumentHistory.Processors.AddRange(new IOperationProcessor[] {
 				new Core.Operations.SelectRow.Processor(),
 				new Core.Operations.SetProperty.Processor(),

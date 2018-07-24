@@ -49,7 +49,7 @@ namespace Tangerine.UI.Timeline
 		ToolbarButton CreateAnimationPathButton()
 		{
 			var button = new ToolbarButton(IconPool.GetTexture("Timeline.AnimationPath")) { Tip = "Show animation path" };
-			button.AddChangeWatcher(() => CoreUserPreferences.ShowAnimationPath, i => button.Checked = !i);
+			button.AddChangeWatcher(() => CoreUserPreferences.ShowAnimationPath, i => button.Checked = i);
 			button.Clicked += () => CoreUserPreferences.ShowAnimationPath = !CoreUserPreferences.ShowAnimationPath;
 			button.Components.Add(new DocumentationComponent("ShowAnimationPath.md"));
 			return button;
