@@ -14,6 +14,7 @@ namespace Tangerine.UI
 		Widget ContainerWidget { get; }
 		SimpleText PropertyLabel { get; }
 		void DropFiles(IEnumerable<string> files);
+		void Submit();
 	}
 
 	public interface IPropertyEditorParams
@@ -292,6 +293,11 @@ namespace Tangerine.UI
 				}
 			});
 		}
+
+		public virtual void Submit()
+		{
+			
+		}
 	}
 
 	public class Vector2PropertyEditor : CommonPropertyEditor<Vector2>
@@ -329,6 +335,15 @@ namespace Tangerine.UI
 			} else {
 				editor.Text = currentValue.ToString();
 			}
+		}
+
+		public override void Submit()
+		{
+			string text = editorX.Text;
+			var currentX = CoalescedPropertyComponentValue(v => v.X);
+			var currentY = CoalescedPropertyComponentValue(v => v.Y);
+			SetComponent(EditorParams, 0, editorX, currentX.GetValue());
+			SetComponent(EditorParams, 1, editorY, currentY.GetValue());
 		}
 	}
 
@@ -371,6 +386,16 @@ namespace Tangerine.UI
 			} else {
 				editor.Text = currentValue.ToString();
 			}
+		}
+
+		public override void Submit()
+		{
+			var currentX = CoalescedPropertyComponentValue(v => v.X);
+			var currentY = CoalescedPropertyComponentValue(v => v.Y);
+			var currentZ = CoalescedPropertyComponentValue(v => v.Z);
+			SetComponent(EditorParams, 0, editorX, currentX.GetValue());
+			SetComponent(EditorParams, 1, editorY, currentY.GetValue());
+			SetComponent(EditorParams, 2, editorZ, currentZ.GetValue());
 		}
 	}
 
@@ -418,6 +443,14 @@ namespace Tangerine.UI
 				editor.Text = RoundAngle(currentValue.ToEulerAngles()[component] * Mathf.RadToDeg).ToString();
 			}
 		}
+
+		public override void Submit()
+		{
+			var current = CoalescedPropertyValue();
+			SetComponent(EditorParams, 0, editorX, current.GetValue());
+			SetComponent(EditorParams, 1, editorY, current.GetValue());
+			SetComponent(EditorParams, 2, editorZ, current.GetValue());
+		}
 	}
 
 	public class NumericRangePropertyEditor : CommonPropertyEditor<NumericRange>
@@ -460,6 +493,14 @@ namespace Tangerine.UI
 				editor.Text = currentValue.ToString();
 			}
 		}
+
+		public override void Submit()
+		{
+			var currentMed = CoalescedPropertyComponentValue(v => v.Median);
+			var currentDisp = CoalescedPropertyComponentValue(v => v.Dispersion);
+			SetComponent(EditorParams, 0, medEditor, currentMed.GetValue());
+			SetComponent(EditorParams, 1, dispEditor, currentDisp.GetValue());
+		}
 	}
 
 	public class NodeReferencePropertyEditor<T> : CommonPropertyEditor<NodeReference<T>> where T : Node
@@ -475,11 +516,20 @@ namespace Tangerine.UI
 			editor = editorParams.EditBoxFactory();
 			editor.LayoutCell = new LayoutCell(Alignment.Center);
 			ContainerWidget.AddNode(editor);
-			editor.Submitted += text => {
-				SetProperty(new NodeReference<T>(text));
-			};
+			editor.Submitted += text => SetComponent(text);
 			editor.AddChangeWatcher(CoalescedPropertyValue(), v => editor.Text = v?.Id);
 		}
+
+		void SetComponent(string text)
+		{
+			SetProperty(new NodeReference<T>(text));
+		}
+
+		public override void Submit()
+		{
+			SetComponent(editor.Text);
+		}
+
 	}
 
 	public class StringPropertyEditor : CommonPropertyEditor<string>
@@ -494,9 +544,15 @@ namespace Tangerine.UI
 			editor.Editor.EditorParams.MaxLines = multiline ? maxLines : 1;
 			editor.MinHeight += multiline ? editor.TextWidget.FontHeight * (maxLines - 1) : 0;
 			ContainerWidget.AddNode(editor);
-			editor.Submitted += SetProperty;
+			editor.Submitted += text => SetProperty(text);
 			editor.AddChangeWatcher(CoalescedPropertyValue(), v => editor.Text = v);
 		}
+
+		public override void Submit()
+		{
+			SetProperty(editor.Text);
+		}
+
 	}
 
 	public class EnumPropertyEditor<T> : CommonPropertyEditor<T>
@@ -549,15 +605,24 @@ namespace Tangerine.UI
 			editor = editorParams.NumericEditBoxFactory();
 			ContainerWidget.AddNode(editor);
 			var current = CoalescedPropertyValue();
-			editor.Submitted += text => {
-				float newValue;
-				if (float.TryParse(text, out newValue)) {
-					SetProperty(newValue);
-				}
-
-				editor.Text = current.GetValue().ToString();
-			};
+			editor.Submitted += text => SetComponent(text, current);
 			editor.AddChangeWatcher(current, v => editor.Text = v.ToString());
+		}
+
+		public void SetComponent(string text, IDataflowProvider<float> current)
+		{
+			float newValue;
+			if (float.TryParse(text, out newValue)) {
+				SetProperty(newValue);
+			}
+
+			editor.Text = current.GetValue().ToString();
+		}
+
+		public override void Submit()
+		{
+			var current = CoalescedPropertyValue();
+			SetComponent(editor.Text, current);
 		}
 	}
 
@@ -593,15 +658,25 @@ namespace Tangerine.UI
 			editor.LayoutCell = new LayoutCell(Alignment.Center);
 			ContainerWidget.AddNode(editor);
 			var current = CoalescedPropertyValue();
-			editor.Submitted += text => {
-				int newValue;
-				if (int.TryParse(text, out newValue)) {
-					SetProperty(newValue);
-				} else {
-					editor.Text = current.GetValue().ToString();
-				}
-			};
+			editor.Submitted += text => SetComponent(text, current);
 			editor.AddChangeWatcher(current, v => editor.Text = v.ToString());
+		}
+
+		public void SetComponent(string text, IDataflowProvider<int> current)
+		{
+			int newValue;
+			if (int.TryParse(text, out newValue)) {
+				SetProperty(newValue);
+			}
+			else {
+				editor.Text = current.GetValue().ToString();
+			}
+		}
+
+		public override void Submit()
+		{
+			var current = CoalescedPropertyValue();
+			SetComponent(editor.Text, current);
 		}
 	}
 
@@ -644,17 +719,27 @@ namespace Tangerine.UI
 			};
 			colorBox.Clicked += () => Expanded = !Expanded;
 			var currentColorString = currentColor.Select(i => i.ToString(Color4.StringPresentation.Dec));
-			editor.Submitted += text => {
-				Color4 newColor;
-				if (Color4.TryParse(text, out newColor)) {
-					SetProperty(newColor);
-				} else {
-					editor.Text = currentColorString.GetValue();
-				}
-			};
+			editor.Submitted += text => SetComponent(text, currentColorString);
 			editor.Tasks.Add(currentColorString.Consume(v => editor.Text = v));
 		}
 
+		public void SetComponent(string text, IDataflowProvider<string> currentColorString)
+		{
+			Color4 newColor;
+			if (Color4.TryParse(text, out newColor)) {
+				SetProperty(newColor);
+			}
+			else {
+				editor.Text = currentColorString.GetValue();
+			}
+		}
+
+		public override void Submit()
+		{
+			var currentColor = CoalescedPropertyValue(Color4.White).DistinctUntilChanged();
+			var currentColorString = currentColor.Select(i => i.ToString(Color4.StringPresentation.Dec));
+			SetComponent(editor.Text, currentColorString);
+		}
 
 		private Node CreatePipetteButton()
 		{
@@ -709,7 +794,7 @@ namespace Tangerine.UI
 				}
 			});
 			editor.LayoutCell = new LayoutCell(Alignment.Center);
-			editor.Submitted += text => AssignAsset(AssetPath.CorrectSlashes(text));
+			editor.Submitted += text => SetComponent(text);
 			button.Clicked += () => {
 				var dlg = new FileDialog {
 					AllowedFileTypes = allowedFileTypes,
@@ -721,6 +806,16 @@ namespace Tangerine.UI
 					LastOpenedDirectory = Project.Current.GetSystemDirectory(dlg.FileName);
 				}
 			};
+		}
+
+		public void SetComponent(string text)
+		{
+			AssignAsset(AssetPath.CorrectSlashes(text));
+		}
+
+		public override void Submit()
+		{
+			SetComponent(editor.Text);
 		}
 
 		private void SetFilePath(string path)
