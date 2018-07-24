@@ -11,11 +11,12 @@ namespace Tangerine.UI.SceneView
 	class CreateSplinePointProcessor : ITaskProvider
 	{
 		SceneView sv => SceneView.Instance;
+		ICommand command;
 
 		public IEnumerator<object> Task()
 		{
 			while (true) {
-				if (CreateNodeRequestComponent.Consume<SplinePoint>(SceneView.Instance.Components)) {
+				if (CreateNodeRequestComponent.Consume<SplinePoint>(SceneView.Instance.Components, out command)) {
 					yield return CreateSplinePointTask();
 				}
 				yield return null;
@@ -24,6 +25,7 @@ namespace Tangerine.UI.SceneView
 
 		IEnumerator<object> CreateSplinePointTask()
 		{
+			command.Checked = true;
 			while (true) {
 				if (sv.InputArea.IsMouseOver()) {
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
@@ -64,6 +66,7 @@ namespace Tangerine.UI.SceneView
 				}
 				yield return null;
 			}
+			command.Checked = false;
 		}
 	}
 }

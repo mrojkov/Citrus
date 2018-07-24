@@ -59,7 +59,7 @@ namespace Tangerine
 
 			foreach (var type in Project.Current.RegisteredNodeTypes) {
 				var cmd = new Command(type.Name) { Icon = NodeIconPool.GetTexture(type) };
-				CommandHandlerList.Global.Connect(cmd, new CreateNode(type));
+				CommandHandlerList.Global.Connect(cmd, new CreateNode(type, cmd));
 				if (type.Namespace == "Lime") {
 					create.Add(cmd);
 					CreateNodeCommands.Add(cmd);
@@ -196,7 +196,7 @@ namespace Tangerine
 			create.Add(customNodes = new Command("Custom Nodes", new Menu()));
 			foreach (var t in Project.GetNodesTypesOrdered("Lime")) {
 				var cmd = new Command(t.Name) { Icon = NodeIconPool.GetTexture(t) };
-				CommandHandlerList.Global.Connect(cmd, new CreateNode(t));
+				CommandHandlerList.Global.Connect(cmd, new CreateNode(t, cmd));
 				create.Add(cmd);
 				CreateNodeCommands.Add(cmd);
 			}

@@ -11,17 +11,23 @@ namespace Tangerine.UI.SceneView
 
 		public IEnumerator<object> Task()
 		{
+			ICommand command = new Command();
 			Type nodeTypeActive = null;
 			while (true) {
 				if (sv.Input.WasKeyPressed(Key.Escape) || sv.Input.WasMousePressed(1)) {
 					nodeTypeActive = null;
 				}
 				Type nodeTypeIncome;
-				if (CreateNodeRequestComponent.Consume<Widget>(sv.Components, out nodeTypeIncome)) {
+				ICommand newCommand;
+				if (CreateNodeRequestComponent.Consume<Widget>(sv.Components, out nodeTypeIncome, out newCommand)) {
 					nodeTypeActive = nodeTypeIncome;
+					command.Checked = false;
+					command = newCommand;
+					command.Checked = true;
 				}
 
 				if (nodeTypeActive == null) {
+					command.Checked = false;
 					yield return null;
 					continue;
 				}

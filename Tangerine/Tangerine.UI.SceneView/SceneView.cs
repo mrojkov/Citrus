@@ -252,9 +252,9 @@ namespace Tangerine.UI.SceneView
 			new InspectRootNodePresenter(this);
 		}
 
-		public void CreateNode(Type nodeType)
+		public void CreateNode(Type nodeType, ICommand command)
 		{
-			Components.Add(new CreateNodeRequestComponent { NodeType = nodeType });
+			Components.Add(new CreateNodeRequestComponent { NodeType = nodeType, Command = command });
 		}
 
 		public void DuplicateSelectedNodes()
@@ -355,23 +355,33 @@ namespace Tangerine.UI.SceneView
 	public class CreateNodeRequestComponent : Component
 	{
 		public Type NodeType { get; set; }
+		public ICommand Command { get; set; }
 
-		public static bool Consume<T>(ComponentCollection<Component> components, out Type nodeType) where T : Node
+		public static bool Consume<T>(ComponentCollection<Component> components, out Type nodeType, out ICommand command) where T : Node
 		{
 			var c = components.Get<CreateNodeRequestComponent>();
 			if (c != null && (c.NodeType.IsSubclassOf(typeof(T)) || c.NodeType == typeof(T))) {
 				components.Remove<CreateNodeRequestComponent>();
 				nodeType = c.NodeType;
+				command = c.Command;
 				return true;
 			}
 			nodeType = null;
+			command = null;
 			return false;
 		}
 
 		public static bool Consume<T>(ComponentCollection<Component> components) where T : Node
 		{
 			Type type;
-			return Consume<T>(components, out type);
+			ICommand command;
+			return Consume<T>(components, out type, out command);
+		}
+
+		public static bool Consume<T>(ComponentCollection<Component> components, out ICommand command) where T : Node
+		{
+			Type type;
+			return Consume<T>(components, out type, out command);
 		}
 	}
 }

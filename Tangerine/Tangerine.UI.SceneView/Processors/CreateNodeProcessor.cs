@@ -11,7 +11,8 @@ namespace Tangerine.UI.SceneView
 		{
 			while (true) {
 				Type type;
-				if (CreateNodeRequestComponent.Consume<Node>(SceneView.Instance.Components, out type)) {
+				ICommand command;
+				if (CreateNodeRequestComponent.Consume<Node>(SceneView.Instance.Components, out type, out command)) {
 					try {
 						Document.Current.History.DoTransaction(() => {
 							Core.Operations.CreateNode.Perform(type);

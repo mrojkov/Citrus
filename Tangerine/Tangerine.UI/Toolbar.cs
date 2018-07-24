@@ -24,6 +24,7 @@ namespace Tangerine
 				b.Clicked += () => CommandQueue.Instance.Add((Command)c);
 				b.Updating += _ => {
 					b.Texture = c.Icon;
+					b.Selected = c.Checked;
 					b.Enabled = c.Enabled;
 					b.Tip = c.Text;
 				};
