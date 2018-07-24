@@ -51,6 +51,11 @@ namespace Tangerine
 		{
 			Project.Current.Close();
 		}
+
+		public override void RefreshCommand(ICommand command)
+		{
+			command.Enabled = Project.Current != Project.Null;
+		}
 	}
 
 	public class FileNew : CommandHandler
