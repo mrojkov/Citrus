@@ -66,6 +66,7 @@ namespace Tangerine.UI.SceneView
 				}
 				yield return null;
 			}
+			command.Checked = false;
 		}
 	}
 }
