@@ -14,6 +14,7 @@ namespace Orange
 	{
 		private static string newCitrusDirectory;
 		private static string targetDirectory;
+		private static string newProjectCitprojPath;
 
 		private static void Exec(string name, string args)
 		{
@@ -41,9 +42,13 @@ namespace Orange
 		[Export(nameof(OrangePlugin.MenuItems))]
 		[ExportMetadata("Label", "New Project")]
 		[ExportMetadata("Priority", 3)]
-		public static void NewProjectAction(Action<string> projectOpened = null)
+		public static void NewProjectAction()
 		{
-			string newProjectCitprojPath = "";
+			NewProjectAction(null);
+		}
+
+		public static void NewProjectAction(Action<string> projectOpened)
+		{
 			Application.InvokeOnMainThread(() => {
 				var citrusPath = Toolbox.CalcCitrusDirectory();
 				var dlg = new FileDialog {
