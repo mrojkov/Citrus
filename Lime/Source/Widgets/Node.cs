@@ -7,6 +7,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using Yuzu;
 
 namespace Lime
@@ -1094,10 +1095,12 @@ namespace Lime
 			texture?.GetHandle();
 		}
 
-		[ThreadStatic]
-		private static HashSet<string> scenesBeingLoaded;
-		[ThreadStatic]
-		public static Action<string> SceneLoading;
+		private static ThreadLocal<HashSet<string>> scenesBeingLoaded = new ThreadLocal<HashSet<string>>(() => new HashSet<string>());
+
+		public delegate bool SceneLoadingDelegate(string path, ref Node instance, bool external);
+		public delegate void SceneLoadedDelegate(string path, Node instance, bool external);
+		public static ThreadLocal<SceneLoadingDelegate> SceneLoading;
+		public static ThreadLocal<SceneLoadedDelegate> SceneLoaded;
 
 		/// <summary>
 		/// For each root node of deserialized node hierarchy this component will be added and set to path in asset bundle.
@@ -1122,17 +1125,23 @@ namespace Lime
 
 		public static Node CreateFromAssetBundle(string path, Node instance = null)
 		{
-			if (scenesBeingLoaded == null) {
-				scenesBeingLoaded = new HashSet<string>();
+			return CreateFromAssetBundleHelper(path, instance, false);
+		}
+
+		private static Node CreateFromAssetBundleHelper(string path, Node instance = null, bool external = false)
+		{
+			if (SceneLoading?.Value?.Invoke(path, ref instance, external) ?? false) {
+				SceneLoaded?.Value?.Invoke(path, instance, external);
+				return instance;
 			}
 			var fullPath = ResolveScenePath(path);
 			if (fullPath == null) {
 				throw new Exception($"Scene '{path}' not found in current asset bundle");
 			}
-			if (scenesBeingLoaded.Contains(fullPath)) {
+			if (scenesBeingLoaded.Value.Contains(fullPath)) {
 				throw new Exception($"Cyclic scenes dependency was detected: {fullPath}");
 			}
-			scenesBeingLoaded.Add(fullPath);
+			scenesBeingLoaded.Value.Add(fullPath);
 			try {
 				using (Stream stream = AssetBundle.Current.OpenFileLocalized(fullPath)) {
 					instance = Serialization.ReadObject<Node>(fullPath, stream, instance);
@@ -1140,12 +1149,13 @@ namespace Lime
 				instance.LoadExternalScenes();
 				instance.Components.Add(new AssetBundlePathComponent(fullPath));
 			} finally {
-				scenesBeingLoaded.Remove(fullPath);
+				scenesBeingLoaded.Value.Remove(fullPath);
 			}
 			if (instance is Model3D) {
 				var attachment = new Model3DAttachmentParser().Parse(path);
 				attachment?.Apply((Model3D)instance);
 			}
+			SceneLoaded?.Value?.Invoke(path, instance, external);
 			return instance;
 		}
 
@@ -1156,8 +1166,7 @@ namespace Lime
 					child.LoadExternalScenes();
 				}
 			} else if (ResolveScenePath(ContentsPath) != null) {
-				SceneLoading?.Invoke(ContentsPath);
-				var content = CreateFromAssetBundle(ContentsPath, null);
+				var content = CreateFromAssetBundleHelper(ContentsPath, null, true);
 				ReplaceContent(content);
 			}
 		}
