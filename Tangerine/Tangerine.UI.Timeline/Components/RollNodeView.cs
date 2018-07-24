@@ -69,7 +69,11 @@ namespace Tangerine.UI.Timeline.Components
 			}));
 			expandButtonContainer.Updating += delta =>
 				expandButton.Visible = nodeData.Node.Animators.Count > 0;
-			imageCombiner = new Image(NodeIconPool.GetTexture(typeof(ImageCombiner))) {
+			imageCombiner = new Image(nodeData.Node.GetType() == typeof(ImageCombiner)
+									? IconPool.GetTexture("Timeline.NoEntry")
+									: NodeIconPool.GetTexture(typeof(ImageCombiner)))
+			{
+				Color = Color4.Transparent,
 				HitTestTarget = false,
 				MinMaxSize = new Vector2(21, 16),
 				Padding = new Thickness { Left = 5 },
@@ -124,24 +128,37 @@ namespace Tangerine.UI.Timeline.Components
 			}));
 		}
 
-		public static void UpdateIsImageCombinerArg(Row row)
+		public static void UpdateImageCombinerIndication(Row row)
 		{
 			var view = row.Components.Get<RowView>()?.RollRow as RollNodeView;
 			if (view == null) {
 				return;
 			}
-			view.imageCombiner.Color = IsImageCombinerArg(row) ? Color4.White : Color4.Transparent;
+			var combiner = row.Components.Get<NodeRow>()?.Node as ImageCombiner;
+			if (combiner == null) {
+				UpdateIsImageCombinerArg(row, view);
+				return;
+			}
+			IImageCombinerArg arg1;
+			IImageCombinerArg arg2;
+			if (combiner.GetArgs(out arg1, out arg2)) {
+				view.label.Color = ColorTheme.Current.Basic.BlackText;
+				view.imageCombiner.Color = Color4.Transparent;
+			}
+			else {
+				view.label.Color = ColorTheme.Current.Basic.RedText;
+				view.imageCombiner.Color = Color4.White;
+			}
 		}
-
-		private static bool IsImageCombinerArg(Row row)
+		private static void UpdateIsImageCombinerArg(Row row, RollNodeView view)
 		{
 			var arg = row.Components.Get<NodeRow>()?.Node as IImageCombinerArg;
 			if (arg == null) {
-				return false;
+				return;
 			}
 			var image = arg as Node;
 			if (image == null) {
-				return false;
+				return;
 			}
 			var index = image.Parent.Nodes.IndexOf(image);
 			var count = image.Parent.Nodes.Count;
@@ -154,7 +171,7 @@ namespace Tangerine.UI.Timeline.Components
 				result |= image.Parent.Nodes[index - 1] is IImageCombinerArg
 					&& image.Parent.Nodes[index - 2] is ImageCombiner;
 			}
-			return result;
+			view.imageCombiner.Color = result ? Color4.White : Color4.Transparent;
 		}
 
 		public Widget Widget => widget;

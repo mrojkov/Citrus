@@ -22,6 +22,7 @@ namespace Lime
 		public class ColorTheme
 		{
 			public Color4 BlackText;
+			public Color4 RedText;
 			public Color4 GrayText;
 			public Color4 WhiteBackground;
 			public Color4 GrayBackground;
@@ -59,6 +60,7 @@ namespace Lime
 				var blackText = new Color4(204, 204, 204);
 				return new ColorTheme {
 					BlackText = blackText,
+					RedText = new Color4(255, 100, 100),
 					GrayText = blackText.Darken(0.35f),
 					WhiteBackground = Color4.Black.Lighten(0.25f),
 					GrayBackground = new Color4(45, 45, 48),
@@ -98,6 +100,7 @@ namespace Lime
 				var grayBackground = new Color4(240, 240, 240);
 				return new ColorTheme {
 					BlackText = Color4.Black,
+					RedText = Color4.Red,
 					GrayText = Color4.Black.Lighten(0.35f),
 					WhiteBackground = Color4.White,
 					GrayBackground = grayBackground,

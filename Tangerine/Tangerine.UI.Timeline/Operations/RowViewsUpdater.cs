@@ -22,7 +22,7 @@ namespace Tangerine.UI.Timeline
 		{
 			var view = row.Components.GetOrAdd<RowView>();
 			if (view.RollRow != null) {
-				RollNodeView.UpdateIsImageCombinerArg(row);
+				RollNodeView.UpdateImageCombinerIndication(row);
 				return;
 			}
 			if (row.Components.Contains<Core.Components.BoneRow>()) {
