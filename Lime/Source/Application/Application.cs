@@ -78,7 +78,7 @@ namespace Lime
 #endif // WIN
 			}
 		}
-		
+
 		public static IWindow WindowUnderMouse { get; internal set; }
 
 		public static void InvalidateWindows()
@@ -225,14 +225,14 @@ namespace Lime
 			System.Globalization.CultureInfo.DefaultThreadCurrentCulture = culture;
 			AudioSystem.Initialize(options);
 #if WIN
-#if DEBUG
-			System.Windows.Forms.Application.SetUnhandledExceptionMode(
-				System.Windows.Forms.UnhandledExceptionMode.ThrowException);
-#else
-			SetGlobalExceptionHandler();
-			System.Windows.Forms.Application.SetUnhandledExceptionMode(
-				System.Windows.Forms.UnhandledExceptionMode.CatchException);
-#endif // DEBUG
+			if (System.Diagnostics.Debugger.IsAttached) {
+				System.Windows.Forms.Application.SetUnhandledExceptionMode(
+					System.Windows.Forms.UnhandledExceptionMode.ThrowException);
+			} else {
+				SetGlobalExceptionHandler();
+				System.Windows.Forms.Application.SetUnhandledExceptionMode(
+					System.Windows.Forms.UnhandledExceptionMode.CatchException);
+			}
 			// This function doesn't work on XP, and we don't want to add dpiAware into manifest
 			// because this will require adding into every new project.
 			try {
