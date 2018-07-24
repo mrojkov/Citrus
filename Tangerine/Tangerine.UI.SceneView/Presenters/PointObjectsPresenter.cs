@@ -104,7 +104,7 @@ namespace Tangerine.UI.SceneView
 
 		void DrawPointObject(Vector2 position, Color4 color)
 		{
-			Renderer.DrawRound(position, 6, 10, ColorTheme.Current.SceneView.SplainStroke);
+			Renderer.DrawRound(position, 6, 10, ColorTheme.Current.SceneView.SplineStroke);
 			Renderer.DrawRound(position, 4, 10, color);
 		}
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Lime;
 using Tangerine.Core;
 using System.Linq;
@@ -32,13 +32,13 @@ namespace Tangerine.UI.SceneView
 					var a = Vector2.CosSin(point.TangentAngle * Mathf.DegToRad) * TangentWeightRatio * point.TangentWeight;
 					var p1 = t * (point.TransformedPosition + a);
 					var p2 = t * (point.TransformedPosition - a);
-					Renderer.DrawLine(new Vector2(p1.X+1, p1.Y + 1), new Vector2(p2.X + 1, p2.Y + 1), ColorTheme.Current.SceneView.SplainStroke);
+					Renderer.DrawLine(new Vector2(p1.X+1, p1.Y + 1), new Vector2(p2.X + 1, p2.Y + 1), ColorTheme.Current.SceneView.SplineStroke);
 					Renderer.DrawLine(p1, p2, color);
-					Renderer.DrawLine(new Vector2(p1.X - 1, p1.Y - 1), new Vector2(p2.X - 1, p2.Y - 1), ColorTheme.Current.SceneView.SplainStroke);
+					Renderer.DrawLine(new Vector2(p1.X - 1, p1.Y - 1), new Vector2(p2.X - 1, p2.Y - 1), ColorTheme.Current.SceneView.SplineStroke);
 					Renderer.DrawLine(p1, p2, color);
-					Renderer.DrawRound(p1, 5, 10, ColorTheme.Current.SceneView.SplainStroke);
+					Renderer.DrawRound(p1, 5, 10, ColorTheme.Current.SceneView.SplineStroke);
 					Renderer.DrawRound(p1, 3, 10, color);
-					Renderer.DrawRound(p2, 5, 10, ColorTheme.Current.SceneView.SplainStroke);
+					Renderer.DrawRound(p2, 5, 10, ColorTheme.Current.SceneView.SplineStroke);
 					Renderer.DrawRound(p2, 3, 10, color);
 				}
 			}
