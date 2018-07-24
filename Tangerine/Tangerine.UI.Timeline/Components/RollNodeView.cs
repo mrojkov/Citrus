@@ -233,6 +233,9 @@ namespace Tangerine.UI.Timeline.Components
 			);
 			button.AddTransactionClickHandler(() => {
 				Core.Operations.SetProperty.Perform(nodeData, nameof(NodeRow.Expanded), !nodeData.Expanded, isChangingDocument: false);
+				if (nodeData.Expanded) {
+					Timeline.Instance.EnsureRowChildsVisible(row);
+				}
 			});
 			return button;
 		}

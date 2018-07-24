@@ -210,6 +210,27 @@ namespace Tangerine.UI.Timeline
 			}
 		}
 
+		public void EnsureRowChildsVisible(Row row)
+		{
+			var first = row.RollWidget();
+			var lastRow = row.Rows.Last();
+			while (lastRow.Rows.Count > 0) {
+				lastRow = lastRow.Rows.Last();
+			}
+			var last = lastRow.RollWidget();
+			float bottom = last.Bottom();
+			float top = first.Top();
+			float d = bottom - top;
+			float height = Roll.RootWidget.Height;
+			if (d > height) {
+				OffsetY = top;
+			} else if (bottom > OffsetY + height) {
+				OffsetY += bottom - OffsetY - height;
+			} else if (top < OffsetY) {
+				OffsetY = top;
+			}
+		}
+
 		public bool IsColumnVisible(int col)
 		{
 			var pos = col * TimelineMetrics.ColWidth - Offset.X;

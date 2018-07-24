@@ -46,7 +46,9 @@ namespace Tangerine.UI.Timeline
 							boneData.Bone.Parent.AsWidget.Nodes.OfType<Bone>().ToList(),
 							boneData.ChildrenExpanded);
 					}
-
+					if (boneData.ChildrenExpanded) {
+						Timeline.Instance.EnsureRowChildsVisible(row);
+					}
 					Document.Current.History.CommitTransaction();
 				}
 			};

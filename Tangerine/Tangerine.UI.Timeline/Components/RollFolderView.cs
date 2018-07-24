@@ -122,7 +122,12 @@ namespace Tangerine.UI.Timeline.Components
 				() => folder.Items.Count != 0,
 				i => button.Visible = folder.Items.Count != 0
 			);
-			button.AddTransactionClickHandler(() => Core.Operations.SetProperty.Perform(folder, nameof(Folder.Expanded), !folder.Expanded));
+			button.AddTransactionClickHandler(() => {
+				Core.Operations.SetProperty.Perform(folder, nameof(Folder.Expanded), !folder.Expanded);
+				if (folder.Expanded) {
+					Timeline.Instance.EnsureRowChildsVisible(row);
+				}
+			});
 			return button;
 		}
 
