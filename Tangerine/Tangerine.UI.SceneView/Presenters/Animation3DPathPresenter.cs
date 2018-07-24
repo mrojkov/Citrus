@@ -8,6 +8,9 @@ namespace Tangerine.UI.SceneView
 {
 	public class Animation3DPathPresenter : CustomPresenter<Viewport3D>
 	{
+		private List<Vector3> points = new List<Vector3>();
+		private List<Vector3> approximation = new List<Vector3>();
+
 		protected override void InternalRender(Viewport3D viewport)
 		{
 			if (Document.Current.PreviewAnimation) {
@@ -30,7 +33,7 @@ namespace Tangerine.UI.SceneView
 						if (keys.Count == 0) {
 							continue;
 						}
-						var points = new List<Vector3>();
+						points.Clear();
 						for (int i = 0; i < keys.Count; ++i) {
 							points.Add((Vector3)keys[i].Value);
 						}
@@ -44,7 +47,7 @@ namespace Tangerine.UI.SceneView
 						var viewportToSceneFrame = viewport.CalcTransitionToSpaceOf(SceneView.Instance.Frame);
 						SceneView.Instance.Frame.PrepareRendererState();
 						for (int i = 0; i < points.Count - 1; ++i) {
-							var approximation = Approximate(points, i, i + 1, keys[i].Function, 10);
+							Approximate(i, i + 1, keys[i].Function, 10);
 							var start = (Vector2)viewport.WorldToViewportPoint(approximation[0] * worldTransform) * viewportToSceneFrame;
 							for (int j = 1; j < approximation.Count; ++j) {
 								var end = (Vector2)viewport.WorldToViewportPoint(approximation[j] * worldTransform) * viewportToSceneFrame;
@@ -58,10 +61,11 @@ namespace Tangerine.UI.SceneView
 			}
 		}
 
-		private static List<Vector3> Approximate(List<Vector3> points, int index1, int index2, KeyFunction keyFunction, int numberOfPoints)
+		private void Approximate(int index1, int index2, KeyFunction keyFunction, int numberOfPoints)
 		{
 			int index0;
 			int index3;
+			approximation.Clear();
 			if (keyFunction == KeyFunction.Spline) {
 				index0 = index1 < 1 ? 0 : index1 - 1;
 				index3 = index2 >= points.Count - 1 ? points.Count - 1 : index2 + 1;
@@ -69,11 +73,13 @@ namespace Tangerine.UI.SceneView
 				index0 = index1 < 1 ? points.Count - 1 : index1 - 1;
 				index3 = index2 >= points.Count - 1 ? 0 : index2 + 1;
 			} else {
-				return new List<Vector3> { points[index1], points[index2] };
+				approximation.Add(points[index1]);
+				approximation.Add(points[index2]);
+				return;
 			}
-			var result = new List<Vector3> { points[index1] };
+			approximation.Add(points[index1]);
 			for (int i = 1; i < numberOfPoints - 1; ++i) {
-				result.Add(
+				approximation.Add(
 					Mathf.CatmullRomSpline(
 						(float)i / numberOfPoints,
 						points[index0],
@@ -83,8 +89,7 @@ namespace Tangerine.UI.SceneView
 					)
 				);
 			}
-			result.Add(points[index2]);
-			return result;
+			approximation.Add(points[index2]);
 		}
 	}
 }
