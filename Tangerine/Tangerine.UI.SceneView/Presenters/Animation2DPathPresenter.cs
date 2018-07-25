@@ -51,7 +51,9 @@ namespace Tangerine.UI.SceneView
 									new Vector2(4, 1)
 								);
 							}
+							Renderer.DrawRound(points[i] * transform, 3, 10, ColorTheme.Current.SceneView.PointObject.Darken(0.3f));
 						}
+						Renderer.DrawRound(points[points.Count - 1] * transform, 3, 10, ColorTheme.Current.SceneView.PointObject.Darken(0.3f));
 					}
 				}
 			}
