@@ -44,6 +44,7 @@ namespace Tangerine.UI.SceneView.Processors
 			var maxValue = nineGridLine.MaxValue;
 			var size = nineGridLine.TextureSize;
 			float clipTolerance = 15 / size;
+			float[] clipPositions = { 0, maxValue, maxValue / 3, maxValue / 3 * 2 };
 			using(Document.Current.History.BeginTransaction()) {
 				while (sv.Input.IsMousePressed()) {
 					Document.Current.History.RollbackTransaction();
@@ -54,7 +55,9 @@ namespace Tangerine.UI.SceneView.Processors
 					if (Mathf.Abs(diff) > Mathf.ZeroTolerance) {
 						float newValue = value + diff;
 						if (sv.Input.IsKeyPressed(Key.Shift)) {
-							newValue = newValue.Snap(0, clipTolerance).Snap(maxValue,clipTolerance);
+							foreach (var origin in clipPositions) {
+								newValue = newValue.Snap(origin, clipTolerance);
+							}
 						}
 						Core.Operations.SetAnimableProperty.Perform(nineGrid,
 							propertyName, newValue, CoreUserPreferences.Instance.AutoKeyframes);
