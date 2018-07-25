@@ -73,12 +73,17 @@ namespace Tangerine.UI.Timeline
 					Renderer.DrawLine(x, 0, x, RootWidget.Height, ColorTheme.Current.TimelineRuler.Notchings);
 				}
 			}
+			bool metUpperMarker = false;
 			foreach (var m in Document.Current.Container.Markers) {
 				if (upperMarker != m) {
 					RenderMarker(m);
+				} else {
+					metUpperMarker = true;
 				}
 			}
-
+			if (!metUpperMarker && upperMarker != null) {
+				upperMarker = null;
+			}
 			RenderUpperMarker();
 		}
 
