@@ -109,6 +109,7 @@
     <Compile Include="HotkeyRegistry.cs" />
     <Compile Include="Dialogs\HotkeyEditor.cs" />
     <Compile Include="DocumentTabContextMenu.cs" />
+    <Compile Include="AlignPreferences.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>
@@ -391,6 +392,20 @@
     <EmbeddedResource Include="Resources\SegoeUI.ttf" />
     <EmbeddedResource Include="Resources\Icons\Light\Tools\Edit.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Tools\Edit.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\DistributeLeft.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\DistributeRight.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\DistributeTop.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\DistributeBottom.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\DistributeCentersHorizontally.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\DistributeCentersVertically.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\DistributeLeft.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\DistributeRight.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\DistributeTop.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\DistributeBottom.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\DistributeCentersHorizontally.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\DistributeCentersVertically.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\Selection.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\Selection.png" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
