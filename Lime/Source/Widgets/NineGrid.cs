@@ -42,10 +42,10 @@ namespace Lime
 			Presenter = DefaultPresenter.Instance;
 			HitTestMethod = HitTestMethod.Contents;
 			Texture = new SerializableTexture();
-			Lines[0] = new NineGridLine(5, 2, this);
-			Lines[1] = new NineGridLine(1 ,6, this);
-			Lines[2] = new NineGridLine(7, 1, this);
-			Lines[3] = new NineGridLine(2, 8, this);
+			Lines[0] = new NineGridLine(5, 2, this, nameof(LeftOffset), g => g.Texture.ImageSize.Width, g => g.Size.X, new Vector2(1, 0));
+			Lines[1] = new NineGridLine(1 ,6, this, nameof(RightOffset), g => g.Texture.ImageSize.Width, g => g.Size.X, new Vector2(-1, 0));
+			Lines[2] = new NineGridLine(7, 1, this, nameof(TopOffset), g => g.Texture.ImageSize.Height, g => g.Size.Y, new Vector2(0, 1));
+			Lines[3] = new NineGridLine(2, 8, this, nameof(BottomOffset), g => g.Texture.ImageSize.Height, g => g.Size.Y, new Vector2(0, -1));
 		}
 
 		void BuildLayout(Part[] layout)
@@ -200,31 +200,50 @@ namespace Lime
 		{
 			private readonly int indexA;
 			private readonly int indexB;
-			private readonly NineGrid nineGrid;
-			private Vector2 A => nineGrid.Parts[indexA].Rect.A;
-			private Vector2 B => nineGrid.Parts[indexB].Rect.B;
+			public NineGrid NineGrid { get; private set; }
+			private Vector2 A => NineGrid.Parts[indexA].Rect.A;
+			private Vector2 B => NineGrid.Parts[indexB].Rect.B;
+			public string PropertyName { get; private set; }
+			public float Value => (float)NineGrid.GetType().GetProperty(PropertyName).GetValue(NineGrid);
+			private readonly Func<NineGrid, float> getTextureSize;
+			private readonly Func<NineGrid, float> getGridSize;
+			public float TextureSize => getTextureSize(NineGrid);
+			public float GridSize => getGridSize(NineGrid);
+			public float MaxValue => GridSize / TextureSize;
+			private readonly Vector2 direction;
 
-			public NineGridLine(int indexA, int indexB, NineGrid nineGrid)
+			public NineGridLine(int indexA, int indexB, NineGrid nineGrid, string propertyName,
+				Func<NineGrid, float> getTextureSize, Func<NineGrid, float> getGridSize, Vector2 direction)
 			{
 				this.indexA = indexA;
 				this.indexB = indexB;
-				this.nineGrid = nineGrid;
+				NineGrid = nineGrid;
+				PropertyName = propertyName;
+				this.getTextureSize = getTextureSize;
+				this.getGridSize = getGridSize;
+				this.direction = direction;
 			}
 
 			public void Render(Widget canvas)
 			{
-				var matrix = nineGrid.CalcTransitionToSpaceOf(canvas);
+				var matrix = NineGrid.CalcTransitionToSpaceOf(canvas);
 				var A = matrix.TransformVector(this.A);
 				var B = matrix.TransformVector(this.B);
-				Renderer.DrawLine(A, B, Color4.Red);
+				Renderer.DrawLine(A, B, Color4.Red, 2);
 			}
 
 			public bool HitTest(Vector2 point, Widget canvas, float radius = 10)
 			{
-				var matrix = nineGrid.CalcTransitionToSpaceOf(canvas);
+				var matrix = NineGrid.CalcTransitionToSpaceOf(canvas);
 				var A = matrix.TransformVector(this.A);
 				var B = matrix.TransformVector(this.B);
-				return NineGrid.DistanceFromPointToLine(A, B, point) <= radius;
+				return DistanceFromPointToLine(A, B, point) <= radius;
+			}
+
+			public Vector2 GetDirection(Widget canvas)
+			{
+				var matrix = NineGrid.CalcTransitionToSpaceOf(canvas);
+				return (matrix * direction - matrix * Vector2.Zero).Normalized;
 			}
 		}
 	}

@@ -226,6 +226,7 @@ namespace Tangerine.UI.SceneView
 				new DragPointObjectsProcessor(),
 				new DragSplineTangentsProcessor(),
 				new DragSplinePoint3DProcessor(),
+				new DragNineGridLineProcessor(),
 				new ResizeWidgetsProcessor(),
 				new RescalePointObjectSelectionProcessor(),
 				new RotatePointObjectSelectionProcessor(),
@@ -234,8 +235,7 @@ namespace Tangerine.UI.SceneView
 				new MouseSelectionProcessor(),
 				new ShiftClickProcessor(),
 				new PreviewAnimationProcessor(),
-				new ResolutionPreviewProcessor(),
-				new DragNineGridLineProcessor()
+				new ResolutionPreviewProcessor()
 			);
 		}
 
