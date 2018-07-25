@@ -110,6 +110,7 @@
     <Compile Include="AnimatorAdapter.cs" />
     <Compile Include="TimelineUserPreferences.cs" />
     <Compile Include="Operations\ReverseKeyframes.cs" />
+    <Compile Include="Processors\ImageCombinerIndicationProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tangerine.Core\Tangerine.Core.Mac.csproj">
