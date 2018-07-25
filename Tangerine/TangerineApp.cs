@@ -209,7 +209,6 @@ namespace Tangerine
 				}
 			};
 			var proj = AppUserPreferences.Instance.RecentProjects.FirstOrDefault();
-			proj = null;
 			if (proj != null) {
 				new Project(proj).Open();
 			}
