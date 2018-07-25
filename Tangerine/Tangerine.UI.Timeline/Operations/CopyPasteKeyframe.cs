@@ -39,7 +39,7 @@ namespace Tangerine.UI.Timeline.Operations
 			}
 			int startCol = spans.First().A;
 
-			foreach (var row in Document.Current.TopLevelSelectedRows()) {
+			foreach (var row in Document.Current.SelectedRows()) {
 				spans = row.Components.Get<GridSpanListComponent>()?.Spans;
 				if (spans == null) {
 					continue;
