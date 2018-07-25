@@ -5,6 +5,7 @@ using Lime;
 using Tangerine.Core;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace Tangerine.UI
 {
@@ -721,6 +722,17 @@ namespace Tangerine.UI
 			var currentColorString = currentColor.Select(i => i.ToString(Color4.StringPresentation.Dec));
 			editor.Submitted += text => SetComponent(text, currentColorString);
 			editor.Tasks.Add(currentColorString.Consume(v => editor.Text = v));
+			editor.AddChangeWatcher(() => editor.Text, value => CheckEditorText(value, editor));
+		}
+
+		private static void CheckEditorText(string value, EditBox editor)
+		{
+			var match = Regex.Match(value, @"^\s*\[\s*(\d+)\s*\]\s*$");
+			if (match.Success) {
+				UInt32 number = UInt32.Parse(match.Groups[1].Value);
+				editor.Text = $"{0x000000FF & number}. {(0x0000FF00 & number) >> 8}. " +
+					$"{(0x00FF0000 & number) >> 16}. {(0xFF000000 & number) >> 24}";
+			}
 		}
 
 		public void SetComponent(string text, IDataflowProvider<string> currentColorString)
