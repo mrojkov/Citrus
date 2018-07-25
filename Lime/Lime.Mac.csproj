@@ -33,6 +33,8 @@
     <UseRefCounting>false</UseRefCounting>
     <Profiling>true</Profiling>
     <HttpClientHandler>HttpClientHandler</HttpClientHandler>
+    <AOTMode>None</AOTMode>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -52,6 +54,8 @@
     <UseRefCounting>false</UseRefCounting>
     <Profiling>false</Profiling>
     <HttpClientHandler>HttpClientHandler</HttpClientHandler>
+    <AOTMode>None</AOTMode>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

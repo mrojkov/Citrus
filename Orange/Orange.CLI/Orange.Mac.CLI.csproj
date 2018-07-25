@@ -38,6 +38,8 @@
     <XamMacArch>x86_64</XamMacArch>
     <PackageSigningKey>3rd Party Mac Developer Installer</PackageSigningKey>
     <I18n>west</I18n>
+    <AOTMode>None</AOTMode>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>
@@ -60,6 +62,8 @@
     <XamMacArch>i386</XamMacArch>
     <I18n>west</I18n>
     <MonoBundlingExtraArgs>--registrar:dynamic</MonoBundlingExtraArgs>
+    <AOTMode>None</AOTMode>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
