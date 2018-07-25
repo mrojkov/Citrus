@@ -63,6 +63,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="NineGridLine.cs" />
     <Compile Include="Presenters\InspectRootNodePresenter.cs" />
     <Compile Include="Presenters\NineGridLinePresenter.cs" />
     <Compile Include="Presenters\ParticleEmitterPresenter.cs" />

@@ -18,7 +18,7 @@ namespace Tangerine.UI.SceneView.Presenters
 		{
 			var grids = Core.Document.Current.SelectedNodes().Editable().OfType<NineGrid>().ToList();
 			foreach (var grid in grids) {
-				foreach (var line in grid.Lines) {
+				foreach (var line in NineGridLine.GetForNineGrid(grid)) {
 					line.Render(canvas);
 				}
 			}

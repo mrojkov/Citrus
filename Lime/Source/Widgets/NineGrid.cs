@@ -35,17 +35,12 @@ namespace Lime
 		Part[] layout = new Part[9];
 
 		public Part[] Parts => layout;
-		public NineGridLine[] Lines { get; } = new NineGridLine[4];
 
 		public NineGrid()
 		{
 			Presenter = DefaultPresenter.Instance;
 			HitTestMethod = HitTestMethod.Contents;
 			Texture = new SerializableTexture();
-			Lines[0] = new NineGridLine(5, 2, this, nameof(LeftOffset), g => g.Texture.ImageSize.Width, g => g.Size.X, new Vector2(1, 0));
-			Lines[1] = new NineGridLine(1 ,6, this, nameof(RightOffset), g => g.Texture.ImageSize.Width, g => g.Size.X, new Vector2(-1, 0));
-			Lines[2] = new NineGridLine(7, 1, this, nameof(TopOffset), g => g.Texture.ImageSize.Height, g => g.Size.Y, new Vector2(0, 1));
-			Lines[3] = new NineGridLine(2, 8, this, nameof(BottomOffset), g => g.Texture.ImageSize.Height, g => g.Size.Y, new Vector2(0, -1));
 		}
 
 		void BuildLayout(Part[] layout)
@@ -173,78 +168,6 @@ namespace Lime
 				return !Texture.IsTransparentPixel(ui, vi);
 			}
 			return false;
-		}
-
-		private static float DistanceFromPointToLine(Vector2 A, Vector2 B, Vector2 P)
-		{
-			var a = A.Y - B.Y;
-			var b = B.X - A.X;
-			var c = B.Y * A.X - A.Y * B.X;
-			return Mathf.Abs(P.X * a + P.Y * b + c) / Mathf.Sqrt(a * a + b * b);
-		}
-
-		public bool HitTest(Vector2 point, Widget canvas)
-		{
-			var matrix = CalcTransitionToSpaceOf(canvas);
-			var A = matrix.TransformVector(new Vector2(0, 0));
-			var B = matrix.TransformVector(new Vector2(Width, 0));
-			var C = matrix.TransformVector(new Vector2(Width, Height));
-			var D = matrix.TransformVector(new Vector2(0, Height));
-			return DistanceFromPointToLine(A, B, point) <= Height
-				&& DistanceFromPointToLine(A, D, point) <= Width
-				&& DistanceFromPointToLine(D, C, point) <= Height
-				&& DistanceFromPointToLine(B, C, point) <= Width;
-		}
-
-		public class NineGridLine
-		{
-			private readonly int indexA;
-			private readonly int indexB;
-			public NineGrid NineGrid { get; private set; }
-			private Vector2 A => NineGrid.Parts[indexA].Rect.A;
-			private Vector2 B => NineGrid.Parts[indexB].Rect.B;
-			public string PropertyName { get; private set; }
-			public float Value => (float)NineGrid.GetType().GetProperty(PropertyName).GetValue(NineGrid);
-			private readonly Func<NineGrid, float> getTextureSize;
-			private readonly Func<NineGrid, float> getGridSize;
-			public float TextureSize => getTextureSize(NineGrid);
-			public float GridSize => getGridSize(NineGrid);
-			public float MaxValue => GridSize / TextureSize;
-			private readonly Vector2 direction;
-
-			public NineGridLine(int indexA, int indexB, NineGrid nineGrid, string propertyName,
-				Func<NineGrid, float> getTextureSize, Func<NineGrid, float> getGridSize, Vector2 direction)
-			{
-				this.indexA = indexA;
-				this.indexB = indexB;
-				NineGrid = nineGrid;
-				PropertyName = propertyName;
-				this.getTextureSize = getTextureSize;
-				this.getGridSize = getGridSize;
-				this.direction = direction;
-			}
-
-			public void Render(Widget canvas)
-			{
-				var matrix = NineGrid.CalcTransitionToSpaceOf(canvas);
-				var A = matrix.TransformVector(this.A);
-				var B = matrix.TransformVector(this.B);
-				Renderer.DrawLine(A, B, Color4.Red, 2);
-			}
-
-			public bool HitTest(Vector2 point, Widget canvas, float radius = 10)
-			{
-				var matrix = NineGrid.CalcTransitionToSpaceOf(canvas);
-				var A = matrix.TransformVector(this.A);
-				var B = matrix.TransformVector(this.B);
-				return DistanceFromPointToLine(A, B, point) <= radius;
-			}
-
-			public Vector2 GetDirection(Widget canvas)
-			{
-				var matrix = NineGrid.CalcTransitionToSpaceOf(canvas);
-				return (matrix * direction - matrix * Vector2.Zero).Normalized;
-			}
 		}
 	}
 }

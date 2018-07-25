@@ -18,7 +18,7 @@ namespace Tangerine.UI.SceneView.Processors
 				var grids = Document.Current.SelectedNodes().Editable().OfType<NineGrid>();
 				var mousePosition = sv.MousePosition;
 				foreach (var grid in grids) {
-					foreach (var line in grid.Lines) {
+					foreach (var line in NineGridLine.GetForNineGrid(grid)) {
 						if (line.HitTest(mousePosition, sv.Scene)) {
 							Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 							if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {
@@ -33,13 +33,13 @@ namespace Tangerine.UI.SceneView.Processors
 			}
 		}
 
-		private IEnumerator<object> Drag(NineGrid.NineGridLine nineGridLine)
+		private IEnumerator<object> Drag(NineGridLine nineGridLine)
 		{
 			var transform = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
 			var initMousePos = sv.MousePosition * transform;
 			var dir = nineGridLine.GetDirection(sv.Scene);
 			float value = nineGridLine.Value;
-			var nineGrid = nineGridLine.NineGrid;
+			var nineGrid = nineGridLine.Owner;
 			var propertyName = nineGridLine.PropertyName;
 			var maxValue = nineGridLine.MaxValue;
 			var size = nineGridLine.TextureSize;
