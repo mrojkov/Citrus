@@ -31,6 +31,9 @@ namespace Tangerine.UI.Timeline
 					upperMarker = markers[i];
 				}
 			});
+			RootWidget.AddChangeWatcher(() => Document.Current.Container, (value) => {
+				upperMarker = null;
+			});
 		}
 
 		void RootWidget_DoubleClick(WidgetInput input, Key key)
