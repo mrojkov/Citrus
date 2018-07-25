@@ -74,6 +74,11 @@ namespace Tangerine.UI.SceneView
 				}
 				if (index != bone.Index && sv.Input.IsKeyPressed(Key.Alt)) {
 					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.Position), index == 0 ? entry.Joint + dragDelta : Vector2.Zero, CoreUserPreferences.Instance.AutoKeyframes);
+					var parentEntry = bone.Parent.AsWidget.BoneArray[index];
+					float parentAngle = (parentEntry.Tip - parentEntry.Joint).Atan2Deg;
+					var boneEntry = bone.Parent.AsWidget.BoneArray[bone.Index];
+					float boneAngle = (boneEntry.Tip - boneEntry.Joint).Atan2Deg;
+					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.Rotation), index == 0 ? boneAngle : boneAngle - parentAngle, CoreUserPreferences.Instance.AutoKeyframes);
 					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.BaseIndex), index, CoreUserPreferences.Instance.AutoKeyframes);
 					Core.Operations.SortBonesInChain.Perform(bone);
 				}
