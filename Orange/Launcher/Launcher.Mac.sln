@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Launcher.Mac", "Launcher.Ma
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yuzu.Mac", "..\..\Yuzu\Yuzu.Mac.csproj", "{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lime.Mac", "..\..\Lime\Lime.Mac.csproj", "{DC16EEBF-404D-4610-B87A-15B57464D707}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -19,15 +21,15 @@ Global
 		{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}.Debug|x86.Build.0 = Debug|Any CPU
 		{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}.Release|x86.ActiveCfg = Release|Any CPU
 		{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}.Release|x86.Build.0 = Release|Any CPU
+		{DC16EEBF-404D-4610-B87A-15B57464D707}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DC16EEBF-404D-4610-B87A-15B57464D707}.Debug|x86.Build.0 = Debug|Any CPU
+		{DC16EEBF-404D-4610-B87A-15B57464D707}.Release|x86.ActiveCfg = Release|Any CPU
+		{DC16EEBF-404D-4610-B87A-15B57464D707}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
 		$0.TextStylePolicy = $1
-		$1.FileWidth = 120
-		$1.TabsToSpaces = False
 		$1.EolMarker = Windows
-		$1.inheritsSet = VisualStudio
-		$1.inheritsScope = text/plain
 		$1.scope = text/x-csharp
 		$0.CSharpFormattingPolicy = $2
 		$2.BeforeMethodDeclarationParentheses = False
@@ -37,31 +39,37 @@ Global
 		$2.BeforeDelegateDeclarationParentheses = False
 		$2.NewParentheses = False
 		$2.SpacesBeforeBrackets = False
-		$2.inheritsSet = Mono
-		$2.inheritsScope = text/x-csharp
 		$2.scope = text/x-csharp
+		$2.IndentSwitchSection = False
+		$2.NewLinesForBracesInProperties = False
+		$2.NewLinesForBracesInAccessors = False
+		$2.NewLinesForBracesInAnonymousMethods = False
+		$2.NewLinesForBracesInControlBlocks = False
+		$2.NewLinesForBracesInAnonymousTypes = False
+		$2.NewLinesForBracesInObjectCollectionArrayInitializers = False
+		$2.NewLinesForBracesInLambdaExpressionBody = False
+		$2.NewLineForElse = False
+		$2.NewLineForCatch = False
+		$2.NewLineForFinally = False
+		$2.NewLineForMembersInObjectInit = False
+		$2.NewLineForMembersInAnonymousTypes = False
+		$2.NewLineForClausesInQuery = False
+		$2.SpacingAfterMethodDeclarationName = True
+		$2.SpaceAfterMethodCallName = True
+		$2.SpaceBeforeOpenSquareBracket = True
 		$0.TextStylePolicy = $3
-		$3.FileWidth = 120
-		$3.TabWidth = 4
 		$3.EolMarker = Windows
-		$3.inheritsSet = Mono
-		$3.inheritsScope = text/plain
 		$3.scope = text/plain
+		$3.IndentWidth = 8
 		$0.TextStylePolicy = $4
 		$4.inheritsSet = null
 		$4.scope = text/x-csrc
 		$0.StandardHeader = $5
-		$5.Text =
-		$5.IncludeInNewFiles = True
 		$0.DotNetNamingPolicy = $6
-		$6.DirectoryNamespaceAssociation = None
-		$6.ResourceNamePolicy = FileFormatDefault
 		$0.TextStylePolicy = $7
 		$7.inheritsSet = null
 		$7.scope = application/xml
 		$0.XmlFormattingPolicy = $8
-		$8.inheritsSet = Mono
-		$8.inheritsScope = application/xml
 		$8.scope = application/xml
 	EndGlobalSection
 EndGlobal

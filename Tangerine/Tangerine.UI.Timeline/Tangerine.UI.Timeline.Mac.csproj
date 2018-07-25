@@ -31,6 +31,8 @@
     <XamMacArch></XamMacArch>
     <Profiling>true</Profiling>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AOTMode>None</AOTMode>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -48,6 +50,8 @@
     <CodeSignResourceRules></CodeSignResourceRules>
     <XamMacArch></XamMacArch>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AOTMode>None</AOTMode>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

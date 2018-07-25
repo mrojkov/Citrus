@@ -20,8 +20,7 @@ namespace Lime
 				if (Owner == null) {
 					return 0;
 				}
-				AnimationBlending animationBlending;
-				Options.TryGetValue(Owner.DefaultAnimation.Id ?? "", out animationBlending);
+				Options.TryGetValue(Owner.DefaultAnimation.Id ?? "", out var animationBlending);
 				return animationBlending?.Option.Frames ?? 0;
 			}
 			set {
@@ -29,8 +28,7 @@ namespace Lime
 					throw new InvalidOperationException();
 				}
 				var animationId = Owner.DefaultAnimation.Id ?? "";
-				AnimationBlending animationBlending;
-				if (!Options.TryGetValue(animationId, out animationBlending)) {
+				if (!Options.TryGetValue(animationId, out var animationBlending)) {
 					animationBlending = new AnimationBlending {
 						Option = new BlendingOption()
 					};
@@ -59,22 +57,19 @@ namespace Lime
 			blendings.Remove(animation.Id ?? "");
 
 			BlendingOption blendingOption = null;
-			AnimationBlending animationBlending;
-			Options.TryGetValue(animation.Id ?? "", out animationBlending);
+			Options.TryGetValue(animation.Id ?? "", out var animationBlending);
 			if (animationBlending != null) {
 				if (animationBlending.Option != null) {
 					blendingOption = animationBlending.Option;
 				}
 
-				MarkerBlending markerBlending;
-				animationBlending.MarkersOptions.TryGetValue(markerId, out markerBlending);
+				animationBlending.MarkersOptions.TryGetValue(markerId, out var markerBlending);
 				if (markerBlending != null) {
 					if (markerBlending.Option != null) {
 						blendingOption = markerBlending.Option;
 					}
 					if (!string.IsNullOrEmpty(sourceMarkerId)) {
-						BlendingOption sourceMarkerBlending;
-						markerBlending.SourceMarkersOptions.TryGetValue(sourceMarkerId, out sourceMarkerBlending);
+						markerBlending.SourceMarkersOptions.TryGetValue(sourceMarkerId, out var sourceMarkerBlending);
 						if (sourceMarkerBlending != null) {
 							blendingOption = sourceMarkerBlending;
 						}
@@ -93,15 +88,13 @@ namespace Lime
 
 		public void UpdateWantedState(Animation animation)
 		{
-			BlendingProcess blending;
-			blendings.TryGetValue(animation.Id ?? "", out blending);
+			blendings.TryGetValue(animation.Id ?? "", out var blending);
 			blending?.SaveWantedState();
 		}
 
 		public void Update(Animation animation, float delta)
 		{
-			BlendingProcess blending;
-			blendings.TryGetValue(animation.Id ?? "", out blending);
+			blendings.TryGetValue(animation.Id ?? "", out var blending);
 			if (blending == null) {
 				return;
 			}
@@ -169,20 +162,16 @@ namespace Lime
 		{
 			public static NodeState TryGetState(Node node, Animation animation)
 			{
-				var node3D = node as Node3D;
-				if (node3D != null) {
+				if (node is Node3D node3D) {
 					return Node3DState.TryGetState(node3D, animation);
 				}
-				var widget = node as Widget;
-				if (widget != null) {
+				if (node is Widget widget) {
 					return WidgetState.TryGetState(widget, animation);
 				}
-				var point = node as DistortionMeshPoint;
-				if (point != null) {
+				if (node is DistortionMeshPoint point) {
 					return DistortionMeshPointState.TryGetState(point, animation);
 				}
-				var bone = node as Bone;
-				if (bone != null) {
+				if (node is Bone bone) {
 					return BoneState.TryGetState(bone, animation);
 				}
 				return null;
@@ -217,8 +206,7 @@ namespace Lime
 
 			public static NodeState TryGetState(Node3D node3D, Animation animation)
 			{
-				var mesh3D = node3D as Mesh3D;
-				if (mesh3D != null && mesh3D.Submeshes.All(sm => sm.Bones.Count == 0)) {
+				if (node3D is Mesh3D mesh3D && mesh3D.Submeshes.All(sm => sm.Bones.Count == 0)) {
 					var existsBones = false;
 					for (var i = 0; i < mesh3D.Submeshes.Count; i++) {
 						if (mesh3D.Submeshes[i].Bones.Count != 0) {
@@ -231,14 +219,9 @@ namespace Lime
 						return null;
 					}
 				}
-
-				Animator<Vector3> positionAnimator;
-				Animator<Quaternion> rotationAnimator;
-				Animator<Vector3> scaleAnimator;
-				node3D.Animators.TryFind("Position", out positionAnimator, animation.Id);
-				node3D.Animators.TryFind("Rotation", out rotationAnimator, animation.Id);
-				node3D.Animators.TryFind("Scale", out scaleAnimator, animation.Id);
-
+				node3D.Animators.TryFind("Position", out Animator<Vector3> positionAnimator, animation.Id);
+				node3D.Animators.TryFind("Rotation", out Animator<Quaternion> rotationAnimator, animation.Id);
+				node3D.Animators.TryFind("Scale", out Animator<Vector3> scaleAnimator, animation.Id);
 				return
 					positionAnimator != null || rotationAnimator != null || scaleAnimator != null ?
 					new Node3DState(node3D) :
@@ -291,19 +274,12 @@ namespace Lime
 					return null;
 				}
 
-				Animator<Vector2> positionAnimator;
-				Animator<float> rotationAnimator;
-				Animator<Vector2> scaleAnimator;
-				Animator<Vector2> sizeAnimator;
-				Animator<Color4> colorAnimator;
-				Animator<bool> visibleAnimator;
-				widget.Animators.TryFind("Position", out positionAnimator, animation.Id);
-				widget.Animators.TryFind("Rotation", out rotationAnimator, animation.Id);
-				widget.Animators.TryFind("Scale", out scaleAnimator, animation.Id);
-				widget.Animators.TryFind("Size", out sizeAnimator, animation.Id);
-				widget.Animators.TryFind("Color", out colorAnimator, animation.Id);
-				widget.Animators.TryFind("Visible", out visibleAnimator, animation.Id);
-
+				widget.Animators.TryFind("Position", out Animator<Vector2> positionAnimator, animation.Id);
+				widget.Animators.TryFind("Rotation", out Animator<float> rotationAnimator, animation.Id);
+				widget.Animators.TryFind("Scale", out Animator<Vector2> scaleAnimator, animation.Id);
+				widget.Animators.TryFind("Size", out Animator<Vector2> sizeAnimator, animation.Id);
+				widget.Animators.TryFind("Color", out Animator<Color4> colorAnimator, animation.Id);
+				widget.Animators.TryFind("Visible", out Animator<bool> visibleAnimator, animation.Id);
 				var existsAtLeastOneAnimator =
 					positionAnimator != null ||
 					rotationAnimator != null ||
@@ -357,10 +333,8 @@ namespace Lime
 
 			public static NodeState TryGetState(DistortionMeshPoint point, Animation animation)
 			{
-				Animator<Vector2> positionAnimator;
-				Animator<Color4> colorAnimator;
-				point.Animators.TryFind("Position", out positionAnimator, animation.Id);
-				point.Animators.TryFind("Color", out colorAnimator, animation.Id);
+				point.Animators.TryFind("Position", out Animator<Vector2> positionAnimator, animation.Id);
+				point.Animators.TryFind("Color", out Animator<Color4> colorAnimator, animation.Id);
 
 				return positionAnimator != null || colorAnimator != null ? new DistortionMeshPointState(point) : null;
 			}
@@ -396,10 +370,8 @@ namespace Lime
 
 			public static NodeState TryGetState(Bone bone, Animation animation)
 			{
-				Animator<Vector2> positionAnimator;
-				Animator<float> rotationAnimator;
-				bone.Animators.TryFind("Position", out positionAnimator, animation.Id);
-				bone.Animators.TryFind("Rotation", out rotationAnimator, animation.Id);
+				bone.Animators.TryFind("Position", out Animator<Vector2> positionAnimator, animation.Id);
+				bone.Animators.TryFind("Rotation", out Animator<float> rotationAnimator, animation.Id);
 
 				return positionAnimator != null || rotationAnimator != null ? new BoneState(bone) : null;
 			}
@@ -450,8 +422,8 @@ namespace Lime
 
 		public double Frames
 		{
-			get { return AnimationUtils.SecondsToFrames(Duration); }
-			set { Duration = value * AnimationUtils.SecondsPerFrame; }
+			get => AnimationUtils.SecondsToFrames(Duration);
+			set => Duration = value * AnimationUtils.SecondsPerFrame;
 		}
 
 		public BlendingOption() { }

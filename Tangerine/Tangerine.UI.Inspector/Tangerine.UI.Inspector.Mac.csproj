@@ -30,6 +30,8 @@
     <CodeSignResourceRules></CodeSignResourceRules>
     <XamMacArch></XamMacArch>
     <Profiling>true</Profiling>
+    <AOTMode>None</AOTMode>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -46,6 +48,8 @@
     <CodeSignEntitlements></CodeSignEntitlements>
     <CodeSignResourceRules></CodeSignResourceRules>
     <XamMacArch></XamMacArch>
+    <AOTMode>None</AOTMode>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

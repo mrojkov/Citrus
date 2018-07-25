@@ -41,6 +41,7 @@
     <EnableCodeSigning>false</EnableCodeSigning>
     <AOTMode>None</AOTMode>
     <EnableSGenConc>true</EnableSGenConc>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>
@@ -63,6 +64,7 @@
     <HttpClientHandler>HttpClientHandler</HttpClientHandler>
     <XamMacArch>i386</XamMacArch>
     <AOTMode>None</AOTMode>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

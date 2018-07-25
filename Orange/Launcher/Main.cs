@@ -120,7 +120,7 @@ namespace Launcher
 #endif // WIN
 		private static string OrangeDirectory { get { return Path.Combine(citrusDirectory, "Orange"); } }
 
-		private static string citrusDirectory = Orange.Toolbox.CalcCitrusDirectory();
+		private static readonly string citrusDirectory = Toolbox.CalcCitrusDirectory();
 
 		[STAThread]
 		public static int Main(string[] args)
