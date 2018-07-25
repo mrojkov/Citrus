@@ -10,6 +10,8 @@ namespace Tangerine.UI.Timeline
 		public int MeasuredFrameDistance { get; set; }
 		public Widget RootWidget { get; private set; }
 
+		private Marker upperMarker = null;
+
 		public Rulerbar()
 		{
 			RootWidget = new Widget {
@@ -26,12 +28,11 @@ namespace Tangerine.UI.Timeline
 				var markers = Document.Current.Container.Markers;
 				int i = markers.FindIndex(m => m.Frame == value);
 				if (i >= 0) {
-					Document.Current.History.DoTransaction(() => {
-						var temp = markers[i];
-						Core.Operations.DeleteMarker.Perform(Document.Current.Container, temp, false);
-						Core.Operations.SetMarker.Perform(Document.Current.Container, temp, false);
-					});
+					upperMarker = markers[i];
 				}
+			});
+			RootWidget.AddChangeWatcher(() => Document.Current.Container, (value) => {
+				upperMarker = null;
 			});
 		}
 
@@ -73,8 +74,12 @@ namespace Tangerine.UI.Timeline
 				}
 			}
 			foreach (var m in Document.Current.Container.Markers) {
-				RenderMarker(m);
+				if (upperMarker != m) {
+					RenderMarker(m);
+				}
 			}
+
+			RenderUpperMarker();
 		}
 
 		void RenderCursor()
@@ -101,6 +106,12 @@ namespace Tangerine.UI.Timeline
 				Renderer.DrawRectOutline(pos, pos + extent + padding.LeftTop + padding.RightBottom, Theme.Colors.ControlBorder);
 				Renderer.DrawTextLine(pos + padding.LeftTop, marker.Id, h, Theme.Colors.BlackText, 0.0f);
 			}
+		}
+
+		void RenderUpperMarker()
+		{
+			if (upperMarker != null)
+				RenderMarker(upperMarker);
 		}
 
 		Color4 GetMarkerColor(Marker marker)
