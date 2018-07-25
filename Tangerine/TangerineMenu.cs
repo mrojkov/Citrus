@@ -21,6 +21,7 @@ namespace Tangerine
 		private static Menu localizationMenu;
 		private static Command localizationCommand;
 		private static Menu layoutMenu;
+		private static Menu orangeMenu;
 
 		static TangerineMenu()
 		{
@@ -32,6 +33,10 @@ namespace Tangerine
 			resolution = new Menu();
 			overlaysMenu = new Menu();
 			rulerMenu = new Menu();
+			orangeMenu = new Menu();
+			RebuildOrangeMenu(null);
+			Project.Opening += (s) => RebuildOrangeMenu(s);
+			Project.Closing += () => RebuildOrangeMenu(null);
 			CreateMainMenu();
 			CreateResolutionMenu();
 		}
@@ -86,7 +91,6 @@ namespace Tangerine
 		private static void CreateMainMenu()
 		{
 			Menu viewMenu;
-			Menu orangeMenu = CreateOrangeMenu();
 			Application.MainMenu = new Menu {
 #if MAC
 				new Command("Application", new Menu {
@@ -203,11 +207,15 @@ namespace Tangerine
 			GenericCommands.Revert.Icon = IconPool.GetTexture("Tools.Revert");
 		}
 
-		private static Menu CreateOrangeMenu()
+		private static void RebuildOrangeMenu(string citprojPath)
 		{
 			var blacklist = new HashSet<string> { "Run Tangerine" };
-			var orangeMenu = new Menu();
-			Orange.MenuController.Instance.CreateAssemblyMenuItems();
+			orangeMenu.Clear();
+			if (citprojPath == null) {
+				orangeMenu.Add(Command.MenuSeparator);
+				return;
+			}
+			Orange.PluginLoader.ScanForPlugins(citprojPath);
 			foreach (var menuItem in Orange.MenuController.Instance.GetVisibleAndSortedItems()) {
 				if (blacklist.Contains(menuItem.Label)) {
 					continue;
@@ -217,7 +225,7 @@ namespace Tangerine
 				}));
 			}
 
-			return orangeMenu;
+			return;
 		}
 
 		public static void OnProjectChanged(Project proj)
