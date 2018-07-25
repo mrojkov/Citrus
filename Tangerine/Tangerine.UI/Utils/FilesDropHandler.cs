@@ -109,7 +109,7 @@ namespace Tangerine.UI
 							case ".tan":
 							case ".model":
 							case ".scene":
-								DropSceneContextMenu.Create(assetPath, assetType, widget.Size, NodeCreated);
+								DropSceneContextMenu.Create(assetPath, assetType, NodeCreated);
 								break;
 						}
 					} catch (System.Exception e) {
@@ -126,7 +126,7 @@ namespace Tangerine.UI
 					}
 					menu.Popup();
 				}
-				Document.Current.History.CommitTransaction();	
+				Document.Current.History.CommitTransaction();
 			}
 		}
 

@@ -12,7 +12,7 @@ namespace Tangerine.UI
 {
 	public static class DropSceneContextMenu
 	{
-		public static void Create(string assetPath, string assetType, Vector2 size, Action<Node> onNodeCreated)
+		public static void Create(string assetPath, string assetType, Action<Node> onNodeCreated)
 		{
 			var fileName = Path.GetFileNameWithoutExtension(assetPath);
 			var menu = new Menu() {
@@ -25,7 +25,7 @@ namespace Tangerine.UI
 						SetProperty.Perform(node, nameof(Node.Id), fileName);
 						if (scene is Widget) {
 							SetProperty.Perform(node, nameof(Widget.Pivot), Vector2.Half);
-							SetProperty.Perform(node, nameof(Widget.Size), size);
+							SetProperty.Perform(node, nameof(Widget.Size), ((Widget)scene).Size);
 						}
 						onNodeCreated?.Invoke(node);
 						node.LoadExternalScenes();
