@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using Lime;
 using Tangerine.Core;
-using Tangerine.Core.Operations;
-using System.Text.RegularExpressions;
 
 namespace Tangerine.UI
 {
@@ -126,15 +124,11 @@ namespace Tangerine.UI
 					assetType = null;
 					return false;
 				} else {
-					var localPath = path.Substring(assetsPath.Length + 1);
-					assetPath = System.IO.Path.ChangeExtension(localPath, null);
-					assetType = System.IO.Path.GetExtension(localPath).ToLower();
-					return true;
+					path = path.Substring(assetsPath.Length + 1);
 				}
 			}
-			var match = Regex.Match(path, @"^(.+)(\..+?)?$");
-			assetPath = match.Groups[1].Value;
-			assetType = match.Groups[2].Value;
+			assetPath = System.IO.Path.ChangeExtension(path, null);
+			assetType = System.IO.Path.GetExtension(path).ToLower();
 			return true;
 		}		
 	}
