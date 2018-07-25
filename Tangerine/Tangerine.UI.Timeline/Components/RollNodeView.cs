@@ -21,6 +21,10 @@ namespace Tangerine.UI.Timeline.Components
 		protected readonly ToolbarButton lockButton;
 		protected readonly ToolbarButton lockAnimationButton;
 		protected readonly Widget indentSpacer;
+		protected readonly Image imageCombinerIndicator;
+
+		public SimpleText Label => label;
+		public Image ImageCombinerIndicator => imageCombinerIndicator;
 
 		private static readonly Color4[] ColorMarks = {
 			Color4.Transparent,
@@ -68,6 +72,12 @@ namespace Tangerine.UI.Timeline.Components
 			}));
 			expandButtonContainer.Updating += delta =>
 				expandButton.Visible = nodeData.Node.Animators.Count > 0;
+			imageCombinerIndicator = new Image {
+				Texture = nodeData.Node is ImageCombiner ? IconPool.GetTexture("Timeline.NoEntry") : NodeIconPool.GetTexture(typeof(ImageCombiner)),
+				Color = Color4.Transparent,
+				MinMaxSize = new Vector2(21, 16),
+				Padding = new Thickness { Left = 5 },
+			};
 			enterButton = NodeCompositionValidator.CanHaveChildren(nodeData.Node.GetType()) ? CreateEnterButton() : null;
 			eyeButton = CreateEyeButton();
 			lockButton = CreateLockButton();
@@ -84,6 +94,7 @@ namespace Tangerine.UI.Timeline.Components
 					new HSpacer(3),
 					label,
 					editBox,
+					imageCombinerIndicator,
 					new Widget(),
 					(Widget)enterButton ?? (Widget)new HSpacer(Theme.Metrics.DefaultToolbarButtonSize.X),
 					lockAnimationButton,

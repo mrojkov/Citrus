@@ -7,6 +7,7 @@ using Tangerine.Core;
 using Tangerine.UI;
 using Tangerine.UI.Docking;
 using Tangerine.UI.BackupHistoryPanel;
+using Tangerine.UI.Timeline.Processors;
 
 namespace Tangerine
 {
@@ -188,6 +189,7 @@ namespace Tangerine
 				new TriggersValidatorOnSetKeyframe(),
 				new UpdateNodesAndApplyAnimatorsProcessor(),
 				new RowsSynchronizer(),
+				new ImageCombinerIndicationProcessor(),
 			});
 			DocumentHistory.Processors.AddRange(UI.Timeline.Timeline.GetOperationProcessors());
 

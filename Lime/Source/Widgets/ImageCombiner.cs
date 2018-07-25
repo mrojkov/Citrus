@@ -62,7 +62,7 @@ namespace Lime
 			return (v.Y - u.Y) * (w.X - v.X) > (v.X - u.X) * (w.Y - v.Y);
 		}
 
-		bool GetArgs(out IImageCombinerArg arg1, out IImageCombinerArg arg2)
+		public bool GetArgs(out IImageCombinerArg arg1, out IImageCombinerArg arg2)
 		{
 			if (Parent != null) {
 				int index = Parent.Nodes.IndexOf(this);

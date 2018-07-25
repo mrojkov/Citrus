@@ -406,6 +406,8 @@
     <EmbeddedResource Include="Resources\Icons\Light\Tools\DistributeCentersVertically.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Tools\Selection.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Tools\Selection.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Timeline\NoEntry.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Timeline\NoEntry.png" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

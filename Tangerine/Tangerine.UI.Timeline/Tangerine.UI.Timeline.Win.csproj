@@ -73,6 +73,7 @@
     <Compile Include="Operations\SetCurrentColumn.cs" />
     <Compile Include="Operations\ShiftGridSelection.cs" />
     <Compile Include="Processors\GridPane\ClampScrollPosProcessor.cs" />
+    <Compile Include="Processors\ImageCombinerIndicationProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Processors\GridPane\DragKeyframesRespondentProcessor.cs" />
     <Compile Include="Processors\GridPane\GridMouseScrollProcessor.cs" />
