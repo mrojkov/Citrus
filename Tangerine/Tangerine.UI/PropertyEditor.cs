@@ -918,9 +918,17 @@ namespace Tangerine.UI
 
 		protected override bool IsValid(string path)
 		{
-			if (base.IsValid(path) == true) {
+			if (base.IsValid(path)) {
 				var resolvedPath = Node.ResolveScenePath(path);
-				return (resolvedPath != null) ? AssetBundle.Current.FileExists(resolvedPath) : false;
+				if (resolvedPath == null || !AssetBundle.Current.FileExists(resolvedPath)) {
+					editor.Text = CoalescedPropertyValue().GetValue();
+					AlertDialog.Show($"{EditorParams.PropertyName}: Value is not valid");
+					return false;
+				}
+				string assetPath;
+				string assetType;
+				return Utils.ExtractAssetPathOrShowAlert(path, out assetPath, out assetType)
+					&& Utils.AssertCurrentDocument(assetPath, assetType);
 			}
 			return false;
 		}
@@ -932,7 +940,6 @@ namespace Tangerine.UI
 				Document.Current.RefreshExternalScenes();
 			} else {
 				editor.Text = CoalescedPropertyValue().GetValue();
-				new AlertDialog($"{EditorParams.PropertyName}: Value is not valid", "Ok").Show();
 			}
 		}
 	}
