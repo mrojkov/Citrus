@@ -33,8 +33,7 @@ namespace Tangerine.Processors
 						SetImageCombinerIndication(rows[i + 1]);
 						SetImageCombinerIndication(rows[i + 2]);
 						i += 2;
-					}
-					else {
+					} else {
 						view.Label.Color = ColorTheme.Current.Basic.RedText;
 						view.ImageCombinerIndicator.Color = Color4.White;
 					}
