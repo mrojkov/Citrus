@@ -297,8 +297,28 @@ namespace Tangerine.UI.Timeline
 					if (IsDescendant(bone, targetParent)) return false;
 					if (bone.BaseIndex == 0 && !location.ParentRow.Components.Contains<BoneRow>()) {
 						MoveFolderItemTo(bone, location);
+					} else if (!location.ParentRow.Components.Contains<BoneRow>()) {
+						SetAnimableProperty.Perform(
+							bone, nameof(Bone.Position),
+							bone.Position * bone.CalcLocalToParentWidgetTransform(),
+							CoreUserPreferences.Instance.AutoKeyframes);
+						var boneEntry = bone.Parent.AsWidget.BoneArray[bone.Index];
+						float angle = (boneEntry.Tip - boneEntry.Joint).Atan2Deg;
+						SetAnimableProperty.Perform(
+							bone, nameof(Bone.Rotation),
+							angle, CoreUserPreferences.Instance.AutoKeyframes);
 					} else {
-						SetProperty.Perform(bone, nameof(Bone.Position), Vector2.Zero);
+						SetAnimableProperty.Perform(
+							bone, nameof(Bone.Position),
+							Vector2.Zero, CoreUserPreferences.Instance.AutoKeyframes);
+						var newParent = location.ParentRow.Components.Get<BoneRow>().Bone;
+						var parentEntry = newParent.Parent.AsWidget.BoneArray[newParent.Index];
+						float parentAngle = (parentEntry.Tip - parentEntry.Joint).Atan2Deg;
+						var boneEntry = bone.Parent.AsWidget.BoneArray[bone.Index];
+						float angle = (boneEntry.Tip - boneEntry.Joint).Atan2Deg;
+						SetAnimableProperty.Perform(
+							bone, nameof(Bone.Rotation),
+							angle - parentAngle, CoreUserPreferences.Instance.AutoKeyframes);
 					}
 
 					SetProperty.Perform(bone, nameof(Bone.BaseIndex), targetParent?.Index ?? 0);
