@@ -253,6 +253,7 @@ namespace Tangerine.UI.SceneView
 			new FrameBorderPresenter(this);
 			new InspectRootNodePresenter(this);
 			new NineGridLinePresenter(this);
+			new Animation2DPathPresenter(this);
 		}
 
 		public void CreateNode(Type nodeType, ICommand command)

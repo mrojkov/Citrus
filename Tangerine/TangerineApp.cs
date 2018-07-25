@@ -165,7 +165,6 @@ namespace Tangerine
 				}
 			};
 			Document.NodeDecorators.AddFor<ParticleEmitter>(n => n.CompoundPostPresenter.Add(new UI.SceneView.ParticleEmitterPresenter()));
-			Document.NodeDecorators.Add(n => n.CompoundPostPresenter.Add(new UI.SceneView.Animation2DPathPresenter()));
 			DocumentHistory.Processors.AddRange(new IOperationProcessor[] {
 				new Core.Operations.SelectRow.Processor(),
 				new Core.Operations.SetProperty.Processor(),
