@@ -7,12 +7,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Tangerine.Core;
 using Tangerine.Core.Components;
-using Tangerine.UI;
 using Tangerine.UI.Timeline.Components;
 
-namespace Tangerine.Processors
+namespace Tangerine.UI.Timeline.Processors
 {
-	class ImageCombinerIndicationProcessor : SymmetricOperationProcessor
+	public class ImageCombinerIndicationProcessor : SymmetricOperationProcessor
 	{
 		public override void Process(IOperation op)
 		{
@@ -33,7 +32,8 @@ namespace Tangerine.Processors
 						SetImageCombinerIndication(rows[i + 1]);
 						SetImageCombinerIndication(rows[i + 2]);
 						i += 2;
-					} else {
+					}
+					else {
 						view.Label.Color = ColorTheme.Current.Basic.RedText;
 						view.ImageCombinerIndicator.Color = Color4.White;
 					}
