@@ -224,6 +224,7 @@ namespace Tangerine.UI.SceneView
 				new DragPointObjectsProcessor(),
 				new DragSplineTangentsProcessor(),
 				new DragSplinePoint3DProcessor(),
+				new DragAnimationPathPointProcessor(),
 				new ResizeWidgetsProcessor(),
 				new RescalePointObjectSelectionProcessor(),
 				new RotatePointObjectSelectionProcessor(),

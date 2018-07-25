@@ -29,15 +29,12 @@ namespace Tangerine.UI.SceneView
 						animator.TargetProperty == nameof(Widget.Position)
 					) {
 						var keys = animator.ReadonlyKeys.ToList();
-						if (keys.Count == 0) {
+						if (keys.Count < 2) {
 							continue;
 						}
 						points.Clear();
 						for (int i = 0; i < keys.Count; ++i) {
 							points.Add((Vector2)keys[i].Value);
-						}
-						if (points.Count < 2) {
-							continue;
 						}
 						var transform = node.Parent.AsWidget.CalcTransitionToSpaceOf(SceneView.Instance.Frame);
 						SceneView.Instance.Frame.PrepareRendererState();
