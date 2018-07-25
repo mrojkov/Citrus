@@ -23,7 +23,6 @@ namespace Tangerine.UI.Timeline
 					CreateAutoKeyframesButton(),
 					CreateNewFolderButton(),
 					CreateCurveEditorButton(),
-					CreateAnimationPathButton(),
 					CreateAnimationIndicator(),
 					new Widget(),
 					CreateExitButton(),
@@ -43,15 +42,6 @@ namespace Tangerine.UI.Timeline
 			button.AddChangeWatcher(() => CoreUserPreferences.AnimationMode, i => button.Checked = i);
 			button.Clicked += () => CoreUserPreferences.AnimationMode = !CoreUserPreferences.AnimationMode;
 			button.Components.Add(new DocumentationComponent("AnimationMode"));
-			return button;
-		}
-
-		ToolbarButton CreateAnimationPathButton()
-		{
-			var button = new ToolbarButton(IconPool.GetTexture("Timeline.AnimationPath")) { Tip = "Show animation path" };
-			button.AddChangeWatcher(() => CoreUserPreferences.ShowAnimationPath, i => button.Checked = i);
-			button.Clicked += () => CoreUserPreferences.ShowAnimationPath = !CoreUserPreferences.ShowAnimationPath;
-			button.Components.Add(new DocumentationComponent("ShowAnimationPath.md"));
 			return button;
 		}
 

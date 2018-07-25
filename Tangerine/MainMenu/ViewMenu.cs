@@ -172,4 +172,14 @@ namespace Tangerine
 			DictionaryPath = dictionaryPath;
 		}
 	}
+
+	public class ShowAnimation : CommandHandler
+	{
+		public override void Execute() {
+			CoreUserPreferences.Instance.ShowAnimationPath = !CoreUserPreferences.Instance.ShowAnimationPath;
+			Application.InvalidateWindows();
+		}
+		public override void RefreshCommand(ICommand command) =>
+			command.Checked = CoreUserPreferences.Instance.ShowAnimationPath;
+	}
 }
