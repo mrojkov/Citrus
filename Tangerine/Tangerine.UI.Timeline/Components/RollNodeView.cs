@@ -23,6 +23,9 @@ namespace Tangerine.UI.Timeline.Components
 		protected readonly Widget indentSpacer;
 		protected readonly Image imageCombinerIndicator;
 
+		public SimpleText Label => label;
+		public Image ImageCombinerIndicator => imageCombinerIndicator;
+
 		private static readonly Color4[] ColorMarks = {
 			Color4.Transparent,
 			ColorTheme.Current.TimelineRoll.RedMark,
@@ -123,52 +126,6 @@ namespace Tangerine.UI.Timeline.Components
 					Rename();
 				});
 			}));
-		}
-
-		public static void UpdateImageCombinerIndication(Row row)
-		{
-			var view = row.Components.Get<RowView>()?.RollRow as RollNodeView;
-			if (view == null) {
-				return;
-			}
-			var combiner = row.Components.Get<NodeRow>()?.Node as ImageCombiner;
-			if (combiner == null) {
-				UpdateIsImageCombinerArg(row, view);
-				return;
-			}
-			IImageCombinerArg arg1;
-			IImageCombinerArg arg2;
-			if (combiner.GetArgs(out arg1, out arg2)) {
-				view.label.Color = ColorTheme.Current.Basic.BlackText;
-				view.imageCombinerIndicator.Color = Color4.Transparent;
-			} else {
-				view.label.Color = ColorTheme.Current.Basic.RedText;
-				view.imageCombinerIndicator.Color = Color4.White;
-			}
-		}
-		
-		private static void UpdateIsImageCombinerArg(Row row, RollNodeView view)
-		{
-			var arg = row.Components.Get<NodeRow>()?.Node as IImageCombinerArg;
-			if (arg == null) {
-				return;
-			}
-			var image = arg as Node;
-			if (image == null) {
-				return;
-			}
-			var index = image.Parent.Nodes.IndexOf(image);
-			var count = image.Parent.Nodes.Count;
-			var result = false;
-			if (count > index + 1 && index > 0) {
-				result |= image.Parent.Nodes[index - 1] is ImageCombiner
-					&& image.Parent.Nodes[index + 1] is IImageCombinerArg;
-			}
-			if (!result && index > 1) {
-				result |= image.Parent.Nodes[index - 1] is IImageCombinerArg
-					&& image.Parent.Nodes[index - 2] is ImageCombiner;
-			}
-			view.imageCombinerIndicator.Color = result ? Color4.White : Color4.Transparent;
 		}
 
 		public Widget Widget => widget;

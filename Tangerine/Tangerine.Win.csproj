@@ -65,6 +65,7 @@
     <Compile Include="DisplayResolutions.cs" />
     <Compile Include="OrangePluginUIBuidler.cs" />
     <Compile Include="HotkeyRegistry.cs" />
+    <Compile Include="Processors\ImageCombinerIndicationProcessor.cs" />
     <Compile Include="TangerineApp.cs" />
     <Compile Include="Main.Win.cs" />
     <Compile Include="TangerineMenu.cs" />
