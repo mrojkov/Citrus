@@ -100,12 +100,12 @@ namespace Tangerine.UI.FilesystemView
 		public string CurrentPath
 		{
 			get { return currentPath; }
-			set
-			{
+			set {
 				try {
 					Directory.EnumerateFileSystemEntries(value).ToList();
 					currentPath = value;
-				} catch {
+				}
+				catch {
 					(new AlertDialog("Invalid Directory")).Show();
 				}
 			}
@@ -173,6 +173,13 @@ namespace Tangerine.UI.FilesystemView
 					}
 				default:
 					throw new ArgumentException();
+			}
+		}
+
+		public IEnumerable<string> EnumerateDirectories(string path)
+		{
+			foreach (var i in Directory.EnumerateDirectories(path).OrderBy(f => f)) {
+				yield return i;
 			}
 		}
 

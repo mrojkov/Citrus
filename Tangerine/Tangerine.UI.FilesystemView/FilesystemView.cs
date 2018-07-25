@@ -151,9 +151,9 @@ namespace Tangerine.UI.FilesystemView
 		public void Initialize()
 		{
 			var up = RootWidget.Components.Get<ViewNodeComponent>().ViewNode as FSViewNode;
-			toolbar = new FilesystemToolbar(this);
-			toolbar.TabTravesable = new TabTraversable();
 			model = new Model(up.Path);
+			toolbar = new FilesystemToolbar(this, model);
+			toolbar.TabTravesable = new TabTraversable();
 			InitializeWidgets();
 			selectionPreviewSplitter.Stretches = Splitter.GetStretchesList(up.SelectionPreviewSplitterStretches, 1, 1);
 			cookingRulesSplitter.Stretches = Splitter.GetStretchesList(up.CookingRulesSplitterStretches, 1, 1);
@@ -251,7 +251,7 @@ namespace Tangerine.UI.FilesystemView
 			InvalidateView(path, sortType, orderType);
 		}
 
-		public void Open(string path)
+		public bool Open(string path)
 		{
 			try {
 				var attr = File.GetAttributes(path);
@@ -262,11 +262,37 @@ namespace Tangerine.UI.FilesystemView
 						Project.Current.OpenDocument(path, true);
 					}
 				}
+				return true;
 			}
-			catch (FileNotFoundException e) {
+			catch (ArgumentException) {
+				var dialog = new AlertDialog("The path is empty, contains only white spaces, or contains invalid characters.");
+				dialog.Show();
+			}
+			catch (PathTooLongException) {
+				var dialog = new AlertDialog("The specified path, file name, or both exceed the system-defined maximum length.");
+				dialog.Show();
+			}
+			catch (NotSupportedException) {
+				var dialog = new AlertDialog("The path is in an invalid format.");
+				dialog.Show();
+			}
+			catch (FileNotFoundException) {
 				var dialog = new AlertDialog("Tangerine can not find \"" + path + "\".\nCheck the spelling and try again.");
 				dialog.Show();
 			}
+			catch (DirectoryNotFoundException) {
+				var dialog = new AlertDialog("The path represents a directory and is invalid, such as being on an unmapped drive, or the directory cannot be found.");
+				dialog.Show();
+			}
+			catch (IOException) {
+				var dialog = new AlertDialog("This file is being used by another process.");
+				dialog.Show();
+			}
+			catch (UnauthorizedAccessException) {
+				var dialog = new AlertDialog("Tangerine does not have the required permission.");
+				dialog.Show();
+			}
+			return false;
 		}
 
 		private void OpenSpecial(string path)
