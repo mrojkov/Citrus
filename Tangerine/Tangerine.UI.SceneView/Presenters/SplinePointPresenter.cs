@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Lime;
 using Tangerine.Core;
 using System.Linq;
@@ -32,8 +32,14 @@ namespace Tangerine.UI.SceneView
 					var a = Vector2.CosSin(point.TangentAngle * Mathf.DegToRad) * TangentWeightRatio * point.TangentWeight;
 					var p1 = t * (point.TransformedPosition + a);
 					var p2 = t * (point.TransformedPosition - a);
+					var norm = (p2 - p1).Normalized;
+					norm = new Vector2(-norm.Y, norm.X);
+					Renderer.DrawLine(p1 + norm, p2 + norm, ColorTheme.Current.SceneView.SplineOutline);
 					Renderer.DrawLine(p1, p2, color);
+					Renderer.DrawLine(p1 - norm, p2 - norm, ColorTheme.Current.SceneView.SplineOutline);
+					Renderer.DrawRound(p1, 5, 10, ColorTheme.Current.SceneView.SplineOutline);
 					Renderer.DrawRound(p1, 3, 10, color);
+					Renderer.DrawRound(p2, 5, 10, ColorTheme.Current.SceneView.SplineOutline);
 					Renderer.DrawRound(p2, 3, 10, color);
 				}
 			}
