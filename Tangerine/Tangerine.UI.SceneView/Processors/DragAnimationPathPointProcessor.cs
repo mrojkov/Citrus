@@ -20,6 +20,9 @@ namespace Tangerine.UI.SceneView
 				var nodes = Document.Current.SelectedNodes().Editable();
 				var mousePosition = sv.MousePosition;
 				foreach (var node in nodes) {
+					if (!(node is Widget)) {
+						continue;
+					}
 					if (node is IAnimable) {
 						var animable = node as IAnimable;
 						foreach (var animator in animable.Animators) {
@@ -33,7 +36,7 @@ namespace Tangerine.UI.SceneView
 									if ((mousePosition - (Vector2)key.Value * transform).Length < 20) {
 										Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 										if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {
-											yield return Drag(node, key);
+											yield return Drag(node as Widget, animator, key);
 										}
 										goto Next;
 									} 
@@ -47,9 +50,9 @@ namespace Tangerine.UI.SceneView
 			}
 		}
 
-		private IEnumerator<object> Drag(Node node, IKeyframe key)
+		private IEnumerator<object> Drag(Widget widget, IAnimator animator, IKeyframe key)
 		{
-			var transform = sv.Scene.CalcTransitionToSpaceOf(node.Parent.AsWidget);
+			var transform = sv.Scene.CalcTransitionToSpaceOf(widget.Parent.AsWidget);
 			var initMousePos = sv.MousePosition * transform;
 			using (Document.Current.History.BeginTransaction()) {
 				while (sv.Input.IsMousePressed()) {
@@ -57,6 +60,7 @@ namespace Tangerine.UI.SceneView
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					var curMousePos = sv.MousePosition * transform;
 					var diff = curMousePos - initMousePos;
+					animator.ResetCache();
 					Core.Operations.SetProperty.Perform(
 						typeof(IKeyframe), key, nameof(IKeyframe.Value), (Vector2)key.Value + diff);
 					yield return null;
