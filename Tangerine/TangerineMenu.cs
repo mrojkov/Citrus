@@ -212,10 +212,8 @@ namespace Tangerine
 			var blacklist = new HashSet<string> { "Run Tangerine" };
 			orangeMenu.Clear();
 			if (citprojPath == null) {
-				orangeMenu.Add(Command.MenuSeparator);
 				return;
 			}
-			Orange.PluginLoader.ScanForPlugins(citprojPath);
 			foreach (var menuItem in Orange.MenuController.Instance.GetVisibleAndSortedItems()) {
 				if (blacklist.Contains(menuItem.Label)) {
 					continue;
