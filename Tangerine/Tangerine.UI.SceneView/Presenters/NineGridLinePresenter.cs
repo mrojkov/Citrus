@@ -91,7 +91,7 @@ namespace Tangerine.UI.SceneView
 			Renderer.DrawLine(A, B, Color4.Red, 2);
 		}
 
-		public bool HitTest(Vector2 point, Widget canvas, float radius = 10)
+		public bool HitTest(Vector2 point, Widget canvas, float radius = 20)
 		{
 			var matrix = Owner.CalcTransitionToSpaceOf(canvas);
 			var A = matrix.TransformVector(this.A);
