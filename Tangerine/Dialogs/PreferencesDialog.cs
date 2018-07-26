@@ -189,6 +189,17 @@ namespace Tangerine
 
 		Widget CreateGeneralPane()
 		{
+			var parent = new Widget();
+			parent.Layout = new VBoxLayout { Spacing = 0 };
+			parent.Padding = contentPadding;
+			var platform = new Widget();
+			platform.Layout = new HBoxLayout { Spacing = 4, CellDefaults = new LayoutCell(Alignment.Center) };
+			platform.Padding = contentPadding;
+			platform.AddNode(new ThemedSimpleText("Target platform"));
+			var platformPicker = (Orange.The.UI as OrangeInterface).PlatformPicker;
+			platformPicker.Unlink();
+			platform.AddNode(platformPicker);
+			parent.AddNode(platform);
 			var pane = new ThemedScrollView();
 			pane.Content.Layout = new VBoxLayout { Spacing = 4 };
 			pane.Content.Padding = contentPadding;
@@ -212,7 +223,8 @@ namespace Tangerine
 				() => UI.SceneView.SceneUserPreferences.Instance.DefaultBoneWidth, (v) => Application.InvalidateWindows());
 			new EnumPropertyEditor<KeyFunction>(
 				new PropertyEditorParams(pane.Content, CoreUserPreferences.Instance, nameof(CoreUserPreferences.DefaultKeyFunction), "Default interpolation"));
-			return pane;
+			parent.AddNode(pane);
+			return parent;
 		}
 
 		private void SaveAfterEdit()

@@ -56,6 +56,7 @@
     <Compile Include="Dialogs\HelpDialog.cs" />
     <Compile Include="Dialogs\ManageRulersDialog.cs" />
     <Compile Include="Dialogs\OrangePluginOptionsDialog.cs" />
+    <Compile Include="PlatformPicker.cs" />
     <Compile Include="Dialogs\PreferencesDialog.cs" />
     <Compile Include="Dialogs\HotkeyEditor.cs" />
     <Compile Include="DocumentTabContextMenu.cs" />

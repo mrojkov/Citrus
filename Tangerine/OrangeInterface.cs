@@ -11,6 +11,8 @@ namespace Tangerine
 	{
 		public OrangePluginUIBuidler PluginUIBuilder;
 
+		public readonly PlatformPicker PlatformPicker = new PlatformPicker();
+
 		public override bool AskConfirmation(string text)
 		{
 			bool? result = null;
@@ -33,7 +35,7 @@ namespace Tangerine
 
 		public override Target GetActiveTarget()
 		{
-			return The.Workspace.Targets.First();
+			return PlatformPicker.SelectedTarget;
 		}
 
 		public override bool DoesNeedSvnUpdate()
@@ -49,5 +51,10 @@ namespace Tangerine
 
 		public override void CreatePluginUI(IPluginUIBuilder builder) { }
 		public override void DestroyPluginUI() { }
+
+		public override void OnWorkspaceOpened()
+		{
+			PlatformPicker.Reload();
+		}
 	}
 }

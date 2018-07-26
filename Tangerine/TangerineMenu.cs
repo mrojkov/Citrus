@@ -229,7 +229,7 @@ namespace Tangerine
 			});
 			var cookGameAssets = items.First((i) => i.Label == "Cook Game Assets");
 			CommandHandlerList.Global.Connect(OrangeCommands.CookGameAssets, () => {
-				WidgetContext.Current.Root.Tasks.Add(
+				context.Root.Tasks.Add(
 					OrangeTask(() => cookGameAssets.Action())
 				);
 			});
@@ -242,7 +242,7 @@ namespace Tangerine
 				}
 				string label = Regex.Replace(menuItem.Label, @"(?<!&)&(?!&)", "&&");
 				orangeMenu.Add(new Command(label, () => {
-					WidgetContext.Current.Root.Tasks.Add(OrangeTask(() => menuItem.Action()));
+					context.Root.Tasks.Add(OrangeTask(() => menuItem.Action()));
 				}));
 			}
 			return;
