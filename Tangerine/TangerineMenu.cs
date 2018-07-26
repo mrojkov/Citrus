@@ -216,7 +216,7 @@ namespace Tangerine
 				return;
 			}
 			var items = Orange.MenuController.Instance.GetVisibleAndSortedItems();
-			var buildAndRun = items.First((i) => i.Label == "Build & Run");
+			var buildAndRun = items.First((i) => i.Label == "Build and Run");
 			var context = WidgetContext.Current;
 			CommandHandlerList.Global.Connect(OrangeCommands.Run, () => {
 				context.Root.Tasks.Add(OrangeTask(
@@ -234,12 +234,11 @@ namespace Tangerine
 			orangeMenu.Add(OrangeCommands.Run);
 			orangeMenu.Add(OrangeCommands.RunConfig);
 			orangeMenu.Add(OrangeCommands.CookGameAssets);
-			foreach (var menuItem in items.Where((i) => i.Label != "Build & Run" && i.Label != "Cook Game Assets")) {
+			foreach (var menuItem in items.Where((i) => i.Label != "Build and Run" && i.Label != "Cook Game Assets")) {
 				if (blacklist.Contains(menuItem.Label)) {
 					continue;
 				}
-				string label = Regex.Replace(menuItem.Label, @"(?<!&)&(?!&)", "&&");
-				orangeMenu.Add(new Command(label, () => {
+				orangeMenu.Add(new Command(menuItem.Label, () => {
 					context.Root.Tasks.Add(OrangeTask(() => menuItem.Action()));
 				}));
 			}

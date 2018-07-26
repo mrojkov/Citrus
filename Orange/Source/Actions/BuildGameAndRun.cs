@@ -8,7 +8,7 @@ namespace Orange
 		public const string ConsoleCommandPassArguments = "--passargs";
 
 		[Export(nameof(OrangePlugin.MenuItemsWithErrorDetails))]
-		[ExportMetadata("Label", "Build & Run")]
+		[ExportMetadata("Label", "Build and Run")]
 		[ExportMetadata("Priority", 0)]
 		public static string BuildAndRunAction()
 		{
