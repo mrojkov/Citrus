@@ -183,4 +183,11 @@ namespace Tangerine.UI
 #endif
 		public static readonly ICommand OpenInSystemFileManager = new Command(OpenInSystemFileManagerDescription);
 	}
+
+	public static class OrangeCommands
+	{
+		public static readonly ICommand Run = new Command("Run", new Shortcut(Key.F9));
+		public static readonly ICommand RunConfig = new Command("Run config", new Shortcut(Modifiers.Control, Key.F9));
+		public static readonly ICommand CookGameAssets = new Command("Cook Game Assets", new Shortcut(Modifiers.Alt, Key.F9));
+	}
 }

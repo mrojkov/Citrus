@@ -550,6 +550,7 @@ namespace Tangerine
 			h.Connect(TimelineCommands.CopyKeyframes, UI.Timeline.Operations.CopyKeyframes.Perform);
 			h.Connect(TimelineCommands.PasteKeyframes, UI.Timeline.Operations.PasteKeyframes.Perform);
 			h.Connect(TimelineCommands.ReverseKeyframes, UI.Timeline.Operations.ReverseKeyframes.Perform);
+			h.Connect(OrangeCommands.RunConfig, new OrangeCommandHandler(() => new OrangePluginOptionsDialog()));
 		}
 
 		private void InitializeHotkeys()
@@ -562,6 +563,7 @@ namespace Tangerine
 			HotkeyRegistry.InitCommands(typeof(SceneViewCommands), "Scene View Commands");
 			HotkeyRegistry.InitCommands(typeof(Tools), "Tools");
 			HotkeyRegistry.InitCommands(typeof(FilesystemCommands), "Filesystem Commands");
+			HotkeyRegistry.InitCommands(typeof(OrangeCommands), "Orange Commands");
 			HotkeyRegistry.InitCommands(Command.Editing, "Editing", "Editing");
 			var defaultProfile = HotkeyRegistry.CreateProfile(HotkeyRegistry.DefaultProfileName);
 			if (File.Exists(defaultProfile.Filepath)) {
