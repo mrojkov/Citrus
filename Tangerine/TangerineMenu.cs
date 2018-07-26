@@ -36,8 +36,6 @@ namespace Tangerine
 			rulerMenu = new Menu();
 			orangeMenu = new Menu();
 			RebuildOrangeMenu(null);
-			Project.Opening += (s) => RebuildOrangeMenu(s);
-			Project.Closing += () => RebuildOrangeMenu(null);
 			CreateMainMenu();
 			CreateResolutionMenu();
 		}
@@ -254,6 +252,7 @@ namespace Tangerine
 				CommandHandlerList.Global.Disconnect(item);
 			}
 			overlaysMenu.Clear();
+			RebuildOrangeMenu(proj.CitprojPath);
 			if (proj == Project.Null)
 				return;
 			proj.UserPreferences.Rulers.CollectionChanged += OnRulersCollectionChanged;

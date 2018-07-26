@@ -41,7 +41,6 @@ namespace Tangerine.Core
 
 		public static event Action<Document> DocumentSaving;
 		public static event Action<string> Opening;
-		public static event Action Closing;
 
 		private Project() { }
 
@@ -130,7 +129,6 @@ namespace Tangerine.Core
 			} catch (System.Exception) { }
 			AssetBundle.Current = null;
 			Current = Null;
-			Closing?.Invoke();
 			return true;
 		}
 
