@@ -32,9 +32,7 @@ namespace Lime
 			public Rectangle UV;
 		};
 
-		Part[] layout = new Part[9];
-
-		public Part[] Parts => layout;
+		public Part[] Parts { get; } = new Part[9];
 
 		public NineGrid()
 		{
@@ -127,21 +125,21 @@ namespace Lime
 
 		public override void Render()
 		{
-			BuildLayout(layout);
+			BuildLayout(Parts);
 			Renderer.Transform1 = LocalToWorldTransform;
 			Renderer.Blending = GlobalBlending;
 			Renderer.Shader = GlobalShader;
-			for (int i = 0; i < layout.Length; i++) {
-				var part = layout[i];
+			for (int i = 0; i < Parts.Length; i++) {
+				var part = Parts[i];
 				Renderer.DrawSprite(Texture, GlobalColor, part.Rect.A, part.Rect.Size, part.UV.A, part.UV.B);
 			}
 		}
 
 		internal protected override bool PartialHitTestByContents (ref HitTestArgs args)
 		{
-			BuildLayout(layout);
-			for (int i = 0; i < layout.Length; i++) {
-				if (PartHitTest(layout[i], args.Point))
+			BuildLayout(Parts);
+			for (int i = 0; i < Parts.Length; i++) {
+				if (PartHitTest(Parts[i], args.Point))
 					return true;
 			}
 			return false;
