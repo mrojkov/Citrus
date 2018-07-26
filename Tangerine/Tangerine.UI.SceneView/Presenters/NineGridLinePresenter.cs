@@ -30,7 +30,7 @@ namespace Tangerine.UI.SceneView
 	{
 		public NineGrid Owner { get; private set; }
 		public string PropertyName => PropertyNames[index];
-		public float Value => (float)Owner.GetType().GetProperty(PropertyName).GetValue(Owner);
+		public float Value => PropertyGetters[index](Owner);
 		public float TextureSize => TextureSizeGetters[index % 2](Owner);
 		public float GridSize => NineGridSizeGetters[index % 2](Owner);
 		public float MaxValue => GridSize / TextureSize;
@@ -49,6 +49,11 @@ namespace Tangerine.UI.SceneView
 		private readonly string[] PropertyNames = {
 			nameof(NineGrid.LeftOffset),  nameof(NineGrid.TopOffset),
 			nameof(NineGrid.RightOffset), nameof(NineGrid.BottomOffset)
+		};
+
+		private readonly Func<NineGrid, float>[] PropertyGetters = {
+			g => g.LeftOffset, g => g.TopOffset,
+			g => g.RightOffset, g => g.BottomOffset
 		};
 
 		private readonly Func<NineGrid, float>[] TextureSizeGetters = {
