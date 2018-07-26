@@ -99,9 +99,9 @@ namespace Tangerine.UI.SceneView
 			return DistanceFromPointToLine(A, B, point) <= radius;
 		}
 
-		public Vector2 GetDirection(Widget canvas)
+		public Vector2 GetDirection()
 		{
-			var matrix = Owner.CalcTransitionToSpaceOf(canvas);
+			var matrix = Owner.CalcLocalToParentTransform();
 			return (matrix * Directions[index] - matrix * Vector2.Zero).Normalized;
 		}
 

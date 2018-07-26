@@ -37,7 +37,7 @@ namespace Tangerine.UI.SceneView
 		{
 			var transform = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
 			var initMousePos = sv.MousePosition * transform;
-			var dir = nineGridLine.GetDirection(sv.Scene);
+			var dir = nineGridLine.GetDirection();
 			float value = nineGridLine.Value;
 			var nineGrid = nineGridLine.Owner;
 			var propertyName = nineGridLine.PropertyName;
