@@ -34,6 +34,7 @@ namespace Tangerine.UI.SceneView
 		public float TextureSize => TextureSizeGetters[index % 2](Owner);
 		public float GridSize => NineGridSizeGetters[index % 2](Owner);
 		public float MaxValue => GridSize / TextureSize;
+		public float Scale => NineGridScaleGetters[index % 2](Owner);
 
 		private readonly int index;
 		private int IndexA => Indexes[index].Item1;
@@ -64,6 +65,11 @@ namespace Tangerine.UI.SceneView
 		private readonly Func<NineGrid, float>[] NineGridSizeGetters = {
 			g => g.Size.X,
 			g => g.Size.Y
+		};
+
+		private readonly Func<NineGrid, float>[] NineGridScaleGetters = {
+			g => g.Scale.X,
+			g => g.Scale.Y
 		};
 
 		private readonly Vector2[] Directions = {

@@ -42,7 +42,7 @@ namespace Tangerine.UI.SceneView
 			var nineGrid = nineGridLine.Owner;
 			var propertyName = nineGridLine.PropertyName;
 			var maxValue = nineGridLine.MaxValue;
-			var size = nineGridLine.TextureSize;
+			var size = nineGridLine.TextureSize * nineGridLine.Scale;
 			float clipTolerance = 15 / size;
 			float[] clipPositions = { 0, maxValue, maxValue / 3, maxValue / 3 * 2 };
 			using(Document.Current.History.BeginTransaction()) {
