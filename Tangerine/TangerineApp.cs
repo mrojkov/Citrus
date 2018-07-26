@@ -243,12 +243,14 @@ namespace Tangerine
 			DocumentHistory.Processors.AddRange(UI.Timeline.Timeline.GetOperationProcessors());
 
 			InitializeHotkeys();
+			RegisterToolbarCommands();
 
 			Toolbars.Add("Editing", new Toolbar(dockManager.ToolbarArea));
 			Toolbars.Add("Create", new Toolbar(dockManager.ToolbarArea));
 			Toolbars.Add("Tools", new Toolbar(dockManager.ToolbarArea));
 			RefreshCreateNodeCommands();
-			CreateToolsToolbar();
+			AppUserPreferences.Instance.ToolbarLayout = ToolbarLayout.DefaultToolbarLayout();
+			AppUserPreferences.Instance.ToolbarLayout.Rebuild(dockManager.ToolbarArea);
 			Document.AttachingViews += doc => {
 				if (doc.Views.Count == 0) {
 					doc.Views.AddRange(new IDocumentView[] {
@@ -336,7 +338,7 @@ namespace Tangerine
 
 		public void RefreshCreateNodeCommands()
 		{
-			var createToolbar = Toolbars["Create"];
+			var createToolbar = AppUserPreferences.Instance.ToolbarLayout.CreateToolbar;
 			createToolbar.Clear();
 			foreach (var c in TangerineMenu.CreateNodeCommands) {
 				createToolbar.Add(c);
@@ -346,37 +348,35 @@ namespace Tangerine
 			UI.SceneView.VisualHintsPanel.Refresh();
 		}
 
-		void CreateToolsToolbar()
+		void RegisterToolbarCommands()
 		{
-			var tb = Toolbars["Tools"];
-			tb.Add(Tools.AlignLeft);
-			tb.Add(Tools.AlignTop);
-			tb.Add(Tools.AlignRight);
-			tb.Add(Tools.AlignBottom);
-			tb.Add(Tools.AlignCentersHorizontally);
-			tb.Add(Tools.AlignCentersVertically);
-			tb.Add(Tools.DistributeLeft);
-			tb.Add(Tools.DistributeHorizontally);
-			tb.Add(Tools.DistributeRight);
-			tb.Add(Tools.DistributeTop);
-			tb.Add(Tools.DistributeVertically);
-			tb.Add(Tools.DistributeBottom);
-			tb.Add(Tools.AlignTo);
-			tb.Add(Tools.CenterHorizontally);
-			tb.Add(Tools.CenterVertically);
-			tb.Add(Tools.CenterAlignTo);
-			tb.Add(Tools.RestoreOriginalSize);
-			tb.Add(Tools.ResetScale);
-			tb.Add(Tools.ResetRotation);
-			tb.Add(Tools.FitToContainer);
-			tb.Add(Tools.FitToContent);
-			tb.Add(Tools.FlipX);
-			tb.Add(Tools.FlipY);
-			tb.Add(Tools.CenterView);
-			tb = Toolbars["Editing"];
-			tb.Add(Command.Undo);
-			tb.Add(Command.Redo);
-			tb.Add(GenericCommands.Revert);
+			ToolbarCommandRegister.RegisterCommands(
+				Command.Undo,
+				Command.Redo,
+				GenericCommands.Revert,
+				Tools.AlignLeft,
+				Tools.AlignTop,
+				Tools.AlignRight,
+				Tools.AlignBottom,
+				Tools.AlignCentersHorizontally,
+				Tools.AlignCentersVertically,
+				Tools.DistributeLeft,
+				Tools.DistributeHorizontally,
+				Tools.DistributeRight,
+				Tools.DistributeTop,
+				Tools.DistributeVertically,
+				Tools.DistributeBottom,
+				Tools.AlignTo,
+				Tools.CenterHorizontally,
+				Tools.CenterVertically,
+				Tools.RestoreOriginalSize,
+				Tools.ResetScale,
+				Tools.ResetRotation,
+				Tools.FitToContainer,
+				Tools.FitToContent,
+				Tools.FlipX,
+				Tools.FlipY
+			);
 		}
 
 		Yuzu.AbstractDeserializer DeserializeHotStudioAssets(string path, System.IO.Stream stream)
