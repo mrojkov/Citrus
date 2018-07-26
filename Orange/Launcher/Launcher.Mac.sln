@@ -5,8 +5,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Launcher.Mac", "Launcher.Ma
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yuzu.Mac", "..\..\Yuzu\Yuzu.Mac.csproj", "{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lime.Mac", "..\..\Lime\Lime.Mac.csproj", "{DC16EEBF-404D-4610-B87A-15B57464D707}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -21,10 +19,6 @@ Global
 		{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}.Debug|x86.Build.0 = Debug|Any CPU
 		{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}.Release|x86.ActiveCfg = Release|Any CPU
 		{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}.Release|x86.Build.0 = Release|Any CPU
-		{DC16EEBF-404D-4610-B87A-15B57464D707}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{DC16EEBF-404D-4610-B87A-15B57464D707}.Debug|x86.Build.0 = Debug|Any CPU
-		{DC16EEBF-404D-4610-B87A-15B57464D707}.Release|x86.ActiveCfg = Release|Any CPU
-		{DC16EEBF-404D-4610-B87A-15B57464D707}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0

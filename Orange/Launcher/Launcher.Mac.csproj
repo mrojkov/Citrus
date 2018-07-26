@@ -129,9 +129,6 @@
     <Compile Include="..\Source\Nuget\Nuget.cs">
       <Link>Mac\Nuget.cs</Link>
     </Compile>
-    <Compile Include="..\Source\Toolbox\Toolbox.cs">
-      <Link>Mac\Toolbox.cs</Link>
-    </Compile>
     <Compile Include="..\Source\TargetPlatform.cs">
       <Link>Mac\TargetPlatform.cs</Link>
     </Compile>
@@ -142,6 +139,7 @@
     <Compile Include="..\Source\CitrusVersion.cs">
       <Link>CitrusVersion.cs</Link>
     </Compile>
+    <Compile Include="Toolbox.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="Mac\MainWindow.xib" />
@@ -159,10 +157,6 @@
     <ProjectReference Include="..\..\Yuzu\Yuzu.Mac.csproj">
       <Project>{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}</Project>
       <Name>Yuzu.Mac</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Lime\Lime.Mac.csproj">
-      <Project>{DC16EEBF-404D-4610-B87A-15B57464D707}</Project>
-      <Name>Lime.Mac</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>
