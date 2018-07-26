@@ -175,7 +175,7 @@ namespace Tangerine
 		private Widget CreateThemePane()
 		{
 			var pane = new Widget();
-			pane.Layout = new VBoxLayout { Spacing = 0 };
+			pane.Layout = new VBoxLayout { Spacing = 10 };
 			pane.Padding = contentPadding;
 			var themeEditor = new ColorThemeEditor() {
 				Layout = new VBoxLayout { Spacing = 10 },
