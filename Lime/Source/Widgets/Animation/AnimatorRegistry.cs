@@ -62,6 +62,11 @@ namespace Lime
 			Add(typeof(NodeReference<Camera3D>), typeof(Animator<NodeReference<Camera3D>>));
 		}
 		
+		public bool Contains(Type propertyType)
+		{
+			return map.ContainsKey(propertyType);
+		}
+
 		Dictionary<Type, Type> map = new Dictionary<Type, Type>();
 	}
 }
