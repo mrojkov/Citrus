@@ -84,6 +84,8 @@ namespace Lime
 			public Color4 ZebraColor2 { get; set; }
 			[YuzuRequired]
 			public Color4 SelectedBorder { get; set; }
+			[YuzuRequired]
+			public Color4 RedText { get; set; }
 
 			public static ColorTheme CreateDarkTheme()
 			{

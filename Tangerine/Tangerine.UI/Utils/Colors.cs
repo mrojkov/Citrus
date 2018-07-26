@@ -87,6 +87,8 @@ namespace Tangerine.UI
 			public Color4 EmitterCustomShape { get; set; }
 			[YuzuRequired]
 			public Color4 EmitterCustomShapeLine { get; set; }
+			[YuzuRequired]
+			public Color4 SplineOutline { get; set; }
 		}
 
 		public class TimelineGridColors
