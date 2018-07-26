@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Tangerine.Core;
 
-namespace Tangerine.UI.SceneView.Processors
+namespace Tangerine.UI.SceneView
 {
 	class DragNineGridLineProcessor : ITaskProvider
 	{

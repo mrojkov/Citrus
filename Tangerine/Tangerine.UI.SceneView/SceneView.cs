@@ -5,8 +5,6 @@ using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Operations;
 using Tangerine.UI.Docking;
-using Tangerine.UI.SceneView.Presenters;
-using Tangerine.UI.SceneView.Processors;
 
 namespace Tangerine.UI.SceneView
 {
