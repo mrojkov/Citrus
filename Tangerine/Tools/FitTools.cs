@@ -1,6 +1,7 @@
 using System.Linq;
 using Lime;
 using Tangerine.UI;
+using Tangerine.UI.SceneView;
 
 namespace Tangerine
 {
@@ -108,6 +109,20 @@ namespace Tangerine
 					Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), widget.Position + p0 - p1);
 				}
 			}
+		}
+	}
+
+	public class CenterView : DocumentCommandHandler
+	{
+		public override void ExecuteTransaction()
+		{
+			var sv = SceneView.Instance;
+			var scene = sv.Scene;
+			var frame = sv.Frame;
+			if (Utils.CalcAABB(Core.Document.Current.SelectedNodes().Editable(), scene, out Rectangle aabb)) {
+				scene.Position = -aabb.Center * scene.Scale + new Vector2(frame.Width / 2, frame.Height / 2);
+			}
+			
 		}
 	}
 }
