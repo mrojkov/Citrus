@@ -208,7 +208,7 @@ namespace Tangerine
 
 		private static void RebuildOrangeMenu(string citprojPath)
 		{
-			var blacklist = new HashSet<string> { "Run Tangerine" };
+			var blacklist = new HashSet<string> { "Run Tangerine", "Build and Run", "Cook Game Assets" };
 			orangeMenu.Clear();
 			if (citprojPath == null) {
 				CommandHandlerList.Global.Disconnect(OrangeCommands.Run);
@@ -234,7 +234,7 @@ namespace Tangerine
 			orangeMenu.Add(OrangeCommands.Run);
 			orangeMenu.Add(OrangeCommands.RunConfig);
 			orangeMenu.Add(OrangeCommands.CookGameAssets);
-			foreach (var menuItem in items.Where((i) => i.Label != "Build and Run" && i.Label != "Cook Game Assets")) {
+			foreach (var menuItem in items) {
 				if (blacklist.Contains(menuItem.Label)) {
 					continue;
 				}
