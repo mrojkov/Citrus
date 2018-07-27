@@ -33,7 +33,7 @@ namespace Tangerine.Dialogs
 					continue;
 				}
 				CreateColorEditor(
-					pane, Theme.Colors,
+					pane, AppUserPreferences.Instance.LimeColorTheme,
 					color.Name,
 					$"Basic {color.Name}",
 					() => color.GetValue(Theme.Colors)
@@ -48,10 +48,10 @@ namespace Tangerine.Dialogs
 						continue;
 					}
 					CreateColorEditor(
-						pane, category.GetValue(ColorTheme.Current),
+						pane, category.GetValue(AppUserPreferences.Instance.ColorTheme),
 						color.Name,
 						$"{category.Name} {color.Name}",
-						() => color.GetValue(category.GetValue(ColorTheme.Current))
+						() => color.GetValue(category.GetValue(AppUserPreferences.Instance.ColorTheme))
 					);
 				}
 			}
@@ -69,10 +69,6 @@ namespace Tangerine.Dialogs
 				) {
 					DefaultValueGetter = valueGetter
 				}
-			);
-			tmp.ContainerWidget.AddChangeWatcher(
-				new Property<Color4>(source, propertyName),
-				(v) => Application.InvalidateWindows()
 			);
 		}
 	}
