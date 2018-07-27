@@ -112,6 +112,10 @@
     <Compile Include="Processors\ResolutionPreviewProcessor.cs" />
 	<Compile Include="Widgets\ZoomWidget.cs" />
 	<Compile Include="Presenters\ParticleEmitterPresenter.cs" />
+	<Compile Include="Processors\DragAnimationPathPointProcessor.cs" />
+	<Compile Include="Presenters\Animation2DPathPresenter.cs" />
+	<Compile Include="Presenters\Animation3DPathPresenter.cs" />
+	<Compile Include="Presenters\AnimationPathPresenter.cs" />
 	<Compile Include="Presenters\NineGridLinePresenter.cs" />
 	<Compile Include="Processors\DragNineGridLineProcessor.cs" />
   </ItemGroup>

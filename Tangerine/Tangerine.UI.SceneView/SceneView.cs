@@ -224,6 +224,7 @@ namespace Tangerine.UI.SceneView
 				new DragPointObjectsProcessor(),
 				new DragSplineTangentsProcessor(),
 				new DragSplinePoint3DProcessor(),
+				new DragAnimationPathPointProcessor(),
 				new ResizeWidgetsProcessor(),
 				new RescalePointObjectSelectionProcessor(),
 				new RotatePointObjectSelectionProcessor(),
@@ -252,6 +253,7 @@ namespace Tangerine.UI.SceneView
 			new FrameBorderPresenter(this);
 			new InspectRootNodePresenter(this);
 			new NineGridLinePresenter(this);
+			new Animation2DPathPresenter(this);
 		}
 
 		public void CreateNode(Type nodeType, ICommand command)

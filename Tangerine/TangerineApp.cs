@@ -128,6 +128,7 @@ namespace Tangerine
 			BackupManager.Instance.Activate(Project.Tasks);
 			Document.NodeDecorators.AddFor<Spline>(n => n.CompoundPostPresenter.Add(new UI.SceneView.SplinePresenter()));
 			Document.NodeDecorators.AddFor<Viewport3D>(n => n.CompoundPostPresenter.Add(new UI.SceneView.Spline3DPresenter()));
+			Document.NodeDecorators.AddFor<Viewport3D>(n => n.CompoundPostPresenter.Add(new UI.SceneView.Animation3DPathPresenter()));
 			Document.NodeDecorators.AddFor<Widget>(n => {
 				if (n.AsWidget.SkinningWeights == null) {
 					n.AsWidget.SkinningWeights = new SkinningWeights();
@@ -524,6 +525,7 @@ namespace Tangerine
 			h.Connect(SceneViewCommands.SnapRulerLinesToWidgets, new SnapRulerLinesToWidgetCommandHandler());
 			h.Connect(SceneViewCommands.ClearActiveRuler, new DocumentDelegateCommandHandler(ClearActiveRuler));
 			h.Connect(SceneViewCommands.ManageRulers, new ManageRulers());
+			h.Connect(SceneViewCommands.ShowAnimationPath, new ShowAnimation());
 			h.Connect(TimelineCommands.CutKeyframes, UI.Timeline.Operations.CutKeyframes.Perform);
 			h.Connect(TimelineCommands.CopyKeyframes, UI.Timeline.Operations.CopyKeyframes.Perform);
 			h.Connect(TimelineCommands.PasteKeyframes, UI.Timeline.Operations.PasteKeyframes.Perform);

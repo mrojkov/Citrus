@@ -63,9 +63,12 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Presenters\Animation2DPathPresenter.cs" />
+    <Compile Include="Presenters\Animation3DPathPresenter.cs" />
     <Compile Include="Presenters\InspectRootNodePresenter.cs" />
     <Compile Include="Presenters\NineGridLinePresenter.cs" />
     <Compile Include="Presenters\ParticleEmitterPresenter.cs" />
+    <Compile Include="Processors\DragAnimationPathPointProcessor.cs" />
     <Compile Include="Processors\DragNineGridLineProcessor.cs" />
     <Compile Include="Processors\ResolutionPreviewProcessor.cs" />
     <Compile Include="ResolutionHandlers.cs" />

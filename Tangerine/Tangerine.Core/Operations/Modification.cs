@@ -14,6 +14,7 @@ namespace Tangerine.Core.Operations
 		public readonly object Obj;
 		public readonly object Value;
 		public readonly PropertyInfo Property;
+		public readonly Type Type;
 
 		public override bool IsChangingDocument => isChangingDocument;
 
@@ -22,11 +23,26 @@ namespace Tangerine.Core.Operations
 			Document.Current.History.Perform(new SetProperty(obj, propertyName, value, isChangingDocument));
 		}
 
+		public static void Perform(Type type, object obj, string propertyName, object value, bool isChangingDocument = true)
+		{
+			Document.Current.History.Perform(new SetProperty(type, obj, propertyName, value, isChangingDocument));
+		}
+
 		protected SetProperty(object obj, string propertyName, object value, bool isChangingDocument)
 		{
+			Type = obj.GetType();
 			Obj = obj;
 			Value = value;
-			Property = obj.GetType().GetProperty(propertyName);
+			Property = Type.GetProperty(propertyName);
+			this.isChangingDocument = isChangingDocument;
+		}
+
+		protected SetProperty(Type type, object obj, string propertyName, object value, bool isChangingDocument)
+		{
+			Type = type;
+			Obj = obj;
+			Value = value;
+			Property = Type.GetProperty(propertyName);
 			this.isChangingDocument = isChangingDocument;
 		}
 
