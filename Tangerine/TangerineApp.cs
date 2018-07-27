@@ -98,9 +98,29 @@ namespace Tangerine
 				}
 			};
 			Project.DocumentReloadConfirmation += doc => {
-				var alert = new AlertDialog($"The file '{doc.Path}' has been changed outside of Tangerine.\nDo you want to keep your changes, or reload the file from disk?", "Keep", "Reload");
-				var res = alert.Show();
-				return res == 0 || res == -1 ? false : true;
+				if (doc.IsModified) {
+					var modifiedAlert = new AlertDialog($"{doc.Path}\n\nThis file hase been modified by another program and has unsaved changes.\nDo you want to reload it from disk? ", "Yes", "No");
+					var res = modifiedAlert.Show();
+					if (res == 1 || res == -1) {
+						doc.History.ExternalModification();
+						return false;
+					}
+					return true;
+				}
+				if (CoreUserPreferences.Instance.ReloadModifiedFiles) {
+					return true;
+				}
+				var alert = new AlertDialog($"{doc.Path}\n\nThis file hase been modified by another program.\nDo you want to reload it from disk? ", "Yes, always", "Yes", "No");
+				var r = alert.Show();
+				if (r == 0) {
+					CoreUserPreferences.Instance.ReloadModifiedFiles = true;
+					return true;
+				}
+				if (r == 2) {
+					doc.History.ExternalModification();
+					return false;
+				}
+				return true;
 			};
 
 			Project.TempFileLoadConfirmation += path => {

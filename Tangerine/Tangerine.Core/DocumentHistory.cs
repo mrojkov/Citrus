@@ -174,6 +174,12 @@ namespace Tangerine.Core
 			RefreshModifiedStatus();
 		}
 		
+		public void ExternalModification()
+		{
+			saveIndex = -1;
+			RefreshModifiedStatus();
+		}
+
 		private void OnChange()
 		{
 			RefreshModifiedStatus();
