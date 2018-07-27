@@ -193,6 +193,8 @@ namespace Tangerine
 			pane.Content.Layout = new VBoxLayout { Spacing = 4 };
 			pane.Content.Padding = contentPadding;
 			editors.AddRange(new IPropertyEditor[] {
+				new BooleanPropertyEditor(
+					new PropertyEditorParams(pane.Content, CoreUserPreferences.Instance, nameof(CoreUserPreferences.ReloadModifiedFiles), "Reload modified files")),
 				new Vector2PropertyEditor(
 					new PropertyEditorParams(pane.Content, Tangerine.AppUserPreferences.Instance, nameof(Tangerine.AppUserPreferences.DefaultSceneDimensions), "Default scene dimensions")),
 				new BooleanPropertyEditor(

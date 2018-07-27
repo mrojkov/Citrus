@@ -17,6 +17,9 @@ namespace Tangerine.Core
 		[YuzuRequired]
 		public KeyFunction DefaultKeyFunction { get; set; }
 
+		[YuzuRequired]
+		public bool ReloadModifiedFiles { get; set; }
+
 		public CoreUserPreferences()
 		{
 			ResetToDefaults();
