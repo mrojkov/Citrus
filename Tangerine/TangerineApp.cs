@@ -249,7 +249,6 @@ namespace Tangerine
 			Toolbars.Add("Create", new Toolbar(dockManager.ToolbarArea));
 			Toolbars.Add("Tools", new Toolbar(dockManager.ToolbarArea));
 			RefreshCreateNodeCommands();
-			AppUserPreferences.Instance.ToolbarLayout = ToolbarLayout.DefaultToolbarLayout();
 			AppUserPreferences.Instance.ToolbarLayout.Rebuild(dockManager.ToolbarArea);
 			Document.AttachingViews += doc => {
 				if (doc.Views.Count == 0) {

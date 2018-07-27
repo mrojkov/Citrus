@@ -25,43 +25,57 @@ namespace Tangerine.UI
 
 	public class ToolbarLayout
 	{
-		public class ToolbarPanel
+		public class ToolbarRow
 		{
 			[YuzuRequired]
 			public List<int> CommandIndexes { get; set; } = new List<int>();
 
-			private readonly Widget toolbarContainer;
-			private readonly Toolbar toolbar;
+			[YuzuOptional]
+			public string Title { get; set; } = "Row";
 
-			public ToolbarPanel()
+			[YuzuRequired]
+			public int Index { get; set; }
+
+			public readonly bool Editable = true;
+
+			private readonly Widget toolbarContainer;
+			public readonly Toolbar Toolbar;
+
+			public ToolbarRow()
 			{
 				toolbarContainer = new Frame {
 					ClipChildren = ClipMethod.ScissorTest,
 					Layout = new HBoxLayout { Spacing = 4 },
 					LayoutCell = new LayoutCell { StretchY = 0 },
 				};
-				toolbar = new Toolbar(toolbarContainer);
+				Toolbar = new Toolbar(toolbarContainer);
+			}
+
+			public ToolbarRow(bool editable) : this()
+			{
+				Editable = editable;
 			}
 
 			public void Rebuild(Widget widget)
 			{
-				toolbar.Clear();
+				widget.Nodes.Add(toolbarContainer);
+				if (CommandIndexes.Count == 0) {
+					return;
+				}
+				Toolbar.Clear();
 				int count = ToolbarCommandRegister.RegisteredCommands.Count;
 				foreach (var index in CommandIndexes) {
 					if (index >= count) {
 						continue;
 					}
-					toolbar.Add(ToolbarCommandRegister.RegisteredCommands[index]);
+					Toolbar.Add(ToolbarCommandRegister.RegisteredCommands[index]);
 				}
-				toolbar.Rebuild();
-				widget.Nodes.Add(toolbarContainer);
+				Toolbar.Rebuild();
 			}
 
-			public static ToolbarPanel FromCommands(params ICommand[] commands)
+			public static ToolbarRow FromCommands(params ICommand[] commands)
 			{
-				var toolbarPanel = new ToolbarPanel {
-					CommandIndexes = new List<int>()
-				};
+				var toolbarPanel = new ToolbarRow();
 				foreach (var command in commands) {
 					toolbarPanel.CommandIndexes.Add(ToolbarCommandRegister.RegisteredCommands.IndexOf(command));
 				}
@@ -69,77 +83,95 @@ namespace Tangerine.UI
 			}
 		}
 
-		public class ToolbarRow
-		{
-			[YuzuRequired]
-			public List<ToolbarPanel> Panels { get; set; } = new List<ToolbarPanel>();
-
-			[YuzuOptional]
-			public string Title { get; set; } = "Row";
-
-			private readonly Widget panelsContainer;
-
-			public ToolbarRow()
-			{
-				panelsContainer = new Frame {
-					ClipChildren = ClipMethod.ScissorTest,
-					Layout = new HBoxLayout { Spacing = 4 },
-					LayoutCell = new LayoutCell { StretchY = 0 },
-				};
-			}
-
-			public void Rebuild(Widget widget)
-			{
-				panelsContainer.Nodes.Clear();
-				foreach (var panel in Panels) {
-					panel.Rebuild(panelsContainer);
-				}
-				widget.Nodes.Add(panelsContainer);
-			}
-		}
-
 		[YuzuRequired]
 		public List<ToolbarRow> Rows { get; set; } = new List<ToolbarRow>();
 
-		[YuzuRequired]
-		public int CreateRowIndex { get; set; } = 0;
+		public readonly ToolbarRow CreateToolbarRow;
 
-		private readonly Widget createToolbarWidget;
-		public readonly Toolbar CreateToolbar;
+		[YuzuRequired]
+		public int CreateRowIndex {
+			get => CreateToolbarRow.Index;
+			set => CreateToolbarRow.Index = value;
+		}
+
+		public Toolbar CreateToolbar { get => CreateToolbarRow.Toolbar; }
 
 		public ToolbarLayout()
 		{
-			createToolbarWidget = new Frame {
-				ClipChildren = ClipMethod.ScissorTest,
-				Layout = new HBoxLayout { Spacing = 4 },
-				LayoutCell = new LayoutCell { StretchY = 0 },
+			CreateToolbarRow = new ToolbarRow(false) {
+				Index = 0,
+				Title = "Create tools row",
 			};
-			CreateToolbar = new Toolbar(createToolbarWidget);
 		}
 
 		public void Rebuild(Widget widget)
 		{
 			widget.Nodes.Clear();
-			foreach (var row in Rows) {
+			foreach (var row in GetAllRows()) {
 				row.Rebuild(widget);
 			}
-			widget.Nodes.Insert(CreateRowIndex, createToolbarWidget);
+		}
+
+		public IEnumerable<ToolbarRow> GetAllRows()
+		{
+			for (int i = 0; i < CreateRowIndex; ++i) {
+				yield return Rows[i];
+			}
+			yield return CreateToolbarRow;
+			for (int i = CreateRowIndex; i < Rows.Count; ++i) {
+				yield return Rows[i];
+			}
 		}
 
 		public static ToolbarLayout DefaultToolbarLayout()
 		{
 			return new ToolbarLayout {
-				Rows = new List<ToolbarRow> {
+				Rows = {
 					new ToolbarRow {
+						Index = 1,
 						Title = "Row1",
-						Panels = new List<ToolbarPanel> {
-							new ToolbarPanel() {
-								CommandIndexes = new List<int>(Enumerable.Range(0, 25))
-							}
-						}
+						CommandIndexes = new List<int>(Enumerable.Range(0, 10))
+					},
+					new ToolbarRow {
+						Index = 2,
+						Title = "Row2",
+						CommandIndexes = new List<int>(Enumerable.Range(10, 10))
 					}
 				}
 			};
+		}
+
+		public ToolbarRow GetRow(int index)
+		{
+			if (index == CreateRowIndex) {
+				return CreateToolbarRow;
+			}
+			return Rows[index > CreateRowIndex ? index - 1 : index];
+		}
+
+		public void SortRows()
+		{
+			Rows.Sort((row1, row2) => {
+				int i1 = row1.Index;
+				int i2 = row2.Index;
+				if (i1 == i2) {
+					return 0;
+				}
+				if (i1 < i2) {
+					return -1;
+				}
+				return 1;
+			});
+		}
+
+		public bool ContainsIndex(int index)
+		{
+			foreach (var row in Rows) {
+				if (row.CommandIndexes.Contains(index)) {
+					return true;
+				}
+			}
+			return false;
 		}
 	}
 }

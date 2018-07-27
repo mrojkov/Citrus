@@ -52,6 +52,7 @@ namespace Tangerine
 			Content.AddTab("Appearance", CreateColorsPane());
 			Content.AddTab("Theme", CreateThemePane());
 			Content.AddTab("Keyboard shortcuts", CreateKeyboardPane());
+			Content.AddTab("Toolbar", new ToolbarLayoutEditor());
 
 			rootWidget = new ThemedInvalidableWindowWidget(window) {
 				Padding = new Thickness(8),
