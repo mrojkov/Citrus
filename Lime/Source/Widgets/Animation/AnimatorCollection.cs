@@ -43,7 +43,6 @@ namespace Lime
 				}
 				a.Next = item;
 			}
-			item.Bind(owner);
 			Animation animation;
 			if (owner.Animations.TryFind(item.AnimationId, out animation)) {
 				animation.NextMarkerOrTriggerTime = null;

@@ -9,8 +9,6 @@ namespace Lime
 		IAnimable Owner { get; set; }
 		IAnimator Next { get; set; }
 
-		void Bind(IAnimable owner);
-
 		IAnimator Clone();
 
 		bool IsTriggerable { get; set; }
@@ -137,21 +135,9 @@ namespace Lime
 			return clone;
 		}
 
-		protected delegate void SetterDelegate(T value);
+		private delegate void SetterDelegate(T value);
 
-		protected SetterDelegate Setter;
-
-		public void Bind(IAnimable owner)
-		{
-			Owner = owner;
-			var p = AnimationUtils.GetProperty(owner.GetType(), TargetProperty);
-			IsTriggerable = p.Triggerable;
-			var mi = p.Info.GetSetMethod();
-			if (mi == null) {
-				throw new Lime.Exception("Property '{0}' (class '{1}') is readonly", TargetProperty, owner.GetType());
-			}
-			Setter = (SetterDelegate)Delegate.CreateDelegate(typeof(SetterDelegate), owner, mi);
-		}
+		private SetterDelegate Setter;
 
 		protected virtual T InterpolateLinear(float t) => Value2;
 		protected virtual T InterpolateSplined(float t) => InterpolateLinear(t);
@@ -175,8 +161,22 @@ namespace Lime
 		public void Apply(double time)
 		{
 			if (Enabled) {
+				if (Setter == null) {
+					Bind();
+				}
 				Setter(CalcValue(time));
 			}
+		}
+
+		private void Bind()
+		{
+			var p = AnimationUtils.GetProperty(Owner.GetType(), TargetProperty);
+			IsTriggerable = p.Triggerable;
+			var mi = p.Info.GetSetMethod();
+			if (mi == null) {
+				throw new Lime.Exception("Property '{0}' (class '{1}') is readonly", TargetProperty, Owner.GetType());
+			}
+			Setter = (SetterDelegate)Delegate.CreateDelegate(typeof(SetterDelegate), Owner, mi);
 		}
 
 		public void ResetCache()

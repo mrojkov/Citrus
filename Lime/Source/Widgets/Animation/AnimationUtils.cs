@@ -28,10 +28,14 @@ namespace Lime
 			public bool Triggerable;
 		}
 
-		private static Dictionary<string, List<PropertyData>> propertyCache = new Dictionary<string, List<PropertyData>>();
+		[ThreadStatic]
+		private static Dictionary<string, List<PropertyData>> propertyCache;
 
 		internal static PropertyData GetProperty(Type ownerType, string propertyName)
 		{
+			if (propertyCache == null) {
+				propertyCache = new Dictionary<string, List<PropertyData>>();
+			}
 			List<PropertyData> plist;
 			if (!propertyCache.TryGetValue(propertyName, out plist)) {
 				plist = new List<PropertyData>();
