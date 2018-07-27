@@ -349,7 +349,6 @@ namespace Tangerine.UI.FilesystemView
 				(scrollView.Input.WasKeyPressed(Key.MouseWheelDown) || scrollView.Input.WasKeyPressed(Key.MouseWheelUp))
 			) {
 				scrollView.Unlink();
-				preview.RootWidget.Unlink();
 				if (scrollView.Direction == ScrollDirection.Horizontal) {
 					scrollView = new ThemedScrollView(ScrollDirection.Vertical) {
 						TabTravesable = new TabTraversable(),
@@ -361,8 +360,6 @@ namespace Tangerine.UI.FilesystemView
 					};
 					scrollView.Content.Layout = new VFlowLayout { Spacing = 1.0f };
 				}
-				preview = new Preview();
-				preview.RootWidget.TabTravesable = new TabTraversable();
 				
 				scrollView.Content.Padding = new Thickness(5.0f);
 				scrollView.Content.CompoundPostPresenter.Insert(0, new DelegatePresenter<Widget>(RenderFilesWidgetRectSelection));
@@ -376,7 +373,6 @@ namespace Tangerine.UI.FilesystemView
 				});
 
 				InvalidateView(model.CurrentPath);
-				preview.ClearTextureCache();
 				lastKeyboardSelectedFilesystemItem = scrollView.Content.FirstChild as FilesystemItem;
 
 				selectionPreviewSplitter.Nodes.Clear();
