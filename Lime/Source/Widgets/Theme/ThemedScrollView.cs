@@ -8,6 +8,7 @@ namespace Lime
 		public override bool IsNotDecorated() => false;
 
 		public ScrollView Behaviour { get; set; }
+		public ScrollDirection Direction;
 
 		public float ScrollPosition
 		{
@@ -34,14 +35,15 @@ namespace Lime
 		{
 			var slider = new Widget();
 			slider.Size = new Vector2(10, 5);
-			if (scrollDirection == ScrollDirection.Vertical) {
+			Direction = scrollDirection;
+			if (scrollDirection == ScrollDirection.Vertical) { // Small icons
 				slider.CompoundPresenter.Add(new DelegatePresenter<Widget>(_ => {
 					PrepareRendererState();
 					Renderer.DrawRect(new Vector2(Width - slider.Width, 0), Size, Theme.Colors.ScrollbarBackground);
 					slider.PrepareRendererState();
 					Renderer.DrawRect(new Vector2(2, 0), new Vector2(slider.Width - 2, slider.Height), Theme.Colors.ScrollbarThumb);
 				}));
-			} else {
+			} else { // Linear
 				slider.CompoundPresenter.Add(new DelegatePresenter<Widget>(_ => {
 					PrepareRendererState();
 					Renderer.DrawRect(new Vector2(0, Height - slider.Height), Size, Theme.Colors.ScrollbarBackground);

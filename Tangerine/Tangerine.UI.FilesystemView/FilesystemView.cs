@@ -330,6 +330,7 @@ namespace Tangerine.UI.FilesystemView
 		{
 			ProcessInputOverFSItem();
 			ProcessDragState(dt);
+			ProcessChangeViewMode();
 			typeNavigationTimeout -= dt;
 			if (scrollView.IsFocused()) {
 				ProcessTypingNavigation();
@@ -338,6 +339,49 @@ namespace Tangerine.UI.FilesystemView
 				foreach (var c in printableKeysCommands) {
 					c.Consume();
 				}
+			}
+		}
+
+		private void ProcessChangeViewMode()
+		{
+			if (
+				scrollView.Input.WasKeyPressed(Key.Control) &&
+				scrollView.Input.WheelScrollAmount != 0
+				) {
+				scrollView.Unlink();
+				preview.RootWidget.Unlink();
+				if (scrollView.Direction == ScrollDirection.Horizontal) {
+					scrollView = new ThemedScrollView(ScrollDirection.Vertical) {
+						TabTravesable = new TabTraversable(),
+					};
+					scrollView.Content.Layout = new HFlowLayout { Spacing = 1.0f };
+				} else {
+					scrollView = new ThemedScrollView(ScrollDirection.Horizontal) {
+						TabTravesable = new TabTraversable(),
+					};
+					scrollView.Content.Layout = new VFlowLayout { Spacing = 1.0f };
+				}
+				preview = new Preview();
+				preview.RootWidget.TabTravesable = new TabTraversable();
+				
+				scrollView.Content.Padding = new Thickness(5.0f);
+				scrollView.Content.CompoundPostPresenter.Insert(0, new DelegatePresenter<Widget>(RenderFilesWidgetRectSelection));
+				scrollView.Updated += ScrollViewUpdated;
+				scrollView.Content.Presenter = new DelegatePresenter<Widget>((w) => {
+					w.PrepareRendererState();
+					var wp = w.ParentWidget;
+					var p = wp.Padding;
+					Renderer.DrawRect(-w.Position + Vector2.Zero - new Vector2(p.Left, p.Top),
+						-w.Position + wp.Size + new Vector2(p.Right, p.Bottom), Theme.Colors.WhiteBackground);
+				});
+
+				InvalidateView(model.CurrentPath);
+				preview.ClearTextureCache();
+				lastKeyboardSelectedFilesystemItem = scrollView.Content.FirstChild as FilesystemItem;
+
+				selectionPreviewSplitter.Nodes.Clear();
+				selectionPreviewSplitter.Nodes.Add(scrollView);
+				selectionPreviewSplitter.Nodes.Add(preview.RootWidget);
 			}
 		}
 
