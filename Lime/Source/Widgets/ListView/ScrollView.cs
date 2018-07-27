@@ -27,13 +27,16 @@ namespace Lime
 		public ScrollDirection ScrollDirection { get; private set; }
 		private WheelScrollState wheelScrollState;
 		public bool ScrollWhenContentFits = true;
+		public bool CenterWhenContentFits { get; set; } = false;
+		private bool firstUpdate = true;
+		private bool ContentFits => ProjectToScrollAxis(Frame.Size - Content.Size) > 0.0f;
 		private DragGesture dragGesture;
 		private Vector2 ScrollAxis
 		{
 			get
 			{
-				return ScrollDirection == ScrollDirection.Horizontal ? 
-					Frame.LocalToWorldTransform.U.Normalized : 
+				return ScrollDirection == ScrollDirection.Horizontal ?
+					Frame.LocalToWorldTransform.U.Normalized :
 					Frame.LocalToWorldTransform.V.Normalized;
 			}
 		}
@@ -61,7 +64,7 @@ namespace Lime
 			set { SetScrollPosition(value); }
 		}
 
-		public float MinScrollPosition = 0;
+		public float MinScrollPosition => CenterWhenContentFits ? -Mathf.Max(0, ProjectToScrollAxis(Frame.Size - Content.Size) * 0.5f) : 0.0f;
 		public float MaxScrollPosition => Mathf.Max(0, ProjectToScrollAxis(Content.Size - Frame.Size).Round()) + MinScrollPosition;
 
 		private Task scrollingTask;
@@ -228,6 +231,12 @@ namespace Lime
 
 		private IEnumerator<object> MainTask()
 		{
+			if (firstUpdate) {
+				if (CenterWhenContentFits && ContentFits) {
+					ScrollPosition = MinScrollPosition;
+				}
+				firstUpdate = false;
+			}
 			while (true) {
 				if (dragGesture.WasBegan()) {
 					StopScrolling();
