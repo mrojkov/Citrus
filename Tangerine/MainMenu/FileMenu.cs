@@ -45,6 +45,8 @@ namespace Tangerine
 	{
 		public override void Execute()
 		{
+			FontPool.Instance.Clear();
+			TangerineApp.LoadFont();
 			Orange.NewProject.NewProjectAction(FileOpenProject.Execute);
 		}
 	}	
