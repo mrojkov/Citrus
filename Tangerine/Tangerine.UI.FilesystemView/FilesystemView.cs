@@ -345,9 +345,9 @@ namespace Tangerine.UI.FilesystemView
 		private void ProcessChangeViewMode()
 		{
 			if (
-				scrollView.Input.WasKeyPressed(Key.Control) &&
-				scrollView.Input.WheelScrollAmount != 0
-				) {
+				scrollView.Input.IsKeyPressed(Key.Control) &&
+				(scrollView.Input.WasKeyPressed(Key.MouseWheelDown) || scrollView.Input.WasKeyPressed(Key.MouseWheelUp))
+			) {
 				scrollView.Unlink();
 				preview.RootWidget.Unlink();
 				if (scrollView.Direction == ScrollDirection.Horizontal) {
