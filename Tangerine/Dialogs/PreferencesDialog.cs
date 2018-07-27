@@ -77,6 +77,7 @@ namespace Tangerine
 				window.Close();
 				NodeDecorationsPanel.Refresh();
 				Core.UserPreferences.Instance.Save();
+				AlertDialog.Show("Color theme changes will be applied after Tangerine restart.");
 			};
 			resetButton.Clicked += () => {
 				if (new AlertDialog($"Are you sure you want to reset to defaults?", "Yes", "Cancel").Show() == 0) {
