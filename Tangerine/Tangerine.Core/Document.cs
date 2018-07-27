@@ -445,11 +445,7 @@ namespace Tangerine.Core
 			}
 			foreach (var decorator in NodeDecorators) {
 				decorator(node);
-				foreach (var descendant in node.Descendants) {
-					decorator(descendant);
-				}
 			}
-
 			foreach (var child in node.Nodes) {
 				Decorate(child);
 			}
