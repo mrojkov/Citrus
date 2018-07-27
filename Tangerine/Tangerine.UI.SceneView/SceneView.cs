@@ -229,6 +229,7 @@ namespace Tangerine.UI.SceneView
 				new RotatePointObjectSelectionProcessor(),
 				new RotateWidgetsProcessor(),
 				new RulerProcessor(),
+				new DragNineGridLineProcessor(),
 				new MouseSelectionProcessor(),
 				new ShiftClickProcessor(),
 				new PreviewAnimationProcessor(),
@@ -250,6 +251,7 @@ namespace Tangerine.UI.SceneView
 			new DistortionMeshPresenter(this);
 			new FrameBorderPresenter(this);
 			new InspectRootNodePresenter(this);
+			new NineGridLinePresenter(this);
 		}
 
 		public void CreateNode(Type nodeType, ICommand command)
