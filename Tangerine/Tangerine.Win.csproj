@@ -165,8 +165,6 @@
     <EmbeddedResource Include="Resources\Icons\Light\Tools\Selection.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Timeline\NoEntry.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Timeline\NoEntry.png" />
-    <EmbeddedResource Include="Resources\Icons\Dark\Timeline\AnimationPath.png" />
-    <EmbeddedResource Include="Resources\Icons\Light\Timeline\AnimationPath.png" />
     <EmbeddedResource Include="Resources\Icons\Light\SceneView\ZoomIn.png" />
     <EmbeddedResource Include="Resources\Icons\Light\SceneView\ZoomOut.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\SceneView\ZoomIn.png" />
