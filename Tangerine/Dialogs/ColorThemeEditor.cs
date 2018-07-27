@@ -14,6 +14,12 @@ namespace Tangerine.Dialogs
 	{
 		public ColorThemeEditor()
 		{
+			Rebuild();
+		}
+
+		public void Rebuild()
+		{
+			Nodes.Clear();
 			var pane = new ThemedScrollView();
 			pane.Content.Layout = new VBoxLayout { Spacing = 4 };
 			pane.Content.Padding = new Thickness(10);

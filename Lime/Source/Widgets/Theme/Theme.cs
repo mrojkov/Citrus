@@ -166,6 +166,11 @@ namespace Lime
 					ZebraColor2 = Color4.White.Darken(0.1f),
 				};
 			}
+
+			public ColorTheme Clone()
+			{
+				return (ColorTheme)this.MemberwiseClone();
+			}
 		}
 
 		public static ColorTheme Colors = ColorTheme.CreateLightTheme();

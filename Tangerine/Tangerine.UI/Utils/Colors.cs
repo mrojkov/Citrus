@@ -225,7 +225,7 @@ namespace Tangerine.UI
 
 		[YuzuRequired]
 		public bool IsDark { get; set; }
-		public Theme.ColorTheme Basic { get; set; } = Theme.Colors;
+		public Theme.ColorTheme Basic { get; set; }
 		[YuzuRequired]
 		public ToolbarColors Toolbar { get; set; }
 		[YuzuRequired]
@@ -247,12 +247,20 @@ namespace Tangerine.UI
 		[YuzuRequired]
 		public KeyboardColors Keyboard { get; set; }
 
+		public ColorTheme Clone()
+		{
+			var clone = (ColorTheme)this.MemberwiseClone();
+			clone.Basic = Basic?.Clone();
+			return clone;
+		}
+
 		public static ColorTheme Current = CreateLightTheme();
 
 		public static ColorTheme CreateDarkTheme()
 		{
-			var toolbuttonHighlightBorder = Theme.Colors.KeyboardFocusBorder.Lighten(0.2f);
-			var toolbuttonHighlightBackground = Theme.Colors.KeyboardFocusBorder.Darken(0.3f);
+			var basic = Theme.ColorTheme.CreateDarkTheme();
+			var toolbuttonHighlightBorder = basic.KeyboardFocusBorder.Lighten(0.2f);
+			var toolbuttonHighlightBackground = basic.KeyboardFocusBorder.Darken(0.3f);
 			var toolbar = new ToolbarColors {
 				ButtonHighlightBorder = toolbuttonHighlightBorder,
 				ButtonHighlightBackground = toolbuttonHighlightBackground,
@@ -261,7 +269,7 @@ namespace Tangerine.UI
 				ButtonCheckedBorder = toolbuttonHighlightBorder.Lighten(0.1f),
 				ButtonCheckedBackground = toolbuttonHighlightBackground.Transparentify(0.5f),
 				ButtonDisabledColor = Color4.Gray.Lighten(0.1f),
-				Background = Theme.Colors.GrayBackground,
+				Background = basic.GrayBackground,
 				ButtonSelected = toolbuttonHighlightBorder,
 				Separator = Color4.Gray.Lighten(0.3f),
 			};
@@ -330,7 +338,7 @@ namespace Tangerine.UI
 			};
 			var timelineRoll = new TimelineRollColors {
 				Lines = timelineGrid.Lines,
-				GrayedLabel = Theme.Colors.BlackText.Darken(0.5f),
+				GrayedLabel = basic.BlackText.Darken(0.5f),
 				DragCursor = new Color4(254, 170, 24),
 				DragTarget = new Color4(254, 170, 24, 20),
 				BlueMark = new Color4(0, 255, 255).Darken(0.15f),
@@ -343,15 +351,15 @@ namespace Tangerine.UI
 			};
 			var docking = new DockingColors {
 				DragRectagleOutline = new Color4(0, 255, 255),
-				PanelTitleBackground = Theme.Colors.GrayBackground.Lighten(0.1f),
-				PanelTitleSeparator = Theme.Colors.GrayBackground.Lighten(0.15f)
+				PanelTitleBackground = basic.GrayBackground.Lighten(0.1f),
+				PanelTitleSeparator = basic.GrayBackground.Lighten(0.15f)
 			};
 			var inspector = new InspectorColors {
-				BorderAroundKeyframeColorbox = Theme.Colors.ControlBorder,
+				BorderAroundKeyframeColorbox = basic.ControlBorder,
 				CategoryLabelBackground = Color4.Black.Lighten(0.3f),
 				GroupHeaderLabelBackground = Color4.Black.Lighten(0.275f),
-				StripeBackground1 = Theme.Colors.GrayBackground,
-				StripeBackground2 = Theme.Colors.GrayBackground.Lighten(0.05f),
+				StripeBackground1 = basic.GrayBackground,
+				StripeBackground2 = basic.GrayBackground.Lighten(0.05f),
 			};
 			var keyboard = new KeyboardColors {
 				BlackText = Color4.White,
@@ -365,7 +373,7 @@ namespace Tangerine.UI
 			};
 			return new ColorTheme {
 				IsDark = true,
-				Basic = Theme.Colors,
+				Basic = basic,
 				Toolbar = toolbar,
 				SceneView = sceneView,
 				TimelineGrid = timelineGrid,
@@ -381,8 +389,9 @@ namespace Tangerine.UI
 
 		public static ColorTheme CreateLightTheme()
 		{
-			var toolbuttonHighlightBorder = Theme.Colors.KeyboardFocusBorder.Darken(0.2f);
-			var toolbuttonHighlightBackground = Theme.Colors.KeyboardFocusBorder.Lighten(0.3f);
+			var basic = Theme.ColorTheme.CreateLightTheme();
+			var toolbuttonHighlightBorder = basic.KeyboardFocusBorder.Darken(0.2f);
+			var toolbuttonHighlightBackground = basic.KeyboardFocusBorder.Lighten(0.3f);
 			var toolbar = new ToolbarColors {
 				ButtonHighlightBorder = toolbuttonHighlightBorder,
 				ButtonHighlightBackground = toolbuttonHighlightBackground,
@@ -391,7 +400,7 @@ namespace Tangerine.UI
 				ButtonCheckedBorder = toolbuttonHighlightBorder.Darken(0.1f),
 				ButtonCheckedBackground = toolbuttonHighlightBackground.Transparentify(0.5f),
 				ButtonDisabledColor = Color4.Gray.Darken(0.1f),
-				Background = Theme.Colors.GrayBackground,
+				Background = basic.GrayBackground,
 				ButtonSelected = toolbuttonHighlightBorder,
 				Separator = Color4.Gray.Lighten(0.3f),
 			};
@@ -460,7 +469,7 @@ namespace Tangerine.UI
 			};
 			var timelineRoll = new TimelineRollColors {
 				Lines = timelineGrid.Lines,
-				GrayedLabel = Theme.Colors.BlackText.Lighten(0.5f),
+				GrayedLabel = basic.BlackText.Lighten(0.5f),
 				DragCursor = Color4.Black,
 				DragTarget = new Color4(0, 0, 0, 20),
 				BlueMark = new Color4(0, 255, 255),
@@ -473,15 +482,15 @@ namespace Tangerine.UI
 			};
 			var docking = new DockingColors {
 				DragRectagleOutline = Color4.FromFloats(0.2f, 0.2f, 1f),
-				PanelTitleBackground = Theme.Colors.GrayBackground.Darken(0.1f),
-				PanelTitleSeparator = Theme.Colors.GrayBackground.Darken(0.15f)
+				PanelTitleBackground = basic.GrayBackground.Darken(0.1f),
+				PanelTitleSeparator = basic.GrayBackground.Darken(0.15f)
 			};
 			var inspector = new InspectorColors {
-				BorderAroundKeyframeColorbox = Theme.Colors.ControlBorder,
+				BorderAroundKeyframeColorbox = basic.ControlBorder,
 				CategoryLabelBackground = Color4.White.Darken(0.2f),
 				GroupHeaderLabelBackground = Color4.White.Darken(0.175f),
-				StripeBackground1 = Theme.Colors.GrayBackground,
-				StripeBackground2 = Theme.Colors.GrayBackground.Darken(0.05f),
+				StripeBackground1 = basic.GrayBackground,
+				StripeBackground2 = basic.GrayBackground.Darken(0.05f),
 			};
 			var keyboard = new KeyboardColors {
 				BlackText = Color4.Black,
@@ -495,7 +504,7 @@ namespace Tangerine.UI
 			};
 			return new ColorTheme {
 				IsDark = false,
-				Basic = Theme.Colors,
+				Basic = basic,
 				Toolbar = toolbar,
 				SceneView = sceneView,
 				TimelineGrid = timelineGrid,

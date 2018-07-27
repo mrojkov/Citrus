@@ -297,8 +297,8 @@ namespace Tangerine
 
 		void SetColorTheme(ColorTheme theme, Theme.ColorTheme limeTheme)
 		{
-			Theme.Colors = limeTheme;
-			ColorTheme.Current = theme;
+			Theme.Colors = limeTheme.Clone();
+			ColorTheme.Current = theme.Clone();
 		}
 
 		class UpdateNodesAndApplyAnimatorsProcessor : SymmetricOperationProcessor
