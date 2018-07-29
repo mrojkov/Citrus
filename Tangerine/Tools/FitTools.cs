@@ -16,7 +16,7 @@ namespace Tangerine
 						if (extNode is Widget) {
 							Core.Operations.SetAnimableProperty.Perform(node, nameof(Widget.Size), ((Widget)extNode).Size);
 						}
-						return;
+						continue;
 					}
 				}
 				if (node is Widget) {
