@@ -82,7 +82,6 @@ namespace Lime
 			}
 		}
 
-		private readonly Stopwatch stopwatch = new Stopwatch();
 		private KeyboardHandler keyboardHandler;
 		private Input input;
 		private AndroidSoftKeyboard androidSoftKeyboard;
@@ -97,7 +96,6 @@ namespace Lime
 			}
 			keyboardHandler = new KeyboardHandler(input);
 			SetOnKeyListener(keyboardHandler);
-			stopwatch.Start();
 		}
 
 		public override IInputConnection OnCreateInputConnection(EditorInfo outAttrs)
@@ -339,12 +337,7 @@ namespace Lime
 
 		protected override void OnUpdateFrame(FrameEventArgs e)
 		{
-			var delta = Mathf.Clamp((float)stopwatch.Elapsed.TotalSeconds, 0, Application.MaxDelta);
-			stopwatch.Restart();
-			base.OnUpdateFrame(new FrameEventArgs(delta));
-			AudioSystem.Update();
-			input.CopyKeysState();
-			input.ProcessPendingKeyEvents(delta);
+			base.OnUpdateFrame(e);
 			keyboardHandler.ProcessTextInput();
 		}
 

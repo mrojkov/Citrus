@@ -92,18 +92,27 @@ namespace Lime
 			ActivityDelegate.Instance.GameView.Resize += (sender, e) => {
 				RaiseResized(((ResizeEventArgs)e).DeviceRotated);
 			};
-			ActivityDelegate.Instance.GameView.RenderFrame += (sender, e) => {
-				RaiseRendering();
-				fpsCounter.Refresh();
-			};
-			ActivityDelegate.Instance.GameView.UpdateFrame += (sender, e) => {
-				UnclampedDelta = (float)e.Time;
-				var delta = Math.Min(UnclampedDelta, Application.MaxDelta);
-				RaiseUpdating(delta);
-			};
+			ActivityDelegate.Instance.GameView.UpdateFrame += GameView_UpdateFrame;
+			ActivityDelegate.Instance.GameView.RenderFrame += GameView_RenderFrame;
 
 			PixelScale = Resources.System.DisplayMetrics.Density;
 			Application.WindowUnderMouse = this;
+		}
+
+		private void GameView_UpdateFrame(object sender, OpenTK.FrameEventArgs e)
+		{
+			UnclampedDelta = (float)e.Time;
+			var delta = Math.Min(UnclampedDelta, Application.MaxDelta);
+			RaiseUpdating(delta);
+			AudioSystem.Update();
+			Input.CopyKeysState();
+			Input.ProcessPendingKeyEvents(delta);
+		}
+
+		private void GameView_RenderFrame(object sender, OpenTK.FrameEventArgs e)
+		{
+			fpsCounter.Refresh();
+			RaiseRendering();
 		}
 
 		public void Center() {}
