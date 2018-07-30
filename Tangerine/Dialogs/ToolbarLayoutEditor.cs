@@ -11,16 +11,26 @@ namespace Tangerine.Dialogs
 {
 	class ToolbarLayoutEditor : Widget
 	{
-		private readonly ToolbarLayout toolbarLayout = AppUserPreferences.Instance.ToolbarLayout;
-		private readonly ThemedScrollView availableCommands = CreateCommandsView();
-		private readonly ThemedScrollView usedCommands = CreateCommandsView();
-		private readonly ThemedDropDownList rowList = new ThemedDropDownList();
-		private readonly ThemedEditBox editBox = new ThemedEditBox();
+		private ToolbarLayout toolbarLayout = AppUserPreferences.Instance.ToolbarLayout;
+		private ThemedScrollView availableCommands;
+		private ThemedScrollView usedCommands;
+		private ThemedDropDownList rowList;
+		private ThemedEditBox editBox;
 
 		public ToolbarLayoutEditor()
 		{
 			Layout = new VBoxLayout { Spacing = 10 };
 			Padding = new Thickness(10);
+			Initialize();
+		}
+
+		private void Initialize()
+		{
+			Nodes.Clear();
+			availableCommands = CreateCommandsView();
+			usedCommands = CreateCommandsView();
+			rowList = new ThemedDropDownList();
+			editBox = new ThemedEditBox();
 			CreateRowControls();
 			var widget = new Widget {
 				Layout = new HBoxLayout()
@@ -171,6 +181,13 @@ namespace Tangerine.Dialogs
 				var command = ToolbarCommandRegister.RegisteredCommands[index];
 				usedCommands.Content.AddNode(new CommandRow(command));
 			}
+		}
+
+		public void ResetToDefaults()
+		{
+			AppUserPreferences.Instance.ToolbarLayout = toolbarLayout = ToolbarLayout.DefaultToolbarLayout();
+			Initialize();
+			toolbarLayout.Rebuild(DockManager.Instance.ToolbarArea);
 		}
 
 		private void CreateCommandControls()

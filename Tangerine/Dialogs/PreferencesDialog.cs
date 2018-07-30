@@ -20,6 +20,7 @@ namespace Tangerine
 		readonly Button resetButton;
 		readonly Frame Frame;
 		readonly TabbedWidget Content;
+		readonly ToolbarLayoutEditor toolbarLayoutEditor;
 
 		private List<IPropertyEditor> editors = new List<IPropertyEditor>();
 
@@ -52,7 +53,7 @@ namespace Tangerine
 			Content.AddTab("Appearance", CreateColorsPane());
 			Content.AddTab("Theme", CreateThemePane());
 			Content.AddTab("Keyboard shortcuts", CreateKeyboardPane());
-			Content.AddTab("Toolbar", new ToolbarLayoutEditor());
+			Content.AddTab("Toolbar", toolbarLayoutEditor = new ToolbarLayoutEditor());
 
 			rootWidget = new ThemedInvalidableWindowWidget(window) {
 				Padding = new Thickness(8),
@@ -126,6 +127,7 @@ namespace Tangerine
 			UI.Timeline.TimelineUserPreferences.Instance.ResetToDefaults();
 			Core.CoreUserPreferences.Instance.ResetToDefaults();
 			HotkeyRegistry.ResetToDefaults();
+			toolbarLayoutEditor.ResetToDefaults();
 		}
 
 		private Widget CreateColorsPane()

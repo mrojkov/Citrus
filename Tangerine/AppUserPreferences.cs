@@ -35,7 +35,7 @@ namespace Tangerine
 		public int AutosaveDelay { get; set; }
 
 		[YuzuRequired]
-		public ToolbarLayout ToolbarLayout { get; set; }
+		public ToolbarLayout ToolbarLayout { get; set; } = ToolbarLayout.DefaultToolbarLayout();
 
 		public AppUserPreferences()
 		{
@@ -50,7 +50,6 @@ namespace Tangerine
 			LimeColorTheme = Theme.ColorTheme.CreateLightTheme();
 			DefaultSceneDimensions = new Vector2(1024, 768);
 			AutosaveDelay = 600;
-			ToolbarLayout = ToolbarLayout.DefaultToolbarLayout();
 		}
 
 		public static AppUserPreferences Instance => Core.UserPreferences.Instance.Get<AppUserPreferences>();
