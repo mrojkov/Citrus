@@ -18,15 +18,12 @@ namespace Tangerine.UI.Timeline.Processors
 			var rows = Document.Current.Rows;
 			for (int i = 0; i < rows.Count; ++i) {
 				var row = rows[i];
-				var view = row.Components.Get<RowView>()?.RollRow as RollNodeView;
-				if (view == null) {
+				if (!(row.Components.Get<RowView>()?.RollRow is RollNodeView view)) {
 					continue;
 				}
-				var combiner = row.Components.Get<NodeRow>()?.Node as ImageCombiner;
-				if (combiner != null) {
-					IImageCombinerArg arg1;
-					IImageCombinerArg arg2;
-					if (combiner.GetArgs(out arg1, out arg2)) {
+				var node = row.Components.Get<NodeRow>()?.Node;
+				if (row.Components.Get<NodeRow>()?.Node is ImageCombiner combiner) {
+					if (combiner.GetArgs(out IImageCombinerArg arg1, out IImageCombinerArg arg2)) {
 						view.Label.Color = ColorTheme.Current.Basic.BlackText;
 						view.ImageCombinerIndicator.Color = Color4.Transparent;
 						SetImageCombinerIndication(rows[i + 1]);
@@ -39,8 +36,7 @@ namespace Tangerine.UI.Timeline.Processors
 					}
 					continue;
 				}
-				var arg = row.Components.Get<NodeRow>()?.Node as IImageCombinerArg;
-				if (arg != null) {
+				if (row.Components.Get<NodeRow>()?.Node is IImageCombinerArg arg) {
 					view.ImageCombinerIndicator.Color = Color4.Transparent;
 				}
 			}
