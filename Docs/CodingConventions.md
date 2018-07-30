@@ -271,15 +271,17 @@ var names = collection
 ```
 
 - **Всегда**: Форматируй switch statement согласно следующим правилам:
-  - однострочные `case` допустимы, если тело `case` из одной строчки (не считая `break`)
+  - однострочные `case` допустимы, если тело `case` из одной строчки считая `break`
   - вставляй отступ перед case
   - если тело case обрамляется в фигурные скобки, то откывающая скобка должна быть расположена на одной строчке с case, а закрывающая на отдельной строчке, на уровне вложенности соответствующего case; `break` или `return` в таком случае должен оставаться внутри фигурных скобок
 
 Примеры правильного форматирования `switch` statement:
 
 ```csharp
-public List<ChestBonusConfig> Config {
-  get {
+public List<ChestBonusConfig> Config
+{
+  get
+  {
     switch (Kind) {
       case SlotKind.StarterPack: return The.Config.StarterPackContents;
       case SlotKind.ProductPack: return The.Config.GetProductPackConfig(Index);
