@@ -270,6 +270,45 @@ var names = collection
             .Select(item => item.Name);
 ```
 
+- **Всегда**: Форматируй switch statement согласно следующим правилам:
+  - однострочные `case` допустимы, если тело `case` из одной строчки (не считая `break`)
+  - вставляй отступ перед case
+  - если тело case обрамляется в фигурные скобки, то откывающая скобка должна быть расположена на одной строчке с case, а закрывающая на отдельной строчке, на уровне вложенности соответствующего case; `break` или `return` в таком случае должен оставаться внутри фигурных скобок
+
+Примеры правильного форматирования `switch` statement:
+
+```csharp
+public List<ChestBonusConfig> Config {
+  get {
+    switch (Kind) {
+      case SlotKind.StarterPack: return The.Config.StarterPackContents;
+      case SlotKind.ProductPack: return The.Config.GetProductPackConfig(Index);
+      case SlotKind.CoinPack: case SlotKind.ButtonMore: return null;
+      default: throw new ArgumentOutOfRangeException();
+    }
+  }
+}
+
+private Widget GetBasicWidget()
+{
+  switch (ParticlesLinkage) {
+    case ParticlesLinkage.Parent:
+      return ParentWidget;
+    case ParticlesLinkage.Other: {
+      var widget = ParentWidget;
+      while (widget != null) {
+        if (widget.Id == LinkageWidgetName) {
+            return widget;
+        }
+      widget = widget.ParentWidget;
+      }
+      return null;
+    }
+    case ParticlesLinkage.Root:
+    default:
+      return (Parent != null) ? WidgetContext.Current.Root : null;
+}
+```
 
 - **Всегда**: Используй кодировку UTF-8.
 
