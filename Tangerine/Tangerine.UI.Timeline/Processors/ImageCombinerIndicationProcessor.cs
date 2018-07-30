@@ -49,8 +49,9 @@ namespace Tangerine.UI.Timeline.Processors
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private static void SetImageCombinerIndication(Row row)
 		{
-			var view = row.Components.Get<RowView>().RollRow as RollNodeView;
-			view.ImageCombinerIndicator.Color = Color4.White;
+			if (row.Components.Get<RowView>()?.RollRow is RollNodeView view) {
+				view.ImageCombinerIndicator.Color = Color4.White;
+			}
 		}
 	}
 }
