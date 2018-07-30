@@ -59,9 +59,9 @@ namespace Tangerine.Dialogs
 			}
 			AddNode(rowList);
 			var btnAdd = new ThemedButton("Add row");
-			btnAdd.Clicked += () => AddRow();
+			btnAdd.Clicked += AddRow;
 			var btnRem = new ThemedButton("Remove row");
-			btnRem.Clicked += () => RemoveRow();
+			btnRem.Clicked += RemoveRow;
 			var btnUp = new ThemedButton("Move row up") {
 				MinMaxWidth = 100f
 			};
@@ -328,8 +328,7 @@ namespace Tangerine.Dialogs
 				var row = (CommandRow)owner;
 				row.Clicked += () => {
 					foreach (var node in row.Parent.Nodes) {
-						var crow = node as CommandRow;
-						if (crow == null) {
+						if (!(node is CommandRow crow)) {
 							return;
 						}
 						crow.Selected = false;
