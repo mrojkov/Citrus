@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Lime;
 using Tangerine.Core;
@@ -143,35 +144,21 @@ namespace Tangerine.UI.Timeline
 
 		private static void CopyMarker(Marker marker)
 		{
-			var stream = new System.IO.MemoryStream();
-			Serialization.WriteObject(Document.Current.Path, stream, marker, Serialization.Format.JSON);
-			Clipboard.Text = System.Text.Encoding.UTF8.GetString(stream.ToArray());
+			Clipboard.SetData(marker);
 		}
 
 		private static bool CanParseMarkerFromClipboard()
 		{
-			try {
-				var text = Clipboard.Text;
-				var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(text));
-				Serialization.ReadObject<Marker>(Document.Current.Path, stream);
-				return true;
-			} catch (System.Exception) { }
-			return false;
+			return Clipboard.GetData<Marker>() != null;
 		}
 
 		private static void PasteMarker(int frameUnderMouse)
 		{
-			try {
-				var text = Clipboard.Text;
-				var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(text));
-				var m = Serialization.ReadObject<Marker>(Document.Current.Path, stream);
-				m.Frame = frameUnderMouse;
-				Document.Current.History.DoTransaction(() => {
-					SetMarker.Perform(Document.Current.Container, m, true);
-				});
-			} catch (System.Exception e) {
-				Debug.Write(e);
-			}
+			var m = Clipboard.GetData<Marker>().Clone();
+			m.Frame = frameUnderMouse;
+			Document.Current.History.DoTransaction(() => {
+				SetMarker.Perform(Document.Current.Container, m, true);
+			});
 		}
 
 		private static void DeleteMarker(Marker marker)
@@ -183,41 +170,27 @@ namespace Tangerine.UI.Timeline
 
 		public static void CopyMarkers()
 		{
-			var frame = new Frame();
+			var markers = new List<Marker>();
 			foreach (var marker in Document.Current.Container.Markers) {
-				frame.Markers.Add(marker);
+				markers.Add(marker);
 			}
-			var stream = new System.IO.MemoryStream();
-			Serialization.WriteObject(Document.Current.Path, stream, frame, Serialization.Format.JSON);
-			var text = System.Text.Encoding.UTF8.GetString(stream.ToArray());
-			Clipboard.Text = text;
+			Clipboard.SetData(markers);
 		}
 
 		private static bool CanParseMarkersFromClipboard()
 		{
-			try {
-				var text = Clipboard.Text;
-				var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(text));
-				var frame = Serialization.ReadObject<Frame>(Document.Current.Path, stream);
-				return frame.Markers.Count > 0;
-			} catch (System.Exception) { }
-			return false;
+			return Clipboard.GetData<List<Marker>>() != null;
 		}
 
 		public static void PasteMarkers()
 		{
-			try {
-				Document.Current.History.DoTransaction(() => {
-					var text = Clipboard.Text;
-					var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(text));
-					var frame = Serialization.ReadObject<Frame>(Document.Current.Path, stream);
-					foreach (var marker in frame.Markers) {
-						SetMarker.Perform(Document.Current.Container, marker, true);
-					}
-				});
-			} catch (System.Exception e) {
-				Debug.Write(e);
-			}
+			Document.Current.History.DoTransaction(() => {
+				var markers = Clipboard.GetData<List<Marker>>();
+				foreach (var marker in markers) {
+					var m = marker.Clone();
+					SetMarker.Perform(Document.Current.Container, m, true);
+				}
+			});
 		}
 
 		public static void DeleteMarkers()

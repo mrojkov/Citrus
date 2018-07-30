@@ -22,6 +22,15 @@ namespace Lime
 				}
 			}
 		}
+
+		private static class TypeData<T>
+		{
+			public static T Data { get; set; } = default;
+		}
+
+		public T GetData<T>() => TypeData<T>.Data;
+
+		public void SetData<T>(T value) => TypeData<T>.Data = value;
 	}
 }
 #endif
