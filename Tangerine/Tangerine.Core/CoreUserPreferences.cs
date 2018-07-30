@@ -17,6 +17,9 @@ namespace Tangerine.Core
 		[YuzuRequired]
 		public bool ReloadModifiedFiles { get; set; }
 
+		[YuzuRequired]
+		public bool StopAnimationOnCurrentFrame { get; set; }
+
 		public CoreUserPreferences()
 		{
 			ResetToDefaults();
@@ -27,6 +30,7 @@ namespace Tangerine.Core
 			AutoKeyframes = false;
 			AnimationMode = false;
 			DefaultKeyFunction = KeyFunction.Linear;
+			StopAnimationOnCurrentFrame = false;
 		}
 
 		public static CoreUserPreferences Instance => UserPreferences.Instance.Get<CoreUserPreferences>();
