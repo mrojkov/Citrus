@@ -147,7 +147,11 @@ namespace Tangerine.Core.Operations
 					if (bone.BaseIndex != 0) {
 						continue;
 					}
-					var newIndex = Document.Current.Container.Nodes.OfType<Bone>().Max(b => b.Index) + 1;
+					var newIndex = 1;
+					var bones = Document.Current.Container.Nodes.OfType<Bone>();
+					if (bones.Any()) {
+						newIndex = bones.Max(b => b.Index) + 1;
+					}
 					var children = BoneUtils.FindBoneDescendats(bone, items.OfType<Bone>()).ToList();
 					var map = new Dictionary<int, int>();
 					map.Add(bone.Index, newIndex);
