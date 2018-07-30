@@ -106,12 +106,12 @@
     <Compile Include="MainMenu\EditMenu.cs" />
     <Compile Include="OrangeInterface.cs" />
     <Compile Include="DisplayResolutions.cs" />
-    <Compile Include="OrangePluginUIBuidler.cs" />
     <Compile Include="AppUserPreferences.cs" />
     <Compile Include="HotkeyRegistry.cs" />
     <Compile Include="Dialogs\HotkeyEditor.cs" />
     <Compile Include="DocumentTabContextMenu.cs" />
     <Compile Include="AlignPreferences.cs" />
+    <Compile Include="Dialogs\OrangePluginOptionsDialog.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

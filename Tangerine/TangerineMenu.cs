@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Lime;
 using Tangerine.Core;
 using Tangerine.UI;
@@ -21,6 +22,7 @@ namespace Tangerine
 		private static Menu localizationMenu;
 		private static Command localizationCommand;
 		private static Menu layoutMenu;
+		private static Menu orangeMenu;
 
 		static TangerineMenu()
 		{
@@ -32,6 +34,8 @@ namespace Tangerine
 			resolution = new Menu();
 			overlaysMenu = new Menu();
 			rulerMenu = new Menu();
+			orangeMenu = new Menu();
+			RebuildOrangeMenu(null);
 			CreateMainMenu();
 			CreateResolutionMenu();
 		}
@@ -86,7 +90,6 @@ namespace Tangerine
 		private static void CreateMainMenu()
 		{
 			Menu viewMenu;
-			Menu orangeMenu = CreateOrangeMenu();
 			Application.MainMenu = new Menu {
 #if MAC
 				new Command("Application", new Menu {
@@ -203,21 +206,43 @@ namespace Tangerine
 			GenericCommands.Revert.Icon = IconPool.GetTexture("Tools.Revert");
 		}
 
-		private static Menu CreateOrangeMenu()
+		private static void RebuildOrangeMenu(string citprojPath)
 		{
-			var blacklist = new HashSet<string> { "Run Tangerine" };
-			var orangeMenu = new Menu();
-			Orange.MenuController.Instance.CreateAssemblyMenuItems();
-			foreach (var menuItem in Orange.MenuController.Instance.GetVisibleAndSortedItems()) {
+			var blacklist = new HashSet<string> { "Run Tangerine", "Build and Run", "Cook Game Assets" };
+			orangeMenu.Clear();
+			if (citprojPath == null) {
+				CommandHandlerList.Global.Disconnect(OrangeCommands.Run);
+				CommandHandlerList.Global.Disconnect(OrangeCommands.CookGameAssets);
+				return;
+			}
+			var items = Orange.MenuController.Instance.GetVisibleAndSortedItems();
+			var buildAndRun = items.First((i) => i.Label == "Build and Run");
+			var context = WidgetContext.Current;
+			CommandHandlerList.Global.Connect(OrangeCommands.Run, () => {
+				context.Root.Tasks.Add(OrangeTask(
+					() => {
+						buildAndRun.Action();
+					})
+				);
+			});
+			var cookGameAssets = items.First((i) => i.Label == "Cook Game Assets");
+			CommandHandlerList.Global.Connect(OrangeCommands.CookGameAssets, () => {
+				context.Root.Tasks.Add(
+					OrangeTask(() => cookGameAssets.Action())
+				);
+			});
+			orangeMenu.Add(OrangeCommands.Run);
+			orangeMenu.Add(OrangeCommands.RunConfig);
+			orangeMenu.Add(OrangeCommands.CookGameAssets);
+			foreach (var menuItem in items) {
 				if (blacklist.Contains(menuItem.Label)) {
 					continue;
 				}
 				orangeMenu.Add(new Command(menuItem.Label, () => {
-					WidgetContext.Current.Root.Tasks.Add(OrangeTask(() => menuItem.Action()));
+					context.Root.Tasks.Add(OrangeTask(() => menuItem.Action()));
 				}));
 			}
-
-			return orangeMenu;
+			return;
 		}
 
 		public static void OnProjectChanged(Project proj)
@@ -226,6 +251,7 @@ namespace Tangerine
 				CommandHandlerList.Global.Disconnect(item);
 			}
 			overlaysMenu.Clear();
+			RebuildOrangeMenu(proj.CitprojPath);
 			if (proj == Project.Null)
 				return;
 			proj.UserPreferences.Rulers.CollectionChanged += OnRulersCollectionChanged;
