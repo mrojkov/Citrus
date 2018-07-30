@@ -81,6 +81,10 @@ namespace Tangerine.UI.Inspector
 					// WTF, Bug in Mono?
 					continue;
 				}
+				// Root must be always visible
+				if (Document.Current.InspectRootNode && property.Name == nameof(Widget.Visible)) {
+					continue;
+				}
 				var yuzuField = PropertyAttributes<YuzuField>.Get(type, property.Name);
 				var tang = PropertyAttributes<TangerineKeyframeColorAttribute>.Get(type, property.Name);
 				var tangIgnore = PropertyAttributes<TangerineIgnoreAttribute>.Get(type, property.Name);
