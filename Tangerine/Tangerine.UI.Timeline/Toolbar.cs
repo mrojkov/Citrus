@@ -23,6 +23,7 @@ namespace Tangerine.UI.Timeline
 					CreateAutoKeyframesButton(),
 					CreateNewFolderButton(),
 					CreateCurveEditorButton(),
+					CreateAnimationStretchButton(),
 					CreateAnimationIndicator(),
 					new Widget(),
 					CreateExitButton(),
@@ -145,6 +146,15 @@ namespace Tangerine.UI.Timeline
 				}
 			});
 			button.Components.Add(new DocumentationComponent("LockAnimation"));
+			return button;
+		}
+
+		ToolbarButton CreateAnimationStretchButton()
+		{
+			var button = new ToolbarButton(IconPool.GetTexture("Timeline.AnimationStretch")) { Tip = "Animation stretch mode" };
+			button.AddChangeWatcher(() => UserPreferences.AnimationStretchMode, i => button.Checked = i);
+			button.Clicked += () => UserPreferences.AnimationStretchMode = !UserPreferences.AnimationStretchMode;
+			button.Components.Add(new DocumentationComponent("AnimationStretch.md"));
 			return button;
 		}
 

@@ -76,6 +76,7 @@
     <Compile Include="Operations\SelectGridSpan.cs" />
     <Compile Include="Operations\SetCurrentColumn.cs" />
     <Compile Include="Operations\ShiftGridSelection.cs" />
+    <Compile Include="Processors\GridPane\AnimationStretchProcessor.cs" />
     <Compile Include="Processors\GridPane\ClampScrollPosProcessor.cs" />
     <Compile Include="Processors\ImageCombinerIndicationProcessor.cs" />
     <Compile Include="Processors\TiedIndicationProcessor.cs" />
