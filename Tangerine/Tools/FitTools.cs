@@ -9,6 +9,16 @@ namespace Tangerine
 		public override void ExecuteTransaction()
 		{
 			foreach (var node in Core.Document.Current.SelectedNodes().Editable()) {
+				if (node is Frame) {
+					var frame = node as Frame;
+					if (!string.IsNullOrEmpty(frame.ContentsPath)) {
+						var extNode = Node.CreateFromAssetBundle(frame.ContentsPath);
+						if (extNode is Widget) {
+							Core.Operations.SetAnimableProperty.Perform(node, nameof(Widget.Size), ((Widget)extNode).Size);
+						}
+						continue;
+					}
+				}
 				if (node is Widget) {
 					var widget = node as Widget;
 					var originalSize = widget.Texture == null ? Widget.DefaultWidgetSize : (Vector2)widget.Texture.ImageSize;
