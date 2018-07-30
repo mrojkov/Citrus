@@ -12,11 +12,16 @@ using Yuzu;
 
 namespace Tangerine.UI.Timeline.Operations
 {
+	internal static class KeyframeClipboard
+	{
+		public static List<RowKeyBinding> Keys;
+	}
+
 	public static class CopyKeyframes
 	{
 		public static void Perform()
 		{
-			Clipboard.SetData(GetKeyframes());
+			KeyframeClipboard.Keys = GetKeyframes();
 		}
 
 		private static List<RowKeyBinding> GetKeyframes()
@@ -86,7 +91,7 @@ namespace Tangerine.UI.Timeline.Operations
 	{
 		public static void Perform()
 		{
-			var keys = Clipboard.GetData<List<RowKeyBinding>>();
+			var keys = KeyframeClipboard.Keys;
 			if (keys == null || !Document.Current.TopLevelSelectedRows().Any()) {
 				return;
 			}

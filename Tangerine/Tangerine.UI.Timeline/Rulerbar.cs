@@ -12,6 +12,8 @@ namespace Tangerine.UI.Timeline
 		public Widget RootWidget { get; private set; }
 
 		private Marker upperMarker = null;
+		private static Marker copiedMarker;
+		private static List<Marker> copiedMarkers;
 
 		public Rulerbar()
 		{
@@ -144,17 +146,17 @@ namespace Tangerine.UI.Timeline
 
 		private static void CopyMarker(Marker marker)
 		{
-			Clipboard.SetData(marker);
+			copiedMarker = marker;
 		}
 
 		private static bool CanParseMarkerFromClipboard()
 		{
-			return Clipboard.GetData<Marker>() != null;
+			return copiedMarker != null;
 		}
 
 		private static void PasteMarker(int frameUnderMouse)
 		{
-			var m = Clipboard.GetData<Marker>().Clone();
+			var m = copiedMarker.Clone();
 			m.Frame = frameUnderMouse;
 			Document.Current.History.DoTransaction(() => {
 				SetMarker.Perform(Document.Current.Container, m, true);
@@ -170,23 +172,21 @@ namespace Tangerine.UI.Timeline
 
 		public static void CopyMarkers()
 		{
-			var markers = new List<Marker>();
+			copiedMarkers = new List<Marker>();
 			foreach (var marker in Document.Current.Container.Markers) {
-				markers.Add(marker);
+				copiedMarkers.Add(marker);
 			}
-			Clipboard.SetData(markers);
 		}
 
 		private static bool CanParseMarkersFromClipboard()
 		{
-			return Clipboard.GetData<List<Marker>>() != null;
+			return copiedMarkers != null;
 		}
 
 		public static void PasteMarkers()
 		{
 			Document.Current.History.DoTransaction(() => {
-				var markers = Clipboard.GetData<List<Marker>>();
-				foreach (var marker in markers) {
+				foreach (var marker in copiedMarkers) {
 					var m = marker.Clone();
 					SetMarker.Perform(Document.Current.Container, m, true);
 				}
