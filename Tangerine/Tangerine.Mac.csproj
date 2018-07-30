@@ -394,8 +394,6 @@
     <EmbeddedResource Include="Resources\SegoeUI.ttf" />
     <EmbeddedResource Include="Resources\Icons\Light\Tools\Edit.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Tools\Edit.png" />
-    <EmbeddedResource Include="Resources\Icons\Dark\Timeline\AnimationPath.png" />
-    <EmbeddedResource Include="Resources\Icons\Light\Timeline\AnimationPath.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Tools\DistributeLeft.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Tools\DistributeRight.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Tools\DistributeTop.png" />
