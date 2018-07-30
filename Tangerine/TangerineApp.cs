@@ -458,7 +458,7 @@ namespace Tangerine
 			}
 		}
 
-		static void LoadFont()
+		public static void LoadFont()
 		{
 			var fontData = new EmbeddedResource("Tangerine.Resources.SegoeUI.ttf", "Tangerine").GetResourceBytes();
 			var font = new DynamicFont(fontData);
