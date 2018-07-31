@@ -122,6 +122,7 @@ namespace Tangerine.UI
 		public static readonly ICommand AlignBottom = new Command("Align Bottom") { Icon = IconPool.GetTexture("Tools.AlignBottom") };
 		public static readonly ICommand CenterHorizontally = new Command("Center Horizontally") { Icon = IconPool.GetTexture("Tools.CenterH") };
 		public static readonly ICommand CenterVertically = new Command("Center Vertically") { Icon = IconPool.GetTexture("Tools.CenterV") };
+		public static readonly ICommand CenterAlignTo = new Command("Align To Parent") { Icon = IconPool.GetTexture("Tools.Parent") };
 		public static readonly ICommand AlignCentersHorizontally = new Command("Align Centers Horizontally") { Icon = IconPool.GetTexture("Tools.AlignCentersHorizontally") };
 		public static readonly ICommand AlignCentersVertically = new Command("Align Centers Vertically") { Icon = IconPool.GetTexture("Tools.AlignCentersVertically") };
 		public static readonly ICommand DistributeLeft = new Command("Distribute Left") { Icon = IconPool.GetTexture("Tools.DistributeLeft") };
