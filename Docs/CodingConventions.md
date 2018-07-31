@@ -302,13 +302,36 @@ private Widget GetBasicWidget()
         if (widget.Id == LinkageWidgetName) {
             return widget;
         }
-      widget = widget.ParentWidget;
+        widget = widget.ParentWidget;
       }
       return null;
     }
     case ParticlesLinkage.Root:
     default:
       return (Parent != null) ? WidgetContext.Current.Root : null;
+}
+
+switch (type) {
+  case SignatureType.BinaryUnordered:
+    yd = new BinaryDeserializer {
+      Options = defaultYuzuCommonOptions,
+      BinaryOptions = new BinarySerializeOptions { Unordered = true },
+    };
+    break;
+  case SignatureType.BinaryOrdered:
+    yd = new BinaryDeserializer {
+      Options = defaultYuzuCommonOptions,
+    };
+    break;
+  case SignatureType.Json:
+    SkipBomIfPresent(ms);
+    yd = new JsonDeserializer {
+      JsonOptions = defaultYuzuJSONOptions,
+      Options = defaultYuzuCommonOptions
+    };
+    break;
+  default:
+    throw new System.Exception("Unexpected Case");
 }
 ```
 
