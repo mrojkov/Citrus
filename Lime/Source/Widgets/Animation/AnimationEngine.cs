@@ -84,7 +84,7 @@ namespace Lime
 			}
 		}
 
-		protected double? GetNextMarkerOrTriggerTime(Animation animation, int nextFrame)
+		protected static double? GetNextMarkerOrTriggerTime(Animation animation, int nextFrame)
 		{
 			int? nextMarkerOrTriggerFrame = null;
 			foreach (var marker in animation.Markers) {
@@ -99,15 +99,10 @@ namespace Lime
 						continue;
 					}
 
-					foreach (var key in animator.ReadonlyKeys) {
-						if (key.Frame < nextFrame) {
-							continue;
+					if (animator.TryGetNextKeyFrame(nextFrame, out var keyFrame)) {
+						if (!nextMarkerOrTriggerFrame.HasValue || keyFrame < nextMarkerOrTriggerFrame.Value) {
+							nextMarkerOrTriggerFrame = keyFrame;
 						}
-
-						if (!nextMarkerOrTriggerFrame.HasValue || key.Frame < nextMarkerOrTriggerFrame.Value) {
-							nextMarkerOrTriggerFrame = key.Frame;
-						}
-						break;
 					}
 				}
 			}

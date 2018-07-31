@@ -34,6 +34,8 @@ namespace Lime
 		object UserData { get; set; }
 
 		Type GetValueType();
+
+		bool TryGetNextKeyFrame(int nextFrame, out int keyFrame);
 	}
 
 	public interface IKeyframeList : IList<IKeyframe>
@@ -199,6 +201,20 @@ namespace Lime
 			} else {
 				return InterpolateSplined(t);
 			}
+		}
+
+		public bool TryGetNextKeyFrame(int nextFrame, out int keyFrame)
+		{
+			foreach (var key in ReadonlyKeys) {
+				if (key.Frame < nextFrame) {
+					continue;
+				}
+
+				keyFrame = key.Frame;
+				return true;
+			}
+			keyFrame = -1;
+			return false;
 		}
 
 		private void CacheInterpolationParameters(double time)
