@@ -88,6 +88,16 @@ namespace Lime
 			}
 		}
 
+		public static bool AreAllWindowsInactive()
+		{
+			foreach (var window in Windows) {
+				if (window.Active) {
+					return false;
+				}
+			}
+			return true;
+		}
+
 		private static DeviceOrientation supportedDeviceOrientations = DeviceOrientation.All;
 		/// <summary>
 		/// Supported device orientations (only for mobile platforms)
