@@ -127,6 +127,7 @@ namespace Lime
 		public IAnimator Clone()
 		{
 			var clone = (Animator<T>)MemberwiseClone();
+			clone.Setter = null;
 			clone.Owner = null;
 			clone.Next = null;
 			clone.boxedKeys = null;
