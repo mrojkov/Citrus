@@ -35,7 +35,7 @@ namespace Lime
 
 		public GestureManager GestureManager { get; set; }
 
-		public WidgetContext(Widget root) : base("Current")
+		public WidgetContext(Widget root) : base(Property.Create(() => Current, (v) => Current = v))
 		{
 			Root = root;
 			if (Current == null) {

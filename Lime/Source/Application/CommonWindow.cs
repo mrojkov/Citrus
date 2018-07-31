@@ -44,7 +44,7 @@ namespace Lime
 			if (Current == null) {
 				Current = (IWindow)this;
 			}
-			Context = new Context(new Property(typeof(CommonWindow), nameof(Current)), this);
+			Context = new Context(Property.Create(() => Current, (v) => Current = v), this);
 		}
 
 		protected void RaiseActivated()

@@ -46,6 +46,13 @@ namespace Lime
 			this.value = this;
 		}
 
+		protected Context(Property property)
+		{
+			EnsureStack();
+			this.property = property;
+			this.value = this;
+		}
+
 		private void EnsureStack()
 		{
 			stack = stack ?? new Stack<ActivationRecord>();
