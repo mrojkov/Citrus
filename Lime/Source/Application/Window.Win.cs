@@ -463,6 +463,8 @@ namespace Lime
 		{
 			if (active) {
 				active = false;
+				// Andrey Tyshchenko: clear Input state, the next activated window
+				// will receive KeyDown event and restore Input state
 				Input.ClearKeyState();
 				RaiseDeactivated();
 			}
@@ -561,6 +563,15 @@ namespace Lime
 			if (k != Key.Unknown) {
 				Input.SetKeyState(k, true);
 			}
+			if ((e.Modifiers & Keys.Shift) != 0) {
+				Input.SetKeyState(Key.Shift, true);
+			}
+			if ((e.Modifiers & Keys.Alt) != 0) {
+				Input.SetKeyState(Key.Alt, true);
+			}
+			if ((e.Modifiers & Keys.Control) != 0) {
+				Input.SetKeyState(Key.Control, true);
+			}
 		}
 
 		private void OnKeyUp(object sender, KeyEventArgs e)
@@ -618,9 +629,6 @@ namespace Lime
 				Input.CopyKeysState();
 				Input.ProcessPendingKeyEvents(delta);
 				Input.TextInput = null;
-			}
-			if (Application.AreAllWindowsInactive()) {
-				Input.ClearKeyState();
 			}
 			if (wasInvalidated || renderingState == RenderingState.RenderDeferred) {
 				glControl.Invalidate();
