@@ -794,7 +794,7 @@ namespace Lime
 
 		private void TriggerMultipleAnimations(double animationTimeCorrection = 0)
 		{
-			if (Trigger.Contains(',')) {
+			if (Trigger.IndexOf(',') >= 0) {
 				foreach (var s in Trigger.Split(',')) {
 					TriggerAnimation(s.Trim(), animationTimeCorrection);
 				}
@@ -805,7 +805,7 @@ namespace Lime
 
 		private void TriggerAnimation(string markerWithOptionalAnimationId, double animationTimeCorrection = 0)
 		{
-			if (markerWithOptionalAnimationId.Contains('@')) {
+			if (markerWithOptionalAnimationId.IndexOf('@') >= 0) {
 				var s = markerWithOptionalAnimationId.Split('@');
 				if (s.Length == 2) {
 					var markerId = s[0];
