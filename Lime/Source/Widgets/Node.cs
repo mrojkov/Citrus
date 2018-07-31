@@ -972,11 +972,18 @@ namespace Lime
 		private Node TryFindNodeByPath(string path)
 		{
 			Node child = this;
-			foreach (string id in path.Split('/')) {
-				child = child.TryFindNodeById(id);
-				if (child == null)
+			var start = 0;
+
+			while (start <= path.Length) {
+				var end = path.IndexOf('/', start);
+				end = end >= 0 ? end : path.Length;
+				child = child.TryFindNodeById(path, start, end - start);
+				if (child == null) {
 					break;
+				}
+				start = end + 1;
 			}
+
 			return child;
 		}
 
@@ -1025,6 +1032,11 @@ namespace Lime
 		/// </summary>
 		private Node TryFindNodeById(string id)
 		{
+			return TryFindNodeById(id, 0, id.Length);
+		}
+
+		private Node TryFindNodeById(string path, int start, int length)
+		{
 			if (nodeSearchQueue == null) {
 				nodeSearchQueue = new Queue<Node>();
 			}
@@ -1034,7 +1046,11 @@ namespace Lime
 				var parent = queue.Dequeue();
 				var child = parent.FirstChild;
 				for (; child != null; child = child.NextSibling) {
-					if (child.Id == id) {
+					var isEqual =
+						child.Id != null &&
+						child.Id.Length == length &&
+						string.CompareOrdinal(child.Id, 0, path, start, length) == 0;
+					if (isEqual) {
 						queue.Clear();
 						return child;
 					}
