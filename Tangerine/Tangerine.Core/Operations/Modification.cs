@@ -800,7 +800,7 @@ namespace Tangerine.Core.Operations
 					newOverallWeight += skinningWeights[i].Weight;
 				}
 			}
-			if (Mathf.Abs(overallWeight) > Mathf.ZeroTolerance && newOverallWeight < overallWeight) {
+			if (Mathf.Abs(overallWeight) > Mathf.ZeroTolerance && Mathf.Abs(newOverallWeight) > Mathf.ZeroTolerance) {
 				var factor = overallWeight / newOverallWeight;
 				for (var i = 0; i < 4; i++) {
 					var boneWeight = skinningWeights[i];
