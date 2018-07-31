@@ -463,6 +463,7 @@ namespace Lime
 		{
 			if (active) {
 				active = false;
+				Input.ClearKeyState();
 				RaiseDeactivated();
 			}
 		}
