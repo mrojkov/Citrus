@@ -20,9 +20,13 @@ namespace Tangerine.UI.Timeline
 					Operations.SetCurrentColumn.Processor.CacheAnimationsStates = true;
 					using (Document.Current.History.BeginTransaction()) {
 						int initialCol = CalcColumn(rulerWidget.LocalMousePosition().X);
+						int backup = timeline.CurrentColumn;
 						var marker = Document.Current.Container.Markers.FirstOrDefault(m => m.Frame == initialCol);
 						while (input.IsMousePressed()) {
+							// Evgenii Polikutin: don't Undo to avoid animation cache invalidation
+							SetCurrentColumn.IsFrozen = true;
 							SetCurrentColumn.RollbackHistoryWithoutScrolling();
+							SetCurrentColumn.IsFrozen = false;
 
 							var cw = TimelineMetrics.ColWidth;
 							var mp = rulerWidget.LocalMousePosition().X;
@@ -38,6 +42,8 @@ namespace Tangerine.UI.Timeline
 									DragMarker(marker, CalcColumn(mp));
 								}
 							}
+							// Evgenii Polikutin: we need operation to backup the value we need, not the previous one
+							Document.Current.AnimationFrame = backup;
 							Operations.SetCurrentColumn.Perform(CalcColumn(mp));
 							timeline.Ruler.MeasuredFrameDistance = timeline.CurrentColumn - initialCol;
 							Window.Current.Invalidate();
