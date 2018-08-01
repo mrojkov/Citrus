@@ -21,7 +21,7 @@ namespace Tangerine.UI.FilesystemView
 	{
 		public Toolbar()
 		{
-			Padding = new Thickness { Left = 4 };
+			Padding = new Thickness(4);
 			MinMaxHeight = Metrics.ToolbarHeight;
 			MinWidth = 50;// TimelineMetrics.ToolbarMinWidth;
 			Presenter = new DelegatePresenter<Widget>(Render);
