@@ -71,7 +71,7 @@ namespace Tangerine.UI.Timeline
 								k1.Frame += offset.X;
 								// The same logic is used to create keyframes as everywhere, but extended by setting
 								// all parameters from a particular keyframe. Yes, this creates some overhead.
-								operations.Add(() => SetAnimableProperty.Perform(destNode, a.TargetProperty, k1.Value, true, true, k1.Frame));
+								operations.Add(() => SetAnimableProperty.Perform(destNode, a.TargetProperty, k1.Value, true, false, k1.Frame));
 								operations.Add(() => Core.Operations.SetKeyframe.Perform(destNode, a.TargetProperty, Document.Current.AnimationId, k1));
 							}
 							// Order is importent. RemoveKeyframe must be after SetKeyframe,
