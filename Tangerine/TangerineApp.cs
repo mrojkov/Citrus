@@ -211,6 +211,7 @@ namespace Tangerine
 				new UpdateNodesAndApplyAnimatorsProcessor(),
 				new RowsSynchronizer(),
 				new ImageCombinerIndicationProcessor(),
+				new TiedIndicationProcessor()
 			});
 			DocumentHistory.Processors.AddRange(UI.Timeline.Timeline.GetOperationProcessors());
 
