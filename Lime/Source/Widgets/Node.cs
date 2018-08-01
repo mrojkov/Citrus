@@ -445,11 +445,9 @@ namespace Lime
 					return;
 				}
 				tag = value;
-				OnTagChanged();
 			}
 		}
 		private string tag;
-		protected virtual void OnTagChanged() { }
 
 		[YuzuMember]
 		[YuzuSerializeIf(nameof(NeedSerializeAnimations))]

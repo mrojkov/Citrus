@@ -155,9 +155,9 @@ namespace Lime
 		{
 			bool dirty = false;
 			foreach (var s in renderer.Styles) {
-				if (s.PaletteIndex != -1) {
+				if (s.GradientMapIndex != -1) {
 					dirty = true;
-					s.PaletteIndex = ShaderPrograms.ColorfulTextShaderProgram.GradientMapTextureSize - s.PaletteIndex - 1;
+					s.gradientMapIndex = ShaderPrograms.ColorfulTextShaderProgram.GradientMapTextureSize - s.GradientMapIndex - 1;
 				}
 			}
 			return dirty;
@@ -349,7 +349,7 @@ namespace Lime
 			private Blending blending;
 			private IMaterial material;
 			private TextRenderer textRenderer;
-			private int paletteIndex;
+			private int gradientMapIndex;
 
 			public void Init(Blending blending, ShaderId shader, TextRenderer textRenderer)
 			{
@@ -362,12 +362,12 @@ namespace Lime
 			public IMaterial GetMaterial(int tag)
 			{
 				var style = textRenderer.Styles[tag];
-				if (material == null || paletteIndex != style.PaletteIndex) {
-					paletteIndex = style.PaletteIndex;
-					if (paletteIndex < 0) {
+				if (material == null || gradientMapIndex != style.GradientMapIndex) {
+					gradientMapIndex = style.GradientMapIndex;
+					if (gradientMapIndex < 0) {
 						material = WidgetMaterial.GetInstance(blending, shader, 1);
 					} else {
-						material = ColorfulTextMaterial.GetInstance(blending, paletteIndex);
+						material = ColorfulTextMaterial.GetInstance(blending, gradientMapIndex);
 					}
 				}
 				return material;
