@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Lime
@@ -111,6 +111,15 @@ namespace Lime
 
 		public void Apply(int pass)
 		{
+			var texture = ShaderPrograms.ColorfulTextShaderProgram.GradientRampTexture;
+			if (texture == null || texture.IsStubTexture) {
+				var warningText = "GradientMap texture doesnt exist at './Data/Fonts/GradientMap.png' If you want to use it, create it and dont forget cooking rule file to disable texture atlas for it.";
+#if DEBUG
+				throw new Lime.Exception(warningText);
+#else
+				Console.WriteLine(warningText);
+#endif
+			}
 			PlatformRenderer.SetBlendState(blendState);
 			PlatformRenderer.SetTextureLegacy(1, ShaderPrograms.ColorfulTextShaderProgram.GradientRampTexture);
 			PlatformRenderer.SetShaderProgram(ShaderPrograms.ColorfulTextShaderProgram.GetInstance());
