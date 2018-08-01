@@ -617,7 +617,7 @@ namespace Lime
 				Input.ProcessPendingKeyEvents(delta);
 				Input.TextInput = null;
 			}
-			if (Application.Windows.All(window => !window.Active)) {
+			if (Application.AreAllWindowsInactive()) {
 				Input.ClearKeyState();
 			}
 			if (renderingState == RenderingState.RenderDeferred) {

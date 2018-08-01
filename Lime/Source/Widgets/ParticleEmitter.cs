@@ -307,7 +307,29 @@ namespace Lime
 			particles.Clear();
 		}
 
-		private List<ParticleModifier> GetModifiers() => Nodes.OfType<ParticleModifier>().ToList();
+		private bool TryGetRandomModifier(out ParticleModifier modifier)
+		{
+			var count = 0;
+			modifier = null;
+			for (var n = FirstChild; n != null; n = n.NextSibling) {
+				count += n is ParticleModifier ? 1 : 0;
+			}
+			if (count == 0) {
+				return false;
+			}
+			var targetIndex = Rng.RandomInt(count);
+			var index = 0;
+			for (var n = FirstChild; n != null; n = n.NextSibling) {
+				if (n is ParticleModifier particleModifier) {
+					if (index == targetIndex) {
+						modifier = particleModifier;
+						return true;
+					}
+					index++;
+				}
+			}
+			return false;
+		}
 
 		private Widget GetBasicWidget()
 		{
@@ -673,11 +695,9 @@ namespace Lime
 				throw new Lime.Exception("Invalid particle emitter shape");
 			}
 			p.RegularPosition = transform.TransformVector(position);
-			var modifiers = GetModifiers();
-			if (modifiers.Count == 0) {
+			if (!TryGetRandomModifier(out p.Modifier)) {
 				return false;
 			}
-			p.Modifier = modifiers[Rng.RandomInt(modifiers.Count)];
 			var animationDuration = AnimationUtils.FramesToSeconds(p.Modifier.Animators.GetOverallDuration());
 			p.AgeToAnimationTime = (float)(animationDuration / p.Lifetime);
 			if (EmissionType == EmissionType.Inner) {

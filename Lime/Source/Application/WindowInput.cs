@@ -1,4 +1,6 @@
-﻿namespace Lime
+using System;
+
+namespace Lime
 {
 	public class WindowInput
 	{
@@ -22,7 +24,7 @@
 			set
 			{
 				mousePositionTransform = value;
-				calculatedTouchPositions = new Vector2?[Input.MaxTouches];
+				Array.Clear(calculatedTouchPositions, 0, Input.MaxTouches);
 				lastDesktopMousePosition = new Vector2(-1, -1);
 			}
 		}
