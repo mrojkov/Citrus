@@ -17,7 +17,7 @@ namespace Tangerine
 
 	public abstract class AlignObjectHandler : DocumentCommandHandler
 	{
-		readonly ICommand command;
+		private readonly ICommand command;
 
 		public AlignObjectHandler(ICommand command)
 		{
@@ -98,11 +98,11 @@ namespace Tangerine
 			public static void Create(AlignObjectHandler alignToHandler)
 			{
 				var menu = new Menu();
-				var curAlignObject = alignToHandler.GetAlignObject();
+				var currentAlignObject = alignToHandler.GetAlignObject();
 				foreach (AlignObject alignObject in Enum.GetValues(typeof(AlignObject))) {
 					menu.Add(new Command(AlignToString(alignObject),
 						new ChangeAlignObject(alignObject, alignToHandler).Execute) {
-						Checked = curAlignObject == alignObject
+						Checked = currentAlignObject == alignObject
 					});
 				}
 				menu.Popup();
@@ -136,14 +136,16 @@ namespace Tangerine
 			{
 				var alignObject = alignToHandler.GetAlignObject();
 				new Menu {
-					new Command(AlignToString(AlignObject.Parent),
-						new ChangeAlignObject(AlignObject.Parent, alignToHandler).Execute)
-					{
+					new Command(
+						AlignToString(AlignObject.Parent),
+						new ChangeAlignObject(AlignObject.Parent, alignToHandler).Execute
+					) {
 						Checked = alignObject == AlignObject.Parent
 					},
-					new Command(AlignToString(AlignObject.Root),
-						new ChangeAlignObject(AlignObject.Root, alignToHandler).Execute)
-					{
+					new Command(
+						AlignToString(AlignObject.Root),
+						new ChangeAlignObject(AlignObject.Root, alignToHandler).Execute
+					) {
 						Checked = alignObject == AlignObject.Root
 					}
 				}.Popup();
