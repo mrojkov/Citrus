@@ -410,6 +410,8 @@
     <EmbeddedResource Include="Resources\Icons\Dark\Tools\Selection.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Timeline\NoEntry.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Timeline\NoEntry.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Timeline\Tied.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Timeline\Tied.png" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
