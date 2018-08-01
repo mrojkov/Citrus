@@ -1,9 +1,7 @@
 using Lime;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Tangerine.Core;
 using Tangerine.UI.Timeline.Components;
 
@@ -13,48 +11,33 @@ namespace Tangerine.UI.Timeline.Processors
     {
         public override void Process(IOperation op)
         {
-            var rows = Document.Current.Rows;
             var ties = new Dictionary<int, HashSet<Node>>();
-            for (int i = 0; i < rows.Count; ++i)
+            foreach (var row in Document.Current.Rows)
             {
-				if (rows[i].Components.Get<RowView>()?.RollRow is RollNodeView view) {
+				if (row.Components.Get<RowView>()?.RollRow is RollNodeView view) {
 					var node = view.NodeData?.Node;
-
-					Property<SkinningWeights> property = null;
-					if (node is Widget widget) {
-						property = new Property<SkinningWeights>(() => widget.SkinningWeights);
-					}
-					if (node is DistortionMeshPoint point) {
-						property = new Property<SkinningWeights>(() => point.SkinningWeights);	
-					}
-					if (property != null) {
-						var sw = property.Getter();
-						if (sw?.IsEmpty() ?? true) {
-							view.TiedIndicator.Color = Color4.Transparent;
-						}
-						else {
-							view.TiedIndicator.Color = Color4.White;
-							AddTie(ties, sw.Bone0.Index, node);
-							AddTie(ties, sw.Bone1.Index, node);
-							AddTie(ties, sw.Bone2.Index, node);
-							AddTie(ties, sw.Bone3.Index, node);
-						}
-					}
-
-					if (node is DistortionMesh mesh) {
-						bool tied = false;
-						foreach (var index in GetTiedBoneIndexes(mesh)) {
-							AddTie(ties, index, mesh);
-							tied = true;
-						}
-						view.TiedIndicator.Color = tied ? Color4.White : Color4.Transparent;
+					switch (node) {
+						case Widget widget:
+							AddTies(ties, new Property<SkinningWeights>(() => widget.SkinningWeights), view, widget);
+							if (widget is DistortionMesh mesh) {
+								bool tied = false;
+								foreach (var index in GetTiedBoneIndexes(mesh)) {
+									AddTie(ties, index, mesh);
+									tied = true;
+								}
+								view.TiedIndicator.Color = tied ? Color4.White : Color4.Transparent;
+							}
+							break;
+						case DistortionMeshPoint point:
+							AddTies(ties, new Property<SkinningWeights>(() => point.SkinningWeights), view, point);
+							break;
 					}
 				}
 			}
-            for (int i = 0; i < rows.Count; ++i)
+            foreach (var row in Document.Current.Rows)
             {
 				if (
-					rows[i].Components.Get<RowView>()?.RollRow is RollNodeView view &&
+					row.Components.Get<RowView>()?.RollRow is RollNodeView view &&
 					view.NodeData?.Node is Bone bone
 				) {
 					if (ties.ContainsKey(bone.Index)) {
@@ -75,21 +58,35 @@ namespace Tangerine.UI.Timeline.Processors
 		internal static IEnumerable<int> GetTiedBoneIndexes(DistortionMesh mesh)
 		{
 			foreach (var point in mesh.Nodes.OfType<DistortionMeshPoint>()) {
-				var sw = point.SkinningWeights;
-				if (!sw?.IsEmpty() ?? false) {
-					if (sw.Bone0.Index != 0) {
-						yield return sw.Bone0.Index;
-					}
-					if (sw.Bone1.Index != 0) {
-						yield return sw.Bone1.Index;
-					}
-					if (sw.Bone2.Index != 0) {
-						yield return sw.Bone2.Index;
-					}
-					if (sw.Bone3.Index != 0) {
-						yield return sw.Bone3.Index;
-					}
+				if (point.SkinningWeights?.IsEmpty() ?? true) {
+					continue;
 				}
+				if (point.SkinningWeights.Bone0.Index != 0) {
+					yield return point.SkinningWeights.Bone0.Index;
+				}
+				if (point.SkinningWeights.Bone1.Index != 0) {
+					yield return point.SkinningWeights.Bone1.Index;
+				}
+				if (point.SkinningWeights.Bone2.Index != 0) {
+					yield return point.SkinningWeights.Bone2.Index;
+				}
+				if (point.SkinningWeights.Bone3.Index != 0) {
+					yield return point.SkinningWeights.Bone3.Index;
+				}
+			}
+		}
+
+		private static void AddTies(Dictionary<int, HashSet<Node>> ties, Property<SkinningWeights> property, RollNodeView view, Node node)
+		{
+			var skinningWeights = property.Getter();
+			if (skinningWeights?.IsEmpty() ?? true) {
+				view.TiedIndicator.Color = Color4.Transparent;
+			} else {
+				view.TiedIndicator.Color = Color4.White;
+				AddTie(ties, skinningWeights.Bone0.Index, node);
+				AddTie(ties, skinningWeights.Bone1.Index, node);
+				AddTie(ties, skinningWeights.Bone2.Index, node);
+				AddTie(ties, skinningWeights.Bone3.Index, node);
 			}
 		}
 
