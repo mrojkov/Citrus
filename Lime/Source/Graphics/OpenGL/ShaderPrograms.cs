@@ -279,7 +279,7 @@ namespace Lime
 		/// </summary>
 		/// <remarks>
 		/// To apply this shader you need:
-		/// 1. Data/gradient_map.png file with size of 256x256 and ARGB8 compression.
+		/// 1. Data/Fonts/GradientMap.png file with size of 256x256 and ARGB8 compression.
 		/// 2. Use <see cref="Node.Tag"/> field of <see cref="SimpleText"/> or <see cref="TextStyle"/>
 		///    to specify color row from this file.
 		/// </remarks>
@@ -351,7 +351,7 @@ namespace Lime
 
 			private static ITexture fontGradientTexture;
 
-			public static ITexture GradientRampTexture => fontGradientTexture = fontGradientTexture ?? new SerializableTexture("Fonts/gradient_map");
+			public static ITexture GradientRampTexture => fontGradientTexture = fontGradientTexture ?? new SerializableTexture("Fonts/GradientMap");
 		}
 
 		public class DashedLineShaderProgram : ShaderProgram
