@@ -17,7 +17,7 @@ namespace Lime
 		private Vector2 shadowOffset;
 		private Color4 textColor;
 		private Color4 shadowColor;
-		internal int PaletteIndex = -1;
+		internal int gradientMapIndex = -1;
 		private float letterSpacing;
 		public static TextStyle Default = new TextStyle();
 
@@ -180,6 +180,20 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		public int GradientMapIndex
+		{
+			get
+			{
+				return gradientMapIndex;
+			}
+			set
+			{
+				gradientMapIndex = value;
+				InvalidateRichText();
+			}
+		}
+
+		[YuzuMember]
 		[TangerineKeyframeColor(7)]
 		public float LetterSpacing
 		{
@@ -203,15 +217,7 @@ namespace Lime
 			Font = new SerializableFont();
 		}
 
-		void InvalidateRichText() => (Parent as RichText)?.Invalidate();
-
-		protected override void OnTagChanged()
-		{
-			if (!int.TryParse(Tag, out PaletteIndex)) {
-				PaletteIndex = -1;
-			}
-			(Parent as RichText)?.Invalidate();
-		}
+		private void InvalidateRichText() => (Parent as RichText)?.Invalidate();
 
 		public override void AddToRenderChain(RenderChain chain)
 		{

@@ -22,7 +22,7 @@ namespace Lime
 		private TextOverflowMode overflowMode;
 		private bool wordSplitAllowed;
 		private TextProcessorDelegate textProcessor;
-		internal int PaletteIndex = -1;
+		private int gradientMapIndex = -1;
 		private float letterSpacing;
 
 		public enum RenderingMode
@@ -180,6 +180,18 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		public int GradientMapIndex
+		{
+			get {
+				return gradientMapIndex;
+			}
+			set {
+				gradientMapIndex = value;
+				Invalidate();
+			}
+		}
+
+		[YuzuMember]
 		[TangerineKeyframeColor(7)]
 		public float LetterSpacing
 		{
@@ -251,14 +263,6 @@ namespace Lime
 			Invalidate();
 		}
 
-		protected override void OnTagChanged()
-		{
-			if (!int.TryParse(Tag, out PaletteIndex)) {
-				PaletteIndex = -1;
-			}
-			Invalidate();
-		}
-
 		protected override void DiscardMaterial()
 		{
 			Invalidate();
@@ -271,17 +275,17 @@ namespace Lime
 			PrepareSpriteListAndSyncCaret();
 			Renderer.Transform1 = LocalToWorldTransform;
 			var effectiveColor = GlobalColor * textColor;
-			if (PaletteIndex < 0 || RenderMode == RenderingMode.Common) {
+			if (GradientMapIndex < 0 || RenderMode == RenderingMode.Common) {
 				spriteList.Render(effectiveColor, blending, shader);
 			} else {
 				if (RenderMode == RenderingMode.OnePassWithOutline || RenderMode == RenderingMode.TwoPasses) {
-					ColorfulMaterialProvider.Instance.Init(blending, PaletteIndex);
+					ColorfulMaterialProvider.Instance.Init(blending, GradientMapIndex);
 					spriteList.Render(effectiveColor, ColorfulMaterialProvider.Instance);
 				}
 
 				if (RenderMode == RenderingMode.OnePassWithoutOutline || RenderMode == RenderingMode.TwoPasses) {
 					ColorfulMaterialProvider.Instance.Init(
-							blending, ShaderPrograms.ColorfulTextShaderProgram.GradientMapTextureSize - PaletteIndex - 1);
+							blending, ShaderPrograms.ColorfulTextShaderProgram.GradientMapTextureSize - GradientMapIndex - 1);
 					spriteList.Render(effectiveColor, ColorfulMaterialProvider.Instance);
 				}
 			}
@@ -531,9 +535,9 @@ namespace Lime
 
 			private IMaterial material;
 
-			public void Init(Blending blending, int paletteIndex)
+			public void Init(Blending blending, int gradientMapIndex)
 			{
-				material = ColorfulTextMaterial.GetInstance(blending, paletteIndex);
+				material = ColorfulTextMaterial.GetInstance(blending, gradientMapIndex);
 			}
 
 			public IMaterial GetMaterial(int tag) => material;
