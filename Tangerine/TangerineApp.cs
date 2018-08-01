@@ -327,6 +327,7 @@ namespace Tangerine
 			tb.Add(Tools.AlignTo);
 			tb.Add(Tools.CenterHorizontally);
 			tb.Add(Tools.CenterVertically);
+			tb.Add(Tools.CenterAlignTo);
 			tb.Add(Tools.RestoreOriginalSize);
 			tb.Add(Tools.ResetScale);
 			tb.Add(Tools.ResetRotation);
@@ -521,7 +522,8 @@ namespace Tangerine
 			h.Connect(Tools.CenterVertically, new DistributeCenterVertically());
 			h.Connect(Tools.AlignCentersHorizontally, new AlignCentersHorizontally());
 			h.Connect(Tools.AlignCentersVertically, new AlignCentersVertically());
-			h.Connect(Tools.AlignTo, new AlignToHandler(Tools.AlignTo));
+			h.Connect(Tools.AlignTo, new AlignAndDistributeObjectHandler(Tools.AlignTo));
+			h.Connect(Tools.CenterAlignTo, new CenterObjectHandler(Tools.CenterAlignTo));
 			h.Connect(Tools.RestoreOriginalSize, new RestoreOriginalSize());
 			h.Connect(Tools.ResetScale, new ResetScale());
 			h.Connect(Tools.ResetRotation, new ResetRotation());
