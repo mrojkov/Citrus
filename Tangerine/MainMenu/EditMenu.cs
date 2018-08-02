@@ -271,9 +271,9 @@ namespace Tangerine
 					p.Index++;
 					if (node is Widget) {
 						GroupNodes.TransformPropertyAndKeyframes<Vector2>(node, nameof(Widget.Position), v => localToParentTransform * v);
-						GroupNodes.TransformPropertyAndKeyframes<Vector2>(node, nameof(Widget.Scale), v =>( Matrix32.Scaling(v) * localToParentTransform).ToTransform2().Scale);
+						GroupNodes.TransformPropertyAndKeyframes<Vector2>(node, nameof(Widget.Scale), v => v * group.Scale);
 						GroupNodes.TransformPropertyAndKeyframes<float>(node, nameof(Widget.Rotation),
-							v => (Matrix32.Rotation(v * Mathf.DegToRad) * localToParentTransform).ToTransform2().Rotation);
+							v => v * Mathf.Sign(group.Scale.X * group.Scale.Y) + group.Rotation);
 						GroupNodes.TransformPropertyAndKeyframes<Color4>(node, nameof(Widget.Color), v => group.Color * v);
 					} else if (node is Bone) {
 						var root = BoneUtils.FindBoneRoot((Bone) node, groupNodes);
