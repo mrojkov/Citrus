@@ -234,6 +234,7 @@ namespace Tangerine
 						new UI.SearchPanel(searchPanel.ContentWidget),
 						new BackupHistoryPanel(backupHistoryPanel.ContentWidget),
 					});
+					UI.SceneView.SceneView.ShowNodeDecorationsPanelButton.Clicked = () => dockManager.ShowPanel(nodeDecorationsPanel);
 				}
 			};
 			var proj = AppUserPreferences.Instance.RecentProjects.FirstOrDefault();

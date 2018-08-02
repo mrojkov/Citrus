@@ -145,6 +145,8 @@
   <ItemGroup>
     <Content Include="icon.ico" />
     <EmbeddedResource Include="Resources\Icons\Light\Timeline\Tied.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\SceneView\ShowPanel.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\SceneView\ShowPanel.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Tools\Parent.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Tools\Parent.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Tools\DistributeBottom.png" />

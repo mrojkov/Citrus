@@ -24,6 +24,13 @@ namespace Tangerine.UI.SceneView
 		public readonly SceneWidget Scene;
 		public static readonly RulersWidget RulersWidget = new RulersWidget();
 		public static readonly ZoomWidget ZoomWidget = new ZoomWidget();
+		public static readonly ToolbarButton ShowNodeDecorationsPanelButton = new ToolbarButton {
+			Tip = "Node decarations",
+			Texture = IconPool.GetTexture("SceneView.ShowPanel"),
+			MinMaxSize = new Vector2(24),
+			LayoutCell = new LayoutCell(new Alignment { X = HAlignment.Left, Y = VAlignment.Bottom } )
+		};
+
 		/// <summary>
 		/// Gets the mouse position in the scene coordinates.
 		/// </summary>
@@ -171,6 +178,7 @@ namespace Tangerine.UI.SceneView
 		public void Attach()
 		{
 			Instance = this;
+			Panel.AddNode(ShowNodeDecorationsPanelButton);
 			Panel.AddNode(ZoomWidget);
 			Panel.AddNode(RulersWidget);
 			Panel.AddNode(Frame);
@@ -182,6 +190,7 @@ namespace Tangerine.UI.SceneView
 			DockManager.Instance.RemoveFilesDropHandler(filesDropHandler);
 			Instance = null;
 			Frame.Unlink();
+			ShowNodeDecorationsPanelButton.Unlink();
 			RulersWidget.Unlink();
 			ZoomWidget.Unlink();
 		}
