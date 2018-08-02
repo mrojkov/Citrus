@@ -263,32 +263,25 @@ namespace Tangerine.UI.FilesystemView
 					}
 				}
 				return true;
-			}
-			catch (ArgumentException) {
+			} catch (ArgumentException) {
 				var dialog = new AlertDialog("The path is empty, contains only white spaces, or contains invalid characters.");
 				dialog.Show();
-			}
-			catch (PathTooLongException) {
+			} catch (PathTooLongException) {
 				var dialog = new AlertDialog("The specified path, file name, or both exceed the system-defined maximum length.");
 				dialog.Show();
-			}
-			catch (NotSupportedException) {
+			} catch (NotSupportedException) {
 				var dialog = new AlertDialog("The path is in an invalid format.");
 				dialog.Show();
-			}
-			catch (FileNotFoundException) {
+			} catch (FileNotFoundException) {
 				var dialog = new AlertDialog("Tangerine can not find \"" + path + "\".\nCheck the spelling and try again.");
 				dialog.Show();
-			}
-			catch (DirectoryNotFoundException) {
+			} catch (DirectoryNotFoundException) {
 				var dialog = new AlertDialog("The path represents a directory and is invalid, such as being on an unmapped drive, or the directory cannot be found.");
 				dialog.Show();
-			}
-			catch (IOException) {
+			} catch (IOException) {
 				var dialog = new AlertDialog("This file is being used by another process.");
 				dialog.Show();
-			}
-			catch (UnauthorizedAccessException) {
+			} catch (UnauthorizedAccessException) {
 				var dialog = new AlertDialog("Tangerine does not have the required permission.");
 				dialog.Show();
 			}

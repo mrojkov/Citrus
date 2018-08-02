@@ -10,7 +10,6 @@ namespace Tangerine.UI.FilesystemView
 		public const float ItemPadding = 2.0f;
 		public const float ItemWidth = 200.0f;
 		public const float Spacing = 2.0f;
-		private WidgetFlatFillPresenter fill;
 		public FilesystemItem(string path, bool visibalFill = false)
 		{
 			FilesystemPath = path;
@@ -48,15 +47,15 @@ namespace Tangerine.UI.FilesystemView
 			text.Width = text.MinMaxWidth = Mathf.Min(ItemWidth - (IconSize + ItemPadding * 2 + Spacing + 2), text.MeasureUncutText().X);
 
 			if (visibalFill) {
-				fill = new WidgetFlatFillPresenter(Color4.Transparent);
-				CompoundPresenter.Add(fill);
-				Updating += (float delta) => {
+				CompoundPresenter.Add(new DelegatePresenter<Widget>(_ => {
 					if (IsMouseOverThisOrDescendant()) {
-						fill.Color = Theme.Colors.SelectedBackground;
-					} else {
-						fill.Color = Color4.Transparent;
+						PrepareRendererState();
+						Renderer.DrawRect(Vector2.Zero, Size, Theme.Colors.HoveredBackground);
+						if (Input.WasMousePressed()) {
+							Renderer.DrawRectOutline(Vector2.Zero, Size, Theme.Colors.SelectedBorder);
+						}
 					}
-				};
+				}));
 			}
 		}
 	}

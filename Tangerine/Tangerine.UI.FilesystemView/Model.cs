@@ -178,9 +178,7 @@ namespace Tangerine.UI.FilesystemView
 
 		public IEnumerable<string> EnumerateDirectories(string path)
 		{
-			foreach (var i in Directory.EnumerateDirectories(path).OrderBy(f => f)) {
-				yield return i;
-			}
+			return Directory.EnumerateDirectories(path).OrderBy(f => f);
 		}
 
 		public void GoTo(string path)
