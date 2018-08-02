@@ -247,7 +247,7 @@ namespace Tangerine.UI.SceneView
 			{
 				base.Render();
 				PrepareRendererState();
-				Renderer.DrawLine(10, Height / 2, Width - 10, Height / 2, Color4.Gray.Lighten(0.3f));
+				Renderer.DrawLine(10, Height / 2, Width - 10, Height / 2, ColorTheme.Current.Toolbar.Separator);
 			}
 		}
 	}
