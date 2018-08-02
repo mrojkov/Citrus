@@ -45,14 +45,14 @@ namespace Tangerine.UI.SceneView
 			showAllEditor = new BooleanEditor("All");
 			showAllEditor.CheckBox.Changed += e => {
 				if (e.ChangedByUser) {
-					foreach(var group in rootWidget.Content.Nodes.OfType<DisplayPivotPropertyEditorGroup>()) {
+					foreach(var group in rootWidget.Content.Nodes.OfType<DisplayNodeDecorationEditorGroup>()) {
 						group.AllEditor.CheckBox.SetChecked(e.Value, true);
 					}
 				}
 			};
 			rootWidget.Content.AddNode(showAllEditor);
 			for (int i = 0; i < GroupNames.Length; ++i) {
-				var group = new DisplayPivotPropertyEditorGroup(Groups[i], GroupNames[i]);
+				var group = new DisplayNodeDecorationEditorGroup(Groups[i], GroupNames[i]);
 				rootWidget.Content.AddNode(group);
 				showAllEditor.AddChangeWatcher(() => group.AllEditor.CheckBox.Checked, v => TryCheckAll());
 			}
@@ -74,7 +74,7 @@ namespace Tangerine.UI.SceneView
 
 		private void TryCheckAll()
 		{
-			foreach (var group in rootWidget.Content.Nodes.OfType<DisplayPivotPropertyEditorGroup>()) {
+			foreach (var group in rootWidget.Content.Nodes.OfType<DisplayNodeDecorationEditorGroup>()) {
 				if (!group.AllEditor.CheckBox.Checked) {
 					showAllEditor.CheckBox.Checked = false;
 					return;
@@ -111,12 +111,12 @@ namespace Tangerine.UI.SceneView
 			}
 		}
 
-		private class DisplayPivotPropertyEditor : Widget
+		private class DisplayNodeDecorationEditor : Widget
 		{
 			private readonly Type type;
 			public readonly BooleanEditor BooleanEditor;
 
-			public DisplayPivotPropertyEditor(Type type)
+			public DisplayNodeDecorationEditor(Type type)
 			{
 				this.type = type;
 				Layout = new VBoxLayout();
@@ -136,7 +136,7 @@ namespace Tangerine.UI.SceneView
 			}
 		}
 
-		private class DisplayPivotPropertyEditorGroup : Widget
+		private class DisplayNodeDecorationEditorGroup : Widget
 		{
 			public BooleanEditor AllEditor { get; private set; }
 			private ToolbarButton button;
@@ -144,7 +144,7 @@ namespace Tangerine.UI.SceneView
 			private List<Type> types;
 			private bool expanded = false;
 
-			public DisplayPivotPropertyEditorGroup(List<Type> types, string name)
+			public DisplayNodeDecorationEditorGroup(List<Type> types, string name)
 			{
 				allTypes = types;
 				Id = name;
@@ -169,7 +169,7 @@ namespace Tangerine.UI.SceneView
 					}
 				} else {
 					AllEditor.CheckBox.Checked = e.Value;
-					foreach (var editor in Nodes.Skip(1).OfType<DisplayPivotPropertyEditor>()) {
+					foreach (var editor in Nodes.Skip(1).OfType<DisplayNodeDecorationEditor>()) {
 						editor.BooleanEditor.CheckBox.Checked = e.Value;
 					}
 				}
@@ -219,7 +219,7 @@ namespace Tangerine.UI.SceneView
 				types = Project.Current.RegisteredNodeTypes.Where(t => allTypes.Contains(t)).ToList();
 				if (expanded) {
 					foreach (var type in types) {
-						var editor = new DisplayPivotPropertyEditor(type);
+						var editor = new DisplayNodeDecorationEditor(type);
 						editor.BooleanEditor.CheckBox.Changed += e => {
 							if (e.ChangedByUser) {
 								Application.MainWindow.Invalidate();
