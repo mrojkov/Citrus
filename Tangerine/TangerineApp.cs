@@ -72,7 +72,9 @@ namespace Tangerine
 			var consolePanel = new Panel("Console");
 			var backupHistoryPanel = new Panel("Backups history");
 			var documentPanel = new Panel(DockManager.DocumentAreaId, undockable: false);
+			var nodeDecorationsPanel = new Panel("Node decorations");
 			new UI.Console(consolePanel);
+			new UI.SceneView.NodeDecorations(nodeDecorationsPanel);
 
 			var dockManager = DockManager.Instance;
 			var root = dockManager.Model.WindowPlacements.First();
@@ -82,6 +84,7 @@ namespace Tangerine
 			dockManager.AddPanel(backupHistoryPanel, documentPlacement, DockSite.Right, 0.3f);
 			dockManager.AddPanel(searchPanel, documentPlacement, DockSite.Right, 0.3f);
 			dockManager.AddPanel(filesystemPanel, documentPlacement, DockSite.Right, 0.3f);
+			dockManager.AddPanel(nodeDecorationsPanel, documentPlacement, DockSite.Right, 0.3f);
 			dockManager.AddPanel(consolePanel, documentPlacement, DockSite.Bottom, 0.3f);
 			DockManagerInitialState = dockManager.ExportState();
 			var documentViewContainer = InitializeDocumentArea(dockManager);
@@ -309,6 +312,7 @@ namespace Tangerine
 			}
 			HotkeyRegistry.InitCommands(TangerineMenu.CreateNodeCommands, "Tools", "Tools");
 			HotkeyRegistry.UpdateProfiles();
+			UI.SceneView.NodeDecorations.Refresh();
 		}
 
 		void CreateToolsToolbar()

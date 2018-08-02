@@ -32,7 +32,7 @@ namespace Tangerine.UI.SceneView
 		public bool DisplayPivotsForAllWidgets { get; set; }
 
 		[YuzuOptional]
-		public bool DisplayPivotsForInvisibleWidgets { get; set; }
+		public bool DisplayNodeDecorationsForInvisibleWidgets { get; set; }
 
 		[YuzuRequired]
 		public bool Bones3DVisible { get; set; }
@@ -45,6 +45,9 @@ namespace Tangerine.UI.SceneView
 
 		[YuzuRequired]
 		public bool SnapRulerLinesToWidgets { get; set; }
+
+		[YuzuRequired]
+		public HashSet<string> DisplayNodeDecorationsForTypes { get; set; }
 
 		public SceneUserPreferences()
 		{
@@ -61,11 +64,12 @@ namespace Tangerine.UI.SceneView
 			AnimationPreviewBackground = Color4.Black.Transparentify(0.6f);
 			DrawFrameBorder = false;
 			DisplayPivotsForAllWidgets = true;
-			DisplayPivotsForInvisibleWidgets = false;
+			DisplayNodeDecorationsForInvisibleWidgets = false;
 			Bones3DVisible = false;
 			SnapRulerLinesToWidgets = false;
 			SnapWidgetBorderToRuler = false;
 			SnapWidgetPivotToRuler = false;
+			DisplayNodeDecorationsForTypes = new HashSet<string>();
 		}
 
 		public static SceneUserPreferences Instance => Core.UserPreferences.Instance.Get<SceneUserPreferences>();

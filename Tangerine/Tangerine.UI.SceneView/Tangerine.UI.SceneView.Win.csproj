@@ -63,6 +63,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="NodeDecorations.cs" />
     <Compile Include="Presenters\Animation2DPathPresenter.cs" />
     <Compile Include="Presenters\Animation3DPathPresenter.cs" />
     <Compile Include="Presenters\InspectRootNodePresenter.cs" />

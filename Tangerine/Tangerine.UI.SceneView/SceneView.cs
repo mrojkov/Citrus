@@ -345,13 +345,13 @@ namespace Tangerine.UI.SceneView
 		{
 			public override void ExecuteTransaction()
 			{
-				SceneUserPreferences.Instance.DisplayPivotsForInvisibleWidgets = !SceneUserPreferences.Instance.DisplayPivotsForInvisibleWidgets;
+				SceneUserPreferences.Instance.DisplayNodeDecorationsForInvisibleWidgets = !SceneUserPreferences.Instance.DisplayNodeDecorationsForInvisibleWidgets;
 				CommonWindow.Current.Invalidate();
 			}
 
 			public override bool GetChecked()
 			{
-				return SceneUserPreferences.Instance.DisplayPivotsForInvisibleWidgets;
+				return SceneUserPreferences.Instance.DisplayNodeDecorationsForInvisibleWidgets;
 			}
 		}
 	}
