@@ -53,6 +53,7 @@
     <Compile Include="ITaskProvider.cs" />
     <Compile Include="NodeEditorState.cs" />
     <Compile Include="Operations\ClearRowSelection.cs" />
+    <Compile Include="Operations\ReplaceContents.cs" />
     <Compile Include="Operations\CopyPaste.cs" />
     <Compile Include="Operations\DistortionMeshProcessor.cs" />
     <Compile Include="Operations\DummyOperation.cs" />

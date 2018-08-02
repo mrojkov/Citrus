@@ -418,7 +418,7 @@ namespace Tangerine
 				if (item != null) {
 					var button = (Button)Core.Operations.CreateNode.Perform(typeof(Button), location);
 					Convert(frame, button);
-					button.ReplaceContent(frame);
+					ReplaceContents.Perform(frame, button);
 					int[] markerFrames = { 0, 10, 20, 30, 40 };
 					string[] makerIds = { "Normal", "Focus", "Press", "Release", "Disable" };
 					for (var i = 0; i < 5; i++) {
@@ -437,7 +437,9 @@ namespace Tangerine
 					prop.IsDefined(typeof(Yuzu.YuzuMember), true) &&
 					prop.CanWrite &&
 					prop.Name != nameof(Node.Parent) &&
-					prop.Name != nameof(Node.Nodes)
+					prop.Name != nameof(Node.Nodes) &&
+					prop.Name != nameof(Node.Animations) &&
+					prop.Name != nameof(Node.Animators)
 				);
 			var buttonProperties =
 				button.GetType().GetProperties()
@@ -454,6 +456,9 @@ namespace Tangerine
 				if (pair.WidgetProp.PropertyType == pair.ButtonProp.PropertyType) {
 					pair.ButtonProp.SetValue(button, pair.WidgetProp.GetValue(frame));
 				}
+			}
+			foreach (var animator in frame.Animators) {
+				button.Animators.Add(animator.Clone());
 			}
 		}
 	}
