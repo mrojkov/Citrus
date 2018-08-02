@@ -204,6 +204,8 @@ namespace Lime
 			throw new Lime.Exception("Can't create framebuffer, aborting");
 		}
 
+		private DeviceOrientation previousAllowedOrientaion = 0;
+
 		protected override void OnRenderFrame(FrameEventArgs e)
 		{
 			if (GraphicsContext == null || GraphicsContext.IsDisposed) {
@@ -215,7 +217,10 @@ namespace Lime
 			var allowedOrientaion = IsRotationEnabled()
 				? Application.SupportedDeviceOrientations
 				: Application.CurrentDeviceOrientation;
-			RestrictSupportedOrientationsWith(allowedOrientaion);
+			if (previousAllowedOrientaion != allowedOrientaion) {
+				RestrictSupportedOrientationsWith(allowedOrientaion);
+				previousAllowedOrientaion = allowedOrientaion;
+			}
 			base.OnRenderFrame(e);
 			SwapBuffers();
 		}
