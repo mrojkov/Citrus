@@ -21,6 +21,13 @@ namespace Lime
 			rhs = temp;
 		}
 
+		public static void Swap<T>(IList<T> list, int lhsIndex, int rhsIndex)
+		{
+			var temp = list[lhsIndex];
+			list[lhsIndex] = list[rhsIndex];
+			list[rhsIndex] = temp;
+		}
+
 		public static int ComputeHash(byte[] data, int length)
 		{
 			unchecked {
