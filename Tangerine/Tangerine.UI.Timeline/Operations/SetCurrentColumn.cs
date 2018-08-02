@@ -6,6 +6,8 @@ namespace Tangerine.UI.Timeline.Operations
 	public class SetCurrentColumn : Operation
 	{
 		private static bool isScrollingFrozen;
+		// Evgenii Polikutin: needed for RulerbarMouseScrollProcessor to avoid extra operations
+		public static bool IsFrozen;
 
 		protected int Column;
 		protected Node Container;
@@ -58,6 +60,9 @@ namespace Tangerine.UI.Timeline.Operations
 
 			protected override void InternalUndo(SetCurrentColumn op)
 			{
+				if (IsFrozen) {
+					return;
+				}
 				SetColumn(op.Restore<Backup>().Column, op.Container);
 			}
 
