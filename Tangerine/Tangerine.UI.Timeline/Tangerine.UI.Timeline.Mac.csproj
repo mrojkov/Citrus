@@ -115,6 +115,8 @@
     <Compile Include="TimelineUserPreferences.cs" />
     <Compile Include="Operations\ReverseKeyframes.cs" />
     <Compile Include="Processors\ImageCombinerIndicationProcessor.cs" />
+    <Compile Include="Components\ShowTiedNodesContextMenu.cs" />
+    <Compile Include="Processors\TiedIndicationProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tangerine.Core\Tangerine.Core.Mac.csproj">

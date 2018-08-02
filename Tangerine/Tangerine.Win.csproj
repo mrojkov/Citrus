@@ -76,6 +76,7 @@
     <Compile Include="AppUserPreferences.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Resources\Icons\Dark\Timeline\Tied.png" />
     <EmbeddedResource Include="Resources\Images.xcassets\AppIcons.appiconset\Contents.json" />
     <EmbeddedResource Include="Resources\SegoeUI.ttf" />
   </ItemGroup>
@@ -143,6 +144,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="icon.ico" />
+    <EmbeddedResource Include="Resources\Icons\Light\Timeline\Tied.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Tools\Parent.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Tools\Parent.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Tools\DistributeBottom.png" />

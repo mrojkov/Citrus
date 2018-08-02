@@ -22,9 +22,12 @@ namespace Tangerine.UI.Timeline.Components
 		protected readonly ToolbarButton lockAnimationButton;
 		protected readonly Widget indentSpacer;
 		protected readonly Image imageCombinerIndicator;
+		protected readonly ToolbarButton tiedIndicator;
 
+		public NodeRow NodeData => nodeData;
 		public SimpleText Label => label;
 		public Image ImageCombinerIndicator => imageCombinerIndicator;
+		public ToolbarButton TiedIndicator => tiedIndicator;
 
 		private static readonly Color4[] ColorMarks = {
 			Color4.Transparent,
@@ -78,6 +81,14 @@ namespace Tangerine.UI.Timeline.Components
 				MinMaxSize = new Vector2(21, 16),
 				Padding = new Thickness { Left = 5 },
 			};
+			tiedIndicator = new ToolbarButton {
+				Texture = IconPool.GetTexture("Timeline.Tied"),
+				Color = Color4.Transparent,
+				MinMaxSize = new Vector2(21, 16),
+				Padding = new Thickness { Left = 5 },
+				Highlightable = false
+			};
+			tiedIndicator.Clicked += () => ShowTiedNodesContextMenu.Create(this);
 			enterButton = NodeCompositionValidator.CanHaveChildren(nodeData.Node.GetType()) ? CreateEnterButton() : null;
 			eyeButton = CreateEyeButton();
 			lockButton = CreateLockButton();
@@ -94,6 +105,7 @@ namespace Tangerine.UI.Timeline.Components
 					new HSpacer(3),
 					label,
 					editBox,
+					tiedIndicator,
 					imageCombinerIndicator,
 					new Widget(),
 					(Widget)enterButton ?? (Widget)new HSpacer(Theme.Metrics.DefaultToolbarButtonSize.X),
