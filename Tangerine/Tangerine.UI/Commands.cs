@@ -34,6 +34,9 @@ namespace Tangerine.UI
 		public static readonly ICommand MoveDown = new Command("Move down", new Shortcut(Modifiers.Control, Key.LBracket));
 		public static readonly ICommand MoveUp = new Command("Move up", new Shortcut(Modifiers.Control, Key.RBracket));
 		public static readonly ICommand ReverseKeyframes = new Command("Reverse keyframes");
+		public static readonly ICommand CreatePositionKeyframe = new Command("Create position keyframe", new Shortcut(Key.E));
+		public static readonly ICommand CreateRotationKeyframe = new Command("Create rotation keyframe", new Shortcut(Key.R));
+		public static readonly ICommand CreateScaleKeyframe = new Command("Create scale keyframe", new Shortcut(Key.T));
 	}
 
 	public static class InspectorCommands

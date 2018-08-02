@@ -66,6 +66,7 @@
     <Compile Include="Operations\EnsureCurrentColumnVisibleIfContainerChanged.cs" />
     <Compile Include="Operations\EnsureRowVisibleIfSelected.cs" />
     <Compile Include="Operations\GridWidgetsUpdater.cs" />
+    <Compile Include="Operations\InsertKeyframes.cs" />
     <Compile Include="Operations\MoveNodes.cs" />
     <Compile Include="Operations\OverviewWidgetsUpdater.cs" />
     <Compile Include="Components\RollBoneView.cs" />
