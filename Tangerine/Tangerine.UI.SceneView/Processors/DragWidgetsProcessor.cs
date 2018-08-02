@@ -21,9 +21,6 @@ namespace Tangerine.UI.SceneView
 				if (Utils.CalcHullAndPivot(widgets, sv.Scene, out hull, out pivot) && sv.HitTestControlPoint(pivot)) {
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {
-						if (sv.Input.IsKeyPressed(Key.Alt)) {
-							Document.Current.History.DoTransaction(sv.DuplicateSelectedNodes);
-						}
 						yield return Drag();
 					}
 				}
@@ -38,8 +35,18 @@ namespace Tangerine.UI.SceneView
 
 		IEnumerator<object> Drag()
 		{
+			var initialMousePos = sv.MousePosition;
+			while ((sv.MousePosition - initialMousePos).Length <= 10 && sv.Input.IsMousePressed()) {
+				Utils.ChangeCursorIfDefault(MouseCursor.Hand);
+				yield return null;
+			}
+			if (!sv.Input.IsMousePressed()) {
+				yield break;
+			}
+			if (sv.Input.IsKeyPressed(Key.Alt)) {
+				Document.Current.History.DoTransaction(sv.DuplicateSelectedNodes);
+			}
 			using (Document.Current.History.BeginTransaction()) {
-				var initialMousePos = sv.MousePosition;
 				var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>().ToList();
 				var dragDirection = DragDirection.Any;
 				Quadrangle hull;
