@@ -501,8 +501,8 @@ namespace Tangerine.UI.Docking
 				if (resizeMainWindow && state.WindowPlacements.First().Size != Vector2.Zero) {
 					var mainWindow = Model.MainWindow;
 					MainWindowWidget.Window.ClientSize = mainWindow.Size;
-					MainWindowWidget.Window.State = mainWindow.State;
 					MainWindowWidget.Window.ClientPosition = mainWindow.Position;
+					MainWindowWidget.Window.State = mainWindow.State;
 				}
 				Model.Panels.AddRange(savedPanels.Except(Model.Panels).ToList());
 			} catch {
