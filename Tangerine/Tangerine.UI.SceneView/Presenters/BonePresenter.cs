@@ -73,8 +73,11 @@ namespace Tangerine.UI.SceneView
 
 		private void DrawBones(Bone bone, Widget canvas)
 		{
-			var t = bone.Parent.AsWidget.CalcTransitionToSpaceOf(canvas);
 			var selected = Document.Current.SelectedNodes().Contains(bone);
+			if (!SceneUserPreferences.Instance.DisplayNodeDecorationsForTypes.Contains(nameof(Bone)) && !selected) {
+				return;
+			}
+			var t = bone.Parent.AsWidget.CalcTransitionToSpaceOf(canvas);
 			var color = selected ? ColorTheme.Current.SceneView.Selection : ColorTheme.Current.SceneView.BoneOutline;
 			var hull = CalcHull(bone);
 			// Draw bone outline

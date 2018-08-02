@@ -15,14 +15,14 @@ namespace Tangerine.UI.SceneView
 		private BooleanEditor showAllEditor;
 		private readonly List<List<Type>> Groups = new List<List<Type>> {
 			new List<Type> { typeof(Frame), typeof(Button), typeof(Slider), typeof(Viewport3D), typeof(Node3D) },
-			new List<Type> { typeof(Image), typeof(ImageCombiner) },
-			new List<Type> { typeof(Audio), typeof(Movie) },
+			new List<Type> { typeof(Image) },
+			new List<Type> { typeof(Movie) },
 			new List<Type> { typeof(Bone) },
 			new List<Type> { typeof(DistortionMesh) },
-			new List<Type> { typeof(ParticleEmitter), typeof(ParticleModifier), typeof(EmitterShapePoint), typeof(ParticlesMagnet) },
+			new List<Type> { typeof(ParticleEmitter) },
 			new List<Type> { typeof(SimpleText), typeof(RichText), typeof(TextStyle), typeof(NineGrid) },
-			new List<Type> { typeof(Spline), typeof(SplinePoint), typeof(SplineGear), typeof(Spline3D), typeof(SplinePoint3D), typeof(SplineGear3D), typeof(Polyline), typeof(PolylinePoint) },
-			new List<Type> { typeof(Camera3D), typeof(Model3D), typeof(WidgetAdapter3D), typeof(LightSource) }
+			new List<Type> { typeof(Spline),  typeof(Spline3D), typeof(Polyline) },
+			new List<Type> { typeof(Camera3D), typeof(Model3D), typeof(WidgetAdapter3D) }
 		};
 		private readonly string[] GroupNames = { "Groups", "Images", "Media", "Bones", "DistortionMeshes", "Particles", "UI", "Splines", "3D" };
 
@@ -62,6 +62,7 @@ namespace Tangerine.UI.SceneView
 				if (e.ChangedByUser) {
 					SceneUserPreferences.Instance.DisplayNodeDecorationsForInvisibleWidgets = e.Value;
 				}
+				Application.MainWindow.Invalidate();
 			};
 			showInvisibleEditor.CheckBox.AddChangeWatcher(
 				() => SceneUserPreferences.Instance.DisplayNodeDecorationsForInvisibleWidgets,
@@ -172,6 +173,7 @@ namespace Tangerine.UI.SceneView
 						editor.BooleanEditor.CheckBox.Checked = e.Value;
 					}
 				}
+				Application.MainWindow.Invalidate();
 			}
 
 			private void TryCheckAll()
@@ -192,7 +194,6 @@ namespace Tangerine.UI.SceneView
 					MinMaxSize = new Vector2(18, 26),
 					Padding = new Thickness { Top = 8, Left = 8, Right = 0, Bottom = 8 },
 					Texture = expanded ? IconPool.GetTexture("Timeline.minus") : IconPool.GetTexture("Timeline.plus"),
-					Color = Color4.Red
 				};
 				button.Clicked += ToggleExpanded;
 				return button;
@@ -219,7 +220,12 @@ namespace Tangerine.UI.SceneView
 				if (expanded) {
 					foreach (var type in types) {
 						var editor = new DisplayPivotPropertyEditor(type);
-						editor.BooleanEditor.CheckBox.Changed += _ => TryCheckAll();
+						editor.BooleanEditor.CheckBox.Changed += e => {
+							if (e.ChangedByUser) {
+								Application.MainWindow.Invalidate();
+								TryCheckAll();
+							}
+						};
 						editor.BooleanEditor.CheckBox.Checked = SceneUserPreferences.Instance.DisplayNodeDecorationsForTypes.Contains(type.Name);
 						editor.Padding = new Thickness { Left = 38 };
 						AddNode(editor);
