@@ -96,7 +96,11 @@ namespace Tangerine.UI.SceneView
 			var matrix = Owner.CalcTransitionToSpaceOf(canvas);
 			var A = matrix.TransformVector(this.A);
 			var B = matrix.TransformVector(this.B);
-			return DistanceFromPointToLine(A, B, point) <= radius;
+			var length = (A - B).Length;
+			return
+				DistanceFromPointToLine(A, B, point, out Vector2 linePoint) <= radius &&
+				(A - linePoint).Length <= length &&
+				(B - linePoint).Length <= length;
 		}
 
 		public Vector2 GetDirection()
@@ -105,11 +109,16 @@ namespace Tangerine.UI.SceneView
 			return (matrix * Directions[index] - matrix * Vector2.Zero).Normalized;
 		}
 
-		private static float DistanceFromPointToLine(Vector2 A, Vector2 B, Vector2 P)
+		private static float DistanceFromPointToLine(Vector2 A, Vector2 B, Vector2 P, out Vector2 point)
 		{
 			var a = A.Y - B.Y;
 			var b = B.X - A.X;
 			var c = B.Y * A.X - A.Y * B.X;
+			point = new Vector2 {
+				X = b * (b * P.X - a * P.Y) - a * c,
+				Y = a * (-b * P.X + a * P.Y) - b * c
+			};
+			point /= a * a + b * b;
 			return Mathf.Abs(P.X * a + P.Y * b + c) / Mathf.Sqrt(a * a + b * b);
 		}
 
