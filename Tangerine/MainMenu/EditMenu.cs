@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Lime;
 using Tangerine.UI;
 using Tangerine.Core;
@@ -390,6 +391,69 @@ namespace Tangerine
 			}
 			foreach (var n in node.Nodes) {
 				UpsampleNodeAnimation(n);
+			}
+		}
+	}
+
+	public class ConvertToButton : DocumentCommandHandler
+	{
+		public override void ExecuteTransaction() {
+			var rows = Document.Current.SelectedRows().ToList();
+			foreach (var row in rows) {
+				if (row.Components.Get<NodeRow>()?.Node is Frame frame) {
+					if (frame.Markers.Count > 0) {
+						AlertDialog.Show("Cannot convert widget with existing markers");
+						return;
+					}
+				} else {
+					AlertDialog.Show("Only frames can be converted");
+					return;
+				}
+			}
+			foreach (var row in rows) {
+				var frame = (Frame)row.Components.Get<NodeRow>()?.Node;
+				var item = Row.GetFolderItem(row);
+				var index = row.Parent.Rows.IndexOf(row);
+				var location = Row.GetFolderItemLocation(row.Parent.Rows[index]);
+				if (item != null) {
+					var button = (Button)Core.Operations.CreateNode.Perform(typeof(Button), location);
+					Convert(frame, button);
+					button.ReplaceContent(frame);
+					int[] markerFrames = { 0, 10, 20, 30, 40 };
+					string[] makerIds = { "Normal", "Focus", "Press", "Release", "Disable" };
+					for (var i = 0; i < 5; i++) {
+						button.Markers.Add(new Marker(makerIds[i], markerFrames[i], MarkerAction.Stop));
+					}
+					UnlinkFolderItem.Perform(Document.Current.Container, item);
+				}
+			}
+		}
+
+		private void Convert(Frame frame, Button button)
+		{
+			var widgetProperties =
+				frame.GetType().GetProperties()
+				.Where(prop =>
+					prop.IsDefined(typeof(Yuzu.YuzuMember), true) &&
+					prop.CanWrite &&
+					prop.Name != nameof(Node.Parent) &&
+					prop.Name != nameof(Node.Nodes)
+				);
+			var buttonProperties =
+				button.GetType().GetProperties()
+				.Where(prop => prop.IsDefined(typeof(Yuzu.YuzuMember), true) && prop.CanRead);
+			var pairs =
+				widgetProperties.
+				Join(
+					buttonProperties,
+					prop => prop.Name,
+					prop => prop.Name,
+					(wigdetProp, buttonProp) => new { WidgetProp = wigdetProp, ButtonProp = buttonProp }
+				);
+			foreach (var pair in pairs) {
+				if (pair.WidgetProp.PropertyType == pair.ButtonProp.PropertyType) {
+					pair.ButtonProp.SetValue(button, pair.WidgetProp.GetValue(frame));
+				}
 			}
 		}
 	}

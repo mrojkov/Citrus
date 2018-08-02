@@ -84,6 +84,7 @@ namespace Tangerine.UI
 		public static readonly ICommand HelpMode = new Command("Help Mode", Key.F1);
 		public static readonly ICommand SaveLayout = new Command("Save layout");
 		public static readonly ICommand LoadLayout = new Command("Load layout");
+		public static readonly ICommand ConvertToButton = new Command("Convert to Button");
 	}
 
 	public static class SceneViewCommands

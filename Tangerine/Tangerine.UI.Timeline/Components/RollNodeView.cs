@@ -330,7 +330,9 @@ namespace Tangerine.UI.Timeline.Components
 						CreateSetColorMarkCommand("Green", 5),
 						CreateSetColorMarkCommand("Violet", 6),
 						CreateSetColorMarkCommand("Gray", 7),
-				}))
+				})),
+				Command.MenuSeparator,
+				GenericCommands.ConvertToButton
 			};
 			if (nodeData.Node is Model3D && nodeData.Node.ContentsPath != null) {
 				menu.Insert(0, new Command("Edit Attachment Properties", DisplayAttachmentDialog));

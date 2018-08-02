@@ -508,6 +508,7 @@ namespace Tangerine
 			h.Connect(GenericCommands.UpsampleAnimationTwice, new UpsampleAnimationTwice());
 			h.Connect(GenericCommands.ViewHelp, () => new HelpDialog(Documentation.StartPage));
 			h.Connect(GenericCommands.HelpMode, () => Documentation.IsHelpModeOn = !Documentation.IsHelpModeOn);
+			h.Connect(GenericCommands.ConvertToButton, new ConvertToButton());
 			h.Connect(Tools.AlignLeft, new AlignLeft());
 			h.Connect(Tools.AlignRight, new AlignRight());
 			h.Connect(Tools.AlignTop, new AlignTop());
