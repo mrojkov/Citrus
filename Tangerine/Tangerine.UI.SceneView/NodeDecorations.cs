@@ -211,7 +211,7 @@ namespace Tangerine.UI.SceneView
 
 			public BooleanEditor(ICommand command) : this(command.Text)
 			{
-				AddNode(new ThemedSimpleText(command.Shortcut.ToString()) {
+				AddNode(new ThemedSimpleText(command.Shortcut.ToString().Replace("Unknown", "")) {
 					Padding = new Thickness { Right = 10 }
 				});
 			}
