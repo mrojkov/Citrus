@@ -135,6 +135,13 @@ namespace Tangerine.UI.Docking
 			Refresh();
 		}
 
+		public void TogglePanel(Panel panel)
+		{
+			var placement = Model.FindPanelPlacement(panel.Id);
+			placement.Hidden = !placement.Hidden;
+			Refresh();
+		}
+
 		public void Refresh()
 		{
 			CloseWindowsIfNecessary();
@@ -152,7 +159,7 @@ namespace Tangerine.UI.Docking
 		{
 			var floatingWindowDefaultSize = new Vector2(200, 300);
 			var descendantPanelsList = GetDescendantPanelPlacements().ToList();
-			// Remove all placements which not refered to existing panels 
+			// Remove all placements which not refered to existing panels
 			foreach (var panel in descendantPanelsList.ToList()) {
 				if (!Model.Panels.Any(p => p.Id == panel.Id)) {
 					var windowPlacement = Model.GetWindowByPlacement(panel);

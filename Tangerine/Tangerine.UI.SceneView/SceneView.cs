@@ -25,7 +25,7 @@ namespace Tangerine.UI.SceneView
 		public static readonly RulersWidget RulersWidget = new RulersWidget();
 		public static readonly ZoomWidget ZoomWidget = new ZoomWidget();
 		public static readonly ToolbarButton ShowNodeDecorationsPanelButton = new ToolbarButton {
-			Tip = "Node decarations",
+			Tip = "Node decorations",
 			Texture = IconPool.GetTexture("SceneView.ShowPanel"),
 			MinMaxSize = new Vector2(24),
 			LayoutCell = new LayoutCell(new Alignment { X = HAlignment.Left, Y = VAlignment.Bottom } )
@@ -65,12 +65,12 @@ namespace Tangerine.UI.SceneView
 			ConnectCommand(SceneViewCommands.ToggleDisplayRuler, new DisplayRuler());
 			ConnectCommand(SceneViewCommands.SaveCurrentRuler, new SaveRuler());
 		}
-		
+
 		private static void ConnectCommand(ICommand command, DocumentCommandHandler handler)
 		{
 			CommandHandlerList.Global.Connect(command, handler);
 		}
-		
+
 		private static void ConnectCommand(ICommand command, Action action, Func<bool> enableChecker = null)
 		{
 			CommandHandlerList.Global.Connect(command, new DocumentDelegateCommandHandler(action, enableChecker));
