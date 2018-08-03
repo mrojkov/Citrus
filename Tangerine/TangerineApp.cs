@@ -74,7 +74,6 @@ namespace Tangerine
 			var documentPanel = new Panel(DockManager.DocumentAreaId, undockable: false);
 			var nodeDecorationsPanel = new Panel("Node decorations");
 			new UI.Console(consolePanel);
-			new UI.SceneView.NodeDecorationsPanel(nodeDecorationsPanel);
 
 			var dockManager = DockManager.Instance;
 			var root = dockManager.Model.WindowPlacements.First();
@@ -220,6 +219,11 @@ namespace Tangerine
 			DocumentHistory.Processors.AddRange(UI.Timeline.Timeline.GetOperationProcessors());
 
 			InitializeHotkeys();
+
+			// Andery Tyshchenko: Create panel after hotkeys initialization
+			// to properly display hotkeys on panel
+			new UI.SceneView.NodeDecorationsPanel(nodeDecorationsPanel);
+
 			Toolbars.Add("Editing", new Toolbar(dockManager.ToolbarArea));
 			Toolbars.Add("Create", new Toolbar(dockManager.ToolbarArea));
 			Toolbars.Add("Tools", new Toolbar(dockManager.ToolbarArea));

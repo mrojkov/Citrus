@@ -62,7 +62,7 @@ namespace Tangerine.UI.SceneView
 		public static NodeDecorationsPanel Instance { get; private set; }
 		private readonly Panel panel;
 		private readonly ThemedScrollView rootWidget;
-		private BooleanEditor showAllEditor;
+		private BooleanEditor displayAllEditor;
 		private readonly List<List<NodeDecoration>> Groups = new List<List<NodeDecoration>> {
 			new List<NodeDecoration> {
 				NodeDecoration.Frame,
@@ -103,7 +103,13 @@ namespace Tangerine.UI.SceneView
 				NodeDecoration.WidgetAdapter3D
 			}
 		};
-		private readonly string[] GroupNames = { "Groups", "Images", "Media", "Bones", "DistortionMeshes", "Particles", "UI", "Splines", "3D" };
+
+		private static readonly string[] GroupNames = { "Groups", "Images", "Media", "Bones", "DistortionMeshes", "Particles", "UI", "Splines", "3D" };
+
+		private static readonly Dictionary<NodeDecoration, ICommand> NodeDecorationCommands = new Dictionary<NodeDecoration, ICommand> {
+			{ NodeDecoration.Bone3D, SceneViewCommands.DisplayBones },
+			{ NodeDecoration.Invisible, SceneViewCommands.DisplayPivotsForInvisibleWidgets }
+		};
 
 		public NodeDecorationsPanel(Panel panel)
 		{
@@ -121,52 +127,48 @@ namespace Tangerine.UI.SceneView
 		private void RefreshEditors()
 		{
 			rootWidget.Content.Nodes.Clear();
-			showAllEditor = new BooleanEditor("All");
-			showAllEditor.CheckBox.Changed += e => {
+			displayAllEditor = new BooleanEditor(SceneViewCommands.DisplayPivotsForAllWidgets);
+			displayAllEditor.CheckBox.Changed += e => {
 				if (e.ChangedByUser) {
 					foreach(var group in rootWidget.Content.Nodes.OfType<DisplayNodeDecorationEditorGroup>()) {
 						group.AllEditor.CheckBox.SetChecked(e.Value, true);
 					}
 				}
 			};
-			rootWidget.Content.AddNode(showAllEditor);
+			rootWidget.Content.AddNode(displayAllEditor);
 			for (int i = 0; i < GroupNames.Length; ++i) {
 				var group = new DisplayNodeDecorationEditorGroup(Groups[i], GroupNames[i]);
 				rootWidget.Content.AddNode(group);
-				showAllEditor.AddChangeWatcher(() => group.AllEditor.CheckBox.Checked, v => TryCheckAll());
+				displayAllEditor.AddChangeWatcher(() => group.AllEditor.CheckBox.Checked, v => TryCheckAll());
 			}
 			rootWidget.Content.AddNode(new Separator());
-			var showInvisibleEditor = new DisplayNodeDecorationEditor(NodeDecoration.Invisible) {
-				Padding = new Thickness { Left = 29, Top = 5 }
+			var displayInvisibleEditor = new DisplayNodeDecorationEditor(NodeDecoration.Invisible) {
+				Padding = new Thickness { Left = 24 }
 			};
-			rootWidget.Content.AddNode(showInvisibleEditor);
+			rootWidget.Content.AddNode(displayInvisibleEditor);
 		}
 
 		private void TryCheckAll()
 		{
 			foreach (var group in rootWidget.Content.Nodes.OfType<DisplayNodeDecorationEditorGroup>()) {
 				if (!group.AllEditor.CheckBox.Checked) {
-					showAllEditor.CheckBox.Checked = false;
+					displayAllEditor.CheckBox.Checked = false;
 					return;
 				}
 			}
-			showAllEditor.CheckBox.Checked = true;
-		}
-
-		public static void ToggleAll()
-		{
-			Instance.showAllEditor.CheckBox.SetChecked(!Instance.showAllEditor.CheckBox.Checked, true);
-			if (Instance.panel.ContentWidget.GetRoot() is ThemedInvalidableWindowWidget widget) {
-				widget.Window.Invalidate();
-			}
-		}
-
-		public static bool GetCheckedAll()
-		{
-			return Instance.showAllEditor.CheckBox.Checked;
+			displayAllEditor.CheckBox.Checked = true;
 		}
 
 		public static void Refresh() => Instance?.RefreshEditors();
+
+		public static void ToggleDisplayAll(bool changedByUser) => Instance?.displayAllEditor.CheckBox.Toggle(changedByUser);
+
+		public static void Invalidate()
+		{
+			if (Instance?.panel.ContentWidget.GetRoot() is ThemedInvalidableWindowWidget widget) {
+				widget.Window.Invalidate();
+			}
+		}
 
 		private class ThemedCheckBox : Lime.ThemedCheckBox
 		{
@@ -174,6 +176,11 @@ namespace Tangerine.UI.SceneView
 			{
 				Checked = value;
 				RiseChanged(changedByUser);
+			}
+
+			public void Toggle(bool changedByUser)
+			{
+				SetChecked(!Checked, changedByUser);
 			}
 		}
 
@@ -184,6 +191,7 @@ namespace Tangerine.UI.SceneView
 			public BooleanEditor(string text)
 			{
 				Layout = new HBoxLayout() { Spacing = 6 };
+				LayoutCell = new LayoutCell(Alignment.LeftCenter, 1);
 				Padding = new Thickness(5);
 				CheckBox = new ThemedCheckBox();
 				AddNode(CheckBox);
@@ -191,19 +199,31 @@ namespace Tangerine.UI.SceneView
 					Text = text,
 					Padding = new Thickness { Left = 5 }
 				});
+				AddNode(new Widget());
+			}
+
+			public BooleanEditor(ICommand command) : this(command.Text)
+			{
+				AddNode(new ThemedSimpleText(command.Shortcut.ToString()) {
+					Padding = new Thickness { Right = 10 }
+				});
 			}
 		}
 
 		private class DisplayNodeDecorationEditor : Widget
 		{
 			private readonly NodeDecoration decoration;
-			public readonly BooleanEditor BooleanEditor;
+			private readonly BooleanEditor BooleanEditor;
 
 			public DisplayNodeDecorationEditor(NodeDecoration decoration)
 			{
 				this.decoration = decoration;
-				Layout = new VBoxLayout();
-				BooleanEditor = new BooleanEditor(Enum.GetName(typeof(NodeDecoration), decoration));
+				Layout = new HBoxLayout();
+				if (NodeDecorationCommands.ContainsKey(decoration)) {
+					BooleanEditor = new BooleanEditor(NodeDecorationCommands[decoration]);
+				} else {
+					BooleanEditor = new BooleanEditor(Enum.GetName(typeof(NodeDecoration), decoration));
+				}
 				BooleanEditor.CheckBox.Checked = SceneUserPreferences.Instance.DisplayNodeDecorationsForTypes.Contains(decoration);
 				BooleanEditor.CheckBox.Changed += UpdateValue;
 				BooleanEditor.CheckBox.AddChangeWatcher(
@@ -229,7 +249,7 @@ namespace Tangerine.UI.SceneView
 		{
 			public BooleanEditor AllEditor { get; private set; }
 			private ToolbarButton button;
-			private List<NodeDecoration> decorations;
+			private readonly List<NodeDecoration> decorations;
 			private bool expanded = false;
 
 			public DisplayNodeDecorationEditorGroup(List<NodeDecoration> decorations, string name)
@@ -284,6 +304,9 @@ namespace Tangerine.UI.SceneView
 			{
 				AllEditor = new BooleanEditor(Id);
 				AllEditor.CheckBox.Changed += CheckAll;
+				AllEditor.AddChangeWatcher(
+					() => SceneUserPreferences.Instance.DisplayNodeDecorationsForTypes.Count,
+					 _ => TryCheckAll());
 				return AllEditor;
 			}
 
@@ -299,13 +322,9 @@ namespace Tangerine.UI.SceneView
 				});
 				if (expanded) {
 					foreach (var decoration in decorations) {
-						var editor = new DisplayNodeDecorationEditor(decoration);
-						editor.BooleanEditor.CheckBox.Changed += e => {
-							if (e.ChangedByUser) {
-								TryCheckAll();
-							}
+						var editor = new DisplayNodeDecorationEditor(decoration) {
+							Padding = new Thickness { Left = 38 }
 						};
-						editor.Padding = new Thickness { Left = 38 };
 						AddNode(editor);
 					}
 				}

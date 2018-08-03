@@ -325,14 +325,30 @@ namespace Tangerine.UI.SceneView
 			}
 		}
 
-		private class DisplayBones : DocumentCommandHandler
+		private class DisplayNodeDecorationHandler : DocumentCommandHandler
 		{
-			public override bool GetChecked() => SceneUserPreferences.Instance.Bones3DVisible;
+			private readonly NodeDecoration decoration;
+
+			public DisplayNodeDecorationHandler(NodeDecoration decoration)
+			{
+				this.decoration = decoration;
+			}
 
 			public override void ExecuteTransaction()
 			{
-				SceneUserPreferences.Instance.Bones3DVisible = !SceneUserPreferences.Instance.Bones3DVisible;
-				CommonWindow.Current.Invalidate();
+				if (SceneUserPreferences.Instance.DisplayNodeDecorationsForTypes.Contains(decoration)) {
+					SceneUserPreferences.Instance.DisplayNodeDecorationsForTypes.Remove(decoration);
+				} else {
+					SceneUserPreferences.Instance.DisplayNodeDecorationsForTypes.Add(decoration);
+				}
+				NodeDecorationsPanel.Invalidate();
+			}
+		}
+
+		private class DisplayBones : DisplayNodeDecorationHandler
+		{
+			public DisplayBones() : base(NodeDecoration.Bone3D)
+			{
 			}
 		}
 
@@ -340,25 +356,15 @@ namespace Tangerine.UI.SceneView
 		{
 			public override void ExecuteTransaction()
 			{
-				NodeDecorationsPanel.ToggleAll();
-			}
-
-			public override bool GetChecked()
-			{
-				return NodeDecorationsPanel.GetCheckedAll();
+				NodeDecorationsPanel.ToggleDisplayAll(changedByUser: true);
+				NodeDecorationsPanel.Invalidate();
 			}
 		}
 
-		private class DisplayPivotsForInvisibleWidgets : DocumentCommandHandler
+		private class DisplayPivotsForInvisibleWidgets : DisplayNodeDecorationHandler
 		{
-			public override void ExecuteTransaction()
+			public DisplayPivotsForInvisibleWidgets() : base(NodeDecoration.Invisible)
 			{
-				throw new NotImplementedException();
-			}
-
-			public override bool GetChecked()
-			{
-				return true;
 			}
 		}
 	}

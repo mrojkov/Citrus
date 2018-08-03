@@ -7,6 +7,7 @@ using Tangerine.Core;
 using System;
 using System.IO;
 using Tangerine.Dialogs;
+using Tangerine.UI.SceneView;
 
 namespace Tangerine
 {
@@ -78,6 +79,7 @@ namespace Tangerine
 				if (theme != AppUserPreferences.Instance.Theme) {
 					AlertDialog.Show("The color theme change will take effect next time you run Tangerine.");
 				}
+				NodeDecorationsPanel.Refresh();
 				Core.UserPreferences.Instance.Save();
 			};
 			resetButton.Clicked += () => {
