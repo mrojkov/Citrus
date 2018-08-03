@@ -33,11 +33,11 @@ namespace Tangerine.UI.SceneView
 		AnimationPath,
 	}
 
-	static class Extentions
+	public static class NodeDecorationExtentions
 	{
-		private static readonly Dictionary<Type, NodeDecoration> typeToDecoration = GenerateDictionary();
+		private static readonly Dictionary<Type, NodeDecoration> typeToDecoration = GenerateTypeToDecorationDictionary();
 
-		private static Dictionary<Type, NodeDecoration> GenerateDictionary()
+		private static Dictionary<Type, NodeDecoration> GenerateTypeToDecorationDictionary()
 		{
 			var result = new Dictionary<Type, NodeDecoration>();
 			foreach (var decoration in Enum.GetValues(typeof(NodeDecoration))) {
