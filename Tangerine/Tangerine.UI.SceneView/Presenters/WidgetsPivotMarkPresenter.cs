@@ -42,9 +42,9 @@ namespace Tangerine.UI.SceneView
 				return widgets.Where(w =>
 					w.Color.A == 0 ||
 					!w.Visible ||
-					SceneUserPreferences.Instance.DisplayNodeDecorationsForTypes.Contains(w.GetType().Name));
+					SceneUserPreferences.Instance.DisplayNodeDecorationsForTypes.Contains(w.GetType().ToNodeDecorations()));
 			}
-			return widgets.Where(w => SceneUserPreferences.Instance.DisplayNodeDecorationsForTypes.Contains(w.GetType().Name));
+			return widgets.Where(w => SceneUserPreferences.Instance.DisplayNodeDecorationsForTypes.Contains(w.GetType().ToNodeDecorations()));
 		}
 	}
 }

@@ -7,26 +7,104 @@ using Tangerine.UI.Docking;
 
 namespace Tangerine.UI.SceneView
 {
-	public class NodeDecorations
+	public enum NodeDecorations
 	{
-		public static NodeDecorations Instance { get; private set; }
+		Frame,
+		Button,
+		Slider,
+		Viewport3D,
+		Node3D,
+		Image,
+		Movie,
+		Bone,
+		Bone3D,
+		DistortionMesh,
+		ParticleEmitter,
+		SimpleText,
+		RichText,
+		NineGrid,
+		Spline,
+		Spline3D,
+		Polyline,
+		Camera3D,
+		Model3D,
+		WidgetAdapter3D
+	}
+
+	static class Extentions
+	{
+		private static readonly Dictionary<Type, NodeDecorations> typeToDecoration = GenerateDictionary();
+
+		private static Dictionary<Type, NodeDecorations> GenerateDictionary()
+		{
+			var result = new Dictionary<Type, NodeDecorations>();
+			foreach (var decoration in Enum.GetValues(typeof(NodeDecorations))) {
+				var type = Type.GetType($"Lime.{Enum.GetName(typeof(NodeDecorations), decoration)},Lime");
+				if (type != null) {
+					result.Add(type, (NodeDecorations)decoration);
+				}
+			}
+			return result;
+		}
+
+		public static NodeDecorations ToNodeDecorations(this Type type)
+		{
+			if (typeToDecoration.ContainsKey(type)) {
+				return typeToDecoration[type];
+			}
+			throw new ArgumentException();
+		}
+	}
+
+	public class NodeDecorationsPanel
+	{
+		public static NodeDecorationsPanel Instance { get; private set; }
 		private readonly Panel panel;
 		private readonly ThemedScrollView rootWidget;
 		private BooleanEditor showAllEditor;
-		private readonly List<List<Type>> Groups = new List<List<Type>> {
-			new List<Type> { typeof(Frame), typeof(Button), typeof(Slider), typeof(Viewport3D), typeof(Node3D) },
-			new List<Type> { typeof(Image) },
-			new List<Type> { typeof(Movie) },
-			new List<Type> { typeof(Bone) },
-			new List<Type> { typeof(DistortionMesh) },
-			new List<Type> { typeof(ParticleEmitter) },
-			new List<Type> { typeof(SimpleText), typeof(RichText), typeof(TextStyle), typeof(NineGrid) },
-			new List<Type> { typeof(Spline),  typeof(Spline3D), typeof(Polyline) },
-			new List<Type> { typeof(Camera3D), typeof(Model3D), typeof(WidgetAdapter3D) }
+		private readonly List<List<NodeDecorations>> Groups = new List<List<NodeDecorations>> {
+			new List<NodeDecorations> {
+				NodeDecorations.Frame,
+				NodeDecorations.Button,
+				NodeDecorations.Slider,
+				NodeDecorations.Viewport3D,
+				NodeDecorations.Node3D
+			},
+			new List<NodeDecorations> {
+				NodeDecorations.Image
+			},
+			new List<NodeDecorations> {
+				NodeDecorations.Movie
+			},
+			new List<NodeDecorations> {
+				NodeDecorations.Bone,
+				NodeDecorations.Bone3D
+			},
+			new List<NodeDecorations> {
+				NodeDecorations.DistortionMesh
+			},
+			new List<NodeDecorations> {
+				NodeDecorations.ParticleEmitter
+			},
+			new List<NodeDecorations> {
+				NodeDecorations.SimpleText,
+				NodeDecorations.RichText,
+				NodeDecorations.NineGrid
+			},
+			new List<NodeDecorations> {
+				NodeDecorations.Spline,
+				NodeDecorations.Spline3D,
+				NodeDecorations.Polyline
+			},
+			new List<NodeDecorations> {
+				NodeDecorations.Camera3D,
+				NodeDecorations.Model3D,
+				NodeDecorations.WidgetAdapter3D
+			}
 		};
 		private readonly string[] GroupNames = { "Groups", "Images", "Media", "Bones", "DistortionMeshes", "Particles", "UI", "Splines", "3D" };
 
-		public NodeDecorations(Panel panel)
+		public NodeDecorationsPanel(Panel panel)
 		{
 			if (Instance != null) {
 				throw new InvalidOperationException();
@@ -126,25 +204,30 @@ namespace Tangerine.UI.SceneView
 
 		private class DisplayNodeDecorationEditor : Widget
 		{
-			private readonly Type type;
+			private readonly NodeDecorations decoration;
 			public readonly BooleanEditor BooleanEditor;
 
-			public DisplayNodeDecorationEditor(Type type)
+			public DisplayNodeDecorationEditor(NodeDecorations decoration)
 			{
-				this.type = type;
+				this.decoration = decoration;
 				Layout = new VBoxLayout();
-				BooleanEditor = new BooleanEditor(type.Name);
-				BooleanEditor.CheckBox.Checked = SceneUserPreferences.Instance.DisplayNodeDecorationsForTypes.Contains(type.Name);
+				BooleanEditor = new BooleanEditor(Enum.GetName(typeof(NodeDecorations), decoration));
+				BooleanEditor.CheckBox.Checked = SceneUserPreferences.Instance.DisplayNodeDecorationsForTypes.Contains(decoration);
 				BooleanEditor.CheckBox.Changed += UpdateValue;
+				BooleanEditor.CheckBox.AddChangeWatcher(
+					() => SceneUserPreferences.Instance.DisplayNodeDecorationsForTypes.Contains(decoration),
+					v => BooleanEditor.CheckBox.Checked = v);
 				AddNode(BooleanEditor);
 			}
 
 			private void UpdateValue(CheckBox.ChangedEventArgs e)
 			{
-				if (e.Value) {
-					SceneUserPreferences.Instance.DisplayNodeDecorationsForTypes.Add(type.Name);
-				} else {
-					SceneUserPreferences.Instance.DisplayNodeDecorationsForTypes.Remove(type.Name);
+				if (e.ChangedByUser) {
+					if (e.Value) {
+						SceneUserPreferences.Instance.DisplayNodeDecorationsForTypes.Add(decoration);
+					} else {
+						SceneUserPreferences.Instance.DisplayNodeDecorationsForTypes.Remove(decoration);
+					}
 				}
 			}
 		}
@@ -153,13 +236,12 @@ namespace Tangerine.UI.SceneView
 		{
 			public BooleanEditor AllEditor { get; private set; }
 			private ToolbarButton button;
-			private readonly List<Type> allTypes;
-			private List<Type> types;
+			private readonly List<NodeDecorations> decorations;
 			private bool expanded = false;
 
-			public DisplayNodeDecorationEditorGroup(List<Type> types, string name)
+			public DisplayNodeDecorationEditorGroup(List<NodeDecorations> decorations, string name)
 			{
-				allTypes = types;
+				this.decorations = decorations;
 				Id = name;
 				Layout = new VBoxLayout { Spacing = 6 };
 				Rebuild();
@@ -170,20 +252,13 @@ namespace Tangerine.UI.SceneView
 				if (!e.ChangedByUser) {
 					return;
 				}
-				if (!expanded) {
-					if (e.Value) {
-						foreach (var type in types) {
-							SceneUserPreferences.Instance.DisplayNodeDecorationsForTypes.Add(type.Name);
-						}
-					} else {
-						foreach (var type in types) {
-							SceneUserPreferences.Instance.DisplayNodeDecorationsForTypes.Remove(type.Name);
-						}
+				if (e.Value) {
+					foreach (var decoration in decorations) {
+						SceneUserPreferences.Instance.DisplayNodeDecorationsForTypes.Add(decoration);
 					}
 				} else {
-					AllEditor.CheckBox.Checked = e.Value;
-					foreach (var editor in Nodes.Skip(1).OfType<DisplayNodeDecorationEditor>()) {
-						editor.BooleanEditor.CheckBox.Checked = e.Value;
+					foreach (var decoration in decorations) {
+						SceneUserPreferences.Instance.DisplayNodeDecorationsForTypes.Remove(decoration);
 					}
 				}
 				Application.MainWindow.Invalidate();
@@ -191,8 +266,8 @@ namespace Tangerine.UI.SceneView
 
 			private void TryCheckAll()
 			{
-				foreach (var type in types) {
-					if (!SceneUserPreferences.Instance.DisplayNodeDecorationsForTypes.Contains(type.Name)) {
+				foreach (var decoration in decorations) {
+					if (!SceneUserPreferences.Instance.DisplayNodeDecorationsForTypes.Contains(decoration)) {
 						AllEditor.CheckBox.Checked = false;
 						return;
 					}
@@ -229,17 +304,15 @@ namespace Tangerine.UI.SceneView
 						CreateAllEditor()
 					}
 				});
-				types = Project.Current.RegisteredNodeTypes.Where(t => allTypes.Contains(t)).ToList();
 				if (expanded) {
-					foreach (var type in types) {
-						var editor = new DisplayNodeDecorationEditor(type);
+					foreach (var decoration in decorations) {
+						var editor = new DisplayNodeDecorationEditor(decoration);
 						editor.BooleanEditor.CheckBox.Changed += e => {
 							if (e.ChangedByUser) {
-								Application.MainWindow.Invalidate();
 								TryCheckAll();
+								Application.MainWindow.Invalidate();
 							}
 						};
-						editor.BooleanEditor.CheckBox.Checked = SceneUserPreferences.Instance.DisplayNodeDecorationsForTypes.Contains(type.Name);
 						editor.Padding = new Thickness { Left = 38 };
 						AddNode(editor);
 					}

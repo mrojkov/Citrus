@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
@@ -44,7 +45,7 @@ namespace Tangerine.UI.SceneView
 		public bool SnapRulerLinesToWidgets { get; set; }
 
 		[YuzuRequired]
-		public HashSet<string> DisplayNodeDecorationsForTypes { get; set; }
+		public HashSet<NodeDecorations> DisplayNodeDecorationsForTypes { get; set; }
 
 		public SceneUserPreferences()
 		{
@@ -65,7 +66,10 @@ namespace Tangerine.UI.SceneView
 			SnapRulerLinesToWidgets = false;
 			SnapWidgetBorderToRuler = false;
 			SnapWidgetPivotToRuler = false;
-			DisplayNodeDecorationsForTypes = new HashSet<string>();
+			DisplayNodeDecorationsForTypes = new HashSet<NodeDecorations>();
+			foreach (var decoration in Enum.GetValues(typeof(NodeDecorations))) {
+				DisplayNodeDecorationsForTypes.Add((NodeDecorations)decoration);
+			}
 		}
 
 		public static SceneUserPreferences Instance => Core.UserPreferences.Instance.Get<SceneUserPreferences>();

@@ -74,7 +74,7 @@ namespace Tangerine
 			var documentPanel = new Panel(DockManager.DocumentAreaId, undockable: false);
 			var nodeDecorationsPanel = new Panel("Node decorations");
 			new UI.Console(consolePanel);
-			new UI.SceneView.NodeDecorations(nodeDecorationsPanel);
+			new UI.SceneView.NodeDecorationsPanel(nodeDecorationsPanel);
 
 			var dockManager = DockManager.Instance;
 			var root = dockManager.Model.WindowPlacements.First();
@@ -313,7 +313,6 @@ namespace Tangerine
 			}
 			HotkeyRegistry.InitCommands(TangerineMenu.CreateNodeCommands, "Tools", "Tools");
 			HotkeyRegistry.UpdateProfiles();
-			UI.SceneView.NodeDecorations.Refresh();
 		}
 
 		void CreateToolsToolbar()

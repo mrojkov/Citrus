@@ -340,12 +340,12 @@ namespace Tangerine.UI.SceneView
 		{
 			public override void ExecuteTransaction()
 			{
-				NodeDecorations.ToggleAll();
+				NodeDecorationsPanel.ToggleAll();
 			}
 
 			public override bool GetChecked()
 			{
-				return NodeDecorations.GetCheckedAll();
+				return NodeDecorationsPanel.GetCheckedAll();
 			}
 		}
 
