@@ -251,6 +251,7 @@ namespace Tangerine.UI.FilesystemView
 			Text = GetNameOfFolder(path);
 			MinMaxWidth = Renderer.MeasureTextLine(Text, Theme.Metrics.TextHeight, 3).X;
 			Gestures.Add(new ClickGesture(0, () => view.Open(path)));
+			Gestures.Add(new ClickGesture(1, () => SystemShellContextMenu.Instance.Show(path)));
 		}
 
 		public static string GetNameOfFolder(string path)
@@ -277,6 +278,7 @@ namespace Tangerine.UI.FilesystemView
 			Text = GetNameOfRoot(path);
 			MinMaxWidth = Renderer.MeasureTextLine(Text, Theme.Metrics.TextHeight, 4).X;
 			Gestures.Add(new ClickGesture(0, () => view.Open(System.IO.Path.GetPathRoot(path))));
+			Gestures.Add(new ClickGesture(1, () => SystemShellContextMenu.Instance.Show(path)));
 		}
 
 		public static string GetNameOfRoot(string path)
@@ -390,8 +392,8 @@ namespace Tangerine.UI.FilesystemView
 		public RootsDirectoryPicker(Vector2 globalPosition, FilesystemView view) : base(DefaultWindowOptions)
 		{
 			this.view = view;
-
-			internalRoots = System.Environment.GetLogicalDrives();
+			var logicalDrives = System.IO.Directory.GetLogicalDrives();
+			internalRoots = GetRealRootsPathsFromLogicalDrives(logicalDrives);
 			rootItems = GetRootItems(internalRoots);
 
 			widget = new Widget {
@@ -412,36 +414,41 @@ namespace Tangerine.UI.FilesystemView
 			ClientPosition = globalPosition;
 		}
 
-		private Widget[] GetRootItems(string[] paths)
+		public static string[] GetRealRootsPathsFromLogicalDrives(string[] logicalDrives)
 		{
-			Widget[] items = new Widget[internalRoots.Length];
+			var countOfRealRoots = 0;
+			foreach(var path in logicalDrives) {
+				if (System.IO.Directory.Exists(path)) {
+					countOfRealRoots++;
+				}
+			}
+			string[] realRoots = new string[countOfRealRoots];
+			var i = 0;
+			foreach(var root in logicalDrives) {
+				if (System.IO.Directory.Exists(root)) {
+					realRoots[i] = root;
+					i++;
+					if (i == countOfRealRoots) break;
+				}
+			}
+			return realRoots;
+		}
+
+		private FilesystemItem[] GetRootItems(string[] paths)
+		{
+			FilesystemItem[] items = new FilesystemItem[internalRoots.Length];
 			var i = 0;
 			foreach (var path in paths) {
-				Widget item = new Widget() {
-					HitTestTarget = true,
-					Layout = new HBoxLayout(),
-					Nodes = {
-						new ThemedSimpleText {
-							Text = path.Remove(path.Length - 1)
-						}
-					}
-				};
-				item.CompoundPresenter.Add(new DelegatePresenter<Widget>(_ => {
-					if (item.IsMouseOverThisOrDescendant()) {
-						item.PrepareRendererState();
-						Renderer.DrawRect(Vector2.Zero, item.Size, Theme.Colors.HoveredBackground);
-						if (Input.WasMousePressed()) {
-							Renderer.DrawRectOutline(Vector2.Zero, item.Size, Theme.Colors.SelectedBorder);
-						}
-					}
-				}));
+				FilesystemItem item = new FilesystemItem(path, true);
 				item.Updating += (float delta) => {
 					if (IsMouseEntering(item)) {
 						Invalidate();
 					}
-					if (item.Input.WasMouseReleased()) {
+					if (item.Input.WasMouseReleased(0)) {
 						Close();
 						view.Open(path);
+					} else if (item.Input.WasMouseReleased(1)) {
+						SystemShellContextMenu.Instance.Show(item.FilesystemPath);
 					}
 				};
 				items[i] = item;
@@ -530,9 +537,11 @@ namespace Tangerine.UI.FilesystemView
 					if (IsMouseEntering(item)) {
 						Invalidate();
 					}
-					if (item.Input.WasMouseReleased()) {
+					if (item.Input.WasMouseReleased(0)) {
 						Close();
 						view.Open(item.FilesystemPath);
+					} else if (item.Input.WasMouseReleased(1)) {
+						SystemShellContextMenu.Instance.Show(item.FilesystemPath);
 					}
 				};
 			}
