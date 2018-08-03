@@ -184,13 +184,13 @@ namespace Lime
 				float paddingH = widget.Padding.Left + widget.Padding.Right;
 				float dx = paddingH;
 				float dy = widget.Padding.Top + widget.Padding.Bottom - Spacing;
-				float maxrowdy = 0;
+				float dyInRowMax = 0;
 				int i = 0;
 				Action<int> split = (splitIndex) => {
 					splitIndices.Add(splitIndex);
 					dx = paddingH;
-					dy += maxrowdy + Spacing;
-					maxrowdy = 0.0f;
+					dy += dyInRowMax + Spacing;
+					dyInRowMax = 0.0f;
 				};
 				splitIndices.Clear();
 				splitIndices.Add(i);
@@ -199,8 +199,8 @@ namespace Lime
 					var w = widgets[i];
 					minWidth = Math.Max(minWidth, w.EffectiveMinSize.X);
 					dx += w.EffectiveMinSize.X;
-					if (dy <= widget.Height) {
-						maxrowdy = Mathf.Max(maxrowdy, w.EffectiveMinSize.Y);
+					if (dx <= widget.Width) {
+						dyInRowMax = Mathf.Max(dyInRowMax, w.EffectiveMinSize.Y);
 					}
 					if (w.EffectiveMinSize.X + paddingH > widget.Width && splitIndices.Last() == i) {
 						split(i + 1);
@@ -222,13 +222,13 @@ namespace Lime
 				float paddingV = widget.Padding.Top + widget.Padding.Bottom;
 				float dx = widget.Padding.Left + widget.Padding.Right - Spacing;
 				float dy = paddingV;
-				float maxColumnDx = 0;
+				float dxInColumnMax = 0;
 				int i = 0;
 				Action<int> split = (splitIndex) => {
 					splitIndices.Add(splitIndex);
-					dx += maxColumnDx + Spacing;
+					dx += dxInColumnMax + Spacing;
 					dy = paddingV;
-					maxColumnDx = 0.0f;
+					dxInColumnMax = 0.0f;
 				};
 				splitIndices.Clear();
 				splitIndices.Add(i);
@@ -237,8 +237,8 @@ namespace Lime
 					var w = widgets[i];
 					minHeight = Math.Max(minHeight, w.EffectiveMinSize.Y);
 					dy += w.EffectiveMinSize.Y;
-					if (dx <= widget.Width) {
-						maxColumnDx = Mathf.Max(maxColumnDx, w.EffectiveMinSize.X);
+					if (dy <= widget.Height) {
+						dxInColumnMax = Mathf.Max(dxInColumnMax, w.EffectiveMinSize.X);
 					}
 					if (w.EffectiveMinSize.Y + paddingV > widget.Height && splitIndices.Last() == i) {
 						split(i + 1);
