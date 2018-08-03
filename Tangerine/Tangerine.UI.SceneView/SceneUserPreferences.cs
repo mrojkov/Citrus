@@ -30,9 +30,6 @@ namespace Tangerine.UI.SceneView
 		public bool DrawFrameBorder { get; set; }
 
 		[YuzuRequired]
-		public bool Bones3DVisible { get; set; }
-
-		[YuzuRequired]
 		public bool SnapWidgetBorderToRuler { get; set; }
 
 		[YuzuRequired]
@@ -58,7 +55,6 @@ namespace Tangerine.UI.SceneView
 			RootWidgetOverlayColor = ColorTheme.Current.SceneView.RootWidgetOverlayColor;
 			AnimationPreviewBackground = Color4.Black.Transparentify(0.6f);
 			DrawFrameBorder = false;
-			Bones3DVisible = false;
 			SnapRulerLinesToWidgets = false;
 			SnapWidgetBorderToRuler = false;
 			SnapWidgetPivotToRuler = false;
