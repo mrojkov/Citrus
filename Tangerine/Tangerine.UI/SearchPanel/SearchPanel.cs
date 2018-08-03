@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
+using System.Reflection;
 
 namespace Tangerine.UI
 {
@@ -147,8 +148,15 @@ namespace Tangerine.UI
 		static IEnumerable<Node> GetResults(Node rootNode, string searchString)
 		{
 			var searchStringLowercase = searchString.Trim().ToLower();
-			return rootNode.Descendants.Where(i => i.Id?.ToLower().Contains(searchStringLowercase) ?? false).
-				OrderBy(i => i.Id.ToLower());
+			return rootNode.Descendants
+				.Where(i => {
+					bool textContains =
+						i.GetType().GetProperty("Text") is PropertyInfo textProp &&
+						textProp.GetValue(i) is string s &&
+						s.ToLower().Contains(searchStringLowercase);
+					return (i.Id?.ToLower().Contains(searchStringLowercase) ?? false) || textContains;
+				})
+				.OrderBy(i => i.Id.ToLower());
 		}
 
 		//static IEnumerable<Node> DescendantsWithoutExternalDuplicates(Node root)
