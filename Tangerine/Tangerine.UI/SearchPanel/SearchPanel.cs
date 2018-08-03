@@ -96,6 +96,12 @@ namespace Tangerine.UI
 				}
 				externalSceneDoc.SceneNavigatedFrom = curScenePath; 
 				node = GetResults(externalSceneDoc.RootNode, searchString).ToList()[localIndex];
+				Document.SetCurrent(externalSceneDoc);
+				Document.Current.History.DoTransaction(() => {
+					Core.Operations.EnterNode.Perform(node.Parent, selectFirstNode: false);
+					Core.Operations.SelectNode.Perform(node);
+				});
+				return;
 			}
 			Core.Operations.EnterNode.Perform(node.Parent, selectFirstNode: false);
 			Core.Operations.SelectNode.Perform(node);
