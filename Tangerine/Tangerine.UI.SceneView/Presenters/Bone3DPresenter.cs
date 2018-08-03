@@ -17,7 +17,10 @@ namespace Tangerine.UI.SceneView
 
 		private static void RenderSelection(Widget canvas)
 		{
-			if (Document.Current.ExpositionMode) {
+			if (
+				Document.Current.ExpositionMode ||
+				!SceneUserPreferences.Instance.DisplayedNodeDecorations.Contains(NodeDecoration.Bone3D)
+			) {
 				return;
 			}
 			canvas.PrepareRendererState();

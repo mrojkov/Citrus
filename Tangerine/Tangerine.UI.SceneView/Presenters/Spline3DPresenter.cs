@@ -16,7 +16,12 @@ namespace Tangerine.UI.SceneView
 			if (Document.Current.PreviewAnimation) {
 				return;
 			}
+			bool display = SceneUserPreferences.Instance.DisplayedNodeDecorations.Contains(NodeDecoration.Spline3D);
+			var selection = Document.Current.SelectedNodes().Editable().OfType<Spline3D>().ToList();
 			foreach (var spline in viewport.Descendants.OfType<Spline3D>()) {
+				if (!display && !selection.Contains(spline)) {
+					continue;
+				}
 				Renderer.Flush();
 				SceneView.Instance.Frame.PrepareRendererState();
 				var cameraProjection = Renderer.Projection;
