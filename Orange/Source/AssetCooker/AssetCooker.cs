@@ -115,6 +115,11 @@ namespace Orange
 
 		private static void CookBundles(bool requiredCookCode = true, List<string> bundles = null)
 		{
+			bool skipCodeCooking = The.Workspace.ProjectJson.GetValue<bool>("SkipCodeCooking");
+			if (skipCodeCooking) {
+				requiredCookCode = false;
+			}
+
 			var extraBundles = new HashSet<string>();
 			foreach (var dictionaryItem in cookingRulesMap) {
 				foreach (var bundle in dictionaryItem.Value.Bundles) {
