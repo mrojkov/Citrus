@@ -58,8 +58,8 @@ namespace Tangerine.UI.SceneView
 			ConnectCommand(SceneViewCommands.Duplicate, DuplicateNodes,
 				() => Document.Current?.TopLevelSelectedRows().Any(row => row.IsCopyPasteAllowed()) ?? false);
 			ConnectCommand(SceneViewCommands.DisplayBones, new DisplayBones());
-			ConnectCommand(SceneViewCommands.DisplayPivotsForAllWidgets, new DisplayAllNodeDecorations());
-			ConnectCommand(SceneViewCommands.DisplayPivotsForInvisibleWidgets, new DisplayNodeDecorationsForInvisibleWidgets());
+			ConnectCommand(SceneViewCommands.DisplayAllNodeDecorations, new DisplayAllNodeDecorations());
+			ConnectCommand(SceneViewCommands.DisplayNodeDecorationsForInvisibleWidgets, new DisplayNodeDecorationsForInvisibleWidgets());
 			ConnectCommand(SceneViewCommands.TieWidgetsWithBones, TieWidgetsWithBones);
 			ConnectCommand(SceneViewCommands.UntieWidgetsFromBones, UntieWidgetsFromBones);
 			ConnectCommand(SceneViewCommands.ToggleDisplayRuler, new DisplayRuler());

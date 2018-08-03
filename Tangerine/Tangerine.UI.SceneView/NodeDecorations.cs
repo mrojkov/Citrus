@@ -114,7 +114,7 @@ namespace Tangerine.UI.SceneView
 
 		private static readonly Dictionary<NodeDecoration, ICommand> NodeDecorationCommands = new Dictionary<NodeDecoration, ICommand> {
 			{ NodeDecoration.Bone3D, SceneViewCommands.DisplayBones },
-			{ NodeDecoration.Invisible, SceneViewCommands.DisplayPivotsForInvisibleWidgets },
+			{ NodeDecoration.Invisible, SceneViewCommands.DisplayNodeDecorationsForInvisibleWidgets },
 			{ NodeDecoration.AnimationPath, SceneViewCommands.ShowAnimationPath }
 		};
 
@@ -134,7 +134,7 @@ namespace Tangerine.UI.SceneView
 		private void RefreshEditors()
 		{
 			rootWidget.Content.Nodes.Clear();
-			displayAllEditor = new BooleanEditor(SceneViewCommands.DisplayPivotsForAllWidgets);
+			displayAllEditor = new BooleanEditor(SceneViewCommands.DisplayAllNodeDecorations);
 			displayAllEditor.CheckBox.Changed += e => {
 				if (e.ChangedByUser) {
 					foreach(var group in rootWidget.Content.Nodes.OfType<DisplayNodeDecorationEditorGroup>()) {

@@ -103,8 +103,8 @@ namespace Tangerine.UI
 		public static readonly ICommand DragUpFast = new Command(new Shortcut(Modifiers.Shift, Key.W));
 		public static readonly ICommand DragDownFast = new Command(new Shortcut(Modifiers.Shift, Key.S));
 		public static readonly ICommand DisplayBones = new Command("Bone (3D)", new Shortcut(Modifiers.Command, Key.B));
-		public static readonly ICommand DisplayPivotsForAllWidgets = new Command("Display All", new Shortcut(Modifiers.Command, Key.M));
-		public static readonly ICommand DisplayPivotsForInvisibleWidgets = new Command("Display Invisible", new Shortcut(Modifiers.Command | Modifiers.Alt, Key.M));
+		public static readonly ICommand DisplayAllNodeDecorations = new Command("Display All", new Shortcut(Modifiers.Command, Key.M));
+		public static readonly ICommand DisplayNodeDecorationsForInvisibleWidgets = new Command("Display Invisible", new Shortcut(Modifiers.Command | Modifiers.Alt, Key.M));
 		public static readonly ICommand TieWidgetsWithBones = new Command("Tie Widgets With Bones", new Shortcut(Modifiers.Command, Key.T));
 		public static readonly ICommand UntieWidgetsFromBones = new Command("Untie Widgets From Bones", new Shortcut(Modifiers.Command | Modifiers.Shift, Key.T));
 		public static readonly ICommand Duplicate = new Command("Duplicate", new Shortcut(Modifiers.Command, Key.D));
