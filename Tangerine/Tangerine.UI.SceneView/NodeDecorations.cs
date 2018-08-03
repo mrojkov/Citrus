@@ -83,6 +83,19 @@ namespace Tangerine.UI.SceneView
 			showAllEditor.CheckBox.Checked = true;
 		}
 
+		public static void ToggleAll()
+		{
+			Instance.showAllEditor.CheckBox.SetChecked(!Instance.showAllEditor.CheckBox.Checked, true);
+			if (Instance.panel.ContentWidget.GetRoot() is ThemedInvalidableWindowWidget widget) {
+				widget.Window.Invalidate();
+			}
+		}
+
+		public static bool GetCheckedAll()
+		{
+			return Instance.showAllEditor.CheckBox.Checked;
+		}
+
 		public static void Refresh() => Instance?.RefreshEditors();
 
 		private class ThemedCheckBox : Lime.ThemedCheckBox

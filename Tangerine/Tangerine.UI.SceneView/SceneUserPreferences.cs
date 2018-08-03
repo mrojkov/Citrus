@@ -28,10 +28,7 @@ namespace Tangerine.UI.SceneView
 		[YuzuRequired]
 		public bool DrawFrameBorder { get; set; }
 
-		[YuzuOptional]
-		public bool DisplayPivotsForAllWidgets { get; set; }
-
-		[YuzuOptional]
+		[YuzuRequired]
 		public bool DisplayNodeDecorationsForInvisibleWidgets { get; set; }
 
 		[YuzuRequired]
@@ -63,7 +60,6 @@ namespace Tangerine.UI.SceneView
 			RootWidgetOverlayColor = ColorTheme.Current.SceneView.RootWidgetOverlayColor;
 			AnimationPreviewBackground = Color4.Black.Transparentify(0.6f);
 			DrawFrameBorder = false;
-			DisplayPivotsForAllWidgets = true;
 			DisplayNodeDecorationsForInvisibleWidgets = false;
 			Bones3DVisible = false;
 			SnapRulerLinesToWidgets = false;

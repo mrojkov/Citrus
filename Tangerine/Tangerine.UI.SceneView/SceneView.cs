@@ -340,13 +340,12 @@ namespace Tangerine.UI.SceneView
 		{
 			public override void ExecuteTransaction()
 			{
-				SceneUserPreferences.Instance.DisplayPivotsForAllWidgets = !SceneUserPreferences.Instance.DisplayPivotsForAllWidgets;
-				CommonWindow.Current.Invalidate();
+				NodeDecorations.ToggleAll();
 			}
 
 			public override bool GetChecked()
 			{
-				return SceneUserPreferences.Instance.DisplayPivotsForAllWidgets;
+				return NodeDecorations.GetCheckedAll();
 			}
 		}
 
