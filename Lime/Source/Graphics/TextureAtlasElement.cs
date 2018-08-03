@@ -66,8 +66,8 @@ namespace Lime
 			if (uv.X > 1) uv.X = 1;
 			if (uv.Y < 0) uv.Y = 0;
 			if (uv.Y > 1) uv.Y = 1;
-			float width = AtlasUVRect.B.X - AtlasUVRect.A.X;
-			float height = AtlasUVRect.B.Y - AtlasUVRect.A.Y;
+			float width = AtlasUVRect.BX - AtlasUVRect.AX;
+			float height = AtlasUVRect.BY - AtlasUVRect.AY;
 			uv.X = AtlasUVRect.Left + width * uv.X;
 			uv.Y = AtlasUVRect.Top + height * uv.Y;
 		}
