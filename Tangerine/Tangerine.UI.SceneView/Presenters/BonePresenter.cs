@@ -74,7 +74,7 @@ namespace Tangerine.UI.SceneView
 		private void DrawBones(Bone bone, Widget canvas)
 		{
 			var selected = Document.Current.SelectedNodes().Contains(bone);
-			if (!SceneUserPreferences.Instance.DisplayedNodeDecorations.Contains(NodeDecoration.Bone) && !selected) {
+			if (!NodeDecoration.Bone.RequiredToDisplay() && !selected) {
 				return;
 			}
 			var t = bone.Parent.AsWidget.CalcTransitionToSpaceOf(canvas);

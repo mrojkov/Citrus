@@ -336,11 +336,7 @@ namespace Tangerine.UI.SceneView
 
 			public override void ExecuteTransaction()
 			{
-				if (SceneUserPreferences.Instance.DisplayedNodeDecorations.Contains(decoration)) {
-					SceneUserPreferences.Instance.DisplayedNodeDecorations.Remove(decoration);
-				} else {
-					SceneUserPreferences.Instance.DisplayedNodeDecorations.Add(decoration);
-				}
+				decoration.SetDisplay(!decoration.RequiredToDisplay());
 				NodeDecorationsPanel.Invalidate();
 			}
 		}

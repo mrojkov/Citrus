@@ -16,7 +16,7 @@ namespace Tangerine.UI.SceneView
 			if (Document.Current.PreviewAnimation) {
 				return;
 			}
-			bool display = SceneUserPreferences.Instance.DisplayedNodeDecorations.Contains(NodeDecoration.Spline3D);
+			bool display = NodeDecoration.Spline3D.RequiredToDisplay();
 			var selection = Document.Current.SelectedNodes().Editable().OfType<Spline3D>().ToList();
 			foreach (var spline in viewport.Descendants.OfType<Spline3D>()) {
 				if (!display && !selection.Contains(spline)) {
@@ -46,7 +46,7 @@ namespace Tangerine.UI.SceneView
 				Renderer.CullMode = oldCullMode;
 			}
 		}
- 
+
 		void DrawSplinePoint(SplinePoint3D point, Viewport3D viewport, Matrix44 splineWorldMatrix, bool selected)
 		{
 			var color = selected ? Color4.Green : Color4.Red;

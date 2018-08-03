@@ -19,7 +19,7 @@ namespace Tangerine.UI.SceneView
 		{
 			if (
 				Document.Current.ExpositionMode ||
-				!SceneUserPreferences.Instance.DisplayedNodeDecorations.Contains(NodeDecoration.Bone3D)
+				!NodeDecoration.Bone3D.RequiredToDisplay()
 			) {
 				return;
 			}

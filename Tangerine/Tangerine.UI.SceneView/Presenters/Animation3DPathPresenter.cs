@@ -16,7 +16,7 @@ namespace Tangerine.UI.SceneView
 			if (Document.Current.PreviewAnimation) {
 				return;
 			}
-			if (!SceneUserPreferences.Instance.DisplayedNodeDecorations.Contains(NodeDecoration.AnimationPath)) {
+			if (!NodeDecoration.AnimationPath.RequiredToDisplay()) {
 				return;
 			}
 			foreach (var node in Document.Current.SelectedNodes().Editable().OfType<Node3D>()) {

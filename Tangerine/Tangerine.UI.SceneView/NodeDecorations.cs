@@ -56,6 +56,20 @@ namespace Tangerine.UI.SceneView
 			}
 			throw new ArgumentException();
 		}
+
+		public static bool RequiredToDisplay(this NodeDecoration decoration)
+		{
+			return SceneUserPreferences.Instance.DisplayedNodeDecorations.Contains(decoration);
+		}
+
+		public static void SetDisplay(this NodeDecoration decoration, bool requiredToDisplay)
+		{
+			if (requiredToDisplay) {
+				SceneUserPreferences.Instance.DisplayedNodeDecorations.Add(decoration);
+			} else {
+				SceneUserPreferences.Instance.DisplayedNodeDecorations.Remove(decoration);
+			}
+		}
 	}
 
 	public class NodeDecorationsPanel
@@ -231,10 +245,10 @@ namespace Tangerine.UI.SceneView
 				} else {
 					BooleanEditor = new BooleanEditor(Enum.GetName(typeof(NodeDecoration), decoration));
 				}
-				BooleanEditor.CheckBox.Checked = SceneUserPreferences.Instance.DisplayedNodeDecorations.Contains(decoration);
+				BooleanEditor.CheckBox.Checked = decoration.RequiredToDisplay();
 				BooleanEditor.CheckBox.Changed += UpdateValue;
 				BooleanEditor.CheckBox.AddChangeWatcher(
-					() => SceneUserPreferences.Instance.DisplayedNodeDecorations.Contains(decoration),
+					() => decoration.RequiredToDisplay(),
 					v => BooleanEditor.CheckBox.Checked = v);
 				AddNode(BooleanEditor);
 			}
@@ -242,11 +256,7 @@ namespace Tangerine.UI.SceneView
 			private void UpdateValue(CheckBox.ChangedEventArgs e)
 			{
 				if (e.ChangedByUser) {
-					if (e.Value) {
-						SceneUserPreferences.Instance.DisplayedNodeDecorations.Add(decoration);
-					} else {
-						SceneUserPreferences.Instance.DisplayedNodeDecorations.Remove(decoration);
-					}
+					decoration.SetDisplay(e.Value);
 					Application.MainWindow.Invalidate();
 				}
 			}
@@ -272,14 +282,8 @@ namespace Tangerine.UI.SceneView
 				if (!e.ChangedByUser) {
 					return;
 				}
-				if (e.Value) {
-					foreach (var decoration in decorations) {
-						SceneUserPreferences.Instance.DisplayedNodeDecorations.Add(decoration);
-					}
-				} else {
-					foreach (var decoration in decorations) {
-						SceneUserPreferences.Instance.DisplayedNodeDecorations.Remove(decoration);
-					}
+				foreach (var decoration in decorations) {
+					decoration.SetDisplay(e.Value);
 				}
 				Application.MainWindow.Invalidate();
 			}
@@ -287,7 +291,7 @@ namespace Tangerine.UI.SceneView
 			private void TryCheckAll()
 			{
 				foreach (var decoration in decorations) {
-					if (!SceneUserPreferences.Instance.DisplayedNodeDecorations.Contains(decoration)) {
+					if (!decoration.RequiredToDisplay()) {
 						AllEditor.CheckBox.Checked = false;
 						return;
 					}
