@@ -58,8 +58,8 @@ namespace Tangerine.UI.SceneView
 			ConnectCommand(SceneViewCommands.Duplicate, DuplicateNodes,
 				() => Document.Current?.TopLevelSelectedRows().Any(row => row.IsCopyPasteAllowed()) ?? false);
 			ConnectCommand(SceneViewCommands.DisplayBones, new DisplayBones());
-			ConnectCommand(SceneViewCommands.DisplayPivotsForAllWidgets, new DisplayPivotsForAllWidgets());
-			ConnectCommand(SceneViewCommands.DisplayPivotsForInvisibleWidgets, new DisplayPivotsForInvisibleWidgets());
+			ConnectCommand(SceneViewCommands.DisplayPivotsForAllWidgets, new DisplayAllNodeDecorations());
+			ConnectCommand(SceneViewCommands.DisplayPivotsForInvisibleWidgets, new DisplayNodeDecorationsForInvisibleWidgets());
 			ConnectCommand(SceneViewCommands.TieWidgetsWithBones, TieWidgetsWithBones);
 			ConnectCommand(SceneViewCommands.UntieWidgetsFromBones, UntieWidgetsFromBones);
 			ConnectCommand(SceneViewCommands.ToggleDisplayRuler, new DisplayRuler());
@@ -336,10 +336,10 @@ namespace Tangerine.UI.SceneView
 
 			public override void ExecuteTransaction()
 			{
-				if (SceneUserPreferences.Instance.DisplayNodeDecorationsForTypes.Contains(decoration)) {
-					SceneUserPreferences.Instance.DisplayNodeDecorationsForTypes.Remove(decoration);
+				if (SceneUserPreferences.Instance.DisplayedNodeDecorations.Contains(decoration)) {
+					SceneUserPreferences.Instance.DisplayedNodeDecorations.Remove(decoration);
 				} else {
-					SceneUserPreferences.Instance.DisplayNodeDecorationsForTypes.Add(decoration);
+					SceneUserPreferences.Instance.DisplayedNodeDecorations.Add(decoration);
 				}
 				NodeDecorationsPanel.Invalidate();
 			}
@@ -352,7 +352,7 @@ namespace Tangerine.UI.SceneView
 			}
 		}
 
-		private class DisplayPivotsForAllWidgets : DocumentCommandHandler
+		private class DisplayAllNodeDecorations : DocumentCommandHandler
 		{
 			public override void ExecuteTransaction()
 			{
@@ -361,9 +361,9 @@ namespace Tangerine.UI.SceneView
 			}
 		}
 
-		private class DisplayPivotsForInvisibleWidgets : DisplayNodeDecorationHandler
+		private class DisplayNodeDecorationsForInvisibleWidgets : DisplayNodeDecorationHandler
 		{
-			public DisplayPivotsForInvisibleWidgets() : base(NodeDecoration.Invisible)
+			public DisplayNodeDecorationsForInvisibleWidgets() : base(NodeDecoration.Invisible)
 			{
 			}
 		}
