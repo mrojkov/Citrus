@@ -30,7 +30,7 @@ namespace Tangerine.UI.SceneView
 				return;
 			}
 			canvas.PrepareRendererState();
-			var nodes = Document.Current.Container.Nodes;
+			var nodes = Document.Current.SelectedNodes().Editable();
 			foreach (var node in nodes) {
 				if (node is IAnimable) {
 					var animable = node as IAnimable;

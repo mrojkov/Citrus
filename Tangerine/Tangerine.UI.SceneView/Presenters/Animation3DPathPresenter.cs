@@ -19,7 +19,7 @@ namespace Tangerine.UI.SceneView
 			if (!SceneUserPreferences.Instance.DisplayedNodeDecorations.Contains(NodeDecoration.AnimationPath)) {
 				return;
 			}
-			foreach (var node in viewport.Descendants.OfType<Node3D>()) {
+			foreach (var node in Document.Current.SelectedNodes().Editable().OfType<Node3D>()) {
 				if (!(node is IAnimable)) {
 					continue;
 				}
