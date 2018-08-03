@@ -5,6 +5,7 @@ using Lime;
 using Tangerine.Core;
 using Tangerine.UI;
 using Tangerine.UI.Docking;
+using Tangerine.UI.SceneView;
 
 namespace Tangerine
 {
@@ -173,13 +174,10 @@ namespace Tangerine
 		}
 	}
 
-	public class ShowAnimation : CommandHandler
+	public class ShowAnimation : SceneView.DisplayNodeDecorationHandler
 	{
-		public override void Execute() {
-			CoreUserPreferences.Instance.ShowAnimationPath = !CoreUserPreferences.Instance.ShowAnimationPath;
-			Application.InvalidateWindows();
+		public ShowAnimation() : base(NodeDecoration.AnimationPath)
+		{
 		}
-		public override void RefreshCommand(ICommand command) =>
-			command.Checked = CoreUserPreferences.Instance.ShowAnimationPath;
 	}
 }

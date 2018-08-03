@@ -30,6 +30,7 @@ namespace Tangerine.UI.SceneView
 		Model3D,
 		WidgetAdapter3D,
 		Invisible,
+		AnimationPath,
 	}
 
 	static class Extentions
@@ -101,14 +102,20 @@ namespace Tangerine.UI.SceneView
 				NodeDecoration.Camera3D,
 				NodeDecoration.Model3D,
 				NodeDecoration.WidgetAdapter3D
+			},
+			new List<NodeDecoration> {
+				NodeDecoration.AnimationPath
 			}
 		};
 
-		private static readonly string[] GroupNames = { "Groups", "Images", "Media", "Bones", "DistortionMeshes", "Particles", "UI", "Splines", "3D" };
+		private static readonly string[] GroupNames = {
+			"Groups", "Images", "Media", "Bones", "DistortionMeshes", "Particles", "UI", "Splines", "3D", "Other"
+		};
 
 		private static readonly Dictionary<NodeDecoration, ICommand> NodeDecorationCommands = new Dictionary<NodeDecoration, ICommand> {
 			{ NodeDecoration.Bone3D, SceneViewCommands.DisplayBones },
-			{ NodeDecoration.Invisible, SceneViewCommands.DisplayPivotsForInvisibleWidgets }
+			{ NodeDecoration.Invisible, SceneViewCommands.DisplayPivotsForInvisibleWidgets },
+			{ NodeDecoration.AnimationPath, SceneViewCommands.ShowAnimationPath }
 		};
 
 		public NodeDecorationsPanel(Panel panel)

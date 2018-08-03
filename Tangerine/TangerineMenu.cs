@@ -166,7 +166,6 @@ namespace Tangerine
 						GenericCommands.LoadLayout,
 						GenericCommands.DefaultLayout,
 					})),
-					SceneViewCommands.ShowAnimationPath,
 					new Command("Pads", PadsMenu),
 					new Command("Resolution", resolution),
 					Command.MenuSeparator,

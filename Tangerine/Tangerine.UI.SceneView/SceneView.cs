@@ -325,7 +325,7 @@ namespace Tangerine.UI.SceneView
 			}
 		}
 
-		private class DisplayNodeDecorationHandler : DocumentCommandHandler
+		public class DisplayNodeDecorationHandler : DocumentCommandHandler
 		{
 			private readonly NodeDecoration decoration;
 

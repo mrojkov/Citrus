@@ -12,9 +12,6 @@ namespace Tangerine.Core
 		public bool AnimationMode { get; set; }
 
 		[YuzuRequired]
-		public bool ShowAnimationPath { get; set; }
-
-		[YuzuRequired]
 		public KeyFunction DefaultKeyFunction { get; set; }
 
 		[YuzuRequired]
