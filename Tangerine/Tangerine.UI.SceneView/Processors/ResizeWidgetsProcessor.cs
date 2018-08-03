@@ -11,6 +11,8 @@ namespace Tangerine.UI.SceneView
 	{
 		SceneView sv => SceneView.Instance;
 
+		private Dictionary<Widget, Vector2> childPositions = new Dictionary<Widget, Vector2>();
+
 		public IEnumerator<object> Task()
 		{
 			while (true) {
@@ -53,6 +55,21 @@ namespace Tangerine.UI.SceneView
 
 					Utils.ChangeCursorIfDefault(cursor);
 					var proportional = sv.Input.IsKeyPressed(Key.Shift);
+					{
+						if (
+							sv.Input.IsKeyPressed(Key.Z) &&
+							!sv.Input.IsKeyPressed(Key.Control) &&
+							widgets.Count == 1 &&
+							widgets[0] is Frame frame
+						) {
+							childPositions.Clear();
+							foreach (var widget in frame.Nodes.OfType<Widget>()) {
+								childPositions.Add(
+									widget,
+									widget.CalcPositionInSpaceOf(Document.Current.Container.AsWidget));
+							}
+						}
+					}
 
 					RescaleWidgets(widgets.Count <= 1,
 						sv.Input.IsKeyPressed(Key.Control)
@@ -65,6 +82,24 @@ namespace Tangerine.UI.SceneView
 						proportional,
 						!sv.Input.IsKeyPressed(Key.Control)
 					);
+
+					{
+						if (
+							sv.Input.IsKeyPressed(Key.Z) &&
+							!sv.Input.IsKeyPressed(Key.Control)
+							&& widgets.Count == 1 &&
+							widgets[0] is Frame frame
+						) {
+							foreach (var widget in frame.Nodes.OfType<Widget>()) {
+								var oldPosition = childPositions[widget];
+								Core.Operations.SetAnimableProperty.Perform(
+									widget, nameof(widget.Position),
+									Document.Current.Container.AsWidget.CalcTransitionToSpaceOf(frame) *
+										oldPosition
+								);
+							}
+						}
+					}
 
 					yield return null;
 				}
