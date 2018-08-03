@@ -12,7 +12,7 @@ namespace Tangerine.UI.SceneView
 			if (
 				Document.Current.PreviewAnimation ||
 				(
-					!SceneUserPreferences.Instance.DisplayNodeDecorationsForTypes.Contains(NodeDecorations.Spline) &&
+					!SceneUserPreferences.Instance.DisplayNodeDecorationsForTypes.Contains(NodeDecoration.Spline) &&
 					!(Document.Current.Container == spline) &&
 					!Document.Current.SelectedNodes().Contains(spline)
 				)

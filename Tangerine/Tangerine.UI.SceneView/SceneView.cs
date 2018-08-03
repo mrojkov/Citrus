@@ -353,13 +353,12 @@ namespace Tangerine.UI.SceneView
 		{
 			public override void ExecuteTransaction()
 			{
-				SceneUserPreferences.Instance.DisplayNodeDecorationsForInvisibleWidgets = !SceneUserPreferences.Instance.DisplayNodeDecorationsForInvisibleWidgets;
-				CommonWindow.Current.Invalidate();
+				throw new NotImplementedException();
 			}
 
 			public override bool GetChecked()
 			{
-				return SceneUserPreferences.Instance.DisplayNodeDecorationsForInvisibleWidgets;
+				return true;
 			}
 		}
 	}

@@ -30,9 +30,6 @@ namespace Tangerine.UI.SceneView
 		public bool DrawFrameBorder { get; set; }
 
 		[YuzuRequired]
-		public bool DisplayNodeDecorationsForInvisibleWidgets { get; set; }
-
-		[YuzuRequired]
 		public bool Bones3DVisible { get; set; }
 
 		[YuzuRequired]
@@ -45,7 +42,7 @@ namespace Tangerine.UI.SceneView
 		public bool SnapRulerLinesToWidgets { get; set; }
 
 		[YuzuRequired]
-		public HashSet<NodeDecorations> DisplayNodeDecorationsForTypes { get; set; }
+		public HashSet<NodeDecoration> DisplayNodeDecorationsForTypes { get; set; }
 
 		public SceneUserPreferences()
 		{
@@ -61,14 +58,13 @@ namespace Tangerine.UI.SceneView
 			RootWidgetOverlayColor = ColorTheme.Current.SceneView.RootWidgetOverlayColor;
 			AnimationPreviewBackground = Color4.Black.Transparentify(0.6f);
 			DrawFrameBorder = false;
-			DisplayNodeDecorationsForInvisibleWidgets = false;
 			Bones3DVisible = false;
 			SnapRulerLinesToWidgets = false;
 			SnapWidgetBorderToRuler = false;
 			SnapWidgetPivotToRuler = false;
-			DisplayNodeDecorationsForTypes = new HashSet<NodeDecorations>();
-			foreach (var decoration in Enum.GetValues(typeof(NodeDecorations))) {
-				DisplayNodeDecorationsForTypes.Add((NodeDecorations)decoration);
+			DisplayNodeDecorationsForTypes = new HashSet<NodeDecoration>();
+			foreach (var decoration in Enum.GetValues(typeof(NodeDecoration))) {
+				DisplayNodeDecorationsForTypes.Add((NodeDecoration)decoration);
 			}
 		}
 

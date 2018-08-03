@@ -7,7 +7,7 @@ using Tangerine.UI.Docking;
 
 namespace Tangerine.UI.SceneView
 {
-	public enum NodeDecorations
+	public enum NodeDecoration
 	{
 		Frame,
 		Button,
@@ -28,26 +28,27 @@ namespace Tangerine.UI.SceneView
 		Polyline,
 		Camera3D,
 		Model3D,
-		WidgetAdapter3D
+		WidgetAdapter3D,
+		Invisible,
 	}
 
 	static class Extentions
 	{
-		private static readonly Dictionary<Type, NodeDecorations> typeToDecoration = GenerateDictionary();
+		private static readonly Dictionary<Type, NodeDecoration> typeToDecoration = GenerateDictionary();
 
-		private static Dictionary<Type, NodeDecorations> GenerateDictionary()
+		private static Dictionary<Type, NodeDecoration> GenerateDictionary()
 		{
-			var result = new Dictionary<Type, NodeDecorations>();
-			foreach (var decoration in Enum.GetValues(typeof(NodeDecorations))) {
-				var type = Type.GetType($"Lime.{Enum.GetName(typeof(NodeDecorations), decoration)},Lime");
+			var result = new Dictionary<Type, NodeDecoration>();
+			foreach (var decoration in Enum.GetValues(typeof(NodeDecoration))) {
+				var type = Type.GetType($"Lime.{Enum.GetName(typeof(NodeDecoration), decoration)},Lime");
 				if (type != null) {
-					result.Add(type, (NodeDecorations)decoration);
+					result.Add(type, (NodeDecoration)decoration);
 				}
 			}
 			return result;
 		}
 
-		public static NodeDecorations ToNodeDecorations(this Type type)
+		public static NodeDecoration ToNodeDecoration(this Type type)
 		{
 			if (typeToDecoration.ContainsKey(type)) {
 				return typeToDecoration[type];
@@ -62,44 +63,44 @@ namespace Tangerine.UI.SceneView
 		private readonly Panel panel;
 		private readonly ThemedScrollView rootWidget;
 		private BooleanEditor showAllEditor;
-		private readonly List<List<NodeDecorations>> Groups = new List<List<NodeDecorations>> {
-			new List<NodeDecorations> {
-				NodeDecorations.Frame,
-				NodeDecorations.Button,
-				NodeDecorations.Slider,
-				NodeDecorations.Viewport3D,
-				NodeDecorations.Node3D
+		private readonly List<List<NodeDecoration>> Groups = new List<List<NodeDecoration>> {
+			new List<NodeDecoration> {
+				NodeDecoration.Frame,
+				NodeDecoration.Button,
+				NodeDecoration.Slider,
+				NodeDecoration.Viewport3D,
+				NodeDecoration.Node3D
 			},
-			new List<NodeDecorations> {
-				NodeDecorations.Image
+			new List<NodeDecoration> {
+				NodeDecoration.Image
 			},
-			new List<NodeDecorations> {
-				NodeDecorations.Movie
+			new List<NodeDecoration> {
+				NodeDecoration.Movie
 			},
-			new List<NodeDecorations> {
-				NodeDecorations.Bone,
-				NodeDecorations.Bone3D
+			new List<NodeDecoration> {
+				NodeDecoration.Bone,
+				NodeDecoration.Bone3D
 			},
-			new List<NodeDecorations> {
-				NodeDecorations.DistortionMesh
+			new List<NodeDecoration> {
+				NodeDecoration.DistortionMesh
 			},
-			new List<NodeDecorations> {
-				NodeDecorations.ParticleEmitter
+			new List<NodeDecoration> {
+				NodeDecoration.ParticleEmitter
 			},
-			new List<NodeDecorations> {
-				NodeDecorations.SimpleText,
-				NodeDecorations.RichText,
-				NodeDecorations.NineGrid
+			new List<NodeDecoration> {
+				NodeDecoration.SimpleText,
+				NodeDecoration.RichText,
+				NodeDecoration.NineGrid
 			},
-			new List<NodeDecorations> {
-				NodeDecorations.Spline,
-				NodeDecorations.Spline3D,
-				NodeDecorations.Polyline
+			new List<NodeDecoration> {
+				NodeDecoration.Spline,
+				NodeDecoration.Spline3D,
+				NodeDecoration.Polyline
 			},
-			new List<NodeDecorations> {
-				NodeDecorations.Camera3D,
-				NodeDecorations.Model3D,
-				NodeDecorations.WidgetAdapter3D
+			new List<NodeDecoration> {
+				NodeDecoration.Camera3D,
+				NodeDecoration.Model3D,
+				NodeDecoration.WidgetAdapter3D
 			}
 		};
 		private readonly string[] GroupNames = { "Groups", "Images", "Media", "Bones", "DistortionMeshes", "Particles", "UI", "Splines", "3D" };
@@ -135,18 +136,9 @@ namespace Tangerine.UI.SceneView
 				showAllEditor.AddChangeWatcher(() => group.AllEditor.CheckBox.Checked, v => TryCheckAll());
 			}
 			rootWidget.Content.AddNode(new Separator());
-			var showInvisibleEditor = new BooleanEditor("Invisible");
-			showInvisibleEditor.CheckBox.Changed += e => {
-				if (e.ChangedByUser) {
-					SceneUserPreferences.Instance.DisplayNodeDecorationsForInvisibleWidgets = e.Value;
-				}
-				Application.MainWindow.Invalidate();
+			var showInvisibleEditor = new DisplayNodeDecorationEditor(NodeDecoration.Invisible) {
+				Padding = new Thickness { Left = 29, Top = 5 }
 			};
-			showInvisibleEditor.CheckBox.AddChangeWatcher(
-				() => SceneUserPreferences.Instance.DisplayNodeDecorationsForInvisibleWidgets,
-				v => showInvisibleEditor.CheckBox.Checked = v);
-			showInvisibleEditor.Padding = new Thickness { Left = 29, Top = 5 };
-			showInvisibleEditor.CheckBox.Checked = SceneUserPreferences.Instance.DisplayNodeDecorationsForInvisibleWidgets;
 			rootWidget.Content.AddNode(showInvisibleEditor);
 		}
 
@@ -204,14 +196,14 @@ namespace Tangerine.UI.SceneView
 
 		private class DisplayNodeDecorationEditor : Widget
 		{
-			private readonly NodeDecorations decoration;
+			private readonly NodeDecoration decoration;
 			public readonly BooleanEditor BooleanEditor;
 
-			public DisplayNodeDecorationEditor(NodeDecorations decoration)
+			public DisplayNodeDecorationEditor(NodeDecoration decoration)
 			{
 				this.decoration = decoration;
 				Layout = new VBoxLayout();
-				BooleanEditor = new BooleanEditor(Enum.GetName(typeof(NodeDecorations), decoration));
+				BooleanEditor = new BooleanEditor(Enum.GetName(typeof(NodeDecoration), decoration));
 				BooleanEditor.CheckBox.Checked = SceneUserPreferences.Instance.DisplayNodeDecorationsForTypes.Contains(decoration);
 				BooleanEditor.CheckBox.Changed += UpdateValue;
 				BooleanEditor.CheckBox.AddChangeWatcher(
@@ -228,6 +220,7 @@ namespace Tangerine.UI.SceneView
 					} else {
 						SceneUserPreferences.Instance.DisplayNodeDecorationsForTypes.Remove(decoration);
 					}
+					Application.MainWindow.Invalidate();
 				}
 			}
 		}
@@ -236,10 +229,10 @@ namespace Tangerine.UI.SceneView
 		{
 			public BooleanEditor AllEditor { get; private set; }
 			private ToolbarButton button;
-			private readonly List<NodeDecorations> decorations;
+			private List<NodeDecoration> decorations;
 			private bool expanded = false;
 
-			public DisplayNodeDecorationEditorGroup(List<NodeDecorations> decorations, string name)
+			public DisplayNodeDecorationEditorGroup(List<NodeDecoration> decorations, string name)
 			{
 				this.decorations = decorations;
 				Id = name;
@@ -310,7 +303,6 @@ namespace Tangerine.UI.SceneView
 						editor.BooleanEditor.CheckBox.Changed += e => {
 							if (e.ChangedByUser) {
 								TryCheckAll();
-								Application.MainWindow.Invalidate();
 							}
 						};
 						editor.Padding = new Thickness { Left = 38 };
