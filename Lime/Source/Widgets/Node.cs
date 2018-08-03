@@ -1189,7 +1189,7 @@ namespace Lime
 		{
 			var nodeType = GetType();
 			var contentType = content.GetType();
-			if (nodeType != contentType && !nodeType.IsSubclassOf(contentType)) {
+			if (nodeType != contentType && !contentType.IsSubclassOf(nodeType)) {
 				// Handle legacy case: Replace Button content by external Frame
 				if (nodeType == typeof(Button) && contentType == typeof(Frame)) {
 					Components.Remove(typeof(AssetBundlePathComponent));
