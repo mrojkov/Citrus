@@ -553,6 +553,9 @@ namespace Tangerine
 			h.Connect(TimelineCommands.CopyKeyframes, UI.Timeline.Operations.CopyKeyframes.Perform);
 			h.Connect(TimelineCommands.PasteKeyframes, UI.Timeline.Operations.PasteKeyframes.Perform);
 			h.Connect(TimelineCommands.ReverseKeyframes, UI.Timeline.Operations.ReverseKeyframes.Perform);
+			h.Connect(TimelineCommands.CreatePositionKeyframe, UI.Timeline.Operations.InsertPositionKeyframe.Perform);
+			h.Connect(TimelineCommands.CreateRotationKeyframe, UI.Timeline.Operations.InsertRotationKeyframe.Perform);
+			h.Connect(TimelineCommands.CreateScaleKeyframe, UI.Timeline.Operations.InsertScaleKeyframe.Perform);
 			h.Connect(OrangeCommands.RunConfig, new OrangeCommandHandler(() => new OrangePluginOptionsDialog()));
 		}
 
