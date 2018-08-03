@@ -13,7 +13,10 @@ namespace Tangerine.UI.SceneView
 
 		protected override void InternalRender(Viewport3D viewport)
 		{
-			if (Document.Current.PreviewAnimation) {
+			if (
+				Document.Current.PreviewAnimation ||
+				Document.Current.ExpositionMode
+			) {
 				return;
 			}
 			if (!NodeDecoration.AnimationPath.RequiredToDisplay()) {

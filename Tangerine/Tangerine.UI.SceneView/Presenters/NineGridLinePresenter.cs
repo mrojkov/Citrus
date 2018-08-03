@@ -14,6 +14,9 @@ namespace Tangerine.UI.SceneView
 
 		private static void Render(Widget canvas)
 		{
+			if (Core.Document.Current.ExpositionMode || Core.Document.Current.PreviewAnimation) {
+				return;
+			}
 			var grids = Core.Document.Current.SelectedNodes().Editable().OfType<NineGrid>();
 			foreach (var grid in grids) {
 				foreach (var line in NineGridLine.GetForNineGrid(grid)) {
