@@ -36,6 +36,12 @@ namespace Lime
 		/// </summary>
 		public Rectangle ClipRegion = DefaultClipRegion;
 
+		//public Rectangle ClipRegion
+		//{
+		//	get { return DefaultClipRegion; }
+		//	set { }
+		//}
+
 		public List<Item>[] Layers { get; private set; } = new List<Item>[LayerCount];
 
 		public int CurrentLayer
@@ -59,24 +65,45 @@ namespace Lime
 			currentList.Add(new Item { Node = node, Presenter = presenter });
 		}
 
+		public void GetRenderObjects(List<RenderObject> list)
+		{
+			for (var i = 0; i < Layers.Length; i++) {
+				var layer = Layers[i];
+				if (layer == null) {
+					continue;
+				}
+				for (var j = layer.Count - 1; j >= 0; j--) {
+					var item = layer[j];
+					var ro = item.Presenter.GetRenderObject(item.Node);
+					if (ro != null) {
+						list.Add(ro);
+					}
+				}
+			}
+		}
+
+		private List<RenderObject> renderObjects = new List<RenderObject>();
+
+		[System.Obsolete]
+		public void Render()
+		{
+			try {
+				renderObjects.Clear();
+				GetRenderObjects(renderObjects);
+				foreach (var ro in renderObjects) {
+					ro.Render();
+					ro.Rendered = true;
+				}
+			} finally {
+				renderObjects.Clear();
+			}
+		}
+
+		[System.Obsolete]
 		public void RenderAndClear()
 		{
 			Render();
 			Clear();
-		}
-
-		public void Render()
-		{
-			for (int i = 0; i < Layers.Length; i++) {
-				var list = Layers[i];
-				if (list == null || list.Count == 0) {
-					continue;
-				}
-				for (int j = list.Count - 1; j >= 0; j--) {
-					var t = list[j];
-					t.Presenter.Render(t.Node);
-				}
-			}
 		}
 
 		public bool HitTest(ref HitTestArgs args)

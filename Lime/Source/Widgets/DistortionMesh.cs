@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Yuzu;
 
 namespace Lime
@@ -35,7 +36,6 @@ namespace Lime
 			return Nodes[i] as DistortionMeshPoint;
 		}
 
-		protected static Vertex[] polygon = new Vertex[6];
 		protected static DistortionMeshPoint[] points = new DistortionMeshPoint[4];
 
 		public override void AddToRenderChain(RenderChain chain)
@@ -45,57 +45,74 @@ namespace Lime
 			}
 		}
 
-		protected Vertex CalculateCenterVertex()
+		protected internal override Lime.RenderObject GetRenderObject()
 		{
-			var v = new Vertex();
-			v.UV1 = Vector2.Zero;
-			v.Pos = Vector2.Zero;
-			Vector2 colorAR, colorGB;
-			colorAR = colorGB = Vector2.Zero;
-			for (int t = 0; t < 4; t++) {
-				v.UV1 += points[t].UV;
-				v.Pos += points[t].TransformedPosition;
-				colorAR.X += points[t].Color.A;
-				colorAR.Y += points[t].Color.R;
-				colorGB.X += points[t].Color.G;
-				colorGB.Y += points[t].Color.B;
+			var ro = RenderObjectPool<RenderObject>.Acquire();
+			ro.CaptureRenderState(this);
+			ro.Texture = Texture;
+			ro.Vertices.Clear();
+			ro.Indices.Clear();
+			for (var n = FirstChild; n != null; n = n.NextSibling) {
+				var p = (DistortionMeshPoint)n;
+				ro.Vertices.Add(new Vertex {
+					Pos = p.TransformedPosition,
+					Color = p.Color * GlobalColor,
+					UV1 = p.UV
+				});
 			}
-			Vector2 k = new Vector2(0.25f, 0.25f);
-			colorAR *= k;
-			colorGB *= k;
-			v.Color = new Color4((byte)colorAR.Y, (byte)colorGB.X, (byte)colorGB.Y, (byte)colorAR.X) * GlobalColor;
-			v.UV1 *= k;
-			v.Pos *= k;
-			return v;
-		}
-
-		protected virtual void RenderTile()
-		{
-			polygon[0] = CalculateCenterVertex();
-			for (int t = 0; t < 5; t++) {
-				int w = t % 4;
-				polygon[t + 1].Color = points[w].Color * GlobalColor;
-				polygon[t + 1].UV1 = points[w].UV;
-				polygon[t + 1].Pos = points[w].TransformedPosition;
-			}
-			Renderer.DrawTriangleFan(Texture, polygon, 6);
-		}
-
-		public override void Render()
-		{
-			Renderer.Blending = GlobalBlending;
-			Renderer.Shader = GlobalShader;
-			Renderer.Transform1 = LocalToWorldTransform;
 			for (int i = 0; i < NumRows; ++i) {
 				for (int j = 0; j < NumCols; ++j) {
-					points[0] = GetPoint(i, j);
-					points[1] = GetPoint(i + 1, j);
-					points[2] = GetPoint(i + 1, j + 1);
-					points[3] = GetPoint(i, j + 1);
-					if (points[0] != null && points[1] != null && points[2] != null && points[3] != null) {
-						RenderTile();
-					}
+					var t = i * (NumCols + 1) + j;
+					ro.Indices.Add(t);
+					ro.Indices.Add(t + NumCols + 1);
+					ro.Indices.Add(t + NumCols + 2);
+					ro.Indices.Add(t + 1);
 				}
+			}
+			return ro;
+		}
+
+		private class RenderObject : WidgetRenderObject
+		{
+			private static Vertex[] polygon = new Vertex[6];
+
+			public readonly List<Vertex> Vertices = new List<Vertex>();
+			public readonly List<int> Indices = new List<int>();
+			public ITexture Texture;
+
+			public override void Render()
+			{
+				PrepareRenderState();
+				for (int i = 0; i < Indices.Count; i += 4) {
+					polygon[0] = CalculateCenterVertex(i);
+					for (int t = 0; t < 5; t++) {
+						polygon[t + 1] = Vertices[Indices[i + (t % 4)]];
+					}
+					Renderer.DrawTriangleFan(Texture, polygon, 6);
+				}
+			}
+
+			protected Vertex CalculateCenterVertex(int index)
+			{
+				var v = new Vertex();
+				Vector2 colorAR, colorGB;
+				colorAR = colorGB = Vector2.Zero;
+				for (int t = index; t < index + 4; t++) {
+					var p = Vertices[Indices[t]];
+					v.UV1 += p.UV1;
+					v.Pos += p.Pos;
+					colorAR.X += p.Color.A;
+					colorAR.Y += p.Color.R;
+					colorGB.X += p.Color.G;
+					colorGB.Y += p.Color.B;
+				}
+				Vector2 k = new Vector2(0.25f, 0.25f);
+				colorAR *= k;
+				colorGB *= k;
+				v.Color = new Color4((byte)colorAR.Y, (byte)colorGB.X, (byte)colorGB.Y, (byte)colorAR.X);
+				v.UV1 *= k;
+				v.Pos *= k;
+				return v;
 			}
 		}
 	}

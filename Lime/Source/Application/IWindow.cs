@@ -139,6 +139,8 @@ namespace Lime
 		/// </summary>
 		WindowInput Input { get; }
 
+		bool AsyncRendering { get; }
+
 		/// <summary>
 		/// Gets current FPS for the window.
 		/// </summary>

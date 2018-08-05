@@ -30,6 +30,7 @@ namespace Lime
 		public bool Visible = true;
 		public bool VSync = true;
 		public bool UseTimer = true;
+		public bool AsyncRendering = false;
 		/// <summary>
 		/// System.Drawing.Icon on Windows
 		/// </summary>

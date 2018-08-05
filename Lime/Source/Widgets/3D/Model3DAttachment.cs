@@ -755,16 +755,21 @@ namespace Lime
 			Scene = (Frame)Node.CreateFromAssetBundle(path);
 		}
 
-		public override void Render(Node node)
+		public override RenderObject GetRenderObject(Node node)
 		{
-			if (!Animation.IsRunning && !WasSnapshotDeprecated) {
-				return;
-			}
-
-			Scene.RenderToTexture(Snapshot, renderChain);
-			renderChain.Clear();
-			WasSnapshotDeprecated = false;
+			return null;
 		}
+
+		//public override void Render(Node node)
+		//{
+		//	if (!Animation.IsRunning && !WasSnapshotDeprecated) {
+		//		return;
+		//	}
+
+		//	Scene.RenderToTexture(Snapshot, renderChain);
+		//	renderChain.Clear();
+		//	WasSnapshotDeprecated = false;
+		//}
 
 		public override IPresenter Clone()
 		{

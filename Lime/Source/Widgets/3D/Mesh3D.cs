@@ -99,54 +99,59 @@ namespace Lime
 			CullMode = CullMode.Front;
 		}
 
-		public override void Render()
+		protected internal override RenderObject GetRenderObject()
 		{
-			if (SkipRender) {
-				return;
-			}
-			
-			var lightningEnabled = ProcessLightning && Viewport != null && Viewport.LightSource != null && Viewport.LightSource.Visible;
-			var shadowsEnabled = lightningEnabled && Viewport.LightSource.ShadowMappingEnabled;
-			var oldColorFactor = Renderer.ColorFactor;
-			Renderer.ColorFactor = GlobalColor;
-			Renderer.World = GlobalTransform;
-			Renderer.CullMode = CullMode;
-			var invWorld = GlobalTransform.CalcInverted();
-			foreach (var sm in Submeshes) {
-				var skin = sm.Material as IMaterialSkin;
-				if (skin != null && sm.Bones.Count > 0) {
-					skin.SkinEnabled = sm.Bones.Count > 0;
-					if (skin.SkinEnabled) {
-						if (sharedBoneTransforms.Length < sm.Bones.Count) {
-							sharedBoneTransforms = new Matrix44[sm.Bones.Count];
-						}
-						for (var i = 0; i < sm.Bones.Count; i++) {
-							sharedBoneTransforms[i] = sm.BoneBindPoses[i] * sm.Bones[i].GlobalTransform * invWorld;
-						}
-						skin.SetBones(sharedBoneTransforms, sm.Bones.Count);
-					}
-				}
-				var lightningMaterial = sm.Material as IMaterialLightning;
-				if (lightningMaterial != null) {
-					lightningMaterial.ProcessLightning = lightningEnabled;
-					if (lightningEnabled) {
-						lightningMaterial.SetLightData(Viewport.LightSource);
-					}
-				}
-
-				var shadowMaterial = sm.Material as IMaterialShadowReciever;
-				if (shadowMaterial != null) {
-					shadowMaterial.RecieveShadows = shadowsEnabled && RecieveShadow;
-				}
-
-				for (int i = 0; i < sm.Material.PassCount; i++) {
-					sm.Material.Apply(i);
-					sm.Mesh.DrawIndexed(0, sm.Mesh.Indices.Length);
-				}
-				Renderer.PolyCount3d += sm.Mesh.Indices.Length / 3;
-			}
-			Renderer.ColorFactor = oldColorFactor;
+			return null;
 		}
+
+		//public override void Render()
+		//{
+		//	if (SkipRender) {
+		//		return;
+		//	}
+
+		//	var lightningEnabled = ProcessLightning && Viewport != null && Viewport.LightSource != null && Viewport.LightSource.Visible;
+		//	var shadowsEnabled = lightningEnabled && Viewport.LightSource.ShadowMappingEnabled;
+		//	var oldColorFactor = Renderer.ColorFactor;
+		//	Renderer.ColorFactor = GlobalColor;
+		//	Renderer.World = GlobalTransform;
+		//	Renderer.CullMode = CullMode;
+		//	var invWorld = GlobalTransform.CalcInverted();
+		//	foreach (var sm in Submeshes) {
+		//		var skin = sm.Material as IMaterialSkin;
+		//		if (skin != null && sm.Bones.Count > 0) {
+		//			skin.SkinEnabled = sm.Bones.Count > 0;
+		//			if (skin.SkinEnabled) {
+		//				if (sharedBoneTransforms.Length < sm.Bones.Count) {
+		//					sharedBoneTransforms = new Matrix44[sm.Bones.Count];
+		//				}
+		//				for (var i = 0; i < sm.Bones.Count; i++) {
+		//					sharedBoneTransforms[i] = sm.BoneBindPoses[i] * sm.Bones[i].GlobalTransform * invWorld;
+		//				}
+		//				skin.SetBones(sharedBoneTransforms, sm.Bones.Count);
+		//			}
+		//		}
+		//		var lightningMaterial = sm.Material as IMaterialLightning;
+		//		if (lightningMaterial != null) {
+		//			lightningMaterial.ProcessLightning = lightningEnabled;
+		//			if (lightningEnabled) {
+		//				lightningMaterial.SetLightData(Viewport.LightSource);
+		//			}
+		//		}
+
+		//		var shadowMaterial = sm.Material as IMaterialShadowReciever;
+		//		if (shadowMaterial != null) {
+		//			shadowMaterial.RecieveShadows = shadowsEnabled && RecieveShadow;
+		//		}
+
+		//		for (int i = 0; i < sm.Material.PassCount; i++) {
+		//			sm.Material.Apply(i);
+		//			sm.Mesh.DrawIndexed(0, sm.Mesh.Indices.Length);
+		//		}
+		//		Renderer.PolyCount3d += sm.Mesh.Indices.Length / 3;
+		//	}
+		//	Renderer.ColorFactor = oldColorFactor;
+		//}
 
 		internal protected override bool PartialHitTest (ref HitTestArgs args)
 		{

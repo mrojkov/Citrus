@@ -5,7 +5,7 @@ namespace Lime
 {
 	public interface IPresenter
 	{
-		void Render(Node node);
+		RenderObject GetRenderObject(Node node);
 		bool PartialHitTest(Node node, ref HitTestArgs args);
 		IPresenter Clone();
 	}
@@ -14,16 +14,9 @@ namespace Lime
 	{
 		public static readonly DefaultPresenter Instance = new DefaultPresenter();
 
-		public void Render(Node node)
+		public RenderObject GetRenderObject(Node node)
 		{
-#if PROFILE
-			var watch = System.Diagnostics.Stopwatch.StartNew();
-			node.Render();
-			watch.Stop();
-			NodeProfiler.RegisterRender(node, watch.ElapsedTicks);
-#else
-			node.Render();
-#endif
+			return node.GetRenderObject();
 		}
 
 		public bool PartialHitTest(Node node, ref HitTestArgs args)
@@ -53,11 +46,17 @@ namespace Lime
 			}
 		}
 
-		public void Render(Node node)
+		public Lime.RenderObject GetRenderObject(Node node)
 		{
-			for (int i = Count - 1; i >= 0; i--) {
-				this[i].Render(node);
+			var ro = RenderObjectPool<RenderObject>.Acquire();
+			ro.Objects.Clear();
+			for (var i = Count - 1; i >= 0; i--) {
+				var obj = this[i].GetRenderObject(node);
+				if (obj != null) {
+					ro.Objects.Add(obj);
+				}
 			}
+			return ro;
 		}
 
 		public bool PartialHitTest(Node node, ref HitTestArgs args)
@@ -78,24 +77,64 @@ namespace Lime
 			}
 			return r;
 		}
+
+		private class RenderObject : Lime.RenderObject
+		{
+			public readonly List<Lime.RenderObject> Objects = new List<Lime.RenderObject>();
+
+			public override void Render()
+			{
+				foreach (var obj in Objects) {
+					obj.Render();
+				}
+			}
+		}
 	}
 
 	public class CustomPresenter : IPresenter
 	{
+		public virtual Lime.RenderObject GetRenderObject(Node node)
+		{
+			var ro = RenderObjectPool<RenderObject>.Acquire();
+			ro.Node = node;
+			ro.Presenter = this;
+			return ro;
+		}
+
 		public virtual void Render(Node node) { }
-		public virtual bool PartialHitTest(Node node, ref HitTestArgs args) { return false; }
+
+		private class RenderObject : Lime.RenderObject
+		{
+			public Node Node;
+			public CustomPresenter Presenter;
+
+			public override void Render()
+			{
+				if (!System.Threading.Thread.CurrentThread.IsMain()) {
+					throw new InvalidOperationException();
+				}
+				Presenter.Render(Node);
+			}
+		}
+
+		public virtual bool PartialHitTest(Node node, ref HitTestArgs args) => false;
 		public virtual IPresenter Clone() { return (CustomPresenter)MemberwiseClone(); }
 	}
 
-	public class CustomPresenter<T> : IPresenter where T: Node
+	public class CustomPresenter<T> : CustomPresenter where T: Node
 	{
-		public void Render(Node node) => InternalRender((T)node);
-		public bool PartialHitTest(Node node, ref HitTestArgs args) => InternalPartialHitTest((T)node, ref args);
+		public override sealed void Render(Node node)
+		{
+			InternalRender((T)node);
+		}
+
+		public override sealed bool PartialHitTest(Node node, ref HitTestArgs args)
+		{
+			return InternalPartialHitTest((T)node, ref args);
+		}
 
 		protected virtual void InternalRender(T node) { }
 		protected virtual bool InternalPartialHitTest(T node, ref HitTestArgs args) => false;
-
-		public virtual IPresenter Clone() { return (CustomPresenter<T>)MemberwiseClone(); }
 	}
 
 	public class DelegatePresenter<T> : CustomPresenter where T: Node
@@ -104,7 +143,10 @@ namespace Lime
 		readonly Action<T> render;
 		readonly HitTestDelegate hitTest;
 
-		public DelegatePresenter(Action<T> render) { this.render = render; }
+		public DelegatePresenter(Action<T> render)
+		{
+			this.render = render;
+		}
 
 		public DelegatePresenter(HitTestDelegate hitTest)
 		{
@@ -119,8 +161,7 @@ namespace Lime
 
 		public override void Render(Node node)
 		{
-			if (render != null)
-				render((T)node);
+			render?.Invoke((T)node);
 		}
 
 		public override bool PartialHitTest(Node node, ref HitTestArgs args)
@@ -129,7 +170,7 @@ namespace Lime
 		}
 	}
 
-	public class WidgetBoundsPresenter : CustomPresenter<Widget>
+	public class WidgetBoundsPresenter : IPresenter
 	{
 		public Color4 Color { get; set; }
 		public float Thickness { get; set; }
@@ -141,18 +182,46 @@ namespace Lime
 			Thickness = thickness;
 		}
 
-		protected override void InternalRender(Widget widget)
+		public Lime.RenderObject GetRenderObject(Node node)
 		{
-			widget.PrepareRendererState();
+			var widget = (Widget)node;
+			var ro = RenderObjectPool<RenderObject>.Acquire();
+			ro.CaptureRenderState(widget);
+			ro.Color = Color * widget.GlobalColor;
+			ro.Thickness = Thickness;
 			if (IgnorePadding) {
-				Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Color * widget.GlobalColor, Thickness);
+				ro.Position = Vector2.Zero;
+				ro.Size = widget.Size;
 			} else {
-				Renderer.DrawRectOutline(widget.ContentPosition, widget.ContentSize, Color * widget.GlobalColor, Thickness);
+				ro.Position = widget.ContentPosition;
+				ro.Size = widget.ContentSize;
+			}
+			return ro;
+		}
+
+		public bool PartialHitTest(Node node, ref HitTestArgs args) => false;
+
+		public IPresenter Clone()
+		{
+			return (WidgetBoundsPresenter)MemberwiseClone();
+		}
+
+		private class RenderObject : WidgetRenderObject
+		{
+			public Vector2 Position;
+			public Vector2 Size;
+			public Color4 Color;
+			public float Thickness;
+
+			public override void Render()
+			{
+				PrepareRenderState();
+				Renderer.DrawRectOutline(Position, Size, Color, Thickness);
 			}
 		}
 	}
 
-	public class WidgetFlatFillPresenter : CustomPresenter<Widget>
+	public class WidgetFlatFillPresenter : IPresenter
 	{
 		public Color4 Color { get; set; }
 		public bool IgnorePadding { get; set; }
@@ -162,13 +231,39 @@ namespace Lime
 			Color = color;
 		}
 
-		protected override void InternalRender(Widget widget)
+		public Lime.RenderObject GetRenderObject(Node node)
 		{
-			widget.PrepareRendererState();
+			var widget = (Widget)node;
+			var ro = RenderObjectPool<RenderObject>.Acquire();
+			ro.CaptureRenderState(widget);
+			ro.Color = Color * widget.GlobalColor;
 			if (IgnorePadding) {
-				Renderer.DrawRect(Vector2.Zero, widget.Size, Color * widget.GlobalColor);
+				ro.Position = Vector2.Zero;
+				ro.Size = widget.Size;
 			} else {
-				Renderer.DrawRect(widget.ContentPosition, widget.ContentSize, Color * widget.GlobalColor);
+				ro.Position = widget.ContentPosition;
+				ro.Size = widget.ContentSize;
+			}
+			return ro;
+		}
+
+		public bool PartialHitTest(Node node, ref HitTestArgs args) => false;
+
+		public IPresenter Clone()
+		{
+			return (WidgetFlatFillPresenter)MemberwiseClone();
+		}
+
+		private class RenderObject : WidgetRenderObject
+		{
+			public Vector2 Position;
+			public Vector2 Size;
+			public Color4 Color;
+
+			public override void Render()
+			{
+				PrepareRenderState();
+				Renderer.DrawRect(Position, Size, Color);
 			}
 		}
 	}

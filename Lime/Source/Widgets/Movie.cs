@@ -77,11 +77,11 @@ namespace Lime
 			movieTexture.Update(delta);
 		}
 
-		public override void Render()
-		{
-			PrepareRendererState();
-			Renderer.DrawSprite(movieTexture, GlobalColor, Vector2.Zero, Size, Vector2.Zero, Vector2.One);
-		}
+		//public override void Render()
+		//{
+		//	PrepareRendererState();
+		//	Renderer.DrawSprite(movieTexture, GlobalColor, Vector2.Zero, Size, Vector2.Zero, Vector2.One);
+		//}
 
 		public override void OnTrigger(string property, double animationTimeCorrection = 0)
 		{

@@ -16,7 +16,7 @@ namespace Lime
 
 	public abstract class AssetBundle : IDisposable
 	{
-		[ThreadStatic]
+		//[ThreadStatic]
 		private static AssetBundle current;
 
 		public static AssetBundle Current

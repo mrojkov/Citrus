@@ -930,22 +930,28 @@ namespace Lime
 			}
 		}
 
-		public override void Render()
+		protected internal override Lime.RenderObject GetRenderObject()
 		{
-			Matrix32 matrix = Matrix32.Identity;
-			Color4 color = Color4.White;
-			Widget basicWidget = GetBasicWidget();
-			if (basicWidget != null) {
-				matrix = basicWidget.LocalToWorldTransform;
-				color = basicWidget.GlobalColor;
-			}
-			Renderer.Blending = GlobalBlending;
-			Renderer.Shader = GlobalShader;
-			foreach (var particle in particles) {
-				RenderParticle(particle, matrix, color);
-			}
-			Renderer.Transform1 = basicWidget.LocalToWorldTransform;
+			var ro = RenderObjectPool<RenderObject>.Acquire();
+			return ro;
 		}
+
+		//public override void Render()
+		//{
+		//	Matrix32 matrix = Matrix32.Identity;
+		//	Color4 color = Color4.White;
+		//	Widget basicWidget = GetBasicWidget();
+		//	if (basicWidget != null) {
+		//		matrix = basicWidget.LocalToWorldTransform;
+		//		color = basicWidget.GlobalColor;
+		//	}
+		//	Renderer.Blending = GlobalBlending;
+		//	Renderer.Shader = GlobalShader;
+		//	foreach (var particle in particles) {
+		//		RenderParticle(particle, matrix, color);
+		//	}
+		//	Renderer.Transform1 = basicWidget.LocalToWorldTransform;
+		//}
 
 		public void DeleteAllParticles()
 		{
@@ -1018,6 +1024,13 @@ namespace Lime
 			animator.ReadonlyKeys.Add(2, new Color4(255, 255, 255, 0));
 			defaultModifier.Animators.Add(animator);
 			Nodes.Add(defaultModifier);
+		}
+
+		private class RenderObject : Lime.RenderObject
+		{
+			public override void Render()
+			{
+			}
 		}
 	}
 }

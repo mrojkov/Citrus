@@ -270,27 +270,16 @@ namespace Lime
 			Invalidate();
 		}
 
-		public override void Render()
+		protected internal override Lime.RenderObject GetRenderObject()
 		{
-			var blending = GlobalBlending;
-			var shader = GlobalShader;
 			PrepareSpriteListAndSyncCaret();
-			Renderer.Transform1 = LocalToWorldTransform;
-			var effectiveColor = GlobalColor * textColor;
-			if (GradientMapIndex < 0 || RenderMode == RenderingMode.Common) {
-				spriteList.Render(effectiveColor, blending, shader);
-			} else {
-				if (RenderMode == RenderingMode.OnePassWithOutline || RenderMode == RenderingMode.TwoPasses) {
-					ColorfulMaterialProvider.Instance.Init(blending, GradientMapIndex);
-					spriteList.Render(effectiveColor, ColorfulMaterialProvider.Instance);
-				}
-
-				if (RenderMode == RenderingMode.OnePassWithoutOutline || RenderMode == RenderingMode.TwoPasses) {
-					ColorfulMaterialProvider.Instance.Init(
-							blending, ShaderPrograms.ColorfulTextShaderProgram.GradientMapTextureSize - GradientMapIndex - 1);
-					spriteList.Render(effectiveColor, ColorfulMaterialProvider.Instance);
-				}
-			}
+			var ro = RenderObjectPool<RenderObject>.Acquire();
+			ro.CaptureRenderState(this);
+			ro.SpriteList = spriteList;
+			ro.GradientMapIndex = GradientMapIndex;
+			ro.RenderMode = RenderMode;
+			ro.Color = GlobalColor * textColor;
+			return ro;
 		}
 
 		void IText.SyncCaretPosition()
@@ -529,6 +518,33 @@ namespace Lime
 			var clone = base.Clone() as SimpleText;
 			clone.Caret = clone.Caret.Clone();
 			return clone;
+		}
+
+		private class RenderObject : WidgetRenderObject
+		{
+			public SpriteList SpriteList;
+			public int GradientMapIndex;
+			public RenderingMode RenderMode;
+			public Color4 Color;
+
+			public override void Render()
+			{
+				Renderer.Transform1 = LocalToWorldTransform;
+				if (GradientMapIndex < 0 || RenderMode == RenderingMode.Common) {
+					SpriteList.Render(Color, Blending, Shader);
+				} else {
+					if (RenderMode == RenderingMode.OnePassWithOutline || RenderMode == RenderingMode.TwoPasses) {
+						ColorfulMaterialProvider.Instance.Init(Blending, GradientMapIndex);
+						SpriteList.Render(Color, ColorfulMaterialProvider.Instance);
+					}
+
+					if (RenderMode == RenderingMode.OnePassWithoutOutline || RenderMode == RenderingMode.TwoPasses) {
+						ColorfulMaterialProvider.Instance.Init(
+							Blending, ShaderPrograms.ColorfulTextShaderProgram.GradientMapTextureSize - GradientMapIndex - 1);
+						SpriteList.Render(Color, ColorfulMaterialProvider.Instance);
+					}
+				}
+			}
 		}
 
 		private class ColorfulMaterialProvider : Sprite.IMaterialProvider

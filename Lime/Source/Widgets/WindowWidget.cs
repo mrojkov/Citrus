@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace Lime
 {
@@ -10,6 +12,15 @@ namespace Lime
 	[YuzuDontGenerateDeserializer]
 	public class WindowWidget : Widget
 	{
+		private const int SwapCount = 2;
+
+		private ManualResetEvent renderQueueChanged = new ManualResetEvent(false);
+		private ManualResetEvent updateQueueChanged = new ManualResetEvent(true);
+
+		private ConcurrentQueue<RenderObjectList> renderQueue = new ConcurrentQueue<RenderObjectList>();
+		private ConcurrentQueue<RenderObjectList> updateQueue = new ConcurrentQueue<RenderObjectList>();
+		private RenderObjectList syncRenderObjects = new RenderObjectList();
+
 		private bool windowActivated;
 		private Widget lastFocused;
 		protected readonly RenderChain renderChain;
@@ -26,6 +37,9 @@ namespace Lime
 			WidgetContext.GestureManager = new GestureManager(WidgetContext);
 			window.Activated += () => windowActivated = true;
 			LayoutManager = new LayoutManager();
+			for (var i = 0; i < SwapCount; i++) {
+				updateQueue.Enqueue(new RenderObjectList());
+			}
 		}
 
 		protected virtual bool ContinuousRendering() { return true; }
@@ -53,7 +67,7 @@ namespace Lime
 
 			// Update the widget hierarchy.
 			context.MouseCursor = MouseCursor.Default;
-			base.Update (delta);
+			base.Update(delta);
 			Window.Cursor = context.MouseCursor;
 
 			// Set NodeCapturedByMouse to null if all mouse buttons were released.
@@ -68,11 +82,28 @@ namespace Lime
 
 			// Refresh widgets layout.
 			LayoutManager.Layout();
+			
+			RaiseUpdating(delta);
 
 			// Rebuild the render chain.
 			renderChain.Clear();
 			renderChain.ClipRegion = new Rectangle(Vector2.Zero, Size);
 			RenderChainBuilder?.AddToRenderChain(renderChain);
+
+			if (Window.AsyncRendering) {
+				RenderObjectList renderObjects;
+				while (!updateQueue.TryDequeue(out renderObjects)) {
+					updateQueueChanged.WaitOne();
+				}
+				updateQueueChanged.Reset();
+				renderObjects.Clear();
+				renderChain.GetRenderObjects(renderObjects);
+				renderQueue.Enqueue(renderObjects);
+				renderQueueChanged.Set();
+			} else {
+				syncRenderObjects.Clear();
+				renderChain.GetRenderObjects(syncRenderObjects);
+			}
 
 			ManageFocusOnWindowActivation();
 		}
@@ -124,10 +155,29 @@ namespace Lime
 			return n;
 		}
 
-		public virtual void RenderAll()
+		public void RenderAll()
+		{
+			if (Window.AsyncRendering) {
+				RenderObjectList renderObjects;
+				while (!renderQueue.TryDequeue(out renderObjects)) {
+					renderQueueChanged.WaitOne();
+				}
+				renderQueueChanged.Reset();
+				Render(renderObjects);
+				updateQueue.Enqueue(renderObjects);
+				updateQueueChanged.Set();
+			} else {
+				Render(syncRenderObjects);
+			}
+		}
+
+		protected virtual void Render(RenderObjectList renderObjects)
 		{
 			Renderer.Viewport = new Viewport(GetViewport());
-			renderChain.Render();
+			foreach (var ro in renderObjects) {
+				ro.Render();
+				ro.Rendered = true;
+			}
 		}
 
 		public WindowRect GetViewport()
@@ -199,9 +249,9 @@ namespace Lime
 
 		protected override bool ContinuousRendering() { return false; }
 
-		public override void RenderAll ()
+		protected override void Render(RenderObjectList renderObjects)
 		{
-			base.RenderAll ();
+			base.Render(renderObjects);
 			if (RedrawMarkVisible) {
 				RenderRedrawMark();
 			}

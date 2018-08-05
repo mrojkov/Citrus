@@ -62,21 +62,21 @@ namespace Lime
 			}
 		}
 
-		public override void Render()
-		{
-			if (Widget == null) {
-				return;
-			}
-			Widget.RenderChainBuilder?.AddToRenderChain(renderChain);
-			var oldCullMode = Renderer.CullMode;
-			var oldWorld = Renderer.World;
-			Renderer.CullMode = CullMode.None;
-			Renderer.World = Matrix44.CreateScale(new Vector3(1, -1, 1)) * GlobalTransform;
-			renderChain.RenderAndClear();
-			Renderer.Flush();
-			Renderer.World = oldWorld;
-			Renderer.CullMode = oldCullMode;
-		}
+		//public override void Render()
+		//{
+		//	if (Widget == null) {
+		//		return;
+		//	}
+		//	Widget.RenderChainBuilder?.AddToRenderChain(renderChain);
+		//	var oldCullMode = Renderer.CullMode;
+		//	var oldWorld = Renderer.World;
+		//	Renderer.CullMode = CullMode.None;
+		//	Renderer.World = Matrix44.CreateScale(new Vector3(1, -1, 1)) * GlobalTransform;
+		//	renderChain.RenderAndClear();
+		//	Renderer.Flush();
+		//	Renderer.World = oldWorld;
+		//	Renderer.CullMode = oldCullMode;
+		//}
 
 		internal protected override bool PartialHitTest(ref HitTestArgs args)
 		{

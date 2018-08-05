@@ -156,54 +156,63 @@ namespace Lime
 			}
 		}
 
-		public override void Render()
-		{
-			if (Camera == null) {
-				return;
-			}
-			AdjustCameraAspectRatio();
-			foreach (var node in Nodes) {
-				node.RenderChainBuilder?.AddToRenderChain(renderChain);
-			}
-			var oldWorld = Renderer.World;
-			var oldView = Renderer.View;
-			var oldProj = Renderer.Projection;
-			var oldDepthState = Renderer.DepthState;
-			var oldCullMode = Renderer.CullMode;
-			Renderer.Flush();
-			Renderer.Clear(ClearOptions.DepthBuffer);
-			Renderer.View = Camera.View;
-			Renderer.Projection = TransformProjection(Renderer.Projection);
-			for (var i = 0; i < RenderChain.LayerCount; i++) {
-				var layer = renderChain.Layers[i];
-				if (layer == null || layer.Count == 0) {
-					continue;
-				}
-				foreach (var item in layer) {
-					var p = item.Node as IZSorterParams;
-					if (p == null) {
-						continue;
-					}
-					var list = p.Opaque ? opaqueList : transparentList;
-					list.Add(new RenderItem {
-						Node = item.Node,
-						Presenter = item.Presenter,
-						Distance = p.CalcDistanceToCamera(Camera)
-					});
-				}
-				Renderer.DepthState = DepthState.DepthReadWrite;
-				SortAndFlushList(opaqueList, RenderOrderComparers.FrontToBack);
-				Renderer.DepthState = DepthState.DepthRead;
-				SortAndFlushList(transparentList, RenderOrderComparers.BackToFront);
-			}
-			renderChain.Clear();
-			Renderer.Clear(ClearOptions.DepthBuffer);
-			Renderer.World = oldWorld;
-			Renderer.View = oldView;
-			Renderer.Projection = oldProj;
-			Renderer.DepthState = oldDepthState;
-			Renderer.CullMode = oldCullMode;
-		}
+		//public override void Render()
+		//{
+		//	if (Camera == null) {
+		//		return;
+		//	}
+		//	AdjustCameraAspectRatio();
+		//	foreach (var node in Nodes) {
+		//		node.RenderChainBuilder?.AddToRenderChain(renderChain);
+		//	}
+		//	var oldWorld = Renderer.World;
+		//	var oldView = Renderer.View;
+		//	var oldProj = Renderer.Projection;
+		//	var oldDepthState = Renderer.DepthState;
+		//	var oldCullMode = Renderer.CullMode;
+		//	Renderer.Flush();
+		//	Renderer.Clear(ClearOptions.DepthBuffer);
+		//	Renderer.View = Camera.View;
+		//	Renderer.Projection = TransformProjection(Renderer.Projection);
+		//	for (var i = 0; i < RenderChain.LayerCount; i++) {
+		//		var layer = renderChain.Layers[i];
+		//		if (layer == null || layer.Count == 0) {
+		//			continue;
+		//		}
+		//		foreach (var item in layer) {
+		//			var p = item.Node as IZSorterParams;
+		//			if (p == null) {
+		//				continue;
+		//			}
+		//			var list = p.Opaque ? opaqueList : transparentList;
+		//			list.Add(new RenderItem {
+		//				Node = item.Node,
+		//				Presenter = item.Presenter,
+		//				Distance = p.CalcDistanceToCamera(Camera)
+		//			});
+		//		}
+		//		Renderer.DepthState = DepthState.DepthReadWrite;
+		//		SortAndFlushList(opaqueList, RenderOrderComparers.FrontToBack);
+		//		Renderer.DepthState = DepthState.DepthRead;
+		//		SortAndFlushList(transparentList, RenderOrderComparers.BackToFront);
+		//	}
+		//	renderChain.Clear();
+		//	Renderer.Clear(ClearOptions.DepthBuffer);
+		//	Renderer.World = oldWorld;
+		//	Renderer.View = oldView;
+		//	Renderer.Projection = oldProj;
+		//	Renderer.DepthState = oldDepthState;
+		//	Renderer.CullMode = oldCullMode;
+		//}
+
+		//private void SortAndFlushList(List<RenderItem> items, IComparer<RenderItem> comparer)
+		//{
+		//	items.Sort(comparer);
+		//	foreach (var i in items) {
+		//		i.Presenter.Render(i.Node);
+		//	}
+		//	items.Clear();
+		//}
 
 		public override Node Clone()
 		{
@@ -213,15 +222,6 @@ namespace Lime
 			vp.CameraRef = CameraRef?.Clone();
 			vp.LightSourceRef = LightSourceRef?.Clone();
 			return vp;
-		}
-
-		private void SortAndFlushList(List<RenderItem> items, IComparer<RenderItem> comparer)
-		{
-			items.Sort(comparer);
-			foreach (var i in items) {
-				i.Presenter.Render(i.Node);
-			}
-			items.Clear();
 		}
 
 		public Matrix44 TransformProjection(Matrix44 orthoProjection)

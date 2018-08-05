@@ -1250,40 +1250,40 @@ namespace Lime
 		/// <param name="clearRenderTarget">Whether to clear texture before rendering or not.</param>
 		public void RenderToTexture(ITexture texture, RenderChain renderChain, bool clearRenderTarget = true)
 		{
-			if (Width > 0 && Height > 0) {
-				var savedScissorState = Renderer.ScissorState;
-				texture.SetAsRenderTarget();
-				var savedViewport = Renderer.Viewport;
-				var savedWorld = Renderer.World;
-				var savedView = Renderer.View;
-				var savedProj = Renderer.Projection;
-				var savedDepthState = Renderer.DepthState;
-				var savedCullMode = Renderer.CullMode;
-				var savedTransform2 = Renderer.Transform2;
-				Renderer.ScissorState = ScissorState.ScissorDisabled;
-				Renderer.Viewport = new Viewport(0, 0, texture.ImageSize.Width, texture.ImageSize.Height);
-				if (clearRenderTarget) {
-					Renderer.Clear(new Color4(0, 0, 0, 0));
-				}
-				Renderer.World = Renderer.View = Matrix44.Identity;
-				Renderer.SetOrthogonalProjection(0, 0, Width, Height);
-				Renderer.DepthState = DepthState.DepthDisabled;
-				Renderer.CullMode = CullMode.None;
-				Renderer.Transform2 = LocalToWorldTransform.CalcInversed();
-				for (var node = FirstChild; node != null; node = node.NextSibling) {
-					node.RenderChainBuilder?.AddToRenderChain(renderChain);
-				}
-				renderChain.RenderAndClear();
-				texture.RestoreRenderTarget();
-				Renderer.Transform2 = savedTransform2;
-				Renderer.Viewport = savedViewport;
-				Renderer.World = savedWorld;
-				Renderer.View = savedView;
-				Renderer.Projection = savedProj;
-				Renderer.ScissorState = savedScissorState;
-				Renderer.DepthState = savedDepthState;
-				Renderer.CullMode = savedCullMode;
-			}
+			//if (Width > 0 && Height > 0) {
+			//	var savedScissorState = Renderer.ScissorState;
+			//	texture.SetAsRenderTarget();
+			//	var savedViewport = Renderer.Viewport;
+			//	var savedWorld = Renderer.World;
+			//	var savedView = Renderer.View;
+			//	var savedProj = Renderer.Projection;
+			//	var savedDepthState = Renderer.DepthState;
+			//	var savedCullMode = Renderer.CullMode;
+			//	var savedTransform2 = Renderer.Transform2;
+			//	Renderer.ScissorState = ScissorState.ScissorDisabled;
+			//	Renderer.Viewport = new Viewport(0, 0, texture.ImageSize.Width, texture.ImageSize.Height);
+			//	if (clearRenderTarget) {
+			//		Renderer.Clear(new Color4(0, 0, 0, 0));
+			//	}
+			//	Renderer.World = Renderer.View = Matrix44.Identity;
+			//	Renderer.SetOrthogonalProjection(0, 0, Width, Height);
+			//	Renderer.DepthState = DepthState.DepthDisabled;
+			//	Renderer.CullMode = CullMode.None;
+			//	Renderer.Transform2 = LocalToWorldTransform.CalcInversed();
+			//	for (var node = FirstChild; node != null; node = node.NextSibling) {
+			//		node.RenderChainBuilder?.AddToRenderChain(renderChain);
+			//	}
+			//	renderChain.RenderAndClear();
+			//	texture.RestoreRenderTarget();
+			//	Renderer.Transform2 = savedTransform2;
+			//	Renderer.Viewport = savedViewport;
+			//	Renderer.World = savedWorld;
+			//	Renderer.View = savedView;
+			//	Renderer.Projection = savedProj;
+			//	Renderer.ScissorState = savedScissorState;
+			//	Renderer.DepthState = savedDepthState;
+			//	Renderer.CullMode = savedCullMode;
+			//}
 		}
 
 		/// <summary>

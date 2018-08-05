@@ -16,11 +16,12 @@ namespace Lime
 		private HAlignment hAlignment;
 		private VAlignment vAlignment;
 		private TextOverflowMode overflowMode;
-		public SpriteList spriteList;
+		private SpriteList spriteList;
 		private TextRenderer renderer;
 		private string displayText;
 		private TextProcessorDelegate textProcessor;
 		private int maxDisplayCharacters = -1;
+		private int[] gradientMapIndices;
 
 		[YuzuMember]
 		[TangerineKeyframeColor(12)]
@@ -176,19 +177,15 @@ namespace Lime
 			Invalidate();
 		}
 
-		public override void Render()
+		protected internal override Lime.RenderObject GetRenderObject()
 		{
-			var blending = GlobalBlending;
-			var shader = GlobalShader;
 			EnsureSpriteList();
-			Lime.Renderer.Transform1 = LocalToWorldTransform;
-			ColorfulMaterialProvider.Instance.Init(blending, shader, renderer);
-			spriteList.Render(GlobalColor, ColorfulMaterialProvider.Instance);
-			if (InvertStylesPalleteIndex()) {
-				ColorfulMaterialProvider.Instance.Init(blending, shader, renderer);
-				spriteList.Render(GlobalColor, ColorfulMaterialProvider.Instance);
-				InvertStylesPalleteIndex();
-			}
+			var ro = RenderObjectPool<RenderObject>.Acquire();
+			ro.CaptureRenderState(this);
+			ro.SpriteList = spriteList;
+			ro.GradientMapIndices = gradientMapIndices;
+			ro.Color = GlobalColor;
+			return ro;
 		}
 
 		private void EnsureSpriteList()
@@ -196,6 +193,10 @@ namespace Lime
 			if (spriteList == null) {
 				spriteList = new SpriteList();
 				PrepareRenderer().Render(spriteList, Size, HAlignment, VAlignment, maxDisplayCharacters);
+				gradientMapIndices = new int[renderer.Styles.Count];
+				for (var i = 0; i < gradientMapIndices.Length; i++) {
+					gradientMapIndices[i] = renderer.Styles[i].GradientMapIndex;
+				}
 			}
 		}
 
@@ -275,6 +276,7 @@ namespace Lime
 		public void Invalidate()
 		{
 			spriteList = null;
+			gradientMapIndices = null;
 			parser = null;
 			renderer = null;
 			displayText = null;
@@ -342,6 +344,37 @@ namespace Lime
 			}
 		}
 
+		private class RenderObject : WidgetRenderObject
+		{
+			public SpriteList SpriteList;
+			public int[] GradientMapIndices;
+			public Color4 Color;
+
+			public override void Render()
+			{
+				Renderer.Transform1 = LocalToWorldTransform;
+				ColorfulMaterialProvider.Instance.Init(Blending, Shader, GradientMapIndices);
+				SpriteList.Render(Color, ColorfulMaterialProvider.Instance);
+				if (InvertGradientMapIndices()) {
+					ColorfulMaterialProvider.Instance.Init(Blending, Shader, GradientMapIndices);
+					SpriteList.Render(Color, ColorfulMaterialProvider.Instance);
+					InvertGradientMapIndices();
+				}
+			}
+
+			private bool InvertGradientMapIndices()
+			{
+				bool dirty = false;
+				for (var i = 0; i < GradientMapIndices.Length; i++) {
+					if (GradientMapIndices[i] != -1) {
+						GradientMapIndices[i] = ShaderPrograms.ColorfulTextShaderProgram.GradientMapTextureSize - GradientMapIndices[i] - 1;
+						dirty = true;
+					}
+				}
+				return dirty;
+			}
+		}
+
 		private class ColorfulMaterialProvider : Sprite.IMaterialProvider
 		{
 			public static readonly ColorfulMaterialProvider Instance = new ColorfulMaterialProvider();
@@ -349,22 +382,22 @@ namespace Lime
 			private ShaderId shader;
 			private Blending blending;
 			private IMaterial material;
-			private TextRenderer textRenderer;
 			private int gradientMapIndex;
+			private int[] gradientMapIndices;
 
-			public void Init(Blending blending, ShaderId shader, TextRenderer textRenderer)
+			public void Init(Blending blending, ShaderId shader, int[] gradientMapIndices)
 			{
 				this.blending = blending;
 				this.shader = shader;
-				this.textRenderer = textRenderer;
+				this.gradientMapIndices = gradientMapIndices;
 				material = null;
 			}
 
 			public IMaterial GetMaterial(int tag)
 			{
-				var style = textRenderer.Styles[tag];
-				if (material == null || gradientMapIndex != style.GradientMapIndex) {
-					gradientMapIndex = style.GradientMapIndex;
+				var styleGradientMapIndex = gradientMapIndices[tag];
+				if (material == null || gradientMapIndex != styleGradientMapIndex) {
+					gradientMapIndex = styleGradientMapIndex;
 					if (gradientMapIndex < 0) {
 						material = WidgetMaterial.GetInstance(blending, shader, 1);
 					} else {

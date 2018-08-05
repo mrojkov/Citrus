@@ -98,108 +98,23 @@ namespace Lime
 			}
 		}
 
-		static readonly Vector2[] outVertices = new Vector2[64];
-
-		private void ClipPolygonByLine(Vector2[] vertices, ref int numVertices, Vector2 a, Vector2 b)
-		{
-			const float Eps = 1e-5f;
-			int numOutVertices = 0;
-			for (int i = 0; i < numVertices; i++) {
-				int j = (i < numVertices - 1) ? i + 1 : 0;
-				Vector2 u = vertices[i];
-				Vector2 v = vertices[j];
-
-				float d1 = (u.Y - a.Y) * (b.X - a.X) - (u.X - a.X) * (b.Y - a.Y);
-				float d2 = (v.Y - a.Y) * (b.X - a.X) - (v.X - a.X) * (b.Y - a.Y);
-
-				int s1 = Math.Abs(d1) < Eps ? 0 : ((d1 < 0) ? -1 : 1);
-				int s2 = Math.Abs(d2) < Eps ? 0 : ((d2 < 0) ? -1 : 1);
-
-				// if the first point lies inside visible half-plane or on the line, then include it into list.
-				if (s1 >= 0)
-					outVertices[numOutVertices++] = u;
-				// the line crosses the edge.
-				if (s1 > 0 && s2 < 0 || s1 < 0 && s2 > 0) {
-					float z = (v.X - u.X) * (b.Y - a.Y) - (v.Y - u.Y) * (b.X - a.X);
-					float t = d1 / z;
-					Vector2 p;
-					p.X = u.X + (v.X - u.X) * t;
-					p.Y = u.Y + (v.Y - u.Y) * t;
-					outVertices[numOutVertices++] = p;
-				}
-			}
-			if (numOutVertices < 3)
-				numVertices = 0;
-			else {
-				for (int i = 0; i < numOutVertices; i++)
-					vertices[i] = outVertices[i];
-				numVertices = numOutVertices;
-			}
-		}
-
-		static readonly Vector2[] coords = new Vector2[8];
-		static readonly Vector2[] stencil = new Vector2[4];
-		static readonly Vertex[] vertices = new Vertex[8];
-		static readonly Vector2[] rect = {
-			new Vector2(0, 0),
-			new Vector2(1, 0),
-			new Vector2(1, 1),
-			new Vector2(0, 1)
-		};
-
-		private void RenderHelper(IImageCombinerArg arg1, IImageCombinerArg arg2, IMaterial material, ITexture texture1, ITexture texture2)
-		{
-			Matrix32 transform1 = Matrix32.Scaling(arg1.Size) * arg1.CalcLocalToParentTransform();
-			Matrix32 transform2 = Matrix32.Scaling(arg2.Size) * arg2.CalcLocalToParentTransform();
-			// source rectangle
-			int numCoords = 4;
-			for (int i = 0; i < 4; i++)
-				coords[i] = rect[i] * transform1;
-			for (int i = 0; i < 4; i++)
-				stencil[i] = rect[i] * transform2;
-			bool clockwiseOrder = AreVectorsClockwiseOrdered(stencil[0], stencil[1], stencil[2]);
-			// clip invisible parts
-			for (int i = 0; i < 4; i++) {
-				int j = (i < 3) ? i + 1 : 0;
-				Vector2 v1 = clockwiseOrder ? stencil[j] : stencil[i];
-				Vector2 v2 = clockwiseOrder ? stencil[i] : stencil[j];
-				ClipPolygonByLine(coords, ref numCoords, v1, v2);
-			}
-			if (numCoords < 3)
-				return;
-			// Эти матрицы переводят координаты вершин изображения в текстурные координаты.
-			Matrix32 uvTransform1 = transform1.CalcInversed();
-			Matrix32 uvTransform2 = transform2.CalcInversed();
-			Color4 color = arg1.Color * arg2.Color * Parent.AsWidget.GlobalColor;
-			for (int i = 0; i < numCoords; i++) {
-				vertices[i].Pos = coords[i];
-				vertices[i].Color = color;
-				var uv1 = coords[i] * uvTransform1 * arg1.UVTransform;
-				var uv2 = coords[i] * uvTransform2 * arg2.UVTransform;
-				vertices[i].UV1 = uv1;
-				vertices[i].UV2 = uv2;
-			}
-			Renderer.DrawTriangleFan(texture1, texture2, material, vertices, numCoords);
-		}
-
-		public override void Render()
+		protected internal override Lime.RenderObject GetRenderObject()
 		{
 			if (Parent.AsWidget == null) {
-				return;
+				return null;
 			}
 			IImageCombinerArg arg1, arg2;
 			if (!GetArgs(out arg1, out arg2)) {
-				return;
+				return null;
 			}
 			if (!arg1.GloballyVisible || !arg2.GloballyVisible) {
-				return;
+				return null;
 			}
 			var texture1 = arg1.GetTexture();
 			var texture2 = arg2.GetTexture();
 			if (texture1 == null || texture2 == null) {
-				return;
+				return null;
 			}
-			Renderer.Transform1 = Parent.AsWidget.LocalToWorldTransform;
 			var blending = Blending == Blending.Inherited ? Parent.AsWidget.GlobalBlending : Blending;
 			var material = CustomMaterial;
 			if (material == null) {
@@ -213,7 +128,113 @@ namespace Lime
 				}
 				material = WidgetMaterial.GetInstance(blending, shader, WidgetMaterial.GetNumTextures(texture1, texture2));
 			}
-			RenderHelper(arg1, arg2, material, texture1, texture2);
+			var ro = RenderObjectPool<RenderObject>.Acquire();
+			ro.Material = material;
+			ro.Arg1Texture = texture1;
+			ro.Arg2Texture = texture2;
+			ro.Arg1Transform = Matrix32.Scaling(arg1.Size) * arg1.CalcLocalToParentTransform();
+			ro.Arg2Transform = Matrix32.Scaling(arg2.Size) * arg2.CalcLocalToParentTransform();
+			ro.Arg1UVTransform = arg1.UVTransform;
+			ro.Arg2UVTransform = arg2.UVTransform;
+			ro.LocalToWorldTransform = Parent.AsWidget.LocalToWorldTransform;
+			ro.Color = arg1.Color * arg2.Color * Parent.AsWidget.GlobalColor;
+			return ro;
+		}
+
+		private class RenderObject : Lime.RenderObject
+		{
+			public Matrix32 LocalToWorldTransform;
+			public Matrix32 Arg1Transform;
+			public Matrix32 Arg2Transform;
+			public Matrix32 Arg1UVTransform;
+			public Matrix32 Arg2UVTransform;
+			public IMaterial Material;
+			public ITexture Arg1Texture;
+			public ITexture Arg2Texture;
+			public Color4 Color;
+
+			static readonly Vector2[] coords = new Vector2[8];
+			static readonly Vector2[] stencil = new Vector2[4];
+			static readonly Vertex[] vertices = new Vertex[8];
+			static readonly Vector2[] rect = {
+				new Vector2(0, 0),
+				new Vector2(1, 0),
+				new Vector2(1, 1),
+				new Vector2(0, 1)
+			};
+
+			public override void Render()
+			{
+				// source rectangle
+				int numCoords = 4;
+				for (int i = 0; i < 4; i++) {
+					coords[i] = rect[i] * Arg1Transform;
+					stencil[i] = rect[i] * Arg2Transform;
+				}
+				bool clockwiseOrder = AreVectorsClockwiseOrdered(stencil[0], stencil[1], stencil[2]);
+				// clip invisible parts
+				for (int i = 0; i < 4; i++) {
+					int j = (i < 3) ? i + 1 : 0;
+					Vector2 v1 = clockwiseOrder ? stencil[j] : stencil[i];
+					Vector2 v2 = clockwiseOrder ? stencil[i] : stencil[j];
+					ClipPolygonByLine(coords, ref numCoords, v1, v2);
+				}
+				if (numCoords < 3) {
+					return;
+				}
+				// Эти матрицы переводят координаты вершин изображения в текстурные координаты.
+				var uvTransform1 = Arg1Transform.CalcInversed();
+				var uvTransform2 = Arg2Transform.CalcInversed();
+				for (int i = 0; i < numCoords; i++) {
+					vertices[i].Pos = coords[i];
+					vertices[i].Color = Color;
+					var uv1 = coords[i] * uvTransform1 * Arg1UVTransform;
+					var uv2 = coords[i] * uvTransform2 * Arg2UVTransform;
+					vertices[i].UV1 = uv1;
+					vertices[i].UV2 = uv2;
+				}
+				Renderer.Transform1 = LocalToWorldTransform;
+				Renderer.DrawTriangleFan(Arg1Texture, Arg2Texture, Material, vertices, numCoords);
+			}
+
+			static readonly Vector2[] outVertices = new Vector2[64];
+
+			private void ClipPolygonByLine(Vector2[] vertices, ref int numVertices, Vector2 a, Vector2 b)
+			{
+				const float Eps = 1e-5f;
+				int numOutVertices = 0;
+				for (int i = 0; i < numVertices; i++) {
+					int j = (i < numVertices - 1) ? i + 1 : 0;
+					Vector2 u = vertices[i];
+					Vector2 v = vertices[j];
+
+					float d1 = (u.Y - a.Y) * (b.X - a.X) - (u.X - a.X) * (b.Y - a.Y);
+					float d2 = (v.Y - a.Y) * (b.X - a.X) - (v.X - a.X) * (b.Y - a.Y);
+
+					int s1 = Math.Abs(d1) < Eps ? 0 : ((d1 < 0) ? -1 : 1);
+					int s2 = Math.Abs(d2) < Eps ? 0 : ((d2 < 0) ? -1 : 1);
+
+					// if the first point lies inside visible half-plane or on the line, then include it into list.
+					if (s1 >= 0)
+						outVertices[numOutVertices++] = u;
+					// the line crosses the edge.
+					if (s1 > 0 && s2 < 0 || s1 < 0 && s2 > 0) {
+						float z = (v.X - u.X) * (b.Y - a.Y) - (v.Y - u.Y) * (b.X - a.X);
+						float t = d1 / z;
+						Vector2 p;
+						p.X = u.X + (v.X - u.X) * t;
+						p.Y = u.Y + (v.Y - u.Y) * t;
+						outVertices[numOutVertices++] = p;
+					}
+				}
+				if (numOutVertices < 3) {
+					numVertices = 0;
+				} else {
+					for (int i = 0; i < numOutVertices; i++)
+						vertices[i] = outVertices[i];
+					numVertices = numOutVertices;
+				}
+			}
 		}
 	}
 }
