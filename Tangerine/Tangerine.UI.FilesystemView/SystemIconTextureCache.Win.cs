@@ -28,6 +28,11 @@ namespace Tangerine.UI.FilesystemView
 				return TexturePool.Instance.GetTexture(null);
 			}
 			bool isDirectory = (attr & FileAttributes.Directory) == FileAttributes.Directory;
+			if (isDirectory) {
+				if (new DirectoryInfo(path).Parent == null) {
+					isDirectory = false;
+				}
+			}
 			if (isDirectory && directoryTexture != null) {
 				return directoryTexture;
 			}
