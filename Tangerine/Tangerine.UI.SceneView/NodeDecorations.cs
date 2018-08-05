@@ -33,6 +33,19 @@ namespace Tangerine.UI.SceneView
 		AnimationPath,
 	}
 
+	public static class NodeDecorationUtils
+	{
+		public static bool DisplayCondition(NodeDecoration decoration, Widget widget)
+		{
+			return decoration.RequiredToDisplay() && (widget.GloballyVisible || NodeDecoration.Invisible.RequiredToDisplay());
+		}
+
+		public static bool DisplayCondition(NodeDecoration decoration, Node3D node)
+		{
+			return decoration.RequiredToDisplay() && (node.GloballyVisible || NodeDecoration.Invisible.RequiredToDisplay());
+		}
+	}
+
 	public static class NodeDecorationExtentions
 	{
 		private static readonly Dictionary<Type, NodeDecoration> typeToDecoration = GenerateTypeToDecorationDictionary();

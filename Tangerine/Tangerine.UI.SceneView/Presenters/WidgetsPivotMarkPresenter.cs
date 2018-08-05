@@ -37,11 +37,8 @@ namespace Tangerine.UI.SceneView
 
 		public static IEnumerable<Widget> WidgetsWithDisplayedPivot()
 		{
-			var widgets = Core.Document.Current.Container.Nodes.Editable().OfType<Widget>();
-			if (NodeDecoration.Invisible.RequiredToDisplay()) {
-				return widgets.Where(w => w.Color.A == 0 || !w.Visible || w.GetType().ToNodeDecoration().RequiredToDisplay());
-			}
-			return widgets.Where(w => w.GetType().ToNodeDecoration().RequiredToDisplay());
+			return Core.Document.Current.Container.Nodes.Editable().OfType<Widget>()
+				.Where(w => NodeDecorationUtils.DisplayCondition(w.GetType().ToNodeDecoration(), w));
 		}
 	}
 }
