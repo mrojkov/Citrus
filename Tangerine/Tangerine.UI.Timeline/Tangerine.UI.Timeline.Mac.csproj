@@ -117,6 +117,7 @@
     <Compile Include="Processors\ImageCombinerIndicationProcessor.cs" />
     <Compile Include="Components\ShowTiedNodesContextMenu.cs" />
     <Compile Include="Processors\TiedIndicationProcessor.cs" />
+    <Compile Include="Operations\InsertKeyframes.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tangerine.Core\Tangerine.Core.Mac.csproj">
