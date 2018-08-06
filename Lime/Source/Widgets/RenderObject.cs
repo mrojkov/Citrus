@@ -62,6 +62,7 @@ namespace Lime
 			for (int i = index; i < items.Length; i++) {
 				items[i] = new T();
 			}
+			items[index].Rendered = false;
 			return items[index];
 		}
 	}
