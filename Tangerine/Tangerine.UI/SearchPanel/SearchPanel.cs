@@ -34,21 +34,10 @@ namespace Tangerine.UI
 			RootWidget = new Frame { Id = "SearchPanel",
 				Padding = new Thickness(4),
 				Layout = new VBoxLayout { Spacing = 4 },
-				Nodes = { (searchStringEditor = new ThemedEditBox()), scrollView }
+				Nodes = { (searchStringEditor = new ThemedEditBox()) }
 			};
 			resultPane = scrollView.Content;
-			RootWidget.AddChangeWatcher(() => searchStringEditor.Text, RefreshResultPane);
-			scrollView.TabTravesable = new TabTraversable();
-			resultPane.CompoundPresenter.Insert(0, new DelegatePresenter<Widget>(w => {
-				w.PrepareRendererState();
-				if (scrollView.IsFocused() && results.Count > 0) {
-					Renderer.DrawRect(
-						0, rowHeight * selectedIndex,
-						w.Width, (selectedIndex + 1) * rowHeight,
-						Theme.Colors.SelectedBackground);
-				}
-			}));
-			scrollView.LateTasks.Add(new KeyRepeatHandler(ScrollView_KeyRepeated));
+			new TreeView(RootWidget, Document.Current.RootNode);
 		}
 
 		private void ScrollView_KeyRepeated(WidgetInput input, Key key)
