@@ -448,8 +448,8 @@ namespace Tangerine.UI.FilesystemView
 					break;
 				}
 			case DragState.Selecting: {
-					if (Window.Current.Input.WasKeyReleased(Key.Mouse0)) {
-						Window.Current.Input.ConsumeKey(Key.Mouse0);
+					if (Application.Input.WasKeyReleased(Key.Mouse0)) {
+						Application.Input.ConsumeKey(Key.Mouse0);
 						scrollView.SetFocus();
 						dragState = DragState.None;
 					}
