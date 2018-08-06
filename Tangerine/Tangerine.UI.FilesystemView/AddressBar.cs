@@ -410,6 +410,10 @@ namespace Tangerine.UI.FilesystemView
 				Nodes = { widget }
 			};
 			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
+			rootWidget.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(_ => {
+				rootWidget.PrepareRendererState();
+				Renderer.DrawRectOutline(Vector2.Zero, ClientSize, Color4.Gray);
+			}));
 			Visible = true;
 			ClientPosition = globalPosition;
 		}
@@ -496,7 +500,7 @@ namespace Tangerine.UI.FilesystemView
 		public DirectoryPicker(Vector2 globalPosition, string path, FilesystemView view) : base(DefaultWindowOptions)
 		{
 			this.view = view;
-			
+
 			internalFolders = GetInternalFoldersPaths(path);
 			filesystemItems = GetFilesystemItems(internalFolders);
 			widget = new Widget {
@@ -513,6 +517,10 @@ namespace Tangerine.UI.FilesystemView
 				Nodes = { widget }
 			};
 			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
+			rootWidget.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(_ => {
+				rootWidget.PrepareRendererState();
+				Renderer.DrawRectOutline(Vector2.Zero, ClientSize, Color4.Gray);
+			}));
 			Visible = true;
 			ClientPosition = globalPosition;
 		}
