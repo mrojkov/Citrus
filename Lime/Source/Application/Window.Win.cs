@@ -598,6 +598,7 @@ namespace Lime
 
 		private void Update()
 		{
+			var wasInvalidated = isInvalidated;
 			isInvalidated = false;
 			if (!form.Visible || !form.CanFocus) {
 				return;
@@ -620,8 +621,8 @@ namespace Lime
 			if (Application.AreAllWindowsInactive()) {
 				Input.ClearKeyState();
 			}
-			if (renderingState == RenderingState.RenderDeferred) {
-				Invalidate();
+			if (wasInvalidated || renderingState == RenderingState.RenderDeferred) {
+				glControl.Invalidate();
 			}
 			renderingState = RenderingState.Updated;
 		}
@@ -825,10 +826,7 @@ namespace Lime
 
 		public void Invalidate()
 		{
-			if (!isInvalidated) {
-				glControl.Invalidate();
-				isInvalidated = true;
-			}
+			isInvalidated = true;
 		}
 
 		internal void SetMenu(Menu menu)
