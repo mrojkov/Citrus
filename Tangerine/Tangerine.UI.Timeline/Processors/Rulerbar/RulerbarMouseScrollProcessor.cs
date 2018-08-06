@@ -23,8 +23,11 @@ namespace Tangerine.UI.Timeline
 						int backup = timeline.CurrentColumn;
 						var marker = Document.Current.Container.Markers.FirstOrDefault(m => m.Frame == initialCol);
 						while (input.IsMousePressed()) {
-							// Evgenii Polikutin: don't Undo to avoid animation cache invalidation
-							SetCurrentColumn.IsFrozen = true;
+							bool isEditing = input.IsKeyPressed(Key.Control);
+							bool isShifting = isEditing && input.IsKeyPressed(Key.Shift);
+							// Evgenii Polikutin: don't Undo to avoid animation cache invalidation when just scrolling
+							// Evgenii Polikutin: yet we have to sacrifice performance when editing document
+							SetCurrentColumn.IsFrozen = !isEditing;
 							SetCurrentColumn.RollbackHistoryWithoutScrolling();
 							SetCurrentColumn.IsFrozen = false;
 
@@ -35,8 +38,8 @@ namespace Tangerine.UI.Timeline
 							} else if (mp < cw / 2) {
 								timeline.OffsetX = Math.Max(0, timeline.OffsetX - cw);
 							}
-							if (input.IsKeyPressed(Key.Control) && !input.WasMousePressed()) {
-								if (input.IsKeyPressed(Key.Shift)) {
+							if (isEditing && !input.WasMousePressed()) {
+								if (isShifting) {
 									ShiftTimeline(CalcColumn(mp));
 								} else if (marker != null) {
 									DragMarker(marker, CalcColumn(mp));
