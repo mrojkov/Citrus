@@ -100,7 +100,26 @@ namespace Lime
 			}
 		}
 
-		public ILayout Layout = AnchorLayout.Instance;
+		public ILayout Layout
+		{
+			get { return Components.Get<LayoutComponent>()?.Layout ?? AnchorLayout.Instance; }
+			set
+			{
+				var layoutComponent = Components.Get<LayoutComponent>();
+				bool isAnchorLayout = value is AnchorLayout;
+				if (layoutComponent == null) {
+					if (isAnchorLayout) {
+						return;
+					}
+					layoutComponent = new LayoutComponent();
+					Components.Add(layoutComponent);
+				} else if (isAnchorLayout) {
+					Components.Remove(layoutComponent);
+					return;
+				}
+				layoutComponent.Layout = value;
+			}
+		}
 
 		/// <summary>
 		/// Gets the layout-specific data.
@@ -718,7 +737,6 @@ namespace Lime
 
 		public Widget()
 		{
-			Layout = AnchorLayout.Instance;
 			AsWidget = this;
 			Size = DefaultWidgetSize;
 			Color = Color4.White;

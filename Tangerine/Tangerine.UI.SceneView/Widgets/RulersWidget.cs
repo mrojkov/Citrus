@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using Tangerine.Core;
 using Lime;
@@ -22,7 +22,6 @@ namespace Tangerine.UI.SceneView
 		public RulersWidget()
 		{
 			LayoutCell = new LayoutCell();
-			Layout = new AnchorLayout();
 			Anchors = Anchors.LeftRightTopBottom;
 			topRulerBar = new Widget {
 				Anchors = Anchors.LeftRight,

@@ -1,10 +1,18 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Yuzu;
 
 namespace Lime
 {
+	[TangerineRegisterComponent]
+	public class LayoutComponent : NodeComponent
+	{
+		[YuzuMember]
+		public ILayout Layout = AnchorLayout.Instance;
+	}
+
 	public interface ILayout
 	{
 		List<Rectangle> DebugRectangles { get; }
