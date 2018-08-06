@@ -13,6 +13,7 @@ namespace Tangerine.UI.Timeline
 		Timeline timeline => Timeline.Instance;
 		GridPane grid => Timeline.Instance.Grid;
 		IntVector2 lastSelectedCell;
+		Node lastSelectionContainer;
 
 		public IEnumerator<object> Task()
 		{
@@ -31,15 +32,17 @@ namespace Tangerine.UI.Timeline
 								timeline.Globals.Remove<HasKeyframeRequest>();
 								var isInMultiselectMode = input.IsKeyPressed(Key.Control);
 								var isSelectRangeMode = input.IsKeyPressed(Key.Shift);
-	
-								if (isSelectRangeMode) {
+
+								if (isSelectRangeMode && lastSelectionContainer == Document.Current.Container) {
 									yield return SelectRangeTask(lastSelectedCell, initialCell);
 								} else if (!r.Result || isInMultiselectMode) {
 									yield return SelectTask(initialCell);
 									lastSelectedCell = initialCell;
+									lastSelectionContainer = Document.Current.Container;
 								} else {
 									yield return DragSingleKeyframeTask(initialCell);
 									lastSelectedCell = initialCell;
+									lastSelectionContainer = Document.Current.Container;
 								}
 							}
 						}
