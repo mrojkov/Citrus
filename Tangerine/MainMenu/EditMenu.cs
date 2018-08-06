@@ -8,6 +8,7 @@ using Tangerine.Core;
 using Tangerine.Core.Components;
 using Tangerine.Core.Operations;
 using Node = Lime.Node;
+using System.IO;
 
 namespace Tangerine
 {
@@ -428,6 +429,19 @@ namespace Tangerine
 					Document.Current.History.RollbackTransaction();
 					return;
 				}
+			}
+		}
+	}
+
+	public class GeneratePreview : DocumentCommandHandler
+	{
+		public override void ExecuteTransaction()
+		{
+			if (Document.Current.Format == DocumentFormat.Scene || Document.Current.Format == DocumentFormat.Tan) {
+				var bitmap = Document.Current.RootNode.AsWidget.ToBitmap();
+				var stream = new MemoryStream();
+				bitmap.SaveTo(stream);
+				SetProperty.Perform(Document.Current, nameof(Document.Preview), System.Convert.ToBase64String(stream.ToArray()));
 			}
 		}
 	}

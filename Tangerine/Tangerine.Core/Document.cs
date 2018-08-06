@@ -100,6 +100,11 @@ namespace Tangerine.Core
 		/// </summary>
 		public readonly List<IDocumentView> Views = new List<IDocumentView>();
 
+		/// <summary>
+		/// Base64 representation of Document preview in .png format
+		/// </summary>
+		public string Preview { get; set; }
+
 		public int AnimationFrame
 		{
 			get { return Container.AnimationFrame; }
@@ -154,6 +159,9 @@ namespace Tangerine.Core
 				}
 				Decorate(RootNode);
 				Container = RootNode;
+				if (Format == DocumentFormat.Scene || Format == DocumentFormat.Tan) {
+					Preview = DocumentPreview.ReadAsBase64(Project.Current.GetSystemPath(path, GetFileExtension(Format)));
+				}
 			} catch (System.Exception e) {
 				throw new System.InvalidOperationException($"Can't open '{path}': {e.Message}");
 			}
@@ -330,6 +338,9 @@ namespace Tangerine.Core
 			History.AddSavePoint();
 			Path = path;
 			WriteNodeToFile(path, Format, RootNodeUnwrapped);
+			if (Format == DocumentFormat.Scene || Format == DocumentFormat.Tan) {
+				DocumentPreview.AppendToFile(Project.Current.GetSystemPath(path, GetFileExtension(Format)), Preview);
+			}
 			SetModificationTimeToNow();
 			Project.Current.AddRecentDocument(Path);
 		}
