@@ -17,6 +17,8 @@ namespace Tangerine.UI.Timeline
 		private WidgetInput input => grid.RootWidget.Input;
 		private Dictionary<IKeyframe, double> savedPositions = new Dictionary<IKeyframe, double>();
 		private Dictionary<IAnimator, List<IKeyframe>> savedKeyframes = new Dictionary<IAnimator, List<IKeyframe>>();
+		private Dictionary<Marker, double> savedMarkerPositions = new Dictionary<Marker, double>();
+		private List<Marker> savedMarkers = new List<Marker>();
 
 		public IEnumerator<object> Task() {
 			while (true) {
@@ -53,6 +55,7 @@ namespace Tangerine.UI.Timeline
 		{
 			IntVector2? last = null;
 			Save(boundaries);
+			bool isStretchingMarkers = input.IsKeyPressed(Key.Control);
 			using (Document.Current.History.BeginTransaction()) {
 				while (input.IsMousePressed()) {
 					Utils.ChangeCursorIfDefault(MouseCursor.SizeWE);
@@ -68,7 +71,7 @@ namespace Tangerine.UI.Timeline
 					} else {
 						current.X = Math.Max(current.X, boundaries.Left + 1);
 					}
-					Stretch(boundaries, side, current.X);
+					Stretch(boundaries, side, current.X, stretchMarkers: isStretchingMarkers);
 					if (side == DragSide.Left) {
 						boundaries.Left = current.X;
 					} else {
@@ -87,7 +90,7 @@ namespace Tangerine.UI.Timeline
 			yield return null;
 		}
 
-		private void Stretch(Boundaries boundaries, DragSide side, int newPos)
+		private void Stretch(Boundaries boundaries, DragSide side, int newPos, bool stretchMarkers)
 		{
 			int length;
 			if (side == DragSide.Left) {
@@ -95,13 +98,13 @@ namespace Tangerine.UI.Timeline
 			} else {
 				length = newPos - boundaries.Left - 1;
 			}
+			int oldLength = boundaries.Right - boundaries.Left - 1;
 			for (int i = boundaries.Top; i <= boundaries.Bottom; ++i) {
 				if (!(Document.Current.Rows[i].Components.Get<NodeRow>()?.Node is IAnimable animable)) {
 					continue;
 				}
 				foreach (var animator in animable.Animators.ToList()) {
 					IEnumerable<IKeyframe> saved = savedKeyframes[animator];
-					int oldLength = boundaries.Right - boundaries.Left - 1;
 					if (
 						side == DragSide.Left && length < oldLength ||
 						side == DragSide.Right && length > oldLength
@@ -119,11 +122,33 @@ namespace Tangerine.UI.Timeline
 						} else {
 							newFrame = (int)Math.Round(boundaries.Left + relpos * length);
 						}
-						var k1 = key.Clone();
-						k1.Frame = newFrame;
-						SetAnimableProperty.Perform(animable, animator.TargetProperty, k1.Value,  true, false, k1.Frame);
-						SetKeyframe.Perform(animable, animator.TargetProperty, Document.Current.AnimationId, k1);
+						var newKey = key.Clone();
+						newKey.Frame = newFrame;
+						SetAnimableProperty.Perform(
+							animable, animator.TargetProperty, newKey.Value,
+							createAnimatorIfNeeded: true,
+							createInitialKeyframeForNewAnimator: false,
+							newKey.Frame
+						);
+						SetKeyframe.Perform(animable, animator.TargetProperty, Document.Current.AnimationId, newKey);
 					}
+				}
+			}
+			if (stretchMarkers) {
+				foreach (var marker in savedMarkers) {
+					DeleteMarker.Perform(Document.Current.Container, marker, removeDependencies: false);
+				}
+				foreach (var marker in savedMarkers) {
+					double relpos = savedMarkerPositions[marker];
+					int newFrame;
+					if (side == DragSide.Left) {
+						newFrame = (int)Math.Round(newPos + relpos * length);
+					} else {
+						newFrame = (int)Math.Round(boundaries.Left + relpos * length);
+					}
+					var newMarker = marker.Clone();
+					newMarker.Frame = newFrame;
+					SetMarker.Perform(Document.Current.Container, newMarker, removeDependencies: false);
 				}
 			}
 		}
@@ -132,6 +157,8 @@ namespace Tangerine.UI.Timeline
 		{
 			savedPositions.Clear();
 			savedKeyframes.Clear();
+			savedMarkerPositions.Clear();
+			savedMarkers.Clear();
 			var length = boundaries.Right - boundaries.Left - 1;
 			for (int i = boundaries.Top; i <= boundaries.Bottom; ++i) {
 				if (!(Document.Current.Rows[i].Components.Get<NodeRow>()?.Node is IAnimable animable)) {
@@ -139,15 +166,22 @@ namespace Tangerine.UI.Timeline
 				}
 				foreach (var animator in animable.Animators) {
 					savedKeyframes.Add(animator, new List<IKeyframe>());
-					foreach (
-						var key in animator.Keys.Where(k =>
+					var keys = animator.Keys.Where(k =>
 						boundaries.Left <= k.Frame &&
-						k.Frame < boundaries.Right)
-					) {
+						k.Frame < boundaries.Right
+					);
+					foreach (var key in keys) {
 						savedPositions.Add(key, ((double)key.Frame - boundaries.Left) / length);
 						savedKeyframes[animator].Add(key);
 					}
 				}
+			}
+			var markers = Document.Current.Container.Markers.Where(k =>
+				boundaries.Left <= k.Frame &&
+				k.Frame < boundaries.Right);
+			foreach (var marker in markers) {
+				savedMarkerPositions.Add(marker, ((double)marker.Frame - boundaries.Left) / length);
+				savedMarkers.Add(marker);
 			}
 		}
 
