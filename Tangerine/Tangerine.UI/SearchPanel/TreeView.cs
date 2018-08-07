@@ -2,6 +2,7 @@ using Lime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Tangerine.Core;
 
 namespace Tangerine.UI
@@ -41,6 +42,7 @@ namespace Tangerine.UI
 		public void Filter(string filter)
 		{
 			root.Filter(filter);
+			ClearSelection();
 		}
 
 		public void ClearSelection()
@@ -197,6 +199,29 @@ namespace Tangerine.UI
 			{
 				var label = new ThemedSimpleText { Padding = new Thickness(defaultPadding) };
 				label.AddChangeWatcher(() => rootNode.Id, t => label.Text = Document.Current.RootNode == rootNode ? "root" : t);
+				label.CompoundPresenter.Insert(0, new DelegatePresenter<ThemedSimpleText>(w => {
+					if (String.IsNullOrEmpty(filter)) {
+						return;
+					}
+					w.PrepareRendererState();
+					int index = 0;
+					int previousIndex = 0;
+					var filterSize = Renderer.MeasureTextLine(w.Font, filter, w.FontHeight, w.LetterSpacing);
+					var size = Vector2.Zero;
+					var text = w.Text.ToLower();
+					float left = w.Padding.Left;
+					float top = w.Padding.Top;
+					while ((index = text.IndexOf(filter, previousIndex)) >= 0) {
+						var skippedText = w.Text.Substring(previousIndex, index - previousIndex);
+						var skippedSize = Renderer.MeasureTextLine(w.Font, skippedText, w.FontHeight, w.LetterSpacing);
+						size.X += skippedSize.X;
+						size.Y = Mathf.Max(size.Y, skippedSize.Y);
+						Renderer.DrawRect(left + size.X, top, left + size.X + filterSize.X, top + size.Y, Color4.Yellow.Transparentify(0.7f));
+						size.X += filterSize.X;
+						size.Y = Mathf.Max(size.Y, filterSize.Y);
+						previousIndex = index + filter.Length;
+					}
+				}));
 				return label;
 			}
 
@@ -305,7 +330,7 @@ namespace Tangerine.UI
 
 			public bool Filter(string filter)
 			{
-				this.filter = filter;
+				this.filter = filter.ToLower();
 				treeNodesContainer.Nodes.Clear();
 				bool result = String.IsNullOrEmpty(filter) || (rootNode.Id?.ToLower().Contains(filter.ToLower()) ?? false);
 				foreach (var node in savedNodes) {

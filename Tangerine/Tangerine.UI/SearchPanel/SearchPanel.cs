@@ -47,7 +47,6 @@ namespace Tangerine.UI
 				} else {
 					if (searchTreeView.IsAttached()) {
 						searchTreeView.Detach();
-						searchTreeView.ClearSelection();
 						treeView.Attach();
 					}
 				}
