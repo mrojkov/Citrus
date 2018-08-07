@@ -28,8 +28,8 @@ namespace Tangerine.UI
 			{
 				Application.InvokeOnMainThread(() => {
 					textView.Append(value);
-					textView.ScrollToEnd();
 				});
+				Application.InvokeOnNextUpdate(textView.ScrollToEnd);
 			}
 
 			public override Encoding Encoding { get; }
