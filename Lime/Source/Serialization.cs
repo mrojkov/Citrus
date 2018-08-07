@@ -328,6 +328,7 @@ namespace Lime
 				jd.Generate<DistortionMeshPoint>();
 				jd.Generate<Frame>();
 				jd.Generate<Image>();
+				jd.Generate<TiledImage>();
 				jd.Generate<ImageCombiner>();
 				jd.Generate<Marker>();
 				jd.Generate<Movie>();
