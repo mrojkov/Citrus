@@ -23,8 +23,10 @@ namespace Tangerine.UI
 			public Color4 ButtonDisabledColor { get; set; }
 			[YuzuRequired]
 			public Color4 Background { get; set; }
-			public Color4 ButtonSelected;
-			public Color4 Separator;
+			[YuzuRequired]
+			public Color4 ButtonSelected { get; set; }
+			[YuzuRequired]
+			public Color4 Separator { get; set; }
 		}
 
 		public class SceneViewColors
