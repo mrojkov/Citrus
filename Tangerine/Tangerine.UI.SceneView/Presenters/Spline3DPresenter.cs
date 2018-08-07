@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Lime;
@@ -26,10 +26,11 @@ namespace Tangerine.UI.SceneView
 				}
 				Renderer.Flush();
 				SceneView.Instance.Frame.PrepareRendererState();
-				var cameraProjection = Renderer.Projection;
-				var oldWorldMatrix = Renderer.World;
-				var oldViewMatrix = Renderer.View;
-				var oldCullMode = Renderer.CullMode;
+				Renderer.PushState(
+					RenderState.Projection |
+					RenderState.World |
+					RenderState.View |
+					RenderState.CullMode);
 				Renderer.World = Matrix44.Identity;
 				Renderer.View = Matrix44.Identity;
 				Renderer.CullMode = CullMode.None;
@@ -42,10 +43,7 @@ namespace Tangerine.UI.SceneView
 					}
 				}
 				Renderer.Flush();
-				Renderer.Projection = cameraProjection;
-				Renderer.World = oldWorldMatrix;
-				Renderer.View = oldViewMatrix;
-				Renderer.CullMode = oldCullMode;
+				Renderer.PopState();
 			}
 		}
 

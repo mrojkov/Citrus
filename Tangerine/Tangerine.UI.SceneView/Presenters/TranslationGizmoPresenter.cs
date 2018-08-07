@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Lime;
@@ -27,24 +27,22 @@ namespace Tangerine.UI.SceneView
 			if (nodes.Count == 0) {
 				return;
 			}
+			var root = (WindowWidget)WidgetContext.Current.Root;
 			Renderer.Flush();
-			var oldCullMode = Renderer.CullMode;
-			var oldWorld = Renderer.World;
-			var oldView = Renderer.View;
-			var oldProj = Renderer.Projection;
-			var oldDepthState = Renderer.DepthState;
+			Renderer.PushState(
+				RenderState.CullMode |
+				RenderState.World |
+				RenderState.View |
+				RenderState.Projection |
+				RenderState.DepthState);
 			Renderer.View = vp.Camera.View;
-			Renderer.Projection = vp.TransformProjection(Renderer.Projection);
+			Renderer.Projection = vp.TransformProjection(root.GetProjection());
 			Renderer.DepthState = DepthState.DepthReadWrite;
 			Renderer.Clear(ClearOptions.DepthBuffer);
 			foreach (var node in nodes) {
 				RenderGizmo(node);
 			}
-			Renderer.World = oldWorld;
-			Renderer.View = oldView;
-			Renderer.Projection = oldProj;
-			Renderer.CullMode = oldCullMode;
-			Renderer.DepthState = oldDepthState;
+			Renderer.PopState();
 		}
 
 		Viewport3D GetCurrentViewport3D()

@@ -60,7 +60,7 @@ namespace Tangerine.UI.Timeline
 		{
 			widget.PrepareRendererState();
 			Renderer.DrawRect(Vector2.Zero, RootWidget.Size, ColorTheme.Current.Toolbar.Background);
-			Renderer.Transform1 *= Matrix32.Translation(-Timeline.Instance.Offset.X.Round(), 0);
+			Renderer.MultiplyTransform1(Matrix32.Translation(-Timeline.Instance.Offset.X.Round(), 0));
 			RenderCursor();
 			for (int i = 0; i < Timeline.Instance.ColumnCount; i++) {
 				var x = i * TimelineMetrics.ColWidth + 0.5f;
