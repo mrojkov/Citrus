@@ -2713,23 +2713,10 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Keyframe_String(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Keyframe<global::System.String>)obj;
-			var dg = (BinaryDeserializerGen)d;
-			ReaderClassDef.FieldDef fd;
-			fd = def.Fields[d.Reader.ReadInt16()];
-			if (1 == fd.OurIndex) {
-				result.Frame = d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (2 == fd.OurIndex) {
-				result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (3 == fd.OurIndex) {
-				result.Value = d.Reader.ReadString();
-				if (result.Value == "" && d.Reader.ReadBoolean()) result.Value = null;
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+			result.Frame = d.Reader.ReadInt32();
+			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.Value = d.Reader.ReadString();
+			if (result.Value == "" && d.Reader.ReadBoolean()) result.Value = null;
 		}
 
 		private static object Make_Lime__Keyframe_String(BinaryDeserializer d, ReaderClassDef def)
@@ -2742,22 +2729,9 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Keyframe_Int32(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Keyframe<global::System.Int32>)obj;
-			var dg = (BinaryDeserializerGen)d;
-			ReaderClassDef.FieldDef fd;
-			fd = def.Fields[d.Reader.ReadInt16()];
-			if (1 == fd.OurIndex) {
-				result.Frame = d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (2 == fd.OurIndex) {
-				result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (3 == fd.OurIndex) {
-				result.Value = d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+			result.Frame = d.Reader.ReadInt32();
+			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.Value = d.Reader.ReadInt32();
 		}
 
 		private static object Make_Lime__Keyframe_Int32(BinaryDeserializer d, ReaderClassDef def)
@@ -2770,22 +2744,9 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Keyframe_Boolean(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Keyframe<global::System.Boolean>)obj;
-			var dg = (BinaryDeserializerGen)d;
-			ReaderClassDef.FieldDef fd;
-			fd = def.Fields[d.Reader.ReadInt16()];
-			if (1 == fd.OurIndex) {
-				result.Frame = d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (2 == fd.OurIndex) {
-				result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (3 == fd.OurIndex) {
-				result.Value = d.Reader.ReadBoolean();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+			result.Frame = d.Reader.ReadInt32();
+			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.Value = d.Reader.ReadBoolean();
 		}
 
 		private static object Make_Lime__Keyframe_Boolean(BinaryDeserializer d, ReaderClassDef def)
@@ -2798,22 +2759,9 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Keyframe_Blending(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Keyframe<global::Lime.Blending>)obj;
-			var dg = (BinaryDeserializerGen)d;
-			ReaderClassDef.FieldDef fd;
-			fd = def.Fields[d.Reader.ReadInt16()];
-			if (1 == fd.OurIndex) {
-				result.Frame = d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (2 == fd.OurIndex) {
-				result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (3 == fd.OurIndex) {
-				result.Value = (global::Lime.Blending)d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+			result.Frame = d.Reader.ReadInt32();
+			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.Value = (global::Lime.Blending)d.Reader.ReadInt32();
 		}
 
 		private static object Make_Lime__Keyframe_Blending(BinaryDeserializer d, ReaderClassDef def)
@@ -2827,21 +2775,9 @@ namespace GeneratedDeserializersBIN
 		{
 			var result = (global::Lime.Keyframe<global::Lime.ITexture>)obj;
 			var dg = (BinaryDeserializerGen)d;
-			ReaderClassDef.FieldDef fd;
-			fd = def.Fields[d.Reader.ReadInt16()];
-			if (1 == fd.OurIndex) {
-				result.Frame = d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (2 == fd.OurIndex) {
-				result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (3 == fd.OurIndex) {
-				result.Value = (global::Lime.ITexture)dg.ReadObject<global::Lime.ITexture>();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+			result.Frame = d.Reader.ReadInt32();
+			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.Value = (global::Lime.ITexture)dg.ReadObject<global::Lime.ITexture>();
 		}
 
 		private static object Make_Lime__Keyframe_ITexture(BinaryDeserializer d, ReaderClassDef def)
@@ -2855,21 +2791,9 @@ namespace GeneratedDeserializersBIN
 		{
 			var result = (global::Lime.Keyframe<global::Lime.NumericRange>)obj;
 			var dg = (BinaryDeserializerGen)d;
-			ReaderClassDef.FieldDef fd;
-			fd = def.Fields[d.Reader.ReadInt16()];
-			if (1 == fd.OurIndex) {
-				result.Frame = d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (2 == fd.OurIndex) {
-				result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (3 == fd.OurIndex) {
-				dg.ReadIntoStruct(ref result.Value);
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+			result.Frame = d.Reader.ReadInt32();
+			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			dg.ReadIntoStruct(ref result.Value);
 		}
 
 		private static object Make_Lime__Keyframe_NumericRange(BinaryDeserializer d, ReaderClassDef def)
@@ -2883,23 +2807,11 @@ namespace GeneratedDeserializersBIN
 		{
 			var result = (global::Lime.Keyframe<global::Lime.Vector2>)obj;
 			var dg = (BinaryDeserializerGen)d;
-			ReaderClassDef.FieldDef fd;
-			fd = def.Fields[d.Reader.ReadInt16()];
-			if (1 == fd.OurIndex) {
-				result.Frame = d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (2 == fd.OurIndex) {
-				result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (3 == fd.OurIndex) {
-				dg.EnsureClassDef(typeof(global::Lime.Vector2));
-				result.Value.X = d.Reader.ReadSingle();
-				result.Value.Y = d.Reader.ReadSingle();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+			result.Frame = d.Reader.ReadInt32();
+			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			dg.EnsureClassDef(typeof(global::Lime.Vector2));
+			result.Value.X = d.Reader.ReadSingle();
+			result.Value.Y = d.Reader.ReadSingle();
 		}
 
 		private static object Make_Lime__Keyframe_Vector2(BinaryDeserializer d, ReaderClassDef def)
@@ -2913,22 +2825,10 @@ namespace GeneratedDeserializersBIN
 		{
 			var result = (global::Lime.Keyframe<global::Lime.Color4>)obj;
 			var dg = (BinaryDeserializerGen)d;
-			ReaderClassDef.FieldDef fd;
-			fd = def.Fields[d.Reader.ReadInt16()];
-			if (1 == fd.OurIndex) {
-				result.Frame = d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (2 == fd.OurIndex) {
-				result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (3 == fd.OurIndex) {
-				dg.EnsureClassDef(typeof(global::Lime.Color4));
-				result.Value.ABGR = d.Reader.ReadUInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+			result.Frame = d.Reader.ReadInt32();
+			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			dg.EnsureClassDef(typeof(global::Lime.Color4));
+			result.Value.ABGR = d.Reader.ReadUInt32();
 		}
 
 		private static object Make_Lime__Keyframe_Color4(BinaryDeserializer d, ReaderClassDef def)
@@ -2941,22 +2841,9 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Keyframe_Single(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Keyframe<global::System.Single>)obj;
-			var dg = (BinaryDeserializerGen)d;
-			ReaderClassDef.FieldDef fd;
-			fd = def.Fields[d.Reader.ReadInt16()];
-			if (1 == fd.OurIndex) {
-				result.Frame = d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (2 == fd.OurIndex) {
-				result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (3 == fd.OurIndex) {
-				result.Value = d.Reader.ReadSingle();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+			result.Frame = d.Reader.ReadInt32();
+			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.Value = d.Reader.ReadSingle();
 		}
 
 		private static object Make_Lime__Keyframe_Single(BinaryDeserializer d, ReaderClassDef def)
@@ -2969,22 +2856,9 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Keyframe_EmitterShape(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Keyframe<global::Lime.EmitterShape>)obj;
-			var dg = (BinaryDeserializerGen)d;
-			ReaderClassDef.FieldDef fd;
-			fd = def.Fields[d.Reader.ReadInt16()];
-			if (1 == fd.OurIndex) {
-				result.Frame = d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (2 == fd.OurIndex) {
-				result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (3 == fd.OurIndex) {
-				result.Value = (global::Lime.EmitterShape)d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+			result.Frame = d.Reader.ReadInt32();
+			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.Value = (global::Lime.EmitterShape)d.Reader.ReadInt32();
 		}
 
 		private static object Make_Lime__Keyframe_EmitterShape(BinaryDeserializer d, ReaderClassDef def)
@@ -2997,22 +2871,9 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Keyframe_AudioAction(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Keyframe<global::Lime.AudioAction>)obj;
-			var dg = (BinaryDeserializerGen)d;
-			ReaderClassDef.FieldDef fd;
-			fd = def.Fields[d.Reader.ReadInt16()];
-			if (1 == fd.OurIndex) {
-				result.Frame = d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (2 == fd.OurIndex) {
-				result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (3 == fd.OurIndex) {
-				result.Value = (global::Lime.AudioAction)d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+			result.Frame = d.Reader.ReadInt32();
+			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.Value = (global::Lime.AudioAction)d.Reader.ReadInt32();
 		}
 
 		private static object Make_Lime__Keyframe_AudioAction(BinaryDeserializer d, ReaderClassDef def)
@@ -3026,21 +2887,9 @@ namespace GeneratedDeserializersBIN
 		{
 			var result = (global::Lime.Keyframe<global::Lime.SerializableSample>)obj;
 			var dg = (BinaryDeserializerGen)d;
-			ReaderClassDef.FieldDef fd;
-			fd = def.Fields[d.Reader.ReadInt16()];
-			if (1 == fd.OurIndex) {
-				result.Frame = d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (2 == fd.OurIndex) {
-				result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (3 == fd.OurIndex) {
-				result.Value = (global::Lime.SerializableSample)dg.ReadObject<global::Lime.SerializableSample>();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+			result.Frame = d.Reader.ReadInt32();
+			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.Value = (global::Lime.SerializableSample)dg.ReadObject<global::Lime.SerializableSample>();
 		}
 
 		private static object Make_Lime__Keyframe_SerializableSample(BinaryDeserializer d, ReaderClassDef def)
@@ -3053,22 +2902,9 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Keyframe_HAlignment(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Keyframe<global::Lime.HAlignment>)obj;
-			var dg = (BinaryDeserializerGen)d;
-			ReaderClassDef.FieldDef fd;
-			fd = def.Fields[d.Reader.ReadInt16()];
-			if (1 == fd.OurIndex) {
-				result.Frame = d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (2 == fd.OurIndex) {
-				result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (3 == fd.OurIndex) {
-				result.Value = (global::Lime.HAlignment)d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+			result.Frame = d.Reader.ReadInt32();
+			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.Value = (global::Lime.HAlignment)d.Reader.ReadInt32();
 		}
 
 		private static object Make_Lime__Keyframe_HAlignment(BinaryDeserializer d, ReaderClassDef def)
@@ -3081,22 +2917,9 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Keyframe_VAlignment(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Keyframe<global::Lime.VAlignment>)obj;
-			var dg = (BinaryDeserializerGen)d;
-			ReaderClassDef.FieldDef fd;
-			fd = def.Fields[d.Reader.ReadInt16()];
-			if (1 == fd.OurIndex) {
-				result.Frame = d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (2 == fd.OurIndex) {
-				result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (3 == fd.OurIndex) {
-				result.Value = (global::Lime.VAlignment)d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+			result.Frame = d.Reader.ReadInt32();
+			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.Value = (global::Lime.VAlignment)d.Reader.ReadInt32();
 		}
 
 		private static object Make_Lime__Keyframe_VAlignment(BinaryDeserializer d, ReaderClassDef def)
@@ -3109,22 +2932,9 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Keyframe_MovieAction(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Keyframe<global::Lime.MovieAction>)obj;
-			var dg = (BinaryDeserializerGen)d;
-			ReaderClassDef.FieldDef fd;
-			fd = def.Fields[d.Reader.ReadInt16()];
-			if (1 == fd.OurIndex) {
-				result.Frame = d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (2 == fd.OurIndex) {
-				result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (3 == fd.OurIndex) {
-				result.Value = (global::Lime.MovieAction)d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+			result.Frame = d.Reader.ReadInt32();
+			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.Value = (global::Lime.MovieAction)d.Reader.ReadInt32();
 		}
 
 		private static object Make_Lime__Keyframe_MovieAction(BinaryDeserializer d, ReaderClassDef def)
@@ -3137,22 +2947,9 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Keyframe_ShaderId(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Keyframe<global::Lime.ShaderId>)obj;
-			var dg = (BinaryDeserializerGen)d;
-			ReaderClassDef.FieldDef fd;
-			fd = def.Fields[d.Reader.ReadInt16()];
-			if (1 == fd.OurIndex) {
-				result.Frame = d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (2 == fd.OurIndex) {
-				result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (3 == fd.OurIndex) {
-				result.Value = (global::Lime.ShaderId)d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+			result.Frame = d.Reader.ReadInt32();
+			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.Value = (global::Lime.ShaderId)d.Reader.ReadInt32();
 		}
 
 		private static object Make_Lime__Keyframe_ShaderId(BinaryDeserializer d, ReaderClassDef def)
@@ -3166,24 +2963,12 @@ namespace GeneratedDeserializersBIN
 		{
 			var result = (global::Lime.Keyframe<global::Lime.Vector3>)obj;
 			var dg = (BinaryDeserializerGen)d;
-			ReaderClassDef.FieldDef fd;
-			fd = def.Fields[d.Reader.ReadInt16()];
-			if (1 == fd.OurIndex) {
-				result.Frame = d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (2 == fd.OurIndex) {
-				result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (3 == fd.OurIndex) {
-				dg.EnsureClassDef(typeof(global::Lime.Vector3));
-				result.Value.X = d.Reader.ReadSingle();
-				result.Value.Y = d.Reader.ReadSingle();
-				result.Value.Z = d.Reader.ReadSingle();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+			result.Frame = d.Reader.ReadInt32();
+			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			dg.EnsureClassDef(typeof(global::Lime.Vector3));
+			result.Value.X = d.Reader.ReadSingle();
+			result.Value.Y = d.Reader.ReadSingle();
+			result.Value.Z = d.Reader.ReadSingle();
 		}
 
 		private static object Make_Lime__Keyframe_Vector3(BinaryDeserializer d, ReaderClassDef def)
@@ -3197,25 +2982,13 @@ namespace GeneratedDeserializersBIN
 		{
 			var result = (global::Lime.Keyframe<global::Lime.Quaternion>)obj;
 			var dg = (BinaryDeserializerGen)d;
-			ReaderClassDef.FieldDef fd;
-			fd = def.Fields[d.Reader.ReadInt16()];
-			if (1 == fd.OurIndex) {
-				result.Frame = d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (2 == fd.OurIndex) {
-				result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (3 == fd.OurIndex) {
-				dg.EnsureClassDef(typeof(global::Lime.Quaternion));
-				result.Value.X = d.Reader.ReadSingle();
-				result.Value.Y = d.Reader.ReadSingle();
-				result.Value.Z = d.Reader.ReadSingle();
-				result.Value.W = d.Reader.ReadSingle();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+			result.Frame = d.Reader.ReadInt32();
+			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			dg.EnsureClassDef(typeof(global::Lime.Quaternion));
+			result.Value.X = d.Reader.ReadSingle();
+			result.Value.Y = d.Reader.ReadSingle();
+			result.Value.Z = d.Reader.ReadSingle();
+			result.Value.W = d.Reader.ReadSingle();
 		}
 
 		private static object Make_Lime__Keyframe_Quaternion(BinaryDeserializer d, ReaderClassDef def)
@@ -3228,22 +3001,9 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Keyframe_EmissionType(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Keyframe<global::Lime.EmissionType>)obj;
-			var dg = (BinaryDeserializerGen)d;
-			ReaderClassDef.FieldDef fd;
-			fd = def.Fields[d.Reader.ReadInt16()];
-			if (1 == fd.OurIndex) {
-				result.Frame = d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (2 == fd.OurIndex) {
-				result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (3 == fd.OurIndex) {
-				result.Value = (global::Lime.EmissionType)d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+			result.Frame = d.Reader.ReadInt32();
+			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.Value = (global::Lime.EmissionType)d.Reader.ReadInt32();
 		}
 
 		private static object Make_Lime__Keyframe_EmissionType(BinaryDeserializer d, ReaderClassDef def)
@@ -3257,37 +3017,25 @@ namespace GeneratedDeserializersBIN
 		{
 			var result = (global::Lime.Keyframe<global::Lime.Matrix44>)obj;
 			var dg = (BinaryDeserializerGen)d;
-			ReaderClassDef.FieldDef fd;
-			fd = def.Fields[d.Reader.ReadInt16()];
-			if (1 == fd.OurIndex) {
-				result.Frame = d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (2 == fd.OurIndex) {
-				result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (3 == fd.OurIndex) {
-				dg.EnsureClassDef(typeof(global::Lime.Matrix44));
-				result.Value.M11 = d.Reader.ReadSingle();
-				result.Value.M12 = d.Reader.ReadSingle();
-				result.Value.M13 = d.Reader.ReadSingle();
-				result.Value.M14 = d.Reader.ReadSingle();
-				result.Value.M21 = d.Reader.ReadSingle();
-				result.Value.M22 = d.Reader.ReadSingle();
-				result.Value.M23 = d.Reader.ReadSingle();
-				result.Value.M24 = d.Reader.ReadSingle();
-				result.Value.M31 = d.Reader.ReadSingle();
-				result.Value.M32 = d.Reader.ReadSingle();
-				result.Value.M33 = d.Reader.ReadSingle();
-				result.Value.M34 = d.Reader.ReadSingle();
-				result.Value.M41 = d.Reader.ReadSingle();
-				result.Value.M42 = d.Reader.ReadSingle();
-				result.Value.M43 = d.Reader.ReadSingle();
-				result.Value.M44 = d.Reader.ReadSingle();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+			result.Frame = d.Reader.ReadInt32();
+			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			dg.EnsureClassDef(typeof(global::Lime.Matrix44));
+			result.Value.M11 = d.Reader.ReadSingle();
+			result.Value.M12 = d.Reader.ReadSingle();
+			result.Value.M13 = d.Reader.ReadSingle();
+			result.Value.M14 = d.Reader.ReadSingle();
+			result.Value.M21 = d.Reader.ReadSingle();
+			result.Value.M22 = d.Reader.ReadSingle();
+			result.Value.M23 = d.Reader.ReadSingle();
+			result.Value.M24 = d.Reader.ReadSingle();
+			result.Value.M31 = d.Reader.ReadSingle();
+			result.Value.M32 = d.Reader.ReadSingle();
+			result.Value.M33 = d.Reader.ReadSingle();
+			result.Value.M34 = d.Reader.ReadSingle();
+			result.Value.M41 = d.Reader.ReadSingle();
+			result.Value.M42 = d.Reader.ReadSingle();
+			result.Value.M43 = d.Reader.ReadSingle();
+			result.Value.M44 = d.Reader.ReadSingle();
 		}
 
 		private static object Make_Lime__Keyframe_Matrix44(BinaryDeserializer d, ReaderClassDef def)

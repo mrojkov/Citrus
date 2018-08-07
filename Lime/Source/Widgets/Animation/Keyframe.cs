@@ -36,6 +36,7 @@ namespace Lime
 		}
 	}
 
+	[YuzuCompact]
 	public class Keyframe<T> : IKeyframe
 	{
 		[YuzuMember]
