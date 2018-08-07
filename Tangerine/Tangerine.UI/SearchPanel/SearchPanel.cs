@@ -1,26 +1,13 @@
-using System;
 using System.Linq;
 using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
-using System.Reflection;
 
 namespace Tangerine.UI
 {
 	public class SearchPanel : IDocumentView
 	{
-		public static SearchPanel Instance { get; private set; }
-
-		public readonly Widget PanelWidget;
-		public readonly Frame RootWidget;
-		readonly EditBox searchStringEditor;
-		readonly Widget resultPane;
-		readonly ThemedScrollView scrollView;
-		private List<Node> results = new List<Node>();
-		private int selectedIndex;
-		private int rowHeight = Theme.Metrics.TextHeight;
-
-		class Cmds
+		private static class Cmds
 		{
 			public static readonly Key Up = Key.MapShortcut(Key.Up);
 			public static readonly Key Down = Key.MapShortcut(Key.Down);
@@ -28,6 +15,17 @@ namespace Tangerine.UI
 			public static readonly Key Enter = Key.MapShortcut(Key.Enter);
 			public static readonly List<Key> All = new List<Key> { Up, Down, Cancel, Enter };
 		}
+
+		public static SearchPanel Instance { get; private set; }
+
+		public readonly Widget PanelWidget;
+		public readonly Frame RootWidget;
+		private readonly EditBox searchStringEditor;
+		private readonly Widget resultPane;
+		private readonly ThemedScrollView scrollView;
+		private List<Node> results = new List<Node>();
+		private int selectedIndex;
+		private readonly int rowHeight = Theme.Metrics.TextHeight;
 
 		public SearchPanel(Widget rootWidget)
 		{
@@ -46,14 +44,14 @@ namespace Tangerine.UI
 				if (scrollView.IsFocused() && results.Count > 0) {
 					Renderer.DrawRect(
 						0, rowHeight * selectedIndex,
-						w.Width, (selectedIndex + 1) * rowHeight, 
+						w.Width, (selectedIndex + 1) * rowHeight,
 						Theme.Colors.SelectedBackground);
 				}
 			}));
 			scrollView.LateTasks.Add(new KeyRepeatHandler(ScrollView_KeyRepeated));
 		}
 
-		void ScrollView_KeyRepeated(WidgetInput input, Key key)
+		private void ScrollView_KeyRepeated(WidgetInput input, Key key)
 		{
 			if (Cmds.All.Contains(key)) {
 				input.ConsumeKey(key);
@@ -75,12 +73,12 @@ namespace Tangerine.UI
 			} else {
 				return;
 			}
-			selectedIndex = selectedIndex.Clamp(0, results != null ? results.Count - 1 : 0);
+			selectedIndex = selectedIndex.Clamp(0, results?.Count - 1 ?? 0);
 			EnsureRowVisible(selectedIndex);
 			Window.Current.Invalidate();
 		}
 
-		void NavigateToItem(int selectedIndex)
+		private void NavigateToItem(int selectedIndex)
 		{
 			var node = results[selectedIndex];
 			var ea = node.Ancestors.FirstOrDefault(i => i.ContentsPath != null);
@@ -88,14 +86,14 @@ namespace Tangerine.UI
 			if (ea != null) {
 				var searchString = searchStringEditor.Text;
 				var localIndex = GetResults(ea, searchString).ToList().IndexOf(node);
-				Document externalSceneDoc = null;
+				Document externalSceneDoc;
 				try {
 					externalSceneDoc = Project.Current.OpenDocument(ea.ContentsPath);
 				} catch (System.Exception e) {
 					AlertDialog.Show(e.Message);
 					return;
 				}
-				externalSceneDoc.SceneNavigatedFrom = curScenePath; 
+				externalSceneDoc.SceneNavigatedFrom = curScenePath;
 				node = GetResults(externalSceneDoc.RootNode, searchString).ToList()[localIndex];
 				Document.SetCurrent(externalSceneDoc);
 				Document.Current.History.DoTransaction(() => {
@@ -108,7 +106,7 @@ namespace Tangerine.UI
 			Core.Operations.SelectNode.Perform(node);
 		}
 
-		void EnsureRowVisible(int row)
+		private void EnsureRowVisible(int row)
 		{
 			while ((row + 1) * rowHeight > scrollView.ScrollPosition + scrollView.Height) {
 				scrollView.ScrollPosition++;
@@ -118,7 +116,7 @@ namespace Tangerine.UI
 			}
 		}
 
-		void RefreshResultPane(string searchString)
+		private void RefreshResultPane(string searchString)
 		{
 			if (searchString.IsNullOrWhiteSpace()) {
 				resultPane.Nodes.Clear();
@@ -145,7 +143,7 @@ namespace Tangerine.UI
 			scrollView.ScrollPosition = scrollView.MinScrollPosition;
 		}
 
-		static IEnumerable<Node> GetResults(Node rootNode, string searchString)
+		private static IEnumerable<Node> GetResults(Node rootNode, string searchString)
 		{
 			var searchStringLowercase = searchString.Trim().ToLower();
 			return rootNode.Descendants
@@ -157,25 +155,7 @@ namespace Tangerine.UI
 				.OrderBy(i => i.Id.ToLower());
 		}
 
-		//static IEnumerable<Node> DescendantsWithoutExternalDuplicates(Node root)
-		//{
-		//	var stack = new Stack<Node>();
-		//	var processed = new HashSet<string>();
-		//	foreach (var n in root.Descendants) {
-		//		if (n.ContentsPath != null) {
-		//			stack.Push(n);
-		//		} else {
-		//			while (stack.Count > 0 && !n.DescendantOf(stack.Peek())) {
-		//				processed.Add(stack.Pop().ContentsPath);
-		//			}
-		//		}
-		//		if (stack.Count == 0 || !processed.Contains(stack.Peek().ContentsPath)) {
-		//			yield return n;
-		//		}
-		//	}
-		//}
-
-		static string GetTypeName(Node node)
+		private static string GetTypeName(Node node)
 		{
 			var r = node.GetType().ToString();
 			if (r.StartsWith("Lime.")) {
@@ -184,7 +164,7 @@ namespace Tangerine.UI
 			return r;
 		}
 
-		static string GetContainerPath(Node node)
+		private static string GetContainerPath(Node node)
 		{
 			string r = "";
 			for (var p = node.Parent; p != null; p = p.Parent) {
