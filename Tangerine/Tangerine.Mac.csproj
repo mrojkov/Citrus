@@ -417,6 +417,8 @@
     <EmbeddedResource Include="Resources\Icons\Light\Tools\Parent.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\SceneView\ShowPanel.png" />
     <EmbeddedResource Include="Resources\Icons\Light\SceneView\ShowPanel.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.TiledImage.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.TiledImage.png" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
