@@ -24,14 +24,14 @@ namespace Tangerine.UI.Timeline.Processors
 				var node = row.Components.Get<NodeRow>()?.Node;
 				if (row.Components.Get<NodeRow>()?.Node is ImageCombiner combiner) {
 					if (combiner.GetArgs(out IImageCombinerArg arg1, out IImageCombinerArg arg2)) {
-						view.Label.Color = ColorTheme.Current.Basic.BlackText;
+						view.Label.Color = Theme.Colors.BlackText;
 						view.ImageCombinerIndicator.Color = Color4.Transparent;
 						SetImageCombinerIndication(rows[i + 1]);
 						SetImageCombinerIndication(rows[i + 2]);
 						i += 2;
 					}
 					else {
-						view.Label.Color = ColorTheme.Current.Basic.RedText;
+						view.Label.Color = Theme.Colors.RedText;
 						view.ImageCombinerIndicator.Color = Color4.White;
 					}
 					continue;
