@@ -112,6 +112,7 @@
     <Compile Include="DocumentTabContextMenu.cs" />
     <Compile Include="AlignPreferences.cs" />
     <Compile Include="Dialogs\OrangePluginOptionsDialog.cs" />
+    <Compile Include="Dialogs\ColorThemeEditor.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

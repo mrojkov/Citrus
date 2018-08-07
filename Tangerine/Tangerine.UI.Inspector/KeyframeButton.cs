@@ -18,7 +18,7 @@ namespace Tangerine.UI.Inspector
 			set
 			{
 				@checked = value;
-				image.Color = value ? KeyColor : ColorTheme.Current.Basic.WhiteBackground;
+				image.Color = value ? KeyColor : Theme.Colors.WhiteBackground;
 			}
 		}
 

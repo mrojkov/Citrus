@@ -95,7 +95,7 @@ namespace Tangerine.UI.Timeline
 
 			if (ContentWidget.Nodes.Count > 0) {
 				ContentWidget.PrepareRendererState();
-				Renderer.DrawRect(Vector2.Zero, ContentWidget.Size, ColorTheme.Current.Basic.WhiteBackground);
+				Renderer.DrawRect(Vector2.Zero, ContentWidget.Size, Theme.Colors.WhiteBackground);
 
 				RenderAnimatedRangeBackground();
 				RenderSelectedRowsBackground();

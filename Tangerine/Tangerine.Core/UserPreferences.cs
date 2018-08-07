@@ -6,12 +6,6 @@ using System.Collections.Generic;
 
 namespace Tangerine.Core
 {
-	public enum ColorThemeEnum
-	{
-		Light,
-		Dark
-	}
-
 	public class UserPreferences : ComponentCollection<Component>
 	{
 		public static UserPreferences Instance { get; private set; }

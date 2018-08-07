@@ -18,7 +18,6 @@ namespace Tangerine
 		readonly Button okButton;
 		readonly Button cancelButton;
 		readonly Button resetButton;
-		readonly ColorThemeEnum theme;
 		readonly Frame Frame;
 		readonly TabbedWidget Content;
 
@@ -36,7 +35,6 @@ namespace Tangerine
 
 		public PreferencesDialog()
 		{
-			theme = AppUserPreferences.Instance.Theme;
 			window = new Window(new WindowOptions {
 				ClientSize = new Vector2(800, 600),
 				FixedSize = false,
@@ -51,6 +49,7 @@ namespace Tangerine
 			Content = new TabbedWidget();
 			Content.AddTab("General", CreateGeneralPane(), true);
 			Content.AddTab("Appearance", CreateColorsPane());
+			Content.AddTab("Theme", CreateThemePane());
 			Content.AddTab("Keyboard shortcuts", CreateKeyboardPane());
 
 			rootWidget = new ThemedInvalidableWindowWidget(window) {
@@ -76,11 +75,9 @@ namespace Tangerine
 				saved = true;
 				SaveAfterEdit();
 				window.Close();
-				if (theme != AppUserPreferences.Instance.Theme) {
-					AlertDialog.Show("The color theme change will take effect next time you run Tangerine.");
-				}
 				NodeDecorationsPanel.Refresh();
 				Core.UserPreferences.Instance.Save();
+				AlertDialog.Show("Color theme changes will be applied after Tangerine restart.");
 			};
 			resetButton.Clicked += () => {
 				if (new AlertDialog($"Are you sure you want to reset to defaults?", "Yes", "Cancel").Show() == 0) {
@@ -133,10 +130,6 @@ namespace Tangerine
 			var pane = new ThemedScrollView();
 			pane.Content.Layout = new VBoxLayout { Spacing = 4 };
 			pane.Content.Padding = contentPadding;
-			editors.Add(
-				new EnumPropertyEditor<ColorThemeEnum>(
-					new PropertyEditorParams(pane.Content, AppUserPreferences.Instance, nameof(Tangerine.AppUserPreferences.Theme), "User interface theme"))
-			);
 			var tmp = new BooleanPropertyEditor(
 				new PropertyEditorParams(pane.Content, UI.SceneView.SceneUserPreferences.Instance, nameof(UI.SceneView.SceneUserPreferences.EnableChessBackground), "Chess background"));
 			tmp.ContainerWidget.AddChangeWatcher(
@@ -171,6 +164,107 @@ namespace Tangerine
 				() => Color4.Black.Transparentify(0.6f),
 				pane);
 			return pane;
+		}
+
+		private Widget CreateThemePane()
+		{
+			return new Widget {
+				Layout = new VBoxLayout { Spacing = 10 },
+				Padding = contentPadding,
+				Nodes = { CreateThemeEditor() }
+			};
+		}
+
+		private static Widget CreateThemeEditor()
+		{
+			var pane = new Widget {
+				Layout = new VBoxLayout { Spacing = 10 },
+				Padding = contentPadding
+			};
+			var themeEditor = new ColorThemeEditor() {
+				Layout = new VBoxLayout { Spacing = 10 },
+				Padding = contentPadding
+			};
+			var darkIcons = CreateDarkIconsSwitch(pane);
+			var loadDarkButton = new ThemedButton("Dark preset") {
+				Clicked = () => {
+					AppUserPreferences.Instance.LimeColorTheme = Theme.ColorTheme.CreateDarkTheme();
+					AppUserPreferences.Instance.ColorTheme = ColorTheme.CreateDarkTheme();
+					themeEditor.Rebuild();
+					RebuildThemeEditor(pane);
+				}
+			};
+			var loadLightButton = new ThemedButton("Light preset") {
+				Clicked = () => {
+					AppUserPreferences.Instance.LimeColorTheme = Theme.ColorTheme.CreateLightTheme();
+					AppUserPreferences.Instance.ColorTheme = ColorTheme.CreateLightTheme();
+					themeEditor.Rebuild();
+					RebuildThemeEditor(pane);
+				}
+			};
+			var saveButton = new ThemedButton("Save theme") {
+				Clicked = () => {
+					var dlg = new FileDialog {
+						AllowedFileTypes = new string[] { "theme" },
+						Mode = FileDialogMode.Save
+					};
+					if (dlg.RunModal()) {
+						string path = dlg.FileName;
+						var serializer = new Yuzu.Json.JsonSerializer();
+						try {
+							var limeTheme = AppUserPreferences.Instance.LimeColorTheme;
+							var theme = AppUserPreferences.Instance.ColorTheme;
+							using (var fileStream = new FileStream(path, FileMode.OpenOrCreate)) {
+								serializer.ToStream(new List<object> { limeTheme, theme }, fileStream);
+							}
+						} catch (System.Exception e) {
+							AlertDialog.Show(e.Message);
+						}
+					}
+				}
+			};
+			var loadButton = new ThemedButton("Load theme") {
+				Clicked = () => {
+					var dlg = new FileDialog {
+						AllowedFileTypes = new string[] { "theme" },
+						Mode = FileDialogMode.Open
+					};
+					if (dlg.RunModal()) {
+						string path = dlg.FileName;
+						var deserializer = new Yuzu.Json.JsonDeserializer();
+						try {
+							using (var fs = new FileStream(path, FileMode.OpenOrCreate)) {
+								var read = deserializer.FromStream(new List<object>(), fs) as List<object>;
+								AppUserPreferences.Instance.LimeColorTheme = (Theme.ColorTheme)read[0];
+								AppUserPreferences.Instance.ColorTheme = (ColorTheme)read[1];
+							}
+						} catch (System.Exception e) {
+							AlertDialog.Show(e.Message);
+						}
+					}
+					RebuildThemeEditor(pane);
+				}
+			};
+			var buttons = new Widget {
+				Layout = new HBoxLayout { Spacing = 4 },
+				Nodes = { loadDarkButton, loadLightButton, saveButton, loadButton }
+			};
+			pane.AddNode(buttons);
+			pane.AddNode(themeEditor);
+			return pane;
+		}
+
+		private static void RebuildThemeEditor(Widget pane)
+		{
+			var parent = pane.ParentWidget;
+			parent.Nodes.Clear();
+			parent.AddNode(CreateThemeEditor());
+		}
+
+		private static IPropertyEditor CreateDarkIconsSwitch(Widget pane)
+		{
+			return new BooleanPropertyEditor(
+				new PropertyEditorParams(pane, AppUserPreferences.Instance.ColorTheme, nameof(ColorTheme.IsDark), "Dark icon theme"));
 		}
 
 		public void CreateColorPropertyEditor(string targetProperty, string text, object source, System.Func<object> valueGetter, ThemedScrollView container)

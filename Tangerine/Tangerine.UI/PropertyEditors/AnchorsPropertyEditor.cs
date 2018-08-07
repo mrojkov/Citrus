@@ -5,8 +5,8 @@ namespace Tangerine.UI
 {
 	public class AnchorsPropertyEditor : CommonPropertyEditor<Anchors>
 	{
-		private ToolbarButton firstButton;
-		private Widget group;
+		private readonly ToolbarButton firstButton;
+		private readonly Widget group;
 
 		public AnchorsPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
@@ -20,7 +20,7 @@ namespace Tangerine.UI
 			AddButton(Anchors.CenterV, "Anchor to the center vertically");
 		}
 
-		ToolbarButton AddButton(Anchors anchor, string tip)
+		private ToolbarButton AddButton(Anchors anchor, string tip)
 		{
 			var tb = new AnchorButton { LayoutCell = new LayoutCell(Alignment.Center), Tip = tip };
 			group.AddNode(tb);
@@ -34,10 +34,10 @@ namespace Tangerine.UI
 			return tb;
 		}
 
-		float[] a = { 0, 0, 1, 0, 0, 0, 0, 1, 0.5f, 0, 0, 0.5f };
-		float[] b = { 0, 1, 1, 1, 1, 0, 1, 1, 0.5f, 1, 1, 0.5f };
+		private readonly float[] a = { 0, 0, 1, 0, 0, 0, 0, 1, 0.5f, 0, 0, 0.5f };
+		private readonly float[] b = { 0, 1, 1, 1, 1, 0, 1, 1, 0.5f, 1, 1, 0.5f };
 
-		void DrawIcon(Widget button, Anchors anchor)
+		private void DrawIcon(Widget button, Anchors anchor)
 		{
 			button.PrepareRendererState();
 			int t = -1;
@@ -50,10 +50,11 @@ namespace Tangerine.UI
 			Renderer.DrawLine(
 				Scale(a[t * 2], w), Scale(a[t * 2 + 1], h),
 				Scale(b[t * 2], w), Scale(b[t * 2 + 1], h),
-				ColorTheme.Current.Basic.BlackText);
+				Theme.Colors.BlackText
+			);
 		}
 
-		float Scale(float x, float s)
+		private static float Scale(float x, float s)
 		{
 			x *= s;
 			if (x == 0) x += 4;
@@ -61,14 +62,14 @@ namespace Tangerine.UI
 			return x;
 		}
 
-		class AnchorButton : ToolbarButton
+		private class AnchorButton : ToolbarButton
 		{
 			protected override void GetColors(State state, out Color4 bgColor, out Color4 borderColor)
 			{
 				base.GetColors(state, out bgColor, out borderColor);
 				if (state == State.Default && !Checked) {
-					bgColor = ColorTheme.Current.Basic.WhiteBackground;
-					borderColor = ColorTheme.Current.Basic.ControlBorder;
+					bgColor = Theme.Colors.WhiteBackground;
+					borderColor = Theme.Colors.ControlBorder;
 				}
 			}
 		}

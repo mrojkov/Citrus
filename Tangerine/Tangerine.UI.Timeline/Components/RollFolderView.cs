@@ -136,7 +136,7 @@ namespace Tangerine.UI.Timeline.Components
 			widget.PrepareRendererState();
 			Renderer.DrawRect(
 				Vector2.Zero, widget.Size,
-				row.Selected ? ColorTheme.Current.Basic.SelectedBackground : ColorTheme.Current.Basic.WhiteBackground);
+				row.Selected ? Theme.Colors.SelectedBackground : Theme.Colors.WhiteBackground);
 		}
 
 		IEnumerator<object> HandleDobleClickTask()
