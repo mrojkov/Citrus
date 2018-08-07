@@ -93,6 +93,15 @@ namespace Tangerine.UI.Inspector
 					continue;
 				}
 
+				if (objects.Any(obj =>
+					obj is Node node &&
+					!string.IsNullOrEmpty(node.ContentsPath) &&
+					obj is IExternalScenePropertyOverrideChecker checker &&
+					!checker.IsPropertyOverridden(property)
+				)) {
+					continue;
+				}
+
 				if (!categoryLabelAdded) {
 					categoryLabelAdded = true;
 					var text = type.Name;

@@ -1206,9 +1206,25 @@ namespace Lime
 				Components = content.Components.Clone(this);
 			}
 
-			if ((content is Widget) && (this is Widget)) {
-				((Widget)content).Size = (this as Widget).Size;
+			if (content is IExternalScenePropertyOverrideChecker coordinator) {
+				var properties = nodeType.GetProperties(
+					BindingFlags.Instance |
+					BindingFlags.Public
+				);
+
+				foreach (var property in properties) {
+					if (coordinator.IsPropertyOverridden(property)) {
+						continue;
+					}
+
+					property.SetValue(this, property.GetValue(content));
+				}
+			} else {
+				if ((content is Widget) && (this is Widget)) {
+					((Widget)content).Size = (this as Widget).Size;
+				}
 			}
+
 			Animations.Clear();
 			var animations = content.Animations.ToList();
 			content.Animations.Clear();

@@ -262,6 +262,7 @@
     <Compile Include="Source\Application\FileDialog\FileDialog.Mac.cs" />
     <Compile Include="Source\Application\FileDialog\FileDialog.Win.cs" />
     <Compile Include="Source\Types\Thickness.cs" />
+    <Compile Include="Source\Widgets\IExternalScenePropertyOverrideChecker.cs" />
     <Compile Include="Source\Widgets\HSplitter.cs" />
     <Compile Include="Source\Widgets\VSplitter.cs" />
     <Compile Include="Source\Widgets\Layout\FlowLayout.cs" />

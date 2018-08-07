@@ -216,6 +216,7 @@
     <Compile Include="Source\Types\Vector4.cs" />
     <Compile Include="Source\Types\MonoMac\CG.cs" />
     <Compile Include="Source\Widgets\3D\Spline3D.cs" />
+    <Compile Include="Source\Widgets\IExternalScenePropertyOverrideChecker.cs" />
     <Compile Include="Source\Widgets\HSplitter.cs" />
     <Compile Include="Source\Widgets\VSplitter.cs" />
     <Compile Include="Source\Application\MouseCursor\IStockCursors.cs" />
