@@ -236,7 +236,7 @@
       <Project>{FC2DE6C9-641A-4230-8D29-EA4035CD8708}</Project>
       <Name>Lime.Win</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Yuzu\Yuzu.csproj">
+    <ProjectReference Include="..\Yuzu\Yuzu.Win.csproj">
       <Project>{ddd2dfe9-ced2-4cea-adf0-5a6865865a46}</Project>
       <Name>Yuzu</Name>
     </ProjectReference>

@@ -1,0 +1,3 @@
+[submodule "Yuzu"]
+	path = Yuzu
+	url = ../Yuzu.git

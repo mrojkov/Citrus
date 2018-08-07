@@ -410,7 +410,7 @@
       <Project>{4604AA2E-129F-4814-AD0D-8BA35346ECC4}</Project>
       <Name>Lemon.MonoMac</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Yuzu\Yuzu.csproj">
+    <ProjectReference Include="..\Yuzu\Yuzu.Win.csproj">
       <Project>{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}</Project>
       <Name>Yuzu</Name>
     </ProjectReference>
