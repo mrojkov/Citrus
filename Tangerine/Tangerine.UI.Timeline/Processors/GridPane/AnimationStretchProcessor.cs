@@ -2,8 +2,6 @@ using Lime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Tangerine.Core;
 using Tangerine.Core.Components;
 using Tangerine.Core.Operations;
@@ -12,12 +10,13 @@ using Tangerine.UI.Timeline.Operations;
 
 namespace Tangerine.UI.Timeline
 {
-	class AnimationStretchProcessor : ITaskProvider
+	public class AnimationStretchProcessor : ITaskProvider
 	{
-		Timeline timeline => Timeline.Instance;
-		GridPane grid => Timeline.Instance.Grid;
-		WidgetInput input => grid.RootWidget.Input;
-		Dictionary<IKeyframe, double> savedPositions = new Dictionary<IKeyframe, double>();
+		private Timeline timeline => Timeline.Instance;
+		private GridPane grid => Timeline.Instance.Grid;
+		private WidgetInput input => grid.RootWidget.Input;
+		private Dictionary<IKeyframe, double> savedPositions = new Dictionary<IKeyframe, double>();
+		private Dictionary<IAnimator, List<IKeyframe>> savedKeyframes = new Dictionary<IAnimator, List<IKeyframe>>();
 
 		public IEnumerator<object> Task() {
 			while (true) {
@@ -53,7 +52,7 @@ namespace Tangerine.UI.Timeline
 		private IEnumerator<object> Drag(Boundaries boundaries, DragSide side)
 		{
 			IntVector2? last = null;
-			SavePositions(boundaries);
+			Save(boundaries);
 			using (Document.Current.History.BeginTransaction()) {
 				while (input.IsMousePressed()) {
 					Utils.ChangeCursorIfDefault(MouseCursor.SizeWE);
@@ -62,7 +61,13 @@ namespace Tangerine.UI.Timeline
 						yield return null;
 						continue;
 					}
+					Document.Current.History.RollbackTransaction();
 					current.X = Math.Max(current.X, 0);
+					if (side == DragSide.Left) {
+						current.X = Math.Min(current.X, boundaries.Right - 1);
+					} else {
+						current.X = Math.Max(current.X, boundaries.Left + 1);
+					}
 					Stretch(boundaries, side, current.X);
 					if (side == DragSide.Left) {
 						boundaries.Left = current.X;
@@ -73,6 +78,7 @@ namespace Tangerine.UI.Timeline
 					for (int i = boundaries.Top; i <= boundaries.Bottom; ++i) {
 						SelectGridSpan.Perform(i, boundaries.Left, boundaries.Right);
 					}
+					SetCurrentColumn.Perform(boundaries.Right);
 					last = current;
 					yield return null;
 				}
@@ -89,32 +95,23 @@ namespace Tangerine.UI.Timeline
 			} else {
 				length = newPos - boundaries.Left - 1;
 			}
-			if (length == boundaries.Left - boundaries.Right - 1) {
-				return;
-			}
 			for (int i = boundaries.Top; i <= boundaries.Bottom; ++i) {
 				if (!(Document.Current.Rows[i].Components.Get<NodeRow>()?.Node is IAnimable animable)) {
 					continue;
 				}
-				foreach (var animator in animable.Animators) {
-					List<IKeyframe> saved;
+				foreach (var animator in animable.Animators.ToList()) {
+					IEnumerable<IKeyframe> saved = savedKeyframes[animator];
+					int oldLength = boundaries.Right - boundaries.Left - 1;
 					if (
-						side == DragSide.Left && length < boundaries.Right - boundaries.Left - 1 ||
-						side == DragSide.Right && length > boundaries.Right - boundaries.Left - 1
+						side == DragSide.Left && length < oldLength ||
+						side == DragSide.Right && length > oldLength
 					) {
-						saved = animator.Keys.Where(k =>
-							boundaries.Left <= k.Frame &&
-							k.Frame < boundaries.Right).Reverse().ToList();
-					} else {
-						saved = animator.Keys.Where(k =>
-							boundaries.Left <= k.Frame &&
-							k.Frame < boundaries.Right).ToList();
+						saved = saved.Reverse();
 					}
 					foreach (var key in saved) {
-						int frame = key.Frame;
-						if (!savedPositions.ContainsKey(key)) {
-							continue;
-						}
+						RemoveKeyframe.Perform(animator, key.Frame);
+					}
+					foreach (var key in saved) {
 						double relpos = savedPositions[key];
 						int newFrame;
 						if (side == DragSide.Left) {
@@ -122,36 +119,33 @@ namespace Tangerine.UI.Timeline
 						} else {
 							newFrame = (int)Math.Round(boundaries.Left + relpos * length);
 						}
-						if (frame == newFrame) {
-							continue;
-						}
 						var k1 = key.Clone();
-						savedPositions.Remove(key);
-						savedPositions.Add(k1, relpos);
 						k1.Frame = newFrame;
-						SetAnimableProperty.Perform(animable, animator.TargetProperty, k1.Value, true, true, k1.Frame);
-						SetKeyframe.Perform(animable, animator.TargetProperty, animator.AnimationId, k1);
-						RemoveKeyframe.Perform(animator, key.Frame);
+						SetAnimableProperty.Perform(animable, animator.TargetProperty, k1.Value,  true, false, k1.Frame);
+						SetKeyframe.Perform(animable, animator.TargetProperty, Document.Current.AnimationId, k1);
 					}
 				}
 			}
 		}
 
-		private void SavePositions(Boundaries boundaries)
+		private void Save(Boundaries boundaries)
 		{
 			savedPositions.Clear();
+			savedKeyframes.Clear();
 			var length = boundaries.Right - boundaries.Left - 1;
 			for (int i = boundaries.Top; i <= boundaries.Bottom; ++i) {
 				if (!(Document.Current.Rows[i].Components.Get<NodeRow>()?.Node is IAnimable animable)) {
 					continue;
 				}
 				foreach (var animator in animable.Animators) {
+					savedKeyframes.Add(animator, new List<IKeyframe>());
 					foreach (
 						var key in animator.Keys.Where(k =>
 						boundaries.Left <= k.Frame &&
 						k.Frame < boundaries.Right)
 					) {
 						savedPositions.Add(key, ((double)key.Frame - boundaries.Left) / length);
+						savedKeyframes[animator].Add(key);
 					}
 				}
 			}
