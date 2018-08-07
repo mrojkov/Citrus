@@ -47,7 +47,8 @@ namespace Lime
 
 		private static readonly CommonOptions defaultYuzuCommonOptions = new CommonOptions {
 			TagMode = TagMode.Aliases,
-			AllowEmptyTypes = true
+			AllowEmptyTypes = true,
+			CheckForEmptyCollections = true,
 		};
 
 		private static readonly JsonSerializeOptions defaultYuzuJSONOptions = new JsonSerializeOptions {
