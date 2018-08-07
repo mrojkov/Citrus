@@ -52,7 +52,7 @@ namespace Lime
 
 	[TangerineRegisterNode(Order = 6)]
 	[TangerineNodeBuilder("BuildForTangerine")]
-	[AllowedChildrenTypes(typeof(ParticlesMagnet), typeof(ParticleModifier), typeof(EmitterShapePoint))]
+	[AllowedChildrenTypes(typeof(ParticleModifier), typeof(EmitterShapePoint))]
 	public partial class ParticleEmitter : Widget
 	{
 		internal static System.Random Rng = new System.Random();
