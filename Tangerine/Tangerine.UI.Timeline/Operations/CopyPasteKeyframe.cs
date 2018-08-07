@@ -12,20 +12,16 @@ using Yuzu;
 
 namespace Tangerine.UI.Timeline.Operations
 {
+	internal static class KeyframeClipboard
+	{
+		public static List<RowKeyBinding> Keys;
+	}
+
 	public static class CopyKeyframes
 	{
 		public static void Perform()
 		{
-			Clipboard.Text = CopyToString();
-		}
-
-		private static string CopyToString()
-		{
-			var keys = GetKeyframes();
-			var stream = new System.IO.MemoryStream();
-			Serialization.WriteObject(Document.Current.Path, stream, keys, Serialization.Format.JSON);
-			var text = Encoding.UTF8.GetString(stream.ToArray());
-			return text;
+			KeyframeClipboard.Keys = GetKeyframes();
 		}
 
 		private static List<RowKeyBinding> GetKeyframes()
@@ -95,8 +91,8 @@ namespace Tangerine.UI.Timeline.Operations
 	{
 		public static void Perform()
 		{
-			string data = Clipboard.Text;
-			if (String.IsNullOrEmpty(data) || !Document.Current.TopLevelSelectedRows().Any()) {
+			var keys = KeyframeClipboard.Keys;
+			if (keys == null || !Document.Current.TopLevelSelectedRows().Any()) {
 				return;
 			}
 			int startRow = Document.Current.TopLevelSelectedRows().First().Index;
@@ -105,12 +101,6 @@ namespace Tangerine.UI.Timeline.Operations
 				return;
 			}
 			int startCol = spans.First().A;
-			var stream = new System.IO.MemoryStream(Encoding.UTF8.GetBytes(data));
-			List<RowKeyBinding> keys;
-			try {
-				keys = Serialization.ReadObject<List<RowKeyBinding>>(Document.Current.Path, stream);
-			}
-			catch (System.Exception) { return; }
 			Document.Current.History.DoTransaction(() => {
 				foreach (var key in keys) {
 					int rowIndex = startRow + key.Row;
@@ -126,8 +116,9 @@ namespace Tangerine.UI.Timeline.Operations
 					if (property == null) {
 						continue;
 					}
-					key.Keyframe.Frame = colIndex;
-					SetKeyframe.Perform(animable, key.Property, key.AnimationId, key.Keyframe);
+					var keyframe = key.Keyframe.Clone();
+					keyframe.Frame = colIndex;
+					SetKeyframe.Perform(animable, key.Property, key.AnimationId, keyframe);
 				}
 			});
 		}
