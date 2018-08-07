@@ -603,10 +603,12 @@ namespace Lime
 		/// <summary>
 		/// Runs animation with provided Id and provided marker.
 		/// Throws an exception if sought-for animation or marker doesn't exist.
+		/// Returns this (to use with yield return)
 		/// </summary>
-		public void RunAnimation(string markerId, string animationId = null)
+		public Node RunAnimation(string markerId, string animationId = null)
 		{
 			Animations.Run(animationId, markerId);
+			return this;
 		}
 
 		/// <summary>
