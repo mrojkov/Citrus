@@ -10,15 +10,45 @@ namespace Tangerine.UI
 	{
 		private readonly Node rootNode;
 		private readonly ThemedScrollView scrollView;
+		private readonly TreeNode root;
+		private readonly Widget parent;
 		private TreeNode selected = null;
 
 		public TreeView(Widget parent, Node rootNode)
 		{
 			this.rootNode = rootNode;
+			this.parent = parent;
 			scrollView = new ThemedScrollView();
 			scrollView.Content.Layout = new VBoxLayout();
+			scrollView.Content.AddNode(root = new TreeNode(this, rootNode, null, JointType.LShaped, new List<Joint>(), 0, isLast: true));
+		}
+
+		public void Detach()
+		{
+			scrollView.Unlink();
+		}
+
+		public void Attach()
+		{
 			parent.AddNode(scrollView);
-			scrollView.Content.AddNode(new TreeNode(this, rootNode, null, JointType.LShaped, new List<Joint>(), 0, isLast: true));
+		}
+
+		public bool IsAttached()
+		{
+			return scrollView.Parent != null;
+		}
+
+		public void Filter(string filter)
+		{
+			root.Filter(filter);
+		}
+
+		public void ClearSelection()
+		{
+			if (selected != null) {
+				selected.Selected = false;
+				selected = null;
+			}
 		}
 
 		private void SelectTreeNode(TreeNode node)
@@ -91,6 +121,8 @@ namespace Tangerine.UI
 			private readonly TreeView view;
 			private bool expanded = false;
 			private bool expandable;
+			private string filter;
+			private List<TreeNode> savedNodes = new List<TreeNode>();
 
 			internal bool Selected { get; set; }
 
@@ -221,23 +253,21 @@ namespace Tangerine.UI
 
 			private void UpdateChildTreeNodes()
 			{
-				var treeNodes = treeNodesContainer.Nodes.Cast<TreeNode>().ToList();
-				var rootNodes = treeNodes.Select(t => t.rootNode).ToList();
+				var rootNodes = savedNodes.Select(t => t.rootNode).ToList();
 				treeNodesContainer.Nodes.Clear();
 				foreach (var node in rootNode.Nodes) {
 					var index = rootNodes.IndexOf(node);
 					if (index >= 0) {
-						treeNodesContainer.AddNode(treeNodes[index]);
-						treeNodes[index].SetJoints(JointType.VLine, JointType.TShaped);
+						treeNodesContainer.AddNode(savedNodes[index]);
+						savedNodes[index].SetJoints(JointType.VLine, JointType.TShaped);
 					} else {
 						treeNodesContainer.AddNode(new TreeNode(view, node, this, JointType.TShaped, offsetJoints, level + 1, isLast: false));
 					}
 				}
-				if (treeNodesContainer.Nodes.Count > 0) {
-					((TreeNode)treeNodesContainer.Nodes.Last()).SetJoints(JointType.None, JointType.LShaped);
-					SetExpandable(true);
-				} else {
-					SetExpandable(false);
+				UpdateExpandable();
+				savedNodes = treeNodesContainer.Nodes.Cast<TreeNode>().ToList();
+				if (!String.IsNullOrEmpty(filter)) {
+					view.root.Filter(filter);
 				}
 			}
 
@@ -263,7 +293,7 @@ namespace Tangerine.UI
 					}
 					externalSceneDocument.SceneNavigatedFrom = currentScenePath;
 					node = externalSceneDocument.RootNode;
-					foreach(var i in path) {
+					foreach (var i in path) {
 						node = node.Nodes[i];
 					}
 				}
@@ -271,6 +301,35 @@ namespace Tangerine.UI
 					Core.Operations.EnterNode.Perform(node.Parent, selectFirstNode: false);
 					Core.Operations.SelectNode.Perform(node);
 				});
+			}
+
+			public bool Filter(string filter)
+			{
+				this.filter = filter;
+				treeNodesContainer.Nodes.Clear();
+				bool result = String.IsNullOrEmpty(filter) || (rootNode.Id?.ToLower().Contains(filter.ToLower()) ?? false);
+				foreach (var node in savedNodes) {
+					if (node.Filter(filter)) {
+						result = true;
+						treeNodesContainer.AddNode(node);
+						node.SetJoints(JointType.VLine, JointType.TShaped);
+					}
+				}
+				UpdateExpandable();
+				if (result && expandable && !expanded) {
+					ToggleExpanded();
+				}
+				return result;
+			}
+
+			private void UpdateExpandable()
+			{
+				if (treeNodesContainer.Nodes.Count > 0) {
+					((TreeNode)treeNodesContainer.Nodes.Last()).SetJoints(JointType.None, JointType.LShaped);
+					SetExpandable(true);
+				} else {
+					SetExpandable(false);
+				}
 			}
 		}
 	}

@@ -30,14 +30,29 @@ namespace Tangerine.UI
 		public SearchPanel(Widget rootWidget)
 		{
 			PanelWidget = rootWidget;
-			scrollView = new ThemedScrollView();
 			RootWidget = new Frame { Id = "SearchPanel",
 				Padding = new Thickness(4),
 				Layout = new VBoxLayout { Spacing = 4 },
 				Nodes = { (searchStringEditor = new ThemedEditBox()) }
 			};
-			resultPane = scrollView.Content;
-			new TreeView(RootWidget, Document.Current.RootNode);
+			var treeView = new TreeView(RootWidget, Document.Current.RootNode);
+			var searchTreeView = new TreeView(RootWidget, Document.Current.RootNode);
+			searchStringEditor.AddChangeWatcher(() => searchStringEditor.Text, t => {
+				if (!String.IsNullOrEmpty(t)) {
+					if (treeView.IsAttached()) {
+						treeView.Detach();
+						searchTreeView.Attach();
+					}
+					searchTreeView.Filter(t);
+				} else {
+					if (searchTreeView.IsAttached()) {
+						searchTreeView.Detach();
+						searchTreeView.ClearSelection();
+						treeView.Attach();
+					}
+				}
+			});
+			treeView.Attach();
 		}
 
 		private void ScrollView_KeyRepeated(WidgetInput input, Key key)
