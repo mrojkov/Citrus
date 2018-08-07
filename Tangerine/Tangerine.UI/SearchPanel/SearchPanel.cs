@@ -151,9 +151,7 @@ namespace Tangerine.UI
 			return rootNode.Descendants
 				.Where(i => {
 					bool textContains =
-						i.GetType().GetProperty("Text") is PropertyInfo textProp &&
-						textProp.GetValue(i) is string s &&
-						s.ToLower().Contains(searchStringLowercase);
+						i is IText txt && txt.Text.ToLower().Contains(searchStringLowercase);
 					return (i.Id?.ToLower().Contains(searchStringLowercase) ?? false) || textContains;
 				})
 				.OrderBy(i => i.Id.ToLower());
