@@ -102,6 +102,8 @@
     <Compile Include="TangerineAssetBundle.cs" />
     <Compile Include="BackupManager.cs" />
     <Compile Include="Operations\TimelineColumnRemove.cs" />
+    <Compile Include="Operations\NodeTypeConvert.cs" />
+    <Compile Include="Operations\ReplaceContents.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>
