@@ -32,7 +32,8 @@ namespace Tangerine.UI.SceneView
 		Invisible,
 		AnimationPath,
 		TiledImage,
-		ParticlesMagnet
+		ParticlesMagnet,
+		UnknownWidget
 	}
 
 	public static class NodeDecorationUtils
@@ -69,7 +70,7 @@ namespace Tangerine.UI.SceneView
 			if (typeToDecoration.ContainsKey(type)) {
 				return typeToDecoration[type];
 			}
-			throw new ArgumentException();
+			return NodeDecoration.UnknownWidget;
 		}
 
 		public static bool RequiredToDisplay(this NodeDecoration decoration)
@@ -165,7 +166,8 @@ namespace Tangerine.UI.SceneView
 			new NodeDecorationGroup {
 				Title = "Other",
 				NodeDecorations = {
-					NodeDecoration.AnimationPath
+					NodeDecoration.AnimationPath,
+					NodeDecoration.UnknownWidget
 				}
 			}
 		};
