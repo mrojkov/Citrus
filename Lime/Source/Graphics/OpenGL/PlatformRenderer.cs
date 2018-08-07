@@ -372,16 +372,22 @@ namespace Lime
 			throw new Exception("OpenGL error(s): " + errors);
 		}
 
-		static PlatformRenderer()
+		private static void Initialize()
 		{
 			DefaultFramebuffer = uint.MaxValue;
 			CheckFeatures();
 			textures = new ITexture[maxTextureSlots];
 			vertexBufferViews = new VertexBufferView[maxVertexBufferSlots];
 		}
-
+		
+		private static bool initialized;
+		
 		public static void BeginFrame()
 		{
+			if (!initialized) {
+				Initialize();
+				initialized = true;
+			}
 			DrawCount = 0;
 			SaveDefaultFramebuffer();
 			CurrentFramebuffer = DefaultFramebuffer;

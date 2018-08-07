@@ -59,8 +59,8 @@
     <Compile Include="Scenes\Main\BtnOptions.cs" />
     <Compile Include="Scenes\Main\BtnPlay.cs" />
     <Compile Include="Scenes\Main\MainMenu.cs" />
-    <Compile Include="Scenes\Main\Common.cs" />
     <Compile Include="Scenes\Main\Options.cs" />
+    <Compile Include="Scenes\Common\CheckGroup.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Lime\Lime.Android.csproj">

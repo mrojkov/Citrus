@@ -1,5 +1,6 @@
 #if ANDROID
 using System;
+using System.Threading;
 using System.Collections.Generic;
 
 using Android.Content.Res;
@@ -14,6 +15,9 @@ namespace Lime
 {
 	public class Window : CommonWindow, IWindow
 	{
+		private Thread renderThread;
+		private CancellationToken renderThreadToken;
+		
 		private static readonly IWindowManager WindowManager =
 			AndroidApp.Context.GetSystemService(AndroidContext.WindowService).JavaCast<IWindowManager>();
 
@@ -28,6 +32,7 @@ namespace Lime
 		public string Title { get; set; }
 		public bool Visible { get { return true; } set {} }
 		public WindowInput Input { get; private set; }
+		public bool AsyncRendering { get; private set; }
 		public MouseCursor Cursor { get; set; }
 		public WindowState State { get { return WindowState.Fullscreen; } set {} }
 		public bool FixedSize { get { return true; } set {} }
@@ -80,6 +85,7 @@ namespace Lime
 			Application.MainWindow = this;
 			Input = new WindowInput(this);
 			Active = true;
+			AsyncRendering = options.AsyncRendering;
 			fpsCounter = new FPSCounter();
 			ActivityDelegate.Instance.Paused += activity => {
 				Active = false;
@@ -93,14 +99,38 @@ namespace Lime
 				RaiseResized(((ResizeEventArgs)e).DeviceRotated);
 			};
 			ActivityDelegate.Instance.GameView.UpdateFrame += GameView_UpdateFrame;
-			ActivityDelegate.Instance.GameView.RenderFrame += GameView_RenderFrame;
-
 			PixelScale = Resources.System.DisplayMetrics.Density;
+			
+			if (AsyncRendering) {
+				var renderThreadTokenSource = new CancellationTokenSource();
+				renderThreadToken = renderThreadTokenSource.Token;
+				Application.Exited += renderThreadTokenSource.Cancel;
+				renderThread = new Thread(RenderLoop);
+				renderThread.Start();
+			} else {
+				ActivityDelegate.Instance.GameView.RenderFrame += GameView_RenderFrame;
+			}
 			Application.WindowUnderMouse = this;
+		}
+		
+		private void RenderLoop()
+		{
+			while (!renderThreadToken.IsCancellationRequested) {
+				if (ActivityDelegate.Instance.GameView.ReadyToRender) {
+					ActivityDelegate.Instance.GameView.MakeCurrentActual();
+					RaiseRendering();
+					if (ActivityDelegate.Instance.GameView.ReadyToRender) {
+						ActivityDelegate.Instance.GameView.SwapBuffers();
+					}
+				} else {
+					Thread.Sleep(16);
+				}
+			}
 		}
 
 		private void GameView_UpdateFrame(object sender, OpenTK.FrameEventArgs e)
 		{
+			fpsCounter.Refresh();
 			UnclampedDelta = (float)e.Time;
 			var delta = Math.Min(UnclampedDelta, Application.MaxDelta);
 			RaiseUpdating(delta);
@@ -111,7 +141,6 @@ namespace Lime
 
 		private void GameView_RenderFrame(object sender, OpenTK.FrameEventArgs e)
 		{
-			fpsCounter.Refresh();
 			RaiseRendering();
 		}
 

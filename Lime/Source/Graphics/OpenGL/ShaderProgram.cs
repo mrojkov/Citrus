@@ -47,7 +47,6 @@ namespace Lime
 			this.shaders = new List<Shader>(shaders);
 			this.attribLocations = new List<AttribLocation>(attribLocations);
 			this.samplers = new List<Sampler>(samplers);
-			Create();
 			GLObjectRegistry.Instance.Add(this);
 		}
 

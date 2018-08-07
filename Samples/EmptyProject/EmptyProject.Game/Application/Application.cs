@@ -12,8 +12,6 @@ namespace EmptyProject.Application
 		public const string ApplicationName = "EmptyProject";
 		public static readonly Vector2 DefaultWorldSize = new Vector2(1024, 768);
 
-		private readonly object uiSync = new object();
-
 		public static void Initialize()
 		{
 			Instance = new Application();
@@ -89,7 +87,7 @@ namespace EmptyProject.Application
 
 		private WindowWidget CreateWorld()
 		{
-			var options = new WindowOptions { Title = ApplicationName };
+			var options = new WindowOptions { Title = ApplicationName, AsyncRendering = true };
 			var window = new Window(options);
 			window.Updating += OnUpdateFrame;
 			window.Rendering += OnRenderFrame;
@@ -108,37 +106,31 @@ namespace EmptyProject.Application
 
 		private void OnUpdateFrame(float delta)
 		{
-			lock (uiSync) {
-				Cheats.ProcessCheatKeys();
-				var speedMultiplier = 1.0f;
-				if (Cheats.IsKeyPressed(Key.Shift) || Cheats.IsTripleTouch()) {
-					speedMultiplier = 10.0f;
-				}
-				if (Cheats.IsKeyPressed(Key.Tilde)) {
-					speedMultiplier = 0.1f;
-				}
-
-				delta *= speedMultiplier;
-				The.World.Update(delta);
+			Cheats.ProcessCheatKeys();
+			var speedMultiplier = 1.0f;
+			if (Cheats.IsKeyPressed(Key.Shift) || Cheats.IsTripleTouch()) {
+				speedMultiplier = 10.0f;
 			}
+			if (Cheats.IsKeyPressed(Key.Tilde)) {
+				speedMultiplier = 0.1f;
+			}
+
+			delta *= speedMultiplier;
+			The.World.Update(delta);
 		}
 
 		private void OnResize(bool isDeviceRotated)
 		{
-			lock (uiSync) {
-				DisplayInfo.HandleOrientationOrResolutionChange();
-			}
+			DisplayInfo.HandleOrientationOrResolutionChange();
 		}
 
 		private void OnRenderFrame()
 		{
-			lock (uiSync) {
-				Renderer.BeginFrame();
-				SetupViewportAndProjectionMatrix();
-				World.RenderAll();
-				Cheats.RenderDebugInfo();
-				Renderer.EndFrame();
-			}
+			Renderer.BeginFrame();
+			SetupViewportAndProjectionMatrix();
+			World.RenderAll();
+			Cheats.RenderDebugInfo();
+			Renderer.EndFrame();
 		}
 
 		private static void SetupViewportAndProjectionMatrix()

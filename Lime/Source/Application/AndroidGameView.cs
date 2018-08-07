@@ -86,6 +86,9 @@ namespace Lime
 		private Input input;
 		private AndroidSoftKeyboard androidSoftKeyboard;
 
+		private Func<bool> readyToRender;
+		public bool ReadyToRender => readyToRender.Invoke();
+
 		public GameView(Android.Content.Context context, Input input) : base(context)
 		{
 			this.input = input;
@@ -96,8 +99,11 @@ namespace Lime
 			}
 			keyboardHandler = new KeyboardHandler(input);
 			SetOnKeyListener(keyboardHandler);
-
 			RestrictSupportedOrientationsWith(Application.SupportedDeviceOrientations);
+			var readyToRenderGetter = typeof(OpenTK.Platform.Android.AndroidGameView).GetProperty("ReadyToRender",
+				System.Reflection.BindingFlags.Instance |
+				System.Reflection.BindingFlags.NonPublic).GetMethod;
+			readyToRender = (Func<bool>)readyToRenderGetter.CreateDelegate(typeof(Func<bool>), this);
 		}
 
 		public override IInputConnection OnCreateInputConnection(EditorInfo outAttrs)
@@ -158,6 +164,10 @@ namespace Lime
 			OnRenderFrame(null);
 		}
 
+		public override void MakeCurrent() { }
+
+		public void MakeCurrentActual() => base.MakeCurrent();
+
 		public override bool OnCheckIsTextEditor()
 		{
 			return true;
@@ -208,7 +218,9 @@ namespace Lime
 
 		private DeviceOrientation previousAllowedOrientaion = 0;
 
-		protected override void OnRenderFrame(FrameEventArgs e)
+		protected override void OnRenderFrame(FrameEventArgs e) { }
+
+		public void OnRenderFrameForce(FrameEventArgs e)
 		{
 			if (GraphicsContext == null || GraphicsContext.IsDisposed) {
 				return;
