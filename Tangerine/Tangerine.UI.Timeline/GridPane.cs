@@ -357,12 +357,12 @@ namespace Tangerine.UI.Timeline
 			}
 		}
 
-		public IntVector2 CellUnderMouse(Vector2? position = null)
+		public IntVector2 CellUnderMouse(Vector2? position = null, bool ignoreBounds = true)
 		{
 			var mousePos = position ?? RootWidget.Input.MousePosition - ContentWidget.GlobalPosition;
 			var r = new IntVector2((int)(mousePos.X / TimelineMetrics.ColWidth), 0);
 			if (mousePos.Y >= ContentSize.Y) {
-				r.Y = Math.Max(0, Document.Current.Rows.Count - 1);
+				r.Y = ignoreBounds ? Math.Max(0, Document.Current.Rows.Count - 1) : -1;
 				return r;
 			}
 			foreach (var row in Document.Current.Rows) {

@@ -21,8 +21,8 @@ namespace Tangerine.UI.Timeline
 			while (true) {
 				if (input.WasMousePressed()) {
 					using (Document.Current.History.BeginTransaction()) {
-						var initialCell = grid.CellUnderMouse();
-						if (initialCell.Y < Document.Current.Rows.Count) {
+						var initialCell = grid.CellUnderMouse(null, ignoreBounds: false);
+						if (initialCell.Y >= 0 && initialCell.Y < Document.Current.Rows.Count) {
 							if (IsCellSelected(initialCell)) {
 								yield return DragSelectionTask(initialCell);
 							} else {
