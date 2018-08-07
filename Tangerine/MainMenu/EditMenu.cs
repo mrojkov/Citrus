@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Lime;
 using Tangerine.UI;
 using Tangerine.Core;
@@ -390,6 +391,43 @@ namespace Tangerine
 			}
 			foreach (var n in node.Nodes) {
 				UpsampleNodeAnimation(n);
+			}
+		}
+	}
+
+	public class ConvertToButton : DocumentCommandHandler
+	{
+		public override void ExecuteTransaction() {
+			var rows = Document.Current.SelectedRows().ToList();
+			foreach (var row in rows) {
+				if (row.Components.Get<NodeRow>()?.Node is Frame frame) {
+					if (frame.Markers.Count > 0) {
+						AlertDialog.Show("Cannot convert widget with existing markers");
+						return;
+					}
+				} else {
+					AlertDialog.Show("Only frames can be converted");
+					return;
+				}
+			}
+			foreach (var row in rows) {
+				try {
+					var button = Core.Operations.NodeTypeConvert.Perform(row, typeof(Button), typeof(Widget), new HashSet<string> {
+						nameof(Node.Parent),
+						nameof(Node.Nodes),
+						nameof(Node.Animations),
+						nameof(Node.Animators)
+					});
+					int[] markerFrames = { 0, 10, 20, 30, 40 };
+					string[] makerIds = { "Normal", "Focus", "Press", "Release", "Disable" };
+					for (var i = 0; i < 5; i++) {
+						button.Markers.Add(new Marker(makerIds[i], markerFrames[i], MarkerAction.Stop));
+					}
+				} catch (InvalidOperationException e) {
+					AlertDialog.Show(e.Message);
+					Document.Current.History.RollbackTransaction();
+					return;
+				}
 			}
 		}
 	}

@@ -157,6 +157,7 @@ namespace Tangerine
 					GenericCommands.GroupContentsToMorphableMeshes,
 					GenericCommands.ExportScene,
 					GenericCommands.UpsampleAnimationTwice,
+					GenericCommands.ConvertToButton
 				}),
 				new Command("Create", (create = new Menu())),
 				new Command("View", (viewMenu = new Menu {
