@@ -31,6 +31,8 @@ namespace Tangerine.UI.SceneView
 		WidgetAdapter3D,
 		Invisible,
 		AnimationPath,
+		TiledImage,
+		ParticlesMagnet
 	}
 
 	public static class NodeDecorationUtils
@@ -106,7 +108,8 @@ namespace Tangerine.UI.SceneView
 			new NodeDecorationGroup {
 				Title = "Images",
 				NodeDecorations = {
-					NodeDecoration.Image
+					NodeDecoration.Image,
+					NodeDecoration.TiledImage,
 				}
 			},
 			new NodeDecorationGroup {
@@ -131,7 +134,8 @@ namespace Tangerine.UI.SceneView
 			new NodeDecorationGroup {
 				Title = "Particles",
 				NodeDecorations = {
-					NodeDecoration.ParticleEmitter
+					NodeDecoration.ParticleEmitter,
+					NodeDecoration.ParticlesMagnet,
 				}
 			},
 			new NodeDecorationGroup {
