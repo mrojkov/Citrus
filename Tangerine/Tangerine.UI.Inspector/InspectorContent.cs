@@ -108,7 +108,10 @@ namespace Tangerine.UI.Inspector
 					if (text == "Node" && objects.Count == 1) {
 						text += $" of type '{objects[0].GetType().Name}'";
 					}
-					AddCategoryLabel(text);
+					var label = CreateCategoryLabel(text);
+					if (label != null) {
+						widget.AddNode(label);
+					}
 				}
 				var @params = new PropertyEditorParams(widget, objects, type, property.Name) {
 					NumericEditBoxFactory = () => new TransactionalNumericEditBox(),
@@ -179,7 +182,10 @@ namespace Tangerine.UI.Inspector
 				.Cast<object>()
 				.ToList();
 			var editorParams = new Dictionary<string, List<PropertyEditorParams>>();
-			AddComponentLabel(type, nodes);
+			var label = CreateComponentLabel(type, nodes);
+			if (label != null) {
+				widget.AddNode(label);
+			}
 			foreach (var property in type.GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
 				if (property.Name == "Item") {
 					// WTF, Bug in Mono?
@@ -289,15 +295,14 @@ namespace Tangerine.UI.Inspector
 			Core.Operations.SetAnimableProperty.Perform(obj, propertyName, value, CoreUserPreferences.Instance.AutoKeyframes);
 		}
 
-		private void AddCategoryLabel(string text)
+		private Widget CreateCategoryLabel(string text)
 		{
 			if (string.IsNullOrEmpty(text)) {
-				return;
+				return null;
 			}
-
 			var label = new Widget {
 				LayoutCell = new LayoutCell { StretchY = 0 },
-				Layout = new StackLayout(),
+				Layout = new HBoxLayout(),
 				MinHeight = Theme.Metrics.DefaultButtonSize.Y,
 				Nodes = {
 					new ThemedSimpleText {
@@ -309,29 +314,16 @@ namespace Tangerine.UI.Inspector
 				}
 			};
 			label.CompoundPresenter.Add(new WidgetFlatFillPresenter(ColorTheme.Current.Inspector.CategoryLabelBackground));
-			widget.AddNode(label);
+			return label;
 		}
 
-		private void AddComponentLabel(Type type, IReadOnlyList<Node> nodes)
+		private Widget CreateComponentLabel(Type type, IReadOnlyList<Node> nodes)
 		{
-			var label = new Widget {
-				LayoutCell = new LayoutCell { StretchY = 0 },
-				Layout = new HBoxLayout(),
-				MinHeight = Theme.Metrics.DefaultButtonSize.Y,
-				Nodes = {
-					new ThemedDeleteButton {
-						Clicked = () => RemoveComponent(type, nodes)
-					},
-					new ThemedSimpleText {
-						Text = CamelCaseToLabel(type.Name),
-						Padding = new Thickness(4, 0),
-						VAlignment = VAlignment.Center,
-						ForceUncutText = false,
-					}
-				}
-			};
-			label.CompoundPresenter.Add(new WidgetFlatFillPresenter(ColorTheme.Current.Inspector.CategoryLabelBackground));
-			widget.AddNode(label);
+			var label = CreateCategoryLabel(CamelCaseToLabel(type.Name));
+			label.Nodes.Insert(0, new ThemedDeleteButton {
+				Clicked = () => RemoveComponent(type, nodes)
+			});
+			return label;
 		}
 
 		private void AddGroupHeader(string text)
