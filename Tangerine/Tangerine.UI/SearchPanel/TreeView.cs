@@ -1,6 +1,7 @@
 using Lime;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Tangerine.Core;
 
 namespace Tangerine.UI
@@ -16,10 +17,11 @@ namespace Tangerine.UI
 			scrollView = new ThemedScrollView();
 			scrollView.Content.Layout = new VBoxLayout();
 			parent.AddNode(scrollView);
-			scrollView.Content.AddNode(new TreeNode(rootNode, JointType.Last, new List<Widget>(), last: true));
+			scrollView.Content.AddNode(new TreeNode(rootNode, null, JointType.Last, new List<Joint>(), 0, last: true));
 		}
 
 		private enum JointType {
+			None,
 			HLine,
 			VLine,
 			Middle,
@@ -28,11 +30,11 @@ namespace Tangerine.UI
 
 		private class Joint : Widget
 		{
-			private readonly JointType type;
+			public JointType Type { get; set; }
 
 			public Joint(JointType type, float size)
 			{
-				this.type = type;
+				Type = type;
 				MinMaxWidth = size;
 			}
 
@@ -40,7 +42,9 @@ namespace Tangerine.UI
 			{
 				base.Render();
 				PrepareRendererState();
-				switch (type) {
+				switch (Type) {
+					case JointType.None:
+						break;
 					case JointType.HLine:
 						Renderer.DrawLine(0, Height / 2, Width, Height / 2, Color4.Gray);
 						break;
@@ -65,32 +69,41 @@ namespace Tangerine.UI
 		{
 			private readonly Node rootNode;
 			private bool expanded = false;
-			private readonly ToolbarButton button;
+			private ToolbarButton button;
+			private readonly Joint hJoint = new Joint(JointType.HLine, 18);
 			private readonly Widget nodeContainer;
+			private readonly Joint joint;
+			private readonly List<Joint> offsetWidgets;
+			private readonly int level;
+			private readonly TreeNode parentTreeNode;
+			private bool expandable;
 
-			public TreeNode(Node rootNode, JointType jointType, List<Widget> offsetWidgets, bool last)
+			public TreeNode(Node rootNode, TreeNode parentTreeNode, JointType jointType, List<Joint> offsetWidgets, int level, bool last)
 			{
 				this.rootNode = rootNode;
+				this.level = level;
+				this.parentTreeNode = parentTreeNode;
+				expandable = rootNode.Nodes.Count > 0;
 				Layout = new VBoxLayout();
 				var widget = new Widget { Layout = new HBoxLayout() };
-				foreach (var ow in offsetWidgets) {
-					widget.AddNode(ow.Clone());
+				this.offsetWidgets = offsetWidgets.Select(w => (Joint)w.Clone()).ToList();
+				foreach (var ow in this.offsetWidgets) {
+					widget.AddNode(ow);
 				}
-				widget.AddNode(new Joint(jointType, 18));
-				widget.AddNode(rootNode.Nodes.Count > 0 ? (Widget)(button = CreateExpandButton()) : new Joint(JointType.HLine, 18));
+				widget.AddNode(joint = new Joint(jointType, 18));
+				widget.AddNode(rootNode.Nodes.Count > 0 ? (Widget)CreateExpandButton() : hJoint);
 				widget.AddNode(CreateLabel());
 				AddNode(widget);
-				nodeContainer = new Widget {
-					Layout = new VBoxLayout()
-				};
-				offsetWidgets.Add(last ? (Widget)new HSpacer(18) : new Joint(JointType.VLine, 18));
-				FillNodeContainer(offsetWidgets);
-				offsetWidgets.RemoveAt(offsetWidgets.Count - 1);
+				nodeContainer = new Widget { Layout = new VBoxLayout() };
+				this.offsetWidgets.Add(new Joint(last ? JointType.None : JointType.VLine, 18));
+				UpdateChildTreeNodes();
+				this.AddChangeWatcher(() => rootNode.NextSibling, _ => parentTreeNode?.UpdateChildTreeNodes());
+				this.AddChangeWatcher(() => rootNode.Nodes.Count, _ => UpdateChildTreeNodes());
 			}
 
 			private ToolbarButton CreateExpandButton()
 			{
-				var button = new ToolbarButton {
+				button = new ToolbarButton {
 					Highlightable = false,
 					MinMaxSize = new Vector2(18, 26),
 					Padding = new Thickness { Top = 8, Left = 4, Right = 4, Bottom = 8 },
@@ -109,10 +122,12 @@ namespace Tangerine.UI
 
 			private ThemedSimpleText CreateLabel()
 			{
-				return new ThemedSimpleText {
+				var label = new ThemedSimpleText {
 					Padding = new Thickness(5),
 					Text = Document.Current.RootNode == rootNode ? "root" : rootNode.Id
 				};
+				label.AddChangeWatcher(() => rootNode.Id, t => label.Text = t);
+				return label;
 			}
 
 			public void ToggleExpanded()
@@ -128,20 +143,68 @@ namespace Tangerine.UI
 
 			public void UpdateButtonTexture()
 			{
-				if (button != null) {
-					button.Texture = expanded ? IconPool.GetTexture("Timeline.minus") : IconPool.GetTexture("Timeline.plus");
+				button.Texture = expanded ? IconPool.GetTexture("Timeline.minus") : IconPool.GetTexture("Timeline.plus");
+			}
+
+			public override void Render()
+			{
+				//base.Render();
+				//PrepareRendererState();
+				//Renderer.DrawRectOutline(0, 0, Width, Height, Color4.Red);
+			}
+
+			private static void ReplaceWith(Node with, Node what)
+			{
+				var node = what.Parent;
+				int index = node.Nodes.IndexOf(what);
+				what.Unlink();
+				node.Nodes.Insert(index, with);
+			}
+
+			private void SetExpandable(bool expandable)
+			{
+				if (this.expandable == expandable) {
+					return;
+				}
+				this.expandable = expandable;
+				if (expandable) {
+					ReplaceWith(button, hJoint);
+					return;
+				}
+				ReplaceWith(hJoint, button);
+			}
+
+			private void SetOffsetJoint(int index, JointType jointType)
+			{
+				offsetWidgets[index].Type = jointType;
+				foreach (var node in nodeContainer.Nodes.Cast<TreeNode>()) {
+					node.SetOffsetJoint(index, jointType);
 				}
 			}
 
-			private void FillNodeContainer(List<Widget> offsetWidgets)
+			private void UpdateChildTreeNodes()
 			{
-				if (rootNode.Nodes.Count == 0) {
-					return;
+				var treeNodes = nodeContainer.Nodes.Cast<TreeNode>().ToList();
+				var rootNodes = treeNodes.Select(t => t.rootNode).ToList();
+				nodeContainer.Nodes.Clear();
+				foreach (var node in rootNode.Nodes) {
+					var index = rootNodes.IndexOf(node);
+					if (index >= 0) {
+						nodeContainer.AddNode(treeNodes[index]);
+						treeNodes[index].SetOffsetJoint(level + 1, JointType.VLine);
+						treeNodes[index].joint.Type = JointType.Middle;
+					} else {
+						nodeContainer.AddNode(new TreeNode(node, this, JointType.Middle, offsetWidgets, level + 1, last: false));
+					}
 				}
-				for (int i = 0; i < rootNode.Nodes.Count - 1; ++i) {
-					nodeContainer.AddNode(new TreeNode(rootNode.Nodes[i], JointType.Middle, offsetWidgets, last: false));
+				if (nodeContainer.Nodes.Count > 0) {
+					var lastNode = (TreeNode)nodeContainer.Nodes.Last();
+					lastNode.SetOffsetJoint(level + 1, JointType.None);
+					lastNode.joint.Type = JointType.Last;
+					SetExpandable(true);
+				} else {
+					SetExpandable(false);
 				}
-				nodeContainer.AddNode(new TreeNode(rootNode.Nodes[rootNode.Nodes.Count - 1], JointType.Last, offsetWidgets, last: true));
 			}
 		}
 	}
