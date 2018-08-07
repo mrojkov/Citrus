@@ -125,7 +125,7 @@
       <Project>{e62ba18f-4e1a-466a-8299-67ad567f17e5}</Project>
       <Name>Tangerine.UI.Win</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Yuzu\Yuzu.csproj">
+    <ProjectReference Include="..\..\Yuzu\Yuzu.Win.csproj">
       <Project>{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}</Project>
       <Name>Yuzu</Name>
     </ProjectReference>

@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lemon.Win", "..\..\..\Lemon
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmptyProject.Win", "EmptyProject.Win.csproj", "{87884330-1A04-4008-9D2F-05585F4C7E05}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yuzu", "..\..\..\Yuzu\Yuzu.csproj", "{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yuzu", "..\..\..\Yuzu\Yuzu.Win.csproj", "{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicFont.Win", "..\..\..\Lime\Extensions\DynamicFont\DynamicFont.Win.csproj", "{FE8512BC-7A55-425C-8BC1-AD4D9785CF12}"
 EndProject

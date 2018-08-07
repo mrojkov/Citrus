@@ -44,7 +44,7 @@ namespace Launcher
 
 		private void SynchronizeAllProjects()
 		{
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Yuzu/Yuzu.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Yuzu/Yuzu.Win.csproj");
 			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Yuzu/Yuzu.Mac.csproj");
 			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Lime/Lime.Win.csproj");
 			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Lime/Lime.Mac.csproj");
