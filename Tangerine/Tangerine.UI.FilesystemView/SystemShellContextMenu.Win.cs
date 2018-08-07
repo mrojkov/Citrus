@@ -20,18 +20,17 @@ namespace Tangerine.UI.FilesystemView
 
 		public void Show(IEnumerable<string> paths)
 		{
-			// TODO: multiple paths support
-			ShowShellContextMenu(paths.First(), CommonWindow.Current.Form.Handle, (IntVector2)Application.DesktopMousePosition);
+			ShowShellContextMenu(paths, CommonWindow.Current.Form.Handle, (IntVector2)Application.DesktopMousePosition);
 		}
 
 		public void Show(string path, Vector2 position)
 		{
-			ShowShellContextMenu(path, CommonWindow.Current.Form.Handle, (IntVector2)position);
+			ShowShellContextMenu(new[] { path }, CommonWindow.Current.Form.Handle, (IntVector2)position);
 		}
 
 		public void Show(IEnumerable<string> paths, Vector2 position)
 		{
-			ShowShellContextMenu(paths.First(), CommonWindow.Current.Form.Handle, (IntVector2)position);
+			ShowShellContextMenu(paths, CommonWindow.Current.Form.Handle, (IntVector2)position);
 		}
 
 		private static unsafe IntPtr MenuCallback(IntPtr wnd, WinAPI.WM msg, IntPtr wparam, IntPtr lparam)
@@ -81,19 +80,8 @@ namespace Tangerine.UI.FilesystemView
 			return result;
 		}
 
-		private static void ShowShellContextMenu(string path, IntPtr windowHandle, IntVector2 mousePos)
+		private static void ShowShellContextMenu(IEnumerable<string> paths, IntPtr windowHandle, IntVector2 mousePos)
 		{
-			string dir = Path.GetDirectoryName(path) ?? "";
-			string filename = Path.GetFileNameWithoutExtension(path);
-			string fileExt = Path.GetExtension(path);
-			string pathRoot = Path.GetPathRoot(path);
-			if (!dir.StartsWith(pathRoot)) {
-				dir = Path.Combine(pathRoot, dir);
-			}
-			if (!string.IsNullOrEmpty(filename) && !string.IsNullOrEmpty(fileExt)) {
-				filename += fileExt;
-			}
-			int r = 0;
 			WinAPI.IShellFolder desktop = null;
 			var pathPIDL = IntPtr.Zero;
 			WinAPI.IShellFolder shellFolder = null;
@@ -137,26 +125,41 @@ namespace Tangerine.UI.FilesystemView
 					Marshal.ThrowExceptionForHR(result);
 				}
 			};
-			r = WinAPI.SHGetDesktopFolder(out desktop);
-			checkHResult(r);
-			if (string.IsNullOrEmpty(filename)) {
-				r = WinAPI.SHGetSpecialFolderLocation(IntPtr.Zero, WinAPI.CSIDL.CSIDL_DRIVES, ref pathPIDL);
+			int r = 0;
+			var pidls = new List<IntPtr>();
+			foreach (var path in paths) {
+				string dir = Path.GetDirectoryName(path) ?? "";
+				string filename = Path.GetFileNameWithoutExtension(path);
+				string fileExt = Path.GetExtension(path);
+				string pathRoot = Path.GetPathRoot(path);
+				if (!dir.StartsWith(pathRoot)) {
+					dir = Path.Combine(pathRoot, dir);
+				}
+				if (!string.IsNullOrEmpty(filename) && !string.IsNullOrEmpty(fileExt)) {
+					filename += fileExt;
+				}
+				r = WinAPI.SHGetDesktopFolder(out desktop);
 				checkHResult(r);
-				r = desktop.BindToObject(pathPIDL, IntPtr.Zero, ref WinAPI.Guid_IShellFolder.IID_IShellFolder, out ppv);
-				checkHResult(r);
-				shellFolder = (WinAPI.IShellFolder)Marshal.GetObjectForIUnknown(ppv);
-				r = shellFolder.ParseDisplayName(windowHandle, IntPtr.Zero, dir, ref pchEaten, out filePIDL, ref attr);
-				checkHResult(r);
-			} else {
-				r = desktop.ParseDisplayName(windowHandle, IntPtr.Zero, dir, ref pchEaten, out pathPIDL, ref attr);
-				checkHResult(r);
-				r = desktop.BindToObject(pathPIDL, IntPtr.Zero, ref WinAPI.IID_IShellFolder, out ppv);
-				checkHResult(r);
-				shellFolder = (WinAPI.IShellFolder)Marshal.GetObjectForIUnknown(ppv);
-				r = shellFolder.ParseDisplayName(windowHandle, IntPtr.Zero, filename, ref pchEaten, out filePIDL, ref attr);
-				checkHResult(r);
+				if (string.IsNullOrEmpty(filename)) {
+					r = WinAPI.SHGetSpecialFolderLocation(IntPtr.Zero, WinAPI.CSIDL.CSIDL_DRIVES, ref pathPIDL);
+					checkHResult(r);
+					r = desktop.BindToObject(pathPIDL, IntPtr.Zero, ref WinAPI.Guid_IShellFolder.IID_IShellFolder, out ppv);
+					checkHResult(r);
+					shellFolder = (WinAPI.IShellFolder)Marshal.GetObjectForIUnknown(ppv);
+					r = shellFolder.ParseDisplayName(windowHandle, IntPtr.Zero, dir, ref pchEaten, out filePIDL, ref attr);
+					checkHResult(r);
+				} else {
+					r = desktop.ParseDisplayName(windowHandle, IntPtr.Zero, dir, ref pchEaten, out pathPIDL, ref attr);
+					checkHResult(r);
+					r = desktop.BindToObject(pathPIDL, IntPtr.Zero, ref WinAPI.IID_IShellFolder, out ppv);
+					checkHResult(r);
+					shellFolder = (WinAPI.IShellFolder)Marshal.GetObjectForIUnknown(ppv);
+					r = shellFolder.ParseDisplayName(windowHandle, IntPtr.Zero, filename, ref pchEaten, out filePIDL, ref attr);
+					checkHResult(r);
+				}
+				pidls.Add(filePIDL);
 			}
-			r = shellFolder.GetUIObjectOf(windowHandle, 1, ref filePIDL, ref WinAPI.IID_IContextMenu, 0, out ppv);
+			r = shellFolder.GetUIObjectOf(windowHandle, (uint)pidls.Count, ref pidls.ToArray()[0], ref WinAPI.IID_IContextMenu, 0, out ppv);
 			checkHResult(r);
 			iCMenu = (WinAPI.IContextMenu)Marshal.GetObjectForIUnknown(ppv);
 			shellContextMenu = WinAPI.CreatePopupMenu();
