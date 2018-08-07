@@ -15,6 +15,7 @@ namespace Tangerine.UI
 			public Color4 ButtonDisabledColor;
 			public Color4 Background;
 			public Color4 ButtonSelected;
+			public Color4 Separator;
 		}
 
 		public class SceneViewColors
@@ -162,6 +163,7 @@ namespace Tangerine.UI
 				ButtonDisabledColor = Color4.Gray.Lighten(0.1f),
 				Background = Theme.Colors.GrayBackground,
 				ButtonSelected = toolbuttonHighlightBorder,
+				Separator = Color4.Gray.Lighten(0.3f),
 			};
 			var sceneView = new SceneViewColors {
 				Selection = Color4.Green,
@@ -291,6 +293,7 @@ namespace Tangerine.UI
 				ButtonDisabledColor = Color4.Gray.Darken(0.1f),
 				Background = Theme.Colors.GrayBackground,
 				ButtonSelected = toolbuttonHighlightBorder,
+				Separator = Color4.Gray.Lighten(0.3f),
 			};
 			var sceneView = new SceneViewColors {
 				Selection = Color4.Green,

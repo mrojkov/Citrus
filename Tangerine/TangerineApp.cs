@@ -72,6 +72,7 @@ namespace Tangerine
 			var consolePanel = new Panel("Console");
 			var backupHistoryPanel = new Panel("Backups history");
 			var documentPanel = new Panel(DockManager.DocumentAreaId, undockable: false);
+			var nodeDecorationsPanel = new Panel("Node decorations");
 			new UI.Console(consolePanel);
 
 			var dockManager = DockManager.Instance;
@@ -82,6 +83,7 @@ namespace Tangerine
 			dockManager.AddPanel(backupHistoryPanel, documentPlacement, DockSite.Right, 0.3f);
 			dockManager.AddPanel(searchPanel, documentPlacement, DockSite.Right, 0.3f);
 			dockManager.AddPanel(filesystemPanel, documentPlacement, DockSite.Right, 0.3f);
+			dockManager.AddPanel(nodeDecorationsPanel, documentPlacement, DockSite.Right, 0.3f);
 			dockManager.AddPanel(consolePanel, documentPlacement, DockSite.Bottom, 0.3f);
 			DockManagerInitialState = dockManager.ExportState();
 			var documentViewContainer = InitializeDocumentArea(dockManager);
@@ -217,6 +219,11 @@ namespace Tangerine
 			DocumentHistory.Processors.AddRange(UI.Timeline.Timeline.GetOperationProcessors());
 
 			InitializeHotkeys();
+
+			// Andery Tyshchenko: Create panel after hotkeys initialization
+			// to properly display hotkeys on panel
+			new UI.SceneView.NodeDecorationsPanel(nodeDecorationsPanel);
+
 			Toolbars.Add("Editing", new Toolbar(dockManager.ToolbarArea));
 			Toolbars.Add("Create", new Toolbar(dockManager.ToolbarArea));
 			Toolbars.Add("Tools", new Toolbar(dockManager.ToolbarArea));
@@ -231,6 +238,7 @@ namespace Tangerine
 						new UI.SearchPanel(searchPanel.ContentWidget),
 						new BackupHistoryPanel(backupHistoryPanel.ContentWidget),
 					});
+					UI.SceneView.SceneView.ShowNodeDecorationsPanelButton.Clicked = () => dockManager.TogglePanel(nodeDecorationsPanel);
 				}
 			};
 			var proj = AppUserPreferences.Instance.RecentProjects.FirstOrDefault();

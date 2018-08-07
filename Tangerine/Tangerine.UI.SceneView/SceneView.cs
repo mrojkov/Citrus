@@ -24,6 +24,13 @@ namespace Tangerine.UI.SceneView
 		public readonly SceneWidget Scene;
 		public static readonly RulersWidget RulersWidget = new RulersWidget();
 		public static readonly ZoomWidget ZoomWidget = new ZoomWidget();
+		public static readonly ToolbarButton ShowNodeDecorationsPanelButton = new ToolbarButton {
+			Tip = "Node decorations",
+			Texture = IconPool.GetTexture("SceneView.ShowPanel"),
+			MinMaxSize = new Vector2(24),
+			LayoutCell = new LayoutCell(new Alignment { X = HAlignment.Left, Y = VAlignment.Bottom } )
+		};
+
 		/// <summary>
 		/// Gets the mouse position in the scene coordinates.
 		/// </summary>
@@ -51,19 +58,19 @@ namespace Tangerine.UI.SceneView
 			ConnectCommand(SceneViewCommands.Duplicate, DuplicateNodes,
 				() => Document.Current?.TopLevelSelectedRows().Any(row => row.IsCopyPasteAllowed()) ?? false);
 			ConnectCommand(SceneViewCommands.DisplayBones, new DisplayBones());
-			ConnectCommand(SceneViewCommands.DisplayPivotsForAllWidgets, new DisplayPivotsForAllWidgets());
-			ConnectCommand(SceneViewCommands.DisplayPivotsForInvisibleWidgets, new DisplayPivotsForInvisibleWidgets());
+			ConnectCommand(SceneViewCommands.DisplayAllNodeDecorations, new DisplayAllNodeDecorations());
+			ConnectCommand(SceneViewCommands.DisplayNodeDecorationsForInvisibleWidgets, new DisplayNodeDecorationsForInvisibleWidgets());
 			ConnectCommand(SceneViewCommands.TieWidgetsWithBones, TieWidgetsWithBones);
 			ConnectCommand(SceneViewCommands.UntieWidgetsFromBones, UntieWidgetsFromBones);
 			ConnectCommand(SceneViewCommands.ToggleDisplayRuler, new DisplayRuler());
 			ConnectCommand(SceneViewCommands.SaveCurrentRuler, new SaveRuler());
 		}
-		
+
 		private static void ConnectCommand(ICommand command, DocumentCommandHandler handler)
 		{
 			CommandHandlerList.Global.Connect(command, handler);
 		}
-		
+
 		private static void ConnectCommand(ICommand command, Action action, Func<bool> enableChecker = null)
 		{
 			CommandHandlerList.Global.Connect(command, new DocumentDelegateCommandHandler(action, enableChecker));
@@ -171,6 +178,7 @@ namespace Tangerine.UI.SceneView
 		public void Attach()
 		{
 			Instance = this;
+			Panel.AddNode(ShowNodeDecorationsPanelButton);
 			Panel.AddNode(ZoomWidget);
 			Panel.AddNode(RulersWidget);
 			Panel.AddNode(Frame);
@@ -182,6 +190,7 @@ namespace Tangerine.UI.SceneView
 			DockManager.Instance.RemoveFilesDropHandler(filesDropHandler);
 			Instance = null;
 			Frame.Unlink();
+			ShowNodeDecorationsPanelButton.Unlink();
 			RulersWidget.Unlink();
 			ZoomWidget.Unlink();
 		}
@@ -316,42 +325,42 @@ namespace Tangerine.UI.SceneView
 			}
 		}
 
-		private class DisplayBones : DocumentCommandHandler
+		public class DisplayNodeDecorationHandler : DocumentCommandHandler
 		{
-			public override bool GetChecked() => SceneUserPreferences.Instance.Bones3DVisible;
+			private readonly NodeDecoration decoration;
+
+			public DisplayNodeDecorationHandler(NodeDecoration decoration)
+			{
+				this.decoration = decoration;
+			}
 
 			public override void ExecuteTransaction()
 			{
-				SceneUserPreferences.Instance.Bones3DVisible = !SceneUserPreferences.Instance.Bones3DVisible;
-				CommonWindow.Current.Invalidate();
+				decoration.SetDisplay(!decoration.RequiredToDisplay());
+				NodeDecorationsPanel.Invalidate();
 			}
 		}
 
-		private class DisplayPivotsForAllWidgets : DocumentCommandHandler
+		private class DisplayBones : DisplayNodeDecorationHandler
 		{
-			public override void ExecuteTransaction()
+			public DisplayBones() : base(NodeDecoration.Bone3D)
 			{
-				SceneUserPreferences.Instance.DisplayPivotsForAllWidgets = !SceneUserPreferences.Instance.DisplayPivotsForAllWidgets;
-				CommonWindow.Current.Invalidate();
-			}
-
-			public override bool GetChecked()
-			{
-				return SceneUserPreferences.Instance.DisplayPivotsForAllWidgets;
 			}
 		}
 
-		private class DisplayPivotsForInvisibleWidgets : DocumentCommandHandler
+		private class DisplayAllNodeDecorations : DocumentCommandHandler
 		{
 			public override void ExecuteTransaction()
 			{
-				SceneUserPreferences.Instance.DisplayPivotsForInvisibleWidgets = !SceneUserPreferences.Instance.DisplayPivotsForInvisibleWidgets;
-				CommonWindow.Current.Invalidate();
+				NodeDecorationsPanel.ToggleDisplayAll(changedByUser: true);
+				NodeDecorationsPanel.Invalidate();
 			}
+		}
 
-			public override bool GetChecked()
+		private class DisplayNodeDecorationsForInvisibleWidgets : DisplayNodeDecorationHandler
+		{
+			public DisplayNodeDecorationsForInvisibleWidgets() : base(NodeDecoration.Invisible)
 			{
-				return SceneUserPreferences.Instance.DisplayPivotsForInvisibleWidgets;
 			}
 		}
 	}

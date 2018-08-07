@@ -23,52 +23,55 @@ namespace Tangerine.UI.SceneView
 		{
 			var input = SceneView.Instance.Input;
 			command.Checked = true;
-			while (true) {
-				if (SceneView.Instance.InputArea.IsMouseOver()) {
-					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
-				}
-				CreateNodeRequestComponent.Consume<Node>(SceneView.Instance.Components);
-				if (SceneView.Instance.Input.ConsumeKeyPress(Key.Mouse0)) {
-					SplinePoint3D point;
-					try {
-						point = (SplinePoint3D)Core.Operations.CreateNode.Perform(typeof(SplinePoint3D), aboveSelected: false);
-					} catch (InvalidOperationException e) {
-						AlertDialog.Show(e.Message);
-						yield break;
+			using (Document.Current.History.BeginTransaction()) {
+				while (true) {
+					if (SceneView.Instance.InputArea.IsMouseOver()) {
+						Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					}
-					var spline = (Spline3D)Document.Current.Container;
-					var vp = spline.Viewport;
-					var ray = vp.ScreenPointToRay(SceneView.Instance.Input.MousePosition);
-					var xyPlane = new Plane(new Vector3(0, 0, 1), 0).Transform(spline.GlobalTransform);
-					var d = ray.Intersects(xyPlane);
-					if (d.HasValue) {
-						var pos = (ray.Position + ray.Direction * d.Value) * spline.GlobalTransform.CalcInverted();
-						Core.Operations.SetProperty.Perform(point, nameof(SplinePoint3D.Position), pos);
-						using (Document.Current.History.BeginTransaction()) {
-							while (input.IsMousePressed()) {
-								Document.Current.History.RollbackTransaction();
+					CreateNodeRequestComponent.Consume<Node>(SceneView.Instance.Components);
+					if (SceneView.Instance.Input.ConsumeKeyPress(Key.Mouse0)) {
+						SplinePoint3D point;
+						try {
+							point = (SplinePoint3D)Core.Operations.CreateNode.Perform(typeof(SplinePoint3D), aboveSelected: false);
+						} catch (InvalidOperationException e) {
+							AlertDialog.Show(e.Message);
+							yield break;
+						}
+						var spline = (Spline3D)Document.Current.Container;
+						var vp = spline.Viewport;
+						var ray = vp.ScreenPointToRay(SceneView.Instance.Input.MousePosition);
+						var xyPlane = new Plane(new Vector3(0, 0, 1), 0).Transform(spline.GlobalTransform);
+						var d = ray.Intersects(xyPlane);
+						if (d.HasValue) {
+							var pos = (ray.Position + ray.Direction * d.Value) * spline.GlobalTransform.CalcInverted();
+							Core.Operations.SetProperty.Perform(point, nameof(SplinePoint3D.Position), pos);
+							using (Document.Current.History.BeginTransaction()) {
+								while (input.IsMousePressed()) {
+									Document.Current.History.RollbackTransaction();
 
-								ray = vp.ScreenPointToRay(SceneView.Instance.Input.MousePosition);
-								d = ray.Intersects(xyPlane);
-								if (d.HasValue) {
-									var tangent = (ray.Position + ray.Direction * d.Value) * spline.GlobalTransform.CalcInverted() - point.Position;
-									Core.Operations.SetProperty.Perform(point, nameof(SplinePoint3D.TangentA), tangent);
-									Core.Operations.SetProperty.Perform(point, nameof(SplinePoint3D.TangentB), -tangent);
+									ray = vp.ScreenPointToRay(SceneView.Instance.Input.MousePosition);
+									d = ray.Intersects(xyPlane);
+									if (d.HasValue) {
+										var tangent = (ray.Position + ray.Direction * d.Value) * spline.GlobalTransform.CalcInverted() - point.Position;
+										Core.Operations.SetProperty.Perform(point, nameof(SplinePoint3D.TangentA), tangent);
+										Core.Operations.SetProperty.Perform(point, nameof(SplinePoint3D.TangentB), -tangent);
+									}
+									yield return null;
 								}
-								yield return null;
+								if (point.TangentA.Length < 0.01f) {
+									Core.Operations.SetProperty.Perform(point, nameof(SplinePoint3D.TangentA), new Vector3(1, 0, 0));
+									Core.Operations.SetProperty.Perform(point, nameof(SplinePoint3D.TangentB), new Vector3(-1, 0, 0));
+								}
+								Document.Current.History.CommitTransaction();
 							}
-							if (point.TangentA.Length < 0.01f) {
-								Core.Operations.SetProperty.Perform(point, nameof(SplinePoint3D.TangentA), new Vector3(1, 0, 0));
-								Core.Operations.SetProperty.Perform(point, nameof(SplinePoint3D.TangentB), new Vector3(-1, 0, 0));
-							}
-							Document.Current.History.CommitTransaction();
 						}
 					}
+					if (SceneView.Instance.Input.WasMousePressed(1) || SceneView.Instance.Input.WasKeyPressed(Key.Escape)) {
+						break;
+					}
+					yield return null;
 				}
-				if (SceneView.Instance.Input.WasMousePressed(1) || SceneView.Instance.Input.WasKeyPressed(Key.Escape)) {
-					break;
-				}
-				yield return null;
+				Document.Current.History.CommitTransaction();
 			}
 			this.command.Checked = false;
 			Utils.ChangeCursorIfDefault(MouseCursor.Default);

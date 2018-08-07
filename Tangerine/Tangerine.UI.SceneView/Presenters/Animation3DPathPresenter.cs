@@ -16,10 +16,10 @@ namespace Tangerine.UI.SceneView
 			if (Document.Current.PreviewAnimation) {
 				return;
 			}
-			if (!CoreUserPreferences.Instance.ShowAnimationPath) {
+			if (!NodeDecoration.AnimationPath.RequiredToDisplay()) {
 				return;
 			}
-			foreach (var node in viewport.Descendants.OfType<Node3D>()) {
+			foreach (var node in Document.Current.SelectedNodes().Editable().OfType<Node3D>()) {
 				if (!(node is IAnimable)) {
 					continue;
 				}

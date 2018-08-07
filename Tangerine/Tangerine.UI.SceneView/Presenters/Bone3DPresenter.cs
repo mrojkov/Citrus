@@ -17,7 +17,7 @@ namespace Tangerine.UI.SceneView
 
 		private static void RenderSelection(Widget canvas)
 		{
-			if (Document.Current.ExpositionMode || !SceneUserPreferences.Instance.Bones3DVisible) {
+			if (Document.Current.ExpositionMode) {
 				return;
 			}
 			canvas.PrepareRendererState();

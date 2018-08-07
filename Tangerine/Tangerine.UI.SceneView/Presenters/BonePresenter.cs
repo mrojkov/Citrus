@@ -25,12 +25,14 @@ namespace Tangerine.UI.SceneView
 				return;
 			}
 			canvas.PrepareRendererState();
-			var notSelected = Document.Current.Container.Nodes.Visible().OfType<Bone>().Except(Document.Current.SelectedNodes().OfType<Bone>());
-			foreach (var bone in notSelected) {
-				DrawBones(bone, canvas);
+			if (NodeDecoration.Bone.RequiredToDisplay()) {
+				var notSelected = Document.Current.Container.Nodes.Visible().OfType<Bone>().Except(Document.Current.SelectedNodes().OfType<Bone>());
+				foreach (var bone in notSelected) {
+					DrawBones(bone, canvas, selected: false);
+				}
 			}
 			foreach (var bone in Document.Current.SelectedNodes().Visible().OfType<Bone>()) {
-				DrawBones(bone, canvas);
+				DrawBones(bone, canvas, selected: true);
 			}
 		}
 
@@ -71,10 +73,9 @@ namespace Tangerine.UI.SceneView
 			};
 		}
 
-		private void DrawBones(Bone bone, Widget canvas)
+		private void DrawBones(Bone bone, Widget canvas, bool selected)
 		{
 			var t = bone.Parent.AsWidget.CalcTransitionToSpaceOf(canvas);
-			var selected = Document.Current.SelectedNodes().Contains(bone);
 			var color = selected ? ColorTheme.Current.SceneView.Selection : ColorTheme.Current.SceneView.BoneOutline;
 			var hull = CalcHull(bone);
 			// Draw bone outline

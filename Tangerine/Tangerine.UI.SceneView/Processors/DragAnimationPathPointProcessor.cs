@@ -13,7 +13,7 @@ namespace Tangerine.UI.SceneView
 		public IEnumerator<object> Task()
 		{
 			while (true) {
-				if (!CoreUserPreferences.Instance.ShowAnimationPath) {
+				if (!NodeDecoration.AnimationPath.RequiredToDisplay()) {
 					yield return null;
 					continue;
 				}
@@ -39,7 +39,7 @@ namespace Tangerine.UI.SceneView
 											yield return Drag(node as Widget, animator, key);
 										}
 										goto Next;
-									} 
+									}
 								}
 							}
 						}

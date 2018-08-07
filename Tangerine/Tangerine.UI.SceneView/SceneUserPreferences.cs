@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
@@ -28,15 +29,6 @@ namespace Tangerine.UI.SceneView
 		[YuzuRequired]
 		public bool DrawFrameBorder { get; set; }
 
-		[YuzuOptional]
-		public bool DisplayPivotsForAllWidgets { get; set; }
-
-		[YuzuOptional]
-		public bool DisplayPivotsForInvisibleWidgets { get; set; }
-
-		[YuzuRequired]
-		public bool Bones3DVisible { get; set; }
-
 		[YuzuRequired]
 		public bool SnapWidgetBorderToRuler { get; set; }
 
@@ -45,6 +37,9 @@ namespace Tangerine.UI.SceneView
 
 		[YuzuRequired]
 		public bool SnapRulerLinesToWidgets { get; set; }
+
+		[YuzuRequired]
+		public HashSet<NodeDecoration> DisplayedNodeDecorations { get; set; }
 
 		public SceneUserPreferences()
 		{
@@ -60,12 +55,13 @@ namespace Tangerine.UI.SceneView
 			RootWidgetOverlayColor = ColorTheme.Current.SceneView.RootWidgetOverlayColor;
 			AnimationPreviewBackground = Color4.Black.Transparentify(0.6f);
 			DrawFrameBorder = false;
-			DisplayPivotsForAllWidgets = true;
-			DisplayPivotsForInvisibleWidgets = false;
-			Bones3DVisible = false;
 			SnapRulerLinesToWidgets = false;
 			SnapWidgetBorderToRuler = false;
 			SnapWidgetPivotToRuler = false;
+			DisplayedNodeDecorations = new HashSet<NodeDecoration>();
+			foreach (var decoration in Enum.GetValues(typeof(NodeDecoration))) {
+				DisplayedNodeDecorations.Add((NodeDecoration)decoration);
+			}
 		}
 
 		public static SceneUserPreferences Instance => Core.UserPreferences.Instance.Get<SceneUserPreferences>();
