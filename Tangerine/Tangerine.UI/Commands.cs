@@ -143,6 +143,7 @@ namespace Tangerine.UI
 		public static readonly ICommand FlipY = new Command("Flip Vertically") { Icon = IconPool.GetTexture("Tools.FlipV") };
 		public static readonly ICommand FitToContainer = new Command("Fit To Container") { Icon = IconPool.GetTexture("Tools.FitToContainer") };
 		public static readonly ICommand FitToContent = new Command("Fit To Content") { Icon = IconPool.GetTexture("Tools.FitToContent") };
+		public static readonly ICommand CenterView = new Command("CenterView") { Icon = IconPool.GetTexture("Tools.ToolsCenterView") };
 	}
 
 	public static class FilesystemCommands
