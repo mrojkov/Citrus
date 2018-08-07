@@ -139,35 +139,35 @@ namespace Lime
 
 		public void Apply(int pass)
 		{
-			PrepareShaderProgram();
-            shaderParams.Set(shaderParamKeys.World, Renderer.World);
-			shaderParams.Set(shaderParamKeys.WorldView, Renderer.WorldView);
-			shaderParams.Set(shaderParamKeys.WorldViewProj, Renderer.WorldViewProjection);
-			shaderParams.Set(shaderParamKeys.ColorFactor, Renderer.ColorFactor.ToVector4());
-			shaderParams.Set(shaderParamKeys.DiffuseColor, DiffuseColor.ToVector4());
-			if (processLightning) {
-				shaderParams.Set(shaderParamKeys.LightColor, lightSource.Color.ToVector4());
-				shaderParams.Set(shaderParamKeys.LightDirection, lightSource.Position.Normalized);
-				shaderParams.Set(shaderParamKeys.LightIntensity, lightSource.Intensity);
-				shaderParams.Set(shaderParamKeys.LightStrength, lightSource.Strength);
-				shaderParams.Set(shaderParamKeys.LightAmbient, lightSource.Ambient);
-				shaderParams.Set(shaderParamKeys.LightWorldViewProj,
-					Renderer.World * lightSource.ViewProjection * Matrix44.CreateScale(new Vector3(1, -1, 1)));
-				shaderParams.Set(shaderParamKeys.ShadowColor, lightSource.ShadowColor.ToVector4());
-				PlatformRenderer.SetTextureLegacy(CommonMaterialProgram.ShadowMapTextureStage, lightSource.ShadowMap);
-			}
-			shaderParams.Set(shaderParamKeys.FogColor, FogColor.ToVector4());
-			shaderParams.Set(shaderParamKeys.FogStart, FogStart);
-			shaderParams.Set(shaderParamKeys.FogEnd, FogEnd);
-			shaderParams.Set(shaderParamKeys.FogDensity, FogDensity);
-			if (skinEnabled) {
-				shaderParams.Set(shaderParamKeys.Bones, boneTransforms, boneCount);
-			}
-			PlatformRenderer.SetBlendState(Blending.GetBlendState());
-			PlatformRenderer.SetTextureLegacy(CommonMaterialProgram.DiffuseTextureStage, diffuseTexture);
-			PlatformRenderer.SetShaderProgram(program);
-			PlatformRenderer.SetShaderParams(shaderParamsArray);
-			PlatformRenderer.SetShaderProgram(program);
+			//PrepareShaderProgram();
+   //         shaderParams.Set(shaderParamKeys.World, Renderer.World);
+			//shaderParams.Set(shaderParamKeys.WorldView, Renderer.WorldView);
+			//shaderParams.Set(shaderParamKeys.WorldViewProj, Renderer.WorldViewProjection);
+			//shaderParams.Set(shaderParamKeys.ColorFactor, Renderer.ColorFactor.ToVector4());
+			//shaderParams.Set(shaderParamKeys.DiffuseColor, DiffuseColor.ToVector4());
+			//if (processLightning) {
+			//	shaderParams.Set(shaderParamKeys.LightColor, lightSource.Color.ToVector4());
+			//	shaderParams.Set(shaderParamKeys.LightDirection, lightSource.Position.Normalized);
+			//	shaderParams.Set(shaderParamKeys.LightIntensity, lightSource.Intensity);
+			//	shaderParams.Set(shaderParamKeys.LightStrength, lightSource.Strength);
+			//	shaderParams.Set(shaderParamKeys.LightAmbient, lightSource.Ambient);
+			//	shaderParams.Set(shaderParamKeys.LightWorldViewProj,
+			//		Renderer.World * lightSource.ViewProjection * Matrix44.CreateScale(new Vector3(1, -1, 1)));
+			//	shaderParams.Set(shaderParamKeys.ShadowColor, lightSource.ShadowColor.ToVector4());
+			//	PlatformRenderer.SetTextureLegacy(CommonMaterialProgram.ShadowMapTextureStage, lightSource.ShadowMap);
+			//}
+			//shaderParams.Set(shaderParamKeys.FogColor, FogColor.ToVector4());
+			//shaderParams.Set(shaderParamKeys.FogStart, FogStart);
+			//shaderParams.Set(shaderParamKeys.FogEnd, FogEnd);
+			//shaderParams.Set(shaderParamKeys.FogDensity, FogDensity);
+			//if (skinEnabled) {
+			//	shaderParams.Set(shaderParamKeys.Bones, boneTransforms, boneCount);
+			//}
+			//PlatformRenderer.SetBlendState(Blending.GetBlendState());
+			//PlatformRenderer.SetTextureLegacy(CommonMaterialProgram.DiffuseTextureStage, diffuseTexture);
+			//PlatformRenderer.SetShaderProgram(program);
+			//PlatformRenderer.SetShaderParams(shaderParamsArray);
+			//PlatformRenderer.SetShaderProgram(program);
 
 		}
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Yuzu;
 
 namespace Lime
@@ -41,14 +41,14 @@ namespace Lime
 
 		public void Apply(int pass)
 		{
-			PrepareShaderProgram();
-			shaderParams.Set(shaderParamKeys.LightWorldViewProj, Renderer.FixupWVP(Renderer.World * ViewProjection));
-			if (skinEnabled) {
-				shaderParams.Set(shaderParamKeys.Bones, boneTransforms, boneCount);
-			}
-			PlatformRenderer.SetBlendState(Blending.Alpha.GetBlendState());
-			PlatformRenderer.SetShaderProgram(program);
-			PlatformRenderer.SetShaderParams(shaderParamsArray);
+			//PrepareShaderProgram();
+			//shaderParams.Set(shaderParamKeys.LightWorldViewProj, Renderer.FixupWVP(Renderer.World * ViewProjection));
+			//if (skinEnabled) {
+			//	shaderParams.Set(shaderParamKeys.Bones, boneTransforms, boneCount);
+			//}
+			//PlatformRenderer.SetBlendState(Blending.Alpha.GetBlendState());
+			//PlatformRenderer.SetShaderProgram(program);
+			//PlatformRenderer.SetShaderParams(shaderParamsArray);
 		}
 		
 		private void PrepareShaderProgram()

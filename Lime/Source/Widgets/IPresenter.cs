@@ -86,6 +86,7 @@ namespace Lime
 			{
 				foreach (var obj in Objects) {
 					obj.Render();
+					obj.Rendered = true;
 				}
 			}
 		}

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Lime
@@ -36,57 +36,57 @@ namespace Lime
 
 		public void Render(Matrix44 lightView, Matrix44 lightViewProjection, Viewport lightViewport)
 		{
-			depthmat.ViewProjection = lightViewProjection;
-			map.SetAsRenderTarget();
+			//depthmat.ViewProjection = lightViewProjection;
+			//map.SetAsRenderTarget();
 
-			Renderer.Clear(Color4.White);
+			//Renderer.Clear(Color4.White);
 
-			var oldViewport = Renderer.Viewport;
-			var oldWorld = Renderer.World;
-			var oldView = Renderer.View;
-			var oldProj = Renderer.Projection;
-			var oldDepthState = Renderer.DepthState;
-			var oldCullMode = Renderer.CullMode;
+			//var oldViewport = Renderer.Viewport;
+			//var oldWorld = Renderer.World;
+			//var oldView = Renderer.View;
+			//var oldProj = Renderer.Projection;
+			//var oldDepthState = Renderer.DepthState;
+			//var oldCullMode = Renderer.CullMode;
 
-			Renderer.Flush();
-			Renderer.Viewport = lightViewport;
-			Renderer.DepthState = DepthState.DepthReadWrite;
+			//Renderer.Flush();
+			//Renderer.Viewport = lightViewport;
+			//Renderer.DepthState = DepthState.DepthReadWrite;
 
-			var list = new List<RenderItem>();
-			var chain = new RenderChain();
-			foreach (var node in viewport.Nodes) {
-				node.AddToRenderChain(chain);
-			}
+			//var list = new List<RenderItem>();
+			//var chain = new RenderChain();
+			//foreach (var node in viewport.Nodes) {
+			//	node.AddToRenderChain(chain);
+			//}
 
-			for (var i = 0; i < RenderChain.LayerCount; i++) {
-				var layer = chain.Layers[i];
-				if (layer == null || layer.Count == 0) {
-					continue;
-				}
-				for (var j = 0; j < layer.Count; j++) {
-					var node = layer[j].Node.AsNode3D;
-					list.Add(new RenderItem {
-						Node = node,
-						Distance = lightView.TransformVector(node.GlobalTransform.Translation).Z
-				});
-				}
+			//for (var i = 0; i < RenderChain.LayerCount; i++) {
+			//	var layer = chain.Layers[i];
+			//	if (layer == null || layer.Count == 0) {
+			//		continue;
+			//	}
+			//	for (var j = 0; j < layer.Count; j++) {
+			//		var node = layer[j].Node.AsNode3D;
+			//		list.Add(new RenderItem {
+			//			Node = node,
+			//			Distance = lightView.TransformVector(node.GlobalTransform.Translation).Z
+			//	});
+			//	}
 
-				list.Sort(RenderOrderComparers.FrontToBack);
-				for (int j = 0; j < list.Count; ++j) {
-					RenderNode(list[j].Node);
-				}
-			}
+			//	list.Sort(RenderOrderComparers.FrontToBack);
+			//	for (int j = 0; j < list.Count; ++j) {
+			//		RenderNode(list[j].Node);
+			//	}
+			//}
 
-			chain.Clear();
+			//chain.Clear();
 
-			Renderer.World = oldWorld;
-			Renderer.Viewport = oldViewport;
-			Renderer.View = oldView;
-			Renderer.Projection = oldProj;
-			Renderer.DepthState = oldDepthState;
-			Renderer.CullMode = oldCullMode;
+			//Renderer.World = oldWorld;
+			//Renderer.Viewport = oldViewport;
+			//Renderer.View = oldView;
+			//Renderer.Projection = oldProj;
+			//Renderer.DepthState = oldDepthState;
+			//Renderer.CullMode = oldCullMode;
 
-			map.RestoreRenderTarget();
+			//map.RestoreRenderTarget();
 		}
 
 		private void RenderNode(Node node)

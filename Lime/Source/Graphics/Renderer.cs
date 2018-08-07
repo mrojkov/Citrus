@@ -114,9 +114,9 @@ namespace Lime
 		private static ScissorState scissorState;
 		private static Color4 colorFactor;
 
-		public static Blending Blending;
-		public static ShaderId Shader;
-		public static Matrix32 Transform1;
+		public static Blending Blending { private get; set; }
+		public static ShaderId Shader { private get; set; }
+		public static Matrix32 Transform1 { private get; set; }
 		public static int RenderCycle { get; private set; }
 		public static int PolyCount3d = 0;
 		public static readonly RenderList MainRenderList = new RenderList();
@@ -131,9 +131,8 @@ namespace Lime
 
 		public static Matrix44 World
 		{
-			get { return world; }
-			set
-			{
+			private get { return world; }
+			set {
 				world = value;
 				worldViewDirty = worldViewProjDirty = true;
 				FlushWVPMatrix();
@@ -142,9 +141,8 @@ namespace Lime
 
 		public static Matrix44 View
 		{
-			get { return view; }
-			set
-			{
+			private get { return view; }
+			set {
 				view = value;
 				viewProjDirty = worldViewDirty = worldViewProjDirty = true;
 				FlushWVPMatrix();
@@ -153,9 +151,8 @@ namespace Lime
 
 		public static Matrix44 Projection
 		{
-			get { return proj; }
-			set
-			{
+			private get { return proj; }
+			set {
 				proj = value;
 				viewProjDirty = worldViewProjDirty = true;
 				Flush();
@@ -163,10 +160,9 @@ namespace Lime
 			}
 		}
 
-		public static Matrix44 WorldView
+		private static Matrix44 WorldView
 		{
-			get
-			{
+			get {
 				if (worldViewDirty) {
 					worldViewDirty = false;
 					worldView = world * view;
@@ -175,10 +171,9 @@ namespace Lime
 			}
 		}
 
-		public static Matrix44 ViewProjection
+		private static Matrix44 ViewProjection
 		{
-			get
-			{
+			get {
 				if (viewProjDirty) {
 					viewProjDirty = false;
 					viewProj = view * proj;
@@ -187,10 +182,9 @@ namespace Lime
 			}
 		}
 
-		public static Matrix44 WorldViewProjection
+		private static Matrix44 WorldViewProjection
 		{
-			get
-			{
+			get {
 				if (worldViewProjDirty) {
 					worldViewProjDirty = false;
 					worldViewProj = world * ViewProjection;
@@ -201,9 +195,8 @@ namespace Lime
 
 		public static Matrix32 Transform2
 		{
-			get { return transform2; }
-			set
-			{
+			private get { return transform2; }
+			set {
 				transform2 = value;
 				Transform2Active = !value.IsIdentity();
 			}
@@ -211,9 +204,8 @@ namespace Lime
 
 		public static ScissorState ScissorState
 		{
-			get { return scissorState; }
-			set
-			{
+			private get { return scissorState; }
+			set {
 				MainRenderList.Flush();
 				scissorState = value;
 				PlatformRenderer.SetScissorState(value);
@@ -222,9 +214,8 @@ namespace Lime
 
 		public static StencilState StencilState
 		{
-			get { return stencilState; }
-			set
-			{
+			private get { return stencilState; }
+			set {
 				MainRenderList.Flush();
 				stencilState = value;
 				PlatformRenderer.SetStencilState(value);
@@ -233,9 +224,8 @@ namespace Lime
 
 		public static Viewport Viewport
 		{
-			get { return viewport; }
-			set
-			{
+			private get { return viewport; }
+			set {
 				MainRenderList.Flush();
 				viewport = value;
 				PlatformRenderer.SetViewport(value);
@@ -244,9 +234,8 @@ namespace Lime
 
 		public static DepthState DepthState
 		{
-			get { return depthState; }
-			set
-			{
+			private get { return depthState; }
+			set {
 				MainRenderList.Flush();
 				depthState = value;
 				PlatformRenderer.SetDepthState(depthState);
@@ -255,7 +244,7 @@ namespace Lime
 
 		public static ColorWriteMask ColorWriteEnabled
 		{
-			get { return colorWriteEnabled; }
+			private get { return colorWriteEnabled; }
 			set {
 				if (colorWriteEnabled != value) {
 					Flush();
@@ -267,9 +256,8 @@ namespace Lime
 
 		public static CullMode CullMode
 		{
-			get { return cullMode; }
-			set
-			{
+			private get { return cullMode; }
+			set {
 				if (cullMode != value) {
 					cullMode = value;
 					Flush();
@@ -280,9 +268,8 @@ namespace Lime
 
 		public static Color4 ColorFactor
 		{
-			get { return colorFactor; }
-			set
-			{
+			private get { return colorFactor; }
+			set {
 				if (colorFactor != value) {
 					colorFactor = value;
 					GlobalShaderParams.Set(colorFactorParamKey, colorFactor.ToVector4());
@@ -306,6 +293,14 @@ namespace Lime
 		public static void SetOrthogonalProjection(float left, float top, float right, float bottom)
 		{
 			Projection = Matrix44.CreateOrthographicOffCenter(left, right, bottom, top, -50, 50);
+		}
+
+		public static void SetScissorState(ScissorState value, bool intersectWithCurrent = false)
+		{
+			if (intersectWithCurrent && scissorState.Enable && value.Enable) {
+				value.Bounds = (WindowRect)IntRectangle.Intersect((IntRectangle)value.Bounds, (IntRectangle)scissorState.Bounds);
+			}
+			ScissorState = value;
 		}
 
 		public static void BeginFrame()
@@ -945,6 +940,16 @@ namespace Lime
 			FlushWVPMatrix();
 		}
 
+		public static void MultiplyTransform1(Matrix32 transform)
+		{
+			Transform1 = transform * Transform1;
+		}
+
+		public static void MultiplyTransform2(Matrix32 transform)
+		{
+			Transform2 = transform * Transform2;
+		}
+
 		public static Matrix44 FixupWVP(Matrix44 projection)
 		{
 			if (PlatformRenderer.OffscreenRendering) {
@@ -957,6 +962,160 @@ namespace Lime
 		{
 			GlobalShaderParams.Set(projectionParamKey, FixupWVP(WorldViewProjection));
 		}
+
+		private static Stack<State> stateStack = new Stack<State>();
+		private static Stack<State> statePool = new Stack<State>();
+
+		public static void PushState(RenderState mask)
+		{
+			var state = AcquireState();
+			state.StateMask = mask;
+			if ((mask & RenderState.Viewport) != 0) {
+				state.Viewport = Viewport;
+			}
+			if ((mask & RenderState.Transform1) != 0) {
+				state.Transform1 = Transform1;
+			}
+			if ((mask & RenderState.Transform2) != 0) {
+				state.Transform2 = Transform2;
+			}
+			if ((mask & RenderState.Blending) != 0) {
+				state.Blending = Blending;
+			}
+			if ((mask & RenderState.Shader) != 0) {
+				state.Shader = Shader;
+			}
+			if ((mask & RenderState.ColorWriteEnabled) != 0) {
+				state.ColorWriteEnabled = ColorWriteEnabled;
+			}
+			if ((mask & RenderState.CullMode) != 0) {
+				state.CullMode = CullMode;
+			}
+			if ((mask & RenderState.DepthState) != 0) {
+				state.DepthState = DepthState;
+			}
+			if ((mask & RenderState.ScissorState) != 0) {
+				state.ScissorState = ScissorState;
+			}
+			if ((mask & RenderState.StencilState) != 0) {
+				state.StencilState = StencilState;
+			}
+			if ((mask & RenderState.ColorFactor) != 0) {
+				state.ColorFactor = ColorFactor;
+			}
+			if ((mask & RenderState.World) != 0) {
+				state.World = World;
+			}
+			if ((mask & RenderState.View) != 0) {
+				state.View = View;
+			}
+			if ((mask & RenderState.Projection) != 0) {
+				state.Projection = Projection;
+			}
+			stateStack.Push(state);
+		}
+
+		public static void PopState()
+		{
+			var state = stateStack.Pop();
+			var mask = state.StateMask;
+			if ((mask & RenderState.Viewport) != 0) {
+				Viewport = state.Viewport;
+			}
+			if ((mask & RenderState.Transform1) != 0) {
+				Transform1 = state.Transform1;
+			}
+			if ((mask & RenderState.Transform2) != 0) {
+				Transform2 = state.Transform2;
+			}
+			if ((mask & RenderState.Blending) != 0) {
+				Blending = state.Blending;
+			}
+			if ((mask & RenderState.Shader) != 0) {
+				Shader = state.Shader;
+			}
+			if ((mask & RenderState.ColorWriteEnabled) != 0) {
+				ColorWriteEnabled = state.ColorWriteEnabled;
+			}
+			if ((mask & RenderState.CullMode) != 0) {
+				CullMode = state.CullMode;
+			}
+			if ((mask & RenderState.DepthState) != 0) {
+				DepthState = state.DepthState;
+			}
+			if ((mask & RenderState.ScissorState) != 0) {
+				ScissorState = state.ScissorState;
+			}
+			if ((mask & RenderState.StencilState) != 0) {
+				StencilState = state.StencilState;
+			}
+			if ((mask & RenderState.ColorFactor) != 0) {
+				ColorFactor = state.ColorFactor;
+			}
+			if ((mask & RenderState.World) != 0) {
+				World = state.World;
+			}
+			if ((mask & RenderState.View) != 0) {
+				View = state.View;
+			}
+			if ((mask & RenderState.Projection) != 0) {
+				Projection = state.Projection;
+			}
+			RecycleState(state);
+		}
+
+		private static State AcquireState()
+		{
+			if (statePool.Count > 0) {
+				return statePool.Pop();
+			} else {
+				return new State();
+			}
+		}
+
+		private static void RecycleState(State state)
+		{
+			statePool.Push(state);
+		}
+
+		private class State
+		{
+			public RenderState StateMask;
+			public Viewport Viewport;
+			public Matrix32 Transform1;
+			public Matrix32 Transform2;
+			public Blending Blending;
+			public ShaderId Shader;
+			public ColorWriteMask ColorWriteEnabled;
+			public CullMode CullMode;
+			public DepthState DepthState;
+			public ScissorState ScissorState;
+			public StencilState StencilState;
+			public Color4 ColorFactor;
+			public Matrix44 World;
+			public Matrix44 View;
+			public Matrix44 Projection;
+		}
+	}
+
+	[Flags]
+	public enum RenderState
+	{
+		None = 0,
+		Viewport = 1 << 0,
+		Transform1 = 1 << 1,
+		Transform2 = 1 << 2,
+		Blending = 1 << 3,
+		Shader = 1 << 4,
+		ColorWriteEnabled = 1 << 5,
+		CullMode = 1 << 6,
+		DepthState = 1 << 7,
+		ScissorState = 1 << 8,
+		StencilState = 1 << 9,
+		ColorFactor = 1 << 10,
+		World = 1 << 11,
+		View = 1 << 12,
+		Projection = 1 << 13
 	}
 
 	public class DashedLineMaterial : IMaterial

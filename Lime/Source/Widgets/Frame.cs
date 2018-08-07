@@ -100,7 +100,8 @@ namespace Lime
 
 		private WindowRect CalculateScissorRectangle(Widget widget)
 		{
-			var aabb = widget.CalcAABBInViewportSpace(Renderer.Viewport.Bounds, Renderer.WorldViewProjection);
+			var root = (WindowWidget)WidgetContext.Current.Root;
+			var aabb = widget.CalcAABBInViewportSpace(root.GetViewport(), root.GetProjection());
 			return (WindowRect)aabb;
 		}
 
@@ -236,60 +237,51 @@ namespace Lime
 			private void RenderToTexture()
 			{
 				if (FrameSize.X > 0 && FrameSize.Y > 0) {
-					var savedScissorState = Renderer.ScissorState;
 					RenderTexture.SetAsRenderTarget();
-					var savedViewport = Renderer.Viewport;
-					var savedWorld = Renderer.World;
-					var savedView = Renderer.View;
-					var savedProj = Renderer.Projection;
-					var savedDepthState = Renderer.DepthState;
-					var savedCullMode = Renderer.CullMode;
-					var savedTransform2 = Renderer.Transform2;
-					Renderer.ScissorState = ScissorState.ScissorDisabled;
-					Renderer.Viewport = new Viewport(0, 0, RenderTexture.ImageSize.Width, RenderTexture.ImageSize.Height);
-					Renderer.Clear(new Color4(0, 0, 0, 0));
-					Renderer.World = Renderer.View = Matrix44.Identity;
-					Renderer.SetOrthogonalProjection(0, 0, FrameSize.X, FrameSize.Y);
-					Renderer.DepthState = DepthState.DepthDisabled;
-					Renderer.CullMode = CullMode.None;
-					Renderer.Transform2 = LocalToWorldTransform.CalcInversed();
-					foreach (var ro in Objects) {
-						ro.Render();
+					Renderer.PushState(
+						RenderState.Viewport |
+						RenderState.World |
+						RenderState.View |
+						RenderState.Projection |
+						RenderState.DepthState |
+						RenderState.ScissorState |
+						RenderState.CullMode |
+						RenderState.Transform2);
+					try {
+						Renderer.ScissorState = ScissorState.ScissorDisabled;
+						Renderer.Viewport = new Viewport(0, 0, RenderTexture.ImageSize.Width, RenderTexture.ImageSize.Height);
+						Renderer.Clear(new Color4(0, 0, 0, 0));
+						Renderer.World = Renderer.View = Matrix44.Identity;
+						Renderer.SetOrthogonalProjection(0, 0, FrameSize.X, FrameSize.Y);
+						Renderer.DepthState = DepthState.DepthDisabled;
+						Renderer.CullMode = CullMode.None;
+						Renderer.Transform2 = LocalToWorldTransform.CalcInversed();
+						foreach (var ro in Objects) {
+							ro.Render();
+						}
+					} finally {
+						RenderTexture.RestoreRenderTarget();
+						Renderer.PopState();
 					}
-					RenderTexture.RestoreRenderTarget();
-					Renderer.Transform2 = savedTransform2;
-					Renderer.Viewport = savedViewport;
-					Renderer.World = savedWorld;
-					Renderer.View = savedView;
-					Renderer.Projection = savedProj;
-					Renderer.ScissorState = savedScissorState;
-					Renderer.DepthState = savedDepthState;
-					Renderer.CullMode = savedCullMode;
 				}
 			}
 
 			private void RenderWithScissorTest()
 			{
-				var savedScissorState = Renderer.ScissorState;
+				Renderer.PushState(RenderState.ScissorState);
 				try {
-					var rect = ScissorRect;
-					if (savedScissorState.Enable) {
-						if (!IntersectRectangles(ScissorRect, savedScissorState.Bounds, out rect)) {
-							return;
-						}
-					}
-					Renderer.ScissorState = new ScissorState(rect);
+					Renderer.SetScissorState(new ScissorState(ScissorRect), intersectWithCurrent: true);
 					foreach (var ro in Objects) {
 						ro.Render();
 					}
 				} finally {
-					Renderer.ScissorState = savedScissorState;
+					Renderer.PopState();
 				}
 			}
 
 			private void RenderWithStencilTest()
 			{
-				var savedStencilState = Renderer.StencilState;
+				Renderer.PushState(RenderState.StencilState);
 				try {
 					// Draw mask into stencil buffer
 					var sp = StencilState.Default;
@@ -310,14 +302,8 @@ namespace Lime
 						ro.Render();
 					}
 				} finally {
-					Renderer.StencilState = savedStencilState;
+					Renderer.PopState();
 				}
-			}
-
-			private static bool IntersectRectangles(WindowRect a, WindowRect b, out WindowRect r)
-			{
-				r = (WindowRect)IntRectangle.Intersect((IntRectangle)a, (IntRectangle)b);
-				return r.Width > 0 && r.Height > 0;
 			}
 		}
 	}
