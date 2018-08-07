@@ -135,11 +135,8 @@ namespace Tangerine.UI
 
 			private ThemedSimpleText CreateLabel()
 			{
-				var label = new ThemedSimpleText {
-					Padding = new Thickness(defaultPadding),
-					Text = Document.Current.RootNode == rootNode ? "root" : rootNode.Id
-				};
-				label.AddChangeWatcher(() => rootNode.Id, t => label.Text = t);
+				var label = new ThemedSimpleText { Padding = new Thickness(defaultPadding) };
+				label.AddChangeWatcher(() => rootNode.Id, t => label.Text = Document.Current.RootNode == rootNode ? "root" : t);
 				return label;
 			}
 
