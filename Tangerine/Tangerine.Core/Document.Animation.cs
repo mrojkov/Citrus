@@ -31,10 +31,12 @@ namespace Tangerine.Core
 			if (PreviewAnimation) {
 				PreviewAnimation = false;
 				CurrentFrameSetter.StopAnimationRecursive(PreviewAnimationContainer);
-				CurrentFrameSetter.SetTimeRecursive(PreviewAnimationContainer, 0);
-				SetCurrentFrameToNode(
-					PreviewAnimationBegin, Container, animationMode
-				);
+				if (!CoreUserPreferences.Instance.StopAnimationOnCurrentFrame) {
+					CurrentFrameSetter.SetTimeRecursive(PreviewAnimationContainer, 0);
+					SetCurrentFrameToNode(
+						PreviewAnimationBegin, Container, animationMode
+					);
+				}
 				AudioSystem.StopAll();
 			} else {
 				int savedAnimationFrame = Container.AnimationFrame;

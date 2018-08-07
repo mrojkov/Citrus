@@ -309,7 +309,9 @@ namespace Tangerine
 				new BooleanPropertyEditor(
 					new PropertyEditorParams(pane.Content, CoreUserPreferences.Instance, nameof(CoreUserPreferences.AnimationMode), "Animation mode")),
 				new IntPropertyEditor(
-						new PropertyEditorParams(pane.Content, Tangerine.AppUserPreferences.Instance, nameof(Tangerine.AppUserPreferences.AutosaveDelay), "Autosave delay"))
+						new PropertyEditorParams(pane.Content, Tangerine.AppUserPreferences.Instance, nameof(Tangerine.AppUserPreferences.AutosaveDelay), "Autosave delay")),
+				new BooleanPropertyEditor(
+					new PropertyEditorParams(pane.Content, CoreUserPreferences.Instance, nameof(CoreUserPreferences.StopAnimationOnCurrentFrame), "Stop animaion on current frame")),
 			});
 			var boneWidthPropertyEditor =
 				new FloatPropertyEditor(
