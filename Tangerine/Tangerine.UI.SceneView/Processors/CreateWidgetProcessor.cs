@@ -48,21 +48,22 @@ namespace Tangerine.UI.SceneView
 						DrawRectOutline(rect.A, rect.B, t2);
 					});
 					sv.Frame.CompoundPostPresenter.Add(presenter);
-					while (sv.Input.IsMousePressed()) {
-						rect.B = sv.MousePosition * t;
-						CommonWindow.Current.Invalidate();
-						yield return null;
-					}
-					sv.Frame.CompoundPostPresenter.Remove(presenter);
-					try {
-						Document.Current.History.DoTransaction(() => {
-							var widget = (Widget) Core.Operations.CreateNode.Perform(nodeTypeActive);
+					using (Document.Current.History.BeginTransaction()) {
+						while (sv.Input.IsMousePressed()) {
+							rect.B = sv.MousePosition * t;
+							CommonWindow.Current.Invalidate();
+							yield return null;
+						}
+						sv.Frame.CompoundPostPresenter.Remove(presenter);
+						try {
+							var widget = (Widget)Core.Operations.CreateNode.Perform(nodeTypeActive);
 							Core.Operations.SetProperty.Perform(widget, nameof(Widget.Size), rect.B - rect.A);
 							Core.Operations.SetProperty.Perform(widget, nameof(Widget.Position), rect.A + widget.Size / 2);
 							Core.Operations.SetProperty.Perform(widget, nameof(Widget.Pivot), Vector2.Half);
-						});
-					} catch (InvalidOperationException e) {
-						AlertDialog.Show(e.Message);
+						} catch (InvalidOperationException e) {
+							AlertDialog.Show(e.Message);
+						}
+						Document.Current.History.CommitTransaction();
 					}
 
 					nodeTypeActive = null;
