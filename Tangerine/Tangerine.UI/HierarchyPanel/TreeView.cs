@@ -12,6 +12,7 @@ namespace Tangerine.UI
 		private readonly ThemedScrollView scrollView = new ThemedScrollView();
 		private readonly TreeNode root;
 		private readonly Widget parent;
+		private readonly ThemedSimpleText nothingToShow = new ThemedSimpleText("Nothing to show");
 		private TreeNode selected = null;
 
 		public DocumentHierarchyTreeView(Widget parent, Node rootNode)
@@ -39,7 +40,17 @@ namespace Tangerine.UI
 
 		public void Filter(string filter)
 		{
-			root.Filter(filter);
+			if (root.Filter(filter)) {
+				nothingToShow.Unlink();
+				if (root.Parent == null) {
+					scrollView.Content.AddNode(root);
+				}
+			} else {
+				root.Unlink();
+				if (nothingToShow.Parent == null) {
+					scrollView.Content.AddNode(nothingToShow);
+				}
+			}
 			ClearSelection();
 		}
 
@@ -305,7 +316,7 @@ namespace Tangerine.UI
 
 			private void HightlightText()
 			{
-				if (String.IsNullOrEmpty(filter)) {
+				if (String.IsNullOrEmpty(filter) || !MatchesFilter()) {
 					return;
 				}
 				treeNodeWidget.PrepareRendererState();
@@ -313,12 +324,12 @@ namespace Tangerine.UI
 				int previousIndex = 0;
 				var filterSize = Renderer.MeasureTextLine(label.Font, filter, label.FontHeight, label.LetterSpacing);
 				var size = Vector2.Zero;
-				var text = label.Text.ToLower();
+				var text = rootNode.Id.ToLower();
 				var pos = label.CalcPositionInSpaceOf(treeNodeWidget);
 				pos.X += label.Padding.Left;
 				pos.Y += label.Padding.Top;
 				while ((index = text.IndexOf(filter, previousIndex)) >= 0) {
-					var skippedText = label.Text.Substring(previousIndex, index - previousIndex);
+					var skippedText = text.Substring(previousIndex, index - previousIndex);
 					var skippedSize = Renderer.MeasureTextLine(label.Font, skippedText, label.FontHeight, label.LetterSpacing);
 					size.X += skippedSize.X;
 					size.Y = Mathf.Max(size.Y, skippedSize.Y);
