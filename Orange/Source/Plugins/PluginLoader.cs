@@ -226,19 +226,22 @@ namespace Orange
 		private static Assembly AssemblyResolve(object sender, ResolveEventArgs args)
 		{
 			var commaIndex = args.Name.IndexOf(',');
-			var name = commaIndex < 0 ? args.Name : args.Name.Substring(0, commaIndex);
+			var name = commaIndex < 0 ? Path.GetFileName(args.Name) : args.Name.Substring(0, commaIndex);
 			if (string.IsNullOrEmpty(name)) {
 				return null;
 			}
 
 			var requiredAssemblies = CurrentPlugin?.GetRequiredAssemblies?.Invoke();
-			if (requiredAssemblies == null || !requiredAssemblies.Contains(name)) {
+			string foundPath = requiredAssemblies?.FirstOrDefault(assemblyPath =>
+				assemblyPath == name || Path.GetFileName(assemblyPath).Equals(name, StringComparison.InvariantCultureIgnoreCase)
+			);
+			if (foundPath == null) {
 				return null;
 			}
 
 			Assembly assembly;
 			if (!resolvedAssemblies.TryGetValue(name, out assembly)) {
-				var dllPath = Path.Combine(CurrentPluginDirectory, name) + ".dll";
+				var dllPath = Path.Combine(CurrentPluginDirectory, foundPath) + ".dll";
 				var readAllDllBytes = File.ReadAllBytes(dllPath);
 				byte[] readAllPdbBytes = null;
 #if DEBUG
