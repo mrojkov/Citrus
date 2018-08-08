@@ -396,7 +396,7 @@ namespace Tangerine.UI
 			var hierarchy = new HierarchyColors {
 				SelectionColor = toolbar.ButtonHighlightBackground,
 				GrayedSelectionColor = toolbar.ButtonHighlightBackground.Darken(0.3f),
-				MatchColor = Color4.Yellow.Transparentify(0.6f),
+				MatchColor = Color4.Yellow.Darken(0.5f).Transparentify(0.6f),
 				JointColor = Color4.Gray
 			};
 			return new ColorTheme {

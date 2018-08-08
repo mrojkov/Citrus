@@ -209,6 +209,7 @@ namespace Tangerine.UI
 
 			private readonly Node rootNode;
 			private ToolbarButton expandButton;
+			private ThemedSimpleText label;
 			private readonly Joint expandJoint = new Joint(JointType.HLine, defaultJointWidth);
 			private readonly Widget treeNodesContainer = new Widget { Layout = new VBoxLayout() };
 			private readonly Widget treeNodeWidget;
@@ -268,6 +269,7 @@ namespace Tangerine.UI
 							: ColorTheme.Current.Hierarchy.GrayedSelectionColor;
 						Renderer.DrawRect(0, 0, w.Width, w.Height, color);
 					}
+					HightlightText();
 				}));
 				treeNodeWidget.Clicked += () => view.SelectTreeNode(this);
 				treeNodeWidget.Gestures.Add(new DoubleClickGesture(NavigateToNode));
@@ -305,32 +307,35 @@ namespace Tangerine.UI
 
 			private Widget CreateLabel()
 			{
-				var label = new ThemedSimpleText { Padding = new Thickness(defaultPadding) };
+				label = new ThemedSimpleText { Padding = new Thickness(defaultPadding) };
 				label.AddChangeWatcher(() => rootNode.Id, t => label.Text = Document.Current.RootNode == rootNode ? "root" : t);
-				label.CompoundPresenter.Insert(0, new DelegatePresenter<ThemedSimpleText>(w => {
-					if (String.IsNullOrEmpty(filter)) {
-						return;
-					}
-					w.PrepareRendererState();
-					int index = 0;
-					int previousIndex = 0;
-					var filterSize = Renderer.MeasureTextLine(w.Font, filter, w.FontHeight, w.LetterSpacing);
-					var size = Vector2.Zero;
-					var text = w.Text.ToLower();
-					float left = w.Padding.Left;
-					float top = w.Padding.Top;
-					while ((index = text.IndexOf(filter, previousIndex)) >= 0) {
-						var skippedText = w.Text.Substring(previousIndex, index - previousIndex);
-						var skippedSize = Renderer.MeasureTextLine(w.Font, skippedText, w.FontHeight, w.LetterSpacing);
-						size.X += skippedSize.X;
-						size.Y = Mathf.Max(size.Y, skippedSize.Y);
-						Renderer.DrawRect(left + size.X, top, left + size.X + filterSize.X, top + size.Y, ColorTheme.Current.Hierarchy.MatchColor);
-						size.X += filterSize.X;
-						size.Y = Mathf.Max(size.Y, filterSize.Y);
-						previousIndex = index + filter.Length;
-					}
-				}));
 				return label;
+			}
+
+			private void HightlightText()
+			{
+				if (String.IsNullOrEmpty(filter)) {
+					return;
+				}
+				treeNodeWidget.PrepareRendererState();
+				int index = 0;
+				int previousIndex = 0;
+				var filterSize = Renderer.MeasureTextLine(label.Font, filter, label.FontHeight, label.LetterSpacing);
+				var size = Vector2.Zero;
+				var text = label.Text.ToLower();
+				var pos = label.CalcPositionInSpaceOf(treeNodeWidget);
+				pos.X += label.Padding.Left;
+				pos.Y += label.Padding.Top;
+				while ((index = text.IndexOf(filter, previousIndex)) >= 0) {
+					var skippedText = label.Text.Substring(previousIndex, index - previousIndex);
+					var skippedSize = Renderer.MeasureTextLine(label.Font, skippedText, label.FontHeight, label.LetterSpacing);
+					size.X += skippedSize.X;
+					size.Y = Mathf.Max(size.Y, skippedSize.Y);
+					Renderer.DrawRect(pos.X + size.X, pos.Y, pos.X + size.X + filterSize.X, pos.Y + size.Y, ColorTheme.Current.Hierarchy.MatchColor);
+					size.X += filterSize.X;
+					size.Y = Mathf.Max(size.Y, filterSize.Y);
+					previousIndex = index + filter.Length;
+				}
 			}
 
 			public void ToggleExpanded()
