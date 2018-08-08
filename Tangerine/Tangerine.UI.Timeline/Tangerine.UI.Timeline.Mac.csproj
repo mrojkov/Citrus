@@ -118,6 +118,7 @@
     <Compile Include="Components\ShowTiedNodesContextMenu.cs" />
     <Compile Include="Processors\TiedIndicationProcessor.cs" />
     <Compile Include="Operations\InsertKeyframes.cs" />
+    <Compile Include="Processors\GridPane\AnimationStretchProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tangerine.Core\Tangerine.Core.Mac.csproj">

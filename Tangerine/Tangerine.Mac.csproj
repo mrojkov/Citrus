@@ -419,6 +419,8 @@
     <EmbeddedResource Include="Resources\Icons\Light\SceneView\ShowPanel.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.TiledImage.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.TiledImage.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Timeline\AnimationStretch.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Timeline\AnimationStretch.png" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
