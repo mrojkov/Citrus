@@ -22,7 +22,7 @@ namespace Lime
 
 		[YuzuMember]
 		[TangerineKeyframeColor(7)]
-		public bool OrientToPath { get; set; }
+		public bool AlongPathOrientation { get; set; }
 
 		public SplineGear()
 		{
@@ -49,7 +49,7 @@ namespace Lime
 				var length = spline.CalcPolylineLength();
 				var point = spline.CalcPoint(SplineOffset * length);
 				widget.Position = spline.CalcLocalToParentTransform().TransformVector(point);
-				if (OrientToPath) {
+				if (AlongPathOrientation) {
 					var vec = spline.CalcDerivative(SplineOffset * length);
 					widget.Rotation = Mathf.Atan2(vec) * Mathf.RadToDeg;
 				}
