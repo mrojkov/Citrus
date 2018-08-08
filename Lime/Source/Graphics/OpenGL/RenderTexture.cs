@@ -75,9 +75,6 @@ namespace Lime
 			if (IsDisposed) {
 				throw new ObjectDisposedException(GetType().Name);
 			}
-			if (!Application.CurrentThread.IsMain()) {
-				throw new Lime.Exception("Attempt to create a RenderTexture not from the main thread");
-			}
 			var t = new uint[1];
 			GL.GenFramebuffers(1, t);
 			framebuffer = t[0];
