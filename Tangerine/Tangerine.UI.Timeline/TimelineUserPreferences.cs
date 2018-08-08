@@ -19,6 +19,9 @@ namespace Tangerine.UI.Timeline
 		[YuzuRequired]
 		public List<float> TimelineHSplitterStretches;
 
+		[YuzuRequired]
+		public bool AnimationStretchMode;
+
 		public TimelineUserPreferences()
 		{
 			ResetToDefaults();
