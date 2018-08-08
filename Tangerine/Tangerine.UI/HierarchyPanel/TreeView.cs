@@ -299,7 +299,7 @@ namespace Tangerine.UI
 			private Widget CreateLabel()
 			{
 				label = new ThemedSimpleText { Padding = new Thickness(defaultPadding) };
-				label.AddChangeWatcher(() => rootNode.Id, t => label.Text = Document.Current.RootNode == rootNode ? "root" : t);
+				label.AddChangeWatcher(() => rootNode.Id, t => label.Text = String.IsNullOrEmpty(t) ? $"<{rootNode.GetType().Name}>" : t);
 				return label;
 			}
 
