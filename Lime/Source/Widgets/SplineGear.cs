@@ -20,6 +20,10 @@ namespace Lime
 		[TangerineKeyframeColor(6)]
 		public float SplineOffset { get; set; }
 
+		[YuzuMember]
+		[TangerineKeyframeColor(7)]
+		public bool OrientToPath { get; set; }
+
 		public SplineGear()
 		{
 			RenderChainBuilder = null;
@@ -45,6 +49,10 @@ namespace Lime
 				var length = spline.CalcPolylineLength();
 				var point = spline.CalcPoint(SplineOffset * length);
 				widget.Position = spline.CalcLocalToParentTransform().TransformVector(point);
+				if (OrientToPath) {
+					var vec = spline.CalcDerivative(SplineOffset * length);
+					widget.Rotation = Mathf.Atan2(vec) * Mathf.RadToDeg;
+				}
 			}
 		}
 
