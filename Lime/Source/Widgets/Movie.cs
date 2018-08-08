@@ -77,11 +77,15 @@ namespace Lime
 			movieTexture.Update(delta);
 		}
 
-		//public override void Render()
-		//{
-		//	PrepareRendererState();
-		//	Renderer.DrawSprite(movieTexture, GlobalColor, Vector2.Zero, Size, Vector2.Zero, Vector2.One);
-		//}
+		protected internal override Lime.RenderObject GetRenderObject()
+		{
+			var ro = RenderObjectPool<RenderObject>.Acquire();
+			ro.CaptureRenderState(this);
+			ro.Texture = movieTexture;
+			ro.Color = GlobalColor;
+			ro.Size = Size;
+			return ro;
+		}
 
 		public override void OnTrigger(string property, double animationTimeCorrection = 0)
 		{
@@ -126,6 +130,19 @@ namespace Lime
 		public bool IsPlaying()
 		{
 			return (movieTexture != null) && /*!movieTexture.Stopped &&*/ !movieTexture.Paused;
+		}
+
+		private class RenderObject : WidgetRenderObject
+		{
+			public ITexture Texture;
+			public Color4 Color;
+			public Vector2 Size;
+
+			public override void Render()
+			{
+				PrepareRenderState();
+				Renderer.DrawSprite(Texture, Color, Vector2.Zero, Size, Vector2.Zero, Vector2.One);
+			}
 		}
 	}
 }
