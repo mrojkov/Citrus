@@ -92,7 +92,14 @@ namespace Tangerine.UI
 		}
 
 		private static void NavigateToSelectedNode(TreeView view) => view.NavigateToSelectedNode();
-		private static void SelectNextTreeNode(TreeView view) => view.SelectNextTreeNode();
+		private static void SelectNextTreeNode(TreeView view)
+		{
+			if (!view.HasSelection()) {
+				view.SelectFirstMatch();
+				return;
+			}
+			view.SelectNextTreeNode();
+		}
 		private static void SelectPreviosTreeNode(TreeView view) => view.SelectPreviousTreeNode();
 		private static void EnterSelectedTreeNode(TreeView view) => view.EnterSelectedTreeNode();
 		private static void LeaveSelectedTreeNode(TreeView view) => view.LeaveSelectedTreeNode();

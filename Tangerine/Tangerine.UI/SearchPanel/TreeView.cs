@@ -74,7 +74,7 @@ namespace Tangerine.UI
 
 		public void SelectNextTreeNode()
 		{
-			if (selected == null) {
+			if (!HasSelection()) {
 				return;
 			}
 			if (selected.Expandable && selected.Expanded) {
@@ -93,7 +93,7 @@ namespace Tangerine.UI
 
 		public void SelectPreviousTreeNode()
 		{
-			if (selected == null || selected == root) {
+			if (!HasSelection() || selected == root) {
 				return;
 			}
 			if (selected.Index == 0) {
@@ -110,7 +110,7 @@ namespace Tangerine.UI
 
 		public void EnterSelectedTreeNode()
 		{
-			if (selected == null || !selected.Expandable) {
+			if (!HasSelection() || !selected.Expandable) {
 				return;
 			}
 			selected.Expanded = true;
@@ -132,7 +132,7 @@ namespace Tangerine.UI
 
 		public void EnsureSelectionVisible()
 		{
-			if (selected == null) {
+			if (!HasSelection()) {
 				return;
 			}
 			var pos = selected.CalcPositionInSpaceOf(scrollView.Content);
@@ -141,6 +141,20 @@ namespace Tangerine.UI
 			} else if (pos.Y + selected.RowHeight > scrollView.ScrollPosition + scrollView.Height) {
 				scrollView.ScrollPosition = pos.Y - scrollView.Height + selected.RowHeight;
 			}
+		}
+
+		public bool HasSelection()
+		{
+			return selected != null;
+		}
+
+		public void SelectFirstMatch()
+		{
+			var node = root;
+			while (!node.MatchesFilter()) {
+				node = (TreeNode)node.ChildTreeNodes.First();
+			}
+			SelectTreeNode(node);
 		}
 
 		private enum JointType {
@@ -345,10 +359,10 @@ namespace Tangerine.UI
 
 			private void SetExpandable(bool expandable)
 			{
-				if (this.Expandable == expandable) {
+				if (Expandable == expandable) {
 					return;
 				}
-				this.Expandable = expandable;
+				Expandable = expandable;
 				if (expandable) {
 					ReplaceNode(expandButton, expandJoint);
 					return;
@@ -431,7 +445,7 @@ namespace Tangerine.UI
 			{
 				this.filter = filter.ToLower();
 				treeNodesContainer.Nodes.Clear();
-				bool result = String.IsNullOrEmpty(filter) || (rootNode.Id?.ToLower().Contains(filter.ToLower()) ?? false);
+				bool result = MatchesFilter();
 				int index = 0;
 				foreach (var node in savedNodes) {
 					if (node.Filter(filter)) {
@@ -446,6 +460,11 @@ namespace Tangerine.UI
 					Expanded = true;
 				}
 				return result;
+			}
+
+			public bool MatchesFilter()
+			{
+				return String.IsNullOrEmpty(filter) || (rootNode.Id?.ToLower().Contains(filter.ToLower()) ?? false);
 			}
 
 			private void UpdateExpandable()
