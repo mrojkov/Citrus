@@ -115,7 +115,11 @@ namespace Tangerine.UI.Inspector
 					widget.AddNode(label);
 				}
 			}
-			foreach (var property in type.GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public)) {
+			var bindingFlags = BindingFlags.Instance | BindingFlags.Public;
+			if (!isSubclassOfNodeComponent) {
+				bindingFlags |= BindingFlags.DeclaredOnly;
+			}
+			foreach (var property in type.GetProperties(bindingFlags)) {
 				if (!ShouldInspectProperty(type, objects, property)) {
 					continue;
 				}
