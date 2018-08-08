@@ -93,9 +93,8 @@ namespace Tangerine.UI
 				return;
 			}
 			var newSelected = (TreeNode)selected.ParentTreeNode.ChildTreeNodes[selected.Index - 1];
-			if (newSelected.ChildTreeNodes.Count > 0 && newSelected.Expanded) {
-				SelectTreeNode((TreeNode)newSelected.ChildTreeNodes.Last());
-				return;
+			while (newSelected.Expandable && newSelected.Expanded) {
+				newSelected = (TreeNode)newSelected.ChildTreeNodes.Last();
 			}
 			SelectTreeNode(newSelected);
 		}
