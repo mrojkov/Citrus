@@ -169,18 +169,18 @@ namespace Tangerine.UI
 					case JointType.None:
 						break;
 					case JointType.HLine:
-						Renderer.DrawLine(0, Height / 2, Width, Height / 2, Color4.Gray);
+						Renderer.DrawLine(0, Height / 2, Width, Height / 2, ColorTheme.Current.Hierarchy.JointColor);
 						break;
 					case JointType.VLine:
-						Renderer.DrawLine(Width / 2, 0, Width / 2, Height, Color4.Gray);
+						Renderer.DrawLine(Width / 2, 0, Width / 2, Height, ColorTheme.Current.Hierarchy.JointColor);
 						break;
 					case JointType.TShaped:
-						Renderer.DrawLine(Width / 2, 0, Width / 2, Height, Color4.Gray);
-						Renderer.DrawLine(Width / 2, Height / 2, Width, Height / 2, Color4.Gray);
+						Renderer.DrawLine(Width / 2, 0, Width / 2, Height, ColorTheme.Current.Hierarchy.JointColor);
+						Renderer.DrawLine(Width / 2, Height / 2, Width, Height / 2, ColorTheme.Current.Hierarchy.JointColor);
 						break;
 					case JointType.LShaped:
-						Renderer.DrawLine(Width / 2, 0, Width / 2, Height / 2, Color4.Gray);
-						Renderer.DrawLine(Width / 2, Height / 2, Width, Height / 2, Color4.Gray);
+						Renderer.DrawLine(Width / 2, 0, Width / 2, Height / 2, ColorTheme.Current.Hierarchy.JointColor);
+						Renderer.DrawLine(Width / 2, Height / 2, Width, Height / 2, ColorTheme.Current.Hierarchy.JointColor);
 						break;
 					default:
 						throw new ArgumentException();
@@ -249,7 +249,10 @@ namespace Tangerine.UI
 				treeNodeWidget.CompoundPresenter.Add(new DelegatePresenter<Widget>(w => {
 					if (view.selected == this) {
 						w.PrepareRendererState();
-						Renderer.DrawRect(0, 0, w.Width, w.Height, ColorTheme.Current.Toolbar.ButtonHighlightBackground);
+						var color = view.parent.IsFocused()
+							? ColorTheme.Current.Hierarchy.SelectionColor
+							: ColorTheme.Current.Hierarchy.GrayedSelectionColor;
+						Renderer.DrawRect(0, 0, w.Width, w.Height, color);
 					}
 				}));
 				treeNodeWidget.Clicked += () => view.SelectTreeNode(this);
@@ -279,9 +282,9 @@ namespace Tangerine.UI
 				expandButton.CompoundPresenter.Insert(0, new DelegatePresenter<Widget>(w => {
 					w.PrepareRendererState();
 					var iconSize = (w.Width - 2 * defaultPadding) / 2;
-					Renderer.DrawLine(0, w.Height / 2, w.Width / 2 - iconSize, w.Height / 2, Color4.Gray);
+					Renderer.DrawLine(0, w.Height / 2, w.Width / 2 - iconSize, w.Height / 2, ColorTheme.Current.Hierarchy.JointColor);
 					if (Expanded) {
-						Renderer.DrawLine(w.Width / 2, w.Height / 2 + iconSize, w.Width / 2, w.Height, Color4.Gray);
+						Renderer.DrawLine(w.Width / 2, w.Height / 2 + iconSize, w.Width / 2, w.Height, ColorTheme.Current.Hierarchy.JointColor);
 					}
 				}));
 			}
@@ -307,7 +310,7 @@ namespace Tangerine.UI
 						var skippedSize = Renderer.MeasureTextLine(w.Font, skippedText, w.FontHeight, w.LetterSpacing);
 						size.X += skippedSize.X;
 						size.Y = Mathf.Max(size.Y, skippedSize.Y);
-						Renderer.DrawRect(left + size.X, top, left + size.X + filterSize.X, top + size.Y, Color4.Yellow.Transparentify(0.7f));
+						Renderer.DrawRect(left + size.X, top, left + size.X + filterSize.X, top + size.Y, ColorTheme.Current.Hierarchy.MatchColor);
 						size.X += filterSize.X;
 						size.Y = Mathf.Max(size.Y, filterSize.Y);
 						previousIndex = index + filter.Length;

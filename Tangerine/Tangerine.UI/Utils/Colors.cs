@@ -229,6 +229,18 @@ namespace Tangerine.UI
 			public Color4 Border { get; set; }
 		}
 
+		public class HierarchyColors
+		{
+			[YuzuRequired]
+			public Color4 SelectionColor { get; set; }
+			[YuzuRequired]
+			public Color4 GrayedSelectionColor { get; set; }
+			[YuzuRequired]
+			public Color4 MatchColor { get; set; }
+			[YuzuRequired]
+			public Color4 JointColor { get; set; }
+		}
+
 		[YuzuRequired]
 		public bool IsDark { get; set; }
 		public Theme.ColorTheme Basic { get; set; }
@@ -252,6 +264,8 @@ namespace Tangerine.UI
 		public InspectorColors Inspector { get; set; }
 		[YuzuRequired]
 		public KeyboardColors Keyboard { get; set; }
+		[YuzuRequired]
+		public HierarchyColors Hierarchy { get; set; }
 
 		public ColorTheme Clone()
 		{
@@ -379,6 +393,12 @@ namespace Tangerine.UI
 				SelectedBorder = new Color4(100, 255, 255),
 				Border = new Color4(32, 32, 32)
 			};
+			var hierarchy = new HierarchyColors {
+				SelectionColor = toolbar.ButtonHighlightBackground,
+				GrayedSelectionColor = toolbar.ButtonHighlightBackground.Darken(0.3f),
+				MatchColor = Color4.Yellow.Transparentify(0.6f),
+				JointColor = Color4.Gray
+			};
 			return new ColorTheme {
 				IsDark = true,
 				Basic = basic,
@@ -391,7 +411,8 @@ namespace Tangerine.UI
 				TimelineRoll = timelineRoll,
 				Docking = docking,
 				Inspector = inspector,
-				Keyboard = keyboard
+				Keyboard = keyboard,
+				Hierarchy = hierarchy
 			};
 		}
 
@@ -512,6 +533,12 @@ namespace Tangerine.UI
 				SelectedBorder = new Color4(255, 0, 0),
 				Border = new Color4(32, 32, 32)
 			};
+			var hierarchy = new HierarchyColors {
+				SelectionColor = toolbar.ButtonHighlightBackground,
+				GrayedSelectionColor = toolbar.ButtonHighlightBackground.Darken(0.3f),
+				MatchColor = Color4.Yellow.Transparentify(0.6f),
+				JointColor = Color4.Gray
+			};
 			return new ColorTheme {
 				IsDark = false,
 				Basic = basic,
@@ -524,7 +551,8 @@ namespace Tangerine.UI
 				TimelineRoll = timelineRoll,
 				Docking = docking,
 				Inspector = inspector,
-				Keyboard = keyboard
+				Keyboard = keyboard,
+				Hierarchy = hierarchy
 			};
 		}
 	}
