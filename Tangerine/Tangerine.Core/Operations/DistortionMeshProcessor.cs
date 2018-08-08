@@ -36,6 +36,7 @@ namespace Tangerine.Core.Operations
 						Position = pos
 					};
 					InsertFolderItem.Perform(mesh, new FolderItemLocation(rootFolder, rootFolder.Items.Count), point);
+					Document.Current.Decorate(point);
 				}
 			}
 		}
