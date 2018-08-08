@@ -267,7 +267,11 @@ namespace Tangerine
 		private void OpenDocumentsFromArgs(string[] args)
 		{
 			foreach (var arg in args) {
-				Project.Current.OpenDocument(arg, pathIsGlobal: true);
+				if (Path.GetExtension(arg) == ".citproj") {
+					FileOpenProject.Execute(arg);
+				} else {
+					Project.Current.OpenDocument(arg, pathIsGlobal: true);
+				}
 			}
 		}
 
