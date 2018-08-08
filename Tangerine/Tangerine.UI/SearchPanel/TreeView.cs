@@ -8,14 +8,6 @@ namespace Tangerine.UI
 {
 	class TreeView
 	{
-		public enum AdvanceDirection
-		{
-			Up,
-			Down,
-			Left,
-			Right
-		}
-
 		private readonly Node rootNode;
 		private readonly ThemedScrollView scrollView = new ThemedScrollView();
 		private readonly TreeNode root;
