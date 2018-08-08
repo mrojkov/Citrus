@@ -83,6 +83,7 @@
     <Compile Include="PropertyEditors\FilePropertyEditor.cs" />
     <Compile Include="PropertyEditors\FloatPropertyEditor.cs" />
     <Compile Include="PropertyEditors\FontPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\InstancePropertyEditor.cs" />
     <Compile Include="PropertyEditors\IntPropertyEditor.cs" />
     <Compile Include="PropertyEditors\IPropertyEditor.cs" />
     <Compile Include="PropertyEditors\IPropertyEditorParams.cs" />

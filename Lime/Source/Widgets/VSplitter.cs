@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -113,6 +113,7 @@ namespace Lime
 			}
 		}
 
+		[TangerineIgnore]
 		class VSplitterLayout : VBoxLayout
 		{
 			public override void MeasureSizeConstraints(Widget widget)

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace Lime
 {
+	[TangerineIgnore]
 	public class FlowLayout : CommonLayout, ILayout
 	{
 		public enum FlowDirection

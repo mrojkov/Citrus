@@ -412,6 +412,7 @@ namespace Lime
 			Down = 1
 		}
 
+		[TangerineIgnore]
 		protected class Layout : CommonLayout, ILayout
 		{
 			readonly Widget content;

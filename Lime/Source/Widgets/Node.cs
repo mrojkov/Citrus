@@ -103,7 +103,7 @@ namespace Lime
 		}
 	}
 
-	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
+	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Class, AllowMultiple = false)]
 	public sealed class TangerineIgnoreAttribute : Attribute
 	{ }
 

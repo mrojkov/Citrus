@@ -7,6 +7,7 @@ using Yuzu;
 using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Operations;
+using System.Collections;
 
 namespace Tangerine.UI.Inspector
 {
@@ -152,25 +153,34 @@ namespace Tangerine.UI.Inspector
 			foreach (var header in editorParams.Keys.OrderBy((s) => s)) {
 				AddGroupHeader(header);
 				foreach (var param in editorParams[header]) {
+					bool isPropertyRegistered = false;
+					IPropertyEditor editor = null;
 					foreach (var i in InspectorPropertyRegistry.Instance.Items) {
 						if (i.Condition(param)) {
-							var propertyEditor = i.Builder(param);
-							if (propertyEditor != null) {
-								if (!isSubclassOfNodeComponent) {
-									DecoratePropertyEditor(propertyEditor, row++);
-								} else {
-									DecorateComponentPropertyEditor(propertyEditor, row++);
-								}
-								editors.Add(propertyEditor);
-
-								var showCondition = PropertyAttributes<TangerineIgnoreIfAttribute>.Get(type, param.PropertyInfo.Name);
-								if (showCondition != null) {
-									propertyEditor.ContainerWidget.Updated += (delta) => {
-										propertyEditor.ContainerWidget.Visible = !showCondition.Check(param.Objects.First());
-									};
-								}
-							}
+							isPropertyRegistered = true;
+							editor = i.Builder(param);
 							break;
+						}
+					}
+					if (!isPropertyRegistered) {
+						var propertyType = param.PropertyInfo.PropertyType;
+						if ((propertyType.IsClass || propertyType.IsInterface) && !propertyType.GetInterfaces().Contains(typeof(IEnumerable))) {
+							Type specializedInstancePropertyEditorType = typeof(InstancePropertyEditor<>).MakeGenericType(param.PropertyInfo.PropertyType);
+							editor = Activator.CreateInstance(specializedInstancePropertyEditorType, new object[] { param }) as IPropertyEditor;
+						}
+					}
+					if (editor != null) {
+						if (!isSubclassOfNodeComponent) {
+							DecoratePropertyEditor(editor, row++);
+						} else {
+							DecorateComponentPropertyEditor(editor, row++);
+						}
+						editors.Add(editor);
+						var showCondition = PropertyAttributes<TangerineIgnoreIfAttribute>.Get(type, param.PropertyInfo.Name);
+						if (showCondition != null) {
+							editor.ContainerWidget.Updated += (delta) => {
+								editor.ContainerWidget.Visible = !showCondition.Check(param.Objects.First());
+							};
 						}
 					}
 				}

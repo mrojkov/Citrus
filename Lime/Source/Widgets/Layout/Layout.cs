@@ -9,8 +9,29 @@ namespace Lime
 	[TangerineRegisterComponent]
 	public class LayoutComponent : NodeComponent
 	{
+		private ILayout layout = new HBoxLayout();
 		[YuzuMember]
-		public ILayout Layout = AnchorLayout.Instance;
+		public ILayout Layout
+		{
+			get => layout;
+			set
+			{
+				layout = value;
+				if (Owner != null) {
+					layout.InvalidateConstraintsAndArrangement(Owner as Widget);
+				}
+			}
+		}
+
+		protected override void OnOwnerChanged(Node oldOwner)
+		{
+			base.OnOwnerChanged(oldOwner);
+			if (Owner != null) {
+				layout.InvalidateConstraintsAndArrangement(Owner as Widget);
+			} else if (oldOwner != null) {
+				(oldOwner as Widget).Layout.InvalidateConstraintsAndArrangement(oldOwner as Widget);
+			}
+		}
 	}
 
 	public interface ILayout
@@ -27,13 +48,14 @@ namespace Lime
 		void ArrangeChildren(Widget widget);
 	}
 
+	[TangerineIgnore]
 	public class CommonLayout
 	{
-		public object Tag;
 		public List<Rectangle> DebugRectangles { get; protected set; }
 
 		public bool ConstraintsValid { get; protected set; }
 		public bool ArrangementValid { get; protected set; }
+		[YuzuMember]
 		public bool IgnoreHidden { get; set; }
 
 		public CommonLayout()

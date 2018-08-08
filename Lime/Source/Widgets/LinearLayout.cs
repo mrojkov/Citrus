@@ -5,6 +5,7 @@ namespace Lime
 	// TODO: Get rid of the class, use Widget.Layout technology instead.
 	public class LinearLayout : Node
 	{
+		[TangerineIgnore]
 		class LayoutHandler : CommonLayout, ILayout
 		{
 			private LinearLayout layoutData;

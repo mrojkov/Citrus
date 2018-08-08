@@ -142,6 +142,7 @@ namespace Lime
 			return length;
 		}
 
+		[TangerineIgnore]
 		new class Layout : ScrollView.Layout
 		{
 			readonly Widget slider;
