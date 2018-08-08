@@ -1,9 +1,6 @@
 using Lime;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Tangerine.Core;
 
 namespace Tangerine.UI.SceneView
 {
@@ -14,8 +11,9 @@ namespace Tangerine.UI.SceneView
 		private readonly Slider slider;
 		private readonly Button zoomInButton;
 		private readonly Button zoomOutButton;
-		private readonly SimpleText zoomLabel;
+		private readonly ThemedEditBox zoomEditor;
 		SceneView sv => SceneView.Instance;
+		private float currentSliderValue => zoomTable[(int)(slider.Value).Clamp(0, zoomTable.Count - 1)];
 
 		public ZoomWidget()
 		{
@@ -44,8 +42,10 @@ namespace Tangerine.UI.SceneView
 				LayoutCell = new LayoutCell(Alignment.RightCenter),
 				Anchors = Anchors.Right,
 				Clicked = () => {
-					slider.Value = (slider.Value + slider.Step).Clamp(slider.RangeMin, slider.RangeMax);
-					Zoom();
+					if (currentSliderValue <= sv.Scene.Scale.X) {
+						slider.Value = (slider.Value + slider.Step).Clamp(slider.RangeMin, slider.RangeMax);
+					}
+					Zoom(currentSliderValue);
 				},
 				Texture = IconPool.GetTexture("SceneView.ZoomIn"),
 			};
@@ -55,25 +55,34 @@ namespace Tangerine.UI.SceneView
 				LayoutCell = new LayoutCell(Alignment.RightCenter),
 				Anchors = Anchors.Right,
 				Clicked = () => {
-					slider.Value = (slider.Value - slider.Step).Clamp(slider.RangeMin, slider.RangeMax);
-					Zoom();
+					if (currentSliderValue >= sv.Scene.Scale.X) {
+						slider.Value = (slider.Value - slider.Step).Clamp(slider.RangeMin, slider.RangeMax);
+					}
+					Zoom(currentSliderValue);
 				},
 				Texture = IconPool.GetTexture("SceneView.ZoomOut"),
 			};
 
-			zoomLabel = new ThemedSimpleText {
+			zoomEditor = new ThemedEditBox {
 				LayoutCell = new LayoutCell(Alignment.RightCenter),
-				Anchors = Anchors.Right
+				Anchors = Anchors.Right,
+				MinMaxWidth = 50
+			};
+			zoomEditor.Submitted += value => {
+				bool success = float.TryParse(value.TrimEnd('%'), out float zoom);
+				if (success) {
+					Zoom(zoom / 100);
+				}
 			};
 
-			slider.Updating += delta => {
-				int index = FindNearest(sv.Scene.Scale.X, 0, zoomTable.Count);
+			this.AddChangeWatcher(() => sv.Scene.Scale.X, value => {
+				int index = FindNearest(value, 0, zoomTable.Count);
 				slider.Value = index;
-				zoomLabel.Text = (zoomTable[index] * 100f).ToString() + "%";
-			};
-			slider.Changed += () => Zoom();
+				zoomEditor.Text = (value * 100f).ToString() + "%";
+			});
+			slider.Changed += () => Zoom(currentSliderValue);
 			AddNode(new Widget { LayoutCell = new LayoutCell(Alignment.LeftCenter, 1) });
-			AddNode(zoomLabel);
+			AddNode(zoomEditor);
 			AddNode(zoomOutButton);
 			AddNode(slider);
 			AddNode(zoomInButton);
@@ -86,14 +95,12 @@ namespace Tangerine.UI.SceneView
 			12f, 13f, 14f, 15f, 16f
 		};
 
-		void Zoom()
+		void Zoom(float newZoom)
 		{
 			var prevZoom = sv.Scene.Scale.X;
-			var zoom = zoomTable[(int)(slider.Value).Clamp(0, zoomTable.Count - 1)];
-
 			var p = (sv.Frame.Size / 2 - sv.Scene.Position) / sv.Scene.Scale.X;
-			sv.Scene.Scale = zoom * Vector2.One;
-			sv.Scene.Position -= p * (zoom - prevZoom);
+			sv.Scene.Scale = newZoom * Vector2.One;
+			sv.Scene.Position -= p * (newZoom - prevZoom);
 		}
 
 		private int FindNearest(float x, int left, int right)
