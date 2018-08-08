@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
@@ -9,13 +8,13 @@ namespace Tangerine.UI
 	{
 		public static HierarchyPanel Instance { get; private set; }
 
-		private readonly Widget PanelWidget;
-		private readonly Frame RootWidget;
+		private readonly Widget panelWidget;
+		private readonly Frame rootWidget;
 		private readonly EditBox searchStringEditor;
 		private readonly ThemedScrollView scrollView = new ThemedScrollView();
-		private TreeView view;
+		private DocumentHierarchyTreeView view;
 
-		private static readonly Dictionary<Key, Action<TreeView>> keyActionMap = new Dictionary<Key, Action<TreeView>>() {
+		private static readonly Dictionary<Key, Action<DocumentHierarchyTreeView>> keyActionMap = new Dictionary<Key, Action<DocumentHierarchyTreeView>>() {
 			{ Key.MapShortcut(Key.Enter), NavigateToSelectedNode },
 			{ Key.MapShortcut(Key.Up), SelectPreviosTreeNode },
 			{ Key.MapShortcut(Key.Down), SelectNextTreeNode },
@@ -27,8 +26,8 @@ namespace Tangerine.UI
 
 		public HierarchyPanel(Widget rootWidget)
 		{
-			PanelWidget = rootWidget;
-			RootWidget = new Frame {
+			panelWidget = rootWidget;
+			this.rootWidget = new Frame {
 				Id = "SearchPanel",
 				Padding = new Thickness(5),
 				Layout = new VBoxLayout { Spacing = 5 },
@@ -37,8 +36,8 @@ namespace Tangerine.UI
 				}
 			};
 			rootWidget.TabTravesable = new TabTraversable();
-			var treeView = new TreeView(RootWidget, Document.Current.RootNode);
-			var searchTreeView = new TreeView(RootWidget, Document.Current.RootNode);
+			var treeView = new DocumentHierarchyTreeView(this.rootWidget, Document.Current.RootNode);
+			var searchTreeView = new DocumentHierarchyTreeView(this.rootWidget, Document.Current.RootNode);
 			searchStringEditor.AddChangeWatcher(() => searchStringEditor.Text, t => {
 				if (!String.IsNullOrEmpty(t)) {
 					if (treeView.IsAttached()) {
@@ -57,7 +56,7 @@ namespace Tangerine.UI
 			});
 			treeView.Attach();
 			view = treeView;
-			RootWidget.LateTasks.Add(new KeyRepeatHandler((input, key) => {
+			this.rootWidget.LateTasks.Add(new KeyRepeatHandler((input, key) => {
 				if (keyActionMap.ContainsKey(key)) {
 					input.ConsumeKey(key);
 					keyActionMap[key](view);
@@ -67,8 +66,8 @@ namespace Tangerine.UI
 			}));
 		}
 
-		private static void NavigateToSelectedNode(TreeView view) => view.NavigateToSelectedNode();
-		private static void SelectNextTreeNode(TreeView view)
+		private static void NavigateToSelectedNode(DocumentHierarchyTreeView view) => view.NavigateToSelectedNode();
+		private static void SelectNextTreeNode(DocumentHierarchyTreeView view)
 		{
 			if (!view.HasSelection()) {
 				view.SelectFirstMatch();
@@ -76,22 +75,22 @@ namespace Tangerine.UI
 			}
 			view.SelectNextTreeNode();
 		}
-		private static void SelectPreviosTreeNode(TreeView view) => view.SelectPreviousTreeNode();
-		private static void EnterSelectedTreeNode(TreeView view) => view.EnterSelectedTreeNode();
-		private static void LeaveSelectedTreeNode(TreeView view) => view.LeaveSelectedTreeNode();
-		private static void ToggleSelectedTreeNode(TreeView view) => view.ToggleSelectedTreeNode();
-		private static void ClearSelection(TreeView view) => view.ClearSelection();
+		private static void SelectPreviosTreeNode(DocumentHierarchyTreeView view) => view.SelectPreviousTreeNode();
+		private static void EnterSelectedTreeNode(DocumentHierarchyTreeView view) => view.EnterSelectedTreeNode();
+		private static void LeaveSelectedTreeNode(DocumentHierarchyTreeView view) => view.LeaveSelectedTreeNode();
+		private static void ToggleSelectedTreeNode(DocumentHierarchyTreeView view) => view.ToggleSelectedTreeNode();
+		private static void ClearSelection(DocumentHierarchyTreeView view) => view.ClearSelection();
 
 		public void Attach()
 		{
 			Instance = this;
-			PanelWidget.PushNode(RootWidget);
+			panelWidget.PushNode(rootWidget);
 		}
 
 		public void Detach()
 		{
 			Instance = null;
-			RootWidget.Unlink();
+			rootWidget.Unlink();
 		}
 	}
 }

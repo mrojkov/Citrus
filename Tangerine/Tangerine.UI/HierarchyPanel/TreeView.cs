@@ -6,7 +6,7 @@ using Tangerine.Core;
 
 namespace Tangerine.UI
 {
-	class TreeView
+	class DocumentHierarchyTreeView
 	{
 		private readonly Node rootNode;
 		private readonly ThemedScrollView scrollView = new ThemedScrollView();
@@ -14,7 +14,7 @@ namespace Tangerine.UI
 		private readonly Widget parent;
 		private TreeNode selected = null;
 
-		public TreeView(Widget parent, Node rootNode)
+		public DocumentHierarchyTreeView(Widget parent, Node rootNode)
 		{
 			this.rootNode = rootNode;
 			this.parent = parent;
@@ -207,7 +207,7 @@ namespace Tangerine.UI
 			private readonly Joint parentJoint;
 			private readonly List<Joint> offsetJoints;
 			private readonly int level;
-			private readonly TreeView view;
+			private readonly DocumentHierarchyTreeView view;
 			private bool expanded = false;
 			private string filter;
 			private List<TreeNode> savedNodes = new List<TreeNode>();
@@ -226,7 +226,7 @@ namespace Tangerine.UI
 			public bool Expandable { get; private set; }
 			public float RowHeight => treeNodeWidget.Height;
 
-			public TreeNode(TreeView view, Node rootNode, TreeNode parentTreeNode, JointType jointType, List<Joint> offsetJoints, int level, int index, bool isLast)
+			public TreeNode(DocumentHierarchyTreeView view, Node rootNode, TreeNode parentTreeNode, JointType jointType, List<Joint> offsetJoints, int level, int index, bool isLast)
 			{
 				this.rootNode = rootNode;
 				this.level = level;
