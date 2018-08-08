@@ -58,9 +58,28 @@ namespace Tangerine
 			var stream = new MemoryStream(Encoding.UTF8.GetBytes(serializedArgs));
 			try {
 				var args = Serialization.ReadObject<string[]>(string.Empty, stream);
-				Application.InvokeOnMainThread(() => AnotherInstanceArgsRecieved?.Invoke(args));
+				Application.InvokeOnMainThread(() => {
+					WindowsFormActivator.Activate((Window)Application.MainWindow);
+					AnotherInstanceArgsRecieved?.Invoke(args);
+				});
 			} catch {
 				// ignored
+			}
+		}
+
+		private static class WindowsFormActivator
+		{
+			[System.Runtime.InteropServices.DllImport("user32.dll")]
+			private static extern int ShowWindow(IntPtr hWnd, uint Msg);
+
+			private const uint SW_RESTORE = 0x09;
+
+			public static void Activate(Window window)
+			{
+				if (window.Form.WindowState == System.Windows.Forms.FormWindowState.Minimized) {
+					ShowWindow(window.Form.Handle, SW_RESTORE);
+				}
+				window.Activate();
 			}
 		}
 
