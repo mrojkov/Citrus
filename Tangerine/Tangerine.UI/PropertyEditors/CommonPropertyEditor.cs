@@ -126,7 +126,7 @@ namespace Tangerine.UI
 			if (EditorParams.DefaultValueGetter != null) {
 				menu.Insert(0, resetToDefault);
 			}
-			if (EditorParams.Objects.Count == 1) {
+			if (!EditorParams.Objects.Skip(1).Any()) {
 				var owner = EditorParams.Objects.First();
 				var value = CoalescedPropertyValue().GetValue();
 				var pi = EditorParams.PropertyInfo;

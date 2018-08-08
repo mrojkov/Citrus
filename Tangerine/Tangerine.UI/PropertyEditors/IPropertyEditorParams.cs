@@ -10,7 +10,7 @@ namespace Tangerine.UI
 	public interface IPropertyEditorParams
 	{
 		Widget InspectorPane { get; set; }
-		List<object> Objects { get; set; }
+		IEnumerable<object> Objects { get; set; }
 		Type Type { get; set; }
 		string PropertyName { get; set; }
 		string DisplayName { get; set; }

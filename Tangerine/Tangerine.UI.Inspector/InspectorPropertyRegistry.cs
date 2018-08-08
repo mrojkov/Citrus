@@ -44,9 +44,9 @@ namespace Tangerine.UI.Inspector
 			AddEditor(typeof(CameraProjectionMode), c => new EnumPropertyEditor<CameraProjectionMode>(c));
 			AddEditor(c => {
 				return
-					c.Objects.Count == 1 &&
+					!c.Objects.Skip(1).Any() &&
 					c.PropertyInfo.PropertyType == typeof(ITexture) &&
-					c.PropertyInfo.GetValue(c.Objects[0])?.GetType() == typeof(RenderTexture);
+					c.PropertyInfo.GetValue(c.Objects.First())?.GetType() == typeof(RenderTexture);
 			}, c => new RenderTexturePropertyEditor(c));
 			AddEditor(typeof(ITexture), c => new TexturePropertyEditor(c));
 			AddEditor(typeof(SerializableSample), c => new AudioSamplePropertyEditor(c));

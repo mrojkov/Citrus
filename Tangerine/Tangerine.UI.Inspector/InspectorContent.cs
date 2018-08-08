@@ -21,7 +21,7 @@ namespace Tangerine.UI.Inspector
 			editors = new List<IPropertyEditor>();
 		}
 
-		public void BuildForObjects(IReadOnlyList<object> objects)
+		public void BuildForObjects(IEnumerable<object> objects)
 		{
 			if (Widget.Focused != null && Widget.Focused.DescendantOf(widget)) {
 				widget.SetFocus();
@@ -31,10 +31,10 @@ namespace Tangerine.UI.Inspector
 				var o = objects.Where(i => t.IsInstanceOfType(i)).ToList();
 				PopulateContentForType(t, o);
 			}
-			if (objects.Count > 0 && objects.All(o => o is Node)) {
+			if (objects.Any() && objects.All(o => o is Node)) {
 				var nodes = objects.Cast<Node>().ToList();
 				foreach (var t in GetComponentsTypes(nodes)) {
-					PopulateContentForComponent(t, nodes);
+					PopulateContentForType(t, nodes.Select(n => n.Components.Get(t)));
 				}
 				AddComponentsMenu(nodes);
 			}
@@ -71,42 +71,58 @@ namespace Tangerine.UI.Inspector
 			return types;
 		}
 
-		private void PopulateContentForType(Type type, List<object> objects)
+		private bool ShouldInspectProperty(Type type, IEnumerable<object> objects, PropertyInfo property)
 		{
-			var row = 0;
-			var categoryLabelAdded = false;
-			var editorParams = new Dictionary<string, List<PropertyEditorParams>>();
-			foreach (var property in type.GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public)) {
-				if (property.Name == "Item") {
-					// WTF, Bug in Mono?
-					continue;
-				}
+			if (property.Name == "Item") {
+				// WTF, Bug in Mono?
+				return false;
+			}
+			var yuzuField = PropertyAttributes<YuzuField>.Get(type, property.Name);
+			var tang = PropertyAttributes<TangerineKeyframeColorAttribute>.Get(type, property.Name);
+			var tangIgnore = PropertyAttributes<TangerineIgnoreAttribute>.Get(type, property.Name);
+			var tangInspect = PropertyAttributes<TangerineInspectAttribute>.Get(type, property.Name);
+			if (tangInspect == null && (yuzuField == null && tang == null || tangIgnore != null)) {
+				return false;
+			}
+			if (type.IsSubclassOf(typeof(Node))) {
 				// Root must be always visible
 				if (Document.Current.InspectRootNode && property.Name == nameof(Widget.Visible)) {
-					continue;
+					return false;
 				}
-				var yuzuField = PropertyAttributes<YuzuField>.Get(type, property.Name);
-				var tang = PropertyAttributes<TangerineKeyframeColorAttribute>.Get(type, property.Name);
-				var tangIgnore = PropertyAttributes<TangerineIgnoreAttribute>.Get(type, property.Name);
-				var tangInspect = PropertyAttributes<TangerineInspectAttribute>.Get(type, property.Name);
-				if (tangInspect == null && (yuzuField == null && tang == null || tangIgnore != null)) {
-					continue;
-				}
-
 				if (objects.Any(obj =>
 					obj is Node node &&
 					!string.IsNullOrEmpty(node.ContentsPath) &&
 					obj is IExternalScenePropertyOverrideChecker checker &&
 					!checker.IsPropertyOverridden(property)
 				)) {
+					return false;
+				}
+			}
+			return true;
+		}
+
+		private void PopulateContentForType(Type type, IEnumerable<object> objects)
+		{
+			var row = 0;
+			var categoryLabelAdded = false;
+			var editorParams = new Dictionary<string, List<PropertyEditorParams>>();
+			bool isSubclassOfNode = type.IsSubclassOf(typeof(Node));
+			bool isSubclassOfNodeComponent = type.IsSubclassOf(typeof(NodeComponent));
+			if (isSubclassOfNodeComponent) {
+				var label = CreateComponentLabel(type, objects.Cast<NodeComponent>());
+				if (label != null) {
+					widget.AddNode(label);
+				}
+			}
+			foreach (var property in type.GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public)) {
+				if (!ShouldInspectProperty(type, objects, property)) {
 					continue;
 				}
-
-				if (!categoryLabelAdded) {
+				if (isSubclassOfNode && !categoryLabelAdded) {
 					categoryLabelAdded = true;
 					var text = type.Name;
-					if (text == "Node" && objects.Count == 1) {
-						text += $" of type '{objects[0].GetType().Name}'";
+					if (text == "Node" && !objects.Skip(1).Any()) {
+						text += $" of type '{objects.First().GetType().Name}'";
 					}
 					var label = CreateCategoryLabel(text);
 					if (label != null) {
@@ -127,11 +143,9 @@ namespace Tangerine.UI.Inspector
 						return prop.GetValue(obj);
 					}
 				};
-
 				if (!editorParams.Keys.Contains(@params.Group)) {
 					editorParams.Add(@params.Group, new List<PropertyEditorParams>());
 				}
-
 				editorParams[@params.Group].Add(@params);
 			}
 
@@ -142,13 +156,17 @@ namespace Tangerine.UI.Inspector
 						if (i.Condition(param)) {
 							var propertyEditor = i.Builder(param);
 							if (propertyEditor != null) {
-								DecoratePropertyEditor(propertyEditor, row++);
+								if (!isSubclassOfNodeComponent) {
+									DecoratePropertyEditor(propertyEditor, row++);
+								} else {
+									DecorateComponentPropertyEditor(propertyEditor, row++);
+								}
 								editors.Add(propertyEditor);
 
 								var showCondition = PropertyAttributes<TangerineIgnoreIfAttribute>.Get(type, param.PropertyInfo.Name);
 								if (showCondition != null) {
 									propertyEditor.ContainerWidget.Updated += (delta) => {
-										propertyEditor.ContainerWidget.Visible = !showCondition.Check(param.Objects[0]);
+										propertyEditor.ContainerWidget.Visible = !showCondition.Check(param.Objects.First());
 									};
 								}
 							}
@@ -172,77 +190,6 @@ namespace Tangerine.UI.Inspector
 				}
 			}
 			return types;
-		}
-
-		private void PopulateContentForComponent(Type type, IReadOnlyList<Node> nodes)
-		{
-			var row = 0;
-			var componentsAsObjects = nodes
-				.Select(n => n.Components.Get(type))
-				.Cast<object>()
-				.ToList();
-			var editorParams = new Dictionary<string, List<PropertyEditorParams>>();
-			var label = CreateComponentLabel(type, nodes);
-			if (label != null) {
-				widget.AddNode(label);
-			}
-			foreach (var property in type.GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
-				if (property.Name == "Item") {
-					// WTF, Bug in Mono?
-					continue;
-				}
-				var yuzuField = PropertyAttributes<YuzuField>.Get(type, property.Name);
-				var tang = PropertyAttributes<TangerineKeyframeColorAttribute>.Get(type, property.Name);
-				var tangIgnore = PropertyAttributes<TangerineIgnoreAttribute>.Get(type, property.Name);
-				var tangInspect = PropertyAttributes<TangerineInspectAttribute>.Get(type, property.Name);
-				if (tangInspect == null && (yuzuField == null && tang == null || tangIgnore != null)) {
-					continue;
-				}
-
-				var @params = new PropertyEditorParams(widget, componentsAsObjects, type, property.Name) {
-					NumericEditBoxFactory = () => new TransactionalNumericEditBox(),
-					History = Document.Current.History,
-					PropertySetter = SetAnimableProperty,
-					DefaultValueGetter = () => {
-						var ctr = type.GetConstructor(new Type[] { });
-						if (ctr == null) {
-							return null;
-						}
-						var obj = ctr.Invoke(null);
-						var prop = type.GetProperty(property.Name);
-						return prop.GetValue(obj);
-					}
-				};
-
-				if (!editorParams.Keys.Contains(@params.Group)) {
-					editorParams.Add(@params.Group, new List<PropertyEditorParams>());
-				}
-
-				editorParams[@params.Group].Add(@params);
-			}
-
-			foreach (var header in editorParams.Keys.OrderBy((s) => s)) {
-				AddGroupHeader(header);
-				foreach (var param in editorParams[header]) {
-					foreach (var i in InspectorPropertyRegistry.Instance.Items) {
-						if (i.Condition(param)) {
-							var propertyEditor = i.Builder(param);
-							if (propertyEditor != null) {
-								DecorateComponentPropertyEditor(propertyEditor, row++);
-								editors.Add(propertyEditor);
-
-								var showCondition = PropertyAttributes<TangerineIgnoreIfAttribute>.Get(type, param.PropertyInfo.Name);
-								if (showCondition != null) {
-									propertyEditor.ContainerWidget.Updated += (delta) => {
-										propertyEditor.ContainerWidget.Visible = !showCondition.Check(param.Objects[0]);
-									};
-								}
-							}
-							break;
-						}
-					}
-				}
-			}
 		}
 
 		private void AddComponentsMenu(IReadOnlyList<Node> nodes)
@@ -317,11 +264,11 @@ namespace Tangerine.UI.Inspector
 			return label;
 		}
 
-		private Widget CreateComponentLabel(Type type, IReadOnlyList<Node> nodes)
+		private Widget CreateComponentLabel(Type type, IEnumerable<NodeComponent> components)
 		{
 			var label = CreateCategoryLabel(CamelCaseToLabel(type.Name));
 			label.Nodes.Insert(0, new ThemedDeleteButton {
-				Clicked = () => RemoveComponent(type, nodes)
+				Clicked = () => RemoveComponents(components)
 			});
 			return label;
 		}
@@ -410,7 +357,7 @@ namespace Tangerine.UI.Inspector
 			return Regex.Replace(Regex.Replace(text, @"(\P{Ll})(\P{Ll}\p{Ll})", "$1 $2"), @"(\p{Ll})(\P{Ll})", "$1 $2");
 		}
 
-		private static void CreateComponent(Type type, IReadOnlyList<Node> nodes)
+		private static void CreateComponent(Type type, IEnumerable<Node> nodes)
 		{
 			var constructor = type.GetConstructor(Type.EmptyTypes);
 			using (Document.Current.History.BeginTransaction()) {
@@ -426,14 +373,11 @@ namespace Tangerine.UI.Inspector
 			}
 		}
 
-		private static void RemoveComponent(Type type, IReadOnlyList<Node> nodes)
+		private static void RemoveComponents(IEnumerable<NodeComponent> components)
 		{
 			using (Document.Current.History.BeginTransaction()) {
-				foreach (var node in nodes) {
-					var component = node.Components.Get(type);
-					if (component != null) {
-						DeleteComponent.Perform(node, component);
-					}
+				foreach (var c in components) {
+					DeleteComponent.Perform(c.Owner, c);
 				}
 				Document.Current.History.CommitTransaction();
 			}

@@ -9,7 +9,7 @@ namespace Tangerine.UI
 	{
 		public bool ShowLabel { get; set; } = true;
 		public Widget InspectorPane { get; set; }
-		public List<object> Objects { get; set; }
+		public IEnumerable<object> Objects { get; set; }
 		public Type Type { get; set; }
 		public string PropertyName { get; set; }
 		public string DisplayName { get; set; }
@@ -23,7 +23,7 @@ namespace Tangerine.UI
 		public PropertySetterDelegate PropertySetter { get; set; }
 		public ITransactionalHistory History { get; set; }
 
-		public PropertyEditorParams(Widget inspectorPane, List<object> objects, Type type, string propertyName)
+		public PropertyEditorParams(Widget inspectorPane, IEnumerable<object> objects, Type type, string propertyName)
 		{
 			InspectorPane = inspectorPane;
 			Objects = objects;
