@@ -49,62 +49,58 @@ namespace Tangerine.UI.SceneView
 			using (Document.Current.History.BeginTransaction()) {
 				var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>().ToList();
 				var mouseStartPos = sv.MousePosition;
-
+				bool isChangingScale = sv.Input.IsKeyPressed(Key.Control);
+				bool areChildrenFreezed =
+					this.sv.Input.IsKeyPressed(Key.Z) &&
+					!isChangingScale &&
+					widgets.Count == 1 &&
+					widgets[0] is Frame;
 				while (sv.Input.IsMousePressed()) {
 					Document.Current.History.RollbackTransaction();
 
 					Utils.ChangeCursorIfDefault(cursor);
 					var proportional = sv.Input.IsKeyPressed(Key.Shift);
-					{
-						if (
-							sv.Input.IsKeyPressed(Key.Z) &&
-							!sv.Input.IsKeyPressed(Key.Control) &&
-							widgets.Count == 1 &&
-							widgets[0] is Frame frame
-						) {
-							childPositions.Clear();
-							foreach (var widget in frame.Nodes.OfType<Widget>()) {
-								childPositions.Add(
-									widget,
-									widget.CalcPositionInSpaceOf(Document.Current.Container.AsWidget));
-							}
-						}
+					if (areChildrenFreezed) {
+						SaveGlobalPositions((Frame)widgets[0]);
 					}
-
-					RescaleWidgets(widgets.Count <= 1,
-						sv.Input.IsKeyPressed(Key.Control)
-							? (widgets.Count <= 1 ? (Vector2?) null : pivot)
-							: hull[LookupPivotIndex[controlPointIndex] / 2],
+					Vector2? pivotPoint = isChangingScale ?
+						(widgets.Count <= 1 ? (Vector2?)null : pivot) :
+						hull[LookupPivotIndex[controlPointIndex] / 2];
+					RescaleWidgets(
+						widgets.Count <= 1,
+						pivotPoint,
 						widgets,
 						controlPointIndex,
 						sv.MousePosition,
 						mouseStartPos,
 						proportional,
-						!sv.Input.IsKeyPressed(Key.Control)
+						!isChangingScale
 					);
-
-					{
-						if (
-							sv.Input.IsKeyPressed(Key.Z) &&
-							!sv.Input.IsKeyPressed(Key.Control)
-							&& widgets.Count == 1 &&
-							widgets[0] is Frame frame
-						) {
-							foreach (var widget in frame.Nodes.OfType<Widget>()) {
-								var oldPosition = childPositions[widget];
-								Core.Operations.SetAnimableProperty.Perform(
-									widget, nameof(widget.Position),
-									Document.Current.Container.AsWidget.CalcTransitionToSpaceOf(frame) *
-										oldPosition
-								);
-							}
-						}
+					if (areChildrenFreezed) {
+						RestoreGlobalPositions((Frame)widgets[0]);
 					}
-
 					yield return null;
 				}
 				sv.Input.ConsumeKey(Key.Mouse0);
 				Document.Current.History.CommitTransaction();
+			}
+		}
+
+		private void RestoreGlobalPositions(Frame frame)
+		{
+			foreach (var widget in frame.Nodes.OfType<Widget>()) {
+				var oldPosition = childPositions[widget];
+				var newPosition = Document.Current.Container.AsWidget.CalcTransitionToSpaceOf(frame) * oldPosition;
+				Core.Operations.SetAnimableProperty.Perform(widget, nameof(widget.Position), newPosition);
+			}
+		}
+
+		private void SaveGlobalPositions(Frame frame)
+		{
+			childPositions.Clear();
+			foreach (var widget in frame.Nodes.OfType<Widget>()) {
+				var globalPosition = widget.CalcPositionInSpaceOf(Document.Current.Container.AsWidget);
+				this.childPositions.Add(widget, globalPosition);
 			}
 		}
 
@@ -150,7 +146,7 @@ namespace Tangerine.UI.SceneView
 						deformationScaleInObbSpace.Y = deformationScaleInObbSpace.X;
 					}
 
-					return new Transform2d(Vector2d.Zero, deformationScaleInObbSpace, 0); 
+					return new Transform2d(Vector2d.Zero, deformationScaleInObbSpace, 0);
 				}
 			);
 		}
