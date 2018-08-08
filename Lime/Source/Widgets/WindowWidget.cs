@@ -14,11 +14,12 @@ namespace Lime
 	{
 		private const int SwapCount = 2;
 
-		private ManualResetEvent renderQueueChanged = new ManualResetEvent(false);
-		private ManualResetEvent updateQueueChanged = new ManualResetEvent(true);
+		private ManualResetEvent updateReady = new ManualResetEvent(true);
+		private ManualResetEvent renderReady = new ManualResetEvent(false);
 
-		private ConcurrentQueue<RenderObjectList> renderQueue = new ConcurrentQueue<RenderObjectList>();
-		private ConcurrentQueue<RenderObjectList> updateQueue = new ConcurrentQueue<RenderObjectList>();
+		private RenderObjectList renderObjectList;
+		private RenderObjectList renderObjectList1 = new RenderObjectList();
+		private RenderObjectList renderObjectList2 = new RenderObjectList();
 		private RenderObjectList syncRenderObjects = new RenderObjectList();
 
 		private bool windowActivated;
@@ -37,9 +38,6 @@ namespace Lime
 			WidgetContext.GestureManager = new GestureManager(WidgetContext);
 			window.Activated += () => windowActivated = true;
 			LayoutManager = new LayoutManager();
-			for (var i = 0; i < SwapCount; i++) {
-				updateQueue.Enqueue(new RenderObjectList());
-			}
 		}
 
 		protected virtual bool ContinuousRendering() { return true; }
@@ -48,6 +46,13 @@ namespace Lime
 
 		public override void Update(float delta)
 		{
+			if (Window.AsyncRendering) {
+				updateReady.WaitOne();
+				updateReady.Reset();
+				Toolbox.Swap(ref renderObjectList1, ref renderObjectList2);
+				renderObjectList = renderObjectList2;
+				renderReady.Set();
+			}
 			if (ContinuousRendering()) {
 				Window.Invalidate();
 			}
@@ -91,15 +96,8 @@ namespace Lime
 			RenderChainBuilder?.AddToRenderChain(renderChain);
 
 			if (Window.AsyncRendering) {
-				RenderObjectList renderObjects;
-				while (!updateQueue.TryDequeue(out renderObjects)) {
-					updateQueueChanged.WaitOne();
-				}
-				updateQueueChanged.Reset();
-				renderObjects.Clear();
-				renderChain.GetRenderObjects(renderObjects);
-				renderQueue.Enqueue(renderObjects);
-				renderQueueChanged.Set();
+				renderObjectList1.Clear();
+				renderChain.GetRenderObjects(renderObjectList1);
 			} else {
 				syncRenderObjects.Clear();
 				renderChain.GetRenderObjects(syncRenderObjects);
@@ -158,14 +156,10 @@ namespace Lime
 		public void RenderAll()
 		{
 			if (Window.AsyncRendering) {
-				RenderObjectList renderObjects;
-				while (!renderQueue.TryDequeue(out renderObjects)) {
-					renderQueueChanged.WaitOne();
-				}
-				renderQueueChanged.Reset();
-				Render(renderObjects);
-				updateQueue.Enqueue(renderObjects);
-				updateQueueChanged.Set();
+				renderReady.WaitOne();
+				renderReady.Reset();
+				Render(renderObjectList);
+				updateReady.Set();
 			} else {
 				Render(syncRenderObjects);
 			}
