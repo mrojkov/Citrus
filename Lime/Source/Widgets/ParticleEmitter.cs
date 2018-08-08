@@ -933,25 +933,34 @@ namespace Lime
 		protected internal override Lime.RenderObject GetRenderObject()
 		{
 			var ro = RenderObjectPool<RenderObject>.Acquire();
+			var basicWidget = GetBasicWidget();
+			if (basicWidget != null) {
+				ro.Matrix = basicWidget.LocalToWorldTransform;
+				ro.Color = basicWidget.GlobalColor;
+			} else {
+				ro.Matrix = Matrix32.Identity;
+				ro.Color = Color4.White;
+			}
+			ro.Blending = GlobalBlending;
+			ro.Shader = GlobalShader;
+			ro.Particles.Clear();
+			foreach (var p in particles) {
+				if (p.ColorCurrent.A <= 0) {
+					continue;
+				}
+				var angle = p.Angle;
+				if (AlongPathOrientation) {
+					angle += p.FullDirection;
+				}
+				ro.Particles.Add(new ParticleRenderData {
+					Texture = p.Modifier.GetTexture((int)p.TextureIndex - 1),
+					Transform = p.Transform,
+					Color = p.ColorCurrent,
+					Angle = angle
+				});
+			}
 			return ro;
 		}
-
-		//public override void Render()
-		//{
-		//	Matrix32 matrix = Matrix32.Identity;
-		//	Color4 color = Color4.White;
-		//	Widget basicWidget = GetBasicWidget();
-		//	if (basicWidget != null) {
-		//		matrix = basicWidget.LocalToWorldTransform;
-		//		color = basicWidget.GlobalColor;
-		//	}
-		//	Renderer.Blending = GlobalBlending;
-		//	Renderer.Shader = GlobalShader;
-		//	foreach (var particle in particles) {
-		//		RenderParticle(particle, matrix, color);
-		//	}
-		//	Renderer.Transform1 = basicWidget.LocalToWorldTransform;
-		//}
 
 		public void DeleteAllParticles()
 		{
@@ -1028,9 +1037,29 @@ namespace Lime
 
 		private class RenderObject : Lime.RenderObject
 		{
+			public Matrix32 Matrix;
+			public Color4 Color;
+			public Blending Blending;
+			public ShaderId Shader;
+			public List<ParticleRenderData> Particles = new List<ParticleRenderData>();
+
 			public override void Render()
 			{
+				Renderer.Blending = Blending;
+				Renderer.Shader = Shader;
+				foreach (var p in Particles) {
+					Renderer.Transform1 = p.Transform * Matrix;
+					Renderer.DrawSprite(p.Texture, p.Color * Color, -Vector2.Half, Vector2.One, Vector2.Zero, Vector2.One);
+				}
 			}
+		}
+
+		private struct ParticleRenderData
+		{
+			public ITexture Texture;
+			public Matrix32 Transform;
+			public Color4 Color;
+			public float Angle;
 		}
 	}
 }
