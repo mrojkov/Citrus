@@ -48,7 +48,7 @@ namespace Tangerine
 		public override void ExecuteTransaction()
 		{
 			foreach (var widget in Core.Document.Current.SelectedNodes().Editable().OfType<Widget>()) {
-				Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Rotation), 0);
+				Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Rotation), 0f);
 			}
 		}
 	}
