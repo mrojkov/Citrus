@@ -5,9 +5,9 @@ using Tangerine.Core;
 
 namespace Tangerine.UI
 {
-	public class SearchPanel : IDocumentView
+	public class HierarchyPanel : IDocumentView
 	{
-		public static SearchPanel Instance { get; private set; }
+		public static HierarchyPanel Instance { get; private set; }
 
 		private readonly Widget PanelWidget;
 		private readonly Frame RootWidget;
@@ -25,18 +25,7 @@ namespace Tangerine.UI
 			{ Key.MapShortcut(Key.Space), ToggleSelectedTreeNode },
 		};
 
-		public static SearchPanel Instance { get; private set; }
-
-		public readonly Widget PanelWidget;
-		public readonly Frame RootWidget;
-		private readonly EditBox searchStringEditor;
-		private readonly Widget resultPane;
-		private readonly ThemedScrollView scrollView;
-		private List<Node> results = new List<Node>();
-		private int selectedIndex;
-		private readonly int rowHeight = Theme.Metrics.TextHeight;
-
-		public SearchPanel(Widget rootWidget)
+		public HierarchyPanel(Widget rootWidget)
 		{
 			PanelWidget = rootWidget;
 			RootWidget = new Frame {

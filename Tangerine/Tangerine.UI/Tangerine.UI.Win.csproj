@@ -99,12 +99,13 @@
     <Compile Include="PropertyEditors\TriggerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\Vector2PropertyEditor.cs" />
     <Compile Include="PropertyEditors\Vector3PropertyEditor.cs" />
+    <Compile Include="HierarchyPanel\TreeView.cs" />
     <Compile Include="ToolbarModel.cs" />
     <Compile Include="SearchPanel\TreeView.cs" />
     <Compile Include="UIProcessors.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EmbeddedResources\EmbeddedResource.cs" />
-    <Compile Include="SearchPanel\SearchPanel.cs" />
+    <Compile Include="HierarchyPanel\HierarchyPanel.cs" />
     <Compile Include="TabbedWidget.cs" />
     <Compile Include="ToolbarView.cs" />
     <Compile Include="ToolbarButton.cs" />
