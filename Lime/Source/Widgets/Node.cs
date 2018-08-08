@@ -259,6 +259,7 @@ namespace Lime
 
 		private TangerineFlags tangerineFlags;
 
+		[TangerineIgnore]
 		[YuzuMember]
 		public TangerineFlags TangerineFlags
 		{

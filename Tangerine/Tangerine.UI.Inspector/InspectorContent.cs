@@ -168,7 +168,10 @@ namespace Tangerine.UI.Inspector
 					}
 					if (!isPropertyRegistered) {
 						var propertyType = param.PropertyInfo.PropertyType;
-						if ((propertyType.IsClass || propertyType.IsInterface) && !propertyType.GetInterfaces().Contains(typeof(IEnumerable))) {
+						if (propertyType.IsEnum) {
+							Type specializedEnumPropertyEditorType = typeof(EnumPropertyEditor<>).MakeGenericType(param.PropertyInfo.PropertyType);
+							editor = Activator.CreateInstance(specializedEnumPropertyEditorType, new object[] { param }) as IPropertyEditor;
+						} else if ((propertyType.IsClass || propertyType.IsInterface) && !propertyType.GetInterfaces().Contains(typeof(IEnumerable))) {
 							Type specializedInstancePropertyEditorType = typeof(InstancePropertyEditor<>).MakeGenericType(param.PropertyInfo.PropertyType);
 							editor = Activator.CreateInstance(specializedInstancePropertyEditorType, new object[] { param }) as IPropertyEditor;
 						}
