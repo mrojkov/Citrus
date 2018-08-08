@@ -8,28 +8,28 @@ namespace Tangerine.UI.Timeline
 {
 	public class SelectAndDragKeyframesProcessor : ITaskProvider
 	{
-		IntRectangle rect;
+		private static Timeline Timeline => Timeline.Instance;
+		private static GridPane Grid => Timeline.Instance.Grid;
 
-		Timeline timeline => Timeline.Instance;
-		GridPane grid => Timeline.Instance.Grid;
-		IntVector2 lastSelectedCell;
-		Node lastSelectionContainer;
+		private IntRectangle selectionRectangle;
 
 		public IEnumerator<object> Task()
 		{
-			var input = grid.RootWidget.Input;
+			var input = Grid.RootWidget.Input;
+			var lastSelectedCell = IntVector2.Zero;
+			Node lastSelectionContainer = null;
 			while (true) {
 				if (input.WasMousePressed()) {
 					using (Document.Current.History.BeginTransaction()) {
-						var initialCell = grid.CellUnderMouse();
-						if (initialCell.Y < Document.Current.Rows.Count) {
+						var initialCell = Grid.CellUnderMouse(ignoreBounds: false);
+						if (initialCell.Y >= 0 && initialCell.Y < Document.Current.Rows.Count) {
 							if (IsCellSelected(initialCell)) {
 								yield return DragSelectionTask(initialCell);
 							} else {
 								var r = new HasKeyframeRequest(initialCell);
-								timeline.Globals.Add(r);
+								Timeline.Globals.Add(r);
 								yield return null;
-								timeline.Globals.Remove<HasKeyframeRequest>();
+								Timeline.Globals.Remove<HasKeyframeRequest>();
 								var isInMultiselectMode = input.IsKeyPressed(Key.Control);
 								var isSelectRangeMode = input.IsKeyPressed(Key.Shift);
 
@@ -53,38 +53,43 @@ namespace Tangerine.UI.Timeline
 			}
 		}
 
-		private object SelectRangeTask(IntVector2 A, IntVector2 B)
+		private static object SelectRangeTask(IntVector2 a, IntVector2 b)
 		{
 			Operations.ClearGridSelection.Perform();
 			Core.Operations.ClearRowSelection.Perform();
-			var r = new IntRectangle();
-			r.A.X = Math.Min(A.X, B.X);
-			r.A.Y = Math.Min(A.Y, B.Y);
-			r.B.X = Math.Max(A.X, B.X);
-			r.B.Y = Math.Max(A.Y, B.Y);
-			for (int i = r.A.Y; i <= r.B.Y; i++) {
+			var r = new IntRectangle {
+				A = {
+					X = Math.Min(a.X, b.X),
+					Y = Math.Min(a.Y, b.Y)
+				},
+				B = {
+					X = Math.Max(a.X, b.X),
+					Y = Math.Max(a.Y, b.Y)
+				}
+			};
+			for (var i = r.A.Y; i <= r.B.Y; i++) {
 				Operations.SelectGridSpan.Perform(i, r.A.X, r.B.X + 1);
 			}
 			return null;
 		}
 
-		bool IsCellSelected(IntVector2 cell)
+		private static bool IsCellSelected(IntVector2 cell)
 		{
 			return Document.Current.Rows[cell.Y].Components.GetOrAdd<GridSpanListComponent>().Spans.IsCellSelected(cell.X);
 		}
 
-		private IEnumerator<object> DragSelectionTask(IntVector2 initialCell)
+		private static IEnumerator<object> DragSelectionTask(IntVector2 initialCell)
 		{
-			var input = grid.RootWidget.Input;
+			var input = Grid.RootWidget.Input;
 			var offset = IntVector2.Zero;
-			Action<Widget> r = widget => timeline.Grid.RenderSelection(widget, offset);
-			grid.OnPostRender += r;
+			void Action(Widget widget) => Timeline.Grid.RenderSelection(widget, offset);
+			Grid.OnPostRender += Action;
 			float time = 0;
 
 			while (input.IsMousePressed()) {
 				time += Lime.Task.Current.Delta;
-				offset = grid.CellUnderMouse() - initialCell;
-				timeline.Ruler.MeasuredFrameDistance = timeline.CurrentColumn - initialCell.X;
+				offset = Grid.CellUnderMouse() - initialCell;
+				Timeline.Ruler.MeasuredFrameDistance = Timeline.CurrentColumn - initialCell.X;
 
 				if (!input.IsKeyPressed(Key.Shift)) {
 					offset.Y = 0;
@@ -96,22 +101,22 @@ namespace Tangerine.UI.Timeline
 			// If a user has clicked with control on a keyframe, try to deselect it [CIT-125].
 			if (input.IsKeyPressed(Key.Control) && time < 0.2f) {
 				var kfr = new HasKeyframeRequest(initialCell);
-				timeline.Globals.Add(kfr);
+				Timeline.Globals.Add(kfr);
 				yield return null;
-				timeline.Globals.Remove<HasKeyframeRequest>();
+				Timeline.Globals.Remove<HasKeyframeRequest>();
 				if (kfr.Result) {
 					Operations.DeselectGridSpan.Perform(kfr.Cell.Y, kfr.Cell.X, kfr.Cell.X + 1);
 				}
 			}
-			grid.OnPostRender -= r;
+			Grid.OnPostRender -= Action;
 			Window.Current.Invalidate();
 			if (offset != IntVector2.Zero) {
-				timeline.Globals.Add(new DragKeyframesRequest(offset, !input.IsKeyPressed(Key.Alt)));
-				timeline.Ruler.MeasuredFrameDistance = 0;
+				Timeline.Globals.Add(new DragKeyframesRequest(offset, !input.IsKeyPressed(Key.Alt)));
+				Timeline.Ruler.MeasuredFrameDistance = 0;
 			}
 		}
 
-		private IEnumerator<object> DragSingleKeyframeTask(IntVector2 cell)
+		private static IEnumerator<object> DragSingleKeyframeTask(IntVector2 cell)
 		{
 			Core.Operations.ClearRowSelection.Perform();
 			Operations.ClearGridSelection.Perform();
@@ -121,47 +126,47 @@ namespace Tangerine.UI.Timeline
 
 		private IEnumerator<object> SelectTask(IntVector2 initialCell)
 		{
-			var input = grid.RootWidget.Input;
+			var input = Grid.RootWidget.Input;
 			if (!input.IsKeyPressed(Key.Control)) {
 				Operations.ClearGridSelection.Perform();
 				Core.Operations.ClearRowSelection.Perform();
-				rect = new IntRectangle();
+				selectionRectangle = new IntRectangle();
 			}
-			grid.OnPostRender += RenderSelectionRect;
+			Grid.OnPostRender += RenderSelectionRect;
 			var showMeasuredFrameDistance = false;
 			while (input.IsMousePressed()) {
-				rect.A = initialCell;
-				rect.B = grid.CellUnderMouse();
-				if (rect.Width >= 0) {
-					rect.B.X++;
+				selectionRectangle.A = initialCell;
+				selectionRectangle.B = Grid.CellUnderMouse();
+				if (selectionRectangle.Width >= 0) {
+					selectionRectangle.B.X++;
 				} else {
-					rect.A.X++;
+					selectionRectangle.A.X++;
 				}
-				if (rect.Height >= 0) {
-					rect.B.Y++;
+				if (selectionRectangle.Height >= 0) {
+					selectionRectangle.B.Y++;
 				} else {
-					rect.A.Y++;
+					selectionRectangle.A.Y++;
 				}
-				rect = rect.Normalized;
-				showMeasuredFrameDistance |= rect.Width != 1;
+				selectionRectangle = selectionRectangle.Normalized;
+				showMeasuredFrameDistance |= selectionRectangle.Width != 1;
 				if (showMeasuredFrameDistance) {
-					Timeline.Instance.Ruler.MeasuredFrameDistance = rect.Width;
+					Timeline.Instance.Ruler.MeasuredFrameDistance = selectionRectangle.Width;
 				}
 				Window.Current.Invalidate();
 				yield return null;
 			}
 			Timeline.Instance.Ruler.MeasuredFrameDistance = 0;
-			grid.OnPostRender -= RenderSelectionRect;
-			for (var r = rect.A.Y; r < rect.B.Y; r++) {
-				Operations.SelectGridSpan.Perform(r, rect.A.X, rect.B.X);
+			Grid.OnPostRender -= RenderSelectionRect;
+			for (var r = selectionRectangle.A.Y; r < selectionRectangle.B.Y; r++) {
+				Operations.SelectGridSpan.Perform(r, selectionRectangle.A.X, selectionRectangle.B.X);
 			}
 		}
 
-		void RenderSelectionRect(Widget widget)
+		private void RenderSelectionRect(Widget widget)
 		{
 			widget.PrepareRendererState();
-			var a = grid.CellToGridCoordinates(rect.A);
-			var b = grid.CellToGridCoordinates(rect.B);
+			var a = Grid.CellToGridCoordinates(selectionRectangle.A);
+			var b = Grid.CellToGridCoordinates(selectionRectangle.B);
 			Renderer.DrawRect(a, b, ColorTheme.Current.TimelineGrid.Selection);
 			Renderer.DrawRectOutline(a, b, ColorTheme.Current.TimelineGrid.SelectionBorder);
 		}
