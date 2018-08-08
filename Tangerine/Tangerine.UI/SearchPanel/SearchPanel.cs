@@ -7,7 +7,29 @@ namespace Tangerine.UI
 {
 	public class SearchPanel : IDocumentView
 	{
-		private static class Cmds
+		public static SearchPanel Instance { get; private set; }
+
+		public readonly Widget PanelWidget;
+		public readonly Frame RootWidget;
+		readonly EditBox searchStringEditor;
+		readonly Widget resultPane;
+		private readonly ThemedScrollView scrollView = new ThemedScrollView();
+		private List<Node> results = new List<Node>();
+		private int selectedIndex;
+		private int rowHeight = Theme.Metrics.TextHeight;
+		private TreeView view;
+
+		private static readonly Dictionary<Key, Action<TreeView>> keyActionMap = new Dictionary<Key, Action<TreeView>>() {
+			{ Key.MapShortcut(Key.Enter), NavigateToSelectedNode },
+			{ Key.MapShortcut(Key.Up), SelectPreviosTreeNode },
+			{ Key.MapShortcut(Key.Down), SelectNextTreeNode },
+			{ Key.MapShortcut(Key.Left), LeaveSelectedTreeNode },
+			{ Key.MapShortcut(Key.Right), EnterSelectedTreeNode },
+			{ Key.MapShortcut(Key.Escape), ClearSelection },
+			{ Key.MapShortcut(Key.Space), ToggleSelectedTreeNode },
+		};
+
+		private static class Commands
 		{
 			public static readonly Key Up = Key.MapShortcut(Key.Up);
 			public static readonly Key Down = Key.MapShortcut(Key.Down);
@@ -30,11 +52,15 @@ namespace Tangerine.UI
 		public SearchPanel(Widget rootWidget)
 		{
 			PanelWidget = rootWidget;
-			RootWidget = new Frame { Id = "SearchPanel",
+			RootWidget = new Frame {
+				Id = "SearchPanel",
 				Padding = new Thickness(4),
 				Layout = new VBoxLayout { Spacing = 4 },
-				Nodes = { (searchStringEditor = new ThemedEditBox()) }
+				Nodes = {
+					(searchStringEditor = new ThemedEditBox())
+				}
 			};
+			rootWidget.TabTravesable = new TabTraversable();
 			var treeView = new TreeView(RootWidget, Document.Current.RootNode);
 			var searchTreeView = new TreeView(RootWidget, Document.Current.RootNode);
 			searchStringEditor.AddChangeWatcher(() => searchStringEditor.Text, t => {
@@ -42,44 +68,36 @@ namespace Tangerine.UI
 					if (treeView.IsAttached()) {
 						treeView.Detach();
 						searchTreeView.Attach();
+						view = searchTreeView;
 					}
 					searchTreeView.Filter(t);
 				} else {
 					if (searchTreeView.IsAttached()) {
 						searchTreeView.Detach();
 						treeView.Attach();
+						view = treeView;
 					}
 				}
 			});
 			treeView.Attach();
+			view = treeView;
+			RootWidget.LateTasks.Add(new KeyRepeatHandler((input, key) => {
+				if (keyActionMap.ContainsKey(key)) {
+					input.ConsumeKey(key);
+					keyActionMap[key](view);
+					view.EnsureSelectionVisible();
+					Window.Current.Invalidate();
+				}
+			}));
 		}
 
-		private void ScrollView_KeyRepeated(WidgetInput input, Key key)
-		{
-			if (Cmds.All.Contains(key)) {
-				input.ConsumeKey(key);
-			}
-			if (results.Count == 0) {
-				return;
-			}
-			if (key == Key.Mouse0) {
-				scrollView.SetFocus();
-				selectedIndex = (resultPane.LocalMousePosition().Y / rowHeight).Floor().Clamp(0, results.Count - 1);
-			} else if (key == Cmds.Down) {
-				selectedIndex++;
-			} else if (key == Cmds.Up) {
-				selectedIndex--;
-			} else if (key == Cmds.Cancel) {
-				scrollView.RevokeFocus();
-			} else if (key == Cmds.Enter || key == Key.Mouse0DoubleClick) {
-				Document.Current.History.DoTransaction(() => NavigateToItem(selectedIndex));
-			} else {
-				return;
-			}
-			selectedIndex = selectedIndex.Clamp(0, results?.Count - 1 ?? 0);
-			EnsureRowVisible(selectedIndex);
-			Window.Current.Invalidate();
-		}
+		private static void NavigateToSelectedNode(TreeView view) => view.NavigateToSelectedNode();
+		private static void SelectNextTreeNode(TreeView view) => view.SelectNextTreeNode();
+		private static void SelectPreviosTreeNode(TreeView view) => view.SelectPreviousTreeNode();
+		private static void EnterSelectedTreeNode(TreeView view) => view.EnterSelectedTreeNode();
+		private static void LeaveSelectedTreeNode(TreeView view) => view.LeaveSelectedTreeNode();
+		private static void ToggleSelectedTreeNode(TreeView view) => view.ToggleSelectedTreeNode();
+		private static void ClearSelection(TreeView view) => view.ClearSelection();
 
 		private void NavigateToItem(int selectedIndex)
 		{
@@ -187,7 +205,6 @@ namespace Tangerine.UI
 		{
 			Instance = this;
 			PanelWidget.PushNode(RootWidget);
-			RefreshResultPane(searchStringEditor.Text);
 		}
 
 		public void Detach()

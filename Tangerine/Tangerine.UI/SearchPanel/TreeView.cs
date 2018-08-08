@@ -2,15 +2,22 @@ using Lime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Tangerine.Core;
 
 namespace Tangerine.UI
 {
 	class TreeView
 	{
+		public enum AdvanceDirection
+		{
+			Up,
+			Down,
+			Left,
+			Right
+		}
+
 		private readonly Node rootNode;
-		private readonly ThemedScrollView scrollView;
+		private readonly ThemedScrollView scrollView = new ThemedScrollView();
 		private readonly TreeNode root;
 		private readonly Widget parent;
 		private TreeNode selected = null;
@@ -19,9 +26,8 @@ namespace Tangerine.UI
 		{
 			this.rootNode = rootNode;
 			this.parent = parent;
-			scrollView = new ThemedScrollView();
 			scrollView.Content.Layout = new VBoxLayout();
-			scrollView.Content.AddNode(root = new TreeNode(this, rootNode, null, JointType.LShaped, new List<Joint>(), 0, isLast: true));
+			scrollView.Content.AddNode(root = new TreeNode(this, rootNode, null, JointType.LShaped, new List<Joint>(), 0, 0, isLast: true));
 		}
 
 		public void Detach()
@@ -47,19 +53,94 @@ namespace Tangerine.UI
 
 		public void ClearSelection()
 		{
-			if (selected != null) {
-				selected.Selected = false;
-				selected = null;
+			selected = null;
+			if (parent.IsFocused()) {
+				parent.RevokeFocus();
 			}
 		}
 
 		private void SelectTreeNode(TreeNode node)
 		{
-			if (selected != null) {
-				selected.Selected = false;
+			if (!parent.IsFocused()) {
+				parent.SetFocus();
 			}
 			selected = node;
-			node.Selected = true;
+		}
+
+		public void NavigateToSelectedNode()
+		{
+			selected?.NavigateToNode();
+		}
+
+		public void SelectNextTreeNode()
+		{
+			if (selected == null) {
+				return;
+			}
+			if (selected.Expandable && selected.Expanded) {
+				SelectTreeNode((TreeNode)selected.ChildTreeNodes.First());
+				return;
+			}
+			var newSelected = selected;
+			while (newSelected != root && newSelected.Index == newSelected.ParentTreeNode.ChildTreeNodes.Count - 1) {
+				newSelected = newSelected.ParentTreeNode;
+			}
+			if (newSelected == root) {
+				return;
+			}
+			SelectTreeNode((TreeNode)newSelected.ParentTreeNode.ChildTreeNodes[newSelected.Index + 1]);
+		}
+
+		public void SelectPreviousTreeNode()
+		{
+			if (selected == null || selected == root) {
+				return;
+			}
+			if (selected.Index == 0) {
+				SelectTreeNode(selected.ParentTreeNode);
+				return;
+			}
+			var newSelected = (TreeNode)selected.ParentTreeNode.ChildTreeNodes[selected.Index - 1];
+			if (newSelected.ChildTreeNodes.Count > 0 && newSelected.Expanded) {
+				SelectTreeNode((TreeNode)newSelected.ChildTreeNodes.Last());
+				return;
+			}
+			SelectTreeNode(newSelected);
+		}
+
+		public void EnterSelectedTreeNode()
+		{
+			if (selected == null || !selected.Expandable) {
+				return;
+			}
+			selected.Expanded = true;
+			SelectTreeNode((TreeNode)selected.ChildTreeNodes.First());
+		}
+
+		public void LeaveSelectedTreeNode()
+		{
+			if (selected == null || selected == root) {
+				return;
+			}
+			SelectTreeNode(selected.ParentTreeNode);
+		}
+
+		public void ToggleSelectedTreeNode()
+		{
+			selected?.ToggleExpanded();
+		}
+
+		public void EnsureSelectionVisible()
+		{
+			if (selected == null) {
+				return;
+			}
+			var pos = selected.CalcPositionInSpaceOf(scrollView.Content);
+			if (pos.Y < scrollView.ScrollPosition) {
+				scrollView.ScrollPosition = pos.Y;
+			} else if (pos.Y + selected.RowHeight > scrollView.ScrollPosition + scrollView.Height) {
+				scrollView.ScrollPosition = pos.Y - scrollView.Height + selected.RowHeight;
+			}
 		}
 
 		private enum JointType {
@@ -116,28 +197,40 @@ namespace Tangerine.UI
 			private ToolbarButton expandButton;
 			private readonly Joint expandJoint = new Joint(JointType.HLine, defaultJointWidth);
 			private readonly Widget treeNodesContainer = new Widget { Layout = new VBoxLayout() };
+			private readonly Widget treeNodeWidget;
 			private readonly Joint parentJoint;
 			private readonly List<Joint> offsetJoints;
 			private readonly int level;
-			private readonly TreeNode parentTreeNode;
 			private readonly TreeView view;
 			private bool expanded = false;
-			private bool expandable;
 			private string filter;
 			private List<TreeNode> savedNodes = new List<TreeNode>();
 
-			internal bool Selected { get; set; }
+			public NodeList ChildTreeNodes => treeNodesContainer.Nodes;
+			public int Index { get; private set; }
+			public TreeNode ParentTreeNode { get; private set; }
+			public bool Expanded {
+				get => expanded;
+				set {
+					if (Expandable && expanded != value) {
+						ToggleExpanded();
+					}
+				}
+			}
+			public bool Expandable { get; private set; }
+			public float RowHeight => treeNodeWidget.Height;
 
-			public TreeNode(TreeView view, Node rootNode, TreeNode parentTreeNode, JointType jointType, List<Joint> offsetJoints, int level, bool isLast)
+			public TreeNode(TreeView view, Node rootNode, TreeNode parentTreeNode, JointType jointType, List<Joint> offsetJoints, int level, int index, bool isLast)
 			{
 				this.rootNode = rootNode;
 				this.level = level;
-				this.parentTreeNode = parentTreeNode;
+				ParentTreeNode = parentTreeNode;
 				this.view = view;
-				expandable = rootNode.Nodes.Count > 0;
+				Index = index;
+				Expandable = rootNode.Nodes.Count > 0;
 				Layout = new VBoxLayout();
 
-				var treeNodeWidget = new Widget {
+				treeNodeWidget = new Widget {
 					Layout = new HBoxLayout(),
 					HitTestTarget = true
 				};
@@ -154,15 +247,13 @@ namespace Tangerine.UI
 				treeNodeWidget.AddNode(CreateLabel());
 				treeNodeWidget.AddNode(new Widget());
 				treeNodeWidget.CompoundPresenter.Add(new DelegatePresenter<Widget>(w => {
-					if (Selected) {
+					if (view.selected == this) {
 						w.PrepareRendererState();
 						Renderer.DrawRect(0, 0, w.Width, w.Height, ColorTheme.Current.Toolbar.ButtonHighlightBackground);
 					}
 				}));
-				if (Document.Current.RootNode != rootNode) {
-					treeNodeWidget.Clicked += () => view.SelectTreeNode(this);
-					treeNodeWidget.Gestures.Add(new DoubleClickGesture(NavigateToWidget));
-				}
+				treeNodeWidget.Clicked += () => view.SelectTreeNode(this);
+				treeNodeWidget.Gestures.Add(new DoubleClickGesture(NavigateToNode));
 				AddNode(treeNodeWidget);
 
 				this.AddChangeWatcher(() => rootNode.NextSibling, _ => parentTreeNode?.UpdateChildTreeNodes());
@@ -189,7 +280,7 @@ namespace Tangerine.UI
 					w.PrepareRendererState();
 					var iconSize = (w.Width - 2 * defaultPadding) / 2;
 					Renderer.DrawLine(0, w.Height / 2, w.Width / 2 - iconSize, w.Height / 2, Color4.Gray);
-					if (expanded) {
+					if (Expanded) {
 						Renderer.DrawLine(w.Width / 2, w.Height / 2 + iconSize, w.Width / 2, w.Height, Color4.Gray);
 					}
 				}));
@@ -229,7 +320,7 @@ namespace Tangerine.UI
 			{
 				expanded = !expanded;
 				UpdateButtonTexture();
-				if (!expanded) {
+				if (!Expanded) {
 					treeNodesContainer.Unlink();
 					return;
 				}
@@ -238,7 +329,7 @@ namespace Tangerine.UI
 
 			public void UpdateButtonTexture()
 			{
-				expandButton.Texture = expanded ? IconPool.GetTexture("Timeline.minus") : IconPool.GetTexture("Timeline.plus");
+				expandButton.Texture = Expanded ? IconPool.GetTexture("Timeline.minus") : IconPool.GetTexture("Timeline.plus");
 			}
 
 			private static void ReplaceNode(Node node1, Node node2)
@@ -251,10 +342,10 @@ namespace Tangerine.UI
 
 			private void SetExpandable(bool expandable)
 			{
-				if (this.expandable == expandable) {
+				if (this.Expandable == expandable) {
 					return;
 				}
-				this.expandable = expandable;
+				this.Expandable = expandable;
 				if (expandable) {
 					ReplaceNode(expandButton, expandJoint);
 					return;
@@ -280,13 +371,15 @@ namespace Tangerine.UI
 			{
 				var rootNodes = savedNodes.Select(t => t.rootNode).ToList();
 				treeNodesContainer.Nodes.Clear();
-				foreach (var node in rootNode.Nodes) {
+				for (int i = 0; i < rootNode.Nodes.Count; ++i) {
+					var node = rootNode.Nodes[i];
 					var index = rootNodes.IndexOf(node);
 					if (index >= 0) {
 						treeNodesContainer.AddNode(savedNodes[index]);
 						savedNodes[index].SetJoints(JointType.VLine, JointType.TShaped);
+						savedNodes[index].Index = i;
 					} else {
-						treeNodesContainer.AddNode(new TreeNode(view, node, this, JointType.TShaped, offsetJoints, level + 1, isLast: false));
+						treeNodesContainer.AddNode(new TreeNode(view, node, this, JointType.TShaped, offsetJoints, level + 1, i, isLast: false));
 					}
 				}
 				UpdateExpandable();
@@ -296,8 +389,11 @@ namespace Tangerine.UI
 				}
 			}
 
-			private void NavigateToWidget()
+			internal void NavigateToNode()
 			{
+				if (this == view.root) {
+					return;
+				}
 				var node = rootNode;
 				var path = new Stack<int>();
 				path.Push(node.Parent.Nodes.IndexOf(node));
@@ -333,16 +429,18 @@ namespace Tangerine.UI
 				this.filter = filter.ToLower();
 				treeNodesContainer.Nodes.Clear();
 				bool result = String.IsNullOrEmpty(filter) || (rootNode.Id?.ToLower().Contains(filter.ToLower()) ?? false);
+				int index = 0;
 				foreach (var node in savedNodes) {
 					if (node.Filter(filter)) {
 						result = true;
 						treeNodesContainer.AddNode(node);
 						node.SetJoints(JointType.VLine, JointType.TShaped);
+						node.Index = index++;
 					}
 				}
 				UpdateExpandable();
-				if (result && expandable && !expanded) {
-					ToggleExpanded();
+				if (result) {
+					Expanded = true;
 				}
 				return result;
 			}
