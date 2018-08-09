@@ -171,6 +171,9 @@ namespace Tangerine.Core.Operations
 				} else {
 					op.Animator.ResetCache();
 				}
+				if (op.Animator.TargetProperty == nameof(Node.Trigger)) {
+					Document.ForceAnimationUpdate();
+				}
 			}
 
 			protected override void InternalUndo(RemoveKeyframe op)
@@ -180,6 +183,9 @@ namespace Tangerine.Core.Operations
 				}
 				op.Animator.Keys.AddOrdered(op.Restore<Backup>().Keyframe);
 				op.Animator.ResetCache();
+				if (op.Animator.TargetProperty == nameof(Node.Trigger)) {
+					Document.ForceAnimationUpdate();
+				}
 			}
 		}
 	}
@@ -243,6 +249,9 @@ namespace Tangerine.Core.Operations
 
 				animator.Keys.AddOrdered(op.Keyframe);
 				animator.ResetCache();
+				if (animator.TargetProperty == nameof(Node.Trigger)) {
+					Document.ForceAnimationUpdate();
+				}
 			}
 
 			protected override void InternalUndo(SetKeyframe op)
@@ -260,6 +269,9 @@ namespace Tangerine.Core.Operations
 					op.Animable.Animators.Remove(b.Animator);
 				}
 				b.Animator.ResetCache();
+				if (b.Animator.TargetProperty == nameof(Node.Trigger)) {
+					Document.ForceAnimationUpdate();
+				}
 			}
 		}
 	}

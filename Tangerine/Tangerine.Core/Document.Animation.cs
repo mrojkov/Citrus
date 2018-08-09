@@ -11,9 +11,9 @@ namespace Tangerine.Core
 			set { CurrentFrameSetter.CacheAnimationsStates = value; }
 		}
 
-		public static void SetCurrentFrameToNode(int frameIndex, Node node, bool animationMode)
+		public static void SetCurrentFrameToNode(int frameIndex, Node node, bool animationMode, bool isForced = false)
 		{
-			CurrentFrameSetter.SetCurrentFrameToNode(frameIndex, node, animationMode);
+			CurrentFrameSetter.SetCurrentFrameToNode(frameIndex, node, animationMode, isForced);
 		}
 
 		private static void FastForwardToFrame(Node node, int frameIndex)
@@ -52,6 +52,20 @@ namespace Tangerine.Core
 				PreviewAnimationContainer = Container;
 			}
 			Application.InvalidateWindows();
+		}
+
+
+		public static void ForceAnimationUpdate()
+		{
+			if (Current == null) {
+				return;
+			}
+			SetCurrentFrameToNode(
+				Current.AnimationFrame,
+				Current.Container,
+				CoreUserPreferences.Instance.AnimationMode,
+				isForced: true
+			);
 		}
 
 		private static class CurrentFrameSetter
@@ -133,12 +147,12 @@ namespace Tangerine.Core
 				}
 			}
 
-			internal static void SetCurrentFrameToNode(int frameIndex, Node node, bool animationMode)
+			internal static void SetCurrentFrameToNode(int frameIndex, Node node, bool animationMode, bool isForced)
 			{
 				Audio.GloballyEnable = false;
 				try {
 					var doc = Current;
-					if (animationMode && doc.AnimationFrame != frameIndex) {
+					if (animationMode && (doc.AnimationFrame != frameIndex || isForced)) {
 						node.SetTangerineFlag(TangerineFlags.IgnoreMarkers, true);
 						var cacheFrame = node.Components.Get<AnimationsStatesComponent>()?.Column;
 						if (cacheFrame.HasValue && (cacheFrame.Value > frameIndex ||

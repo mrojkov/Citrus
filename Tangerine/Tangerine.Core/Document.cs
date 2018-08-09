@@ -241,6 +241,7 @@ namespace Tangerine.Core
 				Current = doc;
 				doc?.AttachViews();
 				ProjectUserPreferences.Instance.CurrentDocument = doc?.Path;
+				ForceAnimationUpdate();
 			}
 		}
 
