@@ -156,10 +156,13 @@ namespace Tangerine.UI.Timeline
 			}
 			RenderCursor();
 			MainAreaWidget.PrepareRendererState();
+			// Log10(step) is the approximate number of decimal places in step
+			// We round it up to an integer number and get the number of needed decimal places in output
+			int precision = Math.Max(-(int)Math.Ceiling(Math.Log10(step)), 0);
 			for (var v = a; v <= b; v += step) {
 				var y = ValueToCoord((float)v);
 				if (y >= 0 && y < MainAreaWidget.Height) {
-					DrawScaleMark(v);
+					DrawScaleMark(v, precision);
 				}
 			}
 		}
@@ -189,10 +192,10 @@ namespace Tangerine.UI.Timeline
 			Renderer.DrawLine(0, y, MainAreaWidget.Width, y, ColorTheme.Current.TimelineGrid.LinesLight);
 		}
 
-		void DrawScaleMark(double value)
+		void DrawScaleMark(double value, int precision)
 		{
 			var y = ValueToCoord((float)value);
-			var text = value.ToString();
+			var text = value.ToString($"F{precision}");
 			Renderer.DrawTextLine(2, y - 14, text, 14, Theme.Colors.BlackText, 0);
 		}
 
