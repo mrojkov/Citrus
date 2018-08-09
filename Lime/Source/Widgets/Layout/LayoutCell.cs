@@ -1,15 +1,21 @@
-﻿using System;
+using System;
+using Yuzu;
 
 namespace Lime
 {
 	public class LayoutCell
 	{
+		[YuzuMember]
 		public Alignment Alignment;
+		[YuzuMember]
 		public int ColSpan = 1;
+		[YuzuMember]
 		public int RowSpan = 1;
+		[YuzuMember]
 		public Vector2 Stretch = Vector2.One;
 		public float StretchX { get { return Stretch.X; } set { Stretch.X = value; } }
 		public float StretchY { get { return Stretch.Y; } set { Stretch.Y = value; } }
+		[YuzuMember]
 		public bool Ignore { get; set; }
 		public static readonly LayoutCell Default = new LayoutCell();
 
@@ -26,7 +32,9 @@ namespace Lime
 
 	public struct Alignment
 	{
+		[YuzuMember]
 		public HAlignment X;
+		[YuzuMember]
 		public VAlignment Y;
 
 		public static readonly Alignment LeftTop = new Alignment { X = HAlignment.Left, Y = VAlignment.Top };

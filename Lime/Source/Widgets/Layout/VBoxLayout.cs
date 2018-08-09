@@ -1,12 +1,15 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Collections.Generic;
+using Yuzu;
 
 namespace Lime
 {
 	public class VBoxLayout : CommonLayout, ILayout
 	{
+		[YuzuMember]
 		public float Spacing { get; set; }
+		[YuzuMember]
 		public LayoutCell DefaultCell { get; set; }
 
 		public VBoxLayout()

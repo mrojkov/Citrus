@@ -124,6 +124,7 @@ namespace Lime
 		/// <summary>
 		/// Gets the layout-specific data.
 		/// </summary>
+		[YuzuMember]
 		public LayoutCell LayoutCell { get; set; }
 
 		public virtual Vector2 EffectiveMinSize => Vector2.Max(MinSize, MeasuredMinSize);
@@ -151,6 +152,7 @@ namespace Lime
 			}
 		}
 
+		[YuzuMember]
 		public Vector2 MinSize
 		{
 			get { return minSize; }
@@ -175,6 +177,7 @@ namespace Lime
 			set { MinSize = new Vector2(MinSize.X, value); }
 		}
 
+		[YuzuMember]
 		public Vector2 MaxSize
 		{
 			get { return maxSize; }
@@ -405,6 +408,7 @@ namespace Lime
 		/// Gets or sets the widget padding. Padding defines the white space between the widget content and the widget border.
 		/// The widget presenter and layout should respect the padding.
 		/// </summary>
+		[YuzuMember]
 		public Thickness Padding;
 
 		public Vector2 ContentPosition => new Vector2(Padding.Left, Padding.Top);

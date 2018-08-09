@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using Yuzu;
 
 namespace Lime
 {
@@ -13,9 +14,12 @@ namespace Lime
 			TopToBottom,
 		}
 		private readonly List<int> splitIndices = new List<int>();
+		[YuzuMember]
 		public float Spacing { get; set; }
 		// TODO: implement for any alignment other than justify or left
+		[YuzuMember]
 		public HAlignment RowAlignment { get; set; }
+		[YuzuMember]
 		public VAlignment ColumnAlignment { get; set; }
 		protected readonly FlowDirection Direction;
 

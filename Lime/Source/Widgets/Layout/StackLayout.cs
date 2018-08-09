@@ -1,13 +1,17 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using Yuzu;
 
 namespace Lime
 {
 	public class StackLayout : CommonLayout, ILayout
 	{
+		[YuzuMember]
 		public bool HorizontallySizeable { get; set; }
+		[YuzuMember]
 		public bool VerticallySizeable { get; set; }
+		[YuzuMember]
 		public LayoutCell CellDefaults { get; set; }
 
 		public StackLayout()

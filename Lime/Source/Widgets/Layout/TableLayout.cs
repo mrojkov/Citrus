@@ -1,17 +1,24 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Collections.Generic;
+using Yuzu;
 
 namespace Lime
 {
 	public class TableLayout : CommonLayout, ILayout
 	{
+		[YuzuMember]
 		public int RowCount { get; set; }
+		[YuzuMember]
 		public int ColCount { get; set; }
+		[YuzuMember]
 		public float ColSpacing;
+		[YuzuMember]
 		public float RowSpacing;
 		public float Spacing { set { ColSpacing = RowSpacing = value; } }
+		// TODO: YuzuMember?
 		public List<LayoutCell> ColDefaults = new List<LayoutCell>();
+		// TODO: YuzuMember?
 		public List<LayoutCell> RowDefaults = new List<LayoutCell>();
 
 		public TableLayout()
