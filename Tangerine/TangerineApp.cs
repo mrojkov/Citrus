@@ -169,9 +169,9 @@ namespace Tangerine
 			});
 
 			VisualHintsRegister.Instance.DisplayAll =
-				VisualHintsRegister.Instance.Register("/All", SceneViewCommands.ShowAllVisualHints, enforceVisible: true);
+				VisualHintsRegister.Instance.Register("/All", SceneViewCommands.ShowAllVisualHints, VisualHintsRegister.HideRules.VisibleIfProjectOpened);
 			VisualHintsRegister.Instance.DisplayInvisible =
-				VisualHintsRegister.Instance.Register("/Invisible", SceneViewCommands.ShowVisualHintsForInvisibleNodes, enforceVisible: true);
+				VisualHintsRegister.Instance.Register("/Invisible", SceneViewCommands.ShowVisualHintsForInvisibleNodes, VisualHintsRegister.HideRules.VisibleIfProjectOpened);
 
 			Document.NodeDecorators.AddFor<Node>(n => n.SetTangerineFlag(TangerineFlags.SceneNode, true));
 			dockManager.UnhandledExceptionOccurred += e => {

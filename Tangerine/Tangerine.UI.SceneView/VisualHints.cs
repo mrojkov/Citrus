@@ -2,7 +2,6 @@ using Lime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Tangerine.Core;
 using Tangerine.UI.Docking;
 using Yuzu;
@@ -18,6 +17,7 @@ namespace Tangerine.UI.SceneView
 		[YuzuRequired]
 		public Dictionary<string, VisualHint> SubHints { get; private set; } = new Dictionary<string, VisualHint>();
 
+		public Func<VisualHint, bool> HideRule;
 		public ICommand Command { get; set; } = null;
 		public bool Hidden { get; set; } = true;
 
@@ -28,6 +28,11 @@ namespace Tangerine.UI.SceneView
 		public VisualHint(string title)
 		{
 			Title = title;
+		}
+
+		public bool ShouldBeHidden()
+		{
+			return HideRule?.Invoke(this) ?? true;
 		}
 
 		public static IEnumerable<string> GetNames(string path)
@@ -54,33 +59,36 @@ namespace Tangerine.UI.SceneView
 		public readonly VisualHint EmptyHint = new VisualHint("");
 		public readonly HashSet<VisualHint> AlwaysVisible = new HashSet<VisualHint>();
 
+		public static class HideRules
+		{
+			public readonly static Func<VisualHint, bool> TypeRule = hint => !Instance.typeHintMap.ContainsValue(hint);
+			public readonly static Func<VisualHint, bool> AlwaysVisible = hint => false;
+			public readonly static Func<VisualHint, bool> AlwaysHidden = hint => true;
+			public readonly static Func<VisualHint, bool> VisibleIfProjectOpened = hint => Project.Current == Project.Null;
+		}
+
 		public void EnforceVisible(VisualHint hint)
 		{
 			AlwaysVisible.Add(hint);
 		}
 
-		public VisualHint Register(Type type, ICommand command, bool enforceVisible = false)
+		public VisualHint Register(Type type, ICommand command = null)
 		{
-			var hint = Register(type, enforceVisible);
-			if (hint != EmptyHint) {
-				hint.Command = command;
-			}
-			return hint;
+			return Register(type, command, HideRules.TypeRule);
 		}
 
-		public VisualHint Register(Type type, bool enforceVisible = false)
+		public VisualHint Register(Type type, ICommand command, Func<VisualHint, bool> hideRule)
 		{
 			if (!(type.GetCustomAttributes(typeof(TangerineVisualHintGroupAttribute), false).FirstOrDefault()
 					is TangerineVisualHintGroupAttribute attribute)) {
 				return EmptyHint;
 			}
-			var result = Register($"{attribute.Group.TrimEnd(' ', '/')}/{type.Name}", enforceVisible: enforceVisible);
-			if (!typeHintMap.ContainsKey(type)) {
-				typeHintMap.Add(type, result);
-			} else {
-				typeHintMap[type] = result;
+			var hint = Register($"{attribute.Group.TrimEnd(' ', '/')}/{type.Name}", command, hideRule);
+			if (typeHintMap.ContainsKey(type)) {
+				return typeHintMap[type] = hint;
 			}
-			return result;
+			typeHintMap.Add(type, hint);
+			return hint;
 		}
 
 		public VisualHint FindHint(Type type)
@@ -114,13 +122,11 @@ namespace Tangerine.UI.SceneView
 			return FindHint(path, false);
 		}
 
-		public VisualHint Register(string path, ICommand command = null, bool enforceVisible = false)
+		public VisualHint Register(string path, ICommand command = null, Func<VisualHint, bool> hideRule = null)
 		{
 			var hint = FindHint(path, true);
 			hint.Command = command;
-			if (enforceVisible) {
-				EnforceVisible(hint);
-			}
+			hint.HideRule = hideRule;
 			return hint;
 		}
 
@@ -141,11 +147,6 @@ namespace Tangerine.UI.SceneView
 			RootHint = new VisualHint("");
 		}
 
-		private HashSet<VisualHint> GetTypeHints()
-		{
-			return new HashSet<VisualHint>(typeHintMap.Values);
-		}
-
 		public void DoEnforceVisible()
 		{
 			foreach (var hint in AlwaysVisible) {
@@ -159,15 +160,15 @@ namespace Tangerine.UI.SceneView
 			foreach (var type in Project.Current.RegisteredNodeTypes) {
 				Register(type);
 			}
-			RefreshHidden(RootHint, GetTypeHints());
+			RefreshHidden(RootHint);
 			DoEnforceVisible();
 		}
 
-		private bool RefreshHidden(VisualHint hint, HashSet<VisualHint> hints)
+		private bool RefreshHidden(VisualHint hint)
 		{
-			bool hidden = !hints.Contains(hint);
+			bool hidden = hint.ShouldBeHidden();
 			foreach (var subHint in hint.SubHints.Values) {
-				hidden &= RefreshHidden(subHint, hints);
+				hidden &= RefreshHidden(subHint);
 			}
 			hint.Hidden = hidden;
 			return hidden;
