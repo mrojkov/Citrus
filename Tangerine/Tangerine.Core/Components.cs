@@ -87,4 +87,10 @@ namespace Tangerine.Core.Components
 			Bone = bone;
 		}
 	}
+
+	[NodeComponentDontSerialize]
+	public class TimelineOffset : NodeComponent
+	{
+		public Vector2 Offset { get; set; }
+	}
 }

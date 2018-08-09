@@ -1,8 +1,9 @@
-using System;
-using System.Linq;
 using Lime;
-using Tangerine.Core;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using Tangerine.Core;
+using Tangerine.Core.Components;
 using Tangerine.UI.Docking;
 using Tangerine.UI.Timeline.Components;
 
@@ -73,6 +74,15 @@ namespace Tangerine.UI.Timeline
 			Roll = new RollPane();
 			CreateProcessors();
 			InitializeWidgets();
+			RootWidget.AddChangeWatcher(() => Document.Current.Container, (container) => {
+				Offset = container.Components.GetOrAdd<TimelineOffset>().Offset;
+			});
+			RootWidget.AddChangeWatcher(() => Offset, (value) => {
+				var offset = Document.Current.Container.Components.Get<TimelineOffset>();
+				if (offset != null) {
+					offset.Offset = value;
+				}
+			});
 		}
 
 		public void Attach()
