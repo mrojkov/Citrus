@@ -171,6 +171,14 @@ namespace Tangerine.UI.FilesystemView
 					w.HitTestTarget = true;
 				}
 			}
+			RootWidget.Updating += (float delta) => {
+				if (
+					RootWidget.Input.IsKeyPressed(Key.Control) &&
+					RootWidget.Input.WasKeyReleased(Key.L)
+				) {
+					toolbar.AddressBar.SetFocusOnEditor();
+				}
+			};
 		}
 
 		private void NavigateAndSelect(string filename)
@@ -251,6 +259,14 @@ namespace Tangerine.UI.FilesystemView
 			InvalidateView(path, sortType, orderType);
 		}
 
+		private IEnumerator<object> ShowAlertTask(string message)
+		{
+			yield return Task.WaitWhile(() => RootWidget.Input.ConsumeKeyPress(Key.Enter));
+
+			var dialog = new AlertDialog(message);
+			dialog.Show();
+		}
+
 		public bool Open(string path)
 		{
 			try {
@@ -264,26 +280,19 @@ namespace Tangerine.UI.FilesystemView
 				}
 				return true;
 			} catch (ArgumentException) {
-				var dialog = new AlertDialog("The path is empty, contains only white spaces, or contains invalid characters.");
-				dialog.Show();
+				RootWidget.Tasks.Add(ShowAlertTask("The path is empty, contains only white spaces, or contains invalid characters."));
 			} catch (PathTooLongException) {
-				var dialog = new AlertDialog("The specified path, file name, or both exceed the system-defined maximum length.");
-				dialog.Show();
+				RootWidget.Tasks.Add(ShowAlertTask("The specified path, file name, or both exceed the system-defined maximum length."));
 			} catch (NotSupportedException) {
-				var dialog = new AlertDialog("The path is in an invalid format.");
-				dialog.Show();
+				RootWidget.Tasks.Add(ShowAlertTask("The path is in an invalid format."));
 			} catch (FileNotFoundException) {
-				var dialog = new AlertDialog("Tangerine can not find \"" + path + "\".\nCheck the spelling and try again.");
-				dialog.Show();
+				RootWidget.Tasks.Add(ShowAlertTask("Tangerine can not find \"" + path + "\".\nCheck the spelling and try again."));
 			} catch (DirectoryNotFoundException) {
-				var dialog = new AlertDialog("The path represents a directory and is invalid, such as being on an unmapped drive, or the directory cannot be found.");
-				dialog.Show();
+				RootWidget.Tasks.Add(ShowAlertTask("The path represents a directory and is invalid, such as being on an unmapped drive, or the directory cannot be found."));
 			} catch (IOException) {
-				var dialog = new AlertDialog("This file is being used by another process.");
-				dialog.Show();
+				RootWidget.Tasks.Add(ShowAlertTask("This file is being used by another process."));
 			} catch (UnauthorizedAccessException) {
-				var dialog = new AlertDialog("Tangerine does not have the required permission.");
-				dialog.Show();
+				RootWidget.Tasks.Add(ShowAlertTask("Tangerine does not have the required permission."));
 			}
 			return false;
 		}

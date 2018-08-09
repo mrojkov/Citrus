@@ -10,7 +10,7 @@ namespace Tangerine.UI.FilesystemView
 		public const float ItemPadding = 2.0f;
 		public const float ItemWidth = 200.0f;
 		public const float Spacing = 2.0f;
-		public FilesystemItem(string path, bool visibalFill = false)
+		public FilesystemItem(string path)
 		{
 			FilesystemPath = path;
 			this.Input.AcceptMouseThroughDescendants = true;
@@ -36,7 +36,8 @@ namespace Tangerine.UI.FilesystemView
 				(text = new ThemedSimpleText {
 					ForceUncutText = false,
 					OverflowMode = TextOverflowMode.Ellipsis,
-					Text = isRoot ?
+					Text =
+						isRoot ?
 						FilesystemPath.Remove(FilesystemPath.Length - 1) :
 						Path.GetFileName(FilesystemPath),
 					LayoutCell = new LayoutCell {
@@ -52,18 +53,6 @@ namespace Tangerine.UI.FilesystemView
 				}
 			);
 			text.Width = text.MinMaxWidth = Mathf.Min(ItemWidth - (IconSize + ItemPadding * 2 + Spacing + 2), text.MeasureUncutText().X);
-
-			if (visibalFill) {
-				CompoundPresenter.Add(new DelegatePresenter<Widget>(_ => {
-					if (IsMouseOverThisOrDescendant()) {
-						PrepareRendererState();
-						Renderer.DrawRect(Vector2.Zero, Size, Theme.Colors.HoveredBackground);
-						if (Input.WasMousePressed()) {
-							Renderer.DrawRectOutline(Vector2.Zero, Size, Theme.Colors.SelectedBorder);
-						}
-					}
-				}));
-			}
 		}
 	}
 }
