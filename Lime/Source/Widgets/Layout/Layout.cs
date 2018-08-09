@@ -9,7 +9,8 @@ namespace Lime
 	[TangerineRegisterComponent]
 	public class LayoutComponent : NodeComponent
 	{
-		private ILayout layout = new HBoxLayout();
+		private ILayout layout;
+
 		[YuzuMember]
 		public ILayout Layout
 		{
@@ -18,7 +19,7 @@ namespace Lime
 			{
 				layout = value;
 				if (Owner != null) {
-					layout.InvalidateConstraintsAndArrangement(Owner as Widget);
+					layout?.InvalidateConstraintsAndArrangement(Owner as Widget);
 				}
 			}
 		}
@@ -27,7 +28,7 @@ namespace Lime
 		{
 			base.OnOwnerChanged(oldOwner);
 			if (Owner != null) {
-				layout.InvalidateConstraintsAndArrangement(Owner as Widget);
+				layout?.InvalidateConstraintsAndArrangement(Owner as Widget);
 			} else if (oldOwner != null) {
 				(oldOwner as Widget).Layout.InvalidateConstraintsAndArrangement(oldOwner as Widget);
 			}
