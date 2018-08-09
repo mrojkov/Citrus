@@ -6,10 +6,13 @@ namespace Lime
 	{
 		[YuzuMember]
 		public float Left { get { return LeftTop.X; } set { LeftTop.X = value; } }
+
 		[YuzuMember]
 		public float Top { get { return LeftTop.Y; } set { LeftTop.Y = value; } }
+
 		[YuzuMember]
 		public float Right { get { return RightBottom.X; } set { RightBottom.X = value; } }
+
 		[YuzuMember]
 		public float Bottom { get { return RightBottom.Y; } set { RightBottom.Y = value; } }
 

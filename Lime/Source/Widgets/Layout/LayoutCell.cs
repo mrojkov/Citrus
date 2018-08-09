@@ -6,15 +6,20 @@ namespace Lime
 	public class LayoutCell
 	{
 		[YuzuMember]
-		public Alignment Alignment;
+		public Alignment Alignment { get; set; }
+
 		[YuzuMember]
-		public int ColSpan = 1;
+		public int ColSpan { get; set; } = 1;
+
 		[YuzuMember]
-		public int RowSpan = 1;
+		public int RowSpan { get; set; } = 1;
+
 		[YuzuMember]
-		public Vector2 Stretch = Vector2.One;
-		public float StretchX { get { return Stretch.X; } set { Stretch.X = value; } }
-		public float StretchY { get { return Stretch.Y; } set { Stretch.Y = value; } }
+
+		public Vector2 Stretch { get; set; } = Vector2.One;
+		public float StretchX { get { return Stretch.X; } set { Stretch = new Vector2(value, Stretch.Y); } }
+		public float StretchY { get { return Stretch.Y; } set { Stretch = new Vector2(Stretch.X, value); } }
+
 		[YuzuMember]
 		public bool Ignore { get; set; }
 		public static readonly LayoutCell Default = new LayoutCell();
@@ -33,9 +38,10 @@ namespace Lime
 	public struct Alignment
 	{
 		[YuzuMember]
-		public HAlignment X;
+		public HAlignment X { get; set; }
+
 		[YuzuMember]
-		public VAlignment Y;
+		public VAlignment Y { get; set; }
 
 		public static readonly Alignment LeftTop = new Alignment { X = HAlignment.Left, Y = VAlignment.Top };
 		public static readonly Alignment Center = new Alignment { X = HAlignment.Center, Y = VAlignment.Center };
