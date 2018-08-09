@@ -38,6 +38,7 @@ namespace Tangerine.Core
 					);
 				}
 				AudioSystem.StopAll();
+				ForceAnimationUpdate();
 			} else {
 				int savedAnimationFrame = Container.AnimationFrame;
 				PreviewAnimation = true;
