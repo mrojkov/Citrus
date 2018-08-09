@@ -1,8 +1,9 @@
+using Lime;
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using Lime;
 using Tangerine.Core;
+using Tangerine.Core.Operations;
 using Tangerine.UI.SceneView.WidgetTransforms;
 
 namespace Tangerine.UI.SceneView
@@ -61,19 +62,19 @@ namespace Tangerine.UI.SceneView
 			using (Document.Current.History.BeginTransaction()) {
 				var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>().ToList();
 				var mouseStartPos = SceneView.MousePosition;
-				var isChangingScale = SceneView.Input.IsKeyPressed(Key.Control);
-				var areChildrenFreezed =
-					SceneView.Input.IsKeyPressed(Key.Z) &&
-					!isChangingScale &&
-					widgets.Count == 1 &&
-					widgets[0] is Frame;
 				while (SceneView.Input.IsMousePressed()) {
 					Document.Current.History.RollbackTransaction();
-
+					Matrix32 transform = Matrix32.Identity;
 					Utils.ChangeCursorIfDefault(cursor);
 					var proportional = SceneView.Input.IsKeyPressed(Key.Shift);
+					var isChangingScale = SceneView.Input.IsKeyPressed(Key.Control);
+					var areChildrenFreezed =
+						SceneView.Input.IsKeyPressed(Key.Z) &&
+						!isChangingScale &&
+						widgets.Count == 1 &&
+						widgets[0] is Frame;
 					if (areChildrenFreezed) {
-						SaveGlobalPositions((Frame)widgets[0]);
+						transform = widgets[0].CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
 					}
 					var pivotPoint =
 						isChangingScale ?
@@ -90,7 +91,8 @@ namespace Tangerine.UI.SceneView
 						!isChangingScale
 					);
 					if (areChildrenFreezed) {
-						RestoreGlobalPositions((Frame)widgets[0]);
+						transform *= widgets[0].CalcTransitionToSpaceOf(Document.Current.Container.AsWidget).CalcInversed();
+						RestoreChildrenPositions((Frame)widgets[0], transform);
 					}
 					yield return null;
 				}
@@ -99,21 +101,18 @@ namespace Tangerine.UI.SceneView
 			}
 		}
 
-		private void RestoreGlobalPositions(Frame frame)
+		private static void RestoreChildrenPositions(Frame frame, Matrix32 transform)
 		{
 			foreach (var widget in frame.Nodes.OfType<Widget>()) {
-				var oldPosition = childPositions[widget];
-				var newPosition = Document.Current.Container.AsWidget.CalcTransitionToSpaceOf(frame) * oldPosition;
-				Core.Operations.SetAnimableProperty.Perform(widget, nameof(widget.Position), newPosition);
-			}
-		}
-
-		private void SaveGlobalPositions(Frame frame)
-		{
-			childPositions.Clear();
-			foreach (var widget in frame.Nodes.OfType<Widget>()) {
-				var globalPosition = widget.CalcPositionInSpaceOf(Document.Current.Container.AsWidget);
-				childPositions.Add(widget, globalPosition);
+				var newPosition = transform.TransformVector(widget.Position);
+				SetProperty.Perform(widget, nameof(Widget.Position), newPosition);
+				if (widget.Animators.TryFind(nameof(Widget.Position), out var animator)) {
+					foreach (var key in animator.ReadonlyKeys.ToList()) {
+						var newKey = key.Clone();
+						newKey.Value = transform.TransformVector((Vector2)key.Value);
+						SetKeyframe.Perform(animator, newKey);
+					}
+				}
 			}
 		}
 
