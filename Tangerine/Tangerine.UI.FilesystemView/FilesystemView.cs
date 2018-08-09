@@ -1,9 +1,9 @@
+using Lime;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using Lime;
 using Tangerine.Core;
 
 using Cmds = Tangerine.UI.FilesystemCommands;
@@ -360,7 +360,7 @@ namespace Tangerine.UI.FilesystemView
 					};
 					scrollView.Content.Layout = new VFlowLayout { Spacing = 1.0f };
 				}
-				
+
 				scrollView.Content.Padding = new Thickness(5.0f);
 				scrollView.Content.CompoundPostPresenter.Insert(0, new DelegatePresenter<Widget>(RenderFilesWidgetRectSelection));
 				scrollView.Updated += ScrollViewUpdated;
@@ -505,9 +505,11 @@ namespace Tangerine.UI.FilesystemView
 			}
 		}
 
+		private string lastSelected;
+
 		private void ProcessInputOverFSItem()
 		{
-			// TODO: Ctrl + Shift, Shift clicks
+			// TODO: Ctrl + Shift clicks
 			var nodeUnderMouse = WidgetContext.Current.NodeUnderMouse;
 			if (
 				nodeUnderMouse == null ||
@@ -534,7 +536,12 @@ namespace Tangerine.UI.FilesystemView
 			if (fsItem.Input.ConsumeKeyRelease(Key.Mouse0)) {
 				scrollView.SetFocus();
 				if (!fsItem.IsMouseOver() || selection.Contains(path)) {
-					if (dragState != DragState.Selecting && dragState != DragState.Dragging && !fsItem.Input.IsKeyPressed(Key.Control)) {
+					if (
+						dragState != DragState.Selecting &&
+						dragState != DragState.Dragging &&
+						!fsItem.Input.IsKeyPressed(Key.Control) &&
+						!fsItem.Input.IsKeyPressed(Key.Shift)
+					) {
 						selection.Clear();
 					}
 					selection.Select(path);
@@ -551,7 +558,29 @@ namespace Tangerine.UI.FilesystemView
 						selection.Deselect(path);
 					} else {
 						selection.Select(path);
+						lastSelected = path;
 					}
+				} else if (!input.IsKeyPressed(Key.Control) && input.IsKeyPressed(Key.Shift)) {
+					input.ConsumeKey(Key.Shift);
+					var items = model.EnumerateItems(sortType, orderType).ToList();
+					var currentIndex = items.IndexOf(path);
+					int prevIndex;
+					if (lastSelected == default) {
+						prevIndex = items.FindIndex(i => selection.Contains(i));
+					} else {
+						prevIndex = items.IndexOf(lastSelected);
+					}
+					selection.Clear();
+					if (prevIndex == -1) {
+						selection.Select(path);
+						lastSelected = path;
+						return;
+					}
+					lastSelected = items[prevIndex];
+					for (int i = Math.Min(currentIndex, prevIndex); i <= Math.Max(currentIndex, prevIndex); ++i) {
+						selection.Select(items[i]);
+					}
+					fsItem.Input.ConsumeKeyRelease(Key.Mouse0);
 				} else {
 					if (selection.Contains(path)) {
 						dragState = DragState.WaitingForDragging;
@@ -565,6 +594,7 @@ namespace Tangerine.UI.FilesystemView
 							if (!selection.Contains(path)) {
 								selection.Clear();
 								selection.Select(path);
+								lastSelected = path;
 							}
 							dragState = DragState.WaitingForDragging;
 							dragStartPosition = Window.Current.Input.MousePosition;
