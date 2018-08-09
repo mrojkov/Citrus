@@ -62,6 +62,7 @@ namespace Tangerine
 				TangerineMenu.RebuildCreateImportedTypeMenu();
 			});
 			mainWidget.AddChangeWatcher(() => CoreUserPreferences.Instance.AnimationMode, _ => Document.ForceAnimationUpdate());
+			mainWidget.AddChangeWatcher(() => Document.Current?.Container, _ => Document.ForceAnimationUpdate());
 
 			Application.Exiting += () => Project.Current.Close();
 			Application.Exited += () => {
