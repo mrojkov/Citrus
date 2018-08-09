@@ -28,7 +28,7 @@ namespace Lime
 
 		public int ButtonIndex { get; }
 		public DragDirection Direction { get; }
-		public float DragThreshold { get; }
+		public float DragThreshold { get; set; }
 		// Will cancel any other drag gestures
 		public bool Exclusive { get; set; }
 
