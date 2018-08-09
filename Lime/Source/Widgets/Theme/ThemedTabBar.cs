@@ -19,8 +19,7 @@ namespace Lime
 
 		public ThemedTab()
 		{
-			Padding = Theme.Metrics.ControlsPadding;
-			Padding.Right += 5; // Add space between close button and tab right border.
+			Padding = Theme.Metrics.ControlsPadding + new Thickness(right: 5.0f);
 			MinSize = Theme.Metrics.MinTabSize;
 			MaxSize = Theme.Metrics.MaxTabSize;
 			Size = MinSize;

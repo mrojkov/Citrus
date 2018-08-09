@@ -29,6 +29,22 @@ namespace Lime
 			LeftTop.Y = RightBottom.Y = vertical;
 		}
 
+		public Thickness(float left = 0.0f, float right = 0.0f, float top = 0.0f, float bottom = 0.0f)
+		{
+			LeftTop = new Vector2(left, top);
+			RightBottom = new Vector2(right, bottom);
+		}
+
+		public static Thickness operator + (Thickness lhs, Thickness rhs)
+		{
+			return new Thickness(lhs.Left + rhs.Left, lhs.Right + rhs.Right, lhs.Top + rhs.Top, lhs.Bottom + rhs.Bottom);
+		}
+
+		public static Thickness operator - (Thickness lhs, Thickness rhs)
+		{
+			return new Thickness(lhs.Left - rhs.Left, lhs.Right - rhs.Right, lhs.Top - rhs.Top, lhs.Bottom - rhs.Bottom);
+		}
+
 		public static Vector2 operator + (Vector2 size, Thickness padding)
 		{
 			return size + padding.LeftTop + padding.RightBottom;

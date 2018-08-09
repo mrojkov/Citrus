@@ -25,7 +25,7 @@ namespace Tangerine.UI
 				}
 			});
 			ExpandableContent.AddNode(panel.Widget);
-			panel.Widget.Padding.Right = 12;
+			panel.Widget.Padding = panel.Widget.Padding + new Thickness(right: 12.0f);
 			panel.Widget.Tasks.Add(currentColor.Consume(v => {
 				if (!colorFromPanel) {
 					panel.Color = v;

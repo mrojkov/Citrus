@@ -1476,7 +1476,7 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (19 == fd.OurIndex) {
-				dg.ReadIntoStruct(ref result.Padding);
+				result.Padding = (global::Lime.Thickness)dg.ReadStruct<global::Lime.Thickness>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (20 == fd.OurIndex) {
@@ -1693,7 +1693,7 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (17 == fd.OurIndex) {
-				dg.ReadIntoStruct(ref result.Padding);
+				result.Padding = (global::Lime.Thickness)dg.ReadStruct<global::Lime.Thickness>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (18 == fd.OurIndex) {
@@ -3621,7 +3621,7 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (17 == fd.OurIndex) {
-				dg.ReadIntoStruct(ref result.Padding);
+				result.Padding = (global::Lime.Thickness)dg.ReadStruct<global::Lime.Thickness>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (18 == fd.OurIndex) {
@@ -3816,7 +3816,7 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (18 == fd.OurIndex) {
-				dg.ReadIntoStruct(ref result.Padding);
+				result.Padding = (global::Lime.Thickness)dg.ReadStruct<global::Lime.Thickness>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (19 == fd.OurIndex) {
@@ -4128,7 +4128,7 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (17 == fd.OurIndex) {
-				dg.ReadIntoStruct(ref result.Padding);
+				result.Padding = (global::Lime.Thickness)dg.ReadStruct<global::Lime.Thickness>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (18 == fd.OurIndex) {
@@ -4314,7 +4314,7 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (16 == fd.OurIndex) {
-				dg.ReadIntoStruct(ref result.Padding);
+				result.Padding = (global::Lime.Thickness)dg.ReadStruct<global::Lime.Thickness>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (17 == fd.OurIndex) {
@@ -4516,7 +4516,7 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (16 == fd.OurIndex) {
-				dg.ReadIntoStruct(ref result.Padding);
+				result.Padding = (global::Lime.Thickness)dg.ReadStruct<global::Lime.Thickness>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (17 == fd.OurIndex) {
@@ -4859,7 +4859,7 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (17 == fd.OurIndex) {
-				dg.ReadIntoStruct(ref result.Padding);
+				result.Padding = (global::Lime.Thickness)dg.ReadStruct<global::Lime.Thickness>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (18 == fd.OurIndex) {
@@ -5054,7 +5054,7 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (18 == fd.OurIndex) {
-				dg.ReadIntoStruct(ref result.Padding);
+				result.Padding = (global::Lime.Thickness)dg.ReadStruct<global::Lime.Thickness>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (19 == fd.OurIndex) {
@@ -5301,7 +5301,7 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (29 == fd.OurIndex) {
-				dg.ReadIntoStruct(ref result.Padding);
+				result.Padding = (global::Lime.Thickness)dg.ReadStruct<global::Lime.Thickness>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (30 == fd.OurIndex) {
@@ -5693,7 +5693,7 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (17 == fd.OurIndex) {
-				dg.ReadIntoStruct(ref result.Padding);
+				result.Padding = (global::Lime.Thickness)dg.ReadStruct<global::Lime.Thickness>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (18 == fd.OurIndex) {
@@ -5982,7 +5982,7 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (16 == fd.OurIndex) {
-				dg.ReadIntoStruct(ref result.Padding);
+				result.Padding = (global::Lime.Thickness)dg.ReadStruct<global::Lime.Thickness>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (17 == fd.OurIndex) {
@@ -6402,7 +6402,7 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (18 == fd.OurIndex) {
-				dg.ReadIntoStruct(ref result.Padding);
+				result.Padding = (global::Lime.Thickness)dg.ReadStruct<global::Lime.Thickness>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (19 == fd.OurIndex) {
@@ -6621,7 +6621,7 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (22 == fd.OurIndex) {
-				dg.ReadIntoStruct(ref result.Padding);
+				result.Padding = (global::Lime.Thickness)dg.ReadStruct<global::Lime.Thickness>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (23 == fd.OurIndex) {
@@ -6980,7 +6980,7 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (16 == fd.OurIndex) {
-				dg.ReadIntoStruct(ref result.Padding);
+				result.Padding = (global::Lime.Thickness)dg.ReadStruct<global::Lime.Thickness>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (17 == fd.OurIndex) {

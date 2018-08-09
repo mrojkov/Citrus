@@ -315,7 +315,7 @@ namespace Tangerine.UI.FilesystemView
 					var r = new ThemedNumericEditBox();
 					r.MinMaxHeight = r.Height = RowHeight;
 					r.TextWidget.VAlignment = VAlignment.Center;
-					r.TextWidget.Padding.Top = r.TextWidget.Padding.Bottom = 0.0f;
+					r.TextWidget.Padding = new Thickness(r.TextWidget.Padding.Left, r.TextWidget.Right(), 0.0f, 0.0f);
 					return r;
 				},
 				DropDownListFactory = () => {
@@ -326,7 +326,7 @@ namespace Tangerine.UI.FilesystemView
 				EditBoxFactory = () => {
 					var r = new ThemedEditBox();
 					r.MinMaxHeight = r.Height = RowHeight;
-					r.TextWidget.Padding.Top = r.TextWidget.Padding.Bottom = 0.0f;
+					r.TextWidget.Padding = new Thickness(r.TextWidget.Padding.Left, r.TextWidget.Right(), 0.0f, 0.0f);
 					return r;
 				},
 			};
