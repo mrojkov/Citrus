@@ -83,7 +83,7 @@ namespace Tangerine.UI.SceneView
 					is TangerineVisualHintGroupAttribute attribute)) {
 				return EmptyHint;
 			}
-			var hint = Register($"{attribute.Group.TrimEnd(' ', '/')}/{type.Name}", command, hideRule);
+			var hint = Register($"{attribute.Group.TrimEnd(' ', '/')}/{attribute.AliasTypeName ?? type.Name}", command, hideRule);
 			if (typeHintMap.ContainsKey(type)) {
 				return typeHintMap[type] = hint;
 			}
