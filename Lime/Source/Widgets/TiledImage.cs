@@ -55,7 +55,6 @@ namespace Lime
 			TileRatio = Vector2.One;
 			HitTestMethod = HitTestMethod.Contents;
 			var texture = new SerializableTexture();
-			texture.TextureParams.WrapMode = TextureWrapMode.Repeat;
 			Texture = texture;
 		}
 
