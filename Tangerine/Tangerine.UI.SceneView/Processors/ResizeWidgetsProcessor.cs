@@ -71,8 +71,7 @@ namespace Tangerine.UI.SceneView
 					var areChildrenFreezed =
 						SceneView.Input.IsKeyPressed(Key.Z) &&
 						!isChangingScale &&
-						widgets.Count == 1 &&
-						widgets[0] is Frame;
+						widgets.Count == 1;
 					if (areChildrenFreezed) {
 						transform = widgets[0].CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
 					}
@@ -92,7 +91,7 @@ namespace Tangerine.UI.SceneView
 					);
 					if (areChildrenFreezed) {
 						transform *= widgets[0].CalcTransitionToSpaceOf(Document.Current.Container.AsWidget).CalcInversed();
-						RestoreChildrenPositions((Frame)widgets[0], transform);
+						RestoreChildrenPositions(widgets[0], transform);
 					}
 					yield return null;
 				}
@@ -101,12 +100,12 @@ namespace Tangerine.UI.SceneView
 			}
 		}
 
-		private static void RestoreChildrenPositions(Frame frame, Matrix32 transform)
+		private static void RestoreChildrenPositions(Widget widget, Matrix32 transform)
 		{
-			foreach (var widget in frame.Nodes.OfType<Widget>()) {
-				var newPosition = transform.TransformVector(widget.Position);
-				SetProperty.Perform(widget, nameof(Widget.Position), newPosition);
-				if (widget.Animators.TryFind(nameof(Widget.Position), out var animator)) {
+			foreach (var child in widget.Nodes.OfType<Widget>()) {
+				var newPosition = transform.TransformVector(child.Position);
+				SetProperty.Perform(child, nameof(Widget.Position), newPosition);
+				if (child.Animators.TryFind(nameof(Widget.Position), out var animator)) {
 					foreach (var key in animator.ReadonlyKeys.ToList()) {
 						var newKey = key.Clone();
 						newKey.Value = transform.TransformVector((Vector2)key.Value);
