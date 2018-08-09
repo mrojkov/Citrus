@@ -173,11 +173,4 @@ namespace Tangerine
 			DictionaryPath = dictionaryPath;
 		}
 	}
-
-	public class ShowAnimation : SceneView.DisplayNodeDecorationHandler
-	{
-		public ShowAnimation() : base(NodeDecoration.AnimationPath)
-		{
-		}
-	}
 }

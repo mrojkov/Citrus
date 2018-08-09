@@ -5,6 +5,7 @@ using System.Linq;
 using Lime;
 using Tangerine.Core;
 using Tangerine.UI;
+using Tangerine.UI.SceneView;
 using Tangerine.UI.Docking;
 using Tangerine.UI.BackupHistoryPanel;
 using Tangerine.UI.Timeline.Processors;
@@ -77,7 +78,7 @@ namespace Tangerine
 			var consolePanel = new Panel("Console");
 			var backupHistoryPanel = new Panel("Backups history");
 			var documentPanel = new Panel(DockManager.DocumentAreaId, undockable: false);
-			var nodeDecorationsPanel = new Panel("Node decorations");
+			var visualHintsPanel = new Panel("Visual hints");
 			new UI.Console(consolePanel);
 
 			var dockManager = DockManager.Instance;
@@ -88,7 +89,7 @@ namespace Tangerine
 			dockManager.AddPanel(backupHistoryPanel, documentPlacement, DockSite.Right, 0.3f);
 			dockManager.AddPanel(searchPanel, documentPlacement, DockSite.Right, 0.3f);
 			dockManager.AddPanel(filesystemPanel, documentPlacement, DockSite.Right, 0.3f);
-			dockManager.AddPanel(nodeDecorationsPanel, documentPlacement, DockSite.Right, 0.3f);
+			dockManager.AddPanel(visualHintsPanel, documentPlacement, DockSite.Right, 0.3f);
 			dockManager.AddPanel(consolePanel, documentPlacement, DockSite.Bottom, 0.3f);
 			DockManagerInitialState = dockManager.ExportState();
 			var documentViewContainer = InitializeDocumentArea(dockManager);
@@ -167,6 +168,11 @@ namespace Tangerine
 				}
 			});
 
+			VisualHintsRegister.Instance.DisplayAll =
+				VisualHintsRegister.Instance.Register("/All", SceneViewCommands.ShowAllVisualHints, enforceVisible: true);
+			VisualHintsRegister.Instance.DisplayInvisible =
+				VisualHintsRegister.Instance.Register("/Invisible", SceneViewCommands.ShowVisualHintsForInvisibleNodes, enforceVisible: true);
+
 			Document.NodeDecorators.AddFor<Node>(n => n.SetTangerineFlag(TangerineFlags.SceneNode, true));
 			dockManager.UnhandledExceptionOccurred += e => {
 				AlertDialog.Show(e.Message + "\n" + e.StackTrace);
@@ -227,7 +233,7 @@ namespace Tangerine
 
 			// Andery Tyshchenko: Create panel after hotkeys initialization
 			// to properly display hotkeys on panel
-			new UI.SceneView.NodeDecorationsPanel(nodeDecorationsPanel);
+			new VisualHintsPanel(visualHintsPanel);
 
 			Toolbars.Add("Editing", new Toolbar(dockManager.ToolbarArea));
 			Toolbars.Add("Create", new Toolbar(dockManager.ToolbarArea));
@@ -243,7 +249,7 @@ namespace Tangerine
 						new UI.SearchPanel(searchPanel.ContentWidget),
 						new BackupHistoryPanel(backupHistoryPanel.ContentWidget),
 					});
-					UI.SceneView.SceneView.ShowNodeDecorationsPanelButton.Clicked = () => dockManager.TogglePanel(nodeDecorationsPanel);
+					UI.SceneView.SceneView.ShowNodeDecorationsPanelButton.Clicked = () => dockManager.TogglePanel(visualHintsPanel);
 				}
 			};
 			var proj = AppUserPreferences.Instance.RecentProjects.FirstOrDefault();
@@ -326,6 +332,7 @@ namespace Tangerine
 			}
 			HotkeyRegistry.InitCommands(TangerineMenu.CreateNodeCommands, "Tools", "Tools");
 			HotkeyRegistry.UpdateProfiles();
+			UI.SceneView.VisualHintsPanel.Refresh();
 		}
 
 		void CreateToolsToolbar()
@@ -569,7 +576,6 @@ namespace Tangerine
 			h.Connect(SceneViewCommands.SnapRulerLinesToWidgets, new SnapRulerLinesToWidgetCommandHandler());
 			h.Connect(SceneViewCommands.ClearActiveRuler, new DocumentDelegateCommandHandler(ClearActiveRuler));
 			h.Connect(SceneViewCommands.ManageRulers, new ManageRulers());
-			h.Connect(SceneViewCommands.ShowAnimationPath, new ShowAnimation());
 			h.Connect(TimelineCommands.CutKeyframes, UI.Timeline.Operations.CutKeyframes.Perform);
 			h.Connect(TimelineCommands.CopyKeyframes, UI.Timeline.Operations.CopyKeyframes.Perform);
 			h.Connect(TimelineCommands.PasteKeyframes, UI.Timeline.Operations.PasteKeyframes.Perform);

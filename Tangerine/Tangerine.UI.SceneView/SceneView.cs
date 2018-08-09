@@ -57,9 +57,6 @@ namespace Tangerine.UI.SceneView
 			ConnectCommand(SceneViewCommands.DragRightFast, () => DragNodes(new Vector2(5, 0)));
 			ConnectCommand(SceneViewCommands.Duplicate, DuplicateNodes,
 				() => Document.Current?.TopLevelSelectedRows().Any(row => row.IsCopyPasteAllowed()) ?? false);
-			ConnectCommand(SceneViewCommands.DisplayBones, new DisplayBones());
-			ConnectCommand(SceneViewCommands.DisplayAllNodeDecorations, new DisplayAllNodeDecorations());
-			ConnectCommand(SceneViewCommands.DisplayNodeDecorationsForInvisibleWidgets, new DisplayNodeDecorationsForInvisibleWidgets());
 			ConnectCommand(SceneViewCommands.TieWidgetsWithBones, TieWidgetsWithBones);
 			ConnectCommand(SceneViewCommands.UntieWidgetsFromBones, UntieWidgetsFromBones);
 			ConnectCommand(SceneViewCommands.ToggleDisplayRuler, new DisplayRuler());
@@ -322,45 +319,6 @@ namespace Tangerine.UI.SceneView
 			public override void ExecuteTransaction()
 			{
 				ProjectUserPreferences.Instance.RulerVisible = !ProjectUserPreferences.Instance.RulerVisible;
-			}
-		}
-
-		public class DisplayNodeDecorationHandler : DocumentCommandHandler
-		{
-			private readonly NodeDecoration decoration;
-
-			public DisplayNodeDecorationHandler(NodeDecoration decoration)
-			{
-				this.decoration = decoration;
-			}
-
-			public override void ExecuteTransaction()
-			{
-				decoration.SetDisplay(!decoration.RequiredToDisplay());
-				NodeDecorationsPanel.Invalidate();
-			}
-		}
-
-		private class DisplayBones : DisplayNodeDecorationHandler
-		{
-			public DisplayBones() : base(NodeDecoration.Bone3D)
-			{
-			}
-		}
-
-		private class DisplayAllNodeDecorations : DocumentCommandHandler
-		{
-			public override void ExecuteTransaction()
-			{
-				NodeDecorationsPanel.ToggleDisplayAll(changedByUser: true);
-				NodeDecorationsPanel.Invalidate();
-			}
-		}
-
-		private class DisplayNodeDecorationsForInvisibleWidgets : DisplayNodeDecorationHandler
-		{
-			public DisplayNodeDecorationsForInvisibleWidgets() : base(NodeDecoration.Invisible)
-			{
 			}
 		}
 	}

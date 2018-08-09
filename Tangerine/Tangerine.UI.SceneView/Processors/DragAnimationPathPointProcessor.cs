@@ -13,7 +13,7 @@ namespace Tangerine.UI.SceneView
 		public IEnumerator<object> Task()
 		{
 			while (true) {
-				if (!NodeDecoration.AnimationPath.RequiredToDisplay()) {
+				if (!Animation2DPathPresenter.AnimationPathHint.Enabled) {
 					yield return null;
 					continue;
 				}

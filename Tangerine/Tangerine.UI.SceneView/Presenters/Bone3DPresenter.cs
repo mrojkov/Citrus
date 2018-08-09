@@ -1,15 +1,13 @@
-﻿using Lime;
-using System;
-using System.Collections.Generic;
+using Lime;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Tangerine.Core;
 
 namespace Tangerine.UI.SceneView
 {
 	class Bone3DPresenter : CustomPresenter<Node3D>
 	{
+		private static VisualHint bone3DHint = VisualHintsRegister.Instance.Register("/All/Nodes/Bones/Bone3D", SceneViewCommands.ShowBone3DBisualHint, enforceVisible: true);
+
 		public Bone3DPresenter(SceneView sceneView)
 		{
 			sceneView.Frame.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(RenderSelection));
