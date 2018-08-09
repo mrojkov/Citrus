@@ -8,6 +8,7 @@ namespace Lime
 	[TangerineRegisterNode(Order = 11)]
 	[TangerineNodeBuilder("BuildForTangerine")]
 	[AllowedChildrenTypes(typeof(TextStyle))]
+	[TangerineVisualHintGroup("/All/Nodes/Text")]
 	public class RichText : Widget, IText
 	{
 		private TextParser parser = new TextParser();

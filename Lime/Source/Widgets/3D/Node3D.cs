@@ -6,6 +6,7 @@ namespace Lime
 	[TangerineRegisterNode(CanBeRoot = true, Order = 23)]
 	[AllowedParentTypes(typeof(Node3D), typeof(Viewport3D))]
 	[AllowedChildrenTypes(typeof(Node))]
+	[TangerineVisualHintGroup("/All/Nodes/Containers")]
 	public class Node3D : Node, Viewport3D.IZSorterParams
 	{
 		private Vector3 scale;

@@ -4,6 +4,7 @@ using Yuzu;
 namespace Lime
 {
 	[TangerineRegisterNode(Order = 9)]
+	[TangerineVisualHintGroup("/All/Nodes/Particles")]
 	public class ParticlesMagnet : Widget
 	{
 		public ParticlesMagnet()

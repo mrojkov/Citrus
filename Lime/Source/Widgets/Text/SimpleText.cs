@@ -5,6 +5,7 @@ using Yuzu;
 namespace Lime
 {
 	[TangerineRegisterNode(Order = 10)]
+	[TangerineVisualHintGroup("/All/Nodes/Text")]
 	public class SimpleText : Widget, IText
 	{
 		private SpriteList spriteList;

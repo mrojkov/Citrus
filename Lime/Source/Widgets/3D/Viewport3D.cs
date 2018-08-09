@@ -18,6 +18,7 @@ namespace Lime
 	[TangerineRegisterNode(CanBeRoot = true, Order = 20)]
 	[TangerineNodeBuilder("BuildForTangerine")]
 	[AllowedChildrenTypes(typeof(Node3D), typeof(SplineGear3D))]
+	[TangerineVisualHintGroup("/All/Nodes/Containers")]
 	public class Viewport3D : Widget
 	{
 		public interface IZSorterParams

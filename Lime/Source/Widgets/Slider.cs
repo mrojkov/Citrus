@@ -5,6 +5,7 @@ namespace Lime
 {
 	[TangerineRegisterNode(Order = 18)]
 	[AllowedChildrenTypes(typeof(Node))]
+	[TangerineVisualHintGroup("/All/Nodes/Containers")]
 	public class Slider : Widget
 	{
 		[YuzuMember]

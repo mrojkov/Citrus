@@ -70,6 +70,7 @@ namespace Lime
 	}
 
 	[TangerineRegisterNode(Order = 5)]
+	[TangerineVisualHintGroup("/All/Nodes/Bones")]
 	public class Bone : Node
 	{
 		[YuzuMember]

@@ -3,6 +3,7 @@ using Yuzu;
 namespace Lime
 {
 	[TangerineRegisterNode(Order = 2)]
+	[TangerineVisualHintGroup("/All/Nodes/Images")]
 	public class Image : Widget, IImageCombinerArg
 	{
 		private bool skipRender;

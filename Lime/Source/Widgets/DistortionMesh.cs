@@ -4,6 +4,7 @@ namespace Lime
 {
 	[TangerineRegisterNode(Order = 14)]
 	[AllowedChildrenTypes(typeof(DistortionMeshPoint))]
+	[TangerineVisualHintGroup("/All/Nodes/Images")]
 	public class DistortionMesh : Widget
 	{
 		[YuzuMember]

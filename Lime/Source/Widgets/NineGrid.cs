@@ -4,6 +4,7 @@ using Yuzu;
 namespace Lime
 {
 	[TangerineRegisterNode(Order = 13)]
+	[TangerineVisualHintGroup("/All/Nodes/Images")]
 	public class NineGrid : Widget
 	{
 		[YuzuMember]

@@ -8,6 +8,7 @@ using Yuzu;
 namespace Lime
 {
 	[TangerineRegisterNode(Order = 31)]
+	[TangerineVisualHintGroup("/All/Nodes/Images")]
 	class TiledImage : Widget
 	{
 		private bool skipRender;

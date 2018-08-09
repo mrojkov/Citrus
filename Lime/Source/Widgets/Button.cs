@@ -8,6 +8,7 @@ namespace Lime
 	[TangerineRegisterNode(CanBeRoot = true, Order = 1)]
 	[TangerineNodeBuilder("BuildForTangerine")]
 	[AllowedChildrenTypes(typeof(Node))]
+	[TangerineVisualHintGroup("/All/Nodes/Containers")]
 	public class Button : Widget
 	{
 		private TextPresentersFeeder textPresentersFeeder;
