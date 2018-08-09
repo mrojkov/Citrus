@@ -16,6 +16,17 @@ namespace Tangerine.UI
 			Selector.LayoutCell = new LayoutCell(Alignment.Center);
 			ContainerWidget.AddNode(Selector);
 			var propertyType = typeof(T);
+			var meta = Yuzu.Metadata.Meta.Get(editorParams.Type, Serialization.DefaultYuzuCommonOptions);
+			var propertyMetaItem = meta.Items.Where(i => i.Name == editorParams.PropertyName).First();
+			var defaultValue = propertyMetaItem.GetValue(meta.Default);
+			var resetToDefaultButton = new ToolbarButton(IconPool.GetTexture("Tools.Revert"));
+			resetToDefaultButton.Clicked = () => {
+				SetProperty(defaultValue);
+			};
+			ContainerWidget.AddNode(resetToDefaultButton);
+			if (!propertyType.IsInterface) {
+				Selector.Items.Add(new CommonDropDownList.Item(propertyType.Name, propertyType));
+			}
 			// TODO: cache derived types if this somehow proves to be slow enough to notice
 			foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies()) {
 				var assignables = assembly
@@ -32,10 +43,13 @@ namespace Tangerine.UI
 			Selector.Changed += a => {
 				if (a.ChangedByUser) {
 					Type type = (Type)Selector.Items[a.Index].Value;
-					SetProperty(Activator.CreateInstance(type));
+					SetProperty(type != null ? Activator.CreateInstance(type) : null);
 				}
 			};
-			Selector.AddChangeWatcher(CoalescedPropertyValue(), v => Selector.Value = v.GetType());
+			Selector.AddChangeWatcher(CoalescedPropertyValue(), v => {
+				resetToDefaultButton.Visible = !Equals(v, defaultValue);
+				Selector.Value = v?.GetType();
+			});
 		}
 	}
 }
