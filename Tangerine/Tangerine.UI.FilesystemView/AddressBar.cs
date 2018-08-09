@@ -27,12 +27,10 @@ namespace Tangerine.UI.FilesystemView
 			}
 		}
 
-		public AddressBar(FilesystemView view, Model model)
+		public AddressBar(FilesystemView view)
 		{
 			this.view = view;
 			Layout = new StackLayout();
-			Path = model.CurrentPath;
-			buffer = Path;
 			state = AddressBarState.PathBar;
 			CreatePathBar();
 			CreateEditor();
@@ -63,7 +61,7 @@ namespace Tangerine.UI.FilesystemView
 			dialog.Show();
 		}
 
-		public string AdjustPath(string path)
+		private string AdjustPath(string path)
 		{
 			if (string.IsNullOrWhiteSpace(path)) {
 				return buffer;
@@ -100,7 +98,7 @@ namespace Tangerine.UI.FilesystemView
 			return path;
 		}
 		
-		private string PathToFolderPath(string path)
+		public static string PathToFolderPath(string path)
 		{
 			if (System.IO.Path.GetExtension(path) != string.Empty) {
 				if (!System.IO.Directory.Exists(path)) {
@@ -135,9 +133,7 @@ namespace Tangerine.UI.FilesystemView
 			if (state == AddressBarState.Editor) {
 				state = AddressBarState.PathBar;
 				editor.Text = "";
-				Nodes.Remove(editor);
 				CreatePathBar();
-				Nodes.Add(editor);
 			} else {
 				state = AddressBarState.Editor;
 				DeletePathBar();
@@ -164,7 +160,7 @@ namespace Tangerine.UI.FilesystemView
 
 		private void CreatePathBar()
 		{
-			Nodes.Add(pathBar = new PathBar(view, this));
+			Nodes.Push(pathBar = new PathBar(view, this));
 			pathBar.LayoutCell = new LayoutCell(Alignment.LeftCenter);
 			pathBar.Updating += UpdatingPathBar;
 		}
@@ -187,7 +183,6 @@ namespace Tangerine.UI.FilesystemView
 	public class PathBar : Widget
 	{
 		private string buffer;
-		private string[] topFoldersPaths;
 		private int countOfFolders;
 		private FilesystemView view;
 		private PathRootButton rootButton;
@@ -214,7 +209,7 @@ namespace Tangerine.UI.FilesystemView
 		private void CreateButtons()
 		{
 			countOfFolders = ToСountOfFolders(buffer);
-			topFoldersPaths = FillTopFoldersPaths(buffer, countOfFolders);
+			var topFoldersPaths = FillTopFoldersPaths(buffer, countOfFolders);
 			folderButtons = new PathFolderButton[countOfFolders];
 			arrowButtons = new PathArrowButton[countOfFolders + 1];
 			rootArrowButton = new PathRootArrowButton(view);
@@ -267,17 +262,19 @@ namespace Tangerine.UI.FilesystemView
 			if (string.IsNullOrWhiteSpace(path)) {
 				return null;
 			}
-			var topFolders = new string[countOfFolders];
-			var i = countOfFolders - 1;
-			if (countOfFolders != 0) {
+			if (countOfFolders > 0) {
+				var topFolders = new string[countOfFolders];
+				var i = countOfFolders - 1;
 				topFolders[i] = path;
 				i--;
 				while (i != -1) {
 					topFolders[i] = System.IO.Path.GetDirectoryName(topFolders[i + 1]);
 					i--;
 				}
+				return topFolders;
+			} else {
+				return null;
 			}
-			return topFolders;
 		}
 	}
 
@@ -411,7 +408,7 @@ namespace Tangerine.UI.FilesystemView
 		}
 	}
 
-	public class RootsDirectoryPicker : Window
+	public class RootsDirectoryPicker
 	{
 		private string[] internalRoots;
 		private FilesystemView view;
@@ -420,13 +417,7 @@ namespace Tangerine.UI.FilesystemView
 
 		public Window Window { get; }
 
-		private static WindowOptions DefaultWindowOptions => new WindowOptions {
-			Style = WindowStyle.Borderless,
-			Centered = false,
-			Visible = false
-		};
-
-		public RootsDirectoryPicker(Vector2 globalPosition, FilesystemView view) : base(DefaultWindowOptions)
+		public RootsDirectoryPicker(Vector2 globalPosition, FilesystemView view)
 		{
 			this.view = view;
 			var logicalDrives = System.IO.Directory.GetLogicalDrives();
@@ -497,10 +488,10 @@ namespace Tangerine.UI.FilesystemView
 				}));
 				item.Updating += (float delta) => {
 					if (IsMouseEntering(item)) {
-						Invalidate();
+						Window.Invalidate();
 					}
 					if (item.Input.WasMouseReleased(0)) {
-						Close();
+						Window.Close();
 						view.Open(path);
 					} else if (item.Input.WasMouseReleased(1)) {
 						SystemShellContextMenu.Instance.Show(item.FilesystemPath);

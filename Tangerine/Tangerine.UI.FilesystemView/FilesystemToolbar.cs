@@ -71,7 +71,7 @@ namespace Tangerine.UI.FilesystemView
 								CreateCloseButton()
 							}
 						},
-						(AddressBar = new AddressBar(view, model)),
+						(AddressBar = new AddressBar(view)),
 					}
 				}
 			);
