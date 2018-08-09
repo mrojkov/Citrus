@@ -25,7 +25,7 @@ namespace Lime
 		public delegate AbstractDeserializer DeserializerBuilder(string path, Stream stream);
 
 		public static readonly List<DeserializerBuilder> DeserializerBuilders = new List<DeserializerBuilder> {
-			(path, stream) => new Yuzu.Json.JsonDeserializer { JsonOptions = defaultYuzuJSONOptions, Options = defaultYuzuCommonOptions }
+			(path, stream) => new Yuzu.Json.JsonDeserializer { JsonOptions = defaultYuzuJSONOptions, Options = DefaultYuzuCommonOptions }
 		};
 
 		public static string ShrinkPath(string path)
@@ -45,7 +45,7 @@ namespace Lime
 			return (path[0] == '/') ? path.Substring(1) : GetCurrentSerializationDirectory() + '/' + path;
 		}
 
-		private static readonly CommonOptions defaultYuzuCommonOptions = new CommonOptions {
+		public static readonly CommonOptions DefaultYuzuCommonOptions = new CommonOptions {
 			TagMode = TagMode.Aliases,
 			AllowEmptyTypes = true,
 			CheckForEmptyCollections = true,
@@ -73,10 +73,10 @@ namespace Lime
 			try {
 				if (format == Format.Binary) {
 					WriteYuzuBinarySignature(stream);
-					ys = new Yuzu.Binary.BinarySerializer { Options = defaultYuzuCommonOptions };
+					ys = new Yuzu.Binary.BinarySerializer { Options = DefaultYuzuCommonOptions };
 				} else if (format == Format.JSON) {
 					ys = new Yuzu.Json.JsonSerializer {
-						Options = defaultYuzuCommonOptions,
+						Options = DefaultYuzuCommonOptions,
 						JsonOptions = defaultYuzuJSONOptions
 					};
 				}
@@ -124,7 +124,7 @@ namespace Lime
 			try {
 				AbstractDeserializer d = null;
 				if (CheckYuzuBinarySignature(stream)) {
-					d = new GeneratedDeserializersBIN.BinaryDeserializerGen { Options = defaultYuzuCommonOptions };
+					d = new GeneratedDeserializersBIN.BinaryDeserializerGen { Options = DefaultYuzuCommonOptions };
 				} else {
 					foreach (var db in DeserializerBuilders) {
 						d = db(path, stream);
