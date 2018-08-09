@@ -116,7 +116,7 @@ namespace Tangerine.UI.Inspector
 				}
 			}
 			var bindingFlags = BindingFlags.Instance | BindingFlags.Public;
-			if (!isSubclassOfNodeComponent) {
+			if (isSubclassOfNode) {
 				bindingFlags |= BindingFlags.DeclaredOnly;
 			}
 			foreach (var property in type.GetProperties(bindingFlags)) {
