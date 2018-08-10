@@ -185,7 +185,6 @@ namespace Tangerine.UI.FilesystemView
 		private string buffer;
 		private int countOfFolders;
 		private FilesystemView view;
-		private PathFolderButton rootButton;
 		private PathFolderButton[] folderButtons;
 		private PathArrowButton[] arrowButtons;
 		private PathArrowButton rootArrowButton;
@@ -208,30 +207,25 @@ namespace Tangerine.UI.FilesystemView
 
 		private void CreateButtons()
 		{
-			countOfFolders = ToСountOfFolders(buffer);
-			var topFoldersPaths = FillTopFoldersPaths(buffer, countOfFolders);
+			countOfFolders = GetСountOfFolders(buffer);
+			var topFoldersPaths = GetTopFoldersPaths(buffer, countOfFolders);
 			folderButtons = new PathFolderButton[countOfFolders];
-			arrowButtons = new PathArrowButton[countOfFolders + 1];
-			rootArrowButton = new PathArrowButton(view);
+			arrowButtons = new PathArrowButton[countOfFolders];
 
-			Nodes.Add(rootArrowButton);
-			Nodes.Add(rootButton = new PathFolderButton(view, System.IO.Path.GetPathRoot(buffer)));
-			Nodes.Add(arrowButtons[0] = new PathArrowButton(view, System.IO.Path.GetPathRoot(buffer)));
+			Nodes.Add(rootArrowButton = new PathArrowButton(view));
 			for (var i = 0; i < countOfFolders; i++) {
 				Nodes.Add(folderButtons[i] = new PathFolderButton(view, topFoldersPaths[i]));
-				Nodes.Add(arrowButtons[i + 1] = new PathArrowButton(view, topFoldersPaths[i]));
+				Nodes.Add(arrowButtons[i] = new PathArrowButton(view, topFoldersPaths[i]));
 			}
 		}
 
 		private void DestroyButtons()
 		{
-			Nodes.Remove(rootArrowButton);
-			Nodes.Remove(rootButton);
-			Nodes.Remove(arrowButtons[0]);
-			for (var i = 0; i < countOfFolders; i++) {
-				Nodes.Remove(arrowButtons[i + 1]);
+			for (var i = countOfFolders - 1; i >= 0; i--) {
+				Nodes.Remove(arrowButtons[i]);
 				Nodes.Remove(folderButtons[i]);
 			}
+			Nodes.Remove(rootArrowButton);
 		}
 
 		private void UpdatePathBar()
@@ -240,7 +234,7 @@ namespace Tangerine.UI.FilesystemView
 			CreateButtons();
 		}
 
-		public static int ToСountOfFolders(string path)
+		public static int GetСountOfFolders(string path)
 		{
 			if (string.IsNullOrWhiteSpace(path)) {
 				return -1;
@@ -248,8 +242,8 @@ namespace Tangerine.UI.FilesystemView
 			var folders = 0;
 			for (var i = 0; i < path.Length; i++) {
 				if (
-					path[i] == System.IO.Path.DirectorySeparatorChar &&
-					i + 1 != path.Length
+					path[i] == System.IO.Path.DirectorySeparatorChar ||
+					i == path.Length - 1
 				) {
 					folders++;
 				}
@@ -257,7 +251,7 @@ namespace Tangerine.UI.FilesystemView
 			return folders;
 		}
 
-		public static string[] FillTopFoldersPaths(string path, int countOfFolders)
+		public static string[] GetTopFoldersPaths(string path, int countOfFolders)
 		{
 			if (string.IsNullOrWhiteSpace(path)) {
 				return null;
