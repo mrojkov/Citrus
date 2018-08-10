@@ -8,7 +8,7 @@ namespace Tangerine.UI
 {
 	public class EnumPropertyEditor<T> : CommonPropertyEditor<T>
 	{
-		public DropDownList Selector { get; }
+		protected DropDownList Selector { get; }
 
 		public EnumPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{

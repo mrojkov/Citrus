@@ -9,8 +9,10 @@ namespace Lime
 	{
 		[YuzuMember]
 		public bool HorizontallySizeable { get; set; }
+
 		[YuzuMember]
 		public bool VerticallySizeable { get; set; }
+
 		[YuzuMember]
 		public LayoutCell CellDefaults { get; set; }
 

@@ -15,6 +15,7 @@ namespace Tangerine.UI.Inspector
 	{
 		private readonly List<IPropertyEditor> editors;
 		private readonly Widget widget;
+		private int row;
 
 		public InspectorContent(Widget widget)
 		{
@@ -116,8 +117,6 @@ namespace Tangerine.UI.Inspector
 			return true;
 		}
 
-		private int row = 0;
-
 		private IEnumerable<IPropertyEditor> PopulateContentForType(Type type, IEnumerable<object> objects, Widget widget)
 		{
 			var categoryLabelAdded = false;
@@ -131,7 +130,7 @@ namespace Tangerine.UI.Inspector
 				}
 			}
 			var bindingFlags = BindingFlags.Instance | BindingFlags.Public;
-			if (isSubclassOfNode) {
+			if (!isSubclassOfNodeComponent) {
 				bindingFlags |= BindingFlags.DeclaredOnly;
 			}
 			foreach (var property in type.GetProperties(bindingFlags)) {
@@ -181,7 +180,6 @@ namespace Tangerine.UI.Inspector
 							break;
 						}
 					}
-					Action delayedBuilder = null;
 					if (!isPropertyRegistered) {
 						var propertyType = param.PropertyInfo.PropertyType;
 						if (propertyType.IsEnum) {
