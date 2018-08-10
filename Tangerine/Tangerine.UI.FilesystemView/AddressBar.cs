@@ -185,7 +185,7 @@ namespace Tangerine.UI.FilesystemView
 		private string buffer;
 		private int countOfFolders;
 		private FilesystemView view;
-		private PathRootButton rootButton;
+		private PathFolderButton rootButton;
 		private PathFolderButton[] folderButtons;
 		private PathArrowButton[] arrowButtons;
 		private PathArrowButton rootArrowButton;
@@ -215,10 +215,10 @@ namespace Tangerine.UI.FilesystemView
 			rootArrowButton = new PathArrowButton(view);
 
 			Nodes.Add(rootArrowButton);
-			Nodes.Add(rootButton = new PathRootButton(view, buffer));
+			Nodes.Add(rootButton = new PathFolderButton(view, System.IO.Path.GetPathRoot(buffer)));
 			Nodes.Add(arrowButtons[0] = new PathArrowButton(view, System.IO.Path.GetPathRoot(buffer)));
 			for (var i = 0; i < countOfFolders; i++) {
-				Nodes.Add(folderButtons[i] = new PathFolderButton(topFoldersPaths[i], view));
+				Nodes.Add(folderButtons[i] = new PathFolderButton(view, topFoldersPaths[i]));
 				Nodes.Add(arrowButtons[i + 1] = new PathArrowButton(view, topFoldersPaths[i]));
 			}
 		}
@@ -280,19 +280,24 @@ namespace Tangerine.UI.FilesystemView
 
 	public class PathFolderButton : ThemedButton
 	{
-		public PathFolderButton(string path, FilesystemView view) : base()
+		public PathFolderButton(FilesystemView view, string path) : base()
 		{
-			Text = GetNameOfFolder(path);
+			Text = GetName(path);
 			MinMaxWidth = Renderer.MeasureTextLine(Text, Theme.Metrics.TextHeight, 3).X;
 			Gestures.Add(new ClickGesture(0, () => view.Open(path)));
 			Gestures.Add(new ClickGesture(1, () => SystemShellContextMenu.Instance.Show(path)));
 		}
 
-		public static string GetNameOfFolder(string path)
+		public static string GetName(string path)
 		{
 			if (string.IsNullOrWhiteSpace(path)) {
 				return null;
-			} else {
+			} else if(
+				path[path.Length - 1] == System.IO.Path.DirectorySeparatorChar &&
+				path[path.Length - 2] == System.IO.Path.VolumeSeparatorChar
+			) { // Root
+				return path.Remove(path.Length - 1);
+			} else { // Folder
 				int i;
 				for (i = path.Length - 1; i >= 0; i--) {
 					if (path[i] == System.IO.Path.DirectorySeparatorChar) {
@@ -301,27 +306,6 @@ namespace Tangerine.UI.FilesystemView
 					}
 				}
 				return path.Substring(i);
-			}
-		}
-	}
-
-	public class PathRootButton : ThemedButton
-	{
-		public PathRootButton(FilesystemView view, string path) : base()
-		{
-			Text = GetNameOfRoot(path);
-			MinMaxWidth = Renderer.MeasureTextLine(Text, Theme.Metrics.TextHeight, 4).X;
-			Gestures.Add(new ClickGesture(0, () => view.Open(System.IO.Path.GetPathRoot(path))));
-			Gestures.Add(new ClickGesture(1, () => SystemShellContextMenu.Instance.Show(path)));
-		}
-
-		public static string GetNameOfRoot(string path)
-		{
-			if (string.IsNullOrWhiteSpace(path)) {
-				return null;
-			} else {
-				path = System.IO.Path.GetPathRoot(path);
-				return path.Remove(path.Length - 1);
 			}
 		}
 	}
