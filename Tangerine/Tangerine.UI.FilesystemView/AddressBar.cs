@@ -188,7 +188,7 @@ namespace Tangerine.UI.FilesystemView
 		private PathRootButton rootButton;
 		private PathFolderButton[] folderButtons;
 		private PathArrowButton[] arrowButtons;
-		private PathRootArrowButton rootArrowButton;
+		private PathArrowButton rootArrowButton;
 
 		public PathBar(FilesystemView view, AddressBar addressBar)
 		{
@@ -212,14 +212,14 @@ namespace Tangerine.UI.FilesystemView
 			var topFoldersPaths = FillTopFoldersPaths(buffer, countOfFolders);
 			folderButtons = new PathFolderButton[countOfFolders];
 			arrowButtons = new PathArrowButton[countOfFolders + 1];
-			rootArrowButton = new PathRootArrowButton(view);
+			rootArrowButton = new PathArrowButton(view);
 
 			Nodes.Add(rootArrowButton);
-			Nodes.Add(rootButton = new PathRootButton(buffer, view));
-			Nodes.Add(arrowButtons[0] = new PathArrowButton(System.IO.Path.GetPathRoot(buffer), view));
+			Nodes.Add(rootButton = new PathRootButton(view, buffer));
+			Nodes.Add(arrowButtons[0] = new PathArrowButton(view, System.IO.Path.GetPathRoot(buffer)));
 			for (var i = 0; i < countOfFolders; i++) {
 				Nodes.Add(folderButtons[i] = new PathFolderButton(topFoldersPaths[i], view));
-				Nodes.Add(arrowButtons[i + 1] = new PathArrowButton(topFoldersPaths[i], view));
+				Nodes.Add(arrowButtons[i + 1] = new PathArrowButton(view, topFoldersPaths[i]));
 			}
 		}
 
@@ -307,7 +307,7 @@ namespace Tangerine.UI.FilesystemView
 
 	public class PathRootButton : ThemedButton
 	{
-		public PathRootButton(string path, FilesystemView view) : base()
+		public PathRootButton(FilesystemView view, string path) : base()
 		{
 			Text = GetNameOfRoot(path);
 			MinMaxWidth = Renderer.MeasureTextLine(Text, Theme.Metrics.TextHeight, 4).X;
@@ -338,7 +338,7 @@ namespace Tangerine.UI.FilesystemView
 		private DirectoryPicker picker;
 		private FilesystemView view;
 
-		public PathArrowButton(string path, FilesystemView view) : base()
+		public PathArrowButton(FilesystemView view, string path = null) : base()
 		{
 			this.path = path;
 			this.view = view;
@@ -356,46 +356,6 @@ namespace Tangerine.UI.FilesystemView
 				state = PathArrowButtonState.Expanded;
 				var pickerPosition = Window.Current.LocalToDesktop(GlobalPosition + new Vector2(0, Height));
 				picker = new DirectoryPicker(pickerPosition, view, path);
-				picker.Window.Deactivated += () => {
-					picker.Window.Close();
-					FlipState();
-				};
-			} else {
-				Text = ">";
-				state = PathArrowButtonState.Collapsed;
-				picker.Window.Close();
-			}
-		}
-	}
-
-	public class PathRootArrowButton : ThemedButton
-	{
-		public enum PathArrowButtonState
-		{
-			Collapsed,
-			Expanded
-		}
-		private PathArrowButtonState state;
-		private DirectoryPicker picker;
-		private FilesystemView view;
-
-		public PathRootArrowButton(FilesystemView view) : base()
-		{
-			this.view = view;
-
-			Gestures.Add(new ClickGesture(0, FlipState));
-			Text = ">";
-			state = PathArrowButtonState.Collapsed;
-			MinMaxWidth = Renderer.MeasureTextLine(Text, Theme.Metrics.TextHeight, 5).X;
-		}
-
-		private void FlipState()
-		{
-			if (state == PathArrowButtonState.Collapsed) {
-				Text = "v";
-				state = PathArrowButtonState.Expanded;
-				var pickerPosition = Window.Current.LocalToDesktop(GlobalPosition + new Vector2(0, Height));
-				picker = new DirectoryPicker(pickerPosition, view);
 				picker.Window.Deactivated += () => {
 					picker.Window.Close();
 					FlipState();
