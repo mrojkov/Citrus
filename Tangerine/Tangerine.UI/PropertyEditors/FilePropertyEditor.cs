@@ -28,6 +28,12 @@ namespace Tangerine.UI
 			});
 			editor.LayoutCell = new LayoutCell(Alignment.Center);
 			editor.Submitted += text => SetComponent(text);
+			editor.CompoundPostPresenter.Add(new DelegatePresenter<EditBox>(editBox => {
+				if (!Utils.CheckPathCharacters(editBox.Text)) {
+					editBox.PrepareRendererState();
+					Renderer.DrawRect(Vector2.Zero, editBox.Size, Color4.Red.Transparentify(0.8f));
+				}
+			}));
 			button.Clicked += () => {
 				var dlg = new FileDialog {
 					AllowedFileTypes = allowedFileTypes,
@@ -43,12 +49,12 @@ namespace Tangerine.UI
 
 		public void SetComponent(string text)
 		{
-			AssignAsset(AssetPath.CorrectSlashes(text));
+			SetFilePath(text);
 		}
 
 		public override void Submit()
 		{
-			SetComponent(editor.Text);
+			SetFilePath(editor.Text);
 		}
 
 		private void SetFilePath(string path)
@@ -57,6 +63,9 @@ namespace Tangerine.UI
 			if (Utils.ExtractAssetPathOrShowAlert(path, out asset, out type) &&
 			    Utils.AssertCurrentDocument(asset, type)) {
 				AssignAsset(AssetPath.CorrectSlashes(asset));
+			}
+			if (!Utils.CheckPathCharacters(path)) {
+				AlertDialog.Show($"Asset '{path}' path contains characters other than latin letters and digits. This may cause problems");
 			}
 		}
 
