@@ -39,7 +39,8 @@ namespace Tangerine
 				ClientSize = new Vector2(800, 600),
 				FixedSize = false,
 				Title = "Preferences",
-				MinimumDecoratedSize = new Vector2(400, 300)
+				MinimumDecoratedSize = new Vector2(400, 300),
+				Visible = false
 			});
 			Frame = new ThemedFrame {
 				Padding = new Thickness(8),
@@ -114,6 +115,7 @@ namespace Tangerine
 			foreach (var command in HotkeyRegistry.CurrentProfile.Commands) {
 				command.Command.Shortcut = new Shortcut(Key.Unknown);
 			}
+			window.ShowModal();
 		}
 
 		private void ResetToDefaults()
