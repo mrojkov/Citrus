@@ -20,6 +20,7 @@ namespace Tangerine.UI.Timeline
 				gridHandler.MoveNext();
 				overviewHandler.MoveNext();
 				HandleCellsMagnification(timeline.Grid.RootWidget.Input);
+				HandleCellsMagnification(timeline.Overview.RootWidget.Input);
 				HandleCellsMagnification(timeline.CurveEditor.MainAreaWidget.Input);
 				yield return null;
 			}
