@@ -190,6 +190,15 @@ namespace Tangerine.UI
 			});
 		}
 
+		protected void SetProperty(Func<object> valueProducer)
+		{
+			DoTransaction(() => {
+				foreach (var o in EditorParams.Objects) {
+					EditorParams.PropertySetter(o, EditorParams.PropertyName, valueProducer());
+				}
+			});
+		}
+
 		public virtual void Submit()
 		{
 

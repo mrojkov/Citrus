@@ -42,7 +42,6 @@ namespace Tangerine.UI
 
 		public override void Submit()
 		{
-			string text = editorX.Text;
 			var currentX = CoalescedPropertyComponentValue(v => v.X);
 			var currentY = CoalescedPropertyComponentValue(v => v.Y);
 			SetComponent(EditorParams, 0, editorX, currentX.GetValue());
