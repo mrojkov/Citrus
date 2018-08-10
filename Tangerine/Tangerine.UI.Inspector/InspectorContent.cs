@@ -28,21 +28,35 @@ namespace Tangerine.UI.Inspector
 				widget.SetFocus();
 			}
 			Clear();
-			foreach (var t in GetTypes(objects)) {
-				var o = objects.Where(i => t.IsInstanceOfType(i)).ToList();
-				PopulateContentForType(t, o);
-			}
+			BuildForObjectsHelper(objects).ToList();
 			if (objects.Any() && objects.All(o => o is Node)) {
 				var nodes = objects.Cast<Node>().ToList();
 				foreach (var t in GetComponentsTypes(nodes)) {
-					PopulateContentForType(t, nodes.Select(n => n.Components.Get(t)));
+					PopulateContentForType(t, nodes.Select(n => n.Components.Get(t)), widget).ToList();
 				}
-				AddComponentsMenu(nodes);
+				AddComponentsMenu(nodes, widget);
+			}
+		}
+
+		private IEnumerable<IPropertyEditor> BuildForObjectsHelper(IEnumerable<object> objects, Widget widget = null)
+		{
+			if (widget == null) {
+				widget = this.widget;
+			}
+			if (objects.Any(o => o == null)) {
+				yield break;
+			}
+			foreach (var t in GetTypes(objects)) {
+				var o = objects.Where(i => t.IsInstanceOfType(i)).ToList();
+				foreach (var e in PopulateContentForType(t, o, widget)) {
+					yield return e;
+				}
 			}
 		}
 
 		private void Clear()
 		{
+			row = 0;
 			widget.Nodes.Clear();
 			editors.Clear();
 		}
@@ -102,9 +116,10 @@ namespace Tangerine.UI.Inspector
 			return true;
 		}
 
-		private void PopulateContentForType(Type type, IEnumerable<object> objects)
+		private int row = 0;
+
+		private IEnumerable<IPropertyEditor> PopulateContentForType(Type type, IEnumerable<object> objects, Widget widget)
 		{
-			var row = 0;
 			var categoryLabelAdded = false;
 			var editorParams = new Dictionary<string, List<PropertyEditorParams>>();
 			bool isSubclassOfNode = type.IsSubclassOf(typeof(Node));
@@ -155,7 +170,7 @@ namespace Tangerine.UI.Inspector
 			}
 
 			foreach (var header in editorParams.Keys.OrderBy((s) => s)) {
-				AddGroupHeader(header);
+				AddGroupHeader(header, widget);
 				foreach (var param in editorParams[header]) {
 					bool isPropertyRegistered = false;
 					IPropertyEditor editor = null;
@@ -166,14 +181,24 @@ namespace Tangerine.UI.Inspector
 							break;
 						}
 					}
+					Action delayedBuilder = null;
 					if (!isPropertyRegistered) {
 						var propertyType = param.PropertyInfo.PropertyType;
 						if (propertyType.IsEnum) {
 							Type specializedEnumPropertyEditorType = typeof(EnumPropertyEditor<>).MakeGenericType(param.PropertyInfo.PropertyType);
 							editor = Activator.CreateInstance(specializedEnumPropertyEditorType, new object[] { param }) as IPropertyEditor;
 						} else if ((propertyType.IsClass || propertyType.IsInterface) && !propertyType.GetInterfaces().Contains(typeof(IEnumerable))) {
-							Type specializedInstancePropertyEditorType = typeof(InstancePropertyEditor<>).MakeGenericType(param.PropertyInfo.PropertyType);
-							editor = Activator.CreateInstance(specializedInstancePropertyEditorType, new object[] { param }) as IPropertyEditor;
+							var instanceEditors = new List<IPropertyEditor>();
+							var onValueChanged = new Action<Widget>((w) => {
+								w.Nodes.Clear();
+								foreach (var e in instanceEditors) {
+									editors.Remove(e);
+								}
+								instanceEditors.Clear();
+								instanceEditors.AddRange(BuildForObjectsHelper(objects.Select(o => param.PropertyInfo.GetValue(o)), w));
+							});
+							Type et = typeof(InstancePropertyEditor<>).MakeGenericType(param.PropertyInfo.PropertyType);
+							editor = Activator.CreateInstance(et, new object[] { param, onValueChanged }) as IPropertyEditor;
 						}
 					}
 					if (editor != null) {
@@ -189,6 +214,7 @@ namespace Tangerine.UI.Inspector
 								editor.ContainerWidget.Visible = !showCondition.Check(param.Objects.First());
 							};
 						}
+						yield return editor;
 					}
 				}
 			}
@@ -209,7 +235,7 @@ namespace Tangerine.UI.Inspector
 			return types;
 		}
 
-		private void AddComponentsMenu(IReadOnlyList<Node> nodes)
+		private void AddComponentsMenu(IReadOnlyList<Node> nodes, Widget widget)
 		{
 			if (nodes.Any(n => !string.IsNullOrEmpty(n.ContentsPath))) {
 				return;
@@ -290,7 +316,7 @@ namespace Tangerine.UI.Inspector
 			return label;
 		}
 
-		private void AddGroupHeader(string text)
+		private void AddGroupHeader(string text, Widget widget)
 		{
 			if (string.IsNullOrEmpty(text)) {
 				return;

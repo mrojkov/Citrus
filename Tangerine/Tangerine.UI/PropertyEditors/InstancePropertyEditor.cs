@@ -6,11 +6,11 @@ using Tangerine.Core;
 
 namespace Tangerine.UI
 {
-	public class InstancePropertyEditor<T> : CommonPropertyEditor<T>
+	public class InstancePropertyEditor<T> : ExpandablePropertyEditor<T>
 	{
 		public DropDownList Selector { get; }
 
-		public InstancePropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
+		public InstancePropertyEditor(IPropertyEditorParams editorParams, Action<Widget> OnValueChanged) : base(editorParams)
 		{
 			Selector = editorParams.DropDownListFactory();
 			Selector.LayoutCell = new LayoutCell(Alignment.Center);
@@ -47,6 +47,7 @@ namespace Tangerine.UI
 				}
 			};
 			Selector.AddChangeWatcher(CoalescedPropertyValue(), v => {
+				OnValueChanged?.Invoke(ExpandableContent);
 				resetToDefaultButton.Visible = !Equals(v, defaultValue);
 				Selector.Value = v?.GetType();
 			});
