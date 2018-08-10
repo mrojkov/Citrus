@@ -34,7 +34,6 @@ namespace Tangerine.UI.FilesystemView
 			state = AddressBarState.PathBar;
 			CreatePathBar();
 			CreateEditor();
-
 			Updating += (float delta) => {
 				if (
 					editor.IsFocused() &&
@@ -185,8 +184,7 @@ namespace Tangerine.UI.FilesystemView
 		private string buffer;
 		private int countOfFolders;
 		private FilesystemView view;
-		private PathFolderButton[] folderButtons;
-		private PathArrowButton[] arrowButtons;
+		private PathBarButton[] buttons;
 		private PathArrowButton rootArrowButton;
 
 		public PathBar(FilesystemView view, AddressBar addressBar)
@@ -195,6 +193,7 @@ namespace Tangerine.UI.FilesystemView
 			buffer = addressBar.Path;
 			Layout = new HBoxLayout();
 			LayoutCell = new LayoutCell(Alignment.LeftCenter);
+			Padding = new Thickness(1);
 			CreateButtons();
 
 			Updating += (float delta) => {
@@ -209,21 +208,18 @@ namespace Tangerine.UI.FilesystemView
 		{
 			countOfFolders = GetСountOfFolders(buffer);
 			var topFoldersPaths = GetTopFoldersPaths(buffer, countOfFolders);
-			folderButtons = new PathFolderButton[countOfFolders];
-			arrowButtons = new PathArrowButton[countOfFolders];
-
+			buttons = new PathBarButton[countOfFolders];
+			
 			Nodes.Add(rootArrowButton = new PathArrowButton(view));
 			for (var i = 0; i < countOfFolders; i++) {
-				Nodes.Add(folderButtons[i] = new PathFolderButton(view, topFoldersPaths[i]));
-				Nodes.Add(arrowButtons[i] = new PathArrowButton(view, topFoldersPaths[i]));
+				Nodes.Add(buttons[i] = new PathBarButton(view, topFoldersPaths[i]));
 			}
 		}
 
 		private void DestroyButtons()
 		{
 			for (var i = countOfFolders - 1; i >= 0; i--) {
-				Nodes.Remove(arrowButtons[i]);
-				Nodes.Remove(folderButtons[i]);
+				Nodes.Remove(buttons[i]);
 			}
 			Nodes.Remove(rootArrowButton);
 		}
@@ -272,14 +268,107 @@ namespace Tangerine.UI.FilesystemView
 		}
 	}
 
+
+	public enum PathBarButtonState
+	{
+		Normal,
+		Hovered,
+		Pressed
+	}
+
+	public class PathBarButton : Widget
+	{
+		private PathBarButtonState state;
+		private PathFolderButton folderButton;
+		private PathArrowButton arrowButton;
+
+		public PathBarButton(FilesystemView view, string path) : base()
+		{
+			Layout = new HBoxLayout();
+			HitTestTarget = true;
+
+			folderButton = new PathFolderButton(view, path);
+			arrowButton = new PathArrowButton(view, path);
+
+			Nodes.Add(folderButton);
+			Nodes.Add(arrowButton);
+
+			Updating += (float delta) => {
+				if (arrowButton.ArrowState == PathArrowButtonState.Expanded) {
+					state = PathBarButtonState.Pressed;
+				} else { 
+					if (IsMouseOverThisOrDescendant()) {
+						if (
+							folderButton.WasClicked() ||
+							arrowButton.WasClicked()
+						) {
+							state = PathBarButtonState.Pressed;
+						} else {
+							state = PathBarButtonState.Hovered;
+						}
+					} else {
+						state = PathBarButtonState.Normal;
+					}
+				}
+				folderButton.SetState(state);
+				arrowButton.SetState(state);
+			};
+		}
+	}
+
+	public class PathButtonPresenter : ThemedButton.ButtonPresenter
+	{
+		private ColorGradient innerGradient;
+		private Color4 outline;
+
+		public void SetState(PathBarButtonState state)
+		{
+			CommonWindow.Current.Invalidate();
+			switch (state) {
+				case PathBarButtonState.Pressed:
+					innerGradient = Theme.Colors.ButtonPress;
+					outline = new Color4(143, 179, 215);
+					break;
+				case PathBarButtonState.Hovered:
+					innerGradient = Theme.Colors.ButtonHover;
+					outline = new Color4(143, 179, 215);
+					break;
+				default:
+					innerGradient = new ColorGradient(new Color4(63, 63, 63));
+					outline = Color4.Transparent;
+					break;
+			}
+		}
+
+		public override void Render(Node node)
+		{
+			var widget = node.AsWidget;
+			widget.PrepareRendererState();
+			Renderer.DrawVerticalGradientRect(Vector2.Zero, widget.Size, innerGradient);
+			Renderer.DrawRectOutline(Vector2.Zero, widget.Size, outline);
+		}
+	}
+
 	public class PathFolderButton : ThemedButton
 	{
+		private new PathButtonPresenter Presenter;
+		public PathArrowButton arrowButton;
+		public PathBarButtonState State;
+
 		public PathFolderButton(FilesystemView view, string path) : base()
 		{
 			Text = GetName(path);
+			MinMaxHeight = 20;
+			Presenter = new PathButtonPresenter();
+			base.Presenter = Presenter;
 			MinMaxWidth = Renderer.MeasureTextLine(Text, Theme.Metrics.TextHeight, 3).X;
 			Gestures.Add(new ClickGesture(0, () => view.Open(path)));
 			Gestures.Add(new ClickGesture(1, () => SystemShellContextMenu.Instance.Show(path)));
+		}
+
+		public void SetState(PathBarButtonState state)
+		{
+			Presenter.SetState(state);
 		}
 
 		public static string GetName(string path)
@@ -304,35 +393,65 @@ namespace Tangerine.UI.FilesystemView
 		}
 	}
 
+	public enum PathArrowButtonState
+	{
+		Collapsed,
+		Expanded
+	}
+
 	public class PathArrowButton : ThemedButton
 	{
-		public enum PathArrowButtonState
-		{
-			Collapsed,
-			Expanded
-		}
 		private string path;
-		private PathArrowButtonState state;
 		private DirectoryPicker picker;
 		private FilesystemView view;
+		private new PathButtonPresenter Presenter;
+		public PathArrowButtonState ArrowState;
+		public PathBarButtonState State;
+		public PathFolderButton folderButton;
 
 		public PathArrowButton(FilesystemView view, string path = null) : base()
 		{
 			this.path = path;
 			this.view = view;
-
+			MinMaxHeight = 20;
+			Presenter = new PathButtonPresenter();
+			base.Presenter = Presenter;
+			if (path == null) {
+				Updating += (float delta) => {
+					if (ArrowState == PathArrowButtonState.Expanded) {
+						State = PathBarButtonState.Pressed;
+					} else {
+						if (IsMouseOverThisOrDescendant()) {
+							if (WasClicked()) {
+								State = PathBarButtonState.Pressed;
+							} else {
+								State = PathBarButtonState.Hovered;
+							}
+						} else {
+							State = PathBarButtonState.Normal;
+						}
+					}
+					Presenter.SetState(State);
+				};
+			}
 			Gestures.Add(new ClickGesture(0, FlipState));
 			Text = ">";
-			state = PathArrowButtonState.Collapsed;
+			ArrowState = PathArrowButtonState.Collapsed;
 			MinMaxWidth = Renderer.MeasureTextLine(Text, Theme.Metrics.TextHeight, 5).X;
+		}
+
+		public void SetState(PathBarButtonState state)
+		{
+			Presenter.SetState(state);
 		}
 
 		private void FlipState()
 		{
-			if (state == PathArrowButtonState.Collapsed) {
+			if (ArrowState == PathArrowButtonState.Collapsed) {
 				Text = "v";
-				state = PathArrowButtonState.Expanded;
-				var pickerPosition = Window.Current.LocalToDesktop(GlobalPosition + new Vector2(0, Height));
+				ArrowState = PathArrowButtonState.Expanded;
+				var indent = 14;
+				var pickerPosition = Window.Current.LocalToDesktop(GlobalPosition + new Vector2(-indent, Height));
 				picker = new DirectoryPicker(pickerPosition, view, path);
 				picker.Window.Deactivated += () => {
 					picker.Window.Close();
@@ -340,7 +459,7 @@ namespace Tangerine.UI.FilesystemView
 				};
 			} else {
 				Text = ">";
-				state = PathArrowButtonState.Collapsed;
+				ArrowState = PathArrowButtonState.Collapsed;
 				picker.Window.Close();
 			}
 		}
@@ -389,10 +508,21 @@ namespace Tangerine.UI.FilesystemView
 			scrollView.Content.AddNode(list);
 			var rootWidget = new ThemedInvalidableWindowWidget(Window) {
 				Layout = new VBoxLayout(),
+				Padding = new Thickness(5),
 				Nodes = {
 					scrollView
 				}
 			};
+			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
+			rootWidget.Presenter = new DelegatePresenter<Widget>(_ => {
+				rootWidget.PrepareRendererState();
+				Renderer.DrawRect(Vector2.Zero, Window.ClientSize, new Color4(82, 82, 82));
+			});
+			rootWidget.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(_ => {
+				rootWidget.PrepareRendererState();
+				Renderer.DrawRectOutline(Vector2.Zero, Window.ClientSize, new Color4(39, 39, 39), thickness: 2);
+			}));
+			Window.ClientSize = clientSize + new Vector2(rootWidget.Padding.Left * 2);
 
 			Window.Visible = true;
 			Window.ClientPosition = globalPosition;
