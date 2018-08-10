@@ -2,40 +2,52 @@ using Yuzu;
 
 namespace Lime
 {
+	[YuzuCompact]
 	public struct Thickness
 	{
-		[YuzuMember]
-		public float Left { get { return LeftTop.X; } set { LeftTop.X = value; } }
+		[YuzuMember("0")]
+		public float Left { get; set; }
 
-		[YuzuMember]
-		public float Top { get { return LeftTop.Y; } set { LeftTop.Y = value; } }
+		[YuzuMember("1")]
+		public float Right { get; set; }
 
-		[YuzuMember]
-		public float Right { get { return RightBottom.X; } set { RightBottom.X = value; } }
+		[YuzuMember("2")]
+		public float Top { get; set; }
 
-		[YuzuMember]
-		public float Bottom { get { return RightBottom.Y; } set { RightBottom.Y = value; } }
+		[YuzuMember("3")]
+		public float Bottom { get; set; }
 
-		public Vector2 LeftTop;
-		public Vector2 RightBottom;
+		public Vector2 LeftTop
+		{
+			get { return new Vector2(Left, Top); }
+			set { Left = value.X; Top = value.Y; }
+		}
+
+		public Vector2 RightBottom
+		{
+			get { return new Vector2(Right, Bottom); }
+			set { Right = value.X; Bottom = value.Y; }
+		}
 
 		public static Thickness Zero = new Thickness(0);
 
 		public Thickness(float overall)
 		{
-			LeftTop.X = RightBottom.X = LeftTop.Y = RightBottom.Y = overall;
+			Left = Right = Top = Bottom = overall;
 		}
 
 		public Thickness(float horizontal, float vertical)
 		{
-			LeftTop.X = RightBottom.X = horizontal;
-			LeftTop.Y = RightBottom.Y = vertical;
+			Left = Right = horizontal;
+			Top = Bottom = vertical;
 		}
 
 		public Thickness(float left = 0.0f, float right = 0.0f, float top = 0.0f, float bottom = 0.0f)
 		{
-			LeftTop = new Vector2(left, top);
-			RightBottom = new Vector2(right, bottom);
+			Left = left;
+			Right = right;
+			Top = top;
+			Bottom = bottom;
 		}
 
 		public static Thickness operator + (Thickness lhs, Thickness rhs)

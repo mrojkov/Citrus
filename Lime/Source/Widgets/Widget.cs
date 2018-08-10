@@ -124,8 +124,22 @@ namespace Lime
 		/// <summary>
 		/// Gets the layout-specific data.
 		/// </summary>
-		[YuzuMember]
-		public LayoutCell LayoutCell { get; set; }
+		public LayoutCell LayoutCell
+		{
+			get
+			{
+				return Components.Get<LayoutCellComponent>()?.LayoutCell;
+			}
+			set
+			{
+				var layoutCellComponent = Components.Get<LayoutCellComponent>();
+				if (layoutCellComponent == null) {
+					layoutCellComponent = new LayoutCellComponent();
+					Components.Add(layoutCellComponent);
+				}
+				layoutCellComponent.LayoutCell = value;
+			}
+		}
 
 		public virtual Vector2 EffectiveMinSize => Vector2.Max(MinSize, MeasuredMinSize);
 		public virtual Vector2 EffectiveMaxSize => Vector2.Max(Vector2.Min(MaxSize, MeasuredMaxSize), EffectiveMinSize);
