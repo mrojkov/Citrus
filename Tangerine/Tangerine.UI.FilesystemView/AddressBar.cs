@@ -355,7 +355,7 @@ namespace Tangerine.UI.FilesystemView
 				Text = "v";
 				state = PathArrowButtonState.Expanded;
 				var pickerPosition = Window.Current.LocalToDesktop(GlobalPosition + new Vector2(0, Height));
-				picker = new DirectoryPicker(pickerPosition, path, view);
+				picker = new DirectoryPicker(pickerPosition, view, path);
 				picker.Window.Deactivated += () => {
 					picker.Window.Close();
 					FlipState();
@@ -376,7 +376,7 @@ namespace Tangerine.UI.FilesystemView
 			Expanded
 		}
 		private PathArrowButtonState state;
-		private RootsDirectoryPicker picker;
+		private DirectoryPicker picker;
 		private FilesystemView view;
 
 		public PathRootArrowButton(FilesystemView view) : base()
@@ -395,7 +395,7 @@ namespace Tangerine.UI.FilesystemView
 				Text = "v";
 				state = PathArrowButtonState.Expanded;
 				var pickerPosition = Window.Current.LocalToDesktop(GlobalPosition + new Vector2(0, Height));
-				picker = new RootsDirectoryPicker(pickerPosition, view);
+				picker = new DirectoryPicker(pickerPosition, view);
 				picker.Window.Deactivated += () => {
 					picker.Window.Close();
 					FlipState();
@@ -408,122 +408,6 @@ namespace Tangerine.UI.FilesystemView
 		}
 	}
 
-	public class RootsDirectoryPicker
-	{
-		private string[] internalRoots;
-		private FilesystemView view;
-		private bool IsMouseInside = false;
-		private ThemedScrollView scrollView;
-
-		public Window Window { get; }
-
-		public RootsDirectoryPicker(Vector2 globalPosition, FilesystemView view)
-		{
-			this.view = view;
-			var logicalDrives = System.IO.Directory.GetLogicalDrives();
-			internalRoots = GetRealRootsPathsFromLogicalDrives(logicalDrives);
-			var rootItems = GetRootItems(internalRoots);
-
-			const int MaxItemsOnWindow = 19; // Like in Windows File Explorer
-			var itemsCount = System.Math.Min(rootItems.Length, MaxItemsOnWindow);
-			var clientSize = new Vector2(FilesystemItem.ItemWidth, (FilesystemItem.IconSize + 2 * FilesystemItem.ItemPadding) * itemsCount);
-			Window = new Window(new WindowOptions {
-				ClientSize = clientSize,
-				FixedSize = true,
-				MinimumDecoratedSize = clientSize,
-				Style = WindowStyle.Borderless,
-				Centered = false,
-				Visible = false
-			});
-
-			scrollView = new ThemedScrollView();
-			var list = new Widget {
-				Layout = new VBoxLayout()
-			};
-			list.Nodes.AddRange(rootItems);
-			scrollView.Content.Layout = new VBoxLayout { Spacing = AttachmentMetrics.Spacing };
-			scrollView.Content.AddNode(list);
-			var rootWidget = new ThemedInvalidableWindowWidget(Window) {
-				Layout = new VBoxLayout(),
-				Nodes = {
-					scrollView
-				}
-			};
-
-			Window.Visible = true;
-			Window.ClientPosition = globalPosition;
-		}
-
-		public static string[] GetRealRootsPathsFromLogicalDrives(string[] logicalDrives)
-		{
-			var countOfRealRoots = 0;
-			foreach(var path in logicalDrives) {
-				if (System.IO.Directory.Exists(path)) {
-					countOfRealRoots++;
-				}
-			}
-			string[] realRoots = new string[countOfRealRoots];
-			var i = 0;
-			foreach(var root in logicalDrives) {
-				if (System.IO.Directory.Exists(root)) {
-					realRoots[i] = root;
-					i++;
-					if (i == countOfRealRoots) break;
-				}
-			}
-			return realRoots;
-		}
-
-		private FilesystemItem[] GetRootItems(string[] paths)
-		{
-			FilesystemItem[] items = new FilesystemItem[internalRoots.Length];
-			var i = 0;
-			foreach (var path in paths) {
-				FilesystemItem item = new FilesystemItem(path);
-				item.CompoundPresenter.Add(new DelegatePresenter<Widget>(_ => {
-					if (item.IsMouseOverThisOrDescendant()) {
-						item.PrepareRendererState();
-						Renderer.DrawRect(Vector2.Zero, item.Size, Theme.Colors.HoveredBackground);
-					}
-				}));
-				item.Updating += (float delta) => {
-					if (IsMouseEntering(item)) {
-						Window.Invalidate();
-					}
-					if (item.Input.WasMouseReleased(0)) {
-						Window.Close();
-						view.Open(path);
-					} else if (item.Input.WasMouseReleased(1)) {
-						SystemShellContextMenu.Instance.Show(item.FilesystemPath);
-					}
-				};
-				items[i] = item;
-				i++;
-			}
-			return items;
-		}
-
-		private bool IsMouseEntering(Widget widget)
-		{
-			if (
-				widget.LocalMousePosition().X >= 0 &&
-				widget.LocalMousePosition().Y >= 0 &&
-				widget.LocalMousePosition().X <= widget.Width &&
-				widget.LocalMousePosition().Y <= widget.Height
-			) {
-				if (!IsMouseInside) {
-					IsMouseInside = true;
-					return true;
-				} else {
-					return false;
-				}
-			} else {
-				IsMouseInside = false;
-				return false;
-			}
-		}
-	}
-
 	public class DirectoryPicker
 	{
 		private FilesystemView view;
@@ -532,11 +416,19 @@ namespace Tangerine.UI.FilesystemView
 
 		public Window Window { get; }
 
-		public DirectoryPicker(Vector2 globalPosition, string path, FilesystemView view)
+		public DirectoryPicker(Vector2 globalPosition, FilesystemView view, string path = null)
 		{
 			this.view = view;
-			var internalFolders = GetInternalFoldersPaths(path);
-			var filesystemItems = GetFilesystemItems(internalFolders);
+
+			List<FilesystemItem> filesystemItems = new List<FilesystemItem>();
+			if (path == null) {
+				var logicalDrives = System.IO.Directory.GetLogicalDrives();
+				var availableRoots = GetAvailableRootsPathsFromLogicalDrives(logicalDrives);
+				filesystemItems = GetFilesystemItems(availableRoots);
+			} else {
+				var internalFolders = GetInternalFoldersPaths(path);
+				filesystemItems = GetFilesystemItems(internalFolders);
+			}
 
 			const int MaxItemsOnWindow = 19; // Like in Windows File Explorer
 			var itemsCount = System.Math.Min(filesystemItems.Count, MaxItemsOnWindow);
@@ -602,6 +494,26 @@ namespace Tangerine.UI.FilesystemView
 				};
 			}
 			return items;
+		}
+
+		public static List<string> GetAvailableRootsPathsFromLogicalDrives(string[] logicalDrives)
+		{
+			var countOfRealRoots = 0;
+			foreach (var path in logicalDrives) {
+				if (System.IO.Directory.Exists(path)) {
+					countOfRealRoots++;
+				}
+			}
+			List<string> availableRoots = new List<string>();
+			var i = 0;
+			foreach (var root in logicalDrives) {
+				if (System.IO.Directory.Exists(root)) {
+					availableRoots.Add(root);
+					i++;
+					if (i == countOfRealRoots) break;
+				}
+			}
+			return availableRoots;
 		}
 
 		private bool IsMouseEntering(Widget widget)
