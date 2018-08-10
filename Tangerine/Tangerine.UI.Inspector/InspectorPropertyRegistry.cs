@@ -56,6 +56,7 @@ namespace Tangerine.UI.Inspector
 			AddEditor(typeof(NodeReference<Node3D>), c => new NodeReferencePropertyEditor<Node3D>(c));
 			AddEditor(typeof(NodeReference<Spline3D>), c => new NodeReferencePropertyEditor<Spline3D>(c));
 			AddEditor(typeof(SkinningWeights), c => new SkinningWeightsPropertyEditor(c));
+			AddEditor(typeof(Alignment), c => new AlignmentPropertyEditor(c));
 		}
 
 		void AddEditor(Type type, PropertyEditorBuilder builder)

@@ -6,7 +6,8 @@ namespace Tangerine.UI
 {
 	public class Vector2PropertyEditor : CommonPropertyEditor<Vector2>
 	{
-		private NumericEditBox editorX, editorY;
+		private NumericEditBox editorX;
+		private NumericEditBox editorY;
 
 		public Vector2PropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
