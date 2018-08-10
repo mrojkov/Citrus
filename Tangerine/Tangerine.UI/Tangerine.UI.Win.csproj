@@ -101,6 +101,7 @@
     <Compile Include="PropertyEditors\SkinningWeightsPropertyEditor.cs" />
     <Compile Include="PropertyEditors\StringPropertyEditor.cs" />
     <Compile Include="PropertyEditors\TexturePropertyEditor.cs" />
+    <Compile Include="PropertyEditors\ThicknessPropertyEditor.cs" />
     <Compile Include="PropertyEditors\TriggerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\Vector2PropertyEditor.cs" />
     <Compile Include="PropertyEditors\Vector3PropertyEditor.cs" />
