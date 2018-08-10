@@ -24,6 +24,13 @@ namespace Tangerine.UI.FilesystemView
 			textureCache.Clear();
 		}
 
+		public void ClearTextureCache(string filename)
+		{
+			if (textureCache.ContainsKey(filename)) {
+				textureCache.Remove(filename);
+			}
+		}
+
 		private ITexture PrepareChessTexture(Color4 color1, Color4 color2)
 		{
 			var chessTexture = new Texture2D();
@@ -140,6 +147,7 @@ namespace Tangerine.UI.FilesystemView
 				});
 			}
 			CalcZoomAndMaxZoom();
+			ApplyZoom();
 		}
 
 		private void ApplyZoom()
