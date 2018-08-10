@@ -56,6 +56,7 @@ namespace Lime
 
 		public bool ConstraintsValid { get; protected set; }
 		public bool ArrangementValid { get; protected set; }
+
 		[YuzuMember]
 		public bool IgnoreHidden { get; set; }
 

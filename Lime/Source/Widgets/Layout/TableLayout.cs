@@ -9,12 +9,16 @@ namespace Lime
 	{
 		[YuzuMember]
 		public int RowCount { get; set; }
+
 		[YuzuMember]
 		public int ColCount { get; set; }
+
 		[YuzuMember]
-		public float ColSpacing;
+		public float ColSpacing { get; set; }
+
 		[YuzuMember]
-		public float RowSpacing;
+		public float RowSpacing { get; set; }
+
 		public float Spacing { set { ColSpacing = RowSpacing = value; } }
 		// TODO: YuzuMember?
 		public List<LayoutCell> ColDefaults = new List<LayoutCell>();
