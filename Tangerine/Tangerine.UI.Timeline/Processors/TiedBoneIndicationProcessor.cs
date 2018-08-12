@@ -7,29 +7,35 @@ using Tangerine.UI.Timeline.Components;
 
 namespace Tangerine.UI.Timeline.Processors
 {
-    public class TiedIndicationProcessor : SymmetricOperationProcessor
+    public class TiedBoneIndicationProcessor : SymmetricOperationProcessor
     {
+		private class TiedBoneIndication : TieIndication
+		{
+			public TiedBoneIndication() : base(NodeIconPool.GetTexture(typeof(Bone)), clickable: true)
+			{
+			}
+		}
+
         public override void Process(IOperation op)
         {
-            var ties = new Dictionary<int, HashSet<Node>>();
+            var ties = new Dictionary<Bone, HashSet<RollNodeView>>();
             foreach (var row in Document.Current.Rows)
             {
 				if (row.Components.Get<RowView>()?.RollRow is RollNodeView view) {
+					view.TieIndicationContainer.DisableIndication<TiedBoneIndication>();
 					var node = view.NodeData?.Node;
 					switch (node) {
 						case Widget widget:
-							AddTies(ties, new Property<SkinningWeights>(() => widget.SkinningWeights), view, widget);
+							var nodes = widget.Parent.Nodes;
+							AddTies(ties, new Property<SkinningWeights>(() => widget.SkinningWeights), view, nodes);
 							if (widget is DistortionMesh mesh) {
-								bool tied = false;
 								foreach (var index in GetTiedBoneIndexes(mesh)) {
-									AddTie(ties, index, mesh);
-									tied = true;
+									AddTie(ties, index, view, nodes);
 								}
-								view.TiedIndicator.Color = tied ? Color4.White : Color4.Transparent;
 							}
 							break;
 						case DistortionMeshPoint point:
-							AddTies(ties, new Property<SkinningWeights>(() => point.SkinningWeights), view, point);
+							AddTies(ties, new Property<SkinningWeights>(() => point.SkinningWeights), view, point.Parent.Parent.Nodes);
 							break;
 					}
 				}
@@ -40,16 +46,19 @@ namespace Tangerine.UI.Timeline.Processors
 					row.Components.Get<RowView>()?.RollRow is RollNodeView view &&
 					view.NodeData?.Node is Bone bone
 				) {
-					if (ties.ContainsKey(bone.Index)) {
-						view.TiedIndicator.Color = Color4.White;
+					if (ties.ContainsKey(bone)) {
+						var indication = view.TieIndicationContainer.EnableIndication<TiedBoneIndication>();
+						indication.ClearTiedNodes();
 						var sb = new StringBuilder(bone.Id).Append(": ");
-						foreach (var node in ties[bone.Index]) {
+						foreach (var nodeView in ties[bone]) {
+							var node = nodeView.NodeData.Node;
+							indication.AddTiedNode(node);
 							sb.Append(node.Id).Append(", ");
 						}
 						view.Label.Text = sb.Remove(sb.Length - 2, 2).ToString();
 					} else {
 						view.Label.Text = bone.Id;
-						view.TiedIndicator.Color = Color4.Transparent;
+						view.TieIndicationContainer.DisableIndication<TiedBoneIndication>();
 					}
 				}
             }
@@ -76,29 +85,30 @@ namespace Tangerine.UI.Timeline.Processors
 			}
 		}
 
-		private static void AddTies(Dictionary<int, HashSet<Node>> ties, Property<SkinningWeights> property, RollNodeView view, Node node)
+		private static void AddTies(Dictionary<Bone, HashSet<RollNodeView>> ties, Property<SkinningWeights> property, RollNodeView view, NodeList nodes)
 		{
 			var skinningWeights = property.Getter();
 			if (skinningWeights?.IsEmpty() ?? true) {
-				view.TiedIndicator.Color = Color4.Transparent;
-			} else {
-				view.TiedIndicator.Color = Color4.White;
-				AddTie(ties, skinningWeights.Bone0.Index, node);
-				AddTie(ties, skinningWeights.Bone1.Index, node);
-				AddTie(ties, skinningWeights.Bone2.Index, node);
-				AddTie(ties, skinningWeights.Bone3.Index, node);
+				return;
 			}
+			AddTie(ties, skinningWeights.Bone0.Index, view, nodes);
+			AddTie(ties, skinningWeights.Bone1.Index, view, nodes);
+			AddTie(ties, skinningWeights.Bone2.Index, view, nodes);
+			AddTie(ties, skinningWeights.Bone3.Index, view, nodes);
 		}
 
-		private static void AddTie(Dictionary<int, HashSet<Node>> ties, int index, Node node)
+		private static void AddTie(Dictionary<Bone, HashSet<RollNodeView>> ties, int index, RollNodeView view, NodeList nodes)
 		{
 			if (index == 0) {
 				return;
 			}
-			if (ties.ContainsKey(index)) {
-				ties[index].Add(node);
-			} else {
-				ties.Add(index, new HashSet<Node> { node });
+			var bone = nodes.GetBone(index);
+			if (!ties.ContainsKey(bone)) {
+				ties.Add(bone, new HashSet<RollNodeView> { view });
+				view.TieIndicationContainer.EnableIndication<TiedBoneIndication>().AddTiedNode(bone);
+			} else if (!ties[bone].Contains(view)) {
+				ties[bone].Add(view);
+				view.TieIndicationContainer.EnableIndication<TiedBoneIndication>().AddTiedNode(bone);
 			}
 		}
     }

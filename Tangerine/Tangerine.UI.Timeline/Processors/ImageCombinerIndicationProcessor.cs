@@ -1,10 +1,4 @@
 using Lime;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using Tangerine.Core;
 using Tangerine.Core.Components;
 using Tangerine.UI.Timeline.Components;
@@ -13,6 +7,13 @@ namespace Tangerine.UI.Timeline.Processors
 {
 	public class ImageCombinerIndicationProcessor : SymmetricOperationProcessor
 	{
+		private class ImageCombinerTieIndication : TieIndication
+		{
+			public ImageCombinerTieIndication() : base(NodeIconPool.GetTexture(typeof(ImageCombiner)))
+			{
+			}
+		}
+
 		public override void Process(IOperation op)
 		{
 			var rows = Document.Current.Rows;
@@ -25,28 +26,27 @@ namespace Tangerine.UI.Timeline.Processors
 				if (row.Components.Get<NodeRow>()?.Node is ImageCombiner combiner) {
 					if (combiner.GetArgs(out IImageCombinerArg arg1, out IImageCombinerArg arg2)) {
 						view.Label.Color = Theme.Colors.BlackText;
-						view.ImageCombinerIndicator.Color = Color4.Transparent;
+						view.TieIndicationContainer.EnableIndication<ImageCombinerTieIndication>().Texture = NodeIconPool.GetTexture(typeof(ImageCombiner));
 						SetImageCombinerIndication(rows[i + 1]);
 						SetImageCombinerIndication(rows[i + 2]);
 						i += 2;
 					}
 					else {
 						view.Label.Color = Theme.Colors.RedText;
-						view.ImageCombinerIndicator.Color = Color4.White;
+						view.TieIndicationContainer.EnableIndication<ImageCombinerTieIndication>().Texture = IconPool.GetTexture("Timeline.NoEntry");
 					}
 					continue;
 				}
 				if (row.Components.Get<NodeRow>()?.Node is IImageCombinerArg arg) {
-					view.ImageCombinerIndicator.Color = Color4.Transparent;
+					view.TieIndicationContainer.DisableIndication<ImageCombinerTieIndication>();
 				}
 			}
 		}
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private static void SetImageCombinerIndication(Row row)
 		{
 			if (row.Components.Get<RowView>()?.RollRow is RollNodeView view) {
-				view.ImageCombinerIndicator.Color = Color4.White;
+				view.TieIndicationContainer.EnableIndication<ImageCombinerTieIndication>();
 			}
 		}
 	}

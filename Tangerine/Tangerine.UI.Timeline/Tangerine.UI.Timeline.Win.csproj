@@ -58,7 +58,6 @@
     <Compile Include="Components\RollFolderView.cs" />
     <Compile Include="Components\RollNodeView.cs" />
     <Compile Include="Components\RollPropertyView.cs" />
-    <Compile Include="Components\ShowTiedNodesContextMenu.cs" />
     <Compile Include="CurveEditorPane.cs" />
     <Compile Include="Operations\ClearGridSelection.cs" />
     <Compile Include="Operations\ColumnCountUpdater.cs" />
@@ -79,7 +78,7 @@
     <Compile Include="Processors\GridPane\AnimationStretchProcessor.cs" />
     <Compile Include="Processors\GridPane\ClampScrollPosProcessor.cs" />
     <Compile Include="Processors\ImageCombinerIndicationProcessor.cs" />
-    <Compile Include="Processors\TiedIndicationProcessor.cs" />
+    <Compile Include="Processors\TiedBoneIndicationProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Processors\GridPane\DragKeyframesRespondentProcessor.cs" />
     <Compile Include="Processors\GridPane\GridMouseScrollProcessor.cs" />
@@ -93,6 +92,7 @@
     <Compile Include="OverviewPane.cs" />
     <Compile Include="RollPane.cs" />
     <Compile Include="Rulerbar.cs" />
+    <Compile Include="TieIndication.cs" />
     <Compile Include="Timeline.cs" />
     <Compile Include="Toolbar.cs" />
     <Compile Include="Components\DragKeyframesRequest.cs" />
