@@ -17,7 +17,6 @@ namespace Lime
 		private ManualResetEvent updateReady = new ManualResetEvent(true);
 		private ManualResetEvent renderReady = new ManualResetEvent(false);
 
-		private RenderObjectList renderObjectList;
 		private RenderObjectList renderObjectList1 = new RenderObjectList();
 		private RenderObjectList renderObjectList2 = new RenderObjectList();
 		private RenderObjectList syncRenderObjects = new RenderObjectList();
@@ -46,13 +45,6 @@ namespace Lime
 
 		public override void Update(float delta)
 		{
-			if (Window.AsyncRendering) {
-				updateReady.WaitOne();
-				updateReady.Reset();
-				Toolbox.Swap(ref renderObjectList1, ref renderObjectList2);
-				renderObjectList = renderObjectList2;
-				renderReady.Set();
-			}
 			if (ContinuousRendering()) {
 				Window.Invalidate();
 			}
@@ -96,14 +88,30 @@ namespace Lime
 			RenderChainBuilder?.AddToRenderChain(renderChain);
 
 			if (Window.AsyncRendering) {
+				updateReady.WaitOne();
+				updateReady.Reset();
 				renderObjectList1.Clear();
 				renderChain.GetRenderObjects(renderObjectList1);
+				renderReady.Set();
 			} else {
 				syncRenderObjects.Clear();
 				renderChain.GetRenderObjects(syncRenderObjects);
 			}
 
 			ManageFocusOnWindowActivation();
+		}
+
+		public void RenderAll()
+		{
+			if (Window.AsyncRendering) {
+				renderReady.WaitOne();
+				renderReady.Reset();
+				Toolbox.Swap(ref renderObjectList1, ref renderObjectList2);
+				updateReady.Set();
+				Render(renderObjectList2);
+			} else {
+				Render(syncRenderObjects);
+			}
 		}
 
 		private bool IsAnyCaptureKeyPressed()
@@ -151,18 +159,6 @@ namespace Lime
 				n = null;
 			}
 			return n;
-		}
-
-		public void RenderAll()
-		{
-			if (Window.AsyncRendering) {
-				renderReady.WaitOne();
-				renderReady.Reset();
-				Render(renderObjectList);
-				updateReady.Set();
-			} else {
-				Render(syncRenderObjects);
-			}
 		}
 
 		protected virtual void Render(RenderObjectList renderObjects)
