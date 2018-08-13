@@ -48,6 +48,42 @@ namespace Lime
 		public void ClearCache() { }
 	}
 
+	public static class FontExtensions
+	{
+		public static Vector2 MeasureTextLine(this IFont font, string text, float fontHeight, float letterSpacing)
+		{
+			return MeasureTextLine(font, text, fontHeight, 0, text.Length, letterSpacing);
+		}
+
+		public static Vector2 MeasureTextLine(this IFont font, string text, float fontHeight, int start, int length, float letterSpacing)
+		{
+			FontChar prevChar = null;
+			var size = new Vector2(0, fontHeight);
+			float width = 0;
+			// float scale = fontHeight / font.CharHeight;
+			for (int i = 0; i < length; i++) {
+				char ch = text[i + start];
+				if (ch == '\n') {
+					size.Y += fontHeight;
+					width = 0;
+					prevChar = null;
+					continue;
+				}
+				var fontChar = font.Chars.Get(ch, fontHeight);
+				if (fontChar == FontChar.Null) {
+					continue;
+				}
+				float scale = fontChar.Height != 0.0f ? fontHeight / fontChar.Height : 0.0f;
+				width += scale * (fontChar.ACWidths.X + fontChar.Kerning(prevChar));
+				width += scale * (fontChar.Width + fontChar.ACWidths.Y);
+				width += scale * letterSpacing;
+				size.X = Math.Max(size.X, width);
+				prevChar = fontChar;
+			}
+			return size;
+		}
+	}
+
 	public class FontCharCollection : IFontCharSource, ICollection<FontChar>
 	{
 		private readonly CharMap charMap = new CharMap();

@@ -108,7 +108,7 @@ namespace Tangerine.UI.Timeline
 			if (!string.IsNullOrWhiteSpace(marker.Id)) {
 				var h = Theme.Metrics.TextHeight;
 				var padding = new Thickness { Left = 3.0f, Right = 5.0f, Top = 1.0f, Bottom = 1.0f };
-				var extent = Renderer.MeasureTextLine(FontPool.Instance.DefaultFont, marker.Id, h, 0.0f);
+				var extent = FontPool.Instance.DefaultFont.MeasureTextLine(marker.Id, h, 0.0f);
 				var pos = new Vector2(r.A.X, r.A.Y - extent.Y - padding.Top - padding.Bottom);
 				Renderer.DrawRect(pos, pos + extent + padding.LeftTop + padding.RightBottom, Theme.Colors.WhiteBackground);
 				Renderer.DrawRectOutline(pos, pos + extent + padding.LeftTop + padding.RightBottom, Theme.Colors.ControlBorder);
