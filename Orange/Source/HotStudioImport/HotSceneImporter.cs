@@ -982,18 +982,24 @@ namespace Orange
 
 		private void ParseLinearLayoutProperty(Node node, string name)
 		{
-			var layout = (LinearLayout)node;
+			bool horizontal = false;
+			bool processHidden = false;
 			switch (name) {
 				case "Horizontal":
-					layout.Horizontal = lexer.ParseBool();
+					horizontal = lexer.ParseBool();
 					break;
 				case "ProcessHidden":
-					layout.ProcessHidden = lexer.ParseBool();
+					processHidden = lexer.ParseBool();
 					break;
 				default:
 					ParseActorProperty(node, name);
 					break;
 			}
+			node.Components.Add(new LayoutComponent {
+				Layout = horizontal
+					? (ILayout)new HBoxLayout { IgnoreHidden = !processHidden }
+					: new VBoxLayout { IgnoreHidden = !processHidden },
+			});
 		}
 
 		private void ParseModelViewProperty(Node node, string name)

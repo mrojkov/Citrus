@@ -187,7 +187,6 @@ namespace Orange
 				{ typeof(RichText), new NodeWriter { ActorClass = "Hot::RichText", Writer = n => WriteRichTextProperties((RichText)n) } },
 				{ typeof(TextStyle), new NodeWriter { ActorClass = "Hot::TextStyle", Writer = n => WriteTextStyleProperties((TextStyle)n) } },
 				{ typeof(NineGrid), new NodeWriter { ActorClass = "Hot::NineGrid", Writer = n => WriteNineGridProperties((NineGrid)n) } },
-				{ typeof(LinearLayout), new NodeWriter { ActorClass = "LinearLayout", Writer = n => WriteLinearLayoutProperties((LinearLayout)n) } },
 				{ typeof(FolderBegin), new NodeWriter { ActorClass = "Hot::FolderBegin", Writer = n => WriteFolderBeginProperties((FolderBegin)n) } },
 				{ typeof(FolderEnd), new NodeWriter { ActorClass = "Hot::FolderEnd", Writer = n => WriteNodeProperties(n) } },
 				{ typeof(Bone), new NodeWriter { ActorClass = "Hot::Bone", Writer = n => WriteBoneProperties((Bone)n) } },
@@ -712,13 +711,6 @@ namespace Orange
 			WriteProperty("TopOffset", node.TopOffset, 0f);
 			WriteProperty("RightOffset", node.RightOffset, 0f);
 			WriteProperty("BottomOffset", node.BottomOffset, 0f);
-		}
-
-		void WriteLinearLayoutProperties(LinearLayout node)
-		{
-			WriteNodeProperties(node);
-			WriteProperty("Horizontal", node.Horizontal, false);
-			WriteProperty("ProcessHidden", node.ProcessHidden, false);
 		}
 
 		void WriteFolderBeginProperties(FolderBegin node)

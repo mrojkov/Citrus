@@ -69,7 +69,6 @@
   <ItemGroup>
     <Compile Include="Source\Types\Matrix44.cs" />
     <Compile Include="Source\Graphics\OpacityMask.cs" />
-    <Compile Include="Source\Widgets\LinearLayout.cs" />
     <Compile Include="Source\Application\OpenTK.Xamarin.iOS\Factory.iPhone.cs" />
     <Compile Include="Source\Application\OpenTK.Xamarin.iOS\GraphicsContext.cs" />
     <Compile Include="Source\Application\OpenTK.Xamarin.iOS\Utilities.iPhone.cs" />
