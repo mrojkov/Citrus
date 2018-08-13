@@ -13,6 +13,7 @@ namespace Tangerine.UI.Timeline.Processors
 		{
 			public TiedBoneIndication() : base(NodeIconPool.GetTexture(typeof(Bone)), clickable: true)
 			{
+				Tip = "Tied to Bone(s)";
 			}
 		}
 
@@ -53,6 +54,7 @@ namespace Tangerine.UI.Timeline.Processors
 						foreach (var nodeView in ties[bone]) {
 							var node = nodeView.NodeData.Node;
 							indication.AddTiedNode(node);
+							indication.Tip = "Tied to Node(s)";
 							sb.Append(node.Id).Append(", ");
 						}
 						view.Label.Text = sb.Remove(sb.Length - 2, 2).ToString();

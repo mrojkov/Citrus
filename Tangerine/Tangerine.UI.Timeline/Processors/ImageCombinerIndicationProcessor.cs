@@ -11,7 +11,17 @@ namespace Tangerine.UI.Timeline.Processors
 		{
 			public ImageCombinerTieIndication() : base(NodeIconPool.GetTexture(typeof(ImageCombiner)))
 			{
+				Tip = "Tied to ImageCombiner";
 			}
+
+			private void SetTipAndTexture(string tip, ITexture texture)
+			{
+				Tip = tip;
+				Texture = texture;
+			}
+
+			public void ShowNormal(string tip = "Has tied arguments") => SetTipAndTexture(tip, NodeIconPool.GetTexture(typeof(ImageCombiner)));
+			public void ShowError(string tip = "No tied arguments") => SetTipAndTexture(tip, IconPool.GetTexture("Timeline.NoEntry"));
 		}
 
 		public override void Process(IOperation op)
@@ -26,14 +36,14 @@ namespace Tangerine.UI.Timeline.Processors
 				if (row.Components.Get<NodeRow>()?.Node is ImageCombiner combiner) {
 					if (combiner.GetArgs(out IImageCombinerArg arg1, out IImageCombinerArg arg2)) {
 						view.Label.Color = Theme.Colors.BlackText;
-						view.TieIndicationContainer.EnableIndication<ImageCombinerTieIndication>().Texture = NodeIconPool.GetTexture(typeof(ImageCombiner));
+						view.TieIndicationContainer.EnableIndication<ImageCombinerTieIndication>().ShowNormal();
 						SetImageCombinerIndication(rows[i + 1]);
 						SetImageCombinerIndication(rows[i + 2]);
 						i += 2;
 					}
 					else {
 						view.Label.Color = Theme.Colors.RedText;
-						view.TieIndicationContainer.EnableIndication<ImageCombinerTieIndication>().Texture = IconPool.GetTexture("Timeline.NoEntry");
+						view.TieIndicationContainer.EnableIndication<ImageCombinerTieIndication>().ShowError();
 					}
 					continue;
 				}

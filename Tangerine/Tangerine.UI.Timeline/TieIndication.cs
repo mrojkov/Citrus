@@ -51,17 +51,17 @@ namespace Tangerine.UI.Timeline
 			AddNode(container);
 		}
 
-		public TieIndication Get<TTieIndication>() where TTieIndication : TieIndication, new()
+		public TTieIndication Get<TTieIndication>() where TTieIndication : TieIndication, new()
 		{
 			return Components.Get<TieIndicationComponent<TTieIndication>>()?.TieIndication;
 		}
 
-		public TieIndication GetOrAdd<TTieIndication>() where TTieIndication : TieIndication, new()
+		public TTieIndication GetOrAdd<TTieIndication>() where TTieIndication : TieIndication, new()
 		{
 			return Components.GetOrAdd<TieIndicationComponent<TTieIndication>>().TieIndication;
 		}
 
-		public TieIndication EnableIndication<TTieIndication>() where TTieIndication : TieIndication, new()
+		public TTieIndication EnableIndication<TTieIndication>() where TTieIndication : TieIndication, new()
 		{
 			var indication = GetOrAdd<TTieIndication>();
 			if (indication.Parent == null) {
@@ -97,7 +97,7 @@ namespace Tangerine.UI.Timeline
 				isSameParent &= node.Parent == parent;
 			}
 			if (nodes.Count() > 0) {
-				if (isSameParent) {
+				if (isSameParent && nodes.Count() > 1) {
 					menu.Add(Command.MenuSeparator);
 					menu.Add(new Command("Show All", new ShowTiedNodes(nodes.ToArray()).Execute));
 				}
