@@ -28,12 +28,57 @@ namespace Tangerine.UI
 					LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0),
 					ForceUncutText = false,
 					MinWidth = 120,
-					OverflowMode = TextOverflowMode.Minify,
 					HitTestTarget = true,
 					TabTravesable = new TabTraversable()
 				};
 				PropertyLabel.Tasks.Add(ManageLabelTask());
+				ContainerWidget.Tasks.Add(ShowTipOnMouseOverTask());
 				ContainerWidget.AddNode(PropertyLabel);
+			}
+		}
+
+		private IEnumerator<object> ShowTipOnMouseOverTask()
+		{
+			while (true) {
+				yield return null;
+				if (PropertyLabel.IsMouseOver() && PropertyLabel.Text != null) {
+					var showTip = true;
+					for (float t = 0; t < 0.5f; t += Task.Current.Delta) {
+						if (!PropertyLabel.IsMouseOver()) {
+							showTip = false;
+							break;
+						}
+						yield return null;
+					}
+					if (showTip) {
+						WidgetContext.Current.Root.Tasks.Add(ShowTipTask());
+					}
+				}
+			}
+		}
+
+		private IEnumerator<object> ShowTipTask()
+		{
+			var window = WidgetContext.Current.Root;
+			var tip = new Widget {
+				Position = PropertyLabel.CalcPositionInSpaceOf(window) +
+					new Vector2(PropertyLabel.Width * 0.66f, PropertyLabel.Height),
+				Size = Vector2.Zero,
+				LayoutCell = new LayoutCell { Ignore = true },
+				Layout = new StackLayout(),
+				Nodes = {
+					new ThemedSimpleText { Text = PropertyLabel.Text, Padding = new Thickness(4) },
+					new ThemedFrame()
+				}
+			};
+			tip.Updated += _ => tip.Size = tip.EffectiveMinSize;
+			window.PushNode(tip);
+			try {
+				while (PropertyLabel.IsMouseOver()) {
+					yield return null;
+				}
+			} finally {
+				tip.Unlink();
 			}
 		}
 
