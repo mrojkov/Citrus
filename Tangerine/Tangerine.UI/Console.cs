@@ -71,6 +71,7 @@ namespace Tangerine.UI
 					textView.SetFocus();
 				}
 				if (textView.Input.WasKeyPressed(Key.Mouse1)) {
+					textView.SetFocus();
 					menu.Popup();
 				}
 				if (textView.IsFocused() && Command.Copy.WasIssued()) {
