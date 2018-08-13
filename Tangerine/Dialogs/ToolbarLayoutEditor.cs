@@ -1,4 +1,6 @@
 using Lime;
+using System;
+using System.Linq;
 using Tangerine.UI;
 using Tangerine.UI.Docking;
 
@@ -9,8 +11,7 @@ namespace Tangerine.Dialogs
 		private ToolbarLayout toolbarLayout = AppUserPreferences.Instance.ToolbarLayout;
 		private ListBox availableCommands;
 		private ListBox usedCommands;
-		private ThemedDropDownList panelList;
-		private ThemedEditBox editBox;
+		private ListBox panelList;
 
 		public ToolbarLayoutEditor()
 		{
@@ -22,20 +23,30 @@ namespace Tangerine.Dialogs
 		private void Initialize()
 		{
 			Nodes.Clear();
-			availableCommands = new ListBox();
-			usedCommands = new ListBox();
-			panelList = new ThemedDropDownList();
-			editBox = new ThemedEditBox();
+			availableCommands = CreateListBox();
+			usedCommands = CreateListBox();
+			panelList = CreateListBox();
 			CreatePanelControls();
 			var widget = new Widget {
 				Layout = new HBoxLayout()
 			};
 			AddNode(widget);
 			widget.AddNode(AddLabel(availableCommands, "Available commands:"));
+			widget.AddNode(CreateCommandControls());
 			widget.AddNode(AddLabel(usedCommands, "Used commands:"));
 			RefreshAvailableCommands();
 			RefreshUsedCommands();
-			CreateCommandControls();
+		}
+
+		private ListBox CreateListBox()
+		{
+			var result = new ListBox();
+			result.Content.Padding = new Thickness(6);
+			result.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(w => {
+				w.PrepareRendererState();
+				Renderer.DrawRectOutline(0, 0, w.Width, w.Height, Theme.Colors.ControlBorder);
+			}));
+			return result;
 		}
 
 		private static Widget AddLabel(Widget widget, string label)
@@ -49,64 +60,64 @@ namespace Tangerine.Dialogs
 			};
 		}
 
+		private ToolbarButton CreateButton(string textureid, string tip, Action clicked)
+		{
+			var result = new ToolbarButton {
+				Texture = IconPool.GetTexture(textureid),
+				Tip = tip
+			};
+			result.Clicked += clicked;
+			return result;
+		}
+
 		private void CreatePanelControls()
 		{
-			panelList.Index = 0;
 			panelList.LayoutCell = new LayoutCell {
 				Alignment = Alignment.Center,
 			};
-			panelList.Changed += e => {
+			panelList.Changed += () => {
 				RefreshUsedCommands();
-				editBox.Text = panelList.Items[panelList.Index].Text;
+				availableCommands.ScrollPosition = availableCommands.MinScrollPosition;
+				usedCommands.ScrollPosition = usedCommands.MinScrollPosition;
+				foreach (var item in panelList.Items.Cast<ListBox.ListBoxItem>()) {
+					((PanelRow)item.Widget).StopEdit();
+				}
 			};
 			foreach (var panel in toolbarLayout.GetAllPanels()) {
-				panelList.Items.Add(new CommonDropDownList.Item(panel.Title, panel));
+				var panelRow = new PanelRow(panel);
+				var item = panelList.AddItem(panelRow);
+				item.DoubleClicked += () => panelRow.StartEdit();
 			}
-			AddNode(panelList);
-			var btnAdd = new ThemedButton("Add panel");
-			btnAdd.Clicked += () => AddPanel(isSeparator: false);
-			var btnRem = new ThemedButton("Remove panel");
-			btnRem.Clicked += RemovePanel;
-			var btnUp = new ThemedButton("Move panel up") {
-				MinMaxWidth = 100f
-			};
-			btnUp.Clicked += () => MovePanel(-1);
-			var btnDown = new ThemedButton("Move panel down") {
-				MinMaxWidth = 100f
-			};
-			btnDown.Clicked += () => MovePanel(1);
-			var btnAddSep = new ThemedButton("Add separator") {
-				MinMaxWidth = 100f
-			};
-			btnAddSep.Clicked += () => AddPanel(isSeparator: true);
-			editBox.Submitted += e => {
-				var panel = panelList.Items[panelList.Index];
-				((ToolbarLayout.ToolbarPanel)panel.Value).Title = e;
-				panel.Text = e;
-				panelList.TextWidget.Text = e;
-			};
-			editBox.Text = panelList.Items[panelList.Index].Text;
-			AddNode(editBox);
+			panelList.SelectedIndex = 0;
 			AddNode(new Widget {
-				Layout = new HBoxLayout { Spacing = 10 },
+				Layout = new HBoxLayout { Spacing = 5 },
+				LayoutCell = new LayoutCell { StretchY = 0 },
 				Nodes = {
-					btnAdd,
-					btnRem,
-					btnUp,
-					btnDown,
-					btnAddSep
+					new Widget {
+						Layout = new VBoxLayout(),
+						Nodes = {
+							CreateButton("Preferences.AddPanel", "Add panel", () => AddPanel(isSeparator: false)),
+							CreateButton("Preferences.RemovePanel", "Remove panel", RemovePanel),
+							CreateButton("Preferences.MoveUp", "Move panel up", () => MovePanel(-1)),
+							CreateButton("Preferences.MoveDown", "Move panel down", () => MovePanel(1)),
+							CreateButton("Preferences.AddRow", "Add row", () => AddPanel(isSeparator: true)),
+						}
+					},
+					panelList
 				}
 			});
 		}
 
 		private void AddPanel(bool isSeparator)
 		{
-			int index = panelList.Index;
+			int index = panelList.SelectedIndex;
 			var panel = new ToolbarLayout.ToolbarPanel(!isSeparator) {
 				Title = isSeparator ? "Separator" : "Panel",
 				IsSeparator = isSeparator
 			};
-			panelList.Items.Insert(index, new CommonDropDownList.Item(panel.Title, panel));
+			var panelRow = new PanelRow(panel);
+			panelList.SelectedItem = panelList.InsertItem(index, panelRow);
+			panelList.SelectedItem.DoubleClicked += () => panelRow.StartEdit();
 			if (index > toolbarLayout.CreatePanelIndex) {
 				index -= 1;
 			} else {
@@ -119,17 +130,16 @@ namespace Tangerine.Dialogs
 			toolbarLayout.Panels.Insert(index, panel);
 			RefreshAvailableCommands();
 			RefreshUsedCommands();
-			editBox.Text = panel.Title;
 			toolbarLayout.Rebuild(DockManager.Instance.ToolbarArea);
 		}
 
 		private void RemovePanel()
 		{
-			var panel = (ToolbarLayout.ToolbarPanel)panelList.Items[panelList.Index].Value;
+			var panel = ((PanelRow)panelList.SelectedItem.Widget).Panel;
 			if (panel == toolbarLayout.CreateToolbarPanel) {
 				return;
 			}
-			int index = panelList.Index;
+			int index = panelList.SelectedIndex;
 			if (index > toolbarLayout.CreatePanelIndex) {
 				index -= 1;
 			}
@@ -140,19 +150,19 @@ namespace Tangerine.Dialogs
 				toolbarLayout.Panels[i].Index -= 1;
 			}
 			toolbarLayout.Panels.RemoveAt(index);
-			panelList.Items.RemoveAt(panelList.Index);
-			if (panelList.Index == panelList.Items.Count) {
-				panelList.Index -= 1;
+			panelList.SelectedItem.Unlink();
+			if (index > toolbarLayout.CreatePanelIndex) {
+				index += 1;
 			}
+			panelList.SelectedIndex = index == panelList.Items.Count ? index - 1 : index;
 			RefreshAvailableCommands();
 			RefreshUsedCommands();
-			editBox.Text = panelList.Items[panelList.Index].Text;
 			toolbarLayout.Rebuild(DockManager.Instance.ToolbarArea);
 		}
 
 		private void RefreshAvailableCommands()
 		{
-			var panel = (ToolbarLayout.ToolbarPanel)panelList.Items[panelList.Index].Value;
+			var panel = ((PanelRow)panelList.SelectedItem.Widget).Panel;
 			availableCommands.Items.Clear();
 			for (int i = 0; i < ToolbarCommandRegister.RegisteredCommands.Count; ++i) {
 				var command = ToolbarCommandRegister.RegisteredCommands[i];
@@ -165,7 +175,7 @@ namespace Tangerine.Dialogs
 
 		private void RefreshUsedCommands()
 		{
-			var panel = (ToolbarLayout.ToolbarPanel)panelList.Items[panelList.Index].Value;
+			var panel = ((PanelRow)panelList.SelectedItem.Widget).Panel;
 			usedCommands.Items.Clear();
 			if (!panel.Editable) {
 				return;
@@ -183,36 +193,22 @@ namespace Tangerine.Dialogs
 			toolbarLayout.Rebuild(DockManager.Instance.ToolbarArea);
 		}
 
-		private void CreateCommandControls()
+		private Widget CreateCommandControls()
 		{
-			var addCmd = new ThemedButton("Add command") {
-				MinMaxWidth = 100f
-			};
-			addCmd.Clicked += AddCommand;
-			var remCmd = new ThemedButton("Remove command") {
-				MinMaxWidth = 100f
-			};
-			remCmd.Clicked += RemoveCommand;
-			var moveCmdUp = new ThemedButton("Move command up") {
-				MinMaxWidth = 130f
-			};
-			moveCmdUp.Clicked += () => MoveCommand(-1);
-			var moveCmdDown = new ThemedButton("Move command down") {
-				MinMaxWidth = 130f
-			};
-			moveCmdDown.Clicked += () => MoveCommand(1);
-			AddNode(new Widget {
-				Layout = new HBoxLayout { Spacing = 10 },
+			return new Widget {
+				Layout = new VBoxLayout { Spacing = 5 },
+				LayoutCell = new LayoutCell(Alignment.Center),
+				Padding = new Thickness(5),
 				Nodes = {
-					addCmd,
-					remCmd,
-					moveCmdUp,
-					moveCmdDown
+					CreateButton("Preferences.MoveUp", "Move command up", () => MoveCommand(-1)),
+					CreateButton("Preferences.MoveRight", "Add command", AddCommand),
+					CreateButton("Preferences.MoveLeft", "Remove command", RemoveCommand),
+					CreateButton("Preferences.MoveDown", "Move command down", () => MoveCommand(1))
 				}
-			});
+			};
 		}
 
-		private int GetSelectedPanelIndex(ListBox listBox)
+		private int GetSelectedCommandIndex(ListBox listBox)
 		{
 			var item = listBox.SelectedItem;
 			if (item != null && item.Parent != null) {
@@ -223,18 +219,18 @@ namespace Tangerine.Dialogs
 
 		private void AddCommand()
 		{
-			var panel = (ToolbarLayout.ToolbarPanel)panelList.Items[panelList.Index].Value;
+			var panel = ((PanelRow)panelList.SelectedItem.Widget).Panel;
 			if (!panel.Editable) {
 				return;
 			}
-			int leftPanelIndex = GetSelectedPanelIndex(availableCommands);
+			int leftPanelIndex = GetSelectedCommandIndex(availableCommands);
 			if (leftPanelIndex < 0) {
 				if (availableCommands.Items.Count == 0) {
 					return;
 				}
 				leftPanelIndex = 0;
 			}
-			int rightPanelIndex = GetSelectedPanelIndex(usedCommands);
+			int rightPanelIndex = GetSelectedCommandIndex(usedCommands);
 			rightPanelIndex = rightPanelIndex < 0 ? 0 : rightPanelIndex;
 			var leftItem = (ListBox.ListBoxItem)availableCommands.Items[leftPanelIndex];
 			var leftPanel = (CommandRow)leftItem.Widget;
@@ -247,11 +243,11 @@ namespace Tangerine.Dialogs
 
 		private void RemoveCommand()
 		{
-			var panel = (ToolbarLayout.ToolbarPanel)panelList.Items[panelList.Index].Value;
+			var panel = ((PanelRow)panelList.SelectedItem.Widget).Panel;
 			if (!panel.Editable) {
 				return;
 			}
-			int index = GetSelectedPanelIndex(usedCommands);
+			int index = GetSelectedCommandIndex(usedCommands);
 			if (index < 0) {
 				if (usedCommands.Items.Count == 0) {
 					return;
@@ -266,7 +262,7 @@ namespace Tangerine.Dialogs
 
 		private void MoveCommand(int dir)
 		{
-			var index = GetSelectedPanelIndex(usedCommands);
+			var index = GetSelectedCommandIndex(usedCommands);
 			if (index < 0) {
 				return;
 			}
@@ -274,7 +270,7 @@ namespace Tangerine.Dialogs
 			if (newIndex < 0 || newIndex >= usedCommands.Items.Count) {
 				return;
 			}
-			var panel = (ToolbarLayout.ToolbarPanel)panelList.Items[panelList.Index].Value;
+			var panel = ((PanelRow)panelList.SelectedItem.Widget).Panel;
 			var tmp = panel.CommandIndexes[index];
 			panel.CommandIndexes[index] = panel.CommandIndexes[newIndex];
 			panel.CommandIndexes[newIndex] = tmp;
@@ -294,20 +290,65 @@ namespace Tangerine.Dialogs
 
 		private void MovePanel(int dir)
 		{
-			int index = panelList.Index;
+			int index = panelList.Items.IndexOf(panelList.SelectedItem);
 			int newIndex = index + dir;
 			if (newIndex < 0 || newIndex >= panelList.Items.Count) {
 				return;
 			}
-			var panel1 = panelList.Items[index];
-			var panel2 = panelList.Items[newIndex];
-			((ToolbarLayout.ToolbarPanel)panel1.Value).Index = newIndex;
-			((ToolbarLayout.ToolbarPanel)panel2.Value).Index = index;
-			panelList.Items[index] = panel2;
-			panelList.Items[newIndex] = panel1;
-			panelList.Index = newIndex;
+			var panelRow1 = (PanelRow)((ListBox.ListBoxItem)panelList.Items[index]).Widget;
+			var panelRow2 = (PanelRow)((ListBox.ListBoxItem)panelList.Items[newIndex]).Widget;
+			var panel1 = panelRow1.Panel;
+			var panel2 = panelRow2.Panel;
+			panel1.Index = newIndex;
+			panel2.Index = index;
+			panelRow1.Panel = panel2;
+			panelRow2.Panel = panel1;
+			panelRow1.RefreshTitle();
+			panelRow2.RefreshTitle();
+			panelList.SelectedItem = (ListBox.ListBoxItem)panelList.Items[newIndex];
 			toolbarLayout.SortPanels();
 			toolbarLayout.Rebuild(DockManager.Instance.ToolbarArea);
+		}
+
+		private class PanelRow : Widget
+		{
+			public ToolbarLayout.ToolbarPanel Panel { get; set; }
+			private readonly ThemedSimpleText title = new ThemedSimpleText();
+			private readonly ThemedEditBox editBox = new ThemedEditBox();
+
+			public PanelRow(ToolbarLayout.ToolbarPanel panel)
+			{
+				Panel = panel;
+				Layout = new StackLayout();
+				Padding = new Thickness(5);
+				AddNode(title);
+				editBox.Submitted += s => StopEdit();
+				RefreshTitle();
+			}
+
+			public void StartEdit()
+			{
+				if (title.Parent != null) {
+					title.Unlink();
+					editBox.Text = Panel.Title;
+					AddNode(editBox);
+				}
+			}
+
+			public void StopEdit()
+			{
+				if (title.Parent == null) {
+					Panel.Title = editBox.Text;
+					RefreshTitle();
+					editBox.Unlink();
+					AddNode(title);
+				}
+			}
+
+			public void RefreshTitle()
+			{
+				title.Text = Panel.Title;
+			}
 		}
 
 		private class CommandRow : Widget
@@ -318,9 +359,10 @@ namespace Tangerine.Dialogs
 			{
 				Command = command;
 				Layout = new HBoxLayout { Spacing = 10 };
+				Padding = new Thickness(5);
 				AddNode(new Image {
 					Texture = command.Icon,
-					MinMaxSize = new Vector2(21, 21),
+					MinMaxSize = new Vector2(16),
 				});
 				AddNode(new ThemedSimpleText {
 					Text = command.Text,
@@ -332,28 +374,53 @@ namespace Tangerine.Dialogs
 
 		private class ListBox : ThemedScrollView
 		{
-			public ListBoxItem SelectedItem { get; private set; } = null;
+			private ListBoxItem selectedItem = null;
+			public ListBoxItem SelectedItem
+			{
+				get => selectedItem;
+				set {
+					if (value.parent != this) {
+						throw new ArgumentException();
+					}
+					selectedItem = value;
+				}
+			}
+
+			public int SelectedIndex
+			{
+				get => Items.IndexOf(selectedItem);
+				set => selectedItem = (ListBoxItem)Items[value];
+			}
+
 			public NodeList Items => Content.Nodes;
+
+			public event Action Changed;
 
 			public ListBox()
 			{
 				Content.Layout = new VBoxLayout { Spacing = 4 };
 			}
 
-			public void AddItem(Widget widget)
+			public ListBoxItem AddItem(Widget widget)
 			{
-				Items.Add(new ListBoxItem(widget, this));
+				var item = new ListBoxItem(widget, this);
+				Items.Add(item);
+				return item;
 			}
 
-			public void InsertItem(int index, Widget widget)
+			public ListBoxItem InsertItem(int index, Widget widget)
 			{
-				Items.Insert(index, new ListBoxItem(widget, this));
+				var item = new ListBoxItem(widget, this);
+				Items.Insert(index, item);
+				return item;
 			}
 
 			public class ListBoxItem : Widget
 			{
-				private readonly ListBox parent;
+				internal readonly ListBox parent;
 				public Widget Widget { get; private set; }
+
+				public event Action DoubleClicked;
 
 				public ListBoxItem(Widget widget, ListBox parent)
 				{
@@ -365,7 +432,9 @@ namespace Tangerine.Dialogs
 					AddNode(new Widget());
 					Clicked += () => {
 						parent.SelectedItem = this;
+						parent.Changed?.Invoke();
 					};
+					Gestures.Add(new DoubleClickGesture(() => DoubleClicked?.Invoke()));
 				}
 
 				public override void Render()
