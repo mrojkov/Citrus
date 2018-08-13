@@ -1,25 +1,46 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Tangerine.Core.ExpressionParser;
 
 namespace Tangerine.Core.ExpressionParser
 {
 	public static class Parser
 	{
-		private static readonly Dictionary<TokenType, int> Precendence = new Dictionary<TokenType, int> {
-			{ TokenType.Add, 1 },
-			{ TokenType.Substract, 1 },
-			{ TokenType.Multiply, 2 },
-			{ TokenType.Divide, 2 },
+		private enum Operator
+		{
+			Add, Substract, Multiply, Divide, Negate, LParenthesis
+		}
+
+		private static readonly Dictionary<TokenType, Operator> BinaryOperators = new Dictionary<TokenType, Operator> {
+			{ TokenType.Add, Operator.Add },
+			{ TokenType.Substract, Operator.Substract },
+			{ TokenType.Multiply, Operator.Multiply },
+			{ TokenType.Divide, Operator.Divide },
 		};
 
-		public static double ParseAndCompute(string input)
+		private static readonly Dictionary<Operator, int> Precendence = new Dictionary<Operator, int> {
+			{ Operator.Add, 1 },
+			{ Operator.Substract, 1 },
+			{ Operator.Multiply, 2 },
+			{ Operator.Divide, 2 },
+			{ Operator.Negate, 4 }
+		};
+
+		public static bool TryParse(string input, out double output)
+		{
+			try {
+				output = Parse(input);
+				return true;
+			} catch {
+				output = default;
+				return false;
+			}
+		}
+
+		public static double Parse(string input)
 		{
 			var output = new Stack<double>();
-			var operators = new Stack<TokenType>();
+			var operators = new Stack<Operator>();
+			TokenType? prev = null;
 			foreach (var token in Tokenizer.Tokenize(input)) {
 				if (token == null) {
 					throw new Exception("Expression syntax error");
@@ -29,44 +50,41 @@ namespace Tangerine.Core.ExpressionParser
 						output.Push(token.Value);
 						break;
 					case TokenType.LParenthesis:
-						operators.Push(TokenType.LParenthesis);
+						operators.Push(Operator.LParenthesis);
 						break;
 					case TokenType.RParenthesis:
-						while (operators.Peek() != TokenType.LParenthesis) {
-							var op = operators.Pop();
-							double right = output.Pop();
-							double left = output.Pop();
-							output.Push(Execute(op, left, right));
+						while (operators.Peek() != Operator.LParenthesis) {
+							ExecuteFirst(output, operators);
 						}
 						operators.Pop();
 						break;
 					case TokenType.Add:
 					case TokenType.Substract:
+						if (prev == TokenType.Number || prev == TokenType.RParenthesis) {
+							goto case TokenType.Divide;
+						}
+						if (token.Type == TokenType.Substract) {
+							operators.Push(Operator.Negate);
+						}
+						break;
 					case TokenType.Divide:
 					case TokenType.Multiply:
-						int precendence = Precendence[token.Type];
+						var oper = BinaryOperators[token.Type];
+						int precendence = Precendence[oper];
 						while (
 							operators.Count > 0 &&
-							operators.Peek() != TokenType.LParenthesis &&
+							operators.Peek() != Operator.LParenthesis &&
 							precendence <= Precendence[operators.Peek()]
 						) {
-							var op = operators.Pop();
-							double right = output.Pop();
-							double left = output.Pop();
-							output.Push(Execute(op, left, right));
+							ExecuteFirst(output, operators);
 						}
-						operators.Push(token.Type);
+						operators.Push(oper);
 						break;
 				}
+				prev = token.Type;
 			}
 			while (operators.Count > 0) {
-				var op = operators.Pop();
-				if (op == TokenType.LParenthesis) {
-					throw new Exception("Expression syntax error");
-				}
-				double right = output.Pop();
-				double left = output.Pop();
-				output.Push(Execute(op, left, right));
+				ExecuteFirst(output, operators);
 			}
 			if (output.Count != 1) {
 				throw new Exception("Expression syntax error");
@@ -74,16 +92,28 @@ namespace Tangerine.Core.ExpressionParser
 			return output.Pop();
 		}
 
-		private static double Execute(TokenType operation, double left, double right)
+		private static void ExecuteFirst(Stack<double> output, Stack<Operator> operators)
+		{
+			var op = operators.Pop();
+			if (op == Operator.Negate) {
+				output.Push(-output.Pop());
+				return;
+			}
+			double right = output.Pop();
+			double left = output.Pop();
+			output.Push(Execute(op, left, right));
+		}
+
+		private static double Execute(Operator operation, double left, double right)
 		{
 			switch (operation) {
-				case TokenType.Add:
+				case Operator.Add:
 					return left + right;
-				case TokenType.Substract:
+				case Operator.Substract:
 					return left - right;
-				case TokenType.Multiply:
+				case Operator.Multiply:
 					return left * right;
-				case TokenType.Divide:
+				case Operator.Divide:
 					return left / right;
 				default:
 					throw new Exception("Expression syntax error");
