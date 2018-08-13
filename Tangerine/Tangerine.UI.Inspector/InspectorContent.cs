@@ -15,7 +15,7 @@ namespace Tangerine.UI.Inspector
 	{
 		private readonly List<IPropertyEditor> editors;
 		private readonly Widget widget;
-		private int row;
+		private int row = 1;
 
 		public InspectorContent(Widget widget)
 		{
@@ -57,7 +57,7 @@ namespace Tangerine.UI.Inspector
 
 		private void Clear()
 		{
-			row = 0;
+			row = 1;
 			widget.Nodes.Clear();
 			editors.Clear();
 		}
