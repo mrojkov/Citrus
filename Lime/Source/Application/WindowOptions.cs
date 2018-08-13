@@ -33,6 +33,7 @@ namespace Lime
 
 		// System.Drawing.Icon on Windows
 		public object Icon;
+		public bool ToolWindow = false;
 	}
 }
 

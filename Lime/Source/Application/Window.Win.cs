@@ -264,7 +264,11 @@ namespace Lime
 				// ES20 doesn't allow multiple contexts for now, because of a bug in OpenTK
 				throw new Lime.Exception("Attempt to create a second window for ES20 rendering backend. Use OpenGL backend instead.");
 			}
-			form = new Form();
+			if (options.ToolWindow) {
+				form = new ToolForm();
+			} else {
+				form = new Form();
+			}
 			Input  = new WindowInput(this);
 			using (var graphics = form.CreateGraphics()) {
 				PixelScale = CalcPixelScale(graphics.DpiX);
@@ -930,6 +934,23 @@ namespace Lime
 		{
 			p = (p * pixelScale);
 			return new System.Drawing.Size(p.X.Round(), p.Y.Round());
+		}
+	}
+
+	public class ToolForm : Form
+	{
+		public ToolForm() : base()
+		{
+			this.ShowInTaskbar = false;
+		}
+
+		protected override CreateParams CreateParams
+		{
+			get {
+				CreateParams cp = base.CreateParams;
+				cp.ExStyle |= 0x80;
+				return cp;
+			}
 		}
 	}
 }
