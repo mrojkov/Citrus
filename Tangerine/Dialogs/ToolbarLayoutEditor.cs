@@ -303,8 +303,6 @@ namespace Tangerine.Dialogs
 			panel2.Index = index;
 			panelRow1.Panel = panel2;
 			panelRow2.Panel = panel1;
-			panelRow1.RefreshTitle();
-			panelRow2.RefreshTitle();
 			panelList.SelectedItem = (ListBox.ListBoxItem)panelList.Items[newIndex];
 			toolbarLayout.SortPanels();
 			toolbarLayout.Rebuild(DockManager.Instance.ToolbarArea);
@@ -312,24 +310,39 @@ namespace Tangerine.Dialogs
 
 		private class PanelRow : Widget
 		{
-			public ToolbarLayout.ToolbarPanel Panel { get; set; }
+			private ToolbarLayout.ToolbarPanel panel;
+			public ToolbarLayout.ToolbarPanel Panel
+			{
+				get => panel;
+				set {
+					panel = value;
+					StopEdit();
+					if (value.IsSeparator) {
+						title.Unlink();
+						dummy.Unlink();
+					}
+					RefreshTitle();
+				}
+			}
 			private readonly ThemedSimpleText title = new ThemedSimpleText();
 			private readonly ThemedEditBox editBox = new ThemedEditBox();
+			private readonly Widget dummy = new Widget();
 
 			public PanelRow(ToolbarLayout.ToolbarPanel panel)
 			{
+				title.Text = editBox.Text = panel.Title;
+				editBox.Submitted += s => StopEdit();
+				MinHeight = 26;
 				Panel = panel;
 				Layout = new StackLayout();
 				Padding = new Thickness(5);
-				AddNode(title);
-				editBox.Submitted += s => StopEdit();
-				RefreshTitle();
 			}
 
 			public void StartEdit()
 			{
-				if (title.Parent != null) {
+				if (title.Parent != null && !Panel.IsSeparator) {
 					title.Unlink();
+					dummy.Unlink();
 					editBox.Text = Panel.Title;
 					AddNode(editBox);
 				}
@@ -337,17 +350,27 @@ namespace Tangerine.Dialogs
 
 			public void StopEdit()
 			{
-				if (title.Parent == null) {
+				if (title.Parent == null && !Panel.IsSeparator) {
 					Panel.Title = editBox.Text;
 					RefreshTitle();
 					editBox.Unlink();
 					AddNode(title);
+					AddNode(dummy);
 				}
 			}
 
 			public void RefreshTitle()
 			{
 				title.Text = Panel.Title;
+			}
+
+			public override void Render()
+			{
+				base.Render();
+				if (Panel.IsSeparator) {
+					PrepareRendererState();
+					Renderer.DrawLine(5, Height / 2, Width - 5, Height / 2, Color4.Gray);
+				}
 			}
 		}
 
@@ -369,6 +392,7 @@ namespace Tangerine.Dialogs
 					LayoutCell = new LayoutCell(Alignment.Center),
 					Padding = new Thickness { Left = 5 }
 				});
+				AddNode(new Widget());
 			}
 		}
 
@@ -429,7 +453,6 @@ namespace Tangerine.Dialogs
 					Layout = new HBoxLayout();
 					HitTestTarget = true;
 					AddNode(widget);
-					AddNode(new Widget());
 					Clicked += () => {
 						parent.SelectedItem = this;
 						parent.Changed?.Invoke();
