@@ -272,8 +272,8 @@ namespace Tangerine.UI.FilesystemView
 	public enum PathBarButtonState
 	{
 		Normal,
-		Hovered,
-		Pressed
+		Hover,
+		Press
 	}
 
 	public class PathBarButton : Widget
@@ -295,16 +295,16 @@ namespace Tangerine.UI.FilesystemView
 
 			Updating += (float delta) => {
 				if (arrowButton.ArrowState == PathArrowButtonState.Expanded) {
-					state = PathBarButtonState.Pressed;
+					state = PathBarButtonState.Press;
 				} else { 
 					if (IsMouseOverThisOrDescendant()) {
 						if (
 							folderButton.WasClicked() ||
 							arrowButton.WasClicked()
 						) {
-							state = PathBarButtonState.Pressed;
+							state = PathBarButtonState.Press;
 						} else {
-							state = PathBarButtonState.Hovered;
+							state = PathBarButtonState.Hover;
 						}
 					} else {
 						state = PathBarButtonState.Normal;
@@ -325,17 +325,17 @@ namespace Tangerine.UI.FilesystemView
 		{
 			CommonWindow.Current.Invalidate();
 			switch (state) {
-				case PathBarButtonState.Pressed:
-					innerGradient = Theme.Colors.ButtonPress;
-					outline = new Color4(143, 179, 215);
+				case PathBarButtonState.Normal:
+					innerGradient = Theme.Colors.PathBarButtonNormal;
+					outline = Theme.Colors.PathBarButtonOutlineNormal;
 					break;
-				case PathBarButtonState.Hovered:
-					innerGradient = Theme.Colors.ButtonHover;
-					outline = new Color4(143, 179, 215);
+				case PathBarButtonState.Hover:
+					innerGradient = Theme.Colors.PathBarButtonHover;
+					outline = Theme.Colors.PathBarButtonOutlineHover;
 					break;
-				default:
-					innerGradient = new ColorGradient(new Color4(63, 63, 63));
-					outline = Color4.Transparent;
+				case PathBarButtonState.Press:
+					innerGradient = Theme.Colors.PathBarButtonPress;
+					outline = Theme.Colors.PathBarButtonOutlinePress;
 					break;
 			}
 		}
@@ -419,13 +419,13 @@ namespace Tangerine.UI.FilesystemView
 			if (path == null) {
 				Updating += (float delta) => {
 					if (ArrowState == PathArrowButtonState.Expanded) {
-						State = PathBarButtonState.Pressed;
+						State = PathBarButtonState.Press;
 					} else {
 						if (IsMouseOverThisOrDescendant()) {
 							if (WasClicked()) {
-								State = PathBarButtonState.Pressed;
+								State = PathBarButtonState.Press;
 							} else {
-								State = PathBarButtonState.Hovered;
+								State = PathBarButtonState.Hover;
 							}
 						} else {
 							State = PathBarButtonState.Normal;
@@ -516,11 +516,11 @@ namespace Tangerine.UI.FilesystemView
 			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
 			rootWidget.Presenter = new DelegatePresenter<Widget>(_ => {
 				rootWidget.PrepareRendererState();
-				Renderer.DrawRect(Vector2.Zero, Window.ClientSize, new Color4(82, 82, 82));
+				Renderer.DrawRect(Vector2.Zero, Window.ClientSize, Theme.Colors.DirectoryPickerBackground);
 			});
 			rootWidget.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(_ => {
 				rootWidget.PrepareRendererState();
-				Renderer.DrawRectOutline(Vector2.Zero, Window.ClientSize, new Color4(39, 39, 39), thickness: 2);
+				Renderer.DrawRectOutline(Vector2.Zero, Window.ClientSize, Theme.Colors.DirectoryPickerOutline, thickness: 2);
 			}));
 			Window.ClientSize = clientSize + new Vector2(rootWidget.Padding.Left * 2);
 
