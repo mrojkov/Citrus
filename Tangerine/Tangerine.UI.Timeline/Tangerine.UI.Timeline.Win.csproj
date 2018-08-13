@@ -78,6 +78,7 @@
     <Compile Include="Processors\GridPane\AnimationStretchProcessor.cs" />
     <Compile Include="Processors\GridPane\ClampScrollPosProcessor.cs" />
     <Compile Include="Processors\ImageCombinerIndicationProcessor.cs" />
+    <Compile Include="Processors\TiedSplineGearIndicationProcessor.cs" />
     <Compile Include="Processors\TiedBoneIndicationProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Processors\GridPane\DragKeyframesRespondentProcessor.cs" />
