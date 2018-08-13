@@ -60,13 +60,18 @@ namespace Tangerine.Dialogs
 			};
 		}
 
-		private ToolbarButton CreateButton(string textureid, string tip, Action clicked)
+		private ToolbarButton CreateButton(string textureid, string tip, Action clicked, params ListBox[] listBoxes)
 		{
 			var result = new ToolbarButton {
 				Texture = IconPool.GetTexture(textureid),
 				Tip = tip
 			};
-			result.Clicked += clicked;
+			result.Clicked += () => {
+				clicked();
+				foreach (var listBox in listBoxes) {
+					Application.InvokeOnNextUpdate(listBox.AdjustScrollPosition);
+				}
+			};
 			return result;
 		}
 
@@ -96,11 +101,11 @@ namespace Tangerine.Dialogs
 					new Widget {
 						Layout = new VBoxLayout(),
 						Nodes = {
-							CreateButton("Preferences.AddPanel", "Add panel", () => AddPanel(isSeparator: false)),
-							CreateButton("Preferences.RemovePanel", "Remove panel", RemovePanel),
-							CreateButton("Preferences.MoveUp", "Move panel up", () => MovePanel(-1)),
-							CreateButton("Preferences.MoveDown", "Move panel down", () => MovePanel(1)),
-							CreateButton("Preferences.AddRow", "Add row", () => AddPanel(isSeparator: true)),
+							CreateButton("Preferences.AddPanel", "Add panel", () => AddPanel(isSeparator: false), panelList),
+							CreateButton("Preferences.RemovePanel", "Remove panel", RemovePanel, panelList),
+							CreateButton("Preferences.MoveUp", "Move panel up", () => MovePanel(-1), panelList),
+							CreateButton("Preferences.MoveDown", "Move panel down", () => MovePanel(1), panelList),
+							CreateButton("Preferences.AddRow", "Add row", () => AddPanel(isSeparator: true), panelList),
 						}
 					},
 					panelList
@@ -200,10 +205,10 @@ namespace Tangerine.Dialogs
 				LayoutCell = new LayoutCell(Alignment.Center),
 				Padding = new Thickness(5),
 				Nodes = {
-					CreateButton("Preferences.MoveUp", "Move command up", () => MoveCommand(-1)),
-					CreateButton("Preferences.MoveRight", "Add command", AddCommand),
-					CreateButton("Preferences.MoveLeft", "Remove command", RemoveCommand),
-					CreateButton("Preferences.MoveDown", "Move command down", () => MoveCommand(1))
+					CreateButton("Preferences.MoveUp", "Move command up", () => MoveCommand(-1), usedCommands),
+					CreateButton("Preferences.MoveRight", "Add command", AddCommand, usedCommands, availableCommands),
+					CreateButton("Preferences.MoveLeft", "Remove command", RemoveCommand, usedCommands, availableCommands),
+					CreateButton("Preferences.MoveDown", "Move command down", () => MoveCommand(1), usedCommands)
 				}
 			};
 		}
@@ -407,6 +412,24 @@ namespace Tangerine.Dialogs
 						throw new ArgumentException();
 					}
 					selectedItem = value;
+				}
+			}
+
+			public void AdjustScrollPosition()
+			{
+				if (Items.Count == 0) {
+					ScrollPosition = MinScrollPosition;
+					return;
+				}
+				Widget widget = (Widget)Items.Last();
+				if (SelectedItem != null && SelectedItem.Parent != null) {
+					widget = SelectedItem;
+				}
+				var pos = widget.CalcPositionInSpaceOf(Content);
+				if (pos.Y < ScrollPosition) {
+					ScrollPosition = pos.Y;
+				} else if (pos.Y + widget.Height > ScrollPosition + Height) {
+					ScrollPosition = pos.Y - Height + widget.Height;
 				}
 			}
 
