@@ -1,5 +1,6 @@
 using Lime;
 using Tangerine.Core;
+using Tangerine.Core.ExpressionParser;
 
 namespace Tangerine.UI
 {
@@ -20,9 +21,8 @@ namespace Tangerine.UI
 
 		public void SetComponent(string text, IDataflowProvider<int> current)
 		{
-			int newValue;
-			if (int.TryParse(text, out newValue)) {
-				SetProperty(newValue);
+			if (Parser.TryParse(text, out double newValue)) {
+				SetProperty((int)newValue);
 			}
 			else {
 				editor.Text = current.GetValue().ToString();

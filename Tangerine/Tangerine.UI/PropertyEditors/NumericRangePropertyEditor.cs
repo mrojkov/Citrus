@@ -1,5 +1,6 @@
 using Lime;
 using Tangerine.Core;
+using Tangerine.Core.ExpressionParser;
 
 namespace Tangerine.UI
 {
@@ -26,15 +27,14 @@ namespace Tangerine.UI
 
 		void SetComponent(IPropertyEditorParams editorParams, int component, NumericEditBox editor, float currentValue)
 		{
-			float newValue;
-			if (float.TryParse(editor.Text, out newValue)) {
+			if (Parser.TryParse(editor.Text, out double newValue)) {
 				DoTransaction(() => {
 					foreach (var obj in editorParams.Objects) {
 						var current = new Property<NumericRange>(obj, editorParams.PropertyName).Value;
 						if (component == 0) {
-							current.Median = newValue;
+							current.Median = (float)newValue;
 						} else {
-							current.Dispersion = newValue;
+							current.Dispersion = (float)newValue;
 						}
 						editorParams.PropertySetter(obj, editorParams.PropertyName, current);
 					}

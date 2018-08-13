@@ -1,5 +1,6 @@
 using Lime;
 using Tangerine.Core;
+using Tangerine.Core.ExpressionParser;
 
 namespace Tangerine.UI
 {
@@ -13,8 +14,7 @@ namespace Tangerine.UI
 			ContainerWidget.AddNode(editor);
 			var current = CoalescedPropertyValue();
 			editor.Submitted += text => {
-				double newValue;
-				if (double.TryParse(text, out newValue)) {
+				if (Parser.TryParse(text, out double newValue)) {
 					SetProperty(newValue);
 				}
 
