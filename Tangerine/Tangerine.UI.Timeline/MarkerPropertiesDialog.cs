@@ -56,7 +56,6 @@ namespace Tangerine.UI.Timeline
 									new DropDownList.Item("Play", MarkerAction.Play),
 									new DropDownList.Item("Jump", MarkerAction.Jump),
 									new DropDownList.Item("Stop", MarkerAction.Stop),
-									new DropDownList.Item("Destroy", MarkerAction.Destroy),
 								},
 								Value = marker.Action
 							}),
