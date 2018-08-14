@@ -15,8 +15,6 @@ namespace Tangerine.UI
 			if (base.IsValid(path)) {
 				var resolvedPath = Node.ResolveScenePath(path);
 				if (resolvedPath == null || !AssetBundle.Current.FileExists(resolvedPath)) {
-					editor.Text = CoalescedPropertyValue().GetValue();
-					AlertDialog.Show($"{EditorParams.PropertyName}: Value is not valid");
 					return false;
 				}
 				string assetPath;

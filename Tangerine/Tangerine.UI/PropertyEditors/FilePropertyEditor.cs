@@ -28,8 +28,10 @@ namespace Tangerine.UI
 			});
 			editor.LayoutCell = new LayoutCell(Alignment.Center);
 			editor.Submitted += text => SetComponent(text);
+			bool textValid = true;
+			editor.AddChangeWatcher(() => editor.Text, text => textValid = IsValid(text));
 			editor.CompoundPostPresenter.Add(new DelegatePresenter<EditBox>(editBox => {
-				if (!Utils.CheckPathCharacters(editBox.Text)) {
+				if (!textValid) {
 					editBox.PrepareRendererState();
 					Renderer.DrawRect(Vector2.Zero, editBox.Size, Color4.Red.Transparentify(0.8f));
 				}
@@ -61,11 +63,13 @@ namespace Tangerine.UI
 		{
 			string asset, type;
 			if (Utils.ExtractAssetPathOrShowAlert(path, out asset, out type) &&
-			    Utils.AssertCurrentDocument(asset, type)) {
-				AssignAsset(AssetPath.CorrectSlashes(asset));
-			}
-			if (!Utils.CheckPathCharacters(path)) {
-				AlertDialog.Show($"Asset '{path}' path contains characters other than latin letters and digits. This may cause problems");
+			    Utils.AssertCurrentDocument(asset, type))
+			{
+				if (!IsValid(asset)) {
+					AlertDialog.Show($"Asset '{asset}' missing or path contains characters other than latin letters and digits.");
+				} else {
+					AssignAsset(AssetPath.CorrectSlashes(asset));
+				}
 			}
 		}
 
@@ -93,11 +97,19 @@ namespace Tangerine.UI
 
 		protected virtual bool IsValid(string path)
 		{
-			var invalidChars = Path.GetInvalidPathChars();
-			if (path.Any(i => invalidChars.Contains(i))) {
-				return false;
+			foreach (var c in path) {
+				if (!ValidChars.Contains(c)) {
+					return false;
+				}
 			}
 			return true;
 		}
+
+		private static readonly List<char> ValidChars =
+			Enumerable.Range(1, 128).Select(i => (char)i).
+			Where(c =>
+				char.IsLetterOrDigit(c) ||
+				c == '\\' || c == '/' ||
+				c == '_' || c == '.' || c == '!').ToList();
 	}
 }

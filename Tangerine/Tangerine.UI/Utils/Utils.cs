@@ -132,10 +132,5 @@ namespace Tangerine.UI
 			assetType = System.IO.Path.GetExtension(path).ToLower();
 			return true;
 		}
-
-		public static bool CheckPathCharacters(string filePath)
-		{
-			return Regex.IsMatch(filePath, @"^[a-zA-z0-9/\: .]*$");
-		}
 	}
 }
