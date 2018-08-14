@@ -73,6 +73,7 @@
     <Compile Include="PropertyEditors\BlendingPropertyEditor.cs" />
     <Compile Include="PropertyEditors\BooleanPropertyEditor.cs" />
     <Compile Include="PropertyEditors\Color4PropertyEditor.cs" />
+    <Compile Include="PropertyEditors\ColorGradientPropertyEditor.cs" />
     <Compile Include="PropertyEditors\CommonPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ContentsPathPropertyEditor.cs" />
     <Compile Include="PropertyEditors\DoublePropertyEditor.cs" />
