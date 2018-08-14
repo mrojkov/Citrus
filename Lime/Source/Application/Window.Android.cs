@@ -98,7 +98,7 @@ namespace Lime
 			ActivityDelegate.Instance.GameView.Resize += (sender, e) => {
 				RaiseResized(((ResizeEventArgs)e).DeviceRotated);
 			};
-			ActivityDelegate.Instance.GameView.UpdateFrame += GameView_UpdateFrame;
+			
 			PixelScale = Resources.System.DisplayMetrics.Density;
 			
 			if (AsyncRendering) {
@@ -107,41 +107,83 @@ namespace Lime
 				Application.Exited += renderThreadTokenSource.Cancel;
 				renderThread = new Thread(RenderLoop);
 				renderThread.Start();
-			} else {
-				ActivityDelegate.Instance.GameView.RenderFrame += GameView_RenderFrame;
 			}
+			
 			Application.WindowUnderMouse = this;
+			
+			var ccb = new ChoreographerCallback(skipFrameTimeout: 8 * 1000000L);
+			long prevFrameTime = Java.Lang.JavaSystem.NanoTime();
+			ccb.OnFrame += frameTimeNanos => {
+				var delta = (float)((frameTimeNanos - prevFrameTime) / 1000000000d);
+				prevFrameTime = frameTimeNanos;
+				fpsCounter.Refresh();
+				RaiseUpdating(delta);
+				if (!AsyncRendering) {
+					RaiseRendering();
+				}
+			};
+			Choreographer.Instance.PostFrameCallback(ccb);
+		}
+		
+		class ChoreographerCallback : Java.Lang.Object, Choreographer.IFrameCallback
+		{
+			private long skipFrameTimeout;
+			
+			public event Action<long> OnFrame;
+
+			public ChoreographerCallback(long skipFrameTimeout)
+			{
+				this.skipFrameTimeout = skipFrameTimeout;
+			}
+
+			public void DoFrame(long frameTimeNanos)
+			{
+				Choreographer.Instance.PostFrameCallback(this);
+				var now = Java.Lang.JavaSystem.NanoTime();
+				if (now - frameTimeNanos < skipFrameTimeout) {
+					OnFrame?.Invoke(frameTimeNanos);
+				}
+			}
 		}
 		
 		private void RenderLoop()
 		{
-			while (!renderThreadToken.IsCancellationRequested) {
-				if (ActivityDelegate.Instance.GameView.ReadyToRender) {
-					ActivityDelegate.Instance.GameView.MakeCurrentActual();
-					RaiseRendering();
-					if (ActivityDelegate.Instance.GameView.ReadyToRender) {
-						ActivityDelegate.Instance.GameView.SwapBuffers();
-					}
-				} else {
-					Thread.Sleep(16);
-				}
-			}
+			Android.OS.Looper.Prepare();
+			var ccb = new ChoreographerCallback(skipFrameTimeout: 8 * 1000000L);
+			ccb.OnFrame += RaiseRendering;
+			Choreographer.Instance.PostFrameCallback(ccb);
+			Android.OS.Looper.Loop();
+			// Alternative render loop implementation:
+			// while (!renderThreadToken.IsCancellationRequested) {
+			//	if (true) {
+			//		if (ActivityDelegate.Instance.GameView.ReadyToRender) {
+			//			ActivityDelegate.Instance.GameView.MakeCurrentActual();
+			//			RaiseRendering();
+			//			ActivityDelegate.Instance.GameView.SwapBuffers();
+			//		}
+			//	} else {
+			//		Thread.Sleep(16);
+			//	}
+			//}
 		}
-
-		private void GameView_UpdateFrame(object sender, OpenTK.FrameEventArgs e)
+		
+		private new void RaiseUpdating(float delta)
 		{
-			fpsCounter.Refresh();
-			UnclampedDelta = (float)e.Time;
-			var delta = Math.Min(UnclampedDelta, Application.MaxDelta);
-			RaiseUpdating(delta);
+			UnclampedDelta = delta;
+			delta = Math.Min(UnclampedDelta, Application.MaxDelta);
+			base.RaiseUpdating(delta);
 			AudioSystem.Update();
 			Input.CopyKeysState();
 			Input.ProcessPendingKeyEvents(delta);
 		}
-
-		private void GameView_RenderFrame(object sender, OpenTK.FrameEventArgs e)
+		
+		private void RaiseRendering(long frameTimeNanos)
 		{
-			RaiseRendering();
+			if (ActivityDelegate.Instance.GameView.ReadyToRender) {
+				ActivityDelegate.Instance.GameView.MakeCurrentActual();
+				base.RaiseRendering();
+				ActivityDelegate.Instance.GameView.SwapBuffers();
+			}
 		}
 
 		public void Center() {}

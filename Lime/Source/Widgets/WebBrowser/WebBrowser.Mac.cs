@@ -60,26 +60,27 @@ namespace Lime
 
 		private CGRect CalculateAABBInWorldSpace(Widget widget)
 		{
-			var aabb = widget.CalcAABBInSpaceOf(WidgetContext.Current.Root);
-			// Get the projected AABB coordinates in the normalized OpenGL space
-			Matrix44 proj = Renderer.Projection;
-			aabb.A = proj.TransformVector(aabb.A);
-			aabb.B = proj.TransformVector(aabb.B);
-			// Transform to 0,0 - 1,1 coordinate space
-			aabb.Left = (1 + aabb.Left) / 2;
-			aabb.Right = (1 + aabb.Right) / 2;
-			aabb.Top = (1 + aabb.Top) / 2;
-			aabb.Bottom = (1 + aabb.Bottom) / 2;
-			// Transform to window coordinates
-			var viewport = Renderer.Viewport;
-			var result = new CGRect();
-			var min = new Vector2(viewport.X, viewport.Y) / Window.Current.PixelScale;
-			var max = new Vector2(viewport.X + viewport.Width, viewport.Y + viewport.Height) / Window.Current.PixelScale;
-			result.X = Mathf.Lerp(aabb.Left, min.X, max.X).Round();
-			result.Width = Mathf.Lerp(aabb.Right, min.X, max.X).Round() - result.X;
-			result.Y = Mathf.Lerp(aabb.Bottom, min.Y, max.Y).Round();
-			result.Height = Mathf.Lerp(aabb.Top, min.Y, max.Y).Round() - result.Y;
-			return result;
+			throw new NotImplementedException();
+			//var aabb = widget.CalcAABBInSpaceOf(WidgetContext.Current.Root);
+			//// Get the projected AABB coordinates in the normalized OpenGL space
+			//Matrix44 proj = Renderer.Projection;
+			//aabb.A = proj.TransformVector(aabb.A);
+			//aabb.B = proj.TransformVector(aabb.B);
+			//// Transform to 0,0 - 1,1 coordinate space
+			//aabb.Left = (1 + aabb.Left) / 2;
+			//aabb.Right = (1 + aabb.Right) / 2;
+			//aabb.Top = (1 + aabb.Top) / 2;
+			//aabb.Bottom = (1 + aabb.Bottom) / 2;
+			//// Transform to window coordinates
+			//var viewport = Renderer.Viewport;
+			//var result = new CGRect();
+			//var min = new Vector2(viewport.X, viewport.Y) / Window.Current.PixelScale;
+			//var max = new Vector2(viewport.X + viewport.Width, viewport.Y + viewport.Height) / Window.Current.PixelScale;
+			//result.X = Mathf.Lerp(aabb.Left, min.X, max.X).Round();
+			//result.Width = Mathf.Lerp(aabb.Right, min.X, max.X).Round() - result.X;
+			//result.Y = Mathf.Lerp(aabb.Bottom, min.Y, max.Y).Round();
+			//result.Height = Mathf.Lerp(aabb.Top, min.Y, max.Y).Round() - result.Y;
+			//return result;
 		}
 
 		private Uri GetUrl()

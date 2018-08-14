@@ -91,6 +91,7 @@ namespace Lime
 
 		public GameView(Android.Content.Context context, Input input) : base(context)
 		{
+			this.AutoSetContextOnRenderFrame = false;
 			this.input = input;
 			androidSoftKeyboard = new AndroidSoftKeyboard(this);
 			Application.SoftKeyboard = androidSoftKeyboard;

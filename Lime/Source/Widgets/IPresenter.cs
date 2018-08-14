@@ -80,14 +80,11 @@ namespace Lime
 
 		private class RenderObject : Lime.RenderObject
 		{
-			public readonly List<Lime.RenderObject> Objects = new List<Lime.RenderObject>();
+			public readonly RenderObjectList Objects = new RenderObjectList();
 
 			public override void Render()
 			{
-				foreach (var obj in Objects) {
-					obj.Render();
-					obj.Rendered = true;
-				}
+				Objects.Render();
 			}
 		}
 	}
