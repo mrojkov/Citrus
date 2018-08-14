@@ -1,3 +1,4 @@
+using Lime;
 using System;
 using System.Collections.Generic;
 
@@ -43,7 +44,7 @@ namespace Tangerine.Core.ExpressionParser
 			TokenType? prev = null;
 			foreach (var token in Tokenizer.Tokenize(input)) {
 				if (token == null) {
-					throw new Exception("Expression syntax error");
+					throw new System.Exception("Expression syntax error");
 				}
 				switch (token.Type) {
 					case TokenType.Number:
@@ -87,7 +88,7 @@ namespace Tangerine.Core.ExpressionParser
 				ExecuteFirst(output, operators);
 			}
 			if (output.Count != 1) {
-				throw new Exception("Expression syntax error");
+				throw new System.Exception("Expression syntax error");
 			}
 			return output.Pop();
 		}
@@ -114,9 +115,12 @@ namespace Tangerine.Core.ExpressionParser
 				case Operator.Multiply:
 					return left * right;
 				case Operator.Divide:
+					if (Math.Abs(right) < Mathf.ZeroTolerance) {
+						throw new ArithmeticException();
+					}
 					return left / right;
 				default:
-					throw new Exception("Expression syntax error");
+					throw new System.Exception("Expression syntax error");
 			}
 		}
 	}
