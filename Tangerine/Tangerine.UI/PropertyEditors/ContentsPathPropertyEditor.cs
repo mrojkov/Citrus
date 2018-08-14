@@ -12,6 +12,9 @@ namespace Tangerine.UI
 
 		protected override bool IsValid(string path)
 		{
+			if (string.IsNullOrEmpty(path)) {
+				return true;
+			}
 			if (base.IsValid(path)) {
 				var resolvedPath = Node.ResolveScenePath(path);
 				if (resolvedPath == null || !AssetBundle.Current.FileExists(resolvedPath)) {
