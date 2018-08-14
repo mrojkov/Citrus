@@ -7,6 +7,7 @@ using System.Text;
 
 namespace Lime
 {
+	[YuzuDontGenerateDeserializer]
 	public class ExpandableListItem : Widget
 	{
 		public readonly Widget Header;

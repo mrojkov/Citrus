@@ -95,6 +95,7 @@ namespace Lime
 	}
 #endif
 
+	[YuzuDontGenerateDeserializer]
 	public interface ITexture : IDisposable
 	{
 		Size ImageSize { get; }
@@ -109,10 +110,6 @@ namespace Lime
 		void RestoreRenderTarget();
 		bool IsTransparentPixel(int x, int y);
 		bool IsStubTexture { get; }
-		// TODO: consider moving SerializationPath from ITexture to SerializableTexture which sounds only logical
-		[YuzuMember]
-		string SerializationPath { get; set; }
-
 		int MemoryUsed { get; }
 		TextureParams TextureParams { get; set; }
 

@@ -36,6 +36,28 @@ namespace Lime
 		}
 	}
 
+	[YuzuSpecializeWith(typeof(Alignment))]
+	[YuzuSpecializeWith(typeof(AudioAction))]
+	[YuzuSpecializeWith(typeof(Blending))]
+	[YuzuSpecializeWith(typeof(bool))]
+	[YuzuSpecializeWith(typeof(Color4))]
+	[YuzuSpecializeWith(typeof(EmissionType))]
+	[YuzuSpecializeWith(typeof(EmitterShape))]
+	[YuzuSpecializeWith(typeof(float))]
+	[YuzuSpecializeWith(typeof(HAlignment))]
+	[YuzuSpecializeWith(typeof(int))]
+	[YuzuSpecializeWith(typeof(ITexture))]
+	[YuzuSpecializeWith(typeof(Matrix44))]
+	[YuzuSpecializeWith(typeof(MovieAction))]
+	[YuzuSpecializeWith(typeof(NumericRange))]
+	[YuzuSpecializeWith(typeof(Quaternion))]
+	[YuzuSpecializeWith(typeof(SerializableSample))]
+	[YuzuSpecializeWith(typeof(ShaderId))]
+	[YuzuSpecializeWith(typeof(string))]
+	[YuzuSpecializeWith(typeof(Thickness))]
+	[YuzuSpecializeWith(typeof(VAlignment))]
+	[YuzuSpecializeWith(typeof(Vector2))]
+	[YuzuSpecializeWith(typeof(Vector3))]
 	[YuzuCompact]
 	public class Keyframe<T> : IKeyframe
 	{

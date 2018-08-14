@@ -33,8 +33,8 @@ namespace Orange
 	{
 		static string ObjectToString(object value)
 		{
-			if (value is ITexture) {
-				var path = ((ITexture)value).SerializationPath;
+			if (value is SerializableTexture) {
+				var path = ((SerializableTexture)value).SerializationPath;
 				value = !path.StartsWith("#") ? RestorePath(path, ".png") : path;
 			}
 			if (value is SerializableSample) {
@@ -104,7 +104,7 @@ namespace Orange
 			public void WriteProperty(string name, object value, object def)
 			{
 				if (
-					(value is ITexture) && string.IsNullOrEmpty((value as ITexture).SerializationPath) ||
+					(value is SerializableTexture) && string.IsNullOrEmpty((value as SerializableTexture).SerializationPath) ||
 					(value is SerializableSample) && string.IsNullOrEmpty((value as SerializableSample).SerializationPath) ||
 					(value is SerializableFont) && string.IsNullOrEmpty((value as SerializableFont).Name) ||
 					value == null || value.Equals(def)

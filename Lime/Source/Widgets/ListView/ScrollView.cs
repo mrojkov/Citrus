@@ -337,6 +337,7 @@ namespace Lime
 			return scrollPosition.Clamp(MinScrollPosition - BounceZoneThickness, MaxScrollPosition + BounceZoneThickness);
 		}
 
+		[YuzuDontGenerateDeserializer]
 		public class ScrollViewContentWidget : Widget
 		{
 			public bool ReverseOrderRendering;
@@ -412,6 +413,7 @@ namespace Lime
 			Down = 1
 		}
 
+		[YuzuDontGenerateDeserializer]
 		[TangerineIgnore]
 		protected class Layout : CommonLayout, ILayout
 		{

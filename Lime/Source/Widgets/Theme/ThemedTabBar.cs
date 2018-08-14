@@ -3,6 +3,7 @@ using System;
 
 namespace Lime
 {
+	[YuzuDontGenerateDeserializer]
 	public class ThemedTabBar : TabBar
 	{
 		public override bool IsNotDecorated() => false;
@@ -13,6 +14,7 @@ namespace Lime
 		}
 	}
 
+	[YuzuDontGenerateDeserializer]
 	public class ThemedTab : Tab
 	{
 		public override bool IsNotDecorated() => false;
@@ -113,6 +115,7 @@ namespace Lime
 		}
 	}
 
+	[YuzuDontGenerateDeserializer]
 	public class ThemedTabCloseButton : Button
 	{
 		private WidgetFlatFillPresenter fill;

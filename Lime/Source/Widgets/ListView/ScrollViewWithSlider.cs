@@ -142,6 +142,7 @@ namespace Lime
 			return length;
 		}
 
+		[YuzuDontGenerateDeserializer]
 		[TangerineIgnore]
 		new class Layout : ScrollView.Layout
 		{

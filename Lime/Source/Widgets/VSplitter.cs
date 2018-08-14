@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace Lime
 {
+	[YuzuDontGenerateDeserializer]
 	public class VSplitter : Splitter
 	{
 		public VSplitter()
@@ -113,6 +114,7 @@ namespace Lime
 			}
 		}
 
+		[YuzuDontGenerateDeserializer]
 		[TangerineIgnore]
 		class VSplitterLayout : VBoxLayout
 		{

@@ -206,6 +206,7 @@ namespace Lime
 			}
 		}
 
+		[YuzuMember]
 		public bool ForceUncutText { get; set; }
 		public RenderingMode RenderMode{ get; set; }
 

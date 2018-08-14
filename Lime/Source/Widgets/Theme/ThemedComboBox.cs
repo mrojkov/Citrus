@@ -3,6 +3,7 @@ using System;
 
 namespace Lime
 {
+	[YuzuDontGenerateDeserializer]
 	public class ThemedComboBox : ComboBox
 	{
 		public override bool IsNotDecorated() => false;

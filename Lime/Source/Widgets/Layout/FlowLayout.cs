@@ -5,6 +5,7 @@ using Yuzu;
 
 namespace Lime
 {
+	[YuzuDontGenerateDeserializer]
 	[TangerineIgnore]
 	public class FlowLayout : CommonLayout, ILayout
 	{

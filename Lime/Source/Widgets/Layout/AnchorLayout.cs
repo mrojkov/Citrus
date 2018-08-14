@@ -2,6 +2,7 @@ using System.Collections.Generic;
 
 namespace Lime
 {
+	[YuzuDontGenerateDeserializer]
 	[TangerineIgnore]
 	public class AnchorLayout : CommonLayout, ILayout
 	{

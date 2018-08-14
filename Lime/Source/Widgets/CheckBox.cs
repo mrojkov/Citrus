@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace Lime
 {
+	[YuzuDontGenerateDeserializer]
 	public class CheckBox : Widget
 	{
 		private bool @checked;

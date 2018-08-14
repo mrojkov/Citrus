@@ -49,6 +49,7 @@ namespace Lime
 		void ArrangeChildren(Widget widget);
 	}
 
+	[YuzuDontGenerateDeserializer]
 	[TangerineIgnore]
 	public class CommonLayout
 	{

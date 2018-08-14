@@ -3,6 +3,7 @@ using System;
 
 namespace Lime
 {
+	[YuzuDontGenerateDeserializer]
 	public class ThemedDefaultWindowWidget : DefaultWindowWidget
 	{
 		public override bool IsNotDecorated() => false;
@@ -13,6 +14,7 @@ namespace Lime
 		}
 	}
 
+	[YuzuDontGenerateDeserializer]
 	public class ThemedInvalidableWindowWidget : InvalidableWindowWidget
 	{
 		public override bool IsNotDecorated() => false;
@@ -23,6 +25,7 @@ namespace Lime
 		}
 	}
 
+	[YuzuDontGenerateDeserializer]
 	internal class WindowWidgetPresenter : CustomPresenter
 	{
 		public override void Render(Node node)

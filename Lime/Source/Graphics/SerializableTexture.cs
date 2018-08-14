@@ -1,4 +1,4 @@
-using System;
+using Yuzu;
 
 namespace Lime
 {
@@ -22,6 +22,7 @@ namespace Lime
 		{
 		}
 
+		[YuzuMember]
 		public string SerializationPath {
 			get { return GetSerializationPath(); }
 			set { SetSerializationPath(value); }

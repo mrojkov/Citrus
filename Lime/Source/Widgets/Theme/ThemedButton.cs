@@ -3,6 +3,7 @@ using System;
 
 namespace Lime
 {
+	[YuzuDontGenerateDeserializer]
 	public class ThemedButton : Button
 	{
 		public override bool IsNotDecorated() => false;

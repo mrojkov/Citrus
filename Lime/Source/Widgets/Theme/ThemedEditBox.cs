@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace Lime
 {
+	[YuzuDontGenerateDeserializer]
 	public class ThemedEditBox : EditBox
 	{
 		public override bool IsNotDecorated() => false;
@@ -64,6 +65,7 @@ namespace Lime
 		}
 	}
 
+	[YuzuDontGenerateDeserializer]
 	public class ThemedNumericEditBox : NumericEditBox
 	{
 		public override bool IsNotDecorated() => false;

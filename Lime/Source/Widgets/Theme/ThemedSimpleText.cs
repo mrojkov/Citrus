@@ -3,6 +3,7 @@ using System;
 
 namespace Lime
 {
+	[YuzuDontGenerateDeserializer]
 	public class ThemedSimpleText : SimpleText
 	{
 		public override bool IsNotDecorated() => false;

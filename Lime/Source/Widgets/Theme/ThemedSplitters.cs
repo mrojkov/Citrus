@@ -3,6 +3,7 @@ using System;
 
 namespace Lime
 {
+	[YuzuDontGenerateDeserializer]
 	public class ThemedHSplitter : HSplitter
 	{
 		public override bool IsNotDecorated() => false;
@@ -15,6 +16,7 @@ namespace Lime
 		}
 	}
 
+	[YuzuDontGenerateDeserializer]
 	public class ThemedVSplitter : VSplitter
 	{
 		public override bool IsNotDecorated() => false;

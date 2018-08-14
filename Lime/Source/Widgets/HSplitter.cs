@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace Lime
 {
+	[YuzuDontGenerateDeserializer]
 	[AllowedChildrenTypes(typeof(Node))]
 	public abstract class Splitter : Widget
 	{
@@ -33,6 +34,7 @@ namespace Lime
 		}
 	}
 
+	[YuzuDontGenerateDeserializer]
 	public class HSplitter : Splitter
 	{
 		public HSplitter()
@@ -142,6 +144,7 @@ namespace Lime
 			}
 		}
 
+		[YuzuDontGenerateDeserializer]
 		[TangerineIgnore]
 		class HSplitterLayout : HBoxLayout
 		{

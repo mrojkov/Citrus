@@ -101,6 +101,7 @@ namespace Lime
 			}
 		}
 
+		[YuzuDontGenerateDeserializer]
 		public class Descriptor
 		{
 			[YuzuMember]

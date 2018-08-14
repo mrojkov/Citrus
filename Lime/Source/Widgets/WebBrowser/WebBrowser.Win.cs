@@ -3,6 +3,7 @@ using System;
 
 namespace Lime
 {
+	[YuzuDontGenerateDeserializer]
 	public class WebBrowser : Widget
 	{
 		public static Func<Widget, IWebBrowserImplementation> BrowserFactory = widget => new WinFormsWebBrowser(widget);

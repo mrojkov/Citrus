@@ -103,6 +103,21 @@ namespace Lime
 		}
 	}
 
+	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true)]
+	public sealed class YuzuSpecializeWithAttribute : Attribute
+	{
+		public Type Type;
+		public YuzuSpecializeWithAttribute(Type type)
+		{
+			Type = type;
+		}
+	}
+
+	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Interface, AllowMultiple = true)]
+	public sealed class YuzuDontGenerateDeserializerAttribute : Attribute
+	{ }
+
+
 	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Class, AllowMultiple = false)]
 	public sealed class TangerineIgnoreAttribute : Attribute
 	{ }
@@ -164,6 +179,7 @@ namespace Lime
 	/// <summary>
 	/// Scene tree element.
 	/// </summary>
+	[YuzuDontGenerateDeserializer]
 	[DebuggerTypeProxy(typeof(NodeDebugView))]
 	public abstract class Node : IDisposable, IAnimable, IFolderItem, IFolderContext, IRenderChainBuilder
 	{
