@@ -27,7 +27,7 @@ namespace Tangerine.UI.SceneView
 			if (nodes.Count == 0) {
 				return;
 			}
-			var root = (WindowWidget)WidgetContext.Current.Root;
+			var cameraProjection = vp.Camera?.Projection ?? Matrix44.Identity;
 			Renderer.Flush();
 			Renderer.PushState(
 				RenderState.CullMode |
@@ -36,7 +36,7 @@ namespace Tangerine.UI.SceneView
 				RenderState.Projection |
 				RenderState.DepthState);
 			Renderer.View = vp.Camera.View;
-			Renderer.Projection = vp.TransformProjection(root.GetProjection());
+			Renderer.Projection = Viewport3D.MakeProjection(vp.Width, vp.Height, vp.LocalToWorldTransform, cameraProjection, Renderer.Projection);
 			Renderer.DepthState = DepthState.DepthReadWrite;
 			Renderer.Clear(ClearOptions.DepthBuffer);
 			foreach (var node in nodes) {
