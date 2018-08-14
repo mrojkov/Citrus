@@ -25,7 +25,8 @@ namespace Tangerine.Core
 		public bool CanRedo() => !IsTransactionActive && currentIndex < operations.Count;
 		public bool IsDocumentModified { get; private set; }
 		public bool IsTransactionActive => transactionStartIndices.Count > 0;
-		
+		public bool AllowCommandExecution { get; set; } = true;
+
 		public IDisposable BeginTransaction()
 		{
 			if (transactionStartIndices.Count == 0) {
@@ -79,6 +80,9 @@ namespace Tangerine.Core
 		public void Perform(IOperation operation)
 		{
 			AssertTransaction();
+			if (!AllowCommandExecution) {
+				return;
+			}
 			operation.TransactionId = transactionId;
 			if (saveIndex > currentIndex) {
 				saveIndex = -1;
