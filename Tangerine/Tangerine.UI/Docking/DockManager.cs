@@ -382,6 +382,7 @@ namespace Tangerine.UI.Docking
 #if WIN
 				Icon = new System.Drawing.Icon(new EmbeddedResource(AppIconPath, "Tangerine").GetResourceStream()),
 #endif
+				ToolWindow = true
 			});
 			window.UnhandledExceptionOnUpdate += e => UnhandledExceptionOccurred?.Invoke(e);
 			SetDropHandler(window);

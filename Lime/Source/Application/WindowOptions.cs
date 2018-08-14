@@ -1,4 +1,4 @@
-﻿
+
 namespace Lime
 {
 	public enum WindowStyle
@@ -30,9 +30,11 @@ namespace Lime
 		public bool Visible = true;
 		public bool VSync = true;
 		public bool UseTimer = true;
-
-		// System.Drawing.Icon on Windows
+		/// <summary>
+		/// System.Drawing.Icon on Windows
+		/// </summary>
 		public object Icon;
+		public bool ToolWindow;
 	}
 }
 
