@@ -119,52 +119,8 @@ namespace Tangerine.UI
 		private static void Awake(Node owner)
 		{
 			var tb = (ToolbarButton)owner;
-			tb.Tasks.Add(tb.ShowTipWhenMouseHangsOverButtonTask());
+			tb.Tasks.Add(UI.Tip.ShowTipOnMouseOverTask(tb, () => tb.Tip));
 			tb.AddChangeWatcher(() => tb.Enabled, _ => Window.Current.Invalidate());
-		}
-
-		private IEnumerator<object> ShowTipWhenMouseHangsOverButtonTask()
-		{
-			while (true) {
-				yield return null;
-				if (IsMouseOver() && Tip != null) {
-					var showTip = true;
-					for (float t = 0; t < 0.5f; t += Task.Current.Delta) {
-						if (!IsMouseOver()) {
-							showTip = false;
-							break;
-						}
-						yield return null;
-					}
-					if (showTip) {
-						WidgetContext.Current.Root.Tasks.Add(ShowTipTask());
-					}
-				}
-			}
-		}
-
-		private IEnumerator<object> ShowTipTask()
-		{
-			var window = WidgetContext.Current.Root;
-			var tip = new Widget {
-				Position = CalcPositionInSpaceOf(window) + new Vector2(Width * 0.66f, Height),
-				Size = Vector2.Zero,
-				LayoutCell = new LayoutCell { Ignore = true },
-				Layout = new StackLayout(),
-				Nodes = {
-					new ThemedSimpleText { Text = Tip, Padding = new Thickness(4) },
-					new ThemedFrame()
-				}
-			};
-			tip.Updated += _ => tip.Size = tip.EffectiveMinSize;
-			window.PushNode(tip);
-			try {
-				while (IsMouseOver()) {
-					yield return null;
-				}
-			} finally {
-				tip.Unlink();
-			}
 		}
 
 		protected virtual void GetColors(State state, out Color4 bgColor, out Color4 borderColor)
