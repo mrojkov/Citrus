@@ -374,7 +374,8 @@ namespace Tangerine
 				Tools.FitToContainer,
 				Tools.FitToContent,
 				Tools.FlipX,
-				Tools.FlipY
+				Tools.FlipY,
+				Tools.CenterView
 			);
 		}
 

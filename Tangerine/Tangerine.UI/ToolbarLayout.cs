@@ -220,7 +220,7 @@ namespace Tangerine.UI
 					new ToolbarPanel {
 						Index = 2,
 						Title = "Panel2",
-						CommandIndexes = new List<int>(Enumerable.Range(3, 22))
+						CommandIndexes = new List<int>(Enumerable.Range(3, 23))
 					},
 				}
 			};
