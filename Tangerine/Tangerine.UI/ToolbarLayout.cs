@@ -1,10 +1,8 @@
-using System;
+using Lime;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Tangerine.UI.Docking;
 using Yuzu;
-using Lime;
 
 namespace Tangerine.UI
 {
@@ -39,19 +37,65 @@ namespace Tangerine.UI
 			[YuzuRequired]
 			public bool IsSeparator { get; set; } = false;
 
+			public ToolbarLayout ParentLayout { get; set; }
+			public Toolbar Toolbar { get; private set; }
 			public readonly bool Editable = true;
 
 			private readonly Widget toolbarContainer;
-			public readonly Toolbar Toolbar;
+			private Image drag;
 
 			public ToolbarPanel()
 			{
 				toolbarContainer = new Frame {
 					ClipChildren = ClipMethod.ScissorTest,
-					Layout = new HBoxLayout { Spacing = 4 },
+					Layout = new HBoxLayout(),
 					LayoutCell = new LayoutCell { StretchY = 0 },
 				};
+				Application.InvokeOnNextUpdate(() => {
+					drag = new Image {
+						Texture = IconPool.GetTexture("Tools.ToolbarSeparator"),
+						LayoutCell = new LayoutCell(Alignment.Center),
+						MinMaxSize = new Vector2(16),
+						Color = IsSeparator ? Color4.Transparent : Color4.White,
+						HitTestTarget = true
+					};
+					if (!IsSeparator) {
+						drag.Tasks.Add(DragTask);
+					}
+					toolbarContainer.Nodes.Insert(0, drag);
+				});
 				Toolbar = new Toolbar(toolbarContainer);
+			}
+
+			private IEnumerator<object> DragTask()
+			{
+				var input = drag.Input;
+				while (true) {
+					if (!input.WasMousePressed()) {
+						yield return null;
+						continue;
+					}
+					input.ConsumeKey(Key.Mouse0);
+					while (input.IsMousePressed()) {
+						Utils.ChangeCursorIfDefault(MouseCursor.Hand);
+						foreach (var panel in ParentLayout.GetAllPanels(appendSeparator: true)) {
+							var container = panel.toolbarContainer;
+							var pos = container.LocalMousePosition();
+							if (panel == this || pos.Y <= 0 || pos.Y >= container.Height || pos.X < 0 || pos.X > container.Width) {
+								continue;
+							}
+							bool isDifferentRow = container.Parent != toolbarContainer.Parent;
+							bool isBefore = !panel.IsSeparator && panel.Index < Index && pos.X <= container.Width / 2;
+							bool isAfter = !panel.IsSeparator && panel.Index > Index && pos.X >= container.Width / 2;
+							if (isDifferentRow || isBefore || isAfter) {
+								ParentLayout.MovePanel(this, panel.Index);
+								goto Next;
+							}
+						}
+						Next:
+						yield return null;
+					}
+				}
 			}
 
 			public ToolbarPanel(bool editable) : this()
@@ -85,12 +129,25 @@ namespace Tangerine.UI
 				}
 				return toolbarPanel;
 			}
+
+			private class SeparatorWidget : Widget
+			{
+				public SeparatorWidget()
+				{
+					MinMaxWidth = 10;
+				}
+
+				public override void Render()
+				{
+					base.Render();
+					PrepareRendererState();
+					Renderer.DrawLine(Width / 2, 5, Width / 2, Height - 5, Color4.Gray);
+				}
+			}
 		}
 
 		[YuzuRequired]
 		public List<ToolbarPanel> Panels { get; set; } = new List<ToolbarPanel>();
-
-		public readonly ToolbarPanel CreateToolbarPanel;
 
 		[YuzuRequired]
 		public int CreatePanelIndex {
@@ -99,12 +156,15 @@ namespace Tangerine.UI
 		}
 
 		public Toolbar CreateToolbar { get => CreateToolbarPanel.Toolbar; }
+		public readonly ToolbarPanel CreateToolbarPanel;
+		private readonly ToolbarPanel separator = new ToolbarPanel { IsSeparator = true };
 
 		public ToolbarLayout()
 		{
 			CreateToolbarPanel = new ToolbarPanel(false) {
 				Index = 1,
 				Title = "Create tools panel",
+				ParentLayout = this
 			};
 		}
 
@@ -117,7 +177,9 @@ namespace Tangerine.UI
 				LayoutCell = new LayoutCell { StretchY = 0 },
 			};
 			widget.AddNode(rowWidget);
-			foreach (var row in GetAllPanels()) {
+			foreach (var row in GetAllPanels(appendSeparator: true)) {
+				row.ParentLayout = this;
+				row.Rebuild(rowWidget);
 				if (row.IsSeparator) {
 					rowWidget = new Frame {
 						ClipChildren = ClipMethod.ScissorTest,
@@ -125,13 +187,11 @@ namespace Tangerine.UI
 						LayoutCell = new LayoutCell { StretchY = 0 },
 					};
 					widget.AddNode(rowWidget);
-					continue;
 				}
-				row.Rebuild(rowWidget);
 			}
 		}
 
-		public IEnumerable<ToolbarPanel> GetAllPanels()
+		public IEnumerable<ToolbarPanel> GetAllPanels(bool appendSeparator = false)
 		{
 			for (int i = 0; i < CreatePanelIndex; ++i) {
 				yield return Panels[i];
@@ -139,6 +199,10 @@ namespace Tangerine.UI
 			yield return CreateToolbarPanel;
 			for (int i = CreatePanelIndex; i < Panels.Count; ++i) {
 				yield return Panels[i];
+			}
+			if (appendSeparator && !Panels.Last().IsSeparator) {
+				separator.Index = Panels.Count;
+				yield return separator;
 			}
 		}
 
@@ -191,6 +255,42 @@ namespace Tangerine.UI
 				}
 			}
 			return false;
+		}
+
+		public void MovePanel(ToolbarPanel panel, int index)
+		{
+			if (panel.Index < CreatePanelIndex) {
+				CreateToolbarPanel.Index -= 1;
+			}
+			if (panel.Index > CreatePanelIndex) {
+				panel.Index -= 1;
+			}
+			if (panel != CreateToolbarPanel) {
+				Panels.RemoveAt(panel.Index);
+			}
+			for (int i = panel.Index; i < Panels.Count; ++i) {
+				Panels[i].Index -= 1;
+			}
+			InsertPanel(panel, index);
+		}
+
+		public void InsertPanel(ToolbarPanel panel, int index)
+		{
+			panel.Index = index;
+			if (panel != CreateToolbarPanel) {
+				if (index > CreatePanelIndex) {
+					index -= 1;
+				} else {
+					CreatePanelIndex += 1;
+				}
+			}
+			for (int i = index; i < Panels.Count; ++i) {
+				Panels[i].Index += 1;
+			}
+			if (panel != CreateToolbarPanel) {
+				Panels.Insert(index, panel);
+			}
+			Rebuild(DockManager.Instance.ToolbarArea);
 		}
 	}
 }

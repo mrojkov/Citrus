@@ -80,6 +80,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Icons\Dark\Timeline\Tied.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\ToolbarSeparator.png" />
     <EmbeddedResource Include="Resources\Images.xcassets\AppIcons.appiconset\Contents.json" />
     <EmbeddedResource Include="Resources\SegoeUI.ttf" />
   </ItemGroup>
@@ -147,6 +148,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="icon.ico" />
+    <Content Include="Resources\Icons\Dark\Tools\ToolbarSeparator.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Filesystem\PathSeparatorCollapsed.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Filesystem\PathSeparatorExpanded.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Filesystem\PathSeparatorCollapsed.png" />

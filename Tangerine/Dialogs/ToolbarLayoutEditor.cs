@@ -123,19 +123,9 @@ namespace Tangerine.Dialogs
 			var panelRow = new PanelRow(panel);
 			panelList.SelectedItem = panelList.InsertItem(index, panelRow);
 			panelList.SelectedItem.DoubleClicked += () => panelRow.StartEdit();
-			if (index > toolbarLayout.CreatePanelIndex) {
-				index -= 1;
-			} else {
-				toolbarLayout.CreateToolbarPanel.Index += 1;
-			}
-			for (int i = index; i < toolbarLayout.Panels.Count; ++i) {
-				toolbarLayout.Panels[i].Index += 1;
-			}
-			panel.Index = index;
-			toolbarLayout.Panels.Insert(index, panel);
+			toolbarLayout.InsertPanel(panel, index);
 			RefreshAvailableCommands();
 			RefreshUsedCommands();
-			toolbarLayout.Rebuild(DockManager.Instance.ToolbarArea);
 		}
 
 		private void RemovePanel()
