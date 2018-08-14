@@ -89,6 +89,7 @@ namespace Tangerine.UI
 							bool isAfter = !panel.IsSeparator && panel.Index > Index && pos.X >= container.Width / 2;
 							if (isDifferentRow || isBefore || isAfter) {
 								ParentLayout.MovePanel(this, panel.Index);
+								ParentLayout.Rebuild(DockManager.Instance.ToolbarArea);
 								goto Next;
 							}
 						}
@@ -168,24 +169,25 @@ namespace Tangerine.UI
 			};
 		}
 
-		public void Rebuild(Widget widget)
+		private static Frame CreateRowWidget()
 		{
-			widget.Nodes.Clear();
-			var rowWidget = new Frame {
+			return new Frame {
 				ClipChildren = ClipMethod.ScissorTest,
 				Layout = new HBoxLayout(),
 				LayoutCell = new LayoutCell { StretchY = 0 },
 			};
+		}
+
+		public void Rebuild(Widget widget)
+		{
+			widget.Nodes.Clear();
+			var rowWidget = CreateRowWidget();
 			widget.AddNode(rowWidget);
-			foreach (var row in GetAllPanels(appendSeparator: true)) {
-				row.ParentLayout = this;
-				row.Rebuild(rowWidget);
-				if (row.IsSeparator) {
-					rowWidget = new Frame {
-						ClipChildren = ClipMethod.ScissorTest,
-						Layout = new HBoxLayout(),
-						LayoutCell = new LayoutCell { StretchY = 0 },
-					};
+			foreach (var panel in GetAllPanels(appendSeparator: true)) {
+				panel.ParentLayout = this;
+				panel.Rebuild(rowWidget);
+				if (panel.IsSeparator) {
+					rowWidget = CreateRowWidget();
 					widget.AddNode(rowWidget);
 				}
 			}
@@ -259,6 +261,12 @@ namespace Tangerine.UI
 
 		public void MovePanel(ToolbarPanel panel, int index)
 		{
+			RemovePanel(panel);
+			InsertPanel(panel, index);
+		}
+
+		public void RemovePanel(ToolbarPanel panel)
+		{
 			if (panel.Index < CreatePanelIndex) {
 				CreateToolbarPanel.Index -= 1;
 			}
@@ -271,7 +279,6 @@ namespace Tangerine.UI
 			for (int i = panel.Index; i < Panels.Count; ++i) {
 				Panels[i].Index -= 1;
 			}
-			InsertPanel(panel, index);
 		}
 
 		public void InsertPanel(ToolbarPanel panel, int index)
@@ -290,7 +297,6 @@ namespace Tangerine.UI
 			if (panel != CreateToolbarPanel) {
 				Panels.Insert(index, panel);
 			}
-			Rebuild(DockManager.Instance.ToolbarArea);
 		}
 	}
 }
