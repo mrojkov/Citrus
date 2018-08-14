@@ -168,6 +168,7 @@ namespace Tangerine.UI.SceneView
 				readonly WidgetBoundsPresenter borderPresenter;
 				readonly Frame frame;
 				readonly SimpleText label;
+				private double savedTime;
 				public bool Closed { get; private set; }
 
 				public Item(Widget widget, Frame frame, WidgetInput input, bool showLabel)
@@ -195,6 +196,14 @@ namespace Tangerine.UI.SceneView
 					frame.AddNode(exposedWidget);
 					borderPresenter = new WidgetBoundsPresenter(ColorTheme.Current.SceneView.ExposedItemInactiveBorder, 1);
 					frame.CompoundPresenter.Push(borderPresenter);
+					int lastFrame = 0;
+					foreach (var node in exposedWidget.Descendants) {
+						foreach (var animator in node.Animators) {
+							foreach (var key in animator.ReadonlyKeys) {
+								lastFrame = Math.Max(lastFrame, key.Frame);
+							}
+						}
+					}
 					frame.Tasks.AddLoop(() => {
 						borderPresenter.Color = Document.Current.SelectedNodes().Contains(widget) ?
 							ColorTheme.Current.SceneView.ExposedItemSelectedBorder :
@@ -221,6 +230,12 @@ namespace Tangerine.UI.SceneView
 							}
 						} else {
 							label.Visible = showLabel;
+						}
+						if (exposedWidget.AnimationFrame <= lastFrame) {
+							savedTime = totalTime;
+						}
+						if (totalTime - savedTime > 1) {
+							exposedWidget.AnimationFrame = 0;
 						}
 					});
 				}
