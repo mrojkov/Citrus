@@ -35,9 +35,8 @@ namespace Tangerine.UI
 						editorParams.PropertySetter(obj, editorParams.PropertyName, current);
 					}
 				});
-			} else {
-				editor.Text = currentValue.ToString();
 			}
+			editor.Text = currentValue.ToString();
 		}
 
 		public override void Submit()

@@ -24,9 +24,7 @@ namespace Tangerine.UI
 			if (Parser.TryParse(text, out double newValue)) {
 				SetProperty((int)newValue);
 			}
-			else {
-				editor.Text = current.GetValue().ToString();
-			}
+			editor.Text = current.GetValue().ToString();
 		}
 
 		public override void Submit()
