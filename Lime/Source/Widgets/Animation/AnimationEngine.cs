@@ -127,11 +127,6 @@ namespace Lime
 					animation.TimeInternal = AnimationUtils.FramesToSeconds(marker.Frame);
 					animation.IsRunning = false;
 					break;
-				case MarkerAction.Destroy:
-					animation.TimeInternal = AnimationUtils.FramesToSeconds(marker.Frame);
-					animation.IsRunning = false;
-					animation.Owner.Unlink();
-					break;
 			}
 			marker.CustomAction?.Invoke();
 		}

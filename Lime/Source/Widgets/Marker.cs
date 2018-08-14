@@ -7,8 +7,7 @@ namespace Lime
 	{
 		Play,
 		Stop,
-		Jump,
-		Destroy
+		Jump
 	}
 
 	public class Marker
