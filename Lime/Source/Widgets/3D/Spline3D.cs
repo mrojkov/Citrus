@@ -157,13 +157,6 @@ namespace Lime
 			return transform.TransformVector(Position);
 		}
 
-		bool Viewport3D.IZSorterParams.Opaque => false;
-
-		float Viewport3D.IZSorterParams.CalcDistanceToCamera(Camera3D camera)
-		{
-			return camera.View.TransformVector(CalcGlobalPosition()).Z;
-		}
-
 		public override void AddToRenderChain(RenderChain chain)
 		{
 		}

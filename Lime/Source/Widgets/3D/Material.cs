@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Lime
 {
@@ -8,17 +8,6 @@ namespace Lime
 		void Apply(int pass);
 		IMaterial Clone();
 		void Invalidate();
-	}
-
-	public interface IMaterialLightning
-	{
-		bool ProcessLightning { get; set; }
-		void SetLightData(LightSource light);
-	}
-
-	public interface IMaterialShadowReciever : IMaterialLightning
-	{
-		bool RecieveShadows { get; set; }
 	}
 
 	public interface IMaterialSkin

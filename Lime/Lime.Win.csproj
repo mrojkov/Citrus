@@ -195,12 +195,9 @@
     <Compile Include="Source\Types\Vector4.cs" />
     <Compile Include="Source\Widgets\3D\CommonMaterial.cs" />
     <Compile Include="Source\Widgets\3D\CommonMaterialProgram.cs" />
-    <Compile Include="Source\Widgets\3D\LightSource.cs" />
     <Compile Include="Source\Widgets\3D\Model3D.cs" />
     <Compile Include="Source\Widgets\3D\Model3DAttachment.cs" />
-    <Compile Include="Source\Widgets\3D\ShadowMapping\DepthBuffer.cs" />
-    <Compile Include="Source\Widgets\3D\ShadowMapping\DepthBufferProgram.cs" />
-    <Compile Include="Source\Widgets\3D\ShadowMapping\DepthBufferRenderer.cs" />
+    <Compile Include="Source\Widgets\3D\RenderObject3D.cs" />
     <Compile Include="Source\Widgets\3D\Spline3D.cs" />
     <Compile Include="Source\Widgets\Materials\HSLMaterial.cs" />
     <Compile Include="Source\Widgets\DropDownList.cs" />

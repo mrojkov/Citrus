@@ -7,7 +7,7 @@ using Yuzu;
 
 namespace Lime
 {
-	public class Mesh3D : Node3D, IShadowCaster, IShadowReciever
+	public class Mesh3D : Node3D
 	{
 		[YuzuCompact]
 		[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 4)]
@@ -65,8 +65,6 @@ namespace Lime
 			public Vector3 Normal;
 		}
 
-		private static Matrix44[] sharedBoneTransforms = new Matrix44[0];
-
 		[YuzuMember]
 		public Submesh3DCollection Submeshes { get; private set; }
 
@@ -98,60 +96,6 @@ namespace Lime
 			Submeshes = new Submesh3DCollection(this);
 			CullMode = CullMode.Front;
 		}
-
-		protected internal override RenderObject GetRenderObject()
-		{
-			return null;
-		}
-
-		//public override void Render()
-		//{
-		//	if (SkipRender) {
-		//		return;
-		//	}
-
-		//	var lightningEnabled = ProcessLightning && Viewport != null && Viewport.LightSource != null && Viewport.LightSource.Visible;
-		//	var shadowsEnabled = lightningEnabled && Viewport.LightSource.ShadowMappingEnabled;
-		//	var oldColorFactor = Renderer.ColorFactor;
-		//	Renderer.ColorFactor = GlobalColor;
-		//	Renderer.World = GlobalTransform;
-		//	Renderer.CullMode = CullMode;
-		//	var invWorld = GlobalTransform.CalcInverted();
-		//	foreach (var sm in Submeshes) {
-		//		var skin = sm.Material as IMaterialSkin;
-		//		if (skin != null && sm.Bones.Count > 0) {
-		//			skin.SkinEnabled = sm.Bones.Count > 0;
-		//			if (skin.SkinEnabled) {
-		//				if (sharedBoneTransforms.Length < sm.Bones.Count) {
-		//					sharedBoneTransforms = new Matrix44[sm.Bones.Count];
-		//				}
-		//				for (var i = 0; i < sm.Bones.Count; i++) {
-		//					sharedBoneTransforms[i] = sm.BoneBindPoses[i] * sm.Bones[i].GlobalTransform * invWorld;
-		//				}
-		//				skin.SetBones(sharedBoneTransforms, sm.Bones.Count);
-		//			}
-		//		}
-		//		var lightningMaterial = sm.Material as IMaterialLightning;
-		//		if (lightningMaterial != null) {
-		//			lightningMaterial.ProcessLightning = lightningEnabled;
-		//			if (lightningEnabled) {
-		//				lightningMaterial.SetLightData(Viewport.LightSource);
-		//			}
-		//		}
-
-		//		var shadowMaterial = sm.Material as IMaterialShadowReciever;
-		//		if (shadowMaterial != null) {
-		//			shadowMaterial.RecieveShadows = shadowsEnabled && RecieveShadow;
-		//		}
-
-		//		for (int i = 0; i < sm.Material.PassCount; i++) {
-		//			sm.Material.Apply(i);
-		//			sm.Mesh.DrawIndexed(0, sm.Mesh.Indices.Length);
-		//		}
-		//		Renderer.PolyCount3d += sm.Mesh.Indices.Length / 3;
-		//	}
-		//	Renderer.ColorFactor = oldColorFactor;
-		//}
 
 		internal protected override bool PartialHitTest (ref HitTestArgs args)
 		{
@@ -200,7 +144,7 @@ namespace Lime
 			return hit;
 		}
 
-		public override float CalcDistanceToCamera(Camera3D camera)
+		private float CalcDistanceToCamera(Camera3D camera)
 		{
 			return camera.View.TransformVector(GlobalCenter).Z;
 		}
@@ -270,46 +214,102 @@ namespace Lime
 			base.Dispose();
 		}
 
-		public void RenderDepthBuffer(IMaterial mat)
+		protected internal override Lime.RenderObject GetRenderObject()
 		{
 			if (SkipRender) {
-				return;
+				return null;
 			}
-
-			Renderer.World = GlobalTransform;
-			Renderer.CullMode = CullMode;
-
-			var invWorld = GlobalTransformInverse;
-
-			foreach (var sm in Submeshes) {
-				var def = sm.Material;
-
-				sm.Material = mat;
-
-				var skin = sm.Material as IMaterialSkin;
-				if (skin != null && sm.Bones.Count > 0) {
-					if(sharedBoneTransforms.Length < sm.Bones.Count) {
-						sharedBoneTransforms = new Matrix44[sm.Bones.Count];
-					}
-					for (var i = 0; i < sm.Bones.Count; i++) {
-						sharedBoneTransforms[i] = sm.BoneBindPoses[i] * sm.Bones[i].GlobalTransform * invWorld;
-					}
-
-					skin.SkinEnabled = true;
-					skin.SetBones(sharedBoneTransforms, sm.Bones.Count);
-				}
-				else {
-					skin.SkinEnabled = false;
-				}
-
-				for (int i = 0; i < sm.Material.PassCount; i++) {
-					sm.Material.Apply(i);
-					sm.Mesh.DrawIndexed(0, sm.Mesh.Indices.Length);
-				}
-				Renderer.PolyCount3d += sm.Mesh.Indices.Length / 3;
-
-				sm.Material = def;
+			var ro = RenderObjectPool<RenderObject>.Acquire();
+			ro.World = GlobalTransform;
+			ro.WorldInverse = GlobalTransformInverse;
+			ro.CullMode = CullMode;
+			ro.ColorFactor = GlobalColor;
+			ro.Opaque = Opaque;
+			ro.DistanceToCamera = CalcDistanceToCamera(Viewport.Camera);
+			var totalBoneCount = 0;
+			foreach (var submesh in Submeshes) {
+				totalBoneCount += submesh.Bones.Count;
 			}
+			if (ro.Bones == null || ro.Bones.Length < totalBoneCount) {
+				ro.Bones = new Matrix44[totalBoneCount];
+				ro.BoneBindPoses = new Matrix44[totalBoneCount];
+			}
+			ro.Meshes.Clear();
+			ro.Materials.Clear();
+			ro.Submeshes.Clear();
+			var firstBone = 0;
+			foreach (var submesh in Submeshes) {
+				for (var i = 0; i < submesh.Bones.Count; i++) {
+					ro.Bones[firstBone + i] = submesh.Bones[i].GlobalTransform;
+					ro.BoneBindPoses[firstBone + i] = submesh.BoneBindPoses[i];
+				}
+				ro.Meshes.Add(submesh.Mesh);
+				ro.Materials.Add(submesh.Material);
+				ro.Submeshes.Add(new SubmeshRenderData {
+					Mesh = ro.Meshes.Count - 1,
+					Material = ro.Materials.Count - 1,
+					FirstBone = firstBone,
+					BoneCount = submesh.Bones.Count
+				});
+				firstBone += submesh.Bones.Count;
+			}
+			return ro;
+		}
+
+		private class RenderObject : RenderObject3D
+		{
+			private static Matrix44[] boneTransforms = new Matrix44[0];
+
+			public Matrix44 World;
+			public Matrix44 WorldInverse;
+			public CullMode CullMode;
+			public Color4 ColorFactor;
+			public Matrix44[] Bones;
+			public Matrix44[] BoneBindPoses;
+			public List<Mesh<Vertex>> Meshes = new List<Mesh<Vertex>>();
+			public List<IMaterial> Materials = new List<IMaterial>();
+			public List<SubmeshRenderData> Submeshes = new List<SubmeshRenderData>();
+
+			public override void Render()
+			{
+				Renderer.PushState(
+					RenderState.World |
+					RenderState.CullMode |
+					RenderState.ColorFactor);
+				Renderer.World = World;
+				Renderer.CullMode = CullMode;
+				Renderer.ColorFactor = ColorFactor;
+				foreach (var submesh in Submeshes) {
+					var mesh = Meshes[submesh.Mesh];
+					var material = Materials[submesh.Material];
+					var skin = material as IMaterialSkin;
+					if (skin != null) {
+						if (boneTransforms.Length < submesh.BoneCount) {
+							boneTransforms = new Matrix44[submesh.BoneCount];
+						}
+						for (var i = 0; i < submesh.BoneCount; i++) {
+							var bone = submesh.FirstBone + i;
+							boneTransforms[i] = BoneBindPoses[bone] * Bones[bone] * WorldInverse;
+						}
+						skin.SkinEnabled = submesh.BoneCount > 0;
+						skin.SetBones(boneTransforms, submesh.BoneCount);
+					}
+					for (var i = 0; i < material.PassCount; i++) {
+						material.Apply(i);
+						mesh.DrawIndexed(0, mesh.Indices.Length);
+					}
+					Renderer.PolyCount3d += mesh.Indices.Length / 3;
+				}
+				Renderer.PopState();
+			}
+		}
+
+		private struct SubmeshRenderData
+		{
+			public int Mesh;
+			public int Material;
+			public int FirstBone;
+			public int BoneCount;
 		}
 	}
 

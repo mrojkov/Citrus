@@ -21,34 +21,14 @@ namespace Lime
 	[TangerineVisualHintGroup("/All/Nodes/Containers")]
 	public class Viewport3D : Widget
 	{
-		public interface IZSorterParams
-		{
-			float CalcDistanceToCamera(Camera3D camera);
-			bool Opaque { get; }
-		}
-
 		private float frame;
-		private List<RenderItem> opaqueList = new List<RenderItem>();
-		private List<RenderItem> transparentList = new List<RenderItem>();
 		private RenderChain renderChain = new RenderChain();
 
 		[YuzuMember]
 		[TangerineKeyframeColor(28)]
 		public NodeReference<Camera3D> CameraRef { get; set; }
 
-		[YuzuMember]
-		[TangerineKeyframeColor(29)]
-		public NodeReference<LightSource> LightSourceRef { get; set; }
-
 		public Camera3D Camera => CameraRef?.GetNode(this);
-		public LightSource LightSource => LightSourceRef?.GetNode(this);
-
-#if DEBUG
-		[TangerineInspect]
-		[TangerineKeyframeColor(30)]
-		public NodeReference<Image> DebugShadowMapImageRef { get; set; }
-		public Image DebugShadowMapImage => this.Parent == null ? null : DebugShadowMapImageRef?.GetNode(this.Parent);
-#endif
 
 		[YuzuMember]
 		[TangerineKeyframeColor(31)]
@@ -65,21 +45,7 @@ namespace Lime
 		public Viewport3D()
 		{
 			Presenter = DefaultPresenter.Instance;
-#if DEBUG
-			DebugShadowMapImageRef = new NodeReference<Image>("ShadowMap");
-#endif
 		}
-
-#if DEBUG
-		public override void Update(float delta)
-		{
-			base.Update(delta);
-
-			if (DebugShadowMapImage != null) {
-				DebugShadowMapImage.Texture = LightSource?.ShadowMap;
-			}
-		}
-#endif
 
 		private void BuildForTangerine()
 		{
@@ -156,95 +122,11 @@ namespace Lime
 			}
 		}
 
-		//public override void Render()
-		//{
-		//	if (Camera == null) {
-		//		return;
-		//	}
-		//	AdjustCameraAspectRatio();
-		//	foreach (var node in Nodes) {
-		//		node.RenderChainBuilder?.AddToRenderChain(renderChain);
-		//	}
-		//	var oldWorld = Renderer.World;
-		//	var oldView = Renderer.View;
-		//	var oldProj = Renderer.Projection;
-		//	var oldDepthState = Renderer.DepthState;
-		//	var oldCullMode = Renderer.CullMode;
-		//	Renderer.Flush();
-		//	Renderer.Clear(ClearOptions.DepthBuffer);
-		//	Renderer.View = Camera.View;
-		//	Renderer.Projection = TransformProjection(Renderer.Projection);
-		//	for (var i = 0; i < RenderChain.LayerCount; i++) {
-		//		var layer = renderChain.Layers[i];
-		//		if (layer == null || layer.Count == 0) {
-		//			continue;
-		//		}
-		//		foreach (var item in layer) {
-		//			var p = item.Node as IZSorterParams;
-		//			if (p == null) {
-		//				continue;
-		//			}
-		//			var list = p.Opaque ? opaqueList : transparentList;
-		//			list.Add(new RenderItem {
-		//				Node = item.Node,
-		//				Presenter = item.Presenter,
-		//				Distance = p.CalcDistanceToCamera(Camera)
-		//			});
-		//		}
-		//		Renderer.DepthState = DepthState.DepthReadWrite;
-		//		SortAndFlushList(opaqueList, RenderOrderComparers.FrontToBack);
-		//		Renderer.DepthState = DepthState.DepthRead;
-		//		SortAndFlushList(transparentList, RenderOrderComparers.BackToFront);
-		//	}
-		//	renderChain.Clear();
-		//	Renderer.Clear(ClearOptions.DepthBuffer);
-		//	Renderer.World = oldWorld;
-		//	Renderer.View = oldView;
-		//	Renderer.Projection = oldProj;
-		//	Renderer.DepthState = oldDepthState;
-		//	Renderer.CullMode = oldCullMode;
-		//}
-
-		//private void SortAndFlushList(List<RenderItem> items, IComparer<RenderItem> comparer)
-		//{
-		//	items.Sort(comparer);
-		//	foreach (var i in items) {
-		//		i.Presenter.Render(i.Node);
-		//	}
-		//	items.Clear();
-		//}
-
 		public override Node Clone()
 		{
 			var vp = (Viewport3D)base.Clone();
-			vp.opaqueList = new List<RenderItem>();
-			vp.transparentList = new List<RenderItem>();
 			vp.CameraRef = CameraRef?.Clone();
-			vp.LightSourceRef = LightSourceRef?.Clone();
 			return vp;
-		}
-
-		public Matrix44 TransformProjection(Matrix44 orthoProjection)
-		{
-			orthoProjection.M33 = 1; // Discard Z normalization, since it comes from the camera projection matrix
-			orthoProjection.M43 = 0;
-			var p =
-				// Transform from <-1, 1> normalized coordinates to the widget space
-				Matrix44.CreateScale(Width / 2, -Height / 2, 1) *
-				Matrix44.CreateTranslation(Width / 2, Height / 2, 0) *
-				(Matrix44)LocalToWorldTransform * orthoProjection;
-			if (Camera != null) {
-				return Camera.Projection * p;
-			} else {
-				return p;
-			}
-		}
-
-		public void InvalidateMaterials()
-		{
-			foreach (var mesh in Descendants.OfType<Mesh3D>().SelectMany((m) => m.Submeshes)) {
-				mesh.Material.Invalidate();
-			}
 		}
 
 		public Vector3 WorldToScreenPoint(Vector3 pt)
@@ -307,33 +189,150 @@ namespace Lime
 			return new Vector3(xy, z) * new Vector3(1, -1, 1);
 		}
 
+		protected internal override Lime.RenderObject GetRenderObject()
+		{
+			if (Camera == null) {
+				return null;
+			}
+			AdjustCameraAspectRatio();
+			var ro = RenderObjectPool<RenderObject>.Acquire();
+			ro.Width = Width;
+			ro.Height = Height;
+			ro.Transform = LocalToWorldTransform;
+			ro.View = Camera.View;
+			ro.Projection = Camera.Projection;
+			try {
+				foreach (var node in Nodes) {
+					node.RenderChainBuilder?.AddToRenderChain(renderChain);
+				}
+				ro.Layers.Clear();
+				ro.Objects.Clear();
+				for (var i = 0; i < RenderChain.LayerCount; i++) {
+					var layer = renderChain.Layers[i];
+					if (layer == null || layer.Count == 0) {
+						continue;
+					}
+					var first = ro.Objects.Count;
+					foreach (var item in layer) {
+						var renderObject = item.Presenter.GetRenderObject(item.Node);
+						if (renderObject != null) {
+							ro.Objects.Add((RenderObject3D)renderObject);
+						}
+					}
+					ro.Layers.Add(new RenderLayer {
+						FirstObject = first,
+						ObjectCount = ro.Objects.Count - first
+					});
+				}
+			} finally {
+				renderChain.Clear();
+			}
+			return ro;
+		}
+
+		private class RenderObject : Lime.RenderObject
+		{
+			private List<RenderObject3D> opaqueObjects = new List<RenderObject3D>();
+			private List<RenderObject3D> transparentObjects = new List<RenderObject3D>();
+
+			public float Width;
+			public float Height;
+			public Matrix32 Transform;
+			public Matrix44 View;
+			public Matrix44 Projection;
+			public List<RenderObject3D> Objects = new List<RenderObject3D>();
+			public List<RenderLayer> Layers = new List<RenderLayer>();
+
+			public override void Render()
+			{
+				Renderer.Flush();
+				Renderer.PushState(
+					RenderState.World |
+					RenderState.View |
+					RenderState.Projection |
+					RenderState.DepthState |
+					RenderState.CullMode);
+				Renderer.View = View;
+				Renderer.Projection = MakeProjection(Width, Height, Transform, Projection, Renderer.Projection);
+				foreach (var layer in Layers) {
+					try {
+						for (var i = 0; i < layer.ObjectCount; i++) {
+							var obj = Objects[layer.FirstObject + i];
+							var list = obj.Opaque ? opaqueObjects : transparentObjects;
+							list.Add(obj);
+						}
+						Renderer.DepthState = DepthState.DepthReadWrite;
+						opaqueObjects.Sort(RenderOrderComparers.FrontToBack);
+						foreach (var obj in opaqueObjects) {
+							obj.Render();
+							obj.Rendered = true;
+						}
+						Renderer.DepthState = DepthState.DepthRead;
+						transparentObjects.Sort(RenderOrderComparers.BackToFront);
+						foreach (var obj in transparentObjects) {
+							obj.Render();
+							obj.Rendered = true;
+						}
+					} finally {
+						opaqueObjects.Clear();
+						transparentObjects.Clear();
+					}
+				}
+				Renderer.Clear(ClearOptions.DepthBuffer);
+				Renderer.PopState();
+			}
+
+			private Matrix44 TransformProjection(Matrix44 orthoProjection)
+			{
+				orthoProjection.M33 = 1; // Discard Z normalization, since it comes from the camera projection matrix
+				orthoProjection.M43 = 0;
+				return Projection *
+					// Transform from <-1, 1> normalized coordinates to the widget space
+					Matrix44.CreateScale(Width / 2, -Height / 2, 1) *
+					Matrix44.CreateTranslation(Width / 2, Height / 2, 0) *
+					(Matrix44)Transform * orthoProjection;
+			}
+		}
+
+		public static Matrix44 MakeProjection(
+			float width, float height, Matrix32 transform,
+			Matrix44 cameraProjection, Matrix44 orthoProjection)
+		{
+			orthoProjection.M33 = 1; // Discard Z normalization, since it comes from the camera projection matrix
+			orthoProjection.M43 = 0;
+			return cameraProjection *
+				// Transform from <-1, 1> normalized coordinates to the widget space
+				Matrix44.CreateScale(width / 2, -height / 2, 1) *
+				Matrix44.CreateTranslation(width / 2, height / 2, 0) *
+				(Matrix44)transform * orthoProjection;
+		}
+
+		private struct RenderLayer
+		{
+			public int FirstObject;
+			public int ObjectCount;
+		}
+
 		private static class RenderOrderComparers
 		{
 			public static readonly BackToFrontComparer BackToFront = new BackToFrontComparer();
 			public static readonly FrontToBackComparer FrontToBack = new FrontToBackComparer();
 		}
 
-		private class BackToFrontComparer : Comparer<RenderItem>
+		private class BackToFrontComparer : Comparer<RenderObject3D>
 		{
-			public override int Compare(RenderItem x, RenderItem y)
+			public override int Compare(RenderObject3D x, RenderObject3D y)
 			{
-				return x.Distance.CompareTo(y.Distance);
+				return x.DistanceToCamera.CompareTo(y.DistanceToCamera);
 			}
 		}
 
-		private class FrontToBackComparer : Comparer<RenderItem>
+		private class FrontToBackComparer : Comparer<RenderObject3D>
 		{
-			public override int Compare(RenderItem x, RenderItem y)
+			public override int Compare(RenderObject3D x, RenderObject3D y)
 			{
-				return y.Distance.CompareTo(x.Distance);
+				return y.DistanceToCamera.CompareTo(x.DistanceToCamera);
 			}
-		}
-
-		private struct RenderItem
-		{
-			public Node Node;
-			public IPresenter Presenter;
-			public float Distance;
 		}
 	}
 }

@@ -7,7 +7,7 @@ using Yuzu;
 
 namespace Lime
 {
-	public class CommonMaterial : IMaterial, IMaterialSkin, IMaterialFog, IMaterialLightning, IMaterialShadowReciever
+	public class CommonMaterial : IMaterial, IMaterialSkin, IMaterialFog
 	{
 		private static Dictionary<CommonMaterialProgramSpec, CommonMaterialProgram> programCache =
 			new Dictionary<CommonMaterialProgramSpec, CommonMaterialProgram>();
@@ -18,9 +18,6 @@ namespace Lime
 		private int boneCount;
 		private bool skinEnabled;
 		private FogMode fogMode;
-		private bool processLightning;
-		private LightSource lightSource;
-		private bool recieveShadows;
 
 		[YuzuMember]
 		public string Name { get; set; }
@@ -82,32 +79,6 @@ namespace Lime
 			}
 		}
 
-		[YuzuMember]
-		public bool ProcessLightning
-		{
-			get { return processLightning; }
-			set
-			{
-				if (processLightning != value) {
-					processLightning = value;
-					program = null;
-				}
-			}
-		}
-
-		public bool RecieveShadows
-		{
-			get { return recieveShadows; }
-			set
-			{
-				if (recieveShadows != value) {
-					recieveShadows = value;
-					program = null;
-				}
-
-			}
-		}
-
 		public CommonMaterial()
 		{
 			DiffuseColor = Color4.White;
@@ -119,11 +90,6 @@ namespace Lime
 			shaderParamsArray = new[] { Renderer.GlobalShaderParams, shaderParams };
 		}
 
-		public void SetLightData(LightSource data)
-		{
-			lightSource = data;
-		}
-
 		public void SetBones(Matrix44[] boneTransforms, int boneCount)
 		{
 			this.boneTransforms = boneTransforms;
@@ -132,43 +98,29 @@ namespace Lime
 
 		public int PassCount => 1;
 
-
 		private ShaderParams[] shaderParamsArray;
 		private ShaderParams shaderParams;
 		private ShaderParamKeys shaderParamKeys;
 
 		public void Apply(int pass)
 		{
-			//PrepareShaderProgram();
-   //         shaderParams.Set(shaderParamKeys.World, Renderer.World);
-			//shaderParams.Set(shaderParamKeys.WorldView, Renderer.WorldView);
-			//shaderParams.Set(shaderParamKeys.WorldViewProj, Renderer.WorldViewProjection);
-			//shaderParams.Set(shaderParamKeys.ColorFactor, Renderer.ColorFactor.ToVector4());
-			//shaderParams.Set(shaderParamKeys.DiffuseColor, DiffuseColor.ToVector4());
-			//if (processLightning) {
-			//	shaderParams.Set(shaderParamKeys.LightColor, lightSource.Color.ToVector4());
-			//	shaderParams.Set(shaderParamKeys.LightDirection, lightSource.Position.Normalized);
-			//	shaderParams.Set(shaderParamKeys.LightIntensity, lightSource.Intensity);
-			//	shaderParams.Set(shaderParamKeys.LightStrength, lightSource.Strength);
-			//	shaderParams.Set(shaderParamKeys.LightAmbient, lightSource.Ambient);
-			//	shaderParams.Set(shaderParamKeys.LightWorldViewProj,
-			//		Renderer.World * lightSource.ViewProjection * Matrix44.CreateScale(new Vector3(1, -1, 1)));
-			//	shaderParams.Set(shaderParamKeys.ShadowColor, lightSource.ShadowColor.ToVector4());
-			//	PlatformRenderer.SetTextureLegacy(CommonMaterialProgram.ShadowMapTextureStage, lightSource.ShadowMap);
-			//}
-			//shaderParams.Set(shaderParamKeys.FogColor, FogColor.ToVector4());
-			//shaderParams.Set(shaderParamKeys.FogStart, FogStart);
-			//shaderParams.Set(shaderParamKeys.FogEnd, FogEnd);
-			//shaderParams.Set(shaderParamKeys.FogDensity, FogDensity);
-			//if (skinEnabled) {
-			//	shaderParams.Set(shaderParamKeys.Bones, boneTransforms, boneCount);
-			//}
-			//PlatformRenderer.SetBlendState(Blending.GetBlendState());
-			//PlatformRenderer.SetTextureLegacy(CommonMaterialProgram.DiffuseTextureStage, diffuseTexture);
-			//PlatformRenderer.SetShaderProgram(program);
-			//PlatformRenderer.SetShaderParams(shaderParamsArray);
-			//PlatformRenderer.SetShaderProgram(program);
-
+			PrepareShaderProgram();
+			shaderParams.Set(shaderParamKeys.World, Renderer.World);
+			shaderParams.Set(shaderParamKeys.WorldView, Renderer.WorldView);
+			shaderParams.Set(shaderParamKeys.WorldViewProj, Renderer.WorldViewProjection);
+			shaderParams.Set(shaderParamKeys.ColorFactor, Renderer.ColorFactor.ToVector4());
+			shaderParams.Set(shaderParamKeys.DiffuseColor, DiffuseColor.ToVector4());
+			shaderParams.Set(shaderParamKeys.FogColor, FogColor.ToVector4());
+			shaderParams.Set(shaderParamKeys.FogStart, FogStart);
+			shaderParams.Set(shaderParamKeys.FogEnd, FogEnd);
+			shaderParams.Set(shaderParamKeys.FogDensity, FogDensity);
+			if (skinEnabled) {
+				shaderParams.Set(shaderParamKeys.Bones, boneTransforms, boneCount);
+			}
+			PlatformRenderer.SetBlendState(Blending.GetBlendState());
+			PlatformRenderer.SetTextureLegacy(CommonMaterialProgram.DiffuseTextureStage, diffuseTexture);
+			PlatformRenderer.SetShaderProgram(program);
+			PlatformRenderer.SetShaderParams(shaderParamsArray);
 		}
 
 		private void PrepareShaderProgram()
@@ -176,18 +128,10 @@ namespace Lime
 			if (program != null) {
 				return;
 			}
-
-			// TODO: We need to tweak shadow quality settings
-			var lightSourceAvailable = lightSource != null;
 			var spec = new CommonMaterialProgramSpec {
 				SkinEnabled = skinEnabled,
 				DiffuseTextureEnabled = diffuseTexture != null,
-				FogMode = FogMode,
-				ProcessLightning = ProcessLightning,
-				RecieveShadows = RecieveShadows,
-				ShadowMapSize = lightSourceAvailable ? lightSource.ShadowMapSize : IntVector2.Zero,
-				SmoothShadows = true,
-				HighQualitySmoothShadows = lightSourceAvailable && lightSource.ShadowMapQuality > ShadowMapTextureQuality.Medium
+				FogMode = FogMode
 			};
 			if (programCache.TryGetValue(spec, out program)) {
 				return;
@@ -213,9 +157,7 @@ namespace Lime
 				FogDensity = FogDensity,
 				Blending = Blending,
 				DiffuseTexture = DiffuseTexture,
-				SkinEnabled = SkinEnabled,
-				ProcessLightning = ProcessLightning,
-				RecieveShadows = RecieveShadows
+				SkinEnabled = SkinEnabled
 			};
 		}
 

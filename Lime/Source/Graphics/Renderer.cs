@@ -131,7 +131,7 @@ namespace Lime
 
 		public static Matrix44 World
 		{
-			private get { return world; }
+			get { return world; }
 			set {
 				world = value;
 				worldViewDirty = worldViewProjDirty = true;
@@ -141,7 +141,7 @@ namespace Lime
 
 		public static Matrix44 View
 		{
-			private get { return view; }
+			get { return view; }
 			set {
 				view = value;
 				viewProjDirty = worldViewDirty = worldViewProjDirty = true;
@@ -151,7 +151,7 @@ namespace Lime
 
 		public static Matrix44 Projection
 		{
-			private get { return proj; }
+			get { return proj; }
 			set {
 				proj = value;
 				viewProjDirty = worldViewProjDirty = true;
@@ -160,7 +160,7 @@ namespace Lime
 			}
 		}
 
-		private static Matrix44 WorldView
+		public static Matrix44 WorldView
 		{
 			get {
 				if (worldViewDirty) {
@@ -171,7 +171,7 @@ namespace Lime
 			}
 		}
 
-		private static Matrix44 ViewProjection
+		public static Matrix44 ViewProjection
 		{
 			get {
 				if (viewProjDirty) {
@@ -182,7 +182,7 @@ namespace Lime
 			}
 		}
 
-		private static Matrix44 WorldViewProjection
+		public static Matrix44 WorldViewProjection
 		{
 			get {
 				if (worldViewProjDirty) {
@@ -268,7 +268,7 @@ namespace Lime
 
 		public static Color4 ColorFactor
 		{
-			private get { return colorFactor; }
+			get { return colorFactor; }
 			set {
 				if (colorFactor != value) {
 					colorFactor = value;

@@ -7,7 +7,7 @@ namespace Lime
 	[TangerineAllowedParentTypes(typeof(Node3D), typeof(Viewport3D))]
 	[TangerineAllowedChildrenTypes(typeof(Node))]
 	[TangerineVisualHintGroup("/All/Nodes/Containers")]
-	public class Node3D : Node, Viewport3D.IZSorterParams
+	public class Node3D : Node
 	{
 		private Vector3 scale;
 		private Quaternion rotation;
@@ -215,11 +215,6 @@ namespace Lime
 			rotation = Quaternion.Identity;
 			visible = true;
 			color = Color4.White;
-		}
-
-		public virtual float CalcDistanceToCamera(Camera3D camera)
-		{
-			return camera.View.TransformVector(GlobalTransform.Translation).Z;
 		}
 
 		public void SetGlobalTransform(Matrix44 transform)
