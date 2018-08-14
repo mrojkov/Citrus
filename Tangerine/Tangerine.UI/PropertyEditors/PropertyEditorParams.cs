@@ -27,6 +27,7 @@ namespace Tangerine.UI
 		public ITransactionalHistory History { get; set; }
 		PropertySetterDelegate IPropertyEditorParamsInternal.PropertySetter => propertySetter;
 		public PropertySetterDelegate PropertySetter { set { propertySetter = value; } }
+		public float LabelWidth { get; set; } = 140;
 
 		public PropertyEditorParams(Widget inspectorPane, IEnumerable<object> objects, IEnumerable<object> rootObjects, Type type, string propertyName, string propertyPath)
 		{

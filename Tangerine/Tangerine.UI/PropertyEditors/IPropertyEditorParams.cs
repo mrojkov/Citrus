@@ -26,6 +26,7 @@ namespace Tangerine.UI
 		Func<EditBox> EditBoxFactory { get; set; }
 		Func<object> DefaultValueGetter { get; set; }
 		ITransactionalHistory History { get; set; }
+		float LabelWidth { get; set; }
 	}
 
 	public interface IPropertyEditorParamsInternal
