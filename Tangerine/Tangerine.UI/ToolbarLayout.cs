@@ -37,7 +37,7 @@ namespace Tangerine.UI
 			[YuzuRequired]
 			public bool IsSeparator { get; set; } = false;
 
-			public ToolbarLayout ParentLayout { get; set; }
+			public ToolbarLayout ToolbarLayout { get; set; }
 			public Toolbar Toolbar { get; private set; }
 			public readonly bool Editable = true;
 
@@ -78,7 +78,7 @@ namespace Tangerine.UI
 					input.ConsumeKey(Key.Mouse0);
 					while (input.IsMousePressed()) {
 						Utils.ChangeCursorIfDefault(MouseCursor.Hand);
-						foreach (var panel in ParentLayout.GetAllPanels(appendSeparator: true)) {
+						foreach (var panel in ToolbarLayout.GetAllPanels(appendSeparator: true)) {
 							var container = panel.toolbarContainer;
 							var pos = container.LocalMousePosition();
 							if (panel == this || pos.Y <= 0 || pos.Y >= container.Height || pos.X < 0 || pos.X > container.Width) {
@@ -88,8 +88,8 @@ namespace Tangerine.UI
 							bool isBefore = !panel.IsSeparator && panel.Index < Index && pos.X <= container.Width / 2;
 							bool isAfter = !panel.IsSeparator && panel.Index > Index && pos.X >= container.Width / 2;
 							if (isDifferentRow || isBefore || isAfter) {
-								ParentLayout.MovePanel(this, panel.Index);
-								ParentLayout.Rebuild(DockManager.Instance.ToolbarArea);
+								ToolbarLayout.MovePanel(this, panel.Index);
+								ToolbarLayout.Rebuild(DockManager.Instance.ToolbarArea);
 								goto Next;
 							}
 						}
@@ -165,7 +165,7 @@ namespace Tangerine.UI
 			CreateToolbarPanel = new ToolbarPanel(false) {
 				Index = 1,
 				Title = "Create tools panel",
-				ParentLayout = this
+				ToolbarLayout = this
 			};
 		}
 
@@ -184,7 +184,7 @@ namespace Tangerine.UI
 			var rowWidget = CreateRowWidget();
 			widget.AddNode(rowWidget);
 			foreach (var panel in GetAllPanels(appendSeparator: true)) {
-				panel.ParentLayout = this;
+				panel.ToolbarLayout = this;
 				panel.Rebuild(rowWidget);
 				if (panel.IsSeparator) {
 					rowWidget = CreateRowWidget();
