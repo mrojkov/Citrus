@@ -42,12 +42,14 @@
     <Folder Include="Resources\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExpressionParser\ExpressionParser.cs" />
     <Compile Include="AutosaveProcessor.cs" />
     <Compile Include="BackupManager.cs" />
     <Compile Include="ClassAttributes.cs" />
     <Compile Include="Components.cs" />
     <Compile Include="CoreUserPreferences.cs" />
     <Compile Include="Document.Animation.cs" />
+    <Compile Include="ExpressionParser\Tokenizer.cs" />
     <Compile Include="HotSerialization.cs" />
     <Compile Include="IDataflow.cs" />
     <Compile Include="ITaskProvider.cs" />
