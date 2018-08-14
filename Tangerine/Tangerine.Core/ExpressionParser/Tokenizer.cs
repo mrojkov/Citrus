@@ -50,6 +50,9 @@ namespace Tangerine.Core.ExpressionParser
 			var names = Enum.GetNames(typeof(TokenType));
 			while (position < input.Length) {
 				var skip = NonWhitespaceRegex.Match(input, position);
+				if (!skip.Success) {
+					yield break;
+				}
 				position = skip.Index;
 				var match = Regex.Match(input, position);
 				if (match.Index != position) {
