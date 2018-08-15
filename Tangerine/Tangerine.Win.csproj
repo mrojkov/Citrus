@@ -56,7 +56,6 @@
     <Compile Include="AlignPreferences.cs" />
     <Compile Include="CommandHandlers.cs" />
     <Compile Include="Dialogs\ColorThemeEditor.cs" />
-    <Compile Include="Dialogs\HelpDialog.cs" />
     <Compile Include="Dialogs\ManageRulersDialog.cs" />
     <Compile Include="Dialogs\OrangePluginOptionsDialog.cs" />
     <Compile Include="Dialogs\PreferencesDialog.cs" />

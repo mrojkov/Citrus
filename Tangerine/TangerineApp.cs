@@ -285,7 +285,7 @@ namespace Tangerine
 			RegisterGlobalCommands();
 
 			Documentation.Init();
-			DocumentationComponent.Clicked = page => new HelpDialog(page);
+			DocumentationComponent.Clicked = page => Documentation.ShowHelp(page);
 		}
 
 		private void OpenDocumentsFromArgs(string[] args)
@@ -535,7 +535,7 @@ namespace Tangerine
 			h.Connect(GenericCommands.GroupContentsToMorphableMeshes, new GroupContentsToMorphableMeshes());
 			h.Connect(GenericCommands.ExportScene, new ExportScene());
 			h.Connect(GenericCommands.UpsampleAnimationTwice, new UpsampleAnimationTwice());
-			h.Connect(GenericCommands.ViewHelp, () => new HelpDialog(Documentation.StartPage));
+			h.Connect(GenericCommands.ViewHelp, () => Documentation.ShowHelp(Documentation.StartPageName));
 			h.Connect(GenericCommands.HelpMode, () => Documentation.IsHelpModeOn = !Documentation.IsHelpModeOn);
 			h.Connect(GenericCommands.ConvertToButton, new ConvertToButton());
 			h.Connect(Tools.AlignLeft, new AlignLeft());

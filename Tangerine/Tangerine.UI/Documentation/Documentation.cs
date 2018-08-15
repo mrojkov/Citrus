@@ -1,12 +1,8 @@
+using Markdig;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
-using Lime;
-using Tangerine.Core;
+using System.Threading;
 
 namespace Tangerine.UI
 {
@@ -21,16 +17,20 @@ namespace Tangerine.UI
 		public static string StyleSheetPath { get; set; } = Path.Combine(MarkdownDocumentationPath, "stylesheet.css");
 
 		public static string PageExtension { get; set; } = ".md";
+		public static string DocExtension { get; set; } = ".html";
 		public static string StartPageName { get; set; } = "StartPage";
 		public static string ErrorPageName { get; set; } = "ErrorPage";
-
-		public static HelpPage StartPage => new HelpPage(StartPageName);
-		public static HelpPage ErrorPage => new HelpPage(ErrorPageName);
 
 		public static string GetPagePath(string pageName)
 		{
 			string path = Path.Combine(MarkdownDocumentationPath, Path.Combine(pageName.Split('.')));
 			return path + PageExtension;
+		}
+
+		public static string GetDocPath(string pageName)
+		{
+			string path = Path.Combine(HtmlDocumentationPath, Path.Combine(pageName.Split('.')));
+			return path + DocExtension;
 		}
 
 		public static void Init()
@@ -49,6 +49,48 @@ namespace Tangerine.UI
 			if (!File.Exists(errorPagePath)) {
 				File.WriteAllText(errorPagePath, "# Error #\nThis is error page");
 			}
+			Update();
+		}
+
+		private static readonly MarkdownPipeline Pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
+
+		private static void Update(string directoryPath = "")
+		{
+			var sourceDirectory = new DirectoryInfo(Path.Combine(MarkdownDocumentationPath, directoryPath));
+			string destination = Path.Combine(HtmlDocumentationPath, directoryPath);
+			if (!Directory.Exists(destination)) {
+				Directory.CreateDirectory(destination);
+			}
+			foreach (var dir in sourceDirectory.GetDirectories()) {
+				Update(Path.Combine(directoryPath, dir.Name));
+			}
+			foreach (var file in sourceDirectory.GetFiles($"*{PageExtension}")) {
+				string destPath = Path.Combine(destination, Path.ChangeExtension(file.Name, DocExtension));
+				if (!File.Exists(destPath) || File.GetLastWriteTimeUtc(destPath) <= File.GetLastWriteTimeUtc(file.FullName)) {
+					using (StreamReader sr = new StreamReader(file.FullName))
+					using (StreamWriter sw = new StreamWriter(destPath, false, Encoding.UTF8)) {
+						sw.WriteLine(
+							"<head>" +
+							$"<link rel=\"stylesheet\" type=\"text/css\" href=\"{StyleSheetPath}\">" +
+							"</head>"
+						);
+						Markdown.ToHtml(sr.ReadToEnd(), sw, Pipeline);
+					}
+				}
+			}
+		}
+
+		public static void ShowHelp(string pageName)
+		{
+			string path = GetDocPath(pageName);
+			new Thread(() => {
+				Thread.CurrentThread.IsBackground = true;
+				if (File.Exists(path)) {
+					System.Diagnostics.Process.Start(path);
+				} else {
+					System.Diagnostics.Process.Start(GetDocPath(ErrorPageName));
+				}
+			}).Start();
 		}
 	}
 }
