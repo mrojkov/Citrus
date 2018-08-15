@@ -9,7 +9,7 @@ namespace Lime
 		private IMaterial oldCustomMaterial;
 
 		private Vector3 hsl;
-
+		
 		[TangerineInspect]
 		public float Hue
 		{
@@ -67,7 +67,7 @@ namespace Lime
 		private void SetMaterial()
 		{
 			if (Owner != null) {
-				((Image)Owner).CustomMaterial = HslShiftMaterial.Instance;
+				((Image)Owner).CustomMaterial = new HslShiftMaterial();
 			}
 		}
 
@@ -82,8 +82,6 @@ namespace Lime
 
 	public class HslShiftMaterial : IMaterial
 	{
-		public static readonly HslShiftMaterial Instance = new HslShiftMaterial();
-
 		private static string vs = @"
 				uniform mat4 matProjection;
 
@@ -147,26 +145,31 @@ namespace Lime
 					fragHSL.yz *= u_hsl.yz;
 					fragHSL.xyz = fragHSL.xyz;
 					vec3 fragRGB = HSLtoRGB(fragHSL);
-					gl_FragColor = vec4(fragRGB, color.w);
+					gl_FragColor = vec4(fragRGB, color.a);
 				}";
 
-		private ShaderProgram shaderProgramPass;
+		private static ShaderProgram shaderProgramPass;
 
-		public int PassCount => 2;
+		public int PassCount => 1;
 
 		private Vector3 hsl;
 
-		private HslShiftMaterial()
+		public HslShiftMaterial()
 		{
-			hsl = new Vector3(1, 1, 1);
+			hsl = new Vector3(0, 1, 1);
 
-			shaderParams = new ShaderParams();
-			shaderParamsArray = new[] { Renderer.GlobalShaderParams, shaderParams };
+			if (shaderParams == null) {
+				shaderParams = new ShaderParams();
+				shaderParamsArray = new[] { Renderer.GlobalShaderParams, shaderParams };
 
-			shaderHueParamKey = shaderParams.GetParamKey<Vector3>("u_hsl");
+				shaderHueParamKey = shaderParams.GetParamKey<Vector3>("u_hsl");
+			}
 		}
 
-		public IMaterial Clone() => Instance;
+		public IMaterial Clone()
+		{
+			return new HslShiftMaterial();
+		}
 
 		public void Apply(int pass)
 		{
@@ -184,9 +187,9 @@ namespace Lime
 
 		public void Invalidate() { }
 
-		private ShaderParams[] shaderParamsArray;
-		private ShaderParams shaderParams;
-		private ShaderParamKey<Vector3> shaderHueParamKey;
+		private static ShaderParams[] shaderParamsArray;
+		private static ShaderParams shaderParams;
+		private static ShaderParamKey<Vector3> shaderHueParamKey;
 
 		public void SetHsl(Vector3 hsl)
 		{
