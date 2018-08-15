@@ -1,10 +1,7 @@
 using Lime;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Tangerine.Core
 {
@@ -42,9 +39,21 @@ namespace Tangerine.Core
 				return;
 			}
 			using(var fs = File.AppendText(filename)) {
-				fs.Write(ScenePreviewSeparator);
-				fs.Write(base64);
+				fs.WriteLine(ScenePreviewSeparator);
+				fs.WriteLine(base64);
 			}
+		}
+
+		public static void Generate()
+		{
+			// Andrey Tyshchenko: Enable animation preview to disable presenters while rendering document preview
+			var savedPreviewAnimation = Document.Current.PreviewAnimation;
+			Document.Current.PreviewAnimation = true;
+			var bitmap = Document.Current.RootNode.AsWidget.ToBitmap().Rescale(newWidth.Round(), newHeight.Round());
+			Document.Current.PreviewAnimation = savedPreviewAnimation;
+			var stream = new MemoryStream();
+			bitmap.SaveTo(stream, CompressionFormat.Jpeg);
+			SetProperty.Perform(Document.Current, nameof(Document.Preview), Convert.ToBase64String(stream.ToArray()));
 		}
 	}
 }

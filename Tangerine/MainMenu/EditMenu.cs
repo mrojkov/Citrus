@@ -438,14 +438,7 @@ namespace Tangerine
 		public override void ExecuteTransaction()
 		{
 			if (Document.Current.Format == DocumentFormat.Scene || Document.Current.Format == DocumentFormat.Tan) {
-				// Andrey Tyshchenko: Enable animation preview to disable presenters while rendering document preview
-				var savedPreviewAnimation = Document.Current.PreviewAnimation;
-				Document.Current.PreviewAnimation = true;
-				var bitmap = Document.Current.RootNode.AsWidget.ToBitmap();
-				Document.Current.PreviewAnimation = savedPreviewAnimation;
-				var stream = new MemoryStream();
-				bitmap.SaveTo(stream);
-				SetProperty.Perform(Document.Current, nameof(Document.Preview), System.Convert.ToBase64String(stream.ToArray()));
+				DocumentPreview.Generate();
 			}
 		}
 	}
