@@ -50,6 +50,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Documentation\CrosslinkExtension.cs" />
     <Compile Include="Documentation\Documentation.cs" />
     <Compile Include="Documentation\DocumentationComponent.cs" />
     <Compile Include="Documentation\HelpModeGestureManager.cs" />

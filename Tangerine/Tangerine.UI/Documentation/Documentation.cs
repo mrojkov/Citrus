@@ -29,7 +29,7 @@ namespace Tangerine.UI
 
 		public static string GetDocPath(string pageName)
 		{
-			string path = Path.Combine(HtmlDocumentationPath, Path.Combine(pageName.Split('.')));
+			string path = Path.Combine(HtmlDocumentationPath, Path.Combine(pageName.Split('.'))).Replace('\\', '/');
 			return path + DocExtension;
 		}
 
@@ -52,7 +52,10 @@ namespace Tangerine.UI
 			Update();
 		}
 
-		private static readonly MarkdownPipeline Pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
+		private static readonly MarkdownPipeline Pipeline =
+			MarkdownExtensions.Use<CrosslinkExtension>(
+				new MarkdownPipelineBuilder()
+			).UseAdvancedExtensions().Build();
 
 		private static void Update(string directoryPath = "")
 		{
