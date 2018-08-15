@@ -22,6 +22,7 @@ namespace Lime
 		public GameController UIViewController { get; private set; }
 		public GameView UIView { get { return UIViewController.View; } }
 		public WindowInput Input { get; private set; }
+		public bool AsyncRendering { get { return false; } private set { } }
 		public bool Active { get; private set; }
 		public string Title { get; set; }
 		public WindowState State { get { return WindowState.Fullscreen; } set {} }
@@ -81,6 +82,7 @@ namespace Lime
 			}
 			Application.MainWindow = this;
 			Active = true;
+			AsyncRendering = options.AsyncRendering;
 			Input = new WindowInput(this);
 			uiWindow = new UIWindow(UIScreen.MainScreen.Bounds);
 			// UIApplicationDelegate must has a Window reference. This is an Apple's requirement.
