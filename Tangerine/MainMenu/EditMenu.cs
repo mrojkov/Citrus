@@ -438,7 +438,7 @@ namespace Tangerine
 		public override void ExecuteTransaction()
 		{
 			if (Document.Current.Format == DocumentFormat.Scene || Document.Current.Format == DocumentFormat.Tan) {
-				DocumentPreview.Generate();
+				DocumentPreview.Generate(Document.Current.Format == DocumentFormat.Scene ? CompressionFormat.Jpeg : CompressionFormat.Png);
 			}
 		}
 	}
