@@ -98,6 +98,18 @@ namespace Lime
 			return true;
 		}
 
+		private static bool isInputAccelerationListening = true;
+
+		public static bool IsInputAccelerationListening {
+			get { return isInputAccelerationListening; }
+			set {
+#if ANDROID
+				AccelerometerListener.IsActive = value;
+#endif
+				isInputAccelerationListening = value;
+			}
+		}
+
 		private static DeviceOrientation supportedDeviceOrientations = DeviceOrientation.All;
 		/// <summary>
 		/// Supported device orientations (only for mobile platforms)

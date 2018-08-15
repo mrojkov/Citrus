@@ -96,6 +96,8 @@ namespace Lime
 			}
 			keyboardHandler = new KeyboardHandler(input);
 			SetOnKeyListener(keyboardHandler);
+
+			RestrictSupportedOrientationsWith(Application.SupportedDeviceOrientations);
 		}
 
 		public override IInputConnection OnCreateInputConnection(EditorInfo outAttrs)
@@ -214,9 +216,8 @@ namespace Lime
 			if (!GraphicsContext.IsCurrent) {
 				MakeCurrent();
 			}
-			var allowedOrientaion = IsRotationEnabled()
-				? Application.SupportedDeviceOrientations
-				: Application.CurrentDeviceOrientation;
+
+			var allowedOrientaion = Application.SupportedDeviceOrientations;
 			if (previousAllowedOrientaion != allowedOrientaion) {
 				RestrictSupportedOrientationsWith(allowedOrientaion);
 				previousAllowedOrientaion = allowedOrientaion;
@@ -247,15 +248,15 @@ namespace Lime
 				case DeviceOrientation.LandscapeRight:
 					return ScreenOrientation.ReverseLandscape;
 				case DeviceOrientation.AllLandscapes:
-					return ScreenOrientation.SensorLandscape;
+					return ScreenOrientation.UserLandscape;
 				case DeviceOrientation.Portrait:
 					return ScreenOrientation.Portrait;
 				case DeviceOrientation.PortraitUpsideDown:
 					return ScreenOrientation.ReversePortrait;
 				case DeviceOrientation.AllPortraits:
-					return ScreenOrientation.SensorPortrait;
+					return ScreenOrientation.UserPortrait;
 				default:
-					return ScreenOrientation.FullSensor;
+					return ScreenOrientation.FullUser;
 			}
 		}
 

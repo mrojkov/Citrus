@@ -16,6 +16,21 @@ namespace Lime
 			AndroidApp.Context.GetSystemService(AndroidContext.WindowService).JavaCast<IWindowManager>();
 		private Input input;
 
+		private static bool isActive = true;
+
+		public static bool IsActive
+		{
+			get { return isActive; }
+			set {
+				isActive = value;
+				if (isActive) {
+					StartListening(Lime.Application.Input);
+				} else {
+					StopListening();
+				}
+			}
+		}
+
 		public void OnAccuracyChanged(Sensor sensor, SensorStatus accuracy) { }
 
 		public void OnSensorChanged(SensorEvent e)
@@ -57,7 +72,7 @@ namespace Lime
 
 		public static void StartListening(Input input)
 		{
-			if (listener == null) {
+			if (listener == null && isActive) {
 				listener = new AccelerometerListener { input = input };
 				var activity = ActivityDelegate.Instance.Activity;
 				var sensorManager = (SensorManager)activity.GetSystemService(AndroidContext.SensorService);
