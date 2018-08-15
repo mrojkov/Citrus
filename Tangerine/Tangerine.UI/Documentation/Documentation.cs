@@ -53,9 +53,10 @@ namespace Tangerine.UI
 		}
 
 		private static readonly MarkdownPipeline Pipeline =
-			MarkdownExtensions.Use<CrosslinkExtension>(
-				new MarkdownPipelineBuilder()
-			).UseAdvancedExtensions().Build();
+			MarkdownExtensions
+				.Use<CrosslinkExtension>(
+					new MarkdownPipelineBuilder()
+				).UseAdvancedExtensions().Build();
 
 		private static void Update(string directoryPath = "")
 		{

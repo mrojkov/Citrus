@@ -1,20 +1,13 @@
 using Markdig;
 using Markdig.Renderers;
-using Markdig.Renderers.Html;
 using Markdig.Renderers.Html.Inlines;
 using Markdig.Syntax.Inlines;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Tangerine.UI
 {
 	public class CrosslinkExtension : IMarkdownExtension
 	{
-		public void Setup(MarkdownPipelineBuilder pipeline) {
-		}
+		public void Setup(MarkdownPipelineBuilder pipeline) { }
 
 		public void Setup(MarkdownPipeline pipeline, IMarkdownRenderer renderer) {
 			var htmlRenderer = renderer as HtmlRenderer;
