@@ -51,20 +51,23 @@ namespace Tangerine.UI
 					Layout = new HBoxLayout(),
 					LayoutCell = new LayoutCell { StretchY = 0 },
 				};
-				Application.InvokeOnNextUpdate(() => {
-					drag = new Image {
-						Texture = IconPool.GetTexture("Tools.ToolbarSeparator"),
-						LayoutCell = new LayoutCell(Alignment.Center),
-						MinMaxSize = new Vector2(16),
-						Color = IsSeparator ? Color4.Transparent : Color4.White,
-						HitTestTarget = true
-					};
-					if (!IsSeparator) {
-						drag.Tasks.Add(DragTask);
-					}
-					toolbarContainer.Nodes.Insert(0, drag);
-				});
+				toolbarContainer.Awoke += ToolbarContainerAwake;
 				Toolbar = new Toolbar(toolbarContainer);
+			}
+
+			private void ToolbarContainerAwake(Node node)
+			{
+				drag = new Image {
+					Texture = IconPool.GetTexture("Tools.ToolbarSeparator"),
+					LayoutCell = new LayoutCell(Alignment.Center),
+					MinMaxSize = new Vector2(16),
+					Color = IsSeparator ? Color4.Transparent : Color4.White,
+					HitTestTarget = true
+				};
+				if (!IsSeparator) {
+					drag.Tasks.Add(DragTask);
+				}
+				toolbarContainer.Nodes.Insert(0, drag);
 			}
 
 			private IEnumerator<object> DragTask()
