@@ -87,6 +87,9 @@ namespace Tangerine.UI
 		public static void ShowHelp(string pageName)
 		{
 			string path = GetDocPath(pageName);
+			// Evgeny Polikutin: if help is open in the same thread,
+			// weird crashes in GestureManager occur (something changes activeGestures collection).
+			// Remove at your own risk
 			new Thread(() => {
 				Thread.CurrentThread.IsBackground = true;
 				if (File.Exists(path)) {
