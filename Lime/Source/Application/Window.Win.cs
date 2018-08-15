@@ -469,7 +469,7 @@ namespace Lime
 				active = false;
 				// Andrey Tyshchenko: clear Input state, the next activated window
 				// will receive KeyDown event and restore Input state
-				Input.ClearKeyState();
+				Input.ClearKeyState(clearMouseButtons: false);
 				RaiseDeactivated();
 			}
 		}
