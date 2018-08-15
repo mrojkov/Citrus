@@ -201,6 +201,7 @@
     <Compile Include="Source\Widgets\3D\ShadowMapping\DepthBufferProgram.cs" />
     <Compile Include="Source\Widgets\3D\ShadowMapping\DepthBufferRenderer.cs" />
     <Compile Include="Source\Widgets\3D\Spline3D.cs" />
+    <Compile Include="Source\Widgets\Animation\HslComponent.cs" />
     <Compile Include="Source\Widgets\DropDownList.cs" />
     <Compile Include="Source\Widgets\Editor.cs" />
     <Compile Include="Source\Graphics\RenderBatch.cs" />
