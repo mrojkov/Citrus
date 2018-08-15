@@ -60,7 +60,8 @@ namespace Tangerine.UI
 
 		private static void Update(string directoryPath = "")
 		{
-			var sourceDirectory = new DirectoryInfo(Path.Combine(MarkdownDocumentationPath, directoryPath));
+			string source = Path.Combine(MarkdownDocumentationPath, directoryPath);
+			var sourceDirectory = new DirectoryInfo(source);
 			string destination = Path.Combine(HtmlDocumentationPath, directoryPath);
 			if (!Directory.Exists(destination)) {
 				Directory.CreateDirectory(destination);
@@ -80,6 +81,19 @@ namespace Tangerine.UI
 						);
 						Markdown.ToHtml(sr.ReadToEnd(), sw, Pipeline);
 					}
+				}
+			}
+			var destinationDirectory = new DirectoryInfo(destination);
+			foreach (var dir in destinationDirectory.GetDirectories()) {
+				string path = Path.Combine(source, dir.Name);
+				if (!Directory.Exists(path)) {
+					Directory.Delete(dir.FullName, true);
+				}
+			}
+			foreach (var file in destinationDirectory.GetFiles($"*{DocExtension}")) {
+				string path = Path.Combine(source, Path.ChangeExtension(file.Name, PageExtension));
+				if (!File.Exists(path)) {
+					File.Delete(file.FullName);
 				}
 			}
 		}
