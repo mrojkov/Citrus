@@ -243,7 +243,7 @@ namespace Tangerine
 			DocumentHistory.Processors.AddRange(UI.Timeline.Timeline.GetOperationProcessors());
 
 			InitializeHotkeys();
-			RegisterToolbarCommands();
+			RegisterCommands();
 
 			Toolbars.Add("Editing", new Toolbar(dockManager.ToolbarArea));
 			Toolbars.Add("Create", new Toolbar(dockManager.ToolbarArea));
@@ -347,8 +347,16 @@ namespace Tangerine
 			UI.SceneView.VisualHintsPanel.Refresh();
 		}
 
-		void RegisterToolbarCommands()
+		void RegisterCommands()
 		{
+			RegisterCommands(typeof(TimelineCommands));
+			RegisterCommands(typeof(InspectorCommands));
+			RegisterCommands(typeof(GenericCommands));
+			RegisterCommands(typeof(SceneViewCommands));
+			RegisterCommands(typeof(Tools));
+			RegisterCommands(typeof(OrangeCommands));
+			CommandRegister.Register("Undo", Command.Undo);
+			CommandRegister.Register("Redo", Command.Redo);
 			ToolbarCommandRegister.RegisterCommands(
 				Command.Undo,
 				Command.Redo,
@@ -377,6 +385,16 @@ namespace Tangerine
 				Tools.FlipY,
 				Tools.CenterView
 			);
+		}
+
+		void RegisterCommands(Type type)
+		{
+			foreach (var field in type.GetFields(System.Reflection.BindingFlags.Static)) {
+				if (!field.GetType().IsSubclassOf(typeof(ICommand))) {
+					continue;
+				}
+				CommandRegister.Register(field.Name, (ICommand)field.GetValue(null));
+			}
 		}
 
 		Yuzu.AbstractDeserializer DeserializeHotStudioAssets(string path, System.IO.Stream stream)
