@@ -1,6 +1,8 @@
 using Lime;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Tangerine.Core;
 
 namespace Tangerine.UI.FilesystemView
 {
@@ -15,21 +17,23 @@ namespace Tangerine.UI.FilesystemView
 		private AddressBarState state;
 		private PathBar pathBar;
 		private ThemedEditBox editor;
-		private FilesystemView view;
+		private Func<string, bool> openPath;
 
 		public string Path
 		{
-			get {
+			get
+			{
 				return buffer;
 			}
-			set {
+			set
+			{
 				buffer = AdjustPath(value);
 			}
 		}
 
-		public AddressBar(FilesystemView view)
+		public AddressBar(Func<string, bool> openPath)
 		{
-			this.view = view;
+			this.openPath = openPath;
 			Layout = new StackLayout();
 			state = AddressBarState.PathBar;
 			CreatePathBar();
@@ -41,7 +45,7 @@ namespace Tangerine.UI.FilesystemView
 				) {
 					state = AddressBarState.Editor;
 					editor.Text = buffer;
-					DeletePathBar();
+					RemovePathBar();
 				}
 				if (
 					state == AddressBarState.Editor &&
@@ -51,7 +55,7 @@ namespace Tangerine.UI.FilesystemView
 				}
 			};
 		}
-		
+
 		private IEnumerator<object> ShowAlertTask(string message)
 		{
 			yield return Task.WaitWhile(() => Input.ConsumeKeyPress(Key.Enter));
@@ -70,13 +74,34 @@ namespace Tangerine.UI.FilesystemView
 				return buffer;
 			}
 
+			if (path.Contains("..")) {
+				var i = 0;
+				
+				if (path.EndsWith("/../")) {
+					i = 4;
+				} else if (path.EndsWith("\'..\'")) {
+					i = 4;
+				} else if (path.EndsWith("/..")) {
+					i = 3;
+				} else if (path.EndsWith("\'..")) {
+					i = 4;
+				} else if (path.EndsWith("..")) {
+					i = 2;
+				}
+
+				if (i != 0) {
+					if (new System.IO.DirectoryInfo(path.Remove(path.Length - i)).Parent == null) {
+						path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop);
+					} else {
+						path = System.IO.Path.GetDirectoryName(path.Remove(path.Length - i));
+					}
+				}
+			}
+
 			char[] charsToTrim = { '.', ' ' };
 			path = path.Trim(charsToTrim);
 
-			if (path.Contains(System.IO.Path.AltDirectorySeparatorChar.ToString())) {
-				Tasks.Add(ShowAlertTask("The path is in an invalid format."));
-				return buffer;
-			}
+			path = path.Replace(System.IO.Path.AltDirectorySeparatorChar, System.IO.Path.DirectorySeparatorChar);
 
 			//If the user added many slashes
 			string doubleDirectorySeparator = string.Empty;
@@ -96,7 +121,7 @@ namespace Tangerine.UI.FilesystemView
 
 			return path;
 		}
-		
+
 		public static string PathToFolderPath(string path)
 		{
 			if (System.IO.Path.GetExtension(path) != string.Empty) {
@@ -135,7 +160,7 @@ namespace Tangerine.UI.FilesystemView
 				CreatePathBar();
 			} else {
 				state = AddressBarState.Editor;
-				DeletePathBar();
+				RemovePathBar();
 				editor.Text = buffer;
 			}
 		}
@@ -147,7 +172,7 @@ namespace Tangerine.UI.FilesystemView
 			editor.Updating += (float delta) => {
 				if (editor.Input.WasKeyPressed(Key.Enter)) {
 					var adjustedText = AdjustPath(editor.Text);
-					if (view.Open(adjustedText)) {
+					if (openPath(adjustedText)) {
 						buffer = PathToFolderPath(adjustedText);
 						FlipState();
 					} else {
@@ -159,7 +184,7 @@ namespace Tangerine.UI.FilesystemView
 
 		private void CreatePathBar()
 		{
-			Nodes.Push(pathBar = new PathBar(view, this));
+			Nodes.Push(pathBar = new PathBar(openPath, this));
 			pathBar.LayoutCell = new LayoutCell(Alignment.LeftCenter);
 			pathBar.Updating += UpdatingPathBar;
 		}
@@ -171,7 +196,7 @@ namespace Tangerine.UI.FilesystemView
 			}
 		}
 
-		private void DeletePathBar()
+		private void RemovePathBar()
 		{
 			Nodes.Remove(pathBar);
 			pathBar.Updating -= UpdatingPathBar;
@@ -182,14 +207,14 @@ namespace Tangerine.UI.FilesystemView
 	public class PathBar : Widget
 	{
 		private string buffer;
-		private int countOfFolders;
-		private FilesystemView view;
+		private List<string> topFoldersPaths;
+		private Func<string, bool> openPath;
 		private PathBarButton[] buttons;
 		private PathArrowButton rootArrowButton;
 
-		public PathBar(FilesystemView view, AddressBar addressBar)
+		public PathBar(Func<string, bool> openPath, AddressBar addressBar)
 		{
-			this.view = view;
+			this.openPath = openPath;
 			buffer = addressBar.Path;
 			Layout = new HBoxLayout();
 			LayoutCell = new LayoutCell(Alignment.LeftCenter);
@@ -206,19 +231,18 @@ namespace Tangerine.UI.FilesystemView
 
 		private void CreateButtons()
 		{
-			countOfFolders = GetСountOfFolders(buffer);
-			var topFoldersPaths = GetTopFoldersPaths(buffer, countOfFolders);
-			buttons = new PathBarButton[countOfFolders];
-			
-			Nodes.Add(rootArrowButton = new PathArrowButton(view));
-			for (var i = 0; i < countOfFolders; i++) {
-				Nodes.Add(buttons[i] = new PathBarButton(view, topFoldersPaths[i]));
+			topFoldersPaths = GetTopFoldersPaths(buffer);
+			buttons = new PathBarButton[topFoldersPaths.Count];
+
+			Nodes.Add(rootArrowButton = new PathArrowButton(openPath));
+			for (var i = topFoldersPaths.Count - 1; i >= 0; i--) {
+				Nodes.Add(buttons[i] = new PathBarButton(openPath, topFoldersPaths[i]));
 			}
 		}
 
-		private void DestroyButtons()
+		private void RemoveButtons()
 		{
-			for (var i = countOfFolders - 1; i >= 0; i--) {
+			for (var i = topFoldersPaths.Count - 1; i >= 0; i--) {
 				Nodes.Remove(buttons[i]);
 			}
 			Nodes.Remove(rootArrowButton);
@@ -226,48 +250,25 @@ namespace Tangerine.UI.FilesystemView
 
 		private void UpdatePathBar()
 		{
-			DestroyButtons();
+			RemoveButtons();
 			CreateButtons();
 		}
 
-		public static int GetСountOfFolders(string path)
-		{
-			if (string.IsNullOrWhiteSpace(path)) {
-				return -1;
-			}
-			var folders = 0;
-			for (var i = 0; i < path.Length; i++) {
-				if (
-					path[i] == System.IO.Path.DirectorySeparatorChar ||
-					i == path.Length - 1
-				) {
-					folders++;
-				}
-			}
-			return folders;
-		}
-
-		public static string[] GetTopFoldersPaths(string path, int countOfFolders)
+		public static List<string> GetTopFoldersPaths(string path)
 		{
 			if (string.IsNullOrWhiteSpace(path)) {
 				return null;
 			}
-			if (countOfFolders > 0) {
-				var topFolders = new string[countOfFolders];
-				var i = countOfFolders - 1;
-				topFolders[i] = path;
-				i--;
-				while (i != -1) {
-					topFolders[i] = System.IO.Path.GetDirectoryName(topFolders[i + 1]);
-					i--;
-				}
-				return topFolders;
-			} else {
-				return null;
+			var topFolders = new List<string>();
+			topFolders.Add(path);
+			var p = System.IO.Path.GetDirectoryName(topFolders[topFolders.Count - 1]);
+			while (p != null) {
+				topFolders.Add(p);
+				p = System.IO.Path.GetDirectoryName(topFolders[topFolders.Count - 1]);
 			}
+			return topFolders;
 		}
 	}
-
 
 	public enum PathBarButtonState
 	{
@@ -282,13 +283,13 @@ namespace Tangerine.UI.FilesystemView
 		private PathFolderButton folderButton;
 		private PathArrowButton arrowButton;
 
-		public PathBarButton(FilesystemView view, string path) : base()
+		public PathBarButton(Func<string, bool> openPath, string path) : base()
 		{
 			Layout = new HBoxLayout();
 			HitTestTarget = true;
 
-			folderButton = new PathFolderButton(view, path);
-			arrowButton = new PathArrowButton(view, path);
+			folderButton = new PathFolderButton(openPath, path);
+			arrowButton = new PathArrowButton(openPath, path);
 
 			Nodes.Add(folderButton);
 			Nodes.Add(arrowButton);
@@ -296,7 +297,7 @@ namespace Tangerine.UI.FilesystemView
 			Updating += (float delta) => {
 				if (arrowButton.ArrowState == PathArrowButtonState.Expanded) {
 					state = PathBarButtonState.Press;
-				} else { 
+				} else {
 					if (IsMouseOverThisOrDescendant()) {
 						if (
 							folderButton.WasClicked() ||
@@ -355,14 +356,14 @@ namespace Tangerine.UI.FilesystemView
 		public PathArrowButton arrowButton;
 		public PathBarButtonState State;
 
-		public PathFolderButton(FilesystemView view, string path) : base()
+		public PathFolderButton(Func<string, bool> openPath, string path) : base()
 		{
 			Text = GetName(path);
-			MinMaxHeight = 20;
 			Presenter = new PathButtonPresenter();
 			base.Presenter = Presenter;
-			MinMaxWidth = Renderer.MeasureTextLine(Text, Theme.Metrics.TextHeight, 3).X;
-			Gestures.Add(new ClickGesture(0, () => view.Open(path)));
+			MinMaxHeight = 20;
+			MinMaxWidth = Renderer.MeasureTextLine(Text, Theme.Metrics.TextHeight, 0).X + 7;
+			Gestures.Add(new ClickGesture(0, () => openPath(path)));
 			Gestures.Add(new ClickGesture(1, () => SystemShellContextMenu.Instance.Show(path)));
 		}
 
@@ -375,12 +376,14 @@ namespace Tangerine.UI.FilesystemView
 		{
 			if (string.IsNullOrWhiteSpace(path)) {
 				return null;
-			} else if(
+			} else if (
 				path[path.Length - 1] == System.IO.Path.DirectorySeparatorChar &&
 				path[path.Length - 2] == System.IO.Path.VolumeSeparatorChar
-			) { // Root
+			) {
+				// Root
 				return path.Remove(path.Length - 1);
-			} else { // Folder
+			} else {
+				// Folder
 				int i;
 				for (i = path.Length - 1; i >= 0; i--) {
 					if (path[i] == System.IO.Path.DirectorySeparatorChar) {
@@ -403,16 +406,16 @@ namespace Tangerine.UI.FilesystemView
 	{
 		private string path;
 		private DirectoryPicker picker;
-		private FilesystemView view;
+		private Func<string, bool> openPath;
 		private new PathButtonPresenter Presenter;
 		public PathArrowButtonState ArrowState;
 		public PathBarButtonState State;
 		public PathFolderButton folderButton;
 
-		public PathArrowButton(FilesystemView view, string path = null) : base()
+		public PathArrowButton(Func<string, bool> openPath, string path = null) : base()
 		{
 			this.path = path;
-			this.view = view;
+			this.openPath = openPath;
 			MinMaxHeight = 20;
 			Presenter = new PathButtonPresenter();
 			base.Presenter = Presenter;
@@ -452,7 +455,8 @@ namespace Tangerine.UI.FilesystemView
 				ArrowState = PathArrowButtonState.Expanded;
 				var indent = 14;
 				var pickerPosition = Window.Current.LocalToDesktop(GlobalPosition + new Vector2(-indent, Height));
-				picker = new DirectoryPicker(pickerPosition, view, path);
+				picker = new DirectoryPicker(openPath, pickerPosition, path);
+				
 				picker.Window.Deactivated += () => {
 					picker.Window.Close();
 					FlipState();
@@ -467,15 +471,17 @@ namespace Tangerine.UI.FilesystemView
 
 	public class DirectoryPicker
 	{
-		private FilesystemView view;
-		private bool IsMouseInside = false;
+		private Func<string, bool> openPath;
 		private ThemedScrollView scrollView;
-
-		public Window Window { get; }
-
-		public DirectoryPicker(Vector2 globalPosition, FilesystemView view, string path = null)
+		public Window Window
 		{
-			this.view = view;
+			get;
+		}
+		public WindowWidget RootWidget;
+
+		public DirectoryPicker(Func<string, bool> openPath, Vector2 globalPosition, string path = null) : base()
+		{
+			this.openPath = openPath;
 
 			List<FilesystemItem> filesystemItems = new List<FilesystemItem>();
 			if (path == null) {
@@ -487,45 +493,55 @@ namespace Tangerine.UI.FilesystemView
 				filesystemItems = GetFilesystemItems(internalFolders);
 			}
 
-			const int MaxItemsOnWindow = 19; // Like in Windows File Explorer
-			var itemsCount = System.Math.Min(filesystemItems.Count, MaxItemsOnWindow);
-			var clientSize = new Vector2(FilesystemItem.ItemWidth, (FilesystemItem.IconSize + 2 * FilesystemItem.ItemPadding) * itemsCount);
-			Window = new Window(new WindowOptions {
-				ClientSize = clientSize,
-				FixedSize = true,
-				MinimumDecoratedSize = clientSize,
-				Style = WindowStyle.Borderless,
-				Centered = false,
-				Visible = false
-			});
-
 			scrollView = new ThemedScrollView();
-			var list = new Widget {
-				Layout = new VBoxLayout()
+			scrollView.Content.Layout = new VBoxLayout();
+			scrollView.Content.Padding = new Thickness(5);
+			scrollView.Content.Nodes.AddRange(filesystemItems);
+
+			// Like in Windows File Explorer
+			const int MaxItemsOnPicker = 19; 
+			var itemsCount = System.Math.Min(filesystemItems.Count, MaxItemsOnPicker);
+			var clientSize = new Vector2(FilesystemItem.ItemWidth, (FilesystemItem.IconSize + 2 * FilesystemItem.ItemPadding) * itemsCount) + new Vector2(scrollView.Content.Padding.Left * 2);
+			scrollView.MinMaxSize = clientSize;
+
+			var windowOptions = new WindowOptions() {
+				ClientSize = scrollView.MinSize,
+				MinimumDecoratedSize = scrollView.MinSize,
+				FixedSize = true,
+				Style = WindowStyle.Borderless,
+				Centered = globalPosition == Vector2.Zero,
+				Visible = false,
 			};
-			list.Nodes.AddRange(filesystemItems);
-			scrollView.Content.Layout = new VBoxLayout { Spacing = AttachmentMetrics.Spacing };
-			scrollView.Content.AddNode(list);
-			var rootWidget = new ThemedInvalidableWindowWidget(Window) {
+			Window = new Window(windowOptions);
+
+			RootWidget = new ThemedInvalidableWindowWidget(Window) {
 				Layout = new VBoxLayout(),
-				Padding = new Thickness(5),
+				LayoutBasedWindowSize = true,
 				Nodes = {
 					scrollView
 				}
 			};
-			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
-			rootWidget.Presenter = new DelegatePresenter<Widget>(_ => {
-				rootWidget.PrepareRendererState();
-				Renderer.DrawRect(Vector2.Zero, Window.ClientSize, Theme.Colors.DirectoryPickerBackground);
+			RootWidget.FocusScope = new KeyboardFocusScope(RootWidget);
+			RootWidget.AddChangeWatcher(() => WidgetContext.Current.NodeUnderMouse, (value) => {
+				if (value != null)
+					if (scrollView.Content == value.Parent) {
+					Window.Current.Invalidate();
+				}
 			});
-			rootWidget.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(_ => {
-				rootWidget.PrepareRendererState();
-				Renderer.DrawRectOutline(Vector2.Zero, Window.ClientSize, Theme.Colors.DirectoryPickerOutline, thickness: 2);
+
+			RootWidget.Presenter = new DelegatePresenter<Widget>(_ => {
+				RootWidget.PrepareRendererState();
+				Renderer.DrawRect(Vector2.One, RootWidget.ContentSize, Theme.Colors.DirectoryPickerBackground);
+			});
+			RootWidget.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(_ => {
+				RootWidget.PrepareRendererState();
+				Renderer.DrawRectOutline(Vector2.Zero, RootWidget.ContentSize, Theme.Colors.DirectoryPickerOutline, thickness: 2);
 			}));
-			Window.ClientSize = clientSize + new Vector2(rootWidget.Padding.Left * 2);
 
 			Window.Visible = true;
-			Window.ClientPosition = globalPosition;
+			if (globalPosition != Vector2.Zero) {
+				Window.ClientPosition = globalPosition;
+			}
 		}
 
 		public static List<string> GetInternalFoldersPaths(string path)
@@ -546,16 +562,13 @@ namespace Tangerine.UI.FilesystemView
 				item.CompoundPresenter.Add(new DelegatePresenter<Widget>(_ => {
 					if (item.IsMouseOverThisOrDescendant()) {
 						item.PrepareRendererState();
-						Renderer.DrawRect(Vector2.Zero, item.Size, Theme.Colors.HoveredBackground);
+						Renderer.DrawRect(Vector2.Zero, item.Size, Theme.Colors.DirectoryPickerItemHoveredBackground);
 					}
 				}));
 				item.Updating += (float delta) => {
-					if (IsMouseEntering(item)) {
-						Window.Invalidate();
-					}
 					if (item.Input.WasMouseReleased(0)) {
 						Window.Close();
-						view.Open(item.FilesystemPath);
+						openPath(item.FilesystemPath);
 					} else if (item.Input.WasMouseReleased(1)) {
 						SystemShellContextMenu.Instance.Show(item.FilesystemPath);
 					}
@@ -566,10 +579,10 @@ namespace Tangerine.UI.FilesystemView
 
 		public static List<string> GetAvailableRootsPathsFromLogicalDrives(string[] logicalDrives)
 		{
-			var countOfRealRoots = 0;
+			var realRootsCount = 0;
 			foreach (var path in logicalDrives) {
 				if (System.IO.Directory.Exists(path)) {
-					countOfRealRoots++;
+					realRootsCount++;
 				}
 			}
 			List<string> availableRoots = new List<string>();
@@ -578,30 +591,10 @@ namespace Tangerine.UI.FilesystemView
 				if (System.IO.Directory.Exists(root)) {
 					availableRoots.Add(root);
 					i++;
-					if (i == countOfRealRoots) break;
+					if (i == realRootsCount) break;
 				}
 			}
 			return availableRoots;
-		}
-
-		private bool IsMouseEntering(Widget widget)
-		{
-			if (
-				widget.LocalMousePosition().X >= 0 &&
-				widget.LocalMousePosition().Y >= 0 &&
-				widget.LocalMousePosition().X <= widget.Width &&
-				widget.LocalMousePosition().Y <= widget.Height
-			) {
-				if (!IsMouseInside) {
-					IsMouseInside = true;
-					return true;
-				} else {
-					return false;
-				}
-			} else {
-				IsMouseInside = false;
-				return false;
-			}
 		}
 	}
 }

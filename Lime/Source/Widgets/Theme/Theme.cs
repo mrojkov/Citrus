@@ -69,6 +69,8 @@ namespace Lime
 			[YuzuRequired]
 			public Color4 DirectoryPickerOutline { get; set; }
 			[YuzuRequired]
+			public Color4 DirectoryPickerItemHoveredBackground { get; set; }
+			[YuzuRequired]
 			public Color4 TabNormal { get; set; }
 			[YuzuRequired]
 			public Color4 TabActive { get; set; }
@@ -133,6 +135,7 @@ namespace Lime
 					PathBarButtonOutlinePress = new Color4(143, 179, 215),
 					DirectoryPickerBackground = new Color4(82, 82, 82),
 					DirectoryPickerOutline = new Color4(39, 39, 39),
+					DirectoryPickerItemHoveredBackground = new Color4 (127, 127, 127),
 					TabNormal = grayBackground.Lighten(0.2f),
 					TabActive = grayBackground.Lighten(0.05f),
 					SeparatorColor = grayBackground.Lighten(0.3f),
@@ -181,6 +184,7 @@ namespace Lime
 					PathBarButtonOutlinePress = new Color4(0, 86, 155),
 					DirectoryPickerBackground = new Color4(240, 240, 240),
 					DirectoryPickerOutline = new Color4(133, 133, 133),
+					DirectoryPickerItemHoveredBackground = new Color4(158, 200, 233),
 					TabNormal = grayBackground.Darken(0.2f),
 					TabActive = grayBackground.Darken(0.05f),
 					SeparatorColor = grayBackground.Darken(0.3f),

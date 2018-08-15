@@ -139,8 +139,6 @@ namespace Tangerine.UI.FilesystemView
 			scrollView = new ThemedScrollView(ScrollDirection.Horizontal) {
 				TabTravesable = new TabTraversable(),
 			};
-			// TODO: Display path
-			RootWidget.AddChangeWatcher(() => model.CurrentPath, (path) => toolbar.AddressBar.Path = path.ToString());
 			crEditor = new CookingRulesEditor(NavigateAndSelect);
 			crEditor.RootWidget.TabTravesable = new TabTraversable();
 			preview = new Preview();
@@ -217,6 +215,7 @@ namespace Tangerine.UI.FilesystemView
 				InvalidateFSWatcher(p);
 				preview.ClearTextureCache();
 				lastKeyboardSelectedFilesystemItem = scrollView.Content.FirstChild as FilesystemItem;
+				toolbar.AddressBar.Path = p.ToString();
 			});
 			RootWidget.Layout = new VBoxLayout();
 			RootWidget.AddNode((cookingRulesSplitter = new ThemedHSplitter {

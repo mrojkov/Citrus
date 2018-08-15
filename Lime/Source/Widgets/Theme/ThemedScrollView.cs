@@ -36,14 +36,16 @@ namespace Lime
 			var slider = new Widget();
 			slider.Size = new Vector2(10, 5);
 			Direction = scrollDirection;
-			if (scrollDirection == ScrollDirection.Vertical) { // Small icons
+			if (scrollDirection == ScrollDirection.Vertical) {
+				// Small icons
 				slider.CompoundPresenter.Add(new DelegatePresenter<Widget>(_ => {
 					PrepareRendererState();
 					Renderer.DrawRect(new Vector2(Width - slider.Width, 0), Size, Theme.Colors.ScrollbarBackground);
 					slider.PrepareRendererState();
 					Renderer.DrawRect(new Vector2(2, 0), new Vector2(slider.Width - 2, slider.Height), Theme.Colors.ScrollbarThumb);
 				}));
-			} else { // Linear
+			} else {
+				// List
 				slider.CompoundPresenter.Add(new DelegatePresenter<Widget>(_ => {
 					PrepareRendererState();
 					Renderer.DrawRect(new Vector2(0, Height - slider.Height), Size, Theme.Colors.ScrollbarBackground);

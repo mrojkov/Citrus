@@ -28,12 +28,17 @@ namespace Tangerine.UI.FilesystemView
 				return TexturePool.Instance.GetTexture(null);
 			}
 			bool isDirectory = (attr & FileAttributes.Directory) == FileAttributes.Directory;
+			var isRoot = false;
 			if (isDirectory) {
 				if (new DirectoryInfo(path).Parent == null) {
-					isDirectory = false;
+					isRoot = true;
 				}
 			}
-			if (isDirectory && directoryTexture != null) {
+			if (
+				isDirectory &&
+				!isRoot &&
+				directoryTexture != null
+			) {
 				return directoryTexture;
 			}
 			var ext = Path.GetExtension(path);
@@ -56,7 +61,7 @@ namespace Tangerine.UI.FilesystemView
 					}
 			}
 			WinAPI.DestroyIcon(shInfo.hIcon);
-			if (isDirectory) {
+			if (isDirectory && !isRoot) {
 				directoryTexture = t;
 			} else {
 				textureCache.Add(ext, t);
