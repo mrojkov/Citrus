@@ -13,6 +13,7 @@ namespace Lime
 	public class Window : CommonWindow, IWindow
 	{
 		private Thread renderThread;
+		private CancellationTokenSource renderThreadTokenSource;
 		private CancellationToken renderThreadToken;
 
 		// This line only suppresses warning: "Window.Current: a name can be simplified".
@@ -358,9 +359,8 @@ namespace Lime
 			}
 			AsyncRendering = options.AsyncRendering;
 			if (AsyncRendering) {
-				var renderThreadTokenSource = new CancellationTokenSource();
+				renderThreadTokenSource = new CancellationTokenSource();
 				renderThreadToken = renderThreadTokenSource.Token;
-				Application.Exited += renderThreadTokenSource.Cancel;
 				renderThread = new Thread(RenderLoop);
 				renderThread.Start();
 			}
@@ -420,6 +420,11 @@ namespace Lime
 
 		private void OnClosed(object sender, FormClosedEventArgs e)
 		{
+			if (AsyncRendering) {
+				renderThreadTokenSource.Cancel();
+				renderThread.Interrupt();
+				renderThread.Join();
+			}
 			RaiseClosed();
 			Application.Windows.Remove(this);
 			if (this == Application.MainWindow) {
@@ -609,7 +614,14 @@ namespace Lime
 			while (!glControl.IsDisposed && !renderThreadToken.IsCancellationRequested) {
 				if (glControl.IsHandleCreated && form.Visible) {
 					glControl.MakeCurrent();
-					RaiseRendering();
+					try {
+						RaiseRendering();
+					} catch (ThreadInterruptedException e) {
+						if (renderThreadToken.IsCancellationRequested) {
+							return;
+						}
+						System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(e).Throw();
+					}
 					glControl.SwapBuffers();
 				} else {
 					Thread.Sleep(16);
