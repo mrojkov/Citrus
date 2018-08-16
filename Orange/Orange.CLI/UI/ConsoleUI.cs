@@ -28,11 +28,10 @@ namespace Orange
 #endif
 			var args = System.Environment.GetCommandLineArgs();
 			CreateMenuItems();
-			if (args.Length < 3) {
-				WriteHelpAndExit();
-			}
-			if (!args[1].StartsWith("-")) {
-				OpenWorkspace(args);
+			if (args.Length >= 3) {
+					if (!args[1].StartsWith("-")) {
+						OpenWorkspace(args);
+					}
 			}
 			RunCommand(Toolbox.GetCommandLineArg("--command"));
 		}
@@ -84,7 +83,7 @@ namespace Orange
 
 		private static void WriteHelpAndExit()
 		{
-			Console.WriteLine($"Orange.CLI citrus_project" +
+			Console.WriteLine($"Orange.CLI [citrus_project]" +
 			                  $" --target:[Win|Mac|ios|android|uc]" +
 			                  $" --command:command" +
 			                  $" [--autoupdate]" +
