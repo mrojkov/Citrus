@@ -29,8 +29,8 @@ namespace Tangerine.UI
 			panel.Widget.Tasks.Add(currentColor.Consume(v => {
 				if (!colorFromPanel) {
 					panel.Color = v;
-					colorFromPanel = false;
 				}
+				colorFromPanel = false;
 			}));
 			panel.Changed += () => {
 				EditorParams.History?.RollbackTransaction();
