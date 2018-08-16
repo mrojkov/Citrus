@@ -245,11 +245,14 @@ namespace Tangerine
 			InitializeHotkeys();
 			RegisterCommands();
 
-			Toolbars.Add("Editing", new Toolbar(dockManager.ToolbarArea));
-			Toolbars.Add("Create", new Toolbar(dockManager.ToolbarArea));
-			Toolbars.Add("Tools", new Toolbar(dockManager.ToolbarArea));
+			// Andrey Tyshchenko: Create panel after hotkeys initialization
+			// to properly display hotkeys on panel
+			new UI.SceneView.NodeDecorationsPanel(nodeDecorationsPanel);
+
+			Toolbars.Add("Toolbar", new Toolbar(dockManager.ToolbarArea));
+			AppUserPreferences.Instance.ToolbarLayout.RefreshAfterLoad();
+			Toolbars["Toolbar"].Rebuild(AppUserPreferences.Instance.ToolbarLayout);
 			RefreshCreateNodeCommands();
-			AppUserPreferences.Instance.ToolbarLayout.Rebuild(dockManager.ToolbarArea);
 			Document.AttachingViews += doc => {
 				if (doc.Views.Count == 0) {
 					doc.Views.AddRange(new IDocumentView[] {
@@ -337,11 +340,7 @@ namespace Tangerine
 
 		public void RefreshCreateNodeCommands()
 		{
-			var createToolbar = AppUserPreferences.Instance.ToolbarLayout.CreateToolbar;
-			createToolbar.Clear();
-			foreach (var c in TangerineMenu.CreateNodeCommands) {
-				createToolbar.Add(c);
-			}
+			Toolbars["Toolbar"].Rebuild();
 			HotkeyRegistry.InitCommands(TangerineMenu.CreateNodeCommands, "Tools", "Tools");
 			HotkeyRegistry.UpdateProfiles();
 			UI.SceneView.VisualHintsPanel.Refresh();
@@ -357,40 +356,13 @@ namespace Tangerine
 			RegisterCommands(typeof(OrangeCommands));
 			CommandRegister.Register("Undo", Command.Undo);
 			CommandRegister.Register("Redo", Command.Redo);
-			ToolbarCommandRegister.RegisterCommands(
-				Command.Undo,
-				Command.Redo,
-				GenericCommands.Revert,
-				Tools.AlignLeft,
-				Tools.AlignTop,
-				Tools.AlignRight,
-				Tools.AlignBottom,
-				Tools.AlignCentersHorizontally,
-				Tools.AlignCentersVertically,
-				Tools.DistributeLeft,
-				Tools.DistributeHorizontally,
-				Tools.DistributeRight,
-				Tools.DistributeTop,
-				Tools.DistributeVertically,
-				Tools.DistributeBottom,
-				Tools.AlignTo,
-				Tools.CenterHorizontally,
-				Tools.CenterVertically,
-				Tools.RestoreOriginalSize,
-				Tools.ResetScale,
-				Tools.ResetRotation,
-				Tools.FitToContainer,
-				Tools.FitToContent,
-				Tools.FlipX,
-				Tools.FlipY,
-				Tools.CenterView
-			);
 		}
 
 		void RegisterCommands(Type type)
 		{
-			foreach (var field in type.GetFields(System.Reflection.BindingFlags.Static)) {
-				if (!field.GetType().IsSubclassOf(typeof(ICommand))) {
+			foreach (var field in type.GetFields(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)) {
+				var fieldType = field.FieldType;
+				if (!(fieldType == typeof(ICommand) || fieldType.IsSubclassOf(typeof(ICommand)))) {
 					continue;
 				}
 				CommandRegister.Register(field.Name, (ICommand)field.GetValue(null));

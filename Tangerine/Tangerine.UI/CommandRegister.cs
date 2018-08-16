@@ -52,12 +52,7 @@ namespace Tangerine.UI
 
 		public static bool TryGetCommand(string id, out ICommand command)
 		{
-			if (commands.ContainsKey(id)) {
-				command = commands[id];
-				return true;
-			}
-			command = null;
-			return false;
+			return commands.TryGetValue(id, out command);
 		}
 
 		public static ICommand GetCommand(string id)
@@ -66,6 +61,27 @@ namespace Tangerine.UI
 				return command;
 			}
 			throw new ArgumentException($"Command with id:'{id}'hasn't been registered");
+		}
+
+		public static IEnumerable<KeyValuePair<string, ICommand>> RegisteredPairs()
+		{
+			foreach (var pair in commands) {
+				yield return pair;
+			}
+		}
+
+		public static IEnumerable<ICommand> RegisteredCommands()
+		{
+			foreach (var command in commands.Values) {
+				yield return command;
+			}
+		}
+
+		public static IEnumerable<string> RegisteredIds()
+		{
+			foreach (var id in commands.Keys) {
+				yield return id;
+			}
 		}
 	}
 }

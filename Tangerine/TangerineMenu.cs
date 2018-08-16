@@ -63,6 +63,7 @@ namespace Tangerine
 
 			foreach (var type in Project.Current.RegisteredNodeTypes) {
 				var cmd = new Command(type.Name) { Icon = NodeIconPool.GetTexture(type) };
+				CommandRegister.Register(cmd, @override: true);
 				CommandHandlerList.Global.Connect(cmd, new CreateNode(type, cmd));
 				if (type.Namespace == "Lime") {
 					create.Add(cmd);

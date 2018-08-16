@@ -1,305 +1,165 @@
 using Lime;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Tangerine.UI.Docking;
 using Yuzu;
 
 namespace Tangerine.UI
 {
-	public static class ToolbarCommandRegister
-	{
-		public static List<ICommand> RegisteredCommands { get; } = new List<ICommand>();
-
-		public static void RegisterCommand(ICommand command)
-		{
-			RegisteredCommands.Add(command);
-		}
-
-		public static void RegisterCommands(params ICommand[] commands)
-		{
-			RegisteredCommands.AddRange(commands);
-		}
-	}
-
 	public class ToolbarLayout
 	{
 		public class ToolbarPanel
 		{
 			[YuzuRequired]
-			public List<int> CommandIndexes { get; set; } = new List<int>();
+			public List<string> CommandIds { get; set; } = new List<string>();
 
 			[YuzuOptional]
 			public string Title { get; set; } = "Panel";
 
+			public ToolbarRow Parent;
+			public int Index;
+
+			public bool ContainsId(string id) => CommandIds.Contains(id);
+		}
+
+		public class ToolbarRow
+		{
 			[YuzuRequired]
-			public int Index { get; set; }
+			public List<ToolbarPanel> Panels { get; set; } = new List<ToolbarPanel>();
 
-			[YuzuRequired]
-			public bool IsSeparator { get; set; } = false;
+			public ToolbarLayout Parent;
+			public int Index;
 
-			public ToolbarLayout ToolbarLayout { get; set; }
-			public Toolbar Toolbar { get; private set; }
-			public readonly bool Editable = true;
-
-			private readonly Widget toolbarContainer;
-			private Image drag;
-
-			public ToolbarPanel()
+			public bool ContainsId(string id)
 			{
-				toolbarContainer = new Frame {
-					ClipChildren = ClipMethod.ScissorTest,
-					Layout = new HBoxLayout(),
-					LayoutCell = new LayoutCell { StretchY = 0 },
-				};
-				toolbarContainer.Awoke += ToolbarContainerAwake;
-				Toolbar = new Toolbar(toolbarContainer);
-			}
-
-			private void ToolbarContainerAwake(Node node)
-			{
-				drag = new Image {
-					Texture = IconPool.GetTexture("Tools.ToolbarSeparator"),
-					LayoutCell = new LayoutCell(Alignment.Center),
-					MinMaxSize = new Vector2(16),
-					Color = IsSeparator ? Color4.Transparent : Color4.White,
-					HitTestTarget = true
-				};
-				if (!IsSeparator) {
-					drag.Tasks.Add(DragTask);
-				}
-				toolbarContainer.Nodes.Insert(0, drag);
-			}
-
-			private IEnumerator<object> DragTask()
-			{
-				var input = drag.Input;
-				while (true) {
-					if (!input.WasMousePressed()) {
-						yield return null;
-						continue;
-					}
-					input.ConsumeKey(Key.Mouse0);
-					while (input.IsMousePressed()) {
-						Utils.ChangeCursorIfDefault(MouseCursor.Hand);
-						foreach (var panel in ToolbarLayout.GetAllPanels(appendSeparator: true)) {
-							var container = panel.toolbarContainer;
-							var pos = container.LocalMousePosition();
-							if (panel == this || pos.Y <= 0 || pos.Y >= container.Height || pos.X < 0 || pos.X > container.Width) {
-								continue;
-							}
-							bool isDifferentRow = container.Parent != toolbarContainer.Parent;
-							bool isBefore = !panel.IsSeparator && panel.Index < Index && pos.X <= container.Width / 2;
-							bool isAfter = !panel.IsSeparator && panel.Index > Index && pos.X >= container.Width / 2;
-							if (isDifferentRow || isBefore || isAfter) {
-								ToolbarLayout.MovePanel(this, panel.Index);
-								ToolbarLayout.Rebuild(DockManager.Instance.ToolbarArea);
-								goto Next;
-							}
-						}
-						Next:
-						yield return null;
+				foreach (var panel in Panels) {
+					if (panel.ContainsId(id)) {
+						return true;
 					}
 				}
-			}
-
-			public ToolbarPanel(bool editable) : this()
-			{
-				Editable = editable;
-			}
-
-			public void Rebuild(Widget widget)
-			{
-				toolbarContainer.Unlink();
-				widget.Nodes.Add(toolbarContainer);
-				if (CommandIndexes.Count == 0) {
-					return;
-				}
-				Toolbar.Clear();
-				int count = ToolbarCommandRegister.RegisteredCommands.Count;
-				foreach (var index in CommandIndexes) {
-					if (index >= count) {
-						continue;
-					}
-					Toolbar.Add(ToolbarCommandRegister.RegisteredCommands[index]);
-				}
-				Toolbar.Rebuild();
-			}
-
-			public static ToolbarPanel FromCommands(params ICommand[] commands)
-			{
-				var toolbarPanel = new ToolbarPanel();
-				foreach (var command in commands) {
-					toolbarPanel.CommandIndexes.Add(ToolbarCommandRegister.RegisteredCommands.IndexOf(command));
-				}
-				return toolbarPanel;
-			}
-
-			private class SeparatorWidget : Widget
-			{
-				public SeparatorWidget()
-				{
-					MinMaxWidth = 10;
-				}
-
-				public override void Render()
-				{
-					base.Render();
-					PrepareRendererState();
-					Renderer.DrawLine(Width / 2, 5, Width / 2, Height - 5, Color4.Gray);
-				}
+				return false;
 			}
 		}
 
 		[YuzuRequired]
-		public List<ToolbarPanel> Panels { get; set; } = new List<ToolbarPanel>();
+		public List<ToolbarRow> Rows { get; set; } = new List<ToolbarRow>();
 
-		[YuzuRequired]
-		public int CreatePanelIndex {
-			get => CreateToolbarPanel.Index;
-			set => CreateToolbarPanel.Index = value;
-		}
-
-		public Toolbar CreateToolbar { get => CreateToolbarPanel.Toolbar; }
-		public readonly ToolbarPanel CreateToolbarPanel;
-		private readonly ToolbarPanel separator = new ToolbarPanel { IsSeparator = true };
-
-		public ToolbarLayout()
+		public void RefreshAfterLoad()
 		{
-			CreateToolbarPanel = new ToolbarPanel(false) {
-				Index = 1,
-				Title = "Create tools panel",
-				ToolbarLayout = this
-			};
-		}
-
-		private static Frame CreateRowWidget()
-		{
-			return new Frame {
-				ClipChildren = ClipMethod.ScissorTest,
-				Layout = new HBoxLayout(),
-				LayoutCell = new LayoutCell { StretchY = 0 },
-			};
-		}
-
-		public void Rebuild(Widget widget)
-		{
-			widget.Nodes.Clear();
-			var rowWidget = CreateRowWidget();
-			widget.AddNode(rowWidget);
-			foreach (var panel in GetAllPanels(appendSeparator: true)) {
-				panel.ToolbarLayout = this;
-				panel.Rebuild(rowWidget);
-				if (panel.IsSeparator) {
-					rowWidget = CreateRowWidget();
-					widget.AddNode(rowWidget);
+			for (int i = 0; i < Rows.Count; ++i) {
+				var row = Rows[i];
+				row.Parent = this;
+				row.Index = i;
+				for (int j = 0; j < row.Panels.Count; ++j) {
+					var panel = row.Panels[j];
+					panel.Parent = row;
+					panel.Index = j;
 				}
 			}
 		}
 
-		public IEnumerable<ToolbarPanel> GetAllPanels(bool appendSeparator = false)
+		public void InsertPanel(ToolbarRow row, ToolbarPanel panel, int index)
 		{
-			for (int i = 0; i < CreatePanelIndex; ++i) {
-				yield return Panels[i];
+			panel.Parent = row;
+			panel.Index = index;
+			for (int i = index; i < row.Panels.Count; ++i) {
+				row.Panels[i].Index += 1;
 			}
-			yield return CreateToolbarPanel;
-			for (int i = CreatePanelIndex; i < Panels.Count; ++i) {
-				yield return Panels[i];
+			row.Panels.Insert(index, panel);
+		}
+
+		public void RemovePanel(ToolbarPanel panel)
+		{
+			var row = panel.Parent;
+			row.Panels.RemoveAt(panel.Index);
+			for (int i = panel.Index; i < row.Panels.Count; ++i) {
+				row.Panels[i].Index -= 1;
 			}
-			if (appendSeparator && !Panels.Last().IsSeparator) {
-				separator.Index = Panels.Count;
-				yield return separator;
+		}
+
+		public void SwapPanels(ToolbarPanel panel1, ToolbarPanel panel2)
+		{
+			panel1.Parent.Panels[panel1.Index] = panel2;
+			panel2.Parent.Panels[panel2.Index] = panel1;
+			var index = panel1.Index;
+			panel1.Index = panel2.Index;
+			panel2.Index = index;
+			var row = panel1.Parent;
+			panel1.Parent = panel2.Parent;
+			panel2.Parent = row;
+		}
+
+		public void InsertRow(ToolbarRow row, int index)
+		{
+			row.Parent = this;
+			row.Index = index;
+			for (int i = index; i < Rows.Count; ++i) {
+				Rows[i].Index += 1;
+			}
+			Rows.Insert(index, row);
+		}
+
+		public void RemoveRow(ToolbarRow row)
+		{
+			var newRow = Rows[row.Index - 1];
+			foreach (var panel in row.Panels) {
+				InsertPanel(newRow, panel, newRow.Panels.Count);
+			}
+			Rows.RemoveAt(row.Index);
+			for (int i = row.Index; i < Rows.Count; ++i) {
+				Rows[i].Index -= 1;
 			}
 		}
 
 		public static ToolbarLayout DefaultToolbarLayout()
 		{
 			return new ToolbarLayout {
-				Panels = {
-					new ToolbarPanel {
-						Index = 0,
-						Title = "Panel1",
-						CommandIndexes = new List<int>(Enumerable.Range(0, 3))
-					},
-					new ToolbarPanel {
-						Index = 2,
-						Title = "Panel2",
-						CommandIndexes = new List<int>(Enumerable.Range(3, 23))
+				Rows = {
+					new ToolbarRow {
+						Panels = {
+							new ToolbarPanel {
+								Title = "Panel1",
+								CommandIds = {
+									"Undo",
+									"Redo",
+									nameof(GenericCommands.Revert),
+								}
+							},
+							new ToolbarPanel {
+								Title = "Panel2",
+								CommandIds = {
+									"Image",
+									"Frame"
+								}
+							},
+							new ToolbarPanel {
+								Title = "Panel3",
+								CommandIds = CommandIds(typeof(Tools)).ToList()
+							},
+						}
 					},
 				}
 			};
 		}
 
-		public ToolbarPanel GetPanel(int index)
+		private static IEnumerable<string> CommandIds(Type type )
 		{
-			if (index == CreatePanelIndex) {
-				return CreateToolbarPanel;
+			foreach (var field in type.GetFields(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)) {
+				var fieldType = field.FieldType;
+				if (fieldType == typeof(ICommand) || fieldType.IsSubclassOf(typeof(ICommand))) {
+					yield return field.Name;
+				}
 			}
-			return Panels[index > CreatePanelIndex ? index - 1 : index];
 		}
 
-		public void SortPanels()
+		public bool ContainsId(string id)
 		{
-			Panels.Sort((panel1, panel2) => {
-				int i1 = panel1.Index;
-				int i2 = panel2.Index;
-				if (i1 == i2) {
-					return 0;
-				}
-				if (i1 < i2) {
-					return -1;
-				}
-				return 1;
-			});
-		}
-
-		public bool ContainsIndex(int index)
-		{
-			foreach (var panel in Panels) {
-				if (panel.CommandIndexes.Contains(index)) {
+			foreach (var row in Rows) {
+				if (row.ContainsId(id)) {
 					return true;
 				}
 			}
 			return false;
-		}
-
-		public void MovePanel(ToolbarPanel panel, int index)
-		{
-			RemovePanel(panel);
-			InsertPanel(panel, index);
-		}
-
-		public void RemovePanel(ToolbarPanel panel)
-		{
-			if (panel.Index < CreatePanelIndex) {
-				CreateToolbarPanel.Index -= 1;
-			}
-			if (panel.Index > CreatePanelIndex) {
-				panel.Index -= 1;
-			}
-			if (panel != CreateToolbarPanel) {
-				Panels.RemoveAt(panel.Index);
-			}
-			for (int i = panel.Index; i < Panels.Count; ++i) {
-				Panels[i].Index -= 1;
-			}
-		}
-
-		public void InsertPanel(ToolbarPanel panel, int index)
-		{
-			panel.Index = index;
-			if (panel != CreateToolbarPanel) {
-				if (index > CreatePanelIndex) {
-					index -= 1;
-				} else {
-					CreatePanelIndex += 1;
-				}
-			}
-			for (int i = index; i < Panels.Count; ++i) {
-				Panels[i].Index += 1;
-			}
-			if (panel != CreateToolbarPanel) {
-				Panels.Insert(index, panel);
-			}
 		}
 	}
 }

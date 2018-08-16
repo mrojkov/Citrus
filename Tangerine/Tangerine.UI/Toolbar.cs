@@ -1,42 +1,83 @@
 using Lime;
-using Tangerine.Core;
+using System.Collections.Generic;
 using Tangerine.UI;
 
 namespace Tangerine
 {
-	public class Toolbar : VersionedCollection<ICommand>
+	public class Toolbar
 	{
-		readonly Widget widget;
+		private readonly Widget widget;
+		private ToolbarLayout toolbarLayout;
 
 		public Toolbar(Widget container)
 		{
-			widget = new Widget();
+			widget = new Widget {
+				Layout = new VBoxLayout(),
+				LayoutCell = new LayoutCell { StretchY = 0 }
+			};
 			container.Nodes.Add(widget);
 			DecorateToolbar(widget);
-			container.AddChangeWatcher(() => Version, _ => Rebuild());
+		}
+
+		public void Rebuild(ToolbarLayout toolbarLayout)
+		{
+			this.toolbarLayout = toolbarLayout;
+			Rebuild();
 		}
 
 		public void Rebuild()
 		{
 			widget.Nodes.Clear();
-			foreach (var c in this) {
-				var b = new ToolbarButton(c.Icon ?? new SerializableTexture());
-				b.Clicked += () => CommandQueue.Instance.Add((Command)c);
-				b.Updating += _ => {
-					b.Texture = c.Icon;
-					b.Selected = c.Checked;
-					b.Enabled = c.Enabled;
-					b.Tip = c.Text;
+			foreach (var row in toolbarLayout.Rows) {
+				var rowWidget = new Widget {
+					MinMaxHeight = Metrics.ToolbarHeight,
+					LayoutCell = new LayoutCell { StretchY = 0 },
+					Layout = new HBoxLayout()
 				};
-				widget.Nodes.Add(b);
+				foreach (var panel in row.Panels) {
+					var panelWidget = new Widget {
+						Layout = new HBoxLayout { Spacing = 1, CellDefaults = new LayoutCell(Alignment.LeftCenter) },
+						LayoutCell = new LayoutCell { StretchY = 0 },
+					};
+					panelWidget.Awoke += PanelAwake;
+					foreach (var id in panel.CommandIds) {
+						if (CommandRegister.TryGetCommand(id, out ICommand command)) {
+							var button = new ToolbarButton(command.Icon ?? new SerializableTexture());
+							button.Clicked += () => CommandQueue.Instance.Add((Command)command);
+							button.Updating += _ => {
+								button.Texture = command.Icon ?? new SerializableTexture();
+								button.Selected = command.Checked;
+								button.Enabled = command.Enabled;
+								button.Tip = command.Text ?? "";
+							};
+							panelWidget.AddNode(button);
+						}
+					}
+					rowWidget.AddNode(panelWidget);
+				}
+				widget.AddNode(rowWidget);
 			}
+		}
+
+		private void PanelAwake(Node node)
+		{
+			var drag = new Image {
+				Texture = IconPool.GetTexture("Tools.ToolbarSeparator"),
+				LayoutCell = new LayoutCell(Alignment.Center),
+				MinMaxSize = new Vector2(16),
+				HitTestTarget = true
+			};
+			drag.Clicked += () => node.Tasks.Add(DragTask);
+			node.Nodes.Insert(0, drag);
+		}
+
+		private IEnumerator<object> DragTask()
+		{
+			yield return null;
 		}
 
 		static void DecorateToolbar(Widget widget)
 		{
-			widget.MinMaxHeight = Metrics.ToolbarHeight;
-			widget.LayoutCell = new LayoutCell { StretchX = 0 };
-			widget.Layout = new HBoxLayout { Spacing = 1, CellDefaults = new LayoutCell(Alignment.Center) };
 			widget.CompoundPresenter.Add(new DelegatePresenter<Widget>(w => {
 				if (w.Width > 0) {
 					w.PrepareRendererState();
