@@ -191,9 +191,9 @@ namespace Lime
 			Application.Input.CopyKeysState();
 		}
 
-		internal void ClearKeyState()
+		internal void ClearKeyState(bool clearMouseButtons = true)
 		{
-			Application.Input.ClearKeyState();
+			Application.Input.ClearKeyState(clearMouseButtons);
 		}
 
 		internal void SetWheelScrollAmount(float delta)

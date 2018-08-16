@@ -292,9 +292,12 @@ namespace Lime
 			}
 		}
 
-		internal void ClearKeyState()
+		internal void ClearKeyState(bool clearMouseButtons = true)
 		{
 			for (int k = 0; k < Key.Count; k++) {
+				if (!clearMouseButtons && ((Key)k).IsMouseKey()) {
+					continue;
+				}
 				keys[k].CurrentState = false;
 				keys[k].Repeated = false;
 			}
