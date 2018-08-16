@@ -364,7 +364,7 @@ namespace Tangerine
 				if (!(fieldType == typeof(ICommand) || fieldType.IsSubclassOf(typeof(ICommand)))) {
 					continue;
 				}
-				CommandRegister.Register(field.Name, (ICommand)field.GetValue(null));
+				CommandRegister.Register(type.Name, field.Name, (ICommand)field.GetValue(null));
 			}
 		}
 

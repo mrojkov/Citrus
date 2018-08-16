@@ -50,7 +50,7 @@ namespace Tangerine
 						};
 					}
 					foreach (var id in panel.CommandIds) {
-						if (CommandRegister.TryGetCommand(id, out ICommand command)) {
+						if (CommandRegister.TryGetCommand("All", id, out ICommand command)) {
 							var button =
 								command.Icon != null ?
 								new ToolbarButton(command.Icon) :

@@ -278,7 +278,7 @@ namespace Tangerine.Dialogs
 		private void RefreshAvailableCommands()
 		{
 			availableCommands.Items.Clear();
-			foreach (var pair in CommandRegister.RegisteredPairs()) {
+			foreach (var pair in CommandRegister.RegisteredPairs("All")) {
 				if (toolbarLayout.ContainsId(pair.Key)) {
 					continue;
 				}
@@ -294,7 +294,7 @@ namespace Tangerine.Dialogs
 				return;
 			}
 			foreach (var id in panel.CommandIds) {
-				if (CommandRegister.TryGetCommand(id, out ICommand command)) {
+				if (CommandRegister.TryGetCommand("All", id, out ICommand command)) {
 					usedCommands.AddItem(new CommandRow(command, id));
 				}
 			}

@@ -4,38 +4,33 @@ using System.Collections.Generic;
 
 namespace Tangerine.UI
 {
-	public static class CommandExtentions
-	{
-		public static void RegisterSelf(this ICommand command, bool @override = false)
-		{
-			CommandRegister.Register(command, @override);
-		}
-
-		public static void UnregisterSelf(this ICommand command)
-		{
-			CommandRegister.Unregister(command);
-		}
-	}
-
 	public static class CommandRegister
 	{
-		private readonly static Dictionary<string, ICommand> commands = new Dictionary<string, ICommand>();
+		private readonly static Dictionary<string, Dictionary<string, ICommand>> commands = new Dictionary<string, Dictionary<string, ICommand>> {
+			{ "All", new Dictionary<string, ICommand>() }
+		};
 
-		public static void Register(string id, ICommand command, bool @override = false)
+		public static void Register(string category, string id, ICommand command, bool @override = false)
 		{
-			if (commands.ContainsKey(id)) {
+			if (!commands.ContainsKey(category)) {
+				commands.Add(category, new Dictionary<string, ICommand>());
+			}
+			var commandsCategory = commands[category];
+			if (commandsCategory.ContainsKey(id)) {
 				if (!@override) {
 					throw new ArgumentException($"Command with id:'{id}' has already been registered. Use @override=true to override previous command", nameof(id));
 				}
-				commands[id] = command;
+				commandsCategory[id] = command;
+				commands["All"][id] = command;
 				return;
 			}
-			commands.Add(id, command);
+			commandsCategory.Add(id, command);
+			commands["All"].Add(id, command);
 		}
 
-		public static void Register(ICommand command, bool @override = false)
+		public static void Register(string category, ICommand command, bool @override = false)
 		{
-			Register(command.Text, command, @override);
+			Register(category, command.Text, command, @override);
 		}
 
 		public static void Unregister(string id)
@@ -50,37 +45,47 @@ namespace Tangerine.UI
 			Unregister(command.Text);
 		}
 
-		public static bool TryGetCommand(string id, out ICommand command)
+		public static bool TryGetCommand(string category, string id, out ICommand command)
 		{
-			return commands.TryGetValue(id, out command);
+			command = null;
+			return
+				commands.TryGetValue(category, out Dictionary<string, ICommand> commandsCategory) &&
+				commandsCategory.TryGetValue(id, out command);
 		}
 
-		public static ICommand GetCommand(string id)
+		public static ICommand GetCommand(string category, string id)
 		{
-			if (TryGetCommand(id, out ICommand command)) {
+			if (TryGetCommand(category, id, out ICommand command)) {
 				return command;
 			}
-			throw new ArgumentException($"Command with id:'{id}'hasn't been registered");
+			throw new ArgumentException($"Command with category:'{category}' and id:'{id}'hasn't been registered");
 		}
 
-		public static IEnumerable<KeyValuePair<string, ICommand>> RegisteredPairs()
+		public static IEnumerable<KeyValuePair<string, ICommand>> RegisteredPairs(string category)
 		{
-			foreach (var pair in commands) {
+			foreach (var pair in commands[category]) {
 				yield return pair;
 			}
 		}
 
 		public static IEnumerable<ICommand> RegisteredCommands()
 		{
-			foreach (var command in commands.Values) {
+			foreach (var command in commands["All"].Values) {
 				yield return command;
 			}
 		}
 
 		public static IEnumerable<string> RegisteredIds()
 		{
-			foreach (var id in commands.Keys) {
+			foreach (var id in commands["All"].Keys) {
 				yield return id;
+			}
+		}
+
+		public static IEnumerable<string> RegisteredCategories()
+		{
+			foreach (var category in commands.Keys) {
+				yield return category;
 			}
 		}
 	}
