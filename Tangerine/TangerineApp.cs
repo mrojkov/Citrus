@@ -15,7 +15,7 @@ namespace Tangerine
 	public class TangerineApp
 	{
 		public static TangerineApp Instance { get; private set; }
-		public readonly Dictionary<string, Toolbar> Toolbars = new Dictionary<string, Toolbar>();
+		public Toolbar Toolbar { get; private set; }
 		public readonly DockManager.State DockManagerInitialState;
 
 		public static void Initialize(string[] args)
@@ -250,7 +250,7 @@ namespace Tangerine
 			new UI.SceneView.NodeDecorationsPanel(nodeDecorationsPanel);
 
 			AppUserPreferences.Instance.ToolbarLayout.RefreshAfterLoad();
-			Toolbars.Add("Toolbar", new Toolbar(dockManager.ToolbarArea, AppUserPreferences.Instance.ToolbarLayout));
+			Toolbar = new Toolbar(dockManager.ToolbarArea, AppUserPreferences.Instance.ToolbarLayout);
 			RefreshCreateNodeCommands();
 			Document.AttachingViews += doc => {
 				if (doc.Views.Count == 0) {
@@ -339,7 +339,7 @@ namespace Tangerine
 
 		public void RefreshCreateNodeCommands()
 		{
-			Toolbars["Toolbar"].Rebuild();
+			Toolbar.Rebuild();
 			HotkeyRegistry.InitCommands(TangerineMenu.CreateNodeCommands, "Tools", "Tools");
 			HotkeyRegistry.UpdateProfiles();
 			UI.SceneView.VisualHintsPanel.Refresh();

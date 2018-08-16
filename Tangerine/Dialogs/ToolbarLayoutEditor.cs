@@ -174,7 +174,7 @@ namespace Tangerine.Dialogs
 			panelList.SelectedItem.DoubleClicked += () => panelRow.StartEdit();
 			toolbarLayout.InsertPanel(row, newPanel, newPanel.Index);
 			RefreshUsedCommands();
-			TangerineApp.Instance.Toolbars["Toolbar"].Rebuild();
+			TangerineApp.Instance.Toolbar.Rebuild();
 		}
 
 		private void RemovePanel()
@@ -194,7 +194,7 @@ namespace Tangerine.Dialogs
 			}
 			RefreshAvailableCommands();
 			RefreshUsedCommands();
-			TangerineApp.Instance.Toolbars["Toolbar"].Rebuild();
+			TangerineApp.Instance.Toolbar.Rebuild();
 		}
 
 		private void MovePanel(int dir)
@@ -223,7 +223,7 @@ namespace Tangerine.Dialogs
 				panelRow1.Panel = panel2;
 				panelRow2.Panel = panel1;
 			}
-			TangerineApp.Instance.Toolbars["Toolbar"].Rebuild();
+			TangerineApp.Instance.Toolbar.Rebuild();
 		}
 
 		private void RemoveRow()
@@ -240,7 +240,7 @@ namespace Tangerine.Dialogs
 			} else {
 				panelList.SelectedItem = null;
 			}
-			TangerineApp.Instance.Toolbars["Toolbar"].Rebuild();
+			TangerineApp.Instance.Toolbar.Rebuild();
 		}
 
 		private void AddRow()
@@ -272,7 +272,7 @@ namespace Tangerine.Dialogs
 			}
 			panelList.InsertItem(index, new ToolbarRowRow(row));
 			toolbarLayout.InsertRow(row, rowIndex);
-			TangerineApp.Instance.Toolbars["Toolbar"].Rebuild();
+			TangerineApp.Instance.Toolbar.Rebuild();
 		}
 
 		private void RefreshAvailableCommands()
@@ -304,7 +304,7 @@ namespace Tangerine.Dialogs
 		{
 			AppUserPreferences.Instance.ToolbarLayout = toolbarLayout = ToolbarLayout.DefaultToolbarLayout();
 			Initialize();
-			TangerineApp.Instance.Toolbars["Toolbar"].Rebuild(toolbarLayout);
+			TangerineApp.Instance.Toolbar.Rebuild(toolbarLayout);
 		}
 
 		private Widget CreateCommandControls()
@@ -340,7 +340,7 @@ namespace Tangerine.Dialogs
 			availableCommands.Items.RemoveAt(leftPanelIndex);
 			usedCommands.InsertItem(rightPanelIndex, leftPanel);
 			panel.CommandIds.Insert(rightPanelIndex, leftPanel.CommandId);
-			TangerineApp.Instance.Toolbars["Toolbar"].Rebuild();
+			TangerineApp.Instance.Toolbar.Rebuild();
 		}
 
 		private void RemoveCommand()
@@ -356,7 +356,7 @@ namespace Tangerine.Dialogs
 			usedCommands.Items.RemoveAt(index);
 			panel.CommandIds.RemoveAt(index);
 			RefreshAvailableCommands();
-			TangerineApp.Instance.Toolbars["Toolbar"].Rebuild();
+			TangerineApp.Instance.Toolbar.Rebuild();
 		}
 
 		private void MoveCommand(int dir)
@@ -384,7 +384,7 @@ namespace Tangerine.Dialogs
 				usedCommands.Items.Insert(index, item2);
 				usedCommands.Items.Insert(newIndex, item1);
 			}
-			TangerineApp.Instance.Toolbars["Toolbar"].Rebuild();
+			TangerineApp.Instance.Toolbar.Rebuild();
 		}
 
 		private class PanelRow : Widget
