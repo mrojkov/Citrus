@@ -153,6 +153,7 @@ namespace Tangerine.UI.Timeline
 		{
 			RootWidget.LateTasks.Add(
 				ShowCurveEditorTask(),
+				new SlowMotionProcessor(),
 				new AnimationStretchProcessor(),
 				new OverviewScrollProcessor(),
 				new MouseWheelProcessor(this),
