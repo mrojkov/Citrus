@@ -119,7 +119,7 @@ namespace Tangerine.UI
 					new ToolbarRow {
 						Panels = {
 							new ToolbarPanel {
-								Title = "Panel1",
+								Title = "History",
 								CommandIds = {
 									"Undo",
 									"Redo",
@@ -127,14 +127,44 @@ namespace Tangerine.UI
 								}
 							},
 							new ToolbarPanel {
-								Title = "Panel2",
+								Title = "Create",
 								CommandIds = {
+									"Frame",
+									"Button",
 									"Image",
-									"Frame"
+									"Audio",
+									"Movie",
+									"Bone",
+									"ParticleEmitter",
+									"ParticleModifier",
+									"EmitterShapePoint",
+									"ParticlesMagnet",
+									"SimpleText",
+									"RichText",
+									"TextStyle",
+									"NineGrid",
+									"DistortionMesh",
+									"Spline",
+									"SplinePoint",
+									"SplineGear",
+									"Slider",
+									"ImageCombiner",
+									"Viewport3D",
+									"Camera3D",
+									"Model3D",
+									"Node3D",
+									"WidgetAdapter3D",
+									"Spline3D",
+									"SplinePoint3D",
+									"SplineGear3D",
+									"LightSource",
+									"Polyline",
+									"PolylinePoint",
+									"TiledImage"
 								}
 							},
 							new ToolbarPanel {
-								Title = "Panel3",
+								Title = "Tools",
 								CommandIds = CommandIds(typeof(Tools)).ToList()
 							},
 						}
