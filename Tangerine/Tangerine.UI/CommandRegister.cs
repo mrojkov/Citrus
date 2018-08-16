@@ -16,11 +16,15 @@ namespace Tangerine.UI
 				commands.Add(category, new Dictionary<string, ICommand>());
 			}
 			var commandsCategory = commands[category];
-			if (commandsCategory.ContainsKey(id)) {
+			if (commands["All"].ContainsKey(id)) {
 				if (!@override) {
 					throw new ArgumentException($"Command with id:'{id}' has already been registered. Use @override=true to override previous command", nameof(id));
 				}
-				commandsCategory[id] = command;
+				if (commandsCategory.ContainsKey(id)) {
+					commandsCategory[id] = command;
+				} else {
+					commandsCategory.Add(id, command);
+				}
 				commands["All"][id] = command;
 				return;
 			}
