@@ -59,17 +59,30 @@ namespace Tangerine.UI.Inspector
 			RootWidget.Content.AddNode(toolbarArea);
 			RootWidget.Content.AddNode(contentWidget);
 			RootWidget.Content.Layout = new VBoxLayout();
-			Toolbar = new Toolbar(toolbarArea);
+			Toolbar = new Toolbar(toolbarArea, GetToolbarLayout());
 			contentWidget.Layout = new VBoxLayout { Tag = "InspectorContent" };
 			Objects = new List<object>();
 			content = new InspectorContent(contentWidget);
 			CreateWatchersToRebuild();
-			SetupToolbar();
 		}
 
-		private void SetupToolbar()
+		private ToolbarLayout GetToolbarLayout()
 		{
-			//Toolbar.Add(InspectorCommands.InspectRootNodeCommand);
+			return new ToolbarLayout {
+				Rows = {
+					new ToolbarLayout.ToolbarRow {
+						Index = 0,
+						Panels = {
+							new ToolbarLayout.ToolbarPanel {
+								Index = 0,
+								Title = "Inspector Toolbar Panel",
+								Draggable = false,
+								CommandIds = { "InspectRootNodeCommand" }
+							}
+						}
+					}
+				}
+			};
 		}
 
 		private void CreateWatchersToRebuild()
@@ -106,7 +119,7 @@ namespace Tangerine.UI.Inspector
 		{
 			content.BuildForObjects(Document.Current.InspectRootNode ? new[] { Document.Current.RootNode } : Document.Current.SelectedNodes().ToArray());
 			InspectorCommands.InspectRootNodeCommand.Icon = Document.Current.InspectRootNode ? inspectRootActivatedTexture : inspectRootDeactivatedTexture;
-			//Toolbar.Rebuild();
+			Toolbar.Rebuild();
 			RootWidget.ScrollPosition = RootWidget.MinScrollPosition;
 		}
 	}

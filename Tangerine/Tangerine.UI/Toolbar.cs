@@ -9,8 +9,9 @@ namespace Tangerine
 		private readonly Widget widget;
 		private ToolbarLayout toolbarLayout;
 
-		public Toolbar(Widget container)
+		public Toolbar(Widget container, ToolbarLayout toolbarLayout)
 		{
+			this.toolbarLayout = toolbarLayout;
 			widget = new Widget {
 				Layout = new VBoxLayout(),
 				LayoutCell = new LayoutCell { StretchY = 0 }
@@ -39,7 +40,9 @@ namespace Tangerine
 						Layout = new HBoxLayout { Spacing = 1, CellDefaults = new LayoutCell(Alignment.LeftCenter) },
 						LayoutCell = new LayoutCell { StretchY = 0 },
 					};
-					panelWidget.Awoke += PanelAwake;
+					if (panel.Draggable) {
+						panelWidget.Awoke += PanelAwake;
+					}
 					foreach (var id in panel.CommandIds) {
 						if (CommandRegister.TryGetCommand(id, out ICommand command)) {
 							var button = new ToolbarButton(command.Icon ?? new SerializableTexture());

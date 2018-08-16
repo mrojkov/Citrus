@@ -16,8 +16,9 @@ namespace Tangerine.UI
 			[YuzuOptional]
 			public string Title { get; set; } = "Panel";
 
-			public ToolbarRow Parent;
-			public int Index;
+			public ToolbarRow Parent { get; set; }
+			public int Index { get; set; }
+			public bool Draggable { get; set; } = true;
 
 			public bool ContainsId(string id) => CommandIds.Contains(id);
 		}
@@ -27,8 +28,8 @@ namespace Tangerine.UI
 			[YuzuRequired]
 			public List<ToolbarPanel> Panels { get; set; } = new List<ToolbarPanel>();
 
-			public ToolbarLayout Parent;
-			public int Index;
+			public ToolbarLayout Parent { get; set; }
+			public int Index { get; set; }
 
 			public bool ContainsId(string id)
 			{

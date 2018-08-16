@@ -249,9 +249,8 @@ namespace Tangerine
 			// to properly display hotkeys on panel
 			new UI.SceneView.NodeDecorationsPanel(nodeDecorationsPanel);
 
-			Toolbars.Add("Toolbar", new Toolbar(dockManager.ToolbarArea));
 			AppUserPreferences.Instance.ToolbarLayout.RefreshAfterLoad();
-			Toolbars["Toolbar"].Rebuild(AppUserPreferences.Instance.ToolbarLayout);
+			Toolbars.Add("Toolbar", new Toolbar(dockManager.ToolbarArea, AppUserPreferences.Instance.ToolbarLayout));
 			RefreshCreateNodeCommands();
 			Document.AttachingViews += doc => {
 				if (doc.Views.Count == 0) {
