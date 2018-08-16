@@ -10,8 +10,11 @@ namespace Tangerine.UI
 	public interface IPropertyEditorParams
 	{
 		Widget InspectorPane { get; set; }
+		IEnumerable<object> RootObjects { get; set; }
 		IEnumerable<object> Objects { get; set; }
 		Type Type { get; set; }
+		// Path to property from RootObject to Object, starts with '@' for component type;
+		string PropertyPath { get; set; }
 		string PropertyName { get; set; }
 		string DisplayName { get; set; }
 		bool ShowLabel { get; set; }

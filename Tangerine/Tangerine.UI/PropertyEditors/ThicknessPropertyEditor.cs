@@ -13,7 +13,7 @@ namespace Tangerine.UI
 		public ThicknessPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
 			ContainerWidget.AddNode(new Widget {
-				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center), Spacing = 4 },
+				Layout = new HBoxLayout { DefaultCell = new LayoutCell(Alignment.Center), Spacing = 4 },
 				Nodes = {
 					(editorLeft = editorParams.NumericEditBoxFactory()),
 					(editorRight = editorParams.NumericEditBoxFactory()),

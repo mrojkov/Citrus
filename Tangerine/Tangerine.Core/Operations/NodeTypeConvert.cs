@@ -76,13 +76,13 @@ namespace Tangerine.Core.Operations
 				);
 			}
 			foreach (var animator in source.Animators) {
-				var prop = destType.GetProperty(animator.TargetProperty);
+				var prop = destType.GetProperty(animator.TargetPropertyPath);
 				if (
 					prop == null ||
-					prop.PropertyType != source.GetType().GetProperty(animator.TargetProperty).PropertyType
+					prop.PropertyType != source.GetType().GetProperty(animator.TargetPropertyPath).PropertyType
 				) {
 					throw new InvalidOperationException(
-						$"Node {source} has animator on property {animator.TargetProperty}, which doesn't exist in {destType}"
+						$"Node {source} has animator on property {animator.TargetPropertyPath}, which doesn't exist in {destType}"
 					);
 				}
 			}

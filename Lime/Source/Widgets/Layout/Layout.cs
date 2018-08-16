@@ -6,6 +6,7 @@ using Yuzu;
 
 namespace Lime
 {
+	[AllowedOwnerTypes(typeof(Widget))]
 	[TangerineRegisterComponent]
 	public class LayoutComponent : NodeComponent
 	{
@@ -17,9 +18,14 @@ namespace Lime
 			get => layout;
 			set
 			{
+				if (layout != null) {
+					layout.Owner = null;
+				}
 				layout = value;
-				if (Owner != null) {
-					layout?.InvalidateConstraintsAndArrangement(Owner as Widget);
+				if (layout != null && Owner != null) {
+					var w = (Widget)Owner;
+					layout.Owner = w;
+					layout.InvalidateConstraintsAndArrangement(w);
 				}
 			}
 		}
@@ -28,16 +34,31 @@ namespace Lime
 		{
 			base.OnOwnerChanged(oldOwner);
 			if (Owner != null) {
-				layout?.InvalidateConstraintsAndArrangement(Owner as Widget);
-			} else if (oldOwner != null) {
-				(oldOwner as Widget).Layout.InvalidateConstraintsAndArrangement(oldOwner as Widget);
+				if (layout != null) {
+					var w = (Widget)Owner;
+					layout.Owner = w;
+					layout.InvalidateConstraintsAndArrangement(w);
+				}
 			}
+			if (oldOwner != null) {
+				var w = (Widget)oldOwner;
+				(w).Layout.InvalidateConstraintsAndArrangement(w);
+			}
+		}
+
+		public override NodeComponent Clone()
+		{
+			var clone = (LayoutComponent)base.Clone();
+			clone.layout = Layout.Clone(null);
+			return clone;
 		}
 	}
 
 	public interface ILayout
 	{
 		List<Rectangle> DebugRectangles { get; }
+
+		Widget Owner { get; set; }
 
 		bool ConstraintsValid { get; }
 		bool ArrangementValid { get; }
@@ -47,19 +68,55 @@ namespace Lime
 		void InvalidateConstraintsAndArrangement(Widget widget);
 		void MeasureSizeConstraints(Widget widget);
 		void ArrangeChildren(Widget widget);
+		ILayout Clone(Widget newOwner);
 	}
 
 	[YuzuDontGenerateDeserializer]
 	[TangerineIgnore]
-	public class CommonLayout
+	public class CommonLayout : IAnimable
 	{
+		public Widget Owner { get; set; }
+
+		public void RemoveAnimators(IAnimable animable)
+		{
+			Owner.Animators.RemoveAllByAnimable(animable);
+		}
+
 		public List<Rectangle> DebugRectangles { get; protected set; }
 
 		public bool ConstraintsValid { get; protected set; }
 		public bool ArrangementValid { get; protected set; }
 
 		[YuzuMember]
-		public bool IgnoreHidden { get; set; }
+		public LayoutCell DefaultCell { get; set; }
+
+		private bool ignoreHidden;
+
+		[YuzuMember]
+		public bool IgnoreHidden
+		{
+			get => ignoreHidden;
+			set {
+				ignoreHidden = value;
+				Owner?.Layout.InvalidateConstraintsAndArrangement(Owner);
+			}
+		}
+
+		protected LayoutCell EffectiveLayoutCell(Widget widget)
+		{
+			return widget.LayoutCell ?? DefaultCell ?? LayoutCell.Default;
+		}
+
+		public CommonLayout Clone(Node newOwner)
+		{
+			CommonLayout clone = (CommonLayout)MemberwiseClone();
+			clone.Owner = (Widget)newOwner;
+			clone.DebugRectangles = null;
+			clone.DefaultCell = DefaultCell?.Clone(clone.Owner);
+			clone.ConstraintsValid = false;
+			clone.ArrangementValid = false;
+			return clone;
+		}
 
 		public CommonLayout()
 		{

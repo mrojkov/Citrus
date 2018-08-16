@@ -21,8 +21,13 @@ namespace Lime
 		}
 	}
 
-	public class NodeComponent : Component, IDisposable
+	public class NodeComponent : Component, IDisposable, IAnimable
 	{
+		public void RemoveAnimators(IAnimable animable)
+		{
+			Owner.Animators.RemoveAllByAnimable(animable);
+		}
+
 		private Node owner;
 		public Node Owner
 		{

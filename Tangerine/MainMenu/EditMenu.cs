@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -113,11 +113,11 @@ namespace Tangerine
 			var value = new Property<T>(node, propertyId).Value;
 			SetProperty.Perform(node, propertyId, transformer(value));
 			foreach (var animation in node.Animators) {
-				if (animation.TargetProperty == propertyId) {
+				if (animation.TargetPropertyPath == propertyId) {
 					foreach (var keyframe in animation.Keys.ToList()) {
 						var newKeyframe = keyframe.Clone();
 						newKeyframe.Value = transformer((T)newKeyframe.Value);
-						SetKeyframe.Perform(node, animation.TargetProperty, animation.AnimationId, newKeyframe);
+						SetKeyframe.Perform(node, animation.TargetPropertyPath, animation.AnimationId, newKeyframe);
 					}
 				}
 			}
@@ -138,9 +138,9 @@ namespace Tangerine
 			var framesDict = new Dictionary<string, SortedSet<int>>();
 			foreach (var bone in boneChain) {
 				foreach (var a in bone.Animators) {
-					if (a.TargetProperty == nameof(Bone.Position) ||
-						a.TargetProperty == nameof(Bone.Length) ||
-					    a.TargetProperty == nameof(Bone.Rotation)
+					if (a.TargetPropertyPath == nameof(Bone.Position) ||
+						a.TargetPropertyPath == nameof(Bone.Length) ||
+					    a.TargetPropertyPath == nameof(Bone.Rotation)
 					) {
 						var id = a.AnimationId ?? DefaultAnimationId;
 						if (!framesDict.ContainsKey(id)) {
@@ -182,7 +182,7 @@ namespace Tangerine
 			foreach (var a in node.Animators) {
 				foreach (var key in a.Keys) {
 					ApplyAnimationAtFrame(a.AnimationId, key.Frame, boneChain);
-					switch (a.TargetProperty) {
+					switch (a.TargetPropertyPath) {
 						case nameof(Bone.Position):
 							if (!data.PositionKeyframes.ContainsKey(key.Frame)) {
 								data.PositionKeyframes[key.Frame] = new Keyframe<Vector2>();

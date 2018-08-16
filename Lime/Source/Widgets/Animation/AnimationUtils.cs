@@ -21,17 +21,42 @@ namespace Lime
 			return frame * SecondsPerFrame;
 		}
 
-		internal struct PropertyData
+		public struct PropertyData
 		{
 			public Type OwnerType;
 			public PropertyInfo Info;
 			public bool Triggerable;
+
+			public static PropertyData Empty = new PropertyData();
 		}
 
 		[ThreadStatic]
 		private static Dictionary<string, List<PropertyData>> propertyCache;
 
-		internal static PropertyData GetProperty(Type ownerType, string propertyName)
+		public static (PropertyData, IAnimable) GetPropertyByPath(IAnimationHost owner, string propertyPath)
+		{
+			PropertyData result = PropertyData.Empty;
+			object o = owner;
+			if (propertyPath[0] == '[') {
+				int index = propertyPath.IndexOf(']');
+				var componentTypeName = propertyPath.Substring(1, index - 1);
+				var type = Yuzu.Metadata.Meta.GetTypeByReadAlias(componentTypeName, Serialization.DefaultYuzuCommonOptions)
+				           ?? Yuzu.Util.TypeSerializer.Deserialize(componentTypeName);
+				o = owner.Components.Get(type);
+				propertyPath = propertyPath.Substring(index + 2);
+			}
+			var parts = propertyPath.Split('.');
+			for (int i = 0; i < parts.Length; i++) {
+				var p = parts[i];
+				result = GetProperty(o.GetType(), p);
+				if (i < parts.Length - 1) {
+					o = result.Info.GetValue(o);
+				}
+			}
+			return (result, (IAnimable)o);
+		}
+
+		public static PropertyData GetProperty(Type ownerType, string propertyName)
 		{
 			if (propertyCache == null) {
 				propertyCache = new Dictionary<string, List<PropertyData>>();

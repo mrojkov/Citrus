@@ -25,7 +25,7 @@ namespace Tangerine.UI.FilesystemView
 			MinMaxHeight = Metrics.ToolbarHeight;
 			MinWidth = 50;// TimelineMetrics.ToolbarMinWidth;
 			Presenter = new DelegatePresenter<Widget>(Render);
-			Layout = new HBoxLayout { Spacing = 2, CellDefaults = new LayoutCell(Alignment.Center) };
+			Layout = new HBoxLayout { Spacing = 2, DefaultCell = new LayoutCell(Alignment.Center) };
 		}
 
 		static void Render(Widget widget)
@@ -34,7 +34,7 @@ namespace Tangerine.UI.FilesystemView
 			Renderer.DrawRect(Vector2.Zero, widget.Size, ColorTheme.Current.Toolbar.Background);
 		}
 	}
-	
+
 	public class FilesystemToolbar : Toolbar
 	{
 		FilesystemView view;
@@ -147,7 +147,7 @@ namespace Tangerine.UI.FilesystemView
 			return new ToolbarButton(IconPool.GetTexture("Filesystem.Home")) {
 				Clicked = () => {
 					if (Project.Current != Project.Null) {
-						view.GoTo(Project.Current.AssetsDirectory); 
+						view.GoTo(Project.Current.AssetsDirectory);
 					}
 				}
 			};

@@ -30,7 +30,7 @@ namespace Tangerine.UI.Timeline.Operations
 			}
 			for (int i = Boundaries.Value.Top; i <= Boundaries.Value.Bottom; ++i) {
 				var animable =
-					Document.Current.Rows[i].Components.Get<NodeRow>()?.Node as IAnimable;
+					Document.Current.Rows[i].Components.Get<NodeRow>()?.Node as IAnimationHost;
 				if (animable == null) {
 					continue;
 				}
@@ -44,7 +44,7 @@ namespace Tangerine.UI.Timeline.Operations
 						}
 						foreach (var key in saved) {
 							SetProperty.Perform(key, nameof(IKeyframe.Frame), Boundaries.Value.Left + Boundaries.Value.Right - key.Frame - 1);
-							SetKeyframe.Perform(animable, animator.TargetProperty, animator.AnimationId, key);
+							SetKeyframe.Perform(animable, animator.TargetPropertyPath, animator.AnimationId, key);
 						}
 					}
 				});
@@ -99,7 +99,7 @@ namespace Tangerine.UI.Timeline.Operations
 		{
 			int right = 0;
 			foreach (var row in Document.Current.Rows) {
-				var animable = row.Components.Get<NodeRow>()?.Node as IAnimable;
+				var animable = row.Components.Get<NodeRow>()?.Node as IAnimationHost;
 				if (animable == null) {
 					continue;
 				}

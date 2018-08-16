@@ -94,7 +94,7 @@ namespace Tangerine.UI.Inspector
 
 		internal void SetKeyFunction(KeyFunction value)
 		{
-			foreach (var animable in editorParams.Objects.OfType<IAnimable>()) {
+			foreach (var animable in editorParams.Objects.OfType<IAnimationHost>()) {
 				IAnimator animator;
 				if (animable.Animators.TryFind(editorParams.PropertyName, out animator, Document.Current.AnimationId)) {
 					var keyframe = animator.ReadonlyKeys.FirstOrDefault(i => i.Frame == Document.Current.AnimationFrame).Clone();

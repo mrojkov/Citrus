@@ -25,12 +25,12 @@ namespace Tangerine.UI.SceneView
 					if (!(node is Widget)) {
 						continue;
 					}
-					if (node is IAnimable) {
-						var animable = node as IAnimable;
+					if (node is IAnimationHost) {
+						var animable = node as IAnimationHost;
 						foreach (var animator in animable.Animators) {
 							if (
 								animator is Vector2Animator &&
-								animator.TargetProperty == nameof(Widget.Position)
+								animator.TargetPropertyPath == nameof(Widget.Position)
 							) {
 								var keys = animator.ReadonlyKeys.ToList();
 								var transform = node.Parent.AsWidget.CalcTransitionToSpaceOf(sv.Scene);

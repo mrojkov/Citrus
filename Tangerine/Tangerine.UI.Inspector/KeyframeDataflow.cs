@@ -41,7 +41,7 @@ namespace Tangerine.UI.Inspector
 		public void Poll()
 		{
 			GotValue = false;
-			var animable = obj as IAnimable;
+			var animable = obj as IAnimationHost;
 			if (animable == null) {
 				return;
 			}
@@ -70,7 +70,7 @@ namespace Tangerine.UI.Inspector
 		IAnimator FindAnimator()
 		{
 			IAnimator animator;
-			return (obj as IAnimable).Animators.TryFind(propertyName, out animator, Document.Current.AnimationId) ? animator : null;
+			return (obj as IAnimationHost).Animators.TryFind(propertyName, out animator, Document.Current.AnimationId) ? animator : null;
 		}
 
 		IKeyframe FindKeyframe()

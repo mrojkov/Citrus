@@ -131,8 +131,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
-				result.TargetProperty = d.Reader.ReadString();
-				if (result.TargetProperty == "" && d.Reader.ReadBoolean()) result.TargetProperty = null;
+				result.TargetPropertyPath = d.Reader.ReadString();
+				if (result.TargetPropertyPath == "" && d.Reader.ReadBoolean()) result.TargetPropertyPath = null;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
@@ -167,8 +167,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
-				result.TargetProperty = d.Reader.ReadString();
-				if (result.TargetProperty == "" && d.Reader.ReadBoolean()) result.TargetProperty = null;
+				result.TargetPropertyPath = d.Reader.ReadString();
+				if (result.TargetPropertyPath == "" && d.Reader.ReadBoolean()) result.TargetPropertyPath = null;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
@@ -203,8 +203,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
-				result.TargetProperty = d.Reader.ReadString();
-				if (result.TargetProperty == "" && d.Reader.ReadBoolean()) result.TargetProperty = null;
+				result.TargetPropertyPath = d.Reader.ReadString();
+				if (result.TargetPropertyPath == "" && d.Reader.ReadBoolean()) result.TargetPropertyPath = null;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
@@ -239,8 +239,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
-				result.TargetProperty = d.Reader.ReadString();
-				if (result.TargetProperty == "" && d.Reader.ReadBoolean()) result.TargetProperty = null;
+				result.TargetPropertyPath = d.Reader.ReadString();
+				if (result.TargetPropertyPath == "" && d.Reader.ReadBoolean()) result.TargetPropertyPath = null;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
@@ -275,8 +275,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
-				result.TargetProperty = d.Reader.ReadString();
-				if (result.TargetProperty == "" && d.Reader.ReadBoolean()) result.TargetProperty = null;
+				result.TargetPropertyPath = d.Reader.ReadString();
+				if (result.TargetPropertyPath == "" && d.Reader.ReadBoolean()) result.TargetPropertyPath = null;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
@@ -311,8 +311,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
-				result.TargetProperty = d.Reader.ReadString();
-				if (result.TargetProperty == "" && d.Reader.ReadBoolean()) result.TargetProperty = null;
+				result.TargetPropertyPath = d.Reader.ReadString();
+				if (result.TargetPropertyPath == "" && d.Reader.ReadBoolean()) result.TargetPropertyPath = null;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
@@ -347,8 +347,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
-				result.TargetProperty = d.Reader.ReadString();
-				if (result.TargetProperty == "" && d.Reader.ReadBoolean()) result.TargetProperty = null;
+				result.TargetPropertyPath = d.Reader.ReadString();
+				if (result.TargetPropertyPath == "" && d.Reader.ReadBoolean()) result.TargetPropertyPath = null;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
@@ -383,8 +383,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
-				result.TargetProperty = d.Reader.ReadString();
-				if (result.TargetProperty == "" && d.Reader.ReadBoolean()) result.TargetProperty = null;
+				result.TargetPropertyPath = d.Reader.ReadString();
+				if (result.TargetPropertyPath == "" && d.Reader.ReadBoolean()) result.TargetPropertyPath = null;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
@@ -419,8 +419,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
-				result.TargetProperty = d.Reader.ReadString();
-				if (result.TargetProperty == "" && d.Reader.ReadBoolean()) result.TargetProperty = null;
+				result.TargetPropertyPath = d.Reader.ReadString();
+				if (result.TargetPropertyPath == "" && d.Reader.ReadBoolean()) result.TargetPropertyPath = null;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
@@ -455,8 +455,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
-				result.TargetProperty = d.Reader.ReadString();
-				if (result.TargetProperty == "" && d.Reader.ReadBoolean()) result.TargetProperty = null;
+				result.TargetPropertyPath = d.Reader.ReadString();
+				if (result.TargetPropertyPath == "" && d.Reader.ReadBoolean()) result.TargetPropertyPath = null;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
@@ -491,8 +491,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
-				result.TargetProperty = d.Reader.ReadString();
-				if (result.TargetProperty == "" && d.Reader.ReadBoolean()) result.TargetProperty = null;
+				result.TargetPropertyPath = d.Reader.ReadString();
+				if (result.TargetPropertyPath == "" && d.Reader.ReadBoolean()) result.TargetPropertyPath = null;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
@@ -527,8 +527,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
-				result.TargetProperty = d.Reader.ReadString();
-				if (result.TargetProperty == "" && d.Reader.ReadBoolean()) result.TargetProperty = null;
+				result.TargetPropertyPath = d.Reader.ReadString();
+				if (result.TargetPropertyPath == "" && d.Reader.ReadBoolean()) result.TargetPropertyPath = null;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
@@ -563,8 +563,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
-				result.TargetProperty = d.Reader.ReadString();
-				if (result.TargetProperty == "" && d.Reader.ReadBoolean()) result.TargetProperty = null;
+				result.TargetPropertyPath = d.Reader.ReadString();
+				if (result.TargetPropertyPath == "" && d.Reader.ReadBoolean()) result.TargetPropertyPath = null;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
@@ -599,8 +599,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
-				result.TargetProperty = d.Reader.ReadString();
-				if (result.TargetProperty == "" && d.Reader.ReadBoolean()) result.TargetProperty = null;
+				result.TargetPropertyPath = d.Reader.ReadString();
+				if (result.TargetPropertyPath == "" && d.Reader.ReadBoolean()) result.TargetPropertyPath = null;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
@@ -635,8 +635,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
-				result.TargetProperty = d.Reader.ReadString();
-				if (result.TargetProperty == "" && d.Reader.ReadBoolean()) result.TargetProperty = null;
+				result.TargetPropertyPath = d.Reader.ReadString();
+				if (result.TargetPropertyPath == "" && d.Reader.ReadBoolean()) result.TargetPropertyPath = null;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
@@ -1423,8 +1423,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
-				result.TargetProperty = d.Reader.ReadString();
-				if (result.TargetProperty == "" && d.Reader.ReadBoolean()) result.TargetProperty = null;
+				result.TargetPropertyPath = d.Reader.ReadString();
+				if (result.TargetPropertyPath == "" && d.Reader.ReadBoolean()) result.TargetPropertyPath = null;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
@@ -2334,7 +2334,7 @@ namespace GeneratedDeserializersBIN
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
-				result.CellDefaults = (global::Lime.LayoutCell)dg.ReadObject<global::Lime.LayoutCell>();
+				result.DefaultCell = (global::Lime.LayoutCell)dg.ReadObject<global::Lime.LayoutCell>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
@@ -2712,8 +2712,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
-				result.TargetProperty = d.Reader.ReadString();
-				if (result.TargetProperty == "" && d.Reader.ReadBoolean()) result.TargetProperty = null;
+				result.TargetPropertyPath = d.Reader.ReadString();
+				if (result.TargetPropertyPath == "" && d.Reader.ReadBoolean()) result.TargetPropertyPath = null;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
@@ -3519,8 +3519,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
-				result.TargetProperty = d.Reader.ReadString();
-				if (result.TargetProperty == "" && d.Reader.ReadBoolean()) result.TargetProperty = null;
+				result.TargetPropertyPath = d.Reader.ReadString();
+				if (result.TargetPropertyPath == "" && d.Reader.ReadBoolean()) result.TargetPropertyPath = null;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
@@ -4873,8 +4873,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
-				result.TargetProperty = d.Reader.ReadString();
-				if (result.TargetProperty == "" && d.Reader.ReadBoolean()) result.TargetProperty = null;
+				result.TargetPropertyPath = d.Reader.ReadString();
+				if (result.TargetPropertyPath == "" && d.Reader.ReadBoolean()) result.TargetPropertyPath = null;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
@@ -5991,8 +5991,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
-				result.TargetProperty = d.Reader.ReadString();
-				if (result.TargetProperty == "" && d.Reader.ReadBoolean()) result.TargetProperty = null;
+				result.TargetPropertyPath = d.Reader.ReadString();
+				if (result.TargetPropertyPath == "" && d.Reader.ReadBoolean()) result.TargetPropertyPath = null;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
@@ -7632,7 +7632,7 @@ namespace GeneratedDeserializersBIN
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
-				result.CellDefaults = (global::Lime.LayoutCell)dg.ReadObject<global::Lime.LayoutCell>();
+				result.DefaultCell = (global::Lime.LayoutCell)dg.ReadObject<global::Lime.LayoutCell>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
@@ -8224,8 +8224,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
-				result.TargetProperty = d.Reader.ReadString();
-				if (result.TargetProperty == "" && d.Reader.ReadBoolean()) result.TargetProperty = null;
+				result.TargetPropertyPath = d.Reader.ReadString();
+				if (result.TargetPropertyPath == "" && d.Reader.ReadBoolean()) result.TargetPropertyPath = null;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
@@ -8269,8 +8269,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
-				result.TargetProperty = d.Reader.ReadString();
-				if (result.TargetProperty == "" && d.Reader.ReadBoolean()) result.TargetProperty = null;
+				result.TargetPropertyPath = d.Reader.ReadString();
+				if (result.TargetPropertyPath == "" && d.Reader.ReadBoolean()) result.TargetPropertyPath = null;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");

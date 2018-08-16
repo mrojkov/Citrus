@@ -30,7 +30,7 @@ namespace Lime
 		{
 			var clone = (AwakeBehavior)base.Clone();
 			clone.IsAwoken = false;
-			return base.Clone();
+			return clone;
 		}
 	}
 

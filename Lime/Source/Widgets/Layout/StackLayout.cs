@@ -13,12 +13,8 @@ namespace Lime
 		[YuzuMember]
 		public bool VerticallySizeable { get; set; }
 
-		[YuzuMember]
-		public LayoutCell CellDefaults { get; set; }
-
 		public StackLayout()
 		{
-			CellDefaults = new LayoutCell();
 			DebugRectangles = new List<Rectangle>();
 		}
 
@@ -52,7 +48,7 @@ namespace Lime
 			foreach (var child in GetChildren(widget)) {
 				var position = widget.ContentPosition;
 				var size = widget.ContentSize;
-				var align = (child.LayoutCell ?? CellDefaults).Alignment;
+				var align = EffectiveLayoutCell(child).Alignment;
 				if (HorizontallySizeable) {
 					position.X = child.X;
 					size.X = child.EffectiveMinSize.X;
@@ -65,6 +61,11 @@ namespace Lime
 				}
 				LayoutWidgetWithinCell(child, position, size, align, DebugRectangles);
 			}
+		}
+
+		ILayout ILayout.Clone(Widget newOwner)
+		{
+			return (StackLayout)Clone(newOwner);
 		}
 	}
 }

@@ -10,7 +10,6 @@ namespace Lime
 	public sealed class AnimatorCollection : ICollection<IAnimator>, IDisposable
 	{
 		private Node owner;
-
 		public IAnimator First { get; private set; }
 		public int Count { get; private set; }
 		public int Version { get; private set; }
@@ -83,7 +82,7 @@ namespace Lime
 		public bool TryFind(string propertyName, out IAnimator animator, string animationId = null)
 		{
 			for (var a = First; a != null; a = a.Next) {
-				if (a.TargetProperty == propertyName && a.AnimationId == animationId) {
+				if (a.TargetPropertyPath == propertyName && a.AnimationId == animationId) {
 					animator = a;
 					return true;
 				}
@@ -108,12 +107,13 @@ namespace Lime
 				if (TryFind(propertyName, out animator, animationId)) {
 					return animator;
 				}
-				PropertyInfo pi = owner.GetType().GetProperty(propertyName);
+				var (p, _) = AnimationUtils.GetPropertyByPath(owner, propertyName);
+				var pi = p.Info;
 				if (pi == null) {
 					throw new Lime.Exception("Unknown property {0} in {1}", propertyName, owner.GetType().Name);
 				}
 				animator = AnimatorRegistry.Instance.CreateAnimator(pi.PropertyType);
-				animator.TargetProperty = propertyName;
+				animator.TargetPropertyPath = propertyName;
 				animator.AnimationId = animationId;
 				Add(animator);
 				Version++;
@@ -139,6 +139,26 @@ namespace Lime
 		}
 
 		bool ICollection<IAnimator>.IsReadOnly => false;
+
+		public void RemoveAllByAnimable(IAnimable animable)
+		{
+			IAnimator prev = null;
+			for (var a = First; a != null; a = a.Next) {
+				if (a.Animable == animable) {
+					if (prev == null) {
+						First = a.Next;
+					} else {
+						prev.Next = a.Next;
+					}
+					a.Owner = null;
+					a.Animable = null;
+					a.Next = null;
+					Count--;
+					Version++;
+				}
+				prev = a;
+			}
+		}
 
 		public bool Remove(IAnimator item)
 		{

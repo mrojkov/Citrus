@@ -449,6 +449,11 @@ namespace Lime
 				}
 				LayoutWidgetWithinCell(content, p, s, Alignment.LeftTop);
 			}
+
+			ILayout ILayout.Clone(Widget newOwner)
+			{
+				throw new NotImplementedException();
+			}
 		}
 	}
 }

@@ -3,18 +3,84 @@ using Yuzu;
 
 namespace Lime
 {
+	[AllowedOwnerTypes(typeof(Widget))]
 	[TangerineRegisterComponent]
 	public class LayoutCellComponent : NodeComponent
 	{
+		private LayoutCell layoutCell;
+
 		[YuzuMember]
-		public LayoutCell LayoutCell { get; set; }
+		public LayoutCell LayoutCell
+		{
+			get => layoutCell;
+			set
+			{
+				if (layoutCell != null) {
+					layoutCell.Owner = null;
+				}
+				layoutCell = value;
+				if (layoutCell != null) {
+					var w = layoutCell.Owner = (Widget)Owner;
+					if (Owner != null) {
+						w.InvalidateParentConstraintsAndArrangement();
+					}
+				}
+			}
+		}
+
+		protected override void OnOwnerChanged(Node oldOwner)
+		{
+			base.OnOwnerChanged(oldOwner);
+			if (LayoutCell != null) {
+				var w = (Widget)Owner;
+				LayoutCell.Owner = w;
+				if (Owner != null) {
+					w.InvalidateParentConstraintsAndArrangement();
+				}
+				if (oldOwner != null) {
+					w = (Widget)oldOwner;
+					w.InvalidateParentConstraintsAndArrangement();
+				}
+			}
+		}
+
+		public override NodeComponent Clone()
+		{
+			var clone = (LayoutCellComponent)base.Clone();
+			clone.layoutCell = LayoutCell.Clone(null);
+			return clone;
+		}
 	}
 
-	public class LayoutCell
+	public class LayoutCell : IAnimable
 	{
+		public Widget Owner { get; set; }
+
+		public void RemoveAnimators(IAnimable animable)
+		{
+			Owner.Animators.RemoveAllByAnimable(animable);
+		}
+
+		public LayoutCell Clone(Widget newOwner)
+		{
+			var clone = (LayoutCell)MemberwiseClone();
+			clone.Owner = newOwner;
+			return clone;
+		}
+
 		[TangerineIgnore]
 		[YuzuMember]
-		public Alignment Alignment { get; set; }
+		public Alignment Alignment
+		{
+			get => alignment;
+			set
+			{
+				alignment = value;
+				Owner?.InvalidateParentConstraintsAndArrangement();
+			}
+		}
+
+		private Alignment alignment;
 
 		[TangerineInspect]
 		public HAlignment HorizontalAlignment
@@ -30,19 +96,58 @@ namespace Lime
 			set { Alignment = new Alignment { X = Alignment.X, Y = value }; }
 		}
 
-		[YuzuMember]
-		public int ColSpan { get; set; } = 1;
 
 		[YuzuMember]
-		public int RowSpan { get; set; } = 1;
+		public int ColSpan
+		{
+			get => colSpan;
+			set {
+				colSpan = value;
+				Owner?.InvalidateParentConstraintsAndArrangement();
+			}
+		}
+
+		private int colSpan = 1;
 
 		[YuzuMember]
-		public Vector2 Stretch { get; set; } = Vector2.One;
+		public int RowSpan
+		{
+			get => rowSpan;
+			set {
+				rowSpan = value;
+				Owner?.InvalidateParentConstraintsAndArrangement();
+			}
+		}
+
+		private int rowSpan = 1;
+
+		[YuzuMember]
+		public Vector2 Stretch
+		{
+			get => stretch;
+			set {
+				stretch = value;
+				Owner?.InvalidateParentConstraintsAndArrangement();
+			}
+		}
+
+		private Vector2 stretch = Vector2.One;
+
 		public float StretchX { get { return Stretch.X; } set { Stretch = new Vector2(value, Stretch.Y); } }
 		public float StretchY { get { return Stretch.Y; } set { Stretch = new Vector2(Stretch.X, value); } }
 
 		[YuzuMember]
-		public bool Ignore { get; set; }
+		public bool Ignore
+		{
+			get => ignore;
+			set {
+				ignore = value;
+				Owner?.InvalidateParentConstraintsAndArrangement();
+			}
+		}
+
+		private bool ignore;
+
 		public static readonly LayoutCell Default = new LayoutCell();
 
 		public LayoutCell() { }

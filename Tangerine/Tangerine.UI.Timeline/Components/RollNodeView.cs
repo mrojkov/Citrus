@@ -80,7 +80,7 @@ namespace Tangerine.UI.Timeline.Components
 			widget = new Widget {
 				Padding = new Thickness { Right = 2 },
 				MinHeight = TimelineMetrics.DefaultRowHeight,
-				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center) },
+				Layout = new HBoxLayout { DefaultCell = new LayoutCell(Alignment.Center) },
 				HitTestTarget = true,
 				Nodes = {
 					expandButtonContainer,
@@ -211,9 +211,9 @@ namespace Tangerine.UI.Timeline.Components
 			Disabled
 		}
 
-		static AnimationState GetAnimationState(IAnimable animable)
+		static AnimationState GetAnimationState(IAnimationHost animationHost)
 		{
-			var animators = animable.Animators;
+			var animators = animationHost.Animators;
 			if (animators.Count == 0)
 				return AnimationState.None;
 			int enabled = 0;

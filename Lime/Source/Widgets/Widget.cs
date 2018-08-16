@@ -111,13 +111,16 @@ namespace Lime
 					if (isAnchorLayout) {
 						return;
 					}
-					layoutComponent = new LayoutComponent();
+					layoutComponent = new LayoutComponent {
+						Layout = value
+					};
 					Components.Add(layoutComponent);
 				} else if (isAnchorLayout) {
 					Components.Remove(layoutComponent);
 					return;
+				} else {
+					layoutComponent.Layout = value;
 				}
-				layoutComponent.Layout = value;
 			}
 		}
 
@@ -134,10 +137,13 @@ namespace Lime
 			{
 				var layoutCellComponent = Components.Get<LayoutCellComponent>();
 				if (layoutCellComponent == null) {
-					layoutCellComponent = new LayoutCellComponent();
+					layoutCellComponent = new LayoutCellComponent {
+						LayoutCell = value
+					};
 					Components.Add(layoutCellComponent);
+				} else {
+					layoutCellComponent.LayoutCell = value;
 				}
-				layoutCellComponent.LayoutCell = value;
 			}
 		}
 

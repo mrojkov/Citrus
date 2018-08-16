@@ -350,7 +350,7 @@ namespace Orange
 			if (animator is Animator<ShaderId>) {
 				return;
 			}
-			if (owner is ParticleModifier && animator.TargetProperty == "Scale" && animator is Vector2Animator) {
+			if (owner is ParticleModifier && animator.TargetPropertyPath == "Scale" && animator is Vector2Animator) {
 				NumericAnimator zoomAnimator;
 				NumericAnimator aspectRatioAnimator;
 				DecomposeParticleModifierScaleAnimator(animator, out zoomAnimator, out aspectRatioAnimator);
@@ -385,10 +385,10 @@ namespace Orange
 		private void DecomposeParticleModifierScaleAnimator(IAnimator animator, out NumericAnimator zoomAnimator, out NumericAnimator aspectRatioAnimator)
 		{
 			zoomAnimator = new NumericAnimator {
-				TargetProperty = "Scale"
+				TargetPropertyPath = "Scale"
 			};
 			aspectRatioAnimator = new NumericAnimator() {
-				TargetProperty = "AspectRatio"
+				TargetPropertyPath = "AspectRatio"
 			};
 			if (animator.ReadonlyKeys.Count == 0) {
 				return;
@@ -404,7 +404,7 @@ namespace Orange
 
 		string GetAnimatorPropertyReference(Node owner, IAnimator animator)
 		{
-			var p = GetHotStudioPropertyName(owner.GetType(), animator.TargetProperty) + '@' + GetHotStudioActorName(owner, animator);
+			var p = GetHotStudioPropertyName(owner.GetType(), animator.TargetPropertyPath) + '@' + GetHotStudioActorName(owner, animator);
 			if (p == "Position@Hot::PointObject") {
 				return "Anchor@Hot::PointObject";
 			}
@@ -415,11 +415,11 @@ namespace Orange
 		{
 			var t = owner.GetType();
 			if (owner is ParticleModifier) {
-				if (animator.TargetProperty == "AspectRatio" || animator.TargetProperty == "Scale") {
+				if (animator.TargetPropertyPath == "AspectRatio" || animator.TargetPropertyPath == "Scale") {
 					return "Hot::ParticleTemplate";
 				}
 			}
-			var nodeType = t.GetProperty(animator.TargetProperty).DeclaringType;
+			var nodeType = t.GetProperty(animator.TargetPropertyPath).DeclaringType;
 			var a = nodeWriters.First(i => i.Key == nodeType).Value.ActorClass;
 			if (a == "Hot::ParticleEmitter2") {
 				return "Hot::ParticleEmitter";

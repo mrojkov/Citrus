@@ -119,9 +119,9 @@ namespace Tangerine.UI.Timeline
 					if (node == null) {
 						continue;
 					}
-					var property = row.Components.Get<PropertyRow>()?.Animator.TargetProperty;
+					var property = row.Components.Get<PropertyRow>()?.Animator.TargetPropertyPath;
 					foreach (var a in node.Animators.ToList()) {
-						if (property != null && a.TargetProperty != property) {
+						if (property != null && a.TargetPropertyPath != property) {
 							continue;
 						}
 						foreach (var k in a.Keys.Where(k => k.Frame >= span.A && k.Frame < span.B).ToList()) {

@@ -65,11 +65,9 @@ namespace Tangerine.UI.Inspector
 		{
 			int currentFrame = Document.Current.AnimationFrame;
 
-			foreach (var animable in editorParams.Objects.OfType<IAnimable>()) {
-				IAnimator animator;
+			foreach (var (animable, owner) in editorParams.RootObjects.Zip(editorParams.Objects, (ro, o) => (ro as IAnimationHost, o))) {
 				bool hasKey = false;
-
-				if (animable.Animators.TryFind(editorParams.PropertyName, out animator, Document.Current.AnimationId)) {
+				if (animable.Animators.TryFind(editorParams.PropertyPath, out IAnimator animator, Document.Current.AnimationId)) {
 					hasKey = animator.ReadonlyKeys.Any(i => i.Frame == currentFrame);
 					if (hasKey && !value) {
 						Core.Operations.RemoveKeyframe.Perform(animator, currentFrame);
@@ -77,11 +75,11 @@ namespace Tangerine.UI.Inspector
 				}
 
 				if (!hasKey && value) {
-					var propValue = new Property(animable, editorParams.PropertyName).Getter();
+					var propValue = new Property(owner, editorParams.PropertyName).Getter();
 					var keyFunction = animator?.Keys.LastOrDefault(k => k.Frame <= currentFrame)?.Function ??
 						CoreUserPreferences.Instance.DefaultKeyFunction;
 					IKeyframe keyframe = Keyframe.CreateForType(editorParams.PropertyInfo.PropertyType, currentFrame, propValue, keyFunction);
-					Core.Operations.SetKeyframe.Perform(animable, editorParams.PropertyName, Document.Current.AnimationId, keyframe);
+					Core.Operations.SetKeyframe.Perform(animable, editorParams.PropertyPath, Document.Current.AnimationId, keyframe);
 				}
 			}
 		}

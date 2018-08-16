@@ -15,7 +15,7 @@ namespace Tangerine.UI
 		public AlignmentPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
 			ContainerWidget.AddNode(new Widget {
-				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center), Spacing = 4 },
+				Layout = new HBoxLayout { DefaultCell = new LayoutCell(Alignment.Center), Spacing = 4 },
 				Nodes = {
 					(selectorH = editorParams.DropDownListFactory()),
 					(selectorV = editorParams.DropDownListFactory())

@@ -6,14 +6,17 @@ namespace Lime
 {
 	public interface IAnimator : IDisposable
 	{
-		IAnimable Owner { get; set; }
+		IAnimationHost Owner { get; set; }
+
+		IAnimable Animable { get; set; }
+
 		IAnimator Next { get; set; }
 
 		IAnimator Clone();
 
 		bool IsTriggerable { get; set; }
 
-		string TargetProperty { get; set; }
+		string TargetPropertyPath { get; set; }
 
 		string AnimationId { get; set; }
 
@@ -32,6 +35,8 @@ namespace Lime
 		IKeyframeList Keys { get; }
 
 		object UserData { get; set; }
+
+		string TargetProperty { get; }
 
 		Type GetValueType();
 
@@ -66,7 +71,8 @@ namespace Lime
 	[YuzuSpecializeWith(typeof(VAlignment))]
 	public class Animator<T> : IAnimator
 	{
-		public IAnimable Owner { get; set; }
+		public IAnimationHost Owner { get; set; }
+		public IAnimable Animable { get; set; }
 		public IAnimator Next { get; set; }
 
 		private double minTime;
@@ -78,8 +84,8 @@ namespace Lime
 		public bool IsTriggerable { get; set; }
 		public bool Enabled { get; set; } = true;
 
-		[YuzuMember]
-		public string TargetProperty { get; set; }
+		[YuzuMember("TargetProperty")]
+		public string TargetPropertyPath { get; set; }
 
 		public Type GetValueType() { return typeof(T); }
 
@@ -171,7 +177,7 @@ namespace Lime
 			if (ReadonlyKeys.Count > 0 && Enabled) {
 				// This function relies on currentKey value. Therefore Apply(time) must be called before.
 				if (ReadonlyKeys[keyIndex].Frame == frame) {
-					Owner.OnTrigger(TargetProperty, animationTimeCorrection);
+					Owner.OnTrigger(TargetPropertyPath, animationTimeCorrection);
 				}
 			}
 		}
@@ -188,13 +194,14 @@ namespace Lime
 
 		private void Bind()
 		{
-			var p = AnimationUtils.GetProperty(Owner.GetType(), TargetProperty);
+			var (p, animable) = AnimationUtils.GetPropertyByPath(Owner, TargetPropertyPath);
+			Animable = animable;
 			IsTriggerable = p.Triggerable;
 			var mi = p.Info.GetSetMethod();
 			if (mi == null) {
-				throw new Lime.Exception("Property '{0}' (class '{1}') is readonly", TargetProperty, Owner.GetType());
+				throw new Lime.Exception("Property '{0}' (class '{1}') is readonly", TargetPropertyPath, animable.GetType());
 			}
-			Setter = (SetterDelegate)Delegate.CreateDelegate(typeof(SetterDelegate), Owner, mi);
+			Setter = (SetterDelegate)Delegate.CreateDelegate(typeof(SetterDelegate), animable, mi);
 		}
 
 		public void ResetCache()
@@ -288,6 +295,17 @@ namespace Lime
 		}
 
 		public int Duration => (ReadonlyKeys.Count == 0) ? 0 : ReadonlyKeys[ReadonlyKeys.Count - 1].Frame;
+
+		public string TargetProperty
+		{
+			get
+			{
+				int index = TargetPropertyPath.LastIndexOf('.');
+				return index == -1
+					? TargetPropertyPath
+					: TargetPropertyPath.Substring(index + 1);
+			}
+		}
 	}
 
 	public class Vector2Animator : Animator<Vector2>

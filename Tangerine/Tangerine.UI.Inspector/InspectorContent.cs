@@ -16,6 +16,8 @@ namespace Tangerine.UI.Inspector
 		private readonly List<IPropertyEditor> editors;
 		private readonly Widget widget;
 		private int row = 1;
+		private IEnumerable<object> rootObjects;
+		private bool allRootObjectsAnimable;
 
 		public InspectorContent(Widget widget)
 		{
@@ -25,6 +27,8 @@ namespace Tangerine.UI.Inspector
 
 		public void BuildForObjects(IEnumerable<object> objects)
 		{
+			rootObjects = objects;
+			allRootObjectsAnimable = rootObjects.All(o => o is IAnimationHost);
 			if (Widget.Focused != null && Widget.Focused.DescendantOf(widget)) {
 				widget.SetFocus();
 			}
@@ -33,13 +37,14 @@ namespace Tangerine.UI.Inspector
 			if (objects.Any() && objects.All(o => o is Node)) {
 				var nodes = objects.Cast<Node>().ToList();
 				foreach (var t in GetComponentsTypes(nodes)) {
-					PopulateContentForType(t, nodes.Select(n => n.Components.Get(t)), widget).ToList();
+					var components = nodes.Select(n => n.Components.Get(t));
+					PopulateContentForType(t, components, widget, "[" + Yuzu.Util.TypeSerializer.Serialize(t) + "]").ToList();
 				}
 				AddComponentsMenu(nodes, widget);
 			}
 		}
 
-		private IEnumerable<IPropertyEditor> BuildForObjectsHelper(IEnumerable<object> objects, Widget widget = null)
+		private IEnumerable<IPropertyEditor> BuildForObjectsHelper(IEnumerable<object> objects, Widget widget = null, string propertyPath = "")
 		{
 			if (widget == null) {
 				widget = this.widget;
@@ -49,7 +54,7 @@ namespace Tangerine.UI.Inspector
 			}
 			foreach (var t in GetTypes(objects)) {
 				var o = objects.Where(i => t.IsInstanceOfType(i)).ToList();
-				foreach (var e in PopulateContentForType(t, o, widget)) {
+				foreach (var e in PopulateContentForType(t, o, widget, propertyPath)) {
 					yield return e;
 				}
 			}
@@ -117,7 +122,7 @@ namespace Tangerine.UI.Inspector
 			return true;
 		}
 
-		private IEnumerable<IPropertyEditor> PopulateContentForType(Type type, IEnumerable<object> objects, Widget widget)
+		private IEnumerable<IPropertyEditor> PopulateContentForType(Type type, IEnumerable<object> objects, Widget widget, string propertyPath)
 		{
 			var categoryLabelAdded = false;
 			var editorParams = new Dictionary<string, List<PropertyEditorParams>>();
@@ -148,10 +153,14 @@ namespace Tangerine.UI.Inspector
 						widget.AddNode(label);
 					}
 				}
-				var @params = new PropertyEditorParams(widget, objects, type, property.Name) {
+				var @params = new PropertyEditorParams(widget, objects, rootObjects, type, property.Name,
+					string.IsNullOrEmpty(propertyPath)
+						? property.Name
+						: propertyPath + "." + property.Name
+				) {
 					NumericEditBoxFactory = () => new TransactionalNumericEditBox(),
 					History = Document.Current.History,
-					PropertySetter = SetAnimableProperty,
+					PropertySetter = allRootObjectsAnimable ? (PropertySetterDelegate)SetAnimableProperty : SetProperty,
 					DefaultValueGetter = () => {
 						var ctr = type.GetConstructor(new Type[] {});
 						if (ctr == null) {
@@ -193,7 +202,7 @@ namespace Tangerine.UI.Inspector
 									editors.Remove(e);
 								}
 								instanceEditors.Clear();
-								instanceEditors.AddRange(BuildForObjectsHelper(objects.Select(o => param.PropertyInfo.GetValue(o)), w));
+								instanceEditors.AddRange(BuildForObjectsHelper(objects.Select(o => param.PropertyInfo.GetValue(o)), w, param.PropertyPath));
 							});
 							Type et = typeof(InstancePropertyEditor<>).MakeGenericType(param.PropertyInfo.PropertyType);
 							editor = Activator.CreateInstance(et, new object[] { param, onValueChanged }) as IPropertyEditor;
@@ -278,6 +287,11 @@ namespace Tangerine.UI.Inspector
 			widget.AddNode(label);
 		}
 
+		private static void SetProperty(object obj, string propertyName, object value)
+		{
+			Core.Operations.SetProperty.Perform(obj, propertyName, value);
+		}
+
 		private static void SetAnimableProperty(object obj, string propertyName, object value)
 		{
 			Core.Operations.SetAnimableProperty.Perform(obj, propertyName, value, CoreUserPreferences.Instance.AutoKeyframes);
@@ -345,8 +359,10 @@ namespace Tangerine.UI.Inspector
 				ctr.Nodes.Insert(0, new HSpacer(20));
 			}
 
-			var index = ctr.Nodes.Count() - 1;
+			var index = ctr.Nodes.Count - 1;
+			bool allRootObjectsAnimable = editor.EditorParams.RootObjects.All(a => a is IAnimationHost);
 			if (
+				allRootObjectsAnimable &&
 				PropertyAttributes<TangerineStaticPropertyAttribute>.Get(editor.EditorParams.PropertyInfo) == null &&
 				AnimatorRegistry.Instance.Contains(editor.EditorParams.PropertyInfo.PropertyType) &&
 				!Document.Current.InspectRootNode

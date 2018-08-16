@@ -36,7 +36,7 @@ namespace Tangerine.UI
 				};
 				wrapper.AddNode(propertyLabel);
 				wrapper.AddNode(new Widget {
-					Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center), Spacing = 4 },
+					Layout = new HBoxLayout { DefaultCell = new LayoutCell(Alignment.Center), Spacing = 4 },
 					Nodes = {
 						indexEditors[i] ,
 						weigthsEditors[i]

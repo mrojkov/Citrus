@@ -69,13 +69,18 @@ namespace Tangerine.Core.Operations
 	{
 		public static void Perform(object @object, string propertyName, object value, bool createAnimatorIfNeeded = false, bool createInitialKeyframeForNewAnimator = true, int atFrame = -1)
 		{
-			SetProperty.Perform(@object, propertyName, value);
 			IAnimator animator;
-			var animable = @object as IAnimable;
+			var animable = @object as IAnimationHost;
+			object owner = @object;
+			AnimationUtils.PropertyData propertyData = AnimationUtils.PropertyData.Empty;
+			if (animable != null) {
+				(propertyData, owner) = AnimationUtils.GetPropertyByPath(animable, propertyName);
+			}
+			SetProperty.Perform(owner, propertyData.Info?.Name ?? propertyName, value);
 			if (animable != null && (animable.Animators.TryFind(propertyName, out animator, Document.Current.AnimationId) || createAnimatorIfNeeded)) {
 
 				if (animator == null && createInitialKeyframeForNewAnimator) {
-					var propertyValue = animable.GetType().GetProperty(propertyName).GetValue(animable);
+					var propertyValue = propertyData.Info.GetValue(owner);
 					Perform(animable, propertyName, propertyValue, true, false, 0);
 				}
 
@@ -86,7 +91,7 @@ namespace Tangerine.Core.Operations
 				}
 
 				try {
-					var type = animable.GetType().GetProperty(propertyName).PropertyType;
+					var type = propertyData.Info.PropertyType;
 					var key =
 						animator?.ReadonlyKeys.FirstOrDefault(i => i.Frame == Document.Current.AnimationFrame)?.Clone() ??
 						Keyframe.CreateForType(type);
@@ -122,7 +127,7 @@ namespace Tangerine.Core.Operations
 			}
 
 			IAnimator animator;
-			var animable = @object as IAnimable;
+			var animable = @object as IAnimationHost;
 			if (animable != null && animable.Animators.TryFind(propertyName, out animator, Document.Current.AnimationId)) {
 				foreach (var keyframe in animator.ReadonlyKeys.ToList()) {
 					if (!(keyframe.Value is T)) continue;
@@ -142,7 +147,7 @@ namespace Tangerine.Core.Operations
 	{
 		public readonly int Frame;
 		public readonly IAnimator Animator;
-		public readonly IAnimable Owner;
+		public readonly IAnimationHost Owner;
 
 		public override bool IsChangingDocument => true;
 
@@ -193,26 +198,26 @@ namespace Tangerine.Core.Operations
 
 	public class SetKeyframe : Operation
 	{
-		public readonly IAnimable Animable;
+		public readonly IAnimationHost AnimationHost;
 		public readonly string PropertyName;
 		public readonly string AnimationId;
 		public readonly IKeyframe Keyframe;
 
 		public override bool IsChangingDocument => true;
 
-		public static void Perform(IAnimable animable, string propertyName, string animationId, IKeyframe keyframe)
+		public static void Perform(IAnimationHost animationHost, string propertyName, string animationId, IKeyframe keyframe)
 		{
-			Document.Current.History.Perform(new SetKeyframe(animable, propertyName, animationId, keyframe));
+			Document.Current.History.Perform(new SetKeyframe(animationHost, propertyName, animationId, keyframe));
 		}
 
 		public static void Perform(IAnimator animator, IKeyframe keyframe)
 		{
-			Perform(animator.Owner, animator.TargetProperty, animator.AnimationId, keyframe);
+			Perform(animator.Owner, animator.TargetPropertyPath, animator.AnimationId, keyframe);
 		}
 
-		private SetKeyframe(IAnimable animable, string propertyName, string animationId, IKeyframe keyframe)
+		private SetKeyframe(IAnimationHost animationHost, string propertyName, string animationId, IKeyframe keyframe)
 		{
-			Animable = animable;
+			AnimationHost = animationHost;
 			PropertyName = propertyName;
 			Keyframe = keyframe;
 			AnimationId = animationId;
@@ -234,8 +239,8 @@ namespace Tangerine.Core.Operations
 
 				if (!op.Find(out backup)) {
 					bool animatorExists =
-						op.Animable.Animators.Any(a => a.TargetProperty == op.PropertyName && a.AnimationId == op.AnimationId);
-					animator = op.Animable.Animators[op.PropertyName, op.AnimationId];
+						op.AnimationHost.Animators.Any(a => a.TargetPropertyPath == op.PropertyName && a.AnimationId == op.AnimationId);
+					animator = op.AnimationHost.Animators[op.PropertyName, op.AnimationId];
 					op.Save(new Backup {
 						AnimatorExists = animatorExists,
 						Animator = animator,
@@ -244,7 +249,7 @@ namespace Tangerine.Core.Operations
 				} else {
 					animator = backup.Animator;
 					if (!backup.AnimatorExists) {
-						op.Animable.Animators.Add(animator);
+						op.AnimationHost.Animators.Add(animator);
 					}
 				}
 
@@ -267,7 +272,7 @@ namespace Tangerine.Core.Operations
 					b.Animator.Keys.AddOrdered(b.Keyframe);
 				}
 				if (!b.AnimatorExists || b.Animator.Keys.Count == 0) {
-					op.Animable.Animators.Remove(b.Animator);
+					op.AnimationHost.Animators.Remove(b.Animator);
 				}
 				b.Animator.ResetCache();
 				if (b.Animator.TargetProperty == nameof(Node.Trigger)) {

@@ -78,5 +78,10 @@ namespace Lime
 				animator.ResetCache();
 			}
 		}
+
+		ILayout ILayout.Clone(Widget newOwner)
+		{
+			return AnchorLayout.Instance;
+		}
 	}
 }

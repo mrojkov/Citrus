@@ -53,7 +53,7 @@ namespace Tangerine.UI.Timeline.Components
 			foreach (var animator in node.Animators) {
 				for (var j = 0; j < animator.ReadonlyKeys.Count; j++) {
 					var key = animator.ReadonlyKeys[j];
-					var colorIndex = PropertyAttributes<TangerineKeyframeColorAttribute>.Get(node.GetType(), animator.TargetProperty)?.ColorIndex ?? 0;
+					var colorIndex = PropertyAttributes<TangerineKeyframeColorAttribute>.Get(animator.Animable.GetType(), animator.TargetProperty)?.ColorIndex ?? 0;
 					var cell = cells[key.Frame];
 					if (cell.StripCount == 0) {
 						cell.Func1 = key.Function;

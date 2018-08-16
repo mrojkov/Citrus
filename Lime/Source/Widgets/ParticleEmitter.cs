@@ -1001,7 +1001,7 @@ namespace Lime
 				Id = "ParticleModifier"
 			};
 			var animator = new Color4Animator() {
-				TargetProperty = "Color"
+				TargetPropertyPath = "Color"
 			};
 			animator.ReadonlyKeys.Add(0, new Color4(255, 255, 255, 0));
 			animator.ReadonlyKeys.Add(1, new Color4(255, 255, 255, 255));

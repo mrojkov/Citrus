@@ -184,8 +184,15 @@ namespace Tangerine.UI
 		protected void SetProperty(object value)
 		{
 			DoTransaction(() => {
-				foreach (var o in EditorParams.Objects) {
-					EditorParams.PropertySetter(o, EditorParams.PropertyName, value);
+				bool allRootObjectsAnimable = EditorParams.RootObjects.All(o => o is IAnimationHost);
+				if (allRootObjectsAnimable) {
+					foreach (var o in EditorParams.RootObjects) {
+						EditorParams.PropertySetter(o, EditorParams.PropertyPath, value);
+					}
+				} else {
+					foreach (var o in EditorParams.Objects) {
+						EditorParams.PropertySetter(o, EditorParams.PropertyName, value);
+					}
 				}
 			});
 		}

@@ -12,10 +12,16 @@ using Yuzu;
 
 namespace Lime
 {
-	public interface IAnimable
+	public interface IAnimationHost
 	{
 		AnimatorCollection Animators { get; }
 		void OnTrigger(string property, double animationTimeCorrection = 0);
+		NodeComponentCollection Components { get; }
+	}
+
+	public interface IAnimable
+	{
+		void RemoveAnimators(IAnimable animable);
 	}
 
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
@@ -181,7 +187,7 @@ namespace Lime
 	/// </summary>
 	[YuzuDontGenerateDeserializer]
 	[DebuggerTypeProxy(typeof(NodeDebugView))]
-	public abstract class Node : IDisposable, IAnimable, IFolderItem, IFolderContext, IRenderChainBuilder
+	public abstract class Node : IDisposable, IAnimationHost, IFolderItem, IFolderContext, IRenderChainBuilder, IAnimable
 	{
 		[Flags]
 		protected internal enum DirtyFlags
@@ -1324,6 +1330,11 @@ namespace Lime
 		internal protected virtual bool PartialHitTest(ref HitTestArgs args)
 		{
 			return false;
+		}
+
+		public void RemoveAnimators(IAnimable owner)
+		{
+			Animators.RemoveAllByAnimable(owner);
 		}
 
 		private class DescendantsEnumerable : IEnumerable<Node>

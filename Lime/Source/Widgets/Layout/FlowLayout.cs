@@ -14,14 +14,17 @@ namespace Lime
 			LeftToRight,
 			TopToBottom,
 		}
-		private readonly List<int> splitIndices = new List<int>();
+		private List<int> splitIndices = new List<int>();
 		[YuzuMember]
 		public float Spacing { get; set; }
+
 		// TODO: implement for any alignment other than justify or left
 		[YuzuMember]
 		public HAlignment RowAlignment { get; set; }
+
 		[YuzuMember]
 		public VAlignment ColumnAlignment { get; set; }
+
 		protected readonly FlowDirection Direction;
 
 		public FlowLayout(FlowDirection direction = FlowDirection.LeftToRight)
@@ -265,6 +268,13 @@ namespace Lime
 			} else {
 				throw new Lime.Exception($"Invalid FlowDirection: {Direction}");
 			}
+		}
+
+		ILayout ILayout.Clone(Widget newOwner)
+		{
+			var clone = (FlowLayout)Clone(newOwner);
+			clone.splitIndices = new List<int>();
+			return clone;
 		}
 	}
 }

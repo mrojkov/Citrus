@@ -15,7 +15,7 @@ namespace Tangerine.Core
 		public AnimatorEditorState(IAnimator animator)
 		{
 			Animator = animator;
-			var propertyType = animator.Owner.GetType().GetProperty(animator.TargetProperty).PropertyType;
+			var propertyType = animator.Owner.GetType().GetProperty(animator.TargetPropertyPath).PropertyType;
 			if (propertyType == typeof(Vector2)) {
 				Curves.Add(new CurveEditorState("X"));
 				Curves.Add(new CurveEditorState("Y"));

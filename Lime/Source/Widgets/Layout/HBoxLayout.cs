@@ -8,13 +8,19 @@ namespace Lime
 	public class HBoxLayout : CommonLayout, ILayout
 	{
 		[YuzuMember]
-		public float Spacing { get; set; }
-		[YuzuMember]
-		public LayoutCell CellDefaults { get; set; }
+		public float Spacing
+		{
+			get => spacing;
+			set {
+				spacing = value;
+				Owner?.Layout.InvalidateConstraintsAndArrangement(Owner);
+			}
+		}
+
+		private float spacing;
 
 		public HBoxLayout()
 		{
-			CellDefaults = new LayoutCell();
 			DebugRectangles = new List<Rectangle>();
 		}
 
@@ -31,7 +37,7 @@ namespace Lime
 				constraints[i++] = new LinearAllocator.Constraints {
 					MinSize = child.EffectiveMinSize.X,
 					MaxSize = child.EffectiveMaxSize.X,
-					Stretch = (child.LayoutCell ?? CellDefaults).StretchX
+					Stretch = EffectiveLayoutCell(child).StretchX
 				};
 			}
 			var availableWidth = Math.Max(0, widget.ContentWidth - (widgets.Count - 1) * Spacing);
@@ -41,7 +47,7 @@ namespace Lime
 			var position = widget.Padding.LeftTop;
 			foreach (var child in widgets) {
 				var size = new Vector2(sizes[i], widget.ContentHeight);
-				var align = (child.LayoutCell ?? CellDefaults).Alignment;
+				var align = EffectiveLayoutCell(child).Alignment;
 				LayoutWidgetWithinCell(child, position, size, align, DebugRectangles);
 				position.X += size.X + Spacing;
 				i++;
@@ -66,6 +72,11 @@ namespace Lime
 			var extraSpace = new Vector2((widgets.Count - 1) * Spacing, 0) + widget.Padding;
 			widget.MeasuredMinSize = minSize + extraSpace;
 			widget.MeasuredMaxSize = maxSize + extraSpace;
+		}
+
+		ILayout ILayout.Clone(Widget newOwner)
+		{
+			return (HBoxLayout)Clone(newOwner);
 		}
 	}
 }
