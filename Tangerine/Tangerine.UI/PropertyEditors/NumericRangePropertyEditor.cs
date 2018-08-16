@@ -38,6 +38,7 @@ namespace Tangerine.UI
 						return current;
 					});
 				});
+				editor.Text = newValue.ToString();
 			} else {
 				editor.Text = currentValue.ToString();
 			}
