@@ -215,7 +215,7 @@ namespace Lime
 
 		private class RenderObject : WidgetRenderObject
 		{
-			public List<Lime.RenderObject> Objects = new List<Lime.RenderObject>();
+			public RenderObjectList Objects = new RenderObjectList();
 			public ITexture RenderTexture;
 			public Vector2 FrameSize;
 			public bool ScissorTest;
@@ -256,9 +256,7 @@ namespace Lime
 						Renderer.DepthState = DepthState.DepthDisabled;
 						Renderer.CullMode = CullMode.None;
 						Renderer.Transform2 = LocalToWorldTransform.CalcInversed();
-						foreach (var ro in Objects) {
-							ro.Render();
-						}
+						Objects.Render();
 					} finally {
 						RenderTexture.RestoreRenderTarget();
 						Renderer.PopState();
@@ -271,9 +269,7 @@ namespace Lime
 				Renderer.PushState(RenderState.ScissorState);
 				try {
 					Renderer.SetScissorState(new ScissorState(ScissorRect), intersectWithCurrent: true);
-					foreach (var ro in Objects) {
-						ro.Render();
-					}
+					Objects.Render();
 				} finally {
 					Renderer.PopState();
 				}
@@ -298,9 +294,7 @@ namespace Lime
 					// Draw the frame content
 					sp.Comparison = CompareFunc.Equal;
 					Renderer.StencilState = sp;
-					foreach (var ro in Objects) {
-						ro.Render();
-					}
+					Objects.Render();
 				} finally {
 					Renderer.PopState();
 				}

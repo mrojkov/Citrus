@@ -164,10 +164,7 @@ namespace Lime
 		protected virtual void Render(RenderObjectList renderObjects)
 		{
 			Renderer.Viewport = new Viewport(GetViewport());
-			foreach (var ro in renderObjects) {
-				ro.Render();
-				ro.Rendered = true;
-			}
+			renderObjects.Render();
 		}
 
 		public WindowRect GetViewport()

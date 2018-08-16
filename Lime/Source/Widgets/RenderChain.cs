@@ -82,7 +82,7 @@ namespace Lime
 			}
 		}
 
-		private List<RenderObject> renderObjects = new List<RenderObject>();
+		private RenderObjectList renderObjects = new RenderObjectList();
 
 		[System.Obsolete]
 		public void Render()
@@ -90,10 +90,7 @@ namespace Lime
 			try {
 				renderObjects.Clear();
 				GetRenderObjects(renderObjects);
-				foreach (var ro in renderObjects) {
-					ro.Render();
-					ro.Rendered = true;
-				}
+				renderObjects.Render();
 			} finally {
 				renderObjects.Clear();
 			}
