@@ -198,7 +198,7 @@ namespace Tangerine.UI
 				VAlignment = VAlignment.Center
 			};
 			Text = text;
-			MaxSize = new Vector2(caption.MeasureUncutText().X + 10, MaxSize.Y);
+			MinMaxSize = new Vector2(caption.MeasureUncutText().X + 10, MaxSize.Y);
 			AddNode(caption);
 			caption.ExpandToContainerWithAnchors();
 		}

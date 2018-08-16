@@ -334,7 +334,7 @@ namespace Tangerine.Dialogs
 			}
 			int rightPanelIndex = usedCommands.SelectedIndex;
 			rightPanelIndex = rightPanelIndex < 0 ? 0 : rightPanelIndex;
-			var leftItem = availableCommands.SelectedItem;
+			var leftItem = (ListBox.ListBoxItem)availableCommands.Items[leftPanelIndex];
 			var leftPanel = (CommandRow)leftItem.Widget;
 			leftPanel.Unlink();
 			availableCommands.Items.RemoveAt(leftPanelIndex);
@@ -494,7 +494,7 @@ namespace Tangerine.Dialogs
 			public ListBoxItem SelectedItem
 			{
 				get {
-					if (selectedItem?.parent != this) {
+					if (selectedItem?.Parent == null) {
 						selectedItem = null;
 					}
 					return selectedItem;
@@ -513,14 +513,14 @@ namespace Tangerine.Dialogs
 					ScrollPosition = MinScrollPosition;
 					return;
 				}
-				Widget widget = (Widget)Items.Last();
-				if (SelectedItem != null && SelectedItem.Parent != null) {
-					widget = SelectedItem;
+				var widget = SelectedItem?.AsWidget;
+				if (widget == null) {
+					widget = Items.Last().AsWidget;
 				}
 				var pos = widget.CalcPositionInSpaceOf(Content);
 				if (pos.Y < ScrollPosition) {
 					ScrollPosition = pos.Y;
-				} else if (pos.Y + widget.Height > ScrollPosition + Height) {
+				} else if (pos.Y + widget.Height > ScrollPosition + Height && SelectedItem != null) {
 					ScrollPosition = pos.Y - Height + widget.Height;
 				}
 			}
