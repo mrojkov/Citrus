@@ -28,7 +28,7 @@ namespace Tangerine.UI.Inspector
 			AddEditor(typeof(Vector3), c => new Vector3PropertyEditor(c));
 			AddEditor(typeof(Quaternion), c => new QuaternionPropertyEditor(c));
 			AddEditor(typeof(NumericRange), c => new NumericRangePropertyEditor(c));
-			AddEditor(c => c.PropertyName == "Text", c => new StringPropertyEditor(c, multiline: true));
+			AddEditor(c => c.PropertyName == "Text", c => new TextPropertyEditor(c));
 			AddEditor(typeof(string), c => new StringPropertyEditor(c));
 			AddEditor(typeof(float), c => new FloatPropertyEditor(c));
 			AddEditor(typeof(double), c => new DoublePropertyEditor(c));

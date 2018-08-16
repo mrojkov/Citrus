@@ -100,6 +100,7 @@
     <Compile Include="PropertyEditors\ShortcutPropertyEditor.cs" />
     <Compile Include="PropertyEditors\SkinningWeightsPropertyEditor.cs" />
     <Compile Include="PropertyEditors\StringPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\TextPropertyEditor.cs" />
     <Compile Include="PropertyEditors\TexturePropertyEditor.cs" />
     <Compile Include="PropertyEditors\ThicknessPropertyEditor.cs" />
     <Compile Include="PropertyEditors\TriggerPropertyEditor.cs" />
@@ -107,6 +108,7 @@
     <Compile Include="PropertyEditors\Vector3PropertyEditor.cs" />
     <Compile Include="HierarchyPanel\TreeView.cs" />
     <Compile Include="ToolbarModel.cs" />
+    <Compile Include="TextEditorWindow.cs" />
     <Compile Include="UIProcessors.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EmbeddedResources\EmbeddedResource.cs" />
