@@ -515,12 +515,12 @@ namespace Lime
 				}
 				if (clickGesture.WasRecognized()) {
 					if (!FocusableWidget.IsFocused()) {
-						FocusableWidget.SetFocus();
 						if (EditorParams.SelectAllOnFocus)
 							SelectAll();
 					} else {
 						HideSelection();
 					}
+					FocusableWidget.SetFocus();
 					CaretPos.WorldPos = DisplayWidget.LocalMousePosition();
 				}
 				if (doubleClickGesture.WasRecognized()) {
