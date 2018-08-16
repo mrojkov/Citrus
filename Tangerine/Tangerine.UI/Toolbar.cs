@@ -51,13 +51,16 @@ namespace Tangerine
 					}
 					foreach (var id in panel.CommandIds) {
 						if (CommandRegister.TryGetCommand(id, out ICommand command)) {
-							var button = new ToolbarButton(command.Icon ?? new SerializableTexture());
+							var button =
+								command.Icon != null ?
+								new ToolbarButton(command.Icon) :
+								new ToolbarButton(command.Text ?? "null");
 							button.Clicked += () => CommandQueue.Instance.Add((Command)command);
 							button.Updating += _ => {
-								button.Texture = command.Icon ?? new SerializableTexture();
+								button.Texture = command.Icon;
 								button.Selected = command.Checked;
 								button.Enabled = command.Enabled;
-								button.Tip = command.Text ?? "";
+								button.Tip = button.Text = command.Text;
 							};
 							panelWidget.AddNode(button);
 						}
