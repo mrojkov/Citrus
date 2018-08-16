@@ -57,20 +57,13 @@ namespace Lime
 					return item;
 				}
 			}
-			var oldCount = items.Length;
 			System.Array.Resize(ref items, items.Length * 2);
 			index = items.Length / 2;
 			for (int i = index; i < items.Length; i++) {
 				items[i] = new T();
 			}
 			items[index].Rendered = false;
-			ROStats.TotalObjects += items.Length - oldCount;
 			return items[index];
 		}
-	}
-
-	static class ROStats
-	{
-		public static int TotalObjects;
 	}
 }
