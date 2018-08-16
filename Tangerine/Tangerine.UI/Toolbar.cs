@@ -109,13 +109,7 @@ namespace Tangerine
 							if (!IsMouseOver(panelWidget, out pos)) {
 								continue;
 							}
-							if (newRowIndex == i && newPanelIndex == j) {
-								goto Next;
-							}
-							bool isDifferentRow = newRowIndex != i;
-							bool isBefore = newPanelIndex < j && pos.X >= panelWidget.Width / 2;
-							bool isAfter = newPanelIndex > j && pos.X <= panelWidget.Width / 2;
-							if (isDifferentRow || isBefore || isAfter) {
+							if ((newRowIndex != i || newPanelIndex != j) && (rowIndex != i || j != rowWidget.Nodes.Count - 1)) {
 								currentPanel = panelWidget;
 								newRowIndex = i;
 								newPanelIndex = j;
