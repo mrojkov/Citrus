@@ -11,6 +11,7 @@ namespace Tangerine.Dialogs
 		private ListBox availableCommands;
 		private ListBox usedCommands;
 		private ListBox panelList;
+		private ThemedDropDownList categoryList;
 
 		public ToolbarLayoutEditor()
 		{
@@ -26,6 +27,7 @@ namespace Tangerine.Dialogs
 			usedCommands = CreateListBox();
 			panelList = CreateListBox();
 			CreatePanelControls();
+			AddNode(CreateCategoryList());
 			var widget = new Widget {
 				Layout = new HBoxLayout()
 			};
@@ -72,6 +74,17 @@ namespace Tangerine.Dialogs
 				}
 			};
 			return result;
+		}
+
+		private ThemedDropDownList CreateCategoryList()
+		{
+			categoryList = new ThemedDropDownList();
+			foreach (var category in CommandRegister.RegisteredCategories()) {
+				categoryList.Items.Add(new CommonDropDownList.Item(category));
+			}
+			categoryList.Index = 0;
+			categoryList.Changed += e => RefreshAvailableCommands();
+			return categoryList;
 		}
 
 		private void CreatePanelControls()
@@ -278,7 +291,7 @@ namespace Tangerine.Dialogs
 		private void RefreshAvailableCommands()
 		{
 			availableCommands.Items.Clear();
-			foreach (var pair in CommandRegister.RegisteredPairs("All")) {
+			foreach (var pair in CommandRegister.RegisteredPairs(categoryList.Items[categoryList.Index].Text)) {
 				if (toolbarLayout.ContainsId(pair.Key)) {
 					continue;
 				}

@@ -353,8 +353,8 @@ namespace Tangerine
 			RegisterCommands(typeof(SceneViewCommands));
 			RegisterCommands(typeof(Tools));
 			RegisterCommands(typeof(OrangeCommands));
-			CommandRegister.Register("Undo", Command.Undo);
-			CommandRegister.Register("Redo", Command.Redo);
+			CommandRegister.Register("GenericCommands", "Undo", Command.Undo);
+			CommandRegister.Register("GenericCommands", "Redo", Command.Redo);
 		}
 
 		void RegisterCommands(Type type)
