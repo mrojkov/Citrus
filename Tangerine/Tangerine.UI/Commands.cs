@@ -4,21 +4,21 @@ namespace Tangerine.UI
 {
 	public static class TimelineCommands
 	{
-		public static readonly ICommand ScrollLeft = new Command(new Shortcut(Key.Left));
-		public static readonly ICommand ScrollRight = new Command(new Shortcut(Key.Right));
-		public static readonly ICommand FastScrollLeft = new Command(new Shortcut(Modifiers.Alt, Key.Left));
-		public static readonly ICommand FastScrollRight = new Command(new Shortcut(Modifiers.Alt, Key.Right));
-		public static readonly ICommand ScrollUp = new Command(new Shortcut(Key.Up));
-		public static readonly ICommand ScrollDown = new Command(new Shortcut(Key.Down));
-		public static readonly ICommand SelectUp = new Command(new Shortcut(Modifiers.Shift, Key.Up));
-		public static readonly ICommand SelectDown = new Command(new Shortcut(Modifiers.Shift, Key.Down));
-		public static readonly ICommand EnterNode = new Command(new Shortcut(Key.Enter));
-		public static readonly ICommand EnterNodeAlias = new Command(new Shortcut(Modifiers.Alt | Modifiers.Shift, Key.Right));
-		public static readonly ICommand EnterNodeMouse = new Command(new Shortcut(Key.MouseForward));
-		public static readonly ICommand ExitNode = new Command(new Shortcut(Key.BackSpace));
-		public static readonly ICommand ExitNodeAlias = new Command(new Shortcut(Modifiers.Alt | Modifiers.Shift, Key.Left));
-		public static readonly ICommand ExitNodeMouse = new Command(new Shortcut(Key.MouseBack));
-		public static readonly ICommand RenameRow = new Command(new Shortcut(Key.F2));
+		public static readonly ICommand ScrollLeft = new Command("Scroll Left", new Shortcut(Key.Left));
+		public static readonly ICommand ScrollRight = new Command("Scroll Right", new Shortcut(Key.Right));
+		public static readonly ICommand FastScrollLeft = new Command("Fast Scroll Left", new Shortcut(Modifiers.Alt, Key.Left));
+		public static readonly ICommand FastScrollRight = new Command("Fast Scroll Right", new Shortcut(Modifiers.Alt, Key.Right));
+		public static readonly ICommand ScrollUp = new Command("Scroll Up", new Shortcut(Key.Up));
+		public static readonly ICommand ScrollDown = new Command("Scroll Down", new Shortcut(Key.Down));
+		public static readonly ICommand SelectUp = new Command("Select Up", new Shortcut(Modifiers.Shift, Key.Up));
+		public static readonly ICommand SelectDown = new Command("Select Down", new Shortcut(Modifiers.Shift, Key.Down));
+		public static readonly ICommand EnterNode = new Command("Enter Node", new Shortcut(Key.Enter));
+		public static readonly ICommand EnterNodeAlias = new Command("Enter Node", new Shortcut(Modifiers.Alt | Modifiers.Shift, Key.Right));
+		public static readonly ICommand EnterNodeMouse = new Command("Enter Node", new Shortcut(Key.MouseForward));
+		public static readonly ICommand ExitNode = new Command("Exit Node", new Shortcut(Key.BackSpace));
+		public static readonly ICommand ExitNodeAlias = new Command("Exit Node", new Shortcut(Modifiers.Alt | Modifiers.Shift, Key.Left));
+		public static readonly ICommand ExitNodeMouse = new Command("Exit Node", new Shortcut(Key.MouseBack));
+		public static readonly ICommand RenameRow = new Command("Rename Row", new Shortcut(Key.F2));
 		public static readonly ICommand DeleteKeyframes = new Command("Delete Selected Keyframes", new Shortcut(Modifiers.Shift, Key.Delete));
 		public static readonly ICommand CreateMarkerPlay = new Command("Create Play Marker", new Shortcut(Modifiers.Alt, Key.Number1));
 		public static readonly ICommand CreateMarkerStop = new Command("Create Stop Marker", new Shortcut(Modifiers.Alt, Key.Number2));
@@ -87,19 +87,19 @@ namespace Tangerine.UI
 
 	public static class SceneViewCommands
 	{
-		public static readonly ICommand PreviewAnimation = new Command(new Shortcut(Key.F5));
-		public static readonly ICommand PreviewAnimationWithTriggeringOfMarkers = new Command(new Shortcut(Modifiers.Control, Key.F5));
+		public static readonly ICommand PreviewAnimation = new Command("Preview Animation", new Shortcut(Key.F5));
+		public static readonly ICommand PreviewAnimationWithTriggeringOfMarkers = new Command("Preview Animation With Triggering Of Markers", new Shortcut(Modifiers.Control, Key.F5));
 		public static readonly ICommand ResolutionChanger = new Command("Preview Next Resolution", new Shortcut(Key.F11));
 		public static readonly ICommand ResolutionReverceChanger = new Command("Preview Previous Resolution", new Shortcut(Modifiers.Shift, Key.F11));
 		public static readonly ICommand ResolutionOrientation = new Command("Preview Next Orientation", new Shortcut(Key.F12));
-		public static readonly ICommand DragRight = new Command(new Shortcut(Key.D));
-		public static readonly ICommand DragLeft = new Command(new Shortcut(Key.A));
-		public static readonly ICommand DragUp = new Command(new Shortcut(Key.W));
-		public static readonly ICommand DragDown = new Command(new Shortcut(Key.S));
-		public static readonly ICommand DragRightFast = new Command(new Shortcut(Modifiers.Shift, Key.D));
-		public static readonly ICommand DragLeftFast = new Command(new Shortcut(Modifiers.Shift, Key.A));
-		public static readonly ICommand DragUpFast = new Command(new Shortcut(Modifiers.Shift, Key.W));
-		public static readonly ICommand DragDownFast = new Command(new Shortcut(Modifiers.Shift, Key.S));
+		public static readonly ICommand DragRight = new Command("Drag Right", new Shortcut(Key.D));
+		public static readonly ICommand DragLeft = new Command("Drag Left", new Shortcut(Key.A));
+		public static readonly ICommand DragUp = new Command("Drag Up", new Shortcut(Key.W));
+		public static readonly ICommand DragDown = new Command("Drag Down", new Shortcut(Key.S));
+		public static readonly ICommand DragRightFast = new Command("Drag Right Fast", new Shortcut(Modifiers.Shift, Key.D));
+		public static readonly ICommand DragLeftFast = new Command("Drag Left Fast", new Shortcut(Modifiers.Shift, Key.A));
+		public static readonly ICommand DragUpFast = new Command("Drag Up Fast", new Shortcut(Modifiers.Shift, Key.W));
+		public static readonly ICommand DragDownFast = new Command("Drag Down Fast", new Shortcut(Modifiers.Shift, Key.S));
 		public static readonly ICommand ShowBone3DBisualHint = new Command("Bone (3D)", new Shortcut(Modifiers.Command, Key.B));
 		public static readonly ICommand ShowAllVisualHints = new Command("Display All", new Shortcut(Modifiers.Command, Key.M));
 		public static readonly ICommand ShowVisualHintsForInvisibleNodes = new Command("Display Invisible", new Shortcut(Modifiers.Command | Modifiers.Alt, Key.M));
