@@ -294,7 +294,9 @@ namespace Tangerine.Dialogs
 				return;
 			}
 			foreach (var id in panel.CommandIds) {
-				usedCommands.AddItem(new CommandRow(CommandRegister.GetCommand(id), id));
+				if (CommandRegister.TryGetCommand(id, out ICommand command)) {
+					usedCommands.AddItem(new CommandRow(command, id));
+				}
 			}
 		}
 
