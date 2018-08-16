@@ -176,11 +176,6 @@ namespace Tangerine.UI.FilesystemView
 			}
 		}
 
-		public IEnumerable<string> EnumerateDirectories(string path)
-		{
-			return Directory.EnumerateDirectories(path).OrderBy(f => f);
-		}
-
 		public void GoTo(string path)
 		{
 			var attr = File.GetAttributes(path);

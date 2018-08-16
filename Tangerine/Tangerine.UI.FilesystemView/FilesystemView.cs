@@ -215,7 +215,6 @@ namespace Tangerine.UI.FilesystemView
 				InvalidateFSWatcher(p);
 				preview.ClearTextureCache();
 				lastKeyboardSelectedFilesystemItem = scrollView.Content.FirstChild as FilesystemItem;
-				toolbar.AddressBar.Path = p.ToString();
 			});
 			RootWidget.Layout = new VBoxLayout();
 			RootWidget.AddNode((cookingRulesSplitter = new ThemedHSplitter {
