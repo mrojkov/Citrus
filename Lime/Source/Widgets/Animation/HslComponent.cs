@@ -13,9 +13,9 @@ namespace Lime
 		[TangerineInspect]
 		public float Hue
 		{
-			get => hsl.X;
+			get => hsl.X * 360.0f;
 			set {
-				hsl.X = value;
+				hsl.X = value / 360.0f;
 				SetHsl(hsl);
 			}
 		}
@@ -23,9 +23,9 @@ namespace Lime
 		[TangerineInspect]
 		public float Saturation
 		{
-			get => hsl.Y;
+			get => hsl.Y * 100.0f;
 			set {
-				hsl.Y = value;
+				hsl.Y = value / 100.0f;
 				SetHsl(hsl);
 			}
 		}
@@ -33,9 +33,9 @@ namespace Lime
 		[TangerineInspect]
 		public float Lightness
 		{
-			get => hsl.Z;
+			get => hsl.Z * 100.0f;
 			set {
-				hsl.Z = value;
+				hsl.Z = value / 100.0f;
 				SetHsl(hsl);
 			}
 		}
@@ -124,7 +124,7 @@ namespace Lime
 					l = (cMax + cMin) / 2.0;
 
 					float cDelta = cMax - cMin;
-					s = mix(cDelta / (cMax + cMin), cDelta / (2.0 - ( cMax + cMin )), step(0.0, l));
+					s = mix(cDelta / (cMax + cMin), cDelta / (2.0 - ( cMax + cMin )), step(0.5, l));
 
 					h += mix(0, (g - b) / cDelta, step(cMax, r));
 					h += mix(0, 2.0 + (b - r) / cDelta, step(cMax, g)) * (1.0 - step(g,r));
