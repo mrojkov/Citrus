@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.IO;
 using System.Collections.Generic;
@@ -399,6 +399,21 @@ namespace Tangerine.Core
 							MinFilter = rule.MinFilter,
 							MagFilter = rule.MagFilter,
 						};
+						// buz: перед тем, как сохранять файл, надо убедиться, что там ещё не создан файл с точно такими же параметрами.
+						// Потому что в зависимости от настроек системы/гита/Аллаха у сохраняемых файлов получаются разные line endings,
+						// и если их постоянно перезаписывать, то они вечно будут показываться как изменённые в git, что жутко бесит,
+						// и мешает работать.
+						if (File.Exists(textureParamsPath)) {
+							try {
+								var existingParams = Serialization.ReadObjectFromFile<TextureParams>(textureParamsPath);
+								if (existingParams.Equals(textureParams)) {
+									continue;
+								}
+							} catch (System.Exception) {
+								// Подавляем исключения сериализации, потому что я не хочу, чтобы
+								// этот костыль ещё и валил Танжерин по хз какому поводу.
+							}
+						}
 						Serialization.WriteObjectToFile(textureParamsPath, textureParams, Serialization.Format.JSON);
 					} else if (File.Exists(textureParamsPath)) {
 						File.Delete(textureParamsPath);
