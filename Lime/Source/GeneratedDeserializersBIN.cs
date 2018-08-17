@@ -2366,14 +2366,18 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.IgnoreHidden = d.Reader.ReadBoolean();
+				result.DefaultCell = (global::Lime.LayoutCell)dg.ReadObject<global::Lime.LayoutCell>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
-				result.RowAlignment = (global::Lime.HAlignment)d.Reader.ReadInt32();
+				result.IgnoreHidden = d.Reader.ReadBoolean();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (4 == fd.OurIndex) {
+				result.RowAlignment = (global::Lime.HAlignment)d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (5 == fd.OurIndex) {
 				result.Spacing = d.Reader.ReadSingle();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
@@ -7713,18 +7717,46 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.ColSpacing = d.Reader.ReadSingle();
+				result.ColDefaults = (global::System.Collections.Generic.List<global::Lime.LayoutCell>)null;
+				var tmp1 = d.Reader.ReadInt32();
+				if (tmp1 >= 0) {
+					result.ColDefaults = new global::System.Collections.Generic.List<global::Lime.LayoutCell>();
+					while (--tmp1 >= 0) {
+						var tmp2 = (global::Lime.LayoutCell)dg.ReadObject<global::Lime.LayoutCell>();
+						result.ColDefaults.Add(tmp2);
+					}
+				}
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
-				result.IgnoreHidden = d.Reader.ReadBoolean();
+				result.ColSpacing = d.Reader.ReadSingle();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (4 == fd.OurIndex) {
-				result.RowCount = d.Reader.ReadInt32();
+				result.DefaultCell = (global::Lime.LayoutCell)dg.ReadObject<global::Lime.LayoutCell>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (5 == fd.OurIndex) {
+				result.IgnoreHidden = d.Reader.ReadBoolean();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (6 == fd.OurIndex) {
+				result.RowCount = d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (7 == fd.OurIndex) {
+				result.RowDefaults = (global::System.Collections.Generic.List<global::Lime.LayoutCell>)null;
+				var tmp3 = d.Reader.ReadInt32();
+				if (tmp3 >= 0) {
+					result.RowDefaults = new global::System.Collections.Generic.List<global::Lime.LayoutCell>();
+					while (--tmp3 >= 0) {
+						var tmp4 = (global::Lime.LayoutCell)dg.ReadObject<global::Lime.LayoutCell>();
+						result.RowDefaults.Add(tmp4);
+					}
+				}
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (8 == fd.OurIndex) {
 				result.RowSpacing = d.Reader.ReadSingle();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
@@ -8304,14 +8336,18 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.IgnoreHidden = d.Reader.ReadBoolean();
+				result.DefaultCell = (global::Lime.LayoutCell)dg.ReadObject<global::Lime.LayoutCell>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
-				result.RowAlignment = (global::Lime.HAlignment)d.Reader.ReadInt32();
+				result.IgnoreHidden = d.Reader.ReadBoolean();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (4 == fd.OurIndex) {
+				result.RowAlignment = (global::Lime.HAlignment)d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (5 == fd.OurIndex) {
 				result.Spacing = d.Reader.ReadSingle();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
