@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 using System.Linq;
 using System.Collections.Generic;
 using Lime;
@@ -275,55 +275,22 @@ namespace Tangerine.UI.SceneView
 					}
 					if (node is Widget widget) {
 						var transform = widget.LocalToWorldTransform;
-						var result = ToAABB(new Quadrangle {
+						var result = new Quadrangle {
 							V1 = Vector2.Zero * transform,
 							V2 = new Vector2(widget.Width, 0) * transform,
 							V3 = widget.Size * transform,
 							V4 = new Vector2(0, widget.Height) * transform
-						});
+						}.ToAABB();
 						foreach (var childNode in widget.Nodes) {
 							var aabb = CalcGlobalAABB(childNode);
 							if (aabb.Width + aabb.Height <= Mathf.ZeroTolerance) {
 								continue;
 							}
-							if (aabb.Right > result.Right) {
-								result.Right = aabb.Right;
-							}
-							if (aabb.Left < result.Left) {
-								result.Left = aabb.Left;
-							}
-							if (aabb.Bottom > result.Bottom) {
-								result.Bottom = aabb.Bottom;
-							}
-							if (aabb.Top < result.Top) {
-								result.Top = aabb.Top;
-							}
+							result = Rectangle.Bounds(result, aabb);
 						}
 						return result;
 					}
 					return new Rectangle(Vector2.Zero, Vector2.Zero);
-				}
-
-				private static Rectangle ToAABB(Quadrangle hull)
-				{
-					var result = new Rectangle(new Vector2(float.PositiveInfinity), new Vector2(float.NegativeInfinity));
-					for (int i = 0; i < 4; ++i) {
-						var x = hull[i].X;
-						var y = hull[i].Y;
-						if (x > result.Right) {
-							result.Right = x;
-						}
-						if (x < result.Left) {
-							result.Left = x;
-						}
-						if (y > result.Bottom) {
-							result.Bottom = y;
-						}
-						if (y < result.Top) {
-							result.Top = y;
-						}
-					}
-					return result;
 				}
 
 				public void Dispose()
