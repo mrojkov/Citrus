@@ -6,11 +6,11 @@ namespace Tangerine.UI
 {
 	public class IntPropertyEditor : CommonPropertyEditor<int>
 	{
-		private EditBox editor;
+		private NumericEditBox editor;
 
 		public IntPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
-			editor = editorParams.EditBoxFactory();
+			editor = editorParams.NumericEditBoxFactory();
 			editor.MinMaxWidth = 80;
 			editor.LayoutCell = new LayoutCell(Alignment.Center);
 			ContainerWidget.AddNode(editor);

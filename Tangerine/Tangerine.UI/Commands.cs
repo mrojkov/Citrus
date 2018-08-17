@@ -39,6 +39,8 @@ namespace Tangerine.UI
 		public static readonly ICommand CreateScaleKeyframe = new Command("Create Scale Keyframe", new Shortcut(Key.T));
 		public static readonly ICommand SelectAllRowKeyframes = new Command("Select All Row Keyframes", new Shortcut(Modifiers.Control | Modifiers.Shift, Key.A));
 		public static readonly ICommand SelectAllKeyframes = new Command("Select All Keyframes", new Shortcut(Modifiers.Control | Modifiers.Alt, Key.A));
+		public static readonly ICommand NumericMove = new Command("Numeric Move");
+		public static readonly ICommand NumericScale = new Command("Numeric Scale");
 	}
 
 	public static class InspectorCommands

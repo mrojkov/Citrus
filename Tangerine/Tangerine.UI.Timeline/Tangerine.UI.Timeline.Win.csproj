@@ -62,11 +62,14 @@
     <Compile Include="Operations\ClearGridSelection.cs" />
     <Compile Include="Operations\ColumnCountUpdater.cs" />
     <Compile Include="Operations\CopyPasteKeyframe.cs" />
+    <Compile Include="Operations\DragKeyframes.cs" />
     <Compile Include="Operations\EnsureCurrentColumnVisibleIfContainerChanged.cs" />
     <Compile Include="Operations\EnsureRowVisibleIfSelected.cs" />
     <Compile Include="Operations\GridWidgetsUpdater.cs" />
     <Compile Include="Operations\ToggleKeyframes.cs" />
     <Compile Include="Operations\MoveNodes.cs" />
+    <Compile Include="Operations\NumericMoveDialog.cs" />
+    <Compile Include="Operations\NumericScaleDialog.cs" />
     <Compile Include="Operations\OverviewWidgetsUpdater.cs" />
     <Compile Include="Components\RollBoneView.cs" />
     <Compile Include="Operations\ReverseKeyframes.cs" />
@@ -103,6 +106,7 @@
     <Compile Include="CommandBindings.cs" />
     <Compile Include="Components\RowView.cs" />
     <Compile Include="TimelineUserPreferences.cs" />
+    <Compile Include="Utils\GridSelection.cs" />
     <Compile Include="Utils\TimelineMetrics.cs" />
     <Compile Include="Operations\DeselectGridSpan.cs" />
     <Compile Include="Components\GridAudioView.cs" />
