@@ -2,8 +2,6 @@ using Lime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Tangerine.UI;
 using static Lime.ThemedButton;
 
@@ -15,7 +13,7 @@ namespace Tangerine.Dialogs
 		private IEnumerable<KeyboardButton> FindButtons(Key key) => buttons.Where(i => i.Key == key);
 
 		private bool IsCommandCurrent(CommandInfo info) => info.Shortcut.Modifiers.HasFlag(Modifiers);
-		
+
 		private bool IsCommandSelected(CommandInfo info) =>
 			info.Shortcut.Modifiers.HasFlag(Modifiers) &&
 			((Main == Key.Unknown) ? false : info.Shortcut.Main == Main);
@@ -24,8 +22,8 @@ namespace Tangerine.Dialogs
 
 		public Modifiers Modifiers { get; private set; }
 		public Key Main { get; private set; }
-		
-		public CommandCategory Category { get; set; }
+
+		public CommandCategoryInfo Category { get; set; }
 		public HotkeyProfile Profile { get; set; }
 
 		public Action SelectedShortcutChanged { get; set; }
@@ -71,21 +69,21 @@ namespace Tangerine.Dialogs
 			if (Category == null) {
 				return;
 			}
-			bool isGenericCategory = (Category.SystemName == typeof(GenericCommands).Name);
+			bool isGenericCategory = (Category.Id == typeof(GenericCommands).Name);
 			SelectedCommands = isGenericCategory ? Profile.Commands.Where(i => IsCommandSelected(i)) :
-				Profile.Commands.Where(i => IsCommandSelected(i) && i.Category == Category);
+				Profile.Commands.Where(i => IsCommandSelected(i) && i.CategoryInfo == Category);
 			foreach (var button in buttons) {
 				button.CommandName = null;
 				button.CommandState = KeyboardCommandState.None;
 				var currentCommands = isGenericCategory ?
 					button.Commands.Where(i => IsCommandCurrent(i)) :
-					button.Commands.Where(i => IsCommandCurrent(i) && i.Category == Category);
+					button.Commands.Where(i => IsCommandCurrent(i) && i.CategoryInfo == Category);
 				bool hasGenericCommand = false;
 				bool hasPanelCommand = false;
 				foreach (var command in currentCommands) {
-					bool isPanel = command.Category.SystemName != typeof(GenericCommands).Name;
+					bool isPanel = command.CategoryInfo.Id != typeof(GenericCommands).Name;
 					hasPanelCommand = hasPanelCommand || isPanel;
-					if (command.Category == Category) {
+					if (command.CategoryInfo == Category) {
 						bool isGeneric = !isPanel;
 						hasGenericCommand = hasGenericCommand || isGeneric;
 					}
@@ -97,7 +95,7 @@ namespace Tangerine.Dialogs
 					button.CommandState = KeyboardCommandState.Generic;
 				}
 
-				button.CommandName = currentCommands.Where(i => i.Category == Category).FirstOrDefault()?.Name;
+				button.CommandName = currentCommands.Where(i => i.CategoryInfo == Category).FirstOrDefault()?.Title;
 			}
 			SelectedShortcutChanged?.Invoke();
 		}
@@ -402,7 +400,7 @@ namespace Tangerine.Dialogs
 		Press,
 		Hold
 	}
-	
+
 	enum KeyboardCommandState
 	{
 		None = 0,
@@ -455,7 +453,7 @@ namespace Tangerine.Dialogs
 		}
 
 		public List<CommandInfo> Commands { get; private set; } = new List<CommandInfo>();
-		
+
 		private KeyboardButtonState state;
 		public KeyboardButtonState State
 		{
@@ -508,7 +506,7 @@ namespace Tangerine.Dialogs
 			triangleVertices[0].Pos = new Vector2(widget.Width, 0);
 			triangleVertices[1].Pos = widget.Size;
 			triangleVertices[2].Pos = new Vector2(0, widget.Height);
-			
+
 			switch (CommandState) {
 				case KeyboardCommandState.None:
 					Renderer.DrawRect(Vector2.Zero, widget.Size, backColor);

@@ -79,8 +79,9 @@ namespace Tangerine.Dialogs
 		private ThemedDropDownList CreateCategoryList()
 		{
 			categoryList = new ThemedDropDownList();
-			foreach (var category in CommandRegister.RegisteredCategories()) {
-				categoryList.Items.Add(new CommonDropDownList.Item(category));
+			categoryList.Items.Add(new CommonDropDownList.Item("All", CommandRegistry.AllCommands));
+			foreach (var categoryInfo in CommandRegistry.RegisteredCategories()) {
+				categoryList.Items.Add(new CommonDropDownList.Item(categoryInfo.Title, categoryInfo));
 			}
 			categoryList.Index = 0;
 			categoryList.Changed += e => RefreshAvailableCommands();
@@ -291,12 +292,14 @@ namespace Tangerine.Dialogs
 		private void RefreshAvailableCommands()
 		{
 			availableCommands.Items.Clear();
-			foreach (var pair in CommandRegister.RegisteredPairs(categoryList.Items[categoryList.Index].Text)) {
-				if (toolbarLayout.ContainsId(pair.Key)) {
+			var categoryInfo = (CommandCategoryInfo)categoryList.Items[categoryList.Index].Value;
+			foreach (var commandInfo in CommandRegistry.RegisteredCommandInfo(categoryInfo)) {
+				if (toolbarLayout.ContainsId(commandInfo.Id)) {
 					continue;
 				}
-				availableCommands.AddItem(new CommandRow(pair.Value, pair.Key));
+				availableCommands.AddItem(new CommandRow(commandInfo));
 			}
+			availableCommands.ScrollPosition = availableCommands.MinScrollPosition;
 		}
 
 		private void RefreshUsedCommands()
@@ -307,8 +310,8 @@ namespace Tangerine.Dialogs
 				return;
 			}
 			foreach (var id in panel.CommandIds) {
-				if (CommandRegister.TryGetCommand("All", id, out ICommand command)) {
-					usedCommands.AddItem(new CommandRow(command, id));
+				if (CommandRegistry.TryGetCommandInfo(id, out CommandInfo commandInfo)) {
+					usedCommands.AddItem(new CommandRow(commandInfo));
 				}
 			}
 		}
@@ -460,22 +463,22 @@ namespace Tangerine.Dialogs
 			public ICommand Command { get; private set; }
 			public string CommandId { get; private set; }
 
-			public CommandRow(ICommand command, string id)
+			public CommandRow(CommandInfo commandInfo)
 			{
-				Command = command;
-				CommandId = id;
+				Command = commandInfo.Command;
+				CommandId = commandInfo.Id;
 				Layout = new HBoxLayout { Spacing = 10 };
 				Padding = new Thickness(5);
-				if (command.Icon != null) {
+				if (Command.Icon != null) {
 					AddNode(new Image {
-						Texture = command.Icon,
+						Texture = Command.Icon,
 						MinMaxSize = new Vector2(16),
 					});
 				} else {
 					AddNode(new HSpacer(16));
 				}
 				AddNode(new ThemedSimpleText {
-					Text = command.Text ?? id,
+					Text = commandInfo.Title,
 					LayoutCell = new LayoutCell(Alignment.Center),
 					Padding = new Thickness { Left = 5 }
 				});

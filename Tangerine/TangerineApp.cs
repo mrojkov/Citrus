@@ -242,8 +242,8 @@ namespace Tangerine
 			});
 			DocumentHistory.Processors.AddRange(UI.Timeline.Timeline.GetOperationProcessors());
 
-			InitializeHotkeys();
 			RegisterCommands();
+			InitializeHotkeys();
 
 			// Andrey Tyshchenko: Create panel after hotkeys initialization
 			// to properly display hotkeys on panel
@@ -340,31 +340,32 @@ namespace Tangerine
 		public void RefreshCreateNodeCommands()
 		{
 			Toolbar.Rebuild();
-			HotkeyRegistry.InitCommands(TangerineMenu.CreateNodeCommands, "Tools", "Tools");
+			HotkeyRegistry.InitDefaultShortcuts();
 			HotkeyRegistry.UpdateProfiles();
 			UI.SceneView.VisualHintsPanel.Refresh();
 		}
 
 		void RegisterCommands()
 		{
-			RegisterCommands(typeof(TimelineCommands));
-			RegisterCommands(typeof(InspectorCommands));
-			RegisterCommands(typeof(GenericCommands));
-			RegisterCommands(typeof(SceneViewCommands));
-			RegisterCommands(typeof(Tools));
-			RegisterCommands(typeof(OrangeCommands));
-			CommandRegister.Register("GenericCommands", "Undo", Command.Undo);
-			CommandRegister.Register("GenericCommands", "Redo", Command.Redo);
+			RegisterCommands(typeof(TimelineCommands), "Timeline Commands");
+			RegisterCommands(typeof(InspectorCommands), "Inspector Commands");
+			RegisterCommands(typeof(GenericCommands), "Generic Commands");
+			RegisterCommands(typeof(SceneViewCommands), "SceneView Commands");
+			RegisterCommands(typeof(Tools), "Tools");
+			RegisterCommands(typeof(OrangeCommands), "Orange Commands");
+			CommandRegistry.Register(Command.Undo, "GenericCommands", "Generic Commands", "Undo");
+			CommandRegistry.Register(Command.Redo, "GenericCommands", "Generic Commands", "Redo");
 		}
 
-		void RegisterCommands(Type type)
+		void RegisterCommands(Type type, string categoryTitle = null)
 		{
+			categoryTitle = categoryTitle ?? type.Name;
 			foreach (var field in type.GetFields(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)) {
 				var fieldType = field.FieldType;
 				if (!(fieldType == typeof(ICommand) || fieldType.IsSubclassOf(typeof(ICommand)))) {
 					continue;
 				}
-				CommandRegister.Register(type.Name, field.Name, (ICommand)field.GetValue(null));
+				CommandRegistry.Register((ICommand)field.GetValue(null), type.Name, categoryTitle, field.Name);
 			}
 		}
 
@@ -590,14 +591,7 @@ namespace Tangerine
 		{
 			string dir = HotkeyRegistry.ProfilesDirectory;
 			Directory.CreateDirectory(dir);
-			HotkeyRegistry.InitCommands(typeof(GenericCommands), "Generic Commands");
-			HotkeyRegistry.InitCommands(typeof(TimelineCommands), "Timeline Commands");
-			HotkeyRegistry.InitCommands(typeof(InspectorCommands), "Inspector Commands");
-			HotkeyRegistry.InitCommands(typeof(SceneViewCommands), "Scene View Commands");
-			HotkeyRegistry.InitCommands(typeof(Tools), "Tools");
-			HotkeyRegistry.InitCommands(typeof(FilesystemCommands), "Filesystem Commands");
-			HotkeyRegistry.InitCommands(typeof(OrangeCommands), "Orange Commands");
-			HotkeyRegistry.InitCommands(Command.Editing, "Editing", "Editing");
+			HotkeyRegistry.InitDefaultShortcuts();
 			var defaultProfile = HotkeyRegistry.CreateProfile(HotkeyRegistry.DefaultProfileName);
 			if (File.Exists(defaultProfile.Filepath)) {
 				defaultProfile.Load();
