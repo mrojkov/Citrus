@@ -79,10 +79,10 @@ namespace Lime
 			return result;
 		}
 
-		public bool TryFind(string propertyName, out IAnimator animator, string animationId = null)
+		public bool TryFind(string propertyPath, out IAnimator animator, string animationId = null)
 		{
 			for (var a = First; a != null; a = a.Next) {
-				if (a.TargetPropertyPath == propertyName && a.AnimationId == animationId) {
+				if (a.TargetPropertyPath == propertyPath && a.AnimationId == animationId) {
 					animator = a;
 					return true;
 				}
@@ -91,29 +91,29 @@ namespace Lime
 			return false;
 		}
 
-		public bool TryFind<T>(string propertyName, out Animator<T> animator, string animationId = null)
+		public bool TryFind<T>(string propertyPath, out Animator<T> animator, string animationId = null)
 		{
 			IAnimator a;
-			TryFind(propertyName, out a, animationId);
+			TryFind(propertyPath, out a, animationId);
 			animator = a as Animator<T>;
 			return animator != null;
 		}
 
-		public IAnimator this[string propertyName, string animationId = null]
+		public IAnimator this[string propertyPath, string animationId = null]
 		{
 			get
 			{
 				IAnimator animator;
-				if (TryFind(propertyName, out animator, animationId)) {
+				if (TryFind(propertyPath, out animator, animationId)) {
 					return animator;
 				}
-				var (p, _) = AnimationUtils.GetPropertyByPath(owner, propertyName);
+				var (p, _) = AnimationUtils.GetPropertyByPath(owner, propertyPath);
 				var pi = p.Info;
 				if (pi == null) {
-					throw new Lime.Exception("Unknown property {0} in {1}", propertyName, owner.GetType().Name);
+					throw new Lime.Exception("Unknown property {0} in {1}", propertyPath, owner.GetType().Name);
 				}
 				animator = AnimatorRegistry.Instance.CreateAnimator(pi.PropertyType);
-				animator.TargetPropertyPath = propertyName;
+				animator.TargetPropertyPath = propertyPath;
 				animator.AnimationId = animationId;
 				Add(animator);
 				Version++;
