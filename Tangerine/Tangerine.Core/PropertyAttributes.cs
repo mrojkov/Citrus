@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System;
 
@@ -21,7 +21,12 @@ namespace Tangerine.Core
 			}
 			T attr;
 			if (!propMap.TryGetValue(property, out attr)) {
-				var prop = type.GetProperty(property);
+				// use last part of property path in case it's Animator.PropertyPath
+				int index = property.LastIndexOf('.');
+				var actualProperty = index == -1
+					? property
+					: property.Substring(index + 1);
+				var prop = type.GetProperty(actualProperty);
 				propMap[property] = attr = prop.GetCustomAttributes(false).FirstOrDefault(i => i is T) as T;
 			}
 			return attr;

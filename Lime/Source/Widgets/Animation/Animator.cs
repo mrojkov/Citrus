@@ -36,8 +36,6 @@ namespace Lime
 
 		object UserData { get; set; }
 
-		string TargetProperty { get; }
-
 		Type GetValueType();
 
 		bool TryGetNextKeyFrame(int nextFrame, out int keyFrame);
@@ -295,17 +293,6 @@ namespace Lime
 		}
 
 		public int Duration => (ReadonlyKeys.Count == 0) ? 0 : ReadonlyKeys[ReadonlyKeys.Count - 1].Frame;
-
-		public string TargetProperty
-		{
-			get
-			{
-				int index = TargetPropertyPath.LastIndexOf('.');
-				return index == -1
-					? TargetPropertyPath
-					: TargetPropertyPath.Substring(index + 1);
-			}
-		}
 	}
 
 	public class Vector2Animator : Animator<Vector2>
