@@ -7,7 +7,7 @@ namespace Tangerine.UI.SceneView
 	{
 		private readonly SceneView sv;
 		private readonly static VisualHint MeshHint =
-			VisualHintsRegister.Instance.Register("/All/Distortion Mesh Grid", hideRule: VisualHintsRegister.HideRules.VisibleIfProjectOpened);
+			VisualHintsRegistry.Instance.Register("/All/Distortion Mesh Grid", hideRule: VisualHintsRegistry.HideRules.VisibleIfProjectOpened);
 
 		public DistortionMeshPresenter(SceneView sceneView)
 		{

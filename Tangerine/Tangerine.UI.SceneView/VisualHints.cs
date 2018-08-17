@@ -44,9 +44,9 @@ namespace Tangerine.UI.SceneView
 		}
 	}
 
-	public class VisualHintsRegister
+	public class VisualHintsRegistry
 	{
-		public static VisualHintsRegister Instance => SceneUserPreferences.Instance.VisualHintsRegister;
+		public static VisualHintsRegistry Instance => SceneUserPreferences.Instance.VisualHintsRegister;
 
 		[YuzuRequired]
 		public VisualHint RootHint { get; set; } = new VisualHint("");
@@ -199,8 +199,8 @@ namespace Tangerine.UI.SceneView
 		private void RefreshEditors()
 		{
 			rootWidget.Content.Nodes.Clear();
-			VisualHintsRegister.Instance.RefreshTypeHints();
-			foreach (var hint in VisualHintsRegister.Instance.RootHint.SubHints.Values) {
+			VisualHintsRegistry.Instance.RefreshTypeHints();
+			foreach (var hint in VisualHintsRegistry.Instance.RootHint.SubHints.Values) {
 				if (!hint.Hidden) {
 					rootWidget.Content.AddNode(new VisualHintEditor(hint));
 				}

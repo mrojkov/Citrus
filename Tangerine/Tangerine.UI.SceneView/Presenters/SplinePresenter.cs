@@ -14,7 +14,7 @@ namespace Tangerine.UI.SceneView
 				(
 					!(Document.Current.Container == spline) &&
 					!Document.Current.SelectedNodes().Contains(spline) &&
-					!VisualHintsRegister.Instance.DisplayCondition(spline)
+					!VisualHintsRegistry.Instance.DisplayCondition(spline)
 				)
 			) {
 				return;

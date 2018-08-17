@@ -19,7 +19,7 @@ namespace Tangerine.UI.SceneView
 			var selection = Document.Current.SelectedNodes().Editable().OfType<Spline3D>().ToList();
 			foreach (var spline in viewport.Descendants.OfType<Spline3D>()) {
 				if (
-					!VisualHintsRegister.Instance.DisplayCondition(spline) &&
+					!VisualHintsRegistry.Instance.DisplayCondition(spline) &&
 					!selection.Contains(spline)
 				) {
 					continue;

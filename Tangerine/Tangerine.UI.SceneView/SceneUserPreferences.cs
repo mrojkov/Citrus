@@ -39,7 +39,7 @@ namespace Tangerine.UI.SceneView
 		public bool SnapRulerLinesToWidgets { get; set; }
 
 		[YuzuRequired]
-		public VisualHintsRegister VisualHintsRegister { get; set; }
+		public VisualHintsRegistry VisualHintsRegister { get; set; }
 
 		public SceneUserPreferences()
 		{
@@ -58,7 +58,7 @@ namespace Tangerine.UI.SceneView
 			SnapRulerLinesToWidgets = false;
 			SnapWidgetBorderToRuler = false;
 			SnapWidgetPivotToRuler = false;
-			VisualHintsRegister = new VisualHintsRegister();
+			VisualHintsRegister = new VisualHintsRegistry();
 		}
 
 		public static SceneUserPreferences Instance => Core.UserPreferences.Instance.Get<SceneUserPreferences>();
