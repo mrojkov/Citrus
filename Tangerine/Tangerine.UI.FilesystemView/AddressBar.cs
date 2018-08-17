@@ -180,7 +180,6 @@ namespace Tangerine.UI.FilesystemView
 			Layout = new HBoxLayout();
 			LayoutCell = new LayoutCell(Alignment.LeftCenter);
 			Padding = new Thickness(1);
-			CreateButtons();
 
 			this.AddChangeWatcher(() => model.CurrentPath, (p) => {
 				UpdatePathBar();
@@ -200,10 +199,12 @@ namespace Tangerine.UI.FilesystemView
 
 		private void RemoveButtons()
 		{
-			for (var i = topFoldersPaths.Count - 1; i >= 0; i--) {
-				Nodes.Remove(buttons[i]);
+			if (buttons != null) {
+				for (var i = buttons.Length - 1; i >= 0; i--) {
+					Nodes.Remove(buttons[i]);
+				}
+				Nodes.Remove(rootArrowButton);
 			}
-			Nodes.Remove(rootArrowButton);
 		}
 
 		private void UpdatePathBar()
@@ -373,6 +374,7 @@ namespace Tangerine.UI.FilesystemView
 		private DirectoryPicker picker;
 		private Func<string, bool> openPath;
 		private new PathButtonPresenter Presenter;
+		private Image icon;
 		public PathArrowButtonState ArrowState;
 		public PathBarButtonState State;
 
@@ -402,9 +404,16 @@ namespace Tangerine.UI.FilesystemView
 				};
 			}
 			Gestures.Add(new ClickGesture(0, FlipState));
-			Text = ">";
+			Layout = new HBoxLayout();
+			MinMaxSize = new Vector2(11, 20);
+			Nodes.Add(icon = new Image {
+				LayoutCell = new LayoutCell {
+					Alignment = new Alignment { X = HAlignment.Center, Y = VAlignment.Center }
+				},
+				MinMaxSize = new Vector2(11, 6),
+				Texture = IconPool.GetTexture("Filesystem.PathSeparatorCollapsed")
+			});
 			ArrowState = PathArrowButtonState.Collapsed;
-			MinMaxWidth = Renderer.MeasureTextLine(Text, Theme.Metrics.TextHeight, 5).X;
 		}
 
 		public void SetState(PathBarButtonState state)
@@ -415,8 +424,8 @@ namespace Tangerine.UI.FilesystemView
 		private void FlipState()
 		{
 			if (ArrowState == PathArrowButtonState.Collapsed) {
-				Text = "v";
 				ArrowState = PathArrowButtonState.Expanded;
+				icon.Texture = IconPool.GetTexture("Filesystem.PathSeparatorExpanded");
 				var indent = 14;
 				var pickerPosition = Window.Current.LocalToDesktop(GlobalPosition + new Vector2(-indent, Height));
 				picker = new DirectoryPicker(openPath, pickerPosition, path);
@@ -426,8 +435,8 @@ namespace Tangerine.UI.FilesystemView
 					FlipState();
 				};
 			} else {
-				Text = ">";
 				ArrowState = PathArrowButtonState.Collapsed;
+				icon.Texture = IconPool.GetTexture("Filesystem.PathSeparatorCollapsed");
 				picker.Window.Close();
 			}
 		}
