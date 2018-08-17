@@ -164,7 +164,6 @@ namespace Tangerine.UI.SceneView
 				readonly Widget originalWidget;
 				readonly Widget exposedWidget;
 				readonly Transform2 originalTransform;
-				readonly Transform2 exposedTransform;
 				readonly WidgetBoundsPresenter borderPresenter;
 				readonly Frame frame;
 				readonly SimpleText label;
@@ -179,12 +178,11 @@ namespace Tangerine.UI.SceneView
 					exposedWidget = (Widget)widget.Clone();
 					exposedWidget.Animations.Clear();
 					originalTransform = widget.CalcTransitionToSpaceOf(frame).ToTransform2();
-					exposedTransform = CalcExposedTransform(widget, frame);
 					originalWidget.SetTangerineFlag(TangerineFlags.HiddenOnExposition, true);
 					frame.HitTestTarget = true;
 					var clickArea = new Widget { Size = frame.Size, Anchors = Anchors.LeftRightTopBottom, HitTestTarget = true };
 					frame.AddNode(clickArea);
-					label = new ThemedSimpleText { 
+					label = new ThemedSimpleText {
 						Visible = showLabel,
 						Position = new Vector2(3, 2),
 						Color = ColorTheme.Current.SceneView.Label,
@@ -247,19 +245,85 @@ namespace Tangerine.UI.SceneView
 
 				Transform2 CalcExposedTransform(Widget widget, Frame frame)
 				{
-					var transform = new Transform2 { Scale = Vector2.One };
+					var rect = CalcGlobalAABB(widget);
+					var t = widget.LocalToWorldTransform.CalcInversed();
+					rect.A *= t;
+					rect.B *= t;
 					var size = new Vector2(widget.Width.Abs(), widget.Height.Abs());
+					var transform = new Transform2 { Scale = Vector2.One * Mathf.Min(size.X / rect.Width.Abs(), size.Y / rect.Height.Abs()) };
 					if (size.X < float.Epsilon || size.Y < float.Epsilon) {
 						return transform;
 					}
 					if (size.X > frame.Width || size.Y > frame.Height) {
 						float scale = (size.X > size.Y) ?
-							frame.Width / widget.Width :
-							frame.Height / widget.Height;
+							frame.Width / size.X :
+							frame.Height / size.Y;
 						transform.Scale *= scale;
 					}
-					transform.Translation = (frame.Size - widget.Size * transform.Scale) / 2;
+					transform.Translation.X = (frame.Size.X - (rect.Width - 2 * rect.AX.Abs()) * transform.Scale.X) / 2;
+					transform.Translation.Y = (frame.Size.Y - (rect.Height - 2 * rect.AY.Abs()) * transform.Scale.Y) / 2;
 					return transform;
+				}
+
+				private static Rectangle CalcGlobalAABB(Node node)
+				{
+					if (node is PointObject pointObject) {
+						var parent = pointObject.Parent.AsWidget;
+						var pos = pointObject.CalcPositionInSpaceOf(parent) * parent.LocalToWorldTransform;
+						var offset = new Vector2(PointObjectsPresenter.CornerOffset);
+						return new Rectangle(pos - offset, pos + offset);
+					}
+					if (node is Widget widget) {
+						var transform = widget.LocalToWorldTransform;
+						var result = ToAABB(new Quadrangle {
+							V1 = Vector2.Zero * transform,
+							V2 = new Vector2(widget.Width, 0) * transform,
+							V3 = widget.Size * transform,
+							V4 = new Vector2(0, widget.Height) * transform
+						});
+						foreach (var childNode in widget.Nodes) {
+							var aabb = CalcGlobalAABB(childNode);
+							if (aabb.Width + aabb.Height <= Mathf.ZeroTolerance) {
+								continue;
+							}
+							if (aabb.Right > result.Right) {
+								result.Right = aabb.Right;
+							}
+							if (aabb.Left < result.Left) {
+								result.Left = aabb.Left;
+							}
+							if (aabb.Bottom > result.Bottom) {
+								result.Bottom = aabb.Bottom;
+							}
+							if (aabb.Top < result.Top) {
+								result.Top = aabb.Top;
+							}
+						}
+						return result;
+					}
+					return new Rectangle(Vector2.Zero, Vector2.Zero);
+				}
+
+				private static Rectangle ToAABB(Quadrangle hull)
+				{
+					var result = new Rectangle(new Vector2(float.PositiveInfinity), new Vector2(float.NegativeInfinity));
+					for (int i = 0; i < 4; ++i) {
+						var x = hull[i].X;
+						var y = hull[i].Y;
+						if (x > result.Right) {
+							result.Right = x;
+						}
+						if (x < result.Left) {
+							result.Left = x;
+						}
+						if (y > result.Bottom) {
+							result.Bottom = y;
+						}
+						if (y < result.Top) {
+							result.Top = y;
+						}
+					}
+					return result;
 				}
 
 				public void Dispose()
@@ -271,7 +335,7 @@ namespace Tangerine.UI.SceneView
 
 				public void Morph(float morphKoeff)
 				{
-					var t = Transform2.Lerp(morphKoeff, originalTransform, exposedTransform);
+					var t = Transform2.Lerp(morphKoeff, originalTransform, CalcExposedTransform(exposedWidget, frame));
 					exposedWidget.Position = t.Translation;
 					exposedWidget.Scale = t.Scale;
 					exposedWidget.Rotation = t.Rotation;
