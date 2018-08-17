@@ -11,15 +11,16 @@ namespace Tangerine.UI.SceneView
 		private List<Vector3> points = new List<Vector3>();
 		private List<Vector3> approximation = new List<Vector3>();
 
+		public readonly VisualHint AnimationPathHint =
+			VisualHintsRegistry.Instance.Register("/All/Animation Path", hideRule: VisualHintsRegistry.HideRules.VisibleIfProjectOpened);
+
 		protected override void InternalRender(Viewport3D viewport)
 		{
 			if (
 				Document.Current.PreviewAnimation ||
-				Document.Current.ExpositionMode
+				Document.Current.ExpositionMode ||
+				!AnimationPathHint.Enabled
 			) {
-				return;
-			}
-			if (!NodeDecoration.AnimationPath.RequiredToDisplay()) {
 				return;
 			}
 			foreach (var node in Document.Current.SelectedNodes().Editable().OfType<Node3D>()) {

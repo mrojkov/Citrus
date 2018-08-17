@@ -11,6 +11,7 @@ namespace Lime
 	/// </summary>
 	[TangerineRegisterNode(Order = 29)]
 	[AllowedChildrenTypes(typeof(PolylinePoint))]
+	[TangerineVisualHintGroup("/All/Nodes/Splines")]
 	public class Polyline : Widget
 	{
 		/// <summary>

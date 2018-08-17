@@ -39,7 +39,7 @@ namespace Tangerine.UI.SceneView
 		public bool SnapRulerLinesToWidgets { get; set; }
 
 		[YuzuRequired]
-		public HashSet<NodeDecoration> DisplayedNodeDecorations { get; set; }
+		public VisualHintsRegistry VisualHintsRegister { get; set; }
 
 		public SceneUserPreferences()
 		{
@@ -58,10 +58,7 @@ namespace Tangerine.UI.SceneView
 			SnapRulerLinesToWidgets = false;
 			SnapWidgetBorderToRuler = false;
 			SnapWidgetPivotToRuler = false;
-			DisplayedNodeDecorations = new HashSet<NodeDecoration>();
-			foreach (var decoration in Enum.GetValues(typeof(NodeDecoration))) {
-				DisplayedNodeDecorations.Add((NodeDecoration)decoration);
-			}
+			VisualHintsRegister = new VisualHintsRegistry();
 		}
 
 		public static SceneUserPreferences Instance => Core.UserPreferences.Instance.Get<SceneUserPreferences>();

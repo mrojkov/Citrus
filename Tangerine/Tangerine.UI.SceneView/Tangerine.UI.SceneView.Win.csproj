@@ -63,7 +63,6 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="NodeDecorations.cs" />
     <Compile Include="Presenters\Animation2DPathPresenter.cs" />
     <Compile Include="Presenters\Animation3DPathPresenter.cs" />
     <Compile Include="Presenters\InspectRootNodePresenter.cs" />
@@ -73,6 +72,7 @@
     <Compile Include="Processors\DragNineGridLineProcessor.cs" />
     <Compile Include="Processors\ResolutionPreviewProcessor.cs" />
     <Compile Include="ResolutionHandlers.cs" />
+    <Compile Include="VisualHints.cs" />
     <Compile Include="Widgets\ZoomWidget.cs" />
     <Compile Include="WidgetTransforms\WidgetTransformsHelper.cs" />
     <Compile Include="WidgetTransforms\Mathd.cs" />

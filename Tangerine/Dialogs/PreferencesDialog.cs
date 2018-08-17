@@ -76,7 +76,7 @@ namespace Tangerine
 				saved = true;
 				SaveAfterEdit();
 				window.Close();
-				NodeDecorationsPanel.Refresh();
+				VisualHintsPanel.Refresh();
 				Core.UserPreferences.Instance.Save();
 				AlertDialog.Show("Color theme changes will be applied after Tangerine restart.");
 			};

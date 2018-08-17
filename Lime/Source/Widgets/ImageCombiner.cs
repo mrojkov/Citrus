@@ -33,6 +33,7 @@ namespace Lime
 	}
 
 	[TangerineRegisterNode(Order = 19)]
+	[TangerineVisualHintGroup("/All/Nodes/Images")]
 	public class ImageCombiner : Node
 	{
 		[YuzuMember]

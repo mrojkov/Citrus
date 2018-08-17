@@ -5,6 +5,7 @@ namespace Lime
 {
 	[TangerineRegisterNode(Order = 15)]
 	[AllowedChildrenTypes(typeof(SplinePoint))]
+	[TangerineVisualHintGroup("/All/Nodes/Splines")]
 	public class Spline : Widget
 	{
 		[YuzuMember]

@@ -122,6 +122,19 @@ namespace Lime
 		}
 	}
 
+	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+	public sealed class TangerineVisualHintGroupAttribute : Attribute
+	{
+		public readonly string Group;
+		public readonly string AliasTypeName;
+
+		public TangerineVisualHintGroupAttribute(string group, string aliasTypeName = null)
+		{
+			Group = group ?? "/";
+			AliasTypeName = aliasTypeName;
+		}
+	}
+
 	[Flags]
 	public enum TangerineFlags
 	{

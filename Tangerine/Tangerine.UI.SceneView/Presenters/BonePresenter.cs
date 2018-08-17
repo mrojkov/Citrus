@@ -25,7 +25,7 @@ namespace Tangerine.UI.SceneView
 				return;
 			}
 			canvas.PrepareRendererState();
-			if (NodeDecoration.Bone.RequiredToDisplay()) {
+			if (VisualHintsRegistry.Instance.FindHint(typeof(Bone)).Enabled) {
 				var notSelected = Document.Current.Container.Nodes.Visible().OfType<Bone>().Except(Document.Current.SelectedNodes().OfType<Bone>());
 				foreach (var bone in notSelected) {
 					DrawBones(bone, canvas, selected: false);

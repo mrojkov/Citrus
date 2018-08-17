@@ -9,11 +9,13 @@ namespace Tangerine.UI.SceneView
 	public class DragAnimationPathPointProcessor : ITaskProvider
 	{
 		static SceneView sv => SceneView.Instance;
+		private readonly VisualHint animationPathHint =
+			VisualHintsRegistry.Instance.Register("/All/Animation Path", hideRule: VisualHintsRegistry.HideRules.VisibleIfProjectOpened);
 
 		public IEnumerator<object> Task()
 		{
 			while (true) {
-				if (!NodeDecoration.AnimationPath.RequiredToDisplay()) {
+				if (!animationPathHint.Enabled) {
 					yield return null;
 					continue;
 				}

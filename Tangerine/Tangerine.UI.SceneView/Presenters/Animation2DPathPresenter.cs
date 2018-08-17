@@ -13,6 +13,9 @@ namespace Tangerine.UI.SceneView
 		private List<Vector2> points = new List<Vector2>();
 		private List<Vector2> approximation = new List<Vector2>();
 
+		private readonly VisualHint AnimationPathHint =
+			VisualHintsRegistry.Instance.Register("/All/Animation Path", hideRule: VisualHintsRegistry.HideRules.VisibleIfProjectOpened);
+
 		private readonly SceneView sv;
 
 		public Animation2DPathPresenter(SceneView sceneView)
@@ -25,11 +28,9 @@ namespace Tangerine.UI.SceneView
 		{
 			if (
 				Document.Current.PreviewAnimation ||
-				Document.Current.ExpositionMode
+				Document.Current.ExpositionMode ||
+				!AnimationPathHint.Enabled
 			) {
-				return;
-			}
-			if (!NodeDecoration.AnimationPath.RequiredToDisplay()) {
 				return;
 			}
 			canvas.PrepareRendererState();

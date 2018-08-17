@@ -10,6 +10,7 @@ namespace Lime
 	}
 
 	[TangerineRegisterNode(Order = 4)]
+	[TangerineVisualHintGroup("/All/Nodes/Media")]
 	public sealed class Movie : Widget, IImageCombinerArg
 	{
 		bool skipRender;

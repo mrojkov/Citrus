@@ -36,6 +36,7 @@ namespace Lime
 	/// Base class for any rendered object.
 	/// </summary>
 	[DebuggerTypeProxy(typeof(WidgetDebugView))]
+	[TangerineVisualHintGroup("/All/Nodes/Containers")]
 	public class Widget : Node
 	{
 		private Vector2 position;
