@@ -148,7 +148,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="icon.ico" />
-    <Content Include="Resources\Icons\Dark\Tools\ToolbarSeparator.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\ToolbarSeparator.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Filesystem\PathSeparatorCollapsed.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Filesystem\PathSeparatorExpanded.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Filesystem\PathSeparatorCollapsed.png" />
