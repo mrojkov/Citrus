@@ -314,8 +314,9 @@ namespace Tangerine.UI
 		{
 			var w = new GradientControlPointWidget(controlPoint, isBorderPoint) {
 				Position = new Vector2(controlPoint.Position * container.Size.X, container.Size.Y),
-				MinMaxSize = 10f * Vector2.One,
-				Size = 10f * Vector2.One,
+				MinMaxHeight = 15f,
+				MinMaxWidth = 10f,
+				Size = new Vector2(10, 15f)
 			};
 			if (!isBorderPoint) {
 				w.Gestures.Add(new ClickGesture(1, () => {
@@ -369,6 +370,7 @@ namespace Tangerine.UI
 		public event Action OnClick;
 		public event Action<float> OnDrag;
 		public bool IsBorderPoint { get; }
+		public const float tipBodyRatio = 1f / 3f;
 
 		public override void Update(float delta)
 		{
@@ -379,10 +381,9 @@ namespace Tangerine.UI
 		public GradientControlPointWidget(GradientControlPoint controlPoint, bool isBorderPoint = false)
 		{
 			ControlPoint = controlPoint;
-			Pivot = new Vector2(0.5f, -0.5f);
+			Pivot = new Vector2(0.5f, 0);
 			IsBorderPoint = isBorderPoint;
 			CompoundPresenter.Add(new DelegatePresenter<Widget>(Render));
-			MinMaxSize = 20f * Vector2.One;
 			HitTestTarget = true;
 			Gestures.Add(dragGesture = new DragGesture());
 			chessTexture = PrepareChessTexture(Color4.White, Color4.Black);
@@ -403,16 +404,17 @@ namespace Tangerine.UI
 		private void Render(Widget w)
 		{
 			w.PrepareRendererState();
-			Renderer.DrawRect(Vector2.Zero, w.Size, new Color4(ControlPoint.Color.R, ControlPoint.Color.G, ControlPoint.Color.B));
+			Renderer.DrawRect(new Vector2(0, w.Size.Y * tipBodyRatio), w.Size, new Color4(ControlPoint.Color.R, ControlPoint.Color.G, ControlPoint.Color.B));
 			var spriteColor = Color4.White.Transparentify(ControlPoint.Color.A / 255f);
 			Renderer.DrawSprite(chessTexture, spriteColor,
-				new Vector2(w.Size.X / 2, 0), new Vector2(w.Size.X / 2, w.Size.Y), Vector2.Zero, Vector2.One);
-			Renderer.DrawRectOutline(Vector2.Zero, w.Size, Color4.Black);
-			vertices[0].Pos = Vector2.Zero;
+				new Vector2(w.Size.X / 2, w.Size.Y * tipBodyRatio),
+				new Vector2(w.Size.X / 2, w.Size.Y * (1 - tipBodyRatio)), Vector2.Zero, Vector2.One);
+			Renderer.DrawRectOutline(new Vector2(0, w.Size.Y * tipBodyRatio), w.Size, Color4.Black);
+			vertices[0].Pos = new Vector2(w.Size.X / 2, 0);
 			vertices[0].Color = Color;
-			vertices[1].Pos = new Vector2(w.Size.X / 2, -w.Size.Y * 0.5f);
+			vertices[1].Pos = new Vector2(w.Size.X, w.Size.Y * tipBodyRatio);
 			vertices[1].Color = Color;
-			vertices[2].Pos = new Vector2(w.Size.X, 0);
+			vertices[2].Pos = new Vector2(0, w.Size.Y * tipBodyRatio);
 			vertices[2].Color = Color;
 			Renderer.DrawTriangleFan(vertices, 3);
 			Renderer.DrawLine(vertices[0].Pos, vertices[1].Pos, Color4.Black);
