@@ -40,7 +40,7 @@ namespace Tangerine
 					var panel = row.Panels[j];
 					var panelWidget = new Widget {
 						Layout = new HBoxLayout { Spacing = 1, CellDefaults = new LayoutCell(Alignment.LeftCenter) },
-						LayoutCell = new LayoutCell { StretchY = 0 },
+						LayoutCell = new LayoutCell(Alignment.LeftCenter) { StretchY = 0 },
 					};
 					if (panel.Draggable) {
 						int rowIndex = i;
