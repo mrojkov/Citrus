@@ -195,7 +195,7 @@ namespace Tangerine.UI.SceneView
 					borderPresenter = new WidgetBoundsPresenter(ColorTheme.Current.SceneView.ExposedItemInactiveBorder, 1);
 					frame.CompoundPresenter.Push(borderPresenter);
 					int lastFrame = 0;
-					foreach (var node in exposedWidget.Descendants) {
+					foreach (var node in exposedWidget.Nodes) {
 						foreach (var animator in node.Animators) {
 							foreach (var key in animator.ReadonlyKeys) {
 								lastFrame = Math.Max(lastFrame, key.Frame);
