@@ -30,7 +30,7 @@ namespace Tangerine.UI
 			Command = command;
 			CategoryInfo = categoryInfo;
 			Id = id;
-			Title = command.Text ?? id;
+			Title = String.IsNullOrEmpty(command.Text) ? $"{{{id}}}" : command.Text;
 		}
 		public override int GetHashCode()
 		{

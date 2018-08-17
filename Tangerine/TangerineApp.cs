@@ -353,6 +353,7 @@ namespace Tangerine
 			RegisterCommands(typeof(SceneViewCommands), "SceneView Commands");
 			RegisterCommands(typeof(Tools), "Tools");
 			RegisterCommands(typeof(OrangeCommands), "Orange Commands");
+			RegisterCommands(typeof(FilesystemCommands), "Filesystem Commands");
 			CommandRegistry.Register(Command.Undo, "GenericCommands", "Generic Commands", "Undo");
 			CommandRegistry.Register(Command.Redo, "GenericCommands", "Generic Commands", "Redo");
 		}

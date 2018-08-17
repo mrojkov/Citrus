@@ -27,8 +27,8 @@ namespace Tangerine.UI.Timeline
 			ConnectCommand(TimelineCommands.ExitNodeMouse, LeaveNode.Perform);
 			ConnectCommand(TimelineCommands.ScrollUp, () => SelectRow(-1, false));
 			ConnectCommand(TimelineCommands.ScrollDown, () => SelectRow(1, false));
-			ConnectCommand(TimelineCommands.SelectUp, () => SelectRow(-1, true));
-			ConnectCommand(TimelineCommands.SelectDown, () => SelectRow(1, true));
+			ConnectCommand(TimelineCommands.SelectNodeUp, () => SelectRow(-1, true));
+			ConnectCommand(TimelineCommands.SelectNodeDown, () => SelectRow(1, true));
 			ConnectCommand(TimelineCommands.ScrollLeft, () => AdvanceCurrentColumn(-1));
 			ConnectCommand(TimelineCommands.ScrollRight, () => AdvanceCurrentColumn(1));
 			ConnectCommand(TimelineCommands.FastScrollLeft, () => AdvanceCurrentColumn(-10));
