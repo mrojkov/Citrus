@@ -1,9 +1,4 @@
-﻿using Lime;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Lime;
 using Tangerine.Core;
 
 namespace Tangerine.UI.SceneView
@@ -11,6 +6,8 @@ namespace Tangerine.UI.SceneView
 	public class DistortionMeshPresenter : CustomPresenter<DistortionMesh>
 	{
 		private readonly SceneView sv;
+		private readonly static VisualHint MeshHint =
+			VisualHintsRegister.Instance.Register("/All/Distortion Mesh Grid", hideRule: VisualHintsRegister.HideRules.VisibleIfProjectOpened);
 
 		public DistortionMeshPresenter(SceneView sceneView)
 		{
@@ -20,7 +17,7 @@ namespace Tangerine.UI.SceneView
 
 		void Render(Widget canvas)
 		{
-			if (!Document.Current.PreviewAnimation && Document.Current.Container is DistortionMesh) {
+			if (MeshHint.Enabled && !Document.Current.PreviewAnimation && Document.Current.Container is DistortionMesh) {
 				var mesh = Document.Current.Container as DistortionMesh;
 				canvas.PrepareRendererState();
 				for (int i = 0; i <= mesh.NumRows; i++) {
