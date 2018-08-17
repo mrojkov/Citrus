@@ -84,7 +84,7 @@ namespace Tangerine.Core.Operations
 
 	public static class Paste
 	{
-		public static void Perform()
+		public static void Perform(bool pasteAtMouse = false)
 		{
 			var row = Document.Current.SelectedRows().LastOrDefault();
 			var loc = row == null ?
@@ -92,7 +92,7 @@ namespace Tangerine.Core.Operations
 				new RowLocation(row.Parent, row.Parent.Rows.IndexOf(row));
 			var data = Clipboard.Text;
 			if (!string.IsNullOrEmpty(data)) {
-				Perform(data, loc);
+				Perform(data, loc, pasteAtMouse);
 			}
 
 			foreach (var node in Document.Current.SelectedNodes()) {
@@ -107,7 +107,7 @@ namespace Tangerine.Core.Operations
 				   location.ParentRow.Components.Contains<BoneRow>();
 		}
 
-		public static bool Perform(string data, RowLocation location)
+		public static bool Perform(string data, RowLocation location, bool pasteAtMouse = false)
 		{
 			if (!CanPaste(data, location)) {
 				return false;
@@ -134,8 +134,15 @@ namespace Tangerine.Core.Operations
 			if (items.Count == 0) {
 				return true;
 			}
+			var mousePosition = Document.Current.Container.AsWidget?.LocalMousePosition();
+			var shift = mousePosition - items.OfType<Widget>().FirstOrDefault()?.Position;
 			foreach (var n in items.OfType<Node>()) {
 				Document.Current.Decorate(n);
+			}
+			if (shift.HasValue && pasteAtMouse) {
+				foreach (var w in items.OfType<Widget>()) {
+					w.Position += shift.Value;
+				}
 			}
 			frame.RootFolder().Items.Clear();
 			frame.RootFolder().SyncDescriptorsAndNodes(frame);
