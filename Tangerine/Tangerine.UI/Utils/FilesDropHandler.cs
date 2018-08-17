@@ -27,6 +27,7 @@ namespace Tangerine.UI
 			private readonly ICommand asImage = new Command("Create Image");
 			private readonly ICommand asDistortionMesh = new Command("Create Distortion Mesh");
 			private readonly ICommand asNineGrid = new Command("Create Nine Grid");
+			private readonly ICommand asTiledImage = new Command("Create Tiled Image");
 			private readonly ICommand asParticleModifier = new Command("Create Particle Modifier");
 
 			public readonly Dictionary<ICommand, Type> Commands;
@@ -38,6 +39,7 @@ namespace Tangerine.UI
 					{ asDistortionMesh, typeof(DistortionMesh) },
 					{ asNineGrid, typeof(NineGrid) },
 					{ asParticleModifier, typeof(ParticleModifier) },
+					{ asTiledImage, typeof(TiledImage) }
 				};
 			}
 		}

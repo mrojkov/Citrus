@@ -9,7 +9,7 @@ namespace Lime
 {
 	[TangerineRegisterNode(Order = 31)]
 	[TangerineVisualHintGroup("/All/Nodes/Images")]
-	class TiledImage : Widget
+	public class TiledImage : Widget
 	{
 		private bool skipRender;
 		private ITexture texture;
