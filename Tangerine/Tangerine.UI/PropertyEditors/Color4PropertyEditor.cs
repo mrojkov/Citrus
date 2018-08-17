@@ -9,6 +9,7 @@ namespace Tangerine.UI
 	{
 		private EditBox editor;
 		private bool colorFromPanel;
+		private Color4 lastColor;
 
 		public Color4PropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
@@ -37,9 +38,14 @@ namespace Tangerine.UI
 				colorFromPanel = true;
 				SetProperty(panel.Color);
 			};
-			panel.DragStarted += () => EditorParams.History?.BeginTransaction();
+			panel.DragStarted += () => {
+				EditorParams.History?.BeginTransaction();
+				lastColor = panel.Color;
+			};
 			panel.DragEnded += () => {
-				EditorParams.History?.CommitTransaction();
+				if (panel.Color != lastColor) {
+					EditorParams.History?.CommitTransaction();
+				}
 				EditorParams.History?.EndTransaction();
 			};
 			colorBox.Clicked += () => Expanded = !Expanded;
