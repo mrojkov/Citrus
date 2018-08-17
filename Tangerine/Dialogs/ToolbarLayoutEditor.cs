@@ -97,15 +97,15 @@ namespace Tangerine.Dialogs
 				RefreshUsedCommands();
 				usedCommands.ScrollPosition = usedCommands.MinScrollPosition;
 				foreach (var item in panelList.Items.Cast<ListBox.ListBoxItem>()) {
-					if (item.Widget is PanelRow row) {
+					if (item.Widget is PanelItem row) {
 						row.StopEdit();
 					}
 				}
 			};
 			foreach (var row in toolbarLayout.Rows) {
-				panelList.AddItem(new ToolbarRowRow(row));
+				panelList.AddItem(new RowItem(row));
 				foreach (var panel in row.Panels) {
-					var panelRow = new PanelRow(panel);
+					var panelRow = new PanelItem(panel);
 					var item = panelList.AddItem(panelRow);
 					item.DoubleClicked += () => panelRow.StartEdit();
 				}
@@ -139,7 +139,7 @@ namespace Tangerine.Dialogs
 			if (panelList.SelectedItem == null) {
 				return null;
 			}
-			if (item.Widget is PanelRow row) {
+			if (item.Widget is PanelItem row) {
 				return row.Panel;
 			}
 			return null;
@@ -151,7 +151,7 @@ namespace Tangerine.Dialogs
 			if (panelList.SelectedItem == null) {
 				return null;
 			}
-			if (item.Widget is ToolbarRowRow row) {
+			if (item.Widget is RowItem row) {
 				return row.Row;
 			}
 			return null;
@@ -163,7 +163,7 @@ namespace Tangerine.Dialogs
 			if (item == null) {
 				return;
 			}
-			if (item.Widget is ToolbarRowRow) {
+			if (item.Widget is RowItem) {
 				RemoveRow();
 			} else {
 				RemovePanel();
@@ -181,7 +181,7 @@ namespace Tangerine.Dialogs
 				Title = "Panel",
 				Index = panel?.Index ?? 0
 			};
-			var panelRow = new PanelRow(newPanel);
+			var panelRow = new PanelItem(newPanel);
 			int index = panelList.SelectedIndex;
 			index = index < 0 ? 0 : index;
 			panelList.SelectedItem = panelList.InsertItem(index, panelRow);
@@ -198,7 +198,7 @@ namespace Tangerine.Dialogs
 			toolbarLayout.RemovePanel(panel);
 			panelList.SelectedItem.Unlink();
 			index = index == panelList.Items.Count ? index - 1 : index;
-			while (index >= 0 && ((ListBox.ListBoxItem)panelList.Items[index]).Widget is ToolbarRowRow) {
+			while (index >= 0 && ((ListBox.ListBoxItem)panelList.Items[index]).Widget is RowItem) {
 				index -= 1;
 			}
 			if (index < 0) {
@@ -216,13 +216,13 @@ namespace Tangerine.Dialogs
 			int index = panelList.SelectedIndex;
 			int newIndex = index + dir;
 			var item1 = panelList.SelectedItem;
-			if (newIndex < 0 || newIndex >= panelList.Items.Count || !(item1.Widget is PanelRow)) {
+			if (newIndex < 0 || newIndex >= panelList.Items.Count || !(item1.Widget is PanelItem)) {
 				return;
 			}
-			var panelRow1 = (PanelRow)item1.Widget;
+			var panelRow1 = (PanelItem)item1.Widget;
 			var panel1 = panelRow1.Panel;
 			var item2 = (ListBox.ListBoxItem)panelList.Items[newIndex];
-			if (item2.Widget is ToolbarRowRow) {
+			if (item2.Widget is RowItem) {
 				var row1 = panel1.Parent;
 				var row2 = toolbarLayout.Rows[row1.Index + dir];
 				toolbarLayout.RemovePanel(panel1);
@@ -231,7 +231,7 @@ namespace Tangerine.Dialogs
 				toolbarLayout.InsertPanel(row2, panel1, dir > 0 ? 0 : row2.Panels.Count);
 			} else {
 				panelList.SelectedItem = (ListBox.ListBoxItem)panelList.Items[newIndex];
-				var panelRow2 = (PanelRow)panelList.SelectedItem.Widget;
+				var panelRow2 = (PanelItem)panelList.SelectedItem.Widget;
 				var panel2 = panelRow2.Panel;
 				toolbarLayout.SwapPanels(panel1, panel2);
 				panelRow1.Panel = panel2;
@@ -273,18 +273,18 @@ namespace Tangerine.Dialogs
 			} else {
 				int i = panelList.SelectedIndex;
 				ListBox.ListBoxItem item = null;
-				while (i >= 0 && (item = (ListBox.ListBoxItem)panelList.Items[i]).Widget is ToolbarRowRow) {
+				while (i >= 0 && (item = (ListBox.ListBoxItem)panelList.Items[i]).Widget is RowItem) {
 					i -= 1;
 				}
 				if (i >= 0) {
-					rowIndex = ((PanelRow)item.Widget).Panel.Parent.Index + panelList.SelectedIndex - i + 1;
+					rowIndex = ((PanelItem)item.Widget).Panel.Parent.Index + panelList.SelectedIndex - i + 1;
 				}
 			}
 			var index = panelList.SelectedIndex;
 			if (index < 0) {
 				index = 0;
 			}
-			panelList.InsertItem(index, new ToolbarRowRow(row));
+			panelList.InsertItem(index, new RowItem(row));
 			toolbarLayout.InsertRow(row, rowIndex);
 			TangerineApp.Instance.Toolbar.Rebuild();
 		}
@@ -297,7 +297,7 @@ namespace Tangerine.Dialogs
 				if (toolbarLayout.ContainsId(commandInfo.Id)) {
 					continue;
 				}
-				availableCommands.AddItem(new CommandRow(commandInfo));
+				availableCommands.AddItem(new CommandItem(commandInfo));
 			}
 			availableCommands.ScrollPosition = availableCommands.MinScrollPosition;
 		}
@@ -311,7 +311,7 @@ namespace Tangerine.Dialogs
 			}
 			foreach (var id in panel.CommandIds) {
 				if (CommandRegistry.TryGetCommandInfo(id, out CommandInfo commandInfo)) {
-					usedCommands.AddItem(new CommandRow(commandInfo));
+					usedCommands.AddItem(new CommandItem(commandInfo));
 				}
 			}
 		}
@@ -340,7 +340,7 @@ namespace Tangerine.Dialogs
 
 		private void AddCommand()
 		{
-			var panel = ((PanelRow)panelList.SelectedItem.Widget).Panel;
+			var panel = ((PanelItem)panelList.SelectedItem.Widget).Panel;
 			int leftPanelIndex = availableCommands.SelectedIndex;
 			if (leftPanelIndex < 0) {
 				if (availableCommands.Items.Count == 0) {
@@ -351,7 +351,7 @@ namespace Tangerine.Dialogs
 			int rightPanelIndex = usedCommands.SelectedIndex;
 			rightPanelIndex = rightPanelIndex < 0 ? 0 : rightPanelIndex;
 			var leftItem = (ListBox.ListBoxItem)availableCommands.Items[leftPanelIndex];
-			var leftPanel = (CommandRow)leftItem.Widget;
+			var leftPanel = (CommandItem)leftItem.Widget;
 			leftPanel.Unlink();
 			availableCommands.Items.RemoveAt(leftPanelIndex);
 			usedCommands.InsertItem(rightPanelIndex, leftPanel);
@@ -361,7 +361,7 @@ namespace Tangerine.Dialogs
 
 		private void RemoveCommand()
 		{
-			var panel = ((PanelRow)panelList.SelectedItem.Widget).Panel;
+			var panel = ((PanelItem)panelList.SelectedItem.Widget).Panel;
 			int index = usedCommands.SelectedIndex;
 			if (index < 0) {
 				if (usedCommands.Items.Count == 0) {
@@ -385,7 +385,7 @@ namespace Tangerine.Dialogs
 			if (newIndex < 0 || newIndex >= usedCommands.Items.Count) {
 				return;
 			}
-			var panel = ((PanelRow)panelList.SelectedItem.Widget).Panel;
+			var panel = ((PanelItem)panelList.SelectedItem.Widget).Panel;
 			var tmp = panel.CommandIds[index];
 			panel.CommandIds[index] = panel.CommandIds[newIndex];
 			panel.CommandIds[newIndex] = tmp;
@@ -403,7 +403,7 @@ namespace Tangerine.Dialogs
 			TangerineApp.Instance.Toolbar.Rebuild();
 		}
 
-		private class PanelRow : Widget
+		private class PanelItem : Widget
 		{
 			private ToolbarLayout.ToolbarPanel panel;
 			public ToolbarLayout.ToolbarPanel Panel
@@ -419,7 +419,7 @@ namespace Tangerine.Dialogs
 			private readonly ThemedEditBox editBox = new ThemedEditBox();
 			private readonly Widget dummy = new Widget();
 
-			public PanelRow(ToolbarLayout.ToolbarPanel panel)
+			public PanelItem(ToolbarLayout.ToolbarPanel panel)
 			{
 				title.Text = editBox.Text = panel.Title;
 				editBox.Submitted += s => StopEdit();
@@ -458,12 +458,12 @@ namespace Tangerine.Dialogs
 			}
 		}
 
-		private class CommandRow : Widget
+		private class CommandItem : Widget
 		{
 			public ICommand Command { get; private set; }
 			public string CommandId { get; private set; }
 
-			public CommandRow(CommandInfo commandInfo)
+			public CommandItem(CommandInfo commandInfo)
 			{
 				Command = commandInfo.Command;
 				CommandId = commandInfo.Id;
@@ -486,11 +486,11 @@ namespace Tangerine.Dialogs
 			}
 		}
 
-		private class ToolbarRowRow : Widget
+		private class RowItem : Widget
 		{
 			public ToolbarLayout.ToolbarRow Row { get; private set; }
 
-			public ToolbarRowRow(ToolbarLayout.ToolbarRow row)
+			public RowItem(ToolbarLayout.ToolbarRow row)
 			{
 				Row = row;
 				MinMaxHeight = 10;
