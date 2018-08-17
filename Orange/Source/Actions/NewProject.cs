@@ -47,6 +47,10 @@ namespace Orange
 			NewProjectAction(null);
 		}
 
+		private static readonly List<char> ValidChars =
+			Enumerable.Range(1, 128).Select(i => (char)i).
+			Where(c => char.IsLetterOrDigit(c)).ToList();
+
 		public static void NewProjectAction(Func<string, bool> projectOpened)
 		{
 			Application.InvokeOnMainThread(() => {
@@ -59,6 +63,14 @@ namespace Orange
 					targetDirectory = dlg.FileName;
 					newCitrusDirectory = Path.Combine(dlg.FileName, "Citrus");
 					var projectName = Path.GetFileName(dlg.FileName);
+					if (char.IsDigit(projectName[0])) {
+						throw new System.Exception($"Project name '{projectName}' cannot start with a digit");
+					}
+					foreach (char c in projectName) {
+						if (!ValidChars.Contains(c)) {
+							throw new System.Exception($"Project name '{projectName}' must contain only latin letters and digits");
+						}
+					}
 					var newProjectApplicationName = String.Join(" ", Regex.Split(projectName, @"(?<!^)(?=[A-Z])"));
 					Console.WriteLine($"New project name is \"{projectName}\"");
 					HashSet<string> textfileExtensions = new HashSet<string> { ".cs", ".xml", ".csproj", ".sln", ".citproj", ".projitems", ".shproj", ".txt", ".plist", ".strings", ".gitignore", };
