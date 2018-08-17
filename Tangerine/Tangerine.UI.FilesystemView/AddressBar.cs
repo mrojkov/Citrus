@@ -272,10 +272,14 @@ namespace Tangerine.UI.FilesystemView
 	{
 		private ColorGradient innerGradient;
 		private Color4 outline;
+		private PathBarButtonState state;
 
 		public void SetState(PathBarButtonState state)
 		{
-			CommonWindow.Current.Invalidate();
+			if (this.state != state) {
+				this.state = state;
+				CommonWindow.Current.Invalidate();
+			}
 			switch (state) {
 				case PathBarButtonState.Normal:
 					innerGradient = Theme.Colors.PathBarButtonNormal;
@@ -373,6 +377,7 @@ namespace Tangerine.UI.FilesystemView
 			base.Presenter = Presenter;
 			if (path == null) {
 				Updating += (float delta) => {
+					var prevState = State;
 					if (Expanded) {
 						State = PathBarButtonState.Press;
 					} else {
@@ -386,7 +391,9 @@ namespace Tangerine.UI.FilesystemView
 							State = PathBarButtonState.Normal;
 						}
 					}
-					Presenter.SetState(State);
+					if (prevState != State) {
+						Presenter.SetState(State);
+					}
 				};
 			}
 			Gestures.Add(new ClickGesture(0, FlipState));
