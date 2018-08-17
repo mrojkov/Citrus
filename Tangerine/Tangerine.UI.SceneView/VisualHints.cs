@@ -182,7 +182,15 @@ namespace Tangerine.UI.SceneView
 		private readonly Panel panel;
 		private readonly ThemedScrollView rootWidget;
 
-		public VisualHintsPanel(Panel panel)
+		public static VisualHintsPanel Create(Panel panel)
+		{
+			if (Instance == null) {
+				Instance = new VisualHintsPanel(panel);
+			}
+			return Instance;
+		}
+
+		private VisualHintsPanel(Panel panel)
 		{
 			if (Instance != null) {
 				throw new InvalidOperationException();
@@ -191,6 +199,7 @@ namespace Tangerine.UI.SceneView
 			this.panel = panel;
 			rootWidget = new ThemedScrollView();
 			rootWidget.Content.Layout = new VBoxLayout { Spacing = 6 };
+			panel.ContentWidget.AddNode(rootWidget);
 		}
 
 		public static void Refresh() => Instance?.RefreshEditors();
@@ -208,12 +217,10 @@ namespace Tangerine.UI.SceneView
 
 		public void Detach()
 		{
-			rootWidget.Unlink();
 		}
 
 		public void Attach()
 		{
-			panel.ContentWidget.AddNode(rootWidget);
 		}
 
 		private class BooleanEditor : Widget

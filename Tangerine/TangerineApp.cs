@@ -244,7 +244,7 @@ namespace Tangerine
 						new UI.SceneView.SceneView(documentViewContainer),
 						new UI.SearchPanel(searchPanel.ContentWidget),
 						new BackupHistoryPanel(backupHistoryPanel.ContentWidget),
-						new VisualHintsPanel(visualHintsPanel)
+						VisualHintsPanel.Create(visualHintsPanel)
 				});
 					UI.SceneView.SceneView.ShowNodeDecorationsPanelButton.Clicked = () => dockManager.TogglePanel(visualHintsPanel);
 				}
