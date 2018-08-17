@@ -257,14 +257,6 @@ namespace Tangerine.UI.FilesystemView
 			InvalidateView(path, sortType, orderType);
 		}
 
-		private IEnumerator<object> ShowAlertTask(string message)
-		{
-			yield return Task.WaitWhile(() => RootWidget.Input.ConsumeKeyPress(Key.Enter));
-
-			var dialog = new AlertDialog(message);
-			dialog.Show();
-		}
-
 		public bool Open(string path)
 		{
 			try {
@@ -278,19 +270,19 @@ namespace Tangerine.UI.FilesystemView
 				}
 				return true;
 			} catch (ArgumentException) {
-				RootWidget.Tasks.Add(ShowAlertTask("The path is empty, contains only white spaces, or contains invalid characters."));
+				AlertDialog.Show("The path is empty, contains only white spaces, or contains invalid characters.");
 			} catch (PathTooLongException) {
-				RootWidget.Tasks.Add(ShowAlertTask("The specified path, file name, or both exceed the system-defined maximum length."));
+				AlertDialog.Show("The specified path, file name, or both exceed the system-defined maximum length.");
 			} catch (NotSupportedException) {
-				RootWidget.Tasks.Add(ShowAlertTask("The path is in an invalid format."));
+				AlertDialog.Show("The path is in an invalid format.");
 			} catch (FileNotFoundException) {
-				RootWidget.Tasks.Add(ShowAlertTask("Tangerine can not find \"" + path + "\".\nCheck the spelling and try again."));
+				AlertDialog.Show($"Tangerine can not find \"{path}\".\nCheck the spelling and try again.");
 			} catch (DirectoryNotFoundException) {
-				RootWidget.Tasks.Add(ShowAlertTask("The path represents a directory and is invalid, such as being on an unmapped drive, or the directory cannot be found."));
+				AlertDialog.Show("The path represents a directory and is invalid, such as being on an unmapped drive, or the directory cannot be found.");
 			} catch (IOException) {
-				RootWidget.Tasks.Add(ShowAlertTask("This file is being used by another process."));
+				AlertDialog.Show("This file is being used by another process.");
 			} catch (UnauthorizedAccessException) {
-				RootWidget.Tasks.Add(ShowAlertTask("Tangerine does not have the required permission."));
+				AlertDialog.Show("Tangerine does not have the required permission.");
 			}
 			return false;
 		}
@@ -698,20 +690,46 @@ namespace Tangerine.UI.FilesystemView
 				for (int navOffset = 0; navOffset < navCommands[navType].Count; navOffset++) {
 					var cmd = navCommands[navType][navOffset];
 					if (cmd.Consume()) {
-						select = navType == 1;
-						toggle = navType == 2;
-						var sign = (navOffset % 2 == 0 ? -1 : 1);
-						switch (navOffset) {
-						// Left, Right
-						case 0: case 1: indexDelta = sign * 1; break;
-						// Up,  Down
-						case 2: case 3:  indexDelta = sign * columnCount; break;
-						// PageUp, PageDown
-						case 4: case 5: indexDelta = sign * columnCount * ((int)(scrollView.Size.Y / (rowHeight + flowLayout.Spacing)) - 1); break;
-						// Home
-						case 6: indexDelta = -rangeSelectionIndex; break;
-						// End
-						case 7: indexDelta = maxIndex - rangeSelectionIndex; break;
+						
+							select = navType == 1;
+							toggle = navType == 2;
+							var sign = (navOffset % 2 == 0 ? -1 : 1);
+						if (scrollView.Direction == ScrollDirection.Vertical) {
+							switch (navOffset) {
+								// Left, Right
+								case 0: case 1: indexDelta = sign * 1; break;
+								// Up,  Down
+								case 2: case 3: indexDelta = sign * columnCount; break;
+								// PageUp, PageDown
+								case 4: case 5: indexDelta = sign * columnCount * ((int)(scrollView.Size.Y / (rowHeight + flowLayout.Spacing)) - 1); break;
+								// Home
+								case 6: indexDelta = -rangeSelectionIndex; break;
+								// End
+								case 7: indexDelta = maxIndex - rangeSelectionIndex; break;
+							}
+						} else {
+							switch (navOffset) {
+								// Left
+								case 0:
+									indexDelta = -columnCount;
+									break;
+								// Right
+								case 1:
+									indexDelta = columnCount;
+									break;
+								// Up
+								case 2:
+									indexDelta = -1;
+									break;
+								// Down
+								case 3:
+									indexDelta = 1;
+									break;
+								// Home
+								case 6: indexDelta = -rangeSelectionIndex; break;
+								// End
+								case 7: indexDelta = maxIndex - rangeSelectionIndex; break;
+							}
 						}
 					}
 				}

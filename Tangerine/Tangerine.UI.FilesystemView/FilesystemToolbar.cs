@@ -52,7 +52,9 @@ namespace Tangerine.UI.FilesystemView
 					Layout = new VBoxLayout(),
 					Nodes = {
 						new Widget {
-							Layout = new HBoxLayout(),
+							Layout = new HBoxLayout(){
+								Spacing = 2
+							},
 							Nodes = {
 								CreateGotoCurrentProjectDirectoryButton(),
 								CreateUpButton(),
@@ -122,9 +124,10 @@ namespace Tangerine.UI.FilesystemView
 					new ThemedDropDownList.Item("Ascending", OrderType.Ascending),
 					new ThemedDropDownList.Item("Descending", OrderType.Descending)
 				},
+				Layout = new HBoxLayout(),
+				MinMaxWidth = Renderer.MeasureTextLine("Descending", Theme.Metrics.TextHeight, 0).X + 30,
 				Index = 0
 			};
-
 			list.Changed += args => {
 				view.SortByType(view.SortType, (OrderType)args.Value);
 			};

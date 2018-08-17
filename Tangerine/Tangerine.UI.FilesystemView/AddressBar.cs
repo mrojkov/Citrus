@@ -46,21 +46,13 @@ namespace Tangerine.UI.FilesystemView
 			};
 		}
 
-		private IEnumerator<object> ShowAlertTask(string message)
-		{
-			yield return Task.WaitWhile(() => Input.ConsumeKeyPress(Key.Enter));
-
-			var dialog = new AlertDialog(message);
-			dialog.Show();
-		}
-
 		private string AdjustPath(string path)
 		{
 			if (string.IsNullOrWhiteSpace(path)) {
 				return model.CurrentPath;
 			}
 			if (path.Length < 3) {
-				Tasks.Add(ShowAlertTask("The size of the path is less than the permissible."));
+				AlertDialog.Show("The size of the path is less than the permissible.");
 				return model.CurrentPath;
 			}
 
@@ -101,7 +93,7 @@ namespace Tangerine.UI.FilesystemView
 			doubleDirectorySeparator += Path.DirectorySeparatorChar;
 			doubleDirectorySeparator += Path.DirectorySeparatorChar;
 			if (path.Contains(doubleDirectorySeparator)) {
-				Tasks.Add(ShowAlertTask("The path is in an invalid format."));
+				AlertDialog.Show("The path is in an invalid format.");
 				return model.CurrentPath;
 			}
 
@@ -254,7 +246,7 @@ namespace Tangerine.UI.FilesystemView
 			Nodes.Add(arrowButton);
 
 			Updating += (float delta) => {
-				if (arrowButton.ArrowState == PathArrowButtonState.Expanded) {
+				if (arrowButton.Expanded) {
 					state = PathBarButtonState.Press;
 				} else {
 					if (IsMouseOverThisOrDescendant()) {
@@ -362,12 +354,6 @@ namespace Tangerine.UI.FilesystemView
 		}
 	}
 
-	public enum PathArrowButtonState
-	{
-		Collapsed,
-		Expanded
-	}
-
 	public class PathArrowButton : ThemedButton
 	{
 		private string path;
@@ -375,7 +361,7 @@ namespace Tangerine.UI.FilesystemView
 		private Func<string, bool> openPath;
 		private new PathButtonPresenter Presenter;
 		private Image icon;
-		public PathArrowButtonState ArrowState;
+		public bool Expanded { get; private set; }
 		public PathBarButtonState State;
 
 		public PathArrowButton(Func<string, bool> openPath, string path = null) : base()
@@ -387,7 +373,7 @@ namespace Tangerine.UI.FilesystemView
 			base.Presenter = Presenter;
 			if (path == null) {
 				Updating += (float delta) => {
-					if (ArrowState == PathArrowButtonState.Expanded) {
+					if (Expanded) {
 						State = PathBarButtonState.Press;
 					} else {
 						if (IsMouseOverThisOrDescendant()) {
@@ -413,7 +399,7 @@ namespace Tangerine.UI.FilesystemView
 				MinMaxSize = new Vector2(11, 6),
 				Texture = IconPool.GetTexture("Filesystem.PathSeparatorCollapsed")
 			});
-			ArrowState = PathArrowButtonState.Collapsed;
+			Expanded = false;
 		}
 
 		public void SetState(PathBarButtonState state)
@@ -423,21 +409,17 @@ namespace Tangerine.UI.FilesystemView
 
 		private void FlipState()
 		{
-			if (ArrowState == PathArrowButtonState.Collapsed) {
-				ArrowState = PathArrowButtonState.Expanded;
+			if (!Expanded) {
+				Expanded = true;
 				icon.Texture = IconPool.GetTexture("Filesystem.PathSeparatorExpanded");
 				var indent = 14;
 				var pickerPosition = Window.Current.LocalToDesktop(GlobalPosition + new Vector2(-indent, Height));
-				picker = new DirectoryPicker(openPath, pickerPosition, path);
-				
-				picker.Window.Deactivated += () => {
-					picker.Window.Close();
-					FlipState();
-				};
+				picker = new DirectoryPicker(openPath, pickerPosition, path);		
+				picker.Closing += FlipState;
 			} else {
-				ArrowState = PathArrowButtonState.Collapsed;
+				Expanded = false;
 				icon.Texture = IconPool.GetTexture("Filesystem.PathSeparatorCollapsed");
-				picker.Window.Close();
+				picker.Close();
 			}
 		}
 	}
@@ -446,11 +428,10 @@ namespace Tangerine.UI.FilesystemView
 	{
 		private Func<string, bool> openPath;
 		private ThemedScrollView scrollView;
-		public Window Window
-		{
-			get;
-		}
-		private WindowWidget RootWidget;
+		private Window window;
+		private WindowWidget rootWidget;
+		private bool closed;
+		public event Action Closing;
 
 		public DirectoryPicker(Func<string, bool> openPath, Vector2 globalPosition, string path = null)
 		{
@@ -468,16 +449,18 @@ namespace Tangerine.UI.FilesystemView
 
 			scrollView = new ThemedScrollView();
 			scrollView.Content.Layout = new VBoxLayout();
-			scrollView.Content.Padding = new Thickness(5);
+			scrollView.Content.Padding = new Thickness(4);
 			scrollView.Content.Nodes.AddRange(filesystemItems);
 
 			// Like in Windows File Explorer
 			const int MaxItemsOnPicker = 19; 
-			var itemsCount = System.Math.Min(filesystemItems.Count, MaxItemsOnPicker);
-			var clientSize = new Vector2(FilesystemItem.ItemWidth, (FilesystemItem.IconSize + 2 * FilesystemItem.ItemPadding) * itemsCount) + new Vector2(scrollView.Content.Padding.Left * 2);
+			var itemsCount = Math.Min(filesystemItems.Count, MaxItemsOnPicker);
+			var clientSize = new Vector2(
+				FilesystemItem.ItemWidth,
+				(FilesystemItem.IconSize + 2 * FilesystemItem.ItemPadding) * itemsCount) + new Vector2(scrollView.Content.Padding.Left * 2);
 			scrollView.MinMaxSize = clientSize;
 
-			var windowOptions = new WindowOptions() {
+			var windowOptions = new WindowOptions {
 				ClientSize = scrollView.MinSize,
 				MinimumDecoratedSize = scrollView.MinSize,
 				FixedSize = true,
@@ -485,38 +468,44 @@ namespace Tangerine.UI.FilesystemView
 				Centered = globalPosition == Vector2.Zero,
 				Visible = false,
 			};
-			Window = new Window(windowOptions);
+			window = new Window(windowOptions);
+			window.Deactivated += Close;
 
-			RootWidget = new ThemedInvalidableWindowWidget(Window) {
+			rootWidget = new ThemedInvalidableWindowWidget(window) {
 				Layout = new VBoxLayout(),
 				LayoutBasedWindowSize = true,
 				Nodes = {
 					scrollView
 				}
 			};
-			RootWidget.FocusScope = new KeyboardFocusScope(RootWidget);
-			RootWidget.AddChangeWatcher(() => WidgetContext.Current.NodeUnderMouse, (value) => {
-				if (value != null)
-					if (scrollView.Content == value.Parent) {
-					Window.Current.Invalidate();
-				}
-			});
 
-			RootWidget.Presenter = new DelegatePresenter<Widget>(_ => {
-				RootWidget.PrepareRendererState();
-				Renderer.DrawRect(Vector2.One, RootWidget.ContentSize, Theme.Colors.DirectoryPickerBackground);
+			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
+			rootWidget.AddChangeWatcher(() => WidgetContext.Current.NodeUnderMouse, (value) => Window.Current.Invalidate());
+
+			rootWidget.Presenter = new DelegatePresenter<Widget>(_ => {
+				rootWidget.PrepareRendererState();
+				Renderer.DrawRect(Vector2.One, rootWidget.ContentSize, Theme.Colors.DirectoryPickerBackground);
 			});
-			RootWidget.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(_ => {
-				RootWidget.PrepareRendererState();
-				Renderer.DrawRectOutline(Vector2.Zero, RootWidget.ContentSize, Theme.Colors.DirectoryPickerOutline, thickness: 2);
+			rootWidget.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(_ => {
+				rootWidget.PrepareRendererState();
+				Renderer.DrawRectOutline(Vector2.Zero, rootWidget.ContentSize, Theme.Colors.DirectoryPickerOutline, thickness: 1);
 			}));
 
-			Window.Visible = true;
+			window.Visible = true;
 			if (globalPosition != Vector2.Zero) {
-				Window.ClientPosition = globalPosition;
+				window.ClientPosition = globalPosition;
 			}
 		}
 
+		public void Close()
+		{
+			if (!closed) {
+				closed = true;
+				Closing?.Invoke();
+				window.Close();
+			}
+		}
+	
 		public static List<string> GetInternalFoldersPaths(string path)
 		{
 			var foldersPaths = new List<string>();
@@ -540,7 +529,7 @@ namespace Tangerine.UI.FilesystemView
 				}));
 				item.Updating += (float delta) => {
 					if (item.Input.WasMouseReleased(0)) {
-						Window.Close();
+						window.Close();
 						openPath(item.FilesystemPath);
 					} else if (item.Input.WasMouseReleased(1)) {
 						SystemShellContextMenu.Instance.Show(item.FilesystemPath);
