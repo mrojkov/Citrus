@@ -244,7 +244,8 @@ namespace Tangerine
 						new UI.SceneView.SceneView(documentViewContainer),
 						new UI.SearchPanel(searchPanel.ContentWidget),
 						new BackupHistoryPanel(backupHistoryPanel.ContentWidget),
-						VisualHintsPanel.Create(visualHintsPanel)
+						// Use VisualHintsPanel sigleton because we need preserve its state between documents.
+						VisualHintsPanel.Instance ?? VisualHintsPanel.Initialize(visualHintsPanel)
 				});
 					UI.SceneView.SceneView.ShowNodeDecorationsPanelButton.Clicked = () => dockManager.TogglePanel(visualHintsPanel);
 				}

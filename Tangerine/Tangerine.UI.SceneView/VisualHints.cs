@@ -182,11 +182,12 @@ namespace Tangerine.UI.SceneView
 		private readonly Panel panel;
 		private readonly ThemedScrollView rootWidget;
 
-		public static VisualHintsPanel Create(Panel panel)
+		public static VisualHintsPanel Initialize(Panel panel)
 		{
-			if (Instance == null) {
-				Instance = new VisualHintsPanel(panel);
+			if (Instance != null) {
+				throw new InvalidOperationException();
 			}
+			Instance = new VisualHintsPanel(panel);
 			return Instance;
 		}
 
