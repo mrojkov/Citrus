@@ -175,7 +175,7 @@ namespace Tangerine.UI.SceneView
 		}
 	}
 
-	public class VisualHintsPanel
+	public class VisualHintsPanel : IDocumentView
 	{
 		public static VisualHintsPanel Instance { get; private set; }
 
@@ -191,7 +191,6 @@ namespace Tangerine.UI.SceneView
 			this.panel = panel;
 			rootWidget = new ThemedScrollView();
 			rootWidget.Content.Layout = new VBoxLayout { Spacing = 6 };
-			panel.ContentWidget.AddNode(rootWidget);
 		}
 
 		public static void Refresh() => Instance?.RefreshEditors();
@@ -205,6 +204,16 @@ namespace Tangerine.UI.SceneView
 					rootWidget.Content.AddNode(new VisualHintEditor(hint));
 				}
 			}
+		}
+
+		public void Detach()
+		{
+			rootWidget.Unlink();
+		}
+
+		public void Attach()
+		{
+			panel.ContentWidget.AddNode(rootWidget);
 		}
 
 		private class BooleanEditor : Widget

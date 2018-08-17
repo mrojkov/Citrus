@@ -13,7 +13,7 @@ namespace Tangerine.UI.SceneView
 		private List<Vector2> points = new List<Vector2>();
 		private List<Vector2> approximation = new List<Vector2>();
 
-		public readonly static VisualHint AnimationPathHint =
+		private readonly VisualHint AnimationPathHint =
 			VisualHintsRegistry.Instance.Register("/All/Animation Path", hideRule: VisualHintsRegistry.HideRules.VisibleIfProjectOpened);
 
 		private readonly SceneView sv;

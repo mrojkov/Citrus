@@ -6,7 +6,7 @@ namespace Tangerine.UI.SceneView
 	public class DistortionMeshPresenter : CustomPresenter<DistortionMesh>
 	{
 		private readonly SceneView sv;
-		private readonly static VisualHint MeshHint =
+		private readonly VisualHint MeshHint =
 			VisualHintsRegistry.Instance.Register("/All/Distortion Mesh Grid", hideRule: VisualHintsRegistry.HideRules.VisibleIfProjectOpened);
 
 		public DistortionMeshPresenter(SceneView sceneView)

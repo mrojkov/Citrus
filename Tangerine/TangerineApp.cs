@@ -231,10 +231,6 @@ namespace Tangerine
 
 			InitializeHotkeys();
 
-			// Andery Tyshchenko: Create panel after hotkeys initialization
-			// to properly display hotkeys on panel
-			new VisualHintsPanel(visualHintsPanel);
-
 			Toolbars.Add("Editing", new Toolbar(dockManager.ToolbarArea));
 			Toolbars.Add("Create", new Toolbar(dockManager.ToolbarArea));
 			Toolbars.Add("Tools", new Toolbar(dockManager.ToolbarArea));
@@ -248,7 +244,8 @@ namespace Tangerine
 						new UI.SceneView.SceneView(documentViewContainer),
 						new UI.SearchPanel(searchPanel.ContentWidget),
 						new BackupHistoryPanel(backupHistoryPanel.ContentWidget),
-					});
+						new VisualHintsPanel(visualHintsPanel)
+				});
 					UI.SceneView.SceneView.ShowNodeDecorationsPanelButton.Clicked = () => dockManager.TogglePanel(visualHintsPanel);
 				}
 			};
