@@ -102,9 +102,11 @@ namespace Tangerine.UI
 
 		public void RemoveRow(ToolbarRow row)
 		{
-			var newRow = Rows[row.Index - 1];
-			foreach (var panel in row.Panels) {
-				InsertPanel(newRow, panel, newRow.Panels.Count);
+			if (row.Index > 0) {
+				var newRow = Rows[row.Index - 1];
+				foreach (var panel in row.Panels) {
+					InsertPanel(newRow, panel, newRow.Panels.Count);
+				}
 			}
 			Rows.RemoveAt(row.Index);
 			for (int i = row.Index; i < Rows.Count; ++i) {
