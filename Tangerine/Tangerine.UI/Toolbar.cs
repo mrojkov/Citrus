@@ -94,8 +94,8 @@ namespace Tangerine
 			var widgetPos = panelContainer.CalcPositionInSpaceOf(rootWidget);
 			var presenter = new DelegatePresenter<Widget>(w => {
 				w.PrepareRendererState();
-				Renderer.DrawRect(widgetPos, widgetPos + panelContainer.Size, Color4.Blue.Transparentify(0.7f));
-				Renderer.DrawRectOutline(widgetPos, widgetPos + panelContainer.Size, Color4.Blue);
+				Renderer.DrawRect(widgetPos, widgetPos + panelContainer.Size, ColorTheme.Current.Toolbar.PanelPlacementHighlightBackground);
+				Renderer.DrawRectOutline(widgetPos, widgetPos + panelContainer.Size, ColorTheme.Current.Toolbar.PanelPlacementHighlightBorder);
 			});
 			while (true) {
 				if (!input.WasMousePressed()) {
