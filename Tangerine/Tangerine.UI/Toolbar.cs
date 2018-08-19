@@ -98,7 +98,7 @@ namespace Tangerine
 				Renderer.DrawRectOutline(widgetPos, widgetPos + panelContainer.Size, ColorTheme.Current.Toolbar.PanelPlacementHighlightBorder);
 			});
 			while (true) {
-				if (!input.WasMousePressed()) {
+				if (!input.WasMousePressed() || Core.Project.Current == Core.Project.Null) {
 					yield return null;
 					continue;
 				}
