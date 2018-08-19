@@ -87,25 +87,28 @@ namespace Tangerine
 
 		private IEnumerator<object> DragTask(Widget panelContainer, WidgetInput input, int rowIndex, int panelIndex)
 		{
+			var rootWidget = widget.GetRoot().AsWidget;
+			var rootPos = widget.CalcPositionInSpaceOf(rootWidget);
 			int newRowIndex = rowIndex;
 			int newPanelIndex = panelIndex;
-			var currentPanel = panelContainer;
+			var widgetPos = panelContainer.CalcPositionInSpaceOf(rootWidget);
+			var presenter = new DelegatePresenter<Widget>(w => {
+				w.PrepareRendererState();
+				Renderer.DrawRect(widgetPos, widgetPos + panelContainer.Size, Color4.Blue.Transparentify(0.7f));
+				Renderer.DrawRectOutline(widgetPos, widgetPos + panelContainer.Size, Color4.Blue);
+			});
 			while (true) {
 				if (!input.WasMousePressed()) {
 					yield return null;
 					continue;
 				}
-				widget.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(w => {
-					w.PrepareRendererState();
-					var pos = currentPanel.CalcPositionInSpaceOf(w);
-					Renderer.DrawRect(pos, pos + panelContainer.Size, Color4.Blue.Transparentify(0.7f));
-					Renderer.DrawRectOutline(pos, pos + panelContainer.Size, Color4.Blue);
-				}));
+				rootWidget.CompoundPostPresenter.Add(presenter);
 				while (input.IsMousePressed()) {
+					Vector2 pos;
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					for (int i = 0; i < widget.Nodes.Count; ++i) {
 						var rowWidget = (Widget)widget.Nodes[i];
-						if (!IsMouseOver(rowWidget, out Vector2 pos)) {
+						if (!IsMouseOver(rowWidget, out pos)) {
 							continue;
 						}
 						for (int j = 0; j < rowWidget.Nodes.Count; ++j) {
@@ -114,7 +117,7 @@ namespace Tangerine
 								continue;
 							}
 							if ((newRowIndex != i || newPanelIndex != j) && (rowIndex != i || j != rowWidget.Nodes.Count - 1)) {
-								currentPanel = panelWidget;
+								widgetPos = panelWidget.CalcPositionInSpaceOf(rootWidget);
 								newRowIndex = i;
 								newPanelIndex = j;
 							}
@@ -122,21 +125,45 @@ namespace Tangerine
 						}
 					}
 					Next:
+					if (!IsMouseOver(widget, out pos)) {
+						newPanelIndex = 0;
+						if (pos.Y < 0) {
+							newRowIndex = -1;
+							widgetPos = rootPos + new Vector2(0, -panelContainer.Height);
+						}
+						if (pos.Y > widget.Height) {
+							newRowIndex = toolbarLayout.Rows.Count;
+							widgetPos = rootPos + new Vector2(0, widget.Height);
+						}
+					}
 					yield return null;
 				}
-				widget.CompoundPostPresenter.RemoveAt(widget.CompoundPostPresenter.Count - 1);
+				rootWidget.CompoundPostPresenter.Remove(presenter);
 				if (newRowIndex == rowIndex && newPanelIndex == panelIndex) {
 					continue;
 				}
-				var row = toolbarLayout.Rows[newRowIndex];
-				var panel = toolbarLayout.Rows[rowIndex].Panels[panelIndex];
+				ToolbarLayout.ToolbarRow row = null;
+				if (newRowIndex < 0 || newRowIndex == toolbarLayout.Rows.Count) {
+					row = new ToolbarLayout.ToolbarRow();
+					toolbarLayout.InsertRow(row, newRowIndex < 0 ? 0 : newRowIndex);
+					if (newRowIndex < 0) {
+						++rowIndex;
+					}
+				} else {
+					row = toolbarLayout.Rows[newRowIndex];
+				}
+				var oldRow = toolbarLayout.Rows[rowIndex];
+				var panel = oldRow.Panels[panelIndex];
 				if (newRowIndex != rowIndex) {
 					toolbarLayout.RemovePanel(panel);
 					toolbarLayout.InsertPanel(row, panel, newPanelIndex);
 				} else {
 					toolbarLayout.SwapPanels(row.Panels[newPanelIndex], panel);
 				}
-				rowIndex = newRowIndex;
+				if (oldRow.Panels.Count == 0) {
+					toolbarLayout.RemoveRow(oldRow);
+				}
+				rowIndex = row.Index;
 				panelIndex = newPanelIndex;
 				toolbarLayout.RefreshAfterLoad();
 				Rebuild();
