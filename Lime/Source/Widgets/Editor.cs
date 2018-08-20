@@ -305,6 +305,7 @@ namespace Lime
 			var w = WordAt(Text.Text, CaretPos.TextPos);
 			SelectionStart.TextPos = w.Left;
 			SelectionEnd.TextPos = w.Right;
+			CaretPos.TextPos = SelectionEnd.TextPos;
 		}
 
 		public void SelectAll()
