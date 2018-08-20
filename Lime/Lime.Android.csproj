@@ -374,6 +374,8 @@
     <Compile Include="Source\Widgets\Layout\VFlowLayout.cs" />
     <Compile Include="Source\Widgets\NodeBehaviours.cs" />
     <Compile Include="Source\Widgets\TiledImage.cs" />
+    <Compile Include="Source\Components\GradientMaterialComponent.cs" />
+    <Compile Include="Source\Widgets\Materials\GradientMaterial.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Android.csproj">

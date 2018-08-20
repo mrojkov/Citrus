@@ -49,6 +49,11 @@ namespace Lime
 		{
 			private ColorGradient innerGradient;
 
+			public ButtonPresenter()
+			{
+				innerGradient = Theme.Colors.ButtonDefault;
+			}
+
 			public virtual void SetState(string state)
 			{
 				CommonWindow.Current.Invalidate();

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Linq;
 using System.Collections.Generic;
 using Lime;
@@ -272,6 +273,84 @@ namespace Tangerine.Core.Operations
 				if (b.Animator.TargetProperty == nameof(Node.Trigger)) {
 					Document.ForceAnimationUpdate();
 				}
+			}
+		}
+	}
+
+	public class InsertListItem : Operation
+	{
+		public readonly IList List;
+		public readonly int Location;
+		public readonly object Item;
+
+		public override bool IsChangingDocument => true;
+
+		public InsertListItem(object item, IList list, int location)
+		{
+			Item = item;
+			List = list;
+			Location = location;
+		}
+
+		public static void Perform(object item, IList list, int location)
+		{
+			Document.Current.History.Perform(new InsertListItem(item, list, location));
+		}
+
+		public class Processor : OperationProcessor<InsertListItem>
+		{
+			protected override void InternalRedo(InsertListItem op)
+			{
+				op.List.Insert(op.Location, op.Item);
+			}
+
+			protected override void InternalUndo(InsertListItem op)
+			{
+				op.List.Remove(op.Item);
+			}
+		}
+	}
+
+	public class RemoveListItem : Operation
+	{
+		public readonly IList List;
+		public readonly int Location;
+		public object Item { get; private set; }
+
+		public override bool IsChangingDocument => true;
+
+		public RemoveListItem(object item, IList list, int location)
+		{
+			Item = item;
+			List = list;
+			Location = location;
+		}
+
+		public static void Perform(object item, IList list)
+		{
+			Document.Current.History.Perform(new RemoveListItem(item, list, 0));
+		}
+
+		public static void Perform(int location, IList list)
+		{
+			Document.Current.History.Perform(new RemoveListItem(null, list, location));
+		}
+
+		public class Processor : OperationProcessor<RemoveListItem>
+		{
+			protected override void InternalRedo(RemoveListItem op)
+			{
+				if (op.Item != null) {
+					op.List.Remove(op.Item);
+				} else {
+					op.Item = op.List[op.Location];
+					op.List.RemoveAt(op.Location);
+				}
+			}
+
+			protected override void InternalUndo(RemoveListItem op)
+			{
+				op.List.Insert(op.Location, op.Item);
 			}
 		}
 	}

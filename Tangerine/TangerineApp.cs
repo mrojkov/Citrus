@@ -204,6 +204,8 @@ namespace Tangerine
 				new Core.Operations.RemoveKeyframe.Processor(),
 				new Core.Operations.SetKeyframe.Processor(),
 				new Core.Operations.InsertFolderItem.Processor(),
+				new Core.Operations.InsertListItem.Processor(),
+				new Core.Operations.RemoveListItem.Processor(),
 				new Core.Operations.UnlinkFolderItem.Processor(),
 				new Core.Operations.MoveNodes.Processor(),
 				new Core.Operations.SetMarker.Processor(),

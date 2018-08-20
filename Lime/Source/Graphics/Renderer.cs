@@ -836,11 +836,31 @@ namespace Lime
 
 		public static void DrawVerticalGradientRect(Vector2 a, Vector2 b, ColorGradient gradient)
 		{
-			staticVertices[0] = new Vertex { Pos = a, Color = gradient.A };
-			staticVertices[1] = new Vertex { Pos = new Vector2(b.X, a.Y), Color = gradient.A };
-			staticVertices[2] = new Vertex { Pos = b, Color = gradient.B };
-			staticVertices[3] = new Vertex { Pos = new Vector2(a.X, b.Y), Color = gradient.B };
+			FindMinMaxGradientPointColors(gradient, out Color4 colorA, out Color4 colorB);
+			staticVertices[0] = new Vertex { Pos = a, Color = colorA };
+			staticVertices[1] = new Vertex { Pos = new Vector2(b.X, a.Y), Color = colorA };
+			staticVertices[2] = new Vertex { Pos = b, Color = colorB };
+			staticVertices[3] = new Vertex { Pos = new Vector2(a.X, b.Y), Color = colorB };
 			DrawTriangleFan(null, null, WidgetMaterial.Diffuse, staticVertices, 4);
+		}
+
+		public static void FindMinMaxGradientPointColors(ColorGradient gradient, out Color4 minPointColor, out Color4 maxPointColor)
+		{
+			var min = float.MaxValue;
+			var max = float.MinValue;
+			minPointColor = Color4.Zero;
+			maxPointColor = Color4.Zero;
+			foreach (var point in gradient) {
+				if (point.Position < min) {
+					minPointColor = point.Color;
+					min = point.Position;
+				}
+
+				if (point.Position > max) {
+					maxPointColor = point.Color;
+					max = point.Position;
+				}
+			}
 		}
 
 		public static void DrawVerticalGradientRect(float x0, float y0, float x1, float y1, ColorGradient gradient)
@@ -855,10 +875,11 @@ namespace Lime
 
 		public static void DrawHorizontalGradientRect(Vector2 a, Vector2 b, ColorGradient gradient)
 		{
-			staticVertices[0] = new Vertex { Pos = a, Color = gradient.A };
-			staticVertices[1] = new Vertex { Pos = new Vector2(b.X, a.Y), Color = gradient.B };
-			staticVertices[2] = new Vertex { Pos = b, Color = gradient.B };
-			staticVertices[3] = new Vertex { Pos = new Vector2(a.X, b.Y), Color = gradient.A };
+			FindMinMaxGradientPointColors(gradient, out Color4 colorA, out Color4 colorB);
+			staticVertices[0] = new Vertex { Pos = a, Color = colorA };
+			staticVertices[1] = new Vertex { Pos = new Vector2(b.X, a.Y), Color = colorB };
+			staticVertices[2] = new Vertex { Pos = b, Color = colorB };
+			staticVertices[3] = new Vertex { Pos = new Vector2(a.X, b.Y), Color = colorA };
 			DrawTriangleFan(null, null, WidgetMaterial.Diffuse, staticVertices, 4);
 		}
 

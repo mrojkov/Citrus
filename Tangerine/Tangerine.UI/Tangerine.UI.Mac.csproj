@@ -133,6 +133,7 @@
     <Compile Include="PropertyEditors\TriggerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\Vector2PropertyEditor.cs" />
     <Compile Include="PropertyEditors\Vector3PropertyEditor.cs" />
+    <Compile Include="PropertyEditors\ColorGradientPropertyEditor.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

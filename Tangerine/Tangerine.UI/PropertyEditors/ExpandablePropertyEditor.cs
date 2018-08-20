@@ -30,8 +30,8 @@ namespace Tangerine.UI
 				Visible = false
 			};
 			ExpandButton = new ThemedExpandButton {
-				Anchors = Anchors.Left,
 				MinMaxSize = Vector2.One * 20f,
+				LayoutCell = new LayoutCell(Alignment.LeftCenter)
 			};
 			ExpandButton.Clicked += () => Expanded = !Expanded;
 			editorParams.InspectorPane.AddNode(ExpandableContent);

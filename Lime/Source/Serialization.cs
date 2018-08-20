@@ -270,6 +270,8 @@ namespace Lime
 				jd.Generate<Animation>();
 				jd.Generate<Spline>();
 				jd.Generate<LinearLayout>();
+				jd.Generate<ColorGradient>();
+				jd.Generate<GradientMaterial>();
 
 				jd.Generate<Animator<string>>();
 				jd.Generate<Animator<int>>();

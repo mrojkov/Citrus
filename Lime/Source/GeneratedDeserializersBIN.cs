@@ -1810,6 +1810,58 @@ namespace GeneratedDeserializersBIN
 			return result;
 		}
 
+		private static void Read_Lime__ColorGradient(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.ColorGradient)obj;
+			var dg = (BinaryDeserializerGen)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_Lime__ColorGradient(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.ColorGradient();
+			Read_Lime__ColorGradient(d, def, result);
+			return result;
+		}
+
+		private static void Read_Lime__GradientMaterial(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.GradientMaterial)obj;
+			var dg = (BinaryDeserializerGen)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				result.Angle = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (2 == fd.OurIndex) {
+				result.Blending = (global::Lime.Blending)d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (3 == fd.OurIndex) {
+				result.Gradient = (global::Lime.ColorGradient)null;
+				var tmp1 = d.Reader.ReadInt32();
+				if (tmp1 >= 0) {
+					result.Gradient = new global::Lime.ColorGradient();
+					while (--tmp1 >= 0) {
+						var tmp2 = (global::Lime.GradientControlPoint)dg.ReadObject<global::Lime.GradientControlPoint>();
+						result.Gradient.Add(tmp2);
+					}
+				}
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_Lime__GradientMaterial(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.GradientMaterial();
+			Read_Lime__GradientMaterial(d, def, result);
+			return result;
+		}
+
 		private static void Read_Lime__Animator_String(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animator<global::System.String>)obj;
@@ -6740,6 +6792,8 @@ namespace GeneratedDeserializersBIN
 			readCache[typeof(global::Lime.Animation)] = Read_Lime__Animation;
 			readCache[typeof(global::Lime.Spline)] = Read_Lime__Spline;
 			readCache[typeof(global::Lime.LinearLayout)] = Read_Lime__LinearLayout;
+			readCache[typeof(global::Lime.ColorGradient)] = Read_Lime__ColorGradient;
+			readCache[typeof(global::Lime.GradientMaterial)] = Read_Lime__GradientMaterial;
 			readCache[typeof(global::Lime.Animator<global::System.String>)] = Read_Lime__Animator_String;
 			readCache[typeof(global::Lime.Animator<global::System.Int32>)] = Read_Lime__Animator_Int32;
 			readCache[typeof(global::Lime.Animator<global::System.Boolean>)] = Read_Lime__Animator_Boolean;
@@ -6850,6 +6904,8 @@ namespace GeneratedDeserializersBIN
 			makeCache[typeof(global::Lime.Animation)] = Make_Lime__Animation;
 			makeCache[typeof(global::Lime.Spline)] = Make_Lime__Spline;
 			makeCache[typeof(global::Lime.LinearLayout)] = Make_Lime__LinearLayout;
+			makeCache[typeof(global::Lime.ColorGradient)] = Make_Lime__ColorGradient;
+			makeCache[typeof(global::Lime.GradientMaterial)] = Make_Lime__GradientMaterial;
 			makeCache[typeof(global::Lime.Animator<global::System.String>)] = Make_Lime__Animator_String;
 			makeCache[typeof(global::Lime.Animator<global::System.Int32>)] = Make_Lime__Animator_Int32;
 			makeCache[typeof(global::Lime.Animator<global::System.Boolean>)] = Make_Lime__Animator_Boolean;
