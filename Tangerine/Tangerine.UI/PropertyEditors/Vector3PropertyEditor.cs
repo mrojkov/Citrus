@@ -34,7 +34,7 @@ namespace Tangerine.UI
 			if (Parser.TryParse(editor.Text, out double newValue)) {
 				DoTransaction(() => {
 					SetProperty<Vector3>((current) => {
-						current[component] = newValue;
+						current[component] = (float)newValue;
 						return current;
 					});
 				});

@@ -177,7 +177,7 @@ namespace Tangerine.Core.Operations
 				} else {
 					op.Animator.ResetCache();
 				}
-				if (op.Animator.TargetProperty == nameof(Node.Trigger)) {
+				if (op.Animator.TargetPropertyPath == nameof(Node.Trigger)) {
 					Document.ForceAnimationUpdate();
 				}
 			}
@@ -189,7 +189,7 @@ namespace Tangerine.Core.Operations
 				}
 				op.Animator.Keys.AddOrdered(op.Restore<Backup>().Keyframe);
 				op.Animator.ResetCache();
-				if (op.Animator.TargetProperty == nameof(Node.Trigger)) {
+				if (op.Animator.TargetPropertyPath == nameof(Node.Trigger)) {
 					Document.ForceAnimationUpdate();
 				}
 			}
@@ -255,7 +255,7 @@ namespace Tangerine.Core.Operations
 
 				animator.Keys.AddOrdered(op.Keyframe);
 				animator.ResetCache();
-				if (animator.TargetProperty == nameof(Node.Trigger)) {
+				if (animator.TargetPropertyPath == nameof(Node.Trigger)) {
 					Document.ForceAnimationUpdate();
 				}
 			}
@@ -275,7 +275,7 @@ namespace Tangerine.Core.Operations
 					op.AnimationHost.Animators.Remove(b.Animator);
 				}
 				b.Animator.ResetCache();
-				if (b.Animator.TargetProperty == nameof(Node.Trigger)) {
+				if (b.Animator.TargetPropertyPath == nameof(Node.Trigger)) {
 					Document.ForceAnimationUpdate();
 				}
 			}
