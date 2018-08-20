@@ -12,8 +12,6 @@ namespace Tangerine
 		{
 			var dlg = new FileDialog { AllowedFileTypes = new string[] { "citproj" }, Mode = FileDialogMode.Open };
 			if (dlg.RunModal()) {
-				FontPool.Instance.Clear();
-				TangerineApp.LoadFont();
 				Execute(dlg.FileName);
 			}
 		}
@@ -22,6 +20,7 @@ namespace Tangerine
 		{
 			if (Project.Current.Close() && fileName.Length > 0) {
 				new Project(fileName).Open();
+				FontPool.Instance.Clear();
 				AddRecentProject(fileName);
 				return true;
 			}
@@ -46,10 +45,9 @@ namespace Tangerine
 		public override void Execute()
 		{
 			FontPool.Instance.Clear();
-			TangerineApp.LoadFont();
 			Orange.NewProject.NewProjectAction(FileOpenProject.Execute);
 		}
-	}	
+	}
 
 	public class FileCloseProject : CommandHandler
 	{

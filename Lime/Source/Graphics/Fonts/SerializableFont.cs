@@ -123,10 +123,15 @@ namespace Lime
 
 		public void Clear()
 		{
+			var defaultFont = this[DefaultFontName];
 			foreach (var font in fonts.Values) {
+				if (font == defaultFont) {
+					continue;
+				}
 				font.Dispose();
 			}
 			fonts.Clear();
+			fonts.Add(DefaultFontName, defaultFont);
 		}
 
 		public void ClearCache()

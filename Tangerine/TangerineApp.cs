@@ -494,7 +494,7 @@ namespace Tangerine
 			// so the visual font height for the same fontHeight will be different for different ttf files.
 			// This workaround returns the magic number for the specific current SegoeUINormal font.
 			font.SetFontHeightResolver(fontHeight => (int) Math.Round(fontHeight * 21f / 16f));
-			FontPool.Instance.AddFont("Default", font);
+			FontPool.Instance.AddFont(FontPool.DefaultFontName, font);
 		}
 
 		void RegisterGlobalCommands()
