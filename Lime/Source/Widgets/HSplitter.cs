@@ -55,7 +55,7 @@ namespace Lime
 				var l = (Layout as HSplitterLayout);
 				if (l.Spacing != value) {
 					l.Spacing = value;
-					l.InvalidateArrangement(this);
+					l.InvalidateArrangement();
 				}
 			}
 		}
@@ -104,7 +104,7 @@ namespace Lime
 					}
 					Stretches[i] = initialWidths[i] + d;
 				}
-				Layout.InvalidateConstraintsAndArrangement(this);
+				Layout.InvalidateConstraintsAndArrangement();
 				yield return null;
 			}
 			RaiseDragEnded();
@@ -147,10 +147,10 @@ namespace Lime
 		[YuzuDontGenerateDeserializer]
 		class HSplitterLayout : HBoxLayout
 		{
-			public override void MeasureSizeConstraints(Widget widget)
+			public override void MeasureSizeConstraints()
 			{
-				UpdateLayoutCells((Splitter)widget);
-				base.MeasureSizeConstraints(widget);
+				UpdateLayoutCells((Splitter)Owner);
+				base.MeasureSizeConstraints();
 			}
 
 			void UpdateLayoutCells(Splitter splitter)

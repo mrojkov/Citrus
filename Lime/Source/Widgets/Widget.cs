@@ -855,7 +855,7 @@ namespace Lime
 		internal void InvalidateParentConstraintsAndArrangement()
 		{
 			if (ParentWidget != null) {
-				ParentWidget.Layout.InvalidateConstraintsAndArrangement(ParentWidget);
+				ParentWidget.Layout.InvalidateConstraintsAndArrangement();
 			}
 		}
 
@@ -904,17 +904,17 @@ namespace Lime
 			if (oldParent != null && oldParent.AsWidget != null) {
 				var w = oldParent.AsWidget;
 				if (w.LayoutManager != null) {
-					w.Layout.InvalidateConstraintsAndArrangement(w);
+					w.Layout.InvalidateConstraintsAndArrangement();
 				}
 			}
 			if (Parent?.AsWidget == null) {
 				LayoutManager = null;
 			} else if (LayoutManager != null) {
 				InvalidateParentConstraintsAndArrangement();
-				Layout.InvalidateConstraintsAndArrangement(this);
+				Layout.InvalidateConstraintsAndArrangement();
 				foreach (var n in Descendants) {
 					var w = n as Widget;
-					w?.Layout.InvalidateConstraintsAndArrangement(w);
+					w?.Layout.InvalidateConstraintsAndArrangement();
 				}
 			}
 		}

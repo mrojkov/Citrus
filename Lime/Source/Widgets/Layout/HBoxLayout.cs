@@ -12,9 +12,12 @@ namespace Lime
 		public float Spacing
 		{
 			get => spacing;
-			set {
-				spacing = value;
-				Owner?.Layout.InvalidateConstraintsAndArrangement(Owner);
+			set
+			{
+				if (spacing != value) {
+					spacing = value;
+					InvalidateConstraintsAndArrangement();
+				}
 			}
 		}
 
@@ -25,10 +28,10 @@ namespace Lime
 			DebugRectangles = new List<Rectangle>();
 		}
 
-		public override void ArrangeChildren(Widget widget)
+		public override void ArrangeChildren()
 		{
 			ArrangementValid = true;
-			var widgets = GetChildren(widget);
+			var widgets = GetChildren();
 			if (widgets.Count == 0) {
 				return;
 			}
@@ -41,13 +44,13 @@ namespace Lime
 					Stretch = EffectiveLayoutCell(child).StretchX
 				};
 			}
-			var availableWidth = Math.Max(0, widget.ContentWidth - (widgets.Count - 1) * Spacing);
+			var availableWidth = Math.Max(0, Owner.ContentWidth - (widgets.Count - 1) * Spacing);
 			var sizes = LinearAllocator.Allocate(availableWidth, constraints, roundSizes: true);
 			i = 0;
 			DebugRectangles.Clear();
-			var position = widget.Padding.LeftTop;
+			var position = Owner.Padding.LeftTop;
 			foreach (var child in widgets) {
-				var size = new Vector2(sizes[i], widget.ContentHeight);
+				var size = new Vector2(sizes[i], Owner.ContentHeight);
 				var align = EffectiveLayoutCell(child).Alignment;
 				LayoutWidgetWithinCell(child, position, size, align, DebugRectangles);
 				position.X += size.X + Spacing;
@@ -55,13 +58,13 @@ namespace Lime
 			}
 		}
 
-		public override void MeasureSizeConstraints(Widget widget)
+		public override void MeasureSizeConstraints()
 		{
 			ConstraintsValid = true;
-			var widgets = GetChildren(widget);
+			var widgets = GetChildren();
 			if (widgets.Count == 0) {
-				widget.MeasuredMinSize = Vector2.Zero;
-				widget.MeasuredMaxSize = Vector2.PositiveInfinity;
+				Owner.MeasuredMinSize = Vector2.Zero;
+				Owner.MeasuredMaxSize = Vector2.PositiveInfinity;
 				return;
 			}
 			var minSize = new Vector2(
@@ -70,9 +73,9 @@ namespace Lime
 			var maxSize = new Vector2(
 				widgets.Sum(i => i.EffectiveMaxSize.X),
 				widgets.Max(i => i.EffectiveMaxSize.Y));
-			var extraSpace = new Vector2((widgets.Count - 1) * Spacing, 0) + widget.Padding;
-			widget.MeasuredMinSize = minSize + extraSpace;
-			widget.MeasuredMaxSize = maxSize + extraSpace;
+			var extraSpace = new Vector2((widgets.Count - 1) * Spacing, 0) + Owner.Padding;
+			Owner.MeasuredMinSize = minSize + extraSpace;
+			Owner.MeasuredMaxSize = maxSize + extraSpace;
 		}
 
 		public override NodeComponent Clone()

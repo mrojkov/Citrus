@@ -9,27 +9,50 @@ namespace Lime
 	public class StackLayout : Layout, ILayout
 	{
 		[YuzuMember]
-		public bool HorizontallySizeable { get; set; }
+		public bool HorizontallySizeable
+		{
+			get => horizontallySizeable;
+			set
+			{
+				if (horizontallySizeable != value) {
+					horizontallySizeable = value;
+					InvalidateConstraintsAndArrangement();
+				}
+			}
+		}
+
+		private bool horizontallySizeable;
 
 		[YuzuMember]
-		public bool VerticallySizeable { get; set; }
+		public bool VerticallySizeable
+		{
+			get => verticallySizeable;
+			set {
+				if (verticallySizeable != value) {
+					verticallySizeable = value;
+					InvalidateConstraintsAndArrangement();
+				}
+			}
+		}
+
+		private bool verticallySizeable;
 
 		public StackLayout()
 		{
 			DebugRectangles = new List<Rectangle>();
 		}
 
-		public override void MeasureSizeConstraints(Widget widget)
+		public override void MeasureSizeConstraints()
 		{
 			ConstraintsValid = true;
-			var widgets = GetChildren(widget);
+			var widgets = GetChildren();
 			if (widgets.Count == 0) {
-				widget.MeasuredMinSize = Vector2.Zero;
-				widget.MeasuredMaxSize = Vector2.PositiveInfinity;
+				Owner.MeasuredMinSize = Vector2.Zero;
+				Owner.MeasuredMaxSize = Vector2.PositiveInfinity;
 				return;
 			}
-			var minSize = new Vector2(widgets.Max(i => i.EffectiveMinSize.X), widgets.Max(i => i.EffectiveMinSize.Y)) + widget.Padding;
-			var maxSize = new Vector2(widgets.Max(i => i.EffectiveMaxSize.X), widgets.Max(i => i.EffectiveMaxSize.Y)) + widget.Padding;
+			var minSize = new Vector2(widgets.Max(i => i.EffectiveMinSize.X), widgets.Max(i => i.EffectiveMinSize.Y)) + Owner.Padding;
+			var maxSize = new Vector2(widgets.Max(i => i.EffectiveMaxSize.X), widgets.Max(i => i.EffectiveMaxSize.Y)) + Owner.Padding;
 			if (HorizontallySizeable) {
 				minSize.X = 0;
 				maxSize.X = float.PositiveInfinity;
@@ -38,17 +61,17 @@ namespace Lime
 				minSize.Y = 0;
 				maxSize.Y = float.PositiveInfinity;
 			}
-			widget.MeasuredMinSize = minSize;
-			widget.MeasuredMaxSize = maxSize;
+			Owner.MeasuredMinSize = minSize;
+			Owner.MeasuredMaxSize = maxSize;
 		}
 
-		public override void ArrangeChildren(Widget widget)
+		public override void ArrangeChildren()
 		{
 			DebugRectangles.Clear();
 			ArrangementValid = true;
-			foreach (var child in GetChildren(widget)) {
-				var position = widget.ContentPosition;
-				var size = widget.ContentSize;
+			foreach (var child in GetChildren()) {
+				var position = Owner.ContentPosition;
+				var size = Owner.ContentSize;
 				var align = EffectiveLayoutCell(child).Alignment;
 				if (HorizontallySizeable) {
 					position.X = child.X;

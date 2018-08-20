@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Lime
@@ -10,43 +10,43 @@ namespace Lime
 		// MeasureQueue has leaf-nodes first order, because widget size constraints depends only on the widget's children constraints.
 		private DepthOrderedQueue measureQueue = new DepthOrderedQueue(rootToLeavesOrder: false);
 
-		public void AddToArrangeQueue(Widget widget)
+		public void AddToArrangeQueue(ILayout layout)
 		{
-			arrangeQueue.Enqueue(widget);
+			arrangeQueue.Enqueue(layout);
 		}
 
-		public void AddToMeasureQueue(Widget widget)
+		public void AddToMeasureQueue(ILayout layout)
 		{
-			measureQueue.Enqueue(widget);
+			measureQueue.Enqueue(layout);
 		}
 
 		public void Layout()
 		{
 			while (true) {
-				var w = measureQueue.Dequeue();
-				if (w == null) {
+				var l = measureQueue.Dequeue();
+				if (l == null) {
 					break;
 				}
 				// Keep in mind: MeasureConstraints could force a parent constraints
 				// invalidation when child constraints has changed.
 				// See MinSize/MaxSize setters.
-				w.Layout.MeasureSizeConstraints(w);
+				l.MeasureSizeConstraints();
 			}
 			while (true) {
-				var w = arrangeQueue.Dequeue();
-				if (w == null) {
+				var l = arrangeQueue.Dequeue();
+				if (l == null) {
 					break;
 				}
 				// Keep in mind: ArrangeChildren could force a child re-arrangement when changes a child size.
 				// See ILayout.OnSizeChanged implementation.
-				w.Layout.ArrangeChildren(w);
+				l.ArrangeChildren();
 			}
 		}
 
 		class DepthOrderedQueue
 		{
 			const int MaxDepth = 20;
-			private List<Widget>[] buckets = new List<Widget>[MaxDepth];
+			private List<ILayout>[] buckets = new List<ILayout>[MaxDepth];
 			private bool rootToLeavesOrder;
 
 			public DepthOrderedQueue(bool rootToLeavesOrder)
@@ -54,19 +54,19 @@ namespace Lime
 				this.rootToLeavesOrder = rootToLeavesOrder;
 			}
 
-			public void Enqueue(Widget widget)
+			public void Enqueue(ILayout layout)
 			{
-				int d = Math.Min(MaxDepth - 1, CalcNodeDepth(widget));
+				int d = Math.Min(MaxDepth - 1, CalcNodeDepth(layout.Owner));
 				if (!rootToLeavesOrder) {
 					d = MaxDepth - 1 - d;
 				}
 				if (buckets[d] == null) {
-					buckets[d] = new List<Widget>();
+					buckets[d] = new List<ILayout>();
 				}
-				buckets[d].Add(widget);
+				buckets[d].Add(layout);
 			}
 
-			public Widget Dequeue()
+			public ILayout Dequeue()
 			{
 				for (int i = 0; i < MaxDepth; i++) {
 					var bucket = buckets[i];
@@ -74,9 +74,9 @@ namespace Lime
 						continue;
 					int c = bucket.Count;
 					if (c > 0) {
-						var widget = bucket[c - 1];
+						var layout = bucket[c - 1];
 						bucket.RemoveAt(c - 1);
-						return widget;
+						return layout;
 					}
 				}
 				return null;

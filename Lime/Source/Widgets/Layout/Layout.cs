@@ -16,10 +16,10 @@ namespace Lime
 		bool ArrangementValid { get; }
 
 		void OnSizeChanged(Widget widget, Vector2 sizeDelta);
-		void InvalidateArrangement(Widget widget);
-		void InvalidateConstraintsAndArrangement(Widget widget);
-		void MeasureSizeConstraints(Widget widget);
-		void ArrangeChildren(Widget widget);
+		void InvalidateArrangement();
+		void InvalidateConstraintsAndArrangement();
+		void MeasureSizeConstraints();
+		void ArrangeChildren();
 	}
 
 	[MutuallyExclusiveDerivedComponents]
@@ -27,14 +27,16 @@ namespace Lime
 	[YuzuDontGenerateDeserializer]
 	public class Layout : NodeComponent, ILayout
 	{
-		public new Widget Owner { get => (Widget)base.Owner; set { base.Owner = value; } }
+		public new Widget Owner
+		{
+			get => (Widget)base.Owner;
+			set => base.Owner = value;
+		}
 
 		public List<Rectangle> DebugRectangles { get; protected set; }
 
 		public bool ConstraintsValid { get; protected set; }
 		public bool ArrangementValid { get; protected set; }
-
-		LayoutCell defaultCell;
 
 		[YuzuMember]
 		public LayoutCell DefaultCell
@@ -52,83 +54,76 @@ namespace Lime
 			}
 		}
 
-		private bool ignoreHidden;
+		private LayoutCell defaultCell;
 
 		[YuzuMember]
 		public bool IgnoreHidden
 		{
 			get => ignoreHidden;
 			set {
-				ignoreHidden = value;
-				Owner?.Layout.InvalidateConstraintsAndArrangement(Owner);
+				if (ignoreHidden != value) {
+					ignoreHidden = value;
+					InvalidateConstraintsAndArrangement();
+				}
 			}
 		}
 
-		protected LayoutCell EffectiveLayoutCell(Widget widget)
-		{
-			return widget.LayoutCell ?? DefaultCell ?? LayoutCell.Default;
-		}
-
-		protected override void OnOwnerChanged(Node oldOwner)
-		{
-			base.OnOwnerChanged(oldOwner);
-			if (Owner != null) {
-				InvalidateConstraintsAndArrangement(Owner);
-			}
-			if (oldOwner != null) {
-				var w = (Widget)oldOwner;
-				(w).Layout.InvalidateConstraintsAndArrangement(w);
-			}
-		}
-
-		public override NodeComponent Clone()
-		{
-			Layout clone = (Layout)base.Clone();
-			clone.DebugRectangles = null;
-			clone.DefaultCell = (LayoutCell)DefaultCell?.Clone();
-			clone.ConstraintsValid = false;
-			clone.ArrangementValid = false;
-			return clone;
-		}
+		private bool ignoreHidden;
 
 		public Layout()
 		{
-			IgnoreHidden = true;
+			ignoreHidden = true;
 			// Make it true by default, because we want the first Invalidate() to add it to the layout queue.
 			ConstraintsValid = ArrangementValid = true;
 		}
 
-		public void InvalidateConstraintsAndArrangement(Widget widget)
+		public void InvalidateConstraintsAndArrangement()
 		{
-			if (widget.LayoutManager != null && ConstraintsValid) {
-				ConstraintsValid = false;
-				widget.LayoutManager.AddToMeasureQueue(widget);
+			if (Owner == null) {
+				return;
 			}
-			InvalidateArrangement(widget);
+			if (Owner.LayoutManager != null && ConstraintsValid) {
+				ConstraintsValid = false;
+				Owner.LayoutManager.AddToMeasureQueue(this);
+			}
+			InvalidateArrangement();
 		}
 
-		public void InvalidateArrangement(Widget widget)
+		public void InvalidateArrangement()
 		{
-			if (widget.LayoutManager != null && ArrangementValid) {
+			if (Owner == null) {
+				return;
+			}
+			if (Owner.LayoutManager != null && ArrangementValid) {
 				ArrangementValid = false;
-				widget.LayoutManager.AddToArrangeQueue(widget);
+				Owner.LayoutManager.AddToArrangeQueue(this);
 			}
 		}
 
 		public virtual void OnSizeChanged(Widget widget, Vector2 sizeDelta)
 		{
 			// Size changing could only affect children arrangement, not the widget's size constraints.
-			InvalidateArrangement(widget);
+			InvalidateArrangement();
 		}
 
-		public virtual void MeasureSizeConstraints(Widget widget) { }
+		public virtual void MeasureSizeConstraints() { }
 
-		public virtual void ArrangeChildren(Widget widget) { }
+		public virtual void ArrangeChildren() { }
 
-#region protected methods
-		protected List<Widget> GetChildren(Widget widget)
+		public override NodeComponent Clone()
 		{
-			return widget.Nodes.OfType<Widget>().Where(
+			Layout clone = (Layout)base.Clone();
+			clone.DebugRectangles = null;
+			clone.defaultCell = null;
+			clone.DefaultCell = (LayoutCell)DefaultCell?.Clone();
+			clone.ConstraintsValid = false;
+			clone.ArrangementValid = false;
+			return clone;
+		}
+
+		protected List<Widget> GetChildren()
+		{
+			return Owner.Nodes.OfType<Widget>().Where(
 				i => (!IgnoreHidden || i.Visible) &&
 				!(i.LayoutCell ?? LayoutCell.Default).Ignore
 			).ToList();
@@ -154,6 +149,25 @@ namespace Lime
 			widget.Size = innerSize;
 			widget.Pivot = Vector2.Zero;
 		}
-#endregion
+
+		protected LayoutCell EffectiveLayoutCell(Widget widget)
+		{
+			return widget.LayoutCell ?? DefaultCell ?? LayoutCell.Default;
+		}
+
+		protected override void OnOwnerChanged(Node oldOwner)
+		{
+			base.OnOwnerChanged(oldOwner);
+			if (Owner != null) {
+				InvalidateConstraintsAndArrangement();
+			}
+			if (oldOwner != null) {
+				var w = (Widget)oldOwner;
+				(w).Layout.InvalidateConstraintsAndArrangement();
+			}
+			if (defaultCell != null) {
+				defaultCell.Owner = Owner;
+			}
+		}
 	}
 }

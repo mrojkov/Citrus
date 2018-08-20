@@ -425,18 +425,18 @@ namespace Lime
 				this.content = content;
 			}
 
-			public override void MeasureSizeConstraints(Widget widget)
+			public override void MeasureSizeConstraints()
 			{
 				ConstraintsValid = true;
-				widget.MeasuredMinSize = Vector2.Zero;
-				widget.MeasuredMaxSize = Vector2.PositiveInfinity;
+				Owner.MeasuredMinSize = Vector2.Zero;
+				Owner.MeasuredMaxSize = Vector2.PositiveInfinity;
 			}
 
-			public override void ArrangeChildren(Widget widget)
+			public override void ArrangeChildren()
 			{
 				ArrangementValid = true;
-				var p = widget.ContentPosition;
-				var s = widget.ContentSize;
+				var p = Owner.ContentPosition;
+				var s = Owner.ContentSize;
 				// Check content.Layout for the compatibility with the existing code.
 				var contentMinSize = (content.Layout is AnchorLayout) ? content.Size : content.EffectiveMinSize;
 				if (direction == ScrollDirection.Vertical) {

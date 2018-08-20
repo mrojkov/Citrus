@@ -1,4 +1,4 @@
-﻿using Lime;
+using Lime;
 using Tangerine.Core;
 
 namespace Tangerine.UI
@@ -26,10 +26,10 @@ namespace Tangerine.UI
 				Nodes = {
 					new Widget {
 						Layout = new TableLayout {
-							ColCount = 2,
+							ColumnCount = 2,
 							RowCount = 2,
 							Spacing = 8,
-							ColDefaults = {
+							ColumnDefaults = {
 								new LayoutCell(Alignment.RightCenter, 0.5f, 0),
 								new LayoutCell(Alignment.LeftCenter, 1, 0)
 							}

@@ -90,21 +90,21 @@ namespace Lime
 			}
 		}
 
-		public void InvalidateConstraintsAndArrangement(Widget widget)
+		public void InvalidateConstraintsAndArrangement()
 		{
 		}
 
-		public void InvalidateArrangement(Widget widget)
-		{
-			throw new System.NotSupportedException();
-		}
-
-		public void MeasureSizeConstraints(Widget widget)
+		public void InvalidateArrangement()
 		{
 			throw new System.NotSupportedException();
 		}
 
-		public void ArrangeChildren(Widget widget)
+		public void MeasureSizeConstraints()
+		{
+			throw new System.NotSupportedException();
+		}
+
+		public void ArrangeChildren()
 		{
 			throw new System.NotSupportedException();
 		}

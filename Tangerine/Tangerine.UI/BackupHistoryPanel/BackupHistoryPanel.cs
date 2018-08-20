@@ -116,10 +116,10 @@ namespace Tangerine.UI.BackupHistoryPanel
 			}
 
 			resultPane.Layout = new TableLayout {
-				ColCount = 1,
-				ColSpacing = 8,
+				ColumnCount = 1,
+				ColumnSpacing = 8,
 				RowCount = history.Count,
-				ColDefaults = new List<LayoutCell> {new LayoutCell {StretchY = 0}}
+				ColumnDefaults = new List<LayoutCell> {new LayoutCell {StretchY = 0}}
 			};
 
 			for (int i = history.Count - 1; i >= 0; i--) {

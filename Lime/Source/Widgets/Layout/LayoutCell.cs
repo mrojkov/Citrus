@@ -7,7 +7,11 @@ namespace Lime
 	[TangerineRegisterComponent]
 	public class LayoutCell : NodeComponent
 	{
-		public new Widget Owner { get => (Widget)base.Owner; set { base.Owner = value; } }
+		public new Widget Owner
+		{
+			get => (Widget)base.Owner;
+			set => base.Owner = value;
+		}
 
 		[TangerineIgnore]
 		[YuzuMember]
@@ -16,8 +20,10 @@ namespace Lime
 			get => alignment;
 			set
 			{
-				alignment = value;
-				Owner?.InvalidateParentConstraintsAndArrangement();
+				if (alignment != value) {
+					alignment = value;
+					Owner?.InvalidateParentConstraintsAndArrangement();
+				}
 			}
 		}
 
@@ -39,24 +45,30 @@ namespace Lime
 
 
 		[YuzuMember]
-		public int ColSpan
+		public int ColumnSpan
 		{
-			get => colSpan;
-			set {
-				colSpan = value;
-				Owner?.InvalidateParentConstraintsAndArrangement();
+			get => columnSpan;
+			set
+			{
+				if (columnSpan != value) {
+					columnSpan = value;
+					Owner?.InvalidateParentConstraintsAndArrangement();
+				}
 			}
 		}
 
-		private int colSpan = 1;
+		private int columnSpan = 1;
 
 		[YuzuMember]
 		public int RowSpan
 		{
 			get => rowSpan;
-			set {
-				rowSpan = value;
-				Owner?.InvalidateParentConstraintsAndArrangement();
+			set
+			{
+				if (rowSpan != value) {
+					rowSpan = value;
+					Owner?.InvalidateParentConstraintsAndArrangement();
+				}
 			}
 		}
 
@@ -66,9 +78,12 @@ namespace Lime
 		public Vector2 Stretch
 		{
 			get => stretch;
-			set {
-				stretch = value;
-				Owner?.InvalidateParentConstraintsAndArrangement();
+			set
+			{
+				if (stretch != value) {
+					stretch = value;
+					Owner?.InvalidateParentConstraintsAndArrangement();
+				}
 			}
 		}
 
@@ -81,9 +96,12 @@ namespace Lime
 		public bool Ignore
 		{
 			get => ignore;
-			set {
-				ignore = value;
-				Owner?.InvalidateParentConstraintsAndArrangement();
+			set
+			{
+				if (ignore != value) {
+					ignore = value;
+					Owner?.InvalidateParentConstraintsAndArrangement();
+				}
 			}
 		}
 
@@ -122,6 +140,9 @@ namespace Lime
 		public static readonly Alignment Center = new Alignment { X = HAlignment.Center, Y = VAlignment.Center };
 		public static readonly Alignment LeftCenter = new Alignment { X = HAlignment.Left, Y = VAlignment.Center };
 		public static readonly Alignment RightCenter = new Alignment { X = HAlignment.Right, Y = VAlignment.Center };
+
+		public static bool operator == (Alignment lhs, Alignment rhs) => lhs.X == rhs.X && lhs.Y == rhs.Y;
+		public static bool operator !=(Alignment lhs, Alignment rhs) => lhs.X != rhs.X || lhs.Y != rhs.Y;
 	}
 }
 

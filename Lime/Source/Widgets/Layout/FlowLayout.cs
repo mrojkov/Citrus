@@ -14,15 +14,51 @@ namespace Lime
 			TopToBottom,
 		}
 		private List<int> splitIndices = new List<int>();
+
 		[YuzuMember]
-		public float Spacing { get; set; }
+		public float Spacing
+		{
+			get => spacing;
+			set
+			{
+				if (spacing != value) {
+					spacing = value;
+					InvalidateConstraintsAndArrangement();
+				}
+			}
+		}
+
+		private float spacing;
 
 		// TODO: implement for any alignment other than justify or left
 		[YuzuMember]
-		public HAlignment RowAlignment { get; set; }
+		public HAlignment RowAlignment
+		{
+			get => rowAlignment;
+			set
+			{
+				if (rowAlignment != value) {
+					rowAlignment = value;
+					InvalidateConstraintsAndArrangement();
+				}
+			}
+		}
+
+		private HAlignment rowAlignment;
 
 		[YuzuMember]
-		public VAlignment ColumnAlignment { get; set; }
+		public VAlignment ColumnAlignment
+		{
+			get => columnAlignment;
+			set {
+				if (columnAlignment != value) {
+					columnAlignment = value;
+					InvalidateConstraintsAndArrangement();
+				}
+			}
+		}
+
+		private VAlignment columnAlignment;
 
 		protected readonly FlowDirection Direction;
 
@@ -62,14 +98,14 @@ namespace Lime
 
 		public override void OnSizeChanged(Widget widget, Vector2 sizeDelta)
 		{
-			InvalidateConstraintsAndArrangement(widget);
+			InvalidateConstraintsAndArrangement();
 		}
 
-		public override void ArrangeChildren(Widget widget)
+		public override void ArrangeChildren()
 		{
 			if (Direction == FlowDirection.LeftToRight) {
 				ArrangementValid = true;
-				var widgets = GetChildren(widget);
+				var widgets = GetChildren();
 				if (widgets.Count == 0) {
 					return;
 				}
@@ -83,7 +119,7 @@ namespace Lime
 					lines[j] = widgets.GetRange(i0, i1 - i0);
 					maxLineHeights[j] = lines[j].Max((w) => w.EffectiveMinSize.Y);
 				}
-				var availableHeight = Math.Max(0, widget.ContentHeight - (lines.Length - 1) * Spacing);
+				var availableHeight = Math.Max(0, Owner.ContentHeight - (lines.Length - 1) * Spacing);
 				float dy = 0.0f;
 				for (int j = 0; j < splitIndices.Count - 1; j++) {
 					int i0 = splitIndices[j];
@@ -91,7 +127,7 @@ namespace Lime
 					var constraints = new LinearAllocator.Constraints[i1 - i0];
 					var line = lines[j];
 					var maxLineHeight = maxLineHeights[j];
-					var availableWidth = Math.Max(0, widget.ContentWidth - (line.Count - 1) * Spacing);
+					var availableWidth = Math.Max(0, Owner.ContentWidth - (line.Count - 1) * Spacing);
 					int i = 0;
 					foreach (var w in line) {
 						constraints[i++] = new LinearAllocator.Constraints {
@@ -110,7 +146,7 @@ namespace Lime
 						var justifyDy = (availableHeight - maxLineHeights.Sum(h => h)) / (lines.Length + 1);
 						dy += justifyDy;
 					}
-					var position = new Vector2(widget.Padding.Left, widget.Padding.Top + dy);
+					var position = new Vector2(Owner.Padding.Left, Owner.Padding.Top + dy);
 					foreach (var w in line) {
 						position.X += justifyDx;
 						var height = (w.LayoutCell ?? LayoutCell.Default).Stretch.Y == 0.0f
@@ -126,7 +162,7 @@ namespace Lime
 				}
 			} else if (Direction == FlowDirection.TopToBottom) {
 				ArrangementValid = true;
-				var widgets = GetChildren(widget);
+				var widgets = GetChildren();
 				if (widgets.Count == 0) {
 					return;
 				}
@@ -140,7 +176,7 @@ namespace Lime
 					lines[j] = widgets.GetRange(i0, i1 - i0);
 					maxLineWidths[j] = lines[j].Max((w) => w.EffectiveMinSize.X);
 				}
-				var availableWidth = Math.Max(0, widget.ContentWidth - (lines.Length - 1) * Spacing);
+				var availableWidth = Math.Max(0, Owner.ContentWidth - (lines.Length - 1) * Spacing);
 				float dx = 0.0f;
 				for (int j = 0; j < splitIndices.Count - 1; j++) {
 					int i0 = splitIndices[j];
@@ -148,7 +184,7 @@ namespace Lime
 					var constraints = new LinearAllocator.Constraints[i1 - i0];
 					var line = lines[j];
 					var maxLineWidth = maxLineWidths[j];
-					var availableHeight = Math.Max(0, widget.ContentHeight - (line.Count - 1) * Spacing);
+					var availableHeight = Math.Max(0, Owner.ContentHeight - (line.Count - 1) * Spacing);
 					int i = 0;
 					foreach (var w in line) {
 						constraints[i++] = new LinearAllocator.Constraints {
@@ -167,7 +203,7 @@ namespace Lime
 						var justifyDx = (availableWidth - maxLineWidths.Sum(w => w)) / (lines.Length + 1);
 						dx += justifyDx;
 					}
-					var position = new Vector2(widget.Padding.Left + dx, widget.Padding.Top);
+					var position = new Vector2(Owner.Padding.Left + dx, Owner.Padding.Top);
 					foreach (var w in line) {
 						position.Y += justifyDy;
 						var width = (w.LayoutCell ?? LayoutCell.Default).Stretch.X == 0.0f
@@ -186,14 +222,14 @@ namespace Lime
 			}
 		}
 
-		public override void MeasureSizeConstraints(Widget widget)
+		public override void MeasureSizeConstraints()
 		{
 			if (Direction == FlowDirection.LeftToRight) {
 				ConstraintsValid = true;
-				var widgets = GetChildren(widget);
-				float paddingH = widget.Padding.Left + widget.Padding.Right;
+				var widgets = GetChildren();
+				float paddingH = Owner.Padding.Left + Owner.Padding.Right;
 				float dx = paddingH;
-				float dy = widget.Padding.Top + widget.Padding.Bottom - Spacing;
+				float dy = Owner.Padding.Top + Owner.Padding.Bottom - Spacing;
 				float dyInRowMax = 0;
 				int i = 0;
 				Action<int> split = (splitIndex) => {
@@ -209,12 +245,12 @@ namespace Lime
 					var w = widgets[i];
 					minWidth = Math.Max(minWidth, w.EffectiveMinSize.X);
 					dx += w.EffectiveMinSize.X;
-					if (dx <= widget.Width) {
+					if (dx <= Owner.Width) {
 						dyInRowMax = Mathf.Max(dyInRowMax, w.EffectiveMinSize.Y);
 					}
-					if (w.EffectiveMinSize.X + paddingH > widget.Width && splitIndices.Last() == i) {
+					if (w.EffectiveMinSize.X + paddingH > Owner.Width && splitIndices.Last() == i) {
 						split(i + 1);
-					} else if (dx > widget.Width) {
+					} else if (dx > Owner.Width) {
 						split(i);
 						i--;
 					} else if (i + 1 == widgets.Count) {
@@ -224,13 +260,13 @@ namespace Lime
 					}
 					i++;
 				}
-				widget.MeasuredMinSize = new Vector2(minWidth, dy);
-				widget.MeasuredMaxSize = new Vector2(float.PositiveInfinity, dy);
+				Owner.MeasuredMinSize = new Vector2(minWidth, dy);
+				Owner.MeasuredMaxSize = new Vector2(float.PositiveInfinity, dy);
 			} else if (Direction == FlowDirection.TopToBottom) {
 				ConstraintsValid = true;
-				var widgets = GetChildren(widget);
-				float paddingV = widget.Padding.Top + widget.Padding.Bottom;
-				float dx = widget.Padding.Left + widget.Padding.Right - Spacing;
+				var widgets = GetChildren();
+				float paddingV = Owner.Padding.Top + Owner.Padding.Bottom;
+				float dx = Owner.Padding.Left + Owner.Padding.Right - Spacing;
 				float dy = paddingV;
 				float dxInColumnMax = 0;
 				int i = 0;
@@ -247,12 +283,12 @@ namespace Lime
 					var w = widgets[i];
 					minHeight = Math.Max(minHeight, w.EffectiveMinSize.Y);
 					dy += w.EffectiveMinSize.Y;
-					if (dy <= widget.Height) {
+					if (dy <= Owner.Height) {
 						dxInColumnMax = Mathf.Max(dxInColumnMax, w.EffectiveMinSize.X);
 					}
-					if (w.EffectiveMinSize.Y + paddingV > widget.Height && splitIndices.Last() == i) {
+					if (w.EffectiveMinSize.Y + paddingV > Owner.Height && splitIndices.Last() == i) {
 						split(i + 1);
-					} else if (dy > widget.Height) {
+					} else if (dy > Owner.Height) {
 						split(i);
 						i--;
 					} else if (i + 1 == widgets.Count) {
@@ -262,8 +298,8 @@ namespace Lime
 					}
 					i++;
 				}
-				widget.MeasuredMinSize = new Vector2(dx, minHeight);
-				widget.MeasuredMaxSize = new Vector2(dx, float.PositiveInfinity);
+				Owner.MeasuredMinSize = new Vector2(dx, minHeight);
+				Owner.MeasuredMaxSize = new Vector2(dx, float.PositiveInfinity);
 			} else {
 				throw new Lime.Exception($"Invalid FlowDirection: {Direction}");
 			}
