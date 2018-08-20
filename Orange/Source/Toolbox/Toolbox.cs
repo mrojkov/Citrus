@@ -138,6 +138,7 @@ namespace Orange
 			foreach (var n in clone.Descendants) {
 				f(n);
 			}
+			clone.Update(0);
 			return clone;
 		}
 	}
