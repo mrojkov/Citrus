@@ -209,11 +209,7 @@ namespace Tangerine.UI.Inspector
 						}
 					}
 					if (editor != null) {
-						if (!isSubclassOfNodeComponent) {
-							DecoratePropertyEditor(editor, row++);
-						} else {
-							DecorateComponentPropertyEditor(editor, row++);
-						}
+						DecoratePropertyEditor(editor, row++);
 						editors.Add(editor);
 						var showCondition = PropertyAttributes<TangerineIgnoreIfAttribute>.Get(type, param.PropertyInfo.Name);
 						if (showCondition != null) {
@@ -258,6 +254,7 @@ namespace Tangerine.UI.Inspector
 					types.Add(type);
 				}
 			}
+			types.Sort((a, b) => a.Name.CompareTo(b.Name));
 
 			var label = new Widget {
 				LayoutCell = new LayoutCell { StretchY = 0 },
@@ -391,22 +388,6 @@ namespace Tangerine.UI.Inspector
 				ColorTheme.Current.Inspector.StripeBackground2
 			) { IgnorePadding = true });
 			editor.ContainerWidget.Components.Add(new DocumentationComponent(editor.EditorParams.PropertyInfo.DeclaringType.Name + "." + editor.EditorParams.PropertyName));
-		}
-
-		private static void DecorateComponentPropertyEditor(IPropertyEditor editor, int row)
-		{
-			var ctr = editor.ContainerWidget;
-			if (!(editor is IExpandablePropertyEditor)) {
-				ctr.Nodes.Insert(0, new HSpacer(20));
-			}
-
-			ctr.Nodes.Insert(2, new HSpacer(42));
-			editor.ContainerWidget.Padding = new Thickness { Left = 4, Top = 1, Right = 12, Bottom = 1 };
-			editor.ContainerWidget.CompoundPresenter.Add(new WidgetFlatFillPresenter(
-				row % 2 == 0 ?
-					ColorTheme.Current.Inspector.StripeBackground1 :
-					ColorTheme.Current.Inspector.StripeBackground2
-			) { IgnorePadding = true });
 		}
 
 		private static string CamelCaseToLabel(string text)
