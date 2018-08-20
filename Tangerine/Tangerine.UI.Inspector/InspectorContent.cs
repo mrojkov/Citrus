@@ -38,7 +38,7 @@ namespace Tangerine.UI.Inspector
 				var nodes = objects.Cast<Node>().ToList();
 				foreach (var t in GetComponentsTypes(nodes)) {
 					var components = nodes.Select(n => n.Components.Get(t));
-					PopulateContentForType(t, components, widget, "[" + Yuzu.Util.TypeSerializer.Serialize(t) + "]").ToList();
+					PopulateContentForType(t, components, widget, $"[{Yuzu.Util.TypeSerializer.Serialize(t)}]").ToList();
 				}
 				AddComponentsMenu(nodes, widget);
 			}
@@ -415,6 +415,12 @@ namespace Tangerine.UI.Inspector
 		{
 			using (Document.Current.History.BeginTransaction()) {
 				foreach (var c in components) {
+					var componentTypeName = $"[{Yuzu.Util.TypeSerializer.Serialize(c.GetType())}]";
+					foreach (var a in c.Owner.Animators.ToList()) {
+						if (a.TargetPropertyPath.StartsWith(componentTypeName, StringComparison.Ordinal)) {
+							RemoveAnimator.Perform(a);
+						}
+					}
 					DeleteComponent.Perform(c.Owner, c);
 				}
 				Document.Current.History.CommitTransaction();
