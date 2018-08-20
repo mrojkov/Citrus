@@ -46,15 +46,14 @@ namespace Tangerine.UI
 		void SetComponent(IPropertyEditorParams editorParams, Type t)
 		{
 			DoTransaction(() => {
-				foreach (var obj in editorParams.Objects) {
-					var current = new Property<Alignment>(obj, editorParams.PropertyName).Value;
+				SetProperty<Alignment>((current) => {
 					if (t == typeof(HAlignment)) {
 						current.X = (HAlignment)selectorH.Value;
 					} else if (t == typeof(VAlignment)) {
 						current.Y = (VAlignment)selectorV.Value;
 					}
-					editorParams.PropertySetter(obj, editorParams.PropertyName, current);
-				}
+					return current;
+				});
 			});
 		}
 

@@ -30,11 +30,10 @@ namespace Tangerine.UI
 		{
 			if (Parser.TryParse(editor.Text, out double newValue)) {
 				DoTransaction(() => {
-					foreach (var obj in editorParams.Objects) {
-						var current = new Property<Vector2>(obj, editorParams.PropertyName).Value;
-						current[component] = (float)newValue;
-						editorParams.PropertySetter(obj, editorParams.PropertyName, current);
-					}
+					SetProperty<Vector2>((current) => {
+						current[component] = newValue;
+						return current;
+					});
 				});
 			}
 			editor.Text = currentValue.ToString();

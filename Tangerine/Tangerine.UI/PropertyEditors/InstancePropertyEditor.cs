@@ -43,7 +43,7 @@ namespace Tangerine.UI
 			Selector.Changed += a => {
 				if (a.ChangedByUser) {
 					Type type = (Type)Selector.Items[a.Index].Value;
-					SetProperty(() => type != null ? Activator.CreateInstance(type) : null);
+					SetProperty<object>((_) => type != null ? Activator.CreateInstance(type) : null);
 				}
 			};
 			Selector.AddChangeWatcher(CoalescedPropertyValue(), v => {

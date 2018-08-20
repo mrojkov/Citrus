@@ -36,12 +36,11 @@ namespace Tangerine.UI
 			float newValue;
 			if (float.TryParse(editor.Text, out newValue)) {
 				DoTransaction(() => {
-					foreach (var obj in editorParams.Objects) {
-						var current = new Property<Quaternion>(obj, editorParams.PropertyName).Value.ToEulerAngles();
-						current[component] = newValue * Mathf.DegToRad;
-						editorParams.PropertySetter(obj, editorParams.PropertyName,
-							Quaternion.CreateFromEulerAngles(current));
-					}
+					SetProperty<Quaternion>((current) => {
+						var eulerAngles = current.ToEulerAngles();
+						eulerAngles[component] = newValue * Mathf.DegToRad;
+						return Quaternion.CreateFromEulerAngles(eulerAngles);
+					});
 				});
 			} else {
 				editor.Text = RoundAngle(currentValue.ToEulerAngles()[component] * Mathf.RadToDeg).ToString();

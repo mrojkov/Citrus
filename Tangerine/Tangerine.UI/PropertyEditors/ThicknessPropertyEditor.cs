@@ -39,16 +39,15 @@ namespace Tangerine.UI
 			float newValue;
 			if (float.TryParse(editor.Text, out newValue)) {
 				DoTransaction(() => {
-					foreach (var obj in editorParams.Objects) {
-						var current = new Property<Thickness>(obj, editorParams.PropertyName).Value;
+					SetProperty<Thickness>((current) => {
 						switch (component) {
 							case 0: current.Left = newValue; break;
 							case 1: current.Right = newValue; break;
 							case 2: current.Top = newValue; break;
 							case 3: current.Bottom = newValue; break;
 						}
-						editorParams.PropertySetter(obj, editorParams.PropertyName, current);
-					}
+						return current;
+					});
 				});
 			} else {
 				switch (component) {

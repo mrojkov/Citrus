@@ -187,21 +187,31 @@ namespace Tangerine.UI
 				bool allRootObjectsAnimable = EditorParams.RootObjects.All(o => o is IAnimationHost);
 				if (allRootObjectsAnimable) {
 					foreach (var o in EditorParams.RootObjects) {
-						EditorParams.PropertySetter(o, EditorParams.PropertyPath, value);
+						((IPropertyEditorParamsInternal)EditorParams).PropertySetter(o, EditorParams.PropertyPath, value);
 					}
 				} else {
 					foreach (var o in EditorParams.Objects) {
-						EditorParams.PropertySetter(o, EditorParams.PropertyName, value);
+						((IPropertyEditorParamsInternal)EditorParams).PropertySetter(o, EditorParams.PropertyName, value);
 					}
 				}
 			});
 		}
 
-		protected void SetProperty(Func<object> valueProducer)
+		protected void SetProperty<ValueType>(Func<ValueType, object> valueProducer)
 		{
 			DoTransaction(() => {
-				foreach (var o in EditorParams.Objects) {
-					EditorParams.PropertySetter(o, EditorParams.PropertyName, valueProducer());
+				bool allRootObjectsAnimable = EditorParams.RootObjects.All(o => o is IAnimationHost);
+				if (allRootObjectsAnimable) {
+					foreach (var o in EditorParams.RootObjects) {
+						var (p, a) = AnimationUtils.GetPropertyByPath((IAnimationHost)o, EditorParams.PropertyPath);
+						var current = p.Info.GetValue(a);
+						((IPropertyEditorParamsInternal)EditorParams).PropertySetter(o, EditorParams.PropertyPath, valueProducer((ValueType)current));
+					}
+				} else {
+					foreach (var o in EditorParams.Objects) {
+						var current = new Property(o, EditorParams.PropertyName).Value;
+						((IPropertyEditorParamsInternal)EditorParams).PropertySetter(o, EditorParams.PropertyName, valueProducer((ValueType)current));
+					}
 				}
 			});
 		}

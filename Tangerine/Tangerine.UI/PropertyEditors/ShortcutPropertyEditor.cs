@@ -19,9 +19,7 @@ namespace Tangerine.UI
 		private void SetValue(Shortcut value)
 		{
 			var oldValue = CoalescedPropertyValue().GetValue();
-			foreach (var obj in EditorParams.Objects) {
-				EditorParams.PropertySetter(obj, EditorParams.PropertyName, value);
-			}
+			SetProperty(value);
 			if (value != oldValue) {
 				PropertyChanged?.Invoke();
 			}

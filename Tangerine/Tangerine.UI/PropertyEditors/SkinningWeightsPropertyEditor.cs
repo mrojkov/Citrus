@@ -61,14 +61,13 @@ namespace Tangerine.UI
 			float newValue;
 			if (float.TryParse(editor.Text, out newValue)) {
 				DoTransaction(() => {
-					foreach (var obj in editorParams.Objects) {
-						var prop = new Property<SkinningWeights>(obj, editorParams.PropertyName).Value.Clone();
-						prop[idx] = new BoneWeight {
+					SetProperty<SkinningWeights>((current) => {
+						current[idx] = new BoneWeight {
 							Index = (int)newValue,
-							Weight = prop[idx].Weight
+							Weight = current[idx].Weight
 						};
-						editorParams.PropertySetter(obj, editorParams.PropertyName, prop);
-					}
+						return current;
+					});
 				});
 			} else {
 				editor.Text = sw[idx].Index.ToString();
@@ -80,14 +79,13 @@ namespace Tangerine.UI
 			float newValue;
 			if (float.TryParse(editor.Text, out newValue)) {
 				DoTransaction(() => {
-					foreach (var obj in editorParams.Objects) {
-						var prop = new Property<SkinningWeights>(obj, editorParams.PropertyName).Value.Clone();
-						prop[idx] = new BoneWeight {
-							Index = prop[idx].Index,
+					SetProperty<SkinningWeights>((current) => {
+						current[idx] = new BoneWeight {
+							Index = current[idx].Index,
 							Weight = newValue
 						};
-						editorParams.PropertySetter(obj, editorParams.PropertyName, prop);
-					}
+						return current;
+					});
 				});
 			} else {
 				editor.Text = sw[idx].Weight.ToString();

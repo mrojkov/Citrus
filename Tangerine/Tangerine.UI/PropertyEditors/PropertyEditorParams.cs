@@ -5,8 +5,10 @@ using Tangerine.Core;
 
 namespace Tangerine.UI
 {
-	public class PropertyEditorParams : IPropertyEditorParams
+	public class PropertyEditorParams : IPropertyEditorParams, IPropertyEditorParamsInternal
 	{
+		private PropertySetterDelegate propertySetter;
+
 		public bool ShowLabel { get; set; } = true;
 		public Widget InspectorPane { get; set; }
 		public IEnumerable<object> RootObjects { get; set; }
@@ -22,11 +24,13 @@ namespace Tangerine.UI
 		public Func<EditBox> EditBoxFactory { get; set; }
 		public Func<DropDownList> DropDownListFactory { get; set; }
 		public Func<object> DefaultValueGetter { get; set; }
-		public PropertySetterDelegate PropertySetter { get; set; }
 		public ITransactionalHistory History { get; set; }
+		PropertySetterDelegate IPropertyEditorParamsInternal.PropertySetter => propertySetter;
+		public PropertySetterDelegate PropertySetter { set { propertySetter = value; } }
 
 		public PropertyEditorParams(Widget inspectorPane, IEnumerable<object> objects, IEnumerable<object> rootObjects, Type type, string propertyName, string propertyPath)
 		{
+			PropertySetter = SetProperty;
 			InspectorPane = inspectorPane;
 			Objects = objects;
 			RootObjects = rootObjects;
@@ -36,7 +40,6 @@ namespace Tangerine.UI
 			TangerineAttribute = PropertyAttributes<TangerineKeyframeColorAttribute>.Get(Type, PropertyName) ?? new TangerineKeyframeColorAttribute(0);
 			Group = PropertyAttributes<TangerineGroupAttribute>.Get(Type, PropertyName)?.Name ?? String.Empty;
 			PropertyInfo = Type.GetProperty(PropertyName);
-			PropertySetter = SetProperty;
 			NumericEditBoxFactory = () => new ThemedNumericEditBox();
 			DropDownListFactory = () => new ThemedDropDownList();
 			EditBoxFactory = () => new ThemedEditBox();

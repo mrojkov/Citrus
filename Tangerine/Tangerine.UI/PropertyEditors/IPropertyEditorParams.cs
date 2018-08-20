@@ -20,11 +20,16 @@ namespace Tangerine.UI
 		bool ShowLabel { get; set; }
 		TangerineKeyframeColorAttribute TangerineAttribute { get; set; }
 		System.Reflection.PropertyInfo PropertyInfo { get; set; }
+		PropertySetterDelegate PropertySetter { set; }
 		Func<NumericEditBox> NumericEditBoxFactory { get; set; }
 		Func<DropDownList> DropDownListFactory { get; set; }
 		Func<EditBox> EditBoxFactory { get; set; }
 		Func<object> DefaultValueGetter { get; set; }
-		PropertySetterDelegate PropertySetter { get; set; }
 		ITransactionalHistory History { get; set; }
+	}
+
+	public interface IPropertyEditorParamsInternal
+	{
+		PropertySetterDelegate PropertySetter { get; }
 	}
 }
