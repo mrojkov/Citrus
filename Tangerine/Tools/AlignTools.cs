@@ -10,7 +10,6 @@ namespace Tangerine
 	public enum AlignObject
 	{
 		Selection,
-		KeyObject,
 		Root,
 		Parent
 	}
@@ -29,8 +28,6 @@ namespace Tangerine
 			switch (align) {
 				case AlignObject.Selection:
 					return "Align to Selection";
-				case AlignObject.KeyObject:
-					return "Align to Key Object";
 				case AlignObject.Root:
 					return "Align to Root";
 				case AlignObject.Parent:
@@ -178,11 +175,6 @@ namespace Tangerine
 			}
 		}
 
-		protected virtual void ToKeyObject()
-		{
-			throw new NotImplementedException();
-		}
-
 		protected virtual void ToRoot()
 		{
 			var container = (Widget)Core.Document.Current.RootNode;
@@ -212,9 +204,6 @@ namespace Tangerine
 			switch (AlignAndDistributeObjectHandler.AlignObject) {
 				case AlignObject.Selection:
 					ToSelection();
-					break;
-				case AlignObject.KeyObject:
-					ToKeyObject();
 					break;
 				case AlignObject.Root:
 					ToRoot();
