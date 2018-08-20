@@ -98,11 +98,11 @@ namespace Tangerine.UI.Inspector
 				// WTF, Bug in Mono?
 				return false;
 			}
-			var yuzuField = PropertyAttributes<YuzuField>.Get(type, property.Name);
+			var yuzuItem = Yuzu.Metadata.Meta.Get(type, Serialization.DefaultYuzuCommonOptions).Items.Find(i => i.PropInfo == property);
 			var tang = PropertyAttributes<TangerineKeyframeColorAttribute>.Get(type, property.Name);
 			var tangIgnore = PropertyAttributes<TangerineIgnoreAttribute>.Get(type, property.Name);
 			var tangInspect = PropertyAttributes<TangerineInspectAttribute>.Get(type, property.Name);
-			if (tangInspect == null && (yuzuField == null && tang == null || tangIgnore != null)) {
+			if (tangInspect == null && (yuzuItem == null && tang == null || tangIgnore != null)) {
 				return false;
 			}
 			if (type.IsSubclassOf(typeof(Node))) {
