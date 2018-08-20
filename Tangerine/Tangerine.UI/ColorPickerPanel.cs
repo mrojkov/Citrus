@@ -115,12 +115,15 @@ namespace Tangerine.UI
 			}
 
 			private Texture2D texture = new Texture2D();
+			private Color4[] image;
 
 			void DrawControl()
 			{
 				int size = (int)Math.Floor(OuterRadius * 2);
 				if (wasHueChanged) {
-					Color4[] image = new Color4[size * size];
+					if (image == null) {
+						image = new Color4[size * size];
+					}
 					for (int y = 0; y < size; ++y) {
 						for (int x = 0; x < size; ++x) {
 							var pick = Pick(size - x - 1, y);
