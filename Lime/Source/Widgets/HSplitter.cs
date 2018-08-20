@@ -145,7 +145,6 @@ namespace Lime
 		}
 
 		[YuzuDontGenerateDeserializer]
-		[TangerineIgnore]
 		class HSplitterLayout : HBoxLayout
 		{
 			public override void MeasureSizeConstraints(Widget widget)

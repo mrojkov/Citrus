@@ -102,24 +102,22 @@ namespace Lime
 
 		public ILayout Layout
 		{
-			get { return Components.Get<LayoutComponent>()?.Layout ?? AnchorLayout.Instance; }
+			get { return (ILayout)Components.Get<Layout>() ?? AnchorLayout.Instance; }
 			set
 			{
-				var layoutComponent = Components.Get<LayoutComponent>();
+				var layoutComponent = Components.Get<Layout>();
 				bool isAnchorLayout = value is AnchorLayout;
 				if (layoutComponent == null) {
 					if (isAnchorLayout) {
 						return;
 					}
-					layoutComponent = new LayoutComponent {
-						Layout = value
-					};
-					Components.Add(layoutComponent);
+					Components.Add((Layout)value);
 				} else if (isAnchorLayout) {
 					Components.Remove(layoutComponent);
 					return;
 				} else {
-					layoutComponent.Layout = value;
+					Components.Remove(layoutComponent);
+					Components.Add((Layout)value);
 				}
 			}
 		}
@@ -129,20 +127,15 @@ namespace Lime
 		/// </summary>
 		public LayoutCell LayoutCell
 		{
-			get
-			{
-				return Components.Get<LayoutCellComponent>()?.LayoutCell;
-			}
+			get => Components.Get<LayoutCell>();
 			set
 			{
-				var layoutCellComponent = Components.Get<LayoutCellComponent>();
-				if (layoutCellComponent == null) {
-					layoutCellComponent = new LayoutCellComponent {
-						LayoutCell = value
-					};
-					Components.Add(layoutCellComponent);
-				} else {
-					layoutCellComponent.LayoutCell = value;
+				var layoutCellComponent = Components.Get<LayoutCell>();
+				if (layoutCellComponent != null) {
+					Components.Remove(layoutCellComponent);
+				}
+				if (value != null) {
+					Components.Add(value);
 				}
 			}
 		}

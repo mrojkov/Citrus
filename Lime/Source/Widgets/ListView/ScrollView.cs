@@ -414,8 +414,7 @@ namespace Lime
 		}
 
 		[YuzuDontGenerateDeserializer]
-		[TangerineIgnore]
-		protected class Layout : CommonLayout, ILayout
+		protected class Layout : Lime.Layout, ILayout
 		{
 			readonly Widget content;
 			protected readonly ScrollDirection direction;
@@ -450,7 +449,7 @@ namespace Lime
 				LayoutWidgetWithinCell(content, p, s, Alignment.LeftTop);
 			}
 
-			ILayout ILayout.Clone(Widget newOwner)
+			public override NodeComponent Clone()
 			{
 				throw new NotImplementedException();
 			}

@@ -6,54 +6,6 @@ using Yuzu;
 
 namespace Lime
 {
-	[AllowedOwnerTypes(typeof(Widget))]
-	[TangerineRegisterComponent]
-	public class LayoutComponent : NodeComponent
-	{
-		private ILayout layout;
-
-		[YuzuMember]
-		public ILayout Layout
-		{
-			get => layout;
-			set
-			{
-				if (layout != null) {
-					layout.Owner = null;
-				}
-				layout = value;
-				if (layout != null && Owner != null) {
-					var w = (Widget)Owner;
-					layout.Owner = w;
-					layout.InvalidateConstraintsAndArrangement(w);
-				}
-			}
-		}
-
-		protected override void OnOwnerChanged(Node oldOwner)
-		{
-			base.OnOwnerChanged(oldOwner);
-			if (Owner != null) {
-				if (layout != null) {
-					var w = (Widget)Owner;
-					layout.Owner = w;
-					layout.InvalidateConstraintsAndArrangement(w);
-				}
-			}
-			if (oldOwner != null) {
-				var w = (Widget)oldOwner;
-				(w).Layout.InvalidateConstraintsAndArrangement(w);
-			}
-		}
-
-		public override NodeComponent Clone()
-		{
-			var clone = (LayoutComponent)base.Clone();
-			clone.layout = Layout.Clone(null);
-			return clone;
-		}
-	}
-
 	public interface ILayout
 	{
 		List<Rectangle> DebugRectangles { get; }
@@ -68,27 +20,37 @@ namespace Lime
 		void InvalidateConstraintsAndArrangement(Widget widget);
 		void MeasureSizeConstraints(Widget widget);
 		void ArrangeChildren(Widget widget);
-		ILayout Clone(Widget newOwner);
 	}
 
+	[MutuallyExclusiveDerivedComponents]
+	[AllowedComponentOwnerTypes(typeof(Widget))]
 	[YuzuDontGenerateDeserializer]
-	[TangerineIgnore]
-	public class CommonLayout : IAnimable
+	public class Layout : NodeComponent, ILayout
 	{
-		public Widget Owner { get; set; }
-
-		public void RemoveAnimators(IAnimable animable)
-		{
-			Owner.Animators.RemoveAllByAnimable(animable);
-		}
+		public new Widget Owner { get => (Widget)base.Owner; set { base.Owner = value; } }
 
 		public List<Rectangle> DebugRectangles { get; protected set; }
 
 		public bool ConstraintsValid { get; protected set; }
 		public bool ArrangementValid { get; protected set; }
 
+		LayoutCell defaultCell;
+
 		[YuzuMember]
-		public LayoutCell DefaultCell { get; set; }
+		public LayoutCell DefaultCell
+		{
+			get => defaultCell;
+			set
+			{
+				if (defaultCell != null) {
+					defaultCell.Owner = null;
+				}
+				defaultCell = value;
+				if (defaultCell != null) {
+					defaultCell.Owner = Owner;
+				}
+			}
+		}
 
 		private bool ignoreHidden;
 
@@ -107,18 +69,29 @@ namespace Lime
 			return widget.LayoutCell ?? DefaultCell ?? LayoutCell.Default;
 		}
 
-		public CommonLayout Clone(Node newOwner)
+		protected override void OnOwnerChanged(Node oldOwner)
 		{
-			CommonLayout clone = (CommonLayout)MemberwiseClone();
-			clone.Owner = (Widget)newOwner;
+			base.OnOwnerChanged(oldOwner);
+			if (Owner != null) {
+				InvalidateConstraintsAndArrangement(Owner);
+			}
+			if (oldOwner != null) {
+				var w = (Widget)oldOwner;
+				(w).Layout.InvalidateConstraintsAndArrangement(w);
+			}
+		}
+
+		public override NodeComponent Clone()
+		{
+			Layout clone = (Layout)base.Clone();
 			clone.DebugRectangles = null;
-			clone.DefaultCell = DefaultCell?.Clone(clone.Owner);
+			clone.DefaultCell = (LayoutCell)DefaultCell?.Clone();
 			clone.ConstraintsValid = false;
 			clone.ArrangementValid = false;
 			return clone;
 		}
 
-		public CommonLayout()
+		public Layout()
 		{
 			IgnoreHidden = true;
 			// Make it true by default, because we want the first Invalidate() to add it to the layout queue.

@@ -115,7 +115,6 @@ namespace Lime
 		}
 
 		[YuzuDontGenerateDeserializer]
-		[TangerineIgnore]
 		class VSplitterLayout : VBoxLayout
 		{
 			public override void MeasureSizeConstraints(Widget widget)

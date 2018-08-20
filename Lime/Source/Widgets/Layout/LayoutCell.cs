@@ -3,70 +3,11 @@ using Yuzu;
 
 namespace Lime
 {
-	[AllowedOwnerTypes(typeof(Widget))]
+	[AllowedComponentOwnerTypes(typeof(Widget))]
 	[TangerineRegisterComponent]
-	public class LayoutCellComponent : NodeComponent
+	public class LayoutCell : NodeComponent
 	{
-		private LayoutCell layoutCell;
-
-		[YuzuMember]
-		public LayoutCell LayoutCell
-		{
-			get => layoutCell;
-			set
-			{
-				if (layoutCell != null) {
-					layoutCell.Owner = null;
-				}
-				layoutCell = value;
-				if (layoutCell != null) {
-					var w = layoutCell.Owner = (Widget)Owner;
-					if (Owner != null) {
-						w.InvalidateParentConstraintsAndArrangement();
-					}
-				}
-			}
-		}
-
-		protected override void OnOwnerChanged(Node oldOwner)
-		{
-			base.OnOwnerChanged(oldOwner);
-			if (LayoutCell != null) {
-				var w = (Widget)Owner;
-				LayoutCell.Owner = w;
-				if (Owner != null) {
-					w.InvalidateParentConstraintsAndArrangement();
-				}
-				if (oldOwner != null) {
-					w = (Widget)oldOwner;
-					w.InvalidateParentConstraintsAndArrangement();
-				}
-			}
-		}
-
-		public override NodeComponent Clone()
-		{
-			var clone = (LayoutCellComponent)base.Clone();
-			clone.layoutCell = LayoutCell.Clone(null);
-			return clone;
-		}
-	}
-
-	public class LayoutCell : IAnimable
-	{
-		public Widget Owner { get; set; }
-
-		public void RemoveAnimators(IAnimable animable)
-		{
-			Owner.Animators.RemoveAllByAnimable(animable);
-		}
-
-		public LayoutCell Clone(Widget newOwner)
-		{
-			var clone = (LayoutCell)MemberwiseClone();
-			clone.Owner = newOwner;
-			return clone;
-		}
+		public new Widget Owner { get => (Widget)base.Owner; set { base.Owner = value; } }
 
 		[TangerineIgnore]
 		[YuzuMember]
@@ -158,6 +99,13 @@ namespace Lime
 			Alignment = alignment;
 			StretchX = stretchX;
 			StretchY = stretchY;
+		}
+
+		protected override void OnOwnerChanged(Node oldOwner)
+		{
+			base.OnOwnerChanged(oldOwner);
+			Owner?.InvalidateParentConstraintsAndArrangement();
+			(oldOwner as Widget)?.InvalidateParentConstraintsAndArrangement();
 		}
 	}
 

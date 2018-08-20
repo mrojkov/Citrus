@@ -5,7 +5,8 @@ using Yuzu;
 
 namespace Lime
 {
-	public class TableLayout : CommonLayout, ILayout
+	[TangerineRegisterComponent]
+	public class TableLayout : Layout, ILayout
 	{
 		[YuzuMember]
 		public int RowCount { get; set; }
@@ -209,9 +210,9 @@ namespace Lime
 			return Mathf.Clamp(cd.ColSpan, 1, ColCount - column);
 		}
 
-		ILayout ILayout.Clone(Widget newOwner)
+		public override NodeComponent Clone()
 		{
-			var clone = (TableLayout)Clone(newOwner);
+			var clone = (TableLayout)base.Clone();
 			clone.ColDefaults = new List<LayoutCell>();
 			clone.RowDefaults = new List<LayoutCell>();
 			return clone;

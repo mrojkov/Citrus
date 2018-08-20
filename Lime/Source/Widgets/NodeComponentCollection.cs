@@ -11,11 +11,11 @@ namespace Lime
 	public sealed class NodeComponentDontSerializeAttribute : Attribute
 	{ }
 
-	public sealed class AllowedOwnerTypes : Attribute
+	public sealed class AllowedComponentOwnerTypes : Attribute
 	{
 		public Type[] Types;
 
-		public AllowedOwnerTypes(params Type[] types)
+		public AllowedComponentOwnerTypes(params Type[] types)
 		{
 			Types = types;
 		}

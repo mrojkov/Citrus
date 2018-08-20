@@ -70,18 +70,18 @@ namespace Tangerine.Core.Operations
 		public static void Perform(object @object, string propertyName, object value, bool createAnimatorIfNeeded = false, bool createInitialKeyframeForNewAnimator = true, int atFrame = -1)
 		{
 			IAnimator animator;
-			var animable = @object as IAnimationHost;
+			var animationHost = @object as IAnimationHost;
 			object owner = @object;
 			AnimationUtils.PropertyData propertyData = AnimationUtils.PropertyData.Empty;
-			if (animable != null) {
-				(propertyData, owner) = AnimationUtils.GetPropertyByPath(animable, propertyName);
+			if (animationHost != null) {
+				(propertyData, owner) = AnimationUtils.GetPropertyByPath(animationHost, propertyName);
 			}
 			SetProperty.Perform(owner, propertyData.Info?.Name ?? propertyName, value);
-			if (animable != null && (animable.Animators.TryFind(propertyName, out animator, Document.Current.AnimationId) || createAnimatorIfNeeded)) {
+			if (animationHost != null && (animationHost.Animators.TryFind(propertyName, out animator, Document.Current.AnimationId) || createAnimatorIfNeeded)) {
 
 				if (animator == null && createInitialKeyframeForNewAnimator) {
 					var propertyValue = propertyData.Info.GetValue(owner);
-					Perform(animable, propertyName, propertyValue, true, false, 0);
+					Perform(animationHost, propertyName, propertyValue, true, false, 0);
 				}
 
 				int savedFrame = -1;
@@ -98,7 +98,7 @@ namespace Tangerine.Core.Operations
 					key.Frame = Document.Current.AnimationFrame;
 					key.Function = animator?.Keys.LastOrDefault(k => k.Frame <= key.Frame)?.Function ?? KeyFunction.Linear;
 					key.Value = value;
-					SetKeyframe.Perform(animable, propertyName, Document.Current.AnimationId, key);
+					SetKeyframe.Perform(animationHost, propertyName, Document.Current.AnimationId, key);
 				} finally {
 					if (savedFrame >= 0) {
 						Document.Current.AnimationFrame = savedFrame;

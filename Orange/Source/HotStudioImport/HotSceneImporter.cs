@@ -995,11 +995,11 @@ namespace Orange
 					ParseActorProperty(node, name);
 					break;
 			}
-			node.Components.Add(new LayoutComponent {
-				Layout = horizontal
-					? (ILayout)new HBoxLayout { IgnoreHidden = !processHidden }
-					: new VBoxLayout { IgnoreHidden = !processHidden },
-			});
+			node.Components.Add(
+				 horizontal
+					? (Layout)new HBoxLayout { IgnoreHidden = !processHidden }
+					: new VBoxLayout { IgnoreHidden = !processHidden }
+			);
 		}
 
 		private void ParseModelViewProperty(Node node, string name)

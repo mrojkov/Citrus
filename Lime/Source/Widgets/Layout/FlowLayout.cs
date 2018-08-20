@@ -6,8 +6,7 @@ using Yuzu;
 namespace Lime
 {
 	[YuzuDontGenerateDeserializer]
-	[TangerineIgnore]
-	public class FlowLayout : CommonLayout, ILayout
+	public class FlowLayout : Layout, ILayout
 	{
 		public enum FlowDirection
 		{
@@ -270,9 +269,9 @@ namespace Lime
 			}
 		}
 
-		ILayout ILayout.Clone(Widget newOwner)
+		public override NodeComponent Clone()
 		{
-			var clone = (FlowLayout)Clone(newOwner);
+			var clone = (FlowLayout)base.Clone();
 			clone.splitIndices = new List<int>();
 			return clone;
 		}

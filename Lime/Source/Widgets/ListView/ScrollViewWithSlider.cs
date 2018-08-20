@@ -143,7 +143,6 @@ namespace Lime
 		}
 
 		[YuzuDontGenerateDeserializer]
-		[TangerineIgnore]
 		new class Layout : ScrollView.Layout
 		{
 			readonly Widget slider;

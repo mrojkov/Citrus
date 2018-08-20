@@ -5,7 +5,8 @@ using Yuzu;
 
 namespace Lime
 {
-	public class StackLayout : CommonLayout, ILayout
+	[TangerineRegisterComponent]
+	public class StackLayout : Layout, ILayout
 	{
 		[YuzuMember]
 		public bool HorizontallySizeable { get; set; }
@@ -63,9 +64,9 @@ namespace Lime
 			}
 		}
 
-		ILayout ILayout.Clone(Widget newOwner)
+		public override NodeComponent Clone()
 		{
-			return (StackLayout)Clone(newOwner);
+			return (StackLayout)base.Clone();
 		}
 	}
 }

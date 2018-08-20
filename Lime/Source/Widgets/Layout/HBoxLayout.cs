@@ -5,7 +5,8 @@ using Yuzu;
 
 namespace Lime
 {
-	public class HBoxLayout : CommonLayout, ILayout
+	[TangerineRegisterComponent]
+	public class HBoxLayout : Layout, ILayout
 	{
 		[YuzuMember]
 		public float Spacing
@@ -74,9 +75,9 @@ namespace Lime
 			widget.MeasuredMaxSize = maxSize + extraSpace;
 		}
 
-		ILayout ILayout.Clone(Widget newOwner)
+		public override NodeComponent Clone()
 		{
-			return (HBoxLayout)Clone(newOwner);
+			return (HBoxLayout)base.Clone();
 		}
 	}
 }

@@ -3,12 +3,23 @@ using System.Collections.Generic;
 namespace Lime
 {
 	[YuzuDontGenerateDeserializer]
-	[TangerineIgnore]
-	public class AnchorLayout : CommonLayout, ILayout
+	public class AnchorLayout : ILayout
 	{
 		public static readonly ILayout Instance = new AnchorLayout();
 
-		public override void OnSizeChanged(Widget widget, Vector2 sizeDelta)
+		public List<Rectangle> DebugRectangles => throw new System.NotSupportedException();
+
+		public Widget Owner
+		{
+			get => throw new System.NotSupportedException();
+			set => throw new System.NotSupportedException();
+		}
+
+		public bool ConstraintsValid => throw new System.NotSupportedException();
+
+		public bool ArrangementValid => throw new System.NotSupportedException();
+
+		public void OnSizeChanged(Widget widget, Vector2 sizeDelta)
 		{
 			for (var child = widget.FirstChild; child != null; child = child.NextSibling) {
 				if (child.AsWidget != null) {
@@ -79,9 +90,23 @@ namespace Lime
 			}
 		}
 
-		ILayout ILayout.Clone(Widget newOwner)
+		public void InvalidateConstraintsAndArrangement(Widget widget)
 		{
-			return AnchorLayout.Instance;
+		}
+
+		public void InvalidateArrangement(Widget widget)
+		{
+			throw new System.NotSupportedException();
+		}
+
+		public void MeasureSizeConstraints(Widget widget)
+		{
+			throw new System.NotSupportedException();
+		}
+
+		public void ArrangeChildren(Widget widget)
+		{
+			throw new System.NotSupportedException();
 		}
 	}
 }
