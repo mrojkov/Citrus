@@ -59,6 +59,7 @@
     <Compile Include="Components\RollNodeView.cs" />
     <Compile Include="Components\RollPropertyView.cs" />
     <Compile Include="CurveEditorPane.cs" />
+    <Compile Include="Operations\CenterTimeline.cs" />
     <Compile Include="Operations\ClearGridSelection.cs" />
     <Compile Include="Operations\ColumnCountUpdater.cs" />
     <Compile Include="Operations\CopyPasteKeyframe.cs" />

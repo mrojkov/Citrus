@@ -587,6 +587,7 @@ namespace Tangerine
 			h.Connect(TimelineCommands.CreatePositionKeyframe, UI.Timeline.Operations.TogglePositionKeyframe.Perform);
 			h.Connect(TimelineCommands.CreateRotationKeyframe, UI.Timeline.Operations.ToggleRotationKeyframe.Perform);
 			h.Connect(TimelineCommands.CreateScaleKeyframe, UI.Timeline.Operations.ToggleScaleKeyframe.Perform);
+			h.Connect(TimelineCommands.CenterTimelineOnCurrentColumn, UI.Timeline.Operations.CenterTimeline.Perform);
 			h.Connect(OrangeCommands.RunConfig, new OrangeCommandHandler(() => new OrangePluginOptionsDialog()));
 			h.Connect(SceneViewCommands.ToggleDisplayRuler, new DisplayRuler());
 			h.Connect(SceneViewCommands.SaveCurrentRuler, new SaveRuler());
