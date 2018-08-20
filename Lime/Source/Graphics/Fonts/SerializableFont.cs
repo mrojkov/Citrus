@@ -121,17 +121,19 @@ namespace Lime
 			}
 		}
 
-		public void Clear()
+		public void Clear(bool preserveDefaultFont = false)
 		{
 			var defaultFont = this[DefaultFontName];
 			foreach (var font in fonts.Values) {
-				if (font == defaultFont) {
+				if (font == defaultFont && preserveDefaultFont) {
 					continue;
 				}
 				font.Dispose();
 			}
 			fonts.Clear();
-			fonts.Add(DefaultFontName, defaultFont);
+			if (preserveDefaultFont) {
+				fonts.Add(DefaultFontName, defaultFont);
+			}
 		}
 
 		public void ClearCache()
