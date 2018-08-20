@@ -104,6 +104,8 @@
     <Compile Include="Operations\TimelineColumnRemove.cs" />
     <Compile Include="Operations\NodeTypeConvert.cs" />
     <Compile Include="Operations\ReplaceContents.cs" />
+    <Compile Include="ExpressionParser\ExpressionParser.cs" />
+    <Compile Include="ExpressionParser\Tokenizer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

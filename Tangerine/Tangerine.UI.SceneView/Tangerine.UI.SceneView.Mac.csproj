@@ -117,7 +117,7 @@
 	<Compile Include="Presenters\Animation3DPathPresenter.cs" />
 	<Compile Include="Presenters\NineGridLinePresenter.cs" />
 	<Compile Include="Processors\DragNineGridLineProcessor.cs" />
-	<Compile Include="NodeDecorations.cs" />
+	<Compile Include="VisualHints.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Mac.csproj">
