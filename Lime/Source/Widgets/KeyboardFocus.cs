@@ -18,7 +18,9 @@ namespace Lime
 	public class KeyboardFocusScope
 	{
 		private readonly Key FocusNext = Key.MapShortcut(Key.Tab);
+		private readonly Key FocusNextArrow = Key.MapShortcut(Key.Right);
 		private readonly Key FocusPrevious = Key.MapShortcut(new Shortcut(Modifiers.Shift, Key.Tab));
+		private readonly Key FocusPreviousArrow = Key.MapShortcut(Key.Left);
 		private Widget lastFocused;
 
 		public readonly Widget Widget;
@@ -60,10 +62,16 @@ namespace Lime
 			if (focused != null && focused.DescendantOf(Widget)) {
 				lastFocused = focused;
 			}
-			if (Widget.Input.ConsumeKeyRepeat(FocusNext)) {
+			if (
+				Widget.Input.ConsumeKeyRepeat(FocusNext) ||
+				Widget.Input.ConsumeKeyRepeat(FocusNextArrow)
+			) {
 				AdvanceFocus(1);
 			}
-			if (Widget.Input.ConsumeKeyRepeat(FocusPrevious)) {
+			if (
+				Widget.Input.ConsumeKeyRepeat(FocusPrevious) ||
+				Widget.Input.ConsumeKeyRepeat(FocusPreviousArrow)
+			) {
 				AdvanceFocus(-1);
 			}
 		}
