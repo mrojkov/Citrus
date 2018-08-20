@@ -262,8 +262,10 @@ namespace Tangerine.UI.SceneView
 					Padding = new Thickness { Right = 10 },
 					LayoutCell = new LayoutCell(Alignment.RightCenter)
 				});
-				CommandHandlerList.Global.Disconnect(command);
-				CommandHandlerList.Global.Connect(command, Issued);
+				Application.InvokeOnNextUpdate(() => {
+					CommandHandlerList.Global.Disconnect(command);
+					CommandHandlerList.Global.Connect(command, Issued);
+				});
 			}
 
 			private void Issued()
