@@ -3186,46 +3186,6 @@ namespace GeneratedDeserializersBIN
 			return result;
 		}
 
-		private static void Read_Lime__LayoutCellComponent(BinaryDeserializer d, ReaderClassDef def, object obj)
-		{
-			var result = (global::Lime.LayoutCellComponent)obj;
-			var dg = (BinaryDeserializerGen)d;
-			ReaderClassDef.FieldDef fd;
-			fd = def.Fields[d.Reader.ReadInt16()];
-			if (1 == fd.OurIndex) {
-				result.LayoutCell = (global::Lime.LayoutCell)dg.ReadObject<global::Lime.LayoutCell>();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
-		}
-
-		private static object Make_Lime__LayoutCellComponent(BinaryDeserializer d, ReaderClassDef def)
-		{
-			var result = new global::Lime.LayoutCellComponent();
-			Read_Lime__LayoutCellComponent(d, def, result);
-			return result;
-		}
-
-		private static void Read_Lime__LayoutComponent(BinaryDeserializer d, ReaderClassDef def, object obj)
-		{
-			var result = (global::Lime.LayoutComponent)obj;
-			var dg = (BinaryDeserializerGen)d;
-			ReaderClassDef.FieldDef fd;
-			fd = def.Fields[d.Reader.ReadInt16()];
-			if (1 == fd.OurIndex) {
-				result.Layout = (global::Lime.ILayout)dg.ReadObject<global::Lime.ILayout>();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
-		}
-
-		private static object Make_Lime__LayoutComponent(BinaryDeserializer d, ReaderClassDef def)
-		{
-			var result = new global::Lime.LayoutComponent();
-			Read_Lime__LayoutComponent(d, def, result);
-			return result;
-		}
-
 		private static void Read_Lime__LightSource(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.LightSource)obj;
@@ -8935,8 +8895,6 @@ namespace GeneratedDeserializersBIN
 			readCache[typeof(global::Lime.Keyframe<global::System.Single>)] = Read_Lime__Keyframe_Single;
 			readCache[typeof(global::Lime.Keyframe<global::System.String>)] = Read_Lime__Keyframe_String;
 			readCache[typeof(global::Lime.LayoutCell)] = Read_Lime__LayoutCell;
-			readCache[typeof(global::Lime.LayoutCellComponent)] = Read_Lime__LayoutCellComponent;
-			readCache[typeof(global::Lime.LayoutComponent)] = Read_Lime__LayoutComponent;
 			readCache[typeof(global::Lime.LightSource)] = Read_Lime__LightSource;
 			readCache[typeof(global::Lime.Marker)] = Read_Lime__Marker;
 			readCache[typeof(global::Lime.MarkerBlending)] = Read_Lime__MarkerBlending;
@@ -9067,8 +9025,6 @@ namespace GeneratedDeserializersBIN
 			makeCache[typeof(global::Lime.Keyframe<global::System.Single>)] = Make_Lime__Keyframe_Single;
 			makeCache[typeof(global::Lime.Keyframe<global::System.String>)] = Make_Lime__Keyframe_String;
 			makeCache[typeof(global::Lime.LayoutCell)] = Make_Lime__LayoutCell;
-			makeCache[typeof(global::Lime.LayoutCellComponent)] = Make_Lime__LayoutCellComponent;
-			makeCache[typeof(global::Lime.LayoutComponent)] = Make_Lime__LayoutComponent;
 			makeCache[typeof(global::Lime.LightSource)] = Make_Lime__LightSource;
 			makeCache[typeof(global::Lime.Marker)] = Make_Lime__Marker;
 			makeCache[typeof(global::Lime.MarkerBlending)] = Make_Lime__MarkerBlending;
