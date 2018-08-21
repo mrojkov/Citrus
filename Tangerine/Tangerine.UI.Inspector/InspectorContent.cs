@@ -368,7 +368,8 @@ namespace Tangerine.UI.Inspector
 			var index = ctr.Nodes.Count() - 1;
 			if (
 				PropertyAttributes<TangerineStaticPropertyAttribute>.Get(editor.EditorParams.PropertyInfo) == null &&
-				AnimatorRegistry.Instance.Contains(editor.EditorParams.PropertyInfo.PropertyType)
+				AnimatorRegistry.Instance.Contains(editor.EditorParams.PropertyInfo.PropertyType) &&
+				!Document.Current.InspectRootNode
 			) {
 				var keyFunctionButton = new KeyFunctionButton {
 					LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0),
