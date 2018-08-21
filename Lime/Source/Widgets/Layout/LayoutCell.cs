@@ -7,12 +7,6 @@ namespace Lime
 	[TangerineRegisterComponent]
 	public class LayoutCell : NodeComponent
 	{
-		public new Widget Owner
-		{
-			get => (Widget)base.Owner;
-			set => base.Owner = value;
-		}
-
 		[TangerineIgnore]
 		[YuzuMember]
 		public Alignment Alignment
@@ -22,7 +16,7 @@ namespace Lime
 			{
 				if (alignment != value) {
 					alignment = value;
-					Owner?.InvalidateParentConstraintsAndArrangement();
+					InvalidateLayout();
 				}
 			}
 		}
@@ -52,7 +46,7 @@ namespace Lime
 			{
 				if (columnSpan != value) {
 					columnSpan = value;
-					Owner?.InvalidateParentConstraintsAndArrangement();
+					InvalidateLayout();
 				}
 			}
 		}
@@ -67,7 +61,7 @@ namespace Lime
 			{
 				if (rowSpan != value) {
 					rowSpan = value;
-					Owner?.InvalidateParentConstraintsAndArrangement();
+					InvalidateLayout();
 				}
 			}
 		}
@@ -82,7 +76,7 @@ namespace Lime
 			{
 				if (stretch != value) {
 					stretch = value;
-					Owner?.InvalidateParentConstraintsAndArrangement();
+					InvalidateLayout();
 				}
 			}
 		}
@@ -100,13 +94,13 @@ namespace Lime
 			{
 				if (ignore != value) {
 					ignore = value;
-					Owner?.InvalidateParentConstraintsAndArrangement();
+					InvalidateLayout();
 				}
 			}
 		}
 
 		private bool ignore;
-
+		internal bool IsOwnedByLayout { get; set; }
 		public static readonly LayoutCell Default = new LayoutCell();
 
 		public LayoutCell() { }
@@ -122,8 +116,18 @@ namespace Lime
 		protected override void OnOwnerChanged(Node oldOwner)
 		{
 			base.OnOwnerChanged(oldOwner);
-			Owner?.InvalidateParentConstraintsAndArrangement();
-			(oldOwner as Widget)?.InvalidateParentConstraintsAndArrangement();
+			InvalidateLayout(oldOwner as Widget);
+			InvalidateLayout(Owner as Widget);
+		}
+
+		private void InvalidateLayout(Widget owner = null)
+		{
+			owner = owner ?? (Widget)Owner;
+			if (IsOwnedByLayout) {
+				owner?.Layout.InvalidateConstraintsAndArrangement();
+			} else {
+				owner?.InvalidateParentConstraintsAndArrangement();
+			}
 		}
 	}
 

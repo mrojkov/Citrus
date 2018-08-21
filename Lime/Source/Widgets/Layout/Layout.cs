@@ -46,10 +46,12 @@ namespace Lime
 			{
 				if (defaultCell != null) {
 					defaultCell.Owner = null;
+					defaultCell.IsOwnedByLayout = false;
 				}
 				defaultCell = value;
 				if (defaultCell != null) {
 					defaultCell.Owner = Owner;
+					defaultCell.IsOwnedByLayout = true;
 				}
 			}
 		}
