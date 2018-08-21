@@ -16,6 +16,8 @@ namespace Tangerine.UI.SceneView
 		public bool Enabled { get; set; } = true;
 		[YuzuOptional]
 		public Dictionary<string, VisualHint> SubHints { get; private set; } = new Dictionary<string, VisualHint>();
+		[YuzuRequired]
+		public bool Expanded { get; set; } = false;
 
 		public Func<VisualHint, bool> HideRule;
 		public ICommand Command { get; set; } = null;
@@ -319,6 +321,7 @@ namespace Tangerine.UI.SceneView
 						parent = this
 					});
 				}
+				rowWidget.AddChangeWatcher(() => hint.Expanded, _ => HandleExpanded());
 				TryCheckAll(traverseParents: false);
 			}
 
@@ -369,13 +372,22 @@ namespace Tangerine.UI.SceneView
 
 			private void ToggleExpanded()
 			{
-				if (container.Parent != null) {
-					container.Unlink();
-					button.Texture = IconPool.GetTexture("Timeline.plus");
-					return;
+				hint.Expanded = !hint.Expanded;
+			}
+
+			private void HandleExpanded()
+			{
+				if (button != null) {
+					if (!hint.Expanded) {
+						container.Unlink();
+						button.Texture = IconPool.GetTexture("Timeline.plus");
+						return;
+					}
+					if (container.Parent == null) {
+						AddNode(container);
+						button.Texture = IconPool.GetTexture("Timeline.minus");
+					}
 				}
-				AddNode(container);
-				button.Texture = IconPool.GetTexture("Timeline.minus");
 			}
 
 			public ToolbarButton CreateExpandButton()
