@@ -451,7 +451,7 @@ namespace Lime
 				case HAlignment.Center:
 					return ((ContentSize.X - lineWidth) * 0.5f + Padding.Left).Round();
 				default:
-					throw new InvalidOperationException();
+					return Padding.Left;
 			}
 		}
 
