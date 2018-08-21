@@ -6,6 +6,12 @@ namespace Tangerine.UI
 {
 	public class TabbedWidget : Widget
 	{
+		public enum TabBarPlacement
+		{
+			Top,
+			Bottom
+		}
+
 		protected Frame ContentContainer { get; private set; }
 		protected List<Widget> Contents { get; } = new List<Widget>();
 		public TabBar TabBar { get; protected set; }
@@ -30,15 +36,20 @@ namespace Tangerine.UI
 			set { TabBar.AllowReordering = value; }
 		}
 
-		public TabbedWidget()
+		public TabbedWidget(TabBarPlacement tabBarPlacement = TabBarPlacement.Top)
 		{
 			ContentContainer = new ThemedFrame();
 			ContentContainer.ClipChildren = ClipMethod.ScissorTest;
 			TabBar = new ThemedTabBar();
 			TabBar.OnReorder += TabBar_OnReorder;
 			Layout = new VBoxLayout();
-			Nodes.Add(TabBar);
-			Nodes.Add(ContentContainer);
+			if (tabBarPlacement == TabBarPlacement.Top) {
+				Nodes.Add(TabBar);
+				Nodes.Add(ContentContainer);
+			} else {
+				Nodes.Add(ContentContainer);
+				Nodes.Add(TabBar);
+			}
 		}
 
 		private void TabBar_OnReorder(TabBar.ReorderEventArgs args)

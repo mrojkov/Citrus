@@ -315,7 +315,10 @@ namespace Tangerine.UI.Docking
 
 		private void CreateTabBarWidget(Splitter container, TabBarPlacement placement, float stretch, int insertAt)
 		{
-			var tabbedWidget = new TabbedWidget { LayoutCell = new LayoutCell { StretchY = 0 }, AllowReordering = true };
+			var tabbedWidget = new TabbedWidget(TabbedWidget.TabBarPlacement.Bottom) {
+				LayoutCell = new LayoutCell { StretchY = 0 },
+				AllowReordering = true
+			};
 			tabbedWidget.FocusScope = new KeyboardFocusScope(tabbedWidget);
 			var rootWidget = AddTitle(tabbedWidget, out ThemedTabCloseButton closeButton, out ThemedSimpleText titleLabel);
 			foreach (var panelPlacement in placement.Placements) {
