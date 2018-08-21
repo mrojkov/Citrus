@@ -1,4 +1,4 @@
-﻿using Lime;
+using Lime;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -80,6 +80,7 @@ namespace Tangerine.UI
 			ContentContainer.Nodes.Clear();
 			ContentContainer.Nodes.Add(Contents[index]);
 			Contents[index].ExpandToContainerWithAnchors();
+			activeTabIndex = index;
 		}
 
 		public void RemoveAt(int index)

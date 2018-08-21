@@ -12,14 +12,14 @@ namespace Tangerine.UI.Docking
 		private PanelPlacement requestedPlacement;
 		private Vector2 positionOffset;
 		private readonly WindowPlacement windowPlacement;
-		private readonly PanelPlacement panelPlacement;
+		private readonly Placement placement;
 		public static bool IsActive { get; private set; }
 		public WindowInput Input { get; }
 
-		private WindowDragBehaviour(string panelId)
+		private WindowDragBehaviour(Placement placement)
 		{
-			panelPlacement = DockManager.Instance.Model.FindPanelPlacement(panelId);
-			windowPlacement = DockManager.Instance.Model.GetWindowByPlacement(panelPlacement);
+			this.placement = placement;
+			windowPlacement = DockManager.Instance.Model.GetWindowByPlacement(placement);
 			((WindowWidget)WidgetContext.Current.Root).Tasks.Add(MoveTask());
 			Input = CommonWindow.Current.Input;
 			Application.Input.Simulator.SetKeyState(Key.Mouse0, true);
@@ -38,9 +38,9 @@ namespace Tangerine.UI.Docking
 			}
 		}
 
-		public static void CreateFor(string panelId, Vector2 positionOffset)
+		public static void CreateFor(Placement placement, Vector2 positionOffset)
 		{
-			new WindowDragBehaviour(panelId) {
+			new WindowDragBehaviour(placement) {
 				positionOffset = positionOffset
 			};
 			IsActive = true;
@@ -50,7 +50,7 @@ namespace Tangerine.UI.Docking
 		{
 			ResetDockComponents();
 			if (requestedSite != DockSite.None) {
-				DockManager.Instance.DockPlacementTo(panelPlacement, requestedPlacement, requestedSite, 0.25f);
+				DockManager.Instance.DockPlacementTo(placement, requestedPlacement, requestedSite, 0.25f);
 			}
 			IsActive = false;
 		}
@@ -143,20 +143,22 @@ namespace Tangerine.UI.Docking
 		}
 	}
 
-	public class PanelDragBehaviour
+	public class DragBehaviour
 	{
 		private readonly Widget inputWidget;
+		private readonly Widget contentWidget;
+		private readonly Placement placement;
 		private Vector2 LocalMousePosition => inputWidget.Parent.AsWidget.LocalMousePosition();
 		private const float Offset = 30;
-		private readonly Panel panel;
 		private readonly WidgetInput input;
 
 		public event Action<Vector2, Vector2> OnUndock;
 
-		public PanelDragBehaviour(Widget inputWidget, Panel panel)
+		public DragBehaviour(Widget inputWidget, Widget contentWidget, Placement placement)
 		{
-			this.panel = panel;
 			this.inputWidget = inputWidget;
+			this.contentWidget = contentWidget;
+			this.placement = placement;
 			input = inputWidget.Input;
 			inputWidget.Tasks.Add(MainTask());
 		}
@@ -166,8 +168,8 @@ namespace Tangerine.UI.Docking
 			while (true) {
 				var pressedPosition = inputWidget.LocalMousePosition();
 				if (input.WasMousePressed()) {
-					if (DockManager.Instance.Model.IsPanelSingleInWindow(panel.Id)) {
-						WindowDragBehaviour.CreateFor(panel.Id, pressedPosition);
+					if (placement.Root.GetDescendantPanels().Count() == 1) {
+						WindowDragBehaviour.CreateFor(placement, pressedPosition);
 					} else {
 						var size = inputWidget.Parent.AsWidget.Size;
 						var initialPosition = LocalMousePosition;
@@ -179,7 +181,7 @@ namespace Tangerine.UI.Docking
 							yield return null;
 						}
 						if (input.IsMousePressed()) {
-							OnUndock?.Invoke(pressedPosition, Application.DesktopMousePosition - (input.MousePosition - panel.ContentWidget.GlobalPosition));
+							OnUndock?.Invoke(pressedPosition, Application.DesktopMousePosition - (input.MousePosition - contentWidget.GlobalPosition));
 						}
 					}
 				}
