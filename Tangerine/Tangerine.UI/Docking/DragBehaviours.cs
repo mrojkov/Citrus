@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Lime;
@@ -50,7 +50,7 @@ namespace Tangerine.UI.Docking
 		{
 			ResetDockComponents();
 			if (requestedSite != DockSite.None) {
-				DockManager.Instance.DockPanelTo(panelPlacement, requestedPlacement, requestedSite, 0.25f);
+				DockManager.Instance.DockPlacementTo(panelPlacement, requestedPlacement, requestedSite, 0.25f);
 			}
 			IsActive = false;
 		}

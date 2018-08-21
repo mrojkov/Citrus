@@ -74,11 +74,11 @@ namespace Tangerine.UI.Docking
 			Instance = new DockManager(windowSize);
 		}
 
-		public void DockPanelTo(PanelPlacement placement, PanelPlacement target, DockSite site, float stretch)
+		public void DockPlacementTo(Placement placement, Placement target, DockSite site, float stretch)
 		{
 			var windowPlacement = Model.GetWindowByPlacement(placement);
 			placement.Unlink();
-			Model.DockPanelTo(placement, target, site, stretch);
+			Model.DockPlacementTo(placement, target, site, stretch);
 			if (!windowPlacement.Root.GetDescendantPanels().Any()) {
 				Model.RemoveWindow(windowPlacement);
 				CloseWindow(windowPlacement.WindowWidget.Window);
