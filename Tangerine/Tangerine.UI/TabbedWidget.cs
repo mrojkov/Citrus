@@ -38,8 +38,17 @@ namespace Tangerine.UI
 
 		public TabbedWidget(TabBarPlacement tabBarPlacement = TabBarPlacement.Top)
 		{
-			ContentContainer = new ThemedFrame();
-			ContentContainer.ClipChildren = ClipMethod.ScissorTest;
+			ContentContainer = new Frame {
+				ClipChildren = ClipMethod.ScissorTest,
+			};
+			ContentContainer.CompoundPresenter.Add(new DelegatePresenter<Frame>(frame => {
+				frame.PrepareRendererState();
+				Renderer.DrawRect(Vector2.Zero, frame.Size, Theme.Colors.GrayBackground);
+			}));
+			ContentContainer.CompoundPostPresenter.Add(new DelegatePresenter<Frame>(frame => {
+				frame.PrepareRendererState();
+				Renderer.DrawRectOutline(Vector2.Zero, frame.Size, Theme.Colors.ControlBorder);
+			}));
 			TabBar = new ThemedTabBar();
 			TabBar.OnReorder += TabBar_OnReorder;
 			Layout = new VBoxLayout();
