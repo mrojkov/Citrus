@@ -11,12 +11,12 @@ namespace Lime
 		public static AnimatorRegistry Instance {
 			get { return instance; }
 		}
-		
+
 		public void Add(Type propertyType, Type animatorType)
 		{
 			map.Add(propertyType, animatorType);
 		}
-		
+
 		public IAnimator CreateAnimator(Type propertyType)
 		{
 			Type animatorType;
@@ -70,5 +70,12 @@ namespace Lime
 		}
 
 		Dictionary<Type, Type> map = new Dictionary<Type, Type>();
+
+		public IEnumerable<Type> EnumerateRegisteredTypes()
+		{
+			foreach (var kv in map) {
+				yield return kv.Key;
+			}
+		}
 	}
 }

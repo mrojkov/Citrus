@@ -56,21 +56,6 @@ namespace Lime
 		int Version { get; }
 	}
 
-	[YuzuSpecializeWith(typeof(Alignment))]
-	[YuzuSpecializeWith(typeof(AudioAction))]
-	[YuzuSpecializeWith(typeof(Blending))]
-	[YuzuSpecializeWith(typeof(bool))]
-	[YuzuSpecializeWith(typeof(EmissionType))]
-	[YuzuSpecializeWith(typeof(EmitterShape))]
-	[YuzuSpecializeWith(typeof(HAlignment))]
-	[YuzuSpecializeWith(typeof(ITexture))]
-	[YuzuSpecializeWith(typeof(MovieAction))]
-	[YuzuSpecializeWith(typeof(NumericRange))]
-	[YuzuSpecializeWith(typeof(SerializableSample))]
-	[YuzuSpecializeWith(typeof(ShaderId))]
-	[YuzuSpecializeWith(typeof(string))]
-	[YuzuSpecializeWith(typeof(Thickness))]
-	[YuzuSpecializeWith(typeof(VAlignment))]
 	public class Animator<T> : IAnimator
 	{
 		public IAnimationHost Owner { get; set; }

@@ -241,9 +241,16 @@ namespace Lime
 						continue;
 					}
 					if (t.IsGenericType) {
-						foreach (var specializationType in t.GetCustomAttributes<YuzuSpecializeWithAttribute>().Select(a => a.Type)) {
-							var specializedType = t.MakeGenericType(new[] { specializationType });
-							types.Add(specializedType);
+						if (t == typeof(Keyframe<>) || t == typeof(Animator<>)) {
+							foreach (var specializationType in AnimatorRegistry.Instance.EnumerateRegisteredTypes()) {
+								var specializedType = t.MakeGenericType(new[] { specializationType });
+								types.Add(specializedType);
+							}
+						} else {
+							foreach (var specializationType in t.GetCustomAttributes<YuzuSpecializeWithAttribute>().Select(a => a.Type)) {
+								var specializedType = t.MakeGenericType(new[] { specializationType });
+								types.Add(specializedType);
+							}
 						}
 					} else {
 						var meta = Yuzu.Metadata.Meta.Get(t, DefaultYuzuCommonOptions);
