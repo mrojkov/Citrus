@@ -504,8 +504,10 @@ namespace Tangerine.UI.Docking
 					throw new System.Exception("Unable to import state: the number of windows is zero");
 				}
 				for (var i = 1; i < Model.WindowPlacements.Count; i++) {
-					Model.WindowPlacements[i].WindowWidget.Nodes.Clear();
-					CloseWindow(Model.WindowPlacements[i].WindowWidget.Window);
+					if (Model.WindowPlacements[i].AnyVisiblePanel()) {
+						Model.WindowPlacements[i].WindowWidget.Nodes.Clear();
+						CloseWindow(Model.WindowPlacements[i].WindowWidget.Window);
+					}
 				}
 				var savedPanels = Model.Panels.ToList();
 				Model.WindowPlacements.Clear();
