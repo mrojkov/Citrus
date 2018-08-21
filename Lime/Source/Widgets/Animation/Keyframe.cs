@@ -6,8 +6,8 @@ namespace Lime
 	public enum KeyFunction
 	{
 		Linear,
-		Spline,
 		Steep,
+		Spline,
 		ClosedSpline,
 	}
 

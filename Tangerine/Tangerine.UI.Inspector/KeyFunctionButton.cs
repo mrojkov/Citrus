@@ -82,10 +82,14 @@ namespace Tangerine.UI.Inspector
 			}
 		}
 
-		static KeyFunction NextKeyFunction(KeyFunction value)
+		private static KeyFunction[] nextKeyFunction = {
+			KeyFunction.Spline, KeyFunction.ClosedSpline,
+			KeyFunction.Steep, KeyFunction.Linear
+		};
+
+		private static KeyFunction NextKeyFunction(KeyFunction value)
 		{
-			var count = Enum.GetValues(typeof(KeyFunction)).Length;
-			return (KeyFunction)(((int)value + 1) % count);
+			return nextKeyFunction[(int)value];
 		}
 
 		internal void SetKeyFunction(KeyFunction value)
