@@ -8,11 +8,11 @@ using Tangerine.Core;
 
 namespace Tangerine.UI
 {
-	public class ValidatedStringPropertyEditor : CommonPropertyEditor<string>
+	public class NodeIdPropertyEditor : CommonPropertyEditor<string>
 	{
 		private EditBox editor;
 
-		public ValidatedStringPropertyEditor(IPropertyEditorParams editorParams, bool multiline = false) : base(editorParams)
+		public NodeIdPropertyEditor(IPropertyEditorParams editorParams, bool multiline = false) : base(editorParams)
 		{
 			editor = editorParams.EditBoxFactory();
 			editor.LayoutCell = new LayoutCell(Alignment.Center);
@@ -37,6 +37,7 @@ namespace Tangerine.UI
 			} else {
 				SetProperty(editor.Text);
 			}
+			editor.Text = CoalescedPropertyValue().GetValue();
 		}
 
 		protected virtual bool IsValid(string value)
