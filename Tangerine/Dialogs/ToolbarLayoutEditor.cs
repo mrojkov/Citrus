@@ -1,6 +1,7 @@
 using Lime;
 using System;
 using System.Linq;
+using Tangerine.Core;
 using Tangerine.UI;
 
 namespace Tangerine.Dialogs
@@ -12,6 +13,7 @@ namespace Tangerine.Dialogs
 		private ListBox usedCommands;
 		private ListBox panelList;
 		private ThemedDropDownList categoryList;
+		private EditBox filterEditBox;
 
 		public ToolbarLayoutEditor()
 		{
@@ -27,7 +29,13 @@ namespace Tangerine.Dialogs
 			usedCommands = CreateListBox();
 			panelList = CreateListBox();
 			CreatePanelControls();
-			AddNode(CreateCategoryList());
+			AddNode(new Widget {
+				Layout = new HBoxLayout { Spacing = 10 },
+				Nodes = {
+					CreateCategoryList(),
+					CreateSearchBox()
+				}
+			});
 			var widget = new Widget {
 				Layout = new HBoxLayout()
 			};
@@ -37,6 +45,22 @@ namespace Tangerine.Dialogs
 			widget.AddNode(AddLabel(usedCommands, "Used commands:"));
 			RefreshAvailableCommands();
 			RefreshUsedCommands();
+		}
+
+		private Widget CreateSearchBox()
+		{
+			filterEditBox = new ThemedEditBox();
+			filterEditBox.AddChangeWatcher(() => filterEditBox.Text, _ => RefreshAvailableCommands());
+			return new Widget {
+				Layout = new HBoxLayout(),
+				LayoutCell = new LayoutCell { StretchX = 2 },
+				Nodes = {
+					new ThemedSimpleText("Search: ") {
+						LayoutCell = new LayoutCell(Alignment.LeftCenter)
+					},
+					filterEditBox
+				}
+			};
 		}
 
 		private ListBox CreateListBox()
@@ -292,9 +316,10 @@ namespace Tangerine.Dialogs
 		private void RefreshAvailableCommands()
 		{
 			availableCommands.Items.Clear();
+			var filter = filterEditBox.Text.ToLower();
 			var categoryInfo = (CommandCategoryInfo)categoryList.Items[categoryList.Index].Value;
 			foreach (var commandInfo in CommandRegistry.RegisteredCommandInfo(categoryInfo)) {
-				if (toolbarLayout.ContainsId(commandInfo.Id)) {
+				if (toolbarLayout.ContainsId(commandInfo.Id) || !commandInfo.Title.ToLower().Contains(filter)) {
 					continue;
 				}
 				availableCommands.AddItem(new CommandItem(commandInfo));
