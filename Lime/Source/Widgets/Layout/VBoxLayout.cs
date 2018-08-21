@@ -80,7 +80,7 @@ namespace Lime
 
 		public override NodeComponent Clone()
 		{
-			return (HBoxLayout)base.Clone();
+			return (VBoxLayout)base.Clone();
 		}
 	}
 }
