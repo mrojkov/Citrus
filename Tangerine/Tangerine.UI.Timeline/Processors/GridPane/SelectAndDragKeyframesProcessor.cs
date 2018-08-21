@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
+using Tangerine.Core.Components;
 using Tangerine.UI.Timeline.Components;
 
 namespace Tangerine.UI.Timeline
@@ -32,11 +33,12 @@ namespace Tangerine.UI.Timeline
 								Timeline.Globals.Remove<HasKeyframeRequest>();
 								var isInMultiselectMode = input.IsKeyPressed(Key.Control);
 								var isSelectRangeMode = input.IsKeyPressed(Key.Shift);
+								var isSelectingKeyframes = input.IsKeyPressed(Key.Alt);
 
 								if (isSelectRangeMode && lastSelectionContainer == Document.Current.Container) {
-									yield return SelectRangeTask(lastSelectedCell, initialCell);
+									yield return SelectRangeTask(lastSelectedCell, initialCell, isSelectingKeyframes);
 								} else if (!r.Result || isInMultiselectMode) {
-									yield return SelectTask(initialCell);
+									yield return SelectTask(initialCell, isSelectingKeyframes);
 									lastSelectedCell = initialCell;
 									lastSelectionContainer = Document.Current.Container;
 								} else {
@@ -53,7 +55,7 @@ namespace Tangerine.UI.Timeline
 			}
 		}
 
-		private static object SelectRangeTask(IntVector2 a, IntVector2 b)
+		private static object SelectRangeTask(IntVector2 a, IntVector2 b, bool selectKeyframes)
 		{
 			Operations.ClearGridSelection.Perform();
 			Core.Operations.ClearRowSelection.Perform();
@@ -67,10 +69,32 @@ namespace Tangerine.UI.Timeline
 					Y = Math.Max(a.Y, b.Y)
 				}
 			};
-			for (var i = r.A.Y; i <= r.B.Y; i++) {
-				Operations.SelectGridSpan.Perform(i, r.A.X, r.B.X + 1);
+			if (selectKeyframes) {
+				SelectKeyframes(r);
+			} else {
+				for (var i = r.A.Y; i <= r.B.Y; i++) {
+					Operations.SelectGridSpan.Perform(i, r.A.X, r.B.X + 1);
+				}
 			}
 			return null;
+		}
+
+		private static void SelectKeyframes(IntRectangle bounds)
+		{
+			foreach (var row in Document.Current.Rows) {
+				if (
+					row.Index >= bounds.A.Y && row.Index <= bounds.B.Y &&
+					row.Components.Get<NodeRow>() is NodeRow nodeRow
+				) {
+					foreach (var animator in nodeRow.Node.Animators) {
+						foreach (var key in animator.ReadonlyKeys) {
+							if (key.Frame >= bounds.A.X && key.Frame <= bounds.B.X) {
+								Operations.SelectGridSpan.Perform(row.Index, key.Frame, key.Frame + 1);
+							}
+						}
+					}
+				}
+			}
 		}
 
 		private static bool IsCellSelected(IntVector2 cell)
@@ -124,7 +148,7 @@ namespace Tangerine.UI.Timeline
 			yield return DragSelectionTask(cell);
 		}
 
-		private IEnumerator<object> SelectTask(IntVector2 initialCell)
+		private IEnumerator<object> SelectTask(IntVector2 initialCell, bool selectKeyframes)
 		{
 			var input = Grid.RootWidget.Input;
 			if (!input.IsKeyPressed(Key.Control)) {
@@ -157,8 +181,12 @@ namespace Tangerine.UI.Timeline
 			}
 			Timeline.Instance.Ruler.MeasuredFrameDistance = 0;
 			Grid.OnPostRender -= RenderSelectionRect;
-			for (var r = selectionRectangle.A.Y; r < selectionRectangle.B.Y; r++) {
-				Operations.SelectGridSpan.Perform(r, selectionRectangle.A.X, selectionRectangle.B.X);
+			if (selectKeyframes) {
+				SelectKeyframes(selectionRectangle);
+			} else {
+				for (var r = selectionRectangle.A.Y; r < selectionRectangle.B.Y; r++) {
+					Operations.SelectGridSpan.Perform(r, selectionRectangle.A.X, selectionRectangle.B.X);
+				}
 			}
 		}
 
