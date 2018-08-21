@@ -44,6 +44,9 @@ namespace Lime
 				var type = Yuzu.Metadata.Meta.GetTypeByReadAlias(componentTypeName, Serialization.DefaultYuzuCommonOptions)
 				           ?? Yuzu.Util.TypeSerializer.Deserialize(componentTypeName);
 				o = host.Components.Get(type);
+				if (o == null) {
+					return (result, null);
+				}
 				prevIndex = index + 2;
 			}
 			while (true) {
@@ -58,6 +61,9 @@ namespace Lime
 					return (result, (IAnimable)o);
 				} else {
 					o = result.Info.GetValue(o);
+					if (o == null) {
+						return (result, null);
+					}
 				}
 				prevIndex = index + 1;
 			}
@@ -81,10 +87,7 @@ namespace Lime
 			var p = new PropertyData();
 			p.Info = ownerType.GetProperty(propertyName);
 			p.OwnerType = ownerType;
-			if (p.Info == null) {
-				throw new Lime.Exception("Property '{0}' doesn't exist for class '{1}'", propertyName, ownerType);
-			}
-			p.Triggerable = p.Info.GetCustomAttributes(typeof(TriggerAttribute), false).Length > 0;
+			p.Triggerable = p.Info?.GetCustomAttributes(typeof(TriggerAttribute), false)?.Length > 0;
 			plist.Add(p);
 			return p;
 		}

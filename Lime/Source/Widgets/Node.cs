@@ -21,7 +21,7 @@ namespace Lime
 
 	public interface IAnimable
 	{
-		void RemoveAnimators(IAnimable animable);
+		void UnbindAnimators();
 	}
 
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
@@ -1043,6 +1043,16 @@ namespace Lime
 			}
 		}
 
+		void IAnimable.UnbindAnimators()
+		{
+			foreach (var a in Animators) {
+				// Optimization: absence of `.` in path means its a node property being animated, so we never need to unbind it
+				if (a.TargetPropertyPath.IndexOf('.') != -1) {
+					a.Unbind();
+				}
+			}
+		}
+
 		/// <summary>
 		/// TODO: Translate
 		/// Этот метод масштабирует позицию и размер данного нода и всех его потомков.
@@ -1330,11 +1340,6 @@ namespace Lime
 		internal protected virtual bool PartialHitTest(ref HitTestArgs args)
 		{
 			return false;
-		}
-
-		public void RemoveAnimators(IAnimable owner)
-		{
-			Animators.RemoveAllByAnimable(owner);
 		}
 
 		private class DescendantsEnumerable : IEnumerable<Node>

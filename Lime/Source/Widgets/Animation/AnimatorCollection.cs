@@ -140,26 +140,6 @@ namespace Lime
 
 		bool ICollection<IAnimator>.IsReadOnly => false;
 
-		public void RemoveAllByAnimable(IAnimable animable)
-		{
-			IAnimator prev = null;
-			for (var a = First; a != null; a = a.Next) {
-				if (a.Animable == animable) {
-					if (prev == null) {
-						First = a.Next;
-					} else {
-						prev.Next = a.Next;
-					}
-					a.Owner = null;
-					a.Animable = null;
-					a.Next = null;
-					Count--;
-					Version++;
-				}
-				prev = a;
-			}
-		}
-
 		public bool Remove(IAnimator item)
 		{
 			if (item.Owner != owner) {

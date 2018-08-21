@@ -39,6 +39,10 @@ namespace Lime
 		Type GetValueType();
 
 		bool TryGetNextKeyFrame(int nextFrame, out int keyFrame);
+
+		void Unbind();
+
+		bool IsZombie { get; }
 	}
 
 	public interface IKeyframeList : IList<IKeyframe>
@@ -81,6 +85,9 @@ namespace Lime
 
 		public bool IsTriggerable { get; set; }
 		public bool Enabled { get; set; } = true;
+		private delegate void SetterDelegate(T value);
+		private SetterDelegate Setter;
+		public bool IsZombie { get; private set; }
 
 		[YuzuMember("TargetProperty")]
 		public string TargetPropertyPath { get; set; }
@@ -149,6 +156,8 @@ namespace Lime
 		{
 			var clone = (Animator<T>)MemberwiseClone();
 			clone.Setter = null;
+			clone.Animable = null;
+			clone.IsZombie = false;
 			clone.Owner = null;
 			clone.Next = null;
 			clone.boxedKeys = null;
@@ -157,9 +166,14 @@ namespace Lime
 			return clone;
 		}
 
-		private delegate void SetterDelegate(T value);
+		public void Unbind()
+		{
+			IsZombie = false;
+			Setter = null;
+			Animable = null;
+		}
 
-		private SetterDelegate Setter;
+		public int Duration => (ReadonlyKeys.Count == 0) ? 0 : ReadonlyKeys[ReadonlyKeys.Count - 1].Frame;
 
 		protected virtual T InterpolateLinear(float t) => Value2;
 		protected virtual T InterpolateSplined(float t) => InterpolateLinear(t);
@@ -182,9 +196,12 @@ namespace Lime
 
 		public void Apply(double time)
 		{
-			if (Enabled) {
+			if (Enabled && !IsZombie) {
 				if (Setter == null) {
 					Bind();
+					if (IsZombie) {
+						return;
+					}
 				}
 				Setter(CalcValue(time));
 			}
@@ -193,12 +210,13 @@ namespace Lime
 		private void Bind()
 		{
 			var (p, animable) = AnimationUtils.GetPropertyByPath(Owner, TargetPropertyPath);
+			var mi = p.Info?.GetSetMethod();
+			if (animable == null || p.Info.PropertyType != typeof(T) || mi == null) {
+				IsZombie = true;
+				return;
+			}
 			Animable = animable;
 			IsTriggerable = p.Triggerable;
-			var mi = p.Info.GetSetMethod();
-			if (mi == null) {
-				throw new Lime.Exception("Property '{0}' (class '{1}') is readonly", TargetPropertyPath, animable.GetType());
-			}
 			Setter = (SetterDelegate)Delegate.CreateDelegate(typeof(SetterDelegate), animable, mi);
 		}
 
@@ -291,8 +309,6 @@ namespace Lime
 			minTime = minFrame * AnimationUtils.SecondsPerFrame;
 			maxTime = maxFrame * AnimationUtils.SecondsPerFrame;
 		}
-
-		public int Duration => (ReadonlyKeys.Count == 0) ? 0 : ReadonlyKeys[ReadonlyKeys.Count - 1].Frame;
 	}
 
 	public class Vector2Animator : Animator<Vector2>

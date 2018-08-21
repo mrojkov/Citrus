@@ -77,13 +77,6 @@ namespace Tangerine.Core.Operations
 				(propertyData, owner) = AnimationUtils.GetPropertyByPath(animationHost, propertyName);
 			}
 			SetProperty.Perform(owner, propertyData.Info?.Name ?? propertyName, value);
-			if (animationHost != null && propertyData.Info?.PropertyType != null && typeof(IAnimable).IsAssignableFrom(propertyData.Info?.PropertyType)) {
-				foreach (var a in animationHost.Animators.ToList()) {
-					if (a.TargetPropertyPath.StartsWith(propertyName, StringComparison.Ordinal)) {
-						RemoveAnimator.Perform(a);
-					}
-				}
-			}
 			if (animationHost != null && (animationHost.Animators.TryFind(propertyName, out animator, Document.Current.AnimationId) || createAnimatorIfNeeded)) {
 				if (animator == null && createInitialKeyframeForNewAnimator) {
 					var propertyValue = propertyData.Info.GetValue(owner);
@@ -144,43 +137,6 @@ namespace Tangerine.Core.Operations
 						keyframeClone.Value = processedValue;
 						SetKeyframe.Perform(animator, keyframeClone);
 					}
-				}
-			}
-		}
-	}
-
-	public class RemoveAnimator : Operation
-	{
-		public override bool IsChangingDocument => true;
-		public readonly IAnimator Animator;
-		public readonly IAnimationHost AnimationHost;
-
-		private RemoveAnimator(IAnimator animator)
-		{
-			Animator = animator;
-			AnimationHost = animator.Owner;
-		}
-
-		public static void Perform(IAnimator animator)
-		{
-			Document.Current.History.Perform(new RemoveAnimator(animator));
-		}
-
-		public class Processor : OperationProcessor<RemoveAnimator>
-		{
-			protected override void InternalRedo(RemoveAnimator op)
-			{
-				op.AnimationHost.Animators.Remove(op.Animator);
-				if (op.Animator.TargetPropertyPath == nameof(Node.Trigger)) {
-					Document.ForceAnimationUpdate();
-				}
-			}
-
-			protected override void InternalUndo(RemoveAnimator op)
-			{
-				op.AnimationHost.Animators.Add(op.Animator);
-				if (op.Animator.TargetPropertyPath == nameof(Node.Trigger)) {
-					Document.ForceAnimationUpdate();
 				}
 			}
 		}

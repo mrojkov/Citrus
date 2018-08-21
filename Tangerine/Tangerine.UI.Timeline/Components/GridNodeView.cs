@@ -51,6 +51,9 @@ namespace Tangerine.UI.Timeline.Components
 			}
 			// Data reading in keys
 			foreach (var animator in node.Animators) {
+				if (animator.IsZombie) {
+					continue;
+				}
 				for (var j = 0; j < animator.ReadonlyKeys.Count; j++) {
 					var key = animator.ReadonlyKeys[j];
 					var colorIndex = PropertyAttributes<TangerineKeyframeColorAttribute>.Get(animator.Animable.GetType(), animator.TargetPropertyPath)?.ColorIndex ?? 0;

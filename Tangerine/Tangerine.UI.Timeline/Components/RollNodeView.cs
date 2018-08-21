@@ -71,8 +71,16 @@ namespace Tangerine.UI.Timeline.Components
 					Renderer.DrawRectOutline(a, b, ColorTheme.Current.TimelineRoll.Lines);
 				}
 			}));
-			expandButtonContainer.Updating += delta =>
-				expandButton.Visible = nodeData.Node.Animators.Count > 0;
+			expandButtonContainer.Updating += delta => {
+				bool visible = false;
+				foreach (var a in nodeData.Node.Animators) {
+					if (!a.IsZombie) {
+						visible = true;
+						break;
+					}
+				}
+				expandButton.Visible = visible;
+			};
 			enterButton = NodeCompositionValidator.CanHaveChildren(nodeData.Node.GetType()) ? CreateEnterButton() : null;
 			eyeButton = CreateEyeButton();
 			lockButton = CreateLockButton();
@@ -218,7 +226,7 @@ namespace Tangerine.UI.Timeline.Components
 				return AnimationState.None;
 			int enabled = 0;
 			foreach (var a in animators) {
-				if (a.Enabled)
+				if (a.Enabled && !a.IsZombie)
 					enabled++;
 			}
 			if (enabled == 0)
