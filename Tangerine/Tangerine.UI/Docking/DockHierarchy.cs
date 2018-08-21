@@ -586,7 +586,7 @@ namespace Tangerine.UI.Docking
 			} else if (SecondChild == null && FirstChild != null) {
 				ReplaceThisWith(FirstChild);
 			} else if (FirstChild == null && SecondChild == null) {
-				Parent.RemovePlacement(this);
+				Parent?.RemovePlacement(this);
 			}
 			FirstChild?.RemoveRedundantNodes();
 			SecondChild?.RemoveRedundantNodes();

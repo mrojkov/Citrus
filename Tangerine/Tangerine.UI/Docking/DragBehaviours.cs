@@ -55,6 +55,20 @@ namespace Tangerine.UI.Docking
 			IsActive = false;
 		}
 
+		private IEnumerable<Panel> GetPanels()
+		{
+			foreach (var panel in AppPlacement.Panels) {
+				var panelPlacement = DockManager.Instance.Model.FindPanelPlacement(panel.Id);
+				if (!panelPlacement.Hidden &&
+					panel.ContentWidget.GetRoot() is WindowWidget &&
+					panelPlacement!= placement &&
+					!panelPlacement.IsDescendantOf(placement)
+				) {
+					yield return panel;
+				}
+			}
+		}
+
 		private void RefreshPlacementAndSite()
 		{
 			var mousePosition = Application.DesktopMousePosition;
@@ -65,8 +79,7 @@ namespace Tangerine.UI.Docking
 			var cachedSite = requestedSite;
 			requestedSite = DockSite.None;
 			windowPlacement.WindowWidget.Window.ClientPosition = mousePosition - positionOffset;
-			var placements = AppPlacement.Panels.Where(pan => !DockManager.Instance.Model.FindPanelPlacement(pan.Id).Hidden && pan.ContentWidget.Parent != null);
-			foreach (var p in placements) {
+			foreach (var p in GetPanels()) {
 				var placement = AppPlacement.FindPanelPlacement(p.Id);
 				var bounds = p.ContentWidget.CalcAABBInWindowSpace();
 				var winPlacement = DockManager.Instance.Model.GetWindowByPlacement(placement);
@@ -74,9 +87,7 @@ namespace Tangerine.UI.Docking
 				if (requestedDockingComponent == null) continue;
 				var clientMousePos = winPlacement.WindowWidget.Window.Input.MousePosition;
 				if (!bounds.Contains(clientMousePos)) continue;
-				DockSite site;
-				Rectangle? rect;
-				CalcSiteAndRect(clientMousePos, bounds, out site, out rect);
+				CalcSiteAndRect(clientMousePos, bounds, out DockSite site, out Rectangle? rect);
 				if (placement.Id == windowPlacement.Root.GetDescendantPanels().First().Id ||
 					placement.Id == DockManager.DocumentAreaId &&
 					site == DockSite.Fill
@@ -168,7 +179,7 @@ namespace Tangerine.UI.Docking
 			while (true) {
 				var pressedPosition = inputWidget.LocalMousePosition();
 				if (input.WasMousePressed()) {
-					if (placement.Root.GetDescendantPanels().Count() == 1) {
+					if (placement.Root == placement.Parent) {
 						WindowDragBehaviour.CreateFor(placement, pressedPosition);
 					} else {
 						var size = inputWidget.Parent.AsWidget.Size;
