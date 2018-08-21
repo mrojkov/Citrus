@@ -4,15 +4,22 @@ using System.Collections.Generic;
 namespace Lime
 {
 	[YuzuDontGenerateDeserializer]
+	public enum CheckBoxState
+	{
+		Unchecked,
+		Checked,
+		Indeterminate
+	}
+
 	public class CheckBox : Widget
 	{
-		private bool @checked;
+		public CheckBoxState State { get; set; }
 
 		public event Action<ChangedEventArgs> Changed;
 
 		public bool Checked
 		{
-			get { return @checked; }
+			get { return State == CheckBoxState.Checked; }
 			set { SetChecked(value); }
 		}
 
@@ -47,13 +54,17 @@ namespace Lime
 
 		private void ToggleInternal(bool changedByUser = false)
 		{
-			SetChecked(!@checked, changedByUser);
+			SetChecked(!Checked, changedByUser);
 		}
 
 		private void SetChecked(bool @checked, bool changedByUser = false)
 		{
-			if (this.@checked != @checked) {
-				this.@checked = @checked;
+			if (@checked && State != CheckBoxState.Checked) {
+				State = CheckBoxState.Checked;
+				RiseChanged(changedByUser);
+				Window.Current.Invalidate();
+			} else if (!@checked && State != CheckBoxState.Unchecked) {
+				State = CheckBoxState.Unchecked;
 				RiseChanged(changedByUser);
 				Window.Current.Invalidate();
 			}

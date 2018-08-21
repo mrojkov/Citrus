@@ -319,7 +319,7 @@ namespace Tangerine.UI.SceneView
 						parent = this
 					});
 				}
-				TryCheckAll();
+				TryCheckAll(traverseParents: false);
 			}
 
 			private void CheckHandle(CheckBox.ChangedEventArgs e)
@@ -339,16 +339,32 @@ namespace Tangerine.UI.SceneView
 				parent?.TryCheckAll();
 			}
 
-			private void TryCheckAll()
+			private void TryCheckAll(bool traverseParents = true)
 			{
-				bool checkedAll = container.Nodes.Count > 0 | BooleanEditor.Checked;
-				foreach (var editor in container.Nodes.Cast<VisualHintEditor>()) {
-					if (!(checkedAll &= editor.BooleanEditor.Checked)) {
-						break;
+				if (container.Nodes.Count > 0) {
+					int countUnchecked = 0;
+					int countIndeterminate = 0;
+					foreach (var editor in container.Nodes.Cast<VisualHintEditor>()) {
+						switch (editor.BooleanEditor.CheckBox.State) {
+							case CheckBoxState.Unchecked:
+								++countUnchecked;
+								break;
+							case CheckBoxState.Indeterminate:
+								++countIndeterminate;
+								break;
+						}
+					}
+					if (countUnchecked == container.Nodes.Count) {
+						BooleanEditor.Checked = false;
+					} else if (countIndeterminate + countUnchecked == 0) {
+						BooleanEditor.Checked = true;
+					} else {
+						BooleanEditor.CheckBox.State = CheckBoxState.Indeterminate;
 					}
 				}
-				BooleanEditor.Checked = checkedAll;
-				parent?.TryCheckAll();
+				if (traverseParents) {
+					parent?.TryCheckAll();
+				}
 			}
 
 			private void ToggleExpanded()

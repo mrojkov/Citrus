@@ -27,9 +27,13 @@ namespace Lime
 		{
 			readonly CheckBox checkBox;
 
-			private VectorShape icon = new VectorShape {
+			private readonly VectorShape checkedIcon = new VectorShape {
 				new VectorShape.Line(0.2f, 0.5f, 0.4f, 0.8f, Theme.Colors.BlackText, 0.1f),
 				new VectorShape.Line(0.4f, 0.8f, 0.75f, 0.25f, Theme.Colors.BlackText, 0.1f),
+			};
+
+			private readonly VectorShape indeterminateIcon = new VectorShape {
+				new VectorShape.Line(0.1f, 0.5f, 0.9f, 0.5f, Theme.Colors.BlackText, 0.1f)
 			};
 
 			public CheckBoxPresenter(CheckBox checkBox)
@@ -43,9 +47,12 @@ namespace Lime
 				widget.PrepareRendererState();
 				Renderer.DrawRect(Vector2.Zero, widget.Size, Theme.Colors.WhiteBackground);
 				Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Theme.Colors.ControlBorder);
-				if (checkBox.Checked) {
+				if (checkBox.State == CheckBoxState.Checked) {
 					var transform = Matrix32.Scaling(Theme.Metrics.CheckBoxSize);
-					icon.Draw(transform);
+					checkedIcon.Draw(transform);
+				} else if (checkBox.State == CheckBoxState.Indeterminate) {
+					var transform = Matrix32.Scaling(Theme.Metrics.CheckBoxSize);
+					indeterminateIcon.Draw(transform);
 				}
 			}
 
