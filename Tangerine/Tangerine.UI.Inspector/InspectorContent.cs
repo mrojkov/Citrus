@@ -38,10 +38,22 @@ namespace Tangerine.UI.Inspector
 				var nodes = objects.Cast<Node>().ToList();
 				foreach (var t in GetComponentsTypes(nodes)) {
 					var components = nodes.Select(n => n.Components.Get(t));
-					PopulateContentForType(t, components, widget, $"[{Yuzu.Util.TypeSerializer.Serialize(t)}]").ToList();
+					PopulateContentForType(t, components, widget, SerializeMutuallyExclusiveComponentGroupBaseType(t)).ToList();
 				}
 				AddComponentsMenu(nodes, widget);
 			}
+		}
+
+		private string SerializeMutuallyExclusiveComponentGroupBaseType(Type t)
+		{
+			while (true) {
+				var bt = t.BaseType;
+				if (bt?.GetCustomAttribute<MutuallyExclusiveDerivedComponentsAttribute>(true) == null) {
+					break;
+				}
+				t = bt;
+			}
+			return $"[{Yuzu.Util.TypeSerializer.Serialize(t)}]";
 		}
 
 		private IEnumerable<IPropertyEditor> BuildForObjectsHelper(IEnumerable<object> objects, Widget widget = null, string propertyPath = "")
