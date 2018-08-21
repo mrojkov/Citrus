@@ -124,5 +124,27 @@ namespace Lime
 		{
 			return GetEnumerator();
 		}
+
+		public Rectangle ToAABB()
+		{
+			var aabb = new Rectangle(Vector2.PositiveInfinity, Vector2.NegativeInfinity);
+			for (int i = 0; i < 4; ++i) {
+				var x = this[i].X;
+				var y = this[i].Y;
+				if (x > aabb.Right) {
+					aabb.Right = x;
+				}
+				if (x < aabb.Left) {
+					aabb.Left = x;
+				}
+				if (y > aabb.Bottom) {
+					aabb.Bottom = y;
+				}
+				if (y < aabb.Top) {
+					aabb.Top = y;
+				}
+			}
+			return aabb;
+		}
 	}
 }
