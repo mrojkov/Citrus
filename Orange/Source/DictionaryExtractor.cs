@@ -131,7 +131,7 @@ namespace Orange
 		{
 			const string quotedStringPattern =
 				@"(?<prefix>[@$])?""(?<string>[^""\\]*(?:\\.[^""\\]*)*)""";
-			var code = File.ReadAllText(file, Encoding.Default);
+			var code = File.ReadAllText(file, Encoding.UTF8);
 			var context = GetContext(file);
 			foreach (var match in Regex.Matches(code, quotedStringPattern)) {
 				var m = match as Match;
