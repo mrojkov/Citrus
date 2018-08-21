@@ -325,6 +325,11 @@ namespace Tangerine.Dialogs
 				availableCommands.AddItem(new CommandItem(commandInfo));
 			}
 			availableCommands.ScrollPosition = availableCommands.MinScrollPosition;
+			availableCommands.Items.Sort((node1, node2) => {
+				var string1 = ((CommandItem)((ListBox.ListBoxItem)node1).Widget).CommandTitle;
+				var string2 = ((CommandItem)((ListBox.ListBoxItem)node2).Widget).CommandTitle;
+				return string.Compare(string1, string2);
+			});
 		}
 
 		private void RefreshUsedCommands()
@@ -485,13 +490,14 @@ namespace Tangerine.Dialogs
 
 		private class CommandItem : Widget
 		{
-			public ICommand Command { get; private set; }
-			public string CommandId { get; private set; }
+			public CommandInfo CommandInfo { get; private set; }
+			public ICommand Command => CommandInfo.Command;
+			public string CommandId => CommandInfo.Id;
+			public string CommandTitle => CommandInfo.Title;
 
 			public CommandItem(CommandInfo commandInfo)
 			{
-				Command = commandInfo.Command;
-				CommandId = commandInfo.Id;
+				CommandInfo = commandInfo;
 				Layout = new HBoxLayout { Spacing = 10 };
 				Padding = new Thickness(5);
 				if (Command.Icon != null) {
