@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace Lime
 {
-	[YuzuDontGenerateDeserializer]
 	public enum CheckBoxState
 	{
 		Unchecked,
@@ -11,9 +10,19 @@ namespace Lime
 		Indeterminate
 	}
 
+	[YuzuDontGenerateDeserializer]
 	public class CheckBox : Widget
 	{
-		public CheckBoxState State { get; set; }
+		private CheckBoxState state;
+		public CheckBoxState State
+		{
+			get => state;
+			set {
+				state = value;
+				RiseChanged();
+				Window.Current.Invalidate();
+			}
+		}
 
 		public event Action<ChangedEventArgs> Changed;
 
