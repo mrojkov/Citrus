@@ -188,7 +188,7 @@ namespace Tangerine.UI.FilesystemView
 		void InitializeWidgets()
 		{
 			RootWidget.AddChangeWatcher(() => selection.Version, Selection_Changed);
-			scrollView.Content.Layout = new VFlowLayout { Spacing = 1.0f };
+			scrollView.Content.Layout = new FlowLayout(LayoutDirection.TopToBottom) { Spacing = 1.0f };
 			scrollView.Content.Padding = new Thickness(5.0f);
 			scrollView.Content.CompoundPostPresenter.Insert(0, new DelegatePresenter<Widget>(RenderFilesWidgetRectSelection));
 			scrollView.Updated += ScrollViewUpdated;
@@ -377,12 +377,12 @@ namespace Tangerine.UI.FilesystemView
 					scrollView = new ThemedScrollView(ScrollDirection.Vertical) {
 						TabTravesable = new TabTraversable(),
 					};
-					scrollView.Content.Layout = new HFlowLayout { Spacing = 1.0f };
+					scrollView.Content.Layout = new FlowLayout(LayoutDirection.LeftToRight) { Spacing = 1.0f };
 				} else {
 					scrollView = new ThemedScrollView(ScrollDirection.Horizontal) {
 						TabTravesable = new TabTraversable(),
 					};
-					scrollView.Content.Layout = new VFlowLayout { Spacing = 1.0f };
+					scrollView.Content.Layout = new FlowLayout(LayoutDirection.TopToBottom) { Spacing = 1.0f };
 				}
 
 				scrollView.Content.Padding = new Thickness(5.0f);

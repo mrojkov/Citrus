@@ -229,12 +229,10 @@
     <Compile Include="Source\Widgets\IExternalScenePropertyOverrideChecker.cs" />
     <Compile Include="Source\Widgets\IRenderChainBuilder.cs" />
     <Compile Include="Source\Widgets\KeyboardFocus.cs" />
-    <Compile Include="Source\Widgets\Layout\HBoxLayout.cs" />
-    <Compile Include="Source\Widgets\Layout\HFlowLayout.cs" />
+    <Compile Include="Source\Widgets\Layout\LinearLayout.cs" />
     <Compile Include="Source\Widgets\Layout\LayoutDebugPresenter.cs" />
     <Compile Include="Source\Widgets\Layout\FlowLayout.cs" />
     <Compile Include="Source\Widgets\3D\WidgetAdapter3D.cs" />
-    <Compile Include="Source\Widgets\Layout\VFlowLayout.cs" />
     <Compile Include="Source\Widgets\Materials\GradientMaterial.cs" />
     <Compile Include="Source\Widgets\MorphableMesh.cs" />
     <Compile Include="Source\Widgets\MorphableMeshBuilder.cs" />
@@ -381,7 +379,6 @@
     <Compile Include="Source\Widgets\Layout\LayoutCell.cs" />
     <Compile Include="Source\Widgets\Layout\LayoutManager.cs" />
     <Compile Include="Source\Widgets\Layout\LinearAllocator.cs" />
-    <Compile Include="Source\Widgets\Layout\VBoxLayout.cs" />
     <Compile Include="Source\Types\MonoMac\CG.cs" />
     <Compile Include="Source\Widgets\Layout\StackLayout.cs" />
     <Compile Include="Source\Application\MouseCursor\IStockCursors.cs" />

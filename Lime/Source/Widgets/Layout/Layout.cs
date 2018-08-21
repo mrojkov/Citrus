@@ -22,6 +22,12 @@ namespace Lime
 		void ArrangeChildren();
 	}
 
+	public enum LayoutDirection
+	{
+		LeftToRight,
+		TopToBottom,
+	}
+
 	[MutuallyExclusiveDerivedComponents]
 	[AllowedComponentOwnerTypes(typeof(Widget))]
 	[YuzuDontGenerateDeserializer]
