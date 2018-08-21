@@ -60,8 +60,10 @@ namespace Lime
 			Add(typeof(NodeReference<Node3D>), typeof(Animator<NodeReference<Node3D>>));
 			Add(typeof(NodeReference<Spline3D>), typeof(Animator<NodeReference<Spline3D>>));
 			Add(typeof(NodeReference<Camera3D>), typeof(Animator<NodeReference<Camera3D>>));
+			Add(typeof(LayoutDirection), typeof(Animator<LayoutDirection>));
+			Add(typeof(Thickness), typeof(ThicknessAnimator));
 		}
-		
+
 		public bool Contains(Type propertyType)
 		{
 			return map.ContainsKey(propertyType);

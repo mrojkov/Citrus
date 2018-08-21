@@ -6,16 +6,16 @@ namespace Lime
 	public struct Thickness
 	{
 		[YuzuMember("0")]
-		public float Left { get; set; }
+		public float Left;
 
 		[YuzuMember("1")]
-		public float Right { get; set; }
+		public float Right;
 
 		[YuzuMember("2")]
-		public float Top { get; set; }
+		public float Top;
 
 		[YuzuMember("3")]
-		public float Bottom { get; set; }
+		public float Bottom;
 
 		public Vector2 LeftTop
 		{

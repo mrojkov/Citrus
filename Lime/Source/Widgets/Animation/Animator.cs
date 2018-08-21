@@ -392,4 +392,27 @@ namespace Lime
 			return Matrix44.Lerp(Value2, Value3, t);
 		}
 	}
+
+	public class ThicknessAnimator : Animator<Thickness>
+	{
+		protected override Thickness InterpolateLinear(float t)
+		{
+			Thickness r;
+			r.Left = Value2.Left + (Value3.Left - Value2.Left) * t;
+			r.Right = Value2.Right + (Value3.Right - Value2.Right) * t;
+			r.Top = Value2.Top + (Value3.Top - Value2.Top) * t;
+			r.Bottom = Value2.Bottom + (Value3.Bottom - Value2.Bottom) * t;
+			return r;
+		}
+
+		protected override Thickness InterpolateSplined(float t)
+		{
+			return new Thickness(
+				Mathf.CatmullRomSpline(t, Value1.Left, Value2.Left, Value3.Left, Value4.Left),
+				Mathf.CatmullRomSpline(t, Value1.Right, Value2.Right, Value3.Right, Value4.Right),
+				Mathf.CatmullRomSpline(t, Value1.Top, Value2.Top, Value3.Top, Value4.Top),
+				Mathf.CatmullRomSpline(t, Value1.Bottom, Value2.Bottom, Value3.Bottom, Value4.Bottom)
+			);
+		}
+	}
 }
