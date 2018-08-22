@@ -23,8 +23,14 @@ namespace Tangerine.UI.Timeline.Processors
 			}
 		}
 
+		private Node container;
+
 		public override void Process(IOperation op)
 		{
+			if (!op.IsChangingDocument && container == Document.Current.Container) {
+				return;
+			}
+			container = Document.Current.Container;
 			var links = new Dictionary<Widget, HashSet<SplineGear>>();
 			var links3D = new Dictionary<Node3D, HashSet<SplineGear3D>>();
 			foreach (var row in Document.Current.Rows) {

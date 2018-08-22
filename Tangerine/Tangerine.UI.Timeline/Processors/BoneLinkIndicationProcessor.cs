@@ -17,9 +17,15 @@ namespace Tangerine.UI.Timeline.Processors
 			}
 		}
 
+	    private Node container;
+
         public override void Process(IOperation op)
         {
-            var links = new Dictionary<Bone, HashSet<RollNodeView>>();
+	        if (!op.IsChangingDocument && container == Document.Current.Container) {
+		        return;
+	        }
+	        container = Document.Current.Container;
+			var links = new Dictionary<Bone, HashSet<RollNodeView>>();
             foreach (var row in Document.Current.Rows)
             {
 	            if (!(row.Components.Get<RowView>()?.RollRow is RollNodeView view)) {

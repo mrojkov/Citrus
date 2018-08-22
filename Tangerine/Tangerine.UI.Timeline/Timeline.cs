@@ -6,6 +6,7 @@ using Tangerine.Core;
 using Tangerine.Core.Components;
 using Tangerine.UI.Docking;
 using Tangerine.UI.Timeline.Components;
+using Tangerine.UI.Timeline.Processors;
 
 namespace Tangerine.UI.Timeline
 {
@@ -55,7 +56,10 @@ namespace Tangerine.UI.Timeline
 				new RowViewsUpdater(),
 				new RollWidgetsUpdater(),
 				new OverviewWidgetsUpdater(),
-				new GridWidgetsUpdater()
+				new GridWidgetsUpdater(),
+				new ImageCombinerLinkIndicationProcessor(),
+				new BoneLinkIndicationProcessor(),
+				new SplineGearLinkIndicationProcessor(),
 			};
 		}
 

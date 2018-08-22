@@ -238,9 +238,6 @@ namespace Tangerine
 				new TriggersValidatorOnSetKeyframe(),
 				new UpdateNodesAndApplyAnimatorsProcessor(),
 				new RowsSynchronizer(),
-				new ImageCombinerIndicationProcessor(),
-				new TiedBoneIndicationProcessor(),
-				new TiedSplineGearIndicationProcessor(),
 				new Core.Operations.ReplaceContents.Processor()
 			});
 			DocumentHistory.Processors.AddRange(UI.Timeline.Timeline.GetOperationProcessors());

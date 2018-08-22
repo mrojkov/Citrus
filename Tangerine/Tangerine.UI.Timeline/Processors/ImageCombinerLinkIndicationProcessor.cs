@@ -24,8 +24,14 @@ namespace Tangerine.UI.Timeline.Processors
 			public void ShowError(string tip = "No linked arguments") => SetTipAndTexture(tip, IconPool.GetTexture("Timeline.NoEntry"));
 		}
 
+		private Node container;
+
 		public override void Process(IOperation op)
 		{
+			if (!op.IsChangingDocument && container == Document.Current.Container) {
+				return;
+			}
+			container = Document.Current.Container;
 			var rows = Document.Current.Rows;
 			for (int i = 0; i < rows.Count; ++i) {
 				var row = rows[i];
