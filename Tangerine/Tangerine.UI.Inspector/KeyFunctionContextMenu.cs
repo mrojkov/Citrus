@@ -10,10 +10,15 @@ namespace Tangerine.UI.Inspector
 {
 	static class KeyFunctionContextMenu
 	{
+		private static KeyFunction[] keyFunctions = {
+			KeyFunction.Linear, KeyFunction.Spline,
+			KeyFunction.Steep, KeyFunction.ClosedSpline,
+		};
+
 		public static void Create(KeyFunctionButtonBinding binding)
 		{
 			var menu = new Menu();
-			foreach (KeyFunction keyFunction in Enum.GetValues(typeof(KeyFunction))) {
+			foreach (KeyFunction keyFunction in keyFunctions) {
 				menu.Add(new Command(Enum.GetName(typeof(KeyFunction), keyFunction),
 					new ChangeKeyFunction(binding, keyFunction).Execute));
 			}
@@ -22,7 +27,6 @@ namespace Tangerine.UI.Inspector
 
 		private class ChangeKeyFunction : CommandHandler
 		{
-
 			private KeyFunctionButtonBinding binding;
 			private KeyFunction keyFunction;
 
