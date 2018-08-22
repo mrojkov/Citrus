@@ -274,6 +274,11 @@ namespace Tangerine.UI.FilesystemView
 		private Color4 outline;
 		private PathBarButtonState state;
 
+		public PathButtonPresenter() : base()
+		{
+			innerGradient = Theme.Colors.PathBarButtonNormal;
+		}
+
 		public void SetState(PathBarButtonState state)
 		{
 			if (this.state != state) {
@@ -421,7 +426,7 @@ namespace Tangerine.UI.FilesystemView
 				icon.Texture = IconPool.GetTexture("Filesystem.PathSeparatorExpanded");
 				var indent = 14;
 				var pickerPosition = Window.Current.LocalToDesktop(GlobalPosition + new Vector2(-indent, Height));
-				picker = new DirectoryPicker(openPath, pickerPosition, path);		
+				picker = new DirectoryPicker(openPath, pickerPosition, path);
 				picker.Closing += FlipState;
 			} else {
 				Expanded = false;
@@ -460,7 +465,7 @@ namespace Tangerine.UI.FilesystemView
 			scrollView.Content.Nodes.AddRange(filesystemItems);
 
 			// Like in Windows File Explorer
-			const int MaxItemsOnPicker = 19; 
+			const int MaxItemsOnPicker = 19;
 			var itemsCount = Math.Min(filesystemItems.Count, MaxItemsOnPicker);
 			var clientSize = new Vector2(
 				FilesystemItem.ItemWidth,
@@ -512,7 +517,7 @@ namespace Tangerine.UI.FilesystemView
 				window.Close();
 			}
 		}
-	
+
 		public static List<string> GetInternalFoldersPaths(string path)
 		{
 			var foldersPaths = new List<string>();
