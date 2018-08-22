@@ -180,7 +180,7 @@ namespace Lime
 	}
 
 	[NodeComponentDontSerialize]
-	[AllowedComponentOwnerTypes(typeof(Image))]
+	[AllowedComponentOwnerTypes(typeof(Widget))]
 	internal class MeasuredSize : NodeComponent
 	{
 		public Vector2 MeasuredMinSize
@@ -220,7 +220,7 @@ namespace Lime
 	}
 
 	[TangerineRegisterComponent]
-	[AllowedComponentOwnerTypes(typeof(Image))]
+	[AllowedComponentOwnerTypes(typeof(Widget))]
 	public class LayoutConstraints : NodeComponent
 	{
 		public new Widget Owner
