@@ -1,5 +1,6 @@
 using Lime;
 using System.Collections.Generic;
+using System.Net;
 using Tangerine.UI;
 
 namespace Tangerine
@@ -88,14 +89,16 @@ namespace Tangerine
 		private IEnumerator<object> DragTask(Widget panelContainer, WidgetInput input, int rowIndex, int panelIndex)
 		{
 			var rootWidget = widget.GetRoot().AsWidget;
-			var rootPos = widget.CalcPositionInSpaceOf(rootWidget);
 			int newRowIndex = rowIndex;
 			int newPanelIndex = panelIndex;
-			var widgetPos = panelContainer.CalcPositionInSpaceOf(rootWidget);
 			var presenter = new DelegatePresenter<Widget>(w => {
 				w.PrepareRendererState();
-				Renderer.DrawRect(widgetPos, widgetPos + panelContainer.Size, ColorTheme.Current.Toolbar.PanelPlacementHighlightBackground);
-				Renderer.DrawRectOutline(widgetPos, widgetPos + panelContainer.Size, ColorTheme.Current.Toolbar.PanelPlacementHighlightBorder);
+				if (panelContainer == null) {
+					return;
+				}
+				var aabb = panelContainer.CalcAABBInSpaceOf(rootWidget);
+				Renderer.DrawRect(aabb.A, aabb.B, ColorTheme.Current.Toolbar.PanelPlacementHighlightBackground);
+				Renderer.DrawRectOutline(aabb.A, aabb.B, ColorTheme.Current.Toolbar.PanelPlacementHighlightBorder);
 			});
 			while (true) {
 				if (!input.WasMousePressed() || Core.Project.Current == Core.Project.Null) {
@@ -117,25 +120,25 @@ namespace Tangerine
 								continue;
 							}
 							if ((newRowIndex != i || newPanelIndex != j) && (rowIndex != i || j != rowWidget.Nodes.Count - 1)) {
-								widgetPos = panelWidget.CalcPositionInSpaceOf(rootWidget);
+								panelContainer = panelWidget;
 								newRowIndex = i;
 								newPanelIndex = j;
 							}
 							goto Next;
 						}
 					}
-					Next:
+
+					panelContainer = null;
 					if (!IsMouseOver(widget, out pos)) {
 						newPanelIndex = 0;
 						if (pos.Y < 0) {
 							newRowIndex = -1;
-							widgetPos = rootPos + new Vector2(0, -panelContainer.Height);
 						}
 						if (pos.Y > widget.Height) {
 							newRowIndex = toolbarModel.Rows.Count;
-							widgetPos = rootPos + new Vector2(0, widget.Height);
 						}
 					}
+					Next:
 					yield return null;
 				}
 				rootWidget.CompoundPostPresenter.Remove(presenter);
