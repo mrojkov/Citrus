@@ -82,7 +82,6 @@
     <Compile Include="Dialogs\AlertDialog.cs" />
     <Compile Include="SearchPanel\SearchPanel.cs" />
     <Compile Include="NodeIconPool.cs" />
-    <Compile Include="Toolbar.cs" />
     <Compile Include="Utils\Utils.cs" />
     <Compile Include="ColorPickerPanel.cs" />
     <Compile Include="Utils\Metrics.cs" />
@@ -134,6 +133,9 @@
     <Compile Include="PropertyEditors\Vector2PropertyEditor.cs" />
     <Compile Include="PropertyEditors\Vector3PropertyEditor.cs" />
     <Compile Include="PropertyEditors\ColorGradientPropertyEditor.cs" />
+    <Compile Include="CommandRegistry.cs" />
+    <Compile Include="ToolbarModel.cs" />
+    <Compile Include="ToolbarView.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>
