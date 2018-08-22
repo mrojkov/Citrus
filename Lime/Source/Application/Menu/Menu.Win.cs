@@ -11,6 +11,19 @@ namespace Lime
 	{
 		readonly List<MenuItem> items = new List<MenuItem>();
 
+		public Menu(bool ignoreFirstFocusLoss = false) : base()
+		{
+			if (ignoreFirstFocusLoss) {
+				bool state = true;
+				NativeContextMenu.Closing += (s, e) => {
+					if (e.CloseReason == ToolStripDropDownCloseReason.AppFocusChange) {
+						e.Cancel = state;
+						state = false;
+					}
+				};
+			}
+		}
+
 		private MenuStrip nativeMainMenu;
 		private ContextMenuStrip nativeContextMenu;
 		internal MenuStrip NativeMainMenu

@@ -100,7 +100,7 @@ namespace Lime
 		{
 			ShowingDropDownList?.Invoke();
 #if MAC || WIN
-			var menu = new Menu();
+			var menu = new Menu(ignoreFirstFocusLoss: true);
 			int j = 0;
 			ICommand selectedCommand = null;
 			foreach (var i in Items) {
@@ -116,7 +116,7 @@ namespace Lime
 				j++;
 			}
 			var aabb = CalcAABBInWindowSpace();
-			menu.Popup(Window.Current, aabb.A, aabb.Width, selectedCommand);
+			menu.Popup(Window.Current, new Vector2(aabb.AX, aabb.BY), aabb.Width, selectedCommand);
 #if WIN
 			menu.ShowImageMargin = false;
 			menu.NativeContextMenu.Capture = true;
