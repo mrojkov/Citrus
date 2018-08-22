@@ -1,9 +1,7 @@
-using Lime;
 using System.Collections.Generic;
-using System.Net;
-using Tangerine.UI;
+using Lime;
 
-namespace Tangerine
+namespace Tangerine.UI
 {
 	public class ToolbarView
 	{
@@ -21,51 +19,52 @@ namespace Tangerine
 			DecorateToolbar(widget);
 		}
 
-		public void Rebuild(ToolbarModel toolbarModel)
+		public void Rebuild(ToolbarModel newToolbarModel)
 		{
-			this.toolbarModel = toolbarModel;
+			toolbarModel = newToolbarModel;
 			Rebuild();
 		}
 
 		public void Rebuild()
 		{
 			widget.Nodes.Clear();
-			for (int i = 0; i < toolbarModel.Rows.Count; ++i) {
+			for (var i = 0; i < toolbarModel.Rows.Count; ++i) {
 				var row = toolbarModel.Rows[i];
 				var rowWidget = new Widget {
 					MinMaxHeight = Metrics.ToolbarHeight,
 					LayoutCell = new LayoutCell { StretchY = 0 },
 					Layout = new HBoxLayout()
 				};
-				for (int j = 0; j < row.Panels.Count; ++j) {
+				for (var j = 0; j < row.Panels.Count; ++j) {
 					var panel = row.Panels[j];
 					var panelWidget = new Widget {
 						Layout = new HBoxLayout { Spacing = 1, CellDefaults = new LayoutCell(Alignment.LeftCenter) },
 						LayoutCell = new LayoutCell(Alignment.LeftCenter) { StretchY = 0 },
 					};
 					if (panel.Draggable) {
-						int rowIndex = i;
-						int panelIndex = j;
+						var rowIndex = i;
+						var panelIndex = j;
 						panelWidget.Awoke += n => {
 							PanelAwake(n, rowIndex, panelIndex);
 						};
 					}
 					foreach (var id in panel.CommandIds) {
-						if (CommandRegistry.TryGetCommandInfo(id, out CommandInfo commandInfo)) {
-							var command = commandInfo.Command;
-							var button =
-								command.Icon != null ?
+						if (!CommandRegistry.TryGetCommandInfo(id, out var commandInfo)) {
+							continue;
+						}
+						var command = commandInfo.Command;
+						var button =
+							command.Icon != null ?
 								new ToolbarButton(command.Icon) :
 								new ToolbarButton(commandInfo.Title);
-							button.Clicked += () => CommandQueue.Instance.Add((Command)command);
-							button.Updating += _ => {
-								button.Texture = command.Icon;
-								button.Selected = command.Checked;
-								button.Enabled = command.Enabled;
-								button.Tip = button.Text = command.Text;
-							};
-							panelWidget.AddNode(button);
-						}
+						button.Clicked += () => CommandQueue.Instance.Add((Command)command);
+						button.Updating += _ => {
+							button.Texture = command.Icon;
+							button.Selected = command.Checked;
+							button.Enabled = command.Enabled;
+							button.Tip = button.Text = command.Text;
+						};
+						panelWidget.AddNode(button);
 					}
 					rowWidget.AddNode(panelWidget);
 				}
@@ -89,8 +88,8 @@ namespace Tangerine
 		private IEnumerator<object> DragTask(Widget panelContainer, WidgetInput input, int rowIndex, int panelIndex)
 		{
 			var rootWidget = widget.GetRoot().AsWidget;
-			int newRowIndex = rowIndex;
-			int newPanelIndex = panelIndex;
+			var newRowIndex = rowIndex;
+			var newPanelIndex = panelIndex;
 			var presenter = new DelegatePresenter<Widget>(w => {
 				w.PrepareRendererState();
 				if (panelContainer == null) {
@@ -109,12 +108,12 @@ namespace Tangerine
 				while (input.IsMousePressed()) {
 					Vector2 pos;
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
-					for (int i = 0; i < widget.Nodes.Count; ++i) {
+					for (var i = 0; i < widget.Nodes.Count; ++i) {
 						var rowWidget = (Widget)widget.Nodes[i];
 						if (!IsMouseOver(rowWidget, out pos)) {
 							continue;
 						}
-						for (int j = 0; j < rowWidget.Nodes.Count; ++j) {
+						for (var j = 0; j < rowWidget.Nodes.Count; ++j) {
 							var panelWidget = (Widget)rowWidget.Nodes[j];
 							if (!IsMouseOver(panelWidget, out pos)) {
 								continue;
@@ -145,7 +144,7 @@ namespace Tangerine
 				if (newRowIndex == rowIndex && newPanelIndex == panelIndex) {
 					continue;
 				}
-				ToolbarModel.ToolbarRow row = null;
+				ToolbarModel.ToolbarRow row;
 				if (newRowIndex < 0 || newRowIndex == toolbarModel.Rows.Count) {
 					row = new ToolbarModel.ToolbarRow();
 					toolbarModel.InsertRow(row, newRowIndex < 0 ? 0 : newRowIndex);
@@ -166,10 +165,9 @@ namespace Tangerine
 				if (oldRow.Panels.Count == 0) {
 					toolbarModel.RemoveRow(oldRow);
 				}
-				rowIndex = row.Index;
-				panelIndex = newPanelIndex;
 				toolbarModel.RefreshAfterLoad();
 				Rebuild();
+				yield break;
 			}
 		}
 
@@ -179,13 +177,14 @@ namespace Tangerine
 			return pos.Y >= 0 && pos.Y <= widget.Height && pos.X >= 0 && pos.X <= widget.Width;
 		}
 
-		static void DecorateToolbar(Widget widget)
+		private static void DecorateToolbar(Widget widget)
 		{
 			widget.CompoundPresenter.Add(new DelegatePresenter<Widget>(w => {
-				if (w.Width > 0) {
-					w.PrepareRendererState();
-					Renderer.DrawRect(Vector2.Zero, w.Size, ColorTheme.Current.Toolbar.Background);
+				if (!(w.Width > 0)) {
+					return;
 				}
+				w.PrepareRendererState();
+				Renderer.DrawRect(Vector2.Zero, w.Size, ColorTheme.Current.Toolbar.Background);
 			}));
 		}
 	}

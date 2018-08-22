@@ -63,7 +63,7 @@ namespace Tangerine.Dialogs
 			};
 		}
 
-		private ListBox CreateListBox()
+		private static ListBox CreateListBox()
 		{
 			var result = new ListBox();
 			result.Content.Padding = new Thickness(6);
@@ -85,10 +85,10 @@ namespace Tangerine.Dialogs
 			};
 		}
 
-		private ToolbarButton CreateButton(string textureid, string tip, Action clicked, params ListBox[] listBoxes)
+		private static ToolbarButton CreateButton(string textureId, string tip, Action clicked, params ListBox[] listBoxes)
 		{
 			var result = new ToolbarButton {
-				Texture = IconPool.GetTexture(textureid),
+				Texture = IconPool.GetTexture(textureId),
 				Tip = tip
 			};
 			result.Clicked += () => {
@@ -197,16 +197,13 @@ namespace Tangerine.Dialogs
 		private void AddPanel()
 		{
 			var panel = GetSelectedPanel();
-			var row = panel?.Parent;
-			if (row == null) {
-				row = toolbarModel.Rows[0];
-			}
+			var row = panel?.Parent ?? toolbarModel.Rows[0];
 			var newPanel = new ToolbarModel.ToolbarPanel() {
 				Title = "Panel",
 				Index = panel?.Index ?? 0
 			};
 			var panelRow = new PanelItem(newPanel);
-			int index = panelList.SelectedIndex;
+			var index = panelList.SelectedIndex;
 			index = index < 0 ? 0 : index;
 			panelList.SelectedItem = panelList.InsertItem(index, panelRow);
 			panelList.SelectedItem.DoubleClicked += () => panelRow.StartEdit();
@@ -218,7 +215,7 @@ namespace Tangerine.Dialogs
 		private void RemovePanel()
 		{
 			var panel = GetSelectedPanel();
-			int index = panelList.SelectedIndex;
+			var index = panelList.SelectedIndex;
 			toolbarModel.RemovePanel(panel);
 			panelList.SelectedItem.Unlink();
 			index = index == panelList.Items.Count ? index - 1 : index;
@@ -237,8 +234,8 @@ namespace Tangerine.Dialogs
 
 		private void MovePanel(int dir)
 		{
-			int index = panelList.SelectedIndex;
-			int newIndex = index + dir;
+			var index = panelList.SelectedIndex;
+			var newIndex = index + dir;
 			var item1 = panelList.SelectedItem;
 			if (newIndex < 0 || newIndex >= panelList.Items.Count || !(item1.Widget is PanelItem)) {
 				return;
@@ -284,21 +281,22 @@ namespace Tangerine.Dialogs
 		private void AddRow()
 		{
 			var row = new ToolbarModel.ToolbarRow();
-			int rowIndex = 0;
+			var rowIndex = 0;
 			var panel = GetSelectedPanel();
 			if (panel != null) {
 				var oldRow = panel.Parent;
-				int savedIndex = panel.Index;
-				for (int i = panel.Index; i < oldRow.Panels.Count; ++i) {
+				var savedIndex = panel.Index;
+				for (var i = panel.Index; i < oldRow.Panels.Count; ++i) {
 					toolbarModel.InsertPanel(row, oldRow.Panels[i], i - savedIndex);
 				}
 				oldRow.Panels.RemoveRange(savedIndex, oldRow.Panels.Count - savedIndex);
 				rowIndex = oldRow.Index + 1;
 			} else {
-				int i = panelList.SelectedIndex;
-				ListBox.ListBoxItem item = null;
-				while (i >= 0 && (item = (ListBox.ListBoxItem)panelList.Items[i]).Widget is RowItem) {
+				var i = panelList.SelectedIndex;
+				var item = (ListBox.ListBoxItem)panelList.Items[i];
+				while (i >= 0 && item.Widget is RowItem) {
 					i -= 1;
+					item = (ListBox.ListBoxItem)panelList.Items[i];
 				}
 				if (i >= 0) {
 					rowIndex = ((PanelItem)item.Widget).Panel.Parent.Index + panelList.SelectedIndex - i + 1;
@@ -371,14 +369,14 @@ namespace Tangerine.Dialogs
 		private void AddCommand()
 		{
 			var panel = ((PanelItem)panelList.SelectedItem.Widget).Panel;
-			int leftPanelIndex = availableCommands.SelectedIndex;
+			var leftPanelIndex = availableCommands.SelectedIndex;
 			if (leftPanelIndex < 0) {
 				if (availableCommands.Items.Count == 0) {
 					return;
 				}
 				leftPanelIndex = 0;
 			}
-			int rightPanelIndex = usedCommands.SelectedIndex;
+			var rightPanelIndex = usedCommands.SelectedIndex;
 			rightPanelIndex = rightPanelIndex < 0 ? 0 : rightPanelIndex;
 			var leftItem = (ListBox.ListBoxItem)availableCommands.Items[leftPanelIndex];
 			var leftPanel = (CommandItem)leftItem.Widget;
@@ -392,7 +390,7 @@ namespace Tangerine.Dialogs
 		private void RemoveCommand()
 		{
 			var panel = ((PanelItem)panelList.SelectedItem.Widget).Panel;
-			int index = usedCommands.SelectedIndex;
+			var index = usedCommands.SelectedIndex;
 			if (index < 0) {
 				if (usedCommands.Items.Count == 0) {
 					return;
@@ -411,7 +409,7 @@ namespace Tangerine.Dialogs
 			if (index < 0) {
 				return;
 			}
-			int newIndex = index + dir;
+			var newIndex = index + dir;
 			if (newIndex < 0 || newIndex >= usedCommands.Items.Count) {
 				return;
 			}
@@ -463,12 +461,13 @@ namespace Tangerine.Dialogs
 
 			public void StartEdit()
 			{
-				if (title.Parent != null) {
-					title.Unlink();
-					dummy.Unlink();
-					editBox.Text = Panel.Title;
-					AddNode(editBox);
+				if (title.Parent == null) {
+					return;
 				}
+				title.Unlink();
+				dummy.Unlink();
+				editBox.Text = Panel.Title;
+				AddNode(editBox);
 			}
 
 			public void StopEdit()
