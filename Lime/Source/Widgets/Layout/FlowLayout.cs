@@ -44,7 +44,9 @@ namespace Lime
 					? splitIndices[rowIndex + 1] - splitIndices[rowIndex]
 					: splitIndices[rowIndex];
 			} else if (Direction == FlowDirection.TopToBottom) {
-				return splitIndices.Count - 1;
+				return splitIndices.Count > 1 ?
+					splitIndices[1] - splitIndices[0] :
+					splitIndices[0];
 			} else {
 				throw new Lime.Exception($"Invalid FlowDirection: {Direction}");
 			}

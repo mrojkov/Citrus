@@ -139,8 +139,6 @@ namespace Tangerine.UI.FilesystemView
 			scrollView = new ThemedScrollView(ScrollDirection.Horizontal) {
 				TabTravesable = new TabTraversable(),
 			};
-			// TODO: Display path
-			RootWidget.AddChangeWatcher(() => model.CurrentPath, (path) => toolbar.Path = path.ToString());
 			crEditor = new CookingRulesEditor(NavigateAndSelect);
 			crEditor.RootWidget.TabTravesable = new TabTraversable();
 			preview = new Preview();
@@ -151,9 +149,9 @@ namespace Tangerine.UI.FilesystemView
 		public void Initialize()
 		{
 			var up = RootWidget.Components.Get<ViewNodeComponent>().ViewNode as FSViewNode;
-			toolbar = new FilesystemToolbar(this);
-			toolbar.TabTravesable = new TabTraversable();
 			model = new Model(up.Path);
+			toolbar = new FilesystemToolbar(this, model);
+			toolbar.TabTravesable = new TabTraversable();
 			InitializeWidgets();
 			selectionPreviewSplitter.Stretches = Splitter.GetStretchesList(up.SelectionPreviewSplitterStretches, 1, 1);
 			cookingRulesSplitter.Stretches = Splitter.GetStretchesList(up.CookingRulesSplitterStretches, 1, 1);
@@ -171,6 +169,14 @@ namespace Tangerine.UI.FilesystemView
 					w.HitTestTarget = true;
 				}
 			}
+			RootWidget.Updating += (float delta) => {
+				if (
+					RootWidget.Input.IsKeyPressed(Key.Control) &&
+					RootWidget.Input.WasKeyReleased(Key.L)
+				) {
+					toolbar.AddressBar.SetFocusOnEditor();
+				}
+			};
 		}
 
 		private void NavigateAndSelect(string filename)
@@ -251,16 +257,34 @@ namespace Tangerine.UI.FilesystemView
 			InvalidateView(path, sortType, orderType);
 		}
 
-		private void Open(string path)
+		public bool Open(string path)
 		{
-			var attr = File.GetAttributes(path);
-			if ((attr & FileAttributes.Directory) == FileAttributes.Directory) {
-				GoTo(path);
-			} else {
-				if (path.EndsWith(".scene") || path.EndsWith(".tan")) {
-					Project.Current.OpenDocument(path, true);
+			try {
+				var attr = File.GetAttributes(path);
+				if ((attr & FileAttributes.Directory) == FileAttributes.Directory) {
+					GoTo(path);
+				} else {
+					if (path.EndsWith(".scene") || path.EndsWith(".tan")) {
+						Project.Current.OpenDocument(path, true);
+					}
 				}
+				return true;
+			} catch (ArgumentException) {
+				AlertDialog.Show("The path is empty, contains only white spaces, or contains invalid characters.");
+			} catch (PathTooLongException) {
+				AlertDialog.Show("The specified path, file name, or both exceed the system-defined maximum length.");
+			} catch (NotSupportedException) {
+				AlertDialog.Show("The path is in an invalid format.");
+			} catch (FileNotFoundException) {
+				AlertDialog.Show($"Tangerine can not find \"{path}\".\nCheck the spelling and try again.");
+			} catch (DirectoryNotFoundException) {
+				AlertDialog.Show("The path represents a directory and is invalid, such as being on an unmapped drive, or the directory cannot be found.");
+			} catch (IOException) {
+				AlertDialog.Show("This file is being used by another process.");
+			} catch (UnauthorizedAccessException) {
+				AlertDialog.Show("Tangerine does not have the required permission.");
 			}
+			return false;
 		}
 
 		private void OpenSpecial(string path)
@@ -666,20 +690,46 @@ namespace Tangerine.UI.FilesystemView
 				for (int navOffset = 0; navOffset < navCommands[navType].Count; navOffset++) {
 					var cmd = navCommands[navType][navOffset];
 					if (cmd.Consume()) {
-						select = navType == 1;
-						toggle = navType == 2;
-						var sign = (navOffset % 2 == 0 ? -1 : 1);
-						switch (navOffset) {
-						// Left, Right
-						case 0: case 1: indexDelta = sign * 1; break;
-						// Up,  Down
-						case 2: case 3:  indexDelta = sign * columnCount; break;
-						// PageUp, PageDown
-						case 4: case 5: indexDelta = sign * columnCount * ((int)(scrollView.Size.Y / (rowHeight + flowLayout.Spacing)) - 1); break;
-						// Home
-						case 6: indexDelta = -rangeSelectionIndex; break;
-						// End
-						case 7: indexDelta = maxIndex - rangeSelectionIndex; break;
+						
+							select = navType == 1;
+							toggle = navType == 2;
+							var sign = (navOffset % 2 == 0 ? -1 : 1);
+						if (scrollView.Direction == ScrollDirection.Vertical) {
+							switch (navOffset) {
+								// Left, Right
+								case 0: case 1: indexDelta = sign * 1; break;
+								// Up,  Down
+								case 2: case 3: indexDelta = sign * columnCount; break;
+								// PageUp, PageDown
+								case 4: case 5: indexDelta = sign * columnCount * ((int)(scrollView.Size.Y / (rowHeight + flowLayout.Spacing)) - 1); break;
+								// Home
+								case 6: indexDelta = -rangeSelectionIndex; break;
+								// End
+								case 7: indexDelta = maxIndex - rangeSelectionIndex; break;
+							}
+						} else {
+							switch (navOffset) {
+								// Left
+								case 0:
+									indexDelta = -columnCount;
+									break;
+								// Right
+								case 1:
+									indexDelta = columnCount;
+									break;
+								// Up
+								case 2:
+									indexDelta = -1;
+									break;
+								// Down
+								case 3:
+									indexDelta = 1;
+									break;
+								// Home
+								case 6: indexDelta = -rangeSelectionIndex; break;
+								// End
+								case 7: indexDelta = maxIndex - rangeSelectionIndex; break;
+							}
 						}
 					}
 				}

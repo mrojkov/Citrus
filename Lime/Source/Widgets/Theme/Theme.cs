@@ -53,6 +53,24 @@ namespace Lime
 			[YuzuRequired]
 			public ColorGradient ExpandButtonDisable { get; set; }
 			[YuzuRequired]
+			public ColorGradient PathBarButtonNormal { get; set; }
+			[YuzuRequired]
+			public ColorGradient PathBarButtonHover { get; set; }
+			[YuzuRequired]
+			public ColorGradient PathBarButtonPress { get; set; }
+			[YuzuRequired]
+			public Color4 PathBarButtonOutlineNormal { get; set; }
+			[YuzuRequired]
+			public Color4 PathBarButtonOutlineHover { get; set; }
+			[YuzuRequired]
+			public Color4 PathBarButtonOutlinePress { get; set; }
+			[YuzuRequired]
+			public Color4 DirectoryPickerBackground { get; set; }
+			[YuzuRequired]
+			public Color4 DirectoryPickerOutline { get; set; }
+			[YuzuRequired]
+			public Color4 DirectoryPickerItemHoveredBackground { get; set; }
+			[YuzuRequired]
 			public Color4 TabNormal { get; set; }
 			[YuzuRequired]
 			public Color4 TabActive { get; set; }
@@ -109,6 +127,15 @@ namespace Lime
 					ExpandButtonHover = new ColorGradient(new Color4(133, 133, 133), new Color4(133, 133, 133)),
 					ExpandButtonPress = new ColorGradient(new Color4(141, 167, 204), new Color4(141, 167, 204)),
 					ExpandButtonDisable = new ColorGradient(new Color4(64, 64, 64), new Color4(64, 64, 64)),
+					PathBarButtonNormal = new ColorGradient(new Color4(63, 63, 63)),
+					PathBarButtonHover = new ColorGradient(new Color4(89, 89, 89)),
+					PathBarButtonPress = new ColorGradient(new Color4(107, 107, 107)),
+					PathBarButtonOutlineNormal = Color4.Transparent,
+					PathBarButtonOutlineHover = new Color4(107, 107, 109),
+					PathBarButtonOutlinePress = new Color4(143, 179, 215),
+					DirectoryPickerBackground = new Color4(82, 82, 82),
+					DirectoryPickerOutline = new Color4(39, 39, 39),
+					DirectoryPickerItemHoveredBackground = new Color4 (127, 127, 127),
 					TabNormal = grayBackground.Lighten(0.2f),
 					TabActive = grayBackground.Lighten(0.05f),
 					SeparatorColor = grayBackground.Lighten(0.3f),
@@ -149,6 +176,15 @@ namespace Lime
 					ExpandButtonHover = new ColorGradient(new Color4(133, 133, 133), new Color4(133, 133, 133)),
 					ExpandButtonPress = new ColorGradient(new Color4(141, 167, 204), new Color4(141, 167, 204)),
 					ExpandButtonDisable = new ColorGradient(new Color4(64, 64, 64), new Color4(64, 64, 64)),
+					PathBarButtonNormal = new ColorGradient(new Color4(255, 255, 255)),
+					PathBarButtonHover = new ColorGradient(new Color4(219, 236, 249)),
+					PathBarButtonPress = new ColorGradient(new Color4(159, 200, 233)),
+					PathBarButtonOutlineNormal = Color4.Transparent,
+					PathBarButtonOutlineHover = new Color4(115, 193, 255),
+					PathBarButtonOutlinePress = new Color4(0, 86, 155),
+					DirectoryPickerBackground = new Color4(240, 240, 240),
+					DirectoryPickerOutline = new Color4(133, 133, 133),
+					DirectoryPickerItemHoveredBackground = new Color4(158, 200, 233),
 					TabNormal = grayBackground.Darken(0.2f),
 					TabActive = grayBackground.Darken(0.05f),
 					SeparatorColor = grayBackground.Darken(0.3f),

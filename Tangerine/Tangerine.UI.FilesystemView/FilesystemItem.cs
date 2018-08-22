@@ -19,19 +19,27 @@ namespace Tangerine.UI.FilesystemView
 			Layout = new HBoxLayout { Spacing = Spacing };
 			Padding = new Thickness(2);
 			HitTestTarget = true;
+			var isRoot = false;
+			if (new DirectoryInfo(FilesystemPath).Parent == null) {
+				isRoot = true;
+			}
+
 			Nodes.AddRange(
 				new Image {
 					LayoutCell = new LayoutCell {
 						Stretch = Vector2.Zero,
 						Alignment = new Alignment { X = HAlignment.Right, Y = VAlignment.Center }
 					},
-					MinMaxSize = new Vector2(16, 16),
+					MinMaxSize = new Vector2(IconSize, IconSize),
 					Texture = SystemIconTextureProvider.Instance.GetTexture(FilesystemPath),
 				},
 				(text = new ThemedSimpleText {
 					ForceUncutText = false,
 					OverflowMode = TextOverflowMode.Ellipsis,
-					Text = Path.GetFileName(FilesystemPath),
+					Text =
+						isRoot ?
+						FilesystemPath.Remove(FilesystemPath.Length - 1) :
+						Path.GetFileName(FilesystemPath),
 					LayoutCell = new LayoutCell {
 						Alignment = new Alignment { X = HAlignment.Right, Y = VAlignment.Bottom }
 					}

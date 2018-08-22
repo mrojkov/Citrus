@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AddressBar.cs" />
     <Compile Include="CookingRulesEditor.cs" />
     <Compile Include="FileEnumerator.cs" />
     <Compile Include="FilesystemPane.cs" />

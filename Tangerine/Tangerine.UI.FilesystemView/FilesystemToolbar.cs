@@ -21,7 +21,7 @@ namespace Tangerine.UI.FilesystemView
 	{
 		public Toolbar()
 		{
-			Padding = new Thickness { Left = 4 };
+			Padding = new Thickness(4);
 			MinMaxHeight = Metrics.ToolbarHeight;
 			MinWidth = 50;// TimelineMetrics.ToolbarMinWidth;
 			Presenter = new DelegatePresenter<Widget>(Render);
@@ -38,9 +38,9 @@ namespace Tangerine.UI.FilesystemView
 	public class FilesystemToolbar : Toolbar
 	{
 		FilesystemView view;
-		private SimpleText pathText;
+		public AddressBar AddressBar;
 
-		public FilesystemToolbar(FilesystemView view)
+		public FilesystemToolbar(FilesystemView view, Model model)
 		{
 			this.view = view;
 			Nodes.AddRange(
@@ -52,7 +52,9 @@ namespace Tangerine.UI.FilesystemView
 					Layout = new VBoxLayout(),
 					Nodes = {
 						new Widget {
-							Layout = new HBoxLayout(),
+							Layout = new HBoxLayout(){
+								Spacing = 2
+							},
 							Nodes = {
 								CreateGotoCurrentProjectDirectoryButton(),
 								CreateUpButton(),
@@ -71,23 +73,10 @@ namespace Tangerine.UI.FilesystemView
 								CreateCloseButton()
 							}
 						},
-						(pathText = new ThemedSimpleText {
-						}),
+						(AddressBar = new AddressBar(view.Open, model)),
 					}
 				}
 			);
-		}
-
-		public string Path
-		{
-			get
-			{
-				return pathText.Text;
-			}
-			set
-			{
-				pathText.Text = value;
-			}
 		}
 
 		private Widget CreateGoBackwardButton()
@@ -135,9 +124,10 @@ namespace Tangerine.UI.FilesystemView
 					new ThemedDropDownList.Item("Ascending", OrderType.Ascending),
 					new ThemedDropDownList.Item("Descending", OrderType.Descending)
 				},
+				Layout = new HBoxLayout(),
+				MinMaxWidth = Renderer.MeasureTextLine("Descending", Theme.Metrics.TextHeight, 0).X + 30,
 				Index = 0
 			};
-
 			list.Changed += args => {
 				view.SortByType(view.SortType, (OrderType)args.Value);
 			};
