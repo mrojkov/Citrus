@@ -90,7 +90,7 @@ namespace Tangerine.UI
 
 		public void Show()
 		{
-			DockManager.Instance.ShowPanel(panel);
+			DockManager.Instance.ShowPanel(panel.Id);
 		}
 	}
 }

@@ -12,7 +12,6 @@ namespace Tangerine.UI.Docking
 		private const string AppIconPath = @"Tangerine.Resources.Icons.icon.ico";
 		public const string DocumentAreaId = "DocumentArea";
 
-		private readonly IMenu padsMenu;
 		private readonly List<FilesDropHandler> filesDropHandlers = new List<FilesDropHandler>();
 
 		public static DockManager Instance { get; private set; }
@@ -24,9 +23,8 @@ namespace Tangerine.UI.Docking
 		public event Action<IEnumerable<string>> FilesDropped;
 		public event Action<System.Exception> UnhandledExceptionOccurred;
 
-		private DockManager(Vector2 windowSize, IMenu padsMenu)
+		private DockManager(Vector2 windowSize)
 		{
-			this.padsMenu = padsMenu;
 			var window = new Window(new WindowOptions {
 				ClientSize = windowSize,
 				FixedSize = false,
@@ -68,12 +66,12 @@ namespace Tangerine.UI.Docking
 				value => Model.WindowPlacements[0].State = value);
 		}
 
-		public static void Initialize(Vector2 windowSize, IMenu padsMenu)
+		public static void Initialize(Vector2 windowSize)
 		{
 			if (Instance != null) {
 				throw new InvalidOperationException();
 			}
-			Instance = new DockManager(windowSize, padsMenu);
+			Instance = new DockManager(windowSize);
 		}
 
 		public void DockPanelTo(PanelPlacement placement, PanelPlacement target, DockSite site, float stretch)
@@ -115,23 +113,19 @@ namespace Tangerine.UI.Docking
 			}
 		}
 
-		public PanelPlacement AddPanel(Panel panel, Placement targetPlacement, DockSite site, float stretch)
+		public PanelPlacement AddPanel(Panel panel, Placement targetPlacement, DockSite site, float stretch = 0.25f)
 		{
-			padsMenu.Add(new Command(panel.Title, () => ShowPanel(panel)));
-			padsMenu.Refresh();
 			return Model.AddPanel(panel, targetPlacement, site, stretch);
 		}
 
 		public PanelPlacement AppendPanelTo(Panel panel, SplitPlacement targetPlacement)
 		{
-			padsMenu.Add(new Command(panel.Title, () => ShowPanel(panel)));
-			padsMenu.Refresh();
 			return Model.AppendPanelToPlacement(panel, targetPlacement);
 		}
 
-		public void ShowPanel(Panel panel)
+		public void ShowPanel(string panelId)
 		{
-			Model.FindPanelPlacement(panel.Id).Hidden = false;
+			Model.FindPanelPlacement(panelId).Hidden = false;
 			Refresh();
 		}
 
@@ -336,6 +330,7 @@ namespace Tangerine.UI.Docking
 				}, true);
 				CreateDragBehaviour(panel, tab);
 			}
+			tabbedWidget.ActiveTabIndex = 0;
 			tabbedWidget.TabBar.OnReorder += args => {
 				var item = placement.Placements[args.OldIndex];
 				placement.RemovePlacement(item);

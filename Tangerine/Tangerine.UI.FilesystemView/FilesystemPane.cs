@@ -205,7 +205,7 @@ namespace Tangerine.UI.FilesystemView
 				dockPanelWidget.Update(0);
 			}
 			var view = views.First();
-			DockManager.Instance.ShowPanel(panel);
+			DockManager.Instance.ShowPanel(panel.Id);
 			var path = FilesystemCommands.NavigateTo.UserData as string;
 			var dir = Path.GetDirectoryName(path);
 			view.GoTo(dir);
