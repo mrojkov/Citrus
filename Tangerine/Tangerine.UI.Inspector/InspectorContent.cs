@@ -16,8 +16,8 @@ namespace Tangerine.UI.Inspector
 		private readonly List<IPropertyEditor> editors;
 		private readonly Widget widget;
 		private int row = 1;
-		private IEnumerable<object> rootObjects;
 		private bool allRootObjectsAnimable;
+		private int totalObjectCount;
 
 		public InspectorContent(Widget widget)
 		{
@@ -27,8 +27,8 @@ namespace Tangerine.UI.Inspector
 
 		public void BuildForObjects(IEnumerable<object> objects)
 		{
-			rootObjects = objects;
-			allRootObjectsAnimable = rootObjects.All(o => o is IAnimationHost);
+			allRootObjectsAnimable = objects.All(o => o is IAnimationHost);
+			totalObjectCount = objects.Count();
 			if (Widget.Focused != null && Widget.Focused.DescendantOf(widget)) {
 				widget.SetFocus();
 			}
@@ -37,11 +37,22 @@ namespace Tangerine.UI.Inspector
 			if (objects.Any() && objects.All(o => o is Node)) {
 				var nodes = objects.Cast<Node>().ToList();
 				foreach (var t in GetComponentsTypes(nodes)) {
-					var components = nodes.Select(n => n.Components.Get(t));
-					PopulateContentForType(t, components, widget, SerializeMutuallyExclusiveComponentGroupBaseType(t)).ToList();
+					var components = new List<NodeComponent>();
+					var nodesWithComponent = new List<Node>();
+					foreach (var n in nodes) {
+						var c = n.Components.Get(t);
+						if (c != null && t.IsAssignableFrom(c.GetType())) {
+							components.Add(c);
+							nodesWithComponent.Add(n);
+						}
+					}
+					PopulateContentForType(t, components, nodesWithComponent, widget, SerializeMutuallyExclusiveComponentGroupBaseType(t)).ToList();
 				}
 				AddComponentsMenu(nodes, widget);
 			}
+			widget.AddNode(new Widget() {
+				MinHeight = 500.0f
+			});
 		}
 
 		private string SerializeMutuallyExclusiveComponentGroupBaseType(Type t)
@@ -56,7 +67,7 @@ namespace Tangerine.UI.Inspector
 			return $"[{Yuzu.Util.TypeSerializer.Serialize(t)}]";
 		}
 
-		private IEnumerable<IPropertyEditor> BuildForObjectsHelper(IEnumerable<object> objects, Widget widget = null, string propertyPath = "")
+		private IEnumerable<IPropertyEditor> BuildForObjectsHelper(IEnumerable<object> objects, IEnumerable<object> rootObjects = null, Widget widget = null, string propertyPath = "")
 		{
 			if (widget == null) {
 				widget = this.widget;
@@ -66,7 +77,7 @@ namespace Tangerine.UI.Inspector
 			}
 			foreach (var t in GetTypes(objects)) {
 				var o = objects.Where(i => t.IsInstanceOfType(i)).ToList();
-				foreach (var e in PopulateContentForType(t, o, widget, propertyPath)) {
+				foreach (var e in PopulateContentForType(t, o, o, widget, propertyPath)) {
 					yield return e;
 				}
 			}
@@ -134,7 +145,7 @@ namespace Tangerine.UI.Inspector
 			return true;
 		}
 
-		private IEnumerable<IPropertyEditor> PopulateContentForType(Type type, IEnumerable<object> objects, Widget widget, string propertyPath)
+		private IEnumerable<IPropertyEditor> PopulateContentForType(Type type, IEnumerable<object> objects, IEnumerable<object> rootObjects, Widget widget, string propertyPath)
 		{
 			var categoryLabelAdded = false;
 			var editorParams = new Dictionary<string, List<PropertyEditorParams>>();
@@ -160,7 +171,10 @@ namespace Tangerine.UI.Inspector
 					if (text == "Node" && !objects.Skip(1).Any()) {
 						text += $" of type '{objects.First().GetType().Name}'";
 					}
-					var label = CreateCategoryLabel(text);
+					if (totalObjectCount > 1) {
+						text += $" ({objects.Count()}/{totalObjectCount})";
+					}
+					var label = CreateCategoryLabel(text, ColorTheme.Current.Inspector.CategoryLabelBackground);
 					if (label != null) {
 						widget.AddNode(label);
 					}
@@ -214,7 +228,7 @@ namespace Tangerine.UI.Inspector
 									editors.Remove(e);
 								}
 								instanceEditors.Clear();
-								instanceEditors.AddRange(BuildForObjectsHelper(objects.Select(o => param.PropertyInfo.GetValue(o)), w, param.PropertyPath));
+								instanceEditors.AddRange(BuildForObjectsHelper(objects.Select(o => param.PropertyInfo.GetValue(o)), rootObjects, w, param.PropertyPath));
 							});
 							Type et = typeof(InstancePropertyEditor<>).MakeGenericType(param.PropertyInfo.PropertyType);
 							editor = Activator.CreateInstance(et, new object[] { param, onValueChanged }) as IPropertyEditor;
@@ -238,12 +252,13 @@ namespace Tangerine.UI.Inspector
 		private static IEnumerable<Type> GetComponentsTypes(IReadOnlyList<Node> nodes)
 		{
 			var types = new List<Type>();
-			var node = nodes.FirstOrDefault();
-			if (node != null) {
+			foreach (var node in nodes) {
 				foreach (var component in node.Components) {
 					var type = component.GetType();
-					if (type.IsDefined(typeof(TangerineRegisterComponentAttribute), true) && nodes.All(n => n.Components.Contains(type))) {
-						types.Add(type);
+					if (type.IsDefined(typeof(TangerineRegisterComponentAttribute), true)) {
+						if (!types.Contains(type)) {
+							types.Add(type);
+						}
 					}
 				}
 			}
@@ -306,7 +321,7 @@ namespace Tangerine.UI.Inspector
 			Core.Operations.SetAnimableProperty.Perform(obj, propertyName, value, CoreUserPreferences.Instance.AutoKeyframes);
 		}
 
-		private Widget CreateCategoryLabel(string text)
+		private Widget CreateCategoryLabel(string text, Color4 color)
 		{
 			if (string.IsNullOrEmpty(text)) {
 				return null;
@@ -324,13 +339,17 @@ namespace Tangerine.UI.Inspector
 					}
 				}
 			};
-			label.CompoundPresenter.Add(new WidgetFlatFillPresenter(ColorTheme.Current.Inspector.CategoryLabelBackground));
+			label.CompoundPresenter.Add(new WidgetFlatFillPresenter(color));
 			return label;
 		}
 
 		private Widget CreateComponentLabel(Type type, IEnumerable<NodeComponent> components)
 		{
-			var label = CreateCategoryLabel(CamelCaseToLabel(type.Name));
+			var text = CamelCaseToLabel(type.Name);
+			if (totalObjectCount > 1) {
+				text += $"({components.Count()}/{totalObjectCount})";
+			}
+			var label = CreateCategoryLabel(text, ColorTheme.Current.Inspector.ComponentHeaderLabelBackground);
 			label.Nodes.Insert(0, new ThemedDeleteButton {
 				Clicked = () => RemoveComponents(components)
 			});

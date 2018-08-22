@@ -204,6 +204,8 @@ namespace Tangerine.UI
 			[YuzuRequired]
 			public Color4 GroupHeaderLabelBackground { get; set; }
 			[YuzuRequired]
+			public Color4 ComponentHeaderLabelBackground { get; set; }
+			[YuzuRequired]
 			public Color4 StripeBackground1 { get; set; }
 			[YuzuRequired]
 			public Color4 StripeBackground2 { get; set; }
@@ -380,6 +382,7 @@ namespace Tangerine.UI
 				BorderAroundKeyframeColorbox = basic.ControlBorder,
 				CategoryLabelBackground = Color4.Black.Lighten(0.3f),
 				GroupHeaderLabelBackground = Color4.Black.Lighten(0.275f),
+				ComponentHeaderLabelBackground = Color4.Black.Lighten(0.375f),
 				StripeBackground1 = basic.GrayBackground,
 				StripeBackground2 = basic.GrayBackground.Lighten(0.05f),
 			};
@@ -520,6 +523,7 @@ namespace Tangerine.UI
 				BorderAroundKeyframeColorbox = basic.ControlBorder,
 				CategoryLabelBackground = Color4.White.Darken(0.2f),
 				GroupHeaderLabelBackground = Color4.White.Darken(0.175f),
+				ComponentHeaderLabelBackground = Color4.White.Darken(0.275f),
 				StripeBackground1 = basic.GrayBackground,
 				StripeBackground2 = basic.GrayBackground.Darken(0.05f),
 			};
