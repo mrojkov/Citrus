@@ -247,6 +247,7 @@ namespace Lime
 			System.Globalization.CultureInfo.DefaultThreadCurrentCulture = culture;
 			AudioSystem.Initialize(options);
 #if WIN
+			System.Windows.Forms.Application.EnableVisualStyles();
 			if (System.Diagnostics.Debugger.IsAttached) {
 				System.Windows.Forms.Application.SetUnhandledExceptionMode(
 					System.Windows.Forms.UnhandledExceptionMode.ThrowException);
