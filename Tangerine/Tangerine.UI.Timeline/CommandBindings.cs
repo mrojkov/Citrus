@@ -22,7 +22,7 @@ namespace Tangerine.UI.Timeline
 			ConnectCommand(TimelineCommands.EnterNode, enter, Document.HasCurrent);
 			ConnectCommand(TimelineCommands.EnterNodeAlias, enter, Document.HasCurrent);
 			ConnectCommand(TimelineCommands.EnterNodeMouse, enter, Document.HasCurrent);
-			ConnectCommand(TimelineCommands.ExpandNodeRow, ExpandNodeRow, Document.HasCurrent);
+			ConnectCommand(TimelineCommands.Expand, Expand, Document.HasCurrent);
 			ConnectCommand(TimelineCommands.RenameRow, RenameCurrentRow);
 			ConnectCommand(TimelineCommands.ExitNode, LeaveNode.Perform);
 			ConnectCommand(TimelineCommands.ExitNodeAlias, LeaveNode.Perform);
@@ -78,12 +78,24 @@ namespace Tangerine.UI.Timeline
 			CommandHandlerList.Global.Connect(command, new DocumentDelegateCommandHandler(action, enableChecker));
 		}
 
-		private static void ExpandNodeRow()
+		private static void Expand()
 		{
 			foreach (var row in Document.Current.SelectedRows().ToList()) {
 				if (row.Components.Get<NodeRow>() is NodeRow nodeRow) {
 					SetProperty.Perform(nodeRow, nameof(NodeRow.Expanded), !nodeRow.Expanded, isChangingDocument: false);
 					if (nodeRow.Expanded && row.Rows.Count > 0) {
+						Timeline.Instance.EnsureRowChildsVisible(row);
+					}
+				}
+				if (row.Components.Get<BoneRow>() is BoneRow boneRow) {
+					SetProperty.Perform(boneRow, nameof(BoneRow.ChildrenExpanded), !boneRow.ChildrenExpanded, isChangingDocument: false);
+					if (boneRow.ChildrenExpanded && row.Rows.Count > 0) {
+						Timeline.Instance.EnsureRowChildsVisible(row);
+					}
+				}
+				if (row.Components.Get<FolderRow>() is FolderRow folderRow) {
+					SetProperty.Perform(folderRow.Folder, nameof(Folder.Expanded), !folderRow.Folder.Expanded, isChangingDocument: false);
+					if (folderRow.Folder.Expanded && row.Rows.Count > 0) {
 						Timeline.Instance.EnsureRowChildsVisible(row);
 					}
 				}
