@@ -27,6 +27,11 @@ namespace Lime
 				if (l == null) {
 					break;
 				}
+				// Ignore this layout in case its orphaned now. This may happen when we somehow trigger Layout.InvalidateConstraintsAndArrangement
+				// and replace given layout on the same frame.
+				if (l.Owner == null) {
+					continue;
+				}
 				// Keep in mind: MeasureConstraints could force a parent constraints
 				// invalidation when child constraints has changed.
 				// See MinSize/MaxSize setters.
@@ -36,6 +41,9 @@ namespace Lime
 				var l = arrangeQueue.Dequeue();
 				if (l == null) {
 					break;
+				}
+				if (l.Owner == null) {
+					continue;
 				}
 				// Keep in mind: ArrangeChildren could force a child re-arrangement when changes a child size.
 				// See ILayout.OnSizeChanged implementation.
