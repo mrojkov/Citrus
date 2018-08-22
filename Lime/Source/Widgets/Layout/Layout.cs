@@ -178,4 +178,86 @@ namespace Lime
 			}
 		}
 	}
+
+	[NodeComponentDontSerialize]
+	[AllowedComponentOwnerTypes(typeof(Image))]
+	internal class MeasuredSize : NodeComponent
+	{
+		public Vector2 MeasuredMinSize
+		{
+			get => measuredMinSize;
+			set {
+				if (measuredMinSize != value) {
+					measuredMinSize = value;
+					Owner?.InvalidateParentConstraintsAndArrangement();
+				}
+			}
+		}
+
+		private Vector2 measuredMinSize;
+
+		public Vector2 MeasuredMaxSize
+		{
+			get => measuredMaxSize;
+			set {
+				if (measuredMaxSize != value) {
+					measuredMaxSize = value;
+					Owner?.InvalidateParentConstraintsAndArrangement();
+				}
+			}
+		}
+
+		private Vector2 measuredMaxSize = Vector2.PositiveInfinity;
+
+		public new Widget Owner
+		{
+			get => (Widget)base.Owner;
+			set => base.Owner = value;
+		}
+
+		public MeasuredSize()
+		{ }
+	}
+
+	[TangerineRegisterComponent]
+	[AllowedComponentOwnerTypes(typeof(Image))]
+	public class LayoutConstraints : NodeComponent
+	{
+		public new Widget Owner
+		{
+			get => (Widget)base.Owner;
+			set => base.Owner = value;
+		}
+
+		[YuzuMember]
+		public Vector2 MinSize
+		{
+			get => minSize;
+			set {
+				if (minSize != value) {
+					minSize = value;
+					Owner?.InvalidateParentConstraintsAndArrangement();
+				}
+			}
+		}
+
+		private Vector2 minSize;
+
+		[YuzuMember]
+		public Vector2 MaxSize
+		{
+			get => maxSize;
+			set {
+				if (maxSize != value) {
+					maxSize = value;
+					Owner?.InvalidateParentConstraintsAndArrangement();
+				}
+			}
+		}
+
+		private Vector2 maxSize = Vector2.PositiveInfinity;
+
+		public LayoutConstraints()
+		{ }
+	}
 }

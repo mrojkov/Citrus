@@ -69,7 +69,7 @@ namespace Lime
 			return ts;
 		}
 
-		public struct Constraints
+		internal struct Constraints
 		{
 			public float MinSize;
 			public float MaxSize;

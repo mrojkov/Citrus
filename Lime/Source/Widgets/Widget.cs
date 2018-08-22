@@ -49,10 +49,6 @@ namespace Lime
 		private ShaderId shader;
 		private Vector2 pivot;
 		private Vector2 scale;
-		private Vector2 minSize;
-		private Vector2 maxSize = Vector2.PositiveInfinity;
-		private Vector2 measuredMinSize;
-		private Vector2 measuredMaxSize = Vector2.PositiveInfinity;
 		private WidgetInput input;
 		/// <summary>
 		/// <code>
@@ -102,7 +98,7 @@ namespace Lime
 
 		public ILayout Layout
 		{
-			get { return (ILayout)Components.Get<Layout>() ?? AnchorLayout.Instance; }
+			get => Components.Get<Layout>() ?? AnchorLayout.Instance;
 			set
 			{
 				var layoutComponent = Components.Get<Layout>();
@@ -128,96 +124,76 @@ namespace Lime
 		public LayoutCell LayoutCell
 		{
 			get => Components.Get<LayoutCell>();
-			set
-			{
-				var layoutCellComponent = Components.Get<LayoutCell>();
-				if (layoutCellComponent != null) {
-					Components.Remove(layoutCellComponent);
-				}
-				if (value != null) {
-					Components.Add(value);
-				}
-			}
+			set => Components.Replace(value);
 		}
 
-		public virtual Vector2 EffectiveMinSize => Vector2.Max(MinSize, MeasuredMinSize);
-		public virtual Vector2 EffectiveMaxSize => Vector2.Max(Vector2.Min(MaxSize, MeasuredMaxSize), EffectiveMinSize);
+		internal MeasuredSize MeasuredSize
+		{
+			get => Components.GetOrAdd<MeasuredSize>();
+			set => Components.Replace(value);
+		}
+
+		public LayoutConstraints LayoutConstraints
+		{
+			get => Components.GetOrAdd<LayoutConstraints>();
+			set => Components.Replace(value);
+		}
 
 		public Vector2 MeasuredMinSize
 		{
-			get { return measuredMinSize; }
-			set {
-				if (measuredMinSize != value) {
-					measuredMinSize = value;
-					InvalidateParentConstraintsAndArrangement();
-				}
-			}
+			get => MeasuredSize.MeasuredMinSize;
+			set => MeasuredSize.MeasuredMinSize = value;
 		}
 
 		public Vector2 MeasuredMaxSize
 		{
-			get { return measuredMaxSize; }
-			set {
-				if (measuredMaxSize != value) {
-					measuredMaxSize = value;
-					InvalidateParentConstraintsAndArrangement();
-				}
-			}
+			get => MeasuredSize.MeasuredMaxSize;
+			set => MeasuredSize.MeasuredMaxSize = value;
 		}
 
-		[YuzuMember]
+		public virtual Vector2 EffectiveMinSize => Vector2.Max(LayoutConstraints.MinSize, MeasuredSize.MeasuredMinSize);
+
+		public virtual Vector2 EffectiveMaxSize => Vector2.Max(Vector2.Min(LayoutConstraints.MaxSize, MeasuredSize.MeasuredMaxSize), EffectiveMinSize);
+
 		public Vector2 MinSize
 		{
-			get { return minSize; }
-			set
-			{
-				if (minSize != value) {
-					minSize = value;
-					InvalidateParentConstraintsAndArrangement();
-				}
-			}
+			get => LayoutConstraints.MinSize;
+			set => LayoutConstraints.MinSize = value;
+		}
+
+		public Vector2 MaxSize
+		{
+			get => LayoutConstraints.MaxSize;
+			set => LayoutConstraints.MaxSize = value;
 		}
 
 		public float MinWidth
 		{
-			get { return MinSize.X; }
-			set { MinSize = new Vector2(value, MinSize.Y); }
+			get { return LayoutConstraints.MinSize.X; }
+			set { LayoutConstraints.MinSize = new Vector2(value, LayoutConstraints.MinSize.Y); }
 		}
 
 		public float MinHeight
 		{
-			get { return MinSize.Y; }
-			set { MinSize = new Vector2(MinSize.X, value); }
-		}
-
-		[YuzuMember]
-		public Vector2 MaxSize
-		{
-			get { return maxSize; }
-			set
-			{
-				if (maxSize != value) {
-					maxSize = value;
-					InvalidateParentConstraintsAndArrangement();
-				}
-			}
+			get { return LayoutConstraints.MinSize.Y; }
+			set { LayoutConstraints.MinSize = new Vector2(LayoutConstraints.MinSize.X, value); }
 		}
 
 		public float MaxWidth
 		{
-			get { return MaxSize.X; }
-			set { MaxSize = new Vector2(value, MaxSize.Y); }
+			get { return LayoutConstraints.MaxSize.X; }
+			set { LayoutConstraints.MaxSize = new Vector2(value, LayoutConstraints.MaxSize.Y); }
 		}
 
 		public float MaxHeight
 		{
-			get { return MaxSize.Y; }
-			set { MaxSize = new Vector2(MaxSize.X, value); }
+			get { return LayoutConstraints.MaxSize.Y; }
+			set { LayoutConstraints.MaxSize = new Vector2(LayoutConstraints.MaxSize.X, value); }
 		}
 
 		public Vector2 MinMaxSize
 		{
-			set { MinSize = MaxSize = value; }
+			set { LayoutConstraints.MinSize = LayoutConstraints.MaxSize = value; }
 		}
 
 		public float MinMaxWidth
