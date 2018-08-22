@@ -6,7 +6,7 @@ using Yuzu;
 
 namespace Tangerine.UI
 {
-	public class ToolbarLayout
+	public class ToolbarModel
 	{
 		public class ToolbarPanel
 		{
@@ -28,7 +28,7 @@ namespace Tangerine.UI
 			[YuzuRequired]
 			public List<ToolbarPanel> Panels { get; set; } = new List<ToolbarPanel>();
 
-			public ToolbarLayout Parent { get; set; }
+			public ToolbarModel Parent { get; set; }
 			public int Index { get; set; }
 
 			public bool ContainsId(string id)
@@ -114,9 +114,9 @@ namespace Tangerine.UI
 			}
 		}
 
-		public static ToolbarLayout DefaultToolbarLayout()
+		public static ToolbarModel DefaultToolbarLayout()
 		{
-			return new ToolbarLayout {
+			return new ToolbarModel {
 				Rows = {
 					new ToolbarRow {
 						Panels = {

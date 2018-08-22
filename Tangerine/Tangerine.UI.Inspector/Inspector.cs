@@ -20,7 +20,7 @@ namespace Tangerine.UI.Inspector
 
 		public readonly Widget PanelWidget;
 		public readonly ThemedScrollView RootWidget;
-		public readonly Toolbar Toolbar;
+		public readonly ToolbarView Toolbar;
 		public readonly List<object> Objects;
 
 		static Inspector()
@@ -59,21 +59,21 @@ namespace Tangerine.UI.Inspector
 			RootWidget.Content.AddNode(toolbarArea);
 			RootWidget.Content.AddNode(contentWidget);
 			RootWidget.Content.Layout = new VBoxLayout();
-			Toolbar = new Toolbar(toolbarArea, GetToolbarLayout());
+			Toolbar = new ToolbarView(toolbarArea, GetToolbarLayout());
 			contentWidget.Layout = new VBoxLayout { Tag = "InspectorContent" };
 			Objects = new List<object>();
 			content = new InspectorContent(contentWidget);
 			CreateWatchersToRebuild();
 		}
 
-		private ToolbarLayout GetToolbarLayout()
+		private static ToolbarModel GetToolbarLayout()
 		{
-			return new ToolbarLayout {
+			return new ToolbarModel {
 				Rows = {
-					new ToolbarLayout.ToolbarRow {
+					new ToolbarModel.ToolbarRow {
 						Index = 0,
 						Panels = {
-							new ToolbarLayout.ToolbarPanel {
+							new ToolbarModel.ToolbarPanel {
 								Index = 0,
 								Title = "Inspector Toolbar Panel",
 								Draggable = false,

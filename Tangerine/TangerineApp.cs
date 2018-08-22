@@ -15,7 +15,7 @@ namespace Tangerine
 	public class TangerineApp
 	{
 		public static TangerineApp Instance { get; private set; }
-		public Toolbar Toolbar { get; private set; }
+		public ToolbarView Toolbar { get; private set; }
 		public readonly DockManager.State DockManagerInitialState;
 
 		public static void Initialize(string[] args)
@@ -249,8 +249,8 @@ namespace Tangerine
 			// to properly display hotkeys on panel
 			new UI.SceneView.NodeDecorationsPanel(nodeDecorationsPanel);
 
-			AppUserPreferences.Instance.ToolbarLayout.RefreshAfterLoad();
-			Toolbar = new Toolbar(dockManager.ToolbarArea, AppUserPreferences.Instance.ToolbarLayout);
+			AppUserPreferences.Instance.ToolbarModel.RefreshAfterLoad();
+			Toolbar = new ToolbarView(dockManager.ToolbarArea, AppUserPreferences.Instance.ToolbarModel);
 			RefreshCreateNodeCommands();
 			Document.AttachingViews += doc => {
 				if (doc.Views.Count == 0) {

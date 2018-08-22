@@ -6,16 +6,16 @@ using Tangerine.UI;
 
 namespace Tangerine.Dialogs
 {
-	public class ToolbarLayoutEditor : Widget
+	public class ToolbarModelEditor : Widget
 	{
-		private ToolbarLayout toolbarLayout = AppUserPreferences.Instance.ToolbarLayout;
+		private ToolbarModel toolbarModel = AppUserPreferences.Instance.ToolbarModel;
 		private ListBox availableCommands;
 		private ListBox usedCommands;
 		private ListBox panelList;
 		private ThemedDropDownList categoryList;
 		private EditBox filterEditBox;
 
-		public ToolbarLayoutEditor()
+		public ToolbarModelEditor()
 		{
 			Layout = new VBoxLayout { Spacing = 10 };
 			Padding = new Thickness(10);
@@ -126,7 +126,7 @@ namespace Tangerine.Dialogs
 					}
 				}
 			};
-			foreach (var row in toolbarLayout.Rows) {
+			foreach (var row in toolbarModel.Rows) {
 				panelList.AddItem(new RowItem(row));
 				foreach (var panel in row.Panels) {
 					var panelRow = new PanelItem(panel);
@@ -157,7 +157,7 @@ namespace Tangerine.Dialogs
 			});
 		}
 
-		private ToolbarLayout.ToolbarPanel GetSelectedPanel()
+		private ToolbarModel.ToolbarPanel GetSelectedPanel()
 		{
 			var item = panelList.SelectedItem;
 			if (panelList.SelectedItem == null) {
@@ -169,7 +169,7 @@ namespace Tangerine.Dialogs
 			return null;
 		}
 
-		private ToolbarLayout.ToolbarRow GetSelectedRow()
+		private ToolbarModel.ToolbarRow GetSelectedRow()
 		{
 			var item = panelList.SelectedItem;
 			if (panelList.SelectedItem == null) {
@@ -199,9 +199,9 @@ namespace Tangerine.Dialogs
 			var panel = GetSelectedPanel();
 			var row = panel?.Parent;
 			if (row == null) {
-				row = toolbarLayout.Rows[0];
+				row = toolbarModel.Rows[0];
 			}
-			var newPanel = new ToolbarLayout.ToolbarPanel() {
+			var newPanel = new ToolbarModel.ToolbarPanel() {
 				Title = "Panel",
 				Index = panel?.Index ?? 0
 			};
@@ -210,7 +210,7 @@ namespace Tangerine.Dialogs
 			index = index < 0 ? 0 : index;
 			panelList.SelectedItem = panelList.InsertItem(index, panelRow);
 			panelList.SelectedItem.DoubleClicked += () => panelRow.StartEdit();
-			toolbarLayout.InsertPanel(row, newPanel, newPanel.Index);
+			toolbarModel.InsertPanel(row, newPanel, newPanel.Index);
 			RefreshUsedCommands();
 			TangerineApp.Instance.Toolbar.Rebuild();
 		}
@@ -219,7 +219,7 @@ namespace Tangerine.Dialogs
 		{
 			var panel = GetSelectedPanel();
 			int index = panelList.SelectedIndex;
-			toolbarLayout.RemovePanel(panel);
+			toolbarModel.RemovePanel(panel);
 			panelList.SelectedItem.Unlink();
 			index = index == panelList.Items.Count ? index - 1 : index;
 			while (index >= 0 && ((ListBox.ListBoxItem)panelList.Items[index]).Widget is RowItem) {
@@ -248,16 +248,16 @@ namespace Tangerine.Dialogs
 			var item2 = (ListBox.ListBoxItem)panelList.Items[newIndex];
 			if (item2.Widget is RowItem) {
 				var row1 = panel1.Parent;
-				var row2 = toolbarLayout.Rows[row1.Index + dir];
-				toolbarLayout.RemovePanel(panel1);
+				var row2 = toolbarModel.Rows[row1.Index + dir];
+				toolbarModel.RemovePanel(panel1);
 				item1.Unlink();
 				panelList.Items.Insert(newIndex, item1);
-				toolbarLayout.InsertPanel(row2, panel1, dir > 0 ? 0 : row2.Panels.Count);
+				toolbarModel.InsertPanel(row2, panel1, dir > 0 ? 0 : row2.Panels.Count);
 			} else {
 				panelList.SelectedItem = (ListBox.ListBoxItem)panelList.Items[newIndex];
 				var panelRow2 = (PanelItem)panelList.SelectedItem.Widget;
 				var panel2 = panelRow2.Panel;
-				toolbarLayout.SwapPanels(panel1, panel2);
+				toolbarModel.SwapPanels(panel1, panel2);
 				panelRow1.Panel = panel2;
 				panelRow2.Panel = panel1;
 			}
@@ -270,7 +270,7 @@ namespace Tangerine.Dialogs
 			if (row == null) {
 				return;
 			}
-			toolbarLayout.RemoveRow(row);
+			toolbarModel.RemoveRow(row);
 			var index = panelList.SelectedIndex;
 			panelList.Items.RemoveAt(index);
 			if (index < panelList.Items.Count) {
@@ -283,14 +283,14 @@ namespace Tangerine.Dialogs
 
 		private void AddRow()
 		{
-			var row = new ToolbarLayout.ToolbarRow();
+			var row = new ToolbarModel.ToolbarRow();
 			int rowIndex = 0;
 			var panel = GetSelectedPanel();
 			if (panel != null) {
 				var oldRow = panel.Parent;
 				int savedIndex = panel.Index;
 				for (int i = panel.Index; i < oldRow.Panels.Count; ++i) {
-					toolbarLayout.InsertPanel(row, oldRow.Panels[i], i - savedIndex);
+					toolbarModel.InsertPanel(row, oldRow.Panels[i], i - savedIndex);
 				}
 				oldRow.Panels.RemoveRange(savedIndex, oldRow.Panels.Count - savedIndex);
 				rowIndex = oldRow.Index + 1;
@@ -309,7 +309,7 @@ namespace Tangerine.Dialogs
 				index = 0;
 			}
 			panelList.InsertItem(index, new RowItem(row));
-			toolbarLayout.InsertRow(row, rowIndex);
+			toolbarModel.InsertRow(row, rowIndex);
 			TangerineApp.Instance.Toolbar.Rebuild();
 		}
 
@@ -319,7 +319,7 @@ namespace Tangerine.Dialogs
 			var filter = filterEditBox.Text.ToLower();
 			var categoryInfo = (CommandCategoryInfo)categoryList.Items[categoryList.Index].Value;
 			foreach (var commandInfo in CommandRegistry.RegisteredCommandInfo(categoryInfo)) {
-				if (toolbarLayout.ContainsId(commandInfo.Id) || !commandInfo.Title.ToLower().Contains(filter)) {
+				if (toolbarModel.ContainsId(commandInfo.Id) || !commandInfo.Title.ToLower().Contains(filter)) {
 					continue;
 				}
 				availableCommands.AddItem(new CommandItem(commandInfo));
@@ -348,9 +348,9 @@ namespace Tangerine.Dialogs
 
 		public void ResetToDefaults()
 		{
-			AppUserPreferences.Instance.ToolbarLayout = toolbarLayout = ToolbarLayout.DefaultToolbarLayout();
+			AppUserPreferences.Instance.ToolbarModel = toolbarModel = ToolbarModel.DefaultToolbarLayout();
 			Initialize();
-			TangerineApp.Instance.Toolbar.Rebuild(toolbarLayout);
+			TangerineApp.Instance.Toolbar.Rebuild(toolbarModel);
 		}
 
 		private Widget CreateCommandControls()
@@ -435,8 +435,8 @@ namespace Tangerine.Dialogs
 
 		private class PanelItem : Widget
 		{
-			private ToolbarLayout.ToolbarPanel panel;
-			public ToolbarLayout.ToolbarPanel Panel
+			private ToolbarModel.ToolbarPanel panel;
+			public ToolbarModel.ToolbarPanel Panel
 			{
 				get => panel;
 				set {
@@ -449,7 +449,7 @@ namespace Tangerine.Dialogs
 			private readonly ThemedEditBox editBox = new ThemedEditBox();
 			private readonly Widget dummy = new Widget();
 
-			public PanelItem(ToolbarLayout.ToolbarPanel panel)
+			public PanelItem(ToolbarModel.ToolbarPanel panel)
 			{
 				title.Text = editBox.Text = panel.Title;
 				editBox.Submitted += s => StopEdit();
@@ -519,9 +519,9 @@ namespace Tangerine.Dialogs
 
 		private class RowItem : Widget
 		{
-			public ToolbarLayout.ToolbarRow Row { get; private set; }
+			public ToolbarModel.ToolbarRow Row { get; private set; }
 
-			public RowItem(ToolbarLayout.ToolbarRow row)
+			public RowItem(ToolbarModel.ToolbarRow row)
 			{
 				Row = row;
 				MinMaxHeight = 10;

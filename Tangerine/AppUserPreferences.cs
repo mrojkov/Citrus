@@ -35,7 +35,7 @@ namespace Tangerine
 		public int AutosaveDelay { get; set; }
 
 		[YuzuRequired]
-		public ToolbarLayout ToolbarLayout { get; set; } = ToolbarLayout.DefaultToolbarLayout();
+		public ToolbarModel ToolbarModel { get; set; } = ToolbarModel.DefaultToolbarLayout();
 
 		public AppUserPreferences()
 		{
