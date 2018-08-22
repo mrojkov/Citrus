@@ -245,10 +245,6 @@ namespace Tangerine
 			RegisterCommands();
 			InitializeHotkeys();
 
-			// Andrey Tyshchenko: Create panel after hotkeys initialization
-			// to properly display hotkeys on panel
-			new UI.SceneView.NodeDecorationsPanel(nodeDecorationsPanel);
-
 			AppUserPreferences.Instance.ToolbarModel.RefreshAfterLoad();
 			Toolbar = new ToolbarView(dockManager.ToolbarArea, AppUserPreferences.Instance.ToolbarModel);
 			RefreshCreateNodeCommands();
