@@ -227,6 +227,11 @@ namespace Lime
 		event Action Rendering;
 
 		/// <summary>
+		/// Occurs before update and render. One can use this event to perform thread unsafe operations with the window.
+		/// </summary>
+		event Action Sync;
+		
+		/// <summary>
 		/// Sets a flag indicating whether the current frame should be rendered.
 		/// </summary>
 		void Invalidate();

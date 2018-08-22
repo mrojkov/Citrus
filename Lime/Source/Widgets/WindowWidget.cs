@@ -12,15 +12,9 @@ namespace Lime
 	[YuzuDontGenerateDeserializer]
 	public class WindowWidget : Widget
 	{
-		private const int SwapCount = 2;
-
-		private ManualResetEvent updateReady = new ManualResetEvent(true);
-		private ManualResetEvent renderReady = new ManualResetEvent(false);
-
 		private RenderObjectList renderObjectList1 = new RenderObjectList();
 		private RenderObjectList renderObjectList2 = new RenderObjectList();
-		private RenderObjectList syncRenderObjects = new RenderObjectList();
-
+		
 		private bool windowActivated;
 		private Widget lastFocused;
 		protected readonly RenderChain renderChain;
@@ -36,6 +30,7 @@ namespace Lime
 			renderChain = new RenderChain();
 			WidgetContext.GestureManager = new GestureManager(WidgetContext);
 			window.Activated += () => windowActivated = true;
+			window.Sync += SwapRenderObjectLists;
 			LayoutManager = new LayoutManager();
 		}
 
@@ -43,6 +38,11 @@ namespace Lime
 
 		private bool prevAnyCaptureKeyPressed;
 
+		private void SwapRenderObjectLists()
+		{
+			Toolbox.Swap(ref renderObjectList1, ref renderObjectList2);
+		}
+		
 		public override void Update(float delta)
 		{
 			if (ContinuousRendering()) {
@@ -86,32 +86,14 @@ namespace Lime
 			renderChain.Clear();
 			renderChain.ClipRegion = new Rectangle(Vector2.Zero, Size);
 			RenderChainBuilder?.AddToRenderChain(renderChain);
-
-			if (Window.AsyncRendering) {
-				updateReady.WaitOne();
-				updateReady.Reset();
-				renderObjectList1.Clear();
-				renderChain.GetRenderObjects(renderObjectList1);
-				renderReady.Set();
-			} else {
-				syncRenderObjects.Clear();
-				renderChain.GetRenderObjects(syncRenderObjects);
-			}
-
+			renderObjectList1.Clear();
+			renderChain.GetRenderObjects(renderObjectList1);
 			ManageFocusOnWindowActivation();
 		}
 
 		public void RenderAll()
 		{
-			if (Window.AsyncRendering) {
-				renderReady.WaitOne();
-				renderReady.Reset();
-				Toolbox.Swap(ref renderObjectList1, ref renderObjectList2);
-				updateReady.Set();
-				Render(renderObjectList2);
-			} else {
-				Render(syncRenderObjects);
-			}
+			Render(renderObjectList2);
 		}
 
 		private bool IsAnyCaptureKeyPressed()

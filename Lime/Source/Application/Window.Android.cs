@@ -16,7 +16,8 @@ namespace Lime
 	public class Window : CommonWindow, IWindow
 	{
 		private Thread renderThread;
-		private CancellationToken renderThreadToken;
+		private ManualResetEvent renderReady = new ManualResetEvent(false);
+		private ManualResetEvent renderCompleted = new ManualResetEvent(false);
 		
 		private static readonly IWindowManager WindowManager =
 			AndroidApp.Context.GetSystemService(AndroidContext.WindowService).JavaCast<IWindowManager>();
@@ -26,7 +27,7 @@ namespace Lime
 
 		private readonly Display display = new Display(WindowManager.DefaultDisplay);
 		private readonly FPSCounter fpsCounter;
-
+		
 		public bool Active { get; private set; }
 		public bool Fullscreen { get { return true; } set {} }
 		public string Title { get; set; }
@@ -102,9 +103,6 @@ namespace Lime
 			PixelScale = Resources.System.DisplayMetrics.Density;
 			
 			if (AsyncRendering) {
-				var renderThreadTokenSource = new CancellationTokenSource();
-				renderThreadToken = renderThreadTokenSource.Token;
-				Application.Exited += renderThreadTokenSource.Cancel;
 				renderThread = new Thread(RenderLoop);
 				renderThread.Start();
 			}
@@ -116,10 +114,19 @@ namespace Lime
 			ccb.OnFrame += frameTimeNanos => {
 				var delta = (float)((frameTimeNanos - prevFrameTime) / 1000000000d);
 				prevFrameTime = frameTimeNanos;
-				fpsCounter.Refresh();
-				RaiseUpdating(delta);
-				if (!AsyncRendering) {
-					RaiseRendering();
+				if (Active && ActivityDelegate.Instance.GameView.IsSurfaceCreated) {
+					RaiseSync();
+					if (AsyncRendering) {
+						renderReady.Set();
+					}
+					fpsCounter.Refresh();
+					Update(delta);
+					if (AsyncRendering) {
+						renderCompleted.WaitOne();
+						renderCompleted.Reset();
+					} else {
+						Render();
+					}
 				}
 			};
 			Choreographer.Instance.PostFrameCallback(ccb);
@@ -139,35 +146,24 @@ namespace Lime
 			public void DoFrame(long frameTimeNanos)
 			{
 				Choreographer.Instance.PostFrameCallback(this);
-				var now = Java.Lang.JavaSystem.NanoTime();
-				if (now - frameTimeNanos < skipFrameTimeout) {
+				//var now = Java.Lang.JavaSystem.NanoTime();
+				//if (now - frameTimeNanos < skipFrameTimeout) {
 					OnFrame?.Invoke(frameTimeNanos);
-				}
+				//}
 			}
 		}
 		
 		private void RenderLoop()
 		{
-			Android.OS.Looper.Prepare();
-			var ccb = new ChoreographerCallback(skipFrameTimeout: 8 * 1000000L);
-			ccb.OnFrame += RaiseRendering;
-			Choreographer.Instance.PostFrameCallback(ccb);
-			Android.OS.Looper.Loop();
-			// Alternative render loop implementation:
-			// while (!renderThreadToken.IsCancellationRequested) {
-			//	if (true) {
-			//		if (ActivityDelegate.Instance.GameView.ReadyToRender) {
-			//			ActivityDelegate.Instance.GameView.MakeCurrentActual();
-			//			RaiseRendering();
-			//			ActivityDelegate.Instance.GameView.SwapBuffers();
-			//		}
-			//	} else {
-			//		Thread.Sleep(16);
-			//	}
-			//}
+			while (true) {
+				renderReady.WaitOne();
+				renderReady.Reset();
+				Render();
+				renderCompleted.Set();
+			}
 		}
 		
-		private new void RaiseUpdating(float delta)
+		private void Update(float delta)
 		{
 			UnclampedDelta = delta;
 			delta = Math.Min(UnclampedDelta, Application.MaxDelta);
@@ -177,15 +173,13 @@ namespace Lime
 			Input.ProcessPendingKeyEvents(delta);
 		}
 		
-		private void RaiseRendering(long frameTimeNanos)
+		private void Render()
 		{
-			if (ActivityDelegate.Instance.GameView.ReadyToRender) {
-				ActivityDelegate.Instance.GameView.MakeCurrentActual();
-				base.RaiseRendering();
-				ActivityDelegate.Instance.GameView.SwapBuffers();
-			}
+			ActivityDelegate.Instance.GameView.MakeCurrentActual();
+			base.RaiseRendering();
+			ActivityDelegate.Instance.GameView.SwapBuffers();
 		}
-
+		
 		public void Center() {}
 		public void Close() {}
 		public void Invalidate() {}

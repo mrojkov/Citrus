@@ -4,18 +4,32 @@ namespace Lime
 {
 	public abstract class RenderObject
 	{
-		internal bool Rendered = true;
+		internal bool Free = true;
 
 		public abstract void Render();
 	}
 
-	public class RenderObjectList : List<RenderObject>
+	public class RenderObjectList
 	{
+		private List<RenderObject> objects = new List<RenderObject>();
+		
+		public void Add(RenderObject obj)
+		{
+			objects.Add(obj);
+		}
+		
+		public void Clear()
+		{
+			foreach (var obj in objects) {
+				obj.Free = true;
+			}
+			objects.Clear();
+		}
+		
 		public void Render()
 		{
-			foreach (var ro in this) {
+			foreach (var ro in objects) {
 				ro.Render();
-				ro.Rendered = true;
 			}
 		}
 	}
@@ -52,8 +66,8 @@ namespace Lime
 				var item = items[index++];
 				if (index == items.Length)
 					index = 0;
-				if (item.Rendered) {
-					item.Rendered = false;
+				if (item.Free) {
+					item.Free = false;
 					return item;
 				}
 			}
@@ -62,7 +76,7 @@ namespace Lime
 			for (int i = index; i < items.Length; i++) {
 				items[i] = new T();
 			}
-			items[index].Rendered = false;
+			items[index].Free = false;
 			return items[index];
 		}
 	}

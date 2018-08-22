@@ -65,7 +65,7 @@ namespace Lime
 			currentList.Add(new Item { Node = node, Presenter = presenter });
 		}
 
-		public void GetRenderObjects(List<RenderObject> list)
+		public void GetRenderObjects(RenderObjectList list)
 		{
 			for (var i = 0; i < Layers.Length; i++) {
 				var layer = Layers[i];

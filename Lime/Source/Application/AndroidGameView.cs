@@ -165,6 +165,20 @@ namespace Lime
 			OnRenderFrame(null);
 		}
 
+		public bool IsSurfaceCreated { get; private set; }
+		
+		protected override void OnLoad(EventArgs e)
+		{
+			base.OnLoad(e);
+			IsSurfaceCreated = true;
+		}
+
+		protected override void OnUnload(EventArgs e)
+		{
+			base.OnUnload(e);
+			IsSurfaceCreated = false;
+		}
+
 		public override void MakeCurrent() { }
 
 		public void MakeCurrentActual() => base.MakeCurrent();

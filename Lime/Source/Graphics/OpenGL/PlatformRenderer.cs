@@ -371,16 +371,6 @@ namespace Lime
 			} while (errCode != ErrorCode.NoError && errCode != ErrorCode.InvalidOperation);
 			throw new Exception("OpenGL error(s): " + errors);
 		}
-
-		private static void Initialize()
-		{
-			DefaultFramebuffer = uint.MaxValue;
-			CheckFeatures();
-			textures = new ITexture[maxTextureSlots];
-			vertexBufferViews = new VertexBufferView[maxVertexBufferSlots];
-		}
-		
-		private static bool initialized;
 		
 		public static void BeginFrame()
 		{
@@ -393,6 +383,16 @@ namespace Lime
 			CurrentFramebuffer = DefaultFramebuffer;
 			Reset();
 			Clear(ClearOptions.All, Color4.Black);
+		}
+		
+		private static bool initialized;
+
+		private static void Initialize()
+		{
+			DefaultFramebuffer = uint.MaxValue;
+			CheckFeatures();
+			textures = new ITexture[maxTextureSlots];
+			vertexBufferViews = new VertexBufferView[maxVertexBufferSlots];
 		}
 
 		private static void SaveDefaultFramebuffer()

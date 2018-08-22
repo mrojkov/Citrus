@@ -265,13 +265,13 @@ namespace Lime
 						opaqueObjects.Sort(RenderOrderComparers.FrontToBack);
 						foreach (var obj in opaqueObjects) {
 							obj.Render();
-							obj.Rendered = true;
+							obj.Free = true;
 						}
 						Renderer.DepthState = DepthState.DepthRead;
 						transparentObjects.Sort(RenderOrderComparers.BackToFront);
 						foreach (var obj in transparentObjects) {
 							obj.Render();
-							obj.Rendered = true;
+							obj.Free = true;
 						}
 					} finally {
 						opaqueObjects.Clear();
