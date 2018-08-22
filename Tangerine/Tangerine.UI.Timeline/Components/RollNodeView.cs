@@ -21,11 +21,11 @@ namespace Tangerine.UI.Timeline.Components
 		protected readonly ToolbarButton lockButton;
 		protected readonly ToolbarButton lockAnimationButton;
 		protected readonly Widget indentSpacer;
-		protected readonly TieIndicationContainer tieIndicationContainer = new TieIndicationContainer();
+		protected readonly LinkIndicatorButtonContainer linkIndicatorButtonContainer = new LinkIndicatorButtonContainer();
 
 		public NodeRow NodeData => nodeData;
 		public SimpleText Label => label;
-		public TieIndicationContainer TieIndicationContainer => tieIndicationContainer;
+		public LinkIndicatorButtonContainer LinkIndicatorButtonContainer => linkIndicatorButtonContainer;
 
 		private static readonly Color4[] ColorMarks = {
 			Color4.Transparent,
@@ -89,7 +89,7 @@ namespace Tangerine.UI.Timeline.Components
 					new HSpacer(3),
 					label,
 					editBox,
-					tieIndicationContainer,
+					linkIndicatorButtonContainer,
 					(Widget)enterButton ?? (Widget)new HSpacer(Theme.Metrics.DefaultToolbarButtonSize.X),
 					lockAnimationButton,
 					eyeButton,
