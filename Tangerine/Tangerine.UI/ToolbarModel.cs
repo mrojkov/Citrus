@@ -11,7 +11,7 @@ namespace Tangerine.UI
 		public class ToolbarPanel
 		{
 			[YuzuRequired]
-			public List<string> CommandIds { get; set; } = new List<string>();
+			public List<string> CommandIds { get; } = new List<string>();
 
 			[YuzuOptional]
 			public string Title { get; set; } = "Panel";
@@ -26,7 +26,7 @@ namespace Tangerine.UI
 		public class ToolbarRow
 		{
 			[YuzuRequired]
-			public List<ToolbarPanel> Panels { get; set; } = new List<ToolbarPanel>();
+			public List<ToolbarPanel> Panels { get; } = new List<ToolbarPanel>();
 
 			public ToolbarModel Parent { get; set; }
 			public int Index { get; set; }
@@ -43,7 +43,7 @@ namespace Tangerine.UI
 		}
 
 		[YuzuRequired]
-		public List<ToolbarRow> Rows { get; set; } = new List<ToolbarRow>();
+		public List<ToolbarRow> Rows { get; } = new List<ToolbarRow>();
 
 		public void RefreshAfterLoad()
 		{
@@ -111,77 +111,6 @@ namespace Tangerine.UI
 			Rows.RemoveAt(row.Index);
 			for (int i = row.Index; i < Rows.Count; ++i) {
 				Rows[i].Index -= 1;
-			}
-		}
-
-		public static ToolbarModel DefaultToolbarLayout()
-		{
-			return new ToolbarModel {
-				Rows = {
-					new ToolbarRow {
-						Panels = {
-							new ToolbarPanel {
-								Title = "History",
-								CommandIds = {
-									"Undo",
-									"Redo",
-									nameof(GenericCommands.Revert),
-								}
-							},
-							new ToolbarPanel {
-								Title = "Create",
-								CommandIds = {
-									"Frame",
-									"Button",
-									"Image",
-									"Audio",
-									"Movie",
-									"Bone",
-									"ParticleEmitter",
-									"ParticleModifier",
-									"EmitterShapePoint",
-									"ParticlesMagnet",
-									"SimpleText",
-									"RichText",
-									"TextStyle",
-									"NineGrid",
-									"DistortionMesh",
-									"Spline",
-									"SplinePoint",
-									"SplineGear",
-									"Slider",
-									"ImageCombiner",
-									"Viewport3D",
-									"Camera3D",
-									"Model3D",
-									"Node3D",
-									"WidgetAdapter3D",
-									"Spline3D",
-									"SplinePoint3D",
-									"SplineGear3D",
-									"LightSource",
-									"Polyline",
-									"PolylinePoint",
-									"TiledImage"
-								}
-							},
-							new ToolbarPanel {
-								Title = "Tools",
-								CommandIds = CommandIds(typeof(Tools)).ToList()
-							},
-						}
-					},
-				}
-			};
-		}
-
-		private static IEnumerable<string> CommandIds(Type type )
-		{
-			foreach (var field in type.GetFields(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)) {
-				var fieldType = field.FieldType;
-				if (fieldType == typeof(ICommand) || fieldType.IsSubclassOf(typeof(ICommand))) {
-					yield return field.Name;
-				}
 			}
 		}
 

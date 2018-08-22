@@ -348,7 +348,7 @@ namespace Tangerine.Dialogs
 
 		public void ResetToDefaults()
 		{
-			AppUserPreferences.Instance.ToolbarModel = toolbarModel = ToolbarModel.DefaultToolbarLayout();
+			AppUserPreferences.Instance.ToolbarModel = toolbarModel = AppUserPreferences.DefaultToolbarModel();
 			Initialize();
 			TangerineApp.Instance.Toolbar.Rebuild(toolbarModel);
 		}
