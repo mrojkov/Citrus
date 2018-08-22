@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using Lime;
 using Tangerine.UI;
 using Tangerine.Core;
@@ -375,7 +374,7 @@ namespace Tangerine
 	{
 		public override void ExecuteTransaction()
 		{
-			UpsampleNodeAnimation(Document.Current.RootNode);
+			UpsampleNodeAnimation(Document.Current.Container);
 		}
 
 		private void UpsampleNodeAnimation(Node node)
