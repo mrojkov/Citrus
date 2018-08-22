@@ -315,7 +315,7 @@ namespace Tangerine.UI.Docking
 
 		private void CreateTabBarWidget(Splitter container, TabBarPlacement placement, float stretch, int insertAt)
 		{
-			var tabbedWidget = new TabbedWidget(TabbedWidget.TabBarPlacement.Bottom) {
+			var tabbedWidget = new TabbedWidget() {
 				LayoutCell = new LayoutCell { StretchY = 0 },
 				AllowReordering = true
 			};
