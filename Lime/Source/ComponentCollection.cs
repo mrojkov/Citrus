@@ -158,6 +158,13 @@ namespace Lime
 			return false;
 		}
 
+		public bool Replace<T>(T component) where T : TComponent
+		{
+			var r = Remove<T>();
+			Add(component);
+			return r;
+		}
+
 		IEnumerator<TComponent> IEnumerable<TComponent>.GetEnumerator() => new Enumerator(buckets);
 
 		IEnumerator IEnumerable.GetEnumerator() => new Enumerator(buckets);
