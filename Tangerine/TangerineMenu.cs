@@ -62,8 +62,8 @@ namespace Tangerine
 			create.Add(customNodes = new Command("Custom Nodes", new Menu()));
 
 			foreach (var type in Project.Current.RegisteredNodeTypes) {
-				var cmd = new Command() { Icon = NodeIconPool.GetTexture(type) };
-				CommandRegistry.Register(cmd, "Create", "Create Commands", "Create" + type.Name, @override: true);
+				var cmd = new Command { Icon = NodeIconPool.GetTexture(type) };
+				CommandRegistry.Register(cmd, "CreateCommands", "Create" + type.Name, @override: true);
 				CommandHandlerList.Global.Connect(cmd, new CreateNode(type, cmd));
 				if (type.Namespace == "Lime") {
 					create.Add(cmd);

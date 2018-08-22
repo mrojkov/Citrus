@@ -42,8 +42,8 @@ namespace Tangerine.Dialogs
 				UpdateButtonCommands();
 				UpdateShortcuts();
 			});
-			Core.WidgetExtensions.AddChangeWatcher(this, () => Modifiers, modifiers => { UpdateShortcuts(); });
-			Core.WidgetExtensions.AddChangeWatcher(this, () => Main, main => { UpdateShortcuts(); });
+			Core.WidgetExtensions.AddChangeWatcher(this, () => Modifiers, modifiers => UpdateShortcuts());
+			Core.WidgetExtensions.AddChangeWatcher(this, () => Main, main => UpdateShortcuts());
 		}
 
 		public void UpdateButtonCommands()

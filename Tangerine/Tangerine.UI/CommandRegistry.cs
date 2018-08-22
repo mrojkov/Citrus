@@ -1,6 +1,7 @@
 using Lime;
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace Tangerine.UI
 {
@@ -10,10 +11,10 @@ namespace Tangerine.UI
 		public string Title { get; private set; }
 		public Dictionary<string, CommandInfo> Commands { get; private set; } = new Dictionary<string, CommandInfo>();
 
-		public CommandCategoryInfo(string id, string title = null)
+		public CommandCategoryInfo(string id)
 		{
 			Id = id;
-			Title = String.IsNullOrEmpty(title) ? $"{{{id}}}" : title;
+			Title = Regex.Replace(id, @"(\S)(\p{Lu}|\d)", "$1 $2");
 		}
 	}
 
@@ -23,14 +24,14 @@ namespace Tangerine.UI
 		public CommandCategoryInfo CategoryInfo { get; private set; }
 		public string Id { get; private set; }
 		public string Title { get; private set; }
-		public Shortcut Shortcut { get; set ; }
+		public Shortcut Shortcut { get; set; }
 
 		public CommandInfo(ICommand command, CommandCategoryInfo categoryInfo, string id)
 		{
 			Command = command;
 			CategoryInfo = categoryInfo;
 			Id = id;
-			Title = String.IsNullOrEmpty(command.Text) ? $"{{{id}}}" : command.Text;
+			Title = String.IsNullOrEmpty(command.Text) ? Regex.Replace(id, @"(\S)(\p{Lu}|\d)", "$1 $2") : command.Text;
 		}
 		public override int GetHashCode()
 		{
@@ -44,10 +45,10 @@ namespace Tangerine.UI
 
 		public readonly static CommandCategoryInfo AllCommands = new CommandCategoryInfo("All");
 
-		public static void Register(ICommand command, string categoryId, string categoryTitle, string commandId, bool @override = false)
+		public static void Register(ICommand command, string categoryId, string commandId, bool @override = false)
 		{
 			if (!categories.ContainsKey(categoryId)) {
-				categories.Add(categoryId, new CommandCategoryInfo(categoryId, categoryTitle));
+				categories.Add(categoryId, new CommandCategoryInfo(categoryId));
 			}
 			var categoryInfo = categories[categoryId];
 			var commandInfo = new CommandInfo(command, categoryInfo, commandId);

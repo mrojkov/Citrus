@@ -102,7 +102,7 @@ namespace Tangerine
 		{
 			Categories = new List<CommandCategoryInfo>();
 			foreach (var categoryInfo in categories) {
-				var newCategoryInfo = new CommandCategoryInfo(categoryInfo.Id, categoryInfo.Title);
+				var newCategoryInfo = new CommandCategoryInfo(categoryInfo.Id);
 				foreach (var commandInfo in categoryInfo.Commands.Values) {
 					var newCommandInfo = new CommandInfo(commandInfo.Command, newCategoryInfo, commandInfo.Id) {
 						Shortcut = commandInfo.Command.Shortcut

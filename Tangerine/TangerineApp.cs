@@ -347,26 +347,25 @@ namespace Tangerine
 
 		void RegisterCommands()
 		{
-			RegisterCommands(typeof(TimelineCommands), "Timeline Commands");
-			RegisterCommands(typeof(InspectorCommands), "Inspector Commands");
-			RegisterCommands(typeof(GenericCommands), "Generic Commands");
-			RegisterCommands(typeof(SceneViewCommands), "SceneView Commands");
-			RegisterCommands(typeof(Tools), "Tools");
-			RegisterCommands(typeof(OrangeCommands), "Orange Commands");
-			RegisterCommands(typeof(FilesystemCommands), "Filesystem Commands");
-			CommandRegistry.Register(Command.Undo, "GenericCommands", "Generic Commands", "Undo");
-			CommandRegistry.Register(Command.Redo, "GenericCommands", "Generic Commands", "Redo");
+			RegisterCommands(typeof(TimelineCommands));
+			RegisterCommands(typeof(InspectorCommands));
+			RegisterCommands(typeof(GenericCommands));
+			RegisterCommands(typeof(SceneViewCommands));
+			RegisterCommands(typeof(Tools));
+			RegisterCommands(typeof(OrangeCommands));
+			RegisterCommands(typeof(FilesystemCommands));
+			CommandRegistry.Register(Command.Undo, "GenericCommands", "Undo");
+			CommandRegistry.Register(Command.Redo, "GenericCommands", "Redo");
 		}
 
-		void RegisterCommands(Type type, string categoryTitle = null)
+		void RegisterCommands(Type type)
 		{
-			categoryTitle = categoryTitle ?? type.Name;
 			foreach (var field in type.GetFields(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)) {
 				var fieldType = field.FieldType;
 				if (!(fieldType == typeof(ICommand) || fieldType.IsSubclassOf(typeof(ICommand)))) {
 					continue;
 				}
-				CommandRegistry.Register((ICommand)field.GetValue(null), type.Name, categoryTitle, field.Name);
+				CommandRegistry.Register((ICommand)field.GetValue(null), type.Name, field.Name);
 			}
 		}
 
