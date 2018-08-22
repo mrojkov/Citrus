@@ -352,7 +352,7 @@ namespace Tangerine.UI.Docking
 				tabbedWidget.ActivateTab(args.NewIndex);
 			};
 			titleLabel.AddChangeWatcher(
-				() => placement.Placements[tabbedWidget.ActiveTabIndex].Title,
+				() => ((Tab)tabbedWidget.TabBar.Nodes[tabbedWidget.ActiveTabIndex]).Text,
 				title => titleLabel.Text = title
 			);
 			closeButton.Clicked += () => {
