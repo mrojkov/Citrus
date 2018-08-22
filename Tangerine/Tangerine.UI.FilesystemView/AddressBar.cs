@@ -339,11 +339,12 @@ namespace Tangerine.UI.FilesystemView
 			Presenter.SetState(state);
 		}
 
-		public static string GetName(string path)
+		private static string GetName(string path)
 		{
 			if (string.IsNullOrWhiteSpace(path)) {
 				return null;
 			} else if (
+				path.Length >= 2 &&
 				path[path.Length - 1] == Path.DirectorySeparatorChar &&
 				path[path.Length - 2] == Path.VolumeSeparatorChar
 			) {
