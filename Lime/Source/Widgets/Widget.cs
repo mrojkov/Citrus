@@ -512,7 +512,6 @@ namespace Lime
 		[TangerineStaticProperty]
 		public SkinningWeights SkinningWeights { get; set; }
 
-		[YuzuMember]
 		public BoneArray BoneArray;
 
 		[YuzuMember]
