@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -55,6 +55,29 @@ namespace Lime
 			set { source[index] = (Keyframe<T>)value; }
 		}
 
+		public IKeyframe GetByFrame(int frame)
+		{
+			int index = GetIndexByFrame(frame);
+			return index >= 0 ? source[GetIndexByFrame(frame)] : null;
+		}
+
+		private int GetIndexByFrame(int frame)
+		{
+			int l = 0;
+			int r = source.Count - 1;
+			while (l <= r) {
+				int m = (l + r) / 2;
+				if (source[m].Frame < frame) {
+					l = m + 1;
+				} else if (source[m].Frame > frame) {
+					r = m - 1;
+				} else {
+					return m;
+				}
+			}
+			return -1;
+		}
+
 		public void Clear()
 		{
 			source.Clear();
@@ -74,7 +97,12 @@ namespace Lime
 
 		public bool Remove(IKeyframe item)
 		{
-			return source.Remove((Keyframe<T>)item);
+			int index = GetIndexByFrame(item.Frame);
+			if (index < 0) {
+				return false;
+			}
+			source.RemoveAt(index);
+			return true;
 		}
 
 		public IEnumerator<IKeyframe> GetEnumerator()

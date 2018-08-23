@@ -75,7 +75,7 @@ namespace Tangerine.UI.Inspector
 
 		IKeyframe FindKeyframe()
 		{
-			return FindAnimator()?.ReadonlyKeys.FirstOrDefault(k => k.Frame == Document.Current.AnimationFrame);
+			return FindAnimator()?.ReadonlyKeys.GetByFrame(Document.Current.AnimationFrame);
 		}
 	}
 }

@@ -93,7 +93,7 @@ namespace Tangerine.Core.Operations
 				try {
 					var type = propertyData.Info.PropertyType;
 					var key =
-						animator?.ReadonlyKeys.FirstOrDefault(i => i.Frame == Document.Current.AnimationFrame)?.Clone() ??
+						animator?.ReadonlyKeys.GetByFrame(Document.Current.AnimationFrame)?.Clone() ??
 						Keyframe.CreateForType(type);
 					key.Frame = Document.Current.AnimationFrame;
 					key.Function = animator?.Keys.LastOrDefault(k => k.Frame <= key.Frame)?.Function ?? KeyFunction.Linear;
@@ -169,7 +169,7 @@ namespace Tangerine.Core.Operations
 
 			protected override void InternalRedo(RemoveKeyframe op)
 			{
-				var kf = op.Animator.Keys.FirstOrDefault(k => k.Frame == op.Frame);
+				var kf = op.Animator.Keys.GetByFrame(op.Frame);
 				op.Save(new Backup { Keyframe = kf });
 				op.Animator.Keys.Remove(kf);
 				if (op.Animator.Keys.Count == 0) {
@@ -244,7 +244,7 @@ namespace Tangerine.Core.Operations
 					op.Save(new Backup {
 						AnimatorExists = animatorExists,
 						Animator = animator,
-						Keyframe = animator.Keys.FirstOrDefault(k => k.Frame == op.Keyframe.Frame)
+						Keyframe = animator.Keys.GetByFrame(op.Keyframe.Frame)
 					});
 				} else {
 					animator = backup.Animator;
@@ -263,7 +263,7 @@ namespace Tangerine.Core.Operations
 			protected override void InternalUndo(SetKeyframe op)
 			{
 				var b = op.Peek<Backup>();
-				var key = b.Animator.Keys.FirstOrDefault(k => k.Frame == op.Keyframe.Frame);
+				var key = b.Animator.Keys.GetByFrame(op.Keyframe.Frame);
 				if (key == null) {
 					throw new InvalidOperationException();
 				}
@@ -522,7 +522,7 @@ namespace Tangerine.Core.Operations
 
 		public static void Perform(Node container, Marker marker, bool removeDependencies)
 		{
-			var previousMarker = container.Markers.FirstOrDefault(i => i.Frame == marker.Frame);
+			var previousMarker = container.Markers.GetByFrame(marker.Frame);
 
 			DocumentHistory.Current.Perform(new SetMarker(container, marker, removeDependencies));
 
@@ -559,7 +559,7 @@ namespace Tangerine.Core.Operations
 			protected override void InternalRedo(SetMarker op)
 			{
 				var backup = new Backup {
-					Marker = op.container.Markers.FirstOrDefault(i => i.Frame == op.marker.Frame)
+					Marker = op.container.Markers.GetByFrame(op.marker.Frame)
 				};
 
 				op.Save(backup);

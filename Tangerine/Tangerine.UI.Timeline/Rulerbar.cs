@@ -43,8 +43,7 @@ namespace Tangerine.UI.Timeline
 		{
 			Document.Current.History.DoTransaction(() => {
 				var timeline = Timeline.Instance;
-				var marker = Document.Current.Container.Markers.FirstOrDefault(
-					i => i.Frame == timeline.CurrentColumn);
+				var marker = Document.Current.Container.Markers.GetByFrame(timeline.CurrentColumn);
 				var newMarker = marker?.Clone() ?? new Marker { Frame = timeline.CurrentColumn };
 				var r = new MarkerPropertiesDialog().Show(newMarker, canDelete: marker != null);
 				if (r == MarkerPropertiesDialog.Result.Ok) {
@@ -209,7 +208,7 @@ namespace Tangerine.UI.Timeline
 			{
 				var menu = new Menu();
 				var frameUnderMouse = Timeline.Instance.Grid.CellUnderMouse().X;
-				var marker = Document.Current.Container.Markers.FirstOrDefault(m => m.Frame == frameUnderMouse);
+				var marker = Document.Current.Container.Markers.GetByFrame(frameUnderMouse);
 				menu.Add(new Command("Copy Marker", () => CopyMarker(marker)) {
 					Enabled = marker != null
 				});

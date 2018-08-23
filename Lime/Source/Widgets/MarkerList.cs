@@ -39,7 +39,16 @@ namespace Lime
 			throw new NotSupportedException();
 		}
 
-		public bool Remove(Marker item) => markers.Remove(item);
+		public bool Remove(Marker item)
+		{
+			int index = GetIndexByFrame(item.Frame);
+			if (index < 0) {
+				return false;
+			}
+			markers.RemoveAt(index);
+			return true;
+		}
+
 		public void RemoveAt(int index) => markers.RemoveAt(index);
 
 		public Marker this[int index]
@@ -83,6 +92,29 @@ namespace Lime
 			return marker;
 		}
 
+		public Marker GetByFrame(int frame)
+		{
+			int index = GetIndexByFrame(frame);
+			return index >= 0 ? markers[index] : null;
+		}
+
+		private int GetIndexByFrame(int frame)
+		{
+			int l = 0;
+			int r = markers.Count - 1;
+			while (l <= r) {
+				int m = (l + r) / 2;
+				if (markers[m].Frame < frame) {
+					l = m + 1;
+				} else if (markers[m].Frame > frame) {
+					r = m - 1;
+				} else {
+					return m;
+				}
+			}
+			return -1;
+		}
+
 		public int FindIndex(Predicate<Marker> match)
 		{
 			return markers.FindIndex(match);
@@ -91,16 +123,6 @@ namespace Lime
 		public bool Exists(Predicate<Marker> match)
 		{
 			return markers.Exists(match);
-		}
-
-		public Marker GetByFrame(int frame)
-		{
-			foreach (var marker in this) {
-				if (marker.Frame == frame) {
-					return marker;
-				}
-			}
-			return null;
 		}
 
 		public void Add(Marker marker)

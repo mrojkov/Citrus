@@ -21,7 +21,7 @@ namespace Tangerine.UI.Timeline
 					using (Document.Current.History.BeginTransaction()) {
 						int initialCol = CalcColumn(rulerWidget.LocalMousePosition().X);
 						int backup = timeline.CurrentColumn;
-						var marker = Document.Current.Container.Markers.FirstOrDefault(m => m.Frame == initialCol);
+						var marker = Document.Current.Container.Markers.GetByFrame(initialCol);
 						while (input.IsMousePressed()) {
 							bool isEditing = input.IsKeyPressed(Key.Control);
 							bool isShifting = isEditing && input.IsKeyPressed(Key.Shift);

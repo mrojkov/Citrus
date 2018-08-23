@@ -49,6 +49,8 @@ namespace Lime
 	{
 		IKeyframe CreateKeyframe();
 
+		IKeyframe GetByFrame(int frame);
+
 		void Add(int frame, object value, KeyFunction function = KeyFunction.Linear);
 		void AddOrdered(int frame, object value, KeyFunction function = KeyFunction.Linear);
 		void AddOrdered(IKeyframe keyframe);
