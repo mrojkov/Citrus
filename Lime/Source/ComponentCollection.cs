@@ -17,6 +17,9 @@ namespace Lime
 		internal static int GetKeyForType(Type type)
 		{
 			lock (keyMap) {
+				if (keyMap.TryGetValue(type, out int key)) {
+					return key;
+				}
 				Type t = type;
 				while (t != null) {
 					if (t.GetCustomAttribute<MutuallyExclusiveDerivedComponentsAttribute>(false) != null) {
@@ -25,7 +28,6 @@ namespace Lime
 					t = t.BaseType;
 				}
 				t = t ?? type;
-				int key;
 				if (!keyMap.TryGetValue(t, out key)) {
 					key = ++keyCounter;
 					keyMap.Add(t, key);
