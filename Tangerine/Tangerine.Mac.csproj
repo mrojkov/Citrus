@@ -113,6 +113,7 @@
     <Compile Include="AlignPreferences.cs" />
     <Compile Include="Dialogs\OrangePluginOptionsDialog.cs" />
     <Compile Include="Dialogs\ColorThemeEditor.cs" />
+    <Compile Include="Dialogs\ToolbarModelEditor.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>
@@ -421,6 +422,30 @@
     <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.TiledImage.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Timeline\AnimationStretch.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Timeline\AnimationStretch.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Preferences\AddPanel.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Preferences\AddRow.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Preferences\MoveDown.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Preferences\MoveLeft.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Preferences\MoveRight.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Preferences\MoveUp.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Preferences\RemovePanel.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Preferences\AddPanel.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Preferences\AddRow.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Preferences\MoveDown.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Preferences\MoveLeft.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Preferences\MoveRight.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Preferences\MoveUp.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Preferences\RemovePanel.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\KeyObject.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\Root.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\ToolbarSeparator.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\KeyObject.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\Root.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\ToolbarSeparator.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Filesystem\PathSeparatorCollapsed.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Filesystem\PathSeparatorExpanded.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Filesystem\PathSeparatorCollapsed.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Filesystem\PathSeparatorExpanded.png" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

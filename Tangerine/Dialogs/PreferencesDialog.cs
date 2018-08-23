@@ -20,6 +20,7 @@ namespace Tangerine
 		readonly Button resetButton;
 		readonly Frame Frame;
 		readonly TabbedWidget Content;
+		readonly ToolbarModelEditor toolbarModelEditor;
 
 		private List<IPropertyEditor> editors = new List<IPropertyEditor>();
 
@@ -52,6 +53,7 @@ namespace Tangerine
 			Content.AddTab("Appearance", CreateColorsPane());
 			Content.AddTab("Theme", CreateThemePane());
 			Content.AddTab("Keyboard shortcuts", CreateKeyboardPane());
+			Content.AddTab("Toolbar", toolbarModelEditor = new ToolbarModelEditor());
 
 			rootWidget = new ThemedInvalidableWindowWidget(window) {
 				Padding = new Thickness(8),
@@ -125,6 +127,7 @@ namespace Tangerine
 			UI.Timeline.TimelineUserPreferences.Instance.ResetToDefaults();
 			Core.CoreUserPreferences.Instance.ResetToDefaults();
 			HotkeyRegistry.ResetToDefaults();
+			toolbarModelEditor.ResetToDefaults();
 		}
 
 		private Widget CreateColorsPane()
@@ -331,7 +334,7 @@ namespace Tangerine
 		{
 			editors.ForEach(i => i.Submit());
 		}
-		
+
 		private Widget CreateKeyboardPane()
 		{
 			var hotkeyEditor = new HotkeyEditor();
@@ -410,10 +413,10 @@ namespace Tangerine
 
 			hotkeyEditor.SelectedShortcutChanged = () => {
 				selectedShortcutsView.Content.Nodes.Clear();
-				var commands = hotkeyEditor.SelectedCommands.ToLookup(i => i.Category);
+				var commands = hotkeyEditor.SelectedCommands.ToLookup(i => i.CategoryInfo);
 				foreach (var category in commands) {
 					selectedShortcutsView.Content.AddNode(new ThemedSimpleText {
-						Text = category.Key.Name,
+						Text = category.Key.Title,
 						VAlignment = VAlignment.Center,
 						Color = Theme.Colors.GrayText
 					});
@@ -424,7 +427,7 @@ namespace Tangerine
 							LayoutCell = new LayoutCell(Alignment.LeftCenter, 1)
 						};
 						var name = new ThemedSimpleText {
-							Text = command.Name,
+							Text = command.Title,
 							VAlignment = VAlignment.Center,
 							LayoutCell = new LayoutCell(Alignment.LeftCenter, 2)
 						};
@@ -455,7 +458,7 @@ namespace Tangerine
 			});
 
 			categoryPicker.Changed += args => {
-				hotkeyEditor.Category = (args.Value as CommandCategory);
+				hotkeyEditor.Category = (args.Value as CommandCategoryInfo);
 				hotkeyEditor.SetFocus();
 				int index = -1;
 				foreach (var node in allShortcutsView.Content.Nodes.SelectMany(i => i.Nodes)) {
@@ -483,7 +486,7 @@ namespace Tangerine
 					deleteButton.Enabled = profile.Name != HotkeyRegistry.DefaultProfileName && profilePicker.Items.Count > 1;
 					categoryPicker.Items.Clear();
 					foreach (var category in profile.Categories) {
-						categoryPicker.Items.Add(new CommonDropDownList.Item(category.Name, category));
+						categoryPicker.Items.Add(new CommonDropDownList.Item(category.Title, category));
 					}
 					categoryPicker.Value = null;
 					categoryPicker.Value = profile.Categories.First();
@@ -564,7 +567,7 @@ namespace Tangerine
 					Expanded = expandableContent.Visible
 				};
 				var title = new ThemedSimpleText {
-					Text = category.Name,
+					Text = category.Title,
 					VAlignment = VAlignment.Center,
 					LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0)
 				};
@@ -579,12 +582,12 @@ namespace Tangerine
 				allShortcutsView.Content.AddNode(header);
 				allShortcutsView.Content.AddNode(expandableContent);
 				var filteredCommands = String.IsNullOrEmpty(filter) ?
-					category.Commands : category.Commands.Where(i => i.Name.ToLower().Contains(filter));
+					category.Commands.Values : category.Commands.Values.Where(i => i.Title.ToLower().Contains(filter));
 				title.Color = filteredCommands.Any() ? Theme.Colors.BlackText : Theme.Colors.GrayText;
 				expandButton.Enabled = filteredCommands.Any();
 				foreach (var command in filteredCommands) {
 					var editor = new ShortcutPropertyEditor(
-						new PropertyEditorParams(expandableContent, command, "Shortcut", command.Name));
+						new PropertyEditorParams(expandableContent, command, "Shortcut", command.Title));
 					editor.PropertyLabel.OverflowMode = TextOverflowMode.Ellipsis;
 					editor.PropertyLabel.LayoutCell = new LayoutCell(Alignment.LeftCenter, 1);
 					editor.PropertyLabel.Padding = new Thickness(expandButton.Width, 0);

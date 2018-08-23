@@ -60,6 +60,7 @@
     <Compile Include="Dialogs\OrangePluginOptionsDialog.cs" />
     <Compile Include="Dialogs\PreferencesDialog.cs" />
     <Compile Include="Dialogs\HotkeyEditor.cs" />
+    <Compile Include="Dialogs\ToolbarModelEditor.cs" />
     <Compile Include="DocumentTabContextMenu.cs" />
     <Compile Include="MainMenu\CreateMenu.cs" />
     <Compile Include="MainMenu\EditMenu.cs" />
@@ -79,6 +80,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Icons\Dark\Timeline\Tied.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Tools\ToolbarSeparator.png" />
     <EmbeddedResource Include="Resources\Images.xcassets\AppIcons.appiconset\Contents.json" />
     <EmbeddedResource Include="Resources\SegoeUI.ttf" />
   </ItemGroup>
@@ -146,10 +148,25 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="icon.ico" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Tools\ToolbarSeparator.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Filesystem\PathSeparatorCollapsed.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Filesystem\PathSeparatorExpanded.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Filesystem\PathSeparatorCollapsed.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Filesystem\PathSeparatorExpanded.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Preferences\MoveLeft.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Preferences\MoveRight.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Preferences\MoveLeft.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Preferences\MoveRight.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Preferences\AddPanel.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Preferences\AddRow.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Preferences\MoveDown.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Preferences\MoveUp.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Preferences\RemovePanel.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Preferences\AddPanel.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Preferences\AddRow.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Preferences\MoveDown.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Preferences\MoveUp.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Preferences\RemovePanel.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Nodes\Lime.TiledImage.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Nodes\Lime.TiledImage.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Timeline\Tied.png" />

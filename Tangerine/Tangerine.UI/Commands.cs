@@ -1,25 +1,24 @@
-using System;
 using Lime;
 
 namespace Tangerine.UI
 {
 	public static class TimelineCommands
 	{
-		public static readonly ICommand ScrollLeft = new Command(new Shortcut(Key.Left));
-		public static readonly ICommand ScrollRight = new Command(new Shortcut(Key.Right));
-		public static readonly ICommand FastScrollLeft = new Command(new Shortcut(Modifiers.Alt, Key.Left));
-		public static readonly ICommand FastScrollRight = new Command(new Shortcut(Modifiers.Alt, Key.Right));
-		public static readonly ICommand ScrollUp = new Command(new Shortcut(Key.Up));
-		public static readonly ICommand ScrollDown = new Command(new Shortcut(Key.Down));
-		public static readonly ICommand SelectUp = new Command(new Shortcut(Modifiers.Shift, Key.Up));
-		public static readonly ICommand SelectDown = new Command(new Shortcut(Modifiers.Shift, Key.Down));
-		public static readonly ICommand EnterNode = new Command(new Shortcut(Key.Enter));
-		public static readonly ICommand EnterNodeAlias = new Command(new Shortcut(Modifiers.Alt | Modifiers.Shift, Key.Right));
-		public static readonly ICommand EnterNodeMouse = new Command(new Shortcut(Key.MouseForward));
-		public static readonly ICommand ExitNode = new Command(new Shortcut(Key.BackSpace));
-		public static readonly ICommand ExitNodeAlias = new Command(new Shortcut(Modifiers.Alt | Modifiers.Shift, Key.Left));
-		public static readonly ICommand ExitNodeMouse = new Command(new Shortcut(Key.MouseBack));
-		public static readonly ICommand RenameRow = new Command(new Shortcut(Key.F2));
+		public static readonly ICommand ScrollLeft = new Command("Scroll Left", new Shortcut(Key.Left));
+		public static readonly ICommand ScrollRight = new Command("Scroll Right", new Shortcut(Key.Right));
+		public static readonly ICommand FastScrollLeft = new Command("Fast Scroll Left", new Shortcut(Modifiers.Alt, Key.Left));
+		public static readonly ICommand FastScrollRight = new Command("Fast Scroll Right", new Shortcut(Modifiers.Alt, Key.Right));
+		public static readonly ICommand ScrollUp = new Command("Scroll Up", new Shortcut(Key.Up));
+		public static readonly ICommand ScrollDown = new Command("Scroll Down", new Shortcut(Key.Down));
+		public static readonly ICommand SelectNodeUp = new Command("Select Up", new Shortcut(Modifiers.Shift, Key.Up));
+		public static readonly ICommand SelectNodeDown = new Command("Select Down", new Shortcut(Modifiers.Shift, Key.Down));
+		public static readonly ICommand EnterNode = new Command("Enter Node", new Shortcut(Key.Enter));
+		public static readonly ICommand EnterNodeAlias = new Command("Enter Node", new Shortcut(Modifiers.Alt | Modifiers.Shift, Key.Right));
+		public static readonly ICommand EnterNodeMouse = new Command("Enter Node", new Shortcut(Key.MouseForward));
+		public static readonly ICommand ExitNode = new Command("Exit Node", new Shortcut(Key.BackSpace));
+		public static readonly ICommand ExitNodeAlias = new Command("Exit Node", new Shortcut(Modifiers.Alt | Modifiers.Shift, Key.Left));
+		public static readonly ICommand ExitNodeMouse = new Command("Exit Node", new Shortcut(Key.MouseBack));
+		public static readonly ICommand RenameRow = new Command("Rename Row", new Shortcut(Key.F2));
 		public static readonly ICommand DeleteKeyframes = new Command("Delete Selected Keyframes", new Shortcut(Modifiers.Shift, Key.Delete));
 		public static readonly ICommand CreateMarkerPlay = new Command("Create Play Marker", new Shortcut(Modifiers.Alt, Key.Number1));
 		public static readonly ICommand CreateMarkerStop = new Command("Create Stop Marker", new Shortcut(Modifiers.Alt, Key.Number2));
@@ -28,20 +27,20 @@ namespace Tangerine.UI
 		public static readonly ICommand CopyMarkers = new Command("Copy All Markers");
 		public static readonly ICommand PasteMarkers = new Command("Paste All Markers");
 		public static readonly ICommand DeleteMarkers = new Command("Delete All Markers");
-		public static readonly ICommand CutKeyframes = new Command("Cut keyframes", new Shortcut(Modifiers.Alt | Modifiers.Control, Key.X));
-		public static readonly ICommand CopyKeyframes = new Command("Copy keyframes", new Shortcut(Modifiers.Alt | Modifiers.Control, Key.C));
-		public static readonly ICommand PasteKeyframes = new Command("Paste keyframes", new Shortcut(Modifiers.Alt | Modifiers.Control, Key.V));
-		public static readonly ICommand MoveDown = new Command("Move down", new Shortcut(Modifiers.Control, Key.LBracket));
-		public static readonly ICommand MoveUp = new Command("Move up", new Shortcut(Modifiers.Control, Key.RBracket));
-		public static readonly ICommand ReverseKeyframes = new Command("Reverse keyframes");
-		public static readonly ICommand CreatePositionKeyframe = new Command("Create position keyframe", new Shortcut(Key.E));
-		public static readonly ICommand CreateRotationKeyframe = new Command("Create rotation keyframe", new Shortcut(Key.R));
-		public static readonly ICommand CreateScaleKeyframe = new Command("Create scale keyframe", new Shortcut(Key.T));
+		public static readonly ICommand CutKeyframes = new Command("Cut Keyframes", new Shortcut(Modifiers.Alt | Modifiers.Control, Key.X));
+		public static readonly ICommand CopyKeyframes = new Command("Copy Keyframes", new Shortcut(Modifiers.Alt | Modifiers.Control, Key.C));
+		public static readonly ICommand PasteKeyframes = new Command("Paste Keyframes", new Shortcut(Modifiers.Alt | Modifiers.Control, Key.V));
+		public static readonly ICommand MoveDown = new Command("Move Down", new Shortcut(Modifiers.Control, Key.LBracket));
+		public static readonly ICommand MoveUp = new Command("Move Up", new Shortcut(Modifiers.Control, Key.RBracket));
+		public static readonly ICommand ReverseKeyframes = new Command("Reverse Keyframes");
+		public static readonly ICommand CreatePositionKeyframe = new Command("Create Position Keyframe", new Shortcut(Key.E));
+		public static readonly ICommand CreateRotationKeyframe = new Command("Create Rotation Keyframe", new Shortcut(Key.R));
+		public static readonly ICommand CreateScaleKeyframe = new Command("Create Scale Keyframe", new Shortcut(Key.T));
 	}
 
 	public static class InspectorCommands
 	{
-		public static readonly ICommand InspectRootNodeCommand = new Command("Inspect root node");
+		public static readonly ICommand InspectRootNodeCommand = new Command("Inspect Root Node");
 	}
 
 	public static class GenericCommands
@@ -62,7 +61,7 @@ namespace Tangerine.UI
 		public static readonly ICommand PreferencesDialog = new Command("Preferences...", new Shortcut(Modifiers.Command, Key.P));
 		public static readonly ICommand Close = new Command("Close");
 		public static readonly ICommand CloseAll = new Command("Close All");
-		public static readonly ICommand CloseAllButCurrent = new Command("Close All But Current");
+		public static readonly ICommand CloseAllButCurrent = new Command("Close All but Current");
 		public static readonly ICommand Group = new Command("Group", new Shortcut(Modifiers.Command, Key.G));
 		public static readonly ICommand Ungroup = new Command("Ungroup", new Shortcut(Modifiers.Command | Modifiers.Shift, Key.G));
 		public static readonly ICommand InsertTimelineColumn = new Command("Insert Timeline Column", new Shortcut(Modifiers.Command, Key.Q));
@@ -76,10 +75,9 @@ namespace Tangerine.UI
 		public static readonly ICommand Quit = new Command("Quit", new Shortcut(Modifiers.Alt, Key.F4));
 #endif
 		public static readonly ICommand DefaultLayout = new Command("Default Layout");
-		public static readonly ICommand GroupContentsToMorphableMeshes = new Command("Group Contents To Morphable Meshes", new Shortcut(Modifiers.Command | Modifiers.Control, Key.M));
+		public static readonly ICommand GroupContentsToMorphableMeshes = new Command("Group Contents to Morphable Meshes", new Shortcut(Modifiers.Command | Modifiers.Control, Key.M));
 		public static readonly ICommand ExportScene = new Command("Export Scene...");
 		public static readonly ICommand UpsampleAnimationTwice = new Command("Upsample Animation Twice");
-		public static readonly ICommand Overlays;
 		public static readonly ICommand ViewHelp = new Command("View Help", new Shortcut(Modifiers.Control, Key.F1));
 		public static readonly ICommand HelpMode = new Command("Help Mode", Key.F1);
 		public static readonly ICommand SaveLayout = new Command("Save layout");
@@ -89,31 +87,31 @@ namespace Tangerine.UI
 
 	public static class SceneViewCommands
 	{
-		public static readonly ICommand PreviewAnimation = new Command(new Shortcut(Key.F5));
-		public static readonly ICommand PreviewAnimationWithTriggeringOfMarkers = new Command(new Shortcut(Modifiers.Control, Key.F5));
+		public static readonly ICommand PreviewAnimation = new Command("Preview Animation", new Shortcut(Key.F5));
+		public static readonly ICommand PreviewAnimationWithTriggeringOfMarkers = new Command("Preview Animation with Triggering of Markers", new Shortcut(Modifiers.Control, Key.F5));
 		public static readonly ICommand ResolutionChanger = new Command("Preview Next Resolution", new Shortcut(Key.F11));
 		public static readonly ICommand ResolutionReverceChanger = new Command("Preview Previous Resolution", new Shortcut(Modifiers.Shift, Key.F11));
 		public static readonly ICommand ResolutionOrientation = new Command("Preview Next Orientation", new Shortcut(Key.F12));
-		public static readonly ICommand DragRight = new Command(new Shortcut(Key.D));
-		public static readonly ICommand DragLeft = new Command(new Shortcut(Key.A));
-		public static readonly ICommand DragUp = new Command(new Shortcut(Key.W));
-		public static readonly ICommand DragDown = new Command(new Shortcut(Key.S));
-		public static readonly ICommand DragRightFast = new Command(new Shortcut(Modifiers.Shift, Key.D));
-		public static readonly ICommand DragLeftFast = new Command(new Shortcut(Modifiers.Shift, Key.A));
-		public static readonly ICommand DragUpFast = new Command(new Shortcut(Modifiers.Shift, Key.W));
-		public static readonly ICommand DragDownFast = new Command(new Shortcut(Modifiers.Shift, Key.S));
+		public static readonly ICommand DragRight = new Command("Drag Right", new Shortcut(Key.D));
+		public static readonly ICommand DragLeft = new Command("Drag Left", new Shortcut(Key.A));
+		public static readonly ICommand DragUp = new Command("Drag Up", new Shortcut(Key.W));
+		public static readonly ICommand DragDown = new Command("Drag Down", new Shortcut(Key.S));
+		public static readonly ICommand DragRightFast = new Command("Drag Right Fast", new Shortcut(Modifiers.Shift, Key.D));
+		public static readonly ICommand DragLeftFast = new Command("Drag Left Fast", new Shortcut(Modifiers.Shift, Key.A));
+		public static readonly ICommand DragUpFast = new Command("Drag Up Fast", new Shortcut(Modifiers.Shift, Key.W));
+		public static readonly ICommand DragDownFast = new Command("Drag Down Fast", new Shortcut(Modifiers.Shift, Key.S));
 		public static readonly ICommand ShowBone3DBisualHint = new Command("Bone (3D)", new Shortcut(Modifiers.Command, Key.B));
 		public static readonly ICommand ShowAllVisualHints = new Command("Display All", new Shortcut(Modifiers.Command, Key.M));
 		public static readonly ICommand ShowVisualHintsForInvisibleNodes = new Command("Display Invisible", new Shortcut(Modifiers.Command | Modifiers.Alt, Key.M));
-		public static readonly ICommand TieWidgetsWithBones = new Command("Tie Widgets With Bones", new Shortcut(Modifiers.Command, Key.T));
-		public static readonly ICommand UntieWidgetsFromBones = new Command("Untie Widgets From Bones", new Shortcut(Modifiers.Command | Modifiers.Shift, Key.T));
+		public static readonly ICommand TieWidgetsWithBones = new Command("Tie Widgets with Bones", new Shortcut(Modifiers.Command, Key.T));
+		public static readonly ICommand UntieWidgetsFromBones = new Command("Untie Widgets from Bones", new Shortcut(Modifiers.Command | Modifiers.Shift, Key.T));
 		public static readonly ICommand Duplicate = new Command("Duplicate", new Shortcut(Modifiers.Command, Key.D));
 		public static readonly ICommand ToggleDisplayRuler = new Command("Toggle Dispaly", new Shortcut(Modifiers.Command | Modifiers.Alt, Key.R));
 		public static readonly ICommand SaveCurrentRuler = new Command("Save Ruler");
 		public static readonly ICommand ClearActiveRuler = new Command("Clear Active Ruler");
-		public static readonly ICommand SnapWidgetPivotToRuler = new Command("Snap Widget Pivot To Ruler");
-		public static readonly ICommand SnapWidgetBorderToRuler = new Command("Snap Widget To Ruler");
-		public static readonly ICommand SnapRulerLinesToWidgets = new Command("Snap Ruler Lines To Widgets");
+		public static readonly ICommand SnapWidgetPivotToRuler = new Command("Snap Widget Pivot to Ruler");
+		public static readonly ICommand SnapWidgetBorderToRuler = new Command("Snap Widget to Ruler");
+		public static readonly ICommand SnapRulerLinesToWidgets = new Command("Snap Ruler Lines to Widgets");
 		public static readonly ICommand ManageRulers = new Command("Manage Rulers");
 		public static readonly ICommand ShowAnimationPath = new Command("Animation Path");
 	}
@@ -126,7 +124,7 @@ namespace Tangerine.UI
 		public static readonly ICommand AlignBottom = new Command("Align Bottom") { Icon = IconPool.GetTexture("Tools.AlignBottom") };
 		public static readonly ICommand CenterHorizontally = new Command("Center Horizontally") { Icon = IconPool.GetTexture("Tools.CenterH") };
 		public static readonly ICommand CenterVertically = new Command("Center Vertically") { Icon = IconPool.GetTexture("Tools.CenterV") };
-		public static readonly ICommand CenterAlignTo = new Command("Align To Parent") { Icon = IconPool.GetTexture("Tools.Parent") };
+		public static readonly ICommand CenterAlignTo = new Command("Align to Parent") { Icon = IconPool.GetTexture("Tools.Parent") };
 		public static readonly ICommand AlignCentersHorizontally = new Command("Align Centers Horizontally") { Icon = IconPool.GetTexture("Tools.AlignCentersHorizontally") };
 		public static readonly ICommand AlignCentersVertically = new Command("Align Centers Vertically") { Icon = IconPool.GetTexture("Tools.AlignCentersVertically") };
 		public static readonly ICommand DistributeLeft = new Command("Distribute Left") { Icon = IconPool.GetTexture("Tools.DistributeLeft") };
@@ -135,15 +133,15 @@ namespace Tangerine.UI
 		public static readonly ICommand DistributeTop = new Command("Distribute Top") { Icon = IconPool.GetTexture("Tools.DistributeTop") };
 		public static readonly ICommand DistributeVertically = new Command("Distribute Verticaly") { Icon = IconPool.GetTexture("Tools.DistributeCentersVertically") };
 		public static readonly ICommand DistributeBottom = new Command("Distribute Bottom") { Icon = IconPool.GetTexture("Tools.DistributeBottom") };
-		public static readonly ICommand AlignTo = new Command("Align To Selection") { Icon = IconPool.GetTexture("Tools.Selection") };
+		public static readonly ICommand AlignTo = new Command("Align to Selection") { Icon = IconPool.GetTexture("Tools.Selection") };
 		public static readonly ICommand RestoreOriginalSize = new Command("Restore Original Size") { Icon = IconPool.GetTexture("Tools.RestoreOriginalSize") };
 		public static readonly ICommand ResetScale = new Command("Reset Scale") { Icon = IconPool.GetTexture("Tools.SetUnitScale") };
 		public static readonly ICommand ResetRotation = new Command("Reset Rotation") { Icon = IconPool.GetTexture("Tools.SetZeroRotation") };
 		public static readonly ICommand FlipX = new Command("Flip Horizontally") { Icon = IconPool.GetTexture("Tools.FlipH") };
 		public static readonly ICommand FlipY = new Command("Flip Vertically") { Icon = IconPool.GetTexture("Tools.FlipV") };
-		public static readonly ICommand FitToContainer = new Command("Fit To Container") { Icon = IconPool.GetTexture("Tools.FitToContainer") };
-		public static readonly ICommand FitToContent = new Command("Fit To Content") { Icon = IconPool.GetTexture("Tools.FitToContent") };
-		public static readonly ICommand CenterView = new Command("CenterView") { Icon = IconPool.GetTexture("Tools.ToolsCenterView") };
+		public static readonly ICommand FitToContainer = new Command("Fit to Container") { Icon = IconPool.GetTexture("Tools.FitToContainer") };
+		public static readonly ICommand FitToContent = new Command("Fit to Content") { Icon = IconPool.GetTexture("Tools.FitToContent") };
+		public static readonly ICommand CenterView = new Command("Center View") { Icon = IconPool.GetTexture("Tools.ToolsCenterView") };
 	}
 
 	public static class FilesystemCommands
@@ -193,7 +191,7 @@ namespace Tangerine.UI
 	public static class OrangeCommands
 	{
 		public static readonly ICommand Run = new Command("Build and Run", new Shortcut(Key.F9));
-		public static readonly ICommand RunConfig = new Command("Run config", new Shortcut(Modifiers.Control, Key.F9));
+		public static readonly ICommand RunConfig = new Command("Run Config", new Shortcut(Modifiers.Control, Key.F9));
 		public static readonly ICommand CookGameAssets = new Command("Cook Game Assets", new Shortcut(Modifiers.Alt, Key.F9));
 	}
 }

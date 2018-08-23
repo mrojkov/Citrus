@@ -46,7 +46,7 @@ namespace Tangerine.UI.Docking
 			ToolbarArea = new Frame {
 				Id = "Toolbar",
 				ClipChildren = ClipMethod.ScissorTest,
-				Layout = new HBoxLayout { Spacing = 4 },
+				Layout = new VBoxLayout { Spacing = 4 },
 				LayoutCell = new LayoutCell { StretchY = 0 },
 			};
 			DocumentArea = new Frame {

@@ -137,7 +137,7 @@ namespace Lime
 				commandVersion = Command.Version;
 				NativeMenuItem.Hidden = !Command.Visible;
 				NativeMenuItem.Enabled = Command.Enabled;
-				NativeMenuItem.Title = Command.Text;
+				NativeMenuItem.Title = Command.Text ?? "";
 				NativeMenuItem.State = Command.Checked ? NSCellStateValue.On : NSCellStateValue.Off;
 				if (Command.Shortcut.Main != Key.Unknown) {
 					NativeMenuItem.KeyEquivalent = GetKeyEquivalent(Command.Shortcut.Main);

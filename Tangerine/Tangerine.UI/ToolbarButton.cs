@@ -19,6 +19,7 @@ namespace Tangerine.UI
 		private ITexture texture;
 		private bool isChecked;
 		private bool highlightable;
+		private string text;
 
 		public bool Selected { get; set; }
 
@@ -58,6 +59,21 @@ namespace Tangerine.UI
 			}
 		}
 
+		private ThemedSimpleText caption;
+		public override string Text
+		{
+			get => text;
+			set {
+				if (value != text) {
+					text = value;
+					if (caption != null) {
+						caption.Text = text;
+						Window.Current.Invalidate();
+					}
+				}
+			}
+		}
+
 		public string Tip { get; set; }
 
 		public ToolbarButton()
@@ -90,6 +106,8 @@ namespace Tangerine.UI
 				if (Texture != null) {
 					var iconColor = Enabled ? GlobalColor : GlobalColor * ColorTheme.Current.Toolbar.ButtonDisabledColor;
 					Renderer.DrawSprite(Texture, iconColor, ContentPosition, ContentSize, Vector2.Zero, Vector2.One);
+				} else if (caption != null) {
+					caption.Color = Enabled ? Theme.Colors.BlackText : Theme.Colors.GrayText;
 				}
 				if (borderColor != Color4.Transparent) {
 					Renderer.DrawRectOutline(Vector2.Zero, Size, borderColor);
@@ -171,6 +189,18 @@ namespace Tangerine.UI
 		public ToolbarButton(ITexture texture) : this()
 		{
 			Texture = texture;
+		}
+
+		public ToolbarButton(string text) : this()
+		{
+			caption = new ThemedSimpleText(text) {
+				HAlignment = HAlignment.Center,
+				VAlignment = VAlignment.Center
+			};
+			Text = text;
+			MinMaxSize = new Vector2(caption.MeasureUncutText().X + 10, MaxSize.Y);
+			AddNode(caption);
+			caption.ExpandToContainerWithAnchors();
 		}
 	}
 }

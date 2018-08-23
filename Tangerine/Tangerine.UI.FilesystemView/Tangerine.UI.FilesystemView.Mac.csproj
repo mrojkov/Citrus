@@ -75,6 +75,7 @@
     <Compile Include="SystemShellContextMenu.Mac.cs" />
     <Compile Include="FilesystemItem.cs" />
     <Compile Include="FileSystemUserPreferences.cs" />
+    <Compile Include="AddressBar.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Mac.csproj">

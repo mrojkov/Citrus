@@ -26,6 +26,10 @@ namespace Tangerine.UI
 			[YuzuRequired]
 			public Color4 ButtonSelected { get; set; }
 			[YuzuRequired]
+			public Color4 PanelPlacementHighlightBackground { get; set; }
+			[YuzuRequired]
+			public Color4 PanelPlacementHighlightBorder { get; set; }
+			[YuzuRequired]
 			public Color4 Separator { get; set; }
 		}
 
@@ -273,6 +277,8 @@ namespace Tangerine.UI
 				ButtonDisabledColor = Color4.Gray.Lighten(0.1f),
 				Background = basic.GrayBackground,
 				ButtonSelected = toolbuttonHighlightBorder,
+				PanelPlacementHighlightBackground = toolbuttonHighlightBackground.Transparentify(0.7f),
+				PanelPlacementHighlightBorder = toolbuttonHighlightBorder,
 				Separator = Color4.Gray.Lighten(0.3f),
 			};
 			var sceneView = new SceneViewColors {
@@ -404,6 +410,8 @@ namespace Tangerine.UI
 				ButtonDisabledColor = Color4.Gray.Darken(0.1f),
 				Background = basic.GrayBackground,
 				ButtonSelected = toolbuttonHighlightBorder,
+				PanelPlacementHighlightBackground = toolbuttonHighlightBackground.Transparentify(0.7f),
+				PanelPlacementHighlightBorder = toolbuttonHighlightBorder,
 				Separator = Color4.Gray.Lighten(0.3f),
 			};
 			var sceneView = new SceneViewColors {

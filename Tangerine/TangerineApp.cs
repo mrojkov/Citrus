@@ -15,7 +15,7 @@ namespace Tangerine
 	public class TangerineApp
 	{
 		public static TangerineApp Instance { get; private set; }
-		public readonly Dictionary<string, Toolbar> Toolbars = new Dictionary<string, Toolbar>();
+		public ToolbarView Toolbar { get; private set; }
 		public readonly DockManager.State DockManagerInitialState;
 
 		public static void Initialize(string[] args)
@@ -242,13 +242,12 @@ namespace Tangerine
 			});
 			DocumentHistory.Processors.AddRange(UI.Timeline.Timeline.GetOperationProcessors());
 
+			RegisterCommands();
 			InitializeHotkeys();
 
-			Toolbars.Add("Editing", new Toolbar(dockManager.ToolbarArea));
-			Toolbars.Add("Create", new Toolbar(dockManager.ToolbarArea));
-			Toolbars.Add("Tools", new Toolbar(dockManager.ToolbarArea));
+			AppUserPreferences.Instance.ToolbarModel.RefreshAfterLoad();
+			Toolbar = new ToolbarView(dockManager.ToolbarArea, AppUserPreferences.Instance.ToolbarModel);
 			RefreshCreateNodeCommands();
-			CreateToolsToolbar();
 			Document.AttachingViews += doc => {
 				if (doc.Views.Count == 0) {
 					doc.Views.AddRange(new IDocumentView[] {
@@ -336,47 +335,34 @@ namespace Tangerine
 
 		public void RefreshCreateNodeCommands()
 		{
-			var createToolbar = Toolbars["Create"];
-			createToolbar.Clear();
-			foreach (var c in TangerineMenu.CreateNodeCommands) {
-				createToolbar.Add(c);
-			}
-			HotkeyRegistry.InitCommands(TangerineMenu.CreateNodeCommands, "Tools", "Tools");
+			Toolbar.Rebuild();
+			HotkeyRegistry.InitDefaultShortcuts();
 			HotkeyRegistry.UpdateProfiles();
 			UI.SceneView.VisualHintsPanel.Refresh();
 		}
 
-		void CreateToolsToolbar()
+		void RegisterCommands()
 		{
-			var tb = Toolbars["Tools"];
-			tb.Add(Tools.AlignLeft);
-			tb.Add(Tools.AlignTop);
-			tb.Add(Tools.AlignRight);
-			tb.Add(Tools.AlignBottom);
-			tb.Add(Tools.AlignCentersHorizontally);
-			tb.Add(Tools.AlignCentersVertically);
-			tb.Add(Tools.DistributeLeft);
-			tb.Add(Tools.DistributeHorizontally);
-			tb.Add(Tools.DistributeRight);
-			tb.Add(Tools.DistributeTop);
-			tb.Add(Tools.DistributeVertically);
-			tb.Add(Tools.DistributeBottom);
-			tb.Add(Tools.AlignTo);
-			tb.Add(Tools.CenterHorizontally);
-			tb.Add(Tools.CenterVertically);
-			tb.Add(Tools.CenterAlignTo);
-			tb.Add(Tools.RestoreOriginalSize);
-			tb.Add(Tools.ResetScale);
-			tb.Add(Tools.ResetRotation);
-			tb.Add(Tools.FitToContainer);
-			tb.Add(Tools.FitToContent);
-			tb.Add(Tools.FlipX);
-			tb.Add(Tools.FlipY);
-			tb.Add(Tools.CenterView);
-			tb = Toolbars["Editing"];
-			tb.Add(Command.Undo);
-			tb.Add(Command.Redo);
-			tb.Add(GenericCommands.Revert);
+			RegisterCommands(typeof(TimelineCommands));
+			RegisterCommands(typeof(InspectorCommands));
+			RegisterCommands(typeof(GenericCommands));
+			RegisterCommands(typeof(SceneViewCommands));
+			RegisterCommands(typeof(Tools));
+			RegisterCommands(typeof(OrangeCommands));
+			RegisterCommands(typeof(FilesystemCommands));
+			CommandRegistry.Register(Command.Undo, "GenericCommands", "Undo");
+			CommandRegistry.Register(Command.Redo, "GenericCommands", "Redo");
+		}
+
+		void RegisterCommands(Type type)
+		{
+			foreach (var field in type.GetFields(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)) {
+				var fieldType = field.FieldType;
+				if (!(fieldType == typeof(ICommand) || fieldType.IsSubclassOf(typeof(ICommand)))) {
+					continue;
+				}
+				CommandRegistry.Register((ICommand)field.GetValue(null), type.Name, field.Name);
+			}
 		}
 
 		Yuzu.AbstractDeserializer DeserializeHotStudioAssets(string path, System.IO.Stream stream)
@@ -601,14 +587,7 @@ namespace Tangerine
 		{
 			string dir = HotkeyRegistry.ProfilesDirectory;
 			Directory.CreateDirectory(dir);
-			HotkeyRegistry.InitCommands(typeof(GenericCommands), "Generic Commands");
-			HotkeyRegistry.InitCommands(typeof(TimelineCommands), "Timeline Commands");
-			HotkeyRegistry.InitCommands(typeof(InspectorCommands), "Inspector Commands");
-			HotkeyRegistry.InitCommands(typeof(SceneViewCommands), "Scene View Commands");
-			HotkeyRegistry.InitCommands(typeof(Tools), "Tools");
-			HotkeyRegistry.InitCommands(typeof(FilesystemCommands), "Filesystem Commands");
-			HotkeyRegistry.InitCommands(typeof(OrangeCommands), "Orange Commands");
-			HotkeyRegistry.InitCommands(Command.Editing, "Editing", "Editing");
+			HotkeyRegistry.InitDefaultShortcuts();
 			var defaultProfile = HotkeyRegistry.CreateProfile(HotkeyRegistry.DefaultProfileName);
 			if (File.Exists(defaultProfile.Filepath)) {
 				defaultProfile.Load();
