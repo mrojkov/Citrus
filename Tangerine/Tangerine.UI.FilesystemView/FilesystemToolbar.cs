@@ -125,7 +125,7 @@ namespace Tangerine.UI.FilesystemView
 					new ThemedDropDownList.Item("Descending", OrderType.Descending)
 				},
 				Layout = new HBoxLayout(),
-				MinMaxWidth = Renderer.MeasureTextLine("Descending", Theme.Metrics.TextHeight, 0).X + 30,
+				MinMaxWidth = FontPool.Instance.DefaultFont.MeasureTextLine("Descending", Theme.Metrics.TextHeight, 0).X + 30,
 				Index = 0
 			};
 			list.Changed += args => {

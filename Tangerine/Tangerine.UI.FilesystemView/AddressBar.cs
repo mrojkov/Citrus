@@ -321,7 +321,7 @@ namespace Tangerine.UI.FilesystemView
 			Presenter = new PathButtonPresenter();
 			base.Presenter = Presenter;
 			MinMaxHeight = 20;
-			MinMaxWidth = Renderer.MeasureTextLine(Text, Theme.Metrics.TextHeight, 0).X + 7;
+			MinMaxWidth = FontPool.Instance.DefaultFont.MeasureTextLine(Text, Theme.Metrics.TextHeight, 0).X + 7;
 			Clicked += () => openPath(path);
 #if WIN
 			UpdateHandler showContextMenu = null;
