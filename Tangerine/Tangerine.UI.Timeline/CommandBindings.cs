@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Lime;
 using Tangerine.Core;
@@ -43,8 +44,34 @@ namespace Tangerine.UI.Timeline
 			ConnectCommand(TimelineCommands.DeleteMarkers, Rulerbar.DeleteMarkers);
 			ConnectCommand(TimelineCommands.MoveDown, MoveNodesDown.Perform);
 			ConnectCommand(TimelineCommands.MoveUp, MoveNodesUp.Perform);
+			ConnectCommand(TimelineCommands.SelectAllRowKeyframes, SelectAllRowKeyframes);
+			ConnectCommand(TimelineCommands.SelectAllKeyframes, SelectAllKeyframes);
 		}
-		
+
+		private static void SelectAllKeyframes()
+		{
+			SelectKeyframes(Document.Current.Rows);
+		}
+
+		private static void SelectAllRowKeyframes()
+		{
+			SelectKeyframes(Document.Current.SelectedRows());
+		}
+
+		private static void SelectKeyframes(IEnumerable<Row> rows)
+		{
+			Operations.ClearGridSelection.Perform();
+			foreach (var row in rows) {
+				if (row.Components.Get<NodeRow>() is NodeRow nodeRow) {
+					foreach (var animator in nodeRow.Node.Animators) {
+						foreach (var key in animator.ReadonlyKeys) {
+							Operations.SelectGridSpan.Perform(row.Index, key.Frame, key.Frame + 1);
+						}
+					}
+				}
+			}
+		}
+
 		private static void ConnectCommand(ICommand command, Action action, Func<bool> enableChecker = null)
 		{
 			CommandHandlerList.Global.Connect(command, new DocumentDelegateCommandHandler(action, enableChecker));
