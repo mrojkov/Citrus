@@ -457,6 +457,10 @@
       <Kind>Dynamic</Kind>
       <SmartLink>False</SmartLink>
     </NativeReference>
+    <NativeReference Include="..\3rdParty\FbxSdk\libFbxSdkUtils.dylib">
+      <Kind>Dynamic</Kind>
+      <SmartLink>False</SmartLink>
+    </NativeReference>
   </ItemGroup>  
   <ItemGroup>
     <Content Include="Documentation\**" />

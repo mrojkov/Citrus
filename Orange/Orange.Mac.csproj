@@ -171,13 +171,6 @@
       <Visible>False</Visible>
     </None>
     <None Include="app.config" />
-    <None Include="..\3rdParty\FbxSdk\libFbxSdkUtils.dylib">
-      <Link>libFbxSdkUtils.dylib</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\3rdParty\FbxSdk\libFbxSdkUtils64.dylib">
-      <Link>libFbxSdkUtils64.dylib</Link>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Mac.csproj">
@@ -214,6 +207,12 @@
     <Content Include="Toolchain.Mac\EtcTool">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <NativeReference Include="..\3rdParty\FbxSdk\libFbxSdkUtils.dylib">
+      <Kind>Dynamic</Kind>
+      <SmartLink>False</SmartLink>
+    </NativeReference>
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>
