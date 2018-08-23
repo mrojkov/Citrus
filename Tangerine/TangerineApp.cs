@@ -702,7 +702,7 @@ namespace Tangerine
 		static void Paste()
 		{
 			try {
-				Core.Operations.Paste.Perform();
+				Core.Operations.Paste.Perform(pasteAtMouse: UI.SceneView.SceneView.Instance.InputArea.IsFocused());
 			} catch (InvalidOperationException e) {
 				Document.Current.History.RollbackTransaction();
 				AlertDialog.Show(e.Message);
