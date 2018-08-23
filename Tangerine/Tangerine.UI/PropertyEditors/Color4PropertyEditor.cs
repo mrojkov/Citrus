@@ -16,7 +16,7 @@ namespace Tangerine.UI
 			var panel = new ColorPickerPanel();
 			var currentColor = CoalescedPropertyValue(Color4.White).DistinctUntilChanged();
 			ContainerWidget.AddNode(new Widget {
-				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center) },
+				Layout = new HBoxLayout { DefaultCell = new LayoutCell(Alignment.Center) },
 				Nodes = {
 					(editor = editorParams.EditBoxFactory()),
 					new HSpacer(4),
@@ -25,7 +25,7 @@ namespace Tangerine.UI
 				}
 			});
 			ExpandableContent.AddNode(panel.Widget);
-			panel.Widget.Padding.Right = 12;
+			panel.Widget.Padding = panel.Widget.Padding + new Thickness(right: 12.0f);
 			panel.Widget.Tasks.Add(currentColor.Consume(v => {
 				if (!colorFromPanel) {
 					panel.Color = v;

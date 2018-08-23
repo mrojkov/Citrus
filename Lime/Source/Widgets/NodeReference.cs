@@ -6,6 +6,9 @@ namespace Lime
 	/// <summary>
 	/// A node reference is used for referencing to a node within a serialized scene by the node Id.
 	/// </summary>
+	[YuzuSpecializeWith(typeof(Lime.Camera3D))]
+	[YuzuSpecializeWith(typeof(Lime.Spline))]
+	[YuzuSpecializeWith(typeof(Lime.Widget))]
 	public class NodeReference<T> where T: Node
 	{
 		private string id;

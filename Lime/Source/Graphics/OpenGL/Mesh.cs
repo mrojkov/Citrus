@@ -11,6 +11,7 @@ using Yuzu;
 
 namespace Lime
 {
+	[YuzuSpecializeWith(typeof(Lime.Mesh3D.Vertex))]
 	public partial class Mesh<T> : IMesh, IGLObject, IDisposable where T : struct
 	{
 		private bool disposed;

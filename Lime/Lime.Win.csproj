@@ -34,7 +34,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <PlatformTarget>x86</PlatformTarget>
-    <OutputPath>bin\Win\Release\</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>WIN;OPENGL;OPENAL</DefineConstants>
     <DebugType>full</DebugType>
     <WarningLevel>4</WarningLevel>
@@ -83,6 +83,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Profile|AnyCPU'">
     <LangVersion>7.2</LangVersion>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Lzma, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -103,6 +104,9 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.ValueTuple, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\System.ValueTuple.4.3.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -225,12 +229,10 @@
     <Compile Include="Source\Widgets\IExternalScenePropertyOverrideChecker.cs" />
     <Compile Include="Source\Widgets\IRenderChainBuilder.cs" />
     <Compile Include="Source\Widgets\KeyboardFocus.cs" />
-    <Compile Include="Source\Widgets\Layout\HBoxLayout.cs" />
-    <Compile Include="Source\Widgets\Layout\HFlowLayout.cs" />
+    <Compile Include="Source\Widgets\Layout\LinearLayout.cs" />
     <Compile Include="Source\Widgets\Layout\LayoutDebugPresenter.cs" />
     <Compile Include="Source\Widgets\Layout\FlowLayout.cs" />
     <Compile Include="Source\Widgets\3D\WidgetAdapter3D.cs" />
-    <Compile Include="Source\Widgets\Layout\VFlowLayout.cs" />
     <Compile Include="Source\Widgets\Materials\GradientMaterial.cs" />
     <Compile Include="Source\Widgets\MorphableMesh.cs" />
     <Compile Include="Source\Widgets\MorphableMeshBuilder.cs" />
@@ -307,7 +309,6 @@
     <Compile Include="Source\Widgets\Frame.cs" />
     <Compile Include="Source\Widgets\Image.cs" />
     <Compile Include="Source\Widgets\ImageCombiner.cs" />
-    <Compile Include="Source\Widgets\LinearLayout.cs" />
     <Compile Include="Source\Widgets\Marker.cs" />
     <Compile Include="Source\Widgets\MarkerList.cs" />
     <Compile Include="Source\Widgets\NineGrid.cs" />
@@ -378,7 +379,6 @@
     <Compile Include="Source\Widgets\Layout\LayoutCell.cs" />
     <Compile Include="Source\Widgets\Layout\LayoutManager.cs" />
     <Compile Include="Source\Widgets\Layout\LinearAllocator.cs" />
-    <Compile Include="Source\Widgets\Layout\VBoxLayout.cs" />
     <Compile Include="Source\Types\MonoMac\CG.cs" />
     <Compile Include="Source\Widgets\Layout\StackLayout.cs" />
     <Compile Include="Source\Application\MouseCursor\IStockCursors.cs" />
@@ -478,6 +478,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

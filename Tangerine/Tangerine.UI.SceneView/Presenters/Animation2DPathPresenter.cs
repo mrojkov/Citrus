@@ -36,12 +36,12 @@ namespace Tangerine.UI.SceneView
 			canvas.PrepareRendererState();
 			var nodes = Document.Current.SelectedNodes().Editable();
 			foreach (var node in nodes) {
-				if (node is IAnimable) {
-					var animable = node as IAnimable;
+				if (node is IAnimationHost) {
+					var animable = node as IAnimationHost;
 					foreach (var animator in animable.Animators) {
 						if (
 							animator is Vector2Animator &&
-							animator.TargetProperty == nameof(Widget.Position)
+							animator.TargetPropertyPath == nameof(Widget.Position)
 						) {
 							var keys = animator.ReadonlyKeys.ToList();
 							if (keys.Count < 2) {

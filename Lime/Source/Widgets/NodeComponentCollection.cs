@@ -11,17 +11,17 @@ namespace Lime
 	public sealed class NodeComponentDontSerializeAttribute : Attribute
 	{ }
 
-	public sealed class AllowedOwnerTypes : Attribute
+	public sealed class AllowedComponentOwnerTypes : Attribute
 	{
 		public Type[] Types;
 
-		public AllowedOwnerTypes(params Type[] types)
+		public AllowedComponentOwnerTypes(params Type[] types)
 		{
 			Types = types;
 		}
 	}
 
-	public class NodeComponent : Component, IDisposable
+	public class NodeComponent : Component, IDisposable, IAnimable
 	{
 		private Node owner;
 		public Node Owner
@@ -35,7 +35,9 @@ namespace Lime
 			{
 				if (value != owner) {
 					var oldOwner = owner;
+					(oldOwner as IAnimable)?.UnbindAnimators();
 					owner = value;
+					(owner as IAnimable)?.UnbindAnimators();
 					OnOwnerChanged(oldOwner);
 				}
 			}
@@ -51,6 +53,11 @@ namespace Lime
 		}
 
 		public virtual void Dispose() { }
+
+		void IAnimable.UnbindAnimators()
+		{
+			((IAnimable)Owner).UnbindAnimators();
+		}
 	}
 
 	public class NodeBehavior : NodeComponent

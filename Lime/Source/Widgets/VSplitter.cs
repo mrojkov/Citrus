@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Lime
 {
+	[YuzuDontGenerateDeserializer]
 	public class VSplitter : Splitter
 	{
 		public VSplitter()
@@ -24,7 +25,7 @@ namespace Lime
 				var l = (Layout as VSplitterLayout);
 				if (l.Spacing != value) {
 					l.Spacing = value;
-					l.InvalidateArrangement(this);
+					l.InvalidateArrangement();
 				}
 			}
 		}
@@ -73,7 +74,7 @@ namespace Lime
 					}
 					Stretches[i] = initialHeights[i] + d;
 				}
-				Layout.InvalidateConstraintsAndArrangement(this);
+				Layout.InvalidateConstraintsAndArrangement();
 				yield return null;
 			}
 			RaiseDragEnded();
@@ -113,12 +114,13 @@ namespace Lime
 			}
 		}
 
+		[YuzuDontGenerateDeserializer]
 		class VSplitterLayout : VBoxLayout
 		{
-			public override void MeasureSizeConstraints(Widget widget)
+			public override void MeasureSizeConstraints()
 			{
-				UpdateLayoutCells((Splitter)widget);
-				base.MeasureSizeConstraints(widget);
+				UpdateLayoutCells((Splitter)Owner);
+				base.MeasureSizeConstraints();
 			}
 
 			void UpdateLayoutCells(Splitter splitter)

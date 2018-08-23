@@ -7,7 +7,7 @@ namespace Tangerine.UI
 	{
 		public TexturePropertyEditor(IPropertyEditorParams editorParams) : base(editorParams, new string[] { "png" })
 		{
-			editor.AddChangeWatcher(CoalescedPropertyValue(), v => editor.Text = v?.SerializationPath ?? "");
+			editor.AddChangeWatcher(CoalescedPropertyValue(), v => editor.Text = (v as SerializableTexture)?.SerializationPath ?? "");
 		}
 
 		protected override void AssignAsset(string path)
@@ -16,7 +16,7 @@ namespace Tangerine.UI
 				SetProperty(new SerializableTexture(path));
 			}
 			else {
-				editor.Text = CoalescedPropertyValue().GetValue().SerializationPath;
+				editor.Text = (CoalescedPropertyValue().GetValue() as SerializableTexture)?.SerializationPath;
 				new AlertDialog($"{EditorParams.PropertyName}: Value is not valid", "Ok").Show();
 			}
 		}

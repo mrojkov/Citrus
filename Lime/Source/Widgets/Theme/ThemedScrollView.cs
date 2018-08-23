@@ -3,6 +3,7 @@ using System;
 
 namespace Lime
 {
+	[YuzuDontGenerateDeserializer]
 	public class ThemedScrollView : Frame
 	{
 		public override bool IsNotDecorated() => false;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
@@ -57,7 +57,7 @@ namespace Tangerine.UI.Timeline
 			toolbar = new Widget {
 				Padding = new Thickness(2, 0),
 				MinMaxHeight = Metrics.ToolbarHeight,
-				Layout = new HBoxLayout { Spacing = 4, CellDefaults = new LayoutCell { Alignment = Alignment.Center } },
+				Layout = new HBoxLayout { Spacing = 4, DefaultCell = new LayoutCell { Alignment = Alignment.Center } },
 				Presenter = new WidgetFlatFillPresenter(ColorTheme.Current.Toolbar.Background),
 			};
 			RootWidget = new Widget {
@@ -89,7 +89,7 @@ namespace Tangerine.UI.Timeline
 				var curve = new Curve(property.Animator, i, adapter, color);
 				Curves.Add(curve);
 				toolbar.AddNode(new ColorBoxButton(color));
-				var name = adapter.GetComponentName(i) ?? property.Animator.TargetProperty;
+				var name = adapter.GetComponentName(i) ?? property.Animator.TargetPropertyPath;
 				var label = new ThemedSimpleText(name) { MinWidth = 60 };
 				int c = i;
 				label.AddChangeWatcher(

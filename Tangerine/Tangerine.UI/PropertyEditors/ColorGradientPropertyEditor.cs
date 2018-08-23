@@ -80,7 +80,9 @@ namespace Tangerine.UI
 			};
 			colorPanel = new ColorPickerPanel();
 			ExpandableContent.AddNode(colorPanel.Widget);
-			colorPanel.Widget.Padding.Right = 12;
+			var padding = colorPanel.Widget.Padding;
+			padding.Right = 12;
+			colorPanel.Widget.Padding = padding;
 			colorPanel.DragStarted += () => EditorParams.History?.BeginTransaction();
 			colorPanel.DragEnded += () => {
 				EditorParams.History?.CommitTransaction();
@@ -102,9 +104,7 @@ namespace Tangerine.UI
 			var defaultValue = EditorParams.DefaultValueGetter();
 			if (defaultValue != null) {
 				DoTransaction(() => {
-					foreach (var o in EditorParams.Objects) {
-						EditorParams.PropertySetter(o, EditorParams.PropertyName, defaultValue);
-					}
+					SetProperty(defaultValue);
 					Core.Operations.SetProperty.Perform(
 						gradientControlWidget, nameof(GradientControlWidget.Gradient), gradientProperty.GetValue());
 				});

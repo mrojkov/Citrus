@@ -120,7 +120,7 @@ namespace Orange
 					n.Folders = null;
 				}
 				foreach (var a in n.Animators.ToList()) {
-					if (a.ReadonlyKeys.Count == 0) {
+					if (a.ReadonlyKeys.Count == 0 || a.IsZombie) {
 						n.Animators.Remove(a);
 					}
 				}

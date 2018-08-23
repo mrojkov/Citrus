@@ -280,7 +280,8 @@ namespace Tangerine.UI.Docking
 					}
 				}
 			};
-			title.Padding.Right += 5; // Add space between close button and titleWidget right border.
+			// Add space between close button and titleWidget right border.
+			title.Padding = title.Padding + new Thickness(right: 5);
 			titleWidget.CompoundPresenter.Add(new DelegatePresenter<Widget>(w => {
 				w.PrepareRendererState();
 				Renderer.DrawRect(Vector2.Zero, w.Size, ColorTheme.Current.Docking.PanelTitleBackground);

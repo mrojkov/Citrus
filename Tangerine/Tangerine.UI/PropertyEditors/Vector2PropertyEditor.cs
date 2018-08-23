@@ -6,12 +6,13 @@ namespace Tangerine.UI
 {
 	public class Vector2PropertyEditor : CommonPropertyEditor<Vector2>
 	{
-		private NumericEditBox editorX, editorY;
+		private NumericEditBox editorX;
+		private NumericEditBox editorY;
 
 		public Vector2PropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
 			ContainerWidget.AddNode(new Widget {
-				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center), Spacing = 4 },
+				Layout = new HBoxLayout { DefaultCell = new LayoutCell(Alignment.Center), Spacing = 4 },
 				Nodes = {
 					(editorX = editorParams.NumericEditBoxFactory()),
 					(editorY = editorParams.NumericEditBoxFactory())
@@ -29,11 +30,10 @@ namespace Tangerine.UI
 		{
 			if (Parser.TryParse(editor.Text, out double newValue)) {
 				DoTransaction(() => {
-					foreach (var obj in editorParams.Objects) {
-						var current = new Property<Vector2>(obj, editorParams.PropertyName).Value;
+					SetProperty<Vector2>((current) => {
 						current[component] = (float)newValue;
-						editorParams.PropertySetter(obj, editorParams.PropertyName, current);
-					}
+						return current;
+					});
 				});
 			}
 			editor.Text = currentValue.ToString();
@@ -41,7 +41,6 @@ namespace Tangerine.UI
 
 		public override void Submit()
 		{
-			string text = editorX.Text;
 			var currentX = CoalescedPropertyComponentValue(v => v.X);
 			var currentY = CoalescedPropertyComponentValue(v => v.Y);
 			SetComponent(EditorParams, 0, editorX, currentX.GetValue());

@@ -17,7 +17,7 @@ namespace Tangerine.UI.Timeline.Components
 		{
 			this.row = row;
 			propRow = row.Components.Get<PropertyRow>();
-			label = new ThemedSimpleText { Text = propRow.Animator.TargetProperty };
+			label = new ThemedSimpleText { Text = propRow.Animator.TargetPropertyPath };
 			propIcon = new Image {
 				LayoutCell = new LayoutCell(Alignment.Center),
 				Texture = IconPool.GetTexture("Nodes.Unknown"),
@@ -26,7 +26,7 @@ namespace Tangerine.UI.Timeline.Components
 			widget = new Widget {
 				Padding = new Thickness { Left = 4, Right = 2 },
 				MinHeight = TimelineMetrics.DefaultRowHeight,
-				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center) },
+				Layout = new HBoxLayout { DefaultCell = new LayoutCell(Alignment.Center) },
 				HitTestTarget = true,
 				Nodes = {
 					(spacer = new Widget()),

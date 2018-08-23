@@ -129,7 +129,6 @@
     <Compile Include="Source\Widgets\Frame.cs" />
     <Compile Include="Source\Widgets\Image.cs" />
     <Compile Include="Source\Widgets\ImageCombiner.cs" />
-    <Compile Include="Source\Widgets\LinearLayout.cs" />
     <Compile Include="Source\Widgets\Marker.cs" />
     <Compile Include="Source\Widgets\Movie.cs" />
     <Compile Include="Source\Widgets\NineGrid.cs" />
@@ -252,7 +251,6 @@
     <Compile Include="Source\Widgets\Layout\LayoutCell.cs" />
     <Compile Include="Source\Widgets\Layout\LayoutManager.cs" />
     <Compile Include="Source\Widgets\Layout\LinearAllocator.cs" />
-    <Compile Include="Source\Widgets\Layout\VBoxLayout.cs" />
     <Compile Include="Source\Application\Menu\Menu.Win.cs" />
     <Compile Include="Source\Application\MouseCursor\MouseCursor.cs" />
     <Compile Include="Source\Application\MouseCursor\MouseCursor.Mac.cs" />
@@ -266,7 +264,6 @@
     <Compile Include="Source\Widgets\HSplitter.cs" />
     <Compile Include="Source\Widgets\VSplitter.cs" />
     <Compile Include="Source\Widgets\Layout\FlowLayout.cs" />
-    <Compile Include="Source\Widgets\Layout\HBoxLayout.cs" />
     <Compile Include="Source\Widgets\Layout\LayoutDebugPresenter.cs" />
     <Compile Include="Source\EnumExtensions.cs" />
     <Compile Include="Source\GeometryUtils.cs" />
@@ -370,12 +367,11 @@
     <Compile Include="Source\Graphics\OpenGL\Buffer.cs" />
     <Compile Include="Source\Graphics\OpenGL\GLExtensions.cs" />
     <Compile Include="Source\Graphics\OpenGL\ShaderParams.cs" />
-    <Compile Include="Source\Widgets\Layout\HFlowLayout.cs" />
-    <Compile Include="Source\Widgets\Layout\VFlowLayout.cs" />
     <Compile Include="Source\Widgets\NodeBehaviours.cs" />
     <Compile Include="Source\Widgets\TiledImage.cs" />
     <Compile Include="Source\Components\GradientMaterialComponent.cs" />
     <Compile Include="Source\Widgets\Materials\GradientMaterial.cs" />
+    <Compile Include="Source\Widgets\Layout\LinearLayout.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Android.csproj">

@@ -48,7 +48,7 @@ namespace Tangerine.Core
 		public static bool ValidateComponentType(Type nodeType, Type componentType)
 		{
 			for (var t = componentType; t != null && t != typeof(NodeComponent); t = t.BaseType) {
-				var a = ClassAttributes<AllowedOwnerTypes>.Get(t);
+				var a = ClassAttributes<AllowedComponentOwnerTypes>.Get(t);
 				if (a != null) {
 					return a.Types.Any(ownerType => ownerType == nodeType || nodeType.IsSubclassOf(ownerType));
 				}

@@ -17,7 +17,7 @@ namespace Tangerine.UI.Timeline
 				MinMaxHeight = Metrics.ToolbarHeight,
 				MinWidth = TimelineMetrics.ToolbarMinWidth,
 				Presenter = new WidgetFlatFillPresenter(ColorTheme.Current.Toolbar.Background),
-				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center) },
+				Layout = new HBoxLayout { DefaultCell = new LayoutCell(Alignment.Center) },
 				Nodes = {
 					CreateAnimationModeButton(),
 					CreateAutoKeyframesButton(),
@@ -158,9 +158,9 @@ namespace Tangerine.UI.Timeline
 			return button;
 		}
 
-		static bool IsAnimationEnabled(IAnimable animable)
+		static bool IsAnimationEnabled(IAnimationHost animationHost)
 		{
-			foreach (var a in animable.Animators) {
+			foreach (var a in animationHost.Animators) {
 				if (!a.Enabled)
 					return false;
 			}

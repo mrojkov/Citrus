@@ -71,8 +71,16 @@ namespace Tangerine.UI.Timeline.Components
 					Renderer.DrawRectOutline(a, b, ColorTheme.Current.TimelineRoll.Lines);
 				}
 			}));
-			expandButtonContainer.Updating += delta =>
-				expandButton.Visible = nodeData.Node.Animators.Count > 0;
+			expandButtonContainer.Updating += delta => {
+				bool visible = false;
+				foreach (var a in nodeData.Node.Animators) {
+					if (!a.IsZombie) {
+						visible = true;
+						break;
+					}
+				}
+				expandButton.Visible = visible;
+			};
 			enterButton = NodeCompositionValidator.CanHaveChildren(nodeData.Node.GetType()) ? CreateEnterButton() : null;
 			eyeButton = CreateEyeButton();
 			lockButton = CreateLockButton();
@@ -80,7 +88,7 @@ namespace Tangerine.UI.Timeline.Components
 			widget = new Widget {
 				Padding = new Thickness { Right = 2 },
 				MinHeight = TimelineMetrics.DefaultRowHeight,
-				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center) },
+				Layout = new HBoxLayout { DefaultCell = new LayoutCell(Alignment.Center) },
 				HitTestTarget = true,
 				Nodes = {
 					expandButtonContainer,
@@ -211,14 +219,14 @@ namespace Tangerine.UI.Timeline.Components
 			Disabled
 		}
 
-		static AnimationState GetAnimationState(IAnimable animable)
+		static AnimationState GetAnimationState(IAnimationHost animationHost)
 		{
-			var animators = animable.Animators;
+			var animators = animationHost.Animators;
 			if (animators.Count == 0)
 				return AnimationState.None;
 			int enabled = 0;
 			foreach (var a in animators) {
-				if (a.Enabled)
+				if (a.Enabled && !a.IsZombie)
 					enabled++;
 			}
 			if (enabled == 0)

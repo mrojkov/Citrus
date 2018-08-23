@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace Lime
 {
+	[YuzuDontGenerateDeserializer]
 	[AllowedChildrenTypes(typeof(Node))]
 	public class Tab : Widget
 	{
@@ -66,6 +67,7 @@ namespace Lime
 		}
 	}
 
+	[YuzuDontGenerateDeserializer]
 	public class TabBar : Widget
 	{
 		private readonly DragGesture gesture;

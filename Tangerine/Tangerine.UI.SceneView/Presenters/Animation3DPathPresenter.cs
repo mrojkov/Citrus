@@ -24,14 +24,14 @@ namespace Tangerine.UI.SceneView
 				return;
 			}
 			foreach (var node in Document.Current.SelectedNodes().Editable().OfType<Node3D>()) {
-				if (!(node is IAnimable)) {
+				if (!(node is IAnimationHost)) {
 					continue;
 				}
-				var animable = (IAnimable)node;
+				var animable = (IAnimationHost)node;
 				foreach (var animator in animable.Animators) {
 					if (
 						animator is Vector3Animator &&
-						animator.TargetProperty == nameof(Node3D.Position)
+						animator.TargetPropertyPath == nameof(Node3D.Position)
 					) {
 						var keys = animator.ReadonlyKeys.ToList();
 						if (keys.Count == 0) {

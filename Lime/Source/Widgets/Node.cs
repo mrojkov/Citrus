@@ -12,10 +12,16 @@ using Yuzu;
 
 namespace Lime
 {
-	public interface IAnimable
+	public interface IAnimationHost
 	{
 		AnimatorCollection Animators { get; }
 		void OnTrigger(string property, double animationTimeCorrection = 0);
+		NodeComponentCollection Components { get; }
+	}
+
+	public interface IAnimable
+	{
+		void UnbindAnimators();
 	}
 
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
@@ -103,7 +109,22 @@ namespace Lime
 		}
 	}
 
-	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
+	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true)]
+	public sealed class YuzuSpecializeWithAttribute : Attribute
+	{
+		public Type Type;
+		public YuzuSpecializeWithAttribute(Type type)
+		{
+			Type = type;
+		}
+	}
+
+	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Interface, AllowMultiple = true)]
+	public sealed class YuzuDontGenerateDeserializerAttribute : Attribute
+	{ }
+
+
+	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Class, AllowMultiple = false)]
 	public sealed class TangerineIgnoreAttribute : Attribute
 	{ }
 
@@ -164,8 +185,9 @@ namespace Lime
 	/// <summary>
 	/// Scene tree element.
 	/// </summary>
+	[YuzuDontGenerateDeserializer]
 	[DebuggerTypeProxy(typeof(NodeDebugView))]
-	public abstract class Node : IDisposable, IAnimable, IFolderItem, IFolderContext, IRenderChainBuilder
+	public abstract class Node : IDisposable, IAnimationHost, IFolderItem, IFolderContext, IRenderChainBuilder, IAnimable
 	{
 		[Flags]
 		protected internal enum DirtyFlags
@@ -259,6 +281,7 @@ namespace Lime
 
 		private TangerineFlags tangerineFlags;
 
+		[TangerineIgnore]
 		[YuzuMember]
 		public TangerineFlags TangerineFlags
 		{
@@ -1016,6 +1039,16 @@ namespace Lime
 			{
 				for (var p = Parent; p != null; p = p.Parent) {
 					yield return p;
+				}
+			}
+		}
+
+		void IAnimable.UnbindAnimators()
+		{
+			foreach (var a in Animators) {
+				// Optimization: absence of `.` in path means its a node property being animated, so we never need to unbind it
+				if (a.TargetPropertyPath.IndexOf('.') != -1) {
+					a.Unbind();
 				}
 			}
 		}

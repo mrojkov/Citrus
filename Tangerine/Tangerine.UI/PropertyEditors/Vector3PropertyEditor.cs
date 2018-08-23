@@ -11,7 +11,7 @@ namespace Tangerine.UI
 		public Vector3PropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
 			ContainerWidget.AddNode(new Widget {
-				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center), Spacing = 4 },
+				Layout = new HBoxLayout { DefaultCell = new LayoutCell(Alignment.Center), Spacing = 4 },
 				Nodes = {
 					(editorX = editorParams.NumericEditBoxFactory()),
 					(editorY = editorParams.NumericEditBoxFactory()),
@@ -33,11 +33,10 @@ namespace Tangerine.UI
 		{
 			if (Parser.TryParse(editor.Text, out double newValue)) {
 				DoTransaction(() => {
-					foreach (var obj in editorParams.Objects) {
-						var current = new Property<Vector3>(obj, editorParams.PropertyName).Value;
+					SetProperty<Vector3>((current) => {
 						current[component] = (float)newValue;
-						editorParams.PropertySetter(obj, editorParams.PropertyName, current);
-					}
+						return current;
+					});
 				});
 			}
 			editor.Text = currentValue.ToString();

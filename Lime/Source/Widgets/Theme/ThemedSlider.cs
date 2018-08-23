@@ -3,6 +3,7 @@ using System;
 
 namespace Lime
 {
+	[YuzuDontGenerateDeserializer]
 	public class ThemedSlider : Slider
 	{
 		public override bool IsNotDecorated() => false;

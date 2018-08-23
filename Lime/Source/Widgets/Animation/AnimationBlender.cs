@@ -11,7 +11,7 @@ namespace Lime
 		private Dictionary<string, BlendingProcess> blendings = new Dictionary<string, BlendingProcess>();
 
 		[YuzuMember]
-		public readonly Dictionary<string, AnimationBlending> Options = new Dictionary<string, AnimationBlending>();
+		public Dictionary<string, AnimationBlending> Options { get; private set; } = new Dictionary<string, AnimationBlending>();
 
 		[TangerineInspect]
 		public double BlendDuration
@@ -403,7 +403,7 @@ namespace Lime
 		public BlendingOption Option;
 
 		[YuzuMember]
-		public readonly Dictionary<string, MarkerBlending> MarkersOptions = new Dictionary<string, MarkerBlending>();
+		public Dictionary<string, MarkerBlending> MarkersOptions = new Dictionary<string, MarkerBlending>();
 	}
 
 	public class MarkerBlending
@@ -412,7 +412,7 @@ namespace Lime
 		public BlendingOption Option;
 
 		[YuzuMember]
-		public readonly Dictionary<string, BlendingOption> SourceMarkersOptions = new Dictionary<string, BlendingOption>();
+		public Dictionary<string, BlendingOption> SourceMarkersOptions = new Dictionary<string, BlendingOption>();
 	}
 
 	public class BlendingOption

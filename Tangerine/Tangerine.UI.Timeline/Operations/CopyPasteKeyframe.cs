@@ -40,7 +40,7 @@ namespace Tangerine.UI.Timeline.Operations
 				if (spans == null) {
 					continue;
 				}
-				var animable = row.Components.Get<NodeRow>()?.Node as IAnimable;
+				var animable = row.Components.Get<NodeRow>()?.Node as IAnimationHost;
 				if (animable == null) {
 					continue;
 				}
@@ -49,7 +49,7 @@ namespace Tangerine.UI.Timeline.Operations
 						list.Add(new RowKeyBinding {
 							AnimationId = animator.AnimationId,
 							Frame = keyframe.Frame - startCol,
-							Property = animator.TargetProperty,
+							Property = animator.TargetPropertyPath,
 							Row = row.Index - startRow,
 							Keyframe = keyframe
 						});
@@ -108,7 +108,7 @@ namespace Tangerine.UI.Timeline.Operations
 					if (rowIndex >= Document.Current.Rows.Count || colIndex < 0) {
 						continue;
 					}
-					var animable = Document.Current.Rows[rowIndex].Components.Get<NodeRow>()?.Node as IAnimable;
+					var animable = Document.Current.Rows[rowIndex].Components.Get<NodeRow>()?.Node as IAnimationHost;
 					if (animable == null) {
 						continue;
 					}
@@ -134,7 +134,7 @@ namespace Tangerine.UI.Timeline.Operations
 					if (spans == null) {
 						continue;
 					}
-					var animable = row.Components.Get<NodeRow>()?.Node as IAnimable;
+					var animable = row.Components.Get<NodeRow>()?.Node as IAnimationHost;
 					if (animable == null) {
 						continue;
 					}

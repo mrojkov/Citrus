@@ -103,7 +103,7 @@ namespace Lime
 					cam.OrthographicSize *= ScaleFactor;
 				}
 				foreach (var animator in node.Animators) {
-					if (animator.TargetProperty == "Position") {
+					if (animator.TargetPropertyPath == "Position") {
 						foreach (Keyframe<Vector3> key in animator.Keys) {
 							key.Value *= sf;
 						}

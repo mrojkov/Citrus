@@ -57,6 +57,11 @@ namespace Lime.RenderOptimizer
 		[YuzuRequired]
 		public Vector3[] Data = new Vector3[4];
 
+		public ContentPlane()
+		{
+
+		}
+
 		public ContentPlane(Rectangle contentAABB)
 		{
 			Data[0] = GetPoint(contentAABB.A);

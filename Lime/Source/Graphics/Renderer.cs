@@ -217,7 +217,7 @@ namespace Lime
 				PlatformRenderer.SetScissorState(value);
 			}
 		}
-		
+
 		public static StencilState StencilState
 		{
 			get { return stencilState; }
@@ -346,53 +346,15 @@ namespace Lime
 			DrawTextLine(font, position, text, color, fontHeight, 0, text.Length, letterSpacing);
 		}
 
-		public static Vector2 MeasureTextLine(string text, float fontHeight, float letterSpacing)
-		{
-			return MeasureTextLine(FontPool.Instance[null], text, fontHeight, 0, text.Length, letterSpacing);
-		}
-
-		public static Vector2 MeasureTextLine(IFont font, string text, float fontHeight, float letterSpacing)
-		{
-			return MeasureTextLine(font, text, fontHeight, 0, text.Length, letterSpacing);
-		}
-
-		public static Vector2 MeasureTextLine(IFont font, string text, float fontHeight, int start, int length, float letterSpacing)
-		{
-			FontChar prevChar = null;
-			var size = new Vector2(0, fontHeight);
-			float width = 0;
-			// float scale = fontHeight / font.CharHeight;
-			for (int i = 0; i < length; i++) {
-				char ch = text[i + start];
-				if (ch == '\n') {
-					size.Y += fontHeight;
-					width = 0;
-					prevChar = null;
-					continue;
-				}
-				var fontChar = font.Chars.Get(ch, fontHeight);
-				if (fontChar == FontChar.Null) {
-					continue;
-				}
-				float scale = fontChar.Height != 0.0f ? fontHeight / fontChar.Height : 0.0f;
-				width += scale * (fontChar.ACWidths.X + fontChar.Kerning(prevChar));
-				width += scale * (fontChar.Width + fontChar.ACWidths.Y);
-				width += scale * letterSpacing;
-				size.X = Math.Max(size.X, width);
-				prevChar = fontChar;
-			}
-			return size;
-		}
-		
 		static SpriteList staticSpriteList = new SpriteList();
-		
+
 		public static void DrawTextLine(IFont font, Vector2 position, string text, Color4 color, float fontHeight, int start, int length, float letterSpacing)
 		{
 			DrawTextLine(font, position, text, color, fontHeight, start, length, letterSpacing, staticSpriteList);
 			staticSpriteList.Render(Color4.White, Blending, Shader);
 			staticSpriteList.Clear();
 		}
-		
+
 		public static void DrawTextLine(
 			IFont font, Vector2 position, string text, Color4 color, float fontHeight, int start, int length, float letterSpacing,
 			SpriteList list, Action<int, Vector2, Vector2> onDrawChar = null, int tag = -1)
@@ -446,17 +408,17 @@ namespace Lime
 			}
 			list.Add(font, color, fontHeight, chars, tag);
 		}
-		
+
 		public static void DrawTriangleFan(Vertex[] vertices, int numVertices)
 		{
 			DrawTriangleFan(null, null, WidgetMaterial.Diffuse, vertices, numVertices);
 		}
-		
+
 		public static void DrawTriangleFan(ITexture texture1, Vertex[] vertices, int numVertices)
 		{
 			DrawTriangleFan(texture1, null, vertices, numVertices);
 		}
-		
+
 		public static void DrawTriangleFan(ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
 		{
 			var material = GetMaterial(GetNumTextures(texture1, texture2));
@@ -479,7 +441,7 @@ namespace Lime
 			batch.LastVertex += numVertices;
 			return batch;
 		}
-		
+
 		public static void DrawTriangleStrip(Vertex[] vertices, int numVertices)
 		{
 			DrawTriangleStrip(null, null, WidgetMaterial.Diffuse, vertices, numVertices);
@@ -495,7 +457,7 @@ namespace Lime
 			var material = GetMaterial(GetNumTextures(texture1, texture2));
 			DrawTriangleStrip(texture1, texture2, material, vertices, numVertices);
 		}
-		
+
 		public static RenderBatch<Vertex> DrawTriangleStrip(ITexture texture1, ITexture texture2, IMaterial material, Vertex[] vertices, int numVertices)
 		{
 			var batch = DrawTrianglesHelper(texture1, texture2, material, vertices, numVertices);
@@ -530,12 +492,12 @@ namespace Lime
 			}
 			return batch;
 		}
-		
+
 		public static void DrawSprite(ITexture texture1, Color4 color, Vector2 position, Vector2 size, Vector2 uv0, Vector2 uv1)
 		{
 			DrawSprite(texture1, null, color, position, size, uv0, uv1, Vector2.Zero, Vector2.Zero);
 		}
-		
+
 		public static void DrawSprite(ITexture texture1, ITexture texture2, Color4 color, Vector2 position, Vector2 size, Vector2 uv0, Vector2 uv1)
 		{
 			DrawSprite(texture1, texture2, color, position, size, uv0, uv1, uv0, uv1);
@@ -547,7 +509,7 @@ namespace Lime
 			DrawSprite(texture1, texture2, material, color, position, size, uv0t1, uv1t1, uv0t2, uv1t2);
 		}
 
-        public static void DrawSprite(ITexture texture1, ITexture texture2, IMaterial material, Color4 color, Vector2 position, Vector2 size, Vector2 uv0t1, Vector2 uv1t1, Vector2 uv0t2, Vector2 uv1t2)
+		public static void DrawSprite(ITexture texture1, ITexture texture2, IMaterial material, Color4 color, Vector2 position, Vector2 size, Vector2 uv0t1, Vector2 uv1t1, Vector2 uv0t2, Vector2 uv1t2)
 		{
 			texture1?.TransformUVCoordinatesToAtlasSpace(ref uv0t1);
 			texture1?.TransformUVCoordinatesToAtlasSpace(ref uv1t1);

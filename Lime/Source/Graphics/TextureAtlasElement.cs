@@ -109,12 +109,6 @@ namespace Lime
 			get { return AtlasTexture.IsStubTexture; }
 		}
 
-		public string SerializationPath
-		{
-			get { throw new NotSupportedException(); }
-			set { throw new NotSupportedException(); }
-		}
-
 		public TextureParams TextureParams
 		{
 			get { return AtlasTexture.TextureParams;}

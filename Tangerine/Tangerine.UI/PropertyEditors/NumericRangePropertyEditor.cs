@@ -11,7 +11,7 @@ namespace Tangerine.UI
 		public NumericRangePropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
 			ContainerWidget.AddNode(new Widget {
-				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center), Spacing = 4 },
+				Layout = new HBoxLayout { DefaultCell = new LayoutCell(Alignment.Center), Spacing = 4 },
 				Nodes = {
 					(medEditor = editorParams.NumericEditBoxFactory()),
 					(dispEditor = editorParams.NumericEditBoxFactory()),
@@ -29,15 +29,14 @@ namespace Tangerine.UI
 		{
 			if (Parser.TryParse(editor.Text, out double newValue)) {
 				DoTransaction(() => {
-					foreach (var obj in editorParams.Objects) {
-						var current = new Property<NumericRange>(obj, editorParams.PropertyName).Value;
+					SetProperty<NumericRange>((current) => {
 						if (component == 0) {
 							current.Median = (float)newValue;
 						} else {
 							current.Dispersion = (float)newValue;
 						}
-						editorParams.PropertySetter(obj, editorParams.PropertyName, current);
-					}
+						return current;
+					});
 				});
 			} else {
 				editor.Text = currentValue.ToString();

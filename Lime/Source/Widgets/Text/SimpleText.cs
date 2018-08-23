@@ -206,6 +206,7 @@ namespace Lime
 			}
 		}
 
+		[YuzuMember]
 		public bool ForceUncutText { get; set; }
 		public RenderingMode RenderMode{ get; set; }
 
@@ -491,12 +492,12 @@ namespace Lime
 
 		private bool IsTextLinePartFitToWidth(string line, int start, int count)
 		{
-			return Renderer.MeasureTextLine(Font, line, FontHeight, start, count, letterSpacing).X <= ContentWidth;
+			return Font.MeasureTextLine(line, FontHeight, start, count, letterSpacing).X <= ContentWidth;
 		}
 
 		private Vector2 MeasureTextLine(string line)
 		{
-			return Renderer.MeasureTextLine(Font, line, FontHeight, letterSpacing);
+			return Font.MeasureTextLine(line, FontHeight, letterSpacing);
 		}
 
 		private string ClipLineWithEllipsis(string line)

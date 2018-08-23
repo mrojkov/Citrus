@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using Tangerine.Core;
 using Lime;
@@ -22,7 +22,6 @@ namespace Tangerine.UI.SceneView
 		public RulersWidget()
 		{
 			LayoutCell = new LayoutCell();
-			Layout = new AnchorLayout();
 			Anchors = Anchors.LeftRightTopBottom;
 			topRulerBar = new Widget {
 				Anchors = Anchors.LeftRight,
@@ -120,7 +119,7 @@ namespace Tangerine.UI.SceneView
 					var isVertical = lineComponent.Line.RulerOrientation == RulerOrientation.Vertical;
 					var value = lineComponent.Line.GetClosestPointToOrigin();
 					var text = $"{(isVertical ? "X:" : "Y:")} {(isVertical ? value.X : value.Y).ToString("G")}";
-					var size = Renderer.MeasureTextLine(text, fontSize, letterspacing) + 2 * padding;
+					var size = FontPool.Instance.DefaultFont.MeasureTextLine(text, fontSize, letterspacing) + 2 * padding;
 					var textPos = mousePos + Vector2.One * 10f;
 					DrawLine(widget.Size, value * t, lineComponent.Line.RulerOrientation, ColorTheme.Current.SceneView.RulerEditableActiveDraging);
 					Renderer.DrawRect(textPos, textPos + size, ColorTheme.Current.SceneView.RulerBackground);
@@ -212,7 +211,7 @@ namespace Tangerine.UI.SceneView
 						if (strokeValue != null) {
 							var lengthMarkerText = ((int)(j * strokeValue.Value)).ToString();
 							var oldTransform = Renderer.Transform1;
-							var textLength = Renderer.MeasureTextLine(lengthMarkerText, fontHeight, letterspacing);
+							var textLength = FontPool.Instance.DefaultFont.MeasureTextLine(lengthMarkerText, fontHeight, letterspacing);
 							if (rulerData.RulerOrientation == RulerOrientation.Vertical) {
 								Renderer.Transform1 = Matrix32.Rotation(-Mathf.HalfPi) * Renderer.Transform1;
 								textOffset = Vector2.Down * (5 + textLength.X);

@@ -109,8 +109,8 @@ namespace Lime.Text
 		float CalcWordWidth(Word word)
 		{
 			var style = Styles[word.Style];
-			Vector2 size = Renderer.MeasureTextLine(
-				style.Font, texts[word.TextIndex], ScaleSize(style.Size), word.Start, word.Length, style.LetterSpacing);
+			Vector2 size = style.Font.MeasureTextLine(
+				texts[word.TextIndex], ScaleSize(style.Size), word.Start, word.Length, style.LetterSpacing);
 			return size.X + (IsBullet(word) ? ScaleSize(style.ImageSize.X) : 0);
 		}
 
@@ -327,12 +327,12 @@ namespace Lime.Text
 				var style = Styles[word.Style];
 				var font = style.Font;
 				var t = texts[word.TextIndex];
-				float dotsWidth = Renderer.MeasureTextLine(font, "...", ScaleSize(style.Size), style.LetterSpacing).X;
+				float dotsWidth = font.MeasureTextLine("...", ScaleSize(style.Size), style.LetterSpacing).X;
 				if (
 					lastWordInLastLine > firstWordInLastLineIndex
 					&& (
-						word.X + Renderer.MeasureTextLine(
-							font, t.Substring(word.Start, 1), ScaleSize(style.Size), style.LetterSpacing).X + dotsWidth > maxWidth
+						word.X + font.MeasureTextLine(
+							t.Substring(word.Start, 1), ScaleSize(style.Size), style.LetterSpacing).X + dotsWidth > maxWidth
 						|| (word.Length == 1 && t[word.Start] == ' ')
 					)
 				) {
@@ -417,7 +417,7 @@ namespace Lime.Text
 			var t = texts[word.TextIndex];
 			do {
 				mid = min + ((max - min) / 2);
-				var w = Renderer.MeasureTextLine(font, t, ScaleSize(style.Size), word.Start, mid, style.LetterSpacing).X;
+				var w = font.MeasureTextLine(t, ScaleSize(style.Size), word.Start, mid, style.LetterSpacing).X;
 				isLineLonger = word.X + w > maxWidth;
 				if (isLineLonger) {
 					max = mid;
@@ -433,7 +433,7 @@ namespace Lime.Text
 		private void ClipWordWithEllipsis(Word word, float maxWidth)
 		{
 			var style = Styles[word.Style];
-			float dotsWidth = Renderer.MeasureTextLine(style.Font, "...", ScaleSize(style.Size), style.LetterSpacing).X;
+			float dotsWidth = style.Font.MeasureTextLine("...", ScaleSize(style.Size), style.LetterSpacing).X;
 			while (word.Length > 1 && word.X + word.Width + dotsWidth > maxWidth) {
 				word.Length--;
 				word.Width = CalcWordWidth(word);

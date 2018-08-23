@@ -1,9 +1,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace Lime
 {
+	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+	public class MutuallyExclusiveDerivedComponentsAttribute : Attribute
+	{ }
+
 	public class Component
 	{
 		private static Dictionary<Type, int> keyMap = new Dictionary<Type, int>();
@@ -12,10 +17,20 @@ namespace Lime
 		internal static int GetKeyForType(Type type)
 		{
 			lock (keyMap) {
-				int key;
-				if (!keyMap.TryGetValue(type, out key)) {
+				if (keyMap.TryGetValue(type, out int key)) {
+					return key;
+				}
+				Type t = type;
+				while (t != null) {
+					if (t.GetCustomAttribute<MutuallyExclusiveDerivedComponentsAttribute>(false) != null) {
+						break;
+					}
+					t = t.BaseType;
+				}
+				t = t ?? type;
+				if (!keyMap.TryGetValue(t, out key)) {
 					key = ++keyCounter;
-					keyMap.Add(type, key);
+					keyMap.Add(t, key);
 				}
 				return key;
 			}
@@ -68,7 +83,7 @@ namespace Lime
 
 		public TComponent Get(Type type) => Get(Component.GetKeyForType(type));
 
-		public T Get<T>() where T : TComponent => (T)Get(ComponentKeyResolver<T>.Key);
+		public T Get<T>() where T : TComponent => Get(ComponentKeyResolver<T>.Key) as T;
 
 		public T GetOrAdd<T>() where T : TComponent, new()
 		{
@@ -145,12 +160,19 @@ namespace Lime
 			return false;
 		}
 
+		public bool Replace<T>(T component) where T : TComponent
+		{
+			var r = Remove<T>();
+			Add(component);
+			return r;
+		}
+
 		IEnumerator<TComponent> IEnumerable<TComponent>.GetEnumerator() => new Enumerator(buckets);
 
 		IEnumerator IEnumerable.GetEnumerator() => new Enumerator(buckets);
-		
+
 		public Enumerator GetEnumerator() => new Enumerator(buckets);
-		
+
 		public struct Enumerator : IEnumerator<TComponent>
 		{
 			private int index;

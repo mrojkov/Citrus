@@ -142,6 +142,7 @@ namespace Lime
 			return length;
 		}
 
+		[YuzuDontGenerateDeserializer]
 		new class Layout : ScrollView.Layout
 		{
 			readonly Widget slider;
@@ -151,14 +152,14 @@ namespace Lime
 				this.slider = slider;
 			}
 
-			public override void ArrangeChildren(Widget widget)
+			public override void ArrangeChildren()
 			{
-				base.ArrangeChildren(widget);
+				base.ArrangeChildren();
 				if (slider != null) {
 					if (direction == ScrollDirection.Vertical) {
-						slider.X = widget.Width - slider.Width;
+						slider.X = Owner.Width - slider.Width;
 					} else {
-						slider.Y = widget.Height - slider.Height;
+						slider.Y = Owner.Height - slider.Height;
 					}
 				}
 			}

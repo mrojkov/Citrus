@@ -2,6 +2,7 @@ using System;
 
 namespace Lime
 {
+	[YuzuDontGenerateDeserializer]
 	public abstract class CommonEditBox : Widget
 	{
 		public bool IsReadOnly
@@ -64,8 +65,10 @@ namespace Lime
 		protected void OnSubmit() => Submitted?.Invoke(Text);
 	}
 
+	[YuzuDontGenerateDeserializer]
 	public class EditBox : CommonEditBox { }
 
+	[YuzuDontGenerateDeserializer]
 	public class NumericEditBox : CommonEditBox
 	{
 		public float Step = 0.1f;

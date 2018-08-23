@@ -20,6 +20,7 @@ namespace Lime
 			public static readonly Thickness ControlsPadding = new Thickness(2);
 		}
 
+		[YuzuDontGenerateDeserializer]
 		public class ColorTheme
 		{
 			[YuzuRequired]

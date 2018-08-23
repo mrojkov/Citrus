@@ -7,22 +7,17 @@ namespace Lime
 	{
 		public struct Entry
 		{
-			[YuzuMember]
 			public float Rotation;
 
-			[YuzuMember]
 			public float Length;
 
-			[YuzuMember]
 			public Vector2 Joint;
 
-			[YuzuMember]
 			public Vector2 Tip;
 
 			/// <summary>
 			/// Bone's transformation relative its reference position.
 			/// </summary>
-			[YuzuMember]
 			public Matrix32 RelativeTransform;
 		}
 
@@ -82,7 +77,7 @@ namespace Lime
 			skinningMatrix.T = ApplySkinningToVector(Vector2.Zero, weights);
 			skinningMatrix.U = ApplySkinningToVector(Vector2.Right, weights) - skinningMatrix.T;
 			skinningMatrix.V = ApplySkinningToVector(Vector2.Down, weights) - skinningMatrix.T;
-				
+
 			return skinningMatrix;
 		}
 

@@ -10,18 +10,26 @@ namespace Tangerine.UI
 	public interface IPropertyEditorParams
 	{
 		Widget InspectorPane { get; set; }
-		List<object> Objects { get; set; }
+		IEnumerable<object> RootObjects { get; set; }
+		IEnumerable<object> Objects { get; set; }
 		Type Type { get; set; }
+		// Path to property from RootObject to Object, starts with '@' for component type;
+		string PropertyPath { get; set; }
 		string PropertyName { get; set; }
 		string DisplayName { get; set; }
 		bool ShowLabel { get; set; }
 		TangerineKeyframeColorAttribute TangerineAttribute { get; set; }
 		System.Reflection.PropertyInfo PropertyInfo { get; set; }
+		PropertySetterDelegate PropertySetter { set; }
 		Func<NumericEditBox> NumericEditBoxFactory { get; set; }
 		Func<DropDownList> DropDownListFactory { get; set; }
 		Func<EditBox> EditBoxFactory { get; set; }
 		Func<object> DefaultValueGetter { get; set; }
-		PropertySetterDelegate PropertySetter { get; set; }
 		ITransactionalHistory History { get; set; }
+	}
+
+	public interface IPropertyEditorParamsInternal
+	{
+		PropertySetterDelegate PropertySetter { get; }
 	}
 }

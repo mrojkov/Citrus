@@ -100,7 +100,7 @@ namespace Tangerine.UI.Timeline
 			}
 			int oldLength = boundaries.Right - boundaries.Left - 1;
 			for (int i = boundaries.Top; i <= boundaries.Bottom; ++i) {
-				if (!(Document.Current.Rows[i].Components.Get<NodeRow>()?.Node is IAnimable animable)) {
+				if (!(Document.Current.Rows[i].Components.Get<NodeRow>()?.Node is IAnimationHost animable)) {
 					continue;
 				}
 				foreach (var animator in animable.Animators.ToList()) {
@@ -125,12 +125,12 @@ namespace Tangerine.UI.Timeline
 						var newKey = key.Clone();
 						newKey.Frame = newFrame;
 						SetAnimableProperty.Perform(
-							animable, animator.TargetProperty, newKey.Value,
+							animable, animator.TargetPropertyPath, newKey.Value,
 							createAnimatorIfNeeded: true,
 							createInitialKeyframeForNewAnimator: false,
 							newKey.Frame
 						);
-						SetKeyframe.Perform(animable, animator.TargetProperty, Document.Current.AnimationId, newKey);
+						SetKeyframe.Perform(animable, animator.TargetPropertyPath, Document.Current.AnimationId, newKey);
 					}
 				}
 			}
@@ -161,7 +161,7 @@ namespace Tangerine.UI.Timeline
 			savedMarkers.Clear();
 			var length = boundaries.Right - boundaries.Left - 1;
 			for (int i = boundaries.Top; i <= boundaries.Bottom; ++i) {
-				if (!(Document.Current.Rows[i].Components.Get<NodeRow>()?.Node is IAnimable animable)) {
+				if (!(Document.Current.Rows[i].Components.Get<NodeRow>()?.Node is IAnimationHost animable)) {
 					continue;
 				}
 				foreach (var animator in animable.Animators) {

@@ -3,7 +3,7 @@ using Yuzu;
 namespace Lime
 {
 	[TangerineRegisterComponent]
-	[AllowedOwnerTypes(typeof(Image))]
+	[AllowedComponentOwnerTypes(typeof(Image))]
 	public class GradientMaterialComponent : NodeComponent
 	{
 		private ColorGradient gradient;

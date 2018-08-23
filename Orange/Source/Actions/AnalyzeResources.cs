@@ -70,7 +70,7 @@ namespace Orange
 				var srcPath = srcFileInfo.Path;
 				using (Lime.Frame scene = new Lime.Frame(srcPath)) {
 					foreach (var j in scene.Descendants) {
-						var checkTexture = new Action<ITexture>((Lime.ITexture t) => {
+						var checkTexture = new Action<SerializableTexture>((Lime.SerializableTexture t) => {
 							if (t == null) {
 								return;
 							}
@@ -113,8 +113,8 @@ namespace Orange
 								t.SerializationPath, j.ToString()));
 						});
 						var checkAnimators = new Action<Node>((Node n) => {
-							Lime.Animator<Lime.ITexture> ta;
-							if (n.Animators.TryFind<ITexture>("Texture", out ta)) {
+							Lime.Animator<Lime.SerializableTexture> ta;
+							if (n.Animators.TryFind<SerializableTexture>("Texture", out ta)) {
 								foreach (var key in ta.ReadonlyKeys) {
 									checkTexture(key.Value);
 								}
@@ -122,7 +122,10 @@ namespace Orange
 						});
 						if (j is Widget) {
 							var w = j as Lime.Widget;
-							checkTexture(w.Texture);
+							var serializableTexture = w.Texture as SerializableTexture;
+							if (serializableTexture != null) {
+								checkTexture(serializableTexture);
+							}
 							checkAnimators(w);
 						} else if (j is ParticleModifier) {
 							var pm = j as Lime.ParticleModifier;

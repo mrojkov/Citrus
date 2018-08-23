@@ -57,15 +57,15 @@ namespace Orange
 		{
 			var header = new Widget {
 				Layout = new TableLayout {
-					ColCount = 2,
+					ColumnCount = 2,
 					RowCount = 2,
 					RowSpacing = 6,
-					ColSpacing = 6,
+					ColumnSpacing = 6,
 					RowDefaults = new List<LayoutCell> {
 						new LayoutCell { StretchY = 0 },
 						new LayoutCell { StretchY = 0 },
 					},
-					ColDefaults = new List<LayoutCell> {
+					ColumnDefaults = new List<LayoutCell> {
 						new LayoutCell { StretchX = 0 },
 						new LayoutCell(),
 					}

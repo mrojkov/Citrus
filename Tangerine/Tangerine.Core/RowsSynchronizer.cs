@@ -74,6 +74,9 @@ namespace Tangerine.Core
 
 		Row AddAnimatorRow(Row parent, Node node, IAnimator animator)
 		{
+			if (animator.IsZombie) {
+				return null;
+			}
 			var row = Document.Current.GetRowForObject(animator);
 			if (!row.Components.Contains<PropertyRow>()) {
 				row.Components.Add(new PropertyRow(node, animator));

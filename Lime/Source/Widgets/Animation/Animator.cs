@@ -6,14 +6,17 @@ namespace Lime
 {
 	public interface IAnimator : IDisposable
 	{
-		IAnimable Owner { get; set; }
+		IAnimationHost Owner { get; set; }
+
+		IAnimable Animable { get; set; }
+
 		IAnimator Next { get; set; }
 
 		IAnimator Clone();
 
 		bool IsTriggerable { get; set; }
 
-		string TargetProperty { get; set; }
+		string TargetPropertyPath { get; set; }
 
 		string AnimationId { get; set; }
 
@@ -36,6 +39,10 @@ namespace Lime
 		Type GetValueType();
 
 		bool TryGetNextKeyFrame(int nextFrame, out int keyFrame);
+
+		void Unbind();
+
+		bool IsZombie { get; }
 	}
 
 	public interface IKeyframeList : IList<IKeyframe>
@@ -51,7 +58,8 @@ namespace Lime
 
 	public class Animator<T> : IAnimator
 	{
-		public IAnimable Owner { get; set; }
+		public IAnimationHost Owner { get; set; }
+		public IAnimable Animable { get; set; }
 		public IAnimator Next { get; set; }
 
 		private double minTime;
@@ -62,9 +70,12 @@ namespace Lime
 
 		public bool IsTriggerable { get; set; }
 		public bool Enabled { get; set; } = true;
+		private delegate void SetterDelegate(T value);
+		private SetterDelegate Setter;
+		public bool IsZombie { get; private set; }
 
-		[YuzuMember]
-		public string TargetProperty { get; set; }
+		[YuzuMember("TargetProperty")]
+		public string TargetPropertyPath { get; set; }
 
 		public Type GetValueType() { return typeof(T); }
 
@@ -130,6 +141,8 @@ namespace Lime
 		{
 			var clone = (Animator<T>)MemberwiseClone();
 			clone.Setter = null;
+			clone.Animable = null;
+			clone.IsZombie = false;
 			clone.Owner = null;
 			clone.Next = null;
 			clone.boxedKeys = null;
@@ -138,9 +151,14 @@ namespace Lime
 			return clone;
 		}
 
-		private delegate void SetterDelegate(T value);
+		public void Unbind()
+		{
+			IsZombie = false;
+			Setter = null;
+			Animable = null;
+		}
 
-		private SetterDelegate Setter;
+		public int Duration => (ReadonlyKeys.Count == 0) ? 0 : ReadonlyKeys[ReadonlyKeys.Count - 1].Frame;
 
 		protected virtual T InterpolateLinear(float t) => Value2;
 		protected virtual T InterpolateSplined(float t) => InterpolateLinear(t);
@@ -156,16 +174,19 @@ namespace Lime
 			if (ReadonlyKeys.Count > 0 && Enabled) {
 				// This function relies on currentKey value. Therefore Apply(time) must be called before.
 				if (ReadonlyKeys[keyIndex].Frame == frame) {
-					Owner.OnTrigger(TargetProperty, animationTimeCorrection);
+					Owner.OnTrigger(TargetPropertyPath, animationTimeCorrection);
 				}
 			}
 		}
 
 		public void Apply(double time)
 		{
-			if (Enabled) {
+			if (Enabled && !IsZombie) {
 				if (Setter == null) {
 					Bind();
+					if (IsZombie) {
+						return;
+					}
 				}
 				Setter(CalcValue(time));
 			}
@@ -173,13 +194,15 @@ namespace Lime
 
 		private void Bind()
 		{
-			var p = AnimationUtils.GetProperty(Owner.GetType(), TargetProperty);
-			IsTriggerable = p.Triggerable;
-			var mi = p.Info.GetSetMethod();
-			if (mi == null) {
-				throw new Lime.Exception("Property '{0}' (class '{1}') is readonly", TargetProperty, Owner.GetType());
+			var (p, animable) = AnimationUtils.GetPropertyByPath(Owner, TargetPropertyPath);
+			var mi = p.Info?.GetSetMethod();
+			if (animable == null || p.Info.PropertyType != typeof(T) || mi == null) {
+				IsZombie = true;
+				return;
 			}
-			Setter = (SetterDelegate)Delegate.CreateDelegate(typeof(SetterDelegate), Owner, mi);
+			Animable = animable;
+			IsTriggerable = p.Triggerable;
+			Setter = (SetterDelegate)Delegate.CreateDelegate(typeof(SetterDelegate), animable, mi);
 		}
 
 		public void ResetCache()
@@ -271,8 +294,6 @@ namespace Lime
 			minTime = minFrame * AnimationUtils.SecondsPerFrame;
 			maxTime = maxFrame * AnimationUtils.SecondsPerFrame;
 		}
-
-		public int Duration => (ReadonlyKeys.Count == 0) ? 0 : ReadonlyKeys[ReadonlyKeys.Count - 1].Frame;
 	}
 
 	public class Vector2Animator : Animator<Vector2>
@@ -354,6 +375,29 @@ namespace Lime
 		protected override Matrix44 InterpolateLinear(float t)
 		{
 			return Matrix44.Lerp(Value2, Value3, t);
+		}
+	}
+
+	public class ThicknessAnimator : Animator<Thickness>
+	{
+		protected override Thickness InterpolateLinear(float t)
+		{
+			Thickness r;
+			r.Left = Value2.Left + (Value3.Left - Value2.Left) * t;
+			r.Right = Value2.Right + (Value3.Right - Value2.Right) * t;
+			r.Top = Value2.Top + (Value3.Top - Value2.Top) * t;
+			r.Bottom = Value2.Bottom + (Value3.Bottom - Value2.Bottom) * t;
+			return r;
+		}
+
+		protected override Thickness InterpolateSplined(float t)
+		{
+			return new Thickness(
+				Mathf.CatmullRomSpline(t, Value1.Left, Value2.Left, Value3.Left, Value4.Left),
+				Mathf.CatmullRomSpline(t, Value1.Right, Value2.Right, Value3.Right, Value4.Right),
+				Mathf.CatmullRomSpline(t, Value1.Top, Value2.Top, Value3.Top, Value4.Top),
+				Mathf.CatmullRomSpline(t, Value1.Bottom, Value2.Bottom, Value3.Bottom, Value4.Bottom)
+			);
 		}
 	}
 }

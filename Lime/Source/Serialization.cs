@@ -25,7 +25,7 @@ namespace Lime
 		public delegate AbstractDeserializer DeserializerBuilder(string path, Stream stream);
 
 		public static readonly List<DeserializerBuilder> DeserializerBuilders = new List<DeserializerBuilder> {
-			(path, stream) => new Yuzu.Json.JsonDeserializer { JsonOptions = defaultYuzuJSONOptions, Options = defaultYuzuCommonOptions }
+			(path, stream) => new Yuzu.Json.JsonDeserializer { JsonOptions = defaultYuzuJSONOptions, Options = DefaultYuzuCommonOptions }
 		};
 
 		public static string ShrinkPath(string path)
@@ -45,7 +45,7 @@ namespace Lime
 			return (path[0] == '/') ? path.Substring(1) : GetCurrentSerializationDirectory() + '/' + path;
 		}
 
-		private static readonly CommonOptions defaultYuzuCommonOptions = new CommonOptions {
+		public static readonly CommonOptions DefaultYuzuCommonOptions = new CommonOptions {
 			TagMode = TagMode.Aliases,
 			AllowEmptyTypes = true,
 			CheckForEmptyCollections = true,
@@ -73,10 +73,10 @@ namespace Lime
 			try {
 				if (format == Format.Binary) {
 					WriteYuzuBinarySignature(stream);
-					ys = new Yuzu.Binary.BinarySerializer { Options = defaultYuzuCommonOptions };
+					ys = new Yuzu.Binary.BinarySerializer { Options = DefaultYuzuCommonOptions };
 				} else if (format == Format.JSON) {
 					ys = new Yuzu.Json.JsonSerializer {
-						Options = defaultYuzuCommonOptions,
+						Options = DefaultYuzuCommonOptions,
 						JsonOptions = defaultYuzuJSONOptions
 					};
 				}
@@ -124,7 +124,7 @@ namespace Lime
 			try {
 				AbstractDeserializer d = null;
 				if (CheckYuzuBinarySignature(stream)) {
-					d = new GeneratedDeserializersBIN.BinaryDeserializerGen { Options = defaultYuzuCommonOptions };
+					d = new GeneratedDeserializersBIN.BinaryDeserializerGen { Options = DefaultYuzuCommonOptions };
 				} else {
 					foreach (var db in DeserializerBuilders) {
 						d = db(path, stream);
@@ -233,125 +233,37 @@ namespace Lime
 			using (var sw = new StreamWriter(ms)) {
 				jd.GenWriter = sw;
 				jd.GenerateHeader();
-				jd.Generate<Font>();
-				jd.Generate<SerializableSample>();
-				jd.Generate<KerningPair>();
-				jd.Generate<FontChar>();
-				jd.Generate<SerializableFont>();
-				jd.Generate<Mesh3D.BlendIndices>();
-				jd.Generate<Mesh3D.BlendWeights>();
-				jd.Generate<Mesh3D.Vertex>();
-				jd.Generate<Mesh<Mesh3D.Vertex>>();
-				jd.Generate<TextureAtlasElement.Params>();
-				jd.Generate<BitSet32>();
-				jd.Generate<BoundingSphere>();
-				jd.Generate<Color4>();
-				jd.Generate<IntRectangle>();
-				jd.Generate<IntVector2>();
-				jd.Generate<Matrix32>();
-				jd.Generate<Matrix44>();
-				jd.Generate<NumericRange>();
-				jd.Generate<Plane>();
-				jd.Generate<Quaternion>();
-				jd.Generate<Ray>();
-				jd.Generate<Rectangle>();
-				jd.Generate<Size>();
-				jd.Generate<Vector2>();
-				jd.Generate<Vector3>();
-				jd.Generate<Vector4>();
-				jd.Generate<Camera3D>();
-				jd.Generate<CommonMaterial>();
-				jd.Generate<Mesh3D>();
-				jd.Generate<Submesh3D>();
-				jd.Generate<Node3D>();
-				jd.Generate<Spline3D>();
-				jd.Generate<SplinePoint3D>();
-				jd.Generate<Viewport3D>();
-				jd.Generate<Animation>();
-				jd.Generate<Spline>();
-				jd.Generate<LinearLayout>();
-				jd.Generate<ColorGradient>();
-				jd.Generate<GradientMaterial>();
 
-				jd.Generate<Animator<string>>();
-				jd.Generate<Animator<int>>();
-				jd.Generate<Animator<bool>>();
-				jd.Generate<Animator<Blending>>();
-				jd.Generate<Animator<ITexture>>();
-				jd.Generate<Animator<NumericRange>>();
-				jd.Generate<Animator<Vector2>>();
-				jd.Generate<Animator<Color4>>();
-				jd.Generate<Animator<float>>();
-				jd.Generate<Animator<EmitterShape>>();
-				jd.Generate<Animator<AudioAction>>();
-				jd.Generate<Animator<SerializableSample>>();
-				jd.Generate<Animator<HAlignment>>();
-				jd.Generate<Animator<VAlignment>>();
-				jd.Generate<Animator<MovieAction>>();
-				jd.Generate<Animator<ShaderId>>();
-				jd.Generate<Animator<Vector3>>();
-				jd.Generate<Animator<Quaternion>>();
-				jd.Generate<Animator<EmissionType>>();
-				jd.Generate<NumericAnimator>();
-				jd.Generate<Vector2Animator>();
-				jd.Generate<Color4Animator>();
-				jd.Generate<QuaternionAnimator>();
-				jd.Generate<Vector3Animator>();
-				jd.Generate<Matrix44Animator>();
-
-				jd.Generate<Keyframe<string>>();
-				jd.Generate<Keyframe<int>>();
-				jd.Generate<Keyframe<bool>>();
-				jd.Generate<Keyframe<Blending>>();
-				jd.Generate<Keyframe<ITexture>>();
-				jd.Generate<Keyframe<NumericRange>>();
-				jd.Generate<Keyframe<Vector2>>();
-				jd.Generate<Keyframe<Color4>>();
-				jd.Generate<Keyframe<float>>();
-				jd.Generate<Keyframe<EmitterShape>>();
-				jd.Generate<Keyframe<AudioAction>>();
-				jd.Generate<Keyframe<SerializableSample>>();
-				jd.Generate<Keyframe<HAlignment>>();
-				jd.Generate<Keyframe<VAlignment>>();
-				jd.Generate<Keyframe<MovieAction>>();
-				jd.Generate<Keyframe<ShaderId>>();
-				jd.Generate<Keyframe<Vector3>>();
-				jd.Generate<Keyframe<Quaternion>>();
-				jd.Generate<Keyframe<EmissionType>>();
-				jd.Generate<Keyframe<Matrix44>>();
-
-				jd.Generate<Audio>();
-				jd.Generate<BoneWeight>();
-				jd.Generate<SkinningWeights>();
-				jd.Generate<Bone>();
-				jd.Generate<BoneArray>();
-				jd.Generate<BoneArray.Entry>();
-				jd.Generate<Button>();
-				jd.Generate<DistortionMesh>();
-				jd.Generate<DistortionMeshPoint>();
-				jd.Generate<Frame>();
-				jd.Generate<Image>();
-				jd.Generate<TiledImage>();
-				jd.Generate<ImageCombiner>();
-				jd.Generate<Marker>();
-				jd.Generate<Movie>();
-				jd.Generate<NineGrid>();
-				jd.Generate<ParticleEmitter>();
-				jd.Generate<ParticleModifier>();
-				jd.Generate<ParticlesMagnet>();
-				jd.Generate<PointObject>();
-				jd.Generate<Slider>();
-				jd.Generate<SplineGear>();
-				jd.Generate<SplinePoint>();
-				jd.Generate<RichText>();
-				jd.Generate<SimpleText>();
-				jd.Generate<TextStyle>();
-				jd.Generate<Widget>();
-				jd.Generate<SerializableTexture>();
-
-				jd.Generate<NodeReference<Widget>>();
-				jd.Generate<NodeReference<Spline>>();
-				jd.Generate<NodeReference<Camera3D>>();
+				var types = new List<Type>();
+				var assembly = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.FullName.StartsWith("Lime", StringComparison.OrdinalIgnoreCase)).First();
+				foreach (var t in assembly.GetTypes()) {
+					if (t.GetCustomAttribute<YuzuDontGenerateDeserializerAttribute>(false) != null) {
+						continue;
+					}
+					if (t.IsGenericType) {
+						if (t == typeof(Keyframe<>) || t == typeof(Animator<>)) {
+							foreach (var specializationType in AnimatorRegistry.Instance.EnumerateRegisteredTypes()) {
+								var specializedType = t.MakeGenericType(new[] { specializationType });
+								types.Add(specializedType);
+							}
+						} else {
+							foreach (var specializationType in t.GetCustomAttributes<YuzuSpecializeWithAttribute>().Select(a => a.Type)) {
+								var specializedType = t.MakeGenericType(new[] { specializationType });
+								types.Add(specializedType);
+							}
+						}
+					} else {
+						var meta = Yuzu.Metadata.Meta.Get(t, DefaultYuzuCommonOptions);
+						if (meta.Items.Count != 0) {
+							types.Add(t);
+						}
+					}
+				}
+				types.Sort((a, b) => a.FullName.CompareTo(b.FullName));
+				foreach (var t in types) {
+					jd.Generate(t);
+					Console.WriteLine(t.FullName);
+				}
 
 				jd.GenerateFooter();
 				sw.Flush();

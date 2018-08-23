@@ -38,29 +38,16 @@ namespace Tangerine.UI.Inspector
 			AddEditor(typeof(ColorGradient), c => new ColorGradientPropertyEditor(c));
 			AddEditor(typeof(Anchors), c => new AnchorsPropertyEditor(c));
 			AddEditor(typeof(Blending), c => new BlendingPropertyEditor(c));
-			AddEditor(typeof(ShaderId), c => new EnumPropertyEditor<ShaderId>(c));
 			AddEditor(typeof(RenderTarget), c => new RenderTargetPropertyEditor(c));
-			AddEditor(typeof(ClipMethod), c => new EnumPropertyEditor<ClipMethod>(c));
-			AddEditor(typeof(CameraProjectionMode), c => new EnumPropertyEditor<CameraProjectionMode>(c));
 			AddEditor(c => {
 				return
-					c.Objects.Count == 1 &&
+					!c.Objects.Skip(1).Any() &&
 					c.PropertyInfo.PropertyType == typeof(ITexture) &&
-					c.PropertyInfo.GetValue(c.Objects[0])?.GetType() == typeof(RenderTexture);
+					c.PropertyInfo.GetValue(c.Objects.First())?.GetType() == typeof(RenderTexture);
 			}, c => new RenderTexturePropertyEditor(c));
 			AddEditor(typeof(ITexture), c => new TexturePropertyEditor(c));
 			AddEditor(typeof(SerializableSample), c => new AudioSamplePropertyEditor(c));
 			AddEditor(typeof(SerializableFont), c => new FontPropertyEditor(c));
-			AddEditor(typeof(HAlignment), c => new EnumPropertyEditor<HAlignment>(c));
-			AddEditor(typeof(VAlignment), c => new EnumPropertyEditor<VAlignment>(c));
-			AddEditor(typeof(AudioAction), c => new EnumPropertyEditor<AudioAction>(c));
-			AddEditor(typeof(MovieAction), c => new EnumPropertyEditor<MovieAction>(c));
-			AddEditor(typeof(EmitterShape), c => new EnumPropertyEditor<EmitterShape>(c));
-			AddEditor(typeof(EmissionType), c => new EnumPropertyEditor<EmissionType>(c));
-			AddEditor(typeof(ParticlesLinkage), c => new EnumPropertyEditor<ParticlesLinkage>(c));
-			AddEditor(typeof(TextOverflowMode), c => new EnumPropertyEditor<TextOverflowMode>(c));
-			AddEditor(typeof(ShadowMapTextureQuality), c => new EnumPropertyEditor<ShadowMapTextureQuality>(c));
-			AddEditor(typeof(HitTestMethod), c => new EnumPropertyEditor<HitTestMethod>(c));
 			AddEditor(typeof(NodeReference<Camera3D>), c => new NodeReferencePropertyEditor<Camera3D>(c));
 			AddEditor(typeof(NodeReference<LightSource>), c => new NodeReferencePropertyEditor<LightSource>(c));
 			AddEditor(typeof(NodeReference<Image>), c => new NodeReferencePropertyEditor<Image>(c));
@@ -69,7 +56,8 @@ namespace Tangerine.UI.Inspector
 			AddEditor(typeof(NodeReference<Node3D>), c => new NodeReferencePropertyEditor<Node3D>(c));
 			AddEditor(typeof(NodeReference<Spline3D>), c => new NodeReferencePropertyEditor<Spline3D>(c));
 			AddEditor(typeof(SkinningWeights), c => new SkinningWeightsPropertyEditor(c));
-			AddEditor(typeof(CullMode), c => new EnumPropertyEditor<CullMode>(c));
+			AddEditor(typeof(Alignment), c => new AlignmentPropertyEditor(c));
+			AddEditor(typeof(Thickness), c => new ThicknessPropertyEditor(c));
 		}
 
 		void AddEditor(Type type, PropertyEditorBuilder builder)

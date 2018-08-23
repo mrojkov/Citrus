@@ -7,6 +7,7 @@ namespace Lime
 	/// <summary>
 	/// Root of the widgets hierarchy.
 	/// </summary>
+	[YuzuDontGenerateDeserializer]
 	public class WindowWidget : Widget
 	{
 		private bool windowActivated;
@@ -141,6 +142,7 @@ namespace Lime
 		public Matrix44 GetProjection() => Matrix44.CreateOrthographicOffCenter(0, Width, Height, 0, -50, 50);
 	}
 
+	[YuzuDontGenerateDeserializer]
 	public class DefaultWindowWidget : WindowWidget
 	{
 		public bool LayoutBasedWindowSize { get; set; }
@@ -185,6 +187,7 @@ namespace Lime
 		}
 	}
 
+	[YuzuDontGenerateDeserializer]
 	public class InvalidableWindowWidget : DefaultWindowWidget
 	{
 		public bool RedrawMarkVisible { get; set; }

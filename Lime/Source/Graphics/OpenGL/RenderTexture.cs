@@ -20,6 +20,7 @@ namespace Lime
 		RGB565
 	}
 
+	[YuzuDontGenerateDeserializer]
 	public class RenderTexture : CommonTexture, ITexture, IGLObject
 	{
 		private uint handle;
@@ -197,11 +198,6 @@ namespace Lime
 		}
 
 		public bool IsStubTexture { get { return false; } }
-
-		public string SerializationPath {
-			get { throw new NotSupportedException(); }
-			set { throw new NotSupportedException(); }
-		}
 
 		public void SetAsRenderTarget()
 		{

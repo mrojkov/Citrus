@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 
 namespace Lime
 {
+	[YuzuDontGenerateDeserializer]
 	public abstract class CommonDropDownList : Widget
 	{
 		public event Action<ChangedEventArgs> Changed;
@@ -172,11 +173,13 @@ namespace Lime
 		}
 	}
 
+	[YuzuDontGenerateDeserializer]
 	public class DropDownList : CommonDropDownList
 	{
 		protected override bool ShouldHandleSpacebar() => true;
 	}
 
+	[YuzuDontGenerateDeserializer]
 	public class ComboBox : CommonDropDownList
 	{
 		public ComboBox()

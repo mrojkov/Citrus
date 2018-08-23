@@ -3,6 +3,7 @@ using System;
 
 namespace Lime
 {
+	[YuzuDontGenerateDeserializer]
 	public class ThemedDropDownList : DropDownList
 	{
 		public override bool IsNotDecorated() => false;

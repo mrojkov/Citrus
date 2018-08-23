@@ -1,26 +1,63 @@
+using Yuzu;
+
 namespace Lime
 {
+	[YuzuCompact]
 	public struct Thickness
 	{
-		public float Left { get { return LeftTop.X; } set { LeftTop.X = value; } }
-		public float Top { get { return LeftTop.Y; } set { LeftTop.Y = value; } }
-		public float Right { get { return RightBottom.X; } set { RightBottom.X = value; } }
-		public float Bottom { get { return RightBottom.Y; } set { RightBottom.Y = value; } }
+		[YuzuMember("0")]
+		public float Left;
 
-		public Vector2 LeftTop;
-		public Vector2 RightBottom;
+		[YuzuMember("1")]
+		public float Right;
+
+		[YuzuMember("2")]
+		public float Top;
+
+		[YuzuMember("3")]
+		public float Bottom;
+
+		public Vector2 LeftTop
+		{
+			get { return new Vector2(Left, Top); }
+			set { Left = value.X; Top = value.Y; }
+		}
+
+		public Vector2 RightBottom
+		{
+			get { return new Vector2(Right, Bottom); }
+			set { Right = value.X; Bottom = value.Y; }
+		}
 
 		public static Thickness Zero = new Thickness(0);
 
 		public Thickness(float overall)
 		{
-			LeftTop.X = RightBottom.X = LeftTop.Y = RightBottom.Y = overall;
+			Left = Right = Top = Bottom = overall;
 		}
 
 		public Thickness(float horizontal, float vertical)
 		{
-			LeftTop.X = RightBottom.X = horizontal;
-			LeftTop.Y = RightBottom.Y = vertical;
+			Left = Right = horizontal;
+			Top = Bottom = vertical;
+		}
+
+		public Thickness(float left = 0.0f, float right = 0.0f, float top = 0.0f, float bottom = 0.0f)
+		{
+			Left = left;
+			Right = right;
+			Top = top;
+			Bottom = bottom;
+		}
+
+		public static Thickness operator + (Thickness lhs, Thickness rhs)
+		{
+			return new Thickness(lhs.Left + rhs.Left, lhs.Right + rhs.Right, lhs.Top + rhs.Top, lhs.Bottom + rhs.Bottom);
+		}
+
+		public static Thickness operator - (Thickness lhs, Thickness rhs)
+		{
+			return new Thickness(lhs.Left - rhs.Left, lhs.Right - rhs.Right, lhs.Top - rhs.Top, lhs.Bottom - rhs.Bottom);
 		}
 
 		public static Vector2 operator + (Vector2 size, Thickness padding)

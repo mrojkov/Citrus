@@ -15,6 +15,7 @@ namespace Lime
 	/// <summary>
 	/// Represents 2D texture
 	/// </summary>
+	[YuzuDontGenerateDeserializer]
 	public partial class Texture2D : CommonTexture, ITexture, IGLObject
 	{
 		#region TextureReloader
@@ -102,12 +103,6 @@ namespace Lime
 		private int usedOnRenderCycle;
 
 		public ITexture AtlasTexture => this;
-
-		public virtual string SerializationPath
-		{
-			get { throw new NotSupportedException(); }
-			set { throw new NotSupportedException(); }
-		}
 
 		public Rectangle AtlasUVRect { get { return uvRect; } }
 

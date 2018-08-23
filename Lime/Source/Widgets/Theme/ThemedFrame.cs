@@ -3,6 +3,7 @@ using System;
 
 namespace Lime
 {
+	[YuzuDontGenerateDeserializer]
 	public class ThemedFrame : Frame
 	{
 		public override bool IsNotDecorated() => false;

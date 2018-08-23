@@ -294,7 +294,7 @@ namespace Tangerine
 			parent.Layout = new VBoxLayout { Spacing = 0 };
 			parent.Padding = contentPadding;
 			var platform = new Widget();
-			platform.Layout = new HBoxLayout { Spacing = 4, CellDefaults = new LayoutCell(Alignment.Center) };
+			platform.Layout = new HBoxLayout { Spacing = 4, DefaultCell = new LayoutCell(Alignment.Center) };
 			platform.Padding = contentPadding;
 			platform.AddNode(new ThemedSimpleText("Target platform"));
 			var platformPicker = (Orange.The.UI as OrangeInterface).PlatformPicker;
@@ -440,7 +440,7 @@ namespace Tangerine
 							}
 						};
 						selectedShortcutsView.Content.AddNode(new Widget {
-							Layout = new TableLayout { Spacing = 4, RowCount = 1, ColCount = 3 },
+							Layout = new TableLayout { Spacing = 4, RowCount = 1, ColumnCount = 3 },
 							Nodes = { shortcut, name, deleteShortcutButton },
 							Padding = new Thickness(15, 0)
 						});
@@ -498,7 +498,7 @@ namespace Tangerine
 			HotkeyRegistry.Reseted = () => UpdateProfiles(profilePicker);
 
 			pane.AddNode(new Widget {
-				Layout = new TableLayout { Spacing = 4, RowCount = 2, ColCount = 3 },
+				Layout = new TableLayout { Spacing = 4, RowCount = 2, ColumnCount = 3 },
 				Nodes = {
 					profileLabel, profilePicker,
 					new Widget {

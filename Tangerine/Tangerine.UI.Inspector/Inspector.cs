@@ -60,7 +60,7 @@ namespace Tangerine.UI.Inspector
 			RootWidget.Content.AddNode(contentWidget);
 			RootWidget.Content.Layout = new VBoxLayout();
 			Toolbar = new ToolbarView(toolbarArea, GetToolbarLayout());
-			contentWidget.Layout = new VBoxLayout { Tag = "InspectorContent" };
+			contentWidget.Layout = new VBoxLayout();
 			Objects = new List<object>();
 			content = new InspectorContent(contentWidget);
 			CreateWatchersToRebuild();

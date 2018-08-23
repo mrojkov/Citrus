@@ -41,6 +41,9 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.ValueTuple, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.3.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -69,6 +72,7 @@
     <Compile Include="IconPool.cs" />
     <Compile Include="NodeIconPool.cs" />
     <Compile Include="OrangeCommandHandler.cs" />
+    <Compile Include="PropertyEditors\AlignmentPropertyEditor.cs" />
     <Compile Include="PropertyEditors\AnchorsPropertyEditor.cs" />
     <Compile Include="PropertyEditors\AudioSamplePropertyEditor.cs" />
     <Compile Include="PropertyEditors\BlendingPropertyEditor.cs" />
@@ -83,6 +87,7 @@
     <Compile Include="PropertyEditors\FilePropertyEditor.cs" />
     <Compile Include="PropertyEditors\FloatPropertyEditor.cs" />
     <Compile Include="PropertyEditors\FontPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\InstancePropertyEditor.cs" />
     <Compile Include="PropertyEditors\IntPropertyEditor.cs" />
     <Compile Include="PropertyEditors\IPropertyEditor.cs" />
     <Compile Include="PropertyEditors\IPropertyEditorParams.cs" />
@@ -96,6 +101,7 @@
     <Compile Include="PropertyEditors\SkinningWeightsPropertyEditor.cs" />
     <Compile Include="PropertyEditors\StringPropertyEditor.cs" />
     <Compile Include="PropertyEditors\TexturePropertyEditor.cs" />
+    <Compile Include="PropertyEditors\ThicknessPropertyEditor.cs" />
     <Compile Include="PropertyEditors\TriggerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\Vector2PropertyEditor.cs" />
     <Compile Include="PropertyEditors\Vector3PropertyEditor.cs" />

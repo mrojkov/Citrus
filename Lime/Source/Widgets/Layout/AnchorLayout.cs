@@ -2,11 +2,24 @@ using System.Collections.Generic;
 
 namespace Lime
 {
-	public class AnchorLayout : CommonLayout, ILayout
+	[YuzuDontGenerateDeserializer]
+	public class AnchorLayout : ILayout
 	{
 		public static readonly ILayout Instance = new AnchorLayout();
 
-		public override void OnSizeChanged(Widget widget, Vector2 sizeDelta)
+		public List<Rectangle> DebugRectangles => throw new System.NotSupportedException();
+
+		public Widget Owner
+		{
+			get => throw new System.NotSupportedException();
+			set => throw new System.NotSupportedException();
+		}
+
+		public bool ConstraintsValid => throw new System.NotSupportedException();
+
+		public bool ArrangementValid => throw new System.NotSupportedException();
+
+		public void OnSizeChanged(Widget widget, Vector2 sizeDelta)
 		{
 			for (var child = widget.FirstChild; child != null; child = child.NextSibling) {
 				if (child.AsWidget != null) {
@@ -75,6 +88,25 @@ namespace Lime
 				}
 				animator.ResetCache();
 			}
+		}
+
+		public void InvalidateConstraintsAndArrangement()
+		{
+		}
+
+		public void InvalidateArrangement()
+		{
+			throw new System.NotSupportedException();
+		}
+
+		public void MeasureSizeConstraints()
+		{
+			throw new System.NotSupportedException();
+		}
+
+		public void ArrangeChildren()
+		{
+			throw new System.NotSupportedException();
 		}
 	}
 }

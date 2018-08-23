@@ -126,14 +126,14 @@ namespace Tangerine.UI
 			if (EditorParams.DefaultValueGetter != null) {
 				menu.Insert(0, resetToDefault);
 			}
-			if (EditorParams.Objects.Count == 1) {
+			if (!EditorParams.Objects.Skip(1).Any()) {
 				var owner = EditorParams.Objects.First();
 				var value = CoalescedPropertyValue().GetValue();
 				var pi = EditorParams.PropertyInfo;
 				if (value != null) {
 					string path = null;
-					if (pi.PropertyType == typeof(ITexture)) {
-						path = (value as ITexture).SerializationPath;
+					if (pi.PropertyType == typeof(SerializableTexture)) {
+						path = (value as SerializableTexture).SerializationPath;
 					} else if (pi.PropertyType == typeof(SerializableSample)) {
 						path = (value as SerializableSample).SerializationPath;
 					} else if (pi.PropertyType == typeof(SerializableFont)) {
@@ -184,8 +184,34 @@ namespace Tangerine.UI
 		protected void SetProperty(object value)
 		{
 			DoTransaction(() => {
-				foreach (var o in EditorParams.Objects) {
-					EditorParams.PropertySetter(o, EditorParams.PropertyName, value);
+				bool allRootObjectsAnimable = EditorParams.RootObjects.All(o => o is IAnimationHost);
+				if (allRootObjectsAnimable) {
+					foreach (var o in EditorParams.RootObjects) {
+						((IPropertyEditorParamsInternal)EditorParams).PropertySetter(o, EditorParams.PropertyPath, value);
+					}
+				} else {
+					foreach (var o in EditorParams.Objects) {
+						((IPropertyEditorParamsInternal)EditorParams).PropertySetter(o, EditorParams.PropertyName, value);
+					}
+				}
+			});
+		}
+
+		protected void SetProperty<ValueType>(Func<ValueType, object> valueProducer)
+		{
+			DoTransaction(() => {
+				bool allRootObjectsAnimable = EditorParams.RootObjects.All(o => o is IAnimationHost);
+				if (allRootObjectsAnimable) {
+					foreach (var o in EditorParams.RootObjects) {
+						var (p, a) = AnimationUtils.GetPropertyByPath((IAnimationHost)o, EditorParams.PropertyPath);
+						var current = p.Info.GetValue(a);
+						((IPropertyEditorParamsInternal)EditorParams).PropertySetter(o, EditorParams.PropertyPath, valueProducer((ValueType)current));
+					}
+				} else {
+					foreach (var o in EditorParams.Objects) {
+						var current = new Property(o, EditorParams.PropertyName).Value;
+						((IPropertyEditorParamsInternal)EditorParams).PropertySetter(o, EditorParams.PropertyName, valueProducer((ValueType)current));
+					}
 				}
 			});
 		}

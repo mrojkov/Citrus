@@ -9,7 +9,7 @@ namespace Tangerine.UI.Inspector
 	class KeyframeDataflow : IDataflow<IKeyframe>
 	{
 		readonly object obj;
-		readonly string propertyName;
+		readonly string propertyPath;
 
 		int animatorCollectionVersion = int.MinValue;
 		int animatorVersion = int.MinValue;
@@ -20,10 +20,10 @@ namespace Tangerine.UI.Inspector
 		public IKeyframe Value { get; private set; }
 		public bool GotValue { get; private set; }
 
-		public KeyframeDataflow(object obj, string propertyName)
+		public KeyframeDataflow(object obj, string propertyPath)
 		{
 			this.obj = obj;
-			this.propertyName = propertyName;
+			this.propertyPath = propertyPath;
 		}
 
 		public void Dispose() { }
@@ -31,8 +31,8 @@ namespace Tangerine.UI.Inspector
 		public static IDataflowProvider<R> GetProvider<R>(IPropertyEditorParams context, Func<IKeyframe, R> selector)
 		{
 			IDataflowProvider<R> provider = null;
-			foreach (var obj in context.Objects) {
-				var p = new DataflowProvider<IKeyframe>(() => new KeyframeDataflow(obj, context.PropertyName)).Select(selector);
+			foreach (var obj in context.RootObjects) {
+				var p = new DataflowProvider<IKeyframe>(() => new KeyframeDataflow(obj, context.PropertyPath)).Select(selector);
 				provider = (provider == null) ? p : provider.SameOrDefault(p);
 			}
 			return provider;
@@ -41,7 +41,7 @@ namespace Tangerine.UI.Inspector
 		public void Poll()
 		{
 			GotValue = false;
-			var animable = obj as IAnimable;
+			var animable = obj as IAnimationHost;
 			if (animable == null) {
 				return;
 			}
@@ -70,7 +70,7 @@ namespace Tangerine.UI.Inspector
 		IAnimator FindAnimator()
 		{
 			IAnimator animator;
-			return (obj as IAnimable).Animators.TryFind(propertyName, out animator, Document.Current.AnimationId) ? animator : null;
+			return (obj as IAnimationHost).Animators.TryFind(propertyPath, out animator, Document.Current.AnimationId) ? animator : null;
 		}
 
 		IKeyframe FindKeyframe()

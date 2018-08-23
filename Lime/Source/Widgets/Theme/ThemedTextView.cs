@@ -6,6 +6,7 @@ using System.Linq;
 
 namespace Lime
 {
+	[YuzuDontGenerateDeserializer]
 	public class ThemedTextView : ThemedScrollView
 	{
 		public class TextLineMultiplicity : NodeComponent

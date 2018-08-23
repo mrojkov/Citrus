@@ -3,6 +3,7 @@ using System;
 
 namespace Lime
 {
+	[YuzuDontGenerateDeserializer]
 	public class ThemedTabBar : TabBar
 	{
 		public override bool IsNotDecorated() => false;
@@ -13,14 +14,14 @@ namespace Lime
 		}
 	}
 
+	[YuzuDontGenerateDeserializer]
 	public class ThemedTab : Tab
 	{
 		public override bool IsNotDecorated() => false;
 
 		public ThemedTab()
 		{
-			Padding = Theme.Metrics.ControlsPadding;
-			Padding.Right += 5; // Add space between close button and tab right border.
+			Padding = Theme.Metrics.ControlsPadding + new Thickness(right: 5.0f);
 			MinSize = Theme.Metrics.MinTabSize;
 			MaxSize = Theme.Metrics.MaxTabSize;
 			Size = MinSize;
@@ -114,6 +115,7 @@ namespace Lime
 		}
 	}
 
+	[YuzuDontGenerateDeserializer]
 	public class ThemedTabCloseButton : Button
 	{
 		private WidgetFlatFillPresenter fill;

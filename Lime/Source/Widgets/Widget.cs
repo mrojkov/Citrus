@@ -49,10 +49,6 @@ namespace Lime
 		private ShaderId shader;
 		private Vector2 pivot;
 		private Vector2 scale;
-		private Vector2 minSize;
-		private Vector2 maxSize = Vector2.PositiveInfinity;
-		private Vector2 measuredMinSize;
-		private Vector2 measuredMaxSize = Vector2.PositiveInfinity;
 		private WidgetInput input;
 		/// <summary>
 		/// <code>
@@ -100,89 +96,104 @@ namespace Lime
 			}
 		}
 
-		public ILayout Layout = AnchorLayout.Instance;
+		public ILayout Layout
+		{
+			get => Components.Get<Layout>() ?? AnchorLayout.Instance;
+			set
+			{
+				var layoutComponent = Components.Get<Layout>();
+				bool isAnchorLayout = value is AnchorLayout;
+				if (layoutComponent == null) {
+					if (isAnchorLayout) {
+						return;
+					}
+					Components.Add((Layout)value);
+				} else if (isAnchorLayout) {
+					Components.Remove(layoutComponent);
+					return;
+				} else {
+					Components.Remove(layoutComponent);
+					Components.Add((Layout)value);
+				}
+			}
+		}
 
 		/// <summary>
 		/// Gets the layout-specific data.
 		/// </summary>
-		public LayoutCell LayoutCell { get; set; }
+		public LayoutCell LayoutCell
+		{
+			get => Components.Get<LayoutCell>();
+			set => Components.Replace(value);
+		}
 
-		public virtual Vector2 EffectiveMinSize => Vector2.Max(MinSize, MeasuredMinSize);
-		public virtual Vector2 EffectiveMaxSize => Vector2.Max(Vector2.Min(MaxSize, MeasuredMaxSize), EffectiveMinSize);
+		internal MeasuredSize MeasuredSize
+		{
+			get => Components.GetOrAdd<MeasuredSize>();
+			set => Components.Replace(value);
+		}
+
+		public LayoutConstraints LayoutConstraints
+		{
+			get => Components.GetOrAdd<LayoutConstraints>();
+			set => Components.Replace(value);
+		}
 
 		public Vector2 MeasuredMinSize
 		{
-			get { return measuredMinSize; }
-			set {
-				if (measuredMinSize != value) {
-					measuredMinSize = value;
-					InvalidateParentConstraintsAndArrangement();
-				}
-			}
+			get => MeasuredSize.MeasuredMinSize;
+			set => MeasuredSize.MeasuredMinSize = value;
 		}
 
 		public Vector2 MeasuredMaxSize
 		{
-			get { return measuredMaxSize; }
-			set {
-				if (measuredMaxSize != value) {
-					measuredMaxSize = value;
-					InvalidateParentConstraintsAndArrangement();
-				}
-			}
+			get => MeasuredSize.MeasuredMaxSize;
+			set => MeasuredSize.MeasuredMaxSize = value;
 		}
+
+		public virtual Vector2 EffectiveMinSize => Vector2.Max(LayoutConstraints.MinSize, MeasuredSize.MeasuredMinSize);
+
+		public virtual Vector2 EffectiveMaxSize => Vector2.Max(Vector2.Min(LayoutConstraints.MaxSize, MeasuredSize.MeasuredMaxSize), EffectiveMinSize);
 
 		public Vector2 MinSize
 		{
-			get { return minSize; }
-			set
-			{
-				if (minSize != value) {
-					minSize = value;
-					InvalidateParentConstraintsAndArrangement();
-				}
-			}
-		}
-
-		public float MinWidth
-		{
-			get { return MinSize.X; }
-			set { MinSize = new Vector2(value, MinSize.Y); }
-		}
-
-		public float MinHeight
-		{
-			get { return MinSize.Y; }
-			set { MinSize = new Vector2(MinSize.X, value); }
+			get => LayoutConstraints.MinSize;
+			set => LayoutConstraints.MinSize = value;
 		}
 
 		public Vector2 MaxSize
 		{
-			get { return maxSize; }
-			set
-			{
-				if (maxSize != value) {
-					maxSize = value;
-					InvalidateParentConstraintsAndArrangement();
-				}
-			}
+			get => LayoutConstraints.MaxSize;
+			set => LayoutConstraints.MaxSize = value;
+		}
+
+		public float MinWidth
+		{
+			get { return LayoutConstraints.MinSize.X; }
+			set { LayoutConstraints.MinSize = new Vector2(value, LayoutConstraints.MinSize.Y); }
+		}
+
+		public float MinHeight
+		{
+			get { return LayoutConstraints.MinSize.Y; }
+			set { LayoutConstraints.MinSize = new Vector2(LayoutConstraints.MinSize.X, value); }
 		}
 
 		public float MaxWidth
 		{
-			get { return MaxSize.X; }
-			set { MaxSize = new Vector2(value, MaxSize.Y); }
+			get { return LayoutConstraints.MaxSize.X; }
+			set { LayoutConstraints.MaxSize = new Vector2(value, LayoutConstraints.MaxSize.Y); }
 		}
 
 		public float MaxHeight
 		{
-			get { return MaxSize.Y; }
-			set { MaxSize = new Vector2(MaxSize.X, value); }
+			get { return LayoutConstraints.MaxSize.Y; }
+			set { LayoutConstraints.MaxSize = new Vector2(LayoutConstraints.MaxSize.X, value); }
 		}
 
 		public Vector2 MinMaxSize
 		{
-			set { MinSize = MaxSize = value; }
+			set { LayoutConstraints.MinSize = LayoutConstraints.MaxSize = value; }
 		}
 
 		public float MinMaxWidth
@@ -386,7 +397,8 @@ namespace Lime
 		/// Gets or sets the widget padding. Padding defines the white space between the widget content and the widget border.
 		/// The widget presenter and layout should respect the padding.
 		/// </summary>
-		public Thickness Padding;
+		[YuzuMember]
+		public Thickness Padding { get; set; }
 
 		public Vector2 ContentPosition => new Vector2(Padding.Left, Padding.Top);
 		public Vector2 ContentSize => new Vector2(Size.X - Padding.Left - Padding.Right, Size.Y - Padding.Top - Padding.Bottom);
@@ -500,7 +512,6 @@ namespace Lime
 		[TangerineStaticProperty]
 		public SkinningWeights SkinningWeights { get; set; }
 
-		[YuzuMember]
 		public BoneArray BoneArray;
 
 		[YuzuMember]
@@ -718,7 +729,6 @@ namespace Lime
 
 		public Widget()
 		{
-			Layout = AnchorLayout.Instance;
 			AsWidget = this;
 			Size = DefaultWidgetSize;
 			Color = Color4.White;
@@ -820,7 +830,7 @@ namespace Lime
 		internal void InvalidateParentConstraintsAndArrangement()
 		{
 			if (ParentWidget != null) {
-				ParentWidget.Layout.InvalidateConstraintsAndArrangement(ParentWidget);
+				ParentWidget.Layout.InvalidateConstraintsAndArrangement();
 			}
 		}
 
@@ -869,17 +879,17 @@ namespace Lime
 			if (oldParent != null && oldParent.AsWidget != null) {
 				var w = oldParent.AsWidget;
 				if (w.LayoutManager != null) {
-					w.Layout.InvalidateConstraintsAndArrangement(w);
+					w.Layout.InvalidateConstraintsAndArrangement();
 				}
 			}
 			if (Parent?.AsWidget == null) {
 				LayoutManager = null;
 			} else if (LayoutManager != null) {
 				InvalidateParentConstraintsAndArrangement();
-				Layout.InvalidateConstraintsAndArrangement(this);
+				Layout.InvalidateConstraintsAndArrangement();
 				foreach (var n in Descendants) {
 					var w = n as Widget;
-					w?.Layout.InvalidateConstraintsAndArrangement(w);
+					w?.Layout.InvalidateConstraintsAndArrangement();
 				}
 			}
 		}

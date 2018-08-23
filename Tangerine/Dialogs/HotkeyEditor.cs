@@ -24,6 +24,7 @@ namespace Tangerine.Dialogs
 		public Key Main { get; private set; }
 
 		public CommandCategoryInfo Category { get; set; }
+
 		public HotkeyProfile Profile { get; set; }
 
 		public Action SelectedShortcutChanged { get; set; }
@@ -201,27 +202,27 @@ namespace Tangerine.Dialogs
 
 		private void BuildKeyboard()
 		{
-			Layout = new TableLayout { ColCount = 3, RowCount = 1, Spacing = 20 };
-			var fRow = new Widget { Layout = new TableLayout { ColCount = 12, RowCount = 1, Spacing = 4 } };
-			var numbersRow = new Widget { Layout = new TableLayout { ColCount = 14, RowCount = 1, Spacing = 4 } };
-			var firstRow = new Widget { Layout = new TableLayout { ColCount = 14, RowCount = 1, Spacing = 4 } };
-			var secondRow = new Widget { Layout = new TableLayout { ColCount = 13, RowCount = 1, Spacing = 4 } };
-			var thirdRow = new Widget { Layout = new TableLayout { ColCount = 12, RowCount = 1, Spacing = 4 } };
-			var controlsRow = new Widget { Layout = new TableLayout { ColCount = 7, RowCount = 1, Spacing = 4 } };
+			Layout = new TableLayout { ColumnCount = 3, RowCount = 1, Spacing = 20 };
+			var fRow = new Widget { Layout = new TableLayout { ColumnCount = 12, RowCount = 1, Spacing = 4 } };
+			var numbersRow = new Widget { Layout = new TableLayout { ColumnCount = 14, RowCount = 1, Spacing = 4 } };
+			var firstRow = new Widget { Layout = new TableLayout { ColumnCount = 14, RowCount = 1, Spacing = 4 } };
+			var secondRow = new Widget { Layout = new TableLayout { ColumnCount = 13, RowCount = 1, Spacing = 4 } };
+			var thirdRow = new Widget { Layout = new TableLayout { ColumnCount = 12, RowCount = 1, Spacing = 4 } };
+			var controlsRow = new Widget { Layout = new TableLayout { ColumnCount = 7, RowCount = 1, Spacing = 4 } };
 
 			var leftPart = new Widget {
-				Layout = new TableLayout { ColCount = 1, RowCount = 6, Spacing = 4 },
+				Layout = new TableLayout { ColumnCount = 1, RowCount = 6, Spacing = 4 },
 				Nodes = { fRow, numbersRow, firstRow, secondRow, thirdRow, controlsRow },
 				LayoutCell = new LayoutCell { StretchX = 15 }
 			};
 
 			var middlePart = new Widget {
-				Layout = new TableLayout { ColCount = 3, RowCount = 6, Spacing = 4 },
+				Layout = new TableLayout { ColumnCount = 3, RowCount = 6, Spacing = 4 },
 				LayoutCell = new LayoutCell { StretchX = 3 }
 			};
 
 			var rightPart = new Widget {
-				Layout = new TableLayout { ColCount = 4, RowCount = 7, Spacing = 4 },
+				Layout = new TableLayout { ColumnCount = 4, RowCount = 7, Spacing = 4 },
 				LayoutCell = new LayoutCell { StretchX = 4 }
 			};
 
@@ -337,7 +338,7 @@ namespace Tangerine.Dialogs
 			CreateButton(middlePart, Key.Right);
 
 			var mouseSpace = CreateSpace(rightPart, 3, 4);
-			mouseSpace.Layout = new TableLayout { ColCount = 2, RowCount = 1, Spacing = 4 };
+			mouseSpace.Layout = new TableLayout { ColumnCount = 2, RowCount = 1, Spacing = 4 };
 			CreateButton(mouseSpace, Key.MouseBack, "Mouse Back");
 			CreateButton(mouseSpace, Key.MouseForward, "Mouse Forward");
 			CreateButton(rightPart, Key.Keypad7, "7");
@@ -353,7 +354,7 @@ namespace Tangerine.Dialogs
 			CreateButton(rightPart, Key.Keypad3, "3");
 			CreateButton(rightPart, Key.KeypadDivide, "/");
 			var lastRow = CreateSpace(rightPart, 1, 4);
-			lastRow.Layout = new TableLayout { ColCount = 3, RowCount = 1, Spacing = 4 };
+			lastRow.Layout = new TableLayout { ColumnCount = 3, RowCount = 1, Spacing = 4 };
 			CreateButton(lastRow, Key.Keypad0, "0").LayoutCell = new LayoutCell { StretchX = 2 };
 			CreateButton(lastRow, Key.KeypadDecimal, ".");
 			CreateButton(lastRow, Key.KeypadMultiply, "*");
@@ -382,12 +383,12 @@ namespace Tangerine.Dialogs
 			return button;
 		}
 
-		private Widget CreateSpace(Widget parent, int rowSpan, int colSpan)
+		private Widget CreateSpace(Widget parent, int rowSpan, int columnSpan)
 		{
 			var space = new Widget {
 				MinSize = Vector2.Zero,
 				MaxSize = Vector2.PositiveInfinity,
-				LayoutCell = new LayoutCell { RowSpan = rowSpan, ColSpan = colSpan }
+				LayoutCell = new LayoutCell { RowSpan = rowSpan, ColumnSpan = columnSpan }
 			};
 			parent.AddNode(space);
 			return space;

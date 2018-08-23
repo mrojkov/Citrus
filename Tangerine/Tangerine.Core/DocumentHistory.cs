@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Lime;
 
@@ -11,7 +11,7 @@ namespace Tangerine.Core
 		void CommitTransaction();
 		void EndTransaction();
 	}
-	
+
 	public class DocumentHistory : ITransactionalHistory
 	{
 		public static readonly ProcessorList Processors = new ProcessorList();
@@ -20,7 +20,7 @@ namespace Tangerine.Core
 		private int transactionId;
 		private int saveIndex;
 		private int currentIndex;
-		
+
 		public bool CanUndo() => !IsTransactionActive && currentIndex > 0;
 		public bool CanRedo() => !IsTransactionActive && currentIndex < operations.Count;
 		public bool IsDocumentModified { get; private set; }
@@ -35,20 +35,20 @@ namespace Tangerine.Core
 			transactionStartIndices.Push(currentIndex);
 			return new Disposable { OnDispose = EndTransaction };
 		}
-		
+
 		private class Disposable : IDisposable
 		{
 			public Action OnDispose;
-			
+
 			public void Dispose() => OnDispose?.Invoke();
 		}
-		
+
 		public void EndTransaction()
 		{
 			RollbackTransaction();
 			transactionStartIndices.Pop();
 		}
-		
+
 		public void DoTransaction(Action block)
 		{
 			using (BeginTransaction()) {
@@ -56,14 +56,14 @@ namespace Tangerine.Core
 				CommitTransaction();
 			}
 		}
-		
+
 		public void CommitTransaction()
 		{
 			AssertTransaction();
 			transactionStartIndices.Pop();
 			transactionStartIndices.Push(currentIndex);
 		}
-		
+
 		public void RollbackTransaction()
 		{
 			AssertTransaction();
@@ -76,7 +76,7 @@ namespace Tangerine.Core
 				OnChange();
 			}
 		}
-		
+
 		public void Perform(IOperation operation)
 		{
 			AssertTransaction();
@@ -109,7 +109,7 @@ namespace Tangerine.Core
 				throw new InvalidOperationException("Can't perform an operation, commit or rollback outside the transaction");
 			}
 		}
-				
+
 		public void Undo()
 		{
 			if (!CanUndo()) {
@@ -147,7 +147,7 @@ namespace Tangerine.Core
 			}
 			OnChange();
 		}
-		
+
 		private int GetTransactionStartIndex()
 		{
 			for (int i = currentIndex; i > 0; i--) {
@@ -167,7 +167,7 @@ namespace Tangerine.Core
 			}
 			return operations.Count;
 		}
-		
+
 		public void AddSavePoint()
 		{
 			for (saveIndex = currentIndex; saveIndex > 0; saveIndex--) {
@@ -177,7 +177,7 @@ namespace Tangerine.Core
 			}
 			RefreshModifiedStatus();
 		}
-		
+
 		public void ExternalModification()
 		{
 			saveIndex = -1;
@@ -189,14 +189,14 @@ namespace Tangerine.Core
 			RefreshModifiedStatus();
 			Application.InvalidateWindows();
 		}
-		
+
 		private void RefreshModifiedStatus()
 		{
-			IsDocumentModified = saveIndex < 0 || (saveIndex <= currentIndex ? 
-				AnyChangingOperationWithinRange(saveIndex, currentIndex) : 
+			IsDocumentModified = saveIndex < 0 || (saveIndex <= currentIndex ?
+				AnyChangingOperationWithinRange(saveIndex, currentIndex) :
 				AnyChangingOperationWithinRange(currentIndex, saveIndex));
 		}
-		
+
 		private bool AnyChangingOperationWithinRange(int start, int end)
 		{
 			for (int i = start; i < end; i++) {
@@ -205,9 +205,9 @@ namespace Tangerine.Core
 			}
 			return false;
 		}
-		
-		public class ProcessorList : List<IOperationProcessor> 
-		{					
+
+		public class ProcessorList : List<IOperationProcessor>
+		{
 			public void Do(IOperation operation)
 			{
 				foreach (var p in this) {

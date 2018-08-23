@@ -94,12 +94,12 @@ namespace Tangerine.UI.Inspector
 
 		internal void SetKeyFunction(KeyFunction value)
 		{
-			foreach (var animable in editorParams.Objects.OfType<IAnimable>()) {
+			foreach (var animable in editorParams.RootObjects.OfType<IAnimationHost>()) {
 				IAnimator animator;
-				if (animable.Animators.TryFind(editorParams.PropertyName, out animator, Document.Current.AnimationId)) {
+				if (animable.Animators.TryFind(editorParams.PropertyPath, out animator, Document.Current.AnimationId)) {
 					var keyframe = animator.ReadonlyKeys.FirstOrDefault(i => i.Frame == Document.Current.AnimationFrame).Clone();
 					keyframe.Function = value;
-					Core.Operations.SetKeyframe.Perform(animable, editorParams.PropertyName, Document.Current.AnimationId, keyframe);
+					Core.Operations.SetKeyframe.Perform(animable, editorParams.PropertyPath, Document.Current.AnimationId, keyframe);
 				}
 			}
 		}

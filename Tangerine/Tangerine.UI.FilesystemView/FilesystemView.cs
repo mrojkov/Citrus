@@ -188,7 +188,7 @@ namespace Tangerine.UI.FilesystemView
 		void InitializeWidgets()
 		{
 			RootWidget.AddChangeWatcher(() => selection.Version, Selection_Changed);
-			scrollView.Content.Layout = new VFlowLayout { Spacing = 1.0f };
+			scrollView.Content.Layout = new FlowLayout(LayoutDirection.TopToBottom) { Spacing = 1.0f };
 			scrollView.Content.Padding = new Thickness(5.0f);
 			scrollView.Content.CompoundPostPresenter.Insert(0, new DelegatePresenter<Widget>(RenderFilesWidgetRectSelection));
 			scrollView.Updated += ScrollViewUpdated;
@@ -377,12 +377,12 @@ namespace Tangerine.UI.FilesystemView
 					scrollView = new ThemedScrollView(ScrollDirection.Vertical) {
 						TabTravesable = new TabTraversable(),
 					};
-					scrollView.Content.Layout = new HFlowLayout { Spacing = 1.0f };
+					scrollView.Content.Layout = new FlowLayout(LayoutDirection.LeftToRight) { Spacing = 1.0f };
 				} else {
 					scrollView = new ThemedScrollView(ScrollDirection.Horizontal) {
 						TabTravesable = new TabTraversable(),
 					};
-					scrollView.Content.Layout = new VFlowLayout { Spacing = 1.0f };
+					scrollView.Content.Layout = new FlowLayout(LayoutDirection.TopToBottom) { Spacing = 1.0f };
 				}
 
 				scrollView.Content.Padding = new Thickness(5.0f);
@@ -685,12 +685,12 @@ namespace Tangerine.UI.FilesystemView
 			}
 			var flowLayout = (scrollView.Content.Layout as FlowLayout);
 			int columnCount = flowLayout.ColumnCount(0);
+			int rowCount = flowLayout.RowCount(0);
 			float rowHeight = FilesystemItem.ItemPadding * 2 + FilesystemItem.IconSize;
 			for (int navType = 0; navType < navCommands.Count; navType++) {
 				for (int navOffset = 0; navOffset < navCommands[navType].Count; navOffset++) {
 					var cmd = navCommands[navType][navOffset];
 					if (cmd.Consume()) {
-						
 							select = navType == 1;
 							toggle = navType == 2;
 							var sign = (navOffset % 2 == 0 ? -1 : 1);
@@ -707,24 +707,14 @@ namespace Tangerine.UI.FilesystemView
 								// End
 								case 7: indexDelta = maxIndex - rangeSelectionIndex; break;
 							}
-						} else {
+						} else if (scrollView.Direction == ScrollDirection.Horizontal) {
 							switch (navOffset) {
-								// Left
-								case 0:
-									indexDelta = -columnCount;
-									break;
-								// Right
-								case 1:
-									indexDelta = columnCount;
-									break;
-								// Up
-								case 2:
-									indexDelta = -1;
-									break;
-								// Down
-								case 3:
-									indexDelta = 1;
-									break;
+								// Left, Right
+								case 0: case 1: indexDelta = sign * rowCount; break;
+								// Up,  Down
+								case 2: case 3: indexDelta = sign * 1; break;
+								// PageUp, PageDown
+								case 4: case 5: /* TODO: Implement for PgUp; PgDown */ break;
 								// Home
 								case 6: indexDelta = -rangeSelectionIndex; break;
 								// End

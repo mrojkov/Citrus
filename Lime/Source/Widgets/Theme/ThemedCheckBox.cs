@@ -3,6 +3,7 @@ using System;
 
 namespace Lime
 {
+	[YuzuDontGenerateDeserializer]
 	public class ThemedCheckBox : CheckBox
 	{
 		public override bool IsNotDecorated() => false;

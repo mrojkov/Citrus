@@ -33,8 +33,8 @@ namespace Orange
 	{
 		static string ObjectToString(object value)
 		{
-			if (value is ITexture) {
-				var path = ((ITexture)value).SerializationPath;
+			if (value is SerializableTexture) {
+				var path = ((SerializableTexture)value).SerializationPath;
 				value = !path.StartsWith("#") ? RestorePath(path, ".png") : path;
 			}
 			if (value is SerializableSample) {
@@ -104,7 +104,7 @@ namespace Orange
 			public void WriteProperty(string name, object value, object def)
 			{
 				if (
-					(value is ITexture) && string.IsNullOrEmpty((value as ITexture).SerializationPath) ||
+					(value is SerializableTexture) && string.IsNullOrEmpty((value as SerializableTexture).SerializationPath) ||
 					(value is SerializableSample) && string.IsNullOrEmpty((value as SerializableSample).SerializationPath) ||
 					(value is SerializableFont) && string.IsNullOrEmpty((value as SerializableFont).Name) ||
 					value == null || value.Equals(def)
@@ -187,7 +187,6 @@ namespace Orange
 				{ typeof(RichText), new NodeWriter { ActorClass = "Hot::RichText", Writer = n => WriteRichTextProperties((RichText)n) } },
 				{ typeof(TextStyle), new NodeWriter { ActorClass = "Hot::TextStyle", Writer = n => WriteTextStyleProperties((TextStyle)n) } },
 				{ typeof(NineGrid), new NodeWriter { ActorClass = "Hot::NineGrid", Writer = n => WriteNineGridProperties((NineGrid)n) } },
-				{ typeof(LinearLayout), new NodeWriter { ActorClass = "LinearLayout", Writer = n => WriteLinearLayoutProperties((LinearLayout)n) } },
 				{ typeof(FolderBegin), new NodeWriter { ActorClass = "Hot::FolderBegin", Writer = n => WriteFolderBeginProperties((FolderBegin)n) } },
 				{ typeof(FolderEnd), new NodeWriter { ActorClass = "Hot::FolderEnd", Writer = n => WriteNodeProperties(n) } },
 				{ typeof(Bone), new NodeWriter { ActorClass = "Hot::Bone", Writer = n => WriteBoneProperties((Bone)n) } },
@@ -351,7 +350,7 @@ namespace Orange
 			if (animator is Animator<ShaderId>) {
 				return;
 			}
-			if (owner is ParticleModifier && animator.TargetProperty == "Scale" && animator is Vector2Animator) {
+			if (owner is ParticleModifier && animator.TargetPropertyPath == "Scale" && animator is Vector2Animator) {
 				NumericAnimator zoomAnimator;
 				NumericAnimator aspectRatioAnimator;
 				DecomposeParticleModifierScaleAnimator(animator, out zoomAnimator, out aspectRatioAnimator);
@@ -386,10 +385,10 @@ namespace Orange
 		private void DecomposeParticleModifierScaleAnimator(IAnimator animator, out NumericAnimator zoomAnimator, out NumericAnimator aspectRatioAnimator)
 		{
 			zoomAnimator = new NumericAnimator {
-				TargetProperty = "Scale"
+				TargetPropertyPath = "Scale"
 			};
 			aspectRatioAnimator = new NumericAnimator() {
-				TargetProperty = "AspectRatio"
+				TargetPropertyPath = "AspectRatio"
 			};
 			if (animator.ReadonlyKeys.Count == 0) {
 				return;
@@ -405,7 +404,7 @@ namespace Orange
 
 		string GetAnimatorPropertyReference(Node owner, IAnimator animator)
 		{
-			var p = GetHotStudioPropertyName(owner.GetType(), animator.TargetProperty) + '@' + GetHotStudioActorName(owner, animator);
+			var p = GetHotStudioPropertyName(owner.GetType(), animator.TargetPropertyPath) + '@' + GetHotStudioActorName(owner, animator);
 			if (p == "Position@Hot::PointObject") {
 				return "Anchor@Hot::PointObject";
 			}
@@ -416,11 +415,11 @@ namespace Orange
 		{
 			var t = owner.GetType();
 			if (owner is ParticleModifier) {
-				if (animator.TargetProperty == "AspectRatio" || animator.TargetProperty == "Scale") {
+				if (animator.TargetPropertyPath == "AspectRatio" || animator.TargetPropertyPath == "Scale") {
 					return "Hot::ParticleTemplate";
 				}
 			}
-			var nodeType = t.GetProperty(animator.TargetProperty).DeclaringType;
+			var nodeType = t.GetProperty(animator.TargetPropertyPath).DeclaringType;
 			var a = nodeWriters.First(i => i.Key == nodeType).Value.ActorClass;
 			if (a == "Hot::ParticleEmitter2") {
 				return "Hot::ParticleEmitter";
@@ -712,13 +711,6 @@ namespace Orange
 			WriteProperty("TopOffset", node.TopOffset, 0f);
 			WriteProperty("RightOffset", node.RightOffset, 0f);
 			WriteProperty("BottomOffset", node.BottomOffset, 0f);
-		}
-
-		void WriteLinearLayoutProperties(LinearLayout node)
-		{
-			WriteNodeProperties(node);
-			WriteProperty("Horizontal", node.Horizontal, false);
-			WriteProperty("ProcessHidden", node.ProcessHidden, false);
 		}
 
 		void WriteFolderBeginProperties(FolderBegin node)
