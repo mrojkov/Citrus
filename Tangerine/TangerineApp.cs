@@ -73,7 +73,7 @@ namespace Tangerine
 
 			var timelinePanel = new Panel("Timeline");
 			var inspectorPanel = new Panel("Inspector");
-			var searchPanel = new Panel("Search");
+			var searchPanel = new Panel("Hierarchy");
 			var filesystemPanel = new Panel("Filesystem");
 			var consolePanel = new Panel("Console");
 			var backupHistoryPanel = new Panel("Backups");
@@ -254,7 +254,7 @@ namespace Tangerine
 						new UI.Inspector.Inspector(inspectorPanel.ContentWidget),
 						new UI.Timeline.Timeline(timelinePanel),
 						new UI.SceneView.SceneView(documentViewContainer),
-						new UI.SearchPanel(searchPanel.ContentWidget),
+						new UI.HierarchyPanel(searchPanel.ContentWidget),
 						new BackupHistoryPanel(backupHistoryPanel.ContentWidget),
 						// Use VisualHintsPanel sigleton because we need preserve its state between documents.
 						VisualHintsPanel.Instance ?? VisualHintsPanel.Initialize(visualHintsPanel)
