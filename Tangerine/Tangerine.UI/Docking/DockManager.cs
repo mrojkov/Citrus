@@ -74,11 +74,11 @@ namespace Tangerine.UI.Docking
 			Instance = new DockManager(windowSize);
 		}
 
-		public void DockPanelTo(PanelPlacement placement, PanelPlacement target, DockSite site, float stretch)
+		public void DockPlacementTo(Placement placement, Placement target, DockSite site, float stretch)
 		{
 			var windowPlacement = Model.GetWindowByPlacement(placement);
 			placement.Unlink();
-			Model.DockPanelTo(placement, target, site, stretch);
+			Model.DockPlacementTo(placement, target, site, stretch);
 			if (!windowPlacement.Root.GetDescendantPanels().Any()) {
 				Model.RemoveWindow(windowPlacement);
 				CloseWindow(windowPlacement.WindowWidget.Window);
@@ -250,6 +250,47 @@ namespace Tangerine.UI.Docking
 			container.Nodes.Insert(insertAt, splitter);
 		}
 
+		private Widget AddTitle(Widget widget, out ThemedTabCloseButton closeButton, out ThemedSimpleText title, string id = null)
+		{
+			Widget titleWidget;
+			var result =  new Widget {
+				Id = id,
+				LayoutCell = new LayoutCell(),
+				Layout = new VBoxLayout(),
+				Nodes = {
+					(titleWidget = new Widget {
+						Layout = new HBoxLayout(),
+						HitTestTarget = true,
+						Nodes = {
+							(title = new ThemedSimpleText {
+								Padding = new Thickness(4, 0),
+								ForceUncutText = false,
+								MinMaxHeight = Theme.Metrics.MinTabSize.Y,
+								VAlignment = VAlignment.Center
+							}),
+							(closeButton = new ThemedTabCloseButton {
+								LayoutCell = new LayoutCell(Alignment.Center)
+							})
+						}
+					}),
+					new Frame {
+						Nodes = {
+							widget
+						}
+					}
+				}
+			};
+			title.Padding.Right += 5; // Add space between close button and titleWidget right border.
+			titleWidget.CompoundPresenter.Add(new DelegatePresenter<Widget>(w => {
+				w.PrepareRendererState();
+				Renderer.DrawRect(Vector2.Zero, w.Size, ColorTheme.Current.Docking.PanelTitleBackground);
+				Renderer.DrawLine(0, w.Height - 0.5f, w.Width, w.Height - 0.5f, ColorTheme.Current.Docking.PanelTitleSeparator);
+			}));
+			widget.ExpandToContainerWithAnchors();
+			result.FocusScope = new KeyboardFocusScope(result);
+			return result;
+		}
+
 		private void CreatePanelWidget(Splitter container, PanelPlacement placement, float stretch, int insertAt)
 		{
 			var panel = Model.Panels.First(pan => pan.Id == placement.Id);
@@ -259,46 +300,14 @@ namespace Tangerine.UI.Docking
 				return;
 			}
 			if (panel.IsUndockable) {
-				ThemedSimpleText titleLabel;
-				ThemedTabCloseButton closeButton;
-				var titleWidget = new Widget {
-					Layout = new HBoxLayout(),
-					Nodes = {
-					(titleLabel = new ThemedSimpleText {
-						Padding = new Thickness(4, 0),
-						ForceUncutText = false,
-						MinMaxHeight = Theme.Metrics.MinTabSize.Y,
-						VAlignment = VAlignment.Center,
-					}),
-					(closeButton = new ThemedTabCloseButton { LayoutCell = new LayoutCell(Alignment.Center) })
-				},
-					HitTestTarget = true
-
-				};
-				titleWidget.Padding.Right += 5; // Add space between close button and titleWidget right border.
+				var rootWidget = AddTitle(widget, out ThemedTabCloseButton closeButton, out ThemedSimpleText titleLabel, $"DockPanel<{panel.Id}>");
 				titleLabel.AddChangeWatcher(() => panel.Title, text => titleLabel.Text = text);
-				titleWidget.CompoundPresenter.Add(new DelegatePresenter<Widget>(w => {
-					w.PrepareRendererState();
-					Renderer.DrawRect(Vector2.Zero, w.Size, ColorTheme.Current.Docking.PanelTitleBackground);
-					Renderer.DrawLine(0, w.Height - 0.5f, w.Width, w.Height - 0.5f, ColorTheme.Current.Docking.PanelTitleSeparator);
-				}));
-				var rootWidget = new Widget {
-					Id = $"DockPanel<{panel.Id}>",
-					LayoutCell = new LayoutCell(),
-					Layout = new VBoxLayout(),
-					Nodes = {
-						titleWidget,
-						new Frame { Nodes = { widget } },
-					}
-				};
-				widget.ExpandToContainerWithAnchors();
-				rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
 				closeButton.Clicked += () => {
 					Model.FindPanelPlacement(panel.Id).Hidden = true;
 					Refresh();
 				};
+				CreateDragBehaviour(placement, rootWidget.Nodes[0].AsWidget, widget);
 				widget = rootWidget;
-				CreateDragBehaviour(panel, titleWidget);
 			}
 			container.Nodes.Insert(insertAt, widget);
 			container.Stretches.Insert(insertAt, stretch);
@@ -306,11 +315,16 @@ namespace Tangerine.UI.Docking
 
 		private void CreateTabBarWidget(Splitter container, TabBarPlacement placement, float stretch, int insertAt)
 		{
-			var tabbedWidget = new TabbedWidget { LayoutCell = new LayoutCell { StretchY = 0 }, AllowReordering = true };
+			var tabbedWidget = new TabbedWidget() {
+				LayoutCell = new LayoutCell { StretchY = 0 },
+				AllowReordering = true
+			};
 			tabbedWidget.FocusScope = new KeyboardFocusScope(tabbedWidget);
-			foreach (var panel in placement.Placements.Select(p => Model.Panels.First(pan => pan.Id == p.Id))) {
+			var rootWidget = AddTitle(tabbedWidget, out ThemedTabCloseButton closeButton, out ThemedSimpleText titleLabel);
+			foreach (var panelPlacement in placement.Placements) {
+				var panel = Model.Panels.First(pan => pan.Id == panelPlacement.Id);
 				panel.ContentWidget.Unlink();
-				if (Model.FindPanelPlacement(panel.Id).Hidden) {
+				if (panelPlacement.Hidden) {
 					continue;
 				}
 				var tab = new ThemedTab {
@@ -328,29 +342,39 @@ namespace Tangerine.UI.Docking
 					Padding = new Thickness(0, 1),
 					Nodes = { panel.ContentWidget }
 				}, true);
-				CreateDragBehaviour(panel, tab);
+				CreateDragBehaviour(panelPlacement, tab, panel.ContentWidget);
 			}
 			tabbedWidget.ActiveTabIndex = 0;
 			tabbedWidget.TabBar.OnReorder += args => {
 				var item = placement.Placements[args.OldIndex];
 				placement.RemovePlacement(item);
 				placement.Placements.Insert(args.NewIndex, item);
+				tabbedWidget.ActivateTab(args.NewIndex);
 			};
-			container.Nodes.Insert(insertAt, tabbedWidget);
+			titleLabel.AddChangeWatcher(
+				() => ((Tab)tabbedWidget.TabBar.Nodes[tabbedWidget.ActiveTabIndex]).Text,
+				title => titleLabel.Text = title
+			);
+			closeButton.Clicked += () => {
+				foreach (var panelPlacement in placement.Placements) {
+					panelPlacement.Hidden = true;
+				}
+				Refresh();
+			};
+			CreateDragBehaviour(placement, rootWidget.Nodes[0].AsWidget, rootWidget);
+			container.Nodes.Insert(insertAt, rootWidget);
 			container.Stretches.Insert(insertAt, stretch);
 		}
 
-		private void CreateDragBehaviour(Panel panel, Widget inputWidget)
+		private void CreateDragBehaviour(Placement placement, Widget inputWidget, Widget contentWidget)
 		{
-			var db = new PanelDragBehaviour(inputWidget, panel);
+			var db = new DragBehaviour(inputWidget, contentWidget, placement);
 			db.OnUndock += (positionOffset, windowPosition) => {
-				var panelWindow = (WindowWidget)panel.ContentWidget.GetRoot();
-				var placement = Model.FindPanelPlacement(panel.Id);
+				var panelWindow = (WindowWidget)contentWidget.GetRoot();
 				var windowPlacement = Model.GetWindowByPlacement(placement);
 				if (windowPlacement.Root.GetDescendantPanels().Count(p => !p.Hidden) > 1) {
-
 					var wrapper = new WindowPlacement {
-						Size = placement.CalcGlobalSize() * panelWindow.Size,
+						Size = placement.CalcGlobalSize() * panelWindow.Size
 					};
 					placement.Unlink();
 					windowPlacement.Root.RemoveRedundantNodes();
@@ -365,7 +389,7 @@ namespace Tangerine.UI.Docking
 					CreateFloatingWindow(wrapper);
 					RefreshWindow(wrapper);
 				}
-				WindowDragBehaviour.CreateFor(panel.Id, positionOffset);
+				WindowDragBehaviour.CreateFor(placement, positionOffset);
 			};
 		}
 
@@ -480,8 +504,10 @@ namespace Tangerine.UI.Docking
 					throw new System.Exception("Unable to import state: the number of windows is zero");
 				}
 				for (var i = 1; i < Model.WindowPlacements.Count; i++) {
-					Model.WindowPlacements[i].WindowWidget.Nodes.Clear();
-					CloseWindow(Model.WindowPlacements[i].WindowWidget.Window);
+					if (Model.WindowPlacements[i].AnyVisiblePanel()) {
+						Model.WindowPlacements[i].WindowWidget.Nodes.Clear();
+						CloseWindow(Model.WindowPlacements[i].WindowWidget.Window);
+					}
 				}
 				var savedPanels = Model.Panels.ToList();
 				Model.WindowPlacements.Clear();
