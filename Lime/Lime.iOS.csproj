@@ -240,7 +240,6 @@
     <Compile Include="Source\Widgets\Layout\LayoutCell.cs" />
     <Compile Include="Source\Widgets\Layout\LayoutManager.cs" />
     <Compile Include="Source\Widgets\Layout\LinearAllocator.cs" />
-    <Compile Include="Source\Widgets\Layout\VBoxLayout.cs" />
     <Compile Include="Source\Application\Menu\Menu.Win.cs" />
     <Compile Include="Source\Application\MouseCursor\MouseCursor.cs" />
     <Compile Include="Source\Application\MouseCursor\MouseCursor.Mac.cs" />
@@ -254,7 +253,6 @@
     <Compile Include="Source\Widgets\HSplitter.cs" />
     <Compile Include="Source\Widgets\VSplitter.cs" />
     <Compile Include="Source\Widgets\Layout\FlowLayout.cs" />
-    <Compile Include="Source\Widgets\Layout\HBoxLayout.cs" />
     <Compile Include="Source\Widgets\Layout\LayoutDebugPresenter.cs" />
     <Compile Include="Source\Graphics\Bitmap.Apple.cs" />
     <Compile Include="Source\EnumExtensions.cs" />
@@ -372,12 +370,11 @@
     <Compile Include="Source\Graphics\OpenGL\GLExtensions.cs" />
     <Compile Include="Source\Graphics\OpenGL\ShaderParams.cs" />
     <Compile Include="Source\Application\WindowInput.cs" />
-    <Compile Include="Source\Widgets\Layout\HFlowLayout.cs" />
-    <Compile Include="Source\Widgets\Layout\VFlowLayout.cs" />
     <Compile Include="Source\Widgets\NodeBehaviours.cs" />
     <Compile Include="Source\Widgets\TiledImage.cs" />
     <Compile Include="Source\Components\GradientMaterialComponent.cs" />
     <Compile Include="Source\Widgets\Materials\GradientMaterial.cs" />
+    <Compile Include="Source\Widgets\Layout\LinearLayout.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />
