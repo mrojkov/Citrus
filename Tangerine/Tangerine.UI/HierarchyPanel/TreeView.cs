@@ -322,7 +322,7 @@ namespace Tangerine.UI
 				treeNodeWidget.PrepareRendererState();
 				int index = 0;
 				int previousIndex = 0;
-				var filterSize = Renderer.MeasureTextLine(label.Font, filter, label.FontHeight, label.LetterSpacing);
+				var filterSize = label.Font.MeasureTextLine(filter, label.FontHeight, label.LetterSpacing);
 				var size = Vector2.Zero;
 				var text = rootNode.Id.ToLower();
 				var pos = label.CalcPositionInSpaceOf(treeNodeWidget);
@@ -330,7 +330,7 @@ namespace Tangerine.UI
 				pos.Y += label.Padding.Top;
 				while ((index = text.IndexOf(filter, previousIndex)) >= 0) {
 					var skippedText = text.Substring(previousIndex, index - previousIndex);
-					var skippedSize = Renderer.MeasureTextLine(label.Font, skippedText, label.FontHeight, label.LetterSpacing);
+					var skippedSize = label.Font.MeasureTextLine(skippedText, label.FontHeight, label.LetterSpacing);
 					size.X += skippedSize.X;
 					size.Y = Mathf.Max(size.Y, skippedSize.Y);
 					Renderer.DrawRect(pos.X + size.X, pos.Y, pos.X + size.X + filterSize.X, pos.Y + size.Y, ColorTheme.Current.Hierarchy.MatchColor);
