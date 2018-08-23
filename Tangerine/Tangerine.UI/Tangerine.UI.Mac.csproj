@@ -80,7 +80,6 @@
     <Compile Include="Console.cs" />
     <Compile Include="ToolbarButton.cs" />
     <Compile Include="Dialogs\AlertDialog.cs" />
-    <Compile Include="SearchPanel\SearchPanel.cs" />
     <Compile Include="NodeIconPool.cs" />
     <Compile Include="Utils\Utils.cs" />
     <Compile Include="ColorPickerPanel.cs" />
@@ -139,6 +138,8 @@
     <Compile Include="PropertyEditors\ThicknessPropertyEditor.cs" />
     <Compile Include="PropertyEditors\InstancePropertyEditor.cs" />
     <Compile Include="PropertyEditors\AlignmentPropertyEditor.cs" />
+    <Compile Include="HierarchyPanel\HierarchyPanel.cs" />
+    <Compile Include="HierarchyPanel\TreeView.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>
@@ -154,5 +155,8 @@
       <Project>{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}</Project>
       <Name>Yuzu.Mac</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="SearchPanel\" />
   </ItemGroup>
 </Project>
