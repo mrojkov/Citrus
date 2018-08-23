@@ -137,6 +137,14 @@ namespace Tangerine.UI.Timeline
 			if (offset != IntVector2.Zero) {
 				Timeline.Globals.Add(new DragKeyframesRequest(offset, !input.IsKeyPressed(Key.Alt)));
 				Timeline.Ruler.MeasuredFrameDistance = 0;
+			} else {
+				Operations.ClearGridSelection.Perform();
+				var currentCell = Grid.CellUnderMouse();
+				Operations.SelectGridSpan.Perform(
+					currentCell.Y,
+					currentCell.X,
+					currentCell.X + 1
+				);
 			}
 		}
 
