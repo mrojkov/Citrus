@@ -188,6 +188,7 @@ namespace Tangerine.UI.SceneView
 				throw new InvalidOperationException();
 			}
 			Instance = new VisualHintsPanel(panel);
+			Refresh();
 			return Instance;
 		}
 
