@@ -15,22 +15,22 @@ namespace Tangerine.Core
 		[YuzuMember]
 		public string CurrentDocument;
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public bool RulerVisible { get; set; }
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public List<string> DisplayedRulers { get; set; } = new List<string>();
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public List<string> DisplayedOverlays { get; set; } = new List<string>();
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public Ruler ActiveRuler { get; set; } = new Ruler();
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public ObservableCollection<Ruler> Rulers { get; } = new ObservableCollection<Ruler>();
 		
-		[YuzuRequired]
+		[YuzuOptional]
 		public readonly List<string> RecentDocuments = new List<string>();
 
 		public const int MaxRecentDocuments = 5;

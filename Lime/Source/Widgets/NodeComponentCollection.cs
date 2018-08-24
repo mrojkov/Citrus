@@ -194,7 +194,7 @@ namespace Lime
 			}
 		}
 
-		[Yuzu.YuzuSerializeItemIf]
+		[global::Yuzu.YuzuSerializeItemIf]
 		private bool SerializeItemIf(int index, Object component)
 		{
 			return !component.GetType().IsDefined(typeof(NodeComponentDontSerializeAttribute), true);

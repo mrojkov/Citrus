@@ -10,11 +10,11 @@ namespace Tangerine.UI.SceneView
 {
 	public class VisualHint
 	{
-		[YuzuRequired]
+		[YuzuOptional]
 		public string Title { get; set; }
-		[YuzuRequired]
+		[YuzuOptional]
 		public bool Enabled { get; set; } = true;
-		[YuzuRequired]
+		[YuzuOptional]
 		public Dictionary<string, VisualHint> SubHints { get; private set; } = new Dictionary<string, VisualHint>();
 
 		public Func<VisualHint, bool> HideRule;
@@ -48,7 +48,7 @@ namespace Tangerine.UI.SceneView
 	{
 		public static VisualHintsRegistry Instance => SceneUserPreferences.Instance.VisualHintsRegister;
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public VisualHint RootHint { get; set; } = new VisualHint("");
 
 		public VisualHint DisplayAll { get; set; }

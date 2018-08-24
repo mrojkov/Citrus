@@ -19,7 +19,7 @@ namespace Tangerine.UI
 			Selector.LayoutCell = new LayoutCell(Alignment.Center);
 			ContainerWidget.AddNode(Selector);
 			var propertyType = typeof(T);
-			var meta = Yuzu.Metadata.Meta.Get(editorParams.Type, Serialization.DefaultYuzuCommonOptions);
+			var meta = Yuzu.Metadata.Meta.Get(editorParams.Type, Serialization.YuzuCommonOptions);
 			var propertyMetaItem = meta.Items.Where(i => i.Name == editorParams.PropertyName).First();
 			var defaultValue = propertyMetaItem.GetValue(meta.Default);
 			var resetToDefaultButton = new ToolbarButton(IconPool.GetTexture("Tools.Revert"));

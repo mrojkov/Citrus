@@ -41,8 +41,8 @@ namespace Lime
 			if (propertyPath[0] == '[') {
 				int index = propertyPath.IndexOf(']');
 				var componentTypeName = propertyPath.Substring(1, index - 1);
-				var type = Yuzu.Metadata.Meta.GetTypeByReadAlias(componentTypeName, Serialization.DefaultYuzuCommonOptions)
-				           ?? Yuzu.Util.TypeSerializer.Deserialize(componentTypeName);
+				var type = global::Yuzu.Metadata.Meta.GetTypeByReadAlias(componentTypeName, Serialization.YuzuCommonOptions)
+				           ?? global::Yuzu.Util.TypeSerializer.Deserialize(componentTypeName);
 				o = host.Components.Get(type);
 				if (o == null) {
 					return (result, null);

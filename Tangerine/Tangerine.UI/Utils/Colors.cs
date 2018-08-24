@@ -7,266 +7,266 @@ namespace Tangerine.UI
 	{
 		public class ToolbarColors
 		{
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 ButtonHighlightBorder { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 ButtonHighlightBackground { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 ButtonPressBorder { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 ButtonPressBackground { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 ButtonCheckedBorder { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 ButtonCheckedBackground { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 ButtonDisabledColor { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 Background { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 ButtonSelected { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 PanelPlacementHighlightBackground { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 PanelPlacementHighlightBorder { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 Separator { get; set; }
 		}
 
 		public class SceneViewColors
 		{
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 Selection { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 LockedWidgetBorder { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 ExposedItemInactiveBorder { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 ExposedItemActiveBorder { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 ExposedItemSelectedBorder { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 Label { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 MouseSelection { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 ContainerOuterSpace { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 ContainerInnerSpace { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 ContainerBorder { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 PointObject { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 Bone { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 BoneOutline { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 BoneEffectiveRadius { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 BoneFadeoutZone { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 BackgroundColorA { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 BackgroundColorB { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 RootWidgetOverlayColor { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 DistortionMeshOutline { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 Ruler { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 RulerEditable { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 RulerEditableActiveDraging { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 SelectedWidget { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 RulerBackground { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 RulerTextColor { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 ResolutionPreviewOuterSpace { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 ResolutionPreviewText { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 EmitterCustomShape { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 EmitterCustomShapeLine { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 SplineOutline { get; set; }
 		}
 
 		public class TimelineGridColors
 		{
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 PropertyRowBackground { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 Lines { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 LinesLight { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 Selection { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 Backlight { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 Cursor { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 RunningCursor { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 WaveformColor { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 WaveformBackground { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 AnimatedRangeBackground { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 SelectedRowBackground { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 SelectionBorder { get; set; }
 		}
 
 		public class TimelineCurveEditorColors
 		{
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4[] Curves { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 Selection { get; set; }
 		}
 
 		public class TimelineRulerColors
 		{
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 Notchings { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 JumpMarker { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 PlayMarker { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 StopMarker { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 UnknownMarker { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 Cursor { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 RunningCursor { get; set; }
 		}
 
 		public class TimelineOverviewColors
 		{
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 Veil { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 Border { get; set; }
 		}
 
 		public class TimelineRollColors
 		{
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 Lines { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 GrayedLabel { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 DragCursor { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 DragTarget { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 BlueMark { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 RedMark { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 GreenMark { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 OrangeMark { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 YellowMark { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 VioletMark { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 GrayMark { get; set; }
 		}
 
 		public class DockingColors
 		{
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 DragRectagleOutline { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 PanelTitleBackground { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 PanelTitleSeparator { get; set; }
 	}
 
 		public class InspectorColors
 		{
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 BorderAroundKeyframeColorbox { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 CategoryLabelBackground { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 GroupHeaderLabelBackground { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 ComponentHeaderLabelBackground { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 StripeBackground1 { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 StripeBackground2 { get; set; }
 		}
 
 		public class KeyboardColors
 		{
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 BlackText { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 GrayText { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 GenericKeyBackground { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 PanelKeyBackground { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 ButtonBackground { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 ModifierBackground { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 SelectedBorder { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 Border { get; set; }
 		}
 
 		public class HierarchyColors
 		{
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 SelectionColor { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 GrayedSelectionColor { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 MatchColor { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 JointColor { get; set; }
 		}
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public bool IsDark { get; set; }
 		public Theme.ColorTheme Basic { get; set; }
-		[YuzuRequired]
+		[YuzuOptional]
 		public ToolbarColors Toolbar { get; set; }
-		[YuzuRequired]
+		[YuzuOptional]
 		public SceneViewColors SceneView { get; set; }
-		[YuzuRequired]
+		[YuzuOptional]
 		public TimelineGridColors TimelineGrid { get; set; }
-		[YuzuRequired]
+		[YuzuOptional]
 		public TimelineCurveEditorColors TimelineCurveEditor { get; set; }
-		[YuzuRequired]
+		[YuzuOptional]
 		public TimelineRulerColors TimelineRuler { get; set; }
-		[YuzuRequired]
+		[YuzuOptional]
 		public TimelineOverviewColors TimelineOverview { get; set; }
-		[YuzuRequired]
+		[YuzuOptional]
 		public TimelineRollColors TimelineRoll { get; set; }
-		[YuzuRequired]
+		[YuzuOptional]
 		public DockingColors Docking { get; set; }
-		[YuzuRequired]
+		[YuzuOptional]
 		public InspectorColors Inspector { get; set; }
-		[YuzuRequired]
+		[YuzuOptional]
 		public KeyboardColors Keyboard { get; set; }
-		[YuzuRequired]
+		[YuzuOptional]
 		public HierarchyColors Hierarchy { get; set; }
 
 		public ColorTheme Clone()

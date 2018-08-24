@@ -5,19 +5,19 @@ namespace Tangerine.Core
 {
 	public class CoreUserPreferences : Component
 	{
-		[YuzuRequired]
+		[YuzuOptional]
 		public bool AutoKeyframes { get; set; }
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public bool AnimationMode { get; set; }
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public KeyFunction DefaultKeyFunction { get; set; }
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public bool ReloadModifiedFiles { get; set; }
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public bool StopAnimationOnCurrentFrame { get; set; }
 
 		public CoreUserPreferences()

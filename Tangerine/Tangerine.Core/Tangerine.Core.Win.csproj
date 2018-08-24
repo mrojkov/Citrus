@@ -82,6 +82,7 @@
     <Compile Include="Operation.cs" />
     <Compile Include="Ruler.cs" />
     <Compile Include="TangerineAssetBundle.cs" />
+    <Compile Include="TangerineYuzu.cs" />
     <Compile Include="TriggersValidation.cs" />
     <Compile Include="UserPreferences.cs" />
     <Compile Include="VersionedCollection.cs" />

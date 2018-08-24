@@ -121,7 +121,7 @@ namespace Tangerine.UI.Inspector
 				// WTF, Bug in Mono?
 				return false;
 			}
-			var yuzuItem = Yuzu.Metadata.Meta.Get(type, Serialization.DefaultYuzuCommonOptions).Items.Find(i => i.PropInfo == property);
+			var yuzuItem = Yuzu.Metadata.Meta.Get(type, Serialization.YuzuCommonOptions).Items.Find(i => i.PropInfo == property);
 			var tang = PropertyAttributes<TangerineKeyframeColorAttribute>.Get(type, property.Name);
 			var tangIgnore = PropertyAttributes<TangerineIgnoreAttribute>.Get(type, property.Name);
 			var tangInspect = PropertyAttributes<TangerineInspectAttribute>.Get(type, property.Name);

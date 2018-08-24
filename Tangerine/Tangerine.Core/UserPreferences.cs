@@ -25,7 +25,7 @@ namespace Tangerine.Core
 			if (System.IO.File.Exists(path)) {
 				try {
 					Clear();
-					Serialization.ReadObjectFromFile<UserPreferences>(path, this);
+					TangerineYuzu.Instance.Value.ReadObjectFromFile<UserPreferences>(path, this);
 					return true;
 				} catch (System.Exception e) {
 					Debug.Write($"Failed to load the user preferences ({path}): {e}");
@@ -38,7 +38,7 @@ namespace Tangerine.Core
 
 		public void Save()
 		{
-			Serialization.WriteObjectToFile(GetPath(), this, Serialization.Format.JSON);
+			TangerineYuzu.Instance.Value.WriteObjectToFile(GetPath(), this, Serialization.Format.JSON);
 		}
 
 		public static string GetPath()

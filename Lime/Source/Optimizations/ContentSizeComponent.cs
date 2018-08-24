@@ -10,7 +10,7 @@ namespace Lime.RenderOptimizer
 	}
 	public class ContentSizeComponent : NodeComponent
 	{
-		[YuzuRequired]
+		[YuzuOptional]
 		public ContentSize Size;
 
 		public bool IsEmpty => Size == null;
@@ -26,7 +26,7 @@ namespace Lime.RenderOptimizer
 
 	public class ContentRectangle : ContentSize
 	{
-		[YuzuRequired]
+		[YuzuOptional]
 		public Rectangle Data;
 
 		public ContentRectangle()
@@ -54,7 +54,7 @@ namespace Lime.RenderOptimizer
 	{
 		private static readonly Matrix44 matrix2DTo3D = Matrix44.CreateScale(new Vector3(1, -1, 1));
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public Vector3[] Data = new Vector3[4];
 
 		public ContentPlane()
@@ -79,7 +79,7 @@ namespace Lime.RenderOptimizer
 	// TODO: Content size for 3D objects
 	public class ContentBox : ContentSize
 	{
-		[YuzuRequired]
+		[YuzuOptional]
 		public Bounds Data;
 	}
 }

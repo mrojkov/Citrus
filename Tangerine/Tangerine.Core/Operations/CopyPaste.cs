@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Lime;
 using Tangerine.Core;
@@ -19,7 +19,7 @@ namespace Tangerine.Core.Operations
 		{
 			using (var frame = CreateInMemoryCopy()) {
 				var stream = new System.IO.MemoryStream();
-				Serialization.WriteObject(Document.Current.Path, stream, frame, Serialization.Format.JSON);
+				TangerineYuzu.Instance.Value.WriteObject(Document.Current.Path, stream, frame, Serialization.Format.JSON);
 				var text = System.Text.Encoding.UTF8.GetString(stream.ToArray());
 				return text;
 			}
@@ -115,7 +115,7 @@ namespace Tangerine.Core.Operations
 			Frame frame;
 			try {
 				var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(data));
-				frame = Serialization.ReadObject<Frame>(Document.Current.Path, stream);
+				frame = TangerineYuzu.Instance.Value.ReadObject<Frame>(Document.Current.Path, stream);
 			} catch (System.Exception e) {
 				Debug.Write(e);
 				return false;

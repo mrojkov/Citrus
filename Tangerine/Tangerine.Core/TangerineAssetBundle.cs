@@ -29,7 +29,7 @@ namespace Tangerine.Core
 				if (!cacheBundle.FileExists(path) || GetFileLastWriteTime(fbxPath) > cacheBundle.GetFileLastWriteTime(path)) {
 					var fullPath = Path.Combine(Orange.The.Workspace.AssetsDirectory, fbxPath);
 					var model = new Orange.FbxModelImporter(fullPath, Orange.The.Workspace.ActiveTarget, new Dictionary<string, Orange.CookingRules>()).Model;
-					Serialization.WriteObjectToBundle(cacheBundle, path, model, Serialization.Format.Binary, ".t3d", AssetAttributes.None, new byte[0]);
+					TangerineYuzu.Instance.Value.WriteObjectToBundle(cacheBundle, path, model, Serialization.Format.Binary, ".t3d", AssetAttributes.None, new byte[0]);
 				}
 			}
 			using (var cacheBundle = new PackedAssetBundle(Orange.The.Workspace.TangerineCacheBundle)) {

@@ -7,7 +7,7 @@ namespace Tangerine.UI.FilesystemView
 {
 	public class FilesystemUserPreferences : Component
 	{
-		[YuzuRequired]
+		[YuzuOptional]
 		public Dictionary<string, ViewNode> ViewRootPerProjectFile = new Dictionary<string, ViewNode>();
 
 		public ViewNode ViewRoot

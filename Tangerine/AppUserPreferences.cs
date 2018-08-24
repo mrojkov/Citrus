@@ -10,33 +10,33 @@ namespace Tangerine
 {
 	public class AppUserPreferences : Component
 	{
-		[YuzuRequired]
+		[YuzuOptional]
 		public UI.Docking.DockManager.State DockState;
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public readonly List<string> RecentProjects;
 
 		public static int RecentProjectsCount { get; private set; } = 5;
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public UI.ColorTheme ColorTheme { get; set; }
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public Theme.ColorTheme LimeColorTheme { get; set; }
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public Vector2 DefaultSceneDimensions { get; set; }
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public string CurrentHotkeyProfile { get; set; }
 
 		/// <summary>
 		/// Autosave delay in seconds
 		/// </summary>
-		[YuzuRequired]
+		[YuzuOptional]
 		public int AutosaveDelay { get; set; }
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public ToolbarModel ToolbarModel { get; set; } = DefaultToolbarModel();
 
 		public AppUserPreferences()

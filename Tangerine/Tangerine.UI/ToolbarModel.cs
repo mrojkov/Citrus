@@ -10,7 +10,7 @@ namespace Tangerine.UI
 	{
 		public class ToolbarPanel
 		{
-			[YuzuRequired]
+			[YuzuOptional]
 			public List<string> CommandIds { get; } = new List<string>();
 
 			[YuzuOptional]
@@ -25,7 +25,7 @@ namespace Tangerine.UI
 
 		public class ToolbarRow
 		{
-			[YuzuRequired]
+			[YuzuOptional]
 			public List<ToolbarPanel> Panels { get; } = new List<ToolbarPanel>();
 
 			public ToolbarModel Parent { get; set; }
@@ -42,7 +42,7 @@ namespace Tangerine.UI
 			}
 		}
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public List<ToolbarRow> Rows { get; } = new List<ToolbarRow>();
 
 		public void RefreshAfterLoad()
