@@ -102,20 +102,19 @@ namespace Tangerine.UI
 		public static readonly ICommand DragLeftFast = new Command("Drag Left Fast", new Shortcut(Modifiers.Shift, Key.A));
 		public static readonly ICommand DragUpFast = new Command("Drag Up Fast", new Shortcut(Modifiers.Shift, Key.W));
 		public static readonly ICommand DragDownFast = new Command("Drag Down Fast", new Shortcut(Modifiers.Shift, Key.S));
-		public static readonly ICommand ShowBone3DBisualHint = new Command("Bone (3D)", new Shortcut(Modifiers.Command, Key.B));
+		public static readonly ICommand ShowBone3DVisualHint = new Command("Bone (3D)", new Shortcut(Modifiers.Command, Key.B));
 		public static readonly ICommand ShowAllVisualHints = new Command("Display All", new Shortcut(Modifiers.Command, Key.M));
 		public static readonly ICommand ShowVisualHintsForInvisibleNodes = new Command("Display Invisible", new Shortcut(Modifiers.Command | Modifiers.Alt, Key.M));
 		public static readonly ICommand TieWidgetsWithBones = new Command("Tie Widgets with Bones", new Shortcut(Modifiers.Command, Key.T));
 		public static readonly ICommand UntieWidgetsFromBones = new Command("Untie Widgets from Bones", new Shortcut(Modifiers.Command | Modifiers.Shift, Key.T));
 		public static readonly ICommand Duplicate = new Command("Duplicate", new Shortcut(Modifiers.Command, Key.D));
-		public static readonly ICommand ToggleDisplayRuler = new Command("Toggle Dispaly", new Shortcut(Modifiers.Command | Modifiers.Alt, Key.R));
+		public static readonly ICommand ToggleDisplayRuler = new Command("Toggle Display", new Shortcut(Modifiers.Command | Modifiers.Alt, Key.R));
 		public static readonly ICommand SaveCurrentRuler = new Command("Save Ruler");
 		public static readonly ICommand ClearActiveRuler = new Command("Clear Active Ruler");
 		public static readonly ICommand SnapWidgetPivotToRuler = new Command("Snap Widget Pivot to Ruler");
 		public static readonly ICommand SnapWidgetBorderToRuler = new Command("Snap Widget to Ruler");
 		public static readonly ICommand SnapRulerLinesToWidgets = new Command("Snap Ruler Lines to Widgets");
 		public static readonly ICommand ManageRulers = new Command("Manage Rulers");
-		public static readonly ICommand ShowAnimationPath = new Command("Animation Path");
 	}
 
 	public static class Tools
