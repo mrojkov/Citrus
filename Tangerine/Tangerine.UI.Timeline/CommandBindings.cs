@@ -87,18 +87,6 @@ namespace Tangerine.UI.Timeline
 						Timeline.Instance.EnsureRowChildsVisible(row);
 					}
 				}
-				if (row.Components.Get<BoneRow>() is BoneRow boneRow) {
-					SetProperty.Perform(boneRow, nameof(BoneRow.ChildrenExpanded), !boneRow.ChildrenExpanded, isChangingDocument: false);
-					if (boneRow.ChildrenExpanded && row.Rows.Count > 0) {
-						Timeline.Instance.EnsureRowChildsVisible(row);
-					}
-				}
-				if (row.Components.Get<FolderRow>() is FolderRow folderRow) {
-					SetProperty.Perform(folderRow.Folder, nameof(Folder.Expanded), !folderRow.Folder.Expanded, isChangingDocument: false);
-					if (folderRow.Folder.Expanded && row.Rows.Count > 0) {
-						Timeline.Instance.EnsureRowChildsVisible(row);
-					}
-				}
 			}
 		}
 
