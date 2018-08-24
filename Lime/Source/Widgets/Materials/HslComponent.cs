@@ -3,8 +3,9 @@ using Yuzu;
 namespace Lime
 {
 	[TangerineRegisterComponent]
-	[AllowedOwnerTypes(typeof(Image))]
-	public class HslComponent : AwakeBehavior
+	[MutuallyExclusiveDerivedComponents]
+	[AllowedComponentOwnerTypes(typeof(Image))]
+	public class HslComponent : NodeComponent
 	{
 		private Vector3 hsl;
 		
@@ -95,8 +96,8 @@ namespace Lime
 
 				vec3 HSLtoRGB(vec3 c)
 				{
-					vec3 rgb = clamp(abs(mod(c.x*6.0 + vec3(0.0, 4.0,2.0),6.0)-3.0)-1.0, 0.0, 1.0);
-					return c.z + c.y * (rgb-0.5)*(1.0-abs(2.0*c.z-1.0));
+					vec3 rgb = clamp(abs(mod(c.x * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0);
+					return c.z + c.y * (rgb - 0.5) * (1.0 - abs(2.0 * c.z - 1.0));
 				}
 
 				vec3 RGBtoHSL(vec3 c)
@@ -114,14 +115,14 @@ namespace Lime
 					s = mix(cDelta / (cMax + cMin), cDelta / (2.0 - (cMax + cMin)), step(0.5, l));
 
 					float inverseDelta = 1.0 / cDelta;
-					h += mix(0, (c.g - c.b) * inverseDelta, step(cMax, c.r));
-					h += mix(0, 2.0 + (c.b - c.r) * inverseDelta, step(cMax, c.g)) * (1.0 - step(c.g, c.r));
-					h += mix(0, 4.0 + (c.r - c.g) * inverseDelta, step(cMax, c.b)) * (1.0 - step(c.b, c.r)) * (1.0 - step(c.b, c.g));
+					h += mix(0.0, (c.g - c.b) * inverseDelta, step(cMax, c.r));
+					h += mix(0.0, 2.0 + (c.b - c.r) * inverseDelta, step(cMax, c.g)) * (1.0 - step(c.g, c.r));
+					h += mix(0.0, 4.0 + (c.r - c.g) * inverseDelta, step(cMax, c.b)) * (1.0 - step(c.b, c.r)) * (1.0 - step(c.b, c.g));
 
-					h = mix(h + 6, h, step(0.0, h));
+					h = mix(h + 6.0, h, step(0.0, h));
 					h = h * inversSix;
 
-					h = mix(h, 0, step(cMax, cMin));
+					h = mix(h, 0.0, step(cMax, cMin));
 					return vec3(h, s, l);
 				}
 
