@@ -114,7 +114,10 @@ namespace Tangerine
 			var dockManager = DockManager.Instance;
 			new UI.Console(consolePanel);
 			var root = dockManager.Model.WindowPlacements.First();
-			var documentPlacement = dockManager.AppendPanelTo(documentPanel, root);
+			var placement = new LinearPlacement(LinearPlacementDirection.Horizontal);
+			dockManager.AddPanel(timelinePanel, root, DockSite.Top, 0.3f);
+			dockManager.DockPlacementTo(placement, root, DockSite.Bottom, 0.5f);
+			dockManager.AppendPanelTo(documentPanel, placement);
 			var commandHandlerList = CommandHandlerList.Global;
 			var commandsDictionary = new Dictionary<string, Command> {
 				{ timelinePanel.Id, new Command(timelinePanel.Title) },
@@ -129,13 +132,12 @@ namespace Tangerine
 				commandHandlerList.Connect(pair.Value, new PanelCommandHandler(pair.Key));
 				TangerineMenu.PadsMenu.Add(pair.Value);
 			}
-			dockManager.AddPanel(timelinePanel, documentPlacement, DockSite.Top, 0.3f);
-			dockManager.AddPanel(inspectorPanel, documentPlacement, DockSite.Left);
-			var filesystemPlacement = dockManager.AddPanel(filesystemPanel, documentPlacement, DockSite.Right, 0.3f);
+			dockManager.AddPanel(inspectorPanel, placement, DockSite.Left);
+			var filesystemPlacement = dockManager.AddPanel(filesystemPanel, placement, DockSite.Right, 0.3f);
 			dockManager.AddPanel(searchPanel, filesystemPlacement, DockSite.Fill);
 			dockManager.AddPanel(backupHistoryPanel, filesystemPlacement, DockSite.Fill);
 			dockManager.AddPanel(consolePanel, filesystemPlacement, DockSite.Bottom, 0.3f);
-			dockManager.AddPanel(visualHintsPanel, documentPlacement, DockSite.Right, 0.3f).Hidden = true;
+			dockManager.AddPanel(visualHintsPanel, placement, DockSite.Right, 0.3f).Hidden = true;
 			DockManagerInitialState = dockManager.ExportState();
 			var documentViewContainer = InitializeDocumentArea(dockManager);
 			documentPanel.ContentWidget.Nodes.Add(dockManager.DocumentArea);
