@@ -200,6 +200,11 @@ namespace Lime
 			}
 		}
 
+		public void Invalidate()
+		{
+			Version++;
+		}
+
 		IEnumerator<IAnimator> IEnumerable<IAnimator>.GetEnumerator() => new Enumerator(First);
 		IEnumerator IEnumerable.GetEnumerator() => new Enumerator(First);
 

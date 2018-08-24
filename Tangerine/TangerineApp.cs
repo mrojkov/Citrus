@@ -214,6 +214,8 @@ namespace Tangerine
 			};
 			Document.NodeDecorators.AddFor<ParticleEmitter>(n => n.CompoundPostPresenter.Add(new UI.SceneView.ParticleEmitterPresenter()));
 			DocumentHistory.Processors.AddRange(new IOperationProcessor[] {
+				new Core.Operations.TimelineHorizontalShift.Processor(),
+				new Core.Operations.RemoveKeyframeRange.Processor(),
 				new Core.Operations.SelectRow.Processor(),
 				new Core.Operations.SetProperty.Processor(),
 				new Core.Operations.RemoveKeyframe.Processor(),
