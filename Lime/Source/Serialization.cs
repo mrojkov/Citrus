@@ -23,19 +23,21 @@ namespace Lime
 
 		private static Stack<string> pathStack = new Stack<string>();
 
-		public readonly List<Serialization.DeserializerBuilder> DeserializerBuilders = new List<Serialization.DeserializerBuilder> {
-			(path, stream) => new global::Yuzu.Json.JsonDeserializer {
-				JsonOptions = defaultYuzuJsonOptions,
-				Options = defaultYuzuCommonOptions,
-			}
-		};
+		public readonly List<Serialization.DeserializerBuilder> DeserializerBuilders = new List<Serialization.DeserializerBuilder>();
 
 		public UInt32 BinarySignature = 0xdeadbabe;
 
 		private Yuzu()
-		{ }
+		{
+			DeserializerBuilders.Add(
+				(path, stream) => new global::Yuzu.Json.JsonDeserializer {
+					JsonOptions = YuzuJsonOptions,
+					Options = YuzuCommonOptions,
+				}
+			);
+		}
 
-		public Yuzu(CommonOptions yuzuCommonOptions, JsonSerializeOptions yuzuJsonOptions)
+		public Yuzu(CommonOptions yuzuCommonOptions, JsonSerializeOptions yuzuJsonOptions) : this()
 		{
 			YuzuCommonOptions = yuzuCommonOptions;
 			YuzuJsonOptions = yuzuJsonOptions;
