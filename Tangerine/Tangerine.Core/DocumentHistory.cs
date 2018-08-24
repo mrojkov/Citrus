@@ -10,6 +10,7 @@ namespace Tangerine.Core
 		void RollbackTransaction();
 		void CommitTransaction();
 		void EndTransaction();
+		void Perform(IOperation operation);
 	}
 
 	public class DocumentHistory : ITransactionalHistory
