@@ -324,6 +324,7 @@
     <Compile Include="Source\Widgets\Materials\GradientMaterial.cs" />
     <Compile Include="Source\Components\GradientMaterialComponent.cs" />
     <Compile Include="Source\Widgets\Layout\LinearLayout.cs" />
+    <Compile Include="Source\Widgets\Animation\HueComponent.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
