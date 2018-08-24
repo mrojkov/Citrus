@@ -33,7 +33,7 @@ namespace Lime
 			if (!string.IsNullOrEmpty(path) && path[0] == '#') {
 				return path;
 			} else {
-				return Serialization.ShrinkPath(path);
+				return Yuzu.Current?.ShrinkPath(path) ?? path;
 			}
 		}
 
@@ -41,7 +41,7 @@ namespace Lime
 		{
 			path = value;
 			if (!string.IsNullOrEmpty(value) && value[0] != '#') {
-				path = Serialization.ExpandPath(value);
+				path = Yuzu.Current?.ExpandPath(value) ?? path;
 			}
 			texture = null;
 		}
@@ -94,7 +94,7 @@ namespace Lime
 				return texture.SurfaceSize;
 			}
 		}
-		
+
 		public ITexture AtlasTexture {
 			get {
 				if (texture == null) {

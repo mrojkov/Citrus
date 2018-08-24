@@ -317,7 +317,7 @@ namespace Orange
 				try {
 					var path = Path.ChangeExtension(pm.Texture.SerializationPath, "png");
 					using (var s = isTangerine
-						? AssetBundle.Current.OpenFile(Serialization.ExpandPath(path))
+						? AssetBundle.Current.OpenFile(Lime.Yuzu.Current?.ExpandPath(path) ?? path)
 						: System.IO.File.OpenRead(path)) {
 						using (var b = new Bitmap(s)) {
 							pm.Size = new Vector2(b.Width, b.Height);

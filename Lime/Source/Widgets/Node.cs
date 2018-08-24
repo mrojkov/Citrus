@@ -245,8 +245,8 @@ namespace Lime
 		[TangerineStaticProperty]
 		public string ContentsPath
 		{
-			get { return Serialization.ShrinkPath(contentsPath); }
-			set { contentsPath = Serialization.ExpandPath(value); }
+			get { return Yuzu.Current?.ShrinkPath(contentsPath) ?? contentsPath; }
+			set { contentsPath = Yuzu.Current?.ExpandPath(value) ?? value; }
 		}
 
 		internal static long NodeReferenceCacheValidationCode = 1;
@@ -1190,12 +1190,13 @@ namespace Lime
 			}
 		}
 
-		public static Node CreateFromAssetBundle(string path, Node instance = null)
+		public static Node CreateFromAssetBundle(string path, Node instance = null, Yuzu yuzu = null)
 		{
-			return CreateFromAssetBundleHelper(path, instance, false);
+			yuzu = yuzu ?? Yuzu.Instance.Value;
+			return CreateFromAssetBundleHelper(path, instance, yuzu, external: false);
 		}
 
-		private static Node CreateFromAssetBundleHelper(string path, Node instance = null, bool external = false)
+		private static Node CreateFromAssetBundleHelper(string path, Node instance = null, Yuzu yuzu = null, bool external = false)
 		{
 			if (SceneLoading?.Value?.Invoke(path, ref instance, external) ?? false) {
 				SceneLoaded?.Value?.Invoke(path, instance, external);
@@ -1211,9 +1212,9 @@ namespace Lime
 			scenesBeingLoaded.Value.Add(fullPath);
 			try {
 				using (Stream stream = AssetBundle.Current.OpenFileLocalized(fullPath)) {
-					instance = Serialization.ReadObject<Node>(fullPath, stream, instance);
+					instance = yuzu.ReadObject<Node>(fullPath, stream, instance);
 				}
-				instance.LoadExternalScenes();
+				instance.LoadExternalScenes(yuzu);
 				instance.Components.Add(new AssetBundlePathComponent(fullPath));
 			} finally {
 				scenesBeingLoaded.Value.Remove(fullPath);
@@ -1226,14 +1227,15 @@ namespace Lime
 			return instance;
 		}
 
-		public void LoadExternalScenes()
+		public void LoadExternalScenes(Yuzu yuzu = null)
 		{
+			yuzu = yuzu ?? Yuzu.Instance.Value;
 			if (string.IsNullOrEmpty(ContentsPath)) {
 				foreach (var child in Nodes) {
 					child.LoadExternalScenes();
 				}
 			} else if (ResolveScenePath(ContentsPath) != null) {
-				var content = CreateFromAssetBundleHelper(ContentsPath, null, true);
+				var content = CreateFromAssetBundleHelper(ContentsPath, null, yuzu, external: true);
 				ReplaceContent(content);
 			}
 		}

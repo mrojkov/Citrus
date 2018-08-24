@@ -21,8 +21,8 @@ namespace Lime
 		[TangerineKeyframeColor(8)]
 		public string Path
 		{
-			get { return Serialization.ShrinkPath(movieTexture.Path); }
-			set { movieTexture.Path = Serialization.ExpandPath(value); }
+			get { return Yuzu.Current?.ShrinkPath(movieTexture.Path) ?? movieTexture.Path; }
+			set { movieTexture.Path = Yuzu.Current?.ExpandPath(value) ?? value; }
 		}
 
 		[YuzuMember]

@@ -3,109 +3,124 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
+using System.Threading;
 using Yuzu;
 using Yuzu.Binary;
 using Yuzu.Json;
 
 namespace Lime
 {
-	public static class Serialization
+	public class Yuzu
 	{
-		static class SerializationStackKeeper
-		{
-			[ThreadStatic]
-			public static Stack<string> stack;
-		}
+		public static Yuzu Current => stackOfCurrent.Value.Count > 0 ? stackOfCurrent.Value.Peek() : null;
+		private static void PushCurrent(Yuzu yuzu) => stackOfCurrent.Value.Push(yuzu);
+		private static Yuzu PopCurrent() => stackOfCurrent.Value.Pop();
 
-		static Stack<string> SerializationPathStack
-		{
-			get { return SerializationStackKeeper.stack ?? (SerializationStackKeeper.stack = new Stack<string>()); }
-		}
+		private static ThreadLocal<Stack<Yuzu>> stackOfCurrent = new ThreadLocal<Stack<Yuzu>>(() => new Stack<Yuzu>());
 
-		public delegate AbstractDeserializer DeserializerBuilder(string path, Stream stream);
+		public static ThreadLocal<Yuzu> Instance { get; } = new ThreadLocal<Yuzu>(() => new Yuzu());
 
-		public static readonly List<DeserializerBuilder> DeserializerBuilders = new List<DeserializerBuilder> {
-			(path, stream) => new Yuzu.Json.JsonDeserializer { JsonOptions = defaultYuzuJSONOptions, Options = DefaultYuzuCommonOptions }
+		private static Stack<string> pathStack = new Stack<string>();
+
+		public readonly List<Serialization.DeserializerBuilder> DeserializerBuilders = new List<Serialization.DeserializerBuilder> {
+			(path, stream) => new global::Yuzu.Json.JsonDeserializer {
+				JsonOptions = defaultYuzuJsonOptions,
+				Options = defaultYuzuCommonOptions,
+			}
 		};
 
-		public static string ShrinkPath(string path)
+		public UInt32 BinarySignature = 0xdeadbabe;
+
+		private Yuzu()
+		{ }
+
+		public Yuzu(CommonOptions yuzuCommonOptions, JsonSerializeOptions yuzuJsonOptions)
 		{
-			if (SerializationPathStack.Count == 0 || string.IsNullOrEmpty(path)) {
+			YuzuCommonOptions = yuzuCommonOptions;
+			YuzuJsonOptions = yuzuJsonOptions;
+		}
+
+		public string ShrinkPath(string path)
+		{
+			if (pathStack.Count == 0 || string.IsNullOrEmpty(path)) {
 				return path;
 			}
 			var d = GetCurrentSerializationDirectory() + '/';
 			return path.StartsWith(d) ? path.Substring(d.Length) : '/' + path;
 		}
 
-		public static string ExpandPath(string path)
+		public string ExpandPath(string path)
 		{
-			if (SerializationPathStack.Count == 0 || string.IsNullOrEmpty(path)) {
+			if (pathStack.Count == 0 || string.IsNullOrEmpty(path)) {
 				return path;
 			}
 			return (path[0] == '/') ? path.Substring(1) : GetCurrentSerializationDirectory() + '/' + path;
 		}
 
-		public static readonly CommonOptions DefaultYuzuCommonOptions = new CommonOptions {
+		public readonly CommonOptions YuzuCommonOptions = defaultYuzuCommonOptions;
+		public readonly JsonSerializeOptions YuzuJsonOptions = defaultYuzuJsonOptions;
+
+		private static readonly CommonOptions defaultYuzuCommonOptions = new CommonOptions {
 			TagMode = TagMode.Aliases,
 			AllowEmptyTypes = true,
 			CheckForEmptyCollections = true,
 		};
 
-		private static readonly JsonSerializeOptions defaultYuzuJSONOptions = new JsonSerializeOptions {
+		private static readonly JsonSerializeOptions defaultYuzuJsonOptions = new JsonSerializeOptions {
 			ArrayLengthPrefix = false,
 			Indent = "\t",
 			FieldSeparator = "\n",
 			SaveRootClass = true,
 			Unordered = true,
 			MaxOnelineFields = 8,
+			BOM = true,
 		};
 
-		public enum Format
+		public void WriteObject<T>(string path, Stream stream, T instance, Serialization.Format format)
 		{
-			JSON,
-			Binary
-		}
-
-		public static void WriteObject<T>(string path, Stream stream, T instance, Format format)
-		{
-			SerializationPathStack.Push(path);
+			pathStack.Push(path);
+			PushCurrent(this);
 			AbstractWriterSerializer ys = null;
 			try {
-				if (format == Format.Binary) {
+				if (format == Serialization.Format.Binary) {
 					WriteYuzuBinarySignature(stream);
-					ys = new Yuzu.Binary.BinarySerializer { Options = DefaultYuzuCommonOptions };
-				} else if (format == Format.JSON) {
-					ys = new Yuzu.Json.JsonSerializer {
-						Options = DefaultYuzuCommonOptions,
-						JsonOptions = defaultYuzuJSONOptions
+					ys = new global::Yuzu.Binary.BinarySerializer { Options = defaultYuzuCommonOptions };
+				} else if (format == Serialization.Format.JSON) {
+					ys = new global::Yuzu.Json.JsonSerializer {
+						Options = defaultYuzuCommonOptions,
+						JsonOptions = defaultYuzuJsonOptions
 					};
 				}
 				ys.ToStream(instance, stream);
 			} finally {
-				SerializationPathStack.Pop();
+				pathStack.Pop();
+				PopCurrent();
 			}
 		}
 
-		public static void WriteObject<T>(string path, Stream stream, T instance, AbstractSerializer serializer)
+		public void WriteObject<T>(string path, Stream stream, T instance, AbstractSerializer serializer)
 		{
-			SerializationPathStack.Push(path);
+			pathStack.Push(path);
+			PushCurrent(this);
 			try {
 				if (serializer is BinarySerializer) {
 					WriteYuzuBinarySignature(stream);
 				}
 				serializer.ToStream(instance, stream);
 			} finally {
-				SerializationPathStack.Pop();
+				pathStack.Pop();
+				PopCurrent();
 			}
 		}
 
-		public static void WriteObjectToFile<T>(string path, T instance, Format format)
+		public void WriteObjectToFile<T>(string path, T instance, Serialization.Format format)
 		{
 			using (FileStream stream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None))
 				WriteObject(path, stream, instance, format);
 		}
 
-		public static void WriteObjectToBundle<T>(AssetBundle bundle, string path, T instance, Format format, string sourceExtension, AssetAttributes attributes, byte[] cookingRulesSHA1)
+		public void WriteObjectToBundle<T>(AssetBundle bundle, string path, T instance, Serialization.Format format, string sourceExtension, AssetAttributes attributes, byte[] cookingRulesSHA1)
 		{
 			using (MemoryStream stream = new MemoryStream()) {
 				WriteObject(path, stream, instance, format);
@@ -114,17 +129,18 @@ namespace Lime
 			}
 		}
 
-		public static T ReadObject<T>(string path, Stream stream, object obj = null)
+		public T ReadObject<T>(string path, Stream stream, object obj = null)
 		{
 			var ms = new MemoryStream();
 			stream.CopyTo(ms);
 			ms.Seek(0, SeekOrigin.Begin);
 			stream = ms;
-			SerializationPathStack.Push(path);
+			pathStack.Push(path);
+			PushCurrent(this);
 			try {
 				AbstractDeserializer d = null;
-				if (CheckYuzuBinarySignature(stream)) {
-					d = new GeneratedDeserializersBIN.BinaryDeserializerGen { Options = DefaultYuzuCommonOptions };
+				if (CheckBinarySignature(stream)) {
+					d = new GeneratedDeserializersBIN.BinaryDeserializerGen { Options = defaultYuzuCommonOptions };
 				} else {
 					foreach (var db in DeserializerBuilders) {
 						d = db(path, stream);
@@ -147,65 +163,88 @@ namespace Lime
 					}
 				}
 			} finally {
-				SerializationPathStack.Pop();
+				pathStack.Pop();
+				PopCurrent();
 			}
 		}
 
-		public static T ReadObject<T>(string path, object obj = null)
+		public T ReadObject<T>(string path, object obj = null)
 		{
 			using (Stream stream = AssetBundle.Current.OpenFileLocalized(path))
 				return ReadObject<T>(path, stream, obj);
 		}
 
-		public static T ReadObjectFromFile<T>(string path, object obj = null)
+		public T ReadObjectFromFile<T>(string path, object obj = null)
 		{
 			using (FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
 				return ReadObject<T>(path, stream, obj);
 		}
 
-		public static int CalcObjectCheckSum<T>(string path, T obj)
+		public int CalcObjectCheckSum<T>(string path, T obj)
 		{
 			using (var memStream = new MemoryStream()) {
-				WriteObject(path, memStream, obj, Format.Binary);
+				WriteObject(path, memStream, obj, Serialization.Format.Binary);
 				memStream.Flush();
 				int checkSum = Toolbox.ComputeHash(memStream.GetBuffer(), (int)memStream.Length);
 				return checkSum;
 			}
 		}
 
-		public static string GetCurrentSerializationPath()
+		public string GetCurrentSerializationPath()
 		{
-			return SerializationPathStack.Peek();
+			return pathStack.Peek();
 		}
 
-		private static string GetCurrentSerializationDirectory()
+		private string GetCurrentSerializationDirectory()
 		{
-			return Path.GetDirectoryName(SerializationPathStack.Peek());
+			return Path.GetDirectoryName(pathStack.Peek());
 		}
 
-		private static void WriteYuzuBinarySignature(Stream s)
+		private void WriteYuzuBinarySignature(Stream s)
 		{
 			var bw = new BinaryWriter(s);
-			bw.Write(0xdeadbabe);
+			bw.Write(BinarySignature);
 		}
 
-		private static bool CheckYuzuBinarySignature(Stream s)
+		private bool CheckBinarySignature(Stream s)
 		{
 			UInt32 signature;
 			try {
-				// TODO: switch to 4.5+, use `using` and `leaveOpen = true`
-				var br = new BinaryReader(s);
-				signature = br.ReadUInt32();
+				using (var br = new BinaryReader(s, Encoding.UTF8, leaveOpen: true)) {
+					signature = br.ReadUInt32();
+				}
 			} catch {
 				s.Seek(0, SeekOrigin.Begin);
 				return false;
 			}
-			bool r = signature == 0xdeadbabe;
+			bool r = signature == BinarySignature;
 			if (!r) {
 				s.Seek(0, SeekOrigin.Begin);
 			}
 			return r;
 		}
+	}
+
+	public static class Serialization
+	{
+		public enum Format
+		{
+			JSON,
+			Binary
+		}
+		public delegate AbstractDeserializer DeserializerBuilder(string path, Stream stream);
+		public static List<DeserializerBuilder> DeserializerBuilders => Yuzu.Instance.Value.DeserializerBuilders;
+		public static CommonOptions YuzuCommonOptions => Yuzu.Instance.Value.YuzuCommonOptions;
+
+		public static void WriteObject<T>(string path, Stream stream, T instance, Format format) => Yuzu.Instance.Value.WriteObject(path, stream, instance, format);
+		public static void WriteObject<T>(string path, Stream stream, T instance, AbstractSerializer serializer) => Yuzu.Instance.Value.WriteObject(path, stream, instance, serializer);
+		public static void WriteObjectToFile<T>(string path, T instance, Format format) => Yuzu.Instance.Value.WriteObjectToFile(path, instance, format);
+		public static void WriteObjectToBundle<T>(AssetBundle bundle, string path, T instance, Format format, string sourceExtension, AssetAttributes attributes, byte[] cookingRulesSHA1) => Yuzu.Instance.Value.WriteObjectToBundle(bundle, path, instance, format, sourceExtension, attributes, cookingRulesSHA1);
+		public static T ReadObject<T>(string path, Stream stream, object obj = null) => Yuzu.Instance.Value.ReadObject<T>(path, stream, obj);
+		public static T ReadObject<T>(string path, object obj = null) => Yuzu.Instance.Value.ReadObject<T>(path, obj);
+		public static T ReadObjectFromFile<T>(string path, object obj = null) => Yuzu.Instance.Value.ReadObjectFromFile<T>(path, obj);
+		public static int CalcObjectCheckSum<T>(string path, T obj) => Yuzu.Instance.Value.CalcObjectCheckSum(path, obj);
+		public static string GetCurrentSerializationPath() => Yuzu.Instance.Value.GetCurrentSerializationPath();
 
 		public static void GenerateDeserializers(string filename, string rootNamespace, List<Type> types)
 		{
@@ -253,7 +292,7 @@ namespace Lime
 							}
 						}
 					} else {
-						var meta = Yuzu.Metadata.Meta.Get(t, DefaultYuzuCommonOptions);
+						var meta = global::Yuzu.Metadata.Meta.Get(t, YuzuCommonOptions);
 						if (meta.Items.Count != 0) {
 							types.Add(t);
 						}
