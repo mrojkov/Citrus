@@ -7,7 +7,7 @@ namespace Tangerine.UI.SceneView
 	class Bone3DPresenter : CustomPresenter<Node3D>
 	{
 		private readonly VisualHint bone3DHint =
-			VisualHintsRegistry.Instance.Register("/All/Nodes/Bones/Bone3D", SceneViewCommands.ShowBone3DBisualHint, VisualHintsRegistry.HideRules.VisibleIfProjectOpened);
+			VisualHintsRegistry.Instance.Register("/All/Nodes/Bones/Bone3D", SceneViewCommands.ShowBone3DVisualHint, VisualHintsRegistry.HideRules.VisibleIfProjectOpened);
 
 		public Bone3DPresenter(SceneView sceneView)
 		{
