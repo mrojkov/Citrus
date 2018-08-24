@@ -419,7 +419,7 @@ namespace Lime
 		/// For enumerating all descendants use Descendants.
 		/// </summary>
 		[YuzuMember]
-		[YuzuSerializeIf(nameof(IsNotDecorated))]
+		[YuzuSerializeIf(nameof(ShouldSerializeNodes))]
 		public NodeList Nodes { get; private set; }
 
 		/// <summary>
@@ -551,6 +551,11 @@ namespace Lime
 		public bool HasGestures() => gestures != null;
 
 		public virtual bool IsNotDecorated() => true;
+
+		public bool ShouldSerializeNodes()
+		{
+			return IsNotDecorated() && Nodes.Count > 0;
+		}
 
 		public virtual void Dispose()
 		{
