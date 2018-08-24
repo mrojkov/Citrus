@@ -536,7 +536,7 @@ namespace Orange
 			var currentRules = rules.CommonRules;
 			try {
 				rules.CommonRules.LastChangeTime = File.GetLastWriteTime(path);
-				using (var s = new FileStream(path, FileMode.Open)) {
+				using (var s = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read)) {
 					TextReader r = new StreamReader(s);
 					string line;
 					while ((line = r.ReadLine()) != null) {
