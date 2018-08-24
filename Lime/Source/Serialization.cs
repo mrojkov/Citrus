@@ -85,11 +85,11 @@ namespace Lime
 			try {
 				if (format == Serialization.Format.Binary) {
 					WriteYuzuBinarySignature(stream);
-					ys = new global::Yuzu.Binary.BinarySerializer { Options = defaultYuzuCommonOptions };
+					ys = new global::Yuzu.Binary.BinarySerializer { Options = YuzuCommonOptions };
 				} else if (format == Serialization.Format.JSON) {
 					ys = new global::Yuzu.Json.JsonSerializer {
-						Options = defaultYuzuCommonOptions,
-						JsonOptions = defaultYuzuJsonOptions
+						Options = YuzuCommonOptions,
+						JsonOptions = YuzuJsonOptions
 					};
 				}
 				ys.ToStream(instance, stream);
@@ -140,7 +140,7 @@ namespace Lime
 			try {
 				AbstractDeserializer d = null;
 				if (CheckBinarySignature(stream)) {
-					d = new GeneratedDeserializersBIN.BinaryDeserializerGen { Options = defaultYuzuCommonOptions };
+					d = new GeneratedDeserializersBIN.BinaryDeserializerGen { Options = YuzuCommonOptions };
 				} else {
 					foreach (var db in DeserializerBuilders) {
 						d = db(path, stream);
