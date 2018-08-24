@@ -819,10 +819,6 @@ namespace Lime
 				return;
 			}
 
-			var ww = value?.GetRoot() as WindowWidget;
-			if (ww != null && !ww.Window.Active) {
-				ww.Window.Activate();
-			}
 			Focused = value;
 			Application.InvalidateWindows();
 		}
