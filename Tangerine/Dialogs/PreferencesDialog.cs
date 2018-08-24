@@ -587,7 +587,7 @@ namespace Tangerine
 				expandButton.Enabled = filteredCommands.Any();
 				foreach (var command in filteredCommands) {
 					var editor = new ShortcutPropertyEditor(
-						new PreferencesPropertyEditorParams(expandableContent, command, "Shortcut", command.Title));
+						new PreferencesPropertyEditorParams(expandableContent, command, "Shortcut", displayName: command.Title));
 					editor.PropertyLabel.OverflowMode = TextOverflowMode.Ellipsis;
 					editor.PropertyLabel.LayoutCell = new LayoutCell(Alignment.LeftCenter, 1);
 					editor.PropertyLabel.Padding = new Thickness(expandButton.Width, 0);
