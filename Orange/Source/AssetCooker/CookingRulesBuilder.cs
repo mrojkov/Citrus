@@ -80,7 +80,7 @@ namespace Orange
 	public class ParticularCookingRules : ICookingRules
 	{
 		// NOTE: function `Override` uses the fact that rule name being parsed matches the field name
-		// for all fields marked with `YuzuRequired`. So don't rename them or do so with cautiousness.
+		// for all fields marked with `YuzuOptional`. So don't rename them or do so with cautiousness.
 		// e.g. don't rename `Bundle` to `Bundles`
 
 		[YuzuMember]

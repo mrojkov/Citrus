@@ -23,87 +23,87 @@ namespace Lime
 		[YuzuDontGenerateDeserializer]
 		public class ColorTheme
 		{
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 BlackText { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 GrayText { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 WhiteBackground { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 GrayBackground { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 SelectedBackground { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 HoveredBackground { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 ControlBorder { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public ColorGradient ButtonDefault { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public ColorGradient ButtonHover { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public ColorGradient ButtonPress { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public ColorGradient ButtonDisable { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public ColorGradient ExpandButtonDefault { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public ColorGradient ExpandButtonHover { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public ColorGradient ExpandButtonPress { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public ColorGradient ExpandButtonDisable { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public ColorGradient PathBarButtonNormal { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public ColorGradient PathBarButtonHover { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public ColorGradient PathBarButtonPress { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 PathBarButtonOutlineNormal { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 PathBarButtonOutlineHover { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 PathBarButtonOutlinePress { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 DirectoryPickerBackground { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 DirectoryPickerOutline { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 DirectoryPickerItemHoveredBackground { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 TabNormal { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 TabActive { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 SeparatorColor { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 KeyboardFocusBorder { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 TextSelection { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 CloseButtonNormal { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 CloseButtonHovered { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 CloseButtonPressed { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 CloseButtonFocusBorderNormal { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 CloseButtonFocusBorderHovered { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 ScrollbarBackground { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 ScrollbarThumb { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 TextCaret { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 ZebraColor1 { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 ZebraColor2 { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 SelectedBorder { get; set; }
-			[YuzuRequired]
+			[YuzuOptional]
 			public Color4 RedText { get; set; }
 
 			public static ColorTheme CreateDarkTheme()

@@ -19,7 +19,7 @@ namespace Tangerine.UI.FilesystemView
 
 	public class ViewNode
 	{
-		[YuzuRequired]
+		[YuzuOptional]
 		public List<ViewNode> Children { get; private set; } = new List<ViewNode>();
 
 		public ViewNode Parent;
@@ -29,28 +29,28 @@ namespace Tangerine.UI.FilesystemView
 
 	public class SplitterNode : ViewNode
 	{
-		[YuzuRequired]
+		[YuzuOptional]
 		public SplitterType Type;
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public List<float> Stretches = new List<float>();
 	}
 
 	public class FSViewNode : ViewNode
 	{
-		[YuzuRequired]
+		[YuzuOptional]
 		public string Path = Project.Current?.AssetsDirectory ?? Directory.GetCurrentDirectory();
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public bool ShowCookingRulesEditor = false;
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public bool ShowSelectionPreview = true;
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public List<float> CookingRulesSplitterStretches = new List<float>();
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public List<float> SelectionPreviewSplitterStretches = new List<float>();
 	}
 }

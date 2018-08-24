@@ -8,37 +8,37 @@ namespace Tangerine.UI.SceneView
 {
 	public class SceneUserPreferences : Component
 	{
-		[YuzuRequired]
+		[YuzuOptional]
 		public float DefaultBoneWidth { get; set; }
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public bool EnableChessBackground { get; set; }
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public Color4 BackgroundColorA { get; set; }
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public Color4 BackgroundColorB { get; set; }
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public Color4 RootWidgetOverlayColor { get; set; }
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public Color4 AnimationPreviewBackground { get; set; }
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public bool DrawFrameBorder { get; set; }
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public bool SnapWidgetBorderToRuler { get; set; }
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public bool SnapWidgetPivotToRuler { get; set; }
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public bool SnapRulerLinesToWidgets { get; set; }
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public VisualHintsRegistry VisualHintsRegister { get; set; }
 
 		public SceneUserPreferences()

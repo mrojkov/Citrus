@@ -6,10 +6,10 @@ namespace Tangerine.Core
 {
 	public class Ruler
 	{
-		[YuzuRequired]
+		[YuzuOptional]
 		public List<RulerLine> Lines { get; } = new List<RulerLine>();
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public string Name { get; set; }
 
 		[YuzuMember]
@@ -20,10 +20,10 @@ namespace Tangerine.Core
 
 	public class RulerLine
 	{
-		[YuzuRequired]
+		[YuzuOptional]
 		public float Value { get; set; }
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public RulerOrientation RulerOrientation { get; set; }
 
 		public RulerLine() { }
