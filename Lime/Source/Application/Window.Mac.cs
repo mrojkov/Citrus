@@ -465,7 +465,7 @@ namespace Lime
 			RefreshMousePosition();
 			RaiseUpdating(delta);
 			AudioSystem.Update();
-			if (Active) {
+			if (Active || Input.IsSimulationRunning) {
 				Input.CopyKeysState();
 				Input.ProcessPendingKeyEvents(delta);
 				Input.TextInput = null;

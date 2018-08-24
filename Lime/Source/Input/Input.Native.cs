@@ -322,10 +322,21 @@ namespace Lime
 		public class InputSimulator
 		{
 			readonly Input input;
+			private int activeRunners;
 
 			public InputSimulator(Input input)
 			{
 				this.input = input;
+			}
+
+			public int ActiveRunners
+			{
+				get => activeRunners;
+				set
+				{
+					activeRunners = value;
+					Window.Current.Input.IsSimulationRunning = activeRunners > 0;
+				}
 			}
 
 			public void SetDesktopMousePosition(Vector2 position)
@@ -336,11 +347,6 @@ namespace Lime
 			public void SetKeyState(Key key, bool value)
 			{
 				input.SetKeyState(key, value);
-			}
-
-			public void SetWindowUnderMouse(IWindow window)
-			{
-				Application.WindowUnderMouse = window;
 			}
 
 			public void OnBetweenFrames(float delta)

@@ -16,6 +16,8 @@ namespace Lime
 
 		public bool Changed => Application.Input.Changed;
 
+		internal bool IsSimulationRunning { get; set; }
+
 		private Matrix32 mousePositionTransform = Matrix32.Identity;
 
 		public Matrix32 MousePositionTransform
@@ -203,6 +205,9 @@ namespace Lime
 
 		private bool ValidateKey(Key key)
 		{
+			if (IsSimulationRunning) {
+				return true;
+			}
 			if (key >= Key.Mouse0 && key <= Key.Touch3) {
 				return ownerWindow == Application.WindowUnderMouse;
 			} else {

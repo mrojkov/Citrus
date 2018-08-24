@@ -629,7 +629,7 @@ namespace Lime
 			RefreshMousePosition();
 			RaiseUpdating(delta);
 			AudioSystem.Update();
-			if (active) {
+			if (active || Input.IsSimulationRunning) {
 				Input.CopyKeysState();
 				Input.ProcessPendingKeyEvents(delta);
 				Input.TextInput = null;
