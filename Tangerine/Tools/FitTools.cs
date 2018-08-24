@@ -1,5 +1,6 @@
 using System.Linq;
 using Lime;
+using Tangerine.Core;
 using Tangerine.UI;
 using Tangerine.UI.SceneView;
 
@@ -13,7 +14,7 @@ namespace Tangerine
 				if (node is Frame) {
 					var frame = node as Frame;
 					if (!string.IsNullOrEmpty(frame.ContentsPath)) {
-						var extNode = Node.CreateFromAssetBundle(frame.ContentsPath);
+						var extNode = Node.CreateFromAssetBundle(frame.ContentsPath, yuzu: TangerineYuzu.Instance.Value);
 						if (extNode is Widget) {
 							Core.Operations.SetAnimableProperty.Perform(node, nameof(Widget.Size), ((Widget)extNode).Size);
 						}
@@ -122,7 +123,7 @@ namespace Tangerine
 			if (Utils.CalcAABB(Core.Document.Current.SelectedNodes().Editable(), scene, out Rectangle aabb)) {
 				scene.Position = -aabb.Center * scene.Scale + new Vector2(frame.Width / 2, frame.Height / 2);
 			}
-			
+
 		}
 	}
 }

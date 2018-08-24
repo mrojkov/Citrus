@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.IO;
 using System.Collections.Generic;
@@ -68,7 +68,7 @@ namespace Tangerine.Core
 			Preferences.Initialize();
 			if (File.Exists(UserprefsPath)) {
 				try {
-					UserPreferences = Serialization.ReadObjectFromFile<ProjectUserPreferences>(UserprefsPath);
+					UserPreferences = TangerineYuzu.Instance.Value.ReadObjectFromFile<ProjectUserPreferences>(UserprefsPath);
 					foreach (var path in UserPreferences.Documents) {
 						try {
 							OpenDocument(path);
@@ -125,7 +125,7 @@ namespace Tangerine.Core
 				}
 			}
 			try {
-				Serialization.WriteObjectToFile(UserprefsPath, UserPreferences, Serialization.Format.JSON);
+				TangerineYuzu.Instance.Value.WriteObjectToFile(UserprefsPath, UserPreferences, Serialization.Format.JSON);
 			} catch (System.Exception) { }
 			AssetBundle.Current = null;
 			Current = Null;
@@ -405,7 +405,7 @@ namespace Tangerine.Core
 						// и мешает работать.
 						if (File.Exists(textureParamsPath)) {
 							try {
-								var existingParams = Serialization.ReadObjectFromFile<TextureParams>(textureParamsPath);
+								var existingParams = TangerineYuzu.Instance.Value.ReadObjectFromFile<TextureParams>(textureParamsPath);
 								if (existingParams.Equals(textureParams)) {
 									continue;
 								}
@@ -414,7 +414,7 @@ namespace Tangerine.Core
 								// этот костыль ещё и валил Танжерин по хз какому поводу.
 							}
 						}
-						Serialization.WriteObjectToFile(textureParamsPath, textureParams, Serialization.Format.JSON);
+						TangerineYuzu.Instance.Value.WriteObjectToFile(textureParamsPath, textureParams, Serialization.Format.JSON);
 					} else if (File.Exists(textureParamsPath)) {
 						File.Delete(textureParamsPath);
 					}

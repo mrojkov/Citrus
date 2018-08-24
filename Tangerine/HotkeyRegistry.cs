@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Tangerine.Core;
 using Tangerine.UI;
 
 namespace Tangerine
@@ -117,7 +118,7 @@ namespace Tangerine
 		public void Load(string filepath)
 		{
 			var data =
-				Serialization.ReadObjectFromFile<Dictionary<string, Dictionary<string, string>>>(filepath);
+				TangerineYuzu.Instance.Value.ReadObjectFromFile<Dictionary<string, Dictionary<string, string>>>(filepath);
 			foreach (var i in data) {
 				var category = Categories.FirstOrDefault(j => j.Id == i.Key);
 				if (category != null) {
@@ -156,7 +157,7 @@ namespace Tangerine
 				}
 				data.Add(category.Id, bindings);
 			}
-			Serialization.WriteObjectToFile(file, data, Serialization.Format.JSON);
+			TangerineYuzu.Instance.Value.WriteObjectToFile(file, data, Serialization.Format.JSON);
 		}
 
 		public void Save()

@@ -143,7 +143,7 @@ namespace Tangerine.Core
 			try {
 				Path = path;
 				Format = ResolveFormat(path);
-				RootNodeUnwrapped = Node.CreateFromAssetBundle(path);
+				RootNodeUnwrapped = Node.CreateFromAssetBundle(path, yuzu: TangerineYuzu.Instance.Value);
 				if (Format == DocumentFormat.Fbx) {
 					Path = defaultPath;
 				}
@@ -347,9 +347,9 @@ namespace Tangerine.Core
 			using (node = CreateCloneForSerialization(node)) {
 				if (format == DocumentFormat.Scene) {
 					var serializer = new HotSceneSerializer();
-					Serialization.WriteObject(path, ms, node, serializer);
+					TangerineYuzu.Instance.Value.WriteObject(path, ms, node, serializer);
 				} else {
-					Serialization.WriteObject(path, ms, node, Serialization.Format.JSON);
+					TangerineYuzu.Instance.Value.WriteObject(path, ms, node, Serialization.Format.JSON);
 				}
 			}
 			var fullPath = Project.Current.GetSystemPath(path, GetFileExtension(format));

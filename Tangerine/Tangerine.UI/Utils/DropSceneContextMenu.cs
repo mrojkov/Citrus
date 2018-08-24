@@ -19,7 +19,7 @@ namespace Tangerine.UI
 				new Command("Open in New Tab", () => Project.Current.OpenDocument(assetPath)),
 				new Command("Add As External Scene", () => Document.Current.History.DoTransaction(
 					() => {
-						var scene = Node.CreateFromAssetBundle(assetPath);
+						var scene = Node.CreateFromAssetBundle(assetPath, yuzu: TangerineYuzu.Instance.Value);
 						var node = CreateNode.Perform(scene.GetType());
 						SetProperty.Perform(node, nameof(Widget.ContentsPath), assetPath);
 						SetProperty.Perform(node, nameof(Node.Id), fileName);

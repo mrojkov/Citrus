@@ -4,6 +4,7 @@ using System.IO.Pipes;
 using System.Text;
 using System.Threading;
 using Lime;
+using Tangerine.Core;
 
 namespace Tangerine
 {
@@ -33,7 +34,7 @@ namespace Tangerine
 			if (!isOnlyInstance) {
 				if (args.Length > 0) {
 					var stream = new MemoryStream();
-					Serialization.WriteObject(string.Empty, stream, args, Serialization.Format.JSON);
+					TangerineYuzu.Instance.Value.WriteObject(string.Empty, stream, args, Serialization.Format.JSON);
 					var serializedArgs = Encoding.UTF8.GetString(stream.ToArray());
 					var manager = new NamedPipeManager(PipeServerName);
 					manager.Write(serializedArgs);
