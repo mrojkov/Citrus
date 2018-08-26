@@ -21,7 +21,7 @@ namespace Lime
 		private bool processLightning;
 		private LightSource lightSource;
 		private bool recieveShadows;
-		
+
 		[YuzuMember]
 		public string Name { get; set; }
 
@@ -104,7 +104,7 @@ namespace Lime
 					recieveShadows = value;
 					program = null;
 				}
-				
+
 			}
 		}
 

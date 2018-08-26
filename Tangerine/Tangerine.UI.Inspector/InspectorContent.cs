@@ -59,10 +59,13 @@ namespace Tangerine.UI.Inspector
 		{
 			while (true) {
 				var bt = t.BaseType;
-				if (bt?.GetCustomAttribute<MutuallyExclusiveDerivedComponentsAttribute>(true) == null) {
+				if (bt.GetType() == typeof(NodeComponent)) {
 					break;
 				}
 				t = bt;
+				if (t?.GetCustomAttribute<MutuallyExclusiveDerivedComponentsAttribute>(true) != null) {
+					break;
+				}
 			}
 			return $"[{Yuzu.Util.TypeSerializer.Serialize(t)}]";
 		}

@@ -322,9 +322,9 @@
     <Compile Include="Source\Widgets\NodeBehaviours.cs" />
     <Compile Include="Source\Widgets\TiledImage.cs" />
     <Compile Include="Source\Widgets\Materials\GradientMaterial.cs" />
-    <Compile Include="Source\Components\GradientMaterialComponent.cs" />
     <Compile Include="Source\Widgets\Layout\LinearLayout.cs" />
-    <Compile Include="Source\Widgets\Animation\HueComponent.cs" />
+    <Compile Include="Source\Widgets\Materials\HSLMaterial.cs" />
+    <Compile Include="Source\Widgets\Materials\MaterialComponent.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

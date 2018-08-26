@@ -202,7 +202,7 @@ namespace Tangerine.UI
 		private readonly Widget gradientPaneContainer;
 		private readonly Widget createPointsPane;
 		private readonly Image gradientPane;
-		private readonly GradientMaterialComponent gradientMaterialComponent;
+		private readonly GradientComponent gradientComponent;
 		private GradientControlPointWidget selectedControlPointWidget;
 		public GradientControlPoint SelectedControlPoint { get; private set; }
 
@@ -228,7 +228,7 @@ namespace Tangerine.UI
 
 		private void Rebuild()
 		{
-			gradientMaterialComponent.Gradient = gradient;
+			gradientComponent.Gradient = gradient;
 			gradientPaneContainer.Nodes.Clear();
 			gradientPaneContainer.Nodes.Add(gradientPane);
 			gradientPane.ExpandToContainerWithAnchors();
@@ -256,8 +256,8 @@ namespace Tangerine.UI
 				w.PrepareRendererState();
 				Renderer.DrawSprite(chessTexture, Color4.White, Vector2.Zero, w.Size, Vector2.Zero, new Vector2(w.Size.X / w.Size.Y, 1));
 			}));
-			gradientMaterialComponent = new GradientMaterialComponent();
-			gradientPane.Components.Add(gradientMaterialComponent);
+			gradientComponent = new GradientComponent();
+			gradientPane.Components.Add(gradientComponent);
 
 			gradientPaneContainer = new Widget {
 				LayoutCell = new LayoutCell(Alignment.LeftCenter, 1, 0.7f),
