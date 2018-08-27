@@ -61,7 +61,7 @@ namespace Tangerine.Dialogs
 		private static void CreateColorEditor(ThemedScrollView container, object source, string propertyName, string displayName, Func<object> valueGetter)
 		{
 			var tmp = new Color4PropertyEditor(
-				new PropertyEditorParams(
+				new PreferencesPropertyEditorParams(
 					container.Content,
 					source,
 					propertyName,

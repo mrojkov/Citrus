@@ -136,11 +136,11 @@ namespace Tangerine
 			pane.Content.Layout = new VBoxLayout { Spacing = 4 };
 			pane.Content.Padding = contentPadding;
 			var tmp = new BooleanPropertyEditor(
-				new PropertyEditorParams(pane.Content, UI.SceneView.SceneUserPreferences.Instance, nameof(UI.SceneView.SceneUserPreferences.EnableChessBackground), "Chess background"));
+				new PreferencesPropertyEditorParams(pane.Content, UI.SceneView.SceneUserPreferences.Instance, nameof(UI.SceneView.SceneUserPreferences.EnableChessBackground), "Chess background"));
 			tmp.ContainerWidget.AddChangeWatcher(
 				() => UI.SceneView.SceneUserPreferences.Instance.EnableChessBackground, (v) => Application.InvalidateWindows());
 			tmp = new BooleanPropertyEditor(
-				new PropertyEditorParams(pane.Content, UI.SceneView.SceneUserPreferences.Instance, nameof(UI.SceneView.SceneUserPreferences.DrawFrameBorder), "Draw frame border"));
+				new PreferencesPropertyEditorParams(pane.Content, UI.SceneView.SceneUserPreferences.Instance, nameof(UI.SceneView.SceneUserPreferences.DrawFrameBorder), "Draw frame border"));
 			tmp.ContainerWidget.AddChangeWatcher(
 				() => UI.SceneView.SceneUserPreferences.Instance.DrawFrameBorder, (v) => Application.InvalidateWindows());
 			editors.Add(tmp);
@@ -269,13 +269,13 @@ namespace Tangerine
 		private static IPropertyEditor CreateDarkIconsSwitch(Widget pane)
 		{
 			return new BooleanPropertyEditor(
-				new PropertyEditorParams(pane, AppUserPreferences.Instance.ColorTheme, nameof(ColorTheme.IsDark), "Dark icon theme"));
+				new PreferencesPropertyEditorParams(pane, AppUserPreferences.Instance.ColorTheme, nameof(ColorTheme.IsDark), null, "Dark icon theme"));
 		}
 
 		public void CreateColorPropertyEditor(string targetProperty, string text, object source, System.Func<object> valueGetter, ThemedScrollView container)
 		{
 			var tmp = new Color4PropertyEditor(
-				new PropertyEditorParams(
+				new PreferencesPropertyEditorParams(
 					container.Content,
 					source,
 					targetProperty,
@@ -306,26 +306,26 @@ namespace Tangerine
 			pane.Content.Padding = contentPadding;
 			editors.AddRange(new IPropertyEditor[] {
 				new BooleanPropertyEditor(
-					new PropertyEditorParams(pane.Content, CoreUserPreferences.Instance, nameof(CoreUserPreferences.ReloadModifiedFiles), "Reload modified files")),
+					new PreferencesPropertyEditorParams(pane.Content, CoreUserPreferences.Instance, nameof(CoreUserPreferences.ReloadModifiedFiles), "Reload modified files")),
 				new Vector2PropertyEditor(
-					new PropertyEditorParams(pane.Content, Tangerine.AppUserPreferences.Instance, nameof(Tangerine.AppUserPreferences.DefaultSceneDimensions), "Default scene dimensions")),
+					new PreferencesPropertyEditorParams(pane.Content, Tangerine.AppUserPreferences.Instance, nameof(Tangerine.AppUserPreferences.DefaultSceneDimensions), "Default scene dimensions")),
 				new BooleanPropertyEditor(
-					new PropertyEditorParams(pane.Content, CoreUserPreferences.Instance, nameof(CoreUserPreferences.AutoKeyframes), "Automatic keyframes")),
+					new PreferencesPropertyEditorParams(pane.Content, CoreUserPreferences.Instance, nameof(CoreUserPreferences.AutoKeyframes), "Automatic keyframes")),
 				new BooleanPropertyEditor(
-					new PropertyEditorParams(pane.Content, CoreUserPreferences.Instance, nameof(CoreUserPreferences.AnimationMode), "Animation mode")),
+					new PreferencesPropertyEditorParams(pane.Content, CoreUserPreferences.Instance, nameof(CoreUserPreferences.AnimationMode), "Animation mode")),
 				new IntPropertyEditor(
-						new PropertyEditorParams(pane.Content, Tangerine.AppUserPreferences.Instance, nameof(Tangerine.AppUserPreferences.AutosaveDelay), "Autosave delay")),
+						new PreferencesPropertyEditorParams(pane.Content, Tangerine.AppUserPreferences.Instance, nameof(Tangerine.AppUserPreferences.AutosaveDelay), "Autosave delay")),
 				new BooleanPropertyEditor(
-					new PropertyEditorParams(pane.Content, CoreUserPreferences.Instance, nameof(CoreUserPreferences.StopAnimationOnCurrentFrame), "Stop animaion on current frame")),
+					new PreferencesPropertyEditorParams(pane.Content, CoreUserPreferences.Instance, nameof(CoreUserPreferences.StopAnimationOnCurrentFrame), "Stop animaion on current frame")),
 			});
 			var boneWidthPropertyEditor =
 				new FloatPropertyEditor(
-					new PropertyEditorParams(pane.Content, UI.SceneView.SceneUserPreferences.Instance, nameof(UI.SceneView.SceneUserPreferences.DefaultBoneWidth), "Bone Width"));
+					new PreferencesPropertyEditorParams(pane.Content, UI.SceneView.SceneUserPreferences.Instance, nameof(UI.SceneView.SceneUserPreferences.DefaultBoneWidth), "Bone Width"));
 
 			boneWidthPropertyEditor.ContainerWidget.AddChangeWatcher(
 				() => UI.SceneView.SceneUserPreferences.Instance.DefaultBoneWidth, (v) => Application.InvalidateWindows());
 			new EnumPropertyEditor<KeyFunction>(
-				new PropertyEditorParams(pane.Content, CoreUserPreferences.Instance, nameof(CoreUserPreferences.DefaultKeyFunction), "Default interpolation"));
+				new PreferencesPropertyEditorParams(pane.Content, CoreUserPreferences.Instance, nameof(CoreUserPreferences.DefaultKeyFunction), "Default interpolation"));
 			parent.AddNode(pane);
 			return parent;
 		}
@@ -587,7 +587,7 @@ namespace Tangerine
 				expandButton.Enabled = filteredCommands.Any();
 				foreach (var command in filteredCommands) {
 					var editor = new ShortcutPropertyEditor(
-						new PropertyEditorParams(expandableContent, command, "Shortcut", command.Title));
+						new PreferencesPropertyEditorParams(expandableContent, command, "Shortcut", command.Title));
 					editor.PropertyLabel.OverflowMode = TextOverflowMode.Ellipsis;
 					editor.PropertyLabel.LayoutCell = new LayoutCell(Alignment.LeftCenter, 1);
 					editor.PropertyLabel.Padding = new Thickness(expandButton.Width, 0);

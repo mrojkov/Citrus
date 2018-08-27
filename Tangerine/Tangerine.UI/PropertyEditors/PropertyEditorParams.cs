@@ -54,4 +54,17 @@ namespace Tangerine.UI
 
 		private void SetProperty(object obj, string propertyName, object value) => PropertyInfo.SetValue(obj, value);
 	}
+
+	public class PreferencesPropertyEditorParams : PropertyEditorParams
+	{
+		public PreferencesPropertyEditorParams(Widget inspectorPane, object obj, string propertyName, string propertyPath = null, string displayName = null) : base(inspectorPane, obj, propertyName, propertyPath, displayName)
+		{
+			LabelWidth = 200;
+		}
+
+		public PreferencesPropertyEditorParams(Widget inspectorPane, IEnumerable<object> objects, IEnumerable<object> rootObjects, Type type, string propertyName, string propertyPath) : base(inspectorPane, objects, rootObjects, type, propertyName, propertyPath)
+		{
+			LabelWidth = 200;
+		}
+	}
 }
