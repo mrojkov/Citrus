@@ -100,7 +100,11 @@ namespace Lime
 		{
 			ShowingDropDownList?.Invoke();
 #if MAC || WIN
+#if WIN
 			var menu = new Menu(ignoreFirstFocusLoss: true);
+#else
+			var menu = new Menu();
+#endif
 			int j = 0;
 			ICommand selectedCommand = null;
 			foreach (var i in Items) {
