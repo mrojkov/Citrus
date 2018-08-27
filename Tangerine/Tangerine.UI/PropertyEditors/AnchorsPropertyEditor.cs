@@ -10,7 +10,7 @@ namespace Tangerine.UI
 
 		public AnchorsPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
-			group = new Widget { Layout = new HBoxLayout { DefaultCell = new LayoutCell(Alignment.Center), Spacing = 4 } };
+			group = new Widget { Layout = new HBoxLayout { DefaultCell = new DefaultLayoutCell(Alignment.Center), Spacing = 4 } };
 			ContainerWidget.AddNode(group);
 			firstButton = AddButton(Anchors.Left, "Anchor to the left");
 			AddButton(Anchors.Right, "Anchor to the right");

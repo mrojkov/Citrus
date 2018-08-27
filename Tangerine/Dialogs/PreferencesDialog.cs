@@ -294,7 +294,7 @@ namespace Tangerine
 			parent.Layout = new VBoxLayout { Spacing = 0 };
 			parent.Padding = contentPadding;
 			var platform = new Widget();
-			platform.Layout = new HBoxLayout { Spacing = 4, DefaultCell = new LayoutCell(Alignment.Center) };
+			platform.Layout = new HBoxLayout { Spacing = 4, DefaultCell = new DefaultLayoutCell(Alignment.Center) };
 			platform.Padding = contentPadding;
 			platform.AddNode(new ThemedSimpleText("Target platform"));
 			var platformPicker = (Orange.The.UI as OrangeInterface).PlatformPicker;

@@ -30,8 +30,8 @@ namespace Tangerine.UI
 							RowCount = 2,
 							Spacing = 8,
 							ColumnDefaults = {
-								new LayoutCell(Alignment.RightCenter, 0.5f, 0),
-								new LayoutCell(Alignment.LeftCenter, 1, 0)
+								new DefaultLayoutCell(Alignment.RightCenter, 0.5f, 0),
+								new DefaultLayoutCell(Alignment.LeftCenter, 1, 0)
 							}
 						},
 						Nodes = {

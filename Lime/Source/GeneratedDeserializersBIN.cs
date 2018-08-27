@@ -2089,6 +2089,50 @@ namespace GeneratedDeserializersBIN
 			return result;
 		}
 
+		private static void Read_Lime__DefaultLayoutCell(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.DefaultLayoutCell)obj;
+			var dg = (BinaryDeserializerGen)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Alignment));
+				var tmp1 = new global::Lime.Alignment();
+				tmp1.X = (global::Lime.HAlignment)d.Reader.ReadInt32();
+				tmp1.Y = (global::Lime.VAlignment)d.Reader.ReadInt32();
+				result.Alignment = tmp1
+;				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (2 == fd.OurIndex) {
+				result.ColumnSpan = d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (3 == fd.OurIndex) {
+				result.Ignore = d.Reader.ReadBoolean();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (4 == fd.OurIndex) {
+				result.RowSpan = d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (5 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Vector2));
+				var tmp2 = new global::Lime.Vector2();
+				tmp2.X = d.Reader.ReadSingle();
+				tmp2.Y = d.Reader.ReadSingle();
+				result.Stretch = tmp2
+;				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_Lime__DefaultLayoutCell(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.DefaultLayoutCell();
+			Read_Lime__DefaultLayoutCell(d, def, result);
+			return result;
+		}
+
 		private static void Read_Lime__DistortionMesh(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.DistortionMesh)obj;
@@ -2843,7 +2887,7 @@ namespace GeneratedDeserializersBIN
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
-				result.DefaultCell = (global::Lime.LayoutCell)dg.ReadObject<global::Lime.LayoutCell>();
+				result.DefaultCell = (global::Lime.DefaultLayoutCell)dg.ReadObject<global::Lime.DefaultLayoutCell>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
@@ -4047,7 +4091,7 @@ namespace GeneratedDeserializersBIN
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
-				result.DefaultCell = (global::Lime.LayoutCell)dg.ReadObject<global::Lime.LayoutCell>();
+				result.DefaultCell = (global::Lime.DefaultLayoutCell)dg.ReadObject<global::Lime.DefaultLayoutCell>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
@@ -8137,7 +8181,7 @@ namespace GeneratedDeserializersBIN
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
-				result.DefaultCell = (global::Lime.LayoutCell)dg.ReadObject<global::Lime.LayoutCell>();
+				result.DefaultCell = (global::Lime.DefaultLayoutCell)dg.ReadObject<global::Lime.DefaultLayoutCell>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
@@ -8218,12 +8262,12 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.ColumnDefaults = (global::System.Collections.Generic.List<global::Lime.LayoutCell>)null;
+				result.ColumnDefaults = (global::System.Collections.Generic.List<global::Lime.DefaultLayoutCell>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
-					result.ColumnDefaults = new global::System.Collections.Generic.List<global::Lime.LayoutCell>();
+					result.ColumnDefaults = new global::System.Collections.Generic.List<global::Lime.DefaultLayoutCell>();
 					while (--tmp1 >= 0) {
-						var tmp2 = (global::Lime.LayoutCell)dg.ReadObject<global::Lime.LayoutCell>();
+						var tmp2 = (global::Lime.DefaultLayoutCell)dg.ReadObject<global::Lime.DefaultLayoutCell>();
 						result.ColumnDefaults.Add(tmp2);
 					}
 				}
@@ -8234,7 +8278,7 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (4 == fd.OurIndex) {
-				result.DefaultCell = (global::Lime.LayoutCell)dg.ReadObject<global::Lime.LayoutCell>();
+				result.DefaultCell = (global::Lime.DefaultLayoutCell)dg.ReadObject<global::Lime.DefaultLayoutCell>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (5 == fd.OurIndex) {
@@ -8246,12 +8290,12 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (7 == fd.OurIndex) {
-				result.RowDefaults = (global::System.Collections.Generic.List<global::Lime.LayoutCell>)null;
+				result.RowDefaults = (global::System.Collections.Generic.List<global::Lime.DefaultLayoutCell>)null;
 				var tmp3 = d.Reader.ReadInt32();
 				if (tmp3 >= 0) {
-					result.RowDefaults = new global::System.Collections.Generic.List<global::Lime.LayoutCell>();
+					result.RowDefaults = new global::System.Collections.Generic.List<global::Lime.DefaultLayoutCell>();
 					while (--tmp3 >= 0) {
-						var tmp4 = (global::Lime.LayoutCell)dg.ReadObject<global::Lime.LayoutCell>();
+						var tmp4 = (global::Lime.DefaultLayoutCell)dg.ReadObject<global::Lime.DefaultLayoutCell>();
 						result.RowDefaults.Add(tmp4);
 					}
 				}
@@ -8722,7 +8766,7 @@ namespace GeneratedDeserializersBIN
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
-				result.DefaultCell = (global::Lime.LayoutCell)dg.ReadObject<global::Lime.LayoutCell>();
+				result.DefaultCell = (global::Lime.DefaultLayoutCell)dg.ReadObject<global::Lime.DefaultLayoutCell>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
@@ -9361,6 +9405,7 @@ namespace GeneratedDeserializersBIN
 			readCache[typeof(global::Lime.Camera3D)] = Read_Lime__Camera3D;
 			readCache[typeof(global::Lime.Color4Animator)] = Read_Lime__Color4Animator;
 			readCache[typeof(global::Lime.CommonMaterial)] = Read_Lime__CommonMaterial;
+			readCache[typeof(global::Lime.DefaultLayoutCell)] = Read_Lime__DefaultLayoutCell;
 			readCache[typeof(global::Lime.DistortionMesh)] = Read_Lime__DistortionMesh;
 			readCache[typeof(global::Lime.DistortionMeshPoint)] = Read_Lime__DistortionMeshPoint;
 			readCache[typeof(global::Lime.EmitterShapePoint)] = Read_Lime__EmitterShapePoint;
@@ -9517,6 +9562,7 @@ namespace GeneratedDeserializersBIN
 			makeCache[typeof(global::Lime.Color4)] = Make_Lime__Color4;
 			makeCache[typeof(global::Lime.Color4Animator)] = Make_Lime__Color4Animator;
 			makeCache[typeof(global::Lime.CommonMaterial)] = Make_Lime__CommonMaterial;
+			makeCache[typeof(global::Lime.DefaultLayoutCell)] = Make_Lime__DefaultLayoutCell;
 			makeCache[typeof(global::Lime.DistortionMesh)] = Make_Lime__DistortionMesh;
 			makeCache[typeof(global::Lime.DistortionMeshPoint)] = Make_Lime__DistortionMeshPoint;
 			makeCache[typeof(global::Lime.EmitterShapePoint)] = Make_Lime__EmitterShapePoint;

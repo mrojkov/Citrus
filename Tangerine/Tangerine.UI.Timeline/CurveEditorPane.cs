@@ -57,7 +57,7 @@ namespace Tangerine.UI.Timeline
 			toolbar = new Widget {
 				Padding = new Thickness(2, 0),
 				MinMaxHeight = Metrics.ToolbarHeight,
-				Layout = new HBoxLayout { Spacing = 4, DefaultCell = new LayoutCell { Alignment = Alignment.Center } },
+				Layout = new HBoxLayout { Spacing = 4, DefaultCell = new DefaultLayoutCell { Alignment = Alignment.Center } },
 				Presenter = new WidgetFlatFillPresenter(ColorTheme.Current.Toolbar.Background),
 			};
 			RootWidget = new Widget {
@@ -65,7 +65,7 @@ namespace Tangerine.UI.Timeline
 				Layout = new VBoxLayout(),
 				Nodes = { MainAreaWidget, toolbar }
 			};
-			RootWidget.AddChangeWatcher(() => RootWidget.Size, 
+			RootWidget.AddChangeWatcher(() => RootWidget.Size,
 				// Some document operation processors (e.g. ColumnCountUpdater) require up-to-date timeline dimensions.
 				_ => Core.Operations.Dummy.Perform());
 			RootWidget.Tasks.Add(
@@ -260,8 +260,8 @@ namespace Tangerine.UI.Timeline
 			ContentWidget.PrepareRendererState();
 			Renderer.DrawLine(
 				x, 0, x, MainAreaWidget.Height - 1,
-				Document.Current.PreviewAnimation ? 
-				ColorTheme.Current.TimelineRuler.RunningCursor : 
+				Document.Current.PreviewAnimation ?
+				ColorTheme.Current.TimelineRuler.RunningCursor :
 				ColorTheme.Current.TimelineRuler.Cursor);
 		}
 

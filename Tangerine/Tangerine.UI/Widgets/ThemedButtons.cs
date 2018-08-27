@@ -1,4 +1,4 @@
-﻿using Lime;
+using Lime;
 
 namespace Tangerine.UI
 {
