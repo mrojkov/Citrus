@@ -70,6 +70,9 @@ namespace Lime
 			return size - padding.LeftTop - padding.RightBottom;
 		}
 
+		public static bool operator ==(Thickness lhs, Thickness rhs) => lhs.Left == rhs.Left && lhs.Right == rhs.Right && lhs.Top == rhs.Right && lhs.Bottom == rhs.Bottom;
+		public static bool operator !=(Thickness lhs, Thickness rhs) => lhs.Left != rhs.Left || lhs.Right != rhs.Right || lhs.Top != rhs.Top || lhs.Bottom != rhs.Bottom;
+
 		public override string ToString()
 		{
 			return string.Format("{0}, {1}, {2}, {3}", Left, Top, Right, Bottom);

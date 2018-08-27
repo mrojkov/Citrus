@@ -398,7 +398,19 @@ namespace Lime
 		/// The widget presenter and layout should respect the padding.
 		/// </summary>
 		[YuzuMember]
-		public Thickness Padding { get; set; }
+		public Thickness Padding
+		{
+			get => padding;
+			set
+			{
+				if (padding != value) {
+					padding = value;
+					Layout.InvalidateConstraintsAndArrangement();
+				}
+			}
+		}
+
+		private Thickness padding;
 
 		public Vector2 ContentPosition => new Vector2(Padding.Left, Padding.Top);
 		public Vector2 ContentSize => new Vector2(Size.X - Padding.Left - Padding.Right, Size.Y - Padding.Top - Padding.Bottom);
