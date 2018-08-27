@@ -22,6 +22,7 @@ namespace Tangerine.UI.Timeline
 			ConnectCommand(TimelineCommands.EnterNode, enter, Document.HasCurrent);
 			ConnectCommand(TimelineCommands.EnterNodeAlias, enter, Document.HasCurrent);
 			ConnectCommand(TimelineCommands.EnterNodeMouse, enter, Document.HasCurrent);
+			ConnectCommand(TimelineCommands.Expand, Expand, Document.HasCurrent);
 			ConnectCommand(TimelineCommands.RenameRow, RenameCurrentRow);
 			ConnectCommand(TimelineCommands.ExitNode, LeaveNode.Perform);
 			ConnectCommand(TimelineCommands.ExitNodeAlias, LeaveNode.Perform);
@@ -77,7 +78,19 @@ namespace Tangerine.UI.Timeline
 			CommandHandlerList.Global.Connect(command, new DocumentDelegateCommandHandler(action, enableChecker));
 		}
 
-		static void RenameCurrentRow()
+		private static void Expand()
+		{
+			foreach (var row in Document.Current.SelectedRows().ToList()) {
+				if (row.Components.Get<NodeRow>() is NodeRow nodeRow) {
+					SetProperty.Perform(nodeRow, nameof(NodeRow.Expanded), !nodeRow.Expanded, isChangingDocument: false);
+					if (nodeRow.Expanded && row.Rows.Count > 0) {
+						Timeline.Instance.EnsureRowChildsVisible(row);
+					}
+				}
+			}
+		}
+
+		private static void RenameCurrentRow()
 		{
 			var doc = Document.Current;
 			if (doc.SelectedRows().Count() != 1) {
@@ -87,7 +100,7 @@ namespace Tangerine.UI.Timeline
 			row.Components.Get<RowView>().RollRow.Rename();
 		}
 
-		static void SelectRow(int advance, bool multiselection)
+		private static void SelectRow(int advance, bool multiselection)
 		{
 			var doc = Document.Current;
 			if (doc.Rows.Count == 0) {
@@ -110,7 +123,7 @@ namespace Tangerine.UI.Timeline
 			}
 		}
 
-		static void RemoveKeyframes()
+		private static void RemoveKeyframes()
 		{
 			foreach (var row in Document.Current.Rows) {
 				var spans = row.Components.GetOrAdd<GridSpanListComponent>().Spans;
@@ -132,12 +145,12 @@ namespace Tangerine.UI.Timeline
 			}
 		}
 
-		static void AdvanceCurrentColumn(int stride)
+		private static void AdvanceCurrentColumn(int stride)
 		{
 			Operations.SetCurrentColumn.Perform(Math.Max(0, Timeline.Instance.CurrentColumn + stride));
 		}
 
-		static void CreateMarker(MarkerAction action)
+		private static void CreateMarker(MarkerAction action)
 		{
 			var timeline = Timeline.Instance;
 			var nearestMarker = Document.Current.Container.Markers.LastOrDefault(
@@ -152,7 +165,7 @@ namespace Tangerine.UI.Timeline
 			SetMarker.Perform(Document.Current.Container, newMarker, true);
 		}
 
-		static string GenerateMarkerId(MarkerList markers, string markerId)
+		private static string GenerateMarkerId(MarkerList markers, string markerId)
 		{
 			int c = 1;
 			string id = markerId;
@@ -163,7 +176,7 @@ namespace Tangerine.UI.Timeline
 			return id;
 		}
 
-		static void DeleteMarker()
+		private static void DeleteMarker()
 		{
 			var timeline = Timeline.Instance;
 			var marker = Document.Current.Container.Markers.FirstOrDefault(i => i.Frame == timeline.CurrentColumn);
