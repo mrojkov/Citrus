@@ -15,7 +15,7 @@ namespace Tangerine.UI
 			EditorContainer.AddNode(Spacer.HStretch());
 			var current = CoalescedPropertyValue();
 			editor.Submitted += text => SetComponent(text, current);
-			editor.AddChangeWatcher(current, v => editor.Text = v.ToString());
+			editor.AddChangeWatcher(current, v => editor.Text = v.ToString("0.###"));
 		}
 
 		public void SetComponent(string text, IDataflowProvider<float> current)
@@ -23,7 +23,7 @@ namespace Tangerine.UI
 			if (Parser.TryParse(text, out double newValue)) {
 				SetProperty((float)newValue);
 			}
-			editor.Text = current.GetValue().ToString();
+			editor.Text = current.GetValue().ToString("0.###");
 		}
 
 		public override void Submit()

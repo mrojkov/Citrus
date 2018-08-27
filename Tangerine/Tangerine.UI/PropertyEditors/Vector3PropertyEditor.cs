@@ -25,9 +25,9 @@ namespace Tangerine.UI
 			editorX.Submitted += text => SetComponent(editorParams, 0, editorX, currentX.GetValue());
 			editorY.Submitted += text => SetComponent(editorParams, 1, editorY, currentY.GetValue());
 			editorZ.Submitted += text => SetComponent(editorParams, 2, editorZ, currentZ.GetValue());
-			editorX.AddChangeWatcher(currentX, v => editorX.Text = v.ToString());
-			editorY.AddChangeWatcher(currentY, v => editorY.Text = v.ToString());
-			editorZ.AddChangeWatcher(currentZ, v => editorZ.Text = v.ToString());
+			editorX.AddChangeWatcher(currentX, v => editorX.Text = v.ToString("0.###"));
+			editorY.AddChangeWatcher(currentY, v => editorY.Text = v.ToString("0.###"));
+			editorZ.AddChangeWatcher(currentZ, v => editorZ.Text = v.ToString("0.###"));
 		}
 
 		void SetComponent(IPropertyEditorParams editorParams, int component, NumericEditBox editor, float currentValue)
@@ -39,9 +39,9 @@ namespace Tangerine.UI
 						return current;
 					});
 				});
-				editor.Text = newValue.ToString();
+				editor.Text = newValue.ToString("0.###");
 			} else {
-				editor.Text = currentValue.ToString();
+				editor.Text = currentValue.ToString("0.###");
 			}
 		}
 

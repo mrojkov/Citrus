@@ -53,7 +53,7 @@ namespace Tangerine.UI
 			indexEditors[idx].Submitted += text => SetIndexValue(EditorParams, idx, indexEditors[idx], currentValue);
 			weigthsEditors[idx].Submitted += text => SetWeightValue(EditorParams, idx, weigthsEditors[idx], currentValue);
 			indexEditors[idx].AddChangeWatcher(provider, v => indexEditors[idx].Text = v[idx].Index.ToString());
-			weigthsEditors[idx].AddChangeWatcher(provider, v => weigthsEditors[idx].Text = v[idx].Weight.ToString());
+			weigthsEditors[idx].AddChangeWatcher(provider, v => weigthsEditors[idx].Text = v[idx].Weight.ToString("0.###"));
 		}
 
 		private void SetIndexValue(IPropertyEditorParams editorParams, int idx, CommonEditBox editor, SkinningWeights sw)
@@ -88,7 +88,7 @@ namespace Tangerine.UI
 					});
 				});
 			} else {
-				editor.Text = sw[idx].Weight.ToString();
+				editor.Text = sw[idx].Weight.ToString("0.###");
 			}
 		}
 	}
