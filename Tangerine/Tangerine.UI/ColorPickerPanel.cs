@@ -58,7 +58,7 @@ namespace Tangerine.UI
 
 		class TriangleColorWheel
 		{
-			readonly Property<ColorHSVA> color;
+			private readonly Property<ColorHSVA> color;
 
 			public const float InnerRadius = 100;
 			public const float OuterRadius = 120;
@@ -73,6 +73,8 @@ namespace Tangerine.UI
 			private const float CenterY = OuterRadius;
 			private const float CursorRadius = (OuterRadius - InnerRadius * Margin) / 2;
 
+			private bool wasHueChanged = true;
+
 			public TriangleColorWheel(Property<ColorHSVA> color)
 			{
 				this.color = color;
@@ -82,6 +84,7 @@ namespace Tangerine.UI
 					PostPresenter = new DelegatePresenter<Widget>(Render)
 				};
 				Widget.Tasks.Add(SelectTask());
+				Widget.AddChangeWatcher(() => color.Value.H, _ => wasHueChanged = true);
 			}
 
 			void Render(Widget widget)
@@ -111,26 +114,31 @@ namespace Tangerine.UI
 				Renderer.DrawCircle(cursor, CursorRadius, 20, Color4.Black);
 			}
 
+			private Texture2D texture = new Texture2D();
+			private Color4[] image;
+
 			void DrawControl()
 			{
 				int size = (int)Math.Floor(OuterRadius * 2);
-				var texture = new Texture2D();
-				Color4[] image = new Color4[size * size];
-				for (int y = 0; y < size; ++y) {
-					for (int x = 0; x < size; ++x) {
-						var pick = Pick(size - x - 1, y);
-						if (pick.Area == Area.Outside) {
-							image[y * size + x] = Color4.Transparent;
-						}
-						else if (pick.Area == Area.Wheel) {
-							image[y * size + x] = new ColorHSVA(pick.H.Value, 1, 1).ToRGBA();
-						}
-						else {
-							image[y * size + x] = new ColorHSVA(color.Value.H, pick.S.Value, pick.V.Value).ToRGBA();
+				if (wasHueChanged) {
+					if (image == null) {
+						image = new Color4[size * size];
+					}
+					for (int y = 0; y < size; ++y) {
+						for (int x = 0; x < size; ++x) {
+							var pick = Pick(size - x - 1, y);
+							if (pick.Area == Area.Outside) {
+								image[y * size + x] = Color4.Transparent;
+							} else if (pick.Area == Area.Wheel) {
+								image[y * size + x] = new ColorHSVA(pick.H.Value, 1, 1).ToRGBA();
+							} else {
+								image[y * size + x] = new ColorHSVA(color.Value.H, pick.S.Value, pick.V.Value).ToRGBA();
+							}
 						}
 					}
+					texture.LoadImage(image, size, size);
+					wasHueChanged = false;
 				}
-				texture.LoadImage(image, size, size);
 				Renderer.DrawSprite(texture, Color4.White, Vector2.Zero, Vector2.One * size, new Vector2(1, 0), new Vector2(0, 1));
 			}
 
