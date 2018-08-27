@@ -37,6 +37,8 @@ namespace Tangerine.UI
 				}
 			};
 			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
+			rootWidget.FocusScope.FocusNext.Add(Key.MapShortcut(Key.Right));
+			rootWidget.FocusScope.FocusPrevious.Add(Key.MapShortcut(Key.Left));
 			var cancelIndex = buttons.ToList().IndexOf("Cancel");
 			if (cancelIndex >= 0) {
 				result = cancelIndex;
