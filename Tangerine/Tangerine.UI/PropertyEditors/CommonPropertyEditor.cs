@@ -27,12 +27,12 @@ namespace Tangerine.UI
 					VAlignment = VAlignment.Center,
 					LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0),
 					ForceUncutText = false,
-					MinWidth = 120,
-					OverflowMode = TextOverflowMode.Minify,
+					MinWidth = editorParams.LabelWidth,
 					HitTestTarget = true,
 					TabTravesable = new TabTraversable()
 				};
 				PropertyLabel.Tasks.Add(ManageLabelTask());
+				ContainerWidget.Tasks.Add(Tip.ShowTipOnMouseOverTask(PropertyLabel, () => PropertyLabel.Text));
 				ContainerWidget.AddNode(PropertyLabel);
 			}
 		}
