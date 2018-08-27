@@ -59,7 +59,7 @@ namespace Tangerine.UI.Inspector
 		{
 			while (true) {
 				var bt = t.BaseType;
-				if (bt.GetType() == typeof(NodeComponent)) {
+				if (bt == typeof(NodeComponent)) {
 					break;
 				}
 				t = bt;
