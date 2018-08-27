@@ -35,8 +35,10 @@ namespace Tangerine.UI
 						return current;
 					});
 				});
+				editor.Text = newValue.ToString();
+			} else {
+				editor.Text = currentValue.ToString();
 			}
-			editor.Text = currentValue.ToString();
 		}
 
 		public override void Submit()
