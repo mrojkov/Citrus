@@ -47,7 +47,7 @@ namespace Lime
 		[TangerineInspect]
 		[TangerineKeyframeColor(30)]
 		public NodeReference<Image> DebugShadowMapImageRef { get; set; }
-		public Image DebugShadowMapImage => DebugShadowMapImageRef?.GetNode(this.Parent);
+		public Image DebugShadowMapImage => this.Parent == null ? null : DebugShadowMapImageRef?.GetNode(this.Parent);
 #endif
 
 		[YuzuMember]
