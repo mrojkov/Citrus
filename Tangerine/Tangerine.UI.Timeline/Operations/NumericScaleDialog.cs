@@ -23,7 +23,7 @@ namespace Tangerine.UI.Timeline
 			window = new Window(new WindowOptions {
 				ClientSize = new Vector2(250, 70),
 				FixedSize = true,
-				Title = "Numeric scale",
+				Title = "Numeric Scale",
 				Visible = false,
 			});
 			rootWidget = new ThemedInvalidableWindowWidget(window) {

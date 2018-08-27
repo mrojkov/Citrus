@@ -17,7 +17,7 @@ namespace Tangerine.UI.Timeline
 			window = new Window(new WindowOptions {
 				ClientSize = new Vector2(250, 70),
 				FixedSize = true,
-				Title = "Numeric move",
+				Title = "Numeric Move",
 				Visible = false,
 			});
 			rootWidget = new ThemedInvalidableWindowWidget(window) {
