@@ -21,8 +21,6 @@ namespace Tangerine.UI
 		private bool highlightable;
 		private string text;
 
-		public bool Selected { get; set; }
-
 		public bool Checked
 		{
 			get { return isChecked; }
@@ -136,9 +134,7 @@ namespace Tangerine.UI
 				borderColor = ColorTheme.Current.Toolbar.ButtonCheckedBorder;
 			} else {
 				bgColor = Color4.Transparent;
-				borderColor = Selected
-					? ColorTheme.Current.Toolbar.ButtonSelected
-					: Color4.Transparent;
+				borderColor = Color4.Transparent;
 			}
 		}
 
