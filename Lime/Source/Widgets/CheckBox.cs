@@ -17,9 +17,14 @@ namespace Lime
 		public CheckBoxState State
 		{
 			get => state;
-			set {
+			set => SetState(value);
+		}
+
+		private void SetState(CheckBoxState value, bool changedByUser = false)
+		{
+			if (state != value) {
 				state = value;
-				RiseChanged();
+				RiseChanged(changedByUser);
 				Window.Current.Invalidate();
 			}
 		}
@@ -69,9 +74,9 @@ namespace Lime
 		private void SetChecked(bool @checked, bool changedByUser = false)
 		{
 			if (@checked && State != CheckBoxState.Checked) {
-				State = CheckBoxState.Checked;
+				SetState(CheckBoxState.Checked, changedByUser);
 			} else if (!@checked && State != CheckBoxState.Unchecked) {
-				State = CheckBoxState.Unchecked;
+				SetState(CheckBoxState.Unchecked, changedByUser);
 			}
 		}
 

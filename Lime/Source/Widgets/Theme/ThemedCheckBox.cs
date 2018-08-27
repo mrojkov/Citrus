@@ -33,7 +33,7 @@ namespace Lime
 			};
 
 			private readonly VectorShape indeterminateIcon = new VectorShape {
-				new VectorShape.Line(0.1f, 0.5f, 0.9f, 0.5f, Theme.Colors.BlackText, 0.1f)
+				new VectorShape.Line(0.2f, 0.5f, 0.8f, 0.5f, Theme.Colors.BlackText, 0.6f, antialiased: false)
 			};
 
 			public CheckBoxPresenter(CheckBox checkBox)
