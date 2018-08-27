@@ -38,7 +38,7 @@ namespace Tangerine.UI
 				for (var j = 0; j < row.Panels.Count; ++j) {
 					var panel = row.Panels[j];
 					var panelWidget = new Widget {
-						Layout = new HBoxLayout { Spacing = 1, DefaultCell = new LayoutCell(Alignment.LeftCenter) },
+						Layout = new HBoxLayout { Spacing = 1, DefaultCell = new DefaultLayoutCell(Alignment.LeftCenter) },
 						LayoutCell = new LayoutCell(Alignment.LeftCenter) { StretchY = 0 },
 					};
 					if (panel.Draggable) {

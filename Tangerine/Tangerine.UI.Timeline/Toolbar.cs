@@ -17,7 +17,7 @@ namespace Tangerine.UI.Timeline
 				MinMaxHeight = Metrics.ToolbarHeight,
 				MinWidth = TimelineMetrics.ToolbarMinWidth,
 				Presenter = new WidgetFlatFillPresenter(ColorTheme.Current.Toolbar.Background),
-				Layout = new HBoxLayout { DefaultCell = new LayoutCell(Alignment.Center) },
+				Layout = new HBoxLayout { DefaultCell = new DefaultLayoutCell(Alignment.Center) },
 				Nodes = {
 					CreateAnimationModeButton(),
 					CreateAutoKeyframesButton(),

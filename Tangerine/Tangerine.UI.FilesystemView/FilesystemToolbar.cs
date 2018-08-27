@@ -25,7 +25,7 @@ namespace Tangerine.UI.FilesystemView
 			MinMaxHeight = Metrics.ToolbarHeight;
 			MinWidth = 50;// TimelineMetrics.ToolbarMinWidth;
 			Presenter = new DelegatePresenter<Widget>(Render);
-			Layout = new HBoxLayout { Spacing = 2, DefaultCell = new LayoutCell(Alignment.Center) };
+			Layout = new HBoxLayout { Spacing = 2, DefaultCell = new DefaultLayoutCell(Alignment.Center) };
 		}
 
 		static void Render(Widget widget)

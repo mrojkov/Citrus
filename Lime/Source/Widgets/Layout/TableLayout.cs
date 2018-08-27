@@ -71,10 +71,10 @@ namespace Lime
 		public float Spacing { set { ColumnSpacing = RowSpacing = value; } }
 
 		[YuzuMember]
-		public List<LayoutCell> ColumnDefaults = new List<LayoutCell>();
+		public List<DefaultLayoutCell> ColumnDefaults = new List<DefaultLayoutCell>();
 
 		[YuzuMember]
-		public List<LayoutCell> RowDefaults = new List<LayoutCell>();
+		public List<DefaultLayoutCell> RowDefaults = new List<DefaultLayoutCell>();
 
 		public TableLayout()
 		{
@@ -147,14 +147,14 @@ namespace Lime
 			}
 		}
 
-		private LayoutCell EffectiveLayoutCell(Widget cell, int row, int column)
+		private ILayoutCell EffectiveLayoutCell(Widget cell, int row, int column)
 		{
-			return cell.LayoutCell
+			return (ILayoutCell)cell.LayoutCell
 			       ?? (ColumnDefaults.Count > column
 				       ? ColumnDefaults[column]
 				       : (RowDefaults.Count > row
 					       ? RowDefaults[row]
-					       : (DefaultCell ?? LayoutCell.Default)));
+					       : (DefaultCell ?? DefaultLayoutCell.Default)));
 		}
 
 		private LinearAllocator.Constraints[] CalcColConstraints(Widget widget, Widget[,] cells)
@@ -261,8 +261,8 @@ namespace Lime
 		public override NodeComponent Clone()
 		{
 			var clone = (TableLayout)base.Clone();
-			clone.ColumnDefaults = new List<LayoutCell>();
-			clone.RowDefaults = new List<LayoutCell>();
+			clone.ColumnDefaults = new List<DefaultLayoutCell>();
+			clone.RowDefaults = new List<DefaultLayoutCell>();
 			return clone;
 		}
 	}

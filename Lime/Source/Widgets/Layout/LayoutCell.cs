@@ -3,10 +3,155 @@ using Yuzu;
 
 namespace Lime
 {
+	public interface ILayoutCell
+	{
+		Alignment Alignment { get; set; }
+		HAlignment HorizontalAlignment { get; set; }
+		VAlignment VerticalAlignment { get; set; }
+		int ColumnSpan { get; set; }
+		int RowSpan { get; set; }
+		Vector2 Stretch { get; set; }
+		float StretchX { get; set; }
+		float StretchY { get; set; }
+		bool Ignore { get; set; }
+		ILayoutCell Clone();
+	}
+
+	public class DefaultLayoutCell : ILayoutCell, IAnimable
+	{
+		public Layout Owner
+		{
+			get => owner;
+			set
+			{
+				owner?.InvalidateConstraintsAndArrangement();
+				owner = value;
+				owner?.InvalidateConstraintsAndArrangement();
+			}
+		}
+
+		Layout owner;
+
+		[TangerineIgnore]
+		[YuzuMember]
+		public Alignment Alignment
+		{
+			get => alignment;
+			set {
+				if (alignment != value) {
+					alignment = value;
+					owner?.InvalidateConstraintsAndArrangement();
+				}
+			}
+		}
+
+		private Alignment alignment;
+
+		[TangerineInspect]
+		public HAlignment HorizontalAlignment
+		{
+			get => Alignment.X;
+			set { Alignment = new Alignment { X = value, Y = Alignment.Y }; }
+		}
+
+		[TangerineInspect]
+		public VAlignment VerticalAlignment
+		{
+			get => Alignment.Y;
+			set { Alignment = new Alignment { X = Alignment.X, Y = value }; }
+		}
+
+
+		[YuzuMember]
+		public int ColumnSpan
+		{
+			get => columnSpan;
+			set {
+				if (columnSpan != value) {
+					columnSpan = value;
+					owner?.InvalidateConstraintsAndArrangement();
+				}
+			}
+		}
+
+		private int columnSpan = 1;
+
+		[YuzuMember]
+		public int RowSpan
+		{
+			get => rowSpan;
+			set {
+				if (rowSpan != value) {
+					rowSpan = value;
+					owner?.InvalidateConstraintsAndArrangement();
+				}
+			}
+		}
+
+		private int rowSpan = 1;
+
+		[YuzuMember]
+		public Vector2 Stretch
+		{
+			get => stretch;
+			set {
+				if (stretch != value) {
+					stretch = value;
+					owner?.InvalidateConstraintsAndArrangement();
+				}
+			}
+		}
+
+		private Vector2 stretch = Vector2.One;
+
+		public float StretchX { get { return Stretch.X; } set { Stretch = new Vector2(value, Stretch.Y); } }
+		public float StretchY { get { return Stretch.Y; } set { Stretch = new Vector2(Stretch.X, value); } }
+
+		[YuzuMember]
+		public bool Ignore
+		{
+			get => ignore;
+			set {
+				if (ignore != value) {
+					ignore = value;
+					owner?.InvalidateConstraintsAndArrangement();
+				}
+			}
+		}
+
+		private bool ignore;
+
+		public static readonly DefaultLayoutCell Default = new DefaultLayoutCell();
+
+		public DefaultLayoutCell() { }
+		public DefaultLayoutCell(Alignment alignment) { Alignment = alignment; }
+		public DefaultLayoutCell(Alignment alignment, float stretchX) : this(alignment, stretchX, 1) { }
+		public DefaultLayoutCell(Alignment alignment, float stretchX, float stretchY)
+		{
+			Alignment = alignment;
+			StretchX = stretchX;
+			StretchY = stretchY;
+		}
+
+		public ILayoutCell Clone()
+		{
+			var clone = (DefaultLayoutCell)MemberwiseClone();
+			clone.owner = null;
+			return clone;
+		}
+
+		public void UnbindAnimators()
+		{
+			((IAnimable)owner)?.UnbindAnimators();
+		}
+	}
+
 	[AllowedComponentOwnerTypes(typeof(Widget))]
 	[TangerineRegisterComponent]
-	public class LayoutCell : NodeComponent
+	public class LayoutCell : NodeComponent, ILayoutCell
 	{
+		public new Widget Owner { get => (Widget)base.Owner; set => base.Owner = value; }
+
 		[TangerineIgnore]
 		[YuzuMember]
 		public Alignment Alignment
@@ -16,7 +161,7 @@ namespace Lime
 			{
 				if (alignment != value) {
 					alignment = value;
-					InvalidateLayout();
+					Owner?.InvalidateParentConstraintsAndArrangement();
 				}
 			}
 		}
@@ -46,7 +191,7 @@ namespace Lime
 			{
 				if (columnSpan != value) {
 					columnSpan = value;
-					InvalidateLayout();
+					Owner?.InvalidateParentConstraintsAndArrangement();
 				}
 			}
 		}
@@ -61,7 +206,7 @@ namespace Lime
 			{
 				if (rowSpan != value) {
 					rowSpan = value;
-					InvalidateLayout();
+					Owner?.InvalidateParentConstraintsAndArrangement();
 				}
 			}
 		}
@@ -76,7 +221,7 @@ namespace Lime
 			{
 				if (stretch != value) {
 					stretch = value;
-					InvalidateLayout();
+					Owner?.InvalidateParentConstraintsAndArrangement();
 				}
 			}
 		}
@@ -94,13 +239,13 @@ namespace Lime
 			{
 				if (ignore != value) {
 					ignore = value;
-					InvalidateLayout();
+					Owner?.InvalidateParentConstraintsAndArrangement();
 				}
 			}
 		}
 
 		private bool ignore;
-		internal bool IsOwnedByLayout { get; set; }
+
 		public static readonly LayoutCell Default = new LayoutCell();
 
 		public LayoutCell() { }
@@ -116,18 +261,13 @@ namespace Lime
 		protected override void OnOwnerChanged(Node oldOwner)
 		{
 			base.OnOwnerChanged(oldOwner);
-			InvalidateLayout(oldOwner as Widget);
-			InvalidateLayout(Owner as Widget);
+			((Widget)oldOwner)?.InvalidateParentConstraintsAndArrangement();
+			Owner?.InvalidateParentConstraintsAndArrangement();
 		}
 
-		private void InvalidateLayout(Widget owner = null)
+		ILayoutCell ILayoutCell.Clone()
 		{
-			owner = owner ?? (Widget)Owner;
-			if (IsOwnedByLayout) {
-				owner?.Layout.InvalidateConstraintsAndArrangement();
-			} else {
-				owner?.InvalidateParentConstraintsAndArrangement();
-			}
+			return (ILayoutCell)Clone();
 		}
 	}
 

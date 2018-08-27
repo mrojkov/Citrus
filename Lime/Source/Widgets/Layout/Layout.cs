@@ -45,24 +45,22 @@ namespace Lime
 		public bool ArrangementValid { get; protected set; }
 
 		[YuzuMember]
-		public LayoutCell DefaultCell
+		public DefaultLayoutCell DefaultCell
 		{
 			get => defaultCell;
 			set
 			{
 				if (defaultCell != null) {
 					defaultCell.Owner = null;
-					defaultCell.IsOwnedByLayout = false;
 				}
 				defaultCell = value;
 				if (defaultCell != null) {
-					defaultCell.Owner = Owner;
-					defaultCell.IsOwnedByLayout = true;
+					defaultCell.Owner = this;
 				}
 			}
 		}
 
-		private LayoutCell defaultCell;
+		private DefaultLayoutCell defaultCell;
 
 		[YuzuMember]
 		public bool IgnoreHidden
@@ -123,7 +121,7 @@ namespace Lime
 			Layout clone = (Layout)base.Clone();
 			clone.DebugRectangles = null;
 			clone.defaultCell = null;
-			clone.DefaultCell = (LayoutCell)DefaultCell?.Clone();
+			clone.DefaultCell = (DefaultLayoutCell)DefaultCell?.Clone();
 			clone.ConstraintsValid = true;
 			clone.ArrangementValid = true;
 			clone.ignoreHidden = ignoreHidden;
@@ -134,7 +132,7 @@ namespace Lime
 		{
 			return Owner.Nodes.OfType<Widget>().Where(
 				i => (!IgnoreHidden || i.Visible) &&
-				!(i.LayoutCell ?? LayoutCell.Default).Ignore
+				!((ILayoutCell)i.LayoutCell ?? DefaultLayoutCell.Default).Ignore
 			).ToList();
 		}
 
@@ -159,9 +157,9 @@ namespace Lime
 			widget.Pivot = Vector2.Zero;
 		}
 
-		protected LayoutCell EffectiveLayoutCell(Widget widget)
+		protected ILayoutCell EffectiveLayoutCell(Widget widget)
 		{
-			return widget.LayoutCell ?? DefaultCell ?? LayoutCell.Default;
+			return widget.LayoutCell ?? (ILayoutCell)DefaultCell ?? LayoutCell.Default;
 		}
 
 		protected override void OnOwnerChanged(Node oldOwner)
@@ -175,7 +173,7 @@ namespace Lime
 				(w).Layout.InvalidateConstraintsAndArrangement();
 			}
 			if (defaultCell != null) {
-				defaultCell.Owner = Owner;
+				defaultCell.Owner = this;
 			}
 		}
 	}

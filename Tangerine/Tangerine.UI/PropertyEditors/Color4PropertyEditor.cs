@@ -16,7 +16,7 @@ namespace Tangerine.UI
 			var panel = new ColorPickerPanel();
 			var currentColor = CoalescedPropertyValue(Color4.White).DistinctUntilChanged();
 			ContainerWidget.AddNode(new Widget {
-				Layout = new HBoxLayout { DefaultCell = new LayoutCell(Alignment.Center) },
+				Layout = new HBoxLayout { DefaultCell = new DefaultLayoutCell(Alignment.Center) },
 				Nodes = {
 					(editor = editorParams.EditBoxFactory()),
 					new HSpacer(4),

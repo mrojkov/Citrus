@@ -119,7 +119,7 @@ namespace Tangerine.UI.BackupHistoryPanel
 				ColumnCount = 1,
 				ColumnSpacing = 8,
 				RowCount = history.Count,
-				ColumnDefaults = new List<LayoutCell> {new LayoutCell {StretchY = 0}}
+				ColumnDefaults = new List<DefaultLayoutCell> {new DefaultLayoutCell { StretchY = 0}}
 			};
 
 			for (int i = history.Count - 1; i >= 0; i--) {
