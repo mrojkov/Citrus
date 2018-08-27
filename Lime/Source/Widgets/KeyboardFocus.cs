@@ -63,13 +63,13 @@ namespace Lime
 			foreach (var key in FocusNext) {
 				if (Widget.Input.ConsumeKeyRepeat(key)) {
 					AdvanceFocus(1);
-					break;
+					return;
 				}
 			}
 			foreach (var key in FocusPrevious) {
 				if (Widget.Input.ConsumeKeyRepeat(key)) {
 					AdvanceFocus(-1);
-					break;
+					return;
 				}
 			}
 		}
