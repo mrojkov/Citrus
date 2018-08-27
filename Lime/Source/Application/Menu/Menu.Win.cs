@@ -18,7 +18,7 @@ namespace Lime
 			get
 			{
 				if (nativeMainMenu == null) {
-					nativeMainMenu = new MenuStrip() {
+					nativeMainMenu = new MenuStrip {
 						Renderer = new Renderer(new Colors()),
 						ForeColor = Colors.Text,
 						BackColor = Colors.Main,
@@ -195,12 +195,13 @@ namespace Lime
 			}
 
 			private static readonly Pen Pen = new Pen(Colors.Text, 2);
+			private static readonly Brush Brush = new SolidBrush(Colors.Text);
 			private static PointF[] CheckMark;
+			private static PointF[] Arrow;
 
 			protected override void OnRenderItemCheck(ToolStripItemImageRenderEventArgs e)
 			{
-				var tsMenuItem = e.Item as ToolStripMenuItem;
-				if (tsMenuItem != null) {
+				if (e.Item is ToolStripMenuItem tsMenuItem) {
 					if (CheckMark == null) {
 						int px = e.ImageRectangle.Left;
 						int py = e.ImageRectangle.Top;
@@ -213,6 +214,24 @@ namespace Lime
 						};
 					}
 					e.Graphics.DrawLines(Pen, CheckMark);
+				}
+			}
+
+			protected override void OnRenderArrow(ToolStripArrowRenderEventArgs e)
+			{
+				if (e.Item is ToolStripMenuItem tsMenuItem) {
+					if (Arrow == null) {
+						int px = e.ArrowRectangle.Left;
+						int py = e.ArrowRectangle.Top;
+						int sizex = e.ArrowRectangle.Size.Width;
+						int sizey = e.ArrowRectangle.Size.Height;
+						Arrow = new PointF[] {
+							new PointF(px + 0.2f * sizex, py + 0.2f * sizey),
+							new PointF(px + 0.8f * sizex, py + 0.5f * sizey),
+							new PointF(px + 0.2f * sizex, py + 0.8f * sizey)
+						};
+					}
+					e.Graphics.FillPolygon(Brush, Arrow);
 				}
 			}
 		}
@@ -229,7 +248,6 @@ namespace Lime
 			Command = command;
 			if (command == Lime.Command.MenuSeparator) {
 				NativeItem = new ToolStripSeparator();
-				var mi = (ToolStripSeparator)NativeItem;
 			} else {
 				NativeItem = new ToolStripMenuItem();
 				NativeItem.Click += (s, e) => CommandQueue.Instance.Add((Command)Command);
@@ -253,7 +271,6 @@ namespace Lime
 			mi.ShortcutKeys = ToNativeKeys(Command.Shortcut);
 			mi.Checked = Command.Checked;
 			mi.DropDown = ((Menu)Command.Menu)?.NativeContextMenu;
-
 		}
 
 		private static Keys ToNativeKeys(Shortcut shortcut)
@@ -319,7 +336,7 @@ namespace Lime
 		}
 	}
 
-	public static class Extensions
+	internal static class Extensions
 	{
 		public static Color ToColor(this Color4 color)
 		{
