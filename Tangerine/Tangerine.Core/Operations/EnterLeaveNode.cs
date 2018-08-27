@@ -14,9 +14,6 @@ namespace Tangerine.Core.Operations
 
 		public static bool Perform(Node container, bool selectFirstNode = true)
 		{
-			if (Document.Current.PreviewAnimation) {
-				Document.Current.TogglePreviewAnimation(CoreUserPreferences.Instance.AnimationMode, false);
-			}
 			if (!NodeCompositionValidator.CanHaveChildren(container.GetType())) {
 				return false;
 			}
@@ -52,9 +49,6 @@ namespace Tangerine.Core.Operations
 		public static void Perform()
 		{
 			var doc = Document.Current;
-			if (doc.PreviewAnimation) {
-				doc.TogglePreviewAnimation(CoreUserPreferences.Instance.AnimationMode, false);
-			}
 			if (doc.Container == doc.RootNode) {
 				var path = doc.SceneNavigatedFrom;
 				if (path != null) {
