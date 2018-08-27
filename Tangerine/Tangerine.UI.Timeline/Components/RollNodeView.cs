@@ -144,7 +144,12 @@ namespace Tangerine.UI.Timeline.Components
 			} else {
 				label.Text = node.Id;
 			}
-			label.Color = IsGrayedLabel(node) ? Theme.Colors.BlackText : ColorTheme.Current.TimelineRoll.GrayedLabel;
+			RefreshLabelColor();
+		}
+
+		public void RefreshLabelColor()
+		{
+			label.Color = IsGrayedLabel(nodeData.Node) ? Theme.Colors.BlackText : ColorTheme.Current.TimelineRoll.GrayedLabel;
 		}
 
 		ToolbarButton CreateEnterButton()

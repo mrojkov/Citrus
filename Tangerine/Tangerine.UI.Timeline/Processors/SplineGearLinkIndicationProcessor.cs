@@ -87,7 +87,7 @@ namespace Tangerine.UI.Timeline.Processors
 			where TGear : Node
 		{
 			if (!links.ContainsKey(node)) {
-				view.Label.Color = Theme.Colors.BlackText;
+				view.RefreshLabelColor();
 				return;
 			}
 			var indication = view.LinkIndicatorButtonContainer.EnableIndication<TLinkIndicatorButton>();
@@ -98,7 +98,7 @@ namespace Tangerine.UI.Timeline.Processors
 				}
 				indication.Tip = $"Linked to {gears.Count} {typeof(TGear).Name}s";
 			} else {
-				view.Label.Color = Theme.Colors.BlackText;
+				view.RefreshLabelColor();
 				indication.Color = Color4.White;
 				indication.Tip = $"Linked to {typeof(TGear).Name}";
 			}
