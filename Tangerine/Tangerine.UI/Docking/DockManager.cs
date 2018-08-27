@@ -422,6 +422,7 @@ namespace Tangerine.UI.Docking
 			var windowWidget = new ThemedInvalidableWindowWidget(window) {
 				Layout = new StackLayout(),
 			};
+			windowWidget.CompoundPostPresenter.Add(new WidgetBoundsPresenter(ColorTheme.Current.Docking.PanelTitleSeparator, 1));
 			windowWidget.WidgetContext.GestureManager = new HelpModeGestureManager(windowWidget.WidgetContext);
 			windowWidget.Components.Add(new RequestedDockingComponent());
 			windowWidget.CompoundPostPresenter.Add(new DockingPresenter());
