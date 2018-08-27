@@ -25,11 +25,11 @@ namespace Tangerine.Core.ExpressionParser
 	{
 		//TODO: autogenerate pattern based on a dictionary
 		private const string Pattern = @"(?xn)
-				(?<Number>(
+				(?<Number>((
 					(\d+\.?\d*) |
 					(\.?\d+) |
 					(\d+\.?\d+)
-				)([eE][-+]?\d+)?) |
+				)([eE][-+]?\d+)?) | (Infinity) | (NaN)) |
 				(?<Add>\+) |
 				(?<Substract>-) |
 				(?<Multiply>\*) |
@@ -55,7 +55,7 @@ namespace Tangerine.Core.ExpressionParser
 				}
 				position = skip.Index;
 				var match = Regex.Match(input, position);
-				if (match.Index != position) {
+				if (match.Index != position || !match.Success) {
 					yield return null;
 					yield break;
 				}
