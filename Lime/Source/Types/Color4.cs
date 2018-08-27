@@ -203,8 +203,19 @@ namespace Lime
 			}
 			int x, z;
 			x = (int)(amount * 255);
-			x = (x < 0) ? 0 :((x > 255) ? 255 : x);
-			var r = new Color4();
+			x = (x < 0) ? 0 : ((x > 255) ? 255 : x);
+			var r = value1;
+
+			// optimization for opacity 0 to 1 animation
+			if (value1.ABGR == 0x00FFFFFF && value2.ABGR == 0xFFFFFFFF) {
+				r.A = (byte)x;
+				return r;
+			}
+			if (value1.ABGR == 0xFFFFFFFF && value2.ABGR == 0x00FFFFFF) {
+				r.A = (byte)(255 - x);
+				return r;
+			}
+
 			z = (value1.R << 8) - value1.R + (value2.R - value1.R) * x;
 			r.R = (byte)(((z << 8) + z + 255) >> 16);
 			z = (value1.G << 8) - value1.G + (value2.G - value1.G) * x;
