@@ -12,6 +12,9 @@ namespace Tangerine.Core.Operations
 	{
 		public static void CopyToClipboard()
 		{
+			if (Document.Current == null) {
+				return;
+			}
 			Clipboard.Text = CopyToString();
 		}
 

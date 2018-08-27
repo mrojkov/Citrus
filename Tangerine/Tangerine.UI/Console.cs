@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -72,6 +72,7 @@ namespace Tangerine.UI
 				}
 				if (textView.Input.WasKeyPressed(Key.Mouse1)) {
 					textView.SetFocus();
+					Window.Current.Activate();
 					menu.Popup();
 				}
 				if (textView.IsFocused() && Command.Copy.WasIssued()) {
