@@ -22,7 +22,7 @@ namespace Tangerine.UI.Timeline
 		[YuzuOptional]
 		public bool AnimationStretchMode;
 
-		[YuzuRequired]
+		[YuzuOptional]
 		public bool SlowMotionMode;
 
 		public TimelineUserPreferences()

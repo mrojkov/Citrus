@@ -13,9 +13,9 @@ namespace Tangerine.UI.Timeline
 					yield return null;
 					continue;
 				}
-				Document.Current.Container.AnimationSpeed = 1;
-				if (Window.Current.Input.IsKeyPressed(Key.Tilde) || TimelineUserPreferences.Instance.SlowMotionMode) {
-					Document.Current.Container.AnimationSpeed = 0.1f;
+				Document.Current.SlowMotion = false;
+				if (Application.Input.IsKeyPressed(Key.Tilde) || TimelineUserPreferences.Instance.SlowMotionMode) {
+					Document.Current.SlowMotion = true;
 				}
 				yield return null;
 			}

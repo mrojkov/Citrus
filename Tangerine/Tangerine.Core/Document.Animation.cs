@@ -1,9 +1,10 @@
-﻿using Lime;
+using Lime;
 
 namespace Tangerine.Core
 {
 	public sealed partial class Document
 	{
+		public bool SlowMotion { get; set; }
 
 		public static bool CacheAnimationsStates
 		{

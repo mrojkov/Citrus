@@ -161,7 +161,7 @@ namespace Tangerine.UI.Timeline
 
 		private ToolbarButton CreateSlowMotionButton()
 		{
-			var button = new ToolbarButton(IconPool.GetTexture("Timeline.SlowMotionMode")) { Tip = "Slow motion mode" };
+			var button = new ToolbarButton(IconPool.GetTexture("Timeline.SlowMotionMode")) { Tip = "Slow motion mode (~)" };
 			button.AddChangeWatcher(() => UserPreferences.SlowMotionMode, i => button.Checked = i);
 			button.Clicked += () => UserPreferences.SlowMotionMode = !UserPreferences.SlowMotionMode;
 			button.Components.Add(new DocumentationComponent("SlowMotionMode.md"));
