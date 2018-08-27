@@ -70,12 +70,8 @@ namespace Lime
 		{
 			if (@checked && State != CheckBoxState.Checked) {
 				State = CheckBoxState.Checked;
-				RiseChanged(changedByUser);
-				Window.Current.Invalidate();
 			} else if (!@checked && State != CheckBoxState.Unchecked) {
 				State = CheckBoxState.Unchecked;
-				RiseChanged(changedByUser);
-				Window.Current.Invalidate();
 			}
 		}
 
