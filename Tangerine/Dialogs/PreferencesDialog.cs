@@ -33,6 +33,7 @@ namespace Tangerine
 
 		private bool saved = false;
 		private HotkeyProfile currentProfile;
+		private bool themeChanged;
 
 		public PreferencesDialog()
 		{
@@ -80,7 +81,9 @@ namespace Tangerine
 				window.Close();
 				VisualHintsPanel.Refresh();
 				Core.UserPreferences.Instance.Save();
-				AlertDialog.Show("Color theme changes will be applied after Tangerine restart.");
+				if (themeChanged) {
+					AlertDialog.Show("Color theme changes will be applied after Tangerine restart.");
+				}
 			};
 			resetButton.Clicked += () => {
 				if (new AlertDialog($"Are you sure you want to reset to defaults?", "Yes", "Cancel").Show() == 0) {
@@ -173,14 +176,24 @@ namespace Tangerine
 
 		private Widget CreateThemePane()
 		{
-			return new Widget {
+			var pane = new Widget {
 				Layout = new VBoxLayout { Spacing = 10 },
 				Padding = contentPadding,
 				Nodes = { CreateThemeEditor() }
 			};
+			return pane;
 		}
 
-		private static Widget CreateThemeEditor()
+		public bool DarkIcons {
+			get {
+				return AppUserPreferences.Instance.ColorTheme.IsDark;
+			}
+			set {
+				AppUserPreferences.Instance.ColorTheme.IsDark = value;
+			}
+		}
+
+		private Widget CreateThemeEditor()
 		{
 			var pane = new Widget {
 				Layout = new VBoxLayout { Spacing = 10 },
@@ -190,13 +203,13 @@ namespace Tangerine
 				Layout = new VBoxLayout { Spacing = 10 },
 				Padding = contentPadding
 			};
+			pane.AddChangeWatcher(() => themeEditor.Version, _ => themeChanged = true);
 			var darkIcons = CreateDarkIconsSwitch(pane);
 			var loadDarkButton = new ThemedButton("Dark preset") {
 				Clicked = () => {
 					AppUserPreferences.Instance.LimeColorTheme = Theme.ColorTheme.CreateDarkTheme();
 					AppUserPreferences.Instance.ColorTheme = ColorTheme.CreateDarkTheme();
 					themeEditor.Rebuild();
-					RebuildThemeEditor(pane);
 				}
 			};
 			var loadLightButton = new ThemedButton("Light preset") {
@@ -204,7 +217,6 @@ namespace Tangerine
 					AppUserPreferences.Instance.LimeColorTheme = Theme.ColorTheme.CreateLightTheme();
 					AppUserPreferences.Instance.ColorTheme = ColorTheme.CreateLightTheme();
 					themeEditor.Rebuild();
-					RebuildThemeEditor(pane);
 				}
 			};
 			var saveButton = new ThemedButton("Save theme") {
@@ -247,7 +259,7 @@ namespace Tangerine
 							AlertDialog.Show(e.Message);
 						}
 					}
-					RebuildThemeEditor(pane);
+					themeEditor.Rebuild();
 				}
 			};
 			var buttons = new Widget {
@@ -259,17 +271,10 @@ namespace Tangerine
 			return pane;
 		}
 
-		private static void RebuildThemeEditor(Widget pane)
-		{
-			var parent = pane.ParentWidget;
-			parent.Nodes.Clear();
-			parent.AddNode(CreateThemeEditor());
-		}
-
-		private static IPropertyEditor CreateDarkIconsSwitch(Widget pane)
+		private IPropertyEditor CreateDarkIconsSwitch(Widget pane)
 		{
 			return new BooleanPropertyEditor(
-				new PreferencesPropertyEditorParams(pane, AppUserPreferences.Instance.ColorTheme, propertyName: nameof(ColorTheme.IsDark), displayName: "Dark icon theme"));
+				new PreferencesPropertyEditorParams(pane, this, propertyName: nameof(DarkIcons), displayName: "Dark icon theme"));
 		}
 
 		public void CreateColorPropertyEditor(string targetProperty, string text, object source, System.Func<object> valueGetter, ThemedScrollView container)

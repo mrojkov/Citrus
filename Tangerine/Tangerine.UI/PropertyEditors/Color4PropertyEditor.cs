@@ -10,6 +10,8 @@ namespace Tangerine.UI
 		private EditBox editor;
 		private Color4 lastColor;
 
+		public event Action Changed;
+
 		public Color4PropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
 			ColorBoxButton colorBox;
@@ -31,6 +33,7 @@ namespace Tangerine.UI
 				if (panel.Color != v) {
 					panel.Color = v;
 				}
+				Changed?.Invoke();
 			}));
 			panel.Changed += () => {
 				EditorParams.History?.RollbackTransaction();
@@ -42,7 +45,7 @@ namespace Tangerine.UI
 			};
 			panel.DragEnded += () => {
 				if (panel.Color != lastColor) {
-					EditorParams.History?.CommitTransaction();
+				EditorParams.History?.CommitTransaction();
 				}
 				EditorParams.History?.EndTransaction();
 			};
