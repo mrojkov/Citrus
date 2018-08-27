@@ -15,7 +15,7 @@ namespace Tangerine.UI
 		private readonly Button cancelButton;
 		private readonly ThemedEditBox editor;
 
-		public TextEditorDialog(string title, string text, int maxLines, Action<string> onSave)
+		public TextEditorDialog(string title, string text, Action<string> onSave)
 		{
 			window = new Window(new WindowOptions {
 				ClientSize = new Vector2(300, 200),
@@ -50,8 +50,10 @@ namespace Tangerine.UI
 					}
 				}
 			};
+			// TODO: implement multiline scrollable text editor.
+			const int maxLines = 640;
 			editor.Editor.EditorParams.MaxLines = maxLines;
-			editor.MinHeight = editor.TextWidget.FontHeight * (maxLines + 1);
+			editor.MinHeight = editor.TextWidget.FontHeight * maxLines;
 			editor.TextWidget.VAlignment = VAlignment.Top;
 			cancelButton.Clicked += () => {
 				window.Close();

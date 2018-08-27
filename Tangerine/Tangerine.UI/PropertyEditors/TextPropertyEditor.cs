@@ -29,7 +29,7 @@ namespace Tangerine.UI
 			editor.Submitted += text => SetProperty(text);
 			editor.AddChangeWatcher(CoalescedPropertyValue(), v => editor.Text = v);
 			button.Clicked += () => {
-				var window = new TextEditorDialog(editorParams.DisplayName ?? editorParams.PropertyName, editor.Text, maxLines, (s) => {
+				var window = new TextEditorDialog(editorParams.DisplayName ?? editorParams.PropertyName, editor.Text, (s) => {
 					SetProperty(s);
 				});
 			};
