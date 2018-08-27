@@ -47,7 +47,11 @@ namespace Tangerine.UI.SceneView
 			topRulerBar.CompoundPostPresenter.Push(new RulerBarPresenter(RulerOrientation.Horizontal));
 			leftRulerBar.CompoundPostPresenter.Push(new RulerBarPresenter(RulerOrientation.Vertical));
 			CompoundPostPresenter.Push(new RulerLinesPresenter(leftRulerBar, topRulerBar));
-			this.AddChangeWatcher(LocalMousePosition, lp => Window.Current.Invalidate());
+			this.AddChangeWatcher(LocalMousePosition, _ => {
+				if (SceneView.Instance.Panel.IsMouseOverThisOrDescendant()) {
+					Window.Current.Invalidate();
+				}
+			});
 			this.AddChangeWatcher(() => ProjectUserPreferences.Instance.RulerVisible,
 				v => {
 					topRulerBar.Visible = v;
