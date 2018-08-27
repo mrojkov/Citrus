@@ -124,8 +124,9 @@ namespace Lime
 			clone.DebugRectangles = null;
 			clone.defaultCell = null;
 			clone.DefaultCell = (LayoutCell)DefaultCell?.Clone();
-			clone.ConstraintsValid = false;
-			clone.ArrangementValid = false;
+			clone.ConstraintsValid = true;
+			clone.ArrangementValid = true;
+			clone.ignoreHidden = ignoreHidden;
 			return clone;
 		}
 

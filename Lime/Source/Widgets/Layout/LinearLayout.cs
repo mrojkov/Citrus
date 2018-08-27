@@ -146,5 +146,12 @@ namespace Lime
 			Owner.MeasuredMinSize = minSize + extraSpace;
 			Owner.MeasuredMaxSize = maxSize + extraSpace;
 		}
+
+		public override NodeComponent Clone()
+		{
+			var clone = (LinearLayout)base.Clone();
+			clone.DebugRectangles = new List<Rectangle>();
+			return clone;
+		}
 	}
 }
