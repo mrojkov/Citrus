@@ -18,7 +18,7 @@ namespace Tangerine
 
 		public static bool Execute(string fileName)
 		{
-			if (Project.Current.Close() && fileName.Length > 0) {
+			if (fileName != default && Project.Current.Close() && fileName.Length > 0) {
 				FontPool.Instance.Clear(preserveDefaultFont: true);
 				new Project(fileName).Open();
 				AddRecentProject(fileName);
