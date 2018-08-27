@@ -61,13 +61,13 @@ namespace Orange
 					RowCount = 2,
 					RowSpacing = 6,
 					ColumnSpacing = 6,
-					RowDefaults = new List<LayoutCell> {
-						new LayoutCell { StretchY = 0 },
-						new LayoutCell { StretchY = 0 },
+					RowDefaults = new List<DefaultLayoutCell> {
+						new DefaultLayoutCell { StretchY = 0 },
+						new DefaultLayoutCell { StretchY = 0 },
 					},
-					ColumnDefaults = new List<LayoutCell> {
-						new LayoutCell { StretchX = 0 },
-						new LayoutCell(),
+					ColumnDefaults = new List<DefaultLayoutCell> {
+						new DefaultLayoutCell { StretchX = 0 },
+						new DefaultLayoutCell(),
 					}
 				},
 				LayoutCell = new LayoutCell { StretchY = 0 }
