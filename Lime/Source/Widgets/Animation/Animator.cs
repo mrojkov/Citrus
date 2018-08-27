@@ -196,7 +196,7 @@ namespace Lime
 		{
 			var (p, animable) = AnimationUtils.GetPropertyByPath(Owner, TargetPropertyPath);
 			var mi = p.Info?.GetSetMethod();
-			if (animable == null || p.Info.PropertyType != typeof(T) || mi == null) {
+			if (animable == null || mi == null || p.Info.PropertyType != typeof(T)) {
 				IsZombie = true;
 				return;
 			}

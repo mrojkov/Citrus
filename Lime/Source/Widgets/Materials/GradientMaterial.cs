@@ -4,6 +4,34 @@ using Yuzu;
 
 namespace Lime
 {
+	[TangerineRegisterComponent]
+	public class GradientComponent : MaterialComponent<GradientMaterial>
+	{
+		[YuzuMember]
+		public float Angle
+		{
+			get => CustomMaterial.Angle;
+			set => CustomMaterial.Angle = value;
+		}
+
+		[YuzuMember]
+		public Blending Blending
+		{
+			get => CustomMaterial.Blending;
+			set => CustomMaterial.Blending = value;
+		}
+
+		[YuzuMember]
+		public ColorGradient Gradient
+		{
+			get => CustomMaterial.Gradient;
+			set => CustomMaterial.Gradient = value;
+		}
+
+		public GradientComponent()
+		{ }
+	}
+
 	public class GradientMaterial : IMaterial
 	{
 		const string vertexShader = @"
@@ -60,7 +88,6 @@ namespace Lime
 		private int currentSize;
 		public int PassCount => 1;
 
-		[YuzuMember]
 		public ColorGradient Gradient
 		{
 			get => gradient;
@@ -73,11 +100,9 @@ namespace Lime
 			}
 		}
 
-		[YuzuMember]
 		public float Angle { get; set; }
 
-		[YuzuMember]
-		public Blending Blending { get; set; }
+		public Blending Blending { get; set; } = Blending.Inherited;
 
 		public Texture2D GradientTexture { get; private set; }
 
@@ -100,6 +125,7 @@ namespace Lime
 					MinMagFilter = TextureFilter.Linear,
 				}
 			};
+			Gradient = new ColorGradient(Color4.White, Color4.Black);
 		}
 
 		public void Apply(int pass)
