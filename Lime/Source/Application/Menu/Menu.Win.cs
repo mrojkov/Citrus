@@ -3,6 +3,7 @@ using System;
 using System.Windows.Forms;
 using System.Collections.Generic;
 using System.Linq;
+using System.Drawing;
 
 namespace Lime
 {
@@ -17,7 +18,11 @@ namespace Lime
 			get
 			{
 				if (nativeMainMenu == null) {
-					nativeMainMenu = new MenuStrip();
+					nativeMainMenu = new MenuStrip {
+						Renderer = new Renderer(new Colors()),
+						ForeColor = Colors.Text,
+						BackColor = Colors.Main,
+					};
 					UpdateNativeMenu(nativeMainMenu);
 				}
 				return nativeMainMenu;
@@ -49,7 +54,10 @@ namespace Lime
 			{
 				if (nativeContextMenu == null) {
 					nativeContextMenu = new ContextMenuStrip {
-						ShowImageMargin = showImageMargin
+						ShowImageMargin = showImageMargin,
+						ForeColor = Colors.Text,
+						BackColor = Colors.Main,
+						Renderer = new Renderer(new Colors()),
 					};
 					UpdateNativeMenu(nativeContextMenu);
 				}
@@ -120,7 +128,7 @@ namespace Lime
 			var w = Window.Current as Window;
 			w.Input.ClearKeyState();
 			var mp = w.WorldToWindow(w.Input.MousePosition);
-			NativeContextMenu.Show(w.Form, new System.Drawing.Point(mp.X.Round(), mp.Y.Round()));
+			NativeContextMenu.Show(w.Form, new Point(mp.X.Round(), mp.Y.Round()));
 		}
 
 		public void Popup(IWindow window, Vector2 position, float minimumWidth, ICommand command)
@@ -140,6 +148,93 @@ namespace Lime
 			var mp = ((Window)window).WorldToWindow(position);
 			NativeContextMenu.Show(window.Form, new System.Drawing.Point(mp.X.Round(), mp.Y.Round()));
 		}
+
+		public class Colors : ProfessionalColorTable
+		{
+			public static Color Secondary => Theme.Colors.WhiteBackground.ToColor();
+			public static Color Main => Theme.Colors.GrayBackground.ToColor();
+			public static Color Text => Theme.Colors.BlackText.ToColor();
+			public static Color Highlight => Theme.Colors.SelectedBackground.ToColor();
+
+			public Colors() : base()
+			{
+				base.UseSystemColors = false;
+			}
+
+			public override Color MenuItemSelected => Highlight;
+			public override Color MenuItemSelectedGradientBegin => Highlight;
+			public override Color MenuItemSelectedGradientEnd => Highlight;
+			public override Color MenuItemPressedGradientBegin => Secondary;
+			public override Color MenuItemPressedGradientEnd => Secondary;
+			public override Color MenuItemBorder => Main;
+			public override Color MenuBorder => Highlight;
+			public override Color MenuStripGradientBegin => Main;
+			public override Color MenuStripGradientEnd => Secondary;
+			public override Color ImageMarginGradientBegin => Main;
+			public override Color ImageMarginGradientEnd => Main;
+			public override Color ImageMarginGradientMiddle => Main;
+			public override Color ImageMarginRevealedGradientBegin => Secondary;
+			public override Color ImageMarginRevealedGradientEnd => Secondary;
+			public override Color ImageMarginRevealedGradientMiddle => Secondary;
+			public override Color ButtonCheckedGradientBegin => Main;
+			public override Color ButtonCheckedGradientEnd => Main;
+			public override Color ButtonCheckedGradientMiddle => Main;
+			public override Color ButtonCheckedHighlight => Highlight;
+			public override Color ButtonCheckedHighlightBorder => Highlight;
+			public override Color CheckBackground => Secondary;
+			public override Color CheckSelectedBackground => Secondary;
+			public override Color CheckPressedBackground => Secondary;
+			public override Color MenuItemPressedGradientMiddle => Secondary;
+			public override Color ToolStripDropDownBackground => Secondary;
+		}
+
+		public class Renderer : ToolStripProfessionalRenderer
+		{
+			public Renderer(ProfessionalColorTable professionalColorTable) : base(professionalColorTable)
+			{
+			}
+
+			private static readonly Pen Pen = new Pen(Colors.Text, 2);
+			private static readonly Brush Brush = new SolidBrush(Colors.Text);
+			private static PointF[] CheckMark;
+			private static PointF[] Arrow;
+
+			protected override void OnRenderItemCheck(ToolStripItemImageRenderEventArgs e)
+			{
+				if (e.Item is ToolStripMenuItem tsMenuItem) {
+					if (CheckMark == null) {
+						int px = e.ImageRectangle.Left;
+						int py = e.ImageRectangle.Top;
+						int sizex = e.ImageRectangle.Size.Width;
+						int sizey = e.ImageRectangle.Size.Height;
+						CheckMark = new PointF[] {
+							new PointF(px + 0.25f * sizex, py + 0.5f * sizey),
+							new PointF(px + 0.5f * sizex, py + 0.75f * sizey),
+							new PointF(px + 0.8f * sizex, py + 0.2f * sizey)
+						};
+					}
+					e.Graphics.DrawLines(Pen, CheckMark);
+				}
+			}
+
+			protected override void OnRenderArrow(ToolStripArrowRenderEventArgs e)
+			{
+				if (e.Item is ToolStripMenuItem tsMenuItem) {
+					if (Arrow == null) {
+						int px = e.ArrowRectangle.Left;
+						int py = e.ArrowRectangle.Top;
+						int sizex = e.ArrowRectangle.Size.Width;
+						int sizey = e.ArrowRectangle.Size.Height;
+						Arrow = new PointF[] {
+							new PointF(px + 0.2f * sizex, py + 0.2f * sizey),
+							new PointF(px + 0.8f * sizex, py + 0.5f * sizey),
+							new PointF(px + 0.2f * sizex, py + 0.8f * sizey)
+						};
+					}
+					e.Graphics.FillPolygon(Brush, Arrow);
+				}
+			}
+		}
 	}
 
 	class MenuItem
@@ -156,7 +251,6 @@ namespace Lime
 			} else {
 				NativeItem = new ToolStripMenuItem();
 				NativeItem.Click += (s, e) => CommandQueue.Instance.Add((Command)Command);
-
 			}
 			Refresh();
 		}
@@ -239,6 +333,14 @@ namespace Lime
 				keys |= Keys.Shift;
 			}
 			return keys;
+		}
+	}
+
+	internal static class Extensions
+	{
+		public static Color ToColor(this Color4 color)
+		{
+			return Color.FromArgb(color.A, color.R, color.G, color.B);
 		}
 	}
 }
