@@ -401,9 +401,7 @@ namespace Tangerine.UI.FilesystemView
 				InvalidateView(model.CurrentPath);
 				lastKeyboardSelectedFilesystemItem = scrollView.Content.FirstChild as FilesystemItem;
 
-				selectionPreviewSplitter.Nodes.Clear();
-				selectionPreviewSplitter.Nodes.Add(scrollView);
-				selectionPreviewSplitter.Nodes.Add(preview.RootWidget);
+				selectionPreviewSplitter.Nodes.Insert(0, scrollView);
 			}
 		}
 
