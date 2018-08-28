@@ -14,5 +14,6 @@ namespace Tangerine.UI
 		SimpleText PropertyLabel { get; }
 		void DropFiles(IEnumerable<string> files);
 		void Submit();
+		bool IsAnimable { get; }
 	}
 }

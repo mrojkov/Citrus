@@ -14,6 +14,7 @@ namespace Tangerine.UI
 		public SimpleText PropertyLabel { get; private set; }
 		public Widget LabelContainer { get; private set; }
 		public Widget EditorContainer { get; private set; }
+		public bool IsAnimable { get; }
 
 		public CommonPropertyEditor(IPropertyEditorParams editorParams)
 		{
@@ -51,6 +52,10 @@ namespace Tangerine.UI
 			} else {
 				LabelContainer = EditorContainer = ContainerWidget;
 			}
+			IsAnimable = EditorParams.RootObjects.All(a => a is IAnimationHost) &&
+			             PropertyAttributes<TangerineStaticPropertyAttribute>.Get(EditorParams.PropertyInfo) == null &&
+			             AnimatorRegistry.Instance.Contains(EditorParams.PropertyInfo.PropertyType) &&
+			             !Document.Current.InspectRootNode;
 		}
 
 		IEnumerator<object> ManageLabelTask()
