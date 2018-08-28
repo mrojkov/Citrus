@@ -179,6 +179,7 @@ namespace Tangerine
 					SceneViewCommands.ResolutionChanger,
 					SceneViewCommands.ResolutionReverceChanger,
 					SceneViewCommands.ResolutionOrientation,
+					TimelineCommands.CenterTimelineOnCurrentColumn,
 					(localizationCommand = new Command("Localization", localizationMenu = new Menu()) {
 						Enabled = false
 					})
