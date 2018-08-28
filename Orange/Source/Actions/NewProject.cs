@@ -92,6 +92,7 @@ namespace Orange
 					Git("init");
 					Git("add -A");
 					Git("submodule add https://gitlab.game-forest.com:8888/Common/Citrus.git Citrus");
+					Git("submodule update --init --recursive");
 					Git("commit -m\"Initial commit.\"");
 #endif // WIN
 				}
