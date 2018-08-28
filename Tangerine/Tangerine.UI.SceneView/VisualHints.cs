@@ -16,7 +16,7 @@ namespace Tangerine.UI.SceneView
 		public bool Enabled { get; set; } = true;
 		[YuzuOptional]
 		public Dictionary<string, VisualHint> SubHints { get; private set; } = new Dictionary<string, VisualHint>();
-		[YuzuRequired]
+		[YuzuOptional]
 		public bool Expanded { get; set; } = false;
 
 		public Func<VisualHint, bool> HideRule;
