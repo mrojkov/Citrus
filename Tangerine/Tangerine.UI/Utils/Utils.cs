@@ -1,8 +1,9 @@
-﻿﻿using System;
-using System.Linq;
+using Lime;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using Lime;
+using System.Linq;
+using System.Text.RegularExpressions;
 using Tangerine.Core;
 
 namespace Tangerine.UI
@@ -130,6 +131,6 @@ namespace Tangerine.UI
 			assetPath = System.IO.Path.ChangeExtension(path, null);
 			assetType = System.IO.Path.GetExtension(path).ToLower();
 			return true;
-		}		
+		}
 	}
 }
