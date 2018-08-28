@@ -265,7 +265,11 @@ namespace Tangerine
 			};
 			var proj = AppUserPreferences.Instance.RecentProjects.FirstOrDefault();
 			if (proj != null) {
-				new Project(proj).Open();
+				try {
+					new Project(proj).Open();
+				} catch {
+					AlertDialog.Show($"Cannot open project '{proj}'. It may be deleted or be otherwise unavailable.");
+				}
 			}
 			OpenDocumentsFromArgs(args);
 			WidgetContext.Current.Root.AddChangeWatcher(() => Project.Current, project => TangerineMenu.OnProjectChanged(project));
