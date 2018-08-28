@@ -82,7 +82,10 @@ namespace Tangerine.UI.FilesystemView
 		private Widget CreateGoBackwardButton()
 		{
 			return new ToolbarButton(IconPool.GetTexture("Filesystem.ArrowLeft")) {
-				Clicked = () => view.GoBackward(),
+				Clicked = () => {
+					view.ScrollView.SetFocus();
+					view.GoBackward();
+				},
 			};
 		}
 
@@ -138,7 +141,10 @@ namespace Tangerine.UI.FilesystemView
 		private Widget CreateGoForwardButton()
 		{
 			return new ToolbarButton(IconPool.GetTexture("Filesystem.ArrowRight")) {
-				Clicked = () => view.GoForward(),
+				Clicked = () => {
+					view.ScrollView.SetFocus();
+					view.GoForward();
+				},
 			};
 		}
 
@@ -147,6 +153,7 @@ namespace Tangerine.UI.FilesystemView
 			return new ToolbarButton(IconPool.GetTexture("Filesystem.Home")) {
 				Clicked = () => {
 					if (Project.Current != Project.Null) {
+						view.ScrollView.SetFocus();
 						view.GoTo(Project.Current.AssetsDirectory);
 					}
 				}
@@ -156,7 +163,10 @@ namespace Tangerine.UI.FilesystemView
 		private Widget CreateUpButton()
 		{
 			return new ToolbarButton(IconPool.GetTexture("Filesystem.ArrowUp")) {
-				Clicked = () => view.GoUp()
+				Clicked = () => {
+					view.ScrollView.SetFocus();
+					view.GoUp();
+				}
 			};
 		}
 
