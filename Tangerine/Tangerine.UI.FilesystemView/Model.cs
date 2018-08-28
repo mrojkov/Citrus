@@ -105,8 +105,8 @@ namespace Tangerine.UI.FilesystemView
 					Directory.EnumerateFileSystemEntries(value).ToList();
 					currentPath = value;
 				}
-				catch {
-					(new AlertDialog("Invalid Directory")).Show();
+				catch (Exception e) {
+					new AlertDialog(e.Message).Show();
 				}
 			}
 		}
@@ -131,13 +131,19 @@ namespace Tangerine.UI.FilesystemView
 		public IEnumerable<string> EnumerateItems(SortType sortType, OrderType orderType)
 		{
 			foreach (var i in SortItems(Directory.EnumerateDirectories(CurrentPath), sortType, orderType, ItemType.Dir)) {
+				if ((File.GetAttributes(i) & FileAttributes.Hidden) != 0) {
+					continue;
+				}
 				yield return i;
 			}
 			foreach (var i in SortItems(Directory.EnumerateFiles(CurrentPath), sortType, orderType, ItemType.File)) {
+				if ((File.GetAttributes(i) & FileAttributes.Hidden) != 0) {
+					continue;
+				}
 				yield return i;
 			}
 		}
-		
+
 		private IEnumerable<string> SortItems(IEnumerable<string> items, SortType sortType, OrderType orderType, ItemType itemType)
 		{
 			switch (sortType) {
