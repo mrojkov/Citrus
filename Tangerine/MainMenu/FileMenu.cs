@@ -44,8 +44,12 @@ namespace Tangerine
 	{
 		public override void Execute()
 		{
-			FontPool.Instance.Clear(preserveDefaultFont: true);
-			Orange.NewProject.NewProjectAction(FileOpenProject.Execute);
+			try {
+				FontPool.Instance.Clear(preserveDefaultFont: true);
+				Orange.NewProject.NewProjectAction(FileOpenProject.Execute);
+			} catch (System.Exception e) {
+				AlertDialog.Show(e.Message);
+			}
 		}
 	}
 
