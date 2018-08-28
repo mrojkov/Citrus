@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Text;
 using Microsoft.Win32;
@@ -67,8 +68,9 @@ namespace Orange.Source
 
 		private static bool TryGetPureMSBuild15Path(out string path)
 		{
-			const string msBuildPath =
-				@"C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin\MSBuild.exe";
+			var msBuildPath = Path.Combine(
+				Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
+				@"Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin\MSBuild.exe");
 
 			if (File.Exists(msBuildPath)) {
 				path = msBuildPath;
