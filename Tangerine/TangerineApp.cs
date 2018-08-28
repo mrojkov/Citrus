@@ -9,6 +9,7 @@ using Tangerine.UI.SceneView;
 using Tangerine.UI.Docking;
 using Tangerine.UI.BackupHistoryPanel;
 using Tangerine.UI.Timeline.Processors;
+using Tangerine.UI.Timeline;
 
 namespace Tangerine
 {
@@ -588,6 +589,8 @@ namespace Tangerine
 			h.Connect(OrangeCommands.RunConfig, new OrangeCommandHandler(() => new OrangePluginOptionsDialog()));
 			h.Connect(SceneViewCommands.ToggleDisplayRuler, new DisplayRuler());
 			h.Connect(SceneViewCommands.SaveCurrentRuler, new SaveRuler());
+			h.Connect(TimelineCommands.NumericMove, () => new NumericMoveDialog());
+			h.Connect(TimelineCommands.NumericScale, () => new NumericScaleDialog());
 		}
 
 		private void InitializeHotkeys()

@@ -78,6 +78,9 @@ namespace Tangerine.UI.Timeline
 						GenericCommands.InsertTimelineColumn,
 						GenericCommands.RemoveTimelineColumn,
 						TimelineCommands.DeleteKeyframes,
+						Command.MenuSeparator,
+						TimelineCommands.NumericMove,
+						TimelineCommands.NumericScale
 					};
 					foreach (var i in menu) {
 						i.Enabled = enabled;
@@ -123,7 +126,7 @@ namespace Tangerine.UI.Timeline
 				}
 			}
 		}
-		
+
 		private void RenderAnimatedRangeBackground()
 		{
 			foreach (var row in Document.Current.Rows) {
