@@ -30,7 +30,7 @@ namespace Tangerine.UI
 			) {
 				return false;
 			}
-			linkInline.Url = Documentation.GetDocPath(linkInline.Url.TrimStart('@'));
+			linkInline.Url = "file:///" + Documentation.GetDocPath(linkInline.Url.TrimStart('@'));
 			renderer.Write(linkInline);
 			return true;
 		}
