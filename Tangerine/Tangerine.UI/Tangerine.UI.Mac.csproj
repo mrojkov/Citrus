@@ -140,6 +140,9 @@
     <Compile Include="PropertyEditors\AlignmentPropertyEditor.cs" />
     <Compile Include="HierarchyPanel\HierarchyPanel.cs" />
     <Compile Include="HierarchyPanel\TreeView.cs" />
+    <Compile Include="Utils\Tip.cs" />
+    <Compile Include="PropertyEditors\TextPropertyEditor.cs" />
+    <Compile Include="TextEditorWindow.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

@@ -106,6 +106,7 @@
     <Compile Include="Operations\ReplaceContents.cs" />
     <Compile Include="ExpressionParser\ExpressionParser.cs" />
     <Compile Include="ExpressionParser\Tokenizer.cs" />
+    <Compile Include="TangerineYuzu.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>
