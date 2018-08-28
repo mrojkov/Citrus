@@ -62,18 +62,13 @@ namespace Tangerine.UI
 					}
 					if (resetToDefault.WasIssued()) {
 						resetToDefault.Consume();
-						ResetToDefault();
+						var defaultValue = EditorParams.DefaultValueGetter();
+						if (defaultValue != null)
+							SetProperty(defaultValue);
 					}
 				}
 				yield return null;
 			}
-		}
-
-		protected virtual void ResetToDefault()
-		{
-			var defaultValue = EditorParams.DefaultValueGetter();
-			if (defaultValue != null)
-				SetProperty(defaultValue);
 		}
 
 		static Yuzu.Json.JsonSerializer serializer = new Yuzu.Json.JsonSerializer {

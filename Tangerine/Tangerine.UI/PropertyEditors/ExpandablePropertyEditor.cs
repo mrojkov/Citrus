@@ -20,7 +20,7 @@ namespace Tangerine.UI
 			}
 		}
 		public Widget ExpandableContent { get; }
-		private ThemedExpandButton ExpandButton { get; }
+		protected ThemedExpandButton ExpandButton { get; }
 
 		public ExpandablePropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{

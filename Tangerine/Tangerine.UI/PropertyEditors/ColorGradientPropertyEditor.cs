@@ -8,31 +8,35 @@ namespace Tangerine.UI
 {
 	public class ColorGradientPropertyEditor : ExpandablePropertyEditor<ColorGradient>
 	{
-		private const float gradientPaneHeight = 35f;
 		private readonly TransactionalGradientControlWidget gradientControlWidget;
 		private readonly ColorPickerPanel colorPanel;
-		private Property<Color4> selectedColorProperty;
-		private Property<float> selectedPositionProperty;
+		private IDataflowProvider<Color4> selectedPointColorProperty;
+		private IDataflowProvider<float> selectedPointPositionProperty;
+		private IDataflowProvider<string> currentColorString;
 		private readonly EditBox colorEditor;
 		private readonly NumericEditBox positionEditor;
-		private IDataflowProvider<string> currentColorString;
-		private GradientControlPoint selectedControlPoint;
-		private bool isColorFromPanel;
-		public bool PropertyWasChanged { get; private set; }
+		private GradientControlPoint selectedControlPoint => gradientControlWidget.SelectedControlPoint;
 
 		public ColorGradientPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
-			gradientControlWidget = new TransactionalGradientControlWidget(editorParams.History) {
-				MinMaxHeight = gradientPaneHeight,
-				Height = gradientPaneHeight,
+			if (editorParams.Objects.Count() > 1) {
+				ExpandButton.Visible = false;
+				ContainerWidget.AddNode(new ThemedSimpleText {
+					Text = "Unable to edit multiple gradients",
+					VAlignment = VAlignment.Center,
+					LayoutCell = new LayoutCell(Alignment.Center, stretchX: 0),
+				});
+				return;
+			}
+			gradientControlWidget = new TransactionalGradientControlWidget(EditorParams.History) {
+				MinMaxHeight = 35f,
+				Height = 35f,
 				LayoutCell = new LayoutCell(Alignment.LeftCenter),
 				Padding = new Thickness { Right = 5f, Bottom = 5f}
 			};
 			var gradientProperty = CoalescedPropertyValue(new ColorGradient(Color4.White, Color4.Black)).DistinctUntilChanged();
 			gradientControlWidget.Gradient = gradientProperty.GetValue();
-			ContainerWidget.Tasks.Add(gradientProperty.Consume(g => {
-				gradientControlWidget.Gradient = g;
-			}));
+			ContainerWidget.AddChangeWatcher(gradientProperty, g => gradientControlWidget.Gradient = g);
 			gradientControlWidget.SelectionChanged += SelectPoint;
 			ContainerWidget.AddNode(gradientControlWidget);
 			ContainerWidget.AddNode(CreatePipetteButton());
@@ -53,75 +57,34 @@ namespace Tangerine.UI
 				},
 				Padding = new Thickness(0, 3f)
 			});
-			positionEditor.Step = 0.01f;
+			positionEditor.Step = 0.005f;
 			colorEditor.Submitted += SetColor;
 			positionEditor.Submitted += SetPosition;
-			gradientControlWidget.ControlPointCreated += point => {
-				if (!InitializePropertyIfNecessary()) {
-					foreach (var o in EditorParams.Objects) {
-						Core.Operations.InsertListItem.Perform(point.Clone(), GetGradientProperty(o), 1, EditorParams.History);
-					}
-				}
-			};
-			gradientControlWidget.ControlPointRemoved += index => {
-				if (!InitializePropertyIfNecessary()) {
-					foreach (var o in EditorParams.Objects) {
-						Core.Operations.RemoveListItem.Perform(index, GetGradientProperty(o), EditorParams.History);
-					}
-				}
-			};
-			gradientControlWidget.ControlPointMoved += (newPos, index) => {
-				if (!InitializePropertyIfNecessary()) {
-					foreach (var o in EditorParams.Objects) {
-						Core.Operations.SetProperty.Perform(GetGradientProperty(o)[index], nameof(GradientControlPoint.Position), newPos, EditorParams.History);
-					}
-				}
-			};
 			colorPanel = new ColorPickerPanel();
 			ExpandableContent.AddNode(colorPanel.Widget);
 			var padding = colorPanel.Widget.Padding;
 			padding.Right = 12;
 			colorPanel.Widget.Padding = padding;
 			colorPanel.DragStarted += () => EditorParams.History?.BeginTransaction();
+			gradientControlWidget.DragStarted += () => EditorParams.History?.BeginTransaction();
+			gradientControlWidget.DragEnded += () => {
+				EditorParams.History?.CommitTransaction();
+				EditorParams.History?.EndTransaction();
+			};
 			colorPanel.DragEnded += () => {
 				EditorParams.History?.CommitTransaction();
 				EditorParams.History?.EndTransaction();
 			};
 			colorPanel.Changed += () => {
 				EditorParams.History?.RollbackTransaction();
-				isColorFromPanel = true;
-				InitializePropertyIfNecessary();
-				Core.Operations.SetProperty.Perform(selectedControlPoint, nameof(GradientControlPoint.Color), colorPanel.Color, EditorParams.History);
-				SetControlPointProperty(nameof(GradientControlPoint.Color), colorPanel.Color);
+				Core.Operations.SetProperty.Perform(selectedControlPoint, nameof(GradientControlPoint.Color), colorPanel.Color);
 			};
-			SelectPoint(gradientControlWidget.SelectedControlPoint);
-		}
-
-		protected override void ResetToDefault()
-		{
-			var gradientProperty = CoalescedPropertyValue(new ColorGradient(Color4.White, Color4.Black)).DistinctUntilChanged();
-			var defaultValue = EditorParams.DefaultValueGetter();
-			if (defaultValue != null) {
-				DoTransaction(() => {
-					SetProperty(defaultValue);
-					Core.Operations.SetProperty.Perform(
-						gradientControlWidget, nameof(TransactionalGradientControlWidget.Gradient), gradientProperty.GetValue(), EditorParams.History);
-				});
-			}
-			gradientControlWidget.Tasks.Clear();
-		}
-
-		private ColorGradient GetGradientProperty(object o)
-		{
-			return (ColorGradient)o.GetType().GetProperty(EditorParams.PropertyName).GetValue(o);
+			SelectPoint(selectedControlPoint);
 		}
 
 		private void SetControlPointProperty(string propertyName, object value)
 		{
-			foreach (var o in EditorParams.Objects) {
-				var idx = gradientControlWidget.Gradient.IndexOf(selectedControlPoint);
-				Core.Operations.SetProperty.Perform(GetGradientProperty(o)[idx], propertyName, value, EditorParams.History);
-			}
+			Core.Operations.SetProperty.Perform(selectedControlPoint, propertyName, value, EditorParams.History);
 		}
 
 		private Node CreatePipetteButton()
@@ -137,11 +100,7 @@ namespace Tangerine.UI
 		public void SetColor(string text)
 		{
 			if (Color4.TryParse(text, out var newColor)) {
-				Document.Current.History.DoTransaction(() => {
-					InitializePropertyIfNecessary();
-					Core.Operations.SetProperty.Perform(selectedControlPoint, nameof(GradientControlPoint.Color), newColor, EditorParams.History);
-					SetControlPointProperty(nameof(GradientControlPoint.Color), newColor);
-				});
+				SetControlPointProperty(nameof(GradientControlPoint.Color), newColor);
 			} else {
 				colorEditor.Text = currentColorString.GetValue();
 			}
@@ -150,48 +109,26 @@ namespace Tangerine.UI
 		public void SetPosition(string text)
 		{
 			if (float.TryParse(text, out var newPosition)) {
-				Document.Current.History.DoTransaction(() => {
-					newPosition = Mathf.Clamp(newPosition, 0, 1);
-					InitializePropertyIfNecessary();
-					Core.Operations.SetProperty.Perform(selectedControlPoint, nameof(GradientControlPoint.Position),
-						newPosition, EditorParams.History);
-					SetControlPointProperty(nameof(GradientControlPoint.Position), newPosition);
-				});
+				SetControlPointProperty(nameof(GradientControlPoint.Position), Mathf.Clamp(newPosition, 0, 1));
 			}
-			positionEditor.Text = selectedPositionProperty.GetValue().ToString();
+			positionEditor.Text = selectedPointPositionProperty.GetValue().ToString();
 		}
 
 		private void SelectPoint(GradientControlPoint point)
 		{
-			selectedControlPoint = point;
-			ContainerWidget.Tasks.Clear();
 			colorEditor.Tasks.Clear();
 			positionEditor.Tasks.Clear();
-			selectedColorProperty = new Property<Color4>(selectedControlPoint, nameof(GradientControlPoint.Color));
-			selectedPositionProperty = new Property<float>(selectedControlPoint, nameof(GradientControlPoint.Position));
-			currentColorString = selectedColorProperty.DistinctUntilChanged().Select(i => i.ToString(Color4.StringPresentation.Dec));
+			selectedPointColorProperty = new Property<Color4>(point, nameof(GradientControlPoint.Color));
+			selectedPointPositionProperty = new Property<float>(point, nameof(GradientControlPoint.Position));
+			currentColorString = selectedPointColorProperty.DistinctUntilChanged().Select(i => i.ToString(Color4.StringPresentation.Dec));
 			colorEditor.Tasks.Add(currentColorString.Consume(v => colorEditor.Text = v));
-			colorPanel.Color = selectedControlPoint.Color;
-			colorEditor.Tasks.Add(selectedColorProperty.DistinctUntilChanged().Consume(v => {
-				if (!isColorFromPanel) {
+			colorPanel.Color = selectedPointColorProperty.GetValue();
+			colorEditor.Tasks.Add(selectedPointColorProperty.DistinctUntilChanged().Consume(v => {
+				if (colorPanel.Color != v) {
 					colorPanel.Color = v;
-					isColorFromPanel = false;
 				}
 			}));
-			positionEditor.Tasks.Add(selectedPositionProperty.DistinctUntilChanged().Consume(v => positionEditor.Text = v.ToString()));
-		}
-
-		private bool InitializePropertyIfNecessary()
-		{
-			if (!PropertyWasChanged) {
-				Core.Operations.SetProperty.Perform(this, nameof(PropertyWasChanged), true, EditorParams.History);
-				foreach (var o in EditorParams.Objects) {
-					Core.Operations.SetProperty.Perform(o, EditorParams.PropertyName,
-						gradientControlWidget.Gradient.Clone(), EditorParams.History);
-				}
-				return true;
-			}
-			return false;
+			positionEditor.Tasks.Add(selectedPointPositionProperty.DistinctUntilChanged().Consume(v => positionEditor.Text = v.ToString()));
 		}
 	}
 
@@ -221,10 +158,12 @@ namespace Tangerine.UI
 			}
 		}
 
+		public event Action DragStarted;
+		public event Action DragEnded;
 		public event Action<GradientControlPoint> SelectionChanged;
-		public event Action<GradientControlPoint> ControlPointCreated;
+		public event Action<GradientControlPoint, int> ControlPointCreated;
 		public event Action<int> ControlPointRemoved;
-		public event Action<float, int> ControlPointMoved;
+		public event Action<float, int> ControlPointPositionChanged;
 
 		private void Rebuild()
 		{
@@ -259,7 +198,6 @@ namespace Tangerine.UI
 			}));
 			gradientComponent = new GradientComponent();
 			gradientPane.Components.Add(gradientComponent);
-
 			gradientPaneContainer = new Widget {
 				LayoutCell = new LayoutCell(Alignment.LeftCenter, 1, 0.7f),
 			};
@@ -291,11 +229,7 @@ namespace Tangerine.UI
 					if (clickGesture.WasBegan()) {
 						var pos = createPointsPane.LocalMousePosition().X / createPointsPane.Size.X;
 						var point = new GradientControlPoint(Gradient.GetNearestPointTo(pos).Color, pos);
-						using (history.BeginTransaction()) {
-							Core.Operations.InsertListItem.Perform(point, gradient, 1, history);
-							ControlPointCreated?.Invoke(point);
-							history.CommitTransaction();
-						}
+						AddPoint(point);
 						CreatePoint(point, Gradient, gradientPaneContainer);
 					}
 				}
@@ -303,42 +237,74 @@ namespace Tangerine.UI
 			}
 		}
 
+		private void AddPoint(GradientControlPoint point)
+		{
+			using (history.BeginTransaction()) {
+				Core.Operations.InsertListItem.Perform(point, gradient, 1);
+				ControlPointCreated?.Invoke(point, 1);
+				history.CommitTransaction();
+			}
+		}
+
+		private void RemovePoint(GradientControlPoint controlPoint, int idx)
+		{
+			using (history.BeginTransaction()) {
+				Core.Operations.RemoveListItem.Perform(controlPoint, gradient);
+				ControlPointRemoved?.Invoke(idx);
+				history.CommitTransaction();
+			};
+		}
+
 		private void InitializePoints(Widget container)
 		{
-			var points = Gradient.Ordered().ToList();
-			foreach (var t in points) {
+			foreach (var t in Gradient.Ordered()) {
 				CreatePoint(t, Gradient, container);
 			}
 		}
 
 		private void CreatePoint(GradientControlPoint controlPoint, ColorGradient gradient, Widget container)
 		{
-			var w = new GradientControlPointWidget(history, controlPoint) {
+			var w = new GradientControlPointWidget(controlPoint) {
 				Position = new Vector2(controlPoint.Position * container.Size.X, container.Size.Y),
 				MinMaxHeight = 15f,
 				MinMaxWidth = 10f,
 				Size = new Vector2(10, 15f)
 			};
 			w.Gestures.Add(new ClickGesture(1, () => {
-				var idx = gradient.IndexOf(w.ControlPoint);
 				if (gradient.Count > 1) {
-					using (history.BeginTransaction()) {
-						Core.Operations.RemoveListItem.Perform(w.ControlPoint, gradient, history);
-						ControlPointRemoved?.Invoke(idx);
-						history.CommitTransaction();
-					}
+					var idx = gradient.IndexOf(w.ControlPoint);
+					RemovePoint(controlPoint, idx);
 					w.UnlinkAndDispose();
 				}
 			}));
-			w.OnClick += () => SelectPoint(w);
-			w.OnDrag += pos => OnControlPointDrag(pos, Gradient.IndexOf(controlPoint));
+			var dragGesture = new DragGesture();
+			w.Gestures.Add(dragGesture);
+			w.Tasks.Add(DragTask(w, controlPoint, dragGesture));
 			container.Nodes.Insert(0, w);
 			SelectPoint(w);
 		}
 
-		private void OnControlPointDrag(float newPosition, int index)
+		private IEnumerator<object> DragTask(GradientControlPointWidget w, GradientControlPoint point, DragGesture dragGesture)
 		{
-			ControlPointMoved?.Invoke(newPosition, index);
+			while (true) {
+				if (dragGesture.WasBegan()) {
+					var prevPos = LocalMousePosition();
+					SelectPoint(w);
+					DragStarted?.Invoke();
+					while (!dragGesture.WasEnded()) {
+						var mousePos = LocalMousePosition();
+						var delta = (mousePos - prevPos) / Size;
+						var newPosition = Mathf.Clamp(point.Position + delta.X, 0, 1);
+						Core.Operations.SetProperty.Perform(point, nameof(GradientControlPoint.Position), newPosition);
+						ControlPointPositionChanged?.Invoke(newPosition, Gradient.IndexOf(point));
+						var x = Mathf.Clamp(mousePos.X, 0, Size.X);
+						prevPos = new Vector2(x, mousePos.Y);
+						yield return null;
+					}
+					DragEnded?.Invoke();
+				}
+				yield return null;
+			}
 		}
 
 		private void SelectPoint(GradientControlPoint point)
@@ -361,13 +327,9 @@ namespace Tangerine.UI
 
 	public class GradientControlPointWidget : Widget
 	{
-		private readonly ITransactionalHistory history;
 		private readonly Vertex[] vertices = { new Vertex(), new Vertex(), new Vertex() };
 		public GradientControlPoint ControlPoint { get; set; }
-		private readonly DragGesture dragGesture;
 		private readonly ITexture chessTexture;
-		public event Action OnClick;
-		public event Action<float> OnDrag;
 		public const float tipBodyRatio = 1f / 3f;
 
 		public override void Update(float delta)
@@ -376,16 +338,13 @@ namespace Tangerine.UI
 			Position = new Vector2(ParentWidget.Size.X * ControlPoint.Position, ParentWidget.Size.Y);
 		}
 
-		public GradientControlPointWidget(ITransactionalHistory history, GradientControlPoint controlPoint)
+		public GradientControlPointWidget(GradientControlPoint controlPoint)
 		{
-			this.history = history;
 			ControlPoint = controlPoint;
 			Pivot = new Vector2(0.5f, 0);
 			CompoundPresenter.Add(new DelegatePresenter<Widget>(Render));
 			HitTestTarget = true;
-			Gestures.Add(dragGesture = new DragGesture());
 			chessTexture = PrepareChessTexture(Color4.White, Color4.Black);
-			Tasks.Add(DragTask());
 		}
 
 		public static ITexture PrepareChessTexture(Color4 color1, Color4 color2)
@@ -418,31 +377,6 @@ namespace Tangerine.UI
 			Renderer.DrawLine(vertices[0].Pos, vertices[1].Pos, Color4.Black);
 			Renderer.DrawLine(vertices[1].Pos, vertices[2].Pos, Color4.Black);
 			Renderer.DrawLine(vertices[2].Pos, vertices[0].Pos, Color4.Black);
-		}
-
-		private IEnumerator<object> DragTask()
-		{
-			while (true) {
-				if (dragGesture.WasBegan()) {
-					var prevPos = ParentWidget.LocalMousePosition();
-					OnClick?.Invoke();
-					using (history.BeginTransaction()) {
-						while (!dragGesture.WasEnded()) {
-							history.RollbackTransaction();
-							var mousePos = ParentWidget.LocalMousePosition();
-							var delta = (mousePos - prevPos) / ParentWidget.Size;
-							var newPosition = Mathf.Clamp(ControlPoint.Position + delta.X, 0, 1);
-							Core.Operations.SetProperty.Perform(ControlPoint, nameof(GradientControlPoint.Position), newPosition, history);
-							OnDrag?.Invoke(newPosition);
-							var x = Mathf.Clamp(mousePos.X, 0, ParentWidget.Size.X);
-							prevPos = new Vector2(x, mousePos.Y);
-							history.CommitTransaction();
-							yield return null;
-						}
-					}
-				}
-				yield return null;
-			}
 		}
 	}
 }
