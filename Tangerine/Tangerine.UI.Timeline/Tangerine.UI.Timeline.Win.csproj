@@ -81,6 +81,7 @@
     <Compile Include="Processors\GridPane\AnimationStretchProcessor.cs" />
     <Compile Include="Processors\GridPane\ClampScrollPosProcessor.cs" />
     <Compile Include="Processors\ImageCombinerLinkIndicationProcessor.cs" />
+    <Compile Include="Processors\SlowMotionProcessor.cs" />
     <Compile Include="Processors\SplineGearLinkIndicationProcessor.cs" />
     <Compile Include="Processors\BoneLinkIndicationProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -152,6 +152,7 @@ namespace Tangerine.UI.SceneView
 			filesDropHandler = new FilesDropHandler(InputArea);
 			filesDropHandler.Handling += FilesDropOnHandling;
 			filesDropHandler.NodeCreated += FilesDropOnNodeCreated;
+			Scene.AddChangeWatcher(() => Document.Current.SlowMotion, v => Scene.AnimationSpeed = v ? 0.1f : 1);
 		}
 
 		private void FilesDropOnHandling()
