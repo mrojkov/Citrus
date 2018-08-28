@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Lime;
+using Tangerine.Core;
 
 namespace Tangerine.UI.FilesystemView
 {
@@ -21,6 +22,13 @@ namespace Tangerine.UI.FilesystemView
 		public void ClearTextureCache()
 		{
 			textureCache.Clear();
+		}
+
+		public void ClearTextureCache(string filename)
+		{
+			if (textureCache.ContainsKey(filename)) {
+				textureCache.Remove(filename);
+			}
 		}
 
 		private ITexture PrepareChessTexture(Color4 color1, Color4 color2)
@@ -139,6 +147,7 @@ namespace Tangerine.UI.FilesystemView
 				});
 			}
 			CalcZoomAndMaxZoom();
+			ApplyZoom();
 		}
 
 		private void ApplyZoom()
@@ -179,23 +188,7 @@ namespace Tangerine.UI.FilesystemView
 			}
 			var extension = Path.GetExtension(filename).ToLower();
 			if (extension == ".scene" || extension == ".tan") {
-				const string SceneThumbnailSeparator = "{8069CDD4-F02F-4981-A3CB-A0BAD4018D00}";
-				var allText = File.ReadAllText(filename);
-				var index = allText.IndexOf(SceneThumbnailSeparator);
-				// Trim zeroes from the end of file since they tend to appear there for unknown reason
-				if (index <= 0) {
-					return null;
-				}
-				var endOfBase64Index = allText.Length - 1;
-				while (allText[endOfBase64Index] == 0 || allText[endOfBase64Index] == '\n' || allText[endOfBase64Index] == '\r') {
-					endOfBase64Index--;
-				}
-				int startOfBase64Index = index + SceneThumbnailSeparator.Length;
-				var previewText = allText.Substring(startOfBase64Index, endOfBase64Index - startOfBase64Index + 1);
-				var previewBytes = System.Convert.FromBase64String(previewText);
-				var texture = new Texture2D();
-				texture.LoadImage(previewBytes);
-				return texture;
+				return DocumentPreview.ReadAsTexture2D(filename);
 			} else {
 				var fi = new FileInfo(filename);
 				if (fi.Length > 1024 * 1024 * 10) {

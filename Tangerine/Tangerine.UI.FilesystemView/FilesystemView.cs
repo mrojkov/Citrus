@@ -121,15 +121,17 @@ namespace Tangerine.UI.FilesystemView
 			fsWatcher?.Dispose();
 			fsWatcher = new Lime.FileSystemWatcher(path, includeSubdirectories: false);
 			// TODO: throttle
-			Action OnFsWatcherChanged = () => {
+			Action<string> OnFsWatcherChanged = p => {
 				InvalidateView(model.CurrentPath);
+				preview.ClearTextureCache(p);
 			};
-			fsWatcher.Deleted += (p) => {
+			fsWatcher.Deleted += p => {
 				selection.Deselect(p);
-				OnFsWatcherChanged();
+				OnFsWatcherChanged(p);
 			};
-			fsWatcher.Created += (p) => OnFsWatcherChanged();
-			fsWatcher.Renamed += (p) => OnFsWatcherChanged();
+			fsWatcher.Created += OnFsWatcherChanged;
+			fsWatcher.Renamed += OnFsWatcherChanged;
+			fsWatcher.Changed += OnFsWatcherChanged;
 		}
 
 		public FilesystemView()

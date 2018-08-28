@@ -118,6 +118,7 @@ namespace Tangerine.UI
 		public static readonly ICommand SnapWidgetBorderToRuler = new Command("Snap Widget to Ruler");
 		public static readonly ICommand SnapRulerLinesToWidgets = new Command("Snap Ruler Lines to Widgets");
 		public static readonly ICommand ManageRulers = new Command("Manage Rulers");
+		public static readonly ICommand GeneratePreview = new Command("Generate Preview");
 	}
 
 	public static class Tools
