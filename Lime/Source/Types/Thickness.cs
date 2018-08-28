@@ -77,5 +77,28 @@ namespace Lime
 		{
 			return string.Format("{0}, {1}, {2}, {3}", Left, Top, Right, Bottom);
 		}
+
+		public override bool Equals(object obj)
+		{
+			if (!(obj is Thickness)) {
+				return false;
+			}
+
+			var thickness = (Thickness)obj;
+			return this.Left == thickness.Left &&
+				   this.Right == thickness.Right &&
+				   this.Top == thickness.Top &&
+				   this.Bottom == thickness.Bottom;
+		}
+
+		public override int GetHashCode()
+		{
+			var hashCode = 551583723;
+			hashCode = hashCode * -1521134295 + this.Left.GetHashCode();
+			hashCode = hashCode * -1521134295 + this.Right.GetHashCode();
+			hashCode = hashCode * -1521134295 + this.Top.GetHashCode();
+			hashCode = hashCode * -1521134295 + this.Bottom.GetHashCode();
+			return hashCode;
+		}
 	}
 }

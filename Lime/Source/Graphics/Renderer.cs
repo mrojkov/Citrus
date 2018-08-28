@@ -75,6 +75,25 @@ namespace Lime
 		{
 			return X == other.X && Y == other.Y && Width == other.Width && Height == other.Height;
 		}
+
+		public override int GetHashCode()
+		{
+			var hashCode = 466501756;
+			hashCode = hashCode * -1521134295 + this.X.GetHashCode();
+			hashCode = hashCode * -1521134295 + this.Y.GetHashCode();
+			hashCode = hashCode * -1521134295 + this.Width.GetHashCode();
+			hashCode = hashCode * -1521134295 + this.Height.GetHashCode();
+			return hashCode;
+		}
+
+		public override bool Equals(object obj)
+		{
+			if (obj is WindowRect wr) {
+				return Equals(wr);
+			} else {
+				return false;
+			}
+		}
 	}
 
 	[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 32)]

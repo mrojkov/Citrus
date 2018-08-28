@@ -17,7 +17,7 @@ namespace Lime
 
 		static bool etc2Checked;
 		static bool etc2Supported;
-		
+
 		private void InitWithKTXTexture(BinaryReader reader)
 		{
 			var identifier = reader.ReadBytes(12);
@@ -83,8 +83,9 @@ namespace Lime
 						GL.BindTexture(TextureTarget.Texture2D, handle);
 						const int etc1Rgb8Oes = 36196;
 						if (etc2Supported || (Application.Platform == PlatformId.Android && glInternalFormat == etc1Rgb8Oes)) {
+#pragma warning disable CS0618
 							GL.CompressedTexImage2D(
-								TextureTarget.Texture2D, mipLevel, (PixelInternalFormat)glInternalFormat, 
+								TextureTarget.Texture2D, mipLevel, (PixelInternalFormat)glInternalFormat,
 								width, height, 0, dataLength, data);
 						} else {
 							var rgba8Data = Marshal.AllocHGlobal(width * height * 4);
@@ -101,8 +102,9 @@ namespace Lime
 						GL.ActiveTexture(TextureUnit.Texture0);
 						GL.BindTexture(TextureTarget.Texture2D, handle);
 						GL.TexImage2D(
-							TextureTarget.Texture2D, mipLevel, (PixelInternalFormat)glInternalFormat, 
+							TextureTarget.Texture2D, mipLevel, (PixelInternalFormat)glInternalFormat,
 							width, height, 0, (PixelFormat)glFormat, (PixelType)glType, data);
+#pragma warning restore CS0618
 						PlatformRenderer.MarkTextureSlotAsDirty(0);
 						PlatformRenderer.CheckErrors();
 					};

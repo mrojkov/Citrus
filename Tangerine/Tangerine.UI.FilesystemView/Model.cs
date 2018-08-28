@@ -66,6 +66,15 @@ namespace Tangerine.UI.FilesystemView
 			return GetEnumerator();
 		}
 
+		public override bool Equals(object obj)
+		{
+			var selection = obj as Selection;
+			return selection != null &&
+				   EqualityComparer<HashSet<string>>.Default.Equals(this.selection, selection.selection);
+		}
+
+		public override int GetHashCode() => 965136989 + EqualityComparer<HashSet<string>>.Default.GetHashCode(this.selection);
+
 		public static bool operator !=(Selection lhs, Selection rhs)
 		{
 			return !(lhs == rhs);

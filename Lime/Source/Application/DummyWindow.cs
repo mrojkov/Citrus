@@ -47,7 +47,9 @@ namespace Lime
 
 		public bool AllowDropFiles { get; set; }
 
+#pragma warning disable CS0067
 		public event Action<IEnumerable<string>> FilesDropped;
+#pragma warning restore CS0067
 		public void DragFiles(string[] filenames)
 		{
 			throw new NotImplementedException();

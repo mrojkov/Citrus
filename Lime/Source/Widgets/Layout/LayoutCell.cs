@@ -287,6 +287,25 @@ namespace Lime
 
 		public static bool operator == (Alignment lhs, Alignment rhs) => lhs.X == rhs.X && lhs.Y == rhs.Y;
 		public static bool operator !=(Alignment lhs, Alignment rhs) => lhs.X != rhs.X || lhs.Y != rhs.Y;
+
+		public override bool Equals(object obj)
+		{
+			if (!(obj is Alignment)) {
+				return false;
+			}
+
+			var alignment = (Alignment)obj;
+			return this.X == alignment.X &&
+				   this.Y == alignment.Y;
+		}
+
+		public override int GetHashCode()
+		{
+			var hashCode = 1861411795;
+			hashCode = hashCode * -1521134295 + this.X.GetHashCode();
+			hashCode = hashCode * -1521134295 + this.Y.GetHashCode();
+			return hashCode;
+		}
 	}
 }
 

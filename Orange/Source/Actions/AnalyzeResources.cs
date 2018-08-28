@@ -13,8 +13,10 @@ namespace Orange
 	{
 		internal struct PathRequestRecord
 		{
+#pragma warning disable CS0649
 			public string path;
 			public string bundle;
+#pragma warning restore CS0649
 		}
 
 		internal static List<PathRequestRecord> requestedPaths;
