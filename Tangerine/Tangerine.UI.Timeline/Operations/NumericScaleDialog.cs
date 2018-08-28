@@ -47,18 +47,25 @@ namespace Tangerine.UI.Timeline
 					}
 				}
 			};
+			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
 			Scale = 1;
 			var editor = new FloatPropertyEditor(new PropertyEditorParams(container, this, nameof(Scale), "Scale"));
 			cancelButton.Clicked += () => {
 				window.Close();
 			};
-			this.okButton.Clicked += () => {
+			okButton.Clicked += () => {
 				editor.Submit();
+				if (Scale < Mathf.ZeroTolerance) {
+					AlertDialog.Show("Scale value too small");
+					window.Close();
+					return;
+				}
 				Document.Current.History.DoTransaction(() => {
 					ScaleKeyframes();
 				});
 				window.Close();
 			};
+			cancelButton.SetFocus();
 			window.ShowModal();
 		}
 
@@ -84,7 +91,13 @@ namespace Tangerine.UI.Timeline
 							RemoveKeyframe.Perform(animator, key.Frame);
 						}
 						foreach (var key in saved) {
-							int newFrame = (int)(boundaries.Value.Left + (key.Frame - boundaries.Value.Left) * Scale);
+							// The formula should behave similiar to stretching animation with mouse
+							int newFrame = (int)(
+								boundaries.Value.Left +
+								(key.Frame - boundaries.Value.Left) *
+								(1 + (boundaries.Value.Left - boundaries.Value.Right) * Scale) /
+								(1 + boundaries.Value.Left - boundaries.Value.Right)
+							);
 							var newKey = key.Clone();
 							newKey.Frame = newFrame;
 							SetAnimableProperty.Perform(

@@ -1,4 +1,5 @@
 using Lime;
+using System;
 using Tangerine.Core;
 
 namespace Tangerine.UI.Timeline
@@ -41,18 +42,24 @@ namespace Tangerine.UI.Timeline
 					}
 				}
 			};
+			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
 			var editor = new IntPropertyEditor(new PropertyEditorParams(container, this, nameof(Shift), "Shift"));
 			cancelButton.Clicked += () => {
 				window.Close();
 			};
 			okButton.Clicked += () => {
 				editor.Submit();
+				if (Shift == 0) {
+					window.Close();
+					return;
+				}
 				Document.Current.History.DoTransaction(() => {
 					Operations.DragKeyframes.Perform(new IntVector2(Shift, 0), removeOriginals: true);
 					Operations.ShiftGridSelection.Perform(new IntVector2(Shift, 0));
 				});
 				window.Close();
 			};
+			cancelButton.SetFocus();
 			window.ShowModal();
 		}
 	}
