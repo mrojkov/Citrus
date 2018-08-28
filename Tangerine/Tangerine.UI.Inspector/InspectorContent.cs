@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using Yuzu;
 using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Operations;
@@ -18,6 +17,9 @@ namespace Tangerine.UI.Inspector
 		private int row = 1;
 		private bool allRootObjectsAnimable;
 		private int totalObjectCount;
+		public event Action<NodeComponent> OnComponentRemove;
+		public DocumentHistory History { get; set; }
+		public Widget Footer { get; set; }
 
 		public InspectorContent(Widget widget)
 		{
@@ -50,9 +52,10 @@ namespace Tangerine.UI.Inspector
 				}
 				AddComponentsMenu(nodes, widget);
 			}
-			widget.AddNode(new Widget() {
-				MinHeight = 500.0f
-			});
+
+			if (Footer != null) {
+				widget.AddNode(Footer);
+			}
 		}
 
 		private string SerializeMutuallyExclusiveComponentGroupBaseType(Type t)
@@ -107,6 +110,9 @@ namespace Tangerine.UI.Inspector
 				var inheritanceList = new List<Type>();
 				for (var t = o.GetType(); t != typeof(object); t = t.BaseType) {
 					inheritanceList.Add(t);
+					if (t.IsSubclassOf(typeof(NodeComponent))) {
+						break;
+					}
 				}
 				inheritanceList.Reverse();
 				foreach (var t in inheritanceList) {
@@ -187,8 +193,8 @@ namespace Tangerine.UI.Inspector
 						? property.Name
 						: propertyPath + "." + property.Name
 				) {
-					NumericEditBoxFactory = () => new TransactionalNumericEditBox(),
-					History = Document.Current.History,
+					NumericEditBoxFactory = () => new TransactionalNumericEditBox(History),
+					History = History,
 					PropertySetter = allRootObjectsAnimable ? (PropertySetterDelegate)SetAnimableProperty : SetProperty,
 					DefaultValueGetter = () => {
 						var ctr = type.GetConstructor(new Type[] {});
@@ -314,14 +320,14 @@ namespace Tangerine.UI.Inspector
 			widget.AddNode(label);
 		}
 
-		private static void SetProperty(object obj, string propertyName, object value)
+		private void SetProperty(object obj, string propertyName, object value)
 		{
-			Core.Operations.SetProperty.Perform(obj, propertyName, value);
+			Core.Operations.SetProperty.Perform(obj, propertyName, value, History);
 		}
 
-		private static void SetAnimableProperty(object obj, string propertyName, object value)
+		private void SetAnimableProperty(object obj, string propertyName, object value)
 		{
-			Core.Operations.SetAnimableProperty.Perform(obj, propertyName, value, CoreUserPreferences.Instance.AutoKeyframes);
+			Core.Operations.SetAnimableProperty.Perform(obj, propertyName, value, History, CoreUserPreferences.Instance.AutoKeyframes);
 		}
 
 		private Widget CreateCategoryLabel(string text, Color4 color)
@@ -445,28 +451,31 @@ namespace Tangerine.UI.Inspector
 			}
 		}
 
-		private static void RemoveComponents(IEnumerable<NodeComponent> components)
+		private void RemoveComponents(IEnumerable<NodeComponent> components)
 		{
 			using (Document.Current.History.BeginTransaction()) {
 				foreach (var c in components) {
-					DeleteComponent.Perform(c.Owner, c);
+					if (c.Owner != null) {
+						DeleteComponent.Perform(c.Owner, c);
+					}
+					OnComponentRemove?.Invoke(c);
 				}
 				Document.Current.History.CommitTransaction();
 			}
 		}
 
-		private class TransactionalNumericEditBox : ThemedNumericEditBox
+		public class TransactionalNumericEditBox : ThemedNumericEditBox
 		{
-			public TransactionalNumericEditBox()
+			public TransactionalNumericEditBox(DocumentHistory history)
 			{
-				BeginSpin += () => Document.Current.History.BeginTransaction();
+				BeginSpin += () => history.BeginTransaction();
 				EndSpin += () => {
-					Document.Current.History.CommitTransaction();
-					Document.Current.History.EndTransaction();
+					history.CommitTransaction();
+					history.EndTransaction();
 				};
 				Submitted += s => {
-					if (Document.Current.History.IsTransactionActive) {
-						Document.Current.History.RollbackTransaction();
+					if (history.IsTransactionActive) {
+						history.RollbackTransaction();
 					}
 				};
 			}

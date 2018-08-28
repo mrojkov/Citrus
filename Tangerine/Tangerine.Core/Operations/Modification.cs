@@ -21,7 +21,12 @@ namespace Tangerine.Core.Operations
 
 		public static void Perform(object obj, string propertyName, object value, bool isChangingDocument = true)
 		{
-			Document.Current.History.Perform(new SetProperty(obj, propertyName, value, isChangingDocument));
+			Perform(obj, propertyName, value, Document.Current.History, isChangingDocument);
+		}
+
+		public static void Perform(object obj, string propertyName, object value, ITransactionalHistory history, bool isChangingDocument = true)
+		{
+			history.Perform(new SetProperty(obj, propertyName, value, isChangingDocument));
 		}
 
 		public static void Perform(Type type, object obj, string propertyName, object value, bool isChangingDocument = true)
@@ -67,7 +72,14 @@ namespace Tangerine.Core.Operations
 
 	public class SetAnimableProperty
 	{
-		public static void Perform(object @object, string propertyName, object value, bool createAnimatorIfNeeded = false, bool createInitialKeyframeForNewAnimator = true, int atFrame = -1)
+		public static void Perform(object @object, string propertyName, object value,
+			bool createAnimatorIfNeeded = false, bool createInitialKeyframeForNewAnimator = true, int atFrame = -1)
+		{
+			Perform(@object, propertyName, value, Document.Current.History, createAnimatorIfNeeded,
+				createInitialKeyframeForNewAnimator, atFrame);
+		}
+
+		public static void Perform(object @object, string propertyName, object value, ITransactionalHistory history, bool createAnimatorIfNeeded = false, bool createInitialKeyframeForNewAnimator = true, int atFrame = -1)
 		{
 			IAnimator animator;
 			var animationHost = @object as IAnimationHost;
@@ -76,7 +88,7 @@ namespace Tangerine.Core.Operations
 			if (animationHost != null) {
 				(propertyData, owner) = AnimationUtils.GetPropertyByPath(animationHost, propertyName);
 			}
-			SetProperty.Perform(owner, propertyData.Info?.Name ?? propertyName, value);
+			SetProperty.Perform(owner, propertyData.Info?.Name ?? propertyName, value, history);
 			if (animationHost != null && (animationHost.Animators.TryFind(propertyName, out animator, Document.Current.AnimationId) || createAnimatorIfNeeded)) {
 				if (animator == null && createInitialKeyframeForNewAnimator) {
 					var propertyValue = propertyData.Info.GetValue(owner);
@@ -97,7 +109,7 @@ namespace Tangerine.Core.Operations
 					key.Frame = Document.Current.AnimationFrame;
 					key.Function = animator?.Keys.LastOrDefault(k => k.Frame <= key.Frame)?.Function ?? KeyFunction.Linear;
 					key.Value = value;
-					SetKeyframe.Perform(animationHost, propertyName, Document.Current.AnimationId, key);
+					SetKeyframe.Perform(animationHost, propertyName, Document.Current.AnimationId, key, history);
 				} finally {
 					if (savedFrame >= 0) {
 						Document.Current.AnimationFrame = savedFrame;
@@ -204,9 +216,14 @@ namespace Tangerine.Core.Operations
 
 		public override bool IsChangingDocument => true;
 
+		public static void Perform(IAnimationHost animationHost, string propertyName, string animationId, IKeyframe keyframe, ITransactionalHistory history)
+		{
+			history.Perform(new SetKeyframe(animationHost, propertyName, animationId, keyframe));
+		}
+
 		public static void Perform(IAnimationHost animationHost, string propertyName, string animationId, IKeyframe keyframe)
 		{
-			Document.Current.History.Perform(new SetKeyframe(animationHost, propertyName, animationId, keyframe));
+			Perform(animationHost, propertyName, animationId, keyframe, Document.Current.History);
 		}
 
 		public static void Perform(IAnimator animator, IKeyframe keyframe)
@@ -298,7 +315,12 @@ namespace Tangerine.Core.Operations
 
 		public static void Perform(object item, IList list, int location)
 		{
-			Document.Current.History.Perform(new InsertListItem(item, list, location));
+			Perform(item, list, location, Document.Current.History);
+		}
+
+		public static void Perform(object item, IList list, int location, ITransactionalHistory history)
+		{
+			history.Perform(new InsertListItem(item, list, location));
 		}
 
 		public class Processor : OperationProcessor<InsertListItem>
@@ -318,7 +340,7 @@ namespace Tangerine.Core.Operations
 	public class RemoveListItem : Operation
 	{
 		public readonly IList List;
-		public readonly int Location;
+		public int Location;
 		public object Item { get; private set; }
 
 		public override bool IsChangingDocument => true;
@@ -332,12 +354,22 @@ namespace Tangerine.Core.Operations
 
 		public static void Perform(object item, IList list)
 		{
-			Document.Current.History.Perform(new RemoveListItem(item, list, 0));
+			Perform(item, list, Document.Current.History);
 		}
 
 		public static void Perform(int location, IList list)
 		{
-			Document.Current.History.Perform(new RemoveListItem(null, list, location));
+			Perform(location, list, Document.Current.History);
+		}
+
+		public static void Perform(int location, IList list, ITransactionalHistory history)
+		{
+			history.Perform(new RemoveListItem(null, list, location));
+		}
+
+		public static void Perform(object item, IList list, ITransactionalHistory history)
+		{
+			history.Perform(new RemoveListItem(item, list, 0));
 		}
 
 		public class Processor : OperationProcessor<RemoveListItem>
@@ -345,6 +377,7 @@ namespace Tangerine.Core.Operations
 			protected override void InternalRedo(RemoveListItem op)
 			{
 				if (op.Item != null) {
+					op.Location = op.List.IndexOf(op.Item);
 					op.List.Remove(op.Item);
 				} else {
 					op.Item = op.List[op.Location];

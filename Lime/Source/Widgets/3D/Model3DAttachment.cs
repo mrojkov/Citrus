@@ -15,6 +15,7 @@ namespace Lime
 		public readonly ObservableCollection<MeshOption> MeshOptions = new ObservableCollection<MeshOption>();
 		public readonly ObservableCollection<Animation> Animations = new ObservableCollection<Animation>();
 		public readonly ObservableCollection<MaterialEffect> MaterialEffects = new ObservableCollection<MaterialEffect>();
+		public readonly ObservableCollection<NodeComponentCollection> NodeComponents = new ObservableCollection<NodeComponentCollection>();
 		public float ScaleFactor { get; set; }
 
 		public class MeshOption
@@ -61,11 +62,46 @@ namespace Lime
 			public BlendingOption Blending { get; set; }
 		}
 
+		public class NodeComponentCollection
+		{
+			public string NodeId { get; set; }
+			public ObservableCollection<NodeComponent> Components { get; set; }
+		}
+
 		public void Apply(Node3D model)
 		{
 			ProcessMeshOptions(model);
 			ProcessAnimations(model);
 			ProcessMaterialEffects(model);
+			ProcessComponents(model);
+		}
+
+		private void ProcessComponents(Node3D model)
+		{
+			foreach (var nodeComponentData in NodeComponents) {
+				Node node;
+				if ((node = model.TryFindNode(nodeComponentData.NodeId)) != null) {
+					foreach (var component in nodeComponentData.Components) {
+						if (ValidateComponentType(node.GetType(), component.GetType())) {
+							node.Components.Add(component.Clone());
+						} else {
+							Console.WriteLine($"Warning: Unable to add {component.GetType().Name} to the {node.Id}." +
+								" This component type isn't allowed for this node type.");
+						}
+					}
+				}
+			}
+		}
+
+		public static bool ValidateComponentType(Type nodeType, Type componentType)
+		{
+			for (var t = componentType; t != null && t != typeof(NodeComponentCollection); t = t.BaseType) {
+				var a = componentType.GetCustomAttributes(false).OfType<AllowedComponentOwnerTypes>().FirstOrDefault();
+				if (a != null) {
+					return a.Types.Any(ownerType => ownerType == nodeType || nodeType.IsSubclassOf(ownerType));
+				}
+			}
+			return true;
 		}
 
 		public void ApplyScaleFactor(Node3D model)
@@ -75,9 +111,6 @@ namespace Lime
 			}
 			var sf = Vector3.One * ScaleFactor;
 			var nodes = model.Descendants.OfType<Node3D>();
-			Vector3 tranlation;
-			Quaternion rotation;
-			Vector3 scale;
 			foreach (var node in nodes) {
 				node.Position *= sf;
 				if (node is Mesh3D) {
@@ -87,8 +120,8 @@ namespace Lime
 							vertices[i].Pos *= sf;
 						}
 						submesh.Mesh.DirtyFlags |= MeshDirtyFlags.Vertices;
-						for (int i = 0; i < submesh.BoneBindPoses.Count; i++) {
-							submesh.BoneBindPoses[i].Decompose(out scale, out rotation, out tranlation);
+						for (var i = 0; i < submesh.BoneBindPoses.Count; i++) {
+							submesh.BoneBindPoses[i].Decompose(out var scale, out Quaternion rotation, out var tranlation);
 							tranlation *= sf;
 							submesh.BoneBindPoses[i] =
 								Matrix44.CreateRotation(rotation) *
@@ -96,8 +129,7 @@ namespace Lime
 								Matrix44.CreateTranslation(tranlation);
 						}
 					}
-				} else if (node is Camera3D) {
-					var cam = node as Camera3D;
+				} else if (node is Camera3D cam) {
 					cam.NearClipPlane *= ScaleFactor;
 					cam.FarClipPlane *= ScaleFactor;
 					cam.OrthographicSize *= ScaleFactor;
@@ -223,7 +255,6 @@ namespace Lime
 
 		private void OverrideAnimation(Node node, Lime.Animation srcAnimation, Lime.Animation dstAnimation)
 		{
-			var srcAnimators = new List<IAnimator>(node.Animators.Where(i => i.AnimationId == srcAnimation.Id));
 			var srcAnimationName = node.Animators.FirstOrDefault()?.AnimationId ?? srcAnimation.Id;
 			foreach (var srcAnimator in node.Animators) {
 				srcAnimator.AnimationId = dstAnimation.Id;
@@ -268,6 +299,9 @@ namespace Lime
 
 			[YuzuMember]
 			public Dictionary<string, ModelAnimationFormat> Animations = null;
+
+			[YuzuMember]
+			public Dictionary<string, ModelComponentsFormat> NodeComponents = null;
 
 			[YuzuMember]
 			public Dictionary<string, ModelMaterialEffectFormat> MaterialEffects = null;
@@ -338,6 +372,15 @@ namespace Lime
 
 			[YuzuMember]
 			public int? Blending = null;
+		}
+
+		public class ModelComponentsFormat
+		{
+			[YuzuMember]
+			public string Node = null;
+
+			[YuzuMember]
+			public List<NodeComponent> Components = null;
 		}
 
 		public class ModelMarkerFormat
@@ -415,6 +458,16 @@ namespace Lime
 							}
 						}
 						attachment.MeshOptions.Add(meshOption);
+					}
+				}
+
+				if (modelAttachmentFormat.NodeComponents != null) {
+					foreach (var nodeComponentFormat in modelAttachmentFormat.NodeComponents) {
+						var componentDescr = new Model3DAttachment.NodeComponentCollection {
+							NodeId = nodeComponentFormat.Key,
+							Components = new ObservableCollection<NodeComponent>(nodeComponentFormat.Value.Components)
+						};
+						attachment.NodeComponents.Add(componentDescr);
 					}
 				}
 
@@ -523,6 +576,9 @@ namespace Lime
 			if (attachment.MaterialEffects.Count > 0) {
 				origin.MaterialEffects = new Dictionary<string, ModelMaterialEffectFormat>();
 			}
+			if (attachment.NodeComponents.Count > 0) {
+				origin.NodeComponents = new Dictionary<string, ModelComponentsFormat>();
+			}
 			foreach (var meshOption in attachment.MeshOptions) {
 				var meshOptionFormat = new MeshOptionFormat {
 					HitTestTarget = meshOption.HitTestTarget,
@@ -540,6 +596,14 @@ namespace Lime
 						break;
 				}
 				origin.MeshOptions.Add(meshOption.Id, meshOptionFormat);
+			}
+
+			foreach (var component in attachment.NodeComponents) {
+				var componentFormat = new ModelComponentsFormat {
+					Node = component.NodeId,
+					Components = component.Components.ToList(),
+				};
+				origin.NodeComponents.Add(component.NodeId, componentFormat);
 			}
 
 			foreach (var animation in attachment.Animations) {

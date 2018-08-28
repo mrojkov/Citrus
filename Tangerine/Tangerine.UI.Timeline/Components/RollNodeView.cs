@@ -325,7 +325,8 @@ namespace Tangerine.UI.Timeline.Components
 				GenericCommands.ConvertToButton
 			};
 			if (nodeData.Node is Model3D && nodeData.Node.ContentsPath != null) {
-				menu.Insert(0, new Command("Edit Attachment Properties", DisplayAttachmentDialog));
+				TimelineCommands.ShowModel3DAttachmentDialog.UserData = nodeData.Node;
+				menu.Insert(0, TimelineCommands.ShowModel3DAttachmentDialog);
 			}
 
 			if (NodeCompositionValidator.CanHaveChildren(nodeData.Node.GetType())) {
@@ -337,11 +338,6 @@ namespace Tangerine.UI.Timeline.Components
 			}
 
 			menu.Popup();
-		}
-
-		private void DisplayAttachmentDialog()
-		{
-			new AttachmentDialog(nodeData.Node as Model3D);
 		}
 
 		private ICommand CreateSetColorMarkCommand(string title, int index)
