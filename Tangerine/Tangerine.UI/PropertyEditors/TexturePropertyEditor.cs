@@ -3,7 +3,7 @@ using Tangerine.Core;
 
 namespace Tangerine.UI
 {
-	public class TexturePropertyEditor : FilePropertyEditor<ITexture>
+	public class TexturePropertyEditor<T> : FilePropertyEditor<T> where T: ITexture
 	{
 		public TexturePropertyEditor(IPropertyEditorParams editorParams) : base(editorParams, new string[] { "png" })
 		{

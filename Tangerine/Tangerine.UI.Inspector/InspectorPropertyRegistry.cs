@@ -45,7 +45,8 @@ namespace Tangerine.UI.Inspector
 					c.PropertyInfo.PropertyType == typeof(ITexture) &&
 					c.PropertyInfo.GetValue(c.Objects.First())?.GetType() == typeof(RenderTexture);
 			}, c => new RenderTexturePropertyEditor(c));
-			AddEditor(typeof(ITexture), c => new TexturePropertyEditor(c));
+			AddEditor(typeof(ITexture), c => new TexturePropertyEditor<ITexture>(c));
+			AddEditor(typeof(SerializableTexture), c => new TexturePropertyEditor<SerializableTexture>(c));
 			AddEditor(typeof(SerializableSample), c => new AudioSamplePropertyEditor(c));
 			AddEditor(typeof(SerializableFont), c => new FontPropertyEditor(c));
 			AddEditor(typeof(NodeReference<Camera3D>), c => new NodeReferencePropertyEditor<Camera3D>(c));
