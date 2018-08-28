@@ -35,9 +35,10 @@
     <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CommonMark, Version=0.1.0.0, Culture=neutral, PublicKeyToken=001ef8810438905d, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\CommonMark.NET.0.15.1\lib\net45\CommonMark.dll</HintPath>
+    <Reference Include="Markdig, Version=0.15.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Markdig.0.15.1\lib\net40\Markdig.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -50,11 +51,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommandRegistry.cs" />
-    <Compile Include="Documentation\CustomHtmlFormatter.cs" />
+    <Compile Include="Documentation\CrosslinkExtension.cs" />
     <Compile Include="Documentation\Documentation.cs" />
     <Compile Include="Documentation\DocumentationComponent.cs" />
     <Compile Include="Documentation\HelpModeGestureManager.cs" />
-    <Compile Include="Documentation\HelpPage.cs" />
     <Compile Include="BackupHistoryPanel\BackupHistoryPanel.cs" />
     <Compile Include="ColorPicker.Win.cs" />
     <Compile Include="ColorPickerPanel.cs" />
