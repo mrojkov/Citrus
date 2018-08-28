@@ -680,6 +680,7 @@ namespace Tangerine.UI.FilesystemView
 				selection.Clear();
 				selection.Select(matches[index].FilesystemPath);
 				lastKeyboardSelectedFilesystemItem = matches[index];
+				EnsureFSItemVisible(lastKeyboardSelectedFilesystemItem);
 			}
 		}
 
