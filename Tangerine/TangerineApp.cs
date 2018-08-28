@@ -567,7 +567,7 @@ namespace Tangerine
 			h.Connect(Tools.CenterView, new CenterView());
 			h.Connect(Command.Copy, new DocumentDelegateCommandHandler(Core.Operations.Copy.CopyToClipboard, IsCopyPasteAllowedForSelection));
 			h.Connect(Command.Cut, new DocumentDelegateCommandHandler(Core.Operations.Cut.Perform, IsCopyPasteAllowedForSelection));
-			h.Connect(Command.Paste, new DocumentDelegateCommandHandler(Paste, Document.HasCurrent));
+			h.Connect(Command.Paste, new DocumentDelegateCommandHandler(() => Paste(), Document.HasCurrent));
 			h.Connect(Command.Delete, new DocumentDelegateCommandHandler(Core.Operations.Delete.Perform, IsCopyPasteAllowedForSelection));
 			h.Connect(Command.SelectAll, new DocumentDelegateCommandHandler(() => {
 				foreach (var row in Document.Current.Rows) {
@@ -576,6 +576,7 @@ namespace Tangerine
 			}, () => Document.Current?.Rows.Count > 0));
 			h.Connect(Command.Undo, () => Document.Current.History.Undo(), () => Document.Current?.History.CanUndo() ?? false);
 			h.Connect(Command.Redo, () => Document.Current.History.Redo(), () => Document.Current?.History.CanRedo() ?? false);
+			h.Connect(SceneViewCommands.PasteAtOldPosition, new DocumentDelegateCommandHandler(() => Paste(pasteAtMouse: false), IsCopyPasteAllowedForSelection));
 			h.Connect(SceneViewCommands.SnapWidgetBorderToRuler, new SnapWidgetBorderCommandHandler());
 			h.Connect(SceneViewCommands.SnapWidgetPivotToRuler, new SnapWidgetPivotCommandHandler());
 			h.Connect(SceneViewCommands.SnapRulerLinesToWidgets, new SnapRulerLinesToWidgetCommandHandler());
@@ -645,10 +646,10 @@ namespace Tangerine
 			}
 		}
 
-		static void Paste()
+		static void Paste(bool pasteAtMouse = true)
 		{
 			try {
-				Core.Operations.Paste.Perform(pasteAtMouse: UI.SceneView.SceneView.Instance.InputArea.IsFocused() && !CoreUserPreferences.Instance.DontPasteAtMouse);
+				Core.Operations.Paste.Perform(pasteAtMouse: UI.SceneView.SceneView.Instance.InputArea.IsFocused() && pasteAtMouse);
 			} catch (InvalidOperationException e) {
 				Document.Current.History.RollbackTransaction();
 				AlertDialog.Show(e.Message);
