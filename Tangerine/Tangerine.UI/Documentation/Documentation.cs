@@ -14,7 +14,7 @@ namespace Tangerine.UI
 			Path.Combine(Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.FullName, "Documentation");
 		public static string HtmlDocumentationPath { get; set; } =
 			Lime.Environment.GetPathInsideDataDirectory("Tangerine", "DocumentationCache");
-		public static string StyleSheetPath { get; set; } = Path.Combine(MarkdownDocumentationPath, "stylesheet.css");
+		public static string StyleSheetPath { get; set; } = "file:///" + Path.Combine(MarkdownDocumentationPath, "stylesheet.css");
 
 		public static string PageExtension { get; set; } = ".md";
 		public static string DocExtension { get; set; } = ".html";
