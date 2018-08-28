@@ -33,13 +33,17 @@ namespace Tangerine.UI.Timeline
 				}
 				var topLeft = grid.CellToGridCoordinates(boundaries.Value.Top, boundaries.Value.Left);
 				var bottomRight = grid.CellToGridCoordinates(boundaries.Value.Bottom + 1, boundaries.Value.Right);
-
-				if (Mathf.Abs(grid.ContentWidget.LocalMousePosition().X - topLeft.X) < 10) {
+				var mousePosition = grid.ContentWidget.LocalMousePosition();
+				if (mousePosition.Y < topLeft.Y || mousePosition.Y > bottomRight.Y) {
+					yield return null;
+					continue;
+				}
+				if (mousePosition.X - topLeft.X < 0 && mousePosition.X - topLeft.X > -10) {
 					Utils.ChangeCursorIfDefault(MouseCursor.SizeWE);
 					if (input.ConsumeKeyPress(Key.Mouse0)) {
 						yield return Drag(boundaries.Value, DragSide.Left);
 					}
-				} else if (Mathf.Abs(grid.ContentWidget.LocalMousePosition().X - bottomRight.X) < 10) {
+				} else if (mousePosition.X - bottomRight.X > 0 && mousePosition.X - bottomRight.X < 10) {
 					Utils.ChangeCursorIfDefault(MouseCursor.SizeWE);
 					if (input.ConsumeKeyPress(Key.Mouse0)) {
 						yield return Drag(boundaries.Value, DragSide.Right);
