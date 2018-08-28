@@ -703,7 +703,20 @@ namespace Tangerine.UI.FilesystemView
 								// Up,  Down
 								case 2: case 3: indexDelta = sign * columnCount; break;
 								// PageUp, PageDown
-								case 4: case 5: indexDelta = sign * columnCount * ((int)(scrollView.Size.Y / (rowHeight + flowLayout.Spacing)) - 1); break;
+								case 4: case 5:
+									int currentColumn = index % columnCount;
+									int count = scrollView.Content.Nodes.Count;
+									bool lastRow = currentColumn < count % columnCount;
+									indexDelta =
+										(sign * columnCount * ((int)(scrollView.Size.Y / (rowHeight + flowLayout.Spacing)) - 1))
+										.Clamp(
+											currentColumn - index,
+											currentColumn + columnCount * (count / columnCount - (lastRow ? 0 : 1)) - index
+										);
+									if (indexDelta == 0) {
+										indexDelta = sign < 0 ? -index : count - index - 1;
+									}
+									break;
 								// Home
 								case 6: indexDelta = -rangeSelectionIndex; break;
 								// End
@@ -716,7 +729,9 @@ namespace Tangerine.UI.FilesystemView
 								// Up,  Down
 								case 2: case 3: indexDelta = sign * 1; break;
 								// PageUp, PageDown
-								case 4: case 5: /* TODO: Implement for PgUp; PgDown */ break;
+								case 4: case 5:
+									indexDelta = (sign * rowCount).Clamp(-index, scrollView.Content.Nodes.Count - index - 1);
+									break;
 								// Home
 								case 6: indexDelta = -rangeSelectionIndex; break;
 								// End
