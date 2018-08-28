@@ -94,7 +94,7 @@ namespace Tangerine.UI
 				Core.Operations.SetProperty.Perform(selectedControlPoint, nameof(GradientControlPoint.Color), colorPanel.Color, EditorParams.History);
 				SetControlPointProperty(nameof(GradientControlPoint.Color), colorPanel.Color);
 			};
-			SelectPoint(gradientControlWidget.SelectedControlPoint, true);
+			SelectPoint(gradientControlWidget.SelectedControlPoint);
 		}
 
 		protected override void ResetToDefault()
@@ -161,7 +161,7 @@ namespace Tangerine.UI
 			positionEditor.Text = selectedPositionProperty.GetValue().ToString();
 		}
 
-		private void SelectPoint(GradientControlPoint point, bool isBorderPoint)
+		private void SelectPoint(GradientControlPoint point)
 		{
 			selectedControlPoint = point;
 			ContainerWidget.Tasks.Clear();
@@ -179,7 +179,6 @@ namespace Tangerine.UI
 				}
 			}));
 			positionEditor.Tasks.Add(selectedPositionProperty.DistinctUntilChanged().Consume(v => positionEditor.Text = v.ToString()));
-			positionPropertyContainer.Visible = !isBorderPoint;
 		}
 
 		private bool InitializePropertyIfNecessary()
@@ -222,7 +221,7 @@ namespace Tangerine.UI
 			}
 		}
 
-		public event Action<GradientControlPoint, bool> SelectionChanged;
+		public event Action<GradientControlPoint> SelectionChanged;
 		public event Action<GradientControlPoint> ControlPointCreated;
 		public event Action<int> ControlPointRemoved;
 		public event Action<float, int> ControlPointMoved;
@@ -297,7 +296,7 @@ namespace Tangerine.UI
 							ControlPointCreated?.Invoke(point);
 							history.CommitTransaction();
 						}
-						CreatePoint(point, false, gradientPaneContainer);
+						CreatePoint(point, Gradient, gradientPaneContainer);
 					}
 				}
 				yield return null;
@@ -307,38 +306,33 @@ namespace Tangerine.UI
 		private void InitializePoints(Widget container)
 		{
 			var points = Gradient.Ordered().ToList();
-			for (var i = 0; i < points.Count; i++) {
-				var isBorderPoint = i == 0 || i == Gradient.Count - 1;
-				CreatePoint(points[i], isBorderPoint, container);
+			foreach (var t in points) {
+				CreatePoint(t, Gradient, container);
 			}
 		}
 
-		private void CreatePoint(GradientControlPoint controlPoint, bool isBorderPoint, Widget container)
+		private void CreatePoint(GradientControlPoint controlPoint, ColorGradient gradient, Widget container)
 		{
-			var w = new GradientControlPointWidget(history, controlPoint, isBorderPoint) {
+			var w = new GradientControlPointWidget(history, controlPoint) {
 				Position = new Vector2(controlPoint.Position * container.Size.X, container.Size.Y),
 				MinMaxHeight = 15f,
 				MinMaxWidth = 10f,
 				Size = new Vector2(10, 15f)
 			};
-			if (!isBorderPoint) {
-				w.Gestures.Add(new ClickGesture(1, () => {
-					var idx = gradient.IndexOf(w.ControlPoint);
+			w.Gestures.Add(new ClickGesture(1, () => {
+				var idx = gradient.IndexOf(w.ControlPoint);
+				if (gradient.Count > 1) {
 					using (history.BeginTransaction()) {
 						Core.Operations.RemoveListItem.Perform(w.ControlPoint, gradient, history);
 						ControlPointRemoved?.Invoke(idx);
 						history.CommitTransaction();
 					}
 					w.UnlinkAndDispose();
-				}));
-			}
+				}
+			}));
 			w.OnClick += () => SelectPoint(w);
 			w.OnDrag += pos => OnControlPointDrag(pos, Gradient.IndexOf(controlPoint));
-			if (!isBorderPoint) {
-				container.Nodes.Insert(0, w);
-			} else {
-				container.AddNode(w);
-			}
+			container.Nodes.Insert(0, w);
 			SelectPoint(w);
 		}
 
@@ -361,7 +355,7 @@ namespace Tangerine.UI
 			}
 			selectedControlPointWidget = w;
 			w.Color = Color4.Black;
-			SelectionChanged?.Invoke(SelectedControlPoint, w.IsBorderPoint);
+			SelectionChanged?.Invoke(SelectedControlPoint);
 		}
 	}
 
@@ -374,7 +368,6 @@ namespace Tangerine.UI
 		private readonly ITexture chessTexture;
 		public event Action OnClick;
 		public event Action<float> OnDrag;
-		public bool IsBorderPoint { get; }
 		public const float tipBodyRatio = 1f / 3f;
 
 		public override void Update(float delta)
@@ -383,12 +376,11 @@ namespace Tangerine.UI
 			Position = new Vector2(ParentWidget.Size.X * ControlPoint.Position, ParentWidget.Size.Y);
 		}
 
-		public GradientControlPointWidget(ITransactionalHistory history, GradientControlPoint controlPoint, bool isBorderPoint = false)
+		public GradientControlPointWidget(ITransactionalHistory history, GradientControlPoint controlPoint)
 		{
 			this.history = history;
 			ControlPoint = controlPoint;
 			Pivot = new Vector2(0.5f, 0);
-			IsBorderPoint = isBorderPoint;
 			CompoundPresenter.Add(new DelegatePresenter<Widget>(Render));
 			HitTestTarget = true;
 			Gestures.Add(dragGesture = new DragGesture());
@@ -434,20 +426,18 @@ namespace Tangerine.UI
 				if (dragGesture.WasBegan()) {
 					var prevPos = ParentWidget.LocalMousePosition();
 					OnClick?.Invoke();
-					if (!IsBorderPoint) {
-						using (history.BeginTransaction()) {
-							while (!dragGesture.WasEnded()) {
-								history.RollbackTransaction();
-								var mousePos = ParentWidget.LocalMousePosition();
-								var delta = (mousePos - prevPos) / ParentWidget.Size;
-								var newPosition = Mathf.Clamp(ControlPoint.Position + delta.X, 0, 1);
-								Core.Operations.SetProperty.Perform(ControlPoint, nameof(GradientControlPoint.Position), newPosition, history);
-								OnDrag?.Invoke(newPosition);
-								var x = Mathf.Clamp(mousePos.X, 0, ParentWidget.Size.X);
-								prevPos = new Vector2(x, mousePos.Y);
-								history.CommitTransaction();
-								yield return null;
-							}
+					using (history.BeginTransaction()) {
+						while (!dragGesture.WasEnded()) {
+							history.RollbackTransaction();
+							var mousePos = ParentWidget.LocalMousePosition();
+							var delta = (mousePos - prevPos) / ParentWidget.Size;
+							var newPosition = Mathf.Clamp(ControlPoint.Position + delta.X, 0, 1);
+							Core.Operations.SetProperty.Perform(ControlPoint, nameof(GradientControlPoint.Position), newPosition, history);
+							OnDrag?.Invoke(newPosition);
+							var x = Mathf.Clamp(mousePos.X, 0, ParentWidget.Size.X);
+							prevPos = new Vector2(x, mousePos.Y);
+							history.CommitTransaction();
+							yield return null;
 						}
 					}
 				}

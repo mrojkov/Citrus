@@ -167,6 +167,9 @@ namespace Lime
 						pixels[i++] = Color4.Lerp(ratio, cachedPoints[j].Color, cachedPoints[j + 1].Color);
 					}
 				}
+				while (i < gradientTexturePixelCount - 1) {
+					pixels[i++] = cachedPoints[currentSize - 1].Color;
+				}
 				GradientTexture.LoadImage(pixels, gradientTexturePixelCount, 1);
 			}
 		}
