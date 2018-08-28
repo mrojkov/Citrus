@@ -59,8 +59,6 @@ namespace Tangerine.UI.SceneView
 				() => Document.Current?.TopLevelSelectedRows().Any(row => row.IsCopyPasteAllowed()) ?? false);
 			ConnectCommand(SceneViewCommands.TieWidgetsWithBones, TieWidgetsWithBones);
 			ConnectCommand(SceneViewCommands.UntieWidgetsFromBones, UntieWidgetsFromBones);
-			ConnectCommand(SceneViewCommands.ToggleDisplayRuler, new DisplayRuler());
-			ConnectCommand(SceneViewCommands.SaveCurrentRuler, new SaveRuler());
 		}
 
 		private static void ConnectCommand(ICommand command, DocumentCommandHandler handler)
@@ -279,46 +277,6 @@ namespace Tangerine.UI.SceneView
 				if (Document.Current.PreviewAnimation) {
 					base.Update(delta);
 				}
-			}
-		}
-
-		private class SaveRuler : DocumentCommandHandler
-		{
-			public override bool GetEnabled()
-			{
-				return SceneViewCommands.ToggleDisplayRuler.Checked &&
-					   ProjectUserPreferences.Instance.ActiveRuler.Lines.Count > 0;
-			}
-
-			public override void ExecuteTransaction()
-			{
-				var ruler = ProjectUserPreferences.Instance.ActiveRuler;
-				if (!new SaveRulerDialog(ruler).Show()) {
-					return;
-				}
-				if (ProjectUserPreferences.Instance.Rulers.Any(o => o.Name == ruler.Name)) {
-					new AlertDialog("Ruler with exact name already exist").Show();
-					ruler.Name = string.Empty;
-					ruler.AnchorToRoot = false;
-				} else {
-					if (ruler.AnchorToRoot) {
-						var size = Document.Current.Container.AsWidget.Size / 2;
-						foreach (var l in ruler.Lines) {
-							l.Value -= (l.RulerOrientation == RulerOrientation.Horizontal ? size.Y : size.X);
-						}
-					}
-					ProjectUserPreferences.Instance.SaveActiveRuler();
-				}
-			}
-		}
-
-		private class DisplayRuler : DocumentCommandHandler
-		{
-			public override bool GetChecked() => ProjectUserPreferences.Instance.RulerVisible;
-
-			public override void ExecuteTransaction()
-			{
-				ProjectUserPreferences.Instance.RulerVisible = !ProjectUserPreferences.Instance.RulerVisible;
 			}
 		}
 	}

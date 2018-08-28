@@ -62,7 +62,6 @@
     <Compile Include="Console.cs" />
     <Compile Include="Cursors.cs" />
     <Compile Include="Dialogs\ModalOperationDialog.cs" />
-    <Compile Include="Dialogs\SaveRulerDialog.cs" />
     <Compile Include="Dialogs\AlertDialog.cs" />
     <Compile Include="Dialogs\AttachmentDialog.cs" />
     <Compile Include="EmbeddedResources\ThemedconResource.cs" />

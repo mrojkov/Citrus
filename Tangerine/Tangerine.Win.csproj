@@ -54,12 +54,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AlignPreferences.cs" />
+    <Compile Include="CommandHandlers.cs" />
     <Compile Include="Dialogs\ColorThemeEditor.cs" />
     <Compile Include="Dialogs\HelpDialog.cs" />
     <Compile Include="Dialogs\ManageRulersDialog.cs" />
     <Compile Include="Dialogs\OrangePluginOptionsDialog.cs" />
     <Compile Include="Dialogs\PreferencesDialog.cs" />
     <Compile Include="Dialogs\HotkeyEditor.cs" />
+    <Compile Include="Dialogs\SaveRulerDialog.cs" />
     <Compile Include="Dialogs\ToolbarModelEditor.cs" />
     <Compile Include="DocumentTabContextMenu.cs" />
     <Compile Include="MainMenu\CreateMenu.cs" />

@@ -69,7 +69,6 @@
     <Compile Include="Documentation\HelpModeGestureManager.cs" />
     <Compile Include="Documentation\HelpPage.cs" />
     <Compile Include="Dialogs\ModalOperationDialog.cs" />
-    <Compile Include="Dialogs\SaveRulerDialog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="IconPool.cs" />
     <Compile Include="Utils\KeyframePalette.cs" />

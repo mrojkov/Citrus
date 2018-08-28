@@ -586,6 +586,8 @@ namespace Tangerine
 			h.Connect(TimelineCommands.CreateRotationKeyframe, UI.Timeline.Operations.ToggleRotationKeyframe.Perform);
 			h.Connect(TimelineCommands.CreateScaleKeyframe, UI.Timeline.Operations.ToggleScaleKeyframe.Perform);
 			h.Connect(OrangeCommands.RunConfig, new OrangeCommandHandler(() => new OrangePluginOptionsDialog()));
+			h.Connect(SceneViewCommands.ToggleDisplayRuler, new DisplayRuler());
+			h.Connect(SceneViewCommands.SaveCurrentRuler, new SaveRuler());
 		}
 
 		private void InitializeHotkeys()
@@ -628,58 +630,6 @@ namespace Tangerine
 		{
 			if (new AlertDialog("Are you sure you want to clear active ruler?", "Yes", "No").Show() == 0) {
 				ProjectUserPreferences.Instance.ActiveRuler.Lines.Clear();
-			}
-		}
-
-		private class SnapWidgetPivotCommandHandler : DocumentCommandHandler
-		{
-			public override bool GetChecked() => UI.SceneView.SceneUserPreferences.Instance.SnapWidgetPivotToRuler;
-			public override void ExecuteTransaction()
-			{
-				var prefs = UI.SceneView.SceneUserPreferences.Instance;
-				prefs.SnapWidgetPivotToRuler = !prefs.SnapWidgetPivotToRuler;
-			}
-		}
-
-		private class SnapWidgetBorderCommandHandler : DocumentCommandHandler
-		{
-			public override bool GetChecked() => UI.SceneView.SceneUserPreferences.Instance.SnapWidgetBorderToRuler;
-			public override void ExecuteTransaction()
-			{
-				var prefs = UI.SceneView.SceneUserPreferences.Instance;
-				prefs.SnapWidgetBorderToRuler = !prefs.SnapWidgetBorderToRuler;
-			}
-		}
-
-		private class SnapRulerLinesToWidgetCommandHandler : DocumentCommandHandler
-		{
-			public override bool GetChecked() => UI.SceneView.SceneUserPreferences.Instance.SnapRulerLinesToWidgets;
-			public override void ExecuteTransaction()
-			{
-				var prefs = UI.SceneView.SceneUserPreferences.Instance;
-				prefs.SnapRulerLinesToWidgets = !prefs.SnapRulerLinesToWidgets;
-			}
-		}
-
-		private class PanelCommandHandler : CommandHandler
-		{
-			private readonly string panelId;
-			private PanelPlacement placement => DockManager.Instance.Model.FindPanelPlacement(panelId);
-
-			public override void RefreshCommand(ICommand command)
-			{
-				command.Checked = !placement.Hidden;
-			}
-
-			public PanelCommandHandler(string panelId)
-			{
-				this.panelId = panelId;
-			}
-
-			public override void Execute()
-			{
-				placement.Hidden = !placement.Hidden;
-				DockManager.Instance.Refresh();
 			}
 		}
 
