@@ -374,7 +374,9 @@ namespace Tangerine
 	{
 		public override void ExecuteTransaction()
 		{
-			UpsampleNodeAnimation(Document.Current.Container);
+			foreach (var n in Document.Current.Container.Nodes) {
+				UpsampleNodeAnimation(n);
+			}
 		}
 
 		private void UpsampleNodeAnimation(Node node)
