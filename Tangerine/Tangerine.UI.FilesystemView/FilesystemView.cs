@@ -539,8 +539,11 @@ namespace Tangerine.UI.FilesystemView
 			var nodeUnderMouse = WidgetContext.Current.NodeUnderMouse;
 			if (
 				nodeUnderMouse == null ||
-				!(nodeUnderMouse is FilesystemItem ||
-					nodeUnderMouse.Parent is FilesystemItem)
+				!(
+					nodeUnderMouse is FilesystemItem ||
+					nodeUnderMouse.Parent is FilesystemItem
+				 ) ||
+				nodeUnderMouse.Parent != scrollView.Content
 			) {
 				return;
 			}
