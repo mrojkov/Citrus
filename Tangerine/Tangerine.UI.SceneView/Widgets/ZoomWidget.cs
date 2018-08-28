@@ -8,7 +8,7 @@ namespace Tangerine.UI.SceneView
 	{
 		public const float FrameHeight = 24;
 
-		private static readonly List<float> zoomTable = new List<float> {
+		public static readonly List<float> zoomTable = new List<float> {
 			0.001f, 0.0025f, 0.005f, 0.01f, 0.025f, 0.05f, 0.10f,
 			0.15f, 0.25f, 0.5f, 0.75f, 1f, 1.5f, 2f, 3f,
 			4f, 5f, 6f, 7f, 8f, 9f, 10f, 11f,
@@ -100,7 +100,7 @@ namespace Tangerine.UI.SceneView
 			SceneView.Scene.Position -= p * (newZoom - prevZoom);
 		}
 
-		private static int FindNearest(float x, int left, int right)
+		public static int FindNearest(float x, int left, int right)
 		{
 			while (true) {
 				if (right - left == 1) {

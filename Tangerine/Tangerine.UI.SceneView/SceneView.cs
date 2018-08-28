@@ -153,6 +153,17 @@ namespace Tangerine.UI.SceneView
 			filesDropHandler.Handling += FilesDropOnHandling;
 			filesDropHandler.NodeCreated += FilesDropOnNodeCreated;
 			Scene.AddChangeWatcher(() => Document.Current.SlowMotion, v => Scene.AnimationSpeed = v ? 0.1f : 1);
+			Frame.Awoke += CenterDocumentRoot;
+		}
+
+		private void CenterDocumentRoot(Node node)
+		{
+			var widget = Document.Current.RootNode.AsWidget;
+			var frameWidth = Frame.Width - RulersWidget.RulerHeight;
+			var frameHeight = Frame.Height - ZoomWidget.FrameHeight + RulersWidget.RulerHeight;
+			var zoomIndex = ZoomWidget.FindNearest(Mathf.Min(frameWidth / widget.Width, frameHeight / widget.Height), 0, ZoomWidget.zoomTable.Count);
+			Scene.Scale = new Vector2(ZoomWidget.zoomTable[zoomIndex]);
+			Scene.Position = -(widget.Position + widget.Size / 2) * Scene.Scale + new Vector2(Frame.Width / 2, Frame.Height / 2);
 		}
 
 		private void FilesDropOnHandling()
