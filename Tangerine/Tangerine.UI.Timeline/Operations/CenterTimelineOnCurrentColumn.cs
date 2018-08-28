@@ -3,7 +3,7 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.Timeline.Operations
 {
-	public static class CenterTimeline
+	public static class CenterTimelineOnCurrentColumn
 	{
 		public static void Perform()
 		{
