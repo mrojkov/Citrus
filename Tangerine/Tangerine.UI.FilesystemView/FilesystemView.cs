@@ -480,11 +480,21 @@ namespace Tangerine.UI.FilesystemView
 					}
 					dragEndPosition = ScrollView.Content.LocalMousePosition();
 					var scrollOffset = 0.0f;
-					if (ScrollView.LocalMousePosition().Y < 0) {
-						scrollOffset = ScrollView.LocalMousePosition().Y;
+					var pos = ScrollView.LocalMousePosition();
+					if (ScrollView.Direction == ScrollDirection.Vertical) {
+						if (pos.Y < 0) {
+							scrollOffset = pos.Y;
 
-					} else if (ScrollView.LocalMousePosition().Y > ScrollView.Size.Y) {
-						scrollOffset = ScrollView.LocalMousePosition().Y - ScrollView.Size.Y;
+						} else if (pos.Y > ScrollView.Height) {
+							scrollOffset = pos.Y - ScrollView.Height;
+						}
+					} else if (ScrollView.Direction == ScrollDirection.Horizontal) {
+						if (pos.X < 0) {
+							scrollOffset = pos.X;
+
+						} else if (pos.X > ScrollView.Width) {
+							scrollOffset = pos.X - ScrollView.Width;
+						}
 					}
 					ScrollView.ScrollPosition += Math.Sign(scrollOffset) * Mathf.Sqr(scrollOffset) * 0.1f * dt;
 					ScrollView.ScrollPosition = Mathf.Clamp(ScrollView.ScrollPosition, ScrollView.MinScrollPosition, ScrollView.MaxScrollPosition);
@@ -787,27 +797,42 @@ namespace Tangerine.UI.FilesystemView
 
 		private void EnsureFSItemVisible(FilesystemItem fsItem)
 		{
-			var y = fsItem.CalcPositionInSpaceOf(ScrollView).Y;
-			EnsureRangeVisible(y, y + fsItem.Height);
+			float min = 0;
+			float offset = 0;
+			var pos = fsItem.CalcPositionInSpaceOf(ScrollView);
+			if (ScrollView.Direction == ScrollDirection.Vertical) {
+				min = pos.Y;
+				offset = min + fsItem.Height - ScrollView.Height;
+			} else if (ScrollView.Direction == ScrollDirection.Horizontal) {
+				min = pos.X;
+				offset = min + fsItem.Width - ScrollView.Width;
+			}
+			EnsureRangeVisible(min, offset);
 		}
 
 		private void EnsureSelectionVisible()
 		{
-			float minY = float.MaxValue;
-			float maxY = float.MinValue;
+			float min = float.MaxValue;
+			float offset = float.MinValue;
 			foreach (var n in ScrollView.Content.Nodes) {
 				var fsItem = n as FilesystemItem;
-				if (selection.Contains(fsItem.FilesystemPath)) {
-					minY = Mathf.Min(minY, fsItem.CalcPositionInSpaceOf(ScrollView).Y);
-					maxY = Mathf.Max(maxY, fsItem.CalcPositionInSpaceOf(ScrollView).Y + fsItem.Height);
+				if (!selection.Contains(fsItem.FilesystemPath)) {
+					continue;
+				}
+				var pos = fsItem.CalcPositionInSpaceOf(ScrollView);
+				if (ScrollView.Direction == ScrollDirection.Vertical) {
+					min = Mathf.Min(min, pos.Y);
+					offset = Mathf.Max(offset, pos.Y + fsItem.Height - ScrollView.Height);
+				} else if (ScrollView.Direction == ScrollDirection.Horizontal) {
+					min = Mathf.Min(min, pos.X);
+					offset = Mathf.Max(offset, pos.X + fsItem.Width - ScrollView.Width);
 				}
 			}
-			EnsureRangeVisible(minY, maxY);
+			EnsureRangeVisible(min, offset);
 		}
 
-		private void EnsureRangeVisible(float min, float max)
+		private void EnsureRangeVisible(float min, float offset)
 		{
-			var offset = max - ScrollView.Height;
 			if (offset > 0.0f) {
 				ScrollView.ScrollPosition += offset;
 			}
