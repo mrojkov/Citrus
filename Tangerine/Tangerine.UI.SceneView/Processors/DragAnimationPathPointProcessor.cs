@@ -23,7 +23,7 @@ namespace Tangerine.UI.SceneView
 					continue;
 				}
 				var nodes = Document.Current.SelectedNodes().Editable();
-				var mousePosition = sv.MousePosition;
+				var mousePosition = sv.Frame.LocalMousePosition();
 				foreach (var node in nodes) {
 					if (!(node is Widget)) {
 						continue;
@@ -36,7 +36,7 @@ namespace Tangerine.UI.SceneView
 								animator.TargetPropertyPath == nameof(Widget.Position)
 							) {
 								var keys = animator.ReadonlyKeys.ToList();
-								var transform = node.Parent.AsWidget.CalcTransitionToSpaceOf(sv.Scene);
+								var transform = node.Parent.AsWidget.CalcTransitionToSpaceOf(sv.Frame);
 								foreach (var key in keys) {
 									if ((mousePosition - (Vector2)key.Value * transform).Length < 20) {
 										Utils.ChangeCursorIfDefault(MouseCursor.Hand);
