@@ -54,6 +54,6 @@ namespace Tangerine.UI
 			Enumerable.Range(1, 128).Select(i => (char)i).
 			Where(c =>
 				char.IsLetterOrDigit(c) ||
-				c == '_' || c == '.').ToList();
+				c == '_' || c == '.' || c == '>' || c == '@' || c == '[' || c == ']').ToList();
 	}
 }
