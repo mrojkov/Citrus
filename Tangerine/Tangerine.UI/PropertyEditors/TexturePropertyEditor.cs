@@ -31,5 +31,13 @@ namespace Tangerine.UI
 				c == '_' || c == '.' || c == '!' || c == '#').ToList();
 
 		protected override IEnumerable<char> ValidChars => validchars;
+
+		protected override string StringValueGetter(T obj) {
+			return (obj as SerializableTexture)?.SerializationPath ?? "";
+		}
+
+		protected override T StringValueSetter(string path) {
+			return (T)(ITexture)new SerializableTexture(path);
+		}
 	}
 }
