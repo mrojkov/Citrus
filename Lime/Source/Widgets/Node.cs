@@ -470,7 +470,10 @@ namespace Lime
 
 		/// <summary>
 		/// Custom data. Can be set via Tangerine (this way it will contain path to external scene).
+		/// Can't use obsolete attribute because of Yuzu Generated Binary Deserializers. But its obsolete, dont use it.
+		/// Use Node Components instead.
 		/// </summary>
+		[TangerineIgnore]
 		[YuzuMember]
 		public string Tag
 		{
