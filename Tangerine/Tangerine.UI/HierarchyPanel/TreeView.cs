@@ -237,6 +237,8 @@ namespace Tangerine.UI
 			public bool Expandable { get; private set; }
 			public float RowHeight => treeNodeWidget.Height;
 
+			private readonly bool[] skippedChangeWatcherUpdate = { false, false };
+
 			public TreeNode(DocumentHierarchyTreeView view, Node rootNode, TreeNode parentTreeNode, JointType jointType, List<Joint> offsetJoints, int level, int index, bool isLast)
 			{
 				this.rootNode = rootNode;
@@ -277,10 +279,18 @@ namespace Tangerine.UI
 				treeNodeWidget.Gestures.Add(new DoubleClickGesture(NavigateToNode));
 				AddNode(treeNodeWidget);
 
-				this.AddChangeWatcher(() => rootNode.NextSibling, _ => parentTreeNode?.UpdateChildTreeNodes());
-				this.AddChangeWatcher(() => rootNode.Nodes.Count, _ => UpdateChildTreeNodes());
+				this.AddChangeWatcher(
+					() => rootNode.NextSibling,
+					_ => parentTreeNode?.UpdateChildTreeNodes(ref skippedChangeWatcherUpdate[0])
+				);
 
-				UpdateChildTreeNodes();
+				this.AddChangeWatcher(
+					() => rootNode.Nodes.Count,
+					_ => UpdateChildTreeNodes(ref skippedChangeWatcherUpdate[1])
+				);
+
+				bool skipped = true;
+				UpdateChildTreeNodes(ref skipped);
 			}
 
 			private void CreateExpandButton()
@@ -391,8 +401,13 @@ namespace Tangerine.UI
 				parentJoint.Type = joint;
 			}
 
-			private void UpdateChildTreeNodes()
+			private void UpdateChildTreeNodes(ref bool skipped)
 			{
+				// Skip first call by change watcher to remove unnecessary updates
+				if (!skipped) {
+					skipped = true;
+					return;
+				}
 				var rootNodes = savedNodes.Select(t => t.rootNode).ToList();
 				treeNodesContainer.Nodes.Clear();
 				for (int i = 0; i < rootNode.Nodes.Count; ++i) {
