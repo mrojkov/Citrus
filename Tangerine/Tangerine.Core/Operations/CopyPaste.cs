@@ -5,6 +5,7 @@ using Tangerine.Core;
 using Tangerine.Core.Components;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using Orange;
 
 namespace Tangerine.Core.Operations
 {
@@ -121,7 +122,13 @@ namespace Tangerine.Core.Operations
 				frame = TangerineYuzu.Instance.Value.ReadObject<Frame>(Document.Current.Path, stream);
 			} catch (System.Exception e) {
 				Debug.Write(e);
-				return false;
+				try {
+					var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(data));
+					frame = (Frame)new HotSceneImporter(isTangerine: true).Import(stream, new Frame(), null);
+				} catch (System.Exception e2) {
+					Debug.Write(e2);
+					return false;
+				}
 			}
 			FolderItemLocation folderLocation;
 			if (location.ParentRow.Rows.Count > 0) {

@@ -1071,6 +1071,7 @@ namespace Orange
 				new KnownActorType {ActorClass = "Hot::ModelView", NodeClass = "Lime.Viewport3D, Lime", PropReader = ParseModelViewProperty},
 				new KnownActorType {ActorClass = "LinearLayout", NodeClass = "Lime.LinearLayout, Lime", PropReader = ParseLinearLayoutProperty},
 				new KnownActorType {ActorClass = "Hot::EmitterShapePoint", NodeClass = "Lime.EmitterShapePoint, Lime", PropReader = ParseEmitterShapePointProperty},
+				new KnownActorType {ActorClass = "HotStudio::ClipboardContainer", NodeClass = "Lime.Frame", PropReader = ParseSceneProperty},
 			};
 		}
 	}
