@@ -15,7 +15,10 @@ namespace Tangerine.UI.SceneView
 		public IEnumerator<object> Task()
 		{
 			while (true) {
-				if (!animationPathHint.Enabled) {
+				if (
+					!animationPathHint.Enabled ||
+					!SceneView.Instance.InputArea.IsMouseOverThisOrDescendant()
+				) {
 					yield return null;
 					continue;
 				}

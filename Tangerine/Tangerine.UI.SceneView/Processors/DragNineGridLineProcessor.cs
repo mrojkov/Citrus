@@ -15,6 +15,10 @@ namespace Tangerine.UI.SceneView
 		public IEnumerator<object> Task()
 		{
 			while (true) {
+				if (!SceneView.Instance.InputArea.IsMouseOverThisOrDescendant()) {
+					yield return null;
+					continue;
+				}
 				var grids = Document.Current.SelectedNodes().Editable().OfType<NineGrid>();
 				var mousePosition = sv.MousePosition;
 				foreach (var grid in grids) {

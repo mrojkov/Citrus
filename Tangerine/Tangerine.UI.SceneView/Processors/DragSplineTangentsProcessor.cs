@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using Lime;
@@ -13,6 +13,10 @@ namespace Tangerine.UI.SceneView
 		public IEnumerator<object> Task()
 		{
 			while (true) {
+				if (!SceneView.Instance.InputArea.IsMouseOverThisOrDescendant()) {
+					yield return null;
+					continue;
+				}
 				var points = Document.Current.SelectedNodes().Editable().OfType<SplinePoint>();
 				foreach (var point in points) {
 					for (int i = 0; i < 2; i++) {
@@ -55,7 +59,7 @@ namespace Tangerine.UI.SceneView
 					}
 					yield return null;
 				}
-				Document.Current.History.CommitTransaction();	
+				Document.Current.History.CommitTransaction();
 			}
 		}
 	}

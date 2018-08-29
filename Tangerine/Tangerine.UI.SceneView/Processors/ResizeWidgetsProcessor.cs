@@ -31,6 +31,10 @@ namespace Tangerine.UI.SceneView
 		public IEnumerator<object> Task()
 		{
 			while (true) {
+				if (!SceneView.Instance.InputArea.IsMouseOverThisOrDescendant()) {
+					yield return null;
+					continue;
+				}
 				var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>();
 				if (Utils.CalcHullAndPivot(widgets, SceneView.Scene, out var hull, out var pivot)) {
 					for (var i = 0; i < 4; i++) {

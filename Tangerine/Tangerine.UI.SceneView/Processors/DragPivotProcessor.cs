@@ -17,6 +17,7 @@ namespace Tangerine.UI.SceneView
 				Vector2 pivot;
 				var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>();
 				if (
+					SceneView.Instance.InputArea.IsMouseOverThisOrDescendant() &&
 					sv.Input.IsKeyPressed(Key.Control) &&
 					Utils.CalcHullAndPivot(widgets, sv.Scene, out hull, out pivot) &&
 					sv.HitTestControlPoint(pivot))

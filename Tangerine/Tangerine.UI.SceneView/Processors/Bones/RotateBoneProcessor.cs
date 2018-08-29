@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using Lime;
@@ -14,6 +14,10 @@ namespace Tangerine.UI.SceneView
 		public IEnumerator<object> Task()
 		{
 			while (true) {
+				if (!SceneView.Instance.InputArea.IsMouseOverThisOrDescendant()) {
+					yield return null;
+					continue;
+				}
 				var bone = Document.Current.SelectedNodes().Editable().OfType<Bone>().FirstOrDefault();
 				if (bone != null) {
 					var entry = bone.Parent.AsWidget.BoneArray[bone.Index];

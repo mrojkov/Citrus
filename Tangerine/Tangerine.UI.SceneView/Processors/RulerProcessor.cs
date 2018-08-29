@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Lime;
@@ -18,7 +18,8 @@ namespace Tangerine.UI.SceneView
 			while (true) {
 				if (ProjectUserPreferences.Instance.RulerVisible &&
 					!Document.Current.ExpositionMode &&
-					!Document.Current.PreviewAnimation
+					!Document.Current.PreviewAnimation &&
+					sceneView.Frame.ParentWidget.IsMouseOverThisOrDescendant()
 				) {
 					RulerLine line;
 					bool lineCaptured;
