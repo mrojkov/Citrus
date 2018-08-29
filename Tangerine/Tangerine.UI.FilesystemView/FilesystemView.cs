@@ -549,10 +549,11 @@ namespace Tangerine.UI.FilesystemView
 			if (
 				nodeUnderMouse == null ||
 				!(
-					nodeUnderMouse is FilesystemItem ||
-					nodeUnderMouse.Parent is FilesystemItem
-				 ) ||
-				nodeUnderMouse.Parent != ScrollView.Content
+					nodeUnderMouse is FilesystemItem &&
+					nodeUnderMouse.Parent == ScrollView.Content ||
+					nodeUnderMouse.Parent is FilesystemItem &&
+					nodeUnderMouse.Parent.Parent == ScrollView.Content
+				)
 			) {
 				return;
 			}
