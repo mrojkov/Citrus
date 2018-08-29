@@ -222,6 +222,7 @@ namespace Tangerine.UI
 			private bool expanded = false;
 			private string filter;
 			private List<TreeNode> savedNodes = new List<TreeNode>();
+			private string lowercaseId;
 
 			public NodeList ChildTreeNodes => treeNodesContainer.Nodes;
 			public int Index { get; private set; }
@@ -239,7 +240,7 @@ namespace Tangerine.UI
 
 			private readonly bool[] skippedChangeWatcherUpdate = { false, false };
 
-			public TreeNode(DocumentHierarchyTreeView view, Node rootNode, TreeNode parentTreeNode, JointType jointType, List<Joint> offsetJoints, int level, int index, bool isLast)
+			public TreeNode(DocumentHierarchyTreeView view, Node rootNode, TreeNode parentTreeNode, JointType jointType, IEnumerable<Joint> offsetJoints, int level, int index, bool isLast)
 			{
 				this.rootNode = rootNode;
 				this.level = level;
@@ -317,10 +318,17 @@ namespace Tangerine.UI
 				}));
 			}
 
+			private void SetLabelText(string id)
+			{
+				label.Text = String.IsNullOrEmpty(id) ? $"<{rootNode.GetType().Name}>" : id;
+				lowercaseId = label.Text.ToLower();
+			}
+
 			private Widget CreateLabel()
 			{
 				label = new ThemedSimpleText { Padding = new Thickness(defaultPadding) };
-				label.AddChangeWatcher(() => rootNode.Id, t => label.Text = String.IsNullOrEmpty(t) ? $"<{rootNode.GetType().Name}>" : t);
+				label.AddChangeWatcher(() => rootNode.Id, SetLabelText);
+				SetLabelText(rootNode.Id);
 				return label;
 			}
 
@@ -334,12 +342,11 @@ namespace Tangerine.UI
 				int previousIndex = 0;
 				var filterSize = label.Font.MeasureTextLine(filter, label.FontHeight, label.LetterSpacing);
 				var size = Vector2.Zero;
-				var text = rootNode.Id.ToLower();
 				var pos = label.CalcPositionInSpaceOf(treeNodeWidget);
 				pos.X += label.Padding.Left;
 				pos.Y += label.Padding.Top;
-				while ((index = text.IndexOf(filter, previousIndex)) >= 0) {
-					var skippedText = text.Substring(previousIndex, index - previousIndex);
+				while ((index = lowercaseId.IndexOf(filter, previousIndex, StringComparison.Ordinal)) >= 0) {
+					string skippedText = lowercaseId.Substring(previousIndex, index - previousIndex);
 					var skippedSize = label.Font.MeasureTextLine(skippedText, label.FontHeight, label.LetterSpacing);
 					size.X += skippedSize.X;
 					size.Y = Mathf.Max(size.Y, skippedSize.Y);
@@ -486,7 +493,7 @@ namespace Tangerine.UI
 
 			public bool MatchesFilter()
 			{
-				return String.IsNullOrEmpty(filter) || (rootNode.Id?.ToLower().Contains(filter.ToLower()) ?? false);
+				return String.IsNullOrEmpty(filter) || (lowercaseId?.Contains(filter) ?? false);
 			}
 
 			private void UpdateExpandable()
