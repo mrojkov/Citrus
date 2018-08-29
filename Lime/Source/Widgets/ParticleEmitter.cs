@@ -129,7 +129,7 @@ namespace Lime
 		/// </summary>
 		[YuzuMember]
 		[TangerineKeyframeColor(8)]
-		public bool ImmortalParticles;
+		public bool ImmortalParticles { get; set; }
 		[YuzuMember]
 		[TangerineKeyframeColor(9)]
 		public EmitterShape Shape { get; set; }
@@ -156,7 +156,7 @@ namespace Lime
 		/// </summary>
 		[YuzuMember]
 		[TangerineKeyframeColor(14)]
-		public float TimeShift;
+		public float TimeShift { get; set; }
 		/// <summary>
 		/// Update: delta *= Speed
 		/// </summary>
