@@ -37,9 +37,9 @@ namespace Tangerine
 			}
 		}
 
-		public static ITexture AlignToTexture(AlignObject align)
+		public static Icon GetIconForAlign(AlignObject align)
 		{
-			return IconPool.GetTexture($"Tools.{Enum.GetName(typeof(AlignObject), align)}");
+			return IconPool.GetIcon($"Tools.{Enum.GetName(typeof(AlignObject), align)}");
 		}
 
 		protected void SetTextAndTexture()

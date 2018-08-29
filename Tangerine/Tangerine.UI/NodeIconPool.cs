@@ -6,15 +6,16 @@ namespace Tangerine.UI
 {
 	public static class NodeIconPool
 	{
-		static Dictionary<Type, ITexture> map = new Dictionary<Type, ITexture>();
+		private static readonly Dictionary<Type, Icon> map = new Dictionary<Type, Icon>();
 
-		public static ITexture GetTexture(Type nodeType)
+		public static Icon GetIcon(Type nodeType)
 		{
-			ITexture texture;
-			if (!map.TryGetValue(nodeType, out texture)) {
-				texture = IconPool.GetTexture("Nodes." + nodeType, "Nodes.Unknown");
+			if (!map.TryGetValue(nodeType, out var icon)) {
+				map[nodeType] = icon = IconPool.GetIcon("Nodes." + nodeType, "Nodes.Unknown");
 			}
-			return texture;
+			return icon;
 		}
+
+		public static ITexture GetTexture(Type nodeType) => GetIcon(nodeType).AsTexture;
 	}
 }

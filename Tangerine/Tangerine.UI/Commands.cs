@@ -126,30 +126,30 @@ namespace Tangerine.UI
 
 	public static class Tools
 	{
-		public static readonly ICommand AlignLeft = new Command("Align Left") { Icon = IconPool.GetTexture("Tools.AlignLeft") };
-		public static readonly ICommand AlignRight = new Command("Align Right") { Icon = IconPool.GetTexture("Tools.AlignRight") };
-		public static readonly ICommand AlignTop = new Command("Align Top") { Icon = IconPool.GetTexture("Tools.AlignTop") };
-		public static readonly ICommand AlignBottom = new Command("Align Bottom") { Icon = IconPool.GetTexture("Tools.AlignBottom") };
-		public static readonly ICommand CenterHorizontally = new Command("Center Horizontally") { Icon = IconPool.GetTexture("Tools.CenterH") };
-		public static readonly ICommand CenterVertically = new Command("Center Vertically") { Icon = IconPool.GetTexture("Tools.CenterV") };
-		public static readonly ICommand CenterAlignTo = new Command("Align to Parent") { Icon = IconPool.GetTexture("Tools.Parent") };
-		public static readonly ICommand AlignCentersHorizontally = new Command("Align Centers Horizontally") { Icon = IconPool.GetTexture("Tools.AlignCentersHorizontally") };
-		public static readonly ICommand AlignCentersVertically = new Command("Align Centers Vertically") { Icon = IconPool.GetTexture("Tools.AlignCentersVertically") };
-		public static readonly ICommand DistributeLeft = new Command("Distribute Left") { Icon = IconPool.GetTexture("Tools.DistributeLeft") };
-		public static readonly ICommand DistributeHorizontally = new Command("Distribute Horizontally") { Icon = IconPool.GetTexture("Tools.DistributeCentersHorizontally") };
-		public static readonly ICommand DistributeRight = new Command("Distribute Right") { Icon = IconPool.GetTexture("Tools.DistributeRight") };
-		public static readonly ICommand DistributeTop = new Command("Distribute Top") { Icon = IconPool.GetTexture("Tools.DistributeTop") };
-		public static readonly ICommand DistributeVertically = new Command("Distribute Verticaly") { Icon = IconPool.GetTexture("Tools.DistributeCentersVertically") };
-		public static readonly ICommand DistributeBottom = new Command("Distribute Bottom") { Icon = IconPool.GetTexture("Tools.DistributeBottom") };
-		public static readonly ICommand AlignTo = new Command("Align to Selection") { Icon = IconPool.GetTexture("Tools.Selection") };
-		public static readonly ICommand RestoreOriginalSize = new Command("Restore Original Size") { Icon = IconPool.GetTexture("Tools.RestoreOriginalSize") };
-		public static readonly ICommand ResetScale = new Command("Reset Scale") { Icon = IconPool.GetTexture("Tools.SetUnitScale") };
-		public static readonly ICommand ResetRotation = new Command("Reset Rotation") { Icon = IconPool.GetTexture("Tools.SetZeroRotation") };
-		public static readonly ICommand FlipX = new Command("Flip Horizontally") { Icon = IconPool.GetTexture("Tools.FlipH") };
-		public static readonly ICommand FlipY = new Command("Flip Vertically") { Icon = IconPool.GetTexture("Tools.FlipV") };
-		public static readonly ICommand FitToContainer = new Command("Fit to Container") { Icon = IconPool.GetTexture("Tools.FitToContainer") };
-		public static readonly ICommand FitToContent = new Command("Fit to Content") { Icon = IconPool.GetTexture("Tools.FitToContent") };
-		public static readonly ICommand CenterView = new Command("Center View") { Icon = IconPool.GetTexture("Tools.ToolsCenterView") };
+		public static readonly ICommand AlignLeft = new Command("Align Left") { Icon = IconPool.GetIcon("Tools.AlignLeft") };
+		public static readonly ICommand AlignRight = new Command("Align Right") { Icon = IconPool.GetIcon("Tools.AlignRight") };
+		public static readonly ICommand AlignTop = new Command("Align Top") { Icon = IconPool.GetIcon("Tools.AlignTop") };
+		public static readonly ICommand AlignBottom = new Command("Align Bottom") { Icon = IconPool.GetIcon("Tools.AlignBottom") };
+		public static readonly ICommand CenterHorizontally = new Command("Center Horizontally") { Icon = IconPool.GetIcon("Tools.CenterH") };
+		public static readonly ICommand CenterVertically = new Command("Center Vertically") { Icon = IconPool.GetIcon("Tools.CenterV") };
+		public static readonly ICommand CenterAlignTo = new Command("Align to Parent") { Icon = IconPool.GetIcon("Tools.Parent") };
+		public static readonly ICommand AlignCentersHorizontally = new Command("Align Centers Horizontally") { Icon = IconPool.GetIcon("Tools.AlignCentersHorizontally") };
+		public static readonly ICommand AlignCentersVertically = new Command("Align Centers Vertically") { Icon = IconPool.GetIcon("Tools.AlignCentersVertically") };
+		public static readonly ICommand DistributeLeft = new Command("Distribute Left") { Icon = IconPool.GetIcon("Tools.DistributeLeft") };
+		public static readonly ICommand DistributeHorizontally = new Command("Distribute Horizontally") { Icon = IconPool.GetIcon("Tools.DistributeCentersHorizontally") };
+		public static readonly ICommand DistributeRight = new Command("Distribute Right") { Icon = IconPool.GetIcon("Tools.DistributeRight") };
+		public static readonly ICommand DistributeTop = new Command("Distribute Top") { Icon = IconPool.GetIcon("Tools.DistributeTop") };
+		public static readonly ICommand DistributeVertically = new Command("Distribute Verticaly") { Icon = IconPool.GetIcon("Tools.DistributeCentersVertically") };
+		public static readonly ICommand DistributeBottom = new Command("Distribute Bottom") { Icon = IconPool.GetIcon("Tools.DistributeBottom") };
+		public static readonly ICommand AlignTo = new Command("Align to Selection") { Icon = IconPool.GetIcon("Tools.Selection") };
+		public static readonly ICommand RestoreOriginalSize = new Command("Restore Original Size") { Icon = IconPool.GetIcon("Tools.RestoreOriginalSize") };
+		public static readonly ICommand ResetScale = new Command("Reset Scale") { Icon = IconPool.GetIcon("Tools.SetUnitScale") };
+		public static readonly ICommand ResetRotation = new Command("Reset Rotation") { Icon = IconPool.GetIcon("Tools.SetZeroRotation") };
+		public static readonly ICommand FlipX = new Command("Flip Horizontally") { Icon = IconPool.GetIcon("Tools.FlipH") };
+		public static readonly ICommand FlipY = new Command("Flip Vertically") { Icon = IconPool.GetIcon("Tools.FlipV") };
+		public static readonly ICommand FitToContainer = new Command("Fit to Container") { Icon = IconPool.GetIcon("Tools.FitToContainer") };
+		public static readonly ICommand FitToContent = new Command("Fit to Content") { Icon = IconPool.GetIcon("Tools.FitToContent") };
+		public static readonly ICommand CenterView = new Command("Center View") { Icon = IconPool.GetIcon("Tools.ToolsCenterView") };
 	}
 
 	public static class FilesystemCommands

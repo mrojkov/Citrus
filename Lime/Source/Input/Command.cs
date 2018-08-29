@@ -50,7 +50,7 @@ namespace Lime
 		/// <summary>
 		/// Gets or sets the icon. The icon is used as the tool button icon.
 		/// </summary>
-		ITexture Icon { get; set; }
+		Icon Icon { get; set; }
 
 		/// <summary>
 		/// Gets the command's version, which is increased after changing any command's property.
@@ -109,7 +109,7 @@ namespace Lime
 		private bool enabled = true;
 		private bool @checked = false;
 		private bool visible = true;
-		private ITexture icon;
+		private Icon icon;
 
 		public int Version { get; private set; } = 1;
 
@@ -174,7 +174,7 @@ namespace Lime
 			}
 		}
 
-		public ITexture Icon
+		public Icon Icon
 		{
 			get { return icon; }
 			set
