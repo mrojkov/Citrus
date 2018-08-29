@@ -12,6 +12,9 @@ namespace Lime
 {
 	public class Window : CommonWindow, IWindow
 	{
+		private ManualResetEvent renderReady = new ManualResetEvent(false);
+		private ManualResetEvent renderCompleted = new ManualResetEvent(true);
+
 		private Thread renderThread;
 		private CancellationTokenSource renderThreadTokenSource;
 		private CancellationToken renderThreadToken;
@@ -28,7 +31,7 @@ namespace Lime
 			Rendered,
 		}
 		private readonly System.Windows.Forms.Timer timer;
-		private OpenTK.GLControl glControl;
+		private GLControl glControl;
 		private Form form;
 		private Stopwatch stopwatch;
 		private bool active;
@@ -230,6 +233,8 @@ namespace Lime
 
 		private class GLControl : OpenTK.GLControl
 		{
+			public event Action BeforeBoundsChanged;
+
 			public GLControl(GraphicsMode mode, int major, int minor, GraphicsContextFlags flags)
 				: base(mode, major, minor, flags)
 			{
@@ -240,14 +245,20 @@ namespace Lime
 			{
 				return true;
 			}
+
+			protected override void SetBoundsCore(int x, int y, int width, int height, BoundsSpecified specified)
+			{
+				BeforeBoundsChanged?.Invoke();
+				base.SetBoundsCore(x, y, width, height, specified);
+			}
 		}
 
-		private static OpenTK.GLControl CreateGLControl()
+		private static GLControl CreateGLControl()
 		{
 			return new GLControl(new GraphicsMode(32, 16, 8), 2, 0,
 				Application.RenderingBackend == RenderingBackend.OpenGL ?
-				OpenTK.Graphics.GraphicsContextFlags.Default :
-				OpenTK.Graphics.GraphicsContextFlags.Embedded
+					OpenTK.Graphics.GraphicsContextFlags.Default :
+					OpenTK.Graphics.GraphicsContextFlags.Embedded
 			);
 		}
 
@@ -269,6 +280,9 @@ namespace Lime
 			if (Application.MainWindow != null && Application.RenderingBackend == RenderingBackend.ES20) {
 				// ES20 doesn't allow multiple contexts for now, because of a bug in OpenTK
 				throw new Lime.Exception("Attempt to create a second window for ES20 rendering backend. Use OpenGL backend instead.");
+			}
+			if (options.UseTimer && options.AsyncRendering) {
+				throw new Lime.Exception("Can't use both timer and async rendering");
 			}
 			if (options.ToolWindow) {
 				form = new ToolForm();
@@ -293,6 +307,8 @@ namespace Lime
 				MaximumDecoratedSize = options.MaximumDecoratedSize;
 			}
 			glControl = CreateGLControl();
+			glControl.CreateControl();
+			glControl.Context.MakeCurrent(null);
 			glControl.Dock = DockStyle.Fill;
 			glControl.Paint += OnPaint;
 			glControl.KeyDown += OnKeyDown;
@@ -310,6 +326,7 @@ namespace Lime
 					Application.WindowUnderMouse = null;
 				}
 			};
+			glControl.BeforeBoundsChanged += WaitForRendering;
 			form.Move += OnMove;
 			form.Activated += OnActivated;
 			form.Deactivate += OnDeactivate;
@@ -324,9 +341,10 @@ namespace Lime
 				};
 				timer.Tick += OnTick;
 			} else {
-				VSync = options.VSync;
+				vSync = options.VSync;
 				glControl.MakeCurrent();
-				glControl.VSync = VSync;
+				glControl.VSync = vSync;
+				glControl.Context.MakeCurrent(null);
 				System.Windows.Forms.Application.Idle += OnTick;
 			}
 
@@ -362,6 +380,7 @@ namespace Lime
 				renderThreadTokenSource = new CancellationTokenSource();
 				renderThreadToken = renderThreadTokenSource.Token;
 				renderThread = new Thread(RenderLoop);
+				renderThread.IsBackground = true;
 				renderThread.Start();
 			}
 			Application.Windows.Add(this);
@@ -378,8 +397,10 @@ namespace Lime
 			{
 				if (vSync != value && timer == null) {
 					vSync = value;
+					WaitForRendering();
 					glControl.MakeCurrent();
 					glControl.VSync = value;
+					glControl.Context.MakeCurrent(null);
 				}
 			}
 		}
@@ -422,7 +443,7 @@ namespace Lime
 		{
 			if (AsyncRendering) {
 				renderThreadTokenSource.Cancel();
-				renderThread.Interrupt();
+				renderReady.Set();
 				renderThread.Join();
 			}
 			RaiseClosed();
@@ -475,7 +496,6 @@ namespace Lime
 		private void OnActivated(object sender, EventArgs e)
 		{
 			if (!active) {
-				glControl.MakeCurrent();
 				active = true;
 				RaiseActivated();
 			}
@@ -611,21 +631,24 @@ namespace Lime
 
 		private void RenderLoop()
 		{
-			while (!glControl.IsDisposed && !renderThreadToken.IsCancellationRequested) {
-				if (glControl.IsHandleCreated && form.Visible) {
-					glControl.MakeCurrent();
-					try {
-						RaiseRendering();
-					} catch (ThreadInterruptedException e) {
-						if (renderThreadToken.IsCancellationRequested) {
-							return;
-						}
-						System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(e).Throw();
-					}
-					glControl.SwapBuffers();
-				} else {
-					Thread.Sleep(16);
+			while (true) {
+				renderReady.WaitOne();
+				renderReady.Reset();
+				if (renderThreadToken.IsCancellationRequested) {
+					return;
 				}
+				glControl.MakeCurrent();
+				RaiseRendering();
+				glControl.SwapBuffers();
+				glControl.Context.MakeCurrent(null);
+				renderCompleted.Set();
+			}
+		}
+
+		private void WaitForRendering()
+		{
+			if (AsyncRendering) {
+				renderCompleted.WaitOne();
 			}
 		}
 
@@ -676,6 +699,14 @@ namespace Lime
 				glControl.Invalidate();
 			}
 			renderingState = RenderingState.Updated;
+			if (AsyncRendering) {
+				renderCompleted.WaitOne();
+				renderCompleted.Reset();
+			}
+			RaiseSync();
+			if (AsyncRendering) {
+				renderReady.Set();
+			}
 		}
 
 		private static Key TranslateKey(Keys key)

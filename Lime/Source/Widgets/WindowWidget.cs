@@ -82,13 +82,14 @@ namespace Lime
 			
 			RaiseUpdating(delta);
 
+			ManageFocusOnWindowActivation();
+
 			// Rebuild the render chain.
 			renderChain.Clear();
 			renderChain.ClipRegion = new Rectangle(Vector2.Zero, Size);
 			RenderChainBuilder?.AddToRenderChain(renderChain);
 			renderObjectList1.Clear();
 			renderChain.GetRenderObjects(renderObjectList1);
-			ManageFocusOnWindowActivation();
 		}
 
 		public void RenderAll()
