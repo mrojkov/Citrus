@@ -11,13 +11,10 @@ namespace Tangerine.UI
 
 		private readonly Widget panelWidget;
 		private readonly Frame rootWidget;
-		private readonly EditBox searchStringEditor;
-		private readonly ThemedScrollView scrollView = new ThemedScrollView();
-		private DocumentHierarchyTreeView view;
 
 		private static readonly Dictionary<Key, Action<DocumentHierarchyTreeView>> keyActionMap = new Dictionary<Key, Action<DocumentHierarchyTreeView>>() {
 			{ Key.MapShortcut(Key.Enter), NavigateToSelectedNode },
-			{ Key.MapShortcut(Key.Up), SelectPreviosTreeNode },
+			{ Key.MapShortcut(Key.Up), SelectPreviousTreeNode },
 			{ Key.MapShortcut(Key.Down), SelectNextTreeNode },
 			{ Key.MapShortcut(Key.Left), LeaveSelectedTreeNode },
 			{ Key.MapShortcut(Key.Right), EnterSelectedTreeNode },
@@ -27,6 +24,8 @@ namespace Tangerine.UI
 
 		public HierarchyPanel(Widget rootWidget)
 		{
+			DocumentHierarchyTreeView view;
+			EditBox searchStringEditor;
 			panelWidget = rootWidget;
 			this.rootWidget = new Frame {
 				Id = "SearchPanel",
@@ -40,7 +39,7 @@ namespace Tangerine.UI
 			var treeView = new DocumentHierarchyTreeView(this.rootWidget, Document.Current.RootNode);
 			var searchTreeView = new DocumentHierarchyTreeView(this.rootWidget, Document.Current.RootNode);
 			searchStringEditor.AddChangeWatcher(() => searchStringEditor.Text, t => {
-				if (!String.IsNullOrEmpty(t)) {
+				if (!string.IsNullOrEmpty(t)) {
 					if (treeView.IsAttached()) {
 						treeView.Detach();
 						searchTreeView.Attach();
@@ -48,22 +47,24 @@ namespace Tangerine.UI
 					}
 					searchTreeView.Filter(t);
 				} else {
-					if (searchTreeView.IsAttached()) {
-						searchTreeView.Detach();
-						treeView.Attach();
-						view = treeView;
+					if (!searchTreeView.IsAttached()) {
+						return;
 					}
+					searchTreeView.Detach();
+					treeView.Attach();
+					view = treeView;
 				}
 			});
 			treeView.Attach();
 			view = treeView;
 			this.rootWidget.LateTasks.Add(new KeyRepeatHandler((input, key) => {
-				if (keyActionMap.ContainsKey(key)) {
-					input.ConsumeKey(key);
-					keyActionMap[key](view);
-					view.EnsureSelectionVisible();
-					Window.Current.Invalidate();
+				if (!keyActionMap.ContainsKey(key)) {
+					return;
 				}
+				input.ConsumeKey(key);
+				keyActionMap[key](view);
+				view.EnsureSelectionVisible();
+				Window.Current.Invalidate();
 			}));
 		}
 
@@ -76,7 +77,7 @@ namespace Tangerine.UI
 			}
 			view.SelectNextTreeNode();
 		}
-		private static void SelectPreviosTreeNode(DocumentHierarchyTreeView view) => view.SelectPreviousTreeNode();
+		private static void SelectPreviousTreeNode(DocumentHierarchyTreeView view) => view.SelectPreviousTreeNode();
 		private static void EnterSelectedTreeNode(DocumentHierarchyTreeView view) => view.EnterSelectedTreeNode();
 		private static void LeaveSelectedTreeNode(DocumentHierarchyTreeView view) => view.LeaveSelectedTreeNode();
 		private static void ToggleSelectedTreeNode(DocumentHierarchyTreeView view) => view.ToggleSelectedTreeNode();
