@@ -264,6 +264,9 @@ namespace Lime
 			} else {
 				NativeItem = new ToolStripMenuItem();
 				NativeItem.Click += (s, e) => CommandQueue.Instance.Add((Command)Command);
+				if (command.Icon != null) {
+					NativeItem.Image = (System.Drawing.Image)command.Icon.AsNativeIcon;
+				}
 			}
 			Refresh();
 		}
