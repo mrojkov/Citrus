@@ -7,7 +7,7 @@ namespace Tangerine.UI
 	{
 		private static Bitmap GetBitmapFromEmbededResource(string resourceId)
 		{
-            var png = new ThemedconResource(resourceId, "Tangerine").GetResourceStream();
+            var png = new ThemedIconResource(resourceId, "Tangerine").GetResourceStream();
 			if (png == null) {
 				throw new ArgumentException($"Icon '{resourceId}' doesn't exist");
 			}

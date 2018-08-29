@@ -15,7 +15,7 @@ namespace Tangerine.UI.SceneView
 			var backgroundTexture = PrepareChessTexture(Color1, Color2);
 			var playButtonTexture = new Texture2D();
 
-			playButtonTexture.LoadImage(new Bitmap(new ThemedconResource("SceneView.Play", "Tangerine").GetResourceStream()));
+			playButtonTexture.LoadImage(new Bitmap(new ThemedIconResource("SceneView.Play", "Tangerine").GetResourceStream()));
 			sceneView.Frame.AddChangeWatcher(
 				() => SceneUserPreferences.Instance.BackgroundColorA,
 				(v) => backgroundTexture = PrepareChessTexture(v, Color2));

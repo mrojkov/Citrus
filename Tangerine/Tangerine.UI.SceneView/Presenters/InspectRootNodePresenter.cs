@@ -12,7 +12,7 @@ namespace Tangerine.UI.SceneView
 		{
 			sceneView.Frame.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(Render));
 			inspectingRootTexture = new Texture2D();
-			inspectingRootTexture.LoadImage(new Bitmap(new ThemedconResource("SceneView.InspectingRoot", "Tangerine").GetResourceStream()));
+			inspectingRootTexture.LoadImage(new Bitmap(new ThemedIconResource("SceneView.InspectingRoot", "Tangerine").GetResourceStream()));
 			inspectingRootTextureSize = (Vector2)inspectingRootTexture.ImageSize;
 		}
 

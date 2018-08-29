@@ -63,7 +63,7 @@
     <Compile Include="Cursors.cs" />
     <Compile Include="Dialogs\ModalOperationDialog.cs" />
     <Compile Include="Dialogs\AlertDialog.cs" />
-    <Compile Include="EmbeddedResources\ThemedconResource.cs" />
+    <Compile Include="EmbeddedResources\ThemedIconResource.cs" />
     <Compile Include="Docking\DockHierarchy.cs" />
     <Compile Include="Docking\DockPresenter.cs" />
     <Compile Include="Docking\DragBehaviours.cs" />

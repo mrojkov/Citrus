@@ -2,9 +2,9 @@ using System.IO;
 
 namespace Tangerine.UI
 {
-    public class ThemedconResource : EmbeddedResource
+    public class ThemedIconResource : EmbeddedResource
 	{
-        public ThemedconResource(string iconId, string assemblyName) : base(iconId, assemblyName) { }
+        public ThemedIconResource(string iconId, string assemblyName) : base(iconId, assemblyName) { }
 
 		public override Stream GetResourceStream()
 		{
