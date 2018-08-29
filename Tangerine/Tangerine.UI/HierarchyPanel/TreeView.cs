@@ -278,18 +278,32 @@ namespace Tangerine.UI
 				treeNodeWidget.Gestures.Add(new DoubleClickGesture(NavigateToNode));
 				AddNode(treeNodeWidget);
 
-				this.AddChangeWatcher(
-					() => rootNode.NextSibling,
-					_ => parentTreeNode?.UpdateChildTreeNodes(ref skippedChangeWatcherUpdate[0])
-				);
-
+				if (parentTreeNode != null) {
+					bool parentFirstUpdate = true;
+					this.AddChangeWatcher(
+						() => rootNode.NextSibling,
+						_ => {
+							if (parentFirstUpdate) {
+								parentFirstUpdate = false;
+								// Skip first update for the sake of optimization.
+								return;
+							}
+							parentTreeNode.UpdateChildren();
+						});
+				}
+				bool childrenFirstUpdate = true;
 				this.AddChangeWatcher(
 					() => rootNode.Nodes.Count,
-					_ => UpdateChildTreeNodes(ref skippedChangeWatcherUpdate[1])
-				);
+					_ => {
+						if (childrenFirstUpdate) {
+							childrenFirstUpdate = false;
+							// Skip first update for the sake of optimization.
+							return;
+						}
+						UpdateChildren();
+					});
 
-				bool skipped = true;
-				UpdateChildTreeNodes(ref skipped);
+				UpdateChildren();
 			}
 
 			private void CreateExpandButton()
@@ -406,13 +420,8 @@ namespace Tangerine.UI
 				parentJoint.Type = joint;
 			}
 
-			private void UpdateChildTreeNodes(ref bool skipped)
+			private void UpdateChildren()
 			{
-				// Skip first call by change watcher to remove unnecessary updates
-				if (!skipped) {
-					skipped = true;
-					return;
-				}
 				var rootNodes = savedNodes.Select(t => t.rootNode).ToList();
 				treeNodesContainer.Nodes.Clear();
 				for (int i = 0; i < rootNode.Nodes.Count; ++i) {
@@ -469,7 +478,7 @@ namespace Tangerine.UI
 
 			public bool Filter(string newFilter)
 			{
-				filter = newFilter.ToLower();
+				filter = newFilter;
 				treeNodesContainer.Nodes.Clear();
 				bool result = MatchesFilter();
 				int index = 0;

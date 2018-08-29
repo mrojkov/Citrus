@@ -45,7 +45,7 @@ namespace Tangerine.UI
 						searchTreeView.Attach();
 						view = searchTreeView;
 					}
-					searchTreeView.Filter(t);
+					searchTreeView.Filter(t.ToLower());
 				} else {
 					if (!searchTreeView.IsAttached()) {
 						return;
