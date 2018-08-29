@@ -17,7 +17,8 @@ namespace Tangerine.UI.SceneView
 			while (true) {
 				if (
 					!animationPathHint.Enabled ||
-					!SceneView.Instance.InputArea.IsMouseOverThisOrDescendant()
+					!SceneView.Instance.InputArea.IsMouseOverThisOrDescendant() ||
+					!sv.Input.IsKeyPressed(Key.Control)
 				) {
 					yield return null;
 					continue;
