@@ -143,7 +143,7 @@ namespace Tangerine
 				history.DoTransaction(() => Core.Operations.InsertListItem.Perform(
 					new Model3DAttachment.NodeComponentCollection { NodeId = "Node id", Components = null },
 					attachment.NodeComponents,
-					attachment.NodeComponents.Count, history));
+					attachment.NodeComponents.Count));
 			}));
 			list.Components.Add(widgetFactory);
 			return pane;
@@ -178,7 +178,7 @@ namespace Tangerine
 			widgetFactory.AddFooter(AnimationRow.CreateFooter(() => {
 				history.DoTransaction(() => Core.Operations.InsertListItem.Perform(new Model3DAttachment.Animation {
 					Name = "Animation",
-				}, attachment.Animations, attachment.Animations.Count, history));
+				}, attachment.Animations, attachment.Animations.Count));
 			}));
 			if (attachment.Animations.All(a => a.Name != Model3DAttachment.DefaultAnimationName)) {
 				attachment.Animations.Insert(0, new Model3DAttachment.Animation {
@@ -204,7 +204,7 @@ namespace Tangerine
 			widgetFactory.AddFooter(MeshRow.CreateFooter(() => {
 				history.DoTransaction(() => Core.Operations.InsertListItem.Perform(new Model3DAttachment.MeshOption {
 					Id = "MeshOption",
-				}, attachment.MeshOptions, attachment.MeshOptions.Count, history));
+				}, attachment.MeshOptions, attachment.MeshOptions.Count));
 			}));
 			list.Components.Add(widgetFactory);
 			return pane;
@@ -228,7 +228,7 @@ namespace Tangerine
 						Name = "MaterialEffect",
 						MaterialName = "MaterialName",
 						Path = "MaterialPath",
-					}, attachment.MaterialEffects, attachment.MaterialEffects.Count, history);
+					}, attachment.MaterialEffects, attachment.MaterialEffects.Count);
 				});
 			}));
 			list.Components.Add(widgetFactory);
@@ -250,7 +250,7 @@ namespace Tangerine
 
 		private static void SetProperty(object obj, string propertyname, object value)
 		{
-			Core.Operations.SetProperty.Perform(obj, propertyname, value, history);
+			Core.Operations.SetProperty.Perform(obj, propertyname, value);
 		}
 
 		private class DeletableRow<T> : Widget
@@ -293,7 +293,7 @@ namespace Tangerine
 					LayoutCell = new LayoutCell(Alignment.LeftTop),
 				};
 				deleteButton.Clicked += () =>
-					history.DoTransaction(() => Core.Operations.RemoveListItem.Perform(Source, sourceCollection, history));
+					history.DoTransaction(() => Core.Operations.RemoveListItem.Perform(Source, sourceCollection));
 				headerWrapper.Nodes.Add(Header);
 				headerWrapper.Nodes.Add(new Widget());
 				headerWrapper.Nodes.Add(deleteButton);
@@ -319,12 +319,12 @@ namespace Tangerine
 					Anchors = Anchors.Center,
 					Clicked = () =>
 						history.DoTransaction(
-							() => Core.Operations.SetProperty.Perform(obj, propName, new BlendingOption(), history)),
+							() => Core.Operations.SetProperty.Perform(obj, propName, new BlendingOption())),
 					LayoutCell = new LayoutCell { Alignment = Alignment.Center }
 				};
 				RemoveButton = new ThemedTabCloseButton {
 					Clicked = () =>
-						history.DoTransaction(() => Core.Operations.SetProperty.Perform(obj, propName, null, history))
+						history.DoTransaction(() => Core.Operations.SetProperty.Perform(obj, propName, null))
 				};
 				Nodes.Add(AddButton);
 				AddChangeWatcher(() => property.Value, (v) => {
@@ -526,7 +526,7 @@ namespace Tangerine
 					w => (TRow)Activator.CreateInstance(typeof(TRow), new object[] { w, source }), source);
 				widgetFactory.AddHeader(header);
 				widgetFactory.AddFooter(DeletableRow<TData>.CreateFooter(() => {
-					history.DoTransaction(() => Core.Operations.InsertListItem.Perform(activator(), source, source.Count, history));
+					history.DoTransaction(() => Core.Operations.InsertListItem.Perform(activator(), source, source.Count));
 				}));
 				list.Components.Add(widgetFactory);
 				this.AddChangeWatcher(() => markersExpandButton.Expanded, (e) => list.Visible = e);
@@ -674,7 +674,7 @@ namespace Tangerine
 				var previousMarkerId = Source.Marker.Id;
 				jumpToPropEditor.Changed += args => {
 					if ((string)args.Value != Source.Marker.JumpTo) {
-						history.DoTransaction(() => Core.Operations.SetProperty.Perform(Source.Marker, nameof(Marker.JumpTo), args.Value, history));
+						history.DoTransaction(() => Core.Operations.SetProperty.Perform(Source.Marker, nameof(Marker.JumpTo), args.Value));
 					}
 				};
 				Header.AddNode(jumpToPropEditor);
@@ -797,7 +797,7 @@ namespace Tangerine
 						ICommand command = new Command(CamelCaseToLabel(type.Name), () => {
 							var constructor = type.GetConstructor(Type.EmptyTypes);
 							history.DoTransaction(() => Core.Operations.InsertListItem.Perform(
-								constructor.Invoke(new object[] { }), source, source.Count, history));
+								constructor.Invoke(new object[] { }), source, source.Count));
 						});
 						menu.Add(command);
 					}

@@ -13,7 +13,7 @@ namespace Tangerine.UI.Timeline.Operations
 
 		public static void Perform()
 		{
-			Document.Current.History.Perform(new ClearGridSelection());
+			DocumentHistory.Current.Perform(new ClearGridSelection());
 		}
 
 		private ClearGridSelection() {}

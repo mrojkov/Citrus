@@ -146,7 +146,7 @@ namespace Tangerine.UI.SceneView
 		private static void DocumentOnSaving(Document document) => Perform(DisabledResolutionPreview, requiredSave: false);
 
 		public static void Perform(ResolutionPreview resolutionPreview, bool requiredSave = true) =>
-			Document.Current.History.Perform(new ResolutionPreviewOperation(resolutionPreview, requiredSave));
+			DocumentHistory.Current.Perform(new ResolutionPreviewOperation(resolutionPreview, requiredSave));
 
 		public ResolutionPreviewOperation(ResolutionPreview resolutionPreview, bool requiredSave)
 		{

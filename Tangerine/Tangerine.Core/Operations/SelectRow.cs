@@ -17,7 +17,7 @@ namespace Tangerine.Core.Operations
 
 		public static void Perform(Row row, bool select = true)
 		{
-			Document.Current.History.Perform(new SelectRow(row, select));
+			DocumentHistory.Current.Perform(new SelectRow(row, select));
 		}
 
 		private SelectRow(Row row, bool select)

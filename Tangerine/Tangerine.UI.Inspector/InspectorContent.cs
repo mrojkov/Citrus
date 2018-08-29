@@ -322,12 +322,12 @@ namespace Tangerine.UI.Inspector
 
 		private void SetProperty(object obj, string propertyName, object value)
 		{
-			Core.Operations.SetProperty.Perform(obj, propertyName, value, History);
+			Core.Operations.SetProperty.Perform(obj, propertyName, value);
 		}
 
 		private void SetAnimableProperty(object obj, string propertyName, object value)
 		{
-			Core.Operations.SetAnimableProperty.Perform(obj, propertyName, value, History, CoreUserPreferences.Instance.AutoKeyframes);
+			Core.Operations.SetAnimableProperty.Perform(obj, propertyName, value, CoreUserPreferences.Instance.AutoKeyframes);
 		}
 
 		private Widget CreateCategoryLabel(string text, Color4 color)

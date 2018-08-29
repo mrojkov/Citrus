@@ -16,7 +16,7 @@ namespace Tangerine.Core.Operations
 
 		public static void Perform(Node from, Node to)
 		{
-			Document.Current.History.Perform(new ReplaceContents(from, to));
+			DocumentHistory.Current.Perform(new ReplaceContents(from, to));
 		}
 
 		protected ReplaceContents(Node from, Node to)

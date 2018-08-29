@@ -67,7 +67,7 @@ namespace Tangerine.UI.Timeline
 			};
 			RootWidget.AddChangeWatcher(() => RootWidget.Size,
 				// Some document operation processors (e.g. ColumnCountUpdater) require up-to-date timeline dimensions.
-				_ => Core.Operations.Dummy.Perform());
+				_ => Core.Operations.Dummy.Perform(Document.Current.History));
 			RootWidget.Tasks.Add(
 				new CurveEditorVerticalZoomProcessor(this),
 				new CurveEditorSelectAndDragKeysProcessor(this),

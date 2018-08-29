@@ -15,7 +15,7 @@ namespace Tangerine.UI.Timeline.Operations
 
 		public static void Perform(IntVector2 offset)
 		{
-			Document.Current.History.Perform(new ShiftGridSelection(offset));
+			DocumentHistory.Current.Perform(new ShiftGridSelection(offset));
 		}
 
 		ShiftGridSelection(IntVector2 offset)

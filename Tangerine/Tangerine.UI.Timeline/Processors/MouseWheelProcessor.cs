@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Lime;
+using Tangerine.Core;
 
 namespace Tangerine.UI.Timeline
 {
@@ -38,7 +39,7 @@ namespace Tangerine.UI.Timeline
 					var delta = input.MousePosition - prevPosition;
 					if (delta != Vector2.Zero && (timeline.Offset.X - delta.X > 0 || timeline.Offset.Y - delta.Y > 0)) {
 						timeline.Offset -= delta;
-						Core.Operations.Dummy.Perform();
+						Core.Operations.Dummy.Perform(Document.Current.History);
 					}
 				}
 				prevPosition = input.MousePosition;
@@ -54,7 +55,7 @@ namespace Tangerine.UI.Timeline
 				TimelineMetrics.ColWidth = (TimelineMetrics.ColWidth + delta).Clamp(5, 30);
 				if (prevColWidth != TimelineMetrics.ColWidth) {
 					timeline.OffsetX += timeline.CurrentColumn * delta;
-					Core.Operations.Dummy.Perform();
+					Core.Operations.Dummy.Perform(Document.Current.History);
 				}
 			}
 		}
