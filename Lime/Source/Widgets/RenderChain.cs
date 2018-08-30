@@ -82,27 +82,6 @@ namespace Lime
 			}
 		}
 
-		private RenderObjectList renderObjects = new RenderObjectList();
-
-		[System.Obsolete]
-		public void Render()
-		{
-			try {
-				renderObjects.Clear();
-				GetRenderObjects(renderObjects);
-				renderObjects.Render();
-			} finally {
-				renderObjects.Clear();
-			}
-		}
-
-		[System.Obsolete]
-		public void RenderAndClear()
-		{
-			Render();
-			Clear();
-		}
-
 		public bool HitTest(ref HitTestArgs args)
 		{
 			for (int i = Layers.Length - 1; i >= 0; i--) {
