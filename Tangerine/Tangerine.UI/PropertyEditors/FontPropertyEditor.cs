@@ -13,7 +13,7 @@ namespace Tangerine.UI
 		{
 			selector = editorParams.DropDownListFactory();
 			selector.LayoutCell = new LayoutCell(Alignment.Center);
-			ContainerWidget.AddNode(selector);
+			EditorContainer.AddNode(selector);
 			var propType = editorParams.PropertyInfo.PropertyType;
 			var items = AssetBundle.Current.EnumerateFiles("Fonts").
 				Where(i => i.EndsWith(".fnt") || i.EndsWith(".tft")).

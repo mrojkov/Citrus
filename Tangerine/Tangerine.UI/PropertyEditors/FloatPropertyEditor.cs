@@ -11,7 +11,8 @@ namespace Tangerine.UI
 		public FloatPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
 			editor = editorParams.NumericEditBoxFactory();
-			ContainerWidget.AddNode(editor);
+			EditorContainer.AddNode(editor);
+			EditorContainer.AddNode(new Widget());
 			var current = CoalescedPropertyValue();
 			editor.Submitted += text => SetComponent(text, current);
 			editor.AddChangeWatcher(current, v => editor.Text = v.ToString());

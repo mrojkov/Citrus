@@ -9,6 +9,8 @@ namespace Tangerine.UI
 	{
 		IPropertyEditorParams EditorParams { get; }
 		Widget ContainerWidget { get; }
+		Widget LabelContainer { get; }
+		Widget EditorContainer { get; }
 		SimpleText PropertyLabel { get; }
 		void DropFiles(IEnumerable<string> files);
 		void Submit();

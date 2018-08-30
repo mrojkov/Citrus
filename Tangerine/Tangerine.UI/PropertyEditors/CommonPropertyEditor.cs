@@ -12,6 +12,8 @@ namespace Tangerine.UI
 		public IPropertyEditorParams EditorParams { get; private set; }
 		public Widget ContainerWidget { get; private set; }
 		public SimpleText PropertyLabel { get; private set; }
+		public Widget LabelContainer { get; private set; }
+		public Widget EditorContainer { get; private set; }
 
 		public CommonPropertyEditor(IPropertyEditorParams editorParams)
 		{
@@ -20,20 +22,34 @@ namespace Tangerine.UI
 				Layout = new HBoxLayout { IgnoreHidden = false },
 				LayoutCell = new LayoutCell { StretchY = 0 },
 			};
+			//ContainerWidget.CompoundPostPresenter.Add(new LayoutDebugPresenter(Color4.Red, 2.0f));
 			editorParams.InspectorPane.AddNode(ContainerWidget);
 			if (editorParams.ShowLabel) {
-				PropertyLabel = new ThemedSimpleText {
-					Text = editorParams.DisplayName ?? editorParams.PropertyName,
-					VAlignment = VAlignment.Center,
-					LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0),
-					ForceUncutText = false,
-					MinWidth = editorParams.LabelWidth,
-					HitTestTarget = true,
-					TabTravesable = new TabTraversable()
+				LabelContainer = new Widget {
+					Layout = new HBoxLayout(),
+					LayoutCell = new LayoutCell { StretchX = 1.0f },
+					Nodes = {
+						(PropertyLabel = new ThemedSimpleText {
+							Text = editorParams.DisplayName ?? editorParams.PropertyName,
+							VAlignment = VAlignment.Center,
+							LayoutCell = new LayoutCell(Alignment.LeftCenter),
+							ForceUncutText = false,
+							// MinWidth = editorParams.LabelWidth,
+							HitTestTarget = true,
+							TabTravesable = new TabTraversable()
+						})
+					}
 				};
 				PropertyLabel.Tasks.Add(ManageLabelTask());
 				ContainerWidget.Tasks.Add(Tip.ShowTipOnMouseOverTask(PropertyLabel, () => PropertyLabel.Text));
-				ContainerWidget.AddNode(PropertyLabel);
+				ContainerWidget.AddNode(LabelContainer);
+				EditorContainer = new Widget {
+					Layout = new HBoxLayout(),
+					LayoutCell = new LayoutCell { StretchX = 2.0f },
+				};
+				ContainerWidget.AddNode(EditorContainer);
+			} else {
+				LabelContainer = EditorContainer = ContainerWidget;
 			}
 		}
 
@@ -212,8 +228,6 @@ namespace Tangerine.UI
 		}
 
 		public virtual void Submit()
-		{
-
-		}
+		{ }
 	}
 }

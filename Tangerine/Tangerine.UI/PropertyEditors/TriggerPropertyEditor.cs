@@ -12,7 +12,8 @@ namespace Tangerine.UI
 		public TriggerPropertyEditor(IPropertyEditorParams editorParams, bool multiline = false) : base(editorParams)
 		{
 			comboBox = new ThemedComboBox { LayoutCell = new LayoutCell(Alignment.Center) };
-			ContainerWidget.AddNode(comboBox);
+			EditorContainer.AddNode(comboBox);
+			EditorContainer.AddNode(new Widget());
 			comboBox.Changed += ComboBox_Changed;
 			foreach (var obj in editorParams.Objects) {
 				var node = (Node)obj;

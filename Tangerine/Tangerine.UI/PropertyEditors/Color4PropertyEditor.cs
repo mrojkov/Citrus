@@ -15,14 +15,15 @@ namespace Tangerine.UI
 			ColorBoxButton colorBox;
 			var panel = new ColorPickerPanel();
 			var currentColor = CoalescedPropertyValue(Color4.White).DistinctUntilChanged();
-			ContainerWidget.AddNode(new Widget {
+			EditorContainer.AddNode(new Widget {
 				Layout = new HBoxLayout { DefaultCell = new DefaultLayoutCell(Alignment.Center) },
 				Nodes = {
 					(editor = editorParams.EditBoxFactory()),
 					new HSpacer(4),
 					(colorBox = new ColorBoxButton(currentColor)),
 					CreatePipetteButton(),
-				}
+					new Widget(),
+				},
 			});
 			ExpandableContent.AddNode(panel.Widget);
 			panel.Widget.Padding = panel.Widget.Padding + new Thickness(right: 12.0f);

@@ -14,7 +14,7 @@ namespace Tangerine.UI
 		{
 			Selector = editorParams.DropDownListFactory();
 			Selector.LayoutCell = new LayoutCell(Alignment.Center);
-			ContainerWidget.AddNode(Selector);
+			EditorContainer.AddNode(Selector);
 			var propType = editorParams.PropertyInfo.PropertyType;
 			var fields = propType.GetFields(BindingFlags.Public | BindingFlags.Static);
 			var allowedFields = fields.Where(f => !Attribute.IsDefined((MemberInfo)f, typeof(TangerineIgnoreAttribute)));

@@ -11,7 +11,7 @@ namespace Tangerine.UI
 		public DoublePropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
 			editor = editorParams.NumericEditBoxFactory();
-			ContainerWidget.AddNode(editor);
+			EditorContainer.AddNode(editor);
 			var current = CoalescedPropertyValue();
 			editor.Submitted += text => {
 				if (Parser.TryParse(text, out double newValue)) {

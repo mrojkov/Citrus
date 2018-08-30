@@ -12,13 +12,14 @@ namespace Tangerine.UI
 
 		public ThicknessPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
-			ContainerWidget.AddNode(new Widget {
+			EditorContainer.AddNode(new Widget {
 				Layout = new HBoxLayout { DefaultCell = new DefaultLayoutCell(Alignment.Center), Spacing = 4 },
 				Nodes = {
 					(editorLeft = editorParams.NumericEditBoxFactory()),
 					(editorRight = editorParams.NumericEditBoxFactory()),
 					(editorTop = editorParams.NumericEditBoxFactory()),
 					(editorBottom = editorParams.NumericEditBoxFactory()),
+					new Widget(),
 				}
 			});
 			var current = CoalescedPropertyValue();

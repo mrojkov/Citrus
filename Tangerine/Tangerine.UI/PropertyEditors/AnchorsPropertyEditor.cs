@@ -11,13 +11,14 @@ namespace Tangerine.UI
 		public AnchorsPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
 			group = new Widget { Layout = new HBoxLayout { DefaultCell = new DefaultLayoutCell(Alignment.Center), Spacing = 4 } };
-			ContainerWidget.AddNode(group);
+			EditorContainer.AddNode(group);
 			firstButton = AddButton(Anchors.Left, "Anchor to the left");
 			AddButton(Anchors.Right, "Anchor to the right");
 			AddButton(Anchors.Top, "Anchor to the top");
 			AddButton(Anchors.Bottom, "Anchor to the bottom");
 			AddButton(Anchors.CenterH, "Anchor to the center horizontally");
 			AddButton(Anchors.CenterV, "Anchor to the center vertically");
+			group.AddNode(new Widget());
 		}
 
 		private ToolbarButton AddButton(Anchors anchor, string tip)

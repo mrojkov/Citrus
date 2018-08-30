@@ -73,8 +73,9 @@ namespace Lime
 		public ThemedNumericEditBox()
 		{
 			ThemedEditBox.Decorate(this);
-			MinMaxWidth = 80;
-			TextWidget.Padding = new Thickness(2);
+			MinWidth = 0.0f;
+			MaxWidth = 105.0f;
+			TextWidget.Padding = new Thickness(left: 5.0f, right: 5.0f, top: 2.0f, bottom: 2.0f);
 			Layout = new HBoxLayout();
 			// Lime.EditorParams.MouseSelectionThreshold is 3 by default and this gesture should be recognized first.
 			// To achieve that we're setting its drag threshold to 2.0f, add it to Editor.ClickableWidget (same collection

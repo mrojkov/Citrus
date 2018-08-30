@@ -15,7 +15,7 @@ namespace Tangerine.UI
 			}
 			editor = editorParams.EditBoxFactory();
 			editor.LayoutCell = new LayoutCell(Alignment.Center);
-			ContainerWidget.AddNode(editor);
+			EditorContainer.AddNode(editor);
 			editor.Submitted += text => SetComponent(text);
 			editor.AddChangeWatcher(CoalescedPropertyValue(), v => editor.Text = v?.Id);
 		}
