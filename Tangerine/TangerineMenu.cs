@@ -23,6 +23,7 @@ namespace Tangerine
 		private static Command localizationCommand;
 		private static Menu layoutMenu;
 		private static Menu orangeMenu;
+		private static ICommand orangeCommand;
 
 		static TangerineMenu()
 		{
@@ -35,6 +36,7 @@ namespace Tangerine
 			overlaysMenu = new Menu();
 			rulerMenu = new Menu();
 			orangeMenu = new Menu();
+			orangeCommand = new Command("Orange", orangeMenu);
 			RebuildOrangeMenu(null);
 			CreateMainMenu();
 			CreateResolutionMenu();
@@ -188,7 +190,7 @@ namespace Tangerine
 					GenericCommands.NextDocument,
 					GenericCommands.PreviousDocument
 				}),
-				new Command("Orange", orangeMenu),
+				orangeCommand,
 				new Command("Help", new Menu {
 					GenericCommands.ViewHelp,
 					GenericCommands.HelpMode
@@ -210,7 +212,7 @@ namespace Tangerine
 		{
 			var blacklist = new HashSet<string> { "Run Tangerine", "Build and Run", "Cook Game Assets" };
 			orangeMenu.Clear();
-			if (citprojPath == null) {
+			if (!(orangeCommand.Enabled = citprojPath != null)) {
 				CommandHandlerList.Global.Disconnect(OrangeCommands.Run);
 				CommandHandlerList.Global.Disconnect(OrangeCommands.CookGameAssets);
 				return;
@@ -242,7 +244,6 @@ namespace Tangerine
 					context.Root.Tasks.Add(OrangeTask(() => menuItem.Action()));
 				}));
 			}
-			return;
 		}
 
 		public static void OnProjectChanged(Project proj)
