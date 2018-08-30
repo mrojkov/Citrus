@@ -5,6 +5,28 @@ namespace Tangerine.Core
 {
 	public static class WidgetExtensions
 	{
+		[ThreadStatic]
+		private static RenderObjectList renderObjects;
+
+		public static void Render(this RenderChain renderChain)
+		{
+			if (renderObjects == null) {
+				renderObjects = new RenderObjectList();
+			}
+			try {
+				renderChain.GetRenderObjects(renderObjects);
+				renderObjects.Render();
+			} finally {
+				renderObjects.Clear();
+			}
+		}
+
+		public static void RenderAndClear(this RenderChain renderChain)
+		{
+			renderChain.Render();
+			renderChain.Clear();
+		}
+
 		public static void PrepareRendererState(this Widget widget)
 		{
 			Renderer.Transform1 = widget.LocalToWorldTransform;
@@ -40,6 +62,7 @@ namespace Tangerine.Core
 					for (var node = widget.FirstChild; node != null; node = node.NextSibling) {
 						node.RenderChainBuilder?.AddToRenderChain(renderChain);
 					}
+					renderChain.Render();
 				} finally {
 					renderChain.Clear();
 				}
