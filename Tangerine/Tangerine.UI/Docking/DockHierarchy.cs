@@ -142,17 +142,27 @@ namespace Tangerine.UI.Docking
 			placement.Unlink();
 		}
 
-		public void DockPlacementTo(LinearPlacement placement, LinearPlacement target)
+		public void DockPlacementTo(LinearPlacement placement, LinearPlacement target, int index = 0, float stretch = 0)
 		{
-			float stretch = 1f / (target.Placements.Count + placement.Placements.Count);
-			var placements = placement.Placements.ToList();
-			foreach (var p in placements) {
-				p.Unlink();
-				target.Placements.Add(p);
+			if (placement.Direction == target.Direction) {
+				stretch = 1f / (target.Placements.Count + placement.Placements.Count);
+				var placements = placement.Placements.ToList();
+				for (int i = placements.Count - 1; i >= 0; --i) {
+					target.Placements.Insert(0, placements[i]);
+				}
+				foreach (var p in target.Placements) {
+					p.Stretch = stretch;
+				}
+				return;
 			}
-			foreach (var p in target.Placements) {
-				p.Stretch = stretch;
+			if (placement.Placements.Count == 1) {
+				var stretchPlacement = placement.Placements[0];
+				stretchPlacement.Unlink();
+				stretchPlacement.Stretch = stretch;
+				target.Placements.Insert(index, stretchPlacement);
+				return;
 			}
+			target.Placements.Insert(index, new StretchPlacement(placement, stretch));
 		}
 
 		private bool CheckPlacement(LinearPlacement placement, DockSite site, out LinearPlacement newPlacement)
@@ -252,7 +262,11 @@ namespace Tangerine.UI.Docking
 					index = parent.Placements.Count;
 				}
 			}
-			parent.Placements.Insert(index, new StretchPlacement(placement, stretch));
+			if (placement is LinearPlacement lPlacement) {
+				DockPlacementTo(lPlacement, parent, index, stretch);
+			} else {
+				parent.Placements.Insert(index, new StretchPlacement(placement, stretch));
+			}
 			parent.NormalizeStretches();
 		}
 
@@ -282,7 +296,7 @@ namespace Tangerine.UI.Docking
 		public WindowPlacement GetWindowByPlacement(Placement target)
 		{
 			foreach (var p in WindowPlacements) {
-				if (target.IsDescendantOf(p.Root)) {
+				if (target.IsDescendantOf(p.Root) || target == p) {
 					return p;
 				}
 			}

@@ -179,7 +179,10 @@ namespace Tangerine.UI.Docking
 			while (true) {
 				var pressedPosition = inputWidget.LocalMousePosition();
 				if (input.WasMousePressed()) {
-					if (placement.Root == placement || placement.Root == placement.Parent.Parent) {
+					var windowPlacement = (WindowPlacement)placement.Root;
+					bool doUndock = windowPlacement != placement &&
+					                (placement.Parent.Parent != windowPlacement || windowPlacement.Placements.Count > 1);
+					if (!doUndock) {
 						var panelWindow = (WindowWidget)contentWidget.GetRoot();
 						var window = panelWindow.Window;
 						if (window.State == WindowState.Maximized) {
