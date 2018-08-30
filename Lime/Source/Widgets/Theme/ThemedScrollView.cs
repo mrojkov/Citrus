@@ -36,6 +36,7 @@ namespace Lime
 		{
 			var slider = new Widget();
 			slider.Size = new Vector2(10, 5);
+			Direction = scrollDirection;
 			slider.CompoundPresenter.Add(new SliderPresenter(this));
 			var ae = new AnimationEngineDelegate();
 			ae.OnRunAnimation = (_, marker, animationTimeCorrection) => {

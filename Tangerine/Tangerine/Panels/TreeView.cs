@@ -176,29 +176,46 @@ namespace Tangerine.Panels
 				MinMaxWidth = size;
 			}
 
-			public override void Render()
+			protected override Lime.RenderObject GetRenderObject()
 			{
-				base.Render();
-				PrepareRendererState();
-				switch (Type) {
-					case JointType.None:
-						break;
-					case JointType.HLine:
-						Renderer.DrawLine(0, Height / 2, Width, Height / 2, ColorTheme.Current.Hierarchy.JointColor);
-						break;
-					case JointType.VLine:
-						Renderer.DrawLine(Width / 2, 0, Width / 2, Height, ColorTheme.Current.Hierarchy.JointColor);
-						break;
-					case JointType.TShaped:
-						Renderer.DrawLine(Width / 2, 0, Width / 2, Height, ColorTheme.Current.Hierarchy.JointColor);
-						Renderer.DrawLine(Width / 2, Height / 2, Width, Height / 2, ColorTheme.Current.Hierarchy.JointColor);
-						break;
-					case JointType.LShaped:
-						Renderer.DrawLine(Width / 2, 0, Width / 2, Height / 2, ColorTheme.Current.Hierarchy.JointColor);
-						Renderer.DrawLine(Width / 2, Height / 2, Width, Height / 2, ColorTheme.Current.Hierarchy.JointColor);
-						break;
-					default:
-						throw new ArgumentException();
+				if (Type == JointType.None) {
+					return null;
+				}
+				var ro = RenderObjectPool<RenderObject>.Acquire();
+				ro.CaptureRenderState(this);
+				ro.Type = Type;
+				ro.Size = Size;
+				ro.Color = ColorTheme.Current.Hierarchy.JointColor;
+				return ro;
+			}
+
+			private class RenderObject : WidgetRenderObject
+			{
+				public Vector2 Size;
+				public Color4 Color;
+				public JointType Type;
+
+				public override void Render()
+				{
+					PrepareRenderState();
+					switch (Type) {
+						case JointType.HLine:
+							Renderer.DrawLine(0, Size.Y / 2, Size.X, Size.Y / 2, Color);
+							break;
+						case JointType.VLine:
+							Renderer.DrawLine(Size.X / 2, 0, Size.X / 2, Size.Y, Color);
+							break;
+						case JointType.TShaped:
+							Renderer.DrawLine(Size.X / 2, 0, Size.X / 2, Size.Y, Color);
+							Renderer.DrawLine(Size.X / 2, Size.Y / 2, Size.X, Size.Y / 2, Color);
+							break;
+						case JointType.LShaped:
+							Renderer.DrawLine(Size.X / 2, 0, Size.X / 2, Size.Y / 2, Color);
+							Renderer.DrawLine(Size.X / 2, Size.Y / 2, Size.X, Size.Y / 2, Color);
+							break;
+						default:
+							throw new ArgumentException();
+					}
 				}
 			}
 		}

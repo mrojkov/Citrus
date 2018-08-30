@@ -301,12 +301,29 @@ namespace Tangerine.UI.FilesystemView
 			}
 		}
 
-		public override void Render(Node node)
+		public override Lime.RenderObject GetRenderObject(Node node)
 		{
-			var widget = node.AsWidget;
-			widget.PrepareRendererState();
-			Renderer.DrawVerticalGradientRect(Vector2.Zero, widget.Size, innerGradient);
-			Renderer.DrawRectOutline(Vector2.Zero, widget.Size, outline);
+			var widget = (Widget)node;
+			var ro = RenderObjectPool<RenderObject>.Acquire();
+			ro.CaptureRenderState(widget);
+			ro.Size = widget.Size;
+			ro.InnerGradient = innerGradient;
+			ro.OutlineColor = outline;
+			return ro;
+		}
+
+		private class RenderObject : WidgetRenderObject
+		{
+			public Vector2 Size;
+			public ColorGradient InnerGradient;
+			public Color4 OutlineColor;
+
+			public override void Render()
+			{
+				PrepareRenderState();
+				Renderer.DrawVerticalGradientRect(Vector2.Zero, Size, InnerGradient);
+				Renderer.DrawRectOutline(Vector2.Zero, Size, OutlineColor);
+			}
 		}
 	}
 

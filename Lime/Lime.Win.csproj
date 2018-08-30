@@ -42,6 +42,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Prefer32Bit>false</Prefer32Bit>
     <LangVersion>7.2</LangVersion>
+    <OutputPath>bin\x86\Release\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -195,6 +196,7 @@
     <Compile Include="Source\Widgets\3D\CommonMaterialProgram.cs" />
     <Compile Include="Source\Widgets\3D\Model3D.cs" />
     <Compile Include="Source\Widgets\3D\Model3DAttachment.cs" />
+    <Compile Include="Source\Widgets\3D\RenderObject3D.cs" />
     <Compile Include="Source\Widgets\3D\Spline3D.cs" />
     <Compile Include="Source\Widgets\Materials\HSLMaterial.cs" />
     <Compile Include="Source\Widgets\DropDownList.cs" />

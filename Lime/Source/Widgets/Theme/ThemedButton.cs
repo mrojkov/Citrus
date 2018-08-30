@@ -81,7 +81,7 @@ namespace Lime
 				return node.PartialHitTest(ref args);
 			}
 
-			public Lime.RenderObject GetRenderObject(Node node)
+			public virtual Lime.RenderObject GetRenderObject(Node node)
 			{
 				var widget = (Widget)node;
 				var ro = RenderObjectPool<RenderObject>.Acquire();
