@@ -11,7 +11,7 @@ namespace Tangerine.UI
 
 		public TextPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
-			ContainerWidget.AddNode(new Widget {
+			EditorContainer.AddNode(new Widget {
 				Layout = new HBoxLayout(),
 				Nodes = {
 					(editor = editorParams.EditBoxFactory()),

@@ -17,7 +17,7 @@ namespace Tangerine.UI
 			editor = editorParams.EditBoxFactory();
 			editor.LayoutCell = new LayoutCell(Alignment.Center);
 			editor.Editor.EditorParams.MaxLines = 1;
-			ContainerWidget.AddNode(editor);
+			EditorContainer.AddNode(editor);
 			bool textValid = true;
 			editor.AddChangeWatcher(() => editor.Text, text => textValid = IsValid(text));
 			editor.CompoundPostPresenter.Add(new DelegatePresenter<EditBox>(editBox => {

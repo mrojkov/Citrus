@@ -12,7 +12,7 @@ namespace Tangerine.UI
 			editor = editorParams.EditBoxFactory();
 			editor.IsReadOnly = true;
 			editor.LayoutCell = new LayoutCell(Alignment.Center);
-			ContainerWidget.AddNode(editor);
+			EditorContainer.AddNode(editor);
 			editor.AddChangeWatcher(CoalescedPropertyValue(), v =>
 				editor.Text = v == null ?
 					"RenderTexture (null)" :

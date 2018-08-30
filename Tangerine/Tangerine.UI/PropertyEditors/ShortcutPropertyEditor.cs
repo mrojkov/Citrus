@@ -45,7 +45,7 @@ namespace Tangerine.UI
 				modifiers = Modifiers.None;
 				SetValue(new Shortcut(modifiers, main));
 			}));
-			editor.AddToNode(ContainerWidget);
+			editor.AddToNode(EditorContainer);
 
 			PropertyLabel.Tasks.Clear();
 			PropertyLabel.Tasks.Add(ManageLabelFocus());
