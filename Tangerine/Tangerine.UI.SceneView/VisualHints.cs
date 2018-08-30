@@ -15,7 +15,7 @@ namespace Tangerine.UI.SceneView
 		[YuzuOptional]
 		public bool Enabled { get; set; } = true;
 		[YuzuOptional]
-		public Dictionary<string, VisualHint> SubHints { get; private set; } = new Dictionary<string, VisualHint>();
+		public Dictionary<string, VisualHint> SubHints { get; } = new Dictionary<string, VisualHint>();
 		[YuzuOptional]
 		public bool Expanded { get; set; } = false;
 
@@ -48,13 +48,34 @@ namespace Tangerine.UI.SceneView
 
 	public class VisualHintsRegistry
 	{
-		public static VisualHintsRegistry Instance => SceneUserPreferences.Instance.VisualHintsRegister;
+		public static VisualHintsRegistry Instance = new VisualHintsRegistry();
 
 		[YuzuOptional]
 		public VisualHint RootHint { get; set; } = new VisualHint("");
 
-		public VisualHint DisplayAll { get; set; }
-		public VisualHint DisplayInvisible { get; set; }
+		private VisualHint displayAll;
+		public VisualHint DisplayAll
+		{
+			get {
+				if (displayAll == null) {
+					RegisterDefaultHints();
+				}
+				return displayAll;
+			}
+			private set => displayAll = value;
+		}
+
+		private VisualHint displayInvisible;
+		public VisualHint DisplayInvisible
+		{
+			get {
+				if (displayInvisible == null) {
+					RegisterDefaultHints();
+				}
+				return displayInvisible;
+			}
+			private set => displayInvisible = value;
+		}
 
 		private readonly Dictionary<Type, VisualHint> typeHintMap = new Dictionary<Type, VisualHint>();
 
@@ -63,15 +84,17 @@ namespace Tangerine.UI.SceneView
 
 		public static class HideRules
 		{
-			public readonly static Func<VisualHint, bool> TypeRule = hint => !Instance.typeHintMap.ContainsValue(hint);
-			public readonly static Func<VisualHint, bool> AlwaysVisible = hint => false;
-			public readonly static Func<VisualHint, bool> AlwaysHidden = hint => true;
-			public readonly static Func<VisualHint, bool> VisibleIfProjectOpened = hint => Project.Current == Project.Null;
+			public static readonly Func<VisualHint, bool> TypeRule = hint => !Instance.typeHintMap.ContainsValue(hint);
+			public static readonly Func<VisualHint, bool> AlwaysVisible = hint => false;
+			public static readonly Func<VisualHint, bool> AlwaysHidden = hint => true;
+			public static readonly Func<VisualHint, bool> VisibleIfProjectOpened = hint => Project.Current == Project.Null;
 		}
 
-		public void EnforceVisible(VisualHint hint)
+		public void RegisterDefaultHints()
 		{
-			AlwaysVisible.Add(hint);
+			DisplayAll = Register("/All", SceneViewCommands.ShowAllVisualHints, HideRules.VisibleIfProjectOpened);
+			DisplayInvisible =
+				Register("/Invisible", SceneViewCommands.ShowVisualHintsForInvisibleNodes, HideRules.VisibleIfProjectOpened);
 		}
 
 		public VisualHint Register(Type type, ICommand command = null)
@@ -163,7 +186,6 @@ namespace Tangerine.UI.SceneView
 				Register(type);
 			}
 			RefreshHidden(RootHint);
-			DoEnforceVisible();
 		}
 
 		private bool RefreshHidden(VisualHint hint)
