@@ -19,10 +19,10 @@ namespace Tangerine.UI.Timeline
 				if (input.WasMousePressed()) {
 					Operations.SetCurrentColumn.Processor.CacheAnimationsStates = true;
 					using (Document.Current.History.BeginTransaction()) {
-						int initialCol = CalcColumn(rulerWidget.LocalMousePosition().X);
-						int backup = timeline.CurrentColumn;
-						int lastColumn = -1;
-						var marker = Document.Current.Container.Markers.GetByFrame(initialCol);
+						int initialColumnUnderMouse = CalcColumn(rulerWidget.LocalMousePosition().X);
+						int initialCurrentColumn = timeline.CurrentColumn;
+						int previousColumn = -1;
+						var marker = Document.Current.Container.Markers.GetByFrame(initialColumnUnderMouse);
 						while (input.IsMousePressed()) {
 							bool isEditing = input.IsKeyPressed(Key.Control);
 							bool isShifting = isEditing && input.IsKeyPressed(Key.Shift);
@@ -34,12 +34,11 @@ namespace Tangerine.UI.Timeline
 							} else if (mp < cw / 2) {
 								timeline.OffsetX = Math.Max(0, timeline.OffsetX - cw);
 							}
-							int column = CalcColumn(mp);
-							if (column == lastColumn) {
+							int newColumn = CalcColumn(mp);
+							if (newColumn == previousColumn) {
 								yield return null;
 								continue;
 							}
-							lastColumn = column;
 							// Evgenii Polikutin: don't Undo to avoid animation cache invalidation when just scrolling
 							// Evgenii Polikutin: yet we have to sacrifice performance when editing document
 							SetCurrentColumn.IsFrozen = !isEditing;
@@ -54,9 +53,13 @@ namespace Tangerine.UI.Timeline
 								}
 							}
 							// Evgenii Polikutin: we need operation to backup the value we need, not the previous one
-							Document.Current.AnimationFrame = backup;
+							Document.Current.AnimationFrame = initialCurrentColumn;
 							Operations.SetCurrentColumn.Perform(CalcColumn(mp));
-							timeline.Ruler.MeasuredFrameDistance = timeline.CurrentColumn - initialCol;
+							timeline.Ruler.MeasuredFrameDistance = timeline.CurrentColumn - initialColumnUnderMouse;
+							if (newColumn == initialCurrentColumn && previousColumn != initialCurrentColumn) {
+								Document.ForceAnimationUpdate();
+							}
+							previousColumn = newColumn;
 							Window.Current.Invalidate();
 							yield return null;
 						}
