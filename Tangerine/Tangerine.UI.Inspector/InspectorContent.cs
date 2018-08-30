@@ -406,8 +406,6 @@ namespace Tangerine.UI.Inspector
 				ctr.Nodes.Insert(index, Spacer.HSpacer(4));
 				ctr.Tasks.Add(new KeyframeButtonBinding(editor.EditorParams, keyframeButton));
 				ctr.Tasks.Add(new KeyFunctionButtonBinding(editor.EditorParams, keyFunctionButton));
-			} else {
-				ctr.Nodes.Insert(1, Spacer.HSpacer(42));
 			}
 			editor.ContainerWidget.Padding = new Thickness { Left = 4, Top = 3, Right = 12, Bottom = 4 };
 			editor.ContainerWidget.CompoundPresenter.Add(new WidgetFlatFillPresenter(
