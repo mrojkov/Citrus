@@ -64,8 +64,8 @@ namespace Tangerine.Dialogs
 				new PreferencesPropertyEditorParams(
 					container.Content,
 					source,
-					propertyName,
-					displayName
+					propertyName: propertyName,
+					displayName: displayName
 				) {
 					DefaultValueGetter = valueGetter
 				}
