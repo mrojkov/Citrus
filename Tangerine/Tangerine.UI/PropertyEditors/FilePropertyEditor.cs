@@ -105,11 +105,13 @@ namespace Tangerine.UI
 			return true;
 		}
 
-		private static readonly List<char> ValidChars =
+		private static readonly IReadOnlyList<char> validchars =
 			Enumerable.Range(1, 128).Select(i => (char)i).
 			Where(c =>
 				char.IsLetterOrDigit(c) ||
 				c == '\\' || c == '/' ||
 				c == '_' || c == '.' || c == '!').ToList();
+
+		protected virtual IEnumerable<char> ValidChars => validchars;
 	}
 }
