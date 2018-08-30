@@ -67,7 +67,10 @@ namespace Tangerine.UI
 			var menu = new Menu();
 			menu.Add(Command.Copy);
 			textView.Updated += (dt) => {
-				if (textView.Input.WasKeyPressed(Key.Mouse0)) {
+				if (
+					textView.Input.WasKeyPressed(Key.Mouse0) ||
+					textView.Input.WasKeyPressed(Key.Mouse1)
+				) {
 					textView.SetFocus();
 					Window.Current.Activate();
 				}
@@ -79,8 +82,6 @@ namespace Tangerine.UI
 					}
 				}
 				if (textView.Input.WasKeyPressed(Key.Mouse1)) {
-					textView.SetFocus();
-					Window.Current.Activate();
 					menu.Popup();
 				}
 				var i = textView.Content.Nodes.Count;
