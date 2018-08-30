@@ -48,7 +48,7 @@ namespace Tangerine.UI.SceneView
 
 	public class VisualHintsRegistry
 	{
-		public static VisualHintsRegistry Instance => SceneUserPreferences.Instance.VisualHintsRegister;
+		public static VisualHintsRegistry Instance = new VisualHintsRegistry();
 
 		[YuzuOptional]
 		public VisualHint RootHint { get; set; } = new VisualHint("");

@@ -70,6 +70,7 @@ namespace Tangerine
 			Application.Exiting += () => Project.Current.Close();
 			Application.Exited += () => {
 				AppUserPreferences.Instance.DockState = DockManager.Instance.ExportState();
+				SceneUserPreferences.Instance.VisualHintsRegistry = VisualHintsRegistry.Instance;
 				Core.UserPreferences.Instance.Save();
 			};
 
@@ -183,6 +184,9 @@ namespace Tangerine
 				}
 			});
 
+			if (SceneUserPreferences.Instance.VisualHintsRegistry != null) {
+				VisualHintsRegistry.Instance = SceneUserPreferences.Instance.VisualHintsRegistry;
+			}
 			VisualHintsRegistry.Instance.RegisterDefaultHints();
 
 			Document.NodeDecorators.AddFor<Node>(n => n.SetTangerineFlag(TangerineFlags.SceneNode, true));
