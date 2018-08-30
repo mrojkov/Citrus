@@ -14,7 +14,7 @@ namespace Tangerine.UI
 			editor.LayoutCell = new LayoutCell(Alignment.Center);
 			editor.Editor.EditorParams.MaxLines = multiline ? maxLines : 1;
 			editor.MinHeight += multiline ? editor.TextWidget.FontHeight * (maxLines - 1) : 0;
-			ContainerWidget.AddNode(editor);
+			EditorContainer.AddNode(editor);
 			editor.Submitted += text => SetProperty(text);
 			editor.AddChangeWatcher(CoalescedPropertyValue(), v => editor.Text = v);
 		}

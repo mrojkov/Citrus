@@ -942,7 +942,7 @@ namespace Tangerine
 				editor.Step = 1f;
 				editor.MinMaxWidth = 80;
 				editor.LayoutCell = new LayoutCell(Alignment.Center);
-				ContainerWidget.AddNode(editor);
+				EditorContainer.AddNode(editor);
 				var current = CoalescedPropertyValue();
 				editor.Submitted += text => {
 					if (int.TryParse(text, out var newValue)) {

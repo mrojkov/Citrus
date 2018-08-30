@@ -11,11 +11,14 @@ namespace Tangerine.UI
 
 		public Vector2PropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
-			ContainerWidget.AddNode(new Widget {
+			EditorContainer.AddNode(new Widget {
 				Layout = new HBoxLayout { DefaultCell = new DefaultLayoutCell(Alignment.Center), Spacing = 4 },
 				Nodes = {
+					//new SimpleText { Text = "X" },
 					(editorX = editorParams.NumericEditBoxFactory()),
-					(editorY = editorParams.NumericEditBoxFactory())
+					// new SimpleText { Text = "Y" },
+					(editorY = editorParams.NumericEditBoxFactory()),
+					new Widget()
 				}
 			});
 			var currentX = CoalescedPropertyComponentValue(v => v.X);

@@ -32,7 +32,7 @@ namespace Lime
 				OffsetContextMenu = p => p + new Vector2(1f, tw.FontHeight + 1f),
 				SelectAllOnFocus = true
 			};
-			eb.Editor = new Editor(tw, editorParams, eb, eb.ScrollWidget);
+			eb.Editor = new Editor(displayWidget: tw, editorParams: editorParams, focusableWidget: eb, clickableWidget: eb.ScrollWidget);
 			var vc = new VerticalLineCaret { Color = Theme.Colors.TextCaret };
 			eb.Updated += delta => {
 				vc.Width = eb.Editor.OverwriteMode && !eb.Editor.HasSelection() ?
@@ -73,112 +73,69 @@ namespace Lime
 		public ThemedNumericEditBox()
 		{
 			ThemedEditBox.Decorate(this);
-			MinMaxWidth = 80;
-			TextWidget.Padding = new Thickness(2);
+			MinWidth = 0.0f;
+			MaxWidth = 105.0f;
+			TextWidget.Padding = new Thickness(left: 5.0f, right: 5.0f, top: 2.0f, bottom: 2.0f);
 			Layout = new HBoxLayout();
-			Nodes.Insert(0, CreateSpinButton(SpinButtonType.Subtractive));
-			Nodes.Add(CreateSpinButton(SpinButtonType.Additive));
-		}
-
-		enum SpinButtonType
-		{
-			Subtractive,
-			Additive
-		}
-
-		Widget CreateSpinButton(SpinButtonType type)
-		{
-			var button = new Widget {
-				HitTestTarget = true,
-				LayoutCell = new LayoutCell { StretchX = 0 },
-				MinWidth = SpinButtonPresenter.ButtonWidth,
-				PostPresenter = new SpinButtonPresenter(type)
+			// Lime.EditorParams.MouseSelectionThreshold is 3 by default and this gesture should be recognized first.
+			// To achieve that we're setting its drag threshold to 2.0f, add it to Editor.ClickableWidget (same collection
+			// editor adds its widgets to) and do it in LateTasks.
+			var dragGesture = new DragGesture(exclusive: true, dragThreshold: 2.0f);
+			Updated += (delta) => {
+				if (Editor.FocusableWidget.IsFocused()) {
+					dragGesture.Cancel();
+				} else if (IsMouseOverThisOrDescendant() || isDragging) {
+					WidgetContext.Current.MouseCursor = MouseCursor.SizeWE;
+				}
 			};
-			button.Awoke += instance => {
-				var dragGesture = new DragGesture();
+			LateTasks.Add(Task.Repeat(() => {
 				dragGesture.Recognized += () => Tasks.Add(SpinByDragTask(dragGesture));
-				var clickGesture = new ClickGesture(() => {
-					var delta = (type == SpinButtonType.Additive ? 1 : -1) * Step;
-					if (Input.IsKeyPressed(Key.Shift)) {
-						delta *= 10f;
-					} else if (Input.IsKeyPressed(Key.Control)) {
-						delta *= 0.1f;
-					}
-					if (!IsReadOnly) {
-						Value += delta;
-					}
-				});
-				var gestures = ((Widget)instance).Gestures;
-				gestures.Add(clickGesture);
-				gestures.Add(dragGesture);
-			};
-			return button;
+				Editor.ClickableWidget.Gestures.Insert(0, dragGesture);
+				return false;
+			}));
 		}
+
+		private bool isDragging;
 
 		private IEnumerator<object> SpinByDragTask(DragGesture dragGesture)
 		{
 			RaiseBeginSpin();
 			try {
-				var prevMousePos = Application.DesktopMousePosition;
+				isDragging = true;
+				var startValue = Value;
+				var startMousePosition = Application.DesktopMousePosition;
+				float accumulator = 0.0f;
 				while (dragGesture.IsChanging()) {
+					var mousePosition = Application.DesktopMousePosition;
 					var disp = CommonWindow.Current.Display;
 					var wrapped = false;
 					if (Application.DesktopMousePosition.X > disp.Position.X + disp.Size.X - 5) {
-						prevMousePos.X = disp.Position.X + 5;
+						accumulator += disp.Position.X + disp.Size.X - 5 - startMousePosition.X;
+						startMousePosition.X = mousePosition.X = disp.Position.X + 5;
 						wrapped = true;
 					}
 					if (Application.DesktopMousePosition.X < disp.Position.X + 5) {
-						prevMousePos.X = disp.Position.X + disp.Size.X - 5;
+						accumulator -= startMousePosition.X - disp.Position.X - 5;
+						startMousePosition.X = mousePosition.X = disp.Position.X + disp.Size.X - 5;
 						wrapped = true;
 					}
 					if (wrapped) {
-						Application.DesktopMousePosition = new Vector2(prevMousePos.X, Application.DesktopMousePosition.Y);
+						Application.DesktopMousePosition = new Vector2(mousePosition.X, Application.DesktopMousePosition.Y);
 					}
-					var delta = (Application.DesktopMousePosition.X - prevMousePos.X).Round() * Step;
+					var delta = (mousePosition.X - startMousePosition.X + accumulator).Round() * Step;
 					if (Input.IsKeyPressed(Key.Shift)) {
 						delta *= 10f;
 					} else if (Input.IsKeyPressed(Key.Control)) {
 						delta *= 0.1f;
 					}
 					if (!IsReadOnly) {
-						Value += delta;
+						Value = startValue + delta;
 					}
-					prevMousePos = Application.DesktopMousePosition;
 					yield return null;
 				}
 			} finally {
+				isDragging = false;
 				RaiseEndSpin();
-			}
-		}
-
-		class SpinButtonPresenter : CustomPresenter
-		{
-			public const float ButtonWidth = 10;
-
-			static Color4 color = Color4.Lerp(0.25f, Theme.Colors.ControlBorder, Theme.Colors.BlackText);
-
-			private readonly VectorShape buttonShape = new VectorShape {
-				new VectorShape.TriangleFan(new float[] { 0.3f, 0.3f, 0.7f, 0.5f, 0.3f, 0.7f }, color)
-			};
-
-			private SpinButtonType type;
-
-			public SpinButtonPresenter(SpinButtonType type)
-			{
-				this.type = type;
-			}
-
-			public override void Render(Node node)
-			{
-				var widget = node.AsWidget;
-				widget.PrepareRendererState();
-				Matrix32 transform;
-				if (type == SpinButtonType.Additive) {
-					transform = Matrix32.Scaling(ButtonWidth, widget.Height - 2) * Matrix32.Translation(1, 1);
-				} else {
-					transform = Matrix32.Scaling(-ButtonWidth, widget.Height - 2) * Matrix32.Translation(ButtonWidth + 1, 1);
-				}
-				buttonShape.Draw(transform);
 			}
 		}
 	}

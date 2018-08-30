@@ -17,7 +17,7 @@ namespace Tangerine.UI
 		{
 			Selector = editorParams.DropDownListFactory();
 			Selector.LayoutCell = new LayoutCell(Alignment.Center);
-			ContainerWidget.AddNode(Selector);
+			EditorContainer.AddNode(Selector);
 			var propertyType = typeof(T);
 			var meta = Yuzu.Metadata.Meta.Get(editorParams.Type, Serialization.YuzuCommonOptions);
 			var propertyMetaItem = meta.Items.Where(i => i.Name == editorParams.PropertyName).First();
@@ -26,7 +26,7 @@ namespace Tangerine.UI
 			resetToDefaultButton.Clicked = () => {
 				SetProperty(defaultValue);
 			};
-			ContainerWidget.AddNode(resetToDefaultButton);
+			EditorContainer.AddNode(resetToDefaultButton);
 			if (!propertyType.IsInterface) {
 				Selector.Items.Add(new CommonDropDownList.Item(propertyType.Name, propertyType));
 			}

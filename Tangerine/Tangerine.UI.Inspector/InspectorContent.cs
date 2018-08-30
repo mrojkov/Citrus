@@ -391,12 +391,12 @@ namespace Tangerine.UI.Inspector
 
 		private static void DecoratePropertyEditor(IPropertyEditor editor, int row)
 		{
-			var ctr = editor.ContainerWidget;
+			var ctr = editor.LabelContainer;
 			if (!(editor is IExpandablePropertyEditor)) {
 				ctr.Nodes.Insert(0, new HSpacer(20));
 			}
 
-			var index = ctr.Nodes.Count - 1;
+			var index = ctr.Nodes.Count;
 			bool allRootObjectsAnimable = editor.EditorParams.RootObjects.All(a => a is IAnimationHost);
 			if (
 				allRootObjectsAnimable &&
@@ -421,7 +421,7 @@ namespace Tangerine.UI.Inspector
 			} else {
 				ctr.Nodes.Insert(2, new HSpacer(42));
 			}
-			editor.ContainerWidget.Padding = new Thickness { Left = 4, Top = 1, Right = 12, Bottom = 1 };
+			editor.ContainerWidget.Padding = new Thickness { Left = 4, Top = 3, Right = 12, Bottom = 4 };
 			editor.ContainerWidget.CompoundPresenter.Add(new WidgetFlatFillPresenter(
 				row % 2 == 0 ?
 				ColorTheme.Current.Inspector.StripeBackground1 :

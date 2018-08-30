@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Lime;
 
 namespace Tangerine.Core
@@ -29,7 +29,7 @@ namespace Tangerine.Core
 		{
 			widget.Tasks.Add(new Property<T>(prop.Getter).DistinctUntilChanged().Consume(action));
 		}
-		
+
 		public static void AddTransactionClickHandler(this Button button, Action clicked)
 		{
 			button.Clicked += () => {

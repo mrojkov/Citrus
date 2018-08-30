@@ -14,7 +14,7 @@ namespace Tangerine.UI
 
 		protected FilePropertyEditor(IPropertyEditorParams editorParams, string[] allowedFileTypes) : base(editorParams)
 		{
-			ContainerWidget.AddNode(new Widget {
+			EditorContainer.AddNode(new Widget {
 				Layout = new HBoxLayout(),
 				Nodes = {
 					(editor = editorParams.EditBoxFactory()),

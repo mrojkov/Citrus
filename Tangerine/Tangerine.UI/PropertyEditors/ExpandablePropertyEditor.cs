@@ -35,7 +35,7 @@ namespace Tangerine.UI
 			};
 			ExpandButton.Clicked += () => Expanded = !Expanded;
 			editorParams.InspectorPane.AddNode(ExpandableContent);
-			ContainerWidget.Nodes.Insert(0, ExpandButton);
+			LabelContainer.Nodes.Insert(0, ExpandButton);
 		}
 	}
 }
