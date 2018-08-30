@@ -134,7 +134,9 @@ namespace Tangerine.UI.Timeline.Components
 		public AwakeBehavior AwakeBehavior => widget.Components.Get<AwakeBehavior>();
 		public float Indentation { set { indentSpacer.MinMaxWidth = value; } }
 
-		bool IsGrayedLabel(Node node) => node.AsWidget?.Visible ?? true;
+		bool IsGrayedLabel(Node node) =>
+			node is Widget w && (!w.Visible || w.Color.A == 0) ||
+			node is Frame frame && frame.ClipChildren == ClipMethod.NoRender;
 
 		void RefreshLabel()
 		{
@@ -149,7 +151,7 @@ namespace Tangerine.UI.Timeline.Components
 
 		public void RefreshLabelColor()
 		{
-			label.Color = IsGrayedLabel(nodeData.Node) ? Theme.Colors.BlackText : ColorTheme.Current.TimelineRoll.GrayedLabel;
+			label.Color = IsGrayedLabel(nodeData.Node) ? ColorTheme.Current.TimelineRoll.GrayedLabel : Theme.Colors.BlackText;
 		}
 
 		ToolbarButton CreateEnterButton()
