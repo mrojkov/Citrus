@@ -1,7 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Lime;
+using System.Linq;
 
 namespace Tangerine.Core.Operations
 {
@@ -9,7 +7,7 @@ namespace Tangerine.Core.Operations
 
 	public static class EnterNode
 	{
-		class SetContainer : SetProperty, ISetContainer
+		private class SetContainer : SetProperty, ISetContainer
 		{
 			public SetContainer(Node value) : base(Document.Current, nameof(Document.Container), value, false) { }
 		}
@@ -28,14 +26,14 @@ namespace Tangerine.Core.Operations
 			return true;
 		}
 
-		static void OpenExternalScene(string path)
+		private static void OpenExternalScene(string path)
 		{
 			var sceneNavigatedFrom = Document.Current.Path;
 			var doc = Project.Current.OpenDocument(path);
 			doc.SceneNavigatedFrom = sceneNavigatedFrom;
 		}
 
-		static void ChangeContainer(Node container, bool selectFirstNode)
+		private static void ChangeContainer(Node container, bool selectFirstNode)
 		{
 			ClearRowSelection.Perform();
 			var prevContainer = Document.Current.Container;

@@ -141,6 +141,7 @@ namespace Tangerine.Core
 			Decorate(RootNode);
 			Container = RootNode;
 			SetModificationTimeToNow();
+			History.PerformingOperation += Document_PerformingOperation;
 		}
 
 		public Document(string path)
@@ -162,8 +163,16 @@ namespace Tangerine.Core
 				if (Format == DocumentFormat.Scene || Format == DocumentFormat.Tan) {
 					Preview = DocumentPreview.ReadAsBase64(Project.Current.GetSystemPath(path, GetFileExtension(Format)));
 				}
+				History.PerformingOperation += Document_PerformingOperation;
 			} catch (System.Exception e) {
 				throw new System.InvalidOperationException($"Can't open '{path}': {e.Message}");
+			}
+		}
+
+		private void Document_PerformingOperation(IOperation operation)
+		{
+			if (PreviewAnimation) {
+				TogglePreviewAnimation(!PreviewAnimation, triggerMarkersBeforeCurrentFrame: true);
 			}
 		}
 

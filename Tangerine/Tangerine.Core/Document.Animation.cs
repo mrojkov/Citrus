@@ -30,7 +30,6 @@ namespace Tangerine.Core
 		public void TogglePreviewAnimation(bool animationMode, bool triggerMarkersBeforeCurrentFrame)
 		{
 			if (PreviewAnimation) {
-				Current.History.AllowCommandExecution = true;
 				PreviewAnimation = false;
 				CurrentFrameSetter.StopAnimationRecursive(PreviewAnimationContainer);
 				if (!CoreUserPreferences.Instance.StopAnimationOnCurrentFrame) {
@@ -42,7 +41,6 @@ namespace Tangerine.Core
 				AudioSystem.StopAll();
 				ForceAnimationUpdate();
 			} else {
-				Current.History.AllowCommandExecution = false;
 				int savedAnimationFrame = Container.AnimationFrame;
 				PreviewAnimation = true;
 				if (triggerMarkersBeforeCurrentFrame) {
