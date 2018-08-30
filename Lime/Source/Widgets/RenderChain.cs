@@ -36,12 +36,6 @@ namespace Lime
 		/// </summary>
 		public Rectangle ClipRegion = DefaultClipRegion;
 
-		//public Rectangle ClipRegion
-		//{
-		//	get { return DefaultClipRegion; }
-		//	set { }
-		//}
-
 		public List<Item>[] Layers { get; private set; } = new List<Item>[LayerCount];
 
 		public int CurrentLayer
