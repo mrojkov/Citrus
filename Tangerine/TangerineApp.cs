@@ -566,7 +566,7 @@ namespace Tangerine
 			h.Connect(Tools.FlipX, new FlipX());
 			h.Connect(Tools.FlipY, new FlipY());
 			h.Connect(Tools.CenterView, new CenterView());
-			h.Connect(Command.Copy, Core.Operations.Copy.CopyToClipboard, () => IsCopyPasteAllowedForSelection() || Tangerine.UI.Console.Instance.RootWidget.IsMouseOverThisOrDescendant());
+			h.Connect(Command.Copy, Core.Operations.Copy.CopyToClipboard, IsCopyPasteAllowedForSelection);
 			h.Connect(Command.Cut, new DocumentDelegateCommandHandler(Core.Operations.Cut.Perform, IsCopyPasteAllowedForSelection));
 			h.Connect(Command.Paste, new DocumentDelegateCommandHandler(() => Paste(), Document.HasCurrent));
 			h.Connect(Command.Delete, new DocumentDelegateCommandHandler(Core.Operations.Delete.Perform, IsCopyPasteAllowedForSelection));
