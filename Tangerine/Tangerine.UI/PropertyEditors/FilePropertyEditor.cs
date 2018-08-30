@@ -78,42 +78,21 @@ namespace Tangerine.UI
 					(propertyData, owner) = AnimationUtils.GetPropertyByPath(animationHost, EditorParams.PropertyPath);
 				}
 				if (propertyData.Info != null) {
-					result.Add(StringValueGetter((T)propertyData.Info.GetValue(owner)));
+					result.Add(ValueToStringConverter((T)propertyData.Info.GetValue(owner)));
 				} else {
-					result.Add(StringValueGetter((T)owner.GetType().GetProperty(EditorParams.PropertyName).GetValue(owner)));
+					result.Add(ValueToStringConverter((T)owner.GetType().GetProperty(EditorParams.PropertyName).GetValue(owner)));
 				}
 			}
 			return result;
 		}
 
-		private void SetPathPrefix(string oldPrefix, string prefix)
-		{
-			DoTransaction(() => {
-				foreach (var obj in EditorParams.Objects) {
-					var animationHost = obj as IAnimationHost;
-					var owner = obj;
-					AnimationUtils.PropertyData propertyData = AnimationUtils.PropertyData.Empty;
-					if (animationHost != null) {
-						(propertyData, owner) = AnimationUtils.GetPropertyByPath(animationHost, EditorParams.PropertyPath);
-					}
-					string value;
-					if (propertyData.Info != null) {
-						value = StringValueGetter((T)propertyData.Info.GetValue(owner));
-					} else {
-						value = StringValueGetter((T)owner.GetType().GetProperty(EditorParams.PropertyName).GetValue(owner));
-					}
-					((IPropertyEditorParamsInternal)EditorParams).
-						PropertySetter(obj, EditorParams.PropertyPath,
-						StringValueSetter(AssetPath.CorrectSlashes(
-							Path.Combine(prefix, value.Substring(oldPrefix.Length).TrimStart('/'))
-					)));
-				}
-			});
-		}
+		private void SetPathPrefix(string oldPrefix, string prefix) =>
+			this.SetProperty<T>(current => StringToValueConverter(AssetPath.CorrectSlashes(
+				Path.Combine(prefix, ValueToStringConverter(current).Substring(oldPrefix.Length).TrimStart('/')))));
 
-		protected abstract string StringValueGetter(T obj);
+		protected abstract string ValueToStringConverter(T obj);
 
-		protected abstract T StringValueSetter(string path);
+		protected abstract T StringToValueConverter(string path);
 
 		public void SetComponent(string text)
 		{
@@ -182,16 +161,16 @@ namespace Tangerine.UI
 
 		public string GetLongestCommonPrefix(List<string> paths)
 		{
-			if (paths == null || paths.Count == 0)
+			if (paths == null || paths.Count == 0) {
 				return String.Empty;
+			}
 			const char Separator = '/';
-			IList<string> directoryParts = new List<string>(paths[0].Split(Separator));
+			var directoryParts = new List<string>(paths[0].Split(Separator));
 			for (int index = 1; index < paths.Count; index++) {
-				IList<string> first = directoryParts;
-				string[] second = paths[index].Split(Separator);
+				var first = directoryParts;
+				var second = paths[index].Split(Separator);
 				int maxPrefixLength = Math.Min(first.Count, second.Length);
 				var tempDirectoryParts = new List<string>(maxPrefixLength);
-
 				for (int part = 0; part < maxPrefixLength; part++) {
 					if (first[part] == second[part])
 						tempDirectoryParts.Add(first[part]);

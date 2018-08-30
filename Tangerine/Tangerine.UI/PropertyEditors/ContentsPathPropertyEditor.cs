@@ -38,12 +38,12 @@ namespace Tangerine.UI
 			}
 		}
 
-		protected override string StringValueGetter(string obj)
+		protected override string ValueToStringConverter(string obj)
 		{
 			return obj ?? "";
 		}
 
-		protected override string StringValueSetter(string path) {
+		protected override string StringToValueConverter(string path) {
 			return path;
 		}
 	}

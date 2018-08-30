@@ -32,11 +32,11 @@ namespace Tangerine.UI
 
 		protected override IEnumerable<char> ValidChars => validchars;
 
-		protected override string StringValueGetter(T obj) {
+		protected override string ValueToStringConverter(T obj) {
 			return (obj as SerializableTexture)?.SerializationPath ?? "";
 		}
 
-		protected override T StringValueSetter(string path) {
+		protected override T StringToValueConverter(string path) {
 			return (T)(ITexture)new SerializableTexture(path);
 		}
 	}
