@@ -2,8 +2,8 @@ using Lime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Tangerine.Core;
 using Tangerine.UI;
-using static Lime.ThemedButton;
 
 namespace Tangerine.Dialogs
 {
@@ -468,7 +468,7 @@ namespace Tangerine.Dialogs
 		public readonly Key Key;
 	}
 
-	class KeyboardButtonPresenter : ButtonPresenter
+	class KeyboardButtonPresenter : CustomPresenter
 	{
 		private Color4 borderColor;
 		public bool IsModifier { get; set; } = false;
@@ -483,7 +483,7 @@ namespace Tangerine.Dialogs
 			}
 		}
 
-		public override void SetState(string state)
+		public void SetState(string state)
 		{
 			CommonWindow.Current.Invalidate();
 			switch (state) {

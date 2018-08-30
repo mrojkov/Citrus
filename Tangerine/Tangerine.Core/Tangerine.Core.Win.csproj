@@ -83,6 +83,7 @@
     <Compile Include="RowsSynchronizer.cs" />
     <Compile Include="Operation.cs" />
     <Compile Include="Ruler.cs" />
+    <Compile Include="SyncPresenters.cs" />
     <Compile Include="TangerineAssetBundle.cs" />
     <Compile Include="TangerineYuzu.cs" />
     <Compile Include="TriggersValidation.cs" />
