@@ -267,7 +267,7 @@ namespace Tangerine.Core
 		{
 			if (!SelectedRows().Any()) {
 				using (History.BeginTransaction()) {
-					Operations.Dummy.Perform();
+					Operations.Dummy.Perform(Current.History);
 					if (Rows.Count > 0) {
 						Operations.SelectRow.Perform(Rows[0]);
 					}

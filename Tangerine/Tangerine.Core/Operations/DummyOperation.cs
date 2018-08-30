@@ -6,9 +6,9 @@ namespace Tangerine.Core.Operations
 	{
 		public override bool IsChangingDocument => false;
 
-		public static void Perform()
+		public static void Perform(DocumentHistory history)
 		{
-			Document.Current.History.DoTransaction(() => Document.Current.History.Perform(new Dummy()));
+			history.DoTransaction(() => Document.Current.History.Perform(new Dummy()));
 		}
 
 		private Dummy() { }

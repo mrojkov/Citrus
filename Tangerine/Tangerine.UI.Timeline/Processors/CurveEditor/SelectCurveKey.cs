@@ -13,7 +13,7 @@ namespace Tangerine.UI.Timeline.Operations
 
 		public static void Perform(Curve curve, IKeyframe key, bool select)
 		{
-			Document.Current.History.Perform(new SelectCurveKey(curve, key, select));
+			DocumentHistory.Current.Perform(new SelectCurveKey(curve, key, select));
 		}
 
 		private SelectCurveKey(Curve curve, IKeyframe key, bool select)

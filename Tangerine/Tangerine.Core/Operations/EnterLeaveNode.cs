@@ -39,7 +39,7 @@ namespace Tangerine.Core.Operations
 		{
 			ClearRowSelection.Perform();
 			var prevContainer = Document.Current.Container;
-			Document.Current.History.Perform(new SetContainer(container));
+			DocumentHistory.Current.Perform(new SetContainer(container));
 			if (selectFirstNode && container.Nodes.Count > 0) {
 				SelectNode.Perform(container.Nodes[0]);
 			}

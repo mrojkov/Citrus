@@ -19,7 +19,7 @@ namespace Tangerine.UI.Timeline.Operations
 			if (Document.Current.PreviewAnimation) {
 				Document.Current.TogglePreviewAnimation(CoreUserPreferences.Instance.AnimationMode, false);
 			}
-			Document.Current.History.Perform(new SetCurrentColumn(column, container));
+			DocumentHistory.Current.Perform(new SetCurrentColumn(column, container));
 		}
 
 		public static void Perform(int column)
@@ -31,7 +31,7 @@ namespace Tangerine.UI.Timeline.Operations
 		{
 			isScrollingFrozen = true;
 			try {
-				Document.Current.History.RollbackTransaction();
+				DocumentHistory.Current.RollbackTransaction();
 			} finally {
 				isScrollingFrozen = false;
 			}

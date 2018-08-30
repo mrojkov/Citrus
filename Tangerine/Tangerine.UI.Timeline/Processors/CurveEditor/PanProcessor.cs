@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Lime;
+using Tangerine.Core;
 
 namespace Tangerine.UI.Timeline
 {
@@ -21,7 +22,7 @@ namespace Tangerine.UI.Timeline
 						var delta = input.MousePosition - prevPosition;
 						if (delta.X != 0 && timeline.OffsetX - delta.X > 0) {
 							timeline.OffsetX -= delta.X;
-							Core.Operations.Dummy.Perform();
+							Core.Operations.Dummy.Perform(Document.Current.History);
 						}
 						if (delta.Y != 0) {
 							var d = curveEditor.CoordToValue(0) - curveEditor.CoordToValue(delta.Y);

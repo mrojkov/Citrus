@@ -10,7 +10,6 @@ namespace Tangerine.Core
 		void RollbackTransaction();
 		void CommitTransaction();
 		void EndTransaction();
-		void Perform(IOperation operation);
 	}
 
 	public class DocumentHistory : ITransactionalHistory
@@ -22,6 +21,8 @@ namespace Tangerine.Core
 		private int saveIndex;
 		private int currentIndex;
 
+		public static DocumentHistory Current { get; private set; }
+
 		public bool CanUndo() => !IsTransactionActive && currentIndex > 0;
 		public bool CanRedo() => !IsTransactionActive && currentIndex < operations.Count;
 		public bool IsDocumentModified { get; private set; }
@@ -32,6 +33,7 @@ namespace Tangerine.Core
 		{
 			if (transactionStartIndices.Count == 0) {
 				transactionId++;
+				Current = this;
 			}
 			transactionStartIndices.Push(currentIndex);
 			return new Disposable { OnDispose = EndTransaction };
@@ -48,6 +50,9 @@ namespace Tangerine.Core
 		{
 			RollbackTransaction();
 			transactionStartIndices.Pop();
+			if (transactionStartIndices.Count == 0) {
+				Current = null;
+			}
 		}
 
 		public void DoTransaction(Action block)

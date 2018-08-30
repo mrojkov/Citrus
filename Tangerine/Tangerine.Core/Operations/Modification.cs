@@ -21,17 +21,12 @@ namespace Tangerine.Core.Operations
 
 		public static void Perform(object obj, string propertyName, object value, bool isChangingDocument = true)
 		{
-			Perform(obj, propertyName, value, Document.Current.History, isChangingDocument);
-		}
-
-		public static void Perform(object obj, string propertyName, object value, ITransactionalHistory history, bool isChangingDocument = true)
-		{
-			history.Perform(new SetProperty(obj, propertyName, value, isChangingDocument));
+			DocumentHistory.Current.Perform(new SetProperty(obj, propertyName, value, isChangingDocument));
 		}
 
 		public static void Perform(Type type, object obj, string propertyName, object value, bool isChangingDocument = true)
 		{
-			Document.Current.History.Perform(new SetProperty(type, obj, propertyName, value, isChangingDocument));
+			DocumentHistory.Current.Perform(new SetProperty(type, obj, propertyName, value, isChangingDocument));
 		}
 
 		protected SetProperty(object obj, string propertyName, object value, bool isChangingDocument)
@@ -72,14 +67,8 @@ namespace Tangerine.Core.Operations
 
 	public class SetAnimableProperty
 	{
-		public static void Perform(object @object, string propertyName, object value,
-			bool createAnimatorIfNeeded = false, bool createInitialKeyframeForNewAnimator = true, int atFrame = -1)
-		{
-			Perform(@object, propertyName, value, Document.Current.History, createAnimatorIfNeeded,
-				createInitialKeyframeForNewAnimator, atFrame);
-		}
 
-		public static void Perform(object @object, string propertyName, object value, ITransactionalHistory history, bool createAnimatorIfNeeded = false, bool createInitialKeyframeForNewAnimator = true, int atFrame = -1)
+		public static void Perform(object @object, string propertyName, object value, bool createAnimatorIfNeeded = false, bool createInitialKeyframeForNewAnimator = true, int atFrame = -1)
 		{
 			IAnimator animator;
 			var animationHost = @object as IAnimationHost;
@@ -88,7 +77,7 @@ namespace Tangerine.Core.Operations
 			if (animationHost != null) {
 				(propertyData, owner) = AnimationUtils.GetPropertyByPath(animationHost, propertyName);
 			}
-			SetProperty.Perform(owner, propertyData.Info?.Name ?? propertyName, value, history);
+			SetProperty.Perform(owner, propertyData.Info?.Name ?? propertyName, value);
 			if (animationHost != null && (animationHost.Animators.TryFind(propertyName, out animator, Document.Current.AnimationId) || createAnimatorIfNeeded)) {
 				if (animator == null && createInitialKeyframeForNewAnimator) {
 					var propertyValue = propertyData.Info.GetValue(owner);
@@ -109,7 +98,7 @@ namespace Tangerine.Core.Operations
 					key.Frame = Document.Current.AnimationFrame;
 					key.Function = animator?.Keys.LastOrDefault(k => k.Frame <= key.Frame)?.Function ?? KeyFunction.Linear;
 					key.Value = value;
-					SetKeyframe.Perform(animationHost, propertyName, Document.Current.AnimationId, key, history);
+					SetKeyframe.Perform(animationHost, propertyName, Document.Current.AnimationId, key);
 				} finally {
 					if (savedFrame >= 0) {
 						Document.Current.AnimationFrame = savedFrame;
@@ -164,7 +153,7 @@ namespace Tangerine.Core.Operations
 
 		public static void Perform(IAnimator animator, int frame)
 		{
-			Document.Current.History.Perform(new RemoveKeyframe(animator, frame));
+			DocumentHistory.Current.Perform(new RemoveKeyframe(animator, frame));
 		}
 
 		private RemoveKeyframe(IAnimator animator, int frame)
@@ -216,14 +205,9 @@ namespace Tangerine.Core.Operations
 
 		public override bool IsChangingDocument => true;
 
-		public static void Perform(IAnimationHost animationHost, string propertyName, string animationId, IKeyframe keyframe, ITransactionalHistory history)
-		{
-			history.Perform(new SetKeyframe(animationHost, propertyName, animationId, keyframe));
-		}
-
 		public static void Perform(IAnimationHost animationHost, string propertyName, string animationId, IKeyframe keyframe)
 		{
-			Perform(animationHost, propertyName, animationId, keyframe, Document.Current.History);
+			DocumentHistory.Current.Perform(new SetKeyframe(animationHost, propertyName, animationId, keyframe));
 		}
 
 		public static void Perform(IAnimator animator, IKeyframe keyframe)
@@ -315,12 +299,7 @@ namespace Tangerine.Core.Operations
 
 		public static void Perform(object item, IList list, int location)
 		{
-			Perform(item, list, location, Document.Current.History);
-		}
-
-		public static void Perform(object item, IList list, int location, ITransactionalHistory history)
-		{
-			history.Perform(new InsertListItem(item, list, location));
+			DocumentHistory.Current.Perform(new InsertListItem(item, list, location));
 		}
 
 		public class Processor : OperationProcessor<InsertListItem>
@@ -352,24 +331,14 @@ namespace Tangerine.Core.Operations
 			Location = location;
 		}
 
-		public static void Perform(object item, IList list)
-		{
-			Perform(item, list, Document.Current.History);
-		}
-
 		public static void Perform(int location, IList list)
 		{
-			Perform(location, list, Document.Current.History);
+			DocumentHistory.Current.Perform(new RemoveListItem(null, list, location));
 		}
 
-		public static void Perform(int location, IList list, ITransactionalHistory history)
+		public static void Perform(object item, IList list)
 		{
-			history.Perform(new RemoveListItem(null, list, location));
-		}
-
-		public static void Perform(object item, IList list, ITransactionalHistory history)
-		{
-			history.Perform(new RemoveListItem(item, list, 0));
+			DocumentHistory.Current.Perform(new RemoveListItem(item, list, 0));
 		}
 
 		public class Processor : OperationProcessor<RemoveListItem>
@@ -410,7 +379,7 @@ namespace Tangerine.Core.Operations
 			if (item is Node && !NodeCompositionValidator.Validate(container.GetType(), item.GetType())) {
 				throw new InvalidOperationException($"Can't put {item.GetType()} into {container.GetType()}");
 			}
-			Document.Current.History.Perform(new InsertFolderItem(container, location, item));
+			DocumentHistory.Current.Perform(new InsertFolderItem(container, location, item));
 		}
 
 		internal static FolderItemLocation GetNewFolderItemLocation(bool aboveSelected)
@@ -502,7 +471,7 @@ namespace Tangerine.Core.Operations
 
 		public static void Perform(Node container, IFolderItem item)
 		{
-			Document.Current.History.Perform(new UnlinkFolderItem(container, item));
+			DocumentHistory.Current.Perform(new UnlinkFolderItem(container, item));
 		}
 
 		private UnlinkFolderItem(Node container, IFolderItem item)
@@ -555,7 +524,7 @@ namespace Tangerine.Core.Operations
 		{
 			var previousMarker = container.Markers.FirstOrDefault(i => i.Frame == marker.Frame);
 
-			Document.Current.History.Perform(new SetMarker(container, marker, removeDependencies));
+			DocumentHistory.Current.Perform(new SetMarker(container, marker, removeDependencies));
 
 			if (removeDependencies) {
 				// Detect if a previous marker id is unique then rename it in triggers and markers.
@@ -631,7 +600,7 @@ namespace Tangerine.Core.Operations
 
 		public static void Perform(Node container, Marker marker, bool removeDependencies)
 		{
-			Document.Current.History.Perform(new DeleteMarker(container, marker, removeDependencies));
+			DocumentHistory.Current.Perform(new DeleteMarker(container, marker, removeDependencies));
 
 			if (removeDependencies) {
 				ProcessAnimableProperty.Perform(container, nameof(Node.Trigger),
@@ -722,7 +691,7 @@ namespace Tangerine.Core.Operations
 
 		public static void Perform(IFolderItem item, FolderItemLocation targetFolder)
 		{
-			Document.Current.History.Perform(
+			DocumentHistory.Current.Perform(
 				new MoveNodes(
 					Document.Current.Container,
 					targetFolder,
@@ -739,7 +708,7 @@ namespace Tangerine.Core.Operations
 				throw new Lime.Exception("Cant put nodes in a non folder row");
 			}
 			foreach (var node in nodes) {
-				Document.Current.History.Perform(
+				DocumentHistory.Current.Perform(
 					new MoveNodes(
 						Document.Current.Container,
 						new FolderItemLocation(targetFolder, i++),
@@ -806,7 +775,7 @@ namespace Tangerine.Core.Operations
 			this.component = component;
 		}
 
-		public static void Perform(Node node, NodeComponent component) => Document.Current.History.Perform(new SetComponent(node, component));
+		public static void Perform(Node node, NodeComponent component) => DocumentHistory.Current.Perform(new SetComponent(node, component));
 
 		public class Processor : OperationProcessor<SetComponent>
 		{
@@ -829,7 +798,7 @@ namespace Tangerine.Core.Operations
 			this.component = component;
 		}
 
-		public static void Perform(Node node, NodeComponent component) => Document.Current.History.Perform(new DeleteComponent(node, component));
+		public static void Perform(Node node, NodeComponent component) => DocumentHistory.Current.Perform(new DeleteComponent(node, component));
 
 		public class Processor : OperationProcessor<DeleteComponent>
 		{

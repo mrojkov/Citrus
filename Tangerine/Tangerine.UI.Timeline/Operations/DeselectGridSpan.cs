@@ -15,7 +15,7 @@ namespace Tangerine.UI.Timeline.Operations
 
 		public static void Perform(int row, int a, int b)
 		{
-			Document.Current.History.Perform(new DeselectGridSpan(row, a, b));
+			DocumentHistory.Current.Perform(new DeselectGridSpan(row, a, b));
 		}
 
 		private DeselectGridSpan(int row, int a, int b)
