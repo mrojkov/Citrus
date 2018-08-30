@@ -17,9 +17,9 @@ namespace Tangerine.UI
 				if (Parser.TryParse(text, out double newValue)) {
 					SetProperty(newValue);
 				}
-				editor.Text = current.GetValue().ToString();
+				editor.Text = current.GetValue().ToString("0.###");
 			};
-			editor.AddChangeWatcher(current, v => editor.Text = v.ToString());
+			editor.AddChangeWatcher(current, v => editor.Text = v.ToString("0.###"));
 		}
 	}
 }

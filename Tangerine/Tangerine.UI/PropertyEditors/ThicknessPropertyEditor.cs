@@ -28,10 +28,10 @@ namespace Tangerine.UI
 			editorTop.Submitted += text => SetComponent(editorParams, 2, editorTop, current.GetValue());
 			editorBottom.Submitted += text => SetComponent(editorParams, 3, editorBottom, current.GetValue());
 			editorLeft.AddChangeWatcher(current, v => {
-				editorLeft.Text = v.Left.ToString();
-				editorRight.Text = v.Right.ToString();
-				editorTop.Text = v.Top.ToString();
-				editorBottom.Text = v.Bottom.ToString();
+				editorLeft.Text = v.Left.ToString("0.###");
+				editorRight.Text = v.Right.ToString("0.###");
+				editorTop.Text = v.Top.ToString("0.###");
+				editorBottom.Text = v.Bottom.ToString("0.###");
 			});
 		}
 
@@ -52,10 +52,10 @@ namespace Tangerine.UI
 				});
 			} else {
 				switch (component) {
-					case 0: editor.Text = currentValue.Left.ToString(); break;
-					case 1: editor.Text = currentValue.Right.ToString(); break;
-					case 2: editor.Text = currentValue.Top.ToString(); break;
-					case 3: editor.Text = currentValue.Bottom.ToString(); break;
+					case 0: editor.Text = currentValue.Left.ToString("0.###"); break;
+					case 1: editor.Text = currentValue.Right.ToString("0.###"); break;
+					case 2: editor.Text = currentValue.Top.ToString("0.###"); break;
+					case 3: editor.Text = currentValue.Bottom.ToString("0.###"); break;
 				}
 			}
 		}

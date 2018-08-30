@@ -111,7 +111,7 @@ namespace Tangerine.UI
 			if (float.TryParse(text, out var newPosition)) {
 				SetControlPointProperty(nameof(GradientControlPoint.Position), Mathf.Clamp(newPosition, 0, 1));
 			}
-			positionEditor.Text = selectedPointPositionProperty.GetValue().ToString();
+			positionEditor.Text = selectedPointPositionProperty.GetValue().ToString("0.###");
 		}
 
 		private void SelectPoint(GradientControlPoint point)

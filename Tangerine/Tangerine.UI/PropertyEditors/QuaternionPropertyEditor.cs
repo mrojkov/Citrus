@@ -24,9 +24,9 @@ namespace Tangerine.UI
 			editorZ.Submitted += text => SetComponent(editorParams, 2, editorZ, current.GetValue());
 			editorX.AddChangeWatcher(current, v => {
 				var ea = v.ToEulerAngles() * Mathf.RadToDeg;
-				editorX.Text = RoundAngle(ea.X).ToString();
-				editorY.Text = RoundAngle(ea.Y).ToString();
-				editorZ.Text = RoundAngle(ea.Z).ToString();
+				editorX.Text = RoundAngle(ea.X).ToString("0.###");
+				editorY.Text = RoundAngle(ea.Y).ToString("0.###");
+				editorZ.Text = RoundAngle(ea.Z).ToString("0.###");
 			});
 		}
 
@@ -44,7 +44,7 @@ namespace Tangerine.UI
 					});
 				});
 			} else {
-				editor.Text = RoundAngle(currentValue.ToEulerAngles()[component] * Mathf.RadToDeg).ToString();
+				editor.Text = RoundAngle(currentValue.ToEulerAngles()[component] * Mathf.RadToDeg).ToString("0.###");
 			}
 		}
 
