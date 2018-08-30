@@ -1,17 +1,14 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Reflection;
 using Lime;
-using Tangerine.Core;
 using Tangerine.UI;
 
 namespace Tangerine.Dialogs
 {
 	public class ColorThemeEditor: Widget
 	{
+		public int Version { get; private set; }
+
 		public ColorThemeEditor()
 		{
 			Rebuild();
@@ -58,7 +55,7 @@ namespace Tangerine.Dialogs
 			AddNode(pane);
 		}
 
-		private static void CreateColorEditor(ThemedScrollView container, object source, string propertyName, string displayName, Func<object> valueGetter)
+		private void CreateColorEditor(ThemedScrollView container, object source, string propertyName, string displayName, Func<object> valueGetter)
 		{
 			var tmp = new Color4PropertyEditor(
 				new PreferencesPropertyEditorParams(
@@ -70,6 +67,12 @@ namespace Tangerine.Dialogs
 					DefaultValueGetter = valueGetter
 				}
 			);
+			tmp.Changed += Editor_Changed;
+		}
+
+		private void Editor_Changed()
+		{
+			Version++;
 		}
 	}
 }
