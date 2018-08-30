@@ -411,11 +411,11 @@ namespace Tangerine.UI.Inspector
 				keyframeButton.Clicked += editor.PropertyLabel.SetFocus;
 				ctr.Nodes.Insert(index++, keyFunctionButton);
 				ctr.Nodes.Insert(index++, keyframeButton);
-				ctr.Nodes.Insert(index, new HSpacer(4));
+				ctr.Nodes.Insert(index, Spacer.HSpacer(4));
 				ctr.Tasks.Add(new KeyframeButtonBinding(editor.EditorParams, keyframeButton));
 				ctr.Tasks.Add(new KeyFunctionButtonBinding(editor.EditorParams, keyFunctionButton));
 			} else {
-				ctr.Nodes.Insert(1, new HSpacer(42));
+				ctr.Nodes.Insert(1, Spacer.HSpacer(42));
 			}
 			editor.ContainerWidget.Padding = new Thickness { Left = 4, Top = 3, Right = 12, Bottom = 4 };
 			editor.ContainerWidget.CompoundPresenter.Add(new WidgetFlatFillPresenter(

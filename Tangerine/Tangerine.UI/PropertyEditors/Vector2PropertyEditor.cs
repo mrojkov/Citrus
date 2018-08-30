@@ -18,7 +18,7 @@ namespace Tangerine.UI
 					(editorX = editorParams.NumericEditBoxFactory()),
 					// new SimpleText { Text = "Y" },
 					(editorY = editorParams.NumericEditBoxFactory()),
-					new Widget()
+					Spacer.HStretch(),
 				}
 			});
 			var currentX = CoalescedPropertyComponentValue(v => v.X);

@@ -19,10 +19,10 @@ namespace Tangerine.UI
 				Layout = new HBoxLayout { DefaultCell = new DefaultLayoutCell(Alignment.Center) },
 				Nodes = {
 					(editor = editorParams.EditBoxFactory()),
-					new HSpacer(4),
+					Spacer.HSpacer(4),
 					(colorBox = new ColorBoxButton(currentColor)),
 					CreatePipetteButton(),
-					new Widget(),
+					Spacer.HStretch(),
 				},
 			});
 			ExpandableContent.AddNode(panel.Widget);

@@ -505,7 +505,7 @@ namespace Tangerine.Dialogs
 						MinMaxSize = new Vector2(16),
 					});
 				} else {
-					AddNode(new HSpacer(16));
+					AddNode(Spacer.HSpacer(16));
 				}
 				AddNode(new ThemedSimpleText {
 					Text = commandInfo.Title,

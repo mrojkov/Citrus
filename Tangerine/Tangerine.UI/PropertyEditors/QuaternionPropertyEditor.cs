@@ -15,7 +15,7 @@ namespace Tangerine.UI
 					(editorX = editorParams.NumericEditBoxFactory()),
 					(editorY = editorParams.NumericEditBoxFactory()),
 					(editorZ = editorParams.NumericEditBoxFactory()),
-					new Widget(),
+					Spacer.HStretch(),
 				}
 			});
 			var current = CoalescedPropertyValue();

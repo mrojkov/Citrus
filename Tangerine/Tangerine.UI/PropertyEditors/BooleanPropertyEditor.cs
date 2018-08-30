@@ -11,7 +11,7 @@ namespace Tangerine.UI
 		{
 			checkBox = new ThemedCheckBox { LayoutCell = new LayoutCell(Alignment.LeftCenter) };
 			EditorContainer.AddNode(checkBox);
-			EditorContainer.AddNode(new Widget());
+			EditorContainer.AddNode(Spacer.HStretch());
 			checkBox.Changed += args => {
 				if (args.ChangedByUser)
 				{

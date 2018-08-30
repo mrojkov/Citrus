@@ -15,7 +15,7 @@ namespace Tangerine.UI
 				Layout = new HBoxLayout(),
 				Nodes = {
 					(editor = editorParams.EditBoxFactory()),
-					new HSpacer(4),
+					Spacer.HSpacer(4),
 					(button = new ThemedButton {
 						Text = "...",
 						MinMaxWidth = 20,

@@ -13,7 +13,7 @@ namespace Tangerine.UI
 			editor = editorParams.NumericEditBoxFactory();
 			editor.LayoutCell = new LayoutCell(Alignment.Center);
 			EditorContainer.AddNode(editor);
-			EditorContainer.AddNode(new Widget());
+			EditorContainer.AddNode(Spacer.HStretch());
 			var current = CoalescedPropertyValue();
 			editor.Submitted += text => SetComponent(text, current);
 			editor.AddChangeWatcher(current, v => editor.Text = v.ToString());

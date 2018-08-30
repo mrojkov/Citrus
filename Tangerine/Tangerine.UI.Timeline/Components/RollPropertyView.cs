@@ -30,14 +30,14 @@ namespace Tangerine.UI.Timeline.Components
 				HitTestTarget = true,
 				Nodes = {
 					(spacer = new Widget()),
-					new HSpacer(6),
+					Spacer.HSpacer(6),
 					propIcon,
-					new HSpacer(3),
+					Spacer.HSpacer(3),
 					label,
 					new Widget(),
 					CreateLockAnimationButton(),
-					new HSpacer(Theme.Metrics.DefaultToolbarButtonSize.X),
-					new HSpacer(Theme.Metrics.DefaultToolbarButtonSize.X)
+					Spacer.HSpacer(Theme.Metrics.DefaultToolbarButtonSize.X),
+					Spacer.HSpacer(Theme.Metrics.DefaultToolbarButtonSize.X)
 				},
 			};
 			widget.Components.Add(new AwakeBehavior());

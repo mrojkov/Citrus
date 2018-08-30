@@ -13,7 +13,7 @@ namespace Tangerine.UI
 		{
 			comboBox = new ThemedComboBox { LayoutCell = new LayoutCell(Alignment.Center) };
 			EditorContainer.AddNode(comboBox);
-			EditorContainer.AddNode(new Widget());
+			EditorContainer.AddNode(Spacer.HStretch());
 			comboBox.Changed += ComboBox_Changed;
 			foreach (var obj in editorParams.Objects) {
 				var node = (Node)obj;

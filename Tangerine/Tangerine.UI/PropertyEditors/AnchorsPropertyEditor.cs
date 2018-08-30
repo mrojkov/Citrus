@@ -18,7 +18,7 @@ namespace Tangerine.UI
 			AddButton(Anchors.Bottom, "Anchor to the bottom");
 			AddButton(Anchors.CenterH, "Anchor to the center horizontally");
 			AddButton(Anchors.CenterV, "Anchor to the center vertically");
-			group.AddNode(new Widget());
+			group.AddNode(Spacer.HStretch());
 		}
 
 		private ToolbarButton AddButton(Anchors anchor, string tip)

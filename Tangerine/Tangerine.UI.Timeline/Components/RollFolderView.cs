@@ -47,7 +47,7 @@ namespace Tangerine.UI.Timeline.Components
 					(spacer = new Widget()),
 					expandButtonContainer,
 					nodeIcon,
-					new HSpacer(3),
+					Spacer.HSpacer(3),
 					label,
 					editBox,
 					new Widget(),

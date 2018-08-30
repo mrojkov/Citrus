@@ -15,7 +15,7 @@ namespace Tangerine.UI
 				Nodes = {
 					(medEditor = editorParams.NumericEditBoxFactory()),
 					(dispEditor = editorParams.NumericEditBoxFactory()),
-					new Widget(),
+					Spacer.HStretch(),
 				}
 			});
 			var currentMed = CoalescedPropertyComponentValue(v => v.Median);
