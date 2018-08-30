@@ -41,7 +41,7 @@ namespace Tangerine.UI.Timeline.Processors
 				var node = row.Components.Get<NodeRow>()?.Node;
 				if (row.Components.Get<NodeRow>()?.Node is ImageCombiner combiner) {
 					if (combiner.GetArgs(out IImageCombinerArg arg1, out IImageCombinerArg arg2)) {
-						view.Label.Color = Theme.Colors.BlackText;
+						view.RefreshLabelColor();
 						view.LinkIndicatorButtonContainer.EnableIndication<ImageCombinerLinkIndicatorButton>().ShowNormal();
 						SetImageCombinerIndication(rows[i + 1]);
 						SetImageCombinerIndication(rows[i + 2]);
