@@ -58,6 +58,7 @@ namespace Tangerine.UI.SceneView
 					var diff = Vector2.DotProduct((curMousePos - initMousePos), dir) / size;
 					if (Mathf.Abs(diff) > Mathf.ZeroTolerance) {
 						float newValue = value + diff;
+						newValue = Mathf.Clamp(newValue, Mathf.ZeroTolerance, maxValue);
 						if (sv.Input.IsKeyPressed(Key.Shift)) {
 							foreach (var origin in clipPositions) {
 								newValue = newValue.Snap(origin, clipTolerance);
