@@ -190,6 +190,7 @@ namespace Tangerine
 			}
 			set {
 				AppUserPreferences.Instance.ColorTheme.IsDark = value;
+				themeChanged = true;
 			}
 		}
 
@@ -203,7 +204,14 @@ namespace Tangerine
 				Layout = new VBoxLayout { Spacing = 10 },
 				Padding = contentPadding
 			};
-			pane.AddChangeWatcher(() => themeEditor.Version, _ => themeChanged = true);
+			bool firstCall = true;
+			pane.AddChangeWatcher(() => themeEditor.Version, _ => {
+				if (firstCall) {
+					firstCall = false;
+					return;
+				}
+				themeChanged = true;
+			});
 			var darkIcons = CreateDarkIconsSwitch(pane);
 			var loadDarkButton = new ThemedButton("Dark preset") {
 				Clicked = () => {
