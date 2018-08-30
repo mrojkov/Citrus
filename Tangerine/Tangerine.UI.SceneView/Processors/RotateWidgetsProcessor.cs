@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Lime;
@@ -15,6 +15,10 @@ namespace Tangerine.UI.SceneView
 		public IEnumerator<object> Task()
 		{
 			while (true) {
+				if (!SceneView.Instance.InputArea.IsMouseOverThisOrDescendant()) {
+					yield return null;
+					continue;
+				}
 				Quadrangle hull;
 				Vector2 pivot;
 				IEnumerable<Widget> widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>();
@@ -42,7 +46,7 @@ namespace Tangerine.UI.SceneView
 					widgets.Select(widget =>
 						new Tuple<Widget, AccumulativeRotationHelper>(widget, new AccumulativeRotationHelper(widget.Rotation, 0))
 					).ToList();
-				
+
 				while (sv.Input.IsMousePressed()) {
 					Utils.ChangeCursorIfDefault(Cursors.Rotate);
 					Document.Current.History.RollbackTransaction();
@@ -60,7 +64,7 @@ namespace Tangerine.UI.SceneView
 			WidgetTransformsHelper.ApplyTransformationToWidgetsGroupObb(
 				sv.Scene,
 				widgets,
-				widgets.Count <= 1 ? (Vector2?) null : pivotPoint, widgets.Count <= 1, 
+				widgets.Count <= 1 ? (Vector2?) null : pivotPoint, widgets.Count <= 1,
 				curMousePos, prevMousePos,
 				false,
 				(originalVectorInObbSpace, deformedVectorInObbSpace) => {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Lime;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +13,10 @@ namespace Tangerine.UI.SceneView
 		public IEnumerator<object> Task()
 		{
 			while (true) {
+				if (!SceneView.Instance.InputArea.IsMouseOverThisOrDescendant()) {
+					yield return null;
+					continue;
+				}
 				var bone = Document.Current.SelectedNodes().Editable().OfType<Bone>().FirstOrDefault();
 				if (bone != null) {
 					var entry = bone.Parent.AsWidget.BoneArray[bone.Index];
@@ -94,7 +98,7 @@ namespace Tangerine.UI.SceneView
 			using (Document.Current.History.BeginTransaction()) {
 				var iniMousePos = sv.MousePosition;
 				var transform = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
-				
+
 				var accumulativeRotationsHelpersByBones = new Dictionary<Bone, AccumulativeRotationHelper>();
 
 				while (sv.Input.IsMousePressed()) {
@@ -109,8 +113,8 @@ namespace Tangerine.UI.SceneView
 							angle = Vector2.AngleDeg(prentDir, dir);
 						}
 						if (!sv.Input.IsKeyPressed(Key.Alt)) {
-							Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.Rotation), 
-								GetRotationByBone(accumulativeRotationsHelpersByBones, bone, angle), 
+							Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.Rotation),
+								GetRotationByBone(accumulativeRotationsHelpersByBones, bone, angle),
 								CoreUserPreferences.Instance.AutoKeyframes
 							);
 						}
@@ -120,7 +124,7 @@ namespace Tangerine.UI.SceneView
 						var boneChain = IKSolver.SolveFor(bone, entry.Tip + dragDelta);
 						foreach (Tuple<Bone, float> pair in boneChain) {
 							Core.Operations.SetAnimableProperty.Perform(pair.Item1, nameof(Bone.Rotation),
-								GetRotationByBone(accumulativeRotationsHelpersByBones, pair.Item1, pair.Item2), 
+								GetRotationByBone(accumulativeRotationsHelpersByBones, pair.Item1, pair.Item2),
 								CoreUserPreferences.Instance.AutoKeyframes
 							);
 						}

@@ -1,4 +1,4 @@
-﻿using Lime;
+using Lime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +15,10 @@ namespace Tangerine.UI.SceneView
 		public IEnumerator<object> Task()
 		{
 			while (true) {
+				if (!SceneView.Instance.InputArea.IsMouseOverThisOrDescendant()) {
+					yield return null;
+					continue;
+				}
 				var bones = Document.Current.SelectedNodes().Editable().OfType<Bone>().ToList();
 				if (bones.Count == 1) {
 					var t = Document.Current.Container.AsWidget.CalcTransitionToSpaceOf(sv.Scene);
@@ -41,7 +45,7 @@ namespace Tangerine.UI.SceneView
 				var initFadeoutZone = bone.FadeoutZone;
 				while (sv.Input.IsMousePressed()) {
 					Document.Current.History.RollbackTransaction();
-					
+
 					Utils.ChangeCursorIfDefault(MouseCursor.SizeNS);
 					var dragDelta = sv.MousePosition - iniMousePos;
 					Core.Operations.SetAnimableProperty.Perform(bone, nameof(Bone.EffectiveRadius), initEffectiveRadius + dragDelta.X, CoreUserPreferences.Instance.AutoKeyframes);

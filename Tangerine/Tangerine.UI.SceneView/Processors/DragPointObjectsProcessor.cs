@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using Lime;
@@ -13,6 +13,10 @@ namespace Tangerine.UI.SceneView
 		public IEnumerator<object> Task()
 		{
 			while (true) {
+				if (!SceneView.Instance.InputArea.IsMouseOverThisOrDescendant()) {
+					yield return null;
+					continue;
+				}
 				Rectangle aabb;
 				var pobjects = Document.Current.SelectedNodes().Editable().OfType<PointObject>();
 				if (

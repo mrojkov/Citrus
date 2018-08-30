@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using Lime;
@@ -11,6 +11,10 @@ namespace Tangerine.UI.SceneView
 		public IEnumerator<object> Task()
 		{
 			while (true) {
+				if (!SceneView.Instance.InputArea.IsMouseOverThisOrDescendant()) {
+					yield return null;
+					continue;
+				}
 				yield return null;
 				var spline = Document.Current.Container as Spline3D;
 				if (spline == null)
@@ -52,7 +56,7 @@ namespace Tangerine.UI.SceneView
 			var offsets = new Vector3?[points.Count()];
 			using (Document.Current.History.BeginTransaction()) {
 				var spline = (Spline3D)Document.Current.Container;
-				var viewport = spline.Viewport;	
+				var viewport = spline.Viewport;
 				var initialMouse = input.MousePosition;
 				var dragDirection = DragDirection.Any;
 				while (input.IsMousePressed()) {
@@ -95,7 +99,7 @@ namespace Tangerine.UI.SceneView
 
 		IEnumerator<object> DragTangent(SplinePoint3D point, int tangentIndex)
 		{
-			var input = SceneView.Instance.Input;			
+			var input = SceneView.Instance.Input;
 			Vector3? posCorrection = null;
 			using (Document.Current.History.BeginTransaction()) {
 				var spline = (Spline3D)Document.Current.Container;
@@ -118,12 +122,12 @@ namespace Tangerine.UI.SceneView
 					}
 					yield return null;
 				}
-				Document.Current.History.CommitTransaction();	
+				Document.Current.History.CommitTransaction();
 			}
 		}
 
-		static string GetTangentPropertyName(int index) => index == 0 ? nameof(SplinePoint3D.TangentA) : nameof(SplinePoint3D.TangentB); 
-  
+		static string GetTangentPropertyName(int index) => index == 0 ? nameof(SplinePoint3D.TangentA) : nameof(SplinePoint3D.TangentB);
+
 		static Plane CalcPlane(Spline3D spline, Vector3 point)
 		{
 			var m = spline.GlobalTransform;

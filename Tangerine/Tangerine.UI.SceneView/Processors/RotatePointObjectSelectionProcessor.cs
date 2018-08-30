@@ -1,4 +1,4 @@
-﻿using Lime;
+using Lime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +13,10 @@ namespace Tangerine.UI.SceneView
 		public IEnumerator<object> Task()
 		{
 			while (true) {
+				if (!SceneView.Instance.InputArea.IsMouseOverThisOrDescendant()) {
+					yield return null;
+					continue;
+				}
 				var selectedPointObjects = Document.Current.SelectedNodes().Editable().OfType<PointObject>().ToList();
 				if (selectedPointObjects.Count() > 1) {
 					Rectangle aabb;
