@@ -646,7 +646,7 @@ namespace Tangerine
 		static void Paste()
 		{
 			try {
-				Core.Operations.Paste.Perform(pasteAtMouse: UI.SceneView.SceneView.Instance.InputArea.IsFocused());
+				Core.Operations.Paste.Perform(pasteAtMouse: UI.SceneView.SceneView.Instance.InputArea.IsFocused() && !CoreUserPreferences.Instance.DontPasteAtMouse);
 			} catch (InvalidOperationException e) {
 				Document.Current.History.RollbackTransaction();
 				AlertDialog.Show(e.Message);

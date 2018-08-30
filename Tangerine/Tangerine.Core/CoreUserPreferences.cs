@@ -20,6 +20,12 @@ namespace Tangerine.Core
 		[YuzuOptional]
 		public bool StopAnimationOnCurrentFrame { get; set; }
 
+		[YuzuOptional]
+		public bool DontPasteAtMouse { get; set; }
+
+		[YuzuOptional]
+		public bool InverseShiftKeyframeDrag { get; set; }
+
 		public CoreUserPreferences()
 		{
 			ResetToDefaults();

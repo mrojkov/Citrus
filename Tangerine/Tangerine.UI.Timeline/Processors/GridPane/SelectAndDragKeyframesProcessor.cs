@@ -115,7 +115,7 @@ namespace Tangerine.UI.Timeline
 				offset = Grid.CellUnderMouse() - initialCell;
 				Timeline.Ruler.MeasuredFrameDistance = Timeline.CurrentColumn - initialCell.X;
 
-				if (!input.IsKeyPressed(Key.Shift)) {
+				if (input.IsKeyPressed(Key.Shift) == CoreUserPreferences.Instance.InverseShiftKeyframeDrag) {
 					offset.Y = 0;
 				}
 

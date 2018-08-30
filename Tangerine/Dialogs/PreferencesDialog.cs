@@ -314,9 +314,13 @@ namespace Tangerine
 				new BooleanPropertyEditor(
 					new PreferencesPropertyEditorParams(pane.Content, CoreUserPreferences.Instance, nameof(CoreUserPreferences.AnimationMode), "Animation mode")),
 				new IntPropertyEditor(
-						new PreferencesPropertyEditorParams(pane.Content, Tangerine.AppUserPreferences.Instance, nameof(Tangerine.AppUserPreferences.AutosaveDelay), "Autosave delay")),
+					new PreferencesPropertyEditorParams(pane.Content, Tangerine.AppUserPreferences.Instance, nameof(Tangerine.AppUserPreferences.AutosaveDelay), "Autosave delay")),
 				new BooleanPropertyEditor(
 					new PreferencesPropertyEditorParams(pane.Content, CoreUserPreferences.Instance, nameof(CoreUserPreferences.StopAnimationOnCurrentFrame), "Stop animaion on current frame")),
+				new BooleanPropertyEditor(
+					new PreferencesPropertyEditorParams(pane.Content, CoreUserPreferences.Instance, nameof(CoreUserPreferences.DontPasteAtMouse), "Don't paste at mouse pointer")),
+				new BooleanPropertyEditor(
+					new PreferencesPropertyEditorParams(pane.Content, CoreUserPreferences.Instance, nameof(CoreUserPreferences.InverseShiftKeyframeDrag), "Inverse Shift behaviour when dragging keyframes")),
 			});
 			var boneWidthPropertyEditor =
 				new FloatPropertyEditor(
