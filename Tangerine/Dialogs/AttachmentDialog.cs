@@ -97,7 +97,12 @@ namespace Tangerine
 					CheckErrors(attachment, source);
 					window.Close();
 					history = null;
-					Model3DAttachmentParser.Save(attachment, System.IO.Path.Combine(Project.Current.AssetsDirectory, source.ContentsPath));
+					// Since attachment dialog not present as modal window, document can be rolled back with "undo"
+					// operation to the state when source isn't presented or source content path isn't set.
+					// So check it out before saving.
+					if (source.DescendantOf(Document.Current.RootNode) && source.ContentsPath != null) {
+						Model3DAttachmentParser.Save(attachment, System.IO.Path.Combine(Project.Current.AssetsDirectory, source.ContentsPath));
+					}
 				} catch (Lime.Exception e) {
 					new AlertDialog(e.Message).Show();
 				}
