@@ -32,6 +32,44 @@ namespace Lime
 			}
 			return stretches;
 		}
+
+		protected abstract class SeparatorsRenderPresenterBase : IPresenter
+		{
+			public IPresenter Clone() => (IPresenter)MemberwiseClone();
+
+			public Lime.RenderObject GetRenderObject(Node node)
+			{
+				var splitter = (Splitter)node;
+				var ro = RenderObjectPool<RenderObject>.Acquire();
+				ro.CaptureRenderState(splitter);
+				ro.SeparatorWidth = splitter.SeparatorWidth;
+				ro.SeparatorColor = splitter.SeparatorColor;
+				ro.Lines.Clear();
+				GetLines(splitter, ro.Lines);
+				return ro;
+			}
+
+			protected abstract void GetLines(Splitter splitter, List<Vector2> lines);
+
+			public bool PartialHitTest(Node node, ref HitTestArgs args) => false;
+
+			private class RenderObject : WidgetRenderObject
+			{
+				public float SeparatorWidth;
+				public Color4 SeparatorColor;
+				public List<Vector2> Lines = new List<Vector2>();
+
+				public override void Render()
+				{
+					PrepareRenderState();
+					for (var i = 0; i < Lines.Count - 1; i += 2) {
+						var p1 = Lines[i];
+						var p2 = Lines[i + 1];
+						Renderer.DrawLine(p1, p2, SeparatorColor, thickness: SeparatorWidth);
+					}
+				}
+			}
+		}
 	}
 
 	[YuzuDontGenerateDeserializer]
@@ -40,7 +78,7 @@ namespace Lime
 		public HSplitter()
 		{
 			Tasks.Add(MainTask());
-			PostPresenter = new DelegatePresenter<Widget>(RenderSeparator);
+			PostPresenter = new SeparatorsRenderPresenter();
 			Layout = new HSplitterLayout();
 		}
 
@@ -57,16 +95,6 @@ namespace Lime
 					l.Spacing = value;
 					l.InvalidateArrangement();
 				}
-			}
-		}
-
-		void RenderSeparator(Widget widget)
-		{
-			widget.PrepareRendererState();
-			for (int i = 0; i < Nodes.Count - 1; i++) {
-				var w = Nodes[i + 1].AsWidget;
-				var x = w.X - SeparatorWidth / 2;
-				Renderer.DrawLine(x, w.Y, x, w.Height + w.Y, SeparatorColor, thickness: SeparatorWidth);
 			}
 		}
 
@@ -120,11 +148,28 @@ namespace Lime
 			}
 		}
 
-		class SeparatorsHitTestPresenter : CustomPresenter
+		class SeparatorsRenderPresenter : SeparatorsRenderPresenterBase
+		{
+			protected override void GetLines(Splitter splitter, List<Vector2> lines)
+			{
+				for (int i = 0; i < splitter.Nodes.Count - 1; i++) {
+					var w = splitter.Nodes[i + 1].AsWidget;
+					var x = w.X - splitter.SeparatorWidth * 0.5f;
+					lines.Add(new Vector2(x, w.Y));
+					lines.Add(new Vector2(x, w.Y + w.Height));
+				}
+			}
+		}
+
+		class SeparatorsHitTestPresenter : IPresenter
 		{
 			public int SeparatorUnderMouse { get; private set; }
 
-			public override bool PartialHitTest(Node node, ref HitTestArgs args)
+			public IPresenter Clone() => (IPresenter)MemberwiseClone();
+
+			public RenderObject GetRenderObject(Node node) => null;
+
+			public bool PartialHitTest(Node node, ref HitTestArgs args)
 			{
 				var splitter = (Splitter)node;
 				for (int i = 0; i < splitter.Nodes.Count - 1; i++) {

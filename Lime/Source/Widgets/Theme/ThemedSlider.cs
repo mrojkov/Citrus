@@ -26,26 +26,68 @@ namespace Lime
 			CompoundPresenter.Add(new SliderPresenter());
 		}
 
-		class SliderThumbPresenter : CustomPresenter
+		class SliderThumbPresenter : IPresenter
 		{
-			public override void Render(Node node)
+			public IPresenter Clone() => this;
+
+			public Lime.RenderObject GetRenderObject(Node node)
 			{
-				var widget = node.AsWidget;
-				widget.PrepareRendererState();
-				var p = new Vector2(0, 2);
-				Renderer.DrawVerticalGradientRect(-p, p + widget.Size, Theme.Colors.ButtonDefault);
-				Renderer.DrawRectOutline(-p, p + widget.Size, Theme.Colors.ControlBorder);
+				var widget = (Widget)node;
+				var ro = RenderObjectPool<RenderObject>.Acquire();
+				ro.CaptureRenderState(widget);
+				ro.Size = widget.Size;
+				ro.Gradient = Theme.Colors.ButtonDefault;
+				ro.BorderColor = Theme.Colors.ControlBorder;
+				return ro;
+			}
+
+			public bool PartialHitTest(Node node, ref HitTestArgs args) => false;
+
+			private class RenderObject : WidgetRenderObject
+			{
+				public Vector2 Size;
+				public ColorGradient Gradient;
+				public Color4 BorderColor;
+
+				public override void Render()
+				{
+					PrepareRenderState();
+					var p = new Vector2(0, 2);
+					Renderer.DrawVerticalGradientRect(-p, p + Size, Gradient);
+					Renderer.DrawRectOutline(-p, p + Size, BorderColor);
+				}
 			}
 		}
 
-		class SliderPresenter : CustomPresenter
+		class SliderPresenter : IPresenter
 		{
-			public override void Render(Node node)
+			public IPresenter Clone() => this;
+
+			public Lime.RenderObject GetRenderObject(Node node)
 			{
-				var widget = node.AsWidget;
-				widget.PrepareRendererState();
-				Renderer.DrawRect(Vector2.Zero, widget.Size, Theme.Colors.WhiteBackground);
-				Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Theme.Colors.ControlBorder);
+				var widget = (Widget)node;
+				var ro = RenderObjectPool<RenderObject>.Acquire();
+				ro.CaptureRenderState(widget);
+				ro.Size = widget.Size;
+				ro.Color = Theme.Colors.WhiteBackground;
+				ro.BorderColor = Theme.Colors.ControlBorder;
+				return ro;
+			}
+
+			public bool PartialHitTest(Node node, ref HitTestArgs args) => false;
+
+			private class RenderObject : WidgetRenderObject
+			{
+				public Vector2 Size;
+				public Color4 Color;
+				public Color4 BorderColor;
+
+				public override void Render()
+				{
+					PrepareRenderState();
+					Renderer.DrawRect(Vector2.Zero, Size, Color);
+					Renderer.DrawRectOutline(Vector2.Zero, Size, BorderColor);
+				}
 			}
 		}
 	}

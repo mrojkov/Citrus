@@ -49,7 +49,7 @@ namespace Lime
 			LateTasks.Add(Theme.MouseHoverInvalidationTask(this));
 		}
 
-		class TabPresenter : CustomPresenter
+		class TabPresenter : IPresenter
 		{
 			private SimpleText label;
 			private bool active;
@@ -63,22 +63,38 @@ namespace Lime
 				label.Color = active ? Theme.Colors.BlackText : Theme.Colors.GrayText;
 			}
 
-			public override void Render(Node node)
-			{
-				var widget = node.AsWidget;
-				widget.PrepareRendererState();
-				var color = active || widget.IsMouseOverThisOrDescendant() ? Theme.Colors.TabActive : Theme.Colors.TabNormal;
-				Renderer.DrawRect(Vector2.Zero, widget.Size - new Vector2(1, 0), color);
-			}
-
-			public override bool PartialHitTest(Node node, ref HitTestArgs args)
+			public bool PartialHitTest(Node node, ref HitTestArgs args)
 			{
 				return node.PartialHitTest(ref args);
+			}
+
+			public Lime.RenderObject GetRenderObject(Node node)
+			{
+				var widget = (Widget)node;
+				var ro = RenderObjectPool<RenderObject>.Acquire();
+				ro.CaptureRenderState(widget);
+				ro.Color = active || widget.IsMouseOverThisOrDescendant() ? Theme.Colors.TabActive : Theme.Colors.TabNormal;
+				ro.Size = widget.Size;
+				return ro;
+			}
+
+			public IPresenter Clone() => (IPresenter)MemberwiseClone();
+
+			private class RenderObject : WidgetRenderObject
+			{
+				public Color4 Color;
+				public Vector2 Size;
+
+				public override void Render()
+				{
+					PrepareRenderState();
+					Renderer.DrawRect(Vector2.Zero, Size - new Vector2(1, 0), Color);
+				}
 			}
 		}
 	}
 
-	public class VectorShapeButtonPresenter : CustomPresenter
+	public class VectorShapeButtonPresenter : IPresenter
 	{
 		private readonly VectorShape Shape;
 
@@ -89,15 +105,7 @@ namespace Lime
 
 		Color4 color;
 
-		public override void Render(Node node)
-		{
-			var widget = node.AsWidget;
-			widget.PrepareRendererState();
-			var transform = Matrix32.Scaling(widget.Size);
-			Shape.Draw(transform, color);
-		}
-
-		public override bool PartialHitTest(Node node, ref HitTestArgs args)
+		public bool PartialHitTest(Node node, ref HitTestArgs args)
 		{
 			return node.PartialHitTest(ref args);
 		}
@@ -111,6 +119,33 @@ namespace Lime
 				color = Theme.Colors.CloseButtonHovered;
 			} else {
 				color = Theme.Colors.CloseButtonPressed;
+			}
+		}
+
+		public Lime.RenderObject GetRenderObject(Node node)
+		{
+			var widget = (Widget)node;
+			var ro = RenderObjectPool<RenderObject>.Acquire();
+			ro.CaptureRenderState(widget);
+			ro.Size = widget.Size;
+			ro.Color = color;
+			ro.Shape = Shape;
+			return ro;
+		}
+
+		public IPresenter Clone() => (IPresenter)MemberwiseClone();
+
+		private class RenderObject : WidgetRenderObject
+		{
+			public Vector2 Size;
+			public Color4 Color;
+			public VectorShape Shape;
+
+			public override void Render()
+			{
+				var transform = Matrix32.Scaling(Size);
+				PrepareRenderState();
+				Shape.Draw(transform, Color);
 			}
 		}
 	}

@@ -14,7 +14,7 @@ namespace Lime
 		}
 	}
 
-	internal class ThemedFramePresenter : CustomPresenter
+	internal class ThemedFramePresenter : IPresenter
 	{
 		private readonly Color4 innerColor;
 		private readonly Color4 borderColor;
@@ -25,12 +25,33 @@ namespace Lime
 			this.borderColor = borderColor;
 		}
 
-		public override void Render(Node node)
+		public IPresenter Clone() => (IPresenter)MemberwiseClone();
+
+		public Lime.RenderObject GetRenderObject(Node node)
 		{
-			var widget = node.AsWidget;
-			widget.PrepareRendererState();
-			Renderer.DrawRect(Vector2.Zero, widget.Size, innerColor);
-			Renderer.DrawRectOutline(Vector2.Zero, widget.Size, borderColor);
+			var widget = (Widget)node;
+			var ro = RenderObjectPool<RenderObject>.Acquire();
+			ro.CaptureRenderState(widget);
+			ro.Size = widget.Size;
+			ro.InnerColor = innerColor;
+			ro.BorderColor = borderColor;
+			return ro;
+		}
+
+		public bool PartialHitTest(Node node, ref HitTestArgs args) => false;
+
+		private class RenderObject : WidgetRenderObject
+		{
+			public Vector2 Size;
+			public Color4 InnerColor;
+			public Color4 BorderColor;
+
+			public override void Render()
+			{
+				PrepareRenderState();
+				Renderer.DrawRect(Vector2.Zero, Size, InnerColor);
+				Renderer.DrawRectOutline(Vector2.Zero, Size, BorderColor);
+			}
 		}
 	}
 }

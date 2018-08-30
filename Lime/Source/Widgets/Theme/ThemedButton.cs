@@ -46,7 +46,7 @@ namespace Lime
 			void SetState(string state);
 		}
 
-		public class ButtonPresenter : CustomPresenter, IButtonPresenter
+		public class ButtonPresenter : IPresenter, IButtonPresenter
 		{
 			private ColorGradient innerGradient;
 
@@ -74,17 +74,36 @@ namespace Lime
 				}
 			}
 
-			public override void Render(Node node)
-			{
-				var widget = node.AsWidget;
-				widget.PrepareRendererState();
-				Renderer.DrawVerticalGradientRect(Vector2.Zero, widget.Size, innerGradient);
-				Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Theme.Colors.ControlBorder);
-			}
+			public IPresenter Clone() => (IPresenter)MemberwiseClone();
 
-			public override bool PartialHitTest(Node node, ref HitTestArgs args)
+			public bool PartialHitTest(Node node, ref HitTestArgs args)
 			{
 				return node.PartialHitTest(ref args);
+			}
+
+			public Lime.RenderObject GetRenderObject(Node node)
+			{
+				var widget = (Widget)node;
+				var ro = RenderObjectPool<RenderObject>.Acquire();
+				ro.CaptureRenderState(widget);
+				ro.Size = widget.Size;
+				ro.Gradient = innerGradient;
+				ro.BorderColor = Theme.Colors.ControlBorder;
+				return ro;
+			}
+
+			private class RenderObject : WidgetRenderObject
+			{
+				public Vector2 Size;
+				public ColorGradient Gradient;
+				public Color4 BorderColor;
+
+				public override void Render()
+				{
+					PrepareRenderState();
+					Renderer.DrawVerticalGradientRect(Vector2.Zero, Size, Gradient);
+					Renderer.DrawRectOutline(Vector2.Zero, Size, BorderColor);
+				}
 			}
 		}
 	}

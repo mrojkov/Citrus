@@ -17,7 +17,7 @@ namespace Lime
 				Id = "TextWidget",
 				VAlignment = VAlignment.Center,
 			};
-			CompoundPresenter.Add(new DropDownListPresenter(this));
+			CompoundPresenter.Add(new DropDownListPresenter());
 			PostPresenter = new Theme.MouseHoverBorderPresenter();
 			LateTasks.Add(Theme.MouseHoverInvalidationTask(this));
 			Padding = Theme.Metrics.ControlsPadding;
@@ -27,35 +27,52 @@ namespace Lime
 			text.Width -= DropDownListPresenter.IconWidth + 4;
 		}
 
-		internal class DropDownListPresenter : CustomPresenter
+		internal class DropDownListPresenter : IPresenter
 		{
 			public const float IconWidth = 20;
 
-			readonly CommonDropDownList list;
-			readonly VectorShape separator = new VectorShape {
+			static readonly VectorShape separator = new VectorShape {
 				new VectorShape.Line(0, 0.1f, 0, 0.9f, Theme.Colors.ControlBorder, 0.05f),
 			};
-			readonly VectorShape icon = new VectorShape {
+			static readonly VectorShape icon = new VectorShape {
 				new VectorShape.Line(0.5f, 0.6f, 0.7f, 0.4f, Color4.White.Transparentify(0.2f), 0.04f, false),
 				new VectorShape.Line(0.5f, 0.6f, 0.3f, 0.4f, Color4.White.Transparentify(0.2f), 0.04f, false),
 				new VectorShape.Line(0.5f, 0.55f, 0.7f, 0.35f, Color4.White.Transparentify(0.5f), 0.04f, false),
 				new VectorShape.Line(0.5f, 0.55f, 0.3f, 0.35f, Color4.White.Transparentify(0.5f), 0.04f, false),
 			};
 
-			public DropDownListPresenter(CommonDropDownList list)
+			public IPresenter Clone() => this;
+
+			public Lime.RenderObject GetRenderObject(Node node)
 			{
-				this.list = list;
+				var dd = (CommonDropDownList)node;
+				var ro = RenderObjectPool<RenderObject>.Acquire();
+				ro.CaptureRenderState(dd);
+				ro.Size = dd.Size;
+				ro.Gradient = Theme.Colors.ButtonDefault;
+				ro.BorderColor = Theme.Colors.ControlBorder;
+				ro.IconColor = dd.Items.Count > 0 ? Theme.Colors.BlackText : Theme.Colors.GrayText;
+				return ro;
 			}
 
-			public override void Render(Node node)
+			public bool PartialHitTest(Node node, ref HitTestArgs args) => false;
+
+			private class RenderObject : WidgetRenderObject
 			{
-				var widget = node.AsWidget;
-				widget.PrepareRendererState();
-				Renderer.DrawVerticalGradientRect(Vector2.Zero, widget.Size, Theme.Colors.ButtonDefault);
-				Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Theme.Colors.ControlBorder);
-				var transform = Matrix32.Scaling(IconWidth, widget.Height) * Matrix32.Translation(widget.Width - IconWidth, 0);
-				separator.Draw(transform);
-				icon.Draw(transform, list.Items.Count > 0 ? Theme.Colors.BlackText : Theme.Colors.GrayText);
+				public Vector2 Size;
+				public ColorGradient Gradient;
+				public Color4 BorderColor;
+				public Color4 IconColor;
+
+				public override void Render()
+				{
+					PrepareRenderState();
+					Renderer.DrawVerticalGradientRect(Vector2.Zero, Size, Gradient);
+					Renderer.DrawRectOutline(Vector2.Zero, Size, BorderColor);
+					var transform = Matrix32.Scaling(IconWidth, Size.Y) * Matrix32.Translation(Size.X - IconWidth, 0);
+					separator.Draw(transform);
+					icon.Draw(transform, IconColor);
+				}
 			}
 		}
 	}

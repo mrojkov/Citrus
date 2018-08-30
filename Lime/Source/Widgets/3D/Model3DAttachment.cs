@@ -736,7 +736,7 @@ namespace Lime
 		}
 	}
 
-	public class MaterialEffectPresenter : CustomPresenter
+	public class MaterialEffectPresenter : IPresenter
 	{
 		private static readonly RenderChain renderChain = new RenderChain();
 		private ITexture snapshot;
@@ -755,9 +755,14 @@ namespace Lime
 			Scene = (Frame)Node.CreateFromAssetBundle(path);
 		}
 
-		public override RenderObject GetRenderObject(Node node)
+		public bool PartialHitTest(Node node, ref HitTestArgs args)
 		{
-			return null;
+			throw new NotImplementedException();
+		}
+
+		public RenderObject GetRenderObject(Node node)
+		{
+			throw new NotImplementedException();
 		}
 
 		//public override void Render(Node node)
@@ -771,7 +776,7 @@ namespace Lime
 		//	WasSnapshotDeprecated = false;
 		//}
 
-		public override IPresenter Clone()
+		public IPresenter Clone()
 		{
 			var clone = (MaterialEffectPresenter)MemberwiseClone();
 			clone.snapshot = null;
