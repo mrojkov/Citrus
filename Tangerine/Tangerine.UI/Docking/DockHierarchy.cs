@@ -376,13 +376,13 @@ namespace Tangerine.UI.Docking
 
 	public class WindowPlacement : LinearPlacement
 	{
-		[YuzuMember]
+		[YuzuOptional]
 		public Vector2 Position;
 
-		[YuzuMember]
+		[YuzuOptional]
 		public Vector2 Size;
 
-		[YuzuMember]
+		[YuzuOptional]
 		public WindowState State;
 
 		public WindowWidget WindowWidget;
@@ -407,13 +407,13 @@ namespace Tangerine.UI.Docking
 
 	public class PanelPlacement : Placement
 	{
-		[YuzuMember]
+		[YuzuOptional]
 		public string Title;
 
-		[YuzuMember]
+		[YuzuOptional]
 		public string Id;
 
-		[YuzuMember]
+		[YuzuOptional]
 		public bool Hidden;
 
 		public override IEnumerable<PanelPlacement> GetDescendantPanels() => new PanelPlacement[] { };
@@ -516,7 +516,7 @@ namespace Tangerine.UI.Docking
 
 	public class TabBarPlacement : Placement
 	{
-		[YuzuMember]
+		[YuzuOptional]
 		public PlacementList<PanelPlacement> Placements { get; }
 
 		public TabBarPlacement()
@@ -596,7 +596,12 @@ namespace Tangerine.UI.Docking
 			}
 		}
 
+		[YuzuOptional]
 		public float Stretch { get; set; }
+
+		public StretchPlacement()
+		{
+		}
 
 		public StretchPlacement(Placement placement, float stretch)
 		{
@@ -650,15 +655,19 @@ namespace Tangerine.UI.Docking
 	public class LinearPlacement : Placement
 	{
 		[YuzuOptional]
-		public readonly PlacementList<StretchPlacement> Placements;
+		public PlacementList<StretchPlacement> Placements { get; }
 
 		[YuzuOptional]
 		public LinearPlacementDirection Direction { get; set; }
 
-		public LinearPlacement(LinearPlacementDirection direction)
+		public LinearPlacement()
+		{
+			Placements = new PlacementList<StretchPlacement>(this);
+		}
+
+		public LinearPlacement(LinearPlacementDirection direction) : this()
 		{
 			Direction = direction;
-			Placements =new PlacementList<StretchPlacement>(this);
 		}
 
 		public override IEnumerable<PanelPlacement> GetDescendantPanels()
