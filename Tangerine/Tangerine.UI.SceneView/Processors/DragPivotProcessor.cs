@@ -45,8 +45,15 @@ namespace Tangerine.UI.SceneView
 					foreach (var widget in widgets) {
 						var transform = sv.Scene.CalcTransitionToSpaceOf(widget);
 						var newPivot = iniMousePos * transform / widget.Size;
-						Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), iniMousePos * sv.Scene.CalcTransitionToSpaceOf(widget.ParentWidget), CoreUserPreferences.Instance.AutoKeyframes);
-						Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Pivot), newPivot, CoreUserPreferences.Instance.AutoKeyframes);
+						Core.Operations.SetAnimableProperty.Perform(
+							widget, nameof(Widget.Position),
+							iniMousePos * sv.Scene.CalcTransitionToSpaceOf(widget.ParentWidget),
+							CoreUserPreferences.Instance.AutoKeyframes
+						);
+						Core.Operations.SetAnimableProperty.Perform(
+							widget, nameof(Widget.Pivot), newPivot,
+							CoreUserPreferences.Instance.AutoKeyframes
+						);
 					}
 				}
 				using (Document.Current.History.BeginTransaction()) {
@@ -67,9 +74,16 @@ namespace Tangerine.UI.SceneView
 							}
 						}
 						curMousePos = SnapMousePosToSpecialPoints(hull, curMousePos, iniMousePos - iniPivot);
-						if (shiftPressed && dragDirection == DragDirection.Any && (curMousePos - iniMousePos).Length > 5) {
+						if (
+							shiftPressed &&
+							dragDirection == DragDirection.Any &&
+							(curMousePos - iniMousePos).Length > 5
+						) {
 							var d = curMousePos - iniMousePos;
-							dragDirection = d.X.Abs() > d.Y.Abs() ? DragDirection.Horizontal : DragDirection.Vertical;
+							dragDirection =
+								d.X.Abs() > d.Y.Abs() ?
+								DragDirection.Horizontal :
+								DragDirection.Vertical;
 						}
 						for (int i = 0; i < widgets.Count; i++) {
 							var widget = widgets[i];
@@ -79,8 +93,16 @@ namespace Tangerine.UI.SceneView
 							var deltaPos = Vector2.RotateDeg(dragDelta * widget.Scale, widget.Rotation);
 							deltaPivot = deltaPivot.Snap(Vector2.Zero);
 							if (deltaPivot != Vector2.Zero) {
-								Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Pivot), widget.Pivot + deltaPivot, CoreUserPreferences.Instance.AutoKeyframes);
-								Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), widget.Position + deltaPos.Snap(Vector2.Zero), CoreUserPreferences.Instance.AutoKeyframes);
+								Core.Operations.SetAnimableProperty.Perform(
+									widget, nameof(Widget.Pivot),
+									widget.Pivot + deltaPivot,
+									CoreUserPreferences.Instance.AutoKeyframes
+								);
+								Core.Operations.SetAnimableProperty.Perform(
+									widget, nameof(Widget.Position),
+									widget.Position + deltaPos.Snap(Vector2.Zero),
+									CoreUserPreferences.Instance.AutoKeyframes
+								);
 							}
 						}
 						yield return null;
