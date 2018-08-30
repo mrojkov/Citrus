@@ -4,24 +4,27 @@ using System.Windows.Forms;
 using System.Collections.Generic;
 using System.Linq;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 
 namespace Lime
 {
 	public class Menu : List<ICommand>, IMenu
 	{
-		readonly List<MenuItem> items = new List<MenuItem>();
+		private readonly List<MenuItem> items = new List<MenuItem>();
 
 		public Menu(bool ignoreFirstFocusLoss = false) : base()
 		{
-			if (ignoreFirstFocusLoss) {
-				bool state = true;
-				NativeContextMenu.Closing += (s, e) => {
-					if (e.CloseReason == ToolStripDropDownCloseReason.AppFocusChange) {
-						e.Cancel = state;
-						state = false;
-					}
-				};
+			if (!ignoreFirstFocusLoss) {
+				return;
 			}
+			bool state = true;
+			NativeContextMenu.Closing += (s, e) => {
+				if (e.CloseReason != ToolStripDropDownCloseReason.AppFocusChange) {
+					return;
+				}
+				e.Cancel = state;
+				state = false;
+			};
 		}
 
 		private MenuStrip nativeMainMenu;
@@ -30,34 +33,32 @@ namespace Lime
 		{
 			get
 			{
-				if (nativeMainMenu == null) {
-					nativeMainMenu = new MenuStrip {
-						Renderer = new Renderer(new Colors()),
-						ForeColor = Colors.Text,
-						BackColor = Colors.Main,
-					};
-					UpdateNativeMenu(nativeMainMenu);
+				if (nativeMainMenu != null) {
+					return nativeMainMenu;
 				}
+				nativeMainMenu = new MenuStrip {
+					Renderer = new Renderer(new Colors()),
+					ForeColor = Colors.Text,
+					BackColor = Colors.Main,
+				};
+				UpdateNativeMenu(nativeMainMenu);
 				return nativeMainMenu;
 			}
 		}
 
 		private bool showImageMargin = true;
+
 		public bool ShowImageMargin
 		{
-			get
-			{
-				return showImageMargin;
-			}
-
-			set
-			{
-				if (value != showImageMargin) {
-					if (nativeContextMenu != null) {
-						nativeContextMenu.ShowImageMargin = value;
-					}
-					showImageMargin = value;
+			get => showImageMargin;
+			set {
+				if (value == showImageMargin) {
+					return;
 				}
+				if (nativeContextMenu != null) {
+					nativeContextMenu.ShowImageMargin = value;
+				}
+				showImageMargin = value;
 			}
 		}
 
@@ -65,15 +66,16 @@ namespace Lime
 		{
 			get
 			{
-				if (nativeContextMenu == null) {
-					nativeContextMenu = new ContextMenuStrip {
-						ShowImageMargin = showImageMargin,
-						ForeColor = Colors.Text,
-						BackColor = Colors.Main,
-						Renderer = new Renderer(new Colors()),
-					};
-					UpdateNativeMenu(nativeContextMenu);
+				if (nativeContextMenu != null) {
+					return nativeContextMenu;
 				}
+				nativeContextMenu = new ContextMenuStrip {
+					ShowImageMargin = showImageMargin,
+					ForeColor = Colors.Text,
+					BackColor = Colors.Main,
+					Renderer = new Renderer(new Colors()),
+				};
+				UpdateNativeMenu(nativeContextMenu);
 				return nativeContextMenu;
 			}
 		}
@@ -207,45 +209,48 @@ namespace Lime
 			{
 			}
 
-			private static readonly Pen Pen = new Pen(Colors.Text, 2);
-			private static readonly Brush Brush = new SolidBrush(Colors.Text);
-			private static PointF[] CheckMark;
-			private static PointF[] Arrow;
+			private static readonly Pen pen = new Pen(Colors.Text, 2.5f);
+			private static readonly Brush brush = new SolidBrush(Colors.Text);
+			private static PointF[] checkMark;
+			private static PointF[] arrow;
 
 			protected override void OnRenderItemCheck(ToolStripItemImageRenderEventArgs e)
 			{
-				if (e.Item is ToolStripMenuItem tsMenuItem) {
-					if (CheckMark == null) {
-						int px = e.ImageRectangle.Left;
-						int py = e.ImageRectangle.Top;
-						int sizex = e.ImageRectangle.Size.Width;
-						int sizey = e.ImageRectangle.Size.Height;
-						CheckMark = new PointF[] {
-							new PointF(px + 0.25f * sizex, py + 0.5f * sizey),
-							new PointF(px + 0.5f * sizex, py + 0.75f * sizey),
-							new PointF(px + 0.8f * sizex, py + 0.2f * sizey)
-						};
-					}
-					e.Graphics.DrawLines(Pen, CheckMark);
+				if (!(e.Item is ToolStripMenuItem)) {
+					return;
 				}
+				if (checkMark == null) {
+					int px = e.ImageRectangle.Left;
+					int py = e.ImageRectangle.Top;
+					int sizeX = e.ImageRectangle.Size.Width;
+					int sizeY = e.ImageRectangle.Size.Height;
+					checkMark = new[] {
+						new PointF(px + 0.3f * sizeX, py + 0.5f * sizeY),
+						new PointF(px + 0.5f * sizeX, py + 0.7f * sizeY),
+						new PointF(px + 0.7f * sizeX, py + 0.3f * sizeY)
+					};
+				}
+				e.Graphics.SmoothingMode = SmoothingMode.HighQuality;
+				e.Graphics.DrawLines(pen, checkMark);
 			}
 
 			protected override void OnRenderArrow(ToolStripArrowRenderEventArgs e)
 			{
-				if (e.Item is ToolStripMenuItem tsMenuItem) {
-					if (Arrow == null) {
-						int px = e.ArrowRectangle.Left;
-						int py = e.ArrowRectangle.Top;
-						int sizex = e.ArrowRectangle.Size.Width;
-						int sizey = e.ArrowRectangle.Size.Height;
-						Arrow = new PointF[] {
-							new PointF(px + 0.2f * sizex, py + 0.2f * sizey),
-							new PointF(px + 0.8f * sizex, py + 0.5f * sizey),
-							new PointF(px + 0.2f * sizex, py + 0.8f * sizey)
-						};
-					}
-					e.Graphics.FillPolygon(Brush, Arrow);
+				if (!(e.Item is ToolStripMenuItem)) {
+					return;
 				}
+				if (arrow == null) {
+					int px = e.ArrowRectangle.Left;
+					int py = e.ArrowRectangle.Top;
+					int sizeX = e.ArrowRectangle.Size.Width;
+					int sizeY = e.ArrowRectangle.Size.Height;
+					arrow = new[] {
+						new PointF(px + 0.3f * sizeX, py + 0.3f * sizeY),
+						new PointF(px + 0.3f * sizeX, py + 0.7f * sizeY),
+						new PointF(px + 0.7f * sizeX, py + 0.5f * sizeY)
+					};
+				}
+				e.Graphics.FillPolygon(brush, arrow);
 			}
 		}
 	}
@@ -294,7 +299,7 @@ namespace Lime
 			return ToNativeKeys(shortcut.Modifiers) | ToNativeKeys(shortcut.Main);
 		}
 
-		private static readonly Func<Keys> InvalidKeyExceptionFunc = () => { throw new ArgumentException(); };
+		private static readonly Func<Keys> InvalidKeyExceptionFunc = () => throw new ArgumentException();
 		private static Keys ToNativeKeys(Key key)
 		{
 			if (key == Key.Unknown) {
