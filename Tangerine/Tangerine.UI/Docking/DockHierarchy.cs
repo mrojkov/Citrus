@@ -262,7 +262,7 @@ namespace Tangerine.UI.Docking
 			parent.NormalizeStretches();
 		}
 
-		public bool IsPanelSingleInWindow(string id) => FindPanelPlacement(id).Root.GetDescendantPanels().Count() == 1;
+		public bool IsPanelSingleInWindow(string id) => FindPanelPlacement(id).Root.GetPanelPlacements().Count() == 1;
 
 		public void AddWindow(WindowPlacement placement) => WindowPlacements.Add(placement);
 
@@ -305,7 +305,7 @@ namespace Tangerine.UI.Docking
 
 		public Placement Root => Parent?.Root ?? this;
 
-		public abstract IEnumerable<PanelPlacement> GetDescendantPanels();
+		public abstract IEnumerable<PanelPlacement> GetPanelPlacements();
 
 		public abstract void RemovePlacement(Placement placement);
 
@@ -416,7 +416,10 @@ namespace Tangerine.UI.Docking
 		[YuzuOptional]
 		public bool Hidden;
 
-		public override IEnumerable<PanelPlacement> GetDescendantPanels() => new PanelPlacement[] { };
+		public override IEnumerable<PanelPlacement> GetPanelPlacements()
+		{
+			yield return this;
+		}
 
 		public override void RemovePlacement(Placement placement) { }
 
@@ -524,7 +527,7 @@ namespace Tangerine.UI.Docking
 			Placements = new PlacementList<PanelPlacement>(this);
 		}
 
-		public override IEnumerable<PanelPlacement> GetDescendantPanels() => Placements;
+		public override IEnumerable<PanelPlacement> GetPanelPlacements() => Placements;
 
 		public override PanelPlacement FindPanelPlacement(string id) => Placements.FirstOrDefault(p => p.Id == id);
 
@@ -549,7 +552,9 @@ namespace Tangerine.UI.Docking
 				return;
 			}
 			if (Placements.Count == 1) {
-				Parent.Replace(this, Placements.First());
+				var placement = Placements[0];
+				placement.Unlink();
+				Parent.Replace(this, placement);
 			}
 		}
 
@@ -609,9 +614,9 @@ namespace Tangerine.UI.Docking
 			Stretch = stretch;
 		}
 
-		public override IEnumerable<PanelPlacement> GetDescendantPanels()
+		public override IEnumerable<PanelPlacement> GetPanelPlacements()
 		{
-			return Placement.GetDescendantPanels();
+			return Placement.GetPanelPlacements();
 		}
 
 		public override void RemovePlacement(Placement placement)
@@ -626,7 +631,7 @@ namespace Tangerine.UI.Docking
 
 		public override PanelPlacement FindPanelPlacement(string id)
 		{
-			return Placement.FindPanelPlacement(id);
+			return Placement?.FindPanelPlacement(id);
 		}
 
 		public override void HideThisOrDescendantPanels()
@@ -636,7 +641,7 @@ namespace Tangerine.UI.Docking
 
 		public override Placement Clone()
 		{
-			return new StretchPlacement(Placement.Clone(), Stretch);
+			return new StretchPlacement(Placement?.Clone(), Stretch);
 		}
 
 		public override bool AnyVisiblePanel()
@@ -648,6 +653,14 @@ namespace Tangerine.UI.Docking
 		{
 			if (old == Placement) {
 				Placement = @new;
+			}
+		}
+
+		public override void RemoveRedundantNodes()
+		{
+			placement?.RemoveRedundantNodes();
+			if (placement == null) {
+				Unlink();
 			}
 		}
 	}
@@ -670,10 +683,10 @@ namespace Tangerine.UI.Docking
 			Direction = direction;
 		}
 
-		public override IEnumerable<PanelPlacement> GetDescendantPanels()
+		public override IEnumerable<PanelPlacement> GetPanelPlacements()
 		{
 			foreach (var placement in Placements) {
-				foreach (var panelPlacement in placement.Placement.GetDescendantPanels()) {
+				foreach (var panelPlacement in placement.GetPanelPlacements()) {
 					yield return panelPlacement;
 				}
 			}
@@ -693,7 +706,7 @@ namespace Tangerine.UI.Docking
 		public override PanelPlacement FindPanelPlacement(string id)
 		{
 			foreach (var placement in Placements) {
-				var panel = placement.Placement.FindPanelPlacement(id);
+				var panel = placement.FindPanelPlacement(id);
 				if (panel != null) {
 					return panel;
 				}
@@ -721,7 +734,7 @@ namespace Tangerine.UI.Docking
 		{
 			bool result = false;
 			foreach (var placement in Placements) {
-				result |= placement.Placement.AnyVisiblePanel();
+				result |= placement?.AnyVisiblePanel() ?? false;
 			}
 			return result;
 		}
@@ -745,6 +758,26 @@ namespace Tangerine.UI.Docking
 			foreach (var pair in Placements)
 			{
 				pair.Stretch /= total;
+			}
+		}
+
+		public override void RemoveRedundantNodes()
+		{
+			int index = 0;
+			while (index < Placements.Count) {
+				var placement = Placements[index];
+				placement.RemoveRedundantNodes();
+				if (placement.Parent != null) {
+					++index;
+				}
+			}
+			if (Placements.Count == 0) {
+				Unlink();
+			}
+			if (Placements.Count == 1 && Parent != null) {
+				var placement = Placements[0].Placement;
+				placement.Unlink();
+				Parent.Replace(this, placement);
 			}
 		}
 	}

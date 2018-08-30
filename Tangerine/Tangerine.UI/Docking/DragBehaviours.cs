@@ -88,7 +88,7 @@ namespace Tangerine.UI.Docking
 				var clientMousePos = winPlacement.WindowWidget.Window.Input.MousePosition;
 				if (!bounds.Contains(clientMousePos)) continue;
 				CalcSiteAndRect(clientMousePos, bounds, out DockSite site, out Rectangle? rect);
-				if (placement.Id == windowPlacement.Root.GetDescendantPanels().First().Id ||
+				if (placement.Id == windowPlacement.Root.GetPanelPlacements().First().Id ||
 					placement.Id == DockManager.DocumentAreaId &&
 					site == DockSite.Fill
 				) {
@@ -179,7 +179,13 @@ namespace Tangerine.UI.Docking
 			while (true) {
 				var pressedPosition = inputWidget.LocalMousePosition();
 				if (input.WasMousePressed()) {
-					if (placement.Root == placement.Parent) {
+					if (placement.Root == placement || placement.Root == placement.Parent.Parent) {
+						var panelWindow = (WindowWidget)contentWidget.GetRoot();
+						var window = panelWindow.Window;
+						if (window.State == WindowState.Maximized) {
+							window.State = WindowState.Normal;
+							pressedPosition = new Vector2(window.ClientSize.X / 2, 10);
+						}
 						WindowDragBehaviour.CreateFor(placement, pressedPosition);
 					} else {
 						var size = inputWidget.Parent.AsWidget.Size;
