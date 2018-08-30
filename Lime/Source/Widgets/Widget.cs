@@ -1240,83 +1240,6 @@ namespace Lime
 			return position.X >= 0 && position.Y >= 0 && position.X < size.X && position.Y < size.Y;
 		}
 
-		/// <summary>
-		/// Renders widget's descendants to texture. If you want to render widget itself
-		/// then add it to provided renderChain before calling RenderToTexture. Be sure
-		/// not to do this inside Render() call.
-		/// </summary>
-		/// <param name="texture">Texture to render to. Must be RenderTexture or SerializableTexture</param>
-		/// <param name="renderChain">Render queue (order relation of elements with tree structure and layers)</param>
-		/// <param name="clearRenderTarget">Whether to clear texture before rendering or not.</param>
-		public void RenderToTexture(ITexture texture, RenderChain renderChain, bool clearRenderTarget = true)
-		{
-			//if (Width > 0 && Height > 0) {
-			//	var savedScissorState = Renderer.ScissorState;
-			//	texture.SetAsRenderTarget();
-			//	var savedViewport = Renderer.Viewport;
-			//	var savedWorld = Renderer.World;
-			//	var savedView = Renderer.View;
-			//	var savedProj = Renderer.Projection;
-			//	var savedDepthState = Renderer.DepthState;
-			//	var savedCullMode = Renderer.CullMode;
-			//	var savedTransform2 = Renderer.Transform2;
-			//	Renderer.ScissorState = ScissorState.ScissorDisabled;
-			//	Renderer.Viewport = new Viewport(0, 0, texture.ImageSize.Width, texture.ImageSize.Height);
-			//	if (clearRenderTarget) {
-			//		Renderer.Clear(new Color4(0, 0, 0, 0));
-			//	}
-			//	Renderer.World = Renderer.View = Matrix44.Identity;
-			//	Renderer.SetOrthogonalProjection(0, 0, Width, Height);
-			//	Renderer.DepthState = DepthState.DepthDisabled;
-			//	Renderer.CullMode = CullMode.None;
-			//	Renderer.Transform2 = LocalToWorldTransform.CalcInversed();
-			//	for (var node = FirstChild; node != null; node = node.NextSibling) {
-			//		node.RenderChainBuilder?.AddToRenderChain(renderChain);
-			//	}
-			//	renderChain.RenderAndClear();
-			//	texture.RestoreRenderTarget();
-			//	Renderer.Transform2 = savedTransform2;
-			//	Renderer.Viewport = savedViewport;
-			//	Renderer.World = savedWorld;
-			//	Renderer.View = savedView;
-			//	Renderer.Projection = savedProj;
-			//	Renderer.ScissorState = savedScissorState;
-			//	Renderer.DepthState = savedDepthState;
-			//	Renderer.CullMode = savedCullMode;
-			//}
-		}
-
-		/// <summary>
-		/// Renders the widget with all descendants into new instance of <see cref="Bitmap">
-		/// </summary>
-		/// <returns></returns>
-		public Bitmap ToBitmap()
-		{
-			var pixelScale = Window.Current.PixelScale;
-			var scaledWidth = (int)(Width * pixelScale);
-			var scaledHeight = (int)(Height * pixelScale);
-			var savedScale = Scale;
-			var savedPosition = Position;
-			var savedPivot = Pivot;
-
-			try {
-				Scale = Vector2.One;
-				Position = Vector2.Zero;
-				Pivot = Vector2.Zero;
-
-				using (var texture = new RenderTexture(scaledWidth, scaledHeight)) {
-					var renderChain = new RenderChain();
-					RenderChainBuilder?.AddToRenderChain(renderChain);
-					RenderToTexture(texture, renderChain);
-					return new Bitmap(texture.GetPixels(), scaledWidth, scaledHeight);
-				}
-			} finally {
-				Scale = savedScale;
-				Position = savedPosition;
-				Pivot = savedPivot;
-			}
-		}
-
 		public void CenterOnParent()
 		{
 			if (Parent == null) {
@@ -1449,13 +1372,6 @@ namespace Lime
 			if (!(this is Image) && (this.Nodes.Count == 0)) {
 				yield return "The widget doesn't contain any drawable node";
 			}
-		}
-
-		public void PrepareRendererState()
-		{
-			Renderer.Transform1 = LocalToWorldTransform;
-			Renderer.Blending = GlobalBlending;
-			Renderer.Shader = GlobalShader;
 		}
 
 		public void ExpandToContainerWithAnchors()
