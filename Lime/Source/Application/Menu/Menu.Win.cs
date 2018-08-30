@@ -209,7 +209,7 @@ namespace Lime
 			{
 			}
 
-			private static readonly Pen pen = new Pen(Colors.Text, 2.5f);
+			private static readonly Pen pen = new Pen(Colors.Text, 1.75f);
 			private static readonly Brush brush = new SolidBrush(Colors.Text);
 			private static PointF[] checkMark;
 			private static PointF[] arrow;
@@ -227,7 +227,7 @@ namespace Lime
 					checkMark = new[] {
 						new PointF(px + 0.3f * sizeX, py + 0.5f * sizeY),
 						new PointF(px + 0.5f * sizeX, py + 0.7f * sizeY),
-						new PointF(px + 0.7f * sizeX, py + 0.3f * sizeY)
+						new PointF(px + 0.7f * sizeX, py + 0.2f * sizeY)
 					};
 				}
 				e.Graphics.SmoothingMode = SmoothingMode.HighQuality;
