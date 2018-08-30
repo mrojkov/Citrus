@@ -60,7 +60,7 @@ namespace Tangerine.UI
 						button.Clicked += () => CommandQueue.Instance.Add((Command)command);
 						button.Updating += _ => {
 							button.Texture = command.Icon;
-							button.Selected = command.Checked;
+							button.Checked = command.Checked;
 							button.Enabled = command.Enabled;
 							button.Tip = button.Text = command.Text;
 						};

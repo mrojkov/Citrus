@@ -937,16 +937,15 @@ namespace Tangerine.Core.Operations
 						if (!CanApplyBone(point.SkinningWeights)) {
 							throw new TieWidgetsWithBonesException(point);
 						}
-						SetAnimableProperty.Perform(point, nameof(PointObject.SkinningWeights),
-							CalcSkinningWeight(point.SkinningWeights, point.CalcPositionInSpaceOf(widget.ParentWidget), boneList), CoreUserPreferences.Instance.AutoKeyframes);
+						SetProperty.Perform(point, nameof(PointObject.SkinningWeights),
+							CalcSkinningWeight(point.SkinningWeights, point.CalcPositionInSpaceOf(widget.ParentWidget), boneList));
 					}
 				} else {
 					if (!CanApplyBone(widget.SkinningWeights)) {
 						throw new TieWidgetsWithBonesException(widget);
 					}
-					SetAnimableProperty.Perform(widget, nameof(PointObject.SkinningWeights),
-						CalcSkinningWeight(widget.SkinningWeights, widget.Position, boneList),
-						CoreUserPreferences.Instance.AutoKeyframes);
+					SetProperty.Perform(widget, nameof(Widget.SkinningWeights),
+						CalcSkinningWeight(widget.SkinningWeights, widget.Position, boneList));
 				}
 			}
 			foreach (var bone in bones) {

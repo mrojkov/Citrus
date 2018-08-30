@@ -15,7 +15,6 @@ namespace Tangerine.UI.Inspector
 		private readonly List<IPropertyEditor> editors;
 		private readonly Widget widget;
 		private int row = 1;
-		private bool allRootObjectsAnimable;
 		private int totalObjectCount;
 		public event Action<NodeComponent> OnComponentRemove;
 		public DocumentHistory History { get; set; }
@@ -29,7 +28,6 @@ namespace Tangerine.UI.Inspector
 
 		public void BuildForObjects(IEnumerable<object> objects)
 		{
-			allRootObjectsAnimable = objects.All(o => o is IAnimationHost);
 			totalObjectCount = objects.Count();
 			if (Widget.Focused != null && Widget.Focused.DescendantOf(widget)) {
 				widget.SetFocus();
@@ -195,7 +193,6 @@ namespace Tangerine.UI.Inspector
 				) {
 					NumericEditBoxFactory = () => new TransactionalNumericEditBox(History),
 					History = History,
-					PropertySetter = allRootObjectsAnimable ? (PropertySetterDelegate)SetAnimableProperty : SetProperty,
 					DefaultValueGetter = () => {
 						var ctr = type.GetConstructor(new Type[] {});
 						if (ctr == null) {
@@ -252,6 +249,7 @@ namespace Tangerine.UI.Inspector
 								editor.ContainerWidget.Visible = !showCondition.Check(param.Objects.First());
 							};
 						}
+						param.PropertySetter = editor.IsAnimable ? (PropertySetterDelegate)SetAnimableProperty : SetProperty;
 						yield return editor;
 					}
 				}
@@ -393,13 +391,7 @@ namespace Tangerine.UI.Inspector
 		{
 			var ctr = editor.LabelContainer;
 			var index = ctr.Nodes.Count;
-			bool allRootObjectsAnimable = editor.EditorParams.RootObjects.All(a => a is IAnimationHost);
-			if (
-				allRootObjectsAnimable &&
-				PropertyAttributes<TangerineStaticPropertyAttribute>.Get(editor.EditorParams.PropertyInfo) == null &&
-				AnimatorRegistry.Instance.Contains(editor.EditorParams.PropertyInfo.PropertyType) &&
-				!Document.Current.InspectRootNode
-			) {
+			if (editor.IsAnimable) {
 				var keyFunctionButton = new KeyFunctionButton {
 					LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0),
 				};
