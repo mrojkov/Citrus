@@ -576,7 +576,7 @@ namespace Tangerine
 			}, () => Document.Current?.Rows.Count > 0));
 			h.Connect(Command.Undo, () => Document.Current.History.Undo(), () => Document.Current?.History.CanUndo() ?? false);
 			h.Connect(Command.Redo, () => Document.Current.History.Redo(), () => Document.Current?.History.CanRedo() ?? false);
-			h.Connect(SceneViewCommands.PasteAtOldPosition, new DocumentDelegateCommandHandler(() => Paste(pasteAtMouse: false), IsCopyPasteAllowedForSelection));
+			h.Connect(SceneViewCommands.PasteAtOldPosition, new DocumentDelegateCommandHandler(() => Paste(pasteAtMouse: false), Document.HasCurrent));
 			h.Connect(SceneViewCommands.SnapWidgetBorderToRuler, new SnapWidgetBorderCommandHandler());
 			h.Connect(SceneViewCommands.SnapWidgetPivotToRuler, new SnapWidgetPivotCommandHandler());
 			h.Connect(SceneViewCommands.SnapRulerLinesToWidgets, new SnapRulerLinesToWidgetCommandHandler());
