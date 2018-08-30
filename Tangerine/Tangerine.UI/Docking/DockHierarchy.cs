@@ -230,6 +230,7 @@ namespace Tangerine.UI.Docking
 				return;
 			}
 			var parent = target as LinearPlacement;
+			int index = 0;
 			if (parent == null) {
 				if (target.Parent is TabBarPlacement parentTabBarPlacement) {
 					target = parentTabBarPlacement;
@@ -238,27 +239,20 @@ namespace Tangerine.UI.Docking
 					if (!CheckPlacement((LinearPlacement)parentStretchPlacement.Parent, site, out parent)) {
 						parentStretchPlacement.Placement = parent;
 						parent.Placements.Add(new StretchPlacement(target, 1));
+					} else {
+						index = parent.Placements.IndexOf(parentStretchPlacement);
+						if (site == DockSite.Right || site == DockSite.Bottom) {
+							++index;
+						}
 					}
 				}
 			} else {
 				parent = CheckPlacement(parent, site);
+				if (site == DockSite.Right || site == DockSite.Bottom) {
+					index = parent.Placements.Count;
+				}
 			}
-			var stretchPlacement = new StretchPlacement(placement, stretch);
-			switch (site)
-			{
-				case DockSite.Left:
-					parent.Placements.Insert(0, stretchPlacement);
-					break;
-				case DockSite.Right:
-					parent.Placements.Add(stretchPlacement);
-					break;
-				case DockSite.Top:
-					parent.Placements.Insert(0, stretchPlacement);
-					break;
-				case DockSite.Bottom:
-					parent.Placements.Add(stretchPlacement);
-					break;
-			}
+			parent.Placements.Insert(index, new StretchPlacement(placement, stretch));
 			parent.NormalizeStretches();
 		}
 
