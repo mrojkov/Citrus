@@ -241,7 +241,7 @@ namespace Tangerine.UI.Docking
 				return;
 			}
 			bool requestTitle = placement is WindowPlacement windowPlacement &&
-			                    windowPlacement.GetPanelPlacements().Count() > 1 &&
+			                    windowPlacement.GetVisiblePanelPlacements().Count() > 1 &&
 								!isMainWindow;
 			placement.SwitchType(
 				panel => CreatePanelWidget(container, panel, stretch),

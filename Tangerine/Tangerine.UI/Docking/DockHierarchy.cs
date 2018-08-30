@@ -391,6 +391,9 @@ namespace Tangerine.UI.Docking
 					break;
 			}
 		}
+
+		public IEnumerable<PanelPlacement> GetVisiblePanelPlacements() =>
+			GetPanelPlacements().Where(panelPlacement => !panelPlacement.Hidden);
 	}
 
 	public class WindowPlacement : LinearPlacement
