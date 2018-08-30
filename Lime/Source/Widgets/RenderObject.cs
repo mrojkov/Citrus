@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Lime
@@ -9,10 +10,14 @@ namespace Lime
 		public abstract void Render();
 	}
 
-	public class RenderObjectList
+	public class RenderObjectList : IReadOnlyList<RenderObject>, IEnumerable<RenderObject>
 	{
 		private List<RenderObject> objects = new List<RenderObject>();
-		
+
+		public int Count => objects.Count;
+
+		public RenderObject this[int index] => objects[index];
+
 		public void Add(RenderObject obj)
 		{
 			objects.Add(obj);
@@ -32,6 +37,12 @@ namespace Lime
 				ro.Render();
 			}
 		}
+
+		public List<RenderObject>.Enumerator GetEnumerator() => objects.GetEnumerator();
+
+		IEnumerator<RenderObject> IEnumerable<RenderObject>.GetEnumerator() => GetEnumerator();
+
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 	}
 
 	public abstract class WidgetRenderObject : RenderObject

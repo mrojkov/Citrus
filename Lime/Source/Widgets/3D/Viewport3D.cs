@@ -216,7 +216,7 @@ namespace Lime
 					foreach (var item in layer) {
 						var renderObject = item.Presenter.GetRenderObject(item.Node);
 						if (renderObject != null) {
-							ro.Objects.Add((RenderObject3D)renderObject);
+							ro.Objects.Add(renderObject);
 						}
 					}
 					ro.Layers.Add(new RenderLayer {
@@ -240,7 +240,7 @@ namespace Lime
 			public Matrix32 Transform;
 			public Matrix44 View;
 			public Matrix44 Projection;
-			public List<RenderObject3D> Objects = new List<RenderObject3D>();
+			public RenderObjectList Objects = new RenderObjectList();
 			public List<RenderLayer> Layers = new List<RenderLayer>();
 
 			public override void Render()
@@ -257,7 +257,7 @@ namespace Lime
 				foreach (var layer in Layers) {
 					try {
 						for (var i = 0; i < layer.ObjectCount; i++) {
-							var obj = Objects[layer.FirstObject + i];
+							var obj = (RenderObject3D)Objects[layer.FirstObject + i];
 							var list = obj.Opaque ? opaqueObjects : transparentObjects;
 							list.Add(obj);
 						}
@@ -265,13 +265,11 @@ namespace Lime
 						opaqueObjects.Sort(RenderOrderComparers.FrontToBack);
 						foreach (var obj in opaqueObjects) {
 							obj.Render();
-							obj.Free = true;
 						}
 						Renderer.DepthState = DepthState.DepthRead;
 						transparentObjects.Sort(RenderOrderComparers.BackToFront);
 						foreach (var obj in transparentObjects) {
 							obj.Render();
-							obj.Free = true;
 						}
 					} finally {
 						opaqueObjects.Clear();
