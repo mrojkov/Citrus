@@ -37,6 +37,7 @@ namespace Lime
 		Square
 	}
 
+#pragma warning disable CS0660, CS0661
 	public struct WindowRect : IEquatable<WindowRect>
 	{
 		public int X;
@@ -75,26 +76,8 @@ namespace Lime
 		{
 			return X == other.X && Y == other.Y && Width == other.Width && Height == other.Height;
 		}
-
-		public override int GetHashCode()
-		{
-			var hashCode = 466501756;
-			hashCode = hashCode * -1521134295 + this.X.GetHashCode();
-			hashCode = hashCode * -1521134295 + this.Y.GetHashCode();
-			hashCode = hashCode * -1521134295 + this.Width.GetHashCode();
-			hashCode = hashCode * -1521134295 + this.Height.GetHashCode();
-			return hashCode;
-		}
-
-		public override bool Equals(object obj)
-		{
-			if (obj is WindowRect wr) {
-				return Equals(wr);
-			} else {
-				return false;
-			}
-		}
 	}
+#pragma warning restore CS0660, CS0661
 
 	[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 32)]
 	public struct Vertex

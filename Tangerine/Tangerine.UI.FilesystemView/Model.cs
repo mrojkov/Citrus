@@ -7,6 +7,7 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.FilesystemView
 {
+#pragma warning disable CS0660, CS0661
 	public class Selection : IEnumerable<string>, IReadOnlyVersionedCollection<string>
 	{
 		public Selection Clone()
@@ -66,15 +67,6 @@ namespace Tangerine.UI.FilesystemView
 			return GetEnumerator();
 		}
 
-		public override bool Equals(object obj)
-		{
-			var selection = obj as Selection;
-			return selection != null &&
-				   EqualityComparer<HashSet<string>>.Default.Equals(this.selection, selection.selection);
-		}
-
-		public override int GetHashCode() => 965136989 + EqualityComparer<HashSet<string>>.Default.GetHashCode(this.selection);
-
 		public static bool operator !=(Selection lhs, Selection rhs)
 		{
 			return !(lhs == rhs);
@@ -95,6 +87,7 @@ namespace Tangerine.UI.FilesystemView
 
 		public int Version { get; private set; }
 	}
+#pragma warning restore CS0660, CS0661
 
 	public class Model
 	{
