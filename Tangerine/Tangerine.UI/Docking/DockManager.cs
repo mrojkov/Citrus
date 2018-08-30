@@ -78,12 +78,16 @@ namespace Tangerine.UI.Docking
 		{
 			var windowPlacement = Model.GetWindowByPlacement(placement);
 			if (placement == windowPlacement) {
-				var linearPlacement = new LinearPlacement(windowPlacement.Direction);
-				foreach (var p in windowPlacement.Placements.ToList()) {
-					linearPlacement.Placements.Add(p);
+				if (windowPlacement.Placements.Count == 1) {
+					placement = windowPlacement.Placements[0].Placement;
+				} else {
+					var linearPlacement = new LinearPlacement(windowPlacement.Direction);
+					foreach (var p in windowPlacement.Placements.ToList()) {
+						linearPlacement.Placements.Add(p);
+					}
+					placement = linearPlacement;
 				}
 				windowPlacement.Placements.Clear();
-				placement = linearPlacement;
 			}
 			placement.Unlink();
 			Model.DockPlacementTo(placement, target, site, stretch);
