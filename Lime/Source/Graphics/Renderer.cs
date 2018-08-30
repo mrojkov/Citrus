@@ -862,25 +862,25 @@ namespace Lime
 
 		public static void DrawRound(Vector2 center, float radius, int numSegments, Color4 innerColor, Color4 outerColor)
 		{
-			if (staticVertices.Length < numSegments + 1) {
-				staticVertices = new Vertex[numSegments + 1];
+			if (staticVertices.Length < numSegments + 2) {
+				staticVertices = new Vertex[numSegments + 2];
 			}
 			staticVertices[0] = new Vertex { Pos = center, Color = innerColor };
-			for (int i = 0; i < numSegments; i++) {
-				staticVertices[i + 1].Pos = Vector2.CosSin(i * Mathf.TwoPi / (numSegments - 1)) * radius + center;
+			for (int i = 0; i < numSegments + 1; i++) {
+				staticVertices[i + 1].Pos = Vector2.CosSin(i * Mathf.TwoPi / numSegments) * radius + center;
 				staticVertices[i + 1].Color = outerColor;
 			}
-			DrawTriangleFan(staticVertices, numSegments + 1);
+			DrawTriangleFan(staticVertices, numSegments + 2);
 		}
 
 		public static void DrawCircle(Vector2 center, float radius, int numSegments, Color4 color)
 		{
-			if (staticVertices.Length < numSegments + 1) {
-				staticVertices = new Vertex[numSegments + 1];
+			if (staticVertices.Length < numSegments + 2) {
+				staticVertices = new Vertex[numSegments + 2];
 			}
 			var prevPos = Vector2.CosSin(0) * radius + center;
-			for (int i = 0; i < numSegments; i++) {
-				var pos = Vector2.CosSin(i * Mathf.TwoPi / (numSegments - 1)) * radius + center;
+			for (int i = 0; i < numSegments + 1; i++) {
+				var pos = Vector2.CosSin(i * Mathf.TwoPi / numSegments) * radius + center;
 				DrawLine(prevPos, pos, color);
 				prevPos = pos;
 			}

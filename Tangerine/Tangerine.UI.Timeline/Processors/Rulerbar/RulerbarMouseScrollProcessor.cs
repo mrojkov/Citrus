@@ -21,15 +21,11 @@ namespace Tangerine.UI.Timeline
 					using (Document.Current.History.BeginTransaction()) {
 						int initialCol = CalcColumn(rulerWidget.LocalMousePosition().X);
 						int backup = timeline.CurrentColumn;
-						var marker = Document.Current.Container.Markers.FirstOrDefault(m => m.Frame == initialCol);
+						int lastColumn = -1;
+						var marker = Document.Current.Container.Markers.GetByFrame(initialCol);
 						while (input.IsMousePressed()) {
 							bool isEditing = input.IsKeyPressed(Key.Control);
 							bool isShifting = isEditing && input.IsKeyPressed(Key.Shift);
-							// Evgenii Polikutin: don't Undo to avoid animation cache invalidation when just scrolling
-							// Evgenii Polikutin: yet we have to sacrifice performance when editing document
-							SetCurrentColumn.IsFrozen = !isEditing;
-							SetCurrentColumn.RollbackHistoryWithoutScrolling();
-							SetCurrentColumn.IsFrozen = false;
 
 							var cw = TimelineMetrics.ColWidth;
 							var mp = rulerWidget.LocalMousePosition().X;
@@ -38,6 +34,18 @@ namespace Tangerine.UI.Timeline
 							} else if (mp < cw / 2) {
 								timeline.OffsetX = Math.Max(0, timeline.OffsetX - cw);
 							}
+							int column = CalcColumn(mp);
+							if (column == lastColumn) {
+								yield return null;
+								continue;
+							}
+							lastColumn = column;
+							// Evgenii Polikutin: don't Undo to avoid animation cache invalidation when just scrolling
+							// Evgenii Polikutin: yet we have to sacrifice performance when editing document
+							SetCurrentColumn.IsFrozen = !isEditing;
+							SetCurrentColumn.RollbackHistoryWithoutScrolling();
+							SetCurrentColumn.IsFrozen = false;
+
 							if (isEditing && !input.WasMousePressed()) {
 								if (isShifting) {
 									ShiftTimeline(CalcColumn(mp));
@@ -64,12 +72,19 @@ namespace Tangerine.UI.Timeline
 		void ShiftTimeline(int destColumn)
 		{
 			var delta = destColumn - timeline.CurrentColumn;
-			for (int i = 0; i < delta.Abs(); i++) {
-				if (delta > 0) {
-					Core.Operations.TimelineHorizontalShift.Perform(timeline.CurrentColumn, 1);
-				} else {
-					Core.Operations.TimelineHorizontalShift.Perform(destColumn, -1);
+			if (delta > 0) {
+				Core.Operations.TimelineHorizontalShift.Perform(timeline.CurrentColumn, delta);
+			} else if (delta < 0) {
+				var container = Document.Current.Container;
+				foreach (var node in container.Nodes) {
+					foreach (var animator in node.Animators.Where(i => i.AnimationId == Document.Current.AnimationId).ToList()) {
+						Core.Operations.RemoveKeyframeRange.Perform(animator, destColumn, timeline.CurrentColumn - 1);
+					}
 				}
+				foreach (var marker in container.Markers.Where(m => m.Frame >= destColumn && m.Frame < timeline.CurrentColumn).ToList()) {
+					Core.Operations.DeleteMarker.Perform(container, marker, removeDependencies: false);
+				}
+				Core.Operations.TimelineHorizontalShift.Perform(destColumn, delta);
 			}
 		}
 

@@ -179,7 +179,7 @@ namespace Tangerine.UI.Timeline
 		private static void DeleteMarker()
 		{
 			var timeline = Timeline.Instance;
-			var marker = Document.Current.Container.Markers.FirstOrDefault(i => i.Frame == timeline.CurrentColumn);
+			var marker = Document.Current.Container.Markers.GetByFrame(timeline.CurrentColumn);
 			if (marker != null) {
 				Core.Operations.DeleteMarker.Perform(Document.Current.Container, marker, true);
 			}
