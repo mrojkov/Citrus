@@ -218,6 +218,7 @@ namespace Tangerine
 					AppUserPreferences.Instance.LimeColorTheme = Theme.ColorTheme.CreateDarkTheme();
 					AppUserPreferences.Instance.ColorTheme = ColorTheme.CreateDarkTheme();
 					themeEditor.Rebuild();
+					themeChanged = true;
 				}
 			};
 			var loadLightButton = new ThemedButton("Light preset") {
@@ -225,6 +226,7 @@ namespace Tangerine
 					AppUserPreferences.Instance.LimeColorTheme = Theme.ColorTheme.CreateLightTheme();
 					AppUserPreferences.Instance.ColorTheme = ColorTheme.CreateLightTheme();
 					themeEditor.Rebuild();
+					themeChanged = true;
 				}
 			};
 			var saveButton = new ThemedButton("Save theme") {
@@ -268,6 +270,7 @@ namespace Tangerine
 						}
 					}
 					themeEditor.Rebuild();
+					themeChanged = true;
 				}
 			};
 			var buttons = new Widget {
