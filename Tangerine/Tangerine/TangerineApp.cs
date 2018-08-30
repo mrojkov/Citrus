@@ -116,8 +116,8 @@ namespace Tangerine
 			var root = dockManager.Model.WindowPlacements.First();
 			var placement = new LinearPlacement(LinearPlacementDirection.Horizontal);
 			dockManager.AddPanel(timelinePanel, root, DockSite.Top, 0.3f);
-			dockManager.DockPlacementTo(placement, root, DockSite.Bottom, 0.5f);
-			dockManager.AppendPanelTo(documentPanel, placement);
+			dockManager.DockPlacementTo(placement, root, DockSite.Bottom, 0.6f);
+			dockManager.AppendPanelTo(documentPanel, placement, 0.5f);
 			var commandHandlerList = CommandHandlerList.Global;
 			var commandsDictionary = new Dictionary<string, Command> {
 				{ timelinePanel.Id, new Command(timelinePanel.Title) },
@@ -133,7 +133,7 @@ namespace Tangerine
 				TangerineMenu.PadsMenu.Add(pair.Value);
 			}
 			dockManager.AddPanel(inspectorPanel, placement, DockSite.Left);
-			var filesystemPlacement = dockManager.AddPanel(filesystemPanel, placement, DockSite.Right, 0.3f);
+			var filesystemPlacement = dockManager.AddPanel(filesystemPanel, placement, DockSite.Right);
 			dockManager.AddPanel(searchPanel, filesystemPlacement, DockSite.Fill);
 			dockManager.AddPanel(backupHistoryPanel, filesystemPlacement, DockSite.Fill);
 			dockManager.AddPanel(consolePanel, filesystemPlacement, DockSite.Bottom, 0.3f);

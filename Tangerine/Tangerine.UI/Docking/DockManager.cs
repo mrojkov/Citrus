@@ -493,7 +493,10 @@ namespace Tangerine.UI.Docking
 						? stretch.X
 						: stretch.Y;
 				}
-				placement.NormalizeStretches();
+				float total = placement.Placements.Select(p => p.Stretch).Aggregate((s1, s2) => s1 + s2);
+				foreach (var stretchPlacement in placement.Placements) {
+					stretchPlacement.Stretch /= total;
+				}
 			};
 		}
 

@@ -186,9 +186,17 @@ namespace Tangerine.UI.Docking
 		{
 			if (!CheckPlacement(placement, site, out var newPlacement)) {
 				placement.Placements.Add(new StretchPlacement(newPlacement, 1));
-				placement.NormalizeStretches();
 			}
 			return newPlacement;
+		}
+
+		private float AdjustStretch(LinearPlacement linearPlacement, float stretch, int index)
+		{
+			if (stretch >= 0) {
+				return stretch;
+			}
+			linearPlacement.Placements[index].Stretch *= 0.75f;
+			return linearPlacement.Placements[index].Stretch * 0.25f;
 		}
 
 		public void DockPlacementTo(Placement placement, Placement target, DockSite site, float stretch)
@@ -230,8 +238,8 @@ namespace Tangerine.UI.Docking
 								break;
 							case TabBarPlacement _:
 							case PanelPlacement _:
-								targetLinearPlacement.Placements.Add(new StretchPlacement(placement, stretch));
-								targetLinearPlacement.NormalizeStretches();
+								targetLinearPlacement.Placements.Add(new StretchPlacement(placement,
+									AdjustStretch(targetLinearPlacement, stretch, targetLinearPlacement.Placements.Count - 1)));
 								break;
 
 						}
@@ -248,9 +256,12 @@ namespace Tangerine.UI.Docking
 				if (target.Parent is StretchPlacement parentStretchPlacement) {
 					if (!CheckPlacement((LinearPlacement)parentStretchPlacement.Parent, site, out parent)) {
 						parentStretchPlacement.Placement = parent;
-						parent.Placements.Add(new StretchPlacement(target, 1));
+						stretch = stretch < 0 ? 0.25f : stretch;
+						parent.Placements.Add(new StretchPlacement(target, 1 - stretch));
+						index = site == DockSite.Bottom || site == DockSite.Right ? 1 : 0;
 					} else {
 						index = parent.Placements.IndexOf(parentStretchPlacement);
+						stretch = AdjustStretch(parent, stretch, index);
 						if (site == DockSite.Right || site == DockSite.Bottom) {
 							++index;
 						}
@@ -261,13 +272,13 @@ namespace Tangerine.UI.Docking
 				if (site == DockSite.Right || site == DockSite.Bottom) {
 					index = parent.Placements.Count;
 				}
+				stretch = AdjustStretch(parent, stretch, index);
 			}
 			if (placement is LinearPlacement lPlacement) {
 				DockPlacementTo(lPlacement, parent, index, stretch);
 			} else {
 				parent.Placements.Insert(index, new StretchPlacement(placement, stretch));
 			}
-			parent.NormalizeStretches();
 		}
 
 		public bool IsPanelSingleInWindow(string id) => FindPanelPlacement(id).Root.GetPanelPlacements().Count() == 1;
@@ -754,18 +765,6 @@ namespace Tangerine.UI.Docking
 			}
 			foreach (var placement in Placements) {
 				placement.Replace(old, @new);
-			}
-		}
-
-		public void NormalizeStretches()
-		{
-			if (Placements.Count == 0) {
-				return;
-			}
-			float total = Placements.Select(p => p.Stretch).Aggregate((accumulator, value) => accumulator + value);
-			foreach (var pair in Placements)
-			{
-				pair.Stretch /= total;
 			}
 		}
 

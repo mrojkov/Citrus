@@ -50,7 +50,7 @@ namespace Tangerine.UI.Docking
 		{
 			ResetDockComponents();
 			if (requestedSite != DockSite.None) {
-				DockManager.Instance.DockPlacementTo(placement, requestedPlacement, requestedSite, 0.25f);
+				DockManager.Instance.DockPlacementTo(placement, requestedPlacement, requestedSite, -1f);
 			}
 			IsActive = false;
 		}
