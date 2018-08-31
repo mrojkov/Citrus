@@ -143,6 +143,7 @@ namespace Lime
 			Input.CopyKeysState();
 			Input.ProcessPendingKeyEvents(delta);
 			AudioSystem.Update();
+			RaiseSync();
 		}
 
 		private void OnRenderFrame(object s, Xamarin.FrameEventArgs e)

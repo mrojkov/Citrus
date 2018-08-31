@@ -475,6 +475,7 @@ namespace Lime
 			if (Application.AreAllWindowsInactive()) {
 				Input.ClearKeyState();
 			}
+			RaiseSync();
 		}
 
 		private void RefreshMousePosition()
