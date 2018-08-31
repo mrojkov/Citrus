@@ -26,9 +26,12 @@
     <EnablePackageSigning>false</EnablePackageSigning>
     <IncludeMonoRuntime>false</IncludeMonoRuntime>
     <UseSGen>false</UseSGen>
-    <CodeSignEntitlements></CodeSignEntitlements>
-    <CodeSignResourceRules></CodeSignResourceRules>
-    <XamMacArch></XamMacArch>
+    <CodeSignEntitlements>
+    </CodeSignEntitlements>
+    <CodeSignResourceRules>
+    </CodeSignResourceRules>
+    <XamMacArch>
+    </XamMacArch>
     <Profiling>true</Profiling>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AOTMode>None</AOTMode>
@@ -37,7 +40,8 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
-    <DefineConstants></DefineConstants>
+    <DefineConstants>
+    </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -46,9 +50,12 @@
     <EnablePackageSigning>false</EnablePackageSigning>
     <IncludeMonoRuntime>false</IncludeMonoRuntime>
     <UseSGen>false</UseSGen>
-    <CodeSignEntitlements></CodeSignEntitlements>
-    <CodeSignResourceRules></CodeSignResourceRules>
-    <XamMacArch></XamMacArch>
+    <CodeSignEntitlements>
+    </CodeSignEntitlements>
+    <CodeSignResourceRules>
+    </CodeSignResourceRules>
+    <XamMacArch>
+    </XamMacArch>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AOTMode>None</AOTMode>
     <LangVersion>7.2</LangVersion>
@@ -88,7 +95,7 @@
     <Compile Include="Components\RollPropertyView.cs" />
     <Compile Include="Components\GridSpanList.cs" />
     <Compile Include="Components\RollBoneView.cs" />
-	<Compile Include="Operations\MoveNodes.cs" />
+    <Compile Include="Operations\MoveNodes.cs" />
     <Compile Include="Operations\SelectGridSpan.cs" />
     <Compile Include="Operations\ColumnCountUpdater.cs" />
     <Compile Include="Operations\CopyPasteKeyframe.cs" />
@@ -120,6 +127,12 @@
     <Compile Include="Processors\BoneLinkIndicationProcessor.cs" />
     <Compile Include="LinkIndicatorButton.cs" />
     <Compile Include="Operations\ToggleKeyframes.cs" />
+    <Compile Include="Utils\GridSelection.cs" />
+    <Compile Include="Operations\CenterTimelineOnCurrentColumn.cs" />
+    <Compile Include="Operations\DragKeyframes.cs" />
+    <Compile Include="Operations\NumericMoveDialog.cs" />
+    <Compile Include="Operations\NumericScaleDialog.cs" />
+    <Compile Include="Processors\SlowMotionProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tangerine.Core\Tangerine.Core.Mac.csproj">

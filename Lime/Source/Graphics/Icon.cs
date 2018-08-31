@@ -16,7 +16,7 @@ namespace Lime
 #if WIN
 				return nativeIcon ?? (nativeIcon = AsBitmap.NativeBitmap);
 #else
-				throw new NotImplementedException();
+				throw new System.NotImplementedException();
 #endif
 			}
 		}

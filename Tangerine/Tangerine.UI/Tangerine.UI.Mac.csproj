@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -53,6 +53,9 @@
     <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Markdig, Version=0.15.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\Markdig.0.15.1\lib\net40\Markdig.dll</HintPath>
+    </Reference>
     <Reference Include="CommonMark, Version=0.1.0.0, Culture=neutral, PublicKeyToken=001ef8810438905d, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)packages\CommonMark.NET.0.15.1\lib\net45\CommonMark.dll</HintPath>
     </Reference>
@@ -62,17 +65,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <Compile Include="ColorPicker.Win.cs" />
+    <Compile Include="PropertyEditors\NodeIdPropertyEditor.cs" />
+    <Compile Include="EmbeddedResources\ThemedIconResource.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Documentation\Documentation.cs" />
     <Compile Include="Documentation\DocumentationComponent.cs" />
     <Compile Include="Documentation\HelpModeGestureManager.cs" />
-    <Compile Include="Documentation\HelpPage.cs" />
     <Compile Include="Dialogs\ModalOperationDialog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="IconPool.cs" />
     <Compile Include="Utils\KeyframePalette.cs" />
-    <Compile Include="Utils\HSpacer.cs" />
     <Compile Include="Utils\Colors.cs" />
     <Compile Include="Docking\DockManager.cs" />
     <Compile Include="Commands.cs" />
@@ -90,7 +94,6 @@
     <Compile Include="ColorPicker.Mac.cs" />
     <Compile Include="WidgetFactoryComponent.cs" />
     <Compile Include="Widgets\ThemedButtons.cs" />
-    <Compile Include="EmbeddedResources\ThemedconResource.cs" />
     <Compile Include="EmbeddedResources\EmbeddedResource.cs" />
     <Compile Include="Docking\DragBehaviours.cs" />
     <Compile Include="Docking\DockHierarchy.cs" />
@@ -99,7 +102,6 @@
     <Compile Include="BackupHistoryPanel\BackupHistoryPanel.cs" />
     <Compile Include="Utils\DropSceneContextMenu.cs" />
     <Compile Include="OrangeCommandHandler.cs" />
-    <Compile Include="Documentation\CustomHtmlFormatter.cs" />
     <Compile Include="PropertyEditors\AnchorsPropertyEditor.cs" />
     <Compile Include="PropertyEditors\AudioSamplePropertyEditor.cs" />
     <Compile Include="PropertyEditors\BlendingPropertyEditor.cs" />
@@ -141,6 +143,8 @@
     <Compile Include="Utils\Tip.cs" />
     <Compile Include="PropertyEditors\TextPropertyEditor.cs" />
     <Compile Include="TextEditorWindow.cs" />
+    <Compile Include="Documentation\CrosslinkExtension.cs" />
+    <Compile Include="Utils\Spacer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>
