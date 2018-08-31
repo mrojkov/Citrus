@@ -948,7 +948,7 @@ namespace Lime
 		{
 			get {
 				CreateParams cp = base.CreateParams;
-				cp.ExStyle |= 0x80;
+				cp.Style &= ~0x20000;
 				return cp;
 			}
 		}
