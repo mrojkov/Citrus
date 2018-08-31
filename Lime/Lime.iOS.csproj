@@ -376,6 +376,8 @@
     <Compile Include="Source\Widgets\Layout\LinearLayout.cs" />
     <Compile Include="Source\Widgets\Materials\HSLMaterial.cs" />
     <Compile Include="Source\Widgets\Materials\MaterialComponent.cs" />
+    <Compile Include="Source\TangerineAttributes.cs" />
+    <Compile Include="Source\Graphics\Icon.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />
