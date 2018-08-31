@@ -37,6 +37,7 @@ namespace Lime
 		Square
 	}
 
+#pragma warning disable CS0660, CS0661
 	public struct WindowRect : IEquatable<WindowRect>
 	{
 		public int X;
@@ -76,6 +77,7 @@ namespace Lime
 			return X == other.X && Y == other.Y && Width == other.Width && Height == other.Height;
 		}
 	}
+#pragma warning restore CS0660, CS0661
 
 	[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 32)]
 	public struct Vertex

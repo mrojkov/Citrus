@@ -14,6 +14,7 @@ namespace Orange
 		private static GitHubClient client = new GitHubClient(new ProductHeaderValue("mrojkov-citrus-auto-updater"));
 		private static bool firstUpdate = true;
 
+#pragma warning disable CS1998
 		public static async Task CheckForUpdates()
 		{
 			var task = Task.Run(async () => {
@@ -104,5 +105,6 @@ namespace Orange
 				}
 			});
 		}
+#pragma warning restore CS1998
 	}
 }

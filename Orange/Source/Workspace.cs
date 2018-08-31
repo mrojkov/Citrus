@@ -95,7 +95,9 @@ namespace Orange
 			if (citrusVersion.IsStandalone) {
 				Console.WriteLine($"Welcome to Citrus. Version {citrusVersion.Version}, build number: {citrusVersion.BuildNumber}");
 			}
+#pragma warning disable CS4014
 			Orange.Updater.CheckForUpdates();
+#pragma warning restore CS4014
 		}
 
 		public void Save()

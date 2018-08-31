@@ -7,6 +7,7 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.FilesystemView
 {
+#pragma warning disable CS0660, CS0661
 	public class Selection : IEnumerable<string>, IReadOnlyVersionedCollection<string>
 	{
 		public Selection Clone()
@@ -86,6 +87,7 @@ namespace Tangerine.UI.FilesystemView
 
 		public int Version { get; private set; }
 	}
+#pragma warning restore CS0660, CS0661
 
 	public class Model
 	{

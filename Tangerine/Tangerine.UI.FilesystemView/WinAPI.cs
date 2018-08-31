@@ -378,10 +378,12 @@ namespace Tangerine.UI.FilesystemView
 			#region IContextMenu overrides
 
 			new int QueryContextMenu(IntPtr hMenu, uint indexMenu, int idCmdFirst, int idCmdLast, CMF uFlags);
-			new int InvokeCommand(IntPtr pici);
 			new int GetCommandString(int idcmd, GCS uflags, int reserved, StringBuilder commandstring, int cch);
 
 			#endregion
+
+			[PreserveSig]
+			int InvokeCommand(IntPtr pici);
 
 			[PreserveSig]
 			int HandleMenuMsg(uint uMsg, IntPtr wParam, IntPtr lParam);
@@ -679,6 +681,7 @@ namespace Tangerine.UI.FilesystemView
 			HSHELL_WINDOWREPLACED = 13
 		}
 
+#pragma warning disable CS0649
 		public struct SHELLEXECUTEINFO
 		{
 			public int cbSize;
@@ -697,6 +700,7 @@ namespace Tangerine.UI.FilesystemView
 			public IntPtr hIcon;
 			public IntPtr hProcess;
 		}
+#pragma warning restore CS0649
 
 		[Flags]
 		public enum ClassStyles : uint

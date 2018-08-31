@@ -271,6 +271,7 @@ namespace Lime
 		}
 	}
 
+#pragma warning disable CS0660, CS0661
 	[YuzuCompact]
 	public struct Alignment
 	{
@@ -288,5 +289,6 @@ namespace Lime
 		public static bool operator == (Alignment lhs, Alignment rhs) => lhs.X == rhs.X && lhs.Y == rhs.Y;
 		public static bool operator !=(Alignment lhs, Alignment rhs) => lhs.X != rhs.X || lhs.Y != rhs.Y;
 	}
+#pragma warning restore CS0660, CS0661
 }
 

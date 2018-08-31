@@ -2,6 +2,7 @@ using Yuzu;
 
 namespace Lime
 {
+#pragma warning disable CS0660, CS0661
 	[YuzuCompact]
 	public struct Thickness
 	{
@@ -78,4 +79,5 @@ namespace Lime
 			return string.Format("{0}, {1}, {2}, {3}", Left, Top, Right, Bottom);
 		}
 	}
+#pragma warning restore CS0660, CS0661
 }
