@@ -25,7 +25,7 @@ namespace Lime
 	}
 
 	[TangerineRegisterNode(CanBeRoot = true, Order = 0)]
-	[AllowedChildrenTypes(typeof(Node))]
+	[TangerineAllowedChildrenTypes(typeof(Node))]
 	[TangerineVisualHintGroup("/All/Nodes/Containers")]
 	public class Frame : Widget, IImageCombinerArg
 	{

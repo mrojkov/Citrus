@@ -4,7 +4,7 @@ using Yuzu;
 namespace Lime
 {
 	[TangerineRegisterNode(Order = 18)]
-	[AllowedChildrenTypes(typeof(Node))]
+	[TangerineAllowedChildrenTypes(typeof(Node))]
 	[TangerineVisualHintGroup("/All/Nodes/Containers")]
 	public class Slider : Widget
 	{

@@ -7,7 +7,7 @@ namespace Lime
 {
 	[TangerineRegisterNode(Order = 11)]
 	[TangerineNodeBuilder("BuildForTangerine")]
-	[AllowedChildrenTypes(typeof(TextStyle))]
+	[TangerineAllowedChildrenTypes(typeof(TextStyle))]
 	[TangerineVisualHintGroup("/All/Nodes/Text")]
 	public class RichText : Widget, IText
 	{

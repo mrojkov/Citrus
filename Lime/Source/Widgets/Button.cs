@@ -7,7 +7,7 @@ namespace Lime
 {
 	[TangerineRegisterNode(CanBeRoot = true, Order = 1)]
 	[TangerineNodeBuilder("BuildForTangerine")]
-	[AllowedChildrenTypes(typeof(Node))]
+	[TangerineAllowedChildrenTypes(typeof(Node))]
 	[TangerineVisualHintGroup("/All/Nodes/Containers")]
 	public class Button : Widget
 	{

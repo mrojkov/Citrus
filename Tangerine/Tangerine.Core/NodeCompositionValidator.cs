@@ -15,7 +15,7 @@ namespace Tangerine.Core
 		private static bool ValidateChildType(Type parentType, Type childType)
 		{
 			for (var p = parentType; p != null; p = p.BaseType) {
-				var a = ClassAttributes<AllowedChildrenTypes>.Get(p);
+				var a = ClassAttributes<TangerineAllowedChildrenTypes>.Get(p);
 				if (a != null) {
 					return a.Types.Any(t => childType == t || childType.IsSubclassOf(t));
 				}
@@ -26,7 +26,7 @@ namespace Tangerine.Core
 		private static bool ValidateParentType(Type parentType, Type childType)
 		{
 			for (var p = childType; p != null; p = p.BaseType) {
-				var a = ClassAttributes<AllowedParentTypes>.Get(p);
+				var a = ClassAttributes<TangerineAllowedParentTypes>.Get(p);
 				if (a != null) {
 					return a.Types.Any(t => parentType == t || parentType.IsSubclassOf(t));
 				}
@@ -37,7 +37,7 @@ namespace Tangerine.Core
 		public static bool CanHaveChildren(Type type)
 		{
 			for (var p = type; p != null; p = p.BaseType) {
-				var a = ClassAttributes<AllowedChildrenTypes>.Get(p);
+				var a = ClassAttributes<TangerineAllowedChildrenTypes>.Get(p);
 				if (a != null) {
 					return a.Types.Length > 0;
 				}

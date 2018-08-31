@@ -4,7 +4,7 @@ using Yuzu;
 namespace Lime
 {
 	[TangerineRegisterNode(Order = 15)]
-	[AllowedChildrenTypes(typeof(SplinePoint))]
+	[TangerineAllowedChildrenTypes(typeof(SplinePoint))]
 	[TangerineVisualHintGroup("/All/Nodes/Splines")]
 	public class Spline : Widget
 	{

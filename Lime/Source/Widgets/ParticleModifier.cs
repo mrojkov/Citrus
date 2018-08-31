@@ -5,7 +5,7 @@ using Yuzu;
 namespace Lime
 {
 	[TangerineRegisterNode(Order = 7)]
-	[AllowedParentTypes(typeof(ParticleEmitter))]
+	[TangerineAllowedParentTypes(typeof(ParticleEmitter))]
 	public class ParticleModifier : Node
 	{
 		[YuzuMember]

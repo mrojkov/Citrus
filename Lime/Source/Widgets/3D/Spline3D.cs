@@ -9,7 +9,7 @@ namespace Lime
 	}
 
 	[TangerineRegisterNode(Order = 25)]
-	[AllowedChildrenTypes(typeof(SplinePoint3D))]
+	[TangerineAllowedChildrenTypes(typeof(SplinePoint3D))]
 	[TangerineVisualHintGroup("/All/Nodes/Splines")]
 	public class Spline3D : Node3D
 	{
@@ -130,7 +130,7 @@ namespace Lime
 	}
 
 	[TangerineRegisterNode(Order = 26)]
-	[AllowedParentTypes(typeof(Spline3D))]
+	[TangerineAllowedParentTypes(typeof(Spline3D))]
 	public class SplinePoint3D : Node, Viewport3D.IZSorterParams
 	{
 		[YuzuMember]

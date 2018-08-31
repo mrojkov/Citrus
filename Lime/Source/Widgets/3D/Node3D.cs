@@ -4,8 +4,8 @@ using Yuzu;
 namespace Lime
 {
 	[TangerineRegisterNode(CanBeRoot = true, Order = 23)]
-	[AllowedParentTypes(typeof(Node3D), typeof(Viewport3D))]
-	[AllowedChildrenTypes(typeof(Node))]
+	[TangerineAllowedParentTypes(typeof(Node3D), typeof(Viewport3D))]
+	[TangerineAllowedChildrenTypes(typeof(Node))]
 	[TangerineVisualHintGroup("/All/Nodes/Containers")]
 	public class Node3D : Node, Viewport3D.IZSorterParams
 	{

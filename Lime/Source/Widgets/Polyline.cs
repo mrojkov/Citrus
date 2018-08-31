@@ -10,7 +10,7 @@ namespace Lime
 	/// Ломаная линия
 	/// </summary>
 	[TangerineRegisterNode(Order = 29)]
-	[AllowedChildrenTypes(typeof(PolylinePoint))]
+	[TangerineAllowedChildrenTypes(typeof(PolylinePoint))]
 	[TangerineVisualHintGroup("/All/Nodes/Splines")]
 	public class Polyline : Widget
 	{
@@ -185,7 +185,7 @@ namespace Lime
 	}
 
 	[TangerineRegisterNode(Order = 30)]
-	[AllowedParentTypes(typeof(Polyline))]
+	[TangerineAllowedParentTypes(typeof(Polyline))]
 	public class PolylinePoint : PointObject
 	{
 	}

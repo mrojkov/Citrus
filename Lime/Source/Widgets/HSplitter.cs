@@ -5,7 +5,7 @@ using System.Linq;
 namespace Lime
 {
 	[YuzuDontGenerateDeserializer]
-	[AllowedChildrenTypes(typeof(Node))]
+	[TangerineAllowedChildrenTypes(typeof(Node))]
 	public abstract class Splitter : Widget
 	{
 		public float SeparatorActiveAreaWidth;

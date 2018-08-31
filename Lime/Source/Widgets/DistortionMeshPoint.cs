@@ -3,7 +3,7 @@ using Yuzu;
 namespace Lime
 {
 	[TangerineForbidCopyPaste]
-	[AllowedParentTypes(typeof(DistortionMesh))]
+	[TangerineAllowedParentTypes(typeof(DistortionMesh))]
 	public class DistortionMeshPoint : PointObject
 	{
 		[YuzuMember]

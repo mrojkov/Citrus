@@ -3,7 +3,7 @@ using Yuzu;
 namespace Lime
 {
 	[TangerineRegisterNode(Order = 12)]
-	[AllowedParentTypes(typeof(RichText))]
+	[TangerineAllowedParentTypes(typeof(RichText))]
 	public class TextStyle : Node
 	{
 		private ITexture imageTexture;

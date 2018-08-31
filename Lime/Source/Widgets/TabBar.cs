@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Lime
 {
 	[YuzuDontGenerateDeserializer]
-	[AllowedChildrenTypes(typeof(Node))]
+	[TangerineAllowedChildrenTypes(typeof(Node))]
 	public class Tab : Widget
 	{
 		private bool active;

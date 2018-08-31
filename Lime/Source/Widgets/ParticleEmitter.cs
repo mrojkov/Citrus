@@ -52,12 +52,12 @@ namespace Lime
 	}
 
 	[TangerineRegisterNode(Order = 8)]
-	[AllowedParentTypes(typeof(ParticleEmitter))]
+	[TangerineAllowedParentTypes(typeof(ParticleEmitter))]
 	public class EmitterShapePoint : PointObject { }
 
 	[TangerineRegisterNode(Order = 6)]
 	[TangerineNodeBuilder("BuildForTangerine")]
-	[AllowedChildrenTypes(typeof(ParticleModifier), typeof(EmitterShapePoint))]
+	[TangerineAllowedChildrenTypes(typeof(ParticleModifier), typeof(EmitterShapePoint))]
 	[TangerineVisualHintGroup("/All/Nodes/Particles")]
 	public partial class ParticleEmitter : Widget, ITangerinePreviewAnimationListener
 	{
