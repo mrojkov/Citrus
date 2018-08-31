@@ -501,7 +501,7 @@ namespace Tangerine.Dialogs
 				Padding = new Thickness(5);
 				if (Command.Icon != null) {
 					AddNode(new Image {
-						Texture = Command.Icon,
+						Texture = Command.Icon.AsTexture,
 						MinMaxSize = new Vector2(16),
 					});
 				} else {

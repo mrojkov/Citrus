@@ -2,86 +2,85 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Lime;
-using Tangerine.Core;
 using Tangerine.UI;
 
 namespace Tangerine
 {
-	public enum AlignObject
+	public enum AlignTo
 	{
 		Selection,
 		Root,
 		Parent
 	}
 
-	public abstract class AlignObjectHandler : DocumentCommandHandler
+	public abstract class AlignToHandler : DocumentCommandHandler
 	{
 		private readonly ICommand command;
 
-		public AlignObjectHandler(ICommand command)
+		protected AlignToHandler(ICommand command)
 		{
 			this.command = command;
 		}
 
-		protected static string AlignToString(AlignObject align)
+		protected static string GetDisplayedTextForAlign(AlignTo align)
 		{
 			switch (align) {
-				case AlignObject.Selection:
+				case AlignTo.Selection:
 					return "Align to Selection";
-				case AlignObject.Root:
+				case AlignTo.Root:
 					return "Align to Root";
-				case AlignObject.Parent:
+				case AlignTo.Parent:
 					return "Align to Parent";
 				default:
 					throw new ArgumentException();
 			}
 		}
 
-		public static ITexture AlignToTexture(AlignObject align)
+		public static Icon GetIconForAlign(AlignTo align)
 		{
-			return IconPool.GetTexture($"Tools.{Enum.GetName(typeof(AlignObject), align)}");
+			return IconPool.GetIcon($"Tools.{Enum.GetName(typeof(AlignTo), align)}");
 		}
 
 		protected void SetTextAndTexture()
 		{
-			var alignObject = GetAlignObject();
-			command.Text = AlignToString(alignObject);
-			command.Icon = AlignToTexture(alignObject);
+			var alignTo = GetAlignTo();
+			command.Text = GetDisplayedTextForAlign(alignTo);
+			command.Icon = GetIconForAlign(alignTo);
 		}
 
-		public abstract AlignObject GetAlignObject();
-		public abstract void SetAlignObject(AlignObject alignObject);
+		public abstract AlignTo GetAlignTo();
+		public abstract void SetAlignTo(AlignTo alignTo);
 
-		protected class ChangeAlignObject : CommandHandler
+		protected class ChangeAlignTo : CommandHandler
 		{
-			private readonly AlignObject alignObject;
-			private readonly AlignObjectHandler alignToHandler;
+			private readonly AlignTo alignTo;
+			private readonly AlignToHandler alignToHandler;
 
-			public ChangeAlignObject(AlignObject alignObject, AlignObjectHandler alignToHandler)
+			public ChangeAlignTo(AlignTo alignTo, AlignToHandler alignToHandler)
 			{
-				this.alignObject = alignObject;
+				this.alignTo = alignTo;
 				this.alignToHandler = alignToHandler;
 			}
 
 			public override void Execute()
 			{
-				alignToHandler.SetAlignObject(alignObject);
+				alignToHandler.SetAlignTo(alignTo);
 			}
 		}
 	}
 
-	public class AlignAndDistributeObjectHandler : AlignObjectHandler
+	public class AlignAndDistributeToHandler : AlignToHandler
 	{
-		public static AlignObject AlignObject = AlignPreferences.Instance.AlignObject;
+		public static AlignTo AlignTo = AlignPreferences.Instance.AlignTo;
 
-		public AlignAndDistributeObjectHandler(ICommand command) : base(command)
+		public AlignAndDistributeToHandler(ICommand command) : base(command)
 		{
 		}
 
-		public override AlignObject GetAlignObject() => AlignObject;
-		public override void SetAlignObject(AlignObject alignObject)
+		public override AlignTo GetAlignTo() => AlignTo;
+		public override void SetAlignTo(AlignTo alignTo)
 		{
-			AlignObject = alignObject;
+			AlignTo = alignTo;
 			SetTextAndTexture();
 		}
 
@@ -92,13 +91,13 @@ namespace Tangerine
 
 		private static class AlignObjectContextMenu
 		{
-			public static void Create(AlignObjectHandler alignToHandler)
+			public static void Create(AlignToHandler alignToHandler)
 			{
 				var menu = new Menu();
-				var currentAlignObject = alignToHandler.GetAlignObject();
-				foreach (AlignObject alignObject in Enum.GetValues(typeof(AlignObject))) {
-					menu.Add(new Command(AlignToString(alignObject),
-						new ChangeAlignObject(alignObject, alignToHandler).Execute) {
+				var currentAlignObject = alignToHandler.GetAlignTo();
+				foreach (AlignTo alignObject in Enum.GetValues(typeof(AlignTo))) {
+					menu.Add(new Command(GetDisplayedTextForAlign(alignObject),
+						new ChangeAlignTo(alignObject, alignToHandler).Execute) {
 						Checked = currentAlignObject == alignObject
 					});
 				}
@@ -107,43 +106,43 @@ namespace Tangerine
 		}
 	}
 
-	public class CenterObjectHandler : AlignObjectHandler
+	public class CenterToHandler : AlignToHandler
 	{
-		public static AlignObject CenterAlignObject = AlignObject.Parent;
+		public static AlignTo CenterAlignTo = AlignTo.Parent;
 
-		public CenterObjectHandler(ICommand command) : base(command)
+		public CenterToHandler(ICommand command) : base(command)
 		{
 		}
 
-		public override AlignObject GetAlignObject() => CenterAlignObject;
-		public override void SetAlignObject(AlignObject alignObject)
+		public override AlignTo GetAlignTo() => CenterAlignTo;
+		public override void SetAlignTo(AlignTo alignTo)
 		{
-			CenterAlignObject = alignObject;
+			CenterAlignTo = alignTo;
 			SetTextAndTexture();
 		}
 
 		public override void ExecuteTransaction()
 		{
-			CenterAlignObjectContextnMenu.Create(this);
+			CenterAlignObjectContextMenu.Create(this);
 		}
 
-		private static class CenterAlignObjectContextnMenu
+		private static class CenterAlignObjectContextMenu
 		{
-			public static void Create(AlignObjectHandler alignToHandler)
+			public static void Create(AlignToHandler alignToHandler)
 			{
-				var alignObject = alignToHandler.GetAlignObject();
+				var alignTo = alignToHandler.GetAlignTo();
 				new Menu {
 					new Command(
-						AlignToString(AlignObject.Parent),
-						new ChangeAlignObject(AlignObject.Parent, alignToHandler).Execute
+						GetDisplayedTextForAlign(AlignTo.Parent),
+						new ChangeAlignTo(AlignTo.Parent, alignToHandler).Execute
 					) {
-						Checked = alignObject == AlignObject.Parent
+						Checked = alignTo == AlignTo.Parent
 					},
 					new Command(
-						AlignToString(AlignObject.Root),
-						new ChangeAlignObject(AlignObject.Root, alignToHandler).Execute
+						GetDisplayedTextForAlign(AlignTo.Root),
+						new ChangeAlignTo(AlignTo.Root, alignToHandler).Execute
 					) {
-						Checked = alignObject == AlignObject.Root
+						Checked = alignTo == AlignTo.Root
 					}
 				}.Popup();
 			}
@@ -201,14 +200,14 @@ namespace Tangerine
 
 		public override void ExecuteTransaction()
 		{
-			switch (AlignAndDistributeObjectHandler.AlignObject) {
-				case AlignObject.Selection:
+			switch (AlignAndDistributeToHandler.AlignTo) {
+				case AlignTo.Selection:
 					ToSelection();
 					break;
-				case AlignObject.Root:
+				case AlignTo.Root:
 					ToRoot();
 					break;
-				case AlignObject.Parent:
+				case AlignTo.Parent:
 					ToParent();
 					break;
 				default:
@@ -249,11 +248,11 @@ namespace Tangerine
 
 		public override void ExecuteTransaction()
 		{
-			switch (CenterObjectHandler.CenterAlignObject) {
-				case AlignObject.Parent:
+			switch (CenterToHandler.CenterAlignTo) {
+				case AlignTo.Parent:
 					ToParent();
 					break;
-				case AlignObject.Root:
+				case AlignTo.Root:
 					ToRoot();
 					break;
 				default:

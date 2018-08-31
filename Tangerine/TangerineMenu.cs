@@ -64,7 +64,7 @@ namespace Tangerine
 			create.Add(customNodes = new Command("Custom Nodes", new Menu()));
 
 			foreach (var type in Project.Current.RegisteredNodeTypes) {
-				var cmd = new Command("Create " + type.Name) { Icon = NodeIconPool.GetTexture(type) };
+				var cmd = new Command("Create " + type.Name) { Icon = NodeIconPool.GetIcon(type) };
 				CommandRegistry.Register(cmd, "CreateCommands", "Create" + type.Name, @override: true);
 				CommandHandlerList.Global.Connect(cmd, new CreateNode(type, cmd));
 				if (type.Namespace == "Lime") {
@@ -198,14 +198,14 @@ namespace Tangerine
 			};
 			create.Add(customNodes = new Command("Custom Nodes", new Menu()));
 			foreach (var t in Project.GetNodesTypesOrdered("Lime")) {
-				var cmd = new Command(t.Name) { Icon = NodeIconPool.GetTexture(t) };
+				var cmd = new Command(t.Name) { Icon = NodeIconPool.GetIcon(t) };
 				CommandHandlerList.Global.Connect(cmd, new CreateNode(t, cmd));
 				create.Add(cmd);
 				CreateNodeCommands.Add(cmd);
 			}
-			Command.Undo.Icon = IconPool.GetTexture("Tools.Undo");
-			Command.Redo.Icon = IconPool.GetTexture("Tools.Redo");
-			GenericCommands.Revert.Icon = IconPool.GetTexture("Tools.Revert");
+			Command.Undo.Icon = IconPool.GetIcon("Tools.Undo");
+			Command.Redo.Icon = IconPool.GetIcon("Tools.Redo");
+			GenericCommands.Revert.Icon = IconPool.GetIcon("Tools.Revert");
 		}
 
 		private static void RebuildOrangeMenu(string citprojPath)

@@ -10,8 +10,8 @@ namespace Tangerine.UI.Inspector
 
 	public class Inspector : IDocumentView
 	{
-		private static readonly ITexture inspectRootActivatedTexture;
-		private static readonly ITexture inspectRootDeactivatedTexture;
+		private static readonly Icon inspectRootActivatedTexture;
+		private static readonly Icon inspectRootDeactivatedTexture;
 
 		private readonly InspectorContent content;
 		private readonly Widget contentWidget;
@@ -25,8 +25,8 @@ namespace Tangerine.UI.Inspector
 
 		static Inspector()
 		{
-			inspectRootActivatedTexture = IconPool.GetTexture("Tools.InspectRootActivated");
-			inspectRootDeactivatedTexture = IconPool.GetTexture("Tools.InspectRootDeactivated");
+			inspectRootActivatedTexture = IconPool.GetIcon("Tools.InspectRootActivated");
+			inspectRootDeactivatedTexture = IconPool.GetIcon("Tools.InspectRootDeactivated");
 		}
 
 		public static void RegisterGlobalCommands()

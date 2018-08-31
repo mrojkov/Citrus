@@ -329,7 +329,7 @@ namespace Lime
 			stopwatch.Start();
 
 			if (options.Icon != null) {
-				form.Icon = (Icon)options.Icon;
+				form.Icon = (System.Drawing.Icon)options.Icon;
 			}
 			Cursor = MouseCursor.Default;
 			Title = options.Title;

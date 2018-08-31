@@ -51,7 +51,7 @@ namespace Tangerine.UI.FilesystemView
 				return TexturePool.Instance.GetTexture(null);
 			}
 			var t = new Texture2D();
-			using (var icon = Icon.FromHandle(shInfo.hIcon)) {
+			using (var icon = System.Drawing.Icon.FromHandle(shInfo.hIcon)) {
 				var b = new Bitmap(icon.Size.Width, icon.Size.Height);
 				using (Graphics g = Graphics.FromImage(b))
 					g.DrawIcon(icon, 0, 0);

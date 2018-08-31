@@ -556,8 +556,8 @@ namespace Tangerine
 			h.Connect(Tools.CenterVertically, new DistributeCenterVertically());
 			h.Connect(Tools.AlignCentersHorizontally, new AlignCentersHorizontally());
 			h.Connect(Tools.AlignCentersVertically, new AlignCentersVertically());
-			h.Connect(Tools.AlignTo, new AlignAndDistributeObjectHandler(Tools.AlignTo));
-			h.Connect(Tools.CenterAlignTo, new CenterObjectHandler(Tools.CenterAlignTo));
+			h.Connect(Tools.AlignTo, new AlignAndDistributeToHandler(Tools.AlignTo));
+			h.Connect(Tools.CenterAlignTo, new CenterToHandler(Tools.CenterAlignTo));
 			h.Connect(Tools.RestoreOriginalSize, new RestoreOriginalSize());
 			h.Connect(Tools.ResetScale, new ResetScale());
 			h.Connect(Tools.ResetRotation, new ResetRotation());
