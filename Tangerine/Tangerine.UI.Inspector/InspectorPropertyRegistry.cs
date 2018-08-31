@@ -26,7 +26,7 @@ namespace Tangerine.UI.Inspector
 				c => {
 					var a = PropertyAttributes<TangerineDropDownListPropertyEditorAttribute>.Get(c.Type, c.PropertyName);
 					Type specializedDropDownListPropertyEditorType = typeof(DropDownListPropertyEditor<>).MakeGenericType(c.PropertyInfo.PropertyType);
-					return Activator.CreateInstance(specializedDropDownListPropertyEditorType, new object[] { c, a.EnumerateItems() }) as IPropertyEditor;
+					return Activator.CreateInstance(specializedDropDownListPropertyEditorType, new object[] { c, a.EnumerateItems(c.Objects.First()) }) as IPropertyEditor;
 				}
 			);
 			AddEditor(c => c.PropertyName == "ContentsPath", c => AllowChildren(c) ? new ContentsPathPropertyEditor(c) : null);
