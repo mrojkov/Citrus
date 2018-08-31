@@ -4,9 +4,6 @@ using System.Threading;
 
 namespace Lime
 {
-	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-	public sealed class TangerineRegisterComponentAttribute : Attribute { }
-
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
 	public sealed class NodeComponentDontSerializeAttribute : Attribute
 	{ }

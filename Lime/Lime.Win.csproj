@@ -185,6 +185,7 @@
     <Compile Include="Source\Profilers\NodeProfilerHelpers\ResultExporter.cs" />
     <Compile Include="Source\Profilers\NodeProfilerHelpers\UsageData.cs" />
     <Compile Include="Source\Profilers\NodeProfilerHelpers\UsageSummary.cs" />
+    <Compile Include="Source\TangerineAttributes.cs" />
     <Compile Include="Source\Types\BoundingSphere.cs" />
     <Compile Include="Source\Types\ContainmentType.cs" />
     <Compile Include="Source\Types\Plane.cs" />

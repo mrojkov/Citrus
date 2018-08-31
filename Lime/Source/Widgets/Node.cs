@@ -24,91 +24,6 @@ namespace Lime
 		void UnbindAnimators();
 	}
 
-	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-	public sealed class TangerineRegisterNodeAttribute : Attribute
-	{
-		public bool CanBeRoot;
-		public int Order = int.MaxValue;
-	}
-
-	/// <summary>
-	/// Denotes a property which can not be animated within Tangerine.
-	/// </summary>
-	public sealed class TangerineStaticPropertyAttribute : Attribute
-	{ }
-
-	public sealed class TangerineKeyframeColorAttribute : Attribute
-	{
-		public int ColorIndex;
-
-		public TangerineKeyframeColorAttribute(int colorIndex)
-		{
-			ColorIndex = colorIndex;
-		}
-	}
-
-	public sealed class TangerineNodeBuilderAttribute : Attribute
-	{
-		public string MethodName { get; private set; }
-
-		public TangerineNodeBuilderAttribute(string methodName)
-		{
-			MethodName = methodName;
-		}
-	}
-
-	public sealed class AllowedParentTypes : Attribute
-	{
-		public Type[] Types;
-
-		public AllowedParentTypes(params Type[] types)
-		{
-			Types = types;
-		}
-	}
-
-	public sealed class AllowedChildrenTypes : Attribute
-	{
-		public Type[] Types;
-
-		public AllowedChildrenTypes(params Type[] types)
-		{
-			Types = types;
-		}
-	}
-
-	public sealed class TangerineForbidCopyPasteAttribute : Attribute
-	{ }
-
-	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
-	public sealed class TangerineIgnoreIfAttribute : Attribute
-	{
-		public readonly string Method;
-
-		private Func<object, bool> checker;
-
-		public TangerineIgnoreIfAttribute(string method)
-		{
-			Method = method;
-		}
-
-		public bool Check(object obj)
-		{
-			if (checker == null) {
-				var fn = obj.GetType().GetMethod(Method, BindingFlags.NonPublic | BindingFlags.Instance);
-				if (fn == null) {
-					throw new System.Exception("Couldn't find method " + Method);
-				}
-
-				var p = Expression.Parameter(typeof(object));
-				var e = Expression.Call(Expression.Convert(p, obj.GetType()), fn);
-				checker = Expression.Lambda<Func<object, bool>>(e, p).Compile();
-			}
-
-			return checker(obj);
-		}
-	}
-
 	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true)]
 	public sealed class YuzuSpecializeWithAttribute : Attribute
 	{
@@ -122,39 +37,6 @@ namespace Lime
 	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Interface, AllowMultiple = true)]
 	public sealed class YuzuDontGenerateDeserializerAttribute : Attribute
 	{ }
-
-
-	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Class, AllowMultiple = false)]
-	public sealed class TangerineIgnoreAttribute : Attribute
-	{ }
-
-	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
-	public sealed class TangerineInspectAttribute : Attribute
-	{ }
-
-	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
-	public sealed class TangerineGroupAttribute : Attribute
-	{
-		public readonly string Name;
-
-		public TangerineGroupAttribute(string name)
-		{
-			Name = name ?? String.Empty;
-		}
-	}
-
-	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-	public sealed class TangerineVisualHintGroupAttribute : Attribute
-	{
-		public readonly string Group;
-		public readonly string AliasTypeName;
-
-		public TangerineVisualHintGroupAttribute(string group, string aliasTypeName = null)
-		{
-			Group = group ?? "/";
-			AliasTypeName = aliasTypeName;
-		}
-	}
 
 	[Flags]
 	public enum TangerineFlags
