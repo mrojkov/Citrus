@@ -35,7 +35,7 @@ namespace Tangerine.UI
 							VAlignment = VAlignment.Center,
 							LayoutCell = new LayoutCell(Alignment.LeftCenter),
 							ForceUncutText = false,
-							// MinWidth = editorParams.LabelWidth,
+							Padding = new Thickness(left: 5.0f),
 							HitTestTarget = true,
 							TabTravesable = new TabTraversable()
 						})

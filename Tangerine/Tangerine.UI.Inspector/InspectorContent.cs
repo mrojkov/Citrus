@@ -389,23 +389,22 @@ namespace Tangerine.UI.Inspector
 
 		private static void DecoratePropertyEditor(IPropertyEditor editor, int row)
 		{
-			var ctr = editor.LabelContainer;
-			var index = ctr.Nodes.Count;
-			if (editor.IsAnimable) {
-				var keyFunctionButton = new KeyFunctionButton {
-					LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0),
-				};
+			var index = 0;
+			bool allRootObjectsAnimable = editor.EditorParams.RootObjects.All(a => a is IAnimationHost);
+			if (
+				allRootObjectsAnimable &&
+				PropertyAttributes<TangerineStaticPropertyAttribute>.Get(editor.EditorParams.PropertyInfo) == null &&
+				AnimatorRegistry.Instance.Contains(editor.EditorParams.PropertyInfo.PropertyType) &&
+				!Document.Current.InspectRootNode
+			) {
+				var keyColor = KeyframePalette.Colors[editor.EditorParams.TangerineAttribute.ColorIndex];
 				var keyframeButton = new KeyframeButton {
 					LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0),
-					KeyColor = KeyframePalette.Colors[editor.EditorParams.TangerineAttribute.ColorIndex],
+					KeyColor = keyColor,
 				};
-				keyFunctionButton.Clicked += editor.PropertyLabel.SetFocus;
 				keyframeButton.Clicked += editor.PropertyLabel.SetFocus;
-				ctr.Nodes.Insert(index++, keyFunctionButton);
-				ctr.Nodes.Insert(index++, keyframeButton);
-				ctr.Nodes.Insert(index, Spacer.HSpacer(4));
-				ctr.Tasks.Add(new KeyframeButtonBinding(editor.EditorParams, keyframeButton));
-				ctr.Tasks.Add(new KeyFunctionButtonBinding(editor.EditorParams, keyFunctionButton));
+				editor.LabelContainer.Nodes.Insert(index++, keyframeButton);
+				editor.ContainerWidget.Tasks.Add(new KeyframeButtonBinding(editor.EditorParams, keyframeButton));
 			}
 			editor.ContainerWidget.Padding = new Thickness { Left = 4, Top = 3, Right = 12, Bottom = 4 };
 			editor.ContainerWidget.CompoundPresenter.Add(new WidgetFlatFillPresenter(

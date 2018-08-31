@@ -150,6 +150,22 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="icon.ico" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Inspector\CatmullromFill.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Inspector\CatmullromOutline.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Inspector\LinearFill.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Inspector\LinearOutline.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Inspector\LoopFill.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Inspector\LoopOutline.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Inspector\StepFill.png" />
+    <EmbeddedResource Include="Resources\Icons\Dark\Inspector\StepOutline.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Inspector\CatmullromFill.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Inspector\CatmullromOutline.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Inspector\LinearFill.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Inspector\LinearOutline.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Inspector\LoopFill.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Inspector\LoopOutline.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Inspector\StepFill.png" />
+    <EmbeddedResource Include="Resources\Icons\Light\Inspector\StepOutline.png" />
     <EmbeddedResource Include="Resources\Icons\Light\Timeline\SlowMotionMode.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Timeline\SlowMotionMode.png" />
     <EmbeddedResource Include="Resources\Icons\Dark\Tools\ToolbarSeparator.png" />

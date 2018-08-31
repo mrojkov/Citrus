@@ -26,7 +26,7 @@ namespace Tangerine.UI
 
 		private static ITexture CreateTexture(string id, string defaultId = null)
 		{
-            var png = new ThemedconResource(id, "Tangerine").GetResourceStream();
+			var png = new ThemedconResource(id, "Tangerine").GetResourceStream();
 			if (png == null) {
 				if (defaultId != null) {
 					return CreateTexture(defaultId);
