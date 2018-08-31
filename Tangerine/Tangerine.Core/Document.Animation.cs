@@ -41,6 +41,11 @@ namespace Tangerine.Core
 				AudioSystem.StopAll();
 				ForceAnimationUpdate();
 			} else {
+				foreach (var node in RootNode.Descendants) {
+					if (node is ITangerinePreviewAnimationListener t) {
+						t.OnStart();
+					}
+				}
 				int savedAnimationFrame = Container.AnimationFrame;
 				PreviewAnimation = true;
 				if (triggerMarkersBeforeCurrentFrame) {

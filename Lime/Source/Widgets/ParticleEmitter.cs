@@ -6,6 +6,11 @@ using Yuzu;
 
 namespace Lime
 {
+	public interface ITangerinePreviewAnimationListener
+	{
+		void OnStart();
+	}
+
 	public enum EmitterShape
 	{
 		Point,
@@ -54,7 +59,7 @@ namespace Lime
 	[TangerineNodeBuilder("BuildForTangerine")]
 	[AllowedChildrenTypes(typeof(ParticleModifier), typeof(EmitterShapePoint))]
 	[TangerineVisualHintGroup("/All/Nodes/Particles")]
-	public partial class ParticleEmitter : Widget
+	public partial class ParticleEmitter : Widget, ITangerinePreviewAnimationListener
 	{
 		internal static System.Random Rng = new System.Random();
 
@@ -129,7 +134,7 @@ namespace Lime
 		/// </summary>
 		[YuzuMember]
 		[TangerineKeyframeColor(8)]
-		public bool ImmortalParticles;
+		public bool ImmortalParticles { get; set; }
 		[YuzuMember]
 		[TangerineKeyframeColor(9)]
 		public EmitterShape Shape { get; set; }
@@ -156,7 +161,7 @@ namespace Lime
 		/// </summary>
 		[YuzuMember]
 		[TangerineKeyframeColor(14)]
-		public float TimeShift;
+		public float TimeShift { get; set; }
 		/// <summary>
 		/// Update: delta *= Speed
 		/// </summary>
@@ -261,6 +266,11 @@ namespace Lime
 		private List<int> cachedShapeTriangles = new List<int>();
 		private List<float> cachedShapeTriangleSizes = new List<float>();
 		public static bool GloballyEnabled = true;
+
+		void ITangerinePreviewAnimationListener.OnStart()
+		{
+			firstUpdate = true;
+		}
 
 		public ParticleEmitter()
 		{
