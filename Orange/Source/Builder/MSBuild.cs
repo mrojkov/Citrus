@@ -29,6 +29,8 @@ namespace Orange.Source
 					$"Please install Microsoft Build Tools 2015: {MSBuildDownloadUrl}",
 					MSBuildDownloadUrl
 				);
+			} else {
+				Console.WriteLine("MSBuild located in: " + builderPath);
 			}
 		}
 
