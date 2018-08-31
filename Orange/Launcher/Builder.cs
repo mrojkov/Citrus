@@ -46,8 +46,12 @@ namespace Launcher
 		{
 			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Yuzu/Yuzu.Win.csproj");
 			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Yuzu/Yuzu.Mac.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Yuzu/Yuzu.iOS.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Yuzu/Yuzu.Android.csproj");
 			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Lime/Lime.Win.csproj");
 			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Lime/Lime.Mac.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Lime/Lime.iOS.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Lime/Lime.Android.csproj");
 			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Lime/Lime.MonoMac.csproj");
 			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Kumquat/Kumquat.Win.csproj");
 			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Kumquat/Kumquat.Mac.csproj");
