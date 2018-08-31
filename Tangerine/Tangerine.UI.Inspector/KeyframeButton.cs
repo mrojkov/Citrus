@@ -57,8 +57,8 @@ namespace Tangerine.UI.Inspector
 			Nodes.Clear();
 			Size = MinMaxSize = new Vector2(22, 22);
 			image = new Image { Size = Size, Shader = ShaderId.Silhuette, Texture = new SerializableTexture(), Color = Theme.Colors.WhiteBackground };
-			fillImage = new Image { Size = Size, Visible = true };
-			outlintImage = new Image { Size = Size, Visible = true };
+			fillImage = new Image { Size = Size, Visible = false };
+			outlintImage = new Image { Size = Size, Visible = false };
 			Nodes.Add(outlintImage);
 			Nodes.Add(fillImage);
 			Nodes.Add(image);
