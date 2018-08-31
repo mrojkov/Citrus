@@ -79,7 +79,7 @@ namespace Tangerine.UI.Docking
 			var windowPlacement = Model.GetWindowByPlacement(placement);
 			if (placement == windowPlacement) {
 				if (windowPlacement.Placements.Count == 1) {
-					placement = windowPlacement.Placements[0].Placement;
+					placement = windowPlacement.Placements[0];
 				} else {
 					var linearPlacement = new LinearPlacement(windowPlacement.Direction);
 					foreach (var p in windowPlacement.Placements.ToList()) {
@@ -189,14 +189,14 @@ namespace Tangerine.UI.Docking
 					Position = Model.WindowPlacements[0].Position + Model.WindowPlacements[0].Size / 2 - floatingWindowDefaultSize / 2,
 					Size = floatingWindowDefaultSize
 				};
-				windowPlacement.Placements.Add(new StretchPlacement(
+				windowPlacement.Placements.Add(
 					new PanelPlacement {
 						Title = panel.Title,
 						Id = panel.Id,
 						Hidden = true
-					},
-					1
-				));
+					}
+				);
+				windowPlacement.Stretches.Add(1);
 				Model.WindowPlacements.Add(windowPlacement);
 			}
 		}
@@ -263,9 +263,9 @@ namespace Tangerine.UI.Docking
 				: new ThemedHSplitter();
 			Widget rootWidget = splitter;
 			bool hasTabBarPlacement = false;
-			foreach (var stretchPlacement in placement.Placements) {
-				hasTabBarPlacement |= stretchPlacement.Placement is TabBarPlacement;
-				CreateWidgetForPlacement(splitter, stretchPlacement.Placement, stretchPlacement.Stretch);
+			for (int i = 0; i < placement.Placements.Count; ++i) {
+				hasTabBarPlacement |= placement.Placements[i] is TabBarPlacement;
+				CreateWidgetForPlacement(splitter, placement.Placements[i], placement.Stretches[i]);
 			}
 			splitter.DragEnded += RefreshDockedSize(placement, splitter);
 			if (requestTitle && !(hasTabBarPlacement && placement.Placements.Count == 1)) {
@@ -281,7 +281,7 @@ namespace Tangerine.UI.Docking
 			container.Nodes.Add(rootWidget);
 		}
 
-		private Widget AddTitle(Widget widget, out ThemedTabCloseButton closeButton, out ThemedSimpleText title, string id = null)
+		private static Widget AddTitle(Widget widget, out ThemedTabCloseButton closeButton, out ThemedSimpleText title, string id = null)
 		{
 			Widget titleWidget;
 			var result =  new Widget {
@@ -332,7 +332,7 @@ namespace Tangerine.UI.Docking
 				return;
 			}
 			if (panel.IsUndockable) {
-				var rootWidget = AddTitle(widget, out ThemedTabCloseButton closeButton, out ThemedSimpleText titleLabel, $"DockPanel<{panel.Id}>");
+				var rootWidget = AddTitle(widget, out var closeButton, out var titleLabel, $"DockPanel<{panel.Id}>");
 				titleLabel.AddChangeWatcher(() => panel.Title, text => titleLabel.Text = text);
 				closeButton.Clicked += () => {
 					Model.FindPanelPlacement(panel.Id).Hidden = true;
@@ -414,7 +414,8 @@ namespace Tangerine.UI.Docking
 					placement.Unlink();
 					windowPlacement.Root.RemoveRedundantNodes();
 					Model.AddWindow(wrapper);
-					wrapper.Placements.Add(new StretchPlacement(placement, 1));
+					wrapper.Placements.Add(placement);
+					wrapper.Stretches.Add(1);
 #if MAC
 					wrapper.Position = windowPosition - new Vector2(0, wrapper.Size.Y);
 #else
@@ -448,7 +449,7 @@ namespace Tangerine.UI.Docking
 				var windowPlacement = Model.WindowPlacements.FirstOrDefault(p => p.WindowWidget?.Window == window);
 				if (windowPlacement != null) {
 					windowPlacement.WindowWidget = null;
-					Model.HideWindowPanels(windowPlacement);
+					DockHierarchy.HideWindowPanels(windowPlacement);
 				}
 				return true;
 			};
@@ -493,13 +494,13 @@ namespace Tangerine.UI.Docking
 			return () => {
 				for (int i = 0; i < splitter.Nodes.Count; ++i) {
 					var stretch = splitter.Nodes[i].AsWidget.LayoutCell.Stretch;
-					placement.Placements[i].Stretch = placement.Direction == LinearPlacementDirection.Horizontal
+					placement.Stretches[i] = placement.Direction == LinearPlacementDirection.Horizontal
 						? stretch.X
 						: stretch.Y;
 				}
-				float total = placement.Placements.Select(p => p.Stretch).Aggregate((s1, s2) => s1 + s2);
-				foreach (var stretchPlacement in placement.Placements) {
-					stretchPlacement.Stretch /= total;
+				float total = placement.Stretches.Aggregate((s1, s2) => s1 + s2);
+				for (int i = 0; i < placement.Stretches.Count; ++i) {
+					placement.Stretches[i] /= total;
 				}
 			};
 		}
