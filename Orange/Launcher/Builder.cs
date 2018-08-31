@@ -57,6 +57,18 @@ namespace Launcher
 			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Orange/Orange.CLI/Orange.Mac.CLI.csproj");
 			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Orange/Orange.GUI/Orange.Win.GUI.csproj");
 			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Orange/Orange.GUI/Orange.Mac.GUI.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Tangerine/Tangerine.Core/Tangerine.Core.Win.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Tangerine/Tangerine.Core/Tangerine.Core.Mac.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Tangerine/Tangerine.UI/Tangerine.UI.Win.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Tangerine/Tangerine.UI/Tangerine.UI.Mac.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Tangerine/Tangerine.UI.FilesystemView/Tangerine.UI.FilesystemView.Win.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Tangerine/Tangerine.UI.FilesystemView/Tangerine.UI.FilesystemView.Mac.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Tangerine/Tangerine.UI.Inspector/Tangerine.UI.Inspector.Win.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Tangerine/Tangerine.UI.Inspector/Tangerine.UI.Inspector.Mac.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Tangerine/Tangerine.UI.SceneView/Tangerine.UI.SceneView.Win.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Tangerine/Tangerine.UI.SceneView/Tangerine.UI.SceneView.Mac.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Tangerine/Tangerine.UI.Timeline/Tangerine.UI.Timeline.Win.csproj");
+			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Tangerine/Tangerine.UI.Timeline/Tangerine.UI.Timeline.Mac.csproj");
 		}
 
 		public Task Start()
