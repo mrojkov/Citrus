@@ -165,20 +165,20 @@ namespace Tangerine.UI.Docking
 			return linearPlacement.Stretches[index] * 0.25f;
 		}
 
-		private static void ReplacePlacement(LinearPlacement linearPlacement, LinearPlacement target, DockSite site, ref float stretch, ref int index)
+		private static void ReplacePlacement(Placement old, LinearPlacement @new, DockSite site, ref float stretch, ref int index)
 		{
-			Placement placement = linearPlacement;
+			var placement = old;
 			index = site == DockSite.Bottom || site == DockSite.Right ? 1 : 0;
 			stretch = stretch < 0 ? 0.25f : stretch;
-			if (linearPlacement.Parent != null) {
-				var parentLinearPlacement = (LinearPlacement)linearPlacement.Parent;
-				parentLinearPlacement.Replace(linearPlacement, target);
+			if (old.Parent != null) {
+				var parentLinearPlacement = (LinearPlacement)old.Parent;
+				parentLinearPlacement.Replace(old, @new);
 			} else {
-				placement = linearPlacement.Placements[0];
-				linearPlacement.Replace(placement, target);
+				placement = ((LinearPlacement)old).Placements[0];
+				old.Replace(placement, @new);
 			}
-			target.Placements.Add(placement);
-			target.Stretches.Add(1 - stretch);
+			@new.Placements.Add(placement);
+			@new.Stretches.Add(1 - stretch);
 		}
 
 		public void DockPlacementTo(Placement placement, Placement target, DockSite site, float stretch)
@@ -235,7 +235,7 @@ namespace Tangerine.UI.Docking
 					target = parentTabBarPlacement;
 				}
 				if (!CheckPlacement((LinearPlacement)target.Parent, site, out parent)) {
-					ReplacePlacement((LinearPlacement)target.Parent, parent, site, ref stretch, ref index);
+					ReplacePlacement(target, parent, site, ref stretch, ref index);
 				}
 				else {
 					index = parent.Placements.IndexOf(target);
