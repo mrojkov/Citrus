@@ -9,6 +9,13 @@ namespace Tangerine.UI.Inspector
 	public class KeyframeButton : Button
 	{
 		readonly Image image;
+		readonly Image fillImage;
+		readonly Image outlintImage;
+		private static string[] iconNames = new[] { "Linear", "Step", "Catmullrom", "Loop" };
+		private List<ITexture> fillTextures = new List<ITexture>();
+		private List<ITexture> outlineTextures = new List<ITexture>();
+		private ClickGesture rightClickGesture;
+		KeyFunction function;
 		bool @checked;
 
 		public Color4 KeyColor { get; set; }
@@ -18,17 +25,46 @@ namespace Tangerine.UI.Inspector
 			set
 			{
 				@checked = value;
-				image.Color = value ? KeyColor : Theme.Colors.WhiteBackground;
+				fillImage.Visible = value;
+				outlintImage.Visible = value;
+				fillImage.Color = KeyColor;
+				outlintImage.Color = ColorTheme.Current.Inspector.BorderAroundKeyframeColorbox;
 			}
 		}
 
+		public void SetKeyFunction(KeyFunction function)
+		{
+			this.function = function;
+			fillImage.Texture = fillTextures[(int)function];
+			outlintImage.Texture = outlineTextures[(int)function];
+		}
+
+		private static void Awake(Node owner)
+		{
+			var kfb = (KeyframeButton)owner;
+			kfb.rightClickGesture = new ClickGesture(1);
+			kfb.Gestures.Add(kfb.rightClickGesture);
+		}
+
+		public bool WasRightClicked() => rightClickGesture?.WasRecognized() ?? false;
+
 		public KeyframeButton()
 		{
+			foreach (var v in Enum.GetValues(typeof(KeyFunction))) {
+				fillTextures.Add(IconPool.GetTexture("Inspector." + iconNames[(int)v] + "Fill"));
+				outlineTextures.Add(IconPool.GetTexture("Inspector." + iconNames[(int)v] + "Outline"));
+			}
 			Nodes.Clear();
-			Size = MinMaxSize = new Vector2(16, 16);
-			image = new Image { Size = Size, Shader = ShaderId.Silhuette, Texture = new SerializableTexture() };
+			Size = MinMaxSize = new Vector2(22, 22);
+			image = new Image { Size = Size, Shader = ShaderId.Silhuette, Texture = new SerializableTexture(), Color = Theme.Colors.WhiteBackground };
+			fillImage = new Image { Size = Size, Visible = true };
+			outlintImage = new Image { Size = Size, Visible = true };
+			Nodes.Add(outlintImage);
+			Nodes.Add(fillImage);
 			Nodes.Add(image);
-			image.PostPresenter = new WidgetBoundsPresenter(ColorTheme.Current.Inspector.BorderAroundKeyframeColorbox);
+			Layout = new StackLayout();
+			this.PostPresenter = new WidgetBoundsPresenter(ColorTheme.Current.Inspector.BorderAroundKeyframeColorbox);
+			Awoke += Awake;
 		}
 	}
 
@@ -45,19 +81,54 @@ namespace Tangerine.UI.Inspector
 
 		public IEnumerator<object> Task()
 		{
-			var provider = KeyframeDataflow.GetProvider(editorParams, i => i != null).DistinctUntilChanged();
-			var hasKeyframe = provider.GetDataflow();
+			var keyFunctionFlow = KeyframeDataflow.GetProvider(editorParams, i => i?.Function).DistinctUntilChanged().GetDataflow();
 			while (true) {
-				bool @checked;
-				if (hasKeyframe.Poll(out @checked)) {
-					button.Checked = @checked;
+				KeyFunction? kf;
+				keyFunctionFlow.Poll(out kf);
+				button.Checked = kf.HasValue;
+				if (kf.HasValue) {
+					button.SetKeyFunction(kf.Value);
 				}
 				if (button.WasClicked()) {
 					Document.Current.History.DoTransaction(() => {
-						SetKeyframe(!hasKeyframe.Value);
+						SetKeyframe(!kf.HasValue);
 					});
 				}
+				if (button.WasRightClicked()) {
+					if (kf.HasValue) {
+						var nextKeyFunction = NextKeyFunction(kf.GetValueOrDefault());
+						Document.Current.History.DoTransaction(() => {
+							SetKeyFunction(nextKeyFunction);
+						});
+					} else {
+						Document.Current.History.DoTransaction(() => {
+							SetKeyframe(true);
+						});
+					}
+				}
 				yield return null;
+			}
+		}
+
+		private static KeyFunction[] nextKeyFunction = {
+			KeyFunction.Spline, KeyFunction.ClosedSpline,
+			KeyFunction.Steep, KeyFunction.Linear
+		};
+
+		private static KeyFunction NextKeyFunction(KeyFunction value)
+		{
+			return nextKeyFunction[(int)value];
+		}
+
+		internal void SetKeyFunction(KeyFunction value)
+		{
+			foreach (var animable in editorParams.RootObjects.OfType<IAnimationHost>()) {
+				IAnimator animator;
+				if (animable.Animators.TryFind(editorParams.PropertyPath, out animator, Document.Current.AnimationId)) {
+					var keyframe = animator.ReadonlyKeys.FirstOrDefault(i => i.Frame == Document.Current.AnimationFrame).Clone();
+					keyframe.Function = value;
+					Core.Operations.SetKeyframe.Perform(animable, editorParams.PropertyPath, Document.Current.AnimationId, keyframe);
+				}
 			}
 		}
 
