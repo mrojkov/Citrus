@@ -17,7 +17,7 @@ namespace Lime
 	{
 		private Thread renderThread;
 		private ManualResetEvent renderReady = new ManualResetEvent(false);
-		private ManualResetEvent renderCompleted = new ManualResetEvent(false);
+		private ManualResetEvent renderCompleted = new ManualResetEvent(true);
 		
 		private static readonly IWindowManager WindowManager =
 			AndroidApp.Context.GetSystemService(AndroidContext.WindowService).JavaCast<IWindowManager>();
@@ -104,27 +104,27 @@ namespace Lime
 			
 			if (AsyncRendering) {
 				renderThread = new Thread(RenderLoop);
+				renderThread.IsBackground = true;
 				renderThread.Start();
 			}
 			
 			Application.WindowUnderMouse = this;
 			
-			var ccb = new ChoreographerCallback(skipFrameTimeout: 8 * 1000000L);
+			var ccb = new ChoreographerCallback();
 			long prevFrameTime = Java.Lang.JavaSystem.NanoTime();
 			ccb.OnFrame += frameTimeNanos => {
 				var delta = (float)((frameTimeNanos - prevFrameTime) / 1000000000d);
 				prevFrameTime = frameTimeNanos;
 				if (Active && ActivityDelegate.Instance.GameView.IsSurfaceCreated) {
-					RaiseSync();
-					if (AsyncRendering) {
-						renderReady.Set();
-					}
 					fpsCounter.Refresh();
 					Update(delta);
 					if (AsyncRendering) {
 						renderCompleted.WaitOne();
 						renderCompleted.Reset();
+						RaiseSync();
+						renderReady.Set();
 					} else {
+						RaiseSync();
 						Render();
 					}
 				}
@@ -134,22 +134,12 @@ namespace Lime
 		
 		class ChoreographerCallback : Java.Lang.Object, Choreographer.IFrameCallback
 		{
-			private long skipFrameTimeout;
-			
 			public event Action<long> OnFrame;
-
-			public ChoreographerCallback(long skipFrameTimeout)
-			{
-				this.skipFrameTimeout = skipFrameTimeout;
-			}
 
 			public void DoFrame(long frameTimeNanos)
 			{
 				Choreographer.Instance.PostFrameCallback(this);
-				//var now = Java.Lang.JavaSystem.NanoTime();
-				//if (now - frameTimeNanos < skipFrameTimeout) {
-					OnFrame?.Invoke(frameTimeNanos);
-				//}
+				OnFrame?.Invoke(frameTimeNanos);
 			}
 		}
 		
