@@ -36,7 +36,7 @@ namespace Tangerine.UI.Timeline.Processors
 	            switch (node) {
 		            case Widget widget:
 			            var nodes = widget.Parent.Nodes;
-			            AddLinks(links, new Property<SkinningWeights>(() => widget.SkinningWeights), view, nodes);
+			            AddLinks(links, widget.SkinningWeights, view, nodes);
 			            if (widget is DistortionMesh mesh) {
 				            foreach (var index in GetLinkedBoneIndexes(mesh)) {
 					            AddLink(links, index, view, nodes);
@@ -44,7 +44,7 @@ namespace Tangerine.UI.Timeline.Processors
 			            }
 			            break;
 		            case DistortionMeshPoint point:
-			            AddLinks(links, new Property<SkinningWeights>(() => point.SkinningWeights), view, point.Parent.Parent.Nodes);
+			            AddLinks(links, point.SkinningWeights, view, point.Parent.Parent.Nodes);
 			            break;
 	            }
             }
@@ -94,9 +94,8 @@ namespace Tangerine.UI.Timeline.Processors
 			}
 		}
 
-		private static void AddLinks(IDictionary<Bone, HashSet<RollNodeView>> links, Property<SkinningWeights> property, RollNodeView view, NodeList nodes)
+		private static void AddLinks(IDictionary<Bone, HashSet<RollNodeView>> links, SkinningWeights skinningWeights, RollNodeView view, NodeList nodes)
 		{
-			var skinningWeights = property.Getter();
 			if (skinningWeights?.IsEmpty() ?? true) {
 				return;
 			}
@@ -112,6 +111,9 @@ namespace Tangerine.UI.Timeline.Processors
 				return;
 			}
 			var bone = nodes.GetBone(index);
+			if (bone == null) {
+				return;
+			}
 			if (!links.ContainsKey(bone)) {
 				links.Add(bone, new HashSet<RollNodeView> { view });
 				view.LinkIndicatorButtonContainer.EnableIndication<BoneLinkIndicatorButton>().AddLinkedNode(bone);
