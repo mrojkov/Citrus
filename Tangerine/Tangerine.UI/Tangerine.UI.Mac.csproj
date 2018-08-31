@@ -68,6 +68,7 @@
     <Compile Include="ColorPicker.Win.cs" />
     <Compile Include="PropertyEditors\NodeIdPropertyEditor.cs" />
     <Compile Include="EmbeddedResources\ThemedIconResource.cs" />
+    <Compile Include="PropertyEditors\DropDownListPropertyEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Documentation\Documentation.cs" />

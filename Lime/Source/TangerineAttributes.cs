@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
+using Yuzu;
 
 namespace Lime
 {
@@ -121,6 +123,30 @@ namespace Lime
 		{
 			Group = group ?? "/";
 			AliasTypeName = aliasTypeName;
+		}
+	}
+
+	public sealed class TangerineDropDownListPropertyEditorAttribute : Attribute
+	{
+		private readonly string methodName;
+		private readonly Type type;
+		private Func<IEnumerable<(string, object)>> lister = null;
+
+		public TangerineDropDownListPropertyEditorAttribute(string methodName, Type type)
+		{
+			this.type = type;
+			this.methodName = methodName;
+		}
+
+		public IEnumerable<(string, object)> EnumerateItems()
+		{
+			var mi = type.GetMethod(methodName, BindingFlags.Static | BindingFlags.Public);
+			if (lister == null) {
+				var fn = type.GetMethod(methodName);
+				var e = Expression.Call(fn);
+				lister = Expression.Lambda<Func<IEnumerable<(string, object)>>>(e).Compile();
+			}
+			return lister();
 		}
 	}
 }

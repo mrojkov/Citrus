@@ -22,6 +22,13 @@ namespace Tangerine.UI.Inspector
 		InspectorPropertyRegistry()
 		{
 			Items = new List<RegistryItem>();
+			AddEditor(c => PropertyAttributes<TangerineDropDownListPropertyEditorAttribute>.Get(c.Type, c.PropertyName) != null,
+				c => {
+					var a = PropertyAttributes<TangerineDropDownListPropertyEditorAttribute>.Get(c.Type, c.PropertyName);
+					Type specializedDropDownListPropertyEditorType = typeof(DropDownListPropertyEditor<>).MakeGenericType(c.PropertyInfo.PropertyType);
+					return Activator.CreateInstance(specializedDropDownListPropertyEditorType, new object[] { c, a.EnumerateItems() }) as IPropertyEditor;
+				}
+			);
 			AddEditor(c => c.PropertyName == "ContentsPath", c => AllowChildren(c) ? new ContentsPathPropertyEditor(c) : null);
 			AddEditor(c => c.PropertyName == "Trigger", c => AllowChildren(c) ? new TriggerPropertyEditor(c) : null);
 			AddEditor(typeof(Vector2), c => new Vector2PropertyEditor(c));
