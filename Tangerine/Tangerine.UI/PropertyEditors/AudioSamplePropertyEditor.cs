@@ -14,5 +14,13 @@ namespace Tangerine.UI
 		{
 			SetProperty(new SerializableSample(path));
 		}
+
+		protected override string ValueToStringConverter(SerializableSample obj) {
+			return obj.SerializationPath ?? "";
+		}
+
+		protected override SerializableSample StringToValueConverter(string path) {
+			return new SerializableSample(path);
+		}
 	}
 }

@@ -37,5 +37,14 @@ namespace Tangerine.UI
 				editor.Text = CoalescedPropertyValue().GetValue();
 			}
 		}
+
+		protected override string ValueToStringConverter(string obj)
+		{
+			return obj ?? "";
+		}
+
+		protected override string StringToValueConverter(string path) {
+			return path;
+		}
 	}
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,11 +7,17 @@ using Tangerine.Core;
 
 namespace Tangerine.UI
 {
-	public abstract class FilePropertyEditor<T> : CommonPropertyEditor<T>
+	public abstract class FilePropertyEditor<T> : ExpandablePropertyEditor<T>
 	{
+		private class PrefixData {
+			public string Prefix { get; set; }
+		}
+
 		protected readonly EditBox editor;
 		protected readonly Button button;
 		protected static string LastOpenedDirectory = Project.Current.GetSystemDirectory(Document.Current.Path);
+
+		private readonly PrefixData prefix = new PrefixData();
 
 		protected FilePropertyEditor(IPropertyEditorParams editorParams, string[] allowedFileTypes) : base(editorParams)
 		{
@@ -47,7 +54,45 @@ namespace Tangerine.UI
 					LastOpenedDirectory = Project.Current.GetSystemDirectory(dlg.FileName);
 				}
 			};
+			ExpandableContent.Padding = new Thickness(24, 10, 2, 2);
+			var prefixEditor = new StringPropertyEditor(new PropertyEditorParams(ExpandableContent, prefix, nameof(PrefixData.Prefix)) { LabelWidth = 180 });
+			prefix.Prefix = GetLongestCommonPrefix(GetPaths());
+			ContainerWidget.AddChangeWatcher(() => prefix.Prefix, v => {
+				string oldPrefix = GetLongestCommonPrefix(GetPaths());
+				if (oldPrefix == v) {
+					return;
+				}
+				SetPathPrefix(oldPrefix, v);
+				prefix.Prefix = v.Trim('/');
+			});
 		}
+
+		private List<string> GetPaths()
+		{
+			var result = new List<string>();
+			foreach (var obj in EditorParams.Objects) {
+				var animationHost = obj as IAnimationHost;
+				var owner = obj;
+				AnimationUtils.PropertyData propertyData = AnimationUtils.PropertyData.Empty;
+				if (animationHost != null) {
+					(propertyData, owner) = AnimationUtils.GetPropertyByPath(animationHost, EditorParams.PropertyPath);
+				}
+				if (propertyData.Info != null) {
+					result.Add(ValueToStringConverter((T)propertyData.Info.GetValue(owner)));
+				} else {
+					result.Add(ValueToStringConverter((T)owner.GetType().GetProperty(EditorParams.PropertyName).GetValue(owner)));
+				}
+			}
+			return result;
+		}
+
+		private void SetPathPrefix(string oldPrefix, string prefix) =>
+			this.SetProperty<T>(current => StringToValueConverter(AssetPath.CorrectSlashes(
+				Path.Combine(prefix, ValueToStringConverter(current).Substring(oldPrefix.Length).TrimStart('/')))));
+
+		protected abstract string ValueToStringConverter(T obj);
+
+		protected abstract T StringToValueConverter(string path);
 
 		public void SetComponent(string text)
 		{
@@ -113,5 +158,26 @@ namespace Tangerine.UI
 				c == '_' || c == '.' || c == '!').ToList();
 
 		protected virtual IEnumerable<char> ValidChars => validchars;
+
+		public string GetLongestCommonPrefix(List<string> paths)
+		{
+			if (paths == null || paths.Count == 0) {
+				return String.Empty;
+			}
+			const char Separator = '/';
+			var directoryParts = new List<string>(paths[0].Split(Separator));
+			for (int index = 1; index < paths.Count; index++) {
+				var first = directoryParts;
+				var second = paths[index].Split(Separator);
+				int maxPrefixLength = Math.Min(first.Count, second.Length);
+				var tempDirectoryParts = new List<string>(maxPrefixLength);
+				for (int part = 0; part < maxPrefixLength; part++) {
+					if (first[part] == second[part])
+						tempDirectoryParts.Add(first[part]);
+				}
+				directoryParts = tempDirectoryParts;
+			}
+			return String.Join(Separator.ToString(), directoryParts);
+		}
 	}
 }
