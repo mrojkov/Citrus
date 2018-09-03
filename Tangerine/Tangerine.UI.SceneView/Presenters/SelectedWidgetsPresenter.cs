@@ -8,6 +8,9 @@ namespace Tangerine.UI.SceneView
 {
 	class SelectedWidgetsPresenter
 	{
+		private readonly VisualHint selectedWidgetPivotVisualHint =
+			VisualHintsRegistry.Instance.Register("/All/Selected Widget Pivot", hideRule: VisualHintsRegistry.HideRules.VisibleIfProjectOpened);
+
 		public SelectedWidgetsPresenter(SceneView sceneView)
 		{
 			sceneView.Frame.CompoundPostPresenter.Add(new SyncDelegatePresenter<Widget>(RenderSelection));
@@ -37,7 +40,14 @@ namespace Tangerine.UI.SceneView
 					Renderer.DrawLine(a, b, ColorTheme.Current.SceneView.SelectedWidget, 1);
 				}
 				var p = widget.CalcPositionInSpaceOf(canvas);
-				Renderer.DrawSprite(t, Color4.White, p - iconSize / 2, iconSize, Vector2.Zero, Vector2.One);
+				Renderer.DrawSprite(t, Color4.Transparent, p - iconSize / 2, iconSize, Vector2.Zero, Vector2.One);
+				if (selectedWidgetPivotVisualHint.Enabled) {
+					Renderer.DrawRectOutline(
+						p - iconSize / 2 - 5 * Vector2.One,
+						p + iconSize / 2 + 5 * Vector2.One,
+						ColorTheme.Current.SceneView.SelectedWidgetPivotOutline
+					);
+				}
 			}
 			Quadrangle hull;
 			Vector2 pivot;
