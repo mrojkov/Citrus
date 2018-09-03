@@ -45,6 +45,7 @@ namespace Tangerine.UI
 			var aabb = Rectangle.Empty;
 			pivot = Vector2.Zero;
 			hull = new Quadrangle();
+			float pivotTolerance = 1e-1f;
 			foreach (var widget in widgets) {
 				if (first == null) {
 					hull = widget.CalcHullInSpaceOf(canvas);
@@ -58,10 +59,10 @@ namespace Tangerine.UI
 						.IncludingPoint(new Vector2(t.Right, t.Top))
 						.IncludingPoint(t.B)
 						.IncludingPoint(new Vector2(t.Left, t.Bottom));
-					hull = aabb.ToQuadrangle();
-					pivotsEqual &= Vector2.Distance(widget.CalcPositionInSpaceOf(canvas), pivot) <= 1e-3;
+					pivotsEqual &= Vector2.Distance(widget.CalcPositionInSpaceOf(canvas), pivot) <= pivotTolerance;
 				}
 			}
+			hull = aabb.ToQuadrangle();
 			if (first == null) {
 				return false;
 			}

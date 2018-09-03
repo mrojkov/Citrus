@@ -13,18 +13,16 @@ namespace Tangerine.UI.SceneView
 		public IEnumerator<object> Task()
 		{
 			while (true) {
-				Quadrangle hull;
-				Vector2 pivot;
 				var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>();
 				if (
 					SceneView.Instance.InputArea.IsMouseOverThisOrDescendant() &&
 					sv.Input.IsKeyPressed(Key.Control) &&
-					Utils.CalcHullAndPivot(widgets, sv.Scene, out hull, out pivot) &&
+					Utils.CalcHullAndPivot(widgets, sv.Scene, out var hull, out var pivot) &&
 					sv.HitTestControlPoint(pivot))
 				{
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {
-						yield return Drag();
+						yield return sv.Input.IsKeyPressed(Key.Alt) ? DragShared(hull) : Drag();
 					}
 				}
 				yield return null;
@@ -36,18 +34,19 @@ namespace Tangerine.UI.SceneView
 			Any, Horizontal, Vertical
 		}
 
-		IEnumerator<object> Drag()
+		IEnumerator<object> DragShared(Quadrangle hull)
 		{
-			var iniMousePos = sv.MousePosition;
 			var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>().ToList();
 			using (Document.Current.History.BeginTransaction()) {
-				if (sv.Input.IsKeyPressed(Key.Alt)) {
+				while (sv.Input.IsMousePressed()) {
+					Document.Current.History.RollbackTransaction();
+					var curMousePos = SnapMousePosToSpecialPoints(hull, sv.MousePosition, Vector2.Zero);
 					foreach (var widget in widgets) {
 						var transform = sv.Scene.CalcTransitionToSpaceOf(widget);
-						var newPivot = iniMousePos * transform / widget.Size;
+						var newPivot = curMousePos * transform / widget.Size;
 						Core.Operations.SetAnimableProperty.Perform(
 							widget, nameof(Widget.Position),
-							iniMousePos * sv.Scene.CalcTransitionToSpaceOf(widget.ParentWidget),
+							curMousePos * sv.Scene.CalcTransitionToSpaceOf(widget.ParentWidget),
 							CoreUserPreferences.Instance.AutoKeyframes
 						);
 						Core.Operations.SetAnimableProperty.Perform(
@@ -55,61 +54,66 @@ namespace Tangerine.UI.SceneView
 							CoreUserPreferences.Instance.AutoKeyframes
 						);
 					}
+					yield return null;
 				}
-				using (Document.Current.History.BeginTransaction()) {
-					var dragDirection = DragDirection.Any;
-					Quadrangle hull;
-					Vector2 iniPivot;
-					Utils.CalcHullAndPivot(widgets, sv.Scene, out hull, out iniPivot);
-					while (sv.Input.IsMousePressed()) {
-						Document.Current.History.RollbackTransaction();
-						Utils.ChangeCursorIfDefault(MouseCursor.Hand);
-						var curMousePos = sv.MousePosition;
-						var shiftPressed = sv.Input.IsKeyPressed(Key.Shift);
-						if (shiftPressed && dragDirection != DragDirection.Any) {
-							if (dragDirection == DragDirection.Horizontal) {
-								curMousePos.Y = iniMousePos.Y;
-							} else if (dragDirection == DragDirection.Vertical) {
-								curMousePos.X = iniMousePos.X;
-							}
+				sv.Input.ConsumeKey(Key.Mouse0);
+				Document.Current.History.CommitTransaction();
+			}
+		}
+
+		IEnumerator<object> Drag()
+		{
+			var iniMousePos = sv.MousePosition;
+			var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>().ToList();
+			using (Document.Current.History.BeginTransaction()) {
+				var dragDirection = DragDirection.Any;
+				Utils.CalcHullAndPivot(widgets, sv.Scene, out var hull, out var iniPivot);
+				while (sv.Input.IsMousePressed()) {
+					Document.Current.History.RollbackTransaction();
+					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
+					var curMousePos = sv.MousePosition;
+					var shiftPressed = sv.Input.IsKeyPressed(Key.Shift);
+					if (shiftPressed && dragDirection != DragDirection.Any) {
+						if (dragDirection == DragDirection.Horizontal) {
+							curMousePos.Y = iniMousePos.Y;
+						} else if (dragDirection == DragDirection.Vertical) {
+							curMousePos.X = iniMousePos.X;
 						}
-						curMousePos = SnapMousePosToSpecialPoints(hull, curMousePos, iniMousePos - iniPivot);
-						if (
-							shiftPressed &&
-							dragDirection == DragDirection.Any &&
-							(curMousePos - iniMousePos).Length > 5
-						) {
-							var d = curMousePos - iniMousePos;
-							dragDirection =
-								d.X.Abs() > d.Y.Abs() ?
-								DragDirection.Horizontal :
-								DragDirection.Vertical;
-						}
-						for (int i = 0; i < widgets.Count; i++) {
-							var widget = widgets[i];
-							var transform = sv.Scene.CalcTransitionToSpaceOf(widget);
-							var dragDelta = curMousePos * transform - iniMousePos * transform;
-							var deltaPivot = dragDelta / widget.Size;
-							var deltaPos = Vector2.RotateDeg(dragDelta * widget.Scale, widget.Rotation);
-							deltaPivot = deltaPivot.Snap(Vector2.Zero);
-							if (deltaPivot != Vector2.Zero) {
-								Core.Operations.SetAnimableProperty.Perform(
-									widget, nameof(Widget.Pivot),
-									widget.Pivot + deltaPivot,
-									CoreUserPreferences.Instance.AutoKeyframes
-								);
-								Core.Operations.SetAnimableProperty.Perform(
-									widget, nameof(Widget.Position),
-									widget.Position + deltaPos.Snap(Vector2.Zero),
-									CoreUserPreferences.Instance.AutoKeyframes
-								);
-							}
-						}
-						yield return null;
 					}
-					sv.Input.ConsumeKey(Key.Mouse0);
-					Document.Current.History.CommitTransaction();
+					curMousePos = SnapMousePosToSpecialPoints(hull, curMousePos, iniMousePos - iniPivot);
+					if (
+						shiftPressed &&
+						dragDirection == DragDirection.Any &&
+						(curMousePos - iniMousePos).Length > 5
+					) {
+						var d = curMousePos - iniMousePos;
+						dragDirection =
+							d.X.Abs() > d.Y.Abs() ?
+							DragDirection.Horizontal :
+							DragDirection.Vertical;
+					}
+					foreach (var widget in widgets) {
+						var transform = sv.Scene.CalcTransitionToSpaceOf(widget);
+						var dragDelta = curMousePos * transform - iniMousePos * transform;
+						var deltaPivot = dragDelta / widget.Size;
+						var deltaPos = Vector2.RotateDeg(dragDelta * widget.Scale, widget.Rotation);
+						deltaPivot = deltaPivot.Snap(Vector2.Zero);
+						if (deltaPivot != Vector2.Zero) {
+							Core.Operations.SetAnimableProperty.Perform(
+								widget, nameof(Widget.Pivot),
+								widget.Pivot + deltaPivot,
+								CoreUserPreferences.Instance.AutoKeyframes
+							);
+							Core.Operations.SetAnimableProperty.Perform(
+								widget, nameof(Widget.Position),
+								widget.Position + deltaPos.Snap(Vector2.Zero),
+								CoreUserPreferences.Instance.AutoKeyframes
+							);
+						}
+					}
+					yield return null;
 				}
+				sv.Input.ConsumeKey(Key.Mouse0);
 				Document.Current.History.CommitTransaction();
 			}
 		}
