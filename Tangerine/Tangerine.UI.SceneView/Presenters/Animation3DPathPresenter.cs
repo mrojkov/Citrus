@@ -6,7 +6,7 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.SceneView
 {
-	public class Animation3DPathPresenter : CustomPresenter<Viewport3D>
+	public class Animation3DPathPresenter : SyncCustomPresenter<Viewport3D>
 	{
 		private List<Vector3> points = new List<Vector3>();
 		private List<Vector3> approximation = new List<Vector3>();

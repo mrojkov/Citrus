@@ -77,7 +77,7 @@ namespace Tangerine.UI.SceneView
 			}
 		}
 
-		private class RulerLinesPresenter : CustomPresenter<Widget>
+		private class RulerLinesPresenter : SyncCustomPresenter<Widget>
 		{
 			private readonly Widget leftRulerBar;
 			private readonly Widget topRulerBar;
@@ -171,7 +171,7 @@ namespace Tangerine.UI.SceneView
 			return step;
 		}
 
-		private class RulerBarPresenter : CustomPresenter<Widget>
+		private class RulerBarPresenter : SyncCustomPresenter<Widget>
 		{
 			private RulerOrientation RulerOrientation { get; set; }
 

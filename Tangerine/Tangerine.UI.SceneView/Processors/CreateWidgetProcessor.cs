@@ -41,7 +41,7 @@ namespace Tangerine.UI.SceneView
 					sv.Input.ConsumeKey(Key.Mouse0);
 					var t = sv.Scene.CalcTransitionToSpaceOf(container);
 					var rect = new Rectangle(sv.MousePosition * t, sv.MousePosition * t);
-					var presenter = new DelegatePresenter<Widget>(w => {
+					var presenter = new SyncDelegatePresenter<Widget>(w => {
 						w.PrepareRendererState();
 						var t2 = container.CalcTransitionToSpaceOf(sv.Frame);
 						DrawRectOutline(rect.A, (rect.A + rect.B) / 2, t2);

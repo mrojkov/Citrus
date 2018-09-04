@@ -6,7 +6,7 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.SceneView
 {
-	public class BonePresenter : CustomPresenter<Frame>
+	public class BonePresenter : SyncCustomPresenter<Frame>
 	{
 		public static float TipWidth => SceneUserPreferences.Instance.DefaultBoneWidth;
 
@@ -15,7 +15,7 @@ namespace Tangerine.UI.SceneView
 		public BonePresenter(SceneView sceneView)
 		{
 			sv = sceneView;
-			sceneView.Frame.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(Render));
+			sceneView.Frame.CompoundPostPresenter.Add(new SyncDelegatePresenter<Widget>(Render));
 		}
 
 

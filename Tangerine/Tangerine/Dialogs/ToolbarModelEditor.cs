@@ -67,7 +67,7 @@ namespace Tangerine.Dialogs
 		{
 			var result = new ListBox();
 			result.Content.Padding = new Thickness(6);
-			result.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(w => {
+			result.CompoundPostPresenter.Add(new SyncDelegatePresenter<Widget>(w => {
 				w.PrepareRendererState();
 				Renderer.DrawRectOutline(0, 0, w.Width, w.Height, Theme.Colors.ControlBorder);
 			}));

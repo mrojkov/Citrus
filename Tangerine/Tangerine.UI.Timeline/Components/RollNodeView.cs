@@ -61,7 +61,7 @@ namespace Tangerine.UI.Timeline.Components
 				LayoutCell = new LayoutCell(Alignment.Center, stretchX: 0),
 				Nodes = { expandButton }
 			};
-			expandButtonContainer.CompoundPresenter.Add(new DelegatePresenter<Widget>(widget => {
+			expandButtonContainer.CompoundPresenter.Add(new SyncDelegatePresenter<Widget>(widget => {
 				widget.PrepareRendererState();
 				var a = new Vector2(0, -4);
 				var b = widget.Size + new Vector2(0, 3);
@@ -108,7 +108,7 @@ namespace Tangerine.UI.Timeline.Components
 			label.AddChangeWatcher(() => nodeData.Node.Id, s => RefreshLabel());
 			label.AddChangeWatcher(() => IsGrayedLabel(nodeData.Node), s => RefreshLabel());
 			label.AddChangeWatcher(() => nodeData.Node.ContentsPath, s => RefreshLabel());
-			widget.CompoundPresenter.Push(new DelegatePresenter<Widget>(RenderBackground));
+			widget.CompoundPresenter.Push(new SyncDelegatePresenter<Widget>(RenderBackground));
 			editBox.Visible = false;
 			widget.Gestures.Add(new ClickGesture(1, ShowPropertyContextMenu));
 			widget.Gestures.Add(new DoubleClickGesture(() => {

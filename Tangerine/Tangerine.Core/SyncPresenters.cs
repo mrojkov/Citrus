@@ -3,7 +3,7 @@ using Lime;
 
 namespace Tangerine.Core
 {
-	public class CustomPresenter : IPresenter
+	public class SyncCustomPresenter : IPresenter
 	{
 		public virtual Lime.RenderObject GetRenderObject(Node node)
 		{
@@ -18,7 +18,7 @@ namespace Tangerine.Core
 		private class RenderObject : Lime.RenderObject
 		{
 			public Node Node;
-			public CustomPresenter Presenter;
+			public SyncCustomPresenter Presenter;
 
 			public override void Render()
 			{
@@ -30,10 +30,10 @@ namespace Tangerine.Core
 		}
 
 		public virtual bool PartialHitTest(Node node, ref HitTestArgs args) => false;
-		public virtual IPresenter Clone() { return (CustomPresenter)MemberwiseClone(); }
+		public virtual IPresenter Clone() { return (SyncCustomPresenter)MemberwiseClone(); }
 	}
 
-	public class CustomPresenter<T> : CustomPresenter where T : Node
+	public class SyncCustomPresenter<T> : SyncCustomPresenter where T : Node
 	{
 		public override sealed void Render(Node node)
 		{
@@ -49,23 +49,23 @@ namespace Tangerine.Core
 		protected virtual bool InternalPartialHitTest(T node, ref HitTestArgs args) => false;
 	}
 
-	public class DelegatePresenter<T> : CustomPresenter where T : Node
+	public class SyncDelegatePresenter<T> : SyncCustomPresenter where T : Node
 	{
 		public delegate bool HitTestDelegate(T node, ref HitTestArgs args);
 		readonly Action<T> render;
 		readonly HitTestDelegate hitTest;
 
-		public DelegatePresenter(Action<T> render)
+		public SyncDelegatePresenter(Action<T> render)
 		{
 			this.render = render;
 		}
 
-		public DelegatePresenter(HitTestDelegate hitTest)
+		public SyncDelegatePresenter(HitTestDelegate hitTest)
 		{
 			this.hitTest = hitTest;
 		}
 
-		public DelegatePresenter(Action<T> render, HitTestDelegate hitTest)
+		public SyncDelegatePresenter(Action<T> render, HitTestDelegate hitTest)
 		{
 			this.render = render;
 			this.hitTest = hitTest;

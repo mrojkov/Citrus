@@ -22,7 +22,7 @@ namespace Tangerine.UI.Timeline
 				MinMaxHeight = Metrics.ToolbarHeight,
 				HitTestTarget = true
 			};
-			RootWidget.CompoundPresenter.Add(new DelegatePresenter<Widget>(Render));
+			RootWidget.CompoundPresenter.Add(new SyncDelegatePresenter<Widget>(Render));
 			RootWidget.LateTasks.Add(
 				new KeyPressHandler(Key.Mouse0DoubleClick, RootWidget_DoubleClick),
 				new KeyPressHandler(Key.Mouse1, (input, key) => new ContextMenu().Show())

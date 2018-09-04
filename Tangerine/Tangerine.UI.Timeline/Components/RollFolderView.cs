@@ -57,7 +57,7 @@ namespace Tangerine.UI.Timeline.Components
 			};
 			widget.Components.Add(new AwakeBehavior());
 			label.AddChangeWatcher(() => folder.Id, s => label.Text = folder.Id);
-			widget.CompoundPresenter.Push(new DelegatePresenter<Widget>(RenderBackground));
+			widget.CompoundPresenter.Push(new SyncDelegatePresenter<Widget>(RenderBackground));
 			editBox.Visible = false;
 			widget.Tasks.Add(HandleDobleClickTask());
 		}

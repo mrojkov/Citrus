@@ -53,7 +53,7 @@ namespace Tangerine.UI.FilesystemView
 				Spacing = 5.0f,
 			};
 			RootWidget.Content.Padding = new Thickness(5.0f);
-			RootWidget.CompoundPresenter.Insert(1, new DelegatePresenter<Widget>((w) => {
+			RootWidget.CompoundPresenter.Insert(1, new SyncDelegatePresenter<Widget>((w) => {
 				w.PrepareRendererState();
 				var ratio = ChessCellSize * 1.0f;
 				Renderer.DrawSprite(

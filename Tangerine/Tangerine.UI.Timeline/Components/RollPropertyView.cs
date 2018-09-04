@@ -41,7 +41,7 @@ namespace Tangerine.UI.Timeline.Components
 				},
 			};
 			widget.Components.Add(new AwakeBehavior());
-			widget.CompoundPresenter.Push(new DelegatePresenter<Widget>(RenderBackground));
+			widget.CompoundPresenter.Push(new SyncDelegatePresenter<Widget>(RenderBackground));
 		}
 
 		ToolbarButton CreateExpandButton()

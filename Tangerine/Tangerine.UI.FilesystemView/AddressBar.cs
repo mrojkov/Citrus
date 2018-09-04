@@ -512,11 +512,11 @@ namespace Tangerine.UI.FilesystemView
 			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
 			rootWidget.AddChangeWatcher(() => WidgetContext.Current.NodeUnderMouse, (value) => Window.Current.Invalidate());
 
-			rootWidget.Presenter = new DelegatePresenter<Widget>(_ => {
+			rootWidget.Presenter = new SyncDelegatePresenter<Widget>(_ => {
 				rootWidget.PrepareRendererState();
 				Renderer.DrawRect(Vector2.One, rootWidget.ContentSize, Theme.Colors.DirectoryPickerBackground);
 			});
-			rootWidget.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(_ => {
+			rootWidget.CompoundPostPresenter.Add(new SyncDelegatePresenter<Widget>(_ => {
 				rootWidget.PrepareRendererState();
 				Renderer.DrawRectOutline(Vector2.Zero, rootWidget.ContentSize, Theme.Colors.DirectoryPickerOutline, thickness: 1);
 			}));
@@ -551,7 +551,7 @@ namespace Tangerine.UI.FilesystemView
 			foreach (var path in paths) {
 				FilesystemItem item;
 				items.Add(item = new FilesystemItem(path));
-				item.CompoundPresenter.Add(new DelegatePresenter<Widget>(_ => {
+				item.CompoundPresenter.Add(new SyncDelegatePresenter<Widget>(_ => {
 					if (item.IsMouseOverThisOrDescendant()) {
 						item.PrepareRendererState();
 						Renderer.DrawRect(Vector2.Zero, item.Size, Theme.Colors.DirectoryPickerItemHoveredBackground);

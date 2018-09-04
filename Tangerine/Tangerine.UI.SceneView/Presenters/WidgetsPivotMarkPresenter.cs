@@ -9,7 +9,7 @@ namespace Tangerine.UI.SceneView
 	{
 		public WidgetsPivotMarkPresenter(SceneView sceneView)
 		{
-			sceneView.Frame.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(RenderWidgetsPivotMark));
+			sceneView.Frame.CompoundPostPresenter.Add(new SyncDelegatePresenter<Widget>(RenderWidgetsPivotMark));
 		}
 
 		private void RenderWidgetsPivotMark(Widget canvas)

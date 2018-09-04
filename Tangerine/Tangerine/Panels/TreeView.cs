@@ -282,7 +282,7 @@ namespace Tangerine.Panels
 				treeNodeWidget.AddNode(rootNode.Nodes.Count > 0 ? expandButton : (Widget)expandJoint);
 				treeNodeWidget.AddNode(CreateLabel());
 				treeNodeWidget.AddNode(new Widget());
-				treeNodeWidget.CompoundPresenter.Add(new DelegatePresenter<Widget>(w => {
+				treeNodeWidget.CompoundPresenter.Add(new SyncDelegatePresenter<Widget>(w => {
 					if (view.selected == this) {
 						w.PrepareRendererState();
 						var color = view.parent.IsFocused()
@@ -338,7 +338,7 @@ namespace Tangerine.Panels
 					Texture = IconPool.GetTexture("Timeline.plus"),
 				};
 				expandButton.Clicked += ToggleExpanded;
-				expandButton.CompoundPresenter.Insert(0, new DelegatePresenter<Widget>(w => {
+				expandButton.CompoundPresenter.Insert(0, new SyncDelegatePresenter<Widget>(w => {
 					w.PrepareRendererState();
 					float iconSize = (w.Width - 2 * DefaultPadding) / 2;
 					Renderer.DrawLine(0, w.Height / 2, w.Width / 2 - iconSize, w.Height / 2, ColorTheme.Current.Hierarchy.JointColor);

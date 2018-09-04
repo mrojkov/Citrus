@@ -100,7 +100,7 @@ namespace Tangerine.UI
 				Nodes.Clear();
 				Size = MinMaxSize = new Vector2(25, Theme.Metrics.DefaultButtonSize.Y);
 				var color = colorProvider.GetDataflow();
-				PostPresenter = new DelegatePresenter<Widget>(widget => {
+				PostPresenter = new SyncDelegatePresenter<Widget>(widget => {
 					widget.PrepareRendererState();
 					Renderer.DrawRect(Vector2.Zero, widget.Size, Color4.White);
 					color.Poll();

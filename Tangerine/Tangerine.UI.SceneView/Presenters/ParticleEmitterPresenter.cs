@@ -5,7 +5,7 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.SceneView
 {
-	public class ParticleEmitterPresenter : CustomPresenter<ParticleEmitter>
+	public class ParticleEmitterPresenter : SyncCustomPresenter<ParticleEmitter>
 	{
 		protected override void InternalRender(ParticleEmitter emitter)
 		{

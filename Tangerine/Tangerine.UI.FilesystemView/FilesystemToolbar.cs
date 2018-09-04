@@ -24,7 +24,7 @@ namespace Tangerine.UI.FilesystemView
 			Padding = new Thickness(4);
 			MinMaxHeight = Metrics.ToolbarHeight;
 			MinWidth = 50;// TimelineMetrics.ToolbarMinWidth;
-			Presenter = new DelegatePresenter<Widget>(Render);
+			Presenter = new SyncDelegatePresenter<Widget>(Render);
 			Layout = new HBoxLayout { Spacing = 2, DefaultCell = new DefaultLayoutCell(Alignment.Center) };
 		}
 
@@ -45,7 +45,7 @@ namespace Tangerine.UI.FilesystemView
 			this.view = view;
 			Nodes.AddRange(
 				new Widget {
-					Presenter = new DelegatePresenter<Widget>((w) => {
+					Presenter = new SyncDelegatePresenter<Widget>((w) => {
 						w.PrepareRendererState();
 						Renderer.DrawLine(0.0f, w.Size.Y, w.Size.X, w.Size.Y, Theme.Colors.SeparatorColor);
 					}),

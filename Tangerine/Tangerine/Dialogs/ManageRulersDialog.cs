@@ -43,7 +43,7 @@ namespace Tangerine
 					}
 				}
 			};
-			container.CompoundPresenter.Add(new DelegatePresenter<Widget>(
+			container.CompoundPresenter.Add(new SyncDelegatePresenter<Widget>(
 				w => {
 					if (w.Parent == null) return;
 					var listView = (ThemedScrollView)w;

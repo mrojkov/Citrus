@@ -2,21 +2,22 @@ using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
 
-namespace Tangerine.Panels
+namespace Tangerine.UI.BackupHistoryPanel
 {
 	public class BackupHistoryPanel : IDocumentView
 	{
-		private static BackupManager.Backup currentBackup;
+		public readonly Widget PanelWidget;
+		public readonly Frame RootWidget;
+		readonly Widget resultPane;
+		readonly ThemedScrollView scrollView;
 
-		private readonly Widget panelWidget;
-		private readonly Frame rootWidget;
-		private readonly Widget resultPane;
-		private readonly ThemedScrollView scrollView;
+		private int SelectedIndex { get; set; }
+		private static BackupManager.Backup currenttBackup;
+
 		private readonly int rowHeight = Theme.Metrics.TextHeight;
 		private List<BackupManager.Backup> history = new List<BackupManager.Backup>();
-		private int selectedIndex;
 
-		private class Cmds
+		class Cmds
 		{
 			public static readonly ICommand Up = new Command(Key.Up);
 			public static readonly ICommand Down = new Command(Key.Down);
@@ -24,39 +25,40 @@ namespace Tangerine.Panels
 			public static readonly ICommand Enter = new Command(Key.Enter);
 		}
 
-		public BackupHistoryPanel(Widget panelWidget)
+		public BackupHistoryPanel(Widget rootWidget)
 		{
-			this.panelWidget = panelWidget;
-			scrollView = new ThemedScrollView { TabTravesable = new TabTraversable() };
-			this.rootWidget = new Frame {
+			PanelWidget = rootWidget;
+			scrollView = new ThemedScrollView();
+			RootWidget = new Frame {
 				Id = "BackupHistoryPanel",
 				Padding = new Thickness(4),
-				Layout = new VBoxLayout { Spacing = 4 },
-				Nodes = { scrollView }
+				Layout = new VBoxLayout {Spacing = 4},
+				Nodes = {scrollView}
 			};
 			resultPane = scrollView.Content;
-			resultPane.CompoundPresenter.Insert(0, new DelegatePresenter<Widget>(w => {
+			scrollView.TabTravesable = new TabTraversable();
+			resultPane.CompoundPresenter.Insert(0, new SyncDelegatePresenter<Widget>(w => {
 				w.PrepareRendererState();
-				if (selectedIndex == 0) {
+				if (SelectedIndex == 0) {
 					if (history?.Count > 0) {
 						Renderer.DrawRect(
-							0, rowHeight * selectedIndex,
-							w.Width, (selectedIndex + 1) * rowHeight,
+							0, rowHeight * SelectedIndex,
+							w.Width, (SelectedIndex + 1) * rowHeight,
 							Theme.Colors.SelectedBackground);
 					}
 				}
 
 				if (history?.Count > 0) {
 					Renderer.DrawRect(
-						0, rowHeight * selectedIndex,
-						w.Width, (selectedIndex + 1) * rowHeight,
+						0, rowHeight * SelectedIndex,
+						w.Width, (SelectedIndex + 1) * rowHeight,
 						Theme.Colors.SelectedBackground);
 				}
 			}));
 			scrollView.LateTasks.Add(new KeyRepeatHandler(ScrollView_KeyRepeated));
 		}
 
-		private void ScrollView_KeyRepeated(WidgetInput input, Key key)
+		void ScrollView_KeyRepeated(WidgetInput input, Key key)
 		{
 			if (history == null || history.Count < 1) {
 				return;
@@ -64,35 +66,35 @@ namespace Tangerine.Panels
 
 			if (key == Key.Mouse0) {
 				scrollView.SetFocus();
-				selectedIndex = (resultPane.LocalMousePosition().Y / rowHeight).Floor().Clamp(0, history.Count - 1);
+				SelectedIndex = (resultPane.LocalMousePosition().Y / rowHeight).Floor().Clamp(0, history.Count - 1);
 			} else if (Cmds.Down.WasIssued()) {
-				selectedIndex++;
+				SelectedIndex++;
 				Cmds.Down.Consume();
 			} else if (Cmds.Up.WasIssued()) {
-				selectedIndex--;
+				SelectedIndex--;
 				Cmds.Up.Consume();
 			} else if (Cmds.Cancel.WasIssued()) {
 				scrollView.RevokeFocus();
 				Cmds.Cancel.Consume();
 			} else if (Cmds.Enter.WasIssued() || key == Key.Mouse0DoubleClick) {
-				Document.Current.History.DoTransaction(() => NavigateToItem(selectedIndex));
+				Document.Current.History.DoTransaction(() => NavigateToItem(SelectedIndex));
 				Cmds.Enter.Consume();
 			} else {
 				return;
 			}
 
-			selectedIndex = selectedIndex.Clamp(0, history?.Count - 1 ?? 0);
-			EnsureRowVisible(selectedIndex);
+			SelectedIndex = SelectedIndex.Clamp(0, history?.Count - 1 ?? 0);
+			EnsureRowVisible(SelectedIndex);
 			Window.Current.Invalidate();
 		}
 
-		private void NavigateToItem(int index)
+		void NavigateToItem(int index)
 		{
-			currentBackup = history[history.Count - 1 - index];
+			currenttBackup = history[history.Count - 1 - index];
 			BackupManager.Instance.SelectBackup(history[history.Count - 1 - index]);
 		}
 
-		private void EnsureRowVisible(int row)
+		void EnsureRowVisible(int row)
 		{
 			while ((row + 1) * rowHeight > scrollView.ScrollPosition + scrollView.Height) {
 				scrollView.ScrollPosition++;
@@ -103,9 +105,9 @@ namespace Tangerine.Panels
 			}
 		}
 
-		private void RefreshHistory()
+		void RefreshHistory()
 		{
-			selectedIndex = 0;
+			SelectedIndex = 0;
 			resultPane.Nodes.Clear();
 			history?.Clear();
 			history = BackupManager.Instance.GetHistory(Document.Current);
@@ -117,13 +119,13 @@ namespace Tangerine.Panels
 				ColumnCount = 1,
 				ColumnSpacing = 8,
 				RowCount = history.Count,
-				ColumnDefaults = new List<DefaultLayoutCell> { new DefaultLayoutCell { StretchY = 0 } }
+				ColumnDefaults = new List<DefaultLayoutCell> {new DefaultLayoutCell { StretchY = 0}}
 			};
 
 			for (int i = history.Count - 1; i >= 0; i--) {
 				resultPane.Nodes.Add(new ThemedSimpleText(history[i].DateTime.ToString() + (history[i].IsActual ? "(Latest)" : "")));
-				if (currentBackup != null && currentBackup.DateTime.Equals(history[i].DateTime)) {
-					selectedIndex = history.Count - i - 1;
+				if (currenttBackup != null && currenttBackup.DateTime.Equals(history[i].DateTime)) {
+					SelectedIndex = history.Count - i - 1;
 				}
 			}
 
@@ -133,14 +135,14 @@ namespace Tangerine.Panels
 		public void Attach()
 		{
 			BackupManager.Instance.BackupSaved += RefreshHistory;
-			panelWidget.PushNode(rootWidget);
+			PanelWidget.PushNode(RootWidget);
 			RefreshHistory();
 		}
 
 		public void Detach()
 		{
 			BackupManager.Instance.BackupSaved -= RefreshHistory;
-			rootWidget.Unlink();
+			RootWidget.Unlink();
 		}
 	}
 }

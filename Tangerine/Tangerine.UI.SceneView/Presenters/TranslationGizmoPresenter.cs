@@ -6,11 +6,11 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.SceneView
 {
-	public class TranslationGizmoPresenter : CustomPresenter<Node3D>
+	public class TranslationGizmoPresenter : SyncCustomPresenter<Node3D>
 	{
 		public TranslationGizmoPresenter(SceneView sceneView)
 		{
-			sceneView.Frame.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(RenderSelection));
+			sceneView.Frame.CompoundPostPresenter.Add(new SyncDelegatePresenter<Widget>(RenderSelection));
 		}
 
 		private void RenderSelection(Widget canvas)

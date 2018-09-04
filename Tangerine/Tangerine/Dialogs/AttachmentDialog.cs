@@ -12,7 +12,7 @@ namespace Tangerine
 {
 	internal static class Presenters
 	{
-		public static IPresenter StripePresenter = new DelegatePresenter<Widget>(
+		public static IPresenter StripePresenter = new SyncDelegatePresenter<Widget>(
 			w => {
 				if (w.Parent != null) {
 					var i = w.Parent.AsWidget.Nodes.IndexOf(w);

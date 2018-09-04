@@ -91,7 +91,7 @@ namespace Tangerine.UI
 			var rootWidget = widget.GetRoot().AsWidget;
 			var newRowIndex = rowIndex;
 			var newPanelIndex = panelIndex;
-			var presenter = new DelegatePresenter<Widget>(w => {
+			var presenter = new SyncDelegatePresenter<Widget>(w => {
 				w.PrepareRendererState();
 				if (panelContainer == null) {
 					return;
@@ -180,7 +180,7 @@ namespace Tangerine.UI
 
 		private static void DecorateToolbar(Widget widget)
 		{
-			widget.CompoundPresenter.Add(new DelegatePresenter<Widget>(w => {
+			widget.CompoundPresenter.Add(new SyncDelegatePresenter<Widget>(w => {
 				if (!(w.Width > 0)) {
 					return;
 				}

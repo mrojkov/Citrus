@@ -19,13 +19,13 @@ namespace Tangerine.UI.Timeline.Components
 			GridWidget = new Widget {
 				LayoutCell = new LayoutCell {StretchY = 0},
 				MinHeight = TimelineMetrics.DefaultRowHeight,
-				Presenter = new DelegatePresenter<Widget>(Render)
+				Presenter = new SyncDelegatePresenter<Widget>(Render)
 			};
 			GridWidget.Components.Add(new AwakeBehavior());
 			OverviewWidget = new Widget {
 				LayoutCell = new LayoutCell {StretchY = 0},
 				MinHeight = TimelineMetrics.DefaultRowHeight,
-				Presenter = new DelegatePresenter<Widget>(Render)
+				Presenter = new SyncDelegatePresenter<Widget>(Render)
 			};
 			OverviewWidget.Components.Add(new AwakeBehavior());
 		}

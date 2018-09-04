@@ -22,7 +22,7 @@ namespace Tangerine.UI.SceneView
 			sceneView.Frame.AddChangeWatcher(
 				() => SceneUserPreferences.Instance.BackgroundColorB,
 				(v) => backgroundTexture = PrepareChessTexture(Color1, v));
-			sceneView.Scene.CompoundPresenter.Push(new DelegatePresenter<Widget>(w => {
+			sceneView.Scene.CompoundPresenter.Push(new SyncDelegatePresenter<Widget>(w => {
 				var ctr = SceneView.Instance.Frame;
 				if (ctr != null) {
 					ctr.PrepareRendererState();
@@ -52,7 +52,7 @@ namespace Tangerine.UI.SceneView
 			}));
 
 
-			sceneView.Scene.CompoundPostPresenter.Push(new DelegatePresenter<Widget>(w => {
+			sceneView.Scene.CompoundPostPresenter.Push(new SyncDelegatePresenter<Widget>(w => {
 				var frame = SceneView.Instance.Frame;
 				if (frame != null && !Core.Document.Current.PreviewAnimation && Core.Document.Current.Container is Widget) {
 					frame.PrepareRendererState();
@@ -69,7 +69,7 @@ namespace Tangerine.UI.SceneView
 				}
 			}));
 			sceneView.Scene.CompoundPostPresenter.Push(
-				new DelegatePresenter<Widget>(
+				new SyncDelegatePresenter<Widget>(
 					(w) => {
 						if (Document.Current.PreviewAnimation) {
 							var ctr = SceneView.Instance.Frame;
@@ -93,7 +93,7 @@ namespace Tangerine.UI.SceneView
 			));
 			var renderChain = new RenderChain();
 			sceneView.Frame.CompoundPostPresenter.Push(
-				new DelegatePresenter<Widget>(
+				new SyncDelegatePresenter<Widget>(
 					(w) => {
 						if (!Document.Current.ExpositionMode) {
 							foreach (var pair in Project.Current.Overlays) {
@@ -123,7 +123,7 @@ namespace Tangerine.UI.SceneView
 						}
 					}));
 			sceneView.Scene.CompoundPostPresenter.Push(
-				new DelegatePresenter<Widget>(
+				new SyncDelegatePresenter<Widget>(
 					(w) => {
 						if (!Document.Current.ResolutionPreview.Enabled) {
 							return;

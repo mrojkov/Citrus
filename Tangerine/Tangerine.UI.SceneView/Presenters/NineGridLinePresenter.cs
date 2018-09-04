@@ -10,7 +10,7 @@ namespace Tangerine.UI.SceneView
 	{
 		public NineGridLinePresenter(SceneView sceneView)
 		{
-			sceneView.Frame.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(Render));
+			sceneView.Frame.CompoundPostPresenter.Add(new SyncDelegatePresenter<Widget>(Render));
 		}
 
 		private static void Render(Widget canvas)

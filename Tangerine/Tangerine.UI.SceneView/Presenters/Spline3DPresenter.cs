@@ -6,7 +6,7 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.SceneView
 {
-	public class Spline3DPresenter : CustomPresenter<Viewport3D>
+	public class Spline3DPresenter : SyncCustomPresenter<Viewport3D>
 	{
 		List<SplinePoint3D> emptySelection = new List<SplinePoint3D>();
 		List<Vector3> splineApproximation = new List<Vector3>();

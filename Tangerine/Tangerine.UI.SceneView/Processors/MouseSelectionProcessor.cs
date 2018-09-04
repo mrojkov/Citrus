@@ -25,7 +25,7 @@ namespace Tangerine.UI.SceneView
 			while (true) {
 				if (input.WasMousePressed() && !input.IsKeyPressed(Key.Shift)) {
 					var rect = new Rectangle(sceneView.MousePosition, sceneView.MousePosition);
-					var presenter = new DelegatePresenter<Widget>(w => {
+					var presenter = new SyncDelegatePresenter<Widget>(w => {
 						w.PrepareRendererState();
 						var t = sceneView.Scene.CalcTransitionToSpaceOf(sceneView.Frame);
 						Renderer.DrawRectOutline(rect.A * t, rect.B * t, ColorTheme.Current.SceneView.MouseSelection);

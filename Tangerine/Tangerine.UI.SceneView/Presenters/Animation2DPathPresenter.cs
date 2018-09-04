@@ -21,7 +21,7 @@ namespace Tangerine.UI.SceneView
 		public Animation2DPathPresenter(SceneView sceneView)
 		{
 			sv = sceneView;
-			sceneView.Frame.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(Render));
+			sceneView.Frame.CompoundPostPresenter.Add(new SyncDelegatePresenter<Widget>(Render));
 		}
 
 		public void Render(Widget canvas)
