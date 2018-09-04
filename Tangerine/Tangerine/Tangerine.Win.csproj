@@ -81,47 +81,47 @@
     <Compile Include="AppUserPreferences.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Lemon\Lemon.Win.csproj">
+    <ProjectReference Include="..\..\Lemon\Lemon.Win.csproj">
       <Project>{538e41e4-725c-4521-bcf3-a5591a1a3afd}</Project>
       <Name>Lemon.Win</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Lime\Extensions\DynamicFont\DynamicFont.Win.csproj">
+    <ProjectReference Include="..\..\Lime\Extensions\DynamicFont\DynamicFont.Win.csproj">
       <Project>{fe8512bc-7a55-425c-8bc1-ad4d9785cf12}</Project>
       <Name>DynamicFont.Win</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Lime\Lime.Win.csproj">
+    <ProjectReference Include="..\..\Lime\Lime.Win.csproj">
       <Project>{fc2de6c9-641a-4230-8d29-ea4035cd8708}</Project>
       <Name>Lime.Win</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Orange\Orange.Win.csproj">
+    <ProjectReference Include="..\..\Orange\Orange.Win.csproj">
       <Project>{6f0c1a51-492a-4e6e-b302-e212d441ebf3}</Project>
       <Name>Orange.Win</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Yuzu\Yuzu.Win.csproj">
+    <ProjectReference Include="..\..\Yuzu\Yuzu.Win.csproj">
       <Project>{ddd2dfe9-ced2-4cea-adf0-5a6865865a46}</Project>
       <Name>Yuzu</Name>
     </ProjectReference>
-    <ProjectReference Include="Tangerine.Core\Tangerine.Core.Win.csproj">
+    <ProjectReference Include="..\Tangerine.Core\Tangerine.Core.Win.csproj">
       <Project>{05fb6476-c29b-49a7-918c-a52caf73fca7}</Project>
       <Name>Tangerine.Core.Win</Name>
     </ProjectReference>
-    <ProjectReference Include="Tangerine.UI.FilesystemView\Tangerine.UI.FilesystemView.Win.csproj">
+    <ProjectReference Include="..\Tangerine.UI.FilesystemView\Tangerine.UI.FilesystemView.Win.csproj">
       <Project>{74f91bd5-9e43-40fd-b8ea-b9819d1ca926}</Project>
       <Name>Tangerine.UI.FilesystemView.Win</Name>
     </ProjectReference>
-    <ProjectReference Include="Tangerine.UI.Inspector\Tangerine.UI.Inspector.Win.csproj">
+    <ProjectReference Include="..\Tangerine.UI.Inspector\Tangerine.UI.Inspector.Win.csproj">
       <Project>{d6b543cb-0223-4210-bb0f-7d8250760895}</Project>
       <Name>Tangerine.UI.Inspector.Win</Name>
     </ProjectReference>
-    <ProjectReference Include="Tangerine.UI.SceneView\Tangerine.UI.SceneView.Win.csproj">
+    <ProjectReference Include="..\Tangerine.UI.SceneView\Tangerine.UI.SceneView.Win.csproj">
       <Project>{80486551-a659-42b0-aada-165c54e9b0af}</Project>
       <Name>Tangerine.UI.SceneView.Win</Name>
     </ProjectReference>
-    <ProjectReference Include="Tangerine.UI.Timeline\Tangerine.UI.Timeline.Win.csproj">
+    <ProjectReference Include="..\Tangerine.UI.Timeline\Tangerine.UI.Timeline.Win.csproj">
       <Project>{db168347-08cc-40fc-b612-5a33a6877863}</Project>
       <Name>Tangerine.UI.Timeline.Win</Name>
     </ProjectReference>
-    <ProjectReference Include="Tangerine.UI\Tangerine.UI.Win.csproj">
+    <ProjectReference Include="..\Tangerine.UI\Tangerine.UI.Win.csproj">
       <Project>{e62ba18f-4e1a-466a-8299-67ad567f17e5}</Project>
       <Name>Tangerine.UI.Win</Name>
     </ProjectReference>
