@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Lime;
 
 namespace Tangerine.Core
@@ -14,7 +15,6 @@ namespace Tangerine.Core
 
 	public class DocumentHistory : ITransactionalHistory
 	{
-		public static readonly ProcessorList Processors = new ProcessorList();
 		private readonly Stack<int> transactionStartIndices = new Stack<int>();
 		private readonly List<IOperation> operations = new List<IOperation>();
 		private int transactionId;
@@ -28,6 +28,11 @@ namespace Tangerine.Core
 		public bool IsDocumentModified { get; private set; }
 		public bool IsTransactionActive => transactionStartIndices.Count > 0;
 		public event Action<IOperation> PerformingOperation;
+
+		public static void AddOperationProcessorTypes(IEnumerable<Type> types)
+		{
+			Processors.OperationProcessorTypes.AddRange(types);
+		}
 
 		public IDisposable BeginTransaction()
 		{
@@ -210,26 +215,75 @@ namespace Tangerine.Core
 			return false;
 		}
 
-		public class ProcessorList : List<IOperationProcessor>
+		private static class Processors
 		{
-			public void Do(IOperation operation)
+			private static readonly Dictionary<Type, IOperationProcessor> processorInstances = new Dictionary<Type, IOperationProcessor>();
+			public static readonly List<Type> OperationProcessorTypes = new List<Type>();
+
+			private static IOperationProcessor GetProcessor(Type t)
 			{
-				foreach (var p in this) {
-					p.Do(operation);
+				if (processorInstances.TryGetValue(t, out IOperationProcessor value)) {
+					return value;
 				}
+				value = (IOperationProcessor)Activator.CreateInstance(t);
+				processorInstances.Add(t, value);
+				return value;
+			}
+
+			public static void Do(IOperation operation)
+			{
+				Traverse(operation, (op, processor) => {
+					processor.Do(op);
+				});
 				operation.Performed = true;
 			}
 
-			public void Invert(IOperation operation)
+			public static void Invert(IOperation operation)
 			{
-				foreach (var p in this) {
+				Traverse(operation, (op, processor) => {
 					if (operation.Performed) {
-						p.Undo(operation);
+						processor.Undo(op);
 					} else {
-						p.Redo(operation);
+						processor.Redo(op);
+					}
+				});
+				operation.Performed = !operation.Performed;
+			}
+
+			private static void Traverse(IOperation operation, Action<IOperation, IOperationProcessor> action)
+			{
+				foreach (var processorType in OperationProcessorTypes) {
+					if (!typeof(IOperationProcessor).IsAssignableFrom(processorType)) {
+						throw new InvalidOperationException();
+					}
+					var operationType = operation.GetType();
+					Type genericOperationProcessorType = null;
+					var t = processorType;
+					while (t != null && t != typeof(object)) {
+						if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(OperationProcessor<>)) {
+							genericOperationProcessorType = t;
+							break;
+						}
+						t = t.BaseType;
+					}
+					if (genericOperationProcessorType != null) {
+						var operationTypeOfProcessor = genericOperationProcessorType.GetGenericArguments().First();
+						if (operationType.IsGenericType) {
+							var operationGenericArguments = operationType.GetGenericArguments();
+							if (
+								operationTypeOfProcessor.IsGenericType &&
+							    operationType.GetGenericTypeDefinition() == operationTypeOfProcessor.GetGenericTypeDefinition()
+							) {
+								var specializedGenericProcessor = processorType.MakeGenericType(operationGenericArguments);
+								action(operation, GetProcessor(specializedGenericProcessor));
+							}
+						} else if (operationType == operationTypeOfProcessor) {
+							action(operation, GetProcessor(processorType));
+						}
+					} else {
+						action(operation, GetProcessor(processorType));
 					}
 				}
-				operation.Performed = !operation.Performed;
 			}
 		}
 	}

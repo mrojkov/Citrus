@@ -47,21 +47,18 @@ namespace Tangerine.UI.Timeline
 
 		public event Action<Vector2> OffsetChanged;
 
-		public static IEnumerable<IOperationProcessor> GetOperationProcessors()
-		{
-			return new IOperationProcessor[] {
-				new EnsureRowVisibleIfSelected(),
-				new EnsureCurrentColumnVisibleIfContainerChanged(),
-				new ColumnCountUpdater(),
-				new RowViewsUpdater(),
-				new RollWidgetsUpdater(),
-				new OverviewWidgetsUpdater(),
-				new GridWidgetsUpdater(),
-				new ImageCombinerLinkIndicationProcessor(),
-				new BoneLinkIndicationProcessor(),
-				new SplineGearLinkIndicationProcessor(),
-			};
-		}
+		public static IEnumerable<Type> GetOperationProcessorTypes() => new [] {
+			typeof(EnsureRowVisibleIfSelected),
+			typeof(EnsureCurrentColumnVisibleIfContainerChanged),
+			typeof(ColumnCountUpdater),
+			typeof(RowViewsUpdater),
+			typeof(RollWidgetsUpdater),
+			typeof(OverviewWidgetsUpdater),
+			typeof(GridWidgetsUpdater),
+			typeof(ImageCombinerLinkIndicationProcessor),
+			typeof(BoneLinkIndicationProcessor),
+			typeof(SplineGearLinkIndicationProcessor),
+		};
 
 		public Timeline(Panel panel)
 		{
