@@ -50,8 +50,6 @@ namespace Lime
 			var ro = RenderObjectPool<RenderObject>.Acquire();
 			ro.CaptureRenderState(this);
 			ro.Texture = Texture;
-			ro.Vertices.Clear();
-			ro.Indices.Clear();
 			for (var n = FirstChild; n != null; n = n.NextSibling) {
 				var p = (DistortionMeshPoint)n;
 				ro.Vertices.Add(new Vertex {
@@ -79,6 +77,13 @@ namespace Lime
 			public readonly List<Vertex> Vertices = new List<Vertex>();
 			public readonly List<int> Indices = new List<int>();
 			public ITexture Texture;
+
+			protected override void OnRelease()
+			{
+				Texture = null;
+				Vertices.Clear();
+				Indices.Clear();
+			}
 
 			public override void Render()
 			{

@@ -190,6 +190,11 @@ namespace Lime
 					Renderer.DrawSprite(Texture, Color, part.Rect.A, part.Rect.Size, part.UV.A, part.UV.B);
 				}
 			}
+
+			protected override void OnRelease()
+			{
+				Texture = null;
+			}
 		}
 	}
 }

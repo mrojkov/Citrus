@@ -545,6 +545,11 @@ namespace Lime
 					}
 				}
 			}
+
+			protected override void OnRelease()
+			{
+				SpriteList = null;
+			}
 		}
 
 		private class ColorfulMaterialProvider : Sprite.IMaterialProvider

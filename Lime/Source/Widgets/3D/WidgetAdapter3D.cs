@@ -98,7 +98,6 @@ namespace Lime
 			ro.DistanceToCamera = CalcDistanceToCamera(Viewport.Camera);
 			try {
 				Widget.RenderChainBuilder?.AddToRenderChain(renderChain);
-				ro.Objects.Clear();
 				renderChain.GetRenderObjects(ro.Objects);
 			} finally {
 				renderChain.Clear();
@@ -119,6 +118,11 @@ namespace Lime
 				Objects.Render();
 				Renderer.Flush();
 				Renderer.PopState();
+			}
+
+			protected override void OnRelease()
+			{
+				Objects.Clear();
 			}
 		}
 	}

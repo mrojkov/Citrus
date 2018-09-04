@@ -197,6 +197,13 @@ namespace Lime
 				Renderer.DrawTriangleFan(Arg1Texture, Arg2Texture, Material, vertices, numCoords);
 			}
 
+			protected override void OnRelease()
+			{
+				Material = null;
+				Arg1Texture = null;
+				Arg2Texture = null;
+			}
+
 			static readonly Vector2[] outVertices = new Vector2[64];
 
 			private void ClipPolygonByLine(Vector2[] vertices, ref int numVertices, Vector2 a, Vector2 b)

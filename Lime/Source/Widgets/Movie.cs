@@ -143,6 +143,11 @@ namespace Lime
 				PrepareRenderState();
 				Renderer.DrawSprite(Texture, Color, Vector2.Zero, Size, Vector2.Zero, Vector2.One);
 			}
+
+			protected override void OnRelease()
+			{
+				Texture = null;
+			}
 		}
 	}
 }

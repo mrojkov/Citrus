@@ -205,8 +205,6 @@ namespace Lime
 				foreach (var node in Nodes) {
 					node.RenderChainBuilder?.AddToRenderChain(renderChain);
 				}
-				ro.Layers.Clear();
-				ro.Objects.Clear();
 				for (var i = 0; i < RenderChain.LayerCount; i++) {
 					var layer = renderChain.Layers[i];
 					if (layer == null || layer.Count == 0) {
@@ -242,6 +240,12 @@ namespace Lime
 			public Matrix44 Projection;
 			public RenderObjectList Objects = new RenderObjectList();
 			public List<RenderLayer> Layers = new List<RenderLayer>();
+
+			protected override void OnRelease()
+			{
+				Objects.Clear();
+				Layers.Clear();
+			}
 
 			public override void Render()
 			{

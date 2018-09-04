@@ -234,9 +234,6 @@ namespace Lime
 				ro.Bones = new Matrix44[totalBoneCount];
 				ro.BoneBindPoses = new Matrix44[totalBoneCount];
 			}
-			ro.Meshes.Clear();
-			ro.Materials.Clear();
-			ro.Submeshes.Clear();
 			var firstBone = 0;
 			foreach (var submesh in Submeshes) {
 				for (var i = 0; i < submesh.Bones.Count; i++) {
@@ -269,6 +266,13 @@ namespace Lime
 			public List<Mesh<Vertex>> Meshes = new List<Mesh<Vertex>>();
 			public List<IMaterial> Materials = new List<IMaterial>();
 			public List<SubmeshRenderData> Submeshes = new List<SubmeshRenderData>();
+
+			protected override void OnRelease()
+			{
+				Meshes.Clear();
+				Materials.Clear();
+				Submeshes.Clear();
+			}
 
 			public override void Render()
 			{

@@ -943,7 +943,6 @@ namespace Lime
 			}
 			ro.Blending = GlobalBlending;
 			ro.Shader = GlobalShader;
-			ro.Particles.Clear();
 			foreach (var p in particles) {
 				if (p.ColorCurrent.A <= 0) {
 					continue;
@@ -1051,6 +1050,11 @@ namespace Lime
 					Renderer.Transform1 = p.Transform * Matrix;
 					Renderer.DrawSprite(p.Texture, p.Color * Color, -Vector2.Half, Vector2.One, Vector2.Zero, Vector2.One);
 				}
+			}
+
+			protected override void OnRelease()
+			{
+				Particles.Clear();
 			}
 		}
 

@@ -208,7 +208,6 @@ namespace Lime
 			foreach (var node in Nodes) {
 				node.RenderChainBuilder?.AddToRenderChain(renderChain);
 			}
-			ro.Objects.Clear();
 			renderChain.GetRenderObjects(ro.Objects);
 			return ro;
 		}
@@ -222,6 +221,12 @@ namespace Lime
 			public WindowRect ScissorRect;
 			public bool StencilTest;
 			public Rectangle StencilRect;
+
+			protected override void OnRelease()
+			{
+				Objects.Clear();
+				RenderTexture = null;
+			}
 
 			public override void Render()
 			{

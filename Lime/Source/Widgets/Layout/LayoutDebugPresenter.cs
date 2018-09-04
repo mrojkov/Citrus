@@ -24,7 +24,6 @@ namespace Lime
 			ro.CaptureRenderState(widget);
 			ro.Color = Color;
 			ro.Thickness = Thickness > 0 ? Thickness : 1 / CommonWindow.Current.PixelScale;
-			ro.DebugRectangles.Clear();
 			foreach (var r in widget.Layout.DebugRectangles) {
 				ro.DebugRectangles.Add(r);
 			}
@@ -47,6 +46,11 @@ namespace Lime
 				foreach (var r in DebugRectangles) {
 					Renderer.DrawRectOutline(r.A, r.B, Color, Thickness);
 				}
+			}
+
+			protected override void OnRelease()
+			{
+				DebugRectangles.Clear();
 			}
 		}
 	}

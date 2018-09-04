@@ -147,6 +147,11 @@ namespace Lime
 				PrepareRenderState();
 				Shape.Draw(transform, Color);
 			}
+
+			protected override void OnRelease()
+			{
+				Shape = null;
+			}
 		}
 	}
 

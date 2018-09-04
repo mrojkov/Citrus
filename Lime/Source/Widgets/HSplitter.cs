@@ -44,7 +44,6 @@ namespace Lime
 				ro.CaptureRenderState(splitter);
 				ro.SeparatorWidth = splitter.SeparatorWidth;
 				ro.SeparatorColor = splitter.SeparatorColor;
-				ro.Lines.Clear();
 				GetLines(splitter, ro.Lines);
 				return ro;
 			}
@@ -67,6 +66,11 @@ namespace Lime
 						var p2 = Lines[i + 1];
 						Renderer.DrawLine(p1, p2, SeparatorColor, thickness: SeparatorWidth);
 					}
+				}
+
+				protected override void OnRelease()
+				{
+					Lines.Clear();
 				}
 			}
 		}

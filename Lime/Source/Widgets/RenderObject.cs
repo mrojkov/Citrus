@@ -8,6 +8,18 @@ namespace Lime
 		internal bool Free = true;
 
 		public abstract void Render();
+
+		public void Release()
+		{
+			if (Free) return;
+			try {
+				OnRelease();
+			} finally {
+				Free = true;
+			}
+		}
+
+		protected virtual void OnRelease() { }
 	}
 
 	public class RenderObjectList : IReadOnlyList<RenderObject>, IEnumerable<RenderObject>
@@ -26,7 +38,7 @@ namespace Lime
 		public void Clear()
 		{
 			foreach (var obj in objects) {
-				obj.Free = true;
+				obj.Release();
 			}
 			objects.Clear();
 		}
