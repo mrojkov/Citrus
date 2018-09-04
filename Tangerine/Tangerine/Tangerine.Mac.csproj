@@ -71,7 +71,7 @@
     <Reference Include="System.Core" />
     <Reference Include="Xamarin.Mac" />
     <Reference Include="Lzma">
-      <HintPath>..\3rdParty\Lzma\bin\Release\Lzma.dll</HintPath>
+      <HintPath>..\..\3rdParty\Lzma\bin\Release\Lzma.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -119,47 +119,47 @@
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\Lime\Extensions\DynamicFont\DynamicFont.Mac.csproj">
+    <ProjectReference Include="..\..\Lime\Extensions\DynamicFont\DynamicFont.Mac.csproj">
       <Project>{B5F74505-80BB-4373-B194-219D743C1FA0}</Project>
       <Name>DynamicFont.Mac</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Lemon\Lemon.Mac.csproj">
+    <ProjectReference Include="..\..\Lemon\Lemon.Mac.csproj">
       <Project>{BB697671-700C-455D-B8EE-66A6B122B949}</Project>
       <Name>Lemon.Mac</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Lime\Lime.Mac.csproj">
+    <ProjectReference Include="..\..\Lime\Lime.Mac.csproj">
       <Project>{DC16EEBF-404D-4610-B87A-15B57464D707}</Project>
       <Name>Lime.Mac</Name>
     </ProjectReference>
-    <ProjectReference Include="Tangerine.Core\Tangerine.Core.Mac.csproj">
+    <ProjectReference Include="..\Tangerine.Core\Tangerine.Core.Mac.csproj">
       <Project>{05FB6476-C29B-49A7-918C-A52CAF73FCA7}</Project>
       <Name>Tangerine.Core.Mac</Name>
     </ProjectReference>
-    <ProjectReference Include="Tangerine.UI\Tangerine.UI.Mac.csproj">
+    <ProjectReference Include="..\Tangerine.UI\Tangerine.UI.Mac.csproj">
       <Project>{E62BA18F-4E1A-466A-8299-67AD567F17E5}</Project>
       <Name>Tangerine.UI.Mac</Name>
     </ProjectReference>
-    <ProjectReference Include="Tangerine.UI.Timeline\Tangerine.UI.Timeline.Mac.csproj">
+    <ProjectReference Include="..\Tangerine.UI.Timeline\Tangerine.UI.Timeline.Mac.csproj">
       <Project>{FB325FE1-F328-4755-885F-E713BD7E7DAD}</Project>
       <Name>Tangerine.UI.Timeline.Mac</Name>
     </ProjectReference>
-    <ProjectReference Include="Tangerine.UI.Inspector\Tangerine.UI.Inspector.Mac.csproj">
+    <ProjectReference Include="..\Tangerine.UI.Inspector\Tangerine.UI.Inspector.Mac.csproj">
       <Project>{D6B543CB-0223-4210-BB0F-7D8250760895}</Project>
       <Name>Tangerine.UI.Inspector.Mac</Name>
     </ProjectReference>
-    <ProjectReference Include="Tangerine.UI.SceneView\Tangerine.UI.SceneView.Mac.csproj">
+    <ProjectReference Include="..\Tangerine.UI.SceneView\Tangerine.UI.SceneView.Mac.csproj">
       <Project>{80486551-A659-42B0-AADA-165C54E9B0AF}</Project>
       <Name>Tangerine.UI.SceneView.Mac</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Yuzu\Yuzu.Mac.csproj">
+    <ProjectReference Include="..\..\Yuzu\Yuzu.Mac.csproj">
       <Project>{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}</Project>
       <Name>Yuzu.Mac</Name>
     </ProjectReference>
-    <ProjectReference Include="Tangerine.UI.FilesystemView\Tangerine.UI.FilesystemView.Mac.csproj">
+    <ProjectReference Include="..\Tangerine.UI.FilesystemView\Tangerine.UI.FilesystemView.Mac.csproj">
       <Project>{8799EA66-04E0-4075-95FE-BF0EC1BC88A1}</Project>
       <Name>Tangerine.UI.FilesystemView.Mac</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Orange\Orange.Mac.csproj">
+    <ProjectReference Include="..\..\Orange\Orange.Mac.csproj">
       <Project>{4B2BDD5A-2AAE-46AE-AA1A-8C9308BAA50D}</Project>
       <Name>Orange.Mac</Name>
     </ProjectReference>
@@ -169,15 +169,15 @@
     </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <NativeReference Include="..\3rdParty\FreeType\libfreetype6.dylib">
+    <NativeReference Include="..\..\3rdParty\FreeType\libfreetype6.dylib">
       <Kind>Dynamic</Kind>
       <SmartLink>False</SmartLink>
     </NativeReference>
-    <NativeReference Include="..\Lemon\Library\bin\Mac\Release\libLemon.dylib">
+    <NativeReference Include="..\..\Lemon\Library\bin\Mac\Release\libLemon.dylib">
       <Kind>Dynamic</Kind>
       <SmartLink>False</SmartLink>
     </NativeReference>
-    <NativeReference Include="..\3rdParty\FbxSdk\libFbxSdkUtils.dylib">
+    <NativeReference Include="..\..\3rdParty\FbxSdk\libFbxSdkUtils.dylib">
       <Kind>Dynamic</Kind>
       <SmartLink>False</SmartLink>
     </NativeReference>
