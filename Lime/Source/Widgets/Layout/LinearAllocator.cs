@@ -23,7 +23,7 @@ namespace Lime
 				float allocatedSize = 0;
 				foreach (var i in indices) {
 					var c = constraints[i];
-					var s = availableSize * c.Stretch / totalStretch;
+					var s = availableSize * (c.Stretch / totalStretch);
 					s = Mathf.Clamp(s, c.MinSize, c.MaxSize);
 					allocatedSize += (sizes[i] = s);
 				}
