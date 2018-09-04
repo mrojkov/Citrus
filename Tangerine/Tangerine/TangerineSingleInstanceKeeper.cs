@@ -1,3 +1,4 @@
+#if WIN
 using System;
 using System.IO;
 using System.IO.Pipes;
@@ -156,3 +157,4 @@ namespace Tangerine
 		}
 	}
 }
+#endif

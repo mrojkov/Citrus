@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -86,6 +86,8 @@
     <ImageAsset Include="Resources\Images.xcassets\AppIcons.appiconset\AppIcon-32%402x.png" />
     <ImageAsset Include="Resources\Images.xcassets\AppIcons.appiconset\AppIcon-512.png" />
     <ImageAsset Include="Resources\Images.xcassets\AppIcons.appiconset\AppIcon-512%402x.png" />
+    <Compile Include="Main.Win.cs" />
+    <Compile Include="TangerineSingleInstanceKeeper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -166,7 +168,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\**" />
-    </ItemGroup>
+  </ItemGroup>
   <ItemGroup />
   <ItemGroup>
     <NativeReference Include="..\..\3rdParty\FreeType\libfreetype6.dylib">
@@ -181,7 +183,7 @@
       <Kind>Dynamic</Kind>
       <SmartLink>False</SmartLink>
     </NativeReference>
-  </ItemGroup>  
+  </ItemGroup>
   <ItemGroup>
     <Content Include="Documentation\**" />
   </ItemGroup>

@@ -44,35 +44,38 @@ namespace Launcher
 
 		private void SynchronizeAllProjects()
 		{
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Yuzu/Yuzu.Win.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Yuzu/Yuzu.Mac.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Yuzu/Yuzu.iOS.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Yuzu/Yuzu.Android.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Lime/Lime.Win.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Lime/Lime.Mac.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Lime/Lime.iOS.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Lime/Lime.Android.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Lime/Lime.MonoMac.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Kumquat/Kumquat.Win.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Kumquat/Kumquat.Mac.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Orange/Orange.Win.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Orange/Orange.Mac.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Orange/Orange.CLI/Orange.Win.CLI.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Orange/Orange.CLI/Orange.Mac.CLI.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Orange/Orange.GUI/Orange.Win.GUI.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Orange/Orange.GUI/Orange.Mac.GUI.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Tangerine/Tangerine.Core/Tangerine.Core.Win.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Tangerine/Tangerine.Core/Tangerine.Core.Mac.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Tangerine/Tangerine.UI/Tangerine.UI.Win.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Tangerine/Tangerine.UI/Tangerine.UI.Mac.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Tangerine/Tangerine.UI.FilesystemView/Tangerine.UI.FilesystemView.Win.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Tangerine/Tangerine.UI.FilesystemView/Tangerine.UI.FilesystemView.Mac.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Tangerine/Tangerine.UI.Inspector/Tangerine.UI.Inspector.Win.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Tangerine/Tangerine.UI.Inspector/Tangerine.UI.Inspector.Mac.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Tangerine/Tangerine.UI.SceneView/Tangerine.UI.SceneView.Win.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Tangerine/Tangerine.UI.SceneView/Tangerine.UI.SceneView.Mac.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Tangerine/Tangerine.UI.Timeline/Tangerine.UI.Timeline.Win.csproj");
-			Orange.CsprojSynchronization.SynchronizeProject($"{citrusDirectory}/Tangerine/Tangerine.UI.Timeline/Tangerine.UI.Timeline.Mac.csproj");
+			void Sync(string csprojPath) =>	Orange.CsprojSynchronization.SynchronizeProject(citrusDirectory + "/" + csprojPath);
+			Sync("Yuzu/Yuzu.Win.csproj");
+			Sync("Yuzu/Yuzu.Mac.csproj");
+			Sync("Yuzu/Yuzu.iOS.csproj");
+			Sync("Yuzu/Yuzu.Android.csproj");
+			Sync("Lime/Lime.Win.csproj");
+			Sync("Lime/Lime.Mac.csproj");
+			Sync("Lime/Lime.iOS.csproj");
+			Sync("Lime/Lime.Android.csproj");
+			Sync("Lime/Lime.MonoMac.csproj");
+			Sync("Kumquat/Kumquat.Win.csproj");
+			Sync("Kumquat/Kumquat.Mac.csproj");
+			Sync("Orange/Orange.Win.csproj");
+			Sync("Orange/Orange.Mac.csproj");
+			Sync("Orange/Orange.CLI/Orange.Win.CLI.csproj");
+			Sync("Orange/Orange.CLI/Orange.Mac.CLI.csproj");
+			Sync("Orange/Orange.GUI/Orange.Win.GUI.csproj");
+			Sync("Orange/Orange.GUI/Orange.Mac.GUI.csproj");
+			Sync("Tangerine/Tangerine.Core/Tangerine.Core.Win.csproj");
+			Sync("Tangerine/Tangerine.Core/Tangerine.Core.Mac.csproj");
+			Sync("Tangerine/Tangerine.UI/Tangerine.UI.Win.csproj");
+			Sync("Tangerine/Tangerine.UI/Tangerine.UI.Mac.csproj");
+			Sync("Tangerine/Tangerine.UI.FilesystemView/Tangerine.UI.FilesystemView.Win.csproj");
+			Sync("Tangerine/Tangerine.UI.FilesystemView/Tangerine.UI.FilesystemView.Mac.csproj");
+			Sync("Tangerine/Tangerine.UI.Inspector/Tangerine.UI.Inspector.Win.csproj");
+			Sync("Tangerine/Tangerine.UI.Inspector/Tangerine.UI.Inspector.Mac.csproj");
+			Sync("Tangerine/Tangerine.UI.SceneView/Tangerine.UI.SceneView.Win.csproj");
+			Sync("Tangerine/Tangerine.UI.SceneView/Tangerine.UI.SceneView.Mac.csproj");
+			Sync("Tangerine/Tangerine.UI.Timeline/Tangerine.UI.Timeline.Win.csproj");
+			Sync("Tangerine/Tangerine.UI.Timeline/Tangerine.UI.Timeline.Mac.csproj");
+			Sync("Tangerine/Tangerine/Tangerine.Win.csproj");
+			Sync("Tangerine/Tangerine/Tangerine.Mac.csproj");
 		}
 
 		public Task Start()
