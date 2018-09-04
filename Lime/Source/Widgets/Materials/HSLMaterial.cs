@@ -47,55 +47,44 @@ namespace Lime
 				}";
 
 		private static string fs = @"
-				uniform lowp sampler2D tex1;
-				uniform lowp vec3 u_hsl;
+			uniform lowp sampler2D tex1;
+			uniform lowp vec3 u_hsl;
 
-				varying lowp vec2 v_uv;
+			varying lowp vec2 v_uv;
 
-				const float inversSix = 1.0 / 6.0;
+			vec3 HslToRgb(vec3 hslColor)
+			{
+			    vec3 rgbColor = vec3(abs(hslColor.x - 3.0) - 1.0, 2.0 - abs(hslColor.x * 6.0 - 2.0), 2.0 - abs(hslColor.x * 6.0 - 4.0));
+			    float saturationLightness = (1.0 - abs(2.0 * hslColor.z - 1.0)) * hslColor.y;
+			    return clamp(rgbColor, vec3(0.0), vec3(1.0)) * saturationLightness + vec3(hslColor.z - saturationLightness / 2.0);
+			}
 
-				vec3 HSLtoRGB(vec3 c)
-				{
-					vec3 rgb = clamp(abs(mod(c.x * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0);
-					return c.z + c.y * (rgb - 0.5) * (1.0 - abs(2.0 * c.z - 1.0));
-				}
+			vec3 RgbToHsl(vec3 rgbColor)
+			{
+			    vec4 chroma = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+			    // Find max and min values.
+			    vec4 tmp = mix(vec4(rgbColor.bg, chroma.wz), vec4(rgbColor.gb, chroma.xy), step(rgbColor.b, rgbColor.g));
+			    vec4 values = mix(vec4(tmp.xyw, rgbColor.r), vec4(rgbColor.r, tmp.yzx), step(tmp.x, rgbColor.r));
+			    float minValue = min(values.w, values.y);
+			    float maxValue = values.x;
+			    float delta = maxValue - minValue;
+			    float e = 1.0e-10;
+			    float hue = abs(values.z + (values.w - values.y) / (6.0 * delta + e));
+			    float lightness = 0.5 * abs(maxValue + minValue);
+			    // If max == min set saturation to 1.0.
+			    float saturation = mix(1.0, clamp(delta / (1.0 - abs(2.0 * lightness - 1.0) + e), 0.0, 1.0), step(e, delta));
+			    return vec3(hue, saturation, lightness);
+			}
 
-				vec3 RGBtoHSL(vec3 c)
-				{
-					float h = 0.0;
-					float s = 0.0;
-					float l = 0.0;
-
-					float cMin = min(c.r, min(c.g, c.b));
-					float cMax = max(c.r, max(c.g, c.b));
-
-					l = (cMax + cMin) * 0.5;
-
-					float cDelta = cMax - cMin;
-					s = mix(cDelta / (cMax + cMin), cDelta / (2.0 - (cMax + cMin)), step(0.5, l));
-
-					float inverseDelta = 1.0 / cDelta;
-					h += mix(0.0, (c.g - c.b) * inverseDelta, step(cMax, c.r));
-					h += mix(0.0, 2.0 + (c.b - c.r) * inverseDelta, step(cMax, c.g)) * (1.0 - step(c.g, c.r));
-					h += mix(0.0, 4.0 + (c.r - c.g) * inverseDelta, step(cMax, c.b)) * (1.0 - step(c.b, c.r)) * (1.0 - step(c.b, c.g));
-
-					h = mix(h + 6.0, h, step(0.0, h));
-					h = h * inversSix;
-
-					h = mix(h, 0.0, step(cMax, cMin));
-					return vec3(h, s, l);
-				}
-
-				void main()
-				{
-					vec4 color = texture2D(tex1, v_uv);
-					vec3 fragHSL = RGBtoHSL(color.rgb);
-					fragHSL.x += u_hsl.x;
-					fragHSL.yz *= u_hsl.yz;
-					fragHSL.xyz = fragHSL.xyz;
-					vec3 fragRGB = HSLtoRGB(fragHSL);
-					gl_FragColor = vec4(fragRGB, color.a);
-				}";
+			void main()
+			{
+			    vec4 color = texture2D(tex1, v_uv);
+			    vec3 hslColor = RgbToHsl(color.rgb);
+			    hslColor.x += u_hsl.x;
+			    hslColor.yz *= u_hsl.yz;
+			    vec3 rgbColor = HslToRgb(hslColor);
+			    gl_FragColor = vec4(rgbColor, color.a);
+			}";
 
 		private static ShaderProgram shaderProgramPass;
 
