@@ -1,7 +1,5 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Tangerine.Core
 {
@@ -18,7 +16,7 @@ namespace Tangerine.Core
 		public abstract bool IsChangingDocument { get; }
 		public bool Performed { get; set; }
 
-		readonly List<object> backup = new List<object>();
+		private readonly List<object> backup = new List<object>();
 
 		public void Save<T>(T data)
 		{
@@ -28,9 +26,9 @@ namespace Tangerine.Core
 		public T Restore<T>()
 		{
 			foreach (var i in backup) {
-				if (i is T) {
-					backup.Remove(i);
-					return (T)i;
+				if (i is T ti) {
+					backup.Remove(ti);
+					return ti;
 				}
 			}
 			throw new InvalidOperationException();
@@ -38,8 +36,7 @@ namespace Tangerine.Core
 
 		public T Peek<T>()
 		{
-			T res;
-			if (!Find(out res)) {
+			if (!Find(out T res)) {
 				throw new InvalidOperationException();
 			}
 			return res;
@@ -48,12 +45,12 @@ namespace Tangerine.Core
 		public bool Find<T>(out T result)
 		{
 			foreach (var i in backup) {
-				if (i is T) {
-					result = (T) i;
+				if (i is T ti) {
+					result = ti;
 					return true;
 				}
 			}
-			result = default(T);
+			result = default;
 			return false;
 		}
 	}
@@ -65,32 +62,14 @@ namespace Tangerine.Core
 		void Redo(IOperation operation);
 	}
 
-	public abstract class OperationProcessor<T> : IOperationProcessor where T: IOperation
+	public abstract class OperationProcessor<TOperation> : IOperationProcessor where TOperation: IOperation
 	{
-		public void Do(IOperation op)
-		{
-			if (op is T) {
-				InternalDo((T)op);
-			}
-		}
-
-		public void Redo(IOperation op)
-		{
-			if (op is T) {
-				InternalRedo((T)op);
-			}
-		}
-
-		public void Undo(IOperation op)
-		{
-			if (op is T) {
-				InternalUndo((T)op);
-			}
-		}
-
-		protected virtual void InternalDo(T op) => InternalRedo(op);
-		protected abstract void InternalRedo(T op);
-		protected abstract void InternalUndo(T op);
+		public void Do(IOperation op) => InternalDo((TOperation)op);
+		public void Redo(IOperation op) => InternalRedo((TOperation)op);
+		public void Undo(IOperation op) => InternalUndo((TOperation)op);
+		protected virtual void InternalDo(TOperation op) => InternalRedo(op);
+		protected abstract void InternalRedo(TOperation op);
+		protected abstract void InternalUndo(TOperation op);
 	}
 
 	public abstract class SymmetricOperationProcessor : IOperationProcessor

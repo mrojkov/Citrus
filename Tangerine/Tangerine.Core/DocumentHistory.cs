@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Lime;
 
 namespace Tangerine.Core
@@ -14,7 +15,6 @@ namespace Tangerine.Core
 
 	public class DocumentHistory : ITransactionalHistory
 	{
-		public static readonly ProcessorList Processors = new ProcessorList();
 		private readonly Stack<int> transactionStartIndices = new Stack<int>();
 		private readonly List<IOperation> operations = new List<IOperation>();
 		private int transactionId;
@@ -28,6 +28,11 @@ namespace Tangerine.Core
 		public bool IsDocumentModified { get; private set; }
 		public bool IsTransactionActive => transactionStartIndices.Count > 0;
 		public event Action<IOperation> PerformingOperation;
+
+		public static void AddOperationProcessorTypes(IEnumerable<Type> types)
+		{
+			Processors.OperationProcessorTypes.AddRange(types);
+		}
 
 		public IDisposable BeginTransaction()
 		{
@@ -210,19 +215,33 @@ namespace Tangerine.Core
 			return false;
 		}
 
-		public class ProcessorList : List<IOperationProcessor>
+		private static class Processors
 		{
-			public void Do(IOperation operation)
+			private static readonly Dictionary<Type, List<IOperationProcessor>> operationTypeToProcessorList = new Dictionary<Type, List<IOperationProcessor>>();
+			private static readonly Dictionary<Type, IOperationProcessor> processorInstances = new Dictionary<Type, IOperationProcessor>();
+			public static readonly List<Type> OperationProcessorTypes = new List<Type>();
+
+			private static IOperationProcessor GetProcessor(Type t)
 			{
-				foreach (var p in this) {
+				if (processorInstances.TryGetValue(t, out IOperationProcessor value)) {
+					return value;
+				}
+				value = (IOperationProcessor)Activator.CreateInstance(t);
+				processorInstances.Add(t, value);
+				return value;
+			}
+
+			public static void Do(IOperation operation)
+			{
+				foreach (var p in EnumerateProcessors(operation)) {
 					p.Do(operation);
 				}
 				operation.Performed = true;
 			}
 
-			public void Invert(IOperation operation)
+			public static void Invert(IOperation operation)
 			{
-				foreach (var p in this) {
+				foreach (var p in EnumerateProcessors(operation)) { 
 					if (operation.Performed) {
 						p.Undo(operation);
 					} else {
@@ -230,6 +249,56 @@ namespace Tangerine.Core
 					}
 				}
 				operation.Performed = !operation.Performed;
+			}
+
+			private static IEnumerable<IOperationProcessor> EnumerateProcessors(IOperation operation)
+			{
+				var operationType = operation.GetType();
+				if (operationTypeToProcessorList.TryGetValue(operationType, out List<IOperationProcessor> cachedProcessorList)
+				) {
+					foreach (var processor in cachedProcessorList) {
+						yield return processor;
+					}
+					yield break;
+				}
+				operationTypeToProcessorList.Add(operationType, cachedProcessorList = new List<IOperationProcessor>());
+				foreach (var processorType in OperationProcessorTypes) {
+					if (!typeof(IOperationProcessor).IsAssignableFrom(processorType)) {
+						throw new InvalidOperationException();
+					}
+					Type genericOperationProcessorType = null;
+					var t = processorType;
+					while (t != null && t != typeof(object)) {
+						if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(OperationProcessor<>)) {
+							genericOperationProcessorType = t;
+							break;
+						}
+						t = t.BaseType;
+					}
+					if (genericOperationProcessorType != null) {
+						var operationTypeOfProcessor = genericOperationProcessorType.GetGenericArguments().First();
+						if (operationType.IsGenericType) {
+							var operationGenericArguments = operationType.GetGenericArguments();
+							if (
+								operationTypeOfProcessor.IsGenericType &&
+								operationTypeOfProcessor.GetGenericTypeDefinition().IsAssignableFrom(operationType.GetGenericTypeDefinition())
+							) {
+								var specializedGenericProcessor = processorType.MakeGenericType(operationGenericArguments);
+								var p = GetProcessor(specializedGenericProcessor);
+								cachedProcessorList.Add(p);
+								yield return p;
+							}
+						} else if (operationTypeOfProcessor.IsAssignableFrom(operationType)) {
+							var p = GetProcessor(processorType);
+							cachedProcessorList.Add(p);
+							yield return p;
+						}
+					} else {
+						var p = GetProcessor(processorType);
+						cachedProcessorList.Add(p);
+						yield return p;
+					}
+				}
 			}
 		}
 	}

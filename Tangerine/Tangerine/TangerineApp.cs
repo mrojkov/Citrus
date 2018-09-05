@@ -212,39 +212,42 @@ namespace Tangerine
 					}
 				}
 			};
+
 			Document.NodeDecorators.AddFor<ParticleEmitter>(n => n.CompoundPostPresenter.Add(new UI.SceneView.ParticleEmitterPresenter()));
-			DocumentHistory.Processors.AddRange(new IOperationProcessor[] {
-				new Core.Operations.TimelineHorizontalShift.Processor(),
-				new Core.Operations.RemoveKeyframeRange.Processor(),
-				new Core.Operations.SelectRow.Processor(),
-				new Core.Operations.SetProperty.Processor(),
-				new Core.Operations.RemoveKeyframe.Processor(),
-				new Core.Operations.SetKeyframe.Processor(),
-				new Core.Operations.InsertFolderItem.Processor(),
-				new Core.Operations.InsertListItem.Processor(),
-				new Core.Operations.RemoveListItem.Processor(),
-				new Core.Operations.UnlinkFolderItem.Processor(),
-				new Core.Operations.MoveNodes.Processor(),
-				new Core.Operations.SetMarker.Processor(),
-				new Core.Operations.DeleteMarker.Processor(),
-				new Core.Operations.SetComponent.Processor(),
-				new Core.Operations.DeleteComponent.Processor(),
-				new Core.Operations.DistortionMeshProcessor(),
-				new Core.Operations.SyncFolderDescriptorsProcessor(),
-				new UI.SceneView.ResolutionPreviewOperation.Processor(),
-				new UI.Timeline.Operations.SelectGridSpan.Processor(),
-				new UI.Timeline.Operations.DeselectGridSpan.Processor(),
-				new UI.Timeline.Operations.ClearGridSelection.Processor(),
-				new UI.Timeline.Operations.ShiftGridSelection.Processor(),
-				new UI.Timeline.Operations.SetCurrentColumn.Processor(),
-				new UI.Timeline.Operations.SelectCurveKey.Processor(),
-				new TriggersValidatorOnSetProperty(),
-				new TriggersValidatorOnSetKeyframe(),
-				new UpdateNodesAndApplyAnimatorsProcessor(),
-				new RowsSynchronizer(),
-				new Core.Operations.ReplaceContents.Processor()
+			DocumentHistory.AddOperationProcessorTypes(new[] {
+				typeof(Core.Operations.TimelineHorizontalShift.Processor),
+				typeof(Core.Operations.RemoveKeyframeRange.Processor),
+				typeof(Core.Operations.SelectRow.Processor),
+				typeof(Core.Operations.SetProperty.Processor),
+				typeof(Core.Operations.RemoveKeyframe.Processor),
+				typeof(Core.Operations.SetKeyframe.Processor),
+				typeof(Core.Operations.InsertFolderItem.Processor),
+				typeof(Core.Operations.InsertListItem.Processor),
+				typeof(Core.Operations.RemoveListItem.Processor),
+				typeof(Core.Operations.AddToList<,>.Processor),
+				typeof(Core.Operations.RemoveFromList<,>.Processor),
+				typeof(Core.Operations.UnlinkFolderItem.Processor),
+				typeof(Core.Operations.MoveNodes.Processor),
+				typeof(Core.Operations.SetMarker.Processor),
+				typeof(Core.Operations.DeleteMarker.Processor),
+				typeof(Core.Operations.SetComponent.Processor),
+				typeof(Core.Operations.DeleteComponent.Processor),
+				typeof(Core.Operations.DistortionMeshProcessor),
+				typeof(Core.Operations.SyncFolderDescriptorsProcessor),
+				typeof(UI.SceneView.ResolutionPreviewOperation.Processor),
+				typeof(UI.Timeline.Operations.SelectGridSpan.Processor),
+				typeof(UI.Timeline.Operations.DeselectGridSpan.Processor),
+				typeof(UI.Timeline.Operations.ClearGridSelection.Processor),
+				typeof(UI.Timeline.Operations.ShiftGridSelection.Processor),
+				typeof(UI.Timeline.Operations.SetCurrentColumn.Processor),
+				typeof(UI.Timeline.Operations.SelectCurveKey.Processor),
+				typeof(TriggersValidatorOnSetProperty),
+				typeof(TriggersValidatorOnSetKeyframe),
+				typeof(UpdateNodesAndApplyAnimatorsProcessor),
+				typeof(RowsSynchronizer),
+				typeof(Core.Operations.ReplaceContents.Processor)
 			});
-			DocumentHistory.Processors.AddRange(UI.Timeline.Timeline.GetOperationProcessors());
+			DocumentHistory.AddOperationProcessorTypes(UI.Timeline.Timeline.GetOperationProcessorTypes());
 
 			RegisterCommands();
 			InitializeHotkeys();

@@ -762,6 +762,51 @@ namespace Tangerine.Core.Operations
 		}
 	}
 
+	public class AddToList<TList, TElement> : Operation where TList : IList<TElement>, new() where TElement : new()
+	{
+		private readonly TList collection;
+		private readonly TElement element;
+
+		public override bool IsChangingDocument => true;
+
+		private AddToList(TList collection, TElement element)
+		{
+			this.collection = collection;
+			this.element = element;
+		}
+
+		public static void Perform(TList collection, TElement element) => DocumentHistory.Current.Perform(new AddToList<TList, TElement>(collection, element));
+
+		public class Processor : OperationProcessor<AddToList<TList, TElement>>
+		{
+			protected override void InternalRedo(AddToList<TList, TElement> op) => op.collection.Add(op.element);
+			protected override void InternalUndo(AddToList<TList, TElement> op) => op.collection.Remove(op.element);
+		}
+
+	}
+
+	public class RemoveFromList<TList, TElement> : Operation where TList : IList<TElement>
+	{
+		private readonly TList collection;
+		private readonly TElement element;
+
+		public override bool IsChangingDocument => true;
+
+		private RemoveFromList(TList collection, TElement element)
+		{
+			this.collection = collection;
+			this.element = element;
+		}
+
+		public static void Perform(TList collection, TElement element) => DocumentHistory.Current.Perform(new RemoveFromList<TList, TElement>(collection, element));
+
+		public class Processor : OperationProcessor<RemoveFromList<TList, TElement>>
+		{
+			protected override void InternalRedo(RemoveFromList<TList, TElement> op) => op.collection.Remove(op.element);
+			protected override void InternalUndo(RemoveFromList<TList, TElement> op) => op.collection.Add(op.element);
+		}
+	}
+
 	public class SetComponent : Operation
 	{
 		private readonly Node node;
