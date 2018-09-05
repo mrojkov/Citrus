@@ -61,7 +61,6 @@
     <Compile Include="Commands.cs" />
     <Compile Include="Console.cs" />
     <Compile Include="Cursors.cs" />
-    <Compile Include="Dialogs\ModalOperationDialog.cs" />
     <Compile Include="Dialogs\AlertDialog.cs" />
     <Compile Include="EmbeddedResources\ThemedIconResource.cs" />
     <Compile Include="Docking\DockHierarchy.cs" />
