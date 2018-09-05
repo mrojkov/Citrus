@@ -281,14 +281,14 @@ namespace Tangerine.Core
 							var operationGenericArguments = operationType.GetGenericArguments();
 							if (
 								operationTypeOfProcessor.IsGenericType &&
-							    operationType.GetGenericTypeDefinition() == operationTypeOfProcessor.GetGenericTypeDefinition()
+								operationTypeOfProcessor.GetGenericTypeDefinition().IsAssignableFrom(operationType.GetGenericTypeDefinition())
 							) {
 								var specializedGenericProcessor = processorType.MakeGenericType(operationGenericArguments);
 								var p = GetProcessor(specializedGenericProcessor);
 								cachedProcessorList.Add(p);
 								yield return p;
 							}
-						} else if (operationType == operationTypeOfProcessor) {
+						} else if (operationTypeOfProcessor.IsAssignableFrom(operationType)) {
 							var p = GetProcessor(processorType);
 							cachedProcessorList.Add(p);
 							yield return p;
