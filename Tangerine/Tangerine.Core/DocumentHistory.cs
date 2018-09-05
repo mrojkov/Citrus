@@ -232,25 +232,25 @@ namespace Tangerine.Core
 
 			public static void Do(IOperation operation)
 			{
-				Traverse(operation, (op, processor) => {
-					processor.Do(op);
-				});
+				foreach (var p in EnumerateProcessors(operation)) {
+					p.Do(operation);
+				}
 				operation.Performed = true;
 			}
 
 			public static void Invert(IOperation operation)
 			{
-				Traverse(operation, (op, processor) => {
+				foreach (var p in EnumerateProcessors(operation)) { 
 					if (operation.Performed) {
-						processor.Undo(op);
+						p.Undo(operation);
 					} else {
-						processor.Redo(op);
+						p.Redo(operation);
 					}
-				});
+				}
 				operation.Performed = !operation.Performed;
 			}
 
-			private static void Traverse(IOperation operation, Action<IOperation, IOperationProcessor> action)
+			private static IEnumerable<IOperationProcessor> EnumerateProcessors(IOperation operation)
 			{
 				foreach (var processorType in OperationProcessorTypes) {
 					if (!typeof(IOperationProcessor).IsAssignableFrom(processorType)) {
@@ -275,13 +275,13 @@ namespace Tangerine.Core
 							    operationType.GetGenericTypeDefinition() == operationTypeOfProcessor.GetGenericTypeDefinition()
 							) {
 								var specializedGenericProcessor = processorType.MakeGenericType(operationGenericArguments);
-								action(operation, GetProcessor(specializedGenericProcessor));
+								yield return GetProcessor(specializedGenericProcessor);
 							}
 						} else if (operationType == operationTypeOfProcessor) {
-							action(operation, GetProcessor(processorType));
+							yield return GetProcessor(processorType);
 						}
 					} else {
-						action(operation, GetProcessor(processorType));
+						yield return GetProcessor(processorType);
 					}
 				}
 			}
