@@ -88,6 +88,9 @@
     <ImageAsset Include="Resources\Images.xcassets\AppIcons.appiconset\AppIcon-512%402x.png" />
     <Compile Include="Main.Win.cs" />
     <Compile Include="TangerineSingleInstanceKeeper.cs" />
+    <Compile Include="Panels\BackupHistoryPanel.cs" />
+    <Compile Include="Panels\HierarchyPanel.cs" />
+    <Compile Include="Panels\TreeView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -186,5 +189,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Documentation\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Panels\" />
   </ItemGroup>
 </Project>

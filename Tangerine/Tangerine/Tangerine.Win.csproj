@@ -80,6 +80,9 @@
     <Compile Include="Tools\FitTools.cs" />
     <Compile Include="AppUserPreferences.cs" />
     <Compile Include="Main.Mac.cs" />
+    <Compile Include="Panels\BackupHistoryPanel.cs" />
+    <Compile Include="Panels\HierarchyPanel.cs" />
+    <Compile Include="Panels\TreeView.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lemon\Lemon.Win.csproj">

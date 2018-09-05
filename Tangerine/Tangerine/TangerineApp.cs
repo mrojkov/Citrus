@@ -7,7 +7,6 @@ using Tangerine.Core;
 using Tangerine.UI;
 using Tangerine.UI.SceneView;
 using Tangerine.UI.Docking;
-using Tangerine.UI.BackupHistoryPanel;
 using Tangerine.UI.Timeline.Processors;
 using Tangerine.UI.Timeline;
 
@@ -259,8 +258,8 @@ namespace Tangerine
 						new UI.Inspector.Inspector(inspectorPanel.ContentWidget),
 						new UI.Timeline.Timeline(timelinePanel),
 						new UI.SceneView.SceneView(documentViewContainer),
-						new UI.HierarchyPanel(searchPanel.ContentWidget),
-						new BackupHistoryPanel(backupHistoryPanel.ContentWidget),
+						new Panels.HierarchyPanel(searchPanel.ContentWidget),
+						new Panels.BackupHistoryPanel(backupHistoryPanel.ContentWidget),
 						// Use VisualHintsPanel sigleton because we need preserve its state between documents.
 						VisualHintsPanel.Instance ?? VisualHintsPanel.Initialize(visualHintsPanel)
 				});

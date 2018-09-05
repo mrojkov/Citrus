@@ -100,7 +100,6 @@
     <Compile Include="Docking\DockHierarchy.cs" />
     <Compile Include="Docking\DockPresenter.cs" />
     <Compile Include="Utils\FilesDropHandler.cs" />
-    <Compile Include="BackupHistoryPanel\BackupHistoryPanel.cs" />
     <Compile Include="Utils\DropSceneContextMenu.cs" />
     <Compile Include="OrangeCommandHandler.cs" />
     <Compile Include="PropertyEditors\AnchorsPropertyEditor.cs" />
@@ -139,8 +138,6 @@
     <Compile Include="PropertyEditors\ThicknessPropertyEditor.cs" />
     <Compile Include="PropertyEditors\InstancePropertyEditor.cs" />
     <Compile Include="PropertyEditors\AlignmentPropertyEditor.cs" />
-    <Compile Include="HierarchyPanel\HierarchyPanel.cs" />
-    <Compile Include="HierarchyPanel\TreeView.cs" />
     <Compile Include="Utils\Tip.cs" />
     <Compile Include="PropertyEditors\TextPropertyEditor.cs" />
     <Compile Include="TextEditorWindow.cs" />

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
 
-namespace Tangerine.UI
+namespace Tangerine.Panels
 {
 	public class HierarchyPanel : IDocumentView
 	{
