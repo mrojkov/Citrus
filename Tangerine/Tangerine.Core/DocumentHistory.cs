@@ -217,6 +217,7 @@ namespace Tangerine.Core
 
 		private static class Processors
 		{
+			private static readonly Dictionary<Type, List<IOperationProcessor>> operationTypeToProcessorList = new Dictionary<Type, List<IOperationProcessor>>();
 			private static readonly Dictionary<Type, IOperationProcessor> processorInstances = new Dictionary<Type, IOperationProcessor>();
 			public static readonly List<Type> OperationProcessorTypes = new List<Type>();
 
@@ -252,11 +253,19 @@ namespace Tangerine.Core
 
 			private static IEnumerable<IOperationProcessor> EnumerateProcessors(IOperation operation)
 			{
+				var operationType = operation.GetType();
+				if (operationTypeToProcessorList.TryGetValue(operationType, out List<IOperationProcessor> cachedProcessorList)
+				) {
+					foreach (var processor in cachedProcessorList) {
+						yield return processor;
+					}
+					yield break;
+				}
+				operationTypeToProcessorList.Add(operationType, cachedProcessorList = new List<IOperationProcessor>());
 				foreach (var processorType in OperationProcessorTypes) {
 					if (!typeof(IOperationProcessor).IsAssignableFrom(processorType)) {
 						throw new InvalidOperationException();
 					}
-					var operationType = operation.GetType();
 					Type genericOperationProcessorType = null;
 					var t = processorType;
 					while (t != null && t != typeof(object)) {
@@ -275,13 +284,19 @@ namespace Tangerine.Core
 							    operationType.GetGenericTypeDefinition() == operationTypeOfProcessor.GetGenericTypeDefinition()
 							) {
 								var specializedGenericProcessor = processorType.MakeGenericType(operationGenericArguments);
-								yield return GetProcessor(specializedGenericProcessor);
+								var p = GetProcessor(specializedGenericProcessor);
+								cachedProcessorList.Add(p);
+								yield return p;
 							}
 						} else if (operationType == operationTypeOfProcessor) {
-							yield return GetProcessor(processorType);
+							var p = GetProcessor(processorType);
+							cachedProcessorList.Add(p);
+							yield return p;
 						}
 					} else {
-						yield return GetProcessor(processorType);
+						var p = GetProcessor(processorType);
+						cachedProcessorList.Add(p);
+						yield return p;
 					}
 				}
 			}
