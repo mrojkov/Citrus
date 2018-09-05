@@ -117,7 +117,7 @@ namespace Lime
 					RenderState.ScissorState |
 					RenderState.View |
 					RenderState.World |
-					RenderState.View |
+					RenderState.Viewport |
 					RenderState.Projection |
 					RenderState.DepthState |
 					RenderState.CullMode |
@@ -158,14 +158,13 @@ namespace Lime
 				widget.Scale = Vector2.One;
 				widget.Position = Vector2.Zero;
 				widget.Pivot = Vector2.Zero;
-				using (var texture = new RenderTexture(scaledWidth, scaledHeight)) {
-					var renderChain = new RenderChain();
-					widget.RenderChainBuilder?.AddToRenderChain(renderChain);
-					RenderToTexture(widget, texture, renderChain);
-					Callback(() => {
-						callback(new Bitmap(texture.GetPixels(), scaledWidth, scaledHeight));
-					});
-				}
+				var texture = new RenderTexture(scaledWidth, scaledHeight);
+				var renderChain = new RenderChain();
+				widget.RenderChainBuilder?.AddToRenderChain(renderChain);
+				RenderToTexture(widget, texture, renderChain);
+				Callback(() => {
+					callback(new Bitmap(texture.GetPixels(), scaledWidth, scaledHeight));
+				});
 			} finally {
 				widget.Scale = savedScale;
 				widget.Position = savedPosition;
