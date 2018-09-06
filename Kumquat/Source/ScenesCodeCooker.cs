@@ -45,6 +45,7 @@ namespace Kumquat
 		private static readonly string[] scenesExtensions = { ".scene", ".tan", ".model" };
 
 		private readonly string directory;
+		private readonly string generatedScenesPath;
 		private readonly string projectName;
 		private readonly Dictionary<string, string> sceneToBundleMap;
 		private readonly Dictionary<string, Node> scenesForProcessing;
@@ -63,6 +64,7 @@ namespace Kumquat
 
 		public ScenesCodeCooker(
 			string directory,
+			string generatedScenesPath,
 			string projectName,
 			string mainBundleName,
 			Dictionary<string, string> sceneToBundleMap,
@@ -73,6 +75,7 @@ namespace Kumquat
 		)
 		{
 			this.directory = directory;
+			this.generatedScenesPath = generatedScenesPath;
 			this.projectName = projectName;
 			this.mainBundleName = mainBundleName;
 			this.sceneToBundleMap = sceneToBundleMap;
@@ -126,11 +129,11 @@ namespace Kumquat
 		public void Start()
 		{
 			Console.WriteLine("Generating scenes code for {0} scenes...", scenesForProcessing.Count);
-			var generatedScenesPath = $"{directory}/{projectName}.GeneratedScenes";
-			if (!Directory.Exists(generatedScenesPath)) {
-				GenerateProjectFiles(generatedScenesPath);
+			var path = $"{directory}/{projectName}.{generatedScenesPath}";
+			if (!Directory.Exists(path)) {
+				GenerateProjectFiles(path);
 			}
-			var scenesPath = $@"{directory}/{projectName}.GeneratedScenes/Scenes";
+			var scenesPath = $@"{directory}/{projectName}.{generatedScenesPath}/Scenes";
 			RemoveOrphanedGeneratedCodeItems();
 			RemoveUpdatingCommonPartsFromCache();
 			foreach (var scenePath in allScenes) {
@@ -246,7 +249,7 @@ namespace Kumquat
 
 		private void RemoveOrphanedGeneratedCodeItems()
 		{
-			var scenesPath = $@"{directory}/{projectName}.GeneratedScenes/Scenes";
+			var scenesPath = $@"{directory}/{projectName}.{generatedScenesPath}/Scenes";
 			var scenesToDelete = new List<string>();
 			var allScenesSet = new HashSet<string>(allScenes);
 			foreach (var scenePath in codeCookerCache.SceneFiles.Keys) {
@@ -279,18 +282,18 @@ namespace Kumquat
 			}
 		}
 
-		private void GenerateProjectFiles(string generatedScenesPath)
+		private void GenerateProjectFiles(string path)
 		{
 			Console.WriteLine("Generating generted scenes project files");
-			Directory.CreateDirectory(generatedScenesPath);
+			Directory.CreateDirectory(path);
 			var projectWin = GetEmbeddedResource("GeneratedScenes.Win.csproj.template");
 			var projectAndroid = GetEmbeddedResource("GeneratedScenes.Android.csproj.template");
 			var projectiOS = GetEmbeddedResource("GeneratedScenes.iOS.csproj.template");
 			var parsedWidgetSourceCode = GetEmbeddedResource("ParsedWidget.cs");
-			File.WriteAllText($@"{generatedScenesPath}/{projectName}.GeneratedScenes.Win.csproj", projectWin.Replace("<%PROJECT_NAME%>", projectName));
-			File.WriteAllText($@"{generatedScenesPath}/{projectName}.GeneratedScenes.Android.csproj", projectAndroid.Replace("<%PROJECT_NAME%>", projectName));
-			File.WriteAllText($@"{generatedScenesPath}/{projectName}.GeneratedScenes.iOS.csproj", projectiOS.Replace("<%PROJECT_NAME%>", projectName));
-			File.WriteAllText($@"{generatedScenesPath}/ParsedWidget.cs", parsedWidgetSourceCode);
+			File.WriteAllText($@"{path}/{projectName}.GeneratedScenes.Win.csproj", projectWin.Replace("<%PROJECT_NAME%>", projectName));
+			File.WriteAllText($@"{path}/{projectName}.GeneratedScenes.Android.csproj", projectAndroid.Replace("<%PROJECT_NAME%>", projectName));
+			File.WriteAllText($@"{path}/{projectName}.GeneratedScenes.iOS.csproj", projectiOS.Replace("<%PROJECT_NAME%>", projectName));
+			File.WriteAllText($@"{path}/ParsedWidget.cs", parsedWidgetSourceCode);
 		}
 
 		static Type GetCommonBaseClass(IReadOnlyList<string> typeNames)
@@ -444,7 +447,7 @@ namespace Kumquat
 				return node.ClassName;
 			}
 
-			var nodeType = $"{node.ClassName}<{node.Type}>";
+			var nodeType = $"{node.ClassName}<{node.TypeFullName}>";
 			var bundleName = GetBundleNameOfExternalScene(node);
 			if (string.IsNullOrEmpty(bundleName)) {
 				return nodeType;

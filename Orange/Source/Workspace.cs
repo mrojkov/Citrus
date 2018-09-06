@@ -12,6 +12,7 @@ namespace Orange
 		public string ProjectDirectory { get; private set; }
 		public string AssetsDirectory { get; private set; }
 		public string Title { get; private set; }
+		public string GeneratedScenesPath { get; private set; }
 		public IFileEnumerator AssetFiles { get; set; }
 		public Json ProjectJson { get; private set; }
 		public List<Target> Targets { get; private set; }
@@ -164,6 +165,10 @@ namespace Orange
 		{
 			ProjectJson = new Json(file);
 			Title = ProjectJson["Title"] as string;
+
+			var generatedScenesConfigPath = ProjectJson["GeneratedScenesPath"] as string;
+			GeneratedScenesPath = string.IsNullOrEmpty(generatedScenesConfigPath) ? "GeneratedScenes" : generatedScenesConfigPath;
+
 			Targets = new List<Target>();
 			FillDefaultTargets();
 			dataFolderName = ProjectJson.GetValue("DataFolderName", "Data");

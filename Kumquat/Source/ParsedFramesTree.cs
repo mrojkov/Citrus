@@ -34,6 +34,7 @@ namespace Kumquat
 		{
 			var result = isRootNode ? scenesCodeCooker.SceneCodeTemplate : scenesCodeCooker.FrameCodeTemplate;
 			result = result.Replace("<%CLASS_NAME%>", ClassName);
+			result = result.Replace("<%WRAPPED_NODE_TYPE_GENERIC_ARGUMENT%>", ParsedNode.TypeFullName);
 			result = result.Replace("<%SCENE_PATH%>", "\"" + Path.ChangeExtension(ScenePath, null) + "\"");
 			result = result.Replace("<%FIELDS%>", GenerateFields(scenesCodeCooker));
 			result = result.Replace("<%INIT_FIELDS%>", GenerateFieldsInitialization(scenesCodeCooker));

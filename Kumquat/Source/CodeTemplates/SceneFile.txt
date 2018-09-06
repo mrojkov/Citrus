@@ -5,11 +5,11 @@ using Lime;
 
 namespace <%NAMESPACE%>
 {
-	public class <%CLASS_NAME%> : <%CLASS_NAME%><Frame>
+	public class <%CLASS_NAME%> : <%CLASS_NAME%><<%WRAPPED_NODE_TYPE_GENERIC_ARGUMENT%>>
 	{
 		public const string AssetPath = <%SCENE_PATH%>;
 
-		public static readonly Frame FrameCache = (Frame)Node.CreateFromAssetBundle(AssetPath);
+		public static readonly <%WRAPPED_NODE_TYPE_GENERIC_ARGUMENT%> FrameCache = (<%WRAPPED_NODE_TYPE_GENERIC_ARGUMENT%>)Node.CreateFromAssetBundle(AssetPath);
 
 		public <%CLASS_NAME%>() : base(FrameCache.Clone<Node>()) { }
 
