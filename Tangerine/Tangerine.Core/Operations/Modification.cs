@@ -62,6 +62,63 @@ namespace Tangerine.Core.Operations
 		}
 	}
 
+	public class SetIndexedProperty : Operation
+	{
+		public readonly object Obj;
+		public readonly object Value;
+		public readonly Func<int> IndexProvider;
+		public readonly PropertyInfo Property;
+		public readonly Type Type;
+		public override bool IsChangingDocument { get; }
+
+		public static void Perform(object obj, string propertyName, Func<int> indexProvider, object value, bool isChangingDocument = true)
+		{
+			DocumentHistory.Current.Perform(new SetIndexedProperty(obj, propertyName, indexProvider, value, isChangingDocument));
+		}
+
+		public static void Perform(Type type, object obj, string propertyName, Func<int> indexProvider, object value, bool isChangingDocument = true)
+		{
+			DocumentHistory.Current.Perform(new SetIndexedProperty(type, obj, propertyName, indexProvider, value, isChangingDocument));
+		}
+
+		protected SetIndexedProperty(object obj, string propertyName, Func<int> indexProvider, object value, bool isChangingDocument)
+		{
+			Type = obj.GetType();
+			Obj = obj;
+			IndexProvider = indexProvider;
+			Value = value;
+			Property = Type.GetProperty(propertyName);
+			IsChangingDocument = isChangingDocument;
+		}
+
+		protected SetIndexedProperty(Type type, object obj, string propertyName, Func<int> indexProvider, object value, bool isChangingDocument)
+		{
+			Type = type;
+			Obj = obj;
+			IndexProvider = indexProvider;
+			Value = value;
+			Property = Type.GetProperty(propertyName);
+			IsChangingDocument = isChangingDocument;
+		}
+
+		public class Processor : OperationProcessor<SetIndexedProperty>
+		{
+			private class Backup { public object Value; }
+
+			protected override void InternalRedo(SetIndexedProperty op)
+			{
+				op.Save(new Backup { Value = op.Property.GetGetMethod().Invoke(op.Obj, new object[] { op.IndexProvider() }) });
+				op.Property.GetSetMethod().Invoke(op.Obj, new [] { op.IndexProvider(), op.Value });
+			}
+
+			protected override void InternalUndo(SetIndexedProperty op)
+			{
+				var v = op.Restore<Backup>().Value;
+				op.Property.GetSetMethod().Invoke(op.Obj, new[] { op.IndexProvider(), v });
+			}
+		}
+	}
+
 	public class SetAnimableProperty
 	{
 

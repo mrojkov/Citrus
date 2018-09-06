@@ -219,6 +219,7 @@ namespace Tangerine
 				typeof(Core.Operations.RemoveKeyframeRange.Processor),
 				typeof(Core.Operations.SelectRow.Processor),
 				typeof(Core.Operations.SetProperty.Processor),
+				typeof(Core.Operations.SetIndexedProperty.Processor),
 				typeof(Core.Operations.RemoveKeyframe.Processor),
 				typeof(Core.Operations.SetKeyframe.Processor),
 				typeof(Core.Operations.InsertFolderItem.Processor),
