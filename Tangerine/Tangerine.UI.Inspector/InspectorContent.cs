@@ -268,23 +268,42 @@ namespace Tangerine.UI.Inspector
 			}
 		}
 
+		private class Ref<T>
+		{
+			public Ref(T value) { Value = value; }
+			public T Value { get; set; }
+			public static implicit operator T(Ref<T> wrapper) => wrapper.Value;
+			public static implicit operator Ref<T>(T value) => new Ref<T>(value);
+		}
+
 		private IPropertyEditor PopulateEditorsForListType(IEnumerable<object> objects, IEnumerable<object> rootObjects, PropertyEditorParams param, Type iListInterface)
 		{
 			var listGenericArgument = iListInterface.GetGenericArguments().First();
+			var indexers = new List<Ref<int>>();
 			Action<Widget, int> onAdd = (w, index) => {
+				Ref<int> indexRef = new Ref<int>(index);
+				indexers.Add(indexRef);
 				var list = (IList)param.PropertyInfo.GetValue(objects.First());
 				var p = new PropertyEditorParams(w, new [] { list }, new[] { list }, param.PropertyInfo.PropertyType, "Item", "Item"
 				) {
 					NumericEditBoxFactory = () => new TransactionalNumericEditBox(History),
 					History = History,
 					DefaultValueGetter = () => default,
-					PropertySetter = (@object, name, value) => Core.Operations.SetIndexedProperty.Perform(@object, name, () => index, value),
-					IndexProvider = () => index,
+					PropertySetter = (@object, name, value) => Core.Operations.SetIndexedProperty.Perform(@object, name, () => indexRef, value),
+					IndexProvider = () => indexRef,
 				};
 				PopulatePropertyEditors(param.PropertyInfo.PropertyType, new [] { list }, rootObjects, w, new Dictionary<string, List<PropertyEditorParams>>{{"", new List<PropertyEditorParams>{ p }}}).ToList();
 			};
-			var onRemove = new Action<Widget, int>((w, o) => {
-				// TODO: shomehow shift indices of preceding element
+			var onRemove = new Action<Widget, int>((w, removedIndex) => {
+				for (int i = indexers.Count - 1; i >= 0; i--) {
+					var indexRef = indexers[i];
+					if (indexRef == removedIndex) {
+						indexers.RemoveAt(i);
+					}
+					if (indexRef > removedIndex) {
+						indexRef.Value--;
+					}
+				}
 			});
 			var specializedICollectionPropertyEditorType = typeof(ListPropertyEditor<,>).MakeGenericType(param.PropertyInfo.PropertyType, listGenericArgument);
 			var editor = Activator.CreateInstance(specializedICollectionPropertyEditorType, param, onAdd, onRemove) as IPropertyEditor;
@@ -293,7 +312,6 @@ namespace Tangerine.UI.Inspector
 
 		private IPropertyEditor PopulateEditorsForInstanceType(IEnumerable<object> objects, IEnumerable<object> rootObjects, PropertyEditorParams param)
 		{
-			IPropertyEditor editor;
 			var instanceEditors = new List<IPropertyEditor>();
 			var onValueChanged = new Action<Widget>((w) => {
 				w.Nodes.Clear();
@@ -306,7 +324,7 @@ namespace Tangerine.UI.Inspector
 					w, param.PropertyPath));
 			});
 			Type et = typeof(InstancePropertyEditor<>).MakeGenericType(param.PropertyInfo.PropertyType);
-			editor = Activator.CreateInstance(et, param, onValueChanged) as IPropertyEditor;
+			var editor = Activator.CreateInstance(et, param, onValueChanged) as IPropertyEditor;
 			return editor;
 		}
 
