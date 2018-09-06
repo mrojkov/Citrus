@@ -21,7 +21,7 @@ namespace Tangerine.UI
 		{
 			if (editorParams.Objects.Count() > 1) {
 				ExpandButton.Visible = false;
-				ContainerWidget.AddNode(new ThemedSimpleText {
+				EditorContainer.AddNode(new ThemedSimpleText {
 					Text = "Unable to edit multiple gradients",
 					VAlignment = VAlignment.Center,
 					LayoutCell = new LayoutCell(Alignment.Center, stretchX: 0),
@@ -38,8 +38,8 @@ namespace Tangerine.UI
 			gradientControlWidget.Gradient = gradientProperty.GetValue();
 			ContainerWidget.AddChangeWatcher(gradientProperty, g => gradientControlWidget.Gradient = g);
 			gradientControlWidget.SelectionChanged += SelectPoint;
-			ContainerWidget.AddNode(gradientControlWidget);
-			ContainerWidget.AddNode(CreatePipetteButton());
+			EditorContainer.AddNode(gradientControlWidget);
+			EditorContainer.AddNode(CreatePipetteButton());
 			ExpandableContent.Padding = new Thickness { Left = 25f, Right = 25f, Top = 5f };
 			ExpandableContent.AddNode(new Widget {
 				Layout = new HBoxLayout { Spacing = 10f },
