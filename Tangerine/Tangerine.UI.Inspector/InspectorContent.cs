@@ -268,19 +268,11 @@ namespace Tangerine.UI.Inspector
 			}
 		}
 
-		private class Ref<T>
-		{
-			public Ref(T value) { Value = value; }
-			public T Value { get; set; }
-			public static implicit operator T(Ref<T> wrapper) => wrapper.Value;
-			public static implicit operator Ref<T>(T value) => new Ref<T>(value);
-		}
-
 		private IPropertyEditor PopulateEditorsForListType(IEnumerable<object> objects, IEnumerable<object> rootObjects, PropertyEditorParams param, Type iListInterface)
 		{
 			var listGenericArgument = iListInterface.GetGenericArguments().First();
 			var indexers = new List<Ref<int>>();
-			Action<Widget, int> onAdd = (w, index) => {
+			Func<Widget, int, Ref<int>> onAdd = (w, index) => {
 				Ref<int> indexRef = new Ref<int>(index);
 				indexers.Add(indexRef);
 				var list = (IList)param.PropertyInfo.GetValue(objects.First());
@@ -293,6 +285,7 @@ namespace Tangerine.UI.Inspector
 					IndexProvider = () => indexRef,
 				};
 				PopulatePropertyEditors(param.PropertyInfo.PropertyType, new [] { list }, rootObjects, w, new Dictionary<string, List<PropertyEditorParams>>{{"", new List<PropertyEditorParams>{ p }}}).ToList();
+				return indexRef;
 			};
 			var onRemove = new Action<Widget, int>((w, removedIndex) => {
 				for (int i = indexers.Count - 1; i >= 0; i--) {

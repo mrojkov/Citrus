@@ -8,6 +8,17 @@ using Tangerine.Core.Operations;
 
 namespace Tangerine.UI
 {
+	public class Ref<T>
+	{
+		public Ref(T value) { Value = value; }
+		public T Value { get; set; }
+		public static implicit operator T(Ref<T> wrapper) => wrapper.Value;
+		public static implicit operator Ref<T>(T value) => new Ref<T>(value);
+	}
+}
+
+namespace Tangerine.UI
+{
 	public interface IListPropertyEditor
 	{
 
@@ -17,7 +28,7 @@ namespace Tangerine.UI
 	{
 		public ThemedAddButton AddButton;
 
-		public ListPropertyEditor(IPropertyEditorParams editorParams, Action<Widget, int> onAdd, Action<Widget, int> onRemove) : base(editorParams)
+		public ListPropertyEditor(IPropertyEditorParams editorParams, Func<Widget, int, Ref<int>> onAdd, Action<Widget, int> onRemove) : base(editorParams)
 		{
 			if (EditorParams.Objects.Skip(1).Any()) {
 				// Dont create editor interface if > 1 objects are selected
@@ -37,17 +48,17 @@ namespace Tangerine.UI
 				var elementContainer = new Widget {
 					Layout = new HBoxLayout()
 				};
+				var indexRef = onAdd(elementContainer, index);
 				var removeButton = new ThemedDeleteButton();
 				removeButton.Clicked += () => {
 					using (Document.Current.History.BeginTransaction()) {
-						RemoveFromList.Perform(list, index);
+						RemoveFromList.Perform(list, indexRef);
 						Document.Current.History.CommitTransaction();
 					}
 					elementContainer.UnlinkAndDispose();
-					onRemove(elementContainer, index);
+					onRemove(elementContainer, indexRef);
 				};
 				ExpandableContent.AddNode(elementContainer);
-				onAdd(elementContainer, index);
 				elementContainer.AddNode(removeButton);
 				return elementContainer;
 			};
