@@ -377,6 +377,7 @@
     <Compile Include="Source\Graphics\Icon.cs" />
     <Compile Include="Source\Graphics\IRenderer.cs" />
     <Compile Include="Source\Widgets\3D\RenderObject3D.cs" />
+    <Compile Include="Source\Widgets\RendererWrapper.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />
