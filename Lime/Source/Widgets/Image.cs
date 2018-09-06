@@ -104,9 +104,11 @@ namespace Lime
 				size.Y = -size.Y;
 			}
 			if (localPoint.X >= 0 && localPoint.Y >= 0 && localPoint.X < size.X && localPoint.Y < size.Y) {
-				int u = (int)(Texture.ImageSize.Width * (localPoint.X / size.X));
-				int v = (int)(Texture.ImageSize.Height * (localPoint.Y / size.Y));
-				return !Texture.IsTransparentPixel(u, v);
+				float u = UV0.X + (UV1.X - UV0.X) * (localPoint.X / size.X);
+				float v = UV0.Y + (UV1.Y - UV0.Y) * (localPoint.Y / size.Y);
+				int tu = (int)(Texture.ImageSize.Width * u);
+				int tv = (int)(Texture.ImageSize.Height * v);
+				return !Texture.IsTransparentPixel(tu, tv);
 			} else {
 				return false;
 			}
