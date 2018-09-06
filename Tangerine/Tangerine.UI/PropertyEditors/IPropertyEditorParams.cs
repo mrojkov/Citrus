@@ -27,6 +27,7 @@ namespace Tangerine.UI
 		Func<object> DefaultValueGetter { get; set; }
 		ITransactionalHistory History { get; set; }
 		float LabelWidth { get; set; }
+		Func<int> IndexProvider { get; set; }
 	}
 
 	public interface IPropertyEditorParamsInternal

@@ -26,8 +26,9 @@ namespace Tangerine.UI
 		public Func<object> DefaultValueGetter { get; set; }
 		public ITransactionalHistory History { get; set; }
 		PropertySetterDelegate IPropertyEditorParamsInternal.PropertySetter => propertySetter;
-		public PropertySetterDelegate PropertySetter { set { propertySetter = value; } }
+		public PropertySetterDelegate PropertySetter { set => propertySetter = value; }
 		public float LabelWidth { get; set; } = 140;
+		public Func<int> IndexProvider { get; set; }
 
 		public PropertyEditorParams(Widget inspectorPane, IEnumerable<object> objects, IEnumerable<object> rootObjects, Type type, string propertyName, string propertyPath)
 		{

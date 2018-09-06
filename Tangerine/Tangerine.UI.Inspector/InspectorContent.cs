@@ -186,6 +186,10 @@ namespace Tangerine.UI.Inspector
 						widget.AddNode(label);
 					}
 				}
+				var isAnimable = rootObjects.All(a => a is IAnimationHost) &&
+				                 PropertyAttributes<TangerineStaticPropertyAttribute>.Get(property) == null &&
+				                 AnimatorRegistry.Instance.Contains(property.PropertyType) &&
+				                 !Document.Current.InspectRootNode;
 				var @params = new PropertyEditorParams(widget, objects, rootObjects, type, property.Name,
 					string.IsNullOrEmpty(propertyPath)
 						? property.Name
@@ -201,59 +205,117 @@ namespace Tangerine.UI.Inspector
 						var obj = ctr.Invoke(null);
 						var prop = type.GetProperty(property.Name);
 						return prop.GetValue(obj);
-					}
-				};
+					},
+					PropertySetter = isAnimable ? (PropertySetterDelegate)SetAnimableProperty : SetProperty
+			};
 				if (!editorParams.Keys.Contains(@params.Group)) {
 					editorParams.Add(@params.Group, new List<PropertyEditorParams>());
 				}
 				editorParams[@params.Group].Add(@params);
 			}
 
-			foreach (var header in editorParams.Keys.OrderBy((s) => s)) {
+			foreach (var propertyEditor in PopulatePropertyEditors(type, objects, rootObjects, widget, editorParams)) {
+				yield return propertyEditor;
+			}
+		}
+
+		private IEnumerable<IPropertyEditor> PopulatePropertyEditors(Type type, IEnumerable<object> objects, IEnumerable<object> rootObjects, Widget widget, Dictionary<string, List<PropertyEditorParams>> editorParams)
+		{
+			foreach (var header in editorParams.Keys.OrderBy((s) => s))
+			{
 				AddGroupHeader(header, widget);
-				foreach (var param in editorParams[header]) {
+				foreach (var param in editorParams[header])
+				{
 					bool isPropertyRegistered = false;
 					IPropertyEditor editor = null;
-					foreach (var i in InspectorPropertyRegistry.Instance.Items) {
-						if (i.Condition(param)) {
+					foreach (var i in InspectorPropertyRegistry.Instance.Items)
+					{
+						if (i.Condition(param))
+						{
 							isPropertyRegistered = true;
 							editor = i.Builder(param);
 							break;
 						}
 					}
+
 					if (!isPropertyRegistered) {
 						var propertyType = param.PropertyInfo.PropertyType;
+						var iListInterface = propertyType.GetInterfaces().FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IList<>));
 						if (propertyType.IsEnum) {
-							Type specializedEnumPropertyEditorType = typeof(EnumPropertyEditor<>).MakeGenericType(param.PropertyInfo.PropertyType);
-							editor = Activator.CreateInstance(specializedEnumPropertyEditorType, new object[] { param }) as IPropertyEditor;
+							editor = CreateEditorForEnum(param);
+						} else if (iListInterface != null) {
+							editor = PopulateEditorsForListType(objects, rootObjects, param, iListInterface);
 						} else if ((propertyType.IsClass || propertyType.IsInterface) && !propertyType.GetInterfaces().Contains(typeof(IEnumerable))) {
-							var instanceEditors = new List<IPropertyEditor>();
-							var onValueChanged = new Action<Widget>((w) => {
-								w.Nodes.Clear();
-								foreach (var e in instanceEditors) {
-									editors.Remove(e);
-								}
-								instanceEditors.Clear();
-								instanceEditors.AddRange(BuildForObjectsHelper(objects.Select(o => param.PropertyInfo.GetValue(o)), rootObjects, w, param.PropertyPath));
-							});
-							Type et = typeof(InstancePropertyEditor<>).MakeGenericType(param.PropertyInfo.PropertyType);
-							editor = Activator.CreateInstance(et, new object[] { param, onValueChanged }) as IPropertyEditor;
+							editor = PopulateEditorsForInstanceType(objects, rootObjects, param);
 						}
 					}
-					if (editor != null) {
+
+					if (editor != null)
+					{
 						DecoratePropertyEditor(editor, row++);
 						editors.Add(editor);
 						var showCondition = PropertyAttributes<TangerineIgnoreIfAttribute>.Get(type, param.PropertyInfo.Name);
-						if (showCondition != null) {
-							editor.ContainerWidget.Updated += (delta) => {
+						if (showCondition != null)
+						{
+							editor.ContainerWidget.Updated += (delta) =>
+							{
 								editor.ContainerWidget.Visible = !showCondition.Check(param.Objects.First());
 							};
 						}
-						param.PropertySetter = editor.IsAnimable ? (PropertySetterDelegate)SetAnimableProperty : SetProperty;
 						yield return editor;
 					}
 				}
 			}
+		}
+
+		private IPropertyEditor PopulateEditorsForListType(IEnumerable<object> objects, IEnumerable<object> rootObjects, PropertyEditorParams param, Type iListInterface)
+		{
+			var listGenericArgument = iListInterface.GetGenericArguments().First();
+			Action<Widget, int> onAdd = (w, index) => {
+				var list = (IList)param.PropertyInfo.GetValue(objects.First());
+				var p = new PropertyEditorParams(w, new [] { list }, new[] { list }, param.PropertyInfo.PropertyType, "Item", "Item"
+				) {
+					NumericEditBoxFactory = () => new TransactionalNumericEditBox(History),
+					History = History,
+					DefaultValueGetter = () => default,
+					PropertySetter = (@object, name, value) => Core.Operations.SetIndexedProperty.Perform(@object, name, () => index, value),
+					IndexProvider = () => index,
+				};
+				PopulatePropertyEditors(param.PropertyInfo.PropertyType, new [] { list }, rootObjects, w, new Dictionary<string, List<PropertyEditorParams>>{{"", new List<PropertyEditorParams>{ p }}}).ToList();
+			};
+			var onRemove = new Action<Widget, int>((w, o) => {
+				// TODO: shomehow shift indices of preceding element
+			});
+			var specializedICollectionPropertyEditorType = typeof(ListPropertyEditor<,>).MakeGenericType(param.PropertyInfo.PropertyType, listGenericArgument);
+			var editor = Activator.CreateInstance(specializedICollectionPropertyEditorType, param, onAdd, onRemove) as IPropertyEditor;
+			return editor;
+		}
+
+		private IPropertyEditor PopulateEditorsForInstanceType(IEnumerable<object> objects, IEnumerable<object> rootObjects, PropertyEditorParams param)
+		{
+			IPropertyEditor editor;
+			var instanceEditors = new List<IPropertyEditor>();
+			var onValueChanged = new Action<Widget>((w) => {
+				w.Nodes.Clear();
+				foreach (var e in instanceEditors) {
+					editors.Remove(e);
+				}
+
+				instanceEditors.Clear();
+				instanceEditors.AddRange(BuildForObjectsHelper(objects.Select(o => param.IndexProvider == null ? param.PropertyInfo.GetValue(o) : param.PropertyInfo.GetValue(o, new object[] {param.IndexProvider()})), rootObjects,
+					w, param.PropertyPath));
+			});
+			Type et = typeof(InstancePropertyEditor<>).MakeGenericType(param.PropertyInfo.PropertyType);
+			editor = Activator.CreateInstance(et, param, onValueChanged) as IPropertyEditor;
+			return editor;
+		}
+
+		private static IPropertyEditor CreateEditorForEnum(PropertyEditorParams param)
+		{
+			IPropertyEditor editor;
+			var specializedEnumPropertyEditorType = typeof(EnumPropertyEditor<>).MakeGenericType(param.PropertyInfo.PropertyType);
+			editor = Activator.CreateInstance(specializedEnumPropertyEditorType, param) as IPropertyEditor;
+			return editor;
 		}
 
 		private static IEnumerable<Type> GetComponentsTypes(IReadOnlyList<Node> nodes)
