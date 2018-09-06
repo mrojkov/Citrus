@@ -131,7 +131,7 @@ namespace Lime
 
 	[TangerineRegisterNode(Order = 26)]
 	[TangerineAllowedParentTypes(typeof(Spline3D))]
-	public class SplinePoint3D : Node, Viewport3D.IZSorterParams
+	public class SplinePoint3D : Node
 	{
 		[YuzuMember]
 		public SplineInterpolation Interpolation { get; set; }
