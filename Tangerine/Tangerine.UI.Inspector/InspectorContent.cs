@@ -124,8 +124,8 @@ namespace Tangerine.UI.Inspector
 
 		private bool ShouldInspectProperty(Type type, IEnumerable<object> objects, PropertyInfo property)
 		{
-			if (property.Name == "Item") {
-				// WTF, Bug in Mono?
+			if (property.GetIndexParameters().Length > 0) {
+				// we dont inspect indexers (they have "Item" name by default
 				return false;
 			}
 			var yuzuItem = Yuzu.Metadata.Meta.Get(type, Serialization.YuzuCommonOptions).Items.Find(i => i.PropInfo == property);
