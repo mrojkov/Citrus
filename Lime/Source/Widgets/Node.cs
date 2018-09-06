@@ -300,6 +300,7 @@ namespace Lime
 		/// Child nodes.
 		/// For enumerating all descendants use Descendants.
 		/// </summary>
+		[TangerineIgnore]
 		[YuzuMember]
 		[YuzuSerializeIf(nameof(ShouldSerializeNodes))]
 		public NodeList Nodes { get; private set; }
@@ -377,6 +378,7 @@ namespace Lime
 		public bool NeedSerializeAnimations() =>
 			Animations.Count > 1 || (Animations.Count == 1 && (FirstAnimation.Id != null || FirstAnimation.Markers.Count > 0));
 
+		[TangerineIgnore]
 		[YuzuMember]
 		public List<Folder.Descriptor> Folders { get; set; }
 
