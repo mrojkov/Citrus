@@ -210,7 +210,7 @@ namespace Lime
 
 		public virtual bool PartialHitTest(Node node, ref HitTestArgs args) => false;
 
-		public IPresenter Clone() => (IPresenter)MemberwiseClone();
+		public virtual IPresenter Clone() => (IPresenter)MemberwiseClone();
 
 		private class RenderObject : Lime.RenderObject
 		{
