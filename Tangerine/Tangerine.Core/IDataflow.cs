@@ -79,6 +79,31 @@ namespace Tangerine.Core
 		}
 	}
 
+	public class IndexedProperty<T> : IDataflowProvider<T>
+	{
+		public Func<T> Getter { get; }
+		public Action<T> Setter { get; }
+
+		public IndexedProperty(object obj, string propertyName, Func<int> indexProvider)
+		{
+			var pi = obj.GetType().GetProperty(propertyName);
+			var getMethod = pi.GetGetMethod();
+			Getter = () => (T)getMethod.Invoke(obj, new object[] { indexProvider() });
+			var setMethod = pi.GetSetMethod();
+			if (setMethod != null) {
+				Setter = (v) => setMethod.Invoke(obj, new object[] { indexProvider(), v });
+			}
+		}
+
+		IDataflow<T> IDataflowProvider<T>.GetDataflow() => new PropertyDataflow<T>(Getter);
+
+		public T Value
+		{
+			get => Getter();
+			set => Setter(value);
+		}
+	}
+
 	public class EventflowProvider<T> : IDataflowProvider<T>
 	{
 		private readonly object obj;
