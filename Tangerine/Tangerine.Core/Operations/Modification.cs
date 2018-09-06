@@ -10,14 +10,11 @@ namespace Tangerine.Core.Operations
 {
 	public class SetProperty : Operation
 	{
-		private bool isChangingDocument;
-
 		public readonly object Obj;
 		public readonly object Value;
 		public readonly PropertyInfo Property;
 		public readonly Type Type;
-
-		public override bool IsChangingDocument => isChangingDocument;
+		public override bool IsChangingDocument { get; }
 
 		public static void Perform(object obj, string propertyName, object value, bool isChangingDocument = true)
 		{
@@ -35,7 +32,7 @@ namespace Tangerine.Core.Operations
 			Obj = obj;
 			Value = value;
 			Property = Type.GetProperty(propertyName);
-			this.isChangingDocument = isChangingDocument;
+			IsChangingDocument = isChangingDocument;
 		}
 
 		protected SetProperty(Type type, object obj, string propertyName, object value, bool isChangingDocument)
@@ -44,12 +41,12 @@ namespace Tangerine.Core.Operations
 			Obj = obj;
 			Value = value;
 			Property = Type.GetProperty(propertyName);
-			this.isChangingDocument = isChangingDocument;
+			IsChangingDocument = isChangingDocument;
 		}
 
 		public class Processor : OperationProcessor<SetProperty>
 		{
-			class Backup { public object Value; }
+			private class Backup { public object Value; }
 
 			protected override void InternalRedo(SetProperty op)
 			{
