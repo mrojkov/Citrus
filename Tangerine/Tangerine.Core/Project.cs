@@ -63,7 +63,11 @@ namespace Tangerine.Core
 				throw new InvalidOperationException();
 			}
 			Current = this;
-			AssetBundle.Current = new TangerineAssetBundle(AssetsDirectory);
+			TangerineAssetBundle tangerineAssetBundle;
+			AssetBundle.Current = tangerineAssetBundle = new TangerineAssetBundle(AssetsDirectory);
+			if (!tangerineAssetBundle.IsActual()) {
+				tangerineAssetBundle.CleanupBundle();
+			}
 			Preferences = new ProjectPreferences();
 			Preferences.Initialize();
 			if (File.Exists(UserprefsPath)) {

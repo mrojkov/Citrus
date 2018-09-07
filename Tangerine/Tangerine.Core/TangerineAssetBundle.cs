@@ -1,12 +1,55 @@
 using System.Collections.Generic;
 using System.IO;
 using Lime;
+using Yuzu;
 
 namespace Tangerine.Core
 {
 	public class TangerineAssetBundle : UnpackedAssetBundle
 	{
+		private const string VersionFile = "__CACHE_VERSION__";
+
+		public class CacheMeta
+		{
+			private const string CurrentVersion = "1.0";
+
+			[YuzuRequired]
+			public string Version { get; set; } = CurrentVersion;
+
+			public bool IsActual => Version == CurrentVersion;
+		}
+
 		public TangerineAssetBundle(string baseDirectory) : base(baseDirectory) { }
+
+		public bool IsActual()
+		{
+			using (var cacheBundle = new PackedAssetBundle(Orange.The.Workspace.TangerineCacheBundle, AssetBundleFlags.Writable)) {
+				if (!cacheBundle.FileExists(VersionFile)) {
+					return false;
+				}
+				try {
+					using (var stream = cacheBundle.OpenFile(VersionFile)) {
+						var cacheMeta = Serialization.ReadObject<CacheMeta>(VersionFile, stream);
+						if (!cacheMeta.IsActual) {
+							return false;
+						}
+					}
+				} catch {
+					return false;
+				}
+			}
+			return true;
+		}
+
+		public void CleanupBundle()
+		{
+			using (var cacheBundle = new PackedAssetBundle(Orange.The.Workspace.TangerineCacheBundle, AssetBundleFlags.Writable)) {
+				foreach (var path in cacheBundle.EnumerateFiles()) {
+					cacheBundle.DeleteFile(path);
+				}
+				Serialization.WriteObjectToBundle(cacheBundle, VersionFile, new CacheMeta(), Serialization.Format.Binary, string.Empty, AssetAttributes.None, new byte[0]);
+			}
+		}
 
 		public override Stream OpenFile(string path)
 		{
