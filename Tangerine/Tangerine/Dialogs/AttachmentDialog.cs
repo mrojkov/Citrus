@@ -64,7 +64,7 @@ namespace Tangerine
 				Title = "Attachment3D",
 				MinimumDecoratedSize = new Vector2(500, 300),
 			});
-			var content = new TabbedWidget();
+			var content = new ThemedTabbedWidget();
 			content.AddTab("General", CreateGeneralPane(attachment), true);
 			content.AddTab("Components", CreateComponentsPane(attachment));
 			content.AddTab("Mesh Options", CreateMeshOptionsPane(attachment));
@@ -149,10 +149,10 @@ namespace Tangerine
 				w => new NodeComponentCollectionRow(w, attachment.NodeComponents), attachment.NodeComponents);
 			widgetFactory.AddHeader(NodeComponentCollectionRow.CreateHeader());
 			widgetFactory.AddFooter(DeletableRow<Model3DAttachment.NodeComponentCollection>.CreateFooter(() => {
-				history.DoTransaction(() => Core.Operations.InsertIntoList.Perform(
+				history.DoTransaction(() => Core.Operations.InsertListItem.Perform(
+					new Model3DAttachment.NodeComponentCollection { NodeId = "Node id", Components = null },
 					attachment.NodeComponents,
-					attachment.NodeComponents.Count,
-					new Model3DAttachment.NodeComponentCollection { NodeId = "Node id", Components = null }));
+					attachment.NodeComponents.Count));
 			}));
 			list.Components.Add(widgetFactory);
 			return pane;

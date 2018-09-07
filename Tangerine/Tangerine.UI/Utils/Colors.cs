@@ -197,7 +197,13 @@ namespace Tangerine.UI
 			public Color4 PanelTitleBackground { get; set; }
 			[YuzuOptional]
 			public Color4 PanelTitleSeparator { get; set; }
-	}
+			[YuzuOptional]
+			public Color4 TabBarBackground { get; set; }
+			[YuzuOptional]
+			public Color4 TabHighlighted { get; set; }
+			[YuzuOptional]
+			public Color4 TabOutline { get; set; }
+		}
 
 		public class InspectorColors : Theme.DefaultColors
 		{
@@ -390,6 +396,10 @@ namespace Tangerine.UI
 				DragRectagleOutline = new Color4(0, 255, 255),
 				PanelTitleBackground = basic.GrayBackground.Lighten(0.1f),
 				PanelTitleSeparator = basic.GrayBackground.Lighten(0.15f),
+				TabBarBackground = basic.GrayBackground,
+				TabHighlighted = basic.TabNormal,
+				TabOutline = basic.TabNormal,
+
 			};
 			var inspector = new InspectorColors {
 				BorderAroundKeyframeColorbox = basic.ControlBorder,
@@ -533,6 +543,9 @@ namespace Tangerine.UI
 				DragRectagleOutline = Color4.FromFloats(0.2f, 0.2f, 1f),
 				PanelTitleBackground = basic.GrayBackground.Darken(0.1f),
 				PanelTitleSeparator = basic.GrayBackground.Darken(0.15f),
+				TabBarBackground = basic.GrayBackground,
+				TabHighlighted = Color4.White.Darken(0.1f),
+				TabOutline = basic.GrayBackground.Darken(0.5f),
 			};
 			var inspector = new InspectorColors {
 				BorderAroundKeyframeColorbox = basic.ControlBorder,

@@ -19,7 +19,7 @@ namespace Tangerine
 		readonly Button cancelButton;
 		readonly Button resetButton;
 		readonly Frame Frame;
-		readonly TabbedWidget Content;
+		readonly ThemedTabbedWidget Content;
 		readonly ToolbarModelEditor toolbarModelEditor;
 
 		private List<IPropertyEditor> editors = new List<IPropertyEditor>();
@@ -50,7 +50,7 @@ namespace Tangerine
 				LayoutCell = new LayoutCell { StretchY = float.MaxValue },
 				Layout = new StackLayout(),
 			};
-			Content = new TabbedWidget();
+			Content = new ThemedTabbedWidget();
 			Content.AddTab("General", CreateGeneralPane(), true);
 			Content.AddTab("Appearance", CreateColorsPane());
 			Content.AddTab("Theme", CreateThemePane());
