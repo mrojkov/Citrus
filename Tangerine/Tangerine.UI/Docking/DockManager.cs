@@ -241,8 +241,8 @@ namespace Tangerine.UI.Docking
 				return;
 			}
 			bool requestTitle = placement is WindowPlacement windowPlacement &&
-			                    windowPlacement.GetVisiblePanelPlacements().Count() > 1 &&
-								!isMainWindow;
+				windowPlacement.GetVisiblePanelPlacements().Count() > 1 &&
+				!isMainWindow;
 			placement.SwitchType(
 				panel => CreatePanelWidget(container, panel, stretch),
 				panelGroup => {
@@ -304,11 +304,7 @@ namespace Tangerine.UI.Docking
 							})
 						}
 					}),
-					new Frame {
-						Nodes = {
-							widget
-						}
-					}
+					widget
 				}
 			};
 			// Add space between close button and titleWidget right border.
@@ -348,7 +344,6 @@ namespace Tangerine.UI.Docking
 		private void CreateTabBarWidget(Splitter container, TabBarPlacement placement, float stretch, bool requestTitle)
 		{
 			var tabbedWidget = new TabbedWidget(TabbedWidget.TabBarPlacement.Bottom) {
-				LayoutCell = new LayoutCell { StretchY = 0 },
 				AllowReordering = true
 			};
 			Widget rootWidget = tabbedWidget;
