@@ -63,16 +63,9 @@ namespace Tangerine.Dialogs
 		private Widget CreateSearchBox()
 		{
 			searchBox = new ThemedEditBox();
-			var firstCall = true;
 			searchBox.AddChangeWatcher(
 				() => searchBox.Text,
-				_ => {
-					if (firstCall) {
-						firstCall = false;
-						return;
-					}
-					ShowSearchedColors();
-				}
+				_ => ApplyColorSearch()
 			);
 			return new Widget {
 				Layout = new HBoxLayout(),
@@ -106,7 +99,7 @@ namespace Tangerine.Dialogs
 			Version++;
 		}
 
-		private void ShowSearchedColors()
+		private void ApplyColorSearch()
 		{
 			pane.ScrollPosition = 0;
 			var isShowingAll = searchBox.Text.Length == 0;
