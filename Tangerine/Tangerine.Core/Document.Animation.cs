@@ -1,9 +1,12 @@
 using Lime;
+using System.Collections.Generic;
 
 namespace Tangerine.Core
 {
 	public sealed partial class Document
 	{
+		private List<double> savedAnimationTimes;
+
 		public bool SlowMotion { get; set; }
 
 		public static bool CacheAnimationsStates
@@ -32,8 +35,11 @@ namespace Tangerine.Core
 			if (PreviewAnimation) {
 				PreviewAnimation = false;
 				CurrentFrameSetter.StopAnimationRecursive(PreviewAnimationContainer);
-				if (!CoreUserPreferences.Instance.StopAnimationOnCurrentFrame) {
-					CurrentFrameSetter.SetTimeRecursive(PreviewAnimationContainer, 0);
+				if (!CoreUserPreferences.Instance.StopAnimationOnCurrentFrame) { 
+					var i = 0;
+					foreach (var node in PreviewAnimationContainer.Descendants) {
+						node.AnimationTime = animationMode ? 0 : savedAnimationTimes[i++];
+					}
 					SetCurrentFrameToNode(
 						PreviewAnimationBegin, Container, animationMode
 					);
@@ -41,6 +47,10 @@ namespace Tangerine.Core
 				AudioSystem.StopAll();
 				ForceAnimationUpdate();
 			} else {
+				savedAnimationTimes = new List<double>();
+				foreach (var node in Container.Descendants) {
+					savedAnimationTimes.Add(node.AnimationTime);
+				}
 				foreach (var node in RootNode.Descendants) {
 					if (node is ITangerinePreviewAnimationListener t) {
 						t.OnStart();
