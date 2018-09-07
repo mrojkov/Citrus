@@ -38,7 +38,7 @@ namespace Tangerine.UI.SceneView
 				}
 			} else {
 				resolutionPreview.Preset = ProjectPreferences.Instance.Resolutions.First();
-				resolutionPreview.IsPortrait = false;
+				resolutionPreview.IsPortrait = !ProjectPreferences.Instance.IsLandscapeDefault;
 				requiredSave = false;
 			}
 			PerformResolutionPreviewOperation(resolutionPreview, requiredSave);

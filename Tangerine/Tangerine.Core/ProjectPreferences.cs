@@ -10,6 +10,7 @@ namespace Tangerine.Core
 		private readonly List<ResolutionPreset> resolutions = new List<ResolutionPreset>();
 		public IReadOnlyList<ResolutionPreset> Resolutions => resolutions;
 		public ResolutionPreset DefaultResolution { get; private set; }
+		public bool IsLandscapeDefault { get; private set; }
 
 		public void Initialize()
 		{
@@ -36,6 +37,7 @@ namespace Tangerine.Core
 					resolutions.Add(new ResolutionPreset(name, width, height, usingResolutionMarkers));
 				}
 				DefaultResolution = resolutions[0];
+				IsLandscapeDefault = (bool)(projectJson.ResolutionSettings.IsLandscapeDefault ?? true);
 				Console.WriteLine("Resolution presets was successfully loaded.");
 			} catch {
 				InitializeDefaultResolutions();
@@ -61,6 +63,7 @@ namespace Tangerine.Core
 				new ResolutionPreset("Xperia Z4 Tablet", 2560, 1600, resolutionMarkers),
 				new ResolutionPreset("LG G6", 2880, 1440, resolutionMarkers),
 			});
+			IsLandscapeDefault = true;
 			Console.WriteLine("Default resolution presets was loaded.");
 		}
 	}
