@@ -109,9 +109,9 @@ namespace Lime
 		public abstract void PopRenderTarget();
 		public abstract void Callback(Action callback);
 
-		public void RenderToTexture(Widget widget, ITexture texture, RenderChain renderChain, bool clearRenderTarget = true)
+		public void RenderToTexture(RenderChain renderChain, ITexture texture, float width, float height, Matrix32 viewMatrix, bool clearRenderTarget = true)
 		{
-			if (widget.Width > 0 && widget.Height > 0) {
+			if (width > 0 && height > 0) {
 				PushRenderTarget(texture);
 				PushState(
 					RenderState.ScissorState |
@@ -129,20 +129,25 @@ namespace Lime
 				}
 				World = Matrix44.Identity;
 				View = Matrix44.Identity;
-				SetOrthogonalProjection(0, 0, widget.Width, widget.Height);
+				SetOrthogonalProjection(0, 0, width, height);
 				DepthState = DepthState.DepthDisabled;
 				CullMode = CullMode.None;
-				Transform2 = widget.LocalToWorldTransform.CalcInversed();
-				try {
-					for (var node = widget.FirstChild; node != null; node = node.NextSibling) {
-						node.RenderChainBuilder?.AddToRenderChain(renderChain);
-					}
-					DrawRenderChain(renderChain);
-				} finally {
-					renderChain.Clear();
-				}
+				Transform2 = viewMatrix;
+				DrawRenderChain(renderChain);
 				PopState();
 				PopRenderTarget();
+			}
+		}
+
+		public void RenderToTexture(Widget widget, ITexture texture, RenderChain renderChain, bool clearRenderTarget = true)
+		{
+			try {
+				for (var node = widget.FirstChild; node != null; node = node.NextSibling) {
+					node.RenderChainBuilder?.AddToRenderChain(renderChain);
+				}
+				RenderToTexture(renderChain, texture, widget.Width, widget.Height, widget.LocalToWorldTransform.CalcInversed(), clearRenderTarget);
+			} finally {
+				renderChain.Clear();
 			}
 		}
 
