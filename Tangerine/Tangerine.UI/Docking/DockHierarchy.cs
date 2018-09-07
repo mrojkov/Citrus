@@ -186,8 +186,7 @@ namespace Tangerine.UI.Docking
 			if (site == DockSite.Fill) {
 				target.SwitchType(
 					targetPanelPlacement => {
-						switch (placement)
-						{
+						switch (placement) {
 							case TabBarPlacement tabBarPlacement:
 								DockPlacementTo(tabBarPlacement, targetPanelPlacement);
 								break;
@@ -200,8 +199,7 @@ namespace Tangerine.UI.Docking
 						}
 					},
 					targetTabBarPlacement => {
-						switch (placement)
-						{
+						switch (placement) {
 							case TabBarPlacement tabBarPlacement:
 								DockPlacementTo(tabBarPlacement, targetTabBarPlacement);
 								break;
@@ -236,8 +234,7 @@ namespace Tangerine.UI.Docking
 				}
 				if (!CheckPlacement((LinearPlacement)target.Parent, site, out parent)) {
 					ReplacePlacement(target, parent, site, ref stretch, ref index);
-				}
-				else {
+				} else {
 					index = parent.Placements.IndexOf(target);
 					stretch = AdjustStretch(parent, stretch, index);
 					if (site == DockSite.Right || site == DockSite.Bottom) {
@@ -296,7 +293,6 @@ namespace Tangerine.UI.Docking
 
 	public abstract class Placement
 	{
-
 		public Placement Parent { get; set; }
 
 		public Placement Root => Parent?.Root ?? this;
@@ -353,8 +349,8 @@ namespace Tangerine.UI.Docking
 		public void SwitchType(
 			Action<PanelPlacement> onPanelPlacement = null,
 			Action<TabBarPlacement> onTabBarPlacement = null,
-			Action<LinearPlacement> onLinearPlacement = null)
-		{
+			Action<LinearPlacement> onLinearPlacement = null
+		) {
 			switch (this)
 			{
 				case PanelPlacement panelPlacement:
@@ -400,9 +396,7 @@ namespace Tangerine.UI.Docking
 			return result;
 		}
 
-		public WindowPlacement() : base(LinearPlacementDirection.Vertical)
-		{
-		}
+		public WindowPlacement() : base(LinearPlacementDirection.Vertical) { }
 	}
 
 	public class PanelPlacement : Placement
