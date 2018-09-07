@@ -344,7 +344,7 @@ namespace Tangerine.Core.Operations
 
 		public override bool IsChangingDocument => true;
 
-		private InsertIntoList(IList collection, int index, object element)
+		protected InsertIntoList(IList collection, int index, object element)
 		{
 			this.collection = collection;
 			this.index = index;
@@ -358,7 +358,6 @@ namespace Tangerine.Core.Operations
 			protected override void InternalRedo(InsertIntoList op) => op.collection.Insert(op.index, op.element);
 			protected override void InternalUndo(InsertIntoList op) => op.collection.RemoveAt(op.index);
 		}
-
 	}
 
 	public class RemoveFromList : Operation
@@ -369,7 +368,7 @@ namespace Tangerine.Core.Operations
 
 		public override bool IsChangingDocument => true;
 
-		private RemoveFromList(IList collection, int index)
+		protected RemoveFromList(IList collection, int index)
 		{
 			this.collection = collection;
 			this.index = index;

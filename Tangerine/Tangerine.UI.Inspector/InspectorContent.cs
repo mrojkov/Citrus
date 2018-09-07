@@ -221,17 +221,13 @@ namespace Tangerine.UI.Inspector
 
 		private IEnumerable<IPropertyEditor> PopulatePropertyEditors(Type type, IEnumerable<object> objects, IEnumerable<object> rootObjects, Widget widget, Dictionary<string, List<PropertyEditorParams>> editorParams)
 		{
-			foreach (var header in editorParams.Keys.OrderBy((s) => s))
-			{
+			foreach (var header in editorParams.Keys.OrderBy((s) => s)) {
 				AddGroupHeader(header, widget);
-				foreach (var param in editorParams[header])
-				{
+				foreach (var param in editorParams[header]) {
 					bool isPropertyRegistered = false;
 					IPropertyEditor editor = null;
-					foreach (var i in InspectorPropertyRegistry.Instance.Items)
-					{
-						if (i.Condition(param))
-						{
+					foreach (var i in InspectorPropertyRegistry.Instance.Items) {
+						if (i.Condition(param)) {
 							isPropertyRegistered = true;
 							editor = i.Builder(param);
 							break;
@@ -250,15 +246,12 @@ namespace Tangerine.UI.Inspector
 						}
 					}
 
-					if (editor != null)
-					{
+					if (editor != null) {
 						DecoratePropertyEditor(editor, row++);
 						editors.Add(editor);
 						var showCondition = PropertyAttributes<TangerineIgnoreIfAttribute>.Get(type, param.PropertyInfo.Name);
-						if (showCondition != null)
-						{
-							editor.ContainerWidget.Updated += (delta) =>
-							{
+						if (showCondition != null) {
+							editor.ContainerWidget.Updated += (delta) => {
 								editor.ContainerWidget.Visible = !showCondition.Check(param.Objects.First());
 							};
 						}
@@ -271,35 +264,12 @@ namespace Tangerine.UI.Inspector
 		private IPropertyEditor PopulateEditorsForListType(IEnumerable<object> objects, IEnumerable<object> rootObjects, PropertyEditorParams param, Type iListInterface)
 		{
 			var listGenericArgument = iListInterface.GetGenericArguments().First();
-			var indexers = new List<Ref<int>>();
-			Func<Widget, int, Ref<int>> onAdd = (w, index) => {
-				Ref<int> indexRef = new Ref<int>(index);
-				indexers.Add(indexRef);
-				var list = (IList)param.PropertyInfo.GetValue(objects.First());
-				var p = new PropertyEditorParams(w, new [] { list }, new[] { list }, param.PropertyInfo.PropertyType, "Item", "Item"
-				) {
-					NumericEditBoxFactory = () => new TransactionalNumericEditBox(History),
-					History = History,
-					DefaultValueGetter = () => default,
-					PropertySetter = (@object, name, value) => Core.Operations.SetIndexedProperty.Perform(@object, name, () => indexRef, value),
-					IndexProvider = () => indexRef,
-				};
-				PopulatePropertyEditors(param.PropertyInfo.PropertyType, new [] { list }, rootObjects, w, new Dictionary<string, List<PropertyEditorParams>>{{"", new List<PropertyEditorParams>{ p }}}).ToList();
-				return indexRef;
+			Action<PropertyEditorParams, Widget, IList> onAdd = (p, w, list) => {
+				PopulatePropertyEditors(param.PropertyInfo.PropertyType, new[] {list}, rootObjects, w,
+					new Dictionary<string, List<PropertyEditorParams>> {{"", new List<PropertyEditorParams> {p}}}).ToList();
 			};
-			var onRemove = new Action<Widget, int>((w, removedIndex) => {
-				for (int i = indexers.Count - 1; i >= 0; i--) {
-					var indexRef = indexers[i];
-					if (indexRef == removedIndex) {
-						indexers.RemoveAt(i);
-					}
-					if (indexRef > removedIndex) {
-						indexRef.Value--;
-					}
-				}
-			});
 			var specializedICollectionPropertyEditorType = typeof(ListPropertyEditor<,>).MakeGenericType(param.PropertyInfo.PropertyType, listGenericArgument);
-			var editor = Activator.CreateInstance(specializedICollectionPropertyEditorType, param, onAdd, onRemove) as IPropertyEditor;
+			var editor = Activator.CreateInstance(specializedICollectionPropertyEditorType, param, onAdd) as IPropertyEditor;
 			return editor;
 		}
 

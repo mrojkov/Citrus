@@ -225,6 +225,8 @@ namespace Tangerine
 				typeof(Core.Operations.InsertFolderItem.Processor),
 				typeof(Core.Operations.InsertIntoList.Processor),
 				typeof(Core.Operations.RemoveFromList.Processor),
+				typeof(RemoveFromListPropertyEditor.Processor),
+				typeof(InsertIntoListPropertyEditor.Processor),
 				typeof(Core.Operations.UnlinkFolderItem.Processor),
 				typeof(Core.Operations.MoveNodes.Processor),
 				typeof(Core.Operations.SetMarker.Processor),
