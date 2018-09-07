@@ -110,8 +110,10 @@ namespace Lime
 
 		protected internal override Lime.RenderObject GetRenderObject()
 		{
+			var blending = GlobalBlending;
+			var shader = GlobalShader;
 			if (material == null) {
-				material = WidgetMaterial.GetInstance(GlobalBlending, GlobalShader, 1);
+				material = WidgetMaterial.GetInstance(blending, shader, 1);
 			}
 			var UV1 = new Vector2 {
 				X = Size.X / texture.ImageSize.Width * TileRatio.X + TileOffset.X,

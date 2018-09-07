@@ -121,8 +121,10 @@ namespace Lime
 
 		protected internal override Lime.RenderObject GetRenderObject()
 		{
+			var blending = GlobalBlending;
+			var shader = GlobalShader;
 			if (material == null) {
-				material = WidgetMaterial.GetInstance(GlobalBlending, GlobalShader, 1);
+				material = WidgetMaterial.GetInstance(blending, shader, 1);
 			}
 			var ro = RenderObjectPool<RenderObject>.Acquire();
 			ro.Texture = Texture;
