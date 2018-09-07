@@ -314,7 +314,7 @@ namespace Tangerine.UI.Docking
 			};
 			// Add space between close button and titleWidget right border.
 			title.Padding = title.Padding + new Thickness(right: 5);
-			titleWidget.CompoundPresenter.Add(new DelegatePresenter<Widget>(w => {
+			titleWidget.CompoundPresenter.Add(new SyncDelegatePresenter<Widget>(w => {
 				w.PrepareRendererState();
 				Renderer.DrawRect(Vector2.Zero, w.Size, ColorTheme.Current.Docking.PanelTitleBackground);
 				Renderer.DrawLine(0, w.Height - 0.5f, w.Width, w.Height - 0.5f, ColorTheme.Current.Docking.PanelTitleSeparator);
@@ -352,7 +352,7 @@ namespace Tangerine.UI.Docking
 				TabBar = new PanelTabBar(),
 				AllowReordering = true,
 				BarPlacement = TabbedWidget.TabBarPlacement.Bottom,
-				PostPresenter = new DelegatePresenter<TabbedWidget>(w => {
+				PostPresenter = new SyncDelegatePresenter<TabbedWidget>(w => {
 					w.PrepareRendererState();
 					var activeTab = (Tab)w.TabBar.Nodes[w.ActiveTabIndex];
 					var start = activeTab.ContentPosition * activeTab.CalcTransitionToSpaceOf(w);
@@ -648,7 +648,7 @@ namespace Tangerine.UI.Docking
 					isActive => Padding = isActive ? new Thickness { Top = -1f, Bottom = 1f} : new Thickness());
 			}
 
-			private class TabPresenter : CustomPresenter<Widget>
+			private class TabPresenter : SyncCustomPresenter<Widget>
 			{
 				private readonly SimpleText label;
 				private bool active;
