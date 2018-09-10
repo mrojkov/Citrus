@@ -418,7 +418,7 @@ namespace Tangerine.UI.Docking
 
 		public override void RemovePlacement(Placement placement) { }
 
-		public override PanelPlacement FindPanelPlacement(string id) => id == Title ? this : null;
+		public override PanelPlacement FindPanelPlacement(string id) => id == Id ? this : null;
 
 		public override bool AnyVisiblePanel() => !Hidden;
 
