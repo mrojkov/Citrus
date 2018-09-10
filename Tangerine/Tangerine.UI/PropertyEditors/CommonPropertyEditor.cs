@@ -185,7 +185,7 @@ namespace Tangerine.UI
 			} else if (indexParameters.Length == 1 && indexParameters.First().ParameterType == typeof(int)) {
 				IDataflowProvider<T> provider = null;
 				foreach (var o in EditorParams.Objects) {
-					var p = new IndexedProperty<T>(o, EditorParams.PropertyName, EditorParams.IndexProvider);
+					var p = new IndexedProperty<T>(o, EditorParams.PropertyName, EditorParams.IndexInList);
 					provider = (provider == null) ? p : provider.SameOrDefault(p, defaultValue);
 				}
 				return provider;
@@ -207,7 +207,7 @@ namespace Tangerine.UI
 			} else if (indexParameters.Length == 1 && indexParameters.First().ParameterType == typeof(int)) {
 				IDataflowProvider<ComponentType> provider = null;
 				foreach (var o in EditorParams.Objects) {
-					var p = new IndexedProperty<T>(o, EditorParams.PropertyName, EditorParams.IndexProvider).Select(selector);
+					var p = new IndexedProperty<T>(o, EditorParams.PropertyName, EditorParams.IndexInList).Select(selector);
 					provider = (provider == null) ? p : provider.SameOrDefault(p, defaultValue);
 				}
 				return provider;
@@ -242,7 +242,9 @@ namespace Tangerine.UI
 					}
 				} else {
 					foreach (var o in EditorParams.Objects) {
-						var current = new Property(o, EditorParams.PropertyName).Value;
+						var current = EditorParams.IndexInList != null
+							? (new IndexedProperty(o, EditorParams.PropertyName, EditorParams.IndexInList)).Value
+							: (new Property(o, EditorParams.PropertyName).Value);
 						((IPropertyEditorParamsInternal)EditorParams).PropertySetter(o, EditorParams.PropertyName, valueProducer((ValueType)current));
 					}
 				}

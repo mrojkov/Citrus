@@ -8,82 +8,19 @@ using Tangerine.Core.Operations;
 
 namespace Tangerine.UI
 {
-	public class Ref<T>
-	{
-		public Ref(T value) { Value = value; }
-		public T Value { get; set; }
-		public static implicit operator T(Ref<T> wrapper) => wrapper.Value;
-		public static implicit operator Ref<T>(T value) => new Ref<T>(value);
-	}
-
 	public interface IListPropertyEditor
 	{
 
 	}
 
-	public class RemoveFromListPropertyEditor : RemoveFromList
+	public class ListPropertyEditor<TList, TElement>
+		: ExpandablePropertyEditor<TList>
+		, IListPropertyEditor where TList : IList<TElement>
+		, IList, new() where TElement : new()
 	{
-		private Action<Widget> onRemove;
-		private Func<Widget> onInsert;
-		private Widget widget;
-
-		protected RemoveFromListPropertyEditor(IList collection, int index, Widget widget, Action<Widget> onRemove, Func<Widget> onInsert) : base(collection, index)
-		{
-			this.onRemove = onRemove;
-			this.onInsert = onInsert;
-			this.widget = widget;
-		}
-
-		public new static void Perform(IList collection, int index, Widget widget, Action<Widget> onRemove, Func<Widget> onInsert) =>
-			DocumentHistory.Current.Perform(new RemoveFromListPropertyEditor(collection, index, widget, onRemove, onInsert));
-
-		public new class Processor : OperationProcessor<RemoveFromListPropertyEditor>
-		{
-			protected override void InternalRedo(RemoveFromListPropertyEditor op)
-			{
-				op.onRemove.Invoke(op.widget);
-			}
-
-			protected override void InternalUndo(RemoveFromListPropertyEditor op)
-			{
-				op.widget = op.onInsert();
-			}
-		}
-	}
-
-	public class InsertIntoListPropertyEditor : InsertIntoList
-	{
-		private Action<Widget> onRemove;
-		private Func<Widget> onInsert;
-		private Widget widget;
-		protected InsertIntoListPropertyEditor(IList collection, int index, object element, Action<Widget> onRemove, Func<Widget> onInsert) : base(collection, index, element)
-		{
-			this.onRemove = onRemove;
-			this.onInsert = onInsert;
-		}
-
-		public static void Perform(IList collection, int index, object element, Action<Widget> onRemove, Func<Widget> onInsert) =>
-			DocumentHistory.Current.Perform(new InsertIntoListPropertyEditor(collection, index, element, onRemove, onInsert));
-
-		public new class Processor : OperationProcessor<InsertIntoListPropertyEditor>
-		{
-			protected override void InternalRedo(InsertIntoListPropertyEditor op)
-			{
-				op.widget = op.onInsert();
-			}
-
-			protected override void InternalUndo(InsertIntoListPropertyEditor op)
-			{
-				op.onRemove.Invoke(op.widget);
-			}
-		}
-	}
-
-	public class ListPropertyEditor<TList, TElement> : ExpandablePropertyEditor<TList>, IListPropertyEditor where TList : IList<TElement>, IList, new() where TElement : new()
-	{
-		private readonly List<Ref<int>> indexers = new List<Ref<int>>();
 		private readonly Action<PropertyEditorParams, Widget, IList> onAdd;
 		private IList list;
+		private Action removeCallback;
 
 		public ListPropertyEditor(IPropertyEditorParams editorParams, Action<PropertyEditorParams, Widget, IList> onAdd) : base(editorParams)
 		{
@@ -109,15 +46,20 @@ namespace Tangerine.UI
 					}
 					var newElement = new TElement();
 					using (Document.Current.History.BeginTransaction()) {
-						InsertIntoListPropertyEditor.Perform(list, list.Count, newElement,
-							(w) => RemoveEditorsAndUpdateIndexers(w, list.Count - 1),
-							() => AfterInsertNewElement(list.Count - 1));
+						int newIndex = list.Count;
+						InsertIntoList.Perform(list, newIndex, newElement);
 						Document.Current.History.CommitTransaction();
 					}
 				}
 			};
 			EditorContainer.AddNode(addButton);
+			ContainerWidget.Updating += _ => removeCallback?.Invoke();
+			ContainerWidget.AddChangeWatcher(() => list.Count, Build);
+		}
 
+		private void Build(int _)
+		{
+			ExpandableContent.Nodes.Clear();
 			if (list != null) {
 				for (int i = 0; i < list.Count; i++) {
 					AfterInsertNewElement(i);
@@ -130,49 +72,28 @@ namespace Tangerine.UI
 			var elementContainer = new Widget {
 				Layout = new HBoxLayout()
 			};
-			var indexRef = new Ref<int>(index);
-			foreach (var indexer in indexers) {
-				if (indexer >= indexRef) {
-					indexer.Value = indexer.Value + 1;
-				}
-			}
-			indexers.Add(indexRef);
 			var p = new PropertyEditorParams(elementContainer, new[] { list }, new[] { list }, EditorParams.PropertyInfo.PropertyType, "Item", "Item"
 			) {
 				NumericEditBoxFactory = EditorParams.NumericEditBoxFactory,
 				History = EditorParams.History,
 				DefaultValueGetter = () => default,
-				PropertySetter = (@object, name, value) => Core.Operations.SetIndexedProperty.Perform(@object, name, () => indexRef, value),
-				IndexProvider = () => indexRef,
+				PropertySetter = (@object, name, value) => Core.Operations.SetIndexedProperty.Perform(@object, name, index, value),
+				IndexInList = index,
 			};
 			onAdd(p, elementContainer, list);
 
 			var removeButton = new ThemedDeleteButton();
-			removeButton.Clicked += () => {
+			Action removeClicked = () => {
+				removeCallback = null;
 				using (Document.Current.History.BeginTransaction()) {
-					RemoveFromListPropertyEditor.Perform(list, indexRef, elementContainer,
-						(w) => RemoveEditorsAndUpdateIndexers(w, indexRef),
-						() => AfterInsertNewElement(indexRef));
+					RemoveFromList.Perform(list, index);
 					Document.Current.History.CommitTransaction();
 				}
 			};
+			removeButton.Clicked += () => removeCallback = removeClicked;
 			ExpandableContent.Nodes.Insert(index, elementContainer);
 			elementContainer.AddNode(removeButton);
 			return elementContainer;
-		}
-
-		private void RemoveEditorsAndUpdateIndexers(Widget elementContainer, int removedIndex)
-		{
-			elementContainer.UnlinkAndDispose();
-			for (int i = indexers.Count - 1; i >= 0; i--) {
-				var indexRef = indexers[i];
-				if (indexRef == removedIndex) {
-					indexers.RemoveAt(i);
-				}
-				if (indexRef > removedIndex) {
-					indexRef.Value--;
-				}
-			}
 		}
 	}
 }

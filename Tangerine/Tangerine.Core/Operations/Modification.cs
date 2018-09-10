@@ -66,36 +66,36 @@ namespace Tangerine.Core.Operations
 	{
 		public readonly object Obj;
 		public readonly object Value;
-		public readonly Func<int> IndexProvider;
+		public readonly int Index;
 		public readonly PropertyInfo Property;
 		public readonly Type Type;
 		public override bool IsChangingDocument { get; }
 
-		public static void Perform(object obj, string propertyName, Func<int> indexProvider, object value, bool isChangingDocument = true)
+		public static void Perform(object obj, string propertyName, int index, object value, bool isChangingDocument = true)
 		{
-			DocumentHistory.Current.Perform(new SetIndexedProperty(obj, propertyName, indexProvider, value, isChangingDocument));
+			DocumentHistory.Current.Perform(new SetIndexedProperty(obj, propertyName, index, value, isChangingDocument));
 		}
 
-		public static void Perform(Type type, object obj, string propertyName, Func<int> indexProvider, object value, bool isChangingDocument = true)
+		public static void Perform(Type type, object obj, string propertyName, int indexProvider, object value, bool isChangingDocument = true)
 		{
 			DocumentHistory.Current.Perform(new SetIndexedProperty(type, obj, propertyName, indexProvider, value, isChangingDocument));
 		}
 
-		protected SetIndexedProperty(object obj, string propertyName, Func<int> indexProvider, object value, bool isChangingDocument)
+		protected SetIndexedProperty(object obj, string propertyName, int index, object value, bool isChangingDocument)
 		{
 			Type = obj.GetType();
 			Obj = obj;
-			IndexProvider = indexProvider;
+			Index = index;
 			Value = value;
 			Property = Type.GetProperty(propertyName);
 			IsChangingDocument = isChangingDocument;
 		}
 
-		protected SetIndexedProperty(Type type, object obj, string propertyName, Func<int> indexProvider, object value, bool isChangingDocument)
+		protected SetIndexedProperty(Type type, object obj, string propertyName, int index, object value, bool isChangingDocument)
 		{
 			Type = type;
 			Obj = obj;
-			IndexProvider = indexProvider;
+			Index = index;
 			Value = value;
 			Property = Type.GetProperty(propertyName);
 			IsChangingDocument = isChangingDocument;
@@ -107,14 +107,14 @@ namespace Tangerine.Core.Operations
 
 			protected override void InternalRedo(SetIndexedProperty op)
 			{
-				op.Save(new Backup { Value = op.Property.GetGetMethod().Invoke(op.Obj, new object[] { op.IndexProvider() }) });
-				op.Property.GetSetMethod().Invoke(op.Obj, new [] { op.IndexProvider(), op.Value });
+				op.Save(new Backup { Value = op.Property.GetGetMethod().Invoke(op.Obj, new object[] { op.Index }) });
+				op.Property.GetSetMethod().Invoke(op.Obj, new [] { op.Index, op.Value });
 			}
 
 			protected override void InternalUndo(SetIndexedProperty op)
 			{
 				var v = op.Restore<Backup>().Value;
-				op.Property.GetSetMethod().Invoke(op.Obj, new[] { op.IndexProvider(), v });
+				op.Property.GetSetMethod().Invoke(op.Obj, new[] { op.Index, v });
 			}
 		}
 	}

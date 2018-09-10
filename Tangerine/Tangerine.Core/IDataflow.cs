@@ -84,14 +84,14 @@ namespace Tangerine.Core
 		public Func<T> Getter { get; }
 		public Action<T> Setter { get; }
 
-		public IndexedProperty(object obj, string propertyName, Func<int> indexProvider)
+		public IndexedProperty(object obj, string propertyName, int index)
 		{
 			var pi = obj.GetType().GetProperty(propertyName);
 			var getMethod = pi.GetGetMethod();
-			Getter = () => (T)getMethod.Invoke(obj, new object[] { indexProvider() });
+			Getter = () => (T)getMethod.Invoke(obj, new object[] { index });
 			var setMethod = pi.GetSetMethod();
 			if (setMethod != null) {
-				Setter = (v) => setMethod.Invoke(obj, new object[] { indexProvider(), v });
+				Setter = (v) => setMethod.Invoke(obj, new object[] { index, v });
 			}
 		}
 

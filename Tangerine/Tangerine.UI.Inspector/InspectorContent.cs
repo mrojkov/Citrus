@@ -207,7 +207,7 @@ namespace Tangerine.UI.Inspector
 						return prop.GetValue(obj);
 					},
 					PropertySetter = isAnimable ? (PropertySetterDelegate)SetAnimableProperty : SetProperty
-			};
+				};
 				if (!editorParams.Keys.Contains(@params.Group)) {
 					editorParams.Add(@params.Group, new List<PropertyEditorParams>());
 				}
@@ -283,7 +283,7 @@ namespace Tangerine.UI.Inspector
 				}
 
 				instanceEditors.Clear();
-				instanceEditors.AddRange(BuildForObjectsHelper(objects.Select(o => param.IndexProvider == null ? param.PropertyInfo.GetValue(o) : param.PropertyInfo.GetValue(o, new object[] {param.IndexProvider()})), rootObjects,
+				instanceEditors.AddRange(BuildForObjectsHelper(objects.Select(o => param.IndexInList == -1 ? param.PropertyInfo.GetValue(o) : param.PropertyInfo.GetValue(o, new object[] {param.IndexInList})), rootObjects,
 					w, param.PropertyPath));
 			});
 			Type et = typeof(InstancePropertyEditor<>).MakeGenericType(param.PropertyInfo.PropertyType);
