@@ -8,15 +8,8 @@ using Tangerine.Core.Operations;
 
 namespace Tangerine.UI
 {
-	public interface IListPropertyEditor
-	{
-
-	}
-
 	public class ListPropertyEditor<TList, TElement>
-		: ExpandablePropertyEditor<TList>
-		, IListPropertyEditor where TList : IList<TElement>
-		, IList, new() where TElement : new()
+		: ExpandablePropertyEditor<TList> where TList : IList<TElement>, IList, new() where TElement : new()
 	{
 		private readonly Action<PropertyEditorParams, Widget, IList> onAdd;
 		private IList list;
@@ -57,12 +50,15 @@ namespace Tangerine.UI
 			ContainerWidget.AddChangeWatcher(() => list.Count, Build);
 		}
 
-		private void Build(int _)
+		private void Build(int newCount)
 		{
-			ExpandableContent.Nodes.Clear();
 			if (list != null) {
-				for (int i = 0; i < list.Count; i++) {
-					AfterInsertNewElement(i);
+				int prevCount = ExpandableContent.Nodes.Count;
+				for (int i = 0; i < prevCount - newCount; i++) {
+					ExpandableContent.Nodes.Last().UnlinkAndDispose();
+				}
+				for (int i = 0; i < newCount - prevCount; i++) {
+					AfterInsertNewElement(prevCount + i);
 				}
 			}
 		}
