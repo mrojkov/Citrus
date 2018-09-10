@@ -332,6 +332,9 @@
     <Compile Include="Source\Widgets\3D\RenderObject3D.cs" />
     <Compile Include="Source\Widgets\RendererWrapper.cs" />
     <Compile Include="Source\Widgets\Animation\IAnimable.cs" />
+    <Compile Include="Source\Widgets\Materials\BlurMaterial.cs" />
+    <Compile Include="Source\Widgets\Materials\PostProcessingComponent.cs" />
+    <Compile Include="Source\Widgets\Materials\PresenterComponent.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
