@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -125,12 +125,12 @@ namespace Lime
 		{
 			Getter = getter;
 			Setter = setter;
-		}	
+		}
 
 		public static Property Create<T>(Func<T> getter, Action<T> setter)
 		{
 			return new Property(() => getter(), x => setter((T)x));
-		}	
+		}
 
 		public Property(Type singleton, string propertyName = "Instance")
 		{
@@ -144,6 +144,25 @@ namespace Lime
 			var pi = obj.GetType().GetProperty(propertyName);
 			Getter = () => pi.GetValue(obj, null);
 			Setter = val => pi.SetValue(obj, val, null);
+		}
+
+		public object Value
+		{
+			get { return Getter(); }
+			set { Setter(value); }
+		}
+	}
+
+	public class IndexedProperty
+	{
+		public Func<object> Getter { get; private set; }
+		public Action<object> Setter { get; private set; }
+
+		public IndexedProperty(object obj, string propertyName, int index)
+		{
+			var pi = obj.GetType().GetProperty(propertyName);
+			Getter = () => pi.GetGetMethod().Invoke(obj, new object[] { index });
+			Setter = val => pi.GetSetMethod().Invoke(obj, new object[] { index, val });
 		}
 
 		public object Value
