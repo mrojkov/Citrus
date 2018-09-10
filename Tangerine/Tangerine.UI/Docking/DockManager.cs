@@ -259,8 +259,13 @@ namespace Tangerine.UI.Docking
 		private void CreateLinearWidget(Splitter container, LinearPlacement placement, float stretch, bool requestTitle)
 		{
 			var splitter = placement.Direction == LinearPlacementDirection.Vertical
-				? (Splitter)new ThemedVSplitter()
-				: new ThemedHSplitter();
+				? (Splitter)new VSplitter()
+				: new HSplitter();
+			splitter.SeparatorColor = Theme.Colors.SeparatorColor;
+			splitter.SeparatorHighlightColor = Theme.Colors.SeparatorHighlightColor;
+			splitter.SeparatorDragColor = Theme.Colors.SeparatorDragColor;
+			splitter.SeparatorWidth = 5f;
+			splitter.SeparatorActiveAreaWidth = 6f;
 			Widget rootWidget = splitter;
 			bool hasTabBarPlacement = false;
 			for (int i = 0; i < placement.Placements.Count; ++i) {
@@ -343,8 +348,22 @@ namespace Tangerine.UI.Docking
 
 		private void CreateTabBarWidget(Splitter container, TabBarPlacement placement, float stretch, bool requestTitle)
 		{
-			var tabbedWidget = new TabbedWidget(TabbedWidget.TabBarPlacement.Bottom) {
-				AllowReordering = true
+			var tabbedWidget = new TabbedWidget {
+				TabBar = new PanelTabBar(),
+				AllowReordering = true,
+				BarPlacement = TabbedWidget.TabBarPlacement.Bottom,
+				PostPresenter = new DelegatePresenter<TabbedWidget>(w => {
+					w.PrepareRendererState();
+					var activeTab = (Tab)w.TabBar.Nodes[w.ActiveTabIndex];
+					var start = activeTab.ContentPosition * activeTab.CalcTransitionToSpaceOf(w);
+					var end = start + activeTab.ContentSize * Vector2.Right;
+					var color = ColorTheme.Current.Docking.TabOutline;
+					Renderer.DrawLine(w.TabBar.Position * Vector2.Down, start, color);
+					Renderer.DrawLine(end, new Vector2(w.Size.X, w.TabBar.Position.Y), color);
+					Renderer.DrawLine(start, start + Vector2.Down * activeTab.ContentSize, color);
+					Renderer.DrawLine(start + Vector2.Down * activeTab.ContentSize, start + activeTab.ContentSize, color);
+					Renderer.DrawLine(end, start + activeTab.ContentSize, color);
+				})
 			};
 			Widget rootWidget = tabbedWidget;
 			tabbedWidget.FocusScope = new KeyboardFocusScope(tabbedWidget);
@@ -354,9 +373,9 @@ namespace Tangerine.UI.Docking
 				if (panelPlacement.Hidden) {
 					continue;
 				}
-				var tab = new ThemedTab {
+				var tab = new PanelTab {
 					Text = panel.Id,
-					Closable = true,
+					Closable = false,
 				};
 				tab.Closing += () => {
 					Model.FindPanelPlacement(panel.Id).Hidden = true;
@@ -385,9 +404,7 @@ namespace Tangerine.UI.Docking
 					title => titleLabel.Text = title
 				);
 				closeButton.Clicked += () => {
-					foreach (var panelPlacement in placement.Placements) {
-						panelPlacement.Hidden = true;
-					}
+					placement.Placements[tabbedWidget.ActiveTabIndex].Hidden = true;
 					Refresh();
 				};
 				CreateDragBehaviour(placement, rootWidget.Nodes[0].AsWidget, rootWidget);
@@ -578,6 +595,86 @@ namespace Tangerine.UI.Docking
 				return new State {
 					WindowPlacements = WindowPlacements.Select(p => p.Clone() as WindowPlacement).ToList()
 				};
+			}
+		}
+
+		[YuzuDontGenerateDeserializer]
+		private class PanelTabBar : TabBar
+		{
+			public PanelTabBar()
+			{
+				Layout = new HBoxLayout();
+				Padding = new Thickness { Bottom = 10f };
+			}
+		}
+
+		[YuzuDontGenerateDeserializer]
+		private class PanelTab : Tab
+		{
+			private const float TabHeight = 20f;
+			private const float TabMaxWidth = 100f;
+			private const float TabMinWidth = 50f;
+			public override bool IsNotDecorated() => false;
+
+			public PanelTab()
+			{
+				MinSize = new Vector2(TabMinWidth, TabHeight);
+				MaxSize = new Vector2(TabMaxWidth, TabHeight);
+				LayoutCell = new LayoutCell(Alignment.LeftTop);
+				Size = MinSize;
+				Layout = new HBoxLayout();
+				var caption = new SimpleText {
+					Id = "TextPresenter",
+					Padding = Theme.Metrics.ControlsPadding,
+					ForceUncutText = false,
+					FontHeight = Theme.Metrics.TextHeight,
+					HAlignment = HAlignment.Center,
+					VAlignment = VAlignment.Center,
+					OverflowMode = TextOverflowMode.Ellipsis,
+					LayoutCell = new LayoutCell(Alignment.Center),
+				};
+				var presenter = new TabPresenter(caption);
+				CompoundPresenter.Add(presenter);
+				DefaultAnimation.AnimationEngine = new AnimationEngineDelegate {
+					OnRunAnimation = (animation, markerId, animationTimeCorrection) => {
+						presenter.SetState(markerId);
+						return true;
+					}
+				};
+				AddNode(caption);
+				HitTestTarget = true;
+				LateTasks.Add(Theme.MouseHoverInvalidationTask(this));
+				this.AddChangeWatcher(() => Active,
+					isActive => Padding = isActive ? new Thickness { Top = -1f, Bottom = 1f} : new Thickness());
+			}
+
+			private class TabPresenter : CustomPresenter<Widget>
+			{
+				private readonly SimpleText label;
+				private bool active;
+
+				public TabPresenter(SimpleText label) { this.label = label; }
+
+				public void SetState(string state)
+				{
+					CommonWindow.Current.Invalidate();
+					active = state == "Active";
+					label.Color = active ? Theme.Colors.BlackText : Theme.Colors.GrayText;
+				}
+
+				protected override bool InternalPartialHitTest(Widget node, ref HitTestArgs args)
+				{
+					return node.BoundingRectHitTest(args.Point);
+				}
+
+				protected override void InternalRender(Widget widget)
+				{
+					widget.PrepareRendererState();
+					var theme = ColorTheme.Current.Docking;
+					var color = active ? theme.TabBarBackground :
+						widget.IsMouseOverThisOrDescendant() ? theme.TabHighlighted : theme.TabBarBackground;
+					Renderer.DrawRect(widget.ContentPosition, widget.ContentPosition + widget.ContentSize, color);
+				}
 			}
 		}
 	}

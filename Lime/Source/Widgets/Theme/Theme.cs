@@ -94,6 +94,10 @@ namespace Lime
 			[YuzuOptional]
 			public Color4 SeparatorColor { get; set; }
 			[YuzuOptional]
+			public Color4 SeparatorHighlightColor { get; set; }
+			[YuzuOptional]
+			public Color4 SeparatorDragColor { get; set; }
+			[YuzuOptional]
 			public Color4 KeyboardFocusBorder { get; set; }
 			[YuzuOptional]
 			public Color4 TextSelection { get; set; }
@@ -158,6 +162,8 @@ namespace Lime
 					TabNormal = grayBackground.Lighten(0.2f),
 					TabActive = grayBackground.Lighten(0.05f),
 					SeparatorColor = grayBackground.Lighten(0.3f),
+					SeparatorHighlightColor = grayBackground.Lighten(0.5f),
+					SeparatorDragColor = grayBackground.Lighten(0.7f),
 					KeyboardFocusBorder = new Color4(100, 150, 200),
 					TextSelection = new Color4(133, 133, 133),
 					CloseButtonNormal = grayBackground.Lighten(0.6f),
@@ -207,7 +213,9 @@ namespace Lime
 					DirectoryPickerItemHoveredBackground = new Color4(158, 200, 233),
 					TabNormal = grayBackground.Darken(0.2f),
 					TabActive = grayBackground.Darken(0.05f),
-					SeparatorColor = grayBackground.Darken(0.3f),
+					SeparatorColor = grayBackground.Darken(0.4f),
+					SeparatorHighlightColor = grayBackground.Darken(0.6f),
+					SeparatorDragColor = grayBackground.Darken(0.7f),
 					KeyboardFocusBorder = new Color4(0, 120, 215),
 					TextSelection = new Color4(200, 230, 255),
 					CloseButtonNormal = grayBackground.Darken(0.6f),
@@ -305,7 +313,7 @@ namespace Lime
 			}
 		}
 
-		internal static IEnumerator<object> MouseHoverInvalidationTask(Widget widget)
+		public static IEnumerator<object> MouseHoverInvalidationTask(Widget widget)
 		{
 			var isHovered = widget.IsMouseOverThisOrDescendant();
 			while (true) {

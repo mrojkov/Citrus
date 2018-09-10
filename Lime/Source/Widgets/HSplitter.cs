@@ -4,12 +4,21 @@ using System.Linq;
 
 namespace Lime
 {
+	public enum SplitterLineState
+	{
+		Default,
+		Highlight,
+		Drag
+	}
+
 	[YuzuDontGenerateDeserializer]
 	[TangerineAllowedChildrenTypes(typeof(Node))]
 	public abstract class Splitter : Widget
 	{
 		public float SeparatorActiveAreaWidth;
 		public Color4 SeparatorColor;
+		public Color4 SeparatorHighlightColor;
+		public Color4 SeparatorDragColor;
 
 		public abstract float SeparatorWidth { get; set; }
 
@@ -44,11 +53,13 @@ namespace Lime
 				ro.CaptureRenderState(splitter);
 				ro.SeparatorWidth = splitter.SeparatorWidth;
 				ro.SeparatorColor = splitter.SeparatorColor;
+				ro.SeparatorHighlightColor = splitter.SeparatorHighlightColor;
+				ro.SeparatorDragColor = splitter.SeparatorDragColor;
 				GetLines(splitter, ro.Lines);
 				return ro;
 			}
 
-			protected abstract void GetLines(Splitter splitter, List<Vector2> lines);
+			protected abstract void GetLines(Splitter splitter, List<SplitterLine> lines);
 
 			public bool PartialHitTest(Node node, ref HitTestArgs args) => false;
 
@@ -56,15 +67,27 @@ namespace Lime
 			{
 				public float SeparatorWidth;
 				public Color4 SeparatorColor;
-				public List<Vector2> Lines = new List<Vector2>();
+				public Color4 SeparatorHighlightColor;
+				public Color4 SeparatorDragColor;
+				public readonly List<SplitterLine> Lines = new List<SplitterLine>();
 
 				public override void Render()
 				{
 					PrepareRenderState();
-					for (var i = 0; i < Lines.Count - 1; i += 2) {
-						var p1 = Lines[i];
-						var p2 = Lines[i + 1];
-						Renderer.DrawLine(p1, p2, SeparatorColor, thickness: SeparatorWidth);
+					for (var i = 0; i < Lines.Count; i ++) {
+						Renderer.DrawLine(Lines[i].Start, Lines[i].End, GetColorForState(Lines[i].State), thickness: SeparatorWidth);
+					}
+				}
+
+				private Color4 GetColorForState(SplitterLineState state)
+				{
+					switch (state) {
+						case SplitterLineState.Highlight:
+							return SeparatorHighlightColor;
+						case SplitterLineState.Drag:
+							return SeparatorDragColor;
+						default:
+							return SeparatorColor;
 					}
 				}
 
@@ -73,18 +96,28 @@ namespace Lime
 					Lines.Clear();
 				}
 			}
+
+			public struct SplitterLine
+			{
+				public Vector2 Start;
+				public Vector2 End;
+				public SplitterLineState State;
+			}
 		}
 	}
 
 	[YuzuDontGenerateDeserializer]
 	public class HSplitter : Splitter
 	{
+		private SeparatorsRenderPresenter separartorRenderer;
+
 		public HSplitter()
 		{
 			Tasks.Add(MainTask());
-			PostPresenter = new SeparatorsRenderPresenter();
+			PostPresenter = separartorRenderer = new SeparatorsRenderPresenter();
 			Layout = new HSplitterLayout();
 		}
+
 
 		public override float SeparatorWidth
 		{
@@ -107,11 +140,24 @@ namespace Lime
 			var p = new SeparatorsHitTestPresenter();
 			CompoundPostPresenter.Add(p);
 			while (true) {
-				if (IsMouseOver() && p.SeparatorUnderMouse >= 0) {
+				bool isNeedToInvalidate = false;
+				if (separartorRenderer.SeparatorUnderMouse != p.SeparatorUnderMouse) {
+					separartorRenderer.SeparatorUnderMouse = p.SeparatorUnderMouse;
+					isNeedToInvalidate = true;
+				}
+				if (IsMouseOver() && separartorRenderer.SeparatorUnderMouse >= 0) {
 					WidgetContext.Current.MouseCursor = MouseCursor.SizeWE;
 					if (Input.WasMousePressed()) {
+						separartorRenderer.isSeparatorUnderMouseDrag = true;
+						Window.Current.Invalidate();
 						yield return DragSeparatorTask(p.SeparatorUnderMouse);
+						separartorRenderer.isSeparatorUnderMouseDrag = false;
+						isNeedToInvalidate = true;
 					}
+				}
+
+				if (isNeedToInvalidate) {
+					Window.Current.Invalidate();
 				}
 				yield return null;
 			}
@@ -154,20 +200,27 @@ namespace Lime
 
 		class SeparatorsRenderPresenter : SeparatorsRenderPresenterBase
 		{
-			protected override void GetLines(Splitter splitter, List<Vector2> lines)
+			public int SeparatorUnderMouse = -1;
+			public bool isSeparatorUnderMouseDrag;
+
+			protected override void GetLines(Splitter splitter, List<SplitterLine> lines)
 			{
 				for (int i = 0; i < splitter.Nodes.Count - 1; i++) {
 					var w = splitter.Nodes[i + 1].AsWidget;
 					var x = w.X - splitter.SeparatorWidth * 0.5f;
-					lines.Add(new Vector2(x, w.Y));
-					lines.Add(new Vector2(x, w.Y + w.Height));
+					lines.Add(new SplitterLine {
+						Start = new Vector2(x, w.Y),
+						End = new Vector2(x, w.Y + w.Height),
+						State = i == SeparatorUnderMouse ? (isSeparatorUnderMouseDrag ?
+							SplitterLineState.Drag : SplitterLineState.Highlight) : SplitterLineState.Default
+					});
 				}
 			}
 		}
 
 		class SeparatorsHitTestPresenter : IPresenter
 		{
-			public int SeparatorUnderMouse { get; private set; }
+			public int SeparatorUnderMouse { get; private set; } = -1;
 
 			public IPresenter Clone() => (IPresenter)MemberwiseClone();
 
