@@ -64,9 +64,10 @@ namespace Tangerine.UI.Docking
 		private static void DockPlacementTo(TabBarPlacement placement, TabBarPlacement target)
 		{
 			var placements = placement.Placements.ToList();
+			placements.Reverse();
 			foreach (var panelPlacement in placements) {
 				panelPlacement.Unlink();
-				target.Placements.Add(panelPlacement);
+				target.Placements.Insert(0, panelPlacement);
 			}
 		}
 
@@ -80,7 +81,7 @@ namespace Tangerine.UI.Docking
 			if (parent is LinearPlacement linearPlacement) {
 				int index = linearPlacement.Placements.IndexOf(target);
 				target.Parent = null;
-				placement.Placements.Add(target);
+				placement.Placements.Insert(0, target);
 				linearPlacement.Placements[index] = placement;
 			}
 		}
@@ -95,7 +96,7 @@ namespace Tangerine.UI.Docking
 				tabBarPlacement.Placements.Add(target);
 				parent.Placements[index] = tabBarPlacement;
 			}
-			tabBarPlacement.Placements.Add(placement);
+			tabBarPlacement.Placements.Insert(0, placement);
 		}
 
 		private void DockPlacementTo(LinearPlacement placement, PanelPlacement target)
@@ -204,7 +205,7 @@ namespace Tangerine.UI.Docking
 								DockPlacementTo(tabBarPlacement, targetTabBarPlacement);
 								break;
 							case PanelPlacement panelPlacement:
-								targetTabBarPlacement.Placements.Add(panelPlacement);
+								targetTabBarPlacement.Placements.Insert(0, panelPlacement);
 								break;
 							case LinearPlacement linearPlacement:
 								DockPlacementTo(linearPlacement, targetTabBarPlacement);
