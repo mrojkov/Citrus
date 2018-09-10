@@ -35,6 +35,7 @@ namespace Tangerine.UI.SceneView
 			if (resolutionPreview.Enabled) {
 				if (resolutionPreview.Preset == null) {
 					resolutionPreview.Preset = ProjectPreferences.Instance.Resolutions.First();
+					resolutionPreview.IsPortrait = !ProjectPreferences.Instance.IsLandscapeDefault;
 				}
 			} else {
 				resolutionPreview.Preset = ProjectPreferences.Instance.Resolutions.First();
@@ -77,7 +78,7 @@ namespace Tangerine.UI.SceneView
 			var resolutionPreview = document.ResolutionPreview;
 			resolutionPreview.Enabled = true;
 			if (resolutionPreview.Preset == null) {
-				resolutionPreview.IsPortrait = false;
+				resolutionPreview.IsPortrait = !ProjectPreferences.Instance.IsLandscapeDefault;
 				resolutionPreview.Preset = !isReverse ? resolutions.First() : resolutions.Last();
 			} else {
 				var index = ((List<ResolutionPreset>)resolutions).IndexOf(resolutionPreview.Preset);
@@ -104,7 +105,7 @@ namespace Tangerine.UI.SceneView
 			var resolutionPreview = document.ResolutionPreview;
 			resolutionPreview.Enabled = true;
 			if (resolutionPreview.Preset == null) {
-				resolutionPreview.IsPortrait = false;
+				resolutionPreview.IsPortrait = !ProjectPreferences.Instance.IsLandscapeDefault;
 				resolutionPreview.Preset = Preferences.Resolutions.First();
 			} else {
 				resolutionPreview.IsPortrait = !resolutionPreview.IsPortrait;
