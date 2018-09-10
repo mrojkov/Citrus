@@ -200,8 +200,7 @@ namespace Tangerine.UI
 		protected void SetProperty(object value)
 		{
 			DoTransaction(() => {
-				bool allRootObjectsAnimable = EditorParams.RootObjects.All(o => o is IAnimationHost);
-				if (allRootObjectsAnimable) {
+				if (IsAnimable) {
 					foreach (var o in EditorParams.RootObjects) {
 						((IPropertyEditorParamsInternal)EditorParams).PropertySetter(o, EditorParams.PropertyPath, value);
 					}
@@ -216,8 +215,7 @@ namespace Tangerine.UI
 		protected void SetProperty<ValueType>(Func<ValueType, object> valueProducer)
 		{
 			DoTransaction(() => {
-				bool allRootObjectsAnimable = EditorParams.RootObjects.All(o => o is IAnimationHost);
-				if (allRootObjectsAnimable) {
+				if (IsAnimable) {
 					foreach (var o in EditorParams.RootObjects) {
 						var (p, a) = AnimationUtils.GetPropertyByPath((IAnimationHost)o, EditorParams.PropertyPath);
 						var current = p.Info.GetValue(a);
