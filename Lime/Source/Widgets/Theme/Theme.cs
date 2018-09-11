@@ -105,6 +105,8 @@ namespace Lime
 			public Color4 SelectedBorder { get; set; }
 			[YuzuOptional]
 			public Color4 RedText { get; set; }
+			[YuzuOptional]
+			public Color4 WarningBackground { get; set; }
 
 			public static ColorTheme CreateDarkTheme()
 			{
@@ -136,7 +138,7 @@ namespace Lime
 					PathBarButtonOutlinePress = new Color4(143, 179, 215),
 					DirectoryPickerBackground = new Color4(82, 82, 82),
 					DirectoryPickerOutline = new Color4(39, 39, 39),
-					DirectoryPickerItemHoveredBackground = new Color4 (127, 127, 127),
+					DirectoryPickerItemHoveredBackground = new Color4(127, 127, 127),
 					TabNormal = grayBackground.Lighten(0.2f),
 					TabActive = grayBackground.Lighten(0.05f),
 					SeparatorColor = grayBackground.Lighten(0.3f),
@@ -152,6 +154,7 @@ namespace Lime
 					TextCaret = new Color4(204, 204, 204),
 					ZebraColor1 = grayBackground.Lighten(0.2f),
 					ZebraColor2 = grayBackground.Lighten(0.3f),
+					WarningBackground = new Color4(255, 194, 26),
 				};
 
 			}
@@ -201,6 +204,7 @@ namespace Lime
 					TextCaret = Color4.Black,
 					ZebraColor1 = Color4.White,
 					ZebraColor2 = Color4.White.Darken(0.1f),
+					WarningBackground = new Color4(255, 194, 26),
 				};
 			}
 

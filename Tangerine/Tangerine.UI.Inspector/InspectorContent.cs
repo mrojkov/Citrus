@@ -261,9 +261,9 @@ namespace Tangerine.UI.Inspector
 		private IPropertyEditor PopulateEditorsForListType(IEnumerable<object> objects, IEnumerable<object> rootObjects, PropertyEditorParams param, Type iListInterface)
 		{
 			var listGenericArgument = iListInterface.GetGenericArguments().First();
-			Action<PropertyEditorParams, Widget, IList> onAdd = (p, w, list) => {
-				PopulatePropertyEditors(param.PropertyInfo.PropertyType, new[] {list}, rootObjects, w,
-					new Dictionary<string, List<PropertyEditorParams>> {{"", new List<PropertyEditorParams> {p}}}).ToList();
+			Func<PropertyEditorParams, Widget, IList, IEnumerable<IPropertyEditor>> onAdd = (p, w, list) => {
+				return PopulatePropertyEditors(param.PropertyInfo.PropertyType, new[] {list}, rootObjects, w,
+					new Dictionary<string, List<PropertyEditorParams>> {{"", new List<PropertyEditorParams> {p}}});
 			};
 			var specializedICollectionPropertyEditorType = typeof(ListPropertyEditor<,>).MakeGenericType(param.PropertyInfo.PropertyType, listGenericArgument);
 			var editor = Activator.CreateInstance(specializedICollectionPropertyEditorType, param, onAdd) as IPropertyEditor;

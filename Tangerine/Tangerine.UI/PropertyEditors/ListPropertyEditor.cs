@@ -11,27 +11,31 @@ namespace Tangerine.UI
 	public class ListPropertyEditor<TList, TElement>
 		: ExpandablePropertyEditor<TList> where TList : IList<TElement>, IList, new() where TElement : new()
 	{
-		private readonly Action<PropertyEditorParams, Widget, IList> onAdd;
+		private readonly Func<PropertyEditorParams, Widget, IList, IEnumerable<IPropertyEditor>> onAdd;
 		private IList list;
 		private Action removeCallback;
 
-		public ListPropertyEditor(IPropertyEditorParams editorParams, Action<PropertyEditorParams, Widget, IList> onAdd) : base(editorParams)
+		public ListPropertyEditor(IPropertyEditorParams editorParams, Func<PropertyEditorParams, Widget, IList, IEnumerable<IPropertyEditor>> onAdd) : base(editorParams)
 		{
 			this.onAdd = onAdd;
 
 			if (EditorParams.Objects.Skip(1).Any()) {
 				// Dont create editor interface if > 1 objects are selected
 				EditorContainer.AddNode(new Widget() {
-					Nodes = { new ThemedSimpleText { Text = "Edit of list properties isnt supported for multiple selection.", ForceUncutText = true } },
+					Layout = new HBoxLayout(),
+					Nodes = { new ThemedSimpleText { Text = "Edit of list properties isnt supported for multiple selection.", ForceUncutText = false } },
 					// TODO: move color to theme
-					Presenter = new WidgetFlatFillPresenter(new Color4(255, 194, 26))
+					Presenter = new WidgetFlatFillPresenter(Theme.Colors.WarningBackground)
 				});
 				return;
 			}
 
-			list = (IList)EditorParams.PropertyInfo.GetValue(EditorParams.Objects.First());
+			ExpandableContent.Padding = new Thickness(left: 4.0f, right: 0.0f, top: 4.0f, bottom: 4.0f);
+
+						list = (IList)EditorParams.PropertyInfo.GetValue(EditorParams.Objects.First());
 			var addButton = new ThemedAddButton() {
 				Clicked = () => {
+					Expanded = true;
 					if (list == null) {
 						var pi = EditorParams.PropertyInfo;
 						var o = EditorParams.Objects.First();
@@ -63,12 +67,9 @@ namespace Tangerine.UI
 			}
 		}
 
-		private Widget AfterInsertNewElement(int index)
+		private void AfterInsertNewElement(int index)
 		{
-			var elementContainer = new Widget {
-				Layout = new HBoxLayout()
-			};
-			var p = new PropertyEditorParams(elementContainer, new[] { list }, EditorParams.RootObjects, EditorParams.PropertyInfo.PropertyType, "Item", EditorParams.PropertyPath + $".Item[{index}]"
+			var p = new PropertyEditorParams(ExpandableContent, new[] { list }, EditorParams.RootObjects, EditorParams.PropertyInfo.PropertyType, "Item", EditorParams.PropertyPath + $".Item[{index}]"
 			) {
 				NumericEditBoxFactory = EditorParams.NumericEditBoxFactory,
 				History = EditorParams.History,
@@ -76,8 +77,9 @@ namespace Tangerine.UI
 				PropertySetter = (@object, name, value) => Core.Operations.SetIndexedProperty.Perform(@object, name, index, value),
 				IndexInList = index,
 				IsAnimableByPath = EditorParams.IsAnimableByPath && list is IAnimable,
+				DisplayName = $"{index}:"
 			};
-			onAdd(p, elementContainer, list);
+			var editor = onAdd(p, ExpandableContent, list).ToList().First();
 
 			var removeButton = new ThemedDeleteButton();
 			Action removeClicked = () => {
@@ -88,9 +90,7 @@ namespace Tangerine.UI
 				}
 			};
 			removeButton.Clicked += () => removeCallback = removeClicked;
-			ExpandableContent.Nodes.Insert(index, elementContainer);
-			elementContainer.AddNode(removeButton);
-			return elementContainer;
+			editor.ContainerWidget.AddNode(removeButton);
 		}
 	}
 }
