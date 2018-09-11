@@ -87,6 +87,7 @@ namespace Tangerine.UI
 		public static readonly ICommand UpsampleAnimationTwice = new Command("Upsample Animation Twice");
 		public static readonly ICommand ViewHelp = new Command("View Help", new Shortcut(Modifiers.Control, Key.F1));
 		public static readonly ICommand HelpMode = new Command("Help Mode", Key.F1);
+		public static readonly ICommand ViewChangelog = new Command("View Changelog");
 		public static readonly ICommand SaveLayout = new Command("Save layout");
 		public static readonly ICommand LoadLayout = new Command("Load layout");
 		public static readonly ICommand ConvertToButton = new Command("Convert to Button");

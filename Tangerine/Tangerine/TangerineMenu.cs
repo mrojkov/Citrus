@@ -193,7 +193,8 @@ namespace Tangerine
 				orangeCommand,
 				new Command("Help", new Menu {
 					GenericCommands.ViewHelp,
-					GenericCommands.HelpMode
+					GenericCommands.HelpMode,
+					GenericCommands.ViewChangelog
 				}),
 			};
 			create.Add(customNodes = new Command("Custom Nodes", new Menu()));
