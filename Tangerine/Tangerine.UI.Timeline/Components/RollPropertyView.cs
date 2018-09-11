@@ -42,6 +42,24 @@ namespace Tangerine.UI.Timeline.Components
 			};
 			widget.Components.Add(new AwakeBehavior());
 			widget.CompoundPresenter.Push(new SyncDelegatePresenter<Widget>(RenderBackground));
+			widget.Gestures.Add(new ClickGesture(1, ShowPropertyContextMenu));
+		}
+
+		void ShowPropertyContextMenu()
+		{
+			Document.Current.History.DoTransaction(() => {
+				if (!row.Selected) {
+					Core.Operations.ClearRowSelection.Perform();
+					Core.Operations.SelectRow.Perform(row);
+				}
+			});
+			var menu = new Menu {
+				Command.Cut,
+				Command.Copy,
+				Command.Paste,
+				Command.Delete
+			};
+			menu.Popup();
 		}
 
 		ToolbarButton CreateExpandButton()
