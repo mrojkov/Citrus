@@ -47,7 +47,7 @@ namespace Tangerine.UI
 			};
 			EditorContainer.AddNode(addButton);
 			ContainerWidget.Updating += _ => removeCallback?.Invoke();
-			ContainerWidget.AddChangeWatcher(() => list.Count, Build);
+			ContainerWidget.AddChangeWatcher(() => list?.Count ?? 0, Build);
 		}
 
 		private void Build(int newCount)
@@ -68,13 +68,14 @@ namespace Tangerine.UI
 			var elementContainer = new Widget {
 				Layout = new HBoxLayout()
 			};
-			var p = new PropertyEditorParams(elementContainer, new[] { list }, new[] { list }, EditorParams.PropertyInfo.PropertyType, "Item", "Item"
+			var p = new PropertyEditorParams(elementContainer, new[] { list }, EditorParams.RootObjects, EditorParams.PropertyInfo.PropertyType, "Item", EditorParams.PropertyPath + $".Item[{index}]"
 			) {
 				NumericEditBoxFactory = EditorParams.NumericEditBoxFactory,
 				History = EditorParams.History,
 				DefaultValueGetter = () => default,
 				PropertySetter = (@object, name, value) => Core.Operations.SetIndexedProperty.Perform(@object, name, index, value),
 				IndexInList = index,
+				IsAnimableByPath = EditorParams.IsAnimableByPath && list is IAnimable,
 			};
 			onAdd(p, elementContainer, list);
 

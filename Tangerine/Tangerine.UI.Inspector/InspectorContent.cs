@@ -46,7 +46,7 @@ namespace Tangerine.UI.Inspector
 							nodesWithComponent.Add(n);
 						}
 					}
-					PopulateContentForType(t, components, nodesWithComponent, widget, SerializeMutuallyExclusiveComponentGroupBaseType(t)).ToList();
+					PopulateContentForType(t, components, nodesWithComponent, !Document.Current.InspectRootNode, widget, SerializeMutuallyExclusiveComponentGroupBaseType(t)).ToList();
 				}
 				AddComponentsMenu(nodes, widget);
 			}
@@ -71,7 +71,7 @@ namespace Tangerine.UI.Inspector
 			return $"[{Yuzu.Util.TypeSerializer.Serialize(t)}]";
 		}
 
-		private IEnumerable<IPropertyEditor> BuildForObjectsHelper(IEnumerable<object> objects, IEnumerable<object> rootObjects = null, Widget widget = null, string propertyPath = "")
+		private IEnumerable<IPropertyEditor> BuildForObjectsHelper(IEnumerable<object> objects, IEnumerable<object> rootObjects = null, bool animableByPath = true, Widget widget = null, string propertyPath = "")
 		{
 			if (widget == null) {
 				widget = this.widget;
@@ -81,7 +81,7 @@ namespace Tangerine.UI.Inspector
 			}
 			foreach (var t in GetTypes(objects)) {
 				var o = objects.Where(i => t.IsInstanceOfType(i)).ToList();
-				foreach (var e in PopulateContentForType(t, o, rootObjects ?? o, widget, propertyPath)) {
+				foreach (var e in PopulateContentForType(t, o, rootObjects ?? o, !Document.Current.InspectRootNode && animableByPath && objects.All(_ => _ is IAnimable), widget, propertyPath)) {
 					yield return e;
 				}
 			}
@@ -152,7 +152,7 @@ namespace Tangerine.UI.Inspector
 			return true;
 		}
 
-		private IEnumerable<IPropertyEditor> PopulateContentForType(Type type, IEnumerable<object> objects, IEnumerable<object> rootObjects, Widget widget, string propertyPath)
+		private IEnumerable<IPropertyEditor> PopulateContentForType(Type type, IEnumerable<object> objects, IEnumerable<object> rootObjects, bool animableByPath, Widget widget, string propertyPath)
 		{
 			var categoryLabelAdded = false;
 			var editorParams = new Dictionary<string, List<PropertyEditorParams>>();
@@ -202,6 +202,7 @@ namespace Tangerine.UI.Inspector
 						var prop = type.GetProperty(property.Name);
 						return prop.GetValue(obj);
 					},
+					IsAnimableByPath = animableByPath,
 				};
 				@params.PropertySetter = @params.IsAnimable ? (PropertySetterDelegate)SetAnimableProperty : SetProperty;
 				if (!editorParams.Keys.Contains(@params.Group)) {
@@ -279,8 +280,13 @@ namespace Tangerine.UI.Inspector
 				}
 
 				instanceEditors.Clear();
-				instanceEditors.AddRange(BuildForObjectsHelper(objects.Select(o => param.IndexInList == -1 ? param.PropertyInfo.GetValue(o) : param.PropertyInfo.GetValue(o, new object[] {param.IndexInList})), rootObjects,
-					w, param.PropertyPath));
+				bool allObjectsAnimable = objects.All(o => o is IAnimable);
+				instanceEditors.AddRange(BuildForObjectsHelper(objects.Select(
+						o => param.IndexInList == -1 ? param.PropertyInfo.GetValue(o) : param.PropertyInfo.GetValue(o, new object[] {param.IndexInList})),
+					rootObjects,
+					param.IsAnimableByPath && allObjectsAnimable,
+					w,
+					param.PropertyPath));
 			});
 			Type et = typeof(InstancePropertyEditor<>).MakeGenericType(param.PropertyInfo.PropertyType);
 			var editor = Activator.CreateInstance(et, param, onValueChanged) as IPropertyEditor;
@@ -429,13 +435,7 @@ namespace Tangerine.UI.Inspector
 		private static void DecoratePropertyEditor(IPropertyEditor editor, int row)
 		{
 			var index = 0;
-			bool allRootObjectsAnimable = editor.EditorParams.RootObjects.All(a => a is IAnimationHost);
-			if (
-				allRootObjectsAnimable &&
-				PropertyAttributes<TangerineStaticPropertyAttribute>.Get(editor.EditorParams.PropertyInfo) == null &&
-				AnimatorRegistry.Instance.Contains(editor.EditorParams.PropertyInfo.PropertyType) &&
-				!Document.Current.InspectRootNode
-			) {
+			if (editor.EditorParams.IsAnimable) {
 				var keyColor = KeyframePalette.Colors[editor.EditorParams.TangerineAttribute.ColorIndex];
 				var keyframeButton = new KeyframeButton {
 					LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0),

@@ -28,6 +28,7 @@ namespace Tangerine.UI
 		ITransactionalHistory History { get; set; }
 		float LabelWidth { get; set; }
 		int IndexInList { get; set; }
+		bool IsAnimableByPath { get; set; }
 		bool IsAnimable { get; }
 	}
 

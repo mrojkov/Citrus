@@ -30,10 +30,11 @@ namespace Tangerine.UI
 		public PropertySetterDelegate PropertySetter { set => propertySetter = value; }
 		public float LabelWidth { get; set; } = 140;
 		public int IndexInList { get; set; } = -1;
+		public bool IsAnimableByPath { get; set; }
 		public bool IsAnimable => RootObjects.All(a => a is IAnimationHost) &&
 			PropertyAttributes<TangerineStaticPropertyAttribute>.Get(PropertyInfo) == null &&
 			AnimatorRegistry.Instance.Contains(PropertyInfo.PropertyType) &&
-			!Document.Current.InspectRootNode;
+			IsAnimableByPath;
 
 		public PropertyEditorParams(Widget inspectorPane, IEnumerable<object> objects, IEnumerable<object> rootObjects, Type type, string propertyName, string propertyPath)
 		{
