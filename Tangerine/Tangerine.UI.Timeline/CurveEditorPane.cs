@@ -51,7 +51,7 @@ namespace Tangerine.UI.Timeline
 				Id = nameof(CurveEditorPane) + "Content",
 				Padding = new Thickness { Top = 1, Bottom = 1 },
 				Layout = new VBoxLayout { Spacing = TimelineMetrics.RowSpacing },
-				Presenter = new DelegatePresenter<Node>(RenderBackgroundAndGrid),
+				Presenter = new SyncDelegatePresenter<Node>(RenderBackgroundAndGrid),
 			};
 			MainAreaWidget.AddNode(ContentWidget);
 			toolbar = new Widget {
@@ -271,7 +271,7 @@ namespace Tangerine.UI.Timeline
 			{
 				Nodes.Clear();
 				Size = MinMaxSize = new Vector2(12, 12);
-				PostPresenter = new DelegatePresenter<Widget>(widget => {
+				PostPresenter = new SyncDelegatePresenter<Widget>(widget => {
 					widget.PrepareRendererState();
 					Renderer.DrawRect(Vector2.Zero, widget.Size, Color4.White);
 					var checkSize = new Vector2(widget.Width / 4, widget.Height / 3);

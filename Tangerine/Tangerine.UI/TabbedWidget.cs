@@ -1,6 +1,7 @@
 using Lime;
 using System.Collections.Generic;
 using System.Linq;
+using Tangerine.Core;
 
 namespace Tangerine.UI
 {
@@ -41,11 +42,11 @@ namespace Tangerine.UI
 			ContentContainer = new Frame {
 				ClipChildren = ClipMethod.ScissorTest,
 			};
-			ContentContainer.CompoundPresenter.Add(new DelegatePresenter<Frame>(frame => {
+			ContentContainer.CompoundPresenter.Add(new SyncDelegatePresenter<Frame>(frame => {
 				frame.PrepareRendererState();
 				Renderer.DrawRect(Vector2.Zero, frame.Size, Theme.Colors.GrayBackground);
 			}));
-			ContentContainer.CompoundPostPresenter.Add(new DelegatePresenter<Frame>(frame => {
+			ContentContainer.CompoundPostPresenter.Add(new SyncDelegatePresenter<Frame>(frame => {
 				frame.PrepareRendererState();
 				Renderer.DrawRectOutline(Vector2.Zero, frame.Size, Theme.Colors.ControlBorder);
 			}));

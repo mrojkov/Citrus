@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace Lime
 {
@@ -10,6 +12,9 @@ namespace Lime
 	[YuzuDontGenerateDeserializer]
 	public class WindowWidget : Widget
 	{
+		private RenderObjectList renderObjectList1 = new RenderObjectList();
+		private RenderObjectList renderObjectList2 = new RenderObjectList();
+		
 		private bool windowActivated;
 		private Widget lastFocused;
 		protected readonly RenderChain renderChain;
@@ -25,13 +30,21 @@ namespace Lime
 			renderChain = new RenderChain();
 			WidgetContext.GestureManager = new GestureManager(WidgetContext);
 			window.Activated += () => windowActivated = true;
+			window.Sync += Sync;
 			LayoutManager = new LayoutManager();
 		}
 
 		protected virtual bool ContinuousRendering() { return true; }
 
 		private bool prevAnyCaptureKeyPressed;
+		private AssetBundle assetBundle;
 
+		private void Sync()
+		{
+			assetBundle = AssetBundle.Initialized ? AssetBundle.Current : null;
+			Toolbox.Swap(ref renderObjectList1, ref renderObjectList2);
+		}
+		
 		public override void Update(float delta)
 		{
 			if (ContinuousRendering()) {
@@ -53,7 +66,7 @@ namespace Lime
 
 			// Update the widget hierarchy.
 			context.MouseCursor = MouseCursor.Default;
-			base.Update (delta);
+			base.Update(delta);
 			Window.Cursor = context.MouseCursor;
 
 			// Set NodeCapturedByMouse to null if all mouse buttons were released.
@@ -68,13 +81,25 @@ namespace Lime
 
 			// Refresh widgets layout.
 			LayoutManager.Layout();
+			
+			RaiseUpdating(delta);
+
+			ManageFocusOnWindowActivation();
 
 			// Rebuild the render chain.
 			renderChain.Clear();
 			renderChain.ClipRegion = new Rectangle(Vector2.Zero, Size);
 			RenderChainBuilder?.AddToRenderChain(renderChain);
+			renderObjectList1.Clear();
+			renderChain.GetRenderObjects(renderObjectList1);
+		}
 
-			ManageFocusOnWindowActivation();
+		public void RenderAll()
+		{
+			if (assetBundle != null) {
+				AssetBundle.SetCurrent(assetBundle, resetTexturePool: false);
+			}
+			Render(renderObjectList2);
 		}
 
 		private bool IsAnyCaptureKeyPressed()
@@ -124,10 +149,10 @@ namespace Lime
 			return n;
 		}
 
-		public virtual void RenderAll()
+		protected virtual void Render(RenderObjectList renderObjects)
 		{
 			Renderer.Viewport = new Viewport(GetViewport());
-			renderChain.Render();
+			renderObjects.Render();
 		}
 
 		public WindowRect GetViewport()
@@ -199,9 +224,9 @@ namespace Lime
 
 		protected override bool ContinuousRendering() { return false; }
 
-		public override void RenderAll ()
+		protected override void Render(RenderObjectList renderObjects)
 		{
-			base.RenderAll ();
+			base.Render(renderObjects);
 			if (RedrawMarkVisible) {
 				RenderRedrawMark();
 			}

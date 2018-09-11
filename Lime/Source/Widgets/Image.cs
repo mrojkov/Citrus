@@ -114,20 +114,52 @@ namespace Lime
 			}
 		}
 
-		public override void Render()
+		public bool IsNotRenderTexture()
+		{
+			return !(texture is RenderTexture);
+		}
+
+		protected internal override Lime.RenderObject GetRenderObject()
 		{
 			var blending = GlobalBlending;
 			var shader = GlobalShader;
 			if (material == null) {
 				material = WidgetMaterial.GetInstance(blending, shader, 1);
 			}
-			Renderer.Transform1 = LocalToWorldTransform;
-			Renderer.DrawSprite(texture, null, CustomMaterial ?? material, GlobalColor, ContentPosition, ContentSize, UV0, UV1, Vector2.Zero, Vector2.Zero);
+			var ro = RenderObjectPool<RenderObject>.Acquire();
+			ro.Texture = Texture;
+			ro.Material = CustomMaterial ?? material;
+			ro.UV0 = UV0;
+			ro.UV1 = UV1;
+			ro.LocalToWorldTransform = LocalToWorldTransform;
+			ro.Position = ContentPosition;
+			ro.Size = ContentSize;
+			ro.Color = GlobalColor;
+			return ro;
 		}
 
-		public bool IsNotRenderTexture()
+		private class RenderObject : Lime.RenderObject
 		{
-			return !(texture is RenderTexture);
+			public ITexture Texture;
+			public IMaterial Material;
+			public Color4 Color;
+			public Vector2 Position;
+			public Vector2 Size;
+			public Vector2 UV0;
+			public Vector2 UV1;
+			public Matrix32 LocalToWorldTransform;
+
+			public override void Render()
+			{
+				Renderer.Transform1 = LocalToWorldTransform;
+				Renderer.DrawSprite(Texture, null, Material, Color, Position, Size, UV0, UV1, Vector2.Zero, Vector2.Zero);
+			}
+
+			protected override void OnRelease()
+			{
+				Texture = null;
+				Material = null;
+			}
 		}
 	}
 }

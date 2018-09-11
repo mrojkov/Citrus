@@ -30,10 +30,17 @@ namespace Lime
 			}
 			set
 			{
-				current = value;
-				// The game could use some of textures from this bundle, and if they are missing
-				// we should notify texture pool to search them again.
-				TexturePool.Instance.DiscardAllStubTextures();
+				SetCurrent(value, resetTexturePool: true);
+			}
+		}
+
+		public static void SetCurrent(AssetBundle bundle, bool resetTexturePool)
+		{
+			if (current != bundle) {
+				current = bundle;
+				if (resetTexturePool) {
+					TexturePool.Instance.DiscardAllTextures();
+				}
 			}
 		}
 

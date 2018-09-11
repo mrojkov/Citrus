@@ -41,7 +41,7 @@ namespace Lime
 			Nodes.Add(root);
 		}
 
-		public override float CalcDistanceToCamera(Camera3D camera)
+		private float CalcDistanceToCamera(Camera3D camera)
 		{
 			if (Widget == null) {
 				return 0f;
@@ -60,22 +60,6 @@ namespace Lime
 			if (GloballyVisible) {
 				AddSelfToRenderChain(chain, Layer);
 			}
-		}
-
-		public override void Render()
-		{
-			if (Widget == null) {
-				return;
-			}
-			Widget.RenderChainBuilder?.AddToRenderChain(renderChain);
-			var oldCullMode = Renderer.CullMode;
-			var oldWorld = Renderer.World;
-			Renderer.CullMode = CullMode.None;
-			Renderer.World = Matrix44.CreateScale(new Vector3(1, -1, 1)) * GlobalTransform;
-			renderChain.RenderAndClear();
-			Renderer.Flush();
-			Renderer.World = oldWorld;
-			Renderer.CullMode = oldCullMode;
 		}
 
 		internal protected override bool PartialHitTest(ref HitTestArgs args)
@@ -101,6 +85,45 @@ namespace Lime
 				}
 			}
 			return false;
+		}
+
+		protected internal override Lime.RenderObject GetRenderObject()
+		{
+			if (Widget == null) {
+				return null;
+			}
+			var ro = RenderObjectPool<RenderObject>.Acquire();
+			ro.World = Matrix44.CreateScale(new Vector3(1, -1, 1)) * GlobalTransform;
+			ro.Opaque = false;
+			ro.DistanceToCamera = CalcDistanceToCamera(Viewport.Camera);
+			try {
+				Widget.RenderChainBuilder?.AddToRenderChain(renderChain);
+				renderChain.GetRenderObjects(ro.Objects);
+			} finally {
+				renderChain.Clear();
+			}
+			return ro;
+		}
+
+		private class RenderObject : RenderObject3D
+		{
+			public Matrix44 World;
+			public RenderObjectList Objects = new RenderObjectList();
+
+			public override void Render()
+			{
+				Renderer.PushState(RenderState.World | RenderState.CullMode);
+				Renderer.World = World;
+				Renderer.CullMode = CullMode.None;
+				Objects.Render();
+				Renderer.Flush();
+				Renderer.PopState();
+			}
+
+			protected override void OnRelease()
+			{
+				Objects.Clear();
+			}
 		}
 	}
 }

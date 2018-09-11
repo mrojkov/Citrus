@@ -21,6 +21,8 @@ namespace Lime
 		private Display display;
 		private bool closed;
 
+		public bool AsyncRendering { get; set; }
+
 		public NSGameView View { get; private set; }
 
 		// This line only suppresses warning: "Window.Current: a name can be simplified".
@@ -473,6 +475,7 @@ namespace Lime
 			if (Application.AreAllWindowsInactive()) {
 				Input.ClearKeyState();
 			}
+			RaiseSync();
 		}
 
 		private void RefreshMousePosition()

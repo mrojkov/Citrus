@@ -59,22 +59,19 @@ namespace Lime
 			currentList.Add(new Item { Node = node, Presenter = presenter });
 		}
 
-		public void RenderAndClear()
+		public void GetRenderObjects(RenderObjectList list)
 		{
-			Render();
-			Clear();
-		}
-
-		public void Render()
-		{
-			for (int i = 0; i < Layers.Length; i++) {
-				var list = Layers[i];
-				if (list == null || list.Count == 0) {
+			for (var i = 0; i < Layers.Length; i++) {
+				var layer = Layers[i];
+				if (layer == null) {
 					continue;
 				}
-				for (int j = list.Count - 1; j >= 0; j--) {
-					var t = list[j];
-					t.Presenter.Render(t.Node);
+				for (var j = layer.Count - 1; j >= 0; j--) {
+					var item = layer[j];
+					var ro = item.Presenter.GetRenderObject(item.Node);
+					if (ro != null) {
+						list.Add(ro);
+					}
 				}
 			}
 		}

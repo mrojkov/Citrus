@@ -216,31 +216,75 @@ namespace Lime
 
 		public static ColorTheme Colors = ColorTheme.CreateLightTheme();
 
-		public class KeyboardFocusBorderPresenter : CustomPresenter
+		public class KeyboardFocusBorderPresenter : IPresenter
 		{
-			private float thikness = 1.0f;
+			private float thickness = 1.0f;
+
 			public KeyboardFocusBorderPresenter(float thikness = 1.0f)
 			{
-				this.thikness = thikness;
+				this.thickness = thikness;
 			}
-			public override void Render(Node node)
+
+			public IPresenter Clone() => (IPresenter)MemberwiseClone();
+
+			public Lime.RenderObject GetRenderObject(Node node)
 			{
-				if (Widget.Focused == node && !node.AsWidget.IsMouseOverThisOrDescendant()) {
-					var widget = node.AsWidget;
-					widget.PrepareRendererState();
-					Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Colors.KeyboardFocusBorder, thikness);
+				var widget = (Widget)node;
+				if (Widget.Focused == node && !widget.IsMouseOverThisOrDescendant()) {
+					var ro = RenderObjectPool<RenderObject>.Acquire();
+					ro.CaptureRenderState(widget);
+					ro.Size = widget.Size;
+					ro.Thickness = thickness;
+					ro.Color = Colors.KeyboardFocusBorder;
+					return ro;
+				}
+				return null;
+			}
+
+			public bool PartialHitTest(Node node, ref HitTestArgs args) => false;
+
+			private class RenderObject : WidgetRenderObject
+			{
+				public Vector2 Size;
+				public float Thickness;
+				public Color4 Color;
+
+				public override void Render()
+				{
+					PrepareRenderState();
+					Renderer.DrawRectOutline(Vector2.Zero, Size, Color, Thickness);
 				}
 			}
 		}
 
-		internal class MouseHoverBorderPresenter : CustomPresenter
+		internal class MouseHoverBorderPresenter : IPresenter
 		{
-			public override void Render(Node node)
+			public IPresenter Clone() => (IPresenter)MemberwiseClone();
+
+			public Lime.RenderObject GetRenderObject(Node node)
 			{
-				var widget = node.AsWidget;
+				var widget = (Widget)node;
 				if (widget.IsMouseOverThisOrDescendant()) {
-					widget.PrepareRendererState();
-					Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Colors.KeyboardFocusBorder, 1);
+					var ro = RenderObjectPool<RenderObject>.Acquire();
+					ro.CaptureRenderState(widget);
+					ro.Size = widget.Size;
+					ro.Color = Colors.KeyboardFocusBorder;
+					return ro;
+				}
+				return null;
+			}
+
+			public bool PartialHitTest(Node node, ref HitTestArgs args) => false;
+
+			private class RenderObject : WidgetRenderObject
+			{
+				public Vector2 Size;
+				public Color4 Color;
+
+				public override void Render()
+				{
+					PrepareRenderState();
+					Renderer.DrawRectOutline(Vector2.Zero, Size, Color, 1);
 				}
 			}
 		}

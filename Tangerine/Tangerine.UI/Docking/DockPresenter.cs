@@ -1,8 +1,9 @@
-﻿using Lime;
+using Lime;
+using Tangerine.Core;
 
 namespace Tangerine.UI.Docking
 {
-	public class DockingPresenter : DelegatePresenter<Widget>
+	public class DockingPresenter : SyncDelegatePresenter<Widget>
 	{
 		public DockingPresenter() : base(Render) { }
 

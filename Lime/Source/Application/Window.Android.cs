@@ -1,5 +1,6 @@
 #if ANDROID
 using System;
+using System.Threading;
 using System.Collections.Generic;
 
 using Android.Content.Res;
@@ -14,6 +15,10 @@ namespace Lime
 {
 	public class Window : CommonWindow, IWindow
 	{
+		private Thread renderThread;
+		private ManualResetEvent renderReady = new ManualResetEvent(false);
+		private ManualResetEvent renderCompleted = new ManualResetEvent(true);
+		
 		private static readonly IWindowManager WindowManager =
 			AndroidApp.Context.GetSystemService(AndroidContext.WindowService).JavaCast<IWindowManager>();
 
@@ -22,12 +27,13 @@ namespace Lime
 
 		private readonly Display display = new Display(WindowManager.DefaultDisplay);
 		private readonly FPSCounter fpsCounter;
-
+		
 		public bool Active { get; private set; }
 		public bool Fullscreen { get { return true; } set {} }
 		public string Title { get; set; }
 		public bool Visible { get { return true; } set {} }
 		public WindowInput Input { get; private set; }
+		public bool AsyncRendering { get; private set; }
 		public MouseCursor Cursor { get; set; }
 		public WindowState State { get { return WindowState.Fullscreen; } set {} }
 		public bool FixedSize { get { return true; } set {} }
@@ -80,6 +86,7 @@ namespace Lime
 			Application.MainWindow = this;
 			Input = new WindowInput(this);
 			Active = true;
+			AsyncRendering = options.AsyncRendering;
 			fpsCounter = new FPSCounter();
 			ActivityDelegate.Instance.Paused += activity => {
 				Active = false;
@@ -92,29 +99,86 @@ namespace Lime
 			ActivityDelegate.Instance.GameView.Resize += (sender, e) => {
 				RaiseResized(((ResizeEventArgs)e).DeviceRotated);
 			};
-			ActivityDelegate.Instance.GameView.UpdateFrame += GameView_UpdateFrame;
-			ActivityDelegate.Instance.GameView.RenderFrame += GameView_RenderFrame;
-
+			
 			PixelScale = Resources.System.DisplayMetrics.Density;
+			
+			if (AsyncRendering) {
+				renderThread = new Thread(RenderLoop);
+				renderThread.IsBackground = true;
+				renderThread.Start();
+			}
+			
 			Application.WindowUnderMouse = this;
+			
+			var ccb = new ChoreographerCallback();
+			long prevFrameTime = Java.Lang.JavaSystem.NanoTime();
+			ccb.OnFrame += frameTimeNanos => {
+				var delta = (float)((frameTimeNanos - prevFrameTime) / 1000000000d);
+				prevFrameTime = frameTimeNanos;
+				if (Active && ActivityDelegate.Instance.GameView.IsSurfaceCreated) {
+					fpsCounter.Refresh();
+					Update(delta);
+					if (AsyncRendering) {
+						renderCompleted.WaitOne();
+						renderCompleted.Reset();
+						RaiseSync();
+						renderReady.Set();
+					} else {
+						RaiseSync();
+						Render();
+					}
+				}
+			};
+			Choreographer.Instance.PostFrameCallback(ccb);
 		}
-
-		private void GameView_UpdateFrame(object sender, OpenTK.FrameEventArgs e)
+		
+		class ChoreographerCallback : Java.Lang.Object, Choreographer.IFrameCallback
 		{
-			UnclampedDelta = (float)e.Time;
-			var delta = Math.Min(UnclampedDelta, Application.MaxDelta);
-			RaiseUpdating(delta);
+			public event Action<long> OnFrame;
+
+			public void DoFrame(long frameTimeNanos)
+			{
+				Choreographer.Instance.PostFrameCallback(this);
+				OnFrame?.Invoke(frameTimeNanos);
+			}
+		}
+		
+		private void RenderLoop()
+		{
+			while (true) {
+				renderReady.WaitOne();
+				renderReady.Reset();
+				var gw = ActivityDelegate.Instance.GameView;
+				var surfaceVersion = gw.SurfaceVersion;
+				try {
+					Render();
+				} catch (System.Exception e) {
+					if (surfaceVersion == gw.SurfaceVersion) {
+						System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(e).Throw();
+					}
+				}
+				renderCompleted.Set();
+			}
+		}
+		
+		private void Update(float delta)
+		{
+			UnclampedDelta = delta;
+			delta = Math.Min(UnclampedDelta, Application.MaxDelta);
+			base.RaiseUpdating(delta);
 			AudioSystem.Update();
 			Input.CopyKeysState();
 			Input.ProcessPendingKeyEvents(delta);
 		}
-
-		private void GameView_RenderFrame(object sender, OpenTK.FrameEventArgs e)
+		
+		private void Render()
 		{
-			fpsCounter.Refresh();
-			RaiseRendering();
+			var gw = ActivityDelegate.Instance.GameView;
+			gw.MakeCurrentActual();
+			base.RaiseRendering();
+			gw.SwapBuffers();
 		}
-
+		
 		public void Center() {}
 		public void Close() {}
 		public void Invalidate() {}

@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
+using System.Threading;
 using System.Windows.Forms;
 using OpenTK.Graphics;
 using WinFormsCloseReason = System.Windows.Forms.CloseReason;
@@ -12,6 +12,13 @@ namespace Lime
 {
 	public class Window : CommonWindow, IWindow
 	{
+		private ManualResetEvent renderReady = new ManualResetEvent(false);
+		private ManualResetEvent renderCompleted = new ManualResetEvent(true);
+
+		private Thread renderThread;
+		private CancellationTokenSource renderThreadTokenSource;
+		private CancellationToken renderThreadToken;
+
 		// This line only suppresses warning: "Window.Current: a name can be simplified".
 		public new static IWindow Current => CommonWindow.Current;
 
@@ -23,8 +30,8 @@ namespace Lime
 			RenderDeferred,
 			Rendered,
 		}
-		private readonly Timer timer;
-		private OpenTK.GLControl glControl;
+		private readonly System.Windows.Forms.Timer timer;
+		private GLControl glControl;
 		private Form form;
 		private Stopwatch stopwatch;
 		private bool active;
@@ -174,6 +181,8 @@ namespace Lime
 			);
 		}
 
+		public bool AsyncRendering { get; }
+
 		public float UnclampedDelta { get; private set; }
 
 		FPSCounter fpsCounter = new FPSCounter();
@@ -224,6 +233,8 @@ namespace Lime
 
 		private class GLControl : OpenTK.GLControl
 		{
+			public event Action BeforeBoundsChanged;
+
 			public GLControl(GraphicsMode mode, int major, int minor, GraphicsContextFlags flags)
 				: base(mode, major, minor, flags)
 			{
@@ -234,14 +245,20 @@ namespace Lime
 			{
 				return true;
 			}
+
+			protected override void SetBoundsCore(int x, int y, int width, int height, BoundsSpecified specified)
+			{
+				BeforeBoundsChanged?.Invoke();
+				base.SetBoundsCore(x, y, width, height, specified);
+			}
 		}
 
-		private static OpenTK.GLControl CreateGLControl()
+		private static GLControl CreateGLControl()
 		{
 			return new GLControl(new GraphicsMode(32, 16, 8), 2, 0,
 				Application.RenderingBackend == RenderingBackend.OpenGL ?
-				OpenTK.Graphics.GraphicsContextFlags.Default :
-				OpenTK.Graphics.GraphicsContextFlags.Embedded
+					OpenTK.Graphics.GraphicsContextFlags.Default :
+					OpenTK.Graphics.GraphicsContextFlags.Embedded
 			);
 		}
 
@@ -263,6 +280,9 @@ namespace Lime
 			if (Application.MainWindow != null && Application.RenderingBackend == RenderingBackend.ES20) {
 				// ES20 doesn't allow multiple contexts for now, because of a bug in OpenTK
 				throw new Lime.Exception("Attempt to create a second window for ES20 rendering backend. Use OpenGL backend instead.");
+			}
+			if (options.UseTimer && options.AsyncRendering) {
+				throw new Lime.Exception("Can't use both timer and async rendering");
 			}
 			if (options.ToolWindow) {
 				form = new ToolForm();
@@ -287,6 +307,8 @@ namespace Lime
 				MaximumDecoratedSize = options.MaximumDecoratedSize;
 			}
 			glControl = CreateGLControl();
+			glControl.CreateControl();
+			glControl.Context.MakeCurrent(null);
 			glControl.Dock = DockStyle.Fill;
 			glControl.Paint += OnPaint;
 			glControl.KeyDown += OnKeyDown;
@@ -304,6 +326,7 @@ namespace Lime
 					Application.WindowUnderMouse = null;
 				}
 			};
+			glControl.BeforeBoundsChanged += WaitForRendering;
 			form.Move += OnMove;
 			form.Activated += OnActivated;
 			form.Deactivate += OnDeactivate;
@@ -312,15 +335,16 @@ namespace Lime
 			active = Form.ActiveForm == form;
 
 			if (options.UseTimer) {
-				timer = new Timer {
+				timer = new System.Windows.Forms.Timer {
 					Interval = (int)(1000.0 / 65),
 					Enabled = true,
 				};
 				timer.Tick += OnTick;
 			} else {
-				VSync = options.VSync;
+				vSync = options.VSync;
 				glControl.MakeCurrent();
-				glControl.VSync = VSync;
+				glControl.VSync = vSync;
+				glControl.Context.MakeCurrent(null);
 				System.Windows.Forms.Application.Idle += OnTick;
 			}
 
@@ -351,6 +375,14 @@ namespace Lime
 				Form.Owner = Application.MainWindow.Form;
 				Form.StartPosition = FormStartPosition.CenterParent;
 			}
+			AsyncRendering = options.AsyncRendering;
+			if (AsyncRendering) {
+				renderThreadTokenSource = new CancellationTokenSource();
+				renderThreadToken = renderThreadTokenSource.Token;
+				renderThread = new Thread(RenderLoop);
+				renderThread.IsBackground = true;
+				renderThread.Start();
+			}
 			Application.Windows.Add(this);
 		}
 
@@ -365,8 +397,10 @@ namespace Lime
 			{
 				if (vSync != value && timer == null) {
 					vSync = value;
+					WaitForRendering();
 					glControl.MakeCurrent();
 					glControl.VSync = value;
+					glControl.Context.MakeCurrent(null);
 				}
 			}
 		}
@@ -407,6 +441,11 @@ namespace Lime
 
 		private void OnClosed(object sender, FormClosedEventArgs e)
 		{
+			if (AsyncRendering) {
+				renderThreadTokenSource.Cancel();
+				renderReady.Set();
+				renderThread.Join();
+			}
 			RaiseClosed();
 			Application.Windows.Remove(this);
 			if (this == Application.MainWindow) {
@@ -457,7 +496,6 @@ namespace Lime
 		private void OnActivated(object sender, EventArgs e)
 		{
 			if (!active) {
-				glControl.MakeCurrent();
 				active = true;
 				RaiseActivated();
 			}
@@ -591,14 +629,36 @@ namespace Lime
 			Input.TextInput += e.KeyChar;
 		}
 
+		private void RenderLoop()
+		{
+			while (true) {
+				renderReady.WaitOne();
+				renderReady.Reset();
+				if (renderThreadToken.IsCancellationRequested) {
+					return;
+				}
+				glControl.MakeCurrent();
+				RaiseRendering();
+				glControl.SwapBuffers();
+				glControl.Context.MakeCurrent(null);
+				renderCompleted.Set();
+			}
+		}
+
+		private void WaitForRendering()
+		{
+			if (AsyncRendering) {
+				renderCompleted.WaitOne();
+			}
+		}
+
 		private void OnPaint(object sender, PaintEventArgs e)
 		{
 			switch (renderingState) {
 				case RenderingState.Updated:
-					if (glControl.IsHandleCreated && form.Visible && !glControl.IsDisposed) {
+					PixelScale = CalcPixelScale(e.Graphics.DpiX);
+					if (!AsyncRendering && glControl.IsHandleCreated && form.Visible && !glControl.IsDisposed) {
 						glControl.MakeCurrent();
-						PixelScale = CalcPixelScale(e.Graphics.DpiX);
-						fpsCounter.Refresh();
 						RaiseRendering();
 						glControl.SwapBuffers();
 					}
@@ -625,6 +685,7 @@ namespace Lime
 			if (this == Application.MainWindow && Application.MainMenu != null) {
 				Application.MainMenu.Refresh();
 			}
+			fpsCounter.Refresh();
 			// Refresh mouse position of every frame to make HitTest work properly if mouse is outside of the screen.
 			RefreshMousePosition();
 			RaiseUpdating(delta);
@@ -638,6 +699,14 @@ namespace Lime
 				glControl.Invalidate();
 			}
 			renderingState = RenderingState.Updated;
+			if (AsyncRendering) {
+				renderCompleted.WaitOne();
+				renderCompleted.Reset();
+			}
+			RaiseSync();
+			if (AsyncRendering) {
+				renderReady.Set();
+			}
 		}
 
 		private static Key TranslateKey(Keys key)

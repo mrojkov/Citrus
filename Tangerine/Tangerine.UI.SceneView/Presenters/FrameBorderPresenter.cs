@@ -4,7 +4,7 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.SceneView
 {
-	public class FrameBorderPresenter : CustomPresenter<DistortionMesh>
+	public class FrameBorderPresenter : SyncCustomPresenter<DistortionMesh>
 	{
 		private readonly SceneView sv;
 		private readonly Texture2D DashTexture;
@@ -12,7 +12,7 @@ namespace Tangerine.UI.SceneView
 		public FrameBorderPresenter(SceneView sceneView)
 		{
 			this.sv = sceneView;
-			sceneView.Frame.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(Render));
+			sceneView.Frame.CompoundPostPresenter.Add(new SyncDelegatePresenter<Widget>(Render));
 			DashTexture = new Texture2D();
             DashTexture.LoadImage(new Bitmap(new ThemedIconResource("SceneView.Dash", "Tangerine").GetResourceStream()));
 			DashTexture.TextureParams = new TextureParams {

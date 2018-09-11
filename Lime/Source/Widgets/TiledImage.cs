@@ -108,14 +108,13 @@ namespace Lime
 			}
 		}
 
-		public override void Render()
+		protected internal override Lime.RenderObject GetRenderObject()
 		{
 			var blending = GlobalBlending;
 			var shader = GlobalShader;
 			if (material == null) {
 				material = WidgetMaterial.GetInstance(blending, shader, 1);
 			}
-			Renderer.Transform1 = LocalToWorldTransform;
 			var UV1 = new Vector2 {
 				X = Size.X / texture.ImageSize.Width * TileRatio.X + TileOffset.X,
 				Y = Size.Y / texture.ImageSize.Height * TileRatio.Y + TileOffset.Y
@@ -124,12 +123,44 @@ namespace Lime
 				UV1.X = (float)Math.Truncate(UV1.X);
 				UV1.Y = (float)Math.Truncate(UV1.Y);
 			}
-			Renderer.DrawSprite(texture, null, CustomMaterial ?? material, GlobalColor, ContentPosition, ContentSize, TileOffset, UV1, Vector2.Zero, Vector2.Zero);
+			var ro = RenderObjectPool<RenderObject>.Acquire();
+			ro.CaptureRenderState(this);
+			ro.Texture = Texture;
+			ro.Material = CustomMaterial ?? material;
+			ro.TileOffset = TileOffset;
+			ro.UV1 = UV1;
+			ro.Color = GlobalColor;
+			ro.Position = ContentPosition;
+			ro.Size = ContentSize;
+			return ro;
 		}
 
 		public bool IsNotRenderTexture()
 		{
 			return !(texture is RenderTexture);
+		}
+
+		private class RenderObject : WidgetRenderObject
+		{
+			public ITexture Texture;
+			public IMaterial Material;
+			public Vector2 TileOffset;
+			public Vector2 UV1;
+			public Color4 Color;
+			public Vector2 Position;
+			public Vector2 Size;
+
+			public override void Render()
+			{
+				PrepareRenderState();
+				Renderer.DrawSprite(Texture, null, Material, Color, Position, Size, TileOffset, UV1, Vector2.Zero, Vector2.Zero);
+			}
+
+			protected override void OnRelease()
+			{
+				Texture = null;
+				Material = null;
+			}
 		}
 	}
 }

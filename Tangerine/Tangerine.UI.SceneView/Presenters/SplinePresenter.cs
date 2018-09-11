@@ -5,7 +5,7 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.SceneView
 {
-	public class SplinePresenter : CustomPresenter<Spline>
+	public class SplinePresenter : SyncCustomPresenter<Spline>
 	{
 		protected override void InternalRender(Spline spline)
 		{

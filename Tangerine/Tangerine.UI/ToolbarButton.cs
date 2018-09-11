@@ -93,7 +93,7 @@ namespace Tangerine.UI
 					return true;
 				}
 			};
-			CompoundPresenter.Add(new DelegatePresenter<Widget>(w => {
+			CompoundPresenter.Add(new SyncDelegatePresenter<Widget>(w => {
 				w.PrepareRendererState();
 				Renderer.Shader = Enabled ? ShaderId.Diffuse : ShaderId.Silhuette;
 				Color4 bgColor, borderColor;

@@ -34,7 +34,6 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <PlatformTarget>x86</PlatformTarget>
-    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>WIN;OPENGL;OPENAL</DefineConstants>
     <DebugType>full</DebugType>
     <WarningLevel>4</WarningLevel>
@@ -43,6 +42,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Prefer32Bit>false</Prefer32Bit>
     <LangVersion>7.2</LangVersion>
+    <OutputPath>bin\x86\Release\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -83,7 +83,6 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Profile|AnyCPU'">
     <LangVersion>7.2</LangVersion>
-    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Lzma, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -195,12 +194,9 @@
     <Compile Include="Source\Types\Vector4.cs" />
     <Compile Include="Source\Widgets\3D\CommonMaterial.cs" />
     <Compile Include="Source\Widgets\3D\CommonMaterialProgram.cs" />
-    <Compile Include="Source\Widgets\3D\LightSource.cs" />
     <Compile Include="Source\Widgets\3D\Model3D.cs" />
     <Compile Include="Source\Widgets\3D\Model3DAttachment.cs" />
-    <Compile Include="Source\Widgets\3D\ShadowMapping\DepthBuffer.cs" />
-    <Compile Include="Source\Widgets\3D\ShadowMapping\DepthBufferProgram.cs" />
-    <Compile Include="Source\Widgets\3D\ShadowMapping\DepthBufferRenderer.cs" />
+    <Compile Include="Source\Widgets\3D\RenderObject3D.cs" />
     <Compile Include="Source\Widgets\3D\Spline3D.cs" />
     <Compile Include="Source\Widgets\Materials\HSLMaterial.cs" />
     <Compile Include="Source\Widgets\DropDownList.cs" />
@@ -242,6 +238,8 @@
     <Compile Include="Source\Widgets\NodeBehaviours.cs" />
     <Compile Include="Source\Widgets\NodeReference.cs" />
     <Compile Include="Source\Profilers\TasksProfiler.cs" />
+    <Compile Include="Source\Widgets\RendererWrapper.cs" />
+    <Compile Include="Source\Widgets\RenderObject.cs" />
     <Compile Include="Source\Widgets\Text\IText.cs" />
     <Compile Include="Source\Widgets\ListView\ExpandableListItem.cs" />
     <Compile Include="Source\Widgets\ListView\ListView.cs" />
@@ -440,6 +438,7 @@
     <Compile Include="Source\Audio\OpenAL\ALMOB\OpenAL.cs" />
     <Compile Include="Source\Audio\OpenAL\ALMOB\OpenALC.cs" />
     <Compile Include="Source\Widgets\WidgetMaterial.cs" />
+    <Compile Include="Source\Graphics\IRenderer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\3rdParty\OpenAL\OpenAL32.dll">
@@ -468,7 +467,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Win.csproj">
-      <Project>{538E41E4-725C-4521-BCF3-A5591A1A3AFD}</Project>
+      <Project>{538e41e4-725c-4521-bcf3-a5591a1a3afd}</Project>
       <Name>Lemon.Win</Name>
     </ProjectReference>
     <ProjectReference Include="..\Yuzu\Yuzu.Win.csproj">

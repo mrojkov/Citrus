@@ -77,7 +77,7 @@ namespace Tangerine.UI.SceneView
 			}
 		}
 
-		private class RulerLinesPresenter : CustomPresenter<Widget>
+		private class RulerLinesPresenter : SyncCustomPresenter<Widget>
 		{
 			private readonly Widget leftRulerBar;
 			private readonly Widget topRulerBar;
@@ -171,7 +171,7 @@ namespace Tangerine.UI.SceneView
 			return step;
 		}
 
-		private class RulerBarPresenter : CustomPresenter<Widget>
+		private class RulerBarPresenter : SyncCustomPresenter<Widget>
 		{
 			private RulerOrientation RulerOrientation { get; set; }
 
@@ -214,18 +214,18 @@ namespace Tangerine.UI.SceneView
 						Renderer.DrawLine(a, b, ColorTheme.Current.SceneView.RulerTextColor);
 						if (strokeValue != null) {
 							var lengthMarkerText = ((int)(j * strokeValue.Value)).ToString();
-							var oldTransform = Renderer.Transform1;
 							var textLength = FontPool.Instance.DefaultFont.MeasureTextLine(lengthMarkerText, fontHeight, letterspacing);
+							var lengthMarkerPosition = a + textOffset;
+							Renderer.PushState(RenderState.Transform1);
+							Renderer.MultiplyTransform1(Matrix32.Translation(lengthMarkerPosition.X.Round(), lengthMarkerPosition.Y.Round()));
 							if (rulerData.RulerOrientation == RulerOrientation.Vertical) {
-								Renderer.Transform1 = Matrix32.Rotation(-Mathf.HalfPi) * Renderer.Transform1;
+								Renderer.MultiplyTransform1(Matrix32.Rotation(-Mathf.HalfPi));
 								textOffset = Vector2.Down * (5 + textLength.X);
 							} else {
 								textOffset = Vector2.Right * 5;
 							}
-							var lengthMarkerPosition = a + textOffset;
-							Renderer.Transform1 *= Matrix32.Translation(lengthMarkerPosition.X.Round(), lengthMarkerPosition.Y.Round());
 							Renderer.DrawTextLine(Vector2.Zero, lengthMarkerText, fontHeight, ColorTheme.Current.SceneView.RulerTextColor, letterspacing);
-							Renderer.Transform1 = oldTransform;
+							Renderer.PopState();
 						}
 					}
 					j++;

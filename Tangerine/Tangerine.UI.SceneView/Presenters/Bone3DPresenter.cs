@@ -4,14 +4,14 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.SceneView
 {
-	class Bone3DPresenter : CustomPresenter<Node3D>
+	class Bone3DPresenter : SyncCustomPresenter<Node3D>
 	{
 		private readonly VisualHint bone3DHint =
 			VisualHintsRegistry.Instance.Register("/All/Nodes/Bones/Bone3D", SceneViewCommands.ShowBone3DVisualHint, VisualHintsRegistry.HideRules.VisibleIfProjectOpened);
 
 		public Bone3DPresenter(SceneView sceneView)
 		{
-			sceneView.Frame.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(RenderSelection));
+			sceneView.Frame.CompoundPostPresenter.Add(new SyncDelegatePresenter<Widget>(RenderSelection));
 		}
 
 		private static void RenderSelection(Widget canvas)

@@ -7,69 +7,10 @@ namespace Lime
 	[TangerineVisualHintGroup("/All/Nodes/3D")]
 	public class Model3D : Node3D
 	{
-		[YuzuMember]
-		[TangerineKeyframeColor(19)]
-		public bool LightningEnabled
-		{
-			get
-			{
-				return lightningEnabled;
-			}
-			set
-			{
-				lightningEnabled = value;
-				ResetLightning();
-			}
-		}
-
-		[YuzuMember]
-		[TangerineKeyframeColor(20)]
-		public bool CastShadow
-		{
-			get
-			{
-				return castShadow;
-			}
-			set
-			{
-				castShadow = value;
-				ResetLightning();
-			}
-		}
-
-		[YuzuMember]
-		[TangerineKeyframeColor(21)]
-		public bool RecieveShadow
-		{
-			get
-			{
-				return recieveShadow;
-			}
-			set
-			{
-				recieveShadow = value;
-				ResetLightning();
-			}
-		}
-
-		private bool castShadow;
-		private bool recieveShadow;
-		private bool lightningEnabled;
-
 		[YuzuAfterDeserialization]
 		public void AfterDeserialization()
 		{
 			RebuildSkeleton();
-		}
-
-		public Model3D()
-		{
-			Awoke += Awake;
-		}
-
-		private static void Awake(Node owner)
-		{
-			((Model3D)owner).ResetLightning();
 		}
 
 		public override Node Clone()
@@ -86,15 +27,6 @@ namespace Lime
 				.SelectMany(m => m.Submeshes);
 			foreach (var sm in submeshes) {
 				sm.RebuildSkeleton(this);
-			}
-		}
-
-		private void ResetLightning()
-		{
-			foreach (var mesh in Descendants.OfType<Mesh3D>()) {
-				mesh.ProcessLightning = lightningEnabled;
-				mesh.RecieveShadow = recieveShadow;
-				mesh.CastShadow = castShadow;
 			}
 		}
 	}

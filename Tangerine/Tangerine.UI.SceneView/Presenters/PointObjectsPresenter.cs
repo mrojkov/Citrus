@@ -15,7 +15,7 @@ namespace Tangerine.UI.SceneView
 		public PointObjectsPresenter(SceneView sceneView)
 		{
 			sv = sceneView;
-			sceneView.Frame.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(Render));
+			sceneView.Frame.CompoundPostPresenter.Add(new SyncDelegatePresenter<Widget>(Render));
 		}
 
 		void Render(Widget canvas)

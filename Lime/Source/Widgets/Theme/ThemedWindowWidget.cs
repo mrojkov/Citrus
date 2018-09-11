@@ -26,13 +26,32 @@ namespace Lime
 	}
 
 	[YuzuDontGenerateDeserializer]
-	internal class WindowWidgetPresenter : CustomPresenter
+	internal class WindowWidgetPresenter : IPresenter
 	{
-		public override void Render(Node node)
+		public IPresenter Clone() => this;
+
+		public Lime.RenderObject GetRenderObject(Node node)
 		{
-			var widget = node.AsWidget;
-			widget.PrepareRendererState();
-			Renderer.DrawRect(Vector2.Zero, widget.Size, Theme.Colors.GrayBackground);
+			var widget = (Widget)node;
+			var ro = RenderObjectPool<RenderObject>.Acquire();
+			ro.CaptureRenderState(widget);
+			ro.Size = widget.Size;
+			ro.Color = Theme.Colors.GrayBackground;
+			return ro;
+		}
+
+		public bool PartialHitTest(Node node, ref HitTestArgs args) => false;
+
+		private class RenderObject : WidgetRenderObject
+		{
+			public Vector2 Size;
+			public Color4 Color;
+
+			public override void Render()
+			{
+				PrepareRenderState();
+				Renderer.DrawRect(Vector2.Zero, Size, Color);
+			}
 		}
 	}
 }

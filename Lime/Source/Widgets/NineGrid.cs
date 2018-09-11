@@ -33,8 +33,6 @@ namespace Lime
 			public Rectangle UV;
 		};
 
-		public Part[] Parts { get; } = new Part[9];
-
 		public NineGrid()
 		{
 			Presenter = DefaultPresenter.Instance;
@@ -42,26 +40,24 @@ namespace Lime
 			Texture = new SerializableTexture();
 		}
 
-		void BuildLayout(Part[] layout)
+		public static void BuildLayout(Part[] layout, Vector2 textureSize, float leftOffset, float rightOffset, float topOffset, float bottomOffset, Vector2 size)
 		{
-			Vector2 textureSize = (Vector2)Texture.ImageSize;
-
-			float leftPart = LeftOffset * textureSize.X;
-			float topPart = TopOffset * textureSize.Y;
-			float rightPart = RightOffset * textureSize.X;
-			float bottomPart = BottomOffset * textureSize.Y;
+			float leftPart = leftOffset * textureSize.X;
+			float topPart = topOffset * textureSize.Y;
+			float rightPart = rightOffset * textureSize.X;
+			float bottomPart = bottomOffset * textureSize.Y;
 
 			float tx0 = 0;
-			float tx1 = LeftOffset;
-			float tx2 = 1 - RightOffset;
+			float tx1 = leftOffset;
+			float tx2 = 1 - rightOffset;
 			float tx3 = 1;
 
 			float ty0 = 0;
-			float ty1 = TopOffset;
-			float ty2 = 1 - BottomOffset;
+			float ty1 = topOffset;
+			float ty2 = 1 - bottomOffset;
 			float ty3 = 1;
 
-			Vector2 gridSize = Size;
+			Vector2 gridSize = size;
 			bool flipX = false;
 			bool flipY = false;
 			if (gridSize.X < 0) {
@@ -124,23 +120,28 @@ namespace Lime
 			}
 		}
 
-		public override void Render()
+		protected internal override Lime.RenderObject GetRenderObject()
 		{
-			BuildLayout(Parts);
-			Renderer.Transform1 = LocalToWorldTransform;
-			Renderer.Blending = GlobalBlending;
-			Renderer.Shader = GlobalShader;
-			for (int i = 0; i < Parts.Length; i++) {
-				var part = Parts[i];
-				Renderer.DrawSprite(Texture, GlobalColor, part.Rect.A, part.Rect.Size, part.UV.A, part.UV.B);
-			}
+			var ro = RenderObjectPool<RenderObject>.Acquire();
+			ro.CaptureRenderState(this);
+			ro.Texture = Texture;
+			ro.LeftOffset = LeftOffset;
+			ro.RightOffset = RightOffset;
+			ro.TopOffset = TopOffset;
+			ro.BottomOffset = BottomOffset;
+			ro.Size = Size;
+			ro.Color = GlobalColor;
+			return ro;
 		}
 
-		internal protected override bool PartialHitTestByContents (ref HitTestArgs args)
+		private Part[] parts;
+
+		internal protected override bool PartialHitTestByContents(ref HitTestArgs args)
 		{
-			BuildLayout(Parts);
-			for (int i = 0; i < Parts.Length; i++) {
-				if (PartHitTest(Parts[i], args.Point))
+			parts = parts ?? new Part[9];
+			BuildLayout(parts, (Vector2)Texture.ImageSize, LeftOffset, RightOffset, TopOffset, BottomOffset, Size);
+			for (int i = 0; i < parts.Length; i++) {
+				if (PartHitTest(parts[i], args.Point))
 					return true;
 			}
 			return false;
@@ -167,6 +168,33 @@ namespace Lime
 				return !Texture.IsTransparentPixel(ui, vi);
 			}
 			return false;
+		}
+
+		private class RenderObject : WidgetRenderObject
+		{
+			private Part[] parts = new Part[9];
+
+			public ITexture Texture;
+			public float LeftOffset;
+			public float RightOffset;
+			public float TopOffset;
+			public float BottomOffset;
+			public Vector2 Size;
+			public Color4 Color;
+
+			public override void Render()
+			{
+				BuildLayout(parts, (Vector2)Texture.ImageSize, LeftOffset, RightOffset, TopOffset, BottomOffset, Size);
+				PrepareRenderState();
+				foreach (var part in parts) {
+					Renderer.DrawSprite(Texture, Color, part.Rect.A, part.Rect.Size, part.UV.A, part.UV.B);
+				}
+			}
+
+			protected override void OnRelease()
+			{
+				Texture = null;
+			}
 		}
 	}
 }

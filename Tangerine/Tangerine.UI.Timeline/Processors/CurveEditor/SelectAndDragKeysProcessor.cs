@@ -25,7 +25,7 @@ namespace Tangerine.UI.Timeline
 					using (Document.Current.History.BeginTransaction()) {
 						var initialMousePos = curveEditor.ContentWidget.LocalMousePosition();
 						var currentMousePos = initialMousePos;
-						var rectanglePresenter = new DelegatePresenter<Widget>(w => {
+						var rectanglePresenter = new SyncDelegatePresenter<Widget>(w => {
 							w.PrepareRendererState();
 							Renderer.DrawRectOutline(initialMousePos, currentMousePos, ColorTheme.Current.TimelineCurveEditor.Selection);
 						});

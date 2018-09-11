@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Lime
@@ -23,12 +23,12 @@ namespace Lime
 
 		public void Draw(Matrix32 transform, Color4 tint)
 		{
-			var t = Renderer.Transform1;
-			Renderer.Transform1 = transform * t;
+			Renderer.PushState(RenderState.Transform1);
+			Renderer.MultiplyTransform1(transform);
 			foreach (var i in this) {
 				i.Draw(tint);
 			}
-			Renderer.Transform1 = t;
+			Renderer.PopState();
 		}
 
 		public class TriangleFan : IVectorShapeElement

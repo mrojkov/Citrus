@@ -81,7 +81,7 @@ namespace Tangerine.UI
 				Widget = new Widget {
 					HitTestTarget = true,
 					MinMaxSize = OuterRadius * 2 * Vector2.One,
-					PostPresenter = new DelegatePresenter<Widget>(Render)
+					PostPresenter = new SyncDelegatePresenter<Widget>(Render)
 				};
 				Widget.Tasks.Add(SelectTask());
 				Widget.AddChangeWatcher(() => color.Value.H, _ => wasHueChanged = true);
@@ -268,7 +268,7 @@ namespace Tangerine.UI
 				Widget.CompoundPresenter.Insert(0, presenter);
 			}
 
-			class BackgroundPresenter : CustomPresenter
+			class BackgroundPresenter : SyncCustomPresenter
 			{
 				readonly Property<ColorHSVA> color;
 
@@ -281,15 +281,15 @@ namespace Tangerine.UI
 				{
 					var widget = node.AsWidget;
 					widget.PrepareRendererState();
-					Renderer.DrawRect(Vector2.Zero, widget.Size, Color4.White);
+					RendererWrapper.Current.DrawRect(Vector2.Zero, widget.Size, Color4.White);
 					int numChecks = 20;
 					var checkSize = new Vector2(widget.Width / numChecks, widget.Height / 2);
 					for (int i = 0; i < numChecks; i++) {
 						var checkPos = new Vector2(i * checkSize.X, (i % 2 == 0) ? 0 : checkSize.Y);
 						Renderer.DrawRect(checkPos, checkPos + checkSize, Color4.Black);
 					}
-					Renderer.DrawRect(Vector2.Zero, widget.Size, color.Value.ToRGBA());
-					Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Theme.Colors.ControlBorder);
+					RendererWrapper.Current.DrawRect(Vector2.Zero, widget.Size, color.Value.ToRGBA());
+					RendererWrapper.Current.DrawRectOutline(Vector2.Zero, widget.Size, Theme.Colors.ControlBorder);
 				}
 			}
 		}

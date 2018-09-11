@@ -344,10 +344,6 @@
     <Compile Include="Source\Profilers\NodeProfilerHelpers\ResultExporter.cs" />
     <Compile Include="Source\Profilers\NodeProfilerHelpers\UsageData.cs" />
     <Compile Include="Source\Profilers\NodeProfilerHelpers\UsageSummary.cs" />
-    <Compile Include="Source\Widgets\3D\LightSource.cs" />
-    <Compile Include="Source\Widgets\3D\ShadowMapping\DepthBuffer.cs" />
-    <Compile Include="Source\Widgets\3D\ShadowMapping\DepthBufferProgram.cs" />
-    <Compile Include="Source\Widgets\3D\ShadowMapping\DepthBufferRenderer.cs" />
     <Compile Include="Source\Widgets\Gestures\ClickGesture.cs" />
     <Compile Include="Source\Widgets\Gestures\DoubleClickGesture.cs" />
     <Compile Include="Source\Widgets\Gestures\DragGesture.cs" />
@@ -373,8 +369,12 @@
     <Compile Include="Source\Widgets\Layout\LinearLayout.cs" />
     <Compile Include="Source\Widgets\Materials\HSLMaterial.cs" />
     <Compile Include="Source\Widgets\Materials\MaterialComponent.cs" />
+    <Compile Include="Source\Widgets\RenderObject.cs" />
     <Compile Include="Source\TangerineAttributes.cs" />
     <Compile Include="Source\Graphics\Icon.cs" />
+    <Compile Include="Source\Graphics\IRenderer.cs" />
+    <Compile Include="Source\Widgets\3D\RenderObject3D.cs" />
+    <Compile Include="Source\Widgets\RendererWrapper.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Android.csproj">

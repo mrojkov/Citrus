@@ -5,7 +5,7 @@ namespace Lime
 {
 	public interface IPresenter
 	{
-		void Render(Node node);
+		RenderObject GetRenderObject(Node node);
 		bool PartialHitTest(Node node, ref HitTestArgs args);
 		IPresenter Clone();
 	}
@@ -14,16 +14,9 @@ namespace Lime
 	{
 		public static readonly DefaultPresenter Instance = new DefaultPresenter();
 
-		public void Render(Node node)
+		public RenderObject GetRenderObject(Node node)
 		{
-#if PROFILE
-			var watch = System.Diagnostics.Stopwatch.StartNew();
-			node.Render();
-			watch.Stop();
-			NodeProfiler.RegisterRender(node, watch.ElapsedTicks);
-#else
-			node.Render();
-#endif
+			return node.GetRenderObject();
 		}
 
 		public bool PartialHitTest(Node node, ref HitTestArgs args)
@@ -53,11 +46,16 @@ namespace Lime
 			}
 		}
 
-		public void Render(Node node)
+		public Lime.RenderObject GetRenderObject(Node node)
 		{
-			for (int i = Count - 1; i >= 0; i--) {
-				this[i].Render(node);
+			var ro = RenderObjectPool<RenderObject>.Acquire();
+			for (var i = Count - 1; i >= 0; i--) {
+				var obj = this[i].GetRenderObject(node);
+				if (obj != null) {
+					ro.Objects.Add(obj);
+				}
 			}
+			return ro;
 		}
 
 		public bool PartialHitTest(Node node, ref HitTestArgs args)
@@ -78,58 +76,24 @@ namespace Lime
 			}
 			return r;
 		}
-	}
 
-	public class CustomPresenter : IPresenter
-	{
-		public virtual void Render(Node node) { }
-		public virtual bool PartialHitTest(Node node, ref HitTestArgs args) { return false; }
-		public virtual IPresenter Clone() { return (CustomPresenter)MemberwiseClone(); }
-	}
-
-	public class CustomPresenter<T> : IPresenter where T: Node
-	{
-		public void Render(Node node) => InternalRender((T)node);
-		public bool PartialHitTest(Node node, ref HitTestArgs args) => InternalPartialHitTest((T)node, ref args);
-
-		protected virtual void InternalRender(T node) { }
-		protected virtual bool InternalPartialHitTest(T node, ref HitTestArgs args) => false;
-
-		public virtual IPresenter Clone() { return (CustomPresenter<T>)MemberwiseClone(); }
-	}
-
-	public class DelegatePresenter<T> : CustomPresenter where T: Node
-	{
-		public delegate bool HitTestDelegate(T node, ref HitTestArgs args);
-		readonly Action<T> render;
-		readonly HitTestDelegate hitTest;
-
-		public DelegatePresenter(Action<T> render) { this.render = render; }
-
-		public DelegatePresenter(HitTestDelegate hitTest)
+		private class RenderObject : Lime.RenderObject
 		{
-			this.hitTest = hitTest;
-		}
+			public readonly RenderObjectList Objects = new RenderObjectList();
 
-		public DelegatePresenter(Action<T> render, HitTestDelegate hitTest)
-		{
-			this.render = render;
-			this.hitTest = hitTest;
-		}
+			public override void Render()
+			{
+				Objects.Render();
+			}
 
-		public override void Render(Node node)
-		{
-			if (render != null)
-				render((T)node);
-		}
-
-		public override bool PartialHitTest(Node node, ref HitTestArgs args)
-		{
-			return hitTest != null && hitTest((T)node, ref args);
+			protected override void OnRelease()
+			{
+				Objects.Clear();
+			}
 		}
 	}
 
-	public class WidgetBoundsPresenter : CustomPresenter<Widget>
+	public class WidgetBoundsPresenter : IPresenter
 	{
 		public Color4 Color { get; set; }
 		public float Thickness { get; set; }
@@ -141,18 +105,46 @@ namespace Lime
 			Thickness = thickness;
 		}
 
-		protected override void InternalRender(Widget widget)
+		public Lime.RenderObject GetRenderObject(Node node)
 		{
-			widget.PrepareRendererState();
+			var widget = (Widget)node;
+			var ro = RenderObjectPool<RenderObject>.Acquire();
+			ro.CaptureRenderState(widget);
+			ro.Color = Color * widget.GlobalColor;
+			ro.Thickness = Thickness;
 			if (IgnorePadding) {
-				Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Color * widget.GlobalColor, Thickness);
+				ro.Position = Vector2.Zero;
+				ro.Size = widget.Size;
 			} else {
-				Renderer.DrawRectOutline(widget.ContentPosition, widget.ContentSize, Color * widget.GlobalColor, Thickness);
+				ro.Position = widget.ContentPosition;
+				ro.Size = widget.ContentSize;
+			}
+			return ro;
+		}
+
+		public bool PartialHitTest(Node node, ref HitTestArgs args) => false;
+
+		public IPresenter Clone()
+		{
+			return (WidgetBoundsPresenter)MemberwiseClone();
+		}
+
+		private class RenderObject : WidgetRenderObject
+		{
+			public Vector2 Position;
+			public Vector2 Size;
+			public Color4 Color;
+			public float Thickness;
+
+			public override void Render()
+			{
+				PrepareRenderState();
+				Renderer.DrawRectOutline(Position, Size, Color, Thickness);
 			}
 		}
 	}
 
-	public class WidgetFlatFillPresenter : CustomPresenter<Widget>
+	public class WidgetFlatFillPresenter : IPresenter
 	{
 		public Color4 Color { get; set; }
 		public bool IgnorePadding { get; set; }
@@ -162,14 +154,117 @@ namespace Lime
 			Color = color;
 		}
 
-		protected override void InternalRender(Widget widget)
+		public Lime.RenderObject GetRenderObject(Node node)
 		{
-			widget.PrepareRendererState();
+			var widget = (Widget)node;
+			var ro = RenderObjectPool<RenderObject>.Acquire();
+			ro.CaptureRenderState(widget);
+			ro.Color = Color * widget.GlobalColor;
 			if (IgnorePadding) {
-				Renderer.DrawRect(Vector2.Zero, widget.Size, Color * widget.GlobalColor);
+				ro.Position = Vector2.Zero;
+				ro.Size = widget.Size;
 			} else {
-				Renderer.DrawRect(widget.ContentPosition, widget.ContentSize, Color * widget.GlobalColor);
+				ro.Position = widget.ContentPosition;
+				ro.Size = widget.ContentSize;
 			}
+			return ro;
+		}
+
+		public bool PartialHitTest(Node node, ref HitTestArgs args) => false;
+
+		public IPresenter Clone()
+		{
+			return (WidgetFlatFillPresenter)MemberwiseClone();
+		}
+
+		private class RenderObject : WidgetRenderObject
+		{
+			public Vector2 Position;
+			public Vector2 Size;
+			public Color4 Color;
+
+			public override void Render()
+			{
+				PrepareRenderState();
+				Renderer.DrawRect(Position, Size, Color);
+			}
+		}
+	}
+
+	public class CustomPresenter : IPresenter
+	{
+		public Lime.RenderObject GetRenderObject(Node node)
+		{
+			var ro = RenderObjectPool<RenderObject>.Acquire();
+			var prevRenderer = RendererWrapper.Current;
+			RendererWrapper.Current = ro.Renderer;
+			try {
+				Render(node);
+			} finally {
+				RendererWrapper.Current = prevRenderer;
+			}
+			return ro;
+		}
+
+		public virtual void Render(Node node) { }
+
+		public virtual bool PartialHitTest(Node node, ref HitTestArgs args) => false;
+
+		public virtual IPresenter Clone() => (IPresenter)MemberwiseClone();
+
+		private class RenderObject : Lime.RenderObject
+		{
+			public DeferredRendererWrapper Renderer = new DeferredRendererWrapper();
+
+			public override void Render()
+			{
+				Renderer.ExecuteCommands(RendererWrapper.Current);
+			}
+
+			protected override void OnRelease()
+			{
+				Renderer.ClearCommands();
+			}
+		}
+	}
+
+	public class CustomPresenter<T> : CustomPresenter where T : Node
+	{
+		public sealed override void Render(Node node) => InternalRender((T)node);
+
+		public sealed override bool PartialHitTest(Node node, ref HitTestArgs args) => InternalPartialHitTest((T)node, ref args);
+
+		protected virtual void InternalRender(T node) { }
+
+		protected virtual bool InternalPartialHitTest(T node, ref HitTestArgs args) => false;
+	}
+
+	public class DelegatePresenter<T> : CustomPresenter<T> where T : Node
+	{
+		public delegate void RenderDelegate(T node);
+		public delegate bool PartialHitTestDelegate(T node, ref HitTestArgs args);
+
+		private RenderDelegate render;
+		private PartialHitTestDelegate partialHitTest;
+
+		public DelegatePresenter(RenderDelegate render) : this(render, null) { }
+
+		public DelegatePresenter(PartialHitTestDelegate partialHitTest) : this(null, partialHitTest) { }
+
+		public DelegatePresenter(RenderDelegate render, PartialHitTestDelegate partialHitTest)
+		{
+			this.render = render;
+			this.partialHitTest = partialHitTest;
+		}
+
+		protected override void InternalRender(T node)
+		{
+			render?.Invoke(node);
+		}
+
+		protected override bool InternalPartialHitTest(T node, ref HitTestArgs args)
+		{
+			return partialHitTest != null && partialHitTest(node, ref args);
 		}
 	}
 }

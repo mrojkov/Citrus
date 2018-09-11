@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace Lime
 {
@@ -29,46 +30,38 @@ namespace Lime
 		private object value;
 		private Property property;
 
-		[ThreadStatic]
-		private static Stack<ActivationRecord> stack;
+		private static ThreadLocal<Stack<ActivationRecord>> stack =
+			new ThreadLocal<Stack<ActivationRecord>>(() => new Stack<ActivationRecord>());
 
 		public Context(Property property, object value)
 		{
-			EnsureStack();
 			this.property = property;
 			this.value = value;
 		}
 
 		protected Context(string propertyName)
 		{
-			EnsureStack();
 			this.property = new Property(GetType(), propertyName);
 			this.value = this;
 		}
 
 		protected Context(Property property)
 		{
-			EnsureStack();
 			this.property = property;
 			this.value = this;
-		}
-
-		private void EnsureStack()
-		{
-			stack = stack ?? new Stack<ActivationRecord>();
 		}
 
 		public IContext Activate()
 		{
 			var r = new ActivationRecord { Context = this, OldValue = property.Getter() };
-			stack.Push(r);
+			stack.Value.Push(r);
 			property.Setter(value);
 			return this;
 		}
 
 		public void Deactivate()
 		{
-			var r = stack.Pop();
+			var r = stack.Value.Pop();
 			if (r.Context != this) {
 				throw new InvalidOperationException();
 			}

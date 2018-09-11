@@ -658,7 +658,7 @@ namespace Lime
 			} while (remainDelta > 0f);
 		}
 
-		public virtual void Render() { }
+		protected internal virtual RenderObject GetRenderObject() => null;
 
 		/// <summary>
 		/// Decides what descendant nodes should be added to render chain and under which conditions.

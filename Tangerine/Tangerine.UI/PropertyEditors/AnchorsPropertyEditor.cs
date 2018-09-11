@@ -26,7 +26,7 @@ namespace Tangerine.UI
 			var tb = new AnchorButton { LayoutCell = new LayoutCell(Alignment.Center), Tip = tip };
 			group.AddNode(tb);
 			var current = CoalescedPropertyValue();
-			tb.CompoundPresenter.Insert(0, new DelegatePresenter<Widget>(w => DrawIcon(w, anchor)));
+			tb.CompoundPresenter.Insert(0, new SyncDelegatePresenter<Widget>(w => DrawIcon(w, anchor)));
 			tb.Clicked += () => {
 				tb.Checked = !tb.Checked;
 				SetProperty(tb.Checked ? current.GetValue() | anchor : current.GetValue() & ~anchor);

@@ -13,6 +13,7 @@ namespace Lime
 		public event ResizeDelegate Resized;
 		public event UpdatingDelegate Updating;
 		public event Action Rendering;
+		public event Action Sync;
 		public event VisibleChangingDelegate VisibleChanging;
 		public object Tag { get; set; }
 
@@ -96,6 +97,13 @@ namespace Lime
 			}
 		}
 
+		protected void RaiseSync()
+		{
+			using (Context.Activate().Scoped()) {
+				Sync?.Invoke();
+			}
+		}
+		
 		private void RaiseUpdatingHelper(float delta)
 		{
 			if (Current.Active) {

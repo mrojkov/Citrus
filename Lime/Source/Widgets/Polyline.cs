@@ -42,41 +42,41 @@ namespace Lime
 
 		static List<Vector2> positions = new List<Vector2>();
 
-		public override void Render()
-		{
-			var t = Matrix32.Identity;
-			PrepareRendererState();
-			if (StaticThickness) {
-				Renderer.Transform1 = Matrix32.Identity;
-				t = LocalToWorldTransform;
-			}
-			int n = Nodes.Count;
-			positions.Clear();
-			foreach (PolylinePoint point in Nodes) {
-				positions.Add(StaticThickness ? point.TransformedPosition * t : point.TransformedPosition);
-			}
-			if (n >= 2) {
-				if (!Closed || n == 2) {
-					DrawHalfLeft(positions[0], positions[1]);
-					DrawHalfRight(positions[n - 1], positions[n - 2]);
-				} else {
-					DrawPart(
-						positions[n - 1],
-						positions[0],
-						positions[1]);
-					DrawPart(
-						positions[n - 2],
-						positions[n - 1],
-						positions[0]);
-				}
-				for (int i = 0; i < n - 2; i++) {
-					DrawPart(
-						positions[i],
-						positions[i + 1],
-						positions[i + 2]);
-				}
-			}
-		}
+		//public override void Render()
+		//{
+		//	var t = Matrix32.Identity;
+		//	PrepareRendererState();
+		//	if (StaticThickness) {
+		//		Renderer.Transform1 = Matrix32.Identity;
+		//		t = LocalToWorldTransform;
+		//	}
+		//	int n = Nodes.Count;
+		//	positions.Clear();
+		//	foreach (PolylinePoint point in Nodes) {
+		//		positions.Add(StaticThickness ? point.TransformedPosition * t : point.TransformedPosition);
+		//	}
+		//	if (n >= 2) {
+		//		if (!Closed || n == 2) {
+		//			DrawHalfLeft(positions[0], positions[1]);
+		//			DrawHalfRight(positions[n - 1], positions[n - 2]);
+		//		} else {
+		//			DrawPart(
+		//				positions[n - 1],
+		//				positions[0],
+		//				positions[1]);
+		//			DrawPart(
+		//				positions[n - 2],
+		//				positions[n - 1],
+		//				positions[0]);
+		//		}
+		//		for (int i = 0; i < n - 2; i++) {
+		//			DrawPart(
+		//				positions[i],
+		//				positions[i + 1],
+		//				positions[i + 2]);
+		//		}
+		//	}
+		//}
 
 		private static Vector2 GetPosition(Node n)
 		{

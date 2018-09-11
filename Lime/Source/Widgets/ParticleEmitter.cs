@@ -930,21 +930,35 @@ namespace Lime
 			}
 		}
 
-		public override void Render()
+		protected internal override Lime.RenderObject GetRenderObject()
 		{
-			Matrix32 matrix = Matrix32.Identity;
-			Color4 color = Color4.White;
-			Widget basicWidget = GetBasicWidget();
+			var ro = RenderObjectPool<RenderObject>.Acquire();
+			var basicWidget = GetBasicWidget();
 			if (basicWidget != null) {
-				matrix = basicWidget.LocalToWorldTransform;
-				color = basicWidget.GlobalColor;
+				ro.Matrix = basicWidget.LocalToWorldTransform;
+				ro.Color = basicWidget.GlobalColor;
+			} else {
+				ro.Matrix = Matrix32.Identity;
+				ro.Color = Color4.White;
 			}
-			Renderer.Blending = GlobalBlending;
-			Renderer.Shader = GlobalShader;
-			foreach (var particle in particles) {
-				RenderParticle(particle, matrix, color);
+			ro.Blending = GlobalBlending;
+			ro.Shader = GlobalShader;
+			foreach (var p in particles) {
+				if (p.ColorCurrent.A <= 0) {
+					continue;
+				}
+				var angle = p.Angle;
+				if (AlongPathOrientation) {
+					angle += p.FullDirection;
+				}
+				ro.Particles.Add(new ParticleRenderData {
+					Texture = p.Modifier.GetTexture((int)p.TextureIndex - 1),
+					Transform = p.Transform,
+					Color = p.ColorCurrent,
+					Angle = angle
+				});
 			}
-			Renderer.Transform1 = basicWidget.LocalToWorldTransform;
+			return ro;
 		}
 
 		public void DeleteAllParticles()
@@ -1018,6 +1032,38 @@ namespace Lime
 			animator.ReadonlyKeys.Add(2, new Color4(255, 255, 255, 0));
 			defaultModifier.Animators.Add(animator);
 			Nodes.Add(defaultModifier);
+		}
+
+		private class RenderObject : Lime.RenderObject
+		{
+			public Matrix32 Matrix;
+			public Color4 Color;
+			public Blending Blending;
+			public ShaderId Shader;
+			public List<ParticleRenderData> Particles = new List<ParticleRenderData>();
+
+			public override void Render()
+			{
+				Renderer.Blending = Blending;
+				Renderer.Shader = Shader;
+				foreach (var p in Particles) {
+					Renderer.Transform1 = p.Transform * Matrix;
+					Renderer.DrawSprite(p.Texture, p.Color * Color, -Vector2.Half, Vector2.One, Vector2.Zero, Vector2.One);
+				}
+			}
+
+			protected override void OnRelease()
+			{
+				Particles.Clear();
+			}
+		}
+
+		private struct ParticleRenderData
+		{
+			public ITexture Texture;
+			public Matrix32 Transform;
+			public Color4 Color;
+			public float Angle;
 		}
 	}
 }

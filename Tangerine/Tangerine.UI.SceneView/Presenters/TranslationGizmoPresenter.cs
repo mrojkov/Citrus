@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Lime;
@@ -6,11 +6,11 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.SceneView
 {
-	public class TranslationGizmoPresenter : CustomPresenter<Node3D>
+	public class TranslationGizmoPresenter : SyncCustomPresenter<Node3D>
 	{
 		public TranslationGizmoPresenter(SceneView sceneView)
 		{
-			sceneView.Frame.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(RenderSelection));
+			sceneView.Frame.CompoundPostPresenter.Add(new SyncDelegatePresenter<Widget>(RenderSelection));
 		}
 
 		private void RenderSelection(Widget canvas)
@@ -27,24 +27,22 @@ namespace Tangerine.UI.SceneView
 			if (nodes.Count == 0) {
 				return;
 			}
+			var cameraProjection = vp.Camera?.Projection ?? Matrix44.Identity;
 			Renderer.Flush();
-			var oldCullMode = Renderer.CullMode;
-			var oldWorld = Renderer.World;
-			var oldView = Renderer.View;
-			var oldProj = Renderer.Projection;
-			var oldDepthState = Renderer.DepthState;
+			Renderer.PushState(
+				RenderState.CullMode |
+				RenderState.World |
+				RenderState.View |
+				RenderState.Projection |
+				RenderState.DepthState);
 			Renderer.View = vp.Camera.View;
-			Renderer.Projection = vp.TransformProjection(Renderer.Projection);
+			Renderer.Projection = Viewport3D.MakeProjection(vp.Width, vp.Height, vp.LocalToWorldTransform, cameraProjection, Renderer.Projection);
 			Renderer.DepthState = DepthState.DepthReadWrite;
 			Renderer.Clear(ClearOptions.DepthBuffer);
 			foreach (var node in nodes) {
 				RenderGizmo(node);
 			}
-			Renderer.World = oldWorld;
-			Renderer.View = oldView;
-			Renderer.Projection = oldProj;
-			Renderer.CullMode = oldCullMode;
-			Renderer.DepthState = oldDepthState;
+			Renderer.PopState();
 		}
 
 		Viewport3D GetCurrentViewport3D()

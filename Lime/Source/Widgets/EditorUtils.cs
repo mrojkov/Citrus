@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -26,7 +26,7 @@ namespace Lime
 		public bool FollowTextColor { get; set; }
 	}
 
-	public class VerticalLineCaret : CustomPresenter, ICaretPresenter
+	public class VerticalLineCaret : IPresenter, ICaretPresenter
 	{
 		public Vector2 Position { get; set; }
 		public Color4 Color { get; set; } = Color4.Black;
@@ -34,12 +34,38 @@ namespace Lime
 		public float Thickness { get; set; } = 1.0f;
 		public float Width { get; set; } = 0;
 
-		public override void Render(Node node)
+		public Lime.RenderObject GetRenderObject(Node node)
 		{
-			if (Visible) {
-				var text = (SimpleText)node;
-				text.PrepareRendererState();
-				var b = Position + new Vector2(Width, text.FontHeight);
+			if (!Visible) {
+				return null;
+			}
+			var text = (SimpleText)node;
+			var ro = RenderObjectPool<RenderObject>.Acquire();
+			ro.CaptureRenderState(text);
+			ro.Position = Position;
+			ro.Color = Color;
+			ro.Thickness = Thickness;
+			ro.Width = Width;
+			ro.FontHeight = text.FontHeight;
+			return ro;
+		}
+
+		public bool PartialHitTest(Node node, ref HitTestArgs args) => false;
+
+		public IPresenter Clone() => (IPresenter)MemberwiseClone();
+
+		private class RenderObject : WidgetRenderObject
+		{
+			public Vector2 Position;
+			public Color4 Color;
+			public float Thickness;
+			public float Width;
+			public float FontHeight;
+
+			public override void Render()
+			{
+				PrepareRenderState();
+				var b = Position + new Vector2(Width, FontHeight);
 				// Zero-width outline is still twice as wide.
 				if (Width <= 0)
 					Renderer.DrawLine(Position, b, Color, Thickness);
@@ -107,7 +133,7 @@ namespace Lime
 		public float OutlineThickness { get; set; } = 1f;
 	}
 
-	public class SelectionPresenter : CustomPresenter, IPresenter
+	public class SelectionPresenter : IPresenter
 	{
 		private ICaretPosition selectionStart;
 		private ICaretPosition selectionEnd;
@@ -123,46 +149,76 @@ namespace Lime
 			container.CompoundPresenter.Add(this);
 		}
 
-		private List<Rectangle> PrepareRows(Vector2 s, Vector2 e, float fh)
+		public Lime.RenderObject GetRenderObject(Node node)
 		{
-			var rows = new List<Rectangle>();
-			if (s.Y == e.Y) {
-				rows.Add(new Rectangle(s, e + Vector2.Down * fh));
-			} else { // Multi-line selection.
-				rows.Add(new Rectangle(s, new Vector2(float.PositiveInfinity, s.Y + fh)));
-				if (s.Y + fh < e.Y)
-					rows.Add(new Rectangle(0, s.Y + fh, float.PositiveInfinity, e.Y));
-				rows.Add(new Rectangle(new Vector2(0, e.Y), e + Vector2.Down * fh));
+			if (!selectionStart.IsVisible || !selectionEnd.IsVisible) {
+				return null;
 			}
-			return rows;
-		}
-
-		public override void Render(Node node)
-		{
-			if (!selectionStart.IsVisible || !selectionEnd.IsVisible) return;
-
 			var s = selectionStart.WorldPos;
 			var e = selectionEnd.WorldPos;
-			if (s == e) return;
+			if (s == e) {
+				return null;
+			}
 			if (s.Y > e.Y || s.Y == e.Y && s.X > e.X) {
 				var t = s;
 				s = e;
 				e = t;
 			}
 			var text = (SimpleText)node;
-			text.PrepareRendererState();
+			var ro = RenderObjectPool<RenderObject>.Acquire();
+			ro.CaptureRenderState(text);
+			ro.SelectionStart = s;
+			ro.SelectionEnd = e;
+			ro.OutlineThickness = selectionParams.OutlineThickness;
+			ro.OutlineColor = selectionParams.OutlineColor;
+			ro.Color = selectionParams.Color;
+			ro.Padding = selectionParams.Padding;
+			ro.Bounds = text.MeasureText().ShrinkedBy(new Thickness(selectionParams.OutlineThickness));
+			ro.FontHeight = text.FontHeight;
+			return ro;
+		}
 
-			var th = selectionParams.OutlineThickness;
-			var b = text.MeasureText().ShrinkedBy(new Thickness(th));
-			var rows = PrepareRows(s, e, text.FontHeight).
-				Select(r => Rectangle.Intersect(r.ExpandedBy(selectionParams.Padding), b)).ToList();
+		public bool PartialHitTest(Node node, ref HitTestArgs args) => false;
 
-			foreach (var r in rows) {
-				var r1 = r.ExpandedBy(new Thickness(th));
-				Renderer.DrawRectOutline(r1.A, r1.B, selectionParams.OutlineColor, th);
+		public IPresenter Clone() => (IPresenter)MemberwiseClone();
+
+		private class RenderObject : WidgetRenderObject
+		{
+			public Vector2 SelectionStart;
+			public Vector2 SelectionEnd;
+			public float OutlineThickness;
+			public Color4 OutlineColor;
+			public Color4 Color;
+			public Thickness Padding;
+			public Rectangle Bounds;
+			public float FontHeight;
+
+			private static List<Rectangle> PrepareRows(Vector2 s, Vector2 e, float fh)
+			{
+				var rows = new List<Rectangle>();
+				if (s.Y == e.Y) {
+					rows.Add(new Rectangle(s, e + Vector2.Down * fh));
+				} else { // Multi-line selection.
+					rows.Add(new Rectangle(s, new Vector2(float.PositiveInfinity, s.Y + fh)));
+					if (s.Y + fh < e.Y)
+						rows.Add(new Rectangle(0, s.Y + fh, float.PositiveInfinity, e.Y));
+					rows.Add(new Rectangle(new Vector2(0, e.Y), e + Vector2.Down * fh));
+				}
+				return rows;
 			}
-			foreach (var r in rows)
-				Renderer.DrawRect(r.A, r.B, selectionParams.Color);
+
+			public override void Render()
+			{
+				PrepareRenderState();
+				var rows = PrepareRows(SelectionStart, SelectionEnd, FontHeight).
+					Select(r => Rectangle.Intersect(r.ExpandedBy(Padding), Bounds)).ToList();
+				foreach (var r in rows) {
+					var r1 = r.ExpandedBy(new Thickness(OutlineThickness));
+					Renderer.DrawRectOutline(r1.A, r1.B, OutlineColor, OutlineThickness);
+				}
+				foreach (var r in rows)
+					Renderer.DrawRect(r.A, r.B, Color);
+			}
 		}
 	}
 

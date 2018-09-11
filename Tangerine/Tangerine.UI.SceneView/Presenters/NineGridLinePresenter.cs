@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Lime;
+using Tangerine.Core;
 
 namespace Tangerine.UI.SceneView
 {
@@ -9,7 +10,7 @@ namespace Tangerine.UI.SceneView
 	{
 		public NineGridLinePresenter(SceneView sceneView)
 		{
-			sceneView.Frame.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(Render));
+			sceneView.Frame.CompoundPostPresenter.Add(new SyncDelegatePresenter<Widget>(Render));
 		}
 
 		private static void Render(Widget canvas)
@@ -39,8 +40,6 @@ namespace Tangerine.UI.SceneView
 		private readonly int index;
 		private int IndexA => indexes[index].Item1;
 		private int IndexB => indexes[index].Item2;
-		private Vector2 A => Owner.Parts[IndexA].Rect.A;
-		private Vector2 B => Owner.Parts[IndexB].Rect.B;
 
 		private static readonly Tuple<int, int>[] indexes = {
 			Tuple.Create(5, 2),
@@ -83,19 +82,27 @@ namespace Tangerine.UI.SceneView
 			Owner = nineGrid;
 		}
 
+		private NineGrid.Part[] parts = new NineGrid.Part[9];
+
+		private void CalcGeometry(Matrix32 matrix, out Vector2 a, out Vector2 b)
+		{
+			NineGrid.BuildLayout(parts, (Vector2)Owner.Texture.ImageSize, Owner.LeftOffset,
+				Owner.RightOffset, Owner.TopOffset, Owner.BottomOffset, Owner.Size);
+			a = matrix.TransformVector(parts[IndexA].Rect.A);
+			b = matrix.TransformVector(parts[IndexB].Rect.B);
+		}
+
 		public void Render(Widget canvas)
 		{
 			var matrix = Owner.CalcTransitionToSpaceOf(canvas);
-			var a = matrix.TransformVector(A);
-			var b = matrix.TransformVector(B);
+			CalcGeometry(matrix, out var a, out var b);
 			Renderer.DrawLine(a, b, Color4.Red, 2);
 		}
 
 		public bool HitTest(Vector2 point, Widget canvas, float radius = 20)
 		{
 			var matrix = Owner.CalcTransitionToSpaceOf(canvas);
-			var a = matrix.TransformVector(A);
-			var b = matrix.TransformVector(B);
+			CalcGeometry(matrix, out var a, out var b);
 			var length = (a - b).Length;
 			return
 				DistanceFromPointToLine(a, b, point, out var linePoint) <= radius &&

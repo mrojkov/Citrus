@@ -3,7 +3,7 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.SceneView
 {
-	public class DistortionMeshPresenter : CustomPresenter<DistortionMesh>
+	public class DistortionMeshPresenter : SyncCustomPresenter<DistortionMesh>
 	{
 		private readonly SceneView sv;
 		private readonly VisualHint MeshHint =
@@ -12,7 +12,7 @@ namespace Tangerine.UI.SceneView
 		public DistortionMeshPresenter(SceneView sceneView)
 		{
 			this.sv = sceneView;
-			sceneView.Frame.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(Render));
+			sceneView.Frame.CompoundPostPresenter.Add(new SyncDelegatePresenter<Widget>(Render));
 		}
 
 		void Render(Widget canvas)

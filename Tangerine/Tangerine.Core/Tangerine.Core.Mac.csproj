@@ -60,6 +60,7 @@
     <Folder Include="Resources\" />
     <Folder Include="Operations\" />
     <Compile Include="Operations\RemoveKeyframeRange.cs" />
+    <Compile Include="SyncPresenters.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Document.Animation.cs" />

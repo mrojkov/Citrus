@@ -115,7 +115,7 @@ namespace Tangerine.UI.SceneView
 			}
 		}
 
-		private class SliderCenterPresenter : CustomPresenter
+		private class SliderCenterPresenter : SyncCustomPresenter
 		{
 			private readonly int middleIndex;
 			private readonly int partsCount;

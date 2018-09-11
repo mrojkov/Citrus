@@ -1,8 +1,9 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 
 namespace Lime
 {
-	public class LayoutDebugPresenter : CustomPresenter
+	public class LayoutDebugPresenter : IPresenter
 	{
 		public readonly Color4 Color;
 		public readonly float Thickness;
@@ -13,15 +14,43 @@ namespace Lime
 			Thickness = thickness;
 		}
 
-		public override void Render(Node node)
+		public Lime.RenderObject GetRenderObject(Node node)
 		{
-			var widget = node.AsWidget;
-			if (widget == null || widget.Layout == null)
-				return;
-			widget.PrepareRendererState();
-			var t = Thickness > 0 ? Thickness : 1 / CommonWindow.Current.PixelScale;
+			var widget = node as Widget;
+			if (widget == null || widget.Layout == null) {
+				return null;
+			}
+			var ro = RenderObjectPool<RenderObject>.Acquire();
+			ro.CaptureRenderState(widget);
+			ro.Color = Color;
+			ro.Thickness = Thickness > 0 ? Thickness : 1 / CommonWindow.Current.PixelScale;
 			foreach (var r in widget.Layout.DebugRectangles) {
-				Renderer.DrawRectOutline(r.A, r.B, Color, t);
+				ro.DebugRectangles.Add(r);
+			}
+			return ro;
+		}
+
+		public bool PartialHitTest(Node node, ref HitTestArgs args) => false;
+
+		public IPresenter Clone() => (IPresenter)MemberwiseClone();
+
+		private class RenderObject : WidgetRenderObject
+		{
+			public float Thickness;
+			public Color4 Color;
+			public List<Rectangle> DebugRectangles = new List<Rectangle>();
+
+			public override void Render()
+			{
+				PrepareRenderState();
+				foreach (var r in DebugRectangles) {
+					Renderer.DrawRectOutline(r.A, r.B, Color, Thickness);
+				}
+			}
+
+			protected override void OnRelease()
+			{
+				DebugRectangles.Clear();
 			}
 		}
 	}

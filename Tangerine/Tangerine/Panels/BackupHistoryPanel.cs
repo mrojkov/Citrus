@@ -35,7 +35,7 @@ namespace Tangerine.Panels
 				Nodes = { scrollView }
 			};
 			resultPane = scrollView.Content;
-			resultPane.CompoundPresenter.Insert(0, new DelegatePresenter<Widget>(w => {
+			resultPane.CompoundPresenter.Insert(0, new SyncDelegatePresenter<Widget>(w => {
 				w.PrepareRendererState();
 				if (selectedIndex == 0) {
 					if (history?.Count > 0) {

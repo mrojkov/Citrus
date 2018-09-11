@@ -141,7 +141,7 @@ namespace Lime
 			aabb.Top = (1 + aabb.Top) / 2;
 			aabb.Bottom = (1 + aabb.Bottom) / 2;
 			// Transform to device coordinates
-			var viewport = Renderer.Viewport;
+			var viewport = ((WindowWidget)WidgetContext.Current.Root).GetViewport();
 			var result = new Rectangle();
 			var min = new Vector2(viewport.X, viewport.Y) / Window.Current.PixelScale;
 			var max = new Vector2(viewport.X + viewport.Width, viewport.Y + viewport.Height) / Window.Current.PixelScale;

@@ -21,7 +21,6 @@ namespace Lime
 		{
 			this.fragmentOrVertex = fragmentOrVertex;
 			this.source = ReplacePrecisionModifiers(source);
-			CreateShader();
 			GLObjectRegistry.Instance.Add(this);
 		}
 

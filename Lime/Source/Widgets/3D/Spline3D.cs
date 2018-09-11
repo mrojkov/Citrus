@@ -131,7 +131,7 @@ namespace Lime
 
 	[TangerineRegisterNode(Order = 26)]
 	[TangerineAllowedParentTypes(typeof(Spline3D))]
-	public class SplinePoint3D : Node, Viewport3D.IZSorterParams
+	public class SplinePoint3D : Node
 	{
 		[YuzuMember]
 		public SplineInterpolation Interpolation { get; set; }
@@ -155,13 +155,6 @@ namespace Lime
 		{
 			var transform = (Parent as Spline3D).GlobalTransform;
 			return transform.TransformVector(Position);
-		}
-
-		bool Viewport3D.IZSorterParams.Opaque => false;
-
-		float Viewport3D.IZSorterParams.CalcDistanceToCamera(Camera3D camera)
-		{
-			return camera.View.TransformVector(CalcGlobalPosition()).Z;
 		}
 
 		public override void AddToRenderChain(RenderChain chain)

@@ -371,22 +371,28 @@ namespace Lime
 			} while (errCode != ErrorCode.NoError && errCode != ErrorCode.InvalidOperation);
 			throw new Exception("OpenGL error(s): " + errors);
 		}
-
-		static PlatformRenderer()
-		{
-			DefaultFramebuffer = uint.MaxValue;
-			CheckFeatures();
-			textures = new ITexture[maxTextureSlots];
-			vertexBufferViews = new VertexBufferView[maxVertexBufferSlots];
-		}
-
+		
 		public static void BeginFrame()
 		{
+			if (!initialized) {
+				Initialize();
+				initialized = true;
+			}
 			DrawCount = 0;
 			SaveDefaultFramebuffer();
 			CurrentFramebuffer = DefaultFramebuffer;
 			Reset();
 			Clear(ClearOptions.All, Color4.Black);
+		}
+		
+		private static bool initialized;
+
+		private static void Initialize()
+		{
+			DefaultFramebuffer = uint.MaxValue;
+			CheckFeatures();
+			textures = new ITexture[maxTextureSlots];
+			vertexBufferViews = new VertexBufferView[maxVertexBufferSlots];
 		}
 
 		private static void SaveDefaultFramebuffer()

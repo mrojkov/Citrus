@@ -35,8 +35,8 @@ namespace Tangerine.UI.Timeline
 				Id = nameof(GridPane) + "Content",
 				Padding = new Thickness { Top = 1, Bottom = 1 },
 				Layout = new VBoxLayout { Spacing = TimelineMetrics.RowSpacing },
-				Presenter = new DelegatePresenter<Node>(RenderBackgroundAndGrid),
-				PostPresenter = new DelegatePresenter<Widget>(w => OnPostRender(w))
+				Presenter = new SyncDelegatePresenter<Node>(RenderBackgroundAndGrid),
+				PostPresenter = new SyncDelegatePresenter<Widget>(w => OnPostRender(w))
 			};
 			RootWidget.AddNode(ContentWidget);
 			RootWidget.AddChangeWatcher(() => RootWidget.Size,

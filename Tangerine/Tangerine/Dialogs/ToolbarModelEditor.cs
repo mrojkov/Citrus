@@ -67,7 +67,7 @@ namespace Tangerine.Dialogs
 		{
 			var result = new ListBox();
 			result.Content.Padding = new Thickness(6);
-			result.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(w => {
+			result.CompoundPostPresenter.Add(new SyncDelegatePresenter<Widget>(w => {
 				w.PrepareRendererState();
 				Renderer.DrawRectOutline(0, 0, w.Width, w.Height, Theme.Colors.ControlBorder);
 			}));
@@ -526,11 +526,23 @@ namespace Tangerine.Dialogs
 				MinMaxHeight = 10;
 			}
 
-			public override void Render()
+			protected override Lime.RenderObject GetRenderObject()
 			{
-				base.Render();
-				PrepareRendererState();
-				Renderer.DrawLine(5, Height / 2, Width - 5, Height / 2, Color4.Gray);
+				var ro = RenderObjectPool<RenderObject>.Acquire();
+				ro.CaptureRenderState(this);
+				ro.Size = Size;
+				return ro;
+			}
+
+			private class RenderObject : WidgetRenderObject
+			{
+				public Vector2 Size;
+
+				public override void Render()
+				{
+					PrepareRenderState();
+					Renderer.DrawLine(5, Size.Y / 2, Size.X - 5, Size.Y / 2, Color4.Gray);
+				}
 			}
 		}
 
@@ -620,12 +632,27 @@ namespace Tangerine.Dialogs
 					Gestures.Add(new DoubleClickGesture(() => DoubleClicked?.Invoke()));
 				}
 
-				public override void Render()
+				protected override Lime.RenderObject GetRenderObject()
 				{
-					base.Render();
-					if (parent.SelectedItem == this) {
-						PrepareRendererState();
-						Renderer.DrawRect(0, 0, Width, Height, ColorTheme.Current.Toolbar.ButtonCheckedBackground);
+					if (parent.SelectedItem != this) {
+						return null;
+					}
+					var ro = RenderObjectPool<RenderObject>.Acquire();
+					ro.CaptureRenderState(this);
+					ro.Size = Size;
+					ro.Color = ColorTheme.Current.Toolbar.ButtonCheckedBackground;
+					return ro;
+				}
+
+				private class RenderObject : WidgetRenderObject
+				{
+					public Vector2 Size;
+					public Color4 Color;
+
+					public override void Render()
+					{
+						PrepareRenderState();
+						Renderer.DrawRect(0, 0, Size.X, Size.Y, Color);
 					}
 				}
 			}

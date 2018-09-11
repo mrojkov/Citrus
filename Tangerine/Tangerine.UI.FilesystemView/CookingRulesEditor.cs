@@ -173,7 +173,7 @@ namespace Tangerine.UI.FilesystemView
 			foreach (var path in selection) {
 				CreateEditingInterfaceForPath(t, path);
 			}
-			scrollView.Content.Presenter = new DelegatePresenter<Widget>((w) => {
+			scrollView.Content.Presenter = new SyncDelegatePresenter<Widget>((w) => {
 				if (cachedZebraTexture == null) {
 					cachedZebraTexture = new Texture2D();
 					cachedZebraTexture.LoadImage(new[] { Theme.Colors.ZebraColor1, Theme.Colors.ZebraColor2 }, 1, 2);
@@ -280,7 +280,7 @@ namespace Tangerine.UI.FilesystemView
 				},
 				Layout = new HBoxLayout(),
 			};
-			container.CompoundPostPresenter.Add(new DelegatePresenter<Widget>((w) => {
+			container.CompoundPostPresenter.Add(new SyncDelegatePresenter<Widget>((w) => {
 				var topmostOverride = crc[key];
 				while (
 					topmostOverride.Parent != null &&
@@ -339,7 +339,7 @@ namespace Tangerine.UI.FilesystemView
 			SimpleText computedValueText;
 			Button createOrDestroyOverride = null;
 			headerWidget.HitTestTarget = true;
-			headerWidget.CompoundPostPresenter.Add(new DelegatePresenter<Widget>((widget) => {
+			headerWidget.CompoundPostPresenter.Add(new SyncDelegatePresenter<Widget>((widget) => {
 				if (widget.IsMouseOver()) {
 					widget.PrepareRendererState();
 					Renderer.DrawRect(

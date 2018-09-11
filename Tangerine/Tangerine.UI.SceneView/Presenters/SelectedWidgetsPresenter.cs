@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using Lime;
+using Tangerine.Core;
 
 namespace Tangerine.UI.SceneView
 {
@@ -9,7 +10,7 @@ namespace Tangerine.UI.SceneView
 	{
 		public SelectedWidgetsPresenter(SceneView sceneView)
 		{
-			sceneView.Frame.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(RenderSelection));
+			sceneView.Frame.CompoundPostPresenter.Add(new SyncDelegatePresenter<Widget>(RenderSelection));
 		}
 
 		private void RenderSelection(Widget canvas)

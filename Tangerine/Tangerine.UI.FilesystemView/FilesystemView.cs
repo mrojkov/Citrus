@@ -193,9 +193,9 @@ namespace Tangerine.UI.FilesystemView
 			RootWidget.AddChangeWatcher(() => selection.Version, Selection_Changed);
 			ScrollView.Content.Layout = new FlowLayout(LayoutDirection.TopToBottom) { Spacing = 1.0f };
 			ScrollView.Content.Padding = new Thickness(5.0f);
-			ScrollView.Content.CompoundPostPresenter.Insert(0, new DelegatePresenter<Widget>(RenderFilesWidgetRectSelection));
+			ScrollView.Content.CompoundPostPresenter.Insert(0, new SyncDelegatePresenter<Widget>(RenderFilesWidgetRectSelection));
 			ScrollView.Updated += ScrollViewUpdated;
-			ScrollView.Content.Presenter = new DelegatePresenter<Widget>((w) => {
+			ScrollView.Content.Presenter = new SyncDelegatePresenter<Widget>((w) => {
 				w.PrepareRendererState();
 				var wp = w.ParentWidget;
 				var p = wp.Padding;
@@ -251,7 +251,7 @@ namespace Tangerine.UI.FilesystemView
 			foreach (var item in model.EnumerateItems(sortType, orderType)) {
 				var fsItem = new FilesystemItem(item);
 				ScrollView.Content.AddNode(fsItem);
-				fsItem.CompoundPresenter.Insert(0, new DelegatePresenter<FilesystemItem>(RenderFSItemSelection));
+				fsItem.CompoundPresenter.Insert(0, new SyncDelegatePresenter<FilesystemItem>(RenderFSItemSelection));
 			}
 		}
 
@@ -389,9 +389,9 @@ namespace Tangerine.UI.FilesystemView
 				}
 
 				ScrollView.Content.Padding = new Thickness(5.0f);
-				ScrollView.Content.CompoundPostPresenter.Insert(0, new DelegatePresenter<Widget>(RenderFilesWidgetRectSelection));
+				ScrollView.Content.CompoundPostPresenter.Insert(0, new SyncDelegatePresenter<Widget>(RenderFilesWidgetRectSelection));
 				ScrollView.Updated += ScrollViewUpdated;
-				ScrollView.Content.Presenter = new DelegatePresenter<Widget>((w) => {
+				ScrollView.Content.Presenter = new SyncDelegatePresenter<Widget>((w) => {
 					w.PrepareRendererState();
 					var wp = w.ParentWidget;
 					var p = wp.Padding;

@@ -12,7 +12,7 @@ namespace Lime
 		{
 			MinSize = Theme.Metrics.DefaultButtonSize;
 			MaxHeight = Theme.Metrics.DefaultButtonSize.Y;
-			CompoundPresenter.Add(new ThemedDropDownList.DropDownListPresenter(this));
+			CompoundPresenter.Add(new ThemedDropDownList.DropDownListPresenter());
 			var editBox = new ThemedEditBox { Id = "TextWidget" };
 			AddNode(editBox);
 			editBox.ExpandToContainerWithAnchors();

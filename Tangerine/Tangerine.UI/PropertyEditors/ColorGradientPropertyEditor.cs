@@ -192,7 +192,7 @@ namespace Tangerine.UI
 				PostPresenter = new WidgetBoundsPresenter(Color4.Black),
 			};
 			var chessTexture = PrepareChessTexture(Color4.White, Color4.Black);
-			gradientPane.CompoundPresenter.Add(new DelegatePresenter<Widget>(w => {
+			gradientPane.CompoundPresenter.Add(new SyncDelegatePresenter<Widget>(w => {
 				w.PrepareRendererState();
 				Renderer.DrawSprite(chessTexture, Color4.White, Vector2.Zero, w.Size, Vector2.Zero, new Vector2(w.Size.X / w.Size.Y, 1));
 			}));
@@ -342,7 +342,7 @@ namespace Tangerine.UI
 		{
 			ControlPoint = controlPoint;
 			Pivot = new Vector2(0.5f, 0);
-			CompoundPresenter.Add(new DelegatePresenter<Widget>(Render));
+			CompoundPresenter.Add(new SyncDelegatePresenter<Widget>(Render));
 			HitTestTarget = true;
 			chessTexture = PrepareChessTexture(Color4.White, Color4.Black);
 		}

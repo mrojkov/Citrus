@@ -20,7 +20,7 @@ namespace Tangerine.UI.Timeline
 				Layout = new VBoxLayout(),
 				SizeChanged = RefreshContentScale
 			};
-			overlayWidget = new Widget { Presenter = new DelegatePresenter<Widget>(RenderOverlay) };
+			overlayWidget = new Widget { Presenter = new SyncDelegatePresenter<Widget>(RenderOverlay) };
 			RootWidget = new CustomFrame {
 				Id = nameof(OverviewPane),
 				LayoutCell = new LayoutCell { StretchY = 1 / 3f },
