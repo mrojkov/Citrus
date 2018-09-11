@@ -242,7 +242,7 @@ namespace Tangerine.UI
 					}
 				} else {
 					foreach (var o in EditorParams.Objects) {
-						var current = EditorParams.IndexInList != null
+						var current = EditorParams.IndexInList != -1
 							? (new IndexedProperty(o, EditorParams.PropertyName, EditorParams.IndexInList)).Value
 							: (new Property(o, EditorParams.PropertyName).Value);
 						((IPropertyEditorParamsInternal)EditorParams).PropertySetter(o, EditorParams.PropertyName, valueProducer((ValueType)current));
