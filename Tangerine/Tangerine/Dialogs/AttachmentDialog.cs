@@ -145,10 +145,10 @@ namespace Tangerine
 				w => new NodeComponentCollectionRow(w, attachment.NodeComponents), attachment.NodeComponents);
 			widgetFactory.AddHeader(NodeComponentCollectionRow.CreateHeader());
 			widgetFactory.AddFooter(DeletableRow<Model3DAttachment.NodeComponentCollection>.CreateFooter(() => {
-				history.DoTransaction(() => Core.Operations.InsertListItem.Perform(
-					new Model3DAttachment.NodeComponentCollection { NodeId = "Node id", Components = null },
+				history.DoTransaction(() => Core.Operations.InsertIntoList.Perform(
 					attachment.NodeComponents,
-					attachment.NodeComponents.Count));
+					attachment.NodeComponents.Count,
+					new Model3DAttachment.NodeComponentCollection { NodeId = "Node id", Components = null }));
 			}));
 			list.Components.Add(widgetFactory);
 			return pane;
@@ -181,9 +181,11 @@ namespace Tangerine
 					w => new AnimationRow(w, attachment.Animations), attachment.Animations);
 			widgetFactory.AddHeader(AnimationRow.CreateHeader());
 			widgetFactory.AddFooter(AnimationRow.CreateFooter(() => {
-				history.DoTransaction(() => Core.Operations.InsertListItem.Perform(new Model3DAttachment.Animation {
-					Name = "Animation",
-				}, attachment.Animations, attachment.Animations.Count));
+				history.DoTransaction(() => Core.Operations.InsertIntoList.Perform(
+					attachment.Animations,
+					attachment.Animations.Count,
+					new Model3DAttachment.Animation { Name = "Animation", }
+				));
 			}));
 			if (attachment.Animations.All(a => a.Name != Model3DAttachment.DefaultAnimationName)) {
 				attachment.Animations.Insert(0, new Model3DAttachment.Animation {
@@ -207,9 +209,11 @@ namespace Tangerine
 				w => new MeshRow(w, attachment.MeshOptions), attachment.MeshOptions);
 			widgetFactory.AddHeader(MeshRow.CreateHeader());
 			widgetFactory.AddFooter(MeshRow.CreateFooter(() => {
-				history.DoTransaction(() => Core.Operations.InsertListItem.Perform(new Model3DAttachment.MeshOption {
-					Id = "MeshOption",
-				}, attachment.MeshOptions, attachment.MeshOptions.Count));
+				history.DoTransaction(() => Core.Operations.InsertIntoList.Perform(
+					attachment.MeshOptions,
+					attachment.MeshOptions.Count,
+					new Model3DAttachment.MeshOption { Id = "MeshOption" }
+				));
 			}));
 			list.Components.Add(widgetFactory);
 			return pane;
@@ -229,11 +233,15 @@ namespace Tangerine
 			widgetFactory.AddHeader(MaterialEffectRow.CreateHeader());
 			widgetFactory.AddFooter(DeletableRow<Model3DAttachment.MaterialEffect>.CreateFooter(() => {
 				history.DoTransaction(() => {
-					Core.Operations.InsertListItem.Perform(new Model3DAttachment.MaterialEffect {
-						Name = "MaterialEffect",
-						MaterialName = "MaterialName",
-						Path = "MaterialPath",
-					}, attachment.MaterialEffects, attachment.MaterialEffects.Count);
+					Core.Operations.InsertIntoList.Perform(
+						attachment.MaterialEffects,
+						attachment.MaterialEffects.Count,
+						new Model3DAttachment.MaterialEffect {
+							Name = "MaterialEffect",
+							MaterialName = "MaterialName",
+							Path = "MaterialPath",
+						}
+					);
 				});
 			}));
 			list.Components.Add(widgetFactory);
@@ -298,7 +306,7 @@ namespace Tangerine
 					LayoutCell = new LayoutCell(Alignment.LeftTop),
 				};
 				deleteButton.Clicked += () =>
-					history.DoTransaction(() => Core.Operations.RemoveListItem.Perform(Source, sourceCollection));
+					history.DoTransaction(() => Core.Operations.RemoveFromList.Perform(sourceCollection, sourceCollection.IndexOf(Source)));
 				headerWrapper.Nodes.Add(Header);
 				headerWrapper.Nodes.Add(new Widget());
 				headerWrapper.Nodes.Add(deleteButton);
@@ -531,7 +539,7 @@ namespace Tangerine
 					w => (TRow)Activator.CreateInstance(typeof(TRow), new object[] { w, source }), source);
 				widgetFactory.AddHeader(header);
 				widgetFactory.AddFooter(DeletableRow<TData>.CreateFooter(() => {
-					history.DoTransaction(() => Core.Operations.InsertListItem.Perform(activator(), source, source.Count));
+					history.DoTransaction(() => Core.Operations.InsertIntoList.Perform(source, source.Count, activator()));
 				}));
 				list.Components.Add(widgetFactory);
 				this.AddChangeWatcher(() => markersExpandButton.Expanded, (e) => list.Visible = e);
@@ -801,8 +809,8 @@ namespace Tangerine
 					foreach (var type in validComponents.Except(GetExceptedTypes(source))) {
 						ICommand command = new Command(CamelCaseToLabel(type.Name), () => {
 							var constructor = type.GetConstructor(Type.EmptyTypes);
-							history.DoTransaction(() => Core.Operations.InsertListItem.Perform(
-								constructor.Invoke(new object[] { }), source, source.Count));
+							history.DoTransaction(() => Core.Operations.InsertIntoList.Perform(
+								source, source.Count, constructor.Invoke(new object[] { })));
 						});
 						menu.Add(command);
 					}
@@ -860,7 +868,7 @@ namespace Tangerine
 					History = history
 				};
 				content.OnComponentRemove += c => {
-					history.DoTransaction(() => Core.Operations.RemoveListItem.Perform(c, sourceCollection));
+					history.DoTransaction(() => Core.Operations.RemoveFromList.Perform(sourceCollection, sourceCollection.IndexOf(c)));
 				};
 				Nodes.Add(container);
 				content.BuildForObjects(new List<object> { source });

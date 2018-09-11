@@ -50,22 +50,36 @@ namespace Lime
 				prevIndex = index + 2;
 			}
 			while (true) {
-				int index = propertyPath.IndexOf('.', prevIndex);
-				bool last = index == -1;
+				int periodIndex = propertyPath.IndexOf('.', prevIndex);
+				bool last = periodIndex == -1;
 				int length = last
 					? propertyPath.Length - prevIndex
-					: index - prevIndex;
+					: periodIndex - prevIndex;
 				var p = propertyPath.Substring(prevIndex, length);
-				result = GetProperty(o.GetType(), p);
+				int bracketIndex = p.IndexOf('[');
+				int indexInList = -1;
+				if (bracketIndex == -1) {
+					result = GetProperty(o.GetType(), p);
+				} else {
+					indexInList = int.Parse(p.Substring(bracketIndex + 1, p.Length - bracketIndex - 2));
+					result = GetProperty(o.GetType(), p.Substring(0, bracketIndex));
+				}
+				if (result.Info == null) {
+					return (result, null);
+				}
 				if (last) {
 					return (result, (IAnimable)o);
 				} else {
-					o = result.Info.GetValue(o);
+					if (indexInList == -1) {
+						o = result.Info.GetValue(o);
+					} else {
+						o = result.Info.GetGetMethod().Invoke(o, new object[] { indexInList });
+					}
 					if (o == null) {
 						return (result, null);
 					}
 				}
-				prevIndex = index + 1;
+				prevIndex = periodIndex + 1;
 			}
 		}
 

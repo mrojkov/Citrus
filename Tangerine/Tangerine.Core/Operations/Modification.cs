@@ -10,14 +10,11 @@ namespace Tangerine.Core.Operations
 {
 	public class SetProperty : Operation
 	{
-		private bool isChangingDocument;
-
 		public readonly object Obj;
 		public readonly object Value;
 		public readonly PropertyInfo Property;
 		public readonly Type Type;
-
-		public override bool IsChangingDocument => isChangingDocument;
+		public override bool IsChangingDocument { get; }
 
 		public static void Perform(object obj, string propertyName, object value, bool isChangingDocument = true)
 		{
@@ -35,7 +32,7 @@ namespace Tangerine.Core.Operations
 			Obj = obj;
 			Value = value;
 			Property = Type.GetProperty(propertyName);
-			this.isChangingDocument = isChangingDocument;
+			IsChangingDocument = isChangingDocument;
 		}
 
 		protected SetProperty(Type type, object obj, string propertyName, object value, bool isChangingDocument)
@@ -44,12 +41,12 @@ namespace Tangerine.Core.Operations
 			Obj = obj;
 			Value = value;
 			Property = Type.GetProperty(propertyName);
-			this.isChangingDocument = isChangingDocument;
+			IsChangingDocument = isChangingDocument;
 		}
 
 		public class Processor : OperationProcessor<SetProperty>
 		{
-			class Backup { public object Value; }
+			private class Backup { public object Value; }
 
 			protected override void InternalRedo(SetProperty op)
 			{
@@ -61,6 +58,63 @@ namespace Tangerine.Core.Operations
 			{
 				var v = op.Restore<Backup>().Value;
 				op.Property.SetValue(op.Obj, v, null);
+			}
+		}
+	}
+
+	public class SetIndexedProperty : Operation
+	{
+		public readonly object Obj;
+		public readonly object Value;
+		public readonly int Index;
+		public readonly PropertyInfo Property;
+		public readonly Type Type;
+		public override bool IsChangingDocument { get; }
+
+		public static void Perform(object obj, string propertyName, int index, object value, bool isChangingDocument = true)
+		{
+			DocumentHistory.Current.Perform(new SetIndexedProperty(obj, propertyName, index, value, isChangingDocument));
+		}
+
+		public static void Perform(Type type, object obj, string propertyName, int indexProvider, object value, bool isChangingDocument = true)
+		{
+			DocumentHistory.Current.Perform(new SetIndexedProperty(type, obj, propertyName, indexProvider, value, isChangingDocument));
+		}
+
+		protected SetIndexedProperty(object obj, string propertyName, int index, object value, bool isChangingDocument)
+		{
+			Type = obj.GetType();
+			Obj = obj;
+			Index = index;
+			Value = value;
+			Property = Type.GetProperty(propertyName);
+			IsChangingDocument = isChangingDocument;
+		}
+
+		protected SetIndexedProperty(Type type, object obj, string propertyName, int index, object value, bool isChangingDocument)
+		{
+			Type = type;
+			Obj = obj;
+			Index = index;
+			Value = value;
+			Property = Type.GetProperty(propertyName);
+			IsChangingDocument = isChangingDocument;
+		}
+
+		public class Processor : OperationProcessor<SetIndexedProperty>
+		{
+			private class Backup { public object Value; }
+
+			protected override void InternalRedo(SetIndexedProperty op)
+			{
+				op.Save(new Backup { Value = op.Property.GetGetMethod().Invoke(op.Obj, new object[] { op.Index }) });
+				op.Property.GetSetMethod().Invoke(op.Obj, new [] { op.Index, op.Value });
+			}
+
+			protected override void InternalUndo(SetIndexedProperty op)
+			{
+				var v = op.Restore<Backup>().Value;
+				op.Property.GetSetMethod().Invoke(op.Obj, new[] { op.Index, v });
 			}
 		}
 	}
@@ -282,82 +336,55 @@ namespace Tangerine.Core.Operations
 		}
 	}
 
-	public class InsertListItem : Operation
+	public class InsertIntoList : Operation
 	{
-		public readonly IList List;
-		public readonly int Location;
-		public readonly object Item;
+		private readonly IList collection;
+		private readonly int index;
+		private readonly object element;
 
 		public override bool IsChangingDocument => true;
 
-		public InsertListItem(object item, IList list, int location)
+		protected InsertIntoList(IList collection, int index, object element)
 		{
-			Item = item;
-			List = list;
-			Location = location;
+			this.collection = collection;
+			this.index = index;
+			this.element = element;
 		}
 
-		public static void Perform(object item, IList list, int location)
-		{
-			DocumentHistory.Current.Perform(new InsertListItem(item, list, location));
-		}
+		public static void Perform(IList collection, int index, object element) => DocumentHistory.Current.Perform(new InsertIntoList(collection, index, element));
 
-		public class Processor : OperationProcessor<InsertListItem>
+		public class Processor : OperationProcessor<InsertIntoList>
 		{
-			protected override void InternalRedo(InsertListItem op)
-			{
-				op.List.Insert(op.Location, op.Item);
-			}
-
-			protected override void InternalUndo(InsertListItem op)
-			{
-				op.List.Remove(op.Item);
-			}
+			protected override void InternalRedo(InsertIntoList op) => op.collection.Insert(op.index, op.element);
+			protected override void InternalUndo(InsertIntoList op) => op.collection.RemoveAt(op.index);
 		}
 	}
 
-	public class RemoveListItem : Operation
+	public class RemoveFromList : Operation
 	{
-		public readonly IList List;
-		public int Location;
-		public object Item { get; private set; }
+		private readonly IList collection;
+		private readonly int index;
+		private object backup;
 
 		public override bool IsChangingDocument => true;
 
-		public RemoveListItem(object item, IList list, int location)
+		protected RemoveFromList(IList collection, int index)
 		{
-			Item = item;
-			List = list;
-			Location = location;
+			this.collection = collection;
+			this.index = index;
 		}
 
-		public static void Perform(int location, IList list)
-		{
-			DocumentHistory.Current.Perform(new RemoveListItem(null, list, location));
-		}
+		public static void Perform(IList collection, int index) => DocumentHistory.Current.Perform(new RemoveFromList(collection, index));
 
-		public static void Perform(object item, IList list)
+		public class Processor : OperationProcessor<RemoveFromList>
 		{
-			DocumentHistory.Current.Perform(new RemoveListItem(item, list, 0));
-		}
-
-		public class Processor : OperationProcessor<RemoveListItem>
-		{
-			protected override void InternalRedo(RemoveListItem op)
+			protected override void InternalRedo(RemoveFromList op)
 			{
-				if (op.Item != null) {
-					op.Location = op.List.IndexOf(op.Item);
-					op.List.Remove(op.Item);
-				} else {
-					op.Item = op.List[op.Location];
-					op.List.RemoveAt(op.Location);
-				}
+				op.backup = op.collection[op.index];
+				op.collection.RemoveAt(op.index);
 			}
 
-			protected override void InternalUndo(RemoveListItem op)
-			{
-				op.List.Insert(op.Location, op.Item);
-			}
+			protected override void InternalUndo(RemoveFromList op) => op.collection.Insert(op.index, op.backup);
 		}
 	}
 
@@ -759,51 +786,6 @@ namespace Tangerine.Core.Operations
 			foreach (var child in tree) {
 				MoveNodes.Perform(child, new FolderItemLocation(loc.Folder, ++loc.Index));
 			}
-		}
-	}
-
-	public class AddToList<TList, TElement> : Operation where TList : IList<TElement>, new() where TElement : new()
-	{
-		private readonly TList collection;
-		private readonly TElement element;
-
-		public override bool IsChangingDocument => true;
-
-		private AddToList(TList collection, TElement element)
-		{
-			this.collection = collection;
-			this.element = element;
-		}
-
-		public static void Perform(TList collection, TElement element) => DocumentHistory.Current.Perform(new AddToList<TList, TElement>(collection, element));
-
-		public class Processor : OperationProcessor<AddToList<TList, TElement>>
-		{
-			protected override void InternalRedo(AddToList<TList, TElement> op) => op.collection.Add(op.element);
-			protected override void InternalUndo(AddToList<TList, TElement> op) => op.collection.Remove(op.element);
-		}
-
-	}
-
-	public class RemoveFromList<TList, TElement> : Operation where TList : IList<TElement>
-	{
-		private readonly TList collection;
-		private readonly TElement element;
-
-		public override bool IsChangingDocument => true;
-
-		private RemoveFromList(TList collection, TElement element)
-		{
-			this.collection = collection;
-			this.element = element;
-		}
-
-		public static void Perform(TList collection, TElement element) => DocumentHistory.Current.Perform(new RemoveFromList<TList, TElement>(collection, element));
-
-		public class Processor : OperationProcessor<RemoveFromList<TList, TElement>>
-		{
-			protected override void InternalRedo(RemoveFromList<TList, TElement> op) => op.collection.Remove(op.element);
-			protected override void InternalUndo(RemoveFromList<TList, TElement> op) => op.collection.Add(op.element);
 		}
 	}
 

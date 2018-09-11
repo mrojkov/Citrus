@@ -13,7 +13,7 @@ namespace Tangerine.Core.Operations
 
 		public override bool IsChangingDocument => false;
 
-		static int selectCounter = 1;
+		private static int selectCounter = 1;
 
 		public static void Perform(Row row, bool select = true)
 		{

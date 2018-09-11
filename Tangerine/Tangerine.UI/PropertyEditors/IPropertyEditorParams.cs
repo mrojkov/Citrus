@@ -27,6 +27,9 @@ namespace Tangerine.UI
 		Func<object> DefaultValueGetter { get; set; }
 		ITransactionalHistory History { get; set; }
 		float LabelWidth { get; set; }
+		int IndexInList { get; set; }
+		bool IsAnimableByPath { get; set; }
+		bool IsAnimable { get; }
 	}
 
 	public interface IPropertyEditorParamsInternal

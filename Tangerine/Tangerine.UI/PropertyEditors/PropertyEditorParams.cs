@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Lime;
 using Tangerine.Core;
 
@@ -26,8 +27,14 @@ namespace Tangerine.UI
 		public Func<object> DefaultValueGetter { get; set; }
 		public ITransactionalHistory History { get; set; }
 		PropertySetterDelegate IPropertyEditorParamsInternal.PropertySetter => propertySetter;
-		public PropertySetterDelegate PropertySetter { set { propertySetter = value; } }
+		public PropertySetterDelegate PropertySetter { set => propertySetter = value; }
 		public float LabelWidth { get; set; } = 140;
+		public int IndexInList { get; set; } = -1;
+		public bool IsAnimableByPath { get; set; }
+		public bool IsAnimable => RootObjects.All(a => a is IAnimationHost) &&
+			PropertyAttributes<TangerineStaticPropertyAttribute>.Get(PropertyInfo) == null &&
+			AnimatorRegistry.Instance.Contains(PropertyInfo.PropertyType) &&
+			IsAnimableByPath;
 
 		public PropertyEditorParams(Widget inspectorPane, IEnumerable<object> objects, IEnumerable<object> rootObjects, Type type, string propertyName, string propertyPath)
 		{

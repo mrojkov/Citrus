@@ -240,7 +240,7 @@ namespace Tangerine.UI
 		private void AddPoint(GradientControlPoint point)
 		{
 			using (history.BeginTransaction()) {
-				Core.Operations.InsertListItem.Perform(point, gradient, 1);
+				Core.Operations.InsertIntoList.Perform(gradient, 1, point);
 				ControlPointCreated?.Invoke(point, 1);
 				history.CommitTransaction();
 			}
@@ -249,7 +249,7 @@ namespace Tangerine.UI
 		private void RemovePoint(GradientControlPoint controlPoint, int idx)
 		{
 			using (history.BeginTransaction()) {
-				Core.Operations.RemoveListItem.Perform(controlPoint, gradient);
+				Core.Operations.RemoveFromList.Perform(gradient, gradient.IndexOf(controlPoint));
 				ControlPointRemoved?.Invoke(idx);
 				history.CommitTransaction();
 			};

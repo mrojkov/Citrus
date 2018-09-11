@@ -15,7 +15,7 @@ namespace Tangerine.Core
 	/// <summary>
 	/// Represents the poll-based stream of values.
 	/// </summary>
-	public interface IDataflow<T> : IDisposable
+	public interface IDataflow<out T> : IDisposable
 	{
 		/// <summary>
 		/// Polls the dataflow.
@@ -33,7 +33,7 @@ namespace Tangerine.Core
 
 	public class DataflowProvider<T> : IDataflowProvider<T>
 	{
-		readonly Func<IDataflow<T>> func;
+		private readonly Func<IDataflow<T>> func;
 
 		public DataflowProvider(Func<IDataflow<T>> func)
 		{
@@ -45,8 +45,8 @@ namespace Tangerine.Core
 
 	public class Property<T> : IDataflowProvider<T>
 	{
-		public Func<T> Getter { get; private set; }
-		public Action<T> Setter { get; private set; }
+		public Func<T> Getter { get; }
+		public Action<T> Setter { get; }
 
 		public Property(Func<T> getter)
 		{
@@ -74,15 +74,40 @@ namespace Tangerine.Core
 
 		public T Value
 		{
-			get { return Getter(); }
-			set { Setter(value); }
+			get => Getter();
+			set => Setter(value);
+		}
+	}
+
+	public class IndexedProperty<T> : IDataflowProvider<T>
+	{
+		public Func<T> Getter { get; }
+		public Action<T> Setter { get; }
+
+		public IndexedProperty(object obj, string propertyName, int index)
+		{
+			var pi = obj.GetType().GetProperty(propertyName);
+			var getMethod = pi.GetGetMethod();
+			Getter = () => (T)getMethod.Invoke(obj, new object[] { index });
+			var setMethod = pi.GetSetMethod();
+			if (setMethod != null) {
+				Setter = (v) => setMethod.Invoke(obj, new object[] { index, v });
+			}
+		}
+
+		IDataflow<T> IDataflowProvider<T>.GetDataflow() => new PropertyDataflow<T>(Getter);
+
+		public T Value
+		{
+			get => Getter();
+			set => Setter(value);
 		}
 	}
 
 	public class EventflowProvider<T> : IDataflowProvider<T>
 	{
-		readonly object obj;
-		readonly string eventName;
+		private readonly object obj;
+		private readonly string eventName;
 
 		public EventflowProvider(object obj, string eventName)
 		{
@@ -90,19 +115,16 @@ namespace Tangerine.Core
 			this.eventName = eventName;
 		}
 
-		public IDataflow<T> GetDataflow()
-		{
-			return new Eventflow<T>(obj, eventName);
-		}
+		public IDataflow<T> GetDataflow() => new Eventflow<T>(obj, eventName);
 	}
 
-	public class Eventflow<T> : IDataflow<T>, IDisposable
+	public class Eventflow<T> : IDataflow<T>
 	{
-		readonly List<T> queue = new List<T>();
-		readonly EventInfo eventInfo;
-		readonly Delegate @delegate;
-		readonly object obj;
-		bool disposed;
+		private readonly List<T> queue = new List<T>();
+		private readonly EventInfo eventInfo;
+		private readonly Delegate @delegate;
+		private readonly object obj;
+		private bool disposed;
 
 		public T Value { get; private set; }
 		public bool GotValue { get; private set; }
@@ -127,7 +149,7 @@ namespace Tangerine.Core
 			disposed = true;
 		}
 
-		Delegate CreateDelegate(EventInfo evt, object obj, string eventName)
+		private Delegate CreateDelegate(EventInfo evt, object obj, string eventName)
 		{
 			var p = evt.EventHandlerType.GetMethod("Invoke").GetParameters();
 			if (p.Length == 1 && p[0].ParameterType == typeof(T)) {
@@ -139,14 +161,14 @@ namespace Tangerine.Core
 			throw new ArgumentException();
 		}
 
-		void EventHandler1(T value)
+		private void EventHandler1(T value)
 		{
 			lock (queue) {
 				queue.Add(value);
 			}
 		}
 
-		void EventHandler2(object sender, T value)
+		private void EventHandler2(object sender, T value)
 		{
 			lock (queue) {
 				queue.Add(value);
@@ -164,9 +186,9 @@ namespace Tangerine.Core
 		}
 	}
 
-	class PropertyDataflow<T> : IDataflow<T>
+	internal class PropertyDataflow<T> : IDataflow<T>
 	{
-		readonly Func<T> getter;
+		private readonly Func<T> getter;
 
 		public T Value { get; private set; }
 		public bool GotValue { get; private set; }
@@ -252,10 +274,10 @@ namespace Tangerine.Core
 			return dataflow.GotValue;
 		}
 
-		class SelectProvider<T, R> : IDataflow<R>
+		private class SelectProvider<T, R> : IDataflow<R>
 		{
-			readonly IDataflow<T> arg;
-			readonly Func<T, R> selector;
+			private readonly IDataflow<T> arg;
+			private readonly Func<T, R> selector;
 
 			public R Value { get; private set; }
 			public bool GotValue { get; private set; }
@@ -280,10 +302,10 @@ namespace Tangerine.Core
 			}
 		}
 
-		class CoalesceProvider<T1, T2> : IDataflow<Tuple<T1, T2>>
+		private class CoalesceProvider<T1, T2> : IDataflow<Tuple<T1, T2>>
 		{
-			readonly IDataflow<T1> arg1;
-			readonly IDataflow<T2> arg2;
+			private readonly IDataflow<T1> arg1;
+			private readonly IDataflow<T2> arg2;
 
 			public bool GotValue { get; private set; }
 			public Tuple<T1, T2> Value { get; private set; }
@@ -310,10 +332,10 @@ namespace Tangerine.Core
 			}
 		}
 
-		class WhereProvider<T> : IDataflow<T>
+		private class WhereProvider<T> : IDataflow<T>
 		{
-			readonly IDataflow<T> arg;
-			readonly Predicate<T> predicate;
+			private readonly IDataflow<T> arg;
+			private readonly Predicate<T> predicate;
 
 			public bool GotValue { get; private set; }
 			public T Value { get; private set; }
@@ -338,11 +360,11 @@ namespace Tangerine.Core
 			}
 		}
 
-		class DistinctUntilChangedProvider<T> : IDataflow<T>
+		private class DistinctUntilChangedProvider<T> : IDataflow<T>
 		{
-			readonly IDataflow<T> arg;
-			T previous;
-			bool hasValue;
+			private readonly IDataflow<T> arg;
+			private T previous;
+			private bool hasValue;
 
 			public bool GotValue { get; private set; }
 			public T Value { get; private set; }
@@ -371,11 +393,11 @@ namespace Tangerine.Core
 			}
 		}
 
-		class SkipProvider<T> : IDataflow<T>
+		private class SkipProvider<T> : IDataflow<T>
 		{
-			readonly IDataflow<T> arg;
-			int countdown;
-			bool done;
+			private readonly IDataflow<T> arg;
+			private int countdown;
+			private bool done;
 
 			public bool GotValue { get; private set; }
 			public T Value { get; private set; }
@@ -401,11 +423,11 @@ namespace Tangerine.Core
 			}
 		}
 
-		class SameOrDefaultProvider<T> : IDataflow<T>
+		private class SameOrDefaultProvider<T> : IDataflow<T>
 		{
-			readonly IDataflow<T> arg1;
-			readonly IDataflow<T> arg2;
-			readonly T defaultValue;
+			private readonly IDataflow<T> arg1;
+			private readonly IDataflow<T> arg2;
+			private readonly T defaultValue;
 
 			public bool GotValue { get; private set; }
 			public T Value { get; private set; }
@@ -435,8 +457,8 @@ namespace Tangerine.Core
 
 		public class Consumer<T> : ITaskProvider
 		{
-			readonly IDataflow<T> dataflow;
-			readonly Action<T> action;
+			private readonly IDataflow<T> dataflow;
+			private readonly Action<T> action;
 
 			public Consumer(IDataflow<T> dataflow, Action<T> action)
 			{
@@ -456,7 +478,7 @@ namespace Tangerine.Core
 				}
 			}
 
-			void Execute()
+			private void Execute()
 			{
 				dataflow.Poll();
 				if (dataflow.GotValue) {

@@ -46,7 +46,7 @@ namespace Tangerine.UI.Inspector
 							nodesWithComponent.Add(n);
 						}
 					}
-					PopulateContentForType(t, components, nodesWithComponent, widget, SerializeMutuallyExclusiveComponentGroupBaseType(t)).ToList();
+					PopulateContentForType(t, components, nodesWithComponent, !Document.Current.InspectRootNode, widget, SerializeMutuallyExclusiveComponentGroupBaseType(t)).ToList();
 				}
 				AddComponentsMenu(nodes, widget);
 			}
@@ -71,7 +71,7 @@ namespace Tangerine.UI.Inspector
 			return $"[{Yuzu.Util.TypeSerializer.Serialize(t)}]";
 		}
 
-		private IEnumerable<IPropertyEditor> BuildForObjectsHelper(IEnumerable<object> objects, IEnumerable<object> rootObjects = null, Widget widget = null, string propertyPath = "")
+		private IEnumerable<IPropertyEditor> BuildForObjectsHelper(IEnumerable<object> objects, IEnumerable<object> rootObjects = null, bool animableByPath = true, Widget widget = null, string propertyPath = "")
 		{
 			if (widget == null) {
 				widget = this.widget;
@@ -81,7 +81,7 @@ namespace Tangerine.UI.Inspector
 			}
 			foreach (var t in GetTypes(objects)) {
 				var o = objects.Where(i => t.IsInstanceOfType(i)).ToList();
-				foreach (var e in PopulateContentForType(t, o, rootObjects ?? o, widget, propertyPath)) {
+				foreach (var e in PopulateContentForType(t, o, rootObjects ?? o, !Document.Current.InspectRootNode && animableByPath && objects.All(_ => _ is IAnimable), widget, propertyPath)) {
 					yield return e;
 				}
 			}
@@ -124,8 +124,8 @@ namespace Tangerine.UI.Inspector
 
 		private bool ShouldInspectProperty(Type type, IEnumerable<object> objects, PropertyInfo property)
 		{
-			if (property.Name == "Item") {
-				// WTF, Bug in Mono?
+			if (property.GetIndexParameters().Length > 0) {
+				// we dont inspect indexers (they have "Item" name by default
 				return false;
 			}
 			var yuzuItem = Yuzu.Metadata.Meta.Get(type, Serialization.YuzuCommonOptions).Items.Find(i => i.PropInfo == property);
@@ -152,7 +152,7 @@ namespace Tangerine.UI.Inspector
 			return true;
 		}
 
-		private IEnumerable<IPropertyEditor> PopulateContentForType(Type type, IEnumerable<object> objects, IEnumerable<object> rootObjects, Widget widget, string propertyPath)
+		private IEnumerable<IPropertyEditor> PopulateContentForType(Type type, IEnumerable<object> objects, IEnumerable<object> rootObjects, bool animableByPath, Widget widget, string propertyPath)
 		{
 			var categoryLabelAdded = false;
 			var editorParams = new Dictionary<string, List<PropertyEditorParams>>();
@@ -201,14 +201,23 @@ namespace Tangerine.UI.Inspector
 						var obj = ctr.Invoke(null);
 						var prop = type.GetProperty(property.Name);
 						return prop.GetValue(obj);
-					}
+					},
+					IsAnimableByPath = animableByPath,
 				};
+				@params.PropertySetter = @params.IsAnimable ? (PropertySetterDelegate)SetAnimableProperty : SetProperty;
 				if (!editorParams.Keys.Contains(@params.Group)) {
 					editorParams.Add(@params.Group, new List<PropertyEditorParams>());
 				}
 				editorParams[@params.Group].Add(@params);
 			}
 
+			foreach (var propertyEditor in PopulatePropertyEditors(type, objects, rootObjects, widget, editorParams)) {
+				yield return propertyEditor;
+			}
+		}
+
+		private IEnumerable<IPropertyEditor> PopulatePropertyEditors(Type type, IEnumerable<object> objects, IEnumerable<object> rootObjects, Widget widget, Dictionary<string, List<PropertyEditorParams>> editorParams)
+		{
 			foreach (var header in editorParams.Keys.OrderBy((s) => s)) {
 				AddGroupHeader(header, widget);
 				foreach (var param in editorParams[header]) {
@@ -221,25 +230,19 @@ namespace Tangerine.UI.Inspector
 							break;
 						}
 					}
+
 					if (!isPropertyRegistered) {
 						var propertyType = param.PropertyInfo.PropertyType;
+						var iListInterface = propertyType.GetInterfaces().FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IList<>));
 						if (propertyType.IsEnum) {
-							Type specializedEnumPropertyEditorType = typeof(EnumPropertyEditor<>).MakeGenericType(param.PropertyInfo.PropertyType);
-							editor = Activator.CreateInstance(specializedEnumPropertyEditorType, new object[] { param }) as IPropertyEditor;
+							editor = CreateEditorForEnum(param);
+						} else if (iListInterface != null) {
+							editor = PopulateEditorsForListType(objects, rootObjects, param, iListInterface);
 						} else if ((propertyType.IsClass || propertyType.IsInterface) && !propertyType.GetInterfaces().Contains(typeof(IEnumerable))) {
-							var instanceEditors = new List<IPropertyEditor>();
-							var onValueChanged = new Action<Widget>((w) => {
-								w.Nodes.Clear();
-								foreach (var e in instanceEditors) {
-									editors.Remove(e);
-								}
-								instanceEditors.Clear();
-								instanceEditors.AddRange(BuildForObjectsHelper(objects.Select(o => param.PropertyInfo.GetValue(o)), rootObjects, w, param.PropertyPath));
-							});
-							Type et = typeof(InstancePropertyEditor<>).MakeGenericType(param.PropertyInfo.PropertyType);
-							editor = Activator.CreateInstance(et, new object[] { param, onValueChanged }) as IPropertyEditor;
+							editor = PopulateEditorsForInstanceType(objects, rootObjects, param);
 						}
 					}
+
 					if (editor != null) {
 						DecoratePropertyEditor(editor, row++);
 						editors.Add(editor);
@@ -249,11 +252,53 @@ namespace Tangerine.UI.Inspector
 								editor.ContainerWidget.Visible = !showCondition.Check(param.Objects.First());
 							};
 						}
-						param.PropertySetter = editor.IsAnimable ? (PropertySetterDelegate)SetAnimableProperty : SetProperty;
 						yield return editor;
 					}
 				}
 			}
+		}
+
+		private IPropertyEditor PopulateEditorsForListType(IEnumerable<object> objects, IEnumerable<object> rootObjects, PropertyEditorParams param, Type iListInterface)
+		{
+			var listGenericArgument = iListInterface.GetGenericArguments().First();
+			Func<PropertyEditorParams, Widget, IList, IEnumerable<IPropertyEditor>> onAdd = (p, w, list) => {
+				return PopulatePropertyEditors(param.PropertyInfo.PropertyType, new[] {list}, rootObjects, w,
+					new Dictionary<string, List<PropertyEditorParams>> {{"", new List<PropertyEditorParams> {p}}});
+			};
+			var specializedICollectionPropertyEditorType = typeof(ListPropertyEditor<,>).MakeGenericType(param.PropertyInfo.PropertyType, listGenericArgument);
+			var editor = Activator.CreateInstance(specializedICollectionPropertyEditorType, param, onAdd) as IPropertyEditor;
+			return editor;
+		}
+
+		private IPropertyEditor PopulateEditorsForInstanceType(IEnumerable<object> objects, IEnumerable<object> rootObjects, PropertyEditorParams param)
+		{
+			var instanceEditors = new List<IPropertyEditor>();
+			var onValueChanged = new Action<Widget>((w) => {
+				w.Nodes.Clear();
+				foreach (var e in instanceEditors) {
+					editors.Remove(e);
+				}
+
+				instanceEditors.Clear();
+				bool allObjectsAnimable = objects.All(o => o is IAnimable);
+				instanceEditors.AddRange(BuildForObjectsHelper(objects.Select(
+						o => param.IndexInList == -1 ? param.PropertyInfo.GetValue(o) : param.PropertyInfo.GetValue(o, new object[] {param.IndexInList})),
+					rootObjects,
+					param.IsAnimableByPath && allObjectsAnimable,
+					w,
+					param.PropertyPath));
+			});
+			Type et = typeof(InstancePropertyEditor<>).MakeGenericType(param.PropertyInfo.PropertyType);
+			var editor = Activator.CreateInstance(et, param, onValueChanged) as IPropertyEditor;
+			return editor;
+		}
+
+		private static IPropertyEditor CreateEditorForEnum(PropertyEditorParams param)
+		{
+			IPropertyEditor editor;
+			var specializedEnumPropertyEditorType = typeof(EnumPropertyEditor<>).MakeGenericType(param.PropertyInfo.PropertyType);
+			editor = Activator.CreateInstance(specializedEnumPropertyEditorType, param) as IPropertyEditor;
+			return editor;
 		}
 
 		private static IEnumerable<Type> GetComponentsTypes(IReadOnlyList<Node> nodes)
@@ -390,13 +435,7 @@ namespace Tangerine.UI.Inspector
 		private static void DecoratePropertyEditor(IPropertyEditor editor, int row)
 		{
 			var index = 0;
-			bool allRootObjectsAnimable = editor.EditorParams.RootObjects.All(a => a is IAnimationHost);
-			if (
-				allRootObjectsAnimable &&
-				PropertyAttributes<TangerineStaticPropertyAttribute>.Get(editor.EditorParams.PropertyInfo) == null &&
-				AnimatorRegistry.Instance.Contains(editor.EditorParams.PropertyInfo.PropertyType) &&
-				!Document.Current.InspectRootNode
-			) {
+			if (editor.EditorParams.IsAnimable) {
 				var keyColor = KeyframePalette.Colors[editor.EditorParams.TangerineAttribute.ColorIndex];
 				var keyframeButton = new KeyframeButton {
 					LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0),

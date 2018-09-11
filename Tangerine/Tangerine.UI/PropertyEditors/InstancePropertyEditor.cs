@@ -20,13 +20,17 @@ namespace Tangerine.UI
 			EditorContainer.AddNode(Selector);
 			var propertyType = typeof(T);
 			var meta = Yuzu.Metadata.Meta.Get(editorParams.Type, Serialization.YuzuCommonOptions);
-			var propertyMetaItem = meta.Items.Where(i => i.Name == editorParams.PropertyName).First();
-			var defaultValue = propertyMetaItem.GetValue(meta.Default);
-			var resetToDefaultButton = new ToolbarButton(IconPool.GetTexture("Tools.Revert"));
-			resetToDefaultButton.Clicked = () => {
-				SetProperty(defaultValue);
-			};
-			EditorContainer.AddNode(resetToDefaultButton);
+			var propertyMetaItem = meta.Items.Where(i => i.Name == editorParams.PropertyName).FirstOrDefault();
+			if (propertyMetaItem != null) {
+				var defaultValue = propertyMetaItem.GetValue(meta.Default);
+				var resetToDefaultButton = new ToolbarButton(IconPool.GetTexture("Tools.Revert")) {
+					Clicked = () => { SetProperty(defaultValue); }
+				};
+				EditorContainer.AddNode(resetToDefaultButton);
+				Selector.AddChangeWatcher(CoalescedPropertyValue(), v => {
+					resetToDefaultButton.Visible = !Equals(v, defaultValue);
+				});
+			}
 			if (!propertyType.IsInterface) {
 				Selector.Items.Add(new CommonDropDownList.Item(propertyType.Name, propertyType));
 			}
@@ -58,7 +62,6 @@ namespace Tangerine.UI
 			};
 			Selector.AddChangeWatcher(CoalescedPropertyValue(), v => {
 				OnValueChanged?.Invoke(ExpandableContent);
-				resetToDefaultButton.Visible = !Equals(v, defaultValue);
 				Selector.Value = v?.GetType();
 			});
 		}

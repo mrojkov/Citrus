@@ -89,6 +89,7 @@
     <Compile Include="PropertyEditors\IntPropertyEditor.cs" />
     <Compile Include="PropertyEditors\IPropertyEditor.cs" />
     <Compile Include="PropertyEditors\IPropertyEditorParams.cs" />
+    <Compile Include="PropertyEditors\ListPropertyEditor.cs" />
     <Compile Include="PropertyEditors\NodeIdPropertyEditor.cs" />
     <Compile Include="PropertyEditors\NodeReferencePropertyEditor.cs" />
     <Compile Include="PropertyEditors\NumericRangePropertyEditor.cs" />

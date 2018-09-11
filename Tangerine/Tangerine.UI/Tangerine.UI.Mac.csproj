@@ -69,6 +69,7 @@
     <Compile Include="PropertyEditors\NodeIdPropertyEditor.cs" />
     <Compile Include="EmbeddedResources\ThemedIconResource.cs" />
     <Compile Include="PropertyEditors\DropDownListPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\ListPropertyEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Documentation\Documentation.cs" />

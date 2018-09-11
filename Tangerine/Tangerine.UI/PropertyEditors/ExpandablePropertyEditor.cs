@@ -11,7 +11,7 @@ namespace Tangerine.UI
 		private bool expanded;
 		public bool Expanded
 		{
-			get { return expanded; }
+			get => expanded;
 			set
 			{
 				expanded = value;

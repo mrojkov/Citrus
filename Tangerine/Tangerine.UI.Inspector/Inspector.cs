@@ -63,7 +63,7 @@ namespace Tangerine.UI.Inspector
 			contentWidget.Layout = new VBoxLayout();
 			Objects = new List<object>();
 			content = new InspectorContent(contentWidget) {
-				Footer = new Widget {MinHeight = 500.0f},
+				Footer = new Widget { MinHeight = 300.0f },
 				History = Document.Current.History
 			};
 			CreateWatchersToRebuild();

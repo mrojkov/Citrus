@@ -94,8 +94,8 @@ namespace Lime
 		/// </summary>
 		public event Action AnimationStopped
 		{
-			add { DefaultAnimation.Stopped += value; }
-			remove { DefaultAnimation.Stopped -= value; }
+			add => DefaultAnimation.Stopped += value;
+			remove => DefaultAnimation.Stopped -= value;
 		}
 
 		private string id;
@@ -108,7 +108,7 @@ namespace Lime
 		[TangerineStaticProperty]
 		public string Id
 		{
-			get { return id; }
+			get => id;
 			set
 			{
 				if (id != value) {
@@ -127,8 +127,8 @@ namespace Lime
 		[TangerineStaticProperty]
 		public string ContentsPath
 		{
-			get { return Yuzu.Current?.ShrinkPath(contentsPath) ?? contentsPath; }
-			set { contentsPath = Yuzu.Current?.ExpandPath(value) ?? value; }
+			get => Yuzu.Current?.ShrinkPath(contentsPath) ?? contentsPath;
+			set => contentsPath = Yuzu.Current?.ExpandPath(value) ?? value;
 		}
 
 		internal static long NodeReferenceCacheValidationCode = 1;
@@ -149,7 +149,7 @@ namespace Lime
 		private Node parent;
 		public Node Parent
 		{
-			get { return parent; }
+			get => parent;
 			internal set
 			{
 				if (parent != value) {
@@ -167,7 +167,7 @@ namespace Lime
 		[YuzuMember]
 		public TangerineFlags TangerineFlags
 		{
-			get { return tangerineFlags; }
+			get => tangerineFlags;
 			set
 			{
 				if (tangerineFlags != value) {
@@ -235,8 +235,8 @@ namespace Lime
 
 		public event Action<Node> Awoke
 		{
-			add { Components.GetOrAdd<AwakeBehavior>().Action += value; }
-			remove { Components.GetOrAdd<AwakeBehavior>().Action -= value; }
+			add => Components.GetOrAdd<AwakeBehavior>().Action += value;
+			remove => Components.GetOrAdd<AwakeBehavior>().Action -= value;
 		}
 
 		internal NodeBehavior[] Behaviours = NodeComponentCollection.EmptyBehaviors;
@@ -247,8 +247,8 @@ namespace Lime
 		/// </summary>
 		public UpdateHandler Updating
 		{
-			get { return Components.GetOrAdd<UpdateBehaviour>().Updating; }
-			set { Components.GetOrAdd<UpdateBehaviour>().Updating = value; }
+			get => Components.GetOrAdd<UpdateBehaviour>().Updating;
+			set => Components.GetOrAdd<UpdateBehaviour>().Updating = value;
 		}
 
 		/// <summary>
@@ -256,8 +256,8 @@ namespace Lime
 		/// </summary>
 		public UpdateHandler Updated
 		{
-			get { return Components.GetOrAdd<UpdatedBehaviour>().Updated; }
-			set { Components.GetOrAdd<UpdatedBehaviour>().Updated = value; }
+			get => Components.GetOrAdd<UpdatedBehaviour>().Updated;
+			set => Components.GetOrAdd<UpdatedBehaviour>().Updated = value;
 		}
 
 		/// <summary>
@@ -300,6 +300,7 @@ namespace Lime
 		/// Child nodes.
 		/// For enumerating all descendants use Descendants.
 		/// </summary>
+		[TangerineIgnore]
 		[YuzuMember]
 		[YuzuSerializeIf(nameof(ShouldSerializeNodes))]
 		public NodeList Nodes { get; private set; }
@@ -307,23 +308,23 @@ namespace Lime
 		/// <summary>
 		/// Markers of default animation.
 		/// </summary>
-		public MarkerList Markers { get { return DefaultAnimation.Markers; } }
+		public MarkerList Markers => DefaultAnimation.Markers;
 
 		/// <summary>
 		/// Returns true if this node is running animation.
 		/// </summary>
 		public bool IsRunning
 		{
-			get { return DefaultAnimation.IsRunning; }
-			set { DefaultAnimation.IsRunning = value; }
+			get => DefaultAnimation.IsRunning;
+			set => DefaultAnimation.IsRunning = value;
 		}
 
 		/// <summary>
 		/// Returns true if this node isn't running animation.
 		/// </summary>
 		public bool IsStopped {
-			get { return !IsRunning; }
-			set { IsRunning = !value; }
+			get => !IsRunning;
+			set => IsRunning = !value;
 		}
 
 		/// <summary>
@@ -331,8 +332,8 @@ namespace Lime
 		/// </summary>
 		public double AnimationTime
 		{
-			get { return DefaultAnimation.Time; }
-			set { DefaultAnimation.Time = value; }
+			get => DefaultAnimation.Time;
+			set => DefaultAnimation.Time = value;
 		}
 
 		/// <summary>
@@ -359,7 +360,7 @@ namespace Lime
 		[YuzuMember]
 		public string Tag
 		{
-			get { return tag; }
+			get => tag;
 			set
 			{
 				if (tag == value) {
@@ -377,6 +378,7 @@ namespace Lime
 		public bool NeedSerializeAnimations() =>
 			Animations.Count > 1 || (Animations.Count == 1 && (FirstAnimation.Id != null || FirstAnimation.Markers.Count > 0));
 
+		[TangerineIgnore]
 		[YuzuMember]
 		public List<Folder.Descriptor> Folders { get; set; }
 
@@ -385,8 +387,8 @@ namespace Lime
 		/// </summary>
 		public string CurrentAnimation
 		{
-			get { return DefaultAnimation.RunningMarkerId; }
-			set { DefaultAnimation.RunningMarkerId = value; }
+			get => DefaultAnimation.RunningMarkerId;
+			set => DefaultAnimation.RunningMarkerId = value;
 		}
 
 		/// <summary>
@@ -542,8 +544,8 @@ namespace Lime
 		/// </summary>
 		public int AnimationFrame
 		{
-			get { return AnimationUtils.SecondsToFrames(AnimationTime); }
-			set { AnimationTime = AnimationUtils.FramesToSeconds(value); }
+			get => AnimationUtils.SecondsToFrames(AnimationTime);
+			set => AnimationTime = AnimationUtils.FramesToSeconds(value);
 		}
 
 		/// <summary>
@@ -595,13 +597,13 @@ namespace Lime
 				if (p != this) {
 					r += " in ";
 				}
-				r += string.IsNullOrEmpty(p.Id) ? p.GetType().Name : string.Format("'{0}'", p.Id);
+				r += string.IsNullOrEmpty(p.Id) ? p.GetType().Name : $"'{p.Id}'";
 				if (!string.IsNullOrEmpty(p.Tag)) {
-					r += string.Format(" ({0})", p.Tag);
+					r += $" ({p.Tag})";
 				}
 				var bundlePath = Components.Get<Node.AssetBundlePathComponent>();
 				if (bundlePath != null) {
-					r += string.Format(" ({0})", bundlePath);
+					r += $" ({bundlePath})";
 				}
 			}
 			return r;
@@ -712,7 +714,7 @@ namespace Lime
 			if (property != "Trigger") {
 				return;
 			}
-			if (String.IsNullOrEmpty(Trigger)) {
+			if (string.IsNullOrEmpty(Trigger)) {
 				AnimationTime = animationTimeCorrection;
 				IsRunning = true;
 			} else {
@@ -795,8 +797,7 @@ namespace Lime
 		/// (i.e. for path Root/Human/Head/Eye Human or Head can be ommited).</param>
 		public T Find<T>(string path) where T : Node
 		{
-			T result = TryFindNode(path) as T;
-			if (result == null) {
+			if (!(TryFindNode(path) is T result)) {
 				throw new Lime.Exception("'{0}' of {1} not found for '{2}'", path, typeof(T).Name, ToString());
 			}
 			return result;
@@ -1032,8 +1033,7 @@ namespace Lime
 
 		private static void PreloadAnimatedTextures(IAnimator animator)
 		{
-			var textureAnimator = animator as Animator<ITexture>;
-			if (textureAnimator != null) {
+			if (animator is Animator<ITexture> textureAnimator) {
 				foreach (var key in textureAnimator.ReadonlyKeys) {
 					key.Value.GetHandle();
 				}
@@ -1047,7 +1047,7 @@ namespace Lime
 			texture?.GetHandle();
 		}
 
-		private static ThreadLocal<HashSet<string>> scenesBeingLoaded = new ThreadLocal<HashSet<string>>(() => new HashSet<string>());
+		private static readonly ThreadLocal<HashSet<string>> scenesBeingLoaded = new ThreadLocal<HashSet<string>>(() => new HashSet<string>());
 
 		public delegate bool SceneLoadingDelegate(string path, ref Node instance, bool external);
 		public delegate void SceneLoadedDelegate(string path, Node instance, bool external);
@@ -1104,9 +1104,9 @@ namespace Lime
 			} finally {
 				scenesBeingLoaded.Value.Remove(fullPath);
 			}
-			if (instance is Model3D) {
+			if (instance is Model3D model3DInstance) {
 				var attachment = new Model3DAttachmentParser().Parse(path);
-				attachment?.Apply((Model3D)instance);
+				attachment?.Apply(model3DInstance);
 			}
 			SceneLoaded?.Value?.Invoke(path, instance, external);
 			return instance;
@@ -1158,8 +1158,8 @@ namespace Lime
 					property.SetValue(this, property.GetValue(content));
 				}
 			} else {
-				if ((content is Widget) && (this is Widget)) {
-					((Widget)content).Size = (this as Widget).Size;
+				if ((content is Widget widget) && (this is Widget)) {
+					widget.Size = ((Widget)this).Size;
 				}
 			}
 

@@ -14,7 +14,6 @@ namespace Tangerine.UI
 		public SimpleText PropertyLabel { get; private set; }
 		public Widget LabelContainer { get; private set; }
 		public Widget EditorContainer { get; private set; }
-		public bool IsAnimable { get; }
 
 		public CommonPropertyEditor(IPropertyEditorParams editorParams)
 		{
@@ -52,10 +51,6 @@ namespace Tangerine.UI
 			} else {
 				LabelContainer = EditorContainer = ContainerWidget;
 			}
-			IsAnimable = EditorParams.RootObjects.All(a => a is IAnimationHost) &&
-			             PropertyAttributes<TangerineStaticPropertyAttribute>.Get(EditorParams.PropertyInfo) == null &&
-			             AnimatorRegistry.Instance.Contains(EditorParams.PropertyInfo.PropertyType) &&
-			             !Document.Current.InspectRootNode;
 		}
 
 		IEnumerator<object> ManageLabelTask()
@@ -179,28 +174,52 @@ namespace Tangerine.UI
 
 		protected IDataflowProvider<T> CoalescedPropertyValue(T defaultValue = default(T))
 		{
-			IDataflowProvider<T> provider = null;
-			foreach (var o in EditorParams.Objects) {
-				var p = new Property<T>(o, EditorParams.PropertyName);
-				provider = (provider == null) ? p : provider.SameOrDefault(p, defaultValue);
+			var indexParameters = EditorParams.PropertyInfo.GetIndexParameters();
+			if (indexParameters.Length == 0) {
+				IDataflowProvider<T> provider = null;
+				foreach (var o in EditorParams.Objects) {
+					var p = new Property<T>(o, EditorParams.PropertyName);
+					provider = (provider == null) ? p : provider.SameOrDefault(p, defaultValue);
+				}
+				return provider;
+			} else if (indexParameters.Length == 1 && indexParameters.First().ParameterType == typeof(int)) {
+				IDataflowProvider<T> provider = null;
+				foreach (var o in EditorParams.Objects) {
+					var p = new IndexedProperty<T>(o, EditorParams.PropertyName, EditorParams.IndexInList);
+					provider = (provider == null) ? p : provider.SameOrDefault(p, defaultValue);
+				}
+				return provider;
+			} else {
+				throw new NotSupportedException();
 			}
-			return provider;
 		}
 
 		protected IDataflowProvider<ComponentType> CoalescedPropertyComponentValue<ComponentType>(Func<T, ComponentType> selector, ComponentType defaultValue = default(ComponentType))
 		{
-			IDataflowProvider<ComponentType> provider = null;
-			foreach (var o in EditorParams.Objects) {
-				var p = new Property<T>(o, EditorParams.PropertyName).Select(selector);
-				provider = (provider == null) ? p : provider.SameOrDefault(p, defaultValue);
+			var indexParameters = EditorParams.PropertyInfo.GetIndexParameters();
+			if (indexParameters.Length == 0) {
+				IDataflowProvider<ComponentType> provider = null;
+				foreach (var o in EditorParams.Objects) {
+					var p = new Property<T>(o, EditorParams.PropertyName).Select(selector);
+					provider = (provider == null) ? p : provider.SameOrDefault(p, defaultValue);
+				}
+				return provider;
+			} else if (indexParameters.Length == 1 && indexParameters.First().ParameterType == typeof(int)) {
+				IDataflowProvider<ComponentType> provider = null;
+				foreach (var o in EditorParams.Objects) {
+					var p = new IndexedProperty<T>(o, EditorParams.PropertyName, EditorParams.IndexInList).Select(selector);
+					provider = (provider == null) ? p : provider.SameOrDefault(p, defaultValue);
+				}
+				return provider;
+			} else {
+				throw new NotSupportedException();
 			}
-			return provider;
 		}
 
 		protected void SetProperty(object value)
 		{
 			DoTransaction(() => {
-				if (IsAnimable) {
+				if (EditorParams.IsAnimable) {
 					foreach (var o in EditorParams.RootObjects) {
 						((IPropertyEditorParamsInternal)EditorParams).PropertySetter(o, EditorParams.PropertyPath, value);
 					}
@@ -215,7 +234,7 @@ namespace Tangerine.UI
 		protected void SetProperty<ValueType>(Func<ValueType, object> valueProducer)
 		{
 			DoTransaction(() => {
-				if (IsAnimable) {
+				if (EditorParams.IsAnimable) {
 					foreach (var o in EditorParams.RootObjects) {
 						var (p, a) = AnimationUtils.GetPropertyByPath((IAnimationHost)o, EditorParams.PropertyPath);
 						var current = p.Info.GetValue(a);
@@ -223,7 +242,9 @@ namespace Tangerine.UI
 					}
 				} else {
 					foreach (var o in EditorParams.Objects) {
-						var current = new Property(o, EditorParams.PropertyName).Value;
+						var current = EditorParams.IndexInList != -1
+							? (new IndexedProperty(o, EditorParams.PropertyName, EditorParams.IndexInList)).Value
+							: (new Property(o, EditorParams.PropertyName).Value);
 						((IPropertyEditorParamsInternal)EditorParams).PropertySetter(o, EditorParams.PropertyName, valueProducer((ValueType)current));
 					}
 				}
