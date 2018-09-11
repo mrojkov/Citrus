@@ -165,7 +165,8 @@ namespace Lime
 			OnRenderFrame(null);
 		}
 
-		public bool IsSurfaceCreated { get; private set; }
+		internal bool IsSurfaceCreated { get; private set; }
+		internal int SurfaceVersion { get; private set; }
 		
 		protected override void OnLoad(EventArgs e)
 		{
@@ -177,12 +178,13 @@ namespace Lime
 		{
 			base.OnUnload(e);
 			IsSurfaceCreated = false;
+			SurfaceVersion++;
 		}
 
 		public override void MakeCurrent() { }
 
 		public void MakeCurrentActual() => base.MakeCurrent();
-
+		
 		public override bool OnCheckIsTextEditor()
 		{
 			return true;

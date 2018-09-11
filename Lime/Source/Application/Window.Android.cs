@@ -148,7 +148,15 @@ namespace Lime
 			while (true) {
 				renderReady.WaitOne();
 				renderReady.Reset();
-				Render();
+				var gw = ActivityDelegate.Instance.GameView;
+				var surfaceVersion = gw.SurfaceVersion;
+				try {
+					Render();
+				} catch (System.Exception e) {
+					if (surfaceVersion == gw.SurfaceVersion) {
+						System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(e).Throw();
+					}
+				}
 				renderCompleted.Set();
 			}
 		}
@@ -165,9 +173,10 @@ namespace Lime
 		
 		private void Render()
 		{
-			ActivityDelegate.Instance.GameView.MakeCurrentActual();
+			var gw = ActivityDelegate.Instance.GameView;
+			gw.MakeCurrentActual();
 			base.RaiseRendering();
-			ActivityDelegate.Instance.GameView.SwapBuffers();
+			gw.SwapBuffers();
 		}
 		
 		public void Center() {}
