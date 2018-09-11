@@ -20,6 +20,7 @@ namespace Tangerine.UI
 		public static string DocExtension { get; set; } = ".html";
 		public static string StartPageName { get; set; } = "StartPage";
 		public static string ErrorPageName { get; set; } = "ErrorPage";
+		public static string ChangelogPageName { get; set; } = "Changelog";
 
 		public static string GetPagePath(string pageName)
 		{
@@ -48,6 +49,10 @@ namespace Tangerine.UI
 			string errorPagePath = GetPagePath(ErrorPageName);
 			if (!File.Exists(errorPagePath)) {
 				File.WriteAllText(errorPagePath, "# Error #\nThis is error page");
+			}
+			string changelogPagePath = GetPagePath(ChangelogPageName);
+			if (!File.Exists(changelogPagePath)) {
+				File.WriteAllText(changelogPagePath, "# Error #\nChangelog is empty!");
 			}
 			Update();
 		}
