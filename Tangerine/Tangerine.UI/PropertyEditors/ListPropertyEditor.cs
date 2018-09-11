@@ -29,10 +29,8 @@ namespace Tangerine.UI
 				});
 				return;
 			}
-
 			ExpandableContent.Padding = new Thickness(left: 4.0f, right: 0.0f, top: 4.0f, bottom: 4.0f);
-
-						list = (IList)EditorParams.PropertyInfo.GetValue(EditorParams.Objects.First());
+			list = (IList)EditorParams.PropertyInfo.GetValue(EditorParams.Objects.First());
 			var addButton = new ThemedAddButton() {
 				Clicked = () => {
 					Expanded = true;
@@ -69,7 +67,8 @@ namespace Tangerine.UI
 
 		private void AfterInsertNewElement(int index)
 		{
-			var p = new PropertyEditorParams(ExpandableContent, new[] { list }, EditorParams.RootObjects, EditorParams.PropertyInfo.PropertyType, "Item", EditorParams.PropertyPath + $".Item[{index}]"
+			var elementContainer = new Widget { Layout = new VBoxLayout() };
+			var p = new PropertyEditorParams(elementContainer, new[] { list }, EditorParams.RootObjects, EditorParams.PropertyInfo.PropertyType, "Item", EditorParams.PropertyPath + $".Item[{index}]"
 			) {
 				NumericEditBoxFactory = EditorParams.NumericEditBoxFactory,
 				History = EditorParams.History,
@@ -79,7 +78,7 @@ namespace Tangerine.UI
 				IsAnimableByPath = EditorParams.IsAnimableByPath && list is IAnimable,
 				DisplayName = $"{index}:"
 			};
-			var editor = onAdd(p, ExpandableContent, list).ToList().First();
+			var editor = onAdd(p, elementContainer, list).ToList().First();
 
 			var removeButton = new ThemedDeleteButton();
 			Action removeClicked = () => {
@@ -89,6 +88,7 @@ namespace Tangerine.UI
 					Document.Current.History.CommitTransaction();
 				}
 			};
+			ExpandableContent.Nodes.Insert(index, elementContainer);
 			removeButton.Clicked += () => removeCallback = removeClicked;
 			editor.ContainerWidget.AddNode(removeButton);
 		}
