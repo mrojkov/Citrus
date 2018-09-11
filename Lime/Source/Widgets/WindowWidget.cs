@@ -30,16 +30,18 @@ namespace Lime
 			renderChain = new RenderChain();
 			WidgetContext.GestureManager = new GestureManager(WidgetContext);
 			window.Activated += () => windowActivated = true;
-			window.Sync += SwapRenderObjectLists;
+			window.Sync += Sync;
 			LayoutManager = new LayoutManager();
 		}
 
 		protected virtual bool ContinuousRendering() { return true; }
 
 		private bool prevAnyCaptureKeyPressed;
+		private AssetBundle assetBundle;
 
-		private void SwapRenderObjectLists()
+		private void Sync()
 		{
+			assetBundle = AssetBundle.Initialized ? AssetBundle.Current : null;
 			Toolbox.Swap(ref renderObjectList1, ref renderObjectList2);
 		}
 		
@@ -94,6 +96,9 @@ namespace Lime
 
 		public void RenderAll()
 		{
+			if (assetBundle != null) {
+				AssetBundle.SetCurrent(assetBundle, resetTexturePool: false);
+			}
 			Render(renderObjectList2);
 		}
 
