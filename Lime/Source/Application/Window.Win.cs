@@ -562,6 +562,10 @@ namespace Lime
 			else if (e.Button == MouseButtons.XButton2) {
 				Input.SetKeyState(Key.MouseForward, true);
 			}
+			Input.SetKeyState(Key.Control, Control.ModifierKeys.HasFlag(Keys.Control));
+			Input.SetKeyState(Key.Shift, Control.ModifierKeys.HasFlag(Keys.Shift));
+			Input.SetKeyState(Key.Alt, Control.ModifierKeys.HasFlag(Keys.Alt));
+			Input.SetKeyState(Key.Win, Control.ModifierKeys.HasFlag(Keys.LWin) || Control.ModifierKeys.HasFlag(Keys.RWin));
 		}
 
 		private void OnMouseUp(object sender, MouseEventArgs e)
