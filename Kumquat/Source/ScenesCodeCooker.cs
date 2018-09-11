@@ -23,6 +23,11 @@ namespace Kumquat
 
 	public class CodeCookerCache
 	{
+		private const string CurrentVersion = "1.1";
+
+		[YuzuRequired]
+		public string Version = CurrentVersion;
+
 		[YuzuMember]
 		public Dictionary<string, SceneRecord> SceneFiles = new Dictionary<string, SceneRecord>();
 
@@ -31,6 +36,8 @@ namespace Kumquat
 
 		[YuzuMember]
 		public Dictionary<string, DateTime> GeneratedProjectFileToModificationDate = new Dictionary<string, DateTime>();
+
+		public bool IsActual => Version == CurrentVersion;
 	}
 
 	public class ScenesCodeCooker

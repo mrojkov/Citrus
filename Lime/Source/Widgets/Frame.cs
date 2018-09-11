@@ -54,6 +54,7 @@ namespace Lime
 			this.Position = position;
 		}
 
+		[Obsolete("Use Node.CreateFromAssetBundle instead", false)]
 		public Frame(string path) : this()
 		{
 			CreateFromAssetBundle(path, this);
@@ -213,7 +214,7 @@ namespace Lime
 
 		public static Frame CreateSubframe(string path)
 		{
-			var frame = (Frame)(new Frame(path).Nodes[0]);
+			var frame = (Frame)CreateFromAssetBundle(path).Nodes[0];
 			frame.Unlink();
 			var pathComponent = frame.Components.Get<AssetBundlePathComponent>();
 			if (pathComponent == null) {

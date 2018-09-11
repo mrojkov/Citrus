@@ -752,7 +752,7 @@ namespace Lime
 		{
 			MaterialName = materialName;
 			EffectName = effectName;
-			Scene = new Frame(path);
+			Scene = (Frame)Node.CreateFromAssetBundle(path);
 		}
 
 		public override void Render(Node node)

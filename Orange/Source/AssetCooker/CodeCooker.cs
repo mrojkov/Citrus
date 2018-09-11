@@ -132,6 +132,9 @@ namespace Orange
 						var jd = new Yuzu.Json.JsonDeserializer();
 						cache = (CodeCookerCache)jd.FromStream(new CodeCookerCache(), stream);
 					}
+					if (!cache.IsActual) {
+						throw new System.Exception("Code cooker cache has deprecated version.");
+					}
 					using (new DirectoryChanger(The.Workspace.ProjectDirectory)) {
 						var projectName = The.Workspace.Title;
 						foreach (var platform in Enum.GetValues(typeof(TargetPlatform))) {

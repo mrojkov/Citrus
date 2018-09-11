@@ -9,7 +9,7 @@ namespace <%NAMESPACE%>
 	{
 		public const string AssetPath = <%SCENE_PATH%>;
 
-		public static readonly Frame FrameCache = new Frame(AssetPath);
+		public static readonly Frame FrameCache = (Frame)Node.CreateFromAssetBundle(AssetPath);
 
 		public <%CLASS_NAME%>() : base(FrameCache.Clone<Node>()) { }
 
