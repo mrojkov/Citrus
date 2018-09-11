@@ -31,7 +31,7 @@ namespace Tangerine.Core.Operations
 				foreach (var animator in node.Animators.Where(i => i.AnimationId == Document.Current.AnimationId).ToList()) {
 					var keys = animator.ReadonlyKeys.ToList();
 					foreach (var k in keys) {
-						if (k.Frame >= removeAt) {
+						if (k.Frame != 0 && k.Frame >= removeAt) {
 							var k1 = k.Clone();
 							k1.Frame -= 1;
 							SetKeyframe.Perform(animator, k1);
@@ -56,7 +56,7 @@ namespace Tangerine.Core.Operations
 				}
 			}
 			foreach (var m in markers) {
-				if (m.Frame >= markersRemoveAt) {
+				if (m.Frame != 0 && m.Frame >= markersRemoveAt) {
 					var m1 = m.Clone();
 					m1.Frame -= 1;
 					DeleteMarker.Perform(container, m, false);
