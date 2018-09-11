@@ -58,6 +58,10 @@ namespace Tangerine.Core.Operations
 				if (folder != null) {
 					frame.RootFolder().Items.Add(CloneFolder(folder));
 				}
+				var animator = row.Components.Get<PropertyRow>()?.Animator.Clone();
+				if (animator != null) {
+					frame.Animators.Add(animator);
+				}
 			}
 			frame.SyncFolderDescriptorsAndNodes();
 			return frame;
@@ -130,6 +134,28 @@ namespace Tangerine.Core.Operations
 					return false;
 				}
 			}
+			var animators = frame.Animators;
+			var items = frame.RootFolder().Items.Where(item => NodeCompositionValidator.IsCopyPasteAllowed(item.GetType())).ToList();
+			if (items.Count == 0) {
+				if (animators.Count != 0) {
+					foreach (var row in Document.Current.TopLevelSelectedRows().ToList()) {
+						if (!(row.Components.Get<NodeRow>()?.Node is IAnimationHost animable)) {
+							continue;
+						}
+						Document.Current.History.DoTransaction(() => {
+							foreach (var animator in animators) {
+								if (animable.GetType().GetProperty(animator.TargetPropertyPath) == null) {
+									continue;
+								}
+								foreach (var keyframe in animator.Keys) {
+									SetKeyframe.Perform(animable, animator.TargetPropertyPath, animator.AnimationId, keyframe);
+								}
+							}
+						});
+					}
+				}
+				return true;
+			}
 			FolderItemLocation folderLocation;
 			if (location.ParentRow.Rows.Count > 0) {
 				folderLocation = Row.GetFolderItemLocation(location.ParentRow.Rows[location.Index]);
@@ -139,10 +165,6 @@ namespace Tangerine.Core.Operations
 			}
 			if (!folderLocation.Folder.Expanded) {
 				SetProperty.Perform(folderLocation.Folder, nameof(Folder.Expanded), true);
-			}
-			var items = frame.RootFolder().Items.Where(item => NodeCompositionValidator.IsCopyPasteAllowed(item.GetType())).ToList();
-			if (items.Count == 0) {
-				return true;
 			}
 			var mousePosition = Document.Current.Container.AsWidget?.LocalMousePosition();
 			var shift = mousePosition - items.OfType<Widget>().FirstOrDefault()?.Position;
@@ -211,6 +233,14 @@ namespace Tangerine.Core.Operations
 		{
 			foreach (var row in Document.Current.TopLevelSelectedRows().ToList()) {
 				if (!row.IsCopyPasteAllowed()) {
+					continue;
+				}
+				if (row.Components.Get<PropertyRow>()?.Animator is IAnimator animator) {
+					Document.Current.History.DoTransaction(() => {
+						foreach (var keyframe in animator.Keys.ToList()) {
+							RemoveKeyframe.Perform(animator, keyframe.Frame);
+						}
+					});
 					continue;
 				}
 				var item = Row.GetFolderItem(row);
