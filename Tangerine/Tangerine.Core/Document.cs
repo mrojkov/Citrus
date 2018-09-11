@@ -483,6 +483,11 @@ namespace Tangerine.Core
 
 		public IEnumerable<Node> SelectedNodes()
 		{
+			if (InspectRootNode) {
+				yield return RootNode;
+				yield break;
+			}
+
 			Node prevNode = null;
 			foreach (var row in Rows) {
 				if (row.Selected) {
