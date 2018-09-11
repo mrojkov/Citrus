@@ -16,8 +16,8 @@ namespace Tangerine.UI.Timeline.Operations
 			var processedKeys = new HashSet<IKeyframe>();
 			var operations = new List<Action>();
 			foreach (var row in Document.Current.Rows) {
-				var spans = row.Components.GetOrAdd<GridSpanListComponent>().Spans;
-				foreach (var span in spans.GetNonOverlappedSpans()) {
+				var spans = row.Components.GetOrAdd<GridSpanListComponent>().Spans.GetNonOverlappedSpans(offset.X > 0);
+				foreach (var span in spans) {
 					var node = row.Components.Get<NodeRow>()?.Node ?? row.Components.Get<PropertyRow>()?.Node;
 					if (node == null) {
 						continue;
@@ -51,12 +51,12 @@ namespace Tangerine.UI.Timeline.Operations
 								// The same logic is used to create keyframes as everywhere, but extended by setting
 								// all parameters from a particular keyframe. Yes, this creates some overhead.
 								operations.Add(() => SetAnimableProperty.Perform(destNode, a.TargetPropertyPath, k1.Value, true, false, k1.Frame));
-								operations.Add(() => Core.Operations.SetKeyframe.Perform(destNode, a.TargetPropertyPath, Document.Current.AnimationId, k1));
+								operations.Add(() => SetKeyframe.Perform(destNode, a.TargetPropertyPath, Document.Current.AnimationId, k1));
 							}
 							// Order is importent. RemoveKeyframe must be after SetKeyframe,
 							// to prevent animator clean up if all keys were removed.
 							if (removeOriginals) {
-								operations.Add(() => Core.Operations.RemoveKeyframe.Perform(a, k.Frame));
+								operations.Add(() => RemoveKeyframe.Perform(a, k.Frame));
 							}
 						}
 					}
