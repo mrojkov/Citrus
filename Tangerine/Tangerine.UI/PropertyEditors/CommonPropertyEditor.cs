@@ -219,7 +219,7 @@ namespace Tangerine.UI
 		protected void SetProperty(object value)
 		{
 			DoTransaction(() => {
-				if (IsAnimable) {
+				if (EditorParams.IsAnimable) {
 					foreach (var o in EditorParams.RootObjects) {
 						((IPropertyEditorParamsInternal)EditorParams).PropertySetter(o, EditorParams.PropertyPath, value);
 					}
@@ -234,7 +234,7 @@ namespace Tangerine.UI
 		protected void SetProperty<ValueType>(Func<ValueType, object> valueProducer)
 		{
 			DoTransaction(() => {
-				if (IsAnimable) {
+				if (EditorParams.IsAnimable) {
 					foreach (var o in EditorParams.RootObjects) {
 						var (p, a) = AnimationUtils.GetPropertyByPath((IAnimationHost)o, EditorParams.PropertyPath);
 						var current = p.Info.GetValue(a);

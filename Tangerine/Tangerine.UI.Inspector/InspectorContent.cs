@@ -186,10 +186,6 @@ namespace Tangerine.UI.Inspector
 						widget.AddNode(label);
 					}
 				}
-				var isAnimable = rootObjects.All(a => a is IAnimationHost) &&
-				                 PropertyAttributes<TangerineStaticPropertyAttribute>.Get(property) == null &&
-				                 AnimatorRegistry.Instance.Contains(property.PropertyType) &&
-				                 !Document.Current.InspectRootNode;
 				var @params = new PropertyEditorParams(widget, objects, rootObjects, type, property.Name,
 					string.IsNullOrEmpty(propertyPath)
 						? property.Name
@@ -206,8 +202,8 @@ namespace Tangerine.UI.Inspector
 						var prop = type.GetProperty(property.Name);
 						return prop.GetValue(obj);
 					},
-					PropertySetter = isAnimable ? (PropertySetterDelegate)SetAnimableProperty : SetProperty
 				};
+				@params.PropertySetter = @params.IsAnimable ? (PropertySetterDelegate)SetAnimableProperty : SetProperty;
 				if (!editorParams.Keys.Contains(@params.Group)) {
 					editorParams.Add(@params.Group, new List<PropertyEditorParams>());
 				}

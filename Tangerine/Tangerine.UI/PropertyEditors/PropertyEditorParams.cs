@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Lime;
 using Tangerine.Core;
 
@@ -29,6 +30,10 @@ namespace Tangerine.UI
 		public PropertySetterDelegate PropertySetter { set => propertySetter = value; }
 		public float LabelWidth { get; set; } = 140;
 		public int IndexInList { get; set; } = -1;
+		public bool IsAnimable => RootObjects.All(a => a is IAnimationHost) &&
+			PropertyAttributes<TangerineStaticPropertyAttribute>.Get(PropertyInfo) == null &&
+			AnimatorRegistry.Instance.Contains(PropertyInfo.PropertyType) &&
+			!Document.Current.InspectRootNode;
 
 		public PropertyEditorParams(Widget inspectorPane, IEnumerable<object> objects, IEnumerable<object> rootObjects, Type type, string propertyName, string propertyPath)
 		{
