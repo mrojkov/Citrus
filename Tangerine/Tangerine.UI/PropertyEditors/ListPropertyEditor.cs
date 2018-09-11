@@ -9,7 +9,7 @@ using Tangerine.Core.Operations;
 namespace Tangerine.UI
 {
 	public class ListPropertyEditor<TList, TElement>
-		: ExpandablePropertyEditor<TList> where TList : IList<TElement>, IList, new() where TElement : new()
+		: ExpandablePropertyEditor<TList> where TList : IList<TElement>, IList, new()
 	{
 		private readonly Func<PropertyEditorParams, Widget, IList, IEnumerable<IPropertyEditor>> onAdd;
 		private IList list;
@@ -39,7 +39,7 @@ namespace Tangerine.UI
 						var o = EditorParams.Objects.First();
 						pi.SetValue(o, list = new TList());
 					}
-					var newElement = new TElement();
+					var newElement = typeof(TElement) == typeof(string) ? (TElement)(object)string.Empty : Activator.CreateInstance<TElement>();
 					using (Document.Current.History.BeginTransaction()) {
 						int newIndex = list.Count;
 						InsertIntoList.Perform(list, newIndex, newElement);
