@@ -468,7 +468,7 @@ namespace Tangerine.Dialogs
 		public readonly Key Key;
 	}
 
-	class KeyboardButtonPresenter : SyncCustomPresenter
+	class KeyboardButtonPresenter : SyncCustomPresenter, ThemedButton.IButtonPresenter
 	{
 		private Color4 borderColor;
 		public bool IsModifier { get; set; } = false;
