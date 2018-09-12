@@ -247,6 +247,7 @@ namespace Tangerine.UI.SceneView
 				new RotateWidgetsProcessor(),
 				new RulerProcessor(),
 				new DragNineGridLineProcessor(),
+				new ShiftTimelineProcessor(),
 				new MouseSelectionProcessor(),
 				new ShiftClickProcessor(),
 				new PreviewAnimationProcessor(),
