@@ -187,11 +187,12 @@ namespace Lime
 			ro.ScissorTest = ro.StencilTest = false;
 			var clipRegion = RenderChain.DefaultClipRegion;
 			if (renderTexture != null) {
-				if (GetTangerineFlag(TangerineFlags.DisplayContent)) {
-					throw new NotImplementedException();
-				}
 				// TODO: Implement clipping, for now disable it.
 				clipRegion = RenderChain.DefaultClipRegion;
+				if (GetTangerineFlag(TangerineFlags.DisplayContent)) {
+					ro.ScissorTest = true;
+					ro.ScissorRect = CalculateScissorRectangle(ClipByWidget ?? this);
+				}
 			} else if (ClipChildren == ClipMethod.ScissorTest) {
 				ro.ScissorTest = true;
 				ro.ScissorRect = CalculateScissorRectangle(ClipByWidget ?? this);
@@ -232,7 +233,8 @@ namespace Lime
 			{
 				if (RenderTexture != null) {
 					RenderToTexture();
-				} else if (ScissorTest) {
+				}
+				if (ScissorTest) {
 					RenderWithScissorTest();
 				} else if (StencilTest) {
 					RenderWithStencilTest();
