@@ -6,8 +6,10 @@ namespace Lime
 		private readonly ShaderParams[] shaderParamsArray;
 		private readonly ShaderParams shaderParams;
 		private readonly ShaderParamKey<float> brightThresholdKey;
+		private readonly ShaderParamKey<Vector3> inversedGammaCorrectionKey;
 
 		public float BrightThreshold { get; set; } = 1f;
+		public Vector3 InversedGammaCorrection { get; set; } = Vector3.One;
 
 		public int PassCount => 1;
 
@@ -19,11 +21,13 @@ namespace Lime
 			shaderParams = new ShaderParams();
 			shaderParamsArray = new[] { Renderer.GlobalShaderParams, shaderParams };
 			brightThresholdKey = shaderParams.GetParamKey<float>("brightThreshold");
+			inversedGammaCorrectionKey = shaderParams.GetParamKey<Vector3>("inversedGammaCorrection");
 		}
 
 		public void Apply(int pass)
 		{
 			shaderParams.Set(brightThresholdKey, BrightThreshold);
+			shaderParams.Set(inversedGammaCorrectionKey, InversedGammaCorrection);
 			PlatformRenderer.SetBlendState(blending.GetBlendState());
 			PlatformRenderer.SetShaderProgram(BloomShaderProgram.GetInstance());
 			PlatformRenderer.SetShaderParams(shaderParamsArray);
@@ -65,6 +69,7 @@ namespace Lime
 
 			uniform lowp sampler2D tex1;
 			uniform lowp float brightThreshold;
+			uniform lowp vec3 inversedGammaCorrection;
 
 			void main() {
 				lowp vec3 luminanceVector = vec3(0.2125, 0.7154, 0.0721);
@@ -72,6 +77,7 @@ namespace Lime
 				lowp float luminance = dot(luminanceVector, c.xyz);
 				luminance = max(0.0, luminance - brightThreshold);
 				c.xyz *= sign(luminance);
+				c.xyz = pow(c.xyz, inversedGammaCorrection);
 				c.a = 1.0;
 				gl_FragColor = c;
 			}

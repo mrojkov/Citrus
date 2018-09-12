@@ -233,6 +233,7 @@
     <Compile Include="Source\Widgets\3D\WidgetAdapter3D.cs" />
     <Compile Include="Source\Widgets\Materials\GradientMaterial.cs" />
     <Compile Include="Source\Widgets\Materials\MaterialComponent.cs" />
+    <Compile Include="Source\Widgets\Materials\PostProcessingPresenter.cs" />
     <Compile Include="Source\Widgets\MorphableMesh.cs" />
     <Compile Include="Source\Widgets\MorphableMeshBuilder.cs" />
     <Compile Include="Source\Widgets\NodeBehaviours.cs" />
