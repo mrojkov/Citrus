@@ -65,6 +65,7 @@ namespace Lime
 			public Vector3 Normal;
 		}
 
+		[TangerineIgnore]
 		[YuzuMember]
 		public Submesh3DCollection Submeshes { get; private set; }
 
