@@ -33,7 +33,7 @@ namespace Lime
 		[ThreadStatic]
 		private static Dictionary<string, List<PropertyData>> propertyCache;
 
-		public static (PropertyData, IAnimable) GetPropertyByPath(IAnimationHost host, string propertyPath)
+		public static (PropertyData, IAnimable, int) GetPropertyByPath(IAnimationHost host, string propertyPath)
 		{
 			PropertyData result = PropertyData.Empty;
 			object o = host;
@@ -45,7 +45,7 @@ namespace Lime
 				           ?? global::Yuzu.Util.TypeSerializer.Deserialize(componentTypeName);
 				o = host.Components.Get(type);
 				if (o == null) {
-					return (result, null);
+					return (result, null, -1);
 				}
 				prevIndex = index + 2;
 			}
@@ -65,18 +65,18 @@ namespace Lime
 					result = GetProperty(o.GetType(), p.Substring(0, bracketIndex));
 				}
 				if (result.Info == null) {
-					return (result, null);
+					return (result, null, -1);
 				}
 				if (last) {
-					return (result, (IAnimable)o);
+					return (result, (IAnimable)o, indexInList);
 				} else {
 					if (indexInList == -1) {
 						o = result.Info.GetValue(o);
 					} else {
-						o = result.Info.GetGetMethod().Invoke(o, new object[] { indexInList });
+						o = result.Info.GetValue(o, new object[] { indexInList });
 					}
 					if (o == null) {
-						return (result, null);
+						return (result, null, -1);
 					}
 				}
 				prevIndex = periodIndex + 1;

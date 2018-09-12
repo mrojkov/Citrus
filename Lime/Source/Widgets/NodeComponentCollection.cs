@@ -20,6 +20,7 @@ namespace Lime
 
 	public class NodeComponent : Component, IDisposable, IAnimable
 	{
+		IAnimable IAnimable.Owner { get => Owner; set => Owner = (Node)value; }
 		private Node owner;
 		public Node Owner
 		{
@@ -50,11 +51,6 @@ namespace Lime
 		}
 
 		public virtual void Dispose() { }
-
-		void IAnimable.UnbindAnimators()
-		{
-			((IAnimable)Owner).UnbindAnimators();
-		}
 	}
 
 	public class NodeBehavior : NodeComponent

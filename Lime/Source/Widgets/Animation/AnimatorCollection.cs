@@ -107,7 +107,7 @@ namespace Lime
 				if (TryFind(propertyPath, out animator, animationId)) {
 					return animator;
 				}
-				var (p, _) = AnimationUtils.GetPropertyByPath(owner, propertyPath);
+				var (p, _, _) = AnimationUtils.GetPropertyByPath(owner, propertyPath);
 				var pi = p.Info;
 				if (pi == null) {
 					throw new Lime.Exception("Unknown property {0} in {1}", propertyPath, owner.GetType().Name);

@@ -378,6 +378,7 @@
     <Compile Include="Source\Graphics\IRenderer.cs" />
     <Compile Include="Source\Widgets\3D\RenderObject3D.cs" />
     <Compile Include="Source\Widgets\RendererWrapper.cs" />
+    <Compile Include="Source\Widgets\Animation\IAnimable.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />

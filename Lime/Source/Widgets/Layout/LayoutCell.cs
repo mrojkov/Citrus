@@ -17,20 +17,18 @@ namespace Lime
 		ILayoutCell Clone();
 	}
 
-	public class DefaultLayoutCell : ILayoutCell, IAnimable
+	public class DefaultLayoutCell : Animable, ILayoutCell
 	{
-		public Layout Owner
+		public new Layout Owner
 		{
-			get => owner;
+			get => (Layout)base.Owner;
 			set
 			{
-				owner?.InvalidateConstraintsAndArrangement();
-				owner = value;
-				owner?.InvalidateConstraintsAndArrangement();
+				((Layout)base.Owner)?.InvalidateConstraintsAndArrangement();
+				base.Owner = value;
+				((Layout)base.Owner)?.InvalidateConstraintsAndArrangement();
 			}
 		}
-
-		Layout owner;
 
 		[TangerineIgnore]
 		[YuzuMember]
@@ -40,7 +38,7 @@ namespace Lime
 			set {
 				if (alignment != value) {
 					alignment = value;
-					owner?.InvalidateConstraintsAndArrangement();
+					Owner?.InvalidateConstraintsAndArrangement();
 				}
 			}
 		}
@@ -69,7 +67,7 @@ namespace Lime
 			set {
 				if (columnSpan != value) {
 					columnSpan = value;
-					owner?.InvalidateConstraintsAndArrangement();
+					Owner?.InvalidateConstraintsAndArrangement();
 				}
 			}
 		}
@@ -83,7 +81,7 @@ namespace Lime
 			set {
 				if (rowSpan != value) {
 					rowSpan = value;
-					owner?.InvalidateConstraintsAndArrangement();
+					Owner?.InvalidateConstraintsAndArrangement();
 				}
 			}
 		}
@@ -97,7 +95,7 @@ namespace Lime
 			set {
 				if (stretch != value) {
 					stretch = value;
-					owner?.InvalidateConstraintsAndArrangement();
+					Owner?.InvalidateConstraintsAndArrangement();
 				}
 			}
 		}
@@ -114,7 +112,7 @@ namespace Lime
 			set {
 				if (ignore != value) {
 					ignore = value;
-					owner?.InvalidateConstraintsAndArrangement();
+					Owner?.InvalidateConstraintsAndArrangement();
 				}
 			}
 		}
@@ -133,16 +131,10 @@ namespace Lime
 			StretchY = stretchY;
 		}
 
-		public ILayoutCell Clone()
+		public new ILayoutCell Clone()
 		{
-			var clone = (DefaultLayoutCell)MemberwiseClone();
-			clone.owner = null;
+			var clone = (DefaultLayoutCell)base.Clone();
 			return clone;
-		}
-
-		public void UnbindAnimators()
-		{
-			((IAnimable)owner)?.UnbindAnimators();
 		}
 	}
 

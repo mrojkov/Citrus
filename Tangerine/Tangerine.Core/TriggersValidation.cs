@@ -37,7 +37,7 @@ namespace Tangerine.Core
 		protected override void InternalRedo(SetKeyframe op)
 		{
 			string refinedTrigger;
-			if (!TryRefineTrigger(op.PropertyName, op.AnimationHost, op.Keyframe.Value, out refinedTrigger)) {
+			if (!TryRefineTrigger(op.PropertyPath, op.AnimationHost, op.Keyframe.Value, out refinedTrigger)) {
 				return;
 			}
 

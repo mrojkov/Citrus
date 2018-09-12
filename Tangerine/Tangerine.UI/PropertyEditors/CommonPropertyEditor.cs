@@ -236,8 +236,8 @@ namespace Tangerine.UI
 			DoTransaction(() => {
 				if (EditorParams.IsAnimable) {
 					foreach (var o in EditorParams.RootObjects) {
-						var (p, a) = AnimationUtils.GetPropertyByPath((IAnimationHost)o, EditorParams.PropertyPath);
-						var current = p.Info.GetValue(a);
+						var (p, a, i) = AnimationUtils.GetPropertyByPath((IAnimationHost)o, EditorParams.PropertyPath);
+						var current = i == -1 ? p.Info.GetValue(a) : p.Info.GetValue(a, new object[] { i });
 						((IPropertyEditorParamsInternal)EditorParams).PropertySetter(o, EditorParams.PropertyPath, valueProducer((ValueType)current));
 					}
 				} else {
