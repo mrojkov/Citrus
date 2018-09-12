@@ -8,23 +8,12 @@ namespace Lime
 		private readonly ShaderParamKey<float> blurringXKey;
 		private readonly ShaderParamKey<float> blurringYKey;
 		private readonly ShaderParamKey<Vector2> dirKey;
+		private readonly ShaderParamKey<float> alphaCorrectionKey;
 
-		private float radius = 1;
-		private float textureScaling = 1;
-
-		public float Radius
-		{
-			get => radius;
-			set => radius = Mathf.Clamp(value, 0f, 10f);
-		}
-		public float TextureScaling
-		{
-			get => textureScaling;
-			set => textureScaling = Mathf.Clamp(value, 0.01f, 1f);
-		}
-		public Color4 BackgroundColor { get; set; } = new Color4(127, 127, 127, 0);
-		public Vector2 Resolution { get; set; } = Vector2.One * 128f;
+		public float Radius { get; set; } = 1f;
+		public Vector2 Step { get; set; } = Vector2.One * (1f / 128f);
 		public Vector2 Dir { get; set; } = new Vector2(0, 1);
+		public float AlphaCorrection { get; set; } = 1f;
 
 		public int PassCount => 1;
 
@@ -38,13 +27,15 @@ namespace Lime
 			blurringXKey = shaderParams.GetParamKey<float>("blurringX");
 			blurringYKey = shaderParams.GetParamKey<float>("blurringY");
 			dirKey = shaderParams.GetParamKey<Vector2>("dir");
+			alphaCorrectionKey = shaderParams.GetParamKey<float>("inversedAlphaCorrection");
 		}
 
 		public void Apply(int pass)
 		{
-			shaderParams.Set(blurringXKey, Radius * TextureScaling / Resolution.X);
-			shaderParams.Set(blurringYKey, Radius * TextureScaling / Resolution.Y);
+			shaderParams.Set(blurringXKey, Radius * Step.X);
+			shaderParams.Set(blurringYKey, Radius * Step.Y);
 			shaderParams.Set(dirKey, Dir);
+			shaderParams.Set(alphaCorrectionKey, 1f / AlphaCorrection);
 			PlatformRenderer.SetBlendState(blending.GetBlendState());
 			PlatformRenderer.SetShaderProgram(BlurShaderProgram.GetInstance());
 			PlatformRenderer.SetShaderParams(shaderParamsArray);
@@ -56,8 +47,7 @@ namespace Lime
 		{
 			return new BlurMaterial(blending) {
 				Radius = Radius,
-				BackgroundColor = BackgroundColor,
-				Resolution = Resolution,
+				Step = Step,
 				Dir = Dir
 			};
 		}
@@ -91,6 +81,7 @@ namespace Lime
 			uniform lowp float blurringX;
 			uniform lowp float blurringY;
 			uniform lowp vec2 dir;
+			uniform lowp float inversedAlphaCorrection;
 
 			void main() {
 				lowp vec4 sum = vec4(0.0);
@@ -110,6 +101,7 @@ namespace Lime
 				sum += texture2D(tex1, vec2(tc.x + 3.0*blurringX*hstep, tc.y + 3.0*blurringY*vstep)) * 0.0540540541;
 				sum += texture2D(tex1, vec2(tc.x + 4.0*blurringX*hstep, tc.y + 4.0*blurringY*vstep)) * 0.0162162162;
 
+				sum.w = pow(sum.w, inversedAlphaCorrection);
 				gl_FragColor = color * sum;
 			}
 			";

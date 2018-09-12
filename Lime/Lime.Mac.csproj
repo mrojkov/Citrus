@@ -335,6 +335,7 @@
     <Compile Include="Source\Widgets\Materials\BlurMaterial.cs" />
     <Compile Include="Source\Widgets\Materials\PostProcessingComponent.cs" />
     <Compile Include="Source\Widgets\Materials\PresenterComponent.cs" />
+    <Compile Include="Source\Widgets\Materials\BloomMaterial.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
