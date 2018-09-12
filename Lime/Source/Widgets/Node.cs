@@ -1271,6 +1271,12 @@ namespace Lime
 			}
 		}
 
+		public static T CreateFromAssetBundle<T>(string path, T instance = null, Yuzu yuzu = null) where T : Node
+		{
+			yuzu = yuzu ?? Yuzu.Instance.Value;
+			return (T) CreateFromAssetBundleHelper(path, instance, yuzu, external: false);
+		}
+
 		public static Node CreateFromAssetBundle(string path, Node instance = null, Yuzu yuzu = null)
 		{
 			yuzu = yuzu ?? Yuzu.Instance.Value;
