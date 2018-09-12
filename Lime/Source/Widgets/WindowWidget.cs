@@ -44,7 +44,13 @@ namespace Lime
 			assetBundle = AssetBundle.Initialized ? AssetBundle.Current : null;
 			Toolbox.Swap(ref renderObjectList1, ref renderObjectList2);
 		}
-		
+
+		public void PrepareToRender()
+		{
+			renderObjectList1.Clear();
+			renderChain.GetRenderObjects(renderObjectList1);
+		}
+
 		public override void Update(float delta)
 		{
 			if (ContinuousRendering()) {
@@ -90,8 +96,6 @@ namespace Lime
 			renderChain.Clear();
 			renderChain.ClipRegion = new Rectangle(Vector2.Zero, Size);
 			RenderChainBuilder?.AddToRenderChain(renderChain);
-			renderObjectList1.Clear();
-			renderChain.GetRenderObjects(renderObjectList1);
 		}
 
 		public void RenderAll()
@@ -209,6 +213,7 @@ namespace Lime
 				Size = Window.ClientSize;
 				Update(delta);
 			}
+			PrepareToRender();
 		}
 	}
 
