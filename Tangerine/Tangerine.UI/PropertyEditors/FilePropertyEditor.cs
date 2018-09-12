@@ -75,7 +75,7 @@ namespace Tangerine.UI
 				var owner = obj;
 				AnimationUtils.PropertyData propertyData = AnimationUtils.PropertyData.Empty;
 				if (animationHost != null) {
-					(propertyData, owner) = AnimationUtils.GetPropertyByPath(animationHost, EditorParams.PropertyPath);
+					(propertyData, owner, _) = AnimationUtils.GetPropertyByPath(animationHost, EditorParams.PropertyPath);
 				}
 				if (propertyData.Info != null) {
 					result.Add(ValueToStringConverter((T)propertyData.Info.GetValue(owner)));

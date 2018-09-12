@@ -12,18 +12,6 @@ using Yuzu;
 
 namespace Lime
 {
-	public interface IAnimationHost
-	{
-		AnimatorCollection Animators { get; }
-		void OnTrigger(string property, double animationTimeCorrection = 0);
-		NodeComponentCollection Components { get; }
-	}
-
-	public interface IAnimable
-	{
-		void UnbindAnimators();
-	}
-
 	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true)]
 	public sealed class YuzuSpecializeWithAttribute : Attribute
 	{
@@ -145,6 +133,8 @@ namespace Lime
 		[Trigger]
 		[TangerineKeyframeColor(1)]
 		public string Trigger { get; set; }
+
+		IAnimable IAnimable.Owner { get => null; set => throw new NotSupportedException(); }
 
 		private Node parent;
 		public Node Parent
@@ -930,16 +920,6 @@ namespace Lime
 			{
 				for (var p = Parent; p != null; p = p.Parent) {
 					yield return p;
-				}
-			}
-		}
-
-		void IAnimable.UnbindAnimators()
-		{
-			foreach (var a in Animators) {
-				// Optimization: absence of `.` in path means its a node property being animated, so we never need to unbind it
-				if (a.TargetPropertyPath.IndexOf('.') != -1) {
-					a.Unbind();
 				}
 			}
 		}

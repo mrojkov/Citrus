@@ -27,6 +27,10 @@ namespace Tangerine.Core
 				var actualProperty = index == -1
 					? property
 					: property.Substring(index + 1);
+				int bracketIndex = actualProperty.IndexOf('[');
+				if (bracketIndex != -1) {
+					actualProperty = actualProperty.Substring(0, bracketIndex);
+				}
 				var prop = type.GetProperties().First(p => p.Name == actualProperty);
 				// workaround for hidden properties ambiguity (e.g. Layout.Owner vs NodeComponent.Owner)
 				propMap[property] = attr = prop.GetCustomAttributes(false).FirstOrDefault(i => i is T) as T;

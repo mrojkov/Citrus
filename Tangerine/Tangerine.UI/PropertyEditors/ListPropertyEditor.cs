@@ -73,11 +73,13 @@ namespace Tangerine.UI
 				NumericEditBoxFactory = EditorParams.NumericEditBoxFactory,
 				History = EditorParams.History,
 				DefaultValueGetter = () => default,
-				PropertySetter = (@object, name, value) => Core.Operations.SetIndexedProperty.Perform(@object, name, index, value),
 				IndexInList = index,
 				IsAnimableByPath = EditorParams.IsAnimableByPath && list is IAnimable,
 				DisplayName = $"{index}:"
 			};
+			p.PropertySetter = p.IsAnimable
+				? (PropertySetterDelegate)((@object, name, value) => Core.Operations.SetAnimableProperty.Perform(@object, name, value, CoreUserPreferences.Instance.AutoKeyframes))
+				: (@object, name, value) => Core.Operations.SetIndexedProperty.Perform(@object, name, index, value);
 			var editor = onAdd(p, elementContainer, list).ToList().First();
 
 			var removeButton = new ThemedDeleteButton();

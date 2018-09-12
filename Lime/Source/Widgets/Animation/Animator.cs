@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Yuzu;
 
@@ -73,7 +74,8 @@ namespace Lime
 		public bool IsTriggerable { get; set; }
 		public bool Enabled { get; set; } = true;
 		private delegate void SetterDelegate(T value);
-		private SetterDelegate Setter;
+		private delegate void IndexedSetterDelegate(int index, T value);
+		private SetterDelegate setter;
 		public bool IsZombie { get; private set; }
 
 		[YuzuMember("TargetProperty")]
@@ -142,7 +144,7 @@ namespace Lime
 		public IAnimator Clone()
 		{
 			var clone = (Animator<T>)MemberwiseClone();
-			clone.Setter = null;
+			clone.setter = null;
 			clone.Animable = null;
 			clone.IsZombie = false;
 			clone.Owner = null;
@@ -156,7 +158,7 @@ namespace Lime
 		public void Unbind()
 		{
 			IsZombie = false;
-			Setter = null;
+			setter = null;
 			Animable = null;
 		}
 
@@ -184,27 +186,34 @@ namespace Lime
 		public void Apply(double time)
 		{
 			if (Enabled && !IsZombie) {
-				if (Setter == null) {
+				if (setter == null) {
 					Bind();
 					if (IsZombie) {
 						return;
 					}
 				}
-				Setter(CalcValue(time));
+				setter(CalcValue(time));
 			}
 		}
 
 		private void Bind()
 		{
-			var (p, animable) = AnimationUtils.GetPropertyByPath(Owner, TargetPropertyPath);
+			var (p, animable, index) = AnimationUtils.GetPropertyByPath(Owner, TargetPropertyPath);
 			var mi = p.Info?.GetSetMethod();
-			if (animable == null || mi == null || p.Info.PropertyType != typeof(T)) {
-				IsZombie = true;
+			IsZombie = animable == null || mi == null || p.Info.PropertyType != typeof(T) || animable is IList list && index >= list.Count;
+			if (IsZombie) {
 				return;
 			}
 			Animable = animable;
 			IsTriggerable = p.Triggerable;
-			Setter = (SetterDelegate)Delegate.CreateDelegate(typeof(SetterDelegate), animable, mi);
+			if (index == -1) {
+				setter = (SetterDelegate)Delegate.CreateDelegate(typeof(SetterDelegate), animable, mi);
+			} else {
+				var indexedSetter = (IndexedSetterDelegate)Delegate.CreateDelegate(typeof(IndexedSetterDelegate), animable, mi);
+				setter = (v) => {
+					indexedSetter(index, v);
+				};
+			}
 		}
 
 		public void ResetCache()
