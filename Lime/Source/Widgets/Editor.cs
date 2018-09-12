@@ -248,6 +248,9 @@ namespace Lime
 
 		private bool InsertChar(char ch)
 		{
+#if WIN
+			if (ch == '\r') return false;
+#endif
 			if (CaretPos.TextPos < 0 || CaretPos.TextPos > TextLength) return false;
 			if (!EditorParams.IsAcceptableLength(TextLength + 1)) return false;
 			if (EditorParams.UseSecureString) {
