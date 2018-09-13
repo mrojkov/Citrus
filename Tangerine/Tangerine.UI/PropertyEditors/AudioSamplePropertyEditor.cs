@@ -16,7 +16,7 @@ namespace Tangerine.UI
 		}
 
 		protected override string ValueToStringConverter(SerializableSample obj) {
-			return obj.SerializationPath ?? "";
+			return obj?.SerializationPath ?? "";
 		}
 
 		protected override SerializableSample StringToValueConverter(string path) {
