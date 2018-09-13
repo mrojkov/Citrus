@@ -52,12 +52,16 @@ namespace Lime
 				}
 				animable = animable.Owner;
 			}
-			throw new InvalidOperationException();
+			return null;
 		}
 
 		public static void UnbindAnimators(this IAnimable animable)
 		{
-			foreach (var a in animable.GetAnimationHost().Animators) {
+			var host = animable.GetAnimationHost();
+			if (host == null) {
+				return;
+			}
+			foreach (var a in host.Animators) {
 				// Optimization: absence of `.` in path means its a node property being animated, so we never need to unbind it
 				if (a.TargetPropertyPath.IndexOf('.') != -1) {
 					a.Unbind();
