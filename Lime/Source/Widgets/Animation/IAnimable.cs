@@ -17,11 +17,16 @@ namespace Lime
 			get => owner;
 			set
 			{
+				var previousOwner = owner;
 				owner?.UnbindAnimators();
 				owner = value;
 				owner?.UnbindAnimators();
+				OnOwnerChanged(previousOwner);
 			}
 		}
+
+		protected virtual void OnOwnerChanged(IAnimable previousOwner) { }
+
 		public Animable Clone()
 		{
 			var clone = (Animable)MemberwiseClone();
@@ -39,19 +44,24 @@ namespace Lime
 
 	public static class IAnimableExtensions
 	{
-		public static void UnbindAnimators(this IAnimable animable)
+		public static IAnimationHost GetAnimationHost(this IAnimable animable)
 		{
 			while (animable != null) {
 				if (animable is IAnimationHost host) {
-					foreach (var a in host.Animators) {
-						// Optimization: absence of `.` in path means its a node property being animated, so we never need to unbind it
-						if (a.TargetPropertyPath.IndexOf('.') != -1) {
-							a.Unbind();
-						}
-					}
-					return;
+					return host;
 				}
 				animable = animable.Owner;
+			}
+			throw new InvalidOperationException();
+		}
+
+		public static void UnbindAnimators(this IAnimable animable)
+		{
+			foreach (var a in animable.GetAnimationHost().Animators) {
+				// Optimization: absence of `.` in path means its a node property being animated, so we never need to unbind it
+				if (a.TargetPropertyPath.IndexOf('.') != -1) {
+					a.Unbind();
+				}
 			}
 		}
 	}
@@ -95,7 +105,7 @@ namespace Lime
 
 		public int Count => list.Count;
 		public bool IsReadOnly => false;
-		public void Add(T item) => list.Add(item);
+		public void Add(T item) => Insert(Count, item);
 		public void Clear()
 		{
 			foreach (var item in this) {
@@ -108,20 +118,20 @@ namespace Lime
 		public int IndexOf(T item) => list.IndexOf(item);
 		public void Insert(int index, T item)
 		{
-			InvalidateAnimableOrUnbindAnimators(item);
+			InvalidateAnimableOrUnbindAnimators(item, this);
 			list.Insert(index, item);
 		}
 		public bool Remove(T item) => list.Remove(item);
 		public void RemoveAt(int index)
 		{
-			InvalidateAnimableOrUnbindAnimators(list[index]);
+			InvalidateAnimableOrUnbindAnimators(list[index], null);
 			list.RemoveAt(index);
 		}
 
-		private void InvalidateAnimableOrUnbindAnimators(T item)
+		private void InvalidateAnimableOrUnbindAnimators(T item, IAnimable newOwner = null)
 		{
 			if (item is IAnimable animable) {
-				animable.Owner = null;
+				animable.Owner = newOwner;
 			} else {
 				Owner.UnbindAnimators();
 			}
