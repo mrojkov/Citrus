@@ -127,7 +127,7 @@ namespace Lime
 			}
 		}
 
-		List<T>.Enumerator GetEnumerator() => list.GetEnumerator();
+		public List<T>.Enumerator GetEnumerator() => list.GetEnumerator();
 
 		public AnimableList()
 		{
