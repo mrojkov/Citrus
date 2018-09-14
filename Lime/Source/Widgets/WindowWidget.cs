@@ -87,8 +87,6 @@ namespace Lime
 
 			// Refresh widgets layout.
 			LayoutManager.Layout();
-			
-			RaiseUpdating(delta);
 
 			ManageFocusOnWindowActivation();
 
