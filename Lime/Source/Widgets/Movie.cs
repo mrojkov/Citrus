@@ -19,6 +19,7 @@ namespace Lime
 
 		[YuzuMember]
 		[TangerineKeyframeColor(8)]
+		[TangerineFileProperty(new [] { "ogv" })]
 		public string Path
 		{
 			get { return Yuzu.Current?.ShrinkPath(movieTexture.Path) ?? movieTexture.Path; }

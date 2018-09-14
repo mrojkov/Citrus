@@ -65,6 +65,24 @@ namespace Tangerine.UI
 				SetPathPrefix(oldPrefix, v);
 				prefix.Prefix = v.Trim('/');
 			});
+
+			editor.AddChangeWatcher(CoalescedPropertyValue(), v => editor.Text = ValueToStringConverter(v) ?? "");
+		}
+
+		protected override void FillContextMenuItems(Menu menu)
+		{
+			base.FillContextMenuItems(menu);
+			if (EditorParams.Objects.Skip(1).Any()) {
+				return;
+			}
+			var path = GetPaths().First();
+			if (!string.IsNullOrEmpty(path)) {
+				path = Path.Combine(Project.Current.AssetsDirectory, path);
+				FilesystemCommands.NavigateTo.UserData = path;
+				menu.Insert(0, FilesystemCommands.NavigateTo);
+				FilesystemCommands.OpenInSystemFileManager.UserData = path;
+				menu.Insert(0, FilesystemCommands.OpenInSystemFileManager);
+			}
 		}
 
 		private List<string> GetPaths()

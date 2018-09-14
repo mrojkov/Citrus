@@ -128,45 +128,21 @@ namespace Tangerine.UI
 
 		private ICommand resetToDefault = new Command("Reset To Default");
 
-		void ShowPropertyContextMenu()
+		protected virtual void FillContextMenuItems(Menu menu)
 		{
-			var menu = new Menu {
+			menu.AddRange(new [] {
 				Command.Copy,
-				Command.Paste
-			};
+				Command.Paste,
+			});
 			if (EditorParams.DefaultValueGetter != null) {
 				menu.Insert(0, resetToDefault);
 			}
-			if (!EditorParams.Objects.Skip(1).Any()) {
-				var owner = EditorParams.Objects.First();
-				var value = CoalescedPropertyValue().GetValue();
-				var pi = EditorParams.PropertyInfo;
-				if (value != null) {
-					string path = null;
-					if (pi.PropertyType == typeof(ITexture)) {
-						path = (value as SerializableTexture)?.SerializationPath;
-					} else if (pi.PropertyType == typeof(SerializableSample)) {
-						path = (value as SerializableSample).SerializationPath;
-					} else if (pi.PropertyType == typeof(SerializableFont)) {
-						var name = (value as SerializableFont).Name;
-						if (string.IsNullOrEmpty(name)) {
-							name = FontPool.DefaultFontName;
-						}
-						path = FontPool.DefaultFontDirectory + name;
-					} else if (owner is Movie && pi.Name == "Path") {
-						path = (owner as Movie).Path;
-					} else if (owner is Node && pi.Name == "ContentsPath") {
-						path = (owner as Node).ContentsPath;
-					}
-					if (!string.IsNullOrEmpty(path)) {
-						path = Path.Combine(Project.Current.AssetsDirectory, path);
-						FilesystemCommands.NavigateTo.UserData = path;
-						menu.Insert(0, FilesystemCommands.NavigateTo);
-						FilesystemCommands.OpenInSystemFileManager.UserData = path;
-						menu.Insert(0, FilesystemCommands.OpenInSystemFileManager);
-					}
-				}
-			}
+		}
+
+		void ShowPropertyContextMenu()
+		{
+			var menu = new Menu {};
+			FillContextMenuItems(menu);
 			menu.Popup();
 		}
 

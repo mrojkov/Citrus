@@ -6,9 +6,7 @@ namespace Tangerine.UI
 	public class ContentsPathPropertyEditor : FilePropertyEditor<string>
 	{
 		public ContentsPathPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams, Document.AllowedFileTypes)
-		{
-			editor.AddChangeWatcher(CoalescedPropertyValue(), v => editor.Text = v);
-		}
+		{ }
 
 		protected override bool IsValid(string path)
 		{

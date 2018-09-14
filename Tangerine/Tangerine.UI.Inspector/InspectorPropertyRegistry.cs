@@ -29,6 +29,13 @@ namespace Tangerine.UI.Inspector
 					return Activator.CreateInstance(specializedDropDownListPropertyEditorType, new object[] { c, a.EnumerateItems(c.Objects.First()) }) as IPropertyEditor;
 				}
 			);
+			AddEditor(c => PropertyAttributes<TangerineFilePropertyAttribute>.Get(c.Type, c.PropertyName) != null,
+				c => {
+					var a = PropertyAttributes<TangerineFilePropertyAttribute>.Get(c.Type, c.PropertyName);
+					Type specializedCustomFilePropertyEditorType = typeof(CustomFilePropertyEditor<>).MakeGenericType(c.PropertyInfo.PropertyType);
+					return Activator.CreateInstance(specializedCustomFilePropertyEditorType, new object[] { c, a }) as IPropertyEditor;
+				}
+			);
 			AddEditor(c => c.PropertyName == "ContentsPath", c => AllowChildren(c) ? new ContentsPathPropertyEditor(c) : null);
 			AddEditor(c => c.PropertyName == "Trigger", c => AllowChildren(c) ? new TriggerPropertyEditor(c) : null);
 			AddEditor(typeof(Vector2), c => new Vector2PropertyEditor(c));

@@ -1,9 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
-using Yuzu;
 
 namespace Lime
 {
@@ -125,6 +123,27 @@ namespace Lime
 			Group = group ?? "/";
 			AliasTypeName = aliasTypeName;
 		}
+	}
+
+	public sealed class TangerineFilePropertyAttribute : Attribute
+	{
+		public readonly string[] AllowedFileTypes;
+		private readonly string valueToStringMethodName;
+		private readonly string stringToValueMethodName;
+		public TangerineFilePropertyAttribute(string[] allowedFileTypes, string ValueToStringMethodName = null, string StringToValueMethodName = null)
+		{
+			AllowedFileTypes = allowedFileTypes;
+			stringToValueMethodName = StringToValueMethodName;
+			valueToStringMethodName = ValueToStringMethodName;
+		}
+
+		public T StringToValueConverter<T>(Type type, string s) => string.IsNullOrEmpty(stringToValueMethodName)
+				? (T)(object)(s ?? "")
+				: (T)type.GetMethod(stringToValueMethodName).Invoke(null, new object[] { s });
+
+		public string ValueToStringConverter<T>(Type type, T v) => string.IsNullOrEmpty(valueToStringMethodName)
+			? (string)(object)(v == null ? (T)(object)"" : v)
+			: (string)type.GetMethod(valueToStringMethodName).Invoke(null, new object[] { v });
 	}
 
 	public sealed class TangerineDropDownListPropertyEditorAttribute : Attribute
