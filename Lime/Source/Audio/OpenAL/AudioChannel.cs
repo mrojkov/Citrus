@@ -11,7 +11,7 @@ using OpenTK.Audio.OpenAL;
 
 namespace Lime
 {
-	internal class AudioChannel : IDisposable, IAudioChannel
+	public class AudioChannel : IDisposable, IAudioChannel
 	{
 		public const int BufferSize = 1024 * 32;
 		public const int NumBuffers = 8;

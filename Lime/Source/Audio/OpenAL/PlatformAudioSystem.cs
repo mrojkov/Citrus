@@ -105,6 +105,8 @@ namespace Lime
 			}
 		}
 
+		public static List<AudioChannel> Channels => channels;
+
 #if ANDROID
 		private static void SetActive(bool value)
 		{
