@@ -105,9 +105,9 @@ namespace Lime
 		public void Apply(int pass)
 		{
 			PrepareShaderProgram();
-			shaderParams.Set(shaderParamKeys.World, Renderer.World);
-			shaderParams.Set(shaderParamKeys.WorldView, Renderer.WorldView);
-			shaderParams.Set(shaderParamKeys.WorldViewProj, Renderer.WorldViewProjection);
+			shaderParams.Set(shaderParamKeys.World, Renderer.FixupWVP(Renderer.World));
+			shaderParams.Set(shaderParamKeys.WorldView, Renderer.FixupWVP(Renderer.WorldView));
+			shaderParams.Set(shaderParamKeys.WorldViewProj, Renderer.FixupWVP(Renderer.WorldViewProjection));
 			shaderParams.Set(shaderParamKeys.ColorFactor, Renderer.ColorFactor.ToVector4());
 			shaderParams.Set(shaderParamKeys.DiffuseColor, DiffuseColor.ToVector4());
 			shaderParams.Set(shaderParamKeys.FogColor, FogColor.ToVector4());

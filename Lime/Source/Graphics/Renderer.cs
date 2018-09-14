@@ -195,7 +195,7 @@ namespace Lime
 
 		public static Matrix32 Transform2
 		{
-			private get { return transform2; }
+			get { return transform2; }
 			set {
 				transform2 = value;
 				Transform2Active = !value.IsIdentity();

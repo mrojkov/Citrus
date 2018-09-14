@@ -257,7 +257,7 @@ namespace Lime
 					RenderState.DepthState |
 					RenderState.CullMode);
 				Renderer.View = View;
-				Renderer.Projection = MakeProjection(Width, Height, Transform, Projection, Renderer.Projection);
+				Renderer.Projection = MakeProjection(Width, Height, Transform * Renderer.Transform2, Projection, Renderer.Projection);
 				foreach (var layer in Layers) {
 					try {
 						for (var i = 0; i < layer.ObjectCount; i++) {

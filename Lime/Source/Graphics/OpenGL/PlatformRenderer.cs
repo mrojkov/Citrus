@@ -596,7 +596,7 @@ namespace Lime
 				lastScissorBounds.Width != lastViewport.Width ||
 				lastScissorBounds.Height != lastViewport.Height
 			) {
-				GL.Scissor(lastViewport.X, lastViewport.Y, lastViewport.Width, lastViewport.Height);
+				GL.Scissor(viewport.X, viewport.Y, viewport.Width, viewport.Height);
 				CheckErrors();
 				needRestoreScissorBounds = true;
 			}
