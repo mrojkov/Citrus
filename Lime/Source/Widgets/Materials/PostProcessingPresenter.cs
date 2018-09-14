@@ -73,6 +73,8 @@ namespace Lime
 			ro.BloomGammaCorrection = component.BloomGammaCorrection;
 			ro.BloomTextureScaling = component.BloomTextureScaling;
 			ro.BlendingAddMaterial = blendingAddMaterial;
+			ro.OverallImpactEnabled = component.OverallImpactEnabled;
+			ro.OverallImpactColor = component.OverallImpactColor;
 			return ro;
 		}
 
@@ -123,6 +125,8 @@ namespace Lime
 			public Vector3 BloomGammaCorrection;
 			public float BloomTextureScaling;
 			public IMaterial BlendingAddMaterial;
+			public bool OverallImpactEnabled;
+			public Color4 OverallImpactColor;
 
 			protected override void OnRelease()
 			{
@@ -147,6 +151,15 @@ namespace Lime
 					PrepareBloom();
 				} finally {
 					FinalizeOffscreenRendering();
+				}
+
+				if (OverallImpactEnabled) {
+					if (Texture != null) {
+						RenderTexture(Texture);
+					} else {
+						RenderTexture(SourceTextureBuffer.Texture, customUV1: Size / originalSize);
+					}
+					Color = OverallImpactColor;
 				}
 				RenderTexture(processedTexture);
 				ApplyBloom();

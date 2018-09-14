@@ -6496,6 +6496,17 @@ namespace GeneratedDeserializersBIN
 				result.BlurTextureScaling = d.Reader.ReadSingle();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
+			if (10 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Color4));
+				var tmp3 = new global::Lime.Color4();
+				tmp3.ABGR = d.Reader.ReadUInt32();
+				result.OverallImpactColor = tmp3;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (11 == fd.OurIndex) {
+				result.OverallImpactEnabled = d.Reader.ReadBoolean();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
 		}
 

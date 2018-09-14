@@ -94,6 +94,14 @@ namespace Lime
 			set => bloomTextureScaling = Mathf.Clamp(value, MinimumTextureScaling, MaximumTextureScaling);
 		}
 
+		[YuzuMember]
+		[TangerineGroup("Overall impact")]
+		public bool OverallImpactEnabled { get; set; }
+
+		[YuzuMember]
+		[TangerineGroup("Overall impact")]
+		public Color4 OverallImpactColor { get; set; } = Color4.White;
+
 		public void GetOwnerRenderObjects(RenderChain renderChain, RenderObjectList roObjects)
 		{
 			Owner.RenderChainBuilder = Owner;
