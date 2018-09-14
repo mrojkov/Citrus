@@ -381,6 +381,7 @@
     <Compile Include="Source\Widgets\Materials\PresenterComponent.cs" />
     <Compile Include="Source\Widgets\Materials\BloomMaterial.cs" />
     <Compile Include="Source\Widgets\Materials\PostProcessingPresenter.cs" />
+    <Compile Include="Source\Widgets\Materials\PostProcessingRenderChainBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Android.csproj">

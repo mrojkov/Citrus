@@ -2,9 +2,10 @@ using Yuzu;
 
 namespace Lime
 {
+	// TODO: Attribute to exclude components with custom presenters and/or custom render chain builders
 	[TangerineRegisterComponent]
-	[AllowedComponentOwnerTypes(typeof(Image))]
-	public class PostProcessingComponent : PresenterComponent<PostProcessingPresenter>
+	[AllowedComponentOwnerTypes(typeof(Widget))]
+	public class PostProcessingComponent : NodeComponent
 	{
 		private const float MinimumTextureScaling = 0.01f;
 		private const float MaximumTextureScaling = 1f;
@@ -14,6 +15,10 @@ namespace Lime
 		internal BlurMaterial BlurMaterial { get; private set; } = new BlurMaterial();
 		internal BloomMaterial BloomMaterial { get; private set; } = new BloomMaterial();
 
+		private PostProcessingPresenter presenter = new PostProcessingPresenter();
+		private IPresenter savedPresenter;
+		private PostProcessingRenderChainBuilder renderChainBuilder = new PostProcessingRenderChainBuilder();
+		private IRenderChainBuilder savedRenderChainBuilder;
 		private float blurRadius = 1f;
 		private float blurTextureScaling = 1f;
 		private float blurAlphaCorrection = 1f;
@@ -90,12 +95,41 @@ namespace Lime
 			set => bloomTextureScaling = Mathf.Clamp(value, MinimumTextureScaling, MaximumTextureScaling);
 		}
 
+		public void GetOwnerRenderObjects(RenderChain renderChain, RenderObjectList roObjects)
+		{
+			Owner.RenderChainBuilder = savedRenderChainBuilder;
+			Owner.Presenter = savedPresenter;
+			Owner.AddToRenderChain(renderChain);
+			renderChain.GetRenderObjects(roObjects);
+			Owner.RenderChainBuilder = renderChainBuilder;
+			Owner.Presenter = presenter;
+		}
+
+		protected override void OnOwnerChanged(Node oldOwner)
+		{
+			base.OnOwnerChanged(oldOwner);
+			if (oldOwner != null) {
+				oldOwner.Presenter = savedPresenter;
+				oldOwner.RenderChainBuilder = savedRenderChainBuilder;
+				renderChainBuilder.Owner = null;
+			}
+			if (Owner != null) {
+				savedPresenter = Owner.Presenter;
+				Owner.Presenter = presenter;
+				savedRenderChainBuilder = Owner.RenderChainBuilder;
+				Owner.RenderChainBuilder = renderChainBuilder;
+				renderChainBuilder.Owner = Owner.AsWidget;
+			}
+		}
+
 		public override NodeComponent Clone()
 		{
-			var component = (PostProcessingComponent)base.Clone();
-			component.BlurMaterial = (BlurMaterial)BlurMaterial.Clone();
-			component.BloomMaterial = (BloomMaterial)BloomMaterial.Clone();
-			return component;
+			var clone = (PostProcessingComponent)base.Clone();
+			clone.presenter = (PostProcessingPresenter)presenter.Clone();
+			clone.renderChainBuilder = (PostProcessingRenderChainBuilder)renderChainBuilder.Clone(null);
+			clone.BlurMaterial = (BlurMaterial)BlurMaterial.Clone();
+			clone.BloomMaterial = (BloomMaterial)BloomMaterial.Clone();
+			return clone;
 		}
 	}
 }
