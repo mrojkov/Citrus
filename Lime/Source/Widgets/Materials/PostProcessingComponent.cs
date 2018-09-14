@@ -15,10 +15,9 @@ namespace Lime
 		internal BlurMaterial BlurMaterial { get; private set; } = new BlurMaterial();
 		internal BloomMaterial BloomMaterial { get; private set; } = new BloomMaterial();
 
+		// TODO: Solve promblem of storing and restoring savedPresenter&savedRenderChainBuilder
 		private PostProcessingPresenter presenter = new PostProcessingPresenter();
-		private IPresenter savedPresenter;
 		private PostProcessingRenderChainBuilder renderChainBuilder = new PostProcessingRenderChainBuilder();
-		private IRenderChainBuilder savedRenderChainBuilder;
 		private float blurRadius = 1f;
 		private float blurTextureScaling = 1f;
 		private float blurAlphaCorrection = 1f;
@@ -97,8 +96,8 @@ namespace Lime
 
 		public void GetOwnerRenderObjects(RenderChain renderChain, RenderObjectList roObjects)
 		{
-			Owner.RenderChainBuilder = savedRenderChainBuilder;
-			Owner.Presenter = savedPresenter;
+			Owner.RenderChainBuilder = Owner;
+			Owner.Presenter = DefaultPresenter.Instance;
 			Owner.AddToRenderChain(renderChain);
 			renderChain.GetRenderObjects(roObjects);
 			Owner.RenderChainBuilder = renderChainBuilder;
@@ -109,14 +108,12 @@ namespace Lime
 		{
 			base.OnOwnerChanged(oldOwner);
 			if (oldOwner != null) {
-				oldOwner.Presenter = savedPresenter;
-				oldOwner.RenderChainBuilder = savedRenderChainBuilder;
+				oldOwner.Presenter = DefaultPresenter.Instance;
+				oldOwner.RenderChainBuilder = oldOwner;
 				renderChainBuilder.Owner = null;
 			}
 			if (Owner != null) {
-				savedPresenter = Owner.Presenter;
 				Owner.Presenter = presenter;
-				savedRenderChainBuilder = Owner.RenderChainBuilder;
 				Owner.RenderChainBuilder = renderChainBuilder;
 				renderChainBuilder.Owner = Owner.AsWidget;
 			}
