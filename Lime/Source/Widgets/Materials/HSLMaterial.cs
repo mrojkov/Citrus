@@ -52,37 +52,37 @@ namespace Lime
 
 			varying lowp vec2 v_uv;
 
-			vec3 HslToRgb(vec3 hslColor)
+			lowp vec3 HslToRgb(lowp vec3 hslColor)
 			{
-			    vec3 rgbColor = vec3(abs(hslColor.x - 3.0) - 1.0, 2.0 - abs(hslColor.x * 6.0 - 2.0), 2.0 - abs(hslColor.x * 6.0 - 4.0));
-			    float saturationLightness = (1.0 - abs(2.0 * hslColor.z - 1.0)) * hslColor.y;
+			    lowp vec3 rgbColor = vec3(abs(hslColor.x - 3.0) - 1.0, 2.0 - abs(hslColor.x * 6.0 - 2.0), 2.0 - abs(hslColor.x * 6.0 - 4.0));
+			    lowp float saturationLightness = (1.0 - abs(2.0 * hslColor.z - 1.0)) * hslColor.y;
 			    return clamp(rgbColor, vec3(0.0), vec3(1.0)) * saturationLightness + vec3(hslColor.z - saturationLightness / 2.0);
 			}
 
-			vec3 RgbToHsl(vec3 rgbColor)
+			lowp vec3 RgbToHsl(lowp vec3 rgbColor)
 			{
-			    vec4 chroma = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+			    lowp vec4 chroma = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
 			    // Find max and min values.
-			    vec4 tmp = mix(vec4(rgbColor.bg, chroma.wz), vec4(rgbColor.gb, chroma.xy), step(rgbColor.b, rgbColor.g));
-			    vec4 values = mix(vec4(tmp.xyw, rgbColor.r), vec4(rgbColor.r, tmp.yzx), step(tmp.x, rgbColor.r));
-			    float minValue = min(values.w, values.y);
-			    float maxValue = values.x;
-			    float delta = maxValue - minValue;
-			    float e = 1.0e-10;
-			    float hue = abs(values.z + (values.w - values.y) / (6.0 * delta + e));
-			    float lightness = 0.5 * abs(maxValue + minValue);
+			    lowp vec4 tmp = mix(vec4(rgbColor.bg, chroma.wz), vec4(rgbColor.gb, chroma.xy), step(rgbColor.b, rgbColor.g));
+			    lowp vec4 values = mix(vec4(tmp.xyw, rgbColor.r), vec4(rgbColor.r, tmp.yzx), step(tmp.x, rgbColor.r));
+			    lowp float minValue = min(values.w, values.y);
+			    lowp float maxValue = values.x;
+			    lowp float delta = maxValue - minValue;
+			    lowp float e = 1.0e-10;
+			    lowp float hue = abs(values.z + (values.w - values.y) / (6.0 * delta + e));
+			    lowp float lightness = 0.5 * abs(maxValue + minValue);
 			    // If max == min set saturation to 1.0.
-			    float saturation = mix(1.0, clamp(delta / (1.0 - abs(2.0 * lightness - 1.0) + e), 0.0, 1.0), step(e, delta));
+			    lowp float saturation = mix(1.0, clamp(delta / (1.0 - abs(2.0 * lightness - 1.0) + e), 0.0, 1.0), step(e, delta));
 			    return vec3(hue, saturation, lightness);
 			}
 
 			void main()
 			{
-			    vec4 color = texture2D(tex1, v_uv);
-			    vec3 hslColor = RgbToHsl(color.rgb);
+			    lowp vec4 color = texture2D(tex1, v_uv);
+			    lowp vec3 hslColor = RgbToHsl(color.rgb);
 			    hslColor.x += u_hsl.x;
 			    hslColor.yz *= u_hsl.yz;
-			    vec3 rgbColor = HslToRgb(hslColor);
+			    lowp vec3 rgbColor = HslToRgb(hslColor);
 			    gl_FragColor = vec4(rgbColor, color.a);
 			}";
 
