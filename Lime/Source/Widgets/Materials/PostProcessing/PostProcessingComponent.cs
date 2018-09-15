@@ -138,6 +138,10 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineGroup("4. Bloom effect")]
+		public Color4 BloomColor { get; set; } = Color4.White;
+
+		[YuzuMember]
 		[TangerineGroup("5. Overall impact")]
 		public bool OverallImpactEnabled { get; set; }
 

@@ -84,6 +84,7 @@ namespace Lime
 			ro.BloomBrightThreshold = component.BloomBrightThreshold * 0.01f;
 			ro.BloomGammaCorrection = component.BloomGammaCorrection;
 			ro.BloomTextureScaling = component.BloomTextureScaling * 0.01f;
+			ro.BloomColor = component.BloomColor;
 			ro.OverallImpactEnabled = component.OverallImpactEnabled;
 			ro.OverallImpactColor = component.OverallImpactColor;
 			ro.BlendingDefaultMaterial = blendingDefaultMaterial;

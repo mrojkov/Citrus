@@ -41,6 +41,7 @@ namespace Lime
 		public float BloomBrightThreshold;
 		public Vector3 BloomGammaCorrection;
 		public float BloomTextureScaling;
+		public Color4 BloomColor;
 		public bool OverallImpactEnabled;
 		public Color4 OverallImpactColor;
 		public IMaterial BlendingDefaultMaterial;
@@ -205,7 +206,7 @@ namespace Lime
 			BlurMaterial.Step = new Vector2(BloomTextureScaling / bloomViewportSize.Width, BloomTextureScaling / bloomViewportSize.Height);
 			BlurMaterial.Dir = Vector2.Down;
 			BlurMaterial.AlphaCorrection = 1f;
-			RenderToTexture(BloomBuffer.FirstBlurPassTexture, BloomBuffer.BrightColorsTexture, BlurMaterial, Color4.White, Color4.Black, bloomViewportSize, bloomUV1);
+			RenderToTexture(BloomBuffer.FirstBlurPassTexture, BloomBuffer.BrightColorsTexture, BlurMaterial, BloomColor, Color4.Black, bloomViewportSize, bloomUV1);
 			BlurMaterial.Dir = Vector2.Right;
 			RenderToTexture(BloomBuffer.FinalTexture, BloomBuffer.FirstBlurPassTexture, BlurMaterial, Color4.White, Color4.Black, bloomViewportSize, bloomUV1);
 
