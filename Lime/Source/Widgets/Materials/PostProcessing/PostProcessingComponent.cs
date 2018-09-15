@@ -26,8 +26,12 @@ namespace Lime
 		private Vector3 bloomGammaCorrection = Vector3.One;
 		private float bloomTextureScaling = 0.5f;
 
+		[TangerineGroup("1. Debug view")]
+		[TangerineInspect]
+		public PostProcessingPresenter.DebugViewMode DebugViewMode { get; set; } = PostProcessingPresenter.DebugViewMode.None;
+
 		[YuzuMember]
-		[TangerineGroup("Blur effect")]
+		[TangerineGroup("2. Blur effect")]
 		public float BlurRadius
 		{
 			get => blurRadius;
@@ -35,7 +39,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		[TangerineGroup("Blur effect")]
+		[TangerineGroup("2. Blur effect")]
 		public float BlurTextureScaling
 		{
 			get => blurTextureScaling;
@@ -43,7 +47,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		[TangerineGroup("Blur effect")]
+		[TangerineGroup("2. Blur effect")]
 		public float BlurAlphaCorrection
 		{
 			get => blurAlphaCorrection;
@@ -51,15 +55,15 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		[TangerineGroup("Blur effect")]
+		[TangerineGroup("2. Blur effect")]
 		public Color4 BlurBackgroundColor { get; set; } = new Color4(127, 127, 127, 0);
 
 		[YuzuMember]
-		[TangerineGroup("Bloom effect")]
+		[TangerineGroup("3. Bloom effect")]
 		public bool BloomEnabled { get; set; }
 
 		[YuzuMember]
-		[TangerineGroup("Bloom effect")]
+		[TangerineGroup("3. Bloom effect")]
 		public float BloomStrength
 		{
 			get => bloomStrength;
@@ -67,7 +71,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		[TangerineGroup("Bloom effect")]
+		[TangerineGroup("3. Bloom effect")]
 		public float BloomBrightThreshold
 		{
 			get => bloomBrightThreshold;
@@ -75,7 +79,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		[TangerineGroup("Bloom effect")]
+		[TangerineGroup("3. Bloom effect")]
 		public Vector3 BloomGammaCorrection
 		{
 			get => bloomGammaCorrection;
@@ -87,7 +91,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		[TangerineGroup("Bloom effect")]
+		[TangerineGroup("3. Bloom effect")]
 		public float BloomTextureScaling
 		{
 			get => bloomTextureScaling;
@@ -95,11 +99,11 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		[TangerineGroup("Overall impact")]
+		[TangerineGroup("4. Overall impact")]
 		public bool OverallImpactEnabled { get; set; }
 
 		[YuzuMember]
-		[TangerineGroup("Overall impact")]
+		[TangerineGroup("4. Overall impact")]
 		public Color4 OverallImpactColor { get; set; } = Color4.White;
 
 		public void GetOwnerRenderObjects(RenderChain renderChain, RenderObjectList roObjects)
