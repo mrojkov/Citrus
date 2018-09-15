@@ -10,7 +10,8 @@ namespace Lime
 		private IMaterial material;
 		private Blending blending;
 		private ShaderId shader;
-		private SourceTextureBuffer sourceTextureBuffer;
+		private TextureBuffer sourceTextureBuffer;
+		private HSLBuffer hslBuffer;
 		private BlurBuffer blurBuffer;
 		private BloomBuffer bloomBuffer;
 
@@ -42,13 +43,16 @@ namespace Lime
 
 			// TODO: Buffers pool
 			// TODO: Recreate buffers when image.Texture was changed
-			if (asImage == null && (sourceTextureBuffer == null || sourceTextureBuffer.Size.Width < bufferSize.Width || sourceTextureBuffer.Size.Height < bufferSize.Height)) {
-				sourceTextureBuffer = new SourceTextureBuffer(bufferSizeWithReserve);
+			if (asImage == null && (sourceTextureBuffer?.IsLessThen(bufferSize) ?? true)) {
+				sourceTextureBuffer = new TextureBuffer(bufferSizeWithReserve);
 			}
-			if (blurBuffer == null || blurBuffer.Size.Width < bufferSize.Width || blurBuffer.Size.Height < bufferSize.Height) {
+			if (component.HSLEnabled && (hslBuffer?.IsLessThen(bufferSize) ?? true)) {
+				hslBuffer = new HSLBuffer(bufferSizeWithReserve);
+			}
+			if (component.BlurEnabled && (blurBuffer?.IsLessThen(bufferSize) ?? true)) {
 				blurBuffer = new BlurBuffer(bufferSizeWithReserve);
 			}
-			if (bloomBuffer == null || bloomBuffer.Size.Width < bufferSize.Width || bloomBuffer.Size.Height < bufferSize.Height) {
+			if (component.BloomEnabled && (bloomBuffer?.IsLessThen(bufferSize) ?? true)) {
 				bloomBuffer = new BloomBuffer(bufferSizeWithReserve);
 			}
 
@@ -62,19 +66,24 @@ namespace Lime
 			ro.UV1 = asImage?.UV1 ?? Vector2.One;
 			ro.DebugViewMode = component.DebugViewMode;
 			ro.SourceTextureBuffer = sourceTextureBuffer;
+			ro.HSLBuffer = hslBuffer;
+			ro.HSLMaterial = component.HSLMaterial;
+			ro.HSLEnabled = component.HSLEnabled;
+			ro.HSL = component.HSL;
 			ro.BlurBuffer = blurBuffer;
 			ro.BlurMaterial = component.BlurMaterial;
+			ro.BlurEnabled = component.BlurEnabled;
 			ro.BlurRadius = component.BlurRadius;
-			ro.BlurTextureScaling = component.BlurTextureScaling;
+			ro.BlurTextureScaling = component.BlurTextureScaling * 0.01f;
 			ro.BlurAlphaCorrection = component.BlurAlphaCorrection;
 			ro.BlurBackgroundColor = component.BlurBackgroundColor;
 			ro.BloomBuffer = bloomBuffer;
 			ro.BloomMaterial = component.BloomMaterial;
 			ro.BloomEnabled = component.BloomEnabled;
 			ro.BloomStrength = component.BloomStrength;
-			ro.BloomBrightThreshold = component.BloomBrightThreshold;
+			ro.BloomBrightThreshold = component.BloomBrightThreshold * 0.01f;
 			ro.BloomGammaCorrection = component.BloomGammaCorrection;
-			ro.BloomTextureScaling = component.BloomTextureScaling;
+			ro.BloomTextureScaling = component.BloomTextureScaling * 0.01f;
 			ro.OverallImpactEnabled = component.OverallImpactEnabled;
 			ro.OverallImpactColor = component.OverallImpactColor;
 			ro.BlendingDefaultMaterial = blendingDefaultMaterial;
@@ -106,46 +115,61 @@ namespace Lime
 			Bloom
 		}
 
-		internal class SourceTextureBuffer
+		internal class TextureBuffer
 		{
-			private RenderTexture texture;
+			private RenderTexture finalTexture;
+
+			protected bool IsDirty { get; set; } = true;
 
 			public Size Size { get; }
-			public RenderTexture Texture => texture ?? (texture = new RenderTexture(Size.Width, Size.Height));
+			public RenderTexture FinalTexture => finalTexture ?? (finalTexture = new RenderTexture(Size.Width, Size.Height));
 
-			public SourceTextureBuffer(Size size)
+			public TextureBuffer(Size size)
 			{
 				Size = size;
 			}
+
+			public bool IsLessThen(Size size) => Size.Width < size.Width || Size.Height < size.Height;
+			public void MarkAsDirty() => IsDirty = true;
 		}
 
-		internal class BlurBuffer
+		internal class HSLBuffer : TextureBuffer
 		{
-			private bool isDirty = true;
+			private Vector3 hsl = new Vector3(float.NaN, float.NaN, float.NaN);
+
+			public HSLBuffer(Size size) : base(size) { }
+
+			public bool EqualRenderParameters(Vector3 hsl) => !IsDirty && this.hsl == hsl;
+
+			public void SetParameters(Vector3 hsl)
+			{
+				IsDirty = false;
+				this.hsl = hsl;
+			}
+		}
+
+		internal class BlurBuffer : TextureBuffer
+		{
+			private RenderTexture firstPassTexture;
 			private float radius = float.NaN;
 			private float textureScaling = float.NaN;
 			private float alphaCorrection = float.NaN;
 			private Color4 backgroundColor = Color4.Zero;
 
-			public RenderTexture FirstPassTexture { get; }
-			public RenderTexture FinalTexture { get; }
-			public Size Size { get; }
+			public RenderTexture FirstPassTexture => firstPassTexture ?? (firstPassTexture = new RenderTexture(Size.Width, Size.Height));
 
-			public BlurBuffer(Size size)
-			{
-				Size = size;
-				FirstPassTexture = new RenderTexture(size.Width, size.Height);
-				FinalTexture = new RenderTexture(size.Width, size.Height);
-			}
-
-			public void MarkAsDirty() => isDirty = true;
+			public BlurBuffer(Size size) : base(size) { }
 
 			public bool EqualRenderParameters(float radius, float textureScaling, float alphaCorrection, Color4 backgroundColor) =>
-				!isDirty && this.radius == radius && this.textureScaling == textureScaling && this.alphaCorrection == alphaCorrection && this.backgroundColor == backgroundColor;
+				!IsDirty &&
+				this.radius == radius &&
+				this.textureScaling == textureScaling &&
+				this.alphaCorrection == alphaCorrection &&
+				this.backgroundColor == backgroundColor;
 
 			public void SetParameters(float radius, float textureScaling, float alphaCorrection, Color4 backgroundColor)
 			{
-				isDirty = false;
+				IsDirty = false;
 				this.radius = radius;
 				this.textureScaling = textureScaling;
 				this.alphaCorrection = alphaCorrection;
@@ -153,35 +177,30 @@ namespace Lime
 			}
 		}
 
-		internal class BloomBuffer
+		internal class BloomBuffer : TextureBuffer
 		{
-			private bool isDirty = true;
+			private RenderTexture brightColorsTexture;
+			private RenderTexture firstBlurPassTexture;
 			private float strength = float.NaN;
 			private float brightThreshold = float.NaN;
 			private Vector3 gammaCorrection = -Vector3.One;
 			private float textureScaling = float.NaN;
 
-			public RenderTexture BrightColorsTexture { get; }
-			public RenderTexture FirstBlurPassTexture { get; }
-			public RenderTexture FinalTexture { get; }
-			public Size Size { get; }
+			public RenderTexture BrightColorsTexture => brightColorsTexture ?? (brightColorsTexture = new RenderTexture(Size.Width, Size.Height));
+			public RenderTexture FirstBlurPassTexture => firstBlurPassTexture ?? (firstBlurPassTexture = new RenderTexture(Size.Width, Size.Height));
 
-			public BloomBuffer(Size size)
-			{
-				Size = size;
-				BrightColorsTexture = new RenderTexture(size.Width, size.Height);
-				FirstBlurPassTexture = new RenderTexture(size.Width, size.Height);
-				FinalTexture = new RenderTexture(size.Width, size.Height);
-			}
-
-			public void MarkAsDirty() => isDirty = true;
+			public BloomBuffer(Size size) : base(size) { }
 
 			public bool EqualRenderParameters(float strength, float brightThreshold, Vector3 gammaCorrection, float textureScaling) =>
-				!isDirty && this.strength == strength && this.brightThreshold == brightThreshold && this.gammaCorrection == gammaCorrection && this.textureScaling == textureScaling;
+				!IsDirty &&
+				this.strength == strength &&
+				this.brightThreshold == brightThreshold &&
+				this.gammaCorrection == gammaCorrection &&
+				this.textureScaling == textureScaling;
 
 			public void SetParameters(float strength, float brightThreshold, Vector3 gammaCorrection, float textureScaling)
 			{
-				isDirty = false;
+				IsDirty = false;
 				this.strength = strength;
 				this.brightThreshold = brightThreshold;
 				this.gammaCorrection = gammaCorrection;
