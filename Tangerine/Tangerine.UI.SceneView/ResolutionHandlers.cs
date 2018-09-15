@@ -136,7 +136,7 @@ namespace Tangerine.UI.SceneView
 		private static ResolutionPreview DisabledResolutionPreview => new ResolutionPreview {
 			Enabled = false,
 			Preset = ProjectPreferences.Instance.Resolutions.First(),
-			IsPortrait = false
+			IsPortrait = !ProjectPreferences.Instance.IsLandscapeDefault
 		};
 
 		private readonly ResolutionPreview resolutionPreview;
