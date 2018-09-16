@@ -23,6 +23,8 @@ namespace Lime
 		public Vector2 UV1;
 		public PostProcessingPresenter.DebugViewMode DebugViewMode;
 		public PostProcessingPresenter.TextureBuffer SourceTextureBuffer;
+		public PostProcessingPresenter.TextureBuffer FirstTemporaryBuffer;
+		public PostProcessingPresenter.TextureBuffer SecondTemporaryBuffer;
 		public PostProcessingPresenter.HSLBuffer HSLBuffer;
 		public HSLMaterial HSLMaterial;
 		public bool HSLEnabled;
@@ -42,6 +44,10 @@ namespace Lime
 		public Vector3 BloomGammaCorrection;
 		public float BloomTextureScaling;
 		public Color4 BloomColor;
+		public bool NoiseEnabled;
+		public float NoiseStrength;
+		public ITexture NoiseTexture;
+		public SoftLightMaterial SoftLightMaterial;
 		public bool OverallImpactEnabled;
 		public Color4 OverallImpactColor;
 		public IMaterial BlendingDefaultMaterial;
@@ -54,12 +60,16 @@ namespace Lime
 			Texture = null;
 			Material = null;
 			SourceTextureBuffer = null;
+			FirstTemporaryBuffer = null;
+			SecondTemporaryBuffer = null;
 			HSLBuffer = null;
 			HSLMaterial = null;
 			BlurBuffer = null;
 			BlurMaterial = null;
 			BloomBuffer = null;
 			BloomMaterial = null;
+			NoiseTexture = null;
+			SoftLightMaterial = null;
 			BlendingDefaultMaterial = null;
 			BlendingAddMaterial = null;
 		}
@@ -72,6 +82,9 @@ namespace Lime
 				ApplyHSL();
 				ApplyBlur();
 				PrepareBloom();
+				if (NoiseEnabled) {
+					MergeBloom();
+				}
 			} finally {
 				FinalizeOffscreenRendering();
 			}
@@ -85,12 +98,16 @@ namespace Lime
 						if (Texture != null) {
 							RenderTexture(Texture);
 						} else {
-							RenderTexture(SourceTextureBuffer.FinalTexture, customUV1: Size / originalSize);
+							RenderTexture(SourceTextureBuffer.Texture, customUV1: Size / originalSize);
 						}
 						Color = OverallImpactColor;
 					}
-					RenderTexture(processedTexture);
-					ApplyBloom();
+					if (!NoiseEnabled) {
+						RenderTexture(processedTexture);
+						ApplyBloom();
+					} else {
+						RenderNoisedTexture();
+					}
 					break;
 			}
 		}
@@ -119,17 +136,17 @@ namespace Lime
 				viewportSize = (Size)Size;
 				textureSize = Size;
 				originalSize = (Vector2)SourceTextureBuffer.Size;
-				SourceTextureBuffer.FinalTexture.SetAsRenderTarget();
+				SourceTextureBuffer.Texture.SetAsRenderTarget();
 				try {
 					Renderer.Viewport = new Viewport(0, 0, viewportSize.Width, viewportSize.Height);
 					Renderer.Clear(Color4.Zero);
 					Renderer.Transform2 = LocalToWorldTransform.CalcInversed();
 					Objects.Render();
 				} finally {
-					SourceTextureBuffer.FinalTexture.RestoreRenderTarget();
+					SourceTextureBuffer.Texture.RestoreRenderTarget();
 					Renderer.PopState();
 				}
-				processedTexture = SourceTextureBuffer.FinalTexture;
+				processedTexture = SourceTextureBuffer.Texture;
 				processedUV1 = (Vector2)viewportSize / originalSize;
 				HSLBuffer?.MarkAsDirty();
 				BlurBuffer?.MarkAsDirty();
@@ -144,14 +161,14 @@ namespace Lime
 				return;
 			}
 			if (HSLBuffer.EqualRenderParameters(HSL)) {
-				processedTexture = HSLBuffer.FinalTexture;
+				processedTexture = HSLBuffer.Texture;
 				return;
 			}
 
 			PrepareOffscreenRendering(originalSize);
 			HSLMaterial.HSL = HSL;
-			RenderToTexture(HSLBuffer.FinalTexture, processedTexture, HSLMaterial, Color4.White, Color4.Zero);
-			processedTexture = HSLBuffer.FinalTexture;
+			RenderToTexture(HSLBuffer.Texture, processedTexture, HSLMaterial, Color4.White, Color4.Zero);
+			processedTexture = HSLBuffer.Texture;
 
 			HSLBuffer.SetParameters(HSL);
 		}
@@ -163,7 +180,7 @@ namespace Lime
 			}
 			viewportSize = (Size)((Vector2)viewportSize * BlurTextureScaling);
 			if (BlurBuffer.EqualRenderParameters(BlurRadius, BlurTextureScaling, BlurAlphaCorrection, BlurBackgroundColor)) {
-				processedTexture = BlurBuffer.FinalTexture;
+				processedTexture = BlurBuffer.Texture;
 				processedUV1 = (Vector2)viewportSize / originalSize;
 				return;
 			}
@@ -173,12 +190,12 @@ namespace Lime
 			BlurMaterial.Step = new Vector2(BlurTextureScaling / viewportSize.Width, BlurTextureScaling / viewportSize.Height);
 			BlurMaterial.Dir = Vector2.Down;
 			BlurMaterial.AlphaCorrection = BlurAlphaCorrection;
-			RenderToTexture(BlurBuffer.FirstPassTexture, processedTexture, BlurMaterial, Color4.White, BlurBackgroundColor);
+			RenderToTexture(FirstTemporaryBuffer.Texture, processedTexture, BlurMaterial, Color4.White, BlurBackgroundColor);
 			processedUV1 = (Vector2)viewportSize / originalSize;
 			BlurMaterial.Dir = Vector2.Right;
-			RenderToTexture(BlurBuffer.FinalTexture, BlurBuffer.FirstPassTexture, BlurMaterial, Color4.White, BlurBackgroundColor);
+			RenderToTexture(BlurBuffer.Texture, FirstTemporaryBuffer.Texture, BlurMaterial, Color4.White, BlurBackgroundColor);
 
-			processedTexture = BlurBuffer.FinalTexture;
+			processedTexture = BlurBuffer.Texture;
 			BlurBuffer.SetParameters(BlurRadius, BlurTextureScaling, BlurAlphaCorrection, BlurBackgroundColor);
 		}
 
@@ -200,15 +217,15 @@ namespace Lime
 				Math.Abs(BloomGammaCorrection.Y) > Mathf.ZeroTolerance ? 1f / BloomGammaCorrection.Y : 0f,
 				Math.Abs(BloomGammaCorrection.Z) > Mathf.ZeroTolerance ? 1f / BloomGammaCorrection.Z : 0f
 			);
-			RenderToTexture(BloomBuffer.BrightColorsTexture, processedTexture, BloomMaterial, Color4.White, Color4.Black, bloomViewportSize);
+			RenderToTexture(FirstTemporaryBuffer.Texture, processedTexture, BloomMaterial, Color4.White, Color4.Black, bloomViewportSize);
 			var bloomUV1 = (Vector2)bloomViewportSize / originalSize;
 			BlurMaterial.Radius = BloomStrength;
 			BlurMaterial.Step = new Vector2(BloomTextureScaling / bloomViewportSize.Width, BloomTextureScaling / bloomViewportSize.Height);
 			BlurMaterial.Dir = Vector2.Down;
 			BlurMaterial.AlphaCorrection = 1f;
-			RenderToTexture(BloomBuffer.FirstBlurPassTexture, BloomBuffer.BrightColorsTexture, BlurMaterial, BloomColor, Color4.Black, bloomViewportSize, bloomUV1);
+			RenderToTexture(SecondTemporaryBuffer.Texture, FirstTemporaryBuffer.Texture, BlurMaterial, BloomColor, Color4.Black, bloomViewportSize, bloomUV1);
 			BlurMaterial.Dir = Vector2.Right;
-			RenderToTexture(BloomBuffer.FinalTexture, BloomBuffer.FirstBlurPassTexture, BlurMaterial, Color4.White, Color4.Black, bloomViewportSize, bloomUV1);
+			RenderToTexture(BloomBuffer.Texture, SecondTemporaryBuffer.Texture, BlurMaterial, Color4.White, Color4.Black, bloomViewportSize, bloomUV1);
 
 			BloomBuffer.SetParameters(BloomStrength, BloomBrightThreshold, BloomGammaCorrection, BloomTextureScaling);
 		}
@@ -217,14 +234,36 @@ namespace Lime
 		{
 			if (BloomEnabled) {
 				var bloomUV1 = originalSize * BloomTextureScaling / originalSize;
-				RenderTexture(BloomBuffer.FinalTexture, BlendingAddMaterial, bloomUV1);
+				RenderTexture(BloomBuffer.Texture, BlendingAddMaterial, bloomUV1);
 			}
 		}
 
 		private void RenderBloom()
 		{
 			var bloomUV1 = originalSize * BloomTextureScaling / originalSize;
-			RenderTexture(BloomBuffer.FinalTexture, BlendingDefaultMaterial, bloomUV1);
+			RenderTexture(BloomBuffer.Texture, BlendingDefaultMaterial, bloomUV1);
+		}
+
+		private void MergeBloom()
+		{
+			if (!BloomEnabled) {
+				return;
+			}
+			PrepareOffscreenRendering(originalSize);
+			if (processedViewport.Width != viewportSize.Width || processedViewport.Height != viewportSize.Height) {
+				Renderer.Viewport = processedViewport = new Viewport(0, 0, viewportSize.Width, viewportSize.Height);
+			}
+			FirstTemporaryBuffer.Texture.SetAsRenderTarget();
+			var color = OverallImpactEnabled ? OverallImpactColor : Color;
+			try {
+				Renderer.Clear(Color4.Zero);
+				Renderer.DrawSprite(processedTexture, null, BlendingDefaultMaterial, color, Vector2.Zero, Size, Vector2.Zero, processedUV1, Vector2.Zero, Vector2.Zero);
+				var bloomUV1 = originalSize * BloomTextureScaling / originalSize;
+				Renderer.DrawSprite(BloomBuffer.Texture, null, BlendingAddMaterial, color, Vector2.Zero, Size, Vector2.Zero, bloomUV1, Vector2.Zero, Vector2.Zero);
+			} finally {
+				FirstTemporaryBuffer.Texture.RestoreRenderTarget();
+			}
+			processedTexture = FirstTemporaryBuffer.Texture;
 		}
 
 		private void RenderToTexture(ITexture renderTargetTexture, ITexture sourceTexture, IMaterial material, Color4 color, Color4 backgroundColor, Size? customViewportSize = null, Vector2? customUV1 = null)
@@ -248,6 +287,14 @@ namespace Lime
 			var uv1 = customUV1 ?? processedUV1;
 			Renderer.Transform1 = LocalToWorldTransform;
 			Renderer.DrawSprite(texture, null, customMaterial ?? Material, Color, Position, Size, UV0 * uv1, UV1 * uv1, Vector2.Zero, Vector2.Zero);
+		}
+
+		private void RenderNoisedTexture()
+		{
+			var noiseUV1 = new Vector2(Size.X / NoiseTexture.ImageSize.Width, Size.Y / NoiseTexture.ImageSize.Height);
+			SoftLightMaterial.Strength = NoiseStrength;
+			Renderer.Transform1 = LocalToWorldTransform;
+			Renderer.DrawSprite(processedTexture, NoiseTexture, SoftLightMaterial, Color, Position, Size, UV0 * processedUV1, UV1 * processedUV1, Vector2.Zero, noiseUV1);
 		}
 
 		private void PrepareOffscreenRendering(Vector2 orthogonalProjection)

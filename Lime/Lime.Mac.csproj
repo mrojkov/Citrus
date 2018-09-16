@@ -339,6 +339,7 @@
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingPresenter.cs" />
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingRenderChainBuilder.cs" />
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingRenderObject.cs" />
+    <Compile Include="Source\Widgets\Materials\SoftLightMaterial.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

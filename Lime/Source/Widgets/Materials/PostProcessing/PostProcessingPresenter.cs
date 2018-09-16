@@ -11,6 +11,8 @@ namespace Lime
 		private Blending blending;
 		private ShaderId shader;
 		private TextureBuffer sourceTextureBuffer;
+		private TextureBuffer firstTemporaryBuffer;
+		private TextureBuffer secondTemporaryBuffer;
 		private HSLBuffer hslBuffer;
 		private BlurBuffer blurBuffer;
 		private BloomBuffer bloomBuffer;
@@ -55,6 +57,10 @@ namespace Lime
 			if (component.BloomEnabled && (bloomBuffer?.IsLessThen(bufferSize) ?? true)) {
 				bloomBuffer = new BloomBuffer(bufferSizeWithReserve);
 			}
+			if ((blurBuffer != null || bloomBuffer != null) && (firstTemporaryBuffer?.IsLessThen(bufferSize) ?? true)) {
+				firstTemporaryBuffer = new TextureBuffer(bufferSizeWithReserve);
+				secondTemporaryBuffer = new TextureBuffer(bufferSizeWithReserve);
+			}
 
 			ro.Texture = asImage?.Texture;
 			ro.Material = asImage != null ? GetImageMaterial(asImage) : blendingDefaultMaterial;
@@ -66,6 +72,8 @@ namespace Lime
 			ro.UV1 = asImage?.UV1 ?? Vector2.One;
 			ro.DebugViewMode = component.DebugViewMode;
 			ro.SourceTextureBuffer = sourceTextureBuffer;
+			ro.FirstTemporaryBuffer = firstTemporaryBuffer;
+			ro.SecondTemporaryBuffer = secondTemporaryBuffer;
 			ro.HSLBuffer = hslBuffer;
 			ro.HSLMaterial = component.HSLMaterial;
 			ro.HSLEnabled = component.HSLEnabled;
@@ -85,6 +93,10 @@ namespace Lime
 			ro.BloomGammaCorrection = component.BloomGammaCorrection;
 			ro.BloomTextureScaling = component.BloomTextureScaling * 0.01f;
 			ro.BloomColor = component.BloomColor;
+			ro.NoiseEnabled = component.NoiseEnabled;
+			ro.NoiseStrength = component.NoiseStrength * 0.01f;
+			ro.NoiseTexture = component.NoiseTexture;
+			ro.SoftLightMaterial = component.SoftLightMaterial;
 			ro.OverallImpactEnabled = component.OverallImpactEnabled;
 			ro.OverallImpactColor = component.OverallImpactColor;
 			ro.BlendingDefaultMaterial = blendingDefaultMaterial;
@@ -123,7 +135,7 @@ namespace Lime
 			protected bool IsDirty { get; set; } = true;
 
 			public Size Size { get; }
-			public RenderTexture FinalTexture => finalTexture ?? (finalTexture = new RenderTexture(Size.Width, Size.Height));
+			public RenderTexture Texture => finalTexture ?? (finalTexture = new RenderTexture(Size.Width, Size.Height));
 
 			public TextureBuffer(Size size)
 			{
@@ -151,13 +163,10 @@ namespace Lime
 
 		internal class BlurBuffer : TextureBuffer
 		{
-			private RenderTexture firstPassTexture;
 			private float radius = float.NaN;
 			private float textureScaling = float.NaN;
 			private float alphaCorrection = float.NaN;
 			private Color4 backgroundColor = Color4.Zero;
-
-			public RenderTexture FirstPassTexture => firstPassTexture ?? (firstPassTexture = new RenderTexture(Size.Width, Size.Height));
 
 			public BlurBuffer(Size size) : base(size) { }
 
@@ -180,15 +189,10 @@ namespace Lime
 
 		internal class BloomBuffer : TextureBuffer
 		{
-			private RenderTexture brightColorsTexture;
-			private RenderTexture firstBlurPassTexture;
 			private float strength = float.NaN;
 			private float brightThreshold = float.NaN;
 			private Vector3 gammaCorrection = -Vector3.One;
 			private float textureScaling = float.NaN;
-
-			public RenderTexture BrightColorsTexture => brightColorsTexture ?? (brightColorsTexture = new RenderTexture(Size.Width, Size.Height));
-			public RenderTexture FirstBlurPassTexture => firstBlurPassTexture ?? (firstBlurPassTexture = new RenderTexture(Size.Width, Size.Height));
 
 			public BloomBuffer(Size size) : base(size) { }
 

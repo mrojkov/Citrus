@@ -18,6 +18,7 @@ namespace Lime
 		internal HSLMaterial HSLMaterial { get; private set; } = new HSLMaterial();
 		internal BlurMaterial BlurMaterial { get; private set; } = new BlurMaterial();
 		internal BloomMaterial BloomMaterial { get; private set; } = new BloomMaterial();
+		internal SoftLightMaterial SoftLightMaterial { get; private set; } = new SoftLightMaterial();
 
 		// TODO: Solve promblem of storing and restoring savedPresenter&savedRenderChainBuilder
 		private PostProcessingPresenter presenter = new PostProcessingPresenter();
@@ -30,6 +31,8 @@ namespace Lime
 		private float bloomBrightThreshold = 1f;
 		private Vector3 bloomGammaCorrection = Vector3.One;
 		private float bloomTextureScaling = 0.5f;
+		private float noiseStrength = 1f;
+		private ITexture noiseTexture;
 
 		[TangerineGroup("1. Debug view")]
 		[TangerineInspect]
@@ -142,12 +145,40 @@ namespace Lime
 		public Color4 BloomColor { get; set; } = Color4.White;
 
 		[YuzuMember]
-		[TangerineGroup("5. Overall impact")]
+		[TangerineGroup("5. Noise")]
+		public bool NoiseEnabled { get; set; }
+
+		[YuzuMember]
+		[TangerineGroup("5. Noise")]
+		public float NoiseStrength
+		{
+			get => noiseStrength * 100f;
+			set => noiseStrength = Mathf.Clamp(value * 0.01f, 0.01f, 1f);
+		}
+
+		[YuzuMember]
+		[TangerineGroup("5. Noise")]
+		[YuzuSerializeIf(nameof(IsNotRenderTexture))]
+		public ITexture NoiseTexture
+		{
+			get => noiseTexture;
+			set {
+				if (noiseTexture != value) {
+					noiseTexture = value;
+					Window.Current?.Invalidate();
+				}
+			}
+		}
+
+		[YuzuMember]
+		[TangerineGroup("6. Overall impact")]
 		public bool OverallImpactEnabled { get; set; }
 
 		[YuzuMember]
-		[TangerineGroup("5. Overall impact")]
+		[TangerineGroup("6. Overall impact")]
 		public Color4 OverallImpactColor { get; set; } = Color4.White;
+
+		public bool IsNotRenderTexture() => !(noiseTexture is RenderTexture);
 
 		public void GetOwnerRenderObjects(RenderChain renderChain, RenderObjectList roObjects)
 		{
@@ -179,8 +210,10 @@ namespace Lime
 			var clone = (PostProcessingComponent)base.Clone();
 			clone.presenter = (PostProcessingPresenter)presenter.Clone();
 			clone.renderChainBuilder = (PostProcessingRenderChainBuilder)renderChainBuilder.Clone(null);
+			clone.HSLMaterial = (HSLMaterial)HSLMaterial.Clone();
 			clone.BlurMaterial = (BlurMaterial)BlurMaterial.Clone();
 			clone.BloomMaterial = (BloomMaterial)BloomMaterial.Clone();
+			clone.SoftLightMaterial = (SoftLightMaterial)SoftLightMaterial.Clone();
 			return clone;
 		}
 	}
