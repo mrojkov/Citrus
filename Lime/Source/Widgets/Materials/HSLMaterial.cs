@@ -99,7 +99,8 @@ namespace Lime
 			void main()
 			{
 			    lowp vec4 color = texture2D(tex1, texCoords1);
-			    lowp vec3 hsl = RgbToHsl(color.rgb);
+				lowp vec3 sourceRgb = min(color.rgb, 0.98823529); // Hack: solve problem with black artifacts
+			    lowp vec3 hsl = RgbToHsl(sourceRgb);
 			    hsl.x += u_hsl.x;
 			    hsl.yz *= u_hsl.yz;
 			    lowp vec3 rgb = HslToRgb(hsl);
