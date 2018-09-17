@@ -90,16 +90,15 @@ namespace Lime
 			}
 
 			switch (DebugViewMode) {
+				case PostProcessingPresenter.DebugViewMode.Original:
+					RenderOriginal();
+					break;
 				case PostProcessingPresenter.DebugViewMode.Bloom when BloomEnabled:
 					RenderBloom();
 					break;
 				default:
 					if (OverallImpactEnabled) {
-						if (Texture != null) {
-							RenderTexture(Texture);
-						} else {
-							RenderTexture(SourceTextureBuffer.Texture, customUV1: Size / originalSize);
-						}
+						RenderOriginal();
 						Color = OverallImpactColor;
 					}
 					if (!NoiseEnabled) {
@@ -287,6 +286,15 @@ namespace Lime
 			var uv1 = customUV1 ?? processedUV1;
 			Renderer.Transform1 = LocalToWorldTransform;
 			Renderer.DrawSprite(texture, null, customMaterial ?? Material, Color, Position, Size, UV0 * uv1, UV1 * uv1, Vector2.Zero, Vector2.Zero);
+		}
+
+		private void RenderOriginal()
+		{
+			if (Texture != null) {
+				RenderTexture(Texture);
+			} else {
+				RenderTexture(SourceTextureBuffer.Texture, customUV1: Size / originalSize);
+			}
 		}
 
 		private void RenderNoisedTexture()

@@ -125,6 +125,7 @@ namespace Lime
 		public enum DebugViewMode
 		{
 			None,
+			Original,
 			Bloom
 		}
 
