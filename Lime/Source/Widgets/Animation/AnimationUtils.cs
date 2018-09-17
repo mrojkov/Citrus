@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -72,6 +73,8 @@ namespace Lime
 				} else {
 					if (indexInList == -1) {
 						o = result.Info.GetValue(o);
+					} else if (o is IList list && indexInList >= list.Count) {
+						return (result, null, -1);
 					} else {
 						o = result.Info.GetValue(o, new object[] { indexInList });
 					}
