@@ -376,6 +376,14 @@
     <Compile Include="Source\Widgets\3D\RenderObject3D.cs" />
     <Compile Include="Source\Widgets\RendererWrapper.cs" />
     <Compile Include="Source\Widgets\Animation\IAnimable.cs" />
+    <Compile Include="Source\Widgets\Materials\BlurMaterial.cs" />
+    <Compile Include="Source\Widgets\Materials\PresenterComponent.cs" />
+    <Compile Include="Source\Widgets\Materials\BloomMaterial.cs" />
+    <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingComponent.cs" />
+    <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingPresenter.cs" />
+    <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingRenderChainBuilder.cs" />
+    <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingRenderObject.cs" />
+    <Compile Include="Source\Widgets\Materials\SoftLightMaterial.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Android.csproj">

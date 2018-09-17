@@ -198,6 +198,7 @@
     <Compile Include="Source\Widgets\3D\Model3DAttachment.cs" />
     <Compile Include="Source\Widgets\3D\RenderObject3D.cs" />
     <Compile Include="Source\Widgets\3D\Spline3D.cs" />
+    <Compile Include="Source\Widgets\Materials\SoftLightMaterial.cs" />
     <Compile Include="Source\Widgets\Materials\HSLMaterial.cs" />
     <Compile Include="Source\Widgets\DropDownList.cs" />
     <Compile Include="Source\Widgets\Editor.cs" />
@@ -233,6 +234,9 @@
     <Compile Include="Source\Widgets\3D\WidgetAdapter3D.cs" />
     <Compile Include="Source\Widgets\Materials\GradientMaterial.cs" />
     <Compile Include="Source\Widgets\Materials\MaterialComponent.cs" />
+    <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingPresenter.cs" />
+    <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingRenderChainBuilder.cs" />
+    <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingRenderObject.cs" />
     <Compile Include="Source\Widgets\MorphableMesh.cs" />
     <Compile Include="Source\Widgets\MorphableMeshBuilder.cs" />
     <Compile Include="Source\Widgets\NodeBehaviours.cs" />
@@ -440,6 +444,10 @@
     <Compile Include="Source\Widgets\WidgetMaterial.cs" />
     <Compile Include="Source\Graphics\IRenderer.cs" />
     <Compile Include="Source\Widgets\Animation\IAnimable.cs" />
+    <Compile Include="Source\Widgets\Materials\BlurMaterial.cs" />
+    <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingComponent.cs" />
+    <Compile Include="Source\Widgets\Materials\PresenterComponent.cs" />
+    <Compile Include="Source\Widgets\Materials\BloomMaterial.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\3rdParty\OpenAL\OpenAL32.dll">

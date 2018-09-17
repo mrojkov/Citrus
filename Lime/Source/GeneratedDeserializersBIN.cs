@@ -6446,6 +6446,116 @@ namespace GeneratedDeserializersBIN
 			return result;
 		}
 
+		private static void Read_Lime__PostProcessingComponent(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.PostProcessingComponent)obj;
+			var dg = (BinaryDeserializerGen)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				result.BloomBrightThreshold = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (2 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Color4));
+				var tmp1 = new global::Lime.Color4();
+				tmp1.ABGR = d.Reader.ReadUInt32();
+				result.BloomColor = tmp1;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (3 == fd.OurIndex) {
+				result.BloomEnabled = d.Reader.ReadBoolean();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (4 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Vector3));
+				var tmp2 = new global::Lime.Vector3();
+				tmp2.X = d.Reader.ReadSingle();
+				tmp2.Y = d.Reader.ReadSingle();
+				tmp2.Z = d.Reader.ReadSingle();
+				result.BloomGammaCorrection = tmp2;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (5 == fd.OurIndex) {
+				result.BloomStrength = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (6 == fd.OurIndex) {
+				result.BloomTextureScaling = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (7 == fd.OurIndex) {
+				result.BlurAlphaCorrection = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (8 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Color4));
+				var tmp3 = new global::Lime.Color4();
+				tmp3.ABGR = d.Reader.ReadUInt32();
+				result.BlurBackgroundColor = tmp3;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (9 == fd.OurIndex) {
+				result.BlurEnabled = d.Reader.ReadBoolean();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (10 == fd.OurIndex) {
+				result.BlurRadius = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (11 == fd.OurIndex) {
+				result.BlurTextureScaling = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (12 == fd.OurIndex) {
+				result.HSLEnabled = d.Reader.ReadBoolean();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (13 == fd.OurIndex) {
+				result.Hue = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (14 == fd.OurIndex) {
+				result.Lightness = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (15 == fd.OurIndex) {
+				result.NoiseEnabled = d.Reader.ReadBoolean();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (16 == fd.OurIndex) {
+				result.NoiseStrength = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (17 == fd.OurIndex) {
+				result.NoiseTexture = (global::Lime.ITexture)dg.ReadObject<global::Lime.ITexture>();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (18 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Color4));
+				var tmp4 = new global::Lime.Color4();
+				tmp4.ABGR = d.Reader.ReadUInt32();
+				result.OverallImpactColor = tmp4;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (19 == fd.OurIndex) {
+				result.OverallImpactEnabled = d.Reader.ReadBoolean();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (20 == fd.OurIndex) {
+				result.Saturation = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_Lime__PostProcessingComponent(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.PostProcessingComponent();
+			Read_Lime__PostProcessingComponent(d, def, result);
+			return result;
+		}
+
 		private static object Make_Lime__Quaternion(BinaryDeserializer d, ReaderClassDef def)
 		{
 			var result = new global::Lime.Quaternion();
@@ -9339,6 +9449,7 @@ namespace GeneratedDeserializersBIN
 			readCache[typeof(global::Lime.PointObject)] = Read_Lime__PointObject;
 			readCache[typeof(global::Lime.Polyline)] = Read_Lime__Polyline;
 			readCache[typeof(global::Lime.PolylinePoint)] = Read_Lime__PolylinePoint;
+			readCache[typeof(global::Lime.PostProcessingComponent)] = Read_Lime__PostProcessingComponent;
 			readCache[typeof(global::Lime.QuaternionAnimator)] = Read_Lime__QuaternionAnimator;
 			readCache[typeof(global::Lime.RenderOptimizer.ContentBox)] = Read_Lime_RenderOptimizer__ContentBox;
 			readCache[typeof(global::Lime.RenderOptimizer.ContentPlane)] = Read_Lime_RenderOptimizer__ContentPlane;
@@ -9506,6 +9617,7 @@ namespace GeneratedDeserializersBIN
 			makeCache[typeof(global::Lime.PointObject)] = Make_Lime__PointObject;
 			makeCache[typeof(global::Lime.Polyline)] = Make_Lime__Polyline;
 			makeCache[typeof(global::Lime.PolylinePoint)] = Make_Lime__PolylinePoint;
+			makeCache[typeof(global::Lime.PostProcessingComponent)] = Make_Lime__PostProcessingComponent;
 			makeCache[typeof(global::Lime.Quaternion)] = Make_Lime__Quaternion;
 			makeCache[typeof(global::Lime.QuaternionAnimator)] = Make_Lime__QuaternionAnimator;
 			makeCache[typeof(global::Lime.Ray)] = Make_Lime__Ray;
