@@ -93,7 +93,7 @@ namespace Lime
 			ro.BloomGammaCorrection = component.BloomGammaCorrection;
 			ro.BloomTextureScaling = component.BloomTextureScaling * 0.01f;
 			ro.BloomColor = component.BloomColor;
-			ro.NoiseEnabled = component.NoiseEnabled;
+			ro.NoiseEnabled = component.NoiseEnabled && component.NoiseTexture != null && !component.NoiseTexture.IsStubTexture;
 			ro.NoiseStrength = component.NoiseStrength * 0.01f;
 			ro.NoiseTexture = component.NoiseTexture;
 			ro.SoftLightMaterial = component.SoftLightMaterial;
