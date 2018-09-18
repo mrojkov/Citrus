@@ -503,7 +503,7 @@ namespace Tangerine.UI
 				UnknownMarker = Color4.Black,
 				Cursor = timelineGrid.Cursor,
 				RunningCursor = timelineGrid.RunningCursor,
-				MarkerBorder = Color4.White,
+				MarkerBorder = Color4.Black,
 			};
 			var timelineOverview = new TimelineOverviewColors {
 				Veil = Color4.White.Darken(0.2f).Transparentify(0.3f),
