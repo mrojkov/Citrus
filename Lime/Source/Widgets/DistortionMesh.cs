@@ -40,7 +40,9 @@ namespace Lime
 
 		public override void AddToRenderChain(RenderChain chain)
 		{
-			if (GloballyVisible && ClipRegionTest(chain.ClipRegion)) {
+			// TODO: Fix ClipRegion for distortion mesh.
+			// Bounding box of distortion mesh doesn't take into account if it linked to bone.
+			if (GloballyVisible /*&& ClipRegionTest(chain.ClipRegion)*/) {
 				AddSelfAndChildrenToRenderChain(chain, Layer);
 			}
 		}
