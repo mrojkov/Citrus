@@ -59,10 +59,10 @@ namespace Tangerine.UI
 						.IncludingPoint(new Vector2(t.Right, t.Top))
 						.IncludingPoint(t.B)
 						.IncludingPoint(new Vector2(t.Left, t.Bottom));
+					hull = aabb.ToQuadrangle();
 					pivotsEqual &= Vector2.Distance(widget.CalcPositionInSpaceOf(canvas), pivot) <= pivotTolerance;
 				}
 			}
-			hull = aabb.ToQuadrangle();
 			if (first == null) {
 				return false;
 			}
