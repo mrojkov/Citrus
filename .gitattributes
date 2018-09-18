@@ -1,0 +1,16 @@
+*.bat          eol=lf
+*.c            eol=lf
+*.cmd          eol=lf
+*.config       eol=lf
+*.cs           eol=lf
+*.csproj       eol=lf
+*.def          eol=lf
+*.exp          eol=lf
+*.gitignore    eol=lf
+*.h            eol=lf
+*.md           eol=lf
+*.sln          eol=lf
+*.txt          eol=lf
+*.vcxproj      eol=lf
+*.xml          eol=lf
+*.gitignore    eol=lf
