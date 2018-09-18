@@ -280,6 +280,13 @@ namespace Tangerine.UI
 			return clone;
 		}
 
+		public enum ColorThemeKind
+		{
+			Light,
+			Dark,
+			Custom,
+		}
+
 		public static ColorTheme Current = CreateLightTheme();
 
 		public static ColorTheme CreateDarkTheme()
