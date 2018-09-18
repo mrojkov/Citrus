@@ -35,7 +35,7 @@ dotnet_naming_style.interface_i_prefix_style.required_prefix = I
 
 indent_style = tab
 csharp_new_line_before_open_brace = types,methods,properties
-end_of_line = crlf
+end_of_line = lf
 tab_width = 4
 charset = utf-8
 trim_trailing_whitespace = true
