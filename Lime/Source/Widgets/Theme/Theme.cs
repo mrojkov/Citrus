@@ -1,6 +1,7 @@
 #if !ANDROID && !iOS
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Yuzu;
 
 namespace Lime
@@ -20,8 +21,23 @@ namespace Lime
 			public static readonly Thickness ControlsPadding = new Thickness(2);
 		}
 
+		// to set all colors to the value of default one, making them more noticeable
+		// in case their value is unset (it'll be (0 0 0 0) otherwise
+		public class DefaultColors
+		{
+			public Color4 DefaultColor { get; set; } = new Color4(255, 0, 255, 255);
+			public DefaultColors()
+			{
+				foreach (var p in GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
+					if (p.PropertyType == typeof(Color4)) {
+						p.SetValue(this, DefaultColor);
+					}
+				}
+			}
+		}
+
 		[YuzuDontGenerateDeserializer]
-		public class ColorTheme
+		public class ColorTheme : DefaultColors
 		{
 			[YuzuOptional]
 			public Color4 BlackText { get; set; }
