@@ -26,28 +26,32 @@ namespace Lime
 
 		public virtual Vector2 Offset { get; set; }
 
+		public Vector2 TransformedPosition { get; private set; }
+
+		public override void Update(float delta)
+		{
+			base.Update(delta);
+			RecalcTransformedPosition();
+		}
+
+		private void RecalcTransformedPosition()
+		{
+			TransformedPosition = Offset;
+			if (Parent?.AsWidget != null) {
+				TransformedPosition = Parent.AsWidget.Size * Position + Offset;
+			}
+			if (SkinningWeights != null && Parent?.Parent != null) {
+				BoneArray a = Parent.Parent.AsWidget.BoneArray;
+				Matrix32 m1 = Parent.AsWidget.CalcLocalToParentTransform();
+				Matrix32 m2 = m1.CalcInversed();
+				TransformedPosition = m2.TransformVector(a.ApplySkinningToVector(m1.TransformVector(TransformedPosition), SkinningWeights));
+			}
+		}
+
 		public Vector2 CalcPositionInSpaceOf(Widget container)
 		{
 			var matrix = Parent.AsWidget.CalcTransitionToSpaceOf(container);
 			return matrix.TransformVector(TransformedPosition);
-		}
-
-		public Vector2 TransformedPosition
-		{
-			get
-			{
-				Vector2 result = Offset;
-				if (Parent?.AsWidget != null) {
-					result = Parent.AsWidget.Size * Position + Offset;
-				}
-				if (SkinningWeights != null && Parent?.Parent != null) {
-					BoneArray a = Parent.Parent.AsWidget.BoneArray;
-					Matrix32 m1 = Parent.AsWidget.CalcLocalToParentTransform();
-					Matrix32 m2 = m1.CalcInversed();
-					result = m2.TransformVector(a.ApplySkinningToVector(m1.TransformVector(result), SkinningWeights));
-				}
-				return result;
-			}
 		}
 
 		public override void AddToRenderChain(RenderChain chain)

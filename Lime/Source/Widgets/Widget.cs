@@ -1040,6 +1040,18 @@ namespace Lime
 			}
 		}
 
+		internal void ExpandBoundingRect(Vector2 point)
+		{
+			var t = false;
+			if (boundingRect.AX > point.X) { boundingRect.AX = point.X; t = true; }
+			if (boundingRect.AY > point.Y) { boundingRect.AY = point.Y; t = true; }
+			if (boundingRect.BX < point.X) { boundingRect.BX = point.X; t = true; }
+			if (boundingRect.BY < point.Y) { boundingRect.BY = point.Y; t = true; }
+			if (t) {
+				ExpandParentBoundingRect();
+			}
+		}
+
 		private void ExpandParentBoundingRect()
 		{
 			if (ParentWidget == null) {
