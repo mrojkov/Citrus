@@ -50,6 +50,14 @@ namespace Lime
 		public SoftLightMaterial SoftLightMaterial;
 		public bool OverallImpactEnabled;
 		public Color4 OverallImpactColor;
+		public VignetteMaterial VignetteMaterial;
+		public Texture2D TransparentTexture;
+		public bool VignetteEnabled;
+		public float VignetteRadius;
+		public float VignetteSoftness;
+		public Vector2 VignetteScale;
+		public Vector2 VignettePivot;
+		public Color4 VignetteColor;
 		public IMaterial BlendingDefaultMaterial;
 		public IMaterial BlendingAddMaterial;
 
@@ -70,6 +78,8 @@ namespace Lime
 			BloomMaterial = null;
 			NoiseTexture = null;
 			SoftLightMaterial = null;
+			VignetteMaterial = null;
+			TransparentTexture = null;
 			BlendingDefaultMaterial = null;
 			BlendingAddMaterial = null;
 		}
@@ -106,6 +116,14 @@ namespace Lime
 						ApplyBloom();
 					} else {
 						RenderNoisedTexture();
+					}
+					if (VignetteEnabled) {
+						VignetteMaterial.Radius = VignetteRadius;
+						VignetteMaterial.Softness = VignetteSoftness;
+						VignetteMaterial.UV1 = Vector2.One / (processedUV1 * VignetteScale);
+						VignetteMaterial.UVOffset = VignettePivot / VignetteScale;
+						VignetteMaterial.Color = VignetteColor;
+						RenderTexture(TransparentTexture, VignetteMaterial);
 					}
 					break;
 			}

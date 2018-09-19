@@ -7,6 +7,7 @@ namespace Lime
 		private readonly RenderChain renderChain = new RenderChain();
 		private readonly IMaterial blendingDefaultMaterial = WidgetMaterial.GetInstance(Blending.Inherited, ShaderId.Inherited, 1);
 		private readonly IMaterial blendingAddMaterial = WidgetMaterial.GetInstance(Blending.Add, ShaderId.Inherited, 1);
+		private readonly Texture2D transparentTexture;
 		private IMaterial material;
 		private Blending blending;
 		private ShaderId shader;
@@ -16,6 +17,12 @@ namespace Lime
 		private HSLBuffer hslBuffer;
 		private BlurBuffer blurBuffer;
 		private BloomBuffer bloomBuffer;
+
+		public PostProcessingPresenter()
+		{
+			transparentTexture = new Texture2D();
+			transparentTexture.LoadImage(new[] { Color4.Zero }, 1, 1);
+		}
 
 		public RenderObject GetRenderObject(Node node)
 		{
@@ -99,6 +106,14 @@ namespace Lime
 			ro.SoftLightMaterial = component.SoftLightMaterial;
 			ro.OverallImpactEnabled = component.OverallImpactEnabled;
 			ro.OverallImpactColor = component.OverallImpactColor;
+			ro.VignetteMaterial = component.VignetteMaterial;
+			ro.TransparentTexture = transparentTexture;
+			ro.VignetteEnabled = component.VignetteEnabled;
+			ro.VignetteRadius = component.VignetteRadius * 0.01f;
+			ro.VignetteSoftness = component.VignetteSoftness * 0.01f;
+			ro.VignetteScale = component.VignetteScale;
+			ro.VignettePivot = component.VignettePivot;
+			ro.VignetteColor = component.VignetteColor;
 			ro.BlendingDefaultMaterial = blendingDefaultMaterial;
 			ro.BlendingAddMaterial = blendingAddMaterial;
 			return ro;

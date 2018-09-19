@@ -7,6 +7,13 @@ namespace Lime
 	[AllowedComponentOwnerTypes(typeof(Widget))]
 	public class PostProcessingComponent : NodeComponent
 	{
+		private const string GroupHSL = "1. HSL";
+		private const string GroupBlur = "2. Blur effect";
+		private const string GroupBloom = "3. Bloom effect";
+		private const string GroupNoise = "4. Noise";
+		private const string GroupVignette = "5. Vignette";
+		private const string GroupOverallImpact = "6. Overall impact";
+		private const string GroupDebugView = "7. Debug view";
 		private const float MinimumTextureScaling = 0.01f;
 		private const float MaximumTextureScaling = 1f;
 		private const float MaximumHue = 1f;
@@ -19,6 +26,7 @@ namespace Lime
 		internal BlurMaterial BlurMaterial { get; private set; } = new BlurMaterial();
 		internal BloomMaterial BloomMaterial { get; private set; } = new BloomMaterial();
 		internal SoftLightMaterial SoftLightMaterial { get; private set; } = new SoftLightMaterial();
+		internal VignetteMaterial VignetteMaterial { get; private set; } = new VignetteMaterial();
 
 		// TODO: Solve promblem of storing and restoring savedPresenter&savedRenderChainBuilder
 		private PostProcessingPresenter presenter = new PostProcessingPresenter();
@@ -33,17 +41,15 @@ namespace Lime
 		private float bloomTextureScaling = 0.5f;
 		private float noiseStrength = 1f;
 		private ITexture noiseTexture;
-
-		[TangerineGroup("1. Debug view")]
-		[TangerineInspect]
-		public PostProcessingPresenter.DebugViewMode DebugViewMode { get; set; } = PostProcessingPresenter.DebugViewMode.None;
+		private float vignetteRadius = 0.5f;
+		private float vignetteSoftness = 0.05f;
 
 		[YuzuMember]
-		[TangerineGroup("2. HSL")]
+		[TangerineGroup(GroupHSL)]
 		public bool HSLEnabled { get; set; }
 
 		[YuzuMember]
-		[TangerineGroup("2. HSL")]
+		[TangerineGroup(GroupHSL)]
 		public float Hue
 		{
 			get => hsl.X * 360f;
@@ -51,7 +57,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		[TangerineGroup("2. HSL")]
+		[TangerineGroup(GroupHSL)]
 		public float Saturation
 		{
 			get => hsl.Y * 100f;
@@ -59,7 +65,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		[TangerineGroup("2. HSL")]
+		[TangerineGroup(GroupHSL)]
 		public float Lightness
 		{
 			get => hsl.Z * 100f;
@@ -69,11 +75,11 @@ namespace Lime
 		public Vector3 HSL => hsl;
 
 		[YuzuMember]
-		[TangerineGroup("3. Blur effect")]
+		[TangerineGroup(GroupBlur)]
 		public bool BlurEnabled { get; set; }
 
 		[YuzuMember]
-		[TangerineGroup("3. Blur effect")]
+		[TangerineGroup(GroupBlur)]
 		public float BlurRadius
 		{
 			get => blurRadius;
@@ -81,7 +87,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		[TangerineGroup("3. Blur effect")]
+		[TangerineGroup(GroupBlur)]
 		public float BlurTextureScaling
 		{
 			get => blurTextureScaling * 100f;
@@ -89,7 +95,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		[TangerineGroup("3. Blur effect")]
+		[TangerineGroup(GroupBlur)]
 		public float BlurAlphaCorrection
 		{
 			get => blurAlphaCorrection;
@@ -97,15 +103,15 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		[TangerineGroup("3. Blur effect")]
+		[TangerineGroup(GroupBlur)]
 		public Color4 BlurBackgroundColor { get; set; } = new Color4(127, 127, 127, 0);
 
 		[YuzuMember]
-		[TangerineGroup("4. Bloom effect")]
+		[TangerineGroup(GroupBloom)]
 		public bool BloomEnabled { get; set; }
 
 		[YuzuMember]
-		[TangerineGroup("4. Bloom effect")]
+		[TangerineGroup(GroupBloom)]
 		public float BloomStrength
 		{
 			get => bloomStrength;
@@ -113,7 +119,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		[TangerineGroup("4. Bloom effect")]
+		[TangerineGroup(GroupBloom)]
 		public float BloomBrightThreshold
 		{
 			get => bloomBrightThreshold * 100f;
@@ -121,7 +127,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		[TangerineGroup("4. Bloom effect")]
+		[TangerineGroup(GroupBloom)]
 		public Vector3 BloomGammaCorrection
 		{
 			get => bloomGammaCorrection;
@@ -133,7 +139,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		[TangerineGroup("4. Bloom effect")]
+		[TangerineGroup(GroupBloom)]
 		public float BloomTextureScaling
 		{
 			get => bloomTextureScaling * 100f;
@@ -141,15 +147,15 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		[TangerineGroup("4. Bloom effect")]
+		[TangerineGroup(GroupBloom)]
 		public Color4 BloomColor { get; set; } = Color4.White;
 
 		[YuzuMember]
-		[TangerineGroup("5. Noise")]
+		[TangerineGroup(GroupNoise)]
 		public bool NoiseEnabled { get; set; }
 
 		[YuzuMember]
-		[TangerineGroup("5. Noise")]
+		[TangerineGroup(GroupNoise)]
 		public float NoiseStrength
 		{
 			get => noiseStrength * 100f;
@@ -157,7 +163,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		[TangerineGroup("5. Noise")]
+		[TangerineGroup(GroupNoise)]
 		[YuzuSerializeIf(nameof(IsNotRenderTexture))]
 		public ITexture NoiseTexture
 		{
@@ -171,12 +177,48 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		[TangerineGroup("6. Overall impact")]
+		[TangerineGroup(GroupVignette)]
+		public bool VignetteEnabled { get; set; }
+
+		[YuzuMember]
+		[TangerineGroup(GroupVignette)]
+		public float VignetteRadius
+		{
+			get => vignetteRadius * 100f;
+			set => vignetteRadius = Mathf.Clamp(value * 0.01f, 0f, 1f);
+		}
+
+		[YuzuMember]
+		[TangerineGroup(GroupVignette)]
+		public float VignetteSoftness
+		{
+			get => vignetteSoftness * 100f;
+			set => vignetteSoftness = Mathf.Clamp(value * 0.01f, 0f, 1f);
+		}
+
+		[YuzuMember]
+		[TangerineGroup(GroupVignette)]
+		public Vector2 VignetteScale { get; set; } = Vector2.One;
+
+		[YuzuMember]
+		[TangerineGroup(GroupVignette)]
+		public Vector2 VignettePivot { get; set; } = Vector2.Half;
+
+		[YuzuMember]
+		[TangerineGroup(GroupVignette)]
+		public Color4 VignetteColor { get; set; } = Color4.Black;
+
+		[YuzuMember]
+		[TangerineGroup(GroupOverallImpact)]
 		public bool OverallImpactEnabled { get; set; }
 
 		[YuzuMember]
-		[TangerineGroup("6. Overall impact")]
+		[TangerineGroup(GroupOverallImpact)]
 		public Color4 OverallImpactColor { get; set; } = Color4.White;
+
+		[TangerineGroup(GroupDebugView)]
+		[TangerineInspect]
+		public PostProcessingPresenter.DebugViewMode DebugViewMode { get; set; } = PostProcessingPresenter.DebugViewMode.None;
 
 		public bool IsNotRenderTexture() => !(noiseTexture is RenderTexture);
 
@@ -214,6 +256,7 @@ namespace Lime
 			clone.BlurMaterial = (BlurMaterial)BlurMaterial.Clone();
 			clone.BloomMaterial = (BloomMaterial)BloomMaterial.Clone();
 			clone.SoftLightMaterial = (SoftLightMaterial)SoftLightMaterial.Clone();
+			clone.VignetteMaterial = (VignetteMaterial)VignetteMaterial.Clone();
 			return clone;
 		}
 	}
