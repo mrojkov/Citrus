@@ -53,6 +53,12 @@ namespace Lime
 			Channel.Stop(fadeoutTime);
 		}
 
+		public void Pause(float fadeoutTime = 0)
+		{
+			EnsureLoaded();
+			Channel.Pause(fadeoutTime);
+		}
+
 		private void EnsureLoaded()
 		{
 			if (IsLoading) {
