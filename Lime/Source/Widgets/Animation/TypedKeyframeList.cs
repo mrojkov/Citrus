@@ -8,7 +8,6 @@ namespace Lime
 	{
 		private List<Keyframe<T>> items = new List<Keyframe<T>>();
 
-		public int Version { get; private set; }
 		internal int RefCount { get; private set; }
 		public int Count => items.Count;
 		public bool IsReadOnly => false;
@@ -25,7 +24,10 @@ namespace Lime
 			return clone;
 		}
 
+#if TANGERINE
+		public int Version { get; set; }
 		internal void IncreaseVersion() => Version++;
+#endif // TANGERINE
 
 		public void Add(int frame, T value, KeyFunction function = KeyFunction.Linear)
 		{
@@ -47,7 +49,9 @@ namespace Lime
 
 		public void AddOrdered(Keyframe<T> keyframe)
 		{
+#if TANGERINE
 			Version++;
+#endif // TANGERINE
 			if (Count == 0 || keyframe.Frame > items[Count - 1].Frame) {
 				items.Add(keyframe);
 			} else {
@@ -86,7 +90,9 @@ namespace Lime
 
 		public void Add(Keyframe<T> item)
 		{
+#if TANGERINE
 			IncreaseVersion();
+#endif // TANGERINE
 			items.Add(item);
 		}
 
@@ -106,7 +112,9 @@ namespace Lime
 		public void Clear()
 		{
 			items.Clear();
+#if TANGERINE
 			IncreaseVersion();
+#endif // TANGERINE
 		}
 
 		public bool Contains(Keyframe<T> item)
@@ -123,7 +131,9 @@ namespace Lime
 
 		public bool Remove(Keyframe<T> item)
 		{
+#if TANGERINE
 			IncreaseVersion();
+#endif // TANGERINE
 			if (items.Remove(item)) {
 				return true;
 			}
@@ -137,13 +147,17 @@ namespace Lime
 
 		public void Insert(int index, Keyframe<T> item)
 		{
+#if TANGERINE
 			IncreaseVersion();
+#endif // TANGERINE
 			items.Insert(index, item);
 		}
 
 		public void RemoveAt(int index)
 		{
+#if TANGERINE
 			IncreaseVersion();
+#endif // TANGERINE
 			items.RemoveAt(index);
 		}
 

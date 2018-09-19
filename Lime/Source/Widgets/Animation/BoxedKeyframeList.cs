@@ -9,8 +9,9 @@ namespace Lime
 	{
 		private TypedKeyframeList<T> source;
 
+#if TANGERINE
 		public int Version => source.Version;
-
+#endif // TANGERINE
 		public int Count => source.Count;
 
 		public bool IsReadOnly => false;
