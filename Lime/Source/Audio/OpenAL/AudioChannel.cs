@@ -43,7 +43,8 @@ namespace Lime
 			None,
 			Play,
 			Stop,
-			Pause
+			Pause,
+			Suspend
 		}
 		
 		public bool Streaming { get { return streaming; } }
@@ -261,6 +262,42 @@ namespace Lime
 			}
 		}
 
+		public ChannelParameters Suspend(float fadeoutTime = 0)
+		{
+			if (!AudioSystem.Active) {
+				return null;
+			}
+			if (fadeoutTime > 0) {
+				fadeSpeed = -1 / fadeoutTime;
+				fadePurpose = FadePurpose.Suspend;
+			} else {
+				fadeSpeed = 0;
+				fadeVolume = 0;
+				SuspendImmediate();
+			}
+			return new ChannelParameters() {
+				Decoder = decoder,
+				Group = Group,
+				Pan = pan,
+				Volume = volume,
+				Pitch = pitch,
+				SamplePath = SamplePath,
+				Priority = Priority,
+				Looping = looping,
+			};
+		}
+
+		private void SuspendImmediate()
+		{
+			lock (streamingSync) {
+				streaming = false;
+				using (new PlatformAudioSystem.ErrorChecker(throwException: false)) {
+					AL.SourceStop(source);
+				}
+				decoder = null;
+			}
+		}
+
 		private void SetPitch(float value)
 		{
 			if (!AudioSystem.Active) {
@@ -327,6 +364,9 @@ namespace Lime
 					break;
 				case FadePurpose.Pause:
 					PauseImmediate();
+					break;
+				case FadePurpose.Suspend:
+					SuspendImmediate();
 					break;
 			}
 			fadePurpose = FadePurpose.None;

@@ -8,6 +8,18 @@ using MonoMac.OpenAL;
 
 namespace Lime
 {
+	public class ChannelParameters
+	{
+		public IAudioDecoder Decoder;
+		public AudioChannelGroup Group;
+		public float Pan;
+		public float Volume;
+		public float Pitch;
+		public string SamplePath;
+		public float Priority;
+		public bool Looping;
+	}
+
 	public class Sound
 	{
 		public Sound()
@@ -22,6 +34,8 @@ namespace Lime
 		public bool IsLoading { get; internal set; }
 
 		public bool IsStopped { get { return Channel.State == AudioChannelState.Stopped; } }
+
+		private ChannelParameters suspendedChannelParameters;
 
 		public float Volume
 		{
@@ -44,7 +58,12 @@ namespace Lime
 		public void Resume(float fadeinTime = 0)
 		{
 			EnsureLoaded();
-			Channel.Resume(fadeinTime);
+			if (suspendedChannelParameters != null) {
+				AudioSystem.ResumeSound(this, suspendedChannelParameters, fadeinTime);
+				suspendedChannelParameters = null;
+			} else {
+				Channel.Resume(fadeinTime);
+			}
 		}
 
 		public void Stop(float fadeoutTime = 0)
@@ -57,6 +76,12 @@ namespace Lime
 		{
 			EnsureLoaded();
 			Channel.Pause(fadeoutTime);
+		}
+
+		public void Suspend(float fadeoutTime = 0)
+		{
+			EnsureLoaded();
+			suspendedChannelParameters = Channel.Suspend(fadeoutTime);
 		}
 
 		private void EnsureLoaded()

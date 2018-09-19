@@ -306,6 +306,25 @@ namespace Lime
 			return sound;
 		}
 
+		private static void LoadSoundToChannel(AudioChannel channel, Sound sound, ChannelParameters channelParameters, float fadeinTime = 0f)
+		{
+			channel.Group = channelParameters.Group;
+			channel.Priority = channelParameters.Priority;
+			channel.Volume = channelParameters.Volume;
+			channel.Pitch = channelParameters.Pitch;
+			channel.Pan = channelParameters.Pan;
+			channel.SamplePath = channelParameters.SamplePath;
+			if (channel != null) {
+				channel.Play(
+					sound,
+					channelParameters.Decoder,
+					channelParameters.Looping,
+					false,
+					fadeinTime
+				);
+			}
+		}
+
 		private static AudioChannel AllocateChannel(float priority)
 		{
 			channels.Sort((a, b) => {
@@ -363,6 +382,22 @@ namespace Lime
 			channel.Pitch = pitch;
 			channel.Pan = pan;
 			return LoadSoundToChannel(channel, path, looping, paused, fadeinTime);
+		}
+
+		public static void Resume (Sound sound, ChannelParameters channelParameters, float fadeinTime = 0)
+		{
+			if (context == null) {
+				return;
+			}
+			var channel = AllocateChannel(channelParameters.Priority);
+			if (channel == null) {
+				sound.Channel = NullAudioChannel.Instance;
+			}
+			if (channel.Sound != null) {
+				channel.Sound.Channel = NullAudioChannel.Instance;
+			}
+			
+			LoadSoundToChannel(channel, sound, channelParameters, fadeinTime);
 		}
 
 		public struct ErrorChecker : IDisposable

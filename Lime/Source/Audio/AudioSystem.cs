@@ -77,6 +77,11 @@ namespace Lime
 			return PlatformAudioSystem.Play(path, group, looping, priority, fadeinTime, paused, volume, pan, pitch);
 		}
 
+		public static void ResumeSound(Sound sound, ChannelParameters channelParameters, float fadeinTime = 0)
+		{
+			PlatformAudioSystem.Resume(sound, channelParameters, fadeinTime);
+		}
+
 		public static Sound PlayMusic(string path, bool looping = true, float priority = 100f, float fadeinTime = 0.5f, bool paused = false, float volume = 1f, float pan = 0f, float pitch = 1f)
 		{
 			return Play(path, AudioChannelGroup.Music, looping, priority, fadeinTime, paused, volume, pan, pitch);
