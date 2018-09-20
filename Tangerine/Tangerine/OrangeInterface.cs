@@ -56,9 +56,9 @@ namespace Tangerine
 		public override void OnWorkspaceOpened()
 		{
 			PlatformPicker.Reload();
-		}		
+		}
 	}
-	
+
 	public class PlatformPicker : ThemedDropDownList
 	{
 		public PlatformPicker()
@@ -83,7 +83,7 @@ namespace Tangerine
 
 		public Target SelectedTarget => (Target)Items[Index].Value;
 	}
-	
+
 	public class OrangePluginUIBuilder : IPluginUIBuilder
 	{
 		public IPluginPanel SidePanel { get; } = new OrangePluginPanel();
