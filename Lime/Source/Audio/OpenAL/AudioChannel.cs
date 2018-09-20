@@ -292,7 +292,7 @@ namespace Lime
 			lock (streamingSync) {
 				streaming = false;
 				using (new PlatformAudioSystem.ErrorChecker(throwException: false)) {
-					AL.SourceStop(source);
+					AL.SourcePause(source);
 				}
 				decoder = null;
 			}
