@@ -119,7 +119,7 @@ namespace Lime
 		public override NodeComponent Clone()
 		{
 			Layout clone = (Layout)base.Clone();
-			clone.DebugRectangles = null;
+			clone.DebugRectangles = new List<Rectangle>();
 			clone.defaultCell = null;
 			clone.DefaultCell = (DefaultLayoutCell)DefaultCell?.Clone();
 			clone.ConstraintsValid = true;
