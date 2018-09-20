@@ -201,18 +201,16 @@ namespace Lime
 			} else {
 				fadeSpeed = 0;
 				fadeVolume = 1;
-				PlayImmediate();
 			}
 			Volume = volume;
+			PlayImmediate();
 		}
 
 		private void PlayImmediate()
 		{
 			streaming = true;
-			if (State == AudioChannelState.Paused) {
-				using (new PlatformAudioSystem.ErrorChecker()) {
-					AL.SourcePlay(source);
-				}
+			using (new PlatformAudioSystem.ErrorChecker()) {
+				AL.SourcePlay(source);
 			}
 		}
 
@@ -293,13 +291,9 @@ namespace Lime
 
 		private void SuspendImmediate()
 		{
-			lock (streamingSync) {
-				streaming = false;
-				using (new PlatformAudioSystem.ErrorChecker(throwException: false)) {
-					AL.SourcePause(source);
-				}
-				decoder = null;
-			}
+			StopImmediate();
+			decoder = null;
+			Sound = null;
 		}
 
 		private void SetPitch(float value)
@@ -361,7 +355,6 @@ namespace Lime
 		{
 			switch (fadePurpose) {
 				case FadePurpose.Play:
-					PlayImmediate();
 					break;
 				case FadePurpose.Stop:
 					StopImmediate();
