@@ -203,6 +203,7 @@ namespace Lime
 				fadeVolume = 1;
 				PlayImmediate();
 			}
+			Volume = volume;
 		}
 
 		private void PlayImmediate()
@@ -228,6 +229,7 @@ namespace Lime
 				fadeVolume = 0;
 				PauseImmediate();
 			}
+			Volume = volume;
 		}
 
 		private void PauseImmediate()
@@ -250,6 +252,7 @@ namespace Lime
 				fadeVolume = 0;
 				StopImmediate();
 			}
+			Volume = volume;
 		}
 
 		private void StopImmediate()
@@ -275,6 +278,7 @@ namespace Lime
 				fadeVolume = 0;
 				SuspendImmediate();
 			}
+			Volume = volume;
 			return new ChannelParameters() {
 				Decoder = decoder,
 				Group = Group,
