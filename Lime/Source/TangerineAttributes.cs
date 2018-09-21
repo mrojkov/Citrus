@@ -159,7 +159,6 @@ namespace Lime
 		public IEnumerable<(string, object)> EnumerateItems(object o)
 		{
 			var type = o.GetType();
-			var mi = type.GetMethod(methodName, BindingFlags.Static | BindingFlags.Public);
 			if (lister == null) {
 				var fn = type.GetMethod(methodName);
 				var e = Expression.Call(fn);
