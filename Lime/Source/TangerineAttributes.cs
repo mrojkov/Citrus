@@ -149,7 +149,6 @@ namespace Lime
 	public sealed class TangerineDropDownListPropertyEditorAttribute : Attribute
 	{
 		private readonly string methodName;
-		private Func<IEnumerable<(string, object)>> lister = null;
 
 		public TangerineDropDownListPropertyEditorAttribute(string methodName)
 		{
@@ -159,12 +158,8 @@ namespace Lime
 		public IEnumerable<(string, object)> EnumerateItems(object o)
 		{
 			var type = o.GetType();
-			if (lister == null) {
-				var fn = type.GetMethod(methodName);
-				var e = Expression.Call(fn);
-				lister = Expression.Lambda<Func<IEnumerable<(string, object)>>>(e).Compile();
-			}
-			return lister();
+			var fn = type.GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public);
+			return (IEnumerable<(string, object)>)fn.Invoke(o, new object[] { });
 		}
 	}
 }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Lime;
 using Tangerine.Core;
 
@@ -13,14 +14,22 @@ namespace Tangerine.UI
 			Selector = editorParams.DropDownListFactory();
 			Selector.LayoutCell = new LayoutCell(Alignment.Center);
 			EditorContainer.AddNode(Selector);
-			foreach (var (key, value) in itemLister) {
-				Selector.Items.Add(new CommonDropDownList.Item(key, value));
-			}
+			RefreshDropDownList();
 			Selector.Changed += a => {
-				if (a.ChangedByUser)
-					SetProperty((T)Selector.Items[a.Index].Value);
+				if (a.ChangedByUser) {
+					RefreshDropDownList();
+					SetProperty((T)itemLister.ElementAt(a.Index).Item2);
+				}
 			};
 			Selector.AddChangeWatcher(CoalescedPropertyValue(), v => Selector.Value = v);
+
+			void RefreshDropDownList()
+			{
+				Selector.Items.Clear();
+				foreach (var (key, value) in itemLister) {
+					Selector.Items.Add(new CommonDropDownList.Item(key, value));
+				}
+			}
 		}
 	}
 }
