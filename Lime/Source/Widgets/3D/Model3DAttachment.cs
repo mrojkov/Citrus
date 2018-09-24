@@ -356,14 +356,31 @@ namespace Lime
 			}
 		}
 
-		private IEnumerable<Node> GetAnimationNodes(Node3D model, Animation animationData)
+		private IEnumerable<Node> GetAnimationNodes(Node3D model, Animation attachmentAnimation)
 		{
-			if (animationData.Nodes.Count > 0) {
-				return animationData.Nodes.Distinct().Select(n => model.FindNode(n.Id));
+			if (attachmentAnimation.Nodes.Count > 0) {
+				var nodeList = new List<Node>();
+				foreach (var attachmentNode in attachmentAnimation.Nodes.Distinct()) {
+					var node = model.TryFindNode(attachmentNode.Id);
+					if (node == null) {
+						Console.WriteLine($"Attachment3D Warning: Undable to add \"{ attachmentNode.Id }\" to the list of animable nodes. Node not found");
+						continue;
+					}
+					nodeList.Add(node);
+				}
+				return nodeList;
 			}
-			if (animationData.IgnoredNodes.Count > 0) {
-				var ignoredNodes = new HashSet<Node>(animationData.IgnoredNodes.Select(n => model.FindNode(n.Id)));
-				return model.Descendants.Where(i => !ignoredNodes.Contains(i));
+			if (attachmentAnimation.IgnoredNodes.Count > 0) {
+				var nodeList = new List<Node>();
+				foreach (var nodeData in attachmentAnimation.IgnoredNodes.Distinct()) {
+					var node = model.TryFindNode(nodeData.Id);
+					if (node == null) {
+						Console.WriteLine($"Attachment3D Warning: Undable to add \"{ nodeData.Id }\" to the list ignored for animation nodes. Node not found");
+						continue;
+					}
+					nodeList.Add(node);
+				}
+				return model.Descendants.Where(i => !nodeList.Contains(i));
 			}
 			return model.Descendants;
 		}
