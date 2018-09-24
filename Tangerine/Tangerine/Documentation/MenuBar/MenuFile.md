@@ -1,5 +1,5 @@
 # Меню "File"
-[[Назад]](@MenuBar)
+[[Назад]](@MenuBar.MenuBar)
 * **New** `Ctrl + N` - создает новый файл. Можно выбрать *.tan, *.scene или *.tan с кастомной рут-сценой
 * **New Project** `Ctrl + J` - cоздает новый проект
 * **Open** `Ctrl + O` - открыть сцену (*.scene / *.tan)
