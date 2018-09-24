@@ -1,4 +1,4 @@
-﻿using EmptyProject.Debug;
+using EmptyProject.Debug;
 using EmptyProject.Dialogs;
 using Lime;
 using System.IO;
@@ -87,7 +87,7 @@ namespace EmptyProject.Application
 
 		private WindowWidget CreateWorld()
 		{
-			var options = new WindowOptions { Title = ApplicationName, AsyncRendering = true };
+			var options = new WindowOptions { Title = ApplicationName, UseTimer = false, AsyncRendering = false };
 			var window = new Window(options);
 			window.Updating += OnUpdateFrame;
 			window.Rendering += OnRenderFrame;
@@ -117,6 +117,7 @@ namespace EmptyProject.Application
 
 			delta *= speedMultiplier;
 			The.World.Update(delta);
+			The.World.PrepareToRender();
 		}
 
 		private void OnResize(bool isDeviceRotated)

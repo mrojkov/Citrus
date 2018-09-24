@@ -70,7 +70,7 @@ namespace RainbowDash
 			size.Y = Mathf.Clamp(extent.Height + Margin, MinSize, float.PositiveInfinity);
 			b.MinSize = size;
 			b.MaxSize = Vector2.PositiveInfinity;
-			b.Layout.InvalidateConstraintsAndArrangement(b);
+			b.Layout.InvalidateConstraintsAndArrangement();
 		}
 
 		public static void DecorateButton(Button b, Color4 bgColor, Color4? textColor = null)
