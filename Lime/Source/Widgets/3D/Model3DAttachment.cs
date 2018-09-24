@@ -16,6 +16,8 @@ namespace Lime
 		public readonly ObservableCollection<Animation> Animations = new ObservableCollection<Animation>();
 		public readonly ObservableCollection<MaterialEffect> MaterialEffects = new ObservableCollection<MaterialEffect>();
 		public readonly ObservableCollection<NodeComponentCollection> NodeComponents = new ObservableCollection<NodeComponentCollection>();
+		public readonly ObservableCollection<NodeRemoval> NodeRemovals = new ObservableCollection<NodeRemoval>();
+
 		public float ScaleFactor { get; set; }
 
 		public class MeshOption
@@ -68,12 +70,18 @@ namespace Lime
 			public ObservableCollection<NodeComponent> Components { get; set; }
 		}
 
+		public class NodeRemoval
+		{
+			public string NodeId { get; set; }
+		}
+
 		public void Apply(Node3D model)
 		{
 			ProcessMeshOptions(model);
 			ProcessAnimations(model);
 			ProcessMaterialEffects(model);
 			ProcessComponents(model);
+			ProcessNodeRemovals(model);
 		}
 
 		private void ProcessComponents(Node3D model)
@@ -253,6 +261,14 @@ namespace Lime
 			}
 		}
 
+		private void ProcessNodeRemovals(Node3D model)
+		{
+			var nodes = NodeRemovals.SelectMany(removal => model.Descendants.Where(node => string.Equals(removal.NodeId, node.Id))).ToList();
+			foreach (var node in nodes) {
+				node.Unlink();
+			}
+		}
+
 		private void OverrideAnimation(Node node, Lime.Animation srcAnimation, Lime.Animation dstAnimation)
 		{
 			var srcAnimationName = node.Animators.FirstOrDefault()?.AnimationId ?? srcAnimation.Id;
@@ -305,6 +321,9 @@ namespace Lime
 
 			[YuzuMember]
 			public Dictionary<string, ModelMaterialEffectFormat> MaterialEffects = null;
+
+			[YuzuMember]
+			public List<string> NodeRemovals = null;
 
 			[YuzuMember]
 			public List<UVAnimationFormat> UVAnimations = null;
@@ -551,6 +570,12 @@ namespace Lime
 					}
 				}
 
+				if (modelAttachmentFormat.NodeRemovals != null) {
+					foreach (var id in modelAttachmentFormat.NodeRemovals) {
+						attachment.NodeRemovals.Add(new Model3DAttachment.NodeRemoval { NodeId = id });
+					}
+				}
+
 				return attachment;
 			} catch (System.Exception e) {
 				throw new System.Exception(modelPath + ": " + e.Message, e);
@@ -579,6 +604,9 @@ namespace Lime
 			if (attachment.NodeComponents.Count > 0) {
 				origin.NodeComponents = new Dictionary<string, ModelComponentsFormat>();
 			}
+			if (attachment.NodeRemovals.Count > 0) {
+				origin.NodeRemovals = new List<string>();
+			}
 			foreach (var meshOption in attachment.MeshOptions) {
 				var meshOptionFormat = new MeshOptionFormat {
 					HitTestTarget = meshOption.HitTestTarget,
@@ -604,6 +632,10 @@ namespace Lime
 					Components = component.Components.ToList(),
 				};
 				origin.NodeComponents.Add(component.NodeId, componentFormat);
+			}
+
+			foreach (var removal in attachment.NodeRemovals) {
+				origin.NodeRemovals.Add(removal.NodeId);
 			}
 
 			foreach (var animation in attachment.Animations) {

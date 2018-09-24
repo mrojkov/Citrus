@@ -70,6 +70,7 @@ namespace Tangerine
 			content.AddTab("Components", CreateComponentsPane(attachment));
 			content.AddTab("Mesh Options", CreateMeshOptionsPane(attachment));
 			content.AddTab("Animations", CreateAnimationsPane(attachment));
+			content.AddTab("Node Removals", CreateNodeRemovalsPane(attachment));
 			Button okButton;
 			WindowWidget rootWidget = new ThemedInvalidableWindowWidget(window) {
 				Padding = new Thickness(8),
@@ -165,6 +166,29 @@ namespace Tangerine
 			if (new HashSet<string>(attachment.NodeComponents.Select(a => a.NodeId)).Count != attachment.NodeComponents.Count) {
 				throw new Lime.Exception("Node components shouldn't have the same node ids");
 			}
+		}
+
+		private static Widget CreateNodeRemovalsPane(Model3DAttachment attachment)
+		{
+			var pane = new ThemedScrollView();
+			pane.Content.Padding = new Thickness { Right = 10 };
+			var list = new Widget {
+				Layout = new VBoxLayout(),
+			};
+			pane.Content.Layout = new VBoxLayout { Spacing = AttachmentMetrics.Spacing };
+			pane.Content.AddNode(list);
+			var widgetFactory = new AttachmentWidgetFactory<Model3DAttachment.NodeRemoval>(
+				w => new NodeRemovalRow(w, attachment.NodeRemovals), attachment.NodeRemovals);
+			widgetFactory.AddHeader(NodeRemovalRow.CreateHeader());
+			widgetFactory.AddFooter(NodeRemovalRow.CreateFooter(() => {
+				history.DoTransaction(() => Core.Operations.InsertIntoList.Perform(
+					attachment.NodeRemovals,
+					attachment.NodeRemovals.Count,
+					new Model3DAttachment.NodeRemoval { NodeId = "NodeRemoval" }
+				));
+			}));
+			list.Components.Add(widgetFactory);
+			return pane;
 		}
 
 		private static Widget CreateAnimationsPane(Model3DAttachment attachment)
@@ -358,6 +382,41 @@ namespace Tangerine
 			private void AddChangeWatcher(Func<BlendingOption> getter, Action<BlendingOption> action)
 			{
 				Tasks.Add(new Property<BlendingOption>(getter).DistinctUntilChanged().Consume(action));
+			}
+		}
+
+		private class NodeRemovalRow : DeletableRow<Model3DAttachment.NodeRemoval>
+		{
+			public NodeRemovalRow(Model3DAttachment.NodeRemoval removal, ObservableCollection<Model3DAttachment.NodeRemoval> options) : base(removal, options)
+			{
+				Layout = new VBoxLayout();
+				Padding = new Thickness(AttachmentMetrics.Spacing);
+				var nodeIdPropertyEditor = new StringPropertyEditor(
+					Decorate(new PropertyEditorParams(
+						Header,
+						removal,
+						nameof(Model3DAttachment.NodeRemoval.NodeId))));
+				nodeIdPropertyEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.EditorWidth;
+				CompoundPresenter.Add(Presenters.StripePresenter);
+			}
+
+			internal static Widget CreateHeader()
+			{
+				return new Widget {
+					Layout = new HBoxLayout { Spacing = AttachmentMetrics.Spacing },
+					Padding = new Thickness { Left = AttachmentMetrics.Spacing },
+					MinMaxHeight = 20,
+					Presenter = Presenters.HeaderPresenter,
+					Nodes = {
+						new ThemedSimpleText {
+							Text = "Node Id",
+							MinMaxWidth = AttachmentMetrics.EditorWidth,
+							VAlignment = VAlignment.Center,
+							ForceUncutText = false
+						},
+						new Widget(),
+					}
+				};
 			}
 		}
 
