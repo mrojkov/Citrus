@@ -23,8 +23,6 @@ namespace Lime
 
 		public bool IsStopped { get { return Channel.State == AudioChannelState.Stopped; } }
 
-		private PlayParameters playParameters;
-
 		public float Volume
 		{
 			get { return Channel.Volume; }
@@ -46,12 +44,7 @@ namespace Lime
 		public void Resume(float fadeinTime = 0)
 		{
 			EnsureLoaded();
-			if (playParameters != null) {
-				AudioSystem.Play(playParameters, fadeinTime);
-				playParameters = null;
-			} else {
-				Channel.Resume(fadeinTime);
-			}
+			Channel.Resume(fadeinTime);
 		}
 
 		public void Stop(float fadeoutTime = 0)
