@@ -1,5 +1,18 @@
 namespace Lime
 {
+	public class PlayParameters
+	{
+		public string Path;
+		public IAudioDecoder Decoder;
+		public AudioChannelGroup Group;
+		public float Pan = 0f;
+		public float Volume = 1f;
+		public float Pitch = 1f;
+		public float Priority = 0.5f;
+		public bool Looping = false;
+		public bool Paused = false;
+	}
+
 	public static class AudioSystem
 	{
 		static readonly float[] groupVolumes = { 1, 1, 1 };
@@ -74,12 +87,22 @@ namespace Lime
 			if (group == AudioChannelGroup.Music && CommandLineArgs.NoMusic) {
 				return new Sound();
 			}
-			return PlatformAudioSystem.Play(path, group, looping, priority, fadeinTime, paused, volume, pan, pitch);
+			return PlatformAudioSystem.Play(new PlayParameters {
+				Path = path,
+				Group = group,
+				Looping = looping,
+				Priority = priority,
+				Paused = paused,
+				Volume = volume,
+				Pan = pan,
+				Pitch = pitch
+			},
+			fadeinTime);
 		}
 
-		public static void ResumeSound(Sound sound, ChannelParameters channelParameters, float fadeinTime = 0)
+		public static Sound Play(PlayParameters parameters, float fadeinTime = 0f)
 		{
-			PlatformAudioSystem.Resume(sound, channelParameters, fadeinTime);
+			return PlatformAudioSystem.Play(parameters, fadeinTime);
 		}
 
 		public static Sound PlayMusic(string path, bool looping = true, float priority = 100f, float fadeinTime = 0.5f, bool paused = false, float volume = 1f, float pan = 0f, float pitch = 1f)

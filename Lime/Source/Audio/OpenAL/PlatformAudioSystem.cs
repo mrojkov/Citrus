@@ -283,46 +283,31 @@ namespace Lime
 			}
 		}
 
-		private static Sound LoadSoundToChannel(AudioChannel channel, string path, bool looping, bool paused, float fadeinTime)
+		private static Sound LoadSoundToChannel(AudioChannel channel, PlayParameters parameters, float fadeinTime)
 		{
 			if (context == null) {
 				return new Sound();
 			}
+			var path = parameters.Path;
 			path += Application.IsTangerine ? ".ogg" : ".sound";
 			var sound = new Sound();
-			var stream = cache.OpenStream(path);
-			if (stream == null) {
-				if (AudioMissing != null) {
-					AudioMissing(path);
+			var decoder = parameters.Decoder;
+			if (decoder == null) {
+				var stream = cache.OpenStream(path);
+				if (stream == null) {
+					if (AudioMissing != null) {
+						AudioMissing(path);
+					}
+					return sound;
 				}
-				return sound;
+				decoder = AudioDecoderFactory.CreateDecoder(stream);
 			}
-			var decoder = AudioDecoderFactory.CreateDecoder(stream);
-			if (channel == null || !channel.Play(sound, decoder, looping, paused, fadeinTime)) {
+			if (channel == null || !channel.Play(sound, decoder, parameters.Looping, parameters.Paused, fadeinTime)) {
 				decoder.Dispose();
 				return sound;
 			}
 			channel.SamplePath = path;
 			return sound;
-		}
-
-		private static void LoadSoundToChannel(AudioChannel channel, Sound sound, ChannelParameters channelParameters, float fadeinTime = 0f)
-		{
-			channel.Group = channelParameters.Group;
-			channel.Priority = channelParameters.Priority;
-			channel.Volume = channelParameters.Volume;
-			channel.Pitch = channelParameters.Pitch;
-			channel.Pan = channelParameters.Pan;
-			channel.SamplePath = channelParameters.SamplePath;
-			if (channel != null) {
-				channel.Play(
-					sound,
-					channelParameters.Decoder,
-					channelParameters.Looping,
-					false,
-					fadeinTime
-				);
-			}
 		}
 
 		private static AudioChannel AllocateChannel(float priority)
@@ -358,46 +343,21 @@ namespace Lime
 			return null;
 		}
 
-		public static Sound Play(
-			string path,
-			AudioChannelGroup group,
-			bool looping = false,
-			float priority = 0.5f,
-			float fadeinTime = 0f,
-			bool paused = false,
-			float volume = 1f,
-			float pan = 0f,
-			float pitch = 1f)
+		public static Sound Play(PlayParameters parameters, float fadeinTime = 0f)
 		{
-			var channel = AllocateChannel(priority);
+			var channel = AllocateChannel(parameters.Priority);
 			if (channel == null) {
 				return new Sound();
 			}
 			if (channel.Sound != null) {
 				channel.Sound.Channel = NullAudioChannel.Instance;
 			}
-			channel.Group = group;
-			channel.Priority = priority;
-			channel.Volume = volume;
-			channel.Pitch = pitch;
-			channel.Pan = pan;
-			return LoadSoundToChannel(channel, path, looping, paused, fadeinTime);
-		}
-
-		public static void Resume (Sound sound, ChannelParameters channelParameters, float fadeinTime = 0)
-		{
-			if (context == null) {
-				return;
-			}
-			var channel = AllocateChannel(channelParameters.Priority);
-			if (channel == null) {
-				sound.Channel = NullAudioChannel.Instance;
-			}
-			if (channel.Sound != null) {
-				channel.Sound.Channel = NullAudioChannel.Instance;
-			}
-			
-			LoadSoundToChannel(channel, sound, channelParameters, fadeinTime);
+			channel.Group = parameters.Group;
+			channel.Priority = parameters.Priority;
+			channel.Volume = parameters.Volume;
+			channel.Pitch = parameters.Pitch;
+			channel.Pan = parameters.Pan;
+			return LoadSoundToChannel(channel, parameters, fadeinTime);
 		}
 
 		public struct ErrorChecker : IDisposable

@@ -1,4 +1,4 @@
-﻿
+
 namespace Lime
 {
 	public enum AudioChannelState
@@ -29,7 +29,7 @@ namespace Lime
 		void Resume(float fadeinTime = 0);
 		void Stop(float fadeoutTime = 0);
 		void Pause(float fadeoutTime = 0);
-		ChannelParameters Suspend(float fadeoutTime = 0);
+		PlayParameters Suspend(float fadeoutTime = 0);
 	}
 
 	public class NullAudioChannel : IAudioChannel
@@ -42,7 +42,7 @@ namespace Lime
 		public void Resume(float fadeinTime = 0) {}
 		public void Stop(float fadeoutTime = 0) {}
 		public void Pause(float fadeoutTime = 0) {}
-		public ChannelParameters Suspend(float fadeoutTime = 0) { return null; }
+		public PlayParameters Suspend(float fadeoutTime = 0) { return null; }
 		public float Volume { get { return 0; } set { } }
 		public float Pitch { get { return 1; } set { } }
 		public string SamplePath { get; set; }

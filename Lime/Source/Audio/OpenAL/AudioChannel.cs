@@ -263,7 +263,7 @@ namespace Lime
 			}
 		}
 
-		public ChannelParameters Suspend(float fadeoutTime = 0)
+		public PlayParameters Suspend(float fadeoutTime = 0)
 		{
 			if (!AudioSystem.Active) {
 				return null;
@@ -277,13 +277,13 @@ namespace Lime
 				SuspendImmediate();
 			}
 			Volume = volume;
-			return new ChannelParameters() {
+			return new PlayParameters {
 				Decoder = decoder,
 				Group = Group,
 				Pan = pan,
 				Volume = volume,
 				Pitch = pitch,
-				SamplePath = SamplePath,
+				Path = SamplePath,
 				Priority = Priority,
 				Looping = looping,
 			};
@@ -293,7 +293,6 @@ namespace Lime
 		{
 			StopImmediate();
 			decoder = null;
-			Sound = null;
 		}
 
 		private void SetPitch(float value)
