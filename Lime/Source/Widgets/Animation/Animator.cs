@@ -44,6 +44,10 @@ namespace Lime
 		void Unbind();
 
 		bool IsZombie { get; }
+
+#if TANGERINE
+		int Version { get; }
+#endif // TANGERINE
 	}
 
 	public interface IKeyframeList : IList<IKeyframe>
@@ -55,8 +59,9 @@ namespace Lime
 		void Add(int frame, object value, KeyFunction function = KeyFunction.Linear);
 		void AddOrdered(int frame, object value, KeyFunction function = KeyFunction.Linear);
 		void AddOrdered(IKeyframe keyframe);
-
+#if TANGERINE
 		int Version { get; }
+#endif // TANGERINE
 	}
 
 	public class Animator<T> : IAnimator
@@ -76,7 +81,23 @@ namespace Lime
 		private delegate void SetterDelegate(T value);
 		private delegate void IndexedSetterDelegate(int index, T value);
 		private SetterDelegate setter;
-		public bool IsZombie { get; private set; }
+		private bool isZombie;
+		public bool IsZombie
+		{
+			get => isZombie;
+			private set
+			{
+				isZombie = value;
+#if TANGERINE
+				version++;
+#endif // TANGERINE
+			}
+		}
+
+#if TANGERINE
+		private int version;
+		public int Version { get => version + ReadonlyKeys.Version; }
+#endif // TANGERINE
 
 		[YuzuMember("TargetProperty")]
 		public string TargetPropertyPath { get; set; }

@@ -41,8 +41,8 @@ namespace Tangerine.UI.Inspector
 		public void Poll()
 		{
 			GotValue = false;
-			var animable = obj as IAnimationHost;
-			if (animable == null) {
+			var animationHost = obj as IAnimationHost;
+			if (animationHost == null) {
 				return;
 			}
 			if ((GotValue |= Document.Current.AnimationFrame != animationFrame)) {
@@ -52,8 +52,8 @@ namespace Tangerine.UI.Inspector
 				animationId = Document.Current.AnimationId;
 				animatorCollectionVersion = int.MinValue;
 			}
-			if ((GotValue |= animatorCollectionVersion != animable.Animators.Version)) {
-				animatorCollectionVersion = animable.Animators.Version;
+			if ((GotValue |= animatorCollectionVersion != animationHost.Animators.Version)) {
+				animatorCollectionVersion = animationHost.Animators.Version;
 				animator = FindAnimator();
 			}
 			if ((GotValue |= animator != null && animator.ReadonlyKeys.Version != animatorVersion)) {

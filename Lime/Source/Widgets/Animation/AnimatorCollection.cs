@@ -12,7 +12,9 @@ namespace Lime
 		private Node owner;
 		public IAnimator First { get; private set; }
 		public int Count { get; private set; }
+#if TANGERINE
 		public int Version { get; private set; }
+#endif // TANGERINE
 
 		public AnimatorCollection(Node owner)
 		{
@@ -46,7 +48,9 @@ namespace Lime
 			if (owner.Animations.TryFind(item.AnimationId, out animation)) {
 				animation.NextMarkerOrTriggerTime = null;
 			}
+#if TANGERINE
 			Version++;
+#endif // TANGERINE
 			Count++;
 		}
 
@@ -67,7 +71,9 @@ namespace Lime
 			}
 			First = null;
 			Count = 0;
+#if TANGERINE
 			Version++;
+#endif // TANGERINE
 		}
 
 		internal static AnimatorCollection SharedClone(Node owner, AnimatorCollection source)
@@ -116,7 +122,9 @@ namespace Lime
 				animator.TargetPropertyPath = propertyPath;
 				animator.AnimationId = animationId;
 				Add(animator);
+#if TANGERINE
 				Version++;
+#endif // TANGERINE
 				return animator;
 			}
 		}
@@ -156,7 +164,9 @@ namespace Lime
 					a.Owner = null;
 					a.Next = null;
 					Count--;
+#if TANGERINE
 					Version++;
+#endif // TANGERINE
 					return true;
 				}
 				prev = a;
@@ -202,7 +212,9 @@ namespace Lime
 
 		public void Invalidate()
 		{
+#if TANGERINE
 			Version++;
+#endif // TANGERINE
 		}
 
 		IEnumerator<IAnimator> IEnumerable<IAnimator>.GetEnumerator() => new Enumerator(First);

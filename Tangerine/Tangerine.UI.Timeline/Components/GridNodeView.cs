@@ -62,7 +62,7 @@ namespace Tangerine.UI.Timeline.Components
 		{
 			int result = node.Animators.Version;
 			foreach (var a in node.Animators) {
-				result = unchecked(a.ReadonlyKeys.Version + result * 314159);
+				result = unchecked(result + a.Version);
 			}
 			return result;
 		}
