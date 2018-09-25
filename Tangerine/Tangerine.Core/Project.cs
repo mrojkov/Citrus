@@ -81,7 +81,14 @@ namespace Tangerine.Core
 						}
 					}
 					var currentDoc = documents.FirstOrDefault(d => d.Path == UserPreferences.CurrentDocument) ?? documents.FirstOrDefault();
-					Document.SetCurrent(currentDoc);
+					try {
+						Document.SetCurrent(currentDoc);
+					} catch (System.Exception e) {
+						if (currentDoc != null) {
+							CloseDocument(currentDoc);
+						}
+						throw;
+					}
 				} catch (System.Exception e) {
 					Debug.Write($"Failed to load the project user preferences: {e}");
 				}

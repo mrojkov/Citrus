@@ -42,7 +42,7 @@ namespace Tangerine.Core
 
 		private DateTime modificationTime;
 
-		public bool Loaded { get; private set; }
+		public bool Loaded { get; private set; } = true;
 
 		public static event Action<Document> AttachingViews;
 		public static Func<Document, CloseAction> CloseConfirmation;
@@ -64,6 +64,11 @@ namespace Tangerine.Core
 		/// Gets the path to the document relative to the project directory.
 		/// </summary>
 		public string Path { get; private set; }
+
+		/// <summary>
+		/// Document name to be displayed.
+		/// </summary>
+		public string DisplayName => (IsModified ? "*" : string.Empty) + System.IO.Path.GetFileName(System.IO.Path.ChangeExtension(Path ?? "Untitled", null));
 
 		/// <summary>
 		/// Gets or sets the file format the document should be saved to.
@@ -149,6 +154,7 @@ namespace Tangerine.Core
 		public Document(string path, bool delayLoad = false)
 		{
 			Path = path;
+			Loaded = false;
 			if (delayLoad) {
 				return;
 			}
@@ -264,10 +270,7 @@ namespace Tangerine.Core
 
 		public static void SetCurrent(Document doc)
 		{
-			if (doc == null) {
-				return;
-			}
-			if (!doc.Loaded) {
+			if (!(doc?.Loaded ?? true)) {
 				doc.Load();
 			}
 			if (Current != doc) {
