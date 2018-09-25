@@ -14,6 +14,7 @@ namespace Tangerine.UI.Timeline
 			var widget = timeline.Grid.RootWidget;
 			while (true) {
 				if (widget.Input.IsMousePressed()) {
+					yield return null;
 					var cw = TimelineMetrics.ColWidth;
 					var p = widget.LocalMousePosition();
 					if (p.X > widget.Width - cw / 2) {

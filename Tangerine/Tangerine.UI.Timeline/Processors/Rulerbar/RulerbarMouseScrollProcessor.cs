@@ -17,6 +17,7 @@ namespace Tangerine.UI.Timeline
 			var input = rulerWidget.Input;
 			while (true) {
 				if (input.WasMousePressed()) {
+					yield return null;
 					Operations.SetCurrentColumn.Processor.CacheAnimationsStates = true;
 					using (Document.Current.History.BeginTransaction()) {
 						int initialColumnUnderMouse = CalcColumn(rulerWidget.LocalMousePosition().X);
