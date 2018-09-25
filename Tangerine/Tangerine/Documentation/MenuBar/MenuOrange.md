@@ -1,4 +1,5 @@
 # Меню "Window"
+
 [[Назад]](@MenuBar.MenuBar)
 
 Меню "подтягивается" из Orange Launcher (и зависит от Orange Plugins), однако следующие функции встроенны в редактор:
