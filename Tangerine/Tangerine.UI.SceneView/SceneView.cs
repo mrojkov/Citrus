@@ -158,12 +158,17 @@ namespace Tangerine.UI.SceneView
 
 		private void CenterDocumentRoot(Node node)
 		{
+			// Before Frame awakens something is being changed on this frame enough to change Frame Size on LayoutManager.Layout()
+			// which will come at the end of the frame. Force it now to get accurate Frame.Size;
+			WidgetContext.Current.Root.LayoutManager.Layout();
+			var rulerSize = RulersWidget.RulerHeight * (RulersWidget.Visible ? 1 : 0);
 			var widget = Document.Current.RootNode.AsWidget;
-			var frameWidth = Frame.Width - RulersWidget.RulerHeight;
-			var frameHeight = Frame.Height - ZoomWidget.FrameHeight + RulersWidget.RulerHeight;
-			var zoomIndex = ZoomWidget.FindNearest(Mathf.Min(frameWidth / widget.Width, frameHeight / widget.Height), 0, ZoomWidget.zoomTable.Count);
+			var frameWidth = Frame.Width - rulerSize;
+			var frameHeight = Frame.Height - ZoomWidget.FrameHeight - rulerSize;
+			var wnatedZoom = Mathf.Clamp(Mathf.Min(frameWidth / (widget.Width * widget.Scale.X), frameHeight / (widget.Height * widget.Scale.Y)), 0.0f, 1.0f);
+			var zoomIndex = ZoomWidget.FindNearest(wnatedZoom, 0, ZoomWidget.zoomTable.Count);
 			Scene.Scale = new Vector2(ZoomWidget.zoomTable[zoomIndex]);
-			Scene.Position = -(widget.Position + widget.Size / 2) * Scene.Scale + new Vector2(Frame.Width / 2, Frame.Height / 2);
+			Scene.Position = -(widget.Position + widget.Size * widget.Scale * 0.5f) * Scene.Scale + new Vector2(frameWidth * 0.5f, frameHeight * 0.5f) + Vector2.One * rulerSize;
 		}
 
 		private void FilesDropOnHandling()
