@@ -11,7 +11,7 @@ using OpenTK.Audio.OpenAL;
 
 namespace Lime
 {
-	public class AudioChannel : IDisposable, IAudioChannel
+	public class AudioChannel : IDisposable, IAudioChannelInternal, IAudioChannel
 	{
 		public const int BufferSize = 1024 * 32;
 		public const int NumBuffers = 8;
@@ -29,6 +29,7 @@ namespace Lime
 		private float pitch = 1;
 		private float pan = 0;
 		private bool looping;
+		private FadePurpose fadePurpose;
 		private float fadeVolume;
 		private float fadeSpeed;
 		private List<int> allBuffers;
@@ -36,6 +37,15 @@ namespace Lime
 
 		private IAudioDecoder decoder;
 		private readonly IntPtr decodedData;
+
+		private enum FadePurpose
+		{
+			None,
+			Play,
+			Stop,
+			Pause,
+			Suspend
+		}
 		
 		public bool Streaming { get { return streaming; } }
 
@@ -150,17 +160,15 @@ namespace Lime
 					throw new Lime.Exception("Can't play on channel because it is in use");
 				}
 				this.looping = looping;
-				if (this.decoder != null) {
-					this.decoder.Dispose();
-				}
+				this.decoder?.Dispose();
 				this.decoder = decoder;
 			}
 			DetachBuffers();
 			if (Sound != null) {
-				Sound.Channel = NullAudioChannel.Instance;
+				Sound.ChannelInternal = NullAudioChannel.Instance;
 			}
 			this.Sound = sound;
-			sound.Channel = this;
+			sound.ChannelInternal = this;
 			StartupTime = DateTime.Now;
 			if (!paused) {
 				Resume(fadeinTime);
@@ -187,24 +195,41 @@ namespace Lime
 			if (fadeinTime > 0) {
 				fadeVolume = 0;
 				fadeSpeed = 1 / fadeinTime;
+				fadePurpose = FadePurpose.Play;
 			} else {
 				fadeSpeed = 0;
 				fadeVolume = 1;
 			}
 			Volume = volume;
+			PlayImmediate();
+		}
+
+		private void PlayImmediate()
+		{
 			streaming = true;
-			if (State == AudioChannelState.Paused) {
-				using (new PlatformAudioSystem.ErrorChecker()) {
-					AL.SourcePlay(source);
-				}
+			using (new PlatformAudioSystem.ErrorChecker()) {
+				AL.SourcePlay(source);
 			}
 		}
 
-		public void Pause()
+		public void Pause(float fadeoutTime = 0)
 		{
 			if (!AudioSystem.Active) {
 				return;
 			}
+			if (fadeoutTime > 0) {
+				fadeSpeed = -1 / fadeoutTime;
+				fadePurpose = FadePurpose.Pause;
+			} else {
+				fadeSpeed = 0;
+				fadeVolume = 0;
+				PauseImmediate();
+			}
+			Volume = volume;
+		}
+
+		private void PauseImmediate()
+		{
 			using (new PlatformAudioSystem.ErrorChecker()) {
 				AL.SourcePause(source);
 			}
@@ -216,19 +241,57 @@ namespace Lime
 				return;
 			}
 			if (fadeoutTime > 0) {
-				// fadeVolume = 1;
 				fadeSpeed = -1 / fadeoutTime;
-				return;
+				fadePurpose = FadePurpose.Stop;
 			} else {
 				fadeSpeed = 0;
 				fadeVolume = 0;
+				StopImmediate();
 			}
+			Volume = volume;
+		}
+
+		private void StopImmediate()
+		{
 			lock (streamingSync) {
 				streaming = false;
 				using (new PlatformAudioSystem.ErrorChecker(throwException: false)) {
 					AL.SourceStop(source);
 				}
 			}
+		}
+
+		public PlayParameters Suspend(float fadeoutTime = 0)
+		{
+			if (!AudioSystem.Active) {
+				return null;
+			}
+			if (fadeoutTime > 0) {
+				fadeSpeed = -1 / fadeoutTime;
+				fadePurpose = FadePurpose.Suspend;
+			} else {
+				fadeSpeed = 0;
+				fadeVolume = 0;
+				SuspendImmediate();
+			}
+			Volume = volume;
+			return new PlayParameters {
+				Decoder = decoder,
+				Group = Group,
+				Pan = pan,
+				Volume = volume,
+				Pitch = pitch,
+				Path = SamplePath,
+				Priority = Priority,
+				Looping = looping,
+			};
+		}
+
+		private void SuspendImmediate()
+		{
+			StopImmediate();
+			// Set to null to prevent disposing the decoder on next Play().
+			decoder = null;
 		}
 
 		private void SetPitch(float value)
@@ -266,20 +329,42 @@ namespace Lime
 					}
 				}
 			}
-			if (fadeSpeed != 0) {
-				fadeVolume += delta * fadeSpeed;
-				if (fadeVolume > 1) {
-					fadeSpeed = 0;
-					fadeVolume = 1;
-				} else if (fadeVolume < 0) {
-					fadeSpeed = 0;
-					fadeVolume = 0;
-					Stop();
+			if (fadePurpose != FadePurpose.None) {
+				if (fadeSpeed != 0) {
+					fadeVolume += delta * fadeSpeed;
+					if (fadeVolume > 1) {
+						fadeSpeed = 0;
+						fadeVolume = 1;
+					} else if (fadeVolume < 0) {
+						fadeSpeed = 0;
+						fadeVolume = 0;
+					}
+					Volume = volume;
+				} else {
+					FadeFinished();
 				}
-				Volume = volume;
-			} else if (streaming && (Sound?.StopChecker?.Invoke() ?? false)) {
+			}
+			if (streaming && (Sound?.StopChecker?.Invoke() ?? false)) {
 				Stop(0.1f);
 			}
+		}
+
+		private void FadeFinished()
+		{
+			switch (fadePurpose) {
+				case FadePurpose.Play:
+					break;
+				case FadePurpose.Stop:
+					StopImmediate();
+					break;
+				case FadePurpose.Pause:
+					PauseImmediate();
+					break;
+				case FadePurpose.Suspend:
+					SuspendImmediate();
+					break;
+			}
+			fadePurpose = FadePurpose.None;
 		}
 
 		void QueueBuffers()

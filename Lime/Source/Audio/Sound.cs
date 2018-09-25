@@ -12,45 +12,59 @@ namespace Lime
 	{
 		public Sound()
 		{
-			Channel = NullAudioChannel.Instance;
+			ChannelInternal = NullAudioChannel.Instance;
 		}
 
-		public IAudioChannel Channel { get; internal set; }
+		public IAudioChannel Channel => (IAudioChannel)ChannelInternal;
+
+		internal IAudioChannelInternal ChannelInternal { get; set; }
 
 		public System.Func<bool> StopChecker;
 
 		public bool IsLoading { get; internal set; }
 
-		public bool IsStopped { get { return Channel.State == AudioChannelState.Stopped; } }
+		public bool IsStopped { get { return ChannelInternal.State == AudioChannelState.Stopped; } }
 
 		public float Volume
 		{
-			get { return Channel.Volume; }
-			set { Channel.Volume = value; }
+			get { return ChannelInternal.Volume; }
+			set { ChannelInternal.Volume = value; }
 		}
 
 		public float Pitch
 		{
-			get { return Channel.Pitch; }
-			set { Channel.Pitch = value; }
+			get { return ChannelInternal.Pitch; }
+			set { ChannelInternal.Pitch = value; }
 		}
 
 		public float Pan
 		{
-			get { return Channel.Pan; }
-			set { Channel.Pan = value; }
+			get { return ChannelInternal.Pan; }
+			set { ChannelInternal.Pan = value; }
 		}
 
 		public void Resume(float fadeinTime = 0)
 		{
 			EnsureLoaded();
-			Channel.Resume(fadeinTime);
+			ChannelInternal.Resume(fadeinTime);
 		}
 
 		public void Stop(float fadeoutTime = 0)
 		{
 			EnsureLoaded();
-			Channel.Stop(fadeoutTime);
+			ChannelInternal.Stop(fadeoutTime);
+		}
+
+		public void Pause(float fadeoutTime = 0)
+		{
+			EnsureLoaded();
+			ChannelInternal.Pause(fadeoutTime);
+		}
+
+		public PlayParameters Suspend(float fadeoutTime = 0)
+		{
+			EnsureLoaded();
+			return ChannelInternal.Suspend(fadeoutTime);
 		}
 
 		private void EnsureLoaded()

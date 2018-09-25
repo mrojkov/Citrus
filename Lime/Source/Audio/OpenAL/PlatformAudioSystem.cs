@@ -19,7 +19,7 @@ using OpenTK.Audio.OpenAL;
 
 namespace Lime
 {
-	public static class PlatformAudioSystem
+	internal static class PlatformAudioSystem
 	{
 #if ANDROID
 		const string Lib = "openal32";
@@ -42,8 +42,7 @@ namespace Lime
 		static bool audioSessionInterruptionEnded;
 #endif
 
-		public delegate void AudioMissingDelegate(string path);
-		public static event AudioMissingDelegate AudioMissing;
+		public static event Action<string> AudioMissing;
 
 		public static void Initialize(ApplicationOptions options)
 		{
@@ -105,7 +104,7 @@ namespace Lime
 			}
 		}
 
-		public static List<AudioChannel> Channels => channels;
+		public static IEnumerable<IAudioChannel> Channels => channels;
 
 #if ANDROID
 		private static void SetActive(bool value)
@@ -283,22 +282,24 @@ namespace Lime
 			}
 		}
 
-		private static Sound LoadSoundToChannel(AudioChannel channel, string path, bool looping, bool paused, float fadeinTime)
+		private static Sound LoadSoundToChannel(AudioChannel channel, PlayParameters parameters, float fadeinTime)
 		{
 			if (context == null) {
 				return new Sound();
 			}
-			path += Application.IsTangerine ? ".ogg" : ".sound";
+			var path = parameters.Path;
 			var sound = new Sound();
-			var stream = cache.OpenStream(path);
-			if (stream == null) {
-				if (AudioMissing != null) {
-					AudioMissing(path);
+			var decoder = parameters.Decoder;
+			if (decoder == null) {
+				path += Application.IsTangerine ? ".ogg" : ".sound";
+				var stream = cache.OpenStream(path);
+				if (stream == null) {
+					AudioMissing?.Invoke(path);
+					return sound;
 				}
-				return sound;
+				decoder = AudioDecoderFactory.CreateDecoder(stream);
 			}
-			var decoder = AudioDecoderFactory.CreateDecoder(stream);
-			if (channel == null || !channel.Play(sound, decoder, looping, paused, fadeinTime)) {
+			if (channel == null || !channel.Play(sound, decoder, parameters.Looping, parameters.Paused, fadeinTime)) {
 				decoder.Dispose();
 				return sound;
 			}
@@ -339,30 +340,21 @@ namespace Lime
 			return null;
 		}
 
-		public static Sound Play(
-			string path,
-			AudioChannelGroup group,
-			bool looping = false,
-			float priority = 0.5f,
-			float fadeinTime = 0f,
-			bool paused = false,
-			float volume = 1f,
-			float pan = 0f,
-			float pitch = 1f)
+		public static Sound Play(PlayParameters parameters, float fadeinTime = 0f)
 		{
-			var channel = AllocateChannel(priority);
+			var channel = AllocateChannel(parameters.Priority);
 			if (channel == null) {
 				return new Sound();
 			}
 			if (channel.Sound != null) {
-				channel.Sound.Channel = NullAudioChannel.Instance;
+				channel.Sound.ChannelInternal = NullAudioChannel.Instance;
 			}
-			channel.Group = group;
-			channel.Priority = priority;
-			channel.Volume = volume;
-			channel.Pitch = pitch;
-			channel.Pan = pan;
-			return LoadSoundToChannel(channel, path, looping, paused, fadeinTime);
+			channel.Group = parameters.Group;
+			channel.Priority = parameters.Priority;
+			channel.Volume = parameters.Volume;
+			channel.Pitch = parameters.Pitch;
+			channel.Pan = parameters.Pan;
+			return LoadSoundToChannel(channel, parameters, fadeinTime);
 		}
 
 		public struct ErrorChecker : IDisposable
