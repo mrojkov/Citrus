@@ -102,13 +102,14 @@ namespace Tangerine.UI.Timeline
 		void RenderMarker(Marker marker)
 		{
 			var r = GetRectangle(marker.Frame);
-			r.AY = r.BY - 4;
+			r.AY = r.BY - 5;
 			Renderer.DrawRect(r.A, r.B, GetMarkerColor(marker));
+			Renderer.DrawRectOutline(r.A, r.B, ColorTheme.Current.TimelineRuler.MarkerBorder);
 			if (!string.IsNullOrWhiteSpace(marker.Id)) {
 				var h = Theme.Metrics.TextHeight;
 				var padding = new Thickness { Left = 3.0f, Right = 5.0f, Top = 1.0f, Bottom = 1.0f };
 				var extent = FontPool.Instance.DefaultFont.MeasureTextLine(marker.Id, h, 0.0f);
-				var pos = new Vector2(r.A.X, r.A.Y - extent.Y - padding.Top - padding.Bottom);
+				var pos = new Vector2(r.A.X, r.A.Y - extent.Y - padding.Top - padding.Bottom - 1);
 				Renderer.DrawRect(pos, pos + extent + padding.LeftTop + padding.RightBottom, Theme.Colors.WhiteBackground);
 				Renderer.DrawRectOutline(pos, pos + extent + padding.LeftTop + padding.RightBottom, Theme.Colors.ControlBorder);
 				Renderer.DrawTextLine(pos + padding.LeftTop, marker.Id, h, Theme.Colors.BlackText, 0.0f);
@@ -139,7 +140,7 @@ namespace Tangerine.UI.Timeline
 		{
 			return new Rectangle {
 				A = new Vector2(frame * TimelineMetrics.ColWidth + 0.5f, 0),
-				B = new Vector2((frame + 1) * TimelineMetrics.ColWidth + 0.5f, RootWidget.Height)
+				B = new Vector2((frame + 1) * TimelineMetrics.ColWidth + 1.5f, RootWidget.Height)
 			};
 		}
 

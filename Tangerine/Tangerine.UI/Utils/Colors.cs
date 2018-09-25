@@ -151,6 +151,8 @@ namespace Tangerine.UI
 			public Color4 Cursor { get; set; }
 			[YuzuOptional]
 			public Color4 RunningCursor { get; set; }
+			[YuzuOptional]
+			public Color4 MarkerBorder { get; set; }
 		}
 
 		public class TimelineOverviewColors
@@ -330,7 +332,7 @@ namespace Tangerine.UI
 				ResolutionPreviewOuterSpace = new Color4(7, 7, 7, 220),
 				ResolutionPreviewText = new Color4(204, 204, 204),
 				EmitterCustomShape = Color4.Gray.Darken(0.3f).Transparentify(0.5f),
-				EmitterCustomShapeLine = Color4.White.Darken(0.05f)
+				EmitterCustomShapeLine = Color4.White.Darken(0.05f),
 			};
 			var timelineGrid = new TimelineGridColors {
 				PropertyRowBackground = Color4.White.Transparentify(0.95f),
@@ -348,7 +350,7 @@ namespace Tangerine.UI
 			};
 			var timelineCurveEditor = new TimelineCurveEditorColors {
 				Curves = new[] { Color4.Red, Color4.Green, Color4.Blue, Color4.Yellow },
-				Selection = Color4.Green
+				Selection = Color4.Green,
 			};
 			var timelineRuler = new TimelineRulerColors {
 				Notchings = timelineGrid.Lines,
@@ -357,11 +359,12 @@ namespace Tangerine.UI
 				StopMarker = new Color4(163, 0, 0),
 				UnknownMarker = Color4.Black,
 				Cursor = timelineGrid.Cursor,
-				RunningCursor = timelineGrid.RunningCursor
+				RunningCursor = timelineGrid.RunningCursor,
+				MarkerBorder = Color4.White,
 			};
 			var timelineOverview = new TimelineOverviewColors {
 				Veil = Color4.White.Darken(0.2f).Transparentify(0.6f),
-				Border = Color4.White.Darken(0.2f)
+				Border = Color4.White.Darken(0.2f),
 			};
 			var timelineRoll = new TimelineRollColors {
 				Lines = timelineGrid.Lines,
@@ -379,7 +382,7 @@ namespace Tangerine.UI
 			var docking = new DockingColors {
 				DragRectagleOutline = new Color4(0, 255, 255),
 				PanelTitleBackground = basic.GrayBackground.Lighten(0.1f),
-				PanelTitleSeparator = basic.GrayBackground.Lighten(0.15f)
+				PanelTitleSeparator = basic.GrayBackground.Lighten(0.15f),
 			};
 			var inspector = new InspectorColors {
 				BorderAroundKeyframeColorbox = basic.ControlBorder,
@@ -397,13 +400,13 @@ namespace Tangerine.UI
 				ButtonBackground = new Color4(112, 112, 112),
 				ModifierBackground = new Color4(80, 80, 80),
 				SelectedBorder = new Color4(100, 255, 255),
-				Border = new Color4(32, 32, 32)
+				Border = new Color4(32, 32, 32),
 			};
 			var hierarchy = new HierarchyColors {
 				SelectionColor = toolbar.ButtonHighlightBackground,
 				GrayedSelectionColor = toolbar.ButtonHighlightBackground.Darken(0.3f),
 				MatchColor = Color4.Yellow.Darken(0.5f).Transparentify(0.6f),
-				JointColor = Color4.Gray
+				JointColor = Color4.Gray,
 			};
 			return new ColorTheme {
 				IsDark = true,
@@ -418,7 +421,7 @@ namespace Tangerine.UI
 				Docking = docking,
 				Inspector = inspector,
 				Keyboard = keyboard,
-				Hierarchy = hierarchy
+				Hierarchy = hierarchy,
 			};
 		}
 
@@ -472,7 +475,7 @@ namespace Tangerine.UI
 				ResolutionPreviewOuterSpace = new Color4(7, 7, 7, 220),
 				ResolutionPreviewText = new Color4(204, 204, 204),
 				EmitterCustomShape = Color4.Gray.Darken(0.2f).Transparentify(0.5f),
-				EmitterCustomShapeLine = Color4.White
+				EmitterCustomShapeLine = Color4.White,
 			};
 			var timelineGrid = new TimelineGridColors {
 				PropertyRowBackground = Color4.Black.Transparentify(0.95f),
@@ -490,7 +493,7 @@ namespace Tangerine.UI
 			};
 			var timelineCurveEditor = new TimelineCurveEditorColors {
 				Curves = new[] { Color4.Red, Color4.Green, Color4.Blue, Color4.Yellow },
-				Selection = Color4.Green
+				Selection = Color4.Green,
 			};
 			var timelineRuler = new TimelineRulerColors {
 				Notchings = timelineGrid.Lines,
@@ -499,11 +502,12 @@ namespace Tangerine.UI
 				StopMarker = Color4.Red,
 				UnknownMarker = Color4.Black,
 				Cursor = timelineGrid.Cursor,
-				RunningCursor = timelineGrid.RunningCursor
+				RunningCursor = timelineGrid.RunningCursor,
+				MarkerBorder = Color4.Black,
 			};
 			var timelineOverview = new TimelineOverviewColors {
 				Veil = Color4.White.Darken(0.2f).Transparentify(0.3f),
-				Border = Color4.White.Darken(0.2f)
+				Border = Color4.White.Darken(0.2f),
 			};
 			var timelineRoll = new TimelineRollColors {
 				Lines = timelineGrid.Lines,
@@ -521,7 +525,7 @@ namespace Tangerine.UI
 			var docking = new DockingColors {
 				DragRectagleOutline = Color4.FromFloats(0.2f, 0.2f, 1f),
 				PanelTitleBackground = basic.GrayBackground.Darken(0.1f),
-				PanelTitleSeparator = basic.GrayBackground.Darken(0.15f)
+				PanelTitleSeparator = basic.GrayBackground.Darken(0.15f),
 			};
 			var inspector = new InspectorColors {
 				BorderAroundKeyframeColorbox = basic.ControlBorder,
@@ -539,13 +543,13 @@ namespace Tangerine.UI
 				ButtonBackground = new Color4(220, 220, 255),
 				ModifierBackground = new Color4(160, 160, 190),
 				SelectedBorder = new Color4(255, 0, 0),
-				Border = new Color4(32, 32, 32)
+				Border = new Color4(32, 32, 32),
 			};
 			var hierarchy = new HierarchyColors {
 				SelectionColor = toolbar.ButtonHighlightBackground,
 				GrayedSelectionColor = toolbar.ButtonHighlightBackground.Darken(0.3f),
 				MatchColor = Color4.Yellow.Transparentify(0.6f),
-				JointColor = Color4.Gray
+				JointColor = Color4.Gray,
 			};
 			return new ColorTheme {
 				IsDark = false,
@@ -560,7 +564,7 @@ namespace Tangerine.UI
 				Docking = docking,
 				Inspector = inspector,
 				Keyboard = keyboard,
-				Hierarchy = hierarchy
+				Hierarchy = hierarchy,
 			};
 		}
 	}

@@ -34,7 +34,7 @@ namespace Tangerine.UI.Timeline
 				SizeChanged = RefreshContentScale
 			};
 		}
-			
+
 		void RefreshContentScale()
 		{
 			ContentWidget.Scale = RootWidget.Size / Vector2.Max(Vector2.One, ContentWidget.Size);
