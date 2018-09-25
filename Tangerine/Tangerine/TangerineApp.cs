@@ -46,9 +46,17 @@ namespace Tangerine
 				TangerineSingleInstanceKeeper.Instance.ReleaseInstance();
 			};
 #endif
-			SetColorTheme(
-				AppUserPreferences.Instance.ColorTheme,
-				AppUserPreferences.Instance.LimeColorTheme);
+			switch (AppUserPreferences.Instance.ColorThemeKind) {
+				case ColorTheme.ColorThemeKind.Light:
+					SetColorTheme(ColorTheme.CreateLightTheme(), Theme.ColorTheme.CreateLightTheme());
+					break;
+				case ColorTheme.ColorThemeKind.Dark:
+					SetColorTheme(ColorTheme.CreateDarkTheme(), Theme.ColorTheme.CreateDarkTheme());
+					break;
+				case ColorTheme.ColorThemeKind.Custom:
+					SetColorTheme(AppUserPreferences.Instance.ColorTheme, AppUserPreferences.Instance.LimeColorTheme);
+					break;
+			}
 			Application.InvalidateWindows();
 
 			LoadFont();

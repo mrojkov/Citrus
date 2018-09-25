@@ -34,6 +34,7 @@ namespace Tangerine
 		private bool saved = false;
 		private HotkeyProfile currentProfile;
 		private bool themeChanged;
+		private bool themeEdited;
 
 		public PreferencesDialog()
 		{
@@ -81,6 +82,9 @@ namespace Tangerine
 				window.Close();
 				VisualHintsPanel.Refresh();
 				Core.UserPreferences.Instance.Save();
+				if (themeEdited) {
+					AppUserPreferences.Instance.ColorThemeKind = ColorTheme.ColorThemeKind.Custom;
+				}
 				if (themeChanged) {
 					AlertDialog.Show("Color theme changes will be applied after Tangerine restart.");
 				}
@@ -211,10 +215,12 @@ namespace Tangerine
 					return;
 				}
 				themeChanged = true;
+				themeEdited = true;
 			});
 			var darkIcons = CreateDarkIconsSwitch(pane);
 			var loadDarkButton = new ThemedButton("Dark preset") {
 				Clicked = () => {
+					AppUserPreferences.Instance.ColorThemeKind = ColorTheme.ColorThemeKind.Dark;
 					AppUserPreferences.Instance.LimeColorTheme = Theme.ColorTheme.CreateDarkTheme();
 					AppUserPreferences.Instance.ColorTheme = ColorTheme.CreateDarkTheme();
 					themeEditor.Rebuild();
@@ -223,6 +229,7 @@ namespace Tangerine
 			};
 			var loadLightButton = new ThemedButton("Light preset") {
 				Clicked = () => {
+					AppUserPreferences.Instance.ColorThemeKind = ColorTheme.ColorThemeKind.Light;
 					AppUserPreferences.Instance.LimeColorTheme = Theme.ColorTheme.CreateLightTheme();
 					AppUserPreferences.Instance.ColorTheme = ColorTheme.CreateLightTheme();
 					themeEditor.Rebuild();
@@ -262,6 +269,7 @@ namespace Tangerine
 						try {
 							using (var fs = new FileStream(path, FileMode.OpenOrCreate)) {
 								var read = deserializer.FromStream(new List<object>(), fs) as List<object>;
+								AppUserPreferences.Instance.ColorThemeKind = ColorTheme.ColorThemeKind.Custom;
 								AppUserPreferences.Instance.LimeColorTheme = (Theme.ColorTheme)read[0];
 								AppUserPreferences.Instance.ColorTheme = (ColorTheme)read[1];
 							}

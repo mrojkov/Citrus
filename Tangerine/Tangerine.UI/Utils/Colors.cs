@@ -5,7 +5,7 @@ namespace Tangerine.UI
 {
 	public class ColorTheme
 	{
-		public class ToolbarColors
+		public class ToolbarColors : Theme.DefaultColors
 		{
 			[YuzuOptional]
 			public Color4 ButtonHighlightBorder { get; set; }
@@ -33,7 +33,7 @@ namespace Tangerine.UI
 			public Color4 Separator { get; set; }
 		}
 
-		public class SceneViewColors
+		public class SceneViewColors : Theme.DefaultColors
 		{
 			[YuzuOptional]
 			public Color4 Selection { get; set; }
@@ -99,7 +99,7 @@ namespace Tangerine.UI
 			public Color4 SplineOutline { get; set; }
 		}
 
-		public class TimelineGridColors
+		public class TimelineGridColors : Theme.DefaultColors
 		{
 			[YuzuOptional]
 			public Color4 PropertyRowBackground { get; set; }
@@ -127,7 +127,7 @@ namespace Tangerine.UI
 			public Color4 SelectionBorder { get; set; }
 		}
 
-		public class TimelineCurveEditorColors
+		public class TimelineCurveEditorColors : Theme.DefaultColors
 		{
 			[YuzuOptional]
 			public Color4[] Curves { get; set; }
@@ -135,7 +135,7 @@ namespace Tangerine.UI
 			public Color4 Selection { get; set; }
 		}
 
-		public class TimelineRulerColors
+		public class TimelineRulerColors : Theme.DefaultColors
 		{
 			[YuzuOptional]
 			public Color4 Notchings { get; set; }
@@ -155,7 +155,7 @@ namespace Tangerine.UI
 			public Color4 MarkerBorder { get; set; }
 		}
 
-		public class TimelineOverviewColors
+		public class TimelineOverviewColors : Theme.DefaultColors
 		{
 			[YuzuOptional]
 			public Color4 Veil { get; set; }
@@ -163,7 +163,7 @@ namespace Tangerine.UI
 			public Color4 Border { get; set; }
 		}
 
-		public class TimelineRollColors
+		public class TimelineRollColors : Theme.DefaultColors
 		{
 			[YuzuOptional]
 			public Color4 Lines { get; set; }
@@ -189,7 +189,7 @@ namespace Tangerine.UI
 			public Color4 GrayMark { get; set; }
 		}
 
-		public class DockingColors
+		public class DockingColors : Theme.DefaultColors
 		{
 			[YuzuOptional]
 			public Color4 DragRectagleOutline { get; set; }
@@ -199,7 +199,7 @@ namespace Tangerine.UI
 			public Color4 PanelTitleSeparator { get; set; }
 	}
 
-		public class InspectorColors
+		public class InspectorColors : Theme.DefaultColors
 		{
 			[YuzuOptional]
 			public Color4 BorderAroundKeyframeColorbox { get; set; }
@@ -215,7 +215,7 @@ namespace Tangerine.UI
 			public Color4 StripeBackground2 { get; set; }
 		}
 
-		public class KeyboardColors
+		public class KeyboardColors : Theme.DefaultColors
 		{
 			[YuzuOptional]
 			public Color4 BlackText { get; set; }
@@ -235,7 +235,7 @@ namespace Tangerine.UI
 			public Color4 Border { get; set; }
 		}
 
-		public class HierarchyColors
+		public class HierarchyColors : Theme.DefaultColors
 		{
 			[YuzuOptional]
 			public Color4 SelectionColor { get; set; }
@@ -278,6 +278,13 @@ namespace Tangerine.UI
 			var clone = (ColorTheme)this.MemberwiseClone();
 			clone.Basic = Basic?.Clone();
 			return clone;
+		}
+
+		public enum ColorThemeKind
+		{
+			Light,
+			Dark,
+			Custom,
 		}
 
 		public static ColorTheme Current = CreateLightTheme();
