@@ -399,7 +399,7 @@ namespace Lime
 				return null;
 			}
 			if (channel.Sound != null) {
-				channel.Sound.Channel = NullAudioChannel.Instance;
+				channel.Sound.ChannelInternal = NullAudioChannel.Instance;
 			}
 			channel.Group = group;
 			channel.Priority = priority;

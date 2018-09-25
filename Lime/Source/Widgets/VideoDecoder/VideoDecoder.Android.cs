@@ -1,8 +1,9 @@
-﻿#if ANDROID
+#if ANDROID
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using Android.App;
@@ -57,6 +58,7 @@ namespace Lime
 
 		private enum State
 		{
+			Initializing,
 			Initialized,
 			Started,
 			Stoped,
@@ -66,41 +68,43 @@ namespace Lime
 
 		public VideoDecoder(string path)
 		{
-			
-			state = State.Initialized;
-			extractor = new MediaExtractor();
-			extractor.SetDataSource(path);
-			for (int i = 0; i < extractor.TrackCount; ++i) {
-				var format = extractor.GetTrackFormat(i);
-				var mime = format.GetString(MediaFormat.KeyMime);
-				if (mime.StartsWith("video/")) {
-					videoFormat = format;
-					videoTrack = i;
-					videoCodec = MediaCodec.CreateDecoderByType(mime);
-					renderer = new SurfaceTextureRenderer();
-					videoCodec.Configure(videoFormat, renderer.Surface, null, MediaCodecConfigFlags.None);
-					extractor.SelectTrack(i);
-					texture = new RenderTexture(Width, Height);
-					continue;
+			state = State.Initializing;
+			Window.Current.InvokeOnRendering(() => {
+				extractor = new MediaExtractor();
+				extractor.SetDataSource(path);
+				for (int i = 0; i < extractor.TrackCount; ++i) {
+					var format = extractor.GetTrackFormat(i);
+					var mime = format.GetString(MediaFormat.KeyMime);
+					if (mime.StartsWith("video/")) {
+						videoFormat = format;
+						videoTrack = i;
+						videoCodec = MediaCodec.CreateDecoderByType(mime);
+						renderer = new SurfaceTextureRenderer();
+						videoCodec.Configure(videoFormat, renderer.Surface, null, MediaCodecConfigFlags.None);
+						extractor.SelectTrack(i);
+						texture = new RenderTexture(Width, Height);
+						continue;
+					}
+					if (mime.StartsWith("audio/")) {
+						audioFormat = format;
+						audioTrack = i;
+						audioCodec = MediaCodec.CreateDecoderByType(mime);
+						audioCodec.Configure(audioFormat, null, null, MediaCodecConfigFlags.None);
+						extractor.SelectTrack(i);
+						var bufferSize = AudioTrack.GetMinBufferSize(44100, ChannelOut.Stereo, global::Android.Media.Encoding.Pcm16bit);
+						audio = new AudioTrack(
+							global::Android.Media.Stream.Music,
+							44100,
+							ChannelOut.Stereo,
+							global::Android.Media.Encoding.Pcm16bit,
+							bufferSize,
+							AudioTrackMode.Stream
+						);
+						continue;
+					}
 				}
-				if (mime.StartsWith("audio/")) {
-					audioFormat = format;
-					audioTrack = i;
-					audioCodec = MediaCodec.CreateDecoderByType(mime);
-					audioCodec.Configure(audioFormat, null, null, MediaCodecConfigFlags.None);
-					extractor.SelectTrack(i);
-					var bufferSize = AudioTrack.GetMinBufferSize(44100, ChannelOut.Stereo, global::Android.Media.Encoding.Pcm16bit);
-					audio = new AudioTrack(
-						global::Android.Media.Stream.Music,
-						44100,
-						ChannelOut.Stereo,
-						global::Android.Media.Encoding.Pcm16bit,
-						bufferSize,
-						AudioTrackMode.Stream
-					);
-					continue;
-				}
-			}
+				state = State.Initialized;
+			});
 		}
 
 		private void ExtractAndQueueSample(MediaExtractor extractor, MediaCodec codec, ref bool hasInput)
@@ -132,11 +136,18 @@ namespace Lime
 			}
 		}
 
+		private bool startRequested = false;
+
 		public async System.Threading.Tasks.Task Start()
 		{
+			if (state == State.Initializing) {
+				startRequested = true;
+				return;
+			}
 			if (state == State.Started) {
 				return;
 			}
+			startRequested = false;
 			stopDecodeCancelationTokenSource = new CancellationTokenSource();
 			var stopDecodeCancelationToken = stopDecodeCancelationTokenSource.Token;
 			var audioFinished = false;
@@ -271,7 +282,7 @@ namespace Lime
 
 		public void Stop()
 		{
-			if (state == State.Stoped || state == State.Finished || state == State.Initialized) {
+			if (state == State.Stoped || state == State.Finished || state == State.Initialized || state == State.Initializing) {
 				return;
 			}
 			Pause();
@@ -295,6 +306,9 @@ namespace Lime
 
 		public void Update(float delta)
 		{
+			if (state == State.Initialized && startRequested) {
+				Start();
+			}
 			if (state == State.Started) {
 				currentPosition += (long)(delta * 1000000);
 				checkAudioQueue.Set();
@@ -313,31 +327,62 @@ namespace Lime
 		public void Dispose()
 		{
 			stopDecodeCancelationTokenSource.Cancel();
-			if (videoCodec != null) {
-				videoCodec.Stop();
-				videoCodec.Dispose();
-				videoCodec = null;
-			}
-			if (audioCodec != null) {
-				audioCodec.Stop();
-				audioCodec.Dispose();
-				audioCodec = null;
-			}
-			if (audio != null) {
-				audio.Dispose();
-				audio = null;
-			}
-			extractor.Dispose();
-			extractor = null;
+			Window.Current.InvokeOnRendering(() => {
+				if (videoCodec != null) {
+					videoCodec.Stop();
+					videoCodec.Dispose();
+					videoCodec = null;
+				}
+				if (audioCodec != null) {
+					audioCodec.Stop();
+					audioCodec.Dispose();
+					audioCodec = null;
+				}
+				if (audio != null) {
+					audio.Dispose();
+					audio = null;
+				}
+				extractor.Dispose();
+				extractor = null;
+			});
 		}
+
+		
 
 		private class SurfaceTextureRenderer
 		{
+			public class SurfaceTextureMaterial : IMaterial
+			{
+				private readonly BlendState blendState;
+				private readonly ShaderParams[] shaderParamsArray;
+				private readonly ShaderParams shaderParams;
+
+				public float Strength { get; set; } = 1f;
+
+				public int PassCount => 1;
+
+				public SurfaceTextureMaterial()
+				{
+					blendState = BlendState.Default;
+					shaderParams = new ShaderParams();
+					shaderParamsArray = new[] { Renderer.GlobalShaderParams, shaderParams };
+				}
+
+				public void Apply(int pass)
+				{
+					PlatformRenderer.SetBlendState(blendState);
+					PlatformRenderer.SetShaderProgram(SurfaceTextureProgram.GetInstance());
+					PlatformRenderer.SetShaderParams(shaderParamsArray);
+				}
+
+				public void Invalidate() { }
+
+				public IMaterial Clone() => new SurfaceTextureMaterial();
+			}
 
 			private class SurfaceTextureProgram : ShaderProgram
 			{
 				private const string VertexShader = @"
-				uniform mat4 matProjection;
 				attribute vec4 a_Position;
 				attribute vec4 a_UV;
 				varying vec2 v_UV;
@@ -361,6 +406,10 @@ namespace Lime
 
 				private const int TextureStage = 0;
 
+				private static SurfaceTextureProgram instance;
+
+				public static SurfaceTextureProgram GetInstance() => instance ?? (instance = new SurfaceTextureProgram());
+
 				public SurfaceTextureProgram() : base(GetShaders(), GetAttribLocations(), GetSamplers())
 				{
 				}
@@ -368,29 +417,29 @@ namespace Lime
 				private static Shader[] GetShaders()
 				{
 					return new Shader[] {
-					new VertexShader(VertexShader),
-					new FragmentShader(FragmentShader)
-				};
+						new VertexShader(VertexShader),
+						new FragmentShader(FragmentShader)
+					};
 				}
 
 				private static AttribLocation[] GetAttribLocations()
 				{
 					return new AttribLocation[] {
-					new AttribLocation { Name = "a_Position", Index = ShaderPrograms.Attributes.Pos1 },
-					new AttribLocation { Name = "a_UV", Index = ShaderPrograms.Attributes.UV1 }
-				};
+						new AttribLocation { Name = "a_Position", Index = ShaderPrograms.Attributes.Pos1 },
+						new AttribLocation { Name = "a_UV", Index = ShaderPrograms.Attributes.UV1 }
+					};
 				}
 
 				private static Sampler[] GetSamplers()
 				{
 					return new Sampler[] {
-					new Sampler { Name = "u_Texture", Stage = TextureStage }
-				};
+						new Sampler { Name = "u_Texture", Stage = TextureStage }
+					};
 				}
 			}
 
-			private SurfaceTextureProgram program;
-			private Mesh mesh;
+			private SurfaceTextureMaterial material;
+			private Mesh<VertexPosUV> mesh;
 
 			private uint surfaceTextureId;
 			private SurfaceTexture surfaceTexture;
@@ -401,50 +450,42 @@ namespace Lime
 
 			public SurfaceTextureRenderer()
 			{
-				program = new SurfaceTextureProgram();
-				mesh = new Mesh() {
-					IndexBuffer = new IndexBuffer {
-						Data = new ushort[] {
-						0, 1, 2, 2, 3, 0
-					},
-					},
-					VertexBuffers = new[] {
-					new VertexBuffer<Vector2> {
-						Data = new Vector2 [] {
-							new Vector2 (-1,  1),
-							new Vector2( 1,  1),
-							new Vector2( 1, -1),
-							new Vector2(-1, -1)
-						},
-					},
-					new VertexBuffer<Vector2> {
-						Data = new Vector2 [] {
-							new Vector2(0, 0),
-							new Vector2(1, 0),
-							new Vector2(1, 1),
-							new Vector2(0, 1)
-						},
-					}
-				},
-					Attributes = new[] {
-					new [] { ShaderPrograms.Attributes.Pos1 },
-					new [] { ShaderPrograms.Attributes.UV1 }
-				}
+				material = new SurfaceTextureMaterial();
+				mesh = new Mesh<VertexPosUV>();
+				mesh.Indices = new ushort[] {
+					0, 1, 2, 2, 3, 0
 				};
+				mesh.Vertices = new VertexPosUV[] {
+					new VertexPosUV() { UV1 = new Vector2(0, 0), Pos = new Vector2(-1,  1) },
+					new VertexPosUV() { UV1 = new Vector2(1, 0), Pos = new Vector2( 1,  1) },
+					new VertexPosUV() { UV1 = new Vector2(1, 1), Pos = new Vector2( 1, -1) },
+					new VertexPosUV() { UV1 = new Vector2(0, 1), Pos = new Vector2(-1, -1) },
+				};
+				mesh.AttributeLocations = new[] { ShaderPrograms.Attributes.Pos1, ShaderPrograms.Attributes.UV1 };
+				mesh.DirtyFlags = MeshDirtyFlags.All;
 				CreateSurface();
+			}
+
+			[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 32)]
+			public struct VertexPosUV
+			{
+				public Vector2 Pos;
+				public Vector2 UV1;
 			}
 
 			private void PushTexture()
 			{
-				PlatformRenderer.PushTexture(0, 0);
+				PlatformRenderer.SetTexture(0, null);
+				GL.ActiveTexture(TextureUnit.Texture0);
 				PlatformRenderer.CheckErrors();
 				GL.BindTexture(TextureTarget, surfaceTextureId);
 			}
 
 			private void PopTexture()
 			{
+				GL.ActiveTexture(TextureUnit.Texture0);
 				GL.BindTexture(TextureTarget, 0);
-				PlatformRenderer.PopTexture(0);
+				PlatformRenderer.SetTexture(0, null);
 			}
 
 			private void CreateSurface()
@@ -463,12 +504,12 @@ namespace Lime
 			public void Render(ITexture target)
 			{
 				if (target != null) {
-					var savedViewport = Renderer.Viewport;
-					Renderer.Viewport = new WindowRect { X = 0, Y = 0, Width = target.ImageSize.Width, Height = target.ImageSize.Height };
-					target.SetAsRenderTarget();
+					RendererWrapper.Current.PushState(RenderState.Viewport | RenderState.Shader | RenderState.Blending);
+					RendererWrapper.Current.Viewport = new Viewport(0, 0, target.ImageSize.Width, target.ImageSize.Height);
+					RendererWrapper.Current.PushRenderTarget(target);
 					Render();
-					target.RestoreRenderTarget();
-					Renderer.Viewport = savedViewport;
+					RendererWrapper.Current.PopRenderTarget();
+					RendererWrapper.Current.PopState();
 				} else {
 					Render();
 				}
@@ -476,11 +517,10 @@ namespace Lime
 
 			public void Render()
 			{
-
 				surfaceTexture.UpdateTexImage();
 				PushTexture();
-				program.Use();
-				PlatformRenderer.DrawTriangles(mesh, 0, mesh.IndexBuffer.Data.Length);
+				material.Apply(0);
+				mesh.DrawIndexed(0, mesh.Indices.Length);
 				PopTexture();
 
 			}

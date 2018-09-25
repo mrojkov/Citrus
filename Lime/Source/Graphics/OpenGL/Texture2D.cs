@@ -321,6 +321,33 @@ namespace Lime
 			});
 		}
 
+		public void LoadImage(IntPtr pixels, int width, int height)
+		{
+			LoadImage(pixels, width, height, PixelFormat.Rgba);
+		}
+
+		internal void LoadImage(IntPtr pixels, int width, int height, PixelFormat pixelFormat)
+		{
+			LoadImage(pixels, width, height, PixelInternalFormat.Rgba, pixelFormat);
+		}
+
+		internal void LoadImage(IntPtr pixels, int width, int height, PixelInternalFormat pixelInternalFormat, PixelFormat pixelFormat)
+		{
+			MemoryUsed = 4 * width * height;
+			ImageSize = new Size(width, height);
+			SurfaceSize = ImageSize;
+			uvRect = new Rectangle(0, 0, 1, 1);
+
+			Window.Current.InvokeOnRendering(() => {
+				PrepareOpenGLTexture();
+				GL.ActiveTexture(TextureUnit.Texture0);
+				GL.BindTexture(TextureTarget.Texture2D, handle);
+				GL.TexImage2D(TextureTarget.Texture2D, 0, pixelInternalFormat, width, height, 0, pixelFormat, PixelType.UnsignedByte, pixels);
+				PlatformRenderer.MarkTextureSlotAsDirty(0);
+				PlatformRenderer.CheckErrors();
+			});
+		}
+
 		/// <summary>
 		/// Load subtexture from pixel array
 		/// Warning: this method doesn't support automatic texture reload after restoring graphics context

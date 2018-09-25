@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,49 +10,71 @@ namespace Lime
 	{
 		public bool Looped { get { return decoder.Looped; } set { decoder.Looped = value; } }
 		private VideoDecoder decoder;
-		public VideoPlayer (Widget parentWidget)
+		public VideoPlayer(Widget parentWidget)
 		{
-			parentWidget.Nodes.Add (this);
+			parentWidget.Nodes.Add(this);
 			Size = parentWidget.Size;
 			Anchors = Anchors.LeftRight | Anchors.TopBottom;
 		}
 
-		public override void Update (float delta)
+		public override void Update(float delta)
 		{
-			base.Update (delta);
+			base.Update(delta);
 			decoder.Update(delta);
-			decoder.UpdateTexture();
 		}
 
-		public void InitPlayer (string sourcePath)
+		public void InitPlayer(string sourcePath)
 		{
 			decoder = new VideoDecoder(sourcePath);
 			Texture = decoder.Texture;
 		}
 
-		public void Start ()
+		public void Start()
 		{
 			decoder.Start();
 		}
 
-		public void Pause ()
+		public void Pause()
 		{
 			decoder.Pause();
 		}
 
-		public void Stop ()
+		public void Stop()
 		{
 			decoder.Stop();
 		}
 
-		public override void Dispose ()
+		public override void Dispose()
 		{
 			if (decoder != null) {
 				decoder.Dispose();
 				decoder = null;
 			}
 			Texture = null;
-			base.Dispose ();
+			base.Dispose();
+		}
+
+		protected internal override Lime.RenderObject GetRenderObject()
+		{
+			var renderObject = (RenderObject)GetRenderObject<RenderObject>();
+			renderObject.Decoder = decoder;
+			return renderObject;
+		}
+
+		private class RenderObject : Image.RenderObject
+		{
+			public VideoDecoder Decoder;
+
+			public override void Render()
+			{
+				Decoder.UpdateTexture();
+				base.Render();
+			}
+
+			protected override void OnRelease()
+			{
+				base.OnRelease();
+			}
 		}
 	}
 }

@@ -1,4 +1,4 @@
-﻿#if WIN
+#if WIN
 using MFDecoder;
 using System;
 using System.Collections.Generic;
@@ -87,7 +87,7 @@ namespace Lime
 
 		public void Bump()
 		{
-			sound.Bump();
+			//sound.Bump();
 		}
 
 		public void Write(byte[] pcm)
@@ -106,8 +106,8 @@ namespace Lime
 		private Texture2D lumaTexture;
 		private Texture2D chromaTexture;
 		private RenderTexture texture;
-		private static YUVtoRGBProgram program;
-		private static Mesh mesh;
+		private static YUVtoRGBMaterial material;
+		private static Mesh<VertexPosUV> mesh;
 
 		private AudioPlayer audioPlayer;
 
@@ -168,39 +168,29 @@ namespace Lime
 			texture = new RenderTexture(width, height);
 			audioQueue = new Queue<Sample>();
 			videoQueue = new Queue<Sample>();
-			if (program == null) {
-				program = new YUVtoRGBProgram();
-				mesh = new Mesh() {
-					IndexBuffer = new IndexBuffer {
-						Data = new ushort[] {
-							0, 1, 2, 2, 3, 0
-						},
-					},
-					VertexBuffers = new[] {
-						new VertexBuffer<Vector2> {
-							Data = new Vector2 [] {
-								new Vector2 (-1,  1),
-								new Vector2( 1,  1),
-								new Vector2( 1, -1),
-								new Vector2(-1, -1)
-							},
-						},
-						new VertexBuffer<Vector2> {
-							Data = new Vector2 [] {
-								new Vector2(0, 0),
-								new Vector2(1, 0),
-								new Vector2(1, 1),
-								new Vector2(0, 1)
-							},
-						}
-					},
-					Attributes = new[] {
-						new [] { ShaderPrograms.Attributes.Pos1 },
-						new [] { ShaderPrograms.Attributes.UV1 }
-					}
+			if (material == null) {
+				material = new YUVtoRGBMaterial();
+				mesh = new Mesh<VertexPosUV>();
+				mesh.Indices = new ushort[] {
+					0, 1, 2, 2, 3, 0
 				};
+				mesh.Vertices = new VertexPosUV[] {
+					new VertexPosUV() { UV1 = new Vector2(0, 0), Pos = new Vector2(-1,  1) },
+					new VertexPosUV() { UV1 = new Vector2(1, 0), Pos = new Vector2( 1,  1) },
+					new VertexPosUV() { UV1 = new Vector2(1, 1), Pos = new Vector2( 1, -1) },
+					new VertexPosUV() { UV1 = new Vector2(0, 1), Pos = new Vector2(-1, -1) },
+				};
+				mesh.AttributeLocations = new[] { ShaderPrograms.Attributes.Pos1, ShaderPrograms.Attributes.UV1 };
+				mesh.DirtyFlags = MeshDirtyFlags.All;
 			}
 			audioPlayer = new AudioPlayer();
+		}
+
+		[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 32)]
+		public struct VertexPosUV
+		{
+			public Vector2 Pos;
+			public Vector2 UV1;
 		}
 
 		public async System.Threading.Tasks.Task Start()
@@ -347,7 +337,7 @@ namespace Lime
 				var sample = currentVideoSample;
 				var pinnedArray = GCHandle.Alloc(sample.Data, GCHandleType.Pinned);
 				var pointer = pinnedArray.AddrOfPinnedObject();
-				var pixelInternalFormat = (OpenTK.Graphics.ES20.PixelInternalFormat.Luminance) ; //OpenTK.Graphics.ES20.PixelInternalFormat.Luminance
+				var pixelInternalFormat = (OpenTK.Graphics.ES20.PixelInternalFormat.Luminance); //OpenTK.Graphics.ES20.PixelInternalFormat.Luminance
 				lumaTexture.LoadImage(pointer, width, height, pixelInternalFormat, OpenTK.Graphics.ES20.PixelFormat.Luminance);
 
 
@@ -356,17 +346,15 @@ namespace Lime
 				chromaTexture.LoadImage(pointer + width * height, width / 2, height / 2, pixelInternalFormat, pixelFormat);
 				pinnedArray.Free();
 
-
-				var savedViewport = Renderer.Viewport;
-				Renderer.Viewport = new WindowRect { X = 0, Y = 0, Width = texture.ImageSize.Width, Height = texture.ImageSize.Height };
-				texture.SetAsRenderTarget();
-				PlatformRenderer.SetTexture(lumaTexture, 0);
-				PlatformRenderer.SetTexture(chromaTexture, 1);
-				program.Use();
-				PlatformRenderer.DrawTriangles(mesh, 0, mesh.IndexBuffer.Data.Length);
-
-				texture.RestoreRenderTarget();
-				Renderer.Viewport = savedViewport;
+				RendererWrapper.Current.PushState(RenderState.Viewport | RenderState.Shader | RenderState.Blending);
+				RendererWrapper.Current.Viewport = new Viewport(0, 0, texture.ImageSize.Width, texture.ImageSize.Height);
+				RendererWrapper.Current.PushRenderTarget(texture);
+				PlatformRenderer.SetTexture(0, lumaTexture);
+				PlatformRenderer.SetTexture(1, chromaTexture);
+				material.Apply(0);
+				mesh.DrawIndexed(0, mesh.Indices.Length);
+				RendererWrapper.Current.PopRenderTarget();
+				RendererWrapper.Current.PopState();
 			}
 		}
 
@@ -374,6 +362,36 @@ namespace Lime
 		{
 		}
 
+
+
+		public class YUVtoRGBMaterial : IMaterial
+		{
+			private readonly BlendState blendState;
+			private readonly ShaderParams[] shaderParamsArray;
+			private readonly ShaderParams shaderParams;
+
+			public float Strength { get; set; } = 1f;
+
+			public int PassCount => 1;
+
+			public YUVtoRGBMaterial()
+			{
+				blendState = BlendState.Default;
+				shaderParams = new ShaderParams();
+				shaderParamsArray = new[] { Renderer.GlobalShaderParams, shaderParams };
+			}
+
+			public void Apply(int pass)
+			{
+				PlatformRenderer.SetBlendState(blendState);
+				PlatformRenderer.SetShaderProgram(YUVtoRGBProgram.GetInstance());
+				PlatformRenderer.SetShaderParams(shaderParamsArray);
+			}
+
+			public void Invalidate() { }
+
+			public IMaterial Clone() => new YUVtoRGBMaterial();
+		}
 
 		private class YUVtoRGBProgram : ShaderProgram
 		{
@@ -413,6 +431,10 @@ namespace Lime
 
 			private const int LumaTextureStage = 0;
 			private const int ChromaTextureStage = 1;
+
+			private static YUVtoRGBProgram instance;
+
+			public static YUVtoRGBProgram GetInstance() => instance ?? (instance = new YUVtoRGBProgram());
 
 			public YUVtoRGBProgram() : base(GetShaders(), GetAttribLocations(), GetSamplers())
 			{
