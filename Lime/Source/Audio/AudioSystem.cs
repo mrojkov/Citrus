@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+
 namespace Lime
 {
 	public class PlayParameters
@@ -32,6 +35,14 @@ namespace Lime
 			get { return PlatformAudioSystem.Active; }
 			set { PlatformAudioSystem.Active = value; }
 		}
+
+		public static event Action<string> AudioMissing
+		{
+			add { PlatformAudioSystem.AudioMissing += value; }
+			remove { PlatformAudioSystem.AudioMissing -= value; }
+		}
+
+		public static IEnumerable<IAudioChannel> Channels => PlatformAudioSystem.Channels;
 
 		public static float GetGroupVolume(AudioChannelGroup group)
 		{

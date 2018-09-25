@@ -11,7 +11,7 @@ using OpenTK.Audio.OpenAL;
 
 namespace Lime
 {
-	public class AudioChannel : IDisposable, IAudioChannel
+	public class AudioChannel : IDisposable, IAudioChannelInternal, IAudioChannel
 	{
 		public const int BufferSize = 1024 * 32;
 		public const int NumBuffers = 8;
@@ -160,17 +160,15 @@ namespace Lime
 					throw new Lime.Exception("Can't play on channel because it is in use");
 				}
 				this.looping = looping;
-				if (this.decoder != null) {
-					this.decoder.Dispose();
-				}
+				this.decoder?.Dispose();
 				this.decoder = decoder;
 			}
 			DetachBuffers();
 			if (Sound != null) {
-				Sound.Channel = NullAudioChannel.Instance;
+				Sound.ChannelInternal = NullAudioChannel.Instance;
 			}
 			this.Sound = sound;
-			sound.Channel = this;
+			sound.ChannelInternal = this;
 			StartupTime = DateTime.Now;
 			if (!paused) {
 				Resume(fadeinTime);
@@ -292,6 +290,7 @@ namespace Lime
 		private void SuspendImmediate()
 		{
 			StopImmediate();
+			// Set to null to prevent disposing the decoder on next Play().
 			decoder = null;
 		}
 

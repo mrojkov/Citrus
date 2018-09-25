@@ -19,7 +19,7 @@ using OpenTK.Audio.OpenAL;
 
 namespace Lime
 {
-	public static class PlatformAudioSystem
+	internal static class PlatformAudioSystem
 	{
 #if ANDROID
 		const string Lib = "openal32";
@@ -42,8 +42,7 @@ namespace Lime
 		static bool audioSessionInterruptionEnded;
 #endif
 
-		public delegate void AudioMissingDelegate(string path);
-		public static event AudioMissingDelegate AudioMissing;
+		public static event Action<string> AudioMissing;
 
 		public static void Initialize(ApplicationOptions options)
 		{
@@ -105,7 +104,7 @@ namespace Lime
 			}
 		}
 
-		public static List<AudioChannel> Channels => channels;
+		public static IEnumerable<IAudioChannel> Channels => channels;
 
 #if ANDROID
 		private static void SetActive(bool value)
@@ -289,15 +288,13 @@ namespace Lime
 				return new Sound();
 			}
 			var path = parameters.Path;
-			path += Application.IsTangerine ? ".ogg" : ".sound";
 			var sound = new Sound();
 			var decoder = parameters.Decoder;
 			if (decoder == null) {
+				path += Application.IsTangerine ? ".ogg" : ".sound";
 				var stream = cache.OpenStream(path);
 				if (stream == null) {
-					if (AudioMissing != null) {
-						AudioMissing(path);
-					}
+					AudioMissing?.Invoke(path);
 					return sound;
 				}
 				decoder = AudioDecoderFactory.CreateDecoder(stream);
@@ -350,7 +347,7 @@ namespace Lime
 				return new Sound();
 			}
 			if (channel.Sound != null) {
-				channel.Sound.Channel = NullAudioChannel.Instance;
+				channel.Sound.ChannelInternal = NullAudioChannel.Instance;
 			}
 			channel.Group = parameters.Group;
 			channel.Priority = parameters.Priority;

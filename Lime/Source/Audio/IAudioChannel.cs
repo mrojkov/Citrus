@@ -19,12 +19,22 @@ namespace Lime
 	public interface IAudioChannel
 	{
 		AudioChannelState State { get; }
+		AudioChannelGroup Group { get; }
+		float Pan { get; }
+		float Volume { get; }
+		float Pitch { get; }
+		string SamplePath { get; }
+		Sound Sound { get; }
+	}
+
+	internal interface IAudioChannelInternal
+	{
+		AudioChannelState State { get; }
 		AudioChannelGroup Group { get; set; }
 		float Pan { get; set; }
 		float Volume { get; set; }
 		float Pitch { get; set; }
 		string SamplePath { get; set; }
-		Sound Sound { get; }
 
 		void Resume(float fadeinTime = 0);
 		void Stop(float fadeoutTime = 0);
@@ -32,7 +42,7 @@ namespace Lime
 		PlayParameters Suspend(float fadeoutTime = 0);
 	}
 
-	public class NullAudioChannel : IAudioChannel
+	public class NullAudioChannel : IAudioChannelInternal, IAudioChannel
 	{
 		public static NullAudioChannel Instance = new NullAudioChannel();
 
