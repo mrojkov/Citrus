@@ -1,4 +1,4 @@
-# Файлменеджер (Filesystem)
+# Окно "Filesystem"
 
 [[Назад]](@UI)
 
