@@ -79,7 +79,7 @@ namespace Lime
 		public bool Check(object obj)
 		{
 			if (checker == null) {
-				var fn = obj.GetType().GetMethod(Method, BindingFlags.NonPublic | BindingFlags.Instance);
+				var fn = obj.GetType().GetMethod(Method, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 				if (fn == null) {
 					throw new System.Exception("Couldn't find method " + Method);
 				}
