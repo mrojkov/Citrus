@@ -142,7 +142,7 @@
     <Content Include="Documentation\**" />
   </ItemGroup>
   <PropertyGroup>
-    <PostBuildEvent>..\..\..\..\Orange\bin\Win\Release\Orange.CLI.exe --command:"Generate Lime deserializers"
-set errno=0</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>

@@ -92,8 +92,12 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>..\..\..\..\Orange\bin\Win\Release\Orange.CLI.exe --command:"Generate Lime deserializers"
-set errno=0</PreBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>..\..\..\..\Orange\bin\Win\Release\Orange.CLI.exe --command:"Generate Lime deserializers"
+set errno=0</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
