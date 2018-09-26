@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using Yuzu;
 
 namespace Lime
@@ -14,10 +15,11 @@ namespace Lime
 		public string RunningMarkerId { get; set; }
 
 		[YuzuMember]
+		[TangerineIgnore]
 		public MarkerList Markers { get; private set; }
 
 		[YuzuMember]
-		public string Id;
+		public string Id { get; set; }
 
 		public double Time
 		{
