@@ -24,7 +24,9 @@ namespace Orange
 
 		public static void GenerateDeserializers(string filename, string rootNamespace, List<Type> types)
 		{
-			var yjdg = new BinaryDeserializerGenerator(rootNamespace);
+			var yjdg = new BinaryDeserializerGenerator(rootNamespace) {
+				LineSeparator = "\n",
+			};
 			using (var ms = new MemoryStream())
 			using (var sw = new StreamWriter(ms)) {
 				yjdg.GenWriter = sw;
@@ -43,7 +45,9 @@ namespace Orange
 
 		public static void GenerateBinaryDeserializers()
 		{
-			var jd = new BinaryDeserializerGenerator("GeneratedDeserializersBIN");
+			var jd = new BinaryDeserializerGenerator("GeneratedDeserializersBIN", Serialization.YuzuCommonOptions) {
+				LineSeparator = "\n",
+			};
 			using (var ms = new MemoryStream())
 			using (var sw = new StreamWriter(ms)) {
 				jd.GenWriter = sw;
