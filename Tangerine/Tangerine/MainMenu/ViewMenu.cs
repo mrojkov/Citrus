@@ -132,6 +132,9 @@ namespace Tangerine
 			}
 
 			foreach (var document in documents) {
+				if (!document.Loaded) {
+					continue;
+				}
 				foreach (var text in document.RootNode.Descendants.OfType<IText>()) {
 					text.Invalidate();
 				}

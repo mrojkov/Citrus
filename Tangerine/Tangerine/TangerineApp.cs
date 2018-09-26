@@ -468,8 +468,7 @@ namespace Tangerine
 					var tab = new ThemedTab { Closable = true };
 					var currentDocumentChanged = new Property<bool>(() => Document.Current == doc).DistinctUntilChanged().Where(i => i);
 					tab.Tasks.Add(currentDocumentChanged.Consume(_ => tabBar.ActivateTab(tab)));
-					tab.AddChangeWatcher(() => doc.Path, _ => RefreshTabText(doc, tab));
-					tab.AddChangeWatcher(() => doc.IsModified, _ => RefreshTabText(doc, tab));
+					tab.AddChangeWatcher(() => doc.DisplayName, _ => tab.Text = doc.DisplayName);
 					tab.Clicked += doc.MakeCurrent;
 					tab.Closing += () => Project.Current.CloseDocument(doc);
 					tab.Updated += (dt) => {
@@ -513,14 +512,6 @@ namespace Tangerine
 					tabBar.AddNode(tab);
 				}
 				tabBar.AddNode(new Widget { LayoutCell = new LayoutCell { StretchX = 0 } });
-			}
-
-			void RefreshTabText(Document doc, Tab tab)
-			{
-				tab.Text = System.IO.Path.GetFileName(System.IO.Path.ChangeExtension(doc.Path, null));
-				if (doc.IsModified) {
-					tab.Text += '*';
-				}
 			}
 		}
 

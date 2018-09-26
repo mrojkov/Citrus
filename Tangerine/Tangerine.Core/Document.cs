@@ -42,6 +42,8 @@ namespace Tangerine.Core
 
 		private DateTime modificationTime;
 
+		public bool Loaded { get; private set; } = true;
+
 		public static event Action<Document> AttachingViews;
 		public static Func<Document, CloseAction> CloseConfirmation;
 		public static PathSelectorDelegate PathSelector;
@@ -62,6 +64,11 @@ namespace Tangerine.Core
 		/// Gets the path to the document relative to the project directory.
 		/// </summary>
 		public string Path { get; private set; }
+
+		/// <summary>
+		/// Document name to be displayed.
+		/// </summary>
+		public string DisplayName => (IsModified ? "*" : string.Empty) + System.IO.Path.GetFileName(System.IO.Path.ChangeExtension(Path ?? "Untitled", null));
 
 		/// <summary>
 		/// Gets or sets the file format the document should be saved to.
@@ -144,12 +151,21 @@ namespace Tangerine.Core
 			History.PerformingOperation += Document_PerformingOperation;
 		}
 
-		public Document(string path)
+		public Document(string path, bool delayLoad = false)
+		{
+			Path = path;
+			Loaded = false;
+			if (delayLoad) {
+				return;
+			}
+			Load();
+		}
+
+		private void Load()
 		{
 			try {
-				Path = path;
-				Format = ResolveFormat(path);
-				RootNodeUnwrapped = Node.CreateFromAssetBundle(path, yuzu: TangerineYuzu.Instance.Value);
+				Format = ResolveFormat(Path);
+				RootNodeUnwrapped = Node.CreateFromAssetBundle(Path, yuzu: TangerineYuzu.Instance.Value);
 				if (Format == DocumentFormat.Fbx) {
 					Path = defaultPath;
 				}
@@ -161,12 +177,13 @@ namespace Tangerine.Core
 				Decorate(RootNode);
 				Container = RootNode;
 				if (Format == DocumentFormat.Scene || Format == DocumentFormat.Tan) {
-					Preview = DocumentPreview.ReadAsBase64(Project.Current.GetSystemPath(path, GetFileExtension(Format)));
+					Preview = DocumentPreview.ReadAsBase64(Project.Current.GetSystemPath(Path, GetFileExtension(Format)));
 				}
 				History.PerformingOperation += Document_PerformingOperation;
 			} catch (System.Exception e) {
-				throw new System.InvalidOperationException($"Can't open '{path}': {e.Message}");
+				throw new System.InvalidOperationException($"Can't open '{Path}': {e.Message}");
 			}
+			Loaded = true;
 		}
 
 		private void Document_PerformingOperation(IOperation operation)
@@ -253,6 +270,9 @@ namespace Tangerine.Core
 
 		public static void SetCurrent(Document doc)
 		{
+			if (!(doc?.Loaded ?? true)) {
+				doc.Load();
+			}
 			if (Current != doc) {
 				Current?.DetachViews();
 				Current = doc;

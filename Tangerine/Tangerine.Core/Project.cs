@@ -75,13 +75,20 @@ namespace Tangerine.Core
 					UserPreferences = TangerineYuzu.Instance.Value.ReadObjectFromFile<ProjectUserPreferences>(UserprefsPath);
 					foreach (var path in UserPreferences.Documents) {
 						try {
-							OpenDocument(path);
+							OpenDocument(path, delayLoad: true);
 						} catch (System.Exception e) {
 							Debug.Write($"Failed to open document '{path}': {e.Message}");
 						}
 					}
 					var currentDoc = documents.FirstOrDefault(d => d.Path == UserPreferences.CurrentDocument) ?? documents.FirstOrDefault();
-					Document.SetCurrent(currentDoc);
+					try {
+						Document.SetCurrent(currentDoc);
+					} catch (System.Exception e) {
+						if (currentDoc != null) {
+							CloseDocument(currentDoc);
+						}
+						throw;
+					}
 				} catch (System.Exception e) {
 					Debug.Write($"Failed to load the project user preferences: {e}");
 				}
@@ -165,7 +172,7 @@ namespace Tangerine.Core
 			return doc;
 		}
 
-		public Document OpenDocument(string path, bool pathIsGlobal = false)
+		public Document OpenDocument(string path, bool pathIsGlobal = false, bool delayLoad = false)
 		{
 			string localPath = path;
 			if (pathIsGlobal) {
@@ -183,14 +190,16 @@ namespace Tangerine.Core
 					doc = new Document(tmpFile);
 					doc.SaveAs(localPath);
 				} else {
-					doc = new Document(localPath);
+					doc = new Document(localPath, delayLoad);
 				}
 				if (systemPath != null) {
 					File.Delete(systemPath);
 				}
 				documents.Add(doc);
 			}
-			doc.MakeCurrent();
+			if (!delayLoad) {
+				doc.MakeCurrent();
+			}
 			AddRecentDocument(doc.Path);
 			return doc;
 		}
