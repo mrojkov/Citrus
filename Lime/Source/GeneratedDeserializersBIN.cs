@@ -4652,17 +4652,30 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (5 == fd.OurIndex) {
-				result.ScaleFactor = d.Reader.ReadSingle();
+				result.NodeRemovals = (global::System.Collections.Generic.List<global::System.String>)null;
+				var tmp13 = d.Reader.ReadInt32();
+				if (tmp13 >= 0) {
+					result.NodeRemovals = new global::System.Collections.Generic.List<global::System.String>();
+					while (--tmp13 >= 0) {
+						var tmp14 = d.Reader.ReadString();
+						if (tmp14 == "" && d.Reader.ReadBoolean()) tmp14 = null;
+						result.NodeRemovals.Add(tmp14);
+					}
+				}
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (6 == fd.OurIndex) {
+				result.ScaleFactor = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (7 == fd.OurIndex) {
 				result.UVAnimations = (global::System.Collections.Generic.List<global::Lime.Model3DAttachmentParser.UVAnimationFormat>)null;
-				var tmp13 = d.Reader.ReadInt32();
-				if (tmp13 >= 0) {
+				var tmp15 = d.Reader.ReadInt32();
+				if (tmp15 >= 0) {
 					result.UVAnimations = new global::System.Collections.Generic.List<global::Lime.Model3DAttachmentParser.UVAnimationFormat>();
-					while (--tmp13 >= 0) {
-						var tmp14 = (global::Lime.Model3DAttachmentParser.UVAnimationFormat)dg.ReadObject<global::Lime.Model3DAttachmentParser.UVAnimationFormat>();
-						result.UVAnimations.Add(tmp14);
+					while (--tmp15 >= 0) {
+						var tmp16 = (global::Lime.Model3DAttachmentParser.UVAnimationFormat)dg.ReadObject<global::Lime.Model3DAttachmentParser.UVAnimationFormat>();
+						result.UVAnimations.Add(tmp16);
 					}
 				}
 				fd = def.Fields[d.Reader.ReadInt16()];
