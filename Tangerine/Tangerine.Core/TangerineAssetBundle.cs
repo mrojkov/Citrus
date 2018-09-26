@@ -11,7 +11,7 @@ namespace Tangerine.Core
 
 		public class CacheMeta
 		{
-			private const string CurrentVersion = "1.1";
+			private const string CurrentVersion = "1.2";
 
 			[YuzuRequired]
 			public string Version { get; set; } = CurrentVersion;
@@ -29,7 +29,7 @@ namespace Tangerine.Core
 				}
 				try {
 					using (var stream = cacheBundle.OpenFile(VersionFile)) {
-						var cacheMeta = Serialization.ReadObject<CacheMeta>(VersionFile, stream);
+						var cacheMeta = TangerineYuzu.Instance.Value.ReadObject<CacheMeta>(VersionFile, stream);
 						if (!cacheMeta.IsActual) {
 							return false;
 						}
@@ -47,7 +47,7 @@ namespace Tangerine.Core
 				foreach (var path in cacheBundle.EnumerateFiles()) {
 					cacheBundle.DeleteFile(path);
 				}
-				Serialization.WriteObjectToBundle(cacheBundle, VersionFile, new CacheMeta(), Serialization.Format.Binary, string.Empty, AssetAttributes.None, new byte[0]);
+				TangerineYuzu.Instance.Value.WriteObjectToBundle(cacheBundle, VersionFile, new CacheMeta(), Serialization.Format.Binary, string.Empty, AssetAttributes.None, new byte[0]);
 			}
 		}
 
