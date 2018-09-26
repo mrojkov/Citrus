@@ -25,7 +25,7 @@ namespace Lime
 		// in case their value is unset (it'll be (0 0 0 0) otherwise
 		public class DefaultColors
 		{
-			public Color4 DefaultColor { get; set; } = new Color4(255, 0, 255, 255);
+			public static Color4 DefaultColor { get; set; } = new Color4(255, 0, 255, 255);
 			public DefaultColors()
 			{
 				foreach (var p in GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)) {

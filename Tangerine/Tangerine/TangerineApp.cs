@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using Lime;
 using Tangerine.Core;
 using Tangerine.UI;
@@ -53,9 +54,31 @@ namespace Tangerine
 				case ColorTheme.ColorThemeKind.Dark:
 					SetColorTheme(ColorTheme.CreateDarkTheme(), Theme.ColorTheme.CreateDarkTheme());
 					break;
-				case ColorTheme.ColorThemeKind.Custom:
+				case ColorTheme.ColorThemeKind.Custom: {
+					bool isDark = AppUserPreferences.Instance.ColorTheme.IsDark;
+					ColorTheme theme = null;
+					var flags =
+						BindingFlags.Public |
+						BindingFlags.GetProperty |
+						BindingFlags.SetProperty |
+						BindingFlags.Instance;
+					foreach (var category in typeof(ColorTheme).GetProperties(flags)) {
+						if (category.Name == "Basic") {
+							continue;
+						}
+						var categoryValue = category.GetValue(AppUserPreferences.Instance.ColorTheme);
+						if (categoryValue == null) {
+							if (theme == null) {
+								theme = isDark ? ColorTheme.CreateDarkTheme() : ColorTheme.CreateLightTheme();
+							}
+							category.SetValue(AppUserPreferences.Instance.ColorTheme, category.GetValue(theme));
+							category.SetValue(theme, null);
+						}
+					}
 					SetColorTheme(AppUserPreferences.Instance.ColorTheme, AppUserPreferences.Instance.LimeColorTheme);
 					break;
+				}
+
 			}
 			Application.InvalidateWindows();
 
@@ -337,8 +360,8 @@ namespace Tangerine
 
 		void SetColorTheme(ColorTheme theme, Theme.ColorTheme limeTheme)
 		{
-			Theme.Colors = limeTheme.Clone();
-			ColorTheme.Current = theme.Clone();
+			AppUserPreferences.Instance.LimeColorTheme = Theme.Colors = limeTheme.Clone();
+			AppUserPreferences.Instance.ColorTheme = ColorTheme.Current = theme.Clone();
 		}
 
 		class UpdateNodesAndApplyAnimatorsProcessor : SymmetricOperationProcessor
