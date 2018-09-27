@@ -229,6 +229,9 @@ namespace Orange
 
 		public void Export(Stream stream, Node node, INodeThumbnailProvider thumbnailProvider)
 		{
+			if (AnyComponentsOrAnimations()) {
+				throw new InvalidOperationException("Can't export components or animations");
+			}
 			CreateFolderBeginEndNodes(node);
 			try {
 				ReorderBonesRecursive(node.AsWidget);
@@ -244,6 +247,11 @@ namespace Orange
 				}
 			} finally {
 				RemoveFolderBeginEndNodes(node);
+			}
+
+			bool AnyComponentsOrAnimations()
+			{
+				return node.Descendants.Concat(new [] { node }).Any(i => i.Components.Count > 0 || i.Animations.Count > 1);
 			}
 		}
 
