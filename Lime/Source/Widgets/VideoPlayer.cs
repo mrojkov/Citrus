@@ -21,12 +21,12 @@ namespace Lime
 		{
 			base.Update(delta);
 			decoder.Update(delta);
+			Texture = decoder.Texture;
 		}
 
 		public void InitPlayer(string sourcePath)
 		{
 			decoder = new VideoDecoder(sourcePath);
-			Texture = decoder.Texture;
 		}
 
 		public void Start()

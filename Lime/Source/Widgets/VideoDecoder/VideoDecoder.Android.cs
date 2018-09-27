@@ -170,7 +170,7 @@ namespace Lime
 				}
 			}, stopDecodeCancelationToken);
 
-			
+
 			do {
 				if (state == State.Finished) {
 					currentPosition = 0;
@@ -178,7 +178,7 @@ namespace Lime
 					videoCodec?.Configure(videoFormat, renderer.Surface, null, MediaCodecConfigFlags.None);
 					audioCodec?.Configure(audioFormat, null, null, MediaCodecConfigFlags.None);
 				}
-				
+
 				if (state == State.Finished ||
 					state == State.Initialized
 				) {
@@ -236,7 +236,7 @@ namespace Lime
 					}
 				}, stopDecodeCancelationToken);
 
-				
+
 				var processAudio = System.Threading.Tasks.Task.Run(() => {
 					var eosReceived = audioCodec == null;
 					var info = new BufferInfo();
@@ -347,7 +347,7 @@ namespace Lime
 			});
 		}
 
-		
+
 
 		private class SurfaceTextureRenderer
 		{
@@ -394,7 +394,7 @@ namespace Lime
 			";
 
 				private const string FragmentShader = "#extension GL_OES_EGL_image_external : require" + @"
-				
+
 				precision mediump float;
 				varying vec2 v_UV;
 				uniform samplerExternalOES u_Texture;
