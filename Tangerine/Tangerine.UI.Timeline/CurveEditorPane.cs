@@ -93,7 +93,7 @@ namespace Tangerine.UI.Timeline
 				var label = new ThemedSimpleText(name) { MinWidth = 60 };
 				int c = i;
 				label.AddChangeWatcher(
-					() => adapter.GetComponentValue(curve.Animator, Document.Current.Container.AnimationTime, c),
+					() => adapter.GetComponentValue(curve.Animator, Document.Current.Animation.Time, c),
 					v => label.Text = name + ": " + v.ToString("0.00"));
 				toolbar.AddNode(label);
 			}
@@ -139,7 +139,7 @@ namespace Tangerine.UI.Timeline
 				x += TimelineMetrics.ColWidth;
 			}
 			// Render dark vertical lines below markers.
-			foreach (var m in Document.Current.Container.Markers) {
+			foreach (var m in Document.Current.Animation.Markers) {
 				x = TimelineMetrics.ColWidth * m.Frame + 0.5f;
 				if (timeline.IsColumnVisible(m.Frame)) {
 					Renderer.DrawLine(

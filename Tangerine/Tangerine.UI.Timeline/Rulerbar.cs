@@ -28,7 +28,7 @@ namespace Tangerine.UI.Timeline
 				new KeyPressHandler(Key.Mouse1, (input, key) => new ContextMenu().Show())
 			);
 			RootWidget.AddChangeWatcher(() => Document.Current.AnimationFrame, (value) => {
-				var markers = Document.Current.Container.Markers;
+				var markers = Document.Current.Animation.Markers;
 				int i = markers.FindIndex(m => m.Frame == value);
 				if (i >= 0) {
 					upperMarker = markers[i];
@@ -43,13 +43,13 @@ namespace Tangerine.UI.Timeline
 		{
 			Document.Current.History.DoTransaction(() => {
 				var timeline = Timeline.Instance;
-				var marker = Document.Current.Container.Markers.GetByFrame(timeline.CurrentColumn);
+				var marker = Document.Current.Animation.Markers.GetByFrame(timeline.CurrentColumn);
 				var newMarker = marker?.Clone() ?? new Marker { Frame = timeline.CurrentColumn };
 				var r = new MarkerPropertiesDialog().Show(newMarker, canDelete: marker != null);
 				if (r == MarkerPropertiesDialog.Result.Ok) {
-					Core.Operations.SetMarker.Perform(Document.Current.Container, newMarker, true);
+					Core.Operations.SetMarker.Perform(newMarker, true);
 				} else if (r == MarkerPropertiesDialog.Result.Delete) {
-					Core.Operations.DeleteMarker.Perform(Document.Current.Container, marker, true);
+					Core.Operations.DeleteMarker.Perform(marker, true);
 				}
 			});
 			// To prevent RulerbarMouseScroll.
@@ -76,7 +76,7 @@ namespace Tangerine.UI.Timeline
 				}
 			}
 			bool metUpperMarker = false;
-			foreach (var m in Document.Current.Container.Markers) {
+			foreach (var m in Document.Current.Animation.Markers) {
 				if (upperMarker != m) {
 					RenderMarker(m);
 				} else {
@@ -159,21 +159,21 @@ namespace Tangerine.UI.Timeline
 			var m = copiedMarker.Clone();
 			m.Frame = frameUnderMouse;
 			Document.Current.History.DoTransaction(() => {
-				SetMarker.Perform(Document.Current.Container, m, true);
+				SetMarker.Perform(m, true);
 			});
 		}
 
 		private static void DeleteMarker(Marker marker)
 		{
 			Document.Current.History.DoTransaction(() => {
-				Core.Operations.DeleteMarker.Perform(Document.Current.Container, marker, true);
+				Core.Operations.DeleteMarker.Perform(marker, true);
 			});
 		}
 
 		public static void CopyMarkers()
 		{
 			copiedMarkers = new List<Marker>();
-			foreach (var marker in Document.Current.Container.Markers) {
+			foreach (var marker in Document.Current.Animation.Markers) {
 				copiedMarkers.Add(marker);
 			}
 		}
@@ -188,7 +188,7 @@ namespace Tangerine.UI.Timeline
 			Document.Current.History.DoTransaction(() => {
 				foreach (var marker in copiedMarkers) {
 					var m = marker.Clone();
-					SetMarker.Perform(Document.Current.Container, m, true);
+					SetMarker.Perform(m, true);
 				}
 			});
 		}
@@ -197,8 +197,8 @@ namespace Tangerine.UI.Timeline
 		{
 			Document.Current.History.DoTransaction(() => {
 				var timeline = Timeline.Instance;
-				foreach (var marker in Document.Current.Container.Markers.ToList()) {
-					Core.Operations.DeleteMarker.Perform(Document.Current.Container, marker, true);
+				foreach (var marker in Document.Current.Animation.Markers.ToList()) {
+					Core.Operations.DeleteMarker.Perform(marker, true);
 				}
 			});
 		}
@@ -209,7 +209,7 @@ namespace Tangerine.UI.Timeline
 			{
 				var menu = new Menu();
 				var frameUnderMouse = Timeline.Instance.Grid.CellUnderMouse().X;
-				var marker = Document.Current.Container.Markers.GetByFrame(frameUnderMouse);
+				var marker = Document.Current.Animation.Markers.GetByFrame(frameUnderMouse);
 				menu.Add(new Command("Copy Marker", () => CopyMarker(marker)) {
 					Enabled = marker != null
 				});
@@ -221,13 +221,13 @@ namespace Tangerine.UI.Timeline
 				});
 				menu.Add(Command.MenuSeparator);
 				menu.Add(new Command(TimelineCommands.CopyMarkers.Text, CopyMarkers) {
-					Enabled = Document.Current.Container.Markers.Count > 0
+					Enabled = Document.Current.Animation.Markers.Count > 0
 				});
 				menu.Add(new Command(TimelineCommands.PasteMarkers.Text, PasteMarkers) {
 					Enabled = CanParseMarkersFromClipboard()
 				});
 				menu.Add(new Command(TimelineCommands.DeleteMarkers.Text, DeleteMarkers) {
-					Enabled = Document.Current.Container.Markers.Count > 0
+					Enabled = Document.Current.Animation.Markers.Count > 0
 				});
 				menu.Popup();
 			}

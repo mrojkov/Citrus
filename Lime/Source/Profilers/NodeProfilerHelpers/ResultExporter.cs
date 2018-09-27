@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -54,7 +54,7 @@ namespace Lime.Source.Profilers.NodeProfilerHelpers
 			foreach (var n in clone.Descendants.Where(i => !string.IsNullOrEmpty(i.ContentsPath))) {
 				if (n is Model3D) {
 					n.Nodes.Clear();
-					n.Markers.Clear();
+					n.Animations.Clear();
 				} else {
 					n.ContentsPath = null;
 				}
@@ -63,7 +63,9 @@ namespace Lime.Source.Profilers.NodeProfilerHelpers
 
 		private static void ResetFoldersAndAnimations(Node node)
 		{
-			node.AnimationFrame = 0;
+			foreach (var animation in node.Animations) {
+				animation.Frame = 0;
+			}
 			if (node.Folders != null && node.Folders.Count == 0) {
 				node.Folders = null;
 			}

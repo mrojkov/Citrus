@@ -331,9 +331,9 @@ namespace Orange
 				}
 				writer.EndCollection();
 			}
-			if (node.Markers.Count > 0) {
+			if (node.DefaultAnimation.Markers.Count > 0) {
 				writer.BeginCollection("Markers");
-				foreach (var m in node.Markers) {
+				foreach (var m in node.DefaultAnimation.Markers) {
 					WriteMarker(m);
 				}
 				writer.EndCollection();

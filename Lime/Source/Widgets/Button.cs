@@ -122,7 +122,7 @@ namespace Lime
 				} else if (clickGesture.WasCanceled()) {
 					if (CurrentAnimation == "Press") {
 						TryRunAnimation("Release");
-						while (IsRunning) {
+						while (DefaultAnimation.IsRunning) {
 							yield return 0;
 						}
 					}
@@ -143,7 +143,7 @@ namespace Lime
 		{
 			if (CurrentAnimation != "Release") {
 				if (TryRunAnimation("Release")) {
-					while (IsRunning) {
+					while (DefaultAnimation.IsRunning) {
 						yield return 0;
 					}
 				}
@@ -161,19 +161,19 @@ namespace Lime
 			if (CurrentAnimation == "Release") {
 				// The release animation should be played if we disable the button
 				// right after click on it.
-				while (IsRunning) {
+				while (DefaultAnimation.IsRunning) {
 					yield return 0;
 				}
 			}
 			TryRunAnimation("Disable");
-			while (IsRunning) {
+			while (DefaultAnimation.IsRunning) {
 				yield return 0;
 			}
 			while (!EnableMask.All()) {
 				yield return 0;
 			}
 			TryRunAnimation("Enable");
-			while (IsRunning) {
+			while (DefaultAnimation.IsRunning) {
 				yield return 0;
 			}
 			isDisabledState = false;
@@ -204,8 +204,7 @@ namespace Lime
 			int[] markerFrames = { 0, 10, 20, 30, 40};
 			string[] makerIds = { "Normal", "Focus", "Press", "Release", "Disable" };
 			for (var i = 0; i < 5; i++) {
-
-				Markers.Add(new Marker(makerIds[i], markerFrames[i], MarkerAction.Stop));
+				DefaultAnimation.Markers.Add(new Marker(makerIds[i], markerFrames[i], MarkerAction.Stop));
 			}
 		}
 	}

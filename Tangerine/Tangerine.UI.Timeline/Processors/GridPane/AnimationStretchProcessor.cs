@@ -140,7 +140,7 @@ namespace Tangerine.UI.Timeline
 			}
 			if (stretchMarkers) {
 				foreach (var marker in savedMarkers) {
-					DeleteMarker.Perform(Document.Current.Container, marker, removeDependencies: false);
+					DeleteMarker.Perform(marker, removeDependencies: false);
 				}
 				foreach (var marker in savedMarkers) {
 					double relpos = savedMarkerPositions[marker];
@@ -152,7 +152,7 @@ namespace Tangerine.UI.Timeline
 					}
 					var newMarker = marker.Clone();
 					newMarker.Frame = newFrame;
-					SetMarker.Perform(Document.Current.Container, newMarker, removeDependencies: false);
+					SetMarker.Perform(newMarker, removeDependencies: false);
 				}
 			}
 		}
@@ -180,7 +180,7 @@ namespace Tangerine.UI.Timeline
 					}
 				}
 			}
-			var markers = Document.Current.Container.Markers.Where(k =>
+			var markers = Document.Current.Animation.Markers.Where(k =>
 				boundaries.Left <= k.Frame &&
 				k.Frame < boundaries.Right);
 			foreach (var marker in markers) {

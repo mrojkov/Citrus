@@ -434,7 +434,7 @@ namespace Tangerine
 			public override void Process(IOperation op)
 			{
 				var doc = Document.Current;
-				doc.Container.AnimationFrame = doc.Container.AnimationFrame;
+				doc.Animation.Frame = doc.Animation.Frame;
 				doc.RootNode.Update(0);
 			}
 		}

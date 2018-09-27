@@ -86,7 +86,7 @@ namespace Lime
 		{
 			var time = (int)(Frame * 1000 / 16);
 			foreach (var n in Nodes) {
-				n.AnimationTime = time;
+				n.DefaultAnimation.Time = time;
 			}
 		}
 

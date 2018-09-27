@@ -10,8 +10,7 @@ namespace Tangerine.Core.Operations
 	{
 		public static void Perform(int column)
 		{
-			var container = Document.Current.Container;
-			foreach (var node in container.Nodes) {
+			foreach (var node in Document.Current.Container.Nodes) {
 				var occupied = new HashSet<int>();
 				if (node.Animators.Count == 0) {
 					continue;
@@ -40,7 +39,7 @@ namespace Tangerine.Core.Operations
 					}
 				}
 			}
-			var markers = container.Markers.ToList();
+			var markers = Document.Current.Animation.Markers.ToList();
 			if (markers.Count == 0) {
 				return;
 			}
@@ -59,8 +58,8 @@ namespace Tangerine.Core.Operations
 				if (m.Frame != 0 && m.Frame >= markersRemoveAt) {
 					var m1 = m.Clone();
 					m1.Frame -= 1;
-					DeleteMarker.Perform(container, m, false);
-					SetMarker.Perform(container, m1, false);
+					DeleteMarker.Perform(m, false);
+					SetMarker.Perform(m1, false);
 				}
 			}
 		}

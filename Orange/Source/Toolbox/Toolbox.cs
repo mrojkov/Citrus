@@ -115,7 +115,9 @@ namespace Orange
 				foreach (var tangerineFlag in ignoredTangerineFlags) {
 					n.SetTangerineFlag(tangerineFlag, false);
 				}
-				n.AnimationFrame = 0;
+				foreach (var animation in node.Animations) {
+					animation.Frame = 0;
+				}
 				if (n.Folders != null && n.Folders.Count == 0) {
 					n.Folders = null;
 				}
@@ -126,7 +128,7 @@ namespace Orange
 				}
 				if (!string.IsNullOrEmpty(n.ContentsPath)) {
 					n.Nodes.Clear();
-					n.Markers.Clear();
+					n.Animations.Clear();
 				}
 				if (n.AsWidget?.SkinningWeights?.IsEmpty() ?? false) {
 					n.AsWidget.SkinningWeights = null;

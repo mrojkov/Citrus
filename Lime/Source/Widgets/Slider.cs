@@ -146,11 +146,11 @@ namespace Lime
 			if (RangeMax - RangeMin < float.Epsilon) {
 				return;
 			}
-			var mn = Markers.TryFind("NormalMin");
-			var mx = Markers.TryFind("NormalMax");
+			var mn = DefaultAnimation.Markers.TryFind("NormalMin");
+			var mx = DefaultAnimation.Markers.TryFind("NormalMax");
 			if (mn != null && mx != null) {
 				var t = (Value - RangeMin) / (RangeMax - RangeMin);
-				AnimationTime = mn.Time + (mx.Time - mn.Time) * t;
+				DefaultAnimation.Time = mn.Time + (mx.Time - mn.Time) * t;
 			}
 		}
 

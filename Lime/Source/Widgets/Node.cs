@@ -295,6 +295,7 @@ namespace Lime
 		[YuzuSerializeIf(nameof(ShouldSerializeNodes))]
 		public NodeList Nodes { get; private set; }
 
+#if !TANGERINE
 		/// <summary>
 		/// Markers of default animation.
 		/// </summary>
@@ -325,6 +326,16 @@ namespace Lime
 			get => DefaultAnimation.Time;
 			set => DefaultAnimation.Time = value;
 		}
+
+		/// <summary>
+		/// Get or sets the current animation frame.
+		/// </summary>
+		public int AnimationFrame
+		{
+			get => AnimationUtils.SecondsToFrames(DefaultAnimation.Time);
+			set => DefaultAnimation.Time = AnimationUtils.FramesToSeconds(value);
+		}
+#endif
 
 		/// <summary>
 		/// Returns the first animation in the animation collection
@@ -533,15 +544,6 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Get or sets the current animation frame.
-		/// </summary>
-		public int AnimationFrame
-		{
-			get => AnimationUtils.SecondsToFrames(AnimationTime);
-			set => AnimationTime = AnimationUtils.FramesToSeconds(value);
-		}
-
-		/// <summary>
 		/// Returns a clone of the node hierarchy.
 		/// </summary>
 		public virtual Node Clone()
@@ -712,8 +714,8 @@ namespace Lime
 				return;
 			}
 			if (string.IsNullOrEmpty(Trigger)) {
-				AnimationTime = animationTimeCorrection;
-				IsRunning = true;
+				DefaultAnimation.Time = animationTimeCorrection;
+				DefaultAnimation.IsRunning = true;
 			} else {
 				TriggerMultipleAnimations(animationTimeCorrection);
 			}

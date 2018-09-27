@@ -153,16 +153,16 @@ namespace Tangerine.UI.Timeline
 		private static void CreateMarker(MarkerAction action)
 		{
 			var timeline = Timeline.Instance;
-			var nearestMarker = Document.Current.Container.Markers.LastOrDefault(
+			var nearestMarker = Document.Current.Animation.Markers.LastOrDefault(
 				m => m.Frame < timeline.CurrentColumn && m.Action == MarkerAction.Play);
-			string markerId = (action == MarkerAction.Play) ? GenerateMarkerId(Document.Current.Container.Markers, "Start") : "";
+			string markerId = (action == MarkerAction.Play) ? GenerateMarkerId(Document.Current.Animation.Markers, "Start") : "";
 			var newMarker = new Marker(
 				markerId,
 				timeline.CurrentColumn,
 				action,
 				action == MarkerAction.Jump && nearestMarker != null ? nearestMarker.Id : ""
 			);
-			SetMarker.Perform(Document.Current.Container, newMarker, true);
+			SetMarker.Perform(newMarker, true);
 		}
 
 		private static string GenerateMarkerId(MarkerList markers, string markerId)
@@ -179,9 +179,9 @@ namespace Tangerine.UI.Timeline
 		private static void DeleteMarker()
 		{
 			var timeline = Timeline.Instance;
-			var marker = Document.Current.Container.Markers.GetByFrame(timeline.CurrentColumn);
+			var marker = Document.Current.Animation.Markers.GetByFrame(timeline.CurrentColumn);
 			if (marker != null) {
-				Core.Operations.DeleteMarker.Perform(Document.Current.Container, marker, true);
+				Core.Operations.DeleteMarker.Perform(marker, true);
 			}
 		}
 	}

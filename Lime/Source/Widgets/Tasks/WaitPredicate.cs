@@ -13,7 +13,7 @@ namespace Lime
 		private Node node;
 
 		public AnimationWaitPredicate(Node node) { this.node = node; }
-		public override bool Evaluate() { return node.IsRunning; }
+		public override bool Evaluate() { return node.DefaultAnimation.IsRunning; }
 	}
 
 	class InputWaitPredicate : WaitPredicate

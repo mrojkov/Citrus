@@ -25,6 +25,7 @@ namespace Tangerine.UI.Timeline
 					CreateCurveEditorButton(),
 					CreateAnimationStretchButton(),
 					CreateSlowMotionButton(),
+					CreateAnimationSelector(),
 					CreateAnimationIndicator(),
 					new Widget(),
 					CreateExitButton(),
@@ -37,6 +38,43 @@ namespace Tangerine.UI.Timeline
 
 		TimelineUserPreferences UserPreferences => TimelineUserPreferences.Instance;
 		CoreUserPreferences CoreUserPreferences => Core.CoreUserPreferences.Instance;
+
+		Widget CreateAnimationSelector()
+		{
+			var ddl = new ThemedDropDownList { MinWidth = 100 };
+			ddl.Changed += arg => {
+				if (arg.ChangedByUser) {
+					Document.Current.History.DoTransaction(() => {
+						var animation = (Animation)arg.Value;
+						Core.Operations.SetProperty.Perform(Document.Current, nameof(Document.AnimationId), animation.Id);
+					});
+				}
+			};
+			ddl.AddChangeWatcher(() => CalcAnimationIdsHash(), _ => RefreshSelector());
+			ddl.AddChangeWatcher(() => Document.Current.AnimationId, _ => RefreshSelector());
+			return ddl;
+
+			void RefreshSelector()
+			{
+				ddl.Items.Clear();
+				foreach (var a in Document.Current.Container.Animations) {
+					ddl.Items.Add(new CommonDropDownList.Item(a.Id ?? "Primary", a));
+				}
+				ddl.Text = Document.Current.AnimationId ?? "Primary";
+			}
+
+			int CalcAnimationIdsHash()
+			{
+				unchecked {
+					int result = 17;
+					foreach (var a in Document.Current.Container.Animations) {
+						var id = a.Id;
+						result = (result * 31) + (id != null ? id.GetHashCode() : 0);
+					}
+					return result;
+				}
+			}
+		}
 
 		ToolbarButton CreateAnimationModeButton()
 		{
@@ -62,10 +100,10 @@ namespace Tangerine.UI.Timeline
 			Action f = () => {
 				var distance = Timeline.Instance.Ruler.MeasuredFrameDistance;
 				t.Text = (distance == 0) ?
-					$"Col : {Document.Current.Container.AnimationFrame}" :
-					$"Col : {Document.Current.Container.AnimationFrame} {Timeline.Instance.Ruler.MeasuredFrameDistance:+#;-#;0}";
+					$"Col : {Document.Current.AnimationFrame}" :
+					$"Col : {Document.Current.AnimationFrame} {Timeline.Instance.Ruler.MeasuredFrameDistance:+#;-#;0}";
 			};
-			t.AddChangeWatcher(() => Document.Current.Container.AnimationFrame, _ => f());
+			t.AddChangeWatcher(() => Document.Current.AnimationFrame, _ => f());
 			t.AddChangeWatcher(() => Timeline.Instance.Ruler.MeasuredFrameDistance, _ => f());
 			return t;
 		}

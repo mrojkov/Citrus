@@ -187,7 +187,7 @@ namespace Tangerine.UI.Timeline
 		{
 			var a = new Vector2(0.0f, 1.0f);
 			var b = new Vector2(0.0f, ContentWidget.Height - 2.0f);
-			foreach (var marker in Document.Current.Container.Markers) {
+			foreach (var marker in Document.Current.Animation.Markers) {
 				if (timeline.IsColumnVisible(marker.Frame)) {
 					a.X = b.X = 0.5f + TimelineMetrics.ColWidth * marker.Frame;
 					Renderer.DrawLine(a, b, ColorTheme.Current.TimelineGrid.Lines);

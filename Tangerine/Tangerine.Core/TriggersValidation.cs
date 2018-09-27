@@ -72,7 +72,7 @@ namespace Tangerine.Core
 			var node = (Node) container;
 
 			var trigger = TriggersValidation.Trigger.TryParse((string) triggerValue);
-			if (trigger.Elements.RemoveAll(element => node.Markers.All(marker => marker.Id != element.MarkerId)) == 0) {
+			if (trigger.Elements.RemoveAll(element => node.DefaultAnimation.Markers.All(marker => marker.Id != element.MarkerId)) == 0) {
 				return false;
 			}
 

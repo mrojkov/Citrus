@@ -84,7 +84,7 @@ namespace Tangerine
 					TransformPropertyAndKeyframes<Vector2>(node, nameof(Bone.RefPosition), v => v - aabb.A);
 				}
 			}
-			group.AnimationFrame = container.AnimationFrame;
+			group.DefaultAnimation.Frame = container.DefaultAnimation.Frame;
 			ClearRowSelection.Perform();
 			SelectNode.Perform(group);
 		}
@@ -161,7 +161,7 @@ namespace Tangerine
 				return data;
 			}
 
-			var curFrame = parentNode.AnimationFrame;
+			var curFrame = parentNode.DefaultAnimation.Frame;
 			boneChain.Add(node);
 			foreach (var pair in framesDict) {
 				foreach (var frame in pair.Value) {
@@ -219,10 +219,12 @@ namespace Tangerine
 
 		private static void ApplyAnimationAtFrame(string animationId, int frame, IEnumerable<Bone> bones)
 		{
-			var id = (animationId == DefaultAnimationId) ? null : animationId;
+			if (animationId != DefaultAnimationId) {
+				throw new NotImplementedException();
+			}
 			foreach (var node in bones) {
-				node.AnimationFrame = frame;
-				node.Animators.Apply(node.AnimationTime, id);
+				node.DefaultAnimation.Frame = frame;
+				node.Animators.Apply(node.DefaultAnimation.Time);
 				node.Update(0);
 			}
 		}
@@ -399,7 +401,7 @@ namespace Tangerine
 			var rows = Document.Current.SelectedRows().ToList();
 			foreach (var row in rows) {
 				if (row.Components.Get<NodeRow>()?.Node is Frame frame) {
-					if (frame.Markers.Count > 0) {
+					if (frame.DefaultAnimation.Markers.Count > 0) {
 						AlertDialog.Show("Cannot convert widget with existing markers");
 						return;
 					}
@@ -419,7 +421,7 @@ namespace Tangerine
 					int[] markerFrames = { 0, 10, 20, 30, 40 };
 					string[] makerIds = { "Normal", "Focus", "Press", "Release", "Disable" };
 					for (var i = 0; i < 5; i++) {
-						button.Markers.Add(new Marker(makerIds[i], markerFrames[i], MarkerAction.Stop));
+						button.DefaultAnimation.Markers.Add(new Marker(makerIds[i], markerFrames[i], MarkerAction.Stop));
 					}
 				} catch (InvalidOperationException e) {
 					AlertDialog.Show(e.Message);

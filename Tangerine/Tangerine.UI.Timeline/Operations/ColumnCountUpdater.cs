@@ -13,15 +13,15 @@ namespace Tangerine.UI.Timeline
 		{
 			var timeline = Timeline.Instance;
 			var rows = Document.Current.Rows;
-			var container = Document.Current.Container;
+			var markers = Document.Current.Animation.Markers;
 			int maxColumn = 0;
 			foreach (var row in rows) {
 				var nodeData = row.Components.Get<Core.Components.NodeRow>();
 				if (nodeData != null) {
 					int maxMarkerColumn = 0;
 					var maxAnimatorColumn = Math.Max(maxColumn, nodeData.Node.Animators.GetOverallDuration() + ExtraFramesCount);
-					if (container.Markers.Count > 0) {
-						maxMarkerColumn = Math.Max(maxColumn, container.Markers[container.Markers.Count - 1].Frame + ExtraFramesCount);
+					if (markers.Count > 0) {
+						maxMarkerColumn = Math.Max(maxColumn, markers[markers.Count - 1].Frame + ExtraFramesCount);
 					}
 					maxColumn = Math.Max(maxMarkerColumn, maxAnimatorColumn);
 				}

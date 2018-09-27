@@ -15,16 +15,17 @@ namespace Tangerine.Core
 			set { CurrentFrameSetter.CacheAnimationsStates = value; }
 		}
 
-		public static void SetCurrentFrameToNode(int frameIndex, Node node, bool animationMode, bool isForced = false)
+		public static void SetCurrentFrameToNode(int frameIndex, Animation animation, bool animationMode, bool isForced = false)
 		{
-			CurrentFrameSetter.SetCurrentFrameToNode(frameIndex, node, animationMode, isForced);
+			CurrentFrameSetter.SetCurrentFrameToNode(frameIndex, animation, animationMode, isForced);
 		}
 
-		private static void FastForwardToFrame(Node node, int frameIndex)
+		private static void FastForwardToFrame(Animation animation, int frameIndex)
 		{
+			var node = animation.Owner;
 			node.SetTangerineFlag(TangerineFlags.IgnoreMarkers, true);
 			try {
-				CurrentFrameSetter.FastForwardToFrame(node, frameIndex);
+				CurrentFrameSetter.FastForwardToFrame(animation, frameIndex);
 			} finally {
 				node.SetTangerineFlag(TangerineFlags.IgnoreMarkers, false);
 			}
@@ -38,10 +39,10 @@ namespace Tangerine.Core
 				if (!CoreUserPreferences.Instance.StopAnimationOnCurrentFrame) { 
 					var i = 0;
 					foreach (var node in PreviewAnimationContainer.Descendants) {
-						node.AnimationTime = animationMode ? 0 : savedAnimationTimes[i++];
+						node.DefaultAnimation.Time = animationMode ? 0 : savedAnimationTimes[i++];
 					}
 					SetCurrentFrameToNode(
-						PreviewAnimationBegin, Container, animationMode
+						PreviewAnimationBegin, Animation, animationMode
 					);
 				}
 				AudioSystem.StopAll();
@@ -49,21 +50,21 @@ namespace Tangerine.Core
 			} else {
 				savedAnimationTimes = new List<double>();
 				foreach (var node in Container.Descendants) {
-					savedAnimationTimes.Add(node.AnimationTime);
+					savedAnimationTimes.Add(node.DefaultAnimation.Time);
 				}
 				foreach (var node in RootNode.Descendants) {
 					if (node is ITangerinePreviewAnimationListener t) {
 						t.OnStart();
 					}
 				}
-				int savedAnimationFrame = Container.AnimationFrame;
+				int savedAnimationFrame = AnimationFrame;
 				PreviewAnimation = true;
 				if (triggerMarkersBeforeCurrentFrame) {
-					SetCurrentFrameToNode(0, Container, true);
+					SetCurrentFrameToNode(0, Animation, true);
 				}
-				Container.IsRunning = PreviewAnimation;
+				Animation.IsRunning = PreviewAnimation;
 				if (triggerMarkersBeforeCurrentFrame) {
-					FastForwardToFrame(Container, savedAnimationFrame);
+					FastForwardToFrame(Animation, savedAnimationFrame);
 				}
 				PreviewAnimationBegin = savedAnimationFrame;
 				PreviewAnimationContainer = Container;
@@ -79,7 +80,7 @@ namespace Tangerine.Core
 			}
 			SetCurrentFrameToNode(
 				Current.AnimationFrame,
-				Current.Container,
+				Current.Animation,
 				CoreUserPreferences.Instance.AnimationMode,
 				isForced: true
 			);
@@ -164,11 +165,12 @@ namespace Tangerine.Core
 				}
 			}
 
-			internal static void SetCurrentFrameToNode(int frameIndex, Node node, bool animationMode, bool isForced)
+			internal static void SetCurrentFrameToNode(int frameIndex, Animation animation, bool animationMode, bool isForced)
 			{
 				Audio.GloballyEnable = false;
 				try {
 					var doc = Current;
+					var node = animation.Owner;
 					if (animationMode && (doc.AnimationFrame != frameIndex || isForced)) {
 						node.SetTangerineFlag(TangerineFlags.IgnoreMarkers, true);
 						var cacheFrame = node.Components.Get<AnimationsStatesComponent>()?.Column;
@@ -184,24 +186,23 @@ namespace Tangerine.Core
 							AnimationsStatesComponent.Restore(node);
 						}
 						ClearParticlesRecursive(doc.RootNode);
-						node.IsRunning = true;
-
+						animation.IsRunning = true;
 						if (CacheAnimationsStates && !cacheFrame.HasValue) {
 							cacheFrame = frameIndex - OptimalRollbackForCacheAnimationsStates;
 							if (cacheFrame.Value > 0) {
-								FastForwardToFrame(node, cacheFrame.Value);
+								FastForwardToFrame(animation, cacheFrame.Value);
 								AnimationsStatesComponent.Create(node);
 							}
 						}
-						FastForwardToFrame(node, frameIndex);
+						FastForwardToFrame(animation, frameIndex);
 						StopAnimationRecursive(node);
 						node.SetTangerineFlag(TangerineFlags.IgnoreMarkers, false);
 
 						// Force update to reset Animation.NextMarkerOrTriggerTime for parents.
-						doc.Container.AnimationFrame = doc.Container.AnimationFrame;
+						animation.Frame = doc.Animation.Frame;
 						doc.RootNode.Update(0);
 					} else {
-						node.AnimationFrame = frameIndex;
+						animation.Frame = frameIndex;
 						node.Update(0);
 						ClearParticlesRecursive(node);
 					}
@@ -210,21 +211,21 @@ namespace Tangerine.Core
 				}
 			}
 
-			internal static void FastForwardToFrame(Node node, int frame)
+			internal static void FastForwardToFrame(Animation animation, int frame)
 			{
 				// Try to decrease error in node.AnimationTime by call node.Update several times
 				const float OptimalDelta = 10;
 				float forwardDelta;
 				do {
-					forwardDelta = CalcDeltaToFrame(node, frame);
+					forwardDelta = CalcDeltaToFrame(animation, frame);
 					var delta = Mathf.Min(forwardDelta, OptimalDelta);
-					node.Update(delta);
+					animation.Owner.Update(delta);
 				} while (forwardDelta > OptimalDelta);
 			}
 
-			static float CalcDeltaToFrame(Node node, int frame)
+			static float CalcDeltaToFrame(Animation animation, int frame)
 			{
-				var forwardDelta = AnimationUtils.SecondsPerFrame * frame - node.AnimationTime;
+				var forwardDelta = AnimationUtils.SecondsPerFrame * frame - animation.Time;
 				// Make sure that animation engine will invoke triggers on last frame
 				forwardDelta += 0.00001;
 				// Hack: CompatibilityAnimationEngine workaround

@@ -24,8 +24,7 @@ namespace Tangerine.Core.Operations
 		{
 			protected override void InternalRedo(TimelineHorizontalShift op)
 			{
-				var container = Document.Current.Container;
-				foreach (var node in container.Nodes) {
+				foreach (var node in Document.Current.Container.Nodes) {
 					foreach (var animator in node.Animators.Where(i => i.AnimationId == Document.Current.AnimationId)) {
 						var keys = op.delta > 0 ? animator.ReadonlyKeys.Reverse() : animator.ReadonlyKeys;
 						foreach (var k in keys) {
@@ -37,7 +36,7 @@ namespace Tangerine.Core.Operations
 					}
 					node.Animators.Invalidate();
 				}
-				var markers = op.delta > 0 ? container.Markers.Reverse() : container.Markers;
+				var markers = op.delta > 0 ? Document.Current.Animation.Markers.Reverse() : Document.Current.Animation.Markers;
 				foreach (var m in markers) {
 					if (m.Frame >= op.column) {
 						m.Frame += op.delta;

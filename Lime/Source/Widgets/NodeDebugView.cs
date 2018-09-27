@@ -14,8 +14,6 @@ namespace Lime
 		[DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
 		public Node[] Nodes { get { return node.Nodes.ToArray(); } }
 
-		public Marker[] Markers { get { return node.Markers.ToArray(); } }
-
 		public NodeDebugView(Node node)
 		{
 			this.node = node;

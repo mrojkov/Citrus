@@ -10,21 +10,21 @@ namespace Tangerine.UI.Timeline.Operations
 		public static bool IsFrozen;
 
 		protected int Column;
-		protected Node Container;
+		protected Animation Animation;
 
 		public override bool IsChangingDocument => false;
 
-		public static void Perform(int column, Node container)
+		public static void Perform(int column, Animation animation)
 		{
 			if (Document.Current.PreviewAnimation) {
 				Document.Current.TogglePreviewAnimation(CoreUserPreferences.Instance.AnimationMode, false);
 			}
-			DocumentHistory.Current.Perform(new SetCurrentColumn(column, container));
+			DocumentHistory.Current.Perform(new SetCurrentColumn(column, animation));
 		}
 
 		public static void Perform(int column)
 		{
-			Perform(column, Document.Current.Container);
+			Perform(column, Document.Current.Animation);
 		}
 
 		public static void RollbackHistoryWithoutScrolling()
@@ -37,10 +37,10 @@ namespace Tangerine.UI.Timeline.Operations
 			}
 		}
 
-		private SetCurrentColumn(int column, Node node)
+		private SetCurrentColumn(int column, Animation animation)
 		{
 			Column = column;
-			Container = node;
+			Animation = animation;
 		}
 
 		public class Processor : OperationProcessor<SetCurrentColumn>
@@ -55,7 +55,7 @@ namespace Tangerine.UI.Timeline.Operations
 			protected override void InternalRedo(SetCurrentColumn op)
 			{
 				op.Save(new Backup { Column = Timeline.Instance.CurrentColumn });
-				SetColumn(op.Column, op.Container);
+				SetColumn(op.Column, op.Animation);
 			}
 
 			protected override void InternalUndo(SetCurrentColumn op)
@@ -63,12 +63,12 @@ namespace Tangerine.UI.Timeline.Operations
 				if (IsFrozen) {
 					return;
 				}
-				SetColumn(op.Restore<Backup>().Column, op.Container);
+				SetColumn(op.Restore<Backup>().Column, op.Animation);
 			}
 
-			void SetColumn(int value, Node node)
+			void SetColumn(int value, Animation animation)
 			{
-				Document.SetCurrentFrameToNode(value, node, CoreUserPreferences.Instance.AnimationMode);
+				Document.SetCurrentFrameToNode(value, animation, CoreUserPreferences.Instance.AnimationMode);
 				if (!isScrollingFrozen) {
 					Timeline.Instance.EnsureColumnVisible(value);
 				}

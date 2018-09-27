@@ -541,37 +541,35 @@ namespace Tangerine.Core.Operations
 
 	public class SetMarker : Operation
 	{
-		private readonly Node container;
 		private readonly Marker marker;
 		private readonly bool removeDependencies;
 
 		public override bool IsChangingDocument => true;
 
-		private SetMarker(Node container, Marker marker, bool removeDependencies)
+		private SetMarker(Marker marker, bool removeDependencies)
 		{
-			this.container = container;
 			this.marker = marker;
 			this.removeDependencies = removeDependencies;
 		}
 
-		public static void Perform(Node container, Marker marker, bool removeDependencies)
+		public static void Perform(Marker marker, bool removeDependencies)
 		{
-			var previousMarker = container.Markers.GetByFrame(marker.Frame);
+			var previousMarker = Document.Current.Animation.Markers.GetByFrame(marker.Frame);
 
-			DocumentHistory.Current.Perform(new SetMarker(container, marker, removeDependencies));
+			DocumentHistory.Current.Perform(new SetMarker(marker, removeDependencies));
 
 			if (removeDependencies) {
 				// Detect if a previous marker id is unique then rename it in triggers and markers.
 				if (previousMarker != null && previousMarker.Id != marker.Id &&
-					container.Markers.All(markerEl => markerEl.Id != previousMarker.Id)) {
+					Document.Current.Animation.Markers.All(markerEl => markerEl.Id != previousMarker.Id)) {
 
-					foreach (var markerEl in container.Markers.ToList()) {
+					foreach (var markerEl in Document.Current.Animation.Markers.ToList()) {
 						if (markerEl.Action == MarkerAction.Jump && markerEl.JumpTo == previousMarker.Id) {
 							SetProperty.Perform(markerEl, nameof(markerEl.JumpTo), marker.Id);
 						}
 					}
 
-					ProcessAnimableProperty.Perform(container, nameof(Node.Trigger),
+					ProcessAnimableProperty.Perform(Document.Current.Container, nameof(Node.Trigger),
 						(string value, out string newValue) => {
 							return TriggersValidation.TryRenameMarkerInTrigger(
 								previousMarker.Id, marker.Id, value, out newValue
@@ -593,16 +591,16 @@ namespace Tangerine.Core.Operations
 			protected override void InternalRedo(SetMarker op)
 			{
 				var backup = new Backup {
-					Marker = op.container.Markers.GetByFrame(op.marker.Frame)
+					Marker = Document.Current.Animation.Markers.GetByFrame(op.marker.Frame)
 				};
 
 				op.Save(backup);
-				op.container.Markers.AddOrdered(op.marker);
+				Document.Current.Animation.Markers.AddOrdered(op.marker);
 
 				if (op.removeDependencies) {
 					backup.SavedJumpTo = op.marker.JumpTo;
 					if (op.marker.Action == MarkerAction.Jump &&
-						op.container.Markers.All(markerEl => markerEl.Id != op.marker.JumpTo)) {
+						Document.Current.Animation.Markers.All(markerEl => markerEl.Id != op.marker.JumpTo)) {
 						op.marker.JumpTo = "";
 					}
 				}
@@ -610,10 +608,10 @@ namespace Tangerine.Core.Operations
 
 			protected override void InternalUndo(SetMarker op)
 			{
-				op.container.Markers.Remove(op.marker);
+				Document.Current.Animation.Markers.Remove(op.marker);
 				var b = op.Restore<Backup>();
 				if (b.Marker != null) {
-					op.container.Markers.AddOrdered(b.Marker);
+					Document.Current.Animation.Markers.AddOrdered(b.Marker);
 				}
 
 				if (op.removeDependencies) {
@@ -626,18 +624,17 @@ namespace Tangerine.Core.Operations
 
 	public class DeleteMarker : Operation
 	{
-		private readonly Node container;
 		private readonly Marker marker;
 		private readonly bool removeDependencies;
 
 		public override bool IsChangingDocument => true;
 
-		public static void Perform(Node container, Marker marker, bool removeDependencies)
+		public static void Perform(Marker marker, bool removeDependencies)
 		{
-			DocumentHistory.Current.Perform(new DeleteMarker(container, marker, removeDependencies));
+			DocumentHistory.Current.Perform(new DeleteMarker(marker, removeDependencies));
 
 			if (removeDependencies) {
-				ProcessAnimableProperty.Perform(container, nameof(Node.Trigger),
+				ProcessAnimableProperty.Perform(Document.Current.Container, nameof(Node.Trigger),
 					(string value, out string newValue) => {
 						return TriggersValidation.TryRemoveMarkerFromTrigger(marker.Id, value, out newValue);
 					}
@@ -645,9 +642,8 @@ namespace Tangerine.Core.Operations
 			}
 		}
 
-		private DeleteMarker(Node container, Marker marker, bool removeDependencies)
+		private DeleteMarker(Marker marker, bool removeDependencies)
 		{
-			this.container = container;
 			this.marker = marker;
 			this.removeDependencies = removeDependencies;
 		}
@@ -666,17 +662,17 @@ namespace Tangerine.Core.Operations
 
 			protected override void InternalRedo(DeleteMarker op)
 			{
-				op.container.Markers.Remove(op.marker);
+				Document.Current.Animation.Markers.Remove(op.marker);
 
 				if (op.removeDependencies) {
 					var removedJumpToMarkers = new List<Marker>();
-					for (int i = op.container.Markers.Count - 1; i >= 0; i--) {
-						var marker = op.container.Markers[i];
+					for (int i = Document.Current.Animation.Markers.Count - 1; i >= 0; i--) {
+						var marker = Document.Current.Animation.Markers[i];
 						if (marker.Action != MarkerAction.Jump || marker.JumpTo != op.marker.Id) {
 							continue;
 						}
 						removedJumpToMarkers.Insert(0, marker);
-						op.container.Markers.RemoveAt(i);
+						Document.Current.Animation.Markers.RemoveAt(i);
 					}
 
 					op.Save(new Backup(removedJumpToMarkers));
@@ -685,13 +681,13 @@ namespace Tangerine.Core.Operations
 
 			protected override void InternalUndo(DeleteMarker op)
 			{
-				op.container.Markers.AddOrdered(op.marker);
+				Document.Current.Animation.Markers.AddOrdered(op.marker);
 
 				Backup backup;
 				if (op.Find(out backup)) {
 					backup = op.Restore<Backup>();
 					foreach (var marker in backup.RemovedJumpToMarkers) {
-						op.container.Markers.AddOrdered(marker);
+						Document.Current.Animation.Markers.AddOrdered(marker);
 					}
 				}
 			}
@@ -1051,14 +1047,16 @@ namespace Tangerine.Core.Operations
 	{
 		public static void Perform(Node node)
 		{
-			foreach (var m in node.Parent.Markers) {
-				SetMarker.Perform(node, m.Clone(), true);
+			EnterNode.Perform(node);
+			foreach (var m in node.DefaultAnimation.Markers) {
+				SetMarker.Perform(m.Clone(), true);
 				SetKeyframe.Perform(node, nameof(Node.Trigger), null, new Keyframe<string> {
 					Frame = m.Frame,
 					Value = m.Id,
 					Function = KeyFunction.Linear
 				});
 			}
+			LeaveNode.Perform();
 		}
 	}
 

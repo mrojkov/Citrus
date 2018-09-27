@@ -46,19 +46,21 @@ namespace Tangerine.UI.Timeline.Components
 
 		private static readonly Stack<Cell> cellPool = new Stack<Cell>();
 		private readonly Dictionary<int, Cell> cells = new Dictionary<int, Cell>();
-		private int animatorsHash = -1;
+		private int animatorsVersion = -1;
+		private string animationId;
 
 		protected virtual void Render(Widget widget)
 		{
-			int hash = CalcAnimatorsHash();
-			if (animatorsHash != hash) {
-				animatorsHash = hash;
+			int v = CalcAnimatorsTotalVersion();
+			if (animatorsVersion != v || animationId != Document.Current.AnimationId) {
+				animatorsVersion = v;
+				animationId = Document.Current.AnimationId;
 				GenerateCells();
 			}
 			RenderCells(widget);
 		}
 
-		private int CalcAnimatorsHash()
+		private int CalcAnimatorsTotalVersion()
 		{
 			int result = node.Animators.Version;
 			foreach (var a in node.Animators) {
@@ -75,7 +77,7 @@ namespace Tangerine.UI.Timeline.Components
 			}
 			cells.Clear();
 			foreach (var animator in node.Animators) {
-				if (animator.IsZombie) {
+				if (animator.IsZombie || animator.AnimationId != Document.Current.AnimationId) {
 					continue;
 				}
 				for (var j = 0; j < animator.ReadonlyKeys.Count; j++) {

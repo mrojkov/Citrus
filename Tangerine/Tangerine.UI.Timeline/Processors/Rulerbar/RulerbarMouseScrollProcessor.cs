@@ -22,7 +22,7 @@ namespace Tangerine.UI.Timeline
 						int initialColumnUnderMouse = CalcColumn(rulerWidget.LocalMousePosition().X);
 						int initialCurrentColumn = timeline.CurrentColumn;
 						int previousColumn = -1;
-						var marker = Document.Current.Container.Markers.GetByFrame(initialColumnUnderMouse);
+						var marker = Document.Current.Animation.Markers.GetByFrame(initialColumnUnderMouse);
 						while (input.IsMousePressed()) {
 							bool isEditing = input.IsKeyPressed(Key.Control);
 							bool isShifting = isEditing && input.IsKeyPressed(Key.Shift);
@@ -78,14 +78,13 @@ namespace Tangerine.UI.Timeline
 			if (delta > 0) {
 				Core.Operations.TimelineHorizontalShift.Perform(timeline.CurrentColumn, delta);
 			} else if (delta < 0) {
-				var container = Document.Current.Container;
-				foreach (var node in container.Nodes) {
+				foreach (var node in Document.Current.Container.Nodes) {
 					foreach (var animator in node.Animators.Where(i => i.AnimationId == Document.Current.AnimationId).ToList()) {
 						Core.Operations.RemoveKeyframeRange.Perform(animator, destColumn, timeline.CurrentColumn - 1);
 					}
 				}
-				foreach (var marker in container.Markers.Where(m => m.Frame >= destColumn && m.Frame < timeline.CurrentColumn).ToList()) {
-					Core.Operations.DeleteMarker.Perform(container, marker, removeDependencies: false);
+				foreach (var marker in Document.Current.Animation.Markers.Where(m => m.Frame >= destColumn && m.Frame < timeline.CurrentColumn).ToList()) {
+					Core.Operations.DeleteMarker.Perform(marker, removeDependencies: false);
 				}
 				Core.Operations.TimelineHorizontalShift.Perform(destColumn, delta);
 			}
@@ -93,14 +92,14 @@ namespace Tangerine.UI.Timeline
 
 		void DragMarker(Marker marker, int destColumn)
 		{
-			if (Document.Current.Container.Markers.Any(m => m.Frame == destColumn)) {
+			if (Document.Current.Animation.Markers.Any(m => m.Frame == destColumn)) {
 				// The place is taken by another marker.
 				return;
 			}
 			// Delete and add marker again, because we want to maintain the markers order.
-			Core.Operations.DeleteMarker.Perform(Document.Current.Container, marker, false);
+			Core.Operations.DeleteMarker.Perform(marker, false);
 			Core.Operations.SetProperty.Perform(marker, "Frame", destColumn);
-			Core.Operations.SetMarker.Perform(Document.Current.Container, marker, true);
+			Core.Operations.SetMarker.Perform(marker, true);
 		}
 
 		public static int CalcColumn(float mouseX)

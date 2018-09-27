@@ -55,7 +55,7 @@ namespace Tangerine.UI.Timeline
 			Renderer.DrawRect(a.X, b.Y, b.X, size.Y, veilColor);
 			Renderer.DrawRectOutline(a, b, ColorTheme.Current.TimelineOverview.Border);
 
-			foreach(var m in Document.Current.Container.Markers) {
+			foreach(var m in Document.Current.Animation.Markers) {
 				RenderMarker(m);
 			}
 		}

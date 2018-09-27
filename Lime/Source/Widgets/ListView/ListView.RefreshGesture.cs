@@ -67,7 +67,7 @@ namespace Lime
 				try {
 					yield return refreshTask.GetEnumerator();
 					animation.RunAnimation("Hide");
-					while (animation.IsRunning) {
+					while (animation.DefaultAnimation.IsRunning) {
 						yield return null;
 					}
 				} finally {

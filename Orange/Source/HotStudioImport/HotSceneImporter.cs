@@ -190,7 +190,7 @@ namespace Orange
 					if (marker.Action == MarkerAction.Jump && marker.JumpTo == null) {
 						throw new Exception("Jump marker '{0}' in node '{1}' have no JumpTo property.", marker.Id ?? "<noname>", node.ToString());
 					}
-					node.Markers.Add(marker);
+					node.DefaultAnimation.Markers.Add(marker);
 				}
 				lexer.ParseToken(']');
 				break;

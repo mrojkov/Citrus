@@ -228,18 +228,18 @@ namespace Tangerine.UI.SceneView
 						} else {
 							label.Visible = showLabel;
 						}
-						if (exposedWidget.AnimationFrame <= lastFrame) {
+						if (exposedWidget.DefaultAnimation.Frame <= lastFrame) {
 							savedTime = totalTime;
 						}
 						if (totalTime - savedTime > 1) {
-							exposedWidget.AnimationFrame = 0;
+							exposedWidget.DefaultAnimation.Frame = 0;
 						}
 					});
 				}
 
 				public void RunAnimation()
 				{
-					exposedWidget.IsRunning = true;
+					exposedWidget.DefaultAnimation.IsRunning = true;
 				}
 
 				Transform2 CalcExposedTransform(Widget widget, Frame frame)

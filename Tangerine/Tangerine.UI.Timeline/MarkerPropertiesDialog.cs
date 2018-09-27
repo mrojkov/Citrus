@@ -28,7 +28,7 @@ namespace Tangerine.UI.Timeline
 			var window = new Window(new WindowOptions { FixedSize = true, Title = "Marker properties", Visible = false, Style = WindowStyle.Dialog });
 			jumpToSelector = new ThemedDropDownList();
 			jumpToSelector.Items.Add(new ThemedDropDownList.Item(string.Empty, null));
-			foreach (var m in Document.Current.Container.Markers.Where(m => !string.IsNullOrEmpty(m.Id))) {
+			foreach (var m in Document.Current.Animation.Markers.Where(m => !string.IsNullOrEmpty(m.Id))) {
 				jumpToSelector.Items.Add(new ThemedDropDownList.Item(m.Id, m));
 			}
 			jumpToSelector.Text = marker.JumpTo;

@@ -1,4 +1,4 @@
-﻿using Lime;
+using Lime;
 using System.Collections.Generic;
 using System.Linq;
 using Tangerine.Core;
@@ -21,9 +21,10 @@ namespace Tangerine
 		private static void SetMarker(Node rootNode, string markerId)
 		{
 			foreach (var node in rootNode.Nodes) {
-				var marker = node.Markers.FirstOrDefault(m => m.Id == markerId);
+				var animation = node.DefaultAnimation;
+				var marker = animation.Markers.FirstOrDefault(m => m.Id == markerId);
 				if (marker != null) {
-					UI.Timeline.Operations.SetCurrentColumn.Perform(marker.Frame, node);
+					UI.Timeline.Operations.SetCurrentColumn.Perform(marker.Frame, animation);
 				}
 				SetMarker(node, markerId);
 			}
