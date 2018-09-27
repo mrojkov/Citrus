@@ -74,7 +74,7 @@ namespace Tangerine.UI.Timeline.Components
 			expandButtonContainer.Updating += delta => {
 				bool visible = false;
 				foreach (var a in nodeData.Node.Animators) {
-					if (!a.IsZombie) {
+					if (!a.IsZombie && a.AnimationId == Document.Current.AnimationId) {
 						visible = true;
 						break;
 					}

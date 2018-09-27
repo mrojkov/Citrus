@@ -74,7 +74,7 @@ namespace Tangerine.Core
 
 		Row AddAnimatorRow(Row parent, Node node, IAnimator animator)
 		{
-			if (animator.IsZombie) {
+			if (animator.IsZombie || animator.AnimationId != Document.Current.AnimationId) {
 				return null;
 			}
 			var row = Document.Current.GetRowForObject(animator);
