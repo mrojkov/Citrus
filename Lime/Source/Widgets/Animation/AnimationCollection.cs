@@ -10,8 +10,6 @@ namespace Lime
 
 		public int Count { get; private set; }
 
-		public int Version { get; private set; }
-
 		bool ICollection<Animation>.IsReadOnly => false;
 
 		bool IList.IsReadOnly => false;
@@ -134,7 +132,6 @@ namespace Lime
 			owner.FirstAnimation = null;
 			Count = 0;
 			owner.RefreshRunningAnimationCount();
-			unchecked { Version++; }
 		}
 
 		public bool Contains(Animation item) => item != null && item.Owner == owner;
@@ -202,7 +199,6 @@ namespace Lime
 			}
 			Count++;
 			owner.RefreshRunningAnimationCount();
-			unchecked { Version++; }
 		}
 
 		public void RemoveAt(int index)
@@ -225,7 +221,6 @@ namespace Lime
 			curr.Next = null;
 			Count--;
 			owner.RefreshRunningAnimationCount();
-			unchecked { Version++; }
 		}
 
 		int IList.Add(object value)
