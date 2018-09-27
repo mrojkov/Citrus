@@ -8,12 +8,12 @@ ParticleModifier - элемент для контейнера частиц (Part
 * **Size** - размер частиц
 * **Velocity** - скорость движения частиц
 * **Spin** - вращение
-* **AngularVelocity** -
-* **GravityAmount** - 
-* **WindAmount** - 
-* **MagnetAmount** - 
-* **FirstFrame** - 
-* **LastFrame** - 
-* **AnimationFps** - 
-* **LoopedAnimation** - 
-* **Texture** - 
+* **AngularVelocity** - ???
+* **GravityAmount** - ???
+* **WindAmount** - ???
+* **MagnetAmount** - ???
+* **FirstFrame** - ???
+* **LastFrame** - ???
+* **AnimationFps** - ???
+* **LoopedAnimation** - ???
+* **Texture** - ???

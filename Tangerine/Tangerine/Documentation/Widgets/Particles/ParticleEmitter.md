@@ -6,22 +6,22 @@ ParticleEmitter - контейнер для системы частиц
 
 * **ImmortalParticles** - 
 * **Shape** - форма партиклей
-* **EmissionType** - 
-* **ParticlesLinkage** - 
-* **Number** - 
-* **TimeShift** - 
-* **Speed** - 
-* **AlongPathOrientation** - 
-* **WindDirection** - 
-* **WindAmount** - 
-* **GravityDirection** - 
-* **GravityAmount** - 
-* **MagnetAmount** - 
-* **Orientation** - 
-* **Direction** - 
-* **Lifetime** - 
-* **Zoom** - 
-* **AspectRatio** - 
-* **Velocity** - 
-* **Spin** -
-* **AngularVelocity** - 
+* **EmissionType** - ???
+* **ParticlesLinkage** - ???
+* **Number** - ???
+* **TimeShift** - ???
+* **Speed** - ???
+* **AlongPathOrientation** - ???
+* **WindDirection** - ???
+* **WindAmount** - ???
+* **GravityDirection** - ???
+* **GravityAmount** - ???
+* **MagnetAmount** - ???
+* **Orientation** - ???
+* **Direction** - ???
+* **Lifetime** - ???
+* **Zoom** - ???
+* **AspectRatio** - ???
+* **Velocity** - ???
+* **Spin** - ???
+* **AngularVelocity** - ???

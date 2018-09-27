@@ -4,6 +4,6 @@ ParticlesMagnet - ???
 
 Свойства **ParticlesMagnet**:
 
-* **Shape** - 
-* **Attenuation** - 
-* **Strength** - 
+* **Shape** - ???
+* **Attenuation** - ???
+* **Strength** - ???
