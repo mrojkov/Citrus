@@ -57,7 +57,7 @@ namespace Tangerine.UI.Timeline
 			void RefreshSelector()
 			{
 				ddl.Items.Clear();
-				foreach (var a in Document.Current.Container.Animations) {
+				foreach (var a in Document.Current.RootNode.Animations) {
 					ddl.Items.Add(new CommonDropDownList.Item(a.Id ?? "Primary", a));
 				}
 				ddl.Text = Document.Current.AnimationId ?? "Primary";
