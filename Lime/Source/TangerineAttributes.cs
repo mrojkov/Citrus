@@ -85,7 +85,7 @@ namespace Lime
 				}
 
 				var p = Expression.Parameter(typeof(object));
-				var e = Expression.Call(Expression.Convert(p, obj.GetType()), fn);
+				var e = Expression.Call(Expression.Convert(p, fn.DeclaringType), fn);
 				checker = Expression.Lambda<Func<object, bool>>(e, p).Compile();
 			}
 
