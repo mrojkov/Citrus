@@ -22,6 +22,7 @@ namespace Tangerine.UI
 				}
 			};
 			Selector.AddChangeWatcher(CoalescedPropertyValue(), v => Selector.Value = v);
+			Selector.ShowingDropDownList += RefreshDropDownList;
 
 			void RefreshDropDownList()
 			{
