@@ -5,7 +5,7 @@ namespace Lime
 	// TODO: Attribute to exclude components with custom presenters and/or custom render chain builders
 	[TangerineRegisterComponent]
 	[AllowedComponentOwnerTypes(typeof(Widget))]
-	public class PostProcessingComponent : NodeComponent
+	public class PostProcessingComponent : NodeBehavior
 	{
 		private const string GroupHSL = "1. HSL";
 		private const string GroupBlur = "2. Blur effect";
@@ -13,7 +13,10 @@ namespace Lime
 		private const string GroupNoise = "4. Noise";
 		private const string GroupVignette = "5. Vignette";
 		private const string GroupOverallImpact = "6. Overall impact";
-		private const string GroupDebugView = "7. Debug view";
+		private const string GroupSourceTexture = "7. Source texture";
+		private const string GroupDebugView = "8. Debug view";
+		private const int MinimumTextureSize = 32;
+		private const int MaximumTextureSize = 2048;
 		private const float MinimumTextureScaling = 0.01f;
 		private const float MaximumTextureScaling = 1f;
 		private const float MaximumHue = 1f;
@@ -43,6 +46,10 @@ namespace Lime
 		private ITexture noiseTexture;
 		private float vignetteRadius = 0.5f;
 		private float vignetteSoftness = 0.05f;
+		private Size textureSizeLimit = new Size(256, 256);
+		private bool refreshSourceTexture = true;
+		private int refreshSourceRate;
+		private float refreshSourceDelta;
 
 		[YuzuMember]
 		[TangerineGroup(GroupHSL)]
@@ -216,11 +223,91 @@ namespace Lime
 		[TangerineGroup(GroupOverallImpact)]
 		public Color4 OverallImpactColor { get; set; } = Color4.White;
 
+		[TangerineInspect]
+		[TangerineGroup(GroupSourceTexture)]
+		public int SourceTextureWidth
+		{
+			get => textureSizeLimit.Width;
+			set {
+				textureSizeLimit.Width = Mathf.Clamp(value, MinimumTextureSize, MaximumTextureSize);
+				RequiredRefreshSource = true;
+			}
+		}
+
+		[TangerineInspect]
+		[TangerineGroup(GroupSourceTexture)]
+		public int SourceTextureHeight
+		{
+			get => textureSizeLimit.Height;
+			set {
+				textureSizeLimit.Height = Mathf.Clamp(value, MinimumTextureSize, MaximumTextureSize);
+				RequiredRefreshSource = true;
+			}
+		}
+
+		[YuzuMember]
+		[TangerineIgnore]
+		public Size TextureSizeLimit
+		{
+			get => textureSizeLimit;
+			set {
+				SourceTextureWidth = value.Width;
+				SourceTextureHeight = value.Height;
+			}
+		}
+
+		[YuzuMember]
+		[TangerineGroup(GroupSourceTexture)]
+		public bool RefreshSourceTexture
+		{
+			get => refreshSourceTexture;
+			set {
+				if (refreshSourceTexture != value) {
+					refreshSourceTexture = value;
+					if (value) {
+						RequiredRefreshSource = true;
+					}
+				}
+			}
+		}
+
+		[YuzuMember]
+		[TangerineGroup(GroupSourceTexture)]
+		public int RefreshSourceRate
+		{
+			get => refreshSourceRate;
+			set {
+				value = Mathf.Clamp(value, 0, int.MaxValue);
+				if (refreshSourceRate != value) {
+					refreshSourceRate = value;
+					if (refreshSourceTexture) {
+						RequiredRefreshSource = true;
+					}
+				}
+			}
+		}
+
+		public bool RequiredRefreshSource { get; set; } = true;
+
 		[TangerineGroup(GroupDebugView)]
 		[TangerineInspect]
 		public PostProcessingPresenter.DebugViewMode DebugViewMode { get; set; } = PostProcessingPresenter.DebugViewMode.None;
 
 		public bool IsNotRenderTexture() => !(noiseTexture is RenderTexture);
+
+		public override void Update(float delta)
+		{
+			refreshSourceDelta += delta;
+			if (RefreshSourceTexture) {
+				var d = 1f / refreshSourceRate;
+				if (RefreshSourceRate == 0) {
+					RequiredRefreshSource = true;
+				} else if (refreshSourceDelta >= d) {
+					RequiredRefreshSource = true;
+					refreshSourceDelta %= d;
+				}
+			}
+		}
 
 		public void GetOwnerRenderObjects(RenderChain renderChain, RenderObjectList roObjects)
 		{

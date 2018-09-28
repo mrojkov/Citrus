@@ -4,22 +4,35 @@ namespace Lime
 {
 	public class PostProcessingPresenter : IPresenter
 	{
+		private readonly PostProcessingAction[] postProcessingActions;
+		private readonly WeakReference<ITexture> imageTextureReference = new WeakReference<ITexture>(null);
 		private readonly RenderChain renderChain = new RenderChain();
-		private readonly IMaterial blendingDefaultMaterial = WidgetMaterial.GetInstance(Blending.Inherited, ShaderId.Inherited, 1);
+		private readonly IMaterial defaultMaterial = WidgetMaterial.GetInstance(Blending.Inherited, ShaderId.Inherited, 1);
 		private readonly IMaterial blendingAddMaterial = WidgetMaterial.GetInstance(Blending.Add, ShaderId.Inherited, 1);
 		private readonly Texture2D transparentTexture;
 		private IMaterial material;
 		private Blending blending;
 		private ShaderId shader;
-		private TextureBuffer sourceTextureBuffer;
-		private TextureBuffer firstTemporaryBuffer;
-		private TextureBuffer secondTemporaryBuffer;
-		private HSLBuffer hslBuffer;
-		private BlurBuffer blurBuffer;
-		private BloomBuffer bloomBuffer;
+		private PostProcessingAction.Buffer sourceTextureBuffer;
+		private PostProcessingAction.Buffer firstTemporaryBuffer;
+		private PostProcessingAction.Buffer secondTemporaryBuffer;
+		private PostProcessingActionHSL.Buffer hslBuffer;
+		private PostProcessingActionBlur.Buffer blurBuffer;
+		private PostProcessingActionBloom.Buffer bloomBuffer;
+		private PostProcessingActionNoise.Buffer noiseBuffer;
 
 		public PostProcessingPresenter()
 		{
+			postProcessingActions = new PostProcessingAction[] {
+				new PostProcessingActionTextureBuilder(),
+				new PostProcessingActionOverallImpact(),
+				new PostProcessingActionHSL(),
+				new PostProcessingActionBlur(),
+				new PostProcessingActionBloom(),
+				new PostProcessingActionNoise(),
+				new PostProcessingActionTextureRender(),
+				new PostProcessingActionVignette()
+			};
 			transparentTexture = new Texture2D();
 			transparentTexture.LoadImage(new[] { Color4.Zero }, 1, 1);
 		}
@@ -31,54 +44,50 @@ namespace Lime
 				throw new InvalidOperationException();
 			}
 
-			const int MaxBufferSize = 2048;
-			const float BufferReserve = 1.2f;
-			var widget = (Widget)node;
-			var asImage = widget as Image;
 			var ro = RenderObjectPool<PostProcessingRenderObject>.Acquire();
-			Size bufferSize;
-			Size bufferSizeWithReserve;
-			if (asImage != null) {
-				bufferSize = bufferSizeWithReserve = asImage.Texture.ImageSize;
-			} else {
-				bufferSize = (Size)widget.Size;
-				bufferSize = new Size(Math.Min(bufferSize.Width, MaxBufferSize), Math.Min(bufferSize.Height, MaxBufferSize));
-				bufferSizeWithReserve = (Size)(widget.Size * BufferReserve);
-				bufferSizeWithReserve = new Size(Math.Min(bufferSizeWithReserve.Width, MaxBufferSize), Math.Min(bufferSizeWithReserve.Height, MaxBufferSize));
+			component.GetOwnerRenderObjects(renderChain, ro.Objects);
+			renderChain.Clear();
 
-				component.GetOwnerRenderObjects(renderChain, ro.Objects);
-				renderChain.Clear();
+			var bufferSize = component.TextureSizeLimit;
+			var widget = (Widget)node;
+			var sourceTextureScaling = Mathf.Min(bufferSize.Width / widget.Width, bufferSize.Height / widget.Height);
+			if (sourceTextureBuffer?.Size != bufferSize) {
+				sourceTextureBuffer = new PostProcessingAction.Buffer(bufferSize);
 			}
-
-			// TODO: Buffers pool
-			// TODO: Recreate buffers when image.Texture was changed
-			if (asImage == null && (sourceTextureBuffer?.IsLessThen(bufferSize) ?? true)) {
-				sourceTextureBuffer = new TextureBuffer(bufferSizeWithReserve);
+			if (component.HSLEnabled && hslBuffer?.Size != bufferSize) {
+				hslBuffer = new PostProcessingActionHSL.Buffer(bufferSize);
 			}
-			if (component.HSLEnabled && (hslBuffer?.IsLessThen(bufferSize) ?? true)) {
-				hslBuffer = new HSLBuffer(bufferSizeWithReserve);
+			if (component.BlurEnabled && blurBuffer?.Size != bufferSize) {
+				blurBuffer = new PostProcessingActionBlur.Buffer(bufferSize);
 			}
-			if (component.BlurEnabled && (blurBuffer?.IsLessThen(bufferSize) ?? true)) {
-				blurBuffer = new BlurBuffer(bufferSizeWithReserve);
+			if (component.BloomEnabled && bloomBuffer?.Size != bufferSize) {
+				bloomBuffer = new PostProcessingActionBloom.Buffer(bufferSize);
 			}
-			if (component.BloomEnabled && (bloomBuffer?.IsLessThen(bufferSize) ?? true)) {
-				bloomBuffer = new BloomBuffer(bufferSizeWithReserve);
+			if (component.NoiseEnabled && noiseBuffer?.Size != bufferSize) {
+				noiseBuffer = new PostProcessingActionNoise.Buffer(bufferSize);
 			}
-			if ((blurBuffer != null || bloomBuffer != null) && (firstTemporaryBuffer?.IsLessThen(bufferSize) ?? true)) {
-				firstTemporaryBuffer = new TextureBuffer(bufferSizeWithReserve);
-				secondTemporaryBuffer = new TextureBuffer(bufferSizeWithReserve);
+			if ((component.BlurEnabled || component.BloomEnabled) && firstTemporaryBuffer?.Size != bufferSize) {
+				firstTemporaryBuffer = new PostProcessingAction.Buffer(bufferSize);
+				secondTemporaryBuffer = new PostProcessingAction.Buffer(bufferSize);
+			}
+			if (component.RequiredRefreshSource) {
+				sourceTextureBuffer?.MarkAsDirty();
+				component.RequiredRefreshSource = false;
 			}
 
-			ro.Texture = asImage?.Texture;
-			ro.Material = asImage != null ? GetImageMaterial(asImage) : blendingDefaultMaterial;
+			ro.PostProcessingActions = postProcessingActions;
+			ro.Material = GetMaterial(widget);
 			ro.LocalToWorldTransform = widget.LocalToWorldTransform;
-			ro.Position = asImage?.ContentPosition ?? Vector2.Zero;
-			ro.Size = asImage?.ContentSize ?? widget.Size;
+			ro.Position = widget.ContentPosition;
+			ro.Size = widget.ContentSize;
 			ro.Color = widget.GlobalColor;
-			ro.UV0 = asImage?.UV0 ?? Vector2.Zero;
-			ro.UV1 = asImage?.UV1 ?? Vector2.One;
+			// TODO: Custom UV?
+			ro.UV0 = Vector2.Zero;
+			ro.UV1 = Vector2.One;
 			ro.DebugViewMode = component.DebugViewMode;
+			ro.MarkBuffersAsDirty = false;
 			ro.SourceTextureBuffer = sourceTextureBuffer;
+			ro.SourceTextureScaling = sourceTextureScaling;
 			ro.FirstTemporaryBuffer = firstTemporaryBuffer;
 			ro.SecondTemporaryBuffer = secondTemporaryBuffer;
 			ro.HSLBuffer = hslBuffer;
@@ -100,6 +109,7 @@ namespace Lime
 			ro.BloomGammaCorrection = component.BloomGammaCorrection;
 			ro.BloomTextureScaling = component.BloomTextureScaling * 0.01f;
 			ro.BloomColor = component.BloomColor;
+			ro.NoiseBuffer = noiseBuffer;
 			ro.NoiseEnabled = component.NoiseEnabled && component.NoiseTexture != null && !component.NoiseTexture.IsStubTexture;
 			ro.NoiseStrength = component.NoiseStrength * 0.01f;
 			ro.NoiseTexture = component.NoiseTexture;
@@ -114,21 +124,18 @@ namespace Lime
 			ro.VignetteScale = component.VignetteScale;
 			ro.VignettePivot = component.VignettePivot;
 			ro.VignetteColor = component.VignetteColor;
-			ro.BlendingDefaultMaterial = blendingDefaultMaterial;
+			ro.DefaultMaterial = defaultMaterial;
 			ro.BlendingAddMaterial = blendingAddMaterial;
 			return ro;
 		}
 
-		private IMaterial GetImageMaterial(Image image)
+		private IMaterial GetMaterial(Widget widget)
 		{
-			if (image.CustomMaterial != null) {
-				return image.CustomMaterial;
-			}
-			if (material != null && blending == image.GlobalBlending && shader == image.GlobalShader) {
+			if (material != null && blending == widget.GlobalBlending && shader == widget.GlobalShader) {
 				return material;
 			}
-			blending = image.GlobalBlending;
-			shader = image.GlobalShader;
+			blending = widget.GlobalBlending;
+			shader = widget.GlobalShader;
 			return material = WidgetMaterial.GetInstance(blending, shader, 1);
 		}
 
@@ -142,91 +149,6 @@ namespace Lime
 			None,
 			Original,
 			Bloom
-		}
-
-		internal class TextureBuffer
-		{
-			private RenderTexture finalTexture;
-
-			protected bool IsDirty { get; set; } = true;
-
-			public Size Size { get; }
-			public RenderTexture Texture => finalTexture ?? (finalTexture = new RenderTexture(Size.Width, Size.Height));
-
-			public TextureBuffer(Size size)
-			{
-				Size = size;
-			}
-
-			public bool IsLessThen(Size size) => Size.Width < size.Width || Size.Height < size.Height;
-			public void MarkAsDirty() => IsDirty = true;
-		}
-
-		internal class HSLBuffer : TextureBuffer
-		{
-			private Vector3 hsl = new Vector3(float.NaN, float.NaN, float.NaN);
-
-			public HSLBuffer(Size size) : base(size) { }
-
-			public bool EqualRenderParameters(Vector3 hsl) => !IsDirty && this.hsl == hsl;
-
-			public void SetParameters(Vector3 hsl)
-			{
-				IsDirty = false;
-				this.hsl = hsl;
-			}
-		}
-
-		internal class BlurBuffer : TextureBuffer
-		{
-			private float radius = float.NaN;
-			private float textureScaling = float.NaN;
-			private float alphaCorrection = float.NaN;
-			private Color4 backgroundColor = Color4.Zero;
-
-			public BlurBuffer(Size size) : base(size) { }
-
-			public bool EqualRenderParameters(float radius, float textureScaling, float alphaCorrection, Color4 backgroundColor) =>
-				!IsDirty &&
-				this.radius == radius &&
-				this.textureScaling == textureScaling &&
-				this.alphaCorrection == alphaCorrection &&
-				this.backgroundColor == backgroundColor;
-
-			public void SetParameters(float radius, float textureScaling, float alphaCorrection, Color4 backgroundColor)
-			{
-				IsDirty = false;
-				this.radius = radius;
-				this.textureScaling = textureScaling;
-				this.alphaCorrection = alphaCorrection;
-				this.backgroundColor = backgroundColor;
-			}
-		}
-
-		internal class BloomBuffer : TextureBuffer
-		{
-			private float strength = float.NaN;
-			private float brightThreshold = float.NaN;
-			private Vector3 gammaCorrection = -Vector3.One;
-			private float textureScaling = float.NaN;
-
-			public BloomBuffer(Size size) : base(size) { }
-
-			public bool EqualRenderParameters(float strength, float brightThreshold, Vector3 gammaCorrection, float textureScaling) =>
-				!IsDirty &&
-				this.strength == strength &&
-				this.brightThreshold == brightThreshold &&
-				this.gammaCorrection == gammaCorrection &&
-				this.textureScaling == textureScaling;
-
-			public void SetParameters(float strength, float brightThreshold, Vector3 gammaCorrection, float textureScaling)
-			{
-				IsDirty = false;
-				this.strength = strength;
-				this.brightThreshold = brightThreshold;
-				this.gammaCorrection = gammaCorrection;
-				this.textureScaling = textureScaling;
-			}
 		}
 	}
 }
