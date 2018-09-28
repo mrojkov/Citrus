@@ -78,7 +78,7 @@
 * Добавлена возможность выбрать все ключи анимации для текущей строки (`Ctrl + Shift + A`) и выбрать только ключи анимации выделением через `Alt ` [CIT-668](https://gitlab.game-forest.com:2000/browse/CIT-668)
 * Выделение теперь сбрасывается по клику на выделенной области [CIT-670](https://gitlab.game-forest.com:2000/browse/CIT-670)
 * Изменен порядок интерполяций по-умолчанию (Linear → Spline → Steep → ClosedSpline) [CIT-671](https://gitlab.game-forest.com:2000/browse/CIT-671)
-* Добавлена возможность скрывать только выделенные виджеты на таймлайне (Shift + Show widgets) [CIT-675](https://gitlab.game-forest.com:2000/browse/CIT-675)
+* Добавлена возможность скрывать только выделенные виджеты на таймлайне (Shift + Show Node) [CIT-675](https://gitlab.game-forest.com:2000/browse/CIT-675)
 * Реализована возможность добавить кастомные компоненты в Model3DAttachment [CIT-697](https://gitlab.game-forest.com:2000/browse/CIT-697)
 * Добавлена возможность изменять префикс во множественном выделении виджетов [CIT-699](https://gitlab.game-forest.com:2000/browse/CIT-699)
 * Реализована функция Timeshift для ParticleEmitter (аналогично HotStudio) [CIT-708](https://gitlab.game-forest.com:2000/browse/CIT-708 )

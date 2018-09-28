@@ -1,0 +1,30 @@
+# ParticleEmitter
+
+[[Назад](@MenuBar.MenuCreate)]
+
+ParticleEmitter - контейнер для системы частиц
+
+Свойства **ParticleEmitter**:
+
+* Является [виджетом](@Node.Widget)
+* **ImmortalParticles** - 
+* **Shape** - форма партиклей
+* **EmissionType** - ???
+* **ParticlesLinkage** - ???
+* **Number** - ???
+* **TimeShift** - ???
+* **Speed** - ???
+* **AlongPathOrientation** - ???
+* **WindDirection** - ???
+* **WindAmount** - ???
+* **GravityDirection** - ???
+* **GravityAmount** - ???
+* **MagnetAmount** - ???
+* **Orientation** - ???
+* **Direction** - ???
+* **Lifetime** - ???
+* **Zoom** - ???
+* **AspectRatio** - ???
+* **Velocity** - ???
+* **Spin** - ???
+* **AngularVelocity** - ???

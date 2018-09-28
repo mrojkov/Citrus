@@ -23,7 +23,7 @@
   - **Manage Rulers** - управлять сохраненными линейками
 - **Snap Widget to Ruler** - вкл./выкл. привязку виджета к линейке
 - **Snap Widget Pivot to Ruler** - вкл./выкл. привязку пивота виджета к линейке
-- **Snap Ruler Lines to Widgets** - вкл./выкл. привязку линеек к виджетам
+- **Snap Ruler Lines to Node** - вкл./выкл. привязку линеек к виджетам
 - **Preview Next/Previous Resolution** `F11`\`Shift + F11`- включить превью с разрешениями экрана для различных девайсов
 - **Preview Next Orientation** `F12` - переключить превью со сменой ориентации для данного разрешения девайса
 - **Center Timeline on Current Column** `Ctrl + Shift + C` - центрировать таймлайн на каретке

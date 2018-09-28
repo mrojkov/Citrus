@@ -19,8 +19,8 @@
 * **Ungroup** `Ctrl + Shift + G` - разгруппировать группу
 * **Insert Timeline Column** `Ctrl + Q` - вставить колонку на таймлайне
 * **Remove Timeline Column** `Ctrl + W`- удалить колонку на таймлайне
-* **Tie Widgets with Bones** `Ctrl + T` - связать виджеты с костями
-* **Untie Widgets from Bones** `Ctrl + Shift + T` - отвязать виджеты от костей
+* **Tie Node with Bones** `Ctrl + T` - связать виджеты с костями
+* **Untie Node from Bones** `Ctrl + Shift + T` - отвязать виджеты от костей
 * **Group Contents to Morphable Meshes** `Ctrl + M` - ???
 * **Export Scene** - экспортировать сцену в *.tan
 * **Upsample Animation Twice** - растягивает анимации в 2 раза, работает *только* внутри контейнера (виджета)
