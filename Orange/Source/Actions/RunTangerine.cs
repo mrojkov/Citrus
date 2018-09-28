@@ -13,16 +13,19 @@ namespace Orange
 		{
 			const string projectName = "Tangerine";
 			var projectDirectory = Path.Combine(Toolbox.CalcCitrusDirectory(), projectName);
-			Nuget.Restore(projectDirectory);
 #if WIN
+			var solutionPath = Path.Combine(projectDirectory, projectName + ".Win.sln");
+			Nuget.Restore(solutionPath);
 			var solutionBuilder = new SolutionBuilder(
 				TargetPlatform.Win,
-				Path.Combine(projectDirectory, projectName + ".Win.sln"),
+				solutionPath,
 				BuildConfiguration.Release);
 #elif MAC
+			var solutionPath = Path.Combine(projectDirectory, projectName + ".Win.sln");
+			Nuget.Restore(solutionPath);
 			var solutionBuilder = new SolutionBuilder(
 				TargetPlatform.Mac,
-				Path.Combine(projectDirectory, projectName + ".Mac.sln"),
+				solutionPath,
 				BuildConfiguration.Debug); // RELEASE requires code signing, use debug for a while.
 #endif
 			if (!solutionBuilder.Build()) {
@@ -33,12 +36,14 @@ namespace Orange
 #if WIN
 			p.StartInfo.FileName = Path.Combine(
 				projectDirectory,
+				"Tangerine",
 				"bin",
 				BuildConfiguration.Release,
 				"Tangerine.exe");
 #elif MAC
 			p.StartInfo.FileName = Path.Combine(
 				projectDirectory,
+				"Tangerine",
 				"bin",
 				BuildConfiguration.Debug,
 				"Tangerine.app/Contents/MacOS/Tangerine");
