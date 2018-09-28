@@ -161,7 +161,6 @@ namespace Tangerine.UI.Timeline
 			var input = Grid.RootWidget.Input;
 			if (!input.IsKeyPressed(Key.Control)) {
 				Operations.ClearGridSelection.Perform();
-				Core.Operations.ClearRowSelection.Perform();
 				selectionRectangle = new IntRectangle();
 			}
 			Grid.OnPostRender += RenderSelectionRect;
@@ -189,6 +188,13 @@ namespace Tangerine.UI.Timeline
 			}
 			Timeline.Instance.Ruler.MeasuredFrameDistance = 0;
 			Grid.OnPostRender -= RenderSelectionRect;
+			var selectedRows = Document.Current.SelectedRows();
+			foreach (var row in selectedRows) {
+				if (row.Index < selectionRectangle.A.Y || selectionRectangle.B.Y <= row.Index) {
+					Core.Operations.ClearRowSelection.Perform();
+					break;
+				}
+			}
 			if (selectKeyframes) {
 				SelectKeyframes(selectionRectangle);
 			} else {
