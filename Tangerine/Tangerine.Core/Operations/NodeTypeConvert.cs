@@ -64,7 +64,7 @@ namespace Tangerine.Core.Operations
 				}
 			}
 			foreach (var component in source.Components) {
-				if (NodeCompositionValidator.ValidateComponentType(destType, component.GetType())) {
+				if (!NodeCompositionValidator.ValidateComponentType(destType, component.GetType())) {
 					throw new InvalidOperationException(
 						$"Node {source} has component {component} that will be incompatible with {destType}"
 					);
