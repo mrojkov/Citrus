@@ -64,6 +64,8 @@ namespace Tangerine.UI.Docking
 			MainWindowWidget.AddChangeWatcher(
 				() => MainWindowWidget.Window.State,
 				value => Model.WindowPlacements[0].State = value);
+			MainWindowWidget.Components.Add(new RequestedDockingComponent());
+			MainWindowWidget.CompoundPostPresenter.Add(new DockingPresenter());
 		}
 
 		public static void Initialize(Vector2 windowSize)
@@ -671,6 +673,20 @@ namespace Tangerine.UI.Docking
 						widget.IsMouseOverThisOrDescendant() ? theme.TabHighlighted : theme.TabBarBackground;
 					Renderer.DrawRect(widget.ContentPosition, widget.ContentPosition + widget.ContentSize, color);
 				}
+			}
+		}
+		
+		private class DockingPresenter : SyncDelegatePresenter<Widget>
+		{
+			public DockingPresenter() : base(Render) { }
+	
+			private static void Render(Widget widget)
+			{
+				var comp = widget.Components.Get<RequestedDockingComponent>();
+				if (!comp.Bounds.HasValue) return;
+				widget.PrepareRendererState();
+				Renderer.DrawRectOutline(comp.Bounds.Value.A + Vector2.One, comp.Bounds.Value.B - Vector2.One, ColorTheme.Current.Docking.DragRectagleOutline, 2);
+				Renderer.DrawRect(comp.Bounds.Value.A + Vector2.One, comp.Bounds.Value.B - Vector2.One, ColorTheme.Current.Docking.DragRectagleOutline.Transparentify(0.8f));
 			}
 		}
 	}

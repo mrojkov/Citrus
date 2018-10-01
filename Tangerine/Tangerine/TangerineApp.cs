@@ -86,8 +86,6 @@ namespace Tangerine
 			DockManager.Initialize(new Vector2(1024, 768));
 			TangerineMenu.Create();
 			var mainWidget = DockManager.Instance.MainWindowWidget;
-			mainWidget.Components.Add(new RequestedDockingComponent());
-			mainWidget.CompoundPostPresenter.Add(new DockingPresenter());
 			mainWidget.Window.AllowDropFiles = true;
 			mainWidget.AddChangeWatcher(() => Project.Current, _ => {
 				SetupMainWindowTitle(mainWidget);
