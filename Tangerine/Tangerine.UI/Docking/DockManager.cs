@@ -220,14 +220,12 @@ namespace Tangerine.UI.Docking
 
 		private void CreateWindowsIfNecessary()
 		{
-			for (var i = 0; i < Model.WindowPlacements.Count; i++) {
-				var placement = Model.WindowPlacements[i];
+			foreach (var placement in Model.WindowPlacements) {
 				if (!placement.Root.AnyVisiblePanel()) {
 					continue;
 				}
-
 				if (placement.WindowWidget != null) continue;
-				if (i == 0) {
+				if (placement == Model.WindowPlacements[0]) {
 					placement.WindowWidget = MainWindowWidget;
 				} else {
 					CreateFloatingWindow(placement);
@@ -272,7 +270,7 @@ namespace Tangerine.UI.Docking
 				hasTabBarPlacement |= placement.Placements[i] is TabBarPlacement;
 				CreateWidgetForPlacement(splitter, placement.Placements[i], placement.Stretches[i]);
 			}
-			splitter.DragEnded += RefreshDockedSize(placement, splitter);
+			splitter.DragEnded += () => RefreshDockedSize(placement, splitter);
 			if (requestTitle && !(hasTabBarPlacement && placement.Placements.Count == 1)) {
 				rootWidget = AddTitle(rootWidget, out var closeButton, out var title);
 				closeButton.Clicked += () => {
@@ -501,20 +499,18 @@ namespace Tangerine.UI.Docking
 			CreateWidgetForPlacement(currentContainer, root.Root, isMainWindow: MainWindowWidget == windowWidget);
 		}
 
-		private static Action RefreshDockedSize(LinearPlacement placement, Splitter splitter)
+		private static void RefreshDockedSize(LinearPlacement placement, Splitter splitter)
 		{
-			return () => {
-				for (int i = 0; i < splitter.Nodes.Count; ++i) {
-					var stretch = splitter.Nodes[i].AsWidget.LayoutCell.Stretch;
-					placement.Stretches[i] = placement.Direction == LinearPlacementDirection.Horizontal
-						? stretch.X
-						: stretch.Y;
-				}
-				float total = placement.Stretches.Aggregate((s1, s2) => s1 + s2);
-				for (int i = 0; i < placement.Stretches.Count; ++i) {
-					placement.Stretches[i] /= total;
-				}
-			};
+			for (int i = 0; i < splitter.Nodes.Count; ++i) {
+				var stretch = splitter.Nodes[i].AsWidget.LayoutCell.Stretch;
+				placement.Stretches[i] = placement.Direction == LinearPlacementDirection.Horizontal
+					? stretch.X
+					: stretch.Y;
+			}
+			float total = placement.Stretches.Aggregate((s1, s2) => s1 + s2);
+			for (int i = 0; i < placement.Stretches.Count; ++i) {
+				placement.Stretches[i] /= total;
+			}
 		}
 
 		private void RefreshWindows()
