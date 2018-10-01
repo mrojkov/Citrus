@@ -78,8 +78,19 @@
 * Добавлена возможность выбрать все ключи анимации для текущей строки (`Ctrl + Shift + A`) и выбрать только ключи анимации выделением через `Alt ` [CIT-668](https://gitlab.game-forest.com:2000/browse/CIT-668)
 * Выделение теперь сбрасывается по клику на выделенной области [CIT-670](https://gitlab.game-forest.com:2000/browse/CIT-670)
 * Изменен порядок интерполяций по-умолчанию (Linear → Spline → Steep → ClosedSpline) [CIT-671](https://gitlab.game-forest.com:2000/browse/CIT-671)
-* Добавлена возможность скрывать только выделенные виджеты на таймлайне (Shift + Show Node) [CIT-675](https://gitlab.game-forest.com:2000/browse/CIT-675)
+* Добавлена возможность скрывать только выделенные виджеты на таймлайне (Shift + Show widgets) [CIT-675](https://gitlab.game-forest.com:2000/browse/CIT-675)
 * Реализована возможность добавить кастомные компоненты в Model3DAttachment [CIT-697](https://gitlab.game-forest.com:2000/browse/CIT-697)
 * Добавлена возможность изменять префикс во множественном выделении виджетов [CIT-699](https://gitlab.game-forest.com:2000/browse/CIT-699)
 * Реализована функция Timeshift для ParticleEmitter (аналогично HotStudio) [CIT-708](https://gitlab.game-forest.com:2000/browse/CIT-708 )
+* Исправлено множество багов и недоработок
+
+##### Changelog (11.08.2018 - 1.10.2018)
+* Теперь Orange Launcher регенерирует бинарные десериалайзеры Yuzu [CIT-110](https://gitlab.game-forest.com:2000/browse/CIT-110)
+* Добавлена обводка для маркеров на таймлайне [CIT-713](https://gitlab.game-forest.com:2000/browse/CIT-713)
+* Добавлена возможность работы с аниматорами на таймлайне [CIT-720](https://gitlab.game-forest.com:2000/browse/CIT-720)
+* Реализован ListPropertyEditor (редактор полей типа List<T>) [CIT-750](https://gitlab.game-forest.com:2000/browse/CIT-750)
+* Для текста теперь можно указать PathPropertyEditor [CIT-765](https://gitlab.game-forest.com:2000/browse/CIT-765)
+* Недостающие цвета в конфиге теперь берутся из текущей темы [CIT-766](https://gitlab.game-forest.com:2000/browse/CIT-766)
+* При запуске редактора неиспользуемые сцены не грузятся до их открытия [CIT-790](https://gitlab.game-forest.com:2000/browse/CIT-790)
+* Изменена индикация изменений на сцене [CIT-796](https://gitlab.game-forest.com:2000/browse/CIT-796)
 * Исправлено множество багов и недоработок

@@ -7,24 +7,28 @@ ParticleEmitter - контейнер для системы частиц
 Свойства **ParticleEmitter**:
 
 * Является [виджетом](@Node.Widget)
-* **ImmortalParticles** - 
-* **Shape** - форма партиклей
-* **EmissionType** - ???
-* **ParticlesLinkage** - ???
-* **Number** - ???
-* **TimeShift** - ???
-* **Speed** - ???
-* **AlongPathOrientation** - ???
-* **WindDirection** - ???
-* **WindAmount** - ???
-* **GravityDirection** - ???
-* **GravityAmount** - ???
-* **MagnetAmount** - ???
-* **Orientation** - ???
-* **Direction** - ???
-* **Lifetime** - ???
-* **Zoom** - ???
-* **AspectRatio** - ???
-* **Velocity** - ???
-* **Spin** - ???
-* **AngularVelocity** - ???
+* **ImmortalParticles** - генерировать частицы единожды и не уничтожать их (вкл/выкл)
+* **Shape** - форма контейнера для частиц (Custom активируется автоматически при использовании EmitterShapePoint)
+* **EmissionType** - тип излучения частиц (от центра/к центру)
+* **ParticlesLinkage** - указать, куда привязывать контейнер частиц (root-сцена/текущий контейнер/другое)
+* **Number** - количество сгенеренных частиц в секунду
+* **TimeShift** - временной сдвиг (в секундах)
+* **Speed** - скорость движения частиц
+* **AlongPathOrientation** - включить ориентирование партиклей вдоль трека (сплайна/кривой)
+* **WindDirection** - направление ветра в градусах (0 - дует слева, 90 - дует сверху)
+* **WindAmount** - сила ветра
+* **GravityDirection** - направление гравитации (0 - тянет направо, 90 - тянет вниз)
+* **GravityAmount** - сила гравитации
+* **MagnetAmount** - сила влияния магнитов на эмиттер
+* **Orientation** - угол поворота созданных частиц
+* **Direction** - угол поворота эмиттера (контейнера) частиц
+* **Lifetime** - время жизни частиц в секундах
+* **Zoom** - зум для созданных частиц
+* **AspectRatio** - соотношение сторон для созданных частиц
+* **Velocity** - угловая скорость частиц
+* **Spin** - задать частицам угол вращения (в градусах)
+* **AngularVelocity** - угловая скорость контейнера частиц (в градусах)
+* **RandomMotionRadius** - радиус рандомного движения частиц
+* **RandomMotionSpeed** - скорость рандомного движения частиц
+* **RandomMotionAspectRatio** - соотношение сторон зоны движения частиц
+* **RandomMotionRotation** - вращение рандомного движения частиц

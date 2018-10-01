@@ -2,10 +2,11 @@
 
 [[Назад](@MenuBar.MenuCreate)]
 
-ParticlesMagnet - ???
+ParticlesMagnet - магнит для системы частиц
 
 Свойства **ParticlesMagnet**:
 
-* **Shape** - ???
-* **Attenuation** - ???
-* **Strength** - ???
+* Является [виджетом](@Node.Widget)
+* **Shape** - форма области притяжения магнита
+* **Attenuation** - коэффицицент затухания силы притяжения магнита
+* **Strength** - сила магнита
