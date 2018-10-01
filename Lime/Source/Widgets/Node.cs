@@ -1368,7 +1368,10 @@ namespace Lime
 				);
 
 				foreach (var property in properties) {
-					if (coordinator.IsPropertyOverridden(property)) {
+					if (coordinator.IsPropertyOverridden(property, true)) {
+						if (property.Name == nameof(Widget.Size)) {
+							property.SetValue(content, property.GetValue(this));
+						}
 						continue;
 					}
 
