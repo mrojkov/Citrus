@@ -28,7 +28,7 @@ namespace Lime
 			{
 				TimeInternal = value;
 				NextMarkerOrTriggerTime = null;
-				AnimationEngine.ApplyAnimators(this, false);
+				ApplyAnimators(invokeTriggers: false);
 			}
 		}
 
@@ -64,6 +64,37 @@ namespace Lime
 			}
 		}
 
+		internal List<IAnimator> AnimatorCache = new List<IAnimator>();
+
+		public void RebuildAnimatorCache()
+		{
+			AnimatorCache.Clear();
+			if (Owner != null) {
+				foreach (var node in Owner.Nodes) {
+					CacheAnimators(node);
+				}
+			}
+		}
+
+		private void CacheAnimators(Node node)
+		{
+			foreach (var animator in node.Animators) {
+				if (animator.AnimationId == Id) {
+					AnimatorCache.Add(animator);
+				}
+			}
+			if (Id != null) {
+				foreach (var animation in node.Animations) {
+					if (animation.Id == Id) {
+						return;
+					}
+				}
+				foreach (var child in node.Nodes) {
+					CacheAnimators(child);
+				}
+			}
+		}
+
 		public void Run(string markerId = null)
 		{
 			if (!TryRun(markerId)) {
@@ -82,6 +113,7 @@ namespace Lime
 
 		public void ApplyAnimators(bool invokeTriggers)
 		{
+			RebuildAnimatorCache();
 			AnimationEngine.ApplyAnimators(this, invokeTriggers);
 		}
 

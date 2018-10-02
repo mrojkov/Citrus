@@ -138,14 +138,10 @@ namespace Lime
 
 		private static void ApplyAnimators(Node node, Animation animation, bool invokeTriggers, double animationTimeCorrection = 0)
 		{
-			for (var child = node.FirstChild; child != null; child = child.NextSibling) {
-				var animators = child.Animators;
-				animators.Apply(animation.Time, animation.Id);
+			foreach (var animator in animation.AnimatorCache) {
+				animator.Apply(animation.Time);
 				if (invokeTriggers) {
-					animators.InvokeTriggers(animation.Frame, animationTimeCorrection);
-				}
-				if (animation.Id != null) {
-					ApplyAnimators(child, animation, invokeTriggers);
+					animator.InvokeTrigger(animation.Frame, animationTimeCorrection);
 				}
 			}
 		}
