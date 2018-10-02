@@ -14,6 +14,7 @@ namespace Lime
 		public bool HasNewTexture = false;
 		public bool Looped = false;
 		public ITexture Texture => null;
+		public Action OnStart;
 
 		public VideoDecoder(string path)
 		{
