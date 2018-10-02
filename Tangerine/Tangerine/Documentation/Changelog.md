@@ -45,7 +45,7 @@
 * Реализована функция Timeshift для ParticleEmitter (аналогично HotStudio) [CIT-708](https://gitlab.game-forest.com:2000/browse/CIT-708 )
 * Исправлено множество багов и недоработок
 
-##### Changelog (11.08.2018 - 1.10.2018)
+##### Changelog (11.09.2018 - 1.10.2018)
 * Теперь Orange Launcher регенерирует бинарные десериалайзеры Yuzu [CIT-110](https://gitlab.game-forest.com:2000/browse/CIT-110)
 * Добавлена обводка для маркеров на таймлайне [CIT-713](https://gitlab.game-forest.com:2000/browse/CIT-713)
 * Добавлена возможность работы с аниматорами на таймлайне [CIT-720](https://gitlab.game-forest.com:2000/browse/CIT-720)
