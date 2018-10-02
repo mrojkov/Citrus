@@ -143,6 +143,10 @@
       <HintPath>$(SolutionDir)\packages\Microsoft.WindowsAPICodePack.Shell.1.1.0\lib\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="MFDecoder, Version=1.0.6621.19204, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\MFDecoder\MFDecoder.dll</HintPath>
+    </Reference>
     <Reference Include="OpenTK.GLControl">
       <HintPath>..\3rdParty\OpenTK\OpenTK.GLControl.dll</HintPath>
     </Reference>
@@ -205,6 +209,7 @@
     <Compile Include="Source\Audio\OpenAL\AudioChannel.cs" />
     <Compile Include="Source\Audio\OpenAL\AudioDecoder.cs" />
     <Compile Include="Source\Audio\OpenAL\OggDecoder.cs" />
+    <Compile Include="Source\Audio\OpenAL\PcmDecoder.cs" />
     <Compile Include="Source\Audio\OpenAL\PlatformAudioSystem.cs" />
     <Compile Include="Source\Audio\OpenAL\WaveIMA4Decoder.cs" />
     <Compile Include="Source\EnumExtensions.cs" />
@@ -309,6 +314,7 @@
     <Compile Include="Source\Widgets\Text\TextRenderer.cs" />
     <Compile Include="Source\Widgets\Text\TextParser.cs" />
     <Compile Include="Source\Widgets\TiledImage.cs" />
+    <Compile Include="Source\Widgets\VideoDecoder\VideoDecoder.Win.cs" />
     <Compile Include="Source\Widgets\VSplitter.cs" />
     <Compile Include="Source\Widgets\WebBrowser\IWebBrowserImplementation.cs" />
     <Compile Include="Source\Widgets\WebBrowser\WebBrowser.Win.cs" />
@@ -494,6 +500,10 @@
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingComponent.cs" />
     <Compile Include="Source\Widgets\Materials\PresenterComponent.cs" />
     <Compile Include="Source\Widgets\Materials\BloomMaterial.cs" />
+    <Compile Include="Source\Widgets\VideoPlayer.cs" />
+    <Compile Include="Source\Widgets\VideoDecoder\VideoDecoder.Android.cs" />
+    <Compile Include="Source\Widgets\VideoDecoder\VideoDecoder.cs" />
+    <Compile Include="Source\Widgets\VideoDecoder\VideoDecoder.iOS.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\3rdParty\OpenAL\OpenAL32.dll">

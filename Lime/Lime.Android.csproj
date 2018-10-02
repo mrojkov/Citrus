@@ -145,6 +145,10 @@
     <Compile Include="Source\Widgets\Spline.cs" />
     <Compile Include="Source\Widgets\SplineGear.cs" />
     <Compile Include="Source\Widgets\SplinePoint.cs" />
+    <Compile Include="Source\Widgets\VideoDecoder\VideoDecoder.Android.cs" />
+    <Compile Include="Source\Widgets\VideoDecoder\VideoDecoder.cs" />
+    <Compile Include="Source\Widgets\VideoDecoder\VideoDecoder.iOS.cs" />
+    <Compile Include="Source\Widgets\VideoPlayer.cs" />
     <Compile Include="Source\Widgets\Widget.cs" />
     <Compile Include="Source\Widgets\WidgetDebugView.cs" />
     <Compile Include="Source\Widgets\WidgetInput.cs" />
@@ -384,6 +388,8 @@
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingRenderChainBuilder.cs" />
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingRenderObject.cs" />
     <Compile Include="Source\Widgets\Materials\SoftLightMaterial.cs" />
+    <Compile Include="Source\Audio\OpenAL\PcmDecoder.cs" />
+    <Compile Include="Source\Widgets\VideoDecoder\VideoDecoder.Win.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Android.csproj">

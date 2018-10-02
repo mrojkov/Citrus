@@ -266,6 +266,9 @@ namespace Lime
 				var name = AdjustUniformName(sb.ToString());
 				if (type != ActiveUniformType.Sampler2D &&
 					type != ActiveUniformType.SamplerCube
+#if ANDROID
+					&& type != (ActiveUniformType)36198
+#endif
 				) {
 					yield return new Uniform {
 						Type = type,
@@ -296,7 +299,7 @@ namespace Lime
 				case ActiveUniformType.FloatMat4:
 					return ShaderParams.GetSortingKey(name, typeof(Matrix44));
 				default:
-					throw new NotSupportedException();
+					throw new NotSupportedException($"name: {name}, type: {type.ToString()}");
 			}
 		}
 

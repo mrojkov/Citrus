@@ -119,14 +119,14 @@ namespace Lime
 			return !(texture is RenderTexture);
 		}
 
-		protected internal override Lime.RenderObject GetRenderObject()
+		protected internal virtual Lime.RenderObject GetRenderObject<TRenderObject>() where TRenderObject : RenderObject, new()
 		{
 			var blending = GlobalBlending;
 			var shader = GlobalShader;
 			if (material == null) {
 				material = WidgetMaterial.GetInstance(blending, shader, 1);
 			}
-			var ro = RenderObjectPool<RenderObject>.Acquire();
+			var ro = RenderObjectPool<TRenderObject>.Acquire();
 			ro.Texture = Texture;
 			ro.Material = CustomMaterial ?? material;
 			ro.UV0 = UV0;
@@ -138,7 +138,12 @@ namespace Lime
 			return ro;
 		}
 
-		private class RenderObject : Lime.RenderObject
+		protected internal override Lime.RenderObject GetRenderObject()
+		{
+			return GetRenderObject<RenderObject>();
+		}
+
+		protected internal class RenderObject : Lime.RenderObject
 		{
 			public ITexture Texture;
 			public IMaterial Material;
