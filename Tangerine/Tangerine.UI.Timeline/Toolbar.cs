@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Lime;
 using Tangerine.Core;
@@ -46,33 +47,70 @@ namespace Tangerine.UI.Timeline
 				if (arg.ChangedByUser) {
 					Document.Current.History.DoTransaction(() => {
 						var animation = (Animation)arg.Value;
-						Core.Operations.SetProperty.Perform(Document.Current, nameof(Document.AnimationId), animation.Id);
+						Core.Operations.SetProperty.Perform(Document.Current, nameof(Document.SelectedAnimation), animation);
 					});
 				}
 			};
-			ddl.AddChangeWatcher(() => CalcAnimationIdsHash(), _ => RefreshSelector());
-			ddl.AddChangeWatcher(() => Document.Current.AnimationId, _ => RefreshSelector());
+			ddl.AddChangeWatcher(() => CalcAnimationIdsHash(), _ => RefreshSelector(ddl));
 			return ddl;
+		}
 
-			void RefreshSelector()
-			{
+		List<Animation> tmpAnimations = new List<Animation>();
+
+		void RefreshSelector(CommonDropDownList ddl)
+		{
+			try {
+				GetAnimations(tmpAnimations);
 				ddl.Items.Clear();
-				foreach (var a in Document.Current.RootNode.Animations) {
-					ddl.Items.Add(new CommonDropDownList.Item(a.Id ?? "Primary", a));
+				foreach (var a in tmpAnimations) {
+					var item = a.Id != null
+						? new CommonDropDownList.Item(a.Id, a)
+						: new CommonDropDownList.Item("Primary", null);
+					ddl.Items.Add(item);
 				}
-				ddl.Text = Document.Current.AnimationId ?? "Primary";
+				ddl.Text = Document.Current.SelectedAnimation?.Id ?? "Primary";
+			} finally {
+				tmpAnimations.Clear();
 			}
+		}
 
-			int CalcAnimationIdsHash()
-			{
-				unchecked {
+		int CalcAnimationIdsHash()
+		{
+			unchecked {
+				try {
+					GetAnimations(tmpAnimations);
 					int result = 17;
-					foreach (var a in Document.Current.Container.Animations) {
+					foreach (var a in tmpAnimations) {
 						var id = a.Id;
 						result = (result * 31) + (id != null ? id.GetHashCode() : 0);
 					}
 					return result;
+				} finally {
+					tmpAnimations.Clear();
 				}
+			}
+		}
+
+		void GetAnimations(List<Animation> animations)
+		{
+			var ancestor = Document.Current.Container;
+			while (true) {
+				foreach (var a in ancestor.Animations) {
+					var found = false;
+					foreach (var other in animations) {
+						found = other.Id == a.Id;
+						if (found) {
+							break;
+						}
+					}
+					if (!found) {
+						animations.Add(a);
+					}
+				}
+				if (ancestor == Document.Current.RootNode) {
+					return;
+				}
+				ancestor = ancestor.Parent;
 			}
 		}
 

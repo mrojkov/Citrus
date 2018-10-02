@@ -42,11 +42,6 @@ namespace Tangerine.Core
 		private MemoryStream preloadedSceneStream = null;
 		public DateTime LastWriteTime { get; private set; }
 
-		private Node container;
-
-		private string animationId;
-		private Animation animation;
-
 		public bool Loaded { get; private set; } = true;
 
 		public static event Action<Document> AttachingViews;
@@ -96,16 +91,7 @@ namespace Tangerine.Core
 		/// <summary>
 		/// Gets or sets the current container widget.
 		/// </summary>
-		public Node Container
-		{
-			get { return container; }
-			set {
-				if (container != value) {
-					container = value;
-					animation = null;
-				}
-			}
-		}
+		public Node Container { get; set; }
 
 		/// <summary>
 		/// Gets or sets the scene we are navigated from. Need for getting back into the main scene from the external one.
@@ -145,26 +131,11 @@ namespace Tangerine.Core
 		public ResolutionPreview ResolutionPreview { get; set; } = new ResolutionPreview();
 		public bool InspectRootNode { get; set; }
 
-		public Animation Animation
-		{
-			get {
-				if (animation == null) {
-					animation = animationId != null ? RootNode.Animations.Find(animationId) : Container.DefaultAnimation;
-				}
-				return animation;
-			}
-		}
+		public Animation Animation => SelectedAnimation ?? Container.DefaultAnimation;
 
-		public string AnimationId
-		{
-			get { return animationId; }
-			set {
-				if (animationId != value) {
-					animationId = value;
-					animation = null;
-				}
-			}
-		}
+		public Animation SelectedAnimation { get; set; }
+
+		public string AnimationId => Animation.Id;
 
 		public Document(DocumentFormat format = DocumentFormat.Scene, Type rootType = null)
 		{

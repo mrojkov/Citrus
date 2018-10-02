@@ -374,10 +374,7 @@ namespace Lime
 
 		[YuzuMember]
 		[YuzuSerializeIf(nameof(NeedSerializeAnimations))]
-		[TangerineIgnoreIf(nameof(ShouldNotInspectAnimations))]
 		public AnimationCollection Animations { get; private set; }
-
-		public bool ShouldNotInspectAnimations() => Parent?.GetTangerineFlag(TangerineFlags.SceneNode) ?? false;
 
 		public bool NeedSerializeAnimations() =>
 			Animations.Count > 1 || (Animations.Count == 1 && (FirstAnimation.Id != null || FirstAnimation.Markers.Count > 0));
