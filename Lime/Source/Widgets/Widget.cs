@@ -683,8 +683,9 @@ namespace Lime
 				}
 			}
 #if TANGERINE
+			globallyVisible &= !GetTangerineFlag(TangerineFlags.Hidden);
 			globallyVisible |= GetTangerineFlag(TangerineFlags.Shown | TangerineFlags.DisplayContent);
-			globallyVisible &= !GetTangerineFlag(TangerineFlags.Hidden | TangerineFlags.HiddenOnExposition);
+			globallyVisible &= !GetTangerineFlag(TangerineFlags.HiddenOnExposition);
 #endif // TANGERINE
 		}
 
