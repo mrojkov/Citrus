@@ -553,1032 +553,517 @@ namespace Lime
 				cachedShapePoints.Clear();
 				cachedShapeTriangles.Clear();
 				cachedShapeTriangleSizes.Clear();
-
 			}
-
 			for (int i = 0; i < pointCount; i++) {
-
 				cachedShapePoints.Add(emitterShapePoints[i].TransformedPosition);
-
 			}
-
 			// find if polygon points ar cw or ccw oriented
-
 			float angle = 0;
-
 			angle += Vector2.AngleRad(cachedShapePoints[0] - cachedShapePoints[pointCount - 1],
-
 				cachedShapePoints[1] - cachedShapePoints[0]);
-
 			angle += Vector2.AngleRad(cachedShapePoints[pointCount - 1] - cachedShapePoints[pointCount - 2],
-
 				cachedShapePoints[0] - cachedShapePoints[pointCount - 1]);
-
 			for (int i = 1; i < pointCount - 1; i++) {
-
 				angle += Vector2.AngleRad(cachedShapePoints[i] - cachedShapePoints[i - 1],
-
 					cachedShapePoints[i + 1] - cachedShapePoints[i]);
-
 			}
-
 			float sign = Mathf.Sign(angle);
-
 			cachedShapeTriangles.Clear();
-
 			cachedShapeTriangleSizes.Clear();
-
 			int[] workPoints = new int[emitterShapePoints.Count()];
-
 			for (int i = 0; i < pointCount; i++) {
-
 				workPoints[i] = i;
-
 			}
-
 			int i1;
-
 			int i2;
-
 			int i3;
-
 			float totalSpace = 0;
-
 			while(GetTriangleHelper(workPoints, ref pointCount, out i1, out i2, out i3, sign)) {
-
 				cachedShapeTriangles.Add(i1);
-
 				cachedShapeTriangles.Add(i2);
-
 				cachedShapeTriangles.Add(i3);
-
 				// calc area
-
 				float a = (cachedShapePoints[i2] - cachedShapePoints[i1]).Length;
-
 				float b = (cachedShapePoints[i3] - cachedShapePoints[i2]).Length;
-
 				float c = (cachedShapePoints[i1] - cachedShapePoints[i3]).Length;
-
 				float p = (a + b + c) * 0.5f;
-
 				float s = Mathf.Sqrt(p * (p - a) * (p - b) * (p - c));
-
 				cachedShapeTriangleSizes.Add(s);
-
 				totalSpace += s;
-
 			}
-
 			float accum = 0;
-
 			for(int i = 0; i < cachedShapeTriangleSizes.Count; i++) {
-
 				accum += cachedShapeTriangleSizes[i] / totalSpace;
-
 				cachedShapeTriangleSizes[i] = accum;
-
 			}
-
 		}
-
-
 
 		public override void Update(float delta)
-
 		{
-
 			base.Update(delta);
-
 			if (firstUpdate) {
-
 				firstUpdate = false;
-
 				const float ModellingStep = 0.04f;
-
 				delta = Math.Max(delta, TimeShift);
-
 				while (delta >= ModellingStep) {
-
 					UpdateHelper(ModellingStep);
-
 					delta -= ModellingStep;
-
 				}
-
 				if (delta > 0) {
-
 					UpdateHelper(delta);
-
 				}
-
 			} else {
-
 				UpdateHelper(delta);
-
 			}
-
 		}
-
-
 
 		private Vector2 GenerateRandomMotionControlPoint(ref float rayDirection)
-
 		{
-
 			rayDirection += RandomMotionRotation.UniformRandomNumber(Rng);
-
 			Vector2 result = Vector2.CosSinRough(rayDirection * Mathf.DegToRad);
-
 			NumericRange radius = RandomMotionRadius;
-
 			if (radius.Dispersion == 0) {
-
 				radius.Dispersion = radius.Median;
-
 			}
-
 			result *= Math.Abs(radius.NormalRandomNumber(Rng));
-
 			if (RandomMotionAspectRatio != 1f && RandomMotionAspectRatio > 0f) {
-
 				result.X *= RandomMotionAspectRatio;
-
 				result.Y /= RandomMotionAspectRatio;
-
 			}
-
 			return result;
-
 		}
-
-
 
 		private bool InitializeParticle(Particle p)
-
 		{
-
 			Color4 color;
-
 			Matrix32 transform;
-
 			CalcInitialColorAndTransform(out color, out transform);
-
 			float emitterScaleAmount = 1;
-
 			Vector2 emitterScale = new Vector2();
-
 			emitterScale.X = transform.U.Length;
-
 			emitterScale.Y = transform.V.Length;
-
 			float crossProduct = Vector2.CrossProduct(transform.U, transform.V);
-
 			if (crossProduct < 0.0f)
-
 				emitterScale.Y = -emitterScale.Y;
-
 			emitterScaleAmount = (float)Math.Sqrt(Math.Abs(crossProduct));
-
 			float emitterAngle = transform.U.Atan2Deg;
-
 			NumericRange aspectRatioVariationPair = new NumericRange(0, Math.Max(0.0f, AspectRatio.Dispersion));
-
 			float zoom = Zoom.NormalRandomNumber(Rng);
-
 			float aspectRatio = AspectRatio.Median *
-
 				(1 + Math.Abs(aspectRatioVariationPair.NormalRandomNumber(Rng))) /
-
 				(1 + Math.Abs(aspectRatioVariationPair.NormalRandomNumber(Rng)));
-
 			p.TextureIndex = 0.0f;
-
 			p.Velocity = Velocity.NormalRandomNumber(Rng) * emitterScaleAmount;
-
 			p.ScaleInitial = emitterScale * ApplyAspectRatio(zoom, aspectRatio);
-
 			p.ScaleCurrent = p.ScaleInitial;
-
 			p.WindDirection = WindDirection.UniformRandomNumber(Rng);
-
 			p.WindAmount = WindAmount.NormalRandomNumber(Rng) * emitterScaleAmount;
-
 			p.GravityVelocity = 0.0f;
-
 			p.GravityAcceleration = 0.0f;
-
 			p.GravityAmount = GravityAmount.NormalRandomNumber(Rng) * emitterScaleAmount;
-
 			p.GravityDirection = GravityDirection.NormalRandomNumber(Rng);
-
 			p.MagnetAmountInitial = MagnetAmount.NormalRandomNumber(Rng);
-
 			p.Lifetime = Math.Max(Lifetime.NormalRandomNumber(Rng), 0.1f);
-
 			p.Age = 0.0f;
-
 			p.AngularVelocity = AngularVelocity.NormalRandomNumber(Rng);
-
 			p.Angle = Orientation.UniformRandomNumber(Rng) + emitterAngle;
-
 			p.Spin = Spin.NormalRandomNumber(Rng);
-
 			p.ColorInitial = color;
-
 			p.ColorCurrent = color;
-
 			p.RandomRayDirection = (new NumericRange(0, 360)).UniformRandomNumber(Rng);
-
 			p.RandomSplineVertex0 = GenerateRandomMotionControlPoint(ref p.RandomRayDirection);
-
 			p.RandomSplineVertex1 = Vector2.Zero;
-
 			p.RandomSplineVertex2 = GenerateRandomMotionControlPoint(ref p.RandomRayDirection);
-
 			p.RandomSplineVertex3 = GenerateRandomMotionControlPoint(ref p.RandomRayDirection);
-
 			p.RandomMotionSpeed = RandomMotionSpeed.NormalRandomNumber(Rng);
-
 			p.RandomSplineOffset = 0;
-
 			Vector2 position;
-
 			switch (Shape) {
-
 			case EmitterShape.Point:
-
 				position = 0.5f * Size;
-
 				p.RegularDirection = Direction.UniformRandomNumber(Rng) + emitterAngle - 90.0f;
-
 				break;
-
 			case EmitterShape.Line:
-
 				position = new Vector2(Rng.RandomFloat() * Size.X, Size.Y * 0.5f);
-
 				p.RegularDirection = Direction.UniformRandomNumber(Rng) + emitterAngle - 90.0f;
-
 				break;
-
 			case EmitterShape.Ellipse:
-
 				float angle = Rng.RandomFloat(0, 360);
-
 				Vector2 sincos = Vector2.CosSinRough(angle * Mathf.DegToRad);
-
 				position = 0.5f * ((sincos + Vector2.One) * Size);
-
 				p.RegularDirection = Direction.UniformRandomNumber(Rng) + emitterAngle - 90 + angle;
-
 				break;
-
 			case EmitterShape.Area:
-
 				position.X = Rng.RandomFloat() * Size.X;
-
 				position.Y = Rng.RandomFloat() * Size.Y;
-
 				p.RegularDirection = Direction.UniformRandomNumber(Rng) + emitterAngle - 90.0f;
-
 				break;
-
 			case EmitterShape.Custom:
-
 				position = GetPointInCustomShape();
-
 				p.RegularDirection = Direction.UniformRandomNumber(Rng) + emitterAngle - 90.0f;
-
 				break;
-
 			default:
-
 				throw new Lime.Exception("Invalid particle emitter shape");
-
 			}
-
 			p.RegularPosition = transform.TransformVector(position);
-
 			if (!TryGetRandomModifier(out p.Modifier)) {
-
 				return false;
-
 			}
-
 			var animationDuration = AnimationUtils.FramesToSeconds(p.Modifier.Animators.GetOverallDuration());
-
 			p.AgeToAnimationTime = (float)(animationDuration / p.Lifetime);
-
 			if (EmissionType == EmissionType.Inner) {
-
 				p.RegularDirection += 180;
-
 			} else if ((EmissionType & EmissionType.Inner) != 0) {
-
 				if (Rng.RandomInt(2) == 0) {
-
 					p.RegularDirection += 180;
-
 				}
-
 			} else if (EmissionType == 0) {
-
 				return false;
-
 			}
-
 			p.FullDirection = p.RegularDirection;
-
 			p.FullPosition = p.RegularPosition;
-
 			return true;
-
 		}
-
-
 
 		private Vector2 GetPointInCustomShape()
-
 		{
-
 			if (cachedShapeTriangles.Count == 0) {
-
 				return Vector2.Zero;
-
 			}
-
 			float rand = Rng.RandomFloat();
-
 			int idx = 0;
-
 			for (int i = 0; i < cachedShapeTriangleSizes.Count; i++) {
-
 				if (rand < cachedShapeTriangleSizes[i]) {
-
 					idx = i;
-
 					break;
-
 				}
-
 			}
-
 			float k1 = Rng.RandomFloat();
-
 			float k2 = Rng.RandomFloat();
-
 			if(k1 + k2 > 1) {
-
 				k1 = 1 - k1;
-
 				k2 = 1 - k2;
-
 			}
-
 			float k3 = 1 - k1 - k2;
-
 			int i1 = cachedShapeTriangles[idx * 3 + 0];
-
 			int i2 = cachedShapeTriangles[idx * 3 + 1];
-
 			int i3 = cachedShapeTriangles[idx * 3 + 2];
-
 			return cachedShapePoints[i1] * k1 + cachedShapePoints[i2] * k2 + cachedShapePoints[i3] * k3;
-
 		}
-
-
 
 		private void CalcInitialColorAndTransform(out Color4 color, out Matrix32 transform)
-
 		{
-
 			color = Color;
-
 			transform = CalcLocalToParentTransform();
-
 			Widget basicWidget = GetBasicWidget();
-
 			if (basicWidget != null) {
-
 				for (Node node = Parent; node != null && node != basicWidget; node = node.Parent) {
-
 					if (node.AsWidget != null) {
-
 						transform *= node.AsWidget.CalcLocalToParentTransform();
-
 						color *= node.AsWidget.Color;
-
 					}
-
 				}
-
 			}
-
 		}
-
-
 
 		private bool AdvanceParticle(Particle p, float delta, ref Rectangle boundingRect)
-
 		{
-
 			p.Age += delta;
-
 			if (p.AgeToAnimationTime > 0) {
-
 				p.Modifier.Animators.Apply(p.Age * p.AgeToAnimationTime);
-
 			}
-
 			if (ImmortalParticles) {
-
 				if (p.Lifetime > 0.0f)
-
 					p.Age = p.Age % p.Lifetime;
-
 			}
-
 			// Updating a particle texture index.
-
 			if (p.TextureIndex == 0.0f) {
-
 				p.TextureIndex = (float)p.Modifier.FirstFrame;
-
 			}
-
 			if (p.Modifier.FirstFrame == p.Modifier.LastFrame) {
-
 				p.TextureIndex = (float)p.Modifier.FirstFrame;
-
 			} else if (p.Modifier.FirstFrame < p.Modifier.LastFrame) {
-
 				p.TextureIndex += delta * Math.Max(0, p.Modifier.AnimationFps);
-
 				if (p.Modifier.LoopedAnimation) {
-
 					float upLimit = p.Modifier.LastFrame + 1.0f;
-
 					while (p.TextureIndex > upLimit) {
-
 						p.TextureIndex -= upLimit - p.Modifier.FirstFrame;
-
 					}
-
 				} else {
-
 					p.TextureIndex = Math.Min(p.TextureIndex, p.Modifier.LastFrame);
-
 				}
-
 				p.TextureIndex = Math.Max(p.TextureIndex, p.Modifier.FirstFrame);
-
 			} else {
-
 				p.TextureIndex -= delta * Math.Max(0, p.Modifier.AnimationFps);
-
 				if (p.Modifier.LoopedAnimation) {
-
 					float downLimit = p.Modifier.LastFrame - 1f;
-
 					while (p.TextureIndex < downLimit)
-
 						p.TextureIndex += p.Modifier.FirstFrame - downLimit;
-
 				} else {
-
 					p.TextureIndex = Math.Max(p.TextureIndex, p.Modifier.LastFrame);
-
 				}
-
 				p.TextureIndex = Math.Min(p.TextureIndex, p.Modifier.FirstFrame);
-
 			}
-
 			// Updating other properties of a particle.
-
 			float windVelocity = p.WindAmount * p.Modifier.WindAmount;
-
 			if (windVelocity != 0) {
-
 				var windDirection = Vector2.CosSinRough(p.WindDirection * Mathf.DegToRad);
-
 				p.RegularPosition += windVelocity * delta * windDirection;
-
 			}
-
 			if (p.GravityVelocity != 0) {
-
 				var gravityDirection = Vector2.CosSinRough(p.GravityDirection * Mathf.DegToRad);
-
 				p.RegularPosition += p.GravityVelocity * delta * gravityDirection;
-
 			}
-
 			var direction = Vector2.CosSinRough(p.RegularDirection * Mathf.DegToRad);
-
 			float velocity = p.Velocity * p.Modifier.Velocity;
-
 			p.RegularDirection += p.AngularVelocity * p.Modifier.AngularVelocity * delta;
-
 			p.GravityAcceleration += p.GravityAmount * p.Modifier.GravityAmount * delta;
-
 			p.GravityVelocity += p.GravityAcceleration * delta;
-
 			p.RegularPosition += velocity * delta * direction;
-
 			p.Angle += p.Spin * p.Modifier.Spin * delta;
-
 			p.ScaleCurrent = p.ScaleInitial * p.Modifier.Scale;
-
 			p.ColorCurrent = p.ColorInitial * p.Modifier.Color;
-
 			p.MagnetAmountCurrent = p.MagnetAmountInitial * p.Modifier.MagnetAmount;
-
 			ApplyMagnetsToParticle(p, delta);
-
 			Vector2 positionOnSpline = Vector2.Zero;
-
 			if (p.RandomMotionSpeed > 0.0f) {
-
 				p.RandomSplineOffset += delta * p.RandomMotionSpeed;
-
 				while (p.RandomSplineOffset >= 1.0f) {
-
 					p.RandomSplineOffset -= 1.0f;
-
 					p.RandomSplineVertex0 = p.RandomSplineVertex1;
-
 					p.RandomSplineVertex1 = p.RandomSplineVertex2;
-
 					p.RandomSplineVertex2 = p.RandomSplineVertex3;
-
 					p.RandomSplineVertex3 = GenerateRandomMotionControlPoint(ref p.RandomRayDirection);
-
 				}
-
 				positionOnSpline = Mathf.CatmullRomSpline(p.RandomSplineOffset,
-
 					p.RandomSplineVertex0, p.RandomSplineVertex1,
-
 					p.RandomSplineVertex2, p.RandomSplineVertex3);
-
 			}
-
 			Vector2 previousPosition = p.FullPosition;
-
 			p.FullPosition = p.RegularPosition + positionOnSpline;
-
 			if (AlongPathOrientation) {
-
 				Vector2 deltaPos = p.FullPosition - previousPosition;
-
 				if (deltaPos.SqrLength > 0.00001f)
-
 					p.FullDirection = deltaPos.Atan2Deg;
-
 			}
-
 			// Recalc transformation matrix.
-
 			float angle = p.Angle;
-
 			if (AlongPathOrientation) {
-
 				angle += p.FullDirection;
-
 			}
-
 			var imageSize = p.Modifier.Size;
-
 			var particleSize = p.ScaleCurrent * imageSize;
-
 			var orientation = Vector2.CosSinRough(angle * Mathf.DegToRad);
-
 			var tux = particleSize.X * orientation.X;
-
 			var tuy = particleSize.X * orientation.Y;
-
 			var tvx = -particleSize.Y * orientation.Y;
-
 			var tvy = particleSize.Y * orientation.X;
-
 			var ttx = p.FullPosition.X;
-
 			var tty = p.FullPosition.Y;
-
 			p.Transform.UX = tux;
-
 			p.Transform.UY = tuy;
-
 			p.Transform.VX = tvx;
-
 			p.Transform.VY = tvy;
-
 			p.Transform.TX = ttx;
-
 			p.Transform.TY = tty;
-
 			// Calculate particle's convex hull.
-
 			// The code below is optimized version of:
-
 			// var v1 = transform.TransformVector(-0.5f, -0.5f);
-
 			// var v2 = transform.TransformVector(0.5f, -0.5f);
-
 			// var v3 = transform.TransformVector(-0.5f, 0.5f);
-
 			// var v4 = v2 + v3 - v1;
-
 			var axux = -0.5f * tux;
-
 			var axuy = -0.5f * tuy;
-
 			var ayvx = -0.5f * tvx + ttx;
-
 			var ayvy = -0.5f * tvy + tty;
-
 			float v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y;
-
 			v1x = axux + ayvx;
-
 			v1y = axuy + ayvy;
-
 			v2x = 0.5f * tux + ayvx;
-
 			v2y = 0.5f * tuy + ayvy;
-
 			v3x = axux + 0.5f * tvx + ttx;
-
 			v3y = axuy + 0.5f * tvy + tty;
-
 			v4x = v2x + v3x - v1x;
-
 			v4y = v2y + v3y - v1y;
-
 			// Update given bounding rect.
-
 			if (boundingRect.AX == boundingRect.BX && boundingRect.AY == boundingRect.BY) {
-
 				boundingRect = new Rectangle(v1x, v1y, v1x, v1y);
-
 			}
-
 			if (v1x < boundingRect.AX) boundingRect.AX = v1x;
-
 			if (v1x > boundingRect.BX) boundingRect.BX = v1x;
-
 			if (v2x < boundingRect.AX) boundingRect.AX = v2x;
-
 			if (v2x > boundingRect.BX) boundingRect.BX = v2x;
-
 			if (v2y < boundingRect.AY) boundingRect.AY = v2y;
-
 			if (v2y > boundingRect.BY) boundingRect.BY = v2y;
-
 			if (v3x < boundingRect.AX) boundingRect.AX = v3x;
-
 			if (v3x > boundingRect.BX) boundingRect.BX = v3x;
-
 			if (v3y < boundingRect.AY) boundingRect.AY = v3y;
-
 			if (v3y > boundingRect.BY) boundingRect.BY = v3y;
-
 			if (v4x < boundingRect.AX) boundingRect.AX = v4x;
-
 			if (v4x > boundingRect.BX) boundingRect.BX = v4x;
-
 			if (v4y < boundingRect.AY) boundingRect.AY = v4y;
-
 			if (v4y > boundingRect.BY) boundingRect.BY = v4y;
-
 			return true;
-
 		}
-
-
 
 		private void RenderParticle(Particle p, Matrix32 matrix, Color4 color)
-
 		{
-
 			if (p.ColorCurrent.A <= 0) {
-
 				return;
-
 			}
-
 			float angle = p.Angle;
-
 			if (AlongPathOrientation) {
-
 				angle += p.FullDirection;
-
 			}
-
 			ITexture texture = p.Modifier.GetTexture((int)p.TextureIndex - 1);
-
 			Renderer.Transform1 = p.Transform * matrix;
-
 			Renderer.DrawSprite(texture, p.ColorCurrent * color, -Vector2.Half, Vector2.One, Vector2.Zero, Vector2.One);
-
 		}
-
-
 
 		public override void AddToRenderChain(RenderChain chain)
-
 		{
-
 			if (
-
 				GloballyVisible && (particles.Count > 0 || Application.IsTangerine) &&
-
 				(ParticlesLinkage != ParticlesLinkage.Parent || ClipRegionTest(chain.ClipRegion))
-
 			) {
-
 				AddSelfToRenderChain(chain, Layer);
-
 			}
-
 		}
-
-
 
 		protected internal override Lime.RenderObject GetRenderObject()
-
 		{
-
 			var ro = RenderObjectPool<RenderObject>.Acquire();
-
 			var basicWidget = GetBasicWidget();
-
 			if (basicWidget != null) {
-
 				ro.Matrix = basicWidget.LocalToWorldTransform;
-
 				ro.Color = basicWidget.GlobalColor;
-
 			} else {
-
 				ro.Matrix = Matrix32.Identity;
-
 				ro.Color = Color4.White;
-
 			}
-
 			ro.Blending = GlobalBlending;
-
 			ro.Shader = GlobalShader;
-
 			foreach (var p in particles) {
-
 				if (p.ColorCurrent.A <= 0) {
-
 					continue;
-
 				}
-
 				var angle = p.Angle;
-
 				if (AlongPathOrientation) {
-
 					angle += p.FullDirection;
-
 				}
-
 				ro.Particles.Add(new ParticleRenderData {
-
 					Texture = p.Modifier.GetTexture((int)p.TextureIndex - 1),
-
 					Transform = p.Transform,
-
 					Color = p.ColorCurrent,
-
 					Angle = angle
-
 				});
-
 			}
-
 			return ro;
-
 		}
-
-
 
 		public void DeleteAllParticles()
-
 		{
-
 			FreeLastParticles(particles.Count);
-
 		}
-
-
 
 		public static Vector2 ApplyAspectRatio(Vector2 scale, float aspectRatio)
-
 		{
-
 			return new Vector2(scale.X * aspectRatio, scale.Y / Math.Max(0.0001f, aspectRatio));
-
 		}
-
-
 
 		public static Vector2 ApplyAspectRatio(float zoom, float aspectRatio)
-
 		{
-
 			return new Vector2(zoom * aspectRatio, zoom / Math.Max(0.0001f, aspectRatio));
-
 		}
-
-
 
 		// Decompose 2d scale into 1d scale and aspect ratio
-
 		public static void DecomposeScale(Vector2 scale, out float aspectRatio, out float zoom)
-
 		{
-
 			if (scale.Y == 0.0f) {
-
 				aspectRatio = 1.0f;
-
 				zoom = 0.0f;
-
 				return;
-
 			}
-
 			aspectRatio = Mathf.Sqrt(scale.X / scale.Y);
-
 			zoom = scale.Y * aspectRatio;
-
 		}
-
-
 
 		public void DrawCustomShape(Color4 areaColor, Color4 lineColor, Matrix32 transform)
-
 		{
-
 			for (int i = 0; i < cachedShapeTriangles.Count; i += 3) {
-
 				Vertex[] v = new Vertex[3];
-
 				for (int j = 0; j < 3; ++j) {
-
 					v[j].Color = areaColor;
-
 					v[j].Pos = cachedShapePoints[cachedShapeTriangles[i + j]] * transform;
-
 				}
-
 				Renderer.DrawTriangleStrip(v, v.Length);
-
 			}
-
 			var spacing = new Vector2(3, 2);
-
 			if (cachedShapePoints.Count < 3) {
-
 				return;
-
 			}
-
 			for (int i = 0; i < cachedShapePoints.Count - 1; ++i) {
-
 				Renderer.DrawDashedLine(
-
 					cachedShapePoints[i] * transform,
-
 					cachedShapePoints[i + 1] * transform,
-
 					lineColor,
-
 					spacing
-
 				);
-
 			}
-
 			Renderer.DrawDashedLine(
-
 				cachedShapePoints.Last() * transform,
-
 				cachedShapePoints.First() * transform,
-
 				lineColor,
-
 				spacing
-
 			);
-
 		}
-
-
 
 		// ReSharper disable once UnusedMember.Local
-
 		private void BuildForTangerine()
-
 		{
-
 			var defaultModifier = new ParticleModifier() {
-
 				Id = "ParticleModifier"
-
 			};
-
 			var animator = new Color4Animator() {
-
 				TargetPropertyPath = "Color"
-
 			};
-
 			animator.ReadonlyKeys.Add(0, new Color4(255, 255, 255, 0));
-
 			animator.ReadonlyKeys.Add(1, new Color4(255, 255, 255, 255));
-
 			animator.ReadonlyKeys.Add(2, new Color4(255, 255, 255, 0));
-
 			defaultModifier.Animators.Add(animator);
-
 			Nodes.Add(defaultModifier);
-
 		}
-
-
 
 		private class RenderObject : Lime.RenderObject
-
 		{
-
 			public Matrix32 Matrix;
-
 			public Color4 Color;
-
 			public Blending Blending;
-
 			public ShaderId Shader;
-
 			public List<ParticleRenderData> Particles = new List<ParticleRenderData>();
 
-
-
 			public override void Render()
-
 			{
-
 				Renderer.Blending = Blending;
-
 				Renderer.Shader = Shader;
-
 				foreach (var p in Particles) {
-
 					Renderer.Transform1 = p.Transform * Matrix;
-
 					Renderer.DrawSprite(p.Texture, p.Color * Color, -Vector2.Half, Vector2.One, Vector2.Zero, Vector2.One);
-
 				}
-
 			}
-
-
 
 			protected override void OnRelease()
-
 			{
-
 				Particles.Clear();
-
 			}
-
 		}
-
-
 
 		private struct ParticleRenderData
-
 		{
-
 			public ITexture Texture;
-
 			public Matrix32 Transform;
-
 			public Color4 Color;
-
 			public float Angle;
-
 		}
-
 	}
-
 }
-
