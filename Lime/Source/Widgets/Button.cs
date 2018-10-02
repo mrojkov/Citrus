@@ -105,9 +105,6 @@ namespace Lime
 			var wasMouseOver = true;
 			while (true) {
 				if (clickGesture.WasRecognized()) {
-					while (IsRunning) {
-						yield return 0;
-					}
 					Clicked?.Invoke();
 					// buz: don't play release animation
 					// if button's parent became invisible due to
