@@ -252,11 +252,11 @@ namespace Lime
 
 					model.Animations.Add(animation);
 				} catch (Lime.Exception e) {
-					if (Application.IsTangerine) {
-						Console.WriteLine(e.Message);
-					} else {
-						throw;
-					}
+#if TANGERINE
+					Console.WriteLine(e.Message);
+#else
+					throw;
+#endif // TANGERINE
 				}
 			}
 		}
@@ -275,9 +275,11 @@ namespace Lime
 			foreach (var srcAnimator in node.Animators) {
 				srcAnimator.AnimationId = dstAnimation.Id;
 			}
-			if (Application.IsTangerine && srcAnimationName != srcAnimation.Id) {
+#if TANGERINE
+			if (srcAnimationName != srcAnimation.Id) {
 				Console.WriteLine($"Warning: animation \"{ dstAnimation.Id }\" overriding \"{ srcAnimationName }\" at { node.Id } node");
 			}
+#endif // TANGERINE
 		}
 
 		private IEnumerable<Node> GetAnimationNodes(Node3D model, Animation animationData)

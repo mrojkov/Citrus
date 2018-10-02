@@ -923,7 +923,10 @@ namespace Lime
 		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (
-				GloballyVisible && (particles.Count > 0 || Application.IsTangerine) &&
+				GloballyVisible &&
+#if !TANGERINE
+				particles.Count > 0 &&
+#endif // !TANGERINE
 				(ParticlesLinkage != ParticlesLinkage.Parent || ClipRegionTest(chain.ClipRegion))
 			) {
 				AddSelfToRenderChain(chain, Layer);

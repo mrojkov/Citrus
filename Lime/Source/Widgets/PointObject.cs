@@ -8,9 +8,9 @@ namespace Lime
 
 		public PointObject()
 		{
-			if (!Application.IsTangerine) {
-				RenderChainBuilder = null;
-			}
+#if !TANGERINE
+			RenderChainBuilder = null;
+#endif // !TANGERINE
 		}
 
 		[YuzuMember]

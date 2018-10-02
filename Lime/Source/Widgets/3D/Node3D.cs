@@ -171,10 +171,10 @@ namespace Lime
 		private void RecalcGloballyVisible()
 		{
 			globallyVisible = Visible;
-			if (Application.IsTangerine) {
-				globallyVisible |= GetTangerineFlag(TangerineFlags.Shown);
-				globallyVisible &= !GetTangerineFlag(TangerineFlags.Hidden | TangerineFlags.HiddenOnExposition);
-			}
+#if TANGERINE
+			globallyVisible |= GetTangerineFlag(TangerineFlags.Shown);
+			globallyVisible &= !GetTangerineFlag(TangerineFlags.Hidden | TangerineFlags.HiddenOnExposition);
+#endif // TANGERINE
 			if (Parent != null) {
 				if (Parent.AsWidget != null) {
 					globallyVisible &= Parent.AsWidget.GloballyVisible;

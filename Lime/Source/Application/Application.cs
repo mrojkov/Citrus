@@ -60,7 +60,6 @@ namespace Lime
 	{
 		public static event Action<DeviceOrientation> SupportedDeviceOrientationsChanged;
 		public static readonly List<IWindow> Windows = new List<IWindow>();
-		public static bool IsTangerine;
 
 		private static IWindow mainWindow;
 		public static IWindow MainWindow
