@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -129,7 +129,7 @@ namespace Lime
 				array[i++] = a;
 			}
 		}
-		
+
 		public bool Remove(Animation item)
 		{
 			if (item.Owner != owner) {

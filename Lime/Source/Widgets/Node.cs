@@ -550,10 +550,11 @@ namespace Lime
 			clone.FirstChild = null;
 			clone.NextSibling = null;
 			clone.gestures = null;
-			clone.AsWidget = clone as Widget;
 			clone.Animations = Animations.Clone(clone);
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
 			clone.Nodes = Nodes.Clone(clone);
+			clone.Behaviours = NodeComponentCollection.EmptyBehaviors;
+			clone.LateBehaviours = NodeComponentCollection.EmptyBehaviors;
 			clone.Components = Components.Clone(clone);
 			if (RenderChainBuilder != null) {
 				clone.RenderChainBuilder = RenderChainBuilder.Clone(clone);

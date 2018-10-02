@@ -876,7 +876,10 @@ namespace Lime
 		/// </summary>
 		public override Node Clone()
 		{
-			var clone = base.Clone().AsWidget;
+			var clone = (Widget)base.Clone();
+			clone.AsWidget = clone;
+			clone.SkinningWeights = clone.SkinningWeights?.Clone();
+			clone.BoneArray = new BoneArray();
 			clone.input = null;
 			return clone;
 		}
