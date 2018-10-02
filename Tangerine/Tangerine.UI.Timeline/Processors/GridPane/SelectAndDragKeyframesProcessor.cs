@@ -189,10 +189,12 @@ namespace Tangerine.UI.Timeline
 			Timeline.Instance.Ruler.MeasuredFrameDistance = 0;
 			Grid.OnPostRender -= RenderSelectionRect;
 			var selectedRows = Document.Current.SelectedRows();
-			foreach (var row in selectedRows) {
-				if (row.Index < selectionRectangle.A.Y || selectionRectangle.B.Y <= row.Index) {
-					Core.Operations.ClearRowSelection.Perform();
-					break;
+			if (!input.IsKeyPressed(Key.Control)) {
+				foreach (var row in selectedRows) {
+					if (row.Index < selectionRectangle.A.Y || selectionRectangle.B.Y <= row.Index) {
+						Core.Operations.ClearRowSelection.Perform();
+						break;
+					}
 				}
 			}
 			if (selectKeyframes) {
