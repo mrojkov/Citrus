@@ -29,8 +29,9 @@ namespace Lime
 			decoder = new VideoDecoder(sourcePath);
 		}
 
-		public void Start()
+		public void Start(Action onStart)
 		{
+			decoder.OnStart = onStart;
 			decoder.Start();
 		}
 

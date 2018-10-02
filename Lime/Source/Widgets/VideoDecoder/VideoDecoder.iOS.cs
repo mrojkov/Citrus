@@ -20,6 +20,7 @@ namespace Lime
 		public int Height { get; private set; }
 		public bool HasNewTexture { get; private set; }
 		public ITexture Texture { get => texture; }
+		public Action OnStart;
 
 		private Texture2D texture;
 
@@ -89,6 +90,9 @@ namespace Lime
 				var stopDecodeCancelationToken = stopDecodeCancelationTokenSource.Token;
 				player.Play();
 				state = State.Started;
+
+				OnStart?.Invoke();
+
 				var workTask = System.Threading.Tasks.Task.Run(() => {
 					while (true) {
 						var time = CMTime.FromSeconds(currentPosition, 1000);

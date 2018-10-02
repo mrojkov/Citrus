@@ -27,6 +27,7 @@ namespace Lime
 		public bool HasNewTexture = false;
 		public bool Looped = false;
 		public ITexture Texture => texture;
+		public Action OnStart;
 
 		private SurfaceTextureRenderer renderer;
 		private RenderTexture texture;
@@ -187,6 +188,8 @@ namespace Lime
 				}
 				audio?.Play();
 				state = State.Started;
+
+				OnStart?.Invoke();
 
 				var queueTask = System.Threading.Tasks.Task.Run(() => {
 					var hasVideoInput = videoCodec != null;

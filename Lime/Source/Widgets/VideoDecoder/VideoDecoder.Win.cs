@@ -103,6 +103,8 @@ namespace Lime
 		public bool HasNewTexture = false;
 		public bool Looped = false;
 		public ITexture Texture => texture;
+		public Action OnStart;
+
 		private Texture2D lumaTexture;
 		private Texture2D chromaTexture;
 		private RenderTexture texture;
@@ -207,6 +209,7 @@ namespace Lime
 				}
 				state = State.Started;
 				bool queueTaskCompleted = false;
+				OnStart?.Invoke();
 				var queueTask = System.Threading.Tasks.Task.Run(() => {
 					try {
 						var audioIsEnded = false;
