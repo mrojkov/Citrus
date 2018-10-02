@@ -260,6 +260,7 @@ namespace Tangerine
 				typeof(Core.Operations.TimelineHorizontalShift.Processor),
 				typeof(Core.Operations.RemoveKeyframeRange.Processor),
 				typeof(Core.Operations.SelectRow.Processor),
+				typeof(Core.Operations.RenameAnimationProcessor),
 				typeof(Core.Operations.SetProperty.Processor),
 				typeof(Core.Operations.SetIndexedProperty.Processor),
 				typeof(Core.Operations.RemoveKeyframe.Processor),
