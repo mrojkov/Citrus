@@ -66,21 +66,20 @@ namespace Lime
 
 		internal List<IAnimator> AnimatorCache = new List<IAnimator>();
 
-		public void RebuildAnimatorCache()
+		public void FindAnimators(List<IAnimator> animators)
 		{
-			AnimatorCache.Clear();
 			if (Owner != null) {
 				foreach (var node in Owner.Nodes) {
-					CacheAnimators(node);
+					FindAnimators(node, animators);
 				}
 			}
 		}
 
-		private void CacheAnimators(Node node)
+		private void FindAnimators(Node node, List<IAnimator> animators)
 		{
 			foreach (var animator in node.Animators) {
 				if (animator.AnimationId == Id) {
-					AnimatorCache.Add(animator);
+					animators.Add(animator);
 				}
 			}
 			if (Id != null) {
@@ -90,9 +89,15 @@ namespace Lime
 					}
 				}
 				foreach (var child in node.Nodes) {
-					CacheAnimators(child);
+					FindAnimators(child, animators);
 				}
 			}
+		}
+
+		public void RebuildAnimatorCache()
+		{
+			AnimatorCache.Clear();
+			FindAnimators(AnimatorCache);
 		}
 
 		public void Run(string markerId = null)
