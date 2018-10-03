@@ -39,7 +39,7 @@ namespace Lime
 			if (current != bundle) {
 				current = bundle;
 				if (resetTexturePool) {
-					TexturePool.Instance.DiscardAllTextures();
+					TexturePool.Instance.DiscardAllStubTextures();
 				}
 			}
 		}
