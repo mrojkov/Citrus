@@ -264,8 +264,8 @@ namespace Tangerine.UI.SceneView
 		{
 			new Bone3DPresenter(this);
 			new ContainerAreaPresenter(this);
-			new WidgetsPivotMarkPresenter(this);
 			new SelectedWidgetsPresenter(this);
+			new WidgetsPivotMarkPresenter(this);
 			new PointObjectsPresenter(this);
 			new SplinePointPresenter(this);
 			new TranslationGizmoPresenter(this);

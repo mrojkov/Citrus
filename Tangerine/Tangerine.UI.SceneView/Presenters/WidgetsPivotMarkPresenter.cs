@@ -36,10 +36,8 @@ namespace Tangerine.UI.SceneView
 			}
 		}
 
-		public static IEnumerable<Widget> WidgetsWithDisplayedPivot()
-		{
-			return Core.Document.Current.Container.Nodes.Editable().OfType<Widget>()
-				.Where(w => VisualHintsRegistry.Instance.DisplayCondition(w));
-		}
+		public static IEnumerable<Widget> WidgetsWithDisplayedPivot() =>
+			Core.Document.Current.Container.Nodes.Editable().OfType<Widget>()
+			.Where(w => VisualHintsRegistry.Instance.DisplayCondition(w));
 	}
 }

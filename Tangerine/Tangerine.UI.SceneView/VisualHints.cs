@@ -118,8 +118,8 @@ namespace Tangerine.UI.SceneView
 
 		public VisualHint FindHint(Type type)
 		{
-			if (typeHintMap.ContainsKey(type)) {
-				return typeHintMap[type];
+			if (typeHintMap.TryGetValue(type, out var hint)) {
+				return hint;
 			}
 			return EmptyHint;
 		}

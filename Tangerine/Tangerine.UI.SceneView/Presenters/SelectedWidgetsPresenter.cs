@@ -29,26 +29,6 @@ namespace Tangerine.UI.SceneView
 			if (widgets.Count == 0) {
 				return;
 			}
-			// Render boreder and icon for widgets.
-			var iconSize = new Vector2(16, 16);
-			foreach (var widget in widgets) {
-				var t = NodeIconPool.GetTexture(widget.GetType());
-				var h = widget.CalcHullInSpaceOf(canvas);
-				for (int i = 0; i < 4; i++) {
-					var a = h[i];
-					var b = h[(i + 1) % 4];
-					Renderer.DrawLine(a, b, ColorTheme.Current.SceneView.SelectedWidget, 1);
-				}
-				var p = widget.CalcPositionInSpaceOf(canvas);
-				Renderer.DrawSprite(t, Color4.Transparent, p - iconSize / 2, iconSize, Vector2.Zero, Vector2.One);
-				if (selectedWidgetPivotVisualHint.Enabled) {
-					Renderer.DrawRectOutline(
-						p - iconSize / 2 - 5 * Vector2.One,
-						p + iconSize / 2 + 5 * Vector2.One,
-						ColorTheme.Current.SceneView.SelectedWidgetPivotOutline
-					);
-				}
-			}
 			Quadrangle hull;
 			Vector2 pivot;
 			Utils.CalcHullAndPivot(widgets, canvas, out hull, out pivot);
@@ -69,6 +49,27 @@ namespace Tangerine.UI.SceneView
 					Renderer.DrawLine(abCenter, cdCenter, color);
 					DrawStretchMark(abCenter);
 					DrawStretchMark(cdCenter);
+				}
+			}
+			// Render border and icon for widgets.
+			var iconSize = new Vector2(16, 16);
+			foreach (var widget in widgets) {
+				var t = NodeIconPool.GetTexture(widget.GetType());
+				var h = widget.CalcHullInSpaceOf(canvas);
+				for (int i = 0; i < 4; i++) {
+					var a = h[i];
+					var b = h[(i + 1) % 4];
+					Renderer.DrawLine(a, b, ColorTheme.Current.SceneView.SelectedWidget, 1);
+				}
+				var p = widget.CalcPositionInSpaceOf(canvas);
+				Renderer.DrawSprite(t, ColorTheme.Current.SceneView.SelectedWidgetPivotOutline, p - iconSize / 2, iconSize, Vector2.Zero, Vector2.One);
+				if (selectedWidgetPivotVisualHint.Enabled) {
+					Renderer.DrawRectOutline(
+						p - iconSize / 2 - 5 * Vector2.One,
+						p + iconSize / 2 + 5 * Vector2.One,
+						ColorTheme.Current.SceneView.SelectedWidgetPivotOutline,
+						2.0f
+					);
 				}
 			}
 			// Render multi-pivot mark.

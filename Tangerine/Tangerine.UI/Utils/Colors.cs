@@ -310,7 +310,7 @@ namespace Tangerine.UI
 			};
 			var sceneView = new SceneViewColors {
 				Selection = Color4.Green,
-				SelectedWidgetPivotOutline = Color4.Green,
+				SelectedWidgetPivotOutline = Color4.Red,
 				LockedWidgetBorder = Color4.FromFloats(0, 1, 1),
 				ExposedItemInactiveBorder = Color4.Gray,
 				ExposedItemActiveBorder = Color4.White,
@@ -453,7 +453,7 @@ namespace Tangerine.UI
 			};
 			var sceneView = new SceneViewColors {
 				Selection = Color4.Green,
-				SelectedWidgetPivotOutline = Color4.Green,
+				SelectedWidgetPivotOutline = Color4.Red,
 				LockedWidgetBorder = Color4.FromFloats(0, 1, 1),
 				ExposedItemInactiveBorder = Color4.Gray,
 				ExposedItemActiveBorder = Color4.White,
