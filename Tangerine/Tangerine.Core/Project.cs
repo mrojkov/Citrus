@@ -324,6 +324,9 @@ namespace Tangerine.Core
 		public void ReloadModifiedDocuments()
 		{
 			foreach (var doc in Documents.ToList()) {
+				if (!doc.Loaded) {
+					continue;
+				}
 				if (doc.WasModifiedOutsideTangerine()) {
 					if (DocumentReloadConfirmation(doc)) {
 						ReloadDocument(doc);

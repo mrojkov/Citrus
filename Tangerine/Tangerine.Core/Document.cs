@@ -155,6 +155,7 @@ namespace Tangerine.Core
 		{
 			Path = path;
 			Loaded = false;
+			SetModificationTimeToNow();
 			if (delayLoad) {
 				return;
 			}
