@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -142,7 +142,9 @@ namespace Tangerine.Core
 						}
 					}
 				} else {
-					intervalIndex++;
+					if (intervalIndex < intervalsOfPreservation.Length - 1) {
+						intervalIndex++;
+					}
 					interval += intervalsOfPreservation[intervalIndex];
 					isFirstInterval = false;
 					i--;
