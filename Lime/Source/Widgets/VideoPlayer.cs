@@ -9,7 +9,14 @@ namespace Lime
 	public class VideoPlayer : Image
 	{
 		public bool Looped { get { return decoder.Looped; } set { decoder.Looped = value; } }
+
 		private VideoDecoder decoder;
+
+		public VideoPlayer()
+		{
+			Anchors = Anchors.LeftRight | Anchors.TopBottom;
+		}
+
 		public VideoPlayer(Widget parentWidget)
 		{
 			parentWidget.Nodes.Add(this);
