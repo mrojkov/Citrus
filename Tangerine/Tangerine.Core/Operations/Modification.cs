@@ -345,53 +345,99 @@ namespace Tangerine.Core.Operations
 
 	public class InsertIntoList : Operation
 	{
-		private readonly IList collection;
-		private readonly int index;
-		private readonly object element;
+		public readonly IList List;
+		public readonly int Index;
+		public readonly object Element;
 
 		public override bool IsChangingDocument => true;
 
-		protected InsertIntoList(IList collection, int index, object element)
+		protected InsertIntoList(IList list, int index, object element)
 		{
-			this.collection = collection;
-			this.index = index;
-			this.element = element;
+			List = list;
+			Index = index;
+			Element = element;
 		}
 
-		public static void Perform(IList collection, int index, object element) => DocumentHistory.Current.Perform(new InsertIntoList(collection, index, element));
+		public static void Perform(IList list, int index, object element) => DocumentHistory.Current.Perform(new InsertIntoList(list, index, element));
 
 		public class Processor : OperationProcessor<InsertIntoList>
 		{
-			protected override void InternalRedo(InsertIntoList op) => op.collection.Insert(op.index, op.element);
-			protected override void InternalUndo(InsertIntoList op) => op.collection.RemoveAt(op.index);
+			protected override void InternalRedo(InsertIntoList op) => op.List.Insert(op.Index, op.Element);
+			protected override void InternalUndo(InsertIntoList op) => op.List.RemoveAt(op.Index);
 		}
 	}
 
 	public class RemoveFromList : Operation
 	{
-		private readonly IList collection;
-		private readonly int index;
+		public readonly IList List;
+		public readonly int Index;
 		private object backup;
 
 		public override bool IsChangingDocument => true;
 
-		protected RemoveFromList(IList collection, int index)
+		protected RemoveFromList(IList list, int index)
 		{
-			this.collection = collection;
-			this.index = index;
+			List = list;
+			Index = index;
 		}
 
-		public static void Perform(IList collection, int index) => DocumentHistory.Current.Perform(new RemoveFromList(collection, index));
+		public static void Perform(IList list, int index) => DocumentHistory.Current.Perform(new RemoveFromList(list, index));
 
 		public class Processor : OperationProcessor<RemoveFromList>
 		{
 			protected override void InternalRedo(RemoveFromList op)
 			{
-				op.backup = op.collection[op.index];
-				op.collection.RemoveAt(op.index);
+				op.backup = op.List[op.Index];
+				op.List.RemoveAt(op.Index);
 			}
 
-			protected override void InternalUndo(RemoveFromList op) => op.collection.Insert(op.index, op.backup);
+			protected override void InternalUndo(RemoveFromList op) => op.List.Insert(op.Index, op.backup);
+		}
+	}
+
+	public class AddIntoCollection<TCollection, TElement> : Operation where TCollection : ICollection<TElement>
+	{
+		public readonly TCollection Collection;
+		public readonly TElement Element;
+
+		public override bool IsChangingDocument => true;
+
+		private AddIntoCollection(TCollection collection, TElement element)
+		{
+			Collection = collection;
+			Element = element;
+		}
+
+		public static void Perform(TCollection collection, TElement element) =>
+			DocumentHistory.Current.Perform(new AddIntoCollection<TCollection, TElement>(collection, element));
+
+		public class Processor : OperationProcessor<AddIntoCollection<TCollection, TElement>>
+		{
+			protected override void InternalRedo(AddIntoCollection<TCollection, TElement> op) => op.Collection.Add(op.Element);
+			protected override void InternalUndo(AddIntoCollection<TCollection, TElement> op) => op.Collection.Remove(op.Element);
+		}
+	}
+
+	public class RemoveFromCollection<TCollection, TElement> : Operation where TCollection : ICollection<TElement>
+	{
+		public readonly TCollection Collection;
+		public readonly TElement Element;
+
+		public override bool IsChangingDocument => true;
+
+		private RemoveFromCollection(TCollection collection, TElement element)
+		{
+			Collection = collection;
+			Element = element;
+		}
+
+		public static void Perform(TCollection collection, TElement element) =>
+			DocumentHistory.Current.Perform(new RemoveFromCollection<TCollection, TElement>(collection, element));
+
+		public class Processor : OperationProcessor<RemoveFromCollection<TCollection, TElement>>
+		{
+			protected override void InternalRedo(RemoveFromCollection<TCollection, TElement> op) => op.Collection.Remove(op.Element);
+			protected override void InternalUndo(RemoveFromCollection<TCollection, TElement> op) => op.Collection.Add(op.Element);
 		}
 	}
 
