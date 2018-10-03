@@ -28,7 +28,6 @@ namespace Tangerine
 		{
 			Orange.UserInterface.Instance = new OrangeInterface();
 			WidgetInput.AcceptMouseBeyondWidgetByDefault = false;
-			Application.IsTangerine = true;
 			TangerineYuzu.Instance.Value.DeserializerBuilders.Insert(0, DeserializeHotStudioAssets);
 			Serialization.DeserializerBuilders.Insert(0, DeserializeHotStudioAssets);
 

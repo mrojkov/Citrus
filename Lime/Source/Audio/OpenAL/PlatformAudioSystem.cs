@@ -92,7 +92,7 @@ namespace Lime
 
 		public static bool Active
 		{
-#if iOS			
+#if iOS
 			get { return context != null && Alc.GetCurrentContext() != IntPtr.Zero; }
 #else
 			get { return context != null && Alc.GetCurrentContext().Handle != IntPtr.Zero; }
@@ -292,7 +292,11 @@ namespace Lime
 			var sound = new Sound();
 			var decoder = parameters.Decoder;
 			if (decoder == null) {
-				path += Application.IsTangerine ? ".ogg" : ".sound";
+#if TANGERINE
+				path += ".ogg";
+#else
+				path += ".sound";
+#endif // TANGERINE
 				var stream = cache.OpenStream(path);
 				if (stream == null) {
 					AudioMissing?.Invoke(path);

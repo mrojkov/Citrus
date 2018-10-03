@@ -14,9 +14,9 @@ namespace Lime
 
 		public Spline()
 		{
-			if (!Application.IsTangerine) {
+#if !TANGERINE
 				RenderChainBuilder = null;
-			}
+#endif // !TANGERINE
 		}
 
 		private SplinePoint GetPoint(int index)

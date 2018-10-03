@@ -295,11 +295,11 @@ namespace Lime
 					// For the tangerine we need a maximally accurate math,
 					// to prevent flicker of widgets position, rotation and scale
 					// on "click on pivot".
-					if (Application.IsTangerine) {
-						direction = Vector2.CosSin(Mathf.DegToRad * value);
-					} else {
-						direction = Vector2.CosSinRough(Mathf.DegToRad * value);
-					}
+#if TANGERINE
+					direction = Vector2.CosSin(Mathf.DegToRad * value);
+#else
+					direction = Vector2.CosSinRough(Mathf.DegToRad * value);
+#endif // TANGERINE
 					DirtyMask |= DirtyFlags.LocalTransform | DirtyFlags.ParentBoundingRect;
 					PropagateDirtyFlags(DirtyFlags.GlobalTransform);
 				}
@@ -682,10 +682,11 @@ namespace Lime
 					globallyVisible &= Parent.AsNode3D.GloballyVisible;
 				}
 			}
-			if (Application.IsTangerine) {
-				globallyVisible |= GetTangerineFlag(TangerineFlags.Shown | TangerineFlags.DisplayContent);
-				globallyVisible &= !GetTangerineFlag(TangerineFlags.Hidden | TangerineFlags.HiddenOnExposition);
-			}
+#if TANGERINE
+			globallyVisible &= !GetTangerineFlag(TangerineFlags.Hidden);
+			globallyVisible |= GetTangerineFlag(TangerineFlags.Shown | TangerineFlags.DisplayContent);
+			globallyVisible &= !GetTangerineFlag(TangerineFlags.HiddenOnExposition);
+#endif // TANGERINE
 		}
 
 		/// <summary>
