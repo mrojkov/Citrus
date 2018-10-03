@@ -5,7 +5,6 @@ namespace Lime
 	public class PostProcessingPresenter : IPresenter
 	{
 		private readonly PostProcessingAction[] postProcessingActions;
-		private readonly WeakReference<ITexture> imageTextureReference = new WeakReference<ITexture>(null);
 		private readonly RenderChain renderChain = new RenderChain();
 		private readonly IMaterial defaultMaterial = WidgetMaterial.GetInstance(Blending.Inherited, ShaderId.Inherited, 1);
 		private readonly IMaterial blendingAddMaterial = WidgetMaterial.GetInstance(Blending.Add, ShaderId.Inherited, 1);
@@ -111,9 +110,13 @@ namespace Lime
 			ro.BloomColor = component.BloomColor;
 			ro.NoiseBuffer = noiseBuffer;
 			ro.NoiseEnabled = component.NoiseEnabled && component.NoiseTexture != null && !component.NoiseTexture.IsStubTexture;
-			ro.NoiseStrength = component.NoiseStrength * 0.01f;
+			ro.NoiseBrightThreshold = component.NoiseBrightThreshold * 0.01f;
+			ro.NoiseDarkThreshold = component.NoiseDarkThreshold * 0.01f;
+			ro.NoiseSoftLight = component.NoiseSoftLight * 0.01f;
+			ro.NoiseOffset = component.NoiseOffset;
+			ro.NoiseScale = component.NoiseScale;
 			ro.NoiseTexture = component.NoiseTexture;
-			ro.SoftLightMaterial = component.SoftLightMaterial;
+			ro.NoiseMaterial = component.NoiseMaterial;
 			ro.OverallImpactEnabled = component.OverallImpactEnabled;
 			ro.OverallImpactColor = component.OverallImpactColor;
 			ro.VignetteMaterial = component.VignetteMaterial;

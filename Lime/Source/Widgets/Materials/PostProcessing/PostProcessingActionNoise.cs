@@ -21,18 +21,21 @@ namespace Lime
 			RenderObject.NoiseBuffer.Texture.SetAsRenderTarget();
 			try {
 				Renderer.Clear(Color4.Zero);
-				var noiseUV1 = new Vector2(RenderObject.Size.X / RenderObject.NoiseTexture.ImageSize.Width, RenderObject.Size.Y / RenderObject.NoiseTexture.ImageSize.Height);
-				RenderObject.SoftLightMaterial.Strength = RenderObject.NoiseStrength;
+				var noiseUV0 = RenderObject.NoiseOffset;
+				var noiseUV1 = RenderObject.Size / ((Vector2)RenderObject.NoiseTexture.ImageSize * RenderObject.NoiseScale) + RenderObject.NoiseOffset;
+				RenderObject.NoiseMaterial.BrightThreshold = RenderObject.NoiseBrightThreshold;
+				RenderObject.NoiseMaterial.DarkThreshold = RenderObject.NoiseDarkThreshold;
+				RenderObject.NoiseMaterial.SoftLight = RenderObject.NoiseSoftLight;
 				Renderer.DrawSprite(
 					RenderObject.ProcessedTexture,
 					RenderObject.NoiseTexture,
-					RenderObject.SoftLightMaterial,
+					RenderObject.NoiseMaterial,
 					Color4.White,
 					Vector2.Zero,
 					RenderObject.TextureSize,
 					Vector2.Zero,
 					RenderObject.ProcessedUV1,
-					Vector2.Zero,
+					noiseUV0,
 					noiseUV1
 				);
 			} finally {
@@ -48,16 +51,24 @@ namespace Lime
 
 		internal new class Buffer : PostProcessingAction.Buffer
 		{
-			private float strength = float.NaN;
+			private float brightThreshold = float.NaN;
+			private float darkThreshold = float.NaN;
+			private float softLight = float.NaN;
 
 			public Buffer(Size size) : base(size) { }
 
-			public bool EqualRenderParameters(PostProcessingRenderObject ro) => !IsDirty && strength == ro.NoiseStrength;
+			public bool EqualRenderParameters(PostProcessingRenderObject ro) =>
+				!IsDirty &&
+				brightThreshold == ro.NoiseBrightThreshold &&
+				darkThreshold == ro.NoiseDarkThreshold &&
+				softLight == ro.NoiseSoftLight;
 
 			public void SetRenderParameters(PostProcessingRenderObject ro)
 			{
 				IsDirty = false;
-				strength = ro.NoiseStrength;
+				brightThreshold = ro.NoiseBrightThreshold;
+				darkThreshold = ro.NoiseDarkThreshold;
+				softLight = ro.NoiseSoftLight;
 			}
 		}
 	}

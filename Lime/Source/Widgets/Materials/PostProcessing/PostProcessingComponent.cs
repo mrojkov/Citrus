@@ -28,7 +28,7 @@ namespace Lime
 		internal HSLMaterial HSLMaterial { get; private set; } = new HSLMaterial();
 		internal BlurMaterial BlurMaterial { get; private set; } = new BlurMaterial();
 		internal BloomMaterial BloomMaterial { get; private set; } = new BloomMaterial();
-		internal SoftLightMaterial SoftLightMaterial { get; private set; } = new SoftLightMaterial();
+		internal NoiseMaterial NoiseMaterial { get; private set; } = new NoiseMaterial();
 		internal VignetteMaterial VignetteMaterial { get; private set; } = new VignetteMaterial();
 
 		// TODO: Solve promblem of storing and restoring savedPresenter&savedRenderChainBuilder
@@ -42,8 +42,11 @@ namespace Lime
 		private float bloomBrightThreshold = 1f;
 		private Vector3 bloomGammaCorrection = Vector3.One;
 		private float bloomTextureScaling = 0.5f;
-		private float noiseStrength = 1f;
+		private float noiseBrightThreshold = 1f;
+		private float noiseDarkThreshold;
+		private float noiseSoftLight = 1f;
 		private ITexture noiseTexture;
+		private Vector2 noiseScale = Vector2.One;
 		private float vignetteRadius = 0.5f;
 		private float vignetteSoftness = 0.05f;
 		private Size textureSizeLimit = new Size(256, 256);
@@ -163,15 +166,46 @@ namespace Lime
 
 		[YuzuMember]
 		[TangerineGroup(GroupNoise)]
-		public float NoiseStrength
+		public float NoiseBrightThreshold
 		{
-			get => noiseStrength * 100f;
-			set => noiseStrength = Mathf.Clamp(value * 0.01f, 0.01f, 1f);
+			get => noiseBrightThreshold * 100f;
+			set => noiseBrightThreshold = Mathf.Clamp(value * 0.01f, 0f, 1f);
 		}
 
 		[YuzuMember]
 		[TangerineGroup(GroupNoise)]
-		[YuzuSerializeIf(nameof(IsNotRenderTexture))]
+		public float NoiseDarkThreshold
+		{
+			get => noiseDarkThreshold * 100f;
+			set => noiseDarkThreshold = Mathf.Clamp(value * 0.01f, 0f, 1f);
+		}
+
+		[YuzuMember]
+		[TangerineGroup(GroupNoise)]
+		public float NoiseSoftLight
+		{
+			get => noiseSoftLight * 100f;
+			set => noiseSoftLight = Mathf.Clamp(value * 0.01f, 0f, 1f);
+		}
+
+		[YuzuMember]
+		[TangerineGroup(GroupNoise)]
+		public Vector2 NoiseOffset { get; set; } = Vector2.Zero;
+
+		[YuzuMember]
+		[TangerineGroup(GroupNoise)]
+		public Vector2 NoiseScale
+		{
+			get => noiseScale;
+			set => noiseScale = new Vector2(
+				Mathf.Clamp(value.X, 0.01f, float.MaxValue),
+				Mathf.Clamp(value.Y, 0.01f, float.MaxValue)
+			);
+		}
+
+		[YuzuMember]
+		[TangerineGroup(GroupNoise)]
+		[YuzuSerializeIf(nameof(NoiseIsNotRenderTexture))]
 		public ITexture NoiseTexture
 		{
 			get => noiseTexture;
@@ -293,7 +327,7 @@ namespace Lime
 		[TangerineInspect]
 		public PostProcessingPresenter.DebugViewMode DebugViewMode { get; set; } = PostProcessingPresenter.DebugViewMode.None;
 
-		public bool IsNotRenderTexture() => !(noiseTexture is RenderTexture);
+		public bool NoiseIsNotRenderTexture() => !(noiseTexture is RenderTexture);
 
 		public override void Update(float delta)
 		{
@@ -342,7 +376,7 @@ namespace Lime
 			clone.HSLMaterial = (HSLMaterial)HSLMaterial.Clone();
 			clone.BlurMaterial = (BlurMaterial)BlurMaterial.Clone();
 			clone.BloomMaterial = (BloomMaterial)BloomMaterial.Clone();
-			clone.SoftLightMaterial = (SoftLightMaterial)SoftLightMaterial.Clone();
+			clone.NoiseMaterial = (NoiseMaterial)NoiseMaterial.Clone();
 			clone.VignetteMaterial = (VignetteMaterial)VignetteMaterial.Clone();
 			return clone;
 		}

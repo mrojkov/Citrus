@@ -47,9 +47,13 @@ namespace Lime
 		public Color4 BloomColor;
 		public PostProcessingActionNoise.Buffer NoiseBuffer;
 		public bool NoiseEnabled;
-		public float NoiseStrength;
+		public float NoiseBrightThreshold;
+		public float NoiseDarkThreshold;
+		public float NoiseSoftLight;
+		public Vector2 NoiseOffset;
+		public Vector2 NoiseScale;
 		public ITexture NoiseTexture;
-		public SoftLightMaterial SoftLightMaterial;
+		public NoiseMaterial NoiseMaterial;
 		public bool OverallImpactEnabled;
 		public Color4 OverallImpactColor;
 		public VignetteMaterial VignetteMaterial;
@@ -81,7 +85,7 @@ namespace Lime
 			BloomMaterial = null;
 			NoiseBuffer = null;
 			NoiseTexture = null;
-			SoftLightMaterial = null;
+			NoiseMaterial = null;
 			VignetteMaterial = null;
 			TransparentTexture = null;
 			DefaultMaterial = null;
