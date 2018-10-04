@@ -73,36 +73,49 @@ namespace Lime
 			Window.Current.InvokeOnRendering(() => {
 				extractor = new MediaExtractor();
 				extractor.SetDataSource(path);
-				for (int i = 0; i < extractor.TrackCount; ++i) {
-					var format = extractor.GetTrackFormat(i);
-					var mime = format.GetString(MediaFormat.KeyMime);
-					if (mime.StartsWith("video/")) {
-						videoFormat = format;
-						videoTrack = i;
-						videoCodec = MediaCodec.CreateDecoderByType(mime);
-						renderer = new SurfaceTextureRenderer();
-						videoCodec.Configure(videoFormat, renderer.Surface, null, MediaCodecConfigFlags.None);
-						extractor.SelectTrack(i);
-						texture = new RenderTexture(Width, Height);
-						continue;
+				try {
+					for (int i = 0; i < extractor.TrackCount; ++i) {
+						var format = extractor.GetTrackFormat(i);
+						var mime = format.GetString(MediaFormat.KeyMime);
+						try {
+							if (mime.StartsWith("video/")) {
+								videoFormat = format;
+								videoTrack = i;
+								videoCodec = MediaCodec.CreateDecoderByType(mime);
+								renderer = new SurfaceTextureRenderer();
+								videoCodec.Configure(videoFormat, renderer.Surface, null, MediaCodecConfigFlags.None);
+								extractor.SelectTrack(i);
+								texture = new RenderTexture(Width, Height);
+								continue;
+							}
+						} catch {
+							Lime.Debug.Write("Init video track");
+						}
+
+						try {
+							if (mime.StartsWith("audio/")) {
+								audioFormat = format;
+								audioTrack = i;
+								audioCodec = MediaCodec.CreateDecoderByType(mime);
+								audioCodec.Configure(audioFormat, null, null, MediaCodecConfigFlags.None);
+								extractor.SelectTrack(i);
+								var bufferSize = AudioTrack.GetMinBufferSize(44100, ChannelOut.Stereo, global::Android.Media.Encoding.Pcm16bit);
+								audio = new AudioTrack(
+									global::Android.Media.Stream.Music,
+									44100,
+									ChannelOut.Stereo,
+									global::Android.Media.Encoding.Pcm16bit,
+									bufferSize,
+									AudioTrackMode.Stream
+								);
+								continue;
+							}
+						} catch {
+							Lime.Debug.Write("Init audio track");
+						}
 					}
-					if (mime.StartsWith("audio/")) {
-						audioFormat = format;
-						audioTrack = i;
-						audioCodec = MediaCodec.CreateDecoderByType(mime);
-						audioCodec.Configure(audioFormat, null, null, MediaCodecConfigFlags.None);
-						extractor.SelectTrack(i);
-						var bufferSize = AudioTrack.GetMinBufferSize(44100, ChannelOut.Stereo, global::Android.Media.Encoding.Pcm16bit);
-						audio = new AudioTrack(
-							global::Android.Media.Stream.Music,
-							44100,
-							ChannelOut.Stereo,
-							global::Android.Media.Encoding.Pcm16bit,
-							bufferSize,
-							AudioTrackMode.Stream
-						);
-						continue;
-					}
+				} catch {
+					Lime.Debug.Write("Init player exception");
 				}
 				state = State.Initialized;
 			});
