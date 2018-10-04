@@ -6490,73 +6490,153 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (5 == fd.OurIndex) {
-				result.BloomStrength = d.Reader.ReadSingle();
+				result.BloomShaderId = (global::Lime.BlurShaderId)d.Reader.ReadInt32();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (6 == fd.OurIndex) {
-				result.BloomTextureScaling = d.Reader.ReadSingle();
+				result.BloomStrength = d.Reader.ReadSingle();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (7 == fd.OurIndex) {
-				result.BlurAlphaCorrection = d.Reader.ReadSingle();
+				result.BloomTextureScaling = d.Reader.ReadSingle();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (8 == fd.OurIndex) {
+				result.BlurAlphaCorrection = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (9 == fd.OurIndex) {
 				dg.EnsureClassDef(typeof(global::Lime.Color4));
 				var tmp3 = new global::Lime.Color4();
 				tmp3.ABGR = d.Reader.ReadUInt32();
 				result.BlurBackgroundColor = tmp3;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (9 == fd.OurIndex) {
+			if (10 == fd.OurIndex) {
 				result.BlurEnabled = d.Reader.ReadBoolean();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (10 == fd.OurIndex) {
+			if (11 == fd.OurIndex) {
 				result.BlurRadius = d.Reader.ReadSingle();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (11 == fd.OurIndex) {
-				result.BlurTextureScaling = d.Reader.ReadSingle();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
 			if (12 == fd.OurIndex) {
-				result.HSLEnabled = d.Reader.ReadBoolean();
+				result.BlurShader = (global::Lime.BlurShaderId)d.Reader.ReadInt32();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (13 == fd.OurIndex) {
-				result.Hue = d.Reader.ReadSingle();
+				result.BlurTextureScaling = d.Reader.ReadSingle();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (14 == fd.OurIndex) {
-				result.Lightness = d.Reader.ReadSingle();
+				dg.EnsureClassDef(typeof(global::Lime.Vector3));
+				var tmp4 = new global::Lime.Vector3();
+				tmp4.X = d.Reader.ReadSingle();
+				tmp4.Y = d.Reader.ReadSingle();
+				tmp4.Z = d.Reader.ReadSingle();
+				result.HSL = tmp4;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (15 == fd.OurIndex) {
-				result.NoiseEnabled = d.Reader.ReadBoolean();
+				result.HSLEnabled = d.Reader.ReadBoolean();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (16 == fd.OurIndex) {
-				result.NoiseStrength = d.Reader.ReadSingle();
+				result.NoiseBrightThreshold = d.Reader.ReadSingle();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (17 == fd.OurIndex) {
-				result.NoiseTexture = (global::Lime.ITexture)dg.ReadObject<global::Lime.ITexture>();
+				result.NoiseDarkThreshold = d.Reader.ReadSingle();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (18 == fd.OurIndex) {
-				dg.EnsureClassDef(typeof(global::Lime.Color4));
-				var tmp4 = new global::Lime.Color4();
-				tmp4.ABGR = d.Reader.ReadUInt32();
-				result.OverallImpactColor = tmp4;
+				result.NoiseEnabled = d.Reader.ReadBoolean();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (19 == fd.OurIndex) {
-				result.OverallImpactEnabled = d.Reader.ReadBoolean();
+				dg.EnsureClassDef(typeof(global::Lime.Vector2));
+				var tmp5 = new global::Lime.Vector2();
+				tmp5.X = d.Reader.ReadSingle();
+				tmp5.Y = d.Reader.ReadSingle();
+				result.NoiseOffset = tmp5;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (20 == fd.OurIndex) {
-				result.Saturation = d.Reader.ReadSingle();
+				dg.EnsureClassDef(typeof(global::Lime.Vector2));
+				var tmp6 = new global::Lime.Vector2();
+				tmp6.X = d.Reader.ReadSingle();
+				tmp6.Y = d.Reader.ReadSingle();
+				result.NoiseScale = tmp6;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (21 == fd.OurIndex) {
+				result.NoiseSoftLight = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (22 == fd.OurIndex) {
+				result.NoiseTexture = (global::Lime.ITexture)dg.ReadObject<global::Lime.ITexture>();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (23 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Color4));
+				var tmp7 = new global::Lime.Color4();
+				tmp7.ABGR = d.Reader.ReadUInt32();
+				result.OverallImpactColor = tmp7;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (24 == fd.OurIndex) {
+				result.OverallImpactEnabled = d.Reader.ReadBoolean();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (25 == fd.OurIndex) {
+				result.RefreshSourceRate = d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (26 == fd.OurIndex) {
+				result.RefreshSourceTexture = d.Reader.ReadBoolean();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (27 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Size));
+				var tmp8 = new global::Lime.Size();
+				tmp8.Width = d.Reader.ReadInt32();
+				tmp8.Height = d.Reader.ReadInt32();
+				result.TextureSizeLimit = tmp8;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (28 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Color4));
+				var tmp9 = new global::Lime.Color4();
+				tmp9.ABGR = d.Reader.ReadUInt32();
+				result.VignetteColor = tmp9;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (29 == fd.OurIndex) {
+				result.VignetteEnabled = d.Reader.ReadBoolean();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (30 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Vector2));
+				var tmp10 = new global::Lime.Vector2();
+				tmp10.X = d.Reader.ReadSingle();
+				tmp10.Y = d.Reader.ReadSingle();
+				result.VignettePivot = tmp10;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (31 == fd.OurIndex) {
+				result.VignetteRadius = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (32 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Vector2));
+				var tmp11 = new global::Lime.Vector2();
+				tmp11.X = d.Reader.ReadSingle();
+				tmp11.Y = d.Reader.ReadSingle();
+				result.VignetteScale = tmp11;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (33 == fd.OurIndex) {
+				result.VignetteSoftness = d.Reader.ReadSingle();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");

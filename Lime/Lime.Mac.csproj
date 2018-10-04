@@ -68,7 +68,8 @@
     <UseSGen>false</UseSGen>
     <HttpClientHandler>HttpClientHandler</HttpClientHandler>
     <LinkMode>None</LinkMode>
-    <XamMacArch></XamMacArch>
+    <XamMacArch>
+    </XamMacArch>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>7.2</LangVersion>
     <AOTMode>None</AOTMode>
@@ -84,7 +85,8 @@
     <UseSGen>false</UseSGen>
     <HttpClientHandler>HttpClientHandler</HttpClientHandler>
     <LinkMode>None</LinkMode>
-    <XamMacArch></XamMacArch>
+    <XamMacArch>
+    </XamMacArch>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>7.2</LangVersion>
     <AOTMode>None</AOTMode>
@@ -371,13 +373,23 @@
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingPresenter.cs" />
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingRenderChainBuilder.cs" />
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingRenderObject.cs" />
-    <Compile Include="Source\Widgets\Materials\SoftLightMaterial.cs" />
+    <Compile Include="Source\Widgets\Materials\VignetteMaterial.cs" />
+    <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingAction.cs" />
+    <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionBloom.cs" />
+    <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionBlur.cs" />
+    <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionHSL.cs" />
+    <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionNoise.cs" />
+    <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionOverallImpact.cs" />
+    <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionTextureBuilder.cs" />
+    <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionTextureRender.cs" />
+    <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionVignette.cs" />
     <Compile Include="Source\Widgets\VideoPlayer.cs" />
     <Compile Include="Source\Widgets\VideoDecoder\VideoDecoder.Android.cs" />
     <Compile Include="Source\Widgets\VideoDecoder\VideoDecoder.cs" />
     <Compile Include="Source\Widgets\VideoDecoder\VideoDecoder.iOS.cs" />
     <Compile Include="Source\Audio\OpenAL\PcmDecoder.cs" />
     <Compile Include="Source\Widgets\VideoDecoder\VideoDecoder.Win.cs" />
+    <Compile Include="Source\Widgets\Materials\NoiseMaterial.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

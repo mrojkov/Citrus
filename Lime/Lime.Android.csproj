@@ -387,9 +387,19 @@
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingPresenter.cs" />
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingRenderChainBuilder.cs" />
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingRenderObject.cs" />
-    <Compile Include="Source\Widgets\Materials\SoftLightMaterial.cs" />
+    <Compile Include="Source\Widgets\Materials\VignetteMaterial.cs" />
+    <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingAction.cs" />
+    <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionBloom.cs" />
+    <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionBlur.cs" />
+    <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionHSL.cs" />
+    <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionNoise.cs" />
+    <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionOverallImpact.cs" />
+    <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionTextureBuilder.cs" />
+    <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionTextureRender.cs" />
+    <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionVignette.cs" />
     <Compile Include="Source\Audio\OpenAL\PcmDecoder.cs" />
     <Compile Include="Source\Widgets\VideoDecoder\VideoDecoder.Win.cs" />
+    <Compile Include="Source\Widgets\Materials\NoiseMaterial.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Android.csproj">
