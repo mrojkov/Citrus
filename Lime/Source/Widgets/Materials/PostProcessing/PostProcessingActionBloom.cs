@@ -26,6 +26,7 @@ namespace Lime
 			RenderObject.RenderToTexture(RenderObject.FirstTemporaryBuffer.Texture, RenderObject.ProcessedTexture, RenderObject.BloomMaterial, Color4.White, Color4.Black, bloomViewportSize);
 			var bloomUV1 = (Vector2)bloomViewportSize / bufferSize;
 			RenderObject.BlurMaterial.Radius = RenderObject.BloomStrength;
+			RenderObject.BlurMaterial.BlurShaderId = RenderObject.BloomShaderId;
 			RenderObject.BlurMaterial.Step = RenderObject.ProcessedUV1 * RenderObject.BloomTextureScaling / RenderObject.CurrentBufferSize;
 			RenderObject.BlurMaterial.Dir = Vector2.Down;
 			RenderObject.BlurMaterial.AlphaCorrection = 1f;

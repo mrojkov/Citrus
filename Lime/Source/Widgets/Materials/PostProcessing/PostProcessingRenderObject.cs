@@ -34,6 +34,7 @@ namespace Lime
 		public BlurMaterial BlurMaterial;
 		public bool BlurEnabled;
 		public float BlurRadius;
+		public BlurShaderId BlurShader;
 		public float BlurTextureScaling;
 		public float BlurAlphaCorrection;
 		public Color4 BlurBackgroundColor;
@@ -41,6 +42,7 @@ namespace Lime
 		public BloomMaterial BloomMaterial;
 		public bool BloomEnabled;
 		public float BloomStrength;
+		public BlurShaderId BloomShaderId;
 		public float BloomBrightThreshold;
 		public Vector3 BloomGammaCorrection;
 		public float BloomTextureScaling;

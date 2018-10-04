@@ -17,6 +17,7 @@ namespace Lime
 
 			RenderObject.PrepareOffscreenRendering(RenderObject.Size);
 			RenderObject.BlurMaterial.Radius = RenderObject.BlurRadius;
+			RenderObject.BlurMaterial.BlurShaderId = RenderObject.BlurShader;
 			RenderObject.BlurMaterial.Step = RenderObject.ProcessedUV1 * RenderObject.BlurTextureScaling / RenderObject.CurrentBufferSize;
 			RenderObject.BlurMaterial.Dir = Vector2.Down;
 			RenderObject.BlurMaterial.AlphaCorrection = RenderObject.BlurAlphaCorrection;

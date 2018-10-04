@@ -97,6 +97,7 @@ namespace Lime
 			ro.BlurMaterial = component.BlurMaterial;
 			ro.BlurEnabled = component.BlurEnabled;
 			ro.BlurRadius = component.BlurRadius;
+			ro.BlurShader = component.BlurShader;
 			ro.BlurTextureScaling = component.BlurTextureScaling * 0.01f;
 			ro.BlurAlphaCorrection = component.BlurAlphaCorrection;
 			ro.BlurBackgroundColor = component.BlurBackgroundColor;
@@ -104,6 +105,7 @@ namespace Lime
 			ro.BloomMaterial = component.BloomMaterial;
 			ro.BloomEnabled = component.BloomEnabled;
 			ro.BloomStrength = component.BloomStrength;
+			ro.BloomShaderId = component.BloomShaderId;
 			ro.BloomBrightThreshold = component.BloomBrightThreshold * 0.01f;
 			ro.BloomGammaCorrection = component.BloomGammaCorrection;
 			ro.BloomTextureScaling = component.BloomTextureScaling * 0.01f;

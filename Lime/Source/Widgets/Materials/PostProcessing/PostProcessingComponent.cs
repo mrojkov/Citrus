@@ -22,7 +22,7 @@ namespace Lime
 		private const float MaximumHue = 1f;
 		private const float MaximumSaturation = 1f;
 		private const float MaximumLightness = 1f;
-		private const float MaximumBlurRadius = 10f;
+		private const float MaximumBlurRadius = 30f;
 		private const float MaximumGammaCorrection = 10f;
 
 		internal HSLMaterial HSLMaterial { get; private set; } = new HSLMaterial();
@@ -98,6 +98,10 @@ namespace Lime
 
 		[YuzuMember]
 		[TangerineGroup(GroupBlur)]
+		public BlurShaderId BlurShader { get; set; } = BlurShaderId.GaussOneDimensionalWith5Samples;
+
+		[YuzuMember]
+		[TangerineGroup(GroupBlur)]
 		public float BlurTextureScaling
 		{
 			get => blurTextureScaling * 100f;
@@ -127,6 +131,10 @@ namespace Lime
 			get => bloomStrength;
 			set => bloomStrength = Mathf.Clamp(value, 0f, MaximumBlurRadius);
 		}
+
+		[YuzuMember]
+		[TangerineGroup(GroupBloom)]
+		public BlurShaderId BloomShaderId { get; set; } = BlurShaderId.GaussOneDimensionalWith5Samples;
 
 		[YuzuMember]
 		[TangerineGroup(GroupBloom)]
