@@ -216,7 +216,7 @@ namespace Lime
 
 		[YuzuMember]
 		[TangerineGroup(GroupNoise)]
-		[YuzuSerializeIf(nameof(NoiseIsNotRenderTexture))]
+		[YuzuSerializeIf(nameof(RequiredSerializeNoiseTexture))]
 		public ITexture NoiseTexture
 		{
 			get => noiseTexture;
@@ -356,7 +356,7 @@ namespace Lime
 		[TangerineInspect]
 		public PostProcessingPresenter.DebugViewMode DebugViewMode { get; set; } = PostProcessingPresenter.DebugViewMode.None;
 
-		public bool NoiseIsNotRenderTexture() => !(noiseTexture is RenderTexture);
+		public bool RequiredSerializeNoiseTexture() => noiseTexture != null && !(noiseTexture is RenderTexture);
 
 		public override void Update(float delta)
 		{
