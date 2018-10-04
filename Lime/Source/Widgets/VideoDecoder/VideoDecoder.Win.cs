@@ -195,10 +195,10 @@ namespace Lime
 			public Vector2 UV1;
 		}
 
-		public async System.Threading.Tasks.Task Start()
+		public IEnumerator<object> Start()
 		{
 			if (state == State.Started) {
-				return;
+				yield break;
 			}
 			stopDecodeCancelationTokenSource = new CancellationTokenSource();
 			var token = stopDecodeCancelationTokenSource.Token;
@@ -209,7 +209,7 @@ namespace Lime
 				}
 				state = State.Started;
 				bool queueTaskCompleted = false;
-				OnStart?.Invoke();
+				
 				var queueTask = System.Threading.Tasks.Task.Run(() => {
 					try {
 						var audioIsEnded = false;
@@ -286,13 +286,17 @@ namespace Lime
 						}
 					}
 				}, token);
-				try {
-					await queueTask;
-					await System.Threading.Tasks.Task.WhenAll(audioTask, videoTask);
-				} catch (System.OperationCanceledException e) {
-					Debug.Write("VideoPlayer: queueTask canceled!");
-				}
-				
+				OnStart?.Invoke();
+				while (!queueTask.IsCompleted && !queueTask.IsCanceled && !queueTask.IsFaulted) {
+					yield return null;
+				};
+				while (
+					(!audioTask.IsCompleted && !audioTask.IsCanceled && !audioTask.IsFaulted) ||
+					(!videoTask.IsCompleted && !videoTask.IsCanceled && !videoTask.IsFaulted))
+				{
+					yield return null;
+				};
+
 				if (!token.IsCancellationRequested) {
 					state = State.Finished;
 				}

@@ -139,14 +139,14 @@ namespace Lime
 
 		private bool startRequested = false;
 
-		public async System.Threading.Tasks.Task Start()
+		public IEnumerator<object> Start()
 		{
 			if (state == State.Initializing) {
 				startRequested = true;
-				return;
+				yield return null;
 			}
 			if (state == State.Started) {
-				return;
+				yield break;
 			}
 			startRequested = false;
 			stopDecodeCancelationTokenSource = new CancellationTokenSource();
@@ -189,8 +189,6 @@ namespace Lime
 				audio?.Play();
 				state = State.Started;
 
-				OnStart?.Invoke();
-
 				var queueTask = System.Threading.Tasks.Task.Run(() => {
 					var hasVideoInput = videoCodec != null;
 					var hasAudioInput = audioCodec != null;
@@ -211,7 +209,6 @@ namespace Lime
 					}
 					Debug.Write("queueTask: end");
 				}, stopDecodeCancelationToken);
-
 
 				var processVideo = System.Threading.Tasks.Task.Run(() => {
 					var info = new BufferInfo();
@@ -266,17 +263,22 @@ namespace Lime
 						}
 					}
 				}, stopDecodeCancelationToken);
-				try {
-					await queueTask;
-				} catch (System.OperationCanceledException e) {
-					Debug.Write("VideoPlayer: queueTask canceled");
-				}
-				await System.Threading.Tasks.Task.WhenAll(processVideo, processAudio);
+
+				OnStart?.Invoke();
+
+				while (!queueTask.IsCompleted && !queueTask.IsCanceled && !queueTask.IsFaulted) {
+					yield return null;
+				};
+				while (
+					(!processVideo.IsCompleted && !processVideo.IsCanceled && !processVideo.IsFaulted) ||
+					(!processAudio.IsCompleted && !processAudio.IsCanceled && !processAudio.IsFaulted)) {
+					yield return null;
+				};
 				if (state == State.Started) {
 					state = State.Finished;
+					videoCodec?.Stop();
+					audioCodec?.Stop();
 				}
-				videoCodec?.Stop();
-				audioCodec?.Stop();
 			} while (Looped && !stopDecodeCancelationToken.IsCancellationRequested);
 			audioFinished = true;
 			checkAudioQueue.Set();
@@ -309,9 +311,9 @@ namespace Lime
 
 		public void Update(float delta)
 		{
-			if (state == State.Initialized && startRequested) {
-				Start();
-			}
+			//if (state == State.Initialized && startRequested) {
+			//	Start();
+			//}
 			if (state == State.Started) {
 				currentPosition += (long)(delta * 1000000);
 				checkAudioQueue.Set();

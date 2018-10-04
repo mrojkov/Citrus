@@ -36,10 +36,10 @@ namespace Lime
 			decoder = new VideoDecoder(sourcePath);
 		}
 
-		public void Start(Action onStart)
+		public IEnumerator<object> Start(Action onStart)
 		{
 			decoder.OnStart = onStart;
-			decoder.Start();
+			yield return decoder.Start();
 		}
 
 		public void Pause()
