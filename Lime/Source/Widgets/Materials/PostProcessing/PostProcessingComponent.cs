@@ -49,6 +49,7 @@ namespace Lime
 		private Vector2 noiseScale = Vector2.One;
 		private float vignetteRadius = 0.5f;
 		private float vignetteSoftness = 0.05f;
+		private bool applyPostProcessing = true;
 		private Size textureSizeLimit = new Size(256, 256);
 		private bool refreshSourceTexture = true;
 		private int refreshSourceRate;
@@ -267,6 +268,24 @@ namespace Lime
 
 		[TangerineInspect]
 		[TangerineGroup(GroupSourceTexture)]
+		public bool ApplyPostProcessing
+		{
+			get => applyPostProcessing;
+			set {
+				if (applyPostProcessing != value) {
+					applyPostProcessing = value;
+					if (applyPostProcessing) {
+						AttachToNode(Owner);
+						RequiredRefreshSource = true;
+					} else {
+						DettachFromNode(Owner);
+					}
+				}
+			}
+		}
+
+		[TangerineInspect]
+		[TangerineGroup(GroupSourceTexture)]
 		public int SourceTextureWidth
 		{
 			get => textureSizeLimit.Width;
@@ -354,27 +373,37 @@ namespace Lime
 
 		public void GetOwnerRenderObjects(RenderChain renderChain, RenderObjectList roObjects)
 		{
-			Owner.RenderChainBuilder = Owner;
-			Owner.Presenter = DefaultPresenter.Instance;
+			DettachFromNode(Owner);
 			Owner.AddToRenderChain(renderChain);
 			renderChain.GetRenderObjects(roObjects);
-			Owner.RenderChainBuilder = renderChainBuilder;
-			Owner.Presenter = presenter;
+			if (ApplyPostProcessing) {
+				AttachToNode(Owner);
+			}
 		}
 
 		protected override void OnOwnerChanged(Node oldOwner)
 		{
 			base.OnOwnerChanged(oldOwner);
 			if (oldOwner != null) {
-				oldOwner.Presenter = DefaultPresenter.Instance;
-				oldOwner.RenderChainBuilder = oldOwner;
-				renderChainBuilder.Owner = null;
+				DettachFromNode(oldOwner);
 			}
-			if (Owner != null) {
-				Owner.Presenter = presenter;
-				Owner.RenderChainBuilder = renderChainBuilder;
-				renderChainBuilder.Owner = Owner.AsWidget;
+			if (Owner != null && ApplyPostProcessing) {
+				AttachToNode(Owner);
 			}
+		}
+
+		private void AttachToNode(Node node)
+		{
+			node.Presenter = presenter;
+			node.RenderChainBuilder = renderChainBuilder;
+			renderChainBuilder.Owner = node.AsWidget;
+		}
+
+		private void DettachFromNode(Node node)
+		{
+			node.RenderChainBuilder = node;
+			node.Presenter = DefaultPresenter.Instance;
+			renderChainBuilder.Owner = null;
 		}
 
 		public override NodeComponent Clone()
