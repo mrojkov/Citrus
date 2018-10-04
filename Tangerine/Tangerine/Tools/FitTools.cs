@@ -98,11 +98,21 @@ namespace Tangerine
 			foreach (var widget in nodes.OfType<Widget>()) {
 				Rectangle aabb;
 				if (Utils.CalcAABB(widget.Nodes, widget, out aabb)) {
-					foreach (var w in widget.Nodes.OfType<Widget>()) {
-						Core.Operations.SetAnimableProperty.Perform(w, nameof(Widget.Position), w.Position - aabb.A);
-					}
-					foreach (var po in widget.Nodes.OfType<PointObject>()) {
-						Core.Operations.SetAnimableProperty.Perform(po, nameof(Widget.Position), po.Position - aabb.A);
+					foreach (var n in widget.Nodes) {
+						// either Position of PointObject or of Widget
+						foreach (var animator in n.Animators.Where(a => a.TargetPropertyPath == "Position")) {
+							foreach (var keyframe in animator.ReadonlyKeys.ToList()) {
+								var k = keyframe.Clone();
+								k.Value = (Vector2)k.Value - aabb.A;
+								Core.Operations.SetKeyframe.Perform(animator, k);
+							}
+						}
+						if (n is Widget w) {
+							Core.Operations.SetProperty.Perform(w, nameof(Widget.Position), w.Position - aabb.A);
+						}
+						if (n is PointObject po) {
+							Core.Operations.SetProperty.Perform(po, nameof(PointObject.Position), po.Position - aabb.A);
+						}
 					}
 					var p0 = widget.CalcTransitionToSpaceOf(container) * aabb.A;
 					Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Size), aabb.Size);
