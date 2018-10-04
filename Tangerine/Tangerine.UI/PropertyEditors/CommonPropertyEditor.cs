@@ -170,6 +170,24 @@ namespace Tangerine.UI
 			}
 		}
 
+		protected IDataflowProvider<T> PropertyValue(object o, T defaultValue = default(T))
+		{
+			var indexParameters = EditorParams.PropertyInfo.GetIndexParameters();
+			if (indexParameters.Length == 0) {
+				IDataflowProvider<T> provider = null;
+				var p = new Property<T>(o, EditorParams.PropertyName);
+				provider = (provider == null) ? p : provider.SameOrDefault(p, defaultValue);
+				return provider;
+			} else if (indexParameters.Length == 1 && indexParameters.First().ParameterType == typeof(int)) {
+				IDataflowProvider<T> provider = null;
+				var p = new IndexedProperty<T>(o, EditorParams.PropertyName, EditorParams.IndexInList);
+				provider = (provider == null) ? p : provider.SameOrDefault(p, defaultValue);
+				return provider;
+			} else {
+				throw new NotSupportedException();
+			}
+		}
+
 		protected IDataflowProvider<ComponentType> CoalescedPropertyComponentValue<ComponentType>(Func<T, ComponentType> selector, ComponentType defaultValue = default(ComponentType))
 		{
 			var indexParameters = EditorParams.PropertyInfo.GetIndexParameters();

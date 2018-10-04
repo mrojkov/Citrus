@@ -88,18 +88,8 @@ namespace Tangerine.UI
 		private List<string> GetPaths()
 		{
 			var result = new List<string>();
-			foreach (var obj in EditorParams.Objects) {
-				var animationHost = obj as IAnimationHost;
-				var owner = obj;
-				AnimationUtils.PropertyData propertyData = AnimationUtils.PropertyData.Empty;
-				if (animationHost != null) {
-					(propertyData, owner, _) = AnimationUtils.GetPropertyByPath(animationHost, EditorParams.PropertyPath);
-				}
-				if (propertyData.Info != null) {
-					result.Add(ValueToStringConverter((T)propertyData.Info.GetValue(owner)));
-				} else {
-					result.Add(ValueToStringConverter((T)owner.GetType().GetProperty(EditorParams.PropertyName).GetValue(owner)));
-				}
+			foreach (var o in EditorParams.Objects) {
+				result.Add(ValueToStringConverter(PropertyValue(o).GetValue()));
 			}
 			return result;
 		}
