@@ -545,6 +545,9 @@ namespace Lime
 		{
 			var clone = (Node)MemberwiseClone();
 			++CreatedCount;
+			// it's important to initialize AsWidget and AsNode3D as sooon as possible since following clone process may access them
+			clone.AsWidget = clone as Widget;
+			clone.AsNode3D = clone as Node3D;
 			clone.Parent = null;
 			clone.FirstAnimation = null;
 			clone.FirstChild = null;

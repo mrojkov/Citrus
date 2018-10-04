@@ -269,8 +269,7 @@ namespace Lime
 
 		public override Node Clone()
 		{
-			var clone = base.Clone() as Node3D;
-			clone.AsNode3D = clone;
+			var clone = base.Clone().AsNode3D;
 			clone.Opaque = Opaque;
 			clone.viewport = null;
 			return clone;
