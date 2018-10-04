@@ -52,6 +52,7 @@ namespace Tangerine.UI
 					}
 				}
 			};
+			Expanded = true;
 			EditorContainer.AddNode(addButton);
 			ContainerWidget.Updating += _ => removeCallback?.Invoke();
 			ContainerWidget.AddChangeWatcher(() => list?.Count ?? 0, Build);
