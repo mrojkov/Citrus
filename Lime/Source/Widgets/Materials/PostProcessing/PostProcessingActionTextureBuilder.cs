@@ -27,6 +27,7 @@ namespace Lime
 				RenderObject.SourceTextureBuffer.Texture.RestoreRenderTarget();
 				RenderObject.FinalizeOffscreenRendering();
 			}
+			RenderObject.SourceTextureBuffer.IsDirty = false;
 			RenderObject.MarkBuffersAsDirty = true;
 		}
 	}

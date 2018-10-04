@@ -12,7 +12,7 @@ namespace Lime
 		{
 			private RenderTexture finalTexture;
 
-			public bool IsDirty { get; protected set; } = true;
+			public bool IsDirty { get; set; } = true;
 
 			public Size Size { get; }
 			public RenderTexture Texture => finalTexture ?? (finalTexture = new RenderTexture(Size.Width, Size.Height));

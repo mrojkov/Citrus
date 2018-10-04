@@ -344,6 +344,7 @@ namespace Lime
 				var d = 1f / refreshSourceRate;
 				if (RefreshSourceRate == 0) {
 					RequiredRefreshSource = true;
+					refreshSourceDelta = 0;
 				} else if (refreshSourceDelta >= d) {
 					RequiredRefreshSource = true;
 					refreshSourceDelta %= d;
