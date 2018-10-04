@@ -15,7 +15,7 @@ namespace Lime
 			}
 
 			RenderObject.PrepareOffscreenRendering(RenderObject.Size);
-			RenderObject.HSLMaterial.HSL = RenderObject.HSL;
+			RenderObject.HSLMaterial.HSL = WrappedHSL(RenderObject.HSL);
 			RenderObject.RenderToTexture(RenderObject.HSLBuffer.Texture, RenderObject.ProcessedTexture, RenderObject.HSLMaterial, Color4.White, Color4.Zero);
 
 			RenderObject.HSLBuffer.SetRenderParameters(RenderObject);
@@ -31,13 +31,15 @@ namespace Lime
 
 			public Buffer(Size size) : base(size) { }
 
-			public bool EqualRenderParameters(PostProcessingRenderObject ro) => !IsDirty && hsl == ro.HSL;
+			public bool EqualRenderParameters(PostProcessingRenderObject ro) => !IsDirty && hsl == WrappedHSL(ro.HSL);
 
 			public void SetRenderParameters(PostProcessingRenderObject ro)
 			{
 				IsDirty = false;
-				hsl = ro.HSL;
+				hsl = WrappedHSL(ro.HSL);
 			}
 		}
+
+		private static Vector3 WrappedHSL(Vector3 hsl) => new Vector3(Mathf.Wrap(hsl.X, -0.5f, 0.5f), Mathf.Clamp(hsl.Y, 0f, 2f), Mathf.Clamp(hsl.Z, 0f, 2f));
 	}
 }

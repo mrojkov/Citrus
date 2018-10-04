@@ -92,7 +92,7 @@ namespace Lime
 			ro.HSLBuffer = hslBuffer;
 			ro.HSLMaterial = component.HSLMaterial;
 			ro.HSLEnabled = component.HSLEnabled;
-			ro.HSL = component.HSL;
+			ro.HSL = new Vector3(component.HSL.X * (1f / 360f), component.HSL.Y * 0.01f + 1f, component.HSL.Z * 0.01f + 1f);
 			ro.BlurBuffer = blurBuffer;
 			ro.BlurMaterial = component.BlurMaterial;
 			ro.BlurEnabled = component.BlurEnabled;

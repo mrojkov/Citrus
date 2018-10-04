@@ -19,9 +19,10 @@ namespace Lime
 		private const int MaximumTextureSize = 2048;
 		private const float MinimumTextureScaling = 0.01f;
 		private const float MaximumTextureScaling = 1f;
-		private const float MaximumHue = 1f;
-		private const float MaximumSaturation = 1f;
-		private const float MaximumLightness = 1f;
+		private const float MinimumSaturation = -100f;
+		private const float MaximumSaturation = 100f;
+		private const float MinimumLightness = -100f;
+		private const float MaximumLightness = 100f;
 		private const float MaximumBlurRadius = 30f;
 		private const float MaximumGammaCorrection = 10f;
 
@@ -34,7 +35,6 @@ namespace Lime
 		// TODO: Solve promblem of storing and restoring savedPresenter&savedRenderChainBuilder
 		private PostProcessingPresenter presenter = new PostProcessingPresenter();
 		private PostProcessingRenderChainBuilder renderChainBuilder = new PostProcessingRenderChainBuilder();
-		private Vector3 hsl = new Vector3(0, 1, 1);
 		private float blurRadius = 1f;
 		private float blurTextureScaling = 1f;
 		private float blurAlphaCorrection = 1f;
@@ -59,31 +59,33 @@ namespace Lime
 		[TangerineGroup(GroupHSL)]
 		public bool HSLEnabled { get; set; }
 
-		[YuzuMember]
+		[TangerineInspect]
 		[TangerineGroup(GroupHSL)]
 		public float Hue
 		{
-			get => hsl.X * 360f;
-			set => hsl.X = Mathf.Clamp(value / 360f, 0f, MaximumHue);
+			get => HSL.X;
+			set => HSL = new Vector3(value, HSL.Y, HSL.Z);
 		}
 
-		[YuzuMember]
+		[TangerineInspect]
 		[TangerineGroup(GroupHSL)]
 		public float Saturation
 		{
-			get => hsl.Y * 100f;
-			set => hsl.Y = Mathf.Clamp(value * 0.01f, 0f, MaximumSaturation);
+			get => HSL.Y;
+			set => HSL = new Vector3(HSL.X, Mathf.Clamp(value, MinimumSaturation, MaximumSaturation), HSL.Z);
 		}
 
-		[YuzuMember]
+		[TangerineInspect]
 		[TangerineGroup(GroupHSL)]
 		public float Lightness
 		{
-			get => hsl.Z * 100f;
-			set => hsl.Z = Mathf.Clamp(value * 0.01f, 0f, MaximumLightness);
+			get => HSL.Z;
+			set => HSL = new Vector3(HSL.X, HSL.Y, Mathf.Clamp(value, MinimumLightness, MaximumLightness));
 		}
 
-		public Vector3 HSL => hsl;
+		[YuzuMember]
+		[TangerineIgnore]
+		public Vector3 HSL { get; set; } = Vector3.Zero;
 
 		[YuzuMember]
 		[TangerineGroup(GroupBlur)]
