@@ -33,7 +33,7 @@ namespace Orange
 		private static string GetPagePath(string pageName)
 		{
 			string path = Path.Combine(
-				Toolbox.CalcCitrusDirectory(), "Tangerine", "Documentation", Path.Combine(pageName.Split('.')));
+				Toolbox.CalcCitrusDirectory(), "Tangerine", "Tangerine", "Documentation", Path.Combine(pageName.Split('.')));
 			return path + ".md";
 		}
 
