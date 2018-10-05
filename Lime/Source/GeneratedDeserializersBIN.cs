@@ -6578,25 +6578,29 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (23 == fd.OurIndex) {
+				result.OpagueRendering = d.Reader.ReadBoolean();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (24 == fd.OurIndex) {
 				dg.EnsureClassDef(typeof(global::Lime.Color4));
 				var tmp7 = new global::Lime.Color4();
 				tmp7.ABGR = d.Reader.ReadUInt32();
 				result.OverallImpactColor = tmp7;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (24 == fd.OurIndex) {
+			if (25 == fd.OurIndex) {
 				result.OverallImpactEnabled = d.Reader.ReadBoolean();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (25 == fd.OurIndex) {
+			if (26 == fd.OurIndex) {
 				result.RefreshSourceRate = d.Reader.ReadInt32();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (26 == fd.OurIndex) {
+			if (27 == fd.OurIndex) {
 				result.RefreshSourceTexture = d.Reader.ReadBoolean();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (27 == fd.OurIndex) {
+			if (28 == fd.OurIndex) {
 				dg.EnsureClassDef(typeof(global::Lime.Size));
 				var tmp8 = new global::Lime.Size();
 				tmp8.Width = d.Reader.ReadInt32();
@@ -6604,18 +6608,18 @@ namespace GeneratedDeserializersBIN
 				result.TextureSizeLimit = tmp8;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (28 == fd.OurIndex) {
+			if (29 == fd.OurIndex) {
 				dg.EnsureClassDef(typeof(global::Lime.Color4));
 				var tmp9 = new global::Lime.Color4();
 				tmp9.ABGR = d.Reader.ReadUInt32();
 				result.VignetteColor = tmp9;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (29 == fd.OurIndex) {
+			if (30 == fd.OurIndex) {
 				result.VignetteEnabled = d.Reader.ReadBoolean();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (30 == fd.OurIndex) {
+			if (31 == fd.OurIndex) {
 				dg.EnsureClassDef(typeof(global::Lime.Vector2));
 				var tmp10 = new global::Lime.Vector2();
 				tmp10.X = d.Reader.ReadSingle();
@@ -6623,11 +6627,11 @@ namespace GeneratedDeserializersBIN
 				result.VignettePivot = tmp10;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (31 == fd.OurIndex) {
+			if (32 == fd.OurIndex) {
 				result.VignetteRadius = d.Reader.ReadSingle();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (32 == fd.OurIndex) {
+			if (33 == fd.OurIndex) {
 				dg.EnsureClassDef(typeof(global::Lime.Vector2));
 				var tmp11 = new global::Lime.Vector2();
 				tmp11.X = d.Reader.ReadSingle();
@@ -6635,7 +6639,7 @@ namespace GeneratedDeserializersBIN
 				result.VignetteScale = tmp11;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (33 == fd.OurIndex) {
+			if (34 == fd.OurIndex) {
 				result.VignetteSoftness = d.Reader.ReadSingle();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
