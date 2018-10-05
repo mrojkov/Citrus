@@ -1,8 +1,13 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+
 namespace Lime
 {
 	public class NoiseMaterial : IMaterial
 	{
-		private readonly BlendState blendState;
+		private static readonly BlendState disabledBlendingState = new BlendState { Enable = false };
+
 		private readonly ShaderParams[] shaderParamsArray;
 		private readonly ShaderParams shaderParams;
 		private readonly ShaderParamKey<float> brightThresholdKey;
@@ -10,16 +15,14 @@ namespace Lime
 		private readonly ShaderParamKey<float> softLightKey;
 
 		public float BrightThreshold { get; set; } = 1f;
-		public float DarkThreshold { get; set; } = 0f;
+		public float DarkThreshold { get; set; }
 		public float SoftLight { get; set; } = 1f;
+		public bool Opaque { get; set; }
 
 		public int PassCount => 1;
 
 		public NoiseMaterial()
 		{
-			blendState = BlendState.Default;
-			blendState.SrcBlend = Blend.SrcAlpha;
-			blendState.DstBlend = Blend.InverseSrcAlpha;
 			shaderParams = new ShaderParams();
 			shaderParamsArray = new[] { Renderer.GlobalShaderParams, shaderParams };
 			brightThresholdKey = shaderParams.GetParamKey<float>("brightThreshold");
@@ -32,14 +35,18 @@ namespace Lime
 			shaderParams.Set(brightThresholdKey, BrightThreshold);
 			shaderParams.Set(darkThresholdKey, DarkThreshold);
 			shaderParams.Set(softLightKey, SoftLight);
-			PlatformRenderer.SetBlendState(blendState);
-			PlatformRenderer.SetShaderProgram(NoiseShaderProgram.GetInstance());
+			PlatformRenderer.SetBlendState(!Opaque ? Blending.Alpha.GetBlendState() : disabledBlendingState);
+			PlatformRenderer.SetShaderProgram(NoiseShaderProgram.GetInstance(Opaque));
 			PlatformRenderer.SetShaderParams(shaderParamsArray);
 		}
 
 		public void Invalidate() { }
 
-		public IMaterial Clone() => new NoiseMaterial();
+		public IMaterial Clone() => new NoiseMaterial {
+			BrightThreshold = BrightThreshold,
+			DarkThreshold = DarkThreshold,
+			SoftLight = SoftLight
+		};
 	}
 
 	public class NoiseShaderProgram : ShaderProgram
@@ -64,7 +71,7 @@ namespace Lime
 				texCoords2 = inTexCoords2;
 			}";
 
-		private const string FragmentShader = @"
+		private const string FragmentShaderPart1 = @"
 			varying lowp vec4 color;
 			varying lowp vec2 texCoords1;
 			varying lowp vec2 texCoords2;
@@ -92,20 +99,35 @@ namespace Lime
 				lowp float brightCheck = sign(max(0.0, brightThreshold - luminance));
 				lowp float darkCheck = sign(max(0.0, luminance - darkThreshold));
 
-				lowp vec3 c = blendSoftLight(srcColor.rgb * color.rgb, noiseColor.rgb, softLight * brightCheck * darkCheck);
+				lowp vec3 c = blendSoftLight(srcColor.rgb * color.rgb, noiseColor.rgb, softLight * brightCheck * darkCheck);";
+		private const string FragmentShaderPart2 = @"
 				gl_FragColor = vec4(c.rgb, srcColor.a * color.a);
-			}
-			";
+			}";
+		private const string FragmentShaderPart2Opaque = @"
+				gl_FragColor = vec4(c.rgb, 1.0);
+			}";
 
-		private static NoiseShaderProgram instance;
+		private static readonly Dictionary<int, NoiseShaderProgram> instances = new Dictionary<int, NoiseShaderProgram>();
 
-		public static NoiseShaderProgram GetInstance() => instance ?? (instance = new NoiseShaderProgram());
+		private static int GetInstanceKey(bool opaque) => opaque ? 1 : 0;
 
-		private NoiseShaderProgram() : base(CreateShaders(), ShaderPrograms.Attributes.GetLocations(), ShaderPrograms.GetSamplers()) { }
+		public static NoiseShaderProgram GetInstance(bool opaque = false)
+		{
+			var key = GetInstanceKey(false);
+			return instances.TryGetValue(key, out var shaderProgram) ? shaderProgram : (instances[key] = new NoiseShaderProgram(opaque));
+		}
 
-		private static Shader[] CreateShaders() => new Shader[] {
-			new VertexShader(VertexShader),
-			new FragmentShader(FragmentShader)
-		};
+		private NoiseShaderProgram(bool opaque) : base(CreateShaders(opaque), ShaderPrograms.Attributes.GetLocations(), ShaderPrograms.GetSamplers()) { }
+
+		private static Shader[] CreateShaders(bool opaque)
+		{
+			var fragmentShader = new StringBuilder(FragmentShaderPart1.Length + Math.Max(FragmentShaderPart2.Length, FragmentShaderPart2Opaque.Length));
+			fragmentShader.Append(FragmentShaderPart1);
+			fragmentShader.Append(!opaque ? FragmentShaderPart2 : FragmentShaderPart2Opaque);
+			return new Shader[] {
+				new VertexShader(VertexShader),
+				new FragmentShader(fragmentShader.ToString())
+			};
+		}
 	}
 }

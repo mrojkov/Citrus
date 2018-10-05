@@ -24,6 +24,7 @@ namespace Lime
 		public bool MarkBuffersAsDirty;
 		public PostProcessingAction.Buffer SourceTextureBuffer;
 		public float SourceTextureScaling;
+		public bool OpagueRendering;
 		public PostProcessingAction.Buffer FirstTemporaryBuffer;
 		public PostProcessingAction.Buffer SecondTemporaryBuffer;
 		public PostProcessingActionHSL.Buffer HSLBuffer;
@@ -66,8 +67,9 @@ namespace Lime
 		public Vector2 VignetteScale;
 		public Vector2 VignettePivot;
 		public Color4 VignetteColor;
-		public IMaterial DefaultMaterial;
-		public IMaterial BlendingAddMaterial;
+		public IMaterial AlphaDiffuseMaterial;
+		public IMaterial AddDiffuseMaterial;
+		public IMaterial OpaqueDiffuseMaterial;
 
 		public bool IsNotDebugViewMode => DebugViewMode == PostProcessingPresenter.DebugViewMode.None;
 
@@ -90,8 +92,9 @@ namespace Lime
 			NoiseMaterial = null;
 			VignetteMaterial = null;
 			TransparentTexture = null;
-			DefaultMaterial = null;
-			BlendingAddMaterial = null;
+			AlphaDiffuseMaterial = null;
+			AddDiffuseMaterial = null;
+			OpaqueDiffuseMaterial = null;
 		}
 
 		public override void Render()

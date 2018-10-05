@@ -21,6 +21,7 @@ namespace Lime
 			RenderObject.BlurMaterial.Step = RenderObject.ProcessedUV1 * RenderObject.BlurTextureScaling / RenderObject.CurrentBufferSize;
 			RenderObject.BlurMaterial.Dir = Vector2.Down;
 			RenderObject.BlurMaterial.AlphaCorrection = RenderObject.BlurAlphaCorrection;
+			RenderObject.BlurMaterial.Opaque = RenderObject.OpagueRendering;
 			RenderObject.RenderToTexture(RenderObject.FirstTemporaryBuffer.Texture, RenderObject.ProcessedTexture, RenderObject.BlurMaterial, Color4.White, RenderObject.BlurBackgroundColor);
 			RenderObject.CurrentBufferSize = (Vector2)RenderObject.BlurBuffer.Size;
 			RenderObject.ProcessedUV1 = (Vector2)RenderObject.ViewportSize / RenderObject.CurrentBufferSize;
@@ -38,6 +39,7 @@ namespace Lime
 			private float textureScaling = float.NaN;
 			private float alphaCorrection = float.NaN;
 			private Color4 backgroundColor = Color4.Zero;
+			private bool opaque;
 
 			public Buffer(Size size) : base(size) { }
 
@@ -46,7 +48,8 @@ namespace Lime
 				radius == ro.BlurRadius &&
 				textureScaling == ro.BlurTextureScaling &&
 				alphaCorrection == ro.BlurAlphaCorrection &&
-				backgroundColor == ro.BlurBackgroundColor;
+				backgroundColor == ro.BlurBackgroundColor &&
+				opaque == ro.OpagueRendering;
 
 			public void SetRenderParameters(PostProcessingRenderObject ro)
 			{
@@ -55,6 +58,7 @@ namespace Lime
 				textureScaling = ro.BlurTextureScaling;
 				alphaCorrection = ro.BlurAlphaCorrection;
 				backgroundColor = ro.BlurBackgroundColor;
+				opaque = ro.OpagueRendering;
 			}
 		}
 	}

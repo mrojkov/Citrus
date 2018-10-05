@@ -6,12 +6,14 @@ namespace Lime
 	{
 		private readonly PostProcessingAction[] postProcessingActions;
 		private readonly RenderChain renderChain = new RenderChain();
-		private readonly IMaterial defaultMaterial = WidgetMaterial.GetInstance(Blending.Inherited, ShaderId.Inherited, 1);
-		private readonly IMaterial blendingAddMaterial = WidgetMaterial.GetInstance(Blending.Add, ShaderId.Inherited, 1);
+		private readonly IMaterial alphaDiffuseMaterial = WidgetMaterial.GetInstance(Blending.Alpha, ShaderId.Diffuse, 1);
+		private readonly IMaterial addDiffuseMaterial = WidgetMaterial.GetInstance(Blending.Add, ShaderId.Diffuse, 1);
+		private readonly IMaterial opaqueDiffuseMaterial = WidgetMaterial.GetInstance(Blending.Opaque, ShaderId.Diffuse, 1);
 		private readonly Texture2D transparentTexture;
 		private IMaterial material;
 		private Blending blending;
 		private ShaderId shader;
+		private bool opaque;
 		private PostProcessingAction.Buffer sourceTextureBuffer;
 		private PostProcessingAction.Buffer firstTemporaryBuffer;
 		private PostProcessingAction.Buffer secondTemporaryBuffer;
@@ -75,7 +77,7 @@ namespace Lime
 			}
 
 			ro.PostProcessingActions = postProcessingActions;
-			ro.Material = GetMaterial(widget);
+			ro.Material = GetMaterial(widget, component);
 			ro.LocalToWorldTransform = widget.LocalToWorldTransform;
 			ro.Position = widget.ContentPosition;
 			ro.Size = widget.ContentSize;
@@ -87,6 +89,7 @@ namespace Lime
 			ro.MarkBuffersAsDirty = false;
 			ro.SourceTextureBuffer = sourceTextureBuffer;
 			ro.SourceTextureScaling = sourceTextureScaling;
+			ro.OpagueRendering = component.OpagueRendering;
 			ro.FirstTemporaryBuffer = firstTemporaryBuffer;
 			ro.SecondTemporaryBuffer = secondTemporaryBuffer;
 			ro.HSLBuffer = hslBuffer;
@@ -129,19 +132,22 @@ namespace Lime
 			ro.VignetteScale = component.VignetteScale;
 			ro.VignettePivot = component.VignettePivot;
 			ro.VignetteColor = component.VignetteColor;
-			ro.DefaultMaterial = defaultMaterial;
-			ro.BlendingAddMaterial = blendingAddMaterial;
+			ro.AlphaDiffuseMaterial = alphaDiffuseMaterial;
+			ro.AddDiffuseMaterial = addDiffuseMaterial;
+			ro.OpaqueDiffuseMaterial = opaqueDiffuseMaterial;
 			return ro;
 		}
 
-		private IMaterial GetMaterial(Widget widget)
+		private IMaterial GetMaterial(Widget widget, PostProcessingComponent component)
 		{
-			if (material != null && blending == widget.GlobalBlending && shader == widget.GlobalShader) {
+			if (material != null && blending == widget.GlobalBlending && shader == widget.GlobalShader && opaque == component.OpagueRendering) {
 				return material;
 			}
 			blending = widget.GlobalBlending;
 			shader = widget.GlobalShader;
-			return material = WidgetMaterial.GetInstance(blending, shader, 1);
+			opaque = component.OpagueRendering;
+			var isOpaqueRendering = opaque && blending == Blending.Inherited;
+			return material = WidgetMaterial.GetInstance(!isOpaqueRendering ? blending : Blending.Opaque, shader, 1);
 		}
 
 		// TODO: Fix HitTest of child nodes

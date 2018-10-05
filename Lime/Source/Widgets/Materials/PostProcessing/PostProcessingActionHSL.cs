@@ -16,6 +16,7 @@ namespace Lime
 
 			RenderObject.PrepareOffscreenRendering(RenderObject.Size);
 			RenderObject.HSLMaterial.HSL = WrappedHSL(RenderObject.HSL);
+			RenderObject.HSLMaterial.Opaque = RenderObject.OpagueRendering;
 			RenderObject.RenderToTexture(RenderObject.HSLBuffer.Texture, RenderObject.ProcessedTexture, RenderObject.HSLMaterial, Color4.White, Color4.Zero);
 
 			RenderObject.HSLBuffer.SetRenderParameters(RenderObject);
@@ -28,15 +29,17 @@ namespace Lime
 		internal new class Buffer : PostProcessingAction.Buffer
 		{
 			private Vector3 hsl = new Vector3(float.NaN, float.NaN, float.NaN);
+			private bool opaque;
 
 			public Buffer(Size size) : base(size) { }
 
-			public bool EqualRenderParameters(PostProcessingRenderObject ro) => !IsDirty && hsl == WrappedHSL(ro.HSL);
+			public bool EqualRenderParameters(PostProcessingRenderObject ro) => !IsDirty && hsl == WrappedHSL(ro.HSL) && opaque == ro.OpagueRendering;
 
 			public void SetRenderParameters(PostProcessingRenderObject ro)
 			{
 				IsDirty = false;
 				hsl = WrappedHSL(ro.HSL);
+				opaque = ro.OpagueRendering;
 			}
 		}
 

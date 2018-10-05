@@ -321,6 +321,10 @@ namespace Lime
 
 		[YuzuMember]
 		[TangerineGroup(GroupSourceTexture)]
+		public bool OpagueRendering { get; set; }
+
+		[YuzuMember]
+		[TangerineGroup(GroupSourceTexture)]
 		public bool RefreshSourceTexture
 		{
 			get => refreshSourceTexture;
