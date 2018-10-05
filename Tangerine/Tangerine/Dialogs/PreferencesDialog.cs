@@ -345,6 +345,8 @@ namespace Tangerine
 					new PreferencesPropertyEditorParams(pane.Content, CoreUserPreferences.Instance, propertyName: nameof(CoreUserPreferences.DontPasteAtMouse),  displayName: "Don't paste at mouse pointer")),
 				new BooleanPropertyEditor(
 					new PreferencesPropertyEditorParams(pane.Content, CoreUserPreferences.Instance, propertyName: nameof(CoreUserPreferences.InverseShiftKeyframeDrag), displayName: "Inverse Shift behaviour when dragging keyframes")),
+				new BooleanPropertyEditor(
+					new PreferencesPropertyEditorParams(pane.Content, CoreUserPreferences.Instance, propertyName: nameof(CoreUserPreferences.SwapMouseButtonsForKeyframeSwitch), displayName: "Swap mouse buttons for keyframe switch")),
 			});
 			var boneWidthPropertyEditor =
 				new FloatPropertyEditor(

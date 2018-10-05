@@ -89,12 +89,17 @@ namespace Tangerine.UI.Inspector
 				if (kf.HasValue) {
 					button.SetKeyFunction(kf.Value);
 				}
-				if (button.WasClicked()) {
+				bool wasClicked = button.WasClicked();
+				bool wasRightClicked = button.WasRightClicked();
+				if (CoreUserPreferences.Instance.SwapMouseButtonsForKeyframeSwitch) {
+					Toolbox.Swap(ref wasClicked, ref wasRightClicked);
+				}
+				if (wasClicked) {
 					Document.Current.History.DoTransaction(() => {
 						SetKeyframe(!kf.HasValue);
 					});
 				}
-				if (button.WasRightClicked()) {
+				if (wasRightClicked) {
 					if (kf.HasValue) {
 						var nextKeyFunction = NextKeyFunction(kf.GetValueOrDefault());
 						Document.Current.History.DoTransaction(() => {

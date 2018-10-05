@@ -26,6 +26,9 @@ namespace Tangerine.Core
 		[YuzuOptional]
 		public bool InverseShiftKeyframeDrag { get; set; }
 
+		[YuzuOptional]
+		public bool SwapMouseButtonsForKeyframeSwitch { get; set; }
+
 		public CoreUserPreferences()
 		{
 			ResetToDefaults();
