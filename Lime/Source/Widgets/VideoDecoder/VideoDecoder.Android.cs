@@ -82,45 +82,49 @@ namespace Lime
 			state = State.Initializing;
 			Window.Current.InvokeOnRendering(() => {
 				try {
-					videoExtractor = new MediaExtractor();
-					videoExtractor.SetDataSource(path);
-					videoTrack = SelectTrack(videoExtractor, "video/");
-					if (videoTrack < 0) {
-						throw new System.Exception("Video WOOPS");
+					try {
+						videoExtractor = new MediaExtractor();
+						videoExtractor.SetDataSource(path);
+						videoTrack = SelectTrack(videoExtractor, "video/");
+						if (videoTrack < 0) {
+							throw new System.Exception("Video WOOPS");
+						}
+						videoFormat = videoExtractor.GetTrackFormat(videoTrack);
+						videoCodec = MediaCodec.CreateDecoderByType(videoFormat.GetString(MediaFormat.KeyMime));
+						renderer = new SurfaceTextureRenderer();
+						videoCodec.Configure(videoFormat, renderer.Surface, null, MediaCodecConfigFlags.None);
+						texture = new RenderTexture(Width, Height);
+					} catch {
+						Lime.Debug.Write("Init video track");
 					}
-					videoFormat = videoExtractor.GetTrackFormat(videoTrack);
-					videoCodec = MediaCodec.CreateDecoderByType(videoFormat.GetString(MediaFormat.KeyMime));
-					renderer = new SurfaceTextureRenderer();
-					videoCodec.Configure(videoFormat, renderer.Surface, null, MediaCodecConfigFlags.None);
-					texture = new RenderTexture(Width, Height);
-				} catch {
-					Lime.Debug.Write("Init video track");
-				}
 
-				try {
-					audioExtractor = new MediaExtractor();
-					audioExtractor.SetDataSource(path);
-					audioTrack = SelectTrack(audioExtractor, "audio/");
-					if (audioTrack < 0) {
-						throw new System.Exception("Audio WOOPS");
+					try {
+						audioExtractor = new MediaExtractor();
+						audioExtractor.SetDataSource(path);
+						audioTrack = SelectTrack(audioExtractor, "audio/");
+						if (audioTrack < 0) {
+							throw new System.Exception("Audio WOOPS");
+						}
+						audioFormat = audioExtractor.GetTrackFormat(audioTrack);
+						var sampleRate = audioFormat.GetInteger(MediaFormat.KeySampleRate);
+						audioCodec = MediaCodec.CreateDecoderByType(audioFormat.GetString(MediaFormat.KeyMime));
+						audioCodec.Configure(audioFormat, null, null, MediaCodecConfigFlags.None);
+						var bufferSize = AudioTrack.GetMinBufferSize(sampleRate, ChannelOut.Stereo, Android.Media.Encoding.Pcm16bit);
+						audio = new AudioTrack(
+							global::Android.Media.Stream.Music,
+							sampleRate,
+							ChannelOut.Stereo,
+							Android.Media.Encoding.Pcm16bit,
+							bufferSize,
+							AudioTrackMode.Stream
+						);
+					} catch {
+						Lime.Debug.Write("Init audio track");
 					}
-					audioFormat = audioExtractor.GetTrackFormat(audioTrack);
-					var sampleRate = audioFormat.GetInteger(MediaFormat.KeySampleRate);
-					audioCodec = MediaCodec.CreateDecoderByType(audioFormat.GetString(MediaFormat.KeyMime));
-					audioCodec.Configure(audioFormat, null, null, MediaCodecConfigFlags.None);
-					var bufferSize = AudioTrack.GetMinBufferSize(sampleRate, ChannelOut.Stereo, Android.Media.Encoding.Pcm16bit);
-					audio = new AudioTrack(
-						global::Android.Media.Stream.Music,
-						sampleRate,
-						ChannelOut.Stereo,
-						Android.Media.Encoding.Pcm16bit,
-						bufferSize,
-						AudioTrackMode.Stream
-					);
+					state = State.Initialized;
 				} catch {
-					Lime.Debug.Write("Init audio track");
+					Lime.Debug.Write("Init player");
 				}
-				state = State.Initialized;
 			});
 		}
 
