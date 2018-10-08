@@ -343,12 +343,16 @@ namespace Lime
 		/// </summary>
 		public Animation DefaultAnimation
 		{
-			get
-			{
-				if (FirstAnimation == null) {
-					Animations.Add(new Animation());
+			get {
+				Animation a;
+				for (a = FirstAnimation; a != null; a = a.Next) {
+					if (a.IsLegacy) {
+						return a;
+					}
 				}
-				return FirstAnimation;
+				a = new Animation() { IsLegacy = true };
+				Animations.Add(a);
+				return a;
 			}
 		}
 
@@ -374,10 +378,186 @@ namespace Lime
 
 		[YuzuMember]
 		[YuzuSerializeIf(nameof(NeedSerializeAnimations))]
+		[TangerineIgnore]
 		public AnimationCollection Animations { get; private set; }
 
+#if TANGERINE
+		public class TangerineAnimationCollection : IList<Animation>, IList
+		{
+			private Node owner;
+
+			public Animation this[int index]
+			{
+				get => owner.Animations[ToInternalIndex(index)];
+				set => owner.Animations[ToInternalIndex(index)] = value;
+			}
+
+			public int Count
+			{
+				get {
+					var count = 0;
+					foreach (var a in owner.Animations) {
+						if (!a.IsLegacy) {
+							count++;
+						}
+					}
+					return count;
+				}
+			}
+
+			public bool IsReadOnly => false;
+
+			bool IList.IsReadOnly => false;
+
+			bool IList.IsFixedSize => false;
+
+			int ICollection.Count => Count;
+
+			object ICollection.SyncRoot => this;
+
+			bool ICollection.IsSynchronized => false;
+
+			object IList.this[int index]
+			{
+				get => this[index];
+				set => this[index] = (Animation)value;
+			}
+
+			internal TangerineAnimationCollection(Node owner)
+			{
+				this.owner = owner;
+			}
+
+			public void Add(Animation item)
+			{
+				if (item != null && item.IsLegacy) {
+					throw new ArgumentException(nameof(item));
+				}
+				owner.Animations.Add(item);
+			}
+
+			public void Clear()
+			{
+				while (Count > 0) {
+					RemoveAt(Count - 1);
+				}
+			}
+
+			public bool Contains(Animation item)
+			{
+				return item != null && !item.IsLegacy && owner.Animations.Contains(item);
+			}
+
+			public void CopyTo(Animation[] array, int arrayIndex)
+			{
+				throw new NotImplementedException();
+			}
+
+			public int IndexOf(Animation item)
+			{
+				if (item != null && !item.IsLegacy) {
+					return FromInternalIndex(owner.Animations.IndexOf(item));
+				}
+				return -1;
+			}
+
+			public void Insert(int index, Animation item)
+			{
+				if (item != null && item.IsLegacy) {
+					throw new ArgumentException(nameof(item));
+				}
+				owner.Animations.Insert(ToInternalIndex(index), item);
+			}
+
+			public bool Remove(Animation item)
+			{
+				return item != null && !item.IsLegacy && owner.Animations.Remove(item);
+			}
+
+			public void RemoveAt(int index)
+			{
+				owner.Animations.RemoveAt(ToInternalIndex(index));
+			}
+
+			public IEnumerator<Animation> GetEnumerator()
+			{
+				foreach (var a in owner.Animations) {
+					if (!a.IsLegacy) {
+						yield return a;
+					}
+				}
+			}
+
+			IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+			private int FromInternalIndex(int index)
+			{
+				var j = 0;
+				for (var i = 0; i < index; i++) {
+					if (!owner.Animations[i].IsLegacy) {
+						j++;
+					}
+				}
+				return j;
+			}
+
+			private int ToInternalIndex(int index)
+			{
+				var i = 0;
+				while (true) {
+					if (i == owner.Animations.Count || !owner.Animations[i].IsLegacy) {
+						index--;
+						if (index < 0) {
+							return i;
+						}
+					}
+					i++;
+				}
+			}
+
+			int IList.Add(object value)
+			{
+				Add((Animation)value);
+				return Count - 1;
+			}
+
+			bool IList.Contains(object value)
+			{
+				return value is Animation a && Contains(a);
+			}
+
+			int IList.IndexOf(object value)
+			{
+				if (value is Animation a) {
+					return IndexOf(a);
+				}
+				return -1;
+			}
+
+			void IList.Insert(int index, object value)
+			{
+				Insert(index, (Animation)value);
+			}
+
+			void IList.Remove(object value)
+			{
+				if (value is Animation a) {
+					Remove(a);
+				}
+			}
+
+			void ICollection.CopyTo(Array array, int index)
+			{
+				CopyTo((Animation[])array, index);
+			}
+		}
+
+		[TangerineInspect]
+		public TangerineAnimationCollection TangerineAnimations { get; private set;  }
+#endif
+
 		public bool NeedSerializeAnimations() =>
-			Animations.Count > 1 || (Animations.Count == 1 && (FirstAnimation.Id != null || FirstAnimation.Markers.Count > 0));
+			Animations.Count > 1 || (Animations.Count == 1 && (!FirstAnimation.IsLegacy || FirstAnimation.Markers.Count > 0));
 
 		[TangerineIgnore]
 		[YuzuMember]
@@ -428,6 +608,9 @@ namespace Lime
 			Components = new NodeComponentCollection(this);
 			Animators = new AnimatorCollection(this);
 			Animations = new AnimationCollection(this);
+#if TANGERINE
+			TangerineAnimations = new TangerineAnimationCollection(this);
+#endif
 			Nodes = new NodeList(this);
 			Presenter = DefaultPresenter.Instance;
 			RenderChainBuilder = this;
@@ -556,6 +739,9 @@ namespace Lime
 			clone.NextSibling = null;
 			clone.gestures = null;
 			clone.Animations = Animations.Clone(clone);
+#if TANGERINE
+			clone.TangerineAnimations = new TangerineAnimationCollection(clone);
+#endif
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
 			clone.Nodes = Nodes.Clone(clone);
 			clone.Behaviours = NodeComponentCollection.EmptyBehaviors;

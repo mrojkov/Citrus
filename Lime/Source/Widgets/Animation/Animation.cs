@@ -21,6 +21,10 @@ namespace Lime
 		[YuzuMember]
 		public string Id { get; set; }
 
+		[YuzuMember]
+		[TangerineIgnore]
+		public bool IsLegacy { get; set; }
+
 		public double Time
 		{
 			get { return TimeInternal; }
@@ -82,15 +86,16 @@ namespace Lime
 					animators.Add(animator);
 				}
 			}
-			if (Id != null) {
-				foreach (var animation in node.Animations) {
-					if (animation.Id == Id) {
-						return;
-					}
+			if (IsLegacy) {
+				return;
+			}
+			foreach (var animation in node.Animations) {
+				if (animation.Id == Id) {
+					return;
 				}
-				foreach (var child in node.Nodes) {
-					FindAnimators(child, animators);
-				}
+			}
+			foreach (var child in node.Nodes) {
+				FindAnimators(child, animators);
 			}
 		}
 

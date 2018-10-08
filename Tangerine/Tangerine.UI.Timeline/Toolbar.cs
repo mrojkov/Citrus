@@ -52,6 +52,7 @@ namespace Tangerine.UI.Timeline
 				}
 			};
 			ddl.AddChangeWatcher(() => CalcAnimationIdsHash(), _ => RefreshSelector(ddl));
+			ddl.AddChangeWatcher(() => Document.Current.SelectedAnimation, _ => RefreshSelectedAnimation(ddl));
 			return ddl;
 		}
 
@@ -63,15 +64,25 @@ namespace Tangerine.UI.Timeline
 				GetAnimations(tmpAnimations);
 				ddl.Items.Clear();
 				foreach (var a in tmpAnimations) {
-					var item = a.Id != null
-						? new CommonDropDownList.Item(a.Id, a)
-						: new CommonDropDownList.Item("Primary", null);
+					var item = a.IsLegacy
+						? new CommonDropDownList.Item(a.Id ?? "Primary", null)
+						: new CommonDropDownList.Item(a.Id, a);
 					ddl.Items.Add(item);
 				}
-				ddl.Text = Document.Current.SelectedAnimation?.Id ?? "Primary";
+				RefreshSelectedAnimation(ddl);
 			} finally {
 				tmpAnimations.Clear();
 			}
+		}
+
+		void RefreshSelectedAnimation(CommonDropDownList ddl)
+		{
+			var currentAnimation = Document.Current.Animation;
+			var currentAnimationId = currentAnimation.Id;
+			if (currentAnimationId == null && currentAnimation.IsLegacy) {
+				currentAnimationId = "Primary";
+			}
+			ddl.Text = currentAnimationId;
 		}
 
 		int CalcAnimationIdsHash()
@@ -94,8 +105,9 @@ namespace Tangerine.UI.Timeline
 		void GetAnimations(List<Animation> animations)
 		{
 			var ancestor = Document.Current.Container;
+			animations.Add(ancestor.DefaultAnimation);
 			while (true) {
-				foreach (var a in ancestor.Animations) {
+				foreach (var a in ancestor.TangerineAnimations) {
 					var found = false;
 					foreach (var other in animations) {
 						found = other.Id == a.Id;

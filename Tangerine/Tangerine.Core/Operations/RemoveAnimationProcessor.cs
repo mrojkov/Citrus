@@ -7,7 +7,7 @@ namespace Tangerine.Core.Operations
 	{
 		protected override void InternalDo(RemoveFromList op)
 		{
-			if (op.List is AnimationCollection animations) {
+			if (op.List is Node.TangerineAnimationCollection animations) {
 				var animators = new List<IAnimator>();
 				var animation = animations[op.Index];
 				animation.FindAnimators(animators);
