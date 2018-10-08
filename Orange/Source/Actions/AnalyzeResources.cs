@@ -131,7 +131,10 @@ namespace Orange
 							checkAnimators(w);
 						} else if (j is ParticleModifier) {
 							var pm = j as Lime.ParticleModifier;
-							checkTexture(pm.Texture);
+							var serializableTexture = pm.Texture as SerializableTexture;
+							if (serializableTexture != null) {
+								checkTexture(serializableTexture);
+							}
 							checkAnimators(pm);
 						} else if (j is Lime.Audio) {
 							var au = j as Lime.Audio;

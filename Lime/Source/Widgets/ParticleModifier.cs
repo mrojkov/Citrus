@@ -60,11 +60,11 @@ namespace Lime
 		[TangerineKeyframeColor(14)]
 		public bool LoopedAnimation { get; set; }
 
-		SerializableTexture texture = new SerializableTexture();
+		ITexture texture = new SerializableTexture();
 
 		[YuzuMember]
 		[TangerineKeyframeColor(27)]
-		public SerializableTexture Texture { get { return texture; } set { texture = value; textures = null; } }
+		public ITexture Texture { get { return texture; } set { texture = value; textures = null; } }
 
 		public ParticleModifier()
 		{
@@ -111,9 +111,9 @@ namespace Lime
 			if (FirstFrame == LastFrame) {
 				return texture;
 			}
-			if (textures == null) {
+			if (textures == null && texture is SerializableTexture st) {
 				textures = new List<SerializableTexture>();
-				var path = texture.SerializationPath;
+				var path = st.SerializationPath;
 				for (int i = 0; i < 100; i++) {
 					if (!ChangeTextureFrameIndex(ref path, i))
 						break;

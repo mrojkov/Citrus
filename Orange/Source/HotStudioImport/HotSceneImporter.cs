@@ -313,9 +313,10 @@ namespace Orange
 			ParticleModifier pm = (ParticleModifier)node;
 			switch (name) {
 			case "TexturePath":
-				pm.Texture = new SerializableTexture(lexer.ParsePath());
+				var st = new SerializableTexture(lexer.ParsePath());
+				pm.Texture = st;
 				try {
-					var path = Path.ChangeExtension(pm.Texture.SerializationPath, "png");
+					var path = Path.ChangeExtension(st.SerializationPath, "png");
 					using (var s = isTangerine
 						? AssetBundle.Current.OpenFile(Lime.Yuzu.Current?.ExpandPath(path) ?? path)
 						: System.IO.File.OpenRead(path)) {
@@ -324,7 +325,7 @@ namespace Orange
 						}
 					}
 				} catch (System.Exception e) {
-					Console.WriteLine($"Warning: can't extract size for particle modifier from {pm.Texture.SerializationPath}, {e.Message}");
+					Console.WriteLine($"Warning: can't extract size for particle modifier from {st.SerializationPath}, {e.Message}");
 				}
 				break;
 			case "FirstFrame":
