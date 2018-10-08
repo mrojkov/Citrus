@@ -21,7 +21,7 @@ namespace Lime
 
 		public static ThreadLocal<Yuzu> Instance { get; } = new ThreadLocal<Yuzu>(() => new Yuzu());
 
-		private static Stack<string> pathStack = new Stack<string>();
+		private Stack<string> pathStack = new Stack<string>();
 
 		public readonly List<Serialization.DeserializerBuilder> DeserializerBuilders = new List<Serialization.DeserializerBuilder>();
 
