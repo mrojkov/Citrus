@@ -15,6 +15,7 @@ namespace Lime
 		public bool Looped = false;
 		public ITexture Texture => null;
 		public Action OnStart;
+		public VideoPlayerStatus Status = VideoPlayerStatus.Success;
 
 		public VideoDecoder(string path)
 		{
