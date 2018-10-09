@@ -3,9 +3,8 @@ using System.ComponentModel.Composition;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
-using Orange;
 
-namespace Kill3.OrangePlugin
+namespace Orange
 {
 	public static class UpdateXCodeProject
 	{
@@ -24,11 +23,11 @@ namespace Kill3.OrangePlugin
 			if (builder.Build(output)) {
 				The.UI.ScrollLogToEnd();
 				string allText = output.ToString();
+				var appPath = GetGeneratedAppPath(allText);
 				foreach (var line in allText.Split('\n')) {
 					if (line.Contains("/bin/mtouch")) {
 						var mtouch = line;
 						GenerateUnsignedBinary(mtouch);
-						var appPath = GetGeneratedAppPath(mtouch);
 						var dstPath = GetXCodeProjectDataFolder();
 						CopyContent(appPath, dstPath);
 						CopyDSYM(appPath, Path.GetDirectoryName(dstPath));
@@ -101,15 +100,31 @@ namespace Kill3.OrangePlugin
 			return p;
 		}
 
-		private static string GetGeneratedAppPath(string mtouch)
+		private static string GetGeneratedAppPath(string allText)
 		{
-			var pattern = @"(?<q1>""?)-{1,2}dev[ =](?<q2>""?)(?<path>.*?)(\k<q2>)(\k<q1>)( |$)";
-			var match = Regex.Match(mtouch, pattern);
+			string result = null;
+			foreach (var line in allText.Split('\n')) {
+				if (line.Contains ("/bin/mtouch")) {
+					var pattern = @"(?<q1>""?)-{1,2}dev[ =](?<q2>""?)(?<path>.*?)(\k<q2>)(\k<q1>)( |$)";
+					var match = Regex.Match(line, pattern);
+					if (match.Success) {
+						result = match.Groups["path"].Value;
+					}
+				}
+			}
 
-			if (match.Success) {
-				return match.Groups["path"].Value;
+			if (result == null) {
+				foreach (var line in allText.Split('\n')) {
+					if (line.Contains("Tool /usr/bin/codesign execution started")) {
+						result = line.Substring(line.LastIndexOf(" ", StringComparison.Ordinal) + 1);
+					}
+				}
+			}
+
+			if (result == null) {
+				throw new Lime.Exception("Can't find generated application path.");
 			} else {
-				throw new Exception("Failed to parse mtouch args for app path");
+				return result;
 			}
 		}
 
