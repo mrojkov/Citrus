@@ -41,7 +41,11 @@ namespace Tangerine.UI.SceneView
 		private static IEnumerator<object> Drag()
 		{
 			var initialMousePos = SceneView.MousePosition;
-			while ((SceneView.MousePosition - initialMousePos).Length <= Threshold && SceneView.Input.IsMousePressed()) {
+			while (
+				SceneView.Input.IsKeyPressed(Key.Alt) &&
+				(SceneView.MousePosition - initialMousePos).Length <= Threshold &&
+				SceneView.Input.IsMousePressed()
+			) {
 				Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 				yield return null;
 			}
