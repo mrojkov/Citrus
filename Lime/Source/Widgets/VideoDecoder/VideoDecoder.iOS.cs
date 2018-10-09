@@ -96,9 +96,20 @@ namespace Lime
 
 				var workTask = System.Threading.Tasks.Task.Run(() => {
 					while (true) {
+						var time = CMTime.FromSeconds(currentPosition, 1000);
+						while (!videoOutput.HasNewPixelBufferForItemTime(time)) {
+							checkVideoEvent.WaitOne();
+							checkVideoEvent.Reset();
+							stopDecodeCancelationToken.ThrowIfCancellationRequested();
+							time = CMTime.FromSeconds(currentPosition, 1000);
+						}
 						var timeForDisplay = default(CMTime);
-						var pixelBuffer = videoOutput.CopyPixelBuffer(playerItem.CurrentTime, ref timeForDisplay);
-
+						var pixelBuffer = videoOutput.CopyPixelBuffer(time, ref timeForDisplay);
+						while (currentPosition < timeForDisplay.Seconds) {
+							checkVideoEvent.WaitOne();
+							checkVideoEvent.Reset();
+							stopDecodeCancelationToken.ThrowIfCancellationRequested();
+						}
 						lock (locker) {
 							if (currentPixelBuffer != null) {
 								currentPixelBuffer.Dispose();
