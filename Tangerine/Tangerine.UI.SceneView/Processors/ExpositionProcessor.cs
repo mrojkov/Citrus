@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using Lime;
@@ -83,7 +83,7 @@ namespace Tangerine.UI.SceneView
 			static Frame CreateItemFrame(int index, Widget canvas, Vector2 cellSize)
 			{
 				var rect = GetPlacementRect(index, cellSize, canvas.Size);
-				var frame = new Frame { Position = rect.A, Size = cellSize };
+				var frame = new Frame { Position = new Vector2(rect.A.X.Round(), rect.A.Y.Round()), Size = cellSize };
 				canvas.AddNode(frame);
 				return frame;
 			}
@@ -189,7 +189,6 @@ namespace Tangerine.UI.SceneView
 						Text = (exposedWidget.Id ?? ""),
 						OverflowMode = TextOverflowMode.Ignore
 					};
-					label.FontHeight *= 0.75f;
 					frame.AddNode(label);
 					frame.AddNode(exposedWidget);
 					borderPresenter = new WidgetBoundsPresenter(ColorTheme.Current.SceneView.ExposedItemInactiveBorder, 1);
