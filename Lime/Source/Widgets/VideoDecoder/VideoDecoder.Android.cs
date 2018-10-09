@@ -29,11 +29,11 @@ namespace Lime
 		public bool Looped = false;
 		public ITexture Texture => texture;
 		public Action OnStart;
+		public VideoPlayerStatus Status = VideoPlayerStatus.None;
 
 		private SurfaceTextureRenderer renderer;
 		private RenderTexture texture;
 		private long currentPosition => stopwatch.ElapsedMilliseconds * 1000;
-
 
 		private MediaExtractor videoExtractor;
 		private MediaCodec videoCodec;
@@ -82,49 +82,51 @@ namespace Lime
 			state = State.Initializing;
 			Window.Current.InvokeOnRendering(() => {
 				try {
-					try {
-						videoExtractor = new MediaExtractor();
-						videoExtractor.SetDataSource(path);
-						videoTrack = SelectTrack(videoExtractor, "video/");
-						if (videoTrack < 0) {
-							throw new System.Exception("Video WOOPS");
-						}
-						videoFormat = videoExtractor.GetTrackFormat(videoTrack);
-						videoCodec = MediaCodec.CreateDecoderByType(videoFormat.GetString(MediaFormat.KeyMime));
-						renderer = new SurfaceTextureRenderer();
-						videoCodec.Configure(videoFormat, renderer.Surface, null, MediaCodecConfigFlags.None);
-						texture = new RenderTexture(Width, Height);
-					} catch {
-						Lime.Debug.Write("Init video track");
+					videoExtractor = new MediaExtractor();
+					videoExtractor.SetDataSource(path);
+					videoTrack = SelectTrack(videoExtractor, "video/");
+					if (videoTrack < 0) {
+						throw new System.Exception("Video WOOPS");
 					}
-
-					try {
-						audioExtractor = new MediaExtractor();
-						audioExtractor.SetDataSource(path);
-						audioTrack = SelectTrack(audioExtractor, "audio/");
-						if (audioTrack < 0) {
-							throw new System.Exception("Audio WOOPS");
-						}
-						audioFormat = audioExtractor.GetTrackFormat(audioTrack);
-						var sampleRate = audioFormat.GetInteger(MediaFormat.KeySampleRate);
-						audioCodec = MediaCodec.CreateDecoderByType(audioFormat.GetString(MediaFormat.KeyMime));
-						audioCodec.Configure(audioFormat, null, null, MediaCodecConfigFlags.None);
-						var bufferSize = AudioTrack.GetMinBufferSize(sampleRate, ChannelOut.Stereo, Android.Media.Encoding.Pcm16bit);
-						audio = new AudioTrack(
-							global::Android.Media.Stream.Music,
-							sampleRate,
-							ChannelOut.Stereo,
-							Android.Media.Encoding.Pcm16bit,
-							bufferSize,
-							AudioTrackMode.Stream
-						);
-					} catch {
-						Lime.Debug.Write("Init audio track");
-					}
-					state = State.Initialized;
+					videoFormat = videoExtractor.GetTrackFormat(videoTrack);
+					videoCodec = MediaCodec.CreateDecoderByType(videoFormat.GetString(MediaFormat.KeyMime));
+					renderer = new SurfaceTextureRenderer();
+					videoCodec.Configure(videoFormat, renderer.Surface, null, MediaCodecConfigFlags.None);
+					texture = new RenderTexture(Width, Height);
 				} catch {
-					Lime.Debug.Write("Init player");
+					Lime.Debug.Write("Init video track");
+					Status = VideoPlayerStatus.Error;
+					return;
 				}
+
+				try {
+					audioExtractor = new MediaExtractor();
+					audioExtractor.SetDataSource(path);
+					audioTrack = SelectTrack(audioExtractor, "audio/");
+					if (audioTrack < 0) {
+						throw new System.Exception("Audio WOOPS");
+					}
+					audioFormat = audioExtractor.GetTrackFormat(audioTrack);
+					var sampleRate = audioFormat.GetInteger(MediaFormat.KeySampleRate);
+					audioCodec = MediaCodec.CreateDecoderByType(audioFormat.GetString(MediaFormat.KeyMime));
+					audioCodec.Configure(audioFormat, null, null, MediaCodecConfigFlags.None);
+					var bufferSize = AudioTrack.GetMinBufferSize(sampleRate, ChannelOut.Stereo, Android.Media.Encoding.Pcm16bit);
+					audio = new AudioTrack(
+						global::Android.Media.Stream.Music,
+						sampleRate,
+						ChannelOut.Stereo,
+						Android.Media.Encoding.Pcm16bit,
+						bufferSize,
+						AudioTrackMode.Stream
+					);
+				} catch {
+					Lime.Debug.Write("Init audio track");
+					Status = VideoPlayerStatus.Error;
+					return;
+				}
+
+				state = State.Initialized;
+				Status = VideoPlayerStatus.Success;
 			});
 		}
 
@@ -220,7 +222,7 @@ namespace Lime
 							var pt = info.PresentationTimeUs;
 							while (currentPosition < pt) {
 								Thread.Sleep(10);
-								if(stopDecodeCancelationToken.IsCancellationRequested) {
+								if (stopDecodeCancelationToken.IsCancellationRequested) {
 									videoCodec.ReleaseOutputBuffer(outIndex, false);
 								}
 								stopDecodeCancelationToken.ThrowIfCancellationRequested();
@@ -289,8 +291,8 @@ namespace Lime
 			}
 			Pause();
 			state = State.Stoped;
-			videoExtractor.SeekTo(0, MediaExtractorSeekTo.ClosestSync);
-			audioExtractor.SeekTo(0, MediaExtractorSeekTo.ClosestSync);
+			videoExtractor?.SeekTo(0, MediaExtractorSeekTo.ClosestSync);
+			audioExtractor?.SeekTo(0, MediaExtractorSeekTo.ClosestSync);
 			audioCodec?.Flush();
 			videoCodec?.Flush();
 		}
@@ -341,14 +343,12 @@ namespace Lime
 					audio.Dispose();
 					audio = null;
 				}
-				videoExtractor.Dispose();
+				videoExtractor?.Dispose();
 				videoExtractor = null;
-				audioExtractor.Dispose();
+				audioExtractor?.Dispose();
 				audioExtractor = null;
 			});
 		}
-
-
 
 		private class SurfaceTextureRenderer
 		{
@@ -449,6 +449,13 @@ namespace Lime
 			//https://developer.android.com/reference/android/graphics/SurfaceTexture.html
 			private const TextureTarget TextureTarget = (TextureTarget)All.TextureExternalOes; //<- IMPORTANT for surface texture!!!
 
+			private static VertexPosUV[] meshVertexes = new VertexPosUV[] {
+					new VertexPosUV() { UV1 = new Vector2(0, 0), Pos = new Vector2(-1, 1) },
+					new VertexPosUV() { UV1 = new Vector2(1, 0), Pos = new Vector2(1, 1) },
+					new VertexPosUV() { UV1 = new Vector2(1, 1), Pos = new Vector2(1, -1) },
+					new VertexPosUV() { UV1 = new Vector2(0, 1), Pos = new Vector2(-1, -1) },
+				};
+
 			public SurfaceTextureRenderer()
 			{
 				material = new SurfaceTextureMaterial();
@@ -456,12 +463,7 @@ namespace Lime
 				mesh.Indices = new ushort[] {
 					0, 1, 2, 2, 3, 0
 				};
-				mesh.Vertices = new VertexPosUV[] {
-					new VertexPosUV() { UV1 = new Vector2(0, 0), Pos = new Vector2(-1,  1) },
-					new VertexPosUV() { UV1 = new Vector2(1, 0), Pos = new Vector2( 1,  1) },
-					new VertexPosUV() { UV1 = new Vector2(1, 1), Pos = new Vector2( 1, -1) },
-					new VertexPosUV() { UV1 = new Vector2(0, 1), Pos = new Vector2(-1, -1) },
-				};
+				mesh.Vertices = meshVertexes;
 				mesh.AttributeLocations = new[] { ShaderPrograms.Attributes.Pos1, ShaderPrograms.Attributes.UV1 };
 				mesh.DirtyFlags = MeshDirtyFlags.All;
 				CreateSurface();

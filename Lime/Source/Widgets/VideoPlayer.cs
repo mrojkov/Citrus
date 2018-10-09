@@ -6,11 +6,20 @@ using System.Threading;
 
 namespace Lime
 {
+	public enum VideoPlayerStatus
+	{
+		None,
+		Error,
+		Success
+	}
+
 	public class VideoPlayer : Image
 	{
 		public bool Looped { get { return decoder.Looped; } set { decoder.Looped = value; } }
 
 		private VideoDecoder decoder;
+
+		public VideoPlayerStatus Status => decoder.Status;
 
 		public VideoPlayer()
 		{
@@ -44,12 +53,12 @@ namespace Lime
 
 		public void Pause()
 		{
-			decoder.Pause();
+			decoder?.Pause();
 		}
 
 		public void Stop()
 		{
-			decoder.Stop();
+			decoder?.Stop();
 		}
 
 		public override void Dispose()
