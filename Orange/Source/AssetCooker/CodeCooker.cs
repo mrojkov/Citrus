@@ -118,13 +118,9 @@ namespace Orange
 			var scenesPath = $@"{The.Workspace.ProjectDirectory}/{The.Workspace.Title}.GeneratedScenes/Scenes";
 			var codeCachePath = GetCodeCachePath();
 			if (!File.Exists(codeCachePath)) {
-				// Clean Generated Scenes folder of legacy files if there's no cache
-				if (Directory.Exists(scenesPath)) {
-					ScenesCodeCooker.RetryUntilSuccessDeleteDirectory(scenesPath);
-				}
-				return new CodeCookerCache();
+				return InvalidateCache(scenesPath);
 			} else if (!Directory.Exists(scenesPath)) {
-				return new CodeCookerCache();
+				return InvalidateCache(scenesPath);
 			} else {
 				try {
 					CodeCookerCache cache;
@@ -144,14 +140,14 @@ namespace Orange
 								var projectFilesCache = cache.GeneratedProjectFileToModificationDate;
 								if (!projectFilesCache.ContainsKey(projectPath) || File.GetLastWriteTime(projectPath) > projectFilesCache[projectPath]) {
 									// Consider cache inconsistent if generated project files were modified from outside
-									return new CodeCookerCache();
+									return InvalidateCache(scenesPath);
 								}
 							}
 						}
 					}
 					return cache;
 				} catch {
-					return new CodeCookerCache();
+					return InvalidateCache(scenesPath);
 				}
 			}
 		}
@@ -176,6 +172,14 @@ namespace Orange
 				var js = new Yuzu.Json.JsonSerializer();
 				js.ToStream(codeCookerCache, stream);
 			}
+		}
+
+		private static CodeCookerCache InvalidateCache(string scenesPath)
+		{
+			if (Directory.Exists(scenesPath)) {
+				ScenesCodeCooker.RetryUntilSuccessDeleteDirectory(scenesPath);
+			}
+			return new CodeCookerCache();
 		}
 	}
 }
