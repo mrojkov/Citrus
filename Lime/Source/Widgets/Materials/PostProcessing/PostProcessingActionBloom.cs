@@ -30,7 +30,8 @@ namespace Lime
 			RenderObject.BlurMaterial.Step = RenderObject.ProcessedUV1 * RenderObject.BloomTextureScaling / RenderObject.CurrentBufferSize;
 			RenderObject.BlurMaterial.Dir = Vector2.Down;
 			RenderObject.BlurMaterial.AlphaCorrection = 1f;
-			RenderObject.RenderToTexture(RenderObject.SecondTemporaryBuffer.Texture, RenderObject.FirstTemporaryBuffer.Texture, RenderObject.BlurMaterial, RenderObject.BloomColor, Color4.Black, bloomViewportSize, bloomUV1);
+			RenderObject.BlurMaterial.Opaque = RenderObject.OpagueRendering;
+			RenderObject.RenderToTexture(RenderObject.SecondTemporaryBuffer.Texture, RenderObject.FirstTemporaryBuffer.Texture, RenderObject.BlurMaterial, Color4.White, Color4.Black, bloomViewportSize, bloomUV1);
 			RenderObject.BlurMaterial.Dir = Vector2.Right;
 
 			if (RenderObject.DebugViewMode != PostProcessingPresenter.DebugViewMode.Bloom) {
@@ -41,19 +42,19 @@ namespace Lime
 				}
 				RenderObject.BloomBuffer.Texture.SetAsRenderTarget();
 				try {
+					var material = !RenderObject.OpagueRendering ? RenderObject.AlphaDiffuseMaterial : RenderObject.OpaqueDiffuseMaterial;
 					Renderer.Clear(Color4.Zero);
-					Renderer.DrawSprite(RenderObject.ProcessedTexture, null, RenderObject.DefaultMaterial, Color4.White, Vector2.Zero, RenderObject.Size, Vector2.Zero, RenderObject.ProcessedUV1, Vector2.Zero, Vector2.Zero);
-					Renderer.DrawSprite(RenderObject.FirstTemporaryBuffer.Texture, null, RenderObject.BlendingAddMaterial, Color4.White, Vector2.Zero, RenderObject.Size, Vector2.Zero, bloomUV1, Vector2.Zero, Vector2.Zero);
+					Renderer.DrawSprite(RenderObject.ProcessedTexture, null, material, Color4.White, Vector2.Zero, RenderObject.Size, Vector2.Zero, RenderObject.ProcessedUV1, Vector2.Zero, Vector2.Zero);
+					Renderer.DrawSprite(RenderObject.FirstTemporaryBuffer.Texture, null, RenderObject.AddDiffuseMaterial, RenderObject.BloomColor, Vector2.Zero, RenderObject.Size, Vector2.Zero, bloomUV1, Vector2.Zero, Vector2.Zero);
 				} finally {
 					RenderObject.BloomBuffer.Texture.RestoreRenderTarget();
 				}
-
 				RenderObject.BloomBuffer.SetRenderParameters(RenderObject);
-				RenderObject.MarkBuffersAsDirty = true;
 			} else {
-				RenderObject.RenderToTexture(RenderObject.BloomBuffer.Texture, RenderObject.SecondTemporaryBuffer.Texture, RenderObject.BlurMaterial, Color4.White, Color4.Black, customUV1: bloomUV1);
+				RenderObject.RenderToTexture(RenderObject.BloomBuffer.Texture, RenderObject.SecondTemporaryBuffer.Texture, RenderObject.BlurMaterial, RenderObject.BloomColor, Color4.Black, customUV1: bloomUV1);
 				RenderObject.BloomBuffer.MarkAsDirty();
 			}
+			RenderObject.MarkBuffersAsDirty = true;
 			RenderObject.ProcessedTexture = RenderObject.BloomBuffer.Texture;
 			RenderObject.CurrentBufferSize = (Vector2)RenderObject.BloomBuffer.Size;
 			RenderObject.ProcessedUV1 = (Vector2)RenderObject.ViewportSize / RenderObject.CurrentBufferSize;
@@ -66,6 +67,7 @@ namespace Lime
 			private Vector3 gammaCorrection = -Vector3.One;
 			private float textureScaling = float.NaN;
 			private Color4 color = Color4.Zero;
+			private bool opaque;
 
 			public Buffer(Size size) : base(size) { }
 
@@ -75,7 +77,8 @@ namespace Lime
 				brightThreshold == ro.BloomBrightThreshold &&
 				gammaCorrection == ro.BloomGammaCorrection &&
 				textureScaling == ro.BloomTextureScaling &&
-				color == ro.BloomColor;
+				color == ro.BloomColor &&
+				opaque == ro.OpagueRendering;
 
 			public void SetRenderParameters(PostProcessingRenderObject ro)
 			{
@@ -85,6 +88,7 @@ namespace Lime
 				gammaCorrection = ro.BloomGammaCorrection;
 				textureScaling = ro.BloomTextureScaling;
 				color = ro.BloomColor;
+				opaque = ro.OpagueRendering;
 			}
 		}
 	}

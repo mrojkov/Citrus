@@ -2,7 +2,8 @@ namespace Lime
 {
 	public class BloomMaterial : IMaterial
 	{
-		private readonly Blending blending;
+		private static readonly BlendState disabledBlendingState = new BlendState { Enable = false };
+
 		private readonly ShaderParams[] shaderParamsArray;
 		private readonly ShaderParams shaderParams;
 		private readonly ShaderParamKey<float> brightThresholdKey;
@@ -13,11 +14,8 @@ namespace Lime
 
 		public int PassCount => 1;
 
-		public BloomMaterial() : this(Blending.Alpha) { }
-
-		public BloomMaterial(Blending blending)
+		public BloomMaterial()
 		{
-			this.blending = blending;
 			shaderParams = new ShaderParams();
 			shaderParamsArray = new[] { Renderer.GlobalShaderParams, shaderParams };
 			brightThresholdKey = shaderParams.GetParamKey<float>("brightThreshold");
@@ -28,7 +26,7 @@ namespace Lime
 		{
 			shaderParams.Set(brightThresholdKey, BrightThreshold);
 			shaderParams.Set(inversedGammaCorrectionKey, InversedGammaCorrection);
-			PlatformRenderer.SetBlendState(blending.GetBlendState());
+			PlatformRenderer.SetBlendState(disabledBlendingState);
 			PlatformRenderer.SetShaderProgram(BloomShaderProgram.GetInstance());
 			PlatformRenderer.SetShaderParams(shaderParamsArray);
 		}
@@ -37,8 +35,9 @@ namespace Lime
 
 		public IMaterial Clone()
 		{
-			return new BloomMaterial(blending) {
-				BrightThreshold = BrightThreshold
+			return new BloomMaterial {
+				BrightThreshold = BrightThreshold,
+				InversedGammaCorrection = InversedGammaCorrection
 			};
 		}
 	}
@@ -60,8 +59,7 @@ namespace Lime
 				gl_Position = matProjection * inPos;
 				color = inColor;
 				texCoords1 = inTexCoords1;
-			}
-			";
+			}";
 
 		private const string FragmentShader = @"
 			varying lowp vec4 color;

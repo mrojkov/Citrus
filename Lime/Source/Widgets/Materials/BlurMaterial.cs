@@ -6,6 +6,8 @@ namespace Lime
 {
 	public class BlurMaterial : IMaterial
 	{
+		private static readonly BlendState disabledBlendingState = new BlendState { Enable = false };
+
 		private readonly Blending blending;
 		private readonly ShaderParams[] shaderParamsArray;
 		private readonly ShaderParams shaderParams;
@@ -17,6 +19,7 @@ namespace Lime
 		public Vector2 Step { get; set; } = Vector2.One * (1f / 128f);
 		public Vector2 Dir { get; set; } = new Vector2(0, 1);
 		public float AlphaCorrection { get; set; } = 1f;
+		public bool Opaque { get; set; }
 
 		public int PassCount => 1;
 
@@ -35,8 +38,8 @@ namespace Lime
 		{
 			shaderParams.Set(stepKey, Dir * Radius * Step);
 			shaderParams.Set(alphaCorrectionKey, 1f / AlphaCorrection);
-			PlatformRenderer.SetBlendState(blending.GetBlendState());
-			PlatformRenderer.SetShaderProgram(BlurShaderProgram.GetInstance(BlurShaderId));
+			PlatformRenderer.SetBlendState(!Opaque ? blending.GetBlendState() : disabledBlendingState);
+			PlatformRenderer.SetShaderProgram(BlurShaderProgram.GetInstance(BlurShaderId, Opaque));
 			PlatformRenderer.SetShaderParams(shaderParamsArray);
 		}
 
@@ -46,8 +49,11 @@ namespace Lime
 		{
 			return new BlurMaterial(blending) {
 				Radius = Radius,
+				BlurShaderId = BlurShaderId,
 				Step = Step,
-				Dir = Dir
+				Dir = Dir,
+				AlphaCorrection = AlphaCorrection,
+				Opaque = Opaque
 			};
 		}
 	}
@@ -99,8 +105,12 @@ namespace Lime
 		private const string FragmentShaderSummSelfFormat = "sum += texture2D(tex1, texCoords1) * {0};\n";
 
 		private const string FragmentShaderPart2 = @"
-				sum.w = pow(sum.w, inversedAlphaCorrection);
+				sum.a = pow(sum.a, inversedAlphaCorrection);
 				gl_FragColor = color * sum;
+			}
+			";
+		private const string FragmentShaderPart2Opaque = @"
+				gl_FragColor = vec4(color.rgb * sum.rgb, 1.0);
 			}
 			";
 
@@ -134,14 +144,19 @@ namespace Lime
 				new[] { 0.0001f, 0.000774f, 0.004376f, 0.018049f, 0.054313f, 0.119279f, 0.191215f, 0.223788f, 0.191215f, 0.119279f, 0.054313f, 0.018049f, 0.004376f, 0.000774f, 0.0001f }
 			}
 		};
-		private static readonly Dictionary<BlurShaderId, BlurShaderProgram> instances = new Dictionary<BlurShaderId, BlurShaderProgram>(gaussKernelsWeights.Count);
+		private static readonly Dictionary<int, BlurShaderProgram> instances = new Dictionary<int, BlurShaderProgram>(gaussKernelsWeights.Count);
 
-		public static BlurShaderProgram GetInstance(BlurShaderId blurShaderId = BlurShaderId.GaussOneDimensionalWith5Samples) =>
-			instances.TryGetValue(blurShaderId, out var shaderProgram) ? shaderProgram : (instances[blurShaderId] = new BlurShaderProgram(blurShaderId));
+		private static int GetInstanceKey(BlurShaderId blurShaderId, bool opaque) => (int)blurShaderId | ((opaque ? 1 : 0) << 8);
 
-		private BlurShaderProgram(BlurShaderId blurShaderId) : base(CreateShaders(blurShaderId), ShaderPrograms.Attributes.GetLocations(), ShaderPrograms.GetSamplers()) { }
+		public static BlurShaderProgram GetInstance(BlurShaderId blurShaderId = BlurShaderId.GaussOneDimensionalWith5Samples, bool opaque = false)
+		{
+			var key = GetInstanceKey(blurShaderId, false);
+			return instances.TryGetValue(key, out var shaderProgram) ? shaderProgram : (instances[key] = new BlurShaderProgram(blurShaderId, opaque));
+		}
 
-		private static Shader[] CreateShaders(BlurShaderId blurShaderId)
+		private BlurShaderProgram(BlurShaderId blurShaderId, bool opaque) : base(CreateShaders(blurShaderId, opaque), ShaderPrograms.Attributes.GetLocations(), ShaderPrograms.GetSamplers()) { }
+
+		private static Shader[] CreateShaders(BlurShaderId blurShaderId, bool opaque)
 		{
 			var kernelWeights = gaussKernelsWeights[blurShaderId];
 			var centerKernel = kernelWeights.Length / 2;
@@ -159,8 +174,7 @@ namespace Lime
 					fragmentShader.Append(string.Format(FragmentShaderSummNeighborFormat, weight, offsetStr));
 				}
 			}
-			fragmentShader.Append(FragmentShaderPart2);
-
+			fragmentShader.Append(!opaque ? FragmentShaderPart2 : FragmentShaderPart2Opaque);
 			return new Shader[] {
 				new VertexShader(VertexShader),
 				new FragmentShader(fragmentShader.ToString())

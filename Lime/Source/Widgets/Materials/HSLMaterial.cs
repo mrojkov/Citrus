@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
 using Yuzu;
 
 namespace Lime
@@ -29,6 +32,49 @@ namespace Lime
 
 	public class HSLMaterial : IMaterial
 	{
+		private static readonly BlendState disabledBlendingState = new BlendState { Enable = false };
+
+		private readonly Blending blending;
+		private readonly ShaderParams[] shaderParamsArray;
+		private readonly ShaderParams shaderParams;
+		private readonly ShaderParamKey<Vector3> hslKey;
+
+		public Vector3 HSL = new Vector3(0, 1, 1);
+		public bool Opaque { get; set; }
+
+		public int PassCount => 1;
+
+		public HSLMaterial() : this(Blending.Alpha) { }
+
+		public HSLMaterial(Blending blending)
+		{
+			this.blending = blending;
+			shaderParams = new ShaderParams();
+			shaderParamsArray = new[] { Renderer.GlobalShaderParams, shaderParams };
+			hslKey = shaderParams.GetParamKey<Vector3>("u_hsl");
+		}
+
+		public void Apply(int pass)
+		{
+			shaderParams.Set(hslKey, HSL);
+			PlatformRenderer.SetBlendState(!Opaque ? blending.GetBlendState() : disabledBlendingState);
+			PlatformRenderer.SetShaderProgram(HSLShaderProgram.GetInstance(Opaque));
+			PlatformRenderer.SetShaderParams(shaderParamsArray);
+		}
+
+		public void Invalidate() { }
+
+		public IMaterial Clone()
+		{
+			return new HSLMaterial(blending) {
+				HSL = HSL,
+				Opaque = Opaque
+			};
+		}
+	}
+
+	public class HSLShaderProgram : ShaderProgram
+	{
 		private const string VertexShader = @"
 			attribute vec4 inPos;
 			attribute vec2 inTexCoords1;
@@ -44,7 +90,7 @@ namespace Lime
 			}
 			";
 
-		private const string FragmentShader = @"
+		private const string FragmentShaderPart1 = @"
 			uniform lowp sampler2D tex1;
 			uniform lowp vec3 u_hsl;
 
@@ -103,50 +149,35 @@ namespace Lime
 			    lowp vec3 hsl = RgbToHsl(sourceRgb);
 			    hsl.x += u_hsl.x;
 			    hsl.yz *= u_hsl.yz;
-			    lowp vec3 rgb = HslToRgb(hsl);
-			    gl_FragColor = vec4(rgb, color.a);
+			    lowp vec3 rgb = HslToRgb(hsl);";
+		private const string FragmentShaderPart2 = @"
+				gl_FragColor = vec4(rgb, color.a);
+			}";
+		private const string FragmentShaderPart2Opaque = @"
+				gl_FragColor = vec4(rgb, 1.0);
 			}";
 
-		private static ShaderProgram shaderProgramPass;
+		private static readonly Dictionary<int, HSLShaderProgram> instances = new Dictionary<int, HSLShaderProgram>();
 
-		public int PassCount => 1;
+		private static int GetInstanceKey(bool opaque) => opaque ? 1 : 0;
 
-		public Vector3 HSL;
-
-		public HSLMaterial()
+		public static HSLShaderProgram GetInstance(bool opaque = false)
 		{
-			HSL = new Vector3(0, 1, 1);
-
-			if (shaderParams == null) {
-				shaderParams = new ShaderParams();
-				shaderParamsArray = new[] { Renderer.GlobalShaderParams, shaderParams };
-
-				shaderHueParamKey = shaderParams.GetParamKey<Vector3>("u_hsl");
-			}
+			var key = GetInstanceKey(false);
+			return instances.TryGetValue(key, out var shaderProgram) ? shaderProgram : (instances[key] = new HSLShaderProgram(opaque));
 		}
 
-		public IMaterial Clone() => (IMaterial)MemberwiseClone();
+		private HSLShaderProgram(bool opaque) : base(CreateShaders(opaque), ShaderPrograms.Attributes.GetLocations(), ShaderPrograms.GetSamplers()) { }
 
-		public void Apply(int pass)
+		private static Shader[] CreateShaders(bool opaque)
 		{
-			if (shaderProgramPass == null) {
-				shaderProgramPass = new ShaderProgram(
-					new Shader[] { new VertexShader(VertexShader), new FragmentShader(FragmentShader) },
-					ShaderPrograms.Attributes.GetLocations(),
-					ShaderPrograms.GetSamplers()
-				);
-			}
-			PlatformRenderer.SetBlendState(Blending.None.GetBlendState());
-			PlatformRenderer.SetShaderProgram(shaderProgramPass);
-
-			shaderParams.Set(shaderHueParamKey, HSL);
-			PlatformRenderer.SetShaderParams(shaderParamsArray);
+			var fragmentShader = new StringBuilder(FragmentShaderPart1.Length + Math.Max(FragmentShaderPart2.Length, FragmentShaderPart2Opaque.Length));
+			fragmentShader.Append(FragmentShaderPart1);
+			fragmentShader.Append(!opaque ? FragmentShaderPart2 : FragmentShaderPart2Opaque);
+			return new Shader[] {
+				new VertexShader(VertexShader),
+				new FragmentShader(fragmentShader.ToString())
+			};
 		}
-
-		public void Invalidate() { }
-
-		private static ShaderParams[] shaderParamsArray;
-		private static ShaderParams shaderParams;
-		private static ShaderParamKey<Vector3> shaderHueParamKey;
 	}
 }

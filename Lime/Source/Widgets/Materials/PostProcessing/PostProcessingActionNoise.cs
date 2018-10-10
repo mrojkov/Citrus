@@ -26,6 +26,7 @@ namespace Lime
 				RenderObject.NoiseMaterial.BrightThreshold = RenderObject.NoiseBrightThreshold;
 				RenderObject.NoiseMaterial.DarkThreshold = RenderObject.NoiseDarkThreshold;
 				RenderObject.NoiseMaterial.SoftLight = RenderObject.NoiseSoftLight;
+				RenderObject.NoiseMaterial.Opaque = RenderObject.OpagueRendering;
 				Renderer.DrawSprite(
 					RenderObject.ProcessedTexture,
 					RenderObject.NoiseTexture,
@@ -54,6 +55,7 @@ namespace Lime
 			private float brightThreshold = float.NaN;
 			private float darkThreshold = float.NaN;
 			private float softLight = float.NaN;
+			private bool opaque;
 
 			public Buffer(Size size) : base(size) { }
 
@@ -61,7 +63,8 @@ namespace Lime
 				!IsDirty &&
 				brightThreshold == ro.NoiseBrightThreshold &&
 				darkThreshold == ro.NoiseDarkThreshold &&
-				softLight == ro.NoiseSoftLight;
+				softLight == ro.NoiseSoftLight &&
+				opaque == ro.OpagueRendering;
 
 			public void SetRenderParameters(PostProcessingRenderObject ro)
 			{
@@ -69,6 +72,7 @@ namespace Lime
 				brightThreshold = ro.NoiseBrightThreshold;
 				darkThreshold = ro.NoiseDarkThreshold;
 				softLight = ro.NoiseSoftLight;
+				opaque = ro.OpagueRendering;
 			}
 		}
 	}
