@@ -66,7 +66,8 @@ namespace Lime
 		GaussOneDimensionalWith9Samples,
 		GaussOneDimensionalWith11Samples,
 		GaussOneDimensionalWith13Samples,
-		GaussOneDimensionalWith15Samples
+		GaussOneDimensionalWith15Samples,
+		GaussOneDimensionalWith31Samples
 	}
 
 	public class BlurShaderProgram : ShaderProgram
@@ -142,6 +143,10 @@ namespace Lime
 			{
 				BlurShaderId.GaussOneDimensionalWith15Samples,
 				new[] { 0.0001f, 0.000774f, 0.004376f, 0.018049f, 0.054313f, 0.119279f, 0.191215f, 0.223788f, 0.191215f, 0.119279f, 0.054313f, 0.018049f, 0.004376f, 0.000774f, 0.0001f }
+			},
+			{
+				BlurShaderId.GaussOneDimensionalWith31Samples,
+				new[] { 0.000001f, 0.000009f, 0.0001f, 0.000774f, 0.004376f, 0.018049f, 0.054312f, 0.119277f, 0.191212f, 0.223783f, 0.191212f, 0.119277f, 0.054312f, 0.018049f, 0.004376f, 0.000774f, 0.0001f, 0.000009f, 0.000001f }
 			}
 		};
 		private static readonly Dictionary<int, BlurShaderProgram> instances = new Dictionary<int, BlurShaderProgram>(gaussKernelsWeights.Count);
