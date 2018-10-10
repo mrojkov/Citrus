@@ -133,13 +133,13 @@ namespace Tangerine.UI.FilesystemView
 		public IEnumerable<string> EnumerateItems(SortType sortType, OrderType orderType)
 		{
 			foreach (var i in SortItems(Directory.EnumerateDirectories(CurrentPath), sortType, orderType, ItemType.Dir)) {
-				if ((File.GetAttributes(i) & FileAttributes.Hidden) != 0) {
+				if ((!File.Exists(i) && !Directory.Exists(i)) || (File.GetAttributes(i) & FileAttributes.Hidden) != 0) {
 					continue;
 				}
 				yield return i;
 			}
 			foreach (var i in SortItems(Directory.EnumerateFiles(CurrentPath), sortType, orderType, ItemType.File)) {
-				if ((File.GetAttributes(i) & FileAttributes.Hidden) != 0) {
+				if ((!File.Exists(i) && !Directory.Exists(i)) || (File.GetAttributes(i) & FileAttributes.Hidden) != 0) {
 					continue;
 				}
 				yield return i;
