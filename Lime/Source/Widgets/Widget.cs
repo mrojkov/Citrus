@@ -102,7 +102,7 @@ namespace Lime
 			set
 			{
 				var layoutComponent = Components.Get<Layout>();
-				bool isAnchorLayout = value is AnchorLayout;
+				bool isAnchorLayout = value is AnchorLayout || value == null;
 				if (layoutComponent == null) {
 					if (isAnchorLayout) {
 						return;
