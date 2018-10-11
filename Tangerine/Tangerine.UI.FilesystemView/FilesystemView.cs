@@ -31,8 +31,8 @@ namespace Tangerine.UI.FilesystemView
 		private Lime.FileSystemWatcher fsWatcher;
 		private CookingRulesEditor crEditor;
 		private Preview preview;
-		private List<Tuple<string, Selection>> navHystory = new List<Tuple<string, Selection>>();
-		private int navHystoryIndex = -1;
+		private List<(string, Selection)> navigationHistory = new List<(string, Selection)>();
+		private int navigationHistoryIndex = -1;
 		private NodeToggler toggleCookingRules;
 		private NodeToggler togglePreview;
 		private DragState dragState;
@@ -72,42 +72,59 @@ namespace Tangerine.UI.FilesystemView
 
 		public void GoBackward()
 		{
-			var newIndex = navHystoryIndex - 1;
-			if (newIndex < 0 || newIndex >= navHystory.Count) {
-				return;
-			}
-			var i = navHystory[newIndex];
-			GoTo(i.Item1);
-			foreach (var s in i.Item2) {
+			var newIndex = navigationHistoryIndex - 1;
+			(string Path, Selection Selection) i;
+			do {
+				if (newIndex < 0 || newIndex >= navigationHistory.Count) {
+					return;
+				}
+				i = navigationHistory[newIndex];
+				if (!Directory.Exists(i.Path)) {
+					navigationHistory.RemoveAt(newIndex);
+					newIndex--;
+				} else {
+					break;
+				}
+			} while (true);
+			GoTo(i.Path);
+			foreach (var s in i.Selection) {
 				selection.Select(s);
 			}
-			navHystoryIndex = newIndex;
+			navigationHistoryIndex = newIndex;
 		}
 
 		public void GoForward()
 		{
-			var newIndex = navHystoryIndex + 1;
-			if (newIndex >= navHystory.Count) {
-				return;
-			}
-			var i = navHystory[newIndex];
-			GoTo(i.Item1);
-			foreach (var s in i.Item2) {
+			var newIndex = navigationHistoryIndex + 1;
+			(string Path, Selection Selection) i;
+			do {
+				if (newIndex >= navigationHistory.Count) {
+					return;
+				}
+				i = navigationHistory[newIndex];
+				if (!Directory.Exists(i.Path)) {
+					navigationHistory.RemoveAt(newIndex);
+				} else {
+					break;
+				}
+			} while (true);
+			GoTo(i.Path);
+			foreach (var s in i.Selection) {
 				selection.Select(s);
 			}
-			navHystoryIndex = newIndex;
+			navigationHistoryIndex = newIndex;
 		}
 
 		private void AddToNavHystory(string path)
 		{
-			if (navHystory.Count > 0 && navHystory[navHystoryIndex].Item1 == path) {
+			if (navigationHistory.Count > 0 && navigationHistory[navigationHistoryIndex].Item1 == path) {
 				return;
 			}
-			var i = new Tuple<string, Selection>(path, selection.Clone());
-			navHystory.Add(i);
-			int newIndex = navHystoryIndex + 1;
-			navHystory.RemoveRange(newIndex, navHystory.Count - newIndex - 1);
-			navHystoryIndex = newIndex;
+			var i = (path, selection.Clone());
+			navigationHistory.Add(i);
+			int newIndex = navigationHistoryIndex + 1;
+			navigationHistory.RemoveRange(newIndex, navigationHistory.Count - newIndex - 1);
+			navigationHistoryIndex = newIndex;
 		}
 
 		public void SortByType(SortType sortType, OrderType orderType)
