@@ -46,8 +46,11 @@ namespace Lime
 			}
 
 			var ro = RenderObjectPool<PostProcessingRenderObject>.Acquire();
-			component.GetOwnerRenderObjects(renderChain, ro.Objects);
-			renderChain.Clear();
+			try {
+				component.GetOwnerRenderObjects(renderChain, ro.Objects);
+			} finally {
+				renderChain.Clear();
+			}
 
 			var bufferSize = component.TextureSizeLimit;
 			var widget = (Widget)node;
@@ -150,8 +153,49 @@ namespace Lime
 			return material = WidgetMaterial.GetInstance(!isOpaqueRendering ? blending : Blending.Opaque, shader, 1);
 		}
 
-		// TODO: Fix HitTest of child nodes
-		public bool PartialHitTest(Node node, ref HitTestArgs args) => DefaultPresenter.Instance.PartialHitTest(node, ref args);
+		public bool PartialHitTest(Node node, ref HitTestArgs args)
+		{
+			var widget = (Widget)node;
+			if (!widget.BoundingRectHitTest(args.Point)) {
+				return false;
+			}
+			var savedLayer = renderChain.CurrentLayer;
+			try {
+				renderChain.CurrentLayer = widget.Layer;
+				for (var child = widget.FirstChild; child != null; child = child.NextSibling) {
+					child.RenderChainBuilder?.AddToRenderChain(renderChain);
+				}
+				return renderChain.HitTest(ref args) || SelfPartialHitTest(widget, ref args);
+			} finally {
+				renderChain.Clear();
+				renderChain.CurrentLayer = savedLayer;
+			}
+		}
+
+		public bool SelfPartialHitTest(Widget widget, ref HitTestArgs args)
+		{
+			Node targetNode;
+			for (targetNode = widget; targetNode != null; targetNode = targetNode.Parent) {
+				var method = targetNode.AsWidget?.HitTestMethod ?? HitTestMethod.Contents;
+				if (method == HitTestMethod.Skip || targetNode != widget && method == HitTestMethod.BoundingRect) {
+					return false;
+				}
+				if (targetNode.HitTestTarget) {
+					break;
+				}
+			}
+			if (targetNode == null) {
+				return false;
+			}
+			if (
+				widget.HitTestMethod == HitTestMethod.BoundingRect && widget.BoundingRectHitTest(args.Point) ||
+				widget.HitTestMethod == HitTestMethod.Contents && widget.PartialHitTestByContents(ref args)
+			) {
+				args.Node = targetNode;
+				return true;
+			}
+			return false;
+		}
 
 		public IPresenter Clone() => new PostProcessingPresenter();
 
