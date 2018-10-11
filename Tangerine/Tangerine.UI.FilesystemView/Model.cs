@@ -91,11 +91,10 @@ namespace Tangerine.UI.FilesystemView
 
 	public class Model
 	{
-
 		enum ItemType
 		{
 			File,
-			Dir
+			Directory,
 		}
 
 		private string currentPath;
@@ -121,18 +120,20 @@ namespace Tangerine.UI.FilesystemView
 			}
 		}
 
-		public void GoUp()
+		public void GoUp() => CurrentPath = GetFirstExistentParentPath(Path.GetDirectoryName(CurrentPath));
+
+		private string GetFirstExistentParentPath(string path)
 		{
-			var p = Directory.GetParent(CurrentPath);
-			if (p == null) {
-				return;
+			while (!Directory.Exists(path)) {
+				path = Path.GetDirectoryName(path);
 			}
-			CurrentPath = p.FullName;
+			return path;
 		}
 
 		public IEnumerable<string> EnumerateItems(SortType sortType, OrderType orderType)
 		{
-			foreach (var i in SortItems(Directory.EnumerateDirectories(CurrentPath), sortType, orderType, ItemType.Dir)) {
+			CurrentPath = GetFirstExistentParentPath(CurrentPath);
+			foreach (var i in SortItems(Directory.EnumerateDirectories(CurrentPath), sortType, orderType, ItemType.Directory)) {
 				if ((!File.Exists(i) && !Directory.Exists(i)) || (File.GetAttributes(i) & FileAttributes.Hidden) != 0) {
 					continue;
 				}
@@ -169,12 +170,12 @@ namespace Tangerine.UI.FilesystemView
 					}
 				case SortType.Size:
 					if (orderType == OrderType.Ascending) {
-						if (itemType == ItemType.Dir)
+						if (itemType == ItemType.Directory)
 							return items.OrderBy( f => f.Length);
 						else
 							return items.OrderBy(f => new FileInfo(f).Length);
 					} else {
-						if (itemType == ItemType.Dir)
+						if (itemType == ItemType.Directory)
 							return items.OrderByDescending(f => f.Length);
 						else
 							return items.OrderByDescending(f => new FileInfo(f).Length);
