@@ -50,7 +50,13 @@ namespace Lime
 		public Vector3 BloomGammaCorrection;
 		public float BloomTextureScaling;
 		public Color4 BloomColor;
+		public PostProcessingActionSharpen.Buffer SharpenBuffer;
+		public SharpenMaterial SharpenMaterial;
+		public bool SharpenEnabled;
+		public float SharpenStrength;
+		public float SharpenLimit;
 		public PostProcessingActionNoise.Buffer NoiseBuffer;
+		public NoiseMaterial NoiseMaterial;
 		public bool NoiseEnabled;
 		public float NoiseBrightThreshold;
 		public float NoiseDarkThreshold;
@@ -58,7 +64,6 @@ namespace Lime
 		public Vector2 NoiseOffset;
 		public Vector2 NoiseScale;
 		public ITexture NoiseTexture;
-		public NoiseMaterial NoiseMaterial;
 		public bool OverallImpactEnabled;
 		public Color4 OverallImpactColor;
 		public VignetteMaterial VignetteMaterial;

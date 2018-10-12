@@ -249,6 +249,7 @@
     <Compile Include="Source\Widgets\3D\Model3DAttachment.cs" />
     <Compile Include="Source\Widgets\3D\RenderObject3D.cs" />
     <Compile Include="Source\Widgets\3D\Spline3D.cs" />
+    <Compile Include="Source\Widgets\Materials\SharpenMaterial.cs" />
     <Compile Include="Source\Widgets\Materials\HSLComponent.cs" />
     <Compile Include="Source\Widgets\Materials\NoiseMaterial.cs" />
     <Compile Include="Source\Widgets\Materials\ColorCorrectionMaterial.cs" />
@@ -286,6 +287,7 @@
     <Compile Include="Source\Widgets\3D\WidgetAdapter3D.cs" />
     <Compile Include="Source\Widgets\Materials\GradientMaterial.cs" />
     <Compile Include="Source\Widgets\Materials\MaterialComponent.cs" />
+    <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionSharpen.cs" />
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingPresenter.cs" />
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingRenderChainBuilder.cs" />
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingRenderObject.cs" />

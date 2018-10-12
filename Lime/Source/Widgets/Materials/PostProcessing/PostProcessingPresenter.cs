@@ -20,6 +20,7 @@ namespace Lime
 		private PostProcessingActionColorCorrection.Buffer colorCorrectionBuffer;
 		private PostProcessingActionBlur.Buffer blurBuffer;
 		private PostProcessingActionBloom.Buffer bloomBuffer;
+		private PostProcessingActionSharpen.Buffer sharpenBuffer;
 		private PostProcessingActionNoise.Buffer noiseBuffer;
 
 		public PostProcessingPresenter()
@@ -30,6 +31,7 @@ namespace Lime
 				new PostProcessingActionColorCorrection(),
 				new PostProcessingActionBlur(),
 				new PostProcessingActionBloom(),
+				new PostProcessingActionSharpen(),
 				new PostProcessingActionNoise(),
 				new PostProcessingActionTextureRender(),
 				new PostProcessingActionVignette()
@@ -66,6 +68,9 @@ namespace Lime
 			}
 			if (component.BloomEnabled && bloomBuffer?.Size != bufferSize) {
 				bloomBuffer = new PostProcessingActionBloom.Buffer(bufferSize);
+			}
+			if (component.SharpenEnabled && sharpenBuffer?.Size != bufferSize) {
+				sharpenBuffer = new PostProcessingActionSharpen.Buffer(bufferSize);
 			}
 			if (component.NoiseEnabled && noiseBuffer?.Size != bufferSize) {
 				noiseBuffer = new PostProcessingActionNoise.Buffer(bufferSize);
@@ -118,7 +123,13 @@ namespace Lime
 			ro.BloomGammaCorrection = component.BloomGammaCorrection;
 			ro.BloomTextureScaling = component.BloomTextureScaling * 0.01f;
 			ro.BloomColor = component.BloomColor;
+			ro.SharpenBuffer = sharpenBuffer;
+			ro.SharpenMaterial = component.SharpenMaterial;
+			ro.SharpenEnabled = component.SharpenEnabled;
+			ro.SharpenStrength = component.SharpenStrength;
+			ro.SharpenLimit = component.SharpenLimit;
 			ro.NoiseBuffer = noiseBuffer;
+			ro.NoiseMaterial = component.NoiseMaterial;
 			ro.NoiseEnabled = component.NoiseEnabled && component.NoiseTexture != null && !component.NoiseTexture.IsStubTexture;
 			ro.NoiseBrightThreshold = component.NoiseBrightThreshold * 0.01f;
 			ro.NoiseDarkThreshold = component.NoiseDarkThreshold * 0.01f;
@@ -126,7 +137,6 @@ namespace Lime
 			ro.NoiseOffset = component.NoiseOffset;
 			ro.NoiseScale = component.NoiseScale;
 			ro.NoiseTexture = component.NoiseTexture;
-			ro.NoiseMaterial = component.NoiseMaterial;
 			ro.OverallImpactEnabled = component.OverallImpactEnabled;
 			ro.OverallImpactColor = component.OverallImpactColor;
 			ro.VignetteMaterial = component.VignetteMaterial;

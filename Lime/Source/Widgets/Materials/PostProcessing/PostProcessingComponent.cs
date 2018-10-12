@@ -8,13 +8,14 @@ namespace Lime
 	public class PostProcessingComponent : NodeBehavior
 	{
 		private const string GroupColorCorrection = "1. Color correction";
-		private const string GroupBlur = "2. Blur effect";
-		private const string GroupBloom = "3. Bloom effect";
-		private const string GroupNoise = "4. Noise";
-		private const string GroupVignette = "5. Vignette";
-		private const string GroupOverallImpact = "6. Overall impact";
-		private const string GroupSourceTexture = "7. Source texture";
-		private const string GroupDebugView = "8. Debug view";
+		private const string GroupBlur = "2. Blur";
+		private const string GroupBloom = "3. Bloom";
+		private const string GroupSharpen = "4. Sharpen";
+		private const string GroupNoise = "5. Noise";
+		private const string GroupVignette = "6. Vignette";
+		private const string GroupOverallImpact = "7. Overall impact";
+		private const string GroupSourceTexture = "8. Source texture";
+		private const string GroupDebugView = "9. Debug view";
 		private const int MinimumTextureSize = 32;
 		private const int MaximumTextureSize = 2048;
 		private const float MinimumTextureScaling = 0.01f;
@@ -33,6 +34,7 @@ namespace Lime
 		internal ColorCorrectionMaterial ColorCorrectionMaterial { get; private set; } = new ColorCorrectionMaterial();
 		internal BlurMaterial BlurMaterial { get; private set; } = new BlurMaterial();
 		internal BloomMaterial BloomMaterial { get; private set; } = new BloomMaterial();
+		internal SharpenMaterial SharpenMaterial { get; private set; } = new SharpenMaterial();
 		internal NoiseMaterial NoiseMaterial { get; private set; } = new NoiseMaterial();
 		internal VignetteMaterial VignetteMaterial { get; private set; } = new VignetteMaterial();
 
@@ -60,6 +62,8 @@ namespace Lime
 		private bool refreshSourceTexture = true;
 		private int refreshSourceRate;
 		private float refreshSourceDelta;
+		private float sharpenStrength = 5f;
+		private float sharpenLimit = 0.1f;
 
 		[YuzuMember]
 		[TangerineGroup(GroupColorCorrection)]
@@ -192,6 +196,26 @@ namespace Lime
 		[YuzuMember]
 		[TangerineGroup(GroupBloom)]
 		public Color4 BloomColor { get; set; } = Color4.White;
+
+		[YuzuMember]
+		[TangerineGroup(GroupSharpen)]
+		public bool SharpenEnabled { get; set; }
+
+		[YuzuMember]
+		[TangerineGroup(GroupSharpen)]
+		public float SharpenStrength
+		{
+			get => sharpenStrength;
+			set => sharpenStrength = Mathf.Clamp(value, 0f, 10f);
+		}
+
+		[YuzuMember]
+		[TangerineGroup(GroupSharpen)]
+		public float SharpenLimit
+		{
+			get => sharpenLimit;
+			set => sharpenLimit = Mathf.Clamp(value, 0f, 1f);
+		}
 
 		[YuzuMember]
 		[TangerineGroup(GroupNoise)]
