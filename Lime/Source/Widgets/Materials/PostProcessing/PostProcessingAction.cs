@@ -2,11 +2,9 @@ namespace Lime
 {
 	internal abstract class PostProcessingAction
 	{
-		public PostProcessingRenderObject RenderObject { get; set; }
-
-		public virtual Buffer TextureBuffer => null;
-		public abstract bool Enabled { get; }
-		public abstract void Do();
+		public virtual Buffer GetTextureBuffer(PostProcessingRenderObject ro) => null;
+		public abstract bool EnabledCheck(PostProcessingRenderObject ro);
+		public abstract void Do(PostProcessingRenderObject ro);
 
 		internal class Buffer
 		{

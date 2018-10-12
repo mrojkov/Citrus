@@ -79,6 +79,7 @@ namespace Lime
 		{
 			ProcessedTexture = null;
 			Objects.Clear();
+			PostProcessingActions = null;
 			Material = null;
 			SourceTextureBuffer = null;
 			FirstTemporaryBuffer = null;
@@ -107,24 +108,22 @@ namespace Lime
 					MarkBuffersAsDirty = true;
 				}
 				foreach (var action in PostProcessingActions) {
-					action.RenderObject = this;
+					var buffer = action.GetTextureBuffer(this);
 					if (MarkBuffersAsDirty) {
-						action.TextureBuffer?.MarkAsDirty();
+						buffer?.MarkAsDirty();
 					}
-					if (action.Enabled) {
-						action.Do();
-						if (action.TextureBuffer != null) {
-							action.TextureBuffer.WasApplied = true;
+					if (action.EnabledCheck(this)) {
+						action.Do(this);
+						if (buffer != null) {
+							buffer.WasApplied = true;
 						}
-					} else if (action.TextureBuffer?.WasApplied ?? false) {
-						action.TextureBuffer.WasApplied = false;
-						action.TextureBuffer.MarkAsDirty();
+					} else if (buffer?.WasApplied ?? false) {
+						buffer.WasApplied = false;
+						buffer.MarkAsDirty();
 						MarkBuffersAsDirty = true;
 					}
-					action.RenderObject = null;
 				}
 			} finally {
-				PostProcessingActions = null;
 				FinalizeOffscreenRendering();
 			}
 		}

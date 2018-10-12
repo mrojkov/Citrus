@@ -134,15 +134,15 @@ namespace Lime
 		private const string FragmentShaderPart1 = @"
 			void main()
 			{
-			    lowp vec4 color = texture2D(tex1, texCoords1);";
+				lowp vec4 color = texture2D(tex1, texCoords1);";
 		private const string FragmentShaderBrightnessContrast = @"
 				color.rgb = (color.rgb - 0.5) * contrast + 0.5 + brightness;";
 		private const string FragmentShaderHSL = @"
 				lowp vec3 sourceRgb = min(color.rgb, 0.98823529); // Hack: solve problem with black artifacts
-			    lowp vec3 hsl = RgbToHsl(sourceRgb);
-			    hsl.x += inHsl.x;
-			    hsl.yz *= inHsl.yz;
-			    color.rgb = HslToRgb(hsl);";
+				lowp vec3 hsl = RgbToHsl(sourceRgb);
+				hsl.x += inHsl.x;
+				hsl.yz *= inHsl.yz;
+				color.rgb = HslToRgb(hsl);";
 		private const string FragmentShaderPart2 = @"
 				gl_FragColor = color;
 			}";

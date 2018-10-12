@@ -4,28 +4,28 @@ namespace Lime
 {
 	internal class PostProcessingActionTextureRender : PostProcessingAction
 	{
-		public override bool Enabled => true;
+		public override bool EnabledCheck(PostProcessingRenderObject ro) => true;
 
-		public override void Do()
+		public override void Do(PostProcessingRenderObject ro)
 		{
-			RenderObject.FinalizeOffscreenRendering();
+			ro.FinalizeOffscreenRendering();
 
 			ITexture texture;
-			switch (RenderObject.DebugViewMode) {
+			switch (ro.DebugViewMode) {
 				case PostProcessingPresenter.DebugViewMode.None:
-					texture = RenderObject.ProcessedTexture;
+					texture = ro.ProcessedTexture;
 					break;
 				case PostProcessingPresenter.DebugViewMode.Original:
-					texture = RenderObject.SourceTextureBuffer?.Texture;
+					texture = ro.SourceTextureBuffer?.Texture;
 					break;
 				case PostProcessingPresenter.DebugViewMode.Bloom:
-					texture = RenderObject.BloomBuffer?.Texture;
+					texture = ro.BloomBuffer?.Texture;
 					break;
 				default:
 					throw new ArgumentOutOfRangeException();
 			}
 			if (texture != null) {
-				RenderObject.RenderTexture(texture);
+				ro.RenderTexture(texture);
 			}
 		}
 	}

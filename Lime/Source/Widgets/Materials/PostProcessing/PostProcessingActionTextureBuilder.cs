@@ -2,33 +2,33 @@ namespace Lime
 {
 	internal class PostProcessingActionTextureBuilder : PostProcessingAction
 	{
-		public override bool Enabled => true;
+		public override bool EnabledCheck(PostProcessingRenderObject ro) => true;
 
-		public override void Do()
+		public override void Do(PostProcessingRenderObject ro)
 		{
-			RenderObject.ProcessedViewport = Viewport.Default;
-			RenderObject.TextureSize = RenderObject.Size;
-			RenderObject.CurrentBufferSize = (Vector2)RenderObject.SourceTextureBuffer.Size;
-			RenderObject.ViewportSize = (Size)(RenderObject.TextureSize * RenderObject.SourceTextureScaling);
-			RenderObject.ProcessedTexture = RenderObject.SourceTextureBuffer.Texture;
-			RenderObject.ProcessedUV1 = (Vector2)RenderObject.ViewportSize / RenderObject.CurrentBufferSize;
-			if (!RenderObject.SourceTextureBuffer.IsDirty) {
+			ro.ProcessedViewport = Viewport.Default;
+			ro.TextureSize = ro.Size;
+			ro.CurrentBufferSize = (Vector2)ro.SourceTextureBuffer.Size;
+			ro.ViewportSize = (Size)(ro.TextureSize * ro.SourceTextureScaling);
+			ro.ProcessedTexture = ro.SourceTextureBuffer.Texture;
+			ro.ProcessedUV1 = (Vector2)ro.ViewportSize / ro.CurrentBufferSize;
+			if (!ro.SourceTextureBuffer.IsDirty) {
 				return;
 			}
 
-			RenderObject.PrepareOffscreenRendering(RenderObject.Size);
-			RenderObject.SourceTextureBuffer.Texture.SetAsRenderTarget();
+			ro.PrepareOffscreenRendering(ro.Size);
+			ro.SourceTextureBuffer.Texture.SetAsRenderTarget();
 			try {
-				Renderer.Viewport = new Viewport(0, 0, RenderObject.ViewportSize.Width, RenderObject.ViewportSize.Height);
+				Renderer.Viewport = new Viewport(0, 0, ro.ViewportSize.Width, ro.ViewportSize.Height);
 				Renderer.Clear(Color4.Zero);
-				Renderer.Transform2 = RenderObject.LocalToWorldTransform.CalcInversed();
-				RenderObject.Objects.Render();
+				Renderer.Transform2 = ro.LocalToWorldTransform.CalcInversed();
+				ro.Objects.Render();
 			} finally {
-				RenderObject.SourceTextureBuffer.Texture.RestoreRenderTarget();
-				RenderObject.FinalizeOffscreenRendering();
+				ro.SourceTextureBuffer.Texture.RestoreRenderTarget();
+				ro.FinalizeOffscreenRendering();
 			}
-			RenderObject.SourceTextureBuffer.IsDirty = false;
-			RenderObject.MarkBuffersAsDirty = true;
+			ro.SourceTextureBuffer.IsDirty = false;
+			ro.MarkBuffersAsDirty = true;
 		}
 	}
 }

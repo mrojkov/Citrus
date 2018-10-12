@@ -2,62 +2,62 @@ namespace Lime
 {
 	internal class PostProcessingActionBloom : PostProcessingAction
 	{
-		public override bool Enabled => RenderObject.BloomEnabled;
-		public override PostProcessingAction.Buffer TextureBuffer => RenderObject.BloomBuffer;
+		public override bool EnabledCheck(PostProcessingRenderObject ro) => ro.BloomEnabled;
+		public override PostProcessingAction.Buffer GetTextureBuffer(PostProcessingRenderObject ro) => ro.BloomBuffer;
 
-		public override void Do()
+		public override void Do(PostProcessingRenderObject ro)
 		{
-			if (RenderObject.BloomBuffer.EqualRenderParameters(RenderObject)) {
-				RenderObject.ProcessedTexture = RenderObject.BloomBuffer.Texture;
-				RenderObject.CurrentBufferSize = (Vector2)RenderObject.BloomBuffer.Size;
-				RenderObject.ProcessedUV1 = (Vector2)RenderObject.ViewportSize / RenderObject.CurrentBufferSize;
+			if (ro.BloomBuffer.EqualRenderParameters(ro)) {
+				ro.ProcessedTexture = ro.BloomBuffer.Texture;
+				ro.CurrentBufferSize = (Vector2)ro.BloomBuffer.Size;
+				ro.ProcessedUV1 = (Vector2)ro.ViewportSize / ro.CurrentBufferSize;
 				return;
 			}
 
-			RenderObject.PrepareOffscreenRendering(RenderObject.Size);
-			var bufferSize = (Vector2)RenderObject.BloomBuffer.Size;
-			var bloomViewportSize = (Size)(bufferSize * RenderObject.BloomTextureScaling);
-			RenderObject.BloomMaterial.BrightThreshold = RenderObject.BloomBrightThreshold;
-			RenderObject.BloomMaterial.InversedGammaCorrection = new Vector3(
-				Mathf.Abs(RenderObject.BloomGammaCorrection.X) > Mathf.ZeroTolerance ? 1f / RenderObject.BloomGammaCorrection.X : 0f,
-				Mathf.Abs(RenderObject.BloomGammaCorrection.Y) > Mathf.ZeroTolerance ? 1f / RenderObject.BloomGammaCorrection.Y : 0f,
-				Mathf.Abs(RenderObject.BloomGammaCorrection.Z) > Mathf.ZeroTolerance ? 1f / RenderObject.BloomGammaCorrection.Z : 0f
+			ro.PrepareOffscreenRendering(ro.Size);
+			var bufferSize = (Vector2)ro.BloomBuffer.Size;
+			var bloomViewportSize = (Size)(bufferSize * ro.BloomTextureScaling);
+			ro.BloomMaterial.BrightThreshold = ro.BloomBrightThreshold;
+			ro.BloomMaterial.InversedGammaCorrection = new Vector3(
+				Mathf.Abs(ro.BloomGammaCorrection.X) > Mathf.ZeroTolerance ? 1f / ro.BloomGammaCorrection.X : 0f,
+				Mathf.Abs(ro.BloomGammaCorrection.Y) > Mathf.ZeroTolerance ? 1f / ro.BloomGammaCorrection.Y : 0f,
+				Mathf.Abs(ro.BloomGammaCorrection.Z) > Mathf.ZeroTolerance ? 1f / ro.BloomGammaCorrection.Z : 0f
 			);
-			RenderObject.RenderToTexture(RenderObject.FirstTemporaryBuffer.Texture, RenderObject.ProcessedTexture, RenderObject.BloomMaterial, Color4.White, Color4.Black, bloomViewportSize);
+			ro.RenderToTexture(ro.FirstTemporaryBuffer.Texture, ro.ProcessedTexture, ro.BloomMaterial, Color4.White, Color4.Black, bloomViewportSize);
 			var bloomUV1 = (Vector2)bloomViewportSize / bufferSize;
-			RenderObject.BlurMaterial.Radius = RenderObject.BloomStrength;
-			RenderObject.BlurMaterial.BlurShaderId = RenderObject.BloomShaderId;
-			RenderObject.BlurMaterial.Step = RenderObject.ProcessedUV1 * RenderObject.BloomTextureScaling / RenderObject.CurrentBufferSize;
-			RenderObject.BlurMaterial.Dir = Vector2.Down;
-			RenderObject.BlurMaterial.AlphaCorrection = 1f;
-			RenderObject.BlurMaterial.Opaque = RenderObject.OpagueRendering;
-			RenderObject.RenderToTexture(RenderObject.SecondTemporaryBuffer.Texture, RenderObject.FirstTemporaryBuffer.Texture, RenderObject.BlurMaterial, Color4.White, Color4.Black, bloomViewportSize, bloomUV1);
-			RenderObject.BlurMaterial.Dir = Vector2.Right;
+			ro.BlurMaterial.Radius = ro.BloomStrength;
+			ro.BlurMaterial.BlurShaderId = ro.BloomShaderId;
+			ro.BlurMaterial.Step = ro.ProcessedUV1 * ro.BloomTextureScaling / ro.CurrentBufferSize;
+			ro.BlurMaterial.Dir = Vector2.Down;
+			ro.BlurMaterial.AlphaCorrection = 1f;
+			ro.BlurMaterial.Opaque = ro.OpagueRendering;
+			ro.RenderToTexture(ro.SecondTemporaryBuffer.Texture, ro.FirstTemporaryBuffer.Texture, ro.BlurMaterial, Color4.White, Color4.Black, bloomViewportSize, bloomUV1);
+			ro.BlurMaterial.Dir = Vector2.Right;
 
-			if (RenderObject.DebugViewMode != PostProcessingPresenter.DebugViewMode.Bloom) {
-				RenderObject.RenderToTexture(RenderObject.FirstTemporaryBuffer.Texture, RenderObject.SecondTemporaryBuffer.Texture, RenderObject.BlurMaterial, Color4.White, Color4.Black, bloomViewportSize, bloomUV1);
+			if (ro.DebugViewMode != PostProcessingPresenter.DebugViewMode.Bloom) {
+				ro.RenderToTexture(ro.FirstTemporaryBuffer.Texture, ro.SecondTemporaryBuffer.Texture, ro.BlurMaterial, Color4.White, Color4.Black, bloomViewportSize, bloomUV1);
 
-				if (RenderObject.ProcessedViewport.Width != RenderObject.ViewportSize.Width || RenderObject.ProcessedViewport.Height != RenderObject.ViewportSize.Height) {
-					Renderer.Viewport = RenderObject.ProcessedViewport = new Viewport(0, 0, RenderObject.ViewportSize.Width, RenderObject.ViewportSize.Height);
+				if (ro.ProcessedViewport.Width != ro.ViewportSize.Width || ro.ProcessedViewport.Height != ro.ViewportSize.Height) {
+					Renderer.Viewport = ro.ProcessedViewport = new Viewport(0, 0, ro.ViewportSize.Width, ro.ViewportSize.Height);
 				}
-				RenderObject.BloomBuffer.Texture.SetAsRenderTarget();
+				ro.BloomBuffer.Texture.SetAsRenderTarget();
 				try {
-					var material = !RenderObject.OpagueRendering ? RenderObject.AlphaDiffuseMaterial : RenderObject.OpaqueDiffuseMaterial;
+					var material = !ro.OpagueRendering ? ro.AlphaDiffuseMaterial : ro.OpaqueDiffuseMaterial;
 					Renderer.Clear(Color4.Zero);
-					Renderer.DrawSprite(RenderObject.ProcessedTexture, null, material, Color4.White, Vector2.Zero, RenderObject.Size, Vector2.Zero, RenderObject.ProcessedUV1, Vector2.Zero, Vector2.Zero);
-					Renderer.DrawSprite(RenderObject.FirstTemporaryBuffer.Texture, null, RenderObject.AddDiffuseMaterial, RenderObject.BloomColor, Vector2.Zero, RenderObject.Size, Vector2.Zero, bloomUV1, Vector2.Zero, Vector2.Zero);
+					Renderer.DrawSprite(ro.ProcessedTexture, null, material, Color4.White, Vector2.Zero, ro.Size, Vector2.Zero, ro.ProcessedUV1, Vector2.Zero, Vector2.Zero);
+					Renderer.DrawSprite(ro.FirstTemporaryBuffer.Texture, null, ro.AddDiffuseMaterial, ro.BloomColor, Vector2.Zero, ro.Size, Vector2.Zero, bloomUV1, Vector2.Zero, Vector2.Zero);
 				} finally {
-					RenderObject.BloomBuffer.Texture.RestoreRenderTarget();
+					ro.BloomBuffer.Texture.RestoreRenderTarget();
 				}
-				RenderObject.BloomBuffer.SetRenderParameters(RenderObject);
+				ro.BloomBuffer.SetRenderParameters(ro);
 			} else {
-				RenderObject.RenderToTexture(RenderObject.BloomBuffer.Texture, RenderObject.SecondTemporaryBuffer.Texture, RenderObject.BlurMaterial, RenderObject.BloomColor, Color4.Black, customUV1: bloomUV1);
-				RenderObject.BloomBuffer.MarkAsDirty();
+				ro.RenderToTexture(ro.BloomBuffer.Texture, ro.SecondTemporaryBuffer.Texture, ro.BlurMaterial, ro.BloomColor, Color4.Black, customUV1: bloomUV1);
+				ro.BloomBuffer.MarkAsDirty();
 			}
-			RenderObject.MarkBuffersAsDirty = true;
-			RenderObject.ProcessedTexture = RenderObject.BloomBuffer.Texture;
-			RenderObject.CurrentBufferSize = (Vector2)RenderObject.BloomBuffer.Size;
-			RenderObject.ProcessedUV1 = (Vector2)RenderObject.ViewportSize / RenderObject.CurrentBufferSize;
+			ro.MarkBuffersAsDirty = true;
+			ro.ProcessedTexture = ro.BloomBuffer.Texture;
+			ro.CurrentBufferSize = (Vector2)ro.BloomBuffer.Size;
+			ro.ProcessedUV1 = (Vector2)ro.ViewportSize / ro.CurrentBufferSize;
 		}
 
 		internal new class Buffer : PostProcessingAction.Buffer
