@@ -223,6 +223,9 @@ namespace Lime
 							while (currentPosition < pt) {
 								Thread.Sleep(10);
 								if (stopDecodeCancelationToken.IsCancellationRequested) {
+									if (info.Flags.HasFlag(MediaCodecBufferFlags.EndOfStream)) {
+										eosReceived = true;
+									}
 									videoCodec.ReleaseOutputBuffer(outIndex, false);
 								}
 								stopDecodeCancelationToken.ThrowIfCancellationRequested();
@@ -249,9 +252,15 @@ namespace Lime
 							var pt = info.PresentationTimeUs;
 							while (currentPosition < pt) {
 								Thread.Sleep(10);
-								stopDecodeCancelationToken.ThrowIfCancellationRequested();
+								if (stopDecodeCancelationToken.IsCancellationRequested) {
+									audioCodec.ReleaseOutputBuffer(outIndex, false);
+									if (info.Flags.HasFlag(MediaCodecBufferFlags.EndOfStream)) {
+										eosReceived = true;
+									}
+									stopDecodeCancelationToken.ThrowIfCancellationRequested();
+								}
 							}
-							audio.Write(buffer.Duplicate(), info.Size, WriteMode.Blocking, pt);
+							audio.Write(buffer.Duplicate(), info.Size, WriteMode.Blocking);
 							hasMoreItemsInQueue.Set();
 							audioCodec.ReleaseOutputBuffer(outIndex, false);
 						}
