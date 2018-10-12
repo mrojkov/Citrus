@@ -31,16 +31,21 @@ namespace Lime
 		internal new class Buffer : PostProcessingAction.Buffer
 		{
 			private Vector3 hsl = new Vector3(float.NaN, float.NaN, float.NaN);
+			private float brightness;
+			private float contrast;
 			private bool opaque;
 
 			public Buffer(Size size) : base(size) { }
 
-			public bool EqualRenderParameters(PostProcessingRenderObject ro) => !IsDirty && hsl == WrappedHSL(ro.HSL) && opaque == ro.OpagueRendering;
+			public bool EqualRenderParameters(PostProcessingRenderObject ro) =>
+				!IsDirty && hsl == WrappedHSL(ro.HSL) && brightness == ro.Brightness && contrast == ro.Contrast && opaque == ro.OpagueRendering;
 
 			public void SetRenderParameters(PostProcessingRenderObject ro)
 			{
 				IsDirty = false;
 				hsl = WrappedHSL(ro.HSL);
+				brightness = ro.Brightness;
+				contrast = ro.Contrast;
 				opaque = ro.OpagueRendering;
 			}
 		}
