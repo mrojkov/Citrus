@@ -27,10 +27,12 @@ namespace Lime
 		public bool OpagueRendering;
 		public PostProcessingAction.Buffer FirstTemporaryBuffer;
 		public PostProcessingAction.Buffer SecondTemporaryBuffer;
-		public PostProcessingActionHSL.Buffer HSLBuffer;
-		public HSLMaterial HSLMaterial;
+		public PostProcessingActionColorCorrection.Buffer ColorCorrectionBuffer;
+		public ColorCorrectionMaterial ColorCorrectionMaterial;
 		public bool HSLEnabled;
 		public Vector3 HSL;
+		public float Brightness;
+		public float Contrast;
 		public PostProcessingActionBlur.Buffer BlurBuffer;
 		public BlurMaterial BlurMaterial;
 		public bool BlurEnabled;
@@ -81,8 +83,8 @@ namespace Lime
 			SourceTextureBuffer = null;
 			FirstTemporaryBuffer = null;
 			SecondTemporaryBuffer = null;
-			HSLBuffer = null;
-			HSLMaterial = null;
+			ColorCorrectionBuffer = null;
+			ColorCorrectionMaterial = null;
 			BlurBuffer = null;
 			BlurMaterial = null;
 			BloomBuffer = null;

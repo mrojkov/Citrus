@@ -249,8 +249,9 @@
     <Compile Include="Source\Widgets\3D\Model3DAttachment.cs" />
     <Compile Include="Source\Widgets\3D\RenderObject3D.cs" />
     <Compile Include="Source\Widgets\3D\Spline3D.cs" />
+    <Compile Include="Source\Widgets\Materials\HSLComponent.cs" />
     <Compile Include="Source\Widgets\Materials\NoiseMaterial.cs" />
-    <Compile Include="Source\Widgets\Materials\HSLMaterial.cs" />
+    <Compile Include="Source\Widgets\Materials\ColorCorrectionMaterial.cs" />
     <Compile Include="Source\Widgets\DropDownList.cs" />
     <Compile Include="Source\Widgets\Editor.cs" />
     <Compile Include="Source\Graphics\RenderBatch.cs" />
@@ -504,7 +505,7 @@
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingAction.cs" />
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionBloom.cs" />
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionBlur.cs" />
-    <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionHSL.cs" />
+    <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionColorCorrection.cs" />
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionNoise.cs" />
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionOverallImpact.cs" />
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionTextureBuilder.cs" />

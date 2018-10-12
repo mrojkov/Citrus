@@ -7,7 +7,7 @@ namespace Lime
 	[AllowedComponentOwnerTypes(typeof(Widget))]
 	public class PostProcessingComponent : NodeBehavior
 	{
-		private const string GroupHSL = "1. HSL";
+		private const string GroupColorCorrection = "1. Color correction";
 		private const string GroupBlur = "2. Blur effect";
 		private const string GroupBloom = "3. Bloom effect";
 		private const string GroupNoise = "4. Noise";
@@ -23,10 +23,14 @@ namespace Lime
 		private const float MaximumSaturation = 100f;
 		private const float MinimumLightness = -100f;
 		private const float MaximumLightness = 100f;
+		private const float MinimumBrightness = -100f;
+		private const float MaximumBrightness = 100f;
+		private const float MinimumContrast = -100f;
+		private const float MaximumContrast = 100f;
 		private const float MaximumBlurRadius = 30f;
 		private const float MaximumGammaCorrection = 10f;
 
-		internal HSLMaterial HSLMaterial { get; private set; } = new HSLMaterial();
+		internal ColorCorrectionMaterial ColorCorrectionMaterial { get; private set; } = new ColorCorrectionMaterial();
 		internal BlurMaterial BlurMaterial { get; private set; } = new BlurMaterial();
 		internal BloomMaterial BloomMaterial { get; private set; } = new BloomMaterial();
 		internal NoiseMaterial NoiseMaterial { get; private set; } = new NoiseMaterial();
@@ -35,6 +39,8 @@ namespace Lime
 		// TODO: Solve promblem of storing and restoring savedPresenter&savedRenderChainBuilder
 		private PostProcessingPresenter presenter = new PostProcessingPresenter();
 		private PostProcessingRenderChainBuilder renderChainBuilder = new PostProcessingRenderChainBuilder();
+		private float brightness;
+		private float contrast;
 		private float blurRadius = 1f;
 		private float blurTextureScaling = 1f;
 		private float blurAlphaCorrection = 1f;
@@ -56,11 +62,11 @@ namespace Lime
 		private float refreshSourceDelta;
 
 		[YuzuMember]
-		[TangerineGroup(GroupHSL)]
+		[TangerineGroup(GroupColorCorrection)]
 		public bool HSLEnabled { get; set; }
 
 		[TangerineInspect]
-		[TangerineGroup(GroupHSL)]
+		[TangerineGroup(GroupColorCorrection)]
 		public float Hue
 		{
 			get => HSL.X;
@@ -68,7 +74,7 @@ namespace Lime
 		}
 
 		[TangerineInspect]
-		[TangerineGroup(GroupHSL)]
+		[TangerineGroup(GroupColorCorrection)]
 		public float Saturation
 		{
 			get => HSL.Y;
@@ -76,7 +82,7 @@ namespace Lime
 		}
 
 		[TangerineInspect]
-		[TangerineGroup(GroupHSL)]
+		[TangerineGroup(GroupColorCorrection)]
 		public float Lightness
 		{
 			get => HSL.Z;
@@ -86,6 +92,22 @@ namespace Lime
 		[YuzuMember]
 		[TangerineIgnore]
 		public Vector3 HSL { get; set; } = Vector3.Zero;
+
+		[TangerineInspect]
+		[TangerineGroup(GroupColorCorrection)]
+		public float Brightness
+		{
+			get => brightness;
+			set => brightness = Mathf.Clamp(value, MinimumBrightness, MaximumBrightness);
+		}
+
+		[TangerineInspect]
+		[TangerineGroup(GroupColorCorrection)]
+		public float Contrast
+		{
+			get => contrast;
+			set => contrast = Mathf.Clamp(value, MinimumContrast, MaximumContrast);
+		}
 
 		[YuzuMember]
 		[TangerineGroup(GroupBlur)]
@@ -417,7 +439,7 @@ namespace Lime
 			var clone = (PostProcessingComponent)base.Clone();
 			clone.presenter = (PostProcessingPresenter)presenter.Clone();
 			clone.renderChainBuilder = (PostProcessingRenderChainBuilder)renderChainBuilder.Clone(null);
-			clone.HSLMaterial = (HSLMaterial)HSLMaterial.Clone();
+			clone.ColorCorrectionMaterial = (ColorCorrectionMaterial)ColorCorrectionMaterial.Clone();
 			clone.BlurMaterial = (BlurMaterial)BlurMaterial.Clone();
 			clone.BloomMaterial = (BloomMaterial)BloomMaterial.Clone();
 			clone.NoiseMaterial = (NoiseMaterial)NoiseMaterial.Clone();

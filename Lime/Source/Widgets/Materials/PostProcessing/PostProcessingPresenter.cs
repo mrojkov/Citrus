@@ -17,7 +17,7 @@ namespace Lime
 		private PostProcessingAction.Buffer sourceTextureBuffer;
 		private PostProcessingAction.Buffer firstTemporaryBuffer;
 		private PostProcessingAction.Buffer secondTemporaryBuffer;
-		private PostProcessingActionHSL.Buffer hslBuffer;
+		private PostProcessingActionColorCorrection.Buffer colorCorrectionBuffer;
 		private PostProcessingActionBlur.Buffer blurBuffer;
 		private PostProcessingActionBloom.Buffer bloomBuffer;
 		private PostProcessingActionNoise.Buffer noiseBuffer;
@@ -27,7 +27,7 @@ namespace Lime
 			postProcessingActions = new PostProcessingAction[] {
 				new PostProcessingActionTextureBuilder(),
 				new PostProcessingActionOverallImpact(),
-				new PostProcessingActionHSL(),
+				new PostProcessingActionColorCorrection(),
 				new PostProcessingActionBlur(),
 				new PostProcessingActionBloom(),
 				new PostProcessingActionNoise(),
@@ -58,8 +58,8 @@ namespace Lime
 			if (sourceTextureBuffer?.Size != bufferSize) {
 				sourceTextureBuffer = new PostProcessingAction.Buffer(bufferSize);
 			}
-			if (component.HSLEnabled && hslBuffer?.Size != bufferSize) {
-				hslBuffer = new PostProcessingActionHSL.Buffer(bufferSize);
+			if (component.HSLEnabled && colorCorrectionBuffer?.Size != bufferSize) {
+				colorCorrectionBuffer = new PostProcessingActionColorCorrection.Buffer(bufferSize);
 			}
 			if (component.BlurEnabled && blurBuffer?.Size != bufferSize) {
 				blurBuffer = new PostProcessingActionBlur.Buffer(bufferSize);
@@ -95,10 +95,12 @@ namespace Lime
 			ro.OpagueRendering = component.OpagueRendering;
 			ro.FirstTemporaryBuffer = firstTemporaryBuffer;
 			ro.SecondTemporaryBuffer = secondTemporaryBuffer;
-			ro.HSLBuffer = hslBuffer;
-			ro.HSLMaterial = component.HSLMaterial;
+			ro.ColorCorrectionBuffer = colorCorrectionBuffer;
+			ro.ColorCorrectionMaterial = component.ColorCorrectionMaterial;
 			ro.HSLEnabled = component.HSLEnabled;
 			ro.HSL = new Vector3(component.HSL.X * (1f / 360f), component.HSL.Y * 0.01f + 1f, component.HSL.Z * 0.01f + 1f);
+			ro.Brightness = component.Brightness * 0.01f;
+			ro.Contrast = component.Contrast * 0.01f + 1f;
 			ro.BlurBuffer = blurBuffer;
 			ro.BlurMaterial = component.BlurMaterial;
 			ro.BlurEnabled = component.BlurEnabled;
