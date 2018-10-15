@@ -17,7 +17,7 @@ namespace Lime
 			ro.PrepareOffscreenRendering(ro.Size);
 			ro.SharpenMaterial.Strength = ro.SharpenStrength;
 			ro.SharpenMaterial.Limit = ro.SharpenLimit;
-			ro.SharpenMaterial.Step = ro.ProcessedUV1 / ro.CurrentBufferSize;
+			ro.SharpenMaterial.Step = ro.SharpenStep * (ro.ProcessedUV1 / ro.CurrentBufferSize);
 			ro.SharpenMaterial.Opaque = ro.OpagueRendering;
 			ro.RenderToTexture(ro.SharpenBuffer.Texture, ro.ProcessedTexture, ro.SharpenMaterial, Color4.White, Color4.Zero);
 			ro.CurrentBufferSize = (Vector2)ro.SharpenBuffer.Size;
