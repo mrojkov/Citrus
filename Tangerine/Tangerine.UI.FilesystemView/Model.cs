@@ -10,14 +10,11 @@ namespace Tangerine.UI.FilesystemView
 #pragma warning disable CS0660, CS0661
 	public class Selection : IEnumerable<string>, IReadOnlyVersionedCollection<string>
 	{
-		public Selection Clone()
-		{
-			var r = new Selection();
-			r.selection = new HashSet<string>(this);
-			return r;
-		}
-		private HashSet<string> selection = new HashSet<string>();
+		public int Count => selection.Count;
+		public int Version { get; private set; }
 		public bool Empty => selection.Count == 0;
+		private HashSet<string> selection = new HashSet<string>();
+
 		public void Select(string path)
 		{
 			if (!selection.Contains(path)) {
@@ -25,6 +22,7 @@ namespace Tangerine.UI.FilesystemView
 				Version++;
 			}
 		}
+
 		public void SelectRange(IEnumerable<string> source)
 		{
 			bool changed = false;
@@ -38,6 +36,7 @@ namespace Tangerine.UI.FilesystemView
 				Version++;
 			}
 		}
+
 		public void Deselect(string path)
 		{
 			if (selection.Contains(path)) {
@@ -45,6 +44,7 @@ namespace Tangerine.UI.FilesystemView
 				Version++;
 			}
 		}
+
 		public void Clear()
 		{
 			if (selection.Count != 0) {
@@ -52,40 +52,23 @@ namespace Tangerine.UI.FilesystemView
 				Version++;
 			}
 		}
-		public bool Contains(string path)
-		{
-			return selection.Contains(path);
-		}
 
-		public IEnumerator<string> GetEnumerator()
-		{
-			return selection.GetEnumerator();
-		}
+		public bool Contains(string path) => selection.Contains(path);
+		public Selection Clone() => new Selection { selection = new HashSet<string>(this) };
 
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
-
-		public static bool operator !=(Selection lhs, Selection rhs)
-		{
-			return !(lhs == rhs);
-		}
-
+		public IEnumerator<string> GetEnumerator() => selection.GetEnumerator();
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+		public static bool operator !=(Selection lhs, Selection rhs) => !(lhs == rhs);
 		public static bool operator ==(Selection lhs, Selection rhs)
 		{
-			if (object.ReferenceEquals(lhs, null) && object.ReferenceEquals(rhs, null)) {
+			if (lhs is null && rhs is null) {
 				return true;
 			}
-			if (object.ReferenceEquals(lhs, null) || object.ReferenceEquals(rhs, null)) {
+			if (lhs is null || rhs is null) {
 				return false;
 			}
 			return lhs.SequenceEqual(rhs);
 		}
-
-		public int Count => selection.Count;
-
-		public int Version { get; private set; }
 	}
 #pragma warning restore CS0660, CS0661
 
