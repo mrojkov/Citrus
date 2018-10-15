@@ -10,7 +10,7 @@ namespace Tangerine.UI.FilesystemView
 	public class Preview
 	{
 		public ThemedScrollView RootWidget;
-		private Selection savedSelection = new Selection();
+		private FilesystemSelection savedFilesystemSelection = new FilesystemSelection();
 		// zoom, maxZoom for each element
 		private List<Tuple<int, int>> zoom = new List<Tuple<int, int>>();
 		private int maxZoom = zoomValues.Length - 1;
@@ -107,22 +107,22 @@ namespace Tangerine.UI.FilesystemView
 			}
 		}
 
-		public void Invalidate(Selection selection)
+		public void Invalidate(FilesystemSelection filesystemSelection)
 		{
 			if (RootWidget.Parent == null) {
 				return;
 			}
-			if (savedSelection == selection) {
+			if (savedFilesystemSelection == filesystemSelection) {
 				return;
 			}
-			savedSelection = selection.Clone();
+			savedFilesystemSelection = filesystemSelection.Clone();
 			RootWidget.Content.Nodes.Clear();
-			if (selection.Empty) {
+			if (filesystemSelection.Empty) {
 				return;
 			}
 			RootWidget.ScrollPosition = 0;
 			List<Tuple<string, Image>> previews = new List<Tuple<string, Image>>();
-			foreach (var filename in selection) {
+			foreach (var filename in filesystemSelection) {
 				var pv = GeneratePreview(filename);
 				if (pv != null) {
 					pv.MinMaxSize = (Vector2)pv.Texture.ImageSize;

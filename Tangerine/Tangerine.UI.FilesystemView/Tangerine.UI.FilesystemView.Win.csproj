@@ -60,7 +60,7 @@
     <Compile Include="FilesystemItem.cs" />
     <Compile Include="ISystemIconTextureProvider.cs" />
     <Compile Include="ISystemShellContextMenu.cs" />
-    <Compile Include="Model.cs" />
+    <Compile Include="FilesystemModel.cs" />
     <Compile Include="Preview.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FilesystemToolbar.cs" />

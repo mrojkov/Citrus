@@ -8,7 +8,7 @@ using Tangerine.Core;
 namespace Tangerine.UI.FilesystemView
 {
 #pragma warning disable CS0660, CS0661
-	public class Selection : IEnumerable<string>, IReadOnlyVersionedCollection<string>
+	public class FilesystemSelection : IEnumerable<string>, IReadOnlyVersionedCollection<string>
 	{
 		public int Count => selection.Count;
 		public int Version { get; private set; }
@@ -54,12 +54,12 @@ namespace Tangerine.UI.FilesystemView
 		}
 
 		public bool Contains(string path) => selection.Contains(path);
-		public Selection Clone() => new Selection { selection = new HashSet<string>(this) };
+		public FilesystemSelection Clone() => new FilesystemSelection { selection = new HashSet<string>(this) };
 
 		public IEnumerator<string> GetEnumerator() => selection.GetEnumerator();
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-		public static bool operator !=(Selection lhs, Selection rhs) => !(lhs == rhs);
-		public static bool operator ==(Selection lhs, Selection rhs)
+		public static bool operator !=(FilesystemSelection lhs, FilesystemSelection rhs) => !(lhs == rhs);
+		public static bool operator ==(FilesystemSelection lhs, FilesystemSelection rhs)
 		{
 			if (lhs is null && rhs is null) {
 				return true;
@@ -72,7 +72,7 @@ namespace Tangerine.UI.FilesystemView
 	}
 #pragma warning restore CS0660, CS0661
 
-	public class Model
+	public class FilesystemModel
 	{
 		enum ItemType
 		{
@@ -83,19 +83,18 @@ namespace Tangerine.UI.FilesystemView
 		private string currentPath;
 		public string CurrentPath
 		{
-			get { return currentPath; }
+			get => currentPath;
 			set {
 				try {
 					Directory.EnumerateFileSystemEntries(value).ToList();
 					currentPath = value;
-				}
-				catch (Exception e) {
+				} catch (Exception e) {
 					new AlertDialog(e.Message).Show();
 				}
 			}
 		}
 
-		public Model(string path)
+		public FilesystemModel(string path)
 		{
 			currentPath = path;
 			if (!Directory.Exists(path)) {

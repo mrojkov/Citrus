@@ -14,16 +14,16 @@ namespace Tangerine.UI.FilesystemView
 			PathBar,
 			Editor
 		}
-		private Model model;
+		private FilesystemModel filesystemModel;
 		private AddressBarState state;
 		private PathBar pathBar;
 		private ThemedEditBox editor;
 		private Func<string, bool> openPath;
 
-		public AddressBar(Func<string, bool> openPath, Model model)
+		public AddressBar(Func<string, bool> openPath, FilesystemModel filesystemModel)
 		{
 			this.openPath = openPath;
-			this.model = model;
+			this.filesystemModel = filesystemModel;
 			Layout = new StackLayout();
 			state = AddressBarState.PathBar;
 			CreatePathBar();
@@ -34,7 +34,7 @@ namespace Tangerine.UI.FilesystemView
 					state != AddressBarState.Editor
 				) {
 					state = AddressBarState.Editor;
-					editor.Text = model.CurrentPath;
+					editor.Text = filesystemModel.CurrentPath;
 					RemovePathBar();
 				}
 				if (
@@ -49,11 +49,11 @@ namespace Tangerine.UI.FilesystemView
 		private string AdjustPath(string path)
 		{
 			if (string.IsNullOrWhiteSpace(path)) {
-				return model.CurrentPath;
+				return filesystemModel.CurrentPath;
 			}
 			if (path.Length < 3) {
 				AlertDialog.Show("The size of the path is less than the permissible.");
-				return model.CurrentPath;
+				return filesystemModel.CurrentPath;
 			}
 
 			if (path.Contains("..")) {
@@ -94,7 +94,7 @@ namespace Tangerine.UI.FilesystemView
 			doubleDirectorySeparator += Path.DirectorySeparatorChar;
 			if (path.Contains(doubleDirectorySeparator)) {
 				AlertDialog.Show("The path is in an invalid format.");
-				return model.CurrentPath;
+				return filesystemModel.CurrentPath;
 			}
 
 			if (
@@ -124,7 +124,7 @@ namespace Tangerine.UI.FilesystemView
 			} else {
 				state = AddressBarState.Editor;
 				RemovePathBar();
-				editor.Text = model.CurrentPath;
+				editor.Text = filesystemModel.CurrentPath;
 			}
 		}
 
@@ -138,7 +138,7 @@ namespace Tangerine.UI.FilesystemView
 					if (openPath(adjustedText)) {
 						FlipState();
 					} else {
-						editor.Text = model.CurrentPath;
+						editor.Text = filesystemModel.CurrentPath;
 					}
 				}
 			};
@@ -146,7 +146,7 @@ namespace Tangerine.UI.FilesystemView
 
 		private void CreatePathBar()
 		{
-			Nodes.Push(pathBar = new PathBar(openPath, model));
+			Nodes.Push(pathBar = new PathBar(openPath, filesystemModel));
 			pathBar.LayoutCell = new LayoutCell(Alignment.LeftCenter);
 		}
 
@@ -163,24 +163,24 @@ namespace Tangerine.UI.FilesystemView
 		private Func<string, bool> openPath;
 		private PathBarButton[] buttons;
 		private PathArrowButton rootArrowButton;
-		private Model model;
+		private FilesystemModel filesystemModel;
 
-		public PathBar(Func<string, bool> openPath, Model model)
+		public PathBar(Func<string, bool> openPath, FilesystemModel filesystemModel)
 		{
-			this.model = model;
+			this.filesystemModel = filesystemModel;
 			this.openPath = openPath;
 			Layout = new HBoxLayout();
 			LayoutCell = new LayoutCell(Alignment.LeftCenter);
 			Padding = new Thickness(1);
 
-			this.AddChangeWatcher(() => model.CurrentPath, (p) => {
+			this.AddChangeWatcher(() => filesystemModel.CurrentPath, (p) => {
 				UpdatePathBar();
 			});
 		}
 
 		private void CreateButtons()
 		{
-			topFoldersPaths = GetTopFoldersPaths(model.CurrentPath);
+			topFoldersPaths = GetTopFoldersPaths(filesystemModel.CurrentPath);
 			buttons = new PathBarButton[topFoldersPaths.Count];
 
 			Nodes.Add(rootArrowButton = new PathArrowButton(openPath));

@@ -40,7 +40,7 @@ namespace Tangerine.UI.FilesystemView
 		FilesystemView view;
 		public AddressBar AddressBar;
 
-		public FilesystemToolbar(FilesystemView view, Model model)
+		public FilesystemToolbar(FilesystemView view, FilesystemModel filesystemModel)
 		{
 			this.view = view;
 			Nodes.AddRange(
@@ -73,7 +73,7 @@ namespace Tangerine.UI.FilesystemView
 								CreateCloseButton()
 							}
 						},
-						(AddressBar = new AddressBar(view.Open, model)),
+						(AddressBar = new AddressBar(view.Open, filesystemModel)),
 					}
 				}
 			);
