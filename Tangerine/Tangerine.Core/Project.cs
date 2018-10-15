@@ -174,7 +174,7 @@ namespace Tangerine.Core
 			localPath = AssetPath.CorrectSlashes(localPath);
 			var doc = Documents.FirstOrDefault(i => i.Path == localPath);
 			if (doc == null) {
-				var tmpFile = AutosaveProcessor.GetTemporalFilePath(localPath);
+				var tmpFile = AutosaveProcessor.GetTemporaryFilePath(localPath);
 				string systemPath;
 				if (GetFullPath(tmpFile, out systemPath) && TempFileLoadConfirmation.Invoke(localPath)) {
 					doc = new Document(tmpFile);
@@ -208,7 +208,7 @@ namespace Tangerine.Core
 			string systemPath;
 			if (doc.Close()) {
 				documents.Remove(doc);
-				if (GetFullPath(AutosaveProcessor.GetTemporalFilePath(doc.Path), out systemPath)) {
+				if (GetFullPath(AutosaveProcessor.GetTemporaryFilePath(doc.Path), out systemPath)) {
 					File.Delete(systemPath);
 				}
 				if (doc == Document.Current) {

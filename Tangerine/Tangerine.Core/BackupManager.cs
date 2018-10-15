@@ -80,7 +80,7 @@ namespace Tangerine.Core
 			mode = Mode.Normal;
 		}
 
-		private string GetTemporalPath(string path)
+		private string GetTemporaryPath(string path)
 		{
 			return Path.Combine(Lime.Environment.GetDataDirectory("Tangerine"), "Backups", projectName, "Data", path);
 		}
@@ -89,7 +89,7 @@ namespace Tangerine.Core
 		{
 			if (Document.Current != null) {
 
-				var path = GetTemporalPath(document.Path);
+				var path = GetTemporaryPath(document.Path);
 				var history = GetHistory(path);
 				if (mode != Mode.Normal) {
 					if (history != null) {
@@ -154,7 +154,7 @@ namespace Tangerine.Core
 
 		private void SaveBackup(Document document)
 		{
-			var path = GetTemporalPath(document.Path);
+			var path = GetTemporaryPath(document.Path);
 			Directory.CreateDirectory(path);
 			try {
 				document.SaveTo(Path.Combine(path, DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")));

@@ -17,7 +17,7 @@ namespace Tangerine.Core
 			doc.RowTree = GetFolderRow(doc.Container.RootFolder());
 			doc.RowTree.Rows.Clear();
 			AddFolderContent(doc.RowTree);
-			// Use temporal row list to avoid 'Collection was modified' exception during row batch processing.
+			// Use temporary row list to avoid 'Collection was modified' exception during row batch processing.
 			if (!rows.SequenceEqual(Document.Current.Rows)) {
 				doc.Rows.Clear();
 				doc.Rows.AddRange(rows);
