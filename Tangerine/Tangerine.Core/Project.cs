@@ -32,6 +32,8 @@ namespace Tangerine.Core
 		public static TempFileLoadConfirmationDelegate TempFileLoadConfirmation;
 		public delegate void OpenFileOutsideProjectAttemptDelegate(string filePath);
 		public static OpenFileOutsideProjectAttemptDelegate OpenFileOutsideProjectAttempt;
+		public delegate void HandleMissingDocumentsDelegate(IEnumerable<Document> documents);
+		public static HandleMissingDocumentsDelegate HandleMissingDocuments;
 		public static TaskList Tasks { get; set; }
 		public Dictionary<string, Widget> Overlays { get; } = new Dictionary<string, Widget>();
 		public ProjectPreferences Preferences { get; private set; } = new ProjectPreferences();
@@ -301,11 +303,14 @@ namespace Tangerine.Core
 
 		public void ReloadModifiedDocuments()
 		{
+			HandleMissingDocuments(Documents.Where(d => !File.Exists(d.FullPath)));
 			foreach (var doc in Documents.ToList()) {
 				if (!doc.Loaded) {
 					continue;
 				}
-				if (doc.WasModifiedOutsideTangerine()) {
+				if (!File.Exists(doc.FullPath)) {
+					throw new InvalidOperationException();
+				} else if (doc.WasModifiedOutsideTangerine()) {
 					if (DocumentReloadConfirmation(doc)) {
 						ReloadDocument(doc);
 					} else {

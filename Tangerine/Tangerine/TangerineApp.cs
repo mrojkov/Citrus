@@ -150,6 +150,39 @@ namespace Tangerine
 					default: return Document.CloseAction.Cancel;
 				}
 			};
+			Project.HandleMissingDocuments += documents => {
+				while (documents.Any()) {
+					var nextDocument = documents.First();
+					Document.SetCurrent(nextDocument);
+					var alert = new AlertDialog($"Document {nextDocument.FullPath} has been deleted. Save or Discard?", "Save", "Save All", "Discard", "Discard All");
+					var r = alert.Show();
+					switch (r) {
+						case 0: {
+							Directory.CreateDirectory(Path.GetDirectoryName(nextDocument.FullPath));
+							nextDocument.Save();
+							break;
+						}
+						case 1: {
+							while (documents.Any()) {
+								var d = documents.First();
+								Directory.CreateDirectory(Path.GetDirectoryName(d.FullPath));
+								d.Save();
+							}
+							return;
+						}
+						case 2: {
+							Project.Current.CloseDocument(nextDocument);
+							break;
+						}
+						case 3: {
+							while (documents.Any()) {
+								Project.Current.CloseDocument(documents.First());
+							}
+							return;
+						}
+					}
+				}
+			};
 			Project.DocumentReloadConfirmation += doc => {
 				if (doc.IsModified) {
 					var modifiedAlert = new AlertDialog($"{doc.Path}\n\nThis file has been modified by another program and has unsaved changes.\nDo you want to reload it from disk? ", "Yes", "No");
@@ -234,6 +267,7 @@ namespace Tangerine
 								default: return Document.CloseAction.DiscardChanges;
 							}
 						};
+						// TODO: dont open document if it doesn't exist
 						var path = Document.Current.Path;
 						Project.Current.CloseDocument(Document.Current);
 						Project.Current.OpenDocument(path);

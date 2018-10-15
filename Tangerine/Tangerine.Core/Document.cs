@@ -225,6 +225,7 @@ namespace Tangerine.Core
 			if (Path == defaultPath) {
 				return false;
 			}
+			// care if file no longer exists
 			return File.GetLastWriteTimeUtc(FullPath) > modificationTime;
 		}
 
