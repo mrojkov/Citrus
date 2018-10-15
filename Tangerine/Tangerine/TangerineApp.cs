@@ -152,7 +152,7 @@ namespace Tangerine
 			};
 			Project.DocumentReloadConfirmation += doc => {
 				if (doc.IsModified) {
-					var modifiedAlert = new AlertDialog($"{doc.Path}\n\nThis file hase been modified by another program and has unsaved changes.\nDo you want to reload it from disk? ", "Yes", "No");
+					var modifiedAlert = new AlertDialog($"{doc.Path}\n\nThis file has been modified by another program and has unsaved changes.\nDo you want to reload it from disk? ", "Yes", "No");
 					var res = modifiedAlert.Show();
 					if (res == 1 || res == -1) {
 						doc.History.ExternalModification();
@@ -163,7 +163,7 @@ namespace Tangerine
 				if (CoreUserPreferences.Instance.ReloadModifiedFiles) {
 					return true;
 				}
-				var alert = new AlertDialog($"{doc.Path}\n\nThis file hase been modified by another program.\nDo you want to reload it from disk? ", "Yes, always", "Yes", "No");
+				var alert = new AlertDialog($"{doc.Path}\n\nThis file has been modified by another program.\nDo you want to reload it from disk? ", "Yes, always", "Yes", "No");
 				var r = alert.Show();
 				if (r == 0) {
 					CoreUserPreferences.Instance.ReloadModifiedFiles = true;
