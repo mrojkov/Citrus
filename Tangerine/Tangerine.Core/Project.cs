@@ -154,16 +154,6 @@ namespace Tangerine.Core
 			return false;
 		}
 
-		public string GetSystemPath(string assetPath, string extension)
-		{
-			return Path.ChangeExtension(Path.Combine(AssetsDirectory, assetPath), extension);
-		}
-
-		public string GetSystemDirectory(string assetPath)
-		{
-			return Path.GetDirectoryName(GetSystemPath(assetPath, null));
-		}
-
 		public Document NewDocument(DocumentFormat format = DocumentFormat.Scene, Type rootType = null)
 		{
 			var doc = new Document(format, rootType);
@@ -186,7 +176,7 @@ namespace Tangerine.Core
 			if (doc == null) {
 				var tmpFile = AutosaveProcessor.GetTemporalFilePath(localPath);
 				string systemPath;
-				if (GetSystemPath(tmpFile, out systemPath) && TempFileLoadConfirmation.Invoke(localPath)) {
+				if (GetFullPath(tmpFile, out systemPath) && TempFileLoadConfirmation.Invoke(localPath)) {
 					doc = new Document(tmpFile);
 					doc.SaveAs(localPath);
 				} else {
@@ -212,25 +202,13 @@ namespace Tangerine.Core
 				UserPreferences.RecentDocuments.RemoveAt(UserPreferences.RecentDocuments.Count - 1);
 		}
 
-		public bool GetSystemPath(string localPath, out string systemPath)
-		{
-			systemPath = null;
-			foreach (var ext in Document.AllowedFileTypes) {
-				systemPath = GetSystemPath(localPath, ext);
-				if (File.Exists(systemPath)) {
-					return true;
-				}
-			}
-			return false;
-		}
-
 		public bool CloseDocument(Document doc)
 		{
 			int currentIndex = documents.IndexOf(Document.Current);
 			string systemPath;
 			if (doc.Close()) {
 				documents.Remove(doc);
-				if (GetSystemPath(AutosaveProcessor.GetTemporalFilePath(doc.Path), out systemPath)) {
+				if (GetFullPath(AutosaveProcessor.GetTemporalFilePath(doc.Path), out systemPath)) {
 					File.Delete(systemPath);
 				}
 				if (doc == Document.Current) {
@@ -468,6 +446,23 @@ namespace Tangerine.Core
 			return assembly
 				.GetTypes()
 				.Where(t => typeof(NodeComponent).IsAssignableFrom(t) && t.IsDefined(typeof(TangerineRegisterComponentAttribute)));
+		}
+
+		public string GetFullPath(string assetPath, string extension)
+		{
+			return Path.ChangeExtension(Path.Combine(AssetsDirectory, assetPath), extension);
+		}
+
+		public bool GetFullPath(string localPath, out string fullPath)
+		{
+			fullPath = null;
+			foreach (var ext in Document.AllowedFileTypes) {
+				fullPath = GetFullPath(localPath, ext);
+				if (File.Exists(fullPath)) {
+					return true;
+				}
+			}
+			return false;
 		}
 	}
 }

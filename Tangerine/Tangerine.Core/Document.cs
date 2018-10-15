@@ -66,6 +66,11 @@ namespace Tangerine.Core
 		public string Path { get; private set; }
 
 		/// <summary>
+		/// Gets absolute path to the document.
+		/// </summary>
+		public string FullPath => Project.Current.GetFullPath(Path, GetFileExtension(Loaded ? Format : ResolveFormat(Path)));
+
+		/// <summary>
 		/// Document name to be displayed.
 		/// </summary>
 		public string DisplayName => (IsModified ? "*" : string.Empty) + System.IO.Path.GetFileName(System.IO.Path.ChangeExtension(Path ?? "Untitled", null));
@@ -178,7 +183,7 @@ namespace Tangerine.Core
 				Decorate(RootNode);
 				Container = RootNode;
 				if (Format == DocumentFormat.Scene || Format == DocumentFormat.Tan) {
-					Preview = DocumentPreview.ReadAsBase64(Project.Current.GetSystemPath(Path, GetFileExtension(Format)));
+					Preview = DocumentPreview.ReadAsBase64(FullPath);
 				}
 				History.PerformingOperation += Document_PerformingOperation;
 			} catch (System.Exception e) {
@@ -220,8 +225,7 @@ namespace Tangerine.Core
 			if (Path == defaultPath) {
 				return false;
 			}
-			var fullPath = Project.Current.GetSystemPath(Path, GetFileExtension(Format));
-			return File.GetLastWriteTimeUtc(fullPath) > modificationTime;
+			return File.GetLastWriteTimeUtc(FullPath) > modificationTime;
 		}
 
 		public void SetModificationTimeToNow()
@@ -369,7 +373,7 @@ namespace Tangerine.Core
 			Path = path;
 			WriteNodeToFile(path, Format, RootNodeUnwrapped);
 			if (Format == DocumentFormat.Scene || Format == DocumentFormat.Tan) {
-				DocumentPreview.AppendToFile(Project.Current.GetSystemPath(path, GetFileExtension(Format)), Preview);
+				DocumentPreview.AppendToFile(FullPath, Preview);
 			}
 			SetModificationTimeToNow();
 			Project.Current.AddRecentDocument(Path);
@@ -393,7 +397,7 @@ namespace Tangerine.Core
 					TangerineYuzu.Instance.Value.WriteObject(path, ms, node, Serialization.Format.JSON);
 				}
 			}
-			var fullPath = Project.Current.GetSystemPath(path, GetFileExtension(format));
+			var fullPath = Project.Current.GetFullPath(path, GetFileExtension(format));
 
 			FileMode fileModeForHiddenFile = File.Exists(fullPath) ? FileMode.Truncate : FileMode.Create;
 			using (var fs = new FileStream(fullPath, fileModeForHiddenFile)) {

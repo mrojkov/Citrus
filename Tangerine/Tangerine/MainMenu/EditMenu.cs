@@ -349,7 +349,7 @@ namespace Tangerine
 			var dlg = new FileDialog {
 				AllowedFileTypes = new string[] { Document.Current.GetFileExtension() },
 				Mode = FileDialogMode.Save,
-				InitialDirectory = Project.Current.GetSystemDirectory(Document.Current.Path),
+				InitialDirectory = Path.GetDirectoryName(Document.Current.FullPath),
 			};
 			if (dlg.RunModal()) {
 				string assetPath;

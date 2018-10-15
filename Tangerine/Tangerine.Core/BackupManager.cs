@@ -207,7 +207,7 @@ namespace Tangerine.Core
 		{
 			var localPath = Document.Current.Path;
 			string systemPath;
-			Project.Current.GetSystemPath(Document.Current.Path, out systemPath);
+			Project.Current.GetFullPath(Document.Current.Path, out systemPath);
 			Project.Current.CloseDocument(Document.Current);
 			File.Delete(systemPath);
 			File.Copy(backup.Path, systemPath, true);
