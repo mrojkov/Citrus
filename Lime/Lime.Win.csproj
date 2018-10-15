@@ -249,7 +249,9 @@
     <Compile Include="Source\Widgets\3D\Model3DAttachment.cs" />
     <Compile Include="Source\Widgets\3D\RenderObject3D.cs" />
     <Compile Include="Source\Widgets\3D\Spline3D.cs" />
+    <Compile Include="Source\Widgets\Materials\FXAAMaterial.cs" />
     <Compile Include="Source\Widgets\Materials\DistortionMaterial.cs" />
+    <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionFXAA.cs" />
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionDistortion.cs" />
     <Compile Include="Source\Widgets\Materials\SharpenMaterial.cs" />
     <Compile Include="Source\Widgets\Materials\HSLComponent.cs" />

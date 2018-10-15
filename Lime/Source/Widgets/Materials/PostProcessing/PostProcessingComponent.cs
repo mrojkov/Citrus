@@ -13,10 +13,11 @@ namespace Lime
 		private const string GroupDistortion = "04. Distortion";
 		private const string GroupSharpen = "05. Sharpen";
 		private const string GroupNoise = "06. Noise";
-		private const string GroupVignette = "07. Vignette";
-		private const string GroupOverallImpact = "08. Overall impact";
-		private const string GroupSourceTexture = "09. Source texture";
-		private const string GroupDebugView = "10. Debug view";
+		private const string GroupFXAA = "07. FXAA";
+		private const string GroupVignette = "08. Vignette";
+		private const string GroupOverallImpact = "09. Overall impact";
+		private const string GroupSourceTexture = "10. Source texture";
+		private const string GroupDebugView = "11. Debug view";
 		private const int MinimumTextureSize = 32;
 		private const int MaximumTextureSize = 2048;
 		private const float MinimumTextureScaling = 0.01f;
@@ -31,6 +32,14 @@ namespace Lime
 		private const float MaximumContrast = 100f;
 		private const float MaximumBlurRadius = 30f;
 		private const float MaximumGammaCorrection = 10f;
+		private const float MinimumFXAALumaTreshold = 0f;
+		private const float MaximumFXAALumaTreshold = 1f;
+		private const float MinimumFXAAMulReduce = 1f;
+		private const float MaximumFXAAMulReduce = 256f;
+		private const float MinimumFXAAMinReduce = 1f;
+		private const float MaximumFXAAMinReduce = 512f;
+		private const float MinimumFXAAMaxSpan = 1f;
+		private const float MaximumFXAAMaxSpan = 16f;
 
 		internal ColorCorrectionMaterial ColorCorrectionMaterial { get; private set; } = new ColorCorrectionMaterial();
 		internal BlurMaterial BlurMaterial { get; private set; } = new BlurMaterial();
@@ -38,6 +47,7 @@ namespace Lime
 		internal DistortionMaterial DistortionMaterial { get; private set; } = new DistortionMaterial();
 		internal SharpenMaterial SharpenMaterial { get; private set; } = new SharpenMaterial();
 		internal NoiseMaterial NoiseMaterial { get; private set; } = new NoiseMaterial();
+		internal FXAAMaterial FXAAMaterial { get; private set; } = new FXAAMaterial();
 		internal VignetteMaterial VignetteMaterial { get; private set; } = new VignetteMaterial();
 
 		// TODO: Solve promblem of storing and restoring savedPresenter&savedRenderChainBuilder
@@ -65,6 +75,10 @@ namespace Lime
 		private float noiseSoftLight = 1f;
 		private ITexture noiseTexture;
 		private Vector2 noiseScale = Vector2.One;
+		private float fxaaLumaTreshold = 0.5f;
+		private float fxaaMulReduce = 8f;
+		private float fxaaMinReduce = 128f;
+		private float fxaaMaxSpan = 8f;
 		private float vignetteRadius = 0.5f;
 		private float vignetteSoftness = 0.05f;
 		private bool applyPostProcessing = true;
@@ -269,7 +283,7 @@ namespace Lime
 			set => sharpenLimit = Mathf.Clamp(value, 0f, 1f);
 		}
 
-		[TangerineInspect]
+		[YuzuMember]
 		[TangerineGroup(GroupSharpen)]
 		public float SharpenStep
 		{
@@ -332,6 +346,42 @@ namespace Lime
 					Window.Current?.Invalidate();
 				}
 			}
+		}
+
+		[YuzuMember]
+		[TangerineGroup(GroupFXAA)]
+		public bool FXAAEnabled { get; set; }
+
+		[YuzuMember]
+		[TangerineGroup(GroupFXAA)]
+		public float FXAALumaTreshold
+		{
+			get => fxaaLumaTreshold;
+			set => fxaaLumaTreshold = Mathf.Clamp(value, MinimumFXAALumaTreshold, MaximumFXAALumaTreshold);
+		}
+
+		[YuzuMember]
+		[TangerineGroup(GroupFXAA)]
+		public float FXAAMulReduce
+		{
+			get => fxaaMulReduce;
+			set => fxaaMulReduce = Mathf.Clamp(value, MinimumFXAAMulReduce, MaximumFXAAMulReduce);
+		}
+
+		[YuzuMember]
+		[TangerineGroup(GroupFXAA)]
+		public float FXAAMinReduce
+		{
+			get => fxaaMinReduce;
+			set => fxaaMinReduce = Mathf.Clamp(value, MinimumFXAAMinReduce, MaximumFXAAMinReduce);
+		}
+
+		[YuzuMember]
+		[TangerineGroup(GroupFXAA)]
+		public float FXAAMaxSpan
+		{
+			get => fxaaMaxSpan;
+			set => fxaaMaxSpan = Mathf.Clamp(value, MinimumFXAAMaxSpan, MaximumFXAAMaxSpan);
 		}
 
 		[YuzuMember]
@@ -529,6 +579,7 @@ namespace Lime
 			clone.DistortionMaterial = (DistortionMaterial)DistortionMaterial.Clone();
 			clone.SharpenMaterial = (SharpenMaterial)SharpenMaterial.Clone();
 			clone.NoiseMaterial = (NoiseMaterial)NoiseMaterial.Clone();
+			clone.FXAAMaterial = (FXAAMaterial)FXAAMaterial.Clone();
 			clone.VignetteMaterial = (VignetteMaterial)VignetteMaterial.Clone();
 			return clone;
 		}

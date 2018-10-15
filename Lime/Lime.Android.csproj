@@ -405,6 +405,8 @@
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionSharpen.cs" />
     <Compile Include="Source\Widgets\Materials\DistortionMaterial.cs" />
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionDistortion.cs" />
+    <Compile Include="Source\Widgets\Materials\FXAAMaterial.cs" />
+    <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionFXAA.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Android.csproj">
