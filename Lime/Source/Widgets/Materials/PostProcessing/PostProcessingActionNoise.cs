@@ -2,52 +2,52 @@ namespace Lime
 {
 	internal class PostProcessingActionNoise : PostProcessingAction
 	{
-		public override bool Enabled => RenderObject.NoiseEnabled;
-		public override PostProcessingAction.Buffer TextureBuffer => RenderObject.NoiseBuffer;
+		public override bool EnabledCheck(PostProcessingRenderObject ro) => ro.NoiseEnabled;
+		public override PostProcessingAction.Buffer GetTextureBuffer(PostProcessingRenderObject ro) => ro.NoiseBuffer;
 
-		public override void Do()
+		public override void Do(PostProcessingRenderObject ro)
 		{
-			if (RenderObject.NoiseBuffer.EqualRenderParameters(RenderObject)) {
-				RenderObject.ProcessedTexture = RenderObject.NoiseBuffer.Texture;
-				RenderObject.CurrentBufferSize = (Vector2)RenderObject.NoiseBuffer.Size;
-				RenderObject.ProcessedUV1 = (Vector2)RenderObject.ViewportSize / RenderObject.CurrentBufferSize;
+			if (ro.NoiseBuffer.EqualRenderParameters(ro)) {
+				ro.ProcessedTexture = ro.NoiseBuffer.Texture;
+				ro.CurrentBufferSize = (Vector2)ro.NoiseBuffer.Size;
+				ro.ProcessedUV1 = (Vector2)ro.ViewportSize / ro.CurrentBufferSize;
 				return;
 			}
 
-			RenderObject.PrepareOffscreenRendering(RenderObject.Size);
-			if (RenderObject.ProcessedViewport.Width != RenderObject.ViewportSize.Width || RenderObject.ProcessedViewport.Height != RenderObject.ViewportSize.Height) {
-				Renderer.Viewport = RenderObject.ProcessedViewport = new Viewport(0, 0, RenderObject.ViewportSize.Width, RenderObject.ViewportSize.Height);
+			ro.PrepareOffscreenRendering(ro.Size);
+			if (ro.ProcessedViewport.Width != ro.ViewportSize.Width || ro.ProcessedViewport.Height != ro.ViewportSize.Height) {
+				Renderer.Viewport = ro.ProcessedViewport = new Viewport(0, 0, ro.ViewportSize.Width, ro.ViewportSize.Height);
 			}
-			RenderObject.NoiseBuffer.Texture.SetAsRenderTarget();
+			ro.NoiseBuffer.Texture.SetAsRenderTarget();
 			try {
 				Renderer.Clear(Color4.Zero);
-				var noiseUV0 = RenderObject.NoiseOffset;
-				var noiseUV1 = RenderObject.Size / ((Vector2)RenderObject.NoiseTexture.ImageSize * RenderObject.NoiseScale) + RenderObject.NoiseOffset;
-				RenderObject.NoiseMaterial.BrightThreshold = RenderObject.NoiseBrightThreshold;
-				RenderObject.NoiseMaterial.DarkThreshold = RenderObject.NoiseDarkThreshold;
-				RenderObject.NoiseMaterial.SoftLight = RenderObject.NoiseSoftLight;
-				RenderObject.NoiseMaterial.Opaque = RenderObject.OpagueRendering;
+				var noiseUV0 = ro.NoiseOffset;
+				var noiseUV1 = ro.Size / ((Vector2)ro.NoiseTexture.ImageSize * ro.NoiseScale) + ro.NoiseOffset;
+				ro.NoiseMaterial.BrightThreshold = ro.NoiseBrightThreshold;
+				ro.NoiseMaterial.DarkThreshold = ro.NoiseDarkThreshold;
+				ro.NoiseMaterial.SoftLight = ro.NoiseSoftLight;
+				ro.NoiseMaterial.Opaque = ro.OpagueRendering;
 				Renderer.DrawSprite(
-					RenderObject.ProcessedTexture,
-					RenderObject.NoiseTexture,
-					RenderObject.NoiseMaterial,
+					ro.ProcessedTexture,
+					ro.NoiseTexture,
+					ro.NoiseMaterial,
 					Color4.White,
 					Vector2.Zero,
-					RenderObject.TextureSize,
+					ro.TextureSize,
 					Vector2.Zero,
-					RenderObject.ProcessedUV1,
+					ro.ProcessedUV1,
 					noiseUV0,
 					noiseUV1
 				);
 			} finally {
-				RenderObject.NoiseBuffer.Texture.RestoreRenderTarget();
+				ro.NoiseBuffer.Texture.RestoreRenderTarget();
 			}
 
-			RenderObject.NoiseBuffer.SetRenderParameters(RenderObject);
-			RenderObject.MarkBuffersAsDirty = true;
-			RenderObject.ProcessedTexture = RenderObject.NoiseBuffer.Texture;
-			RenderObject.CurrentBufferSize = (Vector2)RenderObject.NoiseBuffer.Size;
-			RenderObject.ProcessedUV1 = (Vector2)RenderObject.ViewportSize / RenderObject.CurrentBufferSize;
+			ro.NoiseBuffer.SetRenderParameters(ro);
+			ro.MarkBuffersAsDirty = true;
+			ro.ProcessedTexture = ro.NoiseBuffer.Texture;
+			ro.CurrentBufferSize = (Vector2)ro.NoiseBuffer.Size;
+			ro.ProcessedUV1 = (Vector2)ro.ViewportSize / ro.CurrentBufferSize;
 		}
 
 		internal new class Buffer : PostProcessingAction.Buffer

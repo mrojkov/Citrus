@@ -2,45 +2,50 @@ namespace Lime
 {
 	internal class PostProcessingActionColorCorrection : PostProcessingAction
 	{
-		public override bool Enabled => RenderObject.HSLEnabled;
-		public override PostProcessingAction.Buffer TextureBuffer => RenderObject.ColorCorrectionBuffer;
+		public override bool EnabledCheck(PostProcessingRenderObject ro) => ro.HSLEnabled;
+		public override PostProcessingAction.Buffer GetTextureBuffer(PostProcessingRenderObject ro) => ro.ColorCorrectionBuffer;
 
-		public override void Do()
+		public override void Do(PostProcessingRenderObject ro)
 		{
-			if (RenderObject.ColorCorrectionBuffer.EqualRenderParameters(RenderObject)) {
-				RenderObject.ProcessedTexture = RenderObject.ColorCorrectionBuffer.Texture;
-				RenderObject.CurrentBufferSize = (Vector2)RenderObject.ColorCorrectionBuffer.Size;
-				RenderObject.ProcessedUV1 = (Vector2)RenderObject.ViewportSize / RenderObject.CurrentBufferSize;
+			if (ro.ColorCorrectionBuffer.EqualRenderParameters(ro)) {
+				ro.ProcessedTexture = ro.ColorCorrectionBuffer.Texture;
+				ro.CurrentBufferSize = (Vector2)ro.ColorCorrectionBuffer.Size;
+				ro.ProcessedUV1 = (Vector2)ro.ViewportSize / ro.CurrentBufferSize;
 				return;
 			}
 
-			RenderObject.PrepareOffscreenRendering(RenderObject.Size);
-			RenderObject.ColorCorrectionMaterial.HSL = WrappedHSL(RenderObject.HSL);
-			RenderObject.ColorCorrectionMaterial.Brightness = RenderObject.Brightness;
-			RenderObject.ColorCorrectionMaterial.Contrast = RenderObject.Contrast;
-			RenderObject.ColorCorrectionMaterial.Opaque = RenderObject.OpagueRendering;
-			RenderObject.RenderToTexture(RenderObject.ColorCorrectionBuffer.Texture, RenderObject.ProcessedTexture, RenderObject.ColorCorrectionMaterial, Color4.White, Color4.Zero);
+			ro.PrepareOffscreenRendering(ro.Size);
+			ro.ColorCorrectionMaterial.HSL = WrappedHSL(ro.HSL);
+			ro.ColorCorrectionMaterial.Brightness = ro.Brightness;
+			ro.ColorCorrectionMaterial.Contrast = ro.Contrast;
+			ro.ColorCorrectionMaterial.Opaque = ro.OpagueRendering;
+			ro.RenderToTexture(ro.ColorCorrectionBuffer.Texture, ro.ProcessedTexture, ro.ColorCorrectionMaterial, Color4.White, Color4.Zero);
 
-			RenderObject.ColorCorrectionBuffer.SetRenderParameters(RenderObject);
-			RenderObject.MarkBuffersAsDirty = true;
-			RenderObject.ProcessedTexture = RenderObject.ColorCorrectionBuffer.Texture;
-			RenderObject.CurrentBufferSize = (Vector2)RenderObject.ColorCorrectionBuffer.Size;
-			RenderObject.ProcessedUV1 = (Vector2)RenderObject.ViewportSize / RenderObject.CurrentBufferSize;
+			ro.ColorCorrectionBuffer.SetRenderParameters(ro);
+			ro.MarkBuffersAsDirty = true;
+			ro.ProcessedTexture = ro.ColorCorrectionBuffer.Texture;
+			ro.CurrentBufferSize = (Vector2)ro.ColorCorrectionBuffer.Size;
+			ro.ProcessedUV1 = (Vector2)ro.ViewportSize / ro.CurrentBufferSize;
 		}
 
 		internal new class Buffer : PostProcessingAction.Buffer
 		{
 			private Vector3 hsl = new Vector3(float.NaN, float.NaN, float.NaN);
+			private float brightness;
+			private float contrast;
 			private bool opaque;
 
 			public Buffer(Size size) : base(size) { }
 
-			public bool EqualRenderParameters(PostProcessingRenderObject ro) => !IsDirty && hsl == WrappedHSL(ro.HSL) && opaque == ro.OpagueRendering;
+			public bool EqualRenderParameters(PostProcessingRenderObject ro) =>
+				!IsDirty && hsl == WrappedHSL(ro.HSL) && brightness == ro.Brightness && contrast == ro.Contrast && opaque == ro.OpagueRendering;
 
 			public void SetRenderParameters(PostProcessingRenderObject ro)
 			{
 				IsDirty = false;
 				hsl = WrappedHSL(ro.HSL);
+				brightness = ro.Brightness;
+				contrast = ro.Contrast;
 				opaque = ro.OpagueRendering;
 			}
 		}

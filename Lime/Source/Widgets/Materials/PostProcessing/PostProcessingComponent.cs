@@ -7,14 +7,17 @@ namespace Lime
 	[AllowedComponentOwnerTypes(typeof(Widget))]
 	public class PostProcessingComponent : NodeBehavior
 	{
-		private const string GroupColorCorrection = "1. Color correction";
-		private const string GroupBlur = "2. Blur effect";
-		private const string GroupBloom = "3. Bloom effect";
-		private const string GroupNoise = "4. Noise";
-		private const string GroupVignette = "5. Vignette";
-		private const string GroupOverallImpact = "6. Overall impact";
-		private const string GroupSourceTexture = "7. Source texture";
-		private const string GroupDebugView = "8. Debug view";
+		private const string GroupColorCorrection = "01. Color correction";
+		private const string GroupBlur = "02. Blur";
+		private const string GroupBloom = "03. Bloom";
+		private const string GroupSharpen = "04. Sharpen";
+		private const string GroupDistortion = "05. Distortion";
+		private const string GroupFXAA = "06. FXAA";
+		private const string GroupNoise = "07. Noise";
+		private const string GroupVignette = "08. Vignette";
+		private const string GroupOverallImpact = "09. Overall impact";
+		private const string GroupSourceTexture = "10. Source texture";
+		private const string GroupDebugView = "11. Debug view";
 		private const int MinimumTextureSize = 32;
 		private const int MaximumTextureSize = 2048;
 		private const float MinimumTextureScaling = 0.01f;
@@ -29,11 +32,22 @@ namespace Lime
 		private const float MaximumContrast = 100f;
 		private const float MaximumBlurRadius = 30f;
 		private const float MaximumGammaCorrection = 10f;
+		private const float MinimumFXAALumaTreshold = 0f;
+		private const float MaximumFXAALumaTreshold = 1f;
+		private const float MinimumFXAAMulReduce = 1f;
+		private const float MaximumFXAAMulReduce = 256f;
+		private const float MinimumFXAAMinReduce = 1f;
+		private const float MaximumFXAAMinReduce = 512f;
+		private const float MinimumFXAAMaxSpan = 1f;
+		private const float MaximumFXAAMaxSpan = 16f;
 
 		internal ColorCorrectionMaterial ColorCorrectionMaterial { get; private set; } = new ColorCorrectionMaterial();
 		internal BlurMaterial BlurMaterial { get; private set; } = new BlurMaterial();
 		internal BloomMaterial BloomMaterial { get; private set; } = new BloomMaterial();
+		internal DistortionMaterial DistortionMaterial { get; private set; } = new DistortionMaterial();
+		internal SharpenMaterial SharpenMaterial { get; private set; } = new SharpenMaterial();
 		internal NoiseMaterial NoiseMaterial { get; private set; } = new NoiseMaterial();
+		internal FXAAMaterial FXAAMaterial { get; private set; } = new FXAAMaterial();
 		internal VignetteMaterial VignetteMaterial { get; private set; } = new VignetteMaterial();
 
 		// TODO: Solve promblem of storing and restoring savedPresenter&savedRenderChainBuilder
@@ -48,11 +62,23 @@ namespace Lime
 		private float bloomBrightThreshold = 1f;
 		private Vector3 bloomGammaCorrection = Vector3.One;
 		private float bloomTextureScaling = 0.5f;
+		private float distortionBarrelPincushion;
+		private float distortionChromaticAberration;
+		private float distortionRed = -100f;
+		private float distortionGreen;
+		private float distortionBlue = 100f;
+		private float sharpenStrength = 5f;
+		private float sharpenLimit = 0.1f;
+		private float sharpenStep = 1f;
 		private float noiseBrightThreshold = 1f;
 		private float noiseDarkThreshold;
 		private float noiseSoftLight = 1f;
 		private ITexture noiseTexture;
 		private Vector2 noiseScale = Vector2.One;
+		private float fxaaLumaTreshold = 0.5f;
+		private float fxaaMulReduce = 8f;
+		private float fxaaMinReduce = 128f;
+		private float fxaaMaxSpan = 8f;
 		private float vignetteRadius = 0.5f;
 		private float vignetteSoftness = 0.05f;
 		private bool applyPostProcessing = true;
@@ -194,6 +220,78 @@ namespace Lime
 		public Color4 BloomColor { get; set; } = Color4.White;
 
 		[YuzuMember]
+		[TangerineGroup(GroupDistortion)]
+		public bool DistortionEnabled { get; set; }
+
+		[YuzuMember]
+		[TangerineGroup(GroupDistortion)]
+		public float DistortionBarrelPincushion
+		{
+			get => distortionBarrelPincushion;
+			set => distortionBarrelPincushion = Mathf.Clamp(value, -100f, 100f);
+		}
+
+		[YuzuMember]
+		[TangerineGroup(GroupDistortion)]
+		public float DistortionChromaticAberration
+		{
+			get => distortionChromaticAberration;
+			set => distortionChromaticAberration = Mathf.Clamp(value, 0f, 100f);
+		}
+
+		[YuzuMember]
+		[TangerineGroup(GroupDistortion)]
+		public float DistortionRed
+		{
+			get => distortionRed;
+			set => distortionRed = Mathf.Clamp(value, -100f, 100f);
+		}
+
+		[YuzuMember]
+		[TangerineGroup(GroupDistortion)]
+		public float DistortionGreen
+		{
+			get => distortionGreen;
+			set => distortionGreen = Mathf.Clamp(value, -100f, 100f);
+		}
+
+		[YuzuMember]
+		[TangerineGroup(GroupDistortion)]
+		public float DistortionBlue
+		{
+			get => distortionBlue;
+			set => distortionBlue = Mathf.Clamp(value, -100f, 100f);
+		}
+
+		[YuzuMember]
+		[TangerineGroup(GroupSharpen)]
+		public bool SharpenEnabled { get; set; }
+
+		[YuzuMember]
+		[TangerineGroup(GroupSharpen)]
+		public float SharpenStrength
+		{
+			get => sharpenStrength;
+			set => sharpenStrength = Mathf.Clamp(value, 0f, 10f);
+		}
+
+		[YuzuMember]
+		[TangerineGroup(GroupSharpen)]
+		public float SharpenLimit
+		{
+			get => sharpenLimit;
+			set => sharpenLimit = Mathf.Clamp(value, 0f, 1f);
+		}
+
+		[YuzuMember]
+		[TangerineGroup(GroupSharpen)]
+		public float SharpenStep
+		{
+			get => sharpenStep;
+			set => sharpenStep = Mathf.Clamp(value, 0f, 10f);
+		}
+
+		[YuzuMember]
 		[TangerineGroup(GroupNoise)]
 		public bool NoiseEnabled { get; set; }
 
@@ -248,6 +346,42 @@ namespace Lime
 					Window.Current?.Invalidate();
 				}
 			}
+		}
+
+		[YuzuMember]
+		[TangerineGroup(GroupFXAA)]
+		public bool FXAAEnabled { get; set; }
+
+		[YuzuMember]
+		[TangerineGroup(GroupFXAA)]
+		public float FXAALumaTreshold
+		{
+			get => fxaaLumaTreshold;
+			set => fxaaLumaTreshold = Mathf.Clamp(value, MinimumFXAALumaTreshold, MaximumFXAALumaTreshold);
+		}
+
+		[YuzuMember]
+		[TangerineGroup(GroupFXAA)]
+		public float FXAAMulReduce
+		{
+			get => fxaaMulReduce;
+			set => fxaaMulReduce = Mathf.Clamp(value, MinimumFXAAMulReduce, MaximumFXAAMulReduce);
+		}
+
+		[YuzuMember]
+		[TangerineGroup(GroupFXAA)]
+		public float FXAAMinReduce
+		{
+			get => fxaaMinReduce;
+			set => fxaaMinReduce = Mathf.Clamp(value, MinimumFXAAMinReduce, MaximumFXAAMinReduce);
+		}
+
+		[YuzuMember]
+		[TangerineGroup(GroupFXAA)]
+		public float FXAAMaxSpan
+		{
+			get => fxaaMaxSpan;
+			set => fxaaMaxSpan = Mathf.Clamp(value, MinimumFXAAMaxSpan, MaximumFXAAMaxSpan);
 		}
 
 		[YuzuMember]
@@ -442,7 +576,10 @@ namespace Lime
 			clone.ColorCorrectionMaterial = (ColorCorrectionMaterial)ColorCorrectionMaterial.Clone();
 			clone.BlurMaterial = (BlurMaterial)BlurMaterial.Clone();
 			clone.BloomMaterial = (BloomMaterial)BloomMaterial.Clone();
+			clone.DistortionMaterial = (DistortionMaterial)DistortionMaterial.Clone();
+			clone.SharpenMaterial = (SharpenMaterial)SharpenMaterial.Clone();
 			clone.NoiseMaterial = (NoiseMaterial)NoiseMaterial.Clone();
+			clone.FXAAMaterial = (FXAAMaterial)FXAAMaterial.Clone();
 			clone.VignetteMaterial = (VignetteMaterial)VignetteMaterial.Clone();
 			return clone;
 		}

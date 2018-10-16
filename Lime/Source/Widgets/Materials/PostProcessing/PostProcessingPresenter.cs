@@ -20,7 +20,10 @@ namespace Lime
 		private PostProcessingActionColorCorrection.Buffer colorCorrectionBuffer;
 		private PostProcessingActionBlur.Buffer blurBuffer;
 		private PostProcessingActionBloom.Buffer bloomBuffer;
+		private PostProcessingActionDistortion.Buffer distortionBuffer;
+		private PostProcessingActionSharpen.Buffer sharpenBuffer;
 		private PostProcessingActionNoise.Buffer noiseBuffer;
+		private PostProcessingActionFXAA.Buffer fxaaBuffer;
 
 		public PostProcessingPresenter()
 		{
@@ -30,6 +33,9 @@ namespace Lime
 				new PostProcessingActionColorCorrection(),
 				new PostProcessingActionBlur(),
 				new PostProcessingActionBloom(),
+				new PostProcessingActionSharpen(),
+				new PostProcessingActionDistortion(),
+				new PostProcessingActionFXAA(),
 				new PostProcessingActionNoise(),
 				new PostProcessingActionTextureRender(),
 				new PostProcessingActionVignette()
@@ -67,8 +73,17 @@ namespace Lime
 			if (component.BloomEnabled && bloomBuffer?.Size != bufferSize) {
 				bloomBuffer = new PostProcessingActionBloom.Buffer(bufferSize);
 			}
+			if (component.DistortionEnabled && distortionBuffer?.Size != bufferSize) {
+				distortionBuffer = new PostProcessingActionDistortion.Buffer(bufferSize);
+			}
+			if (component.SharpenEnabled && sharpenBuffer?.Size != bufferSize) {
+				sharpenBuffer = new PostProcessingActionSharpen.Buffer(bufferSize);
+			}
 			if (component.NoiseEnabled && noiseBuffer?.Size != bufferSize) {
 				noiseBuffer = new PostProcessingActionNoise.Buffer(bufferSize);
+			}
+			if (component.FXAAEnabled && fxaaBuffer?.Size != bufferSize) {
+				fxaaBuffer = new PostProcessingActionFXAA.Buffer(bufferSize);
 			}
 			if ((component.BlurEnabled || component.BloomEnabled) && firstTemporaryBuffer?.Size != bufferSize) {
 				firstTemporaryBuffer = new PostProcessingAction.Buffer(bufferSize);
@@ -118,7 +133,22 @@ namespace Lime
 			ro.BloomGammaCorrection = component.BloomGammaCorrection;
 			ro.BloomTextureScaling = component.BloomTextureScaling * 0.01f;
 			ro.BloomColor = component.BloomColor;
+			ro.DistortionBuffer = distortionBuffer;
+			ro.DistortionMaterial = component.DistortionMaterial;
+			ro.DistortionEnabled = component.DistortionEnabled;
+			ro.DistortionBarrelPincushion = component.DistortionBarrelPincushion * 0.01f;
+			ro.DistortionChromaticAberration = component.DistortionChromaticAberration * 0.01f;
+			ro.DistortionRed = component.DistortionRed * 0.01f;
+			ro.DistortionGreen = component.DistortionGreen * 0.01f;
+			ro.DistortionBlue = component.DistortionBlue * 0.01f;
+			ro.SharpenBuffer = sharpenBuffer;
+			ro.SharpenMaterial = component.SharpenMaterial;
+			ro.SharpenEnabled = component.SharpenEnabled;
+			ro.SharpenStrength = component.SharpenStrength;
+			ro.SharpenLimit = component.SharpenLimit;
+			ro.SharpenStep = component.SharpenStep;
 			ro.NoiseBuffer = noiseBuffer;
+			ro.NoiseMaterial = component.NoiseMaterial;
 			ro.NoiseEnabled = component.NoiseEnabled && component.NoiseTexture != null && !component.NoiseTexture.IsStubTexture;
 			ro.NoiseBrightThreshold = component.NoiseBrightThreshold * 0.01f;
 			ro.NoiseDarkThreshold = component.NoiseDarkThreshold * 0.01f;
@@ -126,7 +156,13 @@ namespace Lime
 			ro.NoiseOffset = component.NoiseOffset;
 			ro.NoiseScale = component.NoiseScale;
 			ro.NoiseTexture = component.NoiseTexture;
-			ro.NoiseMaterial = component.NoiseMaterial;
+			ro.FXAABuffer = fxaaBuffer;
+			ro.FXAAMaterial = component.FXAAMaterial;
+			ro.FXAAEnabled = component.FXAAEnabled;
+			ro.FXAALumaTreshold = component.FXAALumaTreshold;
+			ro.FXAAMulReduce = component.FXAAMulReduce;
+			ro.FXAAMinReduce = component.FXAAMinReduce;
+			ro.FXAAMaxSpan = component.FXAAMaxSpan;
 			ro.OverallImpactEnabled = component.OverallImpactEnabled;
 			ro.OverallImpactColor = component.OverallImpactColor;
 			ro.VignetteMaterial = component.VignetteMaterial;

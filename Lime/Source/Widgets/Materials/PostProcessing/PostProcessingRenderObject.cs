@@ -50,7 +50,22 @@ namespace Lime
 		public Vector3 BloomGammaCorrection;
 		public float BloomTextureScaling;
 		public Color4 BloomColor;
+		public PostProcessingActionDistortion.Buffer DistortionBuffer;
+		public DistortionMaterial DistortionMaterial;
+		public bool DistortionEnabled;
+		public float DistortionBarrelPincushion;
+		public float DistortionChromaticAberration;
+		public float DistortionRed;
+		public float DistortionGreen;
+		public float DistortionBlue;
+		public PostProcessingActionSharpen.Buffer SharpenBuffer;
+		public SharpenMaterial SharpenMaterial;
+		public bool SharpenEnabled;
+		public float SharpenStrength;
+		public float SharpenLimit;
+		public float SharpenStep;
 		public PostProcessingActionNoise.Buffer NoiseBuffer;
+		public NoiseMaterial NoiseMaterial;
 		public bool NoiseEnabled;
 		public float NoiseBrightThreshold;
 		public float NoiseDarkThreshold;
@@ -58,7 +73,13 @@ namespace Lime
 		public Vector2 NoiseOffset;
 		public Vector2 NoiseScale;
 		public ITexture NoiseTexture;
-		public NoiseMaterial NoiseMaterial;
+		public PostProcessingActionFXAA.Buffer FXAABuffer;
+		public FXAAMaterial FXAAMaterial;
+		public bool FXAAEnabled;
+		public float FXAALumaTreshold;
+		public float FXAAMulReduce;
+		public float FXAAMinReduce;
+		public float FXAAMaxSpan;
 		public bool OverallImpactEnabled;
 		public Color4 OverallImpactColor;
 		public VignetteMaterial VignetteMaterial;
@@ -79,6 +100,7 @@ namespace Lime
 		{
 			ProcessedTexture = null;
 			Objects.Clear();
+			PostProcessingActions = null;
 			Material = null;
 			SourceTextureBuffer = null;
 			FirstTemporaryBuffer = null;
@@ -89,9 +111,15 @@ namespace Lime
 			BlurMaterial = null;
 			BloomBuffer = null;
 			BloomMaterial = null;
+			DistortionBuffer = null;
+			DistortionMaterial = null;
+			SharpenBuffer = null;
+			SharpenMaterial = null;
 			NoiseBuffer = null;
 			NoiseTexture = null;
 			NoiseMaterial = null;
+			FXAABuffer = null;
+			FXAAMaterial = null;
 			VignetteMaterial = null;
 			TransparentTexture = null;
 			AlphaDiffuseMaterial = null;
@@ -107,24 +135,22 @@ namespace Lime
 					MarkBuffersAsDirty = true;
 				}
 				foreach (var action in PostProcessingActions) {
-					action.RenderObject = this;
+					var buffer = action.GetTextureBuffer(this);
 					if (MarkBuffersAsDirty) {
-						action.TextureBuffer?.MarkAsDirty();
+						buffer?.MarkAsDirty();
 					}
-					if (action.Enabled) {
-						action.Do();
-						if (action.TextureBuffer != null) {
-							action.TextureBuffer.WasApplied = true;
+					if (action.EnabledCheck(this)) {
+						action.Do(this);
+						if (buffer != null) {
+							buffer.WasApplied = true;
 						}
-					} else if (action.TextureBuffer?.WasApplied ?? false) {
-						action.TextureBuffer.WasApplied = false;
-						action.TextureBuffer.MarkAsDirty();
+					} else if (buffer?.WasApplied ?? false) {
+						buffer.WasApplied = false;
+						buffer.MarkAsDirty();
 						MarkBuffersAsDirty = true;
 					}
-					action.RenderObject = null;
 				}
 			} finally {
-				PostProcessingActions = null;
 				FinalizeOffscreenRendering();
 			}
 		}

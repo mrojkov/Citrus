@@ -163,10 +163,11 @@ namespace Lime
 
 		private static Shader[] CreateShaders(BlurShaderId blurShaderId, bool opaque)
 		{
+			var length = FragmentShaderPart1.Length + (!opaque ? FragmentShaderPart2.Length : FragmentShaderPart2Opaque.Length);
+			var fragmentShader = new StringBuilder(length);
+			fragmentShader.Append(FragmentShaderPart1);
 			var kernelWeights = gaussKernelsWeights[blurShaderId];
 			var centerKernel = kernelWeights.Length / 2;
-			var fragmentShader = new StringBuilder(FragmentShaderPart1.Length + FragmentShaderPart2.Length);
-			fragmentShader.Append(FragmentShaderPart1);
 			for (var i = 0; i < kernelWeights.Length; i++) {
 				var weight = kernelWeights[i].ToString("F6", CultureInfo.InvariantCulture);
 				if (i == centerKernel) {

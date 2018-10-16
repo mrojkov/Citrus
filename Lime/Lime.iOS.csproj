@@ -404,6 +404,12 @@
     <Compile Include="Source\Widgets\Materials\ColorCorrectionMaterial.cs" />
     <Compile Include="Source\Widgets\Materials\HSLComponent.cs" />
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionColorCorrection.cs" />
+    <Compile Include="Source\Widgets\Materials\SharpenMaterial.cs" />
+    <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionSharpen.cs" />
+    <Compile Include="Source\Widgets\Materials\DistortionMaterial.cs" />
+    <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionDistortion.cs" />
+    <Compile Include="Source\Widgets\Materials\FXAAMaterial.cs" />
+    <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionFXAA.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />

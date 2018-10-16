@@ -2,35 +2,35 @@ namespace Lime
 {
 	internal class PostProcessingActionBlur : PostProcessingAction
 	{
-		public override bool Enabled => RenderObject.BlurEnabled;
-		public override PostProcessingAction.Buffer TextureBuffer => RenderObject.BlurBuffer;
+		public override bool EnabledCheck(PostProcessingRenderObject ro) => ro.BlurEnabled;
+		public override PostProcessingAction.Buffer GetTextureBuffer(PostProcessingRenderObject ro) => ro.BlurBuffer;
 
-		public override void Do()
+		public override void Do(PostProcessingRenderObject ro)
 		{
-			RenderObject.ViewportSize = (Size)((Vector2)RenderObject.ViewportSize * RenderObject.BlurTextureScaling);
-			if (RenderObject.BlurBuffer.EqualRenderParameters(RenderObject)) {
-				RenderObject.ProcessedTexture = RenderObject.BlurBuffer.Texture;
-				RenderObject.CurrentBufferSize = (Vector2)RenderObject.BlurBuffer.Size;
-				RenderObject.ProcessedUV1 = (Vector2)RenderObject.ViewportSize / RenderObject.CurrentBufferSize;
+			ro.ViewportSize = (Size)((Vector2)ro.ViewportSize * ro.BlurTextureScaling);
+			if (ro.BlurBuffer.EqualRenderParameters(ro)) {
+				ro.ProcessedTexture = ro.BlurBuffer.Texture;
+				ro.CurrentBufferSize = (Vector2)ro.BlurBuffer.Size;
+				ro.ProcessedUV1 = (Vector2)ro.ViewportSize / ro.CurrentBufferSize;
 				return;
 			}
 
-			RenderObject.PrepareOffscreenRendering(RenderObject.Size);
-			RenderObject.BlurMaterial.Radius = RenderObject.BlurRadius;
-			RenderObject.BlurMaterial.BlurShaderId = RenderObject.BlurShader;
-			RenderObject.BlurMaterial.Step = RenderObject.ProcessedUV1 * RenderObject.BlurTextureScaling / RenderObject.CurrentBufferSize;
-			RenderObject.BlurMaterial.Dir = Vector2.Down;
-			RenderObject.BlurMaterial.AlphaCorrection = RenderObject.BlurAlphaCorrection;
-			RenderObject.BlurMaterial.Opaque = RenderObject.OpagueRendering;
-			RenderObject.RenderToTexture(RenderObject.FirstTemporaryBuffer.Texture, RenderObject.ProcessedTexture, RenderObject.BlurMaterial, Color4.White, RenderObject.BlurBackgroundColor);
-			RenderObject.CurrentBufferSize = (Vector2)RenderObject.BlurBuffer.Size;
-			RenderObject.ProcessedUV1 = (Vector2)RenderObject.ViewportSize / RenderObject.CurrentBufferSize;
-			RenderObject.BlurMaterial.Dir = Vector2.Right;
-			RenderObject.RenderToTexture(RenderObject.BlurBuffer.Texture, RenderObject.FirstTemporaryBuffer.Texture, RenderObject.BlurMaterial, Color4.White, RenderObject.BlurBackgroundColor);
+			ro.PrepareOffscreenRendering(ro.Size);
+			ro.BlurMaterial.Radius = ro.BlurRadius;
+			ro.BlurMaterial.BlurShaderId = ro.BlurShader;
+			ro.BlurMaterial.Step = ro.ProcessedUV1 * ro.BlurTextureScaling / ro.CurrentBufferSize;
+			ro.BlurMaterial.Dir = Vector2.Down;
+			ro.BlurMaterial.AlphaCorrection = ro.BlurAlphaCorrection;
+			ro.BlurMaterial.Opaque = ro.OpagueRendering;
+			ro.RenderToTexture(ro.FirstTemporaryBuffer.Texture, ro.ProcessedTexture, ro.BlurMaterial, Color4.White, ro.BlurBackgroundColor);
+			ro.CurrentBufferSize = (Vector2)ro.BlurBuffer.Size;
+			ro.ProcessedUV1 = (Vector2)ro.ViewportSize / ro.CurrentBufferSize;
+			ro.BlurMaterial.Dir = Vector2.Right;
+			ro.RenderToTexture(ro.BlurBuffer.Texture, ro.FirstTemporaryBuffer.Texture, ro.BlurMaterial, Color4.White, ro.BlurBackgroundColor);
 
-			RenderObject.BlurBuffer.SetRenderParameters(RenderObject);
-			RenderObject.MarkBuffersAsDirty = true;
-			RenderObject.ProcessedTexture = RenderObject.BlurBuffer.Texture;
+			ro.BlurBuffer.SetRenderParameters(ro);
+			ro.MarkBuffersAsDirty = true;
+			ro.ProcessedTexture = ro.BlurBuffer.Texture;
 		}
 
 		internal new class Buffer : PostProcessingAction.Buffer

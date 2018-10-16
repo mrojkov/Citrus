@@ -2,12 +2,12 @@ namespace Lime
 {
 	internal class PostProcessingActionOverallImpact : PostProcessingAction
 	{
-		public override bool Enabled => RenderObject.OverallImpactEnabled && RenderObject.IsNotDebugViewMode;
+		public override bool EnabledCheck(PostProcessingRenderObject ro) => ro.OverallImpactEnabled && ro.IsNotDebugViewMode;
 
-		public override void Do()
+		public override void Do(PostProcessingRenderObject ro)
 		{
-			RenderObject.RenderTexture(RenderObject.SourceTextureBuffer.Texture, customUV1: RenderObject.Size / (Vector2)RenderObject.SourceTextureBuffer.Size);
-			RenderObject.Color = RenderObject.OverallImpactColor;
+			ro.RenderTexture(ro.SourceTextureBuffer.Texture, customUV1: ro.Size / (Vector2)ro.SourceTextureBuffer.Size);
+			ro.Color = ro.OverallImpactColor;
 		}
 	}
 }
