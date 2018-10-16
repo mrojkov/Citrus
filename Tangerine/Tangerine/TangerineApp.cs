@@ -676,7 +676,8 @@ namespace Tangerine
 				Core.Operations.Paste.Perform(
 					pasteAtMouse:
 						UI.SceneView.SceneView.Instance.InputArea.IsMouseOverThisOrDescendant() &&
-						pasteAtMouse
+						pasteAtMouse &&
+						!CoreUserPreferences.Instance.DontPasteAtMouse
 				);
 			} catch (InvalidOperationException e) {
 				Document.Current.History.RollbackTransaction();
