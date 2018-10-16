@@ -154,7 +154,7 @@ namespace Tangerine
 				while (documents.Any()) {
 					var nextDocument = documents.First();
 					Document.SetCurrent(nextDocument);
-					var alert = new AlertDialog($"Document {nextDocument.FullPath} has been deleted. Save or Discard?", "Save", "Save All", "Discard", "Discard All");
+					var alert = new AlertDialog($"Document {nextDocument.FullPath.Replace('\\', '/')} has been deleted. Save or Discard?", "Save", "Save All", "Discard", "Discard All");
 					var r = alert.Show();
 					switch (r) {
 						case 0: {
