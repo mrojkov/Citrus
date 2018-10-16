@@ -10,10 +10,10 @@ namespace Lime
 		private const string GroupColorCorrection = "01. Color correction";
 		private const string GroupBlur = "02. Blur";
 		private const string GroupBloom = "03. Bloom";
-		private const string GroupDistortion = "04. Distortion";
-		private const string GroupSharpen = "05. Sharpen";
-		private const string GroupNoise = "06. Noise";
-		private const string GroupFXAA = "07. FXAA";
+		private const string GroupSharpen = "04. Sharpen";
+		private const string GroupDistortion = "05. Distortion";
+		private const string GroupFXAA = "06. FXAA";
+		private const string GroupNoise = "07. Noise";
 		private const string GroupVignette = "08. Vignette";
 		private const string GroupOverallImpact = "09. Overall impact";
 		private const string GroupSourceTexture = "10. Source texture";

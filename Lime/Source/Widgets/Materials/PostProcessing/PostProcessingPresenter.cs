@@ -33,10 +33,10 @@ namespace Lime
 				new PostProcessingActionColorCorrection(),
 				new PostProcessingActionBlur(),
 				new PostProcessingActionBloom(),
-				new PostProcessingActionDistortion(),
 				new PostProcessingActionSharpen(),
-				new PostProcessingActionNoise(),
+				new PostProcessingActionDistortion(),
 				new PostProcessingActionFXAA(),
+				new PostProcessingActionNoise(),
 				new PostProcessingActionTextureRender(),
 				new PostProcessingActionVignette()
 			};
