@@ -6,6 +6,7 @@ using Foundation;
 using OpenTK.Graphics.ES20;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -35,6 +36,8 @@ namespace Lime
 		private object locker = new object();
 		private CancellationTokenSource stopDecodeCancelationTokenSource = new CancellationTokenSource();
 		private State state = State.Initialized;
+
+		private Stopwatch stopwatch = new Stopwatch();
 
 		private enum State
 		{
@@ -71,7 +74,7 @@ namespace Lime
 			Width = (int)size.Width;
 			Height = (int)size.Height;
 			Duration = asset.Duration.Seconds;
-			currentPosition = 0;
+			stopwatch.Reset();
 			checkVideoEvent = new ManualResetEvent(false);
 			//prepare audio
 		}
@@ -81,10 +84,10 @@ namespace Lime
 			if (state == State.Started) {
 				yield break;
 			}
-
+			stopwatch.Start();
 			do {
 				if (state == State.Finished) {
-					currentPosition = 0;
+					stopwatch.Restart();
 					player.Seek(CMTime.FromSeconds(0, 1000));
 				}
 				stopDecodeCancelationTokenSource = new CancellationTokenSource();
@@ -96,12 +99,12 @@ namespace Lime
 
 				var workTask = System.Threading.Tasks.Task.Run(() => {
 					while (true) {
-						var time = CMTime.FromSeconds(currentPosition, 1000);
+						var time = player.CurrentTime;
 						while (!videoOutput.HasNewPixelBufferForItemTime(time)) {
 							checkVideoEvent.WaitOne();
 							checkVideoEvent.Reset();
 							stopDecodeCancelationToken.ThrowIfCancellationRequested();
-							time = CMTime.FromSeconds(currentPosition, 1000);
+							time = player.CurrentTime;
 						}
 						var timeForDisplay = default(CMTime);
 						var pixelBuffer = videoOutput.CopyPixelBuffer(time, ref timeForDisplay);
@@ -131,6 +134,7 @@ namespace Lime
 		{
 			if (state == State.Started) {
 				state = State.Paused;
+				stopwatch.Stop();
 				player.Pause();
 				stopDecodeCancelationTokenSource.Cancel();
 				checkVideoEvent.Set();
@@ -144,7 +148,7 @@ namespace Lime
 			}
 			state = State.Stoped;
 			player.Seek(CMTime.FromSeconds(0, 1000));
-			currentPosition = 0;
+			stopwatch.Reset();
 			player.Pause();
 			stopDecodeCancelationTokenSource.Cancel();
 			checkVideoEvent.Set();
@@ -153,7 +157,7 @@ namespace Lime
 		public void Update(float delta)
 		{
 			if (state == State.Started) {
-				currentPosition += delta;
+				currentPosition = stopwatch.ElapsedMilliseconds;
 				checkVideoEvent.Set();
 			}
 		}
