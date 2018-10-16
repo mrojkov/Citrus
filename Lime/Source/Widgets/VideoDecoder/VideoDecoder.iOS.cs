@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 
@@ -170,12 +171,41 @@ namespace Lime
 					var pb = currentPixelBuffer;
 					if (pb != null) {
 						pb.Lock(CVPixelBufferLock.None);
-						var addr = pb.BaseAddress;
-						texture.LoadImage(addr, Width, Height, (PixelFormat)All.Bgra);
+
+						// Sometimes Width can be smaller then length of a row due to byte alignment.
+						if (pb.BytesPerRow > pb.Width * 4) {
+							var tempBuffer = AlignmentPixelBuffer(pb);
+							texture.LoadImage(tempBuffer, Width, Height, (PixelFormat)All.Bgra);
+							Marshal.FreeHGlobal(tempBuffer);
+						} else {
+							texture.LoadImage(pb.BaseAddress, Width, Height, (PixelFormat)All.Bgra);
+						}
 						pb.Unlock(CVPixelBufferLock.None);
 					}
 				}
 			}
+		}
+
+		private IntPtr AlignmentPixelBuffer(CVPixelBuffer pb) {
+			var addr = pb.BaseAddress;
+			var pixels = new byte[Height * Width * 4];
+			var rowLength = Width * 4;
+			unsafe {
+				byte* pBytes = (byte*)addr;
+				int index = 0;
+				byte r;
+				for (int i = 0; i < Height; i++) {
+					for (int j = 0; j < Width * 4; j++) {
+						r = (byte)(*pBytes++);
+						pixels[index++] = r;
+					}
+					// It's just an empty bytes at the end of each row, so we can skip them here.
+					pBytes += pb.BytesPerRow - rowLength;
+				}
+			}
+			var temp = Marshal.AllocHGlobal(pixels.Length);
+			Marshal.Copy(pixels, 0, temp, pixels.Length);
+			return temp;
 		}
 
 		public void Dispose()
