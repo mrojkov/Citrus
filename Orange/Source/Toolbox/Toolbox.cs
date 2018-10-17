@@ -115,6 +115,7 @@ namespace Orange
 				foreach (var tangerineFlag in ignoredTangerineFlags) {
 					n.SetTangerineFlag(tangerineFlag, false);
 				}
+				n.RemoveAnimatorsForExternalAnimations();
 				foreach (var animation in node.Animations) {
 					animation.Frame = 0;
 				}

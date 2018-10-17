@@ -1127,7 +1127,7 @@ namespace Orange
 				var animationPathPrefix = GetModelAnimationPathPrefix(dstPath);
 				DeleteModelExternalAnimations(animationPathPrefix);
 				ExportModelAnimations(model, animationPathPrefix, assetAttributes, cookingRules.SHA1);
-				CleanupAnimators(model);
+				model.RemoveAnimatorsForExternalAnimations();
 				Serialization.WriteObjectToBundle(AssetBundle, dstPath, model, Serialization.Format.Binary, ".t3d", assetAttributes, cookingRules.SHA1);
 				return true;
 			}, (srcPath, dstPath) => modelsToRebuild.Contains(dstPath));
@@ -1152,19 +1152,6 @@ namespace Orange
 				animation.ContentsPath = pathWithoutExt;
 				Serialization.WriteObjectToBundle(AssetBundle, path, data, Serialization.Format.Binary, ".ant", assetAttributes, cookingRulesSHA1);
 				Console.WriteLine("+ " + path);
-			}
-		}
-
-		private static void CleanupAnimators(Node node)
-		{
-			foreach (var animation in node.Animations) {
-				if (!string.IsNullOrEmpty(animation.ContentsPath)) {
-					var animators = new List<IAnimator>();
-					animation.FindAnimators(animators);
-					foreach (var animator in animators) {
-						animator.Owner.Animators.Remove(animator);
-					}
-				}
 			}
 		}
 

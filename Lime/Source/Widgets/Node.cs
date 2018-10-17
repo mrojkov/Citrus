@@ -1219,6 +1219,19 @@ namespace Lime
 			texture?.GetHandle();
 		}
 
+		public void RemoveAnimatorsForExternalAnimations()
+		{
+			foreach (var animation in Animations) {
+				if (!string.IsNullOrEmpty(animation.ContentsPath)) {
+					var animators = new List<IAnimator>();
+					animation.FindAnimators(animators);
+					foreach (var animator in animators) {
+						animator.Owner.Animators.Remove(animator);
+					}
+				}
+			}
+		}
+
 		private static readonly ThreadLocal<HashSet<string>> scenesBeingLoaded = new ThreadLocal<HashSet<string>>(() => new HashSet<string>());
 
 		public delegate bool SceneLoadingDelegate(string path, ref Node instance, bool external);
