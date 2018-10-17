@@ -154,7 +154,7 @@ namespace Tangerine.UI.FilesystemView
 				Clicked = () => {
 					if (Project.Current != Project.Null) {
 						view.ScrollView.SetFocus();
-						view.GoTo(Project.Current.AssetsDirectory);
+						view.GoTo(Project.Current.AssetsDirectory ?? System.IO.Directory.GetDirectoryRoot(System.IO.Directory.GetCurrentDirectory()));
 					}
 				}
 			};

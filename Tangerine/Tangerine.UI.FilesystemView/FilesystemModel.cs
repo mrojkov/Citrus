@@ -98,7 +98,10 @@ namespace Tangerine.UI.FilesystemView
 		{
 			currentPath = path;
 			if (!Directory.Exists(path)) {
-				currentPath = Directory.GetCurrentDirectory();
+				currentPath = Project.Current.AssetsDirectory;
+				if (string.IsNullOrEmpty(currentPath)) {
+					currentPath = Directory.GetDirectoryRoot(Directory.GetCurrentDirectory());
+				}
 			}
 		}
 

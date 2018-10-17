@@ -126,12 +126,7 @@ namespace Tangerine
 
 		private static void InvalidateDisplayedText()
 		{
-			var documents = Project.Current?.Documents;
-			if (documents == null) {
-				return;
-			}
-
-			foreach (var document in documents) {
+			foreach (var document in Project.Current.Documents) {
 				if (!document.Loaded) {
 					continue;
 				}
@@ -143,7 +138,7 @@ namespace Tangerine
 
 		public static List<Locale> GetLocales()
 		{
-			var directory = Project.Current?.AssetsDirectory;
+			var directory = Project.Current.AssetsDirectory;
 			if (string.IsNullOrEmpty(directory)) {
 				return null;
 			}
