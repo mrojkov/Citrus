@@ -253,13 +253,11 @@ namespace Lime
 			if (startFrame != srcAnimator.ReadonlyKeys[startKeyIndex].Frame) {
 				dstAnimator.Keys.Add(startFrame, srcAnimator.CalcValue(AnimationUtils.FramesToSeconds(startFrame)));
 			}
-			if (startFrame != lastFrame) {
-				for (var i = startKeyIndex; i <= lastKeyIndex; i++) {
-					dstAnimator.Keys.Add(srcAnimator.ReadonlyKeys[i]);
-				}
-				if (lastFrame != srcAnimator.ReadonlyKeys[lastKeyIndex].Frame) {
-					dstAnimator.Keys.Add(lastFrame, srcAnimator.CalcValue(AnimationUtils.FramesToSeconds(lastFrame)));
-				}
+			for (var i = startKeyIndex; i <= lastKeyIndex; i++) {
+				dstAnimator.Keys.Add(srcAnimator.ReadonlyKeys[i]);
+			}
+			if (startFrame != lastFrame && lastFrame != srcAnimator.ReadonlyKeys[lastKeyIndex].Frame) {
+				dstAnimator.Keys.Add(lastFrame, srcAnimator.CalcValue(AnimationUtils.FramesToSeconds(lastFrame)));
 			}
 		}
 
