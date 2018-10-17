@@ -23,11 +23,20 @@ namespace GeneratedDeserializersBIN
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
+				result.ContentsPath = d.Reader.ReadString();
+				if (result.ContentsPath == "" && d.Reader.ReadBoolean()) result.ContentsPath = null;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (2 == fd.OurIndex) {
 				result.Id = d.Reader.ReadString();
 				if (result.Id == "" && d.Reader.ReadBoolean()) result.Id = null;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (2 == fd.OurIndex) {
+			if (3 == fd.OurIndex) {
+				result.IsLegacy = d.Reader.ReadBoolean();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (4 == fd.OurIndex) {
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
 					while (--tmp1 >= 0) {
@@ -44,6 +53,32 @@ namespace GeneratedDeserializersBIN
 		{
 			var result = new global::Lime.Animation();
 			Read_Lime__Animation(d, def, result);
+			return result;
+		}
+
+		private static void Read_Lime__Animation__AnimationData(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.Animation.AnimationData)obj;
+			var dg = (BinaryDeserializerGen)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				var tmp1 = d.Reader.ReadInt32();
+				if (tmp1 >= 0) {
+					while (--tmp1 >= 0) {
+						var tmp2 = (global::Lime.IAnimator)dg.ReadObject<global::Lime.IAnimator>();
+						result.Animators.Add(tmp2);
+					}
+				}
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_Lime__Animation__AnimationData(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.Animation.AnimationData();
+			Read_Lime__Animation__AnimationData(d, def, result);
 			return result;
 		}
 
@@ -4553,6 +4588,10 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
+				result.LastFrame = d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (4 == fd.OurIndex) {
 				result.Markers = (global::System.Collections.Generic.Dictionary<global::System.String,global::Lime.Model3DAttachmentParser.ModelMarkerFormat>)null;
 				var tmp3 = d.Reader.ReadInt32();
 				if (tmp3 >= 0) {
@@ -4566,7 +4605,7 @@ namespace GeneratedDeserializersBIN
 				}
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (4 == fd.OurIndex) {
+			if (5 == fd.OurIndex) {
 				result.Nodes = (global::System.Collections.Generic.List<global::System.String>)null;
 				var tmp6 = d.Reader.ReadInt32();
 				if (tmp6 >= 0) {
@@ -4577,6 +4616,10 @@ namespace GeneratedDeserializersBIN
 						result.Nodes.Add(tmp7);
 					}
 				}
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (6 == fd.OurIndex) {
+				result.StartFrame = d.Reader.ReadInt32();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
@@ -4610,72 +4653,58 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.MaterialEffects = (global::System.Collections.Generic.Dictionary<global::System.String,global::Lime.Model3DAttachmentParser.ModelMaterialEffectFormat>)null;
+				result.MeshOptions = (global::System.Collections.Generic.Dictionary<global::System.String,global::Lime.Model3DAttachmentParser.MeshOptionFormat>)null;
 				var tmp4 = d.Reader.ReadInt32();
 				if (tmp4 >= 0) {
-					result.MaterialEffects = new global::System.Collections.Generic.Dictionary<global::System.String,global::Lime.Model3DAttachmentParser.ModelMaterialEffectFormat>();
+					result.MeshOptions = new global::System.Collections.Generic.Dictionary<global::System.String,global::Lime.Model3DAttachmentParser.MeshOptionFormat>();
 					while (--tmp4 >= 0) {
 						var tmp5 = d.Reader.ReadString();
 						if (tmp5 == "" && d.Reader.ReadBoolean()) tmp5 = null;
-						var tmp6 = (global::Lime.Model3DAttachmentParser.ModelMaterialEffectFormat)dg.ReadObject<global::Lime.Model3DAttachmentParser.ModelMaterialEffectFormat>();
-						result.MaterialEffects.Add(tmp5, tmp6);
+						var tmp6 = (global::Lime.Model3DAttachmentParser.MeshOptionFormat)dg.ReadObject<global::Lime.Model3DAttachmentParser.MeshOptionFormat>();
+						result.MeshOptions.Add(tmp5, tmp6);
 					}
 				}
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
-				result.MeshOptions = (global::System.Collections.Generic.Dictionary<global::System.String,global::Lime.Model3DAttachmentParser.MeshOptionFormat>)null;
+				result.NodeComponents = (global::System.Collections.Generic.Dictionary<global::System.String,global::Lime.Model3DAttachmentParser.ModelComponentsFormat>)null;
 				var tmp7 = d.Reader.ReadInt32();
 				if (tmp7 >= 0) {
-					result.MeshOptions = new global::System.Collections.Generic.Dictionary<global::System.String,global::Lime.Model3DAttachmentParser.MeshOptionFormat>();
+					result.NodeComponents = new global::System.Collections.Generic.Dictionary<global::System.String,global::Lime.Model3DAttachmentParser.ModelComponentsFormat>();
 					while (--tmp7 >= 0) {
 						var tmp8 = d.Reader.ReadString();
 						if (tmp8 == "" && d.Reader.ReadBoolean()) tmp8 = null;
-						var tmp9 = (global::Lime.Model3DAttachmentParser.MeshOptionFormat)dg.ReadObject<global::Lime.Model3DAttachmentParser.MeshOptionFormat>();
-						result.MeshOptions.Add(tmp8, tmp9);
+						var tmp9 = (global::Lime.Model3DAttachmentParser.ModelComponentsFormat)dg.ReadObject<global::Lime.Model3DAttachmentParser.ModelComponentsFormat>();
+						result.NodeComponents.Add(tmp8, tmp9);
 					}
 				}
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (4 == fd.OurIndex) {
-				result.NodeComponents = (global::System.Collections.Generic.Dictionary<global::System.String,global::Lime.Model3DAttachmentParser.ModelComponentsFormat>)null;
+				result.NodeRemovals = (global::System.Collections.Generic.List<global::System.String>)null;
 				var tmp10 = d.Reader.ReadInt32();
 				if (tmp10 >= 0) {
-					result.NodeComponents = new global::System.Collections.Generic.Dictionary<global::System.String,global::Lime.Model3DAttachmentParser.ModelComponentsFormat>();
+					result.NodeRemovals = new global::System.Collections.Generic.List<global::System.String>();
 					while (--tmp10 >= 0) {
 						var tmp11 = d.Reader.ReadString();
 						if (tmp11 == "" && d.Reader.ReadBoolean()) tmp11 = null;
-						var tmp12 = (global::Lime.Model3DAttachmentParser.ModelComponentsFormat)dg.ReadObject<global::Lime.Model3DAttachmentParser.ModelComponentsFormat>();
-						result.NodeComponents.Add(tmp11, tmp12);
+						result.NodeRemovals.Add(tmp11);
 					}
 				}
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (5 == fd.OurIndex) {
-				result.NodeRemovals = (global::System.Collections.Generic.List<global::System.String>)null;
-				var tmp13 = d.Reader.ReadInt32();
-				if (tmp13 >= 0) {
-					result.NodeRemovals = new global::System.Collections.Generic.List<global::System.String>();
-					while (--tmp13 >= 0) {
-						var tmp14 = d.Reader.ReadString();
-						if (tmp14 == "" && d.Reader.ReadBoolean()) tmp14 = null;
-						result.NodeRemovals.Add(tmp14);
-					}
-				}
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (6 == fd.OurIndex) {
 				result.ScaleFactor = d.Reader.ReadSingle();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (7 == fd.OurIndex) {
+			if (6 == fd.OurIndex) {
 				result.UVAnimations = (global::System.Collections.Generic.List<global::Lime.Model3DAttachmentParser.UVAnimationFormat>)null;
-				var tmp15 = d.Reader.ReadInt32();
-				if (tmp15 >= 0) {
+				var tmp12 = d.Reader.ReadInt32();
+				if (tmp12 >= 0) {
 					result.UVAnimations = new global::System.Collections.Generic.List<global::Lime.Model3DAttachmentParser.UVAnimationFormat>();
-					while (--tmp15 >= 0) {
-						var tmp16 = (global::Lime.Model3DAttachmentParser.UVAnimationFormat)dg.ReadObject<global::Lime.Model3DAttachmentParser.UVAnimationFormat>();
-						result.UVAnimations.Add(tmp16);
+					while (--tmp12 >= 0) {
+						var tmp13 = (global::Lime.Model3DAttachmentParser.UVAnimationFormat)dg.ReadObject<global::Lime.Model3DAttachmentParser.UVAnimationFormat>();
+						result.UVAnimations.Add(tmp13);
 					}
 				}
 				fd = def.Fields[d.Reader.ReadInt16()];
@@ -4768,36 +4797,6 @@ namespace GeneratedDeserializersBIN
 		{
 			var result = new global::Lime.Model3DAttachmentParser.ModelMarkerFormat();
 			Read_Lime__Model3DAttachmentParser__ModelMarkerFormat(d, def, result);
-			return result;
-		}
-
-		private static void Read_Lime__Model3DAttachmentParser__ModelMaterialEffectFormat(BinaryDeserializer d, ReaderClassDef def, object obj)
-		{
-			var result = (global::Lime.Model3DAttachmentParser.ModelMaterialEffectFormat)obj;
-			var dg = (BinaryDeserializerGen)d;
-			ReaderClassDef.FieldDef fd;
-			fd = def.Fields[d.Reader.ReadInt16()];
-			if (1 == fd.OurIndex) {
-				result.Blending = d.Reader.ReadBoolean() ? (global::System.Int32?)null : d.Reader.ReadInt32();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (2 == fd.OurIndex) {
-				result.MaterialName = d.Reader.ReadString();
-				if (result.MaterialName == "" && d.Reader.ReadBoolean()) result.MaterialName = null;
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (3 == fd.OurIndex) {
-				result.Path = d.Reader.ReadString();
-				if (result.Path == "" && d.Reader.ReadBoolean()) result.Path = null;
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
-		}
-
-		private static object Make_Lime__Model3DAttachmentParser__ModelMaterialEffectFormat(BinaryDeserializer d, ReaderClassDef def)
-		{
-			var result = new global::Lime.Model3DAttachmentParser.ModelMaterialEffectFormat();
-			Read_Lime__Model3DAttachmentParser__ModelMaterialEffectFormat(d, def, result);
 			return result;
 		}
 
@@ -9672,6 +9671,7 @@ namespace GeneratedDeserializersBIN
 		static BinaryDeserializerGen()
 		{
 			readCache[typeof(global::Lime.Animation)] = Read_Lime__Animation;
+			readCache[typeof(global::Lime.Animation.AnimationData)] = Read_Lime__Animation__AnimationData;
 			readCache[typeof(global::Lime.AnimationBlender)] = Read_Lime__AnimationBlender;
 			readCache[typeof(global::Lime.AnimationBlending)] = Read_Lime__AnimationBlending;
 			readCache[typeof(global::Lime.Animator<global::Lime.Anchors>)] = Read_Lime__Animator_Anchors;
@@ -9775,7 +9775,6 @@ namespace GeneratedDeserializersBIN
 			readCache[typeof(global::Lime.Model3DAttachmentParser.ModelAttachmentFormat)] = Read_Lime__Model3DAttachmentParser__ModelAttachmentFormat;
 			readCache[typeof(global::Lime.Model3DAttachmentParser.ModelComponentsFormat)] = Read_Lime__Model3DAttachmentParser__ModelComponentsFormat;
 			readCache[typeof(global::Lime.Model3DAttachmentParser.ModelMarkerFormat)] = Read_Lime__Model3DAttachmentParser__ModelMarkerFormat;
-			readCache[typeof(global::Lime.Model3DAttachmentParser.ModelMaterialEffectFormat)] = Read_Lime__Model3DAttachmentParser__ModelMaterialEffectFormat;
 			readCache[typeof(global::Lime.Model3DAttachmentParser.UVAnimationFormat)] = Read_Lime__Model3DAttachmentParser__UVAnimationFormat;
 			readCache[typeof(global::Lime.Movie)] = Read_Lime__Movie;
 			readCache[typeof(global::Lime.NineGrid)] = Read_Lime__NineGrid;
@@ -9825,6 +9824,7 @@ namespace GeneratedDeserializersBIN
 			readCache[typeof(global::Lime.WidgetAdapter3D)] = Read_Lime__WidgetAdapter3D;
 			makeCache[typeof(global::Lime.Alignment)] = Make_Lime__Alignment;
 			makeCache[typeof(global::Lime.Animation)] = Make_Lime__Animation;
+			makeCache[typeof(global::Lime.Animation.AnimationData)] = Make_Lime__Animation__AnimationData;
 			makeCache[typeof(global::Lime.AnimationBlender)] = Make_Lime__AnimationBlender;
 			makeCache[typeof(global::Lime.AnimationBlending)] = Make_Lime__AnimationBlending;
 			makeCache[typeof(global::Lime.Animator<global::Lime.Anchors>)] = Make_Lime__Animator_Anchors;
@@ -9942,7 +9942,6 @@ namespace GeneratedDeserializersBIN
 			makeCache[typeof(global::Lime.Model3DAttachmentParser.ModelAttachmentFormat)] = Make_Lime__Model3DAttachmentParser__ModelAttachmentFormat;
 			makeCache[typeof(global::Lime.Model3DAttachmentParser.ModelComponentsFormat)] = Make_Lime__Model3DAttachmentParser__ModelComponentsFormat;
 			makeCache[typeof(global::Lime.Model3DAttachmentParser.ModelMarkerFormat)] = Make_Lime__Model3DAttachmentParser__ModelMarkerFormat;
-			makeCache[typeof(global::Lime.Model3DAttachmentParser.ModelMaterialEffectFormat)] = Make_Lime__Model3DAttachmentParser__ModelMaterialEffectFormat;
 			makeCache[typeof(global::Lime.Model3DAttachmentParser.UVAnimationFormat)] = Make_Lime__Model3DAttachmentParser__UVAnimationFormat;
 			makeCache[typeof(global::Lime.Movie)] = Make_Lime__Movie;
 			makeCache[typeof(global::Lime.NineGrid)] = Make_Lime__NineGrid;

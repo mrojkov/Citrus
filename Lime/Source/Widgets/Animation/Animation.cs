@@ -7,6 +7,7 @@ namespace Lime
 	public class Animation : ICloneable
 	{
 		private bool isRunning;
+		private bool animatorsArePropagated;
 		internal Animation Next;
 		internal double TimeInternal;
 		internal double? NextMarkerOrTriggerTime;
@@ -24,6 +25,9 @@ namespace Lime
 		[YuzuMember]
 		[TangerineIgnore]
 		public bool IsLegacy { get; set; }
+
+		[YuzuMember]
+		public string ContentsPath { get; set; }
 
 		public double Time
 		{
@@ -51,6 +55,9 @@ namespace Lime
 			{
 				if (isRunning != value) {
 					isRunning = value;
+					if (isRunning) {
+						Load();
+					}
 					Owner?.RefreshRunningAnimationCount();
 				}
 			}
@@ -123,6 +130,7 @@ namespace Lime
 
 		public void ApplyAnimators(bool invokeTriggers)
 		{
+			Load();
 			RebuildAnimatorCache();
 			AnimationEngine.ApplyAnimators(this, invokeTriggers);
 		}
@@ -144,6 +152,55 @@ namespace Lime
 		object ICloneable.Clone()
 		{
 			return Clone();
+		}
+
+		public void Load()
+		{
+			if (animatorsArePropagated || string.IsNullOrEmpty(ContentsPath) || Owner == null) {
+				return;
+			}
+			var d = AnimationData.Load(ContentsPath);
+			foreach (var animator in d.Animators) {
+				var clone = animator.Clone();
+				var (host, index) = AnimationUtils.GetPropertyHost(Owner, clone.TargetPropertyPath);
+				if (host == null) {
+					continue;
+				}
+				clone.TargetPropertyPath = clone.TargetPropertyPath.Substring(index);
+				host.Animators.Add(clone);
+			}
+			animatorsArePropagated = true;
+		}
+
+		public AnimationData GetData()
+		{
+			var d = new AnimationData();
+			var animators = new List<IAnimator>();
+			FindAnimators(animators);
+			foreach (var animator in animators) {
+				var node = (Node)animator.Owner;
+				var propertyPath = $"{node.Id}/{animator.TargetPropertyPath}";
+				while (node.Parent != Owner) {
+					node = node.Parent;
+					propertyPath = $"{node.Id}/{propertyPath}";
+				}
+				var clone = animator.Clone();
+				clone.TargetPropertyPath = propertyPath;
+				d.Animators.Add(clone);
+			}
+			return d;
+		}
+
+		public class AnimationData
+		{
+			[YuzuMember]
+			public List<IAnimator> Animators { get; private set; } = new List<IAnimator>();
+
+			public static AnimationData Load(string path)
+			{
+				path += ".ant";
+				return Serialization.ReadObject<AnimationData>(path);
+			}
 		}
 	}
 }

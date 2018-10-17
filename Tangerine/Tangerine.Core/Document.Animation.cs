@@ -35,6 +35,7 @@ namespace Tangerine.Core
 		{
 			if (PreviewAnimation) {
 				PreviewAnimation = false;
+				Animation.IsRunning = false;
 				CurrentFrameSetter.StopAnimationRecursive(PreviewAnimationContainer);
 				if (!CoreUserPreferences.Instance.StopAnimationOnCurrentFrame) { 
 					var i = 0;

@@ -66,7 +66,6 @@ namespace Tangerine
 			});
 			var content = new TabbedWidget();
 			content.AddTab("General", CreateGeneralPane(attachment), true);
-			content.AddTab("Material Effects", CreateMaterialEffectsPane(attachment));
 			content.AddTab("Components", CreateComponentsPane(attachment));
 			content.AddTab("Mesh Options", CreateMeshOptionsPane(attachment));
 			content.AddTab("Animations", CreateAnimationsPane(attachment));
@@ -211,11 +210,6 @@ namespace Tangerine
 					new Model3DAttachment.Animation { Name = "Animation", }
 				));
 			}));
-			if (attachment.Animations.All(a => a.Name != Model3DAttachment.DefaultAnimationName)) {
-				attachment.Animations.Insert(0, new Model3DAttachment.Animation {
-					Name = Model3DAttachment.DefaultAnimationName,
-				});
-			}
 			list.Components.Add(widgetFactory);
 			return pane;
 		}
@@ -238,35 +232,6 @@ namespace Tangerine
 					attachment.MeshOptions.Count,
 					new Model3DAttachment.MeshOption { Id = "MeshOption" }
 				));
-			}));
-			list.Components.Add(widgetFactory);
-			return pane;
-		}
-
-		private static Widget CreateMaterialEffectsPane(Model3DAttachment attachment)
-		{
-			var pane = new ThemedScrollView();
-			pane.Content.Padding = new Thickness { Right = 10 };
-			var list = new Widget {
-				Layout = new VBoxLayout(),
-			};
-			pane.Content.Layout = new VBoxLayout { Spacing = AttachmentMetrics.Spacing };
-			pane.Content.AddNode(list);
-			var widgetFactory = new AttachmentWidgetFactory<Model3DAttachment.MaterialEffect>(
-					w => new MaterialEffectRow(w, attachment.MaterialEffects), attachment.MaterialEffects);
-			widgetFactory.AddHeader(MaterialEffectRow.CreateHeader());
-			widgetFactory.AddFooter(DeletableRow<Model3DAttachment.MaterialEffect>.CreateFooter(() => {
-				history.DoTransaction(() => {
-					Core.Operations.InsertIntoList.Perform(
-						attachment.MaterialEffects,
-						attachment.MaterialEffects.Count,
-						new Model3DAttachment.MaterialEffect {
-							Name = "MaterialEffect",
-							MaterialName = "MaterialName",
-							Path = "MaterialPath",
-						}
-					);
-				});
 			}));
 			list.Components.Add(widgetFactory);
 			return pane;
@@ -499,8 +464,6 @@ namespace Tangerine
 			public AnimationRow(Model3DAttachment.Animation animation, ObservableCollection<Model3DAttachment.Animation> options)
 				: base(animation, options)
 			{
-				var isDefault = animation.Name == Model3DAttachment.DefaultAnimationName;
-				deleteButton.Visible = !isDefault;
 				Layout = new VBoxLayout();
 				var expandedButton = new ThemedExpandButton {
 					MinMaxSize = new Vector2(AttachmentMetrics.ExpandButtonSize),
@@ -515,6 +478,20 @@ namespace Tangerine
 						animation,
 						nameof(Model3DAttachment.Animation.Name))));
 				animationNamePropEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.EditorWidth;
+
+				var startFramePropEditor = new IntPropertyEditor(
+					Decorate(new PropertyEditorParams(
+						Header,
+						animation,
+						nameof(Model3DAttachment.Animation.StartFrame))));
+				startFramePropEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.ControlWidth;
+
+				var lastFramePropEditor = new IntPropertyEditor(
+					Decorate(new PropertyEditorParams(
+						Header,
+						animation,
+						nameof(Model3DAttachment.Animation.LastFrame))));
+				lastFramePropEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.ControlWidth;
 
 				Header.AddNode(new BlendingCell(Source, nameof(Model3DAttachment.Animation.Blending)));
 
@@ -550,22 +527,19 @@ namespace Tangerine
 						DestMarkerId = "Marker1"
 					},
 					MarkerBlendingRow.CreateHeader());
-				if (!isDefault) {
-					BuildList<Model3DAttachment.NodeData, NodeRow>(
-						animation.Nodes,
-						expandableContentWrapper,
-						"Nodes",
-						() => new Model3DAttachment.NodeData { Id = "NodeId" },
-						NodeRow.CreateHeader());
+				BuildList<Model3DAttachment.NodeData, NodeRow>(
+					animation.Nodes,
+					expandableContentWrapper,
+					"Nodes",
+					() => new Model3DAttachment.NodeData { Id = "NodeId" },
+					NodeRow.CreateHeader());
 
-					BuildList<Model3DAttachment.NodeData, NodeRow>(
-						animation.IgnoredNodes,
-						expandableContentWrapper,
-						"Ignored Nodes",
-						() => new Model3DAttachment.NodeData { Id = "NodeId" },
-						NodeRow.CreateHeader());
-				}
-
+				BuildList<Model3DAttachment.NodeData, NodeRow>(
+					animation.IgnoredNodes,
+					expandableContentWrapper,
+					"Ignored Nodes",
+					() => new Model3DAttachment.NodeData { Id = "NodeId" },
+					NodeRow.CreateHeader());
 
 				Nodes.Add(expandableContentWrapper);
 				expandableContentWrapper.AddChangeWatcher(
@@ -615,6 +589,18 @@ namespace Tangerine
 						new ThemedSimpleText {
 							Text = "Animation name",
 							MinMaxWidth = AttachmentMetrics.EditorWidth,
+							VAlignment = VAlignment.Center,
+							ForceUncutText = false
+						},
+						new ThemedSimpleText {
+							Text = "Start Frame",
+							MinMaxWidth = AttachmentMetrics.ControlWidth,
+							VAlignment = VAlignment.Center,
+							ForceUncutText = false
+						},
+						new ThemedSimpleText {
+							Text = "Last Frame",
+							MinMaxWidth = AttachmentMetrics.ControlWidth,
 							VAlignment = VAlignment.Center,
 							ForceUncutText = false
 						},
@@ -932,75 +918,6 @@ namespace Tangerine
 				Nodes.Add(container);
 				content.BuildForObjects(new List<object> { source });
 				Padding = new Thickness { Bottom = 4f};
-			}
-		}
-
-		private class MaterialEffectRow : DeletableRow<Model3DAttachment.MaterialEffect>
-		{
-			public MaterialEffectRow(
-				Model3DAttachment.MaterialEffect source,
-				ObservableCollection<Model3DAttachment.MaterialEffect> sourceCollection) : base(source, sourceCollection)
-			{
-				Layout = new HBoxLayout();
-				var namePropEditor = new StringPropertyEditor(
-					Decorate(new PropertyEditorParams(
-						Header,
-						Source,
-						nameof(Model3DAttachment.MaterialEffect.Name))));
-				namePropEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.ControlWidth;
-
-				var materialNamePropEditor = new StringPropertyEditor(
-					Decorate(new PropertyEditorParams(
-						Header,
-						Source,
-						nameof(Model3DAttachment.MaterialEffect.MaterialName))));
-				materialNamePropEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.ControlWidth;
-
-				var pathPropEditor = new StringPropertyEditor(
-					Decorate(new PropertyEditorParams(
-						Header,
-						Source,
-						nameof(Model3DAttachment.MaterialEffect.Path))));
-				pathPropEditor.ContainerWidget.MinMaxWidth = 2 * AttachmentMetrics.EditorWidth;
-
-				Header.AddNode(new BlendingCell(Source, nameof(Model3DAttachment.MaterialEffect.Blending)));
-			}
-
-			public static Widget CreateHeader()
-			{
-				return new Widget {
-					Layout = new HBoxLayout() { Spacing = AttachmentMetrics.Spacing },
-					Padding = new Thickness { Left = AttachmentMetrics.Spacing },
-					MinMaxHeight = 20,
-					Presenter = Presenters.HeaderPresenter,
-					Nodes = {
-						new ThemedSimpleText {
-							Text = "Name",
-							MinMaxWidth = AttachmentMetrics.ControlWidth,
-							VAlignment = VAlignment.Center,
-							ForceUncutText = false
-						},
-						new ThemedSimpleText {
-							Text = "Material Name",
-							MinMaxWidth = AttachmentMetrics.ControlWidth,
-							VAlignment = VAlignment.Center,
-							ForceUncutText = false
-						},
-						new ThemedSimpleText {
-							Text = "Path",
-							MinMaxWidth = 2 * AttachmentMetrics.EditorWidth,
-							VAlignment = VAlignment.Center,
-							ForceUncutText = false
-						},
-						new ThemedSimpleText {
-							Text = "Blending",
-							MinMaxWidth = AttachmentMetrics.ControlWidth,
-							VAlignment = VAlignment.Center,
-							ForceUncutText = false
-						},
-						new Widget(),
-					}
-				};
 			}
 		}
 

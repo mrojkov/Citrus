@@ -39,6 +39,8 @@ namespace Lime
 
 		Type GetValueType();
 
+		object CalcValue(double time);
+
 		bool TryGetNextKeyFrame(int nextFrame, out int keyFrame);
 
 		void Unbind();
@@ -257,6 +259,8 @@ namespace Lime
 				return InterpolateSplined(t);
 			}
 		}
+
+		object IAnimator.CalcValue(double time) => CalcValue(time);
 
 		public bool TryGetNextKeyFrame(int nextFrame, out int keyFrame)
 		{

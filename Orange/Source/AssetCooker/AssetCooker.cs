@@ -246,6 +246,7 @@ namespace Orange
 				}
 			} finally {
 				The.Workspace.AssetFiles = assetFilesEnumerator;
+				modelsToRebuild.Clear();
 				atlasesPostfix = "";
 			}
 		}
@@ -255,11 +256,10 @@ namespace Orange
 			bundleBackupFiles = new List<String>();
 
 			AddStage(RemoveDeprecatedModels);
-			AddStage(SyncModels);
 			AddStage(SyncAtlases, CookingProfile.Total);
 			AddStage(SyncDeleted, CookingProfile.Total);
 			AddStage(() => SyncRawAssets(".json", AssetAttributes.ZippedDeflate));
-			AddStage(() => SyncRawAssets(".txt", AssetAttributes.ZippedDeflate));
+			AddStage(() => SyncTxtAssets());
 			AddStage(() => SyncRawAssets(".csv", AssetAttributes.ZippedDeflate));
 			var rawAssetExtensions = The.Workspace.ProjectJson["RawAssetExtensions"] as string;
 			if (rawAssetExtensions != null) {
@@ -283,6 +283,7 @@ namespace Orange
 			AddStage(() => SyncRawAssets(".raw"));
 			AddStage(WarnAboutNPOTTextures, CookingProfile.Total);
 			AddStage(() => SyncRawAssets(".bin"));
+			AddStage(SyncModels);
 		}
 
 		private static void WarnAboutNPOTTextures()
@@ -328,6 +329,20 @@ namespace Orange
 		{
 			SyncUpdated(extension, extension, (srcPath, dstPath) => {
 				AssetBundle.ImportFile(srcPath, dstPath, 0, extension, attributes, cookingRulesMap[srcPath].SHA1);
+				return true;
+			});
+		}
+
+		private static HashSet<string> modelsToRebuild = new HashSet<string>();
+
+		private static void SyncTxtAssets()
+		{
+			SyncUpdated(".txt", ".txt", (srcPath, dstPath) => {
+				var modelAttachmentExtIndex = dstPath.LastIndexOf(Model3DAttachment.FileExtension);
+				if (modelAttachmentExtIndex >= 0) {
+					modelsToRebuild.Add(dstPath.Remove(modelAttachmentExtIndex) + ".t3d");
+				}
+				AssetBundle.ImportFile(srcPath, dstPath, 0, ".txt", AssetAttributes.Zipped, cookingRulesMap[srcPath].SHA1);
 				return true;
 			});
 		}
@@ -440,17 +455,24 @@ namespace Orange
 				}
 				var assetPath = Path.ChangeExtension(path, GetOriginalAssetExtension(path));
 				if (!assetFiles.Contains(assetPath)) {
+					if (path.EndsWith(".t3d", StringComparison.OrdinalIgnoreCase)) {
+						DeleteModelExternalAnimations(GetModelAnimationPathPrefix(path));
+					}
+					var modelAttachmentExtIndex = path.LastIndexOf(Model3DAttachment.FileExtension);
+					if (modelAttachmentExtIndex >= 0) {
+						modelsToRebuild.Add(path.Remove(modelAttachmentExtIndex) + ".t3d");
+					}
 					DeleteFileFromBundle(path);
 				}
 			}
 		}
 
-		static void SyncUpdated(string fileExtension, string bundleAssetExtension, Converter converter)
+		static void SyncUpdated(string fileExtension, string bundleAssetExtension, Converter converter, Func<string, string, bool> extraOutOfDateChecker = null)
 		{
-			SyncUpdated(fileExtension, bundleAssetExtension, AssetBundle.Current, converter);
+			SyncUpdated(fileExtension, bundleAssetExtension, AssetBundle.Current, converter, extraOutOfDateChecker);
 		}
 
-		static void SyncUpdated(string fileExtension, string bundleAssetExtension, AssetBundle bundle, Converter converter)
+		static void SyncUpdated(string fileExtension, string bundleAssetExtension, AssetBundle bundle, Converter converter, Func<string, string, bool> extraOutOfDateChecker = null)
 		{
 			foreach (var srcFileInfo in The.Workspace.AssetFiles.Enumerate(fileExtension)) {
 				var srcPath = srcFileInfo.Path;
@@ -459,6 +481,7 @@ namespace Orange
 				var srcRules = cookingRulesMap[srcPath];
 				var needUpdate = !bundled || srcFileInfo.LastWriteTime > bundle.GetFileLastWriteTime(dstPath);
 				needUpdate = needUpdate || !srcRules.SHA1.SequenceEqual(bundle.GetCookingRulesSHA1(dstPath));
+				needUpdate = needUpdate || (extraOutOfDateChecker?.Invoke(srcPath, dstPath) ?? false);
 				if (needUpdate) {
 					if (converter != null) {
 						try {
@@ -1084,7 +1107,8 @@ namespace Orange
 		private static void SyncModels()
 		{
 			SyncUpdated(".fbx", ".t3d", (srcPath, dstPath) => {
-				var compression = cookingRulesMap[srcPath].ModelCompression;
+				var cookingRules = cookingRulesMap[srcPath];
+				var compression = cookingRules.ModelCompression;
 				var model = new FbxModelImporter(srcPath, The.Workspace.ActiveTarget, cookingRulesMap).Model;
 				AssetAttributes assetAttributes;
 				switch (compression) {
@@ -1100,9 +1124,53 @@ namespace Orange
 					default:
 						throw new ArgumentOutOfRangeException($"Unknown compression: {compression}");
 				}
-				Serialization.WriteObjectToBundle(AssetBundle, dstPath, model, Serialization.Format.Binary, ".t3d", assetAttributes, cookingRulesMap[srcPath].SHA1);
+				var animationPathPrefix = GetModelAnimationPathPrefix(dstPath);
+				DeleteModelExternalAnimations(animationPathPrefix);
+				ExportModelAnimations(model, animationPathPrefix, assetAttributes, cookingRules.SHA1);
+				CleanupAnimators(model);
+				Serialization.WriteObjectToBundle(AssetBundle, dstPath, model, Serialization.Format.Binary, ".t3d", assetAttributes, cookingRules.SHA1);
 				return true;
-			});
+			}, (srcPath, dstPath) => modelsToRebuild.Contains(dstPath));
+		}
+
+		private static void DeleteModelExternalAnimations(string pathPrefix)
+		{
+			foreach (var path in AssetBundle.EnumerateFiles()) {
+				if (path.EndsWith(".ant") && path.StartsWith(pathPrefix)) {
+					AssetBundle.DeleteFile(path);
+					Console.WriteLine("- " + path);
+				}
+			}
+		}
+
+		private static void ExportModelAnimations(Model3D model, string pathPrefix, AssetAttributes assetAttributes, byte[] cookingRulesSHA1)
+		{
+			foreach (var animation in model.Animations) {
+				var pathWithoutExt = pathPrefix + animation.Id;
+				var path = pathWithoutExt + ".ant";
+				var data = animation.GetData();
+				animation.ContentsPath = pathWithoutExt;
+				Serialization.WriteObjectToBundle(AssetBundle, path, data, Serialization.Format.Binary, ".ant", assetAttributes, cookingRulesSHA1);
+				Console.WriteLine("+ " + path);
+			}
+		}
+
+		private static void CleanupAnimators(Node node)
+		{
+			foreach (var animation in node.Animations) {
+				if (!string.IsNullOrEmpty(animation.ContentsPath)) {
+					var animators = new List<IAnimator>();
+					animation.FindAnimators(animators);
+					foreach (var animator in animators) {
+						animator.Owner.Animators.Remove(animator);
+					}
+				}
+			}
+		}
+
+		private static string GetModelAnimationPathPrefix(string modelPath)
+		{
+			return Toolbox.ToUnixSlashes(Path.GetDirectoryName(modelPath) + "/" + Path.GetFileNameWithoutExtension(modelPath) + "@");
 		}
 
 		public static void CancelCook()

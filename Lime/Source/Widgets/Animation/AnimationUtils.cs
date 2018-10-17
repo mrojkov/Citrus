@@ -34,14 +34,30 @@ namespace Lime
 		[ThreadStatic]
 		private static Dictionary<string, List<PropertyData>> propertyCache;
 
+		public static (IAnimationHost, int) GetPropertyHost(IAnimationHost host, string propertyPath)
+		{
+			int prevIndex = 0;
+			int index;
+			while ((index = propertyPath.IndexOf('/', prevIndex)) >= 0) {
+				var id = propertyPath.Substring(prevIndex, index - prevIndex);
+				host = ((Node)host).TryFindNode(id);
+				if (host == null) {
+					return (null, -1);
+				}
+				prevIndex = index + 1;
+			}
+			return (host, prevIndex);
+		}
+
 		public static (PropertyData, IAnimable, int) GetPropertyByPath(IAnimationHost host, string propertyPath)
 		{
 			PropertyData result = PropertyData.Empty;
+			int prevIndex;
+			(host, prevIndex) = GetPropertyHost(host, propertyPath);
 			object o = host;
-			int prevIndex = 0;
-			if (propertyPath[0] == '[') {
-				int index = propertyPath.IndexOf(']');
-				var componentTypeName = propertyPath.Substring(1, index - 1);
+			if (propertyPath[prevIndex] == '[') {
+				int index = propertyPath.IndexOf(']', prevIndex + 1);
+				var componentTypeName = propertyPath.Substring(prevIndex + 1, index - prevIndex - 1);
 				var type = global::Yuzu.Metadata.Meta.GetTypeByReadAlias(componentTypeName, Serialization.YuzuCommonOptions)
 				           ?? global::Yuzu.Util.TypeSerializer.Deserialize(componentTypeName);
 				o = host.Components.Get(type);

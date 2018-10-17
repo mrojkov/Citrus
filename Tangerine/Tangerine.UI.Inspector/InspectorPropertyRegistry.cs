@@ -36,7 +36,7 @@ namespace Tangerine.UI.Inspector
 					return Activator.CreateInstance(specializedCustomFilePropertyEditorType, new object[] { c, a }) as IPropertyEditor;
 				}
 			);
-			AddEditor(c => c.PropertyName == "ContentsPath", c => AllowChildren(c) ? new ContentsPathPropertyEditor(c) : null);
+			AddEditor(c => c.PropertyName == "ContentsPath" && c.Objects.All(o => o is Node), c => AllowChildren(c) ? new ContentsPathPropertyEditor(c) : null);
 			AddEditor(c => c.PropertyName == "Trigger", c => AllowChildren(c) ? new TriggerPropertyEditor(c) : null);
 			AddEditor(typeof(Vector2), c => new Vector2PropertyEditor(c));
 			AddEditor(typeof(Vector3), c => new Vector3PropertyEditor(c));

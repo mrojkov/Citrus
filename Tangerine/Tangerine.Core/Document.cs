@@ -88,10 +88,25 @@ namespace Tangerine.Core
 		/// </summary>
 		public Node RootNode { get; private set; }
 
+		private Node container;
+
 		/// <summary>
 		/// Gets or sets the current container widget.
 		/// </summary>
-		public Node Container { get; set; }
+		public Node Container
+		{
+			get { return container; }
+			set {
+				if (container != value) {
+					container = value;
+					var animations = new List<Animation>();
+					GetAnimations(animations);
+					if (!animations.Contains(Animation)) {
+						SelectedAnimation = null;
+					}
+				}
+			}
+		}
 
 		/// <summary>
 		/// Gets or sets the scene we are navigated from. Need for getting back into the main scene from the external one.
@@ -175,6 +190,30 @@ namespace Tangerine.Core
 				}
 			} else {
 				Load();
+			}
+		}
+
+		public void GetAnimations(List<Animation> animations)
+		{
+			var ancestor = Container;
+			animations.Add(ancestor.DefaultAnimation);
+			while (true) {
+				foreach (var a in ancestor.TangerineAnimations) {
+					var found = false;
+					foreach (var other in animations) {
+						found = other.Id == a.Id;
+						if (found) {
+							break;
+						}
+					}
+					if (!found) {
+						animations.Add(a);
+					}
+				}
+				if (ancestor == RootNode) {
+					return;
+				}
+				ancestor = ancestor.Parent;
 			}
 		}
 

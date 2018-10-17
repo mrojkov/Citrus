@@ -10,11 +10,9 @@ namespace Lime
 	public class Model3DAttachment
 	{
 		public const string FileExtension = ".Attachment.txt";
-		public const string DefaultAnimationName = "Default";
 
 		public readonly ObservableCollection<MeshOption> MeshOptions = new ObservableCollection<MeshOption>();
 		public readonly ObservableCollection<Animation> Animations = new ObservableCollection<Animation>();
-		public readonly ObservableCollection<MaterialEffect> MaterialEffects = new ObservableCollection<MaterialEffect>();
 		public readonly ObservableCollection<NodeComponentCollection> NodeComponents = new ObservableCollection<NodeComponentCollection>();
 		public readonly ObservableCollection<NodeRemoval> NodeRemovals = new ObservableCollection<NodeRemoval>();
 
@@ -31,6 +29,8 @@ namespace Lime
 		public class Animation
 		{
 			public string Name { get; set; }
+			public int StartFrame { get; set; }
+			public int LastFrame { get; set; }
 			public ObservableCollection<MarkerData> Markers = new ObservableCollection<MarkerData>();
 			public ObservableCollection<NodeData> Nodes = new ObservableCollection<NodeData>();
 			public ObservableCollection<NodeData> IgnoredNodes = new ObservableCollection<NodeData>();
@@ -56,14 +56,6 @@ namespace Lime
 			public BlendingOption Blending { get; set; } = new BlendingOption();
 		}
 
-		public class MaterialEffect
-		{
-			public string Name { get; set; }
-			public string MaterialName { get; set; }
-			public string Path { get; set; }
-			public BlendingOption Blending { get; set; }
-		}
-
 		public class NodeComponentCollection
 		{
 			public string NodeId { get; set; }
@@ -79,9 +71,9 @@ namespace Lime
 		{
 			ProcessMeshOptions(model);
 			ProcessAnimations(model);
-			ProcessMaterialEffects(model);
 			ProcessComponents(model);
 			ProcessNodeRemovals(model);
+			ApplyScaleFactor(model);
 		}
 
 		private void ProcessComponents(Node3D model)
@@ -112,7 +104,7 @@ namespace Lime
 			return true;
 		}
 
-		public void ApplyScaleFactor(Node3D model)
+		private void ApplyScaleFactor(Node3D model)
 		{
 			if (ScaleFactor == 1) {
 				return;
@@ -183,17 +175,23 @@ namespace Lime
 			if (Animations.Count == 0) {
 				return;
 			}
-			var srcAnimation = model.DefaultAnimation;
+			var srcAnimation = model.FirstAnimation;
 			foreach (var animationData in Animations) {
-				var animation = srcAnimation;
-				if (animationData.Name != DefaultAnimationName) {
-					animation = new Lime.Animation {
-						Id = animationData.Name
-					};
+				var animation = new Lime.Animation {
+					Id = animationData.Name
+				};
+				model.Animations.Add(animation);
+
+				if (animationData.StartFrame <= animationData.LastFrame) {
+					var nodes = GetAnimationNodes(model, animationData).ToList();
+					var anims = nodes.SelectMany(n => n.Animators).ToList();
 					foreach (var node in GetAnimationNodes(model, animationData)) {
-						OverrideAnimation(node, srcAnimation, animation);
+						foreach (var animator in node.Animators) {
+							if (animator.AnimationId == srcAnimation.Id) {
+								CopyKeys(animator, node.Animators[animator.TargetPropertyPath, animation.Id], animationData.StartFrame, animationData.LastFrame);
+							}
+						}
 					}
-					model.Animations.Add(animation);
 				}
 
 				var animationBlending = new AnimationBlending() {
@@ -223,40 +221,44 @@ namespace Lime
 					model.Components.GetOrAdd<AnimationBlender>().Options.Add(animation.Id ?? "", animationBlending);
 				}
 			}
+
+			var srcAnimators = new List<IAnimator>();
+			srcAnimation.FindAnimators(srcAnimators);
+			foreach (var srcAnimator in srcAnimators) {
+				srcAnimator.Owner.Animators.Remove(srcAnimator);
+			}
+
+			model.Animations.Remove(srcAnimation);
 		}
 
-		private void ProcessMaterialEffects(Node3D model)
+		private static void CopyKeys(IAnimator srcAnimator, IAnimator dstAnimator, int startFrame, int lastFrame)
 		{
-			var effectEngine = new MaterialEffectEngine();
-			foreach (var effect in MaterialEffects) {
-				try {
-					var effectPresenter = new MaterialEffectPresenter(effect.MaterialName, effect.Name, effect.Path);
-					model.CompoundPresenter.Add(effectPresenter);
-
-					if (effect.Blending != null) {
-						var blender = effectPresenter.Scene.Components.GetOrAdd<AnimationBlender>();
-						var animationBlending = new AnimationBlending() {
-							Option = effect.Blending
-						};
-						blender.Options.Add(effectPresenter.Animation.Id ?? "", animationBlending);
-					}
-
-					var animation = new Lime.Animation {
-						Id = effect.Name,
-						AnimationEngine = effectEngine
-					};
-
-					foreach (var marker in effectPresenter.Animation.Markers) {
-						animation.Markers.Add(marker.Clone());
-					}
-
-					model.Animations.Add(animation);
-				} catch (Lime.Exception e) {
-#if TANGERINE
-					Console.WriteLine(e.Message);
-#else
-					throw;
-#endif // TANGERINE
+			var startKeyIndex = -1;
+			for (var i = 0; i < srcAnimator.ReadonlyKeys.Count; i++) {
+				if (startFrame <= srcAnimator.ReadonlyKeys[i].Frame) {
+					startKeyIndex = i;
+					break;
+				}
+			}
+			var lastKeyIndex = -1;
+			for (var i = srcAnimator.ReadonlyKeys.Count - 1; i >= 0; i--) {
+				if (lastFrame >= srcAnimator.ReadonlyKeys[i].Frame) {
+					lastKeyIndex = i;
+					break;
+				}
+			}
+			if (startKeyIndex == -1 || lastKeyIndex == -1) {
+				return;
+			}
+			if (startFrame != srcAnimator.ReadonlyKeys[startKeyIndex].Frame) {
+				dstAnimator.Keys.Add(startFrame, srcAnimator.CalcValue(AnimationUtils.FramesToSeconds(startFrame)));
+			}
+			if (startFrame != lastFrame) {
+				for (var i = startKeyIndex; i <= lastKeyIndex; i++) {
+					dstAnimator.Keys.Add(srcAnimator.ReadonlyKeys[i]);
+				}
+				if (lastFrame != srcAnimator.ReadonlyKeys[lastKeyIndex].Frame) {
+					dstAnimator.Keys.Add(lastFrame, srcAnimator.CalcValue(AnimationUtils.FramesToSeconds(lastFrame)));
 				}
 			}
 		}
@@ -322,9 +324,6 @@ namespace Lime
 			public Dictionary<string, ModelComponentsFormat> NodeComponents = null;
 
 			[YuzuMember]
-			public Dictionary<string, ModelMaterialEffectFormat> MaterialEffects = null;
-
-			[YuzuMember]
 			public List<string> NodeRemovals = null;
 
 			[YuzuMember]
@@ -381,6 +380,11 @@ namespace Lime
 
 		public class ModelAnimationFormat
 		{
+			[YuzuMember]
+			public int StartFrame;
+
+			[YuzuMember]
+			public int LastFrame;
 
 			[YuzuMember]
 			public List<string> Nodes = null;
@@ -417,18 +421,6 @@ namespace Lime
 
 			[YuzuMember]
 			public Dictionary<string, int> SourceMarkersBlending = null;
-
-			[YuzuMember]
-			public int? Blending = null;
-		}
-
-		public class ModelMaterialEffectFormat
-		{
-			[YuzuMember]
-			public string MaterialName = null;
-
-			[YuzuMember]
-			public string Path = null;
 
 			[YuzuMember]
 			public int? Blending = null;
@@ -496,6 +488,8 @@ namespace Lime
 					foreach (var animationFormat in modelAttachmentFormat.Animations) {
 						var animation = new Model3DAttachment.Animation {
 							Name = animationFormat.Key,
+							StartFrame = animationFormat.Value.StartFrame,
+							LastFrame = animationFormat.Value.LastFrame
 						};
 
 						if (animationFormat.Value.Markers != null) {
@@ -558,20 +552,6 @@ namespace Lime
 					}
 				}
 
-				if (modelAttachmentFormat.MaterialEffects != null) {
-					foreach (var materialEffectFormat in modelAttachmentFormat.MaterialEffects) {
-						var materialEffect = new Model3DAttachment.MaterialEffect() {
-							Name = materialEffectFormat.Key,
-							MaterialName = materialEffectFormat.Value.MaterialName,
-							Path = FixPath(modelPath, materialEffectFormat.Value.Path)
-						};
-						if (materialEffectFormat.Value.Blending != null) {
-							materialEffect.Blending = new BlendingOption((int)materialEffectFormat.Value.Blending);
-						}
-						attachment.MaterialEffects.Add(materialEffect);
-					}
-				}
-
 				if (modelAttachmentFormat.NodeRemovals != null) {
 					foreach (var id in modelAttachmentFormat.NodeRemovals) {
 						attachment.NodeRemovals.Add(new Model3DAttachment.NodeRemoval { NodeId = id });
@@ -599,9 +579,6 @@ namespace Lime
 			}
 			if (attachment.Animations.Count > 0) {
 				origin.Animations = new Dictionary<string, ModelAnimationFormat>();
-			}
-			if (attachment.MaterialEffects.Count > 0) {
-				origin.MaterialEffects = new Dictionary<string, ModelMaterialEffectFormat>();
 			}
 			if (attachment.NodeComponents.Count > 0) {
 				origin.NodeComponents = new Dictionary<string, ModelComponentsFormat>();
@@ -642,6 +619,8 @@ namespace Lime
 
 			foreach (var animation in attachment.Animations) {
 				var animationFormat = new ModelAnimationFormat {
+					StartFrame = animation.StartFrame,
+					LastFrame = animation.LastFrame,
 					Markers = new Dictionary<string, ModelMarkerFormat>(),
 				};
 				foreach (var markerData in animation.Markers) {
@@ -684,18 +663,6 @@ namespace Lime
 				origin.Animations.Add(animation.Name, animationFormat);
 			}
 
-			foreach (var materialEffect in attachment.MaterialEffects) {
-				var name = materialEffect.Path.Split('/');
-				var materialEffectFormat = new ModelMaterialEffectFormat {
-					Path = name.Last(),
-					MaterialName = materialEffect.Name,
-				};
-				if (materialEffect.Blending != null) {
-					materialEffectFormat.Blending = (int)materialEffect.Blending.Duration;
-				}
-				origin.MaterialEffects.Add(materialEffect.Name, materialEffectFormat);
-			}
-
 			return origin;
 		}
 
@@ -708,114 +675,6 @@ namespace Lime
 		private static int FixFrame(int frame, double fps = 30)
 		{
 			return AnimationUtils.SecondsToFrames(frame / fps);
-		}
-	}
-
-	public class MaterialEffectEngine : DefaultAnimationEngine
-	{
-		public override void AdvanceAnimation(Animation animation, float delta)
-		{
-			var effectAnimation = GetPresenter(animation).Animation;
-			effectAnimation.AnimationEngine.AdvanceAnimation(effectAnimation, delta);
-
-			base.AdvanceAnimation(animation, delta);
-		}
-
-		public override void ApplyAnimators(Animation animation, bool invokeTriggers, double animationTimeCorrection = 0)
-		{
-			var effectAnimation = GetPresenter(animation).Animation;
-			effectAnimation.AnimationEngine.ApplyAnimators(effectAnimation, invokeTriggers, animationTimeCorrection);
-
-			base.ApplyAnimators(animation, invokeTriggers, animationTimeCorrection);
-		}
-
-		public override bool TryRunAnimation(Animation animation, string markerId, double animationTimeCorrection = 0)
-		{
-			var presenter = GetPresenter(animation);
-			if (
-				!base.TryRunAnimation(animation, markerId, animationTimeCorrection) ||
-				!presenter.Animation.AnimationEngine.TryRunAnimation(presenter.Animation, markerId, animationTimeCorrection)
-			) {
-				return false;
-			}
-
-			presenter.WasSnapshotDeprecated = true;
-			foreach (var material in GetMaterialsForAnimation(animation)) {
-				material.DiffuseTexture = presenter.Snapshot;
-			}
-			return true;
-		}
-
-		private static MaterialEffectPresenter GetPresenter(Animation animation)
-		{
-			return animation.Owner.CompoundPresenter
-				.OfType<MaterialEffectPresenter>()
-				.First(p => p.EffectName == animation.Id);
-		}
-
-		public static IEnumerable<CommonMaterial> GetMaterialsForAnimation(Animation animation)
-		{
-			return GetMaterials(animation.Owner, GetPresenter(animation).MaterialName);
-		}
-
-		private static IEnumerable<CommonMaterial> GetMaterials(Node model, string name)
-		{
-			return model
-				.Descendants
-				.OfType<Mesh3D>()
-				.SelectMany(i => i.Submeshes)
-				.Select(i => i.Material)
-				.Cast<CommonMaterial>()
-				.Where(i => i.Name == name);
-		}
-	}
-
-	public class MaterialEffectPresenter : IPresenter
-	{
-		private static readonly RenderChain renderChain = new RenderChain();
-		private ITexture snapshot;
-
-		public string MaterialName { get; }
-		public string EffectName { get; }
-		public Widget Scene { get; private set; }
-		public bool WasSnapshotDeprecated { get; set; } = true;
-		public Animation Animation => Scene.DefaultAnimation;
-		public ITexture Snapshot => snapshot ?? (snapshot = new RenderTexture((int)Scene.Width, (int)Scene.Height));
-
-		public MaterialEffectPresenter(string materialName, string effectName, string path)
-		{
-			MaterialName = materialName;
-			EffectName = effectName;
-			Scene = (Frame)Node.CreateFromAssetBundle(path);
-		}
-
-		public bool PartialHitTest(Node node, ref HitTestArgs args)
-		{
-			throw new NotImplementedException();
-		}
-
-		public RenderObject GetRenderObject(Node node)
-		{
-			throw new NotImplementedException();
-		}
-
-		//public override void Render(Node node)
-		//{
-		//	if (!Animation.IsRunning && !WasSnapshotDeprecated) {
-		//		return;
-		//	}
-
-		//	Scene.RenderToTexture(Snapshot, renderChain);
-		//	renderChain.Clear();
-		//	WasSnapshotDeprecated = false;
-		//}
-
-		public IPresenter Clone()
-		{
-			var clone = (MaterialEffectPresenter)MemberwiseClone();
-			clone.snapshot = null;
-			clone.Scene = Scene.Clone<Widget>();
-			return clone;
 		}
 	}
 }
