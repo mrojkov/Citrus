@@ -478,5 +478,18 @@ namespace Tangerine.Core
 			}
 			return false;
 		}
+
+		public static bool operator ==(Project lhs, Project rhs)
+		{
+			if (lhs is null) {
+				lhs = Null;
+			}
+			if (rhs is null) {
+				rhs = Null;
+			}
+			return Equals(rhs, lhs);
+		}
+
+		public static bool operator !=(Project lhs, Project rhs) => !(lhs == rhs);
 	}
 }
