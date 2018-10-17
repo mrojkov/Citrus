@@ -254,22 +254,28 @@ namespace Tangerine
 			Document.NodeDecorators.AddFor<Node>(n => n.SetTangerineFlag(TangerineFlags.SceneNode, true));
 			dockManager.UnhandledExceptionOccurred += e => {
 				AlertDialog.Show(e.Message + "\n" + e.StackTrace);
-				if (Document.Current != null) {
-					while (Document.Current.History.IsTransactionActive) {
-						Document.Current.History.EndTransaction();
+				var doc = Document.Current;
+				if (doc != null) {
+					while (doc.History.IsTransactionActive) {
+						doc.History.EndTransaction();
 					}
 					var closeConfirmation = Document.CloseConfirmation;
 					try {
-						Document.CloseConfirmation = doc => {
-							var alert = new AlertDialog($"Save the changes to document '{doc.Path}' before closing?", "Yes", "No");
+						Document.CloseConfirmation = d => {
+							var alert = new AlertDialog($"Save the changes to document '{d.Path}' before closing?", "Yes", "No");
 							switch (alert.Show()) {
 								case 0: return Document.CloseAction.SaveChanges;
 								default: return Document.CloseAction.DiscardChanges;
 							}
 						};
-						// TODO: dont open document if it doesn't exist
-						var path = Document.Current.Path;
-						Project.Current.CloseDocument(Document.Current);
+						var fullPath = doc.FullPath;
+
+						if (!File.Exists(fullPath)) {
+							Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
+							doc.Save();
+						}
+						var path = doc.Path;
+						Project.Current.CloseDocument(doc);
 						Project.Current.OpenDocument(path);
 					} finally {
 						Document.CloseConfirmation = closeConfirmation;
