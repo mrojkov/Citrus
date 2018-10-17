@@ -164,11 +164,10 @@ namespace Tangerine.UI.Timeline
 		{
 			var a = new Vector2(0.0f, 1.0f);
 			var b = new Vector2(0.0f, ContentWidget.Height - 2.0f);
-			for (int columnIndex = 0; columnIndex <= timeline.ColumnCount; columnIndex++) {
-				if (timeline.IsColumnVisible(columnIndex)) {
-					a.X = b.X = 0.5f + columnIndex * TimelineMetrics.ColWidth;
-					Renderer.DrawLine(a, b, ColorTheme.Current.TimelineGrid.LinesLight);
-				}
+			timeline.GetVisibleColumnRange(out var minColumn, out var maxColumn);
+			for (int columnIndex = minColumn; columnIndex <= maxColumn; columnIndex++) {
+				a.X = b.X = 0.5f + columnIndex * TimelineMetrics.ColWidth;
+				Renderer.DrawLine(a, b, ColorTheme.Current.TimelineGrid.LinesLight);
 			}
 		}
 

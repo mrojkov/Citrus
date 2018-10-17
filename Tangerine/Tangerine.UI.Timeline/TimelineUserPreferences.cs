@@ -38,6 +38,8 @@ namespace Tangerine.UI.Timeline
 			TimelineHSplitterStretches = new List<float>();
 		}
 
-		public static TimelineUserPreferences Instance => Core.UserPreferences.Instance.Get<TimelineUserPreferences>();
+		private static TimelineUserPreferences instance;
+
+		public static TimelineUserPreferences Instance => instance ?? (instance = Core.UserPreferences.Instance.Get<TimelineUserPreferences>());
 	}
 }

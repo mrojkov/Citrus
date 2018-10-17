@@ -33,7 +33,6 @@ namespace Tangerine.UI.Timeline.Components
 
 		private void Render(Widget widget)
 		{
-			var maxCol = Timeline.Instance.ColumnCount;
 			widget.PrepareRendererState();
 			Renderer.DrawRect(Vector2.Zero, widget.ContentSize, ColorTheme.Current.TimelineGrid.PropertyRowBackground);
 			var colorIndex = PropertyAttributes<TangerineKeyframeColorAttribute>.Get(animator.Animable.GetType(), animator.TargetPropertyPath)?.ColorIndex ?? 0;

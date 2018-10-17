@@ -62,7 +62,8 @@ namespace Tangerine.UI.Timeline
 			Renderer.DrawRect(Vector2.Zero, RootWidget.Size, ColorTheme.Current.Toolbar.Background);
 			Renderer.MultiplyTransform1(Matrix32.Translation(-Timeline.Instance.Offset.X.Round(), 0));
 			RenderCursor();
-			for (int i = 0; i < Timeline.Instance.ColumnCount; i++) {
+			Timeline.Instance.GetVisibleColumnRange(out var minColumn, out var maxColumn);
+			for (int i = minColumn; i <= maxColumn; i++) {
 				var x = i * TimelineMetrics.ColWidth + 0.5f;
 				if (i % 10 == 0) {
 					float textHeight = Theme.Metrics.TextHeight;

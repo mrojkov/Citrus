@@ -127,15 +127,13 @@ namespace Tangerine.UI.Timeline
 				}
 			}
 			ContentWidget.PrepareRendererState();
-			int numCols = timeline.ColumnCount;
+			timeline.GetVisibleColumnRange(out var minColumn, out var maxColumn);
 			// Render vertical lines.
-			float x = 0.5f + TimelineMetrics.ColWidth / 2;
-			for (int i = 0; i <= numCols; i++) {
-				if (timeline.IsColumnVisible(i)) {
-					Renderer.DrawLine(
-						x, 1, x, MainAreaWidget.Height - 2,
-						ColorTheme.Current.TimelineGrid.LinesLight);
-				}
+			float x = minColumn * TimelineMetrics.ColWidth + 0.5f + TimelineMetrics.ColWidth / 2;
+			for (int i = minColumn; i <= maxColumn; i++) {
+				Renderer.DrawLine(
+					x, 1, x, MainAreaWidget.Height - 2,
+					ColorTheme.Current.TimelineGrid.LinesLight);
 				x += TimelineMetrics.ColWidth;
 			}
 			// Render dark vertical lines below markers.

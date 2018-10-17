@@ -244,6 +244,12 @@ namespace Tangerine.UI.Timeline
 			}
 		}
 
+		public void GetVisibleColumnRange(out int min, out int max)
+		{
+			min = Math.Max(0, (Offset.X / TimelineMetrics.ColWidth).Round() - 1);
+			max = Math.Min(ColumnCount - 1, ((Offset.X + Ruler.RootWidget.Width) / TimelineMetrics.ColWidth).Round() + 1);
+		}
+
 		public bool IsColumnVisible(int col)
 		{
 			var pos = col * TimelineMetrics.ColWidth - Offset.X;
