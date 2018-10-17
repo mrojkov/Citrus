@@ -65,6 +65,11 @@ namespace Tangerine.Core
 		/// </summary>
 		public string Path { get; private set; }
 
+		public void Relocate(string newPath)
+		{
+			Path = newPath;
+		}
+
 		/// <summary>
 		/// Gets absolute path to the document.
 		/// </summary>

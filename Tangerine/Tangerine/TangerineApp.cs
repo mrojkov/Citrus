@@ -150,35 +150,61 @@ namespace Tangerine
 					default: return Document.CloseAction.Cancel;
 				}
 			};
-			Project.HandleMissingDocuments += documents => {
-				while (documents.Any()) {
-					var nextDocument = documents.First();
-					Document.SetCurrent(nextDocument);
-					var alert = new AlertDialog($"Document {nextDocument.FullPath.Replace('\\', '/')} has been deleted. Save or Discard?", "Save", "Save All", "Discard", "Discard All");
+			Project.HandleMissingDocuments += missingDocuments => {
+				while (missingDocuments.Any()) {
+					var nextDocument = missingDocuments.First();
+					bool loaded = nextDocument.Loaded;
+					string path = nextDocument.Path;
+					if (loaded) {
+						Document.SetCurrent(nextDocument);
+						path = nextDocument.FullPath;
+					} else {
+						if (Project.Current.GetFullPath(nextDocument.Path, out string fullPath)) {
+							path = fullPath;
+						}
+					}
+					path = path.Replace('\\', '/');
+					var choices = loaded ? new [] { "Save", "Save All", "Discard", "Discard All" } : new [] { "Locate", "Discard", "Discard All" };
+					var alert = new AlertDialog($"Document {path} has been moved or deleted.", choices);
 					var r = alert.Show();
-					switch (r) {
-						case 0: {
-							Directory.CreateDirectory(Path.GetDirectoryName(nextDocument.FullPath));
-							nextDocument.Save();
-							break;
+					if (loaded && r == 0) {
+						// Save
+						Directory.CreateDirectory(Path.GetDirectoryName(nextDocument.FullPath));
+						nextDocument.Save();
+					} else if (loaded && r == 1) {
+						// Save All
+						while (missingDocuments.Any()) {
+							var d = missingDocuments.First();
+							Directory.CreateDirectory(Path.GetDirectoryName(d.FullPath));
+							d.Save();
 						}
-						case 1: {
-							while (documents.Any()) {
-								var d = documents.First();
-								Directory.CreateDirectory(Path.GetDirectoryName(d.FullPath));
-								d.Save();
+					} else if (loaded && r == 2 || !loaded && r == 1) {
+						// Discard
+						Project.Current.CloseDocument(nextDocument);
+					} else if (loaded && r == 3 || !loaded && r == 2) {
+						// Discard All
+						while (missingDocuments.Any()) {
+							Project.Current.CloseDocument(missingDocuments.First());
+						}
+					} else if (!loaded && r == 0) {
+						// Locate
+						var dialog = new Lime.FileDialog {
+							AllowsMultipleSelection = false,
+							AllowedFileTypes = Document.AllowedFileTypes,
+							InitialDirectory = Project.Current.AssetsDirectory,
+							InitialFileName = Path.GetFileName(path),
+							Mode = FileDialogMode.Open,
+						};
+						if (dialog.RunModal()) {
+							var newPath = dialog.FileName;
+							newPath = Project.Current.GetLocalDocumentPath(newPath, System.IO.Path.IsPathRooted(newPath) &&
+								!System.IO.Path.GetPathRoot(newPath).Equals(System.IO.Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal));
+							if (!string.IsNullOrEmpty(newPath) && !Project.Current.Documents.Any(d => d.Path == newPath)) {
+								nextDocument.Relocate(newPath);
+							} else {
+								alert = new AlertDialog($"Invalid document path: {newPath}");
+								alert.Show();
 							}
-							return;
-						}
-						case 2: {
-							Project.Current.CloseDocument(nextDocument);
-							break;
-						}
-						case 3: {
-							while (documents.Any()) {
-								Project.Current.CloseDocument(documents.First());
-							}
-							return;
 						}
 					}
 				}
@@ -368,7 +394,7 @@ namespace Tangerine
 				if (Path.GetExtension(arg) == ".citproj") {
 					FileOpenProject.Execute(arg);
 				} else {
-					Project.Current.OpenDocument(arg, pathIsGlobal: true);
+					Project.Current.OpenDocument(arg, pathIsAbsolute: true);
 				}
 			}
 		}

@@ -32,7 +32,7 @@ namespace Tangerine.Core
 		public static TempFileLoadConfirmationDelegate TempFileLoadConfirmation;
 		public delegate void OpenFileOutsideProjectAttemptDelegate(string filePath);
 		public static OpenFileOutsideProjectAttemptDelegate OpenFileOutsideProjectAttempt;
-		public delegate void HandleMissingDocumentsDelegate(IEnumerable<Document> documents);
+		public delegate void HandleMissingDocumentsDelegate(IEnumerable<Document> missingDocuments);
 		public static HandleMissingDocumentsDelegate HandleMissingDocuments;
 		public static TaskList Tasks { get; set; }
 		public Dictionary<string, Widget> Overlays { get; } = new Dictionary<string, Widget>();
@@ -82,6 +82,7 @@ namespace Tangerine.Core
 							Debug.Write($"Failed to open document '{path}': {e.Message}");
 						}
 					}
+					HandleMissingDocuments(Documents.Where(d => !GetFullPath(d.Path, out string fullPath)));
 					var currentDoc = documents.FirstOrDefault(d => d.Path == UserPreferences.CurrentDocument) ?? documents.FirstOrDefault();
 					try {
 						Document.SetCurrent(currentDoc);
@@ -164,16 +165,24 @@ namespace Tangerine.Core
 			return doc;
 		}
 
-		public Document OpenDocument(string path, bool pathIsGlobal = false, bool delayLoad = false)
+		public string GetLocalDocumentPath(string path, bool pathIsAbsolute)
 		{
 			string localPath = path;
-			if (pathIsGlobal) {
+			if (pathIsAbsolute) {
 				if (this == Null || !Current.TryGetAssetPath(path, out localPath)) {
 					OpenFileOutsideProjectAttempt(path);
 					return null;
 				}
 			}
-			localPath = AssetPath.CorrectSlashes(localPath);
+			return AssetPath.CorrectSlashes(localPath);
+		}
+
+		public Document OpenDocument(string path, bool pathIsAbsolute = false, bool delayLoad = false)
+		{
+			var localPath = GetLocalDocumentPath(path, pathIsAbsolute);
+			if (string.IsNullOrEmpty(localPath)) {
+				return null;
+			}
 			var doc = Documents.FirstOrDefault(i => i.Path == localPath);
 			if (doc == null) {
 				var tmpFile = AutosaveProcessor.GetTemporaryFilePath(localPath);
@@ -303,7 +312,7 @@ namespace Tangerine.Core
 
 		public void ReloadModifiedDocuments()
 		{
-			HandleMissingDocuments(Documents.Where(d => !File.Exists(d.FullPath)));
+			HandleMissingDocuments(Documents.Where(d => !GetFullPath(d.Path, out string fullPath)));
 			foreach (var doc in Documents.ToList()) {
 				if (!doc.Loaded) {
 					continue;
