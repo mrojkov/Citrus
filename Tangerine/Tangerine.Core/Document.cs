@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
-using System.Reflection;
 using Lime;
 using Tangerine.Core.Components;
 
@@ -373,7 +372,8 @@ namespace Tangerine.Core
 
 		public void SaveAs(string path)
 		{
-			Project.RaiseDocumetSaving(this);
+			Directory.CreateDirectory(System.IO.Path.GetDirectoryName(FullPath));
+			Project.RaiseDocumentSaving(this);
 			Saving?.Invoke(this);
 			History.AddSavePoint();
 			Path = path;

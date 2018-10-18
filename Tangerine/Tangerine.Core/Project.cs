@@ -445,7 +445,7 @@ namespace Tangerine.Core
 			}
 		}
 
-		public static void RaiseDocumetSaving(Document document)
+		public static void RaiseDocumentSaving(Document document)
 		{
 			DocumentSaving?.Invoke(document);
 		}

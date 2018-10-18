@@ -299,7 +299,6 @@ namespace Tangerine
 						var fullPath = doc.FullPath;
 
 						if (!File.Exists(fullPath)) {
-							Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
 							doc.Save();
 						}
 						var path = doc.Path;
