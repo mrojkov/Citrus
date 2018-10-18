@@ -126,7 +126,7 @@ namespace Lime
 				}
 
 				state = State.Initialized;
-				Status = VideoPlayerStatus.Success;
+				Status = VideoPlayerStatus.Playing;
 			});
 		}
 
@@ -285,6 +285,7 @@ namespace Lime
 				};
 				if (state == State.Started) {
 					state = State.Finished;
+					Status = VideoPlayerStatus.Finished;
 					videoCodec?.Stop();
 					audioCodec?.Stop();
 				}

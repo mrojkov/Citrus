@@ -23,7 +23,7 @@ namespace Lime
 		public bool HasNewTexture { get; private set; }
 		public ITexture Texture { get => texture; }
 		public Action OnStart;
-		public VideoPlayerStatus Status = VideoPlayerStatus.Success;
+		public VideoPlayerStatus Status = VideoPlayerStatus.Playing;
 
 		private Texture2D texture;
 

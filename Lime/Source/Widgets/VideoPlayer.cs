@@ -10,7 +10,8 @@ namespace Lime
 	{
 		None,
 		Error,
-		Success
+		Playing,
+		Finished,
 	}
 
 	public class VideoPlayer : Image

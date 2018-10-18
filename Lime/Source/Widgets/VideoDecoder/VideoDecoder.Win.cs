@@ -104,7 +104,7 @@ namespace Lime
 		public bool Looped = false;
 		public ITexture Texture => texture;
 		public Action OnStart;
-		public VideoPlayerStatus Status = VideoPlayerStatus.Success;
+		public VideoPlayerStatus Status = VideoPlayerStatus.Playing;
 
 		private Texture2D lumaTexture;
 		private Texture2D chromaTexture;
