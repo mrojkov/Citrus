@@ -165,30 +165,28 @@ namespace Tangerine
 					}
 					path = path.Replace('\\', '/');
 					var choices = loaded
-						? new [] { "Save", "Save All", "Discard", "Discard All" }
+						? new [] { "Locate", "Save", "Save All", "Discard", "Discard All" }
 						: new [] { "Locate", "Discard", "Discard All" };
 					var alert = new AlertDialog($"Document {path} has been moved or deleted.", choices);
 					var r = alert.Show();
-					if (loaded && r == 0) {
+					if (loaded && r == 1) {
 						// Save
-						Directory.CreateDirectory(Path.GetDirectoryName(nextDocument.FullPath));
 						nextDocument.Save();
-					} else if (loaded && r == 1) {
+					} else if (loaded && r == 2) {
 						// Save All
 						while (missingDocuments.Any(d => d.Loaded)) {
 							var doc = missingDocuments.First(d => d.Loaded);
-							Directory.CreateDirectory(Path.GetDirectoryName(doc.FullPath));
 							doc.Save();
 						}
-					} else if (loaded && r == 2 || !loaded && r == 1) {
+					} else if (loaded && r == 3 || !loaded && r == 1) {
 						// Discard
 						Project.Current.CloseDocument(nextDocument);
-					} else if (loaded && r == 3 || !loaded && r == 2) {
+					} else if (loaded && r == 4 || !loaded && r == 2) {
 						// Discard All
 						while (missingDocuments.Any()) {
 							Project.Current.CloseDocument(missingDocuments.First());
 						}
-					} else if (!loaded && r == 0) {
+					} else if (r == 0) {
 						// Locate
 						var dialog = new Lime.FileDialog {
 							AllowsMultipleSelection = false,
