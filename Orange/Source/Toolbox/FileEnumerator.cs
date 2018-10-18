@@ -86,7 +86,7 @@ namespace Orange
 					files.Add(new FileInfo { Path = file, LastWriteTime = fileInfo.LastWriteTime });
 				}
 				foreach (var directoryInfo in rootDirectoryInfo.EnumerateDirectories()) {
-					if (scanFilter(directoryInfo)) {
+					if (scanFilter?.Invoke(directoryInfo) ?? true) {
 						queue.Enqueue(directoryInfo);
 					}
 				}
