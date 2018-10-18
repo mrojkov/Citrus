@@ -164,7 +164,9 @@ namespace Tangerine
 						}
 					}
 					path = path.Replace('\\', '/');
-					var choices = loaded ? new [] { "Save", "Save All", "Discard", "Discard All" } : new [] { "Locate", "Discard", "Discard All" };
+					var choices = loaded
+						? new [] { "Save", "Save All", "Discard", "Discard All" }
+						: new [] { "Locate", "Discard", "Discard All" };
 					var alert = new AlertDialog($"Document {path} has been moved or deleted.", choices);
 					var r = alert.Show();
 					if (loaded && r == 0) {
@@ -173,10 +175,10 @@ namespace Tangerine
 						nextDocument.Save();
 					} else if (loaded && r == 1) {
 						// Save All
-						while (missingDocuments.Any()) {
-							var d = missingDocuments.First();
-							Directory.CreateDirectory(Path.GetDirectoryName(d.FullPath));
-							d.Save();
+						while (missingDocuments.Any(d => d.Loaded)) {
+							var doc = missingDocuments.First(d => d.Loaded);
+							Directory.CreateDirectory(Path.GetDirectoryName(doc.FullPath));
+							doc.Save();
 						}
 					} else if (loaded && r == 2 || !loaded && r == 1) {
 						// Discard
