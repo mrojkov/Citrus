@@ -183,7 +183,6 @@ namespace Tangerine.Core
 			string localPath = path;
 			if (pathIsAbsolute) {
 				if (this == Null || !Current.TryGetAssetPath(path, out localPath)) {
-					OpenFileOutsideProjectAttempt(path);
 					return null;
 				}
 			}
@@ -194,6 +193,7 @@ namespace Tangerine.Core
 		{
 			var localPath = GetLocalDocumentPath(path, pathIsAbsolute);
 			if (string.IsNullOrEmpty(localPath)) {
+				OpenFileOutsideProjectAttempt(path);
 				return null;
 			}
 			var doc = Documents.FirstOrDefault(i => i.Path == localPath);
