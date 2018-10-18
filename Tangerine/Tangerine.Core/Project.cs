@@ -4,6 +4,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Reflection;
 using Lime;
+using Orange;
 
 namespace Tangerine.Core
 {
@@ -100,7 +101,19 @@ namespace Tangerine.Core
 			fsWatcher.Changed += HandleFileSystemWatcherEvent;
 			fsWatcher.Created += HandleFileSystemWatcherEvent;
 			fsWatcher.Deleted += HandleFileSystemWatcherEvent;
-			fsWatcher.Renamed += HandleFileSystemWatcherEvent;
+			fsWatcher.Renamed += (previousPath, path) => {
+				// simulating rename as pairs of deleted / created events
+				HandleFileSystemWatcherEvent(path);
+				if (File.Exists(path)) {
+					HandleFileSystemWatcherEvent(previousPath);
+					HandleFileSystemWatcherEvent(path);
+				} else if (Directory.Exists(path)) {
+					foreach (var f in new ScanOptimizedFileEnumerator(path, null).Enumerate()) {
+						HandleFileSystemWatcherEvent(Path.Combine(previousPath, f.Path));
+						HandleFileSystemWatcherEvent(Path.Combine(path, f.Path));
+					}
+				}
+			};
 			var overlaysPath = Path.Combine(Project.Current.AssetsDirectory, "Overlays");
 			if (Directory.Exists(overlaysPath)) {
 				var files = Directory.EnumerateFiles(overlaysPath)
