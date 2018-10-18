@@ -158,7 +158,7 @@ namespace Tangerine.UI.FilesystemView
 				OnFsWatcherChanged(p);
 			};
 			fsWatcher.Created += OnFsWatcherChanged;
-			fsWatcher.Renamed += OnFsWatcherChanged;
+			fsWatcher.Renamed += (prevFullPath, fullPath) => OnFsWatcherChanged(fullPath);
 			fsWatcher.Changed += OnFsWatcherChanged;
 		}
 

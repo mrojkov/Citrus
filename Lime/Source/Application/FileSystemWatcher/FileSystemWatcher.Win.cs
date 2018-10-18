@@ -1,4 +1,4 @@
-﻿#if WIN
+#if WIN
 using System;
 using System.IO;
 
@@ -11,7 +11,7 @@ namespace Lime
 		public event Action<string> Changed;
 		public event Action<string> Created;
 		public event Action<string> Deleted;
-		public event Action<string> Renamed;
+		public event Action<string, string> Renamed;
 
 		public FileSystemWatcher(string path, bool includeSubdirectories)
 		{
@@ -24,7 +24,7 @@ namespace Lime
 			fsWatcher.Changed += (sender, e) => Application.InvokeOnMainThread(() => Changed?.Invoke(e.FullPath));
 			fsWatcher.Created += (sender, e) => Application.InvokeOnMainThread(() => Created?.Invoke(e.FullPath));
 			fsWatcher.Deleted += (sender, e) => Application.InvokeOnMainThread(() => Deleted?.Invoke(e.FullPath));
-			fsWatcher.Renamed += (sender, e) => Application.InvokeOnMainThread(() => Renamed?.Invoke(e.FullPath));
+			fsWatcher.Renamed += (sender, e) => Application.InvokeOnMainThread(() => Renamed?.Invoke(e.OldFullPath, e.FullPath));
 			fsWatcher.EnableRaisingEvents = true;
 		}
 

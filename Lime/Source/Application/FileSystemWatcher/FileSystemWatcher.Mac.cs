@@ -1,4 +1,4 @@
-﻿#if MAC
+#if MAC
 using System;
 using CoreServices;
 using Foundation;
@@ -12,7 +12,7 @@ namespace Lime
 		public event Action<string> Changed;
 		public event Action<string> Created;
 		public event Action<string> Deleted;
-		public event Action<string> Renamed;
+		public event Action<string, string> Renamed;
 
 		private Func<string, bool> Filter;
 
@@ -51,7 +51,7 @@ namespace Lime
 				}
 				if ((e.Flags & FSEventStreamEventFlags.ItemRenamed) != 0) {
 					if (Filter?.Invoke(e.Path) ?? true) {
-						Changed?.Invoke(e.Path);
+						Changed?.Invoke(/* TODO: pass previous path before rename here */, e.Path);
 					}
 				}
 			}
