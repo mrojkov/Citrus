@@ -17,10 +17,8 @@ namespace Lime
 		{
 			fsWatcher = new System.IO.FileSystemWatcher(path);
 			fsWatcher.IncludeSubdirectories = includeSubdirectories;
-			// Watch for changes in LastAccess and LastWrite times, and the renaming of files or directories.
-			fsWatcher.NotifyFilter =
-				NotifyFilters.LastAccess | NotifyFilters.LastWrite |
-				NotifyFilters.FileName | NotifyFilters.DirectoryName;
+			// Watch for changes LastWrite time and the renaming of files or directories.
+			fsWatcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName;
 			fsWatcher.Changed += (sender, e) => Application.InvokeOnMainThread(() => Changed?.Invoke(e.FullPath));
 			fsWatcher.Created += (sender, e) => Application.InvokeOnMainThread(() => Created?.Invoke(e.FullPath));
 			fsWatcher.Deleted += (sender, e) => Application.InvokeOnMainThread(() => Deleted?.Invoke(e.FullPath));
