@@ -2,7 +2,7 @@ namespace Lime
 {
 	public class BlendAnimationEngine : DefaultAnimationEngine
 	{
-		public static new readonly BlendAnimationEngine Instance = new BlendAnimationEngine();
+		public new static readonly BlendAnimationEngine Instance = new BlendAnimationEngine();
 
 		public override void AdvanceAnimation(Animation animation, float delta)
 		{
@@ -10,23 +10,16 @@ namespace Lime
 			Blending(animation, delta);
 		}
 
-		public override void ApplyAnimators(Animation animation, bool invokeTriggers, double animationTimeCorrection = 0)
-		{
-			base.ApplyAnimators(animation, invokeTriggers, animationTimeCorrection);
-			Blending(animation);
-		}
-
 		public override bool TryRunAnimation(Animation animation, string markerId, double animationTimeCorrection = 0)
 		{
 			var blender = animation.Owner.Components.Get<AnimationBlender>();
-			if (blender == null) {
+			if (blender == null || !animation.Markers.TryFind(markerId, out var marker)) {
 				return base.TryRunAnimation(animation, markerId, animationTimeCorrection);
 			}
-			if (markerId != null && animation.Markers.TryFind(markerId) == null) {
-				return false;
-			}
 
-			blender.Attach(animation, markerId, animation.RunningMarkerId);
+			if (marker.Action != MarkerAction.Stop) {
+				blender.Attach(animation, markerId, animation.RunningMarkerId);
+			}
 			base.TryRunAnimation(animation, markerId, animationTimeCorrection);
 			Blending(animation);
 			return true;
@@ -42,11 +35,12 @@ namespace Lime
 				base.ProcessMarker(animation, marker);
 				return;
 			}
-			var gotoMarker = animation.Markers.TryFind(marker.JumpTo);
-			if (gotoMarker != null && gotoMarker != marker) {
+			if (animation.Markers.TryFind(marker.JumpTo, out var gotoMarker) && gotoMarker != marker) {
 				var delta = animation.Time - AnimationUtils.FramesToSeconds(animation.Frame);
 				animation.TimeInternal = gotoMarker.Time;
-				blender.Attach(animation, gotoMarker.Id, animation.RunningMarkerId);
+				if (gotoMarker.Action != MarkerAction.Stop) {
+					blender.Attach(animation, gotoMarker.Id, animation.RunningMarkerId);
+				}
 				AdvanceAnimation(animation, (float)delta);
 			}
 			marker.CustomAction?.Invoke();
