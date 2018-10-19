@@ -64,15 +64,10 @@ namespace Tangerine.Core
 		/// </summary>
 		public string Path { get; private set; }
 
-		public void Relocate(string newPath)
-		{
-			Path = newPath;
-		}
-
 		/// <summary>
 		/// Gets absolute path to the document.
 		/// </summary>
-		public string FullPath => Project.Current.GetFullPath(Path, GetFileExtension(Loaded ? Format : ResolveFormat(Path)));
+		public string FullPath => Project.Current.GetFullPath(Path, GetFileExtension(Format));
 
 		/// <summary>
 		/// Document name to be displayed.
@@ -150,44 +145,57 @@ namespace Tangerine.Core
 				}
 			}
 			RootNode = RootNodeUnwrapped;
-			SetModificationTimeToNow();
 			if (RootNode is Node3D) {
 				RootNode = WrapNodeWithViewport3D(RootNode);
 			}
 			Decorate(RootNode);
 			Container = RootNode;
-			SetModificationTimeToNow();
 			History.PerformingOperation += Document_PerformingOperation;
 		}
+
+		private MemoryStream preloadedSceneStream = null;
 
 		public Document(string path, bool delayLoad = false)
 		{
 			Path = path;
 			Loaded = false;
-			SetModificationTimeToNow();
+			Format = ResolveFormat(Path);
 			if (delayLoad) {
-				return;
+				preloadedSceneStream = new MemoryStream();
+				var fullPath = Node.ResolveScenePath(path);
+				using (var stream = AssetBundle.Current.OpenFileLocalized(fullPath)) {
+					stream.CopyTo(preloadedSceneStream);
+					preloadedSceneStream.Seek(0, SeekOrigin.Begin);
+				}
+			} else {
+				Load();
 			}
-			Load();
 		}
 
 		private void Load()
 		{
 			try {
-				Format = ResolveFormat(Path);
-				RootNodeUnwrapped = Node.CreateFromAssetBundle(Path, yuzu: TangerineYuzu.Instance.Value);
+				if (preloadedSceneStream != null) {
+					RootNodeUnwrapped = Node.CreateFromStream(System.IO.Path.ChangeExtension(Path, GetFileExtension(Format)), yuzu: TangerineYuzu.Instance.Value, stream: preloadedSceneStream);
+				} else {
+					RootNodeUnwrapped = Node.CreateFromAssetBundle(Path, yuzu: TangerineYuzu.Instance.Value);
+				}
 				if (Format == DocumentFormat.Fbx) {
 					Path = defaultPath;
 				}
 				RootNode = RootNodeUnwrapped;
-				SetModificationTimeToNow();
 				if (RootNode is Node3D) {
 					RootNode = WrapNodeWithViewport3D(RootNode);
 				}
 				Decorate(RootNode);
 				Container = RootNode;
 				if (Format == DocumentFormat.Scene || Format == DocumentFormat.Tan) {
-					Preview = DocumentPreview.ReadAsBase64(FullPath);
+					if (preloadedSceneStream != null) {
+						preloadedSceneStream.Seek(0, SeekOrigin.Begin);
+						Preview = DocumentPreview.ReadAsBase64(preloadedSceneStream);
+					} else {
+						Preview = DocumentPreview.ReadAsBase64(FullPath);
+					}
 				}
 				History.PerformingOperation += Document_PerformingOperation;
 			} catch (System.Exception e) {
@@ -222,20 +230,6 @@ namespace Tangerine.Core
 			}
 			vp.CameraRef = new NodeReference<Camera3D>(camera.Id);
 			return vp;
-		}
-
-		public bool WasModifiedOutsideTangerine()
-		{
-			if (Path == defaultPath) {
-				return false;
-			}
-			// care if file no longer exists
-			return File.GetLastWriteTimeUtc(FullPath) > modificationTime;
-		}
-
-		public void SetModificationTimeToNow()
-		{
-			modificationTime = DateTime.UtcNow;
 		}
 
 		public static DocumentFormat ResolveFormat(string path)
@@ -281,7 +275,9 @@ namespace Tangerine.Core
 		public static void SetCurrent(Document doc)
 		{
 			if (!(doc?.Loaded ?? true)) {
-				doc.Load();
+				if (Project.Current.GetFullPath(doc.Path, out string fullPath) || doc.preloadedSceneStream != null) {
+					doc.Load();
+				}
 			}
 			if (Current != doc) {
 				Current?.DetachViews();
@@ -377,11 +373,14 @@ namespace Tangerine.Core
 			Saving?.Invoke(this);
 			History.AddSavePoint();
 			Path = path;
+			if (!File.Exists(FullPath)) {
+				Project.Current.SuppressNextFileCreatedEvent(FullPath);
+			}
+			Project.Current.SuppressNextFileChangedEvent(FullPath);
 			WriteNodeToFile(path, Format, RootNodeUnwrapped);
 			if (Format == DocumentFormat.Scene || Format == DocumentFormat.Tan) {
 				DocumentPreview.AppendToFile(FullPath, Preview);
 			}
-			SetModificationTimeToNow();
 			Project.Current.AddRecentDocument(Path);
 		}
 

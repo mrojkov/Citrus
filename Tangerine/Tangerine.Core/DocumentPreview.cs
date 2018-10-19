@@ -11,9 +11,11 @@ namespace Tangerine.Core
 		const int previewWidth = 150;
 		const int previewHeight = 150;
 
-		public static string ReadAsBase64(string filename)
+		public static string ReadAsBase64(string filename) => ReadAsBase64Helper(File.ReadAllText(filename));
+		public static string ReadAsBase64(Stream stream) => ReadAsBase64Helper((new StreamReader(stream)).ReadToEnd());
+
+		private static string ReadAsBase64Helper(string allText)
 		{
-			var allText = File.ReadAllText(filename);
 			var index = allText.IndexOf(ScenePreviewSeparator);
 			if (index <= 0) {
 				return null;

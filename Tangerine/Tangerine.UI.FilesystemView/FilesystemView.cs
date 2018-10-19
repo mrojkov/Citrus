@@ -145,13 +145,14 @@ namespace Tangerine.UI.FilesystemView
 			fsWatcher?.Dispose();
 			fsWatcher = new Lime.FileSystemWatcher(path, includeSubdirectories: false);
 			Action<string> OnFsWatcherChanged = p => {
-				if (fsWatcherInvalidationTask == null) {
-					RootWidget.Tasks.Add(fsWatcherInvalidationTask = new Task(Task.Delay(0.2f, () => {
-						InvalidateView(filesystemModel.CurrentPath);
-						preview.ClearTextureCache(p);
-						fsWatcherInvalidationTask = null;
-					})));
+				if (fsWatcherInvalidationTask != null) {
+					RootWidget.Tasks.Remove(fsWatcherInvalidationTask);
 				}
+				RootWidget.Tasks.Add(fsWatcherInvalidationTask = new Task(Task.Delay(0.2f, () => {
+					InvalidateView(filesystemModel.CurrentPath);
+					preview.ClearTextureCache(p);
+					fsWatcherInvalidationTask = null;
+				})));
 			};
 			fsWatcher.Deleted += p => {
 				filesystemSelection.Deselect(p);

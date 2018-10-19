@@ -150,63 +150,10 @@ namespace Tangerine
 					default: return Document.CloseAction.Cancel;
 				}
 			};
+			mainWidget.Tasks.Add(HandleMissingDocumentsTask);
 			Project.HandleMissingDocuments += missingDocuments => {
-				while (missingDocuments.Any()) {
-					var nextDocument = missingDocuments.First();
-					bool loaded = nextDocument.Loaded;
-					string path = nextDocument.Path;
-					if (loaded) {
-						Document.SetCurrent(nextDocument);
-						path = nextDocument.FullPath;
-					} else {
-						if (Project.Current.GetFullPath(nextDocument.Path, out string fullPath)) {
-							path = fullPath;
-						}
-					}
-					path = path.Replace('\\', '/');
-					var choices = loaded
-						? new [] { "Locate", "Save", "Save All", "Discard", "Discard All" }
-						: new [] { "Locate", "Discard", "Discard All" };
-					var alert = new AlertDialog($"Document {path} has been moved or deleted.", choices);
-					var r = alert.Show();
-					if (loaded && r == 1) {
-						// Save
-						nextDocument.Save();
-					} else if (loaded && r == 2) {
-						// Save All
-						while (missingDocuments.Any(d => d.Loaded)) {
-							var doc = missingDocuments.First(d => d.Loaded);
-							doc.Save();
-						}
-					} else if (loaded && r == 3 || !loaded && r == 1) {
-						// Discard
-						Project.Current.CloseDocument(nextDocument);
-					} else if (loaded && r == 4 || !loaded && r == 2) {
-						// Discard All
-						while (missingDocuments.Any()) {
-							Project.Current.CloseDocument(missingDocuments.First());
-						}
-					} else if (r == 0) {
-						// Locate
-						var dialog = new Lime.FileDialog {
-							AllowsMultipleSelection = false,
-							AllowedFileTypes = Document.AllowedFileTypes,
-							InitialDirectory = Project.Current.AssetsDirectory,
-							InitialFileName = Path.GetFileName(path),
-							Mode = FileDialogMode.Open,
-						};
-						if (dialog.RunModal()) {
-							var newPath = dialog.FileName;
-							newPath = Project.Current.GetLocalDocumentPath(newPath, System.IO.Path.IsPathRooted(newPath) &&
-								!System.IO.Path.GetPathRoot(newPath).Equals(System.IO.Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal));
-							if (!string.IsNullOrEmpty(newPath) && !Project.Current.Documents.Any(d => d.Path == newPath)) {
-								nextDocument.Relocate(newPath);
-							} else {
-								alert = new AlertDialog($"Invalid document path: {newPath}");
-								alert.Show();
-							}
-						}
-					}
+				foreach (var d in missingDocuments) {
+					missingDocumentsList.Add(d);
 				}
 			};
 			Project.DocumentReloadConfirmation += doc => {
@@ -385,6 +332,60 @@ namespace Tangerine
 
 			Documentation.Init();
 			DocumentationComponent.Clicked = page => Documentation.ShowHelp(page);
+		}
+
+		private List<Document> missingDocumentsList = new List<Document>();
+
+		private IEnumerator<object> HandleMissingDocumentsTask()
+		{
+			while (true) {
+				while (missingDocumentsList.Count == 0) {
+					yield return null;
+				}
+				var missingDocuments = missingDocumentsList.Where(d => !Project.Current.GetFullPath(d.Path, out string fullPath) && Project.Current.Documents.Contains(d));
+				while (missingDocuments.Any()) {
+					var nextDocument = missingDocuments.First();
+					bool loaded = nextDocument.Loaded;
+					Document.SetCurrent(nextDocument);
+					yield return null;
+					string path = nextDocument.FullPath.Replace('\\', '/');
+					var choices = new[] { "Save", "Save All", "Close", "Close All" };
+					var alert = new AlertDialog($"Document {path} has been moved or deleted.", choices);
+					var r = alert.Show();
+					switch (r) {
+						case 0: {
+							// Save
+							nextDocument.Save();
+							missingDocumentsList.Remove(nextDocument);
+							break;
+						}
+						case 1: {
+							// Save All
+							while (missingDocuments.Any()) {
+								nextDocument = missingDocuments.First();
+								Document.SetCurrent(nextDocument);
+								nextDocument.Save();
+								missingDocumentsList.Remove(nextDocument);
+							}
+							break;
+						}
+						case 2: {
+							// Close
+							Project.Current.CloseDocument(nextDocument);
+							missingDocumentsList.Remove(nextDocument);
+							break;
+						}
+						case 3: {
+							// Close All
+							while (missingDocuments.Any()) {
+								Project.Current.CloseDocument(nextDocument = missingDocuments.First());
+								missingDocumentsList.Remove(nextDocument);
+							}
+							break;
+						}
+					}
+				}
+			}
 		}
 
 		private void OpenDocumentsFromArgs(string[] args)
