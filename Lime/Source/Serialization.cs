@@ -133,10 +133,12 @@ namespace Lime
 
 		public T ReadObject<T>(string path, Stream stream, object obj = null)
 		{
-			var ms = new MemoryStream();
-			stream.CopyTo(ms);
-			ms.Seek(0, SeekOrigin.Begin);
-			stream = ms;
+			if (!(stream is MemoryStream)) {
+				var ms = new MemoryStream();
+				stream.CopyTo(ms);
+				ms.Seek(0, SeekOrigin.Begin);
+				stream = ms;
+			}
 			pathStack.Push(path);
 			PushCurrent(this);
 			try {
