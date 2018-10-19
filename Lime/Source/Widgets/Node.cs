@@ -1065,13 +1065,19 @@ namespace Lime
 			return CreateFromAssetBundleHelper(path, instance, yuzu, external: false);
 		}
 
-		private static Node CreateFromAssetBundleHelper(string path, Node instance = null, Yuzu yuzu = null, bool external = false)
+		public static Node CreateFromStream(string path, Node instance = null, Yuzu yuzu = null, Stream stream = null)
+		{
+			yuzu = yuzu ?? Yuzu.Instance.Value;
+			return CreateFromAssetBundleHelper(path, instance, yuzu, stream, external: false);
+		}
+
+		private static Node CreateFromAssetBundleHelper(string path, Node instance = null, Yuzu yuzu = null, Stream stream = null, bool external = false)
 		{
 			if (SceneLoading?.Value?.Invoke(path, ref instance, external) ?? false) {
 				SceneLoaded?.Value?.Invoke(path, instance, external);
 				return instance;
 			}
-			var fullPath = ResolveScenePath(path);
+			var fullPath = stream != null && sceneExtensions.Any(e => path.EndsWith(e, StringComparison.OrdinalIgnoreCase)) ? path : ResolveScenePath(path);
 			if (fullPath == null) {
 				throw new Exception($"Scene '{path}' not found in current asset bundle");
 			}
@@ -1080,8 +1086,12 @@ namespace Lime
 			}
 			scenesBeingLoaded.Value.Add(fullPath);
 			try {
-				using (Stream stream = AssetBundle.Current.OpenFileLocalized(fullPath)) {
+				if (stream != null) {
 					instance = yuzu.ReadObject<Node>(fullPath, stream, instance);
+				} else {
+					using (stream = AssetBundle.Current.OpenFileLocalized(fullPath)) {
+						instance = yuzu.ReadObject<Node>(fullPath, stream, instance);
+					}
 				}
 				instance.LoadExternalScenes(yuzu);
 				instance.Components.Add(new AssetBundlePathComponent(fullPath));
