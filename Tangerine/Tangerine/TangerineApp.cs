@@ -680,7 +680,7 @@ namespace Tangerine
 			h.Connect(TimelineCommands.CreatePositionKeyframe, UI.Timeline.Operations.TogglePositionKeyframe.Perform);
 			h.Connect(TimelineCommands.CreateRotationKeyframe, UI.Timeline.Operations.ToggleRotationKeyframe.Perform);
 			h.Connect(TimelineCommands.CreateScaleKeyframe, UI.Timeline.Operations.ToggleScaleKeyframe.Perform);
-			h.Connect(TimelineCommands.CenterTimelineOnCurrentColumn, UI.Timeline.Operations.CenterTimelineOnCurrentColumn.Perform);
+			h.Connect(TimelineCommands.CenterTimelineOnCurrentColumn, new DocumentDelegateCommandHandler(UI.Timeline.Operations.CenterTimelineOnCurrentColumn.Perform));
 			h.Connect(TimelineCommands.ShowModel3DAttachmentDialog, () => {
 				var model = (Model3D)TimelineCommands.ShowModel3DAttachmentDialog.UserData;
 				TimelineCommands.ShowModel3DAttachmentDialog.UserData = null;

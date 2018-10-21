@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Lime;
 
 namespace Tangerine.UI
@@ -19,18 +19,18 @@ namespace Tangerine.UI
 				history.CommitTransaction();
 			}
 		}
-		
+
 		public abstract void ExecuteTransaction();
 
 		public virtual bool GetEnabled() => true;
 		public virtual bool GetChecked() => false;
 	}
-	
+
 	public class DocumentDelegateCommandHandler : DocumentCommandHandler
 	{
 		private readonly Action executeTransaction;
 		private readonly Func<bool> getEnabled;
-		
+
 		public DocumentDelegateCommandHandler(Action executeTransaction, Func<bool> getEnabled = null)
 		{
 			this.executeTransaction = executeTransaction;
