@@ -130,13 +130,19 @@ namespace Lime
 				}
 				if (Command.Menu != null) {
 					Command.Menu.Refresh();
+					var e = false;
+					foreach (var c in Command.Menu) {
+						e |= (c != Lime.Command.MenuSeparator && c.Enabled);
+					}
+					NativeMenuItem.Enabled = e;
+				} else {
+					NativeMenuItem.Enabled = Command.Enabled;
 				}
 				if (commandVersion == Command.Version) {
 					return;
 				}
 				commandVersion = Command.Version;
 				NativeMenuItem.Hidden = !Command.Visible;
-				NativeMenuItem.Enabled = Command.Enabled;
 				NativeMenuItem.Title = Command.Text ?? "";
 				NativeMenuItem.State = Command.Checked ? NSCellStateValue.On : NSCellStateValue.Off;
 				if (Command.Shortcut.Main != Key.Unknown) {
