@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
-using System.Reflection;
 using Lime;
 using Tangerine.Core.Components;
 
@@ -64,6 +63,11 @@ namespace Tangerine.Core
 		/// Gets the path to the document relative to the project directory.
 		/// </summary>
 		public string Path { get; private set; }
+
+		/// <summary>
+		/// Gets absolute path to the document.
+		/// </summary>
+		public string FullPath => Project.Current.GetFullPath(Path, GetFileExtension(Format));
 
 		/// <summary>
 		/// Document name to be displayed.
@@ -141,44 +145,57 @@ namespace Tangerine.Core
 				}
 			}
 			RootNode = RootNodeUnwrapped;
-			SetModificationTimeToNow();
 			if (RootNode is Node3D) {
 				RootNode = WrapNodeWithViewport3D(RootNode);
 			}
 			Decorate(RootNode);
 			Container = RootNode;
-			SetModificationTimeToNow();
 			History.PerformingOperation += Document_PerformingOperation;
 		}
+
+		private MemoryStream preloadedSceneStream = null;
 
 		public Document(string path, bool delayLoad = false)
 		{
 			Path = path;
 			Loaded = false;
-			SetModificationTimeToNow();
+			Format = ResolveFormat(Path);
 			if (delayLoad) {
-				return;
+				preloadedSceneStream = new MemoryStream();
+				var fullPath = Node.ResolveScenePath(path);
+				using (var stream = AssetBundle.Current.OpenFileLocalized(fullPath)) {
+					stream.CopyTo(preloadedSceneStream);
+					preloadedSceneStream.Seek(0, SeekOrigin.Begin);
+				}
+			} else {
+				Load();
 			}
-			Load();
 		}
 
 		private void Load()
 		{
 			try {
-				Format = ResolveFormat(Path);
-				RootNodeUnwrapped = Node.CreateFromAssetBundle(Path, yuzu: TangerineYuzu.Instance.Value);
+				if (preloadedSceneStream != null) {
+					RootNodeUnwrapped = Node.CreateFromStream(System.IO.Path.ChangeExtension(Path, GetFileExtension(Format)), yuzu: TangerineYuzu.Instance.Value, stream: preloadedSceneStream);
+				} else {
+					RootNodeUnwrapped = Node.CreateFromAssetBundle(Path, yuzu: TangerineYuzu.Instance.Value);
+				}
 				if (Format == DocumentFormat.Fbx) {
 					Path = defaultPath;
 				}
 				RootNode = RootNodeUnwrapped;
-				SetModificationTimeToNow();
 				if (RootNode is Node3D) {
 					RootNode = WrapNodeWithViewport3D(RootNode);
 				}
 				Decorate(RootNode);
 				Container = RootNode;
 				if (Format == DocumentFormat.Scene || Format == DocumentFormat.Tan) {
-					Preview = DocumentPreview.ReadAsBase64(Project.Current.GetSystemPath(Path, GetFileExtension(Format)));
+					if (preloadedSceneStream != null) {
+						preloadedSceneStream.Seek(0, SeekOrigin.Begin);
+						Preview = DocumentPreview.ReadAsBase64(preloadedSceneStream);
+					} else {
+						Preview = DocumentPreview.ReadAsBase64(FullPath);
+					}
 				}
 				History.PerformingOperation += Document_PerformingOperation;
 			} catch (System.Exception e) {
@@ -213,20 +230,6 @@ namespace Tangerine.Core
 			}
 			vp.CameraRef = new NodeReference<Camera3D>(camera.Id);
 			return vp;
-		}
-
-		public bool WasModifiedOutsideTangerine()
-		{
-			if (Path == defaultPath) {
-				return false;
-			}
-			var fullPath = Project.Current.GetSystemPath(Path, GetFileExtension(Format));
-			return File.GetLastWriteTimeUtc(fullPath) > modificationTime;
-		}
-
-		public void SetModificationTimeToNow()
-		{
-			modificationTime = DateTime.UtcNow;
 		}
 
 		public static DocumentFormat ResolveFormat(string path)
@@ -272,7 +275,9 @@ namespace Tangerine.Core
 		public static void SetCurrent(Document doc)
 		{
 			if (!(doc?.Loaded ?? true)) {
-				doc.Load();
+				if (Project.Current.GetFullPath(doc.Path, out string fullPath) || doc.preloadedSceneStream != null) {
+					doc.Load();
+				}
 			}
 			if (Current != doc) {
 				Current?.DetachViews();
@@ -363,15 +368,19 @@ namespace Tangerine.Core
 
 		public void SaveAs(string path)
 		{
-			Project.RaiseDocumetSaving(this);
+			Directory.CreateDirectory(System.IO.Path.GetDirectoryName(FullPath));
+			Project.RaiseDocumentSaving(this);
 			Saving?.Invoke(this);
 			History.AddSavePoint();
 			Path = path;
+			if (!File.Exists(FullPath)) {
+				Project.Current.SuppressNextFileCreatedEvent(FullPath);
+			}
+			Project.Current.SuppressNextFileChangedEvent(FullPath);
 			WriteNodeToFile(path, Format, RootNodeUnwrapped);
 			if (Format == DocumentFormat.Scene || Format == DocumentFormat.Tan) {
-				DocumentPreview.AppendToFile(Project.Current.GetSystemPath(path, GetFileExtension(Format)), Preview);
+				DocumentPreview.AppendToFile(FullPath, Preview);
 			}
-			SetModificationTimeToNow();
 			Project.Current.AddRecentDocument(Path);
 		}
 
@@ -393,7 +402,7 @@ namespace Tangerine.Core
 					TangerineYuzu.Instance.Value.WriteObject(path, ms, node, Serialization.Format.JSON);
 				}
 			}
-			var fullPath = Project.Current.GetSystemPath(path, GetFileExtension(format));
+			var fullPath = Project.Current.GetFullPath(path, GetFileExtension(format));
 
 			FileMode fileModeForHiddenFile = File.Exists(fullPath) ? FileMode.Truncate : FileMode.Create;
 			using (var fs = new FileStream(fullPath, fileModeForHiddenFile)) {

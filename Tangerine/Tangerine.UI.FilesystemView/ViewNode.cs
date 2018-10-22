@@ -39,7 +39,7 @@ namespace Tangerine.UI.FilesystemView
 	public class FSViewNode : ViewNode
 	{
 		[YuzuOptional]
-		public string Path = Project.Current?.AssetsDirectory ?? Directory.GetCurrentDirectory();
+		public string Path = Project.Current.AssetsDirectory ?? Directory.GetDirectoryRoot(Directory.GetCurrentDirectory());
 
 		[YuzuOptional]
 		public bool ShowCookingRulesEditor = false;

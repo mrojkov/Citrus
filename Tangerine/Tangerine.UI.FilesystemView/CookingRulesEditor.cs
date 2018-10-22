@@ -26,7 +26,7 @@ namespace Tangerine.UI.FilesystemView
 		private Toolbar toolbar;
 		public Widget RootWidget;
 		private readonly ThemedScrollView scrollView;
-		private Selection savedSelection;
+		private FilesystemSelection savedFilesystemSelection;
 		private const float RowHeight = 16.0f;
 		private Action<string> navigateAndSelect;
 
@@ -49,7 +49,7 @@ namespace Tangerine.UI.FilesystemView
 			targetSelector.Changed += (value) => {
 				if (value.ChangedByUser) {
 					activeTarget = (Target)value.Value;
-					Invalidate(savedSelection);
+					Invalidate(savedFilesystemSelection);
 				}
 			};
 			targetSelector.Index = 0;
@@ -154,23 +154,23 @@ namespace Tangerine.UI.FilesystemView
 
 		Texture2D cachedZebraTexture = null;
 
-		public void Invalidate(Selection selection)
+		public void Invalidate(FilesystemSelection filesystemSelection)
 		{
-			savedSelection = selection;
+			savedFilesystemSelection = filesystemSelection;
 			scrollView.Content.Nodes.Clear();
 			if (RootWidget.Parent == null) {
 				return;
 			}
-			if (selection == null || selection.Empty) {
+			if (filesystemSelection == null || filesystemSelection.Empty) {
 				return;
 			}
-			var targetDir = new System.IO.FileInfo(selection.First()).Directory.FullName;
+			var targetDir = new System.IO.FileInfo(filesystemSelection.First()).Directory.FullName;
 			if (Orange.The.Workspace.AssetsDirectory == null || !targetDir.StartsWith(Orange.The.Workspace.AssetsDirectory)) {
 				// We're somewhere outside the project directory
 				return;
 			}
 			var t = Orange.CookingRulesBuilder.Build(new FileEnumerator(Orange.The.Workspace.AssetsDirectory, targetDir), activeTarget);
-			foreach (var path in selection) {
+			foreach (var path in filesystemSelection) {
 				CreateEditingInterfaceForPath(t, path);
 			}
 			scrollView.Content.Presenter = new SyncDelegatePresenter<Widget>((w) => {

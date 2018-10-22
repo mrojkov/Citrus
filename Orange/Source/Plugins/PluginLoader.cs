@@ -127,9 +127,13 @@ namespace Orange
 			}
 			CurrentPlugin?.Initialize?.Invoke();
 			var uiBuilder = The.UI.GetPluginUIBuilder();
-			if (uiBuilder != null) {
-				CurrentPlugin?.BuildUI?.Invoke(uiBuilder);
-				The.UI.CreatePluginUI(uiBuilder);
+			try {
+				if (uiBuilder != null) {
+					CurrentPlugin?.BuildUI?.Invoke(uiBuilder);
+					The.UI.CreatePluginUI(uiBuilder);
+				}
+			} catch (System.Exception e) {
+				Orange.UserInterface.Instance.ShowError($"Failed to build Orange Plugin UI with an error: {e.Message}\n{e.StackTrace}");
 			}
 			The.MenuController.CreateAssemblyMenuItems();
 		}

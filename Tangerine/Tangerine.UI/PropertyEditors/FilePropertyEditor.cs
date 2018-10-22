@@ -15,7 +15,7 @@ namespace Tangerine.UI
 
 		protected readonly EditBox editor;
 		protected readonly Button button;
-		protected static string LastOpenedDirectory = Project.Current.GetSystemDirectory(Document.Current.Path);
+		protected static string LastOpenedDirectory = Path.GetDirectoryName(Document.Current.FullPath);
 
 		private readonly PrefixData prefix = new PrefixData();
 
@@ -47,11 +47,11 @@ namespace Tangerine.UI
 				var dlg = new FileDialog {
 					AllowedFileTypes = allowedFileTypes,
 					Mode = FileDialogMode.Open,
-					InitialDirectory = Directory.Exists(LastOpenedDirectory) ? LastOpenedDirectory : Project.Current.GetSystemDirectory(Document.Current.Path),
+					InitialDirectory = Directory.Exists(LastOpenedDirectory) ? LastOpenedDirectory : Path.GetDirectoryName(Document.Current.FullPath),
 				};
 				if (dlg.RunModal()) {
 					SetFilePath(dlg.FileName);
-					LastOpenedDirectory = Project.Current.GetSystemDirectory(dlg.FileName);
+					LastOpenedDirectory = Path.GetDirectoryName(dlg.FileName);
 				}
 			};
 			ExpandableContent.Padding = new Thickness(24, 10, 2, 2);

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Lime
 {
@@ -7,6 +7,6 @@ namespace Lime
 		event Action<string> Changed;
 		event Action<string> Created;
 		event Action<string> Deleted;
-		event Action<string> Renamed;
+		event Action<string, string> Renamed;
 	}
 }

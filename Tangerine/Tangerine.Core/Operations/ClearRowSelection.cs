@@ -11,7 +11,7 @@ namespace Tangerine.Core.Operations
 		public static void Perform()
 		{
 			var rows = Document.Current.Rows.ToList();
-			// Use temporal row list to avoid 'Collection was modified' exception
+			// Use temporary row list to avoid 'Collection was modified' exception
 			foreach (var row in rows) {
 				if (row.Selected) {
 					SelectRow.Perform(row, false);

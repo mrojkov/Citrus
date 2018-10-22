@@ -39,6 +39,9 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.ValueTuple, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.3.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -57,7 +60,7 @@
     <Compile Include="FilesystemItem.cs" />
     <Compile Include="ISystemIconTextureProvider.cs" />
     <Compile Include="ISystemShellContextMenu.cs" />
-    <Compile Include="Model.cs" />
+    <Compile Include="FilesystemModel.cs" />
     <Compile Include="Preview.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FilesystemToolbar.cs" />
@@ -90,6 +93,9 @@
       <Project>{e62ba18f-4e1a-466a-8299-67ad567f17e5}</Project>
       <Name>Tangerine.UI.Win</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

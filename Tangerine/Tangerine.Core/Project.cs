@@ -2,8 +2,10 @@ using System;
 using System.Linq;
 using System.IO;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Reflection;
 using Lime;
+using Orange;
 
 namespace Tangerine.Core
 {
@@ -32,6 +34,8 @@ namespace Tangerine.Core
 		public static TempFileLoadConfirmationDelegate TempFileLoadConfirmation;
 		public delegate void OpenFileOutsideProjectAttemptDelegate(string filePath);
 		public static OpenFileOutsideProjectAttemptDelegate OpenFileOutsideProjectAttempt;
+		public delegate void HandleMissingDocumentsDelegate(IEnumerable<Document> missingDocuments);
+		public static HandleMissingDocumentsDelegate HandleMissingDocuments;
 		public static TaskList Tasks { get; set; }
 		public Dictionary<string, Widget> Overlays { get; } = new Dictionary<string, Widget>();
 		public ProjectPreferences Preferences { get; private set; } = new ProjectPreferences();
@@ -75,7 +79,9 @@ namespace Tangerine.Core
 					UserPreferences = TangerineYuzu.Instance.Value.ReadObjectFromFile<ProjectUserPreferences>(UserprefsPath);
 					foreach (var path in UserPreferences.Documents) {
 						try {
-							OpenDocument(path, delayLoad: true);
+							if (GetFullPath(path, out string fullPath)) {
+								OpenDocument(path, delayLoad: true);
+							}
 						} catch (System.Exception e) {
 							Debug.Write($"Failed to open document '{path}': {e.Message}");
 						}
@@ -94,16 +100,52 @@ namespace Tangerine.Core
 				}
 			}
 			fsWatcher = new Lime.FileSystemWatcher(AssetsDirectory, includeSubdirectories: true);
-			fsWatcher.Changed += HandleFileSystemWatcherEvent;
-			fsWatcher.Created += HandleFileSystemWatcherEvent;
+			fsWatcher.Changed += (path) => {
+				if (filesToSuppressChangedEventFor.Count > 0) {
+					var key = Path.GetFullPath(path).ToLower();
+					if (filesToSuppressChangedEventFor.ContainsKey(key)) {
+						filesToSuppressChangedEventFor[key]--;
+						if (filesToSuppressChangedEventFor[key] == 0) {
+							filesToSuppressChangedEventFor.Remove(key);
+						}
+						return;
+					}
+				}
+				HandleFileSystemWatcherEvent(path);
+			};
+			fsWatcher.Created += (path) => {
+				if (filesToSuppressCreatedEventFor.Count > 0) {
+					var key = Path.GetFullPath(path).ToLower();
+					if (filesToSuppressCreatedEventFor.ContainsKey(key)) {
+						filesToSuppressCreatedEventFor[key]--;
+						if (filesToSuppressCreatedEventFor[key] == 0) {
+							filesToSuppressCreatedEventFor.Remove(key);
+						}
+						return;
+					}
+				}
+				HandleFileSystemWatcherEvent(path);
+			};
 			fsWatcher.Deleted += HandleFileSystemWatcherEvent;
-			fsWatcher.Renamed += HandleFileSystemWatcherEvent;
+			fsWatcher.Renamed += (previousPath, path) => {
+				// simulating rename as pairs of deleted / created events
+				HandleFileSystemWatcherEvent(path);
+				if (File.Exists(path)) {
+					HandleFileSystemWatcherEvent(previousPath);
+					HandleFileSystemWatcherEvent(path);
+				} else if (Directory.Exists(path)) {
+					foreach (var f in new ScanOptimizedFileEnumerator(path, null).Enumerate()) {
+						HandleFileSystemWatcherEvent(Path.Combine(previousPath, f.Path));
+						HandleFileSystemWatcherEvent(Path.Combine(path, f.Path));
+					}
+				}
+			};
 			var overlaysPath = Path.Combine(Project.Current.AssetsDirectory, "Overlays");
 			if (Directory.Exists(overlaysPath)) {
 				var files = Directory.EnumerateFiles(overlaysPath)
 					.Where(file => Path.GetExtension(file) == ".tan" || Path.GetExtension(file) == ".scene");
 				foreach (var file in files) {
-					Project.Current.Overlays.Add(Path.GetFileNameWithoutExtension(file), new Frame(file));
+					Project.Current.Overlays.Add(Path.GetFileNameWithoutExtension(file), (Widget)Node.CreateFromAssetBundle(file, null, TangerineYuzu.Instance.Value));
 				}
 			}
 
@@ -118,6 +160,27 @@ namespace Tangerine.Core
 			}
 		}
 
+		public void SuppressNextFileChangedEvent(string fullPath) {
+			fullPath = Path.GetFullPath(fullPath).ToLower(CultureInfo.InvariantCulture);
+			if (!filesToSuppressChangedEventFor.ContainsKey(fullPath)) {
+				filesToSuppressChangedEventFor.Add(fullPath, 1);
+			} else {
+				filesToSuppressChangedEventFor[fullPath]++;
+			}
+		}
+		private Dictionary<string, int> filesToSuppressChangedEventFor = new Dictionary<string, int>();
+
+		public void SuppressNextFileCreatedEvent(string fullPath)
+		{
+			fullPath = Path.GetFullPath(fullPath).ToLower(CultureInfo.InvariantCulture);
+			if (!filesToSuppressCreatedEventFor.ContainsKey(fullPath)) {
+				filesToSuppressCreatedEventFor.Add(fullPath, 1);
+			} else {
+				filesToSuppressCreatedEventFor[fullPath]++;
+			}
+		}
+		private Dictionary<string, int> filesToSuppressCreatedEventFor = new Dictionary<string, int>();
+
 		public bool Close()
 		{
 			if (Current != this) {
@@ -129,7 +192,10 @@ namespace Tangerine.Core
 			fsWatcher?.Dispose();
 			fsWatcher = null;
 			UserPreferences.Documents.Clear();
-			foreach (var doc in documents.ToList()) {
+			var closingDocuments = documents.ToList();
+			Document.SetCurrent(null);
+			documents.Clear();
+			foreach (var doc in closingDocuments) {
 				UserPreferences.Documents.Add(doc.Path);
 				if (!CloseDocument(doc)) {
 					return false;
@@ -154,16 +220,6 @@ namespace Tangerine.Core
 			return false;
 		}
 
-		public string GetSystemPath(string assetPath, string extension)
-		{
-			return Path.ChangeExtension(Path.Combine(AssetsDirectory, assetPath), extension);
-		}
-
-		public string GetSystemDirectory(string assetPath)
-		{
-			return Path.GetDirectoryName(GetSystemPath(assetPath, null));
-		}
-
 		public Document NewDocument(DocumentFormat format = DocumentFormat.Scene, Type rootType = null)
 		{
 			var doc = new Document(format, rootType);
@@ -172,21 +228,18 @@ namespace Tangerine.Core
 			return doc;
 		}
 
-		public Document OpenDocument(string path, bool pathIsGlobal = false, bool delayLoad = false)
+		public Document OpenDocument(string path, bool pathIsAbsolute = false, bool delayLoad = false)
 		{
-			string localPath = path;
-			if (pathIsGlobal) {
-				if (this == Null || !Current.TryGetAssetPath(path, out localPath)) {
-					OpenFileOutsideProjectAttempt(path);
-					return null;
-				}
+			var localPath = GetLocalDocumentPath(path, pathIsAbsolute);
+			if (string.IsNullOrEmpty(localPath)) {
+				OpenFileOutsideProjectAttempt(path);
+				return null;
 			}
-			localPath = AssetPath.CorrectSlashes(localPath);
 			var doc = Documents.FirstOrDefault(i => i.Path == localPath);
 			if (doc == null) {
-				var tmpFile = AutosaveProcessor.GetTemporalFilePath(localPath);
+				var tmpFile = AutosaveProcessor.GetTemporaryFilePath(localPath);
 				string systemPath;
-				if (GetSystemPath(tmpFile, out systemPath) && TempFileLoadConfirmation.Invoke(localPath)) {
+				if (GetFullPath(tmpFile, out systemPath) && TempFileLoadConfirmation.Invoke(localPath)) {
 					doc = new Document(tmpFile);
 					doc.SaveAs(localPath);
 				} else {
@@ -204,6 +257,17 @@ namespace Tangerine.Core
 			return doc;
 		}
 
+		private string GetLocalDocumentPath(string path, bool pathIsAbsolute)
+		{
+			string localPath = path;
+			if (pathIsAbsolute) {
+				if (this == Null || !Current.TryGetAssetPath(path, out localPath)) {
+					return null;
+				}
+			}
+			return AssetPath.CorrectSlashes(localPath);
+		}
+
 		public void AddRecentDocument(string path)
 		{
 			UserPreferences.RecentDocuments.Remove(path);
@@ -212,25 +276,13 @@ namespace Tangerine.Core
 				UserPreferences.RecentDocuments.RemoveAt(UserPreferences.RecentDocuments.Count - 1);
 		}
 
-		public bool GetSystemPath(string localPath, out string systemPath)
-		{
-			systemPath = null;
-			foreach (var ext in Document.AllowedFileTypes) {
-				systemPath = GetSystemPath(localPath, ext);
-				if (File.Exists(systemPath)) {
-					return true;
-				}
-			}
-			return false;
-		}
-
 		public bool CloseDocument(Document doc)
 		{
 			int currentIndex = documents.IndexOf(Document.Current);
 			string systemPath;
 			if (doc.Close()) {
 				documents.Remove(doc);
-				if (GetSystemPath(AutosaveProcessor.GetTemporalFilePath(doc.Path), out systemPath)) {
+				if (GetFullPath(AutosaveProcessor.GetTemporaryFilePath(doc.Path), out systemPath)) {
 					File.Delete(systemPath);
 				}
 				if (doc == Document.Current) {
@@ -323,17 +375,15 @@ namespace Tangerine.Core
 
 		public void ReloadModifiedDocuments()
 		{
+			HandleMissingDocuments(Documents.Where(d => !GetFullPath(d.Path, out string fullPath)));
 			foreach (var doc in Documents.ToList()) {
-				if (!doc.Loaded) {
-					continue;
-				}
-				if (doc.WasModifiedOutsideTangerine()) {
+				if (!File.Exists(doc.FullPath)) {
+
+				} else if (modifiedAssets.Contains(doc.Path)) {
 					if (DocumentReloadConfirmation(doc)) {
 						ReloadDocument(doc);
-					} else {
-						doc.SetModificationTimeToNow();
 					}
-				} else {
+				} else if (doc.Loaded) {
 					var requiredToRefreshExternalScenes = false;
 					foreach (var descendant in doc.RootNodeUnwrapped.Descendants) {
 						if (string.IsNullOrEmpty(descendant.ContentsPath)) {
@@ -440,7 +490,7 @@ namespace Tangerine.Core
 			}
 		}
 
-		public static void RaiseDocumetSaving(Document document)
+		public static void RaiseDocumentSaving(Document document)
 		{
 			DocumentSaving?.Invoke(document);
 		}
@@ -469,5 +519,35 @@ namespace Tangerine.Core
 				.GetTypes()
 				.Where(t => typeof(NodeComponent).IsAssignableFrom(t) && t.IsDefined(typeof(TangerineRegisterComponentAttribute)));
 		}
+
+		public string GetFullPath(string assetPath, string extension)
+		{
+			return Path.ChangeExtension(Path.Combine(AssetsDirectory, assetPath), extension);
+		}
+
+		public bool GetFullPath(string localPath, out string fullPath)
+		{
+			fullPath = null;
+			foreach (var ext in Document.AllowedFileTypes) {
+				fullPath = GetFullPath(localPath, ext);
+				if (File.Exists(fullPath)) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		public static bool operator ==(Project lhs, Project rhs)
+		{
+			if (lhs is null) {
+				lhs = Null;
+			}
+			if (rhs is null) {
+				rhs = Null;
+			}
+			return Equals(rhs, lhs);
+		}
+
+		public static bool operator !=(Project lhs, Project rhs) => !(lhs == rhs);
 	}
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,7 +14,7 @@ namespace Tangerine.Core
 
 		private readonly Func<int> delayGetter;
 
-		public static string GetTemporalFilePath(string path)
+		public static string GetTemporaryFilePath(string path)
 		{
 			return Path.Combine(Lime.Environment.GetDataDirectory("Tangerine"), Prefix + Path.GetFileName(path));
 		}
@@ -30,7 +30,7 @@ namespace Tangerine.Core
 				yield return delayGetter();
 				foreach (var document in Project.Current.Documents) {
 					if (document.IsModified) {
-						var path = GetTemporalFilePath(document.Path);
+						var path = GetTemporaryFilePath(document.Path);
 						try {
 							document.SaveTo(path, FileAttributes.Hidden);
 						} catch (Exception e) {

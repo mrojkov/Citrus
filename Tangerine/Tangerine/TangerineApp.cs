@@ -150,9 +150,15 @@ namespace Tangerine
 					default: return Document.CloseAction.Cancel;
 				}
 			};
+			mainWidget.Tasks.Add(HandleMissingDocumentsTask);
+			Project.HandleMissingDocuments += missingDocuments => {
+				foreach (var d in missingDocuments) {
+					missingDocumentsList.Add(d);
+				}
+			};
 			Project.DocumentReloadConfirmation += doc => {
 				if (doc.IsModified) {
-					var modifiedAlert = new AlertDialog($"{doc.Path}\n\nThis file hase been modified by another program and has unsaved changes.\nDo you want to reload it from disk? ", "Yes", "No");
+					var modifiedAlert = new AlertDialog($"{doc.Path}\n\nThis file has been modified by another program and has unsaved changes.\nDo you want to reload it from disk? ", "Yes", "No");
 					var res = modifiedAlert.Show();
 					if (res == 1 || res == -1) {
 						doc.History.ExternalModification();
@@ -163,7 +169,7 @@ namespace Tangerine
 				if (CoreUserPreferences.Instance.ReloadModifiedFiles) {
 					return true;
 				}
-				var alert = new AlertDialog($"{doc.Path}\n\nThis file hase been modified by another program.\nDo you want to reload it from disk? ", "Yes, always", "Yes", "No");
+				var alert = new AlertDialog($"{doc.Path}\n\nThis file has been modified by another program.\nDo you want to reload it from disk? ", "Yes, always", "Yes", "No");
 				var r = alert.Show();
 				if (r == 0) {
 					CoreUserPreferences.Instance.ReloadModifiedFiles = true;
@@ -221,21 +227,27 @@ namespace Tangerine
 			Document.NodeDecorators.AddFor<Node>(n => n.SetTangerineFlag(TangerineFlags.SceneNode, true));
 			dockManager.UnhandledExceptionOccurred += e => {
 				AlertDialog.Show(e.Message + "\n" + e.StackTrace);
-				if (Document.Current != null) {
-					while (Document.Current.History.IsTransactionActive) {
-						Document.Current.History.EndTransaction();
+				var doc = Document.Current;
+				if (doc != null) {
+					while (doc.History.IsTransactionActive) {
+						doc.History.EndTransaction();
 					}
 					var closeConfirmation = Document.CloseConfirmation;
 					try {
-						Document.CloseConfirmation = doc => {
-							var alert = new AlertDialog($"Save the changes to document '{doc.Path}' before closing?", "Yes", "No");
+						Document.CloseConfirmation = d => {
+							var alert = new AlertDialog($"Save the changes to document '{d.Path}' before closing?", "Yes", "No");
 							switch (alert.Show()) {
 								case 0: return Document.CloseAction.SaveChanges;
 								default: return Document.CloseAction.DiscardChanges;
 							}
 						};
-						var path = Document.Current.Path;
-						Project.Current.CloseDocument(Document.Current);
+						var fullPath = doc.FullPath;
+
+						if (!File.Exists(fullPath)) {
+							doc.Save();
+						}
+						var path = doc.Path;
+						Project.Current.CloseDocument(doc);
 						Project.Current.OpenDocument(path);
 					} finally {
 						Document.CloseConfirmation = closeConfirmation;
@@ -322,13 +334,67 @@ namespace Tangerine
 			DocumentationComponent.Clicked = page => Documentation.ShowHelp(page);
 		}
 
+		private List<Document> missingDocumentsList = new List<Document>();
+
+		private IEnumerator<object> HandleMissingDocumentsTask()
+		{
+			while (true) {
+				while (missingDocumentsList.Count == 0) {
+					yield return null;
+				}
+				var missingDocuments = missingDocumentsList.Where(d => !Project.Current.GetFullPath(d.Path, out string fullPath) && Project.Current.Documents.Contains(d));
+				while (missingDocuments.Any()) {
+					var nextDocument = missingDocuments.First();
+					bool loaded = nextDocument.Loaded;
+					Document.SetCurrent(nextDocument);
+					yield return null;
+					string path = nextDocument.FullPath.Replace('\\', '/');
+					var choices = new[] { "Save", "Save All", "Close", "Close All" };
+					var alert = new AlertDialog($"Document {path} has been moved or deleted.", choices);
+					var r = alert.Show();
+					switch (r) {
+						case 0: {
+							// Save
+							nextDocument.Save();
+							missingDocumentsList.Remove(nextDocument);
+							break;
+						}
+						case 1: {
+							// Save All
+							while (missingDocuments.Any()) {
+								nextDocument = missingDocuments.First();
+								Document.SetCurrent(nextDocument);
+								nextDocument.Save();
+								missingDocumentsList.Remove(nextDocument);
+							}
+							break;
+						}
+						case 2: {
+							// Close
+							Project.Current.CloseDocument(nextDocument);
+							missingDocumentsList.Remove(nextDocument);
+							break;
+						}
+						case 3: {
+							// Close All
+							while (missingDocuments.Any()) {
+								Project.Current.CloseDocument(nextDocument = missingDocuments.First());
+								missingDocumentsList.Remove(nextDocument);
+							}
+							break;
+						}
+					}
+				}
+			}
+		}
+
 		private void OpenDocumentsFromArgs(string[] args)
 		{
 			foreach (var arg in args) {
 				if (Path.GetExtension(arg) == ".citproj") {
 					FileOpenProject.Execute(arg);
 				} else {
-					Project.Current.OpenDocument(arg, pathIsGlobal: true);
+					Project.Current.OpenDocument(arg, pathIsAbsolute: true);
 				}
 			}
 		}

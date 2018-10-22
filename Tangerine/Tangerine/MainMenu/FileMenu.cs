@@ -105,7 +105,7 @@ namespace Tangerine
 				Mode = FileDialogMode.Open,
 			};
 			if (Document.Current != null) {
-				dlg.InitialDirectory = Project.Current.GetSystemDirectory(Document.Current.Path);
+				dlg.InitialDirectory = Path.GetDirectoryName(Document.Current.FullPath);
 			}
 			if (dlg.RunModal()) {
 				var document = Project.Current.OpenDocument(dlg.FileName, true);
@@ -140,7 +140,7 @@ namespace Tangerine
 			var dlg = new FileDialog {
 				AllowedFileTypes = new string[] { Document.Current.GetFileExtension() },
 				Mode = FileDialogMode.Save,
-				InitialDirectory = Project.Current.GetSystemDirectory(Document.Current.Path)
+				InitialDirectory = Path.GetDirectoryName(Document.Current.FullPath)
 			};
 			path = null;
 			if (!dlg.RunModal()) {
@@ -185,7 +185,7 @@ namespace Tangerine
 			var dlg = new FileDialog {
 				AllowedFileTypes = new string[] { Document.Current.GetFileExtension() },
 				Mode = FileDialogMode.Save,
-				InitialDirectory = Project.Current.GetSystemDirectory(Document.Current.Path),
+				InitialDirectory = Path.GetDirectoryName(Document.Current.FullPath),
 				InitialFileName = Path.GetFileNameWithoutExtension(Document.Current.Path)
 			};
 			if (dlg.RunModal()) {
