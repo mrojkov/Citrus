@@ -278,13 +278,21 @@ namespace Lime
 
 		public void Refresh()
 		{
-			Command.Menu?.Refresh();
+			if (Command.Menu != null) {
+				Command.Menu.Refresh();
+				var e = false;
+				foreach (var c in Command.Menu) {
+					e |= (c != Lime.Command.MenuSeparator && c.Enabled);
+				}
+				NativeItem.Enabled = e;
+			} else {
+				NativeItem.Enabled = Command.Enabled;
+			}
 			if (Command.Version == commandVersion) {
 				return;
 			}
 			commandVersion = Command.Version;
 			NativeItem.Visible = Command.Visible;
-			NativeItem.Enabled = Command.Enabled;
 			NativeItem.Text = Command.Text;
 			var mi = NativeItem as ToolStripMenuItem;
 			if (mi == null)
