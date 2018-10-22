@@ -356,14 +356,18 @@ namespace Tangerine.UI.Docking
 				PostPresenter = new SyncDelegatePresenter<TabbedWidget>(w => {
 					w.PrepareRendererState();
 					var activeTab = (Tab)w.TabBar.Nodes[w.ActiveTabIndex];
-					var start = activeTab.ContentPosition * activeTab.CalcTransitionToSpaceOf(w);
-					var end = start + activeTab.ContentSize * Vector2.Right;
 					var color = ColorTheme.Current.Docking.TabOutline;
-					Renderer.DrawLine(w.TabBar.Position * Vector2.Down, start, color);
-					Renderer.DrawLine(end, new Vector2(w.Size.X, w.TabBar.Position.Y), color);
-					Renderer.DrawLine(start, start + Vector2.Down * activeTab.ContentSize, color);
-					Renderer.DrawLine(start + Vector2.Down * activeTab.ContentSize, start + activeTab.ContentSize, color);
-					Renderer.DrawLine(end, start + activeTab.ContentSize, color);
+					var a = activeTab.CalcPositionInSpaceOf(w);
+					var start = a * Vector2.Down;
+					var b = a + Vector2.Down * activeTab.ContentHeight;
+					var c = b + activeTab.ContentWidth * Vector2.Right;
+					var d = c - Vector2.Down * activeTab.ContentHeight;
+					var end = start + w.Size * Vector2.Right;
+					Renderer.DrawLine(start, a + Vector2.Right * 0.5f, color);
+					Renderer.DrawLine(a, b, color);
+					Renderer.DrawLine(b + new Vector2(-0.5f, -0.5f), c + new Vector2(0.5f, -0.5f), color);
+					Renderer.DrawLine(c, d, color);
+					Renderer.DrawLine(d + Vector2.Left * 0.5f, end, color);
 				})
 			};
 			Widget rootWidget = tabbedWidget;
