@@ -72,13 +72,15 @@ namespace Tangerine.UI.Docking
 		private void RefreshPlacementAndSite()
 		{
 			var mousePosition = Application.DesktopMousePosition;
+			var offset = positionOffset;
 			if (Application.Platform == PlatformId.Mac) {
-				mousePosition.Y -= windowPlacement.WindowWidget.Window.ClientSize.Y;
+				mousePosition.Y -= windowPlacement.WindowWidget.Window.DecoratedSize.Y;
+				offset.Y = -offset.Y;
 			}
 			ResetDockComponents();
 			var cachedSite = requestedSite;
 			requestedSite = DockSite.None;
-			windowPlacement.WindowWidget.Window.ClientPosition = mousePosition - positionOffset;
+			windowPlacement.WindowWidget.Window.ClientPosition = mousePosition - offset;
 			foreach (var p in GetPanels()) {
 				var placement = AppPlacement.FindPanelPlacement(p.Id);
 				var bounds = p.PanelWidget.CalcAABBInWindowSpace();
@@ -177,8 +179,8 @@ namespace Tangerine.UI.Docking
 		private IEnumerator<object> MainTask()
 		{
 			while (true) {
-				var pressedPosition = inputWidget.LocalMousePosition();
 				if (input.WasMousePressed()) {
+					var pressedPosition = inputWidget.LocalMousePosition();
 					var windowPlacement = (WindowPlacement)placement.Root;
 					bool doUndock = windowPlacement != placement &&
 						(placement.Parent != windowPlacement || windowPlacement.Placements.Count > 1);
