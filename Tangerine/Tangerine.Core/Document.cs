@@ -373,14 +373,15 @@ namespace Tangerine.Core
 			Saving?.Invoke(this);
 			History.AddSavePoint();
 			Path = path;
-			if (!File.Exists(FullPath)) {
-				Project.Current.SuppressNextFileCreatedEvent(FullPath);
-			}
-			Project.Current.SuppressNextFileChangedEvent(FullPath);
+			var needSupressCreatedEvent = !File.Exists(FullPath);
 			WriteNodeToFile(path, Format, RootNodeUnwrapped);
 			if (Format == DocumentFormat.Scene || Format == DocumentFormat.Tan) {
 				DocumentPreview.AppendToFile(FullPath, Preview);
 			}
+			if (needSupressCreatedEvent) {
+				Project.Current.SuppressNextFileCreatedEvent(FullPath);
+			}
+			Project.Current.SuppressNextFileChangedEvent(FullPath);
 			Project.Current.AddRecentDocument(Path);
 		}
 

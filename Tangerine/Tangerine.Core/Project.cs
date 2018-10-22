@@ -104,11 +104,17 @@ namespace Tangerine.Core
 				if (filesToSuppressChangedEventFor.Count > 0) {
 					var key = Path.GetFullPath(path).ToLower();
 					if (filesToSuppressChangedEventFor.ContainsKey(key)) {
-						filesToSuppressChangedEventFor[key]--;
-						if (filesToSuppressChangedEventFor[key] == 0) {
+						var (modifiedDate, lastEventDate) = filesToSuppressChangedEventFor[key];
+						if (modifiedDate == File.GetLastWriteTime(key)) {
+							if ((DateTime.Now - lastEventDate).TotalMilliseconds > 50.0) {
+								filesToSuppressChangedEventFor.Remove(key);
+							} else {
+								filesToSuppressChangedEventFor[key] = (modifiedDate, DateTime.Now);
+								return;
+							}
+						} else {
 							filesToSuppressChangedEventFor.Remove(key);
 						}
-						return;
 					}
 				}
 				HandleFileSystemWatcherEvent(path);
@@ -117,11 +123,17 @@ namespace Tangerine.Core
 				if (filesToSuppressCreatedEventFor.Count > 0) {
 					var key = Path.GetFullPath(path).ToLower();
 					if (filesToSuppressCreatedEventFor.ContainsKey(key)) {
-						filesToSuppressCreatedEventFor[key]--;
-						if (filesToSuppressCreatedEventFor[key] == 0) {
+						var (modifiedDate, lastEventDate) = filesToSuppressCreatedEventFor[key];
+						if (modifiedDate == File.GetLastWriteTime(key)) {
+							if ((DateTime.Now - lastEventDate).TotalMilliseconds > 50.0) {
+								filesToSuppressCreatedEventFor.Remove(key);
+							} else {
+								filesToSuppressCreatedEventFor[key] = (modifiedDate, DateTime.Now);
+								return;
+							}
+						} else {
 							filesToSuppressCreatedEventFor.Remove(key);
 						}
-						return;
 					}
 				}
 				HandleFileSystemWatcherEvent(path);
@@ -162,24 +174,26 @@ namespace Tangerine.Core
 
 		public void SuppressNextFileChangedEvent(string fullPath) {
 			fullPath = Path.GetFullPath(fullPath).ToLower(CultureInfo.InvariantCulture);
+			var value = (File.GetLastWriteTime(fullPath), DateTime.Now);
 			if (!filesToSuppressChangedEventFor.ContainsKey(fullPath)) {
-				filesToSuppressChangedEventFor.Add(fullPath, 1);
+				filesToSuppressChangedEventFor.Add(fullPath, value);
 			} else {
-				filesToSuppressChangedEventFor[fullPath]++;
+				filesToSuppressChangedEventFor[fullPath] = value;
 			}
 		}
-		private Dictionary<string, int> filesToSuppressChangedEventFor = new Dictionary<string, int>();
+		private Dictionary<string, (DateTime ModifiedDate, DateTime LastEventDate)> filesToSuppressChangedEventFor = new Dictionary<string, (DateTime, DateTime)>();
 
 		public void SuppressNextFileCreatedEvent(string fullPath)
 		{
 			fullPath = Path.GetFullPath(fullPath).ToLower(CultureInfo.InvariantCulture);
+			var value = (File.GetLastWriteTime(fullPath), DateTime.Now);
 			if (!filesToSuppressCreatedEventFor.ContainsKey(fullPath)) {
-				filesToSuppressCreatedEventFor.Add(fullPath, 1);
+				filesToSuppressCreatedEventFor.Add(fullPath, value);
 			} else {
-				filesToSuppressCreatedEventFor[fullPath]++;
+				filesToSuppressCreatedEventFor[fullPath] = value;
 			}
 		}
-		private Dictionary<string, int> filesToSuppressCreatedEventFor = new Dictionary<string, int>();
+		private Dictionary<string, (DateTime ModifiedDate, DateTime LastEventDate)> filesToSuppressCreatedEventFor = new Dictionary<string, (DateTime, DateTime)>();
 
 		public bool Close()
 		{
