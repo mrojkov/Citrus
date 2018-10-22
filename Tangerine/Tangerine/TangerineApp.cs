@@ -108,6 +108,7 @@ namespace Tangerine
 			var consolePanel = new Panel("Console");
 			var backupHistoryPanel = new Panel("Backups");
 			var documentPanel = new Panel(DockManager.DocumentAreaId, undockable: false);
+			documentPanel.PanelWidget = documentPanel.ContentWidget;
 			var visualHintsPanel = new Panel("Visual Hints");
 			var dockManager = DockManager.Instance;
 			new UI.Console(consolePanel);

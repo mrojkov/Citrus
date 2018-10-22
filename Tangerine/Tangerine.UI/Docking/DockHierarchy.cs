@@ -706,6 +706,7 @@ namespace Tangerine.UI.Docking
 	{
 		public bool IsUndockable { get; private set; }
 		public readonly Widget ContentWidget;
+		public Widget PanelWidget;
 		public readonly string Id;
 
 		public string Title;

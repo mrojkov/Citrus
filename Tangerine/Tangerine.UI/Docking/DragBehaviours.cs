@@ -81,7 +81,7 @@ namespace Tangerine.UI.Docking
 			windowPlacement.WindowWidget.Window.ClientPosition = mousePosition - positionOffset;
 			foreach (var p in GetPanels()) {
 				var placement = AppPlacement.FindPanelPlacement(p.Id);
-				var bounds = p.ContentWidget.CalcAABBInWindowSpace();
+				var bounds = p.PanelWidget.CalcAABBInWindowSpace();
 				var winPlacement = DockManager.Instance.Model.GetWindowByPlacement(placement);
 				var requestedDockingComponent = winPlacement.WindowWidget.Components.Get<RequestedDockingComponent>();
 				if (requestedDockingComponent == null) continue;

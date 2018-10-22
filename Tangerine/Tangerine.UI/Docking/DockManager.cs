@@ -342,6 +342,7 @@ namespace Tangerine.UI.Docking
 				CreateDragBehaviour(placement, rootWidget.Nodes[0].AsWidget, widget);
 				widget = rootWidget;
 			}
+			panel.PanelWidget = widget;
 			container.Nodes.Add(widget);
 			container.Stretches.Add(stretch);
 		}
@@ -367,6 +368,24 @@ namespace Tangerine.UI.Docking
 			};
 			Widget rootWidget = tabbedWidget;
 			tabbedWidget.FocusScope = new KeyboardFocusScope(tabbedWidget);
+			tabbedWidget.TabBar.OnReorder += args => {
+				var item = placement.Placements[args.OldIndex];
+				placement.RemovePlacement(item);
+				placement.Placements.Insert(args.NewIndex, item);
+				tabbedWidget.ActivateTab(args.NewIndex);
+			};
+			if (requestTitle) {
+				rootWidget = AddTitle(tabbedWidget, out var closeButton, out var titleLabel);
+				titleLabel.AddChangeWatcher(
+					() => ((Tab)tabbedWidget.TabBar.Nodes[tabbedWidget.ActiveTabIndex]).Text,
+					title => titleLabel.Text = title
+				);
+				closeButton.Clicked += () => {
+					placement.Placements[tabbedWidget.ActiveTabIndex].Hidden = true;
+					Refresh();
+				};
+				CreateDragBehaviour(placement, rootWidget.Nodes[0].AsWidget, rootWidget);
+			}
 			foreach (var panelPlacement in placement.Placements) {
 				var panel = Model.Panels.First(pan => pan.Id == panelPlacement.Id);
 				panel.ContentWidget.Unlink();
@@ -389,26 +408,9 @@ namespace Tangerine.UI.Docking
 					Nodes = { panel.ContentWidget }
 				}, true);
 				CreateDragBehaviour(panelPlacement, tab, panel.ContentWidget);
+				panel.PanelWidget = rootWidget;
 			}
 			tabbedWidget.ActiveTabIndex = 0;
-			tabbedWidget.TabBar.OnReorder += args => {
-				var item = placement.Placements[args.OldIndex];
-				placement.RemovePlacement(item);
-				placement.Placements.Insert(args.NewIndex, item);
-				tabbedWidget.ActivateTab(args.NewIndex);
-			};
-			if (requestTitle) {
-				rootWidget = AddTitle(tabbedWidget, out var closeButton, out var titleLabel);
-				titleLabel.AddChangeWatcher(
-					() => ((Tab)tabbedWidget.TabBar.Nodes[tabbedWidget.ActiveTabIndex]).Text,
-					title => titleLabel.Text = title
-				);
-				closeButton.Clicked += () => {
-					placement.Placements[tabbedWidget.ActiveTabIndex].Hidden = true;
-					Refresh();
-				};
-				CreateDragBehaviour(placement, rootWidget.Nodes[0].AsWidget, rootWidget);
-			}
 			container.Nodes.Add(rootWidget);
 			container.Stretches.Add(stretch);
 		}
@@ -675,11 +677,11 @@ namespace Tangerine.UI.Docking
 				}
 			}
 		}
-		
+
 		private class DockingPresenter : SyncDelegatePresenter<Widget>
 		{
 			public DockingPresenter() : base(Render) { }
-	
+
 			private static void Render(Widget widget)
 			{
 				var comp = widget.Components.Get<RequestedDockingComponent>();
