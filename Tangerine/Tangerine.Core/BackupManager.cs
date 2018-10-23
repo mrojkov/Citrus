@@ -217,7 +217,7 @@ namespace Tangerine.Core
 		private void SaveModifiedDocuments()
 		{
 			foreach (var document in Project.Current.Documents) {
-				if (document.IsModified) {
+				if (document.Loaded && document.IsModified) {
 					SaveBackup(document);
 				}
 			}

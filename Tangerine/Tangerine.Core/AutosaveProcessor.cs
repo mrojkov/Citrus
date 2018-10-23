@@ -29,7 +29,7 @@ namespace Tangerine.Core
 			while (true) {
 				yield return delayGetter();
 				foreach (var document in Project.Current.Documents) {
-					if (document.IsModified) {
+					if (document.Loaded && document.IsModified) {
 						var path = GetTemporaryFilePath(document.Path);
 						try {
 							document.SaveTo(path, FileAttributes.Hidden);
