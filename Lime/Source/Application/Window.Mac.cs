@@ -252,6 +252,7 @@ namespace Lime
 		private float titleBarHeight;
 		private bool shouldFixFullscreen;
 		private bool needUpdateGLContext = true;
+		private Vector2? positionBeforeResize;
 
 		public IDisplay Display
 		{
@@ -324,6 +325,8 @@ namespace Lime
 				RaiseDeactivated();
 			};
 			window.DidMove += HandleMove;
+			NSNotificationCenter.DefaultCenter.AddObserver(NSWindow.WillStartLiveResizeNotification, OnWillStartLiveResize);
+			NSNotificationCenter.DefaultCenter.AddObserver(NSWindow.DidEndLiveResizeNotification, OnDidEndLiveResize);
 			window.CollectionBehavior = NSWindowCollectionBehavior.FullScreenPrimary;
 			window.ContentView = View;
 			View.Update += Update;
@@ -337,6 +340,20 @@ namespace Lime
 					Application.WindowUnderMouse = null;
 				}
 			};
+		}
+
+		private void OnWillStartLiveResize(NSNotification notification)
+		{
+			if (notification.Object == window) {
+				positionBeforeResize = new Vector2((float)window.Frame.X, (float)window.Frame.Y);
+			}
+		}
+
+		private void OnDidEndLiveResize(NSNotification notification)
+		{
+			if (notification.Object == window) {
+				positionBeforeResize = null;
+			}
 		}
 
 		private bool OnShouldClose(NSObject sender)
@@ -456,6 +473,13 @@ namespace Lime
 		private void HandleResize(object sender, EventArgs e)
 		{
 			RaiseResized(deviceRotated: false);
+			var isZoomed = window.IsZoomed;
+			if (positionBeforeResize.HasValue &&
+				(positionBeforeResize.Value.X != (float)window.Frame.X ||
+				positionBeforeResize.Value.Y != (float)window.Frame.Y)
+			) {
+				RaiseMoved();
+			}
 			Invalidate();
 		}
 
