@@ -37,7 +37,7 @@ namespace Lime
 
 		[YuzuMember]
 		[TangerineKeyframeColor(16)]
-		public Vector2 TileRatio { get; set; }
+		public Vector2 TileSize { get; set; }
 
 		[YuzuMember]
 		[TangerineKeyframeColor(17)]
@@ -53,7 +53,7 @@ namespace Lime
 		{
 			Presenter = DefaultPresenter.Instance;
 			TileOffset = Vector2.Zero;
-			TileRatio = Vector2.One;
+			TileSize = Vector2.One;
 			HitTestMethod = HitTestMethod.Contents;
 			var texture = new SerializableTexture();
 			Texture = texture;
@@ -63,7 +63,7 @@ namespace Lime
 		{
 			Presenter = DefaultPresenter.Instance;
 			TileOffset = Vector2.Zero;
-			TileRatio = Vector2.One;
+			TileSize = Vector2.One;
 			Texture = texture;
 			HitTestMethod = HitTestMethod.Contents;
 			Size = (Vector2)texture.ImageSize;
@@ -116,12 +116,12 @@ namespace Lime
 				material = WidgetMaterial.GetInstance(blending, shader, 1);
 			}
 			var UV1 = new Vector2 {
-				X = Size.X / texture.ImageSize.Width * TileRatio.X + TileOffset.X,
-				Y = Size.Y / texture.ImageSize.Height * TileRatio.Y + TileOffset.Y
+				X = Size.X / TileSize.X + TileOffset.X,
+				Y = Size.Y / TileSize.Y + TileOffset.Y
 			};
 			if (TileRounding) {
-				UV1.X = (float)Math.Truncate(UV1.X);
-				UV1.Y = (float)Math.Truncate(UV1.Y);
+				UV1.X = (float)Math.Round(UV1.X);
+				UV1.Y = (float)Math.Round(UV1.Y);
 			}
 			var ro = RenderObjectPool<RenderObject>.Acquire();
 			ro.CaptureRenderState(this);

@@ -8863,15 +8863,15 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (24 == fd.OurIndex) {
+				result.TileRounding = d.Reader.ReadBoolean();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (25 == fd.OurIndex) {
 				dg.EnsureClassDef(typeof(global::Lime.Vector2));
 				var tmp18 = new global::Lime.Vector2();
 				tmp18.X = d.Reader.ReadSingle();
 				tmp18.Y = d.Reader.ReadSingle();
-				result.TileRatio = tmp18;
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (25 == fd.OurIndex) {
-				result.TileRounding = d.Reader.ReadBoolean();
+				result.TileSize = tmp18;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (26 == fd.OurIndex) {
