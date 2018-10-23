@@ -17,7 +17,10 @@ namespace Lime
 
 		[YuzuMember]
 		[YuzuSerializeIf(nameof(IsNotRenderTexture))]
+#if TANGERINE
 		[TangerineKeyframeColor(15)]
+		[TangerineOnSet(nameof(OnSetTextureViaTangerine))]
+#endif // TANGERINE
 		public override sealed ITexture Texture
 		{
 			get { return texture; }
@@ -29,6 +32,13 @@ namespace Lime
 				}
 			}
 		}
+
+#if TANGERINE
+		private void OnSetTextureViaTangerine()
+		{
+			TileSize = (Vector2)texture.ImageSize;
+		}
+#endif // TANGERINE
 
 		protected override void DiscardMaterial()
 		{
