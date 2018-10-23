@@ -369,6 +369,9 @@ namespace Tangerine.Core
 		public void SaveAs(string path)
 		{
 			Directory.CreateDirectory(System.IO.Path.GetDirectoryName(FullPath));
+			if (!Loaded && IsModified) {
+				Load();
+			}
 			Project.RaiseDocumentSaving(this);
 			Saving?.Invoke(this);
 			History.AddSavePoint();
