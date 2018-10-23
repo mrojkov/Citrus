@@ -559,10 +559,10 @@ namespace Tangerine.UI.Docking
 				if (!state.WindowPlacements.Any()) {
 					throw new System.Exception("Unable to import state: the number of windows is zero");
 				}
-				for (var i = 1; i < Model.WindowPlacements.Count; i++) {
-					if (Model.WindowPlacements[i].AnyVisiblePanel()) {
-						Model.WindowPlacements[i].WindowWidget.Nodes.Clear();
-						CloseWindow(Model.WindowPlacements[i].WindowWidget.Window);
+				foreach (var wp in Model.WindowPlacements.Skip(1)) {
+					if (wp.AnyVisiblePanel()) {
+						wp.WindowWidget.Nodes.Clear();
+						CloseWindow(wp.WindowWidget.Window);
 					}
 				}
 				var savedPanels = Model.Panels.ToList();
@@ -582,7 +582,7 @@ namespace Tangerine.UI.Docking
 					MainWindowWidget.Window.ClientPosition = mainWindow.Position;
 					MainWindowWidget.Window.State = mainWindow.State;
 				}
-				Model.Panels.AddRange(savedPanels.Except(Model.Panels).ToList());
+				Model.Panels.AddRange(savedPanels.Except(Model.Panels));
 			} catch {
 				System.Console.WriteLine("Warning: Unable to load dock state from user preferences");
 				CommandQueue.Instance.Add((Command)GenericCommands.DefaultLayout);
