@@ -159,12 +159,6 @@ namespace Tangerine.UI.Docking
 			RefreshWindows();
 		}
 
-		public void ResolveAndRefresh()
-		{
-			ResolveInconsistency();
-			Refresh();
-		}
-
 		private void ResolveInconsistency()
 		{
 			var floatingWindowDefaultSize = new Vector2(200, 300);
@@ -557,7 +551,7 @@ namespace Tangerine.UI.Docking
 		{
 			try {
 				if (!state.WindowPlacements.Any()) {
-					throw new System.Exception("Unable to import state: the number of windows is zero");
+					throw new DockingException("Unable to import state: the number of windows is zero");
 				}
 				foreach (var wp in Model.WindowPlacements.Skip(1)) {
 					if (wp.AnyVisiblePanel()) {
@@ -582,11 +576,21 @@ namespace Tangerine.UI.Docking
 					MainWindowWidget.Window.ClientPosition = mainWindow.Position;
 					MainWindowWidget.Window.State = mainWindow.State;
 				}
+
 				Model.Panels.AddRange(savedPanels.Except(Model.Panels));
+				ResolveInconsistency();
+			} catch (DockingException e) {
+				LoadDefaultLayoutWithWarning(e.Message);
 			} catch {
-				System.Console.WriteLine("Warning: Unable to load dock state from user preferences");
-				CommandQueue.Instance.Add((Command)GenericCommands.DefaultLayout);
+				LoadDefaultLayoutWithWarning("Unable to load dock state from user preferences");
 			}
+			Refresh();
+		}
+
+		private static void LoadDefaultLayoutWithWarning(string message)
+		{
+			System.Console.WriteLine($"Warning: { message }");
+			CommandQueue.Instance.Add((Command)GenericCommands.DefaultLayout);
 		}
 
 		public class State
@@ -694,6 +698,11 @@ namespace Tangerine.UI.Docking
 				Renderer.DrawRectOutline(comp.Bounds.Value.A + Vector2.One, comp.Bounds.Value.B - Vector2.One, ColorTheme.Current.Docking.DragRectagleOutline, 2);
 				Renderer.DrawRect(comp.Bounds.Value.A + Vector2.One, comp.Bounds.Value.B - Vector2.One, ColorTheme.Current.Docking.DragRectagleOutline.Transparentify(0.8f));
 			}
+		}
+
+		public class DockingException : Lime.Exception
+		{
+			public DockingException(string message) : base(message) { }
 		}
 	}
 }

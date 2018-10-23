@@ -141,7 +141,6 @@ namespace Tangerine
 			var documentViewContainer = InitializeDocumentArea(dockManager);
 			documentPanel.ContentWidget.Nodes.Add(dockManager.DocumentArea);
 			dockManager.ImportState(AppUserPreferences.Instance.DockState);
-			dockManager.ResolveAndRefresh();
 			Document.CloseConfirmation += doc => {
 				var alert = new AlertDialog($"Save the changes to document '{doc.Path}' before closing?", "Yes", "No", "Cancel");
 				switch (alert.Show()) {
