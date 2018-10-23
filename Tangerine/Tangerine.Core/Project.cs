@@ -100,44 +100,8 @@ namespace Tangerine.Core
 				}
 			}
 			fsWatcher = new Lime.FileSystemWatcher(AssetsDirectory, includeSubdirectories: true);
-			fsWatcher.Changed += (path) => {
-				if (filesToSuppressChangedEventFor.Count > 0) {
-					var key = Path.GetFullPath(path).ToLower();
-					if (filesToSuppressChangedEventFor.ContainsKey(key)) {
-						var (modifiedDate, lastEventDate) = filesToSuppressChangedEventFor[key];
-						if (modifiedDate == File.GetLastWriteTime(key)) {
-							if ((DateTime.Now - lastEventDate).TotalMilliseconds > 50.0) {
-								filesToSuppressChangedEventFor.Remove(key);
-							} else {
-								filesToSuppressChangedEventFor[key] = (modifiedDate, DateTime.Now);
-								return;
-							}
-						} else {
-							filesToSuppressChangedEventFor.Remove(key);
-						}
-					}
-				}
-				HandleFileSystemWatcherEvent(path);
-			};
-			fsWatcher.Created += (path) => {
-				if (filesToSuppressCreatedEventFor.Count > 0) {
-					var key = Path.GetFullPath(path).ToLower();
-					if (filesToSuppressCreatedEventFor.ContainsKey(key)) {
-						var (modifiedDate, lastEventDate) = filesToSuppressCreatedEventFor[key];
-						if (modifiedDate == File.GetLastWriteTime(key)) {
-							if ((DateTime.Now - lastEventDate).TotalMilliseconds > 50.0) {
-								filesToSuppressCreatedEventFor.Remove(key);
-							} else {
-								filesToSuppressCreatedEventFor[key] = (modifiedDate, DateTime.Now);
-								return;
-							}
-						} else {
-							filesToSuppressCreatedEventFor.Remove(key);
-						}
-					}
-				}
-				HandleFileSystemWatcherEvent(path);
-			};
+			fsWatcher.Changed += (path) => HandleFileSystemWatcherEvent(path);
+			fsWatcher.Created += (path) => HandleFileSystemWatcherEvent(path);
 			fsWatcher.Deleted += HandleFileSystemWatcherEvent;
 			fsWatcher.Renamed += (previousPath, path) => {
 				// simulating rename as pairs of deleted / created events
@@ -171,29 +135,6 @@ namespace Tangerine.Core
 				}
 			}
 		}
-
-		public void SuppressNextFileChangedEvent(string fullPath) {
-			fullPath = Path.GetFullPath(fullPath).ToLower(CultureInfo.InvariantCulture);
-			var value = (File.GetLastWriteTime(fullPath), DateTime.Now);
-			if (!filesToSuppressChangedEventFor.ContainsKey(fullPath)) {
-				filesToSuppressChangedEventFor.Add(fullPath, value);
-			} else {
-				filesToSuppressChangedEventFor[fullPath] = value;
-			}
-		}
-		private Dictionary<string, (DateTime ModifiedDate, DateTime LastEventDate)> filesToSuppressChangedEventFor = new Dictionary<string, (DateTime, DateTime)>();
-
-		public void SuppressNextFileCreatedEvent(string fullPath)
-		{
-			fullPath = Path.GetFullPath(fullPath).ToLower(CultureInfo.InvariantCulture);
-			var value = (File.GetLastWriteTime(fullPath), DateTime.Now);
-			if (!filesToSuppressCreatedEventFor.ContainsKey(fullPath)) {
-				filesToSuppressCreatedEventFor.Add(fullPath, value);
-			} else {
-				filesToSuppressCreatedEventFor[fullPath] = value;
-			}
-		}
-		private Dictionary<string, (DateTime ModifiedDate, DateTime LastEventDate)> filesToSuppressCreatedEventFor = new Dictionary<string, (DateTime, DateTime)>();
 
 		public bool Close()
 		{
@@ -393,7 +334,7 @@ namespace Tangerine.Core
 			foreach (var doc in Documents.ToList()) {
 				if (!File.Exists(doc.FullPath)) {
 
-				} else if (modifiedAssets.Contains(doc.Path)) {
+				} else if (modifiedAssets.Contains(doc.Path) && doc.LastWriteTime != File.GetLastWriteTime(doc.FullPath)) {
 					if (DocumentReloadConfirmation(doc)) {
 						ReloadDocument(doc);
 					}

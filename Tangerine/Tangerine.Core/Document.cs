@@ -32,15 +32,15 @@ namespace Tangerine.Core
 
 		public static readonly string[] AllowedFileTypes = { "scene", "tan", "t3d", "fbx" };
 
-		readonly string defaultPath = "Untitled";
-		readonly Vector2 defaultSceneSize = new Vector2(1024, 768);
+		private readonly string defaultPath = "Untitled";
+		private readonly Vector2 defaultSceneSize = new Vector2(1024, 768);
 
 		public delegate bool PathSelectorDelegate(out string path);
 
 		private readonly Dictionary<object, Row> rowCache = new Dictionary<object, Row>();
 
-		private DateTime modificationTime;
-
+		private MemoryStream preloadedSceneStream = null;
+		public DateTime LastWriteTime { get; private set; }
 		public bool Loaded { get; private set; } = true;
 
 		public static event Action<Document> AttachingViews;
@@ -53,6 +53,7 @@ namespace Tangerine.Core
 		public readonly DocumentHistory History = new DocumentHistory();
 		public bool IsModified => History.IsDocumentModified;
 		public event Action<Document> Saving;
+
 
 		/// <summary>
 		/// The list of Tangerine node decorators.
@@ -153,13 +154,12 @@ namespace Tangerine.Core
 			History.PerformingOperation += Document_PerformingOperation;
 		}
 
-		private MemoryStream preloadedSceneStream = null;
-
 		public Document(string path, bool delayLoad = false)
 		{
 			Path = path;
 			Loaded = false;
 			Format = ResolveFormat(Path);
+			LastWriteTime = File.GetLastWriteTime(FullPath);
 			if (delayLoad) {
 				preloadedSceneStream = new MemoryStream();
 				var fullPath = Node.ResolveScenePath(path);
@@ -378,10 +378,7 @@ namespace Tangerine.Core
 			if (Format == DocumentFormat.Scene || Format == DocumentFormat.Tan) {
 				DocumentPreview.AppendToFile(FullPath, Preview);
 			}
-			if (needSupressCreatedEvent) {
-				Project.Current.SuppressNextFileCreatedEvent(FullPath);
-			}
-			Project.Current.SuppressNextFileChangedEvent(FullPath);
+			LastWriteTime = File.GetLastWriteTime(FullPath);
 			Project.Current.AddRecentDocument(Path);
 		}
 
