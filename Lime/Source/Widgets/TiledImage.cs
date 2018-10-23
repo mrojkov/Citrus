@@ -134,9 +134,12 @@ namespace Lime
 				size.Y = -size.Y;
 			}
 			if (localPoint.X >= 0 && localPoint.Y >= 0 && localPoint.X < size.X && localPoint.Y < size.Y) {
-				int u = (int)(Texture.ImageSize.Width * (localPoint.X / size.X));
-				int v = (int)(Texture.ImageSize.Height * (localPoint.Y / size.Y));
-				return !Texture.IsTransparentPixel(u, v);
+				var UV1 = CalcUV1();
+				float u = TileOffset.X + (UV1.X - TileOffset.X) * (localPoint.X / size.X);
+				float v = TileOffset.Y + (UV1.Y - TileOffset.Y) * (localPoint.Y / size.Y);
+				int tu = (int)(Texture.ImageSize.Width * u);
+				int tv = (int)(Texture.ImageSize.Height * v);
+				return !Texture.IsTransparentPixel(tu, tv);
 			} else {
 				return false;
 			}
@@ -149,14 +152,7 @@ namespace Lime
 			if (material == null) {
 				material = WidgetMaterial.GetInstance(blending, shader, 1);
 			}
-			var UV1 = new Vector2 {
-				X = TileSize.X == 0.0f ? 1.0f : Size.X / TileSize.X + TileOffset.X,
-				Y = TileSize.Y == 0.0f ? 1.0f : Size.Y / TileSize.Y + TileOffset.Y
-			};
-			if (TileRounding) {
-				UV1.X = (float)Math.Round(UV1.X);
-				UV1.Y = (float)Math.Round(UV1.Y);
-			}
+			var UV1 = CalcUV1();
 			var ro = RenderObjectPool<RenderObject>.Acquire();
 			ro.CaptureRenderState(this);
 			ro.Texture = Texture;
@@ -167,6 +163,19 @@ namespace Lime
 			ro.Position = ContentPosition;
 			ro.Size = ContentSize;
 			return ro;
+		}
+
+		private Vector2 CalcUV1()
+		{
+			var UV1 = new Vector2 {
+				X = (TileSize.X == 0.0f ? 1.0f : Size.X / TileSize.X) + TileOffset.X,
+				Y = (TileSize.Y == 0.0f ? 1.0f : Size.Y / TileSize.Y) + TileOffset.Y
+			};
+			if (TileRounding) {
+				UV1.X = (float)Math.Round(UV1.X);
+				UV1.Y = (float)Math.Round(UV1.Y);
+			}
+			return UV1;
 		}
 
 		public bool IsNotRenderTexture()
