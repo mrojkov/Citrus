@@ -47,6 +47,40 @@ namespace Lime
 		[TangerineKeyframeColor(18)]
 		public bool TileRounding { get; set; }
 
+#if TANGERINE
+		[TangerineInspect]
+		public bool IsTiledAlongX
+		{
+			get => TileSize.X != 0.0f;
+			set
+			{
+				if (value) {
+					TileSize = new Vector2(savedTileSizeX, TileSize.Y);
+				} else {
+					savedTileSizeX = TileSize.X;
+					TileSize = new Vector2(0.0f, TileSize.Y);
+				}
+			}
+		}
+
+		[TangerineInspect]
+		public bool IsTiledAlongY
+		{
+			get => TileSize.Y != 0.0f;
+			set {
+				if (value) {
+					TileSize = new Vector2(TileSize.X, savedTileSizeY);
+				} else {
+					savedTileSizeY = TileSize.Y;
+					TileSize = new Vector2(TileSize.X, 0.0f);
+				}
+			}
+		}
+
+		private float savedTileSizeX;
+		private float savedTileSizeY;
+#endif // TANGERINE
+
 		public IMaterial CustomMaterial { get; set; }
 
 		public TiledImage()
@@ -116,8 +150,8 @@ namespace Lime
 				material = WidgetMaterial.GetInstance(blending, shader, 1);
 			}
 			var UV1 = new Vector2 {
-				X = Size.X / TileSize.X + TileOffset.X,
-				Y = Size.Y / TileSize.Y + TileOffset.Y
+				X = TileSize.X == 0.0f ? 1.0f : Size.X / TileSize.X + TileOffset.X,
+				Y = TileSize.Y == 0.0f ? 1.0f : Size.Y / TileSize.Y + TileOffset.Y
 			};
 			if (TileRounding) {
 				UV1.X = (float)Math.Round(UV1.X);
