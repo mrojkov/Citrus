@@ -251,6 +251,7 @@ namespace Lime
 		private Vector2 windowedClientSize;
 		private float titleBarHeight;
 		private bool shouldFixFullscreen;
+		private bool needUpdateGLContext = true;
 
 		public IDisplay Display
 		{
@@ -298,7 +299,7 @@ namespace Lime
 			window.WindowShouldClose += OnShouldClose;
 			window.WillClose += OnWillClose;
 			window.DidResize += (s, e) => {
-				View.UpdateGLContext();
+				needUpdateGLContext = true;
 				HandleResize(s, e);
 			};
 			window.WillEnterFullScreen += (sender, e) => {
@@ -440,6 +441,11 @@ namespace Lime
 		{
 			if (invalidated) {
 				fpsCounter.Refresh();
+				// Workaround macOS 10.14 issue: UpdateGLContext should be called on render frame, not on DidResize.
+				if (needUpdateGLContext) {
+					needUpdateGLContext = false;
+					View.UpdateGLContext();
+				}
 				View.MakeCurrent();
 				RaiseRendering();
 				View.SwapBuffers();
