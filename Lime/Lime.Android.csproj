@@ -517,6 +517,19 @@
     <Compile Include="Source\Widgets\WindowWidget.cs" />
     <Compile Include="Source\YuzuGeneratedBinaryDeserializer.cs" />
     <Compile Include="Source\YuzuGeneratedCloners.cs" />
+    <Compile Include="Source\Application\FileSystemWatcher\FileSystemWatcher.Dummy.cs" />
+    <Compile Include="Source\Widgets\Gestures\Gesture.PollableEvent.cs" />
+    <Compile Include="Source\Widgets\Gestures\GestureList.cs" />
+    <Compile Include="Source\Widgets\Gestures\LongTapGesture.cs" />
+    <Compile Include="Source\Widgets\Gestures\TapGesture.cs" />
+    <Compile Include="Source\Widgets\Gestures\KineticDragGesture.cs" />
+    <Compile Include="Source\Widgets\Gestures\PinchGesture.cs" />
+    <Compile Include="Source\Widgets\Gestures\KineticMotionStrategy\DeceleratingKineticMotionStrategy.cs" />
+    <Compile Include="Source\Widgets\Gestures\KineticMotionStrategy\FixedTimeKineticMotionStrategy.cs" />
+    <Compile Include="Source\Widgets\Gestures\KineticMotionStrategy\IKineticMotionStrategy.cs" />
+    <Compile Include="Source\Widgets\Gestures\MouseWheelProcessor.cs" />
+    <Compile Include="Source\Widgets\Gestures\SelfEndingGesture.cs" />
+    <Compile Include="Source\Application\FileSystemWatcher\FileSystemWatcher.Dummy.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Android.csproj">
