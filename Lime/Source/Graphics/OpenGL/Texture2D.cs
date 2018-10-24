@@ -453,14 +453,14 @@ namespace Lime
 				int x1 = x * OpacityMask.Width / ImageSize.Width;
 				int y1 = y * OpacityMask.Height / ImageSize.Height;
 				if (TextureParams.WrapModeU == TextureWrapMode.Repeat) {
-					x1 = x1 % OpacityMask.Width;
+					x1 = Math.Abs(x1 % OpacityMask.Width);
 				} else if (TextureParams.WrapModeU == TextureWrapMode.MirroredRepeat) {
 					x1 = (x1 / OpacityMask.Width) % 2 == 0
 						? Math.Abs(x1 % OpacityMask.Width)
 						: OpacityMask.Width - Math.Abs(x1 % OpacityMask.Width);
 				}
 				if (TextureParams.WrapModeV == TextureWrapMode.Repeat) {
-					y1 = y1 % OpacityMask.Height;
+					y1 = Math.Abs(y1 % OpacityMask.Height);
 				} else if (TextureParams.WrapModeV == TextureWrapMode.MirroredRepeat) {
 					y1 = (y1 / OpacityMask.Height) % 2 == 0
 						? Math.Abs(y1 % OpacityMask.Height)
