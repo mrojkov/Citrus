@@ -444,12 +444,13 @@ namespace Orange
 				if (path.StartsWith("Atlases")) {
 					continue;
 				}
-				// Ignore atlas parts and masks
+				// Ignore atlas parts, masks, animations
 				var ext = Path.GetExtension(path);
 				if (
 					path.EndsWith(".atlasPart", StringComparison.OrdinalIgnoreCase) ||
 					path.EndsWith(".mask", StringComparison.OrdinalIgnoreCase) ||
-					path.EndsWith(".texture", StringComparison.OrdinalIgnoreCase)
+					path.EndsWith(".texture", StringComparison.OrdinalIgnoreCase) ||
+					path.EndsWith(".ant", StringComparison.OrdinalIgnoreCase)
 				) {
 					continue;
 				}
