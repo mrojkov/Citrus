@@ -29,8 +29,8 @@ namespace Lime
 		public class Animation
 		{
 			public string Name { get; set; }
-			public int StartFrame { get; set; }
-			public int LastFrame { get; set; }
+			public int StartFrame { get; set; } = 0;
+			public int LastFrame { get; set; } = -1;
 			public ObservableCollection<MarkerData> Markers = new ObservableCollection<MarkerData>();
 			public ObservableCollection<NodeData> Nodes = new ObservableCollection<NodeData>();
 			public ObservableCollection<NodeData> IgnoredNodes = new ObservableCollection<NodeData>();
@@ -170,6 +170,12 @@ namespace Lime
 			}
 		}
 
+		private struct NodeAndAnimator
+		{
+			public Node Node;
+			public IAnimator Animator;
+		}
+
 		private void ProcessAnimations(Node3D model)
 		{
 			if (Animations.Count == 0) {
@@ -179,20 +185,29 @@ namespace Lime
 			if (srcAnimation == null) {
 				return;
 			}
+			var newAnimators = new List<NodeAndAnimator>();
 			foreach (var animationData in Animations) {
+				var id = animationData.Name;
+				if (id == "Default") {
+					id = srcAnimation.Id;
+				}
 				var animation = new Lime.Animation {
-					Id = animationData.Name
+					Id = id
 				};
 				model.Animations.Add(animation);
 
-				if (animationData.StartFrame <= animationData.LastFrame) {
-					var nodes = GetAnimationNodes(model, animationData).ToList();
-					var anims = nodes.SelectMany(n => n.Animators).ToList();
-					foreach (var node in GetAnimationNodes(model, animationData)) {
-						foreach (var animator in node.Animators) {
-							if (animator.AnimationId == srcAnimation.Id) {
-								CopyKeys(animator, node.Animators[animator.TargetPropertyPath, animation.Id], animationData.StartFrame, animationData.LastFrame);
-							}
+				var nodes = GetAnimationNodes(model, animationData).ToList();
+				var anims = nodes.SelectMany(n => n.Animators).ToList();
+				foreach (var node in GetAnimationNodes(model, animationData)) {
+					foreach (var animator in node.Animators) {
+						if (animator.AnimationId == srcAnimation.Id) {
+							var newAnimator = animator.Clone();
+							animator.AnimationId = animation.Id;
+							CopyKeys(animator, newAnimator, animationData.StartFrame, animationData.LastFrame);
+							newAnimators.Add(new NodeAndAnimator {
+								Node = node,
+								Animator = newAnimator
+							});
 						}
 					}
 				}
@@ -227,15 +242,28 @@ namespace Lime
 
 			var srcAnimators = new List<IAnimator>();
 			srcAnimation.FindAnimators(srcAnimators);
-			foreach (var srcAnimator in srcAnimators) {
-				srcAnimator.Owner.Animators.Remove(srcAnimator);
+			foreach (var i in srcAnimators) {
+				i.Owner.Animators.Remove(i);
 			}
 
 			model.Animations.Remove(srcAnimation);
+
+			foreach (var i in newAnimators) {
+				i.Node.Animators.Add(i.Animator);
+			}
 		}
 
 		private static void CopyKeys(IAnimator srcAnimator, IAnimator dstAnimator, int startFrame, int lastFrame)
 		{
+			if (srcAnimator.ReadonlyKeys.Count == 0) {
+				return;
+			}
+			if (startFrame < 0) {
+				startFrame = 0;
+			}
+			if (lastFrame < 0) {
+				lastFrame = srcAnimator.ReadonlyKeys.Count - 1;
+			}
 			var startKeyIndex = -1;
 			for (var i = 0; i < srcAnimator.ReadonlyKeys.Count; i++) {
 				if (startFrame <= srcAnimator.ReadonlyKeys[i].Frame) {
@@ -382,10 +410,12 @@ namespace Lime
 		public class ModelAnimationFormat
 		{
 			[YuzuMember]
-			public int StartFrame;
+			[YuzuSerializeIf(nameof(ShouldSerializeStartFrame))]
+			public int StartFrame = 0;
 
 			[YuzuMember]
-			public int LastFrame;
+			[YuzuSerializeIf(nameof(ShouldSerializeLastFrame))]
+			public int LastFrame = -1;
 
 			[YuzuMember]
 			public List<string> Nodes = null;
@@ -398,6 +428,9 @@ namespace Lime
 
 			[YuzuMember]
 			public int? Blending = null;
+
+			public bool ShouldSerializeStartFrame() => StartFrame > 0;
+			public bool ShouldSerializeLastFrame() => LastFrame >= 0;
 		}
 
 		public class ModelComponentsFormat
