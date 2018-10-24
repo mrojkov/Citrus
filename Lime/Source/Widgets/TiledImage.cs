@@ -97,7 +97,7 @@ namespace Lime
 		{
 			Presenter = DefaultPresenter.Instance;
 			TileOffset = Vector2.Zero;
-			TileSize = Vector2.One;
+			TileSize = Vector2.Zero;
 			HitTestMethod = HitTestMethod.Contents;
 			var texture = new SerializableTexture();
 			Texture = texture;
@@ -107,7 +107,7 @@ namespace Lime
 		{
 			Presenter = DefaultPresenter.Instance;
 			TileOffset = Vector2.Zero;
-			TileSize = Vector2.One;
+			TileSize = Vector2.Zero;
 			Texture = texture;
 			HitTestMethod = HitTestMethod.Contents;
 			Size = (Vector2)texture.ImageSize;
