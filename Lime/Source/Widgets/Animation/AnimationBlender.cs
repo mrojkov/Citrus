@@ -21,7 +21,7 @@ namespace Lime
 					return 0;
 				}
 				Options.TryGetValue(Owner.DefaultAnimation.Id ?? "", out var animationBlending);
-				return animationBlending?.Option.Frames ?? 0;
+				return animationBlending?.Option?.Frames ?? 0;
 			}
 			set {
 				if (Owner == null) {
