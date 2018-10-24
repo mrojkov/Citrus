@@ -159,7 +159,9 @@ namespace Tangerine
 		public override void ExecuteTransaction()
 		{
 			foreach (var doc in Project.Current.Documents) {
-				doc.Save();
+				if (doc.Loaded || doc.IsModified) {
+					doc.Save();
+				}
 			}
 		}
 	}
