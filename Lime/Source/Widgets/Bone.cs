@@ -171,7 +171,7 @@ namespace Lime
 				} else
 					e.RelativeTransform = Matrix32.Identity;
 				Parent.AsWidget.BoneArray[Index] = e;
-				Parent.PropagateDirtyFlags(DirtyFlags.GlobalTransform);
+				Parent.PropagateDirtyFlags(DirtyFlags.GlobalTransform | DirtyFlags.GlobalTransformInverse);
 				for (var child = Parent.FirstChild; child != null; child = child.NextSibling) {
 					child.DirtyMask |= DirtyFlags.LocalTransform | DirtyFlags.ParentBoundingRect;
 				}

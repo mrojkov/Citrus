@@ -224,7 +224,7 @@ namespace Lime
 				if (position.X != value.X || position.Y != value.Y) {
 					position = value;
 					DirtyMask |= DirtyFlags.LocalTransform | DirtyFlags.ParentBoundingRect;
-					PropagateDirtyFlags(DirtyFlags.GlobalTransform);
+					PropagateDirtyFlags(DirtyFlags.GlobalTransform | DirtyFlags.GlobalTransformInverse);
 				}
 			}
 		}
@@ -241,7 +241,7 @@ namespace Lime
 				if (position.X != value) {
 					position.X = value;
 					DirtyMask |= DirtyFlags.LocalTransform | DirtyFlags.ParentBoundingRect;
-					PropagateDirtyFlags(DirtyFlags.GlobalTransform);
+					PropagateDirtyFlags(DirtyFlags.GlobalTransform | DirtyFlags.GlobalTransformInverse);
 				}
 			}
 		}
@@ -258,7 +258,7 @@ namespace Lime
 				if (position.Y != value) {
 					position.Y = value;
 					DirtyMask |= DirtyFlags.LocalTransform | DirtyFlags.ParentBoundingRect;
-					PropagateDirtyFlags(DirtyFlags.GlobalTransform);
+					PropagateDirtyFlags(DirtyFlags.GlobalTransform | DirtyFlags.GlobalTransformInverse);
 				}
 			}
 		}
@@ -275,7 +275,7 @@ namespace Lime
 				if (scale.X != value.X || scale.Y != value.Y) {
 					scale = value;
 					DirtyMask |= DirtyFlags.LocalTransform | DirtyFlags.ParentBoundingRect;
-					PropagateDirtyFlags(DirtyFlags.GlobalTransform);
+					PropagateDirtyFlags(DirtyFlags.GlobalTransform | DirtyFlags.GlobalTransformInverse);
 				}
 			}
 		}
@@ -301,7 +301,7 @@ namespace Lime
 					direction = Vector2.CosSinRough(Mathf.DegToRad * value);
 #endif // TANGERINE
 					DirtyMask |= DirtyFlags.LocalTransform | DirtyFlags.ParentBoundingRect;
-					PropagateDirtyFlags(DirtyFlags.GlobalTransform);
+					PropagateDirtyFlags(DirtyFlags.GlobalTransform | DirtyFlags.GlobalTransformInverse);
 				}
 			}
 		}
@@ -323,7 +323,7 @@ namespace Lime
 					if (boundingRect.AY > value.Y) boundingRect.AY = value.Y;
 					OnSizeChanged(sizeDelta);
 					DirtyMask |= DirtyFlags.LocalTransform;
-					PropagateDirtyFlags(DirtyFlags.GlobalTransform);
+					PropagateDirtyFlags(DirtyFlags.GlobalTransform | DirtyFlags.GlobalTransformInverse);
 				}
 			}
 		}
@@ -355,7 +355,7 @@ namespace Lime
 			{
 				if (size.X != value) {
 					Size = new Vector2(value, Height);
-					PropagateDirtyFlags(DirtyFlags.GlobalTransform);
+					PropagateDirtyFlags(DirtyFlags.GlobalTransform | DirtyFlags.GlobalTransformInverse);
 				}
 			}
 		}
@@ -367,7 +367,7 @@ namespace Lime
 			{
 				if (size.Y != value) {
 					Size = new Vector2(Width, value);
-					PropagateDirtyFlags(DirtyFlags.GlobalTransform);
+					PropagateDirtyFlags(DirtyFlags.GlobalTransform | DirtyFlags.GlobalTransformInverse);
 				}
 			}
 		}
@@ -388,7 +388,7 @@ namespace Lime
 				if (pivot.X != value.X || pivot.Y != value.Y) {
 					pivot = value;
 					DirtyMask |= DirtyFlags.LocalTransform | DirtyFlags.ParentBoundingRect;
-					PropagateDirtyFlags(DirtyFlags.GlobalTransform);
+					PropagateDirtyFlags(DirtyFlags.GlobalTransform | DirtyFlags.GlobalTransformInverse);
 				}
 			}
 		}
