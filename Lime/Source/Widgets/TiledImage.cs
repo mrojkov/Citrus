@@ -178,13 +178,14 @@ namespace Lime
 		private Vector2 CalcUV1()
 		{
 			var UV1 = new Vector2 {
-				X = (TileSize.X == 0.0f ? 1.0f : Size.X / TileSize.X) + TileOffset.X,
-				Y = (TileSize.Y == 0.0f ? 1.0f : Size.Y / TileSize.Y) + TileOffset.Y
+				X = TileSize.X == 0.0f ? 1.0f : Size.X / TileSize.X,
+				Y = TileSize.Y == 0.0f ? 1.0f : Size.Y / TileSize.Y
 			};
 			if (TileRounding) {
 				UV1.X = (float)Math.Round(UV1.X);
 				UV1.Y = (float)Math.Round(UV1.Y);
 			}
+			UV1 += TileOffset;
 			return UV1;
 		}
 
