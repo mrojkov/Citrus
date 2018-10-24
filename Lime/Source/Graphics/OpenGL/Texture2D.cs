@@ -456,15 +456,15 @@ namespace Lime
 					x1 = x1 % OpacityMask.Width;
 				} else if (TextureParams.WrapModeU == TextureWrapMode.MirroredRepeat) {
 					x1 = (x1 / OpacityMask.Width) % 2 == 0
-						? x1 % OpacityMask.Width
-						: OpacityMask.Width -  x1 % OpacityMask.Width;
+						? Math.Abs(x1 % OpacityMask.Width)
+						: OpacityMask.Width - Math.Abs(x1 % OpacityMask.Width);
 				}
 				if (TextureParams.WrapModeV == TextureWrapMode.Repeat) {
 					y1 = y1 % OpacityMask.Height;
 				} else if (TextureParams.WrapModeV == TextureWrapMode.MirroredRepeat) {
 					y1 = (y1 / OpacityMask.Height) % 2 == 0
-						? y1 % OpacityMask.Height
-						: OpacityMask.Height - y1 % OpacityMask.Height;
+						? Math.Abs(y1 % OpacityMask.Height)
+						: OpacityMask.Height - Math.Abs(y1 % OpacityMask.Height);
 				}
 				return !OpacityMask.TestPixel(x1, y1);
 			}
